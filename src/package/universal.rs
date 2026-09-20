@@ -15,7 +15,23 @@ use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
 pub use crate::package::manager::PackageState;
+
+#[cfg(any(feature = "standalone_test", test))]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PackageState {
+    Installed = 0,
+    Available = 1,
+    Updating = 2,
+    Corrupted = 3,
+    BrokenDependency = 4,
+    Failed = 5,
+    Broken = 6,
+    Uninstalled = 7,
+    Downloading = 8,
+    Installing = 9,
+}
 
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
@@ -25,6 +41,8 @@ use crate::klib::{Arc, HashMap, HashSet};
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::{HashMap, HashSet};
+#[cfg(any(feature = "standalone_test", test))]
+use std::sync::Arc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 use crate::runtime::node_distribution::{
@@ -226,13 +244,22 @@ pub enum PackagePriority {
 /// Supported package formats across Linux and BSD ecosystems
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum PackageFormat {
-    Deb,        // apt/dpkg
-    Rpm,        // yum/dnf/zypper
-    Pacman,     // pacman/pkgbuild
-    Snap,       // snap/squashfs
-    Flatpak,    // flatpak sandbox
-    AppImage,   // AppImage single-file container
-    SigmaPkg,   // native SigmaOS format
+    #[default]
+    SigmaPkg,   // native SigmaOS format (.sigpkg)
+    Sigma,      // native SigmaOS format (.sigma)
+    Deb,        // apt/dpkg (.deb)
+    Superdeb,   // Deepin Superdeb (.superdeb)
+    Apt,        // Debian APT (.apt)
+    Rpm,        // yum/dnf/zypper (.rpm)
+    Drpm,       // Delta RPM (.drpm)
+    Yum,        // RedHat YUM (.yum)
+    Zypper,     // OpenSUSE Zypper (.zypper)
+    Pacman,     // pacman/pkgbuild (.pkg.tar.zst / .pacman)
+    Cachy,      // CachyOS Package (.cachy)
+    CachyOS,    // CachyOS Package (.cachyos)
+    Snap,       // snap/squashfs (.snap)
+    Flatpak,    // flatpak sandbox (.flatpak)
+    AppImage,   // AppImage single-file container (.appimage)
     Air,        // Adobe AIR (.air)
     Bottle,     // Homebrew Bottle (.bottle)
     Ipa,        // iOS App (.ipa)
@@ -240,23 +267,30 @@ pub enum PackageFormat {
     Pkg,        // macOS / BSD / Solaris PKG (.pkg)
     Aab,        // Android App Bundle (.aab)
     Apk,        // Android Package / Alpine Package (.apk)
+    Ipk,        // OpenWrt Package (.ipk)
+    Opkg,       // Yocto / OpenEmbedded (.opkg)
     Eopkg,      // Solus eopkg (.eopkg)
+    Moss,       // Solus Moss (.moss)
+    Pisi,       // Pardus / Solus PiSi (.pisi / .PiSi)
+    Nix,        // Nix expression / package (.nix)
     Nixpkg,     // Nix store package (.nixpkg)
+    Guix,       // GNU Guix (.guix / .scm)
+    GuixNar,    // GNU Guix NAR archive (.nar / .nar.xz)
+    NarInfo,    // Nix/Guix Store Info (.narinfo)
     Ebuild,     // Gentoo ebuild (.ebuild / .portage)
+    Portage,    // Gentoo Portage (.portage)
+    Tar,        // Plain tarball (.tar)
     TarGz,      // Compressed Tar (.tar.gz, .tgz)
-    Xz,         // Compressed XZ archive (.xz, .tar.xz)
+    TarXz,      // Compressed XZ archive (.tar.xz)
+    Xz,         // Compressed XZ archive (.xz)
+    Txz,        // Slackware/FreeBSD txz package (.txz)
     App,        // macOS App bundle (.app)
+    AppBundle,  // macOS / iOS App bundle
     Hap,        // HarmonyOS Ability Package (.hap)
-    Pisi,       // Pardus / Solus PiSi (.PiSi)
-    Superdeb,   // Deepin Superdeb (.superdeb)
     Lzm,        // Slax Linux Module (.lzm)
     Pup,        // Puppy Linux Package (.pup)
     Pet,        // Puppy Extra Tarball (.pet)
-    Tar,        // Plain tarball (.tar)
     Xbps,       // Void Linux (.xbps)
-    Zypper,     // OpenSUSE Zypper (.zypper)
-    Guix,       // GNU Guix (.guix / .scm)
-    Moss,       // Solus Moss (.moss)
     Hpkg,       // Haiku Package (.hpkg)
     Tcz,        // Tiny Core Linux (.tcz)
     Gobo,       // GoboLinux (.gobo)
@@ -266,17 +300,36 @@ pub enum PackageFormat {
     Puk,        // Portable Package (.puk)
     Dmg,        // macOS Disk Image (.dmg)
     Cports,     // Chimera Linux (.cports)
-    Cachy,      // CachyOS Package (.cachy)
-    Nix,        // Nix expression / package (.nix)
-    Txz,        // Slackware/FreeBSD txz package (.txz)
-    CachyOS,    // CachyOS (.cachyos)
-    Swupd,      // Clear Linux swupd (.swupd)
-    Starling,   // Starling format (.starling)
     Dports,     // DragonFly BSD DPorts (.dports)
     SlackBuild, // Slackware SlackBuild (.slackbuild / .tlz / .tbz)
     Crux,       // CRUX Linux (.crux / .pkgfile)
-    Drpm,       // Delta RPM (.drpm)
     Stratum,    // Bedrock Linux Stratum (.stratum)
+    Swupd,      // Clear Linux swupd (.swupd)
+    Starling,   // Starling format (.starling)
+    Sovereign,  // Sovereign Security Package (.sovereign)
+    SolarisIps, // Solaris IPS Package (.p5p / .ips)
+    OpenBsdPkg, // OpenBSD Package (.openbsd.tgz)
+    Spack,      // Spack HPC Package (.spack)
+    Conan,      // Conan C/C++ Package (.conan)
+    Vcpkg,      // Microsoft Vcpkg (.vcpkg)
+    Wheel,      // Python Wheel (.whl)
+    Crate,      // Rust Cargo Crate (.crate)
+    Gem,        // RubyGem (.gem)
+    Nupkg,      // .NET NuGet Package (.nupkg)
+    MakeselfRun,// Makeself Archive (.run)
+    ZeroInstallZpk, // ZeroInstall Package (.zpk)
+    KernelModulePkg, // Kernel Module Package (.kmp / .kmod)
+    JavaJar,    // Java Jar (.jar)
+    NpmPkg,     // Node.js NPM (.npm)
+    PhpPhar,    // PHP Phar (.phar)
+    PerlCpan,   // Perl CPAN (.cpan)
+    LuaRock,    // LuaRock (.rock)
+    ElixirHex,  // Elixir Hex (.hex)
+    HaskellCabal,// Haskell Cabal (.cabal)
+    JuliaPkg,   // Julia Package (.jl)
+    RCran,      // R CRAN Package (.rpkg)
+    WindowsMsi, // Windows MSI (.msi)
+    WindowsMsix,// Windows MSIX/AppX (.msix / .appx)
 }
 
 impl PackageFormat {
@@ -395,6 +448,56 @@ impl PackageFormat {
             Some(PackageFormat::SolarisIps)
         } else if normalized.ends_with(".nar") {
             Some(PackageFormat::GuixNar)
+        } else if normalized.ends_with(".spack") {
+            Some(PackageFormat::Spack)
+        } else if normalized.ends_with(".conan") {
+            Some(PackageFormat::Conan)
+        } else if normalized.ends_with(".vcpkg") {
+            Some(PackageFormat::Vcpkg)
+        } else if normalized.ends_with(".whl") {
+            Some(PackageFormat::Wheel)
+        } else if normalized.ends_with(".crate") {
+            Some(PackageFormat::Crate)
+        } else if normalized.ends_with(".gem") {
+            Some(PackageFormat::Gem)
+        } else if normalized.ends_with(".nupkg") {
+            Some(PackageFormat::Nupkg)
+        } else if normalized.ends_with(".run") {
+            Some(PackageFormat::MakeselfRun)
+        } else if normalized.ends_with(".zpk") {
+            Some(PackageFormat::ZeroInstallZpk)
+        } else if normalized.ends_with(".kmp") || normalized.ends_with(".kmod") {
+            Some(PackageFormat::KernelModulePkg)
+        } else if normalized.ends_with(".jar") {
+            Some(PackageFormat::JavaJar)
+        } else if normalized.ends_with(".npm") {
+            Some(PackageFormat::NpmPkg)
+        } else if normalized.ends_with(".phar") {
+            Some(PackageFormat::PhpPhar)
+        } else if normalized.ends_with(".cpan") {
+            Some(PackageFormat::PerlCpan)
+        } else if normalized.ends_with(".rock") {
+            Some(PackageFormat::LuaRock)
+        } else if normalized.ends_with(".hex") {
+            Some(PackageFormat::ElixirHex)
+        } else if normalized.ends_with(".cabal") {
+            Some(PackageFormat::HaskellCabal)
+        } else if normalized.ends_with(".jl") {
+            Some(PackageFormat::JuliaPkg)
+        } else if normalized.ends_with(".rpkg") {
+            Some(PackageFormat::RCran)
+        } else if normalized.ends_with(".msi") {
+            Some(PackageFormat::WindowsMsi)
+        } else if normalized.ends_with(".msix") || normalized.ends_with(".appx") {
+            Some(PackageFormat::WindowsMsix)
+        } else if normalized.ends_with(".swupd") {
+            Some(PackageFormat::Swupd)
+        } else if normalized.ends_with(".starling") {
+            Some(PackageFormat::Starling)
+        } else if normalized.ends_with(".sovereign") {
+            Some(PackageFormat::Sovereign)
+        } else if normalized.ends_with(".narinfo") {
+            Some(PackageFormat::NarInfo)
         } else {
             None
         }
@@ -1447,43 +1550,6 @@ pub struct PackageAdapter {
 }
 
 impl PackageAdapter {
-    pub fn translate_flatpak_sandbox_policy(&self, manifest: &FlatpakManifest) -> Vec<String> {
-        let mut pledges = Vec::new();
-        for arg in &manifest.finish_args {
-            if arg.contains("network") {
-                pledges.push("network".to_string());
-            } else if arg.contains("ipc") {
-                pledges.push("ipc".to_string());
-            } else if arg.contains("filesystem") {
-                pledges.push("unveil_all".to_string());
-            }
-        }
-        pledges
-    }
-
-    pub fn translate_snap_confinement(&self, manifest: &SnapcraftManifest) -> String {
-        if manifest.confinement == "strict" {
-            "strict_pledge_sandbox".to_string()
-        } else {
-            "unconfined_host".to_string()
-        }
-    }
-
-    pub fn mount_appimage_squashfs(&self, runtime: &AppImageRuntime) -> Result<String, &'static str> {
-        if runtime.squashfs_offset == 0 {
-            Err("Invalid squashfs offset")
-        } else {
-            Ok(format!("/tmp/.mount_{}_squashfs", runtime.app_name))
-        }
-    }
-
-    pub fn query_apt_repository(&self, config: &AptRepoConfig) -> bool {
-        !config.sourcelist_url.is_empty()
-    }
-
-    pub fn query_dnf_repository(&self, config: &DnfRepoConfig) -> bool {
-        config.enabled
-    }
     pub fn new(format: PackageFormat, adapter_name: String) -> Self {
         Self {
             format,
@@ -1793,7 +1859,6 @@ impl UniversalPackageManager {
             transaction_history: TransactionalHistory::new(),
             metadata_cache: HashMap::new(),
             user_hooks: Vec::new(),
-            triggers: PackageTriggerRegistry::new(),
             node_distro_engine: NodeBinaryDistroEngine::new(),
             distro_repo_sync: DistroRepoSyncEngine::new(),
             triggers: PackageTriggerRegistry::new(),
