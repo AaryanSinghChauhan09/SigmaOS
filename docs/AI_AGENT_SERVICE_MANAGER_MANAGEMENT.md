@@ -21,3 +21,21 @@ This document details AI agent procedures for maintaining system initialization,
 - `src/init/systemd_init.rs`
 - `src/distro/void_runit.rs`
 - `docs/LINUX_DISTRO_PARITY_CHECKLIST.md`
+
+---
+
+## 4. Systemd Services Architecture, Socket Activation & Hardening
+
+SigmaOS implements comprehensive systemd service compatibility and multi-init bridging (`SystemdEngine` in `src/init/systemd_init.rs`):
+
+### 4.1 Systemd Unit Types & Socket Activation
+* **Unit Types**: Supports `.service`, `.target`, `.socket`, `.timer`, `.path`, `.mount`, `.device`, `.slice`, `.scope`, `.swap` unit types.
+* **Socket Activation**: `SystemdSocketActivationManager` binds sockets (`ListenStream`, `ListenDatagram`, Unix sockets) and triggers target service startup upon incoming connections.
+* **Transient Services**: `generate_transient_service()` spawns dynamic, ephemeral services (`systemd-run`).
+
+### 4.2 Cgroup v2 Slice Resource Governance
+* **Slice Governor**: `SystemdCgroupSliceGovernor` enforces CPU weights and memory limits across system slices (`system.slice`, `user.slice`, `app.slice`).
+
+### 4.3 Security Sandbox & Hardening Analysis
+* **Security Auditor**: `SystemdSecurityAuditor` and `audit_systemd_service_security()` evaluate service hardening profiles (`NoNewPrivileges`, `ProtectSystem`, `ProtectHome`, `PrivateTmp`, `MemoryDenyWriteExecute`, OpenBSD `Pledge`/`Unveil`) and assign a security exposure rating (`OK`, `EXPOSED`, `UNSAFE`).
+* **BSD Parallel Stage Solver**: `BsdRcParallelStageSolver` resolves dependency order for parallel rc.d stage execution.
