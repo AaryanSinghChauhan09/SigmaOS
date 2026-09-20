@@ -448,6 +448,81 @@ mod fhs_tests {
     }
 }
 
+// ================= Comprehensive Linux & BSD Directory Classification Engine =================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SovereignDirectoryCategory {
+    SystemBinaries,
+    BootRelated,
+    KernelRelated,
+    ConfigFiles,
+    UserRelated,
+    SharedLibraries,
+    MountPoints,
+    Media,
+    SystemInfo,
+    MultiUserResources,
+    TemporaryStorage,
+}
+
+pub struct SovereignComprehensiveDirectoryEngine {
+    pub fhs_engine: SovereignFhsHierarchyEngine,
+}
+
+impl SovereignComprehensiveDirectoryEngine {
+    pub fn new() -> Self {
+        Self {
+            fhs_engine: SovereignFhsHierarchyEngine::new(),
+        }
+    }
+
+    pub fn classify_path(&self, raw_path: &str) -> SovereignDirectoryCategory {
+        let path = self.fhs_engine.resolve_fhs_path(raw_path);
+
+        if path.starts_with("/boot") || path.starts_with("/EFI") {
+            SovereignDirectoryCategory::BootRelated
+        } else if path.starts_with("/usr/lib/modules") || path.starts_with("/sys/kernel") {
+            SovereignDirectoryCategory::KernelRelated
+        } else if path.starts_with("/usr/bin") || path.starts_with("/usr/sbin") || path.starts_with("/usr/local/bin") || path.starts_with("/usr/local/sbin") {
+            SovereignDirectoryCategory::SystemBinaries
+        } else if path.starts_with("/usr/lib") || path.starts_with("/usr/lib64") || path.starts_with("/usr/local/lib") {
+            SovereignDirectoryCategory::SharedLibraries
+        } else if path.starts_with("/etc") || path.starts_with("/usr/local/etc") || path.starts_with("/state/etc") {
+            SovereignDirectoryCategory::ConfigFiles
+        } else if path.starts_with("/home") || path.starts_with("/root") || path.starts_with("/usr/home") {
+            SovereignDirectoryCategory::UserRelated
+        } else if path.starts_with("/media") || path.starts_with("/run/media") {
+            SovereignDirectoryCategory::Media
+        } else if path.starts_with("/mnt") || path.starts_with("/system/store") {
+            SovereignDirectoryCategory::MountPoints
+        } else if path.starts_with("/proc") || path.starts_with("/sys") || path.starts_with("/dev") {
+            SovereignDirectoryCategory::SystemInfo
+        } else if path.starts_with("/tmp") || path.starts_with("/var/tmp") || path.starts_with("/run/user") || path.starts_with("/dev/shm") {
+            SovereignDirectoryCategory::TemporaryStorage
+        } else {
+            SovereignDirectoryCategory::MultiUserResources
+        }
+    }
+
+    pub fn get_default_mount_flags(&self, category: SovereignDirectoryCategory) -> u32 {
+        match category {
+            SovereignDirectoryCategory::TemporaryStorage => MNT_NOEXEC | MNT_NOSUID | MNT_NODEV,
+            SovereignDirectoryCategory::Media | SovereignDirectoryCategory::MountPoints => MNT_NOSUID | MNT_NODEV,
+            SovereignDirectoryCategory::UserRelated => MNT_NOSUID | MNT_NODEV,
+            SovereignDirectoryCategory::SystemInfo => MNT_NOEXEC | MNT_NOSUID,
+            SovereignDirectoryCategory::ConfigFiles => MNT_NOSUID,
+            SovereignDirectoryCategory::BootRelated => MNT_RDONLY | MNT_NOSUID | MNT_NODEV,
+            _ => 0,
+        }
+    }
+}
+
+impl Default for SovereignComprehensiveDirectoryEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // ================= GoboLinux Non-Hierarchical Package Directory Resolver =================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -522,5 +597,28 @@ mod gobo_tests {
             symlink,
             "/System/Index/bin/bash -> /Programs/Bash/5.2.21/bin/bash"
         );
+    }
+
+    #[test]
+    fn test_comprehensive_directory_classification() {
+        let engine = SovereignComprehensiveDirectoryEngine::new();
+
+        assert_eq!(engine.classify_path("/bin/sh"), SovereignDirectoryCategory::SystemBinaries);
+        assert_eq!(engine.classify_path("/boot/vmlinuz"), SovereignDirectoryCategory::BootRelated);
+        assert_eq!(engine.classify_path("/usr/lib/modules/6.8.0/kernel"), SovereignDirectoryCategory::KernelRelated);
+        assert_eq!(engine.classify_path("/etc/fstab"), SovereignDirectoryCategory::ConfigFiles);
+        assert_eq!(engine.classify_path("/home/user"), SovereignDirectoryCategory::UserRelated);
+        assert_eq!(engine.classify_path("/lib/libc.so.6"), SovereignDirectoryCategory::SharedLibraries);
+        assert_eq!(engine.classify_path("/mnt/data"), SovereignDirectoryCategory::MountPoints);
+        assert_eq!(engine.classify_path("/media/usb"), SovereignDirectoryCategory::Media);
+        assert_eq!(engine.classify_path("/proc/cpuinfo"), SovereignDirectoryCategory::SystemInfo);
+        assert_eq!(engine.classify_path("/usr/share/doc"), SovereignDirectoryCategory::MultiUserResources);
+        assert_eq!(engine.classify_path("/tmp/test.tmp"), SovereignDirectoryCategory::TemporaryStorage);
+
+        // Mount security flags test
+        let tmp_flags = engine.get_default_mount_flags(SovereignDirectoryCategory::TemporaryStorage);
+        assert_ne!(tmp_flags & MNT_NOEXEC, 0);
+        assert_ne!(tmp_flags & MNT_NOSUID, 0);
+        assert_ne!(tmp_flags & MNT_NODEV, 0);
     }
 }
