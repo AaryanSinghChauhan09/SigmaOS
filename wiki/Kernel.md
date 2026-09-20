@@ -186,6 +186,8 @@ For detailed kernel implementation specifications:
 - [Security](SECURITY.md)
 - [Package Management](Package-Management.md)
 - [Roadmap](ROADMAP.md)
+- [Filesystem](Filesystem.md)
+- [Process Management](process-management.md)
 
 ## Contributing
 
