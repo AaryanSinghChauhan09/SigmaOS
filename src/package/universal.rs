@@ -26,6 +26,9 @@ pub enum PackageState {
     Installing,
     Installed,
     BrokenDependency,
+    Available,
+    Updating,
+    Corrupted,
 }
 
 // SigmaOS Universal Package Manager
@@ -237,7 +240,7 @@ pub enum PackagePriority {
 }
 
 /// Supported package formats across Linux and BSD ecosystems
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PackageFormat {
     #[default]
     Deb,        // apt/dpkg
@@ -293,7 +296,7 @@ pub enum PackageFormat {
     Stratum,    // Bedrock Linux Stratum (.stratum)
     OpenBsdPkg, // OpenBSD package (.openbsd.tgz)
     Ipk,        // OpenWrt IPK package (.ipk)
-    Opkg,       // Opkg package (.opkg)
+    Opkg,       // OPKG package (.opkg)
     SolarisIps, // Solaris IPS package (.p5p / .ips)
     GuixNar,    // GNU Guix NAR archive (.nar)
 }
@@ -1504,12 +1507,12 @@ impl PackageAdapter {
         }
     }
 
-    pub fn query_apt_repository(&self, _config: &AptRepoConfig) -> bool {
-        true
+    pub fn query_apt_repository(&self, config: &AptRepoConfig) -> bool {
+        !config.sourcelist_url.is_empty()
     }
 
-    pub fn query_dnf_repository(&self, _config: &DnfRepoConfig) -> bool {
-        true
+    pub fn query_dnf_repository(&self, config: &DnfRepoConfig) -> bool {
+        config.enabled
     }
 
     pub fn _can_handle(&self, package: &UnifiedPackage) -> bool {
@@ -1780,7 +1783,6 @@ impl UniversalPackageManager {
             user_hooks: Vec::new(),
             node_distro_engine: NodeBinaryDistroEngine::new(),
             distro_repo_sync: DistroRepoSyncEngine::new(),
-            triggers: PackageTriggerRegistry::new(),
         };
 
         manager.add_default_adapters();
