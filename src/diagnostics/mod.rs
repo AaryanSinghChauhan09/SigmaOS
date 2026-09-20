@@ -17,3 +17,6 @@
 pub mod crash;
 pub mod lowlevel;
 pub mod tools;
+pub mod troubleshooting;
+
+pub use troubleshooting::*;
