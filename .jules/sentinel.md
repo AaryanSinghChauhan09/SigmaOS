@@ -1,3 +1,8 @@
+## 2026-09-20 - Fixed-Buffer Truncation Sandboxing Bypass in Unveil Access Validation
+**Vulnerability:** `PledgeManager::validate_unveil_access` in `src/security/pledge.rs` checked for URL-encoded traversal patterns (`%2e%2e`, `%2f`, `%5c`) by copying the path into a fixed 512-byte stack buffer (`let mut buf = [0u8; 512]`). Any path exceeding 512 bytes was truncated during the copy, allowing attackers to place URL-encoded traversal sequences past byte index 512 and bypass unveil sandboxing controls.
+**Learning:** Checking security constraints by copying inputs into fixed-size stack buffers introduces truncation vulnerabilities where malicious payloads placed beyond the buffer length evade validation checks.
+**Prevention:** Perform security constraint checks directly over borrowing slices without allocation or fixed-length copying. In URL-encoded pattern validation, inspect raw byte slices across the full input length.
+
 ## 2026-09-19 - Path Prefix Confusion Sandboxing Bypass in Unveil Sandboxing Engines
 **Vulnerability:** `check_unveil` in `src/security/landlock_sovereign.rs`, `UnveilEntry::covers` in `src/security/sigma_unveil.rs`, and `check_unveil` in `src/distro/linux_bsd_ultimate_synthesis.rs` used naive `path.starts_with(rule_path)` prefix matching without verifying directory component boundaries, allowing sandboxed processes to access unauthorized sibling directories (e.g., unveiling `/etc` permitted access to `/etc_secret` or `/etc_shadow`).
 **Learning:** Checking path prefixes with `starts_with` without validating trailing path separators (`/` or `\`) or exact equality allows path prefix confusion bypasses where an attacker appends characters to a permitted prefix to access restricted sibling paths.
