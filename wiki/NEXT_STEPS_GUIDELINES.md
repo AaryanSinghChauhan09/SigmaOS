@@ -1,7 +1,7 @@
 # SigmaOS Next Steps Guidelines & Operational Execution Handbook
 
 ## Executive Guidelines
-This document establishes the official operational guidelines, execution rules, and domain-by-domain action plan for continuous development on **SigmaOS**. All engineering efforts must strictly align with these guidelines and be committed directly to the `main` branch.
+This document establishes the official operational guidelines, execution rules, and domain-by-domain action plan for continuous development on **SigmaOS**. All engineering efforts must strictly align with these guidelines and be committed directly to the `main` branch, adhering to the repository directive against creating pull requests.
 
 ---
 
@@ -35,26 +35,26 @@ ISO Boot → Live Media → Installer Wizard → First Boot Login → Zenith Des
 ### 🎨 Palette Agent Guidelines (UX & Accessibility)
 - Ensure WCAG 2.1 AA keyboard navigation, high-contrast visual focus indicators, and ARIA labels across all desktop components.
 - Polish interactive user flows in Zenith desktop and installer wizards.
-- Maintain critical UX learnings in `.jules/palette.md`.
+- Maintain critical UX learnings in `.jules/palette.md` and `.Jules/palette.md`.
 
 ---
 
 ## 3. Immediate Domain Action Plan
 
-### Domain A: Kernel & Microkernel Performance
-- Expand x86_64 eBPF JIT compiler for network packet filtering and system tracing.
-- Implement NUMA-aware page frame allocation in `src/kernel/vmm_paging.rs`.
+### Domain A: Code Quality & Microkernel Refactoring
+- Decompose monolithic files like `src/package/universal.rs` into modular sub-modules (`mod.rs`, `adapter.rs`, `resolver.rs`, `hooks.rs`).
+- Maintain 100% pass rate across native Rust test suites and Python integration suites.
 
-### Domain B: Universal Package System (`sigpkg`)
-- Refactor `src/package/universal.rs` into a clean sub-module architecture (`src/package/universal/`).
-- Enhance cross-distro package translation for Arch `.pkg.tar.zst`, Debian `.deb`, Fedora `.rpm`, and Alpine `.apk`.
+### Domain B: Kernel & Microkernel Performance
+- Expand lock-free `io_uring` ring buffer pool for asynchronous disk I/O in `src/kernel/sigma_io_uring.rs`.
+- Implement NUMA-aware physical memory allocation in `src/kernel/vmm_paging.rs`.
 
 ### Domain C: Security & Capability Controls
 - Extend `pledge()` and `unveil()` capability sandboxing across all userland core utilities.
-- Integrate TPM 2.0 PCR sealed keys into emergency shell authentication.
+- Integrate TPM 2.0 PCR sealed keys into `AuthenticatedEmergencyTargetGate` (`src/init/emergency_gate.rs`).
 
 ### Domain D: Zenith Desktop & User Experience
-- Improve high-contrast theme support (`Ayu`, `GruvboxMaterial`, `MaterialOcean`) and focus outlines.
+- Improve high-contrast theme support (`Ayu`, `GruvboxMaterial`, `MaterialOcean`) and focus outlines in Zenith desktop and installer setup configurator (`src/installer/gui_wizard.rs`).
 - Add keyboard shortcut cheatsheet overlay in Zenith window manager.
 
 ---
@@ -64,4 +64,4 @@ Before submitting any changes to `main`:
 1. Run `./run_sigma_tests.sh` to execute all native Rust test suites.
 2. Run `pytest tests/` to execute Python system integration tests.
 3. Ensure zero compiler warnings and clean lint checks.
-4. Execute `/home/jules/self_created_tools/sync_docs.py` to synchronize plan documents across all documentation and wiki mirror directories (`./`, `docs/`, `wiki/`, `WIKI/`, `wiki_content/`, `wiki_repo/`).
+4. Verify document synchronization across all documentation and wiki mirror directories (`./`, `docs/`, `wiki/`, `WIKI/`, `wiki_content/`, `wiki_repo/`).
