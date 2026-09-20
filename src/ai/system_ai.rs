@@ -1,13 +1,13 @@
+// AI/ML Integration (System Optimization)
+// AI-driven system optimization, predictive scaling, anomaly detection,
+// Linux eBPF AI compute scheduling, FreeBSD/OpenBSD sandboxed LLM worker isolation,
+// Arch/Fedora package crash self-healing, and zero-knowledge privacy vector vaults.
+
 use std::vec;
 use std::string::{String, ToString};
 use std::vec::Vec;
 use std::format;
 use std::collections::BTreeMap;
-
-//! AI/ML Integration (System Optimization)
-//! AI-driven system optimization, predictive scaling, anomaly detection,
-//! Linux eBPF AI compute scheduling, FreeBSD/OpenBSD sandboxed LLM worker isolation,
-//! Arch/Fedora package crash self-healing, and zero-knowledge privacy vector vaults.
 
 /// Model type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
