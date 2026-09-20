@@ -14,15 +14,6 @@
 use std::string::String;
 use std::vec::Vec;
 
-/// Simple logging macro
-macro_rules! log {
-    ($($arg:tt)*) => {
-        // Placeholder: In a real implementation, this would write to
-        // the kernel log buffer or serial console
-        let _ = format!($($arg)*);
-    };
-}
-
 /// Boot information passed from bootloader to kernel
 #[derive(Debug, Clone)]
 pub struct BootInfo {
@@ -86,30 +77,30 @@ pub fn kernel_main(boot_info: &BootInfo) -> ! {
     print_banner();
 
     // Initialize logging
-    log!("SigmaOS Kernel v0.1.0 booting...");
-    log!("Boot command line: {}", boot_info.cmdline);
+    println!("SigmaOS Kernel v0.1.0 booting...");
+    println!("Boot command line: {}", boot_info.cmdline);
 
     // Early initialization
     early_init(boot_info);
 
     // Initialize memory manager
-    log!("Initializing memory manager...");
+    println!("Initializing memory manager...");
     init_memory_manager(&boot_info.memory_map);
 
     // Initialize interrupt handling
-    log!("Initializing interrupt handling...");
+    println!("Initializing interrupt handling...");
     init_interrupts();
 
     // Initialize scheduler
-    log!("Initializing scheduler...");
+    println!("Initializing scheduler...");
     init_scheduler();
 
     // Initialize filesystem
-    log!("Initializing filesystem...");
+    println!("Initializing filesystem...");
     init_filesystem();
 
     // Spawn init process (PID 1)
-    log!("Spawning init process (PID 1)...");
+    println!("Spawning init process (PID 1)...");
     spawn_init();
 
     // Should never reach here
@@ -118,26 +109,26 @@ pub fn kernel_main(boot_info: &BootInfo) -> ! {
 
 /// Print kernel banner
 fn print_banner() {
-    log!("████████████████████████████████████████████████████████");
-    log!("█                                                      █");
-    log!("█                    SigmaOS Kernel                    █");
-    log!("█              Secure by Design · Rust Native           █");
-    log!("█                                                      █");
-    log!("████████████████████████████████████████████████████████");
-    log!();
+    println!("████████████████████████████████████████████████████████");
+    println!("█                                                      █");
+    println!("█                    SigmaOS Kernel                    █");
+    println!("█              Secure by Design · Rust Native           █");
+    println!("█                                                      █");
+    println!("████████████████████████████████████████████████████████");
+    println!();
 }
 
 /// Early initialization
 fn early_init(boot_info: &BootInfo) {
-    log!("Early initialization...");
-    log!("Memory regions: {}", boot_info.memory_map.len());
+    println!("Early initialization...");
+    println!("Memory regions: {}", boot_info.memory_map.len());
     
     if let Some(fb) = &boot_info.framebuffer {
-        log!("Framebuffer: {}x{} @ {}bpp", fb.width, fb.height, fb.bpp);
+        println!("Framebuffer: {}x{} @ {}bpp", fb.width, fb.height, fb.bpp);
     }
     
     if let Some(rsdp) = boot_info.rsdp_address {
-        log!("ACPI RSDP at 0x{:x}", rsdp);
+        println!("ACPI RSDP at 0x{:x}", rsdp);
     }
 }
 
@@ -154,10 +145,10 @@ fn init_memory_manager(memory_map: &[MemoryRegion]) {
         .filter(|r| r.mem_type == MemoryType::Usable)
         .collect();
     
-    log!("Usable memory regions: {}", usable_regions.len());
+    println!("Usable memory regions: {}", usable_regions.len());
     
     for region in &usable_regions {
-        log!("  0x{:x} - 0x{:x} ({} MB)", 
+        println!("  0x{:x} - 0x{:x} ({} MB)", 
                  region.start, 
                  region.end, 
                  (region.end - region.start) / (1024 * 1024));
@@ -172,7 +163,7 @@ fn init_interrupts() {
     // - Initialize APIC/xAPIC
     // - Set up timer interrupts
     
-    log!("Interrupt handler: configured");
+    println!("Interrupt handler: configured");
 }
 
 /// Initialize scheduler
@@ -183,7 +174,7 @@ fn init_scheduler() {
     // - Configure scheduler policy (CFS/BORE)
     // - Start scheduling tick
     
-    log!("Scheduler: BORE/EEVDF hybrid ready");
+    println!("Scheduler: BORE/EEVDF hybrid ready");
 }
 
 /// Initialize filesystem
@@ -194,7 +185,7 @@ fn init_filesystem() {
     // - Set up procfs, sysfs, devtmpfs
     // - Load filesystem drivers
     
-    log!("Filesystem: VFS initialized");
+    println!("Filesystem: VFS initialized");
 }
 
 /// Spawn init process (PID 1)
@@ -205,8 +196,8 @@ fn spawn_init() {
     // - Execute sigma-init binary
     // - Pass control to init system
     
-    log!("Init process: spawned (PID 1)");
-    log!("Control transferred to init system");
+    println!("Init process: spawned (PID 1)");
+    println!("Control transferred to init system");
 }
 
 #[cfg(test)]
