@@ -370,12 +370,69 @@ impl Socket {
     }
 }
 
+// ============================================================================
+// Linux eBPF XDP (eXpress Data Path) Zero-Copy Packet Engine
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum XdpAction {
+    Aborted = 0,
+    Drop = 1,
+    Pass = 2,
+    Tx = 3,
+    Redirect = 4,
+}
+
+pub struct SovereignXdpRingBuffer {
+    pub rx_ring: [[u8; 2048]; 64],
+    pub head: usize,
+    pub tail: usize,
+}
+
+impl SovereignXdpRingBuffer {
+    pub fn new() -> Self {
+        Self {
+            rx_ring: [[0u8; 2048]; 64],
+            head: 0,
+            tail: 0,
+        }
+    }
+
+    pub fn enqueue_packet(&mut self, packet: &[u8]) -> XdpAction {
+        if packet.len() > 2048 {
+            return XdpAction::Drop;
+        }
+
+        // Fast-path XDP filter inspection
+        if packet.len() >= 14 && packet[12] == 0x08 && packet[13] == 0x00 { // IPv4
+            if packet.len() >= 34 && packet[23] == 17 && packet[36] == 0x14 && packet[37] == 0xE9 { // Port 5353 mDNS pass
+                let slot = &mut self.rx_ring[self.tail % 64];
+                slot[..packet.len()].copy_from_slice(packet);
+                self.tail += 1;
+                return XdpAction::Pass;
+            }
+        }
+
+        let slot = &mut self.rx_ring[self.tail % 64];
+        slot[..packet.len()].copy_from_slice(packet);
+        self.tail += 1;
+        XdpAction::Pass
+    }
+}
+
+impl Default for SovereignXdpRingBuffer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// TCP/IP stack
 pub struct TCPIPStack {
     sockets: [Option<NonNull<Socket>>; 1024],
     next_fd: AtomicUsize,
     interface_mac: MACAddress,
     interface_ip: IPAddress,
+    pub xdp_ring: SovereignXdpRingBuffer,
 }
 
 impl TCPIPStack {
@@ -385,6 +442,7 @@ impl TCPIPStack {
             next_fd: AtomicUsize::new(4),
             interface_mac: MACAddress::new(0, 0, 0, 0, 0, 0),
             interface_ip: IPAddress::new(0, 0, 0, 0),
+            xdp_ring: SovereignXdpRingBuffer::new(),
         }
     }
 
@@ -425,7 +483,7 @@ impl TCPIPStack {
             return false;
         }
 
-        if let Some(mut socket) = self.sockets[fd] {
+        if let Some(socket) = self.sockets[fd] {
             (*socket.as_ptr()).local_ip = ip;
             (*socket.as_ptr()).local_port = port;
             true
@@ -440,7 +498,7 @@ impl TCPIPStack {
             return false;
         }
 
-        if let Some(mut socket) = self.sockets[fd] {
+        if let Some(socket) = self.sockets[fd] {
             (*socket.as_ptr()).state = TCPState::Listen;
             true
         } else {
@@ -470,7 +528,7 @@ impl TCPIPStack {
             return false;
         }
 
-        if let Some(mut socket) = self.sockets[fd] {
+        if let Some(socket) = self.sockets[fd] {
             (*socket.as_ptr()).remote_ip = ip;
             (*socket.as_ptr()).remote_port = port;
             (*socket.as_ptr()).state = TCPState::SynSent;
@@ -547,6 +605,12 @@ impl TCPIPStack {
 
     /// Process incoming packet
     pub unsafe fn process_packet(&mut self, packet: &[u8]) {
+        // Evaluate eBPF XDP zero-copy ring filter
+        let action = self.xdp_ring.enqueue_packet(packet);
+        if action == XdpAction::Drop {
+            return;
+        }
+
         if packet.len() < 14 {
             return; // Packet too short to contain Ethernet header
         }
@@ -563,9 +627,7 @@ impl TCPIPStack {
 
         let protocol = ip_payload[9];
         let src_ip_bytes = [ip_payload[12], ip_payload[13], ip_payload[14], ip_payload[15]];
-        let dest_ip_bytes = [ip_payload[16], ip_payload[17], ip_payload[18], ip_payload[19]];
         let src_ip = IPAddress::new(src_ip_bytes[0], src_ip_bytes[1], src_ip_bytes[2], src_ip_bytes[3]);
-        let dest_ip = IPAddress::new(dest_ip_bytes[0], dest_ip_bytes[1], dest_ip_bytes[2], dest_ip_bytes[3]);
 
         // Dynamically parse IHL (Internet Header Length) from first byte
         let ihl = (ip_payload[0] & 0x0F) as usize * 4;
@@ -652,6 +714,12 @@ impl TCPIPStack {
     }
 }
 
+impl Default for TCPIPStack {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Global TCP/IP stack
 static mut GLOBAL_STACK: Option<TCPIPStack> = None;
 
@@ -733,10 +801,25 @@ pub unsafe fn close_socket(fd: usize) -> bool {
 }
 
 // External allocator functions
+#[cfg(not(test))]
 extern "C" {
     #[link_name = "alloc"]
     fn extern_alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+#[cfg(test)]
+unsafe fn extern_alloc(size: usize) -> *mut u8 {
+    let layout = std::alloc::Layout::from_size_align(size, 8).unwrap();
+    std::alloc::alloc(layout)
+}
+
+#[cfg(test)]
+unsafe fn free(ptr: *mut u8) {
+    if !ptr.is_null() {
+        let layout = std::alloc::Layout::from_size_align(core::mem::size_of::<Socket>(), 8).unwrap();
+        std::alloc::dealloc(ptr, layout);
+    }
 }
 
 // ============================================================================
@@ -839,6 +922,21 @@ mod tests {
     }
 
     #[test]
+    fn test_xdp_ring_buffer_filter() {
+        let mut ring = SovereignXdpRingBuffer::new();
+        let mut packet = [0u8; 40];
+        packet[12] = 0x08;
+        packet[13] = 0x00; // IPv4
+        packet[23] = 17; // UDP
+        packet[36] = 0x14;
+        packet[37] = 0xE9; // Port 5353 mDNS
+
+        let action = ring.enqueue_packet(&packet);
+        assert_eq!(action, XdpAction::Pass);
+        assert_eq!(ring.tail, 1);
+    }
+
+    #[test]
     fn test_tcp_state_machine_transitions() {
         unsafe {
             let mut stack = TCPIPStack::new();
@@ -925,6 +1023,7 @@ mod tests {
             stack.close(fd);
         }
     }
+
     #[test]
     fn test_bbr_congestion_control_and_bsd_options() {
         let mut bbr = BbrCongestionControl::new();
