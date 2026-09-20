@@ -1,0 +1,23 @@
+name: postmarketOS Alpine Mobile Wayland UI CI
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  postmarketos-mobile-wayland:
+    name: postmarketOS Touch Navigation & Zenith HDR Compositor Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Verify Zenith Wayland Protocol Engine
+        run: |
+          rustc --test --edition=2021 src/desktop/wayland_protocol.rs --cfg 'feature="standalone_test"' -o /tmp/test_wayland && /tmp/test_wayland
+          cargo test --test test_distro_breakthroughs test_postmarketos_mobile_engine
