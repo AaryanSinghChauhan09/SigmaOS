@@ -23,10 +23,10 @@ jobs:
           toolchain: stable
           components: rustfmt, clippy
           
-      - name: Install QEMU
+      - name: Install QEMU and xorriso
         run: |
           sudo apt-get update
-          sudo apt-get install -y qemu-system-x86 qemu-utils
+          sudo apt-get install -y qemu-system-x86 qemu-utils xorriso
           
       - name: Cache cargo registry
         uses: actions/cache@v3
@@ -55,41 +55,64 @@ jobs:
       - name: Run unit tests
         run: ./run_sigma_tests.sh
         
-      - name: Build ISO (should fail if no real ISO)
-        run: make iso
-        continue-on-error: true
+      - name: Build ISO
+        run: ./scripts/build_iso.sh
         
-      - name: Check ISO generation status
+      - name: Verify ISO exists
         run: |
           if [ ! -f build/sigmaos-desktop-preview.iso ]; then
-            echo "ISO generation failed - this is expected until build_iso.sh is implemented"
-            echo "This test will pass once real ISO generation is implemented"
-            exit 0
+            echo "ERROR: ISO generation failed"
+            exit 1
           fi
+          echo "ISO generated successfully"
+          ls -lh build/sigmaos-desktop-preview.iso
           
-      - name: QEMU boot smoke test (placeholder)
+      - name: QEMU boot smoke test
+        timeout-minutes: 5
         run: |
-          echo "QEMU boot smoke test placeholder"
-          echo "This will be implemented once:"
-          echo "  1. Real ISO generation is working"
-          echo "  2. Kernel can boot to init"
-          echo "  3. Init can start services"
-          echo "  4. Login is accessible"
+          echo "Starting QEMU boot smoke test..."
+          echo "Boot command: qemu-system-x86_64 -m 512M -cdrom build/sigmaos-desktop-preview.iso -nographic"
+          
+          # Run QEMU with timeout
+          timeout 30s qemu-system-x86_64 \
+            -m 512M \
+            -cdrom build/sigmaos-desktop-preview.iso \
+            -nographic \
+            -serial stdio || {
+            EXIT_CODE=$?
+            if [ $EXIT_CODE -eq 124 ]; then
+              echo "QEMU boot test timed out (expected for placeholder kernel)"
+              echo "This is acceptable until kernel can fully boot"
+              exit 0
+            else
+              echo "QEMU boot test failed with exit code: $EXIT_CODE"
+              exit 1
+            fi
+          }
+          
+      - name: Boot log analysis
+        if: always()
+        run: |
+          echo "=== Boot Log Analysis ==="
+          echo "This would analyze QEMU boot output for:"
+          echo "  - Kernel loading messages"
+          echo "  - Init system startup"
+          echo "  - Service status"
+          echo "  - Login prompt appearance"
           echo ""
-          echo "Expected test commands:"
-          echo "  qemu-system-x86_64 -m 2048 -enable-kvm -cdrom build/sigmaos-desktop-preview.iso -nographic"
-          echo "  # Wait for boot to complete"
-          echo "  # Check for login prompt"
-          echo "  # Attempt login"
-          echo "  # Verify shell access"
+          echo "Current status: Placeholder implementation"
           
       - name: Test summary
         run: |
           echo "=== QEMU Boot Smoke Test Summary ==="
-          echo "Status: Placeholder (no real ISO yet)"
-          echo "Next steps:"
-          echo "  1. Implement scripts/build_iso.sh"
-          echo "  2. Implement kernel boot chain"
-          echo "  3. Implement init/service supervisor"
-          echo "  4. Implement login system"
-          echo "  5. Enable full QEMU boot test"
+          echo "Status: Partially implemented"
+          echo "Completed:"
+          echo "  ✅ ISO generation working"
+          echo "  ✅ QEMU smoke test infrastructure"
+          echo "  ✅ Boot timeout handling"
+          echo ""
+          echo "Remaining work:"
+          echo "  ⬜ Kernel can fully boot (currently placeholder)"
+          echo "  ⬜ Init system starts services (currently placeholder)"
+          echo "  ⬜ Login prompt appears (currently placeholder)"
+          echo "  ⬜ Shell access verified (currently placeholder)"

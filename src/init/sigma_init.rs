@@ -147,8 +147,9 @@ impl SigmaInit {
         let essential = ["systemd-udevd", "kmod-static-nodes", "network"];
         
         for service_name in &essential {
-            if let Some(service) = self.services.get(*service_name) {
-                self.start_service(service_name)?;
+            let name = service_name.to_string();
+            if self.services.contains_key(&name) {
+                self.start_service(&name)?;
             }
         }
         
@@ -161,7 +162,8 @@ impl SigmaInit {
             println!("Starting service: {}", name);
             
             // Check dependencies
-            for dep in &service.dependencies {
+            let dependencies: Vec<String> = service.dependencies.clone();
+        for dep in &dependencies {
                 if let Some(dep_service) = self.services.get(dep) {
                     if dep_service.state != ServiceState::Running {
                         self.start_service(dep)?;

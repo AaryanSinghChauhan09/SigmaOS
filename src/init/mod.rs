@@ -6,10 +6,14 @@
 
 pub mod sigma_init;
 pub mod login;
+pub mod recovery_shell;
 
 pub use sigma_init::{
     InitConfig, Service, ServiceState, SigmaInit,
 };
 pub use login::{
     LoginService, Session, User,
+};
+pub use recovery_shell::{
+    RecoveryCommand, RecoveryShell,
 };
