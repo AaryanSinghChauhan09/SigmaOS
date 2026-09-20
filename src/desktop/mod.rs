@@ -2,6 +2,7 @@ pub mod mobile_variant;
 pub use mobile_variant::*;
 
 // SigmaOS Desktop Module
+pub mod gaming_engine;
 pub mod mate_betsy;
 pub mod mint_tools;
 pub mod moksha;
@@ -17,15 +18,17 @@ pub mod sovereign_ux_innovation_hub;
 pub mod weather_panel;
 pub mod universal_desktop_framework;
 
+pub use gaming_engine::{
+    AntiCheatCompatibilityShim, AntiCheatEngineType, DirectXApiVersion, FsrUpscalingMode,
+    GameModeCpuGpuGovernor, GamescopeConfig, GamescopeMicrocompositorEngine,
+    ProtonDirectXTranslationShim,
+};
+
 pub use wayland_protocol::*;
 pub use sovereign_ux_innovation_hub::*;
 pub use universal_desktop_framework::*;
 
 pub use crate::desktop::sovereign_navigation_engine::*;
-
-
-
-
 
 pub use ultimate_distro_desktop::{
     ContainerSplitDirection, Gnome46MutterEngine, KRunnerQueryResult, KdePlasma6Engine,
