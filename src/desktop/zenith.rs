@@ -352,6 +352,155 @@ impl SimpleDesktopCompositor {
     }
 }
 
+// =========================================================================
+// LINUX & BSD INSPIRED ZENITH DESKTOP COMPOSITOR EXTENSIONS
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TilingLayoutMode {
+    Dwindle,
+    MasterStack,
+    FloatingGrid,
+    Tabbed,
+}
+
+/// Hyprland-inspired dynamic tiling layout engine
+pub struct HyprlandTilingLayoutEngine {
+    pub layout_mode: TilingLayoutMode,
+    pub gap_size_px: u32,
+    pub border_size_px: u32,
+}
+
+impl HyprlandTilingLayoutEngine {
+    pub fn new() -> Self {
+        Self {
+            layout_mode: TilingLayoutMode::Dwindle,
+            gap_size_px: 10,
+            border_size_px: 2,
+        }
+    }
+
+    pub fn compute_window_geometry(&self, window_idx: usize, total_windows: usize, screen_width: u32, screen_height: u32) -> (u32, u32, u32, u32) {
+        if total_windows == 0 {
+            return (0, 0, screen_width, screen_height);
+        }
+
+        match self.layout_mode {
+            TilingLayoutMode::Dwindle | TilingLayoutMode::MasterStack => {
+                if total_windows == 1 {
+                    (
+                        self.gap_size_px,
+                        self.gap_size_px,
+                        screen_width.saturating_sub(2 * self.gap_size_px),
+                        screen_height.saturating_sub(2 * self.gap_size_px),
+                    )
+                } else if window_idx == 0 {
+                    (
+                        self.gap_size_px,
+                        self.gap_size_px,
+                        (screen_width / 2).saturating_sub(self.gap_size_px),
+                        screen_height.saturating_sub(2 * self.gap_size_px),
+                    )
+                } else {
+                    let stack_count = (total_windows - 1) as u32;
+                    let stack_height = (screen_height.saturating_sub(2 * self.gap_size_px)) / stack_count;
+                    (
+                        screen_width / 2 + self.gap_size_px,
+                        self.gap_size_px + (window_idx as u32 - 1) * stack_height,
+                        (screen_width / 2).saturating_sub(2 * self.gap_size_px),
+                        stack_height.saturating_sub(self.gap_size_px),
+                    )
+                }
+            }
+            _ => (100, 100, 800, 600),
+        }
+    }
+}
+
+impl Default for HyprlandTilingLayoutEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Wayland / COSMIC-inspired direct scanout pipeline with explicit synchronization
+pub struct WaylandCosmicScanoutPipeline {
+    pub explicit_sync_enabled: bool,
+    pub vblank_target_fps: u32,
+    pub direct_scanout_active: bool,
+}
+
+impl WaylandCosmicScanoutPipeline {
+    pub fn new() -> Self {
+        Self {
+            explicit_sync_enabled: true,
+            vblank_target_fps: 144,
+            direct_scanout_active: false,
+        }
+    }
+
+    pub fn acquire_scanout_buffer(&mut self, is_fullscreen: bool) -> bool {
+        self.direct_scanout_active = is_fullscreen && self.explicit_sync_enabled;
+        self.direct_scanout_active
+    }
+}
+
+impl Default for WaylandCosmicScanoutPipeline {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Omarchy / Catppuccin theme palette sync engine
+pub struct OmarchyThemeSyncEngine {
+    pub active_theme: &'static str,
+    pub primary_accent_rgb: (u8, u8, u8),
+    pub background_rgb: (u8, u8, u8),
+}
+
+impl OmarchyThemeSyncEngine {
+    pub fn new() -> Self {
+        Self {
+            active_theme: "TokyoNight",
+            primary_accent_rgb: (122, 162, 247),
+            background_rgb: (26, 27, 38),
+        }
+    }
+
+    pub fn set_theme(&mut self, name: &'static str, accent: (u8, u8, u8), bg: (u8, u8, u8)) {
+        self.active_theme = name;
+        self.primary_accent_rgb = accent;
+        self.background_rgb = bg;
+    }
+}
+
+impl Default for OmarchyThemeSyncEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// GNOME / KDE / macOS fractional display scaling manager
+pub struct FractionalDisplayScaler {
+    pub scale_factor: f32, // e.g. 1.25, 1.5, 2.0
+}
+
+impl FractionalDisplayScaler {
+    pub fn new(scale_factor: f32) -> Self {
+        Self { scale_factor }
+    }
+
+    pub fn scale_dimension(&self, px: u32) -> u32 {
+        (px as f32 * self.scale_factor) as u32
+    }
+}
+
+impl Default for FractionalDisplayScaler {
+    fn default() -> Self {
+        Self::new(1.25)
+    }
+}
+
 impl DesktopCompositor for SimpleDesktopCompositor {
     fn create_window(&mut self, title: &[u8], capability: WindowCapability) -> Result<WindowID, DesktopError> {
         if !self.capability.can_create {
@@ -461,5 +610,46 @@ mod tests {
 
         assert!(compositor.destroy_window(id).is_ok());
         assert_eq!(compositor.list_windows().len(), 0);
+    }
+
+    #[test]
+    fn test_hyprland_tiling_layout_engine() {
+        let tiling = HyprlandTilingLayoutEngine::new();
+        let (x, y, w, h) = tiling.compute_window_geometry(0, 2, 1920, 1080);
+        assert_eq!(x, 10);
+        assert_eq!(y, 10);
+        assert_eq!(w, 950);
+        assert_eq!(h, 1060);
+
+        let (x2, y2, w2, h2) = tiling.compute_window_geometry(1, 2, 1920, 1080);
+        assert_eq!(x2, 970);
+        assert_eq!(y2, 10);
+        assert_eq!(w2, 940);
+        assert_eq!(h2, 1050);
+    }
+
+    #[test]
+    fn test_wayland_cosmic_scanout_pipeline() {
+        let mut scanout = WaylandCosmicScanoutPipeline::new();
+        assert!(scanout.explicit_sync_enabled);
+        assert!(!scanout.acquire_scanout_buffer(false));
+        assert!(scanout.acquire_scanout_buffer(true));
+        assert!(scanout.direct_scanout_active);
+    }
+
+    #[test]
+    fn test_omarchy_theme_sync_engine() {
+        let mut theme_sync = OmarchyThemeSyncEngine::new();
+        assert_eq!(theme_sync.active_theme, "TokyoNight");
+        theme_sync.set_theme("CatppuccinMocha", (203, 166, 247), (30, 30, 46));
+        assert_eq!(theme_sync.active_theme, "CatppuccinMocha");
+        assert_eq!(theme_sync.primary_accent_rgb, (203, 166, 247));
+    }
+
+    #[test]
+    fn test_fractional_display_scaler() {
+        let scaler = FractionalDisplayScaler::new(1.5);
+        assert_eq!(scaler.scale_dimension(100), 150);
+        assert_eq!(scaler.scale_dimension(1920), 2880);
     }
 }

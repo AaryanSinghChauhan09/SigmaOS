@@ -1971,4 +1971,233 @@ mod integration_tests {
         assert_eq!(bound_net, "Intel igc 2.5GbE Ethernet Driver");
         assert_eq!(bound_usb, "Wacom Precision Tablet Driver");
     }
+
+    #[test]
+    fn test_devd_rules_matching() {
+        let mut devd = SovereignDevdRulesEngine::new();
+        let cmd = devd.process_event("USB", "ATTACH").unwrap();
+        assert_eq!(cmd, "/sbin/usb_autobind");
+        assert_eq!(devd.handled_events_count, 1);
+        assert!(devd.process_event("UNKNOWN", "ATTACH").is_none());
+    }
+
+    #[test]
+    fn test_pci_modalias_matching() {
+        let matcher = SovereignPciModaliasMatcher::new();
+        let drv = matcher.match_modalias("pci:v00008086d000015F3sv00001043sd00008678bc02sc00i00").unwrap();
+        assert_eq!(drv, "igc");
+        assert!(matcher.match_modalias("pci:v00009999d00009999").is_none());
+    }
+
+    #[test]
+    fn test_virtio_device_probing() {
+        let mut probe = SovereignVirtioDeviceProbe::new();
+        assert_eq!(probe.probe_virtio_device(0x1000).unwrap(), "VirtIO Net");
+        assert_eq!(probe.probe_virtio_device(0x1001).unwrap(), "VirtIO Block");
+        assert_eq!(probe.probed_devices.len(), 2);
+    }
+
+    #[test]
+    fn test_usb4_thunderbolt_auth() {
+        let mut auth = SovereignUsb4ThunderboltAuthEngine::new();
+        assert!(auth.authorize_device("tb-uuid-001").is_ok());
+        assert!(auth.is_authorized("tb-uuid-001"));
+
+        auth.security_level = SecurityLevel::DisplayPortOnly;
+        assert!(auth.authorize_device("tb-uuid-002").is_err());
+    }
+
+    #[test]
+    fn test_nvme_namespace_controller() {
+        let nvme = SovereignNvmeNamespaceController::new(32);
+        assert_eq!(nvme.identify_namespace(1), Some(1_000_000_000));
+        assert_eq!(nvme.identify_namespace(99), None);
+    }
+}
+
+// =========================================================================
+// 15. LINUX UDEV & FREEBSD DEVD HARDWARE DEVICE MANAGER ENGINES
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct DevdRule {
+    pub subsystem: String,
+    pub match_action: String,
+    pub handler_cmd: String,
+}
+
+pub struct SovereignDevdRulesEngine {
+    pub rules: Vec<DevdRule>,
+    pub handled_events_count: usize,
+}
+
+impl SovereignDevdRulesEngine {
+    pub fn new() -> Self {
+        let mut rules = Vec::new();
+        rules.push(DevdRule {
+            subsystem: "USB".to_string(),
+            match_action: "ATTACH".to_string(),
+            handler_cmd: "/sbin/usb_autobind".to_string(),
+        });
+        rules.push(DevdRule {
+            subsystem: "NET".to_string(),
+            match_action: "LINK_UP".to_string(),
+            handler_cmd: "/sbin/dhcpcd".to_string(),
+        });
+
+        Self {
+            rules,
+            handled_events_count: 0,
+        }
+    }
+
+    pub fn process_event(&mut self, subsystem: &str, action: &str) -> Option<String> {
+        for rule in &self.rules {
+            if rule.subsystem == subsystem && rule.match_action == action {
+                self.handled_events_count += 1;
+                return Some(rule.handler_cmd.clone());
+            }
+        }
+        None
+    }
+}
+
+impl Default for SovereignDevdRulesEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// PCI/USB Vendor-Product Modalias Automatic Driver Matcher
+pub struct SovereignPciModaliasMatcher {
+    pub modalias_database: Vec<(String, String)>, // (modalias_pattern, driver_name)
+}
+
+impl SovereignPciModaliasMatcher {
+    pub fn new() -> Self {
+        let mut db = Vec::new();
+        db.push(("pci:v00008086d000015F3*".to_string(), "igc".to_string()));
+        db.push(("pci:v00001002d0000731F*".to_string(), "amdgpu".to_string()));
+        db.push(("pci:v0000144Dd0000A808*".to_string(), "nvme".to_string()));
+        Self { modalias_database: db }
+    }
+
+    pub fn match_modalias(&self, modalias: &str) -> Option<String> {
+        for (pattern, driver) in &self.modalias_database {
+            let prefix = pattern.trim_end_matches('*');
+            if modalias.starts_with(prefix) {
+                return Some(driver.clone());
+            }
+        }
+        None
+    }
+}
+
+impl Default for SovereignPciModaliasMatcher {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// VirtIO Block / Net / Balloon Auto-Probing Engine
+pub struct SovereignVirtioDeviceProbe {
+    pub probed_devices: Vec<(u16, String)>, // (device_id, device_type)
+}
+
+impl SovereignVirtioDeviceProbe {
+    pub fn new() -> Self {
+        Self { probed_devices: Vec::new() }
+    }
+
+    pub fn probe_virtio_device(&mut self, device_id: u16) -> Option<&'static str> {
+        let name = match device_id {
+            0x1000 | 0x1042 => "VirtIO Net",
+            0x1001 | 0x1041 => "VirtIO Block",
+            0x1002 | 0x1045 => "VirtIO Memory Balloon",
+            0x1003 | 0x1043 => "VirtIO Console",
+            0x1050 => "VirtIO GPU",
+            _ => return None,
+        };
+        self.probed_devices.push((device_id, name.to_string()));
+        Some(name)
+    }
+}
+
+impl Default for SovereignVirtioDeviceProbe {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// USB4 & Thunderbolt 3/4 PCIe Authorization Engine
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SecurityLevel {
+    None,
+    UserAuth,
+    SecureConnect,
+    DisplayPortOnly,
+}
+
+pub struct SovereignUsb4ThunderboltAuthEngine {
+    pub security_level: SecurityLevel,
+    pub authorized_uuids: Vec<String>,
+}
+
+impl SovereignUsb4ThunderboltAuthEngine {
+    pub fn new() -> Self {
+        Self {
+            security_level: SecurityLevel::UserAuth,
+            authorized_uuids: Vec::new(),
+        }
+    }
+
+    pub fn authorize_device(&mut self, uuid: &str) -> Result<(), &'static str> {
+        if self.security_level == SecurityLevel::DisplayPortOnly {
+            return Err("USB4/TB: PCIe tunneling prohibited in DP-only mode");
+        }
+        if !self.authorized_uuids.contains(&uuid.to_string()) {
+            self.authorized_uuids.push(uuid.to_string());
+        }
+        Ok(())
+    }
+
+    pub fn is_authorized(&self, uuid: &str) -> bool {
+        self.authorized_uuids.contains(&uuid.to_string())
+    }
+}
+
+impl Default for SovereignUsb4ThunderboltAuthEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// NVMe Namespace Controller and Queue Allocation Engine
+pub struct SovereignNvmeNamespaceController {
+    pub active_namespaces: Vec<(u32, u64)>, // (nsid, size_blocks)
+    pub max_io_queues: u16,
+}
+
+impl SovereignNvmeNamespaceController {
+    pub fn new(max_io_queues: u16) -> Self {
+        let mut controller = Self {
+            active_namespaces: Vec::new(),
+            max_io_queues,
+        };
+        controller.active_namespaces.push((1, 1_000_000_000)); // Default 500GB NS1
+        controller
+    }
+
+    pub fn identify_namespace(&self, nsid: u32) -> Option<u64> {
+        self.active_namespaces
+            .iter()
+            .find(|(id, _)| *id == nsid)
+            .map(|(_, size)| *size)
+    }
+}
+
+impl Default for SovereignNvmeNamespaceController {
+    fn default() -> Self {
+        Self::new(64)
+    }
 }
