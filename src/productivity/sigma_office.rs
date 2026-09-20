@@ -1313,7 +1313,7 @@ impl SigmaFormulaParserEngine {
                 if r == 0.0 {
                     CellValue::Number(-pv / nper)
                 } else {
-                    let pmt = (pv * r) / (1.0 - (1.0 + r).powf(-nper));
+                    let pmt = (pv * r) / (1.0f64 - f64::powf(1.0f64 + r, -nper));
                     CellValue::Number(-pmt)
                 }
             } else {
@@ -1326,7 +1326,7 @@ impl SigmaFormulaParserEngine {
                 let rate = nums[0];
                 let mut npv = 0.0;
                 for (i, &val) in nums[1..].iter().enumerate() {
-                    npv += val / (1.0 + rate).powf((i + 1) as f64);
+                    npv += val / f64::powf(1.0f64 + rate, (i + 1) as f64);
                 }
                 CellValue::Number(npv)
             } else {

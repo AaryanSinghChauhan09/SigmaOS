@@ -25,12 +25,16 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 pub type PackageID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PackageState {
     Installed = 0,
     Available = 1,
     Updating = 2,
     Corrupted = 3,
+    Uninstalled = 4,
+    Downloading = 5,
+    Installing = 6,
+    BrokenDependency = 7,
 }
 
 pub trait Package {

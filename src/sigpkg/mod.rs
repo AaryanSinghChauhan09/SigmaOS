@@ -84,6 +84,7 @@ pub use universal_oop_system::{
     DebAdapter, RpmAdapter, PacmanAdapter, ApkAdapter, NixAdapter, EbuildAdapter, UniversalPackageManager,
 };
 pub use sovereign_sigpkg::*;
+pub use crate::package::sovereign_distro_package_master_suite::*;
 pub use universal_adapter::{
     AppImageContainer, FlatpakManifest, MappedScriptletHook, PackageFormatAdapter,
     PackagePriority, PacmanPkgbuild, RpmSpecManifest, SigmaPkgHookType, SnapcraftManifest,

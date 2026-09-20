@@ -31,6 +31,7 @@ use core::result::Result::{self, Err, Ok};
 pub struct RepositoryGpgKey {
     pub key_id: String,
     pub owner: String,
+    pub fingerprint: String,
     pub is_valid: bool,
 }
 
@@ -39,6 +40,7 @@ impl RepositoryGpgKey {
         Self {
             key_id: key_id.to_string(),
             owner: owner.to_string(),
+            fingerprint: format!("0x{}", key_id),
             is_valid: true,
         }
     }
@@ -95,19 +97,6 @@ impl MirrorBenchmarkEngine {
 }
 
 /// Repository configuration (Debian sources.list inspiration)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum OfficialArchiveSource {
-    Main,
-    Universe,
-    Multiverse,
-    Restricted,
-}
-
-#[derive(Debug, Clone)]
-pub struct RepositoryGpgKey {
-    pub key_id: String,
-    pub fingerprint: String,
-}
 
 pub struct Repository {
     pub name: String,

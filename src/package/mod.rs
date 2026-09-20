@@ -53,6 +53,8 @@ pub mod linux_bsd_package_advancements;
 pub use linux_bsd_package_advancements::*;
 pub mod sovereign_distro_package_advancements_v2;
 pub use sovereign_distro_package_advancements_v2::*;
+pub mod sovereign_distro_package_master_suite;
+pub use sovereign_distro_package_master_suite::*;
 
 pub use alpine_apk::{ApkPackage, ApkPackageManager, ApkRepository, ApkWorld};
 pub use arch_aur::{AURPackage, BuildError, SigmaAUR, PKGBUILD};

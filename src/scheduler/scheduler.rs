@@ -118,6 +118,45 @@ impl Task {
         self.workload_type = workload;
         self
     }
+
+    // BORE-specific inherent methods
+    pub fn get_burst_score(&self) -> u64 {
+        self.burst_score.load(Ordering::SeqCst)
+    }
+
+    pub fn set_burst_score(&self, score: u64) {
+        self.burst_score.store(score, Ordering::SeqCst);
+    }
+
+    pub fn update_burst_score(&self, delta: i64) {
+        let current = self.burst_score.load(Ordering::SeqCst) as i64;
+        let new = (current + delta).max(0) as u64;
+        self.burst_score.store(new, Ordering::SeqCst);
+    }
+
+    pub fn get_vruntime(&self) -> u64 {
+        self.vruntime.load(Ordering::SeqCst)
+    }
+
+    pub fn set_vruntime(&self, vruntime: u64) {
+        self.vruntime.store(vruntime, Ordering::SeqCst);
+    }
+
+    pub fn update_vruntime(&self, delta: u64) {
+        self.vruntime.fetch_add(delta, Ordering::SeqCst);
+    }
+
+    pub fn get_io_wait_time(&self) -> u64 {
+        self.io_wait_time.load(Ordering::SeqCst)
+    }
+
+    pub fn set_io_wait_time(&self, time: u64) {
+        self.io_wait_time.store(time, Ordering::SeqCst);
+    }
+
+    pub fn update_io_wait_time(&self, delta: u64) {
+        self.io_wait_time.fetch_add(delta, Ordering::SeqCst);
+    }
 }
 
 impl Schedulable for Task {
@@ -183,45 +222,6 @@ impl Schedulable for Task {
 
     fn can_block(&self) -> bool {
         self.capability.can_block
-    }
-
-    // BORE-specific methods
-    pub fn get_burst_score(&self) -> u64 {
-        self.burst_score.load(Ordering::SeqCst)
-    }
-
-    pub fn set_burst_score(&self, score: u64) {
-        self.burst_score.store(score, Ordering::SeqCst);
-    }
-
-    pub fn update_burst_score(&self, delta: i64) {
-        let current = self.burst_score.load(Ordering::SeqCst) as i64;
-        let new = (current + delta).max(0) as u64;
-        self.burst_score.store(new, Ordering::SeqCst);
-    }
-
-    pub fn get_vruntime(&self) -> u64 {
-        self.vruntime.load(Ordering::SeqCst)
-    }
-
-    pub fn set_vruntime(&self, vruntime: u64) {
-        self.vruntime.store(vruntime, Ordering::SeqCst);
-    }
-
-    pub fn update_vruntime(&self, delta: u64) {
-        self.vruntime.fetch_add(delta, Ordering::SeqCst);
-    }
-
-    pub fn get_io_wait_time(&self) -> u64 {
-        self.io_wait_time.load(Ordering::SeqCst)
-    }
-
-    pub fn set_io_wait_time(&self, time: u64) {
-        self.io_wait_time.store(time, Ordering::SeqCst);
-    }
-
-    pub fn update_io_wait_time(&self, delta: u64) {
-        self.io_wait_time.fetch_add(delta, Ordering::SeqCst);
     }
 
     fn as_any(&self) -> &dyn Any {
