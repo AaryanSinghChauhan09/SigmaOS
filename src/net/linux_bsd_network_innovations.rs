@@ -300,6 +300,55 @@ impl XdpZeroCopyPacketRingEngine {
 }
 
 // ============================================================================
+// 4b. FreeBSD VNET Virtualized Network Stack Isolation Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct VnetStackInstance {
+    pub vnet_id: u32,
+    pub interfaces: Vec<String>,
+    pub default_gateway: String,
+    pub is_active: bool,
+}
+
+pub struct FreeBsdVnetIsolationEngine {
+    pub vnet_stacks: HashMap<u32, VnetStackInstance>,
+}
+
+impl FreeBsdVnetIsolationEngine {
+    pub fn new() -> Self {
+        Self {
+            vnet_stacks: HashMap::new(),
+        }
+    }
+
+    pub fn create_vnet_stack(&mut self, vnet_id: u32, gateway: &str) -> Result<(), &'static str> {
+        if self.vnet_stacks.contains_key(&vnet_id) {
+            return Err("VNET stack already exists");
+        }
+        let stack = VnetStackInstance {
+            vnet_id,
+            interfaces: Vec::new(),
+            default_gateway: gateway.to_string(),
+            is_active: true,
+        };
+        self.vnet_stacks.insert(vnet_id, stack);
+        Ok(())
+    }
+
+    pub fn attach_interface(&mut self, vnet_id: u32, iface_name: &str) -> Result<(), &'static str> {
+        if let Some(stack) = self.vnet_stacks.get_mut(&vnet_id) {
+            if !stack.interfaces.contains(&iface_name.to_string()) {
+                stack.interfaces.push(iface_name.to_string());
+            }
+            Ok(())
+        } else {
+            Err("VNET stack not found")
+        }
+    }
+}
+
+// ============================================================================
 // 5. WireGuard Post-Quantum Cryptography (PQC) Tunnel Engine
 // ============================================================================
 
@@ -397,5 +446,15 @@ mod tests {
         let enc = wg.encrypt_tunnel_payload(b"HELLO");
         assert!(enc.starts_with(b"WGPQC_MAC1_HEADER_"));
         assert_eq!(wg.tx_bytes, 5);
+    }
+
+    #[test]
+    fn test_freebsd_vnet_isolation_engine() {
+        let mut vnet_engine = FreeBsdVnetIsolationEngine::new();
+        assert!(vnet_engine.create_vnet_stack(101, "192.168.1.1").is_ok());
+        assert!(vnet_engine.attach_interface(101, "epair0a").is_ok());
+        let stack = vnet_engine.vnet_stacks.get(&101).unwrap();
+        assert_eq!(stack.default_gateway, "192.168.1.1");
+        assert_eq!(stack.interfaces, vec!["epair0a".to_string()]);
     }
 }
