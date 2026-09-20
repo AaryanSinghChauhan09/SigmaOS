@@ -157,14 +157,14 @@
                                 <div class="form-switch">
                                     <label for="toggle-neural-layout" style="cursor: pointer;">Enable Neural Layout Engine</label>
                                     <label class="toggle-switch">
-                                        <input id="toggle-neural-layout" type="checkbox" checked onchange="neural.setMindfulness(this.checked)" title="Enable Neural Layout" aria-label="Enable Neural Layout">
+                                        <input id="toggle-neural-layout" type="checkbox" role="switch" aria-checked="true" checked onchange="neural.setMindfulness(this.checked)" title="Enable Neural Layout" aria-label="Enable Neural Layout">
                                         <span class="slider"></span>
                                     </label>
                                 </div>
                                 <div class="form-switch">
                                     <label for="toggle-ambient-vsync" style="cursor: pointer;">Ambient VSync Overdrive</label>
                                     <label class="toggle-switch">
-                                        <input id="toggle-ambient-vsync" type="checkbox" title="Toggle Ambient VSync" aria-label="Toggle Ambient VSync">
+                                        <input id="toggle-ambient-vsync" type="checkbox" role="switch" aria-checked="false" title="Toggle Ambient VSync" aria-label="Toggle Ambient VSync">
                                         <span class="slider"></span>
                                     </label>
                                 </div>
@@ -552,7 +552,7 @@
     </nav>
 
     <!-- Right-Click Context Menu -->
-    <div id="context-menu" role="menu" aria-label="Desktop Context Menu">
+    <div id="context-menu" role="menu" aria-label="Desktop Context Menu" aria-hidden="true">
         <button type="button" class="context-item" role="menuitem" onclick="contextAction('refresh')" aria-label="Force Refresh System">🔄 Force Refresh</button>
         <button type="button" class="context-item" role="menuitem" onclick="contextAction('cleanup')" aria-label="Purge System Caches">🧹 Purge Caches</button>
         <button type="button" class="context-item" role="menuitem" onclick="contextAction('audit')" aria-label="Attest System Security">🛡️ Attest System</button>
@@ -567,7 +567,7 @@
     </div>
 
     <!-- Sovereign Help Overlay -->
-    <div class="wizard-overlay wizard-overlay--hidden" id="help-overlay"></div>
+    <div class="wizard-overlay wizard-overlay--hidden" id="help-overlay" aria-hidden="true"></div>
 
     <!-- Versioned Kernel API & Decoupled Components -->
     <script type="module" src="zenith_desktop/index.js"></script>
