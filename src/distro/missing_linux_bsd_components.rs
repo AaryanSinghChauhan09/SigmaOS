@@ -240,6 +240,247 @@ impl NixOsFlakeHermeticEngine {
     }
 }
 
+/// FreeBSD ZFS Boot Environment (bectl / beadm parity) Management Engine
+#[derive(Debug, Clone)]
+pub struct FreeBsdZfsBootenvEngine {
+    pub zpool_name: String,
+    pub bootenvs: Vec<(String, bool)>, // (dataset_name, active_on_boot)
+    pub current_active: String,
+}
+
+impl FreeBsdZfsBootenvEngine {
+    pub fn new(zpool_name: &str) -> Self {
+        let default_be = format!("{}/ROOT/default", zpool_name);
+        Self {
+            zpool_name: zpool_name.to_string(),
+            bootenvs: vec![(default_be.clone(), true)],
+            current_active: default_be,
+        }
+    }
+
+    pub fn create_bootenv(&mut self, be_name: &str) -> String {
+        let dataset = format!("{}/ROOT/{}", self.zpool_name, be_name);
+        self.bootenvs.push((dataset.clone(), false));
+        dataset
+    }
+
+    pub fn activate_bootenv(&mut self, be_name: &str) -> Result<String, &'static str> {
+        let dataset = format!("{}/ROOT/{}", self.zpool_name, be_name);
+        let mut found = false;
+        for (ds, active) in self.bootenvs.iter_mut() {
+            if ds == &dataset {
+                *active = true;
+                found = true;
+            } else {
+                *active = false;
+            }
+        }
+        if found {
+            self.current_active = dataset.clone();
+            Ok(dataset)
+        } else {
+            Err("ZFS Boot Environment dataset not found")
+        }
+    }
+}
+
+/// Debian APT Fast Parallel Mirror Selector Engine
+#[derive(Debug, Clone)]
+pub struct AptMirrorSpec {
+    pub url: String,
+    pub ping_ms: u32,
+    pub bandwidth_mbps: u32,
+}
+
+#[derive(Debug, Clone)]
+pub struct DebianAptFastMirrorSelectorEngine {
+    pub candidate_mirrors: Vec<AptMirrorSpec>,
+    pub selected_mirror: Option<String>,
+}
+
+impl DebianAptFastMirrorSelectorEngine {
+    pub fn new() -> Self {
+        Self {
+            candidate_mirrors: Vec::new(),
+            selected_mirror: None,
+        }
+    }
+
+    pub fn add_candidate(&mut self, url: &str, ping_ms: u32, bandwidth_mbps: u32) {
+        self.candidate_mirrors.push(AptMirrorSpec {
+            url: url.to_string(),
+            ping_ms,
+            bandwidth_mbps,
+        });
+    }
+
+    pub fn rank_and_select_fastest(&mut self) -> Option<String> {
+        if self.candidate_mirrors.is_empty() {
+            return None;
+        }
+        self.candidate_mirrors.sort_by_key(|m| (m.ping_ms, u32::MAX - m.bandwidth_mbps));
+        let fastest = self.candidate_mirrors[0].url.clone();
+        self.selected_mirror = Some(fastest.clone());
+        Some(fastest)
+    }
+}
+
+impl Default for DebianAptFastMirrorSelectorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Void Linux Runit Stage 1/2/3 Process Supervision Engine
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RunitSupervisionState {
+    Stage1BootInit,
+    Stage2ServiceSupervision,
+    Stage3HaltReboot,
+}
+
+#[derive(Debug, Clone)]
+pub struct VoidRunitServiceSupervisorEngine {
+    pub active_stage: RunitSupervisionState,
+    pub supervised_services: Vec<(String, bool)>, // (service_name, is_running)
+}
+
+impl VoidRunitServiceSupervisorEngine {
+    pub fn new() -> Self {
+        Self {
+            active_stage: RunitSupervisionState::Stage1BootInit,
+            supervised_services: Vec::new(),
+        }
+    }
+
+    pub fn transition_to_stage2(&mut self) {
+        self.active_stage = RunitSupervisionState::Stage2ServiceSupervision;
+    }
+
+    pub fn enable_service(&mut self, service_name: &str) {
+        self.supervised_services.push((service_name.to_string(), true));
+    }
+
+    pub fn active_service_count(&self) -> usize {
+        self.supervised_services.iter().filter(|(_, running)| *running).count()
+    }
+}
+
+impl Default for VoidRunitServiceSupervisorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Gentoo Portage EAPI 8 Slot & Subslot Resolution Engine
+#[derive(Debug, Clone)]
+pub struct GentooPortageSlotEngine {
+    pub atom: String,
+    pub slot: String,
+    pub subslot: String,
+    pub eapi_level: u32,
+}
+
+impl GentooPortageSlotEngine {
+    pub fn new(atom: &str, slot: &str, subslot: &str, eapi_level: u32) -> Self {
+        Self {
+            atom: atom.to_string(),
+            slot: slot.to_string(),
+            subslot: subslot.to_string(),
+            eapi_level,
+        }
+    }
+
+    pub fn is_eapi_supported(&self) -> bool {
+        self.eapi_level >= 7 && self.eapi_level <= 8
+    }
+
+    pub fn slot_identifier(&self) -> String {
+        format!("{}:{}/{}", self.atom, self.slot, self.subslot)
+    }
+}
+
+/// OpenBSD Pledge & Unveil Security Hardening Engine
+#[derive(Debug, Clone)]
+pub struct OpenBsdPledgeUnveilHardeningEngine {
+    pub promises: Vec<String>,
+    pub unveil_rules: Vec<(String, String)>,
+    pub locked: bool,
+}
+
+impl OpenBsdPledgeUnveilHardeningEngine {
+    pub fn new() -> Self {
+        Self {
+            promises: Vec::new(),
+            unveil_rules: Vec::new(),
+            locked: false,
+        }
+    }
+
+    pub fn pledge(&mut self, promises_str: &str) -> Result<(), &'static str> {
+        if self.locked {
+            return Err("Pledge is locked");
+        }
+        for p in promises_str.split_whitespace() {
+            self.promises.push(p.to_string());
+        }
+        Ok(())
+    }
+
+    pub fn unveil(&mut self, path: &str, perms: &str) -> Result<(), &'static str> {
+        if self.locked {
+            return Err("Unveil is locked");
+        }
+        self.unveil_rules.push((path.to_string(), perms.to_string()));
+        Ok(())
+    }
+
+    pub fn lock(&mut self) {
+        self.locked = true;
+    }
+}
+
+impl Default for OpenBsdPledgeUnveilHardeningEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Fedora Greenboot Health Check Engine (Boot health evaluation & atomic rollback)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GreenbootStatus {
+    Healthy,
+    Degraded,
+    FailedRollbackTriggered,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FedoraGreenbootHealthCheckEngine {
+    pub boot_attempts: u32,
+    pub max_attempts: u32,
+    pub status: GreenbootStatus,
+}
+
+impl FedoraGreenbootHealthCheckEngine {
+    pub fn new(max_attempts: u32) -> Self {
+        Self {
+            boot_attempts: 1,
+            max_attempts,
+            status: GreenbootStatus::Healthy,
+        }
+    }
+
+    pub fn record_boot_failure(&mut self) -> GreenbootStatus {
+        self.boot_attempts += 1;
+        if self.boot_attempts > self.max_attempts {
+            self.status = GreenbootStatus::FailedRollbackTriggered;
+        } else {
+            self.status = GreenbootStatus::Degraded;
+        }
+        self.status
+    }
+}
+
 /// Master Missing Linux & BSD Components Suite
 #[derive(Debug, Clone)]
 pub struct SovereignMissingLinuxBsdSuite {
@@ -250,6 +491,10 @@ pub struct SovereignMissingLinuxBsdSuite {
     pub rump: NetBsdRumpKernelDriverEngine,
     pub sentinel: OpenBsdPledgeUnveilSentinelEngine,
     pub flake: NixOsFlakeHermeticEngine,
+    pub bootenv: FreeBsdZfsBootenvEngine,
+    pub apt_mirror: DebianAptFastMirrorSelectorEngine,
+    pub runit_supervisor: VoidRunitServiceSupervisorEngine,
+    pub greenboot: FedoraGreenbootHealthCheckEngine,
 }
 
 impl SovereignMissingLinuxBsdSuite {
@@ -262,6 +507,10 @@ impl SovereignMissingLinuxBsdSuite {
             rump: NetBsdRumpKernelDriverEngine::new(),
             sentinel: OpenBsdPledgeUnveilSentinelEngine::new(),
             flake: NixOsFlakeHermeticEngine::new("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
+            bootenv: FreeBsdZfsBootenvEngine::new("zroot"),
+            apt_mirror: DebianAptFastMirrorSelectorEngine::new(),
+            runit_supervisor: VoidRunitServiceSupervisorEngine::new(),
+            greenboot: FedoraGreenbootHealthCheckEngine::new(3),
         }
     }
 
@@ -270,6 +519,8 @@ impl SovereignMissingLinuxBsdSuite {
         self.vnet.attach_epair_iface("epair0a");
         self.sentinel.pledge("stdio rpath wpath cpath");
         self.sentinel.unveil("/usr/bin", "rx");
+        self.apt_mirror.add_candidate("deb.debian.org", 12, 1000);
+        self.runit_supervisor.enable_service("dhcpcd");
 
         self.yast2.verify_module("yast2-hardware")
             && self.xbps_src.generate_xbps_binary().contains("sigmaos-core")
@@ -278,6 +529,8 @@ impl SovereignMissingLinuxBsdSuite {
             && self.rump.dispatch_hypercall("rumpvfs", 1) > 0
             && self.sentinel.active_pledges.len() == 4
             && self.flake.evaluate_flake()
+            && self.apt_mirror.rank_and_select_fastest().is_some()
+            && self.runit_supervisor.active_service_count() == 1
     }
 }
 
@@ -300,5 +553,18 @@ mod tests {
         assert!(suite.lbu.apkovl_committed);
         assert!(suite.vnet.is_vnet_isolated());
         assert!(suite.flake.evaluate_flake());
+
+        // Test newly added engines
+        let new_be = suite.bootenv.create_bootenv("v2_release");
+        assert_eq!(new_be, "zroot/ROOT/v2_release");
+        assert_eq!(suite.bootenv.activate_bootenv("v2_release").unwrap(), "zroot/ROOT/v2_release");
+
+        let slot = GentooPortageSlotEngine::new("sys-devel/gcc", "14", "14.2.0", 8);
+        assert!(slot.is_eapi_supported());
+        assert_eq!(slot.slot_identifier(), "sys-devel/gcc:14/14.2.0");
+
+        let mut green = FedoraGreenbootHealthCheckEngine::new(2);
+        assert_eq!(green.record_boot_failure(), GreenbootStatus::Degraded);
+        assert_eq!(green.record_boot_failure(), GreenbootStatus::FailedRollbackTriggered);
     }
 }
