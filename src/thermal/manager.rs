@@ -52,6 +52,7 @@ pub trait ThermalSensor {
 pub struct SimpleThermalSensor {
     pub id: SensorID,
     pub name: [u8; 64],
+    pub name_len: u8,
     pub temperature: AtomicUsize,
     pub max_temperature: AtomicUsize,
 }
@@ -66,6 +67,7 @@ impl SimpleThermalSensor {
         SimpleThermalSensor {
             id,
             name: name_array,
+            name_len: name_len as u8,
             temperature: AtomicUsize::new(40),
             max_temperature: AtomicUsize::new(max_temperature as usize),
         }
@@ -75,8 +77,9 @@ impl SimpleThermalSensor {
 impl ThermalSensor for SimpleThermalSensor {
     fn id(&self) -> SensorID { self.id }
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
+        // Bolt Optimization: O(1) constant-time slice retrieval using cached `name_len`
+        // instead of O(N) zero-byte linear scan (`self.name.iter().position(|&b| b == 0)`).
+        &self.name[..self.name_len as usize]
     }
     fn temperature(&self) -> i32 { self.temperature.load(Ordering::SeqCst) as i32 }
     fn max_temperature(&self) -> i32 { self.max_temperature.load(Ordering::SeqCst) as i32 }
@@ -271,5 +274,22 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     fn into_iter(self) -> Self::IntoIter {
         use core::ops::DerefMut;
         self.deref_mut().iter_mut()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_simple_thermal_sensor_cached_name_len() {
+        let sensor_name = b"CPU_Thermal_Zone_0";
+        let sensor = SimpleThermalSensor::new(1, sensor_name, 100);
+
+        assert_eq!(sensor.id(), 1);
+        assert_eq!(sensor.name(), sensor_name);
+        assert_eq!(sensor.name_len as usize, sensor_name.len());
+        assert_eq!(sensor.max_temperature(), 100);
+        assert_eq!(sensor.temperature(), 40);
     }
 }
