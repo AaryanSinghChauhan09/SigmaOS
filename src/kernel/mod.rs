@@ -162,6 +162,9 @@ pub use mount_namespace::{MountFlags, MountNamespace, MountNamespaceManager, Mou
 pub mod uts_namespace;
 pub use uts_namespace::{UtsNamespace, UtsNamespaceManager};
 
+pub mod semaphore;
+pub use semaphore::{Semaphore, SemaphoreManager, SemaphoreResult, SemaphoreSet};
+
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
 pub use linux_parity::{
