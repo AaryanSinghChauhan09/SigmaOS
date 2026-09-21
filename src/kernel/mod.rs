@@ -75,6 +75,12 @@ pub use signalfd::{Signal, SignalFd, SignalFdFlags, SignalMask, SigInfo};
 pub mod eventfd;
 pub use eventfd::{EventFd, EventFdFlags};
 
+pub mod pipe;
+pub use pipe::{Pipe, PipeFlags, PipePair};
+
+pub mod socket;
+pub use socket::{AddressFamily, Socket, SocketAddr, SocketManager, SocketProtocol, SocketState, SocketType};
+
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
 pub use linux_parity::{
