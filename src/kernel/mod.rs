@@ -96,6 +96,9 @@ pub use fd_table::{FdEntry, FdFlags, FdTable, FdTableManager};
 pub mod rlimit;
 pub use rlimit::{Rlimit, RlimitResource, ResourceLimits, ResourceLimitsManager};
 
+pub mod user_group_db;
+pub use user_group_db::{Group, User, UserGroupDatabase, UserGroupManager};
+
 pub mod linux_bsd_innovations;
 
 pub mod capabilities;
@@ -187,18 +190,6 @@ pub use pipe::{Pipe, PipeFlags, PipeManager};
 
 pub mod socket;
 pub use socket::{Socket, SocketDomain, SocketManager, SocketProtocol, SocketState, SocketType};
-
-pub mod shm;
-pub use shm::{ShmManager, ShmPerm, ShmSegment};
-
-pub mod msgqueue;
-pub use msgqueue::{Message, MessageQueue, MessageQueueManager, MsgQPerm};
-
-pub mod fd_table;
-pub use fd_table::{FdEntry, FdFlags, FdTable, FdTableManager};
-
-pub mod rlimit;
-pub use rlimit::{Rlimit, RlimitResource, ResourceLimits, ResourceLimitsManager};
 
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
