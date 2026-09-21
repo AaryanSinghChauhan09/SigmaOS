@@ -165,6 +165,9 @@ pub use uts_namespace::{UtsNamespace, UtsNamespaceManager};
 pub mod semaphore;
 pub use semaphore::{Semaphore, SemaphoreManager, SemaphoreResult, SemaphoreSet};
 
+pub mod timerfd;
+pub use timerfd::{TimerClock, TimerExpirations, TimerFd, TimerFdManager, TimerFlags, TimerSpec};
+
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
 pub use linux_parity::{

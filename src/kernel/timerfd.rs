@@ -1,19 +1,18 @@
 // Linux-inspired timerfd for timer-based file descriptor notifications
-// Timer management through file descriptor interface for SigmaOS
+// Provides timer events through file descriptors
 
-use std::time::{Duration, Instant};
+use std::collections::HashMap;
+use std::sync::{Arc, Mutex};
 
-/// timerfd clock types
+/// Timer clock types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ClockId {
-    Realtime = 0,
-    Monotonic = 1,
-    Boottime = 2,
-    RealtimeAlarm = 3,
-    BoottimeAlarm = 4,
+pub enum TimerClock {
+    Realtime,
+    Monotonic,
+    Boottime,
 }
 
-/// timerfd configuration flags
+/// Timer flags
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct TimerFlags {
     pub non_blocking: bool,
@@ -22,10 +21,20 @@ pub struct TimerFlags {
 
 impl TimerFlags {
     pub fn new() -> Self {
-        TimerFlags {
+        Self {
             non_blocking: false,
             close_on_exec: false,
         }
+    }
+
+    pub fn with_non_blocking(mut self, value: bool) -> Self {
+        self.non_blocking = value;
+        self
+    }
+
+    pub fn with_close_on_exec(mut self, value: bool) -> Self {
+        self.close_on_exec = value;
+        self
     }
 }
 
@@ -35,212 +44,362 @@ impl Default for TimerFlags {
     }
 }
 
-/// timerfd setting
+/// Timer specification
+#[derive(Debug, Clone, Copy)]
+pub struct TimerSpec {
+    pub interval_sec: u64,
+    pub interval_nsec: u32,
+    pub value_sec: u64,
+    pub value_nsec: u32,
+}
+
+impl TimerSpec {
+    pub fn new() -> Self {
+        Self {
+            interval_sec: 0,
+            interval_nsec: 0,
+            value_sec: 0,
+            value_nsec: 0,
+        }
+    }
+
+    /// Check if timer is periodic
+    pub fn is_periodic(&self) -> bool {
+        self.interval_sec > 0 || self.interval_nsec > 0
+    }
+
+    /// Get interval in nanoseconds
+    pub fn interval_nanos(&self) -> u128 {
+        (self.interval_sec as u128) * 1_000_000_000 + (self.interval_nsec as u128)
+    }
+
+    /// Get initial value in nanoseconds
+    pub fn value_nanos(&self) -> u128 {
+        (self.value_sec as u128) * 1_000_000_000 + (self.value_nsec as u128)
+    }
+}
+
+impl Default for TimerSpec {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Timer expiration count
+#[derive(Debug, Clone, Copy)]
+pub struct TimerExpirations {
+    pub count: u64,
+}
+
+impl TimerExpirations {
+    pub fn new(count: u64) -> Self {
+        Self { count }
+    }
+
+    pub fn as_u64(&self) -> u64 {
+        self.count
+    }
+}
+
+/// Timer file descriptor
 #[derive(Debug, Clone)]
-pub struct TimerSetting {
-    pub interval: Duration,
-    pub initial: Duration,
-}
-
-impl TimerSetting {
-    pub fn new(interval: Duration, initial: Duration) -> Self {
-        TimerSetting { interval, initial }
-    }
-
-    pub fn single_shot(duration: Duration) -> Self {
-        TimerSetting {
-            interval: Duration::ZERO,
-            initial: duration,
-        }
-    }
-
-    pub fn periodic(interval: Duration) -> Self {
-        TimerSetting {
-            interval,
-            initial: interval,
-        }
-    }
-}
-
-/// timerfd instance
 pub struct TimerFd {
-    clock_id: ClockId,
-    flags: TimerFlags,
-    setting: TimerSetting,
-    expirations: u64,
-    armed: bool,
-    deadline: Option<Instant>,
+    pub id: u64,
+    pub clock: TimerClock,
+    pub flags: TimerFlags,
+    pub spec: TimerSpec,
+    pub expirations: u64,
+    pub armed: bool,
 }
 
 impl TimerFd {
-    pub fn new(clock_id: ClockId, flags: TimerFlags) -> Self {
-        TimerFd {
-            clock_id,
+    pub fn new(id: u64, clock: TimerClock, flags: TimerFlags) -> Self {
+        Self {
+            id,
+            clock,
             flags,
-            setting: TimerSetting::new(Duration::ZERO, Duration::ZERO),
+            spec: TimerSpec::new(),
             expirations: 0,
             armed: false,
-            deadline: None,
         }
     }
 
-    /// Set timer configuration
-    pub fn set_time(&mut self, setting: TimerSetting) {
-        self.setting = setting;
+    /// Set timer specification
+    pub fn set_time(&mut self, spec: TimerSpec) {
+        self.spec = spec;
         self.armed = true;
-        
-        // Set deadline based on initial delay
-        if self.setting.initial > Duration::ZERO {
-            self.deadline = Some(Instant::now() + self.setting.initial);
-        } else {
-            self.deadline = None;
-        }
-        
-        self.expirations = 0;
     }
 
-    /// Get timer configuration
-    pub fn get_time(&self) -> TimerSetting {
-        self.setting.clone()
+    /// Get timer specification
+    pub fn get_time(&self) -> TimerSpec {
+        self.spec
     }
 
-    /// Read expirations (returns number of expirations since last read)
-    pub fn read(&mut self) -> Result<u64, String> {
-        if !self.armed {
-            return Err("Timer is not armed".to_string());
-        }
-
-        // Check if timer has expired
-        if let Some(deadline) = self.deadline {
-            if Instant::now() >= deadline {
-                self.expirations += 1;
-                
-                // Reset deadline for periodic timers
-                if self.setting.interval > Duration::ZERO {
-                    self.deadline = Some(Instant::now() + self.setting.interval);
-                } else {
-                    // Single-shot timer, disarm
-                    self.armed = false;
-                    self.deadline = None;
-                }
-            }
-        }
-
-        let expirations = self.expirations;
-        self.expirations = 0;
-        Ok(expirations)
+    /// Disarm timer
+    pub fn disarm(&mut self) {
+        self.armed = false;
+        self.spec = TimerSpec::new();
     }
 
-    /// Check if timer is armed
+    /// Check if armed
     pub fn is_armed(&self) -> bool {
         self.armed
     }
 
-    /// Get remaining time until next expiration
-    pub fn get_remaining(&self) -> Option<Duration> {
-        self.deadline.map(|deadline| {
-            let now = Instant::now();
-            if deadline > now {
-                deadline - now
-            } else {
-                Duration::ZERO
-            }
-        })
+    /// Read expirations (resets count)
+    pub fn read_expirations(&mut self) -> TimerExpirations {
+        let expirations = self.expirations;
+        self.expirations = 0;
+        TimerExpirations::new(expirations)
     }
 
-    /// Disarm the timer
-    pub fn disarm(&mut self) {
-        self.armed = false;
-        self.deadline = None;
-        self.expirations = 0;
+    /// Simulate timer expiration
+    pub fn expire(&mut self) {
+        if self.armed {
+            self.expirations += 1;
+        }
+    }
+
+    /// Get expiration count without resetting
+    pub fn peek_expirations(&self) -> u64 {
+        self.expirations
     }
 }
 
-impl Default for TimerFd {
+/// Timerfd manager for system-wide timerfd management
+pub struct TimerFdManager {
+    timers: Arc<Mutex<HashMap<u64, TimerFd>>>,
+    next_timer_id: Arc<Mutex<u64>>,
+}
+
+impl TimerFdManager {
+    pub fn new() -> Self {
+        Self {
+            timers: Arc::new(Mutex::new(HashMap::new())),
+            next_timer_id: Arc::new(Mutex::new(1)),
+        }
+    }
+
+    /// Create a new timerfd
+    pub fn create_timer(&self, clock: TimerClock, flags: TimerFlags) -> u64 {
+        let mut next_id = self.next_timer_id.lock().unwrap();
+        let timer_id = *next_id;
+        *next_id += 1;
+        drop(next_id);
+
+        let timer = TimerFd::new(timer_id, clock, flags);
+        let mut timers = self.timers.lock().unwrap();
+        timers.insert(timer_id, timer);
+
+        timer_id
+    }
+
+    /// Get a timer by ID
+    pub fn get_timer(&self, timer_id: u64) -> Option<TimerFd> {
+        let timers = self.timers.lock().unwrap();
+        timers.get(&timer_id).cloned()
+    }
+
+    /// Remove a timer
+    pub fn remove_timer(&self, timer_id: u64) -> Result<(), String> {
+        let mut timers = self.timers.lock().unwrap();
+        match timers.remove(&timer_id) {
+            Some(_) => Ok(()),
+            None => Err(format!("Timer {} not found", timer_id)),
+        }
+    }
+
+    /// Set timer time
+    pub fn set_time(&self, timer_id: u64, spec: TimerSpec) -> Result<(), String> {
+        let mut timers = self.timers.lock().unwrap();
+        match timers.get_mut(&timer_id) {
+            Some(timer) => {
+                timer.set_time(spec);
+                Ok(())
+            }
+            None => Err(format!("Timer {} not found", timer_id)),
+        }
+    }
+
+    /// Get timer time
+    pub fn get_time(&self, timer_id: u64) -> Result<TimerSpec, String> {
+        let timers = self.timers.lock().unwrap();
+        match timers.get(&timer_id) {
+            Some(timer) => Ok(timer.get_time()),
+            None => Err(format!("Timer {} not found", timer_id)),
+        }
+    }
+
+    /// Disarm timer
+    pub fn disarm(&self, timer_id: u64) -> Result<(), String> {
+        let mut timers = self.timers.lock().unwrap();
+        match timers.get_mut(&timer_id) {
+            Some(timer) => {
+                timer.disarm();
+                Ok(())
+            }
+            None => Err(format!("Timer {} not found", timer_id)),
+        }
+    }
+
+    /// Read expirations
+    pub fn read(&self, timer_id: u64) -> Result<TimerExpirations, String> {
+        let mut timers = self.timers.lock().unwrap();
+        match timers.get_mut(&timer_id) {
+            Some(timer) => Ok(timer.read_expirations()),
+            None => Err(format!("Timer {} not found", timer_id)),
+        }
+    }
+
+    /// Simulate timer expiration (for testing)
+    pub fn expire(&self, timer_id: u64) -> Result<(), String> {
+        let mut timers = self.timers.lock().unwrap();
+        match timers.get_mut(&timer_id) {
+            Some(timer) => {
+                timer.expire();
+                Ok(())
+            }
+            None => Err(format!("Timer {} not found", timer_id)),
+        }
+    }
+
+    /// Get timer count
+    pub fn timer_count(&self) -> usize {
+        let timers = self.timers.lock().unwrap();
+        timers.len()
+    }
+}
+
+impl Default for TimerFdManager {
     fn default() -> Self {
-        Self::new(ClockId::Monotonic, TimerFlags::new())
+        Self::new()
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::thread;
 
     #[test]
-    fn test_timer_fd_creation() {
-        let timer = TimerFd::new(ClockId::Monotonic, TimerFlags::new());
-        assert_eq!(timer.clock_id, ClockId::Monotonic);
+    fn test_timer_spec() {
+        let spec = TimerSpec::new();
+        assert!(!spec.is_periodic());
+        assert_eq!(spec.interval_nanos(), 0);
+    }
+
+    #[test]
+    fn test_timer_spec_periodic() {
+        let mut spec = TimerSpec::new();
+        spec.interval_sec = 1;
+        assert!(spec.is_periodic());
+        assert_eq!(spec.interval_nanos(), 1_000_000_000);
+    }
+
+    #[test]
+    fn test_timer_flags() {
+        let flags = TimerFlags::new()
+            .with_non_blocking(true)
+            .with_close_on_exec(true);
+
+        assert!(flags.non_blocking);
+        assert!(flags.close_on_exec);
+    }
+
+    #[test]
+    fn test_timer_fd() {
+        let timer = TimerFd::new(1, TimerClock::Monotonic, TimerFlags::new());
+        assert_eq!(timer.id, 1);
         assert!(!timer.is_armed());
-    }
-
-    #[test]
-    fn test_timer_setting_single_shot() {
-        let setting = TimerSetting::single_shot(Duration::from_millis(100));
-        assert_eq!(setting.interval, Duration::ZERO);
-        assert_eq!(setting.initial, Duration::from_millis(100));
-    }
-
-    #[test]
-    fn test_timer_setting_periodic() {
-        let setting = TimerSetting::periodic(Duration::from_millis(50));
-        assert_eq!(setting.interval, Duration::from_millis(50));
-        assert_eq!(setting.initial, Duration::from_millis(50));
+        assert_eq!(timer.peek_expirations(), 0);
     }
 
     #[test]
     fn test_timer_fd_set_time() {
-        let mut timer = TimerFd::new(ClockId::Monotonic, TimerFlags::new());
-        let setting = TimerSetting::single_shot(Duration::from_millis(100));
-        
-        timer.set_time(setting);
+        let mut timer = TimerFd::new(1, TimerClock::Monotonic, TimerFlags::new());
+        let spec = TimerSpec::new();
+        timer.set_time(spec);
         assert!(timer.is_armed());
-        assert!(timer.get_remaining().is_some());
     }
 
     #[test]
     fn test_timer_fd_disarm() {
-        let mut timer = TimerFd::new(ClockId::Monotonic, TimerFlags::new());
-        let setting = TimerSetting::single_shot(Duration::from_millis(100));
-        
-        timer.set_time(setting);
+        let mut timer = TimerFd::new(1, TimerClock::Monotonic, TimerFlags::new());
+        let spec = TimerSpec::new();
+        timer.set_time(spec);
         timer.disarm();
-        
         assert!(!timer.is_armed());
-        assert!(timer.get_remaining().is_none());
     }
 
     #[test]
-    fn test_timer_fd_read_not_armed() {
-        let mut timer = TimerFd::new(ClockId::Monotonic, TimerFlags::new());
-        let result = timer.read();
-        
-        assert!(result.is_err());
+    fn test_timer_fd_expirations() {
+        let mut timer = TimerFd::new(1, TimerClock::Monotonic, TimerFlags::new());
+        timer.expire();
+        timer.expire();
+
+        assert_eq!(timer.peek_expirations(), 2);
+
+        let expirations = timer.read_expirations();
+        assert_eq!(expirations.as_u64(), 2);
+        assert_eq!(timer.peek_expirations(), 0);
     }
 
     #[test]
-    fn test_timer_fd_expiration() {
-        let mut timer = TimerFd::new(ClockId::Monotonic, TimerFlags::new());
-        let setting = TimerSetting::single_shot(Duration::from_millis(10));
-        
-        timer.set_time(setting);
-        
-        // Wait for expiration
-        thread::sleep(Duration::from_millis(20));
-        
-        let expirations = timer.read().unwrap();
-        assert!(expirations >= 1);
+    fn test_timer_fd_manager() {
+        let manager = TimerFdManager::new();
+
+        let timer_id = manager.create_timer(TimerClock::Monotonic, TimerFlags::new());
+        assert_eq!(timer_id, 1);
+
+        let spec = TimerSpec::new();
+        manager.set_time(timer_id, spec).unwrap();
+
+        let retrieved = manager.get_timer(timer_id).unwrap();
+        assert!(retrieved.is_armed());
     }
 
     #[test]
-    fn test_timer_fd_get_remaining() {
-        let mut timer = TimerFd::new(ClockId::Monotonic, TimerFlags::new());
-        let setting = TimerSetting::single_shot(Duration::from_millis(100));
-        
-        timer.set_time(setting);
-        
-        let remaining = timer.get_remaining();
-        assert!(remaining.is_some());
-        assert!(remaining.unwrap() > Duration::ZERO);
+    fn test_timer_fd_manager_expire() {
+        let manager = TimerFdManager::new();
+
+        let timer_id = manager.create_timer(TimerClock::Monotonic, TimerFlags::new());
+        let spec = TimerSpec::new();
+        manager.set_time(timer_id, spec).unwrap();
+
+        manager.expire(timer_id).unwrap();
+        manager.expire(timer_id).unwrap();
+
+        let expirations = manager.read(timer_id).unwrap();
+        assert_eq!(expirations.as_u64(), 2);
+    }
+
+    #[test]
+    fn test_timer_fd_manager_disarm() {
+        let manager = TimerFdManager::new();
+
+        let timer_id = manager.create_timer(TimerClock::Monotonic, TimerFlags::new());
+        let spec = TimerSpec::new();
+        manager.set_time(timer_id, spec).unwrap();
+
+        manager.disarm(timer_id).unwrap();
+
+        let timer = manager.get_timer(timer_id).unwrap();
+        assert!(!timer.is_armed());
+    }
+
+    #[test]
+    fn test_timer_fd_manager_remove() {
+        let manager = TimerFdManager::new();
+
+        let timer_id = manager.create_timer(TimerClock::Monotonic, TimerFlags::new());
+        manager.remove_timer(timer_id).unwrap();
+
+        assert_eq!(manager.timer_count(), 0);
+    }
+
+    #[test]
+    fn test_timer_fd_manager_invalid() {
+        let manager = TimerFdManager::new();
+        assert!(manager.set_time(999, TimerSpec::new()).is_err());
+        assert!(manager.read(999).is_err());
     }
 }
