@@ -393,6 +393,95 @@ impl Default for HardwareTelemetryMonitor {
     }
 }
 
+// ============================================================================
+// 20. Omarchy & SigmaOS Issue Reporter, Debug Diagnostics & PR Workflow Engine
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IssueCategory {
+    VerifiedBug,
+    FeatureSuggestion,
+    SupportQuestion,
+}
+
+#[derive(Debug, Clone)]
+pub struct OmarchyDebugLogPayload {
+    pub version: String,
+    pub cpu_gpu_info: String,
+    pub log_path_tmp: String,
+    pub log_path_xdg_state: String,
+    pub screenrecord_debug_log_path: String,
+    pub upload_url_24h: Option<String>,
+}
+
+/// Sovereign Omarchy & SigmaOS Issue Reporting, Debug Diagnostics (`omarchy debug`) & PR Engine
+pub struct SovereignIssueReporterDebugEngine {
+    pub os_version: String,
+    pub debug_payload: OmarchyDebugLogPayload,
+}
+
+impl SovereignIssueReporterDebugEngine {
+    pub fn new() -> Self {
+        let version = String::from("1.2.0-omarchy-sovereign");
+        let debug_payload = OmarchyDebugLogPayload {
+            version: version.clone(),
+            cpu_gpu_info: String::from("x86_64 AMD Ryzen / NVIDIA RTX 4090"),
+            log_path_tmp: String::from("/tmp/omarchy-debug.log"),
+            log_path_xdg_state: String::from("/home/user/.local/state/omarchy/omarchy-debug.log"),
+            screenrecord_debug_log_path: String::from("/home/user/.local/state/omarchy/omarchy-screenrecord.log"),
+            upload_url_24h: Some(String::from("https://logs.omarchy.org/debug-2026.log")),
+        };
+        Self {
+            os_version: version,
+            debug_payload,
+        }
+    }
+
+    /// `omarchy debug --no-sudo --print`: Generates diagnostic log payload
+    pub fn generate_debug_diagnostics(&self) -> String {
+        format!(
+            "--- OMARCHY DEBUG DIAGNOSTICS ---\nVersion: {}\nCPU/GPU: {}\nTmp Log: {}\nScreenrecord Debug: {}\nUpload Shareable URL: {}\n",
+            self.debug_payload.version,
+            self.debug_payload.cpu_gpu_info,
+            self.debug_payload.log_path_tmp,
+            self.debug_payload.screenrecord_debug_log_path,
+            self.debug_payload.upload_url_24h.as_deref().unwrap_or("N/A")
+        )
+    }
+
+    /// Categorizes user inquiry according to Omarchy submission guidelines
+    pub fn route_issue_category(&self, category: IssueCategory) -> &'static str {
+        match category {
+            IssueCategory::VerifiedBug => "GitHub Issues (https://github.com/omacom/omarchy/issues)",
+            IssueCategory::FeatureSuggestion => "GitHub Discussions (https://github.com/omacom/omarchy/discussions/categories/suggestions)",
+            IssueCategory::SupportQuestion => "Discord Community (https://omarchy.org/discord)",
+        }
+    }
+
+    /// Formulates `gh issue create` command string for GitHub issue tracking
+    pub fn build_gh_issue_cmd(&self, title: &str, steps_to_reproduce: &str, capture_file_path: &str) -> String {
+        format!(
+            "gh issue create --repo omacom/omarchy --title \"{}\" --body \"Version: {}\n\nSteps:\n{}\n\nDebug URL: {}\nAttached File: {}\"",
+            title,
+            self.os_version,
+            steps_to_reproduce,
+            self.debug_payload.upload_url_24h.as_deref().unwrap_or("N/A"),
+            capture_file_path
+        )
+    }
+
+    /// Formulates `gh pr create` command string for upstream pull requests
+    pub fn build_gh_pr_cmd(&self, title: &str, body: &str) -> String {
+        format!("gh pr create --title \"{}\" --body \"{}\"", title, body)
+    }
+}
+
+impl Default for SovereignIssueReporterDebugEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[derive(Debug, Clone, Default)]
 pub struct PhoronixBenchEngine {
     pub benchmarks: BTreeMap<String, PhoronixBenchmarkSuiteNode>,
@@ -1565,6 +1654,30 @@ mod tests {
         assert!(bridge.verify_cross_os_security());
         bridge.push_clipboard_item("New Clipboard Data");
         assert_eq!(bridge.encrypted_clipboard_ring.last().unwrap(), "New Clipboard Data");
+    }
+
+    #[test]
+    fn test_sovereign_issue_reporter_debug_engine() {
+        let engine = SovereignIssueReporterDebugEngine::new();
+        let diag = engine.generate_debug_diagnostics();
+        assert!(diag.contains("1.2.0-omarchy-sovereign"));
+        assert!(diag.contains("/tmp/omarchy-debug.log"));
+
+        let bug_route = engine.route_issue_category(IssueCategory::VerifiedBug);
+        assert!(bug_route.contains("github.com/omacom/omarchy/issues"));
+
+        let suggest_route = engine.route_issue_category(IssueCategory::FeatureSuggestion);
+        assert!(suggest_route.contains("discussions/categories/suggestions"));
+
+        let support_route = engine.route_issue_category(IssueCategory::SupportQuestion);
+        assert!(support_route.contains("omarchy.org/discord"));
+
+        let gh_issue = engine.build_gh_issue_cmd("UI glitch", "1. Open menu 2. Click button", "/tmp/capture.png");
+        assert!(gh_issue.contains("gh issue create"));
+        assert!(gh_issue.contains("UI glitch"));
+
+        let gh_pr = engine.build_gh_pr_cmd("fix: notification position", "Fixed top-right offset");
+        assert!(gh_pr.contains("gh pr create"));
     }
 
     #[test]
