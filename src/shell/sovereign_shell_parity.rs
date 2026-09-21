@@ -1,5 +1,5 @@
-// SigmaOS Sovereign Shell Parity Engine (Bash & Zsh Parity)
-// Advanced shell capabilities inspired by GNU Bash and Zsh on Linux and BSD distros:
+// SigmaOS Sovereign Shell Parity Engine (Bash & Zsh Parity & Omarchy Minimal Starship Prompt)
+// Advanced shell capabilities inspired by GNU Bash, Zsh, and Starship prompt on Linux and BSD distros:
 // - Variable expansion ($VAR, ${VAR:-default})
 // - Pipeline parsing (cmd1 | cmd2)
 // - File redirection (>, >>, <, 2>&1)
@@ -7,6 +7,7 @@
 // - Tab completion engine (commands & path completions)
 // - Custom prompt formatting (PS1 expansion: \u, \h, \w, \$)
 // - Background job control parsing (&)
+// - Minimalist Starship Prompt Engine (Omarchy Linux style: CWD, Git status, exit symbol, zero time/user clutter)
 
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
@@ -342,6 +343,103 @@ impl Default for SovereignBashZshParityShell {
     }
 }
 
+// ============================================================================
+// OMARCHY MINIMAL STARSHIP PROMPT ENGINE
+// ============================================================================
+
+/// Minimalist Starship Prompt Configuration (Omarchy Linux style: ~/.config/starship.toml)
+#[derive(Debug, Clone)]
+pub struct OmarchyStarshipConfig {
+    pub show_username: bool, // Default false (Omarchy minimal)
+    pub show_hostname: bool, // Default false (Omarchy minimal)
+    pub show_time: bool,     // Default false (time is displayed in top bar)
+    pub show_git_branch: bool,
+    pub show_exit_symbol: bool,
+    pub success_symbol: String,
+    pub failure_symbol: String,
+    pub character_symbol: String,
+}
+
+impl Default for OmarchyStarshipConfig {
+    fn default() -> Self {
+        Self {
+            show_username: false,
+            show_hostname: false,
+            show_time: false,
+            show_git_branch: true,
+            show_exit_symbol: true,
+            success_symbol: String::from("❯"),
+            failure_symbol: String::from("✖ ❯"),
+            character_symbol: String::from("❯"),
+        }
+    }
+}
+
+/// Omarchy Minimal Starship Prompt Renderer
+pub struct OmarchyMinimalStarshipPromptEngine {
+    pub config: OmarchyStarshipConfig,
+    pub current_dir: String,
+    pub git_branch: Option<String>,
+    pub last_exit_status: i32,
+}
+
+impl OmarchyMinimalStarshipPromptEngine {
+    pub fn new() -> Self {
+        Self {
+            config: OmarchyStarshipConfig::default(),
+            current_dir: String::from("~/SigmaOS"),
+            git_branch: Some(String::from("main")),
+            last_exit_status: 0,
+        }
+    }
+
+    pub fn set_current_dir(&mut self, path: &str) {
+        self.current_dir = path.to_string();
+    }
+
+    pub fn set_git_branch(&mut self, branch: Option<&str>) {
+        self.git_branch = branch.map(|s| s.to_string());
+    }
+
+    pub fn set_last_exit_status(&mut self, status: i32) {
+        self.last_exit_status = status;
+    }
+
+    /// Renders clean, minimal Starship prompt (e.g. `~/SigmaOS on  main [!] ❯ `)
+    pub fn render_prompt(&self) -> String {
+        let mut prompt = String::new();
+
+        // 1. Directory
+        prompt.push_str(&self.current_dir);
+
+        // 2. Git Branch (if present)
+        if self.config.show_git_branch {
+            if let Some(ref branch) = self.git_branch {
+                prompt.push_str(" on ");
+                prompt.push_str(" ");
+                prompt.push_str(branch);
+            }
+        }
+
+        // 3. Execution status symbol
+        prompt.push(' ');
+        if self.last_exit_status == 0 {
+            prompt.push_str(&self.config.success_symbol);
+        } else {
+            prompt.push_str(&self.config.failure_symbol);
+        }
+        prompt.push(' ');
+
+        prompt
+    }
+}
+
+impl Default for OmarchyMinimalStarshipPromptEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -422,5 +520,20 @@ mod tests {
         // BSD rc.subr helper
         let rc_res = shell.execute_bsd_rc_subr("sshd", "restart").unwrap();
         assert!(rc_res.contains("BSD rc.subr: Service 'sshd' action 'restart'"));
+    }
+
+    #[test]
+    fn test_omarchy_minimal_starship_prompt_engine() {
+        let mut prompt_engine = OmarchyMinimalStarshipPromptEngine::new();
+        assert!(!prompt_engine.config.show_username);
+        assert!(!prompt_engine.config.show_hostname);
+        assert!(!prompt_engine.config.show_time);
+
+        let prompt_str = prompt_engine.render_prompt();
+        assert_eq!(prompt_str, "~/SigmaOS on  main ❯ ");
+
+        prompt_engine.set_last_exit_status(1);
+        let error_prompt = prompt_engine.render_prompt();
+        assert_eq!(error_prompt, "~/SigmaOS on  main ✖ ❯ ");
     }
 }

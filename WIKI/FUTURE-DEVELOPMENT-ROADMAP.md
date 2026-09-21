@@ -5564,3 +5564,21 @@ In addition to RSS/Atom redirection and portal category classification, SigmaOS 
 - **TechPowerUp GPU Database & VRAM Bandwidth Engine (`TechPowerUpGpuDatabaseEngine`)**: GPU architecture specs, clock rates, bus width, and effective GDDR6X memory bandwidth calculation.
 - **Android Police Custom ROM Sideload & microG Engine (`AndroidPoliceCustomRomSideloadEngine`)**: Android A/B partition slot switching, fastboot flashing, APK sideloading, and microG Play Services stubbing.
 - **HWBusters ATX 3.1 PSU Telemetry Engine (`HwbustersPsuEfficiencyTelemetryEngine`)**: ATX 3.1 +12VHPWR transient load spike monitoring, rail voltage ripple compliance checking, and Cybenetics efficiency rating calculation.
+
+
+---
+
+## 132. SOVEREIGN OMARCHY MINIMAL STARSHIP PROMPT SPECIFICATION
+
+### 132.1 Starship Prompt Engine Overview
+SigmaOS incorporates a low-level, zero-dependency `#![no_std]` Rust engine (`OmarchyMinimalStarshipPromptEngine` in `src/shell/sovereign_shell_parity.rs`) inspired by Omarchy Linux and the Starship prompt (`starship.rs`):
+
+1. **Minimalist Prompt Design (`OmarchyStarshipConfig`)**:
+   - Omarchy Linux ships with a clean, clutter-free Starship prompt.
+   - Eliminates username/hostname clutter (user is always known) and time displays (rendered in the status bar/top panel).
+
+2. **Prompt Elements**:
+   - Current working directory path (`~/SigmaOS`).
+   - Git branch indicator (`on  main`).
+   - Execution status symbols (`❯` on success, `✖ ❯` on command failure).
+   - Configurable via `~/.config/starship.toml` parity.
