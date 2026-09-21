@@ -625,6 +625,214 @@ impl OmarchyLiveIsoBootstrapEngine {
 }
 
 
+/// Shell Plugin Kind (Kinds of Omarchy Quickshell Plugins)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OmarchyShellPluginKind {
+    BarWidget,
+    Panel,
+    Overlay,
+    Menu,
+    Service,
+    Bar,
+}
+
+/// Omarchy Plugin Manifest (`manifest.json` schema v1)
+#[derive(Debug, Clone)]
+pub struct OmarchyPluginManifest {
+    pub schema_version: u32,
+    pub plugin_id: String,
+    pub name: String,
+    pub version: String,
+    pub kinds: Vec<OmarchyShellPluginKind>,
+    pub entry_point_qml: String,
+}
+
+/// Discovered Omarchy Shell Plugin instance
+#[derive(Debug, Clone)]
+pub struct OmarchyShellPlugin {
+    pub manifest: OmarchyPluginManifest,
+    pub is_first_party: bool,
+    pub is_enabled: bool,
+    pub install_path: String,
+}
+
+/// Omarchy Quickshell Plugin Manager Engine (`omarchy plugin` CLI & Lifecycle Manager)
+#[derive(Debug, Clone)]
+pub struct OmarchyShellPluginManagerEngine {
+    pub plugins: BTreeMap<String, OmarchyShellPlugin>,
+    pub disabled_first_party_ids: Vec<String>,
+}
+
+impl OmarchyShellPluginManagerEngine {
+    pub fn new() -> Self {
+        let mut manager = Self {
+            plugins: BTreeMap::new(),
+            disabled_first_party_ids: Vec::new(),
+        };
+
+        // Register default first-party Omarchy Quickshell plugins
+        manager.register_built_in(
+            "omarchy.clock",
+            "System Clock",
+            "1.0.0",
+            vec![OmarchyShellPluginKind::BarWidget],
+            "Clock.qml",
+        );
+        manager.register_built_in(
+            "omarchy.network",
+            "Network Status",
+            "1.0.0",
+            vec![OmarchyShellPluginKind::BarWidget, OmarchyShellPluginKind::Service],
+            "Network.qml",
+        );
+        manager.register_built_in(
+            "omarchy.notifications",
+            "Notification Center",
+            "1.0.0",
+            vec![OmarchyShellPluginKind::Panel, OmarchyShellPluginKind::Service],
+            "Notifications.qml",
+        );
+        manager.register_built_in(
+            "omarchy.bar",
+            "Default Top Bar",
+            "1.0.0",
+            vec![OmarchyShellPluginKind::Bar],
+            "Bar.qml",
+        );
+
+        manager
+    }
+
+    pub fn register_built_in(
+        &mut self,
+        id: &str,
+        name: &str,
+        version: &str,
+        kinds: Vec<OmarchyShellPluginKind>,
+        entry: &str,
+    ) {
+        let plugin = OmarchyShellPlugin {
+            manifest: OmarchyPluginManifest {
+                schema_version: 1,
+                plugin_id: id.to_string(),
+                name: name.to_string(),
+                version: version.to_string(),
+                kinds,
+                entry_point_qml: entry.to_string(),
+            },
+            is_first_party: true,
+            is_enabled: true,
+            install_path: format!("$OMARCHY_PATH/shell/plugins/{}", id),
+        };
+        self.plugins.insert(id.to_string(), plugin);
+    }
+
+    pub fn validate_plugin_manifest(&self, manifest: &OmarchyPluginManifest) -> Result<(), &'static str> {
+        if manifest.schema_version != 1 {
+            return Err("Invalid schema version (expected 1)");
+        }
+        if manifest.plugin_id.is_empty() || manifest.name.is_empty() {
+            return Err("Plugin ID or Name cannot be empty");
+        }
+        if manifest.plugin_id.starts_with("omarchy.") {
+            return Err("Reserved namespace 'omarchy.*' is only allowed for built-in plugins");
+        }
+        if manifest.entry_point_qml.is_empty() || manifest.entry_point_qml.contains("..") {
+            return Err("Entry point QML path must be a valid relative path without traversal");
+        }
+        if manifest.kinds.is_empty() {
+            return Err("Plugin must claim at least one kind");
+        }
+        Ok(())
+    }
+
+    pub fn add_plugin_from_git(&mut self, url: &str, manifest: OmarchyPluginManifest, enable_now: bool) -> Result<String, &'static str> {
+        self.validate_plugin_manifest(&manifest)?;
+        let id = manifest.plugin_id.clone();
+        if self.plugins.contains_key(&id) {
+            return Err("Plugin ID is already claimed");
+        }
+
+        let plugin = OmarchyShellPlugin {
+            manifest,
+            is_first_party: false,
+            is_enabled: enable_now,
+            install_path: format!("~/.config/omarchy/plugins/{}", id),
+        };
+
+        self.plugins.insert(id.clone(), plugin);
+        Ok(format!("Successfully cloned '{}' from {}", id, url))
+    }
+
+    pub fn clone_built_in(&mut self, built_in_id: &str, user_prefix: &str) -> Result<String, &'static str> {
+        if let Some(original) = self.plugins.get(built_in_id).cloned() {
+            if !original.is_first_party {
+                return Err("Can only clone built-in plugins");
+            }
+
+            let clone_id = format!("{}.{}", user_prefix, built_in_id.trim_start_matches("omarchy."));
+            let mut clone_manifest = original.manifest.clone();
+            clone_manifest.plugin_id = clone_id.clone();
+            clone_manifest.name = format!("My {}", original.manifest.name);
+
+            let cloned_plugin = OmarchyShellPlugin {
+                manifest: clone_manifest,
+                is_first_party: false,
+                is_enabled: true,
+                install_path: format!("~/.config/omarchy/plugins/{}", clone_id),
+            };
+
+            self.plugins.insert(clone_id.clone(), cloned_plugin);
+            Ok(format!("Cloned {} -> {}", built_in_id, clone_id))
+        } else {
+            Err("Built-in plugin ID not found")
+        }
+    }
+
+    pub fn enable_plugin(&mut self, plugin_id: &str) -> Result<bool, &'static str> {
+        if let Some(plugin) = self.plugins.get_mut(plugin_id) {
+            plugin.is_enabled = true;
+            if plugin.is_first_party {
+                self.disabled_first_party_ids.retain(|id| id != plugin_id);
+            }
+            Ok(true)
+        } else {
+            Err("Plugin not found")
+        }
+    }
+
+    pub fn disable_plugin(&mut self, plugin_id: &str) -> Result<bool, &'static str> {
+        if let Some(plugin) = self.plugins.get_mut(plugin_id) {
+            plugin.is_enabled = false;
+            if plugin.is_first_party && !self.disabled_first_party_ids.contains(&plugin_id.to_string()) {
+                self.disabled_first_party_ids.push(plugin_id.to_string());
+            }
+            Ok(true)
+        } else {
+            Err("Plugin not found")
+        }
+    }
+
+    pub fn remove_plugin(&mut self, plugin_id: &str) -> Result<String, &'static str> {
+        if let Some(plugin) = self.plugins.get(plugin_id) {
+            if plugin.is_first_party {
+                return Err("Cannot remove first-party plugin; use disable instead");
+            }
+            let name = plugin.manifest.name.clone();
+            self.plugins.remove(plugin_id);
+            Ok(format!("Removed plugin '{}' ({})", name, plugin_id))
+        } else {
+            Err("Plugin not found")
+        }
+    }
+}
+
+impl Default for OmarchyShellPluginManagerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod omarchy_tests {
     use super::*;
@@ -773,5 +981,37 @@ mod omarchy_tests {
         let mut boot = OmarchyLiveIsoBootstrapEngine::new("/dev/nvme0n1");
         let res = boot.run_60s_bootstrap_installer().unwrap();
         assert!(res.contains("Omarchy live bootstrap installed"));
+    }
+
+    #[test]
+    fn test_omarchy_shell_plugin_manager_engine() {
+        let mut mgr = OmarchyShellPluginManagerEngine::new();
+        assert_eq!(mgr.plugins.len(), 4);
+
+        // Disabling first-party plugin
+        assert!(mgr.disable_plugin("omarchy.network").unwrap());
+        assert!(mgr.disabled_first_party_ids.contains(&"omarchy.network".to_string()));
+
+        // Cloning built-in plugin
+        let clone_res = mgr.clone_built_in("omarchy.clock", "dhh").unwrap();
+        assert!(clone_res.contains("Cloned omarchy.clock -> dhh.clock"));
+        assert!(mgr.plugins.contains_key("dhh.clock"));
+
+        // Third-party plugin git add & manifest validation
+        let manifest = OmarchyPluginManifest {
+            schema_version: 1,
+            plugin_id: "acme.weather".to_string(),
+            name: "Acme Weather Widget".to_string(),
+            version: "1.2.0".to_string(),
+            kinds: vec![OmarchyShellPluginKind::BarWidget],
+            entry_point_qml: "Weather.qml".to_string(),
+        };
+
+        assert!(mgr.add_plugin_from_git("https://github.com/acme/omarchy-weather.git", manifest, true).is_ok());
+        assert!(mgr.plugins.contains_key("acme.weather"));
+
+        // Removal of third-party plugin vs error on removing built-in
+        assert!(mgr.remove_plugin("acme.weather").is_ok());
+        assert!(mgr.remove_plugin("omarchy.clock").is_err());
     }
 }
