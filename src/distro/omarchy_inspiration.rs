@@ -653,6 +653,7 @@ pub struct OmarchyShellPlugin {
     pub manifest: OmarchyPluginManifest,
     pub is_first_party: bool,
     pub is_enabled: bool,
+    pub is_keep_loaded: bool,
     pub install_path: String,
 }
 
@@ -670,35 +671,30 @@ impl OmarchyShellPluginManagerEngine {
             disabled_first_party_ids: Vec::new(),
         };
 
-        // Register default first-party Omarchy Quickshell plugins
-        manager.register_built_in(
-            "omarchy.clock",
-            "System Clock",
-            "1.0.0",
-            vec![OmarchyShellPluginKind::BarWidget],
-            "Clock.qml",
-        );
-        manager.register_built_in(
-            "omarchy.network",
-            "Network Status",
-            "1.0.0",
-            vec![OmarchyShellPluginKind::BarWidget, OmarchyShellPluginKind::Service],
-            "Network.qml",
-        );
-        manager.register_built_in(
-            "omarchy.notifications",
-            "Notification Center",
-            "1.0.0",
-            vec![OmarchyShellPluginKind::Panel, OmarchyShellPluginKind::Service],
-            "Notifications.qml",
-        );
-        manager.register_built_in(
-            "omarchy.bar",
-            "Default Top Bar",
-            "1.0.0",
-            vec![OmarchyShellPluginKind::Bar],
-            "Bar.qml",
-        );
+        // All 23 first-party Omarchy Quickshell plugins
+        manager.register_built_in("omarchy.bar", "Bar", "1.0.0", vec![OmarchyShellPluginKind::Bar], "bar/Bar.qml", false);
+        manager.register_built_in("omarchy.image-picker", "Image picker", "1.0.0", vec![OmarchyShellPluginKind::Overlay], "image-picker/ImagePicker.qml", true);
+        manager.register_built_in("omarchy.emojis", "Emojis", "1.0.0", vec![OmarchyShellPluginKind::Overlay], "emojis/Emojis.qml", false);
+        manager.register_built_in("omarchy.clipboard", "Clipboard mgr", "1.0.0", vec![OmarchyShellPluginKind::Overlay], "clipboard/Clipboard.qml", false);
+        manager.register_built_in("omarchy.reminders", "Reminders", "1.0.0", vec![OmarchyShellPluginKind::Overlay], "reminders/ReminderFlow.qml", false);
+        manager.register_built_in("omarchy.menu", "Omarchy menu", "1.0.0", vec![OmarchyShellPluginKind::Menu, OmarchyShellPluginKind::BarWidget], "menu/Menu.qml", false);
+        manager.register_built_in("omarchy.notifications", "Notifications", "1.0.0", vec![OmarchyShellPluginKind::Service], "notifications/Service.qml", false);
+        manager.register_built_in("omarchy.audio", "Audio", "1.0.0", vec![OmarchyShellPluginKind::BarWidget], "panels/audio/Panel.qml", false);
+        manager.register_built_in("omarchy.bluetooth", "Bluetooth", "1.0.0", vec![OmarchyShellPluginKind::BarWidget], "panels/bluetooth/Panel.qml", false);
+        manager.register_built_in("omarchy.clock", "Clock", "1.0.0", vec![OmarchyShellPluginKind::BarWidget], "panels/clock/BarWidget.qml", false);
+        manager.register_built_in("omarchy.monitor", "Monitor", "1.0.0", vec![OmarchyShellPluginKind::BarWidget], "panels/monitor/Panel.qml", false);
+        manager.register_built_in("omarchy.network", "Network", "1.0.0", vec![OmarchyShellPluginKind::BarWidget], "panels/network/Panel.qml", false);
+        manager.register_built_in("omarchy.power", "Power", "1.0.0", vec![OmarchyShellPluginKind::BarWidget], "panels/power/Panel.qml", false);
+        manager.register_built_in("omarchy.tailscale", "Tailscale", "1.0.0", vec![OmarchyShellPluginKind::BarWidget], "panels/tailscale/Panel.qml", false);
+        manager.register_built_in("omarchy.agents", "Agents", "1.0.0", vec![OmarchyShellPluginKind::BarWidget], "agents/Panel.qml", false);
+        manager.register_built_in("omarchy.weather", "Weather", "1.0.0", vec![OmarchyShellPluginKind::BarWidget], "panels/weather/BarWidget.qml", false);
+        manager.register_built_in("omarchy.media", "Media", "1.0.0", vec![OmarchyShellPluginKind::Service, OmarchyShellPluginKind::BarWidget], "services/media/Service.qml", false);
+        manager.register_built_in("omarchy.battery", "Battery", "1.0.0", vec![OmarchyShellPluginKind::Service], "services/battery/Service.qml", false);
+        manager.register_built_in("omarchy.idle", "Idle", "1.0.0", vec![OmarchyShellPluginKind::Service], "services/idle/Service.qml", false);
+        manager.register_built_in("omarchy.nightlight", "Night light", "1.0.0", vec![OmarchyShellPluginKind::Service], "services/nightlight/Service.qml", false);
+        manager.register_built_in("omarchy.lock", "Lock screen", "1.0.0", vec![OmarchyShellPluginKind::Service], "lock/Service.qml", true);
+        manager.register_built_in("omarchy.osd", "OSD", "1.0.0", vec![OmarchyShellPluginKind::Panel], "osd/Osd.qml", true);
+        manager.register_built_in("omarchy.polkit", "Polkit agent", "1.0.0", vec![OmarchyShellPluginKind::Service], "polkit/PolkitAgent.qml", false);
 
         manager
     }
@@ -710,6 +706,7 @@ impl OmarchyShellPluginManagerEngine {
         version: &str,
         kinds: Vec<OmarchyShellPluginKind>,
         entry: &str,
+        keep_loaded: bool,
     ) {
         let plugin = OmarchyShellPlugin {
             manifest: OmarchyPluginManifest {
@@ -722,9 +719,21 @@ impl OmarchyShellPluginManagerEngine {
             },
             is_first_party: true,
             is_enabled: true,
+            is_keep_loaded: keep_loaded,
             install_path: format!("$OMARCHY_PATH/shell/plugins/{}", id),
         };
         self.plugins.insert(id.to_string(), plugin);
+    }
+
+    pub fn summon_plugin(&self, plugin_id: &str, payload_json: &str) -> Result<String, &'static str> {
+        if let Some(plugin) = self.plugins.get(plugin_id) {
+            if !plugin.is_enabled {
+                return Err("Plugin is disabled");
+            }
+            Ok(format!("Summoned '{}' ({}) with payload bytes: {}", plugin.manifest.name, plugin_id, payload_json.len()))
+        } else {
+            Err("Plugin ID not found")
+        }
     }
 
     pub fn validate_plugin_manifest(&self, manifest: &OmarchyPluginManifest) -> Result<(), &'static str> {
@@ -757,6 +766,7 @@ impl OmarchyShellPluginManagerEngine {
             manifest,
             is_first_party: false,
             is_enabled: enable_now,
+            is_keep_loaded: false,
             install_path: format!("~/.config/omarchy/plugins/{}", id),
         };
 
@@ -779,6 +789,7 @@ impl OmarchyShellPluginManagerEngine {
                 manifest: clone_manifest,
                 is_first_party: false,
                 is_enabled: true,
+                is_keep_loaded: original.is_keep_loaded,
                 install_path: format!("~/.config/omarchy/plugins/{}", clone_id),
             };
 
@@ -986,11 +997,18 @@ mod omarchy_tests {
     #[test]
     fn test_omarchy_shell_plugin_manager_engine() {
         let mut mgr = OmarchyShellPluginManagerEngine::new();
-        assert_eq!(mgr.plugins.len(), 4);
+        assert_eq!(mgr.plugins.len(), 23);
 
         // Disabling first-party plugin
         assert!(mgr.disable_plugin("omarchy.network").unwrap());
         assert!(mgr.disabled_first_party_ids.contains(&"omarchy.network".to_string()));
+
+        // Summoning plugin
+        let summon_res = mgr.summon_plugin("omarchy.image-picker", "{\"imageDirs\":[\"/home/sovereign/Pictures\"]}").unwrap();
+        assert!(summon_res.contains("Summoned 'Image picker'"));
+
+        let img_picker = mgr.plugins.get("omarchy.image-picker").unwrap();
+        assert!(img_picker.is_keep_loaded);
 
         // Cloning built-in plugin
         let clone_res = mgr.clone_built_in("omarchy.clock", "dhh").unwrap();
