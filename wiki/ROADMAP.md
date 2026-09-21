@@ -348,6 +348,22 @@ The M1 milestone provides a bootable ISO with kernel entry point, init system, l
   - CronManager for job creation, enable/disable, and scheduling
   - Get jobs to run at specific time
   - 13 unit tests passing
+- Swap Management (src/kernel/swap.rs):
+  - Swap device types (Partition, File)
+  - Swap device with path, size, priority, and active state
+  - Device lifecycle (activate, deactivate)
+  - Swap statistics (total, used, free, usage percentage)
+  - SwapManager for device creation, priority setting, and statistics
+  - Global swap enable/disable
+  - 12 unit tests passing
+- Resource Monitoring (src/kernel/resource.rs):
+  - CPU statistics (user, nice, system, idle, iowait, irq, softirq, steal, guest)
+  - Memory statistics (total, free, available, buffers, cached, swap)
+  - Disk statistics (reads/writes, sectors, time, IO operations)
+  - Network statistics (bytes/packets received/sent, errors, drops)
+  - ResourceMonitor for system-wide resource monitoring
+  - Per-device and per-interface statistics tracking
+  - 13 unit tests passing
 
 **Completed Fixes:**
 - Kernel module: removed duplicate structures, virtual_cpu, vmm_paging declarations
@@ -532,6 +548,6 @@ See [BOOT_TO_LOGIN_PATH_SPECIFICATION.md](../docs/BOOT_TO_LOGIN_PATH_SPECIFICATI
 - [PROJECT_STATUS.md](../docs/PROJECT_STATUS.md) - Current implementation status
 
 ### Last Verified
-- **Version:** 2.9
+- **Version:** 3.0
 - **Date:** 2026-09-21
 - **Verified by:** Devin AI Agent
