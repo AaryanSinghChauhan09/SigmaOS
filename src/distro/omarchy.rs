@@ -135,6 +135,7 @@ pub struct OmarchyModernDesktopEngine {
     pub webapps: BTreeMap<String, WebAppSpec>,
     pub gpu_config: Option<GpuDriverConfig>,
     pub dark_mode: bool,
+    pub dotfile_manager: crate::distro::omarchy_dotfiles::OmarchyDotfileManagerEngine,
 }
 
 impl OmarchyModernDesktopEngine {
@@ -186,6 +187,7 @@ impl OmarchyModernDesktopEngine {
             webapps: BTreeMap::new(),
             gpu_config: None,
             dark_mode: true,
+            dotfile_manager: crate::distro::omarchy_dotfiles::OmarchyDotfileManagerEngine::new(),
         };
 
         // Register default modern webapps inspired by Omarchy

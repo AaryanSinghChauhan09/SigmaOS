@@ -1,6 +1,8 @@
 pub mod omarchy_inspiration;
 pub use omarchy_inspiration::*;
 pub mod omarchy;
+pub mod omarchy_dotfiles;
+pub use omarchy_dotfiles::*;
 pub use omarchy::{
     FactoryResetGuardian, GpuDriverConfig, HardwareQuirkAdapter, KeybindingDefinition,
     OmarchyAudioPipewireConfig,
