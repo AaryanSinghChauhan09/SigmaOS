@@ -90,6 +90,24 @@ pub use shm::{ShmManager, ShmSegment};
 pub mod msgqueue;
 pub use msgqueue::{Message, MessageQueue, MessageQueueManager};
 
+pub mod fanotify;
+pub use fanotify::{Fanotify, FanotifyEvent, FanotifyEventFlags, FanotifyManager, FanotifyMarkFlags};
+
+pub mod random;
+pub use random::{RandomBytes, RandomFlags, RandomManager, RandomSource, RandomState};
+
+pub mod capabilities;
+pub use capabilities::{Capability, CapabilityId, CapabilityManager, CapabilitySet};
+
+pub mod futex;
+pub use futex::{Futex, FutexFlags, FutexManager, FutexOp, FutexWaiter};
+
+pub mod keyring;
+pub use keyring::{Key, KeyManager, KeyPayload, KeyPermissions, Keyring, KeyType};
+
+pub mod audit;
+pub use audit::{AuditEvent, AuditEventResult, AuditEventType, AuditLog, AuditManager};
+
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
 pub use linux_parity::{
