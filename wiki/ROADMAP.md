@@ -482,6 +482,12 @@ The M1 milestone provides a bootable ISO with kernel entry point, init system, l
   - FdTable with allocate, close, dup, dup2 operations
   - FdTableManager for system-wide fd table management
   - 15 unit tests passing
+- Resource Limits (src/kernel/rlimit.rs):
+  - RlimitResource (CPU, fsize, data, stack, core, nproc, nofile, etc.)
+  - Rlimit with current and hard limit
+  - ResourceLimits with default limits per resource
+  - ResourceLimitsManager for system-wide resource limit management
+  - 17 unit tests passing
 
 **Completed Fixes:**
 - Kernel module: removed duplicate structures, virtual_cpu, vmm_paging declarations
@@ -666,6 +672,6 @@ See [BOOT_TO_LOGIN_PATH_SPECIFICATION.md](../docs/BOOT_TO_LOGIN_PATH_SPECIFICATI
 - [PROJECT_STATUS.md](../docs/PROJECT_STATUS.md) - Current implementation status
 
 ### Last Verified
-- **Version:** 4.3
+- **Version:** 4.4
 - **Date:** 2026-09-21
 - **Verified by:** Devin AI Agent
