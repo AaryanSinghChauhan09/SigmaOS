@@ -37,6 +37,8 @@ pub mod ipc;
 pub mod kqueue;
 pub mod livepatch;
 pub mod lockdep;
+pub mod module_loader;
+pub mod ebpf_program;
 pub mod cgroups;
 pub mod kobject;
 pub mod ftrace;
@@ -161,6 +163,11 @@ pub use scheduler::{Priority, Process, ProcessState, Scheduler};
 pub use vmm_paging::{PageTableManager, VirtualMemoryManager};
 // Note: linux_bsd_innovations types fully re-exported via `pub use crate::kernel::linux_bsd_innovations::*` above.
 pub use kqueue_event::{Kqueue, KqueueManager, Kevent, FilterType, FilterFlags, Interest};
+pub use module_loader::{ModuleId, ModuleState, ModuleDependency, ModuleMetadata, KernelModule, ModuleLoader};
+pub use ebpf_program::{
+    EbpfProgramType, EbpfInsnClass, EbpfInsn, EbpfRegister, EbpfMapType, EbpfMapDef,
+    EbpfProgram, EbpfVerifierState, EbpfVerifyError, EbpfVerifier, EbpfVm,
+};
 
 // ─── Phase 1: Safe-Rust Kernel Foundation — New Sovereign Modules ─────────────
 pub mod sigma_version;
