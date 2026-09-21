@@ -269,6 +269,20 @@ The M1 milestone provides a bootable ISO with kernel entry point, init system, l
   - Capability restriction and removal
   - CapsicumManager for system-wide sandbox management
   - 12 unit tests passing
+- Pledge Security Sandbox (src/kernel/pledge.rs):
+  - 36 pledge promises (Stdio, Rpath, Wpath, Cpath, Dpath, Tty, Recvfd, Sendfd, Exec, Proc, Id, Setuid, Setgid, Setfgid, Setresuid, Setresgid, Getpw, Timer, Dns, Unix, Flock, Fattr, Inet, Mcast, Route, Audio, Video, Bpf, Unveil, Error, ProtExec, Ps, Vminfo, Idle, Pf, Wifi)
+  - Syscall promise-based security restrictions
+  - Promise parsing from space-separated strings
+  - Pledge context with double-pledge prevention
+  - PledgeManager for system-wide context management
+  - 11 unit tests passing
+- Unveil Security Sandbox (src/kernel/unveil.rs):
+  - Filesystem path access restrictions with permissions (read, write, exec, create)
+  - Path-based rules with specificity matching
+  - Permission helpers (empty, all, rw, rx, r)
+  - Unveil context with lock mechanism
+  - UnveilManager for system-wide context management
+  - 13 unit tests passing
 
 **Completed Fixes:**
 - Kernel module: removed duplicate structures, virtual_cpu, vmm_paging declarations
@@ -453,6 +467,6 @@ See [BOOT_TO_LOGIN_PATH_SPECIFICATION.md](../docs/BOOT_TO_LOGIN_PATH_SPECIFICATI
 - [PROJECT_STATUS.md](../docs/PROJECT_STATUS.md) - Current implementation status
 
 ### Last Verified
-- **Version:** 2.4
+- **Version:** 2.5
 - **Date:** 2026-09-21
 - **Verified by:** Devin AI Agent
