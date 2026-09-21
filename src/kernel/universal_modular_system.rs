@@ -311,11 +311,20 @@ pub enum ProcessState {
     Exited(i32),
 }
 
+#[derive(Debug, Clone)]
+pub struct EnterpriseProcessIsolationPolicy {
+    pub app_name: String,
+    pub is_memory_locked: bool,
+    pub sandbox_rights_mask: u64,
+    pub network_isolated: bool,
+}
+
 pub struct SovereignProcessControlManager {
     pub processes: BTreeMap<u64, ProcessControlEntry>,
     pub cgroups: BTreeMap<String, ResourceQuotaCgroup>,
     pub futex_waiters: BTreeMap<u64, Vec<u64>>, // futex_addr -> vec of pids
     pub kqueue_events: Vec<(u64, String)>,       // (pid, event_type)
+    pub isolation_policies: BTreeMap<String, EnterpriseProcessIsolationPolicy>,
 }
 
 impl SovereignProcessControlManager {
@@ -325,6 +334,7 @@ impl SovereignProcessControlManager {
             cgroups: BTreeMap::new(),
             futex_waiters: BTreeMap::new(),
             kqueue_events: Vec::new(),
+            isolation_policies: BTreeMap::new(),
         };
 
         // Root cgroup
@@ -340,6 +350,24 @@ impl SovereignProcessControlManager {
         );
 
         mgr
+    }
+
+    pub fn register_isolation_policy(
+        &mut self,
+        app_name: &str,
+        is_mem_locked: bool,
+        rights_mask: u64,
+        net_isolated: bool,
+    ) {
+        self.isolation_policies.insert(
+            app_name.to_string(),
+            EnterpriseProcessIsolationPolicy {
+                app_name: app_name.to_string(),
+                is_memory_locked: is_mem_locked,
+                sandbox_rights_mask: rights_mask,
+                network_isolated: net_isolated,
+            },
+        );
     }
 
     pub fn create_cgroup(&mut self, id: &str, cpu_pct: u32, mem_max: u64, max_pids: u32) {
@@ -456,11 +484,20 @@ pub struct SocketBuffer {
     pub payload: Vec<u8>,
 }
 
+#[derive(Debug, Clone)]
+pub struct MeshVpnNetworkRoute {
+    pub interface_name: String,
+    pub virtual_ip: String,
+    pub peer_public_key: String,
+    pub is_active: bool,
+}
+
 pub struct SovereignNetworkStackManager {
     pub pf_rules: Vec<PfFirewallRule>,
     pub xdp_programs_attached: usize,
     pub vnet_namespaces: Vec<String>,
     pub packet_ring_buffer: Vec<SocketBuffer>,
+    pub mesh_vpn_routes: BTreeMap<String, MeshVpnNetworkRoute>,
 }
 
 impl SovereignNetworkStackManager {
@@ -470,7 +507,25 @@ impl SovereignNetworkStackManager {
             xdp_programs_attached: 0,
             vnet_namespaces: vec!["default_vnet".to_string()],
             packet_ring_buffer: Vec::new(),
+            mesh_vpn_routes: BTreeMap::new(),
         }
+    }
+
+    pub fn register_mesh_vpn_route(
+        &mut self,
+        iface: &str,
+        vip: &str,
+        pubkey: &str,
+    ) {
+        self.mesh_vpn_routes.insert(
+            iface.to_string(),
+            MeshVpnNetworkRoute {
+                interface_name: iface.to_string(),
+                virtual_ip: vip.to_string(),
+                peer_public_key: pubkey.to_string(),
+                is_active: true,
+            },
+        );
     }
 
     pub fn add_pf_rule(
@@ -910,5 +965,18 @@ mod step3_tests {
         let mut orchestrator = SovereignKernelSubsystemOrchestrator::new();
         assert!(orchestrator.is_kernel_synchronized);
         assert!(orchestrator.synchronize_kernel_subsystems());
+    }
+
+    #[test]
+    fn test_enterprise_process_isolation_and_mesh_routing() {
+        let mut proc_mgr = SovereignProcessControlManager::new();
+        proc_mgr.register_isolation_policy("1Password", true, 0x1F, true);
+        assert!(proc_mgr.isolation_policies.contains_key("1Password"));
+        assert!(proc_mgr.isolation_policies.get("1Password").unwrap().is_memory_locked);
+
+        let mut net_mgr = SovereignNetworkStackManager::new();
+        net_mgr.register_mesh_vpn_route("tailscale0", "100.64.0.1", "pubkey_abc123");
+        assert!(net_mgr.mesh_vpn_routes.contains_key("tailscale0"));
+        assert_eq!(net_mgr.mesh_vpn_routes.get("tailscale0").unwrap().virtual_ip, "100.64.0.1");
     }
 }
