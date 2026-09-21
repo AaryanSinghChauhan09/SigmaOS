@@ -2555,6 +2555,21 @@ pub struct SovereignWebPage {
     pub blocks: Vec<WebPublisherBlock>,
 }
 
+fn escape_html(input: &str) -> String {
+    let mut escaped = String::with_capacity(input.len());
+    for c in input.chars() {
+        match c {
+            '&' => escaped.push_str("&amp;"),
+            '<' => escaped.push_str("&lt;"),
+            '>' => escaped.push_str("&gt;"),
+            '"' => escaped.push_str("&quot;"),
+            '\'' => escaped.push_str("&#39;"),
+            _ => escaped.push(c),
+        }
+    }
+    escaped
+}
+
 /// Sovereign Web & Intranet Publishing Engine (Google Sites / MS Sway inspired)
 pub struct SovereignWebPublisherEngine {
     pub site_name: String,
@@ -2594,22 +2609,22 @@ impl SovereignWebPublisherEngine {
 
     pub fn render_html_page(&self, page_id: u32) -> Option<String> {
         let page = self.pages.iter().find(|p| p.page_id == page_id)?;
-        let mut html = format!("<!DOCTYPE html><html><head><title>{} - {}</title></head><body>\n", page.page_title, self.site_name);
-        html.push_str(&format!("<header><h1>{}</h1></header><main>\n", self.site_name));
+        let mut html = format!("<!DOCTYPE html><html><head><title>{} - {}</title></head><body>\n", escape_html(&page.page_title), escape_html(&self.site_name));
+        html.push_str(&format!("<header><h1>{}</h1></header><main>\n", escape_html(&self.site_name)));
 
         for block in &page.blocks {
             match block {
                 WebPublisherBlock::HeroBanner { title, subtitle } => {
-                    html.push_str(&format!("<section class=\"hero\"><h2>{}</h2><p>{}</p></section>\n", title, subtitle));
+                    html.push_str(&format!("<section class=\"hero\"><h2>{}</h2><p>{}</p></section>\n", escape_html(title), escape_html(subtitle)));
                 }
                 WebPublisherBlock::SectionText { heading, body } => {
-                    html.push_str(&format!("<section><h3>{}</h3><p>{}</p></section>\n", heading, body));
+                    html.push_str(&format!("<section><h3>{}</h3><p>{}</p></section>\n", escape_html(heading), escape_html(body)));
                 }
                 WebPublisherBlock::EmbeddedSpreadsheet { sheet_title, csv_data } => {
-                    html.push_str(&format!("<section class=\"spreadsheet\"><h3>{}</h3><pre>{}</pre></section>\n", sheet_title, csv_data));
+                    html.push_str(&format!("<section class=\"spreadsheet\"><h3>{}</h3><pre>{}</pre></section>\n", escape_html(sheet_title), escape_html(csv_data)));
                 }
                 WebPublisherBlock::ContactForm { form_title, form_id } => {
-                    html.push_str(&format!("<section class=\"form\"><h3>{}</h3><form data-id=\"{}\"></form></section>\n", form_title, form_id));
+                    html.push_str(&format!("<section class=\"form\"><h3>{}</h3><form data-id=\"{}\"></form></section>\n", escape_html(form_title), form_id));
                 }
             }
         }
