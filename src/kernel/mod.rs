@@ -72,6 +72,9 @@ pub use timerfd::{ClockId, TimerFd, TimerFlags, TimerSetting};
 pub mod signalfd;
 pub use signalfd::{Signal, SignalFd, SignalFdFlags, SignalMask, SigInfo};
 
+pub mod eventfd;
+pub use eventfd::{EventFd, EventFdFlags};
+
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
 pub use linux_parity::{

@@ -53,3 +53,6 @@ pub use fanotify_sovereign::{SovereignFanotifyGroup, FanotifyEvent, FanotifyEven
 
 pub mod inotify;
 pub use inotify::{Inotify, InotifyEvent, InotifyEventType, WatchDescriptor};
+
+pub mod sysfs_linux;
+pub use sysfs_linux::{Sysfs, SysfsEntry, SysfsEntryType};
