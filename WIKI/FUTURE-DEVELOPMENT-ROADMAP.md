@@ -5637,3 +5637,54 @@ SigmaOS systematically defeats traditional Linux and BSD distributions (Ubuntu, 
 2. **Daily Automated Discovery & Wiki Synchronization**:
    - Daily scanning of top open-source repositories to absorb architectural breakthroughs, performance improvements, and security patches into zero-dependency `#![no_std]` Rust modules.
    - Automated documentation synchronization across `WIKI/`, `wiki/`, and `wiki_repo/` targets via `./scripts/sync_wiki.sh`.
+
+
+---
+
+## 131. SOVEREIGN OMARCHY LINUX FILE LAYOUT & WORKSTATION STRUCTURE SPECIFICATION
+
+### 131.1 Overview & Omarchy File Layout Mental Model
+SigmaOS absorbs the workstation file layout, configuration deployment model, and user environment provisioning architecture of **Omarchy Linux** (the developer-focused Arch Linux distribution). The layout separates core runtime logic (`omarchy`), pre-seed userland settings (`omarchy-settings`), GPG keyrings (`omarchy-keyring`), and Neovim IDE environments (`omarchy-nvim`), mapping them directly into SigmaOS's `SigmaPkg` content-addressed storage (CAS) and declarative state graph architecture.
+
+```
++-----------------------------------------------------------------------------------+
+|                  SIGMAOS OMARCHY FILE LAYOUT & PROVISIONING MODEL                  |
++-----------------------------------------------------------------------------------+
+| [1. Seed Phase]         [2. Finalize Phase]            [3. Resync Phase]          |
+| /etc/skel/ -> $HOME     omarchy-provision-user         omarchy-reinstall-configs  |
+| Static user defaults    Dynamic runtime $HOME expansion Clobber back to defaults  |
++-----------------------------------------------------------------------------------+
+| [4. Deferred Provisioning]                             [5. Migration Engine]      |
+| /var/lib/omarchy/provisioning/pending                 omarchy-migrate            |
+| Auto-creates owner user on tty1 on first boot          Per-user Unix timestamp    |
++-----------------------------------------------------------------------------------+
+```
+
+### 131.2 Build-Time Mapping & Package Separation Matrix
+1. **`omarchy` Runtime Package**: Contains binaries (`/usr/bin/omarchy-*`), libalpm hooks (`/usr/share/libalpm/hooks/`), installation scripts (`/usr/share/omarchy/install/`), migration scripts (`/usr/share/omarchy/migrations/`), theme definitions (`/usr/share/omarchy/themes/`), and Quickshell desktop components (`/usr/share/omarchy/shell/`).
+2. **`omarchy-settings` Package**: Contains user skeleton templates (`/etc/skel/.config/**`), system drop-ins (`/etc/**`), icons (`/usr/share/icons/`), fonts (`/usr/share/fonts/omarchy/`), SDDM login themes (`/usr/share/sddm/themes/omarchy/`), Plymouth boot splash screens (`/usr/share/plymouth/themes/omarchy/`), Limine bootloader templates (`/usr/share/omarchy/default/limine/`), and Snapper backup templates (`/etc/snapper/config-templates/omarchy`).
+3. **`etc-overrides/` Collision Resolution**: Files owned by upstream packages (such as `.bashrc`, `nsswitch.conf`, `faillock.conf`, `cups-browsed.conf`, and `plymouthd.conf`) ship under `/usr/share/omarchy/etc-overrides/` and are copied into place during post-install/upgrade hooks (`cp -f`), avoiding package manager file conflict errors.
+
+### 131.3 System Search Indexing & Environment Bootstrapping
+1. **Plocate Btrfs Snapshot Indexing**: `plocate-updatedb.service.d/10-omarchy.conf` configures `updatedb --prune-bind-mounts=no --add-prunepaths=/.snapshots`, ensuring Btrfs subvolume mounts remain searchable while excluding Snapper snapshot directories from indexing bloat.
+2. **Environment Bootstrap Pipeline (`default/bash/env-bootstrap`)**:
+   - Sources `/etc/omarchy.conf` to set `OMARCHY_PATH` (default `/usr/share/omarchy`).
+   - Prepends `$OMARCHY_PATH/bin` to `PATH` when in dev-link mode (`omarchy-dev-link`).
+   - Appends `~/.local/share/mise/shims` and `~/.local/bin` to `PATH` for version-managed developer toolchains across login shells, interactive bash sessions, UWSM Hyprland sessions, and SSH commands.
+   - Updates `/etc/sudoers.d/omarchy-dev-path` via `Defaults secure_path` to ensure `sudo omarchy-*` commands execute the active development checkout.
+
+### 131.4 User Runtime Finalization, Migration Engine & First-Run Workflow
+1. **Runtime Finalization (`omarchy-provision-user`)**:
+   - Executed once per user; creates skill symlinks into `~/.agents/skills/<name>`, `~/.claude/skills/`, `~/.codex/skills/`, `~/.pi/agent/skills/`, `~/.gemini/config/skills/`, and `~/.hermes/skills/` pointing to `$OMARCHY_PATH/default/agents/skills/`.
+   - Runs `xdg-user-dirs-update`, sets default web browser (Chromium/HEY), composes application desktop launchers (`omarchy-refresh-applications`), and sources per-user hardware quirks (`install/user/all.sh`).
+   - Idempotency recorded via `~/.local/state/omarchy/done/finalize-user`.
+2. **Migration Engine (`omarchy-migrate`)**:
+   - Executes timestamped shell migrations (`migrations/<timestamp>.sh`), tracking completion state under `~/.local/state/omarchy/migrations/`.
+   - Graphical logins trigger `omarchy-migrate-notify.service`, prompting users to apply pending system migrations in an interactive terminal.
+3. **Interactive First-Run (`omarchy-provision-first-run`)**:
+   - Executes user systemd units (`bt-agent`, `omarchy-sleep-lock`, `omarchy-recover-internal-monitor`, `omarchy-migrate-notify.service`, `omarchy-fcitx5.service`, `omarchy-crash-watch.service`).
+   - Applies dconf GNOME/GTK themes, speaker audio tuning, welcome toasts, and Wi-Fi connection prompts, recording completion via `~/.local/state/omarchy/done/first-run-user`.
+4. **Explicit Configuration Resync (`omarchy-reinstall-configs`)**:
+   - Allows users to clobber home configs back to packaged defaults by replaying `/etc/skel/.` onto `$HOME`, followed by refreshing Limine boot entries, Plymouth themes, and Neovim configurations.
+5. **Kitty Terminal Security Defaults**:
+   - System default `/etc/xdg/kitty/kitty.conf` enforces `allow_remote_control socket-only`, allowing local scripts to query terminal states over Unix sockets while blocking malicious remote-control payloads originating from terminal output.
