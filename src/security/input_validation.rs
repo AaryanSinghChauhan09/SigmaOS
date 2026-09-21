@@ -55,21 +55,30 @@ pub fn validate_path(path: &[u8]) -> Result<(), ValidationError> {
     }
 
     // Single-pass byte slice scan combining NUL-byte injection checks,
-    // ASCII control character rejection, and path-traversal (`..`) detection.
+    // ASCII control character rejection, and path-traversal (all dot-only
+    // segments of length >= 2, such as `..`, `...`, `....`) detection.
     let mut i = 0usize;
-    while i < len {
-        let b = path[i];
-        if b == 0 {
-            return Err(ValidationError::NullByte);
-        }
-        if b < 32 || b == 127 {
-            return Err(ValidationError::InvalidChars);
-        }
-        if b == b'.' && i + 1 < len && path[i + 1] == b'.' {
-            let before_ok = i == 0 || matches!(path[i - 1], b'/' | b'\\' | b':');
-            let after_ok = i + 2 >= len || matches!(path[i + 2], b'/' | b'\\' | b':');
-            if before_ok && after_ok {
+    let mut segment_start = 0usize;
+    let mut segment_has_non_dot = false;
+
+    while i <= len {
+        if i == len || matches!(path[i], b'/' | b'\\' | b':') {
+            let seg_len = i - segment_start;
+            if seg_len >= 2 && !segment_has_non_dot {
                 return Err(ValidationError::PathTraversal);
+            }
+            segment_start = i + 1;
+            segment_has_non_dot = false;
+        } else {
+            let b = path[i];
+            if b == 0 {
+                return Err(ValidationError::NullByte);
+            }
+            if b < 32 || b == 127 {
+                return Err(ValidationError::InvalidChars);
+            }
+            if b != b'.' {
+                segment_has_non_dot = true;
             }
         }
         i += 1;
@@ -413,14 +422,20 @@ mod tests {
 
     #[test]
     fn test_path_traversal_rejected() {
-        assert!(validate_path(b"../../etc/passwd").is_err());
-        assert!(validate_path(b"/foo/../bar").is_err());
-        assert!(validate_path(b"..").is_err());
-        assert!(validate_path(b"..\\..\\etc\\passwd").is_err());
-        assert!(validate_path(b"C:\\foo\\..\\bar").is_err());
-        assert!(validate_path(b"foo\\..").is_err());
-        assert!(validate_path(b"C:..\\passwd").is_err());
-        assert!(validate_path(b"file:../secret.txt").is_err());
+        assert_eq!(validate_path(b"../../etc/passwd"), Err(ValidationError::PathTraversal));
+        assert_eq!(validate_path(b"/foo/../bar"), Err(ValidationError::PathTraversal));
+        assert_eq!(validate_path(b".."), Err(ValidationError::PathTraversal));
+        assert_eq!(validate_path(b"..\\..\\etc\\passwd"), Err(ValidationError::PathTraversal));
+        assert_eq!(validate_path(b"C:\\foo\\..\\bar"), Err(ValidationError::PathTraversal));
+        assert_eq!(validate_path(b"foo\\.."), Err(ValidationError::PathTraversal));
+        assert_eq!(validate_path(b"C:..\\passwd"), Err(ValidationError::PathTraversal));
+        assert_eq!(validate_path(b"file:../secret.txt"), Err(ValidationError::PathTraversal));
+
+        // Multi-dot path traversal checks (..., ...., etc.)
+        assert_eq!(validate_path(b"/.../etc/passwd"), Err(ValidationError::PathTraversal));
+        assert_eq!(validate_path(b"foo/.../bar"), Err(ValidationError::PathTraversal));
+        assert_eq!(validate_path(b"..../secret"), Err(ValidationError::PathTraversal));
+        assert_eq!(validate_path(b"C:\\...\\Windows"), Err(ValidationError::PathTraversal));
     }
 
     #[test]
