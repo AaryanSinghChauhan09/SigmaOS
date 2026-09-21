@@ -108,6 +108,12 @@ pub use keyring::{Key, KeyManager, KeyPayload, KeyPermissions, Keyring, KeyType}
 pub mod audit;
 pub use audit::{AuditEvent, AuditEventResult, AuditEventType, AuditLog, AuditManager};
 
+pub mod landlock;
+pub use landlock::{LandlockAccess, LandlockDomain, LandlockManager, LandlockRule, LandlockRuleset};
+
+pub mod capsicum;
+pub use capsicum::{CapsicumCapability, CapsicumManager, CapsicumMode, CapsicumRights, CapsicumSandbox};
+
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
 pub use linux_parity::{
