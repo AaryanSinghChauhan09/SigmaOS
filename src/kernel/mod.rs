@@ -85,16 +85,9 @@ pub mod mount;
 pub use mount::{MountFlags, MountNamespace, MountPoint};
 
 pub mod shm;
-pub use shm::{ShmManager, ShmSegment};
+pub use shm::{ShmManager, ShmPerm, ShmSegment};
 
-pub mod msgqueue;
-pub use msgqueue::{Message, MessageQueue, MessageQueueManager};
-
-pub mod fanotify;
-pub use fanotify::{Fanotify, FanotifyEvent, FanotifyEventFlags, FanotifyManager, FanotifyMarkFlags};
-
-pub mod random;
-pub use random::{RandomBytes, RandomFlags, RandomManager, RandomSource, RandomState};
+pub mod linux_bsd_innovations;
 
 pub mod capabilities;
 pub use capabilities::{Capability, CapabilityId, CapabilityManager, CapabilitySet};
@@ -188,6 +181,9 @@ pub use socket::{Socket, SocketDomain, SocketManager, SocketProtocol, SocketStat
 
 pub mod shm;
 pub use shm::{ShmManager, ShmPerm, ShmSegment};
+
+pub mod msgqueue;
+pub use msgqueue::{Message, MessageQueue, MessageQueueManager, MsgQPerm};
 
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
