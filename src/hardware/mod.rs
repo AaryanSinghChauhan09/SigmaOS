@@ -6,8 +6,10 @@ pub mod win32;
 
 pub use compatibility::{
     AcpiPowerState, CompatibilityError, CompatibilityReport,
-    CompatibilityResult, DeviceID, DeviceType, SupportStatus,
-    SimpleAcpiManager, SimpleCompatibilityMatrix, SimpleDevice, SimpleDiagnostics,
+    CompatibilityResult, DeviceID, DeviceType, FreeBsdCamStorageEngine,
+    LinuxNvmeOverFabricsEngine, LinuxThunderboltDisplayPortTunnelEngine,
+    OpenBsdUvideoWebcamEngine, SimpleAcpiManager, SimpleCompatibilityMatrix,
+    SimpleDevice, SimpleDiagnostics, SupportStatus,
 };
 
 pub use tech_powerup_hardware_monitors::{

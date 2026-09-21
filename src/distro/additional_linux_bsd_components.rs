@@ -231,6 +231,158 @@ impl Default for VoidXbpsTransactionJournalEngine {
     }
 }
 
+/// Arch Linux arch-chroot Container Sandbox Engine
+#[derive(Debug, Clone)]
+pub struct ArchChrootContainerEngine {
+    pub chroot_dir: String,
+    pub mount_points: Vec<String>,
+    pub is_bound: bool,
+}
+
+impl ArchChrootContainerEngine {
+    pub fn new(chroot_dir: &str) -> Self {
+        Self {
+            chroot_dir: chroot_dir.to_string(),
+            mount_points: Vec::new(),
+            is_bound: false,
+        }
+    }
+
+    pub fn prepare_chroot_binds(&mut self) {
+        self.mount_points = vec![
+            format!("{}/proc", self.chroot_dir),
+            format!("{}/sys", self.chroot_dir),
+            format!("{}/dev", self.chroot_dir),
+            format!("{}/run", self.chroot_dir),
+        ];
+        self.is_bound = true;
+    }
+
+    pub fn execute_chroot_command(&self, cmd: &str) -> String {
+        if self.is_bound {
+            format!("chroot {} {}", self.chroot_dir, cmd)
+        } else {
+            format!("unbound-chroot {} {}", self.chroot_dir, cmd)
+        }
+    }
+}
+
+/// Debian debconf Automated Installer Preseed Configuration Engine
+#[derive(Debug, Clone)]
+pub struct DebconfPreseedEntry {
+    pub owner: String,
+    pub question: String,
+    pub value_type: String, // "string", "boolean", "select", "password"
+    pub value: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct DebianDebconfPreseedEngine {
+    pub preseed_entries: Vec<DebconfPreseedEntry>,
+}
+
+impl DebianDebconfPreseedEngine {
+    pub fn new() -> Self {
+        Self {
+            preseed_entries: Vec::new(),
+        }
+    }
+
+    pub fn set_preseed(&mut self, owner: &str, question: &str, value_type: &str, value: &str) {
+        self.preseed_entries.push(DebconfPreseedEntry {
+            owner: owner.to_string(),
+            question: question.to_string(),
+            value_type: value_type.to_string(),
+            value: value.to_string(),
+        });
+    }
+
+    pub fn get_preseed(&self, owner: &str, question: &str) -> Option<&DebconfPreseedEntry> {
+        self.preseed_entries.iter().find(|e| e.owner == owner && e.question == question)
+    }
+}
+
+impl Default for DebianDebconfPreseedEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Gentoo ebuild Phase Execution Engine
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum EbuildPhase {
+    PkgSetup,
+    SrcUnpack,
+    SrcPrepare,
+    SrcConfigure,
+    SrcCompile,
+    SrcInstall,
+    PkgPreinst,
+    PkgPostinst,
+}
+
+#[derive(Debug, Clone)]
+pub struct GentooEbuildPhaseRunnerEngine {
+    pub category_pkg: String,
+    pub completed_phases: Vec<EbuildPhase>,
+}
+
+impl GentooEbuildPhaseRunnerEngine {
+    pub fn new(category_pkg: &str) -> Self {
+        Self {
+            category_pkg: category_pkg.to_string(),
+            completed_phases: Vec::new(),
+        }
+    }
+
+    pub fn execute_phase(&mut self, phase: EbuildPhase) -> Result<String, &'static str> {
+        if self.completed_phases.contains(&phase) {
+            return Err("Ebuild phase already executed");
+        }
+        self.completed_phases.push(phase.clone());
+        Ok(format!("Phase {:?} completed for {}", phase, self.category_pkg))
+    }
+}
+
+/// FreeBSD freebsd-update Binary Delta Patching Engine
+#[derive(Debug, Clone)]
+pub struct FreeBsdBinaryPatchRecord {
+    pub file_path: String,
+    pub old_sha256: String,
+    pub new_sha256: String,
+    pub patch_bytes_len: usize,
+}
+
+#[derive(Debug, Clone)]
+pub struct FreeBsdUpdateBinaryPatchEngine {
+    pub target_release: String,
+    pub pending_patches: Vec<FreeBsdBinaryPatchRecord>,
+}
+
+impl FreeBsdUpdateBinaryPatchEngine {
+    pub fn new(target_release: &str) -> Self {
+        Self {
+            target_release: target_release.to_string(),
+            pending_patches: Vec::new(),
+        }
+    }
+
+    pub fn stage_patch(&mut self, file_path: &str, old_hash: &str, new_hash: &str, patch_len: usize) {
+        self.pending_patches.push(FreeBsdBinaryPatchRecord {
+            file_path: file_path.to_string(),
+            old_sha256: old_hash.to_string(),
+            new_sha256: new_hash.to_string(),
+            patch_bytes_len: patch_len,
+        });
+    }
+
+    pub fn apply_all_patches(&mut self) -> usize {
+        let count = self.pending_patches.len();
+        self.pending_patches.clear();
+        count
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -287,5 +439,27 @@ mod tests {
         let undone = journal.rollback_last().unwrap();
         assert_eq!(undone.pkg_name, "curl");
         assert_eq!(journal.history.len(), 0);
+    }
+
+    #[test]
+    fn test_additional_new_distro_engines() {
+        let mut arch_chroot = ArchChrootContainerEngine::new("/mnt/arch");
+        arch_chroot.prepare_chroot_binds();
+        assert!(arch_chroot.is_bound);
+        assert_eq!(arch_chroot.mount_points.len(), 4);
+        assert_eq!(arch_chroot.execute_chroot_command("pacman -Syu"), "chroot /mnt/arch pacman -Syu");
+
+        let mut debconf = DebianDebconfPreseedEngine::new();
+        debconf.set_preseed("tzdata", "tzdata/Zones/Asia", "select", "Kolkata");
+        let entry = debconf.get_preseed("tzdata", "tzdata/Zones/Asia").unwrap();
+        assert_eq!(entry.value, "Kolkata");
+
+        let mut ebuild_runner = GentooEbuildPhaseRunnerEngine::new("sys-apps/systemd");
+        assert!(ebuild_runner.execute_phase(EbuildPhase::PkgSetup).is_ok());
+        assert!(ebuild_runner.execute_phase(EbuildPhase::PkgSetup).is_err());
+
+        let mut freebsd_up = FreeBsdUpdateBinaryPatchEngine::new("14.1-RELEASE");
+        freebsd_up.stage_patch("/boot/kernel/kernel", "abc", "xyz", 1024);
+        assert_eq!(freebsd_up.apply_all_patches(), 1);
     }
 }
