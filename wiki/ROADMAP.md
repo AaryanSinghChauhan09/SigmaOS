@@ -496,6 +496,13 @@ The M1 milestone provides a bootable ISO with kernel entry point, init system, l
   - Add/remove users and groups
   - Add/remove users from groups
   - 16 unit tests passing
+- Process Group/Session (src/kernel/process_group.rs):
+  - ProcessGroup with pgid, leader_pid, members
+  - Session with sid, leader_pid, process_groups
+  - ProcessGroupSessionManager for system-wide management
+  - Create/remove process groups and sessions
+  - Add/remove processes from groups
+  - 12 unit tests passing
 
 **Completed Fixes:**
 - Kernel module: removed duplicate structures, virtual_cpu, vmm_paging declarations
@@ -680,6 +687,6 @@ See [BOOT_TO_LOGIN_PATH_SPECIFICATION.md](../docs/BOOT_TO_LOGIN_PATH_SPECIFICATI
 - [PROJECT_STATUS.md](../docs/PROJECT_STATUS.md) - Current implementation status
 
 ### Last Verified
-- **Version:** 4.5
+- **Version:** 4.6
 - **Date:** 2026-09-21
 - **Verified by:** Devin AI Agent
