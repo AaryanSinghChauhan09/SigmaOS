@@ -28,8 +28,9 @@ pub mod xfce_engine;
 
 pub use gaming_engine::{
     AntiCheatCompatibilityShim, AntiCheatEngineType, DirectXApiVersion, FsrUpscalingMode,
-    GameModeCpuGpuGovernor, GamescopeConfig, GamescopeMicrocompositorEngine,
-    ProtonDirectXTranslationShim,
+    GameModeCpuGpuGovernor, GamescopeConfig, GamescopeMicrocompositorEngine, GamingStoreKind,
+    OmarchyGamingInstallerRegistry, ProtonDirectXTranslationShim, RetroArchConfigEngine,
+    SunshineMoonlightStreamEngine,
 };
 pub use xfce_engine::*;
 pub use wayland_protocol::*;

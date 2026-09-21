@@ -1,7 +1,8 @@
-// SigmaOS Gaming Engine (SteamOS, Garuda, Nobara, FreeBSD Linuxulator Inspired)
+// SigmaOS Gaming Engine (SteamOS, Garuda, Nobara, FreeBSD Linuxulator, Omarchy Inspired)
 // Provides Gamescope microcompositor (FSR upscaling & MangoHud telemetry),
 // Proton DXVK/VKD3D DirectX to Vulkan translation shims,
-// Feral GameMode CPU/GPU high-performance governor, and eBPF Anti-Cheat compatibility sandboxes.
+// Feral GameMode CPU/GPU high-performance governor, eBPF Anti-Cheat compatibility sandboxes,
+// and Omarchy Gaming Hub (Steam, RetroArch, Cloud Gaming, Xbox Controllers, Moonlight/Sunshine, Battle.net, Lutris, Heroic).
 
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
@@ -198,7 +199,151 @@ impl AntiCheatCompatibilityShim {
     }
 }
 
+// ============================================================================
+// Omarchy Gaming Hub (Steam, RetroArch, Cloud, Moonlight/Sunshine, Battle.net, Lutris, Heroic)
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum GamingStoreKind {
+    Steam,
+    RetroArch,
+    XboxCloud,
+    GeForceNow,
+    Minecraft,
+    XboxControllers,
+    Moonlight,
+    Sunshine,
+    BattleNet,
+    Lutris,
+    HeroicEpic,
+}
+
+impl GamingStoreKind {
+    pub fn menu_label(&self) -> &'static str {
+        match self {
+            Self::Steam => "Steam",
+            Self::RetroArch => "RetroArch",
+            Self::XboxCloud => "Xbox Cloud Gaming",
+            Self::GeForceNow => "NVIDIA GeForce NOW",
+            Self::Minecraft => "Minecraft",
+            Self::XboxControllers => "Xbox Bluetooth Controllers",
+            Self::Moonlight => "Moonlight Game Streaming",
+            Self::Sunshine => "Sunshine Host Service",
+            Self::BattleNet => "Battle.net (GE-Proton)",
+            Self::Lutris => "Lutris (Windows Games)",
+            Self::HeroicEpic => "Heroic Launcher (Epic/GOG/Prime)",
+        }
+    }
+}
+
+pub struct OmarchyGamingInstallerRegistry {
+    pub installed_stores: BTreeMap<GamingStoreKind, bool>,
+}
+
+impl OmarchyGamingInstallerRegistry {
+    pub fn new() -> Self {
+        let mut stores = BTreeMap::new();
+        stores.insert(GamingStoreKind::Moonlight, true); // Preinstalled in Omarchy
+
+        Self { installed_stores: stores }
+    }
+
+    pub fn install_gaming_option(&mut self, store: GamingStoreKind) -> String {
+        self.installed_stores.insert(store, true);
+        format!("Omarchy Menu [Install > Gaming > {}]: Package and desktop launcher installed", store.menu_label())
+    }
+
+    pub fn remove_gaming_option(&mut self, store: GamingStoreKind) -> String {
+        self.installed_stores.insert(store, false);
+        format!("Omarchy Menu [Remove > Gaming > {}]: Package removed cleanly", store.menu_label())
+    }
+
+    pub fn is_installed(&self, store: GamingStoreKind) -> bool {
+        *self.installed_stores.get(&store).unwrap_or(&false)
+    }
+}
+
+pub struct RetroArchConfigEngine {
+    pub bios_dir: String,
+    pub roms_dir: String,
+    pub shader_preset: String,
+}
+
+impl RetroArchConfigEngine {
+    pub fn new() -> Self {
+        Self {
+            bios_dir: "~/Games/bios".to_string(),
+            roms_dir: "~/Games/roms".to_string(),
+            shader_preset: "crt-royale".to_string(),
+        }
+    }
+
+    pub fn create_game_launcher_desktop_entry(&self, game_name: &str, core: &str, rom_path: &str) -> String {
+        format!(
+            r#"[Desktop Entry]
+Version=1.0
+Name={}
+Comment=RetroArch Game Launcher Shortcut
+Exec=retroarch -L /usr/lib/libretro/{}_libretro.so "{}"
+Icon=retroarch
+Terminal=false
+Type=Application
+Categories=Game;Emulator;
+"#,
+            game_name, core, rom_path
+        )
+    }
+}
+
+pub struct SunshineMoonlightStreamEngine {
+    pub host_enabled: bool,
+    pub target_resolution: String,
+    pub target_fps: u32,
+    pub bitrate_kbps: u32,
+}
+
+impl SunshineMoonlightStreamEngine {
+    pub fn new() -> Self {
+        Self {
+            host_enabled: false,
+            target_resolution: "2560x1440".to_string(),
+            target_fps: 120,
+            bitrate_kbps: 80000,
+        }
+    }
+
+    pub fn enable_sunshine_host_service(&mut self) -> String {
+        self.host_enabled = true;
+        "omarchy install service sunshine: Sunshine daemon enabled, LAN & Tailscale Moonlight ports opened".to_string()
+    }
+
+    pub fn launch_moonlight_stream(&self, host_ip: &str) -> String {
+        format!(
+            "Moonlight Stream: Connecting to Sunshine host {} @ {} {}fps ({} kbps bitrate)",
+            host_ip, self.target_resolution, self.target_fps, self.bitrate_kbps
+        )
+    }
+}
+
 impl Default for GameModeCpuGpuGovernor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Default for OmarchyGamingInstallerRegistry {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Default for RetroArchConfigEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Default for SunshineMoonlightStreamEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -241,5 +386,43 @@ mod tests {
         let res = shim.process_anticheat_heartbeat();
         assert!(res.contains("EasyAntiCheat"));
         assert!(res.contains("100 syscall validations"));
+    }
+
+    #[test]
+    fn test_omarchy_gaming_registry() {
+        let mut registry = OmarchyGamingInstallerRegistry::new();
+        assert!(registry.is_installed(GamingStoreKind::Moonlight));
+
+        let install_msg = registry.install_gaming_option(GamingStoreKind::Steam);
+        assert!(install_msg.contains("Steam"));
+        assert!(registry.is_installed(GamingStoreKind::Steam));
+
+        let remove_msg = registry.remove_gaming_option(GamingStoreKind::Steam);
+        assert!(remove_msg.contains("removed cleanly"));
+        assert!(!registry.is_installed(GamingStoreKind::Steam));
+    }
+
+    #[test]
+    fn test_retroarch_config_engine() {
+        let retro = RetroArchConfigEngine::new();
+        assert_eq!(retro.shader_preset, "crt-royale");
+
+        let launcher = retro.create_game_launcher_desktop_entry("Chrono Trigger", "snes9x", "~/Games/roms/snes/chrono.sfc");
+        assert!(launcher.contains("Name=Chrono Trigger"));
+        assert!(launcher.contains("snes9x_libretro.so"));
+    }
+
+    #[test]
+    fn test_sunshine_moonlight_stream() {
+        let mut stream = SunshineMoonlightStreamEngine::new();
+        assert_eq!(stream.target_fps, 120);
+
+        let service_msg = stream.enable_sunshine_host_service();
+        assert!(service_msg.contains("Sunshine daemon enabled"));
+        assert!(stream.host_enabled);
+
+        let launch_msg = stream.launch_moonlight_stream("192.168.1.100");
+        assert!(launch_msg.contains("192.168.1.100"));
+        assert!(launch_msg.contains("120fps"));
     }
 }
