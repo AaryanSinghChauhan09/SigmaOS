@@ -235,3 +235,97 @@ mod faq_tests {
         assert_eq!(printer_uri, "ipp://192.168.1.50/ipp/print");
     }
 }
+
+/// 7. Omarchy Countdown Timer Reminder Engine (`omarchy reminder <minutes> <msg>`)
+#[derive(Debug, Clone)]
+pub struct OmarchyCountdownReminder {
+    pub id: u64,
+    pub duration_minutes: u32,
+    pub message: String,
+    pub created_timestamp_sec: u64,
+    pub expire_timestamp_sec: u64,
+    pub is_expired: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct OmarchyTimerReminderEngine {
+    pub reminders: Vec<OmarchyCountdownReminder>,
+    pub next_id: u64,
+}
+
+impl OmarchyTimerReminderEngine {
+    pub fn new() -> Self {
+        Self {
+            reminders: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    /// Set countdown reminder (`Super + Ctrl + R` or `omarchy reminder <minutes> <message>`)
+    pub fn add_reminder(&mut self, duration_minutes: u32, message: &str, current_time_sec: u64) -> u64 {
+        let id = self.next_id;
+        self.next_id += 1;
+        let expire_time = current_time_sec + (duration_minutes as u64 * 60);
+        self.reminders.push(OmarchyCountdownReminder {
+            id,
+            duration_minutes,
+            message: message.to_string(),
+            created_timestamp_sec: current_time_sec,
+            expire_timestamp_sec: expire_time,
+            is_expired: false,
+        });
+        id
+    }
+
+    /// List all set reminders (`Super + Ctrl + Alt + R`)
+    pub fn list_active_reminders(&self) -> Vec<&OmarchyCountdownReminder> {
+        self.reminders.iter().filter(|r| !r.is_expired).collect()
+    }
+
+    /// Clear all set reminders (`Super + Ctrl + Shift + R`)
+    pub fn clear_all_reminders(&mut self) -> usize {
+        let count = self.reminders.len();
+        self.reminders.clear();
+        count
+    }
+
+    /// Parse CLI arguments (`omarchy reminder 7 'Tea ready'`)
+    pub fn parse_cli_args(&mut self, args: &[&str], current_time_sec: u64) -> Result<String, &'static str> {
+        if args.len() < 2 {
+            return Err("Usage: omarchy reminder <minutes> <message>");
+        }
+        let minutes: u32 = args[0].parse().map_err(|_| "Invalid minutes duration")?;
+        let message = args[1];
+        let id = self.add_reminder(minutes, message, current_time_sec);
+        Ok(format!("Reminder #{}: '{}' set for {} minute(s).", id, message, minutes))
+    }
+}
+
+impl Default for OmarchyTimerReminderEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
+mod reminder_tests {
+    use super::*;
+
+    #[test]
+    fn test_omarchy_timer_reminder_engine() {
+        let mut engine = OmarchyTimerReminderEngine::new();
+        let now = 1700000000;
+
+        let id = engine.add_reminder(7, "Tea ready", now);
+        assert_eq!(id, 1);
+        assert_eq!(engine.list_active_reminders().len(), 1);
+
+        let cli_res = engine.parse_cli_args(&["15", "Meeting in 15 mins"], now);
+        assert!(cli_res.is_ok());
+        assert_eq!(engine.list_active_reminders().len(), 2);
+
+        let cleared = engine.clear_all_reminders();
+        assert_eq!(cleared, 2);
+        assert_eq!(engine.list_active_reminders().len(), 0);
+    }
+}
