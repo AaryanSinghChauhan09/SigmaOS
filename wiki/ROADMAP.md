@@ -525,6 +525,15 @@ The M1 milestone provides a bootable ISO with kernel entry point, init system, l
   - Create/read/write/remove files and directories
   - List directory contents
   - 11 unit tests passing
+- Procfs (src/kernel/procfs.rs):
+  - ProcessInfo with pid, ppid, comm, state, utime, stime
+  - Format as /proc/[pid]/stat and /proc/[pid]/status
+  - ProcfsManager for system-wide procfs management
+  - Create/remove processes
+  - Set process state and update CPU time
+  - Read stat and status files
+  - List processes
+  - 12 unit tests passing
 
 **Completed Fixes:**
 - Kernel module: removed duplicate structures, virtual_cpu, vmm_paging declarations
@@ -709,6 +718,6 @@ See [BOOT_TO_LOGIN_PATH_SPECIFICATION.md](../docs/BOOT_TO_LOGIN_PATH_SPECIFICATI
 - [PROJECT_STATUS.md](../docs/PROJECT_STATUS.md) - Current implementation status
 
 ### Last Verified
-- **Version:** 4.9
+- **Version:** 5.0
 - **Date:** 2026-09-21
 - **Verified by:** Devin AI Agent
