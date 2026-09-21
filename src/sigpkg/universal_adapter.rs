@@ -1090,6 +1090,38 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::Vcpkg)
         } else if f.ends_with(".narinfo") {
             Some(PackageFormat::NarInfo)
+        } else if f.ends_with(".msi") {
+            Some(PackageFormat::Msi)
+        } else if f.ends_with(".msix") {
+            Some(PackageFormat::Msix)
+        } else if f.ends_with(".appx") {
+            Some(PackageFormat::Appx)
+        } else if f.ends_with(".run") {
+            Some(PackageFormat::Makeself)
+        } else if f.ends_with(".zpk") {
+            Some(PackageFormat::ZeroInstall)
+        } else if f.ends_with(".kmod") {
+            Some(PackageFormat::Kmod)
+        } else if f.ends_with(".kmp") {
+            Some(PackageFormat::Kmp)
+        } else if f.ends_with(".jar") {
+            Some(PackageFormat::Jar)
+        } else if f.ends_with(".npm") {
+            Some(PackageFormat::Npm)
+        } else if f.ends_with(".phar") {
+            Some(PackageFormat::Phar)
+        } else if f.ends_with(".cpan") {
+            Some(PackageFormat::Cpan)
+        } else if f.ends_with(".rock") {
+            Some(PackageFormat::Rock)
+        } else if f.ends_with(".hex") {
+            Some(PackageFormat::Hex)
+        } else if f.ends_with(".cabal") {
+            Some(PackageFormat::Cabal)
+        } else if f.ends_with(".jl") {
+            Some(PackageFormat::Jl)
+        } else if f.ends_with(".rpkg") {
+            Some(PackageFormat::Rpkg)
         } else {
             None
         }
@@ -1162,6 +1194,20 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::Vcpkg) // Microsoft Vcpkg magic
         } else if data.starts_with(b"NARI") {
             Some(PackageFormat::NarInfo) // Nix/Guix NarInfo substituter magic
+        } else if data.starts_with(b"MSCF") {
+            Some(PackageFormat::Msi) // Windows Installer Cab/MSI magic
+        } else if data.starts_with(b"MAKS") {
+            Some(PackageFormat::Makeself) // Makeself self-extracting archive
+        } else if data.starts_with(b"ZPK!") {
+            Some(PackageFormat::ZeroInstall) // ZeroInstall magic
+        } else if data.starts_with(b"KMOD") {
+            Some(PackageFormat::Kmod) // Kernel Module magic
+        } else if data.starts_with(b"\xca\xfe\xba\xbe") || data.starts_with(b"JAR!") {
+            Some(PackageFormat::Jar) // Java Archive / Bytecode magic
+        } else if data.starts_with(b"NPMP") {
+            Some(PackageFormat::Npm) // NPM package payload magic
+        } else if data.starts_with(b"PHAR") {
+            Some(PackageFormat::Phar) // PHP Archive magic
         } else {
             None
         }
@@ -1967,6 +2013,38 @@ impl UniversalScriptletConverter {
                 "preInstall" => Some(SigmaPkgHookType::PreInstall),
                 "postInstall" => Some(SigmaPkgHookType::PostInstall),
                 "preUnpack" | "preBuild" => Some(SigmaPkgHookType::PreInstall),
+                _ => None,
+            },
+            PackageFormat::OpenBsdPkg => match script_name {
+                "pre-install" | "preinst" => Some(SigmaPkgHookType::PreInstall),
+                "post-install" | "postinst" => Some(SigmaPkgHookType::PostInstall),
+                "pre-deinstall" | "prerm" => Some(SigmaPkgHookType::PreRemove),
+                "post-deinstall" | "postrm" => Some(SigmaPkgHookType::PostRemove),
+                _ => None,
+            },
+            PackageFormat::Ipk | PackageFormat::Opkg => match script_name {
+                "preinst" => Some(SigmaPkgHookType::PreInstall),
+                "postinst" => Some(SigmaPkgHookType::PostInstall),
+                "prerm" => Some(SigmaPkgHookType::PreRemove),
+                "postrm" => Some(SigmaPkgHookType::PostRemove),
+                _ => None,
+            },
+            PackageFormat::SlackBuild | PackageFormat::Txz => match script_name {
+                "doinst.sh" | "postinst" => Some(SigmaPkgHookType::PostInstall),
+                "preinst" => Some(SigmaPkgHookType::PreInstall),
+                "prerm" => Some(SigmaPkgHookType::PreRemove),
+                _ => None,
+            },
+            PackageFormat::Npm | PackageFormat::Wheel | PackageFormat::Crate | PackageFormat::Gem | PackageFormat::Nupkg | PackageFormat::Jar => match script_name {
+                "preinstall" | "pre-install" | "setup" | "pre" => Some(SigmaPkgHookType::PreInstall),
+                "postinstall" | "post-install" | "build" | "post" => Some(SigmaPkgHookType::PostInstall),
+                "preuninstall" | "pre-remove" => Some(SigmaPkgHookType::PreRemove),
+                "postuninstall" | "post-remove" => Some(SigmaPkgHookType::PostRemove),
+                _ => None,
+            },
+            PackageFormat::Msi | PackageFormat::Makeself | PackageFormat::ZeroInstall => match script_name {
+                "install" | "postexec" | "run" => Some(SigmaPkgHookType::PostInstall),
+                "preexec" => Some(SigmaPkgHookType::PreInstall),
                 _ => None,
             },
             _ => None,
