@@ -155,10 +155,18 @@ impl UniversalPackageTranslator {
 }
 
 fn debtor_to_sovereign_name(name: &str) -> &str {
-    if name.contains("ssl") {
+    if name.contains("curl") {
+        "sovereign-curl"
+    } else if name.contains("sqlite") {
+        "sovereign-sqlite"
+    } else if name.contains("ssl") {
         "sovereign-openssl"
-    } else if name.contains("libc") {
+    } else if name.contains("libc") || name == "musl" || name.contains("glibc") {
         "sovereign-libc"
+    } else if name.contains("zlib") {
+        "sovereign-zlib"
+    } else if name.contains("python") {
+        "sovereign-python"
     } else {
         name
     }
@@ -2364,7 +2372,7 @@ pub struct UniversalPackageCommandBridge;
 impl UniversalPackageCommandBridge {
     pub fn translate_cli_command(pm_name: &str, action: &str, pkg: &str) -> Result<String, &'static str> {
         match pm_name.to_lowercase().as_str() {
-            "apt" | "apt-get" | "dpkg" => match action {
+            "apt" | "apt-get" | "dpkg" | "apx" => match action {
                 "install" | "add" => Ok(format!("sigpkg install {}.deb", pkg)),
                 "remove" | "purge" => Ok(format!("sigpkg remove {}", pkg)),
                 "update" | "upgrade" => Ok("sigpkg update".to_string()),
@@ -2376,7 +2384,7 @@ impl UniversalPackageCommandBridge {
                 "-syu" | "update" => Ok("sigpkg update".to_string()),
                 _ => Ok(format!("sigpkg {}", action)),
             },
-            "dnf" | "yum" | "zypper" => match action {
+            "dnf" | "dnf5" | "microdnf" | "yum" | "zypper" => match action {
                 "install" | "in" => Ok(format!("sigpkg install {}.rpm", pkg)),
                 "remove" | "rm" => Ok(format!("sigpkg remove {}", pkg)),
                 "update" | "up" => Ok("sigpkg update".to_string()),
@@ -2391,6 +2399,21 @@ impl UniversalPackageCommandBridge {
             "emerge" | "portage" => match action {
                 "install" | "add" => Ok(format!("sigpkg install {}.ebuild", pkg)),
                 "unmerge" | "deselect" => Ok(format!("sigpkg remove {}", pkg)),
+                _ => Ok(format!("sigpkg {}", action)),
+            },
+            "xbps-install" | "xbps" => match action {
+                "install" | "-S" => Ok(format!("sigpkg install {}.xbps", pkg)),
+                "remove" | "-R" => Ok(format!("sigpkg remove {}", pkg)),
+                _ => Ok(format!("sigpkg {}", action)),
+            },
+            "nix-env" | "nix" => match action {
+                "-i" | "-iA" | "install" => Ok(format!("sigpkg install {}.nixpkg", pkg)),
+                "-e" | "uninstall" => Ok(format!("sigpkg remove {}", pkg)),
+                _ => Ok(format!("sigpkg {}", action)),
+            },
+            "guix" => match action {
+                "install" | "package -i" => Ok(format!("sigpkg install {}.guix", pkg)),
+                "remove" | "package -r" => Ok(format!("sigpkg remove {}", pkg)),
                 _ => Ok(format!("sigpkg {}", action)),
             },
             "pkg" | "ports" => match action {
@@ -2963,10 +2986,25 @@ mod tests {
     }
 
     #[test]
+    fn test_debtor_to_sovereign_name_mappings() {
+        assert_eq!(debtor_to_sovereign_name("libssl-dev"), "sovereign-openssl");
+        assert_eq!(debtor_to_sovereign_name("musl"), "sovereign-libc");
+        assert_eq!(debtor_to_sovereign_name("glibc-devel"), "sovereign-libc");
+        assert_eq!(debtor_to_sovereign_name("sqlite3-dev"), "sovereign-sqlite");
+        assert_eq!(debtor_to_sovereign_name("libcurl4-openssl-dev"), "sovereign-curl");
+        assert_eq!(debtor_to_sovereign_name("zlib1g-dev"), "sovereign-zlib");
+        assert_eq!(debtor_to_sovereign_name("python3-devel"), "sovereign-python");
+    }
+
+    #[test]
     fn test_universal_package_command_translation() {
         assert_eq!(
             UniversalPackageCommandBridge::translate_cli_command("apt", "install", "curl").unwrap(),
             "sigpkg install curl.deb"
+        );
+        assert_eq!(
+            UniversalPackageCommandBridge::translate_cli_command("apx", "install", "htop").unwrap(),
+            "sigpkg install htop.deb"
         );
         assert_eq!(
             UniversalPackageCommandBridge::translate_cli_command("pacman", "-S", "neofetch").unwrap(),
@@ -2977,12 +3015,32 @@ mod tests {
             "sigpkg install nginx.rpm"
         );
         assert_eq!(
+            UniversalPackageCommandBridge::translate_cli_command("dnf5", "install", "podman").unwrap(),
+            "sigpkg install podman.rpm"
+        );
+        assert_eq!(
+            UniversalPackageCommandBridge::translate_cli_command("microdnf", "in", "skopeo").unwrap(),
+            "sigpkg install skopeo.rpm"
+        );
+        assert_eq!(
             UniversalPackageCommandBridge::translate_cli_command("apk", "add", "htop").unwrap(),
             "sigpkg install htop.apk"
         );
         assert_eq!(
             UniversalPackageCommandBridge::translate_cli_command("emerge", "install", "zsh").unwrap(),
             "sigpkg install zsh.ebuild"
+        );
+        assert_eq!(
+            UniversalPackageCommandBridge::translate_cli_command("xbps-install", "install", "void-pkg").unwrap(),
+            "sigpkg install void-pkg.xbps"
+        );
+        assert_eq!(
+            UniversalPackageCommandBridge::translate_cli_command("nix-env", "-i", "nix-pkg").unwrap(),
+            "sigpkg install nix-pkg.nixpkg"
+        );
+        assert_eq!(
+            UniversalPackageCommandBridge::translate_cli_command("guix", "install", "guix-pkg").unwrap(),
+            "sigpkg install guix-pkg.guix"
         );
         assert_eq!(
             UniversalPackageCommandBridge::translate_cli_command("pkg", "install", "git").unwrap(),

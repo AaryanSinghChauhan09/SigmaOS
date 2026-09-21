@@ -4055,18 +4055,18 @@ impl UniversalDistroPackageUnifierEngine {
 
     pub fn map_dependency_name<'a>(&self, name: &'a str) -> &'a str {
         match name {
-            "libssl-dev" | "openssl-devel" | "dev-libs/openssl" | "openssl" | "openssl-dev" => "sovereign-openssl",
-            "libc6" | "glibc" | "sys-libs/glibc" | "musl" | "musl-dev" | "glibc-devel" => "sovereign-libc",
-            "zlib1g-dev" | "zlib-devel" | "sys-libs/zlib" | "zlib" | "zlib-dev" => "sovereign-zlib",
-            "libcurl4-openssl-dev" | "curl-devel" | "net-misc/curl" | "curl" | "curl-dev" => "sovereign-curl",
-            "libsqlite3-dev" | "sqlite-devel" | "dev-db/sqlite" | "sqlite" | "sqlite-dev" => "sovereign-sqlite",
-            "libpq-dev" | "postgresql-devel" | "dev-db/postgresql" | "postgresql" | "postgresql-dev" => "sovereign-postgresql",
-            "libglib2.0-dev" | "glib2-devel" | "dev-libs/glib" | "glib2" | "glib2-dev" => "sovereign-glib2",
-            "python3-dev" | "python3-devel" | "dev-lang/python" | "python3" | "python" | "python-dev" => "sovereign-python",
-            "build-essential" | "base-devel" | "build-base" => "sovereign-build-tools",
-            "libffi-dev" | "libffi-devel" | "dev-libs/libffi" | "libffi" => "sovereign-libffi",
-            "libpam0g-dev" | "pam-devel" | "sys-libs/pam" | "linux-pam" => "sovereign-pam",
-            "libxml2-dev" | "libxml2-devel" | "dev-libs/libxml2" | "libxml2" => "sovereign-libxml2",
+            "libssl-dev" | "openssl-devel" | "dev-libs/openssl" | "openssl" | "openssl-dev" | "libssl3t64" | "openssl-libs" | "cachyos-v3-libssl" => "sovereign-openssl",
+            "libc6" | "glibc" | "sys-libs/glibc" | "musl" | "musl-dev" | "glibc-devel" | "glibc-common" | "libc6-dev" | "glibc-t64" => "sovereign-libc",
+            "zlib1g-dev" | "zlib-devel" | "sys-libs/zlib" | "zlib" | "zlib-dev" | "zlib-ng" => "sovereign-zlib",
+            "libcurl4-openssl-dev" | "curl-devel" | "net-misc/curl" | "curl" | "curl-dev" | "libcurl4t64" | "libcurl-minimal" => "sovereign-curl",
+            "libsqlite3-dev" | "sqlite-devel" | "dev-db/sqlite" | "sqlite" | "sqlite-dev" | "libsqlite3-0t64" | "sqlite-libs" => "sovereign-sqlite",
+            "libpq-dev" | "postgresql-devel" | "dev-db/postgresql" | "postgresql" | "postgresql-dev" | "libpq5" => "sovereign-postgresql",
+            "libglib2.0-dev" | "glib2-devel" | "dev-libs/glib" | "glib2" | "glib2-dev" | "libglib2.0-0t64" | "glib2-libs" => "sovereign-glib2",
+            "python3-dev" | "python3-devel" | "dev-lang/python" | "python3" | "python" | "python-dev" | "python-libs" => "sovereign-python",
+            "build-essential" | "base-devel" | "build-base" | "gcc-c++" | "gcc" => "sovereign-build-tools",
+            "libffi-dev" | "libffi-devel" | "dev-libs/libffi" | "libffi" | "libffi8t64" => "sovereign-libffi",
+            "libpam0g-dev" | "pam-devel" | "sys-libs/pam" | "linux-pam" | "libpam0g-t64" => "sovereign-pam",
+            "libxml2-dev" | "libxml2-devel" | "dev-libs/libxml2" | "libxml2" | "libxml2-t64" => "sovereign-libxml2",
             _ => name,
         }
     }
@@ -5233,6 +5233,76 @@ Description: Hook test";
                 filename
             );
         }
+    }
+
+    #[test]
+    fn test_multi_distro_t64_and_dnf5_dependency_mappings() {
+        let unifier = UniversalDistroPackageUnifierEngine::new();
+
+        assert_eq!(unifier.map_dependency_name("libssl3t64"), "sovereign-openssl");
+        assert_eq!(unifier.map_dependency_name("openssl-libs"), "sovereign-openssl");
+        assert_eq!(unifier.map_dependency_name("cachyos-v3-libssl"), "sovereign-openssl");
+
+        assert_eq!(unifier.map_dependency_name("glibc-t64"), "sovereign-libc");
+        assert_eq!(unifier.map_dependency_name("glibc-common"), "sovereign-libc");
+
+        assert_eq!(unifier.map_dependency_name("libcurl4t64"), "sovereign-curl");
+        assert_eq!(unifier.map_dependency_name("libcurl-minimal"), "sovereign-curl");
+
+        assert_eq!(unifier.map_dependency_name("libsqlite3-0t64"), "sovereign-sqlite");
+        assert_eq!(unifier.map_dependency_name("sqlite-libs"), "sovereign-sqlite");
+
+        assert_eq!(unifier.map_dependency_name("libglib2.0-0t64"), "sovereign-glib2");
+        assert_eq!(unifier.map_dependency_name("libffi8t64"), "sovereign-libffi");
+        assert_eq!(unifier.map_dependency_name("libpam0g-t64"), "sovereign-pam");
+        assert_eq!(unifier.map_dependency_name("libxml2-t64"), "sovereign-libxml2");
+    }
+
+    #[test]
+    fn test_user_defined_build_phase_pipeline() {
+        let mut pipeline = UserDefinedFunctionPipeline::new();
+
+        let prepare_executed = Arc::new(core::sync::atomic::AtomicBool::new(false));
+        let compile_executed = Arc::new(core::sync::atomic::AtomicBool::new(false));
+
+        let prep_flag = Arc::clone(&prepare_executed);
+        pipeline.register_closure("prep-closure", PackageBuildPhase::Prepare, move |_pkg| {
+            prep_flag.store(true, core::sync::atomic::Ordering::SeqCst);
+            Ok(())
+        });
+
+        let comp_flag = Arc::clone(&compile_executed);
+        pipeline.register_closure("compile-closure", PackageBuildPhase::Compile, move |_pkg| {
+            comp_flag.store(true, core::sync::atomic::Ordering::SeqCst);
+            Ok(())
+        });
+
+        let mut pkg: Box<dyn IPackage> = Box::new(StandardPackage {
+            metadata: PackageMetadata {
+                name: "udf-phases".to_string(),
+                version: Version::new(1, 0, 0),
+                description: "udf phases test".to_string(),
+                license: "MIT".to_string(),
+                maintainer: "dev".to_string(),
+                homepage: String::new(),
+                architecture: "x86_64".to_string(),
+                checksum: String::new(),
+                size: 0,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
+            dependencies: Vec::new(),
+            format: PackageFormat::Sigma,
+        });
+
+        assert_eq!(pipeline.execute_phase(PackageBuildPhase::Prepare, pkg.as_mut()).unwrap(), 1);
+        assert!(prepare_executed.load(core::sync::atomic::Ordering::SeqCst));
+        assert!(!compile_executed.load(core::sync::atomic::Ordering::SeqCst));
+
+        assert_eq!(pipeline.execute_phase(PackageBuildPhase::Compile, pkg.as_mut()).unwrap(), 1);
+        assert!(compile_executed.load(core::sync::atomic::Ordering::SeqCst));
     }
 
     #[test]
