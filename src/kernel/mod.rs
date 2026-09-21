@@ -63,6 +63,15 @@ pub use drm_gem::*;
 pub mod entry;
 pub use entry::*;
 
+pub mod epoll;
+pub use epoll::{Epoll, EpollCtlOp, EpollEvent, EpollEventFlags};
+
+pub mod timerfd;
+pub use timerfd::{ClockId, TimerFd, TimerFlags, TimerSetting};
+
+pub mod signalfd;
+pub use signalfd::{Signal, SignalFd, SignalFdFlags, SignalMask, SigInfo};
+
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
 pub use linux_parity::{
