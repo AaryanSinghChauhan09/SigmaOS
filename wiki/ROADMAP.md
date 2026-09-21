@@ -406,6 +406,15 @@ The M1 milestone provides a bootable ISO with kernel entry point, init system, l
   - SemaphoreSet with System V style key-based lookup
   - SemaphoreManager for system-wide semaphore management
   - 10 unit tests passing
+- Timerfd (src/kernel/timerfd.rs):
+  - TimerClock types (Realtime, Monotonic, Boottime)
+  - TimerFlags (non_blocking, close_on_exec)
+  - TimerSpec with interval and value in seconds/nanoseconds
+  - Periodic timer detection
+  - TimerFd with arm/disarm and expiration tracking
+  - TimerExpirations for reading expiration counts
+  - TimerFdManager for system-wide timer management
+  - 12 unit tests passing
 
 **Completed Fixes:**
 - Kernel module: removed duplicate structures, virtual_cpu, vmm_paging declarations
@@ -590,6 +599,6 @@ See [BOOT_TO_LOGIN_PATH_SPECIFICATION.md](../docs/BOOT_TO_LOGIN_PATH_SPECIFICATI
 - [PROJECT_STATUS.md](../docs/PROJECT_STATUS.md) - Current implementation status
 
 ### Last Verified
-- **Version:** 3.3
+- **Version:** 3.4
 - **Date:** 2026-09-21
 - **Verified by:** Devin AI Agent
