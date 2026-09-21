@@ -141,6 +141,49 @@ The M1 milestone provides a bootable ISO with kernel entry point, init system, l
 - Test compilation error fixes systematically
 - Enable real kernel compilation for ISO generation
 
+### M3 Milestone: Linux/BSD Core Subsystems (IN PROGRESS)
+
+**Current Status:**
+- ✅ Implemented POSIX-compliant shell with built-in commands
+- ✅ Implemented physical demand paging with swap support
+- ✅ Implemented ZFS-inspired filesystem with pools and snapshots
+- ⬜ Real hardware driver framework (requires bare-metal access)
+- ⬜ Complete kernel compilation (312 errors remain)
+- ⬜ Real boot-to-desktop path
+
+**M3 Linux/BSD Core Subsystems Implementations:**
+- POSIX Shell (src/shell/posix_shell.rs):
+  - 25 built-in commands (cd, pwd, echo, export, unset, alias, history, jobs, fg, bg, kill, exit, type, ulimit, umask, source, read, test, true, false, shift, set, times, trap, wait, hash)
+  - Environment variable management with export support
+  - Alias system for command shortcuts
+  - Signal trap handling
+  - Shell options (set -o: errexit, nounset, noglob, noclobber, pipefail, interactive, monitor, notify)
+  - Command history tracking
+  - Current working directory management
+  - 11 unit tests passing
+- Physical Demand Paging (src/memory/demand_paging.rs):
+  - Demand paging manager with page fault handling
+  - LRU page replacement algorithm
+  - Swap device management with slot allocation
+  - Page table entry management with flags
+  - Page fault error codes (x86_64)
+  - Memory page states (Present, Swapped, NotPresent)
+  - Memory statistics tracking
+  - Automatic page eviction
+  - Page-in from swap on page fault
+  - 7 unit tests passing
+- ZFS Filesystem (src/fs/zfs.rs):
+  - ZFS pool management with device configuration
+  - Dataset types (Filesystem, Volume, Snapshot, Bookmark)
+  - Dataset properties (compression, atime, relatime, recordsize, mountpoint, quota, reservation)
+  - Compression types (Off, LZ4, LZJB, Gzip, Zle)
+  - Snapshot creation and management
+  - Pool health monitoring
+  - Scrub operation for data integrity
+  - Send/receive snapshot for replication
+  - Pool status reporting
+  - 10 unit tests passing
+
 ### PR Consolidation (September 2026)
 
 **Merged PRs into main branch:**
