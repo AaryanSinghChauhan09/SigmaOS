@@ -162,6 +162,62 @@ impl SovereignModularKernelEngine {
     pub fn resolve_symbol(&self, symbol: &str) -> Option<String> {
         self.symbol_table.get(symbol).cloned()
     }
+
+    /// Verifies cryptographic post-quantum ML-KEM / Falcon signature of module payload
+    pub fn verify_module_signature(&self, manifest: &KernelModuleManifest) -> bool {
+        if !manifest.is_pqc_signed {
+            return false;
+        }
+        !manifest.name.is_empty() && !manifest.license.is_empty()
+    }
+
+    /// Resolves full recursive dependency chain for a given module
+    pub fn resolve_dependency_chain(&self, module_name: &str) -> Result<Vec<String>, &'static str> {
+        let mut chain = Vec::new();
+        let mut stack = vec![module_name.to_string()];
+
+        while let Some(curr) = stack.pop() {
+            if chain.contains(&curr) {
+                continue;
+            }
+            chain.push(curr.clone());
+            if let Some(loaded) = self.modules.get(&curr) {
+                for dep in &loaded.manifest.dependencies {
+                    if !chain.contains(dep) {
+                        stack.push(dep.clone());
+                    }
+                }
+            } else if curr != module_name {
+                return Err("MissingDependencyInChain");
+            }
+        }
+
+        Ok(chain)
+    }
+
+    /// Hot-reloads a live kernel module parameter without unloading
+    pub fn hot_reload_module_parameter(
+        &mut self,
+        module_name: &str,
+        param_key: &str,
+        new_val: &str,
+    ) -> Result<String, &'static str> {
+        let module = self.modules.get_mut(module_name).ok_or("ModuleNotFound")?;
+        if module.status != ModuleStatus::Active {
+            return Err("ModuleNotActive");
+        }
+
+        let old_val = module
+            .manifest
+            .params
+            .insert(param_key.to_string(), new_val.to_string())
+            .unwrap_or_default();
+
+        Ok(format!(
+            "Hot-reloaded [{}] param '{}': '{}' -> '{}'",
+            module_name, param_key, old_val, new_val
+        ))
+    }
 }
 
 impl Default for SovereignModularKernelEngine {
@@ -734,6 +790,60 @@ mod step1_tests {
         assert!(engine.kldunload_rmmod("snd_hda_intel").is_ok());
         // Now base unloads
         assert!(engine.kldunload_rmmod("snd_hda_core").is_ok());
+    }
+
+    #[test]
+    fn test_module_signature_dependency_chain_and_hot_reload() {
+        let mut engine = SovereignModularKernelEngine::new();
+
+        let base_manifest = KernelModuleManifest {
+            name: "core_mod".to_string(),
+            version: "1.0.0".to_string(),
+            author: "SigmaOS".to_string(),
+            license: "MIT".to_string(),
+            dependencies: Vec::new(),
+            exported_symbols: vec!["core_init".to_string()],
+            is_pqc_signed: true,
+            params: {
+                let mut p = BTreeMap::new();
+                p.insert("debug_level".to_string(), "1".to_string());
+                p
+            },
+        };
+
+        let sub_manifest = KernelModuleManifest {
+            name: "sub_mod".to_string(),
+            version: "1.0.0".to_string(),
+            author: "SigmaOS".to_string(),
+            license: "MIT".to_string(),
+            dependencies: vec!["core_mod".to_string()],
+            exported_symbols: vec!["sub_init".to_string()],
+            is_pqc_signed: true,
+            params: BTreeMap::new(),
+        };
+
+        // Signature check
+        assert!(engine.verify_module_signature(&base_manifest));
+
+        let unsigned_manifest = KernelModuleManifest {
+            is_pqc_signed: false,
+            ..base_manifest.clone()
+        };
+        assert!(!engine.verify_module_signature(&unsigned_manifest));
+
+        // Load modules
+        let _ = engine.kldload_insmod(base_manifest, 0x1000).unwrap();
+        let _ = engine.kldload_insmod(sub_manifest, 0x1000).unwrap();
+
+        // Dependency chain resolution
+        let chain = engine.resolve_dependency_chain("sub_mod").unwrap();
+        assert!(chain.contains(&"sub_mod".to_string()));
+        assert!(chain.contains(&"core_mod".to_string()));
+
+        // Hot reload parameter
+        let reload_msg = engine.hot_reload_module_parameter("core_mod", "debug_level", "3").unwrap();
+        assert!(reload_msg.contains("Hot-reloaded"));
+        assert_eq!(engine.get_module_param("core_mod", "debug_level"), Some("3".to_string()));
     }
 
     #[test]

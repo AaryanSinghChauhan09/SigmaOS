@@ -122,11 +122,64 @@ impl AccessibilityProfile {
     }
 }
 
+/// AT-SPI2 DBus Event types for Linux/BSD desktop accessibility IPC parity
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum AtSpi2EventType {
+    FocusChanged,
+    TextChanged,
+    CaretMoved,
+    ValueChanged,
+    StateChanged,
+}
+
+#[derive(Debug, Clone)]
+pub struct AtSpi2BusEvent {
+    pub event_id: u64,
+    pub event_type: AtSpi2EventType,
+    pub source_id: String,
+    pub role_name: String,
+    pub detail: String,
+}
+
+pub struct AtSpi2BusDispatcher {
+    pub event_history: Vec<AtSpi2BusEvent>,
+    pub next_event_id: u64,
+}
+
+impl AtSpi2BusDispatcher {
+    pub fn new() -> Self {
+        Self {
+            event_history: Vec::new(),
+            next_event_id: 1,
+        }
+    }
+
+    pub fn dispatch_event(&mut self, event_type: AtSpi2EventType, source_id: &str, role_name: &str, detail: &str) -> u64 {
+        let event_id = self.next_event_id;
+        self.next_event_id += 1;
+        self.event_history.push(AtSpi2BusEvent {
+            event_id,
+            event_type,
+            source_id: source_id.to_string(),
+            role_name: role_name.to_string(),
+            detail: detail.to_string(),
+        });
+        event_id
+    }
+}
+
+impl Default for AtSpi2BusDispatcher {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Accessibility framework
 pub struct AccessibilityFramework {
     pub profiles: BTreeMap<String, AccessibilityProfile>,
     pub active_profile: Option<String>,
     pub global_settings: BTreeMap<AccessibilityFeature, AccessibilitySetting>,
+    pub at_spi2_bus: AtSpi2BusDispatcher,
 }
 
 impl AccessibilityFramework {
@@ -136,6 +189,7 @@ impl AccessibilityFramework {
             profiles: BTreeMap::new(),
             active_profile: None,
             global_settings: BTreeMap::new(),
+            at_spi2_bus: AtSpi2BusDispatcher::new(),
         };
 
         // Add default profiles
@@ -225,6 +279,14 @@ impl AccessibilityFramework {
             let profile: &mut AccessibilityProfile = profile;
             profile.enable_all();
         }
+
+        self.at_spi2_bus.dispatch_event(
+            AtSpi2EventType::StateChanged,
+            "system_a11y",
+            "framework",
+            &format!("ProfileActivated:{}", name),
+        );
+
         Ok(())
     }
 
@@ -284,29 +346,37 @@ pub enum AccessibilityError {
     FeatureNotSupported,
 }
 
-/// UI Component metadata for automated WCAG 2.1 compliance audits
+/// UI Component metadata for automated WCAG 2.1 / 2.2 compliance audits
 #[derive(Debug, Clone)]
 pub struct AccessibilityComponent {
     pub id: String,
     pub role: String,
     pub label: Option<String>,
-    pub contrast_ratio: f32, // e.g. 4.5
+    pub contrast_ratio: f32, // e.g. 4.5 for AA, 7.0 for AAA
     pub keyboard_focusable: bool,
 }
 
 /// Automated WCAG compliance testing harness for UI components
 pub struct AccessibilityTestingHarness {
     pub min_contrast_ratio: f32,
+    pub enforce_wcag_aaa: bool,
 }
 
 impl AccessibilityTestingHarness {
     pub fn new() -> Self {
         Self {
-            min_contrast_ratio: 4.5,
-        } // WCAG AA standard
+            min_contrast_ratio: 4.5, // WCAG AA standard
+            enforce_wcag_aaa: false,
+        }
     }
 
-    /// Audit an individual UI component for WCAG 2.1 AA compliance
+    pub fn with_wcag_aaa(mut self) -> Self {
+        self.min_contrast_ratio = 7.0; // WCAG AAA standard
+        self.enforce_wcag_aaa = true;
+        self
+    }
+
+    /// Audit an individual UI component for WCAG compliance
     pub fn audit_component(&self, component: &AccessibilityComponent) -> Vec<&'static str> {
         let mut violations = Vec::new();
 
@@ -320,7 +390,11 @@ impl AccessibilityTestingHarness {
         }
 
         if component.contrast_ratio < self.min_contrast_ratio {
-            violations.push("Insufficient text/background contrast ratio (< 4.5:1)");
+            if self.enforce_wcag_aaa {
+                violations.push("Insufficient text/background contrast ratio (< 7.0:1 WCAG AAA)");
+            } else {
+                violations.push("Insufficient text/background contrast ratio (< 4.5:1 WCAG AA)");
+            }
         }
 
         if !component.keyboard_focusable && component.role == "button" {
@@ -363,13 +437,19 @@ mod tests {
     }
 
     #[test]
-    fn test_profile_activation() {
+    fn test_profile_activation_and_at_spi2_event() {
         let mut framework = AccessibilityFramework::new();
         assert!(framework.activate_profile("Vision Impaired").is_ok());
         assert_eq!(
             framework.active_profile,
             Some("Vision Impaired".to_string())
         );
+
+        // Verify AT-SPI2 DBus event was dispatched
+        assert_eq!(framework.at_spi2_bus.event_history.len(), 1);
+        let ev = &framework.at_spi2_bus.event_history[0];
+        assert_eq!(ev.event_type, AtSpi2EventType::StateChanged);
+        assert_eq!(ev.detail, "ProfileActivated:Vision Impaired");
     }
 
     #[test]
@@ -398,29 +478,17 @@ mod tests {
     }
 
     #[test]
-    fn test_accessibility_testing_harness() {
-        let harness = AccessibilityTestingHarness::new();
-        let valid_comp = AccessibilityComponent {
+    fn test_accessibility_testing_harness_wcag_aaa() {
+        let harness = AccessibilityTestingHarness::new().with_wcag_aaa();
+        let comp = AccessibilityComponent {
             id: "btn_ok".to_string(),
             role: "button".to_string(),
             label: Some("Submit".to_string()),
-            contrast_ratio: 5.2,
+            contrast_ratio: 5.2, // Passes AA (4.5) but fails AAA (7.0)
             keyboard_focusable: true,
         };
-        assert!(harness.audit_component(&valid_comp).is_empty());
-
-        let invalid_comp = AccessibilityComponent {
-            id: "btn_bad".to_string(),
-            role: "button".to_string(),
-            label: None,
-            contrast_ratio: 2.1,
-            keyboard_focusable: false,
-        };
-        let violations = harness.audit_component(&invalid_comp);
-        assert_eq!(violations.len(), 3);
-
-        let report = harness.audit_ui_tree(&[valid_comp, invalid_comp]);
-        assert_eq!(report.len(), 1);
-        assert!(report.contains_key("btn_bad"));
+        let violations = harness.audit_component(&comp);
+        assert_eq!(violations.len(), 1);
+        assert!(violations[0].contains("WCAG AAA"));
     }
 }

@@ -22,12 +22,15 @@ pub mod container;
 pub mod customization;
 pub mod dashboard;
 pub mod desktop;
+pub mod init;
 pub mod device;
 pub mod driver;
 pub mod drivers;
 pub mod crypto;
 pub mod filesystem;
 pub mod futuristic_modules;
+pub mod iso;
+pub use iso::*;
 pub mod kernel;
 pub mod klib;
 pub use klib::ZeroDependencyPrimitiveHub;
@@ -46,6 +49,7 @@ pub mod shell;
 pub mod sigpkg;
 pub mod storage;
 pub mod thread;
+pub mod vfs;
 pub use process::{
     AdvancedIpcHub, BsdRusage, CancellationType, CoreDumpMetadata, EventFd,
     JobControlLifecycleEngine, JobState, PosixMessage, PosixMessageQueue, ProcessCancelState,
@@ -74,6 +78,8 @@ pub use sovereign_wiki_master_engine::*;
 pub mod open_source_obsoletion;
 pub mod unimplemented_features;
 pub mod unimplemented_tools;
+pub mod wiki_unimplemented_ideas;
+pub use wiki_unimplemented_ideas::*;
 pub mod userland;
 
 pub use distro::{
@@ -391,5 +397,6 @@ pub mod open_source_obsoletion;
 pub use open_source_obsoletion::*;
 
 pub use distro::missing_linux_bsd_components::*;
+pub use distro::additional_linux_bsd_components::*;
 
 pub use unimplemented_features::*;

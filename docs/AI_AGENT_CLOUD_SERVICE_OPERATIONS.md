@@ -48,3 +48,19 @@ sigma-cloudkube rollout --service auth-service --image v2.0.0
 # Inspect cross-device WireGuard service mesh status
 sigma-cloudkube mesh-status
 ```
+
+---
+
+## 4. Post-Quantum Secure SSH Daemon (`SovereignSshDaemon`) Architecture & Guidelines
+
+SigmaOS integrates a post-quantum secure SSH daemon (`SovereignSshDaemon` in `src/system/cron.rs`) inspired by OpenSSH, Dropbear, and FreeBSD security architectures:
+
+### 4.1 Post-Quantum Cryptography & Key Exchange
+* **Supported Algorithms**: `Kyber1024Ed25519`, `Dilithium5Ed25519`, `Mlkem1024Dilithium5`, and `Curve25519Sha256`.
+* **Hybrid Key Exchange**: Combines ML-KEM-1024 / Kyber-1024 post-quantum key encapsulation with Ed25519 signature validation.
+
+### 4.2 Security & Sandboxing Models
+* **OpenBSD Privilege Separation**: Spawns unprivileged child processes (`privileged_child_pids`) for pre-authentication and session isolation.
+* **OpenBSD Pledge Sandboxing**: Restricts process capability promises (`apply_openbsd_pledge_sandboxing`).
+* **FreeBSD Capsicum Descriptor Rights**: Limits channel socket descriptor rights (`apply_freebsd_capsicum_rights`).
+* **Fail2ban Brute-Force Guard**: Automatically bans IP addresses exceeding `max_auth_tries`.

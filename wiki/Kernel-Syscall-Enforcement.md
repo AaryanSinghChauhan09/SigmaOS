@@ -53,7 +53,7 @@ impl SyscallEnforcer {
                 return Err(SyscallError::Denied);
             }
         }
-        
+
         // Check pledge restrictions
         if let Some(promises) = self.pledge_map.get(&pid) {
             if !promises.allows_syscall(syscall) {
@@ -61,7 +61,7 @@ impl SyscallEnforcer {
                 return Err(SyscallError::Denied);
             }
         }
-        
+
         // Check Capsicum capability mode
         if self.capsicum_mode.contains(&pid) {
             if is_privileged_syscall(syscall) {
@@ -69,7 +69,7 @@ impl SyscallEnforcer {
                 return Err(SyscallError::Denied);
             }
         }
-        
+
         Ok(())
     }
 }
@@ -103,7 +103,7 @@ impl PledgePromises {
             _ => false,
         }
     }
-    
+
     pub fn from_string(s: &str) -> Result<Self, PledgeError> {
         let mut promises = PledgePromises::default();
         for token in s.split_whitespace() {
@@ -136,7 +136,7 @@ impl BpfFilter {
     pub fn evaluate(&self, syscall: u64, args: &[u64]) -> bool {
         let mut accumulator: u64 = syscall;
         let mut pc = 0;
-        
+
         while pc < self.program.len() {
             let insn = &self.program[pc];
             match insn.opcode {
@@ -152,7 +152,7 @@ impl BpfFilter {
             }
             pc += 1;
         }
-        
+
         true
     }
 }
@@ -168,13 +168,13 @@ impl BpfFilter {
 int main() {
     // Restrict to stdio and dns only
     pledge("stdio dns");
-    
+
     // Read from filesystem
     read_file("/etc/config");
-    
+
     // This would fail - exec not allowed
     // exec_program("/bin/ls");
-    
+
     return 0;
 }
 ```
@@ -186,13 +186,13 @@ use sigmaos::seccomp::{BpfFilter, BpfInstruction};
 
 fn set_seccomp_filter() -> Result<(), Box<dyn Error>> {
     let mut filter = BpfFilter::new();
-    
+
     // Allow only read, write, exit
     filter.add_instruction(BpfInstruction::return_allow(SYS_READ));
     filter.add_instruction(BpfInstruction::return_allow(SYS_WRITE));
     filter.add_instruction(BpfInstruction::return_allow(SYS_EXIT));
     filter.add_instruction(BpfInstruction::return_deny());
-    
+
     sigmaos::syscall::set_filter(filter)?;
     Ok(())
 }

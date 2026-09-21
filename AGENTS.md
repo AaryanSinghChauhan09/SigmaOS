@@ -13,6 +13,7 @@ This document defines operational guidelines, security policies, and verificatio
    - Do NOT add external crates under `[dependencies]` in `Cargo.toml` unless absolutely necessary.
    - Use `std::` primitives (`std::vec::Vec`, `std::string::String`, `std::boxed::Box`, `std::sync::Arc`) for user-space components.
    - Use `alloc::` primitives (`alloc::vec::Vec`, `alloc::string::String`, `alloc::format`) and native `#![no_std]` structures for kernel components.
+   - **See [ADR-001](docs/ARCHITECTURE_DECISIONS.md#adr-001-hybrid-stdno_std-architecture) for detailed module classification.**
 
 2. **Cross-OS Subsystem Interoperability:**
    - Every security or kernel component must maintain compatibility across Linux and BSD distribution modes (`LinuxArch`, `LinuxDebian`, `LinuxFedora`, `LinuxNix`, `FreeBsd`, `OpenBsd`, `NetBsd`, `DragonFlyBsd`, `SolarisIllumos`, etc.).

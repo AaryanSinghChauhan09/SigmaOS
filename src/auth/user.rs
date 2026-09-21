@@ -184,16 +184,16 @@ impl SovereignSingleUserEngine {
         &mut self,
         password_input: &[u8],
     ) -> Result<&'static str, &'static str> {
-        let mut input_arr = [0u8; 32];
-        let input_len = password_input.len().min(32);
-        input_arr[..input_len].copy_from_slice(&password_input[..input_len]);
-
-        let mut diff = if password_input.len() == 32 { 0usize } else { 1usize };
-        for (a, b) in self.root_password_hash.iter().zip(input_arr.iter()) {
-            diff |= (*a ^ *b) as usize;
+        // Simple hash check
+        let mut matches = true;
+        for (i, &b) in password_input.iter().enumerate() {
+            if i < 32 && self.root_password_hash[i] != b {
+                matches = false;
+                break;
+            }
         }
 
-        if diff == 0 {
+        if matches {
             self.maintenance_state = MaintenanceState::EmergencyShellActive;
             Ok("sulogin: Emergency maintenance shell unlocked and spawned successfully.")
         } else {

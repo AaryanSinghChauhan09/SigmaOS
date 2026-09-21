@@ -1,12 +1,19 @@
 // SigmaOS Virtualization Module
+pub mod advanced_virt;
+pub mod cgroups;
+pub mod container;
+pub mod deterministic;
 pub mod kvm_vcpu;
+pub mod namespaces;
 pub mod oci_pod;
 pub mod orchestration;
 pub mod rancher;
+pub mod vm_manager;
 
 pub use kvm_vcpu::{
-    KvmExitCode, KvmMemoryRegion, KvmVcpu, KvmVcpuRegisters, KvmVcpuSregs, VirtioDeviceBackend,
-    VirtioDeviceType,
+    FirecrackerMicroVmSupervisor, FreeBsdBhyveVirtioEngine, KvmExitCode, KvmMemoryRegion,
+    KvmVcpu, KvmVcpuRegisters, KvmVcpuSregs, MicroVmConfig, OpenBsdVmmMicroHypervisorEngine,
+    VirtioDeviceBackend, VirtioDeviceType, VmmGuestMode,
 };
 
 pub use orchestration::{

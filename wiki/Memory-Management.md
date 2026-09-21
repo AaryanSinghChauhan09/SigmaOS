@@ -70,7 +70,7 @@ impl VirtualMemoryManager {
 
     pub fn map_page(&mut self, pid: Pid, virtual_addr: VirtualAddress, physical_addr: PhysicalAddress, flags: PageFlags) -> Result<(), MemoryError> {
         let page_table = self.page_tables.entry(pid).or_insert_with(PageTable::new);
-        
+
         let entry = PageTableEntry {
             physical_address: physical_addr,
             present: true,
@@ -80,7 +80,7 @@ impl VirtualMemoryManager {
             dirty: false,
             accessed: false,
         };
-        
+
         page_table.entries.insert(virtual_addr, entry);
         Ok(())
     }
@@ -182,7 +182,7 @@ impl SlabAllocator {
                 return Ok(ptr);
             }
         }
-        
+
         // Allocate from slab
         self.allocate_from_slab(size)
     }
@@ -219,14 +219,14 @@ impl MemoryCompactor {
 
     pub fn compact(&mut self) -> Result<usize, MemoryError> {
         let mut moved_pages = 0;
-        
+
         // Move movable pages to consolidate free space
         for page in &self.movable_pages {
             if self.move_page(*page) {
                 moved_pages += 1;
             }
         }
-        
+
         Ok(moved_pages)
     }
 

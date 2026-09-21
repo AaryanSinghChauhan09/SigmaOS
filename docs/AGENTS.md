@@ -6,7 +6,9 @@ This document provides specialized architectural reference documentation for AI 
 
 ## 1. System Architecture Overview
 
-SigmaOS is designed as a **sovereign, zero-dependency, `#![no_std]` compliant operating system** in Rust. The architecture is divided into modular, decoupled layers:
+SigmaOS is designed as a **sovereign, zero-dependency operating system** in Rust with a hybrid `std`/`#![no_std]` architecture. The architecture is divided into modular, decoupled layers:
+
+**Note:** For detailed architectural decisions including std/no_std module classification, see [ARCHITECTURE_DECISIONS.md](ARCHITECTURE_DECISIONS.md).
 
 ### A. Architectural Pillars
 1. **Multi-Architecture Portability Layer (`src/arch/`)**:
@@ -41,8 +43,11 @@ SigmaOS is designed as a **sovereign, zero-dependency, `#![no_std]` compliant op
 
 When implementing features or bug fixes in SigmaOS:
 
-1. **Zero External Dependencies**: Maintain `[dependencies]` in `Cargo.toml` empty. Do not add third-party crates.
-2. **Strict `#![no_std]` Compatibility**: Use `alloc::` primitives (`alloc::format`, `alloc::string::String`, `alloc::vec::Vec`, `alloc::collections::BTreeMap`) instead of `std` imports for `src/` modules.
+1. **Zero External Dependencies**: Maintain `[dependencies]` in `Cargo.toml` empty. Do not add third-party crates (see ADR-002 for exceptions).
+2. **Hybrid `std`/`#![no_std]` Architecture**:
+   - Use `std::` primitives for user-space modules (`src/userland/`, `src/desktop/`, `src/audio/`, etc.)
+   - Use `alloc::` primitives (`alloc::format`, `alloc::string::String`, `alloc::vec::Vec`, `alloc::collections::BTreeMap`) for kernel and security-critical modules
+   - See [ADR-001](ARCHITECTURE_DECISIONS.md#adr-001-hybrid-stdno_std-architecture) for detailed module classification
 3. **Trait Derivations**: Always derive `Debug`, `Clone`, and `PartialEq` where appropriate on data structures.
 4. **Error Handling**: Use explicit `Result<T, &'static str>` or domain-specific enums instead of panicking.
 

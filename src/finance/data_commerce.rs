@@ -97,7 +97,54 @@ impl Default for RhsmEntitlementEngine {
 }
 
 // =========================================================================
-// 2. FEDORA & RED HAT MARKETPLACE CATALOG & PRICING ENGINE
+// 2. COMMERCIAL CAPABILITY GATE & OPEN-CORE ENTITLEMENT CHECKER
+// =========================================================================
+
+pub struct CommercialCapabilityGate {
+    pub rhsm_engine: RhsmEntitlementEngine,
+}
+
+impl CommercialCapabilityGate {
+    pub fn new(rhsm_engine: RhsmEntitlementEngine) -> Self {
+        Self { rhsm_engine }
+    }
+
+    /// Verifies if an enterprise feature (e.g. 24x7 Livepatching / High Availability ZFS) is permitted
+    pub fn check_enterprise_feature_access(
+        &self,
+        activation_key: &str,
+        feature_id: &str,
+        current_time: u64,
+    ) -> Result<bool, &'static str> {
+        // Microkernel, driver, and POSIX core features are ALWAYS unlocked and free
+        if feature_id.starts_with("core.") || feature_id.starts_with("kernel.") {
+            return Ok(true);
+        }
+
+        let cert = self.rhsm_engine.attach_subscription_key(activation_key, current_time)?;
+
+        match cert.sla {
+            SlaLevel::Premium24x7 => Ok(true),
+            SlaLevel::Standard8x5 => {
+                if feature_id.contains("24x7_support") {
+                    Err("CommercialGate: Feature requires Premium 24x7 entitlement SLA")
+                } else {
+                    Ok(true)
+                }
+            }
+            SlaLevel::SelfSupport => {
+                if feature_id.contains("enterprise") {
+                    Err("CommercialGate: Feature requires Enterprise SLA entitlement")
+                } else {
+                    Ok(true)
+                }
+            }
+        }
+    }
+}
+
+// =========================================================================
+// 3. FEDORA & RED HAT MARKETPLACE CATALOG & PRICING ENGINE
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -172,8 +219,8 @@ impl Default for FedoraDataMarketplaceEngine {
 }
 
 // =========================================================================
-// 3. DATA CONSUMPTION METERING & TELEMETRY BILLING ENGINE
-// =========================================================
+// 4. DATA CONSUMPTION METERING & TELEMETRY BILLING ENGINE
+// =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct UsageRecord {
@@ -227,7 +274,7 @@ impl Default for DataCommerceTelemetryMeter {
 }
 
 // =========================================================================
-// 4. DATA SECURITY & DLP CLASSIFICATION ENGINE
+// 5. DATA SECURITY & DLP CLASSIFICATION ENGINE
 // =========================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -319,6 +366,30 @@ mod tests {
 
         // Expiration check
         assert!(rhsm.attach_subscription_key("key_abc123", 1900000000).is_err());
+    }
+
+    #[test]
+    fn test_commercial_capability_gate() {
+        let mut rhsm = RhsmEntitlementEngine::new();
+        rhsm.register_subscription(
+            "cert_102",
+            "SigmaOS Standard Extension",
+            "key_std456",
+            SlaLevel::Standard8x5,
+            5,
+            1800000000,
+        );
+
+        let gate = CommercialCapabilityGate::new(rhsm);
+
+        // Core kernel features always allowed without key
+        assert!(gate.check_enterprise_feature_access("invalid_key", "kernel.allocator", 1700000000).unwrap());
+
+        // Standard feature allowed with key
+        assert!(gate.check_enterprise_feature_access("key_std456", "standard.monitoring", 1700000000).unwrap());
+
+        // 24x7 support feature fails on Standard SLA
+        assert!(gate.check_enterprise_feature_access("key_std456", "enterprise.24x7_support", 1700000000).is_err());
     }
 
     #[test]

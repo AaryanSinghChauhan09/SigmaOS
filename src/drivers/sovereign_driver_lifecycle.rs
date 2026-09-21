@@ -442,6 +442,76 @@ pub struct ClusterAwarePeripheralManager {
     pub devices: BTreeMap<String, ClusterPeripheralDevice>,
 }
 
+/// Linux udev/modalias and FreeBSD devd inspired driver auto-loader and dynamic matching engine
+#[derive(Debug, Clone)]
+pub struct LinuxModaliasRule {
+    pub pattern: String, // e.g. "pci:v00008086d00001533sv*sd*bc*sc*i*"
+    pub driver_module: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct BsdDevdHardwareEvent {
+    pub system: String,  // e.g. "DEVFS", "USB", "PCI"
+    pub subsystem: String,
+    pub type_event: String, // e.g. "ATTACH", "DETACH"
+    pub device_name: String,
+}
+
+pub struct LinuxBsdDriverManagerExtension {
+    pub modalias_rules: Vec<LinuxModaliasRule>,
+    pub devd_events: Vec<BsdDevdHardwareEvent>,
+    pub dkms_modules: BTreeMap<String, String>, // module_name -> kernel_version
+}
+
+impl LinuxBsdDriverManagerExtension {
+    pub fn new() -> Self {
+        Self {
+            modalias_rules: Vec::new(),
+            devd_events: Vec::new(),
+            dkms_modules: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_modalias_rule(&mut self, pattern: &str, module: &str) {
+        self.modalias_rules.push(LinuxModaliasRule {
+            pattern: pattern.to_string(),
+            driver_module: module.to_string(),
+        });
+    }
+
+    pub fn match_modalias(&self, modalias_str: &str) -> Option<String> {
+        for rule in &self.modalias_rules {
+            if modalias_str.contains(&rule.pattern) || rule.pattern == "*" {
+                return Some(rule.driver_module.clone());
+            }
+        }
+        None
+    }
+
+    pub fn emit_devd_event(&mut self, system: &str, subsystem: &str, type_event: &str, device_name: &str) {
+        self.devd_events.push(BsdDevdHardwareEvent {
+            system: system.to_string(),
+            subsystem: subsystem.to_string(),
+            type_event: type_event.to_string(),
+            device_name: device_name.to_string(),
+        });
+    }
+
+    pub fn build_dkms_module(&mut self, module_name: &str, target_kernel: &str) -> Result<String, &'static str> {
+        if module_name.is_empty() {
+            return Err("Invalid DKMS module name");
+        }
+        self.dkms_modules.insert(module_name.to_string(), target_kernel.to_string());
+        Ok(format!("DKMS: Compiled module '{}' for kernel '{}'", module_name, target_kernel))
+    }
+}
+
+impl Default for LinuxBsdDriverManagerExtension {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ClusterAwarePeripheralManager {
     pub fn new() -> Self {
         Self {
@@ -625,5 +695,20 @@ mod tests {
         let shared_gpus = engine.cluster_peripherals.list_shared_peripherals_by_class("gpu");
         assert_eq!(shared_gpus.len(), 1);
         assert_eq!(shared_gpus[0].node_id, "node-02");
+    }
+
+    #[test]
+    fn test_linux_bsd_driver_manager_extension() {
+        let mut ext = LinuxBsdDriverManagerExtension::new();
+        ext.register_modalias_rule("pci:v00008086d00001533", "e1000e");
+        let matched = ext.match_modalias("pci:v00008086d00001533sv00001028sd00000001").unwrap();
+        assert_eq!(matched, "e1000e");
+
+        ext.emit_devd_event("USB", "INTERFACE", "ATTACH", "da0");
+        assert_eq!(ext.devd_events.len(), 1);
+        assert_eq!(ext.devd_events[0].device_name, "da0");
+
+        let dkms_res = ext.build_dkms_module("nvidia-current", "6.12.0-sigmaos").unwrap();
+        assert!(dkms_res.contains("nvidia-current"));
     }
 }

@@ -93,7 +93,7 @@ impl MemoryController {
     pub fn set_memory_limit(&mut self, cgroup: &str, limit: u64) -> Result<(), CgroupError> {
         let cgroup = self.cgroups.get_mut(cgroup)
             .ok_or(CgroupError::NotFound)?;
-        
+
         cgroup.limits.max = Some(limit);
         self.enforce_limits(cgroup)?;
         Ok(())
@@ -153,7 +153,7 @@ impl OomHandler {
         let largest = processes.iter()
             .max_by_key(|p| p.memory_usage)
             .ok_or(OomError::NoProcesses)?;
-        
+
         sigkill(largest.pid)?;
         self.oom_notifier.notify(cgroup, largest.pid, "memory exceeded limit");
         Ok(())

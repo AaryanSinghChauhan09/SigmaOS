@@ -185,14 +185,14 @@ impl MacFramework {
             if !policy.enforced {
                 continue;
             }
-            
+
             for rule in &policy.rules {
                 if rule.subject == subject && rule.object == object && rule.operation == operation {
                     return rule.decision;
                 }
             }
         }
-        
+
         // Apply default policy
         self.default_policy.check_access(subject, object, operation)
     }

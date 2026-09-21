@@ -1,3 +1,7 @@
+## 2026-09-20 - Borrowed Key Aggregation in Log Summary Analytics
+**Learning:** Aggregating log entries or records (such as `process_pacct_log` in `SovereignAccountingEngine::generate_sa_summary`) by keying intermediate `HashMap` collections on owned `String` objects (`rec.command_name.clone()`) forces a heap allocation for every log entry during map insertion. Keying intermediate aggregation maps on borrowed string slices (`&str`) via `rec.command_name.as_str()` eliminates $O(N)$ heap allocations across log iterations, deferring `String` creation solely to distinct aggregated output items (`summaries.push(...)`). Pre-allocating summary vector capacity (`Vec::with_capacity(map.len())`) further avoids dynamic array resizing during result vector population.
+**Action:** When aggregating records in analytical/accounting routines, key intermediate lookup maps on borrowed references (`&str`) to eliminate per-record heap string allocations.
+
 ## 2026-09-14 - Pre-allocating Vector Capacity & Eliminating Heap Copies in Base64 Codec
 **Learning:** In string/byte codec processing (like Base64 `encode`/`decode`), calling `input.bytes().collect::<Vec<u8>>()` forces an unnecessary $O(N)$ heap vector allocation before chunk iteration. Pre-calculating exact target capacity (`Vec::with_capacity(capacity)`) and directly chunking borrowed byte slices (`input.as_bytes().chunks(4)`) eliminates all intermediate allocations and prevents capacity reallocation overhead during encoding and decoding.
 **Action:** When implementing codecs or byte formatters, operate directly on borrowed byte slices (`as_bytes()`) and pre-allocate target buffer capacities before loop iterations.
@@ -61,3 +65,7 @@
 ## 2026-09-19 - Safe Integer Sizing for Caching Fixed Array String Lengths
 **Learning:** Caching string/slice byte lengths on fixed array structs (e.g., `SimpleFileEntry` with `[u8; 256]`) replaces $O(N)$ zero-byte linear scans (`.position(|&b| b == 0)`) with $O(1)$ constant-time slice indexing. However, typing the length field as `u8` causes integer overflow truncation when the array size equals 256 bytes (`256 as u8` truncates to 0), causing full-capacity strings to evaluate as empty slices. Using `u16` safely accommodates capacities up to 65,535 without truncation risk.
 **Action:** When caching slice lengths for fixed byte arrays with capacity $\ge 256$, always type the length field as `u16` or `usize` to prevent `u8` integer overflow truncation on max-capacity inputs.
+
+## 2026-09-20 - Constant-Time $O(1)$ Plugin Name Retrieval via Cached Byte Lengths
+**Learning:** Querying plugin names via `Plugin::name()` on `SimplePlugin` performed an $O(N)$ zero-byte linear scan (`.position(|&b| b == 0)`) on every call. Storing `name_len: u8` during construction allows `SimplePlugin::name()` to retrieve the byte slice in $O(1)$ constant time without scanning the underlying 64-byte array.
+**Action:** Always store the slice byte length during struct initialization when working with fixed-size byte arrays (`[u8; N]`) to convert string/slice getter calls into $O(1)$ constant-time slice lookups.

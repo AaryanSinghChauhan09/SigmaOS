@@ -2,7 +2,6 @@ use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::collections::BTreeMap;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Systemd-Grade Init and Target State Engine for SigmaOS
@@ -1030,6 +1029,21 @@ impl SystemdEngine {
 
     pub fn register_unit(&mut self, unit: SystemdUnit) {
         self.units.push(unit);
+    }
+
+    /// Evaluates systemd service unit security profile using SystemdSecurityAuditor
+    pub fn audit_systemd_service_security(&self, unit_name: &str) -> Option<SecurityAnalysisReport> {
+        let profile = SystemdUnitHardeningProfile::default();
+        Some(SystemdSecurityAuditor::analyze_profile(unit_name, &profile))
+    }
+
+    /// Spawns a transient systemd service unit using TransientServiceGenerator
+    pub fn generate_transient_service(&mut self, command: &str, service_name: &str) -> Result<u64, &'static str> {
+        let id = (self.units.len() + 100) as u64;
+        let mut unit = TransientServiceGenerator::create_transient_unit(command, service_name);
+        unit.id = id as usize;
+        self.units.push(unit);
+        Ok(id)
     }
 
     pub fn find_unit(&self, id: UnitID) -> Option<&SystemdUnit> {
@@ -2453,5 +2467,16 @@ WantedBy=multi-user.target
         // Now main unit 2 starts successfully
         engine.systemctl_start(2).unwrap();
         assert_eq!(engine.systemctl_status(2), Some(UnitState::Active));
+    }
+
+    #[test]
+    fn test_systemd_engine_security_audit_and_transient_service() {
+        let mut engine = SystemdEngine::new();
+        let report = engine.audit_systemd_service_security("network.service").unwrap();
+        assert_eq!(report.unit_name, "network.service");
+
+        let id = engine.generate_transient_service("/usr/bin/python3 -m http.server", "transient-http").unwrap();
+        assert!(id >= 100);
+        assert_eq!(engine.units.len(), 1);
     }
 }

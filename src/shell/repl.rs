@@ -1576,6 +1576,28 @@ mod tests {
     }
 
     #[test]
+    fn test_multi_dialect_script_execution() {
+        let mut repl = ShellRepl::new();
+
+        let yash_script = "#!/usr/bin/yash\narray arr = (1 2 3)\necho yash_ok";
+        let res_yash = repl.execute_command(ShellCommand::Script {
+            code: yash_script.to_string(),
+        });
+        assert!(res_yash.is_ok());
+
+        let res_dialect = repl.execute_command(ShellCommand::Dialect {
+            code: yash_script.to_string(),
+        });
+        assert!(res_dialect.unwrap().contains("Yash"));
+
+        let mksh_script = "#!/bin/mksh\ninteger count=5";
+        let res_mksh = repl.execute_command(ShellCommand::Script {
+            code: mksh_script.to_string(),
+        });
+        assert!(res_mksh.is_ok());
+    }
+
+    #[test]
     fn test_set_get_variable() {
         let mut repl = ShellRepl::new();
         let set_cmd = ShellCommand::Set {

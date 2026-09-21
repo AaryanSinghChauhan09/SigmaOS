@@ -1,82 +1,94 @@
-# SigmaOS Kernel Subsystem (`Sigma-Kernel`) - Master Development Plan
+# Strategic Development Plan for the SigmaOS Kernel
 
-## 1. Executive Summary & Vision
-
-`Sigma-Kernel` is the native, memory-safe, hybrid monolithic/microkernel core of **SigmaOS**. Built in 100% pure Rust (`#![no_std]`), it combines the raw performance and rich subsystem ecosystem of Linux (6.8+ eBPF JIT, `io_uring` SQPOLL, EEVDF/BORE schedulers, Preempt-RT) with the modular elegance and security hardening of the BSD family (FreeBSD `kqueue`/`vnet`/Capsicum, OpenBSD W^X/KARL/`pledge`/`unveil`, DragonFly LWKT kthreads, and NetBSD Rump Kernel user-space driver sandboxing).
-
----
-
-## 2. Inspirations from Linux & BSD Kernel Ecosystems
-
-| Kernel Origin | Subsystem & Capability Absorbed | Target Subsystem / Module |
-| :--- | :--- | :--- |
-| **Linux Kernel 6.8+** | eBPF JIT compiler & XDP packet engine, `io_uring` SQPOLL zero-copy async I/O, EEVDF & BORE schedulers, Preempt-RT real-time locks, `cgroup v2`, SLUB slab allocator, `ftrace`, Linux Livepatching. | `src/kernel/` (`ebpf.rs`, `io_uring.rs`, `eevdf_sovereign.rs`, `bore.rs`, `livepatch.rs`) |
-| **FreeBSD Kernel** | Scalable `kqueue`/`kevent` event notification engine, `vnet` virtualized network stack instances, Capsicum capability rights, Universal Memory Allocator (UMA), `bhyve` microvm hypervisor gateway. | `src/kernel/` (`kqueue.rs`, `bsd_kernel_parity.rs`, `hypervisor.rs`) |
-| **OpenBSD Kernel** | W^X (Write-or-Execute) memory protection, KARL (Kernel Address Randomized Link), PINSYSCALL hardening, `pledge`/`unveil` syscall sandboxing. | `src/security/` (`pledge.rs`, `landlock.rs`, `kernel_hardening.rs`) |
-| **DragonFly BSD Kernel** | Light Weight Kernel Threads (LWKT) per-CPU lockless scheduling, lock-free IPC ring buffers, Variant Symlinks. | `src/kernel/` (`sigma_kthread.rs`, `ipc.rs`) |
-| **NetBSD Kernel** | Rump Kernels (sanitizing and executing device drivers in isolated user-space memory partitions for zero-crash kernel stability). | `src/kernel/` (`breakthroughs.rs`, `linux_bsd_innovations.rs`) |
+## Executive Summary
+This document establishes the strategic 5-phase development roadmap for the SigmaOS microkernel (`src/kernel/`). Inspired by Linux 6.12+ LTS, FreeBSD 14.1+, OpenBSD 7.6+, and Omarchy Linux desktop paradigms, the plan outlines key architectural advancements across Virtual Memory Management (VMM), asynchronous `io_uring` I/O engines, Multi-Arch HAL with ACPI NUMA topology, Post-Quantum Cryptography (PQC) kernel module verification, and eBPF dynamic tracing with self-healing capabilities.
 
 ---
 
-## 3. 5-Layer Hybrid Kernel Architecture
+## 1. Kernel Architecture Inspiration & Benchmark Matrix
 
-```
-┌────────────────────────────────────────────────────────────────────────┐
-│ Layer 5: NetBSD Rump Isolation, Linux Livepatching & OpenBSD Hardening │
-├────────────────────────────────────────────────────────────────────────┤
-│ Layer 4: `io_uring` SQPOLL, FreeBSD `kqueue`, eBPF/XDP & VNET Fabric  │
-├────────────────────────────────────────────────────────────────────────┤
-│ Layer 3: EEVDF + BORE Scheduler, DragonFly LWKT & `cgroup v2` Engine   │
-├────────────────────────────────────────────────────────────────────────┤
-│ Layer 2: SLUB / UMA Memory Allocator, KSM, NUMA & W^X/KARL Protection  │
-├────────────────────────────────────────────────────────────────────────┤
-│ Layer 1: Hardware Abstraction Layer (HAL) & Multi-Arch Boot Core       │
-└────────────────────────────────────────────────────────────────────────┘
-```
-
-### Layer 1: Hardware Abstraction Layer (HAL) & Multi-Arch Boot Core
-- **14 CPU Target Architectures:** `X86_64`, `AArch64`, `Riscv64`, `LoongArch64`, `Ppc64Le`, `Mips64`, `S390x`, `Sparc64`, `Armv7`, `Riscv32`, `Sh4`, `Alpha`, `M68k`, `X86`.
-- **Interrupt Controller Drivers:** APIC/IOAPIC, ARM GICv2/v3, RISC-V PLIC/CLINT, LoongArch ExtIOI, PowerPC XIVE.
-- **Boot Protocol:** Multiboot2, EFI handover, and FDT DeviceTree hardware autoprobing.
-
-### Layer 2: Memory Management & Allocator Core
-- **SLUB / UMA Allocator:** Lockless per-CPU slab caches for kernel objects (`kmem_cache`).
-- **KSM & NUMA:** Kernel Samepage Merging (KSM) de-duplication and NUMA-aware page placement algorithms.
-- **W^X & KARL Hardening:** Enforcing strict Write-XOR-Execute memory permissions and relinking the kernel binary layout at every boot (KARL).
-
-### Layer 3: Scheduler & Process Threading Engine
-- **EEVDF + BORE Scheduler:** Earliest Eligible Virtual Deadline First (EEVDF) combined with Burst-Oriented Response Extension (BORE) for ultra-responsive desktop interactivity and high-throughput server workloads.
-- **Preempt-RT Real-Time Core:** Low-latency preemption locks for audio/video DSP tasks.
-- **DragonFly LWKT Threads:** Per-CPU Light Weight Kernel Threads operating without global spinlock contention.
-- **Resource Control (`cgroup v2`):** Unified hierarchical accounting for CPU, Memory, I/O, and Process ID limits.
-
-### Layer 4: Async I/O, Event & Network Subsystem
-- **`io_uring` SQPOLL:** Zero-syscall submission/completion queue async I/O engine.
-- **FreeBSD `kqueue`/`kevent`:** Scalable event multiplexing across sockets, files, signals, and process state changes.
-- **eBPF JIT & XDP Engine:** In-kernel eBPF bytecode JIT compiler and Express Data Path (XDP) network packet processor.
-- **FreeBSD VNET Virtualization:** Fully virtualized network stack instances isolated per container or jail.
-
-### Layer 5: Security, Livepatching & Microkernel Isolation
-- **NetBSD Rump Kernel Driver Isolation:** Fault-intolerant drivers executed in isolated userspace memory domains to prevent driver crashes from panicking the kernel.
-- **Linux Livepatching:** Atomic function redirection via `ftrace` trampoline hooks, applying kernel security patches without rebooting.
-- **OpenBSD `pledge`/`unveil` & Capsicum:** Granular process syscall filtering and file descriptor capability rights.
-
----
-
-## 4. Implementation Roadmap
-
-| Milestone | Target Phase | Objectives | Status |
+| Operating System | Kernel Feature | Absorbed Kernel Technology | SigmaOS Integration Layer |
 | :--- | :--- | :--- | :--- |
-| **Milestone 1** | Multi-Arch HAL | Implement Multi-Arch bootloader protocol, APIC/GIC/PLIC interrupt dispatchers, and paging in `src/hal/`. | Implemented |
-| **Milestone 2** | Memory & Sched | Implement SLUB/UMA allocators, EEVDF + BORE scheduler, and `cgroup v2` controllers. | Implemented |
-| **Milestone 3** | Async I/O & eBPF | Implement `io_uring` SQPOLL engine, FreeBSD `kqueue`, eBPF JIT compiler, and XDP packet fabric. | Implemented |
-| **Milestone 4** | Hardening & VNET | Implement OpenBSD W^X/KARL/`pledge`/`unveil`, Capsicum rights, and FreeBSD VNET network virtualization. | Implemented |
-| **Milestone 5** | Rump Isolation & Patch| Implement NetBSD Rump Kernel user-space driver sandboxing and Linux ftrace-based Livepatching. | Implemented |
+| **Linux 6.12+ LTS** | 5-Level PML5 Paging | 57-bit Virtual Address Space expansion (`CR4.LA57`) | `src/kernel/vmm_paging.rs` (`Pml5PageTable`) |
+| **Linux 6.12+ LTS** | `io_uring` SQPOLL | Kernel-thread submission polling for zero-syscall I/O | `src/kernel/io_uring_sqpoll_sovereign.rs` |
+| **Linux 6.12+ LTS** | Landlock LSM v5 | Path-based and network-scoped process sandboxing | `src/kernel/sovereign_nextgen_distro_leap.rs` |
+| **FreeBSD 14.1+** | Capsicum Capabilities | Unforgeable descriptor rights delegation | `src/kernel/bsd_kernel_parity.rs` |
+| **FreeBSD 14.1+** | VNET Network Jails | Virtualized network stack instances per jail/container | `src/kernel/linux_bsd_innovations.rs` (`FreeBsdVnetManager`) |
+| **OpenBSD 7.6+** | Pledge & Unveil | System call promise restrictions & restricted path views | `src/kernel/linux_bsd_innovations.rs` (`OpenBsdPledge`) |
+| **OpenBSD 7.6+** | `pinsyscall` | System call instruction pointer validation | `src/kernel/sovereign_2026_distro_leap_engine.rs` |
+| **CachyOS** | BORE Scheduler | Burst-Oriented Response Enhancer for interactive desktop | `src/kernel/bore.rs` (`InteractiveHybridScheduler`) |
 
 ---
 
-## 5. Verification & Testing Strategy
+## 2. Strategic 5-Phase Kernel Development Roadmap
 
-1. **Unit Tests:** Standalone test suites in `src/hal/multi_arch.rs`, `src/kernel/module_loader.rs`, `src/kernel/missing_linux_kernel_components.rs`, and `src/security/landlock.rs`.
-2. **QEMU Smoke & Integration Testing:** Boot testing across x86_64, AArch64, and RISC-V 64 QEMU virtual machine targets.
-3. **Automated Verification:** Continuous validation via `./run_sigma_tests.sh`.
+```
+┌───────────────────────────────────────────────────────────────────────────┐
+│                 SIGMAOS KERNEL DEVELOPMENT ROADMAP                        │
+└───────────────────────────────────────────────────────────────────────────┘
+   Phase 1: VMM & Proactive Memory Compaction
+   ├── 57-bit PML5 paging (`Pml5PageTable` in `vmm_paging.rs`)
+   ├── Background proactive compaction daemon (`src/kernel/memory.rs`)
+   └── Adaptive KSM (Kernel Samepage Merging) zero-page hash scanner
+
+   Phase 2: Asynchronous io_uring SQPOLL & Zero-Copy VFS
+   ├── Kernel-thread SQPOLL worker daemon (`io_uring_sqpoll_sovereign.rs`)
+   ├── Fixed I/O buffer registration (`IORING_REGISTER_BUFFERS`)
+   └── Async zero-copy `splice`/`sendfile` pipe and socket pipeline
+
+   Phase 3: Multi-Arch HAL & ACPI NUMA / IOMMU DMA Isolation
+   ├── ACPI 6.5+ SRAT/SLIT table parsing in `src/kernel/hal.rs`
+   ├── Per-device IOMMU DMA page table domain mapping (`src/kernel/iommu.rs`)
+   └── CXL 3.0 cache-coherent memory pool abstractions
+
+   Phase 4: Post-Quantum Security & Control-Flow Integrity (CFI)
+   ├── Dilithium-5 PQC digital signature verification for LKM module loading
+   ├── Intel CET / ARM GCS hardware shadow stacks against ROP/JOP exploits
+   └── Landlock LSM v5 rule hierarchies (`SovereignLandlockV5Guard`)
+
+   Phase 5: eBPF Dynamic Tracing & Autonomous Self-Healing Kernel
+   ├── XDP (eXpress Data Path) kernel packet filter engine (`xdp_engine_sovereign.rs`)
+   ├── eBPF JIT bytecode compiler (`src/kernel/ebpf_vm.rs`)
+   └── Automated kernel panic isolation and live-patching (`breakthroughs.rs`)
+```
+
+---
+
+## 3. Detailed Phase Specifications
+
+### Phase 1: VMM & Proactive Memory Compaction
+- **PML5 Paging**: Implements 5-level paging structures to expand x86_64 virtual memory addressing from 48-bit (256 TB) to 57-bit (128 PB), enabling high-density enterprise memory configurations.
+- **Proactive Compaction**: Adds a background memory compaction thread that defragments physical page frames to maintain pools of contiguous 2MB and 1GB transparent huge pages (THP).
+- **Adaptive KSM**: Scans userland memory regions for identical page payloads, merging duplicate pages into single copy-on-write (COW) physical frames.
+
+### Phase 2: Asynchronous `io_uring` SQPOLL & Zero-Copy VFS
+- **SQPOLL Kernel Daemon**: Executes an asynchronous kernel worker thread (`IoUringSqpollDaemon`) that continuously polls the `io_uring` submission queue, eliminating user-to-kernel context switch overhead.
+- **Fixed Buffers**: Pre-registers application memory buffers with `IORING_REGISTER_BUFFERS`, skipping page pinning and unpinning overhead on every I/O call.
+- **Zero-Copy VFS**: Provides kernel-level `splice` pipelines transferring data directly between file descriptors, network sockets, and ring buffers without user-space staging.
+
+### Phase 3: Multi-Arch HAL & ACPI NUMA / IOMMU DMA Isolation
+- **ACPI SRAT/SLIT Parsing**: Dynamically parses System Resource Affinity Tables (SRAT) and System Locality Information Tables (SLIT) at boot to map CPU core affinity directly to NUMA memory nodes.
+- **IOMMU DMA Isolation**: Configures dedicated IOMMU page table domains for every PCIe endpoint device, blocking unauthorized DMA access to kernel memory space.
+- **CXL 3.0 Integration**: Supports CXL 3.0 cache-coherent memory expansion devices as secondary NUMA nodes.
+
+### Phase 4: Post-Quantum Security & Control-Flow Integrity
+- **PQC Module Signature Verification**: Enforces Kyber-1024 / Dilithium-5 post-quantum signature validation prior to loading external kernel modules (`src/kernel/module_loader.rs`).
+- **Hardware Shadow Stacks**: Integrates Intel CET and ARM GCS shadow stack pointer validation on function call returns, blocking Return-Oriented Programming (ROP) attacks.
+- **Landlock LSM v5**: Enforces file path and network port access rules at the kernel boundary (`SovereignLandlockV5Guard`).
+
+### Phase 5: eBPF Dynamic Tracing & Autonomous Self-Healing Kernel
+- **eBPF JIT Compiler**: Translates eBPF bytecode directly into native x86_64 / AArch64 machine instructions for high-performance tracing (`src/kernel/ebpf_vm.rs`).
+- **XDP Fastpath**: Filters network frames at the NIC driver layer before allocating `sk_buff` buffers (`xdp_engine_sovereign.rs`).
+- **Autonomous Self-Healing**: Monitors kernel subsystem health; on soft fault or memory corruption detection, `SelfHealingKernel` isolates the faulty module, applies live patches, and restores valid state without system reboot.
+
+---
+
+## 4. Verification & Testing Strategy
+All kernel features are continuously verified using native test suites:
+```bash
+# Run kernel subsystem tests
+cargo test --package sigmaos --lib kernel
+
+# Run native test runner
+bash run_sigma_tests.sh
+```

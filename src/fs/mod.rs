@@ -17,15 +17,17 @@
 // Virtual filesystem, journaling filesystems (Btrfs, XFS), and storage support
 
 pub mod btrfs;
-// pub mod filesystem;
+pub mod zfs;
 pub mod sigmacas;
 pub mod sigmafs;
-// pub mod support;
-// pub mod vfs;
 pub mod xfs;
 
 pub use btrfs::{
     BtrfsExtent, BtrfsFilesystem, BtrfsSnapshot, BtrfsSubvolume, ChecksumType, CompressionType,
+};
+pub use zfs::{
+    Dataset, DatasetProperties, DatasetType, Pool, PoolHealth, PoolStatus, ScrubResult,
+    ZfsManager, CompressionType as ZfsCompressionType,
 };
 pub use sigmacas::{CasBlock, SigmaFsCasEngine, DILITHIUM5_SIGNATURE_SIZE, SHA256_HASH_SIZE};
 pub use sigmafs::{
@@ -48,3 +50,15 @@ pub use zfs_arc_sovereign::{SovereignZfsArc, ArcBufferHeader};
 
 pub mod fanotify_sovereign;
 pub use fanotify_sovereign::{SovereignFanotifyGroup, FanotifyEvent, FanotifyEventKind, FanotifyResponse, FanotifyMark};
+
+pub mod inotify;
+pub use inotify::{Inotify, InotifyEvent, InotifyEventType, WatchDescriptor};
+
+pub mod sysfs_linux;
+pub use sysfs_linux::{Sysfs, SysfsEntry, SysfsEntryType};
+
+pub mod procfs_linux;
+pub use procfs_linux::{Procfs, ProcEntry, ProcEntryType, ProcessStatus, MemInfo, CpuStats};
+
+pub mod tmpfs_linux;
+pub use tmpfs_linux::{Tmpfs, TmpFile, TmpFileType};

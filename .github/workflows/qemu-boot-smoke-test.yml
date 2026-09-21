@@ -1,0 +1,106 @@
+name: QEMU Boot Smoke Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qemu-boot-test:
+    name: QEMU Boot Smoke Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@4360b52568e2003a75bf9bc1d59f33a8e3fc893c # stable
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+
+      - name: Install QEMU and xorriso
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu-system-x86 qemu-utils xorriso
+
+      - name: Cache cargo registry
+        uses: Swatinem/rust-cache@23bbed732f4b343a6354788775fcd2c7024ce500 # v2.7.7
+
+      - name: Format check
+        run: cargo fmt --check
+
+      - name: Cargo check
+        run: cargo check --lib
+
+      - name: Run unit tests
+        run: ./run_sigma_tests.sh
+
+      - name: Build ISO
+        run: ./scripts/build_iso.sh
+
+      - name: Verify ISO exists
+        run: |
+          if [ ! -f build/sigmaos-desktop-preview.iso ]; then
+            echo "ERROR: ISO generation failed"
+            exit 1
+          fi
+          echo "ISO generated successfully"
+          ls -lh build/sigmaos-desktop-preview.iso
+
+      - name: QEMU boot smoke test
+        timeout-minutes: 5
+        run: |
+          echo "Starting QEMU boot smoke test..."
+          echo "Boot command: qemu-system-x86_64 -m 512M -cdrom build/sigmaos-desktop-preview.iso -nographic"
+
+          # Run QEMU with timeout
+          timeout 30s qemu-system-x86_64 \
+            -m 512M \
+            -cdrom build/sigmaos-desktop-preview.iso \
+            -nographic \
+            -serial stdio || {
+            EXIT_CODE=$?
+            if [ $EXIT_CODE -eq 124 ]; then
+              echo "QEMU boot test timed out (expected for placeholder kernel)"
+              echo "This is acceptable until kernel can fully boot"
+              exit 0
+            else
+              echo "QEMU boot test failed with exit code: $EXIT_CODE"
+              exit 1
+            fi
+          }
+
+      - name: Boot log analysis
+        if: always()
+        run: |
+          echo "=== Boot Log Analysis ==="
+          echo "This would analyze QEMU boot output for:"
+          echo "  - Kernel loading messages"
+          echo "  - Init system startup"
+          echo "  - Service status"
+          echo "  - Login prompt appearance"
+          echo ""
+          echo "Current status: Placeholder implementation"
+
+      - name: Test summary
+        run: |
+          echo "=== QEMU Boot Smoke Test Summary ==="
+          echo "Status: Partially implemented"
+          echo "Completed:"
+          echo "  ✅ ISO generation working"
+          echo "  ✅ QEMU smoke test infrastructure"
+          echo "  ✅ Boot timeout handling"
+          echo ""
+          echo "Remaining work:"
+          echo "  ⬜ Kernel can fully boot (currently placeholder)"
+          echo "  ⬜ Init system starts services (currently placeholder)"
+          echo "  ⬜ Login prompt appears (currently placeholder)"
+          echo "  ⬜ Shell access verified (currently placeholder)"

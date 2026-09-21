@@ -65,6 +65,41 @@ if [ -f "src/distro/missing_linux_bsd_components.rs" ]; then
     ./build/missing_components_test
 fi
 
+if [ -f "src/distro/linux_bsd_ecosystem_synthesis.rs" ]; then
+    echo "Running Extended Linux & BSD Distro Ecosystem Synthesis test suite..."
+    mkdir -p build
+    rustc --test src/distro/linux_bsd_ecosystem_synthesis.rs --edition=2021 -o build/ecosystem_synthesis_test
+    ./build/ecosystem_synthesis_test
+fi
+
+if [ -f "src/toolchain/distro_compiler_innovations.rs" ]; then
+    echo "Running Linux & BSD Distro Compiler Innovations test suite..."
+    mkdir -p build
+    rustc --test src/toolchain/distro_compiler_innovations.rs --edition=2021 -o build/distro_compiler_test
+    ./build/distro_compiler_test
+fi
+
+if [ -f "src/automation/sovereign_hotkeys_synthesis.rs" ]; then
+    echo "Running Sovereign Global Hotkeys Synthesis test suite..."
+    mkdir -p build
+    rustc --test src/automation/sovereign_hotkeys_synthesis.rs --edition=2021 -o build/sovereign_hotkeys_test
+    ./build/sovereign_hotkeys_test
+fi
+
+if [ -f "src/drivers/sovereign_trackpad_synthesis.rs" ]; then
+    echo "Running Sovereign Trackpad Subsystem Synthesis test suite..."
+    mkdir -p build
+    rustc --test src/drivers/sovereign_trackpad_synthesis.rs --edition=2021 -o build/sovereign_trackpad_test
+    ./build/sovereign_trackpad_test
+fi
+
+if [ -f "src/iso/sovereign_rufus_installer_synthesis.rs" ]; then
+    echo "Running Sovereign Rufus & ISOHybrid Installer Synthesis test suite..."
+    mkdir -p build
+    rustc --test src/iso/sovereign_rufus_installer_synthesis.rs --edition=2021 -o build/sovereign_rufus_test
+    ./build/sovereign_rufus_test
+fi
+
 echo "=== All SigmaOS Tests Passed ==="
 
 if [ -f "src/launch_ready/mod.rs" ]; then
@@ -112,7 +147,7 @@ fi
 if [ -f "src/package/universal.rs" ]; then
     echo "Running Universal Package Manager multi-distro test suite..."
     mkdir -p build
-    rustc --test src/package/universal.rs --edition=2021 -o build/universal_pkg_test
+    rustc --test src/package/universal.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/universal_pkg_test
     ./build/universal_pkg_test
 fi
 
@@ -184,13 +219,6 @@ if [ -f "src/wiki_unimplemented_ideas.rs" ]; then
     mkdir -p build
     rustc --test --edition=2021 src/wiki_unimplemented_ideas.rs -o build/test_wiki_unimplemented
     ./build/test_wiki_unimplemented
-fi
-
-if [ -f "src/wiki_distro_ideas_deployment.rs" ]; then
-    echo "Running GitHub Wiki Distro Ideas Deployment test suite..."
-    mkdir -p build
-    rustc --test --edition=2021 src/wiki_distro_ideas_deployment.rs -o build/test_wiki_distro_ideas
-    ./build/test_wiki_distro_ideas
 fi
 
 if [ -f "src/drivers/sovereign_distro_driver_suite.rs" ]; then

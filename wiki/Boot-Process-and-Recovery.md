@@ -69,11 +69,11 @@ impl Bootloader {
 
         let entry = &self.entries[entry_index];
         self.load_kernel(&entry.kernel)?;
-        
+
         if let Some(initrd) = &entry.initrd {
             self.load_initrd(initrd)?;
         }
-        
+
         self.boot_kernel(&entry.parameters)?;
         Ok(())
     }
@@ -226,7 +226,7 @@ impl RecoveryManager {
             description: description.to_string(),
             configuration: self.capture_configuration(),
         };
-        
+
         self.snapshots.push(snapshot);
         Ok(id)
     }
@@ -248,7 +248,7 @@ impl RecoveryManager {
             kernel_version: self.get_kernel_version(),
             packages: self.get_installed_packages(),
         };
-        
+
         self.rollback_points.push(rollback);
         Ok(id)
     }
