@@ -298,6 +298,23 @@ The M1 milestone provides a bootable ISO with kernel entry point, init system, l
   - Pool lifecycle (activate, deactivate) with dataset tracking
   - ZfsManager for system-wide pool and dataset management
   - 12 unit tests passing
+- Btrfs Filesystem (src/kernel/btrfs.rs):
+  - Subvolume types (Subvolume, Snapshot)
+  - Compression types (None, Zlib, Lzo, Zstd)
+  - Subvolume creation with parent tracking and UUID
+  - Snapshot creation from subvolumes
+  - Filesystem lifecycle (mount, unmount) with subvolume tracking
+  - BtrfsManager for system-wide filesystem and subvolume management
+  - 10 unit tests passing
+- Overlay Filesystem (src/kernel/overlay.rs):
+  - Layer types (Lower, Upper, Work)
+  - Union filesystem with layer merging
+  - Lower layers (read-only base layers)
+  - Upper layer (read-write modifications)
+  - Work layer (overlay operations)
+  - OverlayFilesystem with mount/unmount lifecycle
+  - OverlayManager for system-wide overlay management
+  - 9 unit tests passing
 
 **Completed Fixes:**
 - Kernel module: removed duplicate structures, virtual_cpu, vmm_paging declarations
@@ -482,6 +499,6 @@ See [BOOT_TO_LOGIN_PATH_SPECIFICATION.md](../docs/BOOT_TO_LOGIN_PATH_SPECIFICATI
 - [PROJECT_STATUS.md](../docs/PROJECT_STATUS.md) - Current implementation status
 
 ### Last Verified
-- **Version:** 2.6
+- **Version:** 2.7
 - **Date:** 2026-09-21
 - **Verified by:** Devin AI Agent
