@@ -56,6 +56,10 @@ pub mod preempt_rt;
 pub use preempt_rt::*;
 pub mod drm_gem;
 pub use drm_gem::*;
+pub mod linux_kernel_memory_innovations;
+pub use linux_kernel_memory_innovations::*;
+pub mod sovereign_kernel_pinnacle_synthesis;
+pub use sovereign_kernel_pinnacle_synthesis::*;
 
 pub mod linux_bsd_innovations;
 pub mod linux_parity;

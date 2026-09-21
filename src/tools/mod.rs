@@ -50,6 +50,9 @@ pub use tech_media_extended_suite::{
 pub mod dependency_reduction;
 pub use dependency_reduction::*;
 
+pub mod sovereign_archival_and_system_db;
+pub use sovereign_archival_and_system_db::*;
+
 pub mod native_userland_replacements;
 pub use native_userland_replacements::{
     MasterNativeUserlandReplacements, NativePackageParserEngine, NativeShellScriptEliminatorEngine,
