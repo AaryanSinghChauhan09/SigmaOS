@@ -503,6 +503,14 @@ The M1 milestone provides a bootable ISO with kernel entry point, init system, l
   - Create/remove process groups and sessions
   - Add/remove processes from groups
   - 12 unit tests passing
+- IOCTL (src/kernel/ioctl.rs):
+  - IoctlRequest with cmd and arg
+  - IoctlResponse with result and data
+  - IoctlDevice with device type and ioctl handling
+  - IoctlManager for system-wide ioctl management
+  - Open/close devices
+  - Perform ioctl operations
+  - 10 unit tests passing
 
 **Completed Fixes:**
 - Kernel module: removed duplicate structures, virtual_cpu, vmm_paging declarations
@@ -687,6 +695,6 @@ See [BOOT_TO_LOGIN_PATH_SPECIFICATION.md](../docs/BOOT_TO_LOGIN_PATH_SPECIFICATI
 - [PROJECT_STATUS.md](../docs/PROJECT_STATUS.md) - Current implementation status
 
 ### Last Verified
-- **Version:** 4.6
+- **Version:** 4.7
 - **Date:** 2026-09-21
 - **Verified by:** Devin AI Agent
