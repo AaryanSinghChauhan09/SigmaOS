@@ -16,13 +16,28 @@ use std::vec::Vec;
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
+#[cfg(not(feature = "standalone_test"))]
 use crate::package::AptDebManifest;
+#[cfg(not(feature = "standalone_test"))]
 use crate::sigpkg::{Dependency, Package, VersionConstraint};
-
-#[cfg(test)]
-pub use crate::sigpkg::Version;
-
+#[cfg(not(feature = "standalone_test"))]
 pub use crate::sigpkg::universal_engine::PackageFormat;
+#[cfg(not(feature = "standalone_test"))]
+use crate::sigpkg::universal_oop_system::{PackageMetadata, StandardPackage, UniversalPackageManager};
+#[cfg(not(feature = "standalone_test"))]
+pub use crate::security::Permission;
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AptDebManifest {
+    pub package: String,
+    pub version: String,
+    pub architecture: String,
+    pub maintainer: String,
+    pub depends: Vec<String>,
+    pub description: String,
+    pub priority: String,
+}
 
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -39,8 +54,125 @@ pub enum Permission {
     Execute,
 }
 
-#[cfg(not(feature = "standalone_test"))]
-pub use crate::security::Permission;
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Version {
+    pub major: u64,
+    pub minor: u64,
+    pub patch: u64,
+}
+
+#[cfg(feature = "standalone_test")]
+impl core::fmt::Display for Version {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
+    }
+}
+
+#[cfg(feature = "standalone_test")]
+impl Version {
+    pub fn new(major: u64, minor: u64, patch: u64) -> Self {
+        Self { major, minor, patch }
+    }
+    pub fn parse(v: &str) -> Result<Self, &'static str> {
+        let clean = v.split('-').next().unwrap_or(v);
+        let mut parts = clean.split('.');
+        let major = parts.next().unwrap_or("0").chars().filter(|c| c.is_ascii_digit()).collect::<String>().parse().unwrap_or(1);
+        let minor = parts.next().unwrap_or("0").chars().filter(|c| c.is_ascii_digit()).collect::<String>().parse().unwrap_or(0);
+        let patch = parts.next().unwrap_or("0").chars().filter(|c| c.is_ascii_digit()).collect::<String>().parse().unwrap_or(0);
+        Ok(Self::new(major, minor, patch))
+    }
+}
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum VersionConstraint {
+    Exact(Version),
+    GreaterThan(Version),
+    LessThan(Version),
+    GreaterOrEqual(Version),
+    LessOrEqual(Version),
+    Any,
+}
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone)]
+pub struct Dependency {
+    pub name: String,
+    pub version_constraint: VersionConstraint,
+}
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone)]
+pub struct Package {
+    pub name: String,
+    pub version: Version,
+    pub description: String,
+    pub dependencies: Vec<Dependency>,
+    pub checksum: String,
+}
+
+#[cfg(feature = "standalone_test")]
+impl Package {
+    pub fn new(name: String, version: Version, description: String, dependencies: Vec<Dependency>, checksum: String) -> Self {
+        Self { name, version, description, dependencies, checksum }
+    }
+}
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum PackageFormat {
+    Apt, Yum, Pacman, Apk, Pkg, Xbps, Zypper, Portage, Flatpak, Snap, AppImage, Pisi, Nix, Guix,
+    Hpkg, SlackBuild, Pkgsrc, Moss, Tcz, Gobo, Ostree, Air, Bottle, Ipa, Ports, Aab, Hap, Superdeb,
+    Lzm, Pup, Pet, Tar, TarGz, TarXz, AppBundle, Puk, Dmg, Cports, Dports, Ipk, Opkg, SolarisIps,
+    GuixNar, NarInfo, OpenBsdPkg, Swupd, Stratum, Crux, Drpm, Sfs, Wheel, Crate, Gem, Nupkg, Vcpkg,
+    Spack, Conan, Sigma, Sysupdate, Starling, Sovereign, Eopkg,
+}
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone)]
+pub struct PackageMetadata {
+    pub name: String,
+    pub version: Version,
+    pub description: String,
+    pub license: String,
+    pub maintainer: String,
+    pub homepage: String,
+    pub architecture: String,
+    pub checksum: String,
+    pub size: u64,
+    pub install_date: Option<u64>,
+    pub pqc_signature: Option<Vec<u8>>,
+    pub gpg_key_id: Option<String>,
+    pub supported_architectures: Vec<String>,
+}
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone)]
+pub struct StandardPackage {
+    pub metadata: PackageMetadata,
+    pub dependencies: Vec<Dependency>,
+    pub format: PackageFormat,
+}
+
+#[cfg(feature = "standalone_test")]
+pub struct UniversalPackageManager {
+    pub packages: Vec<StandardPackage>,
+}
+
+#[cfg(feature = "standalone_test")]
+impl UniversalPackageManager {
+    pub fn new() -> Self {
+        Self { packages: Vec::new() }
+    }
+    pub fn install_package(&mut self, pkg: Box<StandardPackage>) -> Result<(), &'static str> {
+        self.packages.push(*pkg);
+        Ok(())
+    }
+    pub fn get_package(&self, name: &str) -> Option<&StandardPackage> {
+        self.packages.iter().find(|p| p.metadata.name == name)
+    }
+}
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -70,8 +202,6 @@ pub enum AdapterError {
     ValidationError(String),
     UnsupportedFormat(String),
 }
-/// Use universal_oop_system::UniversalPackageManager instead
-use crate::sigpkg::universal_oop_system::UniversalPackageManager;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Debian-style package priority levels (DFSG and APT standard)
@@ -1564,14 +1694,14 @@ impl Default for UniversalServerImageAdapter {
 /// into native Sigma-pkg models, mapping dependencies, sandboxing capabilities, and registering with Universal PM.
 pub struct SigPkgUniversalBridgeEngine {
     adapter: UniversalPackageAdapter,
-    pm: crate::sigpkg::universal_oop_system::UniversalPackageManager,
+    pm: UniversalPackageManager,
 }
 
 impl SigPkgUniversalBridgeEngine {
     pub fn new() -> Self {
         Self {
             adapter: UniversalPackageAdapter::new(),
-            pm: crate::sigpkg::universal_oop_system::UniversalPackageManager::new(),
+            pm: UniversalPackageManager::new(),
         }
     }
 
@@ -1728,8 +1858,8 @@ impl SigPkgUniversalBridgeEngine {
         raw_data: &[u8],
     ) -> Result<Package, &'static str> {
         let native_pkg = self.convert_to_sigpkg(filename, raw_data)?;
-        let standard_pkg = crate::sigpkg::universal_oop_system::StandardPackage {
-            metadata: crate::sigpkg::universal_oop_system::PackageMetadata {
+        let standard_pkg = StandardPackage {
+            metadata: PackageMetadata {
                 name: native_pkg.name.clone(),
                 version: native_pkg.version.clone(),
                 description: native_pkg.description.clone(),
@@ -1745,7 +1875,7 @@ impl SigPkgUniversalBridgeEngine {
                 supported_architectures: Vec::new(),
             },
             dependencies: Vec::new(),
-            format: crate::sigpkg::universal_oop_system::PackageFormat::Sigma,
+            format: PackageFormat::Sigma,
         };
         let _ = self.pm.install_package(Box::new(standard_pkg));
         Ok(native_pkg)
@@ -2239,7 +2369,7 @@ impl UniversalPmCommandDispatcher {
                 for arg in args {
                     if *arg == "-n" || *arg == "--dry-run" {
                         dry_run = true;
-                    } else if !arg.starts_with('-') && target_packages.is_empty() && *arg != "install" && *arg != "remove" && *arg != "upgrade" {
+                    } else if !arg.starts_with('-') && target_packages.is_empty() && *arg != "install" && *arg != "add" && *arg != "remove" && *arg != "purge" && *arg != "upgrade" && *arg != "update" && *arg != "search" && *arg != "info" && *arg != "query" {
                         target_packages.push(arg.to_string());
                     }
                 }
@@ -2247,47 +2377,17 @@ impl UniversalPmCommandDispatcher {
             "emerge" | "ebuild" | "gentoo" | "portage" => {
                 let mut i = 0;
                 while i < args.len() {
-                    match args[i] {
-                        "install" | "add" => operation = UniversalPmOperation::Install,
-                        "delete" | "remove" => operation = UniversalPmOperation::Remove,
-                        "upgrade" => operation = UniversalPmOperation::Upgrade,
-                        "search" => operation = UniversalPmOperation::Search,
-                        "info" => operation = UniversalPmOperation::QueryInfo,
-                        "-n" => dry_run = true,
-                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
-                        _ => {}
-                    }
-                    i += 1;
-                }
-            }
-            "xbps-install" | "xbps-remove" | "xbps-query" => {
-                if pm == "xbps-install" {
-                    operation = UniversalPmOperation::Install;
-                } else if pm == "xbps-remove" {
-                    operation = UniversalPmOperation::Remove;
-                } else {
-                    operation = UniversalPmOperation::QueryInfo;
-                }
-                for arg in args {
-                    if *arg == "-n" || *arg == "--dry-run" {
-                        dry_run = true;
-                    } else if !arg.starts_with('-') {
-                        target_packages.push(arg.to_string());
-                    }
-                }
-            }
-            "emerge" | "ebuild" => {
-                let mut i = 0;
-                while i < args.len() {
                     let arg = args[i];
-                    if arg == "-C" || arg == "--unmerge" || arg == "--deselect" {
+                    if arg == "-C" || arg == "--unmerge" || arg == "--deselect" || arg == "delete" || arg == "remove" {
                         operation = UniversalPmOperation::Remove;
-                    } else if arg == "-u" || arg.contains('u') || arg == "--update" {
+                    } else if arg == "-u" || arg.contains('u') || arg == "--update" || arg == "upgrade" {
                         operation = UniversalPmOperation::Upgrade;
-                    } else if arg == "-s" || arg == "--search" {
+                    } else if arg == "-s" || arg == "--search" || arg == "search" {
                         operation = UniversalPmOperation::Search;
-                    } else if arg == "--info" {
+                    } else if arg == "--info" || arg == "info" {
                         operation = UniversalPmOperation::QueryInfo;
+                    } else if arg == "install" || arg == "add" {
+                        operation = UniversalPmOperation::Install;
                     } else if !arg.starts_with('-') {
                         target_packages.push(arg.to_string());
                     }
@@ -2373,26 +2473,20 @@ impl UniversalPmCommandDispatcher {
                     }
                 }
             }
-            "pkgman" | "swupd" | "eopkg" | "moss" | "pkgin" | "pkg_delete" | "pkg_info" => {
-                if pm == "pkg_delete" {
-                    operation = UniversalPmOperation::Remove;
-                } else if pm == "pkg_info" {
-                    operation = UniversalPmOperation::QueryInfo;
-                } else {
-                    let mut i = 0;
-                    while i < args.len() {
-                        match args[i] {
-                            "install" | "in" | "it" | "bundle-add" | "add" => operation = UniversalPmOperation::Install,
-                            "uninstall" | "remove" | "rm" | "bundle-remove" => operation = UniversalPmOperation::Remove,
-                            "update" | "upgrade" | "ur" => operation = UniversalPmOperation::Upgrade,
-                            "search" | "se" | "sr" => operation = UniversalPmOperation::Search,
-                            "info" => operation = UniversalPmOperation::QueryInfo,
-                            "-n" | "--dry-run" => dry_run = true,
-                            arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
-                            _ => {}
-                        }
-                        i += 1;
+            "pkgman" | "swupd" | "eopkg" | "moss" | "pkgin" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "install" | "in" | "it" | "bundle-add" | "add" => operation = UniversalPmOperation::Install,
+                        "uninstall" | "remove" | "rm" | "bundle-remove" => operation = UniversalPmOperation::Remove,
+                        "update" | "upgrade" | "ur" => operation = UniversalPmOperation::Upgrade,
+                        "search" | "se" | "sr" => operation = UniversalPmOperation::Search,
+                        "info" => operation = UniversalPmOperation::QueryInfo,
+                        "-n" | "--dry-run" => dry_run = true,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
                     }
+                    i += 1;
                 }
                 if target_packages.is_empty() {
                     for arg in args {
