@@ -185,6 +185,9 @@ pub use shm::{ShmManager, ShmPerm, ShmSegment};
 pub mod msgqueue;
 pub use msgqueue::{Message, MessageQueue, MessageQueueManager, MsgQPerm};
 
+pub mod fd_table;
+pub use fd_table::{FdEntry, FdFlags, FdTable, FdTableManager};
+
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
 pub use linux_parity::{
