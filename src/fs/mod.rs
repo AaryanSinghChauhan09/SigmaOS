@@ -50,3 +50,6 @@ pub use zfs_arc_sovereign::{SovereignZfsArc, ArcBufferHeader};
 
 pub mod fanotify_sovereign;
 pub use fanotify_sovereign::{SovereignFanotifyGroup, FanotifyEvent, FanotifyEventKind, FanotifyResponse, FanotifyMark};
+
+pub mod inotify;
+pub use inotify::{Inotify, InotifyEvent, InotifyEventType, WatchDescriptor};

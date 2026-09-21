@@ -1,601 +1,178 @@
-//! # Namespace Infrastructure Module
-//!
-//! This module provides the core namespace infrastructure for process isolation in SigmaOS.
-//! It supports various namespace types including PID, IPC, Network, UTS, User, Cgroup, and Mount namespaces.
-//!
-//! ## Architecture
-//!
-//! - **KernelNamespace trait**: Generic interface for all namespace types
-//! - **NamespaceRegistry**: Central registry for namespace management
-//! - **Specific namespace implementations**: PID, IPC, Network, UTS, User, Cgroup, Mount
-//!
-//! Inspired by Linux namespaces (CLONE_NEWPID, CLONE_NEWNS, CLONE_NEWNET, CLONE_NEWUTS, CLONE_NEWUSER, CLONE_NEWCGROUP, CLONE_NEWNS)
+// Linux-inspired Process Namespaces for SigmaOS
+// Process isolation and containerization support
 
-use std::sync::atomic::{AtomicU64, AtomicU32, Ordering};
-use std::string::String;
-use std::collections::BTreeMap;
+#![no_std]
 
-/// Maximum number of namespaces in the system
-pub const MAX_NAMESPACES: usize = 1024;
+extern crate alloc;
 
-/// Maximum processes per PID namespace
-pub const MAX_PIDS_PER_NAMESPACE: u32 = 32768;
+use alloc::collections::HashMap;
+use alloc::sync::Arc;
+use alloc::vec::Vec;
+use alloc::string::String;
+use alloc::format;
+use core::sync::atomic::{AtomicU64, Ordering};
+use spin::Mutex;
 
-/// Unique namespace identifier
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct NamespaceId(u64);
+/// Namespace types (Linux namespace.h)
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum NamespaceType {
+    Mount = 0x00000001,
+    Uts = 0x04000000,
+    Ipc = 0x08000000,
+    Network = 0x40000000,
+    User = 0x10000000,
+    Pid = 0x20000000,
+    Cgroup = 0x02000000,
+    Time = 0x00000080,
+}
+
+impl NamespaceType {
+    pub fn from_bits(bits: u32) -> Vec<Self> {
+        let mut types = Vec::new();
+        
+        if bits & (NamespaceType::Mount as u32) != 0 {
+            types.push(NamespaceType::Mount);
+        }
+        if bits & (NamespaceType::Uts as u32) != 0 {
+            types.push(NamespaceType::Uts);
+        }
+        if bits & (NamespaceType::Ipc as u32) != 0 {
+            types.push(NamespaceType::Ipc);
+        }
+        if bits & (NamespaceType::Network as u32) != 0 {
+            types.push(NamespaceType::Network);
+        }
+        if bits & (NamespaceType::User as u32) != 0 {
+            types.push(NamespaceType::User);
+        }
+        if bits & (NamespaceType::Pid as u32) != 0 {
+            types.push(NamespaceType::Pid);
+        }
+        if bits & (NamespaceType::Cgroup as u32) != 0 {
+            types.push(NamespaceType::Cgroup);
+        }
+        if bits & (NamespaceType::Time as u32) != 0 {
+            types.push(NamespaceType::Time);
+        }
+        
+        types
+    }
+}
+
+/// Namespace identifier
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct NamespaceId {
+    pub ns_type: NamespaceType,
+    pub inode: u64,
+}
 
 impl NamespaceId {
-    /// Create a new namespace ID
-    pub fn new(id: u64) -> Self {
-        NamespaceId(id)
-    }
-
-    /// Get the raw ID value
-    pub fn raw(&self) -> u64 {
-        self.0
+    pub fn new(ns_type: NamespaceType, inode: u64) -> Self {
+        NamespaceId { ns_type, inode }
     }
 }
 
-/// Types of namespaces supported by SigmaOS (for trait-based namespace system)
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum KernelNamespaceType {
-    Pid,
-    Ipc,
-    Network,
-    Uts,  // UTS (hostname/domainname)
-    User,
-    Cgroup,
-    Mount,
-}
-
-impl KernelNamespaceType {
-    /// Get a string representation of the namespace type
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            KernelNamespaceType::Pid => "pid",
-            KernelNamespaceType::Ipc => "ipc",
-            KernelNamespaceType::Network => "network",
-            KernelNamespaceType::Uts => "uts",
-            KernelNamespaceType::User => "user",
-            KernelNamespaceType::Cgroup => "cgroup",
-            KernelNamespaceType::Mount => "mount",
-        }
-    }
-}
-
-/// Generic namespace trait defining the interface all namespaces must implement
-pub trait KernelNamespace: Send + Sync {
-    /// Get the unique namespace ID
-    fn namespace_id(&self) -> NamespaceId;
-
-    /// Get the namespace type
-    fn namespace_type(&self) -> KernelNamespaceType;
-
-    /// Get the reference count (how many processes use this namespace)
-    fn ref_count(&self) -> u32;
-
-    /// Increment reference count (when a process enters this namespace)
-    fn increment_ref(&self);
-
-    /// Decrement reference count (when a process leaves this namespace)
-    fn decrement_ref(&self);
-
-    /// Check if this namespace is equal to another
-    fn equals(&self, other: &dyn KernelNamespace) -> bool {
-        self.namespace_id() == other.namespace_id()
-    }
-
-    /// Get namespace metadata as a string
-    fn metadata(&self) -> String;
-}
-
-/// Namespace creation configuration
+/// Namespace instance
 #[derive(Debug, Clone)]
-pub struct NamespaceConfig {
-    pub namespace_type: KernelNamespaceType,
-    pub inherit_from: Option<NamespaceId>,
+pub struct Namespace {
+    pub id: NamespaceId,
+    pub parent: Option<Arc<spin::Mutex<Namespace>>>,
+    pub processes: Vec<u32>,
 }
 
-impl NamespaceConfig {
-    /// Create a new namespace configuration
-    pub fn new(namespace_type: KernelNamespaceType) -> Self {
-        NamespaceConfig {
-            namespace_type,
-            inherit_from: None,
+impl Namespace {
+    pub fn new(ns_type: NamespaceType, inode: u64) -> Self {
+        Namespace {
+            id: NamespaceId::new(ns_type, inode),
+            parent: None,
+            processes: Vec::new(),
         }
     }
 
-    /// Create configuration that inherits from an existing namespace
-    pub fn inherit(namespace_type: KernelNamespaceType, parent_id: NamespaceId) -> Self {
-        NamespaceConfig {
-            namespace_type,
-            inherit_from: Some(parent_id),
-        }
-    }
-}
-
-/// Namespace error types
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum NamespaceError {
-    InvalidNamespaceId,
-    NamespaceFull,
-    NamespaceTypeNotSupported,
-    ProcessNotInNamespace,
-    InsufficientPermissions,
-    AlreadyInNamespace,
-}
-
-impl NamespaceError {
-    /// Get error message
-    pub fn message(&self) -> &'static str {
-        match self {
-            NamespaceError::InvalidNamespaceId => "Invalid namespace ID",
-            NamespaceError::NamespaceFull => "Namespace is full",
-            NamespaceError::NamespaceTypeNotSupported => "Namespace type not supported",
-            NamespaceError::ProcessNotInNamespace => "Process not in namespace",
-            NamespaceError::InsufficientPermissions => "Insufficient permissions",
-            NamespaceError::AlreadyInNamespace => "Process already in this namespace type",
-        }
-    }
-}
-
-/// Global namespace ID generator
-#[derive(Debug)]
-pub struct NamespaceIdGenerator {
-    next_id: AtomicU64,
-}
-
-impl NamespaceIdGenerator {
-    /// Create a new ID generator
-    pub const fn new() -> Self {
-        NamespaceIdGenerator {
-            next_id: AtomicU64::new(1),
+    pub fn with_parent(ns_type: NamespaceType, inode: u64, parent: Arc<spin::Mutex<Namespace>>) -> Self {
+        Namespace {
+            id: NamespaceId::new(ns_type, inode),
+            parent: Some(parent),
+            processes: Vec::new(),
         }
     }
 
-    /// Generate the next namespace ID
-    pub fn next(&self) -> NamespaceId {
-        let id = self.next_id.fetch_add(1, Ordering::SeqCst);
-        NamespaceId(id)
+    pub fn add_process(&mut self, pid: u32) {
+        self.processes.push(pid);
+    }
+
+    pub fn remove_process(&mut self, pid: u32) {
+        self.processes.retain(|&p| p != pid);
+    }
+
+    pub fn process_count(&self) -> usize {
+        self.processes.len()
     }
 }
 
-/// Global namespace ID generator instance
-static NAMESPACE_ID_GEN: NamespaceIdGenerator = NamespaceIdGenerator::new();
-
-/// Get the next global namespace ID
-pub fn next_namespace_id() -> NamespaceId {
-    NAMESPACE_ID_GEN.next()
+/// Namespace manager
+pub struct NamespaceManager {
+    namespaces: HashMap<NamespaceId, Arc<spin::Mutex<Namespace>>>,
+    next_inode: AtomicU64,
 }
 
-// ─── PID Namespace Implementation ─────────────────────────────────────────────
-
-/// PID namespace for process isolation
-#[derive(Debug)]
-pub struct PidNamespace {
-    id: NamespaceId,
-    parent_id: Option<NamespaceId>,
-    ref_count: AtomicU32,
-    next_pid: AtomicU32,
-}
-
-impl PidNamespace {
-    pub fn new(id: NamespaceId, parent_id: Option<NamespaceId>) -> Self {
-        PidNamespace {
-            id,
-            parent_id,
-            ref_count: AtomicU32::new(0),
-            next_pid: AtomicU32::new(1),
-        }
-    }
-
-    pub fn allocate_pid(&self) -> u32 {
-        self.next_pid.fetch_add(1, Ordering::SeqCst)
-    }
-}
-
-impl KernelNamespace for PidNamespace {
-    fn namespace_id(&self) -> NamespaceId {
-        self.id
-    }
-
-    fn namespace_type(&self) -> KernelNamespaceType {
-        KernelNamespaceType::Pid
-    }
-
-    fn ref_count(&self) -> u32 {
-        self.ref_count.load(Ordering::SeqCst)
-    }
-
-    fn increment_ref(&self) {
-        self.ref_count.fetch_add(1, Ordering::SeqCst);
-    }
-
-    fn decrement_ref(&self) {
-        self.ref_count.fetch_sub(1, Ordering::SeqCst);
-    }
-
-    fn metadata(&self) -> String {
-        format!("PID namespace {} (parent: {:?}, refcount: {})", self.id.0, self.parent_id, self.ref_count.load(Ordering::SeqCst))
-    }
-}
-
-// ─── IPC Namespace Implementation ─────────────────────────────────────────────
-
-/// IPC namespace for IPC isolation
-#[derive(Debug)]
-pub struct IpcNamespace {
-    id: NamespaceId,
-    parent_id: Option<NamespaceId>,
-    ref_count: AtomicU32,
-    message_queues: AtomicU64,
-}
-
-impl IpcNamespace {
-    pub fn new(id: NamespaceId, parent_id: Option<NamespaceId>) -> Self {
-        IpcNamespace {
-            id,
-            parent_id,
-            ref_count: AtomicU32::new(0),
-            message_queues: AtomicU64::new(0),
-        }
-    }
-
-    pub fn allocate_queue(&self) -> u64 {
-        self.message_queues.fetch_add(1, Ordering::SeqCst)
-    }
-}
-
-impl KernelNamespace for IpcNamespace {
-    fn namespace_id(&self) -> NamespaceId {
-        self.id
-    }
-
-    fn namespace_type(&self) -> KernelNamespaceType {
-        KernelNamespaceType::Ipc
-    }
-
-    fn ref_count(&self) -> u32 {
-        self.ref_count.load(Ordering::SeqCst)
-    }
-
-    fn increment_ref(&self) {
-        self.ref_count.fetch_add(1, Ordering::SeqCst);
-    }
-
-    fn decrement_ref(&self) {
-        self.ref_count.fetch_sub(1, Ordering::SeqCst);
-    }
-
-    fn metadata(&self) -> String {
-        format!("IPC namespace {} (parent: {:?}, refcount: {}, queues: {})", self.id.0, self.parent_id, self.ref_count.load(Ordering::SeqCst), self.message_queues.load(Ordering::SeqCst))
-    }
-}
-
-// ─── Network Namespace Implementation ─────────────────────────────────────────────
-
-/// Network namespace for network isolation
-#[derive(Debug)]
-pub struct NetworkNamespace {
-    id: NamespaceId,
-    parent_id: Option<NamespaceId>,
-    ref_count: AtomicU32,
-    interfaces: AtomicU64,
-}
-
-impl NetworkNamespace {
-    pub fn new(id: NamespaceId, parent_id: Option<NamespaceId>) -> Self {
-        NetworkNamespace {
-            id,
-            parent_id,
-            ref_count: AtomicU32::new(0),
-            interfaces: AtomicU64::new(0),
-        }
-    }
-
-    pub fn allocate_interface(&self) -> u64 {
-        self.interfaces.fetch_add(1, Ordering::SeqCst)
-    }
-}
-
-impl KernelNamespace for NetworkNamespace {
-    fn namespace_id(&self) -> NamespaceId {
-        self.id
-    }
-
-    fn namespace_type(&self) -> KernelNamespaceType {
-        KernelNamespaceType::Network
-    }
-
-    fn ref_count(&self) -> u32 {
-        self.ref_count.load(Ordering::SeqCst)
-    }
-
-    fn increment_ref(&self) {
-        self.ref_count.fetch_add(1, Ordering::SeqCst);
-    }
-
-    fn decrement_ref(&self) {
-        self.ref_count.fetch_sub(1, Ordering::SeqCst);
-    }
-
-    fn metadata(&self) -> String {
-        format!("Network namespace {} (parent: {:?}, refcount: {}, interfaces: {})", self.id.0, self.parent_id, self.ref_count.load(Ordering::SeqCst), self.interfaces.load(Ordering::SeqCst))
-    }
-}
-
-// ─── UTS Namespace Implementation ─────────────────────────────────────────────
-
-/// UTS namespace for hostname/domainname isolation
-#[derive(Debug)]
-pub struct UtsNamespace {
-    id: NamespaceId,
-    parent_id: Option<NamespaceId>,
-    ref_count: AtomicU32,
-    hostname: String,
-    domainname: String,
-}
-
-impl UtsNamespace {
-    pub fn new(id: NamespaceId, parent_id: Option<NamespaceId>, hostname: &str, domainname: &str) -> Self {
-        UtsNamespace {
-            id,
-            parent_id,
-            ref_count: AtomicU32::new(0),
-            hostname: String::from(hostname),
-            domainname: String::from(domainname),
-        }
-    }
-
-    pub fn set_hostname(&mut self, hostname: &str) {
-        self.hostname = String::from(hostname);
-    }
-
-    pub fn set_domainname(&mut self, domainname: &str) {
-        self.domainname = String::from(domainname);
-    }
-
-    pub fn get_hostname(&self) -> &str {
-        &self.hostname
-    }
-
-    pub fn get_domainname(&self) -> &str {
-        &self.domainname
-    }
-}
-
-impl KernelNamespace for UtsNamespace {
-    fn namespace_id(&self) -> NamespaceId {
-        self.id
-    }
-
-    fn namespace_type(&self) -> KernelNamespaceType {
-        KernelNamespaceType::Uts
-    }
-
-    fn ref_count(&self) -> u32 {
-        self.ref_count.load(Ordering::SeqCst)
-    }
-
-    fn increment_ref(&self) {
-        self.ref_count.fetch_add(1, Ordering::SeqCst);
-    }
-
-    fn decrement_ref(&self) {
-        self.ref_count.fetch_sub(1, Ordering::SeqCst);
-    }
-
-    fn metadata(&self) -> String {
-        format!("UTS namespace {} (parent: {:?}, refcount: {}, hostname: {}, domainname: {})", self.id.0, self.parent_id, self.ref_count.load(Ordering::SeqCst), self.hostname, self.domainname)
-    }
-}
-
-// ─── User Namespace Implementation ─────────────────────────────────────────────
-
-/// User namespace for user/group ID isolation
-#[derive(Debug)]
-pub struct UserNamespace {
-    id: NamespaceId,
-    parent_id: Option<NamespaceId>,
-    ref_count: AtomicU32,
-    uid_map: AtomicU32,
-    gid_map: AtomicU32,
-}
-
-impl UserNamespace {
-    pub fn new(id: NamespaceId, parent_id: Option<NamespaceId>) -> Self {
-        UserNamespace {
-            id,
-            parent_id,
-            ref_count: AtomicU32::new(0),
-            uid_map: AtomicU32::new(0),
-            gid_map: AtomicU32::new(0),
-        }
-    }
-
-    pub fn map_uid(&self, _uid: u32) -> u32 {
-        self.uid_map.fetch_add(1, Ordering::SeqCst)
-    }
-
-    pub fn map_gid(&self, _gid: u32) -> u32 {
-        self.gid_map.fetch_add(1, Ordering::SeqCst)
-    }
-}
-
-impl KernelNamespace for UserNamespace {
-    fn namespace_id(&self) -> NamespaceId {
-        self.id
-    }
-
-    fn namespace_type(&self) -> KernelNamespaceType {
-        KernelNamespaceType::User
-    }
-
-    fn ref_count(&self) -> u32 {
-        self.ref_count.load(Ordering::SeqCst)
-    }
-
-    fn increment_ref(&self) {
-        self.ref_count.fetch_add(1, Ordering::SeqCst);
-    }
-
-    fn decrement_ref(&self) {
-        self.ref_count.fetch_sub(1, Ordering::SeqCst);
-    }
-
-    fn metadata(&self) -> String {
-        format!("User namespace {} (parent: {:?}, refcount: {}, uid_maps: {}, gid_maps: {})", self.id.0, self.parent_id, self.ref_count.load(Ordering::SeqCst), self.uid_map.load(Ordering::SeqCst), self.gid_map.load(Ordering::SeqCst))
-    }
-}
-
-// ─── Cgroup Namespace Implementation ─────────────────────────────────────────────
-
-/// Cgroup namespace for cgroup isolation
-#[derive(Debug)]
-pub struct CgroupNamespace {
-    id: NamespaceId,
-    parent_id: Option<NamespaceId>,
-    ref_count: AtomicU32,
-    cgroups: AtomicU64,
-}
-
-impl CgroupNamespace {
-    pub fn new(id: NamespaceId, parent_id: Option<NamespaceId>) -> Self {
-        CgroupNamespace {
-            id,
-            parent_id,
-            ref_count: AtomicU32::new(0),
-            cgroups: AtomicU64::new(0),
-        }
-    }
-
-    pub fn create_cgroup(&self) -> u64 {
-        self.cgroups.fetch_add(1, Ordering::SeqCst)
-    }
-}
-
-impl KernelNamespace for CgroupNamespace {
-    fn namespace_id(&self) -> NamespaceId {
-        self.id
-    }
-
-    fn namespace_type(&self) -> KernelNamespaceType {
-        KernelNamespaceType::Cgroup
-    }
-
-    fn ref_count(&self) -> u32 {
-        self.ref_count.load(Ordering::SeqCst)
-    }
-
-    fn increment_ref(&self) {
-        self.ref_count.fetch_add(1, Ordering::SeqCst);
-    }
-
-    fn decrement_ref(&self) {
-        self.ref_count.fetch_sub(1, Ordering::SeqCst);
-    }
-
-    fn metadata(&self) -> String {
-        format!("Cgroup namespace {} (parent: {:?}, refcount: {}, cgroups: {})", self.id.0, self.parent_id, self.ref_count.load(Ordering::SeqCst), self.cgroups.load(Ordering::SeqCst))
-    }
-}
-
-// ─── Mount Namespace Implementation ─────────────────────────────────────────────
-
-/// Mount namespace for mount point isolation
-#[derive(Debug)]
-pub struct MountNamespace {
-    id: NamespaceId,
-    parent_id: Option<NamespaceId>,
-    ref_count: AtomicU32,
-    mount_points: AtomicU64,
-}
-
-impl MountNamespace {
-    pub fn new(id: NamespaceId, parent_id: Option<NamespaceId>) -> Self {
-        MountNamespace {
-            id,
-            parent_id,
-            ref_count: AtomicU32::new(0),
-            mount_points: AtomicU64::new(0),
-        }
-    }
-
-    pub fn add_mount(&self) -> u64 {
-        self.mount_points.fetch_add(1, Ordering::SeqCst)
-    }
-}
-
-impl KernelNamespace for MountNamespace {
-    fn namespace_id(&self) -> NamespaceId {
-        self.id
-    }
-
-    fn namespace_type(&self) -> KernelNamespaceType {
-        KernelNamespaceType::Mount
-    }
-
-    fn ref_count(&self) -> u32 {
-        self.ref_count.load(Ordering::SeqCst)
-    }
-
-    fn increment_ref(&self) {
-        self.ref_count.fetch_add(1, Ordering::SeqCst);
-    }
-
-    fn decrement_ref(&self) {
-        self.ref_count.fetch_sub(1, Ordering::SeqCst);
-    }
-
-    fn metadata(&self) -> String {
-        format!("Mount namespace {} (parent: {:?}, refcount: {}, mounts: {})", self.id.0, self.parent_id, self.ref_count.load(Ordering::SeqCst), self.mount_points.load(Ordering::SeqCst))
-    }
-}
-
-// ─── Namespace Registry ─────────────────────────────────────────────────────
-
-/// Central registry for managing all namespaces
-pub struct NamespaceRegistry {
-    namespaces: BTreeMap<NamespaceId, Box<dyn KernelNamespace>>,
-    id_generator: NamespaceIdGenerator,
-}
-
-impl NamespaceRegistry {
+impl NamespaceManager {
     pub fn new() -> Self {
-        NamespaceRegistry {
-            namespaces: BTreeMap::new(),
-            id_generator: NamespaceIdGenerator::new(),
+        NamespaceManager {
+            namespaces: HashMap::new(),
+            next_inode: AtomicU64::new(1),
         }
     }
 
-    pub fn register_namespace(&mut self, namespace: Box<dyn KernelNamespace>) -> Result<(), NamespaceError> {
-        let id = namespace.namespace_id();
-        if self.namespaces.contains_key(&id) {
-            return Err(NamespaceError::AlreadyInNamespace);
+    /// Create a new namespace
+    pub fn create_namespace(&mut self, ns_type: NamespaceType, parent: Option<Arc<spin::Mutex<Namespace>>>) -> Arc<spin::Mutex<Namespace>> {
+        let inode = self.next_inode.fetch_add(1, Ordering::SeqCst);
+
+        let namespace = match parent {
+            Some(p) => Namespace::with_parent(ns_type, inode, p),
+            None => Namespace::new(ns_type, inode),
+        };
+
+        let ns = Arc::new(spin::Mutex::new(namespace));
+        let id = ns.lock().id.clone();
+        self.namespaces.insert(id, ns.clone());
+        ns
+    }
+
+    /// Get a namespace by ID
+    pub fn get_namespace(&self, id: &NamespaceId) -> Option<Arc<spin::Mutex<Namespace>>> {
+        self.namespaces.get(id).cloned()
+    }
+
+    /// Remove a namespace
+    pub fn remove_namespace(&mut self, id: &NamespaceId) -> Result<(), String> {
+        let ns = self.namespaces.get(id)
+            .ok_or_else(|| format!("Namespace not found: {:?}", id))?;
+        
+        let ns_guard = ns.lock();
+        if ns_guard.process_count() > 0 {
+            return Err(format!("Namespace has {} processes, cannot remove", ns_guard.process_count()));
         }
-        self.namespaces.insert(id, namespace);
+        
+        self.namespaces.remove(id);
         Ok(())
     }
 
-    pub fn get_namespace(&self, id: NamespaceId) -> Option<&dyn KernelNamespace> {
-        self.namespaces.get(&id).map(|ns| ns.as_ref())
+    /// Get all namespaces of a specific type
+    pub fn get_namespaces_by_type(&self, ns_type: NamespaceType) -> Vec<Arc<spin::Mutex<Namespace>>> {
+        self.namespaces.values()
+            .filter(|ns| ns.lock().id.ns_type == ns_type)
+            .cloned()
+            .collect()
     }
 
-    pub fn unregister_namespace(&mut self, id: NamespaceId) -> Result<(), NamespaceError> {
-        if self.namespaces.remove(&id).is_some() {
-            Ok(())
-        } else {
-            Err(NamespaceError::InvalidNamespaceId)
-        }
-    }
-
+    /// Get total namespace count
     pub fn namespace_count(&self) -> usize {
         self.namespaces.len()
     }
 }
 
-impl Default for NamespaceRegistry {
+impl Default for NamespaceManager {
     fn default() -> Self {
         Self::new()
     }
@@ -606,152 +183,106 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_namespace_id_creation() {
-        let id1 = NamespaceId::new(42);
-        assert_eq!(id1.raw(), 42);
-
-        let id2 = NamespaceId::new(42);
-        assert_eq!(id1, id2);
+    fn test_namespace_type_from_bits() {
+        let bits = (NamespaceType::Mount as u32) | (NamespaceType::Network as u32);
+        let types = NamespaceType::from_bits(bits);
+        
+        assert_eq!(types.len(), 2);
+        assert!(types.contains(&NamespaceType::Mount));
+        assert!(types.contains(&NamespaceType::Network));
     }
 
     #[test]
-    fn test_namespace_id_generator() {
-        let id1 = next_namespace_id();
-        let id2 = next_namespace_id();
-
-        assert!(id1.raw() < id2.raw());
-        assert_ne!(id1, id2);
+    fn test_namespace_id() {
+        let id = NamespaceId::new(NamespaceType::Pid, 100);
+        assert_eq!(id.ns_type, NamespaceType::Pid);
+        assert_eq!(id.inode, 100);
     }
 
     #[test]
-    fn test_namespace_type_as_str() {
-        assert_eq!(KernelNamespaceType::Pid.as_str(), "pid");
-        assert_eq!(KernelNamespaceType::Ipc.as_str(), "ipc");
-        assert_eq!(KernelNamespaceType::Network.as_str(), "network");
+    fn test_namespace_creation() {
+        let ns = Namespace::new(NamespaceType::Mount, 1);
+        assert_eq!(ns.id.ns_type, NamespaceType::Mount);
+        assert_eq!(ns.id.inode, 1);
+        assert!(ns.parent.is_none());
     }
 
     #[test]
-    fn test_namespace_config() {
-        let config = NamespaceConfig::new(KernelNamespaceType::Pid);
-        assert_eq!(config.namespace_type, KernelNamespaceType::Pid);
-        assert_eq!(config.inherit_from, None);
-
-        let parent_id = NamespaceId::new(1);
-        let config = NamespaceConfig::inherit(KernelNamespaceType::Pid, parent_id);
-        assert_eq!(config.inherit_from, Some(parent_id));
+    fn test_namespace_with_parent() {
+        let parent = Arc::new(spin::Mutex::new(Namespace::new(NamespaceType::Mount, 1)));
+        let child = Namespace::with_parent(NamespaceType::Mount, 2, parent.clone());
+        
+        assert!(child.parent.is_some());
     }
 
     #[test]
-    fn test_namespace_error_messages() {
-        assert!(!NamespaceError::InvalidNamespaceId.message().is_empty());
-        assert!(!NamespaceError::NamespaceFull.message().is_empty());
+    fn test_namespace_add_remove_process() {
+        let mut ns = Namespace::new(NamespaceType::Pid, 1);
+        
+        ns.add_process(100);
+        assert_eq!(ns.process_count(), 1);
+        
+        ns.remove_process(100);
+        assert_eq!(ns.process_count(), 0);
     }
 
     #[test]
-    fn test_pid_namespace() {
-        let id = NamespaceId::new(1);
-        let pid_ns = PidNamespace::new(id, None);
+    fn test_namespace_manager_create() {
+        let mut manager = NamespaceManager::new();
         
-        assert_eq!(pid_ns.namespace_id(), id);
-        assert_eq!(pid_ns.namespace_type(), KernelNamespaceType::Pid);
-        assert_eq!(pid_ns.ref_count(), 0);
+        let ns = manager.create_namespace(NamespaceType::Mount, None);
+        assert_eq!(manager.namespace_count(), 1);
         
-        pid_ns.increment_ref();
-        assert_eq!(pid_ns.ref_count(), 1);
-        
-        let pid1 = pid_ns.allocate_pid();
-        let pid2 = pid_ns.allocate_pid();
-        assert!(pid1 < pid2);
+        let ns_guard = ns.lock();
+        assert_eq!(ns_guard.id.inode, 1);
     }
 
     #[test]
-    fn test_ipc_namespace() {
-        let id = NamespaceId::new(2);
-        let ipc_ns = IpcNamespace::new(id, None);
+    fn test_namespace_manager_with_parent() {
+        let mut manager = NamespaceManager::new();
         
-        assert_eq!(ipc_ns.namespace_type(), KernelNamespaceType::Ipc);
+        let parent = manager.create_namespace(NamespaceType::Mount, None);
+        let child = manager.create_namespace(NamespaceType::Mount, Some(parent));
         
-        ipc_ns.increment_ref();
-        assert_eq!(ipc_ns.ref_count(), 1);
-        
-        let q1 = ipc_ns.allocate_queue();
-        let q2 = ipc_ns.allocate_queue();
-        assert!(q1 < q2);
+        assert_eq!(manager.namespace_count(), 2);
     }
 
     #[test]
-    fn test_network_namespace() {
-        let id = NamespaceId::new(3);
-        let net_ns = NetworkNamespace::new(id, None);
+    fn test_namespace_manager_remove() {
+        let mut manager = NamespaceManager::new();
         
-        assert_eq!(net_ns.namespace_type(), KernelNamespaceType::Network);
+        let ns = manager.create_namespace(NamespaceType::Mount, None);
+        let id = ns.lock().id.clone();
         
-        let if1 = net_ns.allocate_interface();
-        let if2 = net_ns.allocate_interface();
-        assert!(if1 < if2);
+        manager.remove_namespace(&id).unwrap();
+        assert_eq!(manager.namespace_count(), 0);
     }
 
     #[test]
-    fn test_uts_namespace() {
-        let id = NamespaceId::new(4);
-        let mut uts_ns = UtsNamespace::new(id, None, "sigmaos", "local");
+    fn test_namespace_manager_remove_with_processes() {
+        let mut manager = NamespaceManager::new();
         
-        assert_eq!(uts_ns.namespace_type(), KernelNamespaceType::Uts);
-        assert_eq!(uts_ns.get_hostname(), "sigmaos");
-        assert_eq!(uts_ns.get_domainname(), "local");
+        let ns = manager.create_namespace(NamespaceType::Mount, None);
+        {
+            let mut ns_guard = ns.lock();
+            ns_guard.add_process(100);
+        }
         
-        uts_ns.set_hostname("newhost");
-        assert_eq!(uts_ns.get_hostname(), "newhost");
+        let id = ns.lock().id.clone();
+        let result = manager.remove_namespace(&id);
+        
+        assert!(result.is_err());
     }
 
     #[test]
-    fn test_user_namespace() {
-        let id = NamespaceId::new(5);
-        let user_ns = UserNamespace::new(id, None);
+    fn test_namespace_manager_get_by_type() {
+        let mut manager = NamespaceManager::new();
         
-        assert_eq!(user_ns.namespace_type(), KernelNamespaceType::User);
+        manager.create_namespace(NamespaceType::Mount, None);
+        manager.create_namespace(NamespaceType::Network, None);
+        manager.create_namespace(NamespaceType::Mount, None);
         
-        let uid1 = user_ns.map_uid(1000);
-        let uid2 = user_ns.map_uid(1001);
-        assert!(uid1 < uid2);
-    }
-
-    #[test]
-    fn test_cgroup_namespace() {
-        let id = NamespaceId::new(6);
-        let cgroup_ns = CgroupNamespace::new(id, None);
-        
-        assert_eq!(cgroup_ns.namespace_type(), KernelNamespaceType::Cgroup);
-        
-        let cg1 = cgroup_ns.create_cgroup();
-        let cg2 = cgroup_ns.create_cgroup();
-        assert!(cg1 < cg2);
-    }
-
-    #[test]
-    fn test_mount_namespace() {
-        let id = NamespaceId::new(7);
-        let mount_ns = MountNamespace::new(id, None);
-        
-        assert_eq!(mount_ns.namespace_type(), KernelNamespaceType::Mount);
-        
-        let m1 = mount_ns.add_mount();
-        let m2 = mount_ns.add_mount();
-        assert!(m1 < m2);
-    }
-
-    #[test]
-    fn test_namespace_registry() {
-        let mut registry = NamespaceRegistry::new();
-        
-        let id1 = NamespaceId::new(1);
-        let pid_ns = Box::new(PidNamespace::new(id1, None)) as Box<dyn KernelNamespace>;
-        
-        assert!(registry.register_namespace(pid_ns).is_ok());
-        assert_eq!(registry.namespace_count(), 1);
-        
-        assert!(registry.get_namespace(id1).is_some());
-        assert!(registry.unregister_namespace(id1).is_ok());
-        assert_eq!(registry.namespace_count(), 0);
+        let mount_ns = manager.get_namespaces_by_type(NamespaceType::Mount);
+        assert_eq!(mount_ns.len(), 2);
     }
 }

@@ -3,6 +3,8 @@
 pub mod architecture;
 pub mod atomic_extended;
 pub mod cgroup_v2;
+pub mod cgroup_v2_controllers;
+pub use cgroup_v2_controllers::{CgroupController, CgroupControllerConfig, CgroupStats, CgroupV2, CgroupV2Manager};
 pub mod kqueue_event;
 pub mod cgroup_controllers;
 pub mod block_dev;
@@ -71,6 +73,7 @@ pub mod memory;
 pub mod meta;
 pub mod module_loader;
 pub mod namespaces;
+pub use namespaces::{Namespace, NamespaceId, NamespaceManager, NamespaceType};
 pub mod net;
 pub mod nextgen_breakthroughs;
 pub mod numa_allocator;
