@@ -3,6 +3,7 @@
 use std::collections::HashMap;
 use std::format;
 use std::string::String;
+use std::vec::Vec;
 
 /// Display Power Management Signaling (DPMS) state inspired by X11 / Wayland / BSD xset
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -257,6 +258,121 @@ impl ScreenSaverEngine {
     }
 }
 
+// ============================================================================
+// OMARCHY BACKGROUNDS & OWE VIDEO WALLPAPER ENGINE
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WallpaperMediaFormat {
+    StillImage, // png, jpg, webp, bmp
+    VideoMp4,   // mp4, m4v
+    VideoMkv,   // mkv, avi, mov
+    VideoWebm,  // webm
+    AnimatedGif,// gif
+}
+
+impl WallpaperMediaFormat {
+    pub fn from_filename(file_path: &str) -> Self {
+        let lower = file_path.to_lowercase();
+        if lower.ends_with(".mp4") || lower.ends_with(".m4v") {
+            Self::VideoMp4
+        } else if lower.ends_with(".mkv") || lower.ends_with(".avi") || lower.ends_with(".mov") {
+            Self::VideoMkv
+        } else if lower.ends_with(".webm") {
+            Self::VideoWebm
+        } else if lower.ends_with(".gif") {
+            Self::AnimatedGif
+        } else {
+            Self::StillImage
+        }
+    }
+
+    pub fn is_video(&self) -> bool {
+        matches!(self, Self::VideoMp4 | Self::VideoMkv | Self::VideoWebm)
+    }
+}
+
+pub struct OmarchyBackgroundManager {
+    pub active_theme: String,
+    pub backgrounds_base_dir: String,
+    pub available_wallpapers: Vec<String>,
+    pub selected_wallpaper: String,
+}
+
+impl OmarchyBackgroundManager {
+    pub fn new(theme: &str) -> Self {
+        let base_dir = format!("~/.config/omarchy/backgrounds/{}", theme);
+        Self {
+            active_theme: theme.to_string(),
+            backgrounds_base_dir: base_dir,
+            available_wallpapers: Vec::new(),
+            selected_wallpaper: String::new(),
+        }
+    }
+
+    pub fn resolve_theme_background_directory(&self) -> String {
+        format!("~/.config/omarchy/backgrounds/{}", self.active_theme)
+    }
+
+    pub fn open_theme_background_directory_cmd(&self) -> String {
+        format!("nemo ~/.config/omarchy/backgrounds/{}", self.active_theme)
+    }
+
+    pub fn select_wallpaper(&mut self, wallpaper_filename: &str) -> String {
+        self.selected_wallpaper = wallpaper_filename.to_string();
+        format!(
+            "Omarchy Wallpaper Switcher (Super+Ctrl+Space): Active background set to {}/{}",
+            self.resolve_theme_background_directory(), wallpaper_filename
+        )
+    }
+}
+
+pub struct OweVideoWallpaperEngine {
+    pub current_video_path: String,
+    pub is_playing: bool,
+    pub is_audio_muted: bool,
+    pub shared_multihead_decode: bool,
+    pub cached_lockscreen_still_path: String,
+}
+
+impl OweVideoWallpaperEngine {
+    pub fn new(video_path: &str) -> Self {
+        let format = WallpaperMediaFormat::from_filename(video_path);
+        let cached_still = if format.is_video() || format == WallpaperMediaFormat::AnimatedGif {
+            format!("{}.lock_cached_still.png", video_path)
+        } else {
+            video_path.to_string()
+        };
+
+        Self {
+            current_video_path: video_path.to_string(),
+            is_playing: true,
+            is_audio_muted: false,
+            shared_multihead_decode: true, // Decodes once for all monitors
+            cached_lockscreen_still_path: cached_still,
+        }
+    }
+
+    pub fn pause_playback_for_power_saving(&mut self) -> String {
+        self.is_playing = false;
+        "OWE Engine: Video playback paused to preserve battery/power".to_string()
+    }
+
+    pub fn render_lockscreen_frame(&mut self) -> String {
+        self.is_audio_muted = true;
+        format!(
+            "OWE Lockscreen: Displaying cached still frame '{}' with muted audio decode",
+            self.cached_lockscreen_still_path
+        )
+    }
+}
+
+impl Default for OmarchyBackgroundManager {
+    fn default() -> Self {
+        Self::new("nord")
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -333,5 +449,34 @@ mod tests {
         // Update idle again -> now screensaver activates
         engine.update_idle_time(20);
         assert!(engine.is_active);
+    }
+
+    #[test]
+    fn test_omarchy_background_manager() {
+        let mut mgr = OmarchyBackgroundManager::new("nord");
+        assert_eq!(mgr.resolve_theme_background_directory(), "~/.config/omarchy/backgrounds/nord");
+
+        let open_cmd = mgr.open_theme_background_directory_cmd();
+        assert!(open_cmd.contains("nemo"));
+        assert!(open_cmd.contains("nord"));
+
+        let select_msg = mgr.select_wallpaper("cyberpunk_city.mp4");
+        assert!(select_msg.contains("Super+Ctrl+Space"));
+        assert_eq!(mgr.selected_wallpaper, "cyberpunk_city.mp4");
+    }
+
+    #[test]
+    fn test_owe_video_wallpaper_engine() {
+        let mut owe = OweVideoWallpaperEngine::new("matrix_loop.mp4");
+        assert!(owe.shared_multihead_decode);
+        assert!(owe.cached_lockscreen_still_path.contains("lock_cached_still.png"));
+
+        let pause_msg = owe.pause_playback_for_power_saving();
+        assert!(pause_msg.contains("paused"));
+        assert!(!owe.is_playing);
+
+        let lock_msg = owe.render_lockscreen_frame();
+        assert!(lock_msg.contains("muted audio"));
+        assert!(owe.is_audio_muted);
     }
 }

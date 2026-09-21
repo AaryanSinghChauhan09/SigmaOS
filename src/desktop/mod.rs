@@ -58,7 +58,8 @@ pub use mint_tools::{
 };
 
 pub use screensaver::{
-    DpmsState, LockState, ScreenSaverConfig, ScreenSaverEngine, ScreenSaverFrame, ScreenSaverMode,
+    DpmsState, LockState, OmarchyBackgroundManager, OweVideoWallpaperEngine, ScreenSaverConfig,
+    ScreenSaverEngine, ScreenSaverFrame, ScreenSaverMode, WallpaperMediaFormat,
 };
 
 pub use pantheon::{
