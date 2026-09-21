@@ -144,6 +144,12 @@ pub use syslog::{SyslogBuffer, SyslogEntry, SyslogFacility, SyslogManager, Syslo
 pub mod cron;
 pub use cron::{CronField, CronJob, CronManager, CronSchedule};
 
+pub mod swap;
+pub use swap::{SwapDevice, SwapDeviceType, SwapManager, SwapPriority, SwapStats};
+
+pub mod resource;
+pub use resource::{CpuStats, DiskStats, MemoryStats, NetworkStats, ResourceMonitor};
+
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
 pub use linux_parity::{
