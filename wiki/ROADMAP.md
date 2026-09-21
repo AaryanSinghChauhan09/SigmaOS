@@ -423,6 +423,13 @@ The M1 milestone provides a bootable ISO with kernel entry point, init system, l
   - Signal read operation that clears the queue
   - SignalFdManager for system-wide signalfd management
   - 12 unit tests passing
+- Network Namespace (src/kernel/network_namespace.rs):
+  - NetworkNamespace with network device management
+  - NetworkDevice with name, index, MAC address, MTU
+  - Hierarchical namespace management with parent/child relationships
+  - Device add/remove/list operations
+  - NetworkNamespaceManager for system-wide namespace management
+  - 11 unit tests passing
 
 **Completed Fixes:**
 - Kernel module: removed duplicate structures, virtual_cpu, vmm_paging declarations
@@ -607,6 +614,6 @@ See [BOOT_TO_LOGIN_PATH_SPECIFICATION.md](../docs/BOOT_TO_LOGIN_PATH_SPECIFICATI
 - [PROJECT_STATUS.md](../docs/PROJECT_STATUS.md) - Current implementation status
 
 ### Last Verified
-- **Version:** 3.5
+- **Version:** 3.6
 - **Date:** 2026-09-21
 - **Verified by:** Devin AI Agent
