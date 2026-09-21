@@ -66,6 +66,10 @@ The M1 milestone provides a bootable ISO with kernel entry point, init system, l
 - ✅ Implemented POSIX signal delivery infrastructure (sigaction, sigprocmask)
 - ✅ Implemented ELF dynamic linker (ld-linux.so equivalent)
 - ✅ Expanded coreutils suite (ls, cp, mv, rm, cat, chmod, chown, df, du, mkdir, touch)
+- ✅ Implemented pthreads compatibility layer (thread management, synchronization, TLS)
+- ✅ Implemented VFS with POSIX path resolution
+- ✅ Implemented kernel module dynamic loading framework
+- ✅ Implemented eBPF program structure and verification
 - ⬜ 312 compilation errors remain (down from 302, need further investigation)
 
 **Completed Fixes:**
@@ -102,6 +106,34 @@ The M1 milestone provides a bootable ISO with kernel entry point, init system, l
   - ls, cp, mv, rm, cat, chmod, chown, df, du, mkdir, touch
   - POSIX-compatible implementations with standard options
   - Unit tests for each utility
+- POSIX Threads (src/compatibility/pthreads.rs):
+  - Thread management (pthread_t, pthread_attr_t)
+  - Synchronization primitives (pthread_mutex_t, pthread_cond_t, pthread_rwlock_t)
+  - Thread-local storage (pthread_key_t, pthread_setspecific, pthread_getspecific)
+  - Thread operations (pthread_create, pthread_join, pthread_detach, pthread_exit)
+  - Barrier synchronization (pthread_barrier_t)
+  - Fork handlers (pthread_atfork)
+- VFS with POSIX Path Resolution (src/vfs/posix_path.rs):
+  - VFS operations trait (lookup, create, mkdir, unlink, rmdir, rename, getattr, setattr, read, write, readdir, symlink, readlink)
+  - In-memory VFS implementation (MemoryVfs)
+  - POSIX path resolver (PosixPathResolver)
+  - Path normalization (remove . and .. components)
+  - Current directory management (chdir)
+- Kernel Module Dynamic Loading (src/kernel/module_loader.rs):
+  - Module state management (Unloaded, Loading, Loaded, Unloading, Failed)
+  - Module metadata (name, version, author, description, license, dependencies, symbols)
+  - Module loader with dependency resolution
+  - Symbol table for dynamic linking
+  - Module loading/unloading with dependency checking
+  - Symbol resolution for kernel modules
+- eBPF Program Structure (src/kernel/ebpf_program.rs):
+  - eBPF program types (SocketFilter, Kprobe, Tracepoint, Xdp, PerfEvent, CgroupSock, etc.)
+  - eBPF instruction classes (Ld, Ldx, St, Stx, Alu, Jmp, Alu64, Jmp32, LdImmDW)
+  - eBPF instruction structure (64-bit encoding)
+  - eBPF registers (R0-R10)
+  - eBPF map types (Hash, Array, PerCpuHash, PerCpuArray, LruHash, RingBuf)
+  - eBPF verifier with static analysis (instruction count, register bounds, stack depth, unbounded loop detection)
+  - eBPF virtual machine for program execution
 
 **Next Steps:**
 - Investigate remaining 312 compilation errors
