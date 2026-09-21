@@ -8,13 +8,25 @@
 // SPDX-License-Identifier: MIT
 
 // GPU Driver - Linux & BSD inspired GPU acceleration and display layer
-// Supports framebuffer management, 2D acceleration, DRM/KMS atomic plane compositing, Wayland SHM DMA-BUF zero-copy, and OpenBSD wsdisplay VT switching.
+// Supports framebuffer management, 2D acceleration, DRM/KMS atomic plane compositing, GEM/TTM buffer objects, Wayland SHM DMA-BUF zero-copy, and OpenBSD wsdisplay VT switching.
 
 use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
 
+#[cfg(not(test))]
 use super::nvidia_prime::NvidiaPrimeEngine;
+
+#[cfg(test)]
+#[derive(Debug, Clone)]
+pub struct NvidiaPrimeEngine;
+
+#[cfg(test)]
+impl NvidiaPrimeEngine {
+    pub fn new() -> Self {
+        Self
+    }
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GpuState {
@@ -70,6 +82,17 @@ pub struct DrmAtomicPlaneState {
     pub zpos: u32,
 }
 
+/// Linux GEM (Graphics Execution Manager) Buffer Object
+#[derive(Debug, Clone)]
+pub struct GemBufferObject {
+    pub handle: u32,
+    pub size: usize,
+    pub vram_domain: bool, // Dedicated VRAM vs System GTT Memory
+    pub pitch: u32,
+    pub format: PixelFormat,
+    pub is_mapped: bool,
+}
+
 /// Wayland SHM DMA-BUF Zero-Copy Buffer Descriptor
 #[derive(Debug, Clone)]
 pub struct WaylandDmaBuf {
@@ -106,10 +129,12 @@ pub struct GpuDriver {
     primary_device: Option<u32>,
     next_device_id: u32,
     pub atomic_planes: Vec<DrmAtomicPlaneState>,
+    pub gem_buffers: BTreeMap<u32, GemBufferObject>, // handle -> GEM BO
     pub dma_buffers: Vec<WaylandDmaBuf>,
     pub ws_terminals: Vec<OpenBsdWsdisplayVt>,
     pub active_vt: u32,
     pub nvidia_prime_engine: NvidiaPrimeEngine,
+    pub next_gem_handle: u32,
 }
 
 impl GpuDriver {
@@ -120,10 +145,12 @@ impl GpuDriver {
             primary_device: None,
             next_device_id: 0,
             atomic_planes: Vec::new(),
+            gem_buffers: BTreeMap::new(),
             dma_buffers: Vec::new(),
             ws_terminals: Vec::new(),
             active_vt: 1,
             nvidia_prime_engine: NvidiaPrimeEngine::new(),
+            next_gem_handle: 100,
         };
 
         // Pre-configure OpenBSD wsdisplay VTs 1-4
@@ -168,7 +195,7 @@ impl GpuDriver {
             framebuffer: None,
             vram_size,
             supports_2d_accel: true,
-            supports_3d_accel: false,
+            supports_3d_accel: true,
         };
 
         self.devices.insert(id, device);
@@ -298,6 +325,40 @@ impl GpuDriver {
         self.devices.values().collect()
     }
 
+    /// Linux DRM GEM (Graphics Execution Manager) Buffer Object Creation
+    pub fn allocate_gem_buffer(
+        &mut self,
+        size: usize,
+        vram_domain: bool,
+        pitch: u32,
+        format: PixelFormat,
+    ) -> Result<u32, &'static str> {
+        let handle = self.next_gem_handle;
+        self.next_gem_handle += 1;
+
+        let bo = GemBufferObject {
+            handle,
+            size,
+            vram_domain,
+            pitch,
+            format,
+            is_mapped: false,
+        };
+
+        self.gem_buffers.insert(handle, bo);
+        Ok(handle)
+    }
+
+    /// Query GEM Buffer Object by handle
+    pub fn get_gem_buffer(&self, handle: u32) -> Option<&GemBufferObject> {
+        self.gem_buffers.get(&handle)
+    }
+
+    /// Free GEM Buffer Object
+    pub fn free_gem_buffer(&mut self, handle: u32) -> bool {
+        self.gem_buffers.remove(&handle).is_some()
+    }
+
     /// Linux DRM/KMS Atomic Plane Commit
     pub fn commit_atomic_plane(&mut self, plane: DrmAtomicPlaneState) -> Result<(), &'static str> {
         self.atomic_planes.retain(|p| p.plane_id != plane.plane_id);
@@ -379,6 +440,23 @@ mod tests {
         let device = driver.get_device(id).unwrap();
         assert_eq!(device.state, GpuState::HardwareAccelerated);
         assert!(device.framebuffer.is_some());
+    }
+
+    #[test]
+    fn test_gem_buffer_object_allocation() {
+        let mut driver = GpuDriver::new();
+
+        let handle = driver
+            .allocate_gem_buffer(1920 * 1080 * 4, true, 1920 * 4, PixelFormat::Rgba32)
+            .unwrap();
+        assert!(handle >= 100);
+
+        let bo = driver.get_gem_buffer(handle).unwrap();
+        assert_eq!(bo.size, 1920 * 1080 * 4);
+        assert!(bo.vram_domain);
+
+        assert!(driver.free_gem_buffer(handle));
+        assert!(driver.get_gem_buffer(handle).is_none());
     }
 
     #[test]

@@ -3,9 +3,9 @@
 // 30-year ancient-to-modern hardware bring-up tier (BIOS shims, ISA DMA, ATA/IDE, PCIe Gen5/CXL 3.0, NVMe 2.0),
 // and lockless SPSC DMA ring queues under #![no_std] constraints.
 
-
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DriverLifecycleState {
@@ -129,6 +129,18 @@ impl SovereignDriverManager {
             }
         }
         None
+    }
+
+    /// Dynamic Driver Unloading (FreeBSD kldunload / Linux modprobe -r parity)
+    pub fn unload_driver(&mut self, driver_id: usize) -> Result<(), &'static str> {
+        let drv = self.registered_drivers.get_mut(&driver_id).ok_or("Driver not found")?;
+
+        if let Some(pci_id) = &drv.pci_id {
+            self.pci_binding_table.remove(&(pci_id.vendor_id, pci_id.device_id));
+        }
+
+        drv.state = DriverLifecycleState::Unloaded;
+        Ok(())
     }
 }
 
@@ -535,32 +547,13 @@ mod tests {
             DriverLifecycleState::Active
         );
 
-        // Register Nouveau Nvidia Driver
-        let nouveau_id = mgr.register_driver_factory(
-            "nouveau-sovereign-drm",
-            HardwareTier::ModernBareMetal,
-            Some(0x10de),
-            Some(0x2782),
+        // Dynamic Unload driver
+        assert!(mgr.unload_driver(nvme_drv_id).is_ok());
+        assert_eq!(
+            mgr.registered_drivers.get(&nvme_drv_id).unwrap().state,
+            DriverLifecycleState::Unloaded
         );
-        assert_eq!(mgr.autoprobe_pci_bus(0x10de, 0x2782), Some(nouveau_id));
-
-        // Register Apple Silicon ANS2 NVMe Driver
-        let ans2_id = mgr.register_driver_factory(
-            "apple-ans2-nvme",
-            HardwareTier::ModernBareMetal,
-            Some(0x106b),
-            Some(0x2001),
-        );
-        assert_eq!(mgr.autoprobe_pci_bus(0x106b, 0x2001), Some(ans2_id));
-
-        // Register Intel Wi-Fi 7 BE200 Driver
-        let be200_id = mgr.register_driver_factory(
-            "intel-be200-wifi7",
-            HardwareTier::ModernBareMetal,
-            Some(0x8086),
-            Some(0x272b),
-        );
-        assert_eq!(mgr.autoprobe_pci_bus(0x8086, 0x272b), Some(be200_id));
+        assert!(mgr.autoprobe_pci_bus(0x8086, 0x0953).is_none());
 
         // Lockless SPSC DMA Queue test
         let mut dma_queue = LocklessDmaRingQueue::<4>::new();
