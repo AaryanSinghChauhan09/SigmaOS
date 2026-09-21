@@ -155,6 +155,7 @@ pub use spec::{
     SimplePackageManager, UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
 };
 pub use verifier::CryptoVerifier;
+pub use crate::package::sovereign_distro_package_master_suite::*;
 
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
