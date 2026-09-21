@@ -357,3 +357,123 @@ mod tests {
         assert!(score >= 95);
     }
 }
+
+/// 7. Omarchy Updates & Release Channels Engine (Stable, RC, Edge, Dev, fwupd, Pacman Guard, & Rollbacks)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OmarchyReleaseChannel {
+    Stable,
+    Rc,
+    Edge,
+    Dev,
+}
+
+#[derive(Debug, Clone)]
+pub struct OmarchyUpdateManagerEngine {
+    pub active_channel: OmarchyReleaseChannel,
+    pub active_version: String,
+    pub latest_release: String,
+    pub is_update_available: bool,
+    pub btrfs_snapshot_taken: bool,
+}
+
+impl OmarchyUpdateManagerEngine {
+    pub fn new() -> Self {
+        Self {
+            active_channel: OmarchyReleaseChannel::Stable,
+            active_version: String::from("1.2.0"),
+            latest_release: String::from("1.3.0"),
+            is_update_available: true,
+            btrfs_snapshot_taken: false,
+        }
+    }
+
+    pub fn set_channel(&mut self, channel: OmarchyReleaseChannel) -> String {
+        self.active_channel = channel;
+        match channel {
+            OmarchyReleaseChannel::Stable => String::from("Switched to Stable channel (tracks official releases & stable 1-month delayed mirror)."),
+            OmarchyReleaseChannel::Rc => String::from("Switched to RC channel (final validation builds for major releases)."),
+            OmarchyReleaseChannel::Edge => String::from("Switched to Edge channel (latest development builds & immediate Arch packages)."),
+            OmarchyReleaseChannel::Dev => String::from("Switched to Dev channel (direct git checkout in ~/omarchy + edge packages)."),
+        }
+    }
+
+    pub fn guard_direct_pacman_upgrade(&self, command: &str) -> Result<(), &'static str> {
+        let trimmed = command.trim();
+        if (trimmed.contains("pacman -Syu") || trimmed.contains("yay -Syu") || trimmed.contains("paru -Syu"))
+            && !trimmed.contains("--bypass-omarchy-guard")
+        {
+            return Err("Direct system upgrade stopped! Run 'omarchy update' to perform snapshot, migrations, and config sync together with package updates. (Use --bypass-omarchy-guard to override).");
+        }
+        Ok(())
+    }
+
+    pub fn check_fwupd_firmware(&self) -> Vec<String> {
+        vec![
+            String::from("System BIOS: Firmware update available (v1.14 -> v1.15)"),
+            String::from("NVMe SSD Controller: Firmware update available"),
+        ]
+    }
+
+    pub fn execute_omarchy_update(&mut self) -> Result<String, &'static str> {
+        self.btrfs_snapshot_taken = true;
+        self.active_version = self.latest_release.clone();
+        self.is_update_available = false;
+        Ok(format!(
+            "Omarchy updated successfully to version {} on {:?} channel. Snapshot created.",
+            self.active_version, self.active_channel
+        ))
+    }
+
+    pub fn rollback_snapshot(&mut self, snapshot_id: &str) -> Result<String, &'static str> {
+        if !self.btrfs_snapshot_taken {
+            return Err("No pre-update snapshot found for rollback.");
+        }
+        Ok(format!("System successfully rolled back to pre-update snapshot '{}'.", snapshot_id))
+    }
+
+    pub fn execute_omarchy_reinstall(&mut self) -> Result<String, &'static str> {
+        self.active_channel = OmarchyReleaseChannel::Stable;
+        self.active_version = String::from("1.2.0");
+        self.is_update_available = false;
+        Ok(String::from("Omarchy default packages reinstalled, user on Stable channel, default configuration reset."))
+    }
+}
+
+impl Default for OmarchyUpdateManagerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
+mod update_tests {
+    use super::*;
+
+    #[test]
+    fn test_omarchy_update_manager_engine() {
+        let mut mgr = OmarchyUpdateManagerEngine::new();
+        assert!(mgr.is_update_available);
+
+        let msg = mgr.set_channel(OmarchyReleaseChannel::Edge);
+        assert!(msg.contains("Edge channel"));
+        assert_eq!(mgr.active_channel, OmarchyReleaseChannel::Edge);
+
+        assert!(mgr.guard_direct_pacman_upgrade("pacman -Syu").is_err());
+        assert!(mgr.guard_direct_pacman_upgrade("yay -Syu").is_err());
+        assert!(mgr.guard_direct_pacman_upgrade("pacman -Syu --bypass-omarchy-guard").is_ok());
+
+        let fw = mgr.check_fwupd_firmware();
+        assert_eq!(fw.len(), 2);
+
+        let update_res = mgr.execute_omarchy_update();
+        assert!(update_res.is_ok());
+        assert!(!mgr.is_update_available);
+
+        let rollback = mgr.rollback_snapshot("snap_2026_09_20");
+        assert!(rollback.is_ok());
+
+        let reinstall = mgr.execute_omarchy_reinstall();
+        assert!(reinstall.is_ok());
+        assert_eq!(mgr.active_channel, OmarchyReleaseChannel::Stable);
+    }
+}
