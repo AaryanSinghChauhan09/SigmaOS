@@ -168,6 +168,9 @@ pub use semaphore::{Semaphore, SemaphoreManager, SemaphoreResult, SemaphoreSet};
 pub mod timerfd;
 pub use timerfd::{TimerClock, TimerExpirations, TimerFd, TimerFdManager, TimerFlags, TimerSpec};
 
+pub mod signalfd;
+pub use signalfd::{SignalFd, SignalFdFlags, SignalFdManager, SignalInfo, SignalMask};
+
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
 pub use linux_parity::{
