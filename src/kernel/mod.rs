@@ -126,6 +126,12 @@ pub use bsd_jail::{BsdJail, BsdJailConfig, BsdJailManager};
 pub mod zfs;
 pub use zfs::{ZfsDataset, ZfsDatasetProperties, ZfsDatasetType, ZfsManager, ZfsPool, ZfsPoolConfig};
 
+pub mod btrfs;
+pub use btrfs::{BtrfsCompression, BtrfsFilesystem, BtrfsManager, BtrfsSubvolume, BtrfsSubvolumeType};
+
+pub mod overlay;
+pub use overlay::{OverlayConfig, OverlayFilesystem, OverlayLayer, OverlayLayerType, OverlayManager};
+
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
 pub use linux_parity::{
