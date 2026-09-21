@@ -120,6 +120,12 @@ pub use pledge::{PledgeContext, PledgeManager, PledgePromise};
 pub mod unveil;
 pub use unveil::{UnveilContext, UnveilManager, UnveilOperation, UnveilPermissions, UnveilRule};
 
+pub mod bsd_jail;
+pub use bsd_jail::{BsdJail, BsdJailConfig, BsdJailManager};
+
+pub mod zfs;
+pub use zfs::{ZfsDataset, ZfsDatasetProperties, ZfsDatasetType, ZfsManager, ZfsPool, ZfsPoolConfig};
+
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
 pub use linux_parity::{
