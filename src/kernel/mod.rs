@@ -132,6 +132,12 @@ pub use btrfs::{BtrfsCompression, BtrfsFilesystem, BtrfsManager, BtrfsSubvolume,
 pub mod overlay;
 pub use overlay::{OverlayConfig, OverlayFilesystem, OverlayLayer, OverlayLayerType, OverlayManager};
 
+pub mod user_group;
+pub use user_group::{FilePermissions, Group, User, UserGroupManager};
+
+pub mod hostname;
+pub use hostname::HostnameManager;
+
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
 pub use linux_parity::{
