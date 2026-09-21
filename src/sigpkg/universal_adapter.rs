@@ -365,7 +365,6 @@ impl UniversalPackageAdapter {
         text: &str,
     ) -> Result<GentooEbuildMetadata, &'static str> {
         let mut category = String::from("app-misc");
-        let mut package_name = String::new();
         let mut version = String::from("1.0.0");
         let mut rdepend = Vec::new();
         let mut depend = Vec::new();
@@ -374,22 +373,22 @@ impl UniversalPackageAdapter {
 
         // Infer name and version from filename (e.g. `sys-apps/portage-3.0.30.ebuild` or `nginx-1.25.1.ebuild`)
         let clean_filename = filename.trim_end_matches(".ebuild");
-        if clean_filename.contains('/') {
+        let mut package_name = if clean_filename.contains('/') {
             let mut parts = clean_filename.split('/');
             category = parts.next().unwrap_or("app-misc").to_string();
             let name_ver = parts.next().unwrap_or(clean_filename);
             if let Some(pos) = name_ver.rfind('-') {
-                package_name = name_ver[..pos].to_string();
                 version = name_ver[pos + 1..].to_string();
+                name_ver[..pos].to_string()
             } else {
-                package_name = name_ver.to_string();
+                name_ver.to_string()
             }
         } else if let Some(pos) = clean_filename.rfind('-') {
-            package_name = clean_filename[..pos].to_string();
             version = clean_filename[pos + 1..].to_string();
+            clean_filename[..pos].to_string()
         } else {
-            package_name = clean_filename.to_string();
-        }
+            clean_filename.to_string()
+        };
 
         for line in text.lines() {
             let line = line.trim();
