@@ -64,4 +64,4 @@ Before submitting any changes to `main`:
 1. Run `./run_sigma_tests.sh` to execute all native Rust test suites.
 2. Run `pytest tests/` to execute Python system integration tests.
 3. Ensure zero compiler warnings and clean lint checks.
-4. Execute `/home/jules/self_created_tools/sync_docs.py` to synchronize plan documents across all documentation and wiki mirror directories (`./`, `docs/`, `wiki/`, `WIKI/`, `wiki_content/`, `wiki_repo/`).
+4. Execute synchronization tools (`scripts/sync_wiki.sh` or doc sync scripts) to synchronize plan documents across all documentation and wiki mirror directories (`./`, `docs/`, `wiki/`, `WIKI/`, `wiki_content/`, `wiki_repo/`).
