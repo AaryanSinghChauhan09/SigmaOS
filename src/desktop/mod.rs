@@ -12,7 +12,13 @@ pub mod screensaver;
 pub mod sovereign_navigation_engine;
 pub mod web_wasm_bridge;
 pub mod zenith;
+pub mod notifications;
 pub mod zenith_compositor;
+
+pub use notifications::{
+    AdvancedNotificationEngine, DndConfig, NotificationCategory, NotificationItem,
+    NotificationUrgency,
+};
 
 pub use zenith::{
     FractionalDisplayScaler, HyprlandTilingLayoutEngine, OmarchyThemeSyncEngine, SimpleDesktopCompositor,
