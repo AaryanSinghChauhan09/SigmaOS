@@ -150,6 +150,12 @@ pub use swap::{SwapDevice, SwapDeviceType, SwapManager, SwapPriority, SwapStats}
 pub mod resource;
 pub use resource::{CpuStats, DiskStats, MemoryStats, NetworkStats, ResourceMonitor};
 
+pub mod time;
+pub use time::{ClockSource, ClockSourceStats, SystemTime, TimeManager, Timezone};
+
+pub mod signal;
+pub use signal::{Signal, SignalDisposition, SignalHandler, SignalInfo, SignalManager, SignalMask};
+
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
 pub use linux_parity::{
