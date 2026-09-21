@@ -331,6 +331,23 @@ The M1 milestone provides a bootable ISO with kernel entry point, init system, l
   - Length validation (max 253 characters)
   - HostnameManager for system-wide hostname management
   - 12 unit tests passing
+- Syslog System Logging (src/kernel/syslog.rs):
+  - 8 severity levels (Emergency, Alert, Critical, Error, Warning, Notice, Info, Debug)
+  - 24 facilities (Kernel, User, Mail, Daemon, Auth, etc.)
+  - SyslogEntry with timestamp, facility, severity, process, PID, message
+  - Priority calculation (facility * 8 + severity)
+  - SyslogBuffer with max size and circular buffer
+  - Filtering by severity and facility
+  - SyslogManager for system-wide logging
+  - 14 unit tests passing
+- Cron Scheduler (src/kernel/cron.rs):
+  - Cron field parsing (Specific, Range, List, All, Step)
+  - 5-field cron schedule (minute, hour, day of month, month, day of week)
+  - CronJob with schedule, command, and enabled flag
+  - Time matching for job execution
+  - CronManager for job creation, enable/disable, and scheduling
+  - Get jobs to run at specific time
+  - 13 unit tests passing
 
 **Completed Fixes:**
 - Kernel module: removed duplicate structures, virtual_cpu, vmm_paging declarations
@@ -515,6 +532,6 @@ See [BOOT_TO_LOGIN_PATH_SPECIFICATION.md](../docs/BOOT_TO_LOGIN_PATH_SPECIFICATI
 - [PROJECT_STATUS.md](../docs/PROJECT_STATUS.md) - Current implementation status
 
 ### Last Verified
-- **Version:** 2.8
+- **Version:** 2.9
 - **Date:** 2026-09-21
 - **Verified by:** Devin AI Agent
