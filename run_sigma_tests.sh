@@ -241,3 +241,10 @@ if [ -f "src/distro/tech_media_distro_innovations.rs" ]; then
     rustc --test --edition=2021 src/distro/tech_media_distro_innovations.rs -o build/tech_media_distro_test
     ./build/tech_media_distro_test
 fi
+
+if [ -f "src/distro/sovereign_media_and_distro_unimplemented_innovations.rs" ]; then
+    echo "Running Sovereign Media & Distro Unimplemented Innovations test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/distro/sovereign_media_and_distro_unimplemented_innovations.rs -o build/sovereign_media_unimplemented_test
+    ./build/sovereign_media_unimplemented_test
+fi
