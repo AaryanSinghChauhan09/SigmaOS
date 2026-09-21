@@ -111,6 +111,9 @@ pub use flock::{FileLock, FileLockManager, LockOp, LockType};
 pub mod sysfs;
 pub use sysfs::{SysfsEntry, SysfsFileType, SysfsManager};
 
+pub mod procfs;
+pub use procfs::{ProcessInfo, ProcfsManager};
+
 pub mod linux_bsd_innovations;
 
 pub mod capabilities;
