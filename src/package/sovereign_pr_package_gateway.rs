@@ -27,8 +27,13 @@ use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 
+#[cfg(not(any(feature = "standalone_test", test)))]
+use super::universal::{PackageFormat, UnifiedPackage};
+
+#[cfg(any(feature = "standalone_test", test))]
 #[path = "universal.rs"]
 mod universal;
+#[cfg(any(feature = "standalone_test", test))]
 use universal::{PackageFormat, UnifiedPackage};
 
 // ============================================================================

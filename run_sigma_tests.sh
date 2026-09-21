@@ -85,6 +85,12 @@ if [ -f "src/distro/omarchy_update_pipeline_synthesis.rs" ]; then
     ./build/omarchy_update_pipeline_test
 fi
 
+if [ -f "src/desktop/sovereign_omarchy_icon_font_synthesis.rs" ]; then
+    echo -e "${YELLOW}Testing Omarchy Icon Font & Glyph Synthesis...${NC}"
+    rustc --test src/desktop/sovereign_omarchy_icon_font_synthesis.rs --edition=2021 -o build/omarchy_icon_font_test
+    ./build/omarchy_icon_font_test
+fi
+
 if [ -f "src/distro/linux_bsd_ecosystem_synthesis.rs" ]; then
     echo "Running Extended Linux & BSD Distro Ecosystem Synthesis test suite..."
     mkdir -p build
