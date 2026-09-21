@@ -24,7 +24,11 @@
 use std::string::{String, ToString};
 use std::vec::Vec;
 
+#[cfg(all(not(feature = "standalone_test"), not(test)))]
 use crate::klib::HashMap;
+
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::HashMap;
 
 /// Stub capability token for security-aware windowing
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
