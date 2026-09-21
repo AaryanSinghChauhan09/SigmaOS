@@ -87,6 +87,15 @@ pub use mount::{MountFlags, MountNamespace, MountPoint};
 pub mod shm;
 pub use shm::{ShmManager, ShmPerm, ShmSegment};
 
+pub mod msgqueue;
+pub use msgqueue::{Message, MessageQueue, MessageQueueManager, MsgQPerm};
+
+pub mod fd_table;
+pub use fd_table::{FdEntry, FdFlags, FdTable, FdTableManager};
+
+pub mod rlimit;
+pub use rlimit::{Rlimit, RlimitResource, ResourceLimits, ResourceLimitsManager};
+
 pub mod linux_bsd_innovations;
 
 pub mod capabilities;
@@ -187,6 +196,9 @@ pub use msgqueue::{Message, MessageQueue, MessageQueueManager, MsgQPerm};
 
 pub mod fd_table;
 pub use fd_table::{FdEntry, FdFlags, FdTable, FdTableManager};
+
+pub mod rlimit;
+pub use rlimit::{Rlimit, RlimitResource, ResourceLimits, ResourceLimitsManager};
 
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
