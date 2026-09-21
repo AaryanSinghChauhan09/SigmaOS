@@ -114,6 +114,9 @@ pub use sysfs::{SysfsEntry, SysfsFileType, SysfsManager};
 pub mod procfs;
 pub use procfs::{ProcessInfo, ProcfsManager};
 
+pub mod tmpfs;
+pub use tmpfs::{Tmpfs, TmpfsDirectory, TmpfsFile, TmpfsManager};
+
 pub mod linux_bsd_innovations;
 
 pub mod capabilities;
