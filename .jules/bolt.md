@@ -61,3 +61,7 @@
 ## 2026-09-19 - Safe Integer Sizing for Caching Fixed Array String Lengths
 **Learning:** Caching string/slice byte lengths on fixed array structs (e.g., `SimpleFileEntry` with `[u8; 256]`) replaces $O(N)$ zero-byte linear scans (`.position(|&b| b == 0)`) with $O(1)$ constant-time slice indexing. However, typing the length field as `u8` causes integer overflow truncation when the array size equals 256 bytes (`256 as u8` truncates to 0), causing full-capacity strings to evaluate as empty slices. Using `u16` safely accommodates capacities up to 65,535 without truncation risk.
 **Action:** When caching slice lengths for fixed byte arrays with capacity $\ge 256$, always type the length field as `u16` or `usize` to prevent `u8` integer overflow truncation on max-capacity inputs.
+
+## 2026-09-20 - Constant-Time $O(1)$ Plugin Name Retrieval via Cached Byte Lengths
+**Learning:** Querying plugin names via `Plugin::name()` on `SimplePlugin` performed an $O(N)$ zero-byte linear scan (`.position(|&b| b == 0)`) on every call. Storing `name_len: u8` during construction allows `SimplePlugin::name()` to retrieve the byte slice in $O(1)$ constant time without scanning the underlying 64-byte array.
+**Action:** Always store the slice byte length during struct initialization when working with fixed-size byte arrays (`[u8; N]`) to convert string/slice getter calls into $O(1)$ constant-time slice lookups.
