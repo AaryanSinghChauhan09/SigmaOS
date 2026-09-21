@@ -56,3 +56,9 @@ pub use inotify::{Inotify, InotifyEvent, InotifyEventType, WatchDescriptor};
 
 pub mod sysfs_linux;
 pub use sysfs_linux::{Sysfs, SysfsEntry, SysfsEntryType};
+
+pub mod procfs_linux;
+pub use procfs_linux::{Procfs, ProcEntry, ProcEntryType, ProcessStatus, MemInfo, CpuStats};
+
+pub mod tmpfs_linux;
+pub use tmpfs_linux::{Tmpfs, TmpFile, TmpFileType};
