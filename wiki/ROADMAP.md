@@ -315,6 +315,22 @@ The M1 milestone provides a bootable ISO with kernel entry point, init system, l
   - OverlayFilesystem with mount/unmount lifecycle
   - OverlayManager for system-wide overlay management
   - 9 unit tests passing
+- User and Group Management (src/kernel/user_group.rs):
+  - User accounts with UID, username, GID, home directory, shell, full name
+  - Group accounts with GID, groupname, member list
+  - Unix-style file permissions (user/group/other read/write/execute)
+  - User/Group manager with creation, lookup, removal
+  - Group membership management (add, remove, check)
+  - Root user and group protection
+  - 14 unit tests passing
+- Hostname Management (src/kernel/hostname.rs):
+  - System hostname management with validation
+  - Domain name management with validation
+  - Fully qualified domain name (FQDN) generation
+  - Character validation (alphanumeric, hyphen, dot)
+  - Length validation (max 253 characters)
+  - HostnameManager for system-wide hostname management
+  - 12 unit tests passing
 
 **Completed Fixes:**
 - Kernel module: removed duplicate structures, virtual_cpu, vmm_paging declarations
@@ -499,6 +515,6 @@ See [BOOT_TO_LOGIN_PATH_SPECIFICATION.md](../docs/BOOT_TO_LOGIN_PATH_SPECIFICATI
 - [PROJECT_STATUS.md](../docs/PROJECT_STATUS.md) - Current implementation status
 
 ### Last Verified
-- **Version:** 2.7
+- **Version:** 2.8
 - **Date:** 2026-09-21
 - **Verified by:** Devin AI Agent
