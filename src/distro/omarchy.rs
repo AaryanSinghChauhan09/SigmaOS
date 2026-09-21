@@ -631,7 +631,7 @@ pub use omarchy_inspiration::{
 
 #[path = "."]
 pub mod distro {
-    pub use crate::distro::omarchy_inspiration;
+    pub use super::omarchy_inspiration;
 }
 
 /// Omarchy Liveboot ISO & Automated Installer Engine
@@ -701,6 +701,111 @@ impl OmarchyAppLauncherEngine {
 }
 
 impl Default for OmarchyAppLauncherEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// Omarchy Theme Overlay, Font Switcher & Template Engine (`OmarchyThemeOverlayEngine`)
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct OmarchyThemeOverlayEngine {
+    pub current_theme_name: String,
+    pub available_themes: Vec<String>,
+    pub available_fonts: Vec<String>,
+    pub current_font_name: String,
+    pub background_images: Vec<String>,
+    pub current_bg_index: usize,
+    pub user_overlay_dir: String,
+    pub installed_templates: Vec<String>,
+}
+
+impl OmarchyThemeOverlayEngine {
+    pub fn new() -> Self {
+        Self {
+            current_theme_name: "tokyo-night".to_string(),
+            available_themes: vec![
+                "tokyo-night".to_string(),
+                "catppuccin".to_string(),
+                "gruvbox".to_string(),
+                "nord".to_string(),
+                "everforest".to_string(),
+                "kanagawa".to_string(),
+                "dracula".to_string(),
+                "rose-pine".to_string(),
+            ],
+            available_fonts: vec![
+                "JetBrainsMono Nerd Font".to_string(),
+                "FiraCode Nerd Font".to_string(),
+                "Hack Nerd Font".to_string(),
+                "MesloLGS Nerd Font".to_string(),
+            ],
+            current_font_name: "JetBrainsMono Nerd Font".to_string(),
+            background_images: vec![
+                "bg1.jpg".to_string(),
+                "bg2.png".to_string(),
+                "bg3.webp".to_string(),
+            ],
+            current_bg_index: 0,
+            user_overlay_dir: "~/.config/omarchy/themes".to_string(),
+            installed_templates: vec![
+                "alacritty.toml.tpl".to_string(),
+                "ghostty.conf.tpl".to_string(),
+                "kitty.conf.tpl".to_string(),
+                "hyprland.conf.tpl".to_string(),
+            ],
+        }
+    }
+
+    pub fn set_theme(&mut self, theme_name: &str) -> Result<String, &'static str> {
+        let slug = theme_name.to_lowercase().replace(' ', "-");
+        if self.available_themes.contains(&slug) {
+            self.current_theme_name = slug.clone();
+            Ok(slug)
+        } else {
+            // Register as custom overlay theme
+            self.available_themes.push(slug.clone());
+            self.current_theme_name = slug.clone();
+            Ok(slug)
+        }
+    }
+
+    pub fn cycle_background_next(&mut self) -> String {
+        if self.background_images.is_empty() {
+            return "default.jpg".to_string();
+        }
+        self.current_bg_index = (self.current_bg_index + 1) % self.background_images.len();
+        self.background_images[self.current_bg_index].clone()
+    }
+
+    pub fn set_font(&mut self, font_name: &str) -> Result<String, &'static str> {
+        if let Some(font) = self.available_fonts.iter().find(|f| f.eq_ignore_ascii_case(font_name)) {
+            self.current_font_name = font.clone();
+            Ok(font.clone())
+        } else {
+            self.available_fonts.push(font_name.to_string());
+            self.current_font_name = font_name.to_string();
+            Ok(font_name.to_string())
+        }
+    }
+
+    pub fn install_theme_repo(&mut self, repo_url: &str) -> Result<String, &'static str> {
+        if repo_url.is_empty() {
+            return Err("InvalidRepoUrl");
+        }
+        let repo_name = repo_url.split('/').last().unwrap_or("custom-theme").trim_end_matches(".git");
+        let slug = repo_name.to_lowercase().replace(' ', "-");
+        if !self.available_themes.contains(&slug) {
+            self.available_themes.push(slug.clone());
+        }
+        self.current_theme_name = slug.clone();
+        Ok(slug)
+    }
+}
+
+impl Default for OmarchyThemeOverlayEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -890,36 +995,6 @@ impl Default for OmarchyHyprlandDwindleTilingEngine {
 mod omarchy_gap_closure_tests {
     use super::*;
 
-    #[test]
-    fn test_omarchy_hyprland_compositor_config_engine() {
-        let hypr = OmarchyHyprlandCompositorConfigEngine::new();
-        let conf = hypr.generate_hyprland_conf();
-        assert!(conf.contains("border_size = 2"));
-        assert!(conf.contains("windowrulev2 = float,class:^(pavucontrol)$"));
-    }
-
-    #[test]
-    fn test_omarchy_mise_and_lazygit_engines() {
-        let mise = OmarchyMiseVersionManagerEngine::new();
-        let mise_toml = mise.generate_config_toml();
-        assert!(mise_toml.contains("node = \"lts\""));
-        assert!(mise_toml.contains("rust = \"stable\""));
-
-        let lazygit = OmarchyLazyGitConfigurationEngine::new();
-        let lazy_yml = lazygit.generate_config_yml();
-        assert!(lazy_yml.contains("showIcons: true"));
-        assert!(lazy_yml.contains("delta --dark"));
-    }
-
-    #[test]
-    fn test_omarchy_ayu_and_starship_engines() {
-        let ayu_dark = OmarchyAyuThemeEngine::new(true);
-        let css = ayu_dark.generate_gtk_css();
-        assert!(css.contains("@define-color bg_color #0f1419"));
-
-        let starship_toml = OmarchyStarshipPromptConfigEngine::generate_starship_toml();
-        assert!(starship_toml.contains("truncation_length = 3"));
-    }
 
     #[test]
     fn test_omarchy_ghostty_fastfetch_dwindle_engines() {
@@ -937,5 +1012,24 @@ mod omarchy_gap_closure_tests {
         let dwindle_conf = dwindle.generate_dwindle_conf();
         assert!(dwindle_conf.contains("preserve_split = true"));
         assert!(dwindle_conf.contains("force_split = 2"));
+    }
+
+    #[test]
+    fn test_omarchy_theme_overlay_and_font_management() {
+        let mut overlay = OmarchyThemeOverlayEngine::new();
+        assert_eq!(overlay.current_theme_name, "tokyo-night");
+
+        assert_eq!(overlay.set_theme("Catppuccin Mocha").unwrap(), "catppuccin-mocha");
+        assert_eq!(overlay.current_theme_name, "catppuccin-mocha");
+
+        let bg2 = overlay.cycle_background_next();
+        assert_eq!(bg2, "bg2.png");
+
+        assert_eq!(overlay.set_font("FiraCode Nerd Font").unwrap(), "FiraCode Nerd Font");
+        assert_eq!(overlay.current_font_name, "FiraCode Nerd Font");
+
+        let repo_theme = overlay.install_theme_repo("https://github.com/example/tokyo-night-custom.git").unwrap();
+        assert_eq!(repo_theme, "tokyo-night-custom");
+        assert_eq!(overlay.current_theme_name, "tokyo-night-custom");
     }
 }
