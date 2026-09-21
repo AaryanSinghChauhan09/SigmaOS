@@ -1,148 +1,273 @@
-// Linux-inspired epoll I/O event notification
-// Efficient I/O multiplexing for SigmaOS
+// Linux-inspired epoll for I/O event notification
+// Provides scalable I/O event monitoring
 
 use std::collections::HashMap;
+use std::sync::{Arc, Mutex};
 
-/// epoll operation types (Linux epoll.h)
+/// Epoll event types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum EpollCtlOp {
-    Add = 1,
-    Del = 2,
-    Mod = 3,
+pub struct EpollEvents {
+    pub in_events: bool,
+    pub out_events: bool,
+    pub rdhup: bool,
+    pub pri: bool,
+    pub err: bool,
+    pub hup: bool,
 }
 
-/// epoll event flags (Linux epoll.h)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct EpollEventFlags {
-    pub read: bool,
-    pub write: bool,
-    pub edge_triggered: bool,
-    pub urgent: bool,
-    pub error: bool,
-    pub hangup: bool,
-}
-
-impl EpollEventFlags {
+impl EpollEvents {
     pub fn new() -> Self {
-        EpollEventFlags {
-            read: false,
-            write: false,
-            edge_triggered: false,
-            urgent: false,
-            error: false,
-            hangup: false,
+        Self {
+            in_events: false,
+            out_events: false,
+            rdhup: false,
+            pri: false,
+            err: false,
+            hup: false,
         }
     }
 
-    pub fn from_bits(bits: u32) -> Self {
-        EpollEventFlags {
-            read: bits & 0x001 != 0,
-            write: bits & 0x004 != 0,
-            edge_triggered: bits & 0x800 != 0,
-            urgent: bits & 0x002 != 0,
-            error: bits & 0x008 != 0,
-            hangup: bits & 0x010 != 0,
-        }
+    pub fn with_in(mut self) -> Self {
+        self.in_events = true;
+        self
     }
 
-    pub fn to_bits(&self) -> u32 {
+    pub fn with_out(mut self) -> Self {
+        self.out_events = true;
+        self
+    }
+
+    pub fn with_rdhup(mut self) -> Self {
+        self.rdhup = true;
+        self
+    }
+
+    pub fn with_pri(mut self) -> Self {
+        self.pri = true;
+        self
+    }
+
+    pub fn with_err(mut self) -> Self {
+        self.err = true;
+        self
+    }
+
+    pub fn with_hup(mut self) -> Self {
+        self.hup = true;
+        self
+    }
+
+    pub fn to_u32(&self) -> u32 {
         let mut bits = 0u32;
-        if self.read { bits |= 0x001; }
-        if self.write { bits |= 0x004; }
-        if self.edge_triggered { bits |= 0x800; }
-        if self.urgent { bits |= 0x002; }
-        if self.error { bits |= 0x008; }
-        if self.hangup { bits |= 0x010; }
+        if self.in_events { bits |= 0x001; }
+        if self.out_events { bits |= 0x004; }
+        if self.rdhup { bits |= 0x2000; }
+        if self.pri { bits |= 0x002; }
+        if self.err { bits |= 0x008; }
+        if self.hup { bits |= 0x010; }
         bits
     }
 }
 
-impl Default for EpollEventFlags {
+impl Default for EpollEvents {
     fn default() -> Self {
         Self::new()
     }
 }
 
-/// epoll event
+/// Epoll operation
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum EpollOp {
+    Add,
+    Del,
+    Mod,
+}
+
+/// Epoll event
 #[derive(Debug, Clone)]
 pub struct EpollEvent {
-    pub fd: i32,
-    pub flags: EpollEventFlags,
+    pub events: EpollEvents,
     pub data: u64,
 }
 
 impl EpollEvent {
-    pub fn new(fd: i32, flags: EpollEventFlags, data: u64) -> Self {
-        EpollEvent { fd, flags, data }
+    pub fn new(events: EpollEvents, data: u64) -> Self {
+        Self {
+            events,
+            data,
+        }
+    }
+
+    /// Check if event is ready for read
+    pub fn is_in(&self) -> bool {
+        self.events.in_events
+    }
+
+    /// Check if event is ready for write
+    pub fn is_out(&self) -> bool {
+        self.events.out_events
+    }
+
+    /// Check if event has error
+    pub fn is_err(&self) -> bool {
+        self.events.err
+    }
+
+    /// Check if event has hangup
+    pub fn is_hup(&self) -> bool {
+        self.events.hup
     }
 }
 
-/// epoll instance
-pub struct Epoll {
-    events: HashMap<i32, EpollEvent>,
-    ready_events: Vec<EpollEvent>,
+/// Epoll instance
+#[derive(Debug, Clone)]
+pub struct EpollInstance {
+    pub id: u64,
+    pub interests: HashMap<i32, EpollEvent>,
+    pub ready_events: Vec<EpollEvent>,
 }
 
-impl Epoll {
-    pub fn new() -> Self {
-        Epoll {
-            events: HashMap::new(),
+impl EpollInstance {
+    pub fn new(id: u64) -> Self {
+        Self {
+            id,
+            interests: HashMap::new(),
             ready_events: Vec::new(),
         }
     }
 
-    /// Add, modify, or remove an epoll interest
-    pub fn ctl(&mut self, op: EpollCtlOp, fd: i32, event: EpollEvent) -> Result<(), String> {
+    /// Add/modify/delete a file descriptor
+    pub fn ctl(&mut self, op: EpollOp, fd: i32, event: EpollEvent) -> Result<(), String> {
         match op {
-            EpollCtlOp::Add => {
-                if self.events.contains_key(&fd) {
-                    return Err(format!("File descriptor already exists: {}", fd));
+            EpollOp::Add => {
+                if self.interests.contains_key(&fd) {
+                    return Err(format!("File descriptor {} already exists", fd));
                 }
-                self.events.insert(fd, event);
+                self.interests.insert(fd, event);
+                Ok(())
             }
-            EpollCtlOp::Del => {
-                self.events.remove(&fd)
-                    .ok_or_else(|| format!("File descriptor not found: {}", fd))?;
+            EpollOp::Del => {
+                match self.interests.remove(&fd) {
+                    Some(_) => Ok(()),
+                    None => Err(format!("File descriptor {} not found", fd)),
+                }
             }
-            EpollCtlOp::Mod => {
-                self.events.get_mut(&fd)
-                    .ok_or_else(|| format!("File descriptor not found: {}", fd))?
-                    .flags = event.flags;
-            }
-        }
-        Ok(())
-    }
-
-    /// Wait for events
-    pub fn wait(&mut self, max_events: usize, _timeout_ms: i32) -> Vec<EpollEvent> {
-        // Simulate event readiness (in real implementation, this would block)
-        let mut ready = Vec::new();
-        
-        for event in self.events.values() {
-            // Simulate random readiness for testing
-            if event.flags.read || event.flags.write {
-                ready.push(event.clone());
-                if ready.len() >= max_events {
-                    break;
+            EpollOp::Mod => {
+                match self.interests.get_mut(&fd) {
+                    Some(e) => {
+                        *e = event;
+                        Ok(())
+                    }
+                    None => Err(format!("File descriptor {} not found", fd)),
                 }
             }
         }
-        
-        ready
     }
 
-    /// Get event count
-    pub fn event_count(&self) -> usize {
-        self.events.len()
+    /// Wait for events (simulated)
+    pub fn wait(&mut self, max_events: usize) -> Vec<EpollEvent> {
+        let events = self.ready_events.clone();
+        self.ready_events.clear();
+        events.into_iter().take(max_events).collect()
     }
 
-    /// Check if fd is being monitored
-    pub fn is_monitored(&self, fd: i32) -> bool {
-        self.events.contains_key(&fd)
+    /// Add a ready event (simulates I/O readiness)
+    pub fn add_ready_event(&mut self, event: EpollEvent) {
+        self.ready_events.push(event);
+    }
+
+    /// Get interest count
+    pub fn interest_count(&self) -> usize {
+        self.interests.len()
+    }
+
+    /// Get ready event count
+    pub fn ready_count(&self) -> usize {
+        self.ready_events.len()
     }
 }
 
-impl Default for Epoll {
+/// Epoll manager for system-wide epoll management
+pub struct EpollManager {
+    instances: Arc<Mutex<HashMap<u64, EpollInstance>>>,
+    next_instance_id: Arc<Mutex<u64>>,
+}
+
+impl EpollManager {
+    pub fn new() -> Self {
+        Self {
+            instances: Arc::new(Mutex::new(HashMap::new())),
+            next_instance_id: Arc::new(Mutex::new(1)),
+        }
+    }
+
+    /// Create a new epoll instance
+    pub fn create_instance(&self) -> u64 {
+        let mut next_id = self.next_instance_id.lock().unwrap();
+        let instance_id = *next_id;
+        *next_id += 1;
+        drop(next_id);
+
+        let instance = EpollInstance::new(instance_id);
+        let mut instances = self.instances.lock().unwrap();
+        instances.insert(instance_id, instance);
+
+        instance_id
+    }
+
+    /// Get an instance by ID
+    pub fn get_instance(&self, instance_id: u64) -> Option<EpollInstance> {
+        let instances = self.instances.lock().unwrap();
+        instances.get(&instance_id).cloned()
+    }
+
+    /// Remove an instance
+    pub fn remove_instance(&self, instance_id: u64) -> Result<(), String> {
+        let mut instances = self.instances.lock().unwrap();
+        match instances.remove(&instance_id) {
+            Some(_) => Ok(()),
+            None => Err(format!("Instance {} not found", instance_id)),
+        }
+    }
+
+    /// Add/modify/delete a file descriptor
+    pub fn ctl(&self, instance_id: u64, op: EpollOp, fd: i32, event: EpollEvent) -> Result<(), String> {
+        let mut instances = self.instances.lock().unwrap();
+        match instances.get_mut(&instance_id) {
+            Some(inst) => inst.ctl(op, fd, event),
+            None => Err(format!("Instance {} not found", instance_id)),
+        }
+    }
+
+    /// Wait for events
+    pub fn wait(&self, instance_id: u64, max_events: usize) -> Result<Vec<EpollEvent>, String> {
+        let mut instances = self.instances.lock().unwrap();
+        match instances.get_mut(&instance_id) {
+            Some(inst) => Ok(inst.wait(max_events)),
+            None => Err(format!("Instance {} not found", instance_id)),
+        }
+    }
+
+    /// Add a ready event (simulates I/O readiness)
+    pub fn add_ready_event(&self, instance_id: u64, event: EpollEvent) -> Result<(), String> {
+        let mut instances = self.instances.lock().unwrap();
+        match instances.get_mut(&instance_id) {
+            Some(inst) => {
+                inst.add_ready_event(event);
+                Ok(())
+            }
+            None => Err(format!("Instance {} not found", instance_id)),
+        }
+    }
+
+    /// Get instance count
+    pub fn instance_count(&self) -> usize {
+        let instances = self.instances.lock().unwrap();
+        instances.len()
+    }
+}
+
+impl Default for EpollManager {
     fn default() -> Self {
         Self::new()
     }
@@ -153,104 +278,167 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_epoll_event_flags() {
-        let flags = EpollEventFlags::new();
-        assert!(!flags.read);
-        assert!(!flags.write);
+    fn test_epoll_events() {
+        let events = EpollEvents::new().with_in().with_out();
+        assert!(events.in_events);
+        assert!(events.out_events);
+        assert!(!events.err);
     }
 
     #[test]
-    fn test_epoll_event_flags_from_bits() {
-        let bits = 0x001 | 0x004;
-        let flags = EpollEventFlags::from_bits(bits);
-        
-        assert!(flags.read);
-        assert!(flags.write);
-        assert!(!flags.edge_triggered);
+    fn test_epoll_events_all() {
+        let events = EpollEvents::new()
+            .with_in()
+            .with_out()
+            .with_rdhup()
+            .with_pri()
+            .with_err()
+            .with_hup();
+
+        assert!(events.in_events);
+        assert!(events.out_events);
+        assert!(events.rdhup);
+        assert!(events.pri);
+        assert!(events.err);
+        assert!(events.hup);
     }
 
     #[test]
-    fn test_epoll_event_flags_to_bits() {
-        let mut flags = EpollEventFlags::new();
-        flags.read = true;
-        flags.write = true;
-        
-        let bits = flags.to_bits();
-        assert_eq!(bits, 0x001 | 0x004);
+    fn test_epoll_event() {
+        let events = EpollEvents::new().with_in();
+        let event = EpollEvent::new(events, 42);
+
+        assert!(event.is_in());
+        assert!(!event.is_out());
+        assert_eq!(event.data, 42);
     }
 
     #[test]
-    fn test_epoll_ctl_add() {
-        let mut epoll = Epoll::new();
-        let event = EpollEvent::new(1, EpollEventFlags::new(), 0);
-        
-        epoll.ctl(EpollCtlOp::Add, 1, event).unwrap();
-        assert_eq!(epoll.event_count(), 1);
-        assert!(epoll.is_monitored(1));
+    fn test_epoll_instance() {
+        let instance = EpollInstance::new(1);
+        assert_eq!(instance.id, 1);
+        assert_eq!(instance.interest_count(), 0);
+        assert_eq!(instance.ready_count(), 0);
     }
 
     #[test]
-    fn test_epoll_ctl_add_duplicate() {
-        let mut epoll = Epoll::new();
-        let event = EpollEvent::new(1, EpollEventFlags::new(), 0);
-        
-        epoll.ctl(EpollCtlOp::Add, 1, event.clone()).unwrap();
-        let result = epoll.ctl(EpollCtlOp::Add, 1, event);
-        
-        assert!(result.is_err());
+    fn test_epoll_instance_ctl_add() {
+        let mut instance = EpollInstance::new(1);
+
+        let events = EpollEvents::new().with_in();
+        let event = EpollEvent::new(events, 42);
+        instance.ctl(EpollOp::Add, 5, event).unwrap();
+
+        assert_eq!(instance.interest_count(), 1);
     }
 
     #[test]
-    fn test_epoll_ctl_del() {
-        let mut epoll = Epoll::new();
-        let event = EpollEvent::new(1, EpollEventFlags::new(), 0);
-        
-        epoll.ctl(EpollCtlOp::Add, 1, event).unwrap();
-        epoll.ctl(EpollCtlOp::Del, 1, EpollEvent::new(1, EpollEventFlags::new(), 0)).unwrap();
-        
-        assert_eq!(epoll.event_count(), 0);
-        assert!(!epoll.is_monitored(1));
+    fn test_epoll_instance_ctl_add_duplicate() {
+        let mut instance = EpollInstance::new(1);
+
+        let events = EpollEvents::new().with_in();
+        let event = EpollEvent::new(events, 42);
+        instance.ctl(EpollOp::Add, 5, event.clone()).unwrap();
+        assert!(instance.ctl(EpollOp::Add, 5, event).is_err());
     }
 
     #[test]
-    fn test_epoll_ctl_del_nonexistent() {
-        let mut epoll = Epoll::new();
-        let event = EpollEvent::new(1, EpollEventFlags::new(), 0);
-        
-        let result = epoll.ctl(EpollCtlOp::Del, 1, event);
-        assert!(result.is_err());
+    fn test_epoll_instance_ctl_del() {
+        let mut instance = EpollInstance::new(1);
+
+        let events = EpollEvents::new().with_in();
+        let event = EpollEvent::new(events, 42);
+        instance.ctl(EpollOp::Add, 5, event.clone()).unwrap();
+        instance.ctl(EpollOp::Del, 5, event).unwrap();
+
+        assert_eq!(instance.interest_count(), 0);
     }
 
     #[test]
-    fn test_epoll_ctl_mod() {
-        let mut epoll = Epoll::new();
-        let mut event = EpollEvent::new(1, EpollEventFlags::new(), 0);
-        event.flags.read = true;
-        
-        epoll.ctl(EpollCtlOp::Add, 1, event.clone()).unwrap();
-        
-        let mut mod_event = EpollEvent::new(1, EpollEventFlags::new(), 0);
-        mod_event.flags.write = true;
-        epoll.ctl(EpollCtlOp::Mod, 1, mod_event).unwrap();
-        
-        let monitored = epoll.events.get(&1).unwrap();
-        assert!(!monitored.flags.read);
-        assert!(monitored.flags.write);
+    fn test_epoll_instance_ctl_mod() {
+        let mut instance = EpollInstance::new(1);
+
+        let events1 = EpollEvents::new().with_in();
+        let event1 = EpollEvent::new(events1, 42);
+        instance.ctl(EpollOp::Add, 5, event1).unwrap();
+
+        let events2 = EpollEvents::new().with_out();
+        let event2 = EpollEvent::new(events2, 43);
+        instance.ctl(EpollOp::Mod, 5, event2).unwrap();
+
+        assert_eq!(instance.interest_count(), 1);
     }
 
     #[test]
-    fn test_epoll_wait() {
-        let mut epoll = Epoll::new();
-        
-        let mut event1 = EpollEvent::new(1, EpollEventFlags::new(), 0);
-        event1.flags.read = true;
-        epoll.ctl(EpollCtlOp::Add, 1, event1).unwrap();
-        
-        let mut event2 = EpollEvent::new(2, EpollEventFlags::new(), 0);
-        event2.flags.write = true;
-        epoll.ctl(EpollCtlOp::Add, 2, event2).unwrap();
-        
-        let ready = epoll.wait(10, 100);
-        assert!(ready.len() >= 1);
+    fn test_epoll_instance_wait() {
+        let mut instance = EpollInstance::new(1);
+
+        let events = EpollEvents::new().with_in();
+        let event = EpollEvent::new(events, 42);
+        instance.add_ready_event(event.clone());
+        instance.add_ready_event(event);
+
+        let ready = instance.wait(10);
+        assert_eq!(ready.len(), 2);
+        assert_eq!(instance.ready_count(), 0);
+    }
+
+    #[test]
+    fn test_epoll_instance_wait_max() {
+        let mut instance = EpollInstance::new(1);
+
+        let events = EpollEvents::new().with_in();
+        let event = EpollEvent::new(events, 42);
+        for _ in 0..5 {
+            instance.add_ready_event(event.clone());
+        }
+
+        let ready = instance.wait(3);
+        assert_eq!(ready.len(), 3);
+    }
+
+    #[test]
+    fn test_epoll_manager() {
+        let manager = EpollManager::new();
+
+        let instance_id = manager.create_instance();
+        assert_eq!(instance_id, 1);
+
+        let events = EpollEvents::new().with_in();
+        let event = EpollEvent::new(events, 42);
+        manager.ctl(instance_id, EpollOp::Add, 5, event).unwrap();
+
+        assert_eq!(manager.instance_count(), 1);
+    }
+
+    #[test]
+    fn test_epoll_manager_add_ready() {
+        let manager = EpollManager::new();
+
+        let instance_id = manager.create_instance();
+        let events = EpollEvents::new().with_in();
+        let event = EpollEvent::new(events, 42);
+        manager.add_ready_event(instance_id, event).unwrap();
+
+        assert_eq!(manager.wait(instance_id, 10).unwrap().len(), 1);
+    }
+
+    #[test]
+    fn test_epoll_manager_remove() {
+        let manager = EpollManager::new();
+
+        let instance_id = manager.create_instance();
+        manager.remove_instance(instance_id).unwrap();
+
+        assert_eq!(manager.instance_count(), 0);
+    }
+
+    #[test]
+    fn test_epoll_manager_invalid() {
+        let manager = EpollManager::new();
+        let events = EpollEvents::new().with_in();
+        let event = EpollEvent::new(events, 42);
+        assert!(manager.ctl(999, EpollOp::Add, 5, event).is_err());
+        assert!(manager.wait(999, 10).is_err());
     }
 }

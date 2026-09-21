@@ -174,6 +174,9 @@ pub use signalfd::{SignalFd, SignalFdFlags, SignalFdManager, SignalInfo, SignalM
 pub mod network_namespace;
 pub use network_namespace::{NetworkDevice, NetworkNamespace, NetworkNamespaceManager};
 
+pub mod epoll;
+pub use epoll::{EpollEvent, EpollEvents, EpollInstance, EpollManager, EpollOp};
+
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
 pub use linux_parity::{
