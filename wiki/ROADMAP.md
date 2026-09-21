@@ -461,6 +461,13 @@ The M1 milestone provides a bootable ISO with kernel entry point, init system, l
   - Send/recv and sendto/recvfrom for UDP
   - SocketManager for system-wide socket management
   - 15 unit tests passing
+- Shared Memory (src/kernel/shm.rs):
+  - ShmPerm (read, write, execute)
+  - ShmSegment with key-based identification
+  - Attach/detach operations
+  - Read/write with permission checking
+  - ShmManager for system-wide shared memory management
+  - 14 unit tests passing
 
 **Completed Fixes:**
 - Kernel module: removed duplicate structures, virtual_cpu, vmm_paging declarations
@@ -645,6 +652,6 @@ See [BOOT_TO_LOGIN_PATH_SPECIFICATION.md](../docs/BOOT_TO_LOGIN_PATH_SPECIFICATI
 - [PROJECT_STATUS.md](../docs/PROJECT_STATUS.md) - Current implementation status
 
 ### Last Verified
-- **Version:** 4.0
+- **Version:** 4.1
 - **Date:** 2026-09-21
 - **Verified by:** Devin AI Agent
