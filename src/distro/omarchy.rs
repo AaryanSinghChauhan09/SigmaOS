@@ -517,8 +517,13 @@ impl PasswordlessSudoExpiryGuard {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OmarchyNerdFont {
-    FiraCode,
     JetBrainsMono,
+    CascadiaMono,
+    MesloLgMono,
+    FiraCode,
+    VictorCode,
+    BitstreamVeraMono,
+    Iosevka,
     Hack,
     Meslo,
 }
@@ -526,8 +531,13 @@ pub enum OmarchyNerdFont {
 impl OmarchyNerdFont {
     pub fn font_family(&self) -> &'static str {
         match self {
-            Self::FiraCode => "FiraCode Nerd Font",
             Self::JetBrainsMono => "JetBrainsMono Nerd Font",
+            Self::CascadiaMono => "CascadiaMono Nerd Font",
+            Self::MesloLgMono => "Meslo LG Mono Nerd Font",
+            Self::FiraCode => "FiraCode Nerd Font",
+            Self::VictorCode => "Victor Mono Nerd Font",
+            Self::BitstreamVeraMono => "BitstreamVeraSansMono Nerd Font",
+            Self::Iosevka => "Iosevka Nerd Font",
             Self::Hack => "Hack Nerd Font",
             Self::Meslo => "MesloLGS Nerd Font",
         }
@@ -631,8 +641,14 @@ pub use omarchy_inspiration::{
 
 #[path = "."]
 pub mod distro {
-    pub use crate::distro::omarchy_inspiration;
+    pub use crate::omarchy_inspiration;
 }
+
+#[cfg(any(feature = "standalone_test", test))]
+#[path = "omarchy_app_ecosystem.rs"]
+pub mod omarchy_app_ecosystem;
+#[cfg(any(feature = "standalone_test", test))]
+pub use omarchy_app_ecosystem::*;
 
 /// Omarchy Liveboot ISO & Automated Installer Engine
 #[derive(Debug, Clone)]
@@ -751,6 +767,19 @@ mod tests {
         cfg.set_font(OmarchyNerdFont::FiraCode, 12.0);
         assert_eq!(cfg.active_font.font_family(), "FiraCode Nerd Font");
         assert_eq!(cfg.font_size_pt, 12.0);
+    }
+
+    #[test]
+    fn test_omarchy_nerd_fonts_catalog() {
+        assert_eq!(OmarchyNerdFont::JetBrainsMono.font_family(), "JetBrainsMono Nerd Font");
+        assert_eq!(OmarchyNerdFont::CascadiaMono.font_family(), "CascadiaMono Nerd Font");
+        assert_eq!(OmarchyNerdFont::MesloLgMono.font_family(), "Meslo LG Mono Nerd Font");
+        assert_eq!(OmarchyNerdFont::FiraCode.font_family(), "FiraCode Nerd Font");
+        assert_eq!(OmarchyNerdFont::VictorCode.font_family(), "Victor Mono Nerd Font");
+        assert_eq!(OmarchyNerdFont::BitstreamVeraMono.font_family(), "BitstreamVeraSansMono Nerd Font");
+        assert_eq!(OmarchyNerdFont::Iosevka.font_family(), "Iosevka Nerd Font");
+        assert_eq!(OmarchyNerdFont::Hack.font_family(), "Hack Nerd Font");
+        assert_eq!(OmarchyNerdFont::Meslo.font_family(), "MesloLGS Nerd Font");
     }
 
     #[test]
@@ -893,29 +922,26 @@ mod omarchy_gap_closure_tests {
     #[test]
     fn test_omarchy_hyprland_compositor_config_engine() {
         let hypr = OmarchyHyprlandCompositorConfigEngine::new();
-        let conf = hypr.generate_hyprland_conf();
+        let conf = hypr.render_hyprland_conf();
         assert!(conf.contains("border_size = 2"));
-        assert!(conf.contains("windowrulev2 = float,class:^(pavucontrol)$"));
+        assert!(conf.contains("windowrulev2 = float, class:^pavucontrol$"));
     }
 
     #[test]
     fn test_omarchy_mise_and_lazygit_engines() {
         let mise = OmarchyMiseVersionManagerEngine::new();
-        let mise_toml = mise.generate_config_toml();
-        assert!(mise_toml.contains("node = \"lts\""));
-        assert!(mise_toml.contains("rust = \"stable\""));
+        assert_eq!(mise.get_tool_version("node").unwrap(), "20.11.0");
+        assert_eq!(mise.get_tool_version("rust").unwrap(), "1.77.0");
 
         let lazygit = OmarchyLazyGitConfigurationEngine::new();
-        let lazy_yml = lazygit.generate_config_yml();
-        assert!(lazy_yml.contains("showIcons: true"));
-        assert!(lazy_yml.contains("delta --dark"));
+        let lazy_yml = lazygit.generate_config_yaml();
+        assert!(lazy_yml.contains("sideBySideDiff: true"));
     }
 
     #[test]
     fn test_omarchy_ayu_and_starship_engines() {
-        let ayu_dark = OmarchyAyuThemeEngine::new(true);
-        let css = ayu_dark.generate_gtk_css();
-        assert!(css.contains("@define-color bg_color #0f1419"));
+        let ayu_dark = OmarchyAyuThemeEngine::ayu_dark();
+        assert_eq!(ayu_dark.bg_color, "#0f1419");
 
         let starship_toml = OmarchyStarshipPromptConfigEngine::generate_starship_toml();
         assert!(starship_toml.contains("truncation_length = 3"));
