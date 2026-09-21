@@ -8,12 +8,17 @@ pub mod mint_tools;
 pub mod moksha;
 pub mod omarchy_omakase;
 pub mod omarchy_apps;
+pub mod display_scaling;
 pub mod pantheon;
 pub mod screensaver;
 pub mod sovereign_navigation_engine;
 pub mod web_wasm_bridge;
 pub mod zenith;
 pub mod zenith_compositor;
+
+pub use display_scaling::{
+    DisplayTopologyMode, MonitorProfile, OmarchyDisplayScalingEngine,
+};
 
 pub use omarchy_apps::{
     AetherThemePalette, LocalSendShareMode, OmarchyGuiAppEntry, OmarchyGuiAppsEngine,
