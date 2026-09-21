@@ -364,6 +364,25 @@ The M1 milestone provides a bootable ISO with kernel entry point, init system, l
   - ResourceMonitor for system-wide resource monitoring
   - Per-device and per-interface statistics tracking
   - 13 unit tests passing
+- Time Management (src/kernel/time.rs):
+  - Clock source types (TSC, HPET, AcpiPm, RTC)
+  - Clock source statistics with resolution and accuracy
+  - Clock source registration and selection
+  - System time with seconds and nanoseconds
+  - Timezone management with offset and DST support
+  - Common timezones (UTC, EST, PST, GMT, CET, JST)
+  - TimeManager for system-wide time management
+  - 12 unit tests passing
+- Signal Management (src/kernel/signal.rs):
+  - 31 POSIX signals (SIGHUP, SIGINT, SIGKILL, SIGTERM, SIGSEGV, etc.)
+  - Signal dispositions (Default, Ignore, Catch)
+  - Signal handlers with handler addresses
+  - Signal info with sender PID/UID, value, errno
+  - Signal masks for blocking signals
+  - Signal delivery with pending queue
+  - Process creation and signal handler management
+  - SignalManager for system-wide signal management
+  - 13 unit tests passing
 
 **Completed Fixes:**
 - Kernel module: removed duplicate structures, virtual_cpu, vmm_paging declarations
@@ -548,6 +567,6 @@ See [BOOT_TO_LOGIN_PATH_SPECIFICATION.md](../docs/BOOT_TO_LOGIN_PATH_SPECIFICATI
 - [PROJECT_STATUS.md](../docs/PROJECT_STATUS.md) - Current implementation status
 
 ### Last Verified
-- **Version:** 3.0
+- **Version:** 3.1
 - **Date:** 2026-09-21
 - **Verified by:** Devin AI Agent
