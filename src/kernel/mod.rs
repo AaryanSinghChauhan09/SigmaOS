@@ -156,6 +156,12 @@ pub use time::{ClockSource, ClockSourceStats, SystemTime, TimeManager, Timezone}
 pub mod signal;
 pub use signal::{Signal, SignalDisposition, SignalHandler, SignalInfo, SignalManager, SignalMask};
 
+pub mod mount_namespace;
+pub use mount_namespace::{MountFlags, MountNamespace, MountNamespaceManager, MountPoint};
+
+pub mod uts_namespace;
+pub use uts_namespace::{UtsNamespace, UtsNamespaceManager};
+
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
 pub use linux_parity::{
