@@ -5753,3 +5753,39 @@ Top bar panels are keyboard-navigable popups featuring interactive sliders, devi
 4. **Declarative Configuration (`~/.config/omarchy/shell.json`)**:
    - Configures bar position, transparency, `centerAnchor` (pinning clock/widgets to true screen center), and widget layout arrays (`left`, `center`, `right`).
    - Stores idle timeout thresholds (`idle.screensaver` and `idle.lock` in seconds) at root level.
+
+
+---
+
+## 133. SOVEREIGN OMARCHY LINUX OMAKASE PHILOSOPHY & BEAUTIFUL COMPUTING MANIFESTO SPECIFICATION
+
+### 133.1 Overview & Omakase Computing Philosophy
+SigmaOS absorbs the "omakase" (curated chef's choice) computing philosophy and "beauty-as-a-motivator" manifesto of **Omarchy Linux**. Grounded in DHH's premise that productivity is downstream from motivation, Omarchy combines Arch Linux stability, Hyprland dynamic tiling, and Quickshell desktop construction kits into a cohesive, aesthetically delightsome workstation. SigmaOS synthesizes this ethos directly into its `#![no_std]` Rust microkernel, Zenith compositor, and `SigmaPkg` zero-bloat curated software suite.
+
+```
++-----------------------------------------------------------------------------------+
+|               SIGMAOS OMARCHY OMAKASE & BEAUTIFUL COMPUTING MODEL                 |
++-----------------------------------------------------------------------------------+
+| [1. Omakase Curation]       [2. Motivation via Aesthetics] [3. TUI & Terminal]   |
+| Zero-bloat curated tools    Aesthetics drive productivity  Neovim, Ghostty, Kitty |
+| No grab-bag packages        Theme synchronization          Powerline Starship HUD |
++-----------------------------------------------------------------------------------+
+| [4. Curated Software Suite]                                                       |
+| Neovim (IDE), Chromium (Web), Obsidian (Notes), LibreOffice (Office),             |
+| Kdenlive (Video), OBS Studio (Streaming), Audacious (Winamp-style Player)         |
++-----------------------------------------------------------------------------------+
+```
+
+### 133.2 Core Manifesto Pillars & Software Suite Integration
+1. **Productivity Downstream from Motivation**: Rejects bland, utility-only operating system design. A visually captivating desktop environment encourages deep focus, developer joy, and sustained creative output.
+2. **Embracing Low-Level Purity**: Rejects Windows and macOS familiarity traps in favor of pure, terminal-heavy, theme-delighted, tiling-window-managed systems.
+3. **Curated Zero-Bloat Software Suite**:
+   - **Editor & IDE**: Neovim with Omakase LSP / LazyVim presets.
+   - **Web & Browser**: Chromium PWA launcher with sandboxed capability rings.
+   - **Note-Taking & Knowledge**: Obsidian-compatible markdown notebook backlinking engine.
+   - **Office & Productivity**: LibreOffice / OpenDocument compatibility suite.
+   - **Media Production**: Kdenlive non-linear video editor, OBS Studio streaming pipeline, and Audacious retro Winamp-style skin player.
+
+### 133.3 Zenith Compositor & Omakase Synthesis
+1. **Single-Process Zenith Integration**: Merges Hyprland dynamic dwindle tiling, Quickshell HUD panels, and theme palettes (TokyoNight, Catppuccin, Nord, Gruvbox) directly into Zenith compositor, avoiding multi-daemon Wayland memory overhead.
+2. **Declarative Omakase Configuration**: System themes, keybindings, and application defaults are stored in pure, versionable JSON/Nix manifests (`~/.config/omarchy/shell.json`), allowing instant $O(1)$ state rollbacks and profile switches.
