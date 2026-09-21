@@ -476,6 +476,12 @@ The M1 milestone provides a bootable ISO with kernel entry point, init system, l
   - Permission checking
   - MessageQueueManager for system-wide message queue management
   - 14 unit tests passing
+- File Descriptor Table (src/kernel/fd_table.rs):
+  - FdFlags (close_on_exec)
+  - FdEntry with file type and offset tracking
+  - FdTable with allocate, close, dup, dup2 operations
+  - FdTableManager for system-wide fd table management
+  - 15 unit tests passing
 
 **Completed Fixes:**
 - Kernel module: removed duplicate structures, virtual_cpu, vmm_paging declarations
@@ -660,6 +666,6 @@ See [BOOT_TO_LOGIN_PATH_SPECIFICATION.md](../docs/BOOT_TO_LOGIN_PATH_SPECIFICATI
 - [PROJECT_STATUS.md](../docs/PROJECT_STATUS.md) - Current implementation status
 
 ### Last Verified
-- **Version:** 4.2
+- **Version:** 4.3
 - **Date:** 2026-09-21
 - **Verified by:** Devin AI Agent
