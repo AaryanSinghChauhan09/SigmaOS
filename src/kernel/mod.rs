@@ -114,6 +114,12 @@ pub use landlock::{LandlockAccess, LandlockDomain, LandlockManager, LandlockRule
 pub mod capsicum;
 pub use capsicum::{CapsicumCapability, CapsicumManager, CapsicumMode, CapsicumRights, CapsicumSandbox};
 
+pub mod pledge;
+pub use pledge::{PledgeContext, PledgeManager, PledgePromise};
+
+pub mod unveil;
+pub use unveil::{UnveilContext, UnveilManager, UnveilOperation, UnveilPermissions, UnveilRule};
+
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
 pub use linux_parity::{
