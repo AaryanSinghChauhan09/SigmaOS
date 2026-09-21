@@ -515,6 +515,56 @@ impl PasswordlessSudoExpiryGuard {
     }
 }
 
+/// Omarchy Security Policy & Responsible Disclosure Engine
+#[derive(Debug, Clone)]
+pub struct OmarchySecurityReport {
+    pub report_id: String,
+    pub component: String,
+    pub affected_version: String,
+    pub vulnerability_summary: String,
+    pub is_confirmed_vulnerability: bool,
+    pub crosses_security_boundary: bool,
+    pub reporter_contact: String,
+    pub reporter_x_handle: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct OmarchySecurityPolicyEngine {
+    pub security_email: String,
+    pub confirmed_vulnerabilities_count: u32,
+    pub credited_reporters: Vec<String>,
+}
+
+impl OmarchySecurityPolicyEngine {
+    pub fn new() -> Self {
+        Self {
+            security_email: "security@omarchy.org".to_string(),
+            confirmed_vulnerabilities_count: 0,
+            credited_reporters: Vec::new(),
+        }
+    }
+
+    pub fn evaluate_vulnerability_report(&mut self, report: &mut OmarchySecurityReport) -> bool {
+        if report.crosses_security_boundary {
+            report.is_confirmed_vulnerability = true;
+            self.confirmed_vulnerabilities_count += 1;
+            if !report.reporter_x_handle.is_empty() && !self.credited_reporters.contains(&report.reporter_x_handle) {
+                self.credited_reporters.push(report.reporter_x_handle.clone());
+            }
+            true
+        } else {
+            report.is_confirmed_vulnerability = false;
+            false
+        }
+    }
+}
+
+impl Default for OmarchySecurityPolicyEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OmarchyNerdFont {
     FiraCode,
@@ -767,6 +817,29 @@ mod tests {
         assert!(audio.set_low_latency(64));
         assert_eq!(audio.quantum_buffer_size, 64);
         assert!(!audio.set_low_latency(0));
+    }
+
+    #[test]
+    fn test_omarchy_security_policy_engine() {
+        let mut sec = OmarchySecurityPolicyEngine::new();
+        assert_eq!(sec.security_email, "security@omarchy.org");
+
+        let mut report = OmarchySecurityReport {
+            report_id: "sec-001".to_string(),
+            component: "hyprland".to_string(),
+            affected_version: "1.2.0".to_string(),
+            vulnerability_summary: "Privilege boundary bypass".to_string(),
+            is_confirmed_vulnerability: false,
+            crosses_security_boundary: true,
+            reporter_contact: "reporter@example.com".to_string(),
+            reporter_x_handle: "@sec_researcher".to_string(),
+        };
+
+        let confirmed = sec.evaluate_vulnerability_report(&mut report);
+        assert!(confirmed);
+        assert!(report.is_confirmed_vulnerability);
+        assert_eq!(sec.confirmed_vulnerabilities_count, 1);
+        assert_eq!(sec.credited_reporters[0], "@sec_researcher");
     }
     #[test]
     fn test_omarchy_expanded_themes_and_iso_installer() {
