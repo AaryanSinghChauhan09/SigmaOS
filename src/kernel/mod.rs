@@ -180,6 +180,9 @@ pub use epoll::{EpollEvent, EpollEvents, EpollInstance, EpollManager, EpollOp};
 pub mod eventfd;
 pub use eventfd::{EventFd, EventFdFlags, EventFdManager};
 
+pub mod pipe;
+pub use pipe::{Pipe, PipeFlags, PipeManager};
+
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
 pub use linux_parity::{
