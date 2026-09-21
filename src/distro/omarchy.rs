@@ -190,9 +190,19 @@ impl OmarchyModernDesktopEngine {
 
         // Register default modern webapps inspired by Omarchy
         engine.register_webapp(
-            "WhatsApp",
-            "https://web.whatsapp.com/",
-            "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/whatsapp.png",
+            "HEY Email",
+            "https://app.hey.com/",
+            "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/hey.png",
+        );
+        engine.register_webapp(
+            "HEY Calendar",
+            "https://app.hey.com/calendar",
+            "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/hey.png",
+        );
+        engine.register_webapp(
+            "Basecamp",
+            "https://launchpad.37signals.com/",
+            "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/basecamp.png",
         );
         engine.register_webapp(
             "ChatGPT",
@@ -200,14 +210,54 @@ impl OmarchyModernDesktopEngine {
             "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/chatgpt.png",
         );
         engine.register_webapp(
-            "GitHub",
-            "https://github.com/",
-            "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/github-light.png",
+            "Grok",
+            "https://grok.com/",
+            "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/grok.png",
+        );
+        engine.register_webapp(
+            "WhatsApp",
+            "https://web.whatsapp.com/",
+            "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/whatsapp.png",
+        );
+        engine.register_webapp(
+            "Google Messages",
+            "https://messages.google.com/web",
+            "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/google-messages.png",
+        );
+        engine.register_webapp(
+            "Google Photos",
+            "https://photos.google.com/",
+            "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/google-photos.png",
+        );
+        engine.register_webapp(
+            "Google Maps",
+            "https://maps.google.com/",
+            "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/google-maps.png",
+        );
+        engine.register_webapp(
+            "Google Contacts",
+            "https://contacts.google.com/",
+            "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/google-contacts.png",
+        );
+        engine.register_webapp(
+            "X",
+            "https://x.com/",
+            "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/x.png",
         );
         engine.register_webapp(
             "YouTube",
             "https://youtube.com/",
             "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/youtube.png",
+        );
+        engine.register_webapp(
+            "Zoom",
+            "https://zoom.us/app",
+            "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/zoom.png",
+        );
+        engine.register_webapp(
+            "Discord",
+            "https://discord.com/app",
+            "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/discord.png",
         );
 
         engine
