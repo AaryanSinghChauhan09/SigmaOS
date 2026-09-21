@@ -518,6 +518,13 @@ The M1 milestone provides a bootable ISO with kernel entry point, init system, l
   - FileLockManager for system-wide file lock management
   - flock operation for lock type changes
   - 11 unit tests passing
+- Sysfs (src/kernel/sysfs.rs):
+  - SysfsFileType (Regular, Directory, Symlink)
+  - SysfsEntry with hierarchical children and data
+  - SysfsManager for system-wide sysfs management
+  - Create/read/write/remove files and directories
+  - List directory contents
+  - 11 unit tests passing
 
 **Completed Fixes:**
 - Kernel module: removed duplicate structures, virtual_cpu, vmm_paging declarations
@@ -702,6 +709,6 @@ See [BOOT_TO_LOGIN_PATH_SPECIFICATION.md](../docs/BOOT_TO_LOGIN_PATH_SPECIFICATI
 - [PROJECT_STATUS.md](../docs/PROJECT_STATUS.md) - Current implementation status
 
 ### Last Verified
-- **Version:** 4.8
+- **Version:** 4.9
 - **Date:** 2026-09-21
 - **Verified by:** Devin AI Agent
