@@ -99,6 +99,9 @@ pub use rlimit::{Rlimit, RlimitResource, ResourceLimits, ResourceLimitsManager};
 pub mod user_group_db;
 pub use user_group_db::{Group, User, UserGroupDatabase, UserGroupManager};
 
+pub mod process_group;
+pub use process_group::{ProcessGroup, ProcessGroupSessionManager, Session};
+
 pub mod linux_bsd_innovations;
 
 pub mod capabilities;
