@@ -108,6 +108,9 @@ pub use ioctl::{IoctlDevice, IoctlManager, IoctlRequest, IoctlResponse};
 pub mod flock;
 pub use flock::{FileLock, FileLockManager, LockOp, LockType};
 
+pub mod sysfs;
+pub use sysfs::{SysfsEntry, SysfsFileType, SysfsManager};
+
 pub mod linux_bsd_innovations;
 
 pub mod capabilities;
