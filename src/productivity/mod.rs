@@ -16,9 +16,15 @@ pub mod mint_competitor;
 pub mod reminders_advanced;
 pub mod sigma_office;
 pub mod sovereign_apps;
+pub mod pdf;
 pub mod subtitle_editor;
 pub mod tmux;
 pub mod itsfoss_apps_synthesis;
+
+pub use pdf::{
+    PdfDocument, PdfError, PdfPage, SovereignPdf24Engine, SovereignXournalPdfAnnotationEngine,
+    XournalAnnotation, XournalAnnotationType,
+};
 
 pub use enterprise_productivity_suite::*;
 
