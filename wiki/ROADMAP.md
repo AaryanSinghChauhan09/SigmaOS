@@ -240,6 +240,21 @@ The M1 milestone provides a bootable ISO with kernel entry point, init system, l
   - AuditManager for system-wide audit logging
   - Log, get_events, clear operations
   - 11 unit tests passing
+- Fanotify File Access Notification (src/kernel/fanotify.rs):
+  - 10 event flags (Access, Modify, Attrib, CloseWrite, CloseNowrite, Open, MovedFrom, MovedTo, Create, Delete)
+  - Watch management with mark flags (Mount, Filesystem, DontFollow, ExclUnlink, EventOnChild)
+  - Event reporting with watch ID and event data
+  - Event queue, retrieval, and clearing
+  - Watch removal and cleanup
+  - 9 unit tests passing
+- Random Number Generation (src/kernel/random.rs):
+  - getrandom API with urandom (non-blocking) and random (blocking) sources
+  - Random flags (non-blocking, zero, provide_buffer)
+  - RandomState with deterministic PRNG abstraction
+  - RandomBytes wrapper with source tracking
+  - RandomManager for system-wide random coordination
+  - Reseeding support for both sources
+  - 10 unit tests passing
 
 **Completed Fixes:**
 - Kernel module: removed duplicate structures, virtual_cpu, vmm_paging declarations
@@ -424,6 +439,6 @@ See [BOOT_TO_LOGIN_PATH_SPECIFICATION.md](../docs/BOOT_TO_LOGIN_PATH_SPECIFICATI
 - [PROJECT_STATUS.md](../docs/PROJECT_STATUS.md) - Current implementation status
 
 ### Last Verified
-- **Version:** 2.2
+- **Version:** 2.3
 - **Date:** 2026-09-21
 - **Verified by:** Devin AI Agent
