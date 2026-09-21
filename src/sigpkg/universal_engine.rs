@@ -88,6 +88,130 @@ pub enum PackageFormat {
     Starling,
 }
 
+impl PackageFormat {
+    pub fn from_filename(filename: &str) -> Option<Self> {
+        let name = filename.to_lowercase();
+        let name = name.trim();
+        let normalized = name.replace(" ", "");
+
+        if normalized.ends_with(".deb") || normalized.ends_with(".udeb") {
+            Some(PackageFormat::Apt)
+        } else if normalized.ends_with(".superdeb") {
+            Some(PackageFormat::Superdeb)
+        } else if normalized.ends_with(".rpm") || normalized.ends_with(".drpm") {
+            Some(PackageFormat::Yum)
+        } else if normalized.ends_with(".pkg.tar.zst")
+            || normalized.ends_with(".pkg.tar.xz")
+            || normalized.ends_with(".pkg.tar.gz")
+            || normalized.ends_with(".pkg.tar")
+            || normalized.ends_with(".pkgbuild")
+            || normalized.ends_with(".pacman")
+            || normalized == "pacman"
+            || (normalized.contains("pacman") && !normalized.ends_with(".pkg"))
+        {
+            Some(PackageFormat::Pacman)
+        } else if normalized == "snap" || normalized.ends_with(".snap") {
+            Some(PackageFormat::Snap)
+        } else if normalized == "flatpak" || normalized.ends_with(".flatpak") {
+            Some(PackageFormat::Flatpak)
+        } else if normalized == "appimage" || normalized.ends_with(".appimage") {
+            Some(PackageFormat::AppImage)
+        } else if normalized.ends_with(".sigpkg") || normalized.ends_with(".sigma") {
+            Some(PackageFormat::Sovereign)
+        } else if normalized.ends_with(".air") {
+            Some(PackageFormat::Air)
+        } else if normalized.ends_with(".bottle") {
+            Some(PackageFormat::Bottle)
+        } else if normalized.ends_with(".ipa") {
+            Some(PackageFormat::Ipa)
+        } else if normalized.ends_with(".ports") {
+            Some(PackageFormat::Ports)
+        } else if normalized.ends_with(".pkg") {
+            Some(PackageFormat::Pkg)
+        } else if normalized.ends_with(".aab") {
+            Some(PackageFormat::Aab)
+        } else if normalized.ends_with(".apk") {
+            Some(PackageFormat::Apk)
+        } else if normalized.ends_with(".eopkg") {
+            Some(PackageFormat::Eopkg)
+        } else if normalized.ends_with(".nixpkg") || normalized.ends_with(".nix") {
+            Some(PackageFormat::Nix)
+        } else if normalized.ends_with(".ebuild") || normalized.ends_with(".portage") {
+            Some(PackageFormat::Portage)
+        } else if normalized.ends_with(".openbsd.tgz") {
+            Some(PackageFormat::OpenBsdPkg)
+        } else if normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
+            Some(PackageFormat::TarGz)
+        } else if normalized.ends_with(".txz") || normalized.ends_with(".tar.xz") || normalized.ends_with(".xz") {
+            Some(PackageFormat::TarXz)
+        } else if normalized.ends_with(".xbps") {
+            Some(PackageFormat::Xbps)
+        } else if normalized.ends_with(".zypper") {
+            Some(PackageFormat::Zypper)
+        } else if normalized.ends_with(".guix") || normalized.ends_with(".scm") {
+            Some(PackageFormat::Guix)
+        } else if normalized.ends_with(".moss") {
+            Some(PackageFormat::Moss)
+        } else if normalized.ends_with(".hpkg") {
+            Some(PackageFormat::Hpkg)
+        } else if normalized.ends_with(".tcz") {
+            Some(PackageFormat::Tcz)
+        } else if normalized.ends_with(".gobo") {
+            Some(PackageFormat::Gobo)
+        } else if normalized.ends_with(".commit") || normalized.ends_with(".ostree") {
+            Some(PackageFormat::Ostree)
+        } else if normalized.ends_with(".pkgsrc") {
+            Some(PackageFormat::Pkgsrc)
+        } else if normalized.ends_with(".sfs") {
+            Some(PackageFormat::Sfs)
+        } else if normalized.ends_with(".puk") {
+            Some(PackageFormat::Puk)
+        } else if normalized.ends_with(".dmg") {
+            Some(PackageFormat::Dmg)
+        } else if normalized.ends_with(".cports") {
+            Some(PackageFormat::Cports)
+        } else if normalized.ends_with(".cachy") || normalized.ends_with(".cachyos") {
+            Some(PackageFormat::Pacman)
+        } else if normalized.ends_with(".dports") {
+            Some(PackageFormat::Ports)
+        } else if normalized.ends_with(".slackbuild") || normalized.ends_with(".tlz") || normalized.ends_with(".tbz") {
+            Some(PackageFormat::SlackBuild)
+        } else if normalized.ends_with(".crux") || normalized.ends_with(".pkgfile") {
+            Some(PackageFormat::Crux)
+        } else if normalized.ends_with(".stratum") {
+            Some(PackageFormat::Stratum)
+        } else if normalized.ends_with(".app") {
+            Some(PackageFormat::AppBundle)
+        } else if normalized.ends_with(".hap") {
+            Some(PackageFormat::Hap)
+        } else if normalized.ends_with(".pisi") {
+            Some(PackageFormat::Pisi)
+        } else if normalized.ends_with(".lzm") {
+            Some(PackageFormat::Lzm)
+        } else if normalized == "pup" || normalized.ends_with(".pup") {
+            Some(PackageFormat::Pup)
+        } else if normalized == "pet" || normalized.ends_with(".pet") {
+            Some(PackageFormat::Pet)
+        } else if normalized.ends_with(".swupd") {
+            Some(PackageFormat::Swupd)
+        } else if normalized.ends_with(".starling") {
+            Some(PackageFormat::Starling)
+        } else if normalized.ends_with(".tar") {
+            Some(PackageFormat::Tar)
+        } else if normalized.ends_with(".ipk") {
+            Some(PackageFormat::Ipk)
+        } else if normalized.ends_with(".opkg") {
+            Some(PackageFormat::Opkg)
+        } else if normalized.ends_with(".p5p") || normalized.ends_with(".ips") {
+            Some(PackageFormat::SolarisIps)
+        } else if normalized.ends_with(".nar") {
+            Some(PackageFormat::GuixNar)
+        } else {
+            None
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct PackageContext {
     pub name: String,
@@ -2082,6 +2206,55 @@ impl IPackageAdapter for OpenBsdPkgPackageAdapter {
 #[cfg(any(feature = "standalone_test", test))]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_universal_engine_prompt_formats() {
+        let cases = [
+            ("app.air", PackageFormat::Air),
+            ("pkg.bottle", PackageFormat::Bottle),
+            ("app.ipa", PackageFormat::Ipa),
+            ("bsd.ports", PackageFormat::Ports),
+            ("mac.pkg", PackageFormat::Pkg),
+            ("app.aab", PackageFormat::Aab),
+            ("app.apk", PackageFormat::Apk),
+            ("app.AppImage", PackageFormat::AppImage),
+            ("solus.eopkg", PackageFormat::Eopkg),
+            ("nix.nixpkg", PackageFormat::Nix),
+            ("gentoo.portage", PackageFormat::Portage),
+            ("debian.deb", PackageFormat::Apt),
+            ("archive.tar.gz", PackageFormat::TarGz),
+            ("archive.tar .gz", PackageFormat::TarGz),
+            ("compressed.xz", PackageFormat::TarXz),
+            ("fedora.rpm", PackageFormat::Yum),
+            ("gentoo.ebuild", PackageFormat::Portage),
+            ("arch.pkg.tar.xz", PackageFormat::Pacman),
+            ("app.flatpak", PackageFormat::Flatpak),
+            ("macos.app", PackageFormat::AppBundle),
+            ("harmony.hap", PackageFormat::Hap),
+            ("pardus.PiSi", PackageFormat::Pisi),
+            ("archive.tgz", PackageFormat::TarGz),
+            ("deepin.superdeb", PackageFormat::Superdeb),
+            ("slax.lzm", PackageFormat::Lzm),
+            ("puppy.pup", PackageFormat::Pup),
+            ("pup", PackageFormat::Pup),
+            ("canonical.snap", PackageFormat::Snap),
+            ("snap", PackageFormat::Snap),
+            ("pacman.pkg.tar.zst", PackageFormat::Pacman),
+            ("pacman", PackageFormat::Pacman),
+            ("plain.tar", PackageFormat::Tar),
+            ("puppy.pet", PackageFormat::Pet),
+            ("pet", PackageFormat::Pet),
+        ];
+
+        for (filename, expected) in cases {
+            assert_eq!(
+                PackageFormat::from_filename(filename),
+                Some(expected),
+                "Failed for filename {}",
+                filename
+            );
+        }
+    }
 
     #[test]
     fn test_package_adapters_polymorphism() {

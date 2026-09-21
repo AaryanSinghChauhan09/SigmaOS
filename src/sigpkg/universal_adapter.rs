@@ -964,135 +964,7 @@ impl UniversalPackageAdapter {
 
     /// Detects package format based on file extension
     pub fn detect_format_by_extension(&self, filename: &str) -> Option<PackageFormat> {
-        let f = filename.to_lowercase().trim().replace(" ", "");
-        if f.ends_with(".deb") || f.ends_with(".udeb") {
-            Some(PackageFormat::Apt)
-        } else if f.ends_with(".rpm") {
-            Some(PackageFormat::Yum)
-        } else if f.ends_with(".pkg.tar.zst")
-            || f.ends_with(".pkg.tar.xz")
-            || f.ends_with(".pkg.tar.gz")
-            || f.contains("pacman")
-            || f.ends_with(".pacman")
-        {
-            Some(PackageFormat::Pacman)
-        } else if f.ends_with(".apk") {
-            Some(PackageFormat::Apk)
-        } else if f.ends_with(".xbps") {
-            Some(PackageFormat::Xbps)
-        } else if f.ends_with(".air") {
-            Some(PackageFormat::Air)
-        } else if f.ends_with(".bottle") {
-            Some(PackageFormat::Bottle)
-        } else if f.ends_with(".ipa") {
-            Some(PackageFormat::Ipa)
-        } else if f.ends_with(".ports") {
-            Some(PackageFormat::Ports)
-        } else if f.ends_with(".portage") || f.ends_with(".ebuild") {
-            Some(PackageFormat::Portage)
-        } else if f.ends_with(".pkg") {
-            Some(PackageFormat::Pkg)
-        } else if f.ends_with(".aab") {
-            Some(PackageFormat::Aab)
-        } else if f.ends_with(".openbsd.tgz") {
-            Some(PackageFormat::OpenBsdPkg)
-        } else if f.ends_with(".tar.gz") || f.ends_with(".tgz") {
-            Some(PackageFormat::TarGz)
-        } else if f.ends_with(".tar.xz") || f.ends_with(".xz") {
-            Some(PackageFormat::TarXz)
-        } else if f.ends_with(".tar") {
-            Some(PackageFormat::Tar)
-        } else if f.ends_with(".app") {
-            Some(PackageFormat::AppBundle)
-        } else if f.ends_with(".hap") {
-            Some(PackageFormat::Hap)
-        } else if f.ends_with(".pisi") {
-            Some(PackageFormat::Pisi)
-        } else if f.ends_with(".superdeb") {
-            Some(PackageFormat::Superdeb)
-        } else if f.ends_with(".lzm") {
-            Some(PackageFormat::Lzm)
-        } else if f == "pup" || f.ends_with(".pup") {
-            Some(PackageFormat::Pup)
-        } else if f == "pet" || f.ends_with(".pet") {
-            Some(PackageFormat::Pet)
-        } else if f.ends_with(".nixpkg") || f.ends_with(".nix") {
-            Some(PackageFormat::Nix)
-        } else if f.ends_with(".eopkg") {
-            Some(PackageFormat::Eopkg)
-        } else if f.ends_with(".flatpak") {
-            Some(PackageFormat::Flatpak)
-        } else if f.ends_with(".snap") {
-            Some(PackageFormat::Snap)
-        } else if f.ends_with(".appimage") {
-            Some(PackageFormat::AppImage)
-        } else if f.ends_with(".moss") {
-            Some(PackageFormat::Moss)
-        } else if f.ends_with(".hpkg") {
-            Some(PackageFormat::Hpkg)
-        } else if f.ends_with(".tcz") {
-            Some(PackageFormat::Tcz)
-        } else if f.ends_with(".gobo") {
-            Some(PackageFormat::Gobo)
-        } else if f.ends_with(".commit") || f.ends_with(".ostree") {
-            Some(PackageFormat::Ostree)
-        } else if f.ends_with(".pkgsrc") {
-            Some(PackageFormat::Pkgsrc)
-        } else if f.ends_with(".sfs") {
-            Some(PackageFormat::Sfs)
-        } else if f.ends_with(".puk") {
-            Some(PackageFormat::Puk)
-        } else if f.ends_with(".dmg") {
-            Some(PackageFormat::Dmg)
-        } else if f.ends_with(".cports") {
-            Some(PackageFormat::Cports)
-        } else if f.ends_with(".guix") || f.ends_with(".scm") {
-            Some(PackageFormat::Guix)
-        } else if f.ends_with(".zypper") {
-            Some(PackageFormat::Zypper)
-        } else if f.ends_with(".cachy") || f.ends_with(".cachyos") {
-            Some(PackageFormat::Pacman)
-        } else if f.ends_with(".swupd") {
-            Some(PackageFormat::Swupd)
-        } else if f.ends_with(".starling") {
-            Some(PackageFormat::Starling)
-        } else if f.ends_with(".dports") {
-            Some(PackageFormat::Ports)
-        } else if f.ends_with(".slackbuild") || f.ends_with(".tlz") || f.ends_with(".tbz") {
-            Some(PackageFormat::TarGz)
-        } else if f.ends_with(".crux") || f.ends_with(".pkgfile") {
-            Some(PackageFormat::TarXz)
-        } else if f.ends_with(".drpm") {
-            Some(PackageFormat::Yum)
-        } else if f.ends_with(".stratum") {
-            Some(PackageFormat::Sovereign)
-        } else if f.ends_with(".ipk") {
-            Some(PackageFormat::Ipk)
-        } else if f.ends_with(".opkg") {
-            Some(PackageFormat::Opkg)
-        } else if f.ends_with(".p5p") || f.ends_with(".ips") {
-            Some(PackageFormat::SolarisIps)
-        } else if f.ends_with(".nar") {
-            Some(PackageFormat::GuixNar)
-        } else if f.ends_with(".spack") {
-            Some(PackageFormat::Spack)
-        } else if f.ends_with(".conan") {
-            Some(PackageFormat::Conan)
-        } else if f.ends_with(".whl") {
-            Some(PackageFormat::Wheel)
-        } else if f.ends_with(".crate") {
-            Some(PackageFormat::Crate)
-        } else if f.ends_with(".gem") {
-            Some(PackageFormat::Gem)
-        } else if f.ends_with(".nupkg") {
-            Some(PackageFormat::Nupkg)
-        } else if f.ends_with(".vcpkg") {
-            Some(PackageFormat::Vcpkg)
-        } else if f.ends_with(".narinfo") {
-            Some(PackageFormat::NarInfo)
-        } else {
-            None
-        }
+        PackageFormat::from_filename(filename)
     }
 
     /// Detects package format based on header byte signatures (magic bytes)
@@ -2247,51 +2119,21 @@ impl UniversalPmCommandDispatcher {
             "emerge" | "ebuild" | "gentoo" | "portage" => {
                 let mut i = 0;
                 while i < args.len() {
-                    match args[i] {
-                        "install" | "add" => operation = UniversalPmOperation::Install,
-                        "delete" | "remove" => operation = UniversalPmOperation::Remove,
-                        "upgrade" => operation = UniversalPmOperation::Upgrade,
-                        "search" => operation = UniversalPmOperation::Search,
-                        "info" => operation = UniversalPmOperation::QueryInfo,
-                        "-n" => dry_run = true,
-                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
-                        _ => {}
-                    }
-                    i += 1;
-                }
-            }
-            "xbps-install" | "xbps-remove" | "xbps-query" => {
-                if pm == "xbps-install" {
-                    operation = UniversalPmOperation::Install;
-                } else if pm == "xbps-remove" {
-                    operation = UniversalPmOperation::Remove;
-                } else {
-                    operation = UniversalPmOperation::QueryInfo;
-                }
-                for arg in args {
-                    if *arg == "-n" || *arg == "--dry-run" {
-                        dry_run = true;
-                    } else if !arg.starts_with('-') {
-                        target_packages.push(arg.to_string());
-                    }
-                }
-            }
-            "emerge" | "ebuild" => {
-                let mut i = 0;
-                while i < args.len() {
                     let arg = args[i];
-                    if arg == "-C" || arg == "--unmerge" || arg == "--deselect" {
+                    if arg == "install" || arg == "add" {
+                        operation = UniversalPmOperation::Install;
+                    } else if arg == "delete" || arg == "remove" || arg == "-C" || arg == "--unmerge" || arg == "--deselect" {
                         operation = UniversalPmOperation::Remove;
-                    } else if arg == "-u" || arg.contains('u') || arg == "--update" {
+                    } else if arg == "upgrade" || arg == "-u" || arg.contains('u') || arg == "--update" {
                         operation = UniversalPmOperation::Upgrade;
-                    } else if arg == "-s" || arg == "--search" {
+                    } else if arg == "search" || arg == "-s" || arg == "--search" {
                         operation = UniversalPmOperation::Search;
-                    } else if arg == "--info" {
+                    } else if arg == "info" || arg == "--info" {
                         operation = UniversalPmOperation::QueryInfo;
                     } else if !arg.starts_with('-') {
                         target_packages.push(arg.to_string());
                     }
-                    if arg.starts_with('-') && (arg.contains('p') || arg.contains('a') || arg == "--pretend" || arg == "--ask") {
+                    if arg.starts_with('-') && (arg.contains('p') || arg.contains('a') || arg == "--pretend" || arg == "--ask" || arg == "-n") {
                         dry_run = true;
                     }
                     i += 1;
