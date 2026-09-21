@@ -152,3 +152,86 @@ mod tests {
         assert!(starship.contains("success_symbol = \"[➜](bold green)\""));
     }
 }
+
+/// 6. Omarchy FAQ Helper Engine (Keyboard layouts, Clock format, Capture Dirs, Printing, & Preinstall Removal)
+#[derive(Debug, Clone)]
+pub struct OmarchyFaqHelperEngine {
+    pub kb_layout: String,
+    pub kb_options: String,
+    pub clock_format: String,
+    pub screenshot_dir: String,
+    pub screenrecord_dir: String,
+}
+
+impl OmarchyFaqHelperEngine {
+    pub fn new() -> Self {
+        Self {
+            kb_layout: "us,fr".to_string(),
+            kb_options: "compose:caps,shift:both_capslock_cancel,grp:alts_toggle".to_string(),
+            clock_format: "dddd h:mm AP".to_string(),
+            screenshot_dir: "~/Pictures/Screenshots".to_string(),
+            screenrecord_dir: "~/Videos/Screenrecordings".to_string(),
+        }
+    }
+
+    pub fn set_keyboard_layouts(&mut self, layouts: &str, options: &str) {
+        self.kb_layout = layouts.to_string();
+        self.kb_options = options.to_string();
+    }
+
+    pub fn set_clock_format(&mut self, format_str: &str) {
+        self.clock_format = format_str.to_string();
+    }
+
+    pub fn configure_capture_environment(&mut self, screenshot_dir: &str, record_dir: &str) -> Vec<(String, String)> {
+        self.screenshot_dir = screenshot_dir.to_string();
+        self.screenrecord_dir = record_dir.to_string();
+        vec![
+            ("OMASNAP_SCREENSHOT_DIR".to_string(), self.screenshot_dir.clone()),
+            ("OMARCHY_SCREENRECORD_DIR".to_string(), self.screenrecord_dir.clone()),
+        ]
+    }
+
+    pub fn sweep_preinstalls<'a>(&self, preinstalled_packages: &'a [&'a str], keep_list: &[&str]) -> Vec<&'a str> {
+        preinstalled_packages
+            .iter()
+            .copied()
+            .filter(|pkg| !keep_list.contains(pkg))
+            .collect()
+    }
+
+    pub fn configure_ipp_printer(&self, address: &str, queue: &str) -> String {
+        format!("ipp://{}/{}", address.trim_matches('/'), queue.trim_matches('/'))
+    }
+}
+
+impl Default for OmarchyFaqHelperEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
+mod faq_tests {
+    use super::*;
+
+    #[test]
+    fn test_omarchy_faq_helper_engine() {
+        let mut faq = OmarchyFaqHelperEngine::new();
+        faq.set_keyboard_layouts("us,fr", "grp:alts_toggle");
+        assert_eq!(faq.kb_layout, "us,fr");
+
+        faq.set_clock_format("dddd h:mm AP");
+        assert_eq!(faq.clock_format, "dddd h:mm AP");
+
+        let env_vars = faq.configure_capture_environment("~/Pictures/Captures", "~/Videos/Captures");
+        assert_eq!(env_vars[0].1, "~/Pictures/Captures");
+
+        let preinstalls = &["obsidian", "libreoffice", "ghostty", "pavucontrol"];
+        let remaining = faq.sweep_preinstalls(preinstalls, &["ghostty"]);
+        assert_eq!(remaining, vec!["obsidian", "libreoffice", "pavucontrol"]);
+
+        let printer_uri = faq.configure_ipp_printer("192.168.1.50", "ipp/print");
+        assert_eq!(printer_uri, "ipp://192.168.1.50/ipp/print");
+    }
+}

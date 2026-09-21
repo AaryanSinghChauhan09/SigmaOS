@@ -186,6 +186,13 @@ if [ -f "src/wiki_unimplemented_ideas.rs" ]; then
     ./build/test_wiki_unimplemented
 fi
 
+if [ -f "src/wiki_distro_ideas_deployment.rs" ]; then
+    echo "Running GitHub Wiki Distro Ideas Deployment test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/wiki_distro_ideas_deployment.rs -o build/test_wiki_distro_ideas
+    ./build/test_wiki_distro_ideas
+fi
+
 if [ -f "src/drivers/sovereign_distro_driver_suite.rs" ]; then
     echo "Running Sovereign Universal Distro Driver Suite test suite..."
     mkdir -p build
