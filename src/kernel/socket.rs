@@ -1,19 +1,18 @@
-// Linux-inspired socket abstraction
-// Network communication interface for SigmaOS
+// Linux-inspired socket for network communication
+// Provides socket abstraction for TCP/UDP protocols
 
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
-/// socket address family
+/// Socket domain
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AddressFamily {
-    Unspec = 0,
+pub enum SocketDomain {
     Unix = 1,
-    Inet = 2,
-    Inet6 = 10,
+    IPv4 = 2,
+    IPv6 = 10,
 }
 
-/// socket type
+/// Socket type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SocketType {
     Stream = 1,    // TCP
@@ -21,139 +20,141 @@ pub enum SocketType {
     Raw = 3,
 }
 
-/// socket protocol
+/// Socket protocol
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SocketProtocol {
-    Ip = 0,
-    Tcp = 6,
-    Udp = 17,
+    IP = 0,
+    TCP = 6,
+    UDP = 17,
 }
 
-/// socket state
+/// Socket state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SocketState {
-    Unconnected,
-    Connecting,
-    Connected,
-    Listening,
-    Bound,
     Closed,
+    Listen,
+    SynSent,
+    SynReceived,
+    Established,
+    FinWait1,
+    FinWait2,
+    CloseWait,
+    Closing,
+    LastAck,
+    TimeWait,
 }
 
-/// socket address
+/// Socket instance
 #[derive(Debug, Clone)]
-pub struct SocketAddr {
-    pub family: AddressFamily,
-    pub port: u16,
-    pub ip: String,
-}
-
-impl SocketAddr {
-    pub fn new(family: AddressFamily, ip: String, port: u16) -> Self {
-        SocketAddr { family, port, ip }
-    }
-}
-
-/// socket instance
 pub struct Socket {
-    pub fd: i32,
-    pub family: AddressFamily,
+    pub id: u64,
+    pub domain: SocketDomain,
     pub socket_type: SocketType,
     pub protocol: SocketProtocol,
     pub state: SocketState,
-    pub local_addr: Option<SocketAddr>,
-    pub remote_addr: Option<SocketAddr>,
-    pub backlog: i32,
-    pub pending_connections: Vec<Arc<Mutex<Socket>>>,
+    pub local_port: u16,
+    pub remote_port: u16,
+    pub local_address: String,
+    pub remote_address: String,
+    pub backlog: u32,
 }
 
 impl Socket {
-    pub fn new(fd: i32, family: AddressFamily, socket_type: SocketType, protocol: SocketProtocol) -> Self {
-        Socket {
-            fd,
-            family,
+    pub fn new(id: u64, domain: SocketDomain, socket_type: SocketType, protocol: SocketProtocol) -> Self {
+        Self {
+            id,
+            domain,
             socket_type,
             protocol,
-            state: SocketState::Unconnected,
-            local_addr: None,
-            remote_addr: None,
+            state: SocketState::Closed,
+            local_port: 0,
+            remote_port: 0,
+            local_address: String::new(),
+            remote_address: String::new(),
             backlog: 0,
-            pending_connections: Vec::new(),
         }
     }
 
-    /// Bind socket to address
-    pub fn bind(&mut self, addr: SocketAddr) -> Result<(), String> {
-        if self.state != SocketState::Unconnected {
-            return Err("Socket already bound or connected".to_string());
+    /// Bind to local address
+    pub fn bind(&mut self, address: String, port: u16) -> Result<(), String> {
+        if self.state != SocketState::Closed {
+            return Err("Socket not in closed state".to_string());
         }
 
-        self.local_addr = Some(addr);
-        self.state = SocketState::Bound;
+        self.local_address = address;
+        self.local_port = port;
         Ok(())
     }
 
     /// Listen for connections
-    pub fn listen(&mut self, backlog: i32) -> Result<(), String> {
-        if self.state != SocketState::Bound {
-            return Err("Socket not bound".to_string());
-        }
-
+    pub fn listen(&mut self, backlog: u32) -> Result<(), String> {
         if self.socket_type != SocketType::Stream {
             return Err("Only stream sockets can listen".to_string());
         }
 
+        if self.local_port == 0 {
+            return Err("Socket not bound".to_string());
+        }
+
+        self.state = SocketState::Listen;
         self.backlog = backlog;
-        self.state = SocketState::Listening;
         Ok(())
     }
 
     /// Accept a connection
-    pub fn accept(&mut self) -> Result<Arc<Mutex<Socket>>, String> {
-        if self.state != SocketState::Listening {
-            return Err("Socket not listening".to_string());
+    pub fn accept(&mut self) -> Result<Socket, String> {
+        if self.state != SocketState::Listen {
+            return Err("Socket not in listen state".to_string());
         }
 
-        if self.pending_connections.is_empty() {
-            return Err("No pending connections".to_string());
-        }
+        // Simulate accepting a connection
+        let mut new_socket = Socket::new(
+            self.id + 1000,
+            self.domain,
+            self.socket_type,
+            self.protocol,
+        );
+        new_socket.local_address = self.local_address.clone();
+        new_socket.local_port = self.local_port;
+        new_socket.state = SocketState::Established;
 
-        Ok(self.pending_connections.remove(0))
+        Ok(new_socket)
     }
 
     /// Connect to remote address
-    pub fn connect(&mut self, addr: SocketAddr) -> Result<(), String> {
-        if self.state == SocketState::Connected {
-            return Err("Socket already connected".to_string());
+    pub fn connect(&mut self, address: String, port: u16) -> Result<(), String> {
+        if self.socket_type != SocketType::Stream {
+            return Err("Only stream sockets can connect".to_string());
         }
 
-        self.remote_addr = Some(addr);
-        self.state = SocketState::Connected;
+        self.remote_address = address;
+        self.remote_port = port;
+        self.state = SocketState::Established;
         Ok(())
     }
 
     /// Send data
     pub fn send(&self, data: &[u8]) -> Result<usize, String> {
-        if self.state != SocketState::Connected {
+        if self.state != SocketState::Established {
             return Err("Socket not connected".to_string());
         }
 
-        // Simulate sending
+        // Simulate sending data
         Ok(data.len())
     }
 
     /// Receive data
     pub fn recv(&self, _count: usize) -> Result<Vec<u8>, String> {
-        if self.state != SocketState::Connected {
+        if self.state != SocketState::Established {
             return Err("Socket not connected".to_string());
         }
 
-        // Simulate receiving (would block in real implementation)
-        Ok(Vec::new())
+        // Simulate receiving data
+        Ok(vec![])
     }
 
-    /// Send to address (for datagram sockets)
-    pub fn sendto(&self, data: &[u8], _addr: SocketAddr) -> Result<usize, String> {
+    /// Send to address (for UDP)
+    pub fn sendto(&self, data: &[u8], _address: String, _port: u16) -> Result<usize, String> {
         if self.socket_type != SocketType::Datagram {
             return Err("Only datagram sockets can use sendto".to_string());
         }
@@ -161,14 +162,13 @@ impl Socket {
         Ok(data.len())
     }
 
-    /// Receive from address (for datagram sockets)
-    pub fn recvfrom(&self, _count: usize) -> Result<(Vec<u8>, SocketAddr), String> {
+    /// Receive from address (for UDP)
+    pub fn recvfrom(&self, _count: usize) -> Result<(Vec<u8>, String, u16), String> {
         if self.socket_type != SocketType::Datagram {
             return Err("Only datagram sockets can use recvfrom".to_string());
         }
 
-        // Simulate receiving
-        Ok((Vec::new(), SocketAddr::new(AddressFamily::Inet, "0.0.0.0".to_string(), 0)))
+        Ok((vec![], String::new(), 0))
     }
 
     /// Close socket
@@ -182,49 +182,124 @@ impl Socket {
     }
 }
 
-/// socket manager
+/// Socket manager for system-wide socket management
 pub struct SocketManager {
-    sockets: HashMap<i32, Arc<Mutex<Socket>>>,
-    next_fd: i32,
+    sockets: Arc<Mutex<HashMap<u64, Socket>>>,
+    next_socket_id: Arc<Mutex<u64>>,
 }
 
 impl SocketManager {
     pub fn new() -> Self {
-        SocketManager {
-            sockets: HashMap::new(),
-            next_fd: 3, // Start after stdin, stdout, stderr
+        Self {
+            sockets: Arc::new(Mutex::new(HashMap::new())),
+            next_socket_id: Arc::new(Mutex::new(1)),
         }
     }
 
     /// Create a new socket
-    pub fn socket(&mut self, family: AddressFamily, socket_type: SocketType, protocol: SocketProtocol) -> Result<i32, String> {
-        let fd = self.next_fd;
-        self.next_fd += 1;
+    pub fn create_socket(&self, domain: SocketDomain, socket_type: SocketType, protocol: SocketProtocol) -> u64 {
+        let mut next_id = self.next_socket_id.lock().unwrap();
+        let socket_id = *next_id;
+        *next_id += 1;
+        drop(next_id);
 
-        let socket = Arc::new(Mutex::new(Socket::new(fd, family, socket_type, protocol)));
-        self.sockets.insert(fd, socket);
+        let socket = Socket::new(socket_id, domain, socket_type, protocol);
+        let mut sockets = self.sockets.lock().unwrap();
+        sockets.insert(socket_id, socket);
 
-        Ok(fd)
+        socket_id
     }
 
-    /// Get a socket by file descriptor
-    pub fn get_socket(&self, fd: i32) -> Option<Arc<Mutex<Socket>>> {
-        self.sockets.get(&fd).cloned()
+    /// Get a socket by ID
+    pub fn get_socket(&self, socket_id: u64) -> Option<Socket> {
+        let sockets = self.sockets.lock().unwrap();
+        sockets.get(&socket_id).cloned()
     }
 
-    /// Close a socket
-    pub fn close(&mut self, fd: i32) -> Result<(), String> {
-        let socket = self.sockets.remove(&fd)
-            .ok_or_else(|| format!("Socket not found: {}", fd))?;
-        
-        let mut socket_guard = socket.lock().unwrap();
-        socket_guard.close();
-        Ok(())
+    /// Remove a socket
+    pub fn remove_socket(&self, socket_id: u64) -> Result<(), String> {
+        let mut sockets = self.sockets.lock().unwrap();
+        match sockets.remove(&socket_id) {
+            Some(_) => Ok(()),
+            None => Err(format!("Socket {} not found", socket_id)),
+        }
+    }
+
+    /// Bind socket
+    pub fn bind(&self, socket_id: u64, address: String, port: u16) -> Result<(), String> {
+        let mut sockets = self.sockets.lock().unwrap();
+        match sockets.get_mut(&socket_id) {
+            Some(socket) => socket.bind(address, port),
+            None => Err(format!("Socket {} not found", socket_id)),
+        }
+    }
+
+    /// Listen on socket
+    pub fn listen(&self, socket_id: u64, backlog: u32) -> Result<(), String> {
+        let mut sockets = self.sockets.lock().unwrap();
+        match sockets.get_mut(&socket_id) {
+            Some(socket) => socket.listen(backlog),
+            None => Err(format!("Socket {} not found", socket_id)),
+        }
+    }
+
+    /// Accept connection
+    pub fn accept(&self, socket_id: u64) -> Result<Socket, String> {
+        let mut sockets = self.sockets.lock().unwrap();
+        match sockets.get_mut(&socket_id) {
+            Some(socket) => {
+                let new_socket = socket.accept()?;
+                let new_id = new_socket.id;
+                sockets.insert(new_id, new_socket.clone());
+                Ok(new_socket)
+            }
+            None => Err(format!("Socket {} not found", socket_id)),
+        }
+    }
+
+    /// Connect socket
+    pub fn connect(&self, socket_id: u64, address: String, port: u16) -> Result<(), String> {
+        let mut sockets = self.sockets.lock().unwrap();
+        match sockets.get_mut(&socket_id) {
+            Some(socket) => socket.connect(address, port),
+            None => Err(format!("Socket {} not found", socket_id)),
+        }
+    }
+
+    /// Send data
+    pub fn send(&self, socket_id: u64, data: &[u8]) -> Result<usize, String> {
+        let sockets = self.sockets.lock().unwrap();
+        match sockets.get(&socket_id) {
+            Some(socket) => socket.send(data),
+            None => Err(format!("Socket {} not found", socket_id)),
+        }
+    }
+
+    /// Receive data
+    pub fn recv(&self, socket_id: u64, count: usize) -> Result<Vec<u8>, String> {
+        let sockets = self.sockets.lock().unwrap();
+        match sockets.get(&socket_id) {
+            Some(socket) => socket.recv(count),
+            None => Err(format!("Socket {} not found", socket_id)),
+        }
+    }
+
+    /// Close socket
+    pub fn close(&self, socket_id: u64) -> Result<(), String> {
+        let mut sockets = self.sockets.lock().unwrap();
+        match sockets.get_mut(&socket_id) {
+            Some(socket) => {
+                socket.close();
+                Ok(())
+            }
+            None => Err(format!("Socket {} not found", socket_id)),
+        }
     }
 
     /// Get socket count
     pub fn socket_count(&self) -> usize {
-        self.sockets.len()
+        let sockets = self.sockets.lock().unwrap();
+        sockets.len()
     }
 }
 
@@ -239,108 +314,138 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_socket_creation() {
-        let socket = Socket::new(3, AddressFamily::Inet, SocketType::Stream, SocketProtocol::Tcp);
-        assert_eq!(socket.fd, 3);
-        assert_eq!(socket.state, SocketState::Unconnected);
-    }
-
-    #[test]
-    fn test_socket_bind() {
-        let mut socket = Socket::new(3, AddressFamily::Inet, SocketType::Stream, SocketProtocol::Tcp);
-        let addr = SocketAddr::new(AddressFamily::Inet, "127.0.0.1".to_string(), 8080);
-        
-        socket.bind(addr).unwrap();
-        assert_eq!(socket.state, SocketState::Bound);
-        assert!(socket.local_addr.is_some());
-    }
-
-    #[test]
-    fn test_socket_listen() {
-        let mut socket = Socket::new(3, AddressFamily::Inet, SocketType::Stream, SocketProtocol::Tcp);
-        let addr = SocketAddr::new(AddressFamily::Inet, "127.0.0.1".to_string(), 8080);
-        
-        socket.bind(addr).unwrap();
-        socket.listen(10).unwrap();
-        
-        assert_eq!(socket.state, SocketState::Listening);
-        assert_eq!(socket.backlog, 10);
-    }
-
-    #[test]
-    fn test_socket_connect() {
-        let mut socket = Socket::new(3, AddressFamily::Inet, SocketType::Stream, SocketProtocol::Tcp);
-        let addr = SocketAddr::new(AddressFamily::Inet, "127.0.0.1".to_string(), 8080);
-        
-        socket.connect(addr).unwrap();
-        assert_eq!(socket.state, SocketState::Connected);
-    }
-
-    #[test]
-    fn test_socket_send_recv() {
-        let mut socket = Socket::new(3, AddressFamily::Inet, SocketType::Stream, SocketProtocol::Tcp);
-        let addr = SocketAddr::new(AddressFamily::Inet, "127.0.0.1".to_string(), 8080);
-        
-        socket.connect(addr).unwrap();
-        
-        let sent = socket.send(b"hello").unwrap();
-        assert_eq!(sent, 5);
-        
-        let _received = socket.recv(10).unwrap();
-    }
-
-    #[test]
-    fn test_socket_close() {
-        let mut socket = Socket::new(3, AddressFamily::Inet, SocketType::Stream, SocketProtocol::Tcp);
-        socket.close();
-        
+    fn test_socket() {
+        let socket = Socket::new(1, SocketDomain::IPv4, SocketType::Stream, SocketProtocol::TCP);
+        assert_eq!(socket.id, 1);
         assert_eq!(socket.state, SocketState::Closed);
     }
 
     #[test]
-    fn test_socket_manager_creation() {
-        let mut manager = SocketManager::new();
+    fn test_socket_bind() {
+        let mut socket = Socket::new(1, SocketDomain::IPv4, SocketType::Stream, SocketProtocol::TCP);
+        socket.bind("127.0.0.1".to_string(), 8080).unwrap();
+
+        assert_eq!(socket.local_address, "127.0.0.1");
+        assert_eq!(socket.local_port, 8080);
+    }
+
+    #[test]
+    fn test_socket_bind_not_closed() {
+        let mut socket = Socket::new(1, SocketDomain::IPv4, SocketType::Stream, SocketProtocol::TCP);
+        socket.bind("127.0.0.1".to_string(), 8080).unwrap();
+        assert!(socket.bind("127.0.0.1".to_string(), 8081).is_err());
+    }
+
+    #[test]
+    fn test_socket_listen() {
+        let mut socket = Socket::new(1, SocketDomain::IPv4, SocketType::Stream, SocketProtocol::TCP);
+        socket.bind("127.0.0.1".to_string(), 8080).unwrap();
+        socket.listen(128).unwrap();
+
+        assert_eq!(socket.state, SocketState::Listen);
+        assert_eq!(socket.backlog, 128);
+    }
+
+    #[test]
+    fn test_socket_listen_not_stream() {
+        let mut socket = Socket::new(1, SocketDomain::IPv4, SocketType::Datagram, SocketProtocol::UDP);
+        assert!(socket.listen(128).is_err());
+    }
+
+    #[test]
+    fn test_socket_connect() {
+        let mut socket = Socket::new(1, SocketDomain::IPv4, SocketType::Stream, SocketProtocol::TCP);
+        socket.connect("192.168.1.1".to_string(), 80).unwrap();
+
+        assert_eq!(socket.remote_address, "192.168.1.1");
+        assert_eq!(socket.remote_port, 80);
+        assert_eq!(socket.state, SocketState::Established);
+    }
+
+    #[test]
+    fn test_socket_send() {
+        let mut socket = Socket::new(1, SocketDomain::IPv4, SocketType::Stream, SocketProtocol::TCP);
+        socket.connect("192.168.1.1".to_string(), 80).unwrap();
         
-        let fd = manager.socket(AddressFamily::Inet, SocketType::Stream, SocketProtocol::Tcp).unwrap();
-        assert_eq!(fd, 3);
+        let data = b"Hello";
+        let sent = socket.send(data).unwrap();
+        assert_eq!(sent, data.len());
+    }
+
+    #[test]
+    fn test_socket_send_not_connected() {
+        let socket = Socket::new(1, SocketDomain::IPv4, SocketType::Stream, SocketProtocol::TCP);
+        // Socket is in Closed state, not Established
+        assert!(socket.send(b"Hello").is_err());
+    }
+
+    #[test]
+    fn test_socket_close() {
+        let mut socket = Socket::new(1, SocketDomain::IPv4, SocketType::Stream, SocketProtocol::TCP);
+        socket.connect("192.168.1.1".to_string(), 80).unwrap();
+        socket.close();
+
+        assert_eq!(socket.state, SocketState::Closed);
+    }
+
+    #[test]
+    fn test_socket_manager() {
+        let manager = SocketManager::new();
+
+        let socket_id = manager.create_socket(SocketDomain::IPv4, SocketType::Stream, SocketProtocol::TCP);
+        assert_eq!(socket_id, 1);
+
         assert_eq!(manager.socket_count(), 1);
     }
 
     #[test]
-    fn test_socket_manager_get() {
-        let mut manager = SocketManager::new();
-        
-        let fd = manager.socket(AddressFamily::Inet, SocketType::Stream, SocketProtocol::Tcp).unwrap();
-        let socket = manager.get_socket(fd);
-        
-        assert!(socket.is_some());
+    fn test_socket_manager_bind_listen() {
+        let manager = SocketManager::new();
+
+        let socket_id = manager.create_socket(SocketDomain::IPv4, SocketType::Stream, SocketProtocol::TCP);
+        manager.bind(socket_id, "127.0.0.1".to_string(), 8080).unwrap();
+        manager.listen(socket_id, 128).unwrap();
+
+        let socket = manager.get_socket(socket_id).unwrap();
+        assert_eq!(socket.state, SocketState::Listen);
+    }
+
+    #[test]
+    fn test_socket_manager_connect() {
+        let manager = SocketManager::new();
+
+        let socket_id = manager.create_socket(SocketDomain::IPv4, SocketType::Stream, SocketProtocol::TCP);
+        manager.connect(socket_id, "192.168.1.1".to_string(), 80).unwrap();
+
+        let socket = manager.get_socket(socket_id).unwrap();
+        assert_eq!(socket.state, SocketState::Established);
     }
 
     #[test]
     fn test_socket_manager_close() {
-        let mut manager = SocketManager::new();
-        
-        let fd = manager.socket(AddressFamily::Inet, SocketType::Stream, SocketProtocol::Tcp).unwrap();
-        manager.close(fd).unwrap();
-        
+        let manager = SocketManager::new();
+
+        let socket_id = manager.create_socket(SocketDomain::IPv4, SocketType::Stream, SocketProtocol::TCP);
+        manager.close(socket_id).unwrap();
+
+        let socket = manager.get_socket(socket_id).unwrap();
+        assert_eq!(socket.state, SocketState::Closed);
+    }
+
+    #[test]
+    fn test_socket_manager_remove() {
+        let manager = SocketManager::new();
+
+        let socket_id = manager.create_socket(SocketDomain::IPv4, SocketType::Stream, SocketProtocol::TCP);
+        manager.remove_socket(socket_id).unwrap();
+
         assert_eq!(manager.socket_count(), 0);
     }
 
     #[test]
-    fn test_socket_datagram_sendto() {
-        let socket = Socket::new(3, AddressFamily::Inet, SocketType::Datagram, SocketProtocol::Udp);
-        let addr = SocketAddr::new(AddressFamily::Inet, "127.0.0.1".to_string(), 8080);
-        
-        let sent = socket.sendto(b"hello", addr).unwrap();
-        assert_eq!(sent, 5);
-    }
-
-    #[test]
-    fn test_socket_datagram_recvfrom() {
-        let socket = Socket::new(3, AddressFamily::Inet, SocketType::Datagram, SocketProtocol::Udp);
-        
-        let (data, addr) = socket.recvfrom(10).unwrap();
-        assert_eq!(data.len(), 0);
-        assert_eq!(addr.family, AddressFamily::Inet);
+    fn test_socket_manager_invalid() {
+        let manager = SocketManager::new();
+        assert!(manager.bind(999, "127.0.0.1".to_string(), 8080).is_err());
+        assert!(manager.listen(999, 128).is_err());
     }
 }
