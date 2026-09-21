@@ -5688,3 +5688,68 @@ SigmaOS absorbs the workstation file layout, configuration deployment model, and
    - Allows users to clobber home configs back to packaged defaults by replaying `/etc/skel/.` onto `$HOME`, followed by refreshing Limine boot entries, Plymouth themes, and Neovim configurations.
 5. **Kitty Terminal Security Defaults**:
    - System default `/etc/xdg/kitty/kitty.conf` enforces `allow_remote_control socket-only`, allowing local scripts to query terminal states over Unix sockets while blocking malicious remote-control payloads originating from terminal output.
+
+
+---
+
+## 132. SOVEREIGN OMARCHY LINUX TOP BAR, SHELL PANELS & DESKTOP HUD SPECIFICATION
+
+### 132.1 Overview & Single-Process Quickshell Top Bar Architecture
+SigmaOS absorbs the top bar and shell panel architecture of **Omarchy Linux**. Rather than executing a series of standalone, disconnected status bar daemons, the top bar is integrated directly into the single, long-running Zenith compositor and Quickshell process. This single process orchestrates the top bar, application menu, notifications, OSD popups, and lock screen, guaranteeing sub-millisecond panel opening latency, zero IPC serialization overhead, and perfect declarative theme synchronization across all UI components.
+
+```
++-----------------------------------------------------------------------------------+
+|                        SIGMAOS ZENITH / OMARCHY TOP BAR HUD                       |
++-----------------------------------------------------------------------------------+
+| [Left Section]           | [Center Section]          | [Right Section]            |
+| - Omarchy Menu Launcher  - Mode Indicators           - System Tray & Agents       |
+| - Workspace Indicators   - Clock & Calendar          - Bluetooth & Network        |
+|                          - Weather & Keyboard        - Audio, Display & Power     |
+|                          - Update Badge              - Media Player               |
++-----------------------------------------------------------------------------------+
+|                        Hotkey-Driven Pop-Up Shell Panels                          |
+|  Super+Ctrl+A (Audio)  | Super+Ctrl+W (Network) | Super+Ctrl+B (Bluetooth)       |
+|  Super+Ctrl+D (Display)| Super+Ctrl+P (Power)   | Super+Ctrl+Alt+D (Calendar)    |
++-----------------------------------------------------------------------------------+
+```
+
+### 132.2 Mouse Interaction & Widget Click-Action Matrix
+Every top bar widget responds to left, right, middle clicks, and scroll wheel events:
+
+| Widget | Left Click Action | Right Click Action | Middle Click / Scroll Action |
+| :--- | :--- | :--- | :--- |
+| **Menu** | Open Omarchy application menu | Launch new terminal instance | — |
+| **Workspaces** | Focus target workspace | — | — |
+| **Clock** | Open month calendar popup | Cycle clock label format | Middle: Timezone picker |
+| **Weather** | Open forecast popup | Send full weather notification | Middle: Refresh weather data |
+| **Audio** | Open Audio control panel | Mute/unmute master audio | Middle: Audio panel · Scroll: Volume |
+| **Microphone** | Mute/unmute microphone | — | Middle: Audio panel · Scroll: Input level |
+| **Network** | Open Network scanning panel | — | — |
+| **Bluetooth** | Open Bluetooth devices panel | Toggle Bluetooth radio power | — |
+| **Display** | Open Display & monitor panel | — | Scroll: Screen brightness |
+| **Power** | Open Power & battery panel | Toggle battery percentage label | — |
+| **Media** | Play / Pause active media | Show cover-art popup | Middle: Next · Scroll: Prev/Next track |
+| **Agents** | Open AI Agents panel | Launch default AI coding agent | Middle: Cycle active subscription |
+| **Tray** | Hover to reveal drawer | Right-click chevron to manage | — |
+| **Update Badge** | Run system update pipeline | — | — |
+
+### 132.3 Hotkey-Driven Interactive Shell Panels
+Top bar panels are keyboard-navigable popups featuring interactive sliders, device lists, and control toggles:
+1. **Audio Panel (`Super + Ctrl + A`)**: Master volume slider, output device switcher, and per-app stream volume mixer.
+2. **Network Panel (`Super + Ctrl + W`)**: Wi-Fi network scanner, signal strength indicator, connection manager, and custom DNS provider selector.
+3. **Bluetooth Panel (`Super + Ctrl + B`)**: Paired device list, connect/disconnect toggles, and device battery level indicators.
+4. **Power Panel (`Super + Ctrl + P`)**: Battery health telemetry, system info, and power profile switches (separate choices for Battery vs. AC power).
+5. **Display Panel (`Super + Ctrl + D`)**: Brightness slider, text scaling, monitor scaling presets, and per-monitor arrangement controls.
+6. **Calendar Panel (`Super + Ctrl + Alt + D`)**: Month grid with ISO week numbers and month navigation.
+7. **Service Panels (Tailscale & Dropbox)**: Tailscale widget manages tailnet connections, account switches, exit nodes, and P2P file transfers (`Taildrop`). Dropbox widget manages authentication, quota usage, and sync status.
+
+### 132.4 Mode Indicators & Dynamic Bar Customization (`shell.json`)
+1. **Status Indicators**: Center cluster icons light up when active modes are engaged: Do Not Disturb (DND), Night Light, queued Reminders, active Screen Recording, Stay Awake, and Text Dictation.
+2. **Dynamic Drag-and-Drop & CLI Commands**:
+   - Drag empty space on the bar to move position (top, bottom, left, right).
+   - Double-click empty bar space to toggle background transparency.
+   - CLI commands: `omarchy bar position bottom`, `omarchy bar transparent toggle`, `omarchy bar move <id> --section center`, `omarchy plugin enable/disable <id>`.
+3. **Bar Visibility Toggle**: `Super + Shift + Space` toggles top bar visibility instantly without restarting the underlying shell process.
+4. **Declarative Configuration (`~/.config/omarchy/shell.json`)**:
+   - Configures bar position, transparency, `centerAnchor` (pinning clock/widgets to true screen center), and widget layout arrays (`left`, `center`, `right`).
+   - Stores idle timeout thresholds (`idle.screensaver` and `idle.lock` in seconds) at root level.
