@@ -138,6 +138,12 @@ pub use user_group::{FilePermissions, Group, User, UserGroupManager};
 pub mod hostname;
 pub use hostname::HostnameManager;
 
+pub mod syslog;
+pub use syslog::{SyslogBuffer, SyslogEntry, SyslogFacility, SyslogManager, SyslogSeverity};
+
+pub mod cron;
+pub use cron::{CronField, CronJob, CronManager, CronSchedule};
+
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
 pub use linux_parity::{
