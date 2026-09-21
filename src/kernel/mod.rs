@@ -105,6 +105,9 @@ pub use process_group::{ProcessGroup, ProcessGroupSessionManager, Session};
 pub mod ioctl;
 pub use ioctl::{IoctlDevice, IoctlManager, IoctlRequest, IoctlResponse};
 
+pub mod flock;
+pub use flock::{FileLock, FileLockManager, LockOp, LockType};
+
 pub mod linux_bsd_innovations;
 
 pub mod capabilities;
