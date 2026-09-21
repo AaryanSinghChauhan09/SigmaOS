@@ -186,6 +186,9 @@ pub use pipe::{Pipe, PipeFlags, PipeManager};
 pub mod socket;
 pub use socket::{Socket, SocketDomain, SocketManager, SocketProtocol, SocketState, SocketType};
 
+pub mod shm;
+pub use shm::{ShmManager, ShmPerm, ShmSegment};
+
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
 pub use linux_parity::{
