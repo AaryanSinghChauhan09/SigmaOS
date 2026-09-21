@@ -383,6 +383,21 @@ The M1 milestone provides a bootable ISO with kernel entry point, init system, l
   - Process creation and signal handler management
   - SignalManager for system-wide signal management
   - 13 unit tests passing
+- Mount Namespace (src/kernel/mount_namespace.rs):
+  - Mount flags (read_only, noexec, nosuid, nodev, noatime, nodiratime, relatime, bind, remount, move_mount)
+  - Mount point with source, target, filesystem type, options
+  - Mount namespace with hierarchical parent/child relationships
+  - Mount point management (add, remove, list)
+  - MountNamespaceManager for system-wide namespace management
+  - 10 unit tests passing
+- UTS Namespace (src/kernel/uts_namespace.rs):
+  - Per-process hostname and domain name isolation
+  - Hostname validation (empty check, length limit 253)
+  - Domainname validation (length limit 253)
+  - Fully qualified domain name (FQDN) generation
+  - Hierarchical namespace management with parent/child relationships
+  - UtsNamespaceManager for system-wide namespace management
+  - 13 unit tests passing
 
 **Completed Fixes:**
 - Kernel module: removed duplicate structures, virtual_cpu, vmm_paging declarations
@@ -567,6 +582,6 @@ See [BOOT_TO_LOGIN_PATH_SPECIFICATION.md](../docs/BOOT_TO_LOGIN_PATH_SPECIFICATI
 - [PROJECT_STATUS.md](../docs/PROJECT_STATUS.md) - Current implementation status
 
 ### Last Verified
-- **Version:** 3.1
+- **Version:** 3.2
 - **Date:** 2026-09-21
 - **Verified by:** Devin AI Agent
