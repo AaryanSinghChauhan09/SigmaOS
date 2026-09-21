@@ -488,6 +488,14 @@ The M1 milestone provides a bootable ISO with kernel entry point, init system, l
   - ResourceLimits with default limits per resource
   - ResourceLimitsManager for system-wide resource limit management
   - 17 unit tests passing
+- User/Group Database (src/kernel/user_group_db.rs):
+  - User with uid, username, gid, home_dir, shell, gecos
+  - Group with gid, groupname, members
+  - UserGroupDatabase with username/uid and groupname/gid mappings
+  - UserGroupManager for system-wide user/group management
+  - Add/remove users and groups
+  - Add/remove users from groups
+  - 16 unit tests passing
 
 **Completed Fixes:**
 - Kernel module: removed duplicate structures, virtual_cpu, vmm_paging declarations
@@ -672,6 +680,6 @@ See [BOOT_TO_LOGIN_PATH_SPECIFICATION.md](../docs/BOOT_TO_LOGIN_PATH_SPECIFICATI
 - [PROJECT_STATUS.md](../docs/PROJECT_STATUS.md) - Current implementation status
 
 ### Last Verified
-- **Version:** 4.4
+- **Version:** 4.5
 - **Date:** 2026-09-21
 - **Verified by:** Devin AI Agent
