@@ -534,6 +534,15 @@ The M1 milestone provides a bootable ISO with kernel entry point, init system, l
   - Read stat and status files
   - List processes
   - 12 unit tests passing
+- Tmpfs (src/kernel/tmpfs.rs):
+  - TmpfsFile with name, data, size, permissions
+  - TmpfsDirectory with files and subdirectories
+  - Tmpfs with hierarchical directory structure
+  - Create/read/write/remove files and directories
+  - TmpfsManager for system-wide tmpfs management
+  - Navigate directory paths
+  - Calculate total size
+  - 12 unit tests passing
 
 **Completed Fixes:**
 - Kernel module: removed duplicate structures, virtual_cpu, vmm_paging declarations
@@ -718,6 +727,6 @@ See [BOOT_TO_LOGIN_PATH_SPECIFICATION.md](../docs/BOOT_TO_LOGIN_PATH_SPECIFICATI
 - [PROJECT_STATUS.md](../docs/PROJECT_STATUS.md) - Current implementation status
 
 ### Last Verified
-- **Version:** 5.0
+- **Version:** 5.1
 - **Date:** 2026-09-21
 - **Verified by:** Devin AI Agent
