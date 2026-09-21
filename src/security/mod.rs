@@ -102,8 +102,9 @@ pub use parrot_kali::{
 };
 pub use parrot::ParrotSecurityFingerprintEngine;
 pub use password::{
-    BiometricAuth, BiometricResult, BiometricType, FaceIdAuth, FingerprintAuth, PasswordCategory,
-    PasswordEntry, PasswordError, PasswordManager, PasswordManagerResult,
+    BiometricAuth, BiometricResult, BiometricType, FaceIdAuth, Fido2Auth, FingerprintAuth,
+    HardwareAuthManager, HardwareAuthPromptTarget, PasswordCategory, PasswordEntry, PasswordError,
+    PasswordManager, PasswordManagerResult,
 };
 pub use pledge::{
     promises, PledgeError, PledgeManager, PledgePromise, PledgeManager as OriginalPledgeManager,
