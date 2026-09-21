@@ -171,6 +171,9 @@ pub use timerfd::{TimerClock, TimerExpirations, TimerFd, TimerFdManager, TimerFl
 pub mod signalfd;
 pub use signalfd::{SignalFd, SignalFdFlags, SignalFdManager, SignalInfo, SignalMask};
 
+pub mod network_namespace;
+pub use network_namespace::{NetworkDevice, NetworkNamespace, NetworkNamespaceManager};
+
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
 pub use linux_parity::{
