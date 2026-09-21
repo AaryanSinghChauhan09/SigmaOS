@@ -156,10 +156,9 @@ impl SwapManager {
         }
     }
 
-    pub fn swap_in(&mut self, slot_id: u64, dest_vaddr: u64) -> Result<(), &'static str> {
-        let _ = dest_vaddr; // Suppress unused warning - would be used in real implementation
+    pub fn swap_in(&mut self, slot_id: u64, _dest_vaddr: u64) -> Result<(), &'static str> {
         self.swap_in_progress.fetch_add(1, Ordering::SeqCst);
-        
+
         if let Some(entry) = self.swap_slots.get(&slot_id) {
             if entry.entry_type != SwapEntryType::InUse {
                 self.swap_in_progress.fetch_sub(1, Ordering::SeqCst);
@@ -177,12 +176,11 @@ impl SwapManager {
         }
     }
 
-    pub fn swap_out(&mut self, src_vaddr: u64) -> Result<u64, &'static str> {
-        let _ = src_vaddr; // Suppress unused warning - would be used in real implementation
+    pub fn swap_out(&mut self, _src_vaddr: u64) -> Result<u64, &'static str> {
         self.swap_in_progress.fetch_add(1, Ordering::SeqCst);
-        
+
         let slot_id = self.allocate_swap_slot()?;
-        
+
         // Perform actual swap-out operation
         // This would read from src_vaddr and write to backing storage
         
