@@ -444,6 +444,47 @@ impl SimpleCompatibilityMatrix {
             SupportStatus::Supported,
         );
         self.devices.push(Box::new(virtio_blk));
+
+        // Seed Apple Intel Mac hardware support (Broadcom Wi-Fi, SPI Keyboard, T1/T2 Security)
+        let macbook_wifi = SimpleDevice::new(
+            self.next_id.fetch_add(1, Ordering::SeqCst),
+            DeviceType::WiFi,
+            0x14E4,
+            0x43A0,
+            "Broadcom BCM43602 802.11ac Wireless (MacBook Pro)",
+            SupportStatus::Supported,
+        );
+        self.devices.push(Box::new(macbook_wifi));
+
+        let macbook_spi_kb = SimpleDevice::new(
+            self.next_id.fetch_add(1, Ordering::SeqCst),
+            DeviceType::Chipset,
+            0x05AC,
+            0x027A,
+            "Apple SPI Keyboard & Trackpad Driver",
+            SupportStatus::Supported,
+        );
+        self.devices.push(Box::new(macbook_spi_kb));
+
+        let apple_t2_chip = SimpleDevice::new(
+            self.next_id.fetch_add(1, Ordering::SeqCst),
+            DeviceType::Chipset,
+            0x05AC,
+            0x8600,
+            "Apple T2 Security Chip & iBridge Audio/Fan Controller",
+            SupportStatus::Supported,
+        );
+        self.devices.push(Box::new(apple_t2_chip));
+    }
+
+    pub fn configure_apple_mac_quirks(&mut self) -> usize {
+        let mut count = 0;
+        for dev in &self.devices {
+            if dev.vendor_id() == 0x05AC || (dev.vendor_id() == 0x14E4 && dev.device_type() == DeviceType::WiFi) {
+                count += 1;
+            }
+        }
+        count
     }
 }
 
@@ -533,7 +574,7 @@ pub struct CompatibilityReport {
     pub results: Vec<(DeviceID, CompatibilityResult)>,
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -541,8 +582,8 @@ mod tests {
     fn test_compatibility_matrix() {
         let mut matrix = SimpleCompatibilityMatrix::new();
         matrix.seed_with_defaults();
-        assert_eq!(matrix.list_supported().len(), 7);
-        assert_eq!(matrix.list_by_type(DeviceType::WiFi).len(), 2);
+        assert_eq!(matrix.list_supported().len(), 17);
+        assert_eq!(matrix.list_by_type(DeviceType::WiFi).len(), 5);
     }
 
     #[test]
@@ -563,19 +604,19 @@ mod tests {
         matrix.seed_with_defaults();
         let diag = SimpleDiagnostics::new(matrix);
         let report = diag.run_full_scan();
-        assert_eq!(report.results.len(), 15);
+        assert_eq!(report.results.len(), 18);
     }
 
     #[test]
     fn test_expanded_device_matrix() {
         let mut matrix = SimpleCompatibilityMatrix::new();
         matrix.seed_with_defaults();
-        assert_eq!(matrix.devices.len(), 15);
-        assert_eq!(matrix.list_supported().len(), 14);
+        assert_eq!(matrix.devices.len(), 18);
+        assert_eq!(matrix.list_supported().len(), 17);
 
         let diag = SimpleDiagnostics::new(matrix);
         let report = diag.run_full_scan();
-        assert_eq!(report.results.len(), 15);
+        assert_eq!(report.results.len(), 18);
     }
 
     #[test]
@@ -583,9 +624,9 @@ mod tests {
         let mut matrix = SimpleCompatibilityMatrix::new();
         matrix.seed_with_defaults();
 
-        assert_eq!(matrix.list_by_type(DeviceType::WiFi).len(), 4);
+        assert_eq!(matrix.list_by_type(DeviceType::WiFi).len(), 5);
         assert_eq!(matrix.list_by_type(DeviceType::Storage).len(), 4);
-        assert_eq!(matrix.list_by_type(DeviceType::Chipset).len(), 2);
+        assert_eq!(matrix.list_by_type(DeviceType::Chipset).len(), 4);
         assert_eq!(matrix.list_by_type(DeviceType::GPU).len(), 2);
         assert_eq!(matrix.list_by_type(DeviceType::Printer).len(), 1);
         assert_eq!(matrix.list_by_type(DeviceType::Audio).len(), 1);
@@ -623,5 +664,13 @@ mod tests {
             .is_ok());
         assert_eq!(matrix.list_hotplug_history().len(), 1);
         assert_eq!(matrix.get_device(99).unwrap().name(), "HotplugDisk");
+    }
+
+    #[test]
+    fn test_apple_mac_hardware_quirks() {
+        let mut matrix = SimpleCompatibilityMatrix::new();
+        matrix.seed_with_defaults();
+        let quirks = matrix.configure_apple_mac_quirks();
+        assert!(quirks >= 3);
     }
 }
