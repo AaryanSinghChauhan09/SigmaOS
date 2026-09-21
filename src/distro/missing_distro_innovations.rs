@@ -1034,6 +1034,11 @@ impl MissingDistroComponentsEngine {
         engine.register_component("Nix Flakes Lock System", "NixOS", ComponentParityStatus::Implemented);
         engine.register_component("HAMMER2 PFS Clustering", "DragonFly BSD", ComponentParityStatus::Implemented);
         engine.register_component("pkgsrc Cross-Platform Infrastructure", "NetBSD", ComponentParityStatus::Implemented);
+        engine.register_component("Garuda Assistant Btrfs Snapshots", "Garuda Linux", ComponentParityStatus::Implemented);
+        engine.register_component("Vanilla OS ABRoot Slot Switcher", "Vanilla OS", ComponentParityStatus::Implemented);
+        engine.register_component("GhostBSD Netmgr Wi-Fi Station Probe", "GhostBSD", ComponentParityStatus::Implemented);
+        engine.register_component("Guix Shepherd Declarative Service Governor", "GNU Guix", ComponentParityStatus::Implemented);
+        engine.register_component("Clear Linux AutoFDO & Thermal P-State Tuner", "Clear Linux", ComponentParityStatus::Implemented);
 
         engine
     }
@@ -2313,7 +2318,7 @@ mod tests {
     #[test]
     fn test_missing_distro_components_engine() {
         let engine = MissingDistroComponentsEngine::new();
-        assert_eq!(engine.records.len(), 10);
+        assert_eq!(engine.records.len(), 15);
         assert!(engine.is_all_components_implemented());
     }
 

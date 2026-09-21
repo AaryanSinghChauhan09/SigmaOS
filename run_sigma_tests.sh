@@ -65,6 +65,13 @@ if [ -f "src/distro/missing_linux_bsd_components.rs" ]; then
     ./build/missing_components_test
 fi
 
+if [ -f "src/distro/sovereign_distro_innovations_synthesis.rs" ]; then
+    echo "Running Sovereign Distro Innovations Synthesis test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_distro_innovations_synthesis.rs --edition=2021 -o build/distro_innovations_synthesis_test
+    ./build/distro_innovations_synthesis_test
+fi
+
 if [ -f "src/distro/linux_bsd_ecosystem_synthesis.rs" ]; then
     echo "Running Extended Linux & BSD Distro Ecosystem Synthesis test suite..."
     mkdir -p build
