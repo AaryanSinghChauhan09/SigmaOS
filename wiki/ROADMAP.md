@@ -415,6 +415,14 @@ The M1 milestone provides a bootable ISO with kernel entry point, init system, l
   - TimerExpirations for reading expiration counts
   - TimerFdManager for system-wide timer management
   - 12 unit tests passing
+- Signalfd (src/kernel/signalfd.rs):
+  - SignalFdFlags (non_blocking, close_on_exec)
+  - SignalMask with bit-based signal filtering
+  - SignalInfo with signo, errno, code, pid, uid, value
+  - SignalFd with signal queue and mask-based filtering
+  - Signal read operation that clears the queue
+  - SignalFdManager for system-wide signalfd management
+  - 12 unit tests passing
 
 **Completed Fixes:**
 - Kernel module: removed duplicate structures, virtual_cpu, vmm_paging declarations
@@ -599,6 +607,6 @@ See [BOOT_TO_LOGIN_PATH_SPECIFICATION.md](../docs/BOOT_TO_LOGIN_PATH_SPECIFICATI
 - [PROJECT_STATUS.md](../docs/PROJECT_STATUS.md) - Current implementation status
 
 ### Last Verified
-- **Version:** 3.4
+- **Version:** 3.5
 - **Date:** 2026-09-21
 - **Verified by:** Devin AI Agent
