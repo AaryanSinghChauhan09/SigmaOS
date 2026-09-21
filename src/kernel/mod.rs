@@ -87,6 +87,9 @@ pub use mount::{MountFlags, MountNamespace, MountPoint};
 pub mod shm;
 pub use shm::{ShmManager, ShmSegment};
 
+pub mod msgqueue;
+pub use msgqueue::{Message, MessageQueue, MessageQueueManager};
+
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
 pub use linux_parity::{
