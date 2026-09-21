@@ -243,36 +243,49 @@ pub enum PackagePriority {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum PackageFormat {
     #[default]
-    Deb,        // apt/dpkg
-    Rpm,        // yum/dnf/zypper
-    Pacman,     // pacman/pkgbuild
-    Snap,       // snap/squashfs
-    Flatpak,    // flatpak sandbox
+    SigmaPkg,   // Native SigmaOS format
+    Sigma,      // SigmaOS native alias
+    Sovereign,  // Sovereign package format
+    Deb,        // apt/dpkg (.deb)
+    Apt,        // Debian APT alias
+    Udeb,       // Debian installer (.udeb)
+    Superdeb,   // Deepin Superdeb (.superdeb)
+    Rpm,        // RPM package (.rpm)
+    Yum,        // RedHat YUM alias
+    Drpm,       // Delta RPM (.drpm)
+    Zypper,     // OpenSUSE Zypper (.zypper)
+    Pacman,     // Arch Pacman / ALPM (.pkg.tar.zst)
+    Cachy,      // CachyOS package (.cachy)
+    CachyOS,    // CachyOS alias
+    Snap,       // Snapcraft container (.snap)
+    Flatpak,    // Flatpak sandbox (.flatpak)
     AppImage,   // AppImage single-file container
-    SigmaPkg,   // native SigmaOS format
     Air,        // Adobe AIR (.air)
     Bottle,     // Homebrew Bottle (.bottle)
     Ipa,        // iOS App (.ipa)
-    Ports,      // BSD Ports (.ports)
+    Ports,      // FreeBSD / OpenBSD Ports (.ports)
     Pkg,        // macOS / BSD / Solaris PKG (.pkg)
     Aab,        // Android App Bundle (.aab)
-    Apk,        // Android Package / Alpine Package (.apk)
+    Apk,        // Alpine / Android Package (.apk)
     Eopkg,      // Solus eopkg (.eopkg)
     Nixpkg,     // Nix store package (.nixpkg)
-    Ebuild,     // Gentoo ebuild (.ebuild / .portage)
+    Nix,        // Nix expression (.nix)
+    Ebuild,     // Gentoo ebuild (.ebuild)
+    Portage,    // Gentoo Portage (.portage)
     TarGz,      // Compressed Tar (.tar.gz, .tgz)
-    Xz,         // Compressed XZ archive (.xz, .tar.xz)
+    TarXz,      // Compressed Tar XZ (.tar.xz, .pkg.tar.xz)
+    Xz,         // Compressed XZ archive (.xz)
+    Tar,        // Plain tarball (.tar)
     App,        // macOS App bundle (.app)
+    AppBundle,  // macOS App bundle alias
     Hap,        // HarmonyOS Ability Package (.hap)
-    Pisi,       // Pardus / Solus PiSi (.PiSi)
-    Superdeb,   // Deepin Superdeb (.superdeb)
+    Pisi,       // Pardus / Solus PiSi (.pisi)
     Lzm,        // Slax Linux Module (.lzm)
     Pup,        // Puppy Linux Package (.pup)
     Pet,        // Puppy Extra Tarball (.pet)
-    Tar,        // Plain tarball (.tar)
     Xbps,       // Void Linux (.xbps)
-    Zypper,     // OpenSUSE Zypper (.zypper)
     Guix,       // GNU Guix (.guix / .scm)
+    GuixNar,    // GNU Guix NAR archive (.nar)
     Moss,       // Solus Moss (.moss)
     Hpkg,       // Haiku Package (.hpkg)
     Tcz,        // Tiny Core Linux (.tcz)
@@ -283,30 +296,42 @@ pub enum PackageFormat {
     Puk,        // Portable Package (.puk)
     Dmg,        // macOS Disk Image (.dmg)
     Cports,     // Chimera Linux (.cports)
-    Cachy,      // CachyOS Package (.cachy)
-    Nix,        // Nix expression / package (.nix)
-    Txz,        // Slackware/FreeBSD txz package (.txz)
-    CachyOS,    // CachyOS (.cachyos)
-    Swupd,      // Clear Linux swupd (.swupd)
-    Starling,   // Starling format (.starling)
     Dports,     // DragonFly BSD DPorts (.dports)
     SlackBuild, // Slackware SlackBuild (.slackbuild / .tlz / .tbz)
-    Crux,       // CRUX Linux (.crux / .pkgfile)
-    Drpm,       // Delta RPM (.drpm)
+    Txz,        // Slackware/FreeBSD txz package (.txz)
+    Crux,       // CRUX Linux (.crux)
+    Pkgfile,    // CRUX package file (.pkgfile)
     Stratum,    // Bedrock Linux Stratum (.stratum)
     OpenBsdPkg, // OpenBSD package (.openbsd.tgz)
     Ipk,        // OpenWrt IPK package (.ipk)
     Opkg,       // OPKG package (.opkg)
     SolarisIps, // Solaris IPS package (.p5p / .ips)
-    GuixNar,    // GNU Guix NAR archive (.nar)
-    Spack,      // Spack package (.spack)
+    Spack,      // Spack HPC package manager (.spack)
     Conan,      // Conan C/C++ package (.conan)
     Wheel,      // Python Wheel package (.whl)
-    Crate,      // Rust Cargo Crate (.crate)
+    Crate,      // Rust Cargo crate (.crate)
     Gem,        // Ruby Gem (.gem)
     Nupkg,      // .NET NuGet package (.nupkg)
     Vcpkg,      // Microsoft vcpkg (.vcpkg)
     NarInfo,    // Nix NarInfo metadata (.narinfo)
+    Swupd,      // Clear Linux swupd (.swupd)
+    Starling,   // StarlingX (.starling)
+    Msi,        // Windows MSI (.msi)
+    Msix,       // Windows MSIX (.msix)
+    Appx,       // Windows AppX (.appx)
+    Makeself,   // Makeself runnable archive (.run)
+    ZeroInstall, // ZeroInstall package (.zpk)
+    Kmod,       // Kernel Module package (.kmod)
+    Kmp,        // SUSE Kernel Module Package (.kmp)
+    Jar,        // Java Archive (.jar)
+    Npm,        // Node Package Manager (.npm)
+    Phar,       // PHP Archive (.phar)
+    Cpan,       // Perl CPAN package (.cpan)
+    Rock,       // LuaRocks package (.rock)
+    Hex,        // Elixir Hex package (.hex)
+    Cabal,      // Haskell Cabal package (.cabal)
+    Jl,         // Julia package (.jl)
+    Rpkg,       // R CRAN package (.rpkg)
 }
 
 impl PackageFormat {
@@ -441,6 +466,42 @@ impl PackageFormat {
             Some(PackageFormat::Vcpkg)
         } else if normalized.ends_with(".narinfo") {
             Some(PackageFormat::NarInfo)
+        } else if normalized.ends_with(".msi") {
+            Some(PackageFormat::Msi)
+        } else if normalized.ends_with(".msix") {
+            Some(PackageFormat::Msix)
+        } else if normalized.ends_with(".appx") {
+            Some(PackageFormat::Appx)
+        } else if normalized.ends_with(".run") {
+            Some(PackageFormat::Makeself)
+        } else if normalized.ends_with(".zpk") {
+            Some(PackageFormat::ZeroInstall)
+        } else if normalized.ends_with(".kmod") {
+            Some(PackageFormat::Kmod)
+        } else if normalized.ends_with(".kmp") {
+            Some(PackageFormat::Kmp)
+        } else if normalized.ends_with(".jar") {
+            Some(PackageFormat::Jar)
+        } else if normalized.ends_with(".npm") || normalized.ends_with(".tgz") && normalized.contains("npm") {
+            Some(PackageFormat::Npm)
+        } else if normalized.ends_with(".phar") {
+            Some(PackageFormat::Phar)
+        } else if normalized.ends_with(".cpan") {
+            Some(PackageFormat::Cpan)
+        } else if normalized.ends_with(".rock") {
+            Some(PackageFormat::Rock)
+        } else if normalized.ends_with(".hex") {
+            Some(PackageFormat::Hex)
+        } else if normalized.ends_with(".cabal") {
+            Some(PackageFormat::Cabal)
+        } else if normalized.ends_with(".jl") {
+            Some(PackageFormat::Jl)
+        } else if normalized.ends_with(".rpkg") {
+            Some(PackageFormat::Rpkg)
+        } else if normalized.ends_with(".swupd") {
+            Some(PackageFormat::Swupd)
+        } else if normalized.ends_with(".starling") {
+            Some(PackageFormat::Starling)
         } else {
             None
         }
@@ -3003,5 +3064,80 @@ mod tests {
         let nix_pkg = UniversalPackageFormatBridge::detect_and_transpile("bash.nixpkg", b"nix_data").unwrap();
         assert!(nix_pkg.formats.contains(&PackageFormat::Nixpkg));
         assert!(nix_pkg.provides.contains(&"nixos_compat".to_string()));
+    }
+
+    #[test]
+    fn test_all_85_package_formats_detection() {
+        let cases = [
+            ("test.deb", PackageFormat::Deb),
+            ("test.rpm", PackageFormat::Rpm),
+            ("test.pkg.tar.zst", PackageFormat::Pacman),
+            ("test.apk", PackageFormat::Apk),
+            ("test.ebuild", PackageFormat::Ebuild),
+            ("test.xbps", PackageFormat::Xbps),
+            ("test.eopkg", PackageFormat::Eopkg),
+            ("test.moss", PackageFormat::Moss),
+            ("test.slackbuild", PackageFormat::SlackBuild),
+            ("test.crux", PackageFormat::Crux),
+            ("test.cports", PackageFormat::Cports),
+            ("test.tcz", PackageFormat::Tcz),
+            ("test.gobo", PackageFormat::Gobo),
+            ("test.lzm", PackageFormat::Lzm),
+            ("test.pup", PackageFormat::Pup),
+            ("test.pet", PackageFormat::Pet),
+            ("test.stratum", PackageFormat::Stratum),
+            ("test.swupd", PackageFormat::Swupd),
+            ("test.ipk", PackageFormat::Ipk),
+            ("test.opkg", PackageFormat::Opkg),
+            ("test.snap", PackageFormat::Snap),
+            ("test.flatpak", PackageFormat::Flatpak),
+            ("test.appimage", PackageFormat::AppImage),
+            ("test.commit", PackageFormat::Ostree),
+            ("test.sfs", PackageFormat::Sfs),
+            ("test.ports", PackageFormat::Ports),
+            ("test.pkg", PackageFormat::Pkg),
+            ("test.openbsd.tgz", PackageFormat::OpenBsdPkg),
+            ("test.pkgsrc", PackageFormat::Pkgsrc),
+            ("test.dports", PackageFormat::Dports),
+            ("test.ips", PackageFormat::SolarisIps),
+            ("test.dmg", PackageFormat::Dmg),
+            ("test.app", PackageFormat::App),
+            ("test.bottle", PackageFormat::Bottle),
+            ("test.ipa", PackageFormat::Ipa),
+            ("test.aab", PackageFormat::Aab),
+            ("test.hap", PackageFormat::Hap),
+            ("test.hpkg", PackageFormat::Hpkg),
+            ("test.msi", PackageFormat::Msi),
+            ("test.msix", PackageFormat::Msix),
+            ("test.appx", PackageFormat::Appx),
+            ("test.run", PackageFormat::Makeself),
+            ("test.zpk", PackageFormat::ZeroInstall),
+            ("test.nixpkg", PackageFormat::Nixpkg),
+            ("test.nix", PackageFormat::Nixpkg),
+            ("test.guix", PackageFormat::Guix),
+            ("test.spack", PackageFormat::Spack),
+            ("test.conan", PackageFormat::Conan),
+            ("test.whl", PackageFormat::Wheel),
+            ("test.crate", PackageFormat::Crate),
+            ("test.gem", PackageFormat::Gem),
+            ("test.nupkg", PackageFormat::Nupkg),
+            ("test.vcpkg", PackageFormat::Vcpkg),
+            ("test.kmod", PackageFormat::Kmod),
+            ("test.jar", PackageFormat::Jar),
+            ("test.npm", PackageFormat::Npm),
+            ("test.phar", PackageFormat::Phar),
+            ("test.cpan", PackageFormat::Cpan),
+            ("test.rock", PackageFormat::Rock),
+            ("test.hex", PackageFormat::Hex),
+            ("test.cabal", PackageFormat::Cabal),
+            ("test.jl", PackageFormat::Jl),
+            ("test.rpkg", PackageFormat::Rpkg),
+            ("test.sigpkg", PackageFormat::SigmaPkg),
+        ];
+
+        for (filename, expected) in cases {
+            let detected = PackageFormat::from_filename(filename);
+            assert_eq!(detected, Some(expected), "Failed detecting format for {}", filename);
+        }
     }
 }
