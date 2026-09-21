@@ -605,6 +605,34 @@ impl UniversalKernelFormatEngine {
             .ok_or("No default command line embedded in kernel image header")
     }
 
+    /// Compute FNV-1a 64-bit checksum of kernel image payload
+    pub fn calculate_image_checksum(&self, payload: &[u8]) -> u64 {
+        let mut hash = 0xcbf29ce484222325u64;
+        for &b in payload {
+            hash ^= b as u64;
+            hash = hash.wrapping_mul(0x100000001b3u64);
+        }
+        hash
+    }
+
+    /// Verify kernel image checksum and format detection in a single step
+    pub fn verify_checksum_and_format(
+        &self,
+        payload: &[u8],
+        expected_checksum: u64,
+        filename_hint: Option<&str>,
+    ) -> Result<KernelFormat, &'static str> {
+        if payload.is_empty() {
+            return Err("Payload is empty");
+        }
+        let checksum = self.calculate_image_checksum(payload);
+        if checksum != expected_checksum {
+            return Err("Kernel payload checksum mismatch");
+        }
+        self.detect_format(payload, filename_hint)
+            .ok_or("Unable to detect valid kernel format")
+    }
+
     /// Verify kernel image header checksums or signatures
     pub fn verify_kernel_integrity(&self, payload: &[u8], format: KernelFormat) -> bool {
         if payload.is_empty() {
@@ -738,5 +766,18 @@ mod tests {
         assert_eq!(apple_parsed.format, KernelFormat::AppleMachOKernel);
 
         assert!(engine.verify_kernel_integrity(&[b'M', b'Z'], KernelFormat::WindowsNtKernel));
+    }
+
+    #[test]
+    fn test_checksum_calculation_and_verification() {
+        let engine = UniversalKernelFormatEngine::new();
+        let payload = vec![0x7F, b'E', b'L', b'F', 0x01, 0x02, 0x03, 0x04];
+        let checksum = engine.calculate_image_checksum(&payload);
+        assert_ne!(checksum, 0);
+
+        let verified_format = engine.verify_checksum_and_format(&payload, checksum, Some("freebsd_kernel")).unwrap();
+        assert_eq!(verified_format, KernelFormat::FreeBsdElfKernel);
+
+        assert!(engine.verify_checksum_and_format(&payload, checksum + 1, Some("freebsd_kernel")).is_err());
     }
 }
