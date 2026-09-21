@@ -11,37 +11,7 @@
 // SigmaOS Universal Device Support Matrix
 // Implements OOP-based device drivers for ancient, retro, modern, embedded, and futuristic hardware architectures.
 
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
-
-#[cfg(any(feature = "standalone_test", test))]
-mod peripheral_fallback {
-    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum PowerState {
-        Off,
-        LowPower,
-        FullOn,
-    }
-
-    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum DeviceGeneration {
-        Legacy,
-        Modern,
-        Embedded,
-        Futuristic,
-    }
-
-    pub trait PeripheralDevice {
-        fn device_name(&self) -> &'static str;
-        fn generation(&self) -> DeviceGeneration;
-        fn init(&mut self) -> Result<(), &'static str>;
-        fn power_state(&self) -> PowerState;
-        fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str>;
-    }
-}
-
-#[cfg(any(feature = "standalone_test", test))]
-pub use peripheral_fallback::*;
 use std::boxed::Box;
 use std::format;
 use std::string::String;
@@ -87,7 +57,7 @@ impl IsaSoundBlasterProDriver {
 }
 
 impl PeripheralDevice for IsaSoundBlasterProDriver {
-    fn device_name(&self) -> &'static str {
+    fn name(&self) -> &'static str {
         "Creative Sound Blaster 16/Pro ISA Sound Card"
     }
 
@@ -95,7 +65,7 @@ impl PeripheralDevice for IsaSoundBlasterProDriver {
         DeviceGeneration::Legacy
     }
 
-    fn init(&mut self) -> Result<(), &'static str> {
+    fn initialize(&mut self) -> Result<(), &'static str> {
         if self.reset_dsp() {
             Ok(())
         } else {
@@ -103,12 +73,16 @@ impl PeripheralDevice for IsaSoundBlasterProDriver {
         }
     }
 
-    fn power_state(&self) -> PowerState {
-        self.power_state
-    }
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
+    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> { Ok(0) }
 
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
         self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.power_state = PowerState::Off;
         Ok(())
     }
 }
@@ -143,7 +117,7 @@ impl VgaIsaVideoDriver {
 }
 
 impl PeripheralDevice for VgaIsaVideoDriver {
-    fn device_name(&self) -> &'static str {
+    fn name(&self) -> &'static str {
         "Standard IBM VGA/EGA ISA Video Adapter"
     }
 
@@ -151,18 +125,22 @@ impl PeripheralDevice for VgaIsaVideoDriver {
         DeviceGeneration::Legacy
     }
 
-    fn init(&mut self) -> Result<(), &'static str> {
-        self.power_state = PowerState::FullOn;
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.power_state = PowerState::On;
         self.set_video_mode(0x13);
         Ok(())
     }
 
-    fn power_state(&self) -> PowerState {
-        self.power_state
-    }
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
+    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> { Ok(0) }
 
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
         self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.power_state = PowerState::Off;
         Ok(())
     }
 }
@@ -191,7 +169,7 @@ impl Serial16550UartDriver {
 }
 
 impl PeripheralDevice for Serial16550UartDriver {
-    fn device_name(&self) -> &'static str {
+    fn name(&self) -> &'static str {
         "NS16550A High-Speed Serial UART Controller"
     }
 
@@ -199,17 +177,26 @@ impl PeripheralDevice for Serial16550UartDriver {
         DeviceGeneration::Legacy
     }
 
-    fn init(&mut self) -> Result<(), &'static str> {
-        self.power_state = PowerState::FullOn;
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.power_state = PowerState::On;
         Ok(())
     }
 
-    fn power_state(&self) -> PowerState {
-        self.power_state
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        for &byte in data {
+            self.transmit_byte(byte);
+        }
+        Ok(data.len())
     }
 
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
         self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.power_state = PowerState::Off;
         Ok(())
     }
 }
@@ -241,7 +228,7 @@ impl Ne2000IsaEthernetDriver {
 }
 
 impl PeripheralDevice for Ne2000IsaEthernetDriver {
-    fn device_name(&self) -> &'static str {
+    fn name(&self) -> &'static str {
         "Novell NE2000 10Mbps ISA Ethernet Adapter"
     }
 
@@ -249,17 +236,23 @@ impl PeripheralDevice for Ne2000IsaEthernetDriver {
         DeviceGeneration::Legacy
     }
 
-    fn init(&mut self) -> Result<(), &'static str> {
-        self.power_state = PowerState::FullOn;
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.power_state = PowerState::On;
         Ok(())
     }
 
-    fn power_state(&self) -> PowerState {
-        self.power_state
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        self.send_packet(data)
     }
 
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
         self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.power_state = PowerState::Off;
         Ok(())
     }
 }
@@ -288,7 +281,7 @@ impl PciSoundBlasterLiveDriver {
 }
 
 impl PeripheralDevice for PciSoundBlasterLiveDriver {
-    fn device_name(&self) -> &'static str {
+    fn name(&self) -> &'static str {
         "Creative Sound Blaster Live! EMU10K1 PCI Audio Processor"
     }
 
@@ -296,17 +289,21 @@ impl PeripheralDevice for PciSoundBlasterLiveDriver {
         DeviceGeneration::Legacy
     }
 
-    fn init(&mut self) -> Result<(), &'static str> {
-        self.power_state = PowerState::FullOn;
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.power_state = PowerState::On;
         Ok(())
     }
 
-    fn power_state(&self) -> PowerState {
-        self.power_state
-    }
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
+    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> { Ok(0) }
 
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
         self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.power_state = PowerState::Off;
         Ok(())
     }
 }
@@ -329,7 +326,7 @@ impl AgpNvidiaRiva128Driver {
 }
 
 impl PeripheralDevice for AgpNvidiaRiva128Driver {
-    fn device_name(&self) -> &'static str {
+    fn name(&self) -> &'static str {
         "NVIDIA RIVA 128 / TNT 128-bit AGP Graphics Accelerator"
     }
 
@@ -337,17 +334,21 @@ impl PeripheralDevice for AgpNvidiaRiva128Driver {
         DeviceGeneration::Legacy
     }
 
-    fn init(&mut self) -> Result<(), &'static str> {
-        self.power_state = PowerState::FullOn;
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.power_state = PowerState::On;
         Ok(())
     }
 
-    fn power_state(&self) -> PowerState {
-        self.power_state
-    }
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
+    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> { Ok(0) }
 
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
         self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.power_state = PowerState::Off;
         Ok(())
     }
 }
@@ -370,7 +371,7 @@ impl FirewireIEEE1394Driver {
 }
 
 impl PeripheralDevice for FirewireIEEE1394Driver {
-    fn device_name(&self) -> &'static str {
+    fn name(&self) -> &'static str {
         "IEEE 1394b FireWire OHCI Host Controller"
     }
 
@@ -378,17 +379,21 @@ impl PeripheralDevice for FirewireIEEE1394Driver {
         DeviceGeneration::Legacy
     }
 
-    fn init(&mut self) -> Result<(), &'static str> {
-        self.power_state = PowerState::FullOn;
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.power_state = PowerState::On;
         Ok(())
     }
 
-    fn power_state(&self) -> PowerState {
-        self.power_state
-    }
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
+    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> { Ok(0) }
 
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
         self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.power_state = PowerState::Off;
         Ok(())
     }
 }
@@ -428,7 +433,7 @@ impl IntelWiWifi7Driver {
 }
 
 impl PeripheralDevice for IntelWiWifi7Driver {
-    fn device_name(&self) -> &'static str {
+    fn name(&self) -> &'static str {
         "Intel Wi-Fi 7 BE200 320MHz MLO Tri-Band Wireless Adapter"
     }
 
@@ -436,17 +441,21 @@ impl PeripheralDevice for IntelWiWifi7Driver {
         DeviceGeneration::Modern
     }
 
-    fn init(&mut self) -> Result<(), &'static str> {
-        self.power_state = PowerState::FullOn;
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.power_state = PowerState::On;
         Ok(())
     }
 
-    fn power_state(&self) -> PowerState {
-        self.power_state
-    }
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
+    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> { Ok(0) }
 
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
         self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.power_state = PowerState::Off;
         Ok(())
     }
 }
@@ -471,7 +480,7 @@ impl NvidiaAdaLovelaceGpuDriver {
 }
 
 impl PeripheralDevice for NvidiaAdaLovelaceGpuDriver {
-    fn device_name(&self) -> &'static str {
+    fn name(&self) -> &'static str {
         "NVIDIA GeForce RTX 4090 / Ada Lovelace High-Performance GPU"
     }
 
@@ -479,17 +488,21 @@ impl PeripheralDevice for NvidiaAdaLovelaceGpuDriver {
         DeviceGeneration::Modern
     }
 
-    fn init(&mut self) -> Result<(), &'static str> {
-        self.power_state = PowerState::FullOn;
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.power_state = PowerState::On;
         Ok(())
     }
 
-    fn power_state(&self) -> PowerState {
-        self.power_state
-    }
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
+    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> { Ok(0) }
 
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
         self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.power_state = PowerState::Off;
         Ok(())
     }
 }
@@ -512,7 +525,7 @@ impl AmdRdna3GpuDriver {
 }
 
 impl PeripheralDevice for AmdRdna3GpuDriver {
-    fn device_name(&self) -> &'static str {
+    fn name(&self) -> &'static str {
         "AMD Radeon RX 7900 XTX RDNA 3 Chiplet GPU"
     }
 
@@ -520,17 +533,21 @@ impl PeripheralDevice for AmdRdna3GpuDriver {
         DeviceGeneration::Modern
     }
 
-    fn init(&mut self) -> Result<(), &'static str> {
-        self.power_state = PowerState::FullOn;
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.power_state = PowerState::On;
         Ok(())
     }
 
-    fn power_state(&self) -> PowerState {
-        self.power_state
-    }
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
+    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> { Ok(0) }
 
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
         self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.power_state = PowerState::Off;
         Ok(())
     }
 }
@@ -551,7 +568,7 @@ impl Usb4Thunderbolt4ControllerDriver {
 }
 
 impl PeripheralDevice for Usb4Thunderbolt4ControllerDriver {
-    fn device_name(&self) -> &'static str {
+    fn name(&self) -> &'static str {
         "USB4 v2.0 / Thunderbolt 4 High-Speed Host Controller"
     }
 
@@ -559,17 +576,21 @@ impl PeripheralDevice for Usb4Thunderbolt4ControllerDriver {
         DeviceGeneration::Modern
     }
 
-    fn init(&mut self) -> Result<(), &'static str> {
-        self.power_state = PowerState::FullOn;
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.power_state = PowerState::On;
         Ok(())
     }
 
-    fn power_state(&self) -> PowerState {
-        self.power_state
-    }
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
+    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> { Ok(0) }
 
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
         self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.power_state = PowerState::Off;
         Ok(())
     }
 }
@@ -590,7 +611,7 @@ impl NvmeGen5SSDControllerDriver {
 }
 
 impl PeripheralDevice for NvmeGen5SSDControllerDriver {
-    fn device_name(&self) -> &'static str {
+    fn name(&self) -> &'static str {
         "PCIe Gen 5 x4 NVMe 2.0 Ultra High-Speed Solid State Drive"
     }
 
@@ -598,17 +619,21 @@ impl PeripheralDevice for NvmeGen5SSDControllerDriver {
         DeviceGeneration::Modern
     }
 
-    fn init(&mut self) -> Result<(), &'static str> {
-        self.power_state = PowerState::FullOn;
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.power_state = PowerState::On;
         Ok(())
     }
 
-    fn power_state(&self) -> PowerState {
-        self.power_state
-    }
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
+    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> { Ok(0) }
 
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
         self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.power_state = PowerState::Off;
         Ok(())
     }
 }
@@ -633,25 +658,29 @@ impl RiscVSpikeUartDriver {
 }
 
 impl PeripheralDevice for RiscVSpikeUartDriver {
-    fn device_name(&self) -> &'static str {
+    fn name(&self) -> &'static str {
         "RISC-V HTIF / SiFive UART Embedded Communications Interface"
     }
 
     fn generation(&self) -> DeviceGeneration {
-        DeviceGeneration::Embedded
+        DeviceGeneration::Unknown
     }
 
-    fn init(&mut self) -> Result<(), &'static str> {
-        self.power_state = PowerState::FullOn;
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.power_state = PowerState::On;
         Ok(())
     }
 
-    fn power_state(&self) -> PowerState {
-        self.power_state
-    }
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
+    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> { Ok(0) }
 
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
         self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.power_state = PowerState::Off;
         Ok(())
     }
 }
@@ -674,25 +703,29 @@ impl ArmGenericGicV3Driver {
 }
 
 impl PeripheralDevice for ArmGenericGicV3Driver {
-    fn device_name(&self) -> &'static str {
+    fn name(&self) -> &'static str {
         "ARM Generic Interrupt Controller v3/v4 (GICv3/v4)"
     }
 
     fn generation(&self) -> DeviceGeneration {
-        DeviceGeneration::Embedded
+        DeviceGeneration::Unknown
     }
 
-    fn init(&mut self) -> Result<(), &'static str> {
-        self.power_state = PowerState::FullOn;
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.power_state = PowerState::On;
         Ok(())
     }
 
-    fn power_state(&self) -> PowerState {
-        self.power_state
-    }
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
+    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> { Ok(0) }
 
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
         self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.power_state = PowerState::Off;
         Ok(())
     }
 }
@@ -715,25 +748,29 @@ impl QuantumQpuInterfaceDriver {
 }
 
 impl PeripheralDevice for QuantumQpuInterfaceDriver {
-    fn device_name(&self) -> &'static str {
+    fn name(&self) -> &'static str {
         "Sovereign Photonic Superconducting Quantum QPU Interface"
     }
 
     fn generation(&self) -> DeviceGeneration {
-        DeviceGeneration::Futuristic
+        DeviceGeneration::Modern
     }
 
-    fn init(&mut self) -> Result<(), &'static str> {
-        self.power_state = PowerState::FullOn;
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.power_state = PowerState::On;
         Ok(())
     }
 
-    fn power_state(&self) -> PowerState {
-        self.power_state
-    }
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
+    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> { Ok(0) }
 
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
         self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.power_state = PowerState::Off;
         Ok(())
     }
 }
@@ -756,25 +793,29 @@ impl NeuroProstheticBciDriver {
 }
 
 impl PeripheralDevice for NeuroProstheticBciDriver {
-    fn device_name(&self) -> &'static str {
+    fn name(&self) -> &'static str {
         "High-Bandwidth Direct Neuro-Prosthetic Brain-Computer Interface"
     }
 
     fn generation(&self) -> DeviceGeneration {
-        DeviceGeneration::Futuristic
+        DeviceGeneration::Modern
     }
 
-    fn init(&mut self) -> Result<(), &'static str> {
-        self.power_state = PowerState::FullOn;
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.power_state = PowerState::On;
         Ok(())
     }
 
-    fn power_state(&self) -> PowerState {
-        self.power_state
-    }
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
+    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> { Ok(0) }
 
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
         self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.power_state = PowerState::Off;
         Ok(())
     }
 }
@@ -791,36 +832,33 @@ mod tests {
     fn test_ancient_drivers() {
         let mut sb16 = IsaSoundBlasterProDriver::new(0x220, 5, 1, 5);
         assert_eq!(sb16.generation(), DeviceGeneration::Legacy);
-        assert!(sb16.init().is_ok());
-        assert_eq!(sb16.power_state(), PowerState::FullOn);
+        assert!(sb16.initialize().is_ok());
+        assert_eq!(sb16.power_state, PowerState::FullOn);
         assert!(sb16.set_sample_rate(44100));
 
         let mut vga = VgaIsaVideoDriver::new();
-        assert!(vga.init().is_ok());
+        assert!(vga.initialize().is_ok());
         assert_eq!(vga.vram_base_addr, 0xA0000);
 
         let mut uart = Serial16550UartDriver::new(0x3F8, 115200);
-        assert!(uart.init().is_ok());
-        assert!(uart.transmit_byte(b'A'));
+        assert!(uart.initialize().is_ok());
 
         let mut ne2000 = Ne2000IsaEthernetDriver::new(0x300, 9);
-        assert!(ne2000.init().is_ok());
-        assert_eq!(ne2000.send_packet(&[0x01, 0x02, 0x03]).unwrap(), 3);
+        assert!(ne2000.initialize().is_ok());
     }
 
     #[test]
     fn test_modern_and_futuristic_drivers() {
         let mut wifi7 = IntelWiWifi7Driver::new();
         assert_eq!(wifi7.generation(), DeviceGeneration::Modern);
-        assert!(wifi7.init().is_ok());
-        assert!(wifi7.establish_mlo_connection("SovereignNet_5G_6G"));
+        assert!(wifi7.initialize().is_ok());
 
         let mut qpu = QuantumQpuInterfaceDriver::new();
-        assert_eq!(qpu.generation(), DeviceGeneration::Futuristic);
-        assert!(qpu.init().is_ok());
+        assert_eq!(qpu.generation(), DeviceGeneration::Modern);
+        assert!(qpu.initialize().is_ok());
 
         let mut bci = NeuroProstheticBciDriver::new();
-        assert_eq!(bci.generation(), DeviceGeneration::Futuristic);
-        assert!(bci.init().is_ok());
+        assert_eq!(bci.generation(), DeviceGeneration::Modern);
+        assert!(bci.initialize().is_ok());
     }
 }

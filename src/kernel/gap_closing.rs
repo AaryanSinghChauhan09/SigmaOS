@@ -20,7 +20,7 @@
 
 use std::boxed::Box;
 use std::string::String;
-use crate::driver::framework::DeviceObject;
+use crate::driver::framework::DeviceObject as FrameworkDeviceObject;
 use std::vec::Vec;
 use core::option::Option::{self, None, Some};
 use core::result::Result::{self, Err, Ok};

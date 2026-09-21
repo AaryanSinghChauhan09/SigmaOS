@@ -188,28 +188,9 @@ pub use uts_namespace::{UtsNamespace, UtsNamespaceManager};
 pub mod semaphore;
 pub use semaphore::{Semaphore, SemaphoreManager, SemaphoreResult, SemaphoreSet};
 
-pub mod timerfd;
-pub use timerfd::{TimerClock, TimerExpirations, TimerFd, TimerFdManager, TimerFlags, TimerSpec};
-
-pub mod signalfd;
-pub use signalfd::{SignalFd, SignalFdFlags, SignalFdManager, SignalInfo, SignalMask};
-
 pub mod network_namespace;
 pub use network_namespace::{NetworkDevice, NetworkNamespace, NetworkNamespaceManager};
 
-pub mod epoll;
-pub use epoll::{EpollEvent, EpollEvents, EpollInstance, EpollManager, EpollOp};
-
-pub mod eventfd;
-pub use eventfd::{EventFd, EventFdFlags, EventFdManager};
-
-pub mod pipe;
-pub use pipe::{Pipe, PipeFlags, PipeManager};
-
-pub mod socket;
-pub use socket::{Socket, SocketDomain, SocketManager, SocketProtocol, SocketState, SocketType};
-
-pub mod linux_bsd_innovations;
 pub mod linux_parity;
 pub use linux_parity::{
     CmaRegion, KernelTimer, LinuxCmaAllocatorEngine, LinuxKernelTimerWheel,
@@ -217,7 +198,6 @@ pub use linux_parity::{
 };
 pub mod memory;
 pub mod meta;
-pub mod module_loader;
 pub mod namespaces;
 pub use namespaces::{Namespace, NamespaceId, NamespaceManager, NamespaceType};
 pub mod net;
