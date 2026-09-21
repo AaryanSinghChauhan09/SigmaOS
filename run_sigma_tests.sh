@@ -79,6 +79,12 @@ if [ -f "src/distro/sovereign_omarchy_theme_unlock_synthesis.rs" ]; then
     ./build/sovereign_omarchy_themes_test
 fi
 
+if [ -f "src/distro/omarchy_update_pipeline_synthesis.rs" ]; then
+    echo -e "${YELLOW}Testing Omarchy Update Pipeline & Pacman Guard Synthesis...${NC}"
+    rustc --test src/distro/omarchy_update_pipeline_synthesis.rs --edition=2021 -o build/omarchy_update_pipeline_test
+    ./build/omarchy_update_pipeline_test
+fi
+
 if [ -f "src/distro/linux_bsd_ecosystem_synthesis.rs" ]; then
     echo "Running Extended Linux & BSD Distro Ecosystem Synthesis test suite..."
     mkdir -p build
