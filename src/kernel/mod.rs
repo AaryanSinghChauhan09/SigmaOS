@@ -238,6 +238,8 @@ pub mod scheduler;
 pub mod subsystems;
 pub mod timer_subsystem;
 pub mod workqueue;
+pub mod wdk_core;
+pub use wdk_core::*;
 
 pub use missing_linux_kernel_components::{
     BpfRingBufferStreamEngine, EpollCtlOp, EpollEvent, KernelAuditRecord, KernelAuditRecordType,
