@@ -96,6 +96,106 @@ impl OmarchyTheme {
     }
 }
 
+/// Omarchy Development Tools, Editors, Mise, Docker, and GitHub CLI Manager
+#[derive(Debug, Clone)]
+pub struct OmarchyDevToolsEngine {
+    pub default_editor: String,
+    pub installed_editors: Vec<String>,
+    pub theme_matched_editors: Vec<String>,
+    pub mise_runtimes: Vec<String>,
+    pub sudoless_docker: bool,
+    pub docker_db_services: Vec<String>,
+    pub gh_cli_installed: bool,
+}
+
+impl OmarchyDevToolsEngine {
+    pub fn new() -> Self {
+        Self {
+            default_editor: "neovim".to_string(),
+            installed_editors: vec![
+                "neovim".to_string(),
+                "vi".to_string(),
+                "vscode".to_string(),
+                "cursor".to_string(),
+                "zed".to_string(),
+                "sublime-text".to_string(),
+                "helix".to_string(),
+                "vim".to_string(),
+                "emacs".to_string(),
+            ],
+            theme_matched_editors: vec![
+                "vscode".to_string(),
+                "cursor".to_string(),
+                "vscodium".to_string(),
+                "helix".to_string(),
+            ],
+            mise_runtimes: vec![
+                "ruby".to_string(),
+                "node".to_string(),
+                "bun".to_string(),
+                "deno".to_string(),
+                "go".to_string(),
+                "rust".to_string(),
+                "python".to_string(),
+                "java".to_string(),
+                "elixir".to_string(),
+                "dotnet".to_string(),
+                "ocaml".to_string(),
+                "zig".to_string(),
+                "clojure".to_string(),
+                "scala".to_string(),
+                "php".to_string(),
+            ],
+            sudoless_docker: false,
+            docker_db_services: vec![
+                "postgres".to_string(),
+                "mysql".to_string(),
+                "redis".to_string(),
+                "mongodb".to_string(),
+            ],
+            gh_cli_installed: true,
+        }
+    }
+
+    pub fn set_default_editor(&mut self, editor: &str) -> bool {
+        if self.installed_editors.iter().any(|e| e == editor) {
+            self.default_editor = editor.to_string();
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn generate_mise_install_command(&self, runtime: &str) -> String {
+        format!("mise use -g {}", runtime)
+    }
+
+    pub fn toggle_sudoless_docker(&mut self, enable: bool) {
+        self.sudoless_docker = enable;
+    }
+
+    pub fn get_docker_command(&self, subcmd: &str) -> String {
+        if self.sudoless_docker {
+            format!("docker {}", subcmd)
+        } else {
+            format!("sudo docker {}", subcmd)
+        }
+    }
+
+    pub fn generate_github_cli_manifest(&self) -> String {
+        format!(
+            "gh_cli_enabled = {}\nstubs = [\"ghui\", \"lazygit\"]\nkeybinding_lazydocker = \"Super + Shift + D\"\n",
+            self.gh_cli_installed
+        )
+    }
+}
+
+impl Default for OmarchyDevToolsEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Keybinding Action
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct KeybindingDefinition {
@@ -955,6 +1055,26 @@ mod omarchy_gap_closure_tests {
         let nix_config = nix.generate_target_config();
         assert!(nix_config.contains("omarchy-nix"));
         assert!(nix_config.contains("imports = [ ./omarchy.nix ]"));
+    }
+
+    #[test]
+    fn test_omarchy_dev_tools_engine() {
+        let mut dev = OmarchyDevToolsEngine::new();
+        assert_eq!(dev.default_editor, "neovim");
+        assert!(dev.set_default_editor("vscode"));
+        assert_eq!(dev.default_editor, "vscode");
+
+        let mise_cmd = dev.generate_mise_install_command("ruby");
+        assert_eq!(mise_cmd, "mise use -g ruby");
+
+        assert!(!dev.sudoless_docker);
+        dev.toggle_sudoless_docker(true);
+        assert!(dev.sudoless_docker);
+        assert_eq!(dev.get_docker_command("ps"), "docker ps");
+
+        let gh_manifest = dev.generate_github_cli_manifest();
+        assert!(gh_manifest.contains("ghui"));
+        assert!(gh_manifest.contains("lazygit"));
     }
 }
 
