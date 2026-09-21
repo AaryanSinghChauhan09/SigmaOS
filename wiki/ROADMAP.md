@@ -283,6 +283,21 @@ The M1 milestone provides a bootable ISO with kernel entry point, init system, l
   - Unveil context with lock mechanism
   - UnveilManager for system-wide context management
   - 13 unit tests passing
+- BSD Jails (src/kernel/bsd_jail.rs):
+  - Process isolation with restricted filesystem view
+  - Jail configuration with name, path, hostname, IP binding (IPv4/IPv6), securelevel
+  - Process management within jails (add, remove, find)
+  - Jail lifecycle (start, stop) with process tracking
+  - BsdJailManager for system-wide jail management
+  - 10 unit tests passing
+- ZFS-inspired Filesystem (src/kernel/zfs.rs):
+  - ZFS pools with configuration (name, size, ashift, compression)
+  - Dataset types (Filesystem, Volume, Snapshot)
+  - Dataset properties (compression, atime, relatime, dedup, sync, recordsize)
+  - Snapshot creation and management
+  - Pool lifecycle (activate, deactivate) with dataset tracking
+  - ZfsManager for system-wide pool and dataset management
+  - 12 unit tests passing
 
 **Completed Fixes:**
 - Kernel module: removed duplicate structures, virtual_cpu, vmm_paging declarations
@@ -467,6 +482,6 @@ See [BOOT_TO_LOGIN_PATH_SPECIFICATION.md](../docs/BOOT_TO_LOGIN_PATH_SPECIFICATI
 - [PROJECT_STATUS.md](../docs/PROJECT_STATUS.md) - Current implementation status
 
 ### Last Verified
-- **Version:** 2.5
+- **Version:** 2.6
 - **Date:** 2026-09-21
 - **Verified by:** Devin AI Agent
