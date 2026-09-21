@@ -255,6 +255,20 @@ The M1 milestone provides a bootable ISO with kernel entry point, init system, l
   - RandomManager for system-wide random coordination
   - Reseeding support for both sources
   - 10 unit tests passing
+- Landlock Security Sandbox (src/kernel/landlock.rs):
+  - 16 access rights (Execute, WriteFile, ReadFile, ReadDir, RemoveDir, RemoveFile, MakeChar, MakeDir, MakeReg, MakeSock, MakeFifo, MakeBlock, MakeSym, Refer, Truncate)
+  - Path-based rules with specificity matching
+  - Ruleset with rule management and handled access tracking
+  - Domain-based process isolation
+  - LandlockManager for system-wide domain management
+  - 10 unit tests passing
+- Capsicum Security Sandbox (src/kernel/capsicum.rs):
+  - 27 capability rights (Read, Write, Seek, Fcntl, Fstat, Fsync, Fchdir, Fchmod, Fchown, Futimes, Fpathconf, Mmap, MmapRw, Create, Exec, Unlink, Connect, Bind, Listen, Accept, Getpeername, Getsockname, Getsockopt, Setsockopt, Recv, Send, Ioctl)
+  - Capability-based security with fine-grained descriptor rights
+  - Capability mode for process sandboxing
+  - Capability restriction and removal
+  - CapsicumManager for system-wide sandbox management
+  - 12 unit tests passing
 
 **Completed Fixes:**
 - Kernel module: removed duplicate structures, virtual_cpu, vmm_paging declarations
@@ -439,6 +453,6 @@ See [BOOT_TO_LOGIN_PATH_SPECIFICATION.md](../docs/BOOT_TO_LOGIN_PATH_SPECIFICATI
 - [PROJECT_STATUS.md](../docs/PROJECT_STATUS.md) - Current implementation status
 
 ### Last Verified
-- **Version:** 2.3
+- **Version:** 2.4
 - **Date:** 2026-09-21
 - **Verified by:** Devin AI Agent
