@@ -17,15 +17,17 @@
 // Virtual filesystem, journaling filesystems (Btrfs, XFS), and storage support
 
 pub mod btrfs;
-// pub mod filesystem;
+pub mod zfs;
 pub mod sigmacas;
 pub mod sigmafs;
-// pub mod support;
-// pub mod vfs;
 pub mod xfs;
 
 pub use btrfs::{
     BtrfsExtent, BtrfsFilesystem, BtrfsSnapshot, BtrfsSubvolume, ChecksumType, CompressionType,
+};
+pub use zfs::{
+    Dataset, DatasetProperties, DatasetType, Pool, PoolHealth, PoolStatus, ScrubResult,
+    ZfsManager, CompressionType as ZfsCompressionType,
 };
 pub use sigmacas::{CasBlock, SigmaFsCasEngine, DILITHIUM5_SIGNATURE_SIZE, SHA256_HASH_SIZE};
 pub use sigmafs::{
