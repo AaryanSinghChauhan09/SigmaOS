@@ -938,4 +938,98 @@ mod omarchy_gap_closure_tests {
         assert!(dwindle_conf.contains("preserve_split = true"));
         assert!(dwindle_conf.contains("force_split = 2"));
     }
+
+    #[test]
+    fn test_omarchy_cross_platform_target_engine() {
+        let engine = OmarchyCrossPlatformTargetEngine::new(OmarchyPlatformPlatform::AppleSiliconAsahi);
+        let config = engine.generate_target_config();
+        assert!(config.contains("apple_m1_m2"));
+        assert!(config.contains("asahi-alarm.org"));
+
+        let deck = OmarchyCrossPlatformTargetEngine::new(OmarchyPlatformPlatform::SteamDeck);
+        let deck_config = deck.generate_target_config();
+        assert!(deck_config.contains("deckarchy"));
+        assert!(deck_config.contains("steamos-readonly = false"));
+
+        let nix = OmarchyCrossPlatformTargetEngine::new(OmarchyPlatformPlatform::NixOS);
+        let nix_config = nix.generate_target_config();
+        assert!(nix_config.contains("omarchy-nix"));
+        assert!(nix_config.contains("imports = [ ./omarchy.nix ]"));
+    }
+}
+
+/// Supported Omarchy Cross-Platform Execution Targets
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum OmarchyPlatformPlatform {
+    DefaultArch,
+    AppleSiliconAsahi,
+    AppleParallelsVm,
+    VirtualBoxVm,
+    VmwareWorkstationWin11,
+    SteamDeck,
+    NixOS,
+}
+
+impl OmarchyPlatformPlatform {
+    pub fn name(&self) -> &'static str {
+        match self {
+            Self::DefaultArch => "default-arch",
+            Self::AppleSiliconAsahi => "apple-silicon-asahi",
+            Self::AppleParallelsVm => "apple-parallels-vm",
+            Self::VirtualBoxVm => "virtualbox-vm",
+            Self::VmwareWorkstationWin11 => "vmware-workstation-win11",
+            Self::SteamDeck => "steam-deck",
+            Self::NixOS => "nixos",
+        }
+    }
+}
+
+/// Cross-Platform Target Setup & Driver Adaptor Engine
+#[derive(Debug, Clone)]
+pub struct OmarchyCrossPlatformTargetEngine {
+    pub platform: OmarchyPlatformPlatform,
+}
+
+impl OmarchyCrossPlatformTargetEngine {
+    pub fn new(platform: OmarchyPlatformPlatform) -> Self {
+        Self { platform }
+    }
+
+    pub fn generate_target_config(&self) -> String {
+        match self.platform {
+            OmarchyPlatformPlatform::DefaultArch => {
+                "platform = \"default-arch\"\nsetup_guide = \"https://github.com/omacom/omarchy\"\n".to_string()
+            }
+            OmarchyPlatformPlatform::AppleSiliconAsahi => {
+                format!(
+                    "platform = \"apple_m1_m2\"\narch_base = \"asahi-alarm\"\nguide = \"https://github.com/omarchy-mac/omarchy-mac\"\nreference = \"asahi-alarm.org\"\nkernel_params = [\"apple_dcp.show_vblank=1\", \"clk_ignore_unused\"]\n"
+                )
+            }
+            OmarchyPlatformPlatform::AppleParallelsVm => {
+                format!(
+                    "platform = \"apple_parallels_vm\"\ndriver = \"parallels-tools\"\nguide = \"https://github.com/omacom/omarchy/discussions/452\"\nkernel_params = [\"prl_tg.enabled=1\", \"i915.modeset=1\"]\n"
+                )
+            }
+            OmarchyPlatformPlatform::VirtualBoxVm => {
+                format!(
+                    "platform = \"virtualbox_vm\"\ndriver = \"virtualbox-guest-utils\"\nguide = \"https://github.com/omacom/omarchy/discussions/176\"\nkernel_params = [\"vboxvideo\", \"vboxsf\"]\n"
+                )
+            }
+            OmarchyPlatformPlatform::VmwareWorkstationWin11 => {
+                format!(
+                    "platform = \"vmware_workstation_win11\"\ndriver = \"open-vm-tools\"\nguide = \"https://github.com/omacom/omarchy/discussions/572\"\nkernel_params = [\"vmw_balloon\", \"vmw_vmci\"]\n"
+                )
+            }
+            OmarchyPlatformPlatform::SteamDeck => {
+                format!(
+                    "platform = \"steam_deck\"\nscript = \"deckarchy\"\nauthor = \"Altynbek Orumbayev\"\nguide = \"https://github.com/aorumbayev/deckarchy\"\nsteamos-readonly = false\n"
+                )
+            }
+            OmarchyPlatformPlatform::NixOS => {
+                format!(
+                    "platform = \"nixos\"\nflavour = \"omarchy-nix\"\nauthor = \"Henry Sipp\"\nguide = \"https://github.com/henrysipp/omarchy-nix\"\nimports = [ ./omarchy.nix ]\n"
+                )
+            }
+        }
+    }
 }
