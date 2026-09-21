@@ -398,6 +398,14 @@ The M1 milestone provides a bootable ISO with kernel entry point, init system, l
   - Hierarchical namespace management with parent/child relationships
   - UtsNamespaceManager for system-wide namespace management
   - 13 unit tests passing
+- IPC Semaphores (src/kernel/semaphore.rs):
+  - Counting semaphore with initial value and max value
+  - Wait (decrement) and post (increment) operations
+  - Try wait (non-blocking) operation
+  - SemaphoreResult codes (Success, WouldBlock, InvalidValue, Timeout)
+  - SemaphoreSet with System V style key-based lookup
+  - SemaphoreManager for system-wide semaphore management
+  - 10 unit tests passing
 
 **Completed Fixes:**
 - Kernel module: removed duplicate structures, virtual_cpu, vmm_paging declarations
@@ -582,6 +590,6 @@ See [BOOT_TO_LOGIN_PATH_SPECIFICATION.md](../docs/BOOT_TO_LOGIN_PATH_SPECIFICATI
 - [PROJECT_STATUS.md](../docs/PROJECT_STATUS.md) - Current implementation status
 
 ### Last Verified
-- **Version:** 3.2
+- **Version:** 3.3
 - **Date:** 2026-09-21
 - **Verified by:** Devin AI Agent
