@@ -16,6 +16,12 @@ pub mod klib {
 #[path = "../src/klib/config_parser.rs"]
 mod config_parser;
 
+#[path = "../src/klib/vec.rs"]
+pub mod vec;
+
+#[path = "../src/klib/string.rs"]
+mod string;
+
 #[path = "../src/klib/toml.rs"]
 mod toml_parser;
 
@@ -29,6 +35,24 @@ fn test_split_and_trim_string() {
 
     assert_eq!(string_parser::trim_string("   sovereign_os   "), "sovereign_os");
     assert_eq!(string_parser::trim_string("  hello world  "), "hello world");
+}
+
+#[test]
+fn test_sigma_string_operations() {
+    use string::SigmaString;
+
+    let s = SigmaString::from_str("sovereign os microkernel");
+    let parts: Vec<SigmaString> = s.split(' ').collect();
+    assert_eq!(parts.len(), 3);
+    assert_eq!(parts[0].as_str(), "sovereign");
+    assert_eq!(parts[1].as_str(), "os");
+    assert_eq!(parts[2].as_str(), "microkernel");
+
+    assert!(s.contains("os"));
+    assert!(!s.contains("nonexistent"));
+
+    let replaced = s.replace("os", "kernel");
+    assert_eq!(replaced.as_str(), "sovereign kernel microkernel");
 }
 
 #[test]

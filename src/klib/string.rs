@@ -308,7 +308,7 @@ impl SigmaString {
     where
         P: Pattern,
     {
-        pat.find_in(self).is_some()
+        pat.find_in(self.as_str()).is_some()
     }
 
     /// Convert to bytes
@@ -321,22 +321,25 @@ impl SigmaString {
     where
         P: Pattern,
     {
-        pat.find_in(self)
+        pat.find_in(self.as_str())
     }
 
     /// Replace occurrences of a pattern
+    /// Optimized by Bolt ⚡: pre-allocates buffer capacity based on source string length to avoid dynamic reallocations.
     pub fn replace<'a, P>(&'a self, pat: P, replacement: &str) -> SigmaString
     where
         P: Pattern,
     {
         let mut result = SigmaString::new();
+        result.reserve(self.len());
         let mut last_end = 0;
+        let s = self.as_str();
 
-        while let Some(start) = pat.find_in_from(self, last_end) {
+        while let Some(start) = pat.find_in_from(s, last_end) {
             let end = start + pat.pattern_len();
 
             // Add the part before the match
-            result.push_str(&self.as_str()[last_end..start]);
+            result.push_str(&s[last_end..start]);
 
             // Add the replacement
             result.push_str(replacement);
@@ -345,7 +348,7 @@ impl SigmaString {
         }
 
         // Add the remaining part
-        result.push_str(&self.as_str()[last_end..]);
+        result.push_str(&s[last_end..]);
 
         result
     }
@@ -402,20 +405,21 @@ impl core::ops::Index<usize> for SigmaString {
     }
 }
 
-/// Pattern trait for string operations
+/// Pattern trait for string operations - Optimized by Bolt ⚡
+/// Operates directly on string slices (&str) to eliminate temporary heap allocations during iteration
 pub trait Pattern {
-    fn find_in(&self, haystack: &SigmaString) -> Option<usize>;
-    fn find_in_from(&self, haystack: &SigmaString, start: usize) -> Option<usize>;
+    fn find_in(&self, haystack: &str) -> Option<usize>;
+    fn find_in_from(&self, haystack: &str, start: usize) -> Option<usize>;
     fn pattern_len(&self) -> usize;
 }
 
 impl Pattern for char {
-    fn find_in(&self, haystack: &SigmaString) -> Option<usize> {
-        haystack.as_str().find(*self)
+    fn find_in(&self, haystack: &str) -> Option<usize> {
+        haystack.find(*self)
     }
 
-    fn find_in_from(&self, haystack: &SigmaString, start: usize) -> Option<usize> {
-        haystack.as_str()[start..].find(*self).map(|i| start + i)
+    fn find_in_from(&self, haystack: &str, start: usize) -> Option<usize> {
+        haystack[start..].find(*self).map(|i| start + i)
     }
 
     fn pattern_len(&self) -> usize {
@@ -424,12 +428,12 @@ impl Pattern for char {
 }
 
 impl Pattern for &str {
-    fn find_in(&self, haystack: &SigmaString) -> Option<usize> {
-        haystack.as_str().find(*self)
+    fn find_in(&self, haystack: &str) -> Option<usize> {
+        haystack.find(*self)
     }
 
-    fn find_in_from(&self, haystack: &SigmaString, start: usize) -> Option<usize> {
-        haystack.as_str()[start..].find(*self).map(|i| start + i)
+    fn find_in_from(&self, haystack: &str, start: usize) -> Option<usize> {
+        haystack[start..].find(*self).map(|i| start + i)
     }
 
     fn pattern_len(&self) -> usize {
@@ -450,12 +454,13 @@ where
 {
     type Item = SigmaString;
 
+    /// Optimized by Bolt ⚡: searches pattern directly on borrowed `self.haystack` slice,
+    /// eliminating $O(N)$ temporary `SigmaString` heap allocations per iteration step.
     fn next(&mut self) -> Option<Self::Item> {
         if self.finished {
             return None;
         }
-        let temp_string = SigmaString::from_str(self.haystack);
-        if let Some(idx) = self.pat.find_in(&temp_string) {
+        if let Some(idx) = self.pat.find_in(self.haystack) {
             let end = idx + self.pat.pattern_len();
             let result = SigmaString::from_str(&self.haystack[..idx]);
             self.haystack = &self.haystack[end..];
@@ -467,7 +472,7 @@ where
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
