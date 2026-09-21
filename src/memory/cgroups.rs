@@ -1,4 +1,4 @@
-// SigmaOS Linux-inspired Memory Control Groups (memcg) and OOM Killer Subsystem
+// SigmaOS Linux cgroups v2 Memory Controller & FreeBSD RCTL Subsystem
 
 use std::collections::BTreeMap;
 use std::string::String;
@@ -12,14 +12,30 @@ pub enum OomPolicy {
     PanicSystem,          // Trigger system panic
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RctlAction {
+    Deny,    // Fail the memory allocation
+    Log,     // Log warning and allow
+    SigTerm, // Send SIGTERM warning signal
+    SigKill, // Immediate termination via SIGKILL
+}
+
 #[derive(Debug, Clone)]
 pub struct MemCgroup {
     pub id: usize,
     pub name: String,
     pub usage: usize,
-    pub limit: usize,
+    pub limit: usize,           // Legacy limit alias for memory_max
+    pub memory_min: usize,      // Hard protection watermark
+    pub memory_low: usize,      // Soft protection watermark
+    pub memory_high: usize,     // Throttling threshold
+    pub memory_max: usize,      // Hard ceiling limit
+    pub swap_usage: usize,      // Current swap usage in bytes
+    pub swap_max: usize,        // Hard ceiling limit for swap
+    pub pressure_stall_us: u64, // PSI accumulated stall time in microseconds
     pub oom_control_enabled: bool,
     pub parent_id: Option<usize>,
+    pub action_policy: RctlAction,
 }
 
 pub struct MemCgroupManager {
@@ -47,31 +63,79 @@ impl MemCgroupManager {
             name: name.to_string(),
             usage: 0,
             limit,
+            memory_min: 0,
+            memory_low: 0,
+            memory_high: limit.saturating_sub(limit / 10), // Default high threshold at 90%
+            memory_max: limit,
+            swap_usage: 0,
+            swap_max: limit,
+            pressure_stall_us: 0,
             oom_control_enabled: true,
             parent_id,
+            action_policy: RctlAction::Deny,
         };
 
         self.groups.insert(id, cgroup);
         id
     }
 
+    /// Configure 4-tier memory thresholds for cgroups v2 parity
+    pub fn set_tiered_limits(
+        &mut self,
+        cgroup_id: usize,
+        min: usize,
+        low: usize,
+        high: usize,
+        max: usize,
+    ) -> Result<(), &'static str> {
+        if let Some(cgroup) = self.groups.get_mut(&cgroup_id) {
+            cgroup.memory_min = min;
+            cgroup.memory_low = low;
+            cgroup.memory_high = high;
+            cgroup.memory_max = max;
+            cgroup.limit = max;
+            Ok(())
+        } else {
+            Err("Cgroup not found")
+        }
+    }
+
+    /// Set swap memory ceiling limit
+    pub fn set_swap_max(&mut self, cgroup_id: usize, swap_max: usize) -> Result<(), &'static str> {
+        if let Some(cgroup) = self.groups.get_mut(&cgroup_id) {
+            cgroup.swap_max = swap_max;
+            Ok(())
+        } else {
+            Err("Cgroup not found")
+        }
+    }
+
     /// Try to charge memory to a cgroup and its parents.
-    /// If charging would exceed any limit, returns Err(cgroup_id_that_failed).
+    /// If charging would exceed `memory_max` or trigger `RctlAction::Deny`, returns Err(cgroup_id_that_failed).
     pub fn charge_memory(&mut self, cgroup_id: usize, bytes: usize) -> Result<(), usize> {
         let mut current_id = Some(cgroup_id);
         let mut charged_ids = Vec::new();
 
         while let Some(id) = current_id {
             if let Some(cgroup) = self.groups.get_mut(&id) {
-                if cgroup.usage + bytes > cgroup.limit {
-                    // Back out previous successful charges
-                    for back_id in charged_ids {
-                        if let Some(back_cgroup) = self.groups.get_mut(&back_id) {
-                            back_cgroup.usage = back_cgroup.usage.saturating_sub(bytes);
+                let effective_max = cgroup.memory_max;
+                if cgroup.usage + bytes > effective_max {
+                    if cgroup.action_policy == RctlAction::Deny {
+                        // Back out previous successful charges
+                        for back_id in charged_ids {
+                            if let Some(back_cgroup) = self.groups.get_mut(&back_id) {
+                                back_cgroup.usage = back_cgroup.usage.saturating_sub(bytes);
+                            }
                         }
+                        return Err(id); // Limit exceeded at this level
                     }
-                    return Err(id); // Limit exceeded at this level
                 }
+
+                // Check memory_high throttle condition
+                if cgroup.usage + bytes > cgroup.memory_high {
+                    cgroup.pressure_stall_us += 1000; // Record 1ms pressure stall penalty
+                }
+
                 cgroup.usage += bytes;
                 charged_ids.push(id);
                 current_id = cgroup.parent_id;
@@ -88,6 +152,57 @@ impl MemCgroupManager {
         while let Some(id) = current_id {
             if let Some(cgroup) = self.groups.get_mut(&id) {
                 cgroup.usage = cgroup.usage.saturating_sub(bytes);
+                current_id = cgroup.parent_id;
+            } else {
+                break;
+            }
+        }
+    }
+
+    /// Charge swap memory allocations
+    pub fn charge_swap(&mut self, cgroup_id: usize, bytes: usize) -> Result<(), usize> {
+        let mut current_id = Some(cgroup_id);
+        let mut charged_ids = Vec::new();
+
+        while let Some(id) = current_id {
+            if let Some(cgroup) = self.groups.get_mut(&id) {
+                if cgroup.swap_usage + bytes > cgroup.swap_max {
+                    for back_id in charged_ids {
+                        if let Some(back_cgroup) = self.groups.get_mut(&back_id) {
+                            back_cgroup.swap_usage = back_cgroup.swap_usage.saturating_sub(bytes);
+                        }
+                    }
+                    return Err(id);
+                }
+                cgroup.swap_usage += bytes;
+                charged_ids.push(id);
+                current_id = cgroup.parent_id;
+            } else {
+                break;
+            }
+        }
+        Ok(())
+    }
+
+    /// Uncharge swap memory allocations
+    pub fn uncharge_swap(&mut self, cgroup_id: usize, bytes: usize) {
+        let mut current_id = Some(cgroup_id);
+        while let Some(id) = current_id {
+            if let Some(cgroup) = self.groups.get_mut(&id) {
+                cgroup.swap_usage = cgroup.swap_usage.saturating_sub(bytes);
+                current_id = cgroup.parent_id;
+            } else {
+                break;
+            }
+        }
+    }
+
+    /// Record Pressure Stall Information (PSI) stall duration
+    pub fn record_pressure_stall(&mut self, cgroup_id: usize, stall_us: u64) {
+        let mut current_id = Some(cgroup_id);
+        while let Some(id) = current_id {
+            if let Some(cgroup) = self.groups.get_mut(&id) {
+                cgroup.pressure_stall_us = cgroup.pressure_stall_us.saturating_add(stall_us);
                 current_id = cgroup.parent_id;
             } else {
                 break;
@@ -163,7 +278,7 @@ impl MemCgroupManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -199,7 +314,32 @@ mod tests {
         assert_eq!(killed, 102);
         assert_eq!(processes[1].2, false); // pid 102 is now terminated
         assert_eq!(manager.groups.get(&container_cg).unwrap().usage, 150 * 1024);
-        // Memory uncharged from 400KB to 150KB
+    }
+
+    #[test]
+    fn test_cgroups_v2_tiered_limits_and_swap() {
+        let mut manager = MemCgroupManager::new();
+        let cg = manager.create_cgroup("/test_tiered", Some(0), 1024 * 1024);
+
+        assert!(manager.set_tiered_limits(cg, 128 * 1024, 256 * 1024, 512 * 1024, 1024 * 1024).is_ok());
+        assert!(manager.set_swap_max(cg, 512 * 1024).is_ok());
+
+        let cgroup = manager.groups.get(&cg).unwrap();
+        assert_eq!(cgroup.memory_min, 128 * 1024);
+        assert_eq!(cgroup.memory_low, 256 * 1024);
+        assert_eq!(cgroup.memory_high, 512 * 1024);
+        assert_eq!(cgroup.memory_max, 1024 * 1024);
+
+        // Test Swap charging
+        assert!(manager.charge_swap(cg, 256 * 1024).is_ok());
+        assert_eq!(manager.groups.get(&cg).unwrap().swap_usage, 256 * 1024);
+
+        // Charge excess swap - should fail
+        assert_eq!(manager.charge_swap(cg, 300 * 1024), Err(cg));
+
+        // Uncharge swap
+        manager.uncharge_swap(cg, 256 * 1024);
+        assert_eq!(manager.groups.get(&cg).unwrap().swap_usage, 0);
     }
 
     #[test]

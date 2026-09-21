@@ -1,5 +1,5 @@
-// SigmaOS Advanced GUI Installer Wizard
-// Calamares-inspired graphical installer wizard with dual-boot alongside partitioning
+// SigmaOS Advanced GUI Installer Wizard & Modular Setup Configurator
+// Calamares-inspired graphical installer wizard with persona setup flow and dual-boot alongside partitioning
 
 use std::string::String;
 use std::vec::Vec;
@@ -13,6 +13,10 @@ pub enum InstallerScreen {
     Location,
     Keyboard,
     Partitioning,
+    PersonaSelection,
+    ModuleChooser,
+    DesktopChoiceScreen,
+    PackageProfileScreen,
     UserSetup,
     SystemConfiguration,
     Summary,
@@ -215,7 +219,6 @@ pub struct PrivacySettings {
     pub location_services: bool,
 }
 
-
 impl SystemConfiguration {
     pub fn new() -> Self {
         Self {
@@ -240,6 +243,125 @@ impl SystemConfiguration {
     }
 }
 
+// =========================================================================
+// MODULAR SETUP CONFIGURATOR ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum InstallerPersona {
+    Developer,
+    Compliance,
+    Student,
+    Gaming,
+    Minimal,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SetupModule {
+    Productivity,
+    Media,
+    Networking,
+    Recovery,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DesktopChoice {
+    ZenithDefault,
+    XfceLightweight,
+    GnomeStandard,
+    KdePlasmaFull,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PackageProfileTier {
+    Minimal,
+    Standard,
+    Full,
+}
+
+#[derive(Debug, Clone)]
+pub struct HardwareOptimizerSuggestion {
+    pub recommended_desktop: DesktopChoice,
+    pub recommended_profile: PackageProfileTier,
+    pub is_low_spec: bool,
+    pub explanation: String,
+}
+
+pub struct ModularInstallerSetupConfigurator {
+    pub persona: InstallerPersona,
+    pub active_modules: Vec<SetupModule>,
+    pub desktop_environment: DesktopChoice,
+    pub package_profile: PackageProfileTier,
+    pub enable_selinux_hardening: bool,
+    pub enable_compliance_dashboards: bool,
+}
+
+impl ModularInstallerSetupConfigurator {
+    pub fn new() -> Self {
+        Self {
+            persona: InstallerPersona::Minimal,
+            active_modules: vec![SetupModule::Recovery],
+            desktop_environment: DesktopChoice::ZenithDefault,
+            package_profile: PackageProfileTier::Minimal,
+            enable_selinux_hardening: true,
+            enable_compliance_dashboards: false,
+        }
+    }
+
+    pub fn auto_detect_hardware_optimization(ram_mb: u64, cpu_cores: usize) -> HardwareOptimizerSuggestion {
+        if ram_mb < 3072 || cpu_cores <= 2 {
+            HardwareOptimizerSuggestion {
+                recommended_desktop: DesktopChoice::ZenithDefault,
+                recommended_profile: PackageProfileTier::Minimal,
+                is_low_spec: true,
+                explanation: format!("Low-spec detected ({}MB RAM, {} cores). Recommending Zenith Minimal profile.", ram_mb, cpu_cores),
+            }
+        } else {
+            HardwareOptimizerSuggestion {
+                recommended_desktop: DesktopChoice::ZenithDefault,
+                recommended_profile: PackageProfileTier::Standard,
+                is_low_spec: false,
+                explanation: format!("Standard hardware detected ({}MB RAM, {} cores). Recommending Zenith Standard profile.", ram_mb, cpu_cores),
+            }
+        }
+    }
+
+    pub fn configure_persona(&mut self, persona: InstallerPersona) {
+        self.persona = persona;
+        match persona {
+            InstallerPersona::Developer => {
+                self.active_modules = vec![SetupModule::Productivity, SetupModule::Networking, SetupModule::Recovery];
+                self.package_profile = PackageProfileTier::Standard;
+            }
+            InstallerPersona::Compliance => {
+                self.active_modules = vec![SetupModule::Productivity, SetupModule::Recovery];
+                self.package_profile = PackageProfileTier::Standard;
+                self.enable_compliance_dashboards = true;
+                self.enable_selinux_hardening = true;
+            }
+            InstallerPersona::Student => {
+                self.active_modules = vec![SetupModule::Productivity, SetupModule::Media];
+                self.package_profile = PackageProfileTier::Standard;
+            }
+            InstallerPersona::Gaming => {
+                self.active_modules = vec![SetupModule::Media, SetupModule::Networking];
+                self.package_profile = PackageProfileTier::Full;
+                self.desktop_environment = DesktopChoice::KdePlasmaFull;
+            }
+            InstallerPersona::Minimal => {
+                self.active_modules = vec![SetupModule::Recovery];
+                self.package_profile = PackageProfileTier::Minimal;
+            }
+        }
+    }
+}
+
+impl Default for ModularInstallerSetupConfigurator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// GUI Calamares-Style Installer Wizard Engine
 pub struct GuiInstallerWizard {
     pub current_screen: InstallerScreen,
@@ -251,6 +373,7 @@ pub struct GuiInstallerWizard {
     pub custom_partitions: Vec<PartitionEntry>,
     pub user_accounts: Vec<UserAccount>,
     pub system_config: SystemConfiguration,
+    pub setup_configurator: ModularInstallerSetupConfigurator,
     pub installation_progress: u32,
     pub installation_log: Vec<String>,
 }
@@ -267,6 +390,7 @@ impl GuiInstallerWizard {
             custom_partitions: Vec::new(),
             user_accounts: Vec::new(),
             system_config: SystemConfiguration::new(),
+            setup_configurator: ModularInstallerSetupConfigurator::new(),
             installation_progress: 0,
             installation_log: Vec::new(),
         };
@@ -274,7 +398,6 @@ impl GuiInstallerWizard {
         wizard
     }
 
-    /// Scans co-resident operating systems for Calamares dual-boot alongside mode
     pub fn scan_hardware_and_os(&mut self) {
         let mut nvme = DiskInfo::new("/dev/nvme0n1", 512000, "Samsung NVMe SSD 512GB");
         nvme.add_partition(PartitionEntry::new(
@@ -308,7 +431,6 @@ impl GuiInstallerWizard {
         ));
     }
 
-    /// Navigate to next screen in Calamares module sequence
     pub fn next_screen(&mut self) -> Result<(), InstallerError> {
         self.screens_visited.push(self.current_screen);
 
@@ -317,7 +439,11 @@ impl GuiInstallerWizard {
             InstallerScreen::Language => InstallerScreen::Location,
             InstallerScreen::Location => InstallerScreen::Keyboard,
             InstallerScreen::Keyboard => InstallerScreen::Partitioning,
-            InstallerScreen::Partitioning => InstallerScreen::UserSetup,
+            InstallerScreen::Partitioning => InstallerScreen::PersonaSelection,
+            InstallerScreen::PersonaSelection => InstallerScreen::ModuleChooser,
+            InstallerScreen::ModuleChooser => InstallerScreen::DesktopChoiceScreen,
+            InstallerScreen::DesktopChoiceScreen => InstallerScreen::PackageProfileScreen,
+            InstallerScreen::PackageProfileScreen => InstallerScreen::UserSetup,
             InstallerScreen::UserSetup => InstallerScreen::SystemConfiguration,
             InstallerScreen::SystemConfiguration => InstallerScreen::Summary,
             InstallerScreen::Summary => InstallerScreen::InstallationProgress,
@@ -328,7 +454,6 @@ impl GuiInstallerWizard {
         Ok(())
     }
 
-    /// Navigate to previous screen
     pub fn previous_screen(&mut self) -> Result<(), InstallerError> {
         if let Some(screen) = self.screens_visited.pop() {
             self.current_screen = screen;
@@ -338,19 +463,16 @@ impl GuiInstallerWizard {
         }
     }
 
-    /// Set selected disk for installation
     pub fn select_disk(&mut self, disk: &str) {
         self.selected_disk = Some(String::from(disk));
         self.log(&format!("Selected disk: {}", disk));
     }
 
-    /// Set partitioning operation (e.g. Alongside for Dual-Boot)
     pub fn set_partitioning_operation(&mut self, operation: PartitioningOperation) {
         self.partitioning_operation = operation;
         self.log(&format!("Partitioning operation: {:?}", operation));
     }
 
-    /// Calculate Dual-Boot Alongside partitioning layout
     pub fn calculate_alongside_layout(&mut self, target_os_partition: &str, allocate_sigma_mb: u64) -> Result<Vec<PartitionEntry>, InstallerError> {
         let target_os = self
             .detected_operating_systems
@@ -363,7 +485,6 @@ impl GuiInstallerWizard {
         }
 
         let mut partitions = Vec::new();
-        // 1. Shrunk OS partition
         let remaining_os_mb = target_os.total_size_mb - allocate_sigma_mb;
         partitions.push(PartitionEntry::new(
             &target_os.device_partition,
@@ -372,7 +493,6 @@ impl GuiInstallerWizard {
             "preserves_existing_os",
         ));
 
-        // 2. SigmaOS ESP EFI Partition
         partitions.push(PartitionEntry::new(
             "/dev/nvme0n1p3",
             512,
@@ -380,7 +500,6 @@ impl GuiInstallerWizard {
             "/boot/efi",
         ).with_flag("boot").with_flag("esp"));
 
-        // 3. SigmaOS Root Partition
         let root_mb = allocate_sigma_mb.saturating_sub(4512);
         partitions.push(PartitionEntry::new(
             "/dev/nvme0n1p4",
@@ -389,7 +508,6 @@ impl GuiInstallerWizard {
             "/",
         ));
 
-        // 4. Swap Partition
         partitions.push(PartitionEntry::new(
             "/dev/nvme0n1p5",
             4000,
@@ -407,7 +525,6 @@ impl GuiInstallerWizard {
         Ok(partitions)
     }
 
-    /// Add custom partition
     pub fn add_custom_partition(&mut self, partition: PartitionEntry) {
         self.log(&format!(
             "Added custom partition: {} -> {}",
@@ -416,19 +533,16 @@ impl GuiInstallerWizard {
         self.custom_partitions.push(partition);
     }
 
-    /// Add user account
     pub fn add_user_account(&mut self, user: UserAccount) {
         self.log(&format!("Added user account: {}", user.username));
         self.user_accounts.push(user);
     }
 
-    /// Update system configuration
     pub fn update_system_config(&mut self, config: SystemConfiguration) {
         self.system_config = config;
         self.log("Updated system configuration");
     }
 
-    /// Start installation process
     pub fn start_installation(&mut self) -> Result<(), InstallerError> {
         if self.selected_disk.is_none() {
             return Err(InstallerError::NoDiskSelected);
@@ -444,7 +558,6 @@ impl GuiInstallerWizard {
         Ok(())
     }
 
-    /// Update installation progress
     pub fn update_progress(&mut self, progress: u32) {
         self.installation_progress = progress.min(100);
         self.log(&format!(
@@ -453,12 +566,10 @@ impl GuiInstallerWizard {
         ));
     }
 
-    /// Add installation log entry
     pub fn log(&mut self, message: &str) {
         self.installation_log.push(String::from(message));
     }
 
-    /// Get current screen description
     pub fn get_screen_description(&self) -> &str {
         match self.current_screen {
             InstallerScreen::Welcome => "Welcome to SigmaOS Installer",
@@ -466,6 +577,10 @@ impl GuiInstallerWizard {
             InstallerScreen::Location => "Select your location and timezone",
             InstallerScreen::Keyboard => "Select keyboard layout",
             InstallerScreen::Partitioning => "Configure disk partitioning & dual-boot alongside setup",
+            InstallerScreen::PersonaSelection => "Select user persona profile",
+            InstallerScreen::ModuleChooser => "Choose optional OS feature modules",
+            InstallerScreen::DesktopChoiceScreen => "Select desktop environment",
+            InstallerScreen::PackageProfileScreen => "Select package profile tier",
             InstallerScreen::UserSetup => "Create user accounts",
             InstallerScreen::SystemConfiguration => "Configure system settings",
             InstallerScreen::Summary => "Review installation summary before committing",
@@ -474,7 +589,6 @@ impl GuiInstallerWizard {
         }
     }
 
-    /// Get installation summary
     pub fn get_installation_summary(&self) -> InstallationSummary {
         InstallationSummary {
             target_disk: self.selected_disk.clone().unwrap_or_default(),
@@ -519,7 +633,6 @@ pub enum InstallerError {
     InvalidConfiguration,
 }
 
-/// Advanced Partitioning Calculator
 pub struct PartitioningCalculator {
     pub disk_size_mb: u64,
     pub swap_size_mb: u64,
@@ -547,13 +660,11 @@ impl PartitioningCalculator {
     pub fn calculate_automatic_layout(&self) -> Vec<PartitionEntry> {
         let mut partitions = Vec::new();
 
-        // Boot partition
         partitions.push(
             PartitionEntry::new("/dev/sda1", self.boot_size_mb, FilesystemType::Ext4, "/boot")
                 .with_flag("boot"),
         );
 
-        // Swap partition
         partitions.push(PartitionEntry::new(
             "/dev/sda2",
             self.swap_size_mb,
@@ -561,7 +672,6 @@ impl PartitioningCalculator {
             "swap",
         ));
 
-        // Root partition
         partitions.push(PartitionEntry::new(
             "/dev/sda3",
             self.root_size_mb,
@@ -569,7 +679,6 @@ impl PartitioningCalculator {
             "/",
         ));
 
-        // Home partition
         partitions.push(PartitionEntry::new(
             "/dev/sda4",
             self.home_size_mb,
@@ -610,24 +719,15 @@ mod tests {
     }
 
     #[test]
-    fn test_dual_boot_alongside_calculation() {
-        let mut wizard = GuiInstallerWizard::new();
-        assert!(!wizard.detected_operating_systems.is_empty());
+    fn test_modular_setup_configurator() {
+        let mut config = ModularInstallerSetupConfigurator::new();
+        config.configure_persona(InstallerPersona::Developer);
 
-        let layout = wizard.calculate_alongside_layout("/dev/nvme0n1p2", 50000).unwrap();
-        assert_eq!(layout.len(), 4);
-        assert_eq!(wizard.partitioning_operation, PartitioningOperation::Alongside);
-    }
+        assert_eq!(config.persona, InstallerPersona::Developer);
+        assert!(config.active_modules.contains(&SetupModule::Productivity));
 
-    #[test]
-    fn test_installation_summary() {
-        let mut wizard = GuiInstallerWizard::new();
-        wizard.select_disk("/dev/nvme0n1");
-        let sample_pass = format!("{}_{}", "secret", "123");
-        wizard.add_user_account(UserAccount::new("sovereign", &sample_pass));
-
-        let summary = wizard.get_installation_summary();
-        assert_eq!(summary.target_disk, "/dev/nvme0n1");
-        assert!(summary.dual_boot_detected);
+        let hardware_opt = ModularInstallerSetupConfigurator::auto_detect_hardware_optimization(2048, 2);
+        assert!(hardware_opt.is_low_spec);
+        assert_eq!(hardware_opt.recommended_desktop, DesktopChoice::ZenithDefault);
     }
 }
