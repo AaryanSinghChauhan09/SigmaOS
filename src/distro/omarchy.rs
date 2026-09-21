@@ -96,6 +96,63 @@ impl OmarchyTheme {
     }
 }
 
+/// Omarchy Capture, Screen Recording, OCR, and File Sharing Engine
+#[derive(Debug, Clone)]
+pub struct OmarchyCaptureAndSharingEngine {
+    pub screenshot_dir: String,
+    pub screenrecord_dir: String,
+    pub debug_logging: bool,
+}
+
+impl OmarchyCaptureAndSharingEngine {
+    pub fn new() -> Self {
+        Self {
+            screenshot_dir: "~/Pictures/Screenshots".to_string(),
+            screenrecord_dir: "~/Videos".to_string(),
+            debug_logging: false,
+        }
+    }
+
+    pub fn generate_screenshot_cmd(&self, mode: &str, direct_save: bool, editor: &str) -> String {
+        let dest = if direct_save { " save" } else { "" };
+        let ed_flag = if !editor.is_empty() {
+            format!(" --editor={}", editor)
+        } else {
+            "".to_string()
+        };
+        format!("omarchy capture screenshot {}{}{}", mode, dest, ed_flag)
+    }
+
+    pub fn generate_screenrecord_start_cmd(&self, fullscreen: bool, desktop_audio: bool, webcam: bool) -> String {
+        let fs_flag = if fullscreen { " --fullscreen" } else { "" };
+        let audio_flag = if desktop_audio { " --with-desktop-audio" } else { "" };
+        let cam_flag = if webcam { " --with-webcam" } else { "" };
+        format!("omarchy screenrecord{}{}{}", fs_flag, audio_flag, cam_flag)
+    }
+
+    pub fn generate_ocr_cmd(&self) -> &'static str {
+        "omarchy capture text"
+    }
+
+    pub fn generate_localsend_share_cmd(&self, target_type: &str, path: &str) -> String {
+        format!("omarchy share {} {}", target_type, path)
+    }
+
+    pub fn generate_tailscale_send_cmd(&self, machine: &str, file: &str) -> String {
+        format!("omarchy tailscale send {} {}", machine, file)
+    }
+
+    pub fn generate_transcode_cmd(&self, input: &str, format_opt: &str, resolution: &str) -> String {
+        format!("omarchy transcode {} {} {}", input, format_opt, resolution)
+    }
+}
+
+impl Default for OmarchyCaptureAndSharingEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Omarchy Development Tools, Editors, Mise, Docker, and GitHub CLI Manager
 #[derive(Debug, Clone)]
 pub struct OmarchyDevToolsEngine {
@@ -1075,6 +1132,26 @@ mod omarchy_gap_closure_tests {
         let gh_manifest = dev.generate_github_cli_manifest();
         assert!(gh_manifest.contains("ghui"));
         assert!(gh_manifest.contains("lazygit"));
+    }
+
+    #[test]
+    fn test_omarchy_capture_and_sharing_engine() {
+        let capture = OmarchyCaptureAndSharingEngine::new();
+        let shot_cmd = capture.generate_screenshot_cmd("fullscreen", true, "overlay");
+        assert!(shot_cmd.contains("omarchy capture screenshot fullscreen"));
+        assert!(shot_cmd.contains("save"));
+        assert!(shot_cmd.contains("--editor=overlay"));
+
+        let rec_cmd = capture.generate_screenrecord_start_cmd(true, true, true);
+        assert!(rec_cmd.contains("--fullscreen"));
+        assert!(rec_cmd.contains("--with-desktop-audio"));
+        assert!(rec_cmd.contains("--with-webcam"));
+
+        let taildrop_cmd = capture.generate_tailscale_send_cmd("my-server", "/tmp/screenshot.png");
+        assert_eq!(taildrop_cmd, "omarchy tailscale send my-server /tmp/screenshot.png");
+
+        let transcode_cmd = capture.generate_transcode_cmd("/tmp/video.mp4", "webm", "1080p");
+        assert_eq!(transcode_cmd, "omarchy transcode /tmp/video.mp4 webm 1080p");
     }
 }
 
