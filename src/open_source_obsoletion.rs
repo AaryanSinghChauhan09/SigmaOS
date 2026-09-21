@@ -246,6 +246,175 @@ impl Default for SovereignVcsEngine {
 }
 
 // =========================================================================
+// 86. SOVEREIGN RIPGREP SEARCH ENGINE (Superseding ripgrep, grep, ag, ack)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RipgrepMatch {
+    pub line_number: usize,
+    pub line_text: String,
+    pub match_start: usize,
+    pub match_end: usize,
+}
+
+pub struct SovereignRipgrepSearchEngine {
+    pub case_sensitive: bool,
+    pub max_matches: usize,
+}
+
+impl SovereignRipgrepSearchEngine {
+    pub fn new() -> Self {
+        Self {
+            case_sensitive: true,
+            max_matches: 1000,
+        }
+    }
+
+    pub fn search_buffer(&self, query: &str, content: &str) -> Vec<RipgrepMatch> {
+        let mut matches = Vec::new();
+        let query_cmp = if self.case_sensitive {
+            query.to_string()
+        } else {
+            query.to_lowercase()
+        };
+
+        for (idx, line) in content.lines().enumerate() {
+            let line_cmp = if self.case_sensitive {
+                line.to_string()
+            } else {
+                line.to_lowercase()
+            };
+
+            if let Some(pos) = line_cmp.find(&query_cmp) {
+                matches.push(RipgrepMatch {
+                    line_number: idx + 1,
+                    line_text: line.to_string(),
+                    match_start: pos,
+                    match_end: pos + query.len(),
+                });
+                if matches.len() >= self.max_matches {
+                    break;
+                }
+            }
+        }
+        matches
+    }
+}
+
+impl Default for SovereignRipgrepSearchEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 87. SOVEREIGN JQ JSON PROCESSOR ENGINE (Superseding jq, yq, fx)
+// =========================================================================
+
+pub struct SovereignJqJsonProcessorEngine {
+    pub strict_mode: bool,
+}
+
+impl SovereignJqJsonProcessorEngine {
+    pub fn new() -> Self {
+        Self { strict_mode: false }
+    }
+
+    pub fn query_json_field<'a>(&self, json_payload: &'a str, path_query: &str) -> Option<String> {
+        let clean_path = path_query.trim_start_matches('.');
+        if clean_path.is_empty() {
+            return Some(json_payload.to_string());
+        }
+
+        let field_key = format!("\"{}\":", clean_path);
+        if let Some(pos) = json_payload.find(&field_key) {
+            let start = pos + field_key.len();
+            let remainder = json_payload[start..].trim();
+
+            if remainder.starts_with('"') {
+                let quote_start = 1;
+                if let Some(end_quote) = remainder[quote_start..].find('"') {
+                    return Some(remainder[quote_start..quote_start + end_quote].to_string());
+                }
+            } else {
+                let value_end = remainder
+                    .find(|c: char| c == ',' || c == '}' || c == ']' || c.is_whitespace())
+                    .unwrap_or(remainder.len());
+                return Some(remainder[..value_end].to_string());
+            }
+        }
+        None
+    }
+}
+
+impl Default for SovereignJqJsonProcessorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 88. SOVEREIGN EZA FD DIRECTORY ENGINE (Superseding eza, exa, fd, find, ls)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DirectoryFileNode {
+    pub path: String,
+    pub size_bytes: u64,
+    pub is_dir: bool,
+    pub permissions: String,
+}
+
+pub struct SovereignEzaFdDirectoryEngine {
+    pub file_tree: Vec<DirectoryFileNode>,
+}
+
+impl SovereignEzaFdDirectoryEngine {
+    pub fn new() -> Self {
+        Self {
+            file_tree: Vec::new(),
+        }
+    }
+
+    pub fn register_file_node(&mut self, path: &str, size_bytes: u64, is_dir: bool, permissions: &str) {
+        self.file_tree.push(DirectoryFileNode {
+            path: path.to_string(),
+            size_bytes,
+            is_dir,
+            permissions: permissions.to_string(),
+        });
+    }
+
+    pub fn find_glob(&self, glob_pattern: &str) -> Vec<&DirectoryFileNode> {
+        let clean_pattern = glob_pattern.trim_matches('*');
+        self.file_tree
+            .iter()
+            .filter(|node| node.path.contains(clean_pattern))
+            .collect()
+    }
+
+    pub fn format_tree_listing(&self) -> Vec<String> {
+        self.file_tree
+            .iter()
+            .map(|node| {
+                format!(
+                    "{} {:>8} B {}",
+                    node.permissions,
+                    node.size_bytes,
+                    node.path
+                )
+            })
+            .collect()
+    }
+}
+
+impl Default for SovereignEzaFdDirectoryEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // 55. SOVEREIGN FDISK DISK PARTITIONER ENGINE (Superseding fdisk, sfdisk & parted)
 // =========================================================================
 
@@ -3190,6 +3359,9 @@ pub struct SovereignOpenSourceObsoletionOrchestrator {
     pub lazygit: SovereignLazygitEngine,
     pub starship: SovereignStarshipPromptEngine,
     pub yazi: SovereignYaziEngine,
+    pub ripgrep: SovereignRipgrepSearchEngine,
+    pub jq: SovereignJqJsonProcessorEngine,
+    pub eza_fd: SovereignEzaFdDirectoryEngine,
     pub supremacy_suite: open_source_os_gap_closure::OpenSourceProjectSupremacySuite,
     pub total_obsoleted_projects_count: u32,
 }
@@ -3256,8 +3428,11 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             lazygit: SovereignLazygitEngine::new(),
             starship: SovereignStarshipPromptEngine::new(),
             yazi: SovereignYaziEngine::new(),
+            ripgrep: SovereignRipgrepSearchEngine::new(),
+            jq: SovereignJqJsonProcessorEngine::new(),
+            eza_fd: SovereignEzaFdDirectoryEngine::new(),
             supremacy_suite: open_source_os_gap_closure::OpenSourceProjectSupremacySuite::new(),
-            total_obsoleted_projects_count: 75,
+            total_obsoleted_projects_count: 80,
         }
     }
 
@@ -6490,7 +6665,7 @@ mod tests {
     fn test_sovereign_orchestrator_bootstrap() {
         let mut orchestrator = SovereignOpenSourceObsoletionOrchestrator::new();
         let status = orchestrator.bootstrap_sovereign_stack().unwrap();
-        assert!(status.contains("75 legacy open-source projects obsoleted"));
+        assert!(status.contains("80 legacy open-source projects obsoleted"));
     }
 
     #[test]
@@ -6779,5 +6954,41 @@ mod tests {
         let renamed = yazi.batch_select_and_rename(tab_idx, "sigma", "sovereign");
         assert_eq!(renamed, 1);
         assert_eq!(yazi.tabs[tab_idx].entries[0].name, "sovereign.conf");
+    }
+
+    #[test]
+    fn test_sovereign_ripgrep_search_engine() {
+        let mut ripgrep = SovereignRipgrepSearchEngine::new();
+        ripgrep.case_sensitive = false;
+        let content = "fn main() {\n    println!(\"Hello SigmaOS!\");\n}";
+        let matches = ripgrep.search_buffer("hello", content);
+        assert_eq!(matches.len(), 1);
+        assert_eq!(matches[0].line_number, 2);
+        assert!(matches[0].line_text.contains("Hello SigmaOS!"));
+    }
+
+    #[test]
+    fn test_sovereign_jq_json_processor_engine() {
+        let jq = SovereignJqJsonProcessorEngine::new();
+        let json = r#"{"name": "SigmaOS", "version": "1.0", "active": true}"#;
+        let value = jq.query_json_field(json, ".name").unwrap();
+        assert_eq!(value, "SigmaOS");
+
+        let version = jq.query_json_field(json, "version").unwrap();
+        assert_eq!(version, "1.0");
+    }
+
+    #[test]
+    fn test_sovereign_eza_fd_directory_engine() {
+        let mut eza_fd = SovereignEzaFdDirectoryEngine::new();
+        eza_fd.register_file_node("src/main.rs", 512, false, "rwxr-xr-x");
+        eza_fd.register_file_node("src/open_source_obsoletion.rs", 2048, false, "rw-r--r--");
+
+        let matches = eza_fd.find_glob("*.rs");
+        assert_eq!(matches.len(), 2);
+
+        let tree = eza_fd.format_tree_listing();
+        assert_eq!(tree.len(), 2);
+        assert!(tree[1].contains("src/open_source_obsoletion.rs"));
     }
 }

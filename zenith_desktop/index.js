@@ -188,6 +188,23 @@ export function initHighContrastSupport() {
 let lastFocusedElement = null;
 
 /**
+ * Initializes WAI-ARIA switch attributes (role="switch", aria-checked) on toggle switch inputs
+ * and synchronizes aria-checked attribute on state change for screen reader accessibility.
+ */
+export function initToggleSwitches() {
+  const toggleInputs = SovereignDomSelector.selectAll('.toggle-switch input[type="checkbox"]');
+  toggleInputs.forEach((input) => {
+    if (!input.hasAttribute("role")) {
+      input.setAttribute("role", "switch");
+    }
+    input.setAttribute("aria-checked", input.checked ? "true" : "false");
+    input.addEventListener("change", () => {
+      input.setAttribute("aria-checked", input.checked ? "true" : "false");
+    });
+  });
+}
+
+/**
  * Dismisses open modal overlays (#cmd-palette, #context-menu, #help-overlay) when Escape key is pressed
  * and toggles the Command Palette dialog on Alt+Space keyboard shortcut.
  */
@@ -232,9 +249,15 @@ export function initEscapeKeyDismissal() {
         }
       }
       const contextMenu = document.getElementById("context-menu");
-      if (contextMenu) contextMenu.style.display = "none";
+      if (contextMenu) {
+        contextMenu.style.display = "none";
+        contextMenu.setAttribute("aria-hidden", "true");
+      }
       const helpOverlay = document.getElementById("help-overlay");
-      if (helpOverlay) helpOverlay.classList.add("wizard-overlay--hidden");
+      if (helpOverlay) {
+        helpOverlay.classList.add("wizard-overlay--hidden");
+        helpOverlay.setAttribute("aria-hidden", "true");
+      }
     }
   });
 }
@@ -246,12 +269,14 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
       initKeyboardNavigation();
       initHighContrastSupport();
       initTablistNavigation();
+      initToggleSwitches();
       initEscapeKeyDismissal();
     });
   } else {
     initKeyboardNavigation();
     initHighContrastSupport();
     initTablistNavigation();
+    initToggleSwitches();
     initEscapeKeyDismissal();
   }
 }
