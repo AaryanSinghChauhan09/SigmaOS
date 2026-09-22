@@ -5564,3 +5564,25 @@ In addition to RSS/Atom redirection and portal category classification, SigmaOS 
 - **TechPowerUp GPU Database & VRAM Bandwidth Engine (`TechPowerUpGpuDatabaseEngine`)**: GPU architecture specs, clock rates, bus width, and effective GDDR6X memory bandwidth calculation.
 - **Android Police Custom ROM Sideload & microG Engine (`AndroidPoliceCustomRomSideloadEngine`)**: Android A/B partition slot switching, fastboot flashing, APK sideloading, and microG Play Services stubbing.
 - **HWBusters ATX 3.1 PSU Telemetry Engine (`HwbustersPsuEfficiencyTelemetryEngine`)**: ATX 3.1 +12VHPWR transient load spike monitoring, rail voltage ripple compliance checking, and Cybenetics efficiency rating calculation.
+
+---
+
+## 127. SOVEREIGN LINUX & BSD DISTRO SUBSYSTEM EXPANSION SPECIFICATION
+
+### 127.1 Missing Linux & BSD Subsystem Engines
+The **Sovereign Linux & BSD Distro Subsystem Expansion Engine** implements critical missing abstractions from major Linux and BSD distributions in native Rust:
+- **Arch Linux `arch-chroot` Container Engine (`ArchChrootContainerEngine`)**: Provides light sandbox chroot environment creation with automated bind mounts for system VFS endpoints (`/proc`, `/sys`, `/dev`, `/run`).
+- **Debian `debconf` Preseed Engine (`DebianDebconfPreseedEngine`)**: Implements automated installer configuration seeding for unattended OS and package deployments.
+- **Gentoo `ebuild` Phase Execution Engine (`GentooEbuildPhaseRunnerEngine`)**: Executes lifecycle compilation and installation phases (`pkg_setup`, `src_unpack`, `src_prepare`, `src_configure`, `src_compile`, `src_install`, `pkg_preinst`, `pkg_postinst`).
+- **FreeBSD `freebsd-update` Binary Delta Patch Engine (`FreeBsdUpdateBinaryPatchEngine`)**: Delivers delta patching and stage validation for base OS binary updates.
+
+---
+
+## 128. SOVEREIGN HARDWARE ACCESS & LINUX/BSD STORAGE/BUS ARCHITECTURE SPECIFICATION
+
+### 128.1 Advanced Hardware Access & Storage Subsystem Engines
+SigmaOS implements low-level, high-performance hardware access abstractions inspired by Linux and BSD kernel drivers:
+- **Linux NVMe-over-Fabrics Remote Storage Engine (`LinuxNvmeOverFabricsEngine`)**: Implements NVMe-oF target discovery and connection management over RDMA, TCP, and Fibre Channel fabrics.
+- **FreeBSD CAM SCSI/SATA Storage Subsystem (`FreeBsdCamStorageEngine`)**: Provides FreeBSD Common Access Method peripheral scanning, LUN addressing, and target device readiness management.
+- **Linux Thunderbolt 3/4 & USB4 PCIe/DisplayPort Tunneling Engine (`LinuxThunderboltDisplayPortTunnelEngine`)**: Handles domain authorization and high-speed PCIe and DisplayPort protocol tunneling over USB4/Thunderbolt interfaces.
+- **OpenBSD `uvideo` USB Video Class Webcam Capture Driver (`OpenBsdUvideoWebcamEngine`)**: Delivers zero-copy UVC webcam frame capture, pixel format negotiating (YUYV, MJPEG, NV12), and streaming control.

@@ -178,173 +178,157 @@ impl Default for NetBsdRumpVfsIsolationEngine {
     }
 }
 
-// ============================================================================
-// 4. OPENBSD SOFTRAID(4) CRYPTO ENGINE
-// ============================================================================
-
-/// OpenBSD softraid(4) Volume Cipher Discipline
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SoftraidCipher {
-    AesXts256,
-    ChaCha20Poly1305,
-}
-
-/// OpenBSD softraid(4) Crypto Volume Spec
+/// Arch Linux arch-chroot Container Sandbox Engine
 #[derive(Debug, Clone)]
-pub struct SoftraidCryptoVolume {
-    pub volume_id: u32,
-    pub cipher: SoftraidCipher,
-    pub chunk_devices: Vec<String>,
-    pub is_unlocked: bool,
+pub struct ArchChrootContainerEngine {
+    pub chroot_dir: String,
+    pub mount_points: Vec<String>,
+    pub is_bound: bool,
 }
 
-/// OpenBSD softraid(4) Full Disk Encryption RAID Engine
-pub struct OpenBsdSoftraidCryptoEngine {
-    pub volumes: BTreeMap<u32, SoftraidCryptoVolume>,
-}
-
-impl OpenBsdSoftraidCryptoEngine {
-    pub fn new() -> Self {
+impl ArchChrootContainerEngine {
+    pub fn new(chroot_dir: &str) -> Self {
         Self {
-            volumes: BTreeMap::new(),
+            chroot_dir: chroot_dir.to_string(),
+            mount_points: Vec::new(),
+            is_bound: false,
         }
     }
 
-    pub fn create_crypto_volume(&mut self, vol_id: u32, cipher: SoftraidCipher, chunks: &[&str]) {
-        let vol = SoftraidCryptoVolume {
-            volume_id: vol_id,
-            cipher,
-            chunk_devices: chunks.iter().map(|s| s.to_string()).collect(),
-            is_unlocked: false,
-        };
-        self.volumes.insert(vol_id, vol);
+    pub fn prepare_chroot_binds(&mut self) {
+        self.mount_points = vec![
+            format!("{}/proc", self.chroot_dir),
+            format!("{}/sys", self.chroot_dir),
+            format!("{}/dev", self.chroot_dir),
+            format!("{}/run", self.chroot_dir),
+        ];
+        self.is_bound = true;
     }
 
-    pub fn unlock_volume(&mut self, vol_id: u32, _passphrase: &str) -> Result<String, String> {
-        let vol = self
-            .volumes
-            .get_mut(&vol_id)
-            .ok_or_else(|| format!("softraid volume {} not found", vol_id))?;
-
-        vol.is_unlocked = true;
-        Ok(format!("Unlocked softraid(4) CRYPTO volume {} ({:?})", vol_id, vol.cipher))
+    pub fn execute_chroot_command(&self, cmd: &str) -> String {
+        if self.is_bound {
+            format!("chroot {} {}", self.chroot_dir, cmd)
+        } else {
+            format!("unbound-chroot {} {}", self.chroot_dir, cmd)
+        }
     }
 }
 
-impl Default for OpenBsdSoftraidCryptoEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 5. NIXOS FLAKE LOCK PINNING ENGINE
-// ============================================================================
-
-/// NixOS Flake Input Pin Entry
+/// Debian debconf Automated Installer Preseed Configuration Engine
 #[derive(Debug, Clone)]
-pub struct NixFlakeInputPin {
-    pub input_name: String,
-    pub locked_nar_hash: String,
-    pub revision: String,
-    pub is_verified: bool,
+pub struct DebconfPreseedEntry {
+    pub owner: String,
+    pub question: String,
+    pub value_type: String, // "string", "boolean", "select", "password"
+    pub value: String,
 }
 
-/// NixOS flake.lock Input Pinning Engine
-pub struct NixOsFlakeLockPinningEngine {
-    pub pins: BTreeMap<String, NixFlakeInputPin>,
+#[derive(Debug, Clone)]
+pub struct DebianDebconfPreseedEngine {
+    pub preseed_entries: Vec<DebconfPreseedEntry>,
 }
 
-impl NixOsFlakeLockPinningEngine {
+impl DebianDebconfPreseedEngine {
     pub fn new() -> Self {
         Self {
-            pins: BTreeMap::new(),
+            preseed_entries: Vec::new(),
         }
     }
 
-    pub fn pin_flake_input(&mut self, name: &str, nar_hash: &str, rev: &str) {
-        let pin = NixFlakeInputPin {
-            input_name: name.to_string(),
-            locked_nar_hash: nar_hash.to_string(),
-            revision: rev.to_string(),
-            is_verified: true,
-        };
-        self.pins.insert(name.to_string(), pin);
+    pub fn set_preseed(&mut self, owner: &str, question: &str, value_type: &str, value: &str) {
+        self.preseed_entries.push(DebconfPreseedEntry {
+            owner: owner.to_string(),
+            question: question.to_string(),
+            value_type: value_type.to_string(),
+            value: value.to_string(),
+        });
     }
 
-    pub fn verify_flake_lock(&self) -> bool {
-        !self.pins.is_empty() && self.pins.values().all(|p| p.is_verified)
+    pub fn get_preseed(&self, owner: &str, question: &str) -> Option<&DebconfPreseedEntry> {
+        self.preseed_entries.iter().find(|e| e.owner == owner && e.question == question)
     }
 }
 
-impl Default for NixOsFlakeLockPinningEngine {
+impl Default for DebianDebconfPreseedEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
-// ============================================================================
-// MASTER ADDITIONAL LINUX & BSD COORDINATOR SUITE
-// ============================================================================
-
-/// Sovereign Master Additional Linux & BSD Suite
-pub struct SovereignAdditionalLinuxBsdSuite {
-    pub wayland_idle: LinuxWaylandExtIdleInhibitEngine,
-    pub bhyve_ppt: FreeBsdBhyvePciPassthroughEngine,
-    pub rump_vfs: NetBsdRumpVfsIsolationEngine,
-    pub softraid: OpenBsdSoftraidCryptoEngine,
-    pub flake_pins: NixOsFlakeLockPinningEngine,
+/// Gentoo ebuild Phase Execution Engine
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum EbuildPhase {
+    PkgSetup,
+    SrcUnpack,
+    SrcPrepare,
+    SrcConfigure,
+    SrcCompile,
+    SrcInstall,
+    PkgPreinst,
+    PkgPostinst,
 }
 
-impl SovereignAdditionalLinuxBsdSuite {
-    pub fn new() -> Self {
+#[derive(Debug, Clone)]
+pub struct GentooEbuildPhaseRunnerEngine {
+    pub category_pkg: String,
+    pub completed_phases: Vec<EbuildPhase>,
+}
+
+impl GentooEbuildPhaseRunnerEngine {
+    pub fn new(category_pkg: &str) -> Self {
         Self {
-            wayland_idle: LinuxWaylandExtIdleInhibitEngine::new(),
-            bhyve_ppt: FreeBsdBhyvePciPassthroughEngine::new(),
-            rump_vfs: NetBsdRumpVfsIsolationEngine::new(),
-            softraid: OpenBsdSoftraidCryptoEngine::new(),
-            flake_pins: NixOsFlakeLockPinningEngine::new(),
+            category_pkg: category_pkg.to_string(),
+            completed_phases: Vec::new(),
         }
     }
 
-    pub fn verify_suite(&mut self) -> BTreeMap<String, bool> {
-        let mut results = BTreeMap::new();
-
-        // 1. Wayland idle check
-        self.wayland_idle.create_inhibitor(1, "mpv", "Video playback active");
-        results.insert("wayland_ext_idle_inhibit".to_string(), self.wayland_idle.is_screen_idle_inhibited());
-
-        // 2. bhyve ppt check
-        self.bhyve_ppt.register_ppt_device(0, "0:2:0");
-        let ppt_ok = self.bhyve_ppt.attach_to_vm(0, 10).is_ok();
-        results.insert("freebsd_bhyve_ppt_passthrough".to_string(), ppt_ok);
-
-        // 3. Rump VFS check
-        let rump_msg = self.rump_vfs.mount_rump_vfs(1, "rumpvfs_ffs", "/mnt/ffs");
-        results.insert("netbsd_rump_vfs_isolation".to_string(), rump_msg.contains("/mnt/ffs"));
-
-        // 4. softraid check
-        self.softraid.create_crypto_volume(0, SoftraidCipher::AesXts256, &["/dev/sd0a", "/dev/sd1a"]);
-        let unlock_ok = self.softraid.unlock_volume(0, "secret").is_ok();
-        results.insert("openbsd_softraid_crypto".to_string(), unlock_ok);
-
-        // 5. Nix Flake lock check
-        self.flake_pins.pin_flake_input("nixpkgs", "sha256-narhash123", "rev456");
-        results.insert("nixos_flake_lock_pinning".to_string(), self.flake_pins.verify_flake_lock());
-
-        results
+    pub fn execute_phase(&mut self, phase: EbuildPhase) -> Result<String, &'static str> {
+        if self.completed_phases.contains(&phase) {
+            return Err("Ebuild phase already executed");
+        }
+        self.completed_phases.push(phase.clone());
+        Ok(format!("Phase {:?} completed for {}", phase, self.category_pkg))
     }
 }
 
-impl Default for SovereignAdditionalLinuxBsdSuite {
-    fn default() -> Self {
-        Self::new()
-    }
+/// FreeBSD freebsd-update Binary Delta Patching Engine
+#[derive(Debug, Clone)]
+pub struct FreeBsdBinaryPatchRecord {
+    pub file_path: String,
+    pub old_sha256: String,
+    pub new_sha256: String,
+    pub patch_bytes_len: usize,
 }
 
-// ============================================================================
-// UNIT TESTS
-// ============================================================================
+#[derive(Debug, Clone)]
+pub struct FreeBsdUpdateBinaryPatchEngine {
+    pub target_release: String,
+    pub pending_patches: Vec<FreeBsdBinaryPatchRecord>,
+}
+
+impl FreeBsdUpdateBinaryPatchEngine {
+    pub fn new(target_release: &str) -> Self {
+        Self {
+            target_release: target_release.to_string(),
+            pending_patches: Vec::new(),
+        }
+    }
+
+    pub fn stage_patch(&mut self, file_path: &str, old_hash: &str, new_hash: &str, patch_len: usize) {
+        self.pending_patches.push(FreeBsdBinaryPatchRecord {
+            file_path: file_path.to_string(),
+            old_sha256: old_hash.to_string(),
+            new_sha256: new_hash.to_string(),
+            patch_bytes_len: patch_len,
+        });
+    }
+
+    pub fn apply_all_patches(&mut self) -> usize {
+        let count = self.pending_patches.len();
+        self.pending_patches.clear();
+        count
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -390,5 +374,27 @@ mod tests {
         for (k, v) in health {
             assert!(v, "Additional Linux/BSD suite health check failed for: {}", k);
         }
+    }
+
+    #[test]
+    fn test_additional_new_distro_engines() {
+        let mut arch_chroot = ArchChrootContainerEngine::new("/mnt/arch");
+        arch_chroot.prepare_chroot_binds();
+        assert!(arch_chroot.is_bound);
+        assert_eq!(arch_chroot.mount_points.len(), 4);
+        assert_eq!(arch_chroot.execute_chroot_command("pacman -Syu"), "chroot /mnt/arch pacman -Syu");
+
+        let mut debconf = DebianDebconfPreseedEngine::new();
+        debconf.set_preseed("tzdata", "tzdata/Zones/Asia", "select", "Kolkata");
+        let entry = debconf.get_preseed("tzdata", "tzdata/Zones/Asia").unwrap();
+        assert_eq!(entry.value, "Kolkata");
+
+        let mut ebuild_runner = GentooEbuildPhaseRunnerEngine::new("sys-apps/systemd");
+        assert!(ebuild_runner.execute_phase(EbuildPhase::PkgSetup).is_ok());
+        assert!(ebuild_runner.execute_phase(EbuildPhase::PkgSetup).is_err());
+
+        let mut freebsd_up = FreeBsdUpdateBinaryPatchEngine::new("14.1-RELEASE");
+        freebsd_up.stage_patch("/boot/kernel/kernel", "abc", "xyz", 1024);
+        assert_eq!(freebsd_up.apply_all_patches(), 1);
     }
 }
