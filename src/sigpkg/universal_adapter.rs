@@ -1090,6 +1090,38 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::Vcpkg)
         } else if f.ends_with(".narinfo") {
             Some(PackageFormat::NarInfo)
+        } else if f.ends_with(".msi") {
+            Some(PackageFormat::Msi)
+        } else if f.ends_with(".msix") {
+            Some(PackageFormat::Msix)
+        } else if f.ends_with(".appx") {
+            Some(PackageFormat::Appx)
+        } else if f.ends_with(".run") {
+            Some(PackageFormat::MakeselfRun)
+        } else if f.ends_with(".zpk") {
+            Some(PackageFormat::ZeroInstallZpk)
+        } else if f.ends_with(".kmp") {
+            Some(PackageFormat::KernelModuleKmp)
+        } else if f.ends_with(".kmod") {
+            Some(PackageFormat::KernelModuleKmod)
+        } else if f.ends_with(".jar") {
+            Some(PackageFormat::JavaJar)
+        } else if f.ends_with(".npm") {
+            Some(PackageFormat::NpmPkg)
+        } else if f.ends_with(".phar") {
+            Some(PackageFormat::PhpPhar)
+        } else if f.ends_with(".cpan") {
+            Some(PackageFormat::PerlCpan)
+        } else if f.ends_with(".rock") {
+            Some(PackageFormat::LuaRock)
+        } else if f.ends_with(".hex") {
+            Some(PackageFormat::ElixirHex)
+        } else if f.ends_with(".cabal") {
+            Some(PackageFormat::HaskellCabal)
+        } else if f.ends_with(".jl") {
+            Some(PackageFormat::JuliaPkg)
+        } else if f.ends_with(".rpkg") {
+            Some(PackageFormat::RCran)
         } else {
             None
         }
@@ -1162,6 +1194,14 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::Vcpkg) // Microsoft Vcpkg magic
         } else if data.starts_with(b"NARI") {
             Some(PackageFormat::NarInfo) // Nix/Guix NarInfo substituter magic
+        } else if data.starts_with(b"\xd0\xcf\x11\xe0") {
+            Some(PackageFormat::Msi) // Windows OLE/MSI magic
+        } else if data.starts_with(b"#!/bin/sh\n# This script was generated using Makeself") || data.starts_with(b"# Makeself") {
+            Some(PackageFormat::MakeselfRun) // Makeself runner magic
+        } else if data.starts_with(b"\x7fELF") && data.len() > 16 && data[16] == 1 {
+            Some(PackageFormat::KernelModuleKmod) // Relocatable ELF Kernel Module magic
+        } else if data.starts_with(b"<?php") {
+            Some(PackageFormat::PhpPhar) // PHP Phar executable header magic
         } else {
             None
         }

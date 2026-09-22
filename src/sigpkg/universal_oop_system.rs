@@ -139,133 +139,99 @@ pub trait IPackage: Send + Sync {
 }
 
 /// Package format enumeration
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub enum PackageFormat {
-    // Debian-based
+    #[default]
+    Sigma,
+    SigmaPkg,
+    Sovereign,
     Deb,
+    Udeb,
+    Superdeb,
     Apt,
-    // RPM-based
     Rpm,
+    Drpm,
     Yum,
-    // Arch-based
+    Zypper,
     Pacman,
-    // Gentoo-based
+    Pkgbuild,
+    Cachy,
+    CachyOS,
+    Apk,
     Ebuild,
     Portage,
-    // Alpine-based
-    Apk,
-    // Nix-based
     Nix,
-    // Flatpak
-    Flatpak,
-    // Snap
-    Snap,
-    // AppImage
-    AppImage,
-    // Void Linux
-    Xbps,
-    // Slackware
-    Txz,
-    // Solus
-    Eopkg,
-    // OpenSUSE
-    Zypper,
-    // Guix
+    Nixpkg,
     Guix,
-    // SigmaOS Native
-    Sigma,
-    Sovereign,
-    // Adobe AIR
-    Air,
-    // Homebrew Bottle
-    Bottle,
-    // iOS App (.ipa)
-    Ipa,
-    // FreeBSD / OpenBSD Ports
-    Ports,
-    // macOS / FreeBSD / Solaris PKG
-    Pkg,
-    // Android App Bundle (.aab)
-    Aab,
-    // Compressed Tar archives (.tar.gz, .tgz)
-    TarGz,
-    // Compressed Tar XZ archives (.tar.xz, .xz, .pkg.tar.xz)
-    TarXz,
-    // Plain Tar archive (.tar)
-    Tar,
-    // macOS / Nextstep App bundle (.app)
-    AppBundle,
-    // HarmonyOS Ability Package (.hap)
-    Hap,
-    // Pardus / Solus PiSi (.PiSi)
-    Pisi,
-    // Deepin Superdeb (.superdeb)
-    Superdeb,
-    // Slax Linux Module (.lzm)
-    Lzm,
-    // Puppy Linux Package (.pup)
-    Pup,
-    // Puppy Extra Tarball / Pet (.pet)
-    Pet,
-    // Solus Moss (.moss)
-    Moss,
-    // Haiku Package (.hpkg)
-    Hpkg,
-    // Tiny Core Linux extension (.tcz)
-    Tcz,
-    // GoboLinux package (.gobo)
-    Gobo,
-    // OSTree commit (.commit)
-    Ostree,
-    // NetBSD pkgsrc (.pkgsrc)
-    Pkgsrc,
-    // SquashFS package (.sfs)
-    Sfs,
-    // Portable package (.puk)
-    Puk,
-    // macOS Disk Image (.dmg)
-    Dmg,
-    // Chimera Linux (.cports)
-    Cports,
-    // DragonFly BSD DPorts (.dports)
-    Dports,
-    // Slackware SlackBuild (.slackbuild)
-    SlackBuild,
-    // CRUX Linux (.crux)
-    Crux,
-    // Delta RPM (.drpm)
-    Drpm,
-    // Bedrock Linux Stratum (.stratum)
-    Stratum,
-    // OpenWrt / opkg / Entware (.ipk)
-    Ipk,
-    // Yocto / OpenEmbedded (.opkg)
-    Opkg,
-    // OpenBSD pkg_add (.openbsd.tgz / .tgz)
-    OpenBsdPkg,
-    // Solaris / Illumos IPS (.p5p / .ips)
-    SolarisIps,
-    // GNU Guix / Nix Archive (.nar)
     GuixNar,
-    // Spack HPC package manager (.spack)
-    Spack,
-    // C/C++ Conan package (.conan)
-    Conan,
-    // Python Wheel (.whl)
-    Wheel,
-    // Rust Cargo crate (.crate)
-    Crate,
-    // RubyGems (.gem)
-    Gem,
-    // .NET NuGet (.nupkg)
-    Nupkg,
-    // Microsoft Vcpkg (.vcpkg)
-    Vcpkg,
-    // Nix/Guix NarInfo substituter manifest (.narinfo)
     NarInfo,
-    // Clear Linux swupd (.swupd)
+    Xbps,
+    Eopkg,
+    Moss,
+    Pisi,
+    Ipk,
+    Opkg,
+    Ports,
+    OpenBsdPkg,
+    FreeBsdPkg,
+    Pkgsrc,
+    Dports,
+    Cports,
+    SolarisIps,
+    Pkg,
+    Spack,
+    Conan,
+    Wheel,
+    Crate,
+    Gem,
+    Nupkg,
+    Vcpkg,
+    Msi,
+    Msix,
+    Appx,
+    MakeselfRun,
+    ZeroInstallZpk,
+    KernelModuleKmp,
+    KernelModuleKmod,
+    JavaJar,
+    NpmPkg,
+    PhpPhar,
+    PerlCpan,
+    LuaRock,
+    ElixirHex,
+    HaskellCabal,
+    JuliaPkg,
+    RCran,
+    Snap,
+    Flatpak,
+    AppImage,
+    Air,
+    Bottle,
+    Ipa,
+    Aab,
+    TarGz,
+    TarXz,
+    Xz,
+    Tar,
+    Tgz,
+    Txz,
+    App,
+    AppBundle,
+    Hap,
+    Lzm,
+    Pup,
+    Pet,
+    Hpkg,
+    Tcz,
+    Gobo,
+    Ostree,
+    Sfs,
+    Puk,
+    Dmg,
+    SlackBuild,
+    Crux,
+    Stratum,
     Swupd,
-    // StarlingX (.starling)
     Starling,
 }
 
@@ -381,6 +347,38 @@ impl PackageFormat {
             Some(PackageFormat::SolarisIps)
         } else if normalized.ends_with(".nar") {
             Some(PackageFormat::GuixNar)
+        } else if normalized.ends_with(".msi") {
+            Some(PackageFormat::Msi)
+        } else if normalized.ends_with(".msix") {
+            Some(PackageFormat::Msix)
+        } else if normalized.ends_with(".appx") {
+            Some(PackageFormat::Appx)
+        } else if normalized.ends_with(".run") {
+            Some(PackageFormat::MakeselfRun)
+        } else if normalized.ends_with(".zpk") {
+            Some(PackageFormat::ZeroInstallZpk)
+        } else if normalized.ends_with(".kmp") {
+            Some(PackageFormat::KernelModuleKmp)
+        } else if normalized.ends_with(".kmod") {
+            Some(PackageFormat::KernelModuleKmod)
+        } else if normalized.ends_with(".jar") {
+            Some(PackageFormat::JavaJar)
+        } else if normalized.ends_with(".npm") {
+            Some(PackageFormat::NpmPkg)
+        } else if normalized.ends_with(".phar") {
+            Some(PackageFormat::PhpPhar)
+        } else if normalized.ends_with(".cpan") {
+            Some(PackageFormat::PerlCpan)
+        } else if normalized.ends_with(".rock") {
+            Some(PackageFormat::LuaRock)
+        } else if normalized.ends_with(".hex") {
+            Some(PackageFormat::ElixirHex)
+        } else if normalized.ends_with(".cabal") {
+            Some(PackageFormat::HaskellCabal)
+        } else if normalized.ends_with(".jl") {
+            Some(PackageFormat::JuliaPkg)
+        } else if normalized.ends_with(".rpkg") {
+            Some(PackageFormat::RCran)
         } else {
             None
         }
