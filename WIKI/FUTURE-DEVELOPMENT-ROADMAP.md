@@ -5582,3 +5582,31 @@ SigmaOS incorporates a low-level, zero-dependency `#![no_std]` Rust engine (`Oma
    - Git branch indicator (`on  main`).
    - Execution status symbols (`❯` on success, `✖ ❯` on command failure).
    - Configurable via `~/.config/starship.toml` parity.
+
+
+## 133. SOVEREIGN OMARCHY CAPTURE, SCREEN RECORDING, OCR & LOCAL SHARING SPECIFICATION
+
+### 133.1 Overview & Subsystem Architecture
+SigmaOS absorbs the screen capture, video recording, text extraction (OCR), and local file sharing workflows of **Omarchy Linux** into a zero-dependency `#![no_std]` Rust engine (`OmarchyCaptureAndSharingEngine` in `src/distro/omarchy.rs`):
+
+1. **Screenshot Capture Modes**:
+   - Smart interactive region selection (`omarchy screenshot`).
+   - Region selection (`omarchy capture screenshot region`).
+   - Active window capture (`omarchy capture screenshot windows`).
+   - Fullscreen direct-to-disk save (`omarchy capture screenshot fullscreen save`).
+   - Scrolling region stitching (`omarchy capture screenshot scroll`).
+   - Annotation editor overlays (`--editor=overlay` or `--editor=window`).
+   - Default save location `~/Pictures/Screenshots` configurable via `OMASNAP_SCREENSHOT_DIR`.
+
+2. **Screen Recording Engine**:
+   - Fullscreen & region recording (`omarchy screenrecord --fullscreen`).
+   - Audio integration flags (`--with-desktop-audio`, `--with-microphone-audio`).
+   - Live webcam overlay with dynamic resizing (`--with-webcam`, `omarchy capture webcam resize`).
+   - Debug logging via `OMARCHY_SCREENRECORD_DEBUG=true`.
+   - Recording output target directory configurable via `OMARCHY_SCREENRECORD_DIR` (default `~/Videos`).
+
+3. **Text Capture (OCR) & File Sharing**:
+   - Screen region OCR text extraction directly to clipboard (`omarchy capture text`).
+   - LocalSend P2P clipboard, file, and folder sharing (`omarchy share clipboard|file|folder`).
+   - Tailscale Taildrop machine-to-machine transfers (`omarchy tailscale send/receive`).
+   - Media re-encoding & transcoding helper (`omarchy transcode <input> [format] [resolution]`).
