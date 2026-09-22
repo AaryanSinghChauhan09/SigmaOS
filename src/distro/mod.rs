@@ -391,5 +391,5 @@ pub use missing_linux_bsd_components::*;
 pub mod additional_linux_bsd_components;
 pub use additional_linux_bsd_components::*;
 
-pub mod sovereign_media_and_distro_unimplemented_innovations;
-pub use sovereign_media_and_distro_unimplemented_innovations::*;
+pub mod sovereign_linux_bsd_master_innovations;
+pub use sovereign_linux_bsd_master_innovations::*;
