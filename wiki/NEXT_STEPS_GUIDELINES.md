@@ -20,7 +20,8 @@ ISO Boot → Live Media → Installer Wizard → First Boot Login → Zenith Des
 
 ---
 
-## 2. Tri-Agent Execution Guidelines
+## 2. Tri-Agent Execution Guidelines & 500+ Repositories Absorption Plan
+SigmaOS development is governed by the Tri-Agent Steering Framework (Bolt ⚡, Palette 🎨, Sentinel 🛡️) and the 500+ GitHub Repositories Absorption Master Plan detailed in `SIGMAOS_TRI_AGENT_AND_500_REPOS_ABSORPTION_MASTER_PLAN.md`.
 
 ### ⚡ Bolt Agent Guidelines (Performance & Efficiency)
 - Profile code before modifying ($O(N^2) \to O(N \log N)$ or zero-allocation buffers).
