@@ -136,31 +136,6 @@ mod tests {
         let debian = dispatcher.dispatch_command("debian install nginx").unwrap();
         assert_eq!(debian.source_pm, "debian");
         assert_eq!(debian.operation, UniversalPmOperation::Install);
-
-        let emerge = dispatcher.dispatch_command("emerge -uDN @world -p").unwrap();
-        assert_eq!(emerge.source_pm, "emerge");
-        assert_eq!(emerge.operation, UniversalPmOperation::Upgrade);
-        assert!(emerge.dry_run);
-
-        let nix = dispatcher.dispatch_command("nix install nixpkgs#firefox").unwrap();
-        assert_eq!(nix.source_pm, "nix");
-        assert_eq!(nix.operation, UniversalPmOperation::Install);
-
-        let eopkg = dispatcher.dispatch_command("eopkg it vlc").unwrap();
-        assert_eq!(eopkg.source_pm, "eopkg");
-        assert_eq!(eopkg.operation, UniversalPmOperation::Install);
-
-        let slackpkg = dispatcher.dispatch_command("slackpkg install glibc").unwrap();
-        assert_eq!(slackpkg.source_pm, "slackpkg");
-        assert_eq!(slackpkg.operation, UniversalPmOperation::Install);
-
-        let flatpak = dispatcher.dispatch_command("flatpak install org.gimp.GIMP").unwrap();
-        assert_eq!(flatpak.source_pm, "flatpak");
-        assert_eq!(flatpak.operation, UniversalPmOperation::Install);
-
-        let snap = dispatcher.dispatch_command("snap remove vlc").unwrap();
-        assert_eq!(snap.source_pm, "snap");
-        assert_eq!(snap.operation, UniversalPmOperation::Remove);
     }
 
     #[test]

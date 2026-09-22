@@ -2249,6 +2249,50 @@ impl UniversalPmCommandDispatcher {
                 for arg in args {
                     if *arg == "-n" || *arg == "--dry-run" {
                         dry_run = true;
+                    } else if !arg.starts_with('-') && target_packages.is_empty() && *arg != "install" && *arg != "remove" && *arg != "upgrade" {
+                        target_packages.push(arg.to_string());
+                    }
+                }
+            }
+            "emerge" | "ebuild" | "gentoo" | "portage" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "install" | "add" => operation = UniversalPmOperation::Install,
+                        "delete" | "remove" => operation = UniversalPmOperation::Remove,
+                        "upgrade" => operation = UniversalPmOperation::Upgrade,
+                        "search" => operation = UniversalPmOperation::Search,
+                        "info" => operation = UniversalPmOperation::QueryInfo,
+                        "-n" => dry_run = true,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                }
+            }
+            "xbps" | "xbps-install" | "xbps-remove" | "xbps-query" | "void" => {
+                if pm == "xbps-remove" {
+                    operation = UniversalPmOperation::Remove;
+                } else if pm == "xbps-query" {
+                    operation = UniversalPmOperation::QueryInfo;
+                } else {
+                    let mut i = 0;
+                    while i < args.len() {
+                        match args[i] {
+                            "install" | "add" => operation = UniversalPmOperation::Install,
+                            "remove" | "purge" => operation = UniversalPmOperation::Remove,
+                            "upgrade" | "update" => operation = UniversalPmOperation::Upgrade,
+                            "search" => operation = UniversalPmOperation::Search,
+                            "info" | "query" => operation = UniversalPmOperation::QueryInfo,
+                            "-n" | "--dry-run" => dry_run = true,
+                            arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                            _ => {}
+                        }
+                        i += 1;
+                    }
+                }
+                for arg in args {
+                    if *arg == "-n" || *arg == "--dry-run" {
+                        dry_run = true;
                     } else if !arg.starts_with('-') && target_packages.is_empty() && *arg != "install" && *arg != "add" && *arg != "remove" && *arg != "purge" && *arg != "upgrade" && *arg != "update" && *arg != "search" && *arg != "info" && *arg != "query" {
                         target_packages.push(arg.to_string());
                     }
