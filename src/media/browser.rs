@@ -1764,7 +1764,182 @@ impl FirefoxTabUnloadingMemoryEngine {
 }
 
 // =========================================================================
-// 32. UNIFIED SIGMAWEB BROWSER SUITE
+// 32. SOVEREIGN WEB FINGERPRINT CANVAS NOISE ENGINE (LibreWolf / Brave / Mullvad Inspired)
+// =========================================================================
+
+pub struct SovereignWebFingerprintCanvasNoiseEngine {
+    pub canvas_noise_enabled: bool,
+    pub webgl_vendor_masked: bool,
+    pub audio_buffer_noise_enabled: bool,
+    pub seed_offset: u8,
+}
+
+impl SovereignWebFingerprintCanvasNoiseEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            canvas_noise_enabled: true,
+            webgl_vendor_masked: true,
+            audio_buffer_noise_enabled: true,
+            seed_offset: 0x01,
+        }
+    }
+
+    pub fn apply_canvas_pixel_noise(&self, rgba_buffer: &mut [u8]) {
+        if !self.canvas_noise_enabled {
+            return;
+        }
+        for (i, pixel) in rgba_buffer.iter_mut().enumerate() {
+            if i % 4 != 3 { // Do not touch alpha channel
+                *pixel = pixel.wrapping_add(self.seed_offset ^ (i as u8 & 0x03));
+            }
+        }
+    }
+
+    pub fn sanitize_webgl_vendor_info(&self) -> (&'static str, &'static str) {
+        if self.webgl_vendor_masked {
+            ("Mesa/X.org", "Mesa OffScreen Generic Renderer")
+        } else {
+            ("NVIDIA Corporation", "NVIDIA GeForce RTX 4090")
+        }
+    }
+
+    pub fn apply_audio_buffer_noise(&self, audio_samples: &mut [f32]) {
+        if !self.audio_buffer_noise_enabled {
+            return;
+        }
+        for (idx, sample) in audio_samples.iter_mut().enumerate() {
+            let noise = ((idx as f32 * 0.0001) % 0.00001) - 0.000005;
+            *sample += noise;
+        }
+    }
+}
+
+// =========================================================================
+// 33. SOVEREIGN EPHEMERAL STORAGE ISOLATION ENGINE (Mullvad / Container Jars Inspired)
+// =========================================================================
+
+pub struct SovereignEphemeralStorageIsolationEngine {
+    pub isolated_stores: BTreeMap<String, BTreeMap<String, String>>,
+    pub auto_clear_on_tab_close: bool,
+}
+
+impl SovereignEphemeralStorageIsolationEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            isolated_stores: BTreeMap::new(),
+            auto_clear_on_tab_close: true,
+        }
+    }
+
+    pub fn set_item(&mut self, origin: &str, key: &str, value: &str) {
+        self.isolated_stores
+            .entry(origin.to_string())
+            .or_default()
+            .insert(key.to_string(), value.to_string());
+    }
+
+    pub fn get_item(&self, origin: &str, key: &str) -> Option<&String> {
+        self.isolated_stores.get(origin)?.get(key)
+    }
+
+    pub fn purge_origin_storage(&mut self, origin: &str) {
+        self.isolated_stores.remove(origin);
+    }
+}
+
+// =========================================================================
+// 34. FIREFOX VERTICAL TAB GROUP ENGINE (Firefox / Arc / Floorp Inspired)
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct VerticalTabGroup {
+    pub group_id: u32,
+    pub group_title: String,
+    pub is_collapsed: bool,
+    pub tab_ids: Vec<u32>,
+}
+
+pub struct FirefoxVerticalTabGroupEngine {
+    pub groups: BTreeMap<u32, VerticalTabGroup>,
+}
+
+impl FirefoxVerticalTabGroupEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            groups: BTreeMap::new(),
+        }
+    }
+
+    pub fn create_group(&mut self, group_id: u32, title: &str) {
+        self.groups.insert(
+            group_id,
+            VerticalTabGroup {
+                group_id,
+                group_title: title.to_string(),
+                is_collapsed: false,
+                tab_ids: Vec::new(),
+            },
+        );
+    }
+
+    pub fn add_tab_to_group(&mut self, group_id: u32, tab_id: u32) -> bool {
+        if let Some(group) = self.groups.get_mut(&group_id) {
+            if !group.tab_ids.contains(&tab_id) {
+                group.tab_ids.push(tab_id);
+            }
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn toggle_group_collapse(&mut self, group_id: u32) -> bool {
+        if let Some(group) = self.groups.get_mut(&group_id) {
+            group.is_collapsed = !group.is_collapsed;
+            group.is_collapsed
+        } else {
+            false
+        }
+    }
+}
+
+// =========================================================================
+// 35. CHROMIUM V8 JIT HARDENING SANDBOX ENGINE (Chromium / Thorium Inspired)
+// =========================================================================
+
+pub struct ChromiumV8JitHardeningSandboxEngine {
+    pub jit_w_xor_x_enabled: bool,
+    pub isolate_heap_guard_size_bytes: usize,
+}
+
+impl ChromiumV8JitHardeningSandboxEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            jit_w_xor_x_enabled: true,
+            isolate_heap_guard_size_bytes: 1024 * 1024 * 1024, // 1GB Sandbox Heap Guard
+        }
+    }
+
+    pub fn verify_jit_page_permissions(&self, is_writable: bool, is_executable: bool) -> bool {
+        if self.jit_w_xor_x_enabled {
+            // W^X rule: Cannot be writable and executable simultaneously
+            !(is_writable && is_executable)
+        } else {
+            true
+        }
+    }
+
+    pub fn is_heap_address_in_sandbox(&self, addr: usize, sandbox_base: usize) -> bool {
+        addr >= sandbox_base && addr < (sandbox_base + self.isolate_heap_guard_size_bytes)
+    }
+}
+
+// =========================================================================
+// 36. UNIFIED SIGMAWEB BROWSER SUITE
 // =========================================================================
 
 pub struct SigmaWebBrowser {
@@ -1799,6 +1974,10 @@ pub struct SigmaWebBrowser {
     pub cromite_adblock: CromiteAdblockCosmeticEngine,
     pub partition_alloc: ChromiumPartitionAllocSecurityEngine,
     pub tab_unloader: FirefoxTabUnloadingMemoryEngine,
+    pub canvas_noise: SovereignWebFingerprintCanvasNoiseEngine,
+    pub ephemeral_storage: SovereignEphemeralStorageIsolationEngine,
+    pub tab_groups: FirefoxVerticalTabGroupEngine,
+    pub v8_jit_hardening: ChromiumV8JitHardeningSandboxEngine,
 }
 
 impl SigmaWebBrowser {
@@ -1836,6 +2015,10 @@ impl SigmaWebBrowser {
             cromite_adblock: CromiteAdblockCosmeticEngine::new(),
             partition_alloc: ChromiumPartitionAllocSecurityEngine::new(),
             tab_unloader: FirefoxTabUnloadingMemoryEngine::new(),
+            canvas_noise: SovereignWebFingerprintCanvasNoiseEngine::new(),
+            ephemeral_storage: SovereignEphemeralStorageIsolationEngine::new(),
+            tab_groups: FirefoxVerticalTabGroupEngine::new(),
+            v8_jit_hardening: ChromiumV8JitHardeningSandboxEngine::new(),
         }
     }
 
@@ -2259,5 +2442,35 @@ mod tests {
 
         let browser = SigmaWebBrowser::new();
         assert!(browser.cromite_adblock.anti_adblock_bypass_enabled);
+    }
+
+    #[test]
+    fn test_sovereign_browser_new_innovations() {
+        let noise_engine = SovereignWebFingerprintCanvasNoiseEngine::new();
+        let mut rgba = vec![10, 20, 30, 255];
+        noise_engine.apply_canvas_pixel_noise(&mut rgba);
+        assert_ne!(rgba[0], 10);
+        assert_eq!(rgba[3], 255);
+
+        let (vendor, renderer) = noise_engine.sanitize_webgl_vendor_info();
+        assert_eq!(vendor, "Mesa/X.org");
+        assert!(renderer.contains("Generic Renderer"));
+
+        let mut storage = SovereignEphemeralStorageIsolationEngine::new();
+        storage.set_item("https://example.com", "session_token", "xyz123");
+        assert_eq!(storage.get_item("https://example.com", "session_token"), Some(&"xyz123".to_string()));
+        storage.purge_origin_storage("https://example.com");
+        assert_eq!(storage.get_item("https://example.com", "session_token"), None);
+
+        let mut groups = FirefoxVerticalTabGroupEngine::new();
+        groups.create_group(1, "Work");
+        assert!(groups.add_tab_to_group(1, 101));
+        assert!(groups.toggle_group_collapse(1));
+
+        let v8_jit = ChromiumV8JitHardeningSandboxEngine::new();
+        assert!(v8_jit.verify_jit_page_permissions(true, false));
+        assert!(v8_jit.verify_jit_page_permissions(false, true));
+        assert!(!v8_jit.verify_jit_page_permissions(true, true)); // W^X violation
+        assert!(v8_jit.is_heap_address_in_sandbox(0x10005000, 0x10000000));
     }
 }

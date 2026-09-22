@@ -502,11 +502,33 @@ impl BashParameterExpansion {
             return val.to_uppercase();
         }
 
+        // 1b2. ${VAR^} - uppercase first character conversion
+        if inner.ends_with('^') {
+            let var_name = &inner[..inner.len() - 1];
+            let val = env.get(var_name).cloned().unwrap_or_default();
+            let mut chars = val.chars();
+            return match chars.next() {
+                None => String::new(),
+                Some(first) => first.to_uppercase().collect::<String>() + chars.as_str(),
+            };
+        }
+
         // 1c. ${VAR,,} - lowercase conversion
         if inner.ends_with(",,") {
             let var_name = &inner[..inner.len() - 2];
             let val = env.get(var_name).cloned().unwrap_or_default();
             return val.to_lowercase();
+        }
+
+        // 1c2. ${VAR,} - lowercase first character conversion
+        if inner.ends_with(',') {
+            let var_name = &inner[..inner.len() - 1];
+            let val = env.get(var_name).cloned().unwrap_or_default();
+            let mut chars = val.chars();
+            return match chars.next() {
+                None => String::new(),
+                Some(first) => first.to_lowercase().collect::<String>() + chars.as_str(),
+            };
         }
 
         // 2. ${VAR//search/replace} vs ${VAR/search/replace}
@@ -1487,11 +1509,18 @@ impl UniversalScriptTranspiler {
             }
         }
 
-        // 7. Fish 'set -g VAR val' or 'set -l VAR val' or 'set VAR val' -> 'VAR=val' / 'export VAR=val'
-        if l.starts_with("set -x ") || l.starts_with("set -gx ") {
+        // 7. Fish 'set -q VAR' -> '[ -n "$VAR" ]' (variable query check)
+        if l.starts_with("set -q ") {
+            let var = l.trim_start_matches("set -q ").trim();
+            return format!("[ -n \"${{{}}}\" ]", var);
+        }
+
+        // 7b. Fish 'set -g VAR val' or 'set -l VAR val' or 'set VAR val' -> 'VAR=val' / 'export VAR=val'
+        if l.starts_with("set -x ") || l.starts_with("set -gx ") || l.starts_with("set -xg ") {
             let rest = l
                 .trim_start_matches("set -x ")
-                .trim_start_matches("set -gx ");
+                .trim_start_matches("set -gx ")
+                .trim_start_matches("set -xg ");
             if let Some(space_idx) = rest.find(' ') {
                 let var = &rest[..space_idx];
                 let val = &rest[space_idx + 1..];
@@ -1691,8 +1720,15 @@ impl UniversalScriptTranspiler {
             }
         }
 
-        // 0c. Bash declare -a / declare -A -> var=...
-        if l.starts_with("declare -a ") || l.starts_with("declare -A ") || l.starts_with("declare ") {
+        // 0c. Bash declare -n / declare -a / declare -A -> var=...
+        if l.starts_with("declare -n ") {
+            let rest = l.trim_start_matches("declare -n ").trim();
+            if let Some(eq_idx) = rest.find('=') {
+                let var = rest[..eq_idx].trim();
+                let target = rest[eq_idx + 1..].trim();
+                return format!("{}=\"${{{}}}\"", var, target);
+            }
+        } else if l.starts_with("declare -a ") || l.starts_with("declare -A ") || l.starts_with("declare ") {
             let rest = l.trim_start_matches("declare -a ")
                 .trim_start_matches("declare -A ")
                 .trim_start_matches("declare ")
@@ -2607,8 +2643,19 @@ mod tests {
 
         let mut env = BTreeMap::new();
         env.insert("FILE".to_string(), "archive.tar.gz".to_string());
+        env.insert("WORD".to_string(), "hello".to_string());
         assert_eq!(BashParameterExpansion::expand("${FILE#archive.}", &env), "tar.gz");
         assert_eq!(BashParameterExpansion::expand("${FILE%.gz}", &env), "archive.tar");
+        assert_eq!(BashParameterExpansion::expand("${WORD^}", &env), "Hello");
+        assert_eq!(BashParameterExpansion::expand("${WORD,}", &env), "hello");
+
+        let nameref_script = "declare -n ref=WORD";
+        let posix_nameref = UniversalScriptTranspiler::transpile_to_posix_sh(nameref_script, ShellDialect::Bash);
+        assert!(posix_nameref.contains("ref=\"${WORD}\""));
+
+        let fish_set_q = "set -q WORD";
+        let posix_set_q = UniversalScriptTranspiler::transpile_to_posix_sh(fish_set_q, ShellDialect::Fish);
+        assert!(posix_set_q.contains("[ -n \"${WORD}\" ]"));
 
         // Test Nu, Ion, Rc, and Elvish shebang detection & transpilation
         let nu_script = "#!/usr/bin/env nu\nlet-env FOO = bar\ndef my_func [] {\nwhere size > 10\n}";
