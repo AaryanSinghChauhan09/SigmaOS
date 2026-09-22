@@ -234,9 +234,9 @@ mod tests {
     #[test]
     fn test_freeipa_kerberos_auth() {
         let mut ipa = FedoraFreeIpaKerberosAuth::new("FEDORA.LOCAL");
-        // Use environment variable or proper test fixture for password
+        // Use environment variable for password - fail gracefully if not set
         let test_password = std::env::var("SIGMA_TEST_PASSWORD")
-            .unwrap_or_else(|_| "test_password_placeholder".to_string());
+            .expect("SIGMA_TEST_PASSWORD environment variable must be set for this test");
         let ticket = ipa.kinit("admin@FEDORA.LOCAL", &test_password).unwrap();
         assert_eq!(ticket.realm, "FEDORA.LOCAL");
         assert!(ipa.verify_gssapi_token(b"GSSAPI_TICKET_BLOB"));

@@ -139,98 +139,134 @@ pub trait IPackage: Send + Sync {
 }
 
 /// Package format enumeration
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum PackageFormat {
-    #[default]
-    SigmaPkg,
-    Sigma,
-    Sovereign,
+    // Debian-based
     Deb,
     Apt,
-    Udeb,
-    Superdeb,
+    // RPM-based
     Rpm,
     Yum,
-    Drpm,
-    Zypper,
+    // Arch-based
     Pacman,
-    Cachy,
-    CachyOS,
-    Snap,
-    Flatpak,
-    AppImage,
-    Air,
-    Bottle,
-    Ipa,
-    Ports,
-    Pkg,
-    Aab,
-    Apk,
-    Eopkg,
-    Nixpkg,
-    Nix,
+    // Gentoo-based
     Ebuild,
     Portage,
-    TarGz,
-    TarXz,
-    Xz,
-    Tar,
-    App,
-    AppBundle,
-    Hap,
-    Pisi,
-    Lzm,
-    Pup,
-    Pet,
+    // Alpine-based
+    Apk,
+    // Nix-based
+    Nix,
+    // Flatpak
+    Flatpak,
+    // Snap
+    Snap,
+    // AppImage
+    AppImage,
+    // Void Linux
     Xbps,
-    Guix,
-    GuixNar,
-    Moss,
-    Hpkg,
-    Tcz,
-    Gobo,
-    Ostree,
-    Pkgsrc,
-    Sfs,
-    Puk,
-    Dmg,
-    Cports,
-    Dports,
-    SlackBuild,
+    // Slackware
     Txz,
+    // Solus
+    Eopkg,
+    // OpenSUSE
+    Zypper,
+    // Guix
+    Guix,
+    // SigmaOS Native
+    Sigma,
+    Sovereign,
+    // Adobe AIR
+    Air,
+    // Homebrew Bottle
+    Bottle,
+    // iOS App (.ipa)
+    Ipa,
+    // FreeBSD / OpenBSD Ports
+    Ports,
+    // macOS / FreeBSD / Solaris PKG
+    Pkg,
+    // Android App Bundle (.aab)
+    Aab,
+    // Compressed Tar archives (.tar.gz, .tgz)
+    TarGz,
+    // Compressed Tar XZ archives (.tar.xz, .xz, .pkg.tar.xz)
+    TarXz,
+    // Plain Tar archive (.tar)
+    Tar,
+    // macOS / Nextstep App bundle (.app)
+    AppBundle,
+    // HarmonyOS Ability Package (.hap)
+    Hap,
+    // Pardus / Solus PiSi (.PiSi)
+    Pisi,
+    // Deepin Superdeb (.superdeb)
+    Superdeb,
+    // Slax Linux Module (.lzm)
+    Lzm,
+    // Puppy Linux Package (.pup)
+    Pup,
+    // Puppy Extra Tarball / Pet (.pet)
+    Pet,
+    // Solus Moss (.moss)
+    Moss,
+    // Haiku Package (.hpkg)
+    Hpkg,
+    // Tiny Core Linux extension (.tcz)
+    Tcz,
+    // GoboLinux package (.gobo)
+    Gobo,
+    // OSTree commit (.commit)
+    Ostree,
+    // NetBSD pkgsrc (.pkgsrc)
+    Pkgsrc,
+    // SquashFS package (.sfs)
+    Sfs,
+    // Portable package (.puk)
+    Puk,
+    // macOS Disk Image (.dmg)
+    Dmg,
+    // Chimera Linux (.cports)
+    Cports,
+    // DragonFly BSD DPorts (.dports)
+    Dports,
+    // Slackware SlackBuild (.slackbuild)
+    SlackBuild,
+    // CRUX Linux (.crux)
     Crux,
-    Pkgfile,
+    // Delta RPM (.drpm)
+    Drpm,
+    // Bedrock Linux Stratum (.stratum)
     Stratum,
-    OpenBsdPkg,
+    // OpenWrt / opkg / Entware (.ipk)
     Ipk,
+    // Yocto / OpenEmbedded (.opkg)
     Opkg,
+    // OpenBSD pkg_add (.openbsd.tgz / .tgz)
+    OpenBsdPkg,
+    // Solaris / Illumos IPS (.p5p / .ips)
     SolarisIps,
+    // GNU Guix / Nix Archive (.nar)
+    GuixNar,
+    // Spack HPC package manager (.spack)
     Spack,
+    // C/C++ Conan package (.conan)
     Conan,
+    // Python Wheel (.whl)
     Wheel,
+    // Rust Cargo crate (.crate)
     Crate,
+    // RubyGems (.gem)
     Gem,
+    // .NET NuGet (.nupkg)
     Nupkg,
+    // Microsoft Vcpkg (.vcpkg)
     Vcpkg,
+    // Nix/Guix NarInfo substituter manifest (.narinfo)
     NarInfo,
+    // Clear Linux swupd (.swupd)
     Swupd,
+    // StarlingX (.starling)
     Starling,
-    Msi,
-    Msix,
-    Appx,
-    Makeself,
-    ZeroInstall,
-    Kmod,
-    Kmp,
-    Jar,
-    Npm,
-    Phar,
-    Cpan,
-    Rock,
-    Hex,
-    Cabal,
-    Jl,
-    Rpkg,
 }
 
 impl PackageFormat {
@@ -345,54 +381,6 @@ impl PackageFormat {
             Some(PackageFormat::SolarisIps)
         } else if normalized.ends_with(".nar") {
             Some(PackageFormat::GuixNar)
-        } else if normalized.ends_with(".spack") {
-            Some(PackageFormat::Spack)
-        } else if normalized.ends_with(".conan") {
-            Some(PackageFormat::Conan)
-        } else if normalized.ends_with(".whl") {
-            Some(PackageFormat::Wheel)
-        } else if normalized.ends_with(".crate") {
-            Some(PackageFormat::Crate)
-        } else if normalized.ends_with(".gem") {
-            Some(PackageFormat::Gem)
-        } else if normalized.ends_with(".nupkg") {
-            Some(PackageFormat::Nupkg)
-        } else if normalized.ends_with(".vcpkg") {
-            Some(PackageFormat::Vcpkg)
-        } else if normalized.ends_with(".narinfo") {
-            Some(PackageFormat::NarInfo)
-        } else if normalized.ends_with(".msi") {
-            Some(PackageFormat::Msi)
-        } else if normalized.ends_with(".msix") {
-            Some(PackageFormat::Msix)
-        } else if normalized.ends_with(".appx") {
-            Some(PackageFormat::Appx)
-        } else if normalized.ends_with(".run") {
-            Some(PackageFormat::Makeself)
-        } else if normalized.ends_with(".zpk") {
-            Some(PackageFormat::ZeroInstall)
-        } else if normalized.ends_with(".kmod") {
-            Some(PackageFormat::Kmod)
-        } else if normalized.ends_with(".kmp") {
-            Some(PackageFormat::Kmp)
-        } else if normalized.ends_with(".jar") {
-            Some(PackageFormat::Jar)
-        } else if normalized.ends_with(".npm") {
-            Some(PackageFormat::Npm)
-        } else if normalized.ends_with(".phar") {
-            Some(PackageFormat::Phar)
-        } else if normalized.ends_with(".cpan") {
-            Some(PackageFormat::Cpan)
-        } else if normalized.ends_with(".rock") {
-            Some(PackageFormat::Rock)
-        } else if normalized.ends_with(".hex") {
-            Some(PackageFormat::Hex)
-        } else if normalized.ends_with(".cabal") {
-            Some(PackageFormat::Cabal)
-        } else if normalized.ends_with(".jl") {
-            Some(PackageFormat::Jl)
-        } else if normalized.ends_with(".rpkg") {
-            Some(PackageFormat::Rpkg)
         } else {
             None
         }
@@ -940,118 +928,6 @@ impl_generic_package_adapter!(
     "stratum-package:",
     "stratum-package: ",
     "stratum-version: "
-);
-impl_generic_package_adapter!(
-    MsiAdapter,
-    Msi,
-    "msi-package:",
-    "msi-package: ",
-    "msi-version: "
-);
-impl_generic_package_adapter!(
-    MsixAdapter,
-    Msix,
-    "msix-package:",
-    "msix-package: ",
-    "msix-version: "
-);
-impl_generic_package_adapter!(
-    AppxAdapter,
-    Appx,
-    "appx-package:",
-    "appx-package: ",
-    "appx-version: "
-);
-impl_generic_package_adapter!(
-    MakeselfAdapter,
-    Makeself,
-    "makeself-package:",
-    "makeself-package: ",
-    "makeself-version: "
-);
-impl_generic_package_adapter!(
-    ZeroInstallAdapter,
-    ZeroInstall,
-    "zpk-package:",
-    "zpk-package: ",
-    "zpk-version: "
-);
-impl_generic_package_adapter!(
-    KmodAdapter,
-    Kmod,
-    "kmod-package:",
-    "kmod-package: ",
-    "kmod-version: "
-);
-impl_generic_package_adapter!(
-    KmpAdapter,
-    Kmp,
-    "kmp-package:",
-    "kmp-package: ",
-    "kmp-version: "
-);
-impl_generic_package_adapter!(
-    JarAdapter,
-    Jar,
-    "jar-package:",
-    "jar-package: ",
-    "jar-version: "
-);
-impl_generic_package_adapter!(
-    NpmAdapter,
-    Npm,
-    "npm-package:",
-    "npm-package: ",
-    "npm-version: "
-);
-impl_generic_package_adapter!(
-    PharAdapter,
-    Phar,
-    "phar-package:",
-    "phar-package: ",
-    "phar-version: "
-);
-impl_generic_package_adapter!(
-    CpanAdapter,
-    Cpan,
-    "cpan-package:",
-    "cpan-package: ",
-    "cpan-version: "
-);
-impl_generic_package_adapter!(
-    RockAdapter,
-    Rock,
-    "rock-package:",
-    "rock-package: ",
-    "rock-version: "
-);
-impl_generic_package_adapter!(
-    HexAdapter,
-    Hex,
-    "hex-package:",
-    "hex-package: ",
-    "hex-version: "
-);
-impl_generic_package_adapter!(
-    CabalAdapter,
-    Cabal,
-    "cabal-package:",
-    "cabal-package: ",
-    "cabal-version: "
-);
-impl_generic_package_adapter!(
-    JlAdapter,
-    Jl,
-    "jl-package:",
-    "jl-package: ",
-    "jl-version: "
-);
-impl_generic_package_adapter!(
-    RpkgAdapter,
-    Rpkg,
-    "rpkg-package:",
-    "rpkg-package: ",
-    "rpkg-version: "
 );
 
 /// Fedora/RHEL .rpm adapter
@@ -2737,22 +2613,6 @@ impl PackageParserFactory {
         factory.register_parser(Box::new(CruxAdapter::new()));
         factory.register_parser(Box::new(DrpmAdapter::new()));
         factory.register_parser(Box::new(StratumAdapter::new()));
-        factory.register_parser(Box::new(MsiAdapter::new()));
-        factory.register_parser(Box::new(MsixAdapter::new()));
-        factory.register_parser(Box::new(AppxAdapter::new()));
-        factory.register_parser(Box::new(MakeselfAdapter::new()));
-        factory.register_parser(Box::new(ZeroInstallAdapter::new()));
-        factory.register_parser(Box::new(KmodAdapter::new()));
-        factory.register_parser(Box::new(KmpAdapter::new()));
-        factory.register_parser(Box::new(JarAdapter::new()));
-        factory.register_parser(Box::new(NpmAdapter::new()));
-        factory.register_parser(Box::new(PharAdapter::new()));
-        factory.register_parser(Box::new(CpanAdapter::new()));
-        factory.register_parser(Box::new(RockAdapter::new()));
-        factory.register_parser(Box::new(HexAdapter::new()));
-        factory.register_parser(Box::new(CabalAdapter::new()));
-        factory.register_parser(Box::new(JlAdapter::new()));
-        factory.register_parser(Box::new(RpkgAdapter::new()));
 
         factory
     }

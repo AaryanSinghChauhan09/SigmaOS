@@ -3,6 +3,8 @@
 pub mod architecture;
 pub mod atomic_extended;
 pub mod cgroup_v2;
+pub mod cgroup_v2_controllers;
+pub use cgroup_v2_controllers::{CgroupController, CgroupControllerConfig, CgroupStats, CgroupV2, CgroupV2Manager};
 pub mod kqueue_event;
 pub mod cgroup_controllers;
 pub mod block_dev;
@@ -61,6 +63,152 @@ pub use drm_gem::*;
 pub mod entry;
 pub use entry::*;
 
+pub mod epoll;
+pub use epoll::{Epoll, EpollCtlOp, EpollEvent, EpollEventFlags};
+
+pub mod timerfd;
+pub use timerfd::{ClockId, TimerFd, TimerFlags, TimerSetting};
+
+pub mod signalfd;
+pub use signalfd::{Signal, SignalFd, SignalFdFlags, SignalMask, SigInfo};
+
+pub mod eventfd;
+pub use eventfd::{EventFd, EventFdFlags};
+
+pub mod pipe;
+pub use pipe::{Pipe, PipeFlags, PipePair};
+
+pub mod socket;
+pub use socket::{AddressFamily, Socket, SocketAddr, SocketManager, SocketProtocol, SocketState, SocketType};
+
+pub mod mount;
+pub use mount::{MountFlags, MountNamespace, MountPoint};
+
+pub mod shm;
+pub use shm::{ShmManager, ShmPerm, ShmSegment};
+
+pub mod msgqueue;
+pub use msgqueue::{Message, MessageQueue, MessageQueueManager, MsgQPerm};
+
+pub mod fd_table;
+pub use fd_table::{FdEntry, FdFlags, FdTable, FdTableManager};
+
+pub mod rlimit;
+pub use rlimit::{Rlimit, RlimitResource, ResourceLimits, ResourceLimitsManager};
+
+pub mod user_group_db;
+pub use user_group_db::{Group, User, UserGroupDatabase, UserGroupManager};
+
+pub mod process_group;
+pub use process_group::{ProcessGroup, ProcessGroupSessionManager, Session};
+
+pub mod ioctl;
+pub use ioctl::{IoctlDevice, IoctlManager, IoctlRequest, IoctlResponse};
+
+pub mod flock;
+pub use flock::{FileLock, FileLockManager, LockOp, LockType};
+
+pub mod sysfs;
+pub use sysfs::{SysfsEntry, SysfsFileType, SysfsManager};
+
+pub mod procfs;
+pub use procfs::{ProcessInfo, ProcfsManager};
+
+pub mod tmpfs;
+pub use tmpfs::{Tmpfs, TmpfsDirectory, TmpfsFile, TmpfsManager};
+
+pub mod linux_bsd_innovations;
+
+pub mod capabilities;
+pub use capabilities::{Capability, CapabilityId, CapabilityManager, CapabilitySet};
+
+pub mod futex;
+pub use futex::{Futex, FutexFlags, FutexManager, FutexOp, FutexWaiter};
+
+pub mod keyring;
+pub use keyring::{Key, KeyManager, KeyPayload, KeyPermissions, Keyring, KeyType};
+
+pub mod audit;
+pub use audit::{AuditEvent, AuditEventResult, AuditEventType, AuditLog, AuditManager};
+
+pub mod landlock;
+pub use landlock::{LandlockAccess, LandlockDomain, LandlockManager, LandlockRule, LandlockRuleset};
+
+pub mod capsicum;
+pub use capsicum::{CapsicumCapability, CapsicumManager, CapsicumMode, CapsicumRights, CapsicumSandbox};
+
+pub mod pledge;
+pub use pledge::{PledgeContext, PledgeManager, PledgePromise};
+
+pub mod unveil;
+pub use unveil::{UnveilContext, UnveilManager, UnveilOperation, UnveilPermissions, UnveilRule};
+
+pub mod bsd_jail;
+pub use bsd_jail::{BsdJail, BsdJailConfig, BsdJailManager};
+
+pub mod zfs;
+pub use zfs::{ZfsDataset, ZfsDatasetProperties, ZfsDatasetType, ZfsManager, ZfsPool, ZfsPoolConfig};
+
+pub mod btrfs;
+pub use btrfs::{BtrfsCompression, BtrfsFilesystem, BtrfsManager, BtrfsSubvolume, BtrfsSubvolumeType};
+
+pub mod overlay;
+pub use overlay::{OverlayConfig, OverlayFilesystem, OverlayLayer, OverlayLayerType, OverlayManager};
+
+pub mod user_group;
+pub use user_group::{FilePermissions, Group, User, UserGroupManager};
+
+pub mod hostname;
+pub use hostname::HostnameManager;
+
+pub mod syslog;
+pub use syslog::{SyslogBuffer, SyslogEntry, SyslogFacility, SyslogManager, SyslogSeverity};
+
+pub mod cron;
+pub use cron::{CronField, CronJob, CronManager, CronSchedule};
+
+pub mod swap;
+pub use swap::{SwapDevice, SwapDeviceType, SwapManager, SwapPriority, SwapStats};
+
+pub mod resource;
+pub use resource::{CpuStats, DiskStats, MemoryStats, NetworkStats, ResourceMonitor};
+
+pub mod time;
+pub use time::{ClockSource, ClockSourceStats, SystemTime, TimeManager, Timezone};
+
+pub mod signal;
+pub use signal::{Signal, SignalDisposition, SignalHandler, SignalInfo, SignalManager, SignalMask};
+
+pub mod mount_namespace;
+pub use mount_namespace::{MountFlags, MountNamespace, MountNamespaceManager, MountPoint};
+
+pub mod uts_namespace;
+pub use uts_namespace::{UtsNamespace, UtsNamespaceManager};
+
+pub mod semaphore;
+pub use semaphore::{Semaphore, SemaphoreManager, SemaphoreResult, SemaphoreSet};
+
+pub mod timerfd;
+pub use timerfd::{TimerClock, TimerExpirations, TimerFd, TimerFdManager, TimerFlags, TimerSpec};
+
+pub mod signalfd;
+pub use signalfd::{SignalFd, SignalFdFlags, SignalFdManager, SignalInfo, SignalMask};
+
+pub mod network_namespace;
+pub use network_namespace::{NetworkDevice, NetworkNamespace, NetworkNamespaceManager};
+
+pub mod epoll;
+pub use epoll::{EpollEvent, EpollEvents, EpollInstance, EpollManager, EpollOp};
+
+pub mod eventfd;
+pub use eventfd::{EventFd, EventFdFlags, EventFdManager};
+
+pub mod pipe;
+pub use pipe::{Pipe, PipeFlags, PipeManager};
+
+pub mod socket;
+pub use socket::{Socket, SocketDomain, SocketManager, SocketProtocol, SocketState, SocketType};
+
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
 pub use linux_parity::{
@@ -71,6 +219,7 @@ pub mod memory;
 pub mod meta;
 pub mod module_loader;
 pub mod namespaces;
+pub use namespaces::{Namespace, NamespaceId, NamespaceManager, NamespaceType};
 pub mod net;
 pub mod nextgen_breakthroughs;
 pub mod numa_allocator;

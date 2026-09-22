@@ -2,7 +2,7 @@
 // Zero-dependency, std-based implementation with lock-free ring buffers
 
 use std::vec::Vec;
-use core::sync::atomic::{AtomicU32, AtomicU64, AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
 
 /// io_uring operation codes
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -101,8 +101,8 @@ pub struct IoUringEngine {
     
     // Configuration
     max_entries: usize,
-    sq_flags: AtomicU32,
-    cq_flags: AtomicU32,
+    _sq_flags: AtomicU32,
+    _cq_flags: AtomicU32,
 }
 
 impl IoUringEngine {
@@ -121,8 +121,8 @@ impl IoUringEngine {
             cq_tail: AtomicUsize::new(0),
             cq_mask: mask,
             max_entries,
-            sq_flags: AtomicU32::new(0),
-            cq_flags: AtomicU32::new(0),
+            _sq_flags: AtomicU32::new(0),
+            _cq_flags: AtomicU32::new(0),
         }
     }
 
@@ -157,7 +157,7 @@ impl IoUringEngine {
     }
 
     /// Enter submission and wait for completions
-    pub fn enter_submit_and_wait(&mut self, wait_nr: u32) -> usize {
+    pub fn enter_submit_and_wait(&mut self, _wait_nr: u32) -> usize {
         let mut processed = 0;
         
         // Process all available SQEs
@@ -260,8 +260,8 @@ mod tests {
         assert!(ring.submit_sqe(sqe1).is_ok());
         assert!(ring.submit_sqe(sqe2).is_ok());
 
-        let processed = ring.enter_submit_and_wait(0);
-        assert_eq!(processed, 2);
+        let _processed = ring.enter_submit_and_wait(0);
+        assert_eq!(_processed, 2);
 
         let cqe1 = ring.pop_cqe().unwrap();
         assert_eq!(cqe1.user_data, 1001);
@@ -340,8 +340,8 @@ mod tests {
             .with_ioprio(100);
 
         assert!(ring.submit_sqe(sqe).is_ok());
-        let processed = ring.enter_submit_and_wait(0);
-        assert_eq!(processed, 1);
+        let _processed = ring.enter_submit_and_wait(0);
+        assert_eq!(_processed, 1);
 
         let cqe = ring.pop_cqe().unwrap();
         assert_eq!(cqe.res, 128);
