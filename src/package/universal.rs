@@ -336,13 +336,44 @@ pub enum PackageFormat {
     Starling,   // Starling format (.starling)
 }
 
+fn normalize_filename_stack<F, R>(filename: &str, f: F) -> R
+where
+    F: FnOnce(&str, &str) -> R,
+{
+    let mut buf = [0u8; 512];
+    let bytes = filename.as_bytes();
+    let mut len = 0;
+
+    for &b in bytes {
+        if b != b' ' && b != b'\t' && b != b'\r' && b != b'\n' {
+            if len >= buf.len() {
+                // Fallback to heap allocation if filename exceeds stack buffer size
+                let name = filename.to_lowercase();
+                let trimmed = name.trim();
+                let normalized = trimmed.replace(" ", "");
+                return f(trimmed, &normalized);
+            }
+            buf[len] = b.to_ascii_lowercase();
+            len += 1;
+        }
+    }
+
+    if let Ok(normalized) = core::str::from_utf8(&buf[..len]) {
+        f(normalized, normalized)
+    } else {
+        let name = filename.to_lowercase();
+        let trimmed = name.trim().to_string();
+        let normalized = trimmed.replace(" ", "");
+        f(&trimmed, &normalized)
+    }
+}
+
 impl PackageFormat {
     pub fn from_filename(filename: &str) -> Option<Self> {
-        let name = filename.to_lowercase();
-        let name = name.trim();
-        let normalized = name.replace(" ", "");
-
-        if normalized.ends_with(".deb") || normalized.ends_with(".udeb") {
+        // Bolt ⚡ Optimization: Use single-pass stack-buffered normalization helper
+        // to perform ASCII lowercasing and space removal without allocating heap String buffers.
+        normalize_filename_stack(filename, |name, normalized| {
+            if normalized.ends_with(".deb") || normalized.ends_with(".udeb") {
             Some(PackageFormat::Deb)
         } else if normalized.ends_with(".superdeb") {
             Some(PackageFormat::Superdeb)
@@ -503,6 +534,7 @@ impl PackageFormat {
         } else {
             None
         }
+        })
     }
 }
 
