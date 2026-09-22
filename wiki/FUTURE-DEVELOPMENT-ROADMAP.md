@@ -5610,3 +5610,27 @@ SigmaOS absorbs the screen capture, video recording, text extraction (OCR), and 
    - LocalSend P2P clipboard, file, and folder sharing (`omarchy share clipboard|file|folder`).
    - Tailscale Taildrop machine-to-machine transfers (`omarchy tailscale send/receive`).
    - Media re-encoding & transcoding helper (`omarchy transcode <input> [format] [resolution]`).
+
+
+## 134. SOVEREIGN SIGMAOS AI-GENERATED CODE GOVERNANCE & TRANSPARENCY SPECIFICATION
+
+### 134.1 Overview & Governance Rules
+Adapted from the Linux kernel tool-generated content guidance, SigmaOS establishes five mandatory transparency rules (`docs/SIGMAOS_AI_CODING_TRANSPARENCY_GUIDELINES.md`) for AI-assisted ("vibe coding") and autonomous agent development:
+
+1. **Name the AI Tool**:
+   - Explicitly identify the AI tool or model used for code, driver, or documentation generation.
+   - Mandate `Assisted-by: <Tool Name>` trailers in Git commit messages and Pull Requests.
+
+2. **Preserve the Inputs Behind the Result**:
+   - Document and preserve original technical specifications (`PROJECT_SPEC.md`).
+   - Maintain independent test fixtures that the AI model did not directly optimize against.
+
+3. **Keep the Prompt Trail**:
+   - Log prompt sequences (`AI_ASSISTANCE.md`) summarizing goals, constraints, and `#![no_std]` safety boundaries.
+
+4. **Record Exactly What the AI Changed**:
+   - Clearly delineate human-authored specs/fixtures from AI-generated modules and tests.
+
+5. **Make the Generated Code Prove Itself**:
+   - Require 100% test pass rate via `./run_sigma_tests.sh`.
+   - Turn edge cases (dash-heavy signals, white noise, null buffers) into repeatable unit/integration tests before accepting patches.
