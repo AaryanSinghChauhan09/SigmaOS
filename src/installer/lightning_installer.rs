@@ -13,7 +13,6 @@
 use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
-use std::format;
 use std::fmt;
 
 /// Installation configuration
