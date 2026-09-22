@@ -5564,3 +5564,19 @@ In addition to RSS/Atom redirection and portal category classification, SigmaOS 
 - **TechPowerUp GPU Database & VRAM Bandwidth Engine (`TechPowerUpGpuDatabaseEngine`)**: GPU architecture specs, clock rates, bus width, and effective GDDR6X memory bandwidth calculation.
 - **Android Police Custom ROM Sideload & microG Engine (`AndroidPoliceCustomRomSideloadEngine`)**: Android A/B partition slot switching, fastboot flashing, APK sideloading, and microG Play Services stubbing.
 - **HWBusters ATX 3.1 PSU Telemetry Engine (`HwbustersPsuEfficiencyTelemetryEngine`)**: ATX 3.1 +12VHPWR transient load spike monitoring, rail voltage ripple compliance checking, and Cybenetics efficiency rating calculation.
+
+---
+
+## 127. SOVEREIGN LINUX & BSD DISTRO INNOVATIONS, MEDIA INTELLIGENCE & UNIVERSAL SUBSYSTEM ABSORPTION SPECIFICATION
+
+### 127.1 Universal Subsystem Mode Matrix
+SigmaOS expands its universal Linux & BSD distro subsystem bridge (`DistroSubsystemMode` in `src/distro/linux_bsd_inspirations.rs`) to cover over 50+ distributions and specialized OS modes:
+- **Immutable & Containerized Distros**: VanillaOS (APX containerization via `.apx`), Fedora Silverblue (OSTree atomic deployments), Alpine Linux (LBU `.apkovl` overlays and `apk` package database in `/lib/apk/db`).
+- **Embedded & Router Systems**: OpenWrt (UCI `/etc/config` declarative system configuration and `ipk` package management), PostmarketOS (mobile Linux runtime), BusyBox/NuttX minimal profiles.
+- **Rolling & Package Formats**: Arch Linux (`.pkg.tar.zst`), Debian/Ubuntu (`.deb`), RedHat/Fedora/Mageia (`.rpm`), Void Linux (`.xbps`), NixOS (`.nix`), Guix (`.scm`), FreeBSD (`.pkg`), OpenBSD/NetBSD (`.tgz`), Solaris/Illumos (`.p5p`).
+
+### 127.2 Integrated Media Intelligence & Unimplemented Ideas Engine
+SigmaOS consolidates 33+ tech publication portals and distro innovations in `SovereignOmniDistroMediaSynthesisSuite` (`src/distro/sovereign_media_and_distro_unimplemented_innovations.rs`):
+1. **Media Portal Intelligence Engine (`SovereignMediaPortalIntelligenceEngine`)**: Portal lookup, URL normalization, category classification, and canonical domain mappings across 9to5Linux, Phoronix, DistroWatch, TechPowerUp, XDA Developers, ZDNet, and 27 other portals.
+2. **VanillaOS APX Subsystem Engine (`LinuxVanillaOsApxEngine`)**: On-demand isolated container creation (`apx-<subsystem>`) for running non-native package workflows.
+3. **OpenWrt UCI & IPK Management Engine (`LinuxOpenWrtUciIpkEngine`)**: Zero-dependency UCI key-value configuration state management and IPK package installation tracking.

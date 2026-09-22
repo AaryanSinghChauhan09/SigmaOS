@@ -125,6 +125,8 @@ pub struct SovereignLinuxBsdUnimplementedIdeasEngine {
     pub dragonfly_hammer2_pfs_active: bool,
     pub alpine_lbu_apkovl_active: bool,
     pub nixos_flake_hermetic_active: bool,
+    pub vanillaos_apx_container_active: bool,
+    pub openwrt_uci_ipk_active: bool,
 }
 
 impl SovereignLinuxBsdUnimplementedIdeasEngine {
@@ -141,6 +143,8 @@ impl SovereignLinuxBsdUnimplementedIdeasEngine {
             dragonfly_hammer2_pfs_active: true,
             alpine_lbu_apkovl_active: true,
             nixos_flake_hermetic_active: true,
+            vanillaos_apx_container_active: true,
+            openwrt_uci_ipk_active: true,
         }
     }
 
@@ -156,6 +160,79 @@ impl SovereignLinuxBsdUnimplementedIdeasEngine {
             && self.dragonfly_hammer2_pfs_active
             && self.alpine_lbu_apkovl_active
             && self.nixos_flake_hermetic_active
+            && self.vanillaos_apx_container_active
+            && self.openwrt_uci_ipk_active
+    }
+}
+
+/// VanillaOS APX On-Demand Subsystem Container Subsystem
+#[derive(Debug, Clone)]
+pub struct LinuxVanillaOsApxEngine {
+    pub managed_containers: Vec<String>,
+}
+
+impl LinuxVanillaOsApxEngine {
+    pub fn new() -> Self {
+        Self {
+            managed_containers: Vec::new(),
+        }
+    }
+
+    pub fn create_subsystem_container(&mut self, distro_subsystem: &str) -> Result<String, &'static str> {
+        if distro_subsystem.is_empty() {
+            return Err("Subsystem name cannot be empty");
+        }
+        let name = format!("apx-{}", distro_subsystem);
+        if !self.managed_containers.contains(&name) {
+            self.managed_containers.push(name.clone());
+        }
+        Ok(name)
+    }
+}
+
+impl Default for LinuxVanillaOsApxEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// OpenWrt UCI Configuration & IPK Package Management Engine
+#[derive(Debug, Clone)]
+pub struct LinuxOpenWrtUciIpkEngine {
+    pub uci_configs: Vec<(String, String, String)>, // (section, option, value)
+    pub installed_ipk_packages: Vec<String>,
+}
+
+impl LinuxOpenWrtUciIpkEngine {
+    pub fn new() -> Self {
+        Self {
+            uci_configs: Vec::new(),
+            installed_ipk_packages: Vec::new(),
+        }
+    }
+
+    pub fn set_uci_option(&mut self, section: &str, option: &str, val: &str) {
+        if let Some(pos) = self.uci_configs.iter().position(|(s, o, _)| s == section && o == option) {
+            self.uci_configs[pos].2 = val.to_string();
+        } else {
+            self.uci_configs.push((section.to_string(), option.to_string(), val.to_string()));
+        }
+    }
+
+    pub fn install_ipk(&mut self, pkg_name: &str) -> Result<String, &'static str> {
+        if pkg_name.is_empty() {
+            return Err("IPK package name cannot be empty");
+        }
+        if !self.installed_ipk_packages.contains(&pkg_name.to_string()) {
+            self.installed_ipk_packages.push(pkg_name.to_string());
+        }
+        Ok(format!("{}.ipk", pkg_name))
+    }
+}
+
+impl Default for LinuxOpenWrtUciIpkEngine {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
