@@ -240,65 +240,46 @@ pub enum PackagePriority {
 }
 
 /// Supported package formats across Linux and BSD ecosystems
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, PartialOrd, Ord)]
 pub enum PackageFormat {
     #[default]
-    Deb,        // apt/dpkg
-    Rpm,        // yum/dnf/zypper
-    Pacman,     // pacman/pkgbuild
-    Snap,       // snap/squashfs
-    Flatpak,    // flatpak sandbox
-    AppImage,   // AppImage single-file container
     SigmaPkg,   // native SigmaOS format
-    Air,        // Adobe AIR (.air)
-    Bottle,     // Homebrew Bottle (.bottle)
-    Ipa,        // iOS App (.ipa)
-    Ports,      // BSD Ports (.ports)
-    Pkg,        // macOS / BSD / Solaris PKG (.pkg)
-    Aab,        // Android App Bundle (.aab)
-    Apk,        // Android Package / Alpine Package (.apk)
-    Eopkg,      // Solus eopkg (.eopkg)
-    Nixpkg,     // Nix store package (.nixpkg)
-    Ebuild,     // Gentoo ebuild (.ebuild / .portage)
-    TarGz,      // Compressed Tar (.tar.gz, .tgz)
-    Xz,         // Compressed XZ archive (.xz, .tar.xz)
-    App,        // macOS App bundle (.app)
-    Hap,        // HarmonyOS Ability Package (.hap)
-    Pisi,       // Pardus / Solus PiSi (.PiSi)
+    Sigma,
+    Sovereign,
+    Deb,        // apt/dpkg
+    Udeb,       // Micro Debian package (.udeb)
     Superdeb,   // Deepin Superdeb (.superdeb)
-    Lzm,        // Slax Linux Module (.lzm)
-    Pup,        // Puppy Linux Package (.pup)
-    Pet,        // Puppy Extra Tarball (.pet)
-    Tar,        // Plain tarball (.tar)
-    Xbps,       // Void Linux (.xbps)
-    Zypper,     // OpenSUSE Zypper (.zypper)
-    Guix,       // GNU Guix (.guix / .scm)
-    Moss,       // Solus Moss (.moss)
-    Hpkg,       // Haiku Package (.hpkg)
-    Tcz,        // Tiny Core Linux (.tcz)
-    Gobo,       // GoboLinux (.gobo)
-    Ostree,     // OSTree commit (.commit)
-    Pkgsrc,     // NetBSD pkgsrc (.pkgsrc)
-    Sfs,        // SquashFS (.sfs)
-    Puk,        // Portable Package (.puk)
-    Dmg,        // macOS Disk Image (.dmg)
-    Cports,     // Chimera Linux (.cports)
-    Cachy,      // CachyOS Package (.cachy)
-    Nix,        // Nix expression / package (.nix)
-    Txz,        // Slackware/FreeBSD txz package (.txz)
-    CachyOS,    // CachyOS (.cachyos)
-    Swupd,      // Clear Linux swupd (.swupd)
-    Starling,   // Starling format (.starling)
-    Dports,     // DragonFly BSD DPorts (.dports)
-    SlackBuild, // Slackware SlackBuild (.slackbuild / .tlz / .tbz)
-    Crux,       // CRUX Linux (.crux / .pkgfile)
+    Apt,        // Debian APT
+    Rpm,        // yum/dnf/zypper
     Drpm,       // Delta RPM (.drpm)
-    Stratum,    // Bedrock Linux Stratum (.stratum)
-    OpenBsdPkg, // OpenBSD package (.openbsd.tgz)
+    Yum,        // RedHat YUM
+    Zypper,     // OpenSUSE Zypper (.zypper)
+    Pacman,     // pacman/pkgbuild
+    Pkgbuild,   // Arch PKGBUILD
+    Cachy,      // CachyOS Package (.cachy)
+    CachyOS,    // CachyOS (.cachyos)
+    Apk,        // Android Package / Alpine Package (.apk)
+    Ebuild,     // Gentoo ebuild (.ebuild / .portage)
+    Portage,    // Gentoo Portage
+    Nix,        // Nix expression / package (.nix)
+    Nixpkg,     // Nix store package (.nixpkg)
+    Guix,       // GNU Guix (.guix / .scm)
+    GuixNar,    // GNU Guix NAR archive (.nar)
+    NarInfo,    // Nix NarInfo metadata (.narinfo)
+    Xbps,       // Void Linux (.xbps)
+    Eopkg,      // Solus eopkg (.eopkg)
+    Moss,       // Solus Moss (.moss)
+    Pisi,       // Pardus / Solus PiSi (.PiSi)
     Ipk,        // OpenWrt IPK package (.ipk)
     Opkg,       // OPKG package (.opkg)
+    Ports,      // BSD Ports (.ports)
+    OpenBsdPkg, // OpenBSD package (.openbsd.tgz)
+    FreeBsdPkg, // FreeBSD pkg (.pkg)
+    Pkgsrc,     // NetBSD pkgsrc (.pkgsrc)
+    Dports,     // DragonFly BSD DPorts (.dports)
+    Cports,     // Chimera Linux (.cports)
     SolarisIps, // Solaris IPS package (.p5p / .ips)
-    GuixNar,    // GNU Guix NAR archive (.nar)
+    Pkg,        // macOS / BSD / Solaris PKG (.pkg)
     Spack,      // Spack package (.spack)
     Conan,      // Conan C/C++ package (.conan)
     Wheel,      // Python Wheel package (.whl)
@@ -306,7 +287,53 @@ pub enum PackageFormat {
     Gem,        // Ruby Gem (.gem)
     Nupkg,      // .NET NuGet package (.nupkg)
     Vcpkg,      // Microsoft vcpkg (.vcpkg)
-    NarInfo,    // Nix NarInfo metadata (.narinfo)
+    Msi,        // Windows Installer (.msi)
+    Msix,       // Windows App Package (.msix)
+    Appx,       // Windows AppX (.appx)
+    MakeselfRun,// Makeself self-extracting archive (.run)
+    ZeroInstallZpk, // ZeroInstall package (.zpk)
+    KernelModuleKmp, // Kernel Module Package (.kmp)
+    KernelModuleKmod, // Kernel Module (.kmod)
+    JavaJar,    // Java Archive (.jar)
+    NpmPkg,     // Node Package Manager (.npm / tgz)
+    PhpPhar,    // PHP Archive (.phar)
+    PerlCpan,   // Perl CPAN module (.cpan)
+    LuaRock,    // LuaRocks package (.rock)
+    ElixirHex,  // Elixir Hex package (.hex)
+    HaskellCabal, // Haskell Cabal package (.cabal)
+    JuliaPkg,   // Julia package (.jl)
+    RCran,      // R CRAN package (.rpkg)
+    Snap,       // snap/squashfs
+    Flatpak,    // flatpak sandbox
+    AppImage,   // AppImage single-file container
+    Air,        // Adobe AIR (.air)
+    Bottle,     // Homebrew Bottle (.bottle)
+    Ipa,        // iOS App (.ipa)
+    Aab,        // Android App Bundle (.aab)
+    TarGz,      // Compressed Tar (.tar.gz, .tgz)
+    TarXz,      // Compressed Tar XZ (.tar.xz)
+    Xz,         // Compressed XZ archive (.xz)
+    Tar,        // Plain tarball (.tar)
+    Tgz,        // Compressed Tar Gz (.tgz)
+    Txz,        // Slackware/FreeBSD txz package (.txz)
+    App,        // macOS App bundle (.app)
+    AppBundle,  // macOS App Bundle
+    Hap,        // HarmonyOS Ability Package (.hap)
+    Lzm,        // Slax Linux Module (.lzm)
+    Pup,        // Puppy Linux Package (.pup)
+    Pet,        // Puppy Extra Tarball (.pet)
+    Hpkg,       // Haiku Package (.hpkg)
+    Tcz,        // Tiny Core Linux (.tcz)
+    Gobo,       // GoboLinux (.gobo)
+    Ostree,     // OSTree commit (.commit)
+    Sfs,        // SquashFS (.sfs)
+    Puk,        // Portable Package (.puk)
+    Dmg,        // macOS Disk Image (.dmg)
+    SlackBuild, // Slackware SlackBuild (.slackbuild / .tlz / .tbz)
+    Crux,       // CRUX Linux (.crux / .pkgfile)
+    Stratum,    // Bedrock Linux Stratum (.stratum)
+    Swupd,      // Clear Linux swupd (.swupd)
+    Starling,   // Starling format (.starling)
 }
 
 impl PackageFormat {
@@ -441,6 +468,38 @@ impl PackageFormat {
             Some(PackageFormat::Vcpkg)
         } else if normalized.ends_with(".narinfo") {
             Some(PackageFormat::NarInfo)
+        } else if normalized.ends_with(".msi") {
+            Some(PackageFormat::Msi)
+        } else if normalized.ends_with(".msix") {
+            Some(PackageFormat::Msix)
+        } else if normalized.ends_with(".appx") {
+            Some(PackageFormat::Appx)
+        } else if normalized.ends_with(".run") {
+            Some(PackageFormat::MakeselfRun)
+        } else if normalized.ends_with(".zpk") {
+            Some(PackageFormat::ZeroInstallZpk)
+        } else if normalized.ends_with(".kmp") {
+            Some(PackageFormat::KernelModuleKmp)
+        } else if normalized.ends_with(".kmod") {
+            Some(PackageFormat::KernelModuleKmod)
+        } else if normalized.ends_with(".jar") {
+            Some(PackageFormat::JavaJar)
+        } else if normalized.ends_with(".npm") {
+            Some(PackageFormat::NpmPkg)
+        } else if normalized.ends_with(".phar") {
+            Some(PackageFormat::PhpPhar)
+        } else if normalized.ends_with(".cpan") {
+            Some(PackageFormat::PerlCpan)
+        } else if normalized.ends_with(".rock") {
+            Some(PackageFormat::LuaRock)
+        } else if normalized.ends_with(".hex") {
+            Some(PackageFormat::ElixirHex)
+        } else if normalized.ends_with(".cabal") {
+            Some(PackageFormat::HaskellCabal)
+        } else if normalized.ends_with(".jl") {
+            Some(PackageFormat::JuliaPkg)
+        } else if normalized.ends_with(".rpkg") {
+            Some(PackageFormat::RCran)
         } else {
             None
         }
@@ -2863,6 +2922,22 @@ mod tests {
         assert_eq!(PackageFormat::from_filename("dotnet.nupkg"), Some(PackageFormat::Nupkg));
         assert_eq!(PackageFormat::from_filename("ms.vcpkg"), Some(PackageFormat::Vcpkg));
         assert_eq!(PackageFormat::from_filename("nix.narinfo"), Some(PackageFormat::NarInfo));
+        assert_eq!(PackageFormat::from_filename("installer.msi"), Some(PackageFormat::Msi));
+        assert_eq!(PackageFormat::from_filename("app.msix"), Some(PackageFormat::Msix));
+        assert_eq!(PackageFormat::from_filename("app.appx"), Some(PackageFormat::Appx));
+        assert_eq!(PackageFormat::from_filename("setup.run"), Some(PackageFormat::MakeselfRun));
+        assert_eq!(PackageFormat::from_filename("pkg.zpk"), Some(PackageFormat::ZeroInstallZpk));
+        assert_eq!(PackageFormat::from_filename("driver.kmp"), Some(PackageFormat::KernelModuleKmp));
+        assert_eq!(PackageFormat::from_filename("module.kmod"), Some(PackageFormat::KernelModuleKmod));
+        assert_eq!(PackageFormat::from_filename("app.jar"), Some(PackageFormat::JavaJar));
+        assert_eq!(PackageFormat::from_filename("package.npm"), Some(PackageFormat::NpmPkg));
+        assert_eq!(PackageFormat::from_filename("app.phar"), Some(PackageFormat::PhpPhar));
+        assert_eq!(PackageFormat::from_filename("mod.cpan"), Some(PackageFormat::PerlCpan));
+        assert_eq!(PackageFormat::from_filename("lib.rock"), Some(PackageFormat::LuaRock));
+        assert_eq!(PackageFormat::from_filename("pkg.hex"), Some(PackageFormat::ElixirHex));
+        assert_eq!(PackageFormat::from_filename("lib.cabal"), Some(PackageFormat::HaskellCabal));
+        assert_eq!(PackageFormat::from_filename("pkg.jl"), Some(PackageFormat::JuliaPkg));
+        assert_eq!(PackageFormat::from_filename("pkg.rpkg"), Some(PackageFormat::RCran));
     }
 
     #[test]
