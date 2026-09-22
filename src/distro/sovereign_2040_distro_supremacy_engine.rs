@@ -185,7 +185,7 @@ impl SovereignLinux80BcachefsOpticalMeshEngine {
 
 impl Default for SovereignLinux80BcachefsOpticalMeshEngine {
     fn default() -> Self {
-        Self::new((256u64 * 1024 * 1024 * 1024) as usize as u64)
+        Self::new(256u64 * 1024 * 1024 * 1024)
     }
 }
 
