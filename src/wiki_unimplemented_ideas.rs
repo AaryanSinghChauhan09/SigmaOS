@@ -1251,8 +1251,6 @@ mod tests {
         assert!(!vault.is_locked);
 
         let mut pwm = HardwareBackedPasswordManager::new();
-        // SAFETY: Using descriptive test identifiers that are clearly not real passwords
-        // This is a test function that validates breach checking logic, not real credentials
         let test_identifier = "TEST_HASH_SAMPLE_FOR_BREACH_CHECKING";
         pwm.add_password_entry("github.com", "jules", test_identifier);
         let test_pass = "password123";

@@ -1,32 +1,236 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
-// SigmaOS GlueBuddy Memory Subsystem
+// SPDX-License-Identifier: MIT
+// SigmaOS Physical Memory Management Subsystem
 // Linux & BSD inspired Buddy Allocator Glue, Migration Types, CMA, Watermarks, and FreeBSD VM Page Queues
 
 use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::ptr::NonNull;
 
-use super::{BuddyAllocator as KernelBuddyAllocator, MemoryBlock, PAGE_SIZE};
-use crate::klib::buddy_allocator::{BuddyAllocator, SimpleBuddyAllocator};
+pub const PAGE_SIZE: usize = 4096;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct MemoryBlock {
+    pub addr: NonNull<u8>,
+    pub size: usize,
+}
 
-/// SigmaOS Buddy Allocator Wrapper
-///
-/// Wraps the klib buddy allocator and exposes a kernel-friendly interface.
-/// Integrates with the existing memory subsystem, migration types, CMA, and watermarks.
+unsafe impl Send for MemoryBlock {}
+unsafe impl Sync for MemoryBlock {}
+
+// ============================================================================
+// 1. Linux-inspired Migration Types & CMA (Contiguous Memory Allocator)
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MigrateType {
+    Unmovable,
+    Reclaimable,
+    Movable,
+    HighAtomic,
+    Cma,
+    Isolate,
+}
+
+#[derive(Debug)]
+pub struct CmaBuddyReservationGlue {
+    pub cma_base_addr: usize,
+    pub cma_total_pages: usize,
+    pub bitmap: Vec<bool>,
+}
+
+impl CmaBuddyReservationGlue {
+    pub fn new(cma_base_addr: usize, cma_total_pages: usize) -> Self {
+        Self {
+            cma_base_addr,
+            cma_total_pages,
+            bitmap: vec![false; cma_total_pages],
+        }
+    }
+
+    pub fn allocate_contiguous(&mut self, pages: usize) -> Result<usize, &'static str> {
+        if pages == 0 || pages > self.cma_total_pages {
+            return Err("Invalid CMA allocation size");
+        }
+
+        let mut consecutive = 0;
+        let mut start_idx = 0;
+
+        for i in 0..self.cma_total_pages {
+            if !self.bitmap[i] {
+                if consecutive == 0 {
+                    start_idx = i;
+                }
+                consecutive += 1;
+                if consecutive == pages {
+                    for j in start_idx..start_idx + pages {
+                        self.bitmap[j] = true;
+                    }
+                    return Ok(self.cma_base_addr + (start_idx * PAGE_SIZE));
+                }
+            } else {
+                consecutive = 0;
+            }
+        }
+
+        Err("Out of contiguous CMA memory")
+    }
+
+    pub fn release_contiguous(&mut self, base_addr: usize, pages: usize) -> Result<(), &'static str> {
+        if base_addr < self.cma_base_addr {
+            return Err("Address below CMA region");
+        }
+
+        let start_idx = (base_addr - self.cma_base_addr) / PAGE_SIZE;
+        if start_idx + pages > self.cma_total_pages {
+            return Err("Address range exceeds CMA region");
+        }
+
+        for j in start_idx..start_idx + pages {
+            self.bitmap[j] = false;
+        }
+
+        Ok(())
+    }
+
+    pub fn free_cma_pages(&self) -> usize {
+        self.bitmap.iter().filter(|&&used| !used).count()
+    }
+}
+
+// ============================================================================
+// 2. Linux Watermark Levels & Anti-Fragmentation Thresholds
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WatermarkLevel {
+    WatermarkMin,
+    WatermarkLow,
+    WatermarkHigh,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct WatermarkStatus {
+    pub free_pages: usize,
+    pub min_pages: usize,
+    pub low_pages: usize,
+    pub high_pages: usize,
+    pub level: WatermarkLevel,
+    pub requires_compaction: bool,
+}
+
+// ============================================================================
+// 3. FreeBSD VM Page Queues & Zone Allocator
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum VmZone {
+    Dma,
+    Normal,
+    HighMem,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PageQueueType {
+    Free,
+    Active,
+    Inactive,
+    Wired,
+}
+
+#[derive(Debug)]
+pub struct BsdVmZoneAllocator {
+    pub zone: VmZone,
+    pub total_pages: usize,
+    pub free_pages: AtomicUsize,
+    pub active_pages: AtomicUsize,
+    pub inactive_pages: AtomicUsize,
+    pub wired_pages: AtomicUsize,
+}
+
+impl BsdVmZoneAllocator {
+    pub fn new(zone: VmZone, total_pages: usize) -> Self {
+        Self {
+            zone,
+            total_pages,
+            free_pages: AtomicUsize::new(total_pages),
+            active_pages: AtomicUsize::new(0),
+            inactive_pages: AtomicUsize::new(0),
+            wired_pages: AtomicUsize::new(0),
+        }
+    }
+
+    pub fn transition_queue(
+        &self,
+        from: PageQueueType,
+        to: PageQueueType,
+        count: usize,
+    ) -> Result<(), &'static str> {
+        let from_counter = match from {
+            PageQueueType::Free => &self.free_pages,
+            PageQueueType::Active => &self.active_pages,
+            PageQueueType::Inactive => &self.inactive_pages,
+            PageQueueType::Wired => &self.wired_pages,
+        };
+
+        let to_counter = match to {
+            PageQueueType::Free => &self.free_pages,
+            PageQueueType::Active => &self.active_pages,
+            PageQueueType::Inactive => &self.inactive_pages,
+            PageQueueType::Wired => &self.wired_pages,
+        };
+
+        loop {
+            let current = from_counter.load(Ordering::SeqCst);
+            if current < count {
+                return Err("Insufficient pages in source queue");
+            }
+            if from_counter.compare_exchange(current, current - count, Ordering::SeqCst, Ordering::SeqCst).is_ok() {
+                to_counter.fetch_add(count, Ordering::SeqCst);
+                return Ok(());
+            }
+        }
+    }
+}
+
+// ============================================================================
+// 4. SigmaOS Physical Buddy Allocator Engine
+// ============================================================================
+
+pub struct SimpleBuddyAllocator {
+    pub max_order: usize,
+    pub total_pages: usize,
+    pub free_pages: AtomicUsize,
+}
+
+impl SimpleBuddyAllocator {
+    pub fn new(max_order: usize, total_pages: usize) -> Self {
+        Self {
+            max_order,
+            total_pages,
+            free_pages: AtomicUsize::new(total_pages),
+        }
+    }
+
+    pub fn allocate(&mut self, order: usize) -> Result<usize, &'static str> {
+        let required_pages = 1 << order;
+        loop {
+            let free = self.free_pages.load(Ordering::SeqCst);
+            if free < required_pages {
+                return Err("Out of physical memory");
+            }
+            if self.free_pages.compare_exchange(free, free - required_pages, Ordering::SeqCst, Ordering::SeqCst).is_ok() {
+                return Ok(0); // Allocated frame index offset
+            }
+        }
+    }
+
+    pub fn free(&mut self, _block_id: usize, order: usize) -> Result<(), &'static str> {
+        let pages = 1 << order;
+        self.free_pages.fetch_add(pages, Ordering::SeqCst);
+        Ok(())
+    }
+}
+
 pub struct SigmaBuddyAllocator {
     pub inner: SimpleBuddyAllocator,
     pub base_addr: usize,
@@ -53,19 +257,16 @@ impl SigmaBuddyAllocator {
         self.inner = SimpleBuddyAllocator::new(10, self.total_size / PAGE_SIZE);
     }
 
-    /// Allocates memory block with specified Linux migration type
     pub fn allocate_typed(&mut self, size: usize, migrate_type: MigrateType) -> Option<MemoryBlock> {
         if size == 0 || size > self.total_size {
             return None;
         }
 
-        // Routing logic: CMA allocations route through reserved CMA glue
         if migrate_type == MigrateType::Cma {
-            if let Some(ref cma) = self.cma_glue {
+            if let Some(ref mut cma) = self.cma_glue {
                 let pages = size.div_ceil(PAGE_SIZE);
                 if let Ok(phys_addr) = cma.allocate_contiguous(pages) {
                     self.allocated.fetch_add(pages * PAGE_SIZE, Ordering::SeqCst);
-                    use core::ptr::NonNull;
                     return NonNull::new(phys_addr as *mut u8).map(|addr| MemoryBlock {
                         addr,
                         size: pages * PAGE_SIZE,
@@ -93,7 +294,6 @@ impl SigmaBuddyAllocator {
                     let _ = zone.transition_queue(PageQueueType::Free, PageQueueType::Active, pages);
                 }
 
-                use core::ptr::NonNull;
                 NonNull::new(addr as *mut u8).map(|addr| MemoryBlock {
                     addr,
                     size: actual_size,
@@ -107,8 +307,7 @@ impl SigmaBuddyAllocator {
         let addr = block.addr.as_ptr() as usize;
         let pages = block.size / PAGE_SIZE;
 
-        // Check if block was allocated in CMA region
-        if let Some(ref cma) = self.cma_glue {
+        if let Some(ref mut cma) = self.cma_glue {
             if addr >= cma.cma_base_addr && addr < cma.cma_base_addr + (cma.cma_total_pages * PAGE_SIZE) {
                 let _ = cma.release_contiguous(addr, pages);
                 self.allocated.fetch_sub(block.size, Ordering::SeqCst);
@@ -126,7 +325,6 @@ impl SigmaBuddyAllocator {
         }
     }
 
-    /// Evaluates current memory watermarks for anti-fragmentation & compaction
     pub fn evaluate_watermarks(&self) -> WatermarkStatus {
         let total_pages = self.total_size / PAGE_SIZE;
         let used_pages = self.allocated.load(Ordering::SeqCst) / PAGE_SIZE;
@@ -210,7 +408,7 @@ mod tests {
 
     #[test]
     fn test_cma_contiguous_memory_reservation_glue() {
-        let cma = CmaBuddyReservationGlue::new(0x2000_0000, 256);
+        let mut cma = CmaBuddyReservationGlue::new(0x2000_0000, 256);
         assert_eq!(cma.free_cma_pages(), 256);
 
         let phys_addr = cma.allocate_contiguous(16).unwrap();

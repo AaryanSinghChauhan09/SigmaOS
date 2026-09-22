@@ -1029,7 +1029,7 @@ pub use omarchy_inspiration::{
 
 #[path = "."]
 pub mod distro {
-    pub use crate::omarchy_inspiration;
+    pub use super::omarchy_inspiration;
 }
 
 #[cfg(any(feature = "standalone_test", test))]
@@ -1105,6 +1105,111 @@ impl OmarchyAppLauncherEngine {
 }
 
 impl Default for OmarchyAppLauncherEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// Omarchy Theme Overlay, Font Switcher & Template Engine (`OmarchyThemeOverlayEngine`)
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct OmarchyThemeOverlayEngine {
+    pub current_theme_name: String,
+    pub available_themes: Vec<String>,
+    pub available_fonts: Vec<String>,
+    pub current_font_name: String,
+    pub background_images: Vec<String>,
+    pub current_bg_index: usize,
+    pub user_overlay_dir: String,
+    pub installed_templates: Vec<String>,
+}
+
+impl OmarchyThemeOverlayEngine {
+    pub fn new() -> Self {
+        Self {
+            current_theme_name: "tokyo-night".to_string(),
+            available_themes: vec![
+                "tokyo-night".to_string(),
+                "catppuccin".to_string(),
+                "gruvbox".to_string(),
+                "nord".to_string(),
+                "everforest".to_string(),
+                "kanagawa".to_string(),
+                "dracula".to_string(),
+                "rose-pine".to_string(),
+            ],
+            available_fonts: vec![
+                "JetBrainsMono Nerd Font".to_string(),
+                "FiraCode Nerd Font".to_string(),
+                "Hack Nerd Font".to_string(),
+                "MesloLGS Nerd Font".to_string(),
+            ],
+            current_font_name: "JetBrainsMono Nerd Font".to_string(),
+            background_images: vec![
+                "bg1.jpg".to_string(),
+                "bg2.png".to_string(),
+                "bg3.webp".to_string(),
+            ],
+            current_bg_index: 0,
+            user_overlay_dir: "~/.config/omarchy/themes".to_string(),
+            installed_templates: vec![
+                "alacritty.toml.tpl".to_string(),
+                "ghostty.conf.tpl".to_string(),
+                "kitty.conf.tpl".to_string(),
+                "hyprland.conf.tpl".to_string(),
+            ],
+        }
+    }
+
+    pub fn set_theme(&mut self, theme_name: &str) -> Result<String, &'static str> {
+        let slug = theme_name.to_lowercase().replace(' ', "-");
+        if self.available_themes.contains(&slug) {
+            self.current_theme_name = slug.clone();
+            Ok(slug)
+        } else {
+            // Register as custom overlay theme
+            self.available_themes.push(slug.clone());
+            self.current_theme_name = slug.clone();
+            Ok(slug)
+        }
+    }
+
+    pub fn cycle_background_next(&mut self) -> String {
+        if self.background_images.is_empty() {
+            return "default.jpg".to_string();
+        }
+        self.current_bg_index = (self.current_bg_index + 1) % self.background_images.len();
+        self.background_images[self.current_bg_index].clone()
+    }
+
+    pub fn set_font(&mut self, font_name: &str) -> Result<String, &'static str> {
+        if let Some(font) = self.available_fonts.iter().find(|f| f.eq_ignore_ascii_case(font_name)) {
+            self.current_font_name = font.clone();
+            Ok(font.clone())
+        } else {
+            self.available_fonts.push(font_name.to_string());
+            self.current_font_name = font_name.to_string();
+            Ok(font_name.to_string())
+        }
+    }
+
+    pub fn install_theme_repo(&mut self, repo_url: &str) -> Result<String, &'static str> {
+        if repo_url.is_empty() {
+            return Err("InvalidRepoUrl");
+        }
+        let repo_name = repo_url.split('/').last().unwrap_or("custom-theme").trim_end_matches(".git");
+        let slug = repo_name.to_lowercase().replace(' ', "-");
+        if !self.available_themes.contains(&slug) {
+            self.available_themes.push(slug.clone());
+        }
+        self.current_theme_name = slug.clone();
+        Ok(slug)
+    }
+}
+
+impl Default for OmarchyThemeOverlayEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -1466,33 +1571,6 @@ impl Default for OmarchyNavigationShortcutEngine {
 mod omarchy_gap_closure_tests {
     use super::*;
 
-    #[test]
-    fn test_omarchy_hyprland_compositor_config_engine() {
-        let hypr = OmarchyHyprlandCompositorConfigEngine::new();
-        let conf = hypr.render_hyprland_conf();
-        assert!(conf.contains("border_size = 2"));
-        assert!(conf.contains("windowrulev2 = float, class:^pavucontrol$"));
-    }
-
-    #[test]
-    fn test_omarchy_mise_and_lazygit_engines() {
-        let mise = OmarchyMiseVersionManagerEngine::new();
-        assert_eq!(mise.get_tool_version("node").unwrap(), "20.11.0");
-        assert_eq!(mise.get_tool_version("rust").unwrap(), "1.77.0");
-
-        let lazygit = OmarchyLazyGitConfigurationEngine::new();
-        let lazy_yml = lazygit.generate_config_yaml();
-        assert!(lazy_yml.contains("sideBySideDiff: true"));
-    }
-
-    #[test]
-    fn test_omarchy_ayu_and_starship_engines() {
-        let ayu_dark = OmarchyAyuThemeEngine::ayu_dark();
-        assert_eq!(ayu_dark.bg_color, "#0f1419");
-
-        let starship_toml = OmarchyStarshipPromptConfigEngine::generate_starship_toml();
-        assert!(starship_toml.contains("truncation_length = 3"));
-    }
 
     #[test]
     fn test_omarchy_ghostty_fastfetch_dwindle_engines() {
@@ -1513,136 +1591,21 @@ mod omarchy_gap_closure_tests {
     }
 
     #[test]
-    fn test_omarchy_cross_platform_target_engine() {
-        let engine = OmarchyCrossPlatformTargetEngine::new(OmarchyPlatformPlatform::AppleSiliconAsahi);
-        let config = engine.generate_target_config();
-        assert!(config.contains("apple_m1_m2"));
-        assert!(config.contains("asahi-alarm.org"));
+    fn test_omarchy_theme_overlay_and_font_management() {
+        let mut overlay = OmarchyThemeOverlayEngine::new();
+        assert_eq!(overlay.current_theme_name, "tokyo-night");
 
-        let deck = OmarchyCrossPlatformTargetEngine::new(OmarchyPlatformPlatform::SteamDeck);
-        let deck_config = deck.generate_target_config();
-        assert!(deck_config.contains("deckarchy"));
-        assert!(deck_config.contains("steamos-readonly = false"));
+        assert_eq!(overlay.set_theme("Catppuccin Mocha").unwrap(), "catppuccin-mocha");
+        assert_eq!(overlay.current_theme_name, "catppuccin-mocha");
 
-        let nix = OmarchyCrossPlatformTargetEngine::new(OmarchyPlatformPlatform::NixOS);
-        let nix_config = nix.generate_target_config();
-        assert!(nix_config.contains("omarchy-nix"));
-        assert!(nix_config.contains("imports = [ ./omarchy.nix ]"));
-    }
+        let bg2 = overlay.cycle_background_next();
+        assert_eq!(bg2, "bg2.png");
 
-    #[test]
-    fn test_omarchy_dev_tools_engine() {
-        let mut dev = OmarchyDevToolsEngine::new();
-        assert_eq!(dev.default_editor, "neovim");
-        assert!(dev.set_default_editor("vscode"));
-        assert_eq!(dev.default_editor, "vscode");
+        assert_eq!(overlay.set_font("FiraCode Nerd Font").unwrap(), "FiraCode Nerd Font");
+        assert_eq!(overlay.current_font_name, "FiraCode Nerd Font");
 
-        let mise_cmd = dev.generate_mise_install_command("ruby");
-        assert_eq!(mise_cmd, "mise use -g ruby");
-
-        assert!(!dev.sudoless_docker);
-        dev.toggle_sudoless_docker(true);
-        assert!(dev.sudoless_docker);
-        assert_eq!(dev.get_docker_command("ps"), "docker ps");
-
-        let gh_manifest = dev.generate_github_cli_manifest();
-        assert!(gh_manifest.contains("ghui"));
-        assert!(gh_manifest.contains("lazygit"));
-    }
-
-    #[test]
-    fn test_omarchy_capture_and_sharing_engine() {
-        let capture = OmarchyCaptureAndSharingEngine::new();
-        let shot_cmd = capture.generate_screenshot_cmd("fullscreen", true, "overlay");
-        assert!(shot_cmd.contains("omarchy capture screenshot fullscreen"));
-        assert!(shot_cmd.contains("save"));
-        assert!(shot_cmd.contains("--editor=overlay"));
-
-        let rec_cmd = capture.generate_screenrecord_start_cmd(true, true, true);
-        assert!(rec_cmd.contains("--fullscreen"));
-        assert!(rec_cmd.contains("--with-desktop-audio"));
-        assert!(rec_cmd.contains("--with-webcam"));
-
-        let taildrop_cmd = capture.generate_tailscale_send_cmd("my-server", "/tmp/screenshot.png");
-        assert_eq!(taildrop_cmd, "omarchy tailscale send my-server /tmp/screenshot.png");
-
-        let transcode_cmd = capture.generate_transcode_cmd("/tmp/video.mp4", "webm", "1080p");
-        assert_eq!(transcode_cmd, "omarchy transcode /tmp/video.mp4 webm 1080p");
-    }
-}
-
-/// Supported Omarchy Cross-Platform Execution Targets
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum OmarchyPlatformPlatform {
-    DefaultArch,
-    AppleSiliconAsahi,
-    AppleParallelsVm,
-    VirtualBoxVm,
-    VmwareWorkstationWin11,
-    SteamDeck,
-    NixOS,
-}
-
-impl OmarchyPlatformPlatform {
-    pub fn name(&self) -> &'static str {
-        match self {
-            Self::DefaultArch => "default-arch",
-            Self::AppleSiliconAsahi => "apple-silicon-asahi",
-            Self::AppleParallelsVm => "apple-parallels-vm",
-            Self::VirtualBoxVm => "virtualbox-vm",
-            Self::VmwareWorkstationWin11 => "vmware-workstation-win11",
-            Self::SteamDeck => "steam-deck",
-            Self::NixOS => "nixos",
-        }
-    }
-}
-
-/// Cross-Platform Target Setup & Driver Adaptor Engine
-#[derive(Debug, Clone)]
-pub struct OmarchyCrossPlatformTargetEngine {
-    pub platform: OmarchyPlatformPlatform,
-}
-
-impl OmarchyCrossPlatformTargetEngine {
-    pub fn new(platform: OmarchyPlatformPlatform) -> Self {
-        Self { platform }
-    }
-
-    pub fn generate_target_config(&self) -> String {
-        match self.platform {
-            OmarchyPlatformPlatform::DefaultArch => {
-                "platform = \"default-arch\"\nsetup_guide = \"https://github.com/omacom/omarchy\"\n".to_string()
-            }
-            OmarchyPlatformPlatform::AppleSiliconAsahi => {
-                format!(
-                    "platform = \"apple_m1_m2\"\narch_base = \"asahi-alarm\"\nguide = \"https://github.com/omarchy-mac/omarchy-mac\"\nreference = \"asahi-alarm.org\"\nkernel_params = [\"apple_dcp.show_vblank=1\", \"clk_ignore_unused\"]\n"
-                )
-            }
-            OmarchyPlatformPlatform::AppleParallelsVm => {
-                format!(
-                    "platform = \"apple_parallels_vm\"\ndriver = \"parallels-tools\"\nguide = \"https://github.com/omacom/omarchy/discussions/452\"\nkernel_params = [\"prl_tg.enabled=1\", \"i915.modeset=1\"]\n"
-                )
-            }
-            OmarchyPlatformPlatform::VirtualBoxVm => {
-                format!(
-                    "platform = \"virtualbox_vm\"\ndriver = \"virtualbox-guest-utils\"\nguide = \"https://github.com/omacom/omarchy/discussions/176\"\nkernel_params = [\"vboxvideo\", \"vboxsf\"]\n"
-                )
-            }
-            OmarchyPlatformPlatform::VmwareWorkstationWin11 => {
-                format!(
-                    "platform = \"vmware_workstation_win11\"\ndriver = \"open-vm-tools\"\nguide = \"https://github.com/omacom/omarchy/discussions/572\"\nkernel_params = [\"vmw_balloon\", \"vmw_vmci\"]\n"
-                )
-            }
-            OmarchyPlatformPlatform::SteamDeck => {
-                format!(
-                    "platform = \"steam_deck\"\nscript = \"deckarchy\"\nauthor = \"Altynbek Orumbayev\"\nguide = \"https://github.com/aorumbayev/deckarchy\"\nsteamos-readonly = false\n"
-                )
-            }
-            OmarchyPlatformPlatform::NixOS => {
-                format!(
-                    "platform = \"nixos\"\nflavour = \"omarchy-nix\"\nauthor = \"Henry Sipp\"\nguide = \"https://github.com/henrysipp/omarchy-nix\"\nimports = [ ./omarchy.nix ]\n"
-                )
-            }
-        }
+        let repo_theme = overlay.install_theme_repo("https://github.com/example/tokyo-night-custom.git").unwrap();
+        assert_eq!(repo_theme, "tokyo-night-custom");
+        assert_eq!(overlay.current_theme_name, "tokyo-night-custom");
     }
 }

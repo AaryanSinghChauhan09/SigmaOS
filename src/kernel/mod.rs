@@ -775,13 +775,9 @@ pub use universal_modular_system::{
     SovereignPeripheralAccessManager, SovereignProcessControlManager, SovereignVfsStorageManager,
 };
 
-// ─── Universal Kernel Format Engine (Linux & BSD Parity) ───────────────────────
-pub mod universal_kernel_format;
-pub use universal_kernel_format::{
-    KernelArch, KernelFormat, KernelCompression, KernelFormatSymbol, KernelSection,
-    ParsedKernelImage, SigmaKernelExecutionPayload, UniversalKernelFormatEngine,
+// ─── Boot & Kernel Foundations ────────────────────────────────────────────────
+pub mod boot_foundations;
+pub use boot_foundations::{
+    InterruptAndTimerSubsystem, KernelPanicCrashRecoveryEngine, PosixCoreSyscallAbiTable,
+    SmpCpuTopologyManager, UefiBootProtocolManager, UserKernelSpaceMemoryBoundary,
 };
-
-// ─── Hardware Boot-to-Userspace Path Subsystem ──────────────────────────────
-pub mod boot_to_userspace;
-pub use boot_to_userspace::*;

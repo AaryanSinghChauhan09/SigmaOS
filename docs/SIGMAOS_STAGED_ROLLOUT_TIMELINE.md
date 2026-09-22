@@ -1,62 +1,63 @@
-# 📅 SigmaOS Staged Rollout Timeline & Persona Expansion Blueprint
-
-This document outlines the staged release rollout timeline for **SigmaOS** to balance credibility, usability, and strategic differentiation. Each milestone introduces lightweight tools and persona overlays to keep the OS lean, fast, and complete out-of-the-box.
-
----
-
-## 🚀 Rollout Milestones & Phased Strategy
-
-### 1. 6 Months (v1.0 – Core Essentials Baseline)
-*Objective: Deliver a rock-solid, complete, and lean operating system out-of-the-box.*
-
-- **Lightweight Text Editor** → Instant config & file edits out-of-the-box (`sigma-edit` / `nano` compatibility).
-- **Universal Compression Utility** → Comprehensive archive support (`.tar.gz`, `.tar.xz`, `.zip`, `.zst`, `.7z`, `.bz2`).
-- **Network Diagnostics Engine** → Integrated network utilities (`ping`, `curl`, `traceroute`, `netstat`, `dig`).
-- **System Monitoring Dashboard** → Real-time CPU, RAM, GPU, storage, and thermal metrics (`sigma-top` / Zenith HUD widget).
-- **Backup Snapshot & Rollback Tool** → Instant Btrfs/ZFS O(1) CAS generation checkpoints and rollback safety baseline (`sigpkg rollback`).
+# 🚀 SIGMAOS STAGED ROLLOUT TIMELINE & MILESTONE ROADMAP
+## Usability, Ecosystem & System Design Roadmap (v1.0 / v1.2 / v1.5)
+### Repository: https://github.com/AaryanSinghChauhan09/SigmaOS
 
 ---
 
-### 2. 12 Months (v1.2 – Persona Expansion)
-*Objective: Boost adoption across Developer and Enterprise Compliance domains.*
+## EXECUTIVE SUMMARY
 
-#### 🛠️ Developer Persona
-- **File Conversion Utility** → Code, audio, image, and document format converter (`sigma-convert`).
-- **Lightweight IDE Overlay** → Fast, low-memory code editing environment with LSP language server integration.
-
-#### 🛡️ Compliance Persona
-- **Universal Package Fetcher** → On-demand driver, kernel module, and application fetcher (`sigpkg fetch`).
-- **Compliance Checklist Generator** → Automated CIS benchmark, ISO 27001, and SOC2 security compliance report generator.
+To transform SigmaOS into a practical, lightweight, and community-driven operating system, SigmaOS establishes a 3-phase rollout roadmap benchmarked against mature Linux distributions (Fedora, Arch, Debian):
+1. **v1.0 (6 Months – Core Credibility)**: Core OS installer, reproducible release engineering, universal package manager (`sigpkg`), and bootable rollback snapshots.
+2. **v1.2 (12 Months – Adoption Layer)**: Contributor marketplace, beginner-friendly SigmaOS handbook, Ask-SigmaOS forums, governance steering, hardware optimizer, and WCAG accessibility.
+3. **v1.5 (18 Months – Differentiation Layer)**: Gamified productivity overlays, cross-domain dashboards, lifecycle release planner (LTS vs. Rolling), and community persona marketplace.
 
 ---
 
-### 3. 18 Months (v1.5 – Differentiation Layer)
-*Objective: Establish market differentiation across Student and Gaming communities.*
+## STAGED ROLLOUT DASHBOARD
 
-#### 🎓 Student Persona
-- **Productivity Micro-Tools** → Integrated Pomodoro timer, checklist manager, and quick Markdown note-taking overlay.
-- **Flashcard & Quiz Overlay** → Space-repetition flashcard and study quiz overlay for interactive learning.
-
-#### 🎮 Gaming Persona
-- **GPU Scheduler Micro-Tool** → Real-time Vulkan/DXVK/VKD3D performance tuning, GPU clock governor, and Gamescope integration.
-- **Network Latency Monitor** → Real-time packet jitter, bufferbloat monitor, and low-latency packet prioritization.
+| Phase | Milestone Version | Timeline | Core Focus Area | Primary Deliverables & Impact |
+|-------|-------------------|----------|-----------------|--------------------------------|
+| **Phase 1** | **v1.0** | **6 Months** | Core Credibility | Guided Installer, Reproducible Release Engineering, Universal Package Manager (`sigpkg`), Bootable Rollback Snapshots |
+| **Phase 2** | **v1.2** | **12 Months** | Adoption Layer | Community Handbook, Ask-SigmaOS Forums, Governance Steering, ARM/IoT Hardware Optimizer, WCAG Accessibility Overlays |
+| **Phase 3** | **v1.5** | **18 Months** | Differentiation Layer | Gamified Productivity Overlays, Cross-Domain Dashboards, Lifecycle Planner (LTS vs Rolling), Persona Marketplace |
 
 ---
 
-## 📊 Timeline & Impact Dashboard
+## DETAILED PHASE BREAKDOWN
 
-| Milestone | Key Tools & Capabilities | Target Persona | Impact & Strategy |
-|:---|:---|:---|:---|
-| **6 Months (v1.0)** | Text editor, compression, network diagnostics, monitoring dashboard, snapshot rollback | Core OS Baseline | **Completeness Baseline**: Ensures immediate usability and rock-solid system stability from day one. |
-| **12 Months (v1.2)** | File converter, IDE overlay, universal package fetcher, compliance checklist generator | Developer + Compliance | **Adoption Boost**: Drives developer productivity and enterprise compliance qualification. |
-| **18 Months (v1.5)** | Productivity micro-tools, flashcards/quiz overlay, GPU scheduler micro-tool, latency monitor | Student + Gaming | **Market Differentiation**: Outperforms competitor DEs with tailored workflows for study and high-performance gaming. |
+### 🔴 Phase 1: 6 Months (v1.0 – Core Credibility Baseline)
+
+- **Guided Persona Installer**
+  - Guided persona-based setup wizard (Developer, Compliance, Student, Gaming, Minimalist).
+  - Keeps base ISO lightweight under 1.5 GB.
+- **Release Engineering**
+  - Reproducible builds, PQC-signed packages, and predictable release cadence via `sigpkg`.
+- **Universal Package Manager (`sigpkg`)**
+  - Launch `sigpkg` universal package manager with curated repositories unifying Alpine `.apk`, Flatpak, AppImage, and OCI containerized apps.
+- **Bootable Rollback & Snapshot System**
+  - Timeshift-lite / Btrfs / ZFS atomic snapshot integration.
+  - One-click bootloader rollback menu entry (`boot → select snapshot → instant rollback`).
 
 ---
 
-## 🌐 Synchronization & Governance
+### 🟠 Phase 2: 12 Months (v1.2 – Adoption Layer)
 
-This staged rollout timeline is synchronized across the SigmaOS codebase, documentation suite, and Wiki:
-- `docs/ROADMAP.md`
-- `docs/PRIORITIZED_DEVELOPMENT_ROADMAP.md`
-- `docs/RELEASE_CADENCE.md`
-- `ImprovementPlan.md`
+- **Community & Governance**
+  - SigmaOS Handbook (beginner-friendly wiki), Ask-SigmaOS Q&A forums, and defined steering committees with clear licensing.
+- **Hardware & Platform Expansion**
+  - Support for ARM64, RISC-V, IoT edge builds, and hardware spec auto-optimization on boot.
+- **Accessibility Overlays & Multi-Language Support**
+  - WCAG 2.2 AA compliant display scaling, screen reader voice synthesis, and Bhashini multi-language locale packs.
+
+---
+
+### 🟢 Phase 3: 18 Months (v1.5 – Differentiation Layer)
+
+- **Gamified Productivity Overlays**
+  - Pomodoro timers, goal trackers, flashcards, study dashboards, and XP/streak rewards.
+- **Cross-Domain Dashboards**
+  - Single-pane-of-glass overlay combining compliance, productivity, resource monitoring, and backup recovery.
+- **Lifecycle Planner (LTS vs. Rolling)**
+  - Dual release stream strategy: 2-year Long Term Support (LTS) for enterprise/compliance and rolling releases for developers/gamers.
+- **Community Persona Marketplace**
+  - Persona-centric marketplace where community members share custom dashboards, compliance packs, and desktop routines.

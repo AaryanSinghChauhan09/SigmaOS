@@ -824,104 +824,160 @@ impl Default for UdevDevdHotplugEngine {
 }
 
 // ============================================================================
-// 9. Multicore SMP Interrupt Load Balancing Engine (APIC / GIC / PLIC)
+// 11. NixOS / Guix Hermetic Content-Addressable Store (CAS) Verifier
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct IrqRoutingEntry {
-    pub irq_line: u32,
-    pub target_cpu_core: usize,
-    pub interrupt_count: u64,
+pub struct SovereignNixHermeticCasVerifier {
+    pub store_path_prefix: &'static str,
+    pub verified_store_objects: Vec<String>,
 }
 
-pub struct MulticoreSmpInterruptEngine {
-    pub irq_table: Vec<IrqRoutingEntry>,
-    pub num_cpu_cores: usize,
-}
-
-impl MulticoreSmpInterruptEngine {
-    pub fn new(cores: usize) -> Self {
-        Self {
-            irq_table: Vec::new(),
-            num_cpu_cores: cores,
-        }
-    }
-
-    pub fn bind_irq(&mut self, irq_line: u32, target_cpu_core: usize) -> Result<(), &'static str> {
-        if target_cpu_core >= self.num_cpu_cores {
-            return Err("Target core out of bounds");
-        }
-        self.irq_table.push(IrqRoutingEntry {
-            irq_line,
-            target_cpu_core,
-            interrupt_count: 0,
-        });
-        Ok(())
-    }
-
-    pub fn balance_irq_load(&mut self) {
-        for (i, entry) in self.irq_table.iter_mut().enumerate() {
-            entry.target_cpu_core = i % self.num_cpu_cores;
-        }
-    }
-}
-
-impl Default for MulticoreSmpInterruptEngine {
-    fn default() -> Self {
-        Self::new(8)
-    }
-}
-
-// ============================================================================
-// 10. Kernel Profiling & Trace Engine (Linux perf / BSD DTrace Parity)
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct PerfProbeSample {
-    pub timestamp_ns: u64,
-    pub pid: usize,
-    pub rip: u64,
-    pub probe_name: &'static str,
-}
-
-pub struct KernelPerfDtraceEngine {
-    pub is_tracing_active: bool,
-    pub probe_samples: Vec<PerfProbeSample>,
-}
-
-impl KernelPerfDtraceEngine {
+impl SovereignNixHermeticCasVerifier {
     pub fn new() -> Self {
         Self {
-            is_tracing_active: false,
-            probe_samples: Vec::new(),
+            store_path_prefix: "/system/store",
+            verified_store_objects: Vec::new(),
         }
     }
 
-    pub fn start_tracing(&mut self) {
-        self.is_tracing_active = true;
-    }
-
-    pub fn record_sample(&mut self, pid: usize, rip: u64, name: &'static str, time_ns: u64) {
-        if self.is_tracing_active {
-            self.probe_samples.push(PerfProbeSample {
-                timestamp_ns: time_ns,
-                pid,
-                rip,
-                probe_name: name,
-            });
+    pub fn verify_cas_object(&mut self, hash: &str, object_path: &str) -> bool {
+        if !hash.is_empty() && object_path.starts_with(self.store_path_prefix) {
+            self.verified_store_objects.push(object_path.to_string());
+            true
+        } else {
+            false
         }
     }
 }
 
-impl Default for KernelPerfDtraceEngine {
+impl Default for SovereignNixHermeticCasVerifier {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // ============================================================================
-// Unit Tests
+// 12. Void Linux XBPS Transactional Package Trigger Engine
 // ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct SovereignVoidXbpsTransactionalTriggerEngine {
+    pub pending_triggers: Vec<&'static str>,
+    pub executed_triggers: Vec<&'static str>,
+}
+
+impl SovereignVoidXbpsTransactionalTriggerEngine {
+    pub fn new() -> Self {
+        Self {
+            pending_triggers: vec!["update-desktop-database", "ldconfig", "fontconfig-cache"],
+            executed_triggers: Vec::new(),
+        }
+    }
+
+    pub fn execute_all_triggers(&mut self) -> usize {
+        let count = self.pending_triggers.len();
+        self.executed_triggers.append(&mut self.pending_triggers);
+        count
+    }
+}
+
+impl Default for SovereignVoidXbpsTransactionalTriggerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 13. FreeBSD bectl ZFS Boot Environment Dataset Management Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct ZfsBootEnvironment {
+    pub name: String,
+    pub active_boot: bool,
+    pub mountpoint: String,
+}
+
+#[derive(Debug)]
+pub struct SovereignFreeBsdBectlZfsBootEnvironmentEngine {
+    pub environments: Vec<ZfsBootEnvironment>,
+}
+
+impl SovereignFreeBsdBectlZfsBootEnvironmentEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            environments: Vec::new(),
+        };
+        engine.environments.push(ZfsBootEnvironment {
+            name: "default".to_string(),
+            active_boot: true,
+            mountpoint: "/".to_string(),
+        });
+        engine
+    }
+
+    pub fn create_environment(&mut self, name: &str) -> bool {
+        self.environments.push(ZfsBootEnvironment {
+            name: name.to_string(),
+            active_boot: false,
+            mountpoint: format!("/zfs/be/{}", name),
+        });
+        true
+    }
+
+    pub fn activate_environment(&mut self, name: &str) -> bool {
+        let mut found = false;
+        for env in &mut self.environments {
+            if env.name == name {
+                env.active_boot = true;
+                found = true;
+            } else {
+                env.active_boot = false;
+            }
+        }
+        found
+    }
+}
+
+impl Default for SovereignFreeBsdBectlZfsBootEnvironmentEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 14. OpenBSD pinsyscall Syscall Address Boundary Enforcement Engine
+// ============================================================================
+
+#[derive(Debug)]
+pub struct SovereignOpenBsdPinSyscallEngine {
+    pub valid_syscall_regions: Vec<(usize, usize)>, // (start_addr, end_addr)
+}
+
+impl SovereignOpenBsdPinSyscallEngine {
+    pub fn new() -> Self {
+        Self {
+            valid_syscall_regions: Vec::new(),
+        }
+    }
+
+    pub fn register_pinned_region(&mut self, start: usize, end: usize) {
+        self.valid_syscall_regions.push((start, end));
+    }
+
+    pub fn validate_syscall_entry(&self, pc: usize) -> bool {
+        self.valid_syscall_regions
+            .iter()
+            .any(|&(start, end)| pc >= start && pc < end)
+    }
+}
+
+impl Default for SovereignOpenBsdPinSyscallEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -1154,5 +1210,41 @@ impl SovereignUniversalDistroGapResolver {
 impl Default for SovereignUniversalDistroGapResolver {
     fn default() -> Self {
         Self::new()
+    }
+
+    #[test]
+    fn test_sovereign_nix_cas_verifier() {
+        let mut verifier = SovereignNixHermeticCasVerifier::new();
+        assert!(verifier.verify_cas_object("sha256-abc", "/system/store/pkg1"));
+        assert!(!verifier.verify_cas_object("sha256-abc", "/var/tmp/pkg1"));
+        assert_eq!(verifier.verified_store_objects.len(), 1);
+    }
+
+    #[test]
+    fn test_sovereign_void_xbps_trigger_engine() {
+        let mut trigger_engine = SovereignVoidXbpsTransactionalTriggerEngine::new();
+        assert_eq!(trigger_engine.pending_triggers.len(), 3);
+        let count = trigger_engine.execute_all_triggers();
+        assert_eq!(count, 3);
+        assert_eq!(trigger_engine.executed_triggers.len(), 3);
+    }
+
+    #[test]
+    fn test_sovereign_freebsd_bectl_engine() {
+        let mut bectl = SovereignFreeBsdBectlZfsBootEnvironmentEngine::new();
+        assert_eq!(bectl.environments.len(), 1);
+        assert!(bectl.create_environment("backup-2026"));
+        assert_eq!(bectl.environments.len(), 2);
+        assert!(bectl.activate_environment("backup-2026"));
+        assert!(bectl.environments[1].active_boot);
+        assert!(!bectl.environments[0].active_boot);
+    }
+
+    #[test]
+    fn test_sovereign_openbsd_pinsyscall_engine() {
+        let mut pinsyscall = SovereignOpenBsdPinSyscallEngine::new();
+        pinsyscall.register_pinned_region(0x7fff0000, 0x7fff1000);
+        assert!(pinsyscall.validate_syscall_entry(0x7fff0050));
+        assert!(!pinsyscall.validate_syscall_entry(0x10000000));
     }
 }

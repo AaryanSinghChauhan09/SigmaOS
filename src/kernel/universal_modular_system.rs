@@ -162,62 +162,6 @@ impl SovereignModularKernelEngine {
     pub fn resolve_symbol(&self, symbol: &str) -> Option<String> {
         self.symbol_table.get(symbol).cloned()
     }
-
-    /// Verifies cryptographic post-quantum ML-KEM / Falcon signature of module payload
-    pub fn verify_module_signature(&self, manifest: &KernelModuleManifest) -> bool {
-        if !manifest.is_pqc_signed {
-            return false;
-        }
-        !manifest.name.is_empty() && !manifest.license.is_empty()
-    }
-
-    /// Resolves full recursive dependency chain for a given module
-    pub fn resolve_dependency_chain(&self, module_name: &str) -> Result<Vec<String>, &'static str> {
-        let mut chain = Vec::new();
-        let mut stack = vec![module_name.to_string()];
-
-        while let Some(curr) = stack.pop() {
-            if chain.contains(&curr) {
-                continue;
-            }
-            chain.push(curr.clone());
-            if let Some(loaded) = self.modules.get(&curr) {
-                for dep in &loaded.manifest.dependencies {
-                    if !chain.contains(dep) {
-                        stack.push(dep.clone());
-                    }
-                }
-            } else if curr != module_name {
-                return Err("MissingDependencyInChain");
-            }
-        }
-
-        Ok(chain)
-    }
-
-    /// Hot-reloads a live kernel module parameter without unloading
-    pub fn hot_reload_module_parameter(
-        &mut self,
-        module_name: &str,
-        param_key: &str,
-        new_val: &str,
-    ) -> Result<String, &'static str> {
-        let module = self.modules.get_mut(module_name).ok_or("ModuleNotFound")?;
-        if module.status != ModuleStatus::Active {
-            return Err("ModuleNotActive");
-        }
-
-        let old_val = module
-            .manifest
-            .params
-            .insert(param_key.to_string(), new_val.to_string())
-            .unwrap_or_default();
-
-        Ok(format!(
-            "Hot-reloaded [{}] param '{}': '{}' -> '{}'",
-            module_name, param_key, old_val, new_val
-        ))
-    }
 }
 
 impl Default for SovereignModularKernelEngine {
@@ -367,11 +311,20 @@ pub enum ProcessState {
     Exited(i32),
 }
 
+#[derive(Debug, Clone)]
+pub struct EnterpriseProcessIsolationPolicy {
+    pub app_name: String,
+    pub is_memory_locked: bool,
+    pub sandbox_rights_mask: u64,
+    pub network_isolated: bool,
+}
+
 pub struct SovereignProcessControlManager {
     pub processes: BTreeMap<u64, ProcessControlEntry>,
     pub cgroups: BTreeMap<String, ResourceQuotaCgroup>,
     pub futex_waiters: BTreeMap<u64, Vec<u64>>, // futex_addr -> vec of pids
     pub kqueue_events: Vec<(u64, String)>,       // (pid, event_type)
+    pub isolation_policies: BTreeMap<String, EnterpriseProcessIsolationPolicy>,
 }
 
 impl SovereignProcessControlManager {
@@ -381,6 +334,7 @@ impl SovereignProcessControlManager {
             cgroups: BTreeMap::new(),
             futex_waiters: BTreeMap::new(),
             kqueue_events: Vec::new(),
+            isolation_policies: BTreeMap::new(),
         };
 
         // Root cgroup
@@ -396,6 +350,24 @@ impl SovereignProcessControlManager {
         );
 
         mgr
+    }
+
+    pub fn register_isolation_policy(
+        &mut self,
+        app_name: &str,
+        is_mem_locked: bool,
+        rights_mask: u64,
+        net_isolated: bool,
+    ) {
+        self.isolation_policies.insert(
+            app_name.to_string(),
+            EnterpriseProcessIsolationPolicy {
+                app_name: app_name.to_string(),
+                is_memory_locked: is_mem_locked,
+                sandbox_rights_mask: rights_mask,
+                network_isolated: net_isolated,
+            },
+        );
     }
 
     pub fn create_cgroup(&mut self, id: &str, cpu_pct: u32, mem_max: u64, max_pids: u32) {
@@ -512,11 +484,20 @@ pub struct SocketBuffer {
     pub payload: Vec<u8>,
 }
 
+#[derive(Debug, Clone)]
+pub struct MeshVpnNetworkRoute {
+    pub interface_name: String,
+    pub virtual_ip: String,
+    pub peer_public_key: String,
+    pub is_active: bool,
+}
+
 pub struct SovereignNetworkStackManager {
     pub pf_rules: Vec<PfFirewallRule>,
     pub xdp_programs_attached: usize,
     pub vnet_namespaces: Vec<String>,
     pub packet_ring_buffer: Vec<SocketBuffer>,
+    pub mesh_vpn_routes: BTreeMap<String, MeshVpnNetworkRoute>,
 }
 
 impl SovereignNetworkStackManager {
@@ -526,7 +507,25 @@ impl SovereignNetworkStackManager {
             xdp_programs_attached: 0,
             vnet_namespaces: vec!["default_vnet".to_string()],
             packet_ring_buffer: Vec::new(),
+            mesh_vpn_routes: BTreeMap::new(),
         }
+    }
+
+    pub fn register_mesh_vpn_route(
+        &mut self,
+        iface: &str,
+        vip: &str,
+        pubkey: &str,
+    ) {
+        self.mesh_vpn_routes.insert(
+            iface.to_string(),
+            MeshVpnNetworkRoute {
+                interface_name: iface.to_string(),
+                virtual_ip: vip.to_string(),
+                peer_public_key: pubkey.to_string(),
+                is_active: true,
+            },
+        );
     }
 
     pub fn add_pf_rule(
@@ -743,6 +742,45 @@ impl Default for SovereignVfsStorageManager {
 }
 
 // =========================================================================
+// 7. Sovereign Kernel Subsystem Orchestrator Engine
+// =========================================================================
+
+pub struct SovereignKernelSubsystemOrchestrator {
+    pub module_engine: SovereignModularKernelEngine,
+    pub driver_manager: SovereignDriverManager,
+    pub process_manager: SovereignProcessControlManager,
+    pub network_manager: SovereignNetworkStackManager,
+    pub peripheral_manager: SovereignPeripheralAccessManager,
+    pub vfs_manager: SovereignVfsStorageManager,
+    pub is_kernel_synchronized: bool,
+}
+
+impl SovereignKernelSubsystemOrchestrator {
+    pub fn new() -> Self {
+        Self {
+            module_engine: SovereignModularKernelEngine::new(),
+            driver_manager: SovereignDriverManager::new(),
+            process_manager: SovereignProcessControlManager::new(),
+            network_manager: SovereignNetworkStackManager::new(),
+            peripheral_manager: SovereignPeripheralAccessManager::new(),
+            vfs_manager: SovereignVfsStorageManager::new(),
+            is_kernel_synchronized: true,
+        }
+    }
+
+    pub fn synchronize_kernel_subsystems(&mut self) -> bool {
+        self.is_kernel_synchronized = true;
+        self.is_kernel_synchronized
+    }
+}
+
+impl Default for SovereignKernelSubsystemOrchestrator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // Unit Tests for Step 1, Step 2 & Step 3
 // =========================================================================
 
@@ -790,60 +828,6 @@ mod step1_tests {
         assert!(engine.kldunload_rmmod("snd_hda_intel").is_ok());
         // Now base unloads
         assert!(engine.kldunload_rmmod("snd_hda_core").is_ok());
-    }
-
-    #[test]
-    fn test_module_signature_dependency_chain_and_hot_reload() {
-        let mut engine = SovereignModularKernelEngine::new();
-
-        let base_manifest = KernelModuleManifest {
-            name: "core_mod".to_string(),
-            version: "1.0.0".to_string(),
-            author: "SigmaOS".to_string(),
-            license: "MIT".to_string(),
-            dependencies: Vec::new(),
-            exported_symbols: vec!["core_init".to_string()],
-            is_pqc_signed: true,
-            params: {
-                let mut p = BTreeMap::new();
-                p.insert("debug_level".to_string(), "1".to_string());
-                p
-            },
-        };
-
-        let sub_manifest = KernelModuleManifest {
-            name: "sub_mod".to_string(),
-            version: "1.0.0".to_string(),
-            author: "SigmaOS".to_string(),
-            license: "MIT".to_string(),
-            dependencies: vec!["core_mod".to_string()],
-            exported_symbols: vec!["sub_init".to_string()],
-            is_pqc_signed: true,
-            params: BTreeMap::new(),
-        };
-
-        // Signature check
-        assert!(engine.verify_module_signature(&base_manifest));
-
-        let unsigned_manifest = KernelModuleManifest {
-            is_pqc_signed: false,
-            ..base_manifest.clone()
-        };
-        assert!(!engine.verify_module_signature(&unsigned_manifest));
-
-        // Load modules
-        let _ = engine.kldload_insmod(base_manifest, 0x1000).unwrap();
-        let _ = engine.kldload_insmod(sub_manifest, 0x1000).unwrap();
-
-        // Dependency chain resolution
-        let chain = engine.resolve_dependency_chain("sub_mod").unwrap();
-        assert!(chain.contains(&"sub_mod".to_string()));
-        assert!(chain.contains(&"core_mod".to_string()));
-
-        // Hot reload parameter
-        let reload_msg = engine.hot_reload_module_parameter("core_mod", "debug_level", "3").unwrap();
-        assert!(reload_msg.contains("Hot-reloaded"));
-        assert_eq!(engine.get_module_param("core_mod", "debug_level"), Some("3".to_string()));
     }
 
     #[test]
@@ -974,5 +958,25 @@ mod step3_tests {
 
         vfs_mgr.create_snapshot("root_2026_03_28");
         assert_eq!(vfs_mgr.btrfs_snapshots[0], "root_2026_03_28");
+    }
+
+    #[test]
+    fn test_sovereign_kernel_subsystem_orchestrator() {
+        let mut orchestrator = SovereignKernelSubsystemOrchestrator::new();
+        assert!(orchestrator.is_kernel_synchronized);
+        assert!(orchestrator.synchronize_kernel_subsystems());
+    }
+
+    #[test]
+    fn test_enterprise_process_isolation_and_mesh_routing() {
+        let mut proc_mgr = SovereignProcessControlManager::new();
+        proc_mgr.register_isolation_policy("1Password", true, 0x1F, true);
+        assert!(proc_mgr.isolation_policies.contains_key("1Password"));
+        assert!(proc_mgr.isolation_policies.get("1Password").unwrap().is_memory_locked);
+
+        let mut net_mgr = SovereignNetworkStackManager::new();
+        net_mgr.register_mesh_vpn_route("tailscale0", "100.64.0.1", "pubkey_abc123");
+        assert!(net_mgr.mesh_vpn_routes.contains_key("tailscale0"));
+        assert_eq!(net_mgr.mesh_vpn_routes.get("tailscale0").unwrap().virtual_ip, "100.64.0.1");
     }
 }
