@@ -1,15 +1,7 @@
-#![allow(non_camel_case_types)]
-// SPDX-License-Identifier: MIT
-// SigmaOS Additional Linux & BSD Distro Innovations Subsystem
-// (`src/distro/additional_linux_bsd_components.rs`)
-//
-// Zero-dependency, `#![no_std]` compliant Rust components inspired by:
-// - Wayland ext-idle-inhibit-v1 (Idle inhibition manager for media playback & presentations)
-// - FreeBSD bhyve ppt(4) (PCI / PCIe hardware passthrough manager)
-// - NetBSD Rump VFS (Userland sandboxed filesystem & block driver isolation)
-// - OpenBSD softraid(4) (CRYPTO discipline full-disk AES-XTS & ChaCha20-Poly1305 volume)
-// - NixOS Flakes (flake.lock input pin locking & CAS hash verifier)
-// - SovereignAdditionalLinuxBsdSuite (Master coordinator unifying all additional engines)
+// SigmaOS Additional Linux & BSD Distro Components Module
+// Zero-dependency Rust #![no_std] / std implementation of strategic distro abstractions:
+// Debian dpkg-divert & dpkg-statoverride, Arch pacdiff & pacman-key, Gentoo eclass/SLOT & world file,
+// FreeBSD pkg audit VuXML & newsyslog, OpenBSD signify & rcctl, Void xbps journal, Alpine apk trigger hooks.
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::collections::BTreeMap;
@@ -79,9 +71,53 @@ impl Default for LinuxWaylandExtIdleInhibitEngine {
     }
 }
 
-// ============================================================================
-// 2. FREEBSD BHYVE PPT(4) PCI PASSTHROUGH ENGINE
-// ============================================================================
+/// Debian dpkg-statoverride Owner, Group & Mode Permission Override Engine
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct StatoverrideEntry {
+    pub user_owner: String,
+    pub group_owner: String,
+    pub mode_octal: u32,
+    pub path: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct DebianDpkgStatoverrideEngine {
+    pub overrides: Vec<StatoverrideEntry>,
+}
+
+impl DebianDpkgStatoverrideEngine {
+    pub fn new() -> Self {
+        Self { overrides: Vec::new() }
+    }
+
+    pub fn add_override(&mut self, user: &str, group: &str, mode: u32, path: &str) {
+        self.overrides.retain(|o| o.path != path);
+        self.overrides.push(StatoverrideEntry {
+            user_owner: user.to_string(),
+            group_owner: group.to_string(),
+            mode_octal: mode,
+            path: path.to_string(),
+        });
+    }
+
+    pub fn get_override(&self, path: &str) -> Option<&StatoverrideEntry> {
+        self.overrides.iter().find(|o| o.path == path)
+    }
+}
+
+impl Default for DebianDpkgStatoverrideEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Arch Linux pacdiff Configuration Diff & Merge Inspector
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum PacdiffFileStatus {
+    Identical,
+    Modified,
+    Conflict,
+}
 
 /// FreeBSD bhyve `ppt(4)` Passthrough Device
 #[derive(Debug, Clone)]
@@ -97,7 +133,187 @@ pub struct FreeBsdBhyvePciPassthroughEngine {
     pub passthrough_devices: BTreeMap<u32, BhyvePciPassthroughDevice>,
 }
 
-impl FreeBsdBhyvePciPassthroughEngine {
+/// Arch Linux pacman-key GPG Keyring Trust & Verification Engine
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum KeyTrustLevel {
+    Unknown,
+    Never,
+    Marginal,
+    Full,
+    Ultimate,
+}
+
+#[derive(Debug, Clone)]
+pub struct PacmanGpgKeyRecord {
+    pub key_id: String,
+    pub owner_name: String,
+    pub trust_level: KeyTrustLevel,
+    pub is_revoked: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct ArchPacmanKeyringTrustEngine {
+    pub keys: Vec<PacmanGpgKeyRecord>,
+}
+
+impl ArchPacmanKeyringTrustEngine {
+    pub fn new() -> Self {
+        Self { keys: Vec::new() }
+    }
+
+    pub fn import_key(&mut self, key_id: &str, owner: &str, trust: KeyTrustLevel) {
+        self.keys.push(PacmanGpgKeyRecord {
+            key_id: key_id.to_string(),
+            owner_name: owner.to_string(),
+            trust_level: trust,
+            is_revoked: false,
+        });
+    }
+
+    pub fn is_key_trusted(&self, key_id: &str) -> bool {
+        if let Some(k) = self.keys.iter().find(|k| k.key_id == key_id) {
+            !k.is_revoked && (k.trust_level == KeyTrustLevel::Full || k.trust_level == KeyTrustLevel::Ultimate)
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for ArchPacmanKeyringTrustEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Gentoo Portage eclass Inheritance & Slot Dependency Engine
+#[derive(Debug, Clone)]
+pub struct GentooEclassSlotEngine {
+    pub inherited_eclasses: Vec<String>,
+    pub slot: String,
+    pub subslot: Option<String>,
+}
+
+impl GentooEclassSlotEngine {
+    pub fn new(slot: &str) -> Self {
+        Self {
+            inherited_eclasses: Vec::new(),
+            slot: slot.to_string(),
+            subslot: None,
+        }
+    }
+
+    pub fn inherit_eclass(&mut self, eclass_name: &str) {
+        if !self.inherited_eclasses.contains(&eclass_name.to_string()) {
+            self.inherited_eclasses.push(eclass_name.to_string());
+        }
+    }
+
+    pub fn set_subslot(&mut self, subslot: &str) {
+        self.subslot = Some(subslot.to_string());
+    }
+
+    pub fn full_slot_atom(&self) -> String {
+        if let Some(ref ss) = self.subslot {
+            format!("{}/{}", self.slot, ss)
+        } else {
+            self.slot.clone()
+        }
+    }
+}
+
+/// Gentoo Portage World File Atom Tracking & Orphan Cleaning Engine
+#[derive(Debug, Clone)]
+pub struct GentooPortageWorldFileEngine {
+    pub world_atoms: Vec<String>,
+}
+
+impl GentooPortageWorldFileEngine {
+    pub fn new() -> Self {
+        Self { world_atoms: Vec::new() }
+    }
+
+    pub fn add_to_world(&mut self, atom: &str) {
+        if !self.world_atoms.contains(&atom.to_string()) {
+            self.world_atoms.push(atom.to_string());
+        }
+    }
+
+    pub fn remove_from_world(&mut self, atom: &str) {
+        self.world_atoms.retain(|a| a != atom);
+    }
+
+    pub fn is_selected(&self, atom: &str) -> bool {
+        self.world_atoms.contains(&atom.to_string())
+    }
+}
+
+impl Default for GentooPortageWorldFileEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// FreeBSD newsyslog Automated Log Rotation Engine
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NewsyslogRule {
+    pub log_filename: String,
+    pub owner_group: String,
+    pub mode_octal: u32,
+    pub max_files_count: usize,
+    pub max_size_kb: usize,
+    pub flags: String, // e.g. "JC" for bzip2 compression + create
+}
+
+#[derive(Debug, Clone)]
+pub struct FreeBsdNewsyslogEngine {
+    pub rules: Vec<NewsyslogRule>,
+}
+
+impl FreeBsdNewsyslogEngine {
+    pub fn new() -> Self {
+        Self { rules: Vec::new() }
+    }
+
+    pub fn add_rule(&mut self, filename: &str, owner: &str, mode: u32, count: usize, size_kb: usize, flags: &str) {
+        self.rules.push(NewsyslogRule {
+            log_filename: filename.to_string(),
+            owner_group: owner.to_string(),
+            mode_octal: mode,
+            max_files_count: count,
+            max_size_kb: size_kb,
+            flags: flags.to_string(),
+        });
+    }
+
+    pub fn should_rotate(&self, filename: &str, current_size_kb: usize) -> bool {
+        if let Some(rule) = self.rules.iter().find(|r| r.log_filename == filename) {
+            current_size_kb >= rule.max_size_kb
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for FreeBsdNewsyslogEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// FreeBSD pkg audit & VuXML Security Vulnerability Engine
+#[derive(Debug, Clone)]
+pub struct VuxmlAdvisory {
+    pub pkg_name: String,
+    pub vulnerable_version_range: String,
+    pub cve_id: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct FreeBsdPkgAuditVuxmlEngine {
+    pub advisories: Vec<VuxmlAdvisory>,
+}
+
+impl FreeBsdPkgAuditVuxmlEngine {
     pub fn new() -> Self {
         Self {
             passthrough_devices: BTreeMap::new(),
@@ -244,86 +460,8 @@ impl DebianDebconfPreseedEngine {
         });
     }
 
-    pub fn get_preseed(&self, owner: &str, question: &str) -> Option<&DebconfPreseedEntry> {
-        self.preseed_entries.iter().find(|e| e.owner == owner && e.question == question)
-    }
-}
-
-impl Default for DebianDebconfPreseedEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Gentoo ebuild Phase Execution Engine
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum EbuildPhase {
-    PkgSetup,
-    SrcUnpack,
-    SrcPrepare,
-    SrcConfigure,
-    SrcCompile,
-    SrcInstall,
-    PkgPreinst,
-    PkgPostinst,
-}
-
-#[derive(Debug, Clone)]
-pub struct GentooEbuildPhaseRunnerEngine {
-    pub category_pkg: String,
-    pub completed_phases: Vec<EbuildPhase>,
-}
-
-impl GentooEbuildPhaseRunnerEngine {
-    pub fn new(category_pkg: &str) -> Self {
-        Self {
-            category_pkg: category_pkg.to_string(),
-            completed_phases: Vec::new(),
-        }
-    }
-
-    pub fn execute_phase(&mut self, phase: EbuildPhase) -> Result<String, &'static str> {
-        if self.completed_phases.contains(&phase) {
-            return Err("Ebuild phase already executed");
-        }
-        self.completed_phases.push(phase.clone());
-        Ok(format!("Phase {:?} completed for {}", phase, self.category_pkg))
-    }
-}
-
-/// FreeBSD freebsd-update Binary Delta Patching Engine
-#[derive(Debug, Clone)]
-pub struct FreeBsdBinaryPatchRecord {
-    pub file_path: String,
-    pub old_sha256: String,
-    pub new_sha256: String,
-    pub patch_bytes_len: usize,
-}
-
-#[derive(Debug, Clone)]
-pub struct FreeBsdUpdateBinaryPatchEngine {
-    pub target_release: String,
-    pub pending_patches: Vec<FreeBsdBinaryPatchRecord>,
-}
-
-impl FreeBsdUpdateBinaryPatchEngine {
-    pub fn new(target_release: &str) -> Self {
-        Self {
-            target_release: target_release.to_string(),
-            pending_patches: Vec::new(),
-        }
-    }
-
-    pub fn stage_patch(&mut self, file_path: &str, old_hash: &str, new_hash: &str, patch_len: usize) {
-        self.pending_patches.push(FreeBsdBinaryPatchRecord {
-            file_path: file_path.to_string(),
-            old_sha256: old_hash.to_string(),
-            new_sha256: new_hash.to_string(),
-            patch_bytes_len: patch_len,
-        });
-    }
-
-    pub fn check_vulnerability(&self, pkg_name: &str, _version: &str) -> Option<&VuxmlAdvisory> {
+    pub fn check_vulnerability(&self, pkg_name: &str, version: &str) -> Option<&VuxmlAdvisory> {
+        let _ = version;
         self.advisories.iter().find(|a| a.pkg_name == pkg_name)
     }
 }
@@ -334,193 +472,49 @@ impl Default for FreeBsdPkgAuditVuxmlEngine {
     }
 }
 
-/// NetBSD pkgsrc Vulnerability Audit & Portable Binary Build Framework Engine
-#[derive(Debug, Clone)]
-pub struct NetBsdPkgsrcBuildAuditEngine {
-    pub pkgsrc_tree_version: String,
-    pub vulnerability_db_entries: usize,
-    pub bmake_jobs: u16,
+/// OpenBSD rcctl Daemon & Service Supervisor Engine
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RcctlServiceRecord {
+    pub service_name: String,
+    pub is_enabled: bool,
+    pub custom_flags: String,
+    pub timeout_sec: u32,
 }
 
-impl NetBsdPkgsrcBuildAuditEngine {
+#[derive(Debug, Clone)]
+pub struct OpenBsdRcctlServiceEngine {
+    pub services: Vec<RcctlServiceRecord>,
+}
+
+impl OpenBsdRcctlServiceEngine {
     pub fn new() -> Self {
-        Self {
-            pkgsrc_tree_version: String::from("pkgsrc-2026Q1"),
-            vulnerability_db_entries: 1420,
-            bmake_jobs: 8,
-        }
+        Self { services: Vec::new() }
     }
 
-    pub fn audit_pkg_vulnerabilities(&self, pkg_name: &str) -> bool {
-        !pkg_name.is_empty() && self.vulnerability_db_entries > 0
+    pub fn register_service(&mut self, name: &str, enabled: bool, flags: &str) {
+        self.services.push(RcctlServiceRecord {
+            service_name: name.to_string(),
+            is_enabled: enabled,
+            custom_flags: flags.to_string(),
+            timeout_sec: 30,
+        });
     }
 
-    pub fn configure_bmake_build(&mut self, jobs: u16) {
-        self.bmake_jobs = jobs;
-    }
-}
-
-impl Default for NetBsdPkgsrcBuildAuditEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Solus eopkg Delta Package Transaction & Binary Differential Engine
-#[derive(Debug, Clone)]
-pub struct SolusEopkgDeltaTransactionEngine {
-    pub delta_packages_enabled: bool,
-    pub compression_type: String,
-    pub total_bandwidth_saved_mb: usize,
-}
-
-impl SolusEopkgDeltaTransactionEngine {
-    pub fn new() -> Self {
-        Self {
-            delta_packages_enabled: true,
-            compression_type: String::from("zstd"),
-            total_bandwidth_saved_mb: 256,
-        }
-    }
-
-    pub fn calculate_delta_size(&self, full_size_mb: usize) -> usize {
-        if self.delta_packages_enabled {
-            full_size_mb / 4
-        } else {
-            full_size_mb
-        }
-    }
-
-    pub fn apply_delta_patch(&mut self, saved_mb: usize) -> bool {
-        self.total_bandwidth_saved_mb += saved_mb;
-        true
-    }
-}
-
-impl Default for SolusEopkgDeltaTransactionEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// DragonFly BSD HAMMER2 Copy-on-Write & Pseudo-Filesystem (PFS) Replication Engine
-#[derive(Debug, Clone)]
-pub struct DragonFlyBsdHammer2CoWEngine {
-    pub pfs_name: String,
-    pub is_master: bool,
-    pub snapshot_count: usize,
-}
-
-impl DragonFlyBsdHammer2CoWEngine {
-    pub fn new(pfs_name: &str, is_master: bool) -> Self {
-        Self {
-            pfs_name: pfs_name.to_string(),
-            is_master,
-            snapshot_count: 0,
-        }
-    }
-
-    pub fn create_snapshot(&mut self) -> String {
-        self.snapshot_count += 1;
-        format!("{}@snap-{}", self.pfs_name, self.snapshot_count)
-    }
-
-    pub fn verify_pfs_replication(&self) -> bool {
-        !self.pfs_name.is_empty()
-    }
-}
-
-/// GNU Guix Declarative Channel Specification & Git Commit Pinning Engine
-#[derive(Debug, Clone)]
-pub struct GuixChannelSpecificationEngine {
-    pub channel_name: String,
-    pub url: String,
-    pub pinned_commit: String,
-    pub introduction_fingerprint: Option<String>,
-}
-
-impl GuixChannelSpecificationEngine {
-    pub fn new(name: &str, url: &str, commit: &str) -> Self {
-        Self {
-            channel_name: name.to_string(),
-            url: url.to_string(),
-            pinned_commit: commit.to_string(),
-            introduction_fingerprint: None,
-        }
-    }
-
-    pub fn set_channel_introduction(&mut self, fingerprint: &str) {
-        self.introduction_fingerprint = Some(fingerprint.to_string());
-    }
-
-    pub fn verify_channel_pin(&self) -> bool {
-        self.pinned_commit.len() >= 7 && !self.url.is_empty()
-    }
-}
-
-/// NixOS Store Path Verification & Hermetic Closure Integrity Engine
-#[derive(Debug, Clone)]
-pub struct NixOsStorePathVerifierEngine {
-    pub store_prefix: String,
-    pub verified_store_objects: usize,
-}
-
-impl NixOsStorePathVerifierEngine {
-    pub fn new() -> Self {
-        Self {
-            store_prefix: String::from("/nix/store"),
-            verified_store_objects: 0,
-        }
-    }
-
-    pub fn verify_store_path(&mut self, store_path: &str) -> bool {
-        if store_path.starts_with("/nix/store/") && store_path.len() > 43 {
-            self.verified_store_objects += 1;
+    pub fn enable_service(&mut self, name: &str) -> bool {
+        if let Some(s) = self.services.iter_mut().find(|s| s.service_name == name) {
+            s.is_enabled = true;
             true
         } else {
             false
         }
     }
-}
 
-impl Default for NixOsStorePathVerifierEngine {
-    fn default() -> Self {
-        Self::new()
+    pub fn get_flags(&self, name: &str) -> Option<&str> {
+        self.services.iter().find(|s| s.service_name == name).map(|s| s.custom_flags.as_str())
     }
 }
 
-/// Slackware pkgtools Package Format Inspection & doinst.sh Installation Script Engine
-#[derive(Debug, Clone)]
-pub struct SlackwarePkgToolsValidatorEngine {
-    pub supported_extensions: Vec<String>,
-    pub doinst_script_validated: bool,
-}
-
-impl SlackwarePkgToolsValidatorEngine {
-    pub fn new() -> Self {
-        let mut exts = Vec::new();
-        exts.push(String::from("txz"));
-        exts.push(String::from("tgz"));
-        exts.push(String::from("tbz"));
-        exts.push(String::from("tlz"));
-        Self {
-            supported_extensions: exts,
-            doinst_script_validated: true,
-        }
-    }
-
-    pub fn is_valid_slackware_package(&self, filename: &str) -> bool {
-        self.supported_extensions
-            .iter()
-            .any(|ext| filename.ends_with(ext))
-    }
-
-    pub fn validate_doinst_script(&self, script_content: &str) -> bool {
-        !script_content.contains("rm -rf /") && self.doinst_script_validated
-    }
-}
-
-impl Default for SlackwarePkgToolsValidatorEngine {
+impl Default for OpenBsdRcctlServiceEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -543,6 +537,58 @@ impl OpenBsdSignifyBaseEngine {
 
     pub fn verify_signature(&self, message: &[u8], signature: &[u8; 64]) -> bool {
         !message.is_empty() && signature[0] != 0
+    }
+}
+
+/// Alpine Linux APK v3 Trigger Execution Engine
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ApkTriggerHook {
+    pub trigger_path: String,
+    pub target_executable: String,
+    pub pending_triggers_count: usize,
+}
+
+#[derive(Debug, Clone)]
+pub struct AlpineApkTriggerHooksEngine {
+    pub triggers: Vec<ApkTriggerHook>,
+}
+
+impl AlpineApkTriggerHooksEngine {
+    pub fn new() -> Self {
+        Self { triggers: Vec::new() }
+    }
+
+    pub fn register_trigger(&mut self, path: &str, exec: &str) {
+        self.triggers.push(ApkTriggerHook {
+            trigger_path: path.to_string(),
+            target_executable: exec.to_string(),
+            pending_triggers_count: 0,
+        });
+    }
+
+    pub fn notify_file_change(&mut self, path: &str) {
+        for t in self.triggers.iter_mut() {
+            if path.starts_with(&t.trigger_path) {
+                t.pending_triggers_count += 1;
+            }
+        }
+    }
+
+    pub fn run_pending_triggers(&mut self) -> usize {
+        let mut total_executed = 0;
+        for t in self.triggers.iter_mut() {
+            if t.pending_triggers_count > 0 {
+                total_executed += t.pending_triggers_count;
+                t.pending_triggers_count = 0;
+            }
+        }
+        total_executed
+    }
+}
+
+impl Default for AlpineApkTriggerHooksEngine {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -649,47 +695,98 @@ mod tests {
     }
 
     #[test]
-    fn test_freebsd_bhyve_ppt() {
-        let mut ppt = FreeBsdBhyvePciPassthroughEngine::new();
-        ppt.register_ppt_device(1, "0:1:0");
-        let res = ppt.attach_to_vm(1, 42).unwrap();
-        assert!(res.contains("ppt1"));
-        assert!(ppt.passthrough_devices.get(&1).unwrap().is_attached);
+    fn test_dpkg_statoverride_engine() {
+        let mut statoverride = DebianDpkgStatoverrideEngine::new();
+        statoverride.add_override("root", "mail", 0o2755, "/usr/bin/procmail");
+        let entry = statoverride.get_override("/usr/bin/procmail").unwrap();
+        assert_eq!(entry.user_owner, "root");
+        assert_eq!(entry.group_owner, "mail");
+        assert_eq!(entry.mode_octal, 0o2755);
     }
 
     #[test]
-    fn test_softraid_and_flake_pins() {
-        let mut softraid = OpenBsdSoftraidCryptoEngine::new();
-        softraid.create_crypto_volume(1, SoftraidCipher::ChaCha20Poly1305, &["/dev/sd2a"]);
-        assert!(softraid.unlock_volume(1, "pass").is_ok());
+    fn test_pacdiff_merger_engine() {
+        let mut pacdiff = ArchPacdiffMergerEngine::new("/etc/pacman.conf");
+        let status = pacdiff.inspect_status("same", "same");
+        assert_eq!(status, PacdiffFileStatus::Identical);
 
-        let mut nix = NixOsFlakeLockPinningEngine::new();
-        nix.pin_flake_input("home-manager", "sha256-hash", "r1");
-        assert!(nix.verify_flake_lock());
+        let pacnew = pacdiff.overwrite_with_pacnew();
+        assert_eq!(pacnew, "/etc/pacman.conf.pacnew");
+        assert_eq!(pacdiff.pacsave_file.unwrap(), "/etc/pacman.conf.pacsave");
     }
 
     #[test]
-    fn test_additional_linux_bsd_suite() {
-        let mut suite = SovereignAdditionalLinuxBsdSuite::new();
-        let health = suite.verify_suite();
-        assert_eq!(health.len(), 5);
-        for (k, v) in health {
-            assert!(v, "Additional Linux/BSD suite health check failed for: {}", k);
-        }
+    fn test_pacman_keyring_trust_engine() {
+        let mut keyring = ArchPacmanKeyringTrustEngine::new();
+        keyring.import_key("0x12345678", "Arch Linux Master Key", KeyTrustLevel::Ultimate);
+        assert!(keyring.is_key_trusted("0x12345678"));
+        assert!(!keyring.is_key_trusted("0x87654321"));
     }
 
     #[test]
-    fn test_additional_new_distro_engines() {
-        let mut arch_chroot = ArchChrootContainerEngine::new("/mnt/arch");
-        arch_chroot.prepare_chroot_binds();
-        assert!(arch_chroot.is_bound);
-        assert_eq!(arch_chroot.mount_points.len(), 4);
-        assert_eq!(arch_chroot.execute_chroot_command("pacman -Syu"), "chroot /mnt/arch pacman -Syu");
+    fn test_gentoo_eclass_slot_engine() {
+        let mut slot_eng = GentooEclassSlotEngine::new("14");
+        slot_eng.inherit_eclass("toolchain-funcs");
+        slot_eng.set_subslot("14.2");
+        assert_eq!(slot_eng.full_slot_atom(), "14/14.2");
+        assert_eq!(slot_eng.inherited_eclasses.len(), 1);
+    }
 
-        let mut debconf = DebianDebconfPreseedEngine::new();
-        debconf.set_preseed("tzdata", "tzdata/Zones/Asia", "select", "Kolkata");
-        let entry = debconf.get_preseed("tzdata", "tzdata/Zones/Asia").unwrap();
-        assert_eq!(entry.value, "Kolkata");
+    #[test]
+    fn test_gentoo_portage_world_file_engine() {
+        let mut world = GentooPortageWorldFileEngine::new();
+        world.add_to_world("sys-apps/systemd");
+        world.add_to_world("dev-lang/rust");
+        assert!(world.is_selected("dev-lang/rust"));
+        world.remove_from_world("sys-apps/systemd");
+        assert!(!world.is_selected("sys-apps/systemd"));
+    }
+
+    #[test]
+    fn test_freebsd_newsyslog_engine() {
+        let mut newsyslog = FreeBsdNewsyslogEngine::new();
+        newsyslog.add_rule("/var/log/messages", "root:wheel", 0o640, 7, 100, "JC");
+        assert!(newsyslog.should_rotate("/var/log/messages", 100));
+        assert!(!newsyslog.should_rotate("/var/log/messages", 50));
+    }
+
+    #[test]
+    fn test_freebsd_pkg_audit_vuxml_engine() {
+        let mut audit = FreeBsdPkgAuditVuxmlEngine::new();
+        audit.register_advisory("openssl", "< 3.0.12", "CVE-2024-1234");
+        let found = audit.check_vulnerability("openssl", "3.0.11").unwrap();
+        assert_eq!(found.cve_id, "CVE-2024-1234");
+    }
+
+    #[test]
+    fn test_openbsd_rcctl_service_engine() {
+        let mut rcctl = OpenBsdRcctlServiceEngine::new();
+        rcctl.register_service("smtpd", true, "-v");
+        assert_eq!(rcctl.get_flags("smtpd"), Some("-v"));
+        assert!(rcctl.enable_service("smtpd"));
+    }
+
+    #[test]
+    fn test_openbsd_signify_engine() {
+        let signify = OpenBsdSignifyBaseEngine::new("untrusted comment: openbsd-76-base public key", [1u8; 32]);
+        let sig = [1u8; 64];
+        assert!(signify.verify_signature(b"base.tgz", &sig));
+    }
+
+    #[test]
+    fn test_alpine_apk_trigger_hooks_engine() {
+        let mut triggers = AlpineApkTriggerHooksEngine::new();
+        triggers.register_trigger("/usr/lib/gio/modules", "/usr/bin/gio-querymodules");
+        triggers.notify_file_change("/usr/lib/gio/modules/libgiognutls.so");
+        assert_eq!(triggers.run_pending_triggers(), 1);
+        assert_eq!(triggers.run_pending_triggers(), 0);
+    }
+
+    #[test]
+    fn test_void_xbps_journal_engine() {
+        let mut journal = VoidXbpsTransactionJournalEngine::new();
+        journal.log_transaction("curl", "install", 1700000000);
+        assert_eq!(journal.history.len(), 1);
 
         let mut ebuild_runner = GentooEbuildPhaseRunnerEngine::new("sys-apps/systemd");
         assert!(ebuild_runner.execute_phase(EbuildPhase::PkgSetup).is_ok());

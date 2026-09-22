@@ -5568,88 +5568,224 @@ In addition to RSS/Atom redirection and portal category classification, SigmaOS 
 
 ---
 
-## 132. SOVEREIGN OMARCHY MINIMAL STARSHIP PROMPT SPECIFICATION
+## 130. SOVEREIGN AUTONOMOUS AI ENGINEERING SPECIFICATION, UNIVERSAL HARDWARE ADAPTATION & MARKET-DEFEATING STRATEGIC ROADMAP
 
-### 132.1 Starship Prompt Engine Overview
-SigmaOS incorporates a low-level, zero-dependency `#![no_std]` Rust engine (`OmarchyMinimalStarshipPromptEngine` in `src/shell/sovereign_shell_parity.rs`) inspired by Omarchy Linux and the Starship prompt (`starship.rs`):
+### 130.1 Autonomous AI Engineering Specification & Composite Specialist Personas
+SigmaOS development is governed by an autonomous composite AI Development Agent (Jules) adopting specialized engineering personas to audit, design, implement, and maintain system components:
 
-1. **Minimalist Prompt Design (`OmarchyStarshipConfig`)**:
-   - Omarchy Linux ships with a clean, clutter-free Starship prompt.
-   - Eliminates username/hostname clutter (user is always known) and time displays (rendered in the status bar/top panel).
+1. **System / Architecture Designer**:
+   - Owns subsystem boundaries (`kernel/`, `hal/`, `drivers/`, `fs/`, `net/`, `crypto/`, `zenith_desktop/`, `userland/`), maintaining strict architectural modularity and capability isolation.
+2. **Kernel / Systems Engineer**:
+   - Manages task scheduling (`SovereignSched`), syscall gates, `SovereignVMM` 4-level page tables, Copy-on-Write (CoW) memory, and lock-free IPC channels.
+3. **Device Driver Engineer**:
+   - Architects bare-metal drivers (NVMe, xHCI, E1000/RTL8139, AHCI, IDE, ISA) with DMA, IRQ/MSI-X handling, error recovery, and hot-unplug resilience following official hardware datasheets.
+4. **OS Security Engineer / Bug Bounty Responder**:
+   - Threat-models kernel and filesystem changes, enforces Kyber-1024 / Dilithium-5 PQC validation, applies OpenBSD `pledge`/`unveil` path sandboxing, and creates automated regression tests.
+5. **Filesystem & Storage Engineer**:
+   - Enforces Ext4/JBD2/SigmaFS journal correctness, Copy-on-Write extent trees, Merkle root hash verification, and sub-millisecond crash consistency.
+6. **Build / Release / QA Engineer**:
+   - Oversees multi-profile builds (`make PROFILE=<target>`), cross-compilation toolchains, reproducible builds, and 100% passing test execution.
+7. **UI/UX Developer (Palette 🎨)**:
+   - Maintains Zenith compositor rendering directly to hardware framebuffers without X11/Wayland dependencies, declarative JSON themes, keyboard focus rings, and WCAG 2.1 AA accessibility.
+8. **Performance Specialist (Bolt ⚡)**:
+   - Identifies $O(N^2) \to O(N)$ algorithmic bottlenecks, enforces zero-allocation fast paths, SIMD vectorization, and 64-byte cache line alignment, logging insights in `.jules/bolt.md`.
+9. **Security Guardian (Sentinel 🛡️)**:
+   - Audits code for hardcoded credentials, buffer overruns, race conditions, and privilege escalation, enforcing least privilege and logging findings in `.jules/sentinel.md`.
+10. **Maintainer & Repository Governance Lead**:
+    - Oversees issue/PR triage, conventional commit enforcement, DCO signoffs, and daily synchronization across documentation targets (`WIKI/`, `wiki/`, `wiki_repo/`).
 
-2. **Prompt Elements**:
-   - Current working directory path (`~/SigmaOS`).
-   - Git branch indicator (`on  main`).
-   - Execution status symbols (`❯` on success, `✖ ❯` on command failure).
-   - Configurable via `~/.config/starship.toml` parity.
+### 130.2 Universal Hardware Adaptation Matrix (1980s 16-bit to 2026+ Next-Gen)
+SigmaOS provides a unified low-level Hardware Abstraction Layer (`HAL`) engineered to execute without external proprietary driver binaries across every compute era:
+
+| Hardware Era | CPU & Bus Architecture | Storage & Peripheral Interface | Memory & MMU Model | SigmaOS Bare-Metal Driver Object |
+| :--- | :--- | :--- | :--- | :--- |
+| **Ancient (1980s–1990s)** | 16-bit / 32-bit x86, ISA Bus, 8259 PIC, PIT 8254 | ATA/IDE PIO Mode, Floppy FDC, Sound Blaster 16 | Real Mode, Protected Mode, 4KB Flat Paging | `LegacyBusBridge`, `IdeStorageDriver`, `IsaDmaController` |
+| **Transitional (2000s–2010s)** | 32-bit / 64-bit x86_64, PCIe Gen1–Gen3, ACPI 2.0 | SATA AHCI, SAS, USB 1.1/2.0 (UHCI/EHCI) | PAE, 64-bit Long Mode, 4KB Paging | `AhciController`, `AcpiPmtTimer`, `LegacyPciExpressBridge` |
+| **Modern (2020s)** | 64-bit x86_64, AArch64, RISC-V, PCIe Gen4/5 | NVMe 1.4/2.0, xHCI USB 3.2/4.0, Intel E1000/I210 | 4-Level / 5-Level Page Tables, Huge Pages | `NvmeStorageDriver`, `XhciUsb4Controller`, `SigmaBuddyAllocator` |
+| **Next-Gen (2026+)** | x86_64, AArch64, RISC-V 64, PCIe Gen6/7, CXL 3.0 | CXL Memory/Storage Fabric, P2P NVMe, PQC HSM | CXL Coherent Fabric Pools, PQC Enclaves | `CxlFabricGovernor`, `PqcHardwareEnclaveGate`, `DirectP2pStoragePipeline` |
+
+### 130.3 Distro-Crushing OS & Package Absorption Framework (`SigmaPkg`)
+SigmaOS systematically defeats traditional Linux and BSD distributions (Ubuntu, Fedora, Arch, NixOS, Debian, Void, Alpine, FreeBSD, OpenBSD) through architectural superiority:
+
+1. **Universal Multi-Format Package Translation**:
+   - Single-pass parsing and transpilation of 29+ package formats (`.deb`, `.rpm`, `.pkg.tar.zst`, `.ebuild`, `.apk`, `.nix`, `.flatpak`, `.snap`, `.appimage`, `.xbps`, `.txz`, `.eopkg`, `.zypper`, `.guix`, `.cachyos`, `.swupd`, `.starling`, `.sigpkg`, `.air`, `.bottle`, `.ipa`, `.ports`, `.pkg`, `.aab`, `.tar.gz`, `.xz`, `.app`, `.hap`).
+   - Provides runtime POSIX and glibc/musl syscall emulation shims to execute absorbed packages natively inside capability-gated sandboxes.
+2. **Declarative State & $O(1)$ Atomic Rollbacks**:
+   - System state represented as a deterministic Nix-style acyclic graph (`DeclarativeStateGraph`).
+   - Atomic generation updates enable $O(1)$ constant-time rollbacks to verified Merkle root checkpoints.
+3. **Zenith Direct-Hardware Compositor**:
+   - Renders graphical user interfaces directly to bare-metal GPU/framebuffer hardware with zero dependencies on X11 or Wayland display servers.
+   - Merges GNOME minimalism, KDE Plasma customization, COSMIC Rust memory safety, and macOS/Windows multi-display tiling dynamics.
+4. **Preloaded Complete Developer Toolchain**:
+   - Ships out-of-the-box with compilers (C, C++, Rust, Zig, Nim, Python), debuggers, linkers, and build systems preinstalled in a dormant state, consuming zero CPU/RAM until invoked.
+
+### 130.4 Strict Low-Level `#![no_std]` Programming Standards & Bare-Metal OOP Design Patterns
+1. **Absolute `#![no_std]` Zero-Dependency Directive**:
+   - Core kernel, driver, VFS, and network implementations are written strictly in modern systems languages (Rust, Zig, Nim) under `#![no_std]` without `std::`, external C runtimes (`glibc`, `musl`), or third-party crate dependencies.
+   - All register interfaces, memory allocators, and protocol packet processors are built from raw hardware addresses (`0x...`) and bare-metal user-defined functions (UDFs).
+2. **Bare-Metal Object-Oriented Design Patterns**:
+   - **Factory Pattern**: `DriverFactory` dynamically instantiates driver objects based on PCI Vendor/Device IDs or ACPI hardware tables.
+   - **Adapter Pattern**: `LegacyDeviceAdapter` wraps ancient PIO/ISA devices or foreign Linux/BSD driver shims to expose unified asynchronous `BlockDevice` and `NetworkDevice` interfaces.
+   - **Observer Pattern**: `HardwareEventObserver` dispatches asynchronous IRQ notifications and hot-unplug events across registered system shards.
+   - **Singleton Pattern**: `HardwareDeviceManager` coordinates central kernel-driver lifecycles, DMA buffer allocations, and resource isolation.
+
+### 130.5 Multi-Domain Compliance & Autonomous Daily Repository Intelligence
+1. **Multi-Domain Compliance Stack**:
+   - *Data Protection*: GDPR, CCPA, HIPAA, Indian IT Act compliance with zero-knowledge data masking and amnesic RAM scrubbing.
+   - *Information Security*: ISO/IEC 27001, SOC 2 Type II, and CIS Benchmarks compliance with immutable append-only audit logging and PQC Dilithium-5 signatures.
+   - *Accessibility*: WCAG 2.1 AA and Section 508 compliance with native screen readers, voice navigation, and high-contrast rendering.
+2. **Daily Automated Discovery & Wiki Synchronization**:
+   - Daily scanning of top open-source repositories to absorb architectural breakthroughs, performance improvements, and security patches into zero-dependency `#![no_std]` Rust modules.
+   - Automated documentation synchronization across `WIKI/`, `wiki/`, and `wiki_repo/` targets via `./scripts/sync_wiki.sh`.
 
 
-## 133. SOVEREIGN OMARCHY CAPTURE, SCREEN RECORDING, OCR & LOCAL SHARING SPECIFICATION
+---
 
-### 133.1 Overview & Subsystem Architecture
-SigmaOS absorbs the screen capture, video recording, text extraction (OCR), and local file sharing workflows of **Omarchy Linux** into a zero-dependency `#![no_std]` Rust engine (`OmarchyCaptureAndSharingEngine` in `src/distro/omarchy.rs`):
+## 131. SOVEREIGN OMARCHY LINUX FILE LAYOUT & WORKSTATION STRUCTURE SPECIFICATION
 
-1. **Screenshot Capture Modes**:
-   - Smart interactive region selection (`omarchy screenshot`).
-   - Region selection (`omarchy capture screenshot region`).
-   - Active window capture (`omarchy capture screenshot windows`).
-   - Fullscreen direct-to-disk save (`omarchy capture screenshot fullscreen save`).
-   - Scrolling region stitching (`omarchy capture screenshot scroll`).
-   - Annotation editor overlays (`--editor=overlay` or `--editor=window`).
-   - Default save location `~/Pictures/Screenshots` configurable via `OMASNAP_SCREENSHOT_DIR`.
+### 131.1 Overview & Omarchy File Layout Mental Model
+SigmaOS absorbs the workstation file layout, configuration deployment model, and user environment provisioning architecture of **Omarchy Linux** (the developer-focused Arch Linux distribution). The layout separates core runtime logic (`omarchy`), pre-seed userland settings (`omarchy-settings`), GPG keyrings (`omarchy-keyring`), and Neovim IDE environments (`omarchy-nvim`), mapping them directly into SigmaOS's `SigmaPkg` content-addressed storage (CAS) and declarative state graph architecture.
 
-2. **Screen Recording Engine**:
-   - Fullscreen & region recording (`omarchy screenrecord --fullscreen`).
-   - Audio integration flags (`--with-desktop-audio`, `--with-microphone-audio`).
-   - Live webcam overlay with dynamic resizing (`--with-webcam`, `omarchy capture webcam resize`).
-   - Debug logging via `OMARCHY_SCREENRECORD_DEBUG=true`.
-   - Recording output target directory configurable via `OMARCHY_SCREENRECORD_DIR` (default `~/Videos`).
+```
++-----------------------------------------------------------------------------------+
+|                  SIGMAOS OMARCHY FILE LAYOUT & PROVISIONING MODEL                  |
++-----------------------------------------------------------------------------------+
+| [1. Seed Phase]         [2. Finalize Phase]            [3. Resync Phase]          |
+| /etc/skel/ -> $HOME     omarchy-provision-user         omarchy-reinstall-configs  |
+| Static user defaults    Dynamic runtime $HOME expansion Clobber back to defaults  |
++-----------------------------------------------------------------------------------+
+| [4. Deferred Provisioning]                             [5. Migration Engine]      |
+| /var/lib/omarchy/provisioning/pending                 omarchy-migrate            |
+| Auto-creates owner user on tty1 on first boot          Per-user Unix timestamp    |
++-----------------------------------------------------------------------------------+
+```
 
-3. **Text Capture (OCR) & File Sharing**:
-   - Screen region OCR text extraction directly to clipboard (`omarchy capture text`).
-   - LocalSend P2P clipboard, file, and folder sharing (`omarchy share clipboard|file|folder`).
-   - Tailscale Taildrop machine-to-machine transfers (`omarchy tailscale send/receive`).
-   - Media re-encoding & transcoding helper (`omarchy transcode <input> [format] [resolution]`).
+### 131.2 Build-Time Mapping & Package Separation Matrix
+1. **`omarchy` Runtime Package**: Contains binaries (`/usr/bin/omarchy-*`), libalpm hooks (`/usr/share/libalpm/hooks/`), installation scripts (`/usr/share/omarchy/install/`), migration scripts (`/usr/share/omarchy/migrations/`), theme definitions (`/usr/share/omarchy/themes/`), and Quickshell desktop components (`/usr/share/omarchy/shell/`).
+2. **`omarchy-settings` Package**: Contains user skeleton templates (`/etc/skel/.config/**`), system drop-ins (`/etc/**`), icons (`/usr/share/icons/`), fonts (`/usr/share/fonts/omarchy/`), SDDM login themes (`/usr/share/sddm/themes/omarchy/`), Plymouth boot splash screens (`/usr/share/plymouth/themes/omarchy/`), Limine bootloader templates (`/usr/share/omarchy/default/limine/`), and Snapper backup templates (`/etc/snapper/config-templates/omarchy`).
+3. **`etc-overrides/` Collision Resolution**: Files owned by upstream packages (such as `.bashrc`, `nsswitch.conf`, `faillock.conf`, `cups-browsed.conf`, and `plymouthd.conf`) ship under `/usr/share/omarchy/etc-overrides/` and are copied into place during post-install/upgrade hooks (`cp -f`), avoiding package manager file conflict errors.
+
+### 131.3 System Search Indexing & Environment Bootstrapping
+1. **Plocate Btrfs Snapshot Indexing**: `plocate-updatedb.service.d/10-omarchy.conf` configures `updatedb --prune-bind-mounts=no --add-prunepaths=/.snapshots`, ensuring Btrfs subvolume mounts remain searchable while excluding Snapper snapshot directories from indexing bloat.
+2. **Environment Bootstrap Pipeline (`default/bash/env-bootstrap`)**:
+   - Sources `/etc/omarchy.conf` to set `OMARCHY_PATH` (default `/usr/share/omarchy`).
+   - Prepends `$OMARCHY_PATH/bin` to `PATH` when in dev-link mode (`omarchy-dev-link`).
+   - Appends `~/.local/share/mise/shims` and `~/.local/bin` to `PATH` for version-managed developer toolchains across login shells, interactive bash sessions, UWSM Hyprland sessions, and SSH commands.
+   - Updates `/etc/sudoers.d/omarchy-dev-path` via `Defaults secure_path` to ensure `sudo omarchy-*` commands execute the active development checkout.
+
+### 131.4 User Runtime Finalization, Migration Engine & First-Run Workflow
+1. **Runtime Finalization (`omarchy-provision-user`)**:
+   - Executed once per user; creates skill symlinks into `~/.agents/skills/<name>`, `~/.claude/skills/`, `~/.codex/skills/`, `~/.pi/agent/skills/`, `~/.gemini/config/skills/`, and `~/.hermes/skills/` pointing to `$OMARCHY_PATH/default/agents/skills/`.
+   - Runs `xdg-user-dirs-update`, sets default web browser (Chromium/HEY), composes application desktop launchers (`omarchy-refresh-applications`), and sources per-user hardware quirks (`install/user/all.sh`).
+   - Idempotency recorded via `~/.local/state/omarchy/done/finalize-user`.
+2. **Migration Engine (`omarchy-migrate`)**:
+   - Executes timestamped shell migrations (`migrations/<timestamp>.sh`), tracking completion state under `~/.local/state/omarchy/migrations/`.
+   - Graphical logins trigger `omarchy-migrate-notify.service`, prompting users to apply pending system migrations in an interactive terminal.
+3. **Interactive First-Run (`omarchy-provision-first-run`)**:
+   - Executes user systemd units (`bt-agent`, `omarchy-sleep-lock`, `omarchy-recover-internal-monitor`, `omarchy-migrate-notify.service`, `omarchy-fcitx5.service`, `omarchy-crash-watch.service`).
+   - Applies dconf GNOME/GTK themes, speaker audio tuning, welcome toasts, and Wi-Fi connection prompts, recording completion via `~/.local/state/omarchy/done/first-run-user`.
+4. **Explicit Configuration Resync (`omarchy-reinstall-configs`)**:
+   - Allows users to clobber home configs back to packaged defaults by replaying `/etc/skel/.` onto `$HOME`, followed by refreshing Limine boot entries, Plymouth themes, and Neovim configurations.
+5. **Kitty Terminal Security Defaults**:
+   - System default `/etc/xdg/kitty/kitty.conf` enforces `allow_remote_control socket-only`, allowing local scripts to query terminal states over Unix sockets while blocking malicious remote-control payloads originating from terminal output.
 
 
-## 134. SOVEREIGN SIGMAOS AI-GENERATED CODE GOVERNANCE & TRANSPARENCY SPECIFICATION
+---
 
-### 134.1 Overview & Governance Rules
-Adapted from the Linux kernel tool-generated content guidance, SigmaOS establishes five mandatory transparency rules (`docs/SIGMAOS_AI_CODING_TRANSPARENCY_GUIDELINES.md`) for AI-assisted ("vibe coding") and autonomous agent development:
+## 132. SOVEREIGN OMARCHY LINUX TOP BAR, SHELL PANELS & DESKTOP HUD SPECIFICATION
 
-1. **Name the AI Tool**:
-   - Explicitly identify the AI tool or model used for code, driver, or documentation generation.
-   - Mandate `Assisted-by: <Tool Name>` trailers in Git commit messages and Pull Requests.
+### 132.1 Overview & Single-Process Quickshell Top Bar Architecture
+SigmaOS absorbs the top bar and shell panel architecture of **Omarchy Linux**. Rather than executing a series of standalone, disconnected status bar daemons, the top bar is integrated directly into the single, long-running Zenith compositor and Quickshell process. This single process orchestrates the top bar, application menu, notifications, OSD popups, and lock screen, guaranteeing sub-millisecond panel opening latency, zero IPC serialization overhead, and perfect declarative theme synchronization across all UI components.
 
-2. **Preserve the Inputs Behind the Result**:
-   - Document and preserve original technical specifications (`PROJECT_SPEC.md`).
-   - Maintain independent test fixtures that the AI model did not directly optimize against.
+```
++-----------------------------------------------------------------------------------+
+|                        SIGMAOS ZENITH / OMARCHY TOP BAR HUD                       |
++-----------------------------------------------------------------------------------+
+| [Left Section]           | [Center Section]          | [Right Section]            |
+| - Omarchy Menu Launcher  - Mode Indicators           - System Tray & Agents       |
+| - Workspace Indicators   - Clock & Calendar          - Bluetooth & Network        |
+|                          - Weather & Keyboard        - Audio, Display & Power     |
+|                          - Update Badge              - Media Player               |
++-----------------------------------------------------------------------------------+
+|                        Hotkey-Driven Pop-Up Shell Panels                          |
+|  Super+Ctrl+A (Audio)  | Super+Ctrl+W (Network) | Super+Ctrl+B (Bluetooth)       |
+|  Super+Ctrl+D (Display)| Super+Ctrl+P (Power)   | Super+Ctrl+Alt+D (Calendar)    |
++-----------------------------------------------------------------------------------+
+```
 
-3. **Keep the Prompt Trail**:
-   - Log prompt sequences (`AI_ASSISTANCE.md`) summarizing goals, constraints, and `#![no_std]` safety boundaries.
+### 132.2 Mouse Interaction & Widget Click-Action Matrix
+Every top bar widget responds to left, right, middle clicks, and scroll wheel events:
 
-4. **Record Exactly What the AI Changed**:
-   - Clearly delineate human-authored specs/fixtures from AI-generated modules and tests.
+| Widget | Left Click Action | Right Click Action | Middle Click / Scroll Action |
+| :--- | :--- | :--- | :--- |
+| **Menu** | Open Omarchy application menu | Launch new terminal instance | — |
+| **Workspaces** | Focus target workspace | — | — |
+| **Clock** | Open month calendar popup | Cycle clock label format | Middle: Timezone picker |
+| **Weather** | Open forecast popup | Send full weather notification | Middle: Refresh weather data |
+| **Audio** | Open Audio control panel | Mute/unmute master audio | Middle: Audio panel · Scroll: Volume |
+| **Microphone** | Mute/unmute microphone | — | Middle: Audio panel · Scroll: Input level |
+| **Network** | Open Network scanning panel | — | — |
+| **Bluetooth** | Open Bluetooth devices panel | Toggle Bluetooth radio power | — |
+| **Display** | Open Display & monitor panel | — | Scroll: Screen brightness |
+| **Power** | Open Power & battery panel | Toggle battery percentage label | — |
+| **Media** | Play / Pause active media | Show cover-art popup | Middle: Next · Scroll: Prev/Next track |
+| **Agents** | Open AI Agents panel | Launch default AI coding agent | Middle: Cycle active subscription |
+| **Tray** | Hover to reveal drawer | Right-click chevron to manage | — |
+| **Update Badge** | Run system update pipeline | — | — |
 
-5. **Make the Generated Code Prove Itself**:
-   - Require 100% test pass rate via `./run_sigma_tests.sh`.
-   - Turn edge cases (dash-heavy signals, white noise, null buffers) into repeatable unit/integration tests before accepting patches.
+### 132.3 Hotkey-Driven Interactive Shell Panels
+Top bar panels are keyboard-navigable popups featuring interactive sliders, device lists, and control toggles:
+1. **Audio Panel (`Super + Ctrl + A`)**: Master volume slider, output device switcher, and per-app stream volume mixer.
+2. **Network Panel (`Super + Ctrl + W`)**: Wi-Fi network scanner, signal strength indicator, connection manager, and custom DNS provider selector.
+3. **Bluetooth Panel (`Super + Ctrl + B`)**: Paired device list, connect/disconnect toggles, and device battery level indicators.
+4. **Power Panel (`Super + Ctrl + P`)**: Battery health telemetry, system info, and power profile switches (separate choices for Battery vs. AC power).
+5. **Display Panel (`Super + Ctrl + D`)**: Brightness slider, text scaling, monitor scaling presets, and per-monitor arrangement controls.
+6. **Calendar Panel (`Super + Ctrl + Alt + D`)**: Month grid with ISO week numbers and month navigation.
+7. **Service Panels (Tailscale & Dropbox)**: Tailscale widget manages tailnet connections, account switches, exit nodes, and P2P file transfers (`Taildrop`). Dropbox widget manages authentication, quota usage, and sync status.
+
+### 132.4 Mode Indicators & Dynamic Bar Customization (`shell.json`)
+1. **Status Indicators**: Center cluster icons light up when active modes are engaged: Do Not Disturb (DND), Night Light, queued Reminders, active Screen Recording, Stay Awake, and Text Dictation.
+2. **Dynamic Drag-and-Drop & CLI Commands**:
+   - Drag empty space on the bar to move position (top, bottom, left, right).
+   - Double-click empty bar space to toggle background transparency.
+   - CLI commands: `omarchy bar position bottom`, `omarchy bar transparent toggle`, `omarchy bar move <id> --section center`, `omarchy plugin enable/disable <id>`.
+3. **Bar Visibility Toggle**: `Super + Shift + Space` toggles top bar visibility instantly without restarting the underlying shell process.
+4. **Declarative Configuration (`~/.config/omarchy/shell.json`)**:
+   - Configures bar position, transparency, `centerAnchor` (pinning clock/widgets to true screen center), and widget layout arrays (`left`, `center`, `right`).
+   - Stores idle timeout thresholds (`idle.screensaver` and `idle.lock` in seconds) at root level.
 
 
-## 135. SOVEREIGN LINUX & BSD WIKI ROADMAP ENGINES SPECIFICATION
+---
 
-### 135.1 Overview & Subsystem Architecture
-SigmaOS absorbs strategic ZFS boot environment, APT mirror optimization, and Runit service supervision features inspired by FreeBSD, Debian, and Void Linux into zero-dependency Rust engines (`FreeBsdZfsBootenvEngine`, `DebianAptFastMirrorSelectorEngine`, and `VoidRunitServiceSupervisorEngine` in `src/wiki_unimplemented_ideas.rs`):
+## 133. SOVEREIGN OMARCHY LINUX OMAKASE PHILOSOPHY & BEAUTIFUL COMPUTING MANIFESTO SPECIFICATION
 
-1. **FreeBSD ZFS Boot Environments Engine (`FreeBsdZfsBootenvEngine`)**:
-   - Manages ZFS boot environment datasets (`zroot/ROOT/<be_name>`).
-   - Supports creating boot environments from active system snapshots.
-   - Allows switching default boot environment on next boot (`activate_bootenv`).
+### 133.1 Overview & Omakase Computing Philosophy
+SigmaOS absorbs the "omakase" (curated chef's choice) computing philosophy and "beauty-as-a-motivator" manifesto of **Omarchy Linux**. Grounded in DHH's premise that productivity is downstream from motivation, Omarchy combines Arch Linux stability, Hyprland dynamic tiling, and Quickshell desktop construction kits into a cohesive, aesthetically delightsome workstation. SigmaOS synthesizes this ethos directly into its `#![no_std]` Rust microkernel, Zenith compositor, and `SigmaPkg` zero-bloat curated software suite.
 
-2. **Debian APT Fast Mirror Selector Engine (`DebianAptFastMirrorSelectorEngine`)**:
-   - Latency and bandwidth benchmarking across repository mirror servers.
-   - Selects N fastest mirrors for parallel multi-segment downloads.
+```
++-----------------------------------------------------------------------------------+
+|               SIGMAOS OMARCHY OMAKASE & BEAUTIFUL COMPUTING MODEL                 |
++-----------------------------------------------------------------------------------+
+| [1. Omakase Curation]       [2. Motivation via Aesthetics] [3. TUI & Terminal]   |
+| Zero-bloat curated tools    Aesthetics drive productivity  Neovim, Ghostty, Kitty |
+| No grab-bag packages        Theme synchronization          Powerline Starship HUD |
++-----------------------------------------------------------------------------------+
+| [4. Curated Software Suite]                                                       |
+| Neovim (IDE), Chromium (Web), Obsidian (Notes), LibreOffice (Office),             |
+| Kdenlive (Video), OBS Studio (Streaming), Audacious (Winamp-style Player)         |
++-----------------------------------------------------------------------------------+
+```
 
-3. **Void Runit Service Supervisor Engine (`VoidRunitServiceSupervisorEngine`)**:
-   - Models runit 3-stage init lifecycle (`Stage1OneTimeInit`, `Stage2ServiceSupervision`, `Stage3OneTimeShutdown`).
-   - Provides process supervision (`sv up`, `sv down`) and service state tracking.
+### 133.2 Core Manifesto Pillars & Software Suite Integration
+1. **Productivity Downstream from Motivation**: Rejects bland, utility-only operating system design. A visually captivating desktop environment encourages deep focus, developer joy, and sustained creative output.
+2. **Embracing Low-Level Purity**: Rejects Windows and macOS familiarity traps in favor of pure, terminal-heavy, theme-delighted, tiling-window-managed systems.
+3. **Curated Zero-Bloat Software Suite**:
+   - **Editor & IDE**: Neovim with Omakase LSP / LazyVim presets.
+   - **Web & Browser**: Chromium PWA launcher with sandboxed capability rings.
+   - **Note-Taking & Knowledge**: Obsidian-compatible markdown notebook backlinking engine.
+   - **Office & Productivity**: LibreOffice / OpenDocument compatibility suite.
+   - **Media Production**: Kdenlive non-linear video editor, OBS Studio streaming pipeline, and Audacious retro Winamp-style skin player.
+
+### 133.3 Zenith Compositor & Omakase Synthesis
+1. **Single-Process Zenith Integration**: Merges Hyprland dynamic dwindle tiling, Quickshell HUD panels, and theme palettes (TokyoNight, Catppuccin, Nord, Gruvbox) directly into Zenith compositor, avoiding multi-daemon Wayland memory overhead.
+2. **Declarative Omakase Configuration**: System themes, keybindings, and application defaults are stored in pure, versionable JSON/Nix manifests (`~/.config/omarchy/shell.json`), allowing instant $O(1)$ state rollbacks and profile switches.
