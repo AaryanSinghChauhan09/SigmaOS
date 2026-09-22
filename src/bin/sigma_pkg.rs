@@ -109,6 +109,26 @@ mod tests {
         assert_eq!(apt.operation, UniversalPmOperation::Install);
         assert_eq!(apt.target_packages, vec!["nginx", "curl"]);
 
+        let dnf = dispatcher.dispatch_command("dnf remove httpd").unwrap();
+        assert_eq!(dnf.source_pm, "dnf");
+        assert_eq!(dnf.operation, UniversalPmOperation::Remove);
+        assert_eq!(dnf.target_packages, vec!["httpd"]);
+
+        let pacman = dispatcher.dispatch_command("pacman -Syu --dryrun").unwrap();
+        assert_eq!(pacman.source_pm, "pacman");
+        assert_eq!(pacman.operation, UniversalPmOperation::Upgrade);
+        assert!(pacman.dry_run);
+
+        let apk = dispatcher.dispatch_command("apk add musl").unwrap();
+        assert_eq!(apk.source_pm, "apk");
+        assert_eq!(apk.operation, UniversalPmOperation::Install);
+        assert_eq!(apk.target_packages, vec!["musl"]);
+
+        let bsd_pkg = dispatcher.dispatch_command("pkg install -n postgresql15-server").unwrap();
+        assert_eq!(bsd_pkg.source_pm, "pkg");
+        assert_eq!(bsd_pkg.operation, UniversalPmOperation::Install);
+        assert!(bsd_pkg.dry_run);
+
         let debian = dispatcher.dispatch_command("debian install nginx").unwrap();
         assert_eq!(debian.source_pm, "debian");
         assert_eq!(debian.operation, UniversalPmOperation::Install);
@@ -130,6 +150,31 @@ mod tests {
         let void = dispatcher.dispatch_command("void install xbps").unwrap();
         assert_eq!(void.source_pm, "void");
         assert_eq!(void.operation, UniversalPmOperation::Install);
+
+        let emerge = dispatcher.dispatch_command("emerge -uDN @world -p").unwrap();
+        assert_eq!(emerge.source_pm, "emerge");
+        assert_eq!(emerge.operation, UniversalPmOperation::Upgrade);
+        assert!(emerge.dry_run);
+
+        let nix = dispatcher.dispatch_command("nix install nixpkgs#firefox").unwrap();
+        assert_eq!(nix.source_pm, "nix");
+        assert_eq!(nix.operation, UniversalPmOperation::Install);
+
+        let eopkg = dispatcher.dispatch_command("eopkg it vlc").unwrap();
+        assert_eq!(eopkg.source_pm, "eopkg");
+        assert_eq!(eopkg.operation, UniversalPmOperation::Install);
+
+        let slackpkg = dispatcher.dispatch_command("slackpkg install glibc").unwrap();
+        assert_eq!(slackpkg.source_pm, "slackpkg");
+        assert_eq!(slackpkg.operation, UniversalPmOperation::Install);
+
+        let flatpak = dispatcher.dispatch_command("flatpak install org.gimp.GIMP").unwrap();
+        assert_eq!(flatpak.source_pm, "flatpak");
+        assert_eq!(flatpak.operation, UniversalPmOperation::Install);
+
+        let snap = dispatcher.dispatch_command("snap remove vlc").unwrap();
+        assert_eq!(snap.source_pm, "snap");
+        assert_eq!(snap.operation, UniversalPmOperation::Remove);
     }
 
     #[test]
