@@ -250,14 +250,18 @@ impl PackageFormat {
         } else if normalized.ends_with(".pkg.tar.zst")
             || normalized.ends_with(".pkg.tar.xz")
             || normalized.ends_with(".pkg.tar.gz")
-            || normalized.contains("pacman")
+            || normalized.ends_with(".pkg.tar")
+            || normalized.ends_with(".pkgbuild")
+            || normalized.ends_with(".pacman")
+            || normalized == "pacman"
+            || (normalized.contains("pacman") && !normalized.ends_with(".pkg"))
         {
             Some(PackageFormat::Pacman)
-        } else if normalized.ends_with(".snap") {
+        } else if normalized == "snap" || normalized.ends_with(".snap") {
             Some(PackageFormat::Snap)
-        } else if normalized.ends_with(".flatpak") {
+        } else if normalized == "flatpak" || normalized.ends_with(".flatpak") {
             Some(PackageFormat::Flatpak)
-        } else if normalized.ends_with(".appimage") {
+        } else if normalized == "appimage" || normalized.ends_with(".appimage") {
             Some(PackageFormat::AppImage)
         } else if normalized.ends_with(".sigpkg") || normalized.ends_with(".sigma") {
             Some(PackageFormat::Sigma)
@@ -329,9 +333,9 @@ impl PackageFormat {
             Some(PackageFormat::Pisi)
         } else if normalized.ends_with(".lzm") {
             Some(PackageFormat::Lzm)
-        } else if normalized.ends_with(".pup") {
+        } else if normalized == "pup" || normalized.ends_with(".pup") {
             Some(PackageFormat::Pup)
-        } else if normalized.ends_with(".pet") {
+        } else if normalized == "pet" || normalized.ends_with(".pet") {
             Some(PackageFormat::Pet)
         } else if normalized.ends_with(".swupd") {
             Some(PackageFormat::Swupd)

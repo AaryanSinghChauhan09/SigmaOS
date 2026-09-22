@@ -388,11 +388,11 @@ impl PackageFormat {
             || (normalized.contains("pacman") && !normalized.ends_with(".pkg"))
         {
             Some(PackageFormat::Pacman)
-        } else if normalized.ends_with(".snap") {
+        } else if normalized == "snap" || normalized.ends_with(".snap") {
             Some(PackageFormat::Snap)
-        } else if normalized.ends_with(".flatpak") {
+        } else if normalized == "flatpak" || normalized.ends_with(".flatpak") {
             Some(PackageFormat::Flatpak)
-        } else if normalized.ends_with(".appimage") {
+        } else if normalized == "appimage" || normalized.ends_with(".appimage") {
             Some(PackageFormat::AppImage)
         } else if normalized.ends_with(".sigpkg") || normalized.ends_with(".sigma") {
             Some(PackageFormat::SigmaPkg)
@@ -469,9 +469,9 @@ impl PackageFormat {
             Some(PackageFormat::Pisi)
         } else if normalized.ends_with(".lzm") {
             Some(PackageFormat::Lzm)
-        } else if normalized.ends_with(".pup") {
+        } else if normalized == "pup" || normalized.ends_with(".pup") {
             Some(PackageFormat::Pup)
-        } else if normalized.ends_with(".pet") {
+        } else if normalized == "pet" || normalized.ends_with(".pet") {
             Some(PackageFormat::Pet)
         } else if normalized.ends_with(".tar") {
             Some(PackageFormat::Tar)
@@ -2831,6 +2831,21 @@ mod tests {
             enabled: true,
         };
         assert!(dnf_adapter.query_dnf_repository(&dnf_config));
+    }
+
+    #[test]
+    fn test_prompt_formats_bare_and_spaced_extensions() {
+        assert_eq!(PackageFormat::from_filename("pup"), Some(PackageFormat::Pup));
+        assert_eq!(PackageFormat::from_filename("pet"), Some(PackageFormat::Pet));
+        assert_eq!(PackageFormat::from_filename("snap"), Some(PackageFormat::Snap));
+        assert_eq!(PackageFormat::from_filename("flatpak"), Some(PackageFormat::Flatpak));
+        assert_eq!(PackageFormat::from_filename("appimage"), Some(PackageFormat::AppImage));
+        assert_eq!(PackageFormat::from_filename("pacman"), Some(PackageFormat::Pacman));
+        assert_eq!(PackageFormat::from_filename("archive.tar .gz"), Some(PackageFormat::TarGz));
+        assert_eq!(PackageFormat::from_filename("package .pkg.tar.xz"), Some(PackageFormat::Pacman));
+        assert_eq!(PackageFormat::from_filename("sample.PiSi"), Some(PackageFormat::Pisi));
+        assert_eq!(PackageFormat::from_filename("software.superdeb"), Some(PackageFormat::Superdeb));
+        assert_eq!(PackageFormat::from_filename("slax_module.lzm"), Some(PackageFormat::Lzm));
     }
 
     #[test]
