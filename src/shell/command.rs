@@ -749,6 +749,7 @@ pub trait CommandHistory {
 #[repr(C)]
 pub struct SimpleCommandHistory {
     pub history: ShellVec<[u8; 256]>,
+    pub history_lens: ShellVec<u16>,
     pub current_index: AtomicUsize,
 }
 
@@ -756,6 +757,7 @@ impl SimpleCommandHistory {
     pub fn new() -> Self {
         SimpleCommandHistory {
             history: ShellVec::new(),
+            history_lens: ShellVec::new(),
             current_index: AtomicUsize::new(0),
         }
     }
@@ -770,10 +772,14 @@ impl Default for SimpleCommandHistory {
 impl CommandHistory for SimpleCommandHistory {
     fn add(&mut self, command: &[u8]) {
         let mut cmd_array = [0u8; 256];
-        let cmd_len = command.len().min(255);
+        let cmd_len = command.len().min(256);
         // Bolt ⚡ Optimization: Use bulk slice copying (`copy_from_slice`) to allow SIMD vectorization
         cmd_array[..cmd_len].copy_from_slice(&command[..cmd_len]);
         self.history.push(cmd_array);
+        // Bolt ⚡ Optimization: Cache explicit string lengths as u16 during addition to eliminate
+        // O(N) zero-byte linear scans (.position(|&b| b == 0)) on every history retrieval/list query,
+        // reducing slice lookups to bounds-checked O(1) constant time and avoiding u8 overflow on 256-byte strings.
+        self.history_lens.push(cmd_len as u16);
         self.current_index
             .store(self.history.len(), Ordering::SeqCst);
     }
@@ -782,7 +788,11 @@ impl CommandHistory for SimpleCommandHistory {
         let idx = self.current_index.load(Ordering::SeqCst);
         if idx > 0 && idx <= self.history.len() {
             if let Some(cmd) = self.history.get(idx - 1) {
-                let len = cmd.iter().position(|&b| b == 0).unwrap_or(256);
+                let len = self
+                    .history_lens
+                    .get(idx - 1)
+                    .map(|&l| l as usize)
+                    .unwrap_or_else(|| cmd.iter().position(|&b| b == 0).unwrap_or(256));
                 Some(&cmd[..len])
             } else {
                 None
@@ -796,7 +806,11 @@ impl CommandHistory for SimpleCommandHistory {
         let idx = self.current_index.load(Ordering::SeqCst);
         if idx < self.history.len() {
             if let Some(cmd) = self.history.get(idx) {
-                let len = cmd.iter().position(|&b| b == 0).unwrap_or(256);
+                let len = self
+                    .history_lens
+                    .get(idx)
+                    .map(|&l| l as usize)
+                    .unwrap_or_else(|| cmd.iter().position(|&b| b == 0).unwrap_or(256));
                 Some(&cmd[..len])
             } else {
                 None
@@ -807,9 +821,13 @@ impl CommandHistory for SimpleCommandHistory {
     }
 
     fn list(&self) -> ShellVec<&[u8]> {
-        let mut commands = ShellVec::new();
-        for cmd in &*self.history {
-            let len = cmd.iter().position(|&b| b == 0).unwrap_or(256);
+        let mut commands = ShellVec::with_capacity(self.history.len());
+        for (idx, cmd) in self.history.iter().enumerate() {
+            let len = self
+                .history_lens
+                .get(idx)
+                .map(|&l| l as usize)
+                .unwrap_or_else(|| cmd.iter().position(|&b| b == 0).unwrap_or(256));
             commands.push(&cmd[..len]);
         }
         commands
