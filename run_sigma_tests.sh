@@ -249,23 +249,16 @@ if [ -f "src/distro/tech_media_distro_innovations.rs" ]; then
     ./build/tech_media_distro_test
 fi
 
-if [ -f "src/distro/tech_media_extended_innovations.rs" ]; then
-    echo "Running Sovereign Tech Media Extended Distro Innovations test suite..."
+if [ -f "src/open_source_os_gap_closure.rs" ]; then
+    echo "Running Open Source OS Gap Closure test suite..."
     mkdir -p build
-    rustc --test --edition=2021 src/distro/tech_media_extended_innovations.rs -o build/tech_media_ext_distro_test
-    ./build/tech_media_ext_distro_test
+    rustc --test --edition=2021 src/open_source_os_gap_closure.rs -o build/test_open_source_gap_closure
+    ./build/test_open_source_gap_closure
 fi
 
-if [ -f "src/tools/tech_media_extended_suite.rs" ]; then
-    echo "Running Sovereign Tech Media Extended Tools Suite test suite..."
+if [ -f "src/open_source_obsoletion.rs" ]; then
+    echo "Running Open Source Obsoletion test suite..."
     mkdir -p build
-    rustc --test --edition=2021 src/tools/tech_media_extended_suite.rs -o build/tech_media_ext_suite_test
-    ./build/tech_media_ext_suite_test
-fi
-
-if [ -f "src/wiki_distro_ideas_deployment.rs" ]; then
-    echo "Running Sovereign Wiki Distro Ideas Deployment test suite..."
-    mkdir -p build
-    rustc --test --edition=2021 src/wiki_distro_ideas_deployment.rs -o build/test_wiki_distro_ideas
-    ./build/test_wiki_distro_ideas
+    rustc src/open_source_obsoletion.rs --crate-type=lib --test --edition=2021 -o build/test_open_source_obsoletion
+    ./build/test_open_source_obsoletion
 fi

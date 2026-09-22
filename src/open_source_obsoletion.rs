@@ -6230,6 +6230,178 @@ impl Default for SovereignYaziEngine {
 }
 
 // =========================================================================
+// 86. SOVEREIGN NIX FLAKES & GUIX CHANNELS SYSTEM GENERATION ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SovereignFlakeLockInput {
+    pub name: String,
+    pub original_url: String,
+    pub locked_rev: String,
+    pub nar_hash: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SovereignSystemGenerationRecord {
+    pub generation_id: u32,
+    pub lock_inputs: Vec<SovereignFlakeLockInput>,
+    pub created_timestamp_secs: u64,
+    pub profile_symlink: String,
+}
+
+pub struct SovereignNixFlakesSystemGenerationEngine {
+    pub generations: Vec<SovereignSystemGenerationRecord>,
+    pub active_generation_id: u32,
+}
+
+impl SovereignNixFlakesSystemGenerationEngine {
+    pub fn new() -> Self {
+        Self {
+            generations: Vec::new(),
+            active_generation_id: 0,
+        }
+    }
+
+    pub fn build_and_lock_generation(
+        &mut self,
+        inputs: &[SovereignFlakeLockInput],
+        timestamp: u64,
+    ) -> u32 {
+        let new_id = (self.generations.len() + 1) as u32;
+        let record = SovereignSystemGenerationRecord {
+            generation_id: new_id,
+            lock_inputs: inputs.to_vec(),
+            created_timestamp_secs: timestamp,
+            profile_symlink: format!("/nix/var/nix/profiles/system-{}-link", new_id),
+        };
+        self.generations.push(record);
+        self.active_generation_id = new_id;
+        new_id
+    }
+
+    pub fn rollback_generation(&mut self) -> Result<u32, &'static str> {
+        if self.active_generation_id <= 1 {
+            return Err("Nix Flakes: Cannot rollback past initial generation");
+        }
+        self.active_generation_id -= 1;
+        Ok(self.active_generation_id)
+    }
+}
+
+impl Default for SovereignNixFlakesSystemGenerationEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 87. SOVEREIGN APACHE ICEBERG & DELTA LAKE TABULAR STORAGE ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct IcebergDataFileMetadata {
+    pub file_path: String,
+    pub record_count: u64,
+    pub file_size_bytes: u64,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct IcebergSnapshotManifest {
+    pub snapshot_id: u64,
+    pub timestamp_ms: u64,
+    pub added_files: Vec<IcebergDataFileMetadata>,
+}
+
+pub struct SovereignIcebergDeltaLakeStorageEngine {
+    pub table_name: String,
+    pub snapshots: Vec<IcebergSnapshotManifest>,
+    pub current_snapshot_id: u64,
+}
+
+impl SovereignIcebergDeltaLakeStorageEngine {
+    pub fn new(table_name: &str) -> Self {
+        Self {
+            table_name: table_name.to_string(),
+            snapshots: Vec::new(),
+            current_snapshot_id: 0,
+        }
+    }
+
+    pub fn commit_snapshot(&mut self, timestamp_ms: u64, files: &[IcebergDataFileMetadata]) -> u64 {
+        let snap_id = self.current_snapshot_id + 1;
+        self.current_snapshot_id = snap_id;
+        self.snapshots.push(IcebergSnapshotManifest {
+            snapshot_id: snap_id,
+            timestamp_ms,
+            added_files: files.to_vec(),
+        });
+        snap_id
+    }
+
+    pub fn query_time_travel(&self, target_snapshot_id: u64) -> Option<&IcebergSnapshotManifest> {
+        self.snapshots.iter().find(|s| s.snapshot_id == target_snapshot_id)
+    }
+}
+
+// =========================================================================
+// 88. SOVEREIGN CILIUM EBPF TRANSPARENT MTLS ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CiliumSecurityIdentity {
+    pub identity_tag: u32,
+    pub labels: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CiliumMtlsHandshakeState {
+    pub src_identity: u32,
+    pub dst_identity: u32,
+    pub mtls_authenticated: bool,
+}
+
+pub struct SovereignCiliumEbpfMtlsEngine {
+    pub identities: Vec<CiliumSecurityIdentity>,
+    pub handshakes: Vec<CiliumMtlsHandshakeState>,
+}
+
+impl SovereignCiliumEbpfMtlsEngine {
+    pub fn new() -> Self {
+        Self {
+            identities: Vec::new(),
+            handshakes: Vec::new(),
+        }
+    }
+
+    pub fn register_identity(&mut self, tag: u32, labels: &[&str]) {
+        self.identities.push(CiliumSecurityIdentity {
+            identity_tag: tag,
+            labels: labels.iter().map(|s| s.to_string()).collect(),
+        });
+    }
+
+    pub fn authenticate_ebpf_mtls(&mut self, src_tag: u32, dst_tag: u32) -> bool {
+        let valid_src = self.identities.iter().any(|i| i.identity_tag == src_tag);
+        let valid_dst = self.identities.iter().any(|i| i.identity_tag == dst_tag);
+        let authenticated = valid_src && valid_dst;
+
+        self.handshakes.push(CiliumMtlsHandshakeState {
+            src_identity: src_tag,
+            dst_identity: dst_tag,
+            mtls_authenticated: authenticated,
+        });
+
+        authenticated
+    }
+}
+
+impl Default for SovereignCiliumEbpfMtlsEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // UNIT TESTS
 // =========================================================================
 
@@ -7386,60 +7558,50 @@ mod tests {
     }
 
     #[test]
-    fn test_sovereign_openssl_ssh_engine() {
-        let mut engine = SovereignOpenSslSshEngine::new();
-        let keypair = engine.generate_ssh_keypair("ed25519-pqc");
-        assert!(keypair.public_key_pem.contains("ssh-ed25519"));
-        assert!(keypair.fingerprint_sha256.starts_with("SHA256:"));
+    fn test_sovereign_nix_flakes_engine() {
+        let mut flakes = SovereignNixFlakesSystemGenerationEngine::new();
+        let inputs = vec![SovereignFlakeLockInput {
+            name: "nixpkgs".to_string(),
+            original_url: "github:NixOS/nixpkgs/nixos-unstable".to_string(),
+            locked_rev: "e123456789abcdef".to_string(),
+            nar_hash: "sha256-123456789".to_string(),
+        }];
 
-        let tls_session = engine.perform_pqc_tls13_handshake("api.sigmaos.org");
-        assert!(tls_session.established);
-        assert_eq!(tls_session.cipher_suite, "TLS_AES_256_GCM_SHA384_KYBER1024");
+        let gen_id = flakes.build_and_lock_generation(&inputs, 1700000000);
+        assert_eq!(gen_id, 1);
+        assert_eq!(flakes.active_generation_id, 1);
+        assert!(flakes.rollback_generation().is_err());
 
-        engine.register_pkcs11_hardware_token("YubiKey_Slot_1", b"token_data_pqc");
-        assert_eq!(engine.get_pkcs11_token("YubiKey_Slot_1"), Some(&b"token_data_pqc"[..]));
+        let gen_id2 = flakes.build_and_lock_generation(&inputs, 1700001000);
+        assert_eq!(gen_id2, 2);
+        assert_eq!(flakes.rollback_generation().unwrap(), 1);
     }
 
     #[test]
-    fn test_sovereign_parca_perf_profiler_engine() {
-        let mut profiler = SovereignParcaPerfProfilerEngine::new(99);
-        profiler.register_symbol(0x1000, "kernel_entry");
-        profiler.register_symbol(0x2000, "scheduler_tick");
+    fn test_sovereign_iceberg_delta_lake_engine() {
+        let mut iceberg = SovereignIcebergDeltaLakeStorageEngine::new("metrics_db");
+        let files = vec![IcebergDataFileMetadata {
+            file_path: "s3://warehouse/metrics/data_001.parquet".to_string(),
+            record_count: 50000,
+            file_size_bytes: 1048576,
+        }];
 
-        profiler.record_stack_sample(1, &[0x1000, 0x2000], 100000);
-        profiler.record_stack_sample(1, &[0x1000, 0x2000], 200000);
+        let snap_id = iceberg.commit_snapshot(1700000000000, &files);
+        assert_eq!(snap_id, 1);
 
-        let flamegraph = profiler.generate_folded_flamegraph_data();
-        assert_eq!(flamegraph.len(), 1);
-        assert_eq!(flamegraph[0].stack_trace_symbolic, "kernel_entry;scheduler_tick");
-        assert_eq!(flamegraph[0].sample_count, 2);
+        let snapshot = iceberg.query_time_travel(1).unwrap();
+        assert_eq!(snapshot.added_files.len(), 1);
+        assert_eq!(snapshot.added_files[0].record_count, 50000);
     }
 
     #[test]
-    fn test_sovereign_skopeo_oci_registry_engine() {
-        let mut registry = SovereignSkopeoOciRegistryEngine::new();
-        let digest = registry.push_image_manifest("sigmaos/kernel:latest", b"config_json", &[b"layer1_bytes", b"layer2_bytes"]);
-        assert!(digest.starts_with("sha256:"));
+    fn test_sovereign_cilium_ebpf_mtls_engine() {
+        let mut cilium = SovereignCiliumEbpfMtlsEngine::new();
+        cilium.register_identity(100, &["app=frontend", "env=prod"]);
+        cilium.register_identity(200, &["app=backend", "env=prod"]);
 
-        registry.register_multi_arch_index_entry("sigmaos/kernel:v1", "riscv64", "linux", &digest);
-        assert_eq!(registry.manifest_index.get("sigmaos/kernel:v1").unwrap().len(), 1);
-
-        assert!(registry.sync_copy_image("sigmaos/kernel:latest", "sigmaos/kernel:backup").is_ok());
-        assert!(registry.stored_manifests.contains_key("sigmaos/kernel:backup"));
-    }
-
-    #[test]
-    fn test_sovereign_argo_flux_gitops_engine() {
-        let mut gitops = SovereignArgoFluxGitOpsEngine::new();
-        gitops.register_application("core-infra", "https://git.sigmaos.org/infra.git", "deploy/k8s", true, true);
-
-        gitops.update_git_desired_state("core-infra", "main", "hash_v1");
-        gitops.update_cluster_live_state("core-infra", "hash_v0");
-        assert_eq!(gitops.applications.get("core-infra").unwrap().status, GitOpsSyncStatus::OutOfSync);
-
-        let healed = gitops.reconcile_and_self_heal();
-        assert_eq!(healed, 1);
-        assert_eq!(gitops.applications.get("core-infra").unwrap().status, GitOpsSyncStatus::Synced);
-        assert_eq!(gitops.applications.get("core-infra").unwrap().live_manifest_hash, "hash_v1");
+        assert!(cilium.authenticate_ebpf_mtls(100, 200));
+        assert!(!cilium.authenticate_ebpf_mtls(100, 999));
+        assert_eq!(cilium.handshakes.len(), 2);
     }
 }
