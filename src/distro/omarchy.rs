@@ -610,188 +610,6 @@ impl Default for OmarchyAudioPipewireConfig {
     }
 }
 
-// =========================================================================
-// OMARCHY SPEAKER TUNING ENGINE (PipeWire Filter-Chain DSP)
-// =========================================================================
-
-/// Record declaring speaker tuning measurements, provenance, and match rules
-#[derive(Debug, Clone)]
-pub struct SpeakerTuningRecord {
-    pub vendor_model: String,
-    pub match_sku: Vec<String>,
-    pub match_dmi: Vec<String>,
-    pub match_command: Option<String>,
-    pub sink_pattern: String,
-    pub magnitude_rms_db: f32,
-    pub bass_group_delay_swing_ms: f32,
-    pub limiter_headroom_db: f32,
-    pub dynamic_range_delta_lu: f32,
-    pub has_limiter_stage: bool,
-    pub has_low_end_excursion_cut: bool,
-}
-
-impl SpeakerTuningRecord {
-    pub fn new(vendor_model: &str, sink_pattern: &str) -> Self {
-        Self {
-            vendor_model: String::from(vendor_model),
-            match_sku: Vec::new(),
-            match_dmi: Vec::new(),
-            match_command: None,
-            sink_pattern: String::from(sink_pattern),
-            magnitude_rms_db: 0.8,
-            bass_group_delay_swing_ms: 12.5,
-            limiter_headroom_db: 3.0,
-            dynamic_range_delta_lu: 1.2,
-            has_limiter_stage: true,
-            has_low_end_excursion_cut: true,
-        }
-    }
-}
-
-/// Dynamic runtime state of the speaker tuning subsystem
-#[derive(Debug, Clone)]
-pub struct SpeakerTuningState {
-    pub installed: bool,
-    pub active: bool,
-    pub active_sink_name: String,
-    pub physical_target_sink: String,
-    pub easyeffects_running: bool,
-    pub matched_tuning: Option<SpeakerTuningRecord>,
-}
-
-pub struct OmarchySpeakerTuningEngine {
-    pub available_tunings: Vec<SpeakerTuningRecord>,
-    pub state: SpeakerTuningState,
-}
-
-impl OmarchySpeakerTuningEngine {
-    pub fn new() -> Self {
-        let default_tuning = SpeakerTuningRecord {
-            vendor_model: String::from("dell-xps-14-9440"),
-            match_sku: vec![String::from("0DB9"), String::from("0DBA")],
-            match_dmi: vec![String::from("XPS 14 9440"), String::from("Dell Laptops")],
-            match_command: None,
-            sink_pattern: String::from("alsa_output.pci-0000_00_1f.3.analog-stereo"),
-            magnitude_rms_db: 0.65,
-            bass_group_delay_swing_ms: 8.4,
-            limiter_headroom_db: 3.5,
-            dynamic_range_delta_lu: 1.1,
-            has_limiter_stage: true,
-            has_low_end_excursion_cut: true,
-        };
-
-        Self {
-            available_tunings: vec![default_tuning],
-            state: SpeakerTuningState {
-                installed: false,
-                active: false,
-                active_sink_name: String::from("omarchy_speaker_tuning"),
-                physical_target_sink: String::from("alsa_output.pci-0000_00_1f.3.analog-stereo"),
-                easyeffects_running: false,
-                matched_tuning: None,
-            },
-        }
-    }
-
-    pub fn register_tuning(&mut self, tuning: SpeakerTuningRecord) {
-        self.available_tunings.push(tuning);
-    }
-
-    /// Evaluates hardware match in order: match_command -> match_sku -> match_dmi
-    pub fn match_hardware(&self, sku: &str, dmi: &str, command_predicate_result: bool) -> Option<SpeakerTuningRecord> {
-        for tuning in &self.available_tunings {
-            if let Some(ref cmd) = tuning.match_command {
-                if !cmd.is_empty() && command_predicate_result {
-                    return Some(tuning.clone());
-                }
-            } else if !tuning.match_sku.is_empty() {
-                if tuning.match_sku.iter().any(|s| s.eq_ignore_ascii_case(sku)) {
-                    return Some(tuning.clone());
-                }
-            } else if !tuning.match_dmi.is_empty() {
-                if tuning.match_dmi.iter().any(|d| dmi.contains(d)) {
-                    return Some(tuning.clone());
-                }
-            }
-        }
-        None
-    }
-
-    /// `omarchy audio tuning on` - installs and activates matching tuning
-    pub fn tuning_on(&mut self, sku: &str, dmi: &str, command_predicate_result: bool, force: bool) -> Result<String, &'static str> {
-        if self.state.easyeffects_running {
-            return Err("EasyEffects is currently running and cannot coexist with a speaker tuning");
-        }
-
-        if self.state.installed && self.state.active && !force {
-            return Ok(String::from("Tuning is already installed and active (no-op). Pass force=true to re-apply."));
-        }
-
-        let matched = match self.match_hardware(sku, dmi, command_predicate_result) {
-            Some(t) => t,
-            None => return Err("No matching speaker tuning found for this hardware SKU/DMI"),
-        };
-
-        // Graph validation: Must end in limiter and cut non-deliverable bass
-        if !matched.has_limiter_stage {
-            return Err("Invalid tuning graph: Must end in a limiter to prevent clipping");
-        }
-
-        if !matched.has_low_end_excursion_cut {
-            return Err("Invalid tuning graph: Must cut non-deliverable low-end frequencies");
-        }
-
-        // Apply tuning: set active sink, link to physical sink, start PipeWire client service
-        self.state.installed = true;
-        self.state.active = true;
-        self.state.physical_target_sink = matched.sink_pattern.clone();
-        self.state.matched_tuning = Some(matched.clone());
-
-        Ok(format!(
-            "Successfully enabled speaker tuning for model '{}' targeting sink '{}'. PipeWire service 'omarchy-speaker-tuning.service' running.",
-            matched.vendor_model, matched.sink_pattern
-        ))
-    }
-
-    /// `omarchy audio tuning off` - removes tuning and restores raw physical speaker output
-    pub fn tuning_off(&mut self) -> Result<String, &'static str> {
-        if !self.state.installed && !self.state.active {
-            return Ok(String::from("Speaker tuning is already disabled. Raw physical speakers active."));
-        }
-
-        self.state.installed = false;
-        self.state.active = false;
-        self.state.matched_tuning = None;
-
-        Ok(String::from("Stopped omarchy-speaker-tuning.service and removed tuning graph. Default sink restored to raw physical speakers."))
-    }
-
-    /// `omarchy audio tuning status` - queries current tuning status and matching
-    pub fn tuning_status(&self) -> String {
-        let status_str = if self.state.active { "Active" } else { "Inactive" };
-        let installed_str = if self.state.installed { "Installed" } else { "Not Installed" };
-
-        let matched_info = match &self.state.matched_tuning {
-            Some(t) => format!(
-                "Model: {} | RMS Deviation: {:.2} dB | Headroom: {:.1} dB | Bass Delay Swing: {:.1} ms",
-                t.vendor_model, t.magnitude_rms_db, t.limiter_headroom_db, t.bass_group_delay_swing_ms
-            ),
-            None => String::from("None"),
-        };
-
-        format!(
-            "Speaker Tuning Subsystem: [{}] [{}]\nVirtual Sink: {}\nTarget Physical Sink: {}\nMatched Hardware: {}",
-            status_str, installed_str, self.state.active_sink_name, self.state.physical_target_sink, matched_info
-        )
-    }
-}
-
-impl Default for OmarchySpeakerTuningEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 #[cfg(not(any(feature = "standalone_test", test)))]
 pub use crate::distro::omarchy_inspiration::{
     AiAgentProvider, HerdrAgentTask, OmarchyHerdrAiAgentManager, OmarchyLuaConfigEngine,
@@ -804,21 +622,16 @@ pub use crate::distro::omarchy_inspiration::{
 #[path = "omarchy_inspiration.rs"]
 pub mod omarchy_inspiration;
 #[cfg(any(feature = "standalone_test", test))]
-#[path = "omarchy_app_ecosystem.rs"]
-pub mod omarchy_app_ecosystem;
-#[cfg(any(feature = "standalone_test", test))]
 pub use omarchy_inspiration::{
     AiAgentProvider, HerdrAgentTask, OmarchyHerdrAiAgentManager, OmarchyLuaConfigEngine,
     OmarchyPluginMarketplace, OmarchyQuickshellEngine, OmarchyReleaseChannel,
     OmarchyReleaseChannelSnapshotEngine, OmarchySystemThemeStudio, OmarchyThemePalette,
     QuickshellWidget, ShellComponentKind,
 };
-#[cfg(any(feature = "standalone_test", test))]
-pub use omarchy_app_ecosystem::*;
 
 #[path = "."]
 pub mod distro {
-    pub use crate::omarchy_inspiration;
+    pub use crate::distro::omarchy_inspiration;
 }
 
 /// Omarchy Liveboot ISO & Automated Installer Engine
@@ -955,58 +768,6 @@ mod tests {
         assert_eq!(audio.quantum_buffer_size, 64);
         assert!(!audio.set_low_latency(0));
     }
-
-    #[test]
-    fn test_omarchy_speaker_tuning_engine() {
-        let mut tuning_engine = OmarchySpeakerTuningEngine::new();
-
-        // 1. Hardware Matching (SKU match)
-        let matched = tuning_engine.match_hardware("0DB9", "Dell XPS", false);
-        assert!(matched.is_some());
-        assert_eq!(matched.unwrap().vendor_model, "dell-xps-14-9440");
-
-        // 2. Hardware Matching Order Priority (match_command over SKU/DMI for a tuning)
-        let mut custom_tuning = SpeakerTuningRecord::new("custom-laptop-1", "alsa_output.pci-custom");
-        custom_tuning.match_command = Some("is_custom_hardware".to_string());
-        custom_tuning.match_sku = vec!["0DB9".to_string()];
-        // Insert custom tuning at front to test matching priority
-        tuning_engine.available_tunings.insert(0, custom_tuning);
-
-        let priority_matched = tuning_engine.match_hardware("0DB9", "Dell XPS", true);
-        assert!(priority_matched.is_some());
-        assert_eq!(priority_matched.unwrap().vendor_model, "custom-laptop-1");
-
-        // 3. EasyEffects Collision Prevention
-        tuning_engine.state.easyeffects_running = true;
-        assert!(tuning_engine.tuning_on("0DB9", "Dell XPS", false, false).is_err());
-        tuning_engine.state.easyeffects_running = false;
-
-        // 4. Successful Tuning Activation
-        let on_res = tuning_engine.tuning_on("0DB9", "Dell XPS", false, false);
-        assert!(on_res.is_ok());
-        assert!(tuning_engine.state.active);
-        assert!(tuning_engine.state.installed);
-
-        // 5. No-Op on duplicate activation unless forced
-        let duplicate_res = tuning_engine.tuning_on("0DB9", "Dell XPS", false, false);
-        assert!(duplicate_res.unwrap().contains("no-op"));
-
-        // 6. Status Report
-        let status = tuning_status_report(&tuning_engine);
-        assert!(status.contains("Active"));
-        assert!(status.contains("dell-xps-14-9440"));
-
-        // Helper function for status assertion
-        fn tuning_status_report(engine: &OmarchySpeakerTuningEngine) -> String {
-            engine.tuning_status()
-        }
-
-        // 7. Successful Tuning Off
-        let off_res = tuning_engine.tuning_off();
-        assert!(off_res.is_ok());
-        assert!(!tuning_engine.state.active);
-        assert!(!tuning_engine.state.installed);
-    }
     #[test]
     fn test_omarchy_expanded_themes_and_iso_installer() {
         let mut engine = OmarchyModernDesktopEngine::new();
@@ -1132,25 +893,29 @@ mod omarchy_gap_closure_tests {
     #[test]
     fn test_omarchy_hyprland_compositor_config_engine() {
         let hypr = OmarchyHyprlandCompositorConfigEngine::new();
-        let conf = hypr.render_hyprland_conf();
+        let conf = hypr.generate_hyprland_conf();
         assert!(conf.contains("border_size = 2"));
-        assert!(conf.contains("windowrulev2 = float, class:^pavucontrol$"));
+        assert!(conf.contains("windowrulev2 = float,class:^(pavucontrol)$"));
     }
 
     #[test]
     fn test_omarchy_mise_and_lazygit_engines() {
         let mise = OmarchyMiseVersionManagerEngine::new();
-        assert_eq!(mise.get_tool_version("node").unwrap(), "20.11.0");
+        let mise_toml = mise.generate_config_toml();
+        assert!(mise_toml.contains("node = \"lts\""));
+        assert!(mise_toml.contains("rust = \"stable\""));
 
         let lazygit = OmarchyLazyGitConfigurationEngine::new();
-        let lazy_yml = lazygit.generate_config_yaml();
-        assert!(lazy_yml.contains("sideBySideDiff: true"));
+        let lazy_yml = lazygit.generate_config_yml();
+        assert!(lazy_yml.contains("showIcons: true"));
+        assert!(lazy_yml.contains("delta --dark"));
     }
 
     #[test]
     fn test_omarchy_ayu_and_starship_engines() {
-        let ayu_dark = OmarchyAyuThemeEngine::ayu_dark();
-        assert_eq!(ayu_dark.bg_color, "#0f1419");
+        let ayu_dark = OmarchyAyuThemeEngine::new(true);
+        let css = ayu_dark.generate_gtk_css();
+        assert!(css.contains("@define-color bg_color #0f1419"));
 
         let starship_toml = OmarchyStarshipPromptConfigEngine::generate_starship_toml();
         assert!(starship_toml.contains("truncation_length = 3"));

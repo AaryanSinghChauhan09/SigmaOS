@@ -208,20 +208,22 @@ impl SovereignAccountingEngine {
 
     /// Generates process accounting summary report (BSD `sa(8)` command equivalent)
     pub fn generate_sa_summary(&self) -> Vec<CommandSummaryStats> {
-        let mut map: HashMap<String, (usize, u64, u64, u64)> = HashMap::new();
+        // Bolt performance optimization: Key map by borrowed string slice `&str` during aggregation
+        // to avoid allocating heap `String` clones for every log record in `process_pacct_log`.
+        let mut map: HashMap<&str, (usize, u64, u64, u64)> = HashMap::new();
 
         for rec in &self.process_pacct_log {
-            let entry = map.entry(rec.command_name.clone()).or_insert((0, 0, 0, 0));
+            let entry = map.entry(rec.command_name.as_str()).or_insert((0, 0, 0, 0));
             entry.0 += 1;
             entry.1 += rec.utime_ms;
             entry.2 += rec.stime_ms;
             entry.3 += rec.io_bytes_read + rec.io_bytes_written;
         }
 
-        let mut summaries = Vec::new();
+        let mut summaries = Vec::with_capacity(map.len());
         for (name, (calls, utime, stime, io_bytes)) in map {
             summaries.push(CommandSummaryStats {
-                command_name: name,
+                command_name: String::from(name),
                 total_calls: calls,
                 total_utime_ms: utime,
                 total_stime_ms: stime,

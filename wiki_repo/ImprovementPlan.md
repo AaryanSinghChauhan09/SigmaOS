@@ -60,7 +60,7 @@ All updates and recommendations are committed directly to the `main` branch, adh
 ### 🛡️ Sentinel's Daily Security Fix
 - **Fix:** Dilithium-5 / SHA3 Post-Quantum Package Signature Verification in `src/sigpkg/package_signing.rs` and `src/sigpkg/verifier.rs`.
 - **Impact:** Fail-closed signature policy enforcing mandatory SHA3 payload checksums and post-quantum signing keys across untrusted package sources.
-- **Verification:** Verified via `rustc --test src/sigpkg/package_signing.rs` (10 passed) and `rustc --test src/sigpkg/verifier.rs` (6 passed).
+- **Verification:** Verified via `rustc --test src/sigpkg/verifier.rs` (7 passed).
 
 ---
 
@@ -96,7 +96,7 @@ All updates and recommendations are committed directly to the `main` branch, adh
 - **Unit Test Coverage:**
   - `pytest tests/`: 15/15 integration tests passing (100% pass rate).
   - `./run_sigma_tests.sh`: 120+ native Rust test suites passing (security validation, boot protocol, IPC, memory management, distro bridges).
-- **Refactoring Opportunities:** Monolithic files like `src/package/universal.rs` (2,800+ lines) should be decomposed into modular files (`src/package/universal/mod.rs`, `adapter.rs`, `resolver.rs`, `hooks.rs`).
+- **Refactoring Opportunities:** Monolithic files like `src/package/universal.rs` (2,800+ lines) should be decomposed into modular sub-files (`src/package/universal/mod.rs`, `adapter.rs`, `resolver.rs`, `hooks.rs`).
 
 ### 2. Performance & Optimization
 - **Profile & Memory:** Zero-allocation ring buffers (`SigmaVecDeque`), $O(N \log N)$ dependency conflict scanning, and lock-free async I/O rings.
@@ -122,11 +122,11 @@ All updates and recommendations are committed directly to the `main` branch, adh
   - **NetBSD / DragonFly:** `netbsd-rump-kernel-ci.yml`, `dragonfly-hammer2-pfs-ci.yml`.
   - **Gentoo / NixOS:** `gentoo-catalyst-stage3-ci.yml`, `gentoo-portage-ebuild-ci.yml`, `nixos-flake-store-gc-ci.yml`, `nixos-hydra-eval-ci.yml`, `gnu-guix-hermetic-cas-ci.yml`.
   - **Specialty & Mobile:** `bedrock-stratum-multi-distro-ci.yml`, `postmarketos-mobile-wayland-ci.yml`, `illumos-crossbow-dtrace-ci.yml`, `talos-headless-mtls-ci.yml`, `slackware-pkgtool-sysv-ci.yml`, `haiku-packagefs-bfs-ci.yml`, `void-xbps-src-binary-ci.yml`.
-- **Pages & Deployment:** `07_Deployment_Auto_Pages_Deploy.yml` and `github-pages-wiki-deploy.yml` automatically test build assets and publish wiki pages.
+- **Pages & Deployment:** Automated build assets and published wiki documentation pages.
 
 ### 5. Repo Governance
 - **Branch Health:** Direct commits on `main` branch adhering to repository governance guidelines.
-- **Versioning:** Strict Semantic Versioning (SemVer) mapped to staged rollout milestones (v1.0 Core Credibility, v1.2 Adoption Layer, v1.5 Differentiation Layer).
+- **Versioning:** Strict Semantic Versioning (SemVer) mapped to staged rollout milestones.
 
 ### 6. Community & Collaboration
 - **Onboarding Guides:** Clear instructions in `AGENTS.md` and `DEVELOPMENT_GUIDE.md`.
@@ -134,7 +134,7 @@ All updates and recommendations are committed directly to the `main` branch, adh
 
 ### 7. Tools & Utilities
 - **CLI Utilities:** Core utilities (`wc`, `sort`, `chmod`, `uname`, `free`, `uptime`) implemented in `src/userland/coreutils.rs` with multi-call binary support.
-- **Automation Scripts:** `./run_sigma_tests.sh` and Python synchronization tools for maintaining doc consistency across mirror directories (`docs/`, `wiki/`, `WIKI/`, `wiki_content/`, `wiki_repo/`).
+- **Automation Scripts:** `./run_sigma_tests.sh` and shell synchronization tools (`scripts/sync_wiki.sh`) for maintaining doc consistency across mirror directories (`docs/`, `wiki/`, `WIKI/`, `wiki_content/`, `wiki_repo/`).
 
 ### 8. Object-Oriented Programming (OOP) Principles & Design Patterns
 - **Encapsulation:** Private state management with validated public interfaces (e.g., `MemCgroupManager` in `src/memory/cgroups.rs`).
@@ -144,7 +144,7 @@ All updates and recommendations are committed directly to the `main` branch, adh
   - **Factory Pattern:** `ModularInstallerSetupConfigurator::create_setup_config`.
   - **Strategy Pattern:** `UserlandFormatRunner` executable strategy dispatch.
   - **Observer Pattern:** `ThermalGovernor` RAPL callback monitoring.
-  - **Singleton Pattern:** `BoltAutonomousAgent` global orchestration instance.
+  - **Singleton Pattern:** Global orchestration instances.
   - **Command Pattern:** `CommandTransactionExecutor` in universal package operations.
 
 ---

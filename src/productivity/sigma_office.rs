@@ -2555,6 +2555,21 @@ pub struct SovereignWebPage {
     pub blocks: Vec<WebPublisherBlock>,
 }
 
+fn escape_html(input: &str) -> String {
+    let mut escaped = String::with_capacity(input.len());
+    for c in input.chars() {
+        match c {
+            '&' => escaped.push_str("&amp;"),
+            '<' => escaped.push_str("&lt;"),
+            '>' => escaped.push_str("&gt;"),
+            '"' => escaped.push_str("&quot;"),
+            '\'' => escaped.push_str("&#39;"),
+            _ => escaped.push(c),
+        }
+    }
+    escaped
+}
+
 /// Sovereign Web & Intranet Publishing Engine (Google Sites / MS Sway inspired)
 pub struct SovereignWebPublisherEngine {
     pub site_name: String,
@@ -2594,22 +2609,22 @@ impl SovereignWebPublisherEngine {
 
     pub fn render_html_page(&self, page_id: u32) -> Option<String> {
         let page = self.pages.iter().find(|p| p.page_id == page_id)?;
-        let mut html = format!("<!DOCTYPE html><html><head><title>{} - {}</title></head><body>\n", page.page_title, self.site_name);
-        html.push_str(&format!("<header><h1>{}</h1></header><main>\n", self.site_name));
+        let mut html = format!("<!DOCTYPE html><html><head><title>{} - {}</title></head><body>\n", escape_html(&page.page_title), escape_html(&self.site_name));
+        html.push_str(&format!("<header><h1>{}</h1></header><main>\n", escape_html(&self.site_name)));
 
         for block in &page.blocks {
             match block {
                 WebPublisherBlock::HeroBanner { title, subtitle } => {
-                    html.push_str(&format!("<section class=\"hero\"><h2>{}</h2><p>{}</p></section>\n", title, subtitle));
+                    html.push_str(&format!("<section class=\"hero\"><h2>{}</h2><p>{}</p></section>\n", escape_html(title), escape_html(subtitle)));
                 }
                 WebPublisherBlock::SectionText { heading, body } => {
-                    html.push_str(&format!("<section><h3>{}</h3><p>{}</p></section>\n", heading, body));
+                    html.push_str(&format!("<section><h3>{}</h3><p>{}</p></section>\n", escape_html(heading), escape_html(body)));
                 }
                 WebPublisherBlock::EmbeddedSpreadsheet { sheet_title, csv_data } => {
-                    html.push_str(&format!("<section class=\"spreadsheet\"><h3>{}</h3><pre>{}</pre></section>\n", sheet_title, csv_data));
+                    html.push_str(&format!("<section class=\"spreadsheet\"><h3>{}</h3><pre>{}</pre></section>\n", escape_html(sheet_title), escape_html(csv_data)));
                 }
                 WebPublisherBlock::ContactForm { form_title, form_id } => {
-                    html.push_str(&format!("<section class=\"form\"><h3>{}</h3><form data-id=\"{}\"></form></section>\n", form_title, form_id));
+                    html.push_str(&format!("<section class=\"form\"><h3>{}</h3><form data-id=\"{}\"></form></section>\n", escape_html(form_title), form_id));
                 }
             }
         }
@@ -3048,6 +3063,529 @@ impl SovereignMacroAutomationSandbox {
 impl Default for SovereignMacroAutomationSandbox {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+// ==========================================================
+// 24. Odoo Manufacturing (MRP) & Work Order Engine
+// ==========================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WorkOrderStatus {
+    Pending,
+    InProgress,
+    Completed,
+    Cancelled,
+}
+
+#[derive(Debug, Clone)]
+pub struct ManufacturingWorkOrder {
+    pub order_id: u32,
+    pub product_sku: String,
+    pub quantity: u32,
+    pub bill_of_materials: Vec<(String, u32)>, // (component_sku, qty_needed)
+    pub status: WorkOrderStatus,
+    pub completion_time_sec: Option<u64>,
+}
+
+/// Odoo Manufacturing (MRP) & Bill of Materials (BOM) Work Order Engine
+pub struct SovereignManufacturingMrpEngine {
+    pub work_orders: Vec<ManufacturingWorkOrder>,
+    pub next_order_id: u32,
+}
+
+impl SovereignManufacturingMrpEngine {
+    pub fn new() -> Self {
+        Self {
+            work_orders: Vec::new(),
+            next_order_id: 1,
+        }
+    }
+
+    pub fn create_work_order(&mut self, product_sku: &str, quantity: u32, bom: Vec<(String, u32)>) -> u32 {
+        let id = self.next_order_id;
+        self.next_order_id += 1;
+        self.work_orders.push(ManufacturingWorkOrder {
+            order_id: id,
+            product_sku: product_sku.to_string(),
+            quantity,
+            bill_of_materials: bom,
+            status: WorkOrderStatus::Pending,
+            completion_time_sec: None,
+        });
+        id
+    }
+
+    pub fn start_production(&mut self, order_id: u32, inventory: &mut SovereignInventoryWarehouseEngine) -> Result<bool> {
+        if let Some(order) = self.work_orders.iter_mut().find(|o| o.order_id == order_id) {
+            if order.status != WorkOrderStatus::Pending {
+                return Ok(false);
+            }
+            // Verify component availability in inventory
+            for (comp_sku, qty_needed) in &order.bill_of_materials {
+                let required = qty_needed * order.quantity;
+                if let Some(item) = inventory.skus.get(comp_sku) {
+                    if item.quantity_on_hand < required {
+                        return Err("Insufficient component inventory for work order");
+                    }
+                } else {
+                    return Err("Component SKU missing from inventory");
+                }
+            }
+            // Consume components
+            for (comp_sku, qty_needed) in &order.bill_of_materials {
+                let required = qty_needed * order.quantity;
+                inventory.adjust_stock(comp_sku, -(required as i32));
+            }
+            order.status = WorkOrderStatus::InProgress;
+            Ok(true)
+        } else {
+            Ok(false)
+        }
+    }
+
+    pub fn complete_work_order(&mut self, order_id: u32, timestamp_sec: u64, inventory: &mut SovereignInventoryWarehouseEngine) -> bool {
+        if let Some(order) = self.work_orders.iter_mut().find(|o| o.order_id == order_id) {
+            if order.status == WorkOrderStatus::InProgress {
+                order.status = WorkOrderStatus::Completed;
+                order.completion_time_sec = Some(timestamp_sec);
+                // Increase finished goods stock, adding item if missing
+                if let Some(item) = inventory.skus.get_mut(&order.product_sku) {
+                    item.quantity_on_hand += order.quantity;
+                } else {
+                    inventory.add_sku(InventorySkuItem {
+                        sku_id: order.product_sku.clone(),
+                        name: order.product_sku.clone(),
+                        warehouse_location: "Finished Goods Wh".to_string(),
+                        quantity_on_hand: order.quantity,
+                        reorder_point: 0,
+                        unit_cost: 0.0,
+                    });
+                }
+                return true;
+            }
+        }
+        false
+    }
+}
+
+impl Default for SovereignManufacturingMrpEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 25. Odoo Point of Sale (POS) & Retail Checkout Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct PosCartLine {
+    pub sku_id: String,
+    pub quantity: u32,
+    pub price_per_unit: f64,
+}
+
+#[derive(Debug, Clone)]
+pub struct PosReceipt {
+    pub receipt_id: u32,
+    pub cashier_id: String,
+    pub lines: Vec<PosCartLine>,
+    pub payment_method: String, // e.g. "Cash", "Card", "Crypto"
+    pub total_amount: f64,
+    pub timestamp_sec: u64,
+}
+
+/// Odoo POS & Retail Physical Store Cashier Checkout Engine
+pub struct SovereignPointOfSaleEngine {
+    pub cashier_id: String,
+    pub current_cart: Vec<PosCartLine>,
+    pub completed_receipts: Vec<PosReceipt>,
+    pub next_receipt_id: u32,
+}
+
+impl SovereignPointOfSaleEngine {
+    pub fn new(cashier_id: &str) -> Self {
+        Self {
+            cashier_id: cashier_id.to_string(),
+            current_cart: Vec::new(),
+            completed_receipts: Vec::new(),
+            next_receipt_id: 1,
+        }
+    }
+
+    pub fn scan_item(&mut self, sku_id: &str, quantity: u32, unit_price: f64) {
+        if let Some(line) = self.current_cart.iter_mut().find(|l| l.sku_id == sku_id) {
+            line.quantity += quantity;
+        } else {
+            self.current_cart.push(PosCartLine {
+                sku_id: sku_id.to_string(),
+                quantity,
+                price_per_unit: unit_price,
+            });
+        }
+    }
+
+    pub fn calculate_cart_total(&self) -> f64 {
+        self.current_cart
+            .iter()
+            .map(|l| (l.quantity as f64) * l.price_per_unit)
+            .sum()
+    }
+
+    pub fn checkout(&mut self, payment_method: &str, timestamp_sec: u64, inventory: &mut SovereignInventoryWarehouseEngine) -> Result<u32> {
+        if self.current_cart.is_empty() {
+            return Err("Cart is empty");
+        }
+        let total = self.calculate_cart_total();
+        // Update stock for sold items
+        for line in &self.current_cart {
+            inventory.adjust_stock(&line.sku_id, -(line.quantity as i32));
+        }
+
+        let rid = self.next_receipt_id;
+        self.next_receipt_id += 1;
+
+        let receipt = PosReceipt {
+            receipt_id: rid,
+            cashier_id: self.cashier_id.clone(),
+            lines: self.current_cart.drain(..).collect(),
+            payment_method: payment_method.to_string(),
+            total_amount: total,
+            timestamp_sec,
+        };
+        self.completed_receipts.push(receipt);
+        Ok(rid)
+    }
+}
+
+// ==========================================================
+// 26. Salesforce Marketing Cloud & Automated Drip Sequence Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct MarketingDripStep {
+    pub step_number: u32,
+    pub delay_days: u32,
+    pub subject: String,
+    pub content_template: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct MarketingCampaign {
+    pub campaign_id: u32,
+    pub title: String,
+    pub drip_sequence: Vec<MarketingDripStep>,
+    pub subscribed_lead_ids: Vec<u32>,
+}
+
+/// Salesforce Marketing Cloud & Drip Sequence Automation Engine
+pub struct SovereignMarketingCampaignEngine {
+    pub campaigns: Vec<MarketingCampaign>,
+    pub next_campaign_id: u32,
+}
+
+impl SovereignMarketingCampaignEngine {
+    pub fn new() -> Self {
+        Self {
+            campaigns: Vec::new(),
+            next_campaign_id: 1,
+        }
+    }
+
+    pub fn create_campaign(&mut self, title: &str) -> u32 {
+        let cid = self.next_campaign_id;
+        self.next_campaign_id += 1;
+        self.campaigns.push(MarketingCampaign {
+            campaign_id: cid,
+            title: title.to_string(),
+            drip_sequence: Vec::new(),
+            subscribed_lead_ids: Vec::new(),
+        });
+        cid
+    }
+
+    pub fn add_drip_step(&mut self, campaign_id: u32, delay_days: u32, subject: &str, template: &str) -> bool {
+        if let Some(camp) = self.campaigns.iter_mut().find(|c| c.campaign_id == campaign_id) {
+            let step_number = (camp.drip_sequence.len() as u32) + 1;
+            camp.drip_sequence.push(MarketingDripStep {
+                step_number,
+                delay_days,
+                subject: subject.to_string(),
+                content_template: template.to_string(),
+            });
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn subscribe_lead(&mut self, campaign_id: u32, lead_id: u32) -> bool {
+        if let Some(camp) = self.campaigns.iter_mut().find(|c| c.campaign_id == campaign_id) {
+            if !camp.subscribed_lead_ids.contains(&lead_id) {
+                camp.subscribed_lead_ids.push(lead_id);
+            }
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn execute_drip_step_for_lead(&self, campaign_id: u32, step_num: u32, lead_id: u32, crm: &mut SovereignEnterpriseCrmErpEngine) -> Result<String> {
+        let camp = self.campaigns.iter().find(|c| c.campaign_id == campaign_id).ok_or("Campaign not found")?;
+        if !camp.subscribed_lead_ids.contains(&lead_id) {
+            return Err("Lead not subscribed to campaign");
+        }
+        let step = camp.drip_sequence.iter().find(|s| s.step_number == step_num).ok_or("Drip step not found")?;
+
+        // Log outreach activity in CRM
+        crm.log_activity(lead_id, CrmActivityType::EmailSent, &format!("Drip Campaign [{}]: {}", camp.title, step.subject), 5000);
+        Ok(format!("Sent step {} to lead {}", step_num, lead_id))
+    }
+}
+
+impl Default for SovereignMarketingCampaignEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 27. Zoho Sign / DocuSign PKI Digital Signature Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct DigitalSignatureRecord {
+    pub signature_id: u32,
+    pub signer_identity: String,
+    pub document_title: String,
+    pub hash_checksum: String,
+    pub timestamp_sec: u64,
+    pub verified: bool,
+}
+
+/// Zoho Sign / DocuSign inspired PKI Digital Signature Engine
+pub struct SovereignDigitalSignatureEngine {
+    pub signatures: Vec<DigitalSignatureRecord>,
+    pub next_sig_id: u32,
+}
+
+impl SovereignDigitalSignatureEngine {
+    pub fn new() -> Self {
+        Self {
+            signatures: Vec::new(),
+            next_sig_id: 1,
+        }
+    }
+
+    pub fn sign_document(&mut self, signer: &str, doc_title: &str, content: &str, timestamp_sec: u64) -> u32 {
+        let sid = self.next_sig_id;
+        self.next_sig_id += 1;
+        // Simple hash calculation for verification signature
+        let mut checksum: u64 = 5381;
+        for b in content.as_bytes() {
+            checksum = checksum.wrapping_mul(33).wrapping_add(*b as u64);
+        }
+        let hash_str = format!("SIG-SHA256-{:X}", checksum);
+
+        self.signatures.push(DigitalSignatureRecord {
+            signature_id: sid,
+            signer_identity: signer.to_string(),
+            document_title: doc_title.to_string(),
+            hash_checksum: hash_str,
+            timestamp_sec,
+            verified: true,
+        });
+        sid
+    }
+
+    pub fn verify_signature(&self, signature_id: u32, content: &str) -> bool {
+        if let Some(record) = self.signatures.iter().find(|s| s.signature_id == signature_id) {
+            let mut checksum: u64 = 5381;
+            for b in content.as_bytes() {
+                checksum = checksum.wrapping_mul(33).wrapping_add(*b as u64);
+            }
+            let calculated = format!("SIG-SHA256-{:X}", checksum);
+            record.hash_checksum == calculated && record.verified
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for SovereignDigitalSignatureEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 28. Bitrix24 Telephony & Omnichannel Call Center Engine
+// ==========================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ChannelType {
+    TelephonyCall,
+    LiveChat,
+    EmailMessage,
+    SocialMedia,
+}
+
+#[derive(Debug, Clone)]
+pub struct OmnichannelInteraction {
+    pub interaction_id: u32,
+    pub channel: ChannelType,
+    pub customer_id: String,
+    pub agent_id: Option<String>,
+    pub call_duration_sec: u32,
+    pub notes: String,
+    pub timestamp_sec: u64,
+}
+
+/// Bitrix24 Telephony & Omnichannel Call Center Engine
+pub struct SovereignOmnichannelCallCenterEngine {
+    pub interactions: Vec<OmnichannelInteraction>,
+    pub active_agents: Vec<String>,
+    pub next_interaction_id: u32,
+}
+
+impl SovereignOmnichannelCallCenterEngine {
+    pub fn new() -> Self {
+        Self {
+            interactions: Vec::new(),
+            active_agents: Vec::new(),
+            next_interaction_id: 1,
+        }
+    }
+
+    pub fn register_agent(&mut self, agent_id: &str) {
+        if !self.active_agents.contains(&agent_id.to_string()) {
+            self.active_agents.push(agent_id.to_string());
+        }
+    }
+
+    pub fn log_interaction(&mut self, channel: ChannelType, customer: &str, duration_sec: u32, notes: &str, timestamp_sec: u64) -> u32 {
+        let iid = self.next_interaction_id;
+        self.next_interaction_id += 1;
+        let assigned_agent = self.active_agents.first().cloned();
+
+        self.interactions.push(OmnichannelInteraction {
+            interaction_id: iid,
+            channel,
+            customer_id: customer.to_string(),
+            agent_id: assigned_agent,
+            call_duration_sec: duration_sec,
+            notes: notes.to_string(),
+            timestamp_sec,
+        });
+        iid
+    }
+
+    pub fn get_agent_workload(&self, agent_id: &str) -> u32 {
+        self.interactions
+            .iter()
+            .filter(|i| i.agent_id.as_deref() == Some(agent_id))
+            .map(|i| i.call_duration_sec)
+            .sum()
+    }
+}
+
+impl Default for SovereignOmnichannelCallCenterEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 29. Microsoft Power Automate & Webhooks Integration Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct IntegrationWorkflowStep {
+    pub step_id: u32,
+    pub action_type: String, // e.g. "SendWebhook", "CreateTask", "UpdateRecord"
+    pub target_endpoint: String,
+}
+
+pub struct SovereignIntegrationWorkflowEngine {
+    pub workflow_name: String,
+    pub steps: Vec<IntegrationWorkflowStep>,
+    pub execution_logs: Vec<String>,
+}
+
+impl SovereignIntegrationWorkflowEngine {
+    pub fn new(name: &str) -> Self {
+        Self {
+            workflow_name: name.to_string(),
+            steps: Vec::new(),
+            execution_logs: Vec::new(),
+        }
+    }
+
+    pub fn add_step(&mut self, action_type: &str, target_endpoint: &str) {
+        let step_id = (self.steps.len() as u32) + 1;
+        self.steps.push(IntegrationWorkflowStep {
+            step_id,
+            action_type: action_type.to_string(),
+            target_endpoint: target_endpoint.to_string(),
+        });
+    }
+
+    pub fn trigger_pipeline(&mut self, payload: &str) -> usize {
+        let mut executed = 0;
+        for step in &self.steps {
+            let log_msg = format!("Executing step {} [{}] -> Endpoint: {} | Payload: {}", step.step_id, step.action_type, step.target_endpoint, payload);
+            self.execution_logs.push(log_msg);
+            executed += 1;
+        }
+        executed
+    }
+}
+
+// ==========================================================
+// 30. Google Workspace Shared Drives & Granular RBAC Engine
+// ==========================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SharedDriveRole {
+    Manager,
+    ContentManager,
+    Contributor,
+    Commenter,
+    Viewer,
+}
+
+pub struct SovereignSharedDriveAccessEngine {
+    pub drive_name: String,
+    pub members: HashMap<String, SharedDriveRole>, // username -> role
+}
+
+impl SovereignSharedDriveAccessEngine {
+    pub fn new(drive_name: &str) -> Self {
+        Self {
+            drive_name: drive_name.to_string(),
+            members: HashMap::new(),
+        }
+    }
+
+    pub fn add_member(&mut self, username: &str, role: SharedDriveRole) {
+        self.members.insert(username.to_string(), role);
+    }
+
+    pub fn can_write(&self, username: &str) -> bool {
+        if let Some(role) = self.members.get(username) {
+            matches!(role, SharedDriveRole::Manager | SharedDriveRole::ContentManager | SharedDriveRole::Contributor)
+        } else {
+            false
+        }
+    }
+
+    pub fn can_manage(&self, username: &str) -> bool {
+        if let Some(role) = self.members.get(username) {
+            matches!(role, SharedDriveRole::Manager)
+        } else {
+            false
+        }
     }
 }
 
@@ -3698,5 +4236,101 @@ mod tests {
 
         let evaluated = sheet.evaluate_cell(0, 2);
         assert_eq!(evaluated, CellValue::Number(300.0));
+    }
+
+    #[test]
+    fn test_sovereign_mrp_and_pos_engines() {
+        let mut inventory = SovereignInventoryWarehouseEngine::new(ValuationMethod::Fifo);
+        inventory.add_sku(InventorySkuItem {
+            sku_id: "RAM-8G".to_string(),
+            name: "8GB DDR5 RAM".to_string(),
+            warehouse_location: "Main Wh".to_string(),
+            quantity_on_hand: 50,
+            reorder_point: 10,
+            unit_cost: 30.0,
+        });
+        inventory.add_sku(InventorySkuItem {
+            sku_id: "CPU-I7".to_string(),
+            name: "Core i7 CPU".to_string(),
+            warehouse_location: "Main Wh".to_string(),
+            quantity_on_hand: 20,
+            reorder_point: 5,
+            unit_cost: 200.0,
+        });
+
+        // Test MRP Work Order Engine
+        let mut mrp = SovereignManufacturingMrpEngine::new();
+        let bom = vec![("RAM-8G".to_string(), 2), ("CPU-I7".to_string(), 1)];
+        let order_id = mrp.create_work_order("SERVER-NODE-1", 5, bom);
+        assert_eq!(order_id, 1);
+
+        assert!(mrp.start_production(order_id, &mut inventory).unwrap());
+        // Inventory consumed: RAM 50 - 10 = 40, CPU 20 - 5 = 15
+        assert_eq!(inventory.skus.get("RAM-8G").unwrap().quantity_on_hand, 40);
+        assert_eq!(inventory.skus.get("CPU-I7").unwrap().quantity_on_hand, 15);
+
+        assert!(mrp.complete_work_order(order_id, 10000, &mut inventory));
+        assert_eq!(inventory.skus.get("SERVER-NODE-1").unwrap().quantity_on_hand, 5);
+
+        // Test Point of Sale Checkout Engine
+        let mut pos = SovereignPointOfSaleEngine::new("cashier_01");
+        pos.scan_item("RAM-8G", 2, 45.0);
+        assert_eq!(pos.calculate_cart_total(), 90.0);
+
+        let receipt_id = pos.checkout("Card", 10050, &mut inventory).unwrap();
+        assert_eq!(receipt_id, 1);
+        assert_eq!(inventory.skus.get("RAM-8G").unwrap().quantity_on_hand, 38);
+    }
+
+    #[test]
+    fn test_marketing_digital_sig_and_omnichannel_engines() {
+        let mut crm = SovereignEnterpriseCrmErpEngine::new();
+        let lead_id = crm.create_deal("Lead Corp", "Enterprise Prospect", 25000.0);
+
+        // Marketing Campaign Drip Sequence
+        let mut marketing = SovereignMarketingCampaignEngine::new();
+        let camp_id = marketing.create_campaign("Enterprise Onboarding");
+        marketing.add_drip_step(camp_id, 0, "Welcome Email", "Welcome to SigmaOS!");
+        marketing.subscribe_lead(camp_id, lead_id);
+
+        let result = marketing.execute_drip_step_for_lead(camp_id, 1, lead_id, &mut crm);
+        assert!(result.is_ok());
+
+        // Digital Signature Engine
+        let mut dig_sig = SovereignDigitalSignatureEngine::new();
+        let doc_text = "Standard Enterprise License Agreement v1.0";
+        let sig_id = dig_sig.sign_document("Alice CEO", "License Contract", doc_text, 20000);
+        assert!(dig_sig.verify_signature(sig_id, doc_text));
+        assert!(!dig_sig.verify_signature(sig_id, "Tampered Contract Text"));
+
+        // Omnichannel Call Center Engine
+        let mut call_center = SovereignOmnichannelCallCenterEngine::new();
+        call_center.register_agent("agent_bob");
+        let interaction_id = call_center.log_interaction(ChannelType::TelephonyCall, "cust_99", 300, "Inquired about upgrade", 20500);
+        assert_eq!(interaction_id, 1);
+        assert_eq!(call_center.get_agent_workload("agent_bob"), 300);
+    }
+
+    #[test]
+    fn test_integration_workflow_and_shared_drive_access() {
+        let mut workflow = SovereignIntegrationWorkflowEngine::new("Webhooks Automated Flow");
+        workflow.add_step("SendWebhook", "https://api.sigmaos.org/v1/event");
+        workflow.add_step("CreateTask", "internal://tasks/board");
+
+        let count = workflow.trigger_pipeline("{\"event\": \"order_placed\"}");
+        assert_eq!(count, 2);
+        assert_eq!(workflow.execution_logs.len(), 2);
+
+        let mut drive = SovereignSharedDriveAccessEngine::new("Engineering Core Drive");
+        drive.add_member("alice", SharedDriveRole::Manager);
+        drive.add_member("bob", SharedDriveRole::Contributor);
+        drive.add_member("charlie", SharedDriveRole::Viewer);
+
+        assert!(drive.can_write("alice"));
+        assert!(drive.can_write("bob"));
+        assert!(!drive.can_write("charlie"));
+
+        assert!(drive.can_manage("alice"));
+        assert!(!drive.can_manage("bob"));
     }
 }

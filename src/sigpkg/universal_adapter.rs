@@ -365,7 +365,6 @@ impl UniversalPackageAdapter {
         text: &str,
     ) -> Result<GentooEbuildMetadata, &'static str> {
         let mut category = String::from("app-misc");
-        let mut package_name = String::new();
         let mut version = String::from("1.0.0");
         let mut rdepend = Vec::new();
         let mut depend = Vec::new();
@@ -374,22 +373,22 @@ impl UniversalPackageAdapter {
 
         // Infer name and version from filename (e.g. `sys-apps/portage-3.0.30.ebuild` or `nginx-1.25.1.ebuild`)
         let clean_filename = filename.trim_end_matches(".ebuild");
-        if clean_filename.contains('/') {
+        let mut package_name = if clean_filename.contains('/') {
             let mut parts = clean_filename.split('/');
             category = parts.next().unwrap_or("app-misc").to_string();
             let name_ver = parts.next().unwrap_or(clean_filename);
             if let Some(pos) = name_ver.rfind('-') {
-                package_name = name_ver[..pos].to_string();
                 version = name_ver[pos + 1..].to_string();
+                name_ver[..pos].to_string()
             } else {
-                package_name = name_ver.to_string();
+                name_ver.to_string()
             }
         } else if let Some(pos) = clean_filename.rfind('-') {
-            package_name = clean_filename[..pos].to_string();
             version = clean_filename[pos + 1..].to_string();
+            clean_filename[..pos].to_string()
         } else {
-            package_name = clean_filename.to_string();
-        }
+            clean_filename.to_string()
+        };
 
         for line in text.lines() {
             let line = line.trim();
@@ -1869,6 +1868,19 @@ impl UniversalDependencyMapper {
             "llvm" | "llvm-dev" | "llvm-devel" | "devel/llvm" | "sys-devel/llvm" => "llvm".to_string(),
             "rust" | "rustc" | "lang/rust" | "dev-lang/rust" | "rust-dev" => "rust".to_string(),
             "libxml2" | "libxml2-dev" | "libxml2-devel" | "textproc/libxml2" | "dev-libs/libxml2" => "libxml2".to_string(),
+            "git" | "git-core" | "devel/git" | "dev-vcs/git" => "git".to_string(),
+            "ffmpeg" | "ffmpeg-devel" | "multimedia/ffmpeg" | "media-video/ffmpeg" => "ffmpeg".to_string(),
+            "gcc" | "gcc-c++" | "lang/gcc" | "sys-devel/gcc" => "gcc".to_string(),
+            "clang" | "clang-tools-extra" | "lang/clang" | "sys-devel/clang" => "clang".to_string(),
+            "cmake" | "devel/cmake" | "dev-build/cmake" => "cmake".to_string(),
+            "ninja" | "ninja-build" | "devel/ninja" | "dev-build/ninja" => "ninja".to_string(),
+            "ripgrep" | "rg" | "textproc/ripgrep" | "sys-apps/ripgrep" => "ripgrep".to_string(),
+            "bat" | "sys-apps/bat" | "textproc/bat" => "bat".to_string(),
+            "fd" | "fd-find" | "sys-apps/fd" => "fd".to_string(),
+            "zoxide" | "sys-apps/zoxide" => "zoxide".to_string(),
+            "eza" | "exa" | "sys-apps/eza" => "eza".to_string(),
+            "btop" | "sys-process/btop" => "btop".to_string(),
+            "fastfetch" | "sys-apps/fastfetch" => "fastfetch".to_string(),
             _ => clean.to_string(),
         }
     }
@@ -2073,7 +2085,7 @@ impl UniversalPmCommandDispatcher {
         let mut dry_run = false;
 
         match pm.as_str() {
-            "apt" | "apt-get" | "dpkg" => {
+            "apt" | "apt-get" | "dpkg" | "debian" | "ubuntu" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2108,16 +2120,16 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pacman" => {
+            "pacman" | "yay" | "paru" | "pikaur" | "trizen" | "aura" | "arch" | "manjaro" | "cachy" | "cachyos" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
-                        "-S" | "-Sy" => operation = UniversalPmOperation::Install,
-                        "-R" | "-Rns" => operation = UniversalPmOperation::Remove,
-                        "-Syu" | "-Syyu" => operation = UniversalPmOperation::Upgrade,
-                        "-Ss" | "-Qs" => operation = UniversalPmOperation::Search,
-                        "-Si" | "-Qi" => operation = UniversalPmOperation::QueryInfo,
-                        "-Sc" | "-Scc" => operation = UniversalPmOperation::CleanCache,
+                        "-S" | "-Sy" | "install" => operation = UniversalPmOperation::Install,
+                        "-R" | "-Rns" | "remove" => operation = UniversalPmOperation::Remove,
+                        "-Syu" | "-Syyu" | "update" | "upgrade" => operation = UniversalPmOperation::Upgrade,
+                        "-Ss" | "-Qs" | "search" => operation = UniversalPmOperation::Search,
+                        "-Si" | "-Qi" | "info" | "query" => operation = UniversalPmOperation::QueryInfo,
+                        "-Sc" | "-Scc" | "clean" => operation = UniversalPmOperation::CleanCache,
                         "--print" | "--dryrun" => dry_run = true,
                         arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
                         _ => {}
@@ -2125,7 +2137,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "dnf" | "yum" | "zypper" => {
+            "dnf" | "yum" | "microdnf" | "rpm" | "fedora" | "rhel" | "centos" | "zypper" | "opensuse" | "suse" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2142,13 +2154,13 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "apk" => {
+            "apk" | "alpine" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
-                        "add" => operation = UniversalPmOperation::Install,
-                        "del" => operation = UniversalPmOperation::Remove,
-                        "upgrade" => operation = UniversalPmOperation::Upgrade,
+                        "add" | "install" => operation = UniversalPmOperation::Install,
+                        "del" | "delete" | "remove" => operation = UniversalPmOperation::Remove,
+                        "upgrade" | "update" => operation = UniversalPmOperation::Upgrade,
                         "search" => operation = UniversalPmOperation::Search,
                         "info" => operation = UniversalPmOperation::QueryInfo,
                         "-s" | "--simulate" => dry_run = true,
@@ -2174,7 +2186,65 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkg" | "pkgsend" => {
+            "pkg" | "pkgsend" | "pkg_add" | "pkg_delete" | "pkg_info" | "freebsd" | "openbsd" | "netbsd" | "bsd" => {
+                if pm == "pkg_delete" {
+                    operation = UniversalPmOperation::Remove;
+                } else if pm == "pkg_info" {
+                    operation = UniversalPmOperation::QueryInfo;
+                } else {
+                    let mut i = 0;
+                    while i < args.len() {
+                        match args[i] {
+                            "install" | "add" => operation = UniversalPmOperation::Install,
+                            "delete" | "remove" | "purge" => operation = UniversalPmOperation::Remove,
+                            "upgrade" | "update" => operation = UniversalPmOperation::Upgrade,
+                            "search" => operation = UniversalPmOperation::Search,
+                            "info" | "query" | "status" => operation = UniversalPmOperation::QueryInfo,
+                            "-n" | "--dry-run" => dry_run = true,
+                            arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                            _ => {}
+                        }
+                        i += 1;
+                    }
+                }
+                if target_packages.is_empty() {
+                    for arg in args {
+                        if !arg.starts_with('-') && *arg != "install" && *arg != "add" && *arg != "delete" && *arg != "remove" && *arg != "upgrade" {
+                            target_packages.push(arg.to_string());
+                        }
+                    }
+                }
+            }
+            "xbps" | "xbps-install" | "xbps-remove" | "xbps-query" | "void" => {
+                if pm == "xbps-remove" {
+                    operation = UniversalPmOperation::Remove;
+                } else if pm == "xbps-query" {
+                    operation = UniversalPmOperation::QueryInfo;
+                } else {
+                    let mut i = 0;
+                    while i < args.len() {
+                        match args[i] {
+                            "install" | "add" => operation = UniversalPmOperation::Install,
+                            "remove" | "purge" => operation = UniversalPmOperation::Remove,
+                            "upgrade" | "update" => operation = UniversalPmOperation::Upgrade,
+                            "search" => operation = UniversalPmOperation::Search,
+                            "info" | "query" => operation = UniversalPmOperation::QueryInfo,
+                            "-n" | "--dry-run" => dry_run = true,
+                            arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                            _ => {}
+                        }
+                        i += 1;
+                    }
+                }
+                for arg in args {
+                    if *arg == "-n" || *arg == "--dry-run" {
+                        dry_run = true;
+                    } else if !arg.starts_with('-') && target_packages.is_empty() && *arg != "install" && *arg != "remove" && *arg != "upgrade" {
+                        target_packages.push(arg.to_string());
+                    }
+                }
+            }
+            "emerge" | "ebuild" | "gentoo" | "portage" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -3417,5 +3487,34 @@ requires {
         let obsd_manifest = adapter.parse_openbsd_contents(openbsd_contents).unwrap();
         assert_eq!(obsd_manifest.pkgname, "htop");
         assert_eq!(obsd_manifest.version, "3.2.2");
+    }
+
+    #[test]
+    fn test_expanded_cross_distro_command_dispatch_and_dependency_mapping() {
+        let dispatcher = UniversalPmCommandDispatcher::new();
+        let dep_mapper = UniversalDependencyMapper::new();
+
+        let debian = dispatcher.dispatch_command("debian install git-core").unwrap();
+        assert_eq!(debian.source_pm, "debian");
+        assert_eq!(debian.operation, UniversalPmOperation::Install);
+        assert_eq!(debian.target_packages, vec!["git-core"]);
+        assert_eq!(dep_mapper.to_canonical_name(&debian.target_packages[0]), "git");
+
+        let arch = dispatcher.dispatch_command("arch -S --dryrun ffmpeg-devel").unwrap();
+        assert_eq!(arch.source_pm, "arch");
+        assert_eq!(arch.operation, UniversalPmOperation::Install);
+        assert!(arch.dry_run);
+        assert_eq!(dep_mapper.to_canonical_name("ffmpeg-devel"), "ffmpeg");
+
+        let freebsd = dispatcher.dispatch_command("freebsd install -n lang/gcc").unwrap();
+        assert_eq!(freebsd.source_pm, "freebsd");
+        assert_eq!(freebsd.operation, UniversalPmOperation::Install);
+        assert!(freebsd.dry_run);
+        assert_eq!(dep_mapper.to_canonical_name("lang/gcc"), "gcc");
+
+        let void = dispatcher.dispatch_command("void install sys-apps/ripgrep").unwrap();
+        assert_eq!(void.source_pm, "void");
+        assert_eq!(void.operation, UniversalPmOperation::Install);
+        assert_eq!(dep_mapper.to_canonical_name("sys-apps/ripgrep"), "ripgrep");
     }
 }
