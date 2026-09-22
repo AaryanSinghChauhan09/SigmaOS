@@ -93,8 +93,7 @@ impl SovereignKernelModuleSystem {
     pub fn load_module(&mut self, name_str: &str) -> bool {
         // Find module
         let mut mod_idx = None;
-        for i in 0..self.modules.len {
-            let m = unsafe { &*self.modules.data.add(i) };
+        for (i, m) in self.modules.as_slice().iter().enumerate() {
             if m.matches_name(name_str) {
                 mod_idx = Some(i);
                 break;
@@ -102,7 +101,7 @@ impl SovereignKernelModuleSystem {
         }
 
         if let Some(idx) = mod_idx {
-            let m = unsafe { &mut *self.modules.data.add(idx) };
+            let m = &mut self.modules.as_mut_slice()[idx];
             if m.state == ModuleState::Active {
                 return true;
             }
@@ -115,11 +114,12 @@ impl SovereignKernelModuleSystem {
 
             if dep_name_len > 0 {
                 // Dependency is non-empty, must verify it is active
-                let dep_str =
-                    unsafe { core::str::from_utf8_unchecked(&m.dependency[..dep_name_len]) };
+                let dep_str = match core::str::from_utf8(&m.dependency[..dep_name_len]) {
+                    Ok(s) => s,
+                    Err(_) => return false,
+                };
                 let mut dep_active = false;
-                for j in 0..self.modules.len {
-                    let dm = unsafe { &*self.modules.data.add(j) };
+                for dm in self.modules.as_slice().iter() {
                     if dm.matches_name(dep_str) && dm.state == ModuleState::Active {
                         dep_active = true;
                         break;
@@ -140,8 +140,7 @@ impl SovereignKernelModuleSystem {
 
     pub fn ai_assisted_tuning(&mut self, cpu_utilization: u32, thermal_temp: u32) {
         // Auto-optimize module execution parameters based on telemetry parameters
-        for i in 0..self.modules.len {
-            let m = unsafe { &mut *self.modules.data.add(i) };
+        for m in self.modules.as_mut_slice().iter_mut() {
             if cpu_utilization > 80 {
                 // High utilization, compress latency window (aggressive schedule)
                 m.optimized_latency_ticks = 40;
