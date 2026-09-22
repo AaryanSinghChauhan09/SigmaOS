@@ -96,6 +96,9 @@ SigmaOS eliminates external application dependencies across 450+ tools, framewor
 - **[Performance & BORE Scheduler](Performance-Tuning-and-Kernel)**
   Performance tuning and BORE scheduler configuration.
 
+- **[Low-Overhead Kernel Observability](Low-Overhead-Kernel-Observability)**
+  High-performance kernel tracing with SigmaTrace and eBPF.
+
 - **[MGLRU & Memory Reclamation](Performance-Tuning-and-Kernel#mglru--memory-reclamation)**
   Multi-Gen LRU and memory reclamation optimization.
 
@@ -220,5 +223,5 @@ SigmaOS eliminates external application dependencies across 450+ tools, framewor
 ---
 
 ## Omnipresent Self-Sufficiency Reference
-- **[Sovereign OS Absolute Omnipresent Self-Sufficiency Ultra Encyclopedia V31](SOVEREIGN_OS_ABSOLUTE_OMNIPRESENT_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA_V31)**
+- **[Sovereign OS Absolute Omnipresent Self-Sufficiency Ultra Encyclopedia V33](SOVEREIGN_OS_ABSOLUTE_OMNIPRESENT_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA_V33)**
   Master architectural reference detailing native zero-dependency replacements for external software, AI models, frameworks, database engines, robotics tools, codecs, and operating systems.
