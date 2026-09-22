@@ -213,6 +213,7 @@ pub struct LightningInstaller {
     stage: InstallStage,
     start_time: u64,
     available_disks: Vec<DiskInfo>,
+    pub unattended_engine: super::unattended_cidata::CiDataUnattendedEngine,
 }
 
 impl LightningInstaller {
@@ -222,6 +223,7 @@ impl LightningInstaller {
             stage: InstallStage::Initializing,
             start_time: 0,
             available_disks: Vec::new(),
+            unattended_engine: super::unattended_cidata::CiDataUnattendedEngine::new(),
         }
     }
     
