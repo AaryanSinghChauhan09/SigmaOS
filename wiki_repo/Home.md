@@ -36,6 +36,12 @@ SigmaOS natively absorbs and surpasses the core innovations of all major Linux a
 
 ---
 
+## 🤖 AI Agent & Developer Component Guidance
+
+- **[AI Agent SigmaOS Component Development Guidance](AI_AGENT_SIGMAOS_COMPONENT_DEVELOPMENT_GUIDANCE)** — Master engineering standards and step-by-step procedures for AI Agents developing kernel, driver, desktop, package manager, and security components inspired by Linux and BSD distributions.
+
+---
+
 ## 📚 Omnipresent Self-Sufficiency Index
 
 SigmaOS eliminates external application dependencies across 450+ tools, frameworks, codecs, databases, and AI models through native `klib` Safe-Rust implementations:
