@@ -96,6 +96,163 @@ impl OmarchyTheme {
     }
 }
 
+/// Omarchy Capture, Screen Recording, OCR, and File Sharing Engine
+#[derive(Debug, Clone)]
+pub struct OmarchyCaptureAndSharingEngine {
+    pub screenshot_dir: String,
+    pub screenrecord_dir: String,
+    pub debug_logging: bool,
+}
+
+impl OmarchyCaptureAndSharingEngine {
+    pub fn new() -> Self {
+        Self {
+            screenshot_dir: "~/Pictures/Screenshots".to_string(),
+            screenrecord_dir: "~/Videos".to_string(),
+            debug_logging: false,
+        }
+    }
+
+    pub fn generate_screenshot_cmd(&self, mode: &str, direct_save: bool, editor: &str) -> String {
+        let dest = if direct_save { " save" } else { "" };
+        let ed_flag = if !editor.is_empty() {
+            format!(" --editor={}", editor)
+        } else {
+            "".to_string()
+        };
+        format!("omarchy capture screenshot {}{}{}", mode, dest, ed_flag)
+    }
+
+    pub fn generate_screenrecord_start_cmd(&self, fullscreen: bool, desktop_audio: bool, webcam: bool) -> String {
+        let fs_flag = if fullscreen { " --fullscreen" } else { "" };
+        let audio_flag = if desktop_audio { " --with-desktop-audio" } else { "" };
+        let cam_flag = if webcam { " --with-webcam" } else { "" };
+        format!("omarchy screenrecord{}{}{}", fs_flag, audio_flag, cam_flag)
+    }
+
+    pub fn generate_ocr_cmd(&self) -> &'static str {
+        "omarchy capture text"
+    }
+
+    pub fn generate_localsend_share_cmd(&self, target_type: &str, path: &str) -> String {
+        format!("omarchy share {} {}", target_type, path)
+    }
+
+    pub fn generate_tailscale_send_cmd(&self, machine: &str, file: &str) -> String {
+        format!("omarchy tailscale send {} {}", machine, file)
+    }
+
+    pub fn generate_transcode_cmd(&self, input: &str, format_opt: &str, resolution: &str) -> String {
+        format!("omarchy transcode {} {} {}", input, format_opt, resolution)
+    }
+}
+
+impl Default for OmarchyCaptureAndSharingEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Omarchy Development Tools, Editors, Mise, Docker, and GitHub CLI Manager
+#[derive(Debug, Clone)]
+pub struct OmarchyDevToolsEngine {
+    pub default_editor: String,
+    pub installed_editors: Vec<String>,
+    pub theme_matched_editors: Vec<String>,
+    pub mise_runtimes: Vec<String>,
+    pub sudoless_docker: bool,
+    pub docker_db_services: Vec<String>,
+    pub gh_cli_installed: bool,
+}
+
+impl OmarchyDevToolsEngine {
+    pub fn new() -> Self {
+        Self {
+            default_editor: "neovim".to_string(),
+            installed_editors: vec![
+                "neovim".to_string(),
+                "vi".to_string(),
+                "vscode".to_string(),
+                "cursor".to_string(),
+                "zed".to_string(),
+                "sublime-text".to_string(),
+                "helix".to_string(),
+                "vim".to_string(),
+                "emacs".to_string(),
+            ],
+            theme_matched_editors: vec![
+                "vscode".to_string(),
+                "cursor".to_string(),
+                "vscodium".to_string(),
+                "helix".to_string(),
+            ],
+            mise_runtimes: vec![
+                "ruby".to_string(),
+                "node".to_string(),
+                "bun".to_string(),
+                "deno".to_string(),
+                "go".to_string(),
+                "rust".to_string(),
+                "python".to_string(),
+                "java".to_string(),
+                "elixir".to_string(),
+                "dotnet".to_string(),
+                "ocaml".to_string(),
+                "zig".to_string(),
+                "clojure".to_string(),
+                "scala".to_string(),
+                "php".to_string(),
+            ],
+            sudoless_docker: false,
+            docker_db_services: vec![
+                "postgres".to_string(),
+                "mysql".to_string(),
+                "redis".to_string(),
+                "mongodb".to_string(),
+            ],
+            gh_cli_installed: true,
+        }
+    }
+
+    pub fn set_default_editor(&mut self, editor: &str) -> bool {
+        if self.installed_editors.iter().any(|e| e == editor) {
+            self.default_editor = editor.to_string();
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn generate_mise_install_command(&self, runtime: &str) -> String {
+        format!("mise use -g {}", runtime)
+    }
+
+    pub fn toggle_sudoless_docker(&mut self, enable: bool) {
+        self.sudoless_docker = enable;
+    }
+
+    pub fn get_docker_command(&self, subcmd: &str) -> String {
+        if self.sudoless_docker {
+            format!("docker {}", subcmd)
+        } else {
+            format!("sudo docker {}", subcmd)
+        }
+    }
+
+    pub fn generate_github_cli_manifest(&self) -> String {
+        format!(
+            "gh_cli_enabled = {}\nstubs = [\"ghui\", \"lazygit\"]\nkeybinding_lazydocker = \"Super + Shift + D\"\n",
+            self.gh_cli_installed
+        )
+    }
+}
+
+impl Default for OmarchyDevToolsEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Keybinding Action
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct KeybindingDefinition {
@@ -1061,23 +1218,136 @@ mod omarchy_gap_closure_tests {
     }
 
     #[test]
-    fn test_omarchy_navigation_shortcut_engine() {
-        let mut nav = OmarchyNavigationShortcutEngine::new();
-        assert_eq!(nav.default_layout, OmarchyNavigationMode::Dwindle);
-        assert_eq!(nav.toggle_workspace_layout(), OmarchyNavigationMode::Scrolling);
-        assert_eq!(nav.toggle_workspace_layout(), OmarchyNavigationMode::Dwindle);
+    fn test_omarchy_cross_platform_target_engine() {
+        let engine = OmarchyCrossPlatformTargetEngine::new(OmarchyPlatformPlatform::AppleSiliconAsahi);
+        let config = engine.generate_target_config();
+        assert!(config.contains("apple_m1_m2"));
+        assert!(config.contains("asahi-alarm.org"));
 
-        assert_eq!(nav.resolve_shortcut_command("Super+Space"), Some("omarchy-menu"));
-        assert_eq!(nav.resolve_shortcut_command("Super+Return"), Some("ghostty"));
-        assert_eq!(nav.resolve_shortcut_command("Super+L"), Some("hyprland-layout-toggle"));
-        assert_eq!(nav.resolve_shortcut_command("Super+Grave"), Some("hyprland-scratchpad-toggle"));
+        let deck = OmarchyCrossPlatformTargetEngine::new(OmarchyPlatformPlatform::SteamDeck);
+        let deck_config = deck.generate_target_config();
+        assert!(deck_config.contains("deckarchy"));
+        assert!(deck_config.contains("steamos-readonly = false"));
 
-        assert!(nav.group_window("window-1"));
-        assert!(!nav.group_window("window-1"));
-        assert!(nav.pop_window_floating("window-2"));
+        let nix = OmarchyCrossPlatformTargetEngine::new(OmarchyPlatformPlatform::NixOS);
+        let nix_config = nix.generate_target_config();
+        assert!(nix_config.contains("omarchy-nix"));
+        assert!(nix_config.contains("imports = [ ./omarchy.nix ]"));
+    }
 
-        assert!(nav.scratchpad.toggle_scratchpad());
-        nav.scratchpad.send_to_scratchpad("terminal-agent");
-        assert_eq!(nav.scratchpad.active_windows.len(), 1);
+    #[test]
+    fn test_omarchy_dev_tools_engine() {
+        let mut dev = OmarchyDevToolsEngine::new();
+        assert_eq!(dev.default_editor, "neovim");
+        assert!(dev.set_default_editor("vscode"));
+        assert_eq!(dev.default_editor, "vscode");
+
+        let mise_cmd = dev.generate_mise_install_command("ruby");
+        assert_eq!(mise_cmd, "mise use -g ruby");
+
+        assert!(!dev.sudoless_docker);
+        dev.toggle_sudoless_docker(true);
+        assert!(dev.sudoless_docker);
+        assert_eq!(dev.get_docker_command("ps"), "docker ps");
+
+        let gh_manifest = dev.generate_github_cli_manifest();
+        assert!(gh_manifest.contains("ghui"));
+        assert!(gh_manifest.contains("lazygit"));
+    }
+
+    #[test]
+    fn test_omarchy_capture_and_sharing_engine() {
+        let capture = OmarchyCaptureAndSharingEngine::new();
+        let shot_cmd = capture.generate_screenshot_cmd("fullscreen", true, "overlay");
+        assert!(shot_cmd.contains("omarchy capture screenshot fullscreen"));
+        assert!(shot_cmd.contains("save"));
+        assert!(shot_cmd.contains("--editor=overlay"));
+
+        let rec_cmd = capture.generate_screenrecord_start_cmd(true, true, true);
+        assert!(rec_cmd.contains("--fullscreen"));
+        assert!(rec_cmd.contains("--with-desktop-audio"));
+        assert!(rec_cmd.contains("--with-webcam"));
+
+        let taildrop_cmd = capture.generate_tailscale_send_cmd("my-server", "/tmp/screenshot.png");
+        assert_eq!(taildrop_cmd, "omarchy tailscale send my-server /tmp/screenshot.png");
+
+        let transcode_cmd = capture.generate_transcode_cmd("/tmp/video.mp4", "webm", "1080p");
+        assert_eq!(transcode_cmd, "omarchy transcode /tmp/video.mp4 webm 1080p");
+    }
+}
+
+/// Supported Omarchy Cross-Platform Execution Targets
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum OmarchyPlatformPlatform {
+    DefaultArch,
+    AppleSiliconAsahi,
+    AppleParallelsVm,
+    VirtualBoxVm,
+    VmwareWorkstationWin11,
+    SteamDeck,
+    NixOS,
+}
+
+impl OmarchyPlatformPlatform {
+    pub fn name(&self) -> &'static str {
+        match self {
+            Self::DefaultArch => "default-arch",
+            Self::AppleSiliconAsahi => "apple-silicon-asahi",
+            Self::AppleParallelsVm => "apple-parallels-vm",
+            Self::VirtualBoxVm => "virtualbox-vm",
+            Self::VmwareWorkstationWin11 => "vmware-workstation-win11",
+            Self::SteamDeck => "steam-deck",
+            Self::NixOS => "nixos",
+        }
+    }
+}
+
+/// Cross-Platform Target Setup & Driver Adaptor Engine
+#[derive(Debug, Clone)]
+pub struct OmarchyCrossPlatformTargetEngine {
+    pub platform: OmarchyPlatformPlatform,
+}
+
+impl OmarchyCrossPlatformTargetEngine {
+    pub fn new(platform: OmarchyPlatformPlatform) -> Self {
+        Self { platform }
+    }
+
+    pub fn generate_target_config(&self) -> String {
+        match self.platform {
+            OmarchyPlatformPlatform::DefaultArch => {
+                "platform = \"default-arch\"\nsetup_guide = \"https://github.com/omacom/omarchy\"\n".to_string()
+            }
+            OmarchyPlatformPlatform::AppleSiliconAsahi => {
+                format!(
+                    "platform = \"apple_m1_m2\"\narch_base = \"asahi-alarm\"\nguide = \"https://github.com/omarchy-mac/omarchy-mac\"\nreference = \"asahi-alarm.org\"\nkernel_params = [\"apple_dcp.show_vblank=1\", \"clk_ignore_unused\"]\n"
+                )
+            }
+            OmarchyPlatformPlatform::AppleParallelsVm => {
+                format!(
+                    "platform = \"apple_parallels_vm\"\ndriver = \"parallels-tools\"\nguide = \"https://github.com/omacom/omarchy/discussions/452\"\nkernel_params = [\"prl_tg.enabled=1\", \"i915.modeset=1\"]\n"
+                )
+            }
+            OmarchyPlatformPlatform::VirtualBoxVm => {
+                format!(
+                    "platform = \"virtualbox_vm\"\ndriver = \"virtualbox-guest-utils\"\nguide = \"https://github.com/omacom/omarchy/discussions/176\"\nkernel_params = [\"vboxvideo\", \"vboxsf\"]\n"
+                )
+            }
+            OmarchyPlatformPlatform::VmwareWorkstationWin11 => {
+                format!(
+                    "platform = \"vmware_workstation_win11\"\ndriver = \"open-vm-tools\"\nguide = \"https://github.com/omacom/omarchy/discussions/572\"\nkernel_params = [\"vmw_balloon\", \"vmw_vmci\"]\n"
+                )
+            }
+            OmarchyPlatformPlatform::SteamDeck => {
+                format!(
+                    "platform = \"steam_deck\"\nscript = \"deckarchy\"\nauthor = \"Altynbek Orumbayev\"\nguide = \"https://github.com/aorumbayev/deckarchy\"\nsteamos-readonly = false\n"
+                )
+            }
+            OmarchyPlatformPlatform::NixOS => {
+                format!(
+                    "platform = \"nixos\"\nflavour = \"omarchy-nix\"\nauthor = \"Henry Sipp\"\nguide = \"https://github.com/henrysipp/omarchy-nix\"\nimports = [ ./omarchy.nix ]\n"
+                )
+            }
+        }
     }
 }

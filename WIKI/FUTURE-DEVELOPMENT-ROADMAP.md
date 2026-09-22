@@ -5565,29 +5565,91 @@ In addition to RSS/Atom redirection and portal category classification, SigmaOS 
 - **Android Police Custom ROM Sideload & microG Engine (`AndroidPoliceCustomRomSideloadEngine`)**: Android A/B partition slot switching, fastboot flashing, APK sideloading, and microG Play Services stubbing.
 - **HWBusters ATX 3.1 PSU Telemetry Engine (`HwbustersPsuEfficiencyTelemetryEngine`)**: ATX 3.1 +12VHPWR transient load spike monitoring, rail voltage ripple compliance checking, and Cybenetics efficiency rating calculation.
 
+
 ---
 
-## 127. SOVEREIGN OMNI-DISTRO & MEDIA UNIMPLEMENTED IDEAS COMPLETE SYNTHESIS SPECIFICATION
+## 132. SOVEREIGN OMARCHY MINIMAL STARSHIP PROMPT SPECIFICATION
 
-### 127.1 Sovereign Tech Media Portal Intelligence Engine (`SovereignMediaPortalIntelligenceEngine`)
-SigmaOS provides full-spectrum tech media portal redirection, feed aggregation, and domain routing across 33 global technology publications:
-1. **Mobile & Gadgets**: 9to5Google (`9to5google.com`), 9to5Mac (`9to5mac.com`), Android Authority (`androidauthority.com`), Android Police (`androidpolice.com`).
-2. **Linux & Open Source**: 9to5Linux (`9to5linux.com`), DistroWatch (`distrowatch.com`), ItsFOSS (`itsfoss.com`), Linux.com (`linux.com`), Linux.org (`linux.org`), Linux Foundation (`linuxfoundation.org`), LinuxTeck (`linuxteck.com`), Open Source For You (`opensourceforu.com`), Phoronix (`phoronix.com`).
-3. **Hardware & Power Telemetry**: Geeky Gadgets (`geeky-gadgets.com`), HW Busters (`hwbusters.com`), PCMag (`pcmag.com`), PCWorld (`pcworld.com`), TechPowerUp (`techpowerup.com`), TechSpot (`techspot.com`).
-4. **AI & Data Science**: KDnuggets (`kdnuggets.com`), MarkTechPost (`marktechpost.com`).
-5. **Windows & Consumer Tech**: How-To Geek (`howtogeek.com`), MakeUseOf (`makeuseof.com`), Windows Central (`windowscentral.com`), Windows Latest (`windowslatest.com`), XDA Developers (`xda-developers.com`), Appuals (`appuals.com`).
-6. **Enterprise IT & Cloud**: InfoWorld (`infoworld.com`), ITDaily (`itdaily.com`), TechCrunch (`techcrunch.com`), The New Stack (`thenewstack.io`), ZDNet (`zdnet.com`), Frappe Framework (`frappe.io`).
+### 132.1 Starship Prompt Engine Overview
+SigmaOS incorporates a low-level, zero-dependency `#![no_std]` Rust engine (`OmarchyMinimalStarshipPromptEngine` in `src/shell/sovereign_shell_parity.rs`) inspired by Omarchy Linux and the Starship prompt (`starship.rs`):
 
-### 127.2 Sovereign Linux & BSD Unimplemented Ideas Engine (`SovereignLinuxBsdUnimplementedIdeasEngine`)
-Synthesizes all remaining Linux and BSD distribution breakthroughs into safe, zero-dependency Rust abstractions:
-- **Arch Pacman & AUR Sandboxing**: Isolated unprivileged builds and dependency graph validation.
-- **Debian APT Pinning & Preseed**: Automatic release pinning and declarative unattended installer configurations.
-- **Fedora Kickstart & Anaconda**: Automated partitioning, network setup, and kickstart script execution.
-- **Gentoo Ebuild USE Flag Solver**: Automated USE flag resolution and subslot dependency tracking.
-- **Void XBPS Transaction Journaling**: Atomic transaction logs with instant rollback capabilities.
-- **FreeBSD VNET Jail Isolation**: Per-jail virtualized network stacks with epair interfaces.
-- **OpenBSD Pledge & Unveil**: Fine-grained syscall privilege reduction and path restrictor sentinel.
-- **NetBSD Rump Kernel Hypercalls**: Isolated userland driver execution via rumpvfs and rumpnet hypercalls.
-- **DragonFly HAMMER2 PFS**: Pseudo-filesystem subvolumes and clustering snapshot manager.
-- **Alpine LBU apkovl**: RAM-boot persistent overlay commit and apkovl state restore.
-- **NixOS Hermetic Flakes**: Pure store evaluation and lockfile verification.
+1. **Minimalist Prompt Design (`OmarchyStarshipConfig`)**:
+   - Omarchy Linux ships with a clean, clutter-free Starship prompt.
+   - Eliminates username/hostname clutter (user is always known) and time displays (rendered in the status bar/top panel).
+
+2. **Prompt Elements**:
+   - Current working directory path (`~/SigmaOS`).
+   - Git branch indicator (`on  main`).
+   - Execution status symbols (`❯` on success, `✖ ❯` on command failure).
+   - Configurable via `~/.config/starship.toml` parity.
+
+
+## 133. SOVEREIGN OMARCHY CAPTURE, SCREEN RECORDING, OCR & LOCAL SHARING SPECIFICATION
+
+### 133.1 Overview & Subsystem Architecture
+SigmaOS absorbs the screen capture, video recording, text extraction (OCR), and local file sharing workflows of **Omarchy Linux** into a zero-dependency `#![no_std]` Rust engine (`OmarchyCaptureAndSharingEngine` in `src/distro/omarchy.rs`):
+
+1. **Screenshot Capture Modes**:
+   - Smart interactive region selection (`omarchy screenshot`).
+   - Region selection (`omarchy capture screenshot region`).
+   - Active window capture (`omarchy capture screenshot windows`).
+   - Fullscreen direct-to-disk save (`omarchy capture screenshot fullscreen save`).
+   - Scrolling region stitching (`omarchy capture screenshot scroll`).
+   - Annotation editor overlays (`--editor=overlay` or `--editor=window`).
+   - Default save location `~/Pictures/Screenshots` configurable via `OMASNAP_SCREENSHOT_DIR`.
+
+2. **Screen Recording Engine**:
+   - Fullscreen & region recording (`omarchy screenrecord --fullscreen`).
+   - Audio integration flags (`--with-desktop-audio`, `--with-microphone-audio`).
+   - Live webcam overlay with dynamic resizing (`--with-webcam`, `omarchy capture webcam resize`).
+   - Debug logging via `OMARCHY_SCREENRECORD_DEBUG=true`.
+   - Recording output target directory configurable via `OMARCHY_SCREENRECORD_DIR` (default `~/Videos`).
+
+3. **Text Capture (OCR) & File Sharing**:
+   - Screen region OCR text extraction directly to clipboard (`omarchy capture text`).
+   - LocalSend P2P clipboard, file, and folder sharing (`omarchy share clipboard|file|folder`).
+   - Tailscale Taildrop machine-to-machine transfers (`omarchy tailscale send/receive`).
+   - Media re-encoding & transcoding helper (`omarchy transcode <input> [format] [resolution]`).
+
+
+## 134. SOVEREIGN SIGMAOS AI-GENERATED CODE GOVERNANCE & TRANSPARENCY SPECIFICATION
+
+### 134.1 Overview & Governance Rules
+Adapted from the Linux kernel tool-generated content guidance, SigmaOS establishes five mandatory transparency rules (`docs/SIGMAOS_AI_CODING_TRANSPARENCY_GUIDELINES.md`) for AI-assisted ("vibe coding") and autonomous agent development:
+
+1. **Name the AI Tool**:
+   - Explicitly identify the AI tool or model used for code, driver, or documentation generation.
+   - Mandate `Assisted-by: <Tool Name>` trailers in Git commit messages and Pull Requests.
+
+2. **Preserve the Inputs Behind the Result**:
+   - Document and preserve original technical specifications (`PROJECT_SPEC.md`).
+   - Maintain independent test fixtures that the AI model did not directly optimize against.
+
+3. **Keep the Prompt Trail**:
+   - Log prompt sequences (`AI_ASSISTANCE.md`) summarizing goals, constraints, and `#![no_std]` safety boundaries.
+
+4. **Record Exactly What the AI Changed**:
+   - Clearly delineate human-authored specs/fixtures from AI-generated modules and tests.
+
+5. **Make the Generated Code Prove Itself**:
+   - Require 100% test pass rate via `./run_sigma_tests.sh`.
+   - Turn edge cases (dash-heavy signals, white noise, null buffers) into repeatable unit/integration tests before accepting patches.
+
+
+## 135. SOVEREIGN LINUX & BSD WIKI ROADMAP ENGINES SPECIFICATION
+
+### 135.1 Overview & Subsystem Architecture
+SigmaOS absorbs strategic ZFS boot environment, APT mirror optimization, and Runit service supervision features inspired by FreeBSD, Debian, and Void Linux into zero-dependency Rust engines (`FreeBsdZfsBootenvEngine`, `DebianAptFastMirrorSelectorEngine`, and `VoidRunitServiceSupervisorEngine` in `src/wiki_unimplemented_ideas.rs`):
+
+1. **FreeBSD ZFS Boot Environments Engine (`FreeBsdZfsBootenvEngine`)**:
+   - Manages ZFS boot environment datasets (`zroot/ROOT/<be_name>`).
+   - Supports creating boot environments from active system snapshots.
+   - Allows switching default boot environment on next boot (`activate_bootenv`).
+
+2. **Debian APT Fast Mirror Selector Engine (`DebianAptFastMirrorSelectorEngine`)**:
+   - Latency and bandwidth benchmarking across repository mirror servers.
+   - Selects N fastest mirrors for parallel multi-segment downloads.
+
+3. **Void Runit Service Supervisor Engine (`VoidRunitServiceSupervisorEngine`)**:
+   - Models runit 3-stage init lifecycle (`Stage1OneTimeInit`, `Stage2ServiceSupervision`, `Stage3OneTimeShutdown`).
+   - Provides process supervision (`sv up`, `sv down`) and service state tracking.

@@ -18,6 +18,7 @@ pub mod zsh_bash_parity;
 
 pub use self::command::{ShellCommand, SimpleShellSession};
 pub use self::sigma_sh::*;
+pub use self::sovereign_shell_parity::*;
 pub use self::universal_cli_shell_system::*;
 pub use self::zsh_bash_parity::*;
 pub use self::repl::ShellRepl;
