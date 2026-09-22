@@ -193,11 +193,11 @@ if [ -f "src/package/sovereign_distro_package_innovations.rs" ]; then
     ./build/sovereign_innovations_test
 fi
 
-if [ -f "src/package/sovereign_pr_package_gateway.rs" ]; then
-    echo "Running Sovereign PR Package Gateway test suite..."
+if [ -f "src/package/sovereign_distro_package_master_suite.rs" ]; then
+    echo "Running Sovereign Distro Package Master Suite test suite..."
     mkdir -p build
-    rustc --test src/package/sovereign_pr_package_gateway.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_pr_gateway_test
-    ./build/sovereign_pr_gateway_test
+    rustc --test src/package/sovereign_distro_package_master_suite.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_master_suite_test
+    ./build/sovereign_master_suite_test
 fi
 
 if [ -f "src/sigpkg/arch_pacman_engine.rs" ]; then
