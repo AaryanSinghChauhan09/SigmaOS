@@ -420,31 +420,82 @@ impl SpreadsheetProcessor {
         // Evaluate formula if defined
         let result = if let Some(formula) = self.formulas.get(&(row, col)).cloned() {
             let f: &String = &formula;
-            // Resolve simple reference formulas like "=SUM((0,0),(0,1))" or direct mappings
-            if f.starts_with("=") {
-                let inner = &f[1..];
-                if inner.starts_with("SUM") {
-                    // Extract coordinates from "SUM((r1,c1),(r2,c2))"
-                    let parts: Vec<&str> = inner.split(',').collect();
-                    if parts.len() >= 4 {
-                        let r1 = parts[0].trim_start_matches("SUM((").trim().parse::<u32>().unwrap_or(0);
-                        let c1 = parts[1].trim_end_matches(')').trim().parse::<u32>().unwrap_or(0);
-                        let r2 = parts[2].trim_start_matches('(').trim().parse::<u32>().unwrap_or(0);
-                        let c2 = parts[3].trim_end_matches("))").trim().parse::<u32>().unwrap_or(0);
-                        let val1 = self.evaluate_cell(r1, c1);
-                        let val2 = self.evaluate_cell(r2, c2);
-                        match (val1, val2) {
-                            (CellValue::Number(n1), CellValue::Number(n2)) => CellValue::Number(n1 + n2),
-                            _ => CellValue::Number(0.0),
+            if f.starts_with('=') {
+                let inner = f[1..].trim();
+                if inner.starts_with("ARRAYFORMULA(") && inner.ends_with(')') {
+                    let body = inner["ARRAYFORMULA(".len()..inner.len() - 1].trim();
+                    // Handle array operation like "(0,0):(0,4) * 2"
+                    if let Some((range_part, factor_part)) = body.split_once('*') {
+                        let range_part = range_part.trim();
+                        let factor = factor_part.trim().parse::<f64>().unwrap_or(1.0);
+                        if let Some((start_str, end_str)) = range_part.split_once(':') {
+                            let parse_coord = |s: &str| -> Option<(u32, u32)> {
+                                let s = s.trim().trim_matches(|c| c == '(' || c == ')');
+                                let mut p = s.split(',');
+                                let r = p.next()?.trim().parse::<u32>().ok()?;
+                                let c = p.next()?.trim().parse::<u32>().ok()?;
+                                Some((r, c))
+                            };
+                            if let (Some((r1, c1)), Some((r2, c2))) = (parse_coord(start_str), parse_coord(end_str)) {
+                                let r_start = r1.min(r2);
+                                let r_end = r1.max(r2);
+                                let c_start = c1.min(c2);
+                                let c_end = c1.max(c2);
+                                for r_i in r_start..=r_end {
+                                    for c_i in c_start..=c_end {
+                                        let val = match self.evaluate_cell(r_i, c_i) {
+                                            CellValue::Number(n) => n * factor,
+                                            _ => 0.0,
+                                        };
+                                        if (r_i, c_i) != (row, col) {
+                                            self.cells.insert((r_i, c_i), CellValue::Number(val));
+                                            self.evaluated_cache.insert((r_i, c_i), CellValue::Number(val));
+                                        }
+                                    }
+                                }
+                                let my_val = match self.cells.get(&(row, col)) {
+                                    Some(CellValue::Number(n)) => *n,
+                                    _ => match self.evaluate_cell(r_start, c_start) {
+                                        CellValue::Number(n) => n * factor,
+                                        _ => 0.0,
+                                    },
+                                };
+                                CellValue::Number(my_val)
+                            } else {
+                                CellValue::Empty
+                            }
+                        } else {
+                            CellValue::Empty
                         }
                     } else {
-                        let r1 = self.evaluate_cell(0, 0);
-                        let r2 = self.evaluate_cell(0, 1);
-                        match (r1, r2) {
-                            (CellValue::Number(n1), CellValue::Number(n2)) => CellValue::Number(n1 + n2),
-                            _ => CellValue::Number(0.0),
-                        }
+                        CellValue::Empty
                     }
+                } else if inner.starts_with("SUM(") && inner.ends_with(')') {
+                    let range_str = inner["SUM(".len()..inner.len() - 1].trim();
+                    let nums = self.extract_range_numbers(range_str);
+                    CellValue::Number(nums.iter().sum())
+                } else if inner.starts_with("AVERAGE(") && inner.ends_with(')') {
+                    let range_str = inner["AVERAGE(".len()..inner.len() - 1].trim();
+                    let nums = self.extract_range_numbers(range_str);
+                    if nums.is_empty() {
+                        CellValue::Number(0.0)
+                    } else {
+                        CellValue::Number(nums.iter().sum::<f64>() / nums.len() as f64)
+                    }
+                } else if inner.starts_with("MAX(") && inner.ends_with(')') {
+                    let range_str = inner["MAX(".len()..inner.len() - 1].trim();
+                    let nums = self.extract_range_numbers(range_str);
+                    let max = nums.iter().cloned().fold(f64::MIN, f64::max);
+                    CellValue::Number(if max == f64::MIN { 0.0 } else { max })
+                } else if inner.starts_with("MIN(") && inner.ends_with(')') {
+                    let range_str = inner["MIN(".len()..inner.len() - 1].trim();
+                    let nums = self.extract_range_numbers(range_str);
+                    let min = nums.iter().cloned().fold(f64::MAX, f64::min);
+                    CellValue::Number(if min == f64::MAX { 0.0 } else { min })
+                } else if inner.starts_with("COUNT(") && inner.ends_with(')') {
+                    let range_str = inner["COUNT(".len()..inner.len() - 1].trim();
+                    let nums = self.extract_range_numbers(range_str);
+                    CellValue::Number(nums.len() as f64)
                 } else if inner.contains(',') {
                     CellValue::Number(42.0)
                 } else {
@@ -460,6 +511,56 @@ impl SpreadsheetProcessor {
         self.evaluated_cache.insert((row, col), result.clone());
         self.dirty_cells.insert((row, col), false);
         result
+    }
+
+    /// Extract numeric values from a range string like "(0,0):(0,4)" or multiple args like "(0,0),(0,1)" or "10,20,30"
+    fn extract_range_numbers(&mut self, range_str: &str) -> Vec<f64> {
+        let mut numbers = Vec::new();
+        let parse_coord = |s: &str| -> Option<(u32, u32)> {
+            let s = s.trim().trim_matches(|c| c == '(' || c == ')');
+            let mut p = s.split(',');
+            let r = p.next()?.trim().parse::<u32>().ok()?;
+            let c = p.next()?.trim().parse::<u32>().ok()?;
+            Some((r, c))
+        };
+
+        if let Some((start_str, end_str)) = range_str.split_once(':') {
+            if let (Some((r1, c1)), Some((r2, c2))) = (parse_coord(start_str), parse_coord(end_str)) {
+                let r_start = r1.min(r2);
+                let r_end = r1.max(r2);
+                let c_start = c1.min(c2);
+                let c_end = c1.max(c2);
+                for r_i in r_start..=r_end {
+                    for c_i in c_start..=c_end {
+                        if let CellValue::Number(n) = self.evaluate_cell(r_i, c_i) {
+                            numbers.push(n);
+                        }
+                    }
+                }
+                return numbers;
+            }
+        }
+
+        // Check if comma separated coordinates or raw numbers
+        if range_str.contains('(') {
+            // e.g. "(0,0),(0,1)" -> split by "),("
+            for coord_str in range_str.split("),") {
+                if let Some((r, c)) = parse_coord(coord_str) {
+                    if let CellValue::Number(n) = self.evaluate_cell(r, c) {
+                        numbers.push(n);
+                    }
+                }
+            }
+        } else {
+            // Raw number list
+            for part in range_str.split(',') {
+                if let Ok(n) = part.trim().parse::<f64>() {
+                    numbers.push(n);
+                }
+            }
+        }
+
+        numbers
     }
 
     /// Export spreadsheet cells to CSV string
@@ -1404,11 +1505,37 @@ pub struct LookerChartWidget {
     pub data_series: Vec<f64>,
 }
 
+#[derive(Debug, Clone)]
+pub struct LookerFilterControl {
+    pub dimension_key: String,
+    pub filter_value: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct LookerGaugeWidget {
+    pub widget_id: String,
+    pub title: String,
+    pub current_value: f64,
+    pub target_value: f64,
+}
+
+impl LookerGaugeWidget {
+    pub fn progress_percentage(&self) -> f64 {
+        if self.target_value <= 0.0 {
+            0.0
+        } else {
+            ((self.current_value / self.target_value) * 100.0).min(100.0)
+        }
+    }
+}
+
 /// Google Looker Studio / PowerBI inspired Business Intelligence Reporting Engine
 pub struct SigmaLookerAnalyticsEngine {
     pub report_title: String,
     pub metrics: Vec<LookerMetricCard>,
     pub widgets: Vec<LookerChartWidget>,
+    pub filters: Vec<LookerFilterControl>,
+    pub gauge_widgets: Vec<LookerGaugeWidget>,
     pub data_records: Vec<HashMap<String, String>>,
 }
 
@@ -1418,8 +1545,39 @@ impl SigmaLookerAnalyticsEngine {
             report_title: report_title.to_string(),
             metrics: Vec::new(),
             widgets: Vec::new(),
+            filters: Vec::new(),
+            gauge_widgets: Vec::new(),
             data_records: Vec::new(),
         }
+    }
+
+    pub fn add_filter(&mut self, dimension_key: &str, filter_value: &str) {
+        self.filters.push(LookerFilterControl {
+            dimension_key: dimension_key.to_string(),
+            filter_value: filter_value.to_string(),
+        });
+    }
+
+    pub fn add_gauge_widget(&mut self, id: &str, title: &str, current: f64, target: f64) {
+        self.gauge_widgets.push(LookerGaugeWidget {
+            widget_id: id.to_string(),
+            title: title.to_string(),
+            current_value: current,
+            target_value: target,
+        });
+    }
+
+    pub fn get_filtered_records(&self) -> Vec<&HashMap<String, String>> {
+        self.data_records
+            .iter()
+            .filter(|rec| {
+                self.filters.iter().all(|f| {
+                    rec.get(&f.dimension_key)
+                        .map(|v| v.eq_ignore_ascii_case(&f.filter_value))
+                        .unwrap_or(false)
+                })
+            })
+            .collect()
     }
 
     pub fn add_metric(&mut self, title: &str, key: &str, val: f64) {
@@ -1593,10 +1751,19 @@ pub struct InlineDocComment {
     pub resolved: bool,
 }
 
+#[derive(Debug, Clone)]
+pub struct DocumentBranch {
+    pub branch_name: String,
+    pub base_version: u32,
+    pub content: String,
+    pub author: String,
+}
+
 /// Google Docs / MS Word Enterprise Real-Time Suggestion & Smart AI Assistant Engine
 pub struct SigmaDocsEnterpriseCollaborationEngine {
     pub suggestions: Vec<SuggestionEdit>,
     pub comments: Vec<InlineDocComment>,
+    pub branches: HashMap<String, DocumentBranch>,
     pub next_id: u32,
 }
 
@@ -1605,8 +1772,39 @@ impl SigmaDocsEnterpriseCollaborationEngine {
         Self {
             suggestions: Vec::new(),
             comments: Vec::new(),
+            branches: HashMap::new(),
             next_id: 1,
         }
+    }
+
+    pub fn create_branch(&mut self, branch_name: &str, author: &str, content: &str, base_version: u32) {
+        self.branches.insert(
+            branch_name.to_string(),
+            DocumentBranch {
+                branch_name: branch_name.to_string(),
+                base_version,
+                content: content.to_string(),
+                author: author.to_string(),
+            },
+        );
+    }
+
+    pub fn semantic_diff_branch(&self, branch_name: &str, base_content: &str) -> Option<String> {
+        let branch = self.branches.get(branch_name)?;
+        let base_words: Vec<&str> = base_content.split_whitespace().collect();
+        let branch_words: Vec<&str> = branch.content.split_whitespace().collect();
+
+        let added: Vec<&&str> = branch_words.iter().filter(|w| !base_words.contains(w)).collect();
+        let removed: Vec<&&str> = base_words.iter().filter(|w| !branch_words.contains(w)).collect();
+
+        Some(format!(
+            "Branch '{}' diff: +{} added words ({:?}), -{} removed words ({:?})",
+            branch_name,
+            added.len(),
+            added,
+            removed.len(),
+            removed
+        ))
     }
 
     pub fn suggest_edit(&mut self, author: &str, orig: &str, suggested: &str) -> u32 {
@@ -1731,11 +1929,27 @@ pub struct CrmActivityLog {
     pub timestamp_sec: u64,
 }
 
+#[derive(Debug, Clone)]
+pub struct LeadAssignmentRule {
+    pub min_value: f64,
+    pub max_value: f64,
+    pub assigned_rep: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct DealEscalationLevel {
+    pub value_threshold: f64,
+    pub escalation_role: String,
+}
+
 /// Comprehensive Enterprise CRM & ERP Suite Engine
 pub struct SovereignEnterpriseCrmErpEngine {
     pub deals: Vec<EnterpriseDeal>,
     pub invoices: Vec<EnterpriseInvoice>,
     pub activity_logs: Vec<CrmActivityLog>,
+    pub deal_assignees: HashMap<u32, String>,
+    pub assignment_rules: Vec<LeadAssignmentRule>,
+    pub escalation_matrix: Vec<DealEscalationLevel>,
     pub next_id: u32,
 }
 
@@ -1745,8 +1959,49 @@ impl SovereignEnterpriseCrmErpEngine {
             deals: Vec::new(),
             invoices: Vec::new(),
             activity_logs: Vec::new(),
+            deal_assignees: HashMap::new(),
+            assignment_rules: Vec::new(),
+            escalation_matrix: Vec::new(),
             next_id: 1,
         }
+    }
+
+    pub fn add_assignment_rule(&mut self, min: f64, max: f64, rep: &str) {
+        self.assignment_rules.push(LeadAssignmentRule {
+            min_value: min,
+            max_value: max,
+            assigned_rep: rep.to_string(),
+        });
+    }
+
+    pub fn add_escalation_level(&mut self, threshold: f64, role: &str) {
+        self.escalation_matrix.push(DealEscalationLevel {
+            value_threshold: threshold,
+            escalation_role: role.to_string(),
+        });
+    }
+
+    pub fn auto_assign_deal(&mut self, deal_id: u32) -> Option<String> {
+        let deal = self.deals.iter().find(|d| d.deal_id == deal_id)?;
+        let val = deal.deal_value;
+        if let Some(rule) = self.assignment_rules.iter().find(|r| val >= r.min_value && val <= r.max_value) {
+            let rep = rule.assigned_rep.clone();
+            self.deal_assignees.insert(deal_id, rep.clone());
+            Some(rep)
+        } else {
+            None
+        }
+    }
+
+    pub fn check_deal_escalation(&self, deal_id: u32) -> Option<String> {
+        let deal = self.deals.iter().find(|d| d.deal_id == deal_id)?;
+        let val = deal.deal_value;
+        let highest = self
+            .escalation_matrix
+            .iter()
+            .filter(|e| val >= e.value_threshold)
+            .max_by(|a, b| a.value_threshold.partial_cmp(&b.value_threshold).unwrap_or(std::cmp::Ordering::Equal))?;
+        Some(highest.escalation_role.clone())
     }
 
     pub fn create_deal(&mut self, title: &str, customer: &str, value: f64) -> u32 {
@@ -2823,9 +3078,18 @@ pub struct HelpdeskTicket {
     pub sla_deadline_sec: u64,
 }
 
-/// Sovereign Helpdesk Ticket & SLA SLA Engine (Salesforce / Zoho Desk / Odoo Helpdesk)
+#[derive(Debug, Clone)]
+pub struct TicketQueue {
+    pub queue_name: String,
+    pub assigned_agent: Option<String>,
+    pub ticket_ids: Vec<u32>,
+}
+
+/// Sovereign Helpdesk Ticket & SLA Engine (Salesforce / Zoho Desk / Odoo Helpdesk)
 pub struct SovereignHelpdeskSlaEngine {
     pub tickets: Vec<HelpdeskTicket>,
+    pub queues: Vec<TicketQueue>,
+    pub ticket_escalations: HashMap<u32, u8>, // ticket_id -> escalation level (1, 2, 3)
     pub next_ticket_id: u32,
 }
 
@@ -2833,8 +3097,42 @@ impl SovereignHelpdeskSlaEngine {
     pub fn new() -> Self {
         Self {
             tickets: Vec::new(),
+            queues: Vec::new(),
+            ticket_escalations: HashMap::new(),
             next_ticket_id: 1,
         }
+    }
+
+    pub fn create_queue(&mut self, queue_name: &str, assigned_agent: Option<&str>) {
+        self.queues.push(TicketQueue {
+            queue_name: queue_name.to_string(),
+            assigned_agent: assigned_agent.map(|s| s.to_string()),
+            ticket_ids: Vec::new(),
+        });
+    }
+
+    pub fn assign_ticket_to_queue(&mut self, ticket_id: u32, queue_name: &str) -> bool {
+        if let Some(queue) = self.queues.iter_mut().find(|q| q.queue_name == queue_name) {
+            if !queue.ticket_ids.contains(&ticket_id) {
+                queue.ticket_ids.push(ticket_id);
+            }
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn escalate_ticket(&mut self, ticket_id: u32) -> u8 {
+        let level = self.ticket_escalations.entry(ticket_id).or_insert(0);
+        if *level < 3 {
+            *level += 1;
+        }
+        *level
+    }
+
+    pub fn get_remaining_sla_seconds(&self, ticket_id: u32, current_time_sec: u64) -> Option<i64> {
+        let ticket = self.tickets.iter().find(|t| t.ticket_id == ticket_id)?;
+        Some(ticket.sla_deadline_sec as i64 - current_time_sec as i64)
     }
 
     pub fn create_ticket(&mut self, customer: &str, subject: &str, desc: &str, priority: TicketPriority, created_sec: u64) -> u32 {
@@ -2940,6 +3238,21 @@ impl SovereignInventoryWarehouseEngine {
             .values()
             .map(|item| (item.quantity_on_hand as f64) * item.unit_cost)
             .sum()
+    }
+
+    /// Perform inter-warehouse stock transfer between locations
+    pub fn transfer_stock(&mut self, sku_id: &str, target_location: &str, qty: u32) -> bool {
+        if let Some(item) = self.skus.get_mut(sku_id) {
+            if item.quantity_on_hand >= qty {
+                item.quantity_on_hand -= qty;
+                item.warehouse_location = target_location.to_string();
+                true
+            } else {
+                false
+            }
+        } else {
+            false
+        }
     }
 }
 
@@ -3145,27 +3458,56 @@ impl SovereignManufacturingMrpEngine {
     }
 
     pub fn complete_work_order(&mut self, order_id: u32, timestamp_sec: u64, inventory: &mut SovereignInventoryWarehouseEngine) -> bool {
+        let mut bom_to_calc = None;
+        let mut product_sku = String::new();
+        let mut quantity = 0;
+
         if let Some(order) = self.work_orders.iter_mut().find(|o| o.order_id == order_id) {
             if order.status == WorkOrderStatus::InProgress {
                 order.status = WorkOrderStatus::Completed;
                 order.completion_time_sec = Some(timestamp_sec);
-                // Increase finished goods stock, adding item if missing
-                if let Some(item) = inventory.skus.get_mut(&order.product_sku) {
-                    item.quantity_on_hand += order.quantity;
-                } else {
-                    inventory.add_sku(InventorySkuItem {
-                        sku_id: order.product_sku.clone(),
-                        name: order.product_sku.clone(),
-                        warehouse_location: "Finished Goods Wh".to_string(),
-                        quantity_on_hand: order.quantity,
-                        reorder_point: 0,
-                        unit_cost: 0.0,
-                    });
-                }
-                return true;
+                bom_to_calc = Some(order.bill_of_materials.clone());
+                product_sku = order.product_sku.clone();
+                quantity = order.quantity;
             }
         }
+
+        if let Some(bom) = bom_to_calc {
+            let unit_cost = Self::calculate_bom_unit_cost_static(&bom, inventory);
+            if let Some(item) = inventory.skus.get_mut(&product_sku) {
+                item.quantity_on_hand += quantity;
+                item.unit_cost = unit_cost;
+            } else {
+                inventory.add_sku(InventorySkuItem {
+                    sku_id: product_sku.clone(),
+                    name: product_sku,
+                    warehouse_location: "Finished Goods Wh".to_string(),
+                    quantity_on_hand: quantity,
+                    reorder_point: 0,
+                    unit_cost,
+                });
+            }
+            return true;
+        }
         false
+    }
+
+    /// Recursively roll up unit material costs from bill of materials
+    pub fn calculate_bom_unit_cost_static(bom: &[(String, u32)], inventory: &SovereignInventoryWarehouseEngine) -> f64 {
+        let mut total_cost = 0.0;
+        for (comp_sku, qty_needed) in bom {
+            let comp_unit_cost = inventory
+                .skus
+                .get(comp_sku)
+                .map(|item| item.unit_cost)
+                .unwrap_or(0.0);
+            total_cost += comp_unit_cost * (*qty_needed as f64);
+        }
+        total_cost
+    }
+
+    pub fn calculate_bom_unit_cost(&self, bom: &[(String, u32)], inventory: &SovereignInventoryWarehouseEngine) -> f64 {
+        Self::calculate_bom_unit_cost_static(bom, inventory)
     }
 }
 
@@ -4332,5 +4674,87 @@ mod tests {
 
         assert!(drive.can_manage("alice"));
         assert!(!drive.can_manage("bob"));
+    }
+
+    #[test]
+    fn test_expanded_productivity_innovations() {
+        let cap = sigma_types::CapabilityToken { id: 707 };
+
+        // 1. Spreadsheet Array Formulas & Range Aggregations
+        let mut sheet = SpreadsheetProcessor::new("Finances".to_string(), cap.clone());
+        sheet.set_cell(0, 0, CellValue::Number(10.0)).unwrap();
+        sheet.set_cell(0, 1, CellValue::Number(20.0)).unwrap();
+        sheet.set_cell(0, 2, CellValue::Number(30.0)).unwrap();
+        sheet.set_cell(0, 3, CellValue::Number(40.0)).unwrap();
+        sheet.set_cell(0, 4, CellValue::Number(50.0)).unwrap();
+
+        sheet.set_formula(1, 0, "=SUM((0,0):(0,4))").unwrap();
+        assert_eq!(sheet.evaluate_cell(1, 0), CellValue::Number(150.0));
+
+        sheet.set_formula(1, 1, "=AVERAGE((0,0):(0,4))").unwrap();
+        assert_eq!(sheet.evaluate_cell(1, 1), CellValue::Number(30.0));
+
+        sheet.set_formula(2, 0, "=ARRAYFORMULA((0,0):(0,4) * 2)").unwrap();
+        let _ = sheet.evaluate_cell(2, 0);
+
+        // 2. Looker Dashboard Filters & KPI Gauge
+        let mut looker = SigmaLookerAnalyticsEngine::new("Quarterly KPI");
+        let mut rec1 = HashMap::new();
+        rec1.insert("region".to_string(), "US-East".to_string());
+        rec1.insert("sales".to_string(), "100".to_string());
+        let mut rec2 = HashMap::new();
+        rec2.insert("region".to_string(), "US-West".to_string());
+        rec2.insert("sales".to_string(), "200".to_string());
+        looker.ingest_record(rec1);
+        looker.ingest_record(rec2);
+
+        looker.add_filter("region", "US-East");
+        let filtered = looker.get_filtered_records();
+        assert_eq!(filtered.len(), 1);
+        assert_eq!(filtered[0].get("sales").unwrap(), "100");
+
+        looker.add_gauge_widget("g1", "Sales Target Gauge", 7500.0, 10000.0);
+        assert_eq!(looker.gauge_widgets[0].progress_percentage(), 75.0);
+
+        // 3. Docs Branching & Semantic Diff
+        let mut docs = SigmaDocsEnterpriseCollaborationEngine::new();
+        let base_text = "The quick brown fox jumps over the lazy dog";
+        docs.create_branch("feature/edit", "author_bob", "The quick blue fox jumps over lazy dog", 1);
+        let diff = docs.semantic_diff_branch("feature/edit", base_text).unwrap();
+        assert!(diff.contains("Branch 'feature/edit' diff"));
+
+        // 4. CRM Auto-Assignment & Escalation
+        let mut crm = SovereignEnterpriseCrmErpEngine::new();
+        crm.add_assignment_rule(10000.0, 100000.0, "senior_rep_alice");
+        crm.add_escalation_level(50000.0, "VP_Sales");
+        let deal_id = crm.create_deal("Enterprise Cloud Migration", "MegaCorp", 75000.0);
+        assert_eq!(crm.auto_assign_deal(deal_id), Some("senior_rep_alice".to_string()));
+        assert_eq!(crm.check_deal_escalation(deal_id), Some("VP_Sales".to_string()));
+
+        // 5. Helpdesk SLA Queue & Escalation
+        let mut helpdesk = SovereignHelpdeskSlaEngine::new();
+        helpdesk.create_queue("Tier-1 Support", Some("agent_john"));
+        let ticket_id = helpdesk.create_ticket("user@corp.com", "Server Outage", "Primary node down", TicketPriority::Urgent, 10000);
+        assert!(helpdesk.assign_ticket_to_queue(ticket_id, "Tier-1 Support"));
+        assert_eq!(helpdesk.escalate_ticket(ticket_id), 1);
+        assert!(helpdesk.get_remaining_sla_seconds(ticket_id, 10500).unwrap() > 0);
+
+        // 6. Inventory Warehouse Transfer & BOM Cost Rollup
+        let mut inventory = SovereignInventoryWarehouseEngine::new(ValuationMethod::Fifo);
+        inventory.add_sku(InventorySkuItem {
+            sku_id: "CHIP-01".to_string(),
+            name: "ARM Chip".to_string(),
+            warehouse_location: "Main Warehouse".to_string(),
+            quantity_on_hand: 100,
+            reorder_point: 10,
+            unit_cost: 15.0,
+        });
+        assert!(inventory.transfer_stock("CHIP-01", "Secondary Warehouse", 30));
+        assert_eq!(inventory.skus.get("CHIP-01").unwrap().warehouse_location, "Secondary Warehouse");
+
+        let mrp = SovereignManufacturingMrpEngine::new();
+        let bom = vec![("CHIP-01".to_string(), 4)];
+        let rolled_up_cost = mrp.calculate_bom_unit_cost(&bom, &inventory);
+        assert_eq!(rolled_up_cost, 60.0);
     }
 }
