@@ -5634,3 +5634,22 @@ Adapted from the Linux kernel tool-generated content guidance, SigmaOS establish
 5. **Make the Generated Code Prove Itself**:
    - Require 100% test pass rate via `./run_sigma_tests.sh`.
    - Turn edge cases (dash-heavy signals, white noise, null buffers) into repeatable unit/integration tests before accepting patches.
+
+
+## 135. SOVEREIGN LINUX & BSD WIKI ROADMAP ENGINES SPECIFICATION
+
+### 135.1 Overview & Subsystem Architecture
+SigmaOS absorbs strategic ZFS boot environment, APT mirror optimization, and Runit service supervision features inspired by FreeBSD, Debian, and Void Linux into zero-dependency Rust engines (`FreeBsdZfsBootenvEngine`, `DebianAptFastMirrorSelectorEngine`, and `VoidRunitServiceSupervisorEngine` in `src/wiki_unimplemented_ideas.rs`):
+
+1. **FreeBSD ZFS Boot Environments Engine (`FreeBsdZfsBootenvEngine`)**:
+   - Manages ZFS boot environment datasets (`zroot/ROOT/<be_name>`).
+   - Supports creating boot environments from active system snapshots.
+   - Allows switching default boot environment on next boot (`activate_bootenv`).
+
+2. **Debian APT Fast Mirror Selector Engine (`DebianAptFastMirrorSelectorEngine`)**:
+   - Latency and bandwidth benchmarking across repository mirror servers.
+   - Selects N fastest mirrors for parallel multi-segment downloads.
+
+3. **Void Runit Service Supervisor Engine (`VoidRunitServiceSupervisorEngine`)**:
+   - Models runit 3-stage init lifecycle (`Stage1OneTimeInit`, `Stage2ServiceSupervision`, `Stage3OneTimeShutdown`).
+   - Provides process supervision (`sv up`, `sv down`) and service state tracking.

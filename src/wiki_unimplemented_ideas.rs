@@ -77,6 +77,195 @@ impl SigmaOfficeSuiteEngine {
     }
 }
 
+// ============================================================================
+// 20. FREEBSD ZFS BOOTENV ENGINE (Inspired by FreeBSD beadm / bectl)
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct ZfsBootEnvironment {
+    pub name: String,
+    pub dataset_path: String,
+    pub is_active_now: bool,
+    pub is_active_on_reboot: bool,
+    pub space_used_mb: u64,
+    pub created_timestamp: u64,
+}
+
+pub struct FreeBsdZfsBootenvEngine {
+    pub zpool_name: String,
+    pub bootenvs: BTreeMap<String, ZfsBootEnvironment>,
+}
+
+impl FreeBsdZfsBootenvEngine {
+    pub fn new(zpool: &str) -> Self {
+        let mut bootenvs = BTreeMap::new();
+        let default_be = ZfsBootEnvironment {
+            name: String::from("default"),
+            dataset_path: format!("{}/ROOT/default", zpool),
+            is_active_now: true,
+            is_active_on_reboot: true,
+            space_used_mb: 2048,
+            created_timestamp: 1700000000,
+        };
+        bootenvs.insert(String::from("default"), default_be);
+
+        Self {
+            zpool_name: String::from(zpool),
+            bootenvs,
+        }
+    }
+
+    pub fn create_bootenv(&mut self, be_name: &str, source_snapshot: &str) -> bool {
+        if self.bootenvs.contains_key(be_name) {
+            return false;
+        }
+
+        let new_be = ZfsBootEnvironment {
+            name: String::from(be_name),
+            dataset_path: format!("{}/ROOT/{}", self.zpool_name, be_name),
+            is_active_now: false,
+            is_active_on_reboot: false,
+            space_used_mb: 128, // initial clone size
+            created_timestamp: 1700050000,
+        };
+
+        self.bootenvs.insert(String::from(be_name), new_be);
+        let _ = source_snapshot;
+        true
+    }
+
+    pub fn activate_bootenv(&mut self, be_name: &str) -> bool {
+        if !self.bootenvs.contains_key(be_name) {
+            return false;
+        }
+
+        for be in self.bootenvs.values_mut() {
+            be.is_active_on_reboot = be.name == be_name;
+        }
+
+        true
+    }
+}
+
+// ============================================================================
+// 21. DEBIAN APT FAST MIRROR SELECTOR ENGINE (Inspired by apt-fast / netselect-apt)
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct AptMirrorServer {
+    pub url: String,
+    pub region: String,
+    pub latency_ms: f32,
+    pub bandwidth_mbps: f32,
+}
+
+pub struct DebianAptFastMirrorSelectorEngine {
+    pub mirrors: Vec<AptMirrorServer>,
+    pub max_parallel_connections: u32,
+}
+
+impl DebianAptFastMirrorSelectorEngine {
+    pub fn new() -> Self {
+        Self {
+            mirrors: Vec::new(),
+            max_parallel_connections: 8,
+        }
+    }
+
+    pub fn add_mirror(&mut self, url: &str, region: &str, latency: f32, bw: f32) {
+        self.mirrors.push(AptMirrorServer {
+            url: String::from(url),
+            region: String::from(region),
+            latency_ms: latency,
+            bandwidth_mbps: bw,
+        });
+    }
+
+    pub fn select_fastest_mirrors(&mut self, count: usize) -> Vec<String> {
+        self.mirrors.sort_by(|a, b| a.latency_ms.partial_cmp(&b.latency_ms).unwrap_or(core::cmp::Ordering::Equal));
+        self.mirrors.iter().take(count).map(|m| m.url.clone()).collect()
+    }
+}
+
+impl Default for DebianAptFastMirrorSelectorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 22. VOID RUNIT SERVICE SUPERVISOR ENGINE (Inspired by Void Linux runit)
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RunitStage {
+    Stage1OneTimeInit,
+    Stage2ServiceSupervision,
+    Stage3OneTimeShutdown,
+}
+
+#[derive(Debug, Clone)]
+pub struct VoidRunitServiceSpec {
+    pub name: String,
+    pub run_script: String,
+    pub finish_script: String,
+    pub pid: Option<u32>,
+    pub is_enabled: bool,
+    pub is_active: bool,
+}
+
+pub struct VoidRunitServiceSupervisorEngine {
+    pub current_stage: RunitStage,
+    pub services: BTreeMap<String, VoidRunitServiceSpec>,
+}
+
+impl VoidRunitServiceSupervisorEngine {
+    pub fn new() -> Self {
+        Self {
+            current_stage: RunitStage::Stage2ServiceSupervision,
+            services: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_service(&mut self, name: &str, run_cmd: &str) {
+        let spec = VoidRunitServiceSpec {
+            name: String::from(name),
+            run_script: String::from(run_cmd),
+            finish_script: String::from("exit 0"),
+            pid: None,
+            is_enabled: true,
+            is_active: false,
+        };
+        self.services.insert(String::from(name), spec);
+    }
+
+    pub fn supervise_sv_up(&mut self, name: &str, pid: u32) -> bool {
+        if let Some(srv) = self.services.get_mut(name) {
+            srv.is_active = true;
+            srv.pid = Some(pid);
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn supervise_sv_down(&mut self, name: &str) -> bool {
+        if let Some(srv) = self.services.get_mut(name) {
+            srv.is_active = false;
+            srv.pid = None;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for VoidRunitServiceSupervisorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Default for SigmaOfficeSuiteEngine {
     fn default() -> Self {
         Self::new()
@@ -1119,5 +1308,26 @@ mod tests {
         let mut psu = HwbustersPsuEfficiencyTelemetryEngine::new(1000);
         assert!(psu.record_transient_load_spike(800.0, 18.0));
         assert_eq!(psu.calculate_cybenetics_rating(), "Cybenetics Titanium");
+
+        // Test FreeBSD ZFS Bootenv Engine
+        let mut zfs_be = FreeBsdZfsBootenvEngine::new("zroot");
+        assert!(zfs_be.create_bootenv("upgrade-2026", "zroot/ROOT/default@snap1"));
+        assert!(zfs_be.activate_bootenv("upgrade-2026"));
+        assert!(zfs_be.bootenvs.get("upgrade-2026").unwrap().is_active_on_reboot);
+
+        // Test Debian APT Fast Mirror Selector Engine
+        let mut apt_fast = DebianAptFastMirrorSelectorEngine::new();
+        apt_fast.add_mirror("https://deb.debian.org/debian", "US", 45.0, 1000.0);
+        apt_fast.add_mirror("https://mirror.fast.org/debian", "US", 12.0, 2500.0);
+        let fastest = apt_fast.select_fastest_mirrors(1);
+        assert_eq!(fastest[0], "https://mirror.fast.org/debian");
+
+        // Test Void Runit Service Supervisor Engine
+        let mut runit = VoidRunitServiceSupervisorEngine::new();
+        runit.register_service("dhcpcd", "dhcpcd -n");
+        assert!(runit.supervise_sv_up("dhcpcd", 4200));
+        assert!(runit.services.get("dhcpcd").unwrap().is_active);
+        assert!(runit.supervise_sv_down("dhcpcd"));
+        assert!(!runit.services.get("dhcpcd").unwrap().is_active);
     }
 }
