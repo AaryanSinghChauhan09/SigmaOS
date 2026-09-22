@@ -155,10 +155,31 @@ impl UniversalPackageTranslator {
 }
 
 fn debtor_to_sovereign_name(name: &str) -> &str {
-    if name.contains("ssl") {
+    let lower = name.to_lowercase();
+    let lower_trim = lower.trim();
+
+    if lower_trim.starts_with("libssl") || lower_trim.contains("openssl") || lower_trim == "gnutls" || lower_trim.starts_with("libcrypto") {
         "sovereign-openssl"
-    } else if name.contains("libc") {
+    } else if lower_trim == "libc6" || lower_trim == "glibc" || lower_trim == "musl" || lower_trim.starts_with("libc-") || lower_trim.ends_with("-libc") {
         "sovereign-libc"
+    } else if lower_trim == "systemd" || lower_trim == "openrc" || lower_trim.starts_with("systemd-") {
+        "sovereign-init-system"
+    } else if lower_trim == "dbus" || lower_trim == "polkit" || lower_trim == "udev" || lower_trim.starts_with("libdbus") {
+        "sovereign-system-bus"
+    } else if lower_trim == "wayland" || lower_trim == "xorg" || lower_trim == "mesa" || lower_trim == "vulkan-loader" {
+        "sovereign-graphics-stack"
+    } else if lower_trim.starts_with("gtk+") || lower_trim.starts_with("gtk3") || lower_trim.starts_with("gtk4") || lower_trim.starts_with("qt5-") || lower_trim.starts_with("qt6-") {
+        "sovereign-desktop-gui"
+    } else if lower_trim.starts_with("postgresql") || lower_trim.starts_with("mariadb") || lower_trim.starts_with("mysql-") || lower_trim == "sqlite3" {
+        "sovereign-database-engine"
+    } else if lower_trim == "docker" || lower_trim == "podman" || lower_trim == "containerd" || lower_trim == "runc" {
+        "sovereign-container-runtime"
+    } else if lower_trim == "gcc" || lower_trim == "clang" || lower_trim == "llvm" || lower_trim == "rustc" || lower_trim == "cargo" {
+        "sovereign-compiler-toolchain"
+    } else if lower_trim == "pipewire" || lower_trim == "pulseaudio" || lower_trim.starts_with("ffmpeg") || lower_trim == "alsa-lib" {
+        "sovereign-audio-media"
+    } else if lower_trim == "apparmor" || lower_trim == "selinux-policy" || lower_trim == "libpam0g" || lower_trim == "pam" {
+        "sovereign-security-policy"
     } else {
         name
     }
@@ -2988,6 +3009,17 @@ mod tests {
             UniversalPackageCommandBridge::translate_cli_command("pkg", "install", "git").unwrap(),
             "sigpkg install git.pkg"
         );
+    }
+
+    #[test]
+    fn test_debtor_to_sovereign_name_no_false_positives() {
+        assert_eq!(debtor_to_sovereign_name("spamassassin"), "spamassassin");
+        assert_eq!(debtor_to_sovereign_name("trust"), "trust");
+        assert_eq!(debtor_to_sovereign_name("salsa"), "salsa");
+        assert_eq!(debtor_to_sovereign_name("cloud-init"), "cloud-init");
+        assert_eq!(debtor_to_sovereign_name("libssl-dev"), "sovereign-openssl");
+        assert_eq!(debtor_to_sovereign_name("libc6"), "sovereign-libc");
+        assert_eq!(debtor_to_sovereign_name("systemd"), "sovereign-init-system");
     }
 
     #[test]

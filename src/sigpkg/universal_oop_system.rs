@@ -3357,6 +3357,33 @@ pub trait IPackageObserver: Send + Sync {
     fn on_event(&self, event: &PackageEvent);
 }
 
+/// Distro package change observer logging audit events across distro package synchronization
+pub struct DistroChangeObserver {
+    pub audit_log: Arc<std::sync::Mutex<Vec<String>>>,
+}
+
+impl DistroChangeObserver {
+    pub fn new() -> Self {
+        Self {
+            audit_log: Arc::new(std::sync::Mutex::new(Vec::new())),
+        }
+    }
+}
+
+impl Default for DistroChangeObserver {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl IPackageObserver for DistroChangeObserver {
+    fn on_event(&self, event: &PackageEvent) {
+        if let Ok(mut log) = self.audit_log.lock() {
+            log.push(format!("DistroPackageEvent: {:?}", event));
+        }
+    }
+}
+
 pub struct PackageEventManager {
     observers: Vec<Arc<dyn IPackageObserver>>,
 }
