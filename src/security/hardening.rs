@@ -283,12 +283,6 @@ impl Default for SecurityHardeningConfig {
     }
 }
 
-pub fn secure_zeroize(buffer: &mut [u8]) {
-    for byte in buffer.iter_mut() {
-        unsafe { core::ptr::write_volatile(byte, 0) };
-    }
-}
-
 #[derive(Debug, Clone)]
 pub struct AuditLogEntry {
     pub timestamp_ms: u64,

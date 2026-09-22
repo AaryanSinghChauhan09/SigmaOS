@@ -11,7 +11,7 @@ use alloc::vec::Vec;
 use alloc::string::String;
 use alloc::format;
 use core::sync::atomic::{AtomicU64, Ordering};
-use spin::Mutex;
+use std::sync::Mutex;
 
 /// Namespace types (Linux namespace.h)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -76,7 +76,7 @@ impl NamespaceId {
 #[derive(Debug, Clone)]
 pub struct Namespace {
     pub id: NamespaceId,
-    pub parent: Option<Arc<spin::Mutex<Namespace>>>,
+    pub parent: Option<Arc<Mutex<Namespace>>>,
     pub processes: Vec<u32>,
 }
 
@@ -89,7 +89,7 @@ impl Namespace {
         }
     }
 
-    pub fn with_parent(ns_type: NamespaceType, inode: u64, parent: Arc<spin::Mutex<Namespace>>) -> Self {
+    pub fn with_parent(ns_type: NamespaceType, inode: u64, parent: Arc<Mutex<Namespace>>) -> Self {
         Namespace {
             id: NamespaceId::new(ns_type, inode),
             parent: Some(parent),
@@ -112,7 +112,7 @@ impl Namespace {
 
 /// Namespace manager
 pub struct NamespaceManager {
-    namespaces: HashMap<NamespaceId, Arc<spin::Mutex<Namespace>>>,
+    namespaces: HashMap<NamespaceId, Arc<Mutex<Namespace>>>,
     next_inode: AtomicU64,
 }
 
@@ -125,7 +125,7 @@ impl NamespaceManager {
     }
 
     /// Create a new namespace
-    pub fn create_namespace(&mut self, ns_type: NamespaceType, parent: Option<Arc<spin::Mutex<Namespace>>>) -> Arc<spin::Mutex<Namespace>> {
+    pub fn create_namespace(&mut self, ns_type: NamespaceType, parent: Option<Arc<Mutex<Namespace>>>) -> Arc<Mutex<Namespace>> {
         let inode = self.next_inode.fetch_add(1, Ordering::SeqCst);
 
         let namespace = match parent {
@@ -133,14 +133,14 @@ impl NamespaceManager {
             None => Namespace::new(ns_type, inode),
         };
 
-        let ns = Arc::new(spin::Mutex::new(namespace));
-        let id = ns.lock().id.clone();
+        let ns = Arc::new(Mutex::new(namespace));
+        let id = ns.lock().unwrap().id.clone();
         self.namespaces.insert(id, ns.clone());
         ns
     }
 
     /// Get a namespace by ID
-    pub fn get_namespace(&self, id: &NamespaceId) -> Option<Arc<spin::Mutex<Namespace>>> {
+    pub fn get_namespace(&self, id: &NamespaceId) -> Option<Arc<Mutex<Namespace>>> {
         self.namespaces.get(id).cloned()
     }
 
@@ -149,7 +149,7 @@ impl NamespaceManager {
         let ns = self.namespaces.get(id)
             .ok_or_else(|| format!("Namespace not found: {:?}", id))?;
         
-        let ns_guard = ns.lock();
+        let ns_guard = ns.lock().unwrap();
         if ns_guard.process_count() > 0 {
             return Err(format!("Namespace has {} processes, cannot remove", ns_guard.process_count()));
         }
@@ -159,9 +159,9 @@ impl NamespaceManager {
     }
 
     /// Get all namespaces of a specific type
-    pub fn get_namespaces_by_type(&self, ns_type: NamespaceType) -> Vec<Arc<spin::Mutex<Namespace>>> {
+    pub fn get_namespaces_by_type(&self, ns_type: NamespaceType) -> Vec<Arc<Mutex<Namespace>>> {
         self.namespaces.values()
-            .filter(|ns| ns.lock().id.ns_type == ns_type)
+            .filter(|ns| ns.lock().unwrap().id.ns_type == ns_type)
             .cloned()
             .collect()
     }
@@ -209,7 +209,7 @@ mod tests {
 
     #[test]
     fn test_namespace_with_parent() {
-        let parent = Arc::new(spin::Mutex::new(Namespace::new(NamespaceType::Mount, 1)));
+        let parent = Arc::new(Mutex::new(Namespace::new(NamespaceType::Mount, 1)));
         let child = Namespace::with_parent(NamespaceType::Mount, 2, parent.clone());
         
         assert!(child.parent.is_some());
@@ -233,7 +233,7 @@ mod tests {
         let ns = manager.create_namespace(NamespaceType::Mount, None);
         assert_eq!(manager.namespace_count(), 1);
         
-        let ns_guard = ns.lock();
+        let ns_guard = ns.lock().unwrap();
         assert_eq!(ns_guard.id.inode, 1);
     }
 
@@ -252,7 +252,7 @@ mod tests {
         let mut manager = NamespaceManager::new();
         
         let ns = manager.create_namespace(NamespaceType::Mount, None);
-        let id = ns.lock().id.clone();
+        let id = ns.lock().unwrap().id.clone();
         
         manager.remove_namespace(&id).unwrap();
         assert_eq!(manager.namespace_count(), 0);
@@ -264,11 +264,11 @@ mod tests {
         
         let ns = manager.create_namespace(NamespaceType::Mount, None);
         {
-            let mut ns_guard = ns.lock();
+            let mut ns_guard = ns.lock().unwrap();
             ns_guard.add_process(100);
         }
         
-        let id = ns.lock().id.clone();
+        let id = ns.lock().unwrap().id.clone();
         let result = manager.remove_namespace(&id);
         
         assert!(result.is_err());

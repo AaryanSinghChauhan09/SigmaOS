@@ -7,7 +7,6 @@
 pub mod sigma_init;
 pub mod login;
 pub mod recovery_shell;
-pub mod service_supervisor;
 
 pub use sigma_init::{
     InitConfig, Service, ServiceState, SigmaInit,
@@ -17,7 +16,4 @@ pub use login::{
 };
 pub use recovery_shell::{
     RecoveryCommand, RecoveryShell,
-};
-pub use service_supervisor::{
-    ServiceDescriptor, ServiceSupervisor, RestartPolicy,
 };

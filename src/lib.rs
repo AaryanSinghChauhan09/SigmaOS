@@ -173,9 +173,6 @@ pub mod toolchain {
     pub mod codex;
 }
 pub mod scheduler;
-pub mod crypto {
-    pub mod vectorized_pqc;
-}
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -393,7 +390,6 @@ pub use tools::{
     UserIdentity as LibUserIdentity,
 };
 
-pub mod open_source_obsoletion;
 pub use open_source_obsoletion::*;
 
 pub use distro::missing_linux_bsd_components::*;

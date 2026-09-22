@@ -25,8 +25,10 @@ use core::marker::PhantomData;
 pub const KERNEL_ESCALATION_TOKEN: &str = "test_kernel_token_replace_in_production";
 pub const MASTER_ADMIN_TOKEN: &str = "test_admin_token_replace_in_production";
 
-static mut KERNEL_ESCALATION_TOKEN_RUNTIME: Option<[u8; 32]> = None;
-static mut MASTER_ADMIN_TOKEN_RUNTIME: Option<[u8; 32]> = None;
+use core::sync::atomic::{AtomicBool, Ordering};
+static TOKENS_INITIALIZED: AtomicBool = AtomicBool::new(false);
+static KERNEL_TOKEN_STORE: std::sync::Mutex<Option<[u8; 32]>> = std::sync::Mutex::new(None);
+static ADMIN_TOKEN_STORE: std::sync::Mutex<Option<[u8; 32]>> = std::sync::Mutex::new(None);
 
 /// User-level privilege marker
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -41,36 +43,52 @@ pub struct KernelLevel;
 pub struct SecurityAdminLevel;
 
 /// Initialize runtime security tokens (called at boot)
-/// In production, this generates cryptographically secure random tokens
-#[cfg(not(test))]
-pub unsafe fn initialize_security_tokens() {
-    // In real implementation, would use:
-    // - getrandom() syscall
-    // - Hardware RNG (RDRAND/RDSEED)
-    // - /dev/urandom
-    // For now, this is a placeholder that must be replaced
-    KERNEL_ESCALATION_TOKEN_RUNTIME = Some([0u8; 32]);
-    MASTER_ADMIN_TOKEN_RUNTIME = Some([0u8; 32]);
+pub fn initialize_security_tokens() {
+    if TOKENS_INITIALIZED.load(Ordering::SeqCst) {
+        return;
+    }
+    if let Ok(mut kern_guard) = KERNEL_TOKEN_STORE.lock() {
+        if let Ok(mut admin_guard) = ADMIN_TOKEN_STORE.lock() {
+            let kern_bytes = KERNEL_ESCALATION_TOKEN.as_bytes();
+            let admin_bytes = MASTER_ADMIN_TOKEN.as_bytes();
+
+            let mut kern_token = [0u8; 32];
+            let mut admin_token = [0u8; 32];
+
+            let kern_len = kern_bytes.len().min(32);
+            let admin_len = admin_bytes.len().min(32);
+
+            kern_token[..kern_len].copy_from_slice(&kern_bytes[..kern_len]);
+            admin_token[..admin_len].copy_from_slice(&admin_bytes[..admin_len]);
+
+            *kern_guard = Some(kern_token);
+            *admin_guard = Some(admin_token);
+            TOKENS_INITIALIZED.store(true, Ordering::SeqCst);
+        }
+    }
+}
+
+/// Constant-time comparison helper to prevent timing side-channel attacks
+fn constant_time_compare(a: &[u8], b: &[u8]) -> bool {
+    if a.len() != b.len() {
+        return false;
+    }
+    let mut result = 0u8;
+    for (&x, &y) in a.iter().zip(b.iter()) {
+        result |= x ^ y;
+    }
+    result == 0
 }
 
 /// Validate kernel escalation token (non-test)
 #[cfg(not(test))]
 fn validate_kernel_token(token: &[u8]) -> bool {
-    unsafe {
-        if let Some(ref valid_token) = KERNEL_ESCALATION_TOKEN_RUNTIME {
-            // Constant-time comparison to prevent timing attacks
-            if token.len() != valid_token.len() {
-                return false;
-            }
-            let mut result = 0u8;
-            for (a, b) in token.iter().zip(valid_token.iter()) {
-                result |= a ^ b;
-            }
-            result == 0
-        } else {
-            false
+    if let Ok(guard) = KERNEL_TOKEN_STORE.lock() {
+        if let Some(ref valid_token) = *guard {
+            return constant_time_compare(token, valid_token);
         }
     }
+    false
 }
 
 /// Validate kernel escalation token (test only)
