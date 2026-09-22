@@ -45,7 +45,7 @@ export class SovereignDomSelector {
 
 export function initKeyboardNavigation() {
   const interactiveElements = SovereignDomSelector.selectAll(
-    '[role="button"], [tab-index="0"]',
+    '[role="button"], [tabindex="0"], [tab-index="0"]',
   );
 
   interactiveElements.forEach((element) => {
@@ -171,6 +171,39 @@ export function safeDeepMerge(target, source) {
 }
 
 /**
+ * Initializes WAI-ARIA menu keyboard navigation (ArrowDown, ArrowUp, Home, End) for role="menu" containers.
+ */
+export function initMenuNavigation() {
+  const menus = SovereignDomSelector.selectAll('[role="menu"]');
+  menus.forEach((menu) => {
+    menu.addEventListener("keydown", (event) => {
+      const items = SovereignDomSelector.selectAll('[role="menuitem"]', menu).filter(
+        (item) => !item.disabled && item.offsetParent !== null,
+      );
+      if (items.length === 0) return;
+
+      const currentIndex = items.indexOf(document.activeElement);
+      let targetIndex = null;
+
+      if (event.key === "ArrowDown") {
+        targetIndex = currentIndex < 0 ? 0 : (currentIndex + 1) % items.length;
+      } else if (event.key === "ArrowUp") {
+        targetIndex = currentIndex < 0 ? items.length - 1 : (currentIndex - 1 + items.length) % items.length;
+      } else if (event.key === "Home") {
+        targetIndex = 0;
+      } else if (event.key === "End") {
+        targetIndex = items.length - 1;
+      }
+
+      if (targetIndex !== null) {
+        event.preventDefault();
+        items[targetIndex].focus();
+      }
+    });
+  });
+}
+
+/**
  * Initializes listeners for system high-contrast accessibility mode (WCAG 2.1 Level AA).
  * Responds to prefers-contrast: high and forced-colors: active media queries.
  */
@@ -271,6 +304,7 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
       initTablistNavigation();
       initToggleSwitches();
       initEscapeKeyDismissal();
+      initMenuNavigation();
     });
   } else {
     initKeyboardNavigation();
@@ -278,6 +312,7 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
     initTablistNavigation();
     initToggleSwitches();
     initEscapeKeyDismissal();
+    initMenuNavigation();
   }
 }
 
