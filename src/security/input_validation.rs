@@ -300,6 +300,7 @@ pub fn validate_command(cmd: &[u8]) -> Result<(), ValidationError> {
 /// Validate a textual IPv4 address (digits and dots, ≤ 15 bytes).
 /// Rejects leading zeros in multi-digit octets (e.g., `010.0.0.1`) to prevent
 /// octal parser differential and SSRF security bypass vulnerabilities.
+/// Rejects empty octets (e.g., `.1.2.3`, `1..2.3`, `1.2.3.`, `...`).
 pub fn validate_ipv4(addr: &[u8]) -> Result<(), ValidationError> {
     if addr.is_empty() {
         return Err(ValidationError::EmptyInput);
@@ -590,6 +591,12 @@ mod tests {
         assert_eq!(validate_ipv4(b"010.0.0.1"), Err(ValidationError::OutOfRange));
         assert_eq!(validate_ipv4(b"192.168.01.1"), Err(ValidationError::OutOfRange));
         assert_eq!(validate_ipv4(b"001.1.1.1"), Err(ValidationError::OutOfRange));
+
+        // Reject empty octets (leading, trailing, consecutive dots)
+        assert_eq!(validate_ipv4(b".192.168.1.1"), Err(ValidationError::OutOfRange));
+        assert_eq!(validate_ipv4(b"192..168.1.1"), Err(ValidationError::OutOfRange));
+        assert_eq!(validate_ipv4(b"192.168.1.1."), Err(ValidationError::OutOfRange));
+        assert_eq!(validate_ipv4(b"..."), Err(ValidationError::OutOfRange));
     }
 
     #[test]
