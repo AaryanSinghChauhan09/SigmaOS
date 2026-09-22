@@ -9,3 +9,7 @@
 ## 2026-09-25 - ARIA Switch Role & State Synchronization for Custom Toggle Controls
 **Learning:** Custom UI toggle switches using `<input type="checkbox">` elements (e.g., inside `.toggle-switch` wrappers in Zenith Desktop settings) are exposed to assistive technology as standard checkboxes unless annotated with `role="switch"` and dynamically synchronized `aria-checked` ("true"/"false") attributes on `change` events to comply with WAI-ARIA switch patterns.
 **Action:** Always assign `role="switch"` and attach change event listeners to synchronize `aria-checked` whenever introducing custom toggle controls in Zenith Desktop.
+
+## 2026-10-01 - Standard `tabindex` Selector & WAI-ARIA Menu Navigation
+**Learning:** Query selectors for interactive focusable elements must target standard `[tabindex="0"]` (avoiding typos like `[tab-index="0"]`) to ensure keyboard listeners and focus indicators attach reliably, and `role="menu"` components require Arrow key (`ArrowDown`/`ArrowUp`) and `Home`/`End` listeners for WCAG 2.1 menu keyboard navigation.
+**Action:** Always include `[tabindex="0"]` in DOM query selectors for interactive controls and register `initMenuNavigation()` for `role="menu"` containers.
