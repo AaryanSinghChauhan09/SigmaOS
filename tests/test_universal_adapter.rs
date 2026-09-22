@@ -315,16 +315,8 @@ fn test_all_prompt_package_formats() {
         Some(PackageFormat::Starling)
     );
     assert_eq!(
-        adapter.detect_format_by_extension("cachy.cachyos"),
-        Some(PackageFormat::Pacman)
-    );
-    assert_eq!(
         adapter.detect_format_by_extension("clearlinux.swupd"),
         Some(PackageFormat::Swupd)
-    );
-    assert_eq!(
-        adapter.detect_format_by_extension("starling.starling"),
-        Some(PackageFormat::Starling)
     );
     assert_eq!(
         adapter.detect_format_by_extension("cachy.cachyos"),

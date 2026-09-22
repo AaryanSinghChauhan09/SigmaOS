@@ -19,7 +19,7 @@ use std::vec::Vec;
 #[cfg(not(feature = "standalone_test"))]
 use crate::package::AptDebManifest;
 #[cfg(not(feature = "standalone_test"))]
-use crate::sigpkg::{Dependency, Package, VersionConstraint};
+use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 #[cfg(not(feature = "standalone_test"))]
 pub use crate::sigpkg::universal_engine::PackageFormat;
 #[cfg(not(feature = "standalone_test"))]
@@ -55,79 +55,9 @@ pub enum Permission {
 }
 
 #[cfg(feature = "standalone_test")]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct Version {
-    pub major: u64,
-    pub minor: u64,
-    pub patch: u64,
-}
-
+pub use crate::universal_engine::PackageFormat;
 #[cfg(feature = "standalone_test")]
-impl core::fmt::Display for Version {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
-    }
-}
-
-#[cfg(feature = "standalone_test")]
-impl Version {
-    pub fn new(major: u64, minor: u64, patch: u64) -> Self {
-        Self { major, minor, patch }
-    }
-    pub fn parse(v: &str) -> Result<Self, &'static str> {
-        let clean = v.split('-').next().unwrap_or(v);
-        let mut parts = clean.split('.');
-        let major = parts.next().unwrap_or("0").chars().filter(|c| c.is_ascii_digit()).collect::<String>().parse().unwrap_or(1);
-        let minor = parts.next().unwrap_or("0").chars().filter(|c| c.is_ascii_digit()).collect::<String>().parse().unwrap_or(0);
-        let patch = parts.next().unwrap_or("0").chars().filter(|c| c.is_ascii_digit()).collect::<String>().parse().unwrap_or(0);
-        Ok(Self::new(major, minor, patch))
-    }
-}
-
-#[cfg(feature = "standalone_test")]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum VersionConstraint {
-    Exact(Version),
-    GreaterThan(Version),
-    LessThan(Version),
-    GreaterOrEqual(Version),
-    LessOrEqual(Version),
-    Any,
-}
-
-#[cfg(feature = "standalone_test")]
-#[derive(Debug, Clone)]
-pub struct Dependency {
-    pub name: String,
-    pub version_constraint: VersionConstraint,
-}
-
-#[cfg(feature = "standalone_test")]
-#[derive(Debug, Clone)]
-pub struct Package {
-    pub name: String,
-    pub version: Version,
-    pub description: String,
-    pub dependencies: Vec<Dependency>,
-    pub checksum: String,
-}
-
-#[cfg(feature = "standalone_test")]
-impl Package {
-    pub fn new(name: String, version: Version, description: String, dependencies: Vec<Dependency>, checksum: String) -> Self {
-        Self { name, version, description, dependencies, checksum }
-    }
-}
-
-#[cfg(feature = "standalone_test")]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum PackageFormat {
-    Apt, Yum, Pacman, Apk, Pkg, Xbps, Zypper, Portage, Flatpak, Snap, AppImage, Pisi, Nix, Guix,
-    Hpkg, SlackBuild, Pkgsrc, Moss, Tcz, Gobo, Ostree, Air, Bottle, Ipa, Ports, Aab, Hap, Superdeb,
-    Lzm, Pup, Pet, Tar, TarGz, TarXz, AppBundle, Puk, Dmg, Cports, Dports, Ipk, Opkg, SolarisIps,
-    GuixNar, NarInfo, OpenBsdPkg, Swupd, Stratum, Crux, Drpm, Sfs, Wheel, Crate, Gem, Nupkg, Vcpkg,
-    Spack, Conan, Sigma, Sysupdate, Starling, Sovereign, Eopkg,
-}
+pub use crate::universal_oop_system::{Dependency, Package, Version, VersionConstraint};
 
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone)]
@@ -2222,50 +2152,6 @@ impl UniversalPmCommandDispatcher {
                         if !arg.starts_with('-') && *arg != "install" && *arg != "add" && *arg != "delete" && *arg != "remove" && *arg != "upgrade" {
                             target_packages.push(arg.to_string());
                         }
-                    }
-                }
-            }
-            "xbps" | "xbps-install" | "xbps-remove" | "xbps-query" | "void" => {
-                if pm == "xbps-remove" {
-                    operation = UniversalPmOperation::Remove;
-                } else if pm == "xbps-query" {
-                    operation = UniversalPmOperation::QueryInfo;
-                } else {
-                    let mut i = 0;
-                    while i < args.len() {
-                        match args[i] {
-                            "install" | "add" => operation = UniversalPmOperation::Install,
-                            "remove" | "purge" => operation = UniversalPmOperation::Remove,
-                            "upgrade" | "update" => operation = UniversalPmOperation::Upgrade,
-                            "search" => operation = UniversalPmOperation::Search,
-                            "info" | "query" => operation = UniversalPmOperation::QueryInfo,
-                            "-n" | "--dry-run" => dry_run = true,
-                            arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
-                            _ => {}
-                        }
-                        i += 1;
-                    }
-                }
-                for arg in args {
-                    if *arg == "-n" || *arg == "--dry-run" {
-                        dry_run = true;
-                    } else if !arg.starts_with('-') && target_packages.is_empty() && *arg != "install" && *arg != "remove" && *arg != "upgrade" {
-                        target_packages.push(arg.to_string());
-                    }
-                }
-            }
-            "emerge" | "ebuild" | "gentoo" | "portage" => {
-                let mut i = 0;
-                while i < args.len() {
-                    match args[i] {
-                        "install" | "add" => operation = UniversalPmOperation::Install,
-                        "delete" | "remove" => operation = UniversalPmOperation::Remove,
-                        "upgrade" => operation = UniversalPmOperation::Upgrade,
-                        "search" => operation = UniversalPmOperation::Search,
-                        "info" => operation = UniversalPmOperation::QueryInfo,
-                        "-n" => dry_run = true,
-                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
-                        _ => {}
                     }
                 }
             }
