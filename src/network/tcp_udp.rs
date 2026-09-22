@@ -465,6 +465,172 @@ impl NetfilterFirewall {
     }
 }
 
+#[repr(C)]
+pub struct CubicCongestionControl {
+    pub cwnd: AtomicUsize,
+    pub w_max: AtomicUsize,
+}
+
+impl Default for CubicCongestionControl {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl CubicCongestionControl {
+    pub fn new() -> Self {
+        Self {
+            cwnd: AtomicUsize::new(10),
+            w_max: AtomicUsize::new(10),
+        }
+    }
+}
+
+impl CongestionControl for CubicCongestionControl {
+    fn update_cwnd(&mut self, _acked: usize) {
+        let cwnd = self.cwnd.load(Ordering::SeqCst);
+        self.cwnd.store(cwnd + 1, Ordering::SeqCst);
+    }
+
+    fn on_loss(&mut self) {
+        let cwnd = self.cwnd.load(Ordering::SeqCst);
+        self.w_max.store(cwnd, Ordering::SeqCst);
+        self.cwnd.store(cwnd / 2, Ordering::SeqCst);
+    }
+
+    fn get_cwnd(&self) -> usize {
+        self.cwnd.load(Ordering::SeqCst)
+    }
+}
+
+pub struct NewRenoSackCongestionControl {
+    pub cwnd: AtomicUsize,
+    pub sack_blocks: Vec<(u32, u32)>,
+    pub in_fast_recovery: bool,
+}
+
+impl Default for NewRenoSackCongestionControl {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl NewRenoSackCongestionControl {
+    pub fn new() -> Self {
+        Self {
+            cwnd: AtomicUsize::new(10),
+            sack_blocks: Vec::new(),
+            in_fast_recovery: false,
+        }
+    }
+
+    pub fn process_sack(&mut self, left: u32, right: u32) {
+        self.sack_blocks.push((left, right));
+    }
+
+    pub fn enter_fast_recovery(&mut self) {
+        self.in_fast_recovery = true;
+    }
+
+    pub fn exit_fast_recovery(&mut self) {
+        self.in_fast_recovery = false;
+        self.sack_blocks.clear();
+    }
+}
+
+impl CongestionControl for NewRenoSackCongestionControl {
+    fn update_cwnd(&mut self, _acked: usize) {
+        let cwnd = self.cwnd.load(Ordering::SeqCst);
+        self.cwnd.store(cwnd + 1, Ordering::SeqCst);
+    }
+
+    fn on_loss(&mut self) {
+        let cwnd = self.cwnd.load(Ordering::SeqCst);
+        self.cwnd.store(cwnd / 2, Ordering::SeqCst);
+    }
+
+    fn get_cwnd(&self) -> usize {
+        self.cwnd.load(Ordering::SeqCst)
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TcpOption {
+    Mss(u16),
+    WindowScale(u8),
+    SackPermitted,
+}
+
+pub struct TcpOptionParser;
+
+impl TcpOptionParser {
+    pub fn parse(data: &[u8]) -> Vec<TcpOption> {
+        let mut options = Vec::new();
+        let mut i = 0;
+        while i < data.len() {
+            let kind = data[i];
+            if kind == 0 {
+                break;
+            } else if kind == 1 {
+                i += 1;
+            } else if kind == 2 && i + 3 < data.len() {
+                let mss = ((data[i + 2] as u16) << 8) | (data[i + 3] as u16);
+                options.push(TcpOption::Mss(mss));
+                i += 4;
+            } else if kind == 3 && i + 2 < data.len() {
+                options.push(TcpOption::WindowScale(data[i + 2]));
+                i += 3;
+            } else if kind == 4 && i + 1 < data.len() {
+                options.push(TcpOption::SackPermitted);
+                i += 2;
+            } else {
+                i += 1;
+            }
+        }
+        options
+    }
+}
+
+pub struct UdpChecksumEngine;
+
+impl UdpChecksumEngine {
+    pub fn compute_checksum(src: [u8; 4], dst: [u8; 4], src_port: u16, dst_port: u16, payload: &[u8]) -> u16 {
+        let mut sum: u32 = 0;
+        for chunk in src.chunks(2) {
+            sum += ((chunk[0] as u32) << 8) | (chunk[1] as u32);
+        }
+        for chunk in dst.chunks(2) {
+            sum += ((chunk[0] as u32) << 8) | (chunk[1] as u32);
+        }
+        sum += 17; // UDP protocol number
+        sum += (8 + payload.len()) as u32; // UDP length
+        sum += src_port as u32;
+        sum += dst_port as u32;
+        sum += (8 + payload.len()) as u32;
+
+        for chunk in payload.chunks(2) {
+            let word = if chunk.len() == 2 {
+                ((chunk[0] as u32) << 8) | (chunk[1] as u32)
+            } else {
+                (chunk[0] as u32) << 8
+            };
+            sum += word;
+        }
+
+        while (sum >> 16) != 0 {
+            sum = (sum & 0xFFFF) + (sum >> 16);
+        }
+
+        let csum = !(sum as u16);
+        if csum == 0 { 0xFFFF } else { csum }
+    }
+
+    pub fn verify_checksum(src: [u8; 4], dst: [u8; 4], src_port: u16, dst_port: u16, payload: &[u8], expected: u16) -> bool {
+        let computed = Self::compute_checksum(src, dst, src_port, dst_port, payload);
+        computed == expected
+    }
+}
+
 pub trait ZeroCopy {
     fn zero_copy_send(&mut self, data: &[u8]) -> Result<usize, NetworkError>;
     fn zero_copy_recv(&mut self, buffer: &mut [u8]) -> Result<usize, NetworkError>;
