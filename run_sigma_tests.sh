@@ -255,3 +255,10 @@ if [ -f "src/tools/tech_media_extended_suite.rs" ]; then
     rustc --test --edition=2021 src/tools/tech_media_extended_suite.rs -o build/tech_media_ext_suite_test
     ./build/tech_media_ext_suite_test
 fi
+
+if [ -f "src/wiki_distro_ideas_deployment.rs" ]; then
+    echo "Running Sovereign Wiki Distro Ideas Deployment test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/wiki_distro_ideas_deployment.rs -o build/test_wiki_distro_ideas
+    ./build/test_wiki_distro_ideas
+fi
