@@ -90,7 +90,7 @@ impl Dataset {
         if self.dataset_type == DatasetType::Snapshot {
             return Err("Cannot create snapshot of snapshot".to_string());
         }
-        
+
         let full_snapshot_name = format!("{}@{}", self.name, snapshot_name);
         self.snapshots.push(full_snapshot_name.clone());
         Ok(())
@@ -145,7 +145,7 @@ impl Pool {
         let full_name = format!("{}/{}", self.name, name);
         let dataset = Dataset::new(full_name.clone(), DatasetType::Filesystem)
             .with_parent(self.name.clone());
-        
+
         self.datasets.insert(full_name, dataset);
         Ok(())
     }
@@ -155,14 +155,14 @@ impl Pool {
         let full_name = format!("{}/{}", self.name, name);
         let mut dataset = Dataset::new(full_name.clone(), DatasetType::Volume)
             .with_parent(self.name.clone());
-        
+
         dataset.available = size;
         dataset.referenced = size;
-        
+
         self.datasets.insert(full_name, dataset);
         self.allocated += size;
         self.free = self.size - self.allocated;
-        
+
         Ok(())
     }
 
@@ -275,7 +275,7 @@ impl ZfsManager {
     pub fn create_filesystem(&mut self, pool_name: &str, fs_name: String) -> Result<(), String> {
         let pool = self.pools.get_mut(pool_name)
             .ok_or_else(|| format!("Pool not found: {}", pool_name))?;
-        
+
         pool.create_filesystem(fs_name)
     }
 
@@ -287,7 +287,7 @@ impl ZfsManager {
                 return dataset.create_snapshot(snapshot_name);
             }
         }
-        
+
         Err(format!("Dataset not found: {}", dataset_name))
     }
 
@@ -319,13 +319,13 @@ impl ZfsManager {
     pub fn receive_snapshot(&mut self, pool_name: &str, snapshot_name: String) -> Result<(), String> {
         let pool = self.pools.get_mut(pool_name)
             .ok_or_else(|| format!("Pool not found: {}", pool_name))?;
-        
+
         // In real implementation, would receive blocks and create dataset
         // For now, just create a placeholder dataset
         let dataset_name = format!("{}@{}", pool_name, snapshot_name);
         let dataset = Dataset::new(dataset_name.clone(), DatasetType::Snapshot)
             .with_parent(pool_name.to_string());
-        
+
         pool.datasets.insert(dataset_name, dataset);
         Ok(())
     }
@@ -333,7 +333,7 @@ impl ZfsManager {
     /// List all snapshots
     pub fn list_snapshots(&self) -> Vec<String> {
         let mut snapshots = Vec::new();
-        
+
         for pool in self.pools.values() {
             for dataset in pool.datasets.values() {
                 for snapshot in &dataset.snapshots {
@@ -341,7 +341,7 @@ impl ZfsManager {
                 }
             }
         }
-        
+
         snapshots
     }
 }
@@ -359,19 +359,19 @@ mod tests {
     #[test]
     fn test_pool_creation() {
         let mut manager = ZfsManager::new();
-        
+
         manager.create_pool("tank".to_string(), vec!["/dev/sda".to_string()], 1024 * 1024 * 1024).unwrap();
-        
+
         assert!(manager.get_pool("tank").is_some());
     }
 
     #[test]
     fn test_filesystem_creation() {
         let mut manager = ZfsManager::new();
-        
+
         manager.create_pool("tank".to_string(), vec!["/dev/sda".to_string()], 1024 * 1024 * 1024).unwrap();
         manager.create_filesystem("tank", "data".to_string()).unwrap();
-        
+
         let pool = manager.get_pool("tank").unwrap();
         assert!(pool.get_dataset("tank/data").is_some());
     }
@@ -379,12 +379,12 @@ mod tests {
     #[test]
     fn test_volume_creation() {
         let mut manager = ZfsManager::new();
-        
+
         manager.create_pool("tank".to_string(), vec!["/dev/sda".to_string()], 1024 * 1024 * 1024).unwrap();
-        
+
         let pool = manager.get_pool_mut("tank").unwrap();
         pool.create_volume("vol1".to_string(), 100 * 1024 * 1024).unwrap();
-        
+
         assert!(pool.get_dataset("tank/vol1").is_some());
         assert_eq!(pool.allocated, 100 * 1024 * 1024);
     }
@@ -392,12 +392,12 @@ mod tests {
     #[test]
     fn test_snapshot_creation() {
         let mut manager = ZfsManager::new();
-        
+
         manager.create_pool("tank".to_string(), vec!["/dev/sda".to_string()], 1024 * 1024 * 1024).unwrap();
         manager.create_filesystem("tank", "data".to_string()).unwrap();
-        
+
         manager.create_snapshot("tank/data", "snap1".to_string()).unwrap();
-        
+
         let pool = manager.get_pool("tank").unwrap();
         let dataset = pool.get_dataset("tank/data").unwrap();
         assert_eq!(dataset.snapshots.len(), 1);
@@ -406,11 +406,11 @@ mod tests {
     #[test]
     fn test_snapshot_of_snapshot() {
         let mut manager = ZfsManager::new();
-        
+
         manager.create_pool("tank".to_string(), vec!["/dev/sda".to_string()], 1024 * 1024 * 1024).unwrap();
         manager.create_filesystem("tank", "data".to_string()).unwrap();
         manager.create_snapshot("tank/data", "snap1".to_string()).unwrap();
-        
+
         // Try to create snapshot of the snapshot (which should fail)
         let result = manager.create_snapshot("tank/data@snap1", "snap2".to_string());
         assert!(result.is_err());
@@ -419,13 +419,13 @@ mod tests {
     #[test]
     fn test_pool_scrub() {
         let mut manager = ZfsManager::new();
-        
+
         manager.create_pool("tank".to_string(), vec!["/dev/sda".to_string()], 1024 * 1024 * 1024).unwrap();
         manager.create_filesystem("tank", "data".to_string()).unwrap();
-        
+
         let pool = manager.get_pool_mut("tank").unwrap();
         let result = pool.scrub().unwrap();
-        
+
         assert_eq!(result.errors_found, 0);
         assert!(!result.data_corrupted);
     }
@@ -433,10 +433,10 @@ mod tests {
     #[test]
     fn test_list_pools() {
         let mut manager = ZfsManager::new();
-        
+
         manager.create_pool("tank".to_string(), vec!["/dev/sda".to_string()], 1024 * 1024 * 1024).unwrap();
         manager.create_pool("backup".to_string(), vec!["/dev/sdb".to_string()], 1024 * 1024 * 1024).unwrap();
-        
+
         let pools = manager.list_pools();
         assert_eq!(pools.len(), 2);
     }
@@ -444,22 +444,22 @@ mod tests {
     #[test]
     fn test_destroy_pool() {
         let mut manager = ZfsManager::new();
-        
+
         manager.create_pool("tank".to_string(), vec!["/dev/sda".to_string()], 1024 * 1024 * 1024).unwrap();
         manager.destroy_pool("tank").unwrap();
-        
+
         assert!(manager.get_pool("tank").is_none());
     }
 
     #[test]
     fn test_pool_status() {
         let mut manager = ZfsManager::new();
-        
+
         manager.create_pool("tank".to_string(), vec!["/dev/sda".to_string()], 1024 * 1024 * 1024).unwrap();
-        
+
         let pool = manager.get_pool("tank").unwrap();
         let status = pool.get_status();
-        
+
         assert_eq!(status.name, "tank");
         assert_eq!(status.size, 1024 * 1024 * 1024);
         assert_eq!(status.allocated, 0);
@@ -469,18 +469,18 @@ mod tests {
     #[test]
     fn test_dataset_properties() {
         let mut manager = ZfsManager::new();
-        
+
         manager.create_pool("tank".to_string(), vec!["/dev/sda".to_string()], 1024 * 1024 * 1024).unwrap();
-        
+
         let pool = manager.get_pool_mut("tank").unwrap();
         let mut props = DatasetProperties::default();
         props.compression = ZfsCompressionType::Gzip;
         props.recordsize = 256 * 1024;
-        
+
         pool.create_filesystem("data".to_string()).unwrap();
         let dataset = pool.get_dataset_mut("tank/data").unwrap();
         dataset.properties = props;
-        
+
         assert_eq!(dataset.properties.compression, ZfsCompressionType::Gzip);
         assert_eq!(dataset.properties.recordsize, 256 * 1024);
     }

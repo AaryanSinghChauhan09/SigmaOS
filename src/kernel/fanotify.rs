@@ -160,10 +160,10 @@ impl FanotifyManager {
     pub fn report_event(&self, watch_id: u64, event: FanotifyEvent) -> Result<(), String> {
         let watch = self.watches.get(&watch_id)
             .ok_or_else(|| format!("Watch not found: {}", watch_id))?;
-        
+
         let mut watch_guard = watch.lock().unwrap();
         watch_guard.add_event(event);
-        
+
         Ok(())
     }
 
@@ -171,7 +171,7 @@ impl FanotifyManager {
     pub fn get_events(&self, watch_id: u64) -> Result<Vec<FanotifyEvent>, String> {
         let watch = self.watches.get(&watch_id)
             .ok_or_else(|| format!("Watch not found: {}", watch_id))?;
-        
+
         let watch_guard = watch.lock().unwrap();
         Ok(watch_guard.get_events().to_vec())
     }
@@ -180,10 +180,10 @@ impl FanotifyManager {
     pub fn clear_events(&self, watch_id: u64) -> Result<(), String> {
         let watch = self.watches.get(&watch_id)
             .ok_or_else(|| format!("Watch not found: {}", watch_id))?;
-        
+
         let mut watch_guard = watch.lock().unwrap();
         watch_guard.clear_events();
-        
+
         Ok(())
     }
 
@@ -233,7 +233,7 @@ mod tests {
     fn test_fanotify_event_creation() {
         let mask = FanotifyEventMask::new().with_access();
         let event = FanotifyEvent::new(mask, 100, 3, "/test/path".to_string());
-        
+
         assert_eq!(event.pid, 100);
         assert_eq!(event.path, "/test/path");
     }
@@ -242,7 +242,7 @@ mod tests {
     fn test_fanotify_watch_creation() {
         let mask = FanotifyEventMask::new().with_access();
         let watch = FanotifyWatch::new(1, "/test/path".to_string(), mask);
-        
+
         assert_eq!(watch.id(), 1);
         assert_eq!(watch.path(), "/test/path");
         assert_eq!(watch.event_count(), 0);
@@ -253,7 +253,7 @@ mod tests {
         let mask = FanotifyEventMask::new().with_access();
         let mut watch = FanotifyWatch::new(1, "/test/path".to_string(), mask);
         let event = FanotifyEvent::new(mask, 100, 3, "/test/path".to_string());
-        
+
         watch.add_event(event);
         assert_eq!(watch.event_count(), 1);
     }
@@ -263,7 +263,7 @@ mod tests {
         let mask = FanotifyEventMask::new().with_access();
         let mut watch = FanotifyWatch::new(1, "/test/path".to_string(), mask);
         let event = FanotifyEvent::new(mask, 100, 3, "/test/path".to_string());
-        
+
         watch.add_event(event);
         watch.clear_events();
         assert_eq!(watch.event_count(), 0);
@@ -280,7 +280,7 @@ mod tests {
         let mut manager = FanotifyManager::new();
         let mask = FanotifyEventMask::new().with_access();
         let id = manager.create_watch("/test/path".to_string(), mask);
-        
+
         assert_eq!(id, 1);
         assert_eq!(manager.watch_count(), 1);
     }
@@ -290,7 +290,7 @@ mod tests {
         let mut manager = FanotifyManager::new();
         let mask = FanotifyEventMask::new().with_access();
         let watch_id = manager.create_watch("/test/path".to_string(), mask);
-        
+
         let event = FanotifyEvent::new(mask, 100, 3, "/test/path".to_string());
         assert!(manager.report_event(watch_id, event).is_ok());
     }
@@ -300,10 +300,10 @@ mod tests {
         let mut manager = FanotifyManager::new();
         let mask = FanotifyEventMask::new().with_access();
         let watch_id = manager.create_watch("/test/path".to_string(), mask);
-        
+
         let event = FanotifyEvent::new(mask, 100, 3, "/test/path".to_string());
         manager.report_event(watch_id, event).unwrap();
-        
+
         let events = manager.get_events(watch_id).unwrap();
         assert_eq!(events.len(), 1);
     }
@@ -313,10 +313,10 @@ mod tests {
         let mut manager = FanotifyManager::new();
         let mask = FanotifyEventMask::new().with_access();
         let watch_id = manager.create_watch("/test/path".to_string(), mask);
-        
+
         let event = FanotifyEvent::new(mask, 100, 3, "/test/path".to_string());
         manager.report_event(watch_id, event).unwrap();
-        
+
         assert!(manager.clear_events(watch_id).is_ok());
     }
 
@@ -325,7 +325,7 @@ mod tests {
         let mut manager = FanotifyManager::new();
         let mask = FanotifyEventMask::new().with_access();
         let watch_id = manager.create_watch("/test/path".to_string(), mask);
-        
+
         assert!(manager.remove_watch(watch_id).is_ok());
         assert_eq!(manager.watch_count(), 0);
     }

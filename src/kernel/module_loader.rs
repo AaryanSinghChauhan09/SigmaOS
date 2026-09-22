@@ -200,7 +200,7 @@ mod tests {
     #[test]
     fn test_load_module() {
         let mut loader = ModuleLoader::new();
-        
+
         let metadata = ModuleMetadata {
             name: "test_module".to_string(),
             version: "1.0.0".to_string(),
@@ -210,7 +210,7 @@ mod tests {
             dependencies: Vec::new(),
             symbols: vec!["test_symbol".to_string()],
         };
-        
+
         let id = loader.load_module(metadata).unwrap();
         assert!(loader.get_module(id).is_ok());
     }
@@ -218,7 +218,7 @@ mod tests {
     #[test]
     fn test_unload_module() {
         let mut loader = ModuleLoader::new();
-        
+
         let metadata = ModuleMetadata {
             name: "test_module".to_string(),
             version: "1.0.0".to_string(),
@@ -228,7 +228,7 @@ mod tests {
             dependencies: Vec::new(),
             symbols: vec!["test_symbol".to_string()],
         };
-        
+
         let id = loader.load_module(metadata).unwrap();
         loader.unload_module(id).unwrap();
         assert!(loader.get_module(id).is_err());
@@ -237,7 +237,7 @@ mod tests {
     #[test]
     fn test_resolve_symbol() {
         let mut loader = ModuleLoader::new();
-        
+
         let metadata = ModuleMetadata {
             name: "test_module".to_string(),
             version: "1.0.0".to_string(),
@@ -247,7 +247,7 @@ mod tests {
             dependencies: Vec::new(),
             symbols: vec!["test_symbol".to_string()],
         };
-        
+
         loader.load_module(metadata).unwrap();
         let addr = loader.resolve_symbol("test_symbol").unwrap();
         assert!(addr > 0);
@@ -256,7 +256,7 @@ mod tests {
     #[test]
     fn test_module_dependencies() {
         let mut loader = ModuleLoader::new();
-        
+
         let dep_metadata = ModuleMetadata {
             name: "dep_module".to_string(),
             version: "1.0.0".to_string(),
@@ -266,9 +266,9 @@ mod tests {
             dependencies: Vec::new(),
             symbols: vec!["dep_symbol".to_string()],
         };
-        
+
         loader.load_module(dep_metadata).unwrap();
-        
+
         let metadata = ModuleMetadata {
             name: "test_module".to_string(),
             version: "1.0.0".to_string(),
@@ -281,7 +281,7 @@ mod tests {
             }],
             symbols: vec!["test_symbol".to_string()],
         };
-        
+
         let id = loader.load_module(metadata).unwrap();
         let module = loader.get_module(id).unwrap();
         let module = module.lock().unwrap();

@@ -366,7 +366,7 @@ mod tests {
     fn test_socket_send() {
         let mut socket = Socket::new(1, SocketDomain::IPv4, SocketType::Stream, SocketProtocol::TCP);
         socket.connect("192.168.1.1".to_string(), 80).unwrap();
-        
+
         let data = b"Hello";
         let sent = socket.send(data).unwrap();
         assert_eq!(sent, data.len());

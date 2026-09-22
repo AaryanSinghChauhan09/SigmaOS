@@ -28,7 +28,7 @@ pub enum InotifyEventType {
 impl InotifyEventType {
     pub fn from_bits(bits: u32) -> Vec<Self> {
         let mut events = Vec::new();
-        
+
         if bits & (InotifyEventType::Access as u32) != 0 {
             events.push(InotifyEventType::Access);
         }
@@ -77,7 +77,7 @@ impl InotifyEventType {
         if bits & (InotifyEventType::Oneshot as u32) != 0 {
             events.push(InotifyEventType::Oneshot);
         }
-        
+
         events
     }
 }
@@ -210,7 +210,7 @@ mod tests {
     fn test_inotify_event_type_from_bits() {
         let bits = (InotifyEventType::Modify as u32) | (InotifyEventType::Create as u32);
         let events = InotifyEventType::from_bits(bits);
-        
+
         assert_eq!(events.len(), 2);
         assert!(events.contains(&InotifyEventType::Modify));
         assert!(events.contains(&InotifyEventType::Create));
@@ -219,7 +219,7 @@ mod tests {
     #[test]
     fn test_watch_descriptor() {
         let wd = WatchDescriptor::new(1, PathBuf::from("/tmp"), 0xffffffff);
-        
+
         assert_eq!(wd.wd, 1);
         assert_eq!(wd.path, PathBuf::from("/tmp"));
     }
@@ -227,7 +227,7 @@ mod tests {
     #[test]
     fn test_inotify_add_watch() {
         let mut inotify = Inotify::new();
-        
+
         let wd = inotify.add_watch(PathBuf::from("/tmp"), 0xffffffff).unwrap();
         assert_eq!(wd, 1);
         assert_eq!(inotify.watch_count(), 1);
@@ -236,10 +236,10 @@ mod tests {
     #[test]
     fn test_inotify_remove_watch() {
         let mut inotify = Inotify::new();
-        
+
         let wd = inotify.add_watch(PathBuf::from("/tmp"), 0xffffffff).unwrap();
         inotify.remove_watch(wd).unwrap();
-        
+
         assert_eq!(inotify.watch_count(), 0);
     }
 
@@ -252,7 +252,7 @@ mod tests {
             "test.txt".to_string(),
             PathBuf::from("/tmp"),
         );
-        
+
         assert!(event.has_event_type(InotifyEventType::Modify));
         assert!(!event.has_event_type(InotifyEventType::Delete));
     }
@@ -260,7 +260,7 @@ mod tests {
     #[test]
     fn test_inotify_read_events() {
         let mut inotify = Inotify::new();
-        
+
         let event = InotifyEvent::new(
             1,
             InotifyEventType::Create as u32,
@@ -269,7 +269,7 @@ mod tests {
             PathBuf::from("/tmp"),
         );
         inotify.add_event(event);
-        
+
         let events = inotify.read_events();
         assert_eq!(events.len(), 1);
         assert!(events[0].has_event_type(InotifyEventType::Create));

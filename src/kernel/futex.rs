@@ -138,11 +138,11 @@ impl FutexManager {
     pub fn wait(&mut self, address: u64, _expected_value: u32, pid: u32, flags: FutexFlags) -> Result<(), String> {
         // In a real implementation, this would check the actual memory value
         // For now, we just add the waiter to the queue
-        
+
         let queue = self.queues.entry(address).or_insert_with(|| FutexQueue::new(address));
         let waiter = Arc::new(FutexWaiter::new(address, pid, flags));
         queue.add_waiter(waiter);
-        
+
         Ok(())
     }
 
@@ -150,7 +150,7 @@ impl FutexManager {
     pub fn wake(&mut self, address: u64, max_waiters: usize) -> Result<usize, String> {
         let queue = self.queues.get_mut(&address)
             .ok_or_else(|| format!("No waiters on address: {}", address))?;
-        
+
         let mut woken_count = 0;
         for _ in 0..max_waiters {
             if queue.wake_one().is_some() {
@@ -159,14 +159,14 @@ impl FutexManager {
                 break;
             }
         }
-        
+
         queue.remove_woken();
-        
+
         // Remove empty queue
         if queue.waiter_count() == 0 {
             self.queues.remove(&address);
         }
-        
+
         Ok(woken_count)
     }
 
@@ -174,17 +174,17 @@ impl FutexManager {
     pub fn wake_all(&mut self, address: u64) -> Result<usize, String> {
         let queue = self.queues.get_mut(&address)
             .ok_or_else(|| format!("No waiters on address: {}", address))?;
-        
+
         let woken = queue.wake_all();
         let woken_count = woken.len();
-        
+
         queue.remove_woken();
-        
+
         // Remove empty queue
         if queue.waiter_count() == 0 {
             self.queues.remove(&address);
         }
-        
+
         Ok(woken_count)
     }
 
@@ -194,10 +194,10 @@ impl FutexManager {
         let to_requeue_pids = {
             let src_queue = self.queues.get(&src_address)
                 .ok_or_else(|| format!("No waiters on source address: {}", src_address))?;
-            
+
             let mut pids = Vec::new();
             let mut count = 0;
-            
+
             for waiter in &src_queue.waiters {
                 if count < max_waiters && !waiter.woken.load(Ordering::SeqCst) {
                     pids.push(waiter.pid);
@@ -206,26 +206,26 @@ impl FutexManager {
             }
             pids
         };
-        
+
         let requeued_count = to_requeue_pids.len();
-        
+
         // Remove from source
         if let Some(src_queue) = self.queues.get_mut(&src_address) {
             src_queue.waiters.retain(|w| !to_requeue_pids.contains(&w.pid));
-            
+
             // Clean up empty source queue
             if src_queue.waiter_count() == 0 {
                 self.queues.remove(&src_address);
             }
         }
-        
+
         // Add to destination
         let dst_queue = self.queues.entry(dst_address).or_insert_with(|| FutexQueue::new(dst_address));
         for pid in to_requeue_pids {
             let new_waiter = Arc::new(FutexWaiter::new(dst_address, pid, FutexFlags::new()));
             dst_queue.add_waiter(new_waiter);
         }
-        
+
         Ok(requeued_count)
     }
 
@@ -305,7 +305,7 @@ mod tests {
         let mut queue = FutexQueue::new(0x1000);
         let waiter = Arc::new(FutexWaiter::new(0x1000, 1, FutexFlags::new()));
         queue.add_waiter(waiter.clone());
-        
+
         let woken = queue.wake_one();
         assert!(woken.is_some());
         assert_eq!(queue.waiter_count(), 1);
@@ -318,7 +318,7 @@ mod tests {
         let waiter2 = Arc::new(FutexWaiter::new(0x1000, 2, FutexFlags::new()));
         queue.add_waiter(waiter1);
         queue.add_waiter(waiter2);
-        
+
         let woken = queue.wake_all();
         assert_eq!(woken.len(), 2);
     }
@@ -340,7 +340,7 @@ mod tests {
     fn test_futex_manager_wake() {
         let mut manager = FutexManager::new();
         manager.wait(0x1000, 42, 1, FutexFlags::new()).unwrap();
-        
+
         let woken = manager.wake(0x1000, 1).unwrap();
         assert_eq!(woken, 1);
     }
@@ -350,7 +350,7 @@ mod tests {
         let mut manager = FutexManager::new();
         manager.wait(0x1000, 42, 1, FutexFlags::new()).unwrap();
         manager.wait(0x1000, 42, 2, FutexFlags::new()).unwrap();
-        
+
         let woken = manager.wake_all(0x1000).unwrap();
         assert_eq!(woken, 2);
     }
@@ -360,7 +360,7 @@ mod tests {
         let mut manager = FutexManager::new();
         manager.wait(0x1000, 42, 1, FutexFlags::new()).unwrap();
         manager.wait(0x1000, 42, 2, FutexFlags::new()).unwrap();
-        
+
         let requeued = manager.requeue(0x1000, 0x2000, 1).unwrap();
         assert_eq!(requeued, 1);
         assert_eq!(manager.waiter_count(0x1000), 1);

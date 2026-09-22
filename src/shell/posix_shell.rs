@@ -402,13 +402,13 @@ mod tests {
     #[test]
     fn test_shell_var_management() {
         let mut shell = PosixShell::new();
-        
+
         shell.set_var("TEST".to_string(), "value".to_string(), false);
         assert_eq!(shell.get_var("TEST"), Some("value".to_string()));
-        
+
         shell.export_var("TEST");
         assert!(shell.env_vars.get("TEST").unwrap().exported);
-        
+
         shell.unset_var("TEST");
         assert_eq!(shell.get_var("TEST"), None);
     }
@@ -416,10 +416,10 @@ mod tests {
     #[test]
     fn test_shell_alias_management() {
         let mut shell = PosixShell::new();
-        
+
         shell.set_alias("ll".to_string(), "ls -la".to_string());
         assert_eq!(shell.get_alias("ll"), Some("ls -la".to_string()));
-        
+
         shell.unset_alias("ll");
         assert_eq!(shell.get_alias("ll"), None);
     }
@@ -427,9 +427,9 @@ mod tests {
     #[test]
     fn test_shell_cd() {
         let mut shell = PosixShell::new();
-        
+
         assert_eq!(shell.pwd(), "/");
-        
+
         // Test that cd initializes with correct directory
         // Note: Actual path navigation depends on filesystem state
     }
@@ -437,15 +437,15 @@ mod tests {
     #[test]
     fn test_shell_builtins() {
         let mut shell = PosixShell::new();
-        
+
         // Test echo
         let result = shell.execute_builtin(ShellBuiltin::Echo, &["hello".to_string(), "world".to_string()]);
         assert_eq!(result.unwrap(), "hello world");
-        
+
         // Test true
         let result = shell.execute_builtin(ShellBuiltin::True, &[]);
         assert!(result.is_ok());
-        
+
         // Test false
         let result = shell.execute_builtin(ShellBuiltin::False, &[]);
         assert!(result.is_err());
@@ -454,7 +454,7 @@ mod tests {
     #[test]
     fn test_shell_export() {
         let mut shell = PosixShell::new();
-        
+
         shell.execute_builtin(ShellBuiltin::Export, &["TEST=value".to_string()]).unwrap();
         assert_eq!(shell.get_var("TEST"), Some("value".to_string()));
         assert!(shell.env_vars.get("TEST").unwrap().exported);
@@ -463,10 +463,10 @@ mod tests {
     #[test]
     fn test_shell_unset() {
         let mut shell = PosixShell::new();
-        
+
         shell.set_var("TEST".to_string(), "value".to_string(), true);
         assert_eq!(shell.get_var("TEST"), Some("value".to_string()));
-        
+
         shell.execute_builtin(ShellBuiltin::Unset, &["TEST".to_string()]).unwrap();
         assert_eq!(shell.get_var("TEST"), None);
     }
@@ -474,10 +474,10 @@ mod tests {
     #[test]
     fn test_shell_history() {
         let mut shell = PosixShell::new();
-        
+
         shell.add_history("ls -la".to_string());
         shell.add_history("cd /tmp".to_string());
-        
+
         let history = shell.get_history();
         assert_eq!(history.len(), 2);
         assert_eq!(history[0].command, "ls -la");
@@ -487,7 +487,7 @@ mod tests {
     #[test]
     fn test_shell_traps() {
         let mut shell = PosixShell::new();
-        
+
         shell.set_trap(2, "cleanup".to_string());
         assert_eq!(shell.get_trap(2), Some(&"cleanup".to_string()));
     }
@@ -495,12 +495,12 @@ mod tests {
     #[test]
     fn test_shell_options() {
         let mut shell = PosixShell::new();
-        
+
         assert!(!shell.get_option("errexit"));
-        
+
         shell.set_option("errexit", true);
         assert!(shell.get_option("errexit"));
-        
+
         shell.set_option("errexit", false);
         assert!(!shell.get_option("errexit"));
     }
@@ -508,7 +508,7 @@ mod tests {
     #[test]
     fn test_shell_initial_env() {
         let shell = PosixShell::new();
-        
+
         assert!(shell.get_var("PATH").is_some());
         assert!(shell.get_var("HOME").is_some());
         assert!(shell.get_var("USER").is_some());

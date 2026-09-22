@@ -112,7 +112,7 @@ pub struct TimeManager {
 impl TimeManager {
     pub fn new() -> Self {
         let mut timezones = HashMap::new();
-        
+
         // Common timezones
         timezones.insert("UTC".to_string(), Timezone::new("UTC".to_string(), 0));
         timezones.insert("America/New_York".to_string(), Timezone::new("EST".to_string(), -300));

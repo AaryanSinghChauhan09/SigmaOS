@@ -245,13 +245,13 @@ pub fn pthread_key_create(
     _destructor: Option<fn(*mut ())>,
 ) -> Result<(), String> {
     static NEXT_KEY: AtomicU32 = AtomicU32::new(1);
-    
+
     let key_value = NEXT_KEY.fetch_add(1, Ordering::SeqCst);
-    
+
     unsafe {
         *key = PthreadKey::new(key_value);
     }
-    
+
     // In real implementation, would store destructor
     Ok(())
 }
@@ -306,7 +306,7 @@ impl PthreadBarrier {
 
     pub fn wait(&self) -> Result<(), String> {
         let mut guard = self.mutex.lock().map_err(|e| format!("pthread_barrier_wait: {}", e))?;
-        
+
         if self.count.fetch_sub(1, Ordering::SeqCst) == 1 {
             // Last thread to reach barrier
             self.count.store(self.count.load(Ordering::SeqCst) + 1, Ordering::SeqCst);
@@ -316,7 +316,7 @@ impl PthreadBarrier {
                 guard = self.cond.wait(guard).map_err(|e| format!("pthread_barrier_wait: {}", e))?;
             }
         }
-        
+
         Ok(())
     }
 }

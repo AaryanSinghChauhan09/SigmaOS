@@ -198,7 +198,7 @@ impl SeccompManager {
     pub fn check_syscall(&self, pid: u32, syscall: i32, args: &[u64]) -> Result<SeccompOperation, String> {
         let filter = self.process_filters.get(&pid)
             .ok_or_else(|| format!("Process not found: {}", pid))?;
-        
+
         let filter_guard = filter.lock().unwrap();
         Ok(filter_guard.check_syscall(syscall, args))
     }

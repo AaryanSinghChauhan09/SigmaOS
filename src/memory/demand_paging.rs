@@ -431,13 +431,13 @@ mod tests {
     #[test]
     fn test_lru_page_replacer() {
         let mut lru = LruPageReplacer::new();
-        
+
         lru.record_access(1);
         lru.record_access(2);
         lru.record_access(3);
-        
+
         assert_eq!(lru.get_lru(), Some(1));
-        
+
         lru.record_access(1);
         assert_eq!(lru.get_lru(), Some(2));
     }
@@ -445,11 +445,11 @@ mod tests {
     #[test]
     fn test_swap_device() {
         let mut swap = SwapDevice::new(PathBuf::from("/swapfile"), 100);
-        
+
         assert_eq!(swap.allocate_slot(), Some(0));
         assert_eq!(swap.allocate_slot(), Some(1));
         assert_eq!(swap.used_slots, 2);
-        
+
         swap.free_slot(0);
         assert_eq!(swap.used_slots, 1);
     }
@@ -457,9 +457,9 @@ mod tests {
     #[test]
     fn test_demand_paging_allocate() {
         let mut dpm = DemandPagingManager::new(10);
-        
+
         dpm.allocate_page(0x1000).unwrap();
-        
+
         let stats = dpm.get_memory_stats();
         assert_eq!(stats.present_pages, 1);
         assert_eq!(stats.free_pages, 9);
@@ -468,10 +468,10 @@ mod tests {
     #[test]
     fn test_demand_paging_fault_handling() {
         let mut dpm = DemandPagingManager::new(10);
-        
+
         // Handle page fault for new page
         dpm.handle_page_fault(0x1000, PageFaultError::User).unwrap();
-        
+
         let entry = dpm.get_page_table_entry(0x1000);
         assert!(entry.is_some());
         assert!(entry.unwrap().flags.present);
@@ -481,18 +481,18 @@ mod tests {
     fn test_demand_paging_with_swap() {
         let mut dpm = DemandPagingManager::new(2);
         dpm.configure_swap(PathBuf::from("/swapfile"), 100);
-        
+
         // Fill physical memory
         dpm.allocate_page(0x1000).unwrap();
         dpm.allocate_page(0x2000).unwrap();
-        
+
         let stats = dpm.get_memory_stats();
         assert_eq!(stats.present_pages, 2);
         assert_eq!(stats.free_pages, 0);
-        
+
         // Allocate another page - should trigger eviction
         dpm.allocate_page(0x3000).unwrap();
-        
+
         let stats = dpm.get_memory_stats();
         assert_eq!(stats.present_pages, 2);
         assert_eq!(stats.swapped_pages, 1);

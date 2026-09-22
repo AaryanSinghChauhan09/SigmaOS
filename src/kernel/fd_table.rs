@@ -121,7 +121,7 @@ impl FdTable {
     /// Duplicate a file descriptor
     pub fn dup(&mut self, old_fd: i32) -> Result<i32, String> {
         let entry = self.entries.get(&old_fd).ok_or_else(|| format!("File descriptor {} not found", old_fd))?.clone();
-        
+
         let new_fd = self.next_fd;
         self.next_fd += 1;
 
@@ -134,7 +134,7 @@ impl FdTable {
     /// Duplicate a file descriptor to a specific fd
     pub fn dup2(&mut self, old_fd: i32, new_fd: i32) -> Result<i32, String> {
         let entry = self.entries.get(&old_fd).ok_or_else(|| format!("File descriptor {} not found", old_fd))?.clone();
-        
+
         // Close the new_fd if it exists
         if self.entries.contains_key(&new_fd) {
             self.entries.remove(&new_fd);

@@ -381,10 +381,10 @@ mod tests {
     fn test_ebpf_verifier() {
         let verifier = EbpfVerifier::new();
         let mut program = EbpfProgram::new(EbpfProgramType::SocketFilter);
-        
+
         // Add a simple instruction
         program.add_insn(EbpfInsn::new(0x07, 0, 0, 0, 42));
-        
+
         assert!(verifier.verify(&program).is_ok());
     }
 
@@ -392,10 +392,10 @@ mod tests {
     fn test_ebpf_verifier_invalid_register() {
         let verifier = EbpfVerifier::new();
         let mut program = EbpfProgram::new(EbpfProgramType::SocketFilter);
-        
+
         // Add instruction with invalid register
         program.add_insn(EbpfInsn::new(0x07, 11, 0, 0, 42));
-        
+
         assert!(verifier.verify(&program).is_err());
     }
 
@@ -403,9 +403,9 @@ mod tests {
     fn test_ebpf_vm_execute() {
         let mut vm = EbpfVm::new();
         let mut program = EbpfProgram::new(EbpfProgramType::SocketFilter);
-        
+
         program.add_insn(EbpfInsn::new(0x07, 0, 0, 0, 42));
-        
+
         let result = vm.execute(&program).unwrap();
         assert_eq!(result, 42);
     }

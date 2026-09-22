@@ -62,28 +62,28 @@ impl Sysfs {
     fn create_standard_structure(&mut self) {
         // /sys/devices
         self.create_entry("/sys/devices".to_string(), SysfsEntryType::Directory, "".to_string());
-        
+
         // /sys/kernel
         self.create_entry("/sys/kernel".to_string(), SysfsEntryType::Directory, "".to_string());
         self.create_entry("/sys/kernel/version".to_string(), SysfsEntryType::File, "SigmaOS 1.0.0".to_string());
         self.create_entry("/sys/kernel/hostname".to_string(), SysfsEntryType::File, "sigmaos".to_string());
-        
+
         // /sys/module
         self.create_entry("/sys/module".to_string(), SysfsEntryType::Directory, "".to_string());
-        
+
         // /sys/fs
         self.create_entry("/sys/fs".to_string(), SysfsEntryType::Directory, "".to_string());
         self.create_entry("/sys/fs/cgroup".to_string(), SysfsEntryType::Directory, "".to_string());
         self.create_entry("/sys/fs/proc".to_string(), SysfsEntryType::Directory, "".to_string());
-        
+
         // /sys/class
         self.create_entry("/sys/class".to_string(), SysfsEntryType::Directory, "".to_string());
         self.create_entry("/sys/class/net".to_string(), SysfsEntryType::Directory, "".to_string());
         self.create_entry("/sys/class/block".to_string(), SysfsEntryType::Directory, "".to_string());
-        
+
         // /sys/block
         self.create_entry("/sys/block".to_string(), SysfsEntryType::Directory, "".to_string());
-        
+
         // /sys/bus
         self.create_entry("/sys/bus".to_string(), SysfsEntryType::Directory, "".to_string());
         self.create_entry("/sys/bus/pci".to_string(), SysfsEntryType::Directory, "".to_string());
@@ -96,9 +96,9 @@ impl Sysfs {
             entry_type,
             value,
         )));
-        
+
         self.entries.insert(path.clone(), entry.clone());
-        
+
         // Add to parent directory
         if let Some(parent_path) = Self::parent_path(&path) {
             if let Some(parent) = self.entries.get_mut(&parent_path) {
@@ -106,7 +106,7 @@ impl Sysfs {
                 parent_guard.add_child(path.clone());
             }
         }
-        
+
         entry
     }
 
@@ -117,24 +117,24 @@ impl Sysfs {
     pub fn read_entry(&self, path: &str) -> Result<String, String> {
         let entry = self.entries.get(path)
             .ok_or_else(|| format!("Entry not found: {}", path))?;
-        
+
         let entry_guard = entry.lock().unwrap();
         if entry_guard.entry_type != SysfsEntryType::File {
             return Err("Not a file".to_string());
         }
-        
+
         Ok(entry_guard.value.clone())
     }
 
     pub fn write_entry(&self, path: &str, value: String) -> Result<(), String> {
         let entry = self.entries.get(path)
             .ok_or_else(|| format!("Entry not found: {}", path))?;
-        
+
         let mut entry_guard = entry.lock().unwrap();
         if entry_guard.entry_type != SysfsEntryType::File {
             return Err("Not a file".to_string());
         }
-        
+
         entry_guard.value = value;
         Ok(())
     }
@@ -142,12 +142,12 @@ impl Sysfs {
     pub fn list_directory(&self, path: &str) -> Result<Vec<String>, String> {
         let entry = self.entries.get(path)
             .ok_or_else(|| format!("Entry not found: {}", path))?;
-        
+
         let entry_guard = entry.lock().unwrap();
         if entry_guard.entry_type != SysfsEntryType::Directory {
             return Err("Not a directory".to_string());
         }
-        
+
         Ok(entry_guard.children.clone())
     }
 
@@ -155,7 +155,7 @@ impl Sysfs {
         if path == "/" || !path.contains('/') {
             return None;
         }
-        
+
         let last_slash = path.rfind('/');
         if let Some(pos) = last_slash {
             if pos == 0 {
@@ -193,7 +193,7 @@ mod tests {
     fn test_sysfs_create_entry() {
         let mut sysfs = Sysfs::new();
         let entry = sysfs.create_entry("/sys/test".to_string(), SysfsEntryType::File, "test_value".to_string());
-        
+
         let entry_guard = entry.lock().unwrap();
         assert_eq!(entry_guard.value, "test_value");
     }
@@ -216,7 +216,7 @@ mod tests {
     fn test_sysfs_write_entry() {
         let sysfs = Sysfs::new();
         sysfs.write_entry("/sys/kernel/hostname", "newhostname".to_string()).unwrap();
-        
+
         let value = sysfs.read_entry("/sys/kernel/hostname").unwrap();
         assert_eq!(value, "newhostname");
     }
@@ -240,10 +240,10 @@ mod tests {
         let mut sysfs = Sysfs::new();
         let mut entry = SysfsEntry::new("test".to_string(), SysfsEntryType::File, "test".to_string());
         entry.permissions = 0o755;
-        
+
         let entry_arc = Arc::new(Mutex::new(entry));
         sysfs.entries.insert("/sys/test".to_string(), entry_arc.clone());
-        
+
         let entry_guard = entry_arc.lock().unwrap();
         assert_eq!(entry_guard.permissions, 0o755);
     }

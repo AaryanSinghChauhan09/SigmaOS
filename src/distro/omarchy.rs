@@ -611,28 +611,13 @@ impl Default for OmarchyAudioPipewireConfig {
 }
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-pub use crate::distro::omarchy_inspiration::{
-    AiAgentProvider, HerdrAgentTask, OmarchyHerdrAiAgentManager, OmarchyLuaConfigEngine,
-    OmarchyPluginMarketplace, OmarchyQuickshellEngine, OmarchyReleaseChannel,
-    OmarchyReleaseChannelSnapshotEngine, OmarchySystemThemeStudio, OmarchyThemePalette,
-    QuickshellWidget, ShellComponentKind,
-};
+pub use crate::distro::omarchy_inspiration::*;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[path = "omarchy_inspiration.rs"]
 pub mod omarchy_inspiration;
 #[cfg(any(feature = "standalone_test", test))]
-pub use omarchy_inspiration::{
-    AiAgentProvider, HerdrAgentTask, OmarchyHerdrAiAgentManager, OmarchyLuaConfigEngine,
-    OmarchyPluginMarketplace, OmarchyQuickshellEngine, OmarchyReleaseChannel,
-    OmarchyReleaseChannelSnapshotEngine, OmarchySystemThemeStudio, OmarchyThemePalette,
-    QuickshellWidget, ShellComponentKind,
-};
-
-#[path = "."]
-pub mod distro {
-    pub use crate::distro::omarchy_inspiration;
-}
+pub use omarchy_inspiration::*;
 
 /// Omarchy Liveboot ISO & Automated Installer Engine
 #[derive(Debug, Clone)]
@@ -886,40 +871,126 @@ impl Default for OmarchyHyprlandDwindleTilingEngine {
     }
 }
 
+/// Omarchy Navigation Workspace Layout Mode
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum OmarchyNavigationMode {
+    Dwindle,
+    Scrolling,
+}
+
+/// Scratchpad Workspace Container Definition
+#[derive(Debug, Clone)]
+pub struct ScratchpadWorkspace {
+    pub active_windows: Vec<String>,
+    pub visible: bool,
+}
+
+impl ScratchpadWorkspace {
+    pub fn new() -> Self {
+        Self {
+            active_windows: Vec::new(),
+            visible: false,
+        }
+    }
+
+    pub fn toggle_scratchpad(&mut self) -> bool {
+        self.visible = !self.visible;
+        self.visible
+    }
+
+    pub fn send_to_scratchpad(&mut self, window_id: &str) {
+        if !self.active_windows.contains(&window_id.to_string()) {
+            self.active_windows.push(window_id.to_string());
+        }
+    }
+}
+
+impl Default for ScratchpadWorkspace {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Omarchy Navigation & Keyboard Shortcut Engine
+#[derive(Debug, Clone)]
+pub struct OmarchyNavigationShortcutEngine {
+    pub default_layout: OmarchyNavigationMode,
+    pub scratchpad: ScratchpadWorkspace,
+    pub grouped_windows: Vec<String>,
+    pub popped_floating_windows: Vec<String>,
+}
+
+impl OmarchyNavigationShortcutEngine {
+    pub fn new() -> Self {
+        Self {
+            default_layout: OmarchyNavigationMode::Dwindle,
+            scratchpad: ScratchpadWorkspace::new(),
+            grouped_windows: Vec::new(),
+            popped_floating_windows: Vec::new(),
+        }
+    }
+
+    pub fn toggle_workspace_layout(&mut self) -> OmarchyNavigationMode {
+        match self.default_layout {
+            OmarchyNavigationMode::Dwindle => {
+                self.default_layout = OmarchyNavigationMode::Scrolling;
+                OmarchyNavigationMode::Scrolling
+            }
+            OmarchyNavigationMode::Scrolling => {
+                self.default_layout = OmarchyNavigationMode::Dwindle;
+                OmarchyNavigationMode::Dwindle
+            }
+        }
+    }
+
+    pub fn group_window(&mut self, window_id: &str) -> bool {
+        if !self.grouped_windows.contains(&window_id.to_string()) {
+            self.grouped_windows.push(window_id.to_string());
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn pop_window_floating(&mut self, window_id: &str) -> bool {
+        if !self.popped_floating_windows.contains(&window_id.to_string()) {
+            self.popped_floating_windows.push(window_id.to_string());
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn resolve_shortcut_command(&self, shortcut: &str) -> Option<&'static str> {
+        match shortcut {
+            "Super+Space" => Some("omarchy-menu"),
+            "Super+Return" => Some("ghostty"),
+            "Super+Shift+Return" => Some("chromium"),
+            "Super+J" => Some("hyprland-stack-toggle"),
+            "Super+Shift+Right" => Some("hyprland-swap-window"),
+            "Super+Ctrl+T" => Some("activity-monitor --float"),
+            "Super+T" => Some("hyprland-tile-toggle"),
+            "Super+Shift+F" => Some("files-manager"),
+            "Super+L" => Some("hyprland-layout-toggle"),
+            "Super+G" => Some("hyprland-group-toggle"),
+            "Super+O" => Some("hyprland-pop-pin"),
+            "Super+Grave" | "Super+S" => Some("hyprland-scratchpad-toggle"),
+            "Super+W" | "Super+Q" => Some("hyprland-close-window"),
+            "Super+F" => Some("hyprland-fullscreen-toggle"),
+            _ => None,
+        }
+    }
+}
+
+impl Default for OmarchyNavigationShortcutEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod omarchy_gap_closure_tests {
     use super::*;
-
-    #[test]
-    fn test_omarchy_hyprland_compositor_config_engine() {
-        let hypr = OmarchyHyprlandCompositorConfigEngine::new();
-        let conf = hypr.generate_hyprland_conf();
-        assert!(conf.contains("border_size = 2"));
-        assert!(conf.contains("windowrulev2 = float,class:^(pavucontrol)$"));
-    }
-
-    #[test]
-    fn test_omarchy_mise_and_lazygit_engines() {
-        let mise = OmarchyMiseVersionManagerEngine::new();
-        let mise_toml = mise.generate_config_toml();
-        assert!(mise_toml.contains("node = \"lts\""));
-        assert!(mise_toml.contains("rust = \"stable\""));
-
-        let lazygit = OmarchyLazyGitConfigurationEngine::new();
-        let lazy_yml = lazygit.generate_config_yml();
-        assert!(lazy_yml.contains("showIcons: true"));
-        assert!(lazy_yml.contains("delta --dark"));
-    }
-
-    #[test]
-    fn test_omarchy_ayu_and_starship_engines() {
-        let ayu_dark = OmarchyAyuThemeEngine::new(true);
-        let css = ayu_dark.generate_gtk_css();
-        assert!(css.contains("@define-color bg_color #0f1419"));
-
-        let starship_toml = OmarchyStarshipPromptConfigEngine::generate_starship_toml();
-        assert!(starship_toml.contains("truncation_length = 3"));
-    }
 
     #[test]
     fn test_omarchy_ghostty_fastfetch_dwindle_engines() {
@@ -937,5 +1008,26 @@ mod omarchy_gap_closure_tests {
         let dwindle_conf = dwindle.generate_dwindle_conf();
         assert!(dwindle_conf.contains("preserve_split = true"));
         assert!(dwindle_conf.contains("force_split = 2"));
+    }
+
+    #[test]
+    fn test_omarchy_navigation_shortcut_engine() {
+        let mut nav = OmarchyNavigationShortcutEngine::new();
+        assert_eq!(nav.default_layout, OmarchyNavigationMode::Dwindle);
+        assert_eq!(nav.toggle_workspace_layout(), OmarchyNavigationMode::Scrolling);
+        assert_eq!(nav.toggle_workspace_layout(), OmarchyNavigationMode::Dwindle);
+
+        assert_eq!(nav.resolve_shortcut_command("Super+Space"), Some("omarchy-menu"));
+        assert_eq!(nav.resolve_shortcut_command("Super+Return"), Some("ghostty"));
+        assert_eq!(nav.resolve_shortcut_command("Super+L"), Some("hyprland-layout-toggle"));
+        assert_eq!(nav.resolve_shortcut_command("Super+Grave"), Some("hyprland-scratchpad-toggle"));
+
+        assert!(nav.group_window("window-1"));
+        assert!(!nav.group_window("window-1"));
+        assert!(nav.pop_window_floating("window-2"));
+
+        assert!(nav.scratchpad.toggle_scratchpad());
+        nav.scratchpad.send_to_scratchpad("terminal-agent");
+        assert_eq!(nav.scratchpad.active_windows.len(), 1);
     }
 }

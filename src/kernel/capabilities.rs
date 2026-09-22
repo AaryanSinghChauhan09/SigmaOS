@@ -175,7 +175,7 @@ impl CapabilityManager {
     pub fn grant(&self, pid: u32, cap: Capability) -> Result<(), String> {
         let caps = self.process_capabilities.get(&pid)
             .ok_or_else(|| format!("Process not found: {}", pid))?;
-        
+
         let mut caps_guard = caps.lock().unwrap();
         caps_guard.add_permitted(cap);
         caps_guard.add_effective(cap);
@@ -186,7 +186,7 @@ impl CapabilityManager {
     pub fn revoke(&self, pid: u32, cap: Capability) -> Result<(), String> {
         let caps = self.process_capabilities.get(&pid)
             .ok_or_else(|| format!("Process not found: {}", pid))?;
-        
+
         let mut caps_guard = caps.lock().unwrap();
         caps_guard.remove_effective(cap);
         Ok(())
@@ -234,7 +234,7 @@ mod tests {
         let mut capset = CapabilitySet::new();
         capset.add_permitted(Capability::Chown);
         capset.add_effective(Capability::Chown);
-        
+
         assert!(capset.has_permitted(Capability::Chown));
         assert!(capset.has_effective(Capability::Chown));
     }
@@ -245,7 +245,7 @@ mod tests {
         capset.add_permitted(Capability::Chown);
         capset.add_effective(Capability::Chown);
         capset.remove_effective(Capability::Chown);
-        
+
         assert!(capset.has_permitted(Capability::Chown));
         assert!(!capset.has_effective(Capability::Chown));
     }
@@ -260,7 +260,7 @@ mod tests {
     fn test_capability_manager_create_process() {
         let mut manager = CapabilityManager::new();
         let pid = manager.create_process();
-        
+
         assert_eq!(pid, 1);
         assert_eq!(manager.process_count(), 1);
     }
@@ -269,9 +269,9 @@ mod tests {
     fn test_capability_manager_grant() {
         let mut manager = CapabilityManager::new();
         let pid = manager.create_process();
-        
+
         manager.grant(pid, Capability::Chown).unwrap();
-        
+
         let caps = manager.get_capabilities(pid).unwrap();
         let caps_guard = caps.lock().unwrap();
         assert!(caps_guard.has_effective(Capability::Chown));
@@ -281,10 +281,10 @@ mod tests {
     fn test_capability_manager_revoke() {
         let mut manager = CapabilityManager::new();
         let pid = manager.create_process();
-        
+
         manager.grant(pid, Capability::Chown).unwrap();
         manager.revoke(pid, Capability::Chown).unwrap();
-        
+
         let caps = manager.get_capabilities(pid).unwrap();
         let caps_guard = caps.lock().unwrap();
         assert!(!caps_guard.has_effective(Capability::Chown));
@@ -294,7 +294,7 @@ mod tests {
     fn test_capability_manager_remove() {
         let mut manager = CapabilityManager::new();
         let pid = manager.create_process();
-        
+
         manager.remove_process(pid).unwrap();
         assert_eq!(manager.process_count(), 0);
     }

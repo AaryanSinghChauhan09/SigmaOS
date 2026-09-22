@@ -122,19 +122,19 @@ impl VfsOperations for MemoryVfs {
     fn lookup(&self, parent: VfsInode, name: &str) -> Result<VfsInode, String> {
         let entries = self.directories.get(&parent)
             .ok_or_else(|| format!("Parent inode not found"))?;
-        
+
         for entry in entries {
             if entry.name == name {
                 return Ok(entry.inode);
             }
         }
-        
+
         Err(format!("Entry '{}' not found", name))
     }
 
     fn create(&mut self, parent: VfsInode, name: &str, mode: u32) -> Result<VfsInode, String> {
         let inode = self.allocate_inode();
-        
+
         self.inodes.insert(inode, VfsFileAttr {
             inode,
             file_type: VfsFileType::RegularFile,
@@ -146,9 +146,9 @@ impl VfsOperations for MemoryVfs {
             mtime: 0,
             ctime: 0,
         });
-        
+
         self.data.insert(inode, Vec::new());
-        
+
         if let Some(entries) = self.directories.get_mut(&parent) {
             entries.push(VfsDirEntry {
                 name: name.to_string(),
@@ -156,13 +156,13 @@ impl VfsOperations for MemoryVfs {
                 file_type: VfsFileType::RegularFile,
             });
         }
-        
+
         Ok(inode)
     }
 
     fn mkdir(&mut self, parent: VfsInode, name: &str, mode: u32) -> Result<VfsInode, String> {
         let inode = self.allocate_inode();
-        
+
         self.inodes.insert(inode, VfsFileAttr {
             inode,
             file_type: VfsFileType::Directory,
@@ -174,9 +174,9 @@ impl VfsOperations for MemoryVfs {
             mtime: 0,
             ctime: 0,
         });
-        
+
         self.directories.insert(inode, Vec::new());
-        
+
         if let Some(entries) = self.directories.get_mut(&parent) {
             entries.push(VfsDirEntry {
                 name: name.to_string(),
@@ -184,7 +184,7 @@ impl VfsOperations for MemoryVfs {
                 file_type: VfsFileType::Directory,
             });
         }
-        
+
         Ok(inode)
     }
 
@@ -192,11 +192,11 @@ impl VfsOperations for MemoryVfs {
         let inode = self.lookup(parent, name)?;
         self.inodes.remove(&inode);
         self.data.remove(&inode);
-        
+
         if let Some(entries) = self.directories.get_mut(&parent) {
             entries.retain(|e| e.name != name);
         }
-        
+
         Ok(())
     }
 
@@ -204,27 +204,27 @@ impl VfsOperations for MemoryVfs {
         let inode = self.lookup(parent, name)?;
         self.inodes.remove(&inode);
         self.directories.remove(&inode);
-        
+
         if let Some(entries) = self.directories.get_mut(&parent) {
             entries.retain(|e| e.name != name);
         }
-        
+
         Ok(())
     }
 
     fn rename(&mut self, old_parent: VfsInode, old_name: &str, new_parent: VfsInode, new_name: &str) -> Result<(), String> {
         let inode = self.lookup(old_parent, old_name)?;
-        
+
         // Remove from old parent
         if let Some(entries) = self.directories.get_mut(&old_parent) {
             entries.retain(|e| e.name != old_name);
         }
-        
+
         // Add to new parent
         let file_type = self.inodes.get(&inode)
             .map(|attr| attr.file_type)
             .unwrap_or(VfsFileType::RegularFile);
-        
+
         if let Some(entries) = self.directories.get_mut(&new_parent) {
             entries.push(VfsDirEntry {
                 name: new_name.to_string(),
@@ -232,7 +232,7 @@ impl VfsOperations for MemoryVfs {
                 file_type,
             });
         }
-        
+
         Ok(())
     }
 
@@ -250,34 +250,34 @@ impl VfsOperations for MemoryVfs {
     fn read(&self, inode: VfsInode, offset: u64, buf: &mut [u8]) -> Result<usize, String> {
         let data = self.data.get(&inode)
             .ok_or_else(|| format!("Inode not found"))?;
-        
+
         let offset = offset as usize;
         if offset >= data.len() {
             return Ok(0);
         }
-        
+
         let len = std::cmp::min(buf.len(), data.len() - offset);
         buf[..len].copy_from_slice(&data[offset..offset + len]);
-        
+
         Ok(len)
     }
 
     fn write(&mut self, inode: VfsInode, offset: u64, buf: &[u8]) -> Result<usize, String> {
         let data = self.data.get_mut(&inode)
             .ok_or_else(|| format!("Inode not found"))?;
-        
+
         let offset = offset as usize;
         if offset + buf.len() > data.len() {
             data.resize(offset + buf.len(), 0);
         }
-        
+
         data[offset..offset + buf.len()].copy_from_slice(buf);
-        
+
         // Update file size
         if let Some(attr) = self.inodes.get_mut(&inode) {
             attr.size = data.len() as u64;
         }
-        
+
         Ok(buf.len())
     }
 
@@ -289,7 +289,7 @@ impl VfsOperations for MemoryVfs {
 
     fn symlink(&mut self, parent: VfsInode, name: &str, target: &str) -> Result<VfsInode, String> {
         let inode = self.allocate_inode();
-        
+
         self.inodes.insert(inode, VfsFileAttr {
             inode,
             file_type: VfsFileType::SymbolicLink,
@@ -301,9 +301,9 @@ impl VfsOperations for MemoryVfs {
             mtime: 0,
             ctime: 0,
         });
-        
+
         self.symlinks.insert(inode, target.to_string());
-        
+
         if let Some(entries) = self.directories.get_mut(&parent) {
             entries.push(VfsDirEntry {
                 name: name.to_string(),
@@ -311,7 +311,7 @@ impl VfsOperations for MemoryVfs {
                 file_type: VfsFileType::SymbolicLink,
             });
         }
-        
+
         Ok(inode)
     }
 
@@ -341,7 +341,7 @@ impl PosixPathResolver {
     /// Resolve a POSIX path to an inode
     pub fn resolve(&self, path: &str) -> Result<VfsInode, String> {
         let path = Path::new(path);
-        
+
         if path.is_absolute() {
             self.resolve_absolute(path)
         } else {
@@ -351,7 +351,7 @@ impl PosixPathResolver {
 
     fn resolve_absolute(&self, path: &Path) -> Result<VfsInode, String> {
         let mut current = self.root_dir;
-        
+
         for component in path.components() {
             use std::path::Component;
             match component {
@@ -368,13 +368,13 @@ impl PosixPathResolver {
                 Component::Prefix(_) => return Err("Prefix paths not supported".to_string()),
             }
         }
-        
+
         Ok(current)
     }
 
     fn resolve_relative(&self, path: &Path) -> Result<VfsInode, String> {
         let mut current = self.current_dir;
-        
+
         for component in path.components() {
             use std::path::Component;
             match component {
@@ -390,7 +390,7 @@ impl PosixPathResolver {
                 Component::Prefix(_) => return Err("Prefix paths not supported".to_string()),
             }
         }
-        
+
         Ok(current)
     }
 
@@ -398,7 +398,7 @@ impl PosixPathResolver {
     pub fn normalize(path: &str) -> String {
         let path = Path::new(path);
         let mut result = PathBuf::new();
-        
+
         for component in path.components() {
             use std::path::Component;
             match component {
@@ -413,7 +413,7 @@ impl PosixPathResolver {
                 Component::Prefix(_) => continue,
             }
         }
-        
+
         result.to_string_lossy().to_string()
     }
 
@@ -443,7 +443,7 @@ mod tests {
     fn test_memory_vfs_create() {
         let mut vfs = MemoryVfs::new();
         let root = VfsInode::new(0);
-        
+
         let file = vfs.create(root, "test.txt", 0o644).unwrap();
         assert!(vfs.lookup(root, "test.txt").is_ok());
     }
@@ -452,7 +452,7 @@ mod tests {
     fn test_memory_vfs_mkdir() {
         let mut vfs = MemoryVfs::new();
         let root = VfsInode::new(0);
-        
+
         let dir = vfs.mkdir(root, "testdir", 0o755).unwrap();
         assert!(vfs.lookup(root, "testdir").is_ok());
     }
@@ -461,10 +461,10 @@ mod tests {
     fn test_memory_vfs_read_write() {
         let mut vfs = MemoryVfs::new();
         let root = VfsInode::new(0);
-        
+
         let file = vfs.create(root, "test.txt", 0o644).unwrap();
         vfs.write(file, 0, b"hello").unwrap();
-        
+
         let mut buf = [0u8; 5];
         let n = vfs.read(file, 0, &mut buf).unwrap();
         assert_eq!(n, 5);

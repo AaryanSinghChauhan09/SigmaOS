@@ -40,7 +40,7 @@ impl ProcessInfo {
 
     /// Format as /proc/[pid]/stat
     pub fn format_stat(&self) -> String {
-        format!("{} ({}) {} 0 0 0 0 0 0 0 0 {} {}", 
+        format!("{} ({}) {} 0 0 0 0 0 0 0 0 {} {}",
             self.pid, self.comm, self.state, self.utime, self.stime)
     }
 
@@ -69,7 +69,7 @@ pub struct ProcfsManager {
 impl ProcfsManager {
     pub fn new() -> Self {
         let mut processes = HashMap::new();
-        
+
         // Add init process (PID 1)
         processes.insert(1, ProcessInfo::new(1, 0, "init".to_string()));
 
@@ -222,7 +222,7 @@ mod tests {
     fn test_procfs_manager_create_process() {
         let manager = ProcfsManager::new();
         let pid = manager.create_process(1, "test".to_string());
-        
+
         assert_eq!(pid, 2);
         assert_eq!(manager.process_count(), 2);
     }
@@ -231,7 +231,7 @@ mod tests {
     fn test_procfs_manager_get_process() {
         let manager = ProcfsManager::new();
         let pid = manager.create_process(1, "test".to_string());
-        
+
         let process = manager.get_process(pid).unwrap();
         assert_eq!(process.comm, "test");
     }
@@ -241,7 +241,7 @@ mod tests {
         let manager = ProcfsManager::new();
         let pid = manager.create_process(1, "test".to_string());
         manager.remove_process(pid).unwrap();
-        
+
         assert_eq!(manager.process_count(), 1);
     }
 
@@ -250,7 +250,7 @@ mod tests {
         let manager = ProcfsManager::new();
         let pid = manager.create_process(1, "test".to_string());
         manager.set_state(pid, "S".to_string()).unwrap();
-        
+
         let process = manager.get_process(pid).unwrap();
         assert_eq!(process.state, "S");
     }
@@ -259,7 +259,7 @@ mod tests {
     fn test_procfs_manager_read_stat() {
         let manager = ProcfsManager::new();
         let pid = manager.create_process(1, "test".to_string());
-        
+
         let stat = manager.read_stat(pid).unwrap();
         assert!(stat.contains("test"));
     }
@@ -268,7 +268,7 @@ mod tests {
     fn test_procfs_manager_read_status() {
         let manager = ProcfsManager::new();
         let pid = manager.create_process(1, "test".to_string());
-        
+
         let status = manager.read_status(pid).unwrap();
         assert!(status.contains("Name:"));
     }
@@ -277,7 +277,7 @@ mod tests {
     fn test_procfs_manager_list_processes() {
         let manager = ProcfsManager::new();
         manager.create_process(1, "test".to_string());
-        
+
         let pids = manager.list_processes();
         assert!(pids.contains(&1));
         assert!(pids.contains(&2));

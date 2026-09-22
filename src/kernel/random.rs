@@ -113,7 +113,7 @@ impl RandomManager {
         // Initialize with time-based seeds (simplified)
         let seed1 = 1234567890;
         let seed2 = 9876543210;
-        
+
         RandomManager {
             urandom_state: Arc::new(Mutex::new(RandomState::new(seed1))),
             random_state: Arc::new(Mutex::new(RandomState::new(seed2))),
@@ -124,7 +124,7 @@ impl RandomManager {
     pub fn getrandom_urandom(&self, len: usize, _flags: RandomFlags) -> Result<RandomBytes, String> {
         let mut state = self.urandom_state.lock().unwrap();
         let data = state.random_bytes(len);
-        
+
         Ok(RandomBytes::new(data, RandomSource::Urandom))
     }
 
@@ -132,7 +132,7 @@ impl RandomManager {
     pub fn getrandom_random(&self, len: usize, _flags: RandomFlags) -> Result<RandomBytes, String> {
         let mut state = self.random_state.lock().unwrap();
         let data = state.random_bytes(len);
-        
+
         Ok(RandomBytes::new(data, RandomSource::Random))
     }
 
@@ -148,7 +148,7 @@ impl RandomManager {
     pub fn reseed(&self, urandom_seed: u64, random_seed: u64) {
         let mut urandom_state = self.urandom_state.lock().unwrap();
         *urandom_state = RandomState::new(urandom_seed);
-        
+
         let mut random_state = self.random_state.lock().unwrap();
         *random_state = RandomState::new(random_seed);
     }
@@ -210,10 +210,10 @@ mod tests {
     fn test_random_manager_getrandom_urandom() {
         let manager = RandomManager::new();
         let flags = RandomFlags::new();
-        
+
         let result = manager.getrandom_urandom(16, flags);
         assert!(result.is_ok());
-        
+
         let bytes = result.unwrap();
         assert_eq!(bytes.len(), 16);
     }
@@ -222,10 +222,10 @@ mod tests {
     fn test_random_manager_getrandom_random() {
         let manager = RandomManager::new();
         let flags = RandomFlags::new();
-        
+
         let result = manager.getrandom_random(16, flags);
         assert!(result.is_ok());
-        
+
         let bytes = result.unwrap();
         assert_eq!(bytes.len(), 16);
     }
@@ -234,10 +234,10 @@ mod tests {
     fn test_random_manager_getrandom() {
         let manager = RandomManager::new();
         let flags = RandomFlags::new();
-        
+
         let result = manager.getrandom(RandomSource::Urandom, 16, flags);
         assert!(result.is_ok());
-        
+
         let bytes = result.unwrap();
         assert_eq!(bytes.len(), 16);
     }

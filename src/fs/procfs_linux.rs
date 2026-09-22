@@ -152,28 +152,28 @@ impl Procfs {
     fn create_standard_structure(&mut self) {
         // /proc
         self.create_entry("/proc".to_string(), ProcEntryType::Directory, "".to_string());
-        
+
         // /proc/cpuinfo
         self.create_entry("/proc/cpuinfo".to_string(), ProcEntryType::File, self.generate_cpuinfo());
-        
+
         // /proc/meminfo
         self.create_entry("/proc/meminfo".to_string(), ProcEntryType::File, self.generate_meminfo());
-        
+
         // /proc/stat
         self.create_entry("/proc/stat".to_string(), ProcEntryType::File, self.generate_stat());
-        
+
         // /proc/version
         self.create_entry("/proc/version".to_string(), ProcEntryType::File, "SigmaOS version 1.0.0".to_string());
-        
+
         // /proc/uptime
         self.create_entry("/proc/uptime".to_string(), ProcEntryType::File, "1000.0 5000.0".to_string());
-        
+
         // /proc/loadavg
         self.create_entry("/proc/loadavg".to_string(), ProcEntryType::File, "0.50 0.45 0.40 1/100 1234".to_string());
-        
+
         // /proc/self
         self.create_entry("/proc/self".to_string(), ProcEntryType::Symlink, "1".to_string());
-        
+
         // /proc/1 (init process)
         self.create_process_entry(1, "init".to_string());
     }
@@ -214,9 +214,9 @@ impl Procfs {
             entry_type,
             value,
         )));
-        
+
         self.entries.insert(path.clone(), entry.clone());
-        
+
         // Add to parent directory
         if let Some(parent_path) = Self::parent_path(&path) {
             if let Some(parent) = self.entries.get_mut(&parent_path) {
@@ -224,22 +224,22 @@ impl Procfs {
                 parent_guard.add_child(path.clone());
             }
         }
-        
+
         entry
     }
 
     pub fn create_process_entry(&mut self, pid: u32, name: String) {
         let process_dir = format!("/proc/{}", pid);
         self.create_entry(process_dir.clone(), ProcEntryType::Directory, "".to_string());
-        
+
         // /proc/{pid}/status
         let status = ProcessStatus::new(pid, name.clone());
         self.processes.insert(pid, status.clone());
         self.create_entry(format!("{}/status", process_dir), ProcEntryType::File, self.generate_status(&status));
-        
+
         // /proc/{pid}/cmdline
         self.create_entry(format!("{}/cmdline", process_dir), ProcEntryType::File, status.cmdline.clone());
-        
+
         // /proc/{pid}/exe
         self.create_entry(format!("{}/exe", process_dir), ProcEntryType::Symlink, format!("/bin/{}", name));
     }
@@ -258,24 +258,24 @@ impl Procfs {
     pub fn read_entry(&self, path: &str) -> Result<String, String> {
         let entry = self.entries.get(path)
             .ok_or_else(|| format!("Entry not found: {}", path))?;
-        
+
         let entry_guard = entry.lock().unwrap();
         if entry_guard.entry_type != ProcEntryType::File {
             return Err("Not a file".to_string());
         }
-        
+
         Ok(entry_guard.value.clone())
     }
 
     pub fn list_directory(&self, path: &str) -> Result<Vec<String>, String> {
         let entry = self.entries.get(path)
             .ok_or_else(|| format!("Entry not found: {}", path))?;
-        
+
         let entry_guard = entry.lock().unwrap();
         if entry_guard.entry_type != ProcEntryType::Directory {
             return Err("Not a directory".to_string());
         }
-        
+
         Ok(entry_guard.children.clone())
     }
 
@@ -283,7 +283,7 @@ impl Procfs {
         if path == "/proc" || !path.contains('/') {
             return None;
         }
-        
+
         let last_slash = path.rfind('/');
         if let Some(pos) = last_slash {
             if pos == 0 {
@@ -383,7 +383,7 @@ mod tests {
     fn test_procfs_create_process() {
         let mut procfs = Procfs::new();
         procfs.add_process(100, "test".to_string());
-        
+
         let process = procfs.get_process(100);
         assert!(process.is_some());
         assert_eq!(process.unwrap().name, "test");
@@ -414,9 +414,9 @@ mod tests {
         let mut procfs = Procfs::new();
         let mut new_mem = MemInfo::new();
         new_mem.total = 16 * 1024 * 1024 * 1024;
-        
+
         procfs.update_mem_info(new_mem);
-        
+
         let meminfo = procfs.read_entry("/proc/meminfo").unwrap();
         assert!(meminfo.contains("16777216")); // 16 GB in KB
     }

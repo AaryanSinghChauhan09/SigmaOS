@@ -209,15 +209,15 @@ impl KeyManager {
     pub fn add_key(&mut self, keyring_id: u64, key_type: KeyType, description: String, payload: KeyPayload, permissions: KeyPermissions, uid: u32, gid: u32) -> Result<u64, String> {
         let keyring = self.keyrings.get(&keyring_id)
             .ok_or_else(|| format!("Keyring not found: {}", keyring_id))?;
-        
+
         let key_id = self.next_key_id;
         self.next_key_id += 1;
 
         let key = Arc::new(Key::new(key_id, key_type, description, payload, permissions, uid, gid));
-        
+
         let mut keyring_guard = keyring.lock().unwrap();
         keyring_guard.add_key(key);
-        
+
         Ok(key_id)
     }
 
@@ -225,11 +225,11 @@ impl KeyManager {
     pub fn remove_key(&self, keyring_id: u64, key_id: u64) -> Result<(), String> {
         let keyring = self.keyrings.get(&keyring_id)
             .ok_or_else(|| format!("Keyring not found: {}", keyring_id))?;
-        
+
         let mut keyring_guard = keyring.lock().unwrap();
         keyring_guard.remove_key(key_id)
             .ok_or_else(|| format!("Key not found: {}", key_id))?;
-        
+
         Ok(())
     }
 
@@ -237,7 +237,7 @@ impl KeyManager {
     pub fn get_key(&self, keyring_id: u64, key_id: u64) -> Result<Arc<Key>, String> {
         let keyring = self.keyrings.get(&keyring_id)
             .ok_or_else(|| format!("Keyring not found: {}", keyring_id))?;
-        
+
         let keyring_guard = keyring.lock().unwrap();
         keyring_guard.get_key(key_id)
             .ok_or_else(|| format!("Key not found: {}", key_id))
@@ -247,7 +247,7 @@ impl KeyManager {
     pub fn search_key(&self, keyring_id: u64, description: &str) -> Result<Arc<Key>, String> {
         let keyring = self.keyrings.get(&keyring_id)
             .ok_or_else(|| format!("Keyring not found: {}", keyring_id))?;
-        
+
         let keyring_guard = keyring.lock().unwrap();
         keyring_guard.search_key(description)
             .ok_or_else(|| format!("Key not found with description: {}", description))
@@ -302,7 +302,7 @@ mod tests {
             0,
             0
         );
-        
+
         assert_eq!(key.id(), 1);
         assert_eq!(key.description(), "test_key");
     }
@@ -327,7 +327,7 @@ mod tests {
             0,
             0
         ));
-        
+
         keyring.add_key(key);
         assert_eq!(keyring.key_count(), 1);
     }
@@ -344,10 +344,10 @@ mod tests {
             0,
             0
         ));
-        
+
         keyring.add_key(key.clone());
         let removed = keyring.remove_key(1);
-        
+
         assert!(removed.is_some());
         assert_eq!(keyring.key_count(), 0);
     }
@@ -364,10 +364,10 @@ mod tests {
             0,
             0
         ));
-        
+
         keyring.add_key(key);
         let found = keyring.search_key("test_key");
-        
+
         assert!(found.is_some());
     }
 
@@ -381,7 +381,7 @@ mod tests {
     fn test_key_manager_create_keyring() {
         let mut manager = KeyManager::new();
         let id = manager.create_keyring("test_ring".to_string(), None);
-        
+
         assert_eq!(id, 1);
         assert_eq!(manager.keyring_count(), 1);
     }
@@ -390,7 +390,7 @@ mod tests {
     fn test_key_manager_add_key() {
         let mut manager = KeyManager::new();
         let keyring_id = manager.create_keyring("test_ring".to_string(), None);
-        
+
         let key_id = manager.add_key(
             keyring_id,
             KeyType::User,
@@ -400,7 +400,7 @@ mod tests {
             0,
             0
         ).unwrap();
-        
+
         assert_eq!(key_id, 1);
     }
 
@@ -408,7 +408,7 @@ mod tests {
     fn test_key_manager_get_key() {
         let mut manager = KeyManager::new();
         let keyring_id = manager.create_keyring("test_ring".to_string(), None);
-        
+
         let key_id = manager.add_key(
             keyring_id,
             KeyType::User,
@@ -418,7 +418,7 @@ mod tests {
             0,
             0
         ).unwrap();
-        
+
         let key = manager.get_key(keyring_id, key_id).unwrap();
         assert_eq!(key.id(), key_id);
     }
@@ -427,7 +427,7 @@ mod tests {
     fn test_key_manager_search_key() {
         let mut manager = KeyManager::new();
         let keyring_id = manager.create_keyring("test_ring".to_string(), None);
-        
+
         manager.add_key(
             keyring_id,
             KeyType::User,
@@ -437,7 +437,7 @@ mod tests {
             0,
             0
         ).unwrap();
-        
+
         let key = manager.search_key(keyring_id, "test_key").unwrap();
         assert_eq!(key.description(), "test_key");
     }
@@ -446,7 +446,7 @@ mod tests {
     fn test_key_manager_remove_key() {
         let mut manager = KeyManager::new();
         let keyring_id = manager.create_keyring("test_ring".to_string(), None);
-        
+
         let key_id = manager.add_key(
             keyring_id,
             KeyType::User,
@@ -456,7 +456,7 @@ mod tests {
             0,
             0
         ).unwrap();
-        
+
         assert!(manager.remove_key(keyring_id, key_id).is_ok());
     }
 
@@ -464,7 +464,7 @@ mod tests {
     fn test_key_manager_remove_keyring() {
         let mut manager = KeyManager::new();
         let keyring_id = manager.create_keyring("test_ring".to_string(), None);
-        
+
         assert!(manager.remove_keyring(keyring_id).is_ok());
         assert_eq!(manager.keyring_count(), 0);
     }

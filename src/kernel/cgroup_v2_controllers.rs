@@ -28,7 +28,7 @@ pub enum CgroupController {
 impl CgroupController {
     pub fn from_bits(bits: u32) -> Vec<Self> {
         let mut controllers = Vec::new();
-        
+
         if bits & (CgroupController::Cpu as u32) != 0 {
             controllers.push(CgroupController::Cpu);
         }
@@ -53,7 +53,7 @@ impl CgroupController {
         if bits & (CgroupController::Hugetlb as u32) != 0 {
             controllers.push(CgroupController::Hugetlb);
         }
-        
+
         controllers
     }
 }
@@ -220,12 +220,12 @@ impl CgroupV2Manager {
     pub fn remove_cgroup(&mut self, name: &str) -> Result<(), String> {
         let cg = self.cgroups.get(name)
             .ok_or_else(|| format!("cgroup not found: {}", name))?;
-        
+
         let process_count = cg.lock().unwrap().process_count();
         if process_count > 0 {
             return Err(format!("cgroup has {} processes, cannot remove", process_count));
         }
-        
+
         self.cgroups.remove(name);
         Ok(())
     }
@@ -253,7 +253,7 @@ mod tests {
     fn test_cgroup_controller_from_bits() {
         let bits = (CgroupController::Cpu as u32) | (CgroupController::Memory as u32);
         let controllers = CgroupController::from_bits(bits);
-        
+
         assert_eq!(controllers.len(), 2);
         assert!(controllers.contains(&CgroupController::Cpu));
         assert!(controllers.contains(&CgroupController::Memory));
@@ -270,7 +270,7 @@ mod tests {
     fn test_cgroup_controller_config() {
         let mut config = CgroupControllerConfig::new(CgroupController::Cpu);
         config.set_param("cpu.max".to_string(), "100000".to_string());
-        
+
         assert_eq!(config.get_param("cpu.max"), Some(&"100000".to_string()));
     }
 
@@ -285,17 +285,17 @@ mod tests {
     fn test_cgroup_with_parent() {
         let parent = Arc::new(Mutex::new(CgroupV2::new("/".to_string())));
         let child = CgroupV2::with_parent("/test".to_string(), parent.clone());
-        
+
         assert!(child.parent.is_some());
     }
 
     #[test]
     fn test_cgroup_add_remove_controller() {
         let mut cgroup = CgroupV2::new("/test".to_string());
-        
+
         cgroup.add_controller(CgroupController::Cpu);
         assert!(cgroup.get_controller_config(CgroupController::Cpu).is_some());
-        
+
         cgroup.remove_controller(CgroupController::Cpu);
         assert!(cgroup.get_controller_config(CgroupController::Cpu).is_none());
     }
@@ -303,10 +303,10 @@ mod tests {
     #[test]
     fn test_cgroup_add_remove_process() {
         let mut cgroup = CgroupV2::new("/test".to_string());
-        
+
         cgroup.add_process(100);
         assert_eq!(cgroup.process_count(), 1);
-        
+
         cgroup.remove_process(100);
         assert_eq!(cgroup.process_count(), 0);
     }
@@ -314,7 +314,7 @@ mod tests {
     #[test]
     fn test_cgroup_manager_create() {
         let mut manager = CgroupV2Manager::new();
-        
+
         let _cg = manager.create_cgroup("/test".to_string(), None).unwrap();
         assert_eq!(manager.cgroup_count(), 2); // root + test
     }
@@ -322,23 +322,23 @@ mod tests {
     #[test]
     fn test_cgroup_manager_remove() {
         let mut manager = CgroupV2Manager::new();
-        
+
         let _cg = manager.create_cgroup("/test".to_string(), None).unwrap();
         manager.remove_cgroup("/test").unwrap();
-        
+
         assert_eq!(manager.cgroup_count(), 1); // only root
     }
 
     #[test]
     fn test_cgroup_manager_remove_with_processes() {
         let mut manager = CgroupV2Manager::new();
-        
+
         let cg = manager.create_cgroup("/test".to_string(), None).unwrap();
         {
             let mut cg_guard = cg.lock().unwrap();
             cg_guard.add_process(100);
         }
-        
+
         let result = manager.remove_cgroup("/test");
         assert!(result.is_err());
     }
