@@ -39,8 +39,10 @@ pub struct QuickshellWidget {
     pub widget_id: String,
     pub name: String,
     pub component_kind: ShellComponentKind,
+    pub section: String, // "left", "center", "right"
     pub position_index: u32,
     pub is_enabled: bool,
+    pub is_user_cloned: bool,
 }
 
 /// Unified Quickshell Desktop Engine (`shell.json` powered)
@@ -48,36 +50,85 @@ pub struct OmarchyQuickshellEngine {
     pub config_json: String,
     pub widgets: BTreeMap<String, QuickshellWidget>,
     pub active_layout_name: String,
+    pub user_config_path: String,
+    pub user_plugins_dir: String,
+    pub idle_screensaver_secs: u32,
+    pub idle_lock_secs: u32,
 }
 
 impl OmarchyQuickshellEngine {
     pub fn new(layout_name: &str) -> Self {
         let mut engine = Self {
-            config_json: format!("{{\"layout\": \"{}\", \"version\": \"4.0\"}}", layout_name),
+            config_json: format!(
+                "{{\"layout\": \"{}\", \"version\": \"4.0\", \"idle\": {{\"screensaver\": 300, \"lock\": 600}}}}",
+                layout_name
+            ),
             widgets: BTreeMap::new(),
             active_layout_name: layout_name.to_string(),
+            user_config_path: "~/.config/omarchy/shell.json".to_string(),
+            user_plugins_dir: "~/.config/omarchy/plugins/".to_string(),
+            idle_screensaver_secs: 300,
+            idle_lock_secs: 600,
         };
 
         // Default unified shell widgets replacing 8 separate legacy components
-        engine.register_widget("bar_clock", "System Clock", ShellComponentKind::TopBar, 0);
-        engine.register_widget("bar_workspaces", "Workspace Switcher", ShellComponentKind::TopBar, 1);
-        engine.register_widget("walker_launcher", "Walker Application Launcher", ShellComponentKind::AppLauncher, 0);
-        engine.register_widget("mako_notifications", "Notification Daemon", ShellComponentKind::NotificationCenter, 0);
-        engine.register_widget("hyprlock_screen", "Lock Screen", ShellComponentKind::LockScreen, 0);
+        engine.register_widget("bar_clock", "System Clock", ShellComponentKind::TopBar, "right", 0);
+        engine.register_widget("bar_workspaces", "Workspace Switcher", ShellComponentKind::TopBar, "left", 0);
+        engine.register_widget("walker_launcher", "Walker Application Launcher", ShellComponentKind::AppLauncher, "center", 0);
+        engine.register_widget("mako_notifications", "Notification Daemon", ShellComponentKind::NotificationCenter, "right", 1);
+        engine.register_widget("hyprlock_screen", "Lock Screen", ShellComponentKind::LockScreen, "center", 0);
         engine
     }
 
-    pub fn register_widget(&mut self, id: &str, name: &str, kind: ShellComponentKind, pos: u32) {
+    pub fn register_widget(&mut self, id: &str, name: &str, kind: ShellComponentKind, section: &str, pos: u32) {
         self.widgets.insert(
             id.to_string(),
             QuickshellWidget {
                 widget_id: id.to_string(),
                 name: name.to_string(),
                 component_kind: kind,
+                section: section.to_string(),
                 position_index: pos,
                 is_enabled: true,
+                is_user_cloned: false,
             },
         );
+    }
+
+    pub fn set_idle_timeouts(&mut self, screensaver_secs: u32, lock_secs: u32) {
+        self.idle_screensaver_secs = screensaver_secs;
+        self.idle_lock_secs = lock_secs;
+        self.sync_json();
+    }
+
+    pub fn move_bar_widget(&mut self, widget_id: &str, target_section: &str) -> Result<String, &'static str> {
+        if let Some(widget) = self.widgets.get_mut(widget_id) {
+            widget.section = target_section.to_string();
+            self.sync_json();
+            Ok(format!("Moved widget '{}' to section '{}'", widget_id, target_section))
+        } else {
+            Err("Widget not found")
+        }
+    }
+
+    pub fn clone_plugin(&mut self, widget_id: &str, username: &str) -> Result<String, &'static str> {
+        if let Some(widget) = self.widgets.remove(widget_id) {
+            let cloned_id = format!("{}.{}", username, widget.widget_id.trim_start_matches("omarchy."));
+            let cloned_widget = QuickshellWidget {
+                widget_id: cloned_id.clone(),
+                name: format!("{} ({})", widget.name, username),
+                component_kind: widget.component_kind,
+                section: widget.section,
+                position_index: widget.position_index,
+                is_enabled: widget.is_enabled,
+                is_user_cloned: true,
+            };
+            self.widgets.insert(cloned_id.clone(), cloned_widget);
+            self.sync_json();
+            Ok(format!("Cloned plugin '{}' -> '{}{}'", widget_id, self.user_plugins_dir, cloned_id))
+        } else {
+            Err("Plugin widget to clone not found")
+        }
     }
 
     pub fn update_shell_json(&mut self, json_str: &str) -> Result<usize, &'static str> {
@@ -88,11 +139,23 @@ impl OmarchyQuickshellEngine {
         Ok(self.widgets.len())
     }
 
+    fn sync_json(&mut self) {
+        self.config_json = format!(
+            "{{\"layout\": \"{}\", \"idle\": {{\"screensaver\": {}, \"lock\": {}}}, \"widgets\": {}}}",
+            self.active_layout_name,
+            self.idle_screensaver_secs,
+            self.idle_lock_secs,
+            self.widgets.len()
+        );
+    }
+
     pub fn render_shell_summary(&self) -> String {
         format!(
-            "Omarchy Quickshell [{}] managing {} unified components",
+            "Omarchy Quickshell [{}] managing {} unified components (Idle screensaver: {}s, lock: {}s)",
             self.active_layout_name,
-            self.widgets.len()
+            self.widgets.len(),
+            self.idle_screensaver_secs,
+            self.idle_lock_secs
         )
     }
 }
@@ -694,8 +757,29 @@ mod omarchy_tests {
     fn test_quickshell_engine() {
         let mut shell = OmarchyQuickshellEngine::new("quattro_pro");
         assert_eq!(shell.widgets.len(), 5);
+        assert_eq!(shell.idle_screensaver_secs, 300);
+        assert_eq!(shell.idle_lock_secs, 600);
+
+        // Test idle timeout updates
+        shell.set_idle_timeouts(180, 900);
+        assert_eq!(shell.idle_screensaver_secs, 180);
+        assert_eq!(shell.idle_lock_secs, 900);
+        assert!(shell.config_json.contains("\"screensaver\": 180"));
+
+        // Test bar widget section move
+        let res = shell.move_bar_widget("bar_clock", "center").unwrap();
+        assert!(res.contains("Moved widget 'bar_clock' to section 'center'"));
+        assert_eq!(shell.widgets.get("bar_clock").unwrap().section, "center");
+
+        // Test plugin cloning
+        shell.register_widget("omarchy.workspaces", "Workspaces", ShellComponentKind::TopBar, "left", 0);
+        let clone_res = shell.clone_plugin("omarchy.workspaces", "sovereign").unwrap();
+        assert!(clone_res.contains("Cloned plugin 'omarchy.workspaces'"));
+        assert!(shell.widgets.contains_key("sovereign.workspaces"));
+        assert!(shell.widgets.get("sovereign.workspaces").unwrap().is_user_cloned);
+
         assert!(shell.update_shell_json("{\"bar\": {\"height\": 32}}").is_ok());
-        assert!(shell.render_shell_summary().contains("5 unified components"));
+        assert!(shell.render_shell_summary().contains("6 unified components"));
     }
 
     #[test]

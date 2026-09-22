@@ -1,3 +1,5 @@
+pub mod omarchy_server;
+pub use omarchy_server::*;
 pub mod omarchy_inspiration;
 pub use omarchy_inspiration::*;
 pub mod omarchy;
