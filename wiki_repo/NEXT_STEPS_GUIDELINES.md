@@ -5,17 +5,18 @@ This document establishes the official operational guidelines, execution rules, 
 
 ---
 
-## 1. Single Primary User Journey
-SigmaOS adheres strictly to an opinionated, bootable desktop distribution workflow inspired by Omarchy Linux:
+## 1. Single Primary User Journey & PR Package Submissions
+SigmaOS adheres strictly to an opinionated, bootable desktop distribution workflow inspired by Omarchy Linux, Arch Linux AUR, Gentoo Portage, Void XBPS-src, FreeBSD Ports, and Nix Flakes:
 
 ```
-ISO Boot → Live Media → Installer Wizard → First Boot Login → Zenith Desktop → App Launcher → Package Install (sigpkg) → Theme Customization → Atomic OS Update → Rollback Safety Net
+ISO Boot → Live Media → Installer Wizard → First Boot Login → Zenith Desktop → App Launcher → Package Install (sigpkg / PR submission) → Theme Customization → Atomic OS Update → Rollback Safety Net
 ```
 
 ### Mandated Guidelines:
 1. **Zero Simulated Success Paths:** Every installer stage, package operation, and update process must execute real system operations or validate actual hardware state.
-2. **Standard Library in Userland:** Standard Rust (`std`) is canonical for Zenith desktop, package manager (`sigpkg`), installer, and core userland utilities.
-3. **`no_std` Microkernel Isolation:** Bare-metal kernel code (`src/kernel/`), bootloader, and low-level drivers remain strictly `#![no_std]`.
+2. **Pull Request Package Ingestion:** Package contributions in PR format (`PKGBUILD`, `Ebuild`, `deb control`, `spec`, `xbps template`, `flake`) are parsed via `PackagePullRequestParser` in `src/package/universal.rs` and translated automatically into native `UnifiedPackage` builds.
+3. **Standard Library in Userland:** Standard Rust (`std`) is canonical for Zenith desktop, package manager (`sigpkg`), installer, and core userland utilities.
+4. **`no_std` Microkernel Isolation:** Bare-metal kernel code (`src/kernel/`), bootloader, and low-level drivers remain strictly `#![no_std]`.
 
 ---
 
@@ -47,7 +48,7 @@ ISO Boot → Live Media → Installer Wizard → First Boot Login → Zenith Des
 
 ### Domain B: Universal Package System (`sigpkg`)
 - Refactor `src/package/universal.rs` into a clean sub-module architecture (`src/package/universal/`).
-- Enhance cross-distro package translation for Arch `.pkg.tar.zst`, Debian `.deb`, Fedora `.rpm`, and Alpine `.apk`.
+- Expand Pull Request package translation pipeline (`PackagePullRequestParser`) across Arch `.pkg.tar.zst`, Debian `.deb`, Fedora `.rpm`, Alpine `.apk`, Gentoo `.ebuild`, Void `.xbps`, FreeBSD `.pkg`, and Nix `.nix`.
 
 ### Domain C: Security & Capability Controls
 - Extend `pledge()` and `unveil()` capability sandboxing across all userland core utilities.

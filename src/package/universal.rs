@@ -2358,6 +2358,91 @@ impl SovereignPackageRollbackEngine {
     }
 }
 
+/// Pull Request (PR) driven package specification for community distro contributions
+/// (Inspired by Arch AUR PKGBUILDs, Gentoo Ebuilds, Void XBPS-src templates, FreeBSD Ports PRs, and Nix Flakes PRs)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PullRequestPackageSpec {
+    pub pr_id: usize,
+    pub title: String,
+    pub author: String,
+    pub target_format: PackageFormat,
+    pub raw_manifest_body: String,
+    pub build_script: String,
+    pub dependencies: Vec<String>,
+}
+
+/// Parser for Pull Request formatted package specifications and automated translation
+pub struct PackagePullRequestParser;
+
+impl PackagePullRequestParser {
+    pub fn parse_pr_spec(
+        pr_id: usize,
+        title: &str,
+        author: &str,
+        raw_manifest: &str,
+    ) -> Result<PullRequestPackageSpec, &'static str> {
+        let fmt = if raw_manifest.contains("pkgname=") || raw_manifest.contains("PKGBUILD") {
+            PackageFormat::Pacman
+        } else if raw_manifest.contains("Package:") || raw_manifest.contains("Control:") {
+            PackageFormat::Deb
+        } else if raw_manifest.contains("Name:") || raw_manifest.contains("Spec") {
+            PackageFormat::Rpm
+        } else if raw_manifest.contains("EAPI=") || raw_manifest.contains("ebuild") {
+            PackageFormat::Ebuild
+        } else if raw_manifest.contains("pkgname=") && raw_manifest.contains("revision=") {
+            PackageFormat::Xbps
+        } else if raw_manifest.contains("stdenv.mkDerivation") || raw_manifest.contains("flake") {
+            PackageFormat::Nix
+        } else {
+            PackageFormat::SigmaPkg
+        };
+
+        let mut dependencies = Vec::new();
+        for line in raw_manifest.lines() {
+            let line = line.trim();
+            if line.starts_with("depends=") || line.starts_with("Depends:") || line.starts_with("RDEPEND=") {
+                let deps_part = line.split('=').nth(1).or_else(|| line.split(':').nth(1)).unwrap_or("");
+                for dep in deps_part.split_whitespace() {
+                    let clean = dep.trim_matches(|c| c == '(' || c == ')' || c == '\'' || c == '"');
+                    if !clean.is_empty() {
+                        dependencies.push(clean.to_string());
+                    }
+                }
+            }
+        }
+
+        Ok(PullRequestPackageSpec {
+            pr_id,
+            title: title.to_string(),
+            author: author.to_string(),
+            target_format: fmt,
+            raw_manifest_body: raw_manifest.to_string(),
+            build_script: "cargo build --release".to_string(),
+            dependencies,
+        })
+    }
+
+    pub fn transpile_pr_to_unified_package(spec: &PullRequestPackageSpec) -> UnifiedPackage {
+        let pkg_name = if !spec.title.is_empty() {
+            spec.title.to_lowercase().replace(' ', "-")
+        } else {
+            format!("pr-pkg-{}", spec.pr_id)
+        };
+
+        let mut pkg = UnifiedPackage::new(pkg_name, "1.0.0-pr".to_string())
+            .with_format(spec.target_format)
+            .with_provides("pull_request_submission".to_string());
+
+        for dep in &spec.dependencies {
+            pkg = pkg.with_dependency(dep.clone());
+        }
+
+        pkg.properties.insert("pr_id".to_string(), spec.pr_id.to_string());
+        pkg.properties.insert("pr_author".to_string(), spec.author.clone());
+        pkg
+    }
+}
+
 /// Command translation bridge for foreign package manager CLI invocations (`apt`, `pacman`, `dnf`, `apk`, `emerge`, `pkg`)
 pub struct UniversalPackageCommandBridge;
 
@@ -3003,5 +3088,22 @@ mod tests {
         let nix_pkg = UniversalPackageFormatBridge::detect_and_transpile("bash.nixpkg", b"nix_data").unwrap();
         assert!(nix_pkg.formats.contains(&PackageFormat::Nixpkg));
         assert!(nix_pkg.provides.contains(&"nixos_compat".to_string()));
+    }
+
+    #[test]
+    fn test_package_pull_request_parser_and_translation() {
+        let raw_pkgbuild = "pkgname=ripgrep\nPKGBUILD\ndepends=('pcre2' 'glibc')";
+        let spec = PackagePullRequestParser::parse_pr_spec(404, "Add Ripgrep", "Aaryan", raw_pkgbuild).unwrap();
+
+        assert_eq!(spec.pr_id, 404);
+        assert_eq!(spec.target_format, PackageFormat::Pacman);
+        assert!(spec.dependencies.contains(&"pcre2".to_string()));
+        assert!(spec.dependencies.contains(&"glibc".to_string()));
+
+        let pkg = PackagePullRequestParser::transpile_pr_to_unified_package(&spec);
+        assert_eq!(pkg.name, "add-ripgrep");
+        assert_eq!(pkg.version, "1.0.0-pr");
+        assert!(pkg.provides.contains(&"pull_request_submission".to_string()));
+        assert_eq!(pkg.properties.get("pr_author").unwrap(), "Aaryan");
     }
 }

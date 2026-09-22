@@ -1,9 +1,31 @@
 # SigmaOS Comprehensive Master Improvement Plan & Technical Audit
 
 ## Executive Summary
-This document provides a complete technical audit, daily improvement plan, and next steps guidelines for **SigmaOS** (`https://github.com/AaryanSinghChauhan09/SigmaOS/`). It details domain-wide evaluations across code quality, performance profiling, security compliance, documentation, repository governance, community engagement, utility scripts, and Object-Oriented Programming (OOP) refactoring blueprints.
+This document provides a complete technical audit, daily improvement plan, and next steps guidelines for **SigmaOS** (`https://github.com/AaryanSinghChauhan09/SigmaOS/`). It details domain-wide evaluations across code quality, performance profiling, security compliance, documentation, repository governance, community engagement, utility scripts, Object-Oriented Programming (OOP) refactoring blueprints, and PR-driven package manager multi-format support.
 
 All updates and recommendations are committed directly to the `main` branch, adhering strictly to the repository policy against creating pull requests.
+
+---
+
+## 📦 Pull Request (PR) Driven Package System Architecture
+
+Inspired by Linux and BSD distribution packaging workflows (Arch Linux AUR `PKGBUILD`, Gentoo Portage `ebuild`, Void Linux `xbps-src`, FreeBSD Ports PRs, and Nix Flakes PRs), SigmaOS features native Pull Request package translation via `PackagePullRequestParser` and `PullRequestPackageSpec` in `src/package/universal.rs`:
+
+```
+Community PR (PKGBUILD / Ebuild / Spec / deb / Flake)
+       │
+       ▼
+PackagePullRequestParser::parse_pr_spec()
+       │
+       ▼
+PullRequestPackageSpec (Metadata & Dependencies)
+       │
+       ▼
+PackagePullRequestParser::transpile_pr_to_unified_package()
+       │
+       ▼
+UnifiedPackage (Native SigmaPkg Format)
+```
 
 ---
 
@@ -100,7 +122,6 @@ All updates and recommendations are committed directly to the `main` branch, adh
 - **Unit Test Coverage & Untested Functions:**
   - `pytest tests/`: 15/15 integration tests passing (100% pass rate).
   - Standalone Rust test binaries (`rustc --test`) verify `universal.rs` (20 tests), `sigpkg` verifiers (13 tests), `exec_guard.rs` (3 tests), `cow_snapshot.rs` (2 tests), and microkernel modules.
-  - Identified target for expanded coverage: `src/graphics/gpu_driver.rs` DRM/KMS hardware mock scenarios.
 - **Refactoring Opportunities:**
   - Monolithic files such as `src/package/universal.rs` (2,800+ lines) should be decomposed into modular directory structures (`src/package/universal/mod.rs`, `adapter.rs`, `resolver.rs`, `hooks.rs`).
 - **Algorithm Correctness:**
@@ -139,17 +160,7 @@ All updates and recommendations are committed directly to the `main` branch, adh
 - **Documentation Audit:**
   - Complete, up-to-date documentation across `README.md`, `DEVELOPMENT_GUIDE.md`, `DEVELOPER_RULES.md`, and `NEXT_STEPS_GUIDELINES.md`.
 - **GitHub Actions & CI Matrix:**
-  - 55+ automated CI workflows in `.github/workflows/` spanning 15+ Linux and BSD distributions:
-    - **Arch Linux:** `arch-aur-pkgbuild-ci.yml`, `arch-namcap-aur-audit-ci.yml`.
-    - **Alpine Linux:** `alpine-abuild-apk-ci.yml`, `alpine-musl-apk-security-ci.yml`.
-    - **CachyOS:** `cachyos-x86-64-v4-pqc-ci.yml` (AVX-512 & BORE scheduler).
-    - **Debian / Ubuntu:** `debian-autopkgtest-ci.yml`, `debian-sbuild-reproducible-ci.yml`, `ubuntu-apparmor-snapd-ci.yml`.
-    - **Fedora / openSUSE:** `fedora-crypto-policies-rpm-ostree-ci.yml`, `opensuse-obs-kiwi-ci.yml`.
-    - **FreeBSD:** `freebsd-jail-zfs-bootenv-ci.yml`, `freebsd-poudriere-ports-ci.yml`.
-    - **OpenBSD:** `openbsd-pf-pledge-security-ci.yml`, `openbsd-syspatch-pledge-ci.yml`.
-    - **NetBSD / DragonFly:** `netbsd-rump-kernel-ci.yml`, `dragonfly-hammer2-pfs-ci.yml`.
-    - **Gentoo / NixOS:** `gentoo-catalyst-stage3-ci.yml`, `gentoo-portage-ebuild-ci.yml`, `nixos-flake-store-gc-ci.yml`, `nixos-hydra-eval-ci.yml`, `gnu-guix-hermetic-cas-ci.yml`.
-    - **Specialty & Mobile:** `bedrock-stratum-multi-distro-ci.yml`, `postmarketos-mobile-wayland-ci.yml`, `illumos-crossbow-dtrace-ci.yml`, `talos-headless-mtls-ci.yml`, `slackware-pkgtool-sysv-ci.yml`, `haiku-packagefs-bfs-ci.yml`, `void-xbps-src-binary-ci.yml`.
+  - 55+ automated CI workflows in `.github/workflows/` spanning 15+ Linux and BSD distributions.
 - **Onboarding & Usage Instructions:**
   - Detailed CLI flags and usage documentation provided for all userland coreutils and installer scripts.
 
@@ -180,11 +191,12 @@ All updates and recommendations are committed directly to the `main` branch, adh
 - **Abstraction:**
   - Hardware details (CPUs, GPUs, NVMe) hidden behind abstract HAL interfaces (`CpufreqInterface`, `GpuDriverHardwareAbstraction`).
 - **OOP Design Patterns Implemented:**
-  - **Factory Pattern:** `ModularInstallerSetupConfigurator::create_setup_config` builds customized installer configurations.
-  - **Strategy Pattern:** `UserlandFormatRunner` dispatches binary formats (`ELF`, `WASM`, `Flatpak`, `AppImage`).
-  - **Observer Pattern:** `ThermalGovernor` handles RAPL power and temperature callbacks.
+  - **Factory Pattern:** `PackageFactory::get_strategy` builds multi-format package installers.
+  - **Strategy Pattern:** `InstallStrategy` dispatches package installation formats (`Deb`, `Rpm`, `Pacman`, `Apk`, `Ebuild`, `Xbps`, `Nix`).
+  - **Adapter Pattern:** `PackageMetadataAdapter` converts foreign distro package manifests to native `UnifiedPackage`.
+  - **Decorator Pattern:** `SandboxDecorator`, `HardwareOptimizationDecorator`, `PqcSignedDecorator` extend package capabilities dynamically.
+  - **Observer Pattern:** `PackageTriggerRegistry` notifies system observers of state changes.
   - **Command Pattern:** `CommandTransactionExecutor` encapsulates package installation and rollback operations.
-  - **Singleton Pattern:** Global system orchestrator instances guarantee thread-safe global access.
 
 ---
 
@@ -193,6 +205,7 @@ All updates and recommendations are committed directly to the `main` branch, adh
 | Priority | Category | Task / Improvement | Target Subsystem |
 | :--- | :--- | :--- | :--- |
 | **High** | Code Quality | Refactor monolithic `src/package/universal.rs` into modular sub-files (`mod.rs`, `adapter.rs`, `resolver.rs`) | `src/package/` |
+| **High** | Package System | Expand Pull Request package parser (`PackagePullRequestParser`) to support automated CI build verification | `src/package/universal.rs` |
 | **High** | Security | Integrate TPM 2.0 PCR sealed secret unlocking into boot-to-userspace transition | `src/kernel/boot_foundations.rs` |
 | **High** | Performance | Expand lock-free `io_uring` kernel submission ring pool for disk I/O | `src/kernel/sigma_io_uring.rs` |
 | **Medium** | UX / Palette | Enhance Zenith desktop high-contrast focus rings and keyboard navigation | `zenith_desktop/` |
