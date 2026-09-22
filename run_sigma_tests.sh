@@ -65,30 +65,11 @@ if [ -f "src/distro/missing_linux_bsd_components.rs" ]; then
     ./build/missing_components_test
 fi
 
-if [ -f "src/distro/additional_linux_bsd_components.rs" ]; then
-    echo "Running Additional Linux & BSD Components test suite..."
+if [ -f "src/distro/sovereign_distro_innovations_synthesis.rs" ]; then
+    echo "Running Sovereign Distro Innovations Synthesis test suite..."
     mkdir -p build
-    rustc --test src/distro/additional_linux_bsd_components.rs --edition=2021 -o build/additional_components_test
-    ./build/additional_components_test
-fi
-
-if [ -f "src/distro/sovereign_omarchy_theme_unlock_synthesis.rs" ]; then
-    echo "Running Sovereign Omarchy 22-Themes & Boot Unlock Synthesis test suite..."
-    mkdir -p build
-    rustc --test src/distro/sovereign_omarchy_theme_unlock_synthesis.rs --edition=2021 -o build/sovereign_omarchy_themes_test
-    ./build/sovereign_omarchy_themes_test
-fi
-
-if [ -f "src/distro/omarchy_update_pipeline_synthesis.rs" ]; then
-    echo -e "${YELLOW}Testing Omarchy Update Pipeline & Pacman Guard Synthesis...${NC}"
-    rustc --test src/distro/omarchy_update_pipeline_synthesis.rs --edition=2021 -o build/omarchy_update_pipeline_test
-    ./build/omarchy_update_pipeline_test
-fi
-
-if [ -f "src/desktop/sovereign_omarchy_icon_font_synthesis.rs" ]; then
-    echo -e "${YELLOW}Testing Omarchy Icon Font & Glyph Synthesis...${NC}"
-    rustc --test src/desktop/sovereign_omarchy_icon_font_synthesis.rs --edition=2021 -o build/omarchy_icon_font_test
-    ./build/omarchy_icon_font_test
+    rustc --test src/distro/sovereign_distro_innovations_synthesis.rs --edition=2021 -o build/distro_innovations_synthesis_test
+    ./build/distro_innovations_synthesis_test
 fi
 
 if [ -f "src/distro/linux_bsd_ecosystem_synthesis.rs" ]; then
