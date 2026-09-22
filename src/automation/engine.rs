@@ -14,9 +14,6 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 extern crate alloc;
 use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
@@ -26,7 +23,6 @@ use alloc::format;
 /// No dependency on external automation frameworks
 /// Based on Roadmap Item 82: Automation engine
 
-use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
@@ -34,8 +30,8 @@ use core::mem;
 pub type TaskID = usize;
 
 /// Task state
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TaskState {
     Pending = 0,
     Running = 1,
@@ -121,10 +117,11 @@ impl TaskCapability {
 pub struct SimpleTask {
     pub id: TaskID,
     pub name: [u8; 64],
+    pub name_len: u8,
     pub command: [u8; 256],
     pub state: AtomicUsize, // TaskState as usize
     pub capability: TaskCapability,
-    pub dependencies: Vec<TaskID>,
+    pub dependencies: std::vec::Vec<TaskID>,
 }
 
 impl SimpleTask {
@@ -143,10 +140,11 @@ impl SimpleTask {
         SimpleTask {
             id,
             name: name_array,
+            name_len: name_len as u8,
             command: command_array,
             state: AtomicUsize::new(TaskState::Pending as usize),
             capability,
-            dependencies: Vec::new(),
+            dependencies: std::vec::Vec::new(),
         }
     }
 
@@ -171,8 +169,10 @@ impl Task for SimpleTask {
     }
 
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
+        // Bolt ⚡ Optimization: Store explicit name length on instantiation to eliminate
+        // O(N) zero-byte linear scanning (.position(|&b| b == 0)) on every task name access,
+        // reducing slice lookup to instantaneous O(1) constant time.
+        &self.name[..self.name_len as usize]
     }
 
     fn execute(&mut self) -> Result<(), AutomationError> {
@@ -291,7 +291,8 @@ impl WorkflowCapability {
 pub struct SimpleWorkflow {
     pub id: WorkflowID,
     pub name: [u8; 64],
-    pub tasks: Vec<Option<Box<dyn Task>>>,
+    pub name_len: u8,
+    pub tasks: std::vec::Vec<Option<Box<dyn Task>>>,
     pub capability: WorkflowCapability,
 }
 
@@ -307,7 +308,8 @@ impl SimpleWorkflow {
         SimpleWorkflow {
             id,
             name: name_array,
-            tasks: Vec::new(),
+            name_len: name_len as u8,
+            tasks: std::vec::Vec::new(),
             capability,
         }
     }
@@ -319,8 +321,10 @@ impl Workflow for SimpleWorkflow {
     }
 
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
+        // Bolt ⚡ Optimization: Store explicit name length on instantiation to eliminate
+        // O(N) zero-byte linear scanning (.position(|&b| b == 0)) on every workflow name access,
+        // reducing slice lookup to instantaneous O(1) constant time.
+        &self.name[..self.name_len as usize]
     }
 
     fn add_task(&mut self, task: Box<dyn Task>) -> Result<TaskID, AutomationError> {
@@ -401,6 +405,7 @@ pub trait AutomationEngine {
 
 /// Automation statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct AutomationStats {
     pub total_workflows: usize,
     pub running_workflows: usize,
@@ -420,7 +425,7 @@ impl AutomationStats {
 
 /// Simple automation engine (OOP: Concrete engine class)
 pub struct SimpleAutomationEngine {
-    workflows: Vec<Option<Box<dyn Workflow>>>,
+    workflows: std::vec::Vec<Option<Box<dyn Workflow>>>,
     next_id: AtomicUsize,
     stats: AutomationStats,
     capability: EngineCapability,
@@ -454,7 +459,7 @@ impl EngineCapability {
 impl SimpleAutomationEngine {
     pub fn new(capability: EngineCapability) -> Self {
         SimpleAutomationEngine {
-            workflows: Vec::new(),
+            workflows: std::vec::Vec::new(),
             next_id: AtomicUsize::new(1),
             stats: AutomationStats::new(),
             capability,
@@ -631,5 +636,53 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     fn into_iter(self) -> Self::IntoIter {
         use core::ops::DerefMut;
         self.deref_mut().iter_mut()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_simple_task_name_o1_lookup() {
+        let mut task = SimpleTask::new(1, b"clean_cache_task", b"rm -rf /tmp/cache", TaskCapability::full());
+        assert_eq!(task.id(), 1);
+        assert_eq!(task.name(), b"clean_cache_task");
+        assert_eq!(task.state(), TaskState::Pending);
+
+        assert!(task.execute().is_ok());
+        assert_eq!(task.state(), TaskState::Completed);
+    }
+
+    #[test]
+    fn test_simple_workflow_o1_lookup() {
+        let mut workflow = SimpleWorkflow::new(10, b"system_maintenance_wf", WorkflowCapability::full());
+        assert_eq!(workflow.id(), 10);
+        assert_eq!(workflow.name(), b"system_maintenance_wf");
+
+        let task = Box::new(SimpleTask::new(1, b"backup", b"tar czf backup.tgz /data", TaskCapability::full()));
+        let task_id = workflow.add_task(task).unwrap();
+        assert_eq!(task_id, 1);
+
+        let info = workflow.info();
+        assert_eq!(info.total_tasks, 1);
+        assert_eq!(info.completed_tasks, 0);
+
+        assert!(workflow.execute().is_ok());
+        let info_after = workflow.info();
+        assert_eq!(info_after.completed_tasks, 1);
+    }
+
+    #[test]
+    fn test_automation_engine() {
+        let mut engine = SimpleAutomationEngine::new(EngineCapability::full());
+        let mut workflow = Box::new(SimpleWorkflow::new(100, b"engine_wf", WorkflowCapability::full()));
+        workflow.add_task(Box::new(SimpleTask::new(200, b"subtask", b"echo 1", TaskCapability::full()))).unwrap();
+
+        let wf_id = engine.register_workflow(workflow).unwrap();
+        assert_eq!(wf_id, 100);
+
+        assert!(engine.execute_workflow(wf_id).is_ok());
+        assert_eq!(engine.stats().completed_workflows, 1);
     }
 }
