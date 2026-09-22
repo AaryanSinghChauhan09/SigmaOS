@@ -1063,6 +1063,68 @@ impl SovereignUniversalDistroBridge {
         let compatible = self.verify_all_subsystems_compatibility();
         (supervisor, pkg_spec, vfs_etc, compatible)
     }
+
+    pub fn get_distro_subsystem_feature_matrix(&self) -> Vec<(&'static str, String)> {
+        let mut matrix = Vec::new();
+        matrix.push(("init", format!("{:?}", self.get_supervisor_type())));
+        matrix.push(("package", self.translate_package_specifier("base")));
+        matrix.push(("vfs_etc", self.translate_vfs_path("/etc")));
+        matrix.push(("vfs_var", self.translate_vfs_path("/var/lib/pkg")));
+
+        let security_model = match self.mode {
+            DistroSubsystemMode::OpenBsd => "Pledge/Unveil + RetGuard",
+            DistroSubsystemMode::FreeBsd | DistroSubsystemMode::MidnightBsd | DistroSubsystemMode::HardenedBsd => "Capsicum Sandbox + MAC",
+            DistroSubsystemMode::LinuxFedora => "SELinux Target Enforcement",
+            DistroSubsystemMode::LinuxUbuntu => "AppArmor Profile Enforcement",
+            _ => "Landlock v5 + Seccomp BPF",
+        };
+        matrix.push(("security", security_model.to_string()));
+
+        let storage_model = match self.mode {
+            DistroSubsystemMode::FreeBsd | DistroSubsystemMode::SolarisIllumos => "ZFS Boot Environments",
+            DistroSubsystemMode::DragonFlyBsd => "HAMMER2 PFS Snapshots",
+            _ => "Btrfs CoW Subvolumes",
+        };
+        matrix.push(("storage", storage_model.to_string()));
+
+        let net_model = match self.mode {
+            DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => "VNET Virtual Network Stack",
+            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SmartOs => "Crossbow VNIC Etherstub",
+            _ => "eBPF/XDP Zero-Copy Redirect",
+        };
+        matrix.push(("network", net_model.to_string()));
+
+        let container_model = match self.mode {
+            DistroSubsystemMode::FreeBsd => "FreeBSD Jails",
+            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SmartOs => "Solaris Zones",
+            _ => "Rootless OCI Podman/Toolbx",
+        };
+        matrix.push(("container", container_model.to_string()));
+
+        matrix
+    }
+
+    pub fn orchestrate_full_distro_subsystem_stack(
+        &mut self,
+        action: &str,
+    ) -> Result<Vec<(String, String)>, &'static str> {
+        let core_subsystems = [
+            "init", "package", "vfs", "security", "storage", "kernel",
+            "network", "graphics", "power", "ipc", "auth", "audit",
+            "boot", "container", "virtualization", "audio", "memory",
+            "syscall", "device", "crypto", "ai", "monitoring", "desktop",
+            "compiler", "i18n", "bluetooth", "firewall", "diagnostics",
+            "recovery", "time", "shell", "display", "printing", "backup",
+            "telemetry", "compositor", "process",
+        ];
+
+        let mut results = Vec::new();
+        for sub in core_subsystems {
+            let res = self.dispatch_cross_subsystem_operation(sub, action)?;
+            results.push((sub.to_string(), res));
+        }
+        Ok(results)
+    }
 }
 
 // ==========================================
@@ -2185,6 +2247,23 @@ impl SovereignCrossDistroSubsystemOrchestrator {
     pub fn query_subsystem_capabilities(&self) -> (ServiceSupervisorType, String, String, bool) {
         self.bridge.get_distro_capability_matrix()
     }
+
+    pub fn get_distro_subsystem_feature_matrix(&self) -> Vec<(&'static str, String)> {
+        self.bridge.get_distro_subsystem_feature_matrix()
+    }
+
+    pub fn orchestrate_full_distro_subsystem_stack(
+        &mut self,
+        action: &str,
+    ) -> Result<Vec<(String, String)>, &'static str> {
+        let results = self.bridge.orchestrate_full_distro_subsystem_stack(action)?;
+        for (sub, _) in &results {
+            if !self.active_subsystems.contains(sub) {
+                self.active_subsystems.push(sub.clone());
+            }
+        }
+        Ok(results)
+    }
 }
 
 impl Default for SovereignCrossDistroSubsystemOrchestrator {
@@ -2462,6 +2541,37 @@ mod cross_subsystem_tests {
         }
 
         assert!(bridge.verify_all_subsystems_compatibility_matrix());
+    }
+
+    #[test]
+    fn test_orchestrate_full_distro_subsystem_stack() {
+        let mut orchestrator = SovereignCrossDistroSubsystemOrchestrator::new(DistroSubsystemMode::FreeBsd);
+        let results = orchestrator.orchestrate_full_distro_subsystem_stack("audit_subsystem");
+        assert!(results.is_ok());
+        let res_vec = results.unwrap();
+        assert!(res_vec.len() >= 35);
+
+        // Verify active subsystems were registered
+        assert!(orchestrator.active_subsystems.contains(&"init".to_string()));
+        assert!(orchestrator.active_subsystems.contains(&"network".to_string()));
+        assert!(orchestrator.active_subsystems.contains(&"storage".to_string()));
+
+        // Switch to OpenBSD and verify feature matrix
+        orchestrator.set_mode(DistroSubsystemMode::OpenBsd);
+        let matrix = orchestrator.get_distro_subsystem_feature_matrix();
+        let security_feature = matrix.iter().find(|(k, _)| *k == "security").map(|(_, v)| v.as_str());
+        assert_eq!(security_feature, Some("Pledge/Unveil + RetGuard"));
+    }
+
+    #[test]
+    fn test_get_distro_subsystem_feature_matrix() {
+        let fedora_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxFedora);
+        let fedora_matrix = fedora_bridge.get_distro_subsystem_feature_matrix();
+        assert!(fedora_matrix.iter().any(|(k, v)| *k == "security" && v.contains("SELinux")));
+
+        let dragon_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::DragonFlyBsd);
+        let dragon_matrix = dragon_bridge.get_distro_subsystem_feature_matrix();
+        assert!(dragon_matrix.iter().any(|(k, v)| *k == "storage" && v.contains("HAMMER2")));
     }
 }
 
