@@ -7,22 +7,12 @@ pub mod mate_betsy;
 pub mod mint_tools;
 pub mod moksha;
 pub mod omarchy_omakase;
-pub mod omarchy_apps;
-pub mod display_scaling;
 pub mod pantheon;
 pub mod screensaver;
 pub mod sovereign_navigation_engine;
 pub mod web_wasm_bridge;
 pub mod zenith;
 pub mod zenith_compositor;
-
-pub use display_scaling::{
-    DisplayTopologyMode, MonitorProfile, OmarchyDisplayScalingEngine,
-};
-
-pub use omarchy_apps::{
-    AetherThemePalette, LocalSendShareMode, OmarchyGuiAppEntry, OmarchyGuiAppsEngine,
-};
 
 pub use zenith::{
     FractionalDisplayScaler, HyprlandTilingLayoutEngine, OmarchyThemeSyncEngine, SimpleDesktopCompositor,
@@ -34,13 +24,14 @@ pub mod wayland_protocol;
 pub mod sovereign_ux_innovation_hub;
 pub mod weather_panel;
 pub mod universal_desktop_framework;
+pub mod xfce_engine;
 
 pub use gaming_engine::{
     AntiCheatCompatibilityShim, AntiCheatEngineType, DirectXApiVersion, FsrUpscalingMode,
     GameModeCpuGpuGovernor, GamescopeConfig, GamescopeMicrocompositorEngine,
     ProtonDirectXTranslationShim,
 };
-
+pub use xfce_engine::*;
 pub use wayland_protocol::*;
 pub use sovereign_ux_innovation_hub::*;
 pub use universal_desktop_framework::*;

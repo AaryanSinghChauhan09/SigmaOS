@@ -43,6 +43,7 @@ pub mod sigma_pkg;
 pub mod signing;
 pub mod spac;
 pub mod store;
+pub mod transaction_journal;
 pub mod universal;
 pub mod updater;
 pub mod sovereign_distro_package_matrix;
@@ -123,6 +124,9 @@ pub use repository::{
 pub use store::{
     SigmaSoftwareStore, SoftwareRegistryEntry, /* StoreApp, StoreError, */ // store module not available
      GLOBAL_SOFTWARE_STORE,
+};
+pub use transaction_journal::{
+    TransactionEntry, TransactionJournal, TransactionOperation, TransactionState,
 };
 pub use universal::{
     AptDebManifest, ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,

@@ -1,45 +1,23 @@
-pub mod init_abstraction;
-pub mod runit;
-pub mod s6;
-pub mod target_mapper;
-pub mod emergency_gate;
+//! SigmaOS Init System Module
+//!
+//! This module contains the init system (PID 1) for SigmaOS.
+//! The init system is responsible for system initialization,
+//! service management, and system shutdown/reboot.
+
 pub mod sigma_init;
-pub mod sigmainit;
+pub mod login;
+pub mod recovery_shell;
+pub mod service_supervisor;
 
-pub use target_mapper::{RunlevelToTargetMapper, SysvRunlevel};
-pub use emergency_gate::AuthenticatedEmergencyTargetGate;
-pub mod service_innovations_engine;
-pub mod systemd_init;
-pub use service_innovations_engine::*;
-
-pub use service_innovations_engine::{
-    BenchmarkScore, LinuxNewsPressTechFeedsEngine, PowerTelemetryReading,
-    SystemHealthDiagnosticService, TechMediaBenchmarkAggregator, TechNewsFeedItem,
-    ZeroTrustServiceHardeningEngine,
+pub use sigma_init::{
+    InitConfig, Service, ServiceState, SigmaInit,
 };
-
-pub use service_innovations_engine::{
-    BenchmarkScore, LinuxNewsPressTechFeedsEngine, PowerTelemetryReading,
-    SystemHealthDiagnosticService, TechMediaBenchmarkAggregator, TechNewsFeedItem,
-    ZeroTrustServiceHardeningEngine,
+pub use login::{
+    LoginService, Session, User,
 };
-
-pub use service_innovations_engine::{
-    BenchmarkScore, LinuxNewsPressTechFeedsEngine, PowerTelemetryReading,
-    SystemHealthDiagnosticService, TechMediaBenchmarkAggregator, TechNewsFeedItem,
-    ZeroTrustServiceHardeningEngine,
+pub use recovery_shell::{
+    RecoveryCommand, RecoveryShell,
 };
-
-pub use init_abstraction::*;
-pub use runit::*;
-pub use s6::*;
-pub use sigma_init::*;
-pub use sigmainit::*;
-pub use systemd_init::{
-    BsdRcOrder, InitSystemBridge, InitSystemType, JournalEntry, ParsedSystemdUnitFile,
-    RestartPolicy, SystemdBetsyEngine, SystemdCgroupSliceGovernor, SystemdEngine,
-    SystemdServiceWatchdog, SystemdUnit, SystemdUnitFileParser, UnitID, UnitState, UnitType,
+pub use service_supervisor::{
+    ServiceDescriptor, ServiceSupervisor, RestartPolicy,
 };
-
-// ─── Sub-Second Boot Sequencer ────────────────────────────────────────────────
-pub mod subsecond_boot_sequencer;

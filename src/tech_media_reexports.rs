@@ -4,6 +4,7 @@ pub use crate::ai::marktechpost_kdnuggets_data_science::{
 };
 pub use crate::distro::tech_media_distro_innovations::{
     DistroWatchRankTrackerEngine, FrappeEnterpriseFrameworkEngine,
+    GeekyGadgetsHardwareReviewEngine, ItsFossZeroDependencyToolingEngine,
     LinuxTeckSysadminAutomationEngine, MakeUseOfDistroRecommendationEngine,
     NineToFiveGoogleMacEcosystemEngine, NineToFiveLinuxReleaseMatrixEngine,
     SovereignTechMediaDistroInnovationsSuite,

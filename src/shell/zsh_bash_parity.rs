@@ -1045,6 +1045,8 @@ pub enum ShellDialect {
     Ion,
     Rc,
     Elvish,
+    Yash,
+    Mksh,
 }
 
 pub struct FishAbbreviationEngine {
@@ -1262,6 +1264,8 @@ impl UniversalShellCompatibilityEngine {
                     return ShellDialect::Fish;
                 } else if trimmed.contains("tcsh") || trimmed.contains("csh") {
                     return ShellDialect::Tcsh;
+                } else if trimmed.contains("mksh") {
+                    return ShellDialect::Mksh;
                 } else if trimmed.contains("ksh") {
                     return ShellDialect::Ksh;
                 } else if trimmed.contains("dash") {
@@ -1274,6 +1278,8 @@ impl UniversalShellCompatibilityEngine {
                     return ShellDialect::Rc;
                 } else if trimmed.contains("elvish") {
                     return ShellDialect::Elvish;
+                } else if trimmed.contains("yash") {
+                    return ShellDialect::Yash;
                 } else if trimmed.contains("sh") {
                     return ShellDialect::BsdSh;
                 }
@@ -1341,6 +1347,8 @@ impl UniversalScriptTranspiler {
                 ShellDialect::Ion => Self::transpile_ion_line(trimmed, &mut in_function),
                 ShellDialect::Rc => Self::transpile_rc_line(trimmed, &mut in_function),
                 ShellDialect::Elvish => Self::transpile_elvish_line(trimmed, &mut in_function),
+                ShellDialect::Yash => Self::transpile_yash_line(trimmed, &mut in_function),
+                ShellDialect::Mksh => Self::transpile_mksh_line(trimmed),
                 ShellDialect::Dash | ShellDialect::BsdSh => trimmed.to_string(),
             };
 
@@ -1425,6 +1433,18 @@ impl UniversalScriptTranspiler {
                 let target = parts[1..].join(" ");
                 return format!("seq -s '' {} | sed 's/[0-9]/{}/g'", count, target);
             }
+        } else if l.starts_with("string lower ") {
+            let rest = l.trim_start_matches("string lower ").trim();
+            return format!("echo {} | tr '[:upper:]' '[:lower:]'", rest);
+        } else if l.starts_with("string upper ") {
+            let rest = l.trim_start_matches("string upper ").trim();
+            return format!("echo {} | tr '[:lower:]' '[:upper:]'", rest);
+        } else if l.starts_with("string pad ") {
+            let rest = l.trim_start_matches("string pad ").trim();
+            return format!("printf '%20s' {}", rest);
+        } else if l.starts_with("string collect ") {
+            let rest = l.trim_start_matches("string collect ").trim();
+            return format!("echo \"{}\"", rest);
         }
 
         // 3. Fish 'for var in list' -> 'for var in list; do'
@@ -1718,7 +1738,8 @@ impl UniversalScriptTranspiler {
             if let Some(end) = l[start..].find(')') {
                 let absolute_end = start + end;
                 let subcmd = &l[start + 2..absolute_end];
-                l = format!("{} $( {} ){}", &l[..start], subcmd, &l[absolute_end + 1..]);
+                let prefix = l[..start].trim_end();
+                l = format!("{} $( {} ){}", prefix, subcmd.trim(), &l[absolute_end + 1..]);
             } else {
                 break;
             }
@@ -1727,7 +1748,8 @@ impl UniversalScriptTranspiler {
             if let Some(end) = l[start..].find(')') {
                 let absolute_end = start + end;
                 let subcmd = &l[start + 2..absolute_end];
-                l = format!("{} $( {} ){}", &l[..start], subcmd, &l[absolute_end + 1..]);
+                let prefix = l[..start].trim_end();
+                l = format!("{} $( {} ){}", prefix, subcmd.trim(), &l[absolute_end + 1..]);
             } else {
                 break;
             }
@@ -1739,6 +1761,17 @@ impl UniversalScriptTranspiler {
         }
         if l.contains("${(L)") {
             l = l.replace("${(L)", "${");
+        }
+        if l.contains("${(f)") {
+            l = l.replace("${(f)", "${");
+        }
+        if l.contains("${(s:") {
+            if let Some(idx) = l.find("${(s:") {
+                if let Some(end) = l[idx..].find(")}") {
+                    let full_expr = &l[idx..idx + end + 2];
+                    l = l.replace(full_expr, "$var");
+                }
+            }
         }
         if l.contains("${(j:") {
             if let Some(idx) = l.find("${(j:") {
@@ -1975,6 +2008,41 @@ impl UniversalScriptTranspiler {
             return "}".to_string();
         } else if l == "nop" {
             return ":".to_string();
+        }
+        l
+    }
+
+    fn transpile_yash_line(line: &str, in_function: &mut bool) -> String {
+        let l = line.to_string();
+        if l.starts_with("typeset -a ") || l.starts_with("array ") {
+            let clean = l
+                .trim_start_matches("typeset -a ")
+                .trim_start_matches("array ")
+                .trim();
+            if let Some(eq) = clean.find('=') {
+                let var = clean[..eq].trim();
+                let val = clean[eq + 1..].trim().trim_matches('(').trim_matches(')');
+                return format!("{}=\"{}\"", var, val);
+            }
+        } else if l.starts_with("function ") {
+            let name = l.trim_start_matches("function ").trim();
+            *in_function = true;
+            return format!("{}() {{", name);
+        }
+        l
+    }
+
+    fn transpile_mksh_line(line: &str) -> String {
+        let mut l = line.to_string();
+        if l.starts_with("integer ") {
+            let var = l.trim_start_matches("integer ").trim();
+            if let Some(eq) = var.find('=') {
+                return format!("{}", var);
+            }
+            return format!("{}=0", var);
+        } else if l.starts_with("print -r -- ") {
+            let msg = l.trim_start_matches("print -r -- ").trim();
+            return format!("printf '%s\\n' {}", msg);
         }
         l
     }
@@ -2568,5 +2636,25 @@ mod tests {
         let posix_elvish = UniversalScriptTranspiler::transpile_to_posix_sh(elvish_script, ShellDialect::Elvish);
         assert!(posix_elvish.contains("STATUS=ok"));
         assert!(posix_elvish.contains(":"));
+
+        let yash_script = "#!/usr/bin/yash\narray arr = (one two three)\nfunction test_yash";
+        assert_eq!(UniversalShellCompatibilityEngine::detect_shebang_dialect(yash_script), ShellDialect::Yash);
+        let posix_yash = UniversalScriptTranspiler::transpile_to_posix_sh(yash_script, ShellDialect::Yash);
+        assert!(posix_yash.contains("arr=\"one two three\""));
+        assert!(posix_yash.contains("test_yash() {"));
+
+        let mksh_script = "#!/bin/mksh\ninteger count=10\nprint -r -- \"hello world\"";
+        assert_eq!(UniversalShellCompatibilityEngine::detect_shebang_dialect(mksh_script), ShellDialect::Mksh);
+        let posix_mksh = UniversalScriptTranspiler::transpile_to_posix_sh(mksh_script, ShellDialect::Mksh);
+        assert!(posix_mksh.contains("count=10"));
+        assert!(posix_mksh.contains("printf '%s\\n' \"hello world\""));
+
+        let process_sub = "cat <(ls -la) >(grep test)";
+        let posix_proc = UniversalScriptTranspiler::transpile_to_posix_sh(process_sub, ShellDialect::Bash);
+        assert!(posix_proc.contains("cat $( ls -la ) $( grep test )"));
+
+        let fish_str_lower = "string lower HELLO";
+        let posix_fish_str = UniversalScriptTranspiler::transpile_to_posix_sh(fish_str_lower, ShellDialect::Fish);
+        assert!(posix_fish_str.contains("tr '[:upper:]' '[:lower:]'"));
     }
 }

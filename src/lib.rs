@@ -22,6 +22,7 @@ pub mod container;
 pub mod customization;
 pub mod dashboard;
 pub mod desktop;
+pub mod init;
 pub mod device;
 pub mod driver;
 pub mod drivers;
@@ -48,6 +49,7 @@ pub mod shell;
 pub mod sigpkg;
 pub mod storage;
 pub mod thread;
+pub mod vfs;
 pub use process::{
     AdvancedIpcHub, BsdRusage, CancellationType, CoreDumpMetadata, EventFd,
     JobControlLifecycleEngine, JobState, PosixMessage, PosixMessageQueue, ProcessCancelState,
@@ -76,6 +78,8 @@ pub use sovereign_wiki_master_engine::*;
 pub mod open_source_obsoletion;
 pub mod unimplemented_features;
 pub mod unimplemented_tools;
+pub mod wiki_unimplemented_ideas;
+pub use wiki_unimplemented_ideas::*;
 pub mod userland;
 
 pub use distro::{

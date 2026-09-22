@@ -10,12 +10,10 @@ pub mod sovereign_commands;
 pub mod open_source_tools_engine;
 pub mod open_source_cli_tools_suite;
 pub mod tech_media_innovations;
-pub mod antigravity_cli;
 
 pub use tech_media_innovations::*;
 pub use open_source_tools_engine::*;
 pub use open_source_cli_tools_suite::*;
-pub use antigravity_cli::{AntiGravityCliEngine, GravityMode, PhysicsBody2D};
 
 pub use data_tools::{
     ColumnSchema, ColumnarStats, DataAggregationResult, DataFieldType, DataFrame,

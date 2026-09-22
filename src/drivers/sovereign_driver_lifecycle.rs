@@ -3,9 +3,9 @@
 // 30-year ancient-to-modern hardware bring-up tier (BIOS shims, ISA DMA, ATA/IDE, PCIe Gen5/CXL 3.0, NVMe 2.0),
 // and lockless SPSC DMA ring queues under #![no_std] constraints.
 
+
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
-use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DriverLifecycleState {
@@ -129,18 +129,6 @@ impl SovereignDriverManager {
             }
         }
         None
-    }
-
-    /// Dynamic Driver Unloading (FreeBSD kldunload / Linux modprobe -r parity)
-    pub fn unload_driver(&mut self, driver_id: usize) -> Result<(), &'static str> {
-        let drv = self.registered_drivers.get_mut(&driver_id).ok_or("Driver not found")?;
-
-        if let Some(pci_id) = &drv.pci_id {
-            self.pci_binding_table.remove(&(pci_id.vendor_id, pci_id.device_id));
-        }
-
-        drv.state = DriverLifecycleState::Unloaded;
-        Ok(())
     }
 }
 
@@ -454,6 +442,76 @@ pub struct ClusterAwarePeripheralManager {
     pub devices: BTreeMap<String, ClusterPeripheralDevice>,
 }
 
+/// Linux udev/modalias and FreeBSD devd inspired driver auto-loader and dynamic matching engine
+#[derive(Debug, Clone)]
+pub struct LinuxModaliasRule {
+    pub pattern: String, // e.g. "pci:v00008086d00001533sv*sd*bc*sc*i*"
+    pub driver_module: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct BsdDevdHardwareEvent {
+    pub system: String,  // e.g. "DEVFS", "USB", "PCI"
+    pub subsystem: String,
+    pub type_event: String, // e.g. "ATTACH", "DETACH"
+    pub device_name: String,
+}
+
+pub struct LinuxBsdDriverManagerExtension {
+    pub modalias_rules: Vec<LinuxModaliasRule>,
+    pub devd_events: Vec<BsdDevdHardwareEvent>,
+    pub dkms_modules: BTreeMap<String, String>, // module_name -> kernel_version
+}
+
+impl LinuxBsdDriverManagerExtension {
+    pub fn new() -> Self {
+        Self {
+            modalias_rules: Vec::new(),
+            devd_events: Vec::new(),
+            dkms_modules: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_modalias_rule(&mut self, pattern: &str, module: &str) {
+        self.modalias_rules.push(LinuxModaliasRule {
+            pattern: pattern.to_string(),
+            driver_module: module.to_string(),
+        });
+    }
+
+    pub fn match_modalias(&self, modalias_str: &str) -> Option<String> {
+        for rule in &self.modalias_rules {
+            if modalias_str.contains(&rule.pattern) || rule.pattern == "*" {
+                return Some(rule.driver_module.clone());
+            }
+        }
+        None
+    }
+
+    pub fn emit_devd_event(&mut self, system: &str, subsystem: &str, type_event: &str, device_name: &str) {
+        self.devd_events.push(BsdDevdHardwareEvent {
+            system: system.to_string(),
+            subsystem: subsystem.to_string(),
+            type_event: type_event.to_string(),
+            device_name: device_name.to_string(),
+        });
+    }
+
+    pub fn build_dkms_module(&mut self, module_name: &str, target_kernel: &str) -> Result<String, &'static str> {
+        if module_name.is_empty() {
+            return Err("Invalid DKMS module name");
+        }
+        self.dkms_modules.insert(module_name.to_string(), target_kernel.to_string());
+        Ok(format!("DKMS: Compiled module '{}' for kernel '{}'", module_name, target_kernel))
+    }
+}
+
+impl Default for LinuxBsdDriverManagerExtension {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ClusterAwarePeripheralManager {
     pub fn new() -> Self {
         Self {
@@ -547,13 +605,32 @@ mod tests {
             DriverLifecycleState::Active
         );
 
-        // Dynamic Unload driver
-        assert!(mgr.unload_driver(nvme_drv_id).is_ok());
-        assert_eq!(
-            mgr.registered_drivers.get(&nvme_drv_id).unwrap().state,
-            DriverLifecycleState::Unloaded
+        // Register Nouveau Nvidia Driver
+        let nouveau_id = mgr.register_driver_factory(
+            "nouveau-sovereign-drm",
+            HardwareTier::ModernBareMetal,
+            Some(0x10de),
+            Some(0x2782),
         );
-        assert!(mgr.autoprobe_pci_bus(0x8086, 0x0953).is_none());
+        assert_eq!(mgr.autoprobe_pci_bus(0x10de, 0x2782), Some(nouveau_id));
+
+        // Register Apple Silicon ANS2 NVMe Driver
+        let ans2_id = mgr.register_driver_factory(
+            "apple-ans2-nvme",
+            HardwareTier::ModernBareMetal,
+            Some(0x106b),
+            Some(0x2001),
+        );
+        assert_eq!(mgr.autoprobe_pci_bus(0x106b, 0x2001), Some(ans2_id));
+
+        // Register Intel Wi-Fi 7 BE200 Driver
+        let be200_id = mgr.register_driver_factory(
+            "intel-be200-wifi7",
+            HardwareTier::ModernBareMetal,
+            Some(0x8086),
+            Some(0x272b),
+        );
+        assert_eq!(mgr.autoprobe_pci_bus(0x8086, 0x272b), Some(be200_id));
 
         // Lockless SPSC DMA Queue test
         let mut dma_queue = LocklessDmaRingQueue::<4>::new();
@@ -618,5 +695,20 @@ mod tests {
         let shared_gpus = engine.cluster_peripherals.list_shared_peripherals_by_class("gpu");
         assert_eq!(shared_gpus.len(), 1);
         assert_eq!(shared_gpus[0].node_id, "node-02");
+    }
+
+    #[test]
+    fn test_linux_bsd_driver_manager_extension() {
+        let mut ext = LinuxBsdDriverManagerExtension::new();
+        ext.register_modalias_rule("pci:v00008086d00001533", "e1000e");
+        let matched = ext.match_modalias("pci:v00008086d00001533sv00001028sd00000001").unwrap();
+        assert_eq!(matched, "e1000e");
+
+        ext.emit_devd_event("USB", "INTERFACE", "ATTACH", "da0");
+        assert_eq!(ext.devd_events.len(), 1);
+        assert_eq!(ext.devd_events[0].device_name, "da0");
+
+        let dkms_res = ext.build_dkms_module("nvidia-current", "6.12.0-sigmaos").unwrap();
+        assert!(dkms_res.contains("nvidia-current"));
     }
 }

@@ -79,15 +79,17 @@ impl TomlDocument {
             }
             // key = value
             let eq = line.find('=').ok_or("Missing '=' in key/value pair")?;
-            let key = line[..eq].trim().to_string();
+            let key = line[..eq].trim();
             let value = line[eq + 1..].trim();
+            // Bolt ⚡: Keep key as borrowed slice &str and defer allocation until building full_key,
+            // avoiding intermediate temporary String allocations when table prefix is present.
             let full_key = if table.is_empty() {
-                key
+                key.to_string()
             } else {
                 let mut f = String::with_capacity(table.len() + 1 + key.len());
                 f.push_str(&table);
                 f.push('.');
-                f.push_str(&key);
+                f.push_str(key);
                 f
             };
             let parsed = parse_value(value)?;

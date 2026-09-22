@@ -28,5 +28,5 @@ pub use widget_api::{
     Widget as NativeWidget, WidgetApi, WidgetBuilder, WidgetKind, WidgetId,
     Layout, Dimension, Spacing, FlexDirection, Justify, Align,
     Style, WidgetState, Event, EventType, EventHandler, Modifiers,
-    widgets,
+    widgets, DeskletKind, DeskletPositionSpec, SovereignDesklet, SovereignDeskletEngine,
 };
