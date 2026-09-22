@@ -7,9 +7,22 @@
 #![allow(non_camel_case_types)]
 #![allow(clippy::large_enum_variant)]
 #![allow(clippy::type_complexity)]
+#[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
+
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
+
+#[cfg(any(feature = "standalone_test", test))]
+use std::format;
+#[cfg(any(feature = "standalone_test", test))]
+use std::string::{String, ToString};
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 // SigmaPkg - SigmaOS Package Manager
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
@@ -86,7 +99,7 @@ pub use universal_oop_system::{
 pub use sovereign_sigpkg::*;
 pub use crate::package::sovereign_distro_package_master_suite::*;
 pub use universal_adapter::{
-    AppImageContainer, FlatpakManifest, MappedScriptletHook, PackageFormatAdapter,
+    AppImageContainer, AptDebManifest, FlatpakManifest, MappedScriptletHook, PackageFormatAdapter,
     PackagePriority, PacmanPkgbuild, RpmSpecManifest, SigmaPkgHookType, SnapcraftManifest,
     UniversalDependencyMapper, UniversalDryRunResult, UniversalDryRunSimulator,
     UniversalFormatConverter, UniversalPackageAdapter, UniversalScriptletConverter,
