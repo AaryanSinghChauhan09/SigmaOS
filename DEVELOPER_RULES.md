@@ -62,6 +62,13 @@ Inspired by Linux & BSD distribution development standards (Arch Linux, Debian, 
 - **Merkle Closure Store**: Software builds must be addressed by input hashes inside a content-addressed storage (CAS) store.
 - **Atomic State Hot-Swapping**: System configuration updates and package state transitions must support sub-millisecond atomic generation rollbacks.
 
+### 6. **Omarchy & Cloud-Init Unattended Automation Directives**
+- **Read-Only System Guard**: `/usr/share/omarchy/` is strictly read-only for end-user customization tasks. Custom user configs, themes, and hooks must reside under `~/.config/`.
+- **Privilege Escalation Rules**: Use `sudo` for interactive terminal sessions, `pkexec` for background agent/graphical processes, and `--no-sudo --print` for debug commands.
+- **Unattended `cidata` Cloud-Init**: VMs and automated deployments must support cloud-init `cidata` drive auto-detection (`user_configuration.json`, `user_credentials.json`, `authorized_keys`, `tailscale_authkey`, `defer-provisioning`).
+- **Quickshell Plugin Namespacing**: Reserved namespace `omarchy.*` is restricted to first-party built-in plugins. Third-party plugins live in `~/.config/omarchy/plugins/`.
+- **Graphical Acceptance Suite**: Acceptance tests (`test/acceptance.d/*-test.sh`) must run in VM harnesses, generate TAP protocol reports (`parse_tap_output`), and capture step screenshots (`success-<step>.png`, `failure-<step>.png`).
+
 ---
 
 ## Development Workflow
