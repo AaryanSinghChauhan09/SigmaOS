@@ -56,8 +56,9 @@ pub mod landlock_sovereign;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use bsd_hardening::{
-    AslrEngine, BsdHardeningSuite, CapsicumCapability, CapsicumManager, MemoryPermission,
-    PaxMprotect, PledgeManager as BsdPledgeManager, PledgePromise as BsdPledgePromise,
+    AslrEngine, BsdHardeningSuite, BsdSysctlSecurelevelEnforcer, CapsicumCapability,
+    CapsicumManager, MemoryPermission, PaxMprotect, PledgeManager as BsdPledgeManager,
+    PledgePromise as BsdPledgePromise, SecurelevelState as BsdSecurelevelState,
     UnveilEntry as BsdUnveilEntry, UnveilManager as BsdUnveilManager,
     UnveilPermission as BsdUnveilPermission, WxEnforcer,
 };
@@ -101,8 +102,9 @@ pub use parrot_kali::{
 };
 pub use parrot::ParrotSecurityFingerprintEngine;
 pub use password::{
-    BiometricAuth, BiometricResult, BiometricType, FaceIdAuth, FingerprintAuth, PasswordCategory,
-    PasswordEntry, PasswordError, PasswordManager, PasswordManagerResult,
+    BiometricAuth, BiometricResult, BiometricType, FaceIdAuth, Fido2Auth, FingerprintAuth,
+    HardwareAuthManager, HardwareAuthPromptTarget, PasswordCategory, PasswordEntry, PasswordError,
+    PasswordManager, PasswordManagerResult,
 };
 pub use pledge::{
     promises, PledgeError, PledgeManager, PledgePromise, PledgeManager as OriginalPledgeManager,

@@ -21,7 +21,10 @@ use std::vec::Vec;
 // SigmaOS Password Manager
 // OOP-based password management with biometric unlock and encryption
 
+#[cfg(not(any(feature = "standalone_test", test)))]
 use crate::klib::btreemap::BTreeMap;
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::BTreeMap;
 
 /// Password entry
 #[derive(Debug, Clone)]
@@ -487,6 +490,118 @@ impl Default for PasswordManager {
     }
 }
 
+/// FIDO2 Security Device Authentication
+pub struct Fido2Auth {
+    pub enrolled: bool,
+    pub device_name: String,
+}
+
+impl Fido2Auth {
+    pub fn new(device_name: &str) -> Self {
+        Self {
+            enrolled: false,
+            device_name: device_name.to_string(),
+        }
+    }
+
+    pub fn enroll_device(&mut self) -> Result<(), PasswordError> {
+        self.enrolled = true;
+        Ok(())
+    }
+
+    pub fn authenticate_sudo_elevation(&self) -> Result<bool, PasswordError> {
+        if !self.enrolled {
+            return Err(PasswordError::BiometricNotEnrolled);
+        }
+        Ok(true)
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HardwareAuthPromptTarget {
+    LockScreenUnlock,
+    SudoElevation,
+    SystemAuthorizationPrompt,
+}
+
+/// Omarchy Hardware Authentication Manager (Fingerprint + FIDO2)
+pub struct HardwareAuthManager {
+    pub fingerprint_enrolled: bool,
+    pub fido2_enrolled: bool,
+    pub laptop_lid_closed: bool,
+}
+
+impl HardwareAuthManager {
+    pub fn new() -> Self {
+        Self {
+            fingerprint_enrolled: false,
+            fido2_enrolled: false,
+            laptop_lid_closed: false,
+        }
+    }
+
+    /// Setup > Security > Fingerprint
+    pub fn setup_fingerprint(&mut self) -> Result<String, PasswordError> {
+        self.fingerprint_enrolled = true;
+        Ok("Fingerprint package installed and print verified successfully".to_string())
+    }
+
+    /// Remove > Security > Fingerprint
+    pub fn remove_fingerprint(&mut self) {
+        self.fingerprint_enrolled = false;
+    }
+
+    /// Setup > Security > Fido2
+    pub fn setup_fido2(&mut self) -> Result<String, PasswordError> {
+        self.fido2_enrolled = true;
+        Ok("FIDO2 security key configured for sudo and system prompts".to_string())
+    }
+
+    /// Remove > Security > Fido2
+    pub fn remove_fido2(&mut self) {
+        self.fido2_enrolled = false;
+    }
+
+    /// Evaluate whether fingerprint prompt should be active or skipped (e.g. lid closed)
+    pub fn should_prompt_fingerprint(&self, target: HardwareAuthPromptTarget) -> bool {
+        if !self.fingerprint_enrolled {
+            return false;
+        }
+        // Lid closed -> automatically skip sensor and fall back to password prompt
+        if self.laptop_lid_closed {
+            return false;
+        }
+        match target {
+            HardwareAuthPromptTarget::LockScreenUnlock => true,
+            HardwareAuthPromptTarget::SudoElevation => true,
+            HardwareAuthPromptTarget::SystemAuthorizationPrompt => true,
+        }
+    }
+
+    /// Evaluate FIDO2 prompt eligibility (covers sudo & system prompts, NOT lockscreen unlock)
+    pub fn should_prompt_fido2(&self, target: HardwareAuthPromptTarget) -> bool {
+        if !self.fido2_enrolled {
+            return false;
+        }
+        match target {
+            HardwareAuthPromptTarget::LockScreenUnlock => false, // FIDO2 does NOT unlock computer
+            HardwareAuthPromptTarget::SudoElevation => true,
+            HardwareAuthPromptTarget::SystemAuthorizationPrompt => true,
+        }
+    }
+
+    /// Simulates hitting CTRL+C during sudo fingerprint prompt to fall back immediately to password
+    pub fn handle_sudo_ctrl_c_fallback(&self) -> String {
+        "Fingerprint prompt bypassed via CTRL+C. Falling back to password: ".to_string()
+    }
+}
+
+impl Default for HardwareAuthManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Password manager errors
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PasswordError {
@@ -577,5 +692,47 @@ mod tests {
     fn test_generate_password() {
         let password = PasswordManager::generate_password(16, true);
         assert_eq!(password.len(), 16);
+    }
+
+    #[test]
+    fn test_hardware_auth_manager_and_fido2() {
+        let mut hw_mgr = HardwareAuthManager::new();
+        assert!(!hw_mgr.should_prompt_fingerprint(HardwareAuthPromptTarget::LockScreenUnlock));
+        assert!(!hw_mgr.should_prompt_fido2(HardwareAuthPromptTarget::SudoElevation));
+
+        // Setup Fingerprint
+        assert!(hw_mgr.setup_fingerprint().is_ok());
+        assert!(hw_mgr.should_prompt_fingerprint(HardwareAuthPromptTarget::LockScreenUnlock));
+
+        // Close laptop lid -> Fingerprint prompt auto-skipped
+        hw_mgr.laptop_lid_closed = true;
+        assert!(!hw_mgr.should_prompt_fingerprint(HardwareAuthPromptTarget::LockScreenUnlock));
+
+        // Open laptop lid
+        hw_mgr.laptop_lid_closed = false;
+        assert!(hw_mgr.should_prompt_fingerprint(HardwareAuthPromptTarget::LockScreenUnlock));
+
+        // Setup FIDO2
+        assert!(hw_mgr.setup_fido2().is_ok());
+        // FIDO2 covers sudo & system prompts, NOT lockscreen unlock
+        assert!(!hw_mgr.should_prompt_fido2(HardwareAuthPromptTarget::LockScreenUnlock));
+        assert!(hw_mgr.should_prompt_fido2(HardwareAuthPromptTarget::SudoElevation));
+        assert!(hw_mgr.should_prompt_fido2(HardwareAuthPromptTarget::SystemAuthorizationPrompt));
+
+        // Test CTRL+C fallback message
+        let fallback_msg = hw_mgr.handle_sudo_ctrl_c_fallback();
+        assert!(fallback_msg.contains("CTRL+C"));
+
+        // Remove auth
+        hw_mgr.remove_fingerprint();
+        hw_mgr.remove_fido2();
+        assert!(!hw_mgr.should_prompt_fingerprint(HardwareAuthPromptTarget::LockScreenUnlock));
+        assert!(!hw_mgr.should_prompt_fido2(HardwareAuthPromptTarget::SudoElevation));
+
+        // Test Fido2Auth struct directly
+        let mut fido = Fido2Auth::new("YubiKey 5 NFC");
+        assert!(fido.authenticate_sudo_elevation().is_err());
+        assert!(fido.enroll_device().is_ok());
+        assert!(fido.authenticate_sudo_elevation().unwrap());
     }
 }

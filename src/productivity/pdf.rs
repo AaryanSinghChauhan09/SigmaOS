@@ -113,7 +113,7 @@ impl SovereignPdf24Engine {
         let mut splitted = PdfDocument::new(format!("Split Range {}-{}", start_page, end_page));
         for i in (start_page - 1)..end_page {
             let mut page = document.pages[i].clone();
-            page.page_number = i - start_page + 2;
+            page.page_number = i + 2 - start_page;
             splitted.add_page(page);
         }
         Ok(splitted)
@@ -187,6 +187,164 @@ impl SovereignPdf24Engine {
 }
 
 impl Default for SovereignPdf24Engine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// Xournal++ PDF Annotation, Form Filling & Signature Stamping Engine
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum XournalAnnotationType {
+    Text,
+    SignatureImage,
+    FormField,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct XournalAnnotation {
+    pub annotation_id: u64,
+    pub page_number: usize,
+    pub annotation_type: XournalAnnotationType,
+    pub text_content: String,
+    pub position_xy: (f32, f32),
+    pub dimensions: (f32, f32),
+    pub signature_bytes: Vec<u8>,
+    pub font_size: f32,
+}
+
+/// Xournal++ inspired PDF Form Filling, Freehand Text (T Tool), Signature Stamping & Export Engine
+pub struct SovereignXournalPdfAnnotationEngine {
+    pub annotations: Vec<XournalAnnotation>,
+    pub next_annotation_id: u64,
+}
+
+impl SovereignXournalPdfAnnotationEngine {
+    pub fn new() -> Self {
+        Self {
+            annotations: Vec::new(),
+            next_annotation_id: 1,
+        }
+    }
+
+    /// T Tool: Add text annotation anywhere on a PDF page
+    pub fn add_text_annotation(
+        &mut self,
+        page_number: usize,
+        text: &str,
+        pos_xy: (f32, f32),
+        font_size: f32,
+    ) -> u64 {
+        let id = self.next_annotation_id;
+        self.next_annotation_id += 1;
+
+        self.annotations.push(XournalAnnotation {
+            annotation_id: id,
+            page_number,
+            annotation_type: XournalAnnotationType::Text,
+            text_content: String::from(text),
+            position_xy: pos_xy,
+            dimensions: (text.len() as f32 * font_size * 0.5, font_size * 1.2),
+            signature_bytes: Vec::new(),
+            font_size,
+        });
+
+        id
+    }
+
+    /// Image Tool: Stamp an image signature onto a PDF page with custom positioning and resizing
+    pub fn stamp_signature_image(
+        &mut self,
+        page_number: usize,
+        image_bytes: &[u8],
+        pos_xy: (f32, f32),
+        dimensions: (f32, f32),
+    ) -> u64 {
+        let id = self.next_annotation_id;
+        self.next_annotation_id += 1;
+
+        self.annotations.push(XournalAnnotation {
+            annotation_id: id,
+            page_number,
+            annotation_type: XournalAnnotationType::SignatureImage,
+            text_content: String::from("SIGNATURE_STAMP"),
+            position_xy: pos_xy,
+            dimensions,
+            signature_bytes: image_bytes.to_vec(),
+            font_size: 0.0,
+        });
+
+        id
+    }
+
+    /// Fill non-standard PDF form fields
+    pub fn fill_form_field(
+        &mut self,
+        page_number: usize,
+        field_name: &str,
+        field_value: &str,
+        pos_xy: (f32, f32),
+    ) -> u64 {
+        let id = self.next_annotation_id;
+        self.next_annotation_id += 1;
+
+        self.annotations.push(XournalAnnotation {
+            annotation_id: id,
+            page_number,
+            annotation_type: XournalAnnotationType::FormField,
+            text_content: format!("{}:{}", field_name, field_value),
+            position_xy: pos_xy,
+            dimensions: (150.0, 20.0),
+            signature_bytes: Vec::new(),
+            font_size: 11.0,
+        });
+
+        id
+    }
+
+    /// File > Export as PDF: Merges annotations and signatures directly into PDF page streams
+    pub fn export_as_pdf(&self, document: &PdfDocument) -> Result<PdfDocument, PdfError> {
+        if document.pages.is_empty() {
+            return Err(PdfError::EmptyDocument);
+        }
+
+        let mut exported = document.clone();
+        exported.title = format!("{} (Annotated)", document.title);
+
+        for page in &mut exported.pages {
+            let page_annot = self.annotations.iter().filter(|a| a.page_number == page.page_number);
+            for annot in page_annot {
+                let stream_entry = match annot.annotation_type {
+                    XournalAnnotationType::Text => {
+                        format!(
+                            "\n/Text ({}) BT /F1 {} Tf {:.1} {} Td Tj ET",
+                            annot.text_content, annot.font_size, annot.position_xy.0, annot.position_xy.1
+                        )
+                    }
+                    XournalAnnotationType::SignatureImage => {
+                        format!(
+                            "\n/ImageStamp ({}) Do q {:.1} 0 0 {:.1} {:.1} {:.1} cm",
+                            annot.text_content, annot.dimensions.0, annot.dimensions.1, annot.position_xy.0, annot.position_xy.1
+                        )
+                    }
+                    XournalAnnotationType::FormField => {
+                        format!(
+                            "\n/FormField ({}) BT /F1 11.0 Tf {:.1} {} Td Tj ET",
+                            annot.text_content, annot.position_xy.0, annot.position_xy.1
+                        )
+                    }
+                };
+                page.content_stream.extend_from_slice(stream_entry.as_bytes());
+            }
+        }
+
+        Ok(exported)
+    }
+}
+
+impl Default for SovereignXournalPdfAnnotationEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -288,5 +446,33 @@ mod tests {
         let doc = engine.convert_text_to_pdf("Hello World").unwrap();
         assert_eq!(doc.pages.len(), 1);
         assert_eq!(doc.pages[0].content_stream, "Hello World".as_bytes());
+    }
+
+    #[test]
+    fn test_xournal_pdf_annotation_and_signature() {
+        let mut xournal = SovereignXournalPdfAnnotationEngine::new();
+        let text_id = xournal.add_text_annotation(1, "John Doe", (100.0, 500.0), 12.0);
+        assert_eq!(text_id, 1);
+
+        let sig_bytes = b"PNG_FAKE_SIGNATURE_BYTES";
+        let sig_id = xournal.stamp_signature_image(1, sig_bytes, (200.0, 100.0), (120.0, 40.0));
+        assert_eq!(sig_id, 2);
+
+        let form_id = xournal.fill_form_field(1, "TaxID", "999-00-1111", (100.0, 450.0));
+        assert_eq!(form_id, 3);
+
+        let mut doc = PdfDocument::new("Contract".to_string());
+        doc.add_page(PdfPage {
+            page_number: 1,
+            content_stream: b"%PDF-PAGE-1".to_vec(),
+            dimensions: (595.0, 842.0),
+        });
+
+        let exported = xournal.export_as_pdf(&doc).unwrap();
+        assert!(exported.title.contains("Annotated"));
+        let stream_str = String::from_utf8_lossy(&exported.pages[0].content_stream);
+        assert!(stream_str.contains("John Doe"));
+        assert!(stream_str.contains("SIGNATURE_STAMP"));
+        assert!(stream_str.contains("TaxID:999-00-1111"));
     }
 }
