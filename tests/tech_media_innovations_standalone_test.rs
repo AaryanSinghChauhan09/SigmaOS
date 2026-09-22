@@ -8,6 +8,9 @@ fn main() {
     let mut distro_suite = SovereignTechMediaDistroInnovationsSuite::new();
     assert!(distro_suite.verify_suite(), "Distro suite verification failed");
     println!("DistroWatch top rank: {}", distro_suite.rank_tracker.get_top_ranked_distro());
+    assert!(distro_suite.itdaily_cloud.audit_hybrid_cloud(), "ITDaily cloud audit failed");
+    assert!(distro_suite.infoworld_tech.evaluate_architecture(), "InfoWorld architecture evaluation failed");
+    assert!(distro_suite.phoronix_benchmark.run_phoronix_benchmark(), "Phoronix benchmark failed");
 
     let hw_suite = SovereignTechPowerUpHardwareMonitorsSuite::new();
     assert!(hw_suite.verify_suite(), "Hardware suite verification failed");

@@ -241,3 +241,17 @@ if [ -f "src/distro/tech_media_distro_innovations.rs" ]; then
     rustc --test --edition=2021 src/distro/tech_media_distro_innovations.rs -o build/tech_media_distro_test
     ./build/tech_media_distro_test
 fi
+
+if [ -f "src/distro/tech_media_extended_innovations.rs" ]; then
+    echo "Running Sovereign Tech Media Extended Distro Innovations test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/distro/tech_media_extended_innovations.rs -o build/tech_media_ext_distro_test
+    ./build/tech_media_ext_distro_test
+fi
+
+if [ -f "src/tools/tech_media_extended_suite.rs" ]; then
+    echo "Running Sovereign Tech Media Extended Tools Suite test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/tools/tech_media_extended_suite.rs -o build/tech_media_ext_suite_test
+    ./build/tech_media_ext_suite_test
+fi
