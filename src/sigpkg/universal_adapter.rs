@@ -2247,51 +2247,22 @@ impl UniversalPmCommandDispatcher {
             "emerge" | "ebuild" | "gentoo" | "portage" => {
                 let mut i = 0;
                 while i < args.len() {
-                    match args[i] {
-                        "install" | "add" => operation = UniversalPmOperation::Install,
-                        "delete" | "remove" => operation = UniversalPmOperation::Remove,
-                        "upgrade" => operation = UniversalPmOperation::Upgrade,
-                        "search" => operation = UniversalPmOperation::Search,
-                        "info" => operation = UniversalPmOperation::QueryInfo,
-                        "-n" => dry_run = true,
-                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
-                        _ => {}
-                    }
-                    i += 1;
-                }
-            }
-            "xbps-install" | "xbps-remove" | "xbps-query" => {
-                if pm == "xbps-install" {
-                    operation = UniversalPmOperation::Install;
-                } else if pm == "xbps-remove" {
-                    operation = UniversalPmOperation::Remove;
-                } else {
-                    operation = UniversalPmOperation::QueryInfo;
-                }
-                for arg in args {
-                    if *arg == "-n" || *arg == "--dry-run" {
-                        dry_run = true;
-                    } else if !arg.starts_with('-') {
-                        target_packages.push(arg.to_string());
-                    }
-                }
-            }
-            "emerge" | "ebuild" => {
-                let mut i = 0;
-                while i < args.len() {
                     let arg = args[i];
-                    if arg == "-C" || arg == "--unmerge" || arg == "--deselect" {
+                    if arg == "-C" || arg == "--unmerge" || arg == "--deselect" || arg == "delete" || arg == "remove" {
                         operation = UniversalPmOperation::Remove;
-                    } else if arg == "-u" || arg.contains('u') || arg == "--update" {
+                    } else if arg == "-u" || arg.contains('u') || arg == "--update" || arg == "upgrade" {
                         operation = UniversalPmOperation::Upgrade;
-                    } else if arg == "-s" || arg == "--search" {
+                    } else if arg == "-s" || arg == "--search" || arg == "search" {
                         operation = UniversalPmOperation::Search;
-                    } else if arg == "--info" {
+                    } else if arg == "--info" || arg == "info" {
                         operation = UniversalPmOperation::QueryInfo;
-                    } else if !arg.starts_with('-') {
+                    } else if arg == "install" || arg == "add" {
+                        operation = UniversalPmOperation::Install;
+                    } else if !arg.starts_with('-') || arg.starts_with('@') {
                         target_packages.push(arg.to_string());
                     }
-                    if arg.starts_with('-') && (arg.contains('p') || arg.contains('a') || arg == "--pretend" || arg == "--ask") {
+
+                    if arg == "-n" || (arg.starts_with('-') && (arg.contains('p') || arg.contains('a') || arg == "--pretend" || arg == "--ask" || arg == "-pv" || arg == "--dry-run")) {
                         dry_run = true;
                     }
                     i += 1;
@@ -2373,26 +2344,20 @@ impl UniversalPmCommandDispatcher {
                     }
                 }
             }
-            "pkgman" | "swupd" | "eopkg" | "moss" | "pkgin" | "pkg_delete" | "pkg_info" => {
-                if pm == "pkg_delete" {
-                    operation = UniversalPmOperation::Remove;
-                } else if pm == "pkg_info" {
-                    operation = UniversalPmOperation::QueryInfo;
-                } else {
-                    let mut i = 0;
-                    while i < args.len() {
-                        match args[i] {
-                            "install" | "in" | "it" | "bundle-add" | "add" => operation = UniversalPmOperation::Install,
-                            "uninstall" | "remove" | "rm" | "bundle-remove" => operation = UniversalPmOperation::Remove,
-                            "update" | "upgrade" | "ur" => operation = UniversalPmOperation::Upgrade,
-                            "search" | "se" | "sr" => operation = UniversalPmOperation::Search,
-                            "info" => operation = UniversalPmOperation::QueryInfo,
-                            "-n" | "--dry-run" => dry_run = true,
-                            arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
-                            _ => {}
-                        }
-                        i += 1;
+            "pkgman" | "swupd" | "eopkg" | "moss" | "pkgin" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "install" | "in" | "it" | "bundle-add" | "add" => operation = UniversalPmOperation::Install,
+                        "uninstall" | "remove" | "rm" | "bundle-remove" => operation = UniversalPmOperation::Remove,
+                        "update" | "upgrade" | "ur" => operation = UniversalPmOperation::Upgrade,
+                        "search" | "se" | "sr" => operation = UniversalPmOperation::Search,
+                        "info" => operation = UniversalPmOperation::QueryInfo,
+                        "-n" | "--dry-run" => dry_run = true,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
                     }
+                    i += 1;
                 }
                 if target_packages.is_empty() {
                     for arg in args {
