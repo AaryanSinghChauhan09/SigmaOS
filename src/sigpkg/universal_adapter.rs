@@ -126,7 +126,153 @@ pub enum PackageFormat {
     Hpkg, SlackBuild, Pkgsrc, Moss, Tcz, Gobo, Ostree, Air, Bottle, Ipa, Ports, Aab, Hap, Superdeb,
     Lzm, Pup, Pet, Tar, TarGz, TarXz, AppBundle, Puk, Dmg, Cports, Dports, Ipk, Opkg, SolarisIps,
     GuixNar, NarInfo, OpenBsdPkg, Swupd, Stratum, Crux, Drpm, Sfs, Wheel, Crate, Gem, Nupkg, Vcpkg,
-    Spack, Conan, Sigma, Sysupdate, Starling, Sovereign, Eopkg,
+    Spack, Conan, Sigma, Sysupdate, Starling, Sovereign, Eopkg, Msi, MakeselfRun, KernelModuleKmod,
+    PhpPhar, JavaJar, Msix, Appx, ZeroInstallZpk, KernelModuleKmp, NpmPkg, PerlCpan, LuaRock,
+    ElixirHex, HaskellCabal, JuliaPkg, RCran,
+}
+
+#[cfg(feature = "standalone_test")]
+impl PackageFormat {
+    pub fn from_filename(filename: &str) -> Option<Self> {
+        let name = filename.to_lowercase();
+        let normalized = name.replace(" ", "");
+        if normalized.ends_with(".deb") || normalized.ends_with(".udeb") {
+            Some(PackageFormat::Apt)
+        } else if normalized.ends_with(".superdeb") {
+            Some(PackageFormat::Superdeb)
+        } else if normalized.ends_with(".rpm") || normalized.ends_with(".drpm") {
+            Some(PackageFormat::Yum)
+        } else if normalized.ends_with(".pkg.tar.zst")
+            || normalized.ends_with(".pkg.tar.xz")
+            || normalized.ends_with(".pkg.tar.gz")
+            || normalized.ends_with(".pkg.tar")
+            || normalized.ends_with(".pkgbuild")
+            || normalized.ends_with(".pacman")
+            || (normalized.contains("pacman") && !normalized.ends_with(".pkg"))
+        {
+            Some(PackageFormat::Pacman)
+        } else if normalized == "snap" || normalized.ends_with(".snap") {
+            Some(PackageFormat::Snap)
+        } else if normalized == "flatpak" || normalized.ends_with(".flatpak") {
+            Some(PackageFormat::Flatpak)
+        } else if normalized == "appimage" || normalized.ends_with(".appimage") {
+            Some(PackageFormat::AppImage)
+        } else if normalized.ends_with(".air") {
+            Some(PackageFormat::Air)
+        } else if normalized.ends_with(".bottle") {
+            Some(PackageFormat::Bottle)
+        } else if normalized.ends_with(".ipa") {
+            Some(PackageFormat::Ipa)
+        } else if normalized.ends_with(".ports") {
+            Some(PackageFormat::Ports)
+        } else if normalized.ends_with(".pkg") {
+            Some(PackageFormat::Pkg)
+        } else if normalized.ends_with(".aab") {
+            Some(PackageFormat::Aab)
+        } else if normalized.ends_with(".apk") {
+            Some(PackageFormat::Apk)
+        } else if normalized.ends_with(".eopkg") {
+            Some(PackageFormat::Eopkg)
+        } else if normalized.ends_with(".nix") || normalized.ends_with(".nixpkg") {
+            Some(PackageFormat::Nix)
+        } else if normalized.ends_with(".pkgsrc") {
+            Some(PackageFormat::Pkgsrc)
+        } else if normalized.ends_with(".ebuild") || normalized.ends_with(".portage") {
+            Some(PackageFormat::Portage)
+        } else if normalized.ends_with(".openbsd.tgz") {
+            Some(PackageFormat::OpenBsdPkg)
+        } else if normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
+            Some(PackageFormat::TarGz)
+        } else if normalized.ends_with(".tar.xz") || normalized.ends_with(".xz") {
+            Some(PackageFormat::TarXz)
+        } else if normalized.ends_with(".xbps") {
+            Some(PackageFormat::Xbps)
+        } else if normalized.ends_with(".zypper") {
+            Some(PackageFormat::Zypper)
+        } else if normalized.ends_with(".guix") || normalized.ends_with(".scm") {
+            Some(PackageFormat::Guix)
+        } else if normalized.ends_with(".moss") {
+            Some(PackageFormat::Moss)
+        } else if normalized.ends_with(".hpkg") {
+            Some(PackageFormat::Hpkg)
+        } else if normalized.ends_with(".tcz") {
+            Some(PackageFormat::Tcz)
+        } else if normalized.ends_with(".gobo") {
+            Some(PackageFormat::Gobo)
+        } else if normalized.ends_with(".ostree") || normalized.ends_with(".commit") {
+            Some(PackageFormat::Ostree)
+        } else if normalized.ends_with(".hap") {
+            Some(PackageFormat::Hap)
+        } else if normalized.ends_with(".lzm") {
+            Some(PackageFormat::Lzm)
+        } else if normalized.ends_with(".pup") {
+            Some(PackageFormat::Pup)
+        } else if normalized.ends_with(".pet") {
+            Some(PackageFormat::Pet)
+        } else if normalized.ends_with(".tar") {
+            Some(PackageFormat::Tar)
+        } else if normalized.ends_with(".app") {
+            Some(PackageFormat::AppBundle)
+        } else if normalized.ends_with(".puk") {
+            Some(PackageFormat::Puk)
+        } else if normalized.ends_with(".dmg") {
+            Some(PackageFormat::Dmg)
+        } else if normalized.ends_with(".cports") {
+            Some(PackageFormat::Cports)
+        } else if normalized.ends_with(".dports") {
+            Some(PackageFormat::Dports)
+        } else if normalized.ends_with(".ipk") {
+            Some(PackageFormat::Ipk)
+        } else if normalized.ends_with(".opkg") {
+            Some(PackageFormat::Opkg)
+        } else if normalized.ends_with(".p5p") || normalized.ends_with(".ips") {
+            Some(PackageFormat::SolarisIps)
+        } else if normalized.ends_with(".nar") {
+            Some(PackageFormat::GuixNar)
+        } else if normalized.ends_with(".narinfo") {
+            Some(PackageFormat::NarInfo)
+        } else if normalized.ends_with(".swupd") {
+            Some(PackageFormat::Swupd)
+        } else if normalized.ends_with(".stratum") {
+            Some(PackageFormat::Stratum)
+        } else if normalized.ends_with(".crux") {
+            Some(PackageFormat::Crux)
+        } else if normalized.ends_with(".drpm") {
+            Some(PackageFormat::Drpm)
+        } else if normalized.ends_with(".sfs") {
+            Some(PackageFormat::Sfs)
+        } else if normalized.ends_with(".whl") {
+            Some(PackageFormat::Wheel)
+        } else if normalized.ends_with(".crate") {
+            Some(PackageFormat::Crate)
+        } else if normalized.ends_with(".gem") {
+            Some(PackageFormat::Gem)
+        } else if normalized.ends_with(".nupkg") {
+            Some(PackageFormat::Nupkg)
+        } else if normalized.ends_with(".vcpkg") {
+            Some(PackageFormat::Vcpkg)
+        } else if normalized.ends_with(".spack") {
+            Some(PackageFormat::Spack)
+        } else if normalized.ends_with(".conan") {
+            Some(PackageFormat::Conan)
+        } else if normalized.ends_with(".msi") {
+            Some(PackageFormat::Msi)
+        } else if normalized.ends_with(".run") {
+            Some(PackageFormat::MakeselfRun)
+        } else if normalized.ends_with(".kmod") {
+            Some(PackageFormat::KernelModuleKmod)
+        } else if normalized.ends_with(".phar") {
+            Some(PackageFormat::PhpPhar)
+        } else if normalized.ends_with(".jar") {
+            Some(PackageFormat::JavaJar)
+        } else if normalized.ends_with(".msix") {
+            Some(PackageFormat::Msix)
+        } else if normalized.ends_with(".appx") {
+            Some(PackageFormat::Appx)
+        } else {
+            None
+        }
+    }
 }
 
 #[cfg(feature = "standalone_test")]
@@ -1725,6 +1871,34 @@ impl SigPkgUniversalBridgeEngine {
                     &hpkg.requires,
                 )
             }
+            PackageFormat::Flatpak => {
+                let flatpak = self.adapter.parse_flatpak_json(&manifest_text)?;
+                let sdk_deps = vec![flatpak.runtime.clone(), flatpak.sdk.clone()];
+                self.adapter.translate_to_native_package(
+                    &flatpak.app_id,
+                    &flatpak.runtime_version,
+                    &flatpak.app_id,
+                    &sdk_deps,
+                )
+            }
+            PackageFormat::OpenBsdPkg => {
+                let obs = self.adapter.parse_openbsd_contents(&manifest_text)?;
+                self.adapter.translate_to_native_package(
+                    &obs.pkgname,
+                    &obs.version,
+                    &obs.comment,
+                    &obs.depends,
+                )
+            }
+            PackageFormat::SlackBuild => {
+                let slack = self.adapter.parse_slackware_pkg(&manifest_text)?;
+                self.adapter.translate_to_native_package(
+                    &slack.name,
+                    &slack.version,
+                    &slack.description,
+                    &slack.slack_required,
+                )
+            }
             _ => self
                 .adapter
                 .parse_and_translate_manifest(filename, &manifest_text),
@@ -1891,6 +2065,10 @@ impl UniversalDependencyMapper {
             "eza" | "exa" | "sys-apps/eza" => "eza".to_string(),
             "btop" | "sys-process/btop" => "btop".to_string(),
             "fastfetch" | "sys-apps/fastfetch" => "fastfetch".to_string(),
+            "gtk3" | "libgtk-3-dev" | "gtk3-devel" | "x11-libs/gtk+" | "gui-libs/gtk" => "gtk3".to_string(),
+            "gtk4" | "libgtk-4-dev" | "gtk4-devel" | "gui-libs/gtk:4" => "gtk4".to_string(),
+            "qt5" | "qtbase5-dev" | "qt5-qtbase-devel" | "dev-qt/qtcore" => "qt5".to_string(),
+            "mesa" | "libgl1-mesa-dev" | "mesa-libGL-devel" | "media-libs/mesa" => "mesa".to_string(),
             _ => clean.to_string(),
         }
     }
@@ -2222,50 +2400,6 @@ impl UniversalPmCommandDispatcher {
                         if !arg.starts_with('-') && *arg != "install" && *arg != "add" && *arg != "delete" && *arg != "remove" && *arg != "upgrade" {
                             target_packages.push(arg.to_string());
                         }
-                    }
-                }
-            }
-            "xbps" | "xbps-install" | "xbps-remove" | "xbps-query" | "void" => {
-                if pm == "xbps-remove" {
-                    operation = UniversalPmOperation::Remove;
-                } else if pm == "xbps-query" {
-                    operation = UniversalPmOperation::QueryInfo;
-                } else {
-                    let mut i = 0;
-                    while i < args.len() {
-                        match args[i] {
-                            "install" | "add" => operation = UniversalPmOperation::Install,
-                            "remove" | "purge" => operation = UniversalPmOperation::Remove,
-                            "upgrade" | "update" => operation = UniversalPmOperation::Upgrade,
-                            "search" => operation = UniversalPmOperation::Search,
-                            "info" | "query" => operation = UniversalPmOperation::QueryInfo,
-                            "-n" | "--dry-run" => dry_run = true,
-                            arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
-                            _ => {}
-                        }
-                        i += 1;
-                    }
-                }
-                for arg in args {
-                    if *arg == "-n" || *arg == "--dry-run" {
-                        dry_run = true;
-                    } else if !arg.starts_with('-') && target_packages.is_empty() && *arg != "install" && *arg != "remove" && *arg != "upgrade" {
-                        target_packages.push(arg.to_string());
-                    }
-                }
-            }
-            "emerge" | "ebuild" | "gentoo" | "portage" => {
-                let mut i = 0;
-                while i < args.len() {
-                    match args[i] {
-                        "install" | "add" => operation = UniversalPmOperation::Install,
-                        "delete" | "remove" => operation = UniversalPmOperation::Remove,
-                        "upgrade" => operation = UniversalPmOperation::Upgrade,
-                        "search" => operation = UniversalPmOperation::Search,
-                        "info" => operation = UniversalPmOperation::QueryInfo,
-                        "-n" => dry_run = true,
-                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
-                        _ => {}
                     }
                 }
             }
