@@ -28,6 +28,7 @@ This page provides a structured overview of all SigmaOS Wiki articles, organized
 ## Package Management
 
 - [Universal Package Engine (sigpkg)](Package-Management-and-Sigpkg) — Overview of the SigmaPkg package management system
+- [Post-Quantum Cryptography Package Distribution](Post-Quantum-Cryptography-Package-Distribution) — Quantum-safe package distribution using Kyber-1024 and Dilithium-5
 - [Arch PKGBUILD & AUR Helper](ARCH_LINUX_PARITY_FEATURES) — Integration with Arch Linux package formats and AUR
 - [Multi-Distro Adapters](UNIVERSAL_PACKAGE_SYSTEM_IMPLEMENTATION_PLAN) — Support for multiple Linux and BSD package formats
 - [Content-Addressed Storage](Content-Addressed-Storage) — Immutable, cryptographically-verified package storage
@@ -60,6 +61,7 @@ This page provides a structured overview of all SigmaOS Wiki articles, organized
 ## Performance & Kernel
 
 - [Performance & BORE Scheduler](Performance-Tuning-and-Kernel) — Performance tuning and BORE scheduler configuration
+- [Low-Overhead Kernel Observability](Low-Overhead-Kernel-Observability) — High-performance kernel tracing with SigmaTrace and eBPF
 - [MGLRU & Memory Reclamation](Performance-Tuning-and-Kernel#mglru--memory-reclamation) — Multi-Gen LRU and memory reclamation optimization
 - [eBPF / XDP Networking](Performance-Tuning-and-Kernel#ebpf--xdp-zero-copy-networking) — eBPF and XDP zero-copy networking support
 - [Lock-Free Data Structures](SIGMA_CONCURRENCY_PRIMITIVES) — Lock-free concurrency primitives and data structures
@@ -113,6 +115,7 @@ This page provides a structured overview of all SigmaOS Wiki articles, organized
 
 ## Development & Technical
 
+- [AI Agent Component Development Guidance](AI_AGENT_SIGMAOS_COMPONENT_DEVELOPMENT_GUIDANCE) — Engineering standards and workflow for AI agents developing SigmaOS components inspired by Linux & BSD distros
 - [Architecture](ARCHITECTURE_DECISIONS) — std-based architecture decision and implementation strategy
 - [Development Guide](DEVELOPMENT_GUIDE) — Development guidelines and best practices
 - [Build Instructions](BUILD) — Build system and compilation instructions

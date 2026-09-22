@@ -5,10 +5,10 @@ pub use omarchy_inspiration::*;
 pub mod omarchy;
 pub use omarchy::{
     FactoryResetGuardian, GpuDriverConfig, HardwareQuirkAdapter, KeybindingDefinition,
-    OmarchyAudioPipewireConfig,
-    OmarchyModernDesktopEngine, OmarchyNerdFont, OmarchyNeovimPresetEngine,
-    OmarchyTerminalFontConfig, OmarchyTheme,
-    PasswordlessSudoExpiryGuard, SovereignAgentKind, WebAppSpec,
+    LazyVimKeymapSpec, NeovimTerminalAliasLauncher, OmarchyAudioPipewireConfig,
+    OmarchyModernDesktopEngine, OmarchyNerdFont, OmarchyNeovimLazyVimEngine, OmarchyNeovimPresetEngine,
+    OmarchyTerminalFontConfig, OmarchyTheme, PasswordlessSudoExpiryGuard, SovereignAgentKind,
+    SudoEditSessionBridge, WebAppSpec,
 };
 pub mod parrot_security;
 pub mod kali_security;
@@ -110,8 +110,8 @@ pub mod power_network_tools;
 pub mod preseed;
 pub mod ready_to_use;
 pub mod recovery;
-pub mod sovereign_system_innovations;
 pub mod specialized;
+pub mod sovereign_system_innovations;
 pub mod stable_components;
 pub mod tiny_core;
 pub mod visual_dashboard;

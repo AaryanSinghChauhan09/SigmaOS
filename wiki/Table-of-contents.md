@@ -115,6 +115,7 @@ This page provides a structured overview of all SigmaOS Wiki articles, organized
 
 ## Development & Technical
 
+- [AI Agent Component Development Guidance](AI_AGENT_SIGMAOS_COMPONENT_DEVELOPMENT_GUIDANCE) — Engineering standards and workflow for AI agents developing SigmaOS components inspired by Linux & BSD distros
 - [Architecture](ARCHITECTURE_DECISIONS) — std-based architecture decision and implementation strategy
 - [Development Guide](DEVELOPMENT_GUIDE) — Development guidelines and best practices
 - [Build Instructions](BUILD) — Build system and compilation instructions
