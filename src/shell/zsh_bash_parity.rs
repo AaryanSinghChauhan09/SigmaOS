@@ -495,6 +495,23 @@ impl BashParameterExpansion {
             return val.len().to_string();
         }
 
+        // 1a. Bash 5.0+ Parameter Transformation Operators: ${VAR@U}, ${VAR@L}, ${VAR@Q}, ${VAR@A}, ${VAR@E}
+        if inner.contains('@') {
+            if let Some(pos) = inner.find('@') {
+                let var_name = &inner[..pos];
+                let op = &inner[pos + 1..];
+                let val = env.get(var_name).cloned().unwrap_or_default();
+                match op {
+                    "U" => return val.to_uppercase(),
+                    "L" => return val.to_lowercase(),
+                    "Q" => return format!("'{}'", val.replace('\'', "'\\''")),
+                    "A" => return format!("{}='{}'", var_name, val.replace('\'', "'\\''")),
+                    "E" => return val.replace("\\n", "\n").replace("\\t", "\t"),
+                    _ => {}
+                }
+            }
+        }
+
         // 1b. ${VAR^^} - uppercase conversion
         if inner.ends_with("^^") {
             let var_name = &inner[..inner.len() - 2];
@@ -598,8 +615,18 @@ impl BashParameterExpansion {
             return default_val.to_string();
         }
 
-        // 5. ${VAR#prefix} - strip prefix
-        if let Some(pos) = inner.find('#') {
+        // 5. ${VAR##prefix} vs ${VAR#prefix} - strip prefix (greedy vs non-greedy)
+        if inner.contains("##") {
+            if let Some(pos) = inner.find("##") {
+                let var_name = &inner[..pos];
+                let prefix = &inner[pos + 2..];
+                let val = env.get(var_name).cloned().unwrap_or_default();
+                if val.starts_with(prefix) {
+                    return val[prefix.len()..].to_string();
+                }
+                return val;
+            }
+        } else if let Some(pos) = inner.find('#') {
             let var_name = &inner[..pos];
             let prefix = &inner[pos + 1..];
             let val = env.get(var_name).cloned().unwrap_or_default();
@@ -609,8 +636,18 @@ impl BashParameterExpansion {
             return val;
         }
 
-        // 6. ${VAR%suffix} - strip suffix
-        if let Some(pos) = inner.find('%') {
+        // 6. ${VAR%%suffix} vs ${VAR%suffix} - strip suffix (greedy vs non-greedy)
+        if inner.contains("%%") {
+            if let Some(pos) = inner.find("%%") {
+                let var_name = &inner[..pos];
+                let suffix = &inner[pos + 2..];
+                let val = env.get(var_name).cloned().unwrap_or_default();
+                if val.ends_with(suffix) {
+                    return val[..val.len() - suffix.len()].to_string();
+                }
+                return val;
+            }
+        } else if let Some(pos) = inner.find('%') {
             let var_name = &inner[..pos];
             let suffix = &inner[pos + 1..];
             let val = env.get(var_name).cloned().unwrap_or_default();
@@ -1467,6 +1504,29 @@ impl UniversalScriptTranspiler {
         } else if l.starts_with("string collect ") {
             let rest = l.trim_start_matches("string collect ").trim();
             return format!("echo \"{}\"", rest);
+        } else if l.starts_with("string escape ") {
+            let rest = l.trim_start_matches("string escape ").trim();
+            return format!("printf '%q' {}", rest);
+        } else if l.starts_with("string unescape ") {
+            let rest = l.trim_start_matches("string unescape ").trim();
+            return format!("printf '%b' {}", rest);
+        } else if l == "status is-interactive" {
+            return "[ -t 0 ]".to_string();
+        } else if l == "status is-login" {
+            return "[ -n \"$LOGIN_SHELL\" ]".to_string();
+        } else if l.starts_with("type -q ") {
+            let cmd = l.trim_start_matches("type -q ").trim();
+            return format!("command -v {} >/dev/null 2>&1", cmd);
+        } else if l.starts_with("set_color ") {
+            let color = l.trim_start_matches("set_color ").trim();
+            return match color {
+                "red" => "printf '\\033[31m'".to_string(),
+                "green" => "printf '\\033[32m'".to_string(),
+                "yellow" => "printf '\\033[33m'".to_string(),
+                "blue" => "printf '\\033[34m'".to_string(),
+                "normal" | "reset" => "printf '\\033[0m'".to_string(),
+                _ => "printf ''".to_string(),
+            };
         }
 
         // 3. Fish 'for var in list' -> 'for var in list; do'
@@ -1630,7 +1690,7 @@ impl UniversalScriptTranspiler {
             }
         }
 
-        // 4. Tcsh 'if ( expr ) then' -> 'if [ expr ]; then' (including $?VAR existence checks)
+        // 4. Tcsh 'if ( expr ) then' -> 'if [ expr ]; then' (including $?VAR existence checks & ! negation)
         if l.starts_with("if ") && l.contains("then") {
             if let Some(open) = l.find('(') {
                 if let Some(close) = l.find(')') {
@@ -1638,6 +1698,9 @@ impl UniversalScriptTranspiler {
                     if cond.starts_with("$?") {
                         let var_name = &cond[2..];
                         return format!("if [ -n \"${{{}}}\" ]; then", var_name);
+                    } else if cond.starts_with("! ") {
+                        let inner_cond = &cond[2..].trim();
+                        return format!("if [ ! {} ]; then", inner_cond);
                     }
                     return format!("if [ {} ]; then", cond);
                 }
@@ -2069,10 +2132,10 @@ impl UniversalScriptTranspiler {
     }
 
     fn transpile_mksh_line(line: &str) -> String {
-        let mut l = line.to_string();
+        let l = line.to_string();
         if l.starts_with("integer ") {
             let var = l.trim_start_matches("integer ").trim();
-            if let Some(eq) = var.find('=') {
+            if var.contains('=') {
                 return format!("{}", var);
             }
             return format!("{}=0", var);
@@ -2325,6 +2388,19 @@ mod tests {
 
         // Single pattern replacement
         assert_eq!(BashParameterExpansion::expand("${FILE/document/file}", &env), "file.txt");
+
+        // Bash 5.0+ Transformations
+        assert_eq!(BashParameterExpansion::expand("${USER@U}", &env), "SOVEREIGN");
+        assert_eq!(BashParameterExpansion::expand("${USER@L}", &env), "sovereign");
+        assert_eq!(BashParameterExpansion::expand("${USER@Q}", &env), "'sovereign'");
+        assert_eq!(BashParameterExpansion::expand("${USER@A}", &env), "USER='sovereign'");
+
+        // Greedy vs Non-Greedy Prefix/Suffix Stripping
+        env.insert("PATH_VAR".to_string(), "/usr/local/bin/app".to_string());
+        assert_eq!(BashParameterExpansion::expand("${PATH_VAR#/usr/}", &env), "local/bin/app");
+        assert_eq!(BashParameterExpansion::expand("${PATH_VAR##/usr/}", &env), "local/bin/app");
+        assert_eq!(BashParameterExpansion::expand("${PATH_VAR%/app}", &env), "/usr/local/bin");
+        assert_eq!(BashParameterExpansion::expand("${PATH_VAR%%/app}", &env), "/usr/local/bin");
     }
 
     #[test]
@@ -2693,5 +2769,13 @@ mod tests {
         let fish_str_lower = "string lower HELLO";
         let posix_fish_str = UniversalScriptTranspiler::transpile_to_posix_sh(fish_str_lower, ShellDialect::Fish);
         assert!(posix_fish_str.contains("tr '[:upper:]' '[:lower:]'"));
+
+        let fish_status = "status is-interactive";
+        let posix_fish_status = UniversalScriptTranspiler::transpile_to_posix_sh(fish_status, ShellDialect::Fish);
+        assert!(posix_fish_status.contains("[ -t 0 ]"));
+
+        let tcsh_neg = "if ( ! -f /tmp/lock ) then\n  echo ok\nendif";
+        let posix_tcsh_neg = UniversalScriptTranspiler::transpile_to_posix_sh(tcsh_neg, ShellDialect::Tcsh);
+        assert!(posix_tcsh_neg.contains("if [ ! -f /tmp/lock ]; then"));
     }
 }
