@@ -1034,6 +1034,14 @@ impl MissingDistroComponentsEngine {
         engine.register_component("Nix Flakes Lock System", "NixOS", ComponentParityStatus::Implemented);
         engine.register_component("HAMMER2 PFS Clustering", "DragonFly BSD", ComponentParityStatus::Implemented);
         engine.register_component("pkgsrc Cross-Platform Infrastructure", "NetBSD", ComponentParityStatus::Implemented);
+        engine.register_component("APT Release Pinning", "Debian", ComponentParityStatus::Implemented);
+        engine.register_component("Greenwave CI Gating", "Fedora", ComponentParityStatus::Implemented);
+        engine.register_component("ALPM Pacman Hooks", "Arch Linux", ComponentParityStatus::Implemented);
+        engine.register_component("Runit Service Supervisor", "Void Linux", ComponentParityStatus::Implemented);
+        engine.register_component("GEOM Gate Remote Storage", "FreeBSD", ComponentParityStatus::Implemented);
+        engine.register_component("Veriexec Fingerprint Auditor", "NetBSD", ComponentParityStatus::Implemented);
+        engine.register_component("ALTQ HFSC Traffic Shaper", "OpenBSD", ComponentParityStatus::Implemented);
+        engine.register_component("Bcachefs Multi-Tier Storage", "Linux 6.12+", ComponentParityStatus::Implemented);
 
         engine
     }
@@ -2313,7 +2321,7 @@ mod tests {
     #[test]
     fn test_missing_distro_components_engine() {
         let engine = MissingDistroComponentsEngine::new();
-        assert_eq!(engine.records.len(), 10);
+        assert_eq!(engine.records.len(), 18);
         assert!(engine.is_all_components_implemented());
     }
 

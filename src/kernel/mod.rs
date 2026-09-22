@@ -120,6 +120,11 @@ pub use tmpfs::{Tmpfs, TmpfsDirectory, TmpfsFile, TmpfsManager};
 pub mod umask;
 pub use umask::UmaskManager;
 
+pub mod linux_kernel_memory_innovations;
+pub use linux_kernel_memory_innovations::*;
+pub mod sovereign_kernel_pinnacle_synthesis;
+pub use sovereign_kernel_pinnacle_synthesis::*;
+
 pub mod linux_bsd_innovations;
 
 pub mod capabilities;
@@ -251,12 +256,12 @@ pub use generation_manager::{Generation, GenerationManager};
 pub use io_uring::{CompletionQueueEntry, IoUringEngine, IoUringOpcode, SubmissionQueueEntry};
 pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use crate::kernel::linux_bsd_innovations::{
-    AlpineHardenedEnv, AndroidBinderIpc, AndroidBroadcastReceiverRegistry, ArchUserRepoManager,
+    AlpineHardenedEnv, AndroidBinderIpc, AndroidBroadcastReceiverRegistry,
     BinderNode, BottomHalfKernelThread, BoundedBufferProducerConsumer, BroadcastReceiver,
     BsdPfStateTable, CapabilityDerivationTree, CarpSecurityRouter, CgroupResourceLimits, CowBlock,
     CowStorageEngine, CpuIsaMicroarch, DevlinkHealthReporter, DynamicLkmLoader, EbpfInstruction,
     EbpfRuntime, ExokernelHardwareMultiplexer, FastPacketFrame, FreeBsdCapsicumEngine,
-    FreeBsdGeomTopology, FreeBsdJail, FreeBsdVfsNullfs, FreeBsdVnetManager, FutexOp, FutexWaiter,
+    FreeBsdGeomTopology, FreeBsdJail, FreeBsdVnetManager, FutexOp, FutexWaiter,
     GcdDispatchQueue, GcdPriority, GcdTask, GentooUseFlags, GeomClass, GeomProvider,
     Hammer2PfsSnapshot, HammerBlockTransaction, HammerHistoryFilesystem, HurdTranslator,
     HybridKernelManager, HybridTask, IntelClearLinuxStatelessEngine, InteractiveHybridScheduler,
@@ -289,11 +294,11 @@ pub use meta::{
 pub use nextgen_breakthroughs::*;
 pub use paging::{PageTable, PageTableEntry, PageTableFlags, VirtualMemoryManagerV2};
 pub use roundrobin::{
-    RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError,
+    RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRoundRobinSchedulerError,
 };
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
 pub use vmm_paging::{PageTableManager, VirtualMemoryManager};
-// Note: linux_bsd_innovations types fully re-exported via `pub use crate::kernel::linux_bsd_innovations::*` above.
+// Note: linux_bsd_innovations types fully re-exported via `pub use crate::kernel::linux_bsd_innovations::*`
 pub use kqueue_event::{Kqueue, KqueueManager, Kevent, FilterType, FilterFlags, Interest};
 pub use module_loader::{ModuleId, ModuleState, ModuleDependency, ModuleMetadata, KernelModule, ModuleLoader};
 pub use ebpf_program::{
@@ -319,7 +324,7 @@ pub use universal_modular_system::{
 // ─── Universal Kernel Format Engine (Linux & BSD Parity) ───────────────────────
 pub mod universal_kernel_format;
 pub use universal_kernel_format::{
-    KernelArch, KernelCompression, KernelFormat, KernelFormatSymbol, KernelSection,
+    KernelArch, KernelFormat, KernelCompression, KernelFormatSymbol, KernelSection,
     ParsedKernelImage, SigmaKernelExecutionPayload, UniversalKernelFormatEngine,
 };
 

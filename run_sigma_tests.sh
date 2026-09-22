@@ -65,6 +65,32 @@ if [ -f "src/distro/missing_linux_bsd_components.rs" ]; then
     ./build/missing_components_test
 fi
 
+if [ -f "src/distro/additional_linux_bsd_components.rs" ]; then
+    echo "Running Additional Linux & BSD Components test suite..."
+    mkdir -p build
+    rustc --test src/distro/additional_linux_bsd_components.rs --edition=2021 -o build/additional_components_test
+    ./build/additional_components_test
+fi
+
+if [ -f "src/distro/sovereign_omarchy_theme_unlock_synthesis.rs" ]; then
+    echo "Running Sovereign Omarchy 22-Themes & Boot Unlock Synthesis test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_omarchy_theme_unlock_synthesis.rs --edition=2021 -o build/sovereign_omarchy_themes_test
+    ./build/sovereign_omarchy_themes_test
+fi
+
+if [ -f "src/distro/omarchy_update_pipeline_synthesis.rs" ]; then
+    echo -e "${YELLOW}Testing Omarchy Update Pipeline & Pacman Guard Synthesis...${NC}"
+    rustc --test src/distro/omarchy_update_pipeline_synthesis.rs --edition=2021 -o build/omarchy_update_pipeline_test
+    ./build/omarchy_update_pipeline_test
+fi
+
+if [ -f "src/desktop/sovereign_omarchy_icon_font_synthesis.rs" ]; then
+    echo -e "${YELLOW}Testing Omarchy Icon Font & Glyph Synthesis...${NC}"
+    rustc --test src/desktop/sovereign_omarchy_icon_font_synthesis.rs --edition=2021 -o build/omarchy_icon_font_test
+    ./build/omarchy_icon_font_test
+fi
+
 if [ -f "src/distro/linux_bsd_ecosystem_synthesis.rs" ]; then
     echo "Running Extended Linux & BSD Distro Ecosystem Synthesis test suite..."
     mkdir -p build
@@ -84,6 +110,27 @@ if [ -f "src/automation/sovereign_hotkeys_synthesis.rs" ]; then
     mkdir -p build
     rustc --test src/automation/sovereign_hotkeys_synthesis.rs --edition=2021 -o build/sovereign_hotkeys_test
     ./build/sovereign_hotkeys_test
+fi
+
+if [ -f "src/kernel/linux_kernel_memory_innovations.rs" ]; then
+    echo "Running Linux Kernel Memory Innovations test suite..."
+    mkdir -p build
+    rustc --test src/kernel/linux_kernel_memory_innovations.rs --edition=2021 -o build/linux_kernel_memory_test
+    ./build/linux_kernel_memory_test
+fi
+
+if [ -f "src/kernel/sovereign_kernel_pinnacle_synthesis.rs" ]; then
+    echo "Running Sovereign Kernel Pinnacle Synthesis test suite..."
+    mkdir -p build
+    rustc --test src/kernel/sovereign_kernel_pinnacle_synthesis.rs --edition=2021 -o build/sovereign_kernel_pinnacle_test
+    ./build/sovereign_kernel_pinnacle_test
+fi
+
+if [ -f "src/tools/sovereign_archival_and_system_db.rs" ]; then
+    echo "Running Sovereign Archival & POSIX System DB test suite..."
+    mkdir -p build
+    rustc --test src/tools/sovereign_archival_and_system_db.rs --edition=2021 -o build/sovereign_archival_db_test
+    ./build/sovereign_archival_db_test
 fi
 
 if [ -f "src/drivers/sovereign_trackpad_synthesis.rs" ]; then
@@ -163,6 +210,13 @@ if [ -f "src/package/sovereign_distro_package_innovations.rs" ]; then
     mkdir -p build
     rustc --test src/package/sovereign_distro_package_innovations.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_innovations_test
     ./build/sovereign_innovations_test
+fi
+
+if [ -f "src/package/sovereign_pr_package_gateway.rs" ]; then
+    echo "Running Sovereign PR Package Gateway test suite..."
+    mkdir -p build
+    rustc --test src/package/sovereign_pr_package_gateway.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_pr_gateway_test
+    ./build/sovereign_pr_gateway_test
 fi
 
 if [ -f "src/sigpkg/arch_pacman_engine.rs" ]; then

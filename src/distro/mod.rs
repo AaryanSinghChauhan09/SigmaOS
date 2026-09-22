@@ -379,3 +379,8 @@ pub use missing_linux_bsd_components::*;
 
 pub mod additional_linux_bsd_components;
 pub use additional_linux_bsd_components::*;
+pub mod sovereign_omarchy_theme_unlock_synthesis;
+pub use sovereign_omarchy_theme_unlock_synthesis::*;
+
+pub mod omarchy_update_pipeline_synthesis;
+pub use omarchy_update_pipeline_synthesis::*;
