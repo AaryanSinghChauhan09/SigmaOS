@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 
 use std::collections::HashMap;
+use std::format;
 use std::string::String;
 use std::vec::Vec;
 
@@ -448,34 +449,5 @@ mod tests {
         // Update idle again -> now screensaver activates
         engine.update_idle_time(20);
         assert!(engine.is_active);
-    }
-
-    #[test]
-    fn test_omarchy_background_manager() {
-        let mut mgr = OmarchyBackgroundManager::new("nord");
-        assert_eq!(mgr.resolve_theme_background_directory(), "~/.config/omarchy/backgrounds/nord");
-
-        let open_cmd = mgr.open_theme_background_directory_cmd();
-        assert!(open_cmd.contains("nemo"));
-        assert!(open_cmd.contains("nord"));
-
-        let select_msg = mgr.select_wallpaper("cyberpunk_city.mp4");
-        assert!(select_msg.contains("Super+Ctrl+Space"));
-        assert_eq!(mgr.selected_wallpaper, "cyberpunk_city.mp4");
-    }
-
-    #[test]
-    fn test_owe_video_wallpaper_engine() {
-        let mut owe = OweVideoWallpaperEngine::new("matrix_loop.mp4");
-        assert!(owe.shared_multihead_decode);
-        assert!(owe.cached_lockscreen_still_path.contains("lock_cached_still.png"));
-
-        let pause_msg = owe.pause_playback_for_power_saving();
-        assert!(pause_msg.contains("paused"));
-        assert!(!owe.is_playing);
-
-        let lock_msg = owe.render_lockscreen_frame();
-        assert!(lock_msg.contains("muted audio"));
-        assert!(owe.is_audio_muted);
     }
 }

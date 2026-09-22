@@ -226,3 +226,46 @@ _No vulnerabilities reported yet. Be the first!_
 SigmaOS welcomes third-party security audits. If you are interested in conducting a security review, contact us at the email above.
 
 Audit reports will be published in `docs/security-audits/` upon completion.
+
+---
+
+## References
+
+- [ARCHITECTURE_DECISIONS.md](../docs/ARCHITECTURE_DECISIONS.md) - Architecture decisions
+- [PROJECT_STATUS.md](../docs/PROJECT_STATUS.md) - Implementation status
+- [OpenBSD pledge/unveil](https://man.openbsd.org/pledge)
+- [FreeBSD Capsicum](https://man.freebsd.org/capsicum)
+- [Linux Landlock](https://www.kernel.org/doc/html/latest/userspace-api/landlock.html)
+
+---
+
+## AI Agent Maintenance
+
+### Persona Assignment
+- **Primary:** Sentinel (Security)
+- **Secondary:** Bolt (Performance)
+
+### Maintenance Tasks
+- [ ] Update security status in PROJECT_STATUS.md
+- [ ] Verify all internal links resolve
+- [ ] Update kernel hardening features table as new mitigations are added
+- [ ] Update cryptographic standards as new algorithms are adopted
+- [ ] Review and update vulnerability response process
+
+### Known Issues
+- CFI (Control Flow Integrity) is still in progress
+- CET (Control-flow Enforcement Technology) is planned but not implemented
+
+### Edge Cases
+- pledge/unveil may have compatibility issues with some applications that expect unrestricted access
+- Capsicum rights limitation may require careful FD management in complex applications
+
+### Related Components
+- [src/security/](../src/security/)
+- [src/kernel/capabilities.rs](../src/kernel/capabilities.rs)
+- [src/security/sandbox.rs](../src/security/sandbox.rs)
+
+### Last Verified
+- **Version:** 1.0
+- **Date:** 2025-01-22
+- **Verified by:** Devin AI Agent

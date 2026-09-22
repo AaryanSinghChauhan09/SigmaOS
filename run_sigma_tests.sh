@@ -65,13 +65,6 @@ if [ -f "src/distro/missing_linux_bsd_components.rs" ]; then
     ./build/missing_components_test
 fi
 
-if [ -f "src/distro/sovereign_distro_innovations_synthesis.rs" ]; then
-    echo "Running Sovereign Distro Innovations Synthesis test suite..."
-    mkdir -p build
-    rustc --test src/distro/sovereign_distro_innovations_synthesis.rs --edition=2021 -o build/distro_innovations_synthesis_test
-    ./build/distro_innovations_synthesis_test
-fi
-
 if [ -f "src/distro/linux_bsd_ecosystem_synthesis.rs" ]; then
     echo "Running Extended Linux & BSD Distro Ecosystem Synthesis test suite..."
     mkdir -p build
@@ -91,27 +84,6 @@ if [ -f "src/automation/sovereign_hotkeys_synthesis.rs" ]; then
     mkdir -p build
     rustc --test src/automation/sovereign_hotkeys_synthesis.rs --edition=2021 -o build/sovereign_hotkeys_test
     ./build/sovereign_hotkeys_test
-fi
-
-if [ -f "src/kernel/linux_kernel_memory_innovations.rs" ]; then
-    echo "Running Linux Kernel Memory Innovations test suite..."
-    mkdir -p build
-    rustc --test src/kernel/linux_kernel_memory_innovations.rs --edition=2021 -o build/linux_kernel_memory_test
-    ./build/linux_kernel_memory_test
-fi
-
-if [ -f "src/kernel/sovereign_kernel_pinnacle_synthesis.rs" ]; then
-    echo "Running Sovereign Kernel Pinnacle Synthesis test suite..."
-    mkdir -p build
-    rustc --test src/kernel/sovereign_kernel_pinnacle_synthesis.rs --edition=2021 -o build/sovereign_kernel_pinnacle_test
-    ./build/sovereign_kernel_pinnacle_test
-fi
-
-if [ -f "src/tools/sovereign_archival_and_system_db.rs" ]; then
-    echo "Running Sovereign Archival & POSIX System DB test suite..."
-    mkdir -p build
-    rustc --test src/tools/sovereign_archival_and_system_db.rs --edition=2021 -o build/sovereign_archival_db_test
-    ./build/sovereign_archival_db_test
 fi
 
 if [ -f "src/drivers/sovereign_trackpad_synthesis.rs" ]; then

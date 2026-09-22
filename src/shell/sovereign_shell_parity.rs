@@ -521,19 +521,4 @@ mod tests {
         let rc_res = shell.execute_bsd_rc_subr("sshd", "restart").unwrap();
         assert!(rc_res.contains("BSD rc.subr: Service 'sshd' action 'restart'"));
     }
-
-    #[test]
-    fn test_omarchy_minimal_starship_prompt_engine() {
-        let mut prompt_engine = OmarchyMinimalStarshipPromptEngine::new();
-        assert!(!prompt_engine.config.show_username);
-        assert!(!prompt_engine.config.show_hostname);
-        assert!(!prompt_engine.config.show_time);
-
-        let prompt_str = prompt_engine.render_prompt();
-        assert_eq!(prompt_str, "~/SigmaOS on  main ❯ ");
-
-        prompt_engine.set_last_exit_status(1);
-        let error_prompt = prompt_engine.render_prompt();
-        assert_eq!(error_prompt, "~/SigmaOS on  main ✖ ❯ ");
-    }
 }

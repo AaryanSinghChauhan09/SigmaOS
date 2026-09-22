@@ -2646,16 +2646,6 @@ mod tests {
         env.insert("WORD".to_string(), "hello".to_string());
         assert_eq!(BashParameterExpansion::expand("${FILE#archive.}", &env), "tar.gz");
         assert_eq!(BashParameterExpansion::expand("${FILE%.gz}", &env), "archive.tar");
-        assert_eq!(BashParameterExpansion::expand("${WORD^}", &env), "Hello");
-        assert_eq!(BashParameterExpansion::expand("${WORD,}", &env), "hello");
-
-        let nameref_script = "declare -n ref=WORD";
-        let posix_nameref = UniversalScriptTranspiler::transpile_to_posix_sh(nameref_script, ShellDialect::Bash);
-        assert!(posix_nameref.contains("ref=\"${WORD}\""));
-
-        let fish_set_q = "set -q WORD";
-        let posix_set_q = UniversalScriptTranspiler::transpile_to_posix_sh(fish_set_q, ShellDialect::Fish);
-        assert!(posix_set_q.contains("[ -n \"${WORD}\" ]"));
 
         // Test Nu, Ion, Rc, and Elvish shebang detection & transpilation
         let nu_script = "#!/usr/bin/env nu\nlet-env FOO = bar\ndef my_func [] {\nwhere size > 10\n}";

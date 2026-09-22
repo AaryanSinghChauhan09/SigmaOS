@@ -394,6 +394,5 @@ pub use open_source_obsoletion::*;
 
 pub use distro::missing_linux_bsd_components::*;
 pub use distro::additional_linux_bsd_components::*;
-pub use distro::sovereign_distro_innovations_synthesis::*;
 
 pub use unimplemented_features::*;

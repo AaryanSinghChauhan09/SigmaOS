@@ -475,6 +475,7 @@ impl OmarchyDotfilesManagerEngine {
 #[derive(Debug, Clone)]
 pub struct CustomShortcut {
     pub keys: String,
+    pub description: String,
     pub command: String,
 }
 
@@ -486,16 +487,42 @@ pub struct OmarchyKeybindingsStudioEngine {
 impl OmarchyKeybindingsStudioEngine {
     pub fn new() -> Self {
         let mut engine = Self { bindings: Vec::new() };
-        engine.bind_keys("SUPER+RETURN", "kitty");
-        engine.bind_keys("SUPER+D", "rofi -show drun");
+        engine.bind_keys("SUPER+RETURN", "Terminal", "kitty");
+        engine.bind_keys("SUPER+D", "App Launcher", "rofi -show drun");
+        engine.bind_keys("SUPER+F", "Fullscreen", "hyprctl dispatch fullscreen");
         engine
     }
 
-    pub fn bind_keys(&mut self, keys: &str, cmd: &str) {
+    pub fn bind_keys(&mut self, keys: &str, desc: &str, cmd: &str) {
         self.bindings.push(CustomShortcut {
             keys: keys.to_string(),
+            description: desc.to_string(),
             command: cmd.to_string(),
         });
+    }
+
+    pub fn rebind_keys(&mut self, keys: &str, new_desc: &str, new_cmd: &str) -> Option<String> {
+        if let Some(pos) = self.bindings.iter().position(|b| b.keys == keys) {
+            let previous_cmd = self.bindings[pos].command.clone();
+            self.bindings[pos] = CustomShortcut {
+                keys: keys.to_string(),
+                description: new_desc.to_string(),
+                command: new_cmd.to_string(),
+            };
+            Some(previous_cmd)
+        } else {
+            self.bind_keys(keys, new_desc, new_cmd);
+            None
+        }
+    }
+
+    pub fn unbind_keys(&mut self, keys: &str) -> bool {
+        if let Some(pos) = self.bindings.iter().position(|b| b.keys == keys) {
+            self.bindings.remove(pos);
+            true
+        } else {
+            false
+        }
     }
 
     pub fn generate_hyprland_binds(&self) -> Vec<String> {
@@ -923,8 +950,18 @@ mod omarchy_tests {
     #[test]
     fn test_omarchy_keybindings_studio() {
         let mut studio = OmarchyKeybindingsStudioEngine::new();
+        assert_eq!(studio.bindings.len(), 3);
+
+        // Rebind SUPER+F (was fullscreen) to file manager nautilus
+        let prev = studio.rebind_keys("SUPER+F", "File Manager", "nautilus");
+        assert_eq!(prev.unwrap(), "hyprctl dispatch fullscreen");
+
+        // Unbind SUPER+D
+        assert!(studio.unbind_keys("SUPER+D"));
         assert_eq!(studio.bindings.len(), 2);
-        studio.bind_keys("SUPER+SHIFT+Q", "hyprctl dispatch exit");
+
+        // Bind new key
+        studio.bind_keys("SUPER+SHIFT+Q", "Exit Hyprland", "hyprctl dispatch exit");
         let binds = studio.generate_hyprland_binds();
         assert_eq!(binds.len(), 3);
         assert!(binds[2].contains("SUPER+SHIFT+Q"));
