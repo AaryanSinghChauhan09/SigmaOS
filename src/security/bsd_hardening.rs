@@ -168,7 +168,8 @@ impl UnveilManager {
         Ok(())
     }
 
-    /// Check if path access is allowed
+    /// Check if path access is allowed with strict path boundary verification
+    /// to prevent path prefix confusion sandboxing bypasses.
     pub fn check_access(&self, path: &str, permission: UnveilPermission) -> bool {
         if !self.unveiled {
             return false;
@@ -176,7 +177,17 @@ impl UnveilManager {
 
         for entry in &self.entries {
             if path.starts_with(&entry.path) {
-                return entry.permissions.contains(&permission);
+                let e_len = entry.path.len();
+                let is_boundary = path.len() == e_len
+                    || path.as_bytes().get(e_len).copied() == Some(b'/')
+                    || path.as_bytes().get(e_len).copied() == Some(b'\\')
+                    || entry.path.ends_with('/')
+                    || entry.path.ends_with('\\')
+                    || entry.path == "/";
+
+                if is_boundary {
+                    return entry.permissions.contains(&permission);
+                }
             }
         }
 
@@ -463,6 +474,24 @@ mod tests {
         );
         unveil.unveil().unwrap();
         assert!(unveil.check_access("/tmp/file", UnveilPermission::Read));
+    }
+
+    #[test]
+    fn test_unveil_path_boundary_security() {
+        let mut unveil = UnveilManager::new();
+        unveil.add_unveil(
+            "/tmp".to_string(),
+            vec![UnveilPermission::Read, UnveilPermission::Write],
+        );
+        unveil.unveil().unwrap();
+
+        // Valid path under /tmp
+        assert!(unveil.check_access("/tmp/file", UnveilPermission::Read));
+        assert!(unveil.check_access("/tmp", UnveilPermission::Read));
+
+        // Path prefix confusion attack: /tmp_secret should NOT match /tmp rule
+        assert!(!unveil.check_access("/tmp_secret", UnveilPermission::Read));
+        assert!(!unveil.check_access("/tmp_secret/file", UnveilPermission::Read));
     }
 
     #[test]
