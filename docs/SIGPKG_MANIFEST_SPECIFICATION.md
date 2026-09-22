@@ -1,8 +1,8 @@
 # sigpkg Manifest and Signing Specification
 
-**Version:** 1.0  
-**Status:** Draft  
-**Last Updated:** 2025-01-22  
+**Version:** 1.0
+**Status:** Draft
+**Last Updated:** 2025-01-22
 **Purpose:** Define the SigmaOS native package format (sigpkg) manifest schema and signing requirements
 
 ---

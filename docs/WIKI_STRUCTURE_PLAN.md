@@ -1,8 +1,8 @@
 # SigmaOS Wiki Structure Plan
 
-**Version:** 1.0  
-**Status:** Draft  
-**Last Updated:** 2025-01-22  
+**Version:** 1.0
+**Status:** Draft
+**Last Updated:** 2025-01-22
 **Purpose:** Define the Arch Linux-inspired wiki structure for SigmaOS
 
 ---
@@ -469,8 +469,8 @@ See [Architecture Decisions](../docs/ARCHITECTURE_DECISIONS.md) for details.
 ```markdown
 # [Page Title]
 
-**Last Updated:** [Date]  
-**Status:** [Stable/Draft/Deprecated]  
+**Last Updated:** [Date]
+**Status:** [Stable/Draft/Deprecated]
 **Persona:** [Sentinel/Palette/Bolt]
 
 ## Overview
@@ -502,8 +502,8 @@ See [Architecture Decisions](../docs/ARCHITECTURE_DECISIONS.md) for details.
 ```markdown
 # [Page Title]
 
-**Last Updated:** [Date]  
-**Status:** [Stable/Draft/Deprecated]  
+**Last Updated:** [Date]
+**Status:** [Stable/Draft/Deprecated]
 **Persona:** [Bolt]
 
 ## Overview

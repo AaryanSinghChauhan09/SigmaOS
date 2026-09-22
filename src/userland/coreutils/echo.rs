@@ -7,7 +7,7 @@ use std::io::Write;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    
+
     match run(&args) {
         Ok(()) => std::process::exit(0),
         Err(e) => {
@@ -21,7 +21,7 @@ pub fn run(args: &[String]) -> Result<(), String> {
     let mut suppress_newline = false;
     let mut enable_escape = false;
     let mut output_args = Vec::new();
-    
+
     // Parse options
     for arg in args.iter().skip(1) {
         if arg == "-n" {
@@ -36,31 +36,31 @@ pub fn run(args: &[String]) -> Result<(), String> {
             output_args.push(arg.clone());
         }
     }
-    
+
     // Join arguments with spaces
     let output = output_args.join(" ");
-    
+
     // Handle escape sequences if enabled
     let output = if enable_escape {
         interpret_escapes(&output)
     } else {
         output
     };
-    
+
     // Print output
     if suppress_newline {
         print!("{}", output);
     } else {
         println!("{}", output);
     }
-    
+
     Ok(())
 }
 
 fn interpret_escapes(s: &str) -> String {
     let mut result = String::new();
     let mut chars = s.chars().peekable();
-    
+
     while let Some(c) = chars.next() {
         if c == '\\' {
             match chars.next() {
@@ -79,7 +79,7 @@ fn interpret_escapes(s: &str) -> String {
             result.push(c);
         }
     }
-    
+
     result
 }
 

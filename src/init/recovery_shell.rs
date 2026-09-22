@@ -337,7 +337,7 @@ mod tests {
         let shell = RecoveryShell::new();
         let result = shell.parse_command("ls /tmp");
         assert!(result.is_ok());
-        
+
         if let RecoveryCommand::Ls { path } = result.unwrap() {
             assert_eq!(path, "/tmp");
         } else {
@@ -357,7 +357,7 @@ mod tests {
         let shell = RecoveryShell::new();
         let result = shell.parse_command("cd /home");
         assert!(result.is_ok());
-        
+
         if let RecoveryCommand::Cd { path } = result.unwrap() {
             assert_eq!(path, "/home");
         } else {

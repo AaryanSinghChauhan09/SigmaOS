@@ -1,8 +1,8 @@
 # Boot-to-Login Path Specification
 
-**Version:** 1.0  
-**Status:** Draft  
-**Last Updated:** 2025-01-22  
+**Version:** 1.0
+**Status:** Draft
+**Last Updated:** 2025-01-22
 **Purpose:** Define the smallest complete boot-to-login path for SigmaOS
 
 ---

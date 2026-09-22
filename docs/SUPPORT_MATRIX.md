@@ -1,8 +1,8 @@
 # SigmaOS Supported Hardware Matrix
 
-**Version:** 1.0  
-**Status:** Draft  
-**Last Updated:** 2025-01-22  
+**Version:** 1.0
+**Status:** Draft
+**Last Updated:** 2025-01-22
 **Purpose:** Document supported hardware platforms and their compatibility status
 
 ---

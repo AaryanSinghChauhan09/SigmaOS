@@ -31,13 +31,13 @@ impl TransactionOperation {
             }
         }
     }
-    
+
     fn from_string(s: &str) -> Option<Self> {
         let parts: Vec<&str> = s.split_whitespace().collect();
         if parts.is_empty() {
             return None;
         }
-        
+
         match parts[0] {
             "INSTALL" => {
                 if parts.len() >= 3 {
@@ -94,7 +94,7 @@ impl TransactionState {
             TransactionState::RolledBack => "ROLLED_BACK",
         }
     }
-    
+
     fn from_string(s: &str) -> Option<Self> {
         match s {
             "PENDING" => Some(TransactionState::Pending),
@@ -129,26 +129,26 @@ impl TransactionEntry {
             format!("operation:{}", self.operation.to_string()),
             format!("state:{}", self.state.to_string()),
         ];
-        
+
         for path in &self.files_changed {
             lines.push(format!("file:{}", path.display()));
         }
-        
+
         for path in &self.directories_created {
             lines.push(format!("directory:{}", path.display()));
         }
-        
+
         if let Some(ref snapshot) = self.pre_snapshot {
             lines.push(format!("pre_snapshot:{}", snapshot.display()));
         }
-        
+
         if let Some(ref snapshot) = self.post_snapshot {
             lines.push(format!("post_snapshot:{}", snapshot.display()));
         }
-        
+
         lines.join("\n")
     }
-    
+
     /// Deserialize from text format
     fn from_text(text: &str) -> Option<Self> {
         let mut id = None;
@@ -159,7 +159,7 @@ impl TransactionEntry {
         let mut directories_created = Vec::new();
         let mut pre_snapshot = None;
         let mut post_snapshot = None;
-        
+
         for line in text.lines() {
             if line.starts_with("id:") {
                 id = line[3..].parse().ok();
@@ -179,7 +179,7 @@ impl TransactionEntry {
                 post_snapshot = Some(PathBuf::from(&line[14..]));
             }
         }
-        
+
         if let (Some(id), Some(timestamp), Some(operation), Some(state)) = (id, timestamp, operation, state) {
             Some(TransactionEntry {
                 id,
@@ -208,36 +208,36 @@ impl TransactionJournal {
     /// Create a new transaction journal
     pub fn new<P: AsRef<Path>>(journal_path: P) -> io::Result<Self> {
         let journal_path = journal_path.as_ref().to_path_buf();
-        
+
         // Create journal directory if it doesn't exist
         if let Some(parent) = journal_path.parent() {
             fs::create_dir_all(parent)?;
         }
-        
+
         // Load existing journal if it exists
         let (entries, next_id) = if journal_path.exists() {
             Self::load(&journal_path)?
         } else {
             (Vec::new(), 0)
         };
-        
+
         Ok(Self {
             entries,
             journal_path,
             next_id,
         })
     }
-    
+
     /// Load journal from disk
     fn load(path: &Path) -> io::Result<(Vec<TransactionEntry>, u64)> {
         let content = fs::read_to_string(path)?;
         let mut entries = Vec::new();
         let mut next_id = 0;
-        
+
         // Parse simple text format
         let current_entry_lines: Vec<&str> = content.lines().collect();
         let mut current_entry_lines: Vec<String> = Vec::new();
-        
+
         for line in current_entry_lines {
             if line.starts_with("id:") {
                 // New entry starts
@@ -252,7 +252,7 @@ impl TransactionJournal {
                 current_entry_lines.push(line.to_string());
             }
         }
-        
+
         // Don't forget the last entry
         if !current_entry_lines.is_empty() {
             if let Some(entry) = TransactionEntry::from_text(&current_entry_lines.join("\n")) {
@@ -260,33 +260,33 @@ impl TransactionJournal {
                 entries.push(entry);
             }
         }
-        
+
         Ok((entries, next_id))
     }
-    
+
     /// Save journal to disk
     fn save(&self) -> io::Result<()> {
         let mut content = String::new();
-        
+
         for entry in &self.entries {
             content.push_str(&entry.to_text());
             content.push_str("\n---\n");
         }
-        
+
         fs::write(&self.journal_path, content)?;
         Ok(())
     }
-    
+
     /// Begin a new transaction
     pub fn begin_transaction(&mut self, operation: TransactionOperation) -> u64 {
         let id = self.next_id;
         self.next_id += 1;
-        
+
         let timestamp = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap()
             .as_secs();
-        
+
         let entry = TransactionEntry {
             id,
             timestamp,
@@ -297,15 +297,15 @@ impl TransactionJournal {
             pre_snapshot: None,
             post_snapshot: None,
         };
-        
+
         self.entries.push(entry);
         self.save().unwrap_or_else(|e| {
             eprintln!("Failed to save journal: {}", e);
         });
-        
+
         id
     }
-    
+
     /// Set transaction state
     pub fn set_state(&mut self, id: u64, state: TransactionState) -> io::Result<()> {
         if let Some(entry) = self.entries.iter_mut().find(|e| e.id == id) {
@@ -315,7 +315,7 @@ impl TransactionJournal {
             Err(io::Error::new(io::ErrorKind::NotFound, "Transaction not found"))
         }
     }
-    
+
     /// Record file change
     pub fn record_file_change(&mut self, id: u64, path: PathBuf) -> io::Result<()> {
         if let Some(entry) = self.entries.iter_mut().find(|e| e.id == id) {
@@ -325,7 +325,7 @@ impl TransactionJournal {
             Err(io::Error::new(io::ErrorKind::NotFound, "Transaction not found"))
         }
     }
-    
+
     /// Record directory creation
     pub fn record_directory_creation(&mut self, id: u64, path: PathBuf) -> io::Result<()> {
         if let Some(entry) = self.entries.iter_mut().find(|e| e.id == id) {
@@ -335,7 +335,7 @@ impl TransactionJournal {
             Err(io::Error::new(io::ErrorKind::NotFound, "Transaction not found"))
         }
     }
-    
+
     /// Set pre-snapshot path
     pub fn set_pre_snapshot(&mut self, id: u64, snapshot_path: PathBuf) -> io::Result<()> {
         if let Some(entry) = self.entries.iter_mut().find(|e| e.id == id) {
@@ -345,7 +345,7 @@ impl TransactionJournal {
             Err(io::Error::new(io::ErrorKind::NotFound, "Transaction not found"))
         }
     }
-    
+
     /// Set post-snapshot path
     pub fn set_post_snapshot(&mut self, id: u64, snapshot_path: PathBuf) -> io::Result<()> {
         if let Some(entry) = self.entries.iter_mut().find(|e| e.id == id) {
@@ -355,23 +355,23 @@ impl TransactionJournal {
             Err(io::Error::new(io::ErrorKind::NotFound, "Transaction not found"))
         }
     }
-    
+
     /// Get transaction by ID
     pub fn get_transaction(&self, id: u64) -> Option<&TransactionEntry> {
         self.entries.iter().find(|e| e.id == id)
     }
-    
+
     /// Get all transactions
     pub fn get_all_transactions(&self) -> &[TransactionEntry] {
         &self.entries
     }
-    
+
     /// Rollback a transaction
     pub fn rollback(&mut self, id: u64) -> io::Result<()> {
         let entry = self.entries.iter_mut()
             .find(|e| e.id == id)
             .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, "Transaction not found"))?;
-        
+
         // Restore files from pre-snapshot if available
         if let Some(ref snapshot_path) = entry.pre_snapshot {
             if snapshot_path.exists() {
@@ -383,25 +383,25 @@ impl TransactionJournal {
                 ));
             }
         }
-        
+
         // Remove files created by transaction
         for path in &entry.files_changed {
             if path.exists() {
                 fs::remove_file(path)?;
             }
         }
-        
+
         // Remove directories created by transaction
         for path in entry.directories_created.iter().rev() {
             if path.exists() {
                 fs::remove_dir(path)?;
             }
         }
-        
+
         entry.state = TransactionState::RolledBack;
         self.save()
     }
-    
+
     /// Restore system from snapshot
     fn restore_snapshot(snapshot_path: &Path) -> io::Result<()> {
         // TODO: Implement snapshot restoration
@@ -410,11 +410,11 @@ impl TransactionJournal {
         // 2. Restore files from snapshot
         // 3. Restore directory structure
         // 4. Verify integrity
-        
+
         eprintln!("Snapshot restoration not yet implemented: {:?}", snapshot_path);
         Ok(())
     }
-    
+
     /// Get transaction history for a package
     pub fn get_package_history(&self, package_name: &str) -> Vec<&TransactionEntry> {
         self.entries.iter()
@@ -431,60 +431,60 @@ impl TransactionJournal {
 mod tests {
     use super::*;
     use tempfile::TempDir;
-    
+
     #[test]
     fn test_journal_creation() {
         let temp_dir = TempDir::new().unwrap();
         let journal_path = temp_dir.path().join("transactions.json");
-        
+
         let journal = TransactionJournal::new(&journal_path).unwrap();
         assert_eq!(journal.get_all_transactions().len(), 0);
     }
-    
+
     #[test]
     fn test_transaction_lifecycle() {
         let temp_dir = TempDir::new().unwrap();
         let journal_path = temp_dir.path().join("transactions.json");
-        
+
         let mut journal = TransactionJournal::new(&journal_path).unwrap();
-        
+
         // Begin transaction
         let id = journal.begin_transaction(TransactionOperation::Install {
             package_name: "test-package".to_string(),
             version: "1.0.0".to_string(),
         });
-        
+
         // Set state
         journal.set_state(id, TransactionState::InProgress).unwrap();
-        
+
         // Record file change
         journal.record_file_change(id, PathBuf::from("/bin/test")).unwrap();
-        
+
         // Complete transaction
         journal.set_state(id, TransactionState::Completed).unwrap();
-        
+
         // Verify
         let entry = journal.get_transaction(id).unwrap();
         assert_eq!(entry.state, TransactionState::Completed);
         assert_eq!(entry.files_changed.len(), 1);
     }
-    
+
     #[test]
     fn test_package_history() {
         let temp_dir = TempDir::new().unwrap();
         let journal_path = temp_dir.path().join("transactions.json");
-        
+
         let mut journal = TransactionJournal::new(&journal_path).unwrap();
-        
+
         journal.begin_transaction(TransactionOperation::Install {
             package_name: "test-package".to_string(),
             version: "1.0.0".to_string(),
         });
-        
+
         journal.begin_transaction(TransactionOperation::Remove {
             package_name: "test-package".to_string(),
         });
-        
+
         let history = journal.get_package_history("test-package");
         assert_eq!(history.len(), 2);
     }

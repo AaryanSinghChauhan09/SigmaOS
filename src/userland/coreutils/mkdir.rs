@@ -8,7 +8,7 @@ use std::os::unix::fs::PermissionsExt;
 /// Create directories
 pub fn run(path: &str, parents: bool, mode: Option<u32>) -> Result<(), String> {
     let path_obj = Path::new(path);
-    
+
     if parents {
         if let Some(m) = mode {
             fs::create_dir_all(path_obj).map_err(|e| format!("mkdir: {}", e))?;
@@ -24,7 +24,7 @@ pub fn run(path: &str, parents: bool, mode: Option<u32>) -> Result<(), String> {
             fs::create_dir(path_obj).map_err(|e| format!("mkdir: {}", e))?;
         }
     }
-    
+
     Ok(())
 }
 
@@ -39,16 +39,16 @@ fn set_permissions(path: &Path, mode: u32) -> Result<(), String> {
 /// Set permissions recursively
 fn set_permissions_recursive(path: &Path, mode: u32) -> Result<(), String> {
     set_permissions(path, mode)?;
-    
+
     for entry in fs::read_dir(path).map_err(|e| format!("mkdir: {}", e))? {
         let entry = entry.map_err(|e| format!("mkdir: {}", e))?;
         let entry_path = entry.path();
-        
+
         if entry_path.is_dir() {
             set_permissions_recursive(&entry_path, mode)?;
         }
     }
-    
+
     Ok(())
 }
 

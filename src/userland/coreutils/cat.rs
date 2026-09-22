@@ -9,7 +9,7 @@ use std::path::Path;
 pub fn run(paths: &[String], show_number: bool, show_ends: bool) -> Result<(), String> {
     for path in paths {
         let path_obj = Path::new(path);
-        
+
         if path == "-" {
             // Read from stdin
             let stdin = io::stdin();
@@ -22,7 +22,7 @@ pub fn run(paths: &[String], show_number: bool, show_ends: bool) -> Result<(), S
             copy_with_options(&mut file, &mut stdout_lock, show_number, show_ends)?;
         }
     }
-    
+
     Ok(())
 }
 
@@ -76,7 +76,7 @@ mod tests {
         let input = "test content\nline 2\n";
         let mut reader = Cursor::new(input.as_bytes());
         let mut output = Vec::new();
-        
+
         copy_with_options(&mut reader, &mut output, false, false).unwrap();
         assert_eq!(String::from_utf8_lossy(&output), input);
     }

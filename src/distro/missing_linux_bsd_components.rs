@@ -474,146 +474,6 @@ impl Default for HardenedBsdPaxGuardEngine {
     }
 }
 
-/// GNU Guix Declarative Scheme / Guile Package Engine.
-/// Manages Scheme package expressions, generational profile rollbacks, and store commit pinning.
-#[derive(Debug, Clone)]
-pub struct GuixGuileSchemePackageEngine {
-    pub active_generation: u32,
-    pub pinned_commit: String,
-    pub functional_build_sandbox_active: bool,
-}
-
-impl GuixGuileSchemePackageEngine {
-    pub fn new() -> Self {
-        Self {
-            active_generation: 42,
-            pinned_commit: String::from("a1b2c3d4e5f678901234567890abcdef12345678"),
-            functional_build_sandbox_active: true,
-        }
-    }
-
-    pub fn rollback_generation(&mut self) -> u32 {
-        if self.active_generation > 1 {
-            self.active_generation -= 1;
-        }
-        self.active_generation
-    }
-
-    pub fn verify_guix_sandbox(&self) -> bool {
-        self.functional_build_sandbox_active && !self.pinned_commit.is_empty()
-    }
-}
-
-impl Default for GuixGuileSchemePackageEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Slackware pkgtools Package Management Engine.
-/// Manages `.txz` / `.tbz` tarball validation, `installpkg`, `upgradepkg`, and `removepkg`.
-#[derive(Debug, Clone)]
-pub struct SlackwarePkgtoolsEngine {
-    pub installed_packages: Vec<String>,
-    pub pkg_database_path: String,
-}
-
-impl SlackwarePkgtoolsEngine {
-    pub fn new() -> Self {
-        let mut pkgs = Vec::new();
-        pkgs.push(String::from("kernel-huge-6.12.0-x86_64-1"));
-        pkgs.push(String::from("glibc-2.39-x86_64-1"));
-        Self {
-            installed_packages: pkgs,
-            pkg_database_path: String::from("/var/log/packages"),
-        }
-    }
-
-    pub fn installpkg(&mut self, pkg_filename: &str) -> bool {
-        let pkg_name = pkg_filename.trim_end_matches(".txz").trim_end_matches(".tbz");
-        if !self.installed_packages.iter().any(|p| p == pkg_name) {
-            self.installed_packages.push(pkg_name.to_string());
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn upgradepkg(&mut self, old_pkg: &str, new_pkg: &str) -> bool {
-        if let Some(pos) = self.installed_packages.iter().position(|p| p == old_pkg) {
-            self.installed_packages[pos] = new_pkg.trim_end_matches(".txz").to_string();
-            true
-        } else {
-            self.installpkg(new_pkg)
-        }
-    }
-}
-
-impl Default for SlackwarePkgtoolsEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Whonix Tor Gateway & Anonymity Isolation Engine.
-/// Manages stream isolation, transparent Tor routing, and anti-fingerprinting guards.
-#[derive(Debug, Clone)]
-pub struct WhonixAnonTorusIsolationEngine {
-    pub tor_socks_port: u16,
-    pub stream_isolation_active: bool,
-    pub transparent_proxy_enforced: bool,
-}
-
-impl WhonixAnonTorusIsolationEngine {
-    pub fn new() -> Self {
-        Self {
-            tor_socks_port: 9050,
-            stream_isolation_active: true,
-            transparent_proxy_enforced: true,
-        }
-    }
-
-    pub fn verify_anonymity_sandbox(&self) -> bool {
-        self.stream_isolation_active && self.transparent_proxy_enforced && self.tor_socks_port == 9050
-    }
-}
-
-impl Default for WhonixAnonTorusIsolationEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// PCLinuxOS APT-RPM & Synaptic Package Management Engine.
-/// Manages apt-rpm repository transactions, RPM header queries, and Synaptic state abstractions.
-#[derive(Debug, Clone)]
-pub struct PCLinuxOSSynapticAptEngine {
-    pub apt_rpm_repositories_count: usize,
-    pub synaptic_gui_connected: bool,
-    pub pending_rpm_transactions: usize,
-}
-
-impl PCLinuxOSSynapticAptEngine {
-    pub fn new() -> Self {
-        Self {
-            apt_rpm_repositories_count: 5,
-            synaptic_gui_connected: true,
-            pending_rpm_transactions: 0,
-        }
-    }
-
-    pub fn execute_apt_get_dist_upgrade(&mut self) -> bool {
-        self.pending_rpm_transactions = 0;
-        true
-    }
-}
-
-impl Default for PCLinuxOSSynapticAptEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 /// Master Missing Linux & BSD Components Suite
 #[derive(Debug, Clone)]
 pub struct SovereignMissingLinuxBsdSuite {
@@ -632,10 +492,6 @@ pub struct SovereignMissingLinuxBsdSuite {
     pub clear_stateless: ClearLinuxStatelessEngine,
     pub urpmi: MageiaUrpmiEngine,
     pub pax: HardenedBsdPaxGuardEngine,
-    pub guix: GuixGuileSchemePackageEngine,
-    pub slackware: SlackwarePkgtoolsEngine,
-    pub whonix: WhonixAnonTorusIsolationEngine,
-    pub pclinuxos: PCLinuxOSSynapticAptEngine,
 }
 
 impl SovereignMissingLinuxBsdSuite {
@@ -656,10 +512,6 @@ impl SovereignMissingLinuxBsdSuite {
             clear_stateless: ClearLinuxStatelessEngine::new(),
             urpmi: MageiaUrpmiEngine::new(),
             pax: HardenedBsdPaxGuardEngine::new(),
-            guix: GuixGuileSchemePackageEngine::new(),
-            slackware: SlackwarePkgtoolsEngine::new(),
-            whonix: WhonixAnonTorusIsolationEngine::new(),
-            pclinuxos: PCLinuxOSSynapticAptEngine::new(),
         }
     }
 
@@ -676,10 +528,6 @@ impl SovereignMissingLinuxBsdSuite {
         let reset_ok = self.clear_stateless.reset_etc_to_defaults();
         self.urpmi.add_media("nonfree/updates");
         let pax_ok = self.pax.enforce_pax_policy("/usr/bin/sigsudo");
-        let guix_ok = self.guix.verify_guix_sandbox();
-        let slackware_ok = self.slackware.installpkg("bash-5.2-x86_64-1.txz");
-        let whonix_ok = self.whonix.verify_anonymity_sandbox();
-        let pclinuxos_ok = self.pclinuxos.execute_apt_get_dist_upgrade();
 
         self.yast2.verify_module("yast2-hardware")
             && self.xbps_src.generate_xbps_binary().contains("sigmaos-core")
@@ -696,10 +544,6 @@ impl SovereignMissingLinuxBsdSuite {
             && reset_ok
             && self.urpmi.media_sources.len() == 3
             && pax_ok
-            && guix_ok
-            && slackware_ok
-            && whonix_ok
-            && pclinuxos_ok
     }
 }
 
@@ -728,8 +572,5 @@ mod tests {
         assert_eq!(suite.moss.installed_stone_packages.len(), 1);
         assert!(suite.clear_stateless.is_stateless_clean);
         assert!(suite.pax.enforce_pax_policy("/bin/ls"));
-        assert!(suite.guix.verify_guix_sandbox());
-        assert!(suite.whonix.verify_anonymity_sandbox());
-        assert!(suite.pclinuxos.execute_apt_get_dist_upgrade());
     }
 }

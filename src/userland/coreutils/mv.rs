@@ -8,11 +8,11 @@ use std::path::Path;
 pub fn run(src: &str, dst: &str) -> Result<(), String> {
     let src_path = Path::new(src);
     let dst_path = Path::new(dst);
-    
+
     if !src_path.exists() {
         return Err(format!("mv: cannot stat '{}': No such file or directory", src));
     }
-    
+
     fs::rename(src_path, dst_path).map_err(|e| format!("mv: {}", e))
 }
 

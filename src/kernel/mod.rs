@@ -372,6 +372,98 @@ pub use uts_namespace::{UtsNamespace, UtsNamespaceManager};
 pub mod semaphore;
 pub use semaphore::{Semaphore, SemaphoreManager, SemaphoreResult, SemaphoreSet};
 
+pub mod timerfd;
+pub use timerfd::{TimerClock, TimerExpirations, TimerFd, TimerFdManager, TimerFlags, TimerSpec};
+
+pub mod signalfd;
+pub use signalfd::{SignalFd, SignalFdFlags, SignalFdManager, SignalInfo, SignalMask};
+
+pub mod network_namespace;
+pub use network_namespace::{NetworkDevice, NetworkNamespace, NetworkNamespaceManager};
+
+pub mod epoll;
+pub use epoll::{EpollEvent, EpollEvents, EpollInstance, EpollManager, EpollOp};
+
+pub mod eventfd;
+pub use eventfd::{EventFd, EventFdFlags, EventFdManager};
+
+pub mod pipe;
+pub use pipe::{Pipe, PipeFlags, PipeManager};
+
+pub mod socket;
+pub use socket::{Socket, SocketDomain, SocketManager, SocketProtocol, SocketState, SocketType};
+
+pub mod linux_bsd_innovations;
+
+pub mod capabilities;
+pub use capabilities::{Capability, CapabilityId, CapabilityManager, CapabilitySet};
+
+pub mod futex;
+pub use futex::{Futex, FutexFlags, FutexManager, FutexOp, FutexWaiter};
+
+pub mod keyring;
+pub use keyring::{Key, KeyManager, KeyPayload, KeyPermissions, Keyring, KeyType};
+
+pub mod audit;
+pub use audit::{AuditEvent, AuditEventResult, AuditEventType, AuditLog, AuditManager};
+
+pub mod landlock;
+pub use landlock::{LandlockAccess, LandlockDomain, LandlockManager, LandlockRule, LandlockRuleset};
+
+pub mod capsicum;
+pub use capsicum::{CapsicumCapability, CapsicumManager, CapsicumMode, CapsicumRights, CapsicumSandbox};
+
+pub mod pledge;
+pub use pledge::{PledgeContext, PledgeManager, PledgePromise};
+
+pub mod unveil;
+pub use unveil::{UnveilContext, UnveilManager, UnveilOperation, UnveilPermissions, UnveilRule};
+
+pub mod bsd_jail;
+pub use bsd_jail::{BsdJail, BsdJailConfig, BsdJailManager};
+
+pub mod zfs;
+pub use zfs::{ZfsDataset, ZfsDatasetProperties, ZfsDatasetType, ZfsManager, ZfsPool, ZfsPoolConfig};
+
+pub mod btrfs;
+pub use btrfs::{BtrfsCompression, BtrfsFilesystem, BtrfsManager, BtrfsSubvolume, BtrfsSubvolumeType};
+
+pub mod overlay;
+pub use overlay::{OverlayConfig, OverlayFilesystem, OverlayLayer, OverlayLayerType, OverlayManager};
+
+pub mod user_group;
+pub use user_group::{FilePermissions, Group, User, UserGroupManager};
+
+pub mod hostname;
+pub use hostname::HostnameManager;
+
+pub mod syslog;
+pub use syslog::{SyslogBuffer, SyslogEntry, SyslogFacility, SyslogManager, SyslogSeverity};
+
+pub mod cron;
+pub use cron::{CronField, CronJob, CronManager, CronSchedule};
+
+pub mod swap;
+pub use swap::{SwapDevice, SwapDeviceType, SwapManager, SwapPriority, SwapStats};
+
+pub mod resource;
+pub use resource::{CpuStats, DiskStats, MemoryStats, NetworkStats, ResourceMonitor};
+
+pub mod time;
+pub use time::{ClockSource, ClockSourceStats, SystemTime, TimeManager, Timezone};
+
+pub mod signal;
+pub use signal::{Signal, SignalDisposition, SignalHandler, SignalInfo, SignalManager, SignalMask};
+
+pub mod mount_namespace;
+pub use mount_namespace::{MountFlags, MountNamespace, MountNamespaceManager, MountPoint};
+
+pub mod uts_namespace;
+pub use uts_namespace::{UtsNamespace, UtsNamespaceManager};
+
+pub mod semaphore;
+pub use semaphore::{Semaphore, SemaphoreManager, SemaphoreResult, SemaphoreSet};
+
 pub mod network_namespace;
 pub use network_namespace::{NetworkDevice, NetworkNamespace, NetworkNamespaceManager};
 

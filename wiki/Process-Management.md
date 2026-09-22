@@ -437,4 +437,47 @@ If resource limit is exceeded:
 
 ---
 
+## References
+
+- [ARCHITECTURE_DECISIONS.md](../docs/ARCHITECTURE_DECISIONS.md) - Architecture decisions
+- [PROJECT_STATUS.md](../docs/PROJECT_STATUS.md) - Implementation status
+- [Linux CFS Scheduler](https://www.kernel.org/doc/html/latest/scheduler/sched-design-CFS.html)
+- [cgroups v2 Documentation](https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html)
+
+---
+
+## AI Agent Maintenance
+
+### Persona Assignment
+- **Primary:** Bolt (Performance)
+- **Secondary:** Sentinel (Security)
+
+### Maintenance Tasks
+- [ ] Update process management status in PROJECT_STATUS.md
+- [ ] Verify all internal links resolve
+- [ ] Update scheduler policies as new ones are added
+- [ ] Add new cgroup controllers as they are implemented
+- [ ] Update resource limits table
+
+### Known Issues
+- BORE scheduler may have edge cases with certain workloads
+- cgroups v2 may have compatibility issues with some legacy applications
+
+### Edge Cases
+- Real-time scheduling requires careful priority management to avoid starvation
+- cgroup memory limits may cause OOM kills if set too aggressively
+
+### Related Components
+- [src/kernel/scheduler.rs](../src/kernel/scheduler.rs)
+- [src/kernel/cgroups.rs](../src/kernel/cgroups.rs)
+- [src/kernel/resource_limits.rs](../src/kernel/resource_limits.rs)
+- [src/kernel/namespaces.rs](../src/kernel/namespaces.rs)
+
+### Last Verified
+- **Version:** 1.0
+- **Date:** 2025-01-22
+- **Verified by:** Devin AI Agent
+
+---
+
 **[Process Management](Category-Process-Management)** | **[Scheduling](Category-Scheduling)** | **[cgroups](Category-cgroups)**

@@ -44,7 +44,7 @@ SigmaOS is designed as a **sovereign, zero-dependency operating system** in Rust
 When implementing features or bug fixes in SigmaOS:
 
 1. **Zero External Dependencies**: Maintain `[dependencies]` in `Cargo.toml` empty. Do not add third-party crates (see ADR-002 for exceptions).
-2. **Hybrid `std`/`#![no_std]` Architecture**: 
+2. **Hybrid `std`/`#![no_std]` Architecture**:
    - Use `std::` primitives for user-space modules (`src/userland/`, `src/desktop/`, `src/audio/`, etc.)
    - Use `alloc::` primitives (`alloc::format`, `alloc::string::String`, `alloc::vec::Vec`, `alloc::collections::BTreeMap`) for kernel and security-critical modules
    - See [ADR-001](ARCHITECTURE_DECISIONS.md#adr-001-hybrid-stdno_std-architecture) for detailed module classification

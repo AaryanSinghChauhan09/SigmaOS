@@ -2069,10 +2069,10 @@ impl UniversalScriptTranspiler {
     }
 
     fn transpile_mksh_line(line: &str) -> String {
-        let l = line.to_string();
+        let mut l = line.to_string();
         if l.starts_with("integer ") {
             let var = l.trim_start_matches("integer ").trim();
-            if var.contains('=') {
+            if let Some(eq) = var.find('=') {
                 return format!("{}", var);
             }
             return format!("{}=0", var);

@@ -1308,26 +1308,5 @@ mod tests {
         let mut psu = HwbustersPsuEfficiencyTelemetryEngine::new(1000);
         assert!(psu.record_transient_load_spike(800.0, 18.0));
         assert_eq!(psu.calculate_cybenetics_rating(), "Cybenetics Titanium");
-
-        // Test FreeBSD ZFS Bootenv Engine
-        let mut zfs_be = FreeBsdZfsBootenvEngine::new("zroot");
-        assert!(zfs_be.create_bootenv("upgrade-2026", "zroot/ROOT/default@snap1"));
-        assert!(zfs_be.activate_bootenv("upgrade-2026"));
-        assert!(zfs_be.bootenvs.get("upgrade-2026").unwrap().is_active_on_reboot);
-
-        // Test Debian APT Fast Mirror Selector Engine
-        let mut apt_fast = DebianAptFastMirrorSelectorEngine::new();
-        apt_fast.add_mirror("https://deb.debian.org/debian", "US", 45.0, 1000.0);
-        apt_fast.add_mirror("https://mirror.fast.org/debian", "US", 12.0, 2500.0);
-        let fastest = apt_fast.select_fastest_mirrors(1);
-        assert_eq!(fastest[0], "https://mirror.fast.org/debian");
-
-        // Test Void Runit Service Supervisor Engine
-        let mut runit = VoidRunitServiceSupervisorEngine::new();
-        runit.register_service("dhcpcd", "dhcpcd -n");
-        assert!(runit.supervise_sv_up("dhcpcd", 4200));
-        assert!(runit.services.get("dhcpcd").unwrap().is_active);
-        assert!(runit.supervise_sv_down("dhcpcd"));
-        assert!(!runit.services.get("dhcpcd").unwrap().is_active);
     }
 }

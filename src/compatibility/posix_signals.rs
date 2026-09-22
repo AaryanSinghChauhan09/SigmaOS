@@ -418,7 +418,7 @@ impl PosixSignalDeliveryEngine {
         }
 
         let old_mask = self.thread_masks[thread_id].get_mask();
-        
+
         match operation {
             SigprocmaskOp::Block => {
                 self.thread_masks[thread_id].block(mask);
@@ -437,13 +437,13 @@ impl PosixSignalDeliveryEngine {
     /// Process pending signals (called during kernel context switch)
     pub fn process_pending_signals(&mut self, thread_id: usize) -> Vec<SignalInfo> {
         let mut delivered = Vec::new();
-        
+
         if thread_id >= self.thread_masks.len() {
             return delivered;
         }
 
         let mask = self.thread_masks[thread_id].get_mask();
-        
+
         // Check all signals (simplified - in real implementation would check pending queue)
         for sig_num in 1..=31u32 {
             if let Some(signal) = PosixSignal::from_num(sig_num) {
@@ -532,11 +532,11 @@ mod tests {
         let mut mask = SignalMask::empty();
         mask.add(PosixSignal::SIGINT);
         mask.add(PosixSignal::SIGTERM);
-        
+
         assert!(mask.contains(PosixSignal::SIGINT));
         assert!(mask.contains(PosixSignal::SIGTERM));
         assert!(!mask.contains(PosixSignal::SIGKILL));
-        
+
         mask.remove(PosixSignal::SIGINT);
         assert!(!mask.contains(PosixSignal::SIGINT));
     }
@@ -562,13 +562,13 @@ mod tests {
     #[test]
     fn test_thread_signal_mask() {
         let mut mask = ThreadSignalMask::new();
-        
+
         let block_mask = SignalMask { bits: 1u64 << (PosixSignal::SIGINT as u32) };
         mask.block(block_mask);
-        
+
         assert!(mask.is_blocked(PosixSignal::SIGINT));
         assert!(!mask.is_blocked(PosixSignal::SIGTERM));
-        
+
         mask.unblock(block_mask);
         assert!(!mask.is_blocked(PosixSignal::SIGINT));
     }
@@ -576,10 +576,10 @@ mod tests {
     #[test]
     fn test_signal_delivery_engine() {
         let mut engine = PosixSignalDeliveryEngine::new();
-        
+
         // Send signal
         assert!(engine.send_signal(PosixSignal::SIGINT, 1).is_ok());
-        
+
         // Set action
         let action = SignalAction {
             handler: SignalHandler::Ignore,
@@ -588,11 +588,11 @@ mod tests {
             restorer: None,
         };
         assert!(engine.sigaction(PosixSignal::SIGINT, action).is_ok());
-        
+
         // Set mask
         let mask = SignalMask::empty();
         assert!(engine.sigprocmask(0, SigprocmaskOp::SetMask, mask).is_ok());
-        
+
         // Check stats
         let stats = engine.get_stats();
         assert_eq!(stats.total_sent, 1);

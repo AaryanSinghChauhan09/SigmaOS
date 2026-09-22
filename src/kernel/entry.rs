@@ -122,11 +122,11 @@ fn print_banner() {
 fn early_init(boot_info: &BootInfo) {
     println!("Early initialization...");
     println!("Memory regions: {}", boot_info.memory_map.len());
-    
+
     if let Some(fb) = &boot_info.framebuffer {
         println!("Framebuffer: {}x{} @ {}bpp", fb.width, fb.height, fb.bpp);
     }
-    
+
     if let Some(rsdp) = boot_info.rsdp_address {
         println!("ACPI RSDP at 0x{:x}", rsdp);
     }
@@ -139,18 +139,18 @@ fn init_memory_manager(memory_map: &[MemoryRegion]) {
     // - Set up page tables
     // - Initialize the heap allocator
     // - Enable KASLR if configured
-    
+
     let usable_regions: Vec<_> = memory_map
         .iter()
         .filter(|r| r.mem_type == MemoryType::Usable)
         .collect();
-    
+
     println!("Usable memory regions: {}", usable_regions.len());
-    
+
     for region in &usable_regions {
-        println!("  0x{:x} - 0x{:x} ({} MB)", 
-                 region.start, 
-                 region.end, 
+        println!("  0x{:x} - 0x{:x} ({} MB)",
+                 region.start,
+                 region.end,
                  (region.end - region.start) / (1024 * 1024));
     }
 }
@@ -162,7 +162,7 @@ fn init_interrupts() {
     // - Configure exception handlers
     // - Initialize APIC/xAPIC
     // - Set up timer interrupts
-    
+
     println!("Interrupt handler: configured");
 }
 
@@ -173,7 +173,7 @@ fn init_scheduler() {
     // - Set up CPU affinity
     // - Configure scheduler policy (CFS/BORE)
     // - Start scheduling tick
-    
+
     println!("Scheduler: BORE/EEVDF hybrid ready");
 }
 
@@ -184,7 +184,7 @@ fn init_filesystem() {
     // - Mount root filesystem
     // - Set up procfs, sysfs, devtmpfs
     // - Load filesystem drivers
-    
+
     println!("Filesystem: VFS initialized");
 }
 
@@ -195,7 +195,7 @@ fn spawn_init() {
     // - Set up PID 1
     // - Execute sigma-init binary
     // - Pass control to init system
-    
+
     println!("Init process: spawned (PID 1)");
     println!("Control transferred to init system");
 }
@@ -218,7 +218,7 @@ mod tests {
             framebuffer: None,
             rsdp_address: Some(0xf0000),
         };
-        
+
         assert_eq!(boot_info.memory_map.len(), 1);
         assert_eq!(boot_info.cmdline, "sigmaos quiet");
         assert!(boot_info.rsdp_address.is_some());
@@ -231,7 +231,7 @@ mod tests {
             end: 0x100000,
             mem_type: MemoryType::Usable,
         };
-        
+
         assert_eq!(region.mem_type, MemoryType::Usable);
         assert_eq!(region.start, 0x1000);
         assert_eq!(region.end, 0x100000);

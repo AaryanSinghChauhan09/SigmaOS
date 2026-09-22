@@ -1,8 +1,8 @@
 # Wiki Consolidation Status
 
-**Version:** 1.0  
-**Status:** In Progress  
-**Last Updated:** 2025-01-22  
+**Version:** 1.0
+**Status:** In Progress
+**Last Updated:** 2025-01-22
 **Purpose:** Track wiki consolidation progress toward Arch Linux-inspired structure
 
 ---

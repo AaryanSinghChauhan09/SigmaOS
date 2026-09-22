@@ -6,8 +6,8 @@ This document records significant architectural decisions for SigmaOS. Each ADR 
 
 ## ADR-001: Hybrid std/no_std Architecture
 
-**Status:** Accepted  
-**Date:** 2025-01-22  
+**Status:** Accepted
+**Date:** 2025-01-22
 **Context:** Conflicting guidance between `AGENTS.md` and `docs/AGENTS.md` regarding `std` vs `#![no_std]` usage.
 
 ### Problem Statement
@@ -91,8 +91,8 @@ SigmaOS adopts a **hybrid architecture** with clear boundaries:
 
 ## ADR-002: Zero External Dependency Policy
 
-**Status:** Accepted  
-**Date:** 2025-01-22  
+**Status:** Accepted
+**Date:** 2025-01-22
 **Context:** Need to clarify the "zero external dependency" policy given existing exceptions.
 
 ### Problem Statement
@@ -162,8 +162,8 @@ SigmaOS maintains a **minimal external dependency policy**:
 
 ## ADR-003: Documentation Source of Truth
 
-**Status:** Accepted  
-**Date:** 2025-01-22  
+**Status:** Accepted
+**Date:** 2025-01-22
 **Context:** Multiple overlapping documentation sources (`docs/`, `wiki/`, `wiki_content/`, `WIKI/`, `wiki_repo/`).
 
 ### Problem Statement
@@ -255,8 +255,8 @@ For new ADRs, use this template:
 ```markdown
 ## ADR-XXX: [Title]
 
-**Status:** [Proposed | Accepted | Deprecated | Superseded]  
-**Date:** YYYY-MM-DD  
+**Status:** [Proposed | Accepted | Deprecated | Superseded]
+**Date:** YYYY-MM-DD
 **Context:** [Problem statement]
 
 ### Decision

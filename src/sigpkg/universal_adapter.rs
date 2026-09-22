@@ -1761,21 +1761,6 @@ impl UniversalDependencyMapper {
             "eza" | "exa" | "sys-apps/eza" => "eza".to_string(),
             "btop" | "sys-process/btop" => "btop".to_string(),
             "fastfetch" | "sys-apps/fastfetch" => "fastfetch".to_string(),
-            "libbsd" | "libbsd-dev" | "libbsd-devel" | "devel/libbsd" => "libbsd".to_string(),
-            "sndio" | "audio/sndio" | "media-sound/sndio" => "sndio".to_string(),
-            "alsa-lib" | "alsa" | "media-libs/alsa-lib" | "audio/alsa-lib" => "alsa-lib".to_string(),
-            "pulseaudio" | "libpulse" | "media-sound/pulseaudio" | "audio/pulseaudio" => "pulseaudio".to_string(),
-            "vulkan-loader" | "vulkan" | "media-libs/vulkan-loader" | "graphics/vulkan-loader" => "vulkan".to_string(),
-            "mesa" | "mesa-dri-drivers" | "media-libs/mesa" | "graphics/mesa-libs" => "mesa".to_string(),
-            "libdrm" | "x11-libs/libdrm" | "graphics/libdrm" => "libdrm".to_string(),
-            "bzip2" | "bzip2-devel" | "app-arch/bzip2" | "archivers/bzip2" => "bzip2".to_string(),
-            "lz4" | "liblz4-dev" | "app-arch/lz4" | "archivers/lz4" => "lz4".to_string(),
-            "zsh" | "shells/zsh" | "app-shells/zsh" => "zsh".to_string(),
-            "fish" | "shells/fish" | "app-shells/fish" => "fish".to_string(),
-            "tcsh" | "csh" | "shells/tcsh" => "tcsh".to_string(),
-            "wireguard" | "wireguard-tools" | "net-vpn/wireguard-tools" => "wireguard".to_string(),
-            "openrc" | "sys-apps/openrc" => "openrc".to_string(),
-            "runit" | "sys-process/runit" => "runit".to_string(),
             _ => clean.to_string(),
         }
     }
@@ -2107,6 +2092,50 @@ impl UniversalPmCommandDispatcher {
                         if !arg.starts_with('-') && *arg != "install" && *arg != "add" && *arg != "delete" && *arg != "remove" && *arg != "upgrade" {
                             target_packages.push(arg.to_string());
                         }
+                    }
+                }
+            }
+            "xbps" | "xbps-install" | "xbps-remove" | "xbps-query" | "void" => {
+                if pm == "xbps-remove" {
+                    operation = UniversalPmOperation::Remove;
+                } else if pm == "xbps-query" {
+                    operation = UniversalPmOperation::QueryInfo;
+                } else {
+                    let mut i = 0;
+                    while i < args.len() {
+                        match args[i] {
+                            "install" | "add" => operation = UniversalPmOperation::Install,
+                            "remove" | "purge" => operation = UniversalPmOperation::Remove,
+                            "upgrade" | "update" => operation = UniversalPmOperation::Upgrade,
+                            "search" => operation = UniversalPmOperation::Search,
+                            "info" | "query" => operation = UniversalPmOperation::QueryInfo,
+                            "-n" | "--dry-run" => dry_run = true,
+                            arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                            _ => {}
+                        }
+                        i += 1;
+                    }
+                }
+                for arg in args {
+                    if *arg == "-n" || *arg == "--dry-run" {
+                        dry_run = true;
+                    } else if !arg.starts_with('-') && target_packages.is_empty() && *arg != "install" && *arg != "remove" && *arg != "upgrade" {
+                        target_packages.push(arg.to_string());
+                    }
+                }
+            }
+            "emerge" | "ebuild" | "gentoo" | "portage" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "install" | "add" => operation = UniversalPmOperation::Install,
+                        "delete" | "remove" => operation = UniversalPmOperation::Remove,
+                        "upgrade" => operation = UniversalPmOperation::Upgrade,
+                        "search" => operation = UniversalPmOperation::Search,
+                        "info" => operation = UniversalPmOperation::QueryInfo,
+                        "-n" => dry_run = true,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
                     }
                 }
             }

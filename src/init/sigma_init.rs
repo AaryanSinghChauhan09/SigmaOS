@@ -75,41 +75,41 @@ impl SigmaInit {
     /// Create new init system
     pub fn new(config: InitConfig) -> Self {
         let mut services = BTreeMap::new();
-        
+
         // Register services from config
         for service in &config.services {
             services.insert(service.name.clone(), service.clone());
         }
-        
+
         SigmaInit {
             config,
             services,
             current_target: String::new(),
         }
     }
-    
+
     /// Initialize system
     pub fn initialize(&mut self) -> Result<(), String> {
         println!("SigmaOS Init v0.1.0 starting...");
         println!("Hostname: {}", self.config.hostname);
         println!("Default target: {}", self.config.default_target);
-        
+
         // Set hostname
         self.set_hostname(&self.config.hostname)?;
-        
+
         // Mount filesystems
         self.mount_filesystems()?;
-        
+
         // Start essential services
         self.start_essential_services()?;
-        
+
         // Start default target
         self.switch_target(&self.config.default_target)?;
-        
+
         println!("Init system ready");
         Ok(())
     }
-    
+
     /// Set system hostname
     fn set_hostname(&self, hostname: &str) -> Result<(), String> {
         println!("Setting hostname: {}", hostname);
@@ -118,11 +118,11 @@ impl SigmaInit {
         // - Update /etc/hostname
         Ok(())
     }
-    
+
     /// Mount filesystems
     fn mount_filesystems(&self) -> Result<(), String> {
         println!("Mounting filesystems...");
-        
+
         // Placeholder: In a real implementation, this would:
         // - Mount root filesystem
         // - Mount /proc
@@ -130,15 +130,15 @@ impl SigmaInit {
         // - Mount /dev
         // - Mount /tmp (tmpfs)
         // - Mount other filesystems from /etc/fstab
-        
+
         println!("  /proc mounted (procfs)");
         println!("  /sys mounted (sysfs)");
         println!("  /dev mounted (devtmpfs)");
         println!("  /tmp mounted (tmpfs)");
-        
+
         Ok(())
     }
-    
+
     /// Start essential services
     fn start_essential_services(&mut self) -> Result<(), String> {
         println!("Starting essential services...");
@@ -152,15 +152,15 @@ impl SigmaInit {
                 self.start_service(&name)?;
             }
         }
-        
+
         Ok(())
     }
-    
+
     /// Start a service
     pub fn start_service(&mut self, name: &str) -> Result<(), String> {
         if let Some(service) = self.services.get_mut(name) {
             println!("Starting service: {}", name);
-            
+
             // Check dependencies
             let dependencies: Vec<String> = service.dependencies.clone();
         for dep in &dependencies {
@@ -170,108 +170,108 @@ impl SigmaInit {
                     }
                 }
             }
-            
+
             // Mark as starting
             service.state = ServiceState::Starting;
-            
+
             // Execute service
             // Placeholder: In a real implementation, this would:
             // - Fork a new process
             // - Execute the service executable
             // - Set up the environment
             // - Track the PID
-            
-            println!("  Executing: {} {}", service.executable, 
+
+            println!("  Executing: {} {}", service.executable,
                      service.arguments.join(" "));
-            
+
             // Mark as running
             service.state = ServiceState::Running;
             service.pid = Some(1); // Placeholder PID
-            
+
             println!("  Service {} started (PID: {:?})", name, service.pid);
-            
+
             Ok(())
         } else {
             Err(format!("Service not found: {}", name))
         }
     }
-    
+
     /// Stop a service
     pub fn stop_service(&mut self, name: &str) -> Result<(), String> {
         if let Some(service) = self.services.get_mut(name) {
             println!("Stopping service: {}", name);
-            
+
             service.state = ServiceState::Stopping;
-            
+
             // Placeholder: In a real implementation, this would:
             // - Send SIGTERM to the service process
             // - Wait for graceful shutdown
             // - Send SIGKILL if it doesn't terminate
             // - Clean up resources
-            
+
             service.state = ServiceState::Stopped;
             service.pid = None;
-            
+
             println!("  Service {} stopped", name);
-            
+
             Ok(())
         } else {
             Err(format!("Service not found: {}", name))
         }
     }
-    
+
     /// Switch to a target/runlevel
     pub fn switch_target(&mut self, target: &str) -> Result<(), String> {
         println!("Switching to target: {}", target);
         self.current_target = target.to_string();
-        
+
         // Placeholder: In a real implementation, this would:
         // - Stop services not needed for new target
         // - Start services needed for new target
         // - Update runlevel
-        
+
         Ok(())
     }
-    
+
     /// Shutdown system
     pub fn shutdown(&mut self) -> Result<(), String> {
         println!("Initiating system shutdown...");
-        
+
         // Stop all services
         for name in self.services.keys().cloned().collect::<Vec<_>>() {
             let _ = self.stop_service(&name);
         }
-        
+
         // Unmount filesystems
         println!("Unmounting filesystems...");
-        
+
         // Sync filesystems
         println!("Syncing filesystems...");
-        
+
         // Power off
         println!("System shutdown complete");
-        
+
         Ok(())
     }
-    
+
     /// Reboot system
     pub fn reboot(&mut self) -> Result<(), String> {
         println!("Initiating system reboot...");
-        
+
         // Stop all services
         for name in self.services.keys().cloned().collect::<Vec<_>>() {
             let _ = self.stop_service(&name);
         }
-        
+
         // Unmount filesystems
         println!("Unmounting filesystems...");
-        
+
         // Sync filesystems
         println!("Syncing filesystems...");
-        
+
         // Reboot
         println!("System reboot complete");
-        
+
         Ok(())
     }
 }
@@ -314,7 +314,7 @@ impl Default for SigmaInit {
                 },
             ],
         };
-        
+
         SigmaInit::new(config)
     }
 }
@@ -342,7 +342,7 @@ mod tests {
             environment: BTreeMap::new(),
             pid: None,
         };
-        
+
         assert_eq!(service.state, ServiceState::Stopped);
         assert!(service.pid.is_none());
     }
@@ -352,7 +352,7 @@ mod tests {
         let mut init = SigmaInit::default();
         let result = init.start_service("systemd-udevd");
         assert!(result.is_ok());
-        
+
         let service = init.services.get("systemd-udevd").unwrap();
         assert_eq!(service.state, ServiceState::Running);
     }

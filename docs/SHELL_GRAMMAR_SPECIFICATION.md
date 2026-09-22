@@ -1,8 +1,8 @@
 # SigmaOS Shell (sigma-sh) Grammar and Compatibility Specification
 
-**Version:** 1.0  
-**Status:** Draft  
-**Last Updated:** 2025-01-22  
+**Version:** 1.0
+**Status:** Draft
+**Last Updated:** 2025-01-22
 **Purpose:** Define the shell grammar, parsing, and POSIX compatibility targets for sigma-sh
 
 ---

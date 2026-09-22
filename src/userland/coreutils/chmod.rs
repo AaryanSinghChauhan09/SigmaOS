@@ -8,13 +8,13 @@ use std::os::unix::fs::PermissionsExt;
 /// Change file permissions
 pub fn run(path: &str, mode: &str, recursive: bool) -> Result<(), String> {
     let path_obj = Path::new(path);
-    
+
     if !path_obj.exists() {
         return Err(format!("chmod: cannot access '{}': No such file or directory", path));
     }
-    
+
     let permissions = parse_mode(mode)?;
-    
+
     if path_obj.is_dir() && recursive {
         change_permissions_recursive(path_obj, permissions)
     } else {
@@ -44,27 +44,27 @@ fn parse_symbolic_mode(_mode: &str) -> Result<u32, String> {
 fn change_permissions(path: &Path, mode: u32) -> Result<(), String> {
     let metadata = fs::metadata(path).map_err(|e| format!("chmod: {}", e))?;
     let mut permissions = metadata.permissions();
-    
+
     permissions.set_mode(mode);
-    
+
     fs::set_permissions(path, permissions).map_err(|e| format!("chmod: {}", e))
 }
 
 /// Change permissions recursively
 fn change_permissions_recursive(path: &Path, mode: u32) -> Result<(), String> {
     change_permissions(path, mode)?;
-    
+
     for entry in fs::read_dir(path).map_err(|e| format!("chmod: {}", e))? {
         let entry = entry.map_err(|e| format!("chmod: {}", e))?;
         let entry_path = entry.path();
-        
+
         if entry_path.is_dir() {
             change_permissions_recursive(&entry_path, mode)?;
         } else {
             change_permissions(&entry_path, mode)?;
         }
     }
-    
+
     Ok(())
 }
 

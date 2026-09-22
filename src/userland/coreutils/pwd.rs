@@ -17,10 +17,10 @@ fn main() {
 pub fn run() -> Result<(), String> {
     let current_dir = env::current_dir()
         .map_err(|e| format!("failed to get current directory: {}", e))?;
-    
+
     let path = current_dir.to_str()
         .ok_or_else(|| "working directory contains invalid UTF-8".to_string())?;
-    
+
     println!("{}", path);
     Ok(())
 }

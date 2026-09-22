@@ -1,8 +1,8 @@
 # Documentation Source of Truth Policy
 
-**Version:** 1.0  
-**Status:** Draft  
-**Last Updated:** 2025-01-22  
+**Version:** 1.0
+**Status:** Draft
+**Last Updated:** 2025-01-22
 **Purpose:** Define the canonical documentation hierarchy and synchronization process
 
 ---

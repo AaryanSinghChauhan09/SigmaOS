@@ -55,7 +55,7 @@ impl LoginService {
     /// Create new login service
     pub fn new() -> Self {
         let mut users = BTreeMap::new();
-        
+
         // Add default root user
         users.insert(
             String::from("root"),
@@ -68,7 +68,7 @@ impl LoginService {
                 password_hash: String::from("$6$placeholder"), // Placeholder hash
             },
         );
-        
+
         // Add default user
         users.insert(
             String::from("sigma"),
@@ -81,25 +81,25 @@ impl LoginService {
                 password_hash: String::from("$6$placeholder"), // Placeholder hash
             },
         );
-        
+
         LoginService {
             users,
             sessions: Vec::new(),
             next_session_id: 1,
         }
     }
-    
+
     /// Start login prompt
     pub fn prompt_login(&mut self, tty: &str) -> Result<Session, String> {
         println!("SigmaOS v0.1.0");
         println!("{} login: ", tty);
-        
+
         // Read username
         let username = self.read_username()?;
-        
+
         // Authenticate user
         let user = self.authenticate_user(&username)?;
-        
+
         // Create session
         let session = Session {
             session_id: self.next_session_id,
@@ -107,29 +107,29 @@ impl LoginService {
             tty: tty.to_string(),
             login_time: String::from("now"), // Placeholder timestamp
         };
-        
+
         self.sessions.push(session.clone());
         self.next_session_id += 1;
-        
+
         println!("Login successful: {}", username);
         println!("Last login: {}", session.login_time);
-        
+
         // Spawn shell
         self.spawn_shell(&user, tty)?;
-        
+
         Ok(session)
     }
-    
+
     /// Read username from input
     fn read_username(&self) -> Result<String, String> {
         // Placeholder: In a real implementation, this would:
         // - Read from TTY
         // - Validate username format
         // - Handle EOF
-        
+
         Ok(String::from("sigma")) // Placeholder
     }
-    
+
     /// Authenticate user
     fn authenticate_user(&self, username: &str) -> Result<User, String> {
         if let Some(user) = self.users.get(username) {
@@ -137,31 +137,31 @@ impl LoginService {
             // - Prompt for password
             // - Verify password hash
             // - Check account status (locked, expired, etc.)
-            
+
             Ok(user.clone())
         } else {
             Err(format!("User not found: {}", username))
         }
     }
-    
+
     /// Spawn user shell
     fn spawn_shell(&self, user: &User, tty: &str) -> Result<(), String> {
         println!("Starting shell for {}...", user.username);
         println!("Shell: {}", user.shell);
         println!("TTY: {}", tty);
-        
+
         // Placeholder: In a real implementation, this would:
         // - Set user ID and group ID
         // - Set up environment variables
         // - Change to home directory
         // - Execute the shell
         // - Set up controlling terminal
-        
+
         println!("Shell spawned successfully");
-        
+
         Ok(())
     }
-    
+
     /// Add user to database
     pub fn add_user(&mut self, user: User) -> Result<(), String> {
         if self.users.contains_key(&user.username) {
@@ -171,7 +171,7 @@ impl LoginService {
             Ok(())
         }
     }
-    
+
     /// Remove user from database
     pub fn remove_user(&mut self, username: &str) -> Result<(), String> {
         if self.users.remove(username).is_some() {
@@ -180,12 +180,12 @@ impl LoginService {
             Err(format!("User not found: {}", username))
         }
     }
-    
+
     /// List all users
     pub fn list_users(&self) -> Vec<&User> {
         self.users.values().collect()
     }
-    
+
     /// List all active sessions
     pub fn list_sessions(&self) -> &[Session] {
         &self.sessions
@@ -215,7 +215,7 @@ mod tests {
         let service = LoginService::new();
         let result = service.authenticate_user("root");
         assert!(result.is_ok());
-        
+
         let user = result.unwrap();
         assert_eq!(user.username, "root");
         assert_eq!(user.uid, 0);
@@ -239,7 +239,7 @@ mod tests {
             shell: String::from("/bin/sh"),
             password_hash: String::from("$6$placeholder"),
         };
-        
+
         let result = service.add_user(new_user);
         assert!(result.is_ok());
         assert_eq!(service.users.len(), 3);

@@ -21,15 +21,15 @@ for file in "$WIKI_DIR"/*.md; do
     if [ -f "$file" ]; then
         filename=$(basename "$file")
         echo "Uploading $filename..."
-        
+
         # Get page content
         content=$(cat "$file")
-        
+
         # Check if page exists
         existing_sha=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
             "https://api.github.com/repos/$REPO/wiki/pages/$filename" \
             | jq -r '.sha // empty')
-        
+
         if [ "$existing_sha" != "null" ] && [ -n "$existing_sha" ]; then
             # Update existing page
             echo "Updating existing page: $filename"

@@ -7,14 +7,14 @@ use std::path::Path;
 /// Remove file or directory
 pub fn run(path: &str, recursive: bool, force: bool) -> Result<(), String> {
     let path_obj = Path::new(path);
-    
+
     if !path_obj.exists() {
         if force {
             return Ok(());
         }
         return Err(format!("rm: cannot remove '{}': No such file or directory", path));
     }
-    
+
     if path_obj.is_dir() {
         if !recursive {
             return Err(format!("rm: cannot remove '{}': Is a directory", path));
@@ -42,14 +42,14 @@ fn remove_directory(path: &Path, force: bool) -> Result<(), String> {
     for entry in fs::read_dir(path).map_err(|e| format!("rm: {}", e))? {
         let entry = entry.map_err(|e| format!("rm: {}", e))?;
         let entry_path = entry.path();
-        
+
         if entry_path.is_dir() {
             remove_directory(&entry_path, force)?;
         } else {
             remove_file(&entry_path, force)?;
         }
     }
-    
+
     fs::remove_dir(path).map_err(|e| format!("rm: {}", e))
 }
 

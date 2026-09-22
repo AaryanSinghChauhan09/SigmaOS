@@ -15,11 +15,11 @@ jobs:
     name: Documentation Synchronization and Link Checks
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        
+
       - name: Check for manual edits to wiki_content/
         run: |
           echo "Checking for manual edits to wiki_content/..."
@@ -30,7 +30,7 @@ jobs:
             exit 1
           fi
           echo "No manual edits detected in wiki_content/"
-          
+
       - name: Check for manual edits to wiki/
         run: |
           echo "Checking for manual edits to wiki/..."
@@ -41,7 +41,7 @@ jobs:
             exit 1
           fi
           echo "No manual edits detected in wiki/"
-          
+
       - name: Check for stale legacy mirrors
         run: |
           echo "Checking for stale legacy mirrors..."
@@ -51,26 +51,26 @@ jobs:
             echo "These directories are deprecated and will be removed"
             echo "Please edit files in docs/ instead"
           fi
-          
+
       - name: Install markdown-link-check
         run: |
           npm install -g markdown-link-check
-          
+
       - name: Check documentation links
         run: |
           echo "Checking documentation links in docs/..."
           find docs/ -name "*.md" -exec markdown-link-check {} \; || true
-          
+
       - name: Check wiki links
         run: |
           echo "Checking wiki links..."
           find wiki/ -name "*.md" -exec markdown-link-check {} \; || true
-          
+
       - name: Validate internal links
         run: |
           echo "Validating internal documentation structure..."
           echo "Checking that all referenced docs/ files exist..."
-          
+
           # Simple check for common reference patterns
           cd docs/
           for file in *.md; do
@@ -84,12 +84,12 @@ jobs:
               done
             fi
           done
-          
+
       - name: Check for duplicate documentation
         run: |
           echo "Checking for duplicate documentation..."
           echo "Looking for files with similar content..."
-          
+
           # Check for duplicate titles
           cd docs/
           for file in *.md; do
@@ -102,31 +102,31 @@ jobs:
               echo "WARNING: Duplicate title detected: $line"
             fi
           done
-          
+
       - name: Verify documentation policy compliance
         run: |
           echo "Verifying documentation policy compliance..."
-          
+
           # Check that DOCUMENTATION_SOURCE_POLICY.md exists
           if [ ! -f "docs/DOCUMENTATION_SOURCE_POLICY.md" ]; then
             echo "ERROR: DOCUMENTATION_SOURCE_POLICY.md not found"
             exit 1
           fi
-          
+
           # Check that ARCHITECTURE_DECISIONS.md exists
           if [ ! -f "docs/ARCHITECTURE_DECISIONS.md" ]; then
             echo "ERROR: ARCHITECTURE_DECISIONS.md not found"
             exit 1
           fi
-          
+
           # Check that PROJECT_STATUS.md exists
           if [ ! -f "docs/PROJECT_STATUS.md" ]; then
             echo "ERROR: PROJECT_STATUS.md not found"
             exit 1
           fi
-          
+
           echo "Documentation policy compliance verified"
-          
+
       - name: Generate documentation summary
         run: |
           echo "=== Documentation Summary ==="
@@ -135,7 +135,7 @@ jobs:
           echo "wiki_content/ files: $(find wiki_content/ -name "*.md" 2>/dev/null | wc -l)"
           echo "WIKI/ files: $(find WIKI/ -name "*.md" 2>/dev/null | wc -l)"
           echo "wiki_repo/ files: $(find wiki_repo/ -name "*.md" 2>/dev/null | wc -l)"
-          
+
       - name: Documentation check summary
         run: |
           echo "=== Documentation Check Summary ==="

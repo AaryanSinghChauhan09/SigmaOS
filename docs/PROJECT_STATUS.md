@@ -1,7 +1,7 @@
 # SigmaOS Project Status
 
-**Last Updated:** 2025-01-22  
-**Purpose:** Canonical source of truth for SigmaOS implementation status  
+**Last Updated:** 2025-01-22
+**Purpose:** Canonical source of truth for SigmaOS implementation status
 **Principle:** No feature is claimed as "working" without executable evidence
 
 ---

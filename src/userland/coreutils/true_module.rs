@@ -20,9 +20,9 @@ mod tests {
             .arg("-o")
             .arg("/tmp/sigma-true")
             .output();
-        
+
         assert!(result.is_ok());
-        
+
         let result = Command::new("/tmp/sigma-true").status();
         assert!(result.is_ok());
         assert!(result.unwrap().success());

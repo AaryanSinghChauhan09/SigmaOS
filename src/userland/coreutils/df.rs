@@ -45,12 +45,12 @@ pub fn format_size(size: u64, human_readable: bool) -> String {
         const UNITS: &[&str] = &["B", "K", "M", "G", "T"];
         let mut size_f = size as f64;
         let mut unit_idx = 0;
-        
+
         while size_f >= 1024.0 && unit_idx < UNITS.len() - 1 {
             size_f /= 1024.0;
             unit_idx += 1;
         }
-        
+
         format!("{:.1}{}", size_f, UNITS[unit_idx])
     } else {
         format!("{}", size)

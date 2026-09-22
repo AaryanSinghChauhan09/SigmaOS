@@ -1,8 +1,8 @@
 # SigmaOS Coreutils Implementation Plan
 
-**Version:** 1.0  
-**Status:** Draft  
-**Last Updated:** 2025-01-22  
+**Version:** 1.0
+**Status:** Draft
+**Last Updated:** 2025-01-22
 **Purpose:** Define the essential coreutils subset for SigmaOS
 
 ---
@@ -72,7 +72,7 @@ use std::path::Path;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    
+
     match run(&args) {
         Ok(()) => std::process::exit(0),
         Err(e) => {
