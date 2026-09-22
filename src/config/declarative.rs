@@ -1,10 +1,10 @@
-//! Declarative System Configuration Management inspired by NixOS and Guix
-//! Atomic upgrades, system generation tracking, configuration modules, and instant rollbacks.
-use std::vec;
+//! Declarative System Configuration Management inspired by NixOS, Guix, FreeBSD rc.conf, and OpenBSD pf.conf
+//! Atomic upgrades, system generation tracking, configuration modules, key-value rc.conf parsers, and instant rollbacks.
 
-
+use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use std::format;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ConfigState {
@@ -111,6 +111,82 @@ impl ConfigManager {
     }
 }
 
+// ============================================================================
+// Linux & BSD Declarative Configuration Engine (rc.conf, pf.conf, NixOS schema)
+// ============================================================================
+
+pub struct LinuxBsdDeclarativeConfigEngine {
+    pub rc_conf_entries: BTreeMap<String, String>,
+    pub pf_rules: Vec<String>,
+}
+
+impl LinuxBsdDeclarativeConfigEngine {
+    pub fn new() -> Self {
+        let mut rc = BTreeMap::new();
+        rc.insert("hostname".to_string(), "sigmaos-node".to_string());
+        rc.insert("sshd_enable".to_string(), "YES".to_string());
+        rc.insert("pf_enable".to_string(), "YES".to_string());
+
+        let pf = vec![
+            "set skip on lo".to_string(),
+            "block in all".to_string(),
+            "pass out all keep state".to_string(),
+            "pass in proto tcp to port 22 keep state".to_string(),
+        ];
+
+        Self {
+            rc_conf_entries: rc,
+            pf_rules: pf,
+        }
+    }
+
+    pub fn parse_rc_conf(&mut self, rc_conf_content: &str) {
+        for line in rc_conf_content.lines() {
+            let trimmed = line.trim();
+            if trimmed.is_empty() || trimmed.starts_with('#') {
+                continue;
+            }
+            if let Some((k, v)) = trimmed.split_once('=') {
+                let clean_k = k.trim().to_string();
+                let clean_v = v.trim().trim_matches('"').trim_matches('\'').to_string();
+                self.rc_conf_entries.insert(clean_k, clean_v);
+            }
+        }
+    }
+
+    pub fn generate_pf_conf(&self) -> String {
+        self.pf_rules.join("\n")
+    }
+}
+
+pub struct DeclarativeStateReconciler {
+    pub active_config: ConfigManager,
+}
+
+impl DeclarativeStateReconciler {
+    pub fn new(profile: &str) -> Self {
+        Self {
+            active_config: ConfigManager::new(profile),
+        }
+    }
+
+    pub fn reconcile_and_stage(&mut self, module_name: &str, key: &str, value: &str) -> u32 {
+        self.active_config.add_module_to_active(ConfigModule {
+            module_name: module_name.to_string(),
+            options: vec![(key.to_string(), value.to_string())],
+            is_enabled: true,
+        });
+
+        self.active_config.commit_atomic_generation(1718920000)
+    }
+}
+
+impl Default for LinuxBsdDeclarativeConfigEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -131,5 +207,23 @@ mod tests {
         assert!(cfg.rollback(1).is_ok());
         assert_eq!(cfg.active_generation_id, 1);
         assert_eq!(cfg.generations[0].state, ConfigState::Active);
+    }
+
+    #[test]
+    fn test_linux_bsd_declarative_config_engine() {
+        let mut engine = LinuxBsdDeclarativeConfigEngine::new();
+        engine.parse_rc_conf("zfs_enable=\"YES\"\nhostname=\"sovereign-node\"\n");
+        assert_eq!(engine.rc_conf_entries.get("zfs_enable").unwrap(), "YES");
+        assert_eq!(engine.rc_conf_entries.get("hostname").unwrap(), "sovereign-node");
+
+        let pf_conf = engine.generate_pf_conf();
+        assert!(pf_conf.contains("block in all"));
+    }
+
+    #[test]
+    fn test_declarative_state_reconciler() {
+        let mut reconciler = DeclarativeStateReconciler::new("workstation");
+        let new_gen = reconciler.reconcile_and_stage("services.wireguard", "enable", "true");
+        assert_eq!(new_gen, 2);
     }
 }

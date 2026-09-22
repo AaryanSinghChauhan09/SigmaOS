@@ -81,6 +81,10 @@ This document defines operational guidelines, security policies, and verificatio
 - Follow technical directives in `AGENTS_ACCESS_MANAGEMENT.md` and `docs/AGENTS_ACCESS_MANAGEMENT.md`.
 - Manage the complete access lifecycle across LDAP directory services (`LdapAccessClient`), anonymous/authenticated client tiers, direct/relative path canonicalization, memory access protection (`W^X`), read/write permission enforcers (`FileAttributeAccessControl`), RAT remote files, and wireless access points.
 
+### N. Declarative System Configuration & State Reconciliation
+- Declarative configuration modules (`LinuxBsdDeclarativeConfigEngine`, `ConfigManager`) must enforce atomic generation tracking and NixOS-style state reconciliation (`DeclarativeStateReconciler`).
+- Any new system setting or service option added to SigmaOS must declare a corresponding declarative configuration module option and support instant generation rollback.
+
 ---
 
 ## 3. Autonomous AI Agent Development Rules
