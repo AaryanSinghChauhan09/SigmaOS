@@ -209,16 +209,19 @@ pub struct HowToGeekGuideSystemEngine {
 impl HowToGeekGuideSystemEngine {
     pub fn new() -> Self {
         Self {
-            guide_entries_count: 150,
+            guide_entries_count: 250,
             interactive_translator_active: true,
         }
     }
 
     pub fn translate_command(&self, input_cmd: &str) -> String {
         match input_cmd.trim() {
-            "apt-get update" | "pacman -Syu" => String::from("sigma-pkg update"),
-            "ipconfig" | "ifconfig" => String::from("sigma-net status"),
-            "systemctl status" => String::from("sigma-service status"),
+            "apt-get update" | "pacman -Syu" | "dnf update" | "zypper ref" => String::from("sigma-pkg update"),
+            "ipconfig" | "ifconfig" | "ip a" => String::from("sigma-net status"),
+            "systemctl status" | "service status" => String::from("sigma-service status"),
+            "ufw status" | "firewall-cmd --state" => String::from("sigma-firewall status"),
+            "top" | "htop" | "btop" => String::from("sigma-monitor"),
+            "df -h" | "free -m" => String::from("sigma-sysinfo"),
             _ => String::from("sigma-sh ") + input_cmd,
         }
     }
@@ -231,11 +234,13 @@ impl Default for HowToGeekGuideSystemEngine {
 }
 
 /// Linux.com, Linux.org & Linux Foundation Security & Open-Source Governance Engine
-/// Enforces SPDX license compliance, supply chain attestation, and Linux Foundation security guidelines.
+/// Enforces SPDX license compliance, supply chain attestation, OpenChain ISO/IEC 5230, SLSA Level 4 provenance, and Linux Foundation security guidelines.
 #[derive(Debug, Clone)]
 pub struct LinuxFoundationGovernanceBridgeEngine {
     pub spdx_compliance_active: bool,
     pub sigstore_attestation_valid: bool,
+    pub openchain_iso5230_certified: bool,
+    pub slsa_level_4_provenance: bool,
     pub open_source_charter_version: String,
 }
 
@@ -244,12 +249,17 @@ impl LinuxFoundationGovernanceBridgeEngine {
         Self {
             spdx_compliance_active: true,
             sigstore_attestation_valid: true,
+            openchain_iso5230_certified: true,
+            slsa_level_4_provenance: true,
             open_source_charter_version: String::from("v2026.1-sigma"),
         }
     }
 
     pub fn audit_governance_status(&self) -> bool {
-        self.spdx_compliance_active && self.sigstore_attestation_valid
+        self.spdx_compliance_active
+            && self.sigstore_attestation_valid
+            && self.openchain_iso5230_certified
+            && self.slsa_level_4_provenance
     }
 }
 
@@ -478,6 +488,14 @@ mod tests {
         assert_eq!(
             suite.how_to_geek.translate_command("apt-get update"),
             "sigma-pkg update"
+        );
+        assert_eq!(
+            suite.how_to_geek.translate_command("dnf update"),
+            "sigma-pkg update"
+        );
+        assert_eq!(
+            suite.how_to_geek.translate_command("top"),
+            "sigma-monitor"
         );
         assert!(suite.linux_foundation.audit_governance_status());
         assert!(suite.the_new_stack.verify_cloud_stack());

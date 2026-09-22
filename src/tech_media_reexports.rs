@@ -4,10 +4,11 @@ pub use crate::ai::marktechpost_kdnuggets_data_science::{
 };
 pub use crate::distro::tech_media_distro_innovations::{
     DistroWatchRankTrackerEngine, FrappeEnterpriseFrameworkEngine,
-    GeekyGadgetsHardwareReviewEngine, ItsFossZeroDependencyToolingEngine,
+    GeekyGadgetsHardwareReviewEngine, InfoWorldEnterpriseTechEngine,
+    ItDailyEnterpriseCloudEngine, ItsFossZeroDependencyToolingEngine,
     LinuxTeckSysadminAutomationEngine, MakeUseOfDistroRecommendationEngine,
     NineToFiveGoogleMacEcosystemEngine, NineToFiveLinuxReleaseMatrixEngine,
-    SovereignTechMediaDistroInnovationsSuite,
+    PhoronixLinuxBenchmarkSuiteEngine, SovereignTechMediaDistroInnovationsSuite,
 };
 pub use crate::hardware::tech_powerup_hardware_monitors::{
     HardwareBustersPsuRailMonitorEngine, PcWorldBatteryHealthControllerEngine,

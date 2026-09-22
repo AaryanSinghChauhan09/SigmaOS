@@ -277,9 +277,23 @@ if [ -f "src/distro/tech_media_distro_innovations.rs" ]; then
     ./build/tech_media_distro_test
 fi
 
-if [ -f "src/distro/sovereign_media_and_distro_unimplemented_innovations.rs" ]; then
-    echo "Running Sovereign Media & Distro Unimplemented Innovations test suite..."
+if [ -f "src/distro/tech_media_extended_innovations.rs" ]; then
+    echo "Running Sovereign Tech Media Extended Distro Innovations test suite..."
     mkdir -p build
-    rustc --test --edition=2021 src/distro/sovereign_media_and_distro_unimplemented_innovations.rs -o build/sovereign_media_unimplemented_test
-    ./build/sovereign_media_unimplemented_test
+    rustc --test --edition=2021 src/distro/tech_media_extended_innovations.rs -o build/tech_media_ext_distro_test
+    ./build/tech_media_ext_distro_test
+fi
+
+if [ -f "src/tools/tech_media_extended_suite.rs" ]; then
+    echo "Running Sovereign Tech Media Extended Tools Suite test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/tools/tech_media_extended_suite.rs -o build/tech_media_ext_suite_test
+    ./build/tech_media_ext_suite_test
+fi
+
+if [ -f "src/wiki_distro_ideas_deployment.rs" ]; then
+    echo "Running Sovereign Wiki Distro Ideas Deployment test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/wiki_distro_ideas_deployment.rs -o build/test_wiki_distro_ideas
+    ./build/test_wiki_distro_ideas
 fi
