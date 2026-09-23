@@ -1036,6 +1036,12 @@ pub enum ShellDialect {
     Ksh,
     Dash,
     BsdSh,
+    Yash,
+    Mksh,
+    Nu,
+    Ion,
+    Rc,
+    Elvish,
 }
 
 pub struct FishAbbreviationEngine {
@@ -1253,8 +1259,20 @@ impl UniversalShellCompatibilityEngine {
                     return ShellDialect::Fish;
                 } else if trimmed.contains("tcsh") || trimmed.contains("csh") {
                     return ShellDialect::Tcsh;
+                } else if trimmed.contains("mksh") {
+                    return ShellDialect::Mksh;
                 } else if trimmed.contains("ksh") {
                     return ShellDialect::Ksh;
+                } else if trimmed.contains("yash") {
+                    return ShellDialect::Yash;
+                } else if trimmed.contains("nu") {
+                    return ShellDialect::Nu;
+                } else if trimmed.contains("ion") {
+                    return ShellDialect::Ion;
+                } else if trimmed.contains("rc") {
+                    return ShellDialect::Rc;
+                } else if trimmed.contains("elvish") {
+                    return ShellDialect::Elvish;
                 } else if trimmed.contains("dash") {
                     return ShellDialect::Dash;
                 } else if trimmed.contains("sh") {
@@ -1317,9 +1335,13 @@ impl UniversalScriptTranspiler {
             let converted_line = match dialect {
                 ShellDialect::Fish => Self::transpile_fish_line(trimmed, &mut in_function),
                 ShellDialect::Tcsh => Self::transpile_tcsh_line(trimmed),
-                ShellDialect::Bash | ShellDialect::Zsh | ShellDialect::Ksh => {
+                ShellDialect::Bash | ShellDialect::Zsh | ShellDialect::Ksh | ShellDialect::Yash | ShellDialect::Mksh => {
                     Self::transpile_bash_zsh_line(trimmed)
                 }
+                ShellDialect::Nu => Self::transpile_nu_line(trimmed),
+                ShellDialect::Ion => Self::transpile_ion_line(trimmed),
+                ShellDialect::Rc => Self::transpile_rc_line(trimmed),
+                ShellDialect::Elvish => Self::transpile_elvish_line(trimmed),
                 ShellDialect::Dash | ShellDialect::BsdSh => trimmed.to_string(),
             };
 
@@ -1592,6 +1614,79 @@ impl UniversalScriptTranspiler {
         }
 
         l
+    }
+
+    fn transpile_nu_line(line: &str) -> String {
+        let l = line.trim();
+        if l.starts_with("let-env ") || l.starts_with("$env.") {
+            if let Some(eq_idx) = l.find('=') {
+                let var_part = l[..eq_idx].trim();
+                let var_name = var_part.trim_start_matches("let-env ").trim_start_matches("$env.");
+                let val_part = l[eq_idx + 1..].trim();
+                return format!("export {}={}", var_name, val_part);
+            }
+        }
+        if l.starts_with("def ") {
+            let rest = l.trim_start_matches("def ").trim();
+            if let Some(space_idx) = rest.find(' ') {
+                let fn_name = &rest[..space_idx];
+                return format!("{}() {{", fn_name);
+            } else if let Some(bracket_idx) = rest.find('[') {
+                let fn_name = rest[..bracket_idx].trim();
+                return format!("{}() {{", fn_name);
+            }
+        }
+        l.to_string()
+    }
+
+    fn transpile_ion_line(line: &str) -> String {
+        let l = line.trim();
+        if l.starts_with("export ") {
+            return l.to_string();
+        }
+        if l.starts_with("fn ") {
+            let rest = l.trim_start_matches("fn ").trim();
+            if let Some(space_idx) = rest.find(' ') {
+                let fn_name = &rest[..space_idx];
+                return format!("{}() {{", fn_name);
+            }
+        }
+        l.to_string()
+    }
+
+    fn transpile_rc_line(line: &str) -> String {
+        let l = line.trim();
+        if l.starts_with("fn ") {
+            let rest = l.trim_start_matches("fn ").trim();
+            if let Some(space_idx) = rest.find(' ') {
+                let fn_name = &rest[..space_idx];
+                return format!("{}() {{", fn_name);
+            }
+        }
+        if l.starts_with("for (") && l.ends_with(")") {
+            return l.replace("for (", "for ").replace(")", "; do");
+        }
+        l.to_string()
+    }
+
+    fn transpile_elvish_line(line: &str) -> String {
+        let l = line.trim();
+        if l.starts_with("var ") || l.starts_with("set ") {
+            let rest = l.trim_start_matches("var ").trim_start_matches("set ").trim();
+            if let Some(eq_idx) = rest.find('=') {
+                let var = rest[..eq_idx].trim();
+                let val = rest[eq_idx + 1..].trim();
+                return format!("export {}={}", var, val);
+            }
+        }
+        if l.starts_with("fn ") {
+            let rest = l.trim_start_matches("fn ").trim();
+            if let Some(space_idx) = rest.find(' ') {
+                let fn_name = &rest[..space_idx];
+                return format!("{}() {{", fn_name);
+            }
+        }
+        l.to_string()
     }
 
     fn transpile_bash_zsh_line(line: &str) -> String {
@@ -2373,5 +2468,29 @@ mod tests {
         env.insert("FILE".to_string(), "archive.tar.gz".to_string());
         assert_eq!(BashParameterExpansion::expand("${FILE#archive.}", &env), "tar.gz");
         assert_eq!(BashParameterExpansion::expand("${FILE%.gz}", &env), "archive.tar");
+
+        let nu_script = "#!/usr/bin/env nu\nlet-env FOO = bar\ndef my_func [] {\n  echo hi\n}";
+        assert_eq!(UniversalShellCompatibilityEngine::detect_shebang_dialect(nu_script), ShellDialect::Nu);
+        let posix_nu = UniversalScriptTranspiler::transpile_to_posix_sh(nu_script, ShellDialect::Nu);
+        assert!(posix_nu.contains("export FOO=bar"));
+        assert!(posix_nu.contains("my_func() {"));
+
+        let ion_script = "#!/usr/bin/ion\nfn build_pkg {\n  export PORT=8080\n}";
+        assert_eq!(UniversalShellCompatibilityEngine::detect_shebang_dialect(ion_script), ShellDialect::Ion);
+        let posix_ion = UniversalScriptTranspiler::transpile_to_posix_sh(ion_script, ShellDialect::Ion);
+        assert!(posix_ion.contains("build_pkg() {"));
+        assert!(posix_ion.contains("export PORT=8080"));
+
+        let rc_script = "#!/bin/rc\nfn test_run {\n  for (i in 1 2 3)\n}";
+        assert_eq!(UniversalShellCompatibilityEngine::detect_shebang_dialect(rc_script), ShellDialect::Rc);
+        let posix_rc = UniversalScriptTranspiler::transpile_to_posix_sh(rc_script, ShellDialect::Rc);
+        assert!(posix_rc.contains("test_run() {"));
+        assert!(posix_rc.contains("for i in 1 2 3; do"));
+
+        let elvish_script = "#!/usr/bin/elvish\nvar PATH = /bin\nfn setup {\n  echo ready\n}";
+        assert_eq!(UniversalShellCompatibilityEngine::detect_shebang_dialect(elvish_script), ShellDialect::Elvish);
+        let posix_elvish = UniversalScriptTranspiler::transpile_to_posix_sh(elvish_script, ShellDialect::Elvish);
+        assert!(posix_elvish.contains("export PATH=/bin"));
+        assert!(posix_elvish.contains("setup() {"));
     }
 }
