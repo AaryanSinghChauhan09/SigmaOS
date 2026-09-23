@@ -56,6 +56,8 @@ pub mod sovereign_distro_package_advancements_v2;
 pub use sovereign_distro_package_advancements_v2::*;
 pub mod pull_request_workflow;
 pub use pull_request_workflow::*;
+pub mod sovereign_pr_package_gateway;
+pub use sovereign_pr_package_gateway::*;
 
 pub use alpine_apk::{ApkPackage, ApkPackageManager, ApkRepository, ApkWorld};
 pub use arch_aur::{AURPackage, BuildError, SigmaAUR, PKGBUILD};
