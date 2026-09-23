@@ -80,13 +80,13 @@ pub enum DistroSubsystemMode {
     LinuxNobara,
     LinuxPostmarket,
     LinuxKaOS,
-    MidnightBsd,
-    HardenedBsd,
     LinuxSteamOS,
     LinuxVanillaOS,
     LinuxOpenWrt,
     GhostBsd,
     NomadBsd,
+    MidnightBsd,
+    HardenedBsd,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -164,9 +164,9 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::DragonFlyBsd
-            | DistroSubsystemMode::MidnightBsd
             | DistroSubsystemMode::GhostBsd
             | DistroSubsystemMode::NomadBsd
+            | DistroSubsystemMode::MidnightBsd
             | DistroSubsystemMode::HardenedBsd => ServiceSupervisorType::OpenRC,
 
             DistroSubsystemMode::LinuxAlpine
@@ -235,10 +235,13 @@ impl SovereignUniversalDistroBridge {
                 | DistroSubsystemMode::OpenBsd
                 | DistroSubsystemMode::NetBsd
                 | DistroSubsystemMode::DragonFlyBsd
+                | DistroSubsystemMode::GhostBsd
+                | DistroSubsystemMode::NomadBsd
                 | DistroSubsystemMode::MidnightBsd
                 | DistroSubsystemMode::HardenedBsd,
                 "/var/lib/pkg",
             ) => "/var/db/pkg".to_string(),
+            (DistroSubsystemMode::LinuxOpenWrt, "/var/lib/pkg") => "/usr/lib/opkg".to_string(),
             (
                 DistroSubsystemMode::FreeBsd
                 | DistroSubsystemMode::OpenBsd
@@ -306,18 +309,18 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxDeepin
             | DistroSubsystemMode::LinuxAsahi
             | DistroSubsystemMode::LinuxNobara
-            | DistroSubsystemMode::LinuxKaOS
             | DistroSubsystemMode::LinuxSteamOS
-            | DistroSubsystemMode::LinuxVanillaOS => supervisor == ServiceSupervisorType::Systemd,
+            | DistroSubsystemMode::LinuxVanillaOS
+            | DistroSubsystemMode::LinuxKaOS => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::DragonFlyBsd
-            | DistroSubsystemMode::MidnightBsd
             | DistroSubsystemMode::GhostBsd
             | DistroSubsystemMode::NomadBsd
+            | DistroSubsystemMode::MidnightBsd
             | DistroSubsystemMode::HardenedBsd => supervisor == ServiceSupervisorType::OpenRC,
 
             DistroSubsystemMode::LinuxAlpine
@@ -363,14 +366,15 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxManjaro
             | DistroSubsystemMode::LinuxCachyOS
             | DistroSubsystemMode::LinuxAsahi
-            | DistroSubsystemMode::LinuxKaOS
-            | DistroSubsystemMode::LinuxSteamOS => format!("{}.pkg.tar.zst", input_pkg),
+            | DistroSubsystemMode::LinuxSteamOS
+            | DistroSubsystemMode::LinuxKaOS => format!("{}.pkg.tar.zst", input_pkg),
             DistroSubsystemMode::LinuxAlpine
             | DistroSubsystemMode::LinuxChimera
-            | DistroSubsystemMode::LinuxOpenWrt
             | DistroSubsystemMode::LinuxPostmarket => {
                 format!("{}.apk", input_pkg)
             }
+            DistroSubsystemMode::LinuxOpenWrt => format!("{}.ipk", input_pkg),
+            DistroSubsystemMode::LinuxVanillaOS => format!("{}.apx", input_pkg),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", input_pkg),
             DistroSubsystemMode::LinuxNix => format!("{}.nix", input_pkg),
             DistroSubsystemMode::LinuxGuix => format!("{}.scm", input_pkg),
@@ -386,14 +390,13 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxPuppy => format!("{}.pet", input_pkg),
             DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", input_pkg),
             DistroSubsystemMode::LinuxClear => format!("{}.bundle", input_pkg),
-            DistroSubsystemMode::LinuxVanillaOS => format!("{}.deb", input_pkg),
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::LinuxTinyCore => format!("{}.tcz", input_pkg),
             DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::DragonFlyBsd
-            | DistroSubsystemMode::MidnightBsd
             | DistroSubsystemMode::GhostBsd
             | DistroSubsystemMode::NomadBsd
+            | DistroSubsystemMode::MidnightBsd
             | DistroSubsystemMode::HardenedBsd => {
                 format!("{}.pkg", input_pkg)
             }
@@ -434,14 +437,15 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxManjaro
             | DistroSubsystemMode::LinuxCachyOS
             | DistroSubsystemMode::LinuxAsahi
-            | DistroSubsystemMode::LinuxKaOS
-            | DistroSubsystemMode::LinuxSteamOS => format!("{}.pkg.tar.zst", action),
+            | DistroSubsystemMode::LinuxSteamOS
+            | DistroSubsystemMode::LinuxKaOS => format!("{}.pkg.tar.zst", action),
             DistroSubsystemMode::LinuxAlpine
             | DistroSubsystemMode::LinuxChimera
-            | DistroSubsystemMode::LinuxOpenWrt
             | DistroSubsystemMode::LinuxPostmarket => {
                 format!("{}.apk", action)
             }
+            DistroSubsystemMode::LinuxOpenWrt => format!("{}.ipk", action),
+            DistroSubsystemMode::LinuxVanillaOS => format!("{}.apx", action),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", action),
             DistroSubsystemMode::LinuxNix => format!("{}.nix", action),
             DistroSubsystemMode::LinuxGuix => format!("{}.scm", action),
@@ -455,12 +459,11 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxPuppy => format!("{}.pet", action),
             DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", action),
             DistroSubsystemMode::LinuxClear => format!("{}.bundle", action),
-            DistroSubsystemMode::LinuxVanillaOS => format!("{}.deb", action),
             DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::DragonFlyBsd
-            | DistroSubsystemMode::MidnightBsd
             | DistroSubsystemMode::GhostBsd
             | DistroSubsystemMode::NomadBsd
+            | DistroSubsystemMode::MidnightBsd
             | DistroSubsystemMode::HardenedBsd => {
                 format!("{}.pkg", action)
             }
@@ -1089,66 +1092,42 @@ impl SovereignUniversalDistroBridge {
         (supervisor, pkg_spec, vfs_etc, compatible)
     }
 
-    pub fn get_distro_subsystem_feature_matrix(&self) -> Vec<(&'static str, String)> {
-        let mut matrix = Vec::new();
-        matrix.push(("init", format!("{:?}", self.get_supervisor_type())));
-        matrix.push(("package", self.translate_package_specifier("base")));
-        matrix.push(("vfs_etc", self.translate_vfs_path("/etc")));
-        matrix.push(("vfs_var", self.translate_vfs_path("/var/lib/pkg")));
-
-        let security_model = match self.mode {
-            DistroSubsystemMode::OpenBsd => "Pledge/Unveil + RetGuard",
-            DistroSubsystemMode::FreeBsd | DistroSubsystemMode::MidnightBsd | DistroSubsystemMode::HardenedBsd => "Capsicum Sandbox + MAC",
-            DistroSubsystemMode::LinuxFedora => "SELinux Target Enforcement",
-            DistroSubsystemMode::LinuxUbuntu => "AppArmor Profile Enforcement",
-            _ => "Landlock v5 + Seccomp BPF",
-        };
-        matrix.push(("security", security_model.to_string()));
-
-        let storage_model = match self.mode {
-            DistroSubsystemMode::FreeBsd | DistroSubsystemMode::SolarisIllumos => "ZFS Boot Environments",
-            DistroSubsystemMode::DragonFlyBsd => "HAMMER2 PFS Snapshots",
-            _ => "Btrfs CoW Subvolumes",
-        };
-        matrix.push(("storage", storage_model.to_string()));
-
-        let net_model = match self.mode {
-            DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => "VNET Virtual Network Stack",
-            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SmartOs => "Crossbow VNIC Etherstub",
-            _ => "eBPF/XDP Zero-Copy Redirect",
-        };
-        matrix.push(("network", net_model.to_string()));
-
-        let container_model = match self.mode {
-            DistroSubsystemMode::FreeBsd => "FreeBSD Jails",
-            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SmartOs => "Solaris Zones",
-            _ => "Rootless OCI Podman/Toolbx",
-        };
-        matrix.push(("container", container_model.to_string()));
-
-        matrix
-    }
-
-    pub fn orchestrate_full_distro_subsystem_stack(
-        &mut self,
-        action: &str,
-    ) -> Result<Vec<(String, String)>, &'static str> {
-        let core_subsystems = [
+    pub fn orchestrate_full_distro_subsystem_stack(&mut self, action: &str) -> Result<Vec<String>, &'static str> {
+        let subsystems = [
             "init", "package", "vfs", "security", "storage", "kernel",
             "network", "graphics", "power", "ipc", "auth", "audit",
-            "boot", "container", "virtualization", "audio", "memory",
-            "syscall", "device", "crypto", "ai", "monitoring", "desktop",
-            "compiler", "i18n", "bluetooth", "firewall", "diagnostics",
-            "recovery", "time", "shell", "display", "printing", "backup",
-            "telemetry", "compositor", "process",
+            "boot", "container", "virtualization", "audio", "input",
+            "thermal", "memory", "syscall", "device", "crypto", "ai",
+            "monitoring", "desktop", "compiler", "i18n", "bluetooth",
+            "firewall", "diagnostics", "recovery", "time", "shell",
+            "display", "printing", "backup", "telemetry", "compositor",
+            "launcher", "monitor", "notification", "onboarding", "theming", "process",
         ];
 
-        let mut results = Vec::new();
-        for sub in core_subsystems {
+        let mut results = Vec::with_capacity(subsystems.len());
+        for sub in subsystems {
             let res = self.dispatch_cross_subsystem_operation(sub, action)?;
-            results.push((sub.to_string(), res));
+            results.push(res);
         }
         Ok(results)
+    }
+
+    pub fn get_distro_subsystem_feature_matrix(&self) -> Vec<(&'static str, bool)> {
+        vec![
+            ("systemd_supervisor", self.get_supervisor_type() == ServiceSupervisorType::Systemd),
+            ("openrc_supervisor", self.get_supervisor_type() == ServiceSupervisorType::OpenRC),
+            ("runit_supervisor", self.get_supervisor_type() == ServiceSupervisorType::Runit),
+            ("shepherd_supervisor", self.get_supervisor_type() == ServiceSupervisorType::Shepherd),
+            ("dinit_supervisor", self.get_supervisor_type() == ServiceSupervisorType::Dinit),
+            ("sysvinit_supervisor", self.get_supervisor_type() == ServiceSupervisorType::Sysvinit),
+            ("smf_supervisor", self.get_supervisor_type() == ServiceSupervisorType::Smf),
+            ("rcd_supervisor", self.get_supervisor_type() == ServiceSupervisorType::Rcd),
+            ("jail_isolation", self.mode == DistroSubsystemMode::FreeBsd || self.mode == DistroSubsystemMode::DragonFlyBsd || self.mode == DistroSubsystemMode::SmartOs),
+            ("pledge_unveil", self.mode == DistroSubsystemMode::OpenBsd || self.mode == DistroSubsystemMode::NetBsd),
+            ("zones_isolation", self.mode == DistroSubsystemMode::SolarisIllumos),
+            ("landlock_lsm", true),
+            ("cross_subsystem_compatibility", self.verify_all_subsystems_compatibility()),
+        ]
     }
 }
 
@@ -2273,21 +2252,12 @@ impl SovereignCrossDistroSubsystemOrchestrator {
         self.bridge.get_distro_capability_matrix()
     }
 
-    pub fn get_distro_subsystem_feature_matrix(&self) -> Vec<(&'static str, String)> {
-        self.bridge.get_distro_subsystem_feature_matrix()
+    pub fn orchestrate_full_stack(&mut self, action: &str) -> Result<Vec<String>, &'static str> {
+        self.bridge.orchestrate_full_distro_subsystem_stack(action)
     }
 
-    pub fn orchestrate_full_distro_subsystem_stack(
-        &mut self,
-        action: &str,
-    ) -> Result<Vec<(String, String)>, &'static str> {
-        let results = self.bridge.orchestrate_full_distro_subsystem_stack(action)?;
-        for (sub, _) in &results {
-            if !self.active_subsystems.contains(sub) {
-                self.active_subsystems.push(sub.clone());
-            }
-        }
-        Ok(results)
+    pub fn get_feature_matrix(&self) -> Vec<(&'static str, bool)> {
+        self.bridge.get_distro_subsystem_feature_matrix()
     }
 }
 
@@ -2467,6 +2437,11 @@ mod cross_subsystem_tests {
             DistroSubsystemMode::LinuxNobara,
             DistroSubsystemMode::LinuxPostmarket,
             DistroSubsystemMode::LinuxKaOS,
+            DistroSubsystemMode::LinuxSteamOS,
+            DistroSubsystemMode::LinuxVanillaOS,
+            DistroSubsystemMode::LinuxOpenWrt,
+            DistroSubsystemMode::GhostBsd,
+            DistroSubsystemMode::NomadBsd,
             DistroSubsystemMode::MidnightBsd,
             DistroSubsystemMode::HardenedBsd,
         ];
@@ -2570,33 +2545,30 @@ mod cross_subsystem_tests {
 
     #[test]
     fn test_orchestrate_full_distro_subsystem_stack() {
-        let mut orchestrator = SovereignCrossDistroSubsystemOrchestrator::new(DistroSubsystemMode::FreeBsd);
-        let results = orchestrator.orchestrate_full_distro_subsystem_stack("audit_subsystem");
+        let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxDebian);
+        let results = bridge.orchestrate_full_distro_subsystem_stack("audit_pass");
         assert!(results.is_ok());
-        let res_vec = results.unwrap();
-        assert!(res_vec.len() >= 35);
+        let res_list = results.unwrap();
+        assert_eq!(res_list.len(), 44);
+        assert!(res_list[0].contains("audit_pass"));
 
-        // Verify active subsystems were registered
-        assert!(orchestrator.active_subsystems.contains(&"init".to_string()));
-        assert!(orchestrator.active_subsystems.contains(&"network".to_string()));
-        assert!(orchestrator.active_subsystems.contains(&"storage".to_string()));
-
-        // Switch to OpenBSD and verify feature matrix
-        orchestrator.set_mode(DistroSubsystemMode::OpenBsd);
-        let matrix = orchestrator.get_distro_subsystem_feature_matrix();
-        let security_feature = matrix.iter().find(|(k, _)| *k == "security").map(|(_, v)| v.as_str());
-        assert_eq!(security_feature, Some("Pledge/Unveil + RetGuard"));
+        let mut orchestrator = SovereignCrossDistroSubsystemOrchestrator::new(DistroSubsystemMode::LinuxUbuntu);
+        let stack_res = orchestrator.orchestrate_full_stack("init_system");
+        assert!(stack_res.is_ok());
+        assert_eq!(stack_res.unwrap().len(), 44);
     }
 
     #[test]
     fn test_get_distro_subsystem_feature_matrix() {
-        let fedora_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxFedora);
-        let fedora_matrix = fedora_bridge.get_distro_subsystem_feature_matrix();
-        assert!(fedora_matrix.iter().any(|(k, v)| *k == "security" && v.contains("SELinux")));
+        let bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxArch);
+        let matrix = bridge.get_distro_subsystem_feature_matrix();
+        assert!(matrix.iter().any(|(feat, val)| *feat == "systemd_supervisor" && *val));
+        assert!(matrix.iter().any(|(feat, val)| *feat == "cross_subsystem_compatibility" && *val));
 
-        let dragon_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::DragonFlyBsd);
-        let dragon_matrix = dragon_bridge.get_distro_subsystem_feature_matrix();
-        assert!(dragon_matrix.iter().any(|(k, v)| *k == "storage" && v.contains("HAMMER2")));
+        let orchestrator = SovereignCrossDistroSubsystemOrchestrator::new(DistroSubsystemMode::FreeBsd);
+        let matrix_bsd = orchestrator.get_feature_matrix();
+        assert!(matrix_bsd.iter().any(|(feat, val)| *feat == "openrc_supervisor" && *val));
+        assert!(matrix_bsd.iter().any(|(feat, val)| *feat == "jail_isolation" && *val));
     }
 }
 

@@ -548,16 +548,22 @@ impl SovereignMissingLinuxBsdSuite {
 
     pub fn resolve_missing_components_for_subsystem(&mut self, subsystem: &str) -> String {
         match subsystem {
-            "config" | "init" => format!("YaST2 sysconfig modules: {}", self.yast2.active_modules.len()),
-            "toolchain" | "compiler" | "package" => format!("xbps-src package: {}", self.xbps_src.pkgname),
-            "recovery" | "backup" => format!("LBU apkovl mount: {}", self.lbu.overlay_media_path),
-            "network" | "net" => format!("FreeBSD VNET Stack JID: {}", self.vnet.jail_vnet_id),
-            "driver" | "drivers" => format!("NetBSD Rump Drivers: {}", self.rump.rump_subsystems.len()),
-            "security" | "syscall" => format!("OpenBSD Pledge active count: {}", self.sentinel.active_pledges.len()),
-            "buildfarm" | "runtime" => format!("NixOS Flake hash prefix: {}", &self.flake.flake_lock_hash[..8]),
-            "storage" | "fs" => format!("DragonFly HAMMER2 Snapshots: {}", self.hammer2.active_snapshots),
-            "audit" | "tracing" => format!("Illumos DTrace Probes: {}", self.illumos.dtrace_probes_registered),
-            _ => format!("Subsystem '{}' missing distro component verified", subsystem),
+            "control" | "yast2" => format!("YaST2 modules: {:?}", self.yast2.active_modules),
+            "build" | "xbps" => self.xbps_src.generate_xbps_binary(),
+            "overlay" | "lbu" => self.lbu.commit_apkovl(),
+            "vnet" | "network_stack" => format!("VNET ID: {}, isolated: {}", self.vnet.jail_vnet_id, self.vnet.is_vnet_isolated()),
+            "rump" | "anykernel" => format!("Rump hypercalls dispatched: {}", self.rump.hypercalls_dispatched),
+            "pledge" | "unveil" => format!("Pledges: {}, Unveils: {}", self.sentinel.active_pledges.len(), self.sentinel.unveiled_paths.len()),
+            "flake" | "nix" => format!("Flake lock valid: {}", self.flake.evaluate_flake()),
+            "hammer2" | "pfs" => format!("PFS subvolumes: {}", self.hammer2.pfs_subvolumes.len()),
+            "zfs" | "dtrace" => format!("DTrace probes registered: {}", self.illumos.dtrace_probes_registered),
+            "portage" | "eapi" => format!("Portage USE flags: {:?}", self.portage.use_flags),
+            "bedrock" | "strata" => format!("Active stratum: {}", self.bedrock.active_stratum),
+            "moss" | "solus" => format!("Moss packages: {}", self.moss.installed_stone_packages.len()),
+            "clear" | "stateless" => format!("Stateless clean: {}", self.clear_stateless.is_stateless_clean),
+            "urpmi" | "mageia" => format!("Media sources: {}", self.urpmi.media_sources.len()),
+            "pax" | "hardened" => format!("PaX ASLR bits: {}", self.pax.aslr_entropy_bits),
+            _ => format!("Default resolver active for subsystem: {}", subsystem),
         }
     }
 }
@@ -592,9 +598,16 @@ mod tests {
     #[test]
     fn test_resolve_missing_components_for_subsystem() {
         let mut suite = SovereignMissingLinuxBsdSuite::new();
-        assert!(suite.resolve_missing_components_for_subsystem("config").contains("YaST2"));
-        assert!(suite.resolve_missing_components_for_subsystem("network").contains("FreeBSD VNET"));
-        assert!(suite.resolve_missing_components_for_subsystem("security").contains("OpenBSD Pledge"));
-        assert!(suite.resolve_missing_components_for_subsystem("storage").contains("DragonFly HAMMER2"));
+        let res_yast = suite.resolve_missing_components_for_subsystem("yast2");
+        assert!(res_yast.contains("YaST2 modules:"));
+
+        let res_xbps = suite.resolve_missing_components_for_subsystem("xbps");
+        assert!(res_xbps.contains(".xbps"));
+
+        let res_vnet = suite.resolve_missing_components_for_subsystem("vnet");
+        assert!(res_vnet.contains("VNET ID:"));
+
+        let res_unknown = suite.resolve_missing_components_for_subsystem("unknown_sub");
+        assert!(res_unknown.contains("Default resolver active"));
     }
 }
