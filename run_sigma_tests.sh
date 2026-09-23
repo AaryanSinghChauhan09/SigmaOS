@@ -72,6 +72,13 @@ if [ -f "src/distro/sovereign_linux_bsd_distro_master_suite.rs" ]; then
     ./build/distro_master_suite_test
 fi
 
+if [ -f "src/network/approximation_proxy_firewall.rs" ]; then
+    echo "Running Sovereign Approximation Proxy Firewall test suite..."
+    mkdir -p build
+    rustc --test src/network/approximation_proxy_firewall.rs --edition=2021 -o build/approximation_proxy_firewall_test
+    ./build/approximation_proxy_firewall_test
+fi
+
 if [ -f "src/distro/linux_bsd_ecosystem_synthesis.rs" ]; then
     echo "Running Extended Linux & BSD Distro Ecosystem Synthesis test suite..."
     mkdir -p build
