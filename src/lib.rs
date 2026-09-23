@@ -53,6 +53,11 @@ pub use thread::{
     SovereignTask, SovereignThreadPool, SovereignThreadPoolEngine, SovereignWorkerThread,
     TaskPriority, TaskState, ThreadPoolKind,
 };
+pub mod ipc;
+pub use ipc::{
+    AsyncCancellationState, AsyncCancellationType, SovereignApcMessage, SovereignApcRoutine,
+    SovereignAsyncProcedureCallEngine, SovereignAsyncWriteOp, SovereignCancellationToken,
+};
 pub mod vfs;
 pub use process::{
     AdvancedIpcHub, BsdRusage, CancellationType, CoreDumpMetadata, EventFd,
