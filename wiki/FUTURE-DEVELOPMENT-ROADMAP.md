@@ -5564,3 +5564,54 @@ In addition to RSS/Atom redirection and portal category classification, SigmaOS 
 - **TechPowerUp GPU Database & VRAM Bandwidth Engine (`TechPowerUpGpuDatabaseEngine`)**: GPU architecture specs, clock rates, bus width, and effective GDDR6X memory bandwidth calculation.
 - **Android Police Custom ROM Sideload & microG Engine (`AndroidPoliceCustomRomSideloadEngine`)**: Android A/B partition slot switching, fastboot flashing, APK sideloading, and microG Play Services stubbing.
 - **HWBusters ATX 3.1 PSU Telemetry Engine (`HwbustersPsuEfficiencyTelemetryEngine`)**: ATX 3.1 +12VHPWR transient load spike monitoring, rail voltage ripple compliance checking, and Cybenetics efficiency rating calculation.
+
+---
+
+## 127. SOVEREIGN PRACTICAL LINUX & BSD DISTRO-INSPIRED HYBRID ARCHITECTURE SPECIFICATION
+
+### 127.1 Core Hybrid Philosophy & Foundation
+SigmaOS combines the best architectural strengths of Linux and BSD distributions into a cohesive, non-derivative hybrid operating system:
+1. **Linux Ecosystem Strengths**: Linux LTS kernel for broad hardware compatibility, extensive package ecosystem, and modern Wayland/COSMIC desktop tooling.
+2. **BSD Design Discipline**: BSD-style simplicity, clean `rc.conf`-style service configuration, `pledge`/`unveil`/`capsicum` security discipline, and clean separation between base OS and userland packages.
+3. **Hybrid Operating Model**:
+   - Linux kernel base for multi-arch hardware support.
+   - BSD-style service supervision, `rc.d` initialization, and `pf`-style firewall rules.
+   - Debian/Ubuntu stability for core system packages.
+   - Arch Linux rolling speed for userland applications.
+   - Nix/Guix immutable reproducibility for system state and atomic rollbacks.
+
+### 127.2 Core System Layers & Security Architecture
+1. **Universal Package Management Engine (`sigpkg`)**:
+   - PQC Dilithium-5 digital signature verification.
+   - Merkle TUF repository metadata and SAT dependency resolution.
+   - Multi-channel support (stable, testing, unstable, rolling).
+   - Atomic transaction rollbacks and containerized multi-distro adapters (`apx`, `pkgsrc`, `apk`, `xbps`).
+2. **Service Supervision & Initialization**:
+   - Multi-supervisor bridge (`SovereignUniversalDistroBridge`) supporting `systemd`, `OpenRC`, `Runit`, `Shepherd`, `Dinit`, `Smf`, and `sysvinit`.
+   - `rc.conf`-style declarative service configuration and health-check restart policies.
+3. **Storage & Resilient Recovery**:
+   - Snapshot-friendly filesystem roots (Btrfs subvolumes & ZFS datasets).
+   - A/B atomic system image updates and recovery mode fallback entries.
+4. **Zero-Trust Hardening**:
+   - `pf`-style stateful packet filter and Landlock v5 network sandboxing.
+   - OpenBSD `pledge`, `unveil`, and `execpledge` capability restrictions across `execve()` boundaries.
+   - NetBSD `pkgsrc` cross-platform build framework (`NetBsdPkgsrcBuildEngine`).
+   - FreeBSD `kldload`/`kldunload` dynamic driver module manager (`FreeBsdKldloadDriverEngine`).
+   - Alpine `APKINDEX.tar.gz` index parser and signature verifier (`AlpineApkIndexSigningEngine`).
+
+### 127.3 Modern Desktop Environment & Developer Ergonomics
+1. **Wayland-First Zenith Desktop Stack**:
+   - Wayland compositor (`ZenithCompositorEngine`) with tiling/dwindle/master layouts.
+   - XDG desktop portal compliance, display resolution manager, and power governor (`System76PowerGovernor`).
+   - Built-in WCAG 2.1 AA accessibility overlays and Catppuccin/Nord/Gruvbox theming.
+2. **System Administration & Dev Workflows**:
+   - Unified GUI settings app and CLI tool parity (`sigma-pkg`, `rcctl`, `pfctl`, `kldstat`).
+   - Pre-installed developer stacks (Rust, C/C++, Go, Python, Node.js, Zig, Nim).
+   - Built-in container and microVM orchestration (Podman, KVM/QEMU, bhyve, Firecracker).
+
+### 127.4 5-Phase Implementation & Release Discipline Roadmap
+- **Phase 1: Foundation** (Package manager, PQC repo signing, init supervision, Btrfs/ZFS snapshots, recovery environment).
+- **Phase 2: Desktop** (Wayland compositor, app launcher, settings studio, file manager, accessibility defaults).
+- **Phase 3: Security** (`pf` firewall, Landlock v5, OpenBSD `pledge`/`unveil`/`execpledge`, update signing).
+- **Phase 4: Ecosystem** (Curated package repos, Flatpak integration, dev toolchains, containers/microVMs).
+- **Phase 5: Polish & Release** (Release channels, LTS + rolling tracks, bug triage, support docs, and performance tuning).

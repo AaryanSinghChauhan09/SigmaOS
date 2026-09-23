@@ -1,53 +1,8 @@
-# SigmaOS Process Management Architecture & Development Roadmap
+# SigmaOS Process Management Architecture & AI Agent Guidelines
 
 ## Overview
 
-SigmaOS process management (`src/kernel/process.rs`, `src/kernel/scheduler.rs`, `src/process/`, `src/process/sovereign_process_engine.rs`) provides a hybrid BORE+EEVDF scheduler, cgroups v2 resource controllers, capability-bounded sandboxing (`pledge`/`unveil`), zero-copy IPC channels, randomized PID allocation, and dedicated process policies for autonomous AI agent workloads.
-
----
-
-## 🔍 Process Management Gap Analysis & Strategic Roadmap
-
-### Current Capabilities & Development Gaps
-SigmaOS process management incorporates seL4 capability isolation, CachyOS BORE+EEVDF scheduling, and OpenBSD `pledge`/`unveil` sandboxing. However, achieving process management parity with production Linux (Linux kernel process trees, cgroups v2, Seccomp-BPF) and BSD (FreeBSD rctl/procstat, OpenBSD pledge/unveil) requires addressing key gaps:
-
-1. **PID Allocation Security**: Standard sequential PID allocation is vulnerable to PID recycling race conditions. SigmaOS implements `SovereignPidAllocator` with pseudo-random PID assignment and delayed PID reuse queues.
-2. **Process Hierarchy & Group Governance**: Maintaining explicit parent/child process trees, process group IDs (`pgid`), session IDs (`sid`), and POSIX job control terminal bindings.
-3. **POSIX Real-Time Signals & Graceful Escalation**: Real-time signal queues (`SIGRTMIN`..`SIGRTMAX`), `sigqueue` payloads, and `SIGTERM`-to-`SIGKILL` timeout escalation watchers (`SigtermGracefulWatcher`).
-4. **cgroup v2 Resource Controllers**: Hierarchical CPU quota, memory RSS limit (`memory.high`/`memory.max`), process count limit (`pids.max`), and I/O weight controllers.
-5. **Seccomp-BPF & Capability Sandboxing**: Combining OpenBSD `pledge`/`unveil` bitmask checks with Linux Seccomp-BPF system call filter policies.
-
----
-
-### 📊 Process Management Gap Dashboard
-
-| Feature Area | Current State (SigmaOS) | Target State (Linux & BSD Standards) |
-|---|---|---|
-| **PID Allocator** | `SovereignPidAllocator` randomized allocation | Randomized PID allocation with delayed reuse queue |
-| **Process Tree** | Basic parent/child tracking | Full `pgid`/`sid` process group governance & job control |
-| **Signals Engine** | Standard POSIX signals | Real-time `sigqueue` + `SIGTERM`-to-`SIGKILL` graceful escalation watcher |
-| **Resource Control** | cgroups v2 integration | Hierarchical CPU/memory/pids/io cgroups v2 slice controllers |
-| **Sandboxing** | `pledge` & `unveil` API | `pledge`/`unveil` + Seccomp-BPF syscall policy enforcement |
-| **IPC Channels** | Zero-copy IPC & Binder | Zero-copy IPC + shared memory ring buffers + capability pass-through |
-
----
-
-### 🚀 3-Phase Process Management Development Roadmap
-
-#### Phase 1: Process Hierarchy & Signal Escalation (0–6 Months)
-- **Randomized PID Allocation**: Implement delayed PID reuse queues in `SovereignPidAllocator` to prevent PID recycling vulnerabilities.
-- **Process Group & Session Governance**: Maintain parent/child process trees, process group IDs (`pgid`), session IDs (`sid`), and terminal job control bindings.
-- **Graceful Signal Escalation**: Implement `SigtermGracefulWatcher` to handle `SIGTERM` graceful shutdown timeouts with automatic `SIGKILL` escalation.
-
-#### Phase 2: cgroup v2 Controllers & Capability Isolation (6–12 Months)
-- **cgroup v2 Controller Slices**: Enforce hierarchical CPU quotas (`cpu.max`), proactive memory limits (`memory.high`/`memory.max`), and thread caps (`pids.max`).
-- **Seccomp-BPF Syscall Filtering**: Implement Seccomp-BPF filter policies (`SeccompFilterPolicy`) to restrict accessible system call numbers per process.
-- **Bitmask Capability Enforcement**: Enforce OpenBSD `pledge` and `unveil` bitmask checks inside the system call dispatch path.
-
-#### Phase 3: Real-Time Signal Queues & Subagent Orchestration (12–18 Months)
-- **POSIX Real-Time Signals**: Support real-time signals (`SIGRTMIN`..`SIGRTMAX`), `sigqueue` data payloads, and `sigwaitinfo` synchronous signal consumption.
-- **Subagent Process Orchestration**: Integrated process lifecycle manager for autonomous AI agent tasks with resource cap monitoring.
-- **Zero-Copy Binder IPC**: Zero-copy IPC message queues and Android-style Binder handle passing for inter-process communication.
+SigmaOS process management (`src/kernel/process.rs`, `src/kernel/scheduler.rs`, `src/process/`) provides a hybrid BORE+EEVDF scheduler, cgroups v2 resource controllers, capability-bounded sandboxing (`pledge`/`unveil`), zero-copy IPC channels, and dedicated process policies for autonomous AI agent workloads.
 
 ---
 
