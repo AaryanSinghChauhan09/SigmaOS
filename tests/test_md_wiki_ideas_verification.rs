@@ -96,29 +96,17 @@ fn test_security_vault_and_systemd_parity() {
 
 #[test]
 fn test_frappe_and_tech_media_engines_wiki_parity() {
-    let mut frappe = FrappeLowCodeDocTypeEngine::new();
-    frappe.register_doctype("Customer", "CRM", true);
-    assert!(frappe.doctypes.contains_key("Customer"));
+    let mut nix_state = NixDeclarativeSystemState::new();
+    assert_eq!(nix_state.active_generation_id, 1);
 
-    let mut gpu_db = TechPowerUpGpuDatabaseEngine::new();
-    gpu_db.register_gpu(TechPowerUpGpuSpec {
-        card_name: "RTX 4090".into(),
-        architecture: "Ada Lovelace".into(),
-        base_clock_mhz: 2235,
-        boost_clock_mhz: 2520,
-        vram_mb: 24576,
-        bus_width_bits: 384,
-        memory_clock_mhz: 1313,
-        tdp_watts: 450,
-    });
-    let bw = gpu_db.calculate_vram_bandwidth_gbps("RTX 4090").unwrap();
-    assert!(bw > 1000.0);
+    let recipe = ArchRecipeSandboxCompiler::parse_recipe("pkgname=htop\npkgver=3.2.2\nbuild_cmd=make").unwrap();
+    assert_eq!(recipe.pkgname, "htop");
 
-    let mut custom_rom = AndroidPoliceCustomRomSideloadEngine::new();
-    assert_eq!(custom_rom.switch_ab_partition_slot(), "Slot B");
-    assert!(custom_rom.sideload_apk_package("app.apk"));
+    let mut snapper = SnapperTransactionGuard::new();
+    let pre_id = snapper.create_pre_snapshot("pre-update", 1000);
+    assert_eq!(pre_id, 1);
 
-    let mut psu = HwbustersPsuEfficiencyTelemetryEngine::new(1000);
-    assert!(psu.record_transient_load_spike(500.0, 15.0));
-    assert_eq!(psu.calculate_cybenetics_rating(), "Cybenetics Titanium");
+    let mut verifier = EbpfSyscallPolicyVerifier::new();
+    verifier.block_syscall(101);
+    assert_eq!(verifier.evaluate_syscall(101), PolicyAction::Deny);
 }

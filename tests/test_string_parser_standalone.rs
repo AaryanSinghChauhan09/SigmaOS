@@ -1,4 +1,5 @@
 // Standalone test suite for string, config, and TOML parsing optimizations
+extern crate alloc;
 
 #[path = "../src/klib/string_parser.rs"]
 mod string_parser;
@@ -11,6 +12,7 @@ pub mod hashmap;
 
 pub mod klib {
     pub use super::hashmap::HashMap;
+    pub use super::vec;
 }
 
 #[path = "../src/klib/config_parser.rs"]
