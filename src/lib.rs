@@ -293,7 +293,9 @@ pub use kernel::{
 };
 pub use kernel::roundrobin::SchedulerError as RoundRobinSchedulerError;
 pub use network::{
-    compute_checksum as compute_net_checksum, IPv4Address, NetworkPacket, PacketRingBuffer,
+    compute_checksum as compute_net_checksum, AsyncIoBackendKind, AsyncIoFilterKind,
+    AsyncIoInterest, IPv4Address, IoUringCqe, IoUringOpcode, IoUringSqe,
+    NotificationTriggerMode, SovereignAsyncIoEngine, NetworkPacket, PacketRingBuffer,
     RingTcpState, TcpConnection, TcpError, TcpSegment, TcpSocket, TcpStack, TcpState,
     ETHERNET_HEADER_LEN, IPV4_HEADER_LEN, TCP_HEADER_LEN, UDP_HEADER_LEN,
 };

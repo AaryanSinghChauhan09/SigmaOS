@@ -57,3 +57,6 @@ pub use wireguard_sovereign::{SovereignWireGuardTunnel, WgPeer, WgSessionState};
 
 // ─── Phase 1: Post-Quantum WireGuard Bridge ───────────────────────────────────
 pub mod wireguard_pqc_bridge;
+
+pub mod sovereign_async_io;
+pub use sovereign_async_io::*;
