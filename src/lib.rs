@@ -323,9 +323,11 @@ pub use resilience::{
 };
 pub use security::hardening;
 pub use security::{
-    AnonSurfShunt, AppSandboxEngine, ArithmeticSubstitutionDeobfuscator, CapabilityGate,
-    CapabilityToken, ForensicStorageFilter, Permission, PledgeManager, PledgePromise, RoutingMode,
-    SandboxPolicy,
+    AclEntryType, AclInheritanceFlag, AclModel, AclPermission, AclTag, AnonSurfShunt,
+    AppSandboxEngine, ArithmeticSubstitutionDeobfuscator, CapabilityGate, CapabilityToken,
+    ForensicStorageFilter, Permission, PledgeManager, PledgePromise, RoutingMode, SandboxPolicy,
+    SovereignAccessControlList, SovereignAccessControlListEngine, SovereignAclEntry,
+    SovereignSecuritySubject,
 };
 pub use userland::shell::{
     Parser as UserlandShellParser, RedirectSpec, RedirectionEngine, Shell as UserlandShell,
