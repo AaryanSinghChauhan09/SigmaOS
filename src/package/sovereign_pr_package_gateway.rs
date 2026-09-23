@@ -183,12 +183,38 @@ impl MultiFormatPrTranspilationEngine {
         .with_format(PackageFormat::SigmaPkg)
         .with_provides(pr.package_name.clone());
 
-        // Parse foreign dependencies from manifest
+        // Parse foreign dependencies and metadata from manifest across all Linux & BSD package formats
         for line in pr.raw_manifest_content.lines() {
-            if line.starts_with("depends=") || line.starts_with("Depends:") || line.starts_with("DEPENDS=") {
-                let deps_part = line.split('=').nth(1).or_else(|| line.split(':').nth(1)).unwrap_or("");
-                for dep in deps_part.split_whitespace() {
-                    sigma_pkg = sigma_pkg.with_dependency(dep.trim_matches(',').to_string());
+            let trimmed = line.trim();
+            if trimmed.is_empty() || trimmed.starts_with('#') {
+                continue;
+            }
+
+            // Universal multi-format dependency key detection
+            let is_dep_key = trimmed.starts_with("depends=")
+                || trimmed.starts_with("Depends:")
+                || trimmed.starts_with("DEPENDS=")
+                || trimmed.starts_with("RDEPEND=")
+                || trimmed.starts_with("makedepends=")
+                || trimmed.starts_with("build_style=")
+                || trimmed.starts_with("Requires:")
+                || trimmed.starts_with("run_depend=")
+                || trimmed.starts_with("pkg_deps=")
+                || trimmed.starts_with("inputs=")
+                || trimmed.starts_with("packages=")
+                || trimmed.starts_with("PKG_DEPENDS:=");
+
+            if is_dep_key {
+                let deps_part = trimmed
+                    .split('=')
+                    .nth(1)
+                    .or_else(|| trimmed.split(':').nth(1))
+                    .unwrap_or("");
+                for token in deps_part.split_whitespace() {
+                    let clean_dep = token.trim_matches(|c| c == ',' || c == '"' || c == '\'' || c == '(' || c == ')');
+                    if !clean_dep.is_empty() && !clean_dep.contains('$') {
+                        sigma_pkg = sigma_pkg.with_dependency(clean_dep.to_string());
+                    }
                 }
             }
         }
@@ -345,5 +371,38 @@ mod tests {
         for (k, v) in health {
             assert!(v, "PR Package Gateway suite health check failed for: {}", k);
         }
+    }
+
+    #[test]
+    fn test_multi_format_pr_transpilation_all_distros() {
+        let mut suite = SovereignPrPackageGatewaySuite::new();
+
+        // Debian .deb PR
+        let id_deb = suite.submit_package_pr(
+            201, "Add htop deb", "deb_maint", PackageFormat::Deb, "htop", "3.3.0", "GPL-2.0-or-later", "Package: htop\nDepends: libc6, libncursesw6\n",
+        );
+        let sig_deb = suite.process_pr_pipeline(id_deb).unwrap();
+        assert!(sig_deb.dependencies.contains(&"libc6".to_string()));
+
+        // Fedora .rpm PR
+        let id_rpm = suite.submit_package_pr(
+            202, "Add zstd rpm", "rpm_maint", PackageFormat::Rpm, "zstd", "1.5.5", "BSD-3-Clause", "Name: zstd\nRequires: glibc libzstd\n",
+        );
+        let sig_rpm = suite.process_pr_pipeline(id_rpm).unwrap();
+        assert!(sig_rpm.dependencies.contains(&"glibc".to_string()));
+
+        // Gentoo ebuild PR
+        let id_ebuild = suite.submit_package_pr(
+            203, "Add openssl ebuild", "gentoo_maint", PackageFormat::Ebuild, "openssl", "3.1.4", "Apache-2.0", "EAPI=8\nRDEPEND=\"sys-libs/glibc dev-libs/libbsd\"\n",
+        );
+        let sig_ebuild = suite.process_pr_pipeline(id_ebuild).unwrap();
+        assert!(sig_ebuild.dependencies.contains(&"sys-libs/glibc".to_string()));
+
+        // Alpine APKBUILD PR
+        let id_apk = suite.submit_package_pr(
+            204, "Add musl apk", "alpine_maint", PackageFormat::Apk, "musl", "1.2.4", "MIT", "pkgname=musl\nmakedepends=\"gcc make\"\n",
+        );
+        let sig_apk = suite.process_pr_pipeline(id_apk).unwrap();
+        assert!(sig_apk.dependencies.contains(&"gcc".to_string()));
     }
 }
