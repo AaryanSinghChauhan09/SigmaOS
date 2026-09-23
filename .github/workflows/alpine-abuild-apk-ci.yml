@@ -26,4 +26,4 @@ jobs:
         run: |
           mkdir -p build
           echo "Testing Alpine Linux abuild initramfs and APK security..."
-          rustc --edition=2021 --test src/distro/missing_distro_innovations.rs --cfg 'feature="standalone_test"' -o build/test_alpine_abuild && ./build/test_alpine_abuild
+          mkdir -p build && rustc --edition=2021 --test src/distro/missing_distro_innovations.rs --cfg 'feature="standalone_test"' -o build/test_alpine_abuild && ./build/test_alpine_abuild

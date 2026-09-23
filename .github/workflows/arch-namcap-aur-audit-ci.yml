@@ -26,5 +26,5 @@ jobs:
         run: |
           mkdir -p build
           echo "Running Arch Linux namcap & AUR audit tests..."
-          rustc --edition=2021 --test src/distro/arch_parity.rs -o build/test_arch_namcap && ./build/test_arch_namcap
-          rustc --edition=2021 --test src/package/aur_integration.rs -o build/test_aur_namcap && ./build/test_aur_namcap
+          mkdir -p build && rustc --edition=2021 --test src/distro/arch_parity.rs -o build/test_arch_namcap && ./build/test_arch_namcap
+          mkdir -p build && rustc --edition=2021 --test src/package/aur_integration.rs -o build/test_aur_namcap && ./build/test_aur_namcap
