@@ -103,6 +103,7 @@
 - **[[Product Vision & Manifesto|PRODUCT_VISION]]**
 - **[[Release Criteria|RELEASE_CRITERIA]]**
 - **[[Architecture Decision Records|ARCHITECTURE_DECISIONS]]**
+- **[[AI Agent Component Development Framework|Ai-Agent-Component-Development]]**
 - **[[Comprehensive OS Analysis|SIGMAOS_COMPREHENSIVE_OS_ANALYSIS]]**
 - **[[Category:Development|Category-Development]]**
 
