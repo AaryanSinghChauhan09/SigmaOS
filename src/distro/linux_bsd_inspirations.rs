@@ -82,6 +82,8 @@ pub enum DistroSubsystemMode {
     LinuxKaOS,
     MidnightBsd,
     HardenedBsd,
+    LinuxVanillaOS,
+    LinuxOpenWrt,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -150,6 +152,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxAsahi
             | DistroSubsystemMode::LinuxNobara
             | DistroSubsystemMode::LinuxKaOS
+            | DistroSubsystemMode::LinuxVanillaOS
             | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
@@ -163,6 +166,7 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxAlpine
             | DistroSubsystemMode::LinuxVoid
             | DistroSubsystemMode::LinuxAntiX
+            | DistroSubsystemMode::LinuxOpenWrt
             | DistroSubsystemMode::LinuxPostmarket => ServiceSupervisorType::Runit,
 
             DistroSubsystemMode::LinuxPuppy => ServiceSupervisorType::Sysvinit,
@@ -296,6 +300,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxDeepin
             | DistroSubsystemMode::LinuxAsahi
             | DistroSubsystemMode::LinuxNobara
+            | DistroSubsystemMode::LinuxVanillaOS
             | DistroSubsystemMode::LinuxKaOS => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
@@ -309,6 +314,7 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxAlpine
             | DistroSubsystemMode::LinuxVoid
             | DistroSubsystemMode::LinuxAntiX
+            | DistroSubsystemMode::LinuxOpenWrt
             | DistroSubsystemMode::LinuxPostmarket => supervisor == ServiceSupervisorType::Runit,
 
             DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxGuix => {
@@ -351,9 +357,11 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxKaOS => format!("{}.pkg.tar.zst", input_pkg),
             DistroSubsystemMode::LinuxAlpine
             | DistroSubsystemMode::LinuxChimera
+            | DistroSubsystemMode::LinuxOpenWrt
             | DistroSubsystemMode::LinuxPostmarket => {
                 format!("{}.apk", input_pkg)
             }
+            DistroSubsystemMode::LinuxVanillaOS => format!("{}.apx", input_pkg),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", input_pkg),
             DistroSubsystemMode::LinuxNix => format!("{}.nix", input_pkg),
             DistroSubsystemMode::LinuxGuix => format!("{}.scm", input_pkg),
@@ -417,9 +425,11 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxKaOS => format!("{}.pkg.tar.zst", action),
             DistroSubsystemMode::LinuxAlpine
             | DistroSubsystemMode::LinuxChimera
+            | DistroSubsystemMode::LinuxOpenWrt
             | DistroSubsystemMode::LinuxPostmarket => {
                 format!("{}.apk", action)
             }
+            DistroSubsystemMode::LinuxVanillaOS => format!("{}.apx", action),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", action),
             DistroSubsystemMode::LinuxNix => format!("{}.nix", action),
             DistroSubsystemMode::LinuxGuix => format!("{}.scm", action),
