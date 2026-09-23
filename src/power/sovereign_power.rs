@@ -113,6 +113,138 @@ impl Default for SovereignPowerThermalGovernance {
     }
 }
 
+// =========================================================================
+// LINUX TLP & POWER-PROFILES-DAEMON ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LinuxPowerProfile {
+    Performance,
+    Balanced,
+    PowerSaver,
+}
+
+pub struct LinuxTlpPowerProfilesEngine {
+    pub active_profile: LinuxPowerProfile,
+    pub on_ac_power: bool,
+    pub tlp_enabled: bool,
+}
+
+impl LinuxTlpPowerProfilesEngine {
+    pub fn new() -> Self {
+        Self {
+            active_profile: LinuxPowerProfile::Balanced,
+            on_ac_power: true,
+            tlp_enabled: true,
+        }
+    }
+
+    pub fn set_power_profile(&mut self, profile: LinuxPowerProfile) {
+        self.active_profile = profile;
+    }
+
+    pub fn handle_ac_event(&mut self, is_ac: bool) -> LinuxPowerProfile {
+        self.on_ac_power = is_ac;
+        if self.tlp_enabled {
+            if is_ac {
+                self.active_profile = LinuxPowerProfile::Performance;
+            } else {
+                self.active_profile = LinuxPowerProfile::PowerSaver;
+            }
+        }
+        self.active_profile
+    }
+}
+
+impl Default for LinuxTlpPowerProfilesEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// FREEBSD POWERD FREQUENCY SCALING ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FreeBsdPowerdMode {
+    Maximum,
+    Minimum,
+    Adaptive,
+    HiAdaptive,
+}
+
+pub struct FreeBsdPowerdFreqEngine {
+    pub active_mode: FreeBsdPowerdMode,
+    pub current_freq_mhz: u32,
+    pub max_freq_mhz: u32,
+}
+
+impl FreeBsdPowerdFreqEngine {
+    pub fn new(max_freq_mhz: u32) -> Self {
+        Self {
+            active_mode: FreeBsdPowerdMode::HiAdaptive,
+            current_freq_mhz: max_freq_mhz,
+            max_freq_mhz,
+        }
+    }
+
+    pub fn evaluate_frequency(&mut self, cpu_load_pct: f32) -> u32 {
+        let freq = match self.active_mode {
+            FreeBsdPowerdMode::Maximum => self.max_freq_mhz,
+            FreeBsdPowerdMode::Minimum => (self.max_freq_mhz as f32 * 0.3) as u32,
+            FreeBsdPowerdMode::Adaptive => {
+                (self.max_freq_mhz as f32 * (cpu_load_pct / 100.0).clamp(0.3, 1.0)) as u32
+            }
+            FreeBsdPowerdMode::HiAdaptive => {
+                let load_factor = if cpu_load_pct > 50.0 { 1.0 } else { cpu_load_pct / 100.0 };
+                (self.max_freq_mhz as f32 * load_factor.clamp(0.4, 1.0)) as u32
+            }
+        };
+
+        self.current_freq_mhz = freq;
+        freq
+    }
+}
+
+// =========================================================================
+// OPENBSD APMD POWER MANAGEMENT ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OpenBsdApmdMode {
+    Manual,
+    Auto,
+    CoolRun,
+}
+
+pub struct OpenBsdApmdPowerManagementEngine {
+    pub mode: OpenBsdApmdMode,
+    pub battery_percent: u8,
+    pub time_remaining_mins: u32,
+}
+
+impl OpenBsdApmdPowerManagementEngine {
+    pub fn new() -> Self {
+        Self {
+            mode: OpenBsdApmdMode::Auto,
+            battery_percent: 100,
+            time_remaining_mins: 240,
+        }
+    }
+
+    pub fn update_battery_status(&mut self, percent: u8, remaining_mins: u32) {
+        self.battery_percent = percent;
+        self.time_remaining_mins = remaining_mins;
+    }
+}
+
+impl Default for OpenBsdApmdPowerManagementEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -140,5 +272,43 @@ mod tests {
         gov.evaluate_thermal_throttling(60.0);
         assert!(!gov.is_throttled);
         assert_eq!(gov.active_governor, SovereignCpuGovernor::SchedutilAdaptive);
+    }
+
+    #[test]
+    fn test_linux_tlp_power_profiles() {
+        let mut tlp = LinuxTlpPowerProfilesEngine::new();
+        assert_eq!(tlp.active_profile, LinuxPowerProfile::Balanced);
+
+        // Switch to battery power
+        let battery_prof = tlp.handle_ac_event(false);
+        assert_eq!(battery_prof, LinuxPowerProfile::PowerSaver);
+        assert!(!tlp.on_ac_power);
+
+        // Switch to AC power
+        let ac_prof = tlp.handle_ac_event(true);
+        assert_eq!(ac_prof, LinuxPowerProfile::Performance);
+        assert!(tlp.on_ac_power);
+    }
+
+    #[test]
+    fn test_freebsd_powerd_freq_scaling() {
+        let mut powerd = FreeBsdPowerdFreqEngine::new(3200);
+        assert_eq!(powerd.active_mode, FreeBsdPowerdMode::HiAdaptive);
+
+        let freq_low = powerd.evaluate_frequency(20.0);
+        assert_eq!(freq_low, 1280);
+
+        let freq_high = powerd.evaluate_frequency(80.0);
+        assert_eq!(freq_high, 3200);
+    }
+
+    #[test]
+    fn test_openbsd_apmd_power_management() {
+        let mut apmd = OpenBsdApmdPowerManagementEngine::new();
+        assert_eq!(apmd.mode, OpenBsdApmdMode::Auto);
+
+        apmd.update_battery_status(85, 180);
+        assert_eq!(apmd.battery_percent, 85);
+        assert_eq!(apmd.time_remaining_mins, 180);
     }
 }
