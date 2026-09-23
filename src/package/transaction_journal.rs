@@ -430,11 +430,32 @@ impl TransactionJournal {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tempfile::TempDir;
+
+    struct TestDir {
+        path: PathBuf,
+    }
+
+    impl TestDir {
+        fn new(name: &str) -> Self {
+            let path = std::env::temp_dir().join(format!("sigma_journal_test_{}", name));
+            let _ = fs::create_dir_all(&path);
+            Self { path }
+        }
+
+        fn path(&self) -> &Path {
+            &self.path
+        }
+    }
+
+    impl Drop for TestDir {
+        fn drop(&mut self) {
+            let _ = fs::remove_dir_all(&self.path);
+        }
+    }
 
     #[test]
     fn test_journal_creation() {
-        let temp_dir = TempDir::new().unwrap();
+        let temp_dir = TestDir::new("creation");
         let journal_path = temp_dir.path().join("transactions.json");
 
         let journal = TransactionJournal::new(&journal_path).unwrap();
@@ -443,7 +464,7 @@ mod tests {
 
     #[test]
     fn test_transaction_lifecycle() {
-        let temp_dir = TempDir::new().unwrap();
+        let temp_dir = TestDir::new("lifecycle");
         let journal_path = temp_dir.path().join("transactions.json");
 
         let mut journal = TransactionJournal::new(&journal_path).unwrap();
@@ -471,7 +492,7 @@ mod tests {
 
     #[test]
     fn test_package_history() {
-        let temp_dir = TempDir::new().unwrap();
+        let temp_dir = TestDir::new("history");
         let journal_path = temp_dir.path().join("transactions.json");
 
         let mut journal = TransactionJournal::new(&journal_path).unwrap();

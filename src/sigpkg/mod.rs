@@ -7,9 +7,22 @@
 #![allow(non_camel_case_types)]
 #![allow(clippy::large_enum_variant)]
 #![allow(clippy::type_complexity)]
+#[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
+
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
+
+#[cfg(any(feature = "standalone_test", test))]
+use std::format;
+#[cfg(any(feature = "standalone_test", test))]
+use std::string::{String, ToString};
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 // SigmaPkg - SigmaOS Package Manager
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
@@ -141,7 +154,7 @@ pub use pacman_contrib::{
     PacLogEntry, PackageCacheEntry, PendingUpdate, SyncPackage, UpdPkgSumsGenerator,
 };
 pub use portage::{EbuildSpec, PortageResolver, Slot, UseFlag};
-pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
+pub use recipe::{AptDebManifest, BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
 pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use store::{BsdPkgRepositoryMirror, ContentAddressedStore, GentooPortageUseFlagMask, NixOsHermeticCasStore};

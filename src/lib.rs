@@ -80,6 +80,7 @@ pub mod unimplemented_features;
 pub mod unimplemented_tools;
 pub mod wiki_unimplemented_ideas;
 pub use wiki_unimplemented_ideas::*;
+pub mod community;
 pub mod userland;
 
 pub use distro::{
