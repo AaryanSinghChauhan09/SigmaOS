@@ -7,10 +7,12 @@
 #![allow(non_camel_case_types)]
 #![allow(clippy::large_enum_variant)]
 #![allow(clippy::type_complexity)]
+extern crate alloc;
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
 // Core working modules
+pub mod community;
 pub mod open_source_os_gap_closure;
 pub mod accessibility;
 pub mod ai;
@@ -336,8 +338,9 @@ pub use shell::{
     PipelineExecutor, ShellCommand, ShellPledgeUnveilGuard, ShellSyntaxHighlighter,
     SimpleShellSession as ShellRepl, ZshPromptFormatter,
 };
+pub use package::AptDebManifest;
 pub use sigpkg::{
-    AptDebManifest, BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError,
+    BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError,
     RecipeManager, SatSolver, Transaction,
 };
 pub use unimplemented_tools::{

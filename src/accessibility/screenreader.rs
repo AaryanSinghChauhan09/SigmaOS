@@ -17,10 +17,11 @@ pub enum VoiceGender {
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AccessibilityError {
+pub enum ScreenReaderError {
     Success = 0,
     NotFound = 1,
 }
+pub type AccessibilityError = ScreenReaderError;
 
 pub trait Voice {
     fn id(&self) -> VoiceID;
