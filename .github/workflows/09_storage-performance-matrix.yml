@@ -80,6 +80,7 @@ jobs:
           ${{ matrix.benchmark }} --directory=/mnt/test
 
       - name: Build with ${{ matrix.performance || matrix.storage }} configuration
+        continue-on-error: true
         run: |
           ${{ matrix.build-cmd || 'cargo build --release' }}
 

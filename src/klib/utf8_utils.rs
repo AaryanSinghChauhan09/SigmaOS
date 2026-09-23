@@ -64,11 +64,7 @@ pub fn trim_ascii_whitespace(data: &[u8]) -> &[u8] {
         Some(pos) => pos,
         None => return &[],
     };
-    let end = data
-        .iter()
-        .rposition(|b| !is_ascii_whitespace(*b))
-        .map(|i| i + 1)
-        .unwrap_or(start);
+    let end = data.iter().rposition(|b| !is_ascii_whitespace(*b)).map(|i| i + 1).unwrap_or(start);
     &data[start..end]
 }
 
