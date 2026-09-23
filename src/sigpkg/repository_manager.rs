@@ -27,31 +27,6 @@ use core::option::Option::{self, None, Some};
 use core::result::Result::{self, Err, Ok};
 
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct RepositoryGpgKey {
-    pub key_id: String,
-    pub owner: String,
-    pub is_valid: bool,
-}
-
-impl RepositoryGpgKey {
-    pub fn new(key_id: &str, owner: &str) -> Self {
-        Self {
-            key_id: key_id.to_string(),
-            owner: owner.to_string(),
-            is_valid: true,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub enum OfficialArchiveSource {
-    #[default]
-    Main,
-    Universe,
-    Multiverse,
-    Restricted,
-}
 
 pub struct PpaRepository {
     pub owner: String,
@@ -95,18 +70,32 @@ impl MirrorBenchmarkEngine {
 }
 
 /// Repository configuration (Debian sources.list inspiration)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum OfficialArchiveSource {
+    #[default]
     Main,
     Universe,
     Multiverse,
     Restricted,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RepositoryGpgKey {
     pub key_id: String,
+    pub owner: String,
     pub fingerprint: String,
+    pub is_valid: bool,
+}
+
+impl RepositoryGpgKey {
+    pub fn new(key_id: &str, owner: &str) -> Self {
+        Self {
+            key_id: key_id.to_string(),
+            owner: owner.to_string(),
+            fingerprint: key_id.to_string(),
+            is_valid: true,
+        }
+    }
 }
 
 pub struct Repository {

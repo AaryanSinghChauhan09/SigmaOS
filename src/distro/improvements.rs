@@ -1303,6 +1303,7 @@ impl IllumosDTraceTracingGovernor {
 
 
 mod tests {
+    use super::*;
     
 
     #[test]
