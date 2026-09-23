@@ -50,3 +50,7 @@ pub use uefi::{
     MultiKernelBootSelector, SecureBoot, SimpleSecureBoot, SimpleUEFIBootloader,
     SovereignBootWatchdog, UEFIBootloader, UsbHostController,
 };
+
+pub use verified::{
+    QemuArchitectureTarget, QemuBootSerialLogParser, QemuBootStatus, QemuBootVerificationConfig,
+};

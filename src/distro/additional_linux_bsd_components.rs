@@ -231,6 +231,189 @@ impl Default for VoidXbpsTransactionJournalEngine {
     }
 }
 
+/// Arch Linux arch-chroot & systemd-nspawn Container Mount Engine
+#[derive(Debug, Clone)]
+pub struct ArchChrootContainerEngine {
+    pub target_root_dir: String,
+    pub mounted_binds: Vec<String>,
+    pub chroot_active: bool,
+}
+
+impl ArchChrootContainerEngine {
+    pub fn new(target_dir: &str) -> Self {
+        Self {
+            target_root_dir: target_dir.to_string(),
+            mounted_binds: Vec::new(),
+            chroot_active: false,
+        }
+    }
+
+    pub fn prepare_virtual_mounts(&mut self) -> usize {
+        self.mounted_binds.push(format!("{}/proc", self.target_root_dir));
+        self.mounted_binds.push(format!("{}/sys", self.target_root_dir));
+        self.mounted_binds.push(format!("{}/dev", self.target_root_dir));
+        self.mounted_binds.push(format!("{}/run", self.target_root_dir));
+        self.chroot_active = true;
+        self.mounted_binds.len()
+    }
+}
+
+/// Debian dpkg-reconfigure & debconf Preseed Configuration Database
+#[derive(Debug, Clone)]
+pub struct DebianDebconfPreseedEngine {
+    pub package_name: String,
+    pub preseed_answers: std::collections::BTreeMap<String, String>,
+}
+
+impl DebianDebconfPreseedEngine {
+    pub fn new(package: &str) -> Self {
+        Self {
+            package_name: package.to_string(),
+            preseed_answers: std::collections::BTreeMap::new(),
+        }
+    }
+
+    pub fn set_preseed_question(&mut self, question: &str, answer: &str) {
+        self.preseed_answers.insert(question.to_string(), answer.to_string());
+    }
+
+    pub fn query_answer(&self, question: &str) -> Option<&String> {
+        self.preseed_answers.get(question)
+    }
+}
+
+/// Gentoo Portage ebuild Phase Function Hook Execution Engine
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GentooEbuildPhase {
+    Setup,
+    Unpack,
+    Prepare,
+    Configure,
+    Compile,
+    Test,
+    Install,
+}
+
+pub struct GentooEbuildPhaseRunnerEngine {
+    pub atom_name: String,
+    pub executed_phases: Vec<GentooEbuildPhase>,
+}
+
+impl GentooEbuildPhaseRunnerEngine {
+    pub fn new(atom: &str) -> Self {
+        Self {
+            atom_name: atom.to_string(),
+            executed_phases: Vec::new(),
+        }
+    }
+
+    pub fn execute_phase(&mut self, phase: GentooEbuildPhase) -> bool {
+        self.executed_phases.push(phase);
+        true
+    }
+}
+
+/// FreeBSD freebsd-update Binary Patch Rollback & Kernel Update Engine
+#[derive(Debug, Clone)]
+pub struct FreeBsdUpdateBinaryPatchEngine {
+    pub current_release: String,
+    pub target_release: String,
+    pub patched_files_count: usize,
+    pub rollback_available: bool,
+}
+
+impl FreeBsdUpdateBinaryPatchEngine {
+    pub fn new(current: &str, target: &str) -> Self {
+        Self {
+            current_release: current.to_string(),
+            target_release: target.to_string(),
+            patched_files_count: 0,
+            rollback_available: false,
+        }
+    }
+
+    pub fn apply_binary_patches(&mut self, files_count: usize) -> bool {
+        self.patched_files_count = files_count;
+        self.rollback_available = true;
+        true
+    }
+
+    pub fn rollback_patches(&mut self) -> bool {
+        if self.rollback_available {
+            self.patched_files_count = 0;
+            self.rollback_available = false;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+/// Arch Linux arch-audit Package CVE Vulnerability Security Engine
+#[derive(Debug, Clone)]
+pub struct ArchAuditVulnerabilityEntry {
+    pub package_name: String,
+    pub cve_id: String,
+    pub risk_severity: String, // High, Medium, Low
+    pub fixed_version: Option<String>,
+}
+
+pub struct ArchAuditSecurityVulnerabilityEngine {
+    pub vulnerabilities: Vec<ArchAuditVulnerabilityEntry>,
+}
+
+impl ArchAuditSecurityVulnerabilityEngine {
+    pub fn new() -> Self {
+        Self { vulnerabilities: Vec::new() }
+    }
+
+    pub fn register_vulnerability(&mut self, pkg: &str, cve: &str, severity: &str, fixed_ver: Option<&str>) {
+        self.vulnerabilities.push(ArchAuditVulnerabilityEntry {
+            package_name: pkg.to_string(),
+            cve_id: cve.to_string(),
+            risk_severity: severity.to_string(),
+            fixed_version: fixed_ver.map(|s| s.to_string()),
+        });
+    }
+
+    pub fn audit_package(&self, pkg_name: &str) -> Vec<&ArchAuditVulnerabilityEntry> {
+        self.vulnerabilities.iter().filter(|v| v.package_name == pkg_name).collect()
+    }
+}
+
+impl Default for ArchAuditSecurityVulnerabilityEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// FreeBSD poudriere Jail-Isolated Ports Bulk Builder
+#[derive(Debug, Clone)]
+pub struct FreeBsdPoudriereBulkBuilderEngine {
+    pub jail_name: String,
+    pub ports_tree_name: String,
+    pub active_build_jobs: usize,
+    pub completed_packages: Vec<String>,
+}
+
+impl FreeBsdPoudriereBulkBuilderEngine {
+    pub fn new(jail: &str, ports_tree: &str) -> Self {
+        Self {
+            jail_name: jail.to_string(),
+            ports_tree_name: ports_tree.to_string(),
+            active_build_jobs: 0,
+            completed_packages: Vec::new(),
+        }
+    }
+
+    pub fn build_port_package(&mut self, origin: &str) -> bool {
+        self.active_build_jobs += 1;
+        self.completed_packages.push(origin.to_string());
+        self.active_build_jobs -= 1;
+        true
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -287,5 +470,40 @@ mod tests {
         let undone = journal.rollback_last().unwrap();
         assert_eq!(undone.pkg_name, "curl");
         assert_eq!(journal.history.len(), 0);
+
+        // Test Arch chroot container
+        let mut arch_chroot = ArchChrootContainerEngine::new("/mnt");
+        assert_eq!(arch_chroot.prepare_virtual_mounts(), 4);
+        assert!(arch_chroot.chroot_active);
+
+        // Test Debian debconf preseed
+        let mut debconf = DebianDebconfPreseedEngine::new("tzdata");
+        debconf.set_preseed_question("tzdata/areas", "Etc");
+        assert_eq!(debconf.query_answer("tzdata/areas").unwrap(), "Etc");
+
+        // Test Gentoo ebuild phase runner
+        let mut ebuild = GentooEbuildPhaseRunnerEngine::new("app-editors/neovim");
+        assert!(ebuild.execute_phase(GentooEbuildPhase::Setup));
+        assert!(ebuild.execute_phase(GentooEbuildPhase::Compile));
+        assert_eq!(ebuild.executed_phases.len(), 2);
+
+        // Test FreeBSD update binary patch
+        let mut fbsd_update = FreeBsdUpdateBinaryPatchEngine::new("14.1-RELEASE", "14.1-RELEASE-p1");
+        assert!(fbsd_update.apply_binary_patches(12));
+        assert!(fbsd_update.rollback_available);
+        assert!(fbsd_update.rollback_patches());
+        assert!(!fbsd_update.rollback_available);
+
+        // Test Arch audit vulnerability engine
+        let mut arch_audit = ArchAuditSecurityVulnerabilityEngine::new();
+        arch_audit.register_vulnerability("curl", "CVE-2024-9999", "High", Some("8.10.0"));
+        let vulns = arch_audit.audit_package("curl");
+        assert_eq!(vulns.len(), 1);
+        assert_eq!(vulns[0].cve_id, "CVE-2024-9999");
+
+        // Test FreeBSD poudriere bulk builder
+        let mut poudriere = FreeBsdPoudriereBulkBuilderEngine::new("14_1_amd64", "default");
+        assert!(poudriere.build_port_package("security/openssl"));
+        assert_eq!(poudriere.completed_packages.len(), 1);
     }
 }

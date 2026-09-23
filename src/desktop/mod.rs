@@ -12,7 +12,17 @@ pub mod screensaver;
 pub mod sovereign_navigation_engine;
 pub mod web_wasm_bridge;
 pub mod zenith;
+pub mod zenith_advanced_features;
 pub mod zenith_compositor;
+
+pub use zenith_advanced_features::{
+    AdvancedWindowManager, AppletCategory, DesktopActivity, DesktopApplet, DesktopAppletEngine,
+    DesktopInspirationPreset, GestureAction, GestureBinding, GestureType, MonitorConfig,
+    ProfileManager, ProfileSettings, ScratchpadWindow, SuggestionType, UsageProfile,
+    WindowLayoutMode, WindowRule, WindowRuleAction, WindowRuleMatch, WorkspaceConfig,
+    ZenithActivityManager, ZenithDesktopEnvironment, ZenithDesktopSecurityGuard,
+    ZenithScratchpadManager, ZenithThemePreset, ZenithThemePresetManager, ZenithWindowRuleEngine,
+};
 
 pub use zenith::{
     FractionalDisplayScaler, HyprlandTilingLayoutEngine, OmarchyThemeSyncEngine, SimpleDesktopCompositor,
