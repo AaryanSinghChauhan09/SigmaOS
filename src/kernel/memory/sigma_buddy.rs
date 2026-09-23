@@ -18,6 +18,19 @@
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 
+#[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
+
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec::Vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec;
+
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec;
+
 use super::{MemoryBlock, PAGE_SIZE};
 use crate::klib::buddy_allocator::{BuddyAllocator, SimpleBuddyAllocator};
 
@@ -175,7 +188,7 @@ impl BsdVmZoneAllocator {
 /// Integrates with the existing memory subsystem, migration types, CMA, and watermarks.
 /// Sovereign Atomic IPC Ring Buffer for lockless cross-shard message passing
 pub struct SovereignIpcBuffer {
-    buffer: alloc::vec::Vec<u8>,
+    buffer: Vec<u8>,
     head: AtomicUsize,
     tail: AtomicUsize,
     capacity: usize,
@@ -185,7 +198,7 @@ impl SovereignIpcBuffer {
     pub fn new(capacity: usize) -> Self {
         let actual_cap = capacity.next_power_of_two();
         Self {
-            buffer: alloc::vec![0u8; actual_cap],
+            buffer: vec![0u8; actual_cap],
             head: AtomicUsize::new(0),
             tail: AtomicUsize::new(0),
             capacity: actual_cap,
