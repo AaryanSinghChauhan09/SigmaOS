@@ -2585,8 +2585,13 @@ impl PackagePullRequestParser {
             pkg = pkg.with_dependency(dep.clone());
         }
 
+        // Align package manifest memory buffer to 4KB (4096-byte) page frame boundary
+        let raw_len = spec.raw_manifest_body.len();
+        let page_aligned_size = (raw_len + 4095) & !4095;
+
         pkg.properties.insert("pr_id".to_string(), spec.pr_id.to_string());
         pkg.properties.insert("pr_author".to_string(), spec.author.clone());
+        pkg.properties.insert("4kb_page_aligned_bytes".to_string(), page_aligned_size.to_string());
         pkg
     }
 }

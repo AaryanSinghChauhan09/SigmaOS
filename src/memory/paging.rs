@@ -14,6 +14,47 @@ use std::vec::Vec;
 pub const PAGE_SIZE_BYTES: usize = 4096;
 pub const PAGE_TABLE_ENTRIES: usize = 512;
 
+/// 4KB Page Frame Buffer Allocation Engine
+/// Aligns arbitrary package payload byte buffers to 4KB (0x1000) page boundaries,
+/// enforcing Linux/BSD memory alignment and page protection attributes.
+#[derive(Debug, Clone)]
+pub struct Page4KbBufferMapper {
+    pub page_size: usize,
+    pub allocated_page_frames: usize,
+}
+
+impl Page4KbBufferMapper {
+    pub fn new() -> Self {
+        Self {
+            page_size: PAGE_SIZE_BYTES,
+            allocated_page_frames: 0,
+        }
+    }
+
+    pub fn align_to_4kb_pages(&mut self, payload_len: usize) -> usize {
+        let pages = (payload_len + PAGE_SIZE_BYTES - 1) / PAGE_SIZE_BYTES;
+        self.allocated_page_frames += pages;
+        pages * PAGE_SIZE_BYTES
+    }
+
+    pub fn is_4kb_aligned(&self, addr: u64) -> bool {
+        (addr & (PAGE_SIZE_BYTES as u64 - 1)) == 0
+    }
+
+    pub fn allocate_4kb_page_aligned_buffer(&mut self, payload: &[u8]) -> Vec<u8> {
+        let aligned_capacity = self.align_to_4kb_pages(payload.len());
+        let mut aligned_buf = vec![0u8; aligned_capacity];
+        aligned_buf[..payload.len()].copy_from_slice(payload);
+        aligned_buf
+    }
+}
+
+impl Default for Page4KbBufferMapper {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MemoryError {
     OutOfMemory,
@@ -276,6 +317,17 @@ impl SimpleVMM {
     /// Add a Virtual Memory Area for demand paging
     pub fn register_vma(&mut self, vma: VirtualMemoryArea) {
         self.vmas.push(vma);
+    }
+
+    pub fn map_page(
+        &mut self,
+        virt: VirtualAddress,
+        phys: PhysicalAddress,
+    ) -> Result<(), MemoryError> {
+        if (virt.0 & 0xFFF) != 0 || (phys.0 & 0xFFF) != 0 {
+            return Err(MemoryError::InvalidAddress);
+        }
+        self.map_page_with_flags(virt, phys, true, true)
     }
 
     pub fn map_page_with_flags(
@@ -944,6 +996,20 @@ mod tests {
 
         // Confirm KSM references record has split
         assert_eq!(vmm.ksm_registry[0].references.len(), 1);
+    }
+
+    #[test]
+    fn test_4kb_page_buffer_mapper() {
+        let mut mapper = Page4KbBufferMapper::new();
+        assert!(mapper.is_4kb_aligned(0x1000));
+        assert!(mapper.is_4kb_aligned(0x2000));
+        assert!(!mapper.is_4kb_aligned(0x1005));
+
+        let payload = b"package payload data";
+        let aligned = mapper.allocate_4kb_page_aligned_buffer(payload);
+        assert_eq!(aligned.len(), 4096);
+        assert_eq!(&aligned[..payload.len()], payload);
+        assert_eq!(mapper.allocated_page_frames, 1);
     }
 
     #[test]

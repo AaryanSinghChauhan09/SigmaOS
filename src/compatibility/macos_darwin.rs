@@ -400,6 +400,111 @@ pub struct ApfsFileClone {
     pub shared_block_count: usize,
 }
 
+/// APFS FileVault 2 Encryption Key Specification
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FileVaultKeySpec {
+    pub volume_uuid: String,
+    pub xts_aes_key: [u8; 32],
+    pub is_encrypted: bool,
+}
+
+/// APFS Extent Refcount Tree Record (Zero-Copy Block Sharing)
+#[derive(Debug, Clone)]
+pub struct ApfsExtentRecord {
+    pub start_pblock: u64,
+    pub block_count: usize,
+    pub refcount: usize,
+}
+
+/// APFS Directory Firmlink Record (macOS /System/Volumes/Data bi-directional link)
+#[derive(Debug, Clone)]
+pub struct ApfsFirmlink {
+    pub virtual_path: String,
+    pub target_data_path: String,
+}
+
+/// Enhanced APFS Container & Volume Engine
+pub struct ApfsVolumeContainerEngine {
+    pub container_uuid: String,
+    pub total_capacity_bytes: u64,
+    pub extents: Vec<ApfsExtentRecord>,
+    pub firmlinks: Vec<ApfsFirmlink>,
+    pub volume_keys: BTreeMap<String, FileVaultKeySpec>,
+}
+
+impl ApfsVolumeContainerEngine {
+    pub fn new(container_uuid: &str, capacity_bytes: u64) -> Self {
+        let mut engine = Self {
+            container_uuid: container_uuid.to_string(),
+            total_capacity_bytes: capacity_bytes,
+            extents: Vec::new(),
+            firmlinks: Vec::new(),
+            volume_keys: BTreeMap::new(),
+        };
+
+        // Default macOS System <-> Data firmlinks
+        engine.add_firmlink("/Users", "/System/Volumes/Data/Users");
+        engine.add_firmlink("/Applications", "/System/Volumes/Data/Applications");
+        engine.add_firmlink("/usr/local", "/System/Volumes/Data/usr/local");
+        engine
+    }
+
+    pub fn add_firmlink(&mut self, virt_path: &str, data_path: &str) {
+        self.firmlinks.push(ApfsFirmlink {
+            virtual_path: virt_path.to_string(),
+            target_data_path: data_path.to_string(),
+        });
+    }
+
+    pub fn resolve_firmlink(&self, path: &str) -> String {
+        for link in &self.firmlinks {
+            if path == link.virtual_path || path.starts_with(&format!("{}/", link.virtual_path)) {
+                let suffix = &path[link.virtual_path.len()..];
+                return format!("{}{}", link.target_data_path, suffix);
+            }
+        }
+        path.to_string()
+    }
+
+    /// Derives FileVault 2 XTS-AES encryption key for volume
+    pub fn enable_filevault_encryption(&mut self, volume_uuid: &str, passphrase: &str) -> FileVaultKeySpec {
+        let mut key = [0u8; 32];
+        let bytes = passphrase.as_bytes();
+        for (i, &b) in bytes.iter().enumerate() {
+            key[i % 32] ^= b;
+        }
+        let spec = FileVaultKeySpec {
+            volume_uuid: volume_uuid.to_string(),
+            xts_aes_key: key,
+            is_encrypted: true,
+        };
+        self.volume_keys.insert(volume_uuid.to_string(), spec.clone());
+        spec
+    }
+
+    /// Allocates or increments refcount on shared extent blocks (CoW file cloning)
+    pub fn share_extent_block(&mut self, pblock: u64, count: usize) -> usize {
+        for ext in &mut self.extents {
+            if ext.start_pblock == pblock {
+                ext.refcount += 1;
+                return ext.refcount;
+            }
+        }
+        self.extents.push(ApfsExtentRecord {
+            start_pblock: pblock,
+            block_count: count,
+            refcount: 2, // Original + Clone
+        });
+        2
+    }
+}
+
+impl Default for ApfsVolumeContainerEngine {
+    fn default() -> Self {
+        Self::new("container-apfs-001", 512 * 1024 * 1024 * 1024)
+    }
+}
+
 /// APFS Snapshot Manager & Copy-on-Write Clone Engine
 pub struct ApfsSnapshotManager {
     pub snapshots: Vec<ApfsSnapshot>,
@@ -541,6 +646,26 @@ mod tests {
 
         assert_eq!(router.routes.len(), 1);
         assert_eq!(router.routes[0], (1, 2));
+    }
+
+    #[test]
+    fn test_apfs_volume_container_engine() {
+        let mut apfs_container = ApfsVolumeContainerEngine::new("apfs-container-uuid-101", 1024 * 1024 * 1024);
+
+        // Firmlink resolution
+        let resolved_users = apfs_container.resolve_firmlink("/Users/aaryan/Documents");
+        assert_eq!(resolved_users, "/System/Volumes/Data/Users/aaryan/Documents");
+
+        // FileVault 2 encryption key derivation
+        let fv_spec = apfs_container.enable_filevault_encryption("vol-mac-hd", "SuperSecretPassphrase");
+        assert!(fv_spec.is_encrypted);
+        assert_eq!(fv_spec.volume_uuid, "vol-mac-hd");
+
+        // Extent block refcount sharing
+        let refc1 = apfs_container.share_extent_block(0x1000, 64);
+        assert_eq!(refc1, 2);
+        let refc2 = apfs_container.share_extent_block(0x1000, 64);
+        assert_eq!(refc2, 3);
     }
 
     #[test]

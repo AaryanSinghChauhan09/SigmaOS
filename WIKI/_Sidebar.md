@@ -105,6 +105,7 @@
 - **[[Architecture Decision Records|ARCHITECTURE_DECISIONS]]**
 - **[[AI Agent Component Development Framework|Ai-Agent-Component-Development]]**
 - **[[Comprehensive OS Analysis|SIGMAOS_COMPREHENSIVE_OS_ANALYSIS]]**
+- **[[AI Agent Component Framework|SIGMAOS_AI_AGENT_COMPONENT_DEVELOPMENT_FRAMEWORK]]**
 - **[[Category:Development|Category-Development]]**
 
 ---
