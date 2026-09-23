@@ -161,10 +161,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxOmarchy
             | DistroSubsystemMode::LinuxPCLinuxOS
             | DistroSubsystemMode::LinuxSteamOS
+            | DistroSubsystemMode::LinuxVanillaOS
             | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
-
-            DistroSubsystemMode::LinuxSteamOS
-            | DistroSubsystemMode::LinuxVanillaOS => ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
@@ -291,6 +289,61 @@ impl SovereignUniversalDistroBridge {
                 | DistroSubsystemMode::SmartOs,
                 "/sys",
             ) => "/sys".to_string(),
+            (DistroSubsystemMode::LinuxNix, "/bin" | "/usr/bin") => "/run/current-system/sw/bin".to_string(),
+            (
+                DistroSubsystemMode::FreeBsd
+                | DistroSubsystemMode::OpenBsd
+                | DistroSubsystemMode::NetBsd
+                | DistroSubsystemMode::DragonFlyBsd
+                | DistroSubsystemMode::MidnightBsd
+                | DistroSubsystemMode::HardenedBsd
+                | DistroSubsystemMode::GhostBsd
+                | DistroSubsystemMode::NomadBsd
+                | DistroSubsystemMode::SmartOs,
+                "/bin" | "/usr/bin",
+            ) => "/usr/local/bin".to_string(),
+            (
+                DistroSubsystemMode::FreeBsd
+                | DistroSubsystemMode::OpenBsd
+                | DistroSubsystemMode::NetBsd
+                | DistroSubsystemMode::DragonFlyBsd
+                | DistroSubsystemMode::MidnightBsd
+                | DistroSubsystemMode::HardenedBsd
+                | DistroSubsystemMode::GhostBsd
+                | DistroSubsystemMode::NomadBsd
+                | DistroSubsystemMode::SmartOs,
+                "/usr/share",
+            ) => "/usr/local/share".to_string(),
+            (
+                DistroSubsystemMode::FreeBsd
+                | DistroSubsystemMode::GhostBsd
+                | DistroSubsystemMode::MidnightBsd
+                | DistroSubsystemMode::HardenedBsd,
+                "/home",
+            ) => "/usr/home".to_string(),
+            (DistroSubsystemMode::OpenBsd, "/etc/rc.conf") => "/etc/rc.conf.local".to_string(),
+            (
+                DistroSubsystemMode::FreeBsd
+                | DistroSubsystemMode::OpenBsd
+                | DistroSubsystemMode::NetBsd
+                | DistroSubsystemMode::DragonFlyBsd
+                | DistroSubsystemMode::MidnightBsd
+                | DistroSubsystemMode::HardenedBsd
+                | DistroSubsystemMode::GhostBsd
+                | DistroSubsystemMode::NomadBsd,
+                "/etc/pf.conf",
+            ) => "/etc/pf.conf".to_string(),
+            (
+                DistroSubsystemMode::LinuxArch
+                | DistroSubsystemMode::LinuxDebian
+                | DistroSubsystemMode::LinuxFedora
+                | DistroSubsystemMode::LinuxUbuntu
+                | DistroSubsystemMode::LinuxMint
+                | DistroSubsystemMode::LinuxAlpine
+                | DistroSubsystemMode::LinuxGentoo
+                | DistroSubsystemMode::LinuxVoid,
+                "/var/run",
+            ) => "/run".to_string(),
             _ => generic_path.to_string(),
         }
     }
@@ -328,9 +381,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxKaOS
             | DistroSubsystemMode::LinuxOmarchy
             | DistroSubsystemMode::LinuxPCLinuxOS
-            | DistroSubsystemMode::LinuxSteamOS => supervisor == ServiceSupervisorType::Systemd,
-
-            DistroSubsystemMode::LinuxSteamOS
+            | DistroSubsystemMode::LinuxSteamOS
             | DistroSubsystemMode::LinuxVanillaOS => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
@@ -5603,12 +5654,16 @@ mod tests {
         assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.pkg");
         assert_eq!(bridge.get_supervisor_type(), ServiceSupervisorType::OpenRC);
         assert_eq!(bridge.translate_vfs_path("/etc"), "/usr/local/etc");
+        assert_eq!(bridge.translate_vfs_path("/bin"), "/usr/local/bin");
+        assert_eq!(bridge.translate_vfs_path("/home"), "/usr/home");
         assert!(bridge.enforce_security_isolation(101, "/jails/web").is_ok());
         assert!(bridge.active_jail.is_some());
         assert!(bridge.verify_all_subsystems_compatibility());
 
         bridge.set_subsystem_mode(DistroSubsystemMode::OpenBsd);
         assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.tgz");
+        assert_eq!(bridge.translate_vfs_path("/etc/rc.conf"), "/etc/rc.conf.local");
+        assert_eq!(bridge.translate_vfs_path("/etc/pf.conf"), "/etc/pf.conf");
         assert!(bridge.enforce_security_isolation(102, "/var/www").is_ok());
         assert!(bridge.verify_all_subsystems_compatibility());
 
