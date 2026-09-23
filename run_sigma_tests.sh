@@ -172,6 +172,13 @@ if [ -f "src/package/sovereign_distro_package_master_suite.rs" ]; then
     ./build/sovereign_master_suite_test
 fi
 
+if [ -f "src/package/sovereign_distro_package_matrix_expansion.rs" ]; then
+    echo "Running Sovereign Distro Package Matrix Expansion test suite..."
+    mkdir -p build
+    rustc --test src/package/sovereign_distro_package_matrix_expansion.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_matrix_expansion_test
+    ./build/sovereign_matrix_expansion_test
+fi
+
 if [ -f "src/sigpkg/arch_pacman_engine.rs" ]; then
     echo "Running Arch Pacman Engine & AUR compilation test suite..."
     mkdir -p build
