@@ -17,13 +17,12 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::vec;
 use std::format;
+use std::vec;
 
-
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::string::String;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PdfError {
@@ -314,19 +313,29 @@ impl SovereignXournalPdfAnnotationEngine {
         exported.title = format!("{} (Annotated)", document.title);
 
         for page in &mut exported.pages {
-            let page_annot = self.annotations.iter().filter(|a| a.page_number == page.page_number);
+            let page_annot = self
+                .annotations
+                .iter()
+                .filter(|a| a.page_number == page.page_number);
             for annot in page_annot {
                 let stream_entry = match annot.annotation_type {
                     XournalAnnotationType::Text => {
                         format!(
                             "\n/Text ({}) BT /F1 {} Tf {:.1} {} Td Tj ET",
-                            annot.text_content, annot.font_size, annot.position_xy.0, annot.position_xy.1
+                            annot.text_content,
+                            annot.font_size,
+                            annot.position_xy.0,
+                            annot.position_xy.1
                         )
                     }
                     XournalAnnotationType::SignatureImage => {
                         format!(
                             "\n/ImageStamp ({}) Do q {:.1} 0 0 {:.1} {:.1} {:.1} cm",
-                            annot.text_content, annot.dimensions.0, annot.dimensions.1, annot.position_xy.0, annot.position_xy.1
+                            annot.text_content,
+                            annot.dimensions.0,
+                            annot.dimensions.1,
+                            annot.position_xy.0,
+                            annot.position_xy.1
                         )
                     }
                     XournalAnnotationType::FormField => {
@@ -336,7 +345,8 @@ impl SovereignXournalPdfAnnotationEngine {
                         )
                     }
                 };
-                page.content_stream.extend_from_slice(stream_entry.as_bytes());
+                page.content_stream
+                    .extend_from_slice(stream_entry.as_bytes());
             }
         }
 

@@ -182,10 +182,16 @@ impl SigmaDocsEnterpriseCollaborationEngine {
     }
 
     pub fn accept_suggestion(&mut self, sug_id: &str) -> bool {
-        if let Some(sug) = self.suggestions.iter_mut().find(|s| s.suggestion_id == sug_id) {
+        if let Some(sug) = self
+            .suggestions
+            .iter_mut()
+            .find(|s| s.suggestion_id == sug_id)
+        {
             if !sug.is_accepted {
                 sug.is_accepted = true;
-                self.content = self.content.replace(&sug.original_text, &sug.suggested_text);
+                self.content = self
+                    .content
+                    .replace(&sug.original_text, &sug.suggested_text);
                 return true;
             }
         }
@@ -372,7 +378,9 @@ mod tests {
         engine.ingest_record(r2);
 
         assert_eq!(engine.compute_metric_sum("amount"), 4000.0);
-        assert!(engine.export_dashboard_summary().contains("Sales Dashboard"));
+        assert!(engine
+            .export_dashboard_summary()
+            .contains("Sales Dashboard"));
     }
 
     #[test]
@@ -381,7 +389,11 @@ mod tests {
         let s1 = slides.add_slide("Intro", "# Welcome", "Key points for slide 1");
         assert_eq!(s1, 1);
 
-        slides.add_slide("Architecture", "Microkernel details", "Key points for slide 2");
+        slides.add_slide(
+            "Architecture",
+            "Microkernel details",
+            "Key points for slide 2",
+        );
 
         slides.start_presentation();
         assert_eq!(slides.get_current_slide().unwrap().title, "Intro");
