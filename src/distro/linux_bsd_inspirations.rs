@@ -88,6 +88,8 @@ pub enum DistroSubsystemMode {
     GhostBsd,
     NomadBsd,
     LinuxAlpineExtended,
+    LinuxVanillaOS,
+    LinuxOpenWrt,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -159,10 +161,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxOmarchy
             | DistroSubsystemMode::LinuxPCLinuxOS
             | DistroSubsystemMode::LinuxSteamOS
+            | DistroSubsystemMode::LinuxVanillaOS
             | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
-
-            DistroSubsystemMode::LinuxSteamOS
-            | DistroSubsystemMode::LinuxVanillaOS => ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
@@ -326,9 +326,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxKaOS
             | DistroSubsystemMode::LinuxOmarchy
             | DistroSubsystemMode::LinuxPCLinuxOS
-            | DistroSubsystemMode::LinuxSteamOS => supervisor == ServiceSupervisorType::Systemd,
-
-            DistroSubsystemMode::LinuxSteamOS
+            | DistroSubsystemMode::LinuxSteamOS
             | DistroSubsystemMode::LinuxVanillaOS => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
@@ -409,6 +407,8 @@ impl SovereignUniversalDistroBridge {
             }
             DistroSubsystemMode::LinuxPuppy => format!("{}.pet", input_pkg),
             DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", input_pkg),
+            DistroSubsystemMode::LinuxVanillaOS => format!("{}.vso", input_pkg),
+            DistroSubsystemMode::LinuxOpenWrt => format!("{}.ipk", input_pkg),
             DistroSubsystemMode::LinuxClear => format!("{}.bundle", input_pkg),
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::LinuxTinyCore => format!("{}.tcz", input_pkg),
@@ -479,6 +479,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxPCLinuxOS => format!("{}.rpm", action),
             DistroSubsystemMode::LinuxPuppy => format!("{}.pet", action),
             DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", action),
+            DistroSubsystemMode::LinuxVanillaOS => format!("{}.vso", action),
+            DistroSubsystemMode::LinuxOpenWrt => format!("{}.ipk", action),
             DistroSubsystemMode::LinuxClear => format!("{}.bundle", action),
             DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::DragonFlyBsd
@@ -2424,6 +2426,8 @@ mod cross_subsystem_tests {
             DistroSubsystemMode::GhostBsd,
             DistroSubsystemMode::NomadBsd,
             DistroSubsystemMode::LinuxAlpineExtended,
+            DistroSubsystemMode::LinuxVanillaOS,
+            DistroSubsystemMode::LinuxOpenWrt,
         ];
 
         for m in modes {
@@ -2462,6 +2466,14 @@ mod cross_subsystem_tests {
         let ghost_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::GhostBsd);
         assert_eq!(ghost_bridge.translate_package_specifier("app"), "app.pkg");
         assert_eq!(ghost_bridge.get_supervisor_type(), ServiceSupervisorType::OpenRC);
+
+        let vanilla_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxVanillaOS);
+        assert_eq!(vanilla_bridge.translate_package_specifier("app"), "app.vso");
+        assert_eq!(vanilla_bridge.get_supervisor_type(), ServiceSupervisorType::Systemd);
+
+        let openwrt_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxOpenWrt);
+        assert_eq!(openwrt_bridge.translate_package_specifier("app"), "app.ipk");
+        assert_eq!(openwrt_bridge.get_supervisor_type(), ServiceSupervisorType::Runit);
     }
 
     #[test]
