@@ -32,7 +32,7 @@ jobs:
           sudo apt-get install -y qemu-system-x86 qemu-utils xorriso
 
       - name: Cache cargo registry
-        uses: Swatinem/rust-cache@23bbed732f4b343a6354788775fcd2c7024ce500 # v2.7.7
+        uses: Swatinem/rust-cache@f0deed1e08d6b9a8342f0a1496a79be3464161f3 # v2.7.7
           
       - name: Format check
         run: cargo fmt --check
