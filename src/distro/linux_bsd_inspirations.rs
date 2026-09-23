@@ -161,9 +161,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxOmarchy
             | DistroSubsystemMode::LinuxPCLinuxOS
             | DistroSubsystemMode::LinuxSteamOS
-            | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
-
-            DistroSubsystemMode::LinuxVanillaOS => ServiceSupervisorType::Systemd,
+            | DistroSubsystemMode::BedrockLinux
+            | DistroSubsystemMode::LinuxVanillaOS => ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
@@ -327,9 +326,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxKaOS
             | DistroSubsystemMode::LinuxOmarchy
             | DistroSubsystemMode::LinuxPCLinuxOS
-            | DistroSubsystemMode::LinuxSteamOS => supervisor == ServiceSupervisorType::Systemd,
-
-            DistroSubsystemMode::LinuxVanillaOS => supervisor == ServiceSupervisorType::Systemd,
+            | DistroSubsystemMode::LinuxSteamOS
+            | DistroSubsystemMode::LinuxVanillaOS => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
