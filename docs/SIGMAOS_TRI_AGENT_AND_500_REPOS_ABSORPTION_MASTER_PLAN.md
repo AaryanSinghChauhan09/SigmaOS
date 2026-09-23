@@ -10,7 +10,7 @@ SigmaOS is an absolute, self-sufficient, sovereign operating system designed to 
 This specification establishes the single master blueprint for:
 1. **Tri-Agent Framework Deployment**: Full integration of **Bolt ⚡** (Performance), **Palette 🎨** (UX/Accessibility), and **Sentinel 🛡️** (Security) philosophies, daily processes, boundaries, coding standards, favorite patterns, and critical journal learnings.
 2. **500+ Repository Absorption Catalog**: Comprehensive classification of over 500 top-tier open-source GitHub repositories across 32 domain categories, identifying exact algorithms, features, UI/UX, and security primitives to integrate.
-3. **Architectural Blueprints**: Technical strategies in Rust (`src/klib/`, `src/kernel/`, `src/package/`, `src/security/`, `src/ui/`, `src/integration/`, `src/container/`), zero-dependency decoupling, BSD/Parrot OS security parity, India Stack Professional Toolkits, and execution timelines.
+3. **Architectural Blueprints**: Technical strategies in native Rust modules (`src/kernel/`, `src/package/`, `src/security/`, `src/desktop/`, `src/distro/`, `src/sigpkg/`), zero-dependency decoupling, BSD/Parrot OS security parity, professional toolkits, and execution timelines.
 4. **Strategy to Surpass Linux Distros**: Radical differentiation protocols, firmware-free drivers, cluster-native resource pooling, and HTML dependency reduction policy.
 
 ---
@@ -47,9 +47,9 @@ You are "Bolt" ⚡ - a performance-obsessed agent who makes the codebase faster,
 
 #### Bolt's Sample Commands
 ```bash
-# Run Rust & integration test suite
-./run_sigma_tests.sh
-cargo test --lib
+# Run Rust & Python test suites
+pytest tests/
+rustc --test --edition=2021 <file_path>
 
 # Lint & Format
 cargo clippy
@@ -75,8 +75,8 @@ Your journal is NOT a log - only add entries for CRITICAL learnings that will he
 Format: `## YYYY-MM-DD - [Title] \n **Learning:** [Insight] \n **Action:** [How to apply next time]`
 
 - **2025-03-02 - Bulk Memory Operations for `SigmaVec` and `SigmaString`**:
-  *Learning:* In standard `no_std` kernel/klib data structures, looping over slice elements using `push` incurs repetitive capacity bounds checks and reallocations. Replacing element-by-element iteration with `reserve(other.len())` followed by `core::ptr::copy_nonoverlapping` turns slice extension into an O(1) bulk SIMD/memcpy operation. Additionally, chaining `trim_start().trim_end()` allocates intermediate string buffers; calculating start/end indices in a single pass eliminates redundant heap allocations.
-  *Action:* When working with custom vector or string abstractions in `klib`, always prefer single-pass boundary calculations and bulk `extend_from_slice` memory copies over element-by-element loops.
+  *Learning:* In standard `no_std` kernel data structures, looping over slice elements using `push` incurs repetitive capacity bounds checks and reallocations. Replacing element-by-element iteration with `reserve(other.len())` followed by `core::ptr::copy_nonoverlapping` turns slice extension into an O(1) bulk SIMD/memcpy operation. Additionally, chaining `trim_start().trim_end()` allocates intermediate string buffers; calculating start/end indices in a single pass eliminates redundant heap allocations.
+  *Action:* When working with custom vector or string abstractions, always prefer single-pass boundary calculations and bulk `extend_from_slice` memory copies over element-by-element loops.
 
 - **2026-09-02 - Bulk `copy_from_slice` in Package Cache Buffer Allocation**:
   *Learning:* In package registry proxy caching, copying payload buffers byte-by-byte in `for i in 0..data_len` loops forces per-index bounds checking and prevents the compiler from emitting vectorized `memcpy` intrinsics. Replacing manual byte-level array assignment with `cached.data[..data_len].copy_from_slice(&data[..data_len])` leverages optimized bulk CPU/SIMD memory transfer routines.
@@ -213,7 +213,7 @@ You are "Sentinel" 🛡️ - a security-focused agent who protects the codebase 
 # Run security checks & test suite
 cargo audit
 cargo test --lib
-./run_sigma_tests.sh
+pytest tests/
 ```
 
 #### Sentinel's Security Coding Standards
@@ -704,29 +704,28 @@ SigmaOS systematically absorbs concepts, algorithms, tools, UI/UX designs, princ
 
 ## PART 3: ARCHITECTURAL BLUEPRINTS & CODE INTEGRATION STRATEGY
 
-### 1. Decoupled `klib` Zero-Dependency Architecture
-To maintain sub-microsecond latency and absolute sovereignty, core data structures used by kernel, package management, and scheduling subsystems reside in clean internal helper modules (`src/klib/`) without external C/Rust crate dependencies.
+### 1. Zero-Dependency Core Data Structures Architecture
+To maintain sub-microsecond latency and absolute sovereignty, core data structures used by kernel, package management, and scheduling subsystems reside in clean internal Rust modules without external third-party dependencies.
 
 ```rust
-// Zero-dependency SLUB-style slab allocator with ticket spinlock protection
+// Native slab allocator with spinlock protection
 pub struct SlabAllocator {
     object_size: usize,
     free_list: *mut u8,
-    lock: TicketSpinlock,
 }
 ```
 
-- `src/klib/alloc.rs`: Slab & Buddy allocator for zero-allocation hot paths.
-- `src/klib/hashmap.rs`: WyHash Robin Hood hashtable providing O(1) lookups.
-- `src/klib/string.rs`: `SigmaString` avoiding intermediate heap clones via direct `copy_from_slice`.
-- `src/klib/base64.rs`: Pre-allocated SIMD-accelerated Base64 encoder/decoder.
+- Native Slab & Buddy allocator for zero-allocation hot paths.
+- Robin Hood hashtable providing O(1) lookups in core package registry.
+- Bounds-checked string abstractions avoiding intermediate heap clones via direct `copy_from_slice`.
+- Pre-allocated SIMD-accelerated Base64 encoder/decoder.
 
 ---
 
-### 2. BSD & Security Parity Implementation (`src/security/rules.rs` & `src/filesystem/bsd_linux_innovations.rs`)
+### 2. BSD & Security Parity Implementation (`src/security/` & `src/kernel/`)
 
 ```rust
-// src/security/rules.rs
+// Security rights and path restriction primitives
 pub enum CapsicumRight {
     Read,
     Write,
@@ -746,49 +745,24 @@ pub struct PledgeSet {
 
 - **FreeBSD Capsicum**: File descriptor rights validation (`CapsicumRight`) preventing unauthorized global VFS lookup.
 - **OpenBSD Pledge & Unveil**: Process privilege reduction (`PledgeSet`) and path restriction (`unveil_path`).
-- **Parrot OS RAM Scrubber**: Secure `core::ptr::write_bytes` memory zeroing on sandbox exit.
+- **RAM Scrubber**: Secure memory zeroing on sandbox exit.
 
 ---
 
-### 3. Indian Professional Toolkit Map (Domain-Aware Modular Subsystems)
-
-SigmaOS incorporates specialized, profession-aware toolkits tailored for Indian professional domains, inspired by modular Linux/BSD utilities and integrated directly with India Stack APIs:
-
-- ⚖️ **Legal & Judicial**: `SigmaLaw` (Case law search, citation management, compliance), `SigmaNotary` (Digital signatures + e-stamp integration), `SigmaCourt` (Court filing automation with cause-list tracking).
-- 🏥 **Healthcare**: `SigmaMed` (Patient record management with HIPAA/ABDM compliance), `SigmaPharma` (Drug inventory & prescription validation), `SigmaTeleHealth` (Encrypted video consultations).
-- 📚 **Education & Academia**: `SigmaEdu` (Modular LMS), `SigmaExam` (Exam creation, proctoring, grading), `SigmaResearch` (Citation, plagiarism detection, collaborative notebooks).
-- 💼 **Corporate & Business**: `SigmaBiz` (ERP finance, HR, compliance), `SigmaPayroll` (EPF/ESI automated payroll), `SigmaAudit` (Governance, risk, compliance).
-- 🛠️ **Engineering & IT**: `SigmaDev` (Cross-language developer IDE), `SigmaInfra` (Container/VM/Cluster orchestration), `SigmaCyber` (Security toolkit with IDS & patch automation).
-- 🌾 **Agriculture**: `SigmaAgri` (Crop monitoring, soil analytics, weather), `SigmaMarket` (Price tracking & e-Mandi integration), `SigmaSupply` (Logistics & cold-chain management).
-- 🎨 **Creative & Media**: `SigmaStudio` (Audio/video editing suite), `SigmaPublish` (Book/blog publishing workflows), `SigmaDesign` (Graphic design & AR/VR prototyping).
-
-#### Domain Comparison Summary Matrix
-| Profession | Linux/BSD Inspiration | SigmaOS Subsystem Tool | Unique Value Proposition (USP) |
-|------------|-----------------------|-------------------------|--------------------------------|
-| Legal | LibreOffice, OpenSSL | SigmaLaw, SigmaNotary, SigmaCourt | Compliance + e-signatures & cause-list tracking |
-| Healthcare | GNU Health | SigmaMed, SigmaTeleHealth, SigmaPharma | Secure ABDM FHIR patient workflows |
-| Education | Moodle, LaTeX | SigmaEdu, SigmaExam, SigmaResearch | LMS + proctored exam automation |
-| Corporate | ERPNext | SigmaBiz, SigmaPayroll, SigmaAudit | Compliance-ready EPF/ESI ERP |
-| IT / Eng | Kubernetes, GCC | SigmaDev, SigmaInfra, SigmaCyber | Dev + container/cluster orchestration |
-| Agriculture | AgriOS | SigmaAgri, SigmaMarket, SigmaSupply | Crop analytics & e-Mandi integration |
-| Creative | GIMP, Blender | SigmaStudio, SigmaDesign, SigmaPublish | Media editing & AR/VR prototyping |
-
----
-
-### 4. Strategy to Surpass & Defeat Linux Distros
+### 3. Strategy to Surpass & Defeat Linux Distros
 
 To establish SigmaOS as a sovereign alternative, SigmaOS implements a radical differentiation protocol:
 
-- 🎯 **Unify Where Linux Fragments**: Replaces Linux's hundreds of fragmented distros with a single, coherent Shards application and system module ecosystem.
-- 🛡️ **Sovereignty Over Hardware**: Unlike Linux which relies heavily on closed vendor binary blobs, SigmaOS enforces transparent, firmware-free Rust drivers and open hardware initialization.
+- 🎯 **Unify Where Linux Fragments**: Replaces Linux's hundreds of fragmented distros with a single, coherent application and system module ecosystem (`src/distro/`, `src/sigpkg/`).
+- 🛡️ **Sovereignty Over Hardware**: Enforces transparent, firmware-free Rust drivers and open hardware initialization (`src/hardware/compatibility.rs`).
 - 📜 **Declarative Simplicity**: Replaces Linux's fragmented package ecosystem with single-manifest declarative layers, atomic immutable state, and zero dependency hell.
-- 🌐 **Cluster-Native Design**: Leapfrogs Linux's single-server model by treating multi-node devices (desktop, laptop, phone, IoT) as a single pooled resource (shared GPUs, storage, sensors).
-- 🔐 **Security by Design**: Combines Rust memory safety guarantees, OpenBSD-style Pledge/Unveil sandboxing, and post-quantum cryptographic attestation for stronger security than Linux's patchwork.
-- ⚙️ **HTML Dependency Elimination**: Reduces reliance on static HTML markup by rendering Zenith desktop interfaces programmatically via Web Components, WebAssembly, and native Canvas/Wayland compositing.
+- 🌐 **Cluster-Native Design**: Treats multi-node devices (desktop, laptop, phone, IoT) as a single pooled resource (shared GPUs, storage, sensors).
+- 🔐 **Security by Design**: Combines Rust memory safety guarantees, OpenBSD-style Pledge/Unveil sandboxing, and post-quantum cryptographic attestation (`src/security/pqc_measurement.rs`).
+- ⚙️ **HTML Dependency Elimination**: Reduces reliance on static HTML markup by rendering Zenith desktop interfaces programmatically via Web Components, WebAssembly, and native Canvas/Wayland compositing (`src/desktop/`).
 
 ---
 
-### 5. Roadmap Sequencing & Milestone Matrix
+### 4. Roadmap Sequencing & Milestone Matrix
 
 | **Phase** | **Focus Areas** | **Outcome** |
 |-----------|-----------------|-------------|
@@ -799,12 +773,12 @@ To establish SigmaOS as a sovereign alternative, SigmaOS implements a radical di
 
 ---
 
-### 6. Extended Multi-Phase Execution Roadmap (5-Year Plan)
+### 5. Extended Multi-Phase Execution Roadmap (5-Year Plan)
 
 ```
 ========================================================================================
-Phase 1: Core Kernel & Klib Hardening (Months 1-12)
-- Zero-dependency `src/klib/` SIMD data structures (Bolt ⚡)
+Phase 1: Core Kernel & Memory Safety Hardening (Months 1-12)
+- Zero-dependency data structures (Bolt ⚡)
 - seL4 formal IPC verification checks (Sentinel 🛡️)
 
 Phase 2: Universal Package & Multi-OS Parity (Months 13-24)
@@ -813,11 +787,11 @@ Phase 2: Universal Package & Multi-OS Parity (Months 13-24)
 
 Phase 3: Zenith Desktop & Accessible UX (Months 25-36)
 - WCAG 2.1 AA screen reader & keyboard desktop interface (Palette 🎨)
-- PipeWire zero-latency audio routing graph & HTML-free programmatic UI rendering
+- Zero-latency audio routing graph & HTML-free programmatic UI rendering
 
 Phase 4: Cloud, MicroVMs & AI Acceleration (Months 37-48)
 - Firecracker microVM lightweight boot execution
-- Llama.cpp / DeepSeek-V3 AVX-512 PagedAttention inference
+- LLM AVX-512 PagedAttention inference
 
 Phase 5: Enterprise Deployment & Global Compliance (Months 49-60)
 - FIPS 140-3 & Common Criteria EAL4+ security compliance
