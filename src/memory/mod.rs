@@ -17,6 +17,7 @@ pub mod segmentation_paging;
 pub mod tlb_associative;
 pub mod zone;
 pub mod demand_paging;
+pub mod asid_pcid;
 
 pub use paging::{
     MemoryError, PageDirectory, PageDirectoryPointerTable, PageTable, PageTableEntry,
@@ -37,4 +38,7 @@ pub use demand_paging::{
     DemandPagingManager, LruPageReplacer, MemoryPage, DemandPagingStats,
     PageFaultError, PageState, PageTableFlags as DemandPagingFlags, Pfn, SwapDevice, SwapEntry,
     VirtualAddress as DemandPagingVirtualAddress,
+};
+pub use asid_pcid::{
+    AddressSpaceIdentifierEngine, InvpcidMode, PcidDescriptor, CR3_NOFLUSH_BIT, KPTI_USER_PCID_MASK, MAX_X86_PCID,
 };
