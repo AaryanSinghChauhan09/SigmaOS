@@ -185,10 +185,20 @@ impl MultiFormatPrTranspilationEngine {
 
         // Parse foreign dependencies from manifest
         for line in pr.raw_manifest_content.lines() {
-            if line.starts_with("depends=") || line.starts_with("Depends:") || line.starts_with("DEPENDS=") {
+            let lower = line.to_lowercase();
+            if lower.starts_with("depends=")
+                || lower.starts_with("depends:")
+                || lower.starts_with("rdepends=")
+                || lower.starts_with("build-depends:")
+                || lower.starts_with("requires=")
+                || lower.starts_with("pkg_deps=")
+            {
                 let deps_part = line.split('=').nth(1).or_else(|| line.split(':').nth(1)).unwrap_or("");
                 for dep in deps_part.split_whitespace() {
-                    sigma_pkg = sigma_pkg.with_dependency(dep.trim_matches(',').to_string());
+                    let cleaned = dep.trim_matches(|c| c == ',' || c == '"' || c == '\'' || c == '(' || c == ')');
+                    if !cleaned.is_empty() {
+                        sigma_pkg = sigma_pkg.with_dependency(cleaned.to_string());
+                    }
                 }
             }
         }
