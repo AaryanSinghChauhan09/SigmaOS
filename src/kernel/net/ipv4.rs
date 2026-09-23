@@ -118,6 +118,10 @@ pub enum ArpState {
     Incomplete,
     Reachable,
     Stale,
+    Delay,
+    Probe,
+    Permanent,
+    Failed,
 }
 
 #[derive(Debug, Clone)]
@@ -125,6 +129,9 @@ pub struct ArpEntry {
     pub ip: Ipv4Addr,
     pub mac: MacAddr,
     pub state: ArpState,
+    pub created_at_ticks: u64,
+    pub ttl_ticks: u64,
+    pub is_static: bool,
 }
 
 pub struct ArpTable {
@@ -144,14 +151,71 @@ impl ArpTable {
     }
 
     pub fn insert(&mut self, ip: Ipv4Addr, mac: MacAddr) {
+        self.insert_with_ttl(ip, mac, 300, false);
+    }
+
+    pub fn insert_static(&mut self, ip: Ipv4Addr, mac: MacAddr) {
+        self.insert_with_ttl(ip, mac, u64::MAX, true);
+    }
+
+    pub fn insert_with_ttl(&mut self, ip: Ipv4Addr, mac: MacAddr, ttl_ticks: u64, is_static: bool) {
+        let state = if is_static { ArpState::Permanent } else { ArpState::Reachable };
         self.entries.insert(
             ip,
             ArpEntry {
                 ip,
                 mac,
-                state: ArpState::Reachable,
+                state,
+                created_at_ticks: 0,
+                ttl_ticks,
+                is_static,
             },
         );
+    }
+
+    pub fn flush_stale_entries(&mut self, current_ticks: u64) -> usize {
+        let mut to_remove = Vec::new();
+        for (ip, entry) in self.entries.iter_mut() {
+            if entry.is_static || entry.state == ArpState::Permanent {
+                continue;
+            }
+            if current_ticks.saturating_sub(entry.created_at_ticks) >= entry.ttl_ticks {
+                if entry.state == ArpState::Reachable {
+                    entry.state = ArpState::Stale;
+                } else if entry.state == ArpState::Stale {
+                    entry.state = ArpState::Failed;
+                    to_remove.push(*ip);
+                }
+            }
+        }
+        let removed_count = to_remove.len();
+        for ip in to_remove {
+            self.entries.remove(&ip);
+        }
+        removed_count
+    }
+
+    /// Construct a Gratuitous ARP packet (ARP Request or Reply announcing IP/MAC mapping to LAN)
+    pub fn build_gratuitous_arp_packet(sender_ip: Ipv4Addr, sender_mac: MacAddr, is_reply: bool) -> Vec<u8> {
+        let mut packet = Vec::with_capacity(42);
+        // Ethernet Header
+        packet.extend_from_slice(&[0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]); // Broadcast dst
+        packet.extend_from_slice(&sender_mac);                           // Src MAC
+        packet.extend_from_slice(&[0x08, 0x06]);                         // EtherType ARP (0x0806)
+
+        // ARP Payload
+        packet.extend_from_slice(&[0x00, 0x01]);                         // Hardware Type: Ethernet (1)
+        packet.extend_from_slice(&[0x08, 0x00]);                         // Protocol Type: IPv4 (0x0800)
+        packet.push(6);                                                   // HW Size: 6
+        packet.push(4);                                                   // Proto Size: 4
+        let opcode: u16 = if is_reply { 2 } else { 1 };
+        packet.extend_from_slice(&opcode.to_be_bytes());                 // Opcode
+        packet.extend_from_slice(&sender_mac);                           // Sender HW Addr
+        packet.extend_from_slice(&sender_ip);                            // Sender Proto Addr
+        packet.extend_from_slice(&[0x00, 0x00, 0x00, 0x00, 0x00, 0x00]); // Target HW Addr (unknown / zero)
+        packet.extend_from_slice(&sender_ip);                            // Target Proto Addr (own IP for gratuitous ARP)
+
+        packet
     }
 
     pub fn lookup(&self, ip: &Ipv4Addr) -> Option<&ArpEntry> {
@@ -425,5 +489,29 @@ mod tests {
                                                                     // Only loopback route exists
         let result = stack.send([8, 8, 8, 8], 1, &[]);
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_arp_table_gratuitous_and_eviction() {
+        let mut arp = ArpTable::new();
+        arp.insert_static([192, 168, 1, 1], [0x11, 0x22, 0x33, 0x44, 0x55, 0x66]);
+        arp.insert_with_ttl([192, 168, 1, 2], [0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF], 10, false);
+
+        assert_eq!(arp.lookup(&[192, 168, 1, 1]).unwrap().state, ArpState::Permanent);
+        assert_eq!(arp.lookup(&[192, 168, 1, 2]).unwrap().state, ArpState::Reachable);
+
+        // At 15 ticks, Reachable -> Stale
+        arp.flush_stale_entries(15);
+        assert_eq!(arp.lookup(&[192, 168, 1, 2]).unwrap().state, ArpState::Stale);
+
+        // At 25 ticks, Stale -> Failed & Removed
+        let removed = arp.flush_stale_entries(25);
+        assert_eq!(removed, 1);
+        assert!(arp.lookup(&[192, 168, 1, 2]).is_none());
+        assert!(arp.lookup(&[192, 168, 1, 1]).is_some()); // Static retained
+
+        let garp = ArpTable::build_gratuitous_arp_packet([10, 0, 0, 1], [0x00, 0x11, 0x22, 0x33, 0x44, 0x55], false);
+        assert_eq!(garp.len(), 42);
+        assert_eq!(&garp[0..6], &[0xFF; 6]); // Broadcast Ethernet
     }
 }
