@@ -5,3 +5,7 @@
 ## 2026-09-20 - Synchronized ARIA State for Keyboard-Toggled Modal Overlays
 **Learning:** When toggling modal dialog overlays (such as `#cmd-palette`) via keyboard shortcuts (`Alt+Space`) and dismissal keys (`Escape`), `aria-hidden` ("false" when visible, "true" when hidden) must be synchronized on both opening and closing triggers alongside `aria-modal="true"` to prevent accessibility regressions for screen reader users on repeated toggles.
 **Action:** Always update `aria-hidden` and shift focus in both toggle-open and toggle-close handlers for modal dialog components.
+
+## 2026-09-25 - ARIA Switch Role & State Synchronization for Custom Toggle Controls
+**Learning:** Custom UI toggle switches using `<input type="checkbox">` elements (e.g., inside `.toggle-switch` wrappers in Zenith Desktop settings) are exposed to assistive technology as standard checkboxes unless annotated with `role="switch"` and dynamically synchronized `aria-checked` ("true"/"false") attributes on `change` events to comply with WAI-ARIA switch patterns.
+**Action:** Always assign `role="switch"` and attach change event listeners to synchronize `aria-checked` whenever introducing custom toggle controls in Zenith Desktop.

@@ -16,6 +16,7 @@ pub mod paging;
 pub mod segmentation_paging;
 pub mod tlb_associative;
 pub mod zone;
+pub mod demand_paging;
 
 pub use paging::{
     MemoryError, PageDirectory, PageDirectoryPointerTable, PageTable, PageTableEntry,
@@ -32,3 +33,8 @@ pub use segmentation_paging::{
 pub use tlb_associative::{AssociativeTlbCache, TlbAssociativityMode, TlbEntry, TlbPageFlags};
 pub use zone::{BsdZoneAllocator, Slab, Zone, ZoneStats};
 pub use quota::{MemoryController, MemoryStats, MemoryUnit, OomEvent, OomPolicy, ProcessMemoryAccount, PageCacheStat};
+pub use demand_paging::{
+    DemandPagingManager, LruPageReplacer, MemoryPage, DemandPagingStats,
+    PageFaultError, PageState, PageTableFlags as DemandPagingFlags, Pfn, SwapDevice, SwapEntry,
+    VirtualAddress as DemandPagingVirtualAddress,
+};

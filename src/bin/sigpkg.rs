@@ -128,6 +128,14 @@ mod tests {
         assert_eq!(bsd_pkg.source_pm, "pkg");
         assert_eq!(bsd_pkg.operation, UniversalPmOperation::Install);
         assert!(bsd_pkg.dry_run);
+
+        let freebsd = dispatcher.dispatch_command("freebsd install postgresql").unwrap();
+        assert_eq!(freebsd.source_pm, "freebsd");
+        assert_eq!(freebsd.operation, UniversalPmOperation::Install);
+
+        let debian = dispatcher.dispatch_command("debian install nginx").unwrap();
+        assert_eq!(debian.source_pm, "debian");
+        assert_eq!(debian.operation, UniversalPmOperation::Install);
     }
 
     #[test]

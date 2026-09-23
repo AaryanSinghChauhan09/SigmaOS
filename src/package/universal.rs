@@ -2358,6 +2358,51 @@ impl SovereignPackageRollbackEngine {
     }
 }
 
+/// Command translation bridge for foreign package manager CLI invocations (`apt`, `pacman`, `dnf`, `apk`, `emerge`, `pkg`)
+pub struct UniversalPackageCommandBridge;
+
+impl UniversalPackageCommandBridge {
+    pub fn translate_cli_command(pm_name: &str, action: &str, pkg: &str) -> Result<String, &'static str> {
+        match pm_name.to_lowercase().as_str() {
+            "apt" | "apt-get" | "dpkg" => match action {
+                "install" | "add" => Ok(format!("sigpkg install {}.deb", pkg)),
+                "remove" | "purge" => Ok(format!("sigpkg remove {}", pkg)),
+                "update" | "upgrade" => Ok("sigpkg update".to_string()),
+                _ => Ok(format!("sigpkg {}", action)),
+            },
+            "pacman" | "yay" | "paru" => match action.to_lowercase().as_str() {
+                "-s" | "-sync" | "install" => Ok(format!("sigpkg install {}.pkg.tar.zst", pkg)),
+                "-r" | "-remove" => Ok(format!("sigpkg remove {}", pkg)),
+                "-syu" | "update" => Ok("sigpkg update".to_string()),
+                _ => Ok(format!("sigpkg {}", action)),
+            },
+            "dnf" | "yum" | "zypper" => match action {
+                "install" | "in" => Ok(format!("sigpkg install {}.rpm", pkg)),
+                "remove" | "rm" => Ok(format!("sigpkg remove {}", pkg)),
+                "update" | "up" => Ok("sigpkg update".to_string()),
+                _ => Ok(format!("sigpkg {}", action)),
+            },
+            "apk" => match action {
+                "add" => Ok(format!("sigpkg install {}.apk", pkg)),
+                "del" => Ok(format!("sigpkg remove {}", pkg)),
+                "upgrade" => Ok("sigpkg update".to_string()),
+                _ => Ok(format!("sigpkg {}", action)),
+            },
+            "emerge" | "portage" => match action {
+                "install" | "add" => Ok(format!("sigpkg install {}.ebuild", pkg)),
+                "unmerge" | "deselect" => Ok(format!("sigpkg remove {}", pkg)),
+                _ => Ok(format!("sigpkg {}", action)),
+            },
+            "pkg" | "ports" => match action {
+                "install" => Ok(format!("sigpkg install {}.pkg", pkg)),
+                "delete" | "remove" => Ok(format!("sigpkg remove {}", pkg)),
+                _ => Ok(format!("sigpkg {}", action)),
+            },
+            _ => Ok(format!("sigpkg install {}", pkg)),
+        }
+    }
+}
+
 /// Universal Package Format Transpilation Bridge
 /// Auto-detects foreign Linux and BSD package formats and converts them into native `UnifiedPackage` instances
 pub struct UniversalPackageFormatBridge;
@@ -2915,5 +2960,48 @@ mod tests {
         let apk_pkg = UniversalPackageFormatBridge::detect_and_transpile("busybox.apk", b"apk_payload").unwrap();
         assert!(apk_pkg.formats.contains(&PackageFormat::Apk));
         assert!(apk_pkg.dependencies.contains(&"musl".to_string()));
+    }
+
+    #[test]
+    fn test_universal_package_command_translation() {
+        assert_eq!(
+            UniversalPackageCommandBridge::translate_cli_command("apt", "install", "curl").unwrap(),
+            "sigpkg install curl.deb"
+        );
+        assert_eq!(
+            UniversalPackageCommandBridge::translate_cli_command("pacman", "-S", "neofetch").unwrap(),
+            "sigpkg install neofetch.pkg.tar.zst"
+        );
+        assert_eq!(
+            UniversalPackageCommandBridge::translate_cli_command("dnf", "install", "nginx").unwrap(),
+            "sigpkg install nginx.rpm"
+        );
+        assert_eq!(
+            UniversalPackageCommandBridge::translate_cli_command("apk", "add", "htop").unwrap(),
+            "sigpkg install htop.apk"
+        );
+        assert_eq!(
+            UniversalPackageCommandBridge::translate_cli_command("emerge", "install", "zsh").unwrap(),
+            "sigpkg install zsh.ebuild"
+        );
+        assert_eq!(
+            UniversalPackageCommandBridge::translate_cli_command("pkg", "install", "git").unwrap(),
+            "sigpkg install git.pkg"
+        );
+    }
+
+    #[test]
+    fn test_universal_package_format_bridge_multi_distro() {
+        let arch_pkg = UniversalPackageFormatBridge::detect_and_transpile("hyprland.pkg.tar.zst", b"zst_data").unwrap();
+        assert!(arch_pkg.formats.contains(&PackageFormat::Pacman));
+        assert!(arch_pkg.provides.contains(&"arch_compat".to_string()));
+
+        let freebsd_pkg = UniversalPackageFormatBridge::detect_and_transpile("vim.pkg", b"pkg_data").unwrap();
+        assert!(freebsd_pkg.formats.contains(&PackageFormat::Pkg));
+        assert!(freebsd_pkg.provides.contains(&"freebsd_compat".to_string()));
+
+        let nix_pkg = UniversalPackageFormatBridge::detect_and_transpile("bash.nixpkg", b"nix_data").unwrap();
+        assert!(nix_pkg.formats.contains(&PackageFormat::Nixpkg));
+        assert!(nix_pkg.provides.contains(&"nixos_compat".to_string()));
     }
 }

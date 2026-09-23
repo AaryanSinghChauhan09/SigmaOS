@@ -623,9 +623,9 @@ mod tests {
     fn test_installation_summary() {
         let mut wizard = GuiInstallerWizard::new();
         wizard.select_disk("/dev/nvme0n1");
-        // Use proper test fixture for password
+        // Use environment variable for password - fail gracefully if not set
         let sample_pass = std::env::var("SIGMA_TEST_PASSWORD")
-            .unwrap_or_else(|_| "test_password_placeholder".to_string());
+            .expect("SIGMA_TEST_PASSWORD environment variable must be set for this test");
         wizard.add_user_account(UserAccount::new("sovereign", &sample_pass));
 
         let summary = wizard.get_installation_summary();

@@ -3095,10 +3095,12 @@ impl OpenBsdRetguardEngine {
     }
 
     pub fn enter_function(&mut self, func_name: &str, secret_key: u64, sp: u64) -> u64 {
-        let mut hash: u64 = 0xcbf29ce484222325;
+        const FNV_OFFSET_BASIS: u64 = 0xcbf29ce484222325;
+        const FNV_PRIME: u64 = 0x100000001b3;
+        let mut hash = FNV_OFFSET_BASIS;
         for &b in func_name.as_bytes() {
             hash ^= b as u64;
-            hash = hash.wrapping_mul(0x100000001b3);
+            hash = hash.wrapping_mul(FNV_PRIME);
         }
         secret_key ^ hash ^ sp
     }

@@ -772,6 +772,212 @@ impl Default for BackupRecoveryEngine {
 }
 
 // ============================================================================
+// 16. FRAPPE LOW-CODE DOCTYPE & WORKFLOW ENGINE (Inspired by Frappe.io)
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct FrappeDocField {
+    pub fieldname: String,
+    pub label: String,
+    pub fieldtype: String, // Data, Int, Select, Link, Currency
+    pub reqd: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct FrappeDocTypeSchema {
+    pub doctype_name: String,
+    pub module: String,
+    pub fields: Vec<FrappeDocField>,
+    pub is_submittable: bool,
+}
+
+pub struct FrappeLowCodeDocTypeEngine {
+    pub doctypes: BTreeMap<String, FrappeDocTypeSchema>,
+    pub document_store: BTreeMap<String, BTreeMap<String, String>>,
+}
+
+impl FrappeLowCodeDocTypeEngine {
+    pub fn new() -> Self {
+        Self {
+            doctypes: BTreeMap::new(),
+            document_store: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_doctype(&mut self, name: &str, module: &str, submittable: bool) {
+        self.doctypes.insert(
+            String::from(name),
+            FrappeDocTypeSchema {
+                doctype_name: String::from(name),
+                module: String::from(module),
+                fields: Vec::new(),
+                is_submittable: submittable,
+            },
+        );
+    }
+
+    pub fn add_field(&mut self, doctype: &str, fieldname: &str, label: &str, ftype: &str, reqd: bool) -> bool {
+        if let Some(dt) = self.doctypes.get_mut(doctype) {
+            dt.fields.push(FrappeDocField {
+                fieldname: String::from(fieldname),
+                label: String::from(label),
+                fieldtype: String::from(ftype),
+                reqd,
+            });
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn insert_document(&mut self, doctype: &str, doc_id: &str, values: BTreeMap<String, String>) -> bool {
+        if self.doctypes.contains_key(doctype) {
+            let key = format!("{}:{}", doctype, doc_id);
+            self.document_store.insert(key, values);
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for FrappeLowCodeDocTypeEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 17. TECHPOWERUP GPU HARDWARE SPECS & VRAM BANDWIDTH ENGINE (Inspired by TechPowerUp)
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct TechPowerUpGpuSpec {
+    pub card_name: String,
+    pub architecture: String,
+    pub base_clock_mhz: u32,
+    pub boost_clock_mhz: u32,
+    pub vram_mb: u32,
+    pub bus_width_bits: u32,
+    pub memory_clock_mhz: u32,
+    pub tdp_watts: u32,
+}
+
+pub struct TechPowerUpGpuDatabaseEngine {
+    pub gpu_database: BTreeMap<String, TechPowerUpGpuSpec>,
+}
+
+impl TechPowerUpGpuDatabaseEngine {
+    pub fn new() -> Self {
+        Self {
+            gpu_database: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_gpu(&mut self, spec: TechPowerUpGpuSpec) {
+        self.gpu_database.insert(spec.card_name.clone(), spec);
+    }
+
+    pub fn calculate_vram_bandwidth_gbps(&self, card_name: &str) -> Option<f64> {
+        let spec = self.gpu_database.get(card_name)?;
+        // Bandwidth (GB/s) = (Bus Width in Bits / 8) * Memory Clock in MHz * Effective Data Rate Multiplier (GDDR6X effective multiplier=16) / 1000
+        let effective_multiplier = 16.0;
+        let bus_bytes = spec.bus_width_bits as f64 / 8.0;
+        let clock_ghz = spec.memory_clock_mhz as f64 / 1000.0;
+        Some(bus_bytes * clock_ghz * effective_multiplier)
+    }
+}
+
+impl Default for TechPowerUpGpuDatabaseEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 18. ANDROID POLICE CUSTOM ROM SIDELOAD & MICROG STUB ENGINE (Inspired by Android Police & XDA)
+// ============================================================================
+
+pub struct AndroidPoliceCustomRomSideloadEngine {
+    pub slot_a_active: bool,
+    pub microg_play_services_stub_active: bool,
+    pub signature_spoofing_permitted: bool,
+    pub sideloaded_apks: Vec<String>,
+}
+
+impl AndroidPoliceCustomRomSideloadEngine {
+    pub fn new() -> Self {
+        Self {
+            slot_a_active: true,
+            microg_play_services_stub_active: true,
+            signature_spoofing_permitted: true,
+            sideloaded_apks: Vec::new(),
+        }
+    }
+
+    pub fn switch_ab_partition_slot(&mut self) -> &str {
+        self.slot_a_active = !self.slot_a_active;
+        if self.slot_a_active { "Slot A" } else { "Slot B" }
+    }
+
+    pub fn sideload_apk_package(&mut self, apk_name: &str) -> bool {
+        if self.microg_play_services_stub_active {
+            self.sideloaded_apks.push(String::from(apk_name));
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for AndroidPoliceCustomRomSideloadEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 19. HWBUSTERS ATX 3.1 PSU TRANSIENT & VOLTAGE RIPPLE TELEMETRY (Inspired by HWBusters)
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct HwbustersPsuEfficiencyTelemetryEngine {
+    pub rated_wattage: u32,
+    pub current_load_watts: f32,
+    pub rail_12vhpwr_volts: f32,
+    pub ripple_mv: f32,
+}
+
+impl HwbustersPsuEfficiencyTelemetryEngine {
+    pub fn new(wattage: u32) -> Self {
+        Self {
+            rated_wattage: wattage,
+            current_load_watts: 0.0,
+            rail_12vhpwr_volts: 12.05,
+            ripple_mv: 15.0,
+        }
+    }
+
+    pub fn record_transient_load_spike(&mut self, load_watts: f32, ripple_mv: f32) -> bool {
+        self.current_load_watts = load_watts;
+        self.ripple_mv = ripple_mv;
+        // ATX 3.1 specification compliance check: +12V rail ripple must be <= 120mV
+        ripple_mv <= 120.0
+    }
+
+    pub fn calculate_cybenetics_rating(&self) -> &str {
+        let load_factor = self.current_load_watts / self.rated_wattage as f32;
+        if load_factor <= 0.8 && self.ripple_mv <= 20.0 {
+            "Cybenetics Titanium"
+        } else if self.ripple_mv <= 35.0 {
+            "Cybenetics Platinum"
+        } else {
+            "Cybenetics Gold"
+        }
+    }
+}
+
+// ============================================================================
 // UNIT TESTS
 // ============================================================================
 
@@ -880,5 +1086,38 @@ mod tests {
         let mut backup = BackupRecoveryEngine::new();
         let snap_id = backup.create_merkle_snapshot([0xAB; 32], 1700000000);
         assert_eq!(backup.restore_point_in_time(snap_id), Some([0xAB; 32]));
+
+        // Test Frappe DocType Engine
+        let mut frappe = FrappeLowCodeDocTypeEngine::new();
+        frappe.register_doctype("Task", "Projects", true);
+        assert!(frappe.add_field("Task", "subject", "Subject", "Data", true));
+        let mut vals = BTreeMap::new();
+        vals.insert("subject".to_string(), "Build SigmaOS".to_string());
+        assert!(frappe.insert_document("Task", "TASK-001", vals));
+
+        // Test TechPowerUp GPU Engine
+        let mut gpu_db = TechPowerUpGpuDatabaseEngine::new();
+        gpu_db.register_gpu(TechPowerUpGpuSpec {
+            card_name: "RTX 4090".to_string(),
+            architecture: "Ada Lovelace".to_string(),
+            base_clock_mhz: 2235,
+            boost_clock_mhz: 2520,
+            vram_mb: 24576,
+            bus_width_bits: 384,
+            memory_clock_mhz: 1313,
+            tdp_watts: 450,
+        });
+        let bw = gpu_db.calculate_vram_bandwidth_gbps("RTX 4090").unwrap();
+        assert!(bw > 1000.0);
+
+        // Test Android Police Custom ROM Engine
+        let mut android = AndroidPoliceCustomRomSideloadEngine::new();
+        assert_eq!(android.switch_ab_partition_slot(), "Slot B");
+        assert!(android.sideload_apk_package("com.aurora.store"));
+
+        // Test HWBusters PSU Engine
+        let mut psu = HwbustersPsuEfficiencyTelemetryEngine::new(1000);
+        assert!(psu.record_transient_load_spike(800.0, 18.0));
+        assert_eq!(psu.calculate_cybenetics_rating(), "Cybenetics Titanium");
     }
 }

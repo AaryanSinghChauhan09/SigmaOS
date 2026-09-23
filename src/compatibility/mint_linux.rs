@@ -1540,6 +1540,174 @@ impl MintDriverManager {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MintAccessibilitySettings {
+    pub high_contrast_enabled: bool,
+    pub screen_reader_enabled: bool,
+    pub screen_magnifier_scale: u8,
+    pub sticky_keys_enabled: bool,
+    pub visual_bell_enabled: bool,
+    pub font_dpi_scaling_factor: u16,
+}
+
+impl Default for MintAccessibilitySettings {
+    fn default() -> Self {
+        Self {
+            high_contrast_enabled: false,
+            screen_reader_enabled: false,
+            screen_magnifier_scale: 10,
+            sticky_keys_enabled: false,
+            visual_bell_enabled: false,
+            font_dpi_scaling_factor: 100,
+        }
+    }
+}
+
+impl MintAccessibilitySettings {
+    pub fn enable_high_contrast(&mut self) {
+        self.high_contrast_enabled = true;
+    }
+
+    pub fn set_magnifier_scale(&mut self, scale: u8) {
+        self.screen_magnifier_scale = scale.clamp(10, 50);
+    }
+
+    pub fn enable_screen_reader(&mut self) {
+        self.screen_reader_enabled = true;
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MintInstallationMode {
+    SingleBootAutomated,
+    SingleBootManualPartitions,
+    DualBootSeparateDrives,
+    DualBootSingleDriveManual,
+}
+
+#[derive(Debug, Clone)]
+pub struct MintInstallerGuideAssistant {
+    pub mode: MintInstallationMode,
+    pub iso_sha256_verified: bool,
+    pub gpg_signature_verified: bool,
+    pub bitlocker_disabled: bool,
+    pub fast_boot_disabled: bool,
+    pub secure_boot_configured: bool,
+    pub selected_media_writer: String,
+}
+
+impl MintInstallerGuideAssistant {
+    pub fn new(mode: MintInstallationMode) -> Self {
+        Self {
+            mode,
+            iso_sha256_verified: false,
+            gpg_signature_verified: false,
+            bitlocker_disabled: false,
+            fast_boot_disabled: false,
+            secure_boot_configured: false,
+            selected_media_writer: String::from("Ventoy"),
+        }
+    }
+
+    pub fn verify_iso_checksum(&mut self, expected_sha256: &str, calculated_sha256: &str) -> bool {
+        self.iso_sha256_verified = expected_sha256 == calculated_sha256;
+        self.iso_sha256_verified
+    }
+
+    pub fn run_preinstall_checks(&mut self, bitlocker_off: bool, fast_boot_off: bool, secure_boot_ok: bool) -> bool {
+        self.bitlocker_disabled = bitlocker_off;
+        self.fast_boot_disabled = fast_boot_off;
+        self.secure_boot_configured = secure_boot_ok;
+        self.bitlocker_disabled && self.fast_boot_disabled
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MintDesktopEnvironmentType {
+    Cinnamon,
+    Mate,
+    Xfce,
+    LmdeCinnamon,
+}
+
+#[derive(Debug, Clone)]
+pub struct MintDesktopEnvironmentMatrix {
+    pub desktop_type: MintDesktopEnvironmentType,
+    pub wayland_enabled: bool,
+    pub active_applets_count: usize,
+    pub active_desklets_count: usize,
+    pub active_theme: String,
+    pub active_wallpaper: String,
+    pub active_file_manager: String,
+}
+
+impl MintDesktopEnvironmentMatrix {
+    pub fn new(desktop_type: MintDesktopEnvironmentType) -> Self {
+        let (fm, theme) = match desktop_type {
+            MintDesktopEnvironmentType::Cinnamon | MintDesktopEnvironmentType::LmdeCinnamon => ("Nemo", "Mint-Y-Dark"),
+            MintDesktopEnvironmentType::Mate => ("Caja", "Mint-Y"),
+            MintDesktopEnvironmentType::Xfce => ("Thunar", "Mint-X"),
+        };
+        Self {
+            desktop_type,
+            wayland_enabled: false,
+            active_applets_count: 5,
+            active_desklets_count: 2,
+            active_theme: String::from(theme),
+            active_wallpaper: String::from("linuxmint-background.png"),
+            active_file_manager: String::from(fm),
+        }
+    }
+
+    pub fn enable_wayland_compositor(&mut self) {
+        self.wayland_enabled = true;
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct MintSystemUtilitiesHub {
+    pub celluloid_player_ready: bool,
+    pub archive_manager_ready: bool,
+    pub document_viewer_ready: bool,
+    pub screenshot_tool_ready: bool,
+    pub terminal_ready: bool,
+    pub wine_subsystem_ready: bool,
+    pub flatpak_permissions_governor: bool,
+}
+
+impl Default for MintSystemUtilitiesHub {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintSystemUtilitiesHub {
+    pub fn new() -> Self {
+        Self {
+            celluloid_player_ready: true,
+            archive_manager_ready: true,
+            document_viewer_ready: true,
+            screenshot_tool_ready: true,
+            terminal_ready: true,
+            wine_subsystem_ready: true,
+            flatpak_permissions_governor: true,
+        }
+    }
+
+    pub fn query_utility_status(&self, utility_name: &str) -> bool {
+        match utility_name {
+            "celluloid" => self.celluloid_player_ready,
+            "archive_manager" => self.archive_manager_ready,
+            "document_viewer" => self.document_viewer_ready,
+            "screenshot" => self.screenshot_tool_ready,
+            "terminal" => self.terminal_ready,
+            "wine" => self.wine_subsystem_ready,
+            "flatpak" => self.flatpak_permissions_governor,
+            _ => false,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1840,5 +2008,60 @@ mod tests {
 
         let uninst_res = installer.uninstall_mint4win().unwrap();
         assert!(uninst_res.contains("Successfully removed mint4win"));
+    }
+
+    #[test]
+    fn test_mint_accessibility_settings() {
+        let mut settings = MintAccessibilitySettings::default();
+        assert!(!settings.high_contrast_enabled);
+        settings.enable_high_contrast();
+        assert!(settings.high_contrast_enabled);
+
+        settings.set_magnifier_scale(25);
+        assert_eq!(settings.screen_magnifier_scale, 25);
+
+        settings.enable_screen_reader();
+        assert!(settings.screen_reader_enabled);
+    }
+
+    #[test]
+    fn test_mint_installer_guide_assistant() {
+        let mut assistant = MintInstallerGuideAssistant::new(MintInstallationMode::DualBootSingleDriveManual);
+        assert!(!assistant.iso_sha256_verified);
+        assert!(assistant.verify_iso_checksum("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"));
+        assert!(assistant.iso_sha256_verified);
+
+        let precheck = assistant.run_preinstall_checks(true, true, true);
+        assert!(precheck);
+        assert!(assistant.bitlocker_disabled);
+        assert!(assistant.fast_boot_disabled);
+    }
+
+    #[test]
+    fn test_mint_desktop_environment_matrix() {
+        let mut cinnamon = MintDesktopEnvironmentMatrix::new(MintDesktopEnvironmentType::Cinnamon);
+        assert_eq!(cinnamon.active_file_manager, "Nemo");
+        assert!(!cinnamon.wayland_enabled);
+        cinnamon.enable_wayland_compositor();
+        assert!(cinnamon.wayland_enabled);
+
+        let xfce = MintDesktopEnvironmentMatrix::new(MintDesktopEnvironmentType::Xfce);
+        assert_eq!(xfce.active_file_manager, "Thunar");
+
+        let mate = MintDesktopEnvironmentMatrix::new(MintDesktopEnvironmentType::Mate);
+        assert_eq!(mate.active_file_manager, "Caja");
+    }
+
+    #[test]
+    fn test_mint_system_utilities_hub() {
+        let hub = MintSystemUtilitiesHub::new();
+        assert!(hub.query_utility_status("celluloid"));
+        assert!(hub.query_utility_status("archive_manager"));
+        assert!(hub.query_utility_status("document_viewer"));
+        assert!(hub.query_utility_status("screenshot"));
+        assert!(hub.query_utility_status("terminal"));
+        assert!(hub.query_utility_status("wine"));
+        assert!(hub.query_utility_status("flatpak"));
+        assert!(!hub.query_utility_status("unknown_tool"));
     }
 }

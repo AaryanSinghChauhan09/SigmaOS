@@ -158,7 +158,7 @@ impl SwapManager {
 
     pub fn swap_in(&mut self, slot_id: u64, _dest_vaddr: u64) -> Result<(), &'static str> {
         self.swap_in_progress.fetch_add(1, Ordering::SeqCst);
-        
+
         if let Some(entry) = self.swap_slots.get(&slot_id) {
             if entry.entry_type != SwapEntryType::InUse {
                 self.swap_in_progress.fetch_sub(1, Ordering::SeqCst);
@@ -166,7 +166,7 @@ impl SwapManager {
             }
             
             // Perform actual swap-in operation
-            // This would read from backing storage and write to _dest_vaddr
+            // This would read from backing storage and write to dest_vaddr
             
             self.swap_in_progress.fetch_sub(1, Ordering::SeqCst);
             Ok(())
@@ -178,11 +178,11 @@ impl SwapManager {
 
     pub fn swap_out(&mut self, _src_vaddr: u64) -> Result<u64, &'static str> {
         self.swap_in_progress.fetch_add(1, Ordering::SeqCst);
-        
+
         let slot_id = self.allocate_swap_slot()?;
-        
+
         // Perform actual swap-out operation
-        // This would read from _src_vaddr and write to backing storage
+        // This would read from src_vaddr and write to backing storage
         
         if let Some(entry) = self.swap_slots.get_mut(&slot_id) {
             entry.backing_offset = 0; // Set actual offset

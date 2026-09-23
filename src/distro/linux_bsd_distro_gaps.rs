@@ -555,6 +555,33 @@ impl DemandPagingSwapEngine {
             page_faults_handled: 0,
         }
     }
+
+    pub fn handle_page_fault(&mut self, vaddr: u64, cause: PageFaultCause) -> Result<u64, &'static str> {
+        self.page_faults_handled += 1;
+        let mapping = VirtualPageMapping {
+            vaddr,
+            paddr: vaddr,
+            is_present: true,
+            is_writable: cause != PageFaultCause::WriteToReadOnlyCoW,
+            is_swapped_out: false,
+            swap_slot_idx: None,
+        };
+        self.page_table.push(mapping);
+        Ok(vaddr)
+    }
+
+    pub fn swap_out_page(&mut self, vaddr: u64) -> Result<usize, &'static str> {
+        if let Some(entry) = self.page_table.iter_mut().find(|p| p.vaddr == vaddr) {
+            let slot = self.used_swap_slots_mb;
+            self.used_swap_slots_mb += 1;
+            entry.is_swapped_out = true;
+            entry.is_present = false;
+            entry.swap_slot_idx = Some(slot);
+            Ok(slot)
+        } else {
+            Err("Page not found")
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -820,6 +847,17 @@ impl MulticoreSmpInterruptEngine {
         }
     }
 
+    pub fn bind_irq(&mut self, irq_line: u32, target_cpu_core: usize) -> Result<(), &'static str> {
+        if target_cpu_core >= self.num_cpu_cores {
+            return Err("Target core out of bounds");
+        }
+        self.irq_table.push(IrqRoutingEntry {
+            irq_line,
+            target_cpu_core,
+            interrupt_count: 0,
+        });
+        Ok(())
+    }
 
     pub fn balance_irq_load(&mut self) {
         for (i, entry) in self.irq_table.iter_mut().enumerate() {
@@ -885,7 +923,7 @@ impl Default for KernelPerfDtraceEngine {
 // Unit Tests
 // ============================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -1,220 +1,182 @@
-# SigmaOS Filesystem
-
-This page consolidates all filesystem documentation for SigmaOS.
+# SigmaOS Filesystem Documentation
 
 ## Overview
 
-SigmaOS implements a comprehensive filesystem layer inspired by Linux VFS, BSD filesystem architectures, and Windows storage systems. The filesystem layer provides support for multiple filesystem types, advanced storage management, and cross-platform compatibility.
+SigmaOS implements a **Virtual Filesystem Switch (VFS)** layer that provides a unified interface to multiple filesystem backends. The VFS abstracts filesystem-specific operations and presents a POSIX-compatible interface to applications.
 
-## Filesystem Architecture
+## Supported Filesystems
 
-### Design Philosophy
+| Filesystem | Type | Status | Description |
+|------------|------|--------|-------------|
+| SigmaFS | Native | ✅ Beta | SigmaOS native journaled filesystem |
+| ext4 | Linux-compat | ✅ | Extended filesystem 4 (read/write) |
+| FAT32/exFAT | Portable | ✅ | FAT filesystem family |
+| tmpfs | RAM | ✅ | In-memory temporary filesystem |
+| procfs | Virtual | ✅ | Process information pseudo-filesystem |
+| sysfs | Virtual | ✅ | Device/driver information |
+| devtmpfs | Virtual | ✅ | Device nodes |
+| OverlayFS | Union | ✅ | Container/live-CD overlay filesystem |
+| Btrfs | CoW | ⬜ | B-tree filesystem with snapshots (planned) |
+| ZFS | CoW | ⬜ | Zettabyte filesystem (planned) |
+| NFS | Network | ⬜ | Network filesystem (planned) |
 
-#### Virtual Filesystem Switch (VFS)
-- **Abstract filesystem interface** - Unified API for all filesystem types
-- **Filesystem operations** - Standard POSIX-compatible operations
-- **Vnode/inode abstraction** - Unified file representation
-- **Namespace management** - Mount point and path resolution
-- **Cross-filesystem operations** - File operations across different filesystems
+## VFS Architecture
 
-#### Supported Filesystems
-- **ext4** - Default Linux filesystem with journaling
-- **Btrfs** - Copy-on-write filesystem with snapshots
-- **ZFS** - Advanced filesystem with compression and deduplication
-- **F2FS** - Flash-oriented filesystem for SSDs
-- **FAT32/exFAT** - Compatibility with Windows systems
-- **NTFS** - Windows filesystem with read/write support
-- **ISO9660** - Optical disc filesystem
-- **procfs** - Process information filesystem
-- **sysfs** - System information filesystem
-- **tmpfs** - Memory-based temporary filesystem
-- **devtmpfs** - Device filesystem
-- **cgroupfs** - Control group filesystem
-- **EROFs** - Read-only filesystem for embedded systems
-
-### Core Subsystems
-
-#### File Operations
-- **Open/Close** - File descriptor management
-- **Read/Write** - Buffered and direct I/O
-- **Seek** - File position management
-- **Memory mapping** - mmap/mprotect operations
-- **File locking** - Advisory and mandatory locks
-- **Asynchronous I/O** - Non-blocking operations
-
-#### Directory Operations
-- **Create/Remove** - Directory management
-- **Enumeration** - Directory listing
-- **Path resolution** - Canonical path handling
-- **Symlink management** - Symbolic link operations
-- **Hard link support** - Multiple directory entries
-- **Mount point management** - Filesystem mounting
-
-#### Storage Management
-- **Block allocation** - Space allocation strategies
-- **Free space management** - Block tracking
-- **Journaling** - Metadata journaling for crash recovery
-- **Copy-on-Write (CoW)** - Snapshot-based operations
-- **Compression** - On-the-fly data compression
-- **Deduplication** - Block-level deduplication
-- **RAID support** - Software RAID implementations
-
-#### Filesystem Security
-- **POSIX permissions** - User/group/other permissions
-- **Access Control Lists (ACLs)** - Fine-grained permissions
-- **Extended attributes** - Metadata extensions
-- **Capability checks** - Permission verification
-- **Immutable files** - Write protection
-- **Append-only files** - Log file protection
-
-## Advanced Features
-
-### Sovereign Link Engine
-Advanced symbolic link management with:
-- **Cross-filesystem symlinks** - Links across filesystem boundaries
-- **Symlink cache** - Performance optimization
-- **Security validation** - Symlink attack prevention
-- **Follow/symlink options** - Configurable symlink resolution
-- **Absolute/relative symlinks** - Full support for both types
-
-### Copy-on-Write Snapshots
-- **Instant snapshots** - Zero-copy filesystem snapshots
-- **Snapshot management** - Create, delete, list snapshots
-- **Rollback support** - Revert to previous snapshot
-- **Space efficiency** - Shared blocks between snapshots
-- **Live snapshots** - Snapshot without filesystem downtime
-
-### Storage Innovations
-- **Hybrid storage** - SSD/HDD tiering
-- **Thin provisioning** - On-demand allocation
-- **Storage tiering** - Hot/cold data placement
-- **Quota management** - Per-user and per-group limits
-- **Resize operations** - Online filesystem resizing
-- **Migration support** - Data migration between storage systems
-
-## AI Agent Filesystem Guidelines
-
-### Bolt (Performance Persona)
-**Mission:** Filesystem performance optimization
-
-**Focus Areas:**
-- I/O scheduling optimization
-- Cache management improvements
-- Block allocation efficiency
-- Metadata operation speed
-- Parallel I/O operations
-
-**Critical Learning Journal:** `.jules/bolt.md`
-
-### Filesystem Verification Checklist
-Before committing filesystem changes, verify:
-1. No resource leaks in file handle management
-2. Proper error handling for I/O operations
-3. Thread-safe access to shared filesystem structures
-4. No deadlock potential in lock acquisition order
-5. Proper bounds checking on all filesystem buffers
-6. Safe FFI interactions with block devices
-7. Proper cleanup on filesystem unmount
-8. Correct reference counting for inodes/vnodes
-
-## Filesystem Testing
-
-### Unit Testing
-```bash
-# Run filesystem-specific tests
-cargo test --lib filesystem
-
-# Test specific filesystem components
-cargo test --lib filesystem::vfs
-cargo test --lib filesystem::block
-cargo test --lib filesystem::cow_snapshot
+```
+Application (read/write/open/stat)
+          ↓
+  VFS Interface (src/filesystem/vfs.rs)
+     ↙    ↓    ↘
+ SigmaFS  ext4  tmpfs  ...
+  (native) (compat) (ram)
+          ↓
+   Block Device Layer
+   (src/driver/block/)
+          ↓
+  Hardware (NVMe/SATA/USB)
 ```
 
-### Integration Testing
-- **Filesystem stress testing** - High-load filesystem operations
-- **Mount/unmount cycles** - Test filesystem lifecycle
-- **Corruption recovery** - Test journaling and recovery
-- **Performance benchmarks** - Filesystem operation performance
-- **Cross-filesystem operations** - Test interoperability
+## SigmaFS — Native Filesystem
 
-### Verification Commands
-```bash
-# Build filesystem modules
-rustc --edition=2021 --crate-type staticlib src/filesystem/mod.rs
+SigmaFS is designed specifically for SigmaOS:
 
-# Test filesystem compilation
-cargo build --lib
+### Design Goals
+- **Journaling** — crash-consistent writes via write-ahead log
+- **Copy-on-write** — atomic snapshot support
+- **Inline data** — small files stored directly in inode
+- **Extent-based allocation** — reduce fragmentation for large files
+- **Checksums** — per-block CRC32c integrity verification
 
-# Run full test suite
-./run_sigma_tests.sh
+### Inode Structure
+```rust
+pub struct SigmaInode {
+    pub magic: u32,           // 0x53494745 ("SIGE")
+    pub ino: u64,             // Inode number
+    pub mode: u32,            // File type + permissions
+    pub uid: u32,             // Owner UID
+    pub gid: u32,             // Owner GID
+    pub size: u64,            // File size in bytes
+    pub atime: u64,           // Access time (nanoseconds since epoch)
+    pub mtime: u64,           // Modification time
+    pub ctime: u64,           // Change time
+    pub crtime: u64,          // Creation time
+    pub nlinks: u32,          // Hard link count
+    pub flags: InodeFlags,    // Extended flags
+    pub extents: [Extent; 4], // Direct extents (inline)
+    pub overflow_block: u64,  // Extent tree overflow block
+    pub checksum: u32,        // CRC32c of inode data
+}
 ```
 
-## Filesystem Best Practices
+### On-Disk Layout
+```
+Block 0:    Superblock
+Block 1:    Backup superblock
+Block 2-7:  Block group descriptor table
+Block 8:    Journal superblock
+Block 9+:   Journal blocks
+Block N:    Inode bitmap
+Block N+1:  Block bitmap
+Block N+2+: Inode table
+Block M+:   Data blocks
+```
 
-### Memory Safety
-- Use safe Rust abstractions for file operations
-- Minimal unsafe code with extensive documentation
-- Proper error handling for I/O failures
-- Memory barrier usage for SMP systems
-- DMA buffer management for block devices
+## Virtual Filesystem Interface
 
-### Performance
-- Use async I/O where appropriate
-- Implement read-ahead and write-behind
-- Cache frequently accessed metadata
-- Batch operations for efficiency
-- Consider filesystem-specific optimizations
+### Core VFS Operations
 
-### Security
-- Validate all file paths from user space
-- Sanitize filesystem paths
-- Check permissions before operations
-- Audit security-relevant filesystem operations
-- Implement proper error handling
-- Prevent symlink attacks
+```rust
+pub trait VfsNode: Send + Sync {
+    fn read(&self, offset: u64, buf: &mut [u8]) -> Result<usize, VfsError>;
+    fn write(&mut self, offset: u64, buf: &[u8]) -> Result<usize, VfsError>;
+    fn stat(&self) -> Result<FileStat, VfsError>;
+    fn truncate(&mut self, size: u64) -> Result<(), VfsError>;
+    fn sync(&self) -> Result<(), VfsError>;
+}
 
-### Reliability
-- Implement proper journaling
-- Handle hardware errors gracefully
-- Provide data integrity checks
-- Support crash recovery
-- Implement fsync/fdatasync semantics
+pub trait VfsDir: VfsNode {
+    fn lookup(&self, name: &str) -> Result<VfsNodeRef, VfsError>;
+    fn create(&mut self, name: &str, mode: u32) -> Result<VfsNodeRef, VfsError>;
+    fn unlink(&mut self, name: &str) -> Result<(), VfsError>;
+    fn readdir(&self, offset: u64) -> Result<Vec<DirEntry>, VfsError>;
+    fn mkdir(&mut self, name: &str, mode: u32) -> Result<VfsNodeRef, VfsError>;
+    fn rename(&mut self, old: &str, new_dir: &mut dyn VfsDir, new: &str) -> Result<(), VfsError>;
+}
+```
 
-## Documentation References
+### Mount Operations
 
-For detailed filesystem implementation specifications:
-- [Architecture](ARCHITECTURE.md)
-- [Security](SECURITY.md)
-- [Kernel](Kernel.md)
-- [Package Management](Package-Management.md)
-- [Roadmap](ROADMAP.md)
-- [Process Management](process-management.md)
-- [Memory Management](memory-management.md)
+```rust
+// Mount a filesystem
+vfs.mount("/mnt/data", "ext4", "/dev/sda2", MountFlags::empty())?;
 
-## Contributing
+// Mount tmpfs at /tmp
+vfs.mount("/tmp", "tmpfs", "tmpfs", MountFlags::NOEXEC | MountFlags::NOSUID)?;
 
-Filesystem development follows SigmaOS agent guidelines:
-- **Bolt**: Performance optimization (I/O scheduling, cache management)
-- **Sentinel**: Security vulnerability remediation in filesystem code
-- **Palette**: Filesystem UX improvements (better error messages, clearer diagnostics)
+// List mounts
+for mount in vfs.list_mounts() {
+    println!("{} on {} type {} ({})", mount.device, mount.path, mount.fstype, mount.options);
+}
 
-### Filesystem Commit Guidelines
-- Describe filesystem component affected in commit messages
-- Include performance impact when applicable
-- Reference relevant filesystem documentation
-- Test filesystem changes under various load conditions
-- Update filesystem documentation
+// Unmount
+vfs.umount("/mnt/data")?;
+```
 
----
+## Path Resolution
 
-*This page consolidates the following individual filesystem documents:*
-- AGENTS_BASIC_FILESYSTEM_MANAGEMENT.md
-- AGENTS_FILESYSTEM_MANAGEMENT.md
-- AGENTS_LEGACY_FILESYSTEM_DROPPED_STORAGE_MANAGEMENT.md
-- AGENTS_VARIOUS_FILESYSTEM_OPERATIONS_MANAGEMENT.md
-- AI_AGENT_EROFS_FILESYSTEM_MANAGEMENT.md
-- AI_AGENT_FILESYSTEM_MANAGEMENT_ARCHITECTURE.md
-- AI_AGENT_FILESYSTEM_MANAGEMENT_GUIDELINES.md
-- ai-agent-filesystem-management.md
-- AI_AGENT_VARIOUS_FILESYSTEM_OPERATIONS_MANAGEMENT_GUIDELINES.md
-- Filesystem-Support-Matrix.md
+SigmaOS path resolution handles:
+- Absolute paths (`/usr/bin/ls`)
+- Relative paths (`../lib/libsigma.so`)
+- Symlinks (with cycle detection, max depth 40)
+- `.` and `..` components
+- Path traversal prevention (no `..` escaping chroot)
+
+```rust
+// Resolve a path with security validation
+let node = vfs.resolve_path("/usr/bin/ls", resolve_flags)?;
+
+// Resolve relative to a directory fd
+let node = vfs.resolve_at(dirfd, "relative/path", resolve_flags)?;
+```
+
+## File Permissions
+
+SigmaOS uses the standard Unix DAC model plus optional MAC enforcement:
+
+```
+Owner permissions: rwx (bits 8-6)
+Group permissions: rwx (bits 5-3)
+Other permissions: rwx (bits 2-0)
+Special bits:
+  SUID (bit 11): Run as owner
+  SGID (bit 10): Run as group / new files inherit group
+  Sticky (bit 9): Only owner can delete from directory
+```
+
+## Security: OverlayFS for Immutable Root
+
+SigmaOS can run with an **immutable read-only root filesystem** using OverlayFS (ChromeOS-style):
+
+```
+OverlayFS
+  ├── Upper layer: /overlay/upper (writable, RAM or encrypted disk)
+  ├── Work dir:    /overlay/work
+  └── Lower layer: /sigma/rootfs (read-only, signed)
+```
+
+This ensures the base system cannot be tampered with even if an attacker gains code execution.
+
+## Performance Tuning
+
+| Parameter | Description | Recommended |
+|-----------|-------------|-------------|
+| `read_ahead_kb` | Read-ahead window | 128-4096 KB |
+| `dirty_ratio` | Writeback threshold % | 10-20% |
+| `nr_requests` | I/O queue depth | 128-512 |
+| `scheduler` | I/O scheduler | `mq-deadline` (HDD), `none` (NVMe) |
+
+## References
+
+- [Linux VFS Documentation](https://www.kernel.org/doc/html/latest/filesystems/vfs.html)
+- [ext4 Disk Layout](https://ext4.wiki.kernel.org/index.php/Ext4_Disk_Layout)
+- [OverlayFS](https://www.kernel.org/doc/html/latest/filesystems/overlayfs.html)
