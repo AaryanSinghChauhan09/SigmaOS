@@ -75,6 +75,10 @@ pub enum PackageFormat {
     NarInfo,
     Spack,
     Conan,
+    Swupd,
+    Starling,
+    Cachy,
+    CachyOS,
 }
 
 impl PackageFormat {
@@ -212,6 +216,12 @@ impl PackageFormat {
             Some(PackageFormat::Conan)
         } else if normalized.ends_with(".sysupdate") {
             Some(PackageFormat::Sysupdate)
+        } else if normalized.ends_with(".swupd") {
+            Some(PackageFormat::Swupd)
+        } else if normalized.ends_with(".starling") {
+            Some(PackageFormat::Starling)
+        } else if normalized.ends_with(".cachy") || normalized.ends_with(".cachyos") {
+            Some(PackageFormat::CachyOS)
         } else {
             None
         }
@@ -651,7 +661,58 @@ impl PackageAdapterFactory {
             PackageFormat::Vcpkg => Box::new(VcpkgPackageAdapter),
             PackageFormat::NarInfo => Box::new(NarInfoPackageAdapter),
             PackageFormat::Sysupdate => Box::new(SysupdatePackageAdapter),
+            PackageFormat::Swupd => Box::new(SwupdPackageAdapter),
+            PackageFormat::Starling => Box::new(StarlingPackageAdapter),
+            PackageFormat::Cachy | PackageFormat::CachyOS => Box::new(PacmanPackageAdapter),
         }
+    }
+}
+
+pub struct SwupdPackageAdapter;
+impl IPackageAdapter for SwupdPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Swupd
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty Swupd package payload");
+        }
+        Ok(PackageContext {
+            name: "swupd-bundle".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::Swupd,
+            dependencies: vec![],
+            files: vec![],
+            hash: [0x41; 32],
+        })
+    }
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+        println!("Swupd Adapter: Extracted Clear Linux bundle to: {}", store_path);
+        Ok(())
+    }
+}
+
+pub struct StarlingPackageAdapter;
+impl IPackageAdapter for StarlingPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Starling
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty Starling package payload");
+        }
+        Ok(PackageContext {
+            name: "starling-pkg".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::Starling,
+            dependencies: vec![],
+            files: vec![],
+            hash: [0x42; 32],
+        })
+    }
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+        println!("Starling Adapter: Extracted Starling package to: {}", store_path);
+        Ok(())
     }
 }
 

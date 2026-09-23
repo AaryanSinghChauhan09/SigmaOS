@@ -236,7 +236,7 @@ fn test_all_prompt_package_formats() {
     );
     assert_eq!(
         adapter.detect_format_by_extension("debian.deb"),
-        Some(PackageFormat::Apt)
+        Some(PackageFormat::Deb)
     );
     assert_eq!(
         adapter.detect_format_by_extension("archive.tar.gz"),
@@ -248,11 +248,11 @@ fn test_all_prompt_package_formats() {
     );
     assert_eq!(
         adapter.detect_format_by_extension("fedora.rpm"),
-        Some(PackageFormat::Yum)
+        Some(PackageFormat::Rpm)
     );
     assert_eq!(
         adapter.detect_format_by_extension("gentoo.ebuild"),
-        Some(PackageFormat::Portage)
+        Some(PackageFormat::Ebuild)
     );
     assert_eq!(
         adapter.detect_format_by_extension("arch.pkg.tar.xz"),
@@ -333,8 +333,8 @@ fn test_all_unified_package_formats_resolution() {
         ("demo.swupd", PackageFormat::Swupd),
         ("demo.starling", PackageFormat::Starling),
         ("demo.cachyos", PackageFormat::Pacman),
-        ("demo.deb", PackageFormat::Apt),
-        ("demo.rpm", PackageFormat::Yum),
+        ("demo.deb", PackageFormat::Deb),
+        ("demo.rpm", PackageFormat::Rpm),
         ("demo.apk", PackageFormat::Apk),
         ("demo.xbps", PackageFormat::Xbps),
     ];

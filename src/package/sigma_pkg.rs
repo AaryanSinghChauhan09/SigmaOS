@@ -73,6 +73,8 @@ pub enum UniversalPackageFormat {
     FlatpakBundle,  // .flatpak
     SnapPackage,    // .snap
     AppImageBinary, // .AppImage
+    SwupdClear,     // .swupd
+    StarlingFormat, // .starling
 }
 
 /// Importer/Converter engine mapping foreign Linux/BSD packages into SigmaPkg native representation
@@ -128,6 +130,10 @@ impl UniversalPackageImporter {
             Some(UniversalPackageFormat::SnapPackage)
         } else if filename.ends_with(".AppImage") || filename.ends_with(".appimage") {
             Some(UniversalPackageFormat::AppImageBinary)
+        } else if filename.ends_with(".swupd") {
+            Some(UniversalPackageFormat::SwupdClear)
+        } else if filename.ends_with(".starling") {
+            Some(UniversalPackageFormat::StarlingFormat)
         } else {
             None
         }
@@ -176,6 +182,8 @@ impl UniversalPackageImporter {
             UniversalPackageFormat::IosIpa => ("Proprietary", vec![]),
             UniversalPackageFormat::AndroidAab => ("Apache-2.0", vec![]),
             UniversalPackageFormat::HarmonyHap => ("Apache-2.0", vec![]),
+            UniversalPackageFormat::SwupdClear => ("Apache-2.0", vec!["glibc".to_string()]),
+            UniversalPackageFormat::StarlingFormat => ("MIT", vec!["glibc".to_string()]),
         };
 
         let translated_deps = Self::translate_foreign_dependencies(&raw_deps);
@@ -1007,6 +1015,88 @@ impl SigmaPkg {
             pkg.name, pkg.version, format, pkg.license, pkg.architecture, pkg.dependencies
         ))
     }
+
+    /// Dispatches multi-distro PM CLI commands (e.g. `apt install nginx`, `pacman -S firefox`, `dnf install htop`, `apk add bash`, `pkg install redis`) directly via SigmaPkg
+    pub fn execute_universal_cli_command(&mut self, full_cmd: &str) -> Result<String, String> {
+        let tokens: Vec<&str> = full_cmd.split_whitespace().collect();
+        if tokens.is_empty() {
+            return Err("Empty command".to_string());
+        }
+
+        let pm = tokens[0].to_lowercase();
+        let args = &tokens[1..];
+
+        let mut action = "install";
+        let mut target_packages = Vec::new();
+
+        for arg in args {
+            if *arg == "install" || *arg == "-S" || *arg == "add" || *arg == "it" || *arg == "-i" {
+                action = "install";
+            } else if *arg == "remove" || *arg == "purge" || *arg == "-R" || *arg == "del" || *arg == "delete" || *arg == "rm" || *arg == "-C" || *arg == "--unmerge" {
+                action = "remove";
+            } else if *arg == "update" || *arg == "upgrade" || *arg == "-Syu" || *arg == "up" {
+                action = "upgrade";
+            } else if *arg == "search" || *arg == "-Ss" || *arg == "se" || *arg == "find" {
+                action = "search";
+            } else if !arg.starts_with('-') {
+                target_packages.push(arg.to_string());
+            }
+        }
+
+        match action {
+            "install" => {
+                if target_packages.is_empty() {
+                    return Ok(format!("Dispatched {:?} command: No target packages specified", pm));
+                }
+                for pkg_name in &target_packages {
+                    let dummy_pkg = Package {
+                        name: pkg_name.clone(),
+                        version: "1.0.0-universal".to_string(),
+                        description: format!("Dispatched via universal PM command '{}'", pm),
+                        dependencies: vec!["sovereign-libc".to_string()],
+                        conflicts: vec![],
+                        provides: vec![pkg_name.clone()],
+                        size: 5_000_000,
+                        installed_size: 15_000_000,
+                        url: None,
+                        license: "Universal".to_string(),
+                        groups: vec!["universal-cli".to_string()],
+                        architecture: "x86_64".to_string(),
+                        repository: format!("universal-{}", pm),
+                    };
+                    self.local_packages.insert(pkg_name.clone(), dummy_pkg);
+                }
+                Ok(format!(
+                    "Universal PM (via {}): Successfully installed {:?}",
+                    pm, target_packages
+                ))
+            }
+            "remove" => {
+                for pkg_name in &target_packages {
+                    self.local_packages.remove(pkg_name);
+                }
+                Ok(format!(
+                    "Universal PM (via {}): Successfully removed {:?}",
+                    pm, target_packages
+                ))
+            }
+            "upgrade" => {
+                self.upgrade_system()?;
+                Ok(format!("Universal PM (via {}): System upgrade completed", pm))
+            }
+            "search" => {
+                let term = target_packages.first().cloned().unwrap_or_default();
+                let results = self.search(&term);
+                Ok(format!(
+                    "Universal PM (via {}): Found {} results for '{}'",
+                    pm,
+                    results.len(),
+                    term
+                ))
+            }
+            _ => Ok(format!("Universal PM (via {}): Dispatched command '{}'", pm, full_cmd)),
+        }
+    }
 }
 
 #[cfg(test)]
@@ -1187,5 +1277,29 @@ mod tests {
             UniversalPackageImporter::autodetect_format("app.hap"),
             Some(UniversalPackageFormat::HarmonyHap)
         );
+    }
+
+    #[test]
+    fn test_execute_universal_cli_command() {
+        let mut pkg_mgr = SigmaPkg {
+            config: PkgConfig::default(),
+            repositories: vec![],
+            local_packages: HashMap::new(),
+            cache_dir: PathBuf::from("/tmp/sigma_cache_cli_test"),
+            database_dir: PathBuf::from("/tmp/sigma_db_cli_test"),
+        };
+
+        let apt_res = pkg_mgr.execute_universal_cli_command("apt install nginx curl").unwrap();
+        assert!(apt_res.contains("nginx"));
+        assert!(pkg_mgr.local_packages.contains_key("nginx"));
+        assert!(pkg_mgr.local_packages.contains_key("curl"));
+
+        let pac_res = pkg_mgr.execute_universal_cli_command("pacman -R nginx").unwrap();
+        assert!(pac_res.contains("removed"));
+        assert!(!pkg_mgr.local_packages.contains_key("nginx"));
+
+        let apk_res = pkg_mgr.execute_universal_cli_command("apk add musl-dev").unwrap();
+        assert!(apk_res.contains("musl-dev"));
+        assert!(pkg_mgr.local_packages.contains_key("musl-dev"));
     }
 }

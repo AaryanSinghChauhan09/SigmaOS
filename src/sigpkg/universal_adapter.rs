@@ -1825,17 +1825,24 @@ impl UniversalDependencyMapper {
     /// Translates a foreign package dependency name to a canonical Sigma-pkg dependency name
     pub fn to_canonical_name(&self, foreign_name: &str) -> String {
         let raw = foreign_name.trim().to_lowercase();
-        let clean = if let Some(stripped) = raw.strip_prefix("so:") {
+        let clean_str = if let Some(stripped) = raw.strip_prefix("so:") {
             if stripped.starts_with("libc.") {
-                "libc"
+                "libc".to_string()
             } else {
-                stripped.split('.').next().unwrap_or(stripped)
+                stripped.split('.').next().unwrap_or(stripped).to_string()
             }
         } else if let Some(stripped) = raw.strip_prefix("cmd:") {
-            stripped
+            stripped.to_string()
         } else {
-            raw.as_str()
+            raw.clone()
         };
+
+        let uncat_str = if let Some(pos) = clean_str.find('/') {
+            clean_str[pos + 1..].to_string()
+        } else {
+            clean_str
+        };
+        let clean = uncat_str.as_str();
 
         match clean {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl"
@@ -2109,7 +2116,7 @@ impl UniversalPmCommandDispatcher {
         let mut dry_run = false;
 
         match pm.as_str() {
-            "apt" | "apt-get" | "dpkg" => {
+            "apt" | "apt-get" | "dpkg" | "debian" | "ubuntu" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2144,7 +2151,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pacman" | "yay" | "paru" | "pikaur" | "trizen" | "aura" => {
+            "pacman" | "yay" | "paru" | "pikaur" | "trizen" | "aura" | "arch" | "manjaro" | "cachyos" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2161,7 +2168,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "dnf" | "yum" | "zypper" | "microdnf" => {
+            "dnf" | "yum" | "zypper" | "microdnf" | "fedora" | "rhel" | "centos" | "opensuse" | "suse" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2178,7 +2185,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "apk" => {
+            "apk" | "alpine" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2210,7 +2217,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkg" | "pkgsend" => {
+            "pkg" | "pkgsend" | "freebsd" | "netbsd" | "openbsd" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2226,7 +2233,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "xbps-install" | "xbps-remove" | "xbps-query" | "xbps" => {
+            "xbps-install" | "xbps-remove" | "xbps-query" | "xbps" | "void" => {
                 if pm == "xbps-install" {
                     operation = UniversalPmOperation::Install;
                 } else if pm == "xbps-remove" {
@@ -2248,7 +2255,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "emerge" | "ebuild" => {
+            "emerge" | "ebuild" | "gentoo" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2266,7 +2273,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "eopkg" | "moss" => {
+            "eopkg" | "moss" | "solus" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2282,7 +2289,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "nix" | "nix-env" | "guix" => {
+            "nix" | "nix-env" | "guix" | "nixos" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2327,7 +2334,7 @@ impl UniversalPmCommandDispatcher {
                     }
                 }
             }
-            "slackpkg" | "installpkg" | "removepkg" => {
+            "slackpkg" | "installpkg" | "removepkg" | "slackware" => {
                 if pm == "installpkg" {
                     operation = UniversalPmOperation::Install;
                 } else if pm == "removepkg" {
@@ -3197,11 +3204,11 @@ mod tests {
         );
         assert_eq!(
             adapter.detect_format_by_extension("gentoo.ebuild"),
-            Some(PackageFormat::Portage)
+            Some(PackageFormat::Ebuild)
         );
         assert_eq!(
             adapter.detect_format_by_extension("ubuntu.deb"),
-            Some(PackageFormat::Apt)
+            Some(PackageFormat::Deb)
         );
         assert_eq!(
             adapter.detect_format_by_extension("arch.pkg.tar.xz"),
@@ -3209,7 +3216,7 @@ mod tests {
         );
         assert_eq!(
             adapter.detect_format_by_extension("fedora.rpm"),
-            Some(PackageFormat::Yum)
+            Some(PackageFormat::Rpm)
         );
         assert_eq!(
             adapter.detect_format_by_extension("harmony.hap"),
