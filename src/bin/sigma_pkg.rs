@@ -173,6 +173,10 @@ mod tests {
         assert_eq!(format_flag_for_source_pm("openbsd"), Some("--openbsd"));
         assert_eq!(format_flag_for_source_pm("xbps"), Some("--xbps"));
         assert_eq!(format_flag_for_source_pm("emerge"), Some("--ebuild"));
+        assert_eq!(format_flag_for_source_pm("brew"), Some("--bottle"));
+        assert_eq!(format_flag_for_source_pm("pkgman"), Some("--haiku"));
+        assert_eq!(format_flag_for_source_pm("slapt-get"), Some("--slackware"));
+        assert_eq!(format_flag_for_source_pm("pisi"), Some("--eopkg"));
     }
 
     #[test]
@@ -212,7 +216,7 @@ mod tests {
 fn format_flag_for_source_pm(source_pm: &str) -> Option<&'static str> {
     match source_pm.to_lowercase().as_str() {
         "apt" | "apt-get" | "dpkg" | "debian" | "ubuntu" => Some("--apt"),
-        "dnf" | "yum" | "microdnf" | "rpm" | "fedora" | "rhel" | "centos" => Some("--dnf"),
+        "dnf" | "yum" | "microdnf" | "rpm" | "fedora" | "rhel" | "centos" | "urpmi" => Some("--dnf"),
         "pacman" | "yay" | "paru" | "pikaur" | "trizen" | "aura" | "arch" | "manjaro" | "cachy" | "cachyos" => Some("--pacman"),
         "apk" | "alpine" => Some("--apk"),
         "pkg" | "freebsd" | "bsd" => Some("--pkg"),
@@ -223,10 +227,10 @@ fn format_flag_for_source_pm(source_pm: &str) -> Option<&'static str> {
         "emerge" | "ebuild" | "gentoo" | "portage" => Some("--ebuild"),
         "eopkg" | "solus" | "pisi" => Some("--eopkg"),
         "moss" => Some("--moss"),
-        "nix" | "nix-env" | "nixos" => Some("--nix"),
+        "nix" | "nix-env" | "nix-shell" | "nixos" => Some("--nix"),
         "guix" | "guixsd" => Some("--guix"),
-        "slackpkg" | "installpkg" | "removepkg" | "slackware" => Some("--slackware"),
-        "haiku" | "hpkg" => Some("--haiku"),
+        "slackpkg" | "installpkg" | "removepkg" | "slackware" | "slapt-get" | "kiss" | "cpt" => Some("--slackware"),
+        "haiku" | "hpkg" | "pkgman" => Some("--haiku"),
         "flatpak" => Some("--flatpak"),
         "snap" => Some("--snap"),
         "appimage" => Some("--appimage"),
@@ -237,6 +241,7 @@ fn format_flag_for_source_pm(source_pm: &str) -> Option<&'static str> {
         "vcpkg" => Some("--vcpkg"),
         "spack" => Some("--spack"),
         "conan" => Some("--conan"),
+        "brew" => Some("--bottle"),
         "opkg" | "ipkg" => Some("--opkg"),
         "swupd" => Some("--swupd"),
         _ => None,
