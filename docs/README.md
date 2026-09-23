@@ -7,6 +7,7 @@ Welcome to the SigmaOS Desktop Edition documentation repository.
 - [Release Criteria](RELEASE_CRITERIA.md) — Milestone quality gates for bootable desktop ISO releases.
 - [Hardware Support Matrix](SUPPORT_MATRIX.md) — QEMU reference platform and hardware targets.
 - [Master Roadmap](ROADMAP.md) — Chronological execution phases (M0 to M7).
+- [Practical Distro-Inspired Master Roadmap](SIGMA_OS_DISTRO_ROADMAP.md) — 11-pillar strategic blueprint combining Linux hardware support and BSD security discipline.
 - [Strategic Plan Inspired by Linux & BSD](SIGMAOS_STRATEGIC_DEVELOPMENT_PLAN_LINUX_BSD.md) — 5 core strategic pillars.
 
 ## 📦 Package Engine & Technical Specs
