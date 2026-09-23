@@ -63,6 +63,8 @@ pub enum DistroSubsystemMode {
     LinuxTails,
     LinuxGuix,
     LinuxParrot,
+    LinuxVanillaOS,
+    LinuxOpenWrt,
     FreeBsd,
     OpenBsd,
     NetBsd,
@@ -192,6 +194,8 @@ impl SovereignUniversalDistroBridge {
             }
             DistroSubsystemMode::LinuxSlackware
             | DistroSubsystemMode::LinuxTinyCore => ServiceSupervisorType::Sysvinit,
+            DistroSubsystemMode::LinuxVanillaOS => ServiceSupervisorType::Systemd,
+            DistroSubsystemMode::LinuxOpenWrt => ServiceSupervisorType::Sysvinit,
             DistroSubsystemMode::SolarisIllumos => ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => ServiceSupervisorType::Rcd,
         }
@@ -357,9 +361,11 @@ impl SovereignUniversalDistroBridge {
             }
             DistroSubsystemMode::LinuxSlackware
             | DistroSubsystemMode::LinuxTinyCore
-            | DistroSubsystemMode::LinuxPuppy => {
+            | DistroSubsystemMode::LinuxPuppy
+            | DistroSubsystemMode::LinuxOpenWrt => {
                 supervisor == ServiceSupervisorType::Sysvinit
             }
+            DistroSubsystemMode::LinuxVanillaOS => supervisor == ServiceSupervisorType::Systemd,
             DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
         };
@@ -412,6 +418,8 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxClear => format!("{}.bundle", input_pkg),
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::LinuxTinyCore => format!("{}.tcz", input_pkg),
+            DistroSubsystemMode::LinuxVanillaOS => format!("{}.apx", input_pkg),
+            DistroSubsystemMode::LinuxOpenWrt => format!("{}.ipk", input_pkg),
             DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::DragonFlyBsd
             | DistroSubsystemMode::MidnightBsd
@@ -495,6 +503,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::SmartOs => format!("{}.tgz", action),
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", action),
             DistroSubsystemMode::LinuxTinyCore => format!("{}.tcz", action),
+            DistroSubsystemMode::LinuxVanillaOS => format!("{}.apx", action),
+            DistroSubsystemMode::LinuxOpenWrt => format!("{}.ipk", action),
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", action),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", action),
             DistroSubsystemMode::LinuxVanillaOS => format!("{}.apx", action),
