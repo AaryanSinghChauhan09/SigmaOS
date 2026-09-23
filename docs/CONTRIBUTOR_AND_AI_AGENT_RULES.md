@@ -34,6 +34,7 @@ This document outlines the mandatory rules, development policies, and execution 
    - Subsystem features should incorporate paradigms from major Linux distributions (Arch, Debian, Fedora, Gentoo, CachyOS, Alpine, NixOS, Solus, Void) and BSD systems (FreeBSD, OpenBSD, NetBSD, DragonFly BSD, Illumos/SmartOS).
    - Security features must bridge Linux Landlock v5 with FreeBSD Capsicum capability rights, OpenBSD pledge/unveil restrictions, and Fedora SELinux MLS/MCS contexts.
    - User customization tasks must never edit `/usr/share/omarchy/` directly (read-only system defaults); all local overrides belong in `~/.config/`.
+   - Configuration files (such as `/etc/config` and `shell.json`) must enforce schema validation and boundary checks, automatically falling back to default settings stored in `~/.config/` when parsing fails.
    - AI agents and automated scripts must choose appropriate privilege escalation (`sudo` for interactive terminals, `pkexec` for non-interactive agents, and `--no-sudo --print` for `omarchy debug`).
 
 ---
