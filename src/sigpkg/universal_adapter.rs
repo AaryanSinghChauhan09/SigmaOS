@@ -2128,6 +2128,26 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
+            "debian" | "ubuntu" | "fedora" | "rhel" | "centos" | "arch" | "manjaro"
+            | "cachy" | "cachyos" | "alpine" | "freebsd" | "openbsd" | "netbsd" | "bsd"
+            | "void" | "gentoo" | "portage" | "opensuse" | "suse" | "slackware" | "solus"
+            | "nixos" | "guixsd" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "install" | "add" | "in" | "it" | "-S" | "-i" => operation = UniversalPmOperation::Install,
+                        "remove" | "delete" | "del" | "rm" | "erase" | "purge" | "-R" | "-r" => operation = UniversalPmOperation::Remove,
+                        "update" | "upgrade" | "up" | "-Syu" | "dist-upgrade" | "full-upgrade" => operation = UniversalPmOperation::Upgrade,
+                        "search" | "find" | "se" | "sr" | "-Ss" | "-Qs" => operation = UniversalPmOperation::Search,
+                        "info" | "show" | "status" | "query" | "-Si" | "-Qi" => operation = UniversalPmOperation::QueryInfo,
+                        "clean" | "autoclean" | "paccache" | "-Sc" | "-Scc" => operation = UniversalPmOperation::CleanCache,
+                        "-s" | "--dry-run" | "--simulate" | "-n" | "-p" | "--pretend" => dry_run = true,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
             "spack" | "conan" | "pip" | "cargo" | "gem" | "nuget" | "vcpkg" => {
                 let mut i = 0;
                 while i < args.len() {
