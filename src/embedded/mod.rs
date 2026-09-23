@@ -11,6 +11,9 @@ use std::format;
 use core::cell::Cell;
 use core::sync::atomic::{AtomicU32, Ordering};
 
+pub mod arduino_microcontroller_engine;
+pub use arduino_microcontroller_engine::*;
+
 /// Peripheral device types for embedded systems
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PeripheralType {

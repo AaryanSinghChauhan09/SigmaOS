@@ -23,6 +23,7 @@ AI agents building components for SigmaOS must adhere to the design principles d
 | **Alpine Linux** | Diskless RAM rootfs overlays (`lbu`), musl lightweight userland | `src/distro/bsd_linux_innovations.rs` |
 | **NixOS / Guix** | Atomic store paths (`/sigma/store`), declarative channel commit pinning | `src/distro/additional_linux_bsd_components.rs` |
 | **Zorin OS** | Executable Security Guard (`zorin-exec-guard`), adaptive theme chameleon engine | `src/security/exec_guard.rs`, `src/desktop/` |
+| **Vanilla OS / OpenWrt** | A/B Apx containerized package isolation & UCI network configuration | `src/distro/linux_bsd_inspirations.rs` |
 | **Linux Mint** | WebApp Manager (PWAs as desktop apps), Timeshift CoW snapshotting | `src/desktop/web_wasm_bridge.rs`, `src/system/snapshot.rs` |
 | **Omarchy** | Agentic Wayland compositor (`ZenithCompositor`), hotkey studio, Quickshell plugins | `src/distro/omarchy.rs`, `src/distro/omarchy_inspiration.rs` |
 

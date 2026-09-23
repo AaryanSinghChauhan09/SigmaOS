@@ -161,8 +161,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxOmarchy
             | DistroSubsystemMode::LinuxPCLinuxOS
             | DistroSubsystemMode::LinuxSteamOS
-            | DistroSubsystemMode::BedrockLinux
-            | DistroSubsystemMode::LinuxVanillaOS => ServiceSupervisorType::Systemd,
+            | DistroSubsystemMode::LinuxVanillaOS
+            | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
@@ -425,7 +425,7 @@ impl SovereignUniversalDistroBridge {
             }
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", input_pkg),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", input_pkg),
-            DistroSubsystemMode::LinuxVanillaOS => format!("{}.apx", input_pkg),
+            DistroSubsystemMode::LinuxVanillaOS => format!("{}.apk", input_pkg),
             DistroSubsystemMode::LinuxOpenWrt => format!("{}.ipk", input_pkg),
         }
     }
@@ -495,7 +495,7 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxTinyCore => format!("{}.tcz", action),
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", action),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", action),
-            DistroSubsystemMode::LinuxVanillaOS => format!("{}.apx", action),
+            DistroSubsystemMode::LinuxVanillaOS => format!("{}.apk", action),
             DistroSubsystemMode::LinuxOpenWrt => format!("{}.ipk", action),
         };
 

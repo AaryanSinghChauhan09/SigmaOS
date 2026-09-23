@@ -69,6 +69,10 @@ Inspired by Linux & BSD distribution development standards (Arch Linux, Debian, 
 - **Quickshell Plugin Namespacing**: Reserved namespace `omarchy.*` is restricted to first-party built-in plugins. Third-party plugins live in `~/.config/omarchy/plugins/`.
 - **Graphical Acceptance Suite**: Acceptance tests (`test/acceptance.d/*-test.sh`) must run in VM harnesses, generate TAP protocol reports (`parse_tap_output`), and capture step screenshots (`success-<step>.png`, `failure-<step>.png`).
 
+### 7. **Configuration Subsystem & Network Management Directives**
+- **UCI & System Configuration Governance**: System services must validate `/etc/config` TOML/UCI parameters with schema bounds checking and backup rollback files under `~/.config/`.
+- **Network Interface & Route Aliasing**: Network interfaces (FreeBSD VNET, Linux netplan/NetworkManager, Illumos Crossbow) must validate interface aliasing rules without path prefix confusion or unhandled option injection vulnerabilities.
+
 ---
 
 ## Development Workflow
