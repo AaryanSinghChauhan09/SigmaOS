@@ -74,23 +74,19 @@ pub use universal_oop_system::*;
 pub mod verifier;
 pub mod zero_alloc_resolver;
 
-pub use zero_alloc_resolver::{
-    PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES,
-};
 pub use universal_adapter::{
-    PackageFormatAdapter, AdapterError,
+    AdapterError, AppImageContainer, FlatpakManifest, MappedScriptletHook,
+    PackageFormatAdapter, PackagePriority, PacmanPkgbuild, RpmSpecManifest,
+    SigmaPkgHookType, SnapcraftManifest, UniversalDependencyMapper,
+    UniversalDryRunResult, UniversalDryRunSimulator, UniversalFormatConverter,
+    UniversalPackageAdapter, UniversalScriptletConverter,
 };
 pub use universal_oop_system::{
-    DebAdapter, RpmAdapter, PacmanAdapter, ApkAdapter, NixAdapter, EbuildAdapter, UniversalPackageManager,
+    ApkAdapter, DebAdapter, EbuildAdapter, NixAdapter, PacmanAdapter, RpmAdapter,
+    UniversalPackageManager,
 };
 pub use sovereign_sigpkg::*;
 pub use crate::package::sovereign_distro_package_master_suite::*;
-pub use universal_adapter::{
-    AppImageContainer, FlatpakManifest, MappedScriptletHook, PackageFormatAdapter,
-    PackagePriority, PacmanPkgbuild, RpmSpecManifest, SigmaPkgHookType, SnapcraftManifest,
-    UniversalDependencyMapper, UniversalDryRunResult, UniversalDryRunSimulator,
-    UniversalFormatConverter, UniversalPackageAdapter, UniversalScriptletConverter,
-};
 pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
 
 pub use alpine_apk_engine::{AlpineCommunityRepo, ApkIndexParser, ApkPackage};
