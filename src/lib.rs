@@ -51,6 +51,15 @@ pub mod shell;
 pub mod sigpkg;
 pub mod storage;
 pub mod thread;
+pub use thread::{
+    SovereignTask, SovereignThreadPool, SovereignThreadPoolEngine, SovereignWorkerThread,
+    TaskPriority, TaskState, ThreadPoolKind,
+};
+pub mod ipc;
+pub use ipc::{
+    AsyncCancellationState, AsyncCancellationType, SovereignApcMessage, SovereignApcRoutine,
+    SovereignAsyncProcedureCallEngine, SovereignAsyncWriteOp, SovereignCancellationToken,
+};
 pub mod vfs;
 pub use process::{
     AdvancedIpcHub, BsdRusage, CancellationType, CoreDumpMetadata, EventFd,
@@ -291,7 +300,9 @@ pub use kernel::{
 };
 pub use kernel::roundrobin::SchedulerError as RoundRobinSchedulerError;
 pub use network::{
-    compute_checksum as compute_net_checksum, IPv4Address, NetworkPacket, PacketRingBuffer,
+    compute_checksum as compute_net_checksum, AsyncIoBackendKind, AsyncIoFilterKind,
+    AsyncIoInterest, IPv4Address, IoUringCqe, IoUringOpcode, IoUringSqe,
+    NotificationTriggerMode, SovereignAsyncIoEngine, NetworkPacket, PacketRingBuffer,
     RingTcpState, TcpConnection, TcpError, TcpSegment, TcpSocket, TcpStack, TcpState,
     ETHERNET_HEADER_LEN, IPV4_HEADER_LEN, TCP_HEADER_LEN, UDP_HEADER_LEN,
 };
@@ -325,9 +336,11 @@ pub use resilience::{
 };
 pub use security::hardening;
 pub use security::{
-    AnonSurfShunt, AppSandboxEngine, ArithmeticSubstitutionDeobfuscator, CapabilityGate,
-    CapabilityToken, ForensicStorageFilter, Permission, PledgeManager, PledgePromise, RoutingMode,
-    SandboxPolicy,
+    AclEntryType, AclInheritanceFlag, AclModel, AclPermission, AclTag, AnonSurfShunt,
+    AppSandboxEngine, ArithmeticSubstitutionDeobfuscator, CapabilityGate, CapabilityToken,
+    ForensicStorageFilter, Permission, PledgeManager, PledgePromise, RoutingMode, SandboxPolicy,
+    SovereignAccessControlList, SovereignAccessControlListEngine, SovereignAclEntry,
+    SovereignSecuritySubject,
 };
 pub use userland::shell::{
     Parser as UserlandShellParser, RedirectSpec, RedirectionEngine, Shell as UserlandShell,

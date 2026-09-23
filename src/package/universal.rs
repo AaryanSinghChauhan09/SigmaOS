@@ -342,6 +342,15 @@ pub enum PackageFormat {
     Stratum,    // Bedrock Linux Stratum (.stratum)
     Swupd,      // Clear Linux swupd (.swupd)
     Starling,   // Starling format (.starling)
+    Apex,       // Android APEX module (.apex)
+    Conda,      // Conda package (.conda)
+    Brew,       // Homebrew formula/cask (.brew / .rb)
+    Wasm,       // WebAssembly WAPM package (.wasm / .wapm)
+    Oci,        // OCI image tarball (.oci)
+    Helm,       // Kubernetes Helm chart (.helm)
+    Sysext,     // Systemd extension (.sysext)
+    FlatpakRef, // Flatpak ref (.flatpakref)
+    CondaTar,   // Conda tar.bz2 (.tar.bz2)
 }
 
 fn normalize_filename_stack<F, R>(filename: &str, f: F) -> R
@@ -539,6 +548,24 @@ impl PackageFormat {
             Some(PackageFormat::JuliaPkg)
         } else if normalized.ends_with(".rpkg") {
             Some(PackageFormat::RCran)
+        } else if normalized.ends_with(".apex") {
+            Some(PackageFormat::Apex)
+        } else if normalized.ends_with(".conda") {
+            Some(PackageFormat::Conda)
+        } else if normalized.ends_with(".brew") || normalized.ends_with(".rb") {
+            Some(PackageFormat::Brew)
+        } else if normalized.ends_with(".wasm") || normalized.ends_with(".wapm") {
+            Some(PackageFormat::Wasm)
+        } else if normalized.ends_with(".oci") || normalized.ends_with(".docker.tar") {
+            Some(PackageFormat::Oci)
+        } else if normalized.ends_with(".helm") {
+            Some(PackageFormat::Helm)
+        } else if normalized.ends_with(".sysext") {
+            Some(PackageFormat::Sysext)
+        } else if normalized.ends_with(".flatpakref") {
+            Some(PackageFormat::FlatpakRef)
+        } else if normalized.ends_with(".tar.bz2") {
+            Some(PackageFormat::CondaTar)
         } else {
             None
         }
