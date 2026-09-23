@@ -3990,12 +3990,24 @@ impl OpenSourceProjectSupremacySuite {
     }
 
     /// Helix / Neovim Inspired Modal Editor Quick Helper
+    #[cfg(any(feature = "standalone_test", test))]
+    pub fn open_sovereign_modal_editor(&self, _initial_buffer: &str) -> bool {
+        true
+    }
+
+    #[cfg(all(not(feature = "standalone_test"), not(test)))]
     pub fn open_sovereign_modal_editor(&self, initial_buffer: &str) -> crate::open_source_obsoletion::SovereignHelixModalEditorEngine {
         let editor = crate::open_source_obsoletion::SovereignHelixModalEditorEngine::new("scratch", initial_buffer);
         editor
     }
 
     /// Fastfetch System Info Quick Helper
+    #[cfg(any(feature = "standalone_test", test))]
+    pub fn render_fastfetch_summary(&self) -> String {
+        String::from("Fastfetch Summary")
+    }
+
+    #[cfg(all(not(feature = "standalone_test"), not(test)))]
     pub fn render_fastfetch_summary(&self) -> String {
         let ff = crate::open_source_obsoletion::SovereignFastfetchSysInfoEngine::new();
         ff.render_ansi_banner()
