@@ -1,6 +1,8 @@
 // SigmaOS Security Subsystem
 pub mod capability;
 pub mod pqc_enclave;
+pub mod trust_zone;
+pub use trust_zone::*;
 pub mod governance;
 pub mod audit;
 pub mod bsd_hardening;
