@@ -29,3 +29,5 @@ pub use arm_bx_formats::{
 };
 pub mod sovereign_multiarch_hal;
 pub use sovereign_multiarch_hal::*;
+pub mod advanced_paradigm_suite;
+pub use advanced_paradigm_suite::*;
