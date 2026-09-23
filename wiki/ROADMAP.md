@@ -16,6 +16,26 @@
 +-----------------------------------------------------------------------------------+
 ```
 
+## 🐧 Distro-Inspired Practical Roadmap & Architectural Formula
+
+### 1. Base Philosophy & Hybrid Architecture
+- **Stable Core, Modern Edge**: Linux LTS kernel baseline for maximum hardware compatibility paired with OpenBSD/FreeBSD architectural simplicity.
+- **Declarative & Reproducible**: Nix/Guix-inspired system state with atomic snapshot rollbacks.
+- **Clean Boundaries**: Strict separation between core system, desktop applications, and user configuration.
+
+### 2. Core System & Security Architecture
+- **Universal Package Manager**: Signed packages, TUF metadata, multi-distro format support (deb, rpm, pkg.tar.zst, apk, ipk), and multi-channel updates (stable, testing, rolling).
+- **Service & Init Model**: Dual support for `systemd` and `OpenRC` / `Runit` service supervisors with health monitoring and restart policies.
+- **Security Defaults**: OpenBSD `pf`-style firewall rules, Landlock v5 / AppArmor sandboxing, read-only system partitions, and time-bound privilege escalation (`sigsudo`).
+- **Resilient Storage**: Btrfs & ZFS copy-on-write dataset snapshots with `sigbackup` system restore capabilities.
+
+### 3. Modern Desktop & Developer Workflows
+- **Wayland Compositor**: Custom Wayland-first Zenith desktop environment with consistent GTK/Qt theming, system tray, and integrated control center HUD.
+- **Developer Toolchains**: Out-of-the-box support for Rust, Go, Python, Node.js, Java, and C/C++ toolchains, containerization (Podman/Docker), and live kernel debugging.
+- **Release Discipline & Trust**: Guided first-run onboarding, privacy-first telemetry, verified ISO builds, and long-term release lifecycle governance.
+
+---
+
 ## Detailed Phase Status
 1. **Phase 0 & 1 (Baseline)**: Consolidated Rust std desktop development target with 100% test pass rates across native Rust runner (`./run_sigma_tests.sh`) and pytest suites.
 2. **Phase 2 (Desktop Preview)**: Zenith compositor prototype with keyboard-driven Wayland tiling, WASM UI bridge, and integrated control center.

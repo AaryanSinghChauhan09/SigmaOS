@@ -374,6 +374,172 @@ impl FreeBsdVnetIsolationEngine {
 // 5. WireGuard Post-Quantum Cryptography (PQC) Tunnel Engine
 // ============================================================================
 
+// ============================================================================
+// 6. Linux & BSD Inspired Virtual Network Devices Engine
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum VirtualDeviceKind {
+    LinuxVeth,
+    LinuxMacvlan,
+    LinuxIpvlan,
+    LinuxTap,
+    LinuxTun,
+    FreeBsdEpair,
+    OpenBsdVether,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MacvlanMode {
+    Private,
+    Vepa,
+    Bridge,
+    Passthru,
+}
+
+#[derive(Debug, Clone)]
+pub struct VirtualNetworkInterface {
+    pub name: String,
+    pub kind: VirtualDeviceKind,
+    pub mac_address: [u8; 6],
+    pub peer_name: Option<String>,
+    pub parent_iface: Option<String>,
+    pub mode: Option<MacvlanMode>,
+    pub rx_packets: u64,
+    pub tx_packets: u64,
+    pub is_up: bool,
+}
+
+pub struct LinuxBsdVirtualNetworkDeviceEngine {
+    pub devices: HashMap<String, VirtualNetworkInterface>,
+}
+
+impl LinuxBsdVirtualNetworkDeviceEngine {
+    pub fn new() -> Self {
+        Self {
+            devices: HashMap::new(),
+        }
+    }
+
+    pub fn create_veth_pair(&mut self, iface1: &str, iface2: &str) -> Result<(), &'static str> {
+        if self.devices.contains_key(iface1) || self.devices.contains_key(iface2) {
+            return Err("VETH interface already exists");
+        }
+
+        let dev1 = VirtualNetworkInterface {
+            name: iface1.to_string(),
+            kind: VirtualDeviceKind::LinuxVeth,
+            mac_address: [0x02, 0x11, 0x22, 0x33, 0x44, 0x01],
+            peer_name: Some(iface2.to_string()),
+            parent_iface: None,
+            mode: None,
+            rx_packets: 0,
+            tx_packets: 0,
+            is_up: true,
+        };
+
+        let dev2 = VirtualNetworkInterface {
+            name: iface2.to_string(),
+            kind: VirtualDeviceKind::LinuxVeth,
+            mac_address: [0x02, 0x11, 0x22, 0x33, 0x44, 0x02],
+            peer_name: Some(iface1.to_string()),
+            parent_iface: None,
+            mode: None,
+            rx_packets: 0,
+            tx_packets: 0,
+            is_up: true,
+        };
+
+        self.devices.insert(iface1.to_string(), dev1);
+        self.devices.insert(iface2.to_string(), dev2);
+        Ok(())
+    }
+
+    pub fn create_freebsd_epair(&mut self, base_name: &str) -> Result<(String, String), &'static str> {
+        let name_a = format!("{}a", base_name);
+        let name_b = format!("{}b", base_name);
+
+        if self.devices.contains_key(&name_a) || self.devices.contains_key(&name_b) {
+            return Err("FreeBSD Epair interface already exists");
+        }
+
+        let dev_a = VirtualNetworkInterface {
+            name: name_a.clone(),
+            kind: VirtualDeviceKind::FreeBsdEpair,
+            mac_address: [0x02, 0x00, 0xFE, 0x01, 0x00, 0x0A],
+            peer_name: Some(name_b.clone()),
+            parent_iface: None,
+            mode: None,
+            rx_packets: 0,
+            tx_packets: 0,
+            is_up: true,
+        };
+
+        let dev_b = VirtualNetworkInterface {
+            name: name_b.clone(),
+            kind: VirtualDeviceKind::FreeBsdEpair,
+            mac_address: [0x02, 0x00, 0xFE, 0x01, 0x00, 0x0B],
+            peer_name: Some(name_a.clone()),
+            parent_iface: None,
+            mode: None,
+            rx_packets: 0,
+            tx_packets: 0,
+            is_up: true,
+        };
+
+        self.devices.insert(name_a.clone(), dev_a);
+        self.devices.insert(name_b.clone(), dev_b);
+        Ok((name_a, name_b))
+    }
+
+    pub fn create_macvlan(&mut self, name: &str, parent: &str, mode: MacvlanMode) -> Result<(), &'static str> {
+        if self.devices.contains_key(name) {
+            return Err("Macvlan interface already exists");
+        }
+
+        let dev = VirtualNetworkInterface {
+            name: name.to_string(),
+            kind: VirtualDeviceKind::LinuxMacvlan,
+            mac_address: [0x02, 0x50, 0xAA, 0xBB, 0xCC, 0x01],
+            peer_name: None,
+            parent_iface: Some(parent.to_string()),
+            mode: Some(mode),
+            rx_packets: 0,
+            tx_packets: 0,
+            is_up: true,
+        };
+
+        self.devices.insert(name.to_string(), dev);
+        Ok(())
+    }
+
+    pub fn transmit_frame(&mut self, src_iface: &str, frame: &[u8]) -> Result<(), &'static str> {
+        if frame.is_empty() {
+            return Err("Empty frame");
+        }
+
+        let peer_name = {
+            let src = self.devices.get_mut(src_iface).ok_or("Source interface not found")?;
+            if !src.is_up {
+                return Err("Interface is down");
+            }
+            src.tx_packets += 1;
+            src.peer_name.clone()
+        };
+
+        if let Some(peer) = peer_name {
+            if let Some(dst) = self.devices.get_mut(&peer) {
+                if dst.is_up {
+                    dst.rx_packets += 1;
+                    return Ok(());
+                }
+            }
+        }
+
+        Ok(())
+    }
+}
+
 pub struct WireguardPqcTunnelEngine {
     pub interface_name: String,
     pub peer_public_key: String,
@@ -504,5 +670,30 @@ mod tests {
         let stack = vnet_engine.vnet_stacks.get(&101).unwrap();
         assert_eq!(stack.default_gateway, "192.168.1.1");
         assert_eq!(stack.interfaces, vec!["epair0a".to_string()]);
+    }
+
+    #[test]
+    fn test_linux_bsd_virtual_network_device_engine() {
+        let mut net_engine = LinuxBsdVirtualNetworkDeviceEngine::new();
+
+        // Test VETH pair creation and frame transmission
+        assert!(net_engine.create_veth_pair("veth0", "veth1").is_ok());
+        assert!(net_engine.transmit_frame("veth0", b"ETH_FRAME_PAYLOAD").is_ok());
+
+        let dev0 = net_engine.devices.get("veth0").unwrap();
+        let dev1 = net_engine.devices.get("veth1").unwrap();
+        assert_eq!(dev0.tx_packets, 1);
+        assert_eq!(dev1.rx_packets, 1);
+
+        // Test FreeBSD epair creation
+        let (ep_a, ep_b) = net_engine.create_freebsd_epair("epair0").unwrap();
+        assert_eq!(ep_a, "epair0a");
+        assert_eq!(ep_b, "epair0b");
+
+        // Test Macvlan sub-interface creation
+        assert!(net_engine.create_macvlan("mvlan0", "eth0", MacvlanMode::Bridge).is_ok());
+        let mvlan = net_engine.devices.get("mvlan0").unwrap();
+        assert_eq!(mvlan.kind, VirtualDeviceKind::LinuxMacvlan);
+        assert_eq!(mvlan.mode, Some(MacvlanMode::Bridge));
     }
 }

@@ -38,6 +38,89 @@ pub enum BlockError {
     SequentialOnly = 7,
 }
 
+// ── 0. SCSI SENSE KEYS & ADDITIONAL SENSE CODE QUALIFIERS (ASC/ASCQ) ─────
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u8)]
+pub enum ScsiSenseKey {
+    NoSense = 0x00,
+    RecoveredError = 0x01,
+    NotReady = 0x02,
+    MediumError = 0x03,
+    HardwareError = 0x04,
+    IllegalRequest = 0x05,
+    UnitAttention = 0x06,
+    DataProtect = 0x07,
+    BlankCheck = 0x08,
+    VendorSpecific = 0x09,
+    CopyAborted = 0x0A,
+    AbortedCommand = 0x0B,
+    VolumeOverflow = 0x0D,
+    Miscompare = 0x0E,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ScsiAscQualifier {
+    NoAdditionalSense = 0x0000,
+    LogicalUnitNotReady = 0x0400,
+    LogicalUnitNotReadyInitializing = 0x0401,
+    LogicalUnitNotReadyManualIntervention = 0x0402,
+    LogicalUnitNotReadyFormatInProgress = 0x0404,
+    LbaOutOfRange = 0x2100,
+    InvalidCommandOperationCode = 0x2000,
+    WriteProtected = 0x2700,
+    UnrecoveredReadError = 0x1100,
+    WriteError = 0x0C00,
+    MediumNotPresent = 0x3A00,
+    PowerOnReset = 0x2900,
+}
+
+impl ScsiAscQualifier {
+    pub fn asc(&self) -> u8 {
+        ((*self as u16) >> 8) as u8
+    }
+
+    pub fn ascq(&self) -> u8 {
+        ((*self as u16) & 0xFF) as u8
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ScsiSenseData {
+    pub sense_key: ScsiSenseKey,
+    pub asc: u8,
+    pub ascq: u8,
+    pub qualifier: ScsiAscQualifier,
+    pub valid_info: bool,
+    pub information: u64,
+}
+
+impl ScsiSenseData {
+    pub fn new(sense_key: ScsiSenseKey, qualifier: ScsiAscQualifier) -> Self {
+        Self {
+            sense_key,
+            asc: qualifier.asc(),
+            ascq: qualifier.ascq(),
+            qualifier,
+            valid_info: false,
+            information: 0,
+        }
+    }
+
+    pub fn with_info(mut self, info: u64) -> Self {
+        self.valid_info = true;
+        self.information = info;
+        self
+    }
+
+    pub fn description(&self) -> String {
+        format!(
+            "SCSI SenseKey: {:?}, ASC/ASCQ: {:#04X}/{:#04X} ({:?})",
+            self.sense_key, self.asc, self.ascq, self.qualifier
+        )
+    }
+}
+
 pub trait BlockOrientedDevice: Send + Sync {
     fn device_id(&self) -> BlockDeviceID;
     fn device_class(&self) -> DeviceClass;
@@ -552,6 +635,21 @@ mod tests {
 
         assert_eq!(diagram.block_count(), 2);
         assert_eq!(diagram.signal_buses.len(), 1);
+    }
+
+    #[test]
+    fn test_scsi_sense_data_handling() {
+        let sense = ScsiSenseData::new(
+            ScsiSenseKey::IllegalRequest,
+            ScsiAscQualifier::LbaOutOfRange,
+        ).with_info(0x00018000);
+
+        assert_eq!(sense.sense_key, ScsiSenseKey::IllegalRequest);
+        assert_eq!(sense.asc, 0x21);
+        assert_eq!(sense.ascq, 0x00);
+        assert!(sense.valid_info);
+        assert_eq!(sense.information, 0x00018000);
+        assert!(sense.description().contains("IllegalRequest"));
     }
 }
 
