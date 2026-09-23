@@ -36,6 +36,7 @@ SigmaOS Wiki Home
 │   ├── Architecture Overview (Kernel, Userland, Desktop)
 │   ├── Kernel & Microkernel Module Development
 │   ├── Hardware Driver Architecture (3-Tier Model)
+│   ├── AI Agent Component Development Framework (`docs/SIGMAOS_AI_AGENT_COMPONENT_DEVELOPMENT_FRAMEWORK.md`)
 │   ├── Universal Package Recipes & `.sigpkg` Packaging
 │   ├── Rust & C System Call API Reference
 │   └── Testing, Verification & Integration CI

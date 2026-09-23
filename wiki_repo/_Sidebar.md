@@ -104,6 +104,7 @@
 - **[[Release Criteria|RELEASE_CRITERIA]]**
 - **[[Architecture Decision Records|ARCHITECTURE_DECISIONS]]**
 - **[[Comprehensive OS Analysis|SIGMAOS_COMPREHENSIVE_OS_ANALYSIS]]**
+- **[[AI Agent Component Framework|SIGMAOS_AI_AGENT_COMPONENT_DEVELOPMENT_FRAMEWORK]]**
 - **[[Category:Development|Category-Development]]**
 
 ---

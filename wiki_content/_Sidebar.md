@@ -33,6 +33,7 @@
 
 #### 📦 Package Management
 - **[[Universal Package Engine (sigpkg)|Package-Management-and-Sigpkg]]**
+- **[[Post-Quantum Cryptography Package Distribution|Post-Quantum-Cryptography-Package-Distribution]]**
 - **[[Arch PKGBUILD & AUR Helper|ARCH_LINUX_PARITY_FEATURES]]**
 - **[[Multi-Distro Adapters|UNIVERSAL_PACKAGE_SYSTEM_IMPLEMENTATION_PLAN]]**
 - **[[Content-Addressed Storage|Content-Addressed-Storage]]**
@@ -64,6 +65,7 @@
 
 #### ⚡ Performance & Kernel
 - **[[Performance & BORE Scheduler|Performance-Tuning-and-Kernel]]**
+- **[[Low-Overhead Kernel Observability|Low-Overhead-Kernel-Observability]]**
 - **[[MGLRU & Memory Reclamation|Performance-Tuning-and-Kernel#mglru--memory-reclamation]]**
 - **[[eBPF / XDP Networking|Performance-Tuning-and-Kernel#ebpf--xdp-zero-copy-networking]]**
 - **[[Lock-Free Data Structures|SIGMA_CONCURRENCY_PRIMITIVES]]**
@@ -102,6 +104,7 @@
 - **[[Release Criteria|RELEASE_CRITERIA]]**
 - **[[Architecture Decision Records|ARCHITECTURE_DECISIONS]]**
 - **[[Comprehensive OS Analysis|SIGMAOS_COMPREHENSIVE_OS_ANALYSIS]]**
+- **[[AI Agent Component Framework|SIGMAOS_AI_AGENT_COMPONENT_DEVELOPMENT_FRAMEWORK]]**
 - **[[Category:Development|Category-Development]]**
 
 ---
