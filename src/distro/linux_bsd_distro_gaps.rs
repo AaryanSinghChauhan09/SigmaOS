@@ -824,6 +824,111 @@ impl Default for UdevDevdHotplugEngine {
 }
 
 // ============================================================================
+// 9. Multicore SMP Interrupt Engine (Linux irqbalance / FreeBSD intrng Parity)
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct IrqBinding {
+    pub irq_number: u32,
+    pub target_cpu_core: usize,
+    pub interrupt_count: u64,
+}
+
+#[derive(Debug)]
+pub struct MulticoreSmpInterruptEngine {
+    pub num_cpu_cores: usize,
+    pub irq_table: Vec<IrqBinding>,
+}
+
+impl MulticoreSmpInterruptEngine {
+    pub fn new(num_cpu_cores: usize) -> Self {
+        Self {
+            num_cpu_cores,
+            irq_table: Vec::new(),
+        }
+    }
+
+    pub fn bind_irq(&mut self, irq_number: u32, target_cpu_core: usize) -> Result<(), &'static str> {
+        if target_cpu_core >= self.num_cpu_cores {
+            return Err("Target CPU core out of bounds");
+        }
+        self.irq_table.push(IrqBinding {
+            irq_number,
+            target_cpu_core,
+            interrupt_count: 0,
+        });
+        Ok(())
+    }
+
+    pub fn balance_irq_load(&mut self) {
+        if self.num_cpu_cores == 0 {
+            return;
+        }
+        for (i, binding) in self.irq_table.iter_mut().enumerate() {
+            binding.target_cpu_core = i % self.num_cpu_cores;
+        }
+    }
+}
+
+impl Default for MulticoreSmpInterruptEngine {
+    fn default() -> Self {
+        Self::new(4)
+    }
+}
+
+// ============================================================================
+// 10. Kernel Perf & DTrace Dynamic Tracing Engine (Linux perf / illumos DTrace Parity)
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct DtraceProbeSample {
+    pub pid: u32,
+    pub pc: u64,
+    pub probe_name: &'static str,
+    pub timestamp_ns: u64,
+}
+
+#[derive(Debug)]
+pub struct KernelPerfDtraceEngine {
+    pub is_active: bool,
+    pub probe_samples: Vec<DtraceProbeSample>,
+}
+
+impl KernelPerfDtraceEngine {
+    pub fn new() -> Self {
+        Self {
+            is_active: false,
+            probe_samples: Vec::new(),
+        }
+    }
+
+    pub fn start_tracing(&mut self) {
+        self.is_active = true;
+    }
+
+    pub fn stop_tracing(&mut self) {
+        self.is_active = false;
+    }
+
+    pub fn record_sample(&mut self, pid: u32, pc: u64, probe_name: &'static str, timestamp_ns: u64) {
+        if self.is_active {
+            self.probe_samples.push(DtraceProbeSample {
+                pid,
+                pc,
+                probe_name,
+                timestamp_ns,
+            });
+        }
+    }
+}
+
+impl Default for KernelPerfDtraceEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
 // 11. NixOS / Guix Hermetic Content-Addressable Store (CAS) Verifier
 // ============================================================================
 
@@ -1117,7 +1222,7 @@ mod tests {
 
     #[test]
     fn test_sovereign_dns_tls_resolver() {
-        let mut resolver = SovereignDnsTlsResolverEngine::new([1, 1, 1, 1]);
+        let resolver = SovereignDnsTlsResolverEngine::new([1, 1, 1, 1]);
         let localhost_ip = resolver.resolve_domain("localhost").unwrap();
         assert_eq!(localhost_ip, [127, 0, 0, 1]);
     }
@@ -1211,6 +1316,11 @@ impl Default for SovereignUniversalDistroGapResolver {
     fn default() -> Self {
         Self::new()
     }
+}
+
+#[cfg(test)]
+mod tests_gap_additions {
+    use super::*;
 
     #[test]
     fn test_sovereign_nix_cas_verifier() {
