@@ -749,16 +749,16 @@ pub trait CommandHistory {
 #[repr(C)]
 pub struct SimpleCommandHistory {
     pub history: ShellVec<[u8; 256]>,
-    pub history_lens: ShellVec<u16>,
     pub current_index: AtomicUsize,
+    pub history_lens: ShellVec<u16>,
 }
 
 impl SimpleCommandHistory {
     pub fn new() -> Self {
         SimpleCommandHistory {
             history: ShellVec::new(),
-            history_lens: ShellVec::new(),
             current_index: AtomicUsize::new(0),
+            history_lens: ShellVec::new(),
         }
     }
 }
@@ -772,13 +772,13 @@ impl Default for SimpleCommandHistory {
 impl CommandHistory for SimpleCommandHistory {
     fn add(&mut self, command: &[u8]) {
         let mut cmd_array = [0u8; 256];
-        let cmd_len = command.len().min(256);
+        let cmd_len = command.len().min(255);
         // Bolt ⚡ Optimization: Use bulk slice copying (`copy_from_slice`) to allow SIMD vectorization
         cmd_array[..cmd_len].copy_from_slice(&command[..cmd_len]);
         self.history.push(cmd_array);
-        // Bolt ⚡ Optimization: Cache explicit string lengths as u16 during addition to eliminate
-        // O(N) zero-byte linear scans (.position(|&b| b == 0)) on every history retrieval/list query,
-        // reducing slice lookups to bounds-checked O(1) constant time and avoiding u8 overflow on 256-byte strings.
+        // Bolt ⚡ Optimization: Cache explicit string lengths as u16 appended at struct end to preserve
+        // #[repr(C)] field offsets, null-termination invariant at byte 255, and eliminate O(N) zero-byte linear
+        // scans (.position(|&b| b == 0)) on history queries, reducing slice lookups to O(1) constant time.
         self.history_lens.push(cmd_len as u16);
         self.current_index
             .store(self.history.len(), Ordering::SeqCst);
