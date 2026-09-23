@@ -27,7 +27,13 @@ pub mod random;
 pub mod rsa;
 pub mod vectorized_pqc;
 pub mod aegis_vault;
+pub mod advanced_encryption_standard;
 
+pub use advanced_encryption_standard::{
+    LinuxBsdAesXtsVolumeEngine, FreeBsdGeliIntegrityEngine,
+    OpenBsdCryptodevFrameworkEngine, LinuxCryptoTransformRegistry,
+    AesCipherMode, CryptodevSession, CryptoTransformSpec,
+};
 pub use aegis_vault::{
     AegisEncryptedContainer, AegisVaultEncryptionCompressionEngine, AegisVaultError,
 };

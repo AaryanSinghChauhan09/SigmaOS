@@ -324,6 +324,11 @@ pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
     SystemSnapshot,
 };
+pub use crypto::{
+    LinuxBsdAesXtsVolumeEngine, FreeBsdGeliIntegrityEngine,
+    OpenBsdCryptodevFrameworkEngine, LinuxCryptoTransformRegistry,
+    AesCipherMode, CryptodevSession, CryptoTransformSpec,
+};
 pub use security::hardening;
 pub use security::{
     AnonSurfShunt, AppSandboxEngine, ArithmeticSubstitutionDeobfuscator, CapabilityGate,
