@@ -18,6 +18,7 @@ pub mod tlb_associative;
 pub mod zone;
 pub mod demand_paging;
 pub mod asid_pcid;
+pub mod mglru_aging;
 
 pub use paging::{
     MemoryError, PageDirectory, PageDirectoryPointerTable, PageTable, PageTableEntry,
@@ -41,4 +42,7 @@ pub use demand_paging::{
 };
 pub use asid_pcid::{
     AddressSpaceIdentifierEngine, InvpcidMode, PcidDescriptor, CR3_NOFLUSH_BIT, KPTI_USER_PCID_MASK, MAX_X86_PCID,
+};
+pub use mglru_aging::{
+    MglruPageAgingEngine, MglruPageDescriptor, MAX_MGLRU_GENERATIONS, PAGE_ACCESSED_BIT, PAGE_DIRTY_BIT,
 };
