@@ -464,13 +464,7 @@ impl HardwareMacNetworkAccessEngine {
                 }
             }
             (MacAddressFilterPolicy::AllowList, None) => false,
-            (MacAddressFilterPolicy::DenyList, Some(rule)) => {
-                if is_arp_packet && !rule.allow_arp {
-                    false
-                } else {
-                    false
-                }
-            }
+            (MacAddressFilterPolicy::DenyList, Some(_rule)) => false,
             (MacAddressFilterPolicy::DenyList, None) => true,
         };
 
