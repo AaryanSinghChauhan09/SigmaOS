@@ -9,17 +9,17 @@ pub mod enterprise_productivity_suite;
 pub mod finance;
 pub mod flint_chart;
 pub mod gamification;
+pub mod itsfoss_apps_synthesis;
 pub mod linux_bsd_tools;
 pub mod media;
 pub mod mind_map;
 pub mod mint_competitor;
+pub mod pdf;
 pub mod reminders_advanced;
 pub mod sigma_office;
 pub mod sovereign_apps;
-pub mod pdf;
 pub mod subtitle_editor;
 pub mod tmux;
-pub mod itsfoss_apps_synthesis;
 
 pub use pdf::{
     PdfDocument, PdfError, PdfPage, SovereignPdf24Engine, SovereignXournalPdfAnnotationEngine,
@@ -39,34 +39,37 @@ pub use gamification::{
     ProductivityScore,
 };
 pub use media::{AudioChannel, SigmaMediaEngine, GLOBAL_MEDIA_ENGINE};
+pub use reminders_advanced::{
+    EnhancedRemindersEngine, RecurrencePattern, ReminderItem, ReminderPriority,
+};
 pub use sovereign_apps::{
     ProductivityTask, SigmaOfficeDocument, SigmaTasksBoard, SigmaVaultContainer, TaskPriority,
     TextNode,
-};
-pub use reminders_advanced::{
-    EnhancedRemindersEngine, RecurrencePattern, ReminderItem, ReminderPriority,
 };
 pub use tmux::{
     LayoutPreset, SplitDirection, TmuxPane, TmuxSession, TmuxSessionManager, TmuxWindow,
 };
 
-pub use mind_map::{IndentedTextMindMapParserEngine, MindMapCreator, MindMapNode, MindMapLayout, NodeShape, NodeStyle, RelationshipConnection};
+pub use mind_map::{
+    IndentedTextMindMapParserEngine, MindMapCreator, MindMapLayout, MindMapNode, NodeShape,
+    NodeStyle, RelationshipConnection,
+};
 
 pub use sigma_office::{
     AggregationFunction, AutomationTrigger, CellValue, ChannelType, CitationManager,
     CitationSource, CitationStyle, ConditionOperator, ConditionalFormatRule, CrmActivityLog,
-    CrmActivityType, CrmWorkflowRule, CrmWorkflowRuleEngine, DataValidationRule,
-    DatabaseFieldType, DigitalSignatureRecord, DocumentMetrics, DocumentNode, DocumentType,
-    EmployeeNode, EnterpriseDeal, EnterpriseErpLedger, EnterpriseInvoice, FormQuestion,
-    FormQuestionType, FormResponse, GanttTask, GanttTaskDependency, HelpdeskTicket,
-    InlineDocComment, IntegrationWorkflowStep, InventorySkuItem, LedgerJournalEntry,
-    LiveCoAuthoringManager, LookerChartWidget, LookerMetricCard, LowCodeFieldSchema,
-    LowCodeRecord, LowCodeTable, MacroEventType, MacroExecutor, ManufacturingWorkOrder,
-    MarketingCampaign, MarketingDripStep, MasterSlideLayout, OdfDocumentKind,
-    OmnichannelInteraction, ParagraphStyle, PivotTableField, PosCartLine, PosReceipt,
-    PresentationProcessor, QuickNoteChecklistItem, SharedDriveRole, SigmaFormulaParserEngine,
-    SigmaOdfPackageEngine, SigmaOffice, SigmaPivotTableEngine, SigmaSlideDetails,
-    SigmaSpellCheckerEngine, SigmaStyleThemeEngine, SigmaTrackChangesEngine,
+    CrmActivityType, CrmWorkflowRule, CrmWorkflowRuleEngine, DataValidationRule, DatabaseFieldType,
+    DealEscalationLevel, DigitalSignatureRecord, DocumentBranch, DocumentMetrics, DocumentNode,
+    DocumentType, EmployeeNode, EnterpriseDeal, EnterpriseErpLedger, EnterpriseInvoice,
+    FormQuestion, FormQuestionType, FormResponse, GanttTask, GanttTaskDependency, HelpdeskTicket,
+    InlineDocComment, IntegrationWorkflowStep, InventorySkuItem, LeadAssignmentRule,
+    LedgerJournalEntry, LiveCoAuthoringManager, LookerChartWidget, LookerFilterControl,
+    LookerGaugeWidget, LookerMetricCard, LowCodeFieldSchema, LowCodeRecord, LowCodeTable,
+    MacroEventType, MacroExecutor, ManufacturingWorkOrder, MarketingCampaign, MarketingDripStep,
+    MasterSlideLayout, OdfDocumentKind, OmnichannelInteraction, ParagraphStyle, PivotTableField,
+    PosCartLine, PosReceipt, PresentationProcessor, QuickNoteChecklistItem, SharedDriveRole,
+    SigmaFormulaParserEngine, SigmaOdfPackageEngine, SigmaOffice, SigmaPivotTableEngine,
+    SigmaSlideDetails, SigmaSpellCheckerEngine, SigmaStyleThemeEngine, SigmaTrackChangesEngine,
     SovereignCollaborativeWhiteboardEngine, SovereignCrmPipeline, SovereignDigitalSignatureEngine,
     SovereignEmployeeOrgChartEngine, SovereignFormsSurveyEngine, SovereignHelpdeskSlaEngine,
     SovereignIntegrationWorkflowEngine, SovereignInventoryWarehouseEngine,
@@ -76,6 +79,7 @@ pub use sigma_office::{
     SovereignQuickNotesEngine, SovereignSharedDriveAccessEngine, SovereignWebPage,
     SovereignWebPublisherEngine, SovereignWorkgroupGanttEngine, SpreadsheetProcessor,
     SuggestionEdit, TableOfContentsEntry, TableOfContentsGenerator, TaskDependencyType,
-    TextProcessor, TicketPriority, TicketStatus, TypographyRenderer, ValidationRuleType,
-    ValuationMethod, VersionHistoryManager, WebPublisherBlock, WhiteboardElement, WorkOrderStatus,
+    TextProcessor, TicketPriority, TicketQueue, TicketStatus, TypographyRenderer,
+    ValidationRuleType, ValuationMethod, VersionHistoryManager, WebPublisherBlock,
+    WhiteboardElement, WorkOrderStatus,
 };
