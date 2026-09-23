@@ -2186,7 +2186,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkg" | "pkgsend" | "pkg_add" | "pkg_delete" | "pkg_info" | "freebsd" | "openbsd" | "netbsd" | "bsd" => {
+            "pkg" | "pkgadd" | "pkg_delete" | "pkg_info" | "freebsd" | "openbsd" | "netbsd" | "bsd" | "pkgman" | "swupd" | "eopkg" | "moss" | "pkgin" => {
                 if pm == "pkg_delete" {
                     operation = UniversalPmOperation::Remove;
                 } else if pm == "pkg_info" {
@@ -2195,10 +2195,10 @@ impl UniversalPmCommandDispatcher {
                     let mut i = 0;
                     while i < args.len() {
                         match args[i] {
-                            "install" | "add" => operation = UniversalPmOperation::Install,
-                            "delete" | "remove" | "purge" => operation = UniversalPmOperation::Remove,
-                            "upgrade" | "update" => operation = UniversalPmOperation::Upgrade,
-                            "search" => operation = UniversalPmOperation::Search,
+                            "install" | "in" | "it" | "bundle-add" | "add" => operation = UniversalPmOperation::Install,
+                            "delete" | "remove" | "rm" | "purge" | "bundle-remove" => operation = UniversalPmOperation::Remove,
+                            "upgrade" | "update" | "ur" => operation = UniversalPmOperation::Upgrade,
+                            "search" | "se" | "sr" => operation = UniversalPmOperation::Search,
                             "info" | "query" | "status" => operation = UniversalPmOperation::QueryInfo,
                             "-n" | "--dry-run" => dry_run = true,
                             arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
@@ -2209,7 +2209,7 @@ impl UniversalPmCommandDispatcher {
                 }
                 if target_packages.is_empty() {
                     for arg in args {
-                        if !arg.starts_with('-') && *arg != "install" && *arg != "add" && *arg != "delete" && *arg != "remove" && *arg != "upgrade" {
+                        if !arg.starts_with('-') && *arg != "install" && *arg != "add" && *arg != "delete" && *arg != "remove" && *arg != "upgrade" && *arg != "in" && *arg != "it" && *arg != "rm" && *arg != "ur" && *arg != "se" && *arg != "sr" {
                             target_packages.push(arg.to_string());
                         }
                     }
@@ -2245,38 +2245,6 @@ impl UniversalPmCommandDispatcher {
                 }
             }
             "emerge" | "ebuild" | "gentoo" | "portage" => {
-                let mut i = 0;
-                while i < args.len() {
-                    match args[i] {
-                        "install" | "add" => operation = UniversalPmOperation::Install,
-                        "delete" | "remove" => operation = UniversalPmOperation::Remove,
-                        "upgrade" => operation = UniversalPmOperation::Upgrade,
-                        "search" => operation = UniversalPmOperation::Search,
-                        "info" => operation = UniversalPmOperation::QueryInfo,
-                        "-n" => dry_run = true,
-                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
-                        _ => {}
-                    }
-                    i += 1;
-                }
-            }
-            "xbps-install" | "xbps-remove" | "xbps-query" => {
-                if pm == "xbps-install" {
-                    operation = UniversalPmOperation::Install;
-                } else if pm == "xbps-remove" {
-                    operation = UniversalPmOperation::Remove;
-                } else {
-                    operation = UniversalPmOperation::QueryInfo;
-                }
-                for arg in args {
-                    if *arg == "-n" || *arg == "--dry-run" {
-                        dry_run = true;
-                    } else if !arg.starts_with('-') {
-                        target_packages.push(arg.to_string());
-                    }
-                }
-            }
-            "emerge" | "ebuild" => {
                 let mut i = 0;
                 while i < args.len() {
                     let arg = args[i];
@@ -2368,35 +2336,6 @@ impl UniversalPmCommandDispatcher {
                 if target_packages.is_empty() {
                     for arg in args {
                         if !arg.starts_with('-') && *arg != "install" && *arg != "remove" && *arg != "upgrade" {
-                            target_packages.push(arg.to_string());
-                        }
-                    }
-                }
-            }
-            "pkgman" | "swupd" | "eopkg" | "moss" | "pkgin" | "pkg_delete" | "pkg_info" => {
-                if pm == "pkg_delete" {
-                    operation = UniversalPmOperation::Remove;
-                } else if pm == "pkg_info" {
-                    operation = UniversalPmOperation::QueryInfo;
-                } else {
-                    let mut i = 0;
-                    while i < args.len() {
-                        match args[i] {
-                            "install" | "in" | "it" | "bundle-add" | "add" => operation = UniversalPmOperation::Install,
-                            "uninstall" | "remove" | "rm" | "bundle-remove" => operation = UniversalPmOperation::Remove,
-                            "update" | "upgrade" | "ur" => operation = UniversalPmOperation::Upgrade,
-                            "search" | "se" | "sr" => operation = UniversalPmOperation::Search,
-                            "info" => operation = UniversalPmOperation::QueryInfo,
-                            "-n" | "--dry-run" => dry_run = true,
-                            arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
-                            _ => {}
-                        }
-                        i += 1;
-                    }
-                }
-                if target_packages.is_empty() {
-                    for arg in args {
-                        if !arg.starts_with('-') {
                             target_packages.push(arg.to_string());
                         }
                     }
