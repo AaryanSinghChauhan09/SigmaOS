@@ -7,6 +7,7 @@
 #![allow(non_camel_case_types)]
 #![allow(clippy::large_enum_variant)]
 #![allow(clippy::type_complexity)]
+extern crate alloc;
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -85,6 +86,7 @@ pub use universal_oop_system::{
 };
 pub use sovereign_sigpkg::*;
 pub use crate::package::sovereign_distro_package_master_suite::*;
+pub use crate::package::sovereign_universal_package_format_master::*;
 pub use universal_adapter::{
     AppImageContainer, FlatpakManifest, MappedScriptletHook, PackageFormatAdapter,
     PackagePriority, PacmanPkgbuild, RpmSpecManifest, SigmaPkgHookType, SnapcraftManifest,

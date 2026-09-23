@@ -233,6 +233,15 @@ pub enum PackageFormat {
     Stratum,
     Swupd,
     Starling,
+    Apex,
+    Conda,
+    Brew,
+    Wasm,
+    Oci,
+    Helm,
+    Sysext,
+    FlatpakRef,
+    CondaTar,
 }
 
 impl PackageFormat {

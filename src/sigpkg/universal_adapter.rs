@@ -126,7 +126,8 @@ pub enum PackageFormat {
     Hpkg, SlackBuild, Pkgsrc, Moss, Tcz, Gobo, Ostree, Air, Bottle, Ipa, Ports, Aab, Hap, Superdeb,
     Lzm, Pup, Pet, Tar, TarGz, TarXz, AppBundle, Puk, Dmg, Cports, Dports, Ipk, Opkg, SolarisIps,
     GuixNar, NarInfo, OpenBsdPkg, Swupd, Stratum, Crux, Drpm, Sfs, Wheel, Crate, Gem, Nupkg, Vcpkg,
-    Spack, Conan, Sigma, Sysupdate, Starling, Sovereign, Eopkg,
+    Spack, Conan, Sigma, Sysupdate, Starling, Sovereign, Eopkg, Apex, Conda, Brew, Wasm, Oci, Helm,
+    Sysext, FlatpakRef, CondaTar,
 }
 
 #[cfg(feature = "standalone_test")]
