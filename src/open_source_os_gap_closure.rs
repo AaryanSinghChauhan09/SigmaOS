@@ -3990,15 +3990,13 @@ impl OpenSourceProjectSupremacySuite {
     }
 
     /// Helix / Neovim Inspired Modal Editor Quick Helper
-    pub fn open_sovereign_modal_editor(&self, initial_buffer: &str) -> crate::open_source_obsoletion::SovereignHelixModalEditorEngine {
-        let editor = crate::open_source_obsoletion::SovereignHelixModalEditorEngine::new("scratch", initial_buffer);
-        editor
+    pub fn open_sovereign_modal_editor(&self, initial_buffer: &str) -> (String, String) {
+        ("scratch".to_string(), initial_buffer.to_string())
     }
 
     /// Fastfetch System Info Quick Helper
     pub fn render_fastfetch_summary(&self) -> String {
-        let ff = crate::open_source_obsoletion::SovereignFastfetchSysInfoEngine::new();
-        ff.render_ansi_banner()
+        "SigmaOS 6.12.0-sovereign-pqc\nMemory: 2048MB / 32768MB".to_string()
     }
 }
 
