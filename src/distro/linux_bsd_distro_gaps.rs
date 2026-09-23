@@ -1117,9 +1117,45 @@ mod tests {
 
     #[test]
     fn test_sovereign_dns_tls_resolver() {
-        let mut resolver = SovereignDnsTlsResolverEngine::new([1, 1, 1, 1]);
+        let resolver = SovereignDnsTlsResolverEngine::new([1, 1, 1, 1]);
         let localhost_ip = resolver.resolve_domain("localhost").unwrap();
         assert_eq!(localhost_ip, [127, 0, 0, 1]);
+    }
+
+    #[test]
+    fn test_sovereign_nix_cas_verifier() {
+        let mut verifier = SovereignNixHermeticCasVerifier::new();
+        assert!(verifier.verify_cas_object("sha256-abc", "/system/store/pkg1"));
+        assert!(!verifier.verify_cas_object("sha256-abc", "/var/tmp/pkg1"));
+        assert_eq!(verifier.verified_store_objects.len(), 1);
+    }
+
+    #[test]
+    fn test_sovereign_void_xbps_trigger_engine() {
+        let mut trigger_engine = SovereignVoidXbpsTransactionalTriggerEngine::new();
+        assert_eq!(trigger_engine.pending_triggers.len(), 3);
+        let count = trigger_engine.execute_all_triggers();
+        assert_eq!(count, 3);
+        assert_eq!(trigger_engine.executed_triggers.len(), 3);
+    }
+
+    #[test]
+    fn test_sovereign_freebsd_bectl_engine() {
+        let mut bectl = SovereignFreeBsdBectlZfsBootEnvironmentEngine::new();
+        assert_eq!(bectl.environments.len(), 1);
+        assert!(bectl.create_environment("backup-2026"));
+        assert_eq!(bectl.environments.len(), 2);
+        assert!(bectl.activate_environment("backup-2026"));
+        assert!(bectl.environments[1].active_boot);
+        assert!(!bectl.environments[0].active_boot);
+    }
+
+    #[test]
+    fn test_sovereign_openbsd_pinsyscall_engine() {
+        let mut pinsyscall = SovereignOpenBsdPinSyscallEngine::new();
+        pinsyscall.register_pinned_region(0x7fff0000, 0x7fff1000);
+        assert!(pinsyscall.validate_syscall_entry(0x7fff0050));
+        assert!(!pinsyscall.validate_syscall_entry(0x10000000));
     }
 }
 
@@ -1211,40 +1247,78 @@ impl Default for SovereignUniversalDistroGapResolver {
     fn default() -> Self {
         Self::new()
     }
+}
 
-    #[test]
-    fn test_sovereign_nix_cas_verifier() {
-        let mut verifier = SovereignNixHermeticCasVerifier::new();
-        assert!(verifier.verify_cas_object("sha256-abc", "/system/store/pkg1"));
-        assert!(!verifier.verify_cas_object("sha256-abc", "/var/tmp/pkg1"));
-        assert_eq!(verifier.verified_store_objects.len(), 1);
+#[derive(Debug, Clone)]
+pub struct IrqBindEntry {
+    pub irq_num: u32,
+    pub target_cpu_core: u32,
+}
+
+pub struct MulticoreSmpInterruptEngine {
+    pub num_cpu_cores: u32,
+    pub irq_table: Vec<IrqBindEntry>,
+}
+
+impl MulticoreSmpInterruptEngine {
+    pub fn new(num_cpu_cores: u32) -> Self {
+        Self {
+            num_cpu_cores,
+            irq_table: Vec::new(),
+        }
     }
 
-    #[test]
-    fn test_sovereign_void_xbps_trigger_engine() {
-        let mut trigger_engine = SovereignVoidXbpsTransactionalTriggerEngine::new();
-        assert_eq!(trigger_engine.pending_triggers.len(), 3);
-        let count = trigger_engine.execute_all_triggers();
-        assert_eq!(count, 3);
-        assert_eq!(trigger_engine.executed_triggers.len(), 3);
+    pub fn bind_irq(&mut self, irq_num: u32, target_cpu_core: u32) -> Result<(), &'static str> {
+        if target_cpu_core >= self.num_cpu_cores {
+            return Err("Target CPU core index out of bounds");
+        }
+        self.irq_table.push(IrqBindEntry {
+            irq_num,
+            target_cpu_core,
+        });
+        Ok(())
     }
 
-    #[test]
-    fn test_sovereign_freebsd_bectl_engine() {
-        let mut bectl = SovereignFreeBsdBectlZfsBootEnvironmentEngine::new();
-        assert_eq!(bectl.environments.len(), 1);
-        assert!(bectl.create_environment("backup-2026"));
-        assert_eq!(bectl.environments.len(), 2);
-        assert!(bectl.activate_environment("backup-2026"));
-        assert!(bectl.environments[1].active_boot);
-        assert!(!bectl.environments[0].active_boot);
+    pub fn balance_irq_load(&mut self) {
+        for (i, entry) in self.irq_table.iter_mut().enumerate() {
+            entry.target_cpu_core = (i as u32) % self.num_cpu_cores;
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PerfProbeSample {
+    pub pid: u64,
+    pub ip: u64,
+    pub probe_name: String,
+    pub timestamp_ns: u64,
+}
+
+pub struct KernelPerfDtraceEngine {
+    pub tracing_active: bool,
+    pub probe_samples: Vec<PerfProbeSample>,
+}
+
+impl KernelPerfDtraceEngine {
+    pub fn new() -> Self {
+        Self {
+            tracing_active: false,
+            probe_samples: Vec::new(),
+        }
     }
 
-    #[test]
-    fn test_sovereign_openbsd_pinsyscall_engine() {
-        let mut pinsyscall = SovereignOpenBsdPinSyscallEngine::new();
-        pinsyscall.register_pinned_region(0x7fff0000, 0x7fff1000);
-        assert!(pinsyscall.validate_syscall_entry(0x7fff0050));
-        assert!(!pinsyscall.validate_syscall_entry(0x10000000));
+    pub fn start_tracing(&mut self) {
+        self.tracing_active = true;
+    }
+
+    pub fn record_sample(&mut self, pid: u64, ip: u64, probe_name: &str, timestamp_ns: u64) {
+        if self.tracing_active {
+            self.probe_samples.push(PerfProbeSample {
+                pid,
+                ip,
+                probe_name: probe_name.to_string(),
+                timestamp_ns,
+            });
+        }
     }
 }
