@@ -292,6 +292,117 @@ impl LegacyScheduler {
     }
 }
 
+/// 8. Execution Stack Activation Record & Call Frame Engine
+/// Inspired by Linux System V / x86_64 ABI & BSD signal frame unwinding.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ActivationRecord {
+    pub frame_pointer: u64,
+    pub return_address: u64,
+    pub function_name: &'static str,
+    pub argument_registers: [u64; 6], // System V ABI: RDI, RSI, RDX, RCX, R8, R9
+    pub local_variables_size: usize,
+    pub stack_pointer: u64,
+}
+
+impl ActivationRecord {
+    pub fn new(
+        fp: u64,
+        ret_addr: u64,
+        func: &'static str,
+        args: [u64; 6],
+        locals_size: usize,
+        sp: u64,
+    ) -> Self {
+        Self {
+            frame_pointer: fp,
+            return_address: ret_addr,
+            function_name: func,
+            argument_registers: args,
+            local_variables_size: locals_size,
+            stack_pointer: sp,
+        }
+    }
+
+    pub fn is_valid_frame(&self) -> bool {
+        self.stack_pointer <= self.frame_pointer && self.return_address != 0
+    }
+}
+
+/// Linux ucontext_t / BSD sigcontext Signal Stack Frame Preservation
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct UcontextSigcontextNative {
+    pub rip: u64,
+    pub rsp: u64,
+    pub rbp: u64,
+    pub rflags: u64,
+    pub registers: [u64; 16],
+    pub signal_number: i32,
+    pub signal_mask: u64,
+}
+
+impl UcontextSigcontextNative {
+    pub fn new(sig_nr: i32, rip: u64, rsp: u64, rbp: u64) -> Self {
+        Self {
+            rip,
+            rsp,
+            rbp,
+            rflags: 0x202, // IF (Interrupt Flag) enabled
+            registers: [0; 16],
+            signal_number: sig_nr,
+            signal_mask: 0,
+        }
+    }
+}
+
+/// Call Stack Frame Unwinder Engine for Kernel Stack Trace Analysis
+pub struct StackUnwinderEngine {
+    pub frames: Vec<ActivationRecord>,
+}
+
+impl StackUnwinderEngine {
+    pub fn new() -> Self {
+        Self {
+            frames: Vec::new(),
+        }
+    }
+
+    pub fn push_frame(&mut self, record: ActivationRecord) -> Result<(), &'static str> {
+        if !record.is_valid_frame() {
+            return Err("Invalid activation record frame parameters");
+        }
+        self.frames.push(record);
+        Ok(())
+    }
+
+    pub fn pop_frame(&mut self) -> Option<ActivationRecord> {
+        if self.frames.len() == 0 {
+            None
+        } else {
+            let last_idx = self.frames.len() - 1;
+            let record = ActivationRecord {
+                frame_pointer: self.frames[last_idx].frame_pointer,
+                return_address: self.frames[last_idx].return_address,
+                function_name: self.frames[last_idx].function_name,
+                argument_registers: self.frames[last_idx].argument_registers,
+                local_variables_size: self.frames[last_idx].local_variables_size,
+                stack_pointer: self.frames[last_idx].stack_pointer,
+            };
+            self.frames.len -= 1;
+            Some(record)
+        }
+    }
+
+    pub fn unwind_stack_trace(&self) -> usize {
+        self.frames.len()
+    }
+}
+
+impl Default for StackUnwinderEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // Simple Vec implementation for Meta module
 pub struct Vec<T> {
     data: *mut T,
@@ -499,5 +610,42 @@ mod tests {
 
         let sched = LegacyScheduler::new("CFS");
         assert_eq!(sched.calculate_priority_heuristic(0, 100), 20);
+    }
+
+    #[test]
+    fn test_activation_record_stack_unwinding() {
+        let mut unwinder = StackUnwinderEngine::new();
+        let frame1 = ActivationRecord::new(
+            0x7FFFFFFFE000,
+            0x00401050,
+            "sys_write",
+            [1, 0x7FFFFFFFD000, 14, 0, 0, 0],
+            32,
+            0x7FFFFFFFD000,
+        );
+        let frame2 = ActivationRecord::new(
+            0x7FFFFFFFE100,
+            0x00401200,
+            "main",
+            [0, 0, 0, 0, 0, 0],
+            64,
+            0x7FFFFFFFE000,
+        );
+
+        assert!(unwinder.push_frame(frame1).is_ok());
+        assert!(unwinder.push_frame(frame2).is_ok());
+        assert_eq!(unwinder.unwind_stack_trace(), 2);
+
+        let popped = unwinder.pop_frame().unwrap();
+        assert_eq!(popped.function_name, "main");
+        assert_eq!(unwinder.unwind_stack_trace(), 1);
+    }
+
+    #[test]
+    fn test_ucontext_sigcontext_frame() {
+        let ctx = UcontextSigcontextNative::new(11, 0x00401500, 0x7FFFFFFFC000, 0x7FFFFFFFC080);
+        assert_eq!(ctx.signal_number, 11); // SIGSEGV
+        assert_eq!(ctx.rip, 0x00401500);
+        assert_eq!(ctx.rflags, 0x202);
     }
 }
