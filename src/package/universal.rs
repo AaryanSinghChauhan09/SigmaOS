@@ -2542,7 +2542,7 @@ impl PackagePullRequestParser {
     }
 }
 
-/// Command translation bridge for foreign package manager CLI invocations (`apt`, `pacman`, `dnf`, `apk`, `emerge`, `pkg`)
+/// Command translation bridge for foreign package manager CLI invocations (`apt`, `pacman`, `dnf`, `zypper`, `apk`, `emerge`, `pkg`, `xbps`, `eopkg`, `nix`, `guix`, `pkg_add`, `swupd`, `slackpkg`, `opkg`, `spack`, `conan`)
 pub struct UniversalPackageCommandBridge;
 
 impl UniversalPackageCommandBridge {
@@ -2560,10 +2560,16 @@ impl UniversalPackageCommandBridge {
                 "-syu" | "update" => Ok("sigpkg update".to_string()),
                 _ => Ok(format!("sigpkg {}", action)),
             },
-            "dnf" | "yum" | "zypper" => match action {
+            "dnf" | "yum" => match action {
                 "install" | "in" => Ok(format!("sigpkg install {}.rpm", pkg)),
                 "remove" | "rm" => Ok(format!("sigpkg remove {}", pkg)),
                 "update" | "up" => Ok("sigpkg update".to_string()),
+                _ => Ok(format!("sigpkg {}", action)),
+            },
+            "zypper" => match action {
+                "in" | "install" => Ok(format!("sigpkg install {}.zypper", pkg)),
+                "rm" | "remove" => Ok(format!("sigpkg remove {}", pkg)),
+                "up" | "update" | "dup" => Ok("sigpkg update".to_string()),
                 _ => Ok(format!("sigpkg {}", action)),
             },
             "apk" => match action {
@@ -2580,6 +2586,64 @@ impl UniversalPackageCommandBridge {
             "pkg" | "ports" => match action {
                 "install" => Ok(format!("sigpkg install {}.pkg", pkg)),
                 "delete" | "remove" => Ok(format!("sigpkg remove {}", pkg)),
+                _ => Ok(format!("sigpkg {}", action)),
+            },
+            "xbps" | "xbps-install" | "xbps-remove" => match action {
+                "install" | "-S" | "-s" => Ok(format!("sigpkg install {}.xbps", pkg)),
+                "remove" | "-R" | "-r" => Ok(format!("sigpkg remove {}", pkg)),
+                "update" | "-u" => Ok("sigpkg update".to_string()),
+                _ => Ok(format!("sigpkg {}", action)),
+            },
+            "eopkg" => match action {
+                "it" | "install" => Ok(format!("sigpkg install {}.eopkg", pkg)),
+                "rm" | "remove" => Ok(format!("sigpkg remove {}", pkg)),
+                "ur" | "up" | "upgrade" => Ok("sigpkg update".to_string()),
+                _ => Ok(format!("sigpkg {}", action)),
+            },
+            "nix" | "nix-env" => match action {
+                "install" | "-i" | "i" => Ok(format!("sigpkg install {}.nixpkg", pkg)),
+                "uninstall" | "-e" | "e" => Ok(format!("sigpkg remove {}", pkg)),
+                "upgrade" | "-u" => Ok("sigpkg update".to_string()),
+                _ => Ok(format!("sigpkg {}", action)),
+            },
+            "guix" => match action {
+                "install" => Ok(format!("sigpkg install {}.scm", pkg)),
+                "remove" => Ok(format!("sigpkg remove {}", pkg)),
+                "upgrade" => Ok("sigpkg update".to_string()),
+                _ => Ok(format!("sigpkg {}", action)),
+            },
+            "pkg_add" | "pkg_delete" => match action {
+                "install" | "add" => Ok(format!("sigpkg install {}.tgz", pkg)),
+                "delete" | "remove" => Ok(format!("sigpkg remove {}", pkg)),
+                "update" | "-u" => Ok("sigpkg update".to_string()),
+                _ => Ok(format!("sigpkg {}", action)),
+            },
+            "swupd" => match action {
+                "bundle-add" | "install" => Ok(format!("sigpkg install {}.swupd", pkg)),
+                "bundle-remove" | "remove" => Ok(format!("sigpkg remove {}", pkg)),
+                "update" => Ok("sigpkg update".to_string()),
+                _ => Ok(format!("sigpkg {}", action)),
+            },
+            "slackpkg" | "installpkg" | "removepkg" => match action {
+                "install" | "add" => Ok(format!("sigpkg install {}.txz", pkg)),
+                "remove" | "delete" => Ok(format!("sigpkg remove {}", pkg)),
+                "update" | "upgrade" => Ok("sigpkg update".to_string()),
+                _ => Ok(format!("sigpkg {}", action)),
+            },
+            "opkg" | "ipkg" => match action {
+                "install" => Ok(format!("sigpkg install {}.ipk", pkg)),
+                "remove" => Ok(format!("sigpkg remove {}", pkg)),
+                "update" | "upgrade" => Ok("sigpkg update".to_string()),
+                _ => Ok(format!("sigpkg {}", action)),
+            },
+            "spack" => match action {
+                "install" => Ok(format!("sigpkg install {}.spack", pkg)),
+                "uninstall" | "remove" => Ok(format!("sigpkg remove {}", pkg)),
+                _ => Ok(format!("sigpkg {}", action)),
+            },
+            "conan" => match action {
+                "install" => Ok(format!("sigpkg install {}.conan", pkg)),
+                "remove" => Ok(format!("sigpkg remove {}", pkg)),
                 _ => Ok(format!("sigpkg {}", action)),
             },
             _ => Ok(format!("sigpkg install {}", pkg)),
@@ -2606,15 +2670,19 @@ impl UniversalPackageFormatBridge {
 
         // Populate format specific dependencies and tags
         match fmt {
-            PackageFormat::Deb => {
+            PackageFormat::Deb | PackageFormat::Superdeb => {
                 pkg.dependencies.push("libc6".to_string());
                 pkg.provides.push("debian_compat".to_string());
             }
-            PackageFormat::Rpm => {
+            PackageFormat::Rpm | PackageFormat::Drpm => {
                 pkg.dependencies.push("glibc".to_string());
                 pkg.provides.push("fedora_compat".to_string());
             }
-            PackageFormat::Pacman => {
+            PackageFormat::Zypper => {
+                pkg.dependencies.push("glibc".to_string());
+                pkg.provides.push("opensuse_compat".to_string());
+            }
+            PackageFormat::Pacman | PackageFormat::Cachy | PackageFormat::CachyOS => {
                 pkg.dependencies.push("glibc".to_string());
                 pkg.provides.push("arch_compat".to_string());
             }
@@ -2622,13 +2690,65 @@ impl UniversalPackageFormatBridge {
                 pkg.dependencies.push("musl".to_string());
                 pkg.provides.push("alpine_compat".to_string());
             }
-            PackageFormat::Pkg | PackageFormat::Ports => {
+            PackageFormat::Xbps => {
+                pkg.dependencies.push("xbps_libc".to_string());
+                pkg.provides.push("void_compat".to_string());
+            }
+            PackageFormat::Eopkg | PackageFormat::Pisi | PackageFormat::Moss => {
+                pkg.dependencies.push("eopkg_base".to_string());
+                pkg.provides.push("solus_compat".to_string());
+            }
+            PackageFormat::Pkg | PackageFormat::Ports | PackageFormat::FreeBsdPkg => {
                 pkg.dependencies.push("bsd_libc".to_string());
                 pkg.provides.push("freebsd_compat".to_string());
             }
-            PackageFormat::Nixpkg => {
+            PackageFormat::OpenBsdPkg => {
+                pkg.dependencies.push("openbsd_libc".to_string());
+                pkg.provides.push("openbsd_compat".to_string());
+            }
+            PackageFormat::Pkgsrc => {
+                pkg.dependencies.push("netbsd_libc".to_string());
+                pkg.provides.push("netbsd_compat".to_string());
+            }
+            PackageFormat::Dports => {
+                pkg.dependencies.push("dragonfly_libc".to_string());
+                pkg.provides.push("dragonfly_compat".to_string());
+            }
+            PackageFormat::Cports => {
+                pkg.dependencies.push("cports_musl".to_string());
+                pkg.provides.push("chimera_compat".to_string());
+            }
+            PackageFormat::Nix | PackageFormat::Nixpkg => {
                 pkg.dependencies.push("nix_store_path".to_string());
                 pkg.provides.push("nixos_compat".to_string());
+            }
+            PackageFormat::Guix | PackageFormat::GuixNar => {
+                pkg.dependencies.push("guix_store_path".to_string());
+                pkg.provides.push("guix_compat".to_string());
+            }
+            PackageFormat::Ebuild | PackageFormat::Portage => {
+                pkg.dependencies.push("portage_base".to_string());
+                pkg.provides.push("gentoo_compat".to_string());
+            }
+            PackageFormat::Swupd => {
+                pkg.dependencies.push("swupd_bundles".to_string());
+                pkg.provides.push("clearlinux_compat".to_string());
+            }
+            PackageFormat::SlackBuild | PackageFormat::Txz => {
+                pkg.dependencies.push("slackware_base".to_string());
+                pkg.provides.push("slackware_compat".to_string());
+            }
+            PackageFormat::Opkg | PackageFormat::Ipk => {
+                pkg.dependencies.push("musl".to_string());
+                pkg.provides.push("openwrt_compat".to_string());
+            }
+            PackageFormat::Spack => {
+                pkg.dependencies.push("spack_env".to_string());
+                pkg.provides.push("hpc_spack_compat".to_string());
+            }
+            PackageFormat::Conan => {
+                pkg.dependencies.push("conan_center".to_string());
+                pkg.provides.push("cpp_conan_compat".to_string());
             }
             _ => {
                 pkg.provides.push("generic_distro_compat".to_string());

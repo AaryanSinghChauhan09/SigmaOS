@@ -88,21 +88,66 @@ impl SovereignUniversalPackageOrchestratorEngine {
 
         let mut canonical_deps = Vec::new();
         match fmt {
-            PackageFormat::Deb => {
+            PackageFormat::Deb | PackageFormat::Superdeb => {
                 canonical_deps.push("openssl".to_string());
                 canonical_deps.push("libc".to_string());
             }
-            PackageFormat::Rpm => {
+            PackageFormat::Rpm | PackageFormat::Drpm => {
                 canonical_deps.push("libc".to_string());
             }
-            PackageFormat::Pacman | PackageFormat::Cachy => {
+            PackageFormat::Zypper => {
+                canonical_deps.push("glibc".to_string());
+            }
+            PackageFormat::Pacman | PackageFormat::Cachy | PackageFormat::CachyOS => {
                 canonical_deps.push("glibc".to_string());
             }
             PackageFormat::Apk => {
                 canonical_deps.push("musl".to_string());
             }
-            PackageFormat::Pkg | PackageFormat::Ports | PackageFormat::OpenBsdPkg => {
+            PackageFormat::Xbps => {
+                canonical_deps.push("xbps_libc".to_string());
+            }
+            PackageFormat::Eopkg | PackageFormat::Pisi | PackageFormat::Moss => {
+                canonical_deps.push("eopkg_base".to_string());
+            }
+            PackageFormat::Pkg | PackageFormat::Ports | PackageFormat::FreeBsdPkg => {
                 canonical_deps.push("bsd-libc".to_string());
+            }
+            PackageFormat::OpenBsdPkg => {
+                canonical_deps.push("openbsd-libc".to_string());
+            }
+            PackageFormat::Pkgsrc => {
+                canonical_deps.push("netbsd-libc".to_string());
+            }
+            PackageFormat::Dports => {
+                canonical_deps.push("dragonfly-libc".to_string());
+            }
+            PackageFormat::Cports => {
+                canonical_deps.push("cports-musl".to_string());
+            }
+            PackageFormat::Nix | PackageFormat::Nixpkg => {
+                canonical_deps.push("nix-store-path".to_string());
+            }
+            PackageFormat::Guix | PackageFormat::GuixNar => {
+                canonical_deps.push("guix-store-path".to_string());
+            }
+            PackageFormat::Ebuild | PackageFormat::Portage => {
+                canonical_deps.push("portage-base".to_string());
+            }
+            PackageFormat::Swupd => {
+                canonical_deps.push("swupd-bundles".to_string());
+            }
+            PackageFormat::SlackBuild | PackageFormat::Txz => {
+                canonical_deps.push("slackware-base".to_string());
+            }
+            PackageFormat::Opkg | PackageFormat::Ipk => {
+                canonical_deps.push("musl".to_string());
+            }
+            PackageFormat::Spack => {
+                canonical_deps.push("spack-env".to_string());
+            }
+            PackageFormat::Conan => {
+                canonical_deps.push("conan-center".to_string());
             }
             _ => {
                 canonical_deps.push("base-system".to_string());
