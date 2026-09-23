@@ -5,3 +5,6 @@ pub use crate::installer::gui_wizard::{
     DetectedOperatingSystem, GuiInstallerWizard, InstallerStep, PartitionStrategy, PrivacySettings,
     UserAccountConfig,
 };
+
+pub mod production_installer_engine;
+pub use production_installer_engine::*;
