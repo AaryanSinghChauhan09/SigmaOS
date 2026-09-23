@@ -300,6 +300,121 @@ impl Default for KdePlasmaFormatAdapter {
     }
 }
 
+/// Linux & BSD Inspired Universal Application Framework Bridge Engine
+/// Coordinates application lifecycle states, DBus IPC service endpoints, Wayland/X11 window surfaces, and sandbox permissions.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ApplicationLifecycleState {
+    Uninitialized,
+    Launching,
+    Foreground,
+    Background,
+    Suspended,
+    Terminated,
+}
+
+#[derive(Debug, Clone)]
+pub struct AppFrameworkDescriptor {
+    pub app_id: String,
+    pub name: String,
+    pub executable_path: String,
+    pub desktop_format: DesktopFormat,
+    pub state: ApplicationLifecycleState,
+    pub dbus_services: Vec<String>,
+    pub wayland_surface_id: Option<u32>,
+    pub is_sandboxed: bool,
+}
+
+pub struct AppFrameworkBridgeEngine {
+    pub registered_apps: BTreeMap<String, AppFrameworkDescriptor>,
+    pub active_foreground_app_id: Option<String>,
+}
+
+impl AppFrameworkBridgeEngine {
+    pub fn new() -> Self {
+        Self {
+            registered_apps: BTreeMap::new(),
+            active_foreground_app_id: None,
+        }
+    }
+
+    pub fn register_application(
+        &mut self,
+        app_id: &str,
+        name: &str,
+        exec: &str,
+        format: DesktopFormat,
+    ) {
+        let desc = AppFrameworkDescriptor {
+            app_id: app_id.to_string(),
+            name: name.to_string(),
+            executable_path: exec.to_string(),
+            desktop_format: format,
+            state: ApplicationLifecycleState::Uninitialized,
+            dbus_services: Vec::new(),
+            wayland_surface_id: None,
+            is_sandboxed: true,
+        };
+        self.registered_apps.insert(app_id.to_string(), desc);
+    }
+
+    pub fn launch_app(&mut self, app_id: &str) -> Result<u32, &'static str> {
+        let app = self
+            .registered_apps
+            .get_mut(app_id)
+            .ok_or("Application not registered in framework")?;
+        app.state = ApplicationLifecycleState::Launching;
+
+        let surface_id = (app_id.len() * 37) as u32 + 100;
+        app.wayland_surface_id = Some(surface_id);
+        app.state = ApplicationLifecycleState::Foreground;
+
+        self.active_foreground_app_id = Some(app_id.to_string());
+        Ok(surface_id)
+    }
+
+    pub fn move_app_to_background(&mut self, app_id: &str) -> Result<(), &'static str> {
+        let app = self
+            .registered_apps
+            .get_mut(app_id)
+            .ok_or("Application not registered in framework")?;
+        app.state = ApplicationLifecycleState::Background;
+        if self.active_foreground_app_id.as_deref() == Some(app_id) {
+            self.active_foreground_app_id = None;
+        }
+        Ok(())
+    }
+
+    pub fn register_dbus_endpoint(&mut self, app_id: &str, dbus_service: &str) -> Result<(), &'static str> {
+        let app = self
+            .registered_apps
+            .get_mut(app_id)
+            .ok_or("Application not registered in framework")?;
+        if !app.dbus_services.contains(&dbus_service.to_string()) {
+            app.dbus_services.push(dbus_service.to_string());
+        }
+        Ok(())
+    }
+
+    pub fn terminate_app(&mut self, app_id: &str) -> Result<(), &'static str> {
+        let app = self
+            .registered_apps
+            .get_mut(app_id)
+            .ok_or("Application not registered in framework")?;
+        app.state = ApplicationLifecycleState::Terminated;
+        app.wayland_surface_id = None;
+        if self.active_foreground_app_id.as_deref() == Some(app_id) {
+            self.active_foreground_app_id = None;
+        }
+        Ok(())
+    }
+}
+
+impl Default for AppFrameworkBridgeEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// GNOME Shell Format Adapter: Mutter Scaling, Shell Extensions & Libadwaita Theme Engine
 #[derive(Debug, Clone)]
 pub struct GnomeShellFormatAdapter {
@@ -634,5 +749,28 @@ Type=Application
         let runtime = suite.initialize_desktop_session_from_content(hyprland_desktop).unwrap();
         assert_eq!(runtime.active_format, DesktopFormat::Hyprland);
         assert_eq!(suite.get_active_format_name(), "Hyprland");
+    }
+
+    #[test]
+    fn test_app_framework_bridge_engine() {
+        let mut engine = AppFrameworkBridgeEngine::new();
+        engine.register_application("org.gnome.Gimp", "GIMP", "/usr/bin/gimp", DesktopFormat::GnomeShell);
+
+        assert!(engine.register_dbus_endpoint("org.gnome.Gimp", "org.gnome.Gimp.Service").is_ok());
+
+        let surface_id = engine.launch_app("org.gnome.Gimp").unwrap();
+        assert!(surface_id > 100);
+        assert_eq!(engine.active_foreground_app_id, Some("org.gnome.Gimp".to_string()));
+
+        let app_desc = engine.registered_apps.get("org.gnome.Gimp").unwrap();
+        assert_eq!(app_desc.state, ApplicationLifecycleState::Foreground);
+        assert!(app_desc.dbus_services.contains(&"org.gnome.Gimp.Service".to_string()));
+
+        assert!(engine.move_app_to_background("org.gnome.Gimp").is_ok());
+        assert_eq!(engine.active_foreground_app_id, None);
+
+        assert!(engine.terminate_app("org.gnome.Gimp").is_ok());
+        let terminated_app = engine.registered_apps.get("org.gnome.Gimp").unwrap();
+        assert_eq!(terminated_app.state, ApplicationLifecycleState::Terminated);
     }
 }

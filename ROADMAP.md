@@ -1,5 +1,7 @@
 # SigmaOS Master Execution Roadmap
 
+> 📖 **Practical Linux & BSD Distro Roadmap:** See [`docs/SIGMA_OS_DISTRO_ROADMAP.md`](docs/SIGMA_OS_DISTRO_ROADMAP.md) for the detailed 11-pillar strategic blueprint combining Linux hardware support with BSD security discipline and service design.
+
 ```
 +-----------------------------------------------------------------------------------+
 |                        SIGMAOS DESKTOP EDITION ROADMAP                            |
