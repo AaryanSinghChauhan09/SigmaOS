@@ -1,24 +1,6 @@
 // Modern high-performance NVMe PCIe block storage & AHCI SATA Controller Driver
 // Conforms to SigmaOS Unified Peripheral Architecture
-use crate::drivers::peripheral::PowerState;
-
-#[cfg(test)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DeviceGeneration {
-    Legacy,
-    Modern,
-}
-
-#[cfg(test)]
-pub trait TestPeripheralDevice {
-    fn name(&self) -> &'static str;
-    fn generation(&self) -> DeviceGeneration;
-    fn initialize(&mut self) -> Result<(), &'static str>;
-    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str>;
-    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str>;
-    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str>;
-    fn shutdown(&mut self) -> Result<(), &'static str>;
-}
+use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct NvmeCmd {
@@ -245,7 +227,7 @@ impl AhciStorageDriver {
 
 #[cfg(test)]
 #[allow(dead_code)]
-impl TestPeripheralDevice for AhciStorageDriver {
+impl PeripheralDevice for AhciStorageDriver {
     fn name(&self) -> &'static str {
         "AHCI Serial ATA Storage Driver"
     }
@@ -312,7 +294,7 @@ impl ModernNvmeDriver {
 
 #[cfg(test)]
 #[allow(dead_code)]
-impl TestPeripheralDevice for ModernNvmeDriver {
+impl PeripheralDevice for ModernNvmeDriver {
     fn name(&self) -> &'static str {
         "PCIe NVMe Solid-State Block Driver"
     }

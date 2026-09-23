@@ -42,6 +42,7 @@ pub mod memory;
 pub mod network;
 pub mod observability;
 pub mod orchestration;
+pub mod ipc;
 pub mod package;
 pub mod process;
 pub mod productivity;
@@ -204,7 +205,9 @@ pub use automation::{
 };
 pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, TargetPlatform, TranslationLayer,
+    ContainerRuntime, TargetPlatform, TranslationLayer, SovereignLinuxulatorAbiBridge,
+    OpenBsdPledgeUnveilApplicationInterface, FreeBsdCapsicumCapabilityRightsInterface,
+    SovereignUniversalAppInterfaceManager, ApplicationPersonality,
 };
 pub use container::{
     ContainerError, ContainerID, ContainerInfo, ContainerRuntime as CoreContainerRuntime,
@@ -275,7 +278,7 @@ pub use driver::{
     ZeroCopyPacketDriverEngine,
 };
 pub use filesystem::{
-    FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
+    AcyclicDirectoryGraphEngine, SovereignLinkEngine, FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
 };
 pub use governance::{
     FoundationModel, FoundationMember, ReleaseType, RoadmapMilestone, TransparentRoadmap,
@@ -336,6 +339,15 @@ pub use productivity::{
 pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
     SystemSnapshot,
+};
+pub use crypto::{
+    LinuxBsdAesXtsVolumeEngine, FreeBsdGeliIntegrityEngine,
+    OpenBsdCryptodevFrameworkEngine, LinuxCryptoTransformRegistry,
+    AesCipherMode, CryptodevSession, CryptoTransformSpec,
+};
+pub use ipc::{
+    LinuxBsdFastLpcBridgeEngine, AlpcSecurityToken, AlpcSecurityTokenVerifier,
+    AlpcZeroCopySharedSection, AlpcTransportMode, ALPC_MAX_INLINE_SIZE, ALPC_DEFAULT_SECTION_SIZE,
 };
 pub use security::hardening;
 pub use security::{

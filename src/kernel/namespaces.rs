@@ -11,7 +11,7 @@ use alloc::vec::Vec;
 use alloc::string::String;
 use alloc::format;
 use core::sync::atomic::{AtomicU64, Ordering};
-use spin::Mutex;
+use std::sync::Mutex;
 
 /// Namespace types (Linux namespace.h)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -76,7 +76,7 @@ impl NamespaceId {
 #[derive(Debug, Clone)]
 pub struct Namespace {
     pub id: NamespaceId,
-    pub parent: Option<Arc<spin::Mutex<Namespace>>>,
+    pub parent: Option<Arc<Mutex<Namespace>>>,
     pub processes: Vec<u32>,
 }
 
@@ -89,7 +89,7 @@ impl Namespace {
         }
     }
 
-    pub fn with_parent(ns_type: NamespaceType, inode: u64, parent: Arc<spin::Mutex<Namespace>>) -> Self {
+    pub fn with_parent(ns_type: NamespaceType, inode: u64, parent: Arc<Mutex<Namespace>>) -> Self {
         Namespace {
             id: NamespaceId::new(ns_type, inode),
             parent: Some(parent),
@@ -112,7 +112,7 @@ impl Namespace {
 
 /// Namespace manager
 pub struct NamespaceManager {
-    namespaces: HashMap<NamespaceId, Arc<spin::Mutex<Namespace>>>,
+    namespaces: HashMap<NamespaceId, Arc<Mutex<Namespace>>>,
     next_inode: AtomicU64,
 }
 
@@ -125,7 +125,7 @@ impl NamespaceManager {
     }
 
     /// Create a new namespace
-    pub fn create_namespace(&mut self, ns_type: NamespaceType, parent: Option<Arc<spin::Mutex<Namespace>>>) -> Arc<spin::Mutex<Namespace>> {
+    pub fn create_namespace(&mut self, ns_type: NamespaceType, parent: Option<Arc<Mutex<Namespace>>>) -> Arc<Mutex<Namespace>> {
         let inode = self.next_inode.fetch_add(1, Ordering::SeqCst);
 
         let namespace = match parent {
@@ -140,7 +140,7 @@ impl NamespaceManager {
     }
 
     /// Get a namespace by ID
-    pub fn get_namespace(&self, id: &NamespaceId) -> Option<Arc<spin::Mutex<Namespace>>> {
+    pub fn get_namespace(&self, id: &NamespaceId) -> Option<Arc<Mutex<Namespace>>> {
         self.namespaces.get(id).cloned()
     }
 
@@ -159,7 +159,7 @@ impl NamespaceManager {
     }
 
     /// Get all namespaces of a specific type
-    pub fn get_namespaces_by_type(&self, ns_type: NamespaceType) -> Vec<Arc<spin::Mutex<Namespace>>> {
+    pub fn get_namespaces_by_type(&self, ns_type: NamespaceType) -> Vec<Arc<Mutex<Namespace>>> {
         self.namespaces.values()
             .filter(|ns| ns.lock().id.ns_type == ns_type)
             .cloned()
