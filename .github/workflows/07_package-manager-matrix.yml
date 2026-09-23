@@ -88,7 +88,7 @@ jobs:
           # Xbps (Void)
           - pm: xbps
             distro: void
-            container: voidlinux/voidlinux:latest-full
+            container: voidlinux/voidlinux:latest
             install-cmd: "xbps-install -Sy"
             deps: "base-devel rust cargo"
             create-cmd: "xbps-src pkg sigmaos"

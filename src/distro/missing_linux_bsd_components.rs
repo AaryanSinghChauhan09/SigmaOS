@@ -2,17 +2,9 @@
 // Zero-dependency Rust #![no_std] / std implementation of strategic missing distro abstractions:
 // OpenSUSE YaST2, Void xbps-src, Alpine LBU, FreeBSD VNET, NetBSD Rump, OpenBSD Pledge/Unveil, NixOS Flakes.
 
-#[cfg(not(test))]
-use alloc::string::{String, ToString};
-#[cfg(not(test))]
-use alloc::vec::Vec;
-#[cfg(not(test))]
-use alloc::format;
-
-#[cfg(test)]
-use std::string::String;
-#[cfg(test)]
+use std::string::{String, ToString};
 use std::vec::Vec;
+use std::format;
 
 /// OpenSUSE YaST2 Declarative System Control Engine
 #[derive(Debug, Clone)]
