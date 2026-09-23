@@ -45,6 +45,12 @@ pub enum PullRequestPackageFormat {
     SnapPackage,
     AppImage,
     NativeSigPkg,
+    OpenWrtIpk,
+    SolusEopkg,
+    PuppyPet,
+    SlackwareTxz,
+    ClearBundle,
+    IllumosP5p,
 }
 
 impl PullRequestPackageFormat {
@@ -80,6 +86,12 @@ impl PullRequestPackageFormat {
             Self::SnapPackage => "Ubuntu Snap Package",
             Self::AppImage => "AppImage Portable Executable",
             Self::NativeSigPkg => "SigmaOS Native .sigmapkg",
+            Self::OpenWrtIpk => "OpenWrt IPK Package",
+            Self::SolusEopkg => "Solus eopkg Package",
+            Self::PuppyPet => "Puppy Linux PET Package",
+            Self::SlackwareTxz => "Slackware TXZ Package",
+            Self::ClearBundle => "Clear Linux Swupd Bundle",
+            Self::IllumosP5p => "Illumos/Solaris IPS p5p Package",
         }
     }
 }
@@ -323,5 +335,49 @@ mod tests {
         let merged2 = engine.merge_pr(pr2).unwrap();
         assert_eq!(merged2.name, "ripgrep");
         assert_eq!(engine.merged_packages.len(), 2);
+    }
+
+    #[test]
+    fn test_all_20_pr_package_formats() {
+        let formats = [
+            PullRequestPackageFormat::DebianDeb,
+            PullRequestPackageFormat::FedoraRpm,
+            PullRequestPackageFormat::ArchPkgbuild,
+            PullRequestPackageFormat::AlpineApk,
+            PullRequestPackageFormat::GentooEbuild,
+            PullRequestPackageFormat::VoidXbps,
+            PullRequestPackageFormat::FreeBsdPorts,
+            PullRequestPackageFormat::OpenBsdPorts,
+            PullRequestPackageFormat::NixFlake,
+            PullRequestPackageFormat::GuixScheme,
+            PullRequestPackageFormat::FlatpakApp,
+            PullRequestPackageFormat::SnapPackage,
+            PullRequestPackageFormat::AppImage,
+            PullRequestPackageFormat::NativeSigPkg,
+            PullRequestPackageFormat::OpenWrtIpk,
+            PullRequestPackageFormat::SolusEopkg,
+            PullRequestPackageFormat::PuppyPet,
+            PullRequestPackageFormat::SlackwareTxz,
+            PullRequestPackageFormat::ClearBundle,
+            PullRequestPackageFormat::IllumosP5p,
+        ];
+
+        let mut engine = SovereignPackagePullRequestEngine::new();
+        for (i, fmt) in formats.iter().enumerate() {
+            assert!(!fmt.name().is_empty());
+            let pr_id = engine.submit_package_pr(
+                "author",
+                &format!("pkg-{}", i),
+                "1.0.0",
+                *fmt,
+                "manifest_data",
+                &[],
+                b"dilithium5_signature",
+            );
+            assert!(engine.validate_pr(pr_id).unwrap());
+            let merged = engine.merge_pr(pr_id).unwrap();
+            assert_eq!(merged.source_format, *fmt);
+        }
+        assert_eq!(engine.merged_packages.len(), 20);
     }
 }

@@ -203,6 +203,13 @@ impl AtomicVariable {
 }
 
 /// Async Procedure Call (APC) Queue for Kernel & User Callback Dispatching
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum ApcPriority {
+    Normal = 0,
+    High = 1,
+    SpecialKernel = 2,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ApcEnvironment {
     KernelMode,
@@ -210,9 +217,11 @@ pub enum ApcEnvironment {
     SpecialKernelMode,
 }
 
+#[derive(Debug, Clone)]
 pub struct ApcItem {
     pub apc_id: usize,
     pub environment: ApcEnvironment,
+    pub priority: ApcPriority,
     pub target_thread_id: usize,
     pub callback_param: u64,
     pub is_executed: bool,
@@ -232,16 +241,45 @@ impl AsyncProcedureCallQueue {
     }
 
     pub fn queue_apc(&mut self, thread_id: usize, env: ApcEnvironment, param: u64) -> usize {
+        self.queue_apc_with_priority(thread_id, env, ApcPriority::Normal, param)
+    }
+
+    pub fn queue_apc_with_priority(
+        &mut self,
+        thread_id: usize,
+        env: ApcEnvironment,
+        priority: ApcPriority,
+        param: u64,
+    ) -> usize {
         let id = self.next_apc_id.fetch_add(1, Ordering::SeqCst);
         let item = ApcItem {
             apc_id: id,
             environment: env,
+            priority,
             target_thread_id: thread_id,
             callback_param: param,
             is_executed: false,
         };
         self.pending_apcs.push(item);
+        // Maintain high priority APCs at the head of queue
+        self.pending_apcs.sort_by(|a, b| b.priority.cmp(&a.priority));
         id
+    }
+
+    pub fn cancel_apc(&mut self, apc_id: usize) -> bool {
+        if let Some(pos) = self.pending_apcs.iter().position(|a| a.apc_id == apc_id && !a.is_executed) {
+            self.pending_apcs.remove(pos);
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn pending_count_for_thread(&self, thread_id: usize) -> usize {
+        self.pending_apcs
+            .iter()
+            .filter(|a| a.target_thread_id == thread_id && !a.is_executed)
+            .count()
     }
 
     pub fn dispatch_apcs_for_thread(&mut self, thread_id: usize, env: ApcEnvironment) -> usize {
@@ -275,8 +313,14 @@ mod tests {
         assert_eq!(counter.get(), 15);
 
         let mut apc_q = AsyncProcedureCallQueue::new();
-        let apc_id = apc_q.queue_apc(1001, ApcEnvironment::KernelMode, 0x11223344);
-        assert_eq!(apc_id, 1);
+        let apc_id1 = apc_q.queue_apc(1001, ApcEnvironment::KernelMode, 0x11223344);
+        let apc_id2 = apc_q.queue_apc_with_priority(1001, ApcEnvironment::KernelMode, ApcPriority::SpecialKernel, 0x55667788);
+        assert_eq!(apc_id1, 1);
+        assert_eq!(apc_id2, 2);
+        assert_eq!(apc_q.pending_count_for_thread(1001), 2);
+        assert_eq!(apc_q.pending_apcs[0].apc_id, 2); // Priority check: SpecialKernel at front
+        assert!(apc_q.cancel_apc(apc_id1));
+        assert_eq!(apc_q.pending_count_for_thread(1001), 1);
         let count = apc_q.dispatch_apcs_for_thread(1001, ApcEnvironment::KernelMode);
         assert_eq!(count, 1);
     }
