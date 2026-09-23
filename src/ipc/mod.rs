@@ -60,3 +60,9 @@ pub use tech_media_std_streams_synthesis::{
     SovereignTechMediaStdStreamsSuite, StreamColorLevel, StructuredJsonLogStreamFormatter,
     ZeroCopySpliceTeeStreamEngine,
 };
+
+pub mod advanced_lpc;
+pub use advanced_lpc::{
+    LinuxBsdFastLpcBridgeEngine, AlpcSecurityToken, AlpcSecurityTokenVerifier,
+    AlpcZeroCopySharedSection, AlpcTransportMode, ALPC_MAX_INLINE_SIZE, ALPC_DEFAULT_SECTION_SIZE,
+};

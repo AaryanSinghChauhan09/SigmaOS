@@ -38,6 +38,7 @@ pub mod memory;
 pub mod network;
 pub mod observability;
 pub mod orchestration;
+pub mod ipc;
 pub mod package;
 pub mod process;
 pub mod productivity;
@@ -328,6 +329,10 @@ pub use crypto::{
     LinuxBsdAesXtsVolumeEngine, FreeBsdGeliIntegrityEngine,
     OpenBsdCryptodevFrameworkEngine, LinuxCryptoTransformRegistry,
     AesCipherMode, CryptodevSession, CryptoTransformSpec,
+};
+pub use ipc::{
+    LinuxBsdFastLpcBridgeEngine, AlpcSecurityToken, AlpcSecurityTokenVerifier,
+    AlpcZeroCopySharedSection, AlpcTransportMode, ALPC_MAX_INLINE_SIZE, ALPC_DEFAULT_SECTION_SIZE,
 };
 pub use security::hardening;
 pub use security::{
