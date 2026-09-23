@@ -4,6 +4,7 @@
 // Inspired by Linux (credentials/cgroups/sec) & BSD (ucred/capsicum)
 // Zero-dependency implementation - no external libraries required
 
+pub mod anonymous_directory;
 pub mod append_rights;
 pub mod control;
 
@@ -14,8 +15,9 @@ pub use control::{
     AccessControlMatrix, AclEntry, AclTag, AclType, CapBoundingSet, DacPermission, FilterPolicy,
     MacAddressFilter, MacSecurityLabel, PosixAcl, SensitivityLevel, ZeroTrustAccessGate,
 };
-pub use control::*;
+pub use anonymous_directory::*;
 pub use append_rights::*;
+pub use control::*;
 pub use crate::filesystem::ext4_ntfs_security::*;
 
 use std::string::{String, ToString};
