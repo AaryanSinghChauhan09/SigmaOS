@@ -24,18 +24,6 @@ where
     entries: Vec<(K, V)>,
 }
 
-impl<K, V> Clone for BTreeMap<K, V>
-where
-    K: PartialEq + Clone + Ord,
-    V: Clone,
-{
-    fn clone(&self) -> Self {
-        BTreeMap {
-            entries: self.entries.clone(),
-        }
-    }
-}
-
 pub enum Entry<'a, K: 'a + PartialEq + Clone + Ord, V: 'a + Clone> {
     Occupied(OccupiedEntry<'a, K, V>),
     Vacant(VacantEntry<'a, K, V>),
