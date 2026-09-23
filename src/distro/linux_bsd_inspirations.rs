@@ -88,6 +88,8 @@ pub enum DistroSubsystemMode {
     GhostBsd,
     NomadBsd,
     LinuxAlpineExtended,
+    LinuxVanillaOS,
+    LinuxOpenWrt,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -159,10 +161,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxOmarchy
             | DistroSubsystemMode::LinuxPCLinuxOS
             | DistroSubsystemMode::LinuxSteamOS
+            | DistroSubsystemMode::LinuxVanillaOS
             | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
-
-            DistroSubsystemMode::LinuxSteamOS
-            | DistroSubsystemMode::LinuxVanillaOS => ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
@@ -326,10 +326,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxKaOS
             | DistroSubsystemMode::LinuxOmarchy
             | DistroSubsystemMode::LinuxPCLinuxOS
+            | DistroSubsystemMode::LinuxVanillaOS
             | DistroSubsystemMode::LinuxSteamOS => supervisor == ServiceSupervisorType::Systemd,
-
-            DistroSubsystemMode::LinuxSteamOS
-            | DistroSubsystemMode::LinuxVanillaOS => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
@@ -378,7 +376,9 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxZorin
             | DistroSubsystemMode::LinuxParrot
             | DistroSubsystemMode::LinuxWhonix
+            | DistroSubsystemMode::LinuxVanillaOS
             | DistroSubsystemMode::LinuxDeepin => format!("{}.deb", input_pkg),
+            DistroSubsystemMode::LinuxOpenWrt => format!("{}.ipk", input_pkg),
             DistroSubsystemMode::LinuxArch
             | DistroSubsystemMode::LinuxGaruda
             | DistroSubsystemMode::LinuxEndeavour
@@ -450,7 +450,9 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxZorin
             | DistroSubsystemMode::LinuxParrot
             | DistroSubsystemMode::LinuxWhonix
+            | DistroSubsystemMode::LinuxVanillaOS
             | DistroSubsystemMode::LinuxDeepin => format!("{}.deb", action),
+            DistroSubsystemMode::LinuxOpenWrt => format!("{}.ipk", action),
             DistroSubsystemMode::LinuxArch
             | DistroSubsystemMode::LinuxGaruda
             | DistroSubsystemMode::LinuxEndeavour
