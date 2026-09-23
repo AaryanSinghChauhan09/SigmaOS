@@ -33,6 +33,7 @@ pub mod printing;
 pub mod usb_hid;
 pub mod sovereign_driver_lifecycle;
 pub mod vesa;
+pub mod ata_bus_controller;
 
 pub use printing::{CupsIppPrintSpooler, LpdSpooler, PpdDriverMatcher, PrintJob, PrintJobState};
 
@@ -65,6 +66,10 @@ pub use sovereign_driver_lifecycle::{
 };
 pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
+pub use ata_bus_controller::{
+    AhciNcqSlot, AtaBusControllerEngine, AtaBusType, AtaCommand, AtaDeviceIdentity, AHCI_MAX_NCQ_TAGS,
+    ATA_SECTOR_SIZE_BYTES,
+};
 
 pub use distro_device_expansion::{
     CanBusSocketDriver, Cxl3MemoryExpanderDriver, FloppyDiskControllerDriver,

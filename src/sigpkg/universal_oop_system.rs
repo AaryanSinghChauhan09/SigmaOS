@@ -4052,6 +4052,21 @@ impl UniversalDistroPackageUnifierEngine {
     pub fn unify_package(&self, foreign_package: &dyn IPackage) -> Result<Box<dyn IPackage>, ParseError> {
         let meta = foreign_package.metadata();
 
+        // Generate 32-byte cacheline aligned header descriptor for fast memory slab allocation
+        #[cfg(all(not(feature = "standalone_test"), not(test)))]
+        {
+            let format_id = foreign_package.format() as u16;
+            let _hdr32 = crate::memory::low_level::PackageHeader32ByteDescriptor::new(
+                *b"SPKG",
+                format_id,
+                meta.version.major as u16,
+                meta.version.minor as u16,
+                meta.version.patch as u16,
+                0x12345678,
+                1,
+            );
+        }
+
         // 1. Expand macros in description/paths if applicable
         let expanded_desc = self.macro_evaluator.expand(&meta.description);
 
