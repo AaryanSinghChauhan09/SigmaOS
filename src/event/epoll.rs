@@ -10,6 +10,7 @@ pub const EPOLLOUT: u32 = 0x004;
 pub const EPOLLERR: u32 = 0x008;
 pub const EPOLLHUP: u32 = 0x010;
 pub const EPOLLRDHUP: u32 = 0x2000;
+pub const EPOLLONESHOT: u32 = 1 << 30;
 pub const EPOLLET: u32 = 1 << 31;
 
 /// Epoll Operation Control Opcodes
@@ -163,13 +164,47 @@ impl EpollInstance {
                 };
                 n_ready += 1;
 
-                // Edge-triggered reset
-                if (item.events & EPOLLET) != 0 {
+                if (item.events & EPOLLONESHOT) != 0 {
+                    item.ready_events = 0;
+                    item.events = 0;
+                } else if (item.events & EPOLLET) != 0 {
+                    item.ready_events = 0;
+                } else {
                     item.ready_events = 0;
                 }
             }
         }
 
         n_ready
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_epoll_oneshot_rearm() {
+        let mut epoll = EpollInstance::new(10, 16);
+        let ev = EpollEvent::new(EPOLLIN | EPOLLONESHOT, 3);
+        assert!(epoll.ctl(EpollOp::CtlAdd, 3, Some(ev)).is_ok());
+
+        epoll.trigger_event(3, EPOLLIN);
+        let mut out = [EpollEvent::new(0, 0); 4];
+        let n = epoll.wait(&mut out);
+        assert_eq!(n, 1);
+        assert_eq!(out[0].data.fd, 3);
+
+        // Next wait should yield 0 because EPOLLONESHOT disabled it
+        epoll.trigger_event(3, EPOLLIN);
+        let n2 = epoll.wait(&mut out);
+        assert_eq!(n2, 0);
+
+        // Re-arm via EpollOp::CtlMod
+        let rearm_ev = EpollEvent::new(EPOLLIN | EPOLLONESHOT, 3);
+        assert!(epoll.ctl(EpollOp::CtlMod, 3, Some(rearm_ev)).is_ok());
+        epoll.trigger_event(3, EPOLLIN);
+        let n3 = epoll.wait(&mut out);
+        assert_eq!(n3, 1);
     }
 }
