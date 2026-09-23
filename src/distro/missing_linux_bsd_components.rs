@@ -2,17 +2,9 @@
 // Zero-dependency Rust #![no_std] / std implementation of strategic missing distro abstractions:
 // OpenSUSE YaST2, Void xbps-src, Alpine LBU, FreeBSD VNET, NetBSD Rump, OpenBSD Pledge/Unveil, NixOS Flakes.
 
-#[cfg(not(test))]
-use alloc::string::{String, ToString};
-#[cfg(not(test))]
-use alloc::vec::Vec;
-#[cfg(not(test))]
-use alloc::format;
-
-#[cfg(test)]
-use std::string::String;
-#[cfg(test)]
+use std::string::{String, ToString};
 use std::vec::Vec;
+use std::format;
 
 /// OpenSUSE YaST2 Declarative System Control Engine
 #[derive(Debug, Clone)]
@@ -545,6 +537,27 @@ impl SovereignMissingLinuxBsdSuite {
             && self.urpmi.media_sources.len() == 3
             && pax_ok
     }
+
+    pub fn resolve_missing_components_for_subsystem(&mut self, subsystem: &str) -> String {
+        match subsystem {
+            "control" | "yast2" => format!("YaST2 modules: {:?}", self.yast2.active_modules),
+            "build" | "xbps" => self.xbps_src.generate_xbps_binary(),
+            "overlay" | "lbu" => self.lbu.commit_apkovl(),
+            "vnet" | "network_stack" => format!("VNET ID: {}, isolated: {}", self.vnet.jail_vnet_id, self.vnet.is_vnet_isolated()),
+            "rump" | "anykernel" => format!("Rump hypercalls dispatched: {}", self.rump.hypercalls_dispatched),
+            "pledge" | "unveil" => format!("Pledges: {}, Unveils: {}", self.sentinel.active_pledges.len(), self.sentinel.unveiled_paths.len()),
+            "flake" | "nix" => format!("Flake lock valid: {}", self.flake.evaluate_flake()),
+            "hammer2" | "pfs" => format!("PFS subvolumes: {}", self.hammer2.pfs_subvolumes.len()),
+            "zfs" | "dtrace" => format!("DTrace probes registered: {}", self.illumos.dtrace_probes_registered),
+            "portage" | "eapi" => format!("Portage USE flags: {:?}", self.portage.use_flags),
+            "bedrock" | "strata" => format!("Active stratum: {}", self.bedrock.active_stratum),
+            "moss" | "solus" => format!("Moss packages: {}", self.moss.installed_stone_packages.len()),
+            "clear" | "stateless" => format!("Stateless clean: {}", self.clear_stateless.is_stateless_clean),
+            "urpmi" | "mageia" => format!("Media sources: {}", self.urpmi.media_sources.len()),
+            "pax" | "hardened" => format!("PaX ASLR bits: {}", self.pax.aslr_entropy_bits),
+            _ => format!("Default resolver active for subsystem: {}", subsystem),
+        }
+    }
 }
 
 impl Default for SovereignMissingLinuxBsdSuite {
@@ -572,5 +585,21 @@ mod tests {
         assert_eq!(suite.moss.installed_stone_packages.len(), 1);
         assert!(suite.clear_stateless.is_stateless_clean);
         assert!(suite.pax.enforce_pax_policy("/bin/ls"));
+    }
+
+    #[test]
+    fn test_resolve_missing_components_for_subsystem() {
+        let mut suite = SovereignMissingLinuxBsdSuite::new();
+        let res_yast = suite.resolve_missing_components_for_subsystem("yast2");
+        assert!(res_yast.contains("YaST2 modules:"));
+
+        let res_xbps = suite.resolve_missing_components_for_subsystem("xbps");
+        assert!(res_xbps.contains(".xbps"));
+
+        let res_vnet = suite.resolve_missing_components_for_subsystem("vnet");
+        assert!(res_vnet.contains("VNET ID:"));
+
+        let res_unknown = suite.resolve_missing_components_for_subsystem("unknown_sub");
+        assert!(res_unknown.contains("Default resolver active"));
     }
 }

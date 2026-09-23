@@ -337,9 +337,10 @@ pub use shell::{
     SimpleShellSession as ShellRepl, ZshPromptFormatter,
 };
 pub use sigpkg::{
-    AptDebManifest, BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError,
+    BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError,
     RecipeManager, SatSolver, Transaction,
 };
+pub use package::AptDebManifest;
 pub use unimplemented_tools::{
     AdaptiveUxAgent, AiAnomalyFirewall, AiCodeAssistant, AiDependencyResolver,
     AiDifficultyDirector, AiFileOrganizer, AiScheduler, AiSearchAssistant, AiTaskbar,
@@ -373,7 +374,7 @@ pub use ai::wandr::{
     ResearchResult, SigmaWandrAgent, WandrDocument, WandrEvaluator, WandrResearchAgent, WandrTask,
 };
 
-pub use community::toolkit::{
+pub use distro::community::toolkit::{
     ArticleCategory, CommunityHandbookCatalog, HandbookArticle, HybridFirewallTemplateStore,
     PackageRecipe as CommunityPackageRecipe, RecipeSourceFormat, ReproduciblePackageRecipeManager,
     SecurityModelType, SecurityProfileTemplateStore, SecurityTemplate,

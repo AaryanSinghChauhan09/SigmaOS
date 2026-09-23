@@ -2,17 +2,9 @@
 // Zero-dependency Rust #![no_std] / std implementation of strategic distro abstractions:
 // Debian dpkg-divert, Arch pacdiff, Gentoo eclass/SLOT, FreeBSD pkg audit VuXML, OpenBSD signify, Void xbps journal.
 
-#[cfg(not(test))]
-use alloc::string::{String, ToString};
-#[cfg(not(test))]
-use alloc::vec::Vec;
-#[cfg(not(test))]
-use alloc::format;
-
-#[cfg(test)]
-use std::string::String;
-#[cfg(test)]
+use std::string::{String, ToString};
 use std::vec::Vec;
+use std::format;
 
 /// Debian dpkg-divert File Diversion Engine
 #[derive(Debug, Clone, PartialEq, Eq)]

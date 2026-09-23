@@ -8,7 +8,11 @@ pub mod screenreader;
 pub use framework::*;
 pub use keyboard::*;
 pub use magnifier::*;
-pub use screenreader::*;
+pub use screenreader::{
+    BrailleDisplay, OnScreenKeyboard, ScreenReader, SimpleBrailleDisplay,
+    SimpleOnScreenKeyboard, SimpleScreenReader, SimpleVirtualKey, SimpleVoice,
+    VirtualKey, Voice, VoiceGender, VoiceID,
+};
 
 pub struct AccessibilityEngine;
 
