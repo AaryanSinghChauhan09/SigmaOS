@@ -149,7 +149,38 @@ pub struct TaskstatsAccount {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 5. SOVEREIGN SYSTEM ACCOUNTING ENGINE
+// 5. LINUX & BSD NETWORK & DISK I/O ACCOUNTING (netstat -i / diskstats / gstat)
+// ─────────────────────────────────────────────────────────────────────────────
+
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct SovereignNetworkInterfaceAccounting {
+    pub interface_name: String,
+    pub rx_bytes: u64,
+    pub rx_packets: u64,
+    pub rx_errors: u64,
+    pub rx_dropped: u64,
+    pub tx_bytes: u64,
+    pub tx_packets: u64,
+    pub tx_errors: u64,
+    pub tx_dropped: u64,
+    pub tcp_retransmits: u64,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct SovereignStorageIoAccounting {
+    pub device_name: String,
+    pub reads_completed: u64,
+    pub read_sectors: u64,
+    pub read_time_ms: u64,
+    pub writes_completed: u64,
+    pub write_sectors: u64,
+    pub write_time_ms: u64,
+    pub io_in_progress_queue_depth: u32,
+    pub io_total_time_ms: u64,
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 6. SOVEREIGN SYSTEM ACCOUNTING ENGINE
 // ─────────────────────────────────────────────────────────────────────────────
 
 pub struct CommandSummaryStats {
@@ -166,6 +197,8 @@ pub struct SovereignAccountingEngine {
     pub user_wtmp_log: Vec<UtmpSessionRecord>,
     pub failed_btmp_log: Vec<UtmpSessionRecord>,
     pub delay_accounting_table: HashMap<Pid, TaskstatsAccount>,
+    pub net_interface_accounting_table: HashMap<String, SovereignNetworkInterfaceAccounting>,
+    pub disk_io_accounting_table: HashMap<String, SovereignStorageIoAccounting>,
     pub accounting_enabled: bool,
 }
 
@@ -177,7 +210,23 @@ impl SovereignAccountingEngine {
             user_wtmp_log: Vec::new(),
             failed_btmp_log: Vec::new(),
             delay_accounting_table: HashMap::new(),
+            net_interface_accounting_table: HashMap::new(),
+            disk_io_accounting_table: HashMap::new(),
             accounting_enabled: true,
+        }
+    }
+
+    /// Records network interface statistics
+    pub fn update_net_interface_stats(&mut self, stats: SovereignNetworkInterfaceAccounting) {
+        if self.accounting_enabled {
+            self.net_interface_accounting_table.insert(stats.interface_name.clone(), stats);
+        }
+    }
+
+    /// Records storage device I/O diskstats statistics
+    pub fn update_disk_io_stats(&mut self, stats: SovereignStorageIoAccounting) {
+        if self.accounting_enabled {
+            self.disk_io_accounting_table.insert(stats.device_name.clone(), stats);
         }
     }
 
@@ -294,5 +343,51 @@ mod tests {
         assert_eq!(summaries[0].total_calls, 2);
         assert_eq!(summaries[0].total_utime_ms, 1200);
         assert_eq!(summaries[0].total_io_bytes, 6144);
+    }
+
+    #[test]
+    fn test_network_interface_accounting() {
+        let mut engine = SovereignAccountingEngine::new();
+        let net_stat = SovereignNetworkInterfaceAccounting {
+            interface_name: "eth0".to_string(),
+            rx_bytes: 1048576,
+            rx_packets: 1024,
+            rx_errors: 0,
+            rx_dropped: 2,
+            tx_bytes: 2097152,
+            tx_packets: 2048,
+            tx_errors: 0,
+            tx_dropped: 0,
+            tcp_retransmits: 1,
+        };
+
+        engine.update_net_interface_stats(net_stat);
+        assert_eq!(engine.net_interface_accounting_table.len(), 1);
+        let eth0 = engine.net_interface_accounting_table.get("eth0").unwrap();
+        assert_eq!(eth0.rx_bytes, 1048576);
+        assert_eq!(eth0.rx_dropped, 2);
+        assert_eq!(eth0.tcp_retransmits, 1);
+    }
+
+    #[test]
+    fn test_storage_io_accounting() {
+        let mut engine = SovereignAccountingEngine::new();
+        let disk_stat = SovereignStorageIoAccounting {
+            device_name: "nvme0n1".to_string(),
+            reads_completed: 5000,
+            read_sectors: 40000,
+            read_time_ms: 120,
+            writes_completed: 2500,
+            write_sectors: 20000,
+            write_time_ms: 80,
+            io_in_progress_queue_depth: 3,
+            io_total_time_ms: 200,
+        };
+
+        engine.update_disk_io_stats(disk_stat);
+        assert_eq!(engine.disk_io_accounting_table.len(), 1);
+        let nvme = engine.disk_io_accounting_table.get("nvme0n1").unwrap();
+        assert_eq!(nvme.reads_completed, 5000);
+        assert_eq!(nvme.io_in_progress_queue_depth, 3);
     }
 }
