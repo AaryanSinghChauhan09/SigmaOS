@@ -10,6 +10,8 @@
 // - Puppy Linux (SFS SquashFS layered package module dynamic on-the-fly overlay engine)
 // - SovereignLinuxBsdEcosystemSynthesisSuite (Master coordinator unifying all 5 innovation engines)
 
+extern crate alloc;
+
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]

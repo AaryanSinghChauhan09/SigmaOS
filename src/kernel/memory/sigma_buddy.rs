@@ -185,7 +185,7 @@ impl SovereignIpcBuffer {
     pub fn new(capacity: usize) -> Self {
         let actual_cap = capacity.next_power_of_two();
         Self {
-            buffer: alloc::vec![0u8; actual_cap],
+            buffer: vec![0u8; actual_cap],
             head: AtomicUsize::new(0),
             tail: AtomicUsize::new(0),
             capacity: actual_cap,

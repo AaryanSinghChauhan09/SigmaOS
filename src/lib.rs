@@ -7,8 +7,12 @@
 #![allow(non_camel_case_types)]
 #![allow(clippy::large_enum_variant)]
 #![allow(clippy::type_complexity)]
+extern crate alloc;
+
 // SigmaOS Library
 // Core library for SigmaOS operating system
+
+pub mod community;
 
 // Core working modules
 pub mod open_source_os_gap_closure;
