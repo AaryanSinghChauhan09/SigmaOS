@@ -47,6 +47,96 @@ pub struct QuotaTracker {
     pub max_inodes: u64,
 }
 
+/// Directed Acyclic Graph (DAG) Directory Link Engine
+#[derive(Debug, Clone)]
+pub struct AcyclicDirectoryGraphEngine {
+    pub parent_child_map: BTreeMap<u64, BTreeSet<u64>>, // Parent Inode -> Set of Child Inodes
+    pub node_depth_map: BTreeMap<u64, usize>,           // Inode -> Depth in DAG
+}
+
+impl AcyclicDirectoryGraphEngine {
+    pub fn new() -> Self {
+        Self {
+            parent_child_map: BTreeMap::new(),
+            node_depth_map: BTreeMap::new(),
+        }
+    }
+
+    /// Check if target_ino is an ancestor of candidate_ino (cycle detection)
+    pub fn is_ancestor(&self, candidate_ino: u64, target_ino: u64) -> bool {
+        if candidate_ino == target_ino {
+            return true;
+        }
+
+        let mut stack = vec![candidate_ino];
+        let mut visited = BTreeSet::new();
+
+        while let Some(current) = stack.pop() {
+            if current == target_ino {
+                return true;
+            }
+
+            if visited.contains(&current) {
+                continue;
+            }
+            visited.insert(current);
+
+            if let Some(children) = self.parent_child_map.get(&current) {
+                for &child in children {
+                    if !visited.contains(&child) {
+                        stack.push(child);
+                    }
+                }
+            }
+        }
+
+        false
+    }
+
+    /// Add a directed edge from parent_ino to child_ino if it does not introduce a cycle
+    pub fn add_directory_edge(&mut self, parent_ino: u64, child_ino: u64) -> Result<(), String> {
+        if self.is_ancestor(child_ino, parent_ino) {
+            return Err("ELOOP: Directory graph edge would create a cycle in DAG".to_string());
+        }
+
+        self.parent_child_map
+            .entry(parent_ino)
+            .or_default()
+            .insert(child_ino);
+
+        let parent_depth = *self.node_depth_map.get(&parent_ino).unwrap_or(&0);
+        let current_child_depth = *self.node_depth_map.get(&child_ino).unwrap_or(&0);
+        if parent_depth + 1 > current_child_depth {
+            self.node_depth_map.insert(child_ino, parent_depth + 1);
+        }
+
+        Ok(())
+    }
+
+    /// Remove a directed edge from parent_ino to child_ino
+    pub fn remove_directory_edge(&mut self, parent_ino: u64, child_ino: u64) -> bool {
+        if let Some(children) = self.parent_child_map.get_mut(&parent_ino) {
+            let removed = children.remove(&child_ino);
+            if children.is_empty() {
+                self.parent_child_map.remove(&parent_ino);
+            }
+            return removed;
+        }
+        false
+    }
+
+    /// Get current depth of node in DAG
+    pub fn get_depth(&self, ino: u64) -> usize {
+        *self.node_depth_map.get(&ino).unwrap_or(&0)
+    }
+}
+
+impl Default for AcyclicDirectoryGraphEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct SovereignLinkEngine {
     pub inodes: BTreeMap<u64, InodeRecord>,
     pub vfs_entries: BTreeMap<String, DirectoryEntry>, // path -> dentry
@@ -518,5 +608,24 @@ mod tests {
 
         let res = engine.resolve_path("/System/Volumes/Data/Shared").unwrap();
         assert_eq!(res, "/Users/Shared");
+    }
+
+    #[test]
+    fn test_acyclic_directory_graph_engine() {
+        let mut graph = AcyclicDirectoryGraphEngine::new();
+
+        // 1. Add valid parent -> child edges (root -> dir1 -> dir2)
+        assert!(graph.add_directory_edge(1, 10).is_ok());
+        assert!(graph.add_directory_edge(10, 20).is_ok());
+
+        assert_eq!(graph.get_depth(10), 1);
+        assert_eq!(graph.get_depth(20), 2);
+
+        // 2. Cycle detection: Attempting to link dir2 -> root should fail
+        assert!(graph.add_directory_edge(20, 1).is_err());
+
+        // 3. Remove edge
+        assert!(graph.remove_directory_edge(10, 20));
+        assert!(!graph.is_ancestor(10, 20));
     }
 }

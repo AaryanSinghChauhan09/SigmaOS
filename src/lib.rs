@@ -264,7 +264,7 @@ pub use driver::{
     ZeroCopyPacketDriverEngine,
 };
 pub use filesystem::{
-    FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
+    AcyclicDirectoryGraphEngine, SovereignLinkEngine, FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
 };
 pub use governance::{
     FoundationModel, FoundationMember, ReleaseType, RoadmapMilestone, TransparentRoadmap,
