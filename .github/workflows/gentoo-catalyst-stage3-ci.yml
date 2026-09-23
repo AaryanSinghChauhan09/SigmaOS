@@ -26,4 +26,4 @@ jobs:
         run: |
           mkdir -p build
           echo "Executing Gentoo Portage EAPI 8 slot operator & catalyst stage3 tests..."
-          rustc --test --edition 2021 src/distro/open_source_distro_innovations.rs -o build/test_gentoo_catalyst && ./build/test_gentoo_catalyst
+          mkdir -p build && rustc --test --edition 2021 src/distro/open_source_distro_innovations.rs -o build/test_gentoo_catalyst && ./build/test_gentoo_catalyst

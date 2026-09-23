@@ -34,5 +34,5 @@ jobs:
         run: |
           mkdir -p build
           echo "Simulating SLSA Level 3 build provenance & Cosign binary signature verification..."
-          rustc --edition=2021 --test src/arch_kernel_inspirations.rs -o build/test_slsa_cosign && ./build/test_slsa_cosign
+          mkdir -p build && rustc --edition=2021 --test src/arch_kernel_inspirations.rs -o build/test_slsa_cosign && ./build/test_slsa_cosign
           python -m pytest tests/test_integration_system.py -k test_cosign || true

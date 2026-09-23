@@ -26,4 +26,4 @@ jobs:
         run: |
           mkdir -p build
           echo "Executing OpenBSD syspatch & pledge/unveil sandbox checks..."
-          rustc --edition=2021 --test src/distro/missing_distro_innovations.rs --cfg 'feature="standalone_test"' -o build/test_openbsd_pledge && ./build/test_openbsd_pledge
+          mkdir -p build && rustc --edition=2021 --test src/distro/missing_distro_innovations.rs --cfg 'feature="standalone_test"' -o build/test_openbsd_pledge && ./build/test_openbsd_pledge

@@ -26,5 +26,5 @@ jobs:
         run: |
           mkdir -p build
           echo "Evaluating NixOS Hydra declarative state and hermetic CAS store..."
-          rustc --edition=2021 --test src/distro/sovereign_nextgen_distro_leap.rs -o build/test_nix_hydra && ./build/test_nix_hydra
-          rustc --edition=2021 --test src/distro/wiki_ideas_implementation.rs -o build/test_nix_wiki && ./build/test_nix_wiki
+          mkdir -p build && rustc --edition=2021 --test src/distro/sovereign_nextgen_distro_leap.rs -o build/test_nix_hydra && ./build/test_nix_hydra
+          mkdir -p build && rustc --edition=2021 --test src/distro/wiki_ideas_implementation.rs -o build/test_nix_wiki && ./build/test_nix_wiki

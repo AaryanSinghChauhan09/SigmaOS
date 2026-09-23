@@ -26,4 +26,4 @@ jobs:
         run: |
           mkdir -p build
           echo "Executing FreeBSD poudriere & Capsicum security test matrix..."
-          rustc --edition=2021 --test --cfg 'feature="standalone_test"' src/distro/linux_bsd_inspirations.rs -o build/test_freebsd_poudriere && ./build/test_freebsd_poudriere
+          mkdir -p build && rustc --edition=2021 --test --cfg 'feature="standalone_test"' src/distro/linux_bsd_inspirations.rs -o build/test_freebsd_poudriere && ./build/test_freebsd_poudriere

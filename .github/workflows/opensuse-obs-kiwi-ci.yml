@@ -26,4 +26,4 @@ jobs:
         run: |
           mkdir -p build
           echo "Executing openSUSE OBS, Snapper CoW & YaST test suite..."
-          rustc --test --edition=2021 src/distro/improvements.rs -o build/test_opensuse_obs && ./build/test_opensuse_obs
+          mkdir -p build && rustc --test --edition=2021 src/distro/improvements.rs -o build/test_opensuse_obs && ./build/test_opensuse_obs
