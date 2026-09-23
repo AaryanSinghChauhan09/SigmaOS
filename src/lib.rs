@@ -194,7 +194,9 @@ pub use automation::{
 };
 pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, TargetPlatform, TranslationLayer,
+    ContainerRuntime, TargetPlatform, TranslationLayer, SovereignLinuxulatorAbiBridge,
+    OpenBsdPledgeUnveilApplicationInterface, FreeBsdCapsicumCapabilityRightsInterface,
+    SovereignUniversalAppInterfaceManager, ApplicationPersonality,
 };
 pub use container::{
     ContainerError, ContainerID, ContainerInfo, ContainerRuntime as CoreContainerRuntime,

@@ -4,6 +4,13 @@ use core::sync::atomic::{AtomicU64, Ordering};
 
 pub mod abi_extended;
 pub mod abi_translator;
+pub mod universal_app_interface;
+
+pub use universal_app_interface::{
+    SovereignLinuxulatorAbiBridge, OpenBsdPledgeUnveilApplicationInterface,
+    FreeBsdCapsicumCapabilityRightsInterface, SovereignUniversalAppInterfaceManager,
+    ApplicationPersonality,
+};
 pub mod absorb_tools;
 pub mod advanced_ecosystem;
 pub mod alpine_linux;
