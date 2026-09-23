@@ -77,8 +77,10 @@ impl ABITranslator {
         syscall_nr: u32,
         args: &[u64],
     ) -> SyscallAbiMapping {
-        let arg_regs = match conv_for_os_abi(os_abi) {
-            _ => vec!["RDI", "RSI", "RDX", "R10", "R8", "R9"],
+        let (arg_regs, vector) = match os_abi {
+            "windows" => (vec!["RCX", "RDX", "R8", "R9"], 0x2E),
+            "freebsd" | "openbsd" | "netbsd" => (vec!["RDI", "RSI", "RDX", "R10", "R8", "R9"], 0x80),
+            _ => (vec!["RDI", "RSI", "RDX", "R10", "R8", "R9"], 0x80),
         };
 
         let mut mapped_args = Vec::new();
@@ -91,7 +93,7 @@ impl ABITranslator {
         SyscallAbiMapping {
             os_abi: os_abi.to_string(),
             syscall_nr,
-            syscall_vector: 0x80,
+            syscall_vector: vector,
             arg_registers: mapped_args,
         }
     }
@@ -483,6 +485,11 @@ mod tests {
         let bsd_sys_read = translator.translate_syscall_abi("freebsd", 3, &[3, 0x1000, 64]);
         assert_eq!(bsd_sys_read.syscall_vector, 0x80);
         assert_eq!(bsd_sys_read.arg_registers[0], ("RDI".to_string(), 3));
+
+        // Windows NT syscall
+        let win_sys_read = translator.translate_syscall_abi("windows", 0x25, &[10, 20, 30, 40]);
+        assert_eq!(win_sys_read.syscall_vector, 0x2E);
+        assert_eq!(win_sys_read.arg_registers[0], ("RCX".to_string(), 10));
 
         // Signal frame context creation
         let sig_frame = translator.construct_signal_frame_context(11, 0x7FFF0000, 0x4000);
