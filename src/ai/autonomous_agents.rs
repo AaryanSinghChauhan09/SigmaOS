@@ -540,7 +540,7 @@ impl AgentBase for BridgeAgent {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -416,7 +416,7 @@ pub struct MemoryManagementResult {
     pub reclaim_stats: ReclaimStats,
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

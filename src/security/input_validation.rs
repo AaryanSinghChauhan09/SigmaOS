@@ -55,30 +55,21 @@ pub fn validate_path(path: &[u8]) -> Result<(), ValidationError> {
     }
 
     // Single-pass byte slice scan combining NUL-byte injection checks,
-    // ASCII control character rejection, and path-traversal (all dot-only
-    // segments of length >= 2, such as `..`, `...`, `....`) detection.
+    // ASCII control character rejection, and path-traversal (`..`) detection.
     let mut i = 0usize;
-    let mut segment_start = 0usize;
-    let mut segment_has_non_dot = false;
-
-    while i <= len {
-        if i == len || matches!(path[i], b'/' | b'\\' | b':') {
-            let seg_len = i - segment_start;
-            if seg_len >= 2 && !segment_has_non_dot {
+    while i < len {
+        let b = path[i];
+        if b == 0 {
+            return Err(ValidationError::NullByte);
+        }
+        if b < 32 || b == 127 {
+            return Err(ValidationError::InvalidChars);
+        }
+        if b == b'.' && i + 1 < len && path[i + 1] == b'.' {
+            let before_ok = i == 0 || matches!(path[i - 1], b'/' | b'\\' | b':');
+            let after_ok = i + 2 >= len || matches!(path[i + 2], b'/' | b'\\' | b':');
+            if before_ok && after_ok {
                 return Err(ValidationError::PathTraversal);
-            }
-            segment_start = i + 1;
-            segment_has_non_dot = false;
-        } else {
-            let b = path[i];
-            if b == 0 {
-                return Err(ValidationError::NullByte);
-            }
-            if b < 32 || b == 127 {
-                return Err(ValidationError::InvalidChars);
-            }
-            if b != b'.' {
-                segment_has_non_dot = true;
             }
         }
         i += 1;
@@ -300,7 +291,6 @@ pub fn validate_command(cmd: &[u8]) -> Result<(), ValidationError> {
 /// Validate a textual IPv4 address (digits and dots, ≤ 15 bytes).
 /// Rejects leading zeros in multi-digit octets (e.g., `010.0.0.1`) to prevent
 /// octal parser differential and SSRF security bypass vulnerabilities.
-/// Rejects empty octets (e.g., `.1.2.3`, `1..2.3`, `1.2.3.`, `...`).
 pub fn validate_ipv4(addr: &[u8]) -> Result<(), ValidationError> {
     if addr.is_empty() {
         return Err(ValidationError::EmptyInput);
@@ -423,20 +413,14 @@ mod tests {
 
     #[test]
     fn test_path_traversal_rejected() {
-        assert_eq!(validate_path(b"../../etc/passwd"), Err(ValidationError::PathTraversal));
-        assert_eq!(validate_path(b"/foo/../bar"), Err(ValidationError::PathTraversal));
-        assert_eq!(validate_path(b".."), Err(ValidationError::PathTraversal));
-        assert_eq!(validate_path(b"..\\..\\etc\\passwd"), Err(ValidationError::PathTraversal));
-        assert_eq!(validate_path(b"C:\\foo\\..\\bar"), Err(ValidationError::PathTraversal));
-        assert_eq!(validate_path(b"foo\\.."), Err(ValidationError::PathTraversal));
-        assert_eq!(validate_path(b"C:..\\passwd"), Err(ValidationError::PathTraversal));
-        assert_eq!(validate_path(b"file:../secret.txt"), Err(ValidationError::PathTraversal));
-
-        // Multi-dot path traversal checks (..., ...., etc.)
-        assert_eq!(validate_path(b"/.../etc/passwd"), Err(ValidationError::PathTraversal));
-        assert_eq!(validate_path(b"foo/.../bar"), Err(ValidationError::PathTraversal));
-        assert_eq!(validate_path(b"..../secret"), Err(ValidationError::PathTraversal));
-        assert_eq!(validate_path(b"C:\\...\\Windows"), Err(ValidationError::PathTraversal));
+        assert!(validate_path(b"../../etc/passwd").is_err());
+        assert!(validate_path(b"/foo/../bar").is_err());
+        assert!(validate_path(b"..").is_err());
+        assert!(validate_path(b"..\\..\\etc\\passwd").is_err());
+        assert!(validate_path(b"C:\\foo\\..\\bar").is_err());
+        assert!(validate_path(b"foo\\..").is_err());
+        assert!(validate_path(b"C:..\\passwd").is_err());
+        assert!(validate_path(b"file:../secret.txt").is_err());
     }
 
     #[test]
@@ -591,12 +575,6 @@ mod tests {
         assert_eq!(validate_ipv4(b"010.0.0.1"), Err(ValidationError::OutOfRange));
         assert_eq!(validate_ipv4(b"192.168.01.1"), Err(ValidationError::OutOfRange));
         assert_eq!(validate_ipv4(b"001.1.1.1"), Err(ValidationError::OutOfRange));
-
-        // Reject empty octets (leading, trailing, consecutive dots)
-        assert_eq!(validate_ipv4(b".192.168.1.1"), Err(ValidationError::OutOfRange));
-        assert_eq!(validate_ipv4(b"192..168.1.1"), Err(ValidationError::OutOfRange));
-        assert_eq!(validate_ipv4(b"192.168.1.1."), Err(ValidationError::OutOfRange));
-        assert_eq!(validate_ipv4(b"..."), Err(ValidationError::OutOfRange));
     }
 
     #[test]

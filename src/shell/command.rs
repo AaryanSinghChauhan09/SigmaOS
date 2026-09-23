@@ -64,12 +64,16 @@ impl ShellCommand for SimpleShellCommand {
     }
 
     fn execute(&mut self, _args: &[[u8; 64]]) -> Result<ShellVec<u8>, CommandError> {
+        let mut output = ShellVec::new();
         let name = self.name();
-        // Bolt ⚡ Optimization: Pre-allocate target buffer capacity and use bulk slice copying
-        // (`extend_from_slice`) to eliminate byte-by-byte push reallocation overhead.
-        let mut output = ShellVec::with_capacity(name.len() + 5);
-        output.extend_from_slice(name);
-        output.extend_from_slice(b": ok\n");
+        for &byte in name {
+            output.push(byte);
+        }
+        output.push(b':');
+        output.push(b' ');
+        output.push(b'o');
+        output.push(b'k');
+        output.push(b'\n');
         Ok(output)
     }
 
@@ -110,22 +114,35 @@ impl ShellCommand for SigmaGrepCommand {
             }
         }
 
-        // Bolt ⚡ Optimization: Pre-allocate capacity for output buffer and bulk append slices
-        output.reserve(256 + query.len());
-        output.extend_from_slice(b"[sigmagrep (absorbing grep/ripgrep)] Searching for '");
-        output.extend_from_slice(query);
-        output.extend_from_slice(b"' ");
+        let header_prefix = b"[sigmagrep (absorbing grep/ripgrep)] Searching for '";
+        for &b in header_prefix {
+            output.push(b);
+        }
+        for &b in query {
+            output.push(b);
+        }
+        for &b in b"' " {
+            output.push(b);
+        }
 
         if case_insensitive {
-            output.extend_from_slice(b"(case-insensitive) ");
+            for &b in b"(case-insensitive) " {
+                output.push(b);
+            }
         }
         if line_numbers {
-            output.extend_from_slice(b"(line-numbers) ");
+            for &b in b"(line-numbers) " {
+                output.push(b);
+            }
         }
         if recursive {
-            output.extend_from_slice(b"(recursive) ");
+            for &b in b"(recursive) " {
+                output.push(b);
+            }
         }
-        output.extend_from_slice(b"...\n");
+        for &b in b"...\n" {
+            output.push(b);
+        }
 
         let matches: &[(i32, &[u8])] = &[
             (12, b"src/main.rs: let query = \"pattern\";"),
@@ -147,10 +164,14 @@ impl ShellCommand for SigmaGrepCommand {
                         idx -= 1;
                     }
                 }
-                output.extend_from_slice(&line_buf[idx + 1..16]);
+                for &b in &line_buf[idx + 1..16] {
+                    output.push(b);
+                }
                 output.push(b':');
             }
-            output.extend_from_slice(text);
+            for &b in *text {
+                output.push(b);
+            }
             output.push(b'\n');
         }
 
@@ -203,23 +224,35 @@ impl ShellCommand for SigmaFindCommand {
             }
         }
 
-        // Bolt ⚡ Optimization: Pre-allocate capacity for output buffer and bulk append slices
-        output.reserve(256 + pattern.len());
-        output.extend_from_slice(b"[sigmafind (absorbing find/fd)] Finding matches for '");
-        output.extend_from_slice(pattern);
-        output.extend_from_slice(b"' ");
+        for &b in b"[sigmafind (absorbing find/fd)] Finding matches for '" {
+            output.push(b);
+        }
+        for &b in pattern {
+            output.push(b);
+        }
+        for &b in b"' " {
+            output.push(b);
+        }
 
         if regex_mode {
-            output.extend_from_slice(b"(regex-mode) ");
+            for &b in b"(regex-mode) " {
+                output.push(b);
+            }
         }
         if let Some(_d) = max_depth {
-            output.extend_from_slice(b"(max-depth set) ");
+            for &b in b"(max-depth set) " {
+                output.push(b);
+            }
         }
-        output.extend_from_slice(b"...\n");
+        for &b in b"...\n" {
+            output.push(b);
+        }
 
         let matches: &[&[u8]] = &[b"src/package/universal.rs", b"tests/integration_test.rs"];
         for text in matches {
-            output.extend_from_slice(text);
+            for &b in *text {
+                output.push(b);
+            }
             output.push(b'\n');
         }
 
@@ -258,26 +291,42 @@ impl ShellCommand for SigmaDiffCommand {
             }
         }
 
-        // Bolt ⚡ Optimization: Pre-allocate capacity for output buffer and bulk append slices
-        output.reserve(256);
-        output.extend_from_slice(b"[sigmadiff (absorbing diff/git-diff)] Comparing files ");
+        for &b in b"[sigmadiff (absorbing diff/git-diff)] Comparing files " {
+            output.push(b);
+        }
         if ignore_whitespace {
-            output.extend_from_slice(b"(ignoring whitespace) ");
+            for &b in b"(ignoring whitespace) " {
+                output.push(b);
+            }
         }
         if side_by_side {
-            output.extend_from_slice(b"(side-by-side) ");
+            for &b in b"(side-by-side) " {
+                output.push(b);
+            }
         }
         if unified {
-            output.extend_from_slice(b"(unified) ");
+            for &b in b"(unified) " {
+                output.push(b);
+            }
         }
-        output.extend_from_slice(b"...\n");
+        for &b in b"...\n" {
+            output.push(b);
+        }
 
         if side_by_side {
-            output.extend_from_slice(b"left_file.txt             | right_file.txt\n");
-            output.extend_from_slice(b"hello world               | hello brave new world\n");
+            for &b in b"left_file.txt             | right_file.txt\n" {
+                output.push(b);
+            }
+            for &b in b"hello world               | hello brave new world\n" {
+                output.push(b);
+            }
         } else {
-            output.extend_from_slice(b"--- left_file.txt\n+++ right_file.txt\n");
-            output.extend_from_slice(b"@@ -1,1 +1,1 @@\n-hello world\n+hello brave new world\n");
+            for &b in b"--- left_file.txt\n+++ right_file.txt\n" {
+                output.push(b);
+            }
+            for &b in b"@@ -1,1 +1,1 @@\n-hello world\n+hello brave new world\n" {
+                output.push(b);
+            }
         }
 
         Ok(output)
@@ -296,15 +345,19 @@ impl ShellCommand for WhichCommand {
     }
 
     fn execute(&mut self, args: &[[u8; 64]]) -> Result<ShellVec<u8>, CommandError> {
-        let mut output = ShellVec::with_capacity(args.len() * 32);
+        let mut output = ShellVec::new();
         for arg in args {
             let len = arg.iter().position(|&b| b == 0).unwrap_or(64);
             if len == 0 {
                 continue;
             }
             let s = &arg[..len];
-            output.extend_from_slice(b"/system/bin/");
-            output.extend_from_slice(s);
+            for &b in b"/system/bin/" {
+                output.push(b);
+            }
+            for &b in s {
+                output.push(b);
+            }
             output.push(b'\n');
         }
         Ok(output)
@@ -323,15 +376,19 @@ impl ShellCommand for TypeCommand {
     }
 
     fn execute(&mut self, args: &[[u8; 64]]) -> Result<ShellVec<u8>, CommandError> {
-        let mut output = ShellVec::with_capacity(args.len() * 48);
+        let mut output = ShellVec::new();
         for arg in args {
             let len = arg.iter().position(|&b| b == 0).unwrap_or(64);
             if len == 0 {
                 continue;
             }
             let s = &arg[..len];
-            output.extend_from_slice(s);
-            output.extend_from_slice(b" is a shell builtin\n");
+            for &b in s {
+                output.push(b);
+            }
+            for &b in b" is a shell builtin\n" {
+                output.push(b);
+            }
         }
         Ok(output)
     }
@@ -374,7 +431,9 @@ impl ShellCommand for PushdCommand {
                 }
             }
         }
-        output.extend_from_slice(b"pushd: directory pushed\n");
+        for &b in b"pushd: directory pushed\n" {
+            output.push(b);
+        }
         Ok(output)
     }
 
@@ -398,9 +457,13 @@ impl ShellCommand for PopdCommand {
             if !self.dir_stack.is_null() && !(*self.dir_stack).stack.is_empty() {
                 let last_idx = (*self.dir_stack).stack.len() - 1;
                 (*self.dir_stack).stack.remove(last_idx);
-                output.extend_from_slice(b"popd: popped directory\n");
+                for &b in b"popd: popped directory\n" {
+                    output.push(b);
+                }
             } else {
-                output.extend_from_slice(b"popd: directory stack empty\n");
+                for &b in b"popd: directory stack empty\n" {
+                    output.push(b);
+                }
             }
         }
         Ok(output)
@@ -421,8 +484,10 @@ impl ShellCommand for DirsCommand {
     }
 
     fn execute(&mut self, _args: &[[u8; 64]]) -> Result<ShellVec<u8>, CommandError> {
-        let mut output = ShellVec::with_capacity(128);
-        output.extend_from_slice(b"Directory stack: ");
+        let mut output = ShellVec::new();
+        for &b in b"Directory stack: " {
+            output.push(b);
+        }
         unsafe {
             if !self.dir_stack.is_null() {
                 for (i, dir) in (*self.dir_stack).stack.iter().enumerate() {
@@ -430,7 +495,9 @@ impl ShellCommand for DirsCommand {
                         output.push(b' ');
                     }
                     let len = dir.iter().position(|&b| b == 0).unwrap_or(64);
-                    output.extend_from_slice(&dir[..len]);
+                    for &b in &dir[..len] {
+                        output.push(b);
+                    }
                 }
             }
         }
@@ -575,21 +642,20 @@ impl SimpleCommandRegistry {
         let type_cmd = TypeCommand;
         self.commands.push(Some(Box::new(type_cmd)));
 
-        #[allow(unused_unsafe)]
         static mut GLOBAL_DIR_STACK: DirectoryStack = DirectoryStack { stack: Vec::new() };
         unsafe {
             let pushd = PushdCommand {
-                dir_stack: core::ptr::addr_of_mut!(GLOBAL_DIR_STACK),
+                dir_stack: &raw mut GLOBAL_DIR_STACK,
             };
             self.commands.push(Some(Box::new(pushd)));
 
             let popd = PopdCommand {
-                dir_stack: core::ptr::addr_of_mut!(GLOBAL_DIR_STACK),
+                dir_stack: &raw mut GLOBAL_DIR_STACK,
             };
             self.commands.push(Some(Box::new(popd)));
 
             let dirs = DirsCommand {
-                dir_stack: core::ptr::addr_of_mut!(GLOBAL_DIR_STACK),
+                dir_stack: &raw mut GLOBAL_DIR_STACK,
             };
             self.commands.push(Some(Box::new(dirs)));
         }
@@ -629,10 +695,12 @@ impl CommandRegistry for SimpleCommandRegistry {
     fn unregister(&mut self, name: &[u8]) -> Result<(), CommandError> {
         let name_len = name.iter().position(|&b| b == 0).unwrap_or(name.len());
         let name_slice = &name[..name_len];
-        for slot in &mut self.commands {
-            if let Some(ref cmd) = slot {
+        for i in 0..self.commands.len() {
+            if let Some(Some(ref cmd)) = self.commands.get(i) {
                 if cmd.name() == name_slice {
-                    *slot = None;
+                    if let Some(slot) = self.commands.get_mut(i) {
+                        *slot = None;
+                    }
                     return Ok(());
                 }
             }
@@ -643,8 +711,8 @@ impl CommandRegistry for SimpleCommandRegistry {
     fn get(&self, name: &[u8]) -> Option<&dyn ShellCommand> {
         let name_len = name.iter().position(|&b| b == 0).unwrap_or(name.len());
         let name_slice = &name[..name_len];
-        for slot in &self.commands {
-            if let Some(ref command) = slot {
+        for i in 0..self.commands.len() {
+            if let Some(Some(ref command)) = self.commands.get(i) {
                 if command.name() == name_slice {
                     return Some(command.as_ref());
                 }
@@ -719,9 +787,12 @@ impl ShellSession for SimpleShellSession {
         let mut value_array = [0u8; 128];
         let key_len = key.len().min(63);
         let value_len = value.len().min(127);
-        // Bolt ⚡ Optimization: Use bulk slice copying (`copy_from_slice`) to allow SIMD vectorization
-        key_array[..key_len].copy_from_slice(&key[..key_len]);
-        value_array[..value_len].copy_from_slice(&value[..value_len]);
+        for i in 0..key_len {
+            key_array[i] = key[i];
+        }
+        for i in 0..value_len {
+            value_array[i] = value[i];
+        }
         self.environment.push((key_array, value_array));
     }
 
@@ -750,7 +821,6 @@ pub trait CommandHistory {
 pub struct SimpleCommandHistory {
     pub history: ShellVec<[u8; 256]>,
     pub current_index: AtomicUsize,
-    pub history_lens: ShellVec<u16>,
 }
 
 impl SimpleCommandHistory {
@@ -758,7 +828,6 @@ impl SimpleCommandHistory {
         SimpleCommandHistory {
             history: ShellVec::new(),
             current_index: AtomicUsize::new(0),
-            history_lens: ShellVec::new(),
         }
     }
 }
@@ -773,13 +842,10 @@ impl CommandHistory for SimpleCommandHistory {
     fn add(&mut self, command: &[u8]) {
         let mut cmd_array = [0u8; 256];
         let cmd_len = command.len().min(255);
-        // Bolt ⚡ Optimization: Use bulk slice copying (`copy_from_slice`) to allow SIMD vectorization
-        cmd_array[..cmd_len].copy_from_slice(&command[..cmd_len]);
+        for i in 0..cmd_len {
+            cmd_array[i] = command[i];
+        }
         self.history.push(cmd_array);
-        // Bolt ⚡ Optimization: Cache explicit string lengths as u16 appended at struct end to preserve
-        // #[repr(C)] field offsets, null-termination invariant at byte 255, and eliminate O(N) zero-byte linear
-        // scans (.position(|&b| b == 0)) on history queries, reducing slice lookups to O(1) constant time.
-        self.history_lens.push(cmd_len as u16);
         self.current_index
             .store(self.history.len(), Ordering::SeqCst);
     }
@@ -788,11 +854,7 @@ impl CommandHistory for SimpleCommandHistory {
         let idx = self.current_index.load(Ordering::SeqCst);
         if idx > 0 && idx <= self.history.len() {
             if let Some(cmd) = self.history.get(idx - 1) {
-                let len = self
-                    .history_lens
-                    .get(idx - 1)
-                    .map(|&l| l as usize)
-                    .unwrap_or_else(|| cmd.iter().position(|&b| b == 0).unwrap_or(256));
+                let len = cmd.iter().position(|&b| b == 0).unwrap_or(256);
                 Some(&cmd[..len])
             } else {
                 None
@@ -806,11 +868,7 @@ impl CommandHistory for SimpleCommandHistory {
         let idx = self.current_index.load(Ordering::SeqCst);
         if idx < self.history.len() {
             if let Some(cmd) = self.history.get(idx) {
-                let len = self
-                    .history_lens
-                    .get(idx)
-                    .map(|&l| l as usize)
-                    .unwrap_or_else(|| cmd.iter().position(|&b| b == 0).unwrap_or(256));
+                let len = cmd.iter().position(|&b| b == 0).unwrap_or(256);
                 Some(&cmd[..len])
             } else {
                 None
@@ -821,13 +879,9 @@ impl CommandHistory for SimpleCommandHistory {
     }
 
     fn list(&self) -> ShellVec<&[u8]> {
-        let mut commands = ShellVec::with_capacity(self.history.len());
-        for (idx, cmd) in self.history.iter().enumerate() {
-            let len = self
-                .history_lens
-                .get(idx)
-                .map(|&l| l as usize)
-                .unwrap_or_else(|| cmd.iter().position(|&b| b == 0).unwrap_or(256));
+        let mut commands = ShellVec::new();
+        for cmd in &*self.history {
+            let len = cmd.iter().position(|&b| b == 0).unwrap_or(256);
             commands.push(&cmd[..len]);
         }
         commands

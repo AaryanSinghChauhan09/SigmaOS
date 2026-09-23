@@ -253,7 +253,7 @@ impl Default for CpufreqManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

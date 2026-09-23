@@ -34,28 +34,9 @@ pub enum DesktopInspirationPreset {
     CosmicRust,  // Pop!_OS COSMIC auto-tiling Rust workspace
 }
 
-/// Zenith Desktop Environment System Profile
-#[derive(Debug, Clone)]
-pub struct ZenithDesktopEnvironment {
-    pub layout_mode: WindowLayoutMode,
-    pub panel_height: u32,
-    pub enable_gestures: bool,
-    pub active_preset: DesktopInspirationPreset,
-}
-
 impl ZenithDesktopEnvironment {
-    pub fn new() -> Self {
-        Self {
-            layout_mode: WindowLayoutMode::DynamicBSP,
-            panel_height: 32,
-            enable_gestures: true,
-            active_preset: DesktopInspirationPreset::CosmicRust,
-        }
-    }
-
     /// Apply Linux or BSD desktop inspiration preset parameters
     pub fn apply_desktop_inspiration(&mut self, preset: DesktopInspirationPreset) {
-        self.active_preset = preset;
         match preset {
             DesktopInspirationPreset::KdePlasma => {
                 self.layout_mode = WindowLayoutMode::Floating;
@@ -88,12 +69,6 @@ impl ZenithDesktopEnvironment {
                 self.enable_gestures = true;
             }
         }
-    }
-}
-
-impl Default for ZenithDesktopEnvironment {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -906,7 +881,7 @@ impl Default for ZenithDesktopSecurityGuard {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

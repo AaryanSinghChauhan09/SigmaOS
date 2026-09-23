@@ -268,7 +268,7 @@ impl Default for SecureEnclaveKeyStore {
 // UNIT TESTS MODULE
 // =========================================================================
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

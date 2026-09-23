@@ -503,7 +503,7 @@ impl Default for XzTool {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

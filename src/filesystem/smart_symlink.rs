@@ -24,7 +24,10 @@ impl SymlinkResolverRule for LinuxPersonaRule {
         "linux-persona-rule"
     }
     fn evaluate(&self, persona: KernelPersona) -> bool {
-        matches!(persona, KernelPersona::Linux6X | KernelPersona::Linux2_6)
+        match persona {
+            KernelPersona::Linux6X | KernelPersona::Linux2_6 => true,
+            _ => false,
+        }
     }
 }
 

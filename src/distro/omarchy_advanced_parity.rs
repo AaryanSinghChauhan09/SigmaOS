@@ -1,10 +1,13 @@
 // SigmaOS Omarchy Advanced Parity Engine
 // Inspired by Omarchy 4 Linux (Hyprland dynamic workspace tiling, Waybar applet studio, Ghostty/Kitty terminal configs, Omakase Neovim LSP, and 60-second live ISO bootstrap)
-// Std-based implementation with zero external dependencies.
+// Pure #![no_std] compliant implementation with zero external dependencies using alloc primitives.
 
-use std::format;
-use std::string::{String, ToString};
-use std::vec::Vec;
+#![no_std]
+extern crate alloc;
+
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 /// 1. Hyprland Dynamic Window Tiling & Animation Curve Engine (Omarchy 4 Parity)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

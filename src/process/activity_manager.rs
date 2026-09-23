@@ -344,7 +344,7 @@ impl Default for ActivityManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

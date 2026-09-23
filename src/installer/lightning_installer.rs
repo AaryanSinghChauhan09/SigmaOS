@@ -1,19 +1,21 @@
 // src/installer/lightning_installer.rs
-// Lightning-fast OS installer for SigmaOS & Omarchy Dual Boot Installation Engine
-// Target: 60-second complete installation & seamless side-by-side dual boot setup
+// Lightning-fast OS installer for SigmaOS
+// Target: 60-second complete installation
 //
 // Features:
-// - Automatic partitioning & Free Space Dual-Boot Installation
-// - LUKS partition encryption by default with unencrypted toggle
-// - BitLocker full-disk encryption conflict detection & guidance
-// - Limine Bootloader scanner (`limine-scan`) for auto-detecting Windows Boot Manager
+// - Automatic partitioning
 // - Driver auto-detection
-// - Live USB support & ZFS/Btrfs snapshots
+// - Live USB support
+// - ZFS/Btrfs snapshots
+// - Multi-boot configuration
 
-use std::collections::BTreeMap;
-use std::string::String;
-use std::vec::Vec;
-use std::fmt;
+#![no_std]
+
+extern crate alloc;
+use alloc::string::String;
+use alloc::vec::Vec;
+use alloc::format;
+use core::fmt;
 
 /// Installation configuration
 #[derive(Debug, Clone)]
@@ -213,7 +215,6 @@ pub struct LightningInstaller {
     stage: InstallStage,
     start_time: u64,
     available_disks: Vec<DiskInfo>,
-    pub unattended_engine: super::unattended_cidata::CiDataUnattendedEngine,
 }
 
 impl LightningInstaller {
@@ -223,7 +224,6 @@ impl LightningInstaller {
             stage: InstallStage::Initializing,
             start_time: 0,
             available_disks: Vec::new(),
-            unattended_engine: super::unattended_cidata::CiDataUnattendedEngine::new(),
         }
     }
     
@@ -453,152 +453,6 @@ impl LightningInstaller {
     }
 }
 
-// ============================================================================
-// Omarchy Dual Boot Installation & Limine Bootloader Scanner Engine
-// ============================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DualBootMode {
-    FullDiskOverwrite,
-    FreeSpacePartitionInstall,
-    ExistingPartitionSelect,
-}
-
-#[derive(Debug, Clone)]
-pub struct BitLockerProtectionStatus {
-    pub is_bitlocker_enabled: bool,
-    pub device_encryption_active: bool,
-    pub warning_message: String,
-}
-
-pub struct OmarchyDualBootInstallerEngine {
-    pub mode: DualBootMode,
-    pub target_partition: String,
-    pub allocate_free_space_mb: u64,
-    pub luks_encryption_enabled: bool,
-    pub bitlocker_status: BitLockerProtectionStatus,
-}
-
-impl OmarchyDualBootInstallerEngine {
-    pub fn new() -> Self {
-        Self {
-            mode: DualBootMode::FreeSpacePartitionInstall,
-            target_partition: "/dev/nvme0n1p4".to_string(),
-            allocate_free_space_mb: 50 * 1024, // 50GB default free space install
-            luks_encryption_enabled: true,       // LUKS encryption enabled by default
-            bitlocker_status: BitLockerProtectionStatus {
-                is_bitlocker_enabled: false,
-                device_encryption_active: false,
-                warning_message: String::new(),
-            },
-        }
-    }
-
-    pub fn check_bitlocker_conflict(&mut self, is_windows_encrypted: bool) -> Result<(), String> {
-        if is_windows_encrypted {
-            self.bitlocker_status.is_bitlocker_enabled = true;
-            self.bitlocker_status.device_encryption_active = true;
-            self.bitlocker_status.warning_message = "BitLocker / Device Encryption active. Please boot to Windows, go to Settings -> Privacy & Security -> Device encryption, and toggle BitLocker off before dual booting.".to_string();
-            return Err("EBITLOCKER: Windows BitLocker full-disk encryption active".to_string());
-        }
-        Ok(())
-    }
-
-    pub fn stage_free_space_install(&mut self, free_mb: u64) -> Result<String, &'static str> {
-        if free_mb < 20 * 1024 {
-            return Err("EINSUFFICIENT_SPACE: Free space installation requires at least 20GB");
-        }
-        self.allocate_free_space_mb = free_mb;
-        self.mode = DualBootMode::FreeSpacePartitionInstall;
-
-        let enc_status = if self.luks_encryption_enabled {
-            "LUKS2 Encrypted"
-        } else {
-            "Unencrypted"
-        };
-
-        Ok(format!(
-            "Omarchy Dual Boot: Staged {}MB partition install in free space ({})",
-            self.allocate_free_space_mb, enc_status
-        ))
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct LimineBootEntry {
-    pub title: String,
-    pub efi_path: String,
-    pub os_type: String,
-}
-
-pub struct LimineBootloaderScannerEngine {
-    pub detected_entries: Vec<LimineBootEntry>,
-    pub limine_config_path: String,
-}
-
-impl LimineBootloaderScannerEngine {
-    pub fn new() -> Self {
-        Self {
-            detected_entries: Vec::new(),
-            limine_config_path: "/boot/limine.conf".to_string(),
-        }
-    }
-
-    pub fn run_limine_scan(&mut self) -> usize {
-        let entries = vec![
-            LimineBootEntry {
-                title: "Omarchy Linux".to_string(),
-                efi_path: "boot():/vmlinuz-linux".to_string(),
-                os_type: "Omarchy".to_string(),
-            },
-            LimineBootEntry {
-                title: "Windows Boot Manager".to_string(),
-                efi_path: "boot():/EFI/Microsoft/Boot/bootmgfw.efi".to_string(),
-                os_type: "Windows".to_string(),
-            },
-        ];
-
-        self.detected_entries = entries.clone();
-        entries.len()
-    }
-
-    pub fn generate_limine_conf(&self) -> String {
-        let mut conf = String::from(
-            r#"TIMEOUT=5
-DEFAULT_ENTRY=1
-
-:Omarchy Linux
-    PROTOCOL=linux
-    KERNEL_PATH=boot():/vmlinuz-linux
-    CMDLINE=root=UUID=1234-ABCD-5678 rw quiet
-"#,
-        );
-
-        for entry in &self.detected_entries {
-            if entry.os_type == "Windows" {
-                conf.push_str(&format!(
-                    "\n:{}\n    PROTOCOL=efi_chainload\n    IMAGE_PATH={}\n",
-                    entry.title, entry.efi_path
-                ));
-            }
-        }
-
-        conf
-    }
-}
-
-impl Default for OmarchyDualBootInstallerEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl Default for LimineBootloaderScannerEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 /// Installer errors
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum InstallerError {
@@ -671,30 +525,5 @@ mod tests {
         
         installer.detect_disks().unwrap();
         assert_eq!(installer.available_disks.len(), 2);
-    }
-
-    #[test]
-    fn test_omarchy_dual_boot_installer() {
-        let mut dual = OmarchyDualBootInstallerEngine::new();
-        assert!(dual.luks_encryption_enabled);
-
-        let stage_msg = dual.stage_free_space_install(50 * 1024).unwrap();
-        assert!(stage_msg.contains("51200MB"));
-        assert!(stage_msg.contains("LUKS2 Encrypted"));
-
-        let bitlocker_err = dual.check_bitlocker_conflict(true);
-        assert!(bitlocker_err.is_err());
-        assert!(dual.bitlocker_status.is_bitlocker_enabled);
-    }
-
-    #[test]
-    fn test_limine_bootloader_scanner() {
-        let mut scanner = LimineBootloaderScannerEngine::new();
-        let found = scanner.run_limine_scan();
-        assert_eq!(found, 2);
-
-        let conf = scanner.generate_limine_conf();
-        assert!(conf.contains("Windows Boot Manager"));
-        assert!(conf.contains("PROTOCOL=efi_chainload"));
     }
 }

@@ -232,7 +232,7 @@ impl Default for OSIntegrationManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

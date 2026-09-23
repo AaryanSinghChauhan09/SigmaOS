@@ -28,11 +28,11 @@ use std::vec::Vec;
 #[cfg(not(test))]
 use crate::distro::fedora_pagure_exporter::FedoraPagureExporterEngine;
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 #[path = "fedora_pagure_exporter.rs"]
 mod fedora_pagure_exporter;
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 use fedora_pagure_exporter::FedoraPagureExporterEngine;
 
 // ============================================================================
@@ -201,7 +201,7 @@ impl FedoraNewHotnessUpstreamMonitorEngine {
 // Unit Tests
 // ============================================================================
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

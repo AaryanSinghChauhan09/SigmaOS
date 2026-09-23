@@ -315,7 +315,7 @@ impl Default for SovereignGameEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

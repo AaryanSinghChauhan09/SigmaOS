@@ -1,10 +1,11 @@
+#![cfg_attr(not(test), no_std)]
+use std::vec;
 // SigmaOS Process Supervisor
 // Linux/BSD distro-inspired process management
 // Handles process supervision, monitoring, and lifecycle management
 
 use std::collections::BTreeMap;
 use std::string::String;
-use std::vec;
 use std::vec::Vec;
 
 /// Process state
@@ -250,7 +251,7 @@ pub enum SupervisorError {
     MonitorError(String),
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

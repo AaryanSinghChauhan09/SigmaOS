@@ -172,7 +172,6 @@ impl WeatherPanel {
     }
 
     /// Convert Fahrenheit to Celsius
-    #[allow(dead_code)]
     fn fahrenheit_to_celsius(&self, fahrenheit: f32) -> f32 {
         (fahrenheit - 32.0) * 5.0 / 9.0
     }

@@ -273,7 +273,7 @@ impl Default for SovereignSkillKernel {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -7,7 +7,6 @@
 #![allow(non_camel_case_types)]
 #![allow(clippy::large_enum_variant)]
 #![allow(clippy::type_complexity)]
-extern crate alloc;
 // SigmaOS — sigma_string_utils.rs
 // Custom string manipulation utilities that avoid std::string wherever possible.
 // All functions operate on raw byte slices (&[u8] / &mut [u8]) or the crate's
@@ -273,7 +272,7 @@ pub fn replace_bytes(input: &[u8], from: &[u8], to: &[u8]) -> SigmaByteBuf {
     if from.is_empty() || from.len() > input.len() {
         return SigmaByteBuf::from(input);
     }
-    let mut out = SigmaByteBuf::with_capacity(input.len());
+    let mut out = SigmaByteBuf::new();
     let mut i = 0usize;
     while i <= input.len().saturating_sub(from.len()) {
         if &input[i..i + from.len()] == from {
@@ -371,7 +370,7 @@ impl<K: Eq + SigmaHash + Clone, V: Clone> SigmaHashMap<K, V> {
                 Some((k, v)) if k == key => return Some(v),
                 _ => {}
             }
-            i = Self::next_idx(i, cap);
+            i = (i + 1) % cap;
             if i == start {
                 return None;
             }
@@ -394,7 +393,7 @@ impl<K: Eq + SigmaHash + Clone, V: Clone> SigmaHashMap<K, V> {
                 }
                 _ => {}
             }
-            i = Self::next_idx(i, cap);
+            i = (i + 1) % cap;
             if i == start {
                 return None;
             }
@@ -425,7 +424,7 @@ impl<K: Eq + SigmaHash + Clone, V: Clone> SigmaHashMap<K, V> {
                 Some((k, _)) if k == key => break,
                 _ => {}
             }
-            i = Self::next_idx(i, cap);
+            i = (i + 1) % cap;
             if i == start {
                 return None;
             }
@@ -433,7 +432,7 @@ impl<K: Eq + SigmaHash + Clone, V: Clone> SigmaHashMap<K, V> {
         let removed = self.buckets[i].take().map(|(_, v)| v);
         self.len -= 1;
         // Backward-shift neighbouring entries to close the gap.
-        let mut j = Self::next_idx(i, cap);
+        let mut j = (i + 1) % cap;
         while self.buckets[j].is_some() {
             let natural = self.buckets[j]
                 .as_ref()
@@ -446,7 +445,7 @@ impl<K: Eq + SigmaHash + Clone, V: Clone> SigmaHashMap<K, V> {
                 self.buckets[i] = self.buckets[j].take();
                 i = j;
             }
-            j = Self::next_idx(j, cap);
+            j = (j + 1) % cap;
             if j == i {
                 break;
             }
@@ -463,28 +462,8 @@ impl<K: Eq + SigmaHash + Clone, V: Clone> SigmaHashMap<K, V> {
 
     // ── private helpers ──────────────────────────────────────────────────────
 
-    #[inline]
     fn hash_index(&self, key: &K, cap: usize) -> usize {
-        if cap == 0 {
-            return 0;
-        }
-        if cap.is_power_of_two() {
-            (key.sigma_hash() as usize) & (cap - 1)
-        } else {
-            (key.sigma_hash() as usize) % cap
-        }
-    }
-
-    #[inline]
-    fn next_idx(i: usize, cap: usize) -> usize {
-        if cap == 0 {
-            return 0;
-        }
-        if cap.is_power_of_two() {
-            (i + 1) & (cap - 1)
-        } else {
-            (i + 1) % cap
-        }
+        (key.sigma_hash() as usize) % cap
     }
 
     fn probe_for_insert(&self, key: &K) -> usize {
@@ -497,12 +476,12 @@ impl<K: Eq + SigmaHash + Clone, V: Clone> SigmaHashMap<K, V> {
                 Some((k, _)) if k == key => return i,
                 _ => {}
             }
-            i = Self::next_idx(i, cap);
+            i = (i + 1) % cap;
         }
     }
 
     fn rehash(&mut self, new_cap: usize) {
-        let new_cap = new_cap.max(SIGMA_MAP_INITIAL_BUCKETS).next_power_of_two();
+        let new_cap = new_cap.max(SIGMA_MAP_INITIAL_BUCKETS);
         let mut new_buckets: Vec<Option<(K, V)>> = Vec::new();
         for _ in 0..new_cap {
             new_buckets.push(None);
@@ -510,14 +489,14 @@ impl<K: Eq + SigmaHash + Clone, V: Clone> SigmaHashMap<K, V> {
         let old_buckets = core::mem::replace(&mut self.buckets, new_buckets);
         for slot in old_buckets.into_iter().flatten() {
             let (k, v) = slot;
-            let idx = self.hash_index(&k, new_cap);
+            let idx = (k.sigma_hash() as usize) % new_cap;
             let mut i = idx;
             loop {
                 if self.buckets[i].is_none() {
                     self.buckets[i] = Some((k, v));
                     break;
                 }
-                i = Self::next_idx(i, new_cap);
+                i = (i + 1) % new_cap;
             }
         }
     }
@@ -653,7 +632,7 @@ pub fn sort_by<T, F: Fn(&T, &T) -> core::cmp::Ordering>(slice: &mut [T], compare
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

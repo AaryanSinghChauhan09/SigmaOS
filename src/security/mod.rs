@@ -1,8 +1,6 @@
 // SigmaOS Security Subsystem
 pub mod capability;
 pub mod pqc_enclave;
-pub mod trust_zone;
-pub use trust_zone::*;
 pub mod governance;
 pub mod audit;
 pub mod bsd_hardening;
@@ -10,7 +8,6 @@ pub mod sigma_pledge;
 pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
-pub mod exec_guard;
 
 // SigmaOS Security Subsystem
 pub mod seccomp;
@@ -57,12 +54,10 @@ pub mod landlock;
 pub use landlock::{LandlockEngine, LandlockPathBeneathAttr, LandlockRuleset};
 pub mod landlock_sovereign;
 
-pub use exec_guard::*;
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use bsd_hardening::{
-    AslrEngine, BsdHardeningSuite, BsdSysctlSecurelevelEnforcer, CapsicumCapability,
-    CapsicumManager, MemoryPermission, PaxMprotect, PledgeManager as BsdPledgeManager,
-    PledgePromise as BsdPledgePromise, SecurelevelState as BsdSecurelevelState,
+    AslrEngine, BsdHardeningSuite, CapsicumCapability, CapsicumManager, MemoryPermission,
+    PaxMprotect, PledgeManager as BsdPledgeManager, PledgePromise as BsdPledgePromise,
     UnveilEntry as BsdUnveilEntry, UnveilManager as BsdUnveilManager,
     UnveilPermission as BsdUnveilPermission, WxEnforcer,
 };
@@ -106,9 +101,8 @@ pub use parrot_kali::{
 };
 pub use parrot::ParrotSecurityFingerprintEngine;
 pub use password::{
-    BiometricAuth, BiometricResult, BiometricType, FaceIdAuth, Fido2Auth, FingerprintAuth,
-    HardwareAuthManager, HardwareAuthPromptTarget, PasswordCategory, PasswordEntry, PasswordError,
-    PasswordManager, PasswordManagerResult,
+    BiometricAuth, BiometricResult, BiometricType, FaceIdAuth, FingerprintAuth, PasswordCategory,
+    PasswordEntry, PasswordError, PasswordManager, PasswordManagerResult,
 };
 pub use pledge::{
     promises, PledgeError, PledgeManager, PledgePromise, PledgeManager as OriginalPledgeManager,
@@ -152,8 +146,3 @@ pub use crate::security::vulnerability::{SimpleVulnerability, SimpleVulnerabilit
 
 // ─── Capability Monitor (pledge + unveil + Capsicum) ─────────────────────────
 pub mod capability_monitor;
-pub mod sudo_engine;
-pub mod unified_access_control;
-
-pub use sudo_engine::*;
-pub use unified_access_control::*;

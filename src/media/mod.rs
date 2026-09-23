@@ -23,13 +23,12 @@ pub use browser::{
     ArcBoostScript, ArcBrowserBoostEngine, BraveShieldsEngine, BrowserContainerType,
     BrowserProcess, BrowserProcessType, BrowserTabInstance, ChromiumIpcChannelEngine,
     ChromiumIpcMessage, DeclarativeNetRequestEngine, DnrActionType, DohEchEncryptionEngine,
-    DuckAssistPrivacyEngine, FirefoxContainerJarManager, FloorpVerticalTabBarEngine,
-    GlobalPrivacyControl, KagiLensesFilterEngine, MullvadPrivacyIsolationEngine,
-    OnionCircuitNode, PaleMoonGoannaEngine, QuantumWebRenderEngine, ResistFingerprintingEngine,
-    SearchEngineType, SearchSwitcher, SecureStorageContainer, SigmaWebBrowser,
-    SovereignBrowserEngine, TabMemoryOptimizer, TelemetryAndTrackerStripper,
-    ThoriumPerformanceEngine, TorCircuitManager, TorSecurityLevel, TrackerTrustGrade,
-    UBlockOriginFilterEngine, ZenWorkspaceTreeEngine,
+    DuckAssistPrivacyEngine, FirefoxContainerJarManager, GlobalPrivacyControl,
+    MullvadPrivacyIsolationEngine, OnionCircuitNode, QuantumWebRenderEngine,
+    ResistFingerprintingEngine, SearchEngineType, SearchSwitcher, SecureStorageContainer,
+    SigmaWebBrowser, SovereignBrowserEngine, TabMemoryOptimizer, TelemetryAndTrackerStripper,
+    TorCircuitManager, TorSecurityLevel, TrackerTrustGrade, UBlockOriginFilterEngine,
+    ZenWorkspaceTreeEngine,
 };
 
 pub use sovereign_video_player::{

@@ -27,9 +27,7 @@ pub mod random;
 pub mod rsa;
 pub mod vectorized_pqc;
 pub mod aegis_vault;
-pub mod asymmetric_clustering;
 
-pub use asymmetric_clustering::*;
 pub use aegis_vault::{
     AegisEncryptedContainer, AegisVaultEncryptionCompressionEngine, AegisVaultError,
 };

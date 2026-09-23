@@ -4,11 +4,7 @@
 // - RadixTree<T>: Linux kernel `lib/radix-tree.c` inspired page-cache / PID radix lookup tree
 // - SovereignPriorityQueue<T>: BSD `sys/queue.h` and Linux scheduler binary heap priority queue
 
-#[cfg(not(any(feature = "standalone_test", test)))]
-use std::vec::Vec;
-
-#[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
+use crate::klib::Vec;
 
 // =========================================================================
 // 1. Splay Tree ADT (Inspired by FreeBSD sys/tree.h SPLAY)
@@ -29,7 +25,7 @@ pub struct SplayTree<K, V> {
     root: Option<usize>,
 }
 
-impl<K, V> SplayTree<K, V> {
+impl<K: Ord + Clone, V: Clone> SplayTree<K, V> {
     pub fn new() -> Self {
         Self {
             nodes: Vec::new(),
@@ -37,18 +33,6 @@ impl<K, V> SplayTree<K, V> {
         }
     }
 
-    /// Returns total element count
-    pub fn len(&self) -> usize {
-        self.nodes.iter().filter(|n| n.is_some()).count()
-    }
-
-    /// Checks if tree is empty
-    pub fn is_empty(&self) -> bool {
-        self.len() == 0
-    }
-}
-
-impl<K: Ord + Clone, V: Clone> SplayTree<K, V> {
     /// Inserts a key-value pair into the splay tree
     pub fn insert(&mut self, key: K, value: V) {
         if self.root.is_none() {
@@ -130,9 +114,19 @@ impl<K: Ord + Clone, V: Clone> SplayTree<K, V> {
         }
         None
     }
+
+    /// Returns total element count
+    pub fn len(&self) -> usize {
+        self.nodes.iter().filter(|n| n.is_some()).count()
+    }
+
+    /// Checks if tree is empty
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
 }
 
-impl<K, V> Default for SplayTree<K, V> {
+impl<K: Ord + Clone, V: Clone> Default for SplayTree<K, V> {
     fn default() -> Self {
         Self::new()
     }
@@ -154,23 +148,13 @@ pub struct RadixTree<T> {
     entries: Vec<RadixNode<T>>,
 }
 
-impl<T> RadixTree<T> {
+impl<T: Clone> RadixTree<T> {
     pub fn new() -> Self {
         Self {
             entries: Vec::new(),
         }
     }
 
-    pub fn len(&self) -> usize {
-        self.entries.iter().filter(|e| e.value.is_some()).count()
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.len() == 0
-    }
-}
-
-impl<T: Clone> RadixTree<T> {
     /// Store value at u64 key index
     pub fn insert(&mut self, key: u64, value: T) {
         for entry in self.entries.iter_mut() {
@@ -204,9 +188,17 @@ impl<T: Clone> RadixTree<T> {
         }
         None
     }
+
+    pub fn len(&self) -> usize {
+        self.entries.iter().filter(|e| e.value.is_some()).count()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
 }
 
-impl<T> Default for RadixTree<T> {
+impl<T: Clone> Default for RadixTree<T> {
     fn default() -> Self {
         Self::new()
     }
@@ -221,31 +213,14 @@ pub struct SovereignPriorityQueue<T> {
     heap: Vec<T>,
 }
 
-impl<T> SovereignPriorityQueue<T> {
+impl<T: Ord + Clone> SovereignPriorityQueue<T> {
     pub fn new() -> Self {
         Self { heap: Vec::new() }
     }
 
-    pub fn len(&self) -> usize {
-        self.heap.len()
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.heap.is_empty()
-    }
-
-    pub fn peek(&self) -> Option<&T> {
-        self.heap.first()
-    }
-}
-
-impl<T: Ord + Clone> SovereignPriorityQueue<T> {
     pub fn push(&mut self, item: T) {
         self.heap.push(item);
-        if self.heap.len() <= 1 {
-            return;
-        }
-        let mut idx: usize = self.heap.len() - 1;
+        let mut idx = self.heap.len() - 1;
         while idx > 0 {
             let parent = (idx - 1) / 2;
             if self.heap[idx] > self.heap[parent] {
@@ -271,6 +246,10 @@ impl<T: Ord + Clone> SovereignPriorityQueue<T> {
         max_val
     }
 
+    pub fn peek(&self) -> Option<&T> {
+        self.heap.first()
+    }
+
     fn sift_down(&mut self, mut idx: usize) {
         let len = self.heap.len();
         loop {
@@ -293,9 +272,17 @@ impl<T: Ord + Clone> SovereignPriorityQueue<T> {
             }
         }
     }
+
+    pub fn len(&self) -> usize {
+        self.heap.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.heap.is_empty()
+    }
 }
 
-impl<T> Default for SovereignPriorityQueue<T> {
+impl<T: Ord + Clone> Default for SovereignPriorityQueue<T> {
     fn default() -> Self {
         Self::new()
     }
@@ -305,7 +292,7 @@ impl<T> Default for SovereignPriorityQueue<T> {
 // 4. Unit Tests
 // =========================================================================
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

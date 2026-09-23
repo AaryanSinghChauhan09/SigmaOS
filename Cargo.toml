@@ -69,11 +69,8 @@ x11 = []
 unexpected_cfgs = { level = "warn", check-cfg = [
     'cfg(custom_alloc_error_handler)',
     'cfg(standalone_test)',
-    'cfg(std)',
-    'cfg(sigmaos_lib)',
     'cfg(feature, values("cache-lru", "cache-lfu", "cache-arc", "jemalloc", "mimalloc", "scheduler-eevdf", "scheduler-bore", "lock-free", "mutex", "rwlock", "io-sequential", "io-random", "io-mmap"))'
 ] }
-non_camel_case_types = "allow"
 
 [profile.dev]
 opt-level = 0
@@ -106,11 +103,3 @@ name = "sigmaos_setup_wizard"
 path = "tools/build/SigmaOSSetupWizard.rs"
 test = false
 required-features = ["microkernel"]
-
-[[bin]]
-name = "sigpkg"
-path = "src/bin/sigpkg.rs"
-
-[[bin]]
-name = "sigma-pkg"
-path = "src/bin/sigma_pkg.rs"

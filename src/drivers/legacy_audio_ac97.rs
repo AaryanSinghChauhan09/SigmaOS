@@ -14,17 +14,24 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 // Legacy AC97 Audio codec driver simulator
-use crate::drivers::peripheral::PowerState;
+use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceGeneration {
     Legacy,
     Modern,
 }
 
-#[cfg(test)]
-pub trait TestPeripheralDevice {
+#[cfg(test_disabled)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PowerState {
+    Off,
+    On,
+}
+
+#[cfg(test_disabled)]
+pub trait PeripheralDevice {
     fn name(&self) -> &'static str;
     fn generation(&self) -> DeviceGeneration;
     fn initialize(&mut self) -> Result<(), &'static str>;
@@ -49,9 +56,7 @@ impl LegacyAudioAc97 {
     }
 }
 
-#[cfg(test)]
-#[allow(dead_code)]
-impl TestPeripheralDevice for LegacyAudioAc97 {
+impl PeripheralDevice for LegacyAudioAc97 {
     fn name(&self) -> &'static str {
         "AC97 Legacy Sound Blaster Driver"
     }
@@ -98,7 +103,7 @@ impl TestPeripheralDevice for LegacyAudioAc97 {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

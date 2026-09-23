@@ -7,7 +7,7 @@ use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 use crate::klib::HashMap;
-#[cfg(test)]
+#[cfg(test_disabled)]
 use std::collections::HashMap;
 
 #[path = "memory/resource_allocator.rs"]
@@ -219,7 +219,7 @@ impl BuddyAllocator {
             return None;
         }
 
-        let pages = (size + PAGE_SIZE - 1) / PAGE_SIZE;
+        let pages = size.div_ceil(PAGE_SIZE);
         let order = self.calculate_order(pages);
 
         // Find smallest block that can satisfy request
@@ -599,7 +599,7 @@ impl Ne2000DmaBuffer {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

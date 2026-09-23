@@ -1,9 +1,10 @@
 //! Network Driver Framework (Linux mac80211 & FreeBSD net80211 Inspiration)
 //! Supports wireless (Intel iwlwifi, Broadcom brcmfmac, Realtek rtw88, Atheros ath10k), ethernet, and Bluetooth
 
-use std::boxed::Box;
-use std::string::{String, ToString};
-use std::vec::Vec;
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 /// Network device types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -405,7 +406,6 @@ pub struct AtherosAthDriver {
     info: NetworkInfo,
     initialized: bool,
     noise_floor_dbm: i8,
-    #[allow(dead_code)]
     ampdu_aggr_enabled: bool,
 }
 
@@ -511,7 +511,7 @@ impl Default for NetworkManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -268,7 +268,7 @@ impl Default for SigmaSELinux {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

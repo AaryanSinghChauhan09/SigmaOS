@@ -2,7 +2,6 @@ pub mod mobile_variant;
 pub use mobile_variant::*;
 
 // SigmaOS Desktop Module
-pub mod gaming_engine;
 pub mod mate_betsy;
 pub mod mint_tools;
 pub mod moksha;
@@ -11,42 +10,22 @@ pub mod pantheon;
 pub mod screensaver;
 pub mod sovereign_navigation_engine;
 pub mod web_wasm_bridge;
-pub mod zenith;
-pub mod zenith_advanced_features;
 pub mod zenith_compositor;
-
-pub use zenith_advanced_features::{
-    AdvancedWindowManager, AppletCategory, DesktopActivity, DesktopApplet, DesktopAppletEngine,
-    DesktopInspirationPreset, GestureAction, GestureBinding, GestureType, MonitorConfig,
-    ProfileManager, ProfileSettings, ScratchpadWindow, SuggestionType, UsageProfile,
-    WindowLayoutMode, WindowRule, WindowRuleAction, WindowRuleMatch, WorkspaceConfig,
-    ZenithActivityManager, ZenithDesktopEnvironment, ZenithDesktopSecurityGuard,
-    ZenithScratchpadManager, ZenithThemePreset, ZenithThemePresetManager, ZenithWindowRuleEngine,
-};
-
-pub use zenith::{
-    FractionalDisplayScaler, HyprlandTilingLayoutEngine, OmarchyThemeSyncEngine, SimpleDesktopCompositor,
-    SimpleWindow, TilingLayoutMode, WaylandCosmicScanoutPipeline, Window, WindowCapability,
-    WindowInfo,
-};
 pub mod ultimate_distro_desktop;
 pub mod wayland_protocol;
 pub mod sovereign_ux_innovation_hub;
 pub mod weather_panel;
-pub mod universal_desktop_framework;
-pub mod xfce_engine;
 
-pub use gaming_engine::{
-    AntiCheatCompatibilityShim, AntiCheatEngineType, DirectXApiVersion, FsrUpscalingMode,
-    GameModeCpuGpuGovernor, GamescopeConfig, GamescopeMicrocompositorEngine,
-    ProtonDirectXTranslationShim,
-};
-pub use xfce_engine::*;
 pub use wayland_protocol::*;
 pub use sovereign_ux_innovation_hub::*;
-pub use universal_desktop_framework::*;
 
 pub use crate::desktop::sovereign_navigation_engine::*;
+
+
+
+pub use sovereign_navigation_engine::*;
+
+pub use sovereign_navigation_engine::*;
 
 pub use ultimate_distro_desktop::{
     ContainerSplitDirection, Gnome46MutterEngine, KRunnerQueryResult, KdePlasma6Engine,
@@ -67,8 +46,7 @@ pub use mint_tools::{
 };
 
 pub use screensaver::{
-    DpmsState, LockState, OmarchyBackgroundManager, OweVideoWallpaperEngine, ScreenSaverConfig,
-    ScreenSaverEngine, ScreenSaverFrame, ScreenSaverMode, WallpaperMediaFormat,
+    DpmsState, LockState, ScreenSaverConfig, ScreenSaverEngine, ScreenSaverFrame, ScreenSaverMode,
 };
 
 pub use pantheon::{
@@ -84,12 +62,6 @@ pub use moksha::{
 };
 
 pub use zenith_compositor::{
-    AccessibilityBusEvent, AccessibilityBusManager, ColorManagementEngine, ColorProfileSpec,
-    CompositorShortcutAction, DataOfferPayload, DataSelectionManager, DataSelectionType,
-    DesktopNotificationMessage, DndActionState, DragAndDropSession, DrmAtomicCommit,
-    DrmConnectorStatus, DrmKmsDevice, DrmPlaneType, EvdevInputEngine, InputDeviceType,
-    KeyModifiers, LockScreenSessionEngine, NotificationDaemonEngine, PortalCaptureEngine,
-    ScreenshotFrame, SessionLockState, SoftwareRenderer, X11WindowMetadata, XWaylandBridgeEngine,
     DamageRegion, InputEvent, InputEventData, InputEventType, Output, Surface, SurfaceType,
     WindowGeometry, WindowState, ZenithCompositor, ZenithWindow,
 };

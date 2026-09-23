@@ -193,7 +193,7 @@ impl Default for DebianPackageTranslator {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

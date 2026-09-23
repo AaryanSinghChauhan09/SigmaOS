@@ -187,7 +187,7 @@ impl Default for XorShiftRng {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

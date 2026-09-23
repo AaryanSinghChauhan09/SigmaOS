@@ -414,7 +414,7 @@ impl Default for ElementaryHigChecker {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

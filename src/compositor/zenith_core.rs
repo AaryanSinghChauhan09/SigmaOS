@@ -22,7 +22,7 @@
 #![allow(dead_code)]
 
 use std::collections::BTreeMap;
-use std::string::String;
+use std::string::{String, ToString};
 use std::vec::Vec;
 use std::format;
 
@@ -566,7 +566,6 @@ impl ZenithCompositor {
 
     /// Dispatch a keyboard event to the focused surface
     pub fn dispatch_key_event(&mut self, event: WlKeyEvent) -> Option<WlObjectId> {
-        let _ = event; // Suppress unused warning - would be dispatched in real implementation
         self.stats.key_events += 1;
         self.keyboard_focus
     }

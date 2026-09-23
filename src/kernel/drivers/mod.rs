@@ -15,11 +15,6 @@
 
 /// SigmaOS Kernel Drivers — aggregates legacy and modern driver modules
 pub mod legacy;
-pub mod nvme;
-pub mod xhci;
-
-pub use nvme::{NvmeIoOpcode, NvmeQueuePair, SovereignPcieNvmeDriver};
-pub use xhci::{SovereignUsbXhciDriver, XhciRing, XhciTrbType};
 
 pub use legacy::{
     E1000Driver,

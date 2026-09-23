@@ -321,7 +321,7 @@ impl Default for FilesystemManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

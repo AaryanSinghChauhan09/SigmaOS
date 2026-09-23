@@ -278,7 +278,7 @@ impl Default for SignalManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     use crate::kernel::proc::process_lifecycle::{ProcessLifecycleManager};

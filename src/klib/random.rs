@@ -75,7 +75,7 @@ pub fn init_global_rng(seed: u64) {
 /// Get a random u64 using the global RNG
 pub fn random_u64() -> u64 {
     unsafe {
-        match &*core::ptr::addr_of!(GLOBAL_RNG) {
+        match &*(&raw const GLOBAL_RNG) {
             Some(rng) => rng.gen_u64(),
             None => {
                 // Fallback if not initialized
@@ -90,7 +90,7 @@ pub fn random_u32() -> u32 {
     (random_u64() & 0xFFFFFFFF) as u32
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

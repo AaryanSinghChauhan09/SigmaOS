@@ -1,10 +1,3 @@
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::new_without_default)]
-#![allow(non_camel_case_types)]
-#![allow(unused_variables)]
-#![allow(unused_imports)]
-#![allow(dead_code)]
-#![allow(unexpected_cfgs)]
 use std::string::String;
 use std::vec;
 use std::vec::Vec;
@@ -19,26 +12,12 @@ pub enum InstructionCyclePhase {
     Commit,
 }
 
-#[cfg(not(feature = "standalone_test"))]
-use super::structures::ThreadState;
-
-#[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ThreadState {
     Ready,
     Running,
     Blocked,
     Terminated,
-}
-
-#[cfg(feature = "standalone_test")]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CpuArchitectureClass {
-    X86_32,
-    X86_64,
-    AArch64,
-    RiscV32,
-    RiscV64,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -298,7 +277,7 @@ impl RiscV64Hal {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -335,6 +314,15 @@ mod tests {
         let (r32_name, r32_paging, _) = engine_riscv32.get_arch_info();
         assert_eq!(r32_name, "RiscV32 (RV32I)");
         assert_eq!(r32_paging, "Sv32 2-Level Paging");
+
+        let loong = LoongArch64Hal::new();
+        assert_eq!(loong.arch_name(), "LoongArch64 (Loongson 64)");
+
+        let ppc = PowerPC64Hal::new();
+        assert_eq!(ppc.arch_name(), "PowerPC64 (ppc64le / POWER9/10)");
+
+        let s390 = S390xHal::new();
+        assert_eq!(s390.arch_name(), "S390x (IBM z/Architecture)");
     }
 
     #[test]
@@ -360,6 +348,91 @@ mod tests {
 }
 
 /// Memory Descriptor List (MDL) mapping virtual buffer to locked physical pages
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct LoongArch64Hal {
+    pub pgdl_base: u64,
+    pub pgdh_base: u64,
+    pub pwcl_base: u64,
+}
+
+impl LoongArch64Hal {
+    pub fn new() -> Self {
+        Self {
+            pgdl_base: 0x0000_1000,
+            pgdh_base: 0x0000_2000,
+            pwcl_base: 0x0000_0001,
+        }
+    }
+
+    pub fn arch_name(&self) -> &'static str {
+        "LoongArch64 (Loongson 64)"
+    }
+
+    pub fn paging_mode(&self) -> &'static str {
+        "4-Level PWCL Page Table Walking"
+    }
+
+    pub fn privilege_levels(&self) -> &'static str {
+        "PL0 (Kernel) / PL3 (User)"
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct PowerPC64Hal {
+    pub sdr1_base: u64,
+    pub msr: u64,
+}
+
+impl PowerPC64Hal {
+    pub fn new() -> Self {
+        Self {
+            sdr1_base: 0x0000_8000,
+            msr: 0x8000_0000_0000_9032,
+        }
+    }
+
+    pub fn arch_name(&self) -> &'static str {
+        "PowerPC64 (ppc64le / POWER9/10)"
+    }
+
+    pub fn paging_mode(&self) -> &'static str {
+        "Radix / Hash Page Table (HPT)"
+    }
+
+    pub fn privilege_levels(&self) -> &'static str {
+        "Problem State (User) / Supervisor Mode"
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct S390xHal {
+    pub control_reg0: u64,
+    pub control_reg13: u64,
+}
+
+impl S390xHal {
+    pub fn new() -> Self {
+        Self {
+            control_reg0: 0x0000_0000_0000_0001,
+            control_reg13: 0x0000_0000_0000_4000,
+        }
+    }
+
+    pub fn arch_name(&self) -> &'static str {
+        "S390x (IBM z/Architecture)"
+    }
+
+    pub fn paging_mode(&self) -> &'static str {
+        "5-Level Region & Segment Table Translation"
+    }
+
+    pub fn privilege_levels(&self) -> &'static str {
+        "Problem State (User) / Supervisor State"
+    }
+}
+
+
 pub struct MemoryDescriptorList {
     pub virtual_address: usize,
     pub byte_count: usize,
@@ -477,6 +550,9 @@ pub enum CpuArchitectureClass {
     AArch64,
     RiscV32,
     RiscV64,
+    LoongArch64,
+    PowerPC64,
+    S390x,
 }
 
 // 6. Unified Architecture Engine
@@ -537,6 +613,18 @@ impl ArchitectureEngine {
             }
             CpuArchitectureClass::RiscV64 => {
                 let hal = RiscV64Hal::new();
+                (hal.arch_name(), hal.paging_mode(), hal.privilege_levels())
+            }
+            CpuArchitectureClass::LoongArch64 => {
+                let hal = LoongArch64Hal::new();
+                (hal.arch_name(), hal.paging_mode(), hal.privilege_levels())
+            }
+            CpuArchitectureClass::PowerPC64 => {
+                let hal = PowerPC64Hal::new();
+                (hal.arch_name(), hal.paging_mode(), hal.privilege_levels())
+            }
+            CpuArchitectureClass::S390x => {
+                let hal = S390xHal::new();
                 (hal.arch_name(), hal.paging_mode(), hal.privilege_levels())
             }
         }

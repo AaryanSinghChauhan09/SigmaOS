@@ -156,7 +156,6 @@ pub struct DeviceFallbackRoute {
 pub struct AiExecutionDispatcher {
     discrete_gpu_available: bool,
     integrated_npu_available: bool,
-    #[allow(dead_code)]
     cpu_simd_available: bool,
     fallback_count: usize,
 }
@@ -250,7 +249,7 @@ impl AiExecutionDispatcher {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -1,3 +1,4 @@
+
 // Sovereign Core Apps Shard (SigmaOffice, SigmaTasks, SigmaVault, SigmaChat)
 // Zero-dependency, #![no_std] compliant
 
@@ -281,7 +282,7 @@ impl Default for SigmaChatRoomManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

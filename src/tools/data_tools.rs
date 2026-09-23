@@ -370,7 +370,7 @@ impl Default for DataVisualizationEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

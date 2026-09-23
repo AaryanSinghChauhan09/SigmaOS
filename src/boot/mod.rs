@@ -5,7 +5,6 @@ pub mod boot_snapshot;
 pub mod bridge_grid;
 pub mod firmware;
 pub mod firmware_bridge;
-pub mod initramfs;
 pub mod multiboot2;
 pub mod optimization;
 pub mod pci;
@@ -40,17 +39,8 @@ pub use sigma_boot::{
 pub use boot_snapshot::{
     BootSnapshotConfig, BootSnapshotEngine, BootSnapshotItem, BootSnapshotStatus,
 };
-pub use initramfs::{
-    CpioArchiveUnpacker, CpioFileEntry, EarlyLuksUnsealEngine, EarlyStoragePoolScanner,
-    EmergencyRecoveryGate, InitramfsCmdlineParser, InitramfsPivotRootEngine,
-    SovereignInitramfsEngine,
-};
 pub use uefi::{
     AcpiParser, BootError, GopFramebuffer, GopSplashCanvas, MicrokernelProfile,
     MultiKernelBootSelector, SecureBoot, SimpleSecureBoot, SimpleUEFIBootloader,
     SovereignBootWatchdog, UEFIBootloader, UsbHostController,
-};
-
-pub use verified::{
-    QemuArchitectureTarget, QemuBootSerialLogParser, QemuBootStatus, QemuBootVerificationConfig,
 };

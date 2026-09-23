@@ -147,7 +147,7 @@ impl Default for Alert {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     

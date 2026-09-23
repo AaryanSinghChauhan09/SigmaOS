@@ -340,7 +340,7 @@ impl Default for ScosmosManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

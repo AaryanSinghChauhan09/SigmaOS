@@ -50,23 +50,19 @@ pub struct Transaction {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum UniversalPackageFormat {
     DebianDeb,      // .deb (APT/dpkg)
-    ArchPacman,     // .pkg.tar.zst / .pkg.tar.xz (pacman)
+    ArchPacman,     // .pkg.tar.zst (pacman)
     FedoraRpm,      // .rpm (dnf/rpm)
-    ZypperDrpm,     // .drpm / .delta.rpm (Zypper delta RPM)
     AlpineApk,      // .apk (apk)
     GentooEbuild,   // .ebuild (portage)
-    GentooTbz2,     // .tbz2 / .tar.bz2 (Gentoo binary pkg)
     VoidXbps,       // .xbps (xbps)
     FreeBsdPkg,     // .txz / .pkg (pkg)
     OpenBsdPkg,     // .tgz / .pkg (OpenBSD pkg_add)
     NetBsdPkgsrc,   // .tgz / .tgz (NetBSD pkgsrc)
     SlackwarePkg,   // .txz / .tgz (Slackware installpkg)
-    CruxPkg,        // .pkg.tar.gz (Crux pkgutils)
-    MossPackage,    // .stone (Serpent OS Moss package)
     NixDerivation,  // .nix / .drv (NixOS store derivation)
     GuixPackage,    // .scm (GNU Guix package scheme)
     HaikuHpkg,      // .hpkg (Haiku package format)
-    SolusEopkg,     // .eopkg / .pisi (Solus eopkg / PiSi)
+    SolusEopkg,     // .eopkg / .pisi (Solus eopkg)
     OpenWrtIpk,     // .ipk / .opkg (OpenWrt opkg)
     TinyCoreTcz,    // .tcz / .sfs (TinyCore Linux)
     ChimeraCports,  // .cports (Chimera Linux)
@@ -88,16 +84,12 @@ impl UniversalPackageImporter {
             Some(UniversalPackageFormat::DebianDeb)
         } else if filename.ends_with(".pkg.tar.zst") || filename.ends_with(".pkg.tar.xz") {
             Some(UniversalPackageFormat::ArchPacman)
-        } else if filename.ends_with(".drpm") || filename.ends_with(".delta.rpm") {
-            Some(UniversalPackageFormat::ZypperDrpm)
         } else if filename.ends_with(".rpm") {
             Some(UniversalPackageFormat::FedoraRpm)
         } else if filename.ends_with(".apk") && !filename.contains("android") {
             Some(UniversalPackageFormat::AlpineApk)
         } else if filename.ends_with(".ebuild") {
             Some(UniversalPackageFormat::GentooEbuild)
-        } else if filename.ends_with(".tbz2") {
-            Some(UniversalPackageFormat::GentooTbz2)
         } else if filename.ends_with(".xbps") {
             Some(UniversalPackageFormat::VoidXbps)
         } else if filename.ends_with(".openbsd.tgz") {
@@ -106,10 +98,6 @@ impl UniversalPackageImporter {
             Some(UniversalPackageFormat::NetBsdPkgsrc)
         } else if filename.ends_with(".slackware.txz") || filename.ends_with(".slackware.tgz") {
             Some(UniversalPackageFormat::SlackwarePkg)
-        } else if filename.ends_with(".pkg.tar.gz") {
-            Some(UniversalPackageFormat::CruxPkg)
-        } else if filename.ends_with(".stone") {
-            Some(UniversalPackageFormat::MossPackage)
         } else if filename.ends_with(".txz") || filename.ends_with(".pkg") {
             Some(UniversalPackageFormat::FreeBsdPkg)
         } else if filename.ends_with(".nix") || filename.ends_with(".drv") {
@@ -158,14 +146,12 @@ impl UniversalPackageImporter {
         let (license, raw_deps) = match format {
             UniversalPackageFormat::DebianDeb => ("GPL-3.0-or-later", vec!["libc6".to_string(), "libssl-dev".to_string()]),
             UniversalPackageFormat::ArchPacman => ("MIT", vec!["glibc".to_string(), "openssl".to_string()]),
-            UniversalPackageFormat::FedoraRpm | UniversalPackageFormat::ZypperDrpm => {
+            UniversalPackageFormat::FedoraRpm => {
                 ("GPLv2+", vec!["glibc".to_string(), "bash".to_string(), "openssl-devel".to_string()])
             }
             UniversalPackageFormat::AlpineApk => ("MIT/GPL-2.0", vec!["musl".to_string(), "openssl-dev".to_string()]),
-            UniversalPackageFormat::GentooEbuild | UniversalPackageFormat::GentooTbz2 => ("GPL-2.0-or-later", vec!["sys-libs/glibc".to_string(), "dev-libs/openssl".to_string()]),
+            UniversalPackageFormat::GentooEbuild => ("GPL-2.0-or-later", vec!["sys-libs/glibc".to_string(), "dev-libs/openssl".to_string()]),
             UniversalPackageFormat::VoidXbps => ("BSD-2-Clause", vec!["libc6".to_string(), "libssl-dev".to_string()]),
-            UniversalPackageFormat::CruxPkg => ("GPL-2.0-or-later", vec!["glibc".to_string(), "ncurses".to_string()]),
-            UniversalPackageFormat::MossPackage => ("GPL-3.0-or-later", vec!["glibc".to_string(), "openssl".to_string()]),
             UniversalPackageFormat::FreeBsdPkg => {
                 ("BSD-2-Clause", vec!["freebsd-runtime".to_string(), "security/openssl".to_string()])
             }
@@ -217,30 +203,16 @@ impl UniversalPackageImporter {
             .iter()
             .map(|dep| {
                 let dep_lower = dep.to_lowercase();
-                if dep_lower.contains("ssl") || dep_lower.contains("crypto") || dep_lower.contains("gnutls") || dep_lower.contains("mbedtls") {
+                if dep_lower.contains("ssl") || dep_lower.contains("crypto") {
                     "sovereign-openssl".to_string()
                 } else if dep_lower.contains("libc") || dep_lower == "musl" || dep_lower.contains("freebsd-runtime") || dep_lower.contains("openbsd-sys") || dep_lower.contains("haiku-libroot") {
                     "sovereign-libc".to_string()
-                } else if dep_lower.contains("zlib") || dep_lower.contains("zstd") || dep_lower.contains("lz4") || dep_lower.contains("xz") || dep_lower.contains("bzip2") {
+                } else if dep_lower.contains("zlib") {
                     "sovereign-zlib".to_string()
-                } else if dep_lower.contains("python") || dep_lower.contains("perl") || dep_lower.contains("ruby") || dep_lower.contains("lua") {
-                    "sovereign-interpreter".to_string()
-                } else if dep_lower == "bash" || dep_lower == "zsh" || dep_lower == "sh" || dep_lower == "fish" || dep_lower == "ksh" {
+                } else if dep_lower.contains("python") {
+                    "sovereign-python".to_string()
+                } else if dep_lower == "bash" || dep_lower == "zsh" || dep_lower == "sh" {
                     "sovereign-shell".to_string()
-                } else if dep_lower.contains("ncurses") || dep_lower.contains("readline") || dep_lower.contains("pcre") {
-                    "sovereign-terminal-ui".to_string()
-                } else if dep_lower.contains("sqlite") || dep_lower.contains("postgres") || dep_lower.contains("mysql") || dep_lower.contains("mariadb") {
-                    "sovereign-database".to_string()
-                } else if dep_lower.contains("expat") || dep_lower.contains("libxml") || dep_lower.contains("yaml") || dep_lower.contains("json") {
-                    "sovereign-xml-parser".to_string()
-                } else if dep_lower.contains("glib") || dep_lower.contains("wayland") || dep_lower.contains("x11") || dep_lower.contains("xcb") || dep_lower.contains("mesa") || dep_lower.contains("vulkan") || dep_lower.contains("gtk") || dep_lower.contains("qt") {
-                    "sovereign-desktop-gui".to_string()
-                } else if dep_lower.contains("pipewire") || dep_lower.contains("pulseaudio") || dep_lower.contains("alsa") || dep_lower.contains("ffmpeg") || dep_lower.contains("gstreamer") {
-                    "sovereign-multimedia".to_string()
-                } else if dep_lower.contains("curl") || dep_lower.contains("wget") {
-                    "sovereign-networking".to_string()
-                } else if dep_lower.contains("gcc") || dep_lower.contains("clang") || dep_lower.contains("llvm") || dep_lower.contains("make") || dep_lower.contains("cmake") {
-                    "sovereign-toolchain".to_string()
                 } else {
                     dep.clone()
                 }
@@ -354,179 +326,6 @@ impl ForeignRepoIndexParser {
                             current_deps.push(dep.to_string());
                         }
                     }
-                }
-            }
-            UniversalPackageFormat::ArchPacman => {
-                // Parses Arch Pacman repo desc metadata or sync DB index entries (%NAME%, %VERSION%, %DESC%, %DEPENDS%)
-                let mut current_name = String::new();
-                let mut current_ver = String::new();
-                let mut current_desc = String::new();
-                let mut current_deps = Vec::new();
-                let mut current_section = "";
-
-                for line in raw_index.lines() {
-                    let trimmed = line.trim();
-                    if trimmed.starts_with('%') && trimmed.ends_with('%') {
-                        current_section = &trimmed[1..trimmed.len() - 1];
-                        continue;
-                    }
-
-                    if trimmed.is_empty() {
-                        continue;
-                    }
-
-                    match current_section {
-                        "NAME" => current_name = trimmed.to_string(),
-                        "VERSION" => current_ver = trimmed.to_string(),
-                        "DESC" => current_desc = trimmed.to_string(),
-                        "DEPENDS" => current_deps.push(trimmed.to_string()),
-                        _ => {}
-                    }
-                }
-
-                if !current_name.is_empty() {
-                    packages.push(Package {
-                        name: current_name.clone(),
-                        version: current_ver.clone(),
-                        description: current_desc.clone(),
-                        dependencies: UniversalPackageImporter::translate_foreign_dependencies(&current_deps),
-                        conflicts: vec![],
-                        provides: vec![current_name],
-                        size: 3_500_000,
-                        installed_size: 12_000_000,
-                        url: None,
-                        license: "Arch-Standard".to_string(),
-                        groups: vec!["pacman-repo".to_string()],
-                        architecture: "x86_64".to_string(),
-                        repository: "pacman-index".to_string(),
-                    });
-                }
-            }
-            UniversalPackageFormat::FedoraRpm | UniversalPackageFormat::ZypperDrpm => {
-                // Parses DNF/RPM primary XML metadata (<package><name>...</name><version ver="..."/><summary>...</summary><format><rpm:requires>...</format></package>)
-                let mut current_name = String::new();
-                let mut current_ver = String::new();
-                let mut current_desc = String::new();
-                let mut current_deps = Vec::new();
-
-                for line in raw_index.lines() {
-                    let trimmed = line.trim();
-                    if trimmed.contains("<package") {
-                        current_name.clear();
-                        current_ver.clear();
-                        current_desc.clear();
-                        current_deps.clear();
-                    }
-                    if let (Some(start), Some(end)) = (trimmed.find("<name>"), trimmed.find("</name>")) {
-                        current_name = trimmed[start + 6..end].to_string();
-                    }
-                    if trimmed.contains("<version ") {
-                        if let Some(ver_pos) = trimmed.find("ver=\"") {
-                            let rest = &trimmed[ver_pos + 5..];
-                            if let Some(quote_end) = rest.find('"') {
-                                current_ver = rest[..quote_end].to_string();
-                            }
-                        }
-                    }
-                    if let (Some(start), Some(end)) = (trimmed.find("<summary>"), trimmed.find("</summary>")) {
-                        current_desc = trimmed[start + 9..end].to_string();
-                    }
-                    if trimmed.contains("<rpm:entry name=\"") {
-                        if let Some(name_pos) = trimmed.find("name=\"") {
-                            let rest = &trimmed[name_pos + 6..];
-                            if let Some(quote_end) = rest.find('"') {
-                                current_deps.push(rest[..quote_end].to_string());
-                            }
-                        }
-                    }
-                    if trimmed.contains("</package>") {
-                        if !current_name.is_empty() {
-                            packages.push(Package {
-                                name: current_name.clone(),
-                                version: current_ver.clone(),
-                                description: current_desc.clone(),
-                                dependencies: UniversalPackageImporter::translate_foreign_dependencies(&current_deps),
-                                conflicts: vec![],
-                                provides: vec![current_name.clone()],
-                                size: 4_000_000,
-                                installed_size: 14_000_000,
-                                url: None,
-                                license: "RPM-Standard".to_string(),
-                                groups: vec!["rpm-repo".to_string()],
-                                architecture: "x86_64".to_string(),
-                                repository: "rpm-primary-xml".to_string(),
-                            });
-                        }
-                    }
-                }
-            }
-            UniversalPackageFormat::FreeBsdPkg | UniversalPackageFormat::OpenBsdPkg | UniversalPackageFormat::NetBsdPkgsrc => {
-                // Parses BSD pkg +MANIFEST format (name: ..., version: ..., comment: ..., deps: ...)
-                let mut current_name = String::new();
-                let mut current_ver = String::new();
-                let mut current_desc = String::new();
-                let mut current_deps = Vec::new();
-
-                for line in raw_index.lines() {
-                    let trimmed = line.trim();
-                    if trimmed.is_empty() {
-                        if !current_name.is_empty() {
-                            packages.push(Package {
-                                name: current_name.clone(),
-                                version: current_ver.clone(),
-                                description: current_desc.clone(),
-                                dependencies: UniversalPackageImporter::translate_foreign_dependencies(&current_deps),
-                                conflicts: vec![],
-                                provides: vec![current_name.clone()],
-                                size: 3_000_000,
-                                installed_size: 10_000_000,
-                                url: None,
-                                license: "BSD-Standard".to_string(),
-                                groups: vec!["bsd-repo".to_string()],
-                                architecture: "x86_64".to_string(),
-                                repository: "bsd-manifest".to_string(),
-                            });
-                            current_name.clear();
-                            current_ver.clear();
-                            current_desc.clear();
-                            current_deps.clear();
-                        }
-                        continue;
-                    }
-
-                    if let Some(pos) = trimmed.find(':') {
-                        let key = trimmed[..pos].trim();
-                        let val = trimmed[pos + 1..].trim().trim_matches(&['"', '\'', ','][..]);
-                        match key {
-                            "name" => current_name = val.to_string(),
-                            "version" => current_ver = val.to_string(),
-                            "comment" | "desc" => current_desc = val.to_string(),
-                            "dep" | "deps" | "origin" => {
-                                if !val.is_empty() {
-                                    current_deps.push(val.to_string());
-                                }
-                            }
-                            _ => {}
-                        }
-                    }
-                }
-
-                if !current_name.is_empty() {
-                    packages.push(Package {
-                        name: current_name.clone(),
-                        version: current_ver.clone(),
-                        description: current_desc.clone(),
-                        dependencies: UniversalPackageImporter::translate_foreign_dependencies(&current_deps),
-                        conflicts: vec![],
-                        provides: vec![current_name],
-                        size: 3_000_000,
-                        installed_size: 10_000_000,
-                        url: None,
-                        license: "BSD-Standard".to_string(),
-                        groups: vec!["bsd-repo".to_string()],
-                        architecture: "x86_64".to_string(),
-                        repository: "bsd-manifest".to_string(),
-                    });
                 }
             }
             _ => {
@@ -1208,102 +1007,6 @@ impl SigmaPkg {
             pkg.name, pkg.version, format, pkg.license, pkg.architecture, pkg.dependencies
         ))
     }
-
-    /// Ingests, parses, and transactionally installs raw package binary data of any supported Linux or BSD format
-    pub fn install_universal_package(
-        &mut self,
-        file_name: &str,
-        _raw_data: &[u8],
-    ) -> Result<Package, String> {
-        let format = UniversalPackageImporter::autodetect_format(file_name)
-            .ok_or_else(|| format!("Universal PM: Format detection failed for '{}'", file_name))?;
-
-        let package = UniversalPackageImporter::parse_foreign_package(file_name, format)?;
-
-        // Validate maintainer scriptlets with security sandbox policy
-        let scriptlet_result = UniversalScriptletSandbox::transpile_and_sandbox(
-            format,
-            "postinst",
-            "#!/bin/sh\nmkdir -p /etc/sigma-pkg\n",
-        );
-        if !scriptlet_result.safe_execution {
-            return Err(format!("Universal PM: Security sandbox blocked installation scriptlet for '{}'", file_name));
-        }
-
-        self.local_packages.insert(package.name.clone(), package.clone());
-        Ok(package)
-    }
-
-    /// Dispatches multi-distro PM CLI command operations (apt-get, pacman, dnf, zypper, apk, pkg_add, pkg)
-    pub fn execute_universal_cli_command(&mut self, pm_style: &str, action: &str, pkg_name: &str) -> Result<String, String> {
-        match pm_style {
-            "apt" | "apt-get" => match action {
-                "install" => {
-                    let filename = format!("{}.deb", pkg_name);
-                    let pkg = self.import_and_install_foreign_package(&filename)?;
-                    Ok(format!("APT: Installed package '{}' ({})", pkg.name, pkg.version))
-                }
-                "remove" | "purge" => {
-                    self.remove_packages(&[pkg_name.to_string()])?;
-                    Ok(format!("APT: Removed package '{}'", pkg_name))
-                }
-                "update" => {
-                    let count = self.sync_foreign_distro_repositories()?;
-                    Ok(format!("APT: Updated {} repositories", count))
-                }
-                _ => Err(format!("APT: Unknown action '{}'", action)),
-            },
-            "pacman" => match action {
-                "-S" | "-Sy" | "-Syu" => {
-                    let filename = format!("{}.pkg.tar.zst", pkg_name);
-                    let pkg = self.import_and_install_foreign_package(&filename)?;
-                    Ok(format!("Pacman: Synchronized & installed '{}'", pkg.name))
-                }
-                "-R" | "-Rns" => {
-                    self.remove_packages(&[pkg_name.to_string()])?;
-                    Ok(format!("Pacman: Removed package '{}'", pkg_name))
-                }
-                _ => Err(format!("Pacman: Unknown action '{}'", action)),
-            },
-            "dnf" | "yum" | "zypper" => match action {
-                "install" | "in" => {
-                    let filename = format!("{}.rpm", pkg_name);
-                    let pkg = self.import_and_install_foreign_package(&filename)?;
-                    Ok(format!("DNF/Zypper: Installed package '{}'", pkg.name))
-                }
-                "remove" | "rm" => {
-                    self.remove_packages(&[pkg_name.to_string()])?;
-                    Ok(format!("DNF/Zypper: Removed package '{}'", pkg_name))
-                }
-                _ => Err(format!("DNF/Zypper: Unknown action '{}'", action)),
-            },
-            "apk" => match action {
-                "add" => {
-                    let filename = format!("{}.apk", pkg_name);
-                    let pkg = self.import_and_install_foreign_package(&filename)?;
-                    Ok(format!("APK: Added package '{}'", pkg.name))
-                }
-                "del" => {
-                    self.remove_packages(&[pkg_name.to_string()])?;
-                    Ok(format!("APK: Deleted package '{}'", pkg_name))
-                }
-                _ => Err(format!("APK: Unknown action '{}'", action)),
-            },
-            "pkg" | "pkg_add" => match action {
-                "install" | "add" => {
-                    let filename = format!("{}.txz", pkg_name);
-                    let pkg = self.import_and_install_foreign_package(&filename)?;
-                    Ok(format!("BSD pkg: Installed package '{}'", pkg.name))
-                }
-                "delete" | "delete_pkg" => {
-                    self.remove_packages(&[pkg_name.to_string()])?;
-                    Ok(format!("BSD pkg: Deleted package '{}'", pkg_name))
-                }
-                _ => Err(format!("BSD pkg: Unknown action '{}'", action)),
-            },
-            _ => Err(format!("Unsupported foreign package manager style: '{}'", pm_style)),
-        }
-    }
 }
 
 #[cfg(test)]
@@ -1412,23 +1115,6 @@ mod tests {
     }
 
     #[test]
-    fn test_install_universal_package_raw_bytes() {
-        let mut pkg_mgr = SigmaPkg {
-            config: PkgConfig::default(),
-            repositories: vec![],
-            local_packages: HashMap::new(),
-            cache_dir: PathBuf::from("/tmp/sigma_cache_test2"),
-            database_dir: PathBuf::from("/tmp/sigma_db_test2"),
-        };
-
-        let installed = pkg_mgr
-            .install_universal_package("ripgrep-13.0.0.pkg.tar.zst", b"dummy_tar_zst_data")
-            .unwrap();
-        assert_eq!(installed.name, "ripgrep");
-        assert!(pkg_mgr.local_packages.contains_key("ripgrep"));
-    }
-
-    #[test]
     fn test_foreign_repo_index_parser() {
         let apt_index = "Package: curl\nVersion: 8.2.1\nDescription: Command line tool\nDepends: libc6, libssl3\n\nPackage: wget\nVersion: 1.21.3\nDescription: Network retriever\nDepends: libc6\n\n";
         let pkgs = ForeignRepoIndexParser::parse_index(UniversalPackageFormat::DebianDeb, apt_index);
@@ -1501,58 +1187,5 @@ mod tests {
             UniversalPackageImporter::autodetect_format("app.hap"),
             Some(UniversalPackageFormat::HarmonyHap)
         );
-        assert_eq!(
-            UniversalPackageImporter::autodetect_format("pkg.stone"),
-            Some(UniversalPackageFormat::MossPackage)
-        );
-        assert_eq!(
-            UniversalPackageImporter::autodetect_format("pkg.drpm"),
-            Some(UniversalPackageFormat::ZypperDrpm)
-        );
-    }
-
-    #[test]
-    fn test_multi_distro_repo_indexes() {
-        let pacman_idx = "%NAME%\nripgrep\n\n%VERSION%\n14.1.0-1\n\n%DESC%\nFast search tool\n\n%DEPENDS%\npcre2\nsh\n\n";
-        let pacman_pkgs = ForeignRepoIndexParser::parse_index(UniversalPackageFormat::ArchPacman, pacman_idx);
-        assert_eq!(pacman_pkgs.len(), 1);
-        assert_eq!(pacman_pkgs[0].name, "ripgrep");
-        assert!(pacman_pkgs[0].dependencies.contains(&"sovereign-terminal-ui".to_string()));
-        assert!(pacman_pkgs[0].dependencies.contains(&"sovereign-shell".to_string()));
-
-        let rpm_xml = "<package><name>nginx</name><version ver=\"1.24.0\"/><summary>HTTP server</summary><format><rpm:requires><rpm:entry name=\"libssl.so.3\"/></rpm:requires></format></package>";
-        let rpm_pkgs = ForeignRepoIndexParser::parse_index(UniversalPackageFormat::FedoraRpm, rpm_xml);
-        assert_eq!(rpm_pkgs.len(), 1);
-        assert_eq!(rpm_pkgs[0].name, "nginx");
-        assert!(rpm_pkgs[0].dependencies.contains(&"sovereign-openssl".to_string()));
-
-        let bsd_manifest = "name: openntpd\nversion: 6.8p1\ncomment: Network Time Protocol daemon\ndeps: libressl\n\n";
-        let bsd_pkgs = ForeignRepoIndexParser::parse_index(UniversalPackageFormat::FreeBsdPkg, bsd_manifest);
-        assert_eq!(bsd_pkgs.len(), 1);
-        assert_eq!(bsd_pkgs[0].name, "openntpd");
-        assert!(bsd_pkgs[0].dependencies.contains(&"sovereign-openssl".to_string()));
-    }
-
-    #[test]
-    fn test_execute_universal_cli_command() {
-        let mut pkg_mgr = SigmaPkg {
-            config: PkgConfig::default(),
-            repositories: vec![],
-            local_packages: HashMap::new(),
-            cache_dir: PathBuf::from("/tmp/sigma_cli_cache"),
-            database_dir: PathBuf::from("/tmp/sigma_cli_db"),
-        };
-
-        let res_apt = pkg_mgr.execute_universal_cli_command("apt", "install", "git").unwrap();
-        assert!(res_apt.contains("APT: Installed package 'git'"));
-
-        let res_pacman = pkg_mgr.execute_universal_cli_command("pacman", "-S", "neovim").unwrap();
-        assert!(res_pacman.contains("Pacman: Synchronized & installed 'neovim'"));
-
-        let res_apk = pkg_mgr.execute_universal_cli_command("apk", "add", "bash").unwrap();
-        assert!(res_apk.contains("APK: Added package 'bash'"));
-
-        let res_bsd = pkg_mgr.execute_universal_cli_command("pkg", "install", "tmux").unwrap();
-        assert!(res_bsd.contains("BSD pkg: Installed package 'tmux'"));
     }
 }

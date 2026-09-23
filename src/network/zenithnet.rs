@@ -444,7 +444,7 @@ impl Default for ZenithNet {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

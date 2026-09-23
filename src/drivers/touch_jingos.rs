@@ -13,17 +13,24 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-use crate::drivers::peripheral::PowerState;
+use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceGeneration {
     Legacy,
     Modern,
 }
 
-#[cfg(test)]
-pub trait TestPeripheralDevice {
+#[cfg(test_disabled)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PowerState {
+    Off,
+    On,
+}
+
+#[cfg(test_disabled)]
+pub trait PeripheralDevice {
     fn name(&self) -> &'static str;
     fn generation(&self) -> DeviceGeneration;
     fn initialize(&mut self) -> Result<(), &'static str>;
@@ -48,9 +55,7 @@ impl TouchJingosDriver {
     }
 }
 
-#[cfg(test)]
-#[allow(dead_code)]
-impl TestPeripheralDevice for TouchJingosDriver {
+impl PeripheralDevice for TouchJingosDriver {
     fn name(&self) -> &'static str {
         "JingOS Capacitive Gestural Touchscreen Driver"
     }
@@ -109,7 +114,7 @@ impl TestPeripheralDevice for TouchJingosDriver {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

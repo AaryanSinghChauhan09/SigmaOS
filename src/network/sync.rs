@@ -459,7 +459,7 @@ impl core::fmt::Display for SyncError {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

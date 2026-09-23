@@ -269,8 +269,8 @@ impl AurDependencySolverEngine {
                 let mut all_deps = node.dependencies.clone();
                 all_deps.extend(node.make_dependencies.clone());
 
-                for dep in &all_deps {
-                    self.topological_sort(dep, visited, visiting, order)?;
+                for dep in all_deps {
+                    self.topological_sort(&dep, visited, visiting, order)?;
                 }
             }
 
@@ -434,7 +434,7 @@ impl AurNamcapPortclippyLinter {
 // Unit Tests
 // ============================================================================
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

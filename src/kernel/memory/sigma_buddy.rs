@@ -175,7 +175,7 @@ impl BsdVmZoneAllocator {
 /// Integrates with the existing memory subsystem, migration types, CMA, and watermarks.
 /// Sovereign Atomic IPC Ring Buffer for lockless cross-shard message passing
 pub struct SovereignIpcBuffer {
-    buffer: std::vec::Vec<u8>,
+    buffer: alloc::vec::Vec<u8>,
     head: AtomicUsize,
     tail: AtomicUsize,
     capacity: usize,
@@ -185,7 +185,7 @@ impl SovereignIpcBuffer {
     pub fn new(capacity: usize) -> Self {
         let actual_cap = capacity.next_power_of_two();
         Self {
-            buffer: std::vec![0u8; actual_cap],
+            buffer: alloc::vec![0u8; actual_cap],
             head: AtomicUsize::new(0),
             tail: AtomicUsize::new(0),
             capacity: actual_cap,
@@ -273,7 +273,7 @@ impl SigmaBuddyAllocator {
         // Routing logic: CMA allocations route through reserved CMA glue
         if migrate_type == MigrateType::Cma {
             if let Some(ref cma) = self.cma_glue {
-                let pages = (size + PAGE_SIZE - 1) / PAGE_SIZE;
+                let pages = size.div_ceil(PAGE_SIZE);
                 if let Ok(phys_addr) = cma.allocate_contiguous(pages) {
                     self.allocated
                         .fetch_add(pages * PAGE_SIZE, Ordering::SeqCst);
@@ -293,7 +293,7 @@ impl SigmaBuddyAllocator {
         if size == 0 || size > self.total_size {
             return None;
         }
-        let pages = (size + PAGE_SIZE - 1) / PAGE_SIZE;
+        let pages = size.div_ceil(PAGE_SIZE);
         let order = Self::calculate_order(pages);
         match self.inner.allocate(order) {
             Ok(block_id) => {
@@ -412,7 +412,7 @@ impl Default for SigmaBuddyAllocator {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

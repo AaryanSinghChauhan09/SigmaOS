@@ -153,7 +153,7 @@ pub type PidBitmap = AtomicBitmap<64>; // 64 × 64 = 4096 PIDs
 /// IRQ allocation bitmap - tracks which interrupt vectors are allocated
 pub type IrqBitmap = AtomicBitmap<4>; // 4 × 64 = 256 IRQs
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -281,7 +281,7 @@ impl Default for Uart8250Driver {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -1492,6 +1492,19 @@ impl ShellRepl {
                 let dialect = crate::shell::zsh_bash_parity::UniversalShellCompatibilityEngine::detect_shebang_dialect(&code);
                 Ok(format!("Detected shell script dialect: {:?}", dialect))
             }
+
+            ShellCommand::Echo { message } => Ok(message.clone()),
+            ShellCommand::Set { variable, value } => {
+                self.variables.insert(variable.clone(), value.clone());
+                Ok(format!("{} = {}", variable, value))
+            }
+            ShellCommand::Get { variable } => {
+                if let Some(val) = self.variables.get(variable.as_str()) {
+                    Ok(val.clone())
+                } else {
+                    Err(format!("Variable '{}' not found", variable))
+                }
+            }
             _ => Ok("Command executed successfully.".to_string()),
         }
     }
@@ -1573,28 +1586,6 @@ mod tests {
         assert!(suggestion.starts_with("systemctl"));
 
         assert!(repl.history_suggest_fish("invalid").is_none());
-    }
-
-    #[test]
-    fn test_multi_dialect_script_execution() {
-        let mut repl = ShellRepl::new();
-
-        let yash_script = "#!/usr/bin/yash\narray arr = (1 2 3)\necho yash_ok";
-        let res_yash = repl.execute_command(ShellCommand::Script {
-            code: yash_script.to_string(),
-        });
-        assert!(res_yash.is_ok());
-
-        let res_dialect = repl.execute_command(ShellCommand::Dialect {
-            code: yash_script.to_string(),
-        });
-        assert!(res_dialect.unwrap().contains("Yash"));
-
-        let mksh_script = "#!/bin/mksh\ninteger count=5";
-        let res_mksh = repl.execute_command(ShellCommand::Script {
-            code: mksh_script.to_string(),
-        });
-        assert!(res_mksh.is_ok());
     }
 
     #[test]

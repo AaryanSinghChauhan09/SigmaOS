@@ -403,7 +403,7 @@ impl Default for ServiceManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

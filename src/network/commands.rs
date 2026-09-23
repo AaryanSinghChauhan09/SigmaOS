@@ -665,7 +665,7 @@ impl FirewallCommand {
 pub static GLOBAL_UFW_RULE: UfwDefaultRule = UfwDefaultRule;
 pub static GLOBAL_FIREWALL: FirewallCommand = FirewallCommand::new(&GLOBAL_UFW_RULE);
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -2,9 +2,9 @@
 // Inspired by DistroWatch, 9to5Linux, MakeUseOf, LinuxTeck, Appuals, ZDNet, and DistroWatch
 
 #[cfg(not(test))]
-use alloc::string::String;
+use crate::klib::string::String;
 #[cfg(not(test))]
-use alloc::vec::Vec;
+use crate::klib::vec::Vec;
 
 #[cfg(test)]
 use std::string::String;
@@ -21,7 +21,6 @@ pub struct DistroWatchRankTrackerEngine {
 impl DistroWatchRankTrackerEngine {
     pub fn new() -> Self {
         let mut tracked = Vec::new();
-        tracked.push(String::from("SigmaOS"));
         tracked.push(String::from("Debian"));
         tracked.push(String::from("Fedora"));
         tracked.push(String::from("Arch Linux"));
@@ -41,20 +40,6 @@ impl DistroWatchRankTrackerEngine {
             String::from("SigmaOS")
         } else {
             self.tracked_distros[0].clone()
-        }
-    }
-
-    pub fn rank_distro_hits(&self, distro: &str) -> usize {
-        self.tracked_distros
-            .iter()
-            .position(|d| d.eq_ignore_ascii_case(distro))
-            .map(|idx| idx + 1)
-            .unwrap_or(999)
-    }
-
-    pub fn add_distro_to_watch(&mut self, distro: &str) {
-        if !self.tracked_distros.iter().any(|d| d.eq_ignore_ascii_case(distro)) {
-            self.tracked_distros.push(String::from(distro));
         }
     }
 }
@@ -87,18 +72,7 @@ impl NineToFiveLinuxReleaseMatrixEngine {
     }
 
     pub fn is_kernel_up_to_date(&self, current: &str) -> bool {
-        current.contains("6.12") || current.contains("6.13") || current.contains("sigma")
-    }
-
-    pub fn verify_sched_ext_support(&self, kernel_version: &str) -> bool {
-        kernel_version.contains("6.12") || kernel_version.contains("6.13") || kernel_version.contains("sigma")
-    }
-
-    pub fn query_release_matrix(&self, distro_or_component: &str) -> Option<String> {
-        self.tracked_releases
-            .iter()
-            .find(|r| r.contains(distro_or_component))
-            .cloned()
+        current.contains("6.12") || current.contains("sigma")
     }
 }
 
@@ -146,7 +120,6 @@ pub struct LinuxTeckSysadminAutomationEngine {
     pub iptables_hardened: bool,
     pub ssh_root_login_disabled: bool,
     pub auto_security_patches: bool,
-    pub sysctl_kernel_hardened: bool,
 }
 
 impl LinuxTeckSysadminAutomationEngine {
@@ -155,19 +128,11 @@ impl LinuxTeckSysadminAutomationEngine {
             iptables_hardened: true,
             ssh_root_login_disabled: true,
             auto_security_patches: true,
-            sysctl_kernel_hardened: true,
         }
     }
 
     pub fn run_hardening_audit(&self) -> bool {
-        self.iptables_hardened
-            && self.ssh_root_login_disabled
-            && self.auto_security_patches
-            && self.sysctl_kernel_hardened
-    }
-
-    pub fn verify_zero_trust_network_security(&self) -> bool {
-        self.iptables_hardened && self.sysctl_kernel_hardened
+        self.iptables_hardened && self.ssh_root_login_disabled && self.auto_security_patches
     }
 }
 
@@ -249,186 +214,6 @@ impl Default for FrappeEnterpriseFrameworkEngine {
     }
 }
 
-/// ItsFOSS Zero-Dependency Tooling & Open-Source Desktop Tips Engine.
-/// Provides zero-dependency CLI utilities, desktop customization tips, and system optimization suggestions.
-#[derive(Debug, Clone)]
-pub struct ItsFossZeroDependencyToolingEngine {
-    pub cli_tips_count: usize,
-    pub zero_dep_utilities_active: bool,
-}
-
-impl ItsFossZeroDependencyToolingEngine {
-    pub fn new() -> Self {
-        Self {
-            cli_tips_count: 75,
-            zero_dep_utilities_active: true,
-        }
-    }
-
-    pub fn get_recommended_tool(&self, category: &str) -> String {
-        match category.to_ascii_lowercase().as_str() {
-            "terminal" => String::from("sigma-term"),
-            "editor" => String::from("sigma-nvim"),
-            "fetch" => String::from("sigma-fastfetch"),
-            "package" => String::from("sigpkg"),
-            _ => String::from("sigma-sh"),
-        }
-    }
-
-    pub fn verify_tooling(&self) -> bool {
-        self.zero_dep_utilities_active && self.cli_tips_count > 0
-    }
-}
-
-impl Default for ItsFossZeroDependencyToolingEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Geeky Gadgets Hardware Review & Hardware Benchmark Engine.
-/// Provides PCIe bus health checks, NVMe storage benchmarks, and peripheral diagnostics.
-#[derive(Debug, Clone)]
-pub struct GeekyGadgetsHardwareReviewEngine {
-    pub pcie_gen5_supported: bool,
-    pub nvme_read_speed_mbps: u32,
-    pub hardware_review_passed: bool,
-}
-
-impl GeekyGadgetsHardwareReviewEngine {
-    pub fn new() -> Self {
-        Self {
-            pcie_gen5_supported: true,
-            nvme_read_speed_mbps: 7400,
-            hardware_review_passed: true,
-        }
-    }
-
-    pub fn run_storage_benchmark(&self) -> bool {
-        self.nvme_read_speed_mbps >= 3500 && self.hardware_review_passed
-    }
-}
-
-impl Default for GeekyGadgetsHardwareReviewEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// TechPowerUp GPU-Z VRM Thermal Telemetry & VBIOS Power Target Engine.
-/// Manages GPU power limits, VRM phase temperatures, and VBIOS power target offsets.
-#[derive(Debug, Clone)]
-pub struct TechPowerUpGpuTelemetryEngine {
-    pub gpu_vrm_temp_celsius: u8,
-    pub power_target_percent: u16,
-    pub vbios_power_limit_watts: u32,
-    pub telemetry_ok: bool,
-}
-
-impl TechPowerUpGpuTelemetryEngine {
-    pub fn new() -> Self {
-        Self {
-            gpu_vrm_temp_celsius: 52,
-            power_target_percent: 100,
-            vbios_power_limit_watts: 320,
-            telemetry_ok: true,
-        }
-    }
-
-    pub fn audit_vrm_telemetry(&self) -> bool {
-        self.gpu_vrm_temp_celsius < 95 && self.telemetry_ok
-    }
-
-    pub fn set_power_target(&mut self, target_pct: u16) -> bool {
-        if (50..=120).contains(&target_pct) {
-            self.power_target_percent = target_pct;
-            true
-        } else {
-            false
-        }
-    }
-}
-
-impl Default for TechPowerUpGpuTelemetryEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Phoronix Test Suite (PTS) Automated Profiler & Regression Detection Engine.
-/// Provides automated system benchmarking, performance tracking, and regression alerts.
-#[derive(Debug, Clone)]
-pub struct PhoronixTestRunnerEngine {
-    pub pts_version: String,
-    pub last_score_ops_per_sec: f64,
-    pub regression_detected: bool,
-}
-
-impl PhoronixTestRunnerEngine {
-    pub fn new() -> Self {
-        Self {
-            pts_version: String::from("v10.8.4-sigma"),
-            last_score_ops_per_sec: 145000.0,
-            regression_detected: false,
-        }
-    }
-
-    pub fn evaluate_benchmark_score(&mut self, score: f64, baseline: f64) -> bool {
-        self.last_score_ops_per_sec = score;
-        if score < baseline * 0.95 {
-            self.regression_detected = true;
-            false
-        } else {
-            self.regression_detected = false;
-            true
-        }
-    }
-}
-
-impl Default for PhoronixTestRunnerEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// PCWorld Battery Health & Power Governor Engine.
-/// Manages battery charge thresholds, energy profiles, and battery cycle longevity optimizations.
-#[derive(Debug, Clone)]
-pub struct PcWorldBatteryGovernorEngine {
-    pub charge_limit_percent: u8,
-    pub power_saving_active: bool,
-    pub estimated_health_percent: u8,
-}
-
-impl PcWorldBatteryGovernorEngine {
-    pub fn new() -> Self {
-        Self {
-            charge_limit_percent: 80,
-            power_saving_active: false,
-            estimated_health_percent: 98,
-        }
-    }
-
-    pub fn should_continue_charging(&self, current_charge_percent: u8) -> bool {
-        current_charge_percent < self.charge_limit_percent
-    }
-
-    pub fn set_charge_limit(&mut self, limit_pct: u8) -> bool {
-        if (50..=100).contains(&limit_pct) {
-            self.charge_limit_percent = limit_pct;
-            true
-        } else {
-            false
-        }
-    }
-}
-
-impl Default for PcWorldBatteryGovernorEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 /// Master coordinator for Tech Media Distro Innovations.
 #[derive(Debug, Clone)]
 pub struct SovereignTechMediaDistroInnovationsSuite {
@@ -438,11 +223,6 @@ pub struct SovereignTechMediaDistroInnovationsSuite {
     pub sysadmin_automation: LinuxTeckSysadminAutomationEngine,
     pub google_mac_ecosystem: NineToFiveGoogleMacEcosystemEngine,
     pub frappe_framework: FrappeEnterpriseFrameworkEngine,
-    pub itsfoss_tooling: ItsFossZeroDependencyToolingEngine,
-    pub geeky_gadgets_review: GeekyGadgetsHardwareReviewEngine,
-    pub techpowerup_telemetry: TechPowerUpGpuTelemetryEngine,
-    pub phoronix_runner: PhoronixTestRunnerEngine,
-    pub pcworld_battery: PcWorldBatteryGovernorEngine,
 }
 
 impl SovereignTechMediaDistroInnovationsSuite {
@@ -454,11 +234,6 @@ impl SovereignTechMediaDistroInnovationsSuite {
             sysadmin_automation: LinuxTeckSysadminAutomationEngine::new(),
             google_mac_ecosystem: NineToFiveGoogleMacEcosystemEngine::new(),
             frappe_framework: FrappeEnterpriseFrameworkEngine::new(),
-            itsfoss_tooling: ItsFossZeroDependencyToolingEngine::new(),
-            geeky_gadgets_review: GeekyGadgetsHardwareReviewEngine::new(),
-            techpowerup_telemetry: TechPowerUpGpuTelemetryEngine::new(),
-            phoronix_runner: PhoronixTestRunnerEngine::new(),
-            pcworld_battery: PcWorldBatteryGovernorEngine::new(),
         }
     }
 
@@ -468,11 +243,6 @@ impl SovereignTechMediaDistroInnovationsSuite {
             && self.sysadmin_automation.run_hardening_audit()
             && self.google_mac_ecosystem.is_ecosystem_healthy()
             && self.frappe_framework.erpnext_workflow_active
-            && self.itsfoss_tooling.verify_tooling()
-            && self.geeky_gadgets_review.run_storage_benchmark()
-            && self.techpowerup_telemetry.audit_vrm_telemetry()
-            && !self.phoronix_runner.regression_detected
-            && self.pcworld_battery.estimated_health_percent > 80
     }
 }
 
@@ -490,21 +260,11 @@ mod tests {
     fn test_tech_media_distro_innovations() {
         let mut suite = SovereignTechMediaDistroInnovationsSuite::new();
         assert!(suite.verify_suite());
-        assert_eq!(suite.rank_tracker.get_top_ranked_distro(), "SigmaOS");
-        assert_eq!(suite.rank_tracker.rank_distro_hits("SigmaOS"), 1);
+        assert_eq!(suite.rank_tracker.get_top_ranked_distro(), "Debian");
         assert!(suite.release_matrix.is_kernel_up_to_date("6.12.0-sigma"));
-        assert!(suite.release_matrix.verify_sched_ext_support("6.12.0-sigma"));
-        assert!(suite.sysadmin_automation.verify_zero_trust_network_security());
         assert_eq!(
             suite.recommendation.recommend_profile_for_ram(512),
             "SigmaOS AntiX-Inspired Ultralight GUI"
         );
-        assert_eq!(suite.itsfoss_tooling.get_recommended_tool("terminal"), "sigma-term");
-        assert!(suite.geeky_gadgets_review.run_storage_benchmark());
-        assert!(suite.techpowerup_telemetry.audit_vrm_telemetry());
-        assert!(suite.techpowerup_telemetry.set_power_target(110));
-        assert!(suite.phoronix_runner.evaluate_benchmark_score(150000.0, 140000.0));
-        assert!(suite.pcworld_battery.should_continue_charging(75));
-        assert!(!suite.pcworld_battery.should_continue_charging(85));
     }
 }

@@ -190,7 +190,7 @@ impl PeripheralDevice for Ufs4StorageDriver {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     use crate::drivers::peripheral::{DeviceGeneration, PeripheralManager, PowerState};

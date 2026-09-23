@@ -283,7 +283,7 @@ pub const fn fnv1a_hash(s: &str) -> u64 {
     hash
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

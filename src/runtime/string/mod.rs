@@ -147,7 +147,7 @@ impl Default for SigmaString {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     

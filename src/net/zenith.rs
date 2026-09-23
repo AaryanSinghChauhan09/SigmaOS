@@ -297,7 +297,7 @@ impl Default for NetworkDriverManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

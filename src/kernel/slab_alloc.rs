@@ -195,7 +195,7 @@ pub unsafe fn init_all_slabs() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

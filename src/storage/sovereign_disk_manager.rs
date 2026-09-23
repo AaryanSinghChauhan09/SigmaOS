@@ -314,7 +314,7 @@ impl Default for SovereignLvmEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

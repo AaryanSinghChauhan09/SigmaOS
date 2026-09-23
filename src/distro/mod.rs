@@ -1,23 +1,17 @@
-pub mod omarchy_server;
-pub use omarchy_server::*;
 pub mod omarchy_inspiration;
 pub use omarchy_inspiration::*;
 pub mod omarchy;
-pub mod omarchy_dotfiles;
-pub use omarchy_dotfiles::*;
 pub use omarchy::{
     FactoryResetGuardian, GpuDriverConfig, HardwareQuirkAdapter, KeybindingDefinition,
-    LazyVimKeymapSpec, NeovimTerminalAliasLauncher, OmarchyAudioPipewireConfig,
-    OmarchyModernDesktopEngine, OmarchyNerdFont, OmarchyNeovimLazyVimEngine, OmarchyNeovimPresetEngine,
-    OmarchyTerminalFontConfig, OmarchyTheme, PasswordlessSudoExpiryGuard, SovereignAgentKind,
-    SudoEditSessionBridge, WebAppSpec,
+    OmarchyAudioPipewireConfig,
+    OmarchyModernDesktopEngine, OmarchyNerdFont, OmarchyNeovimPresetEngine,
+    OmarchyTerminalFontConfig, OmarchyTheme,
+    PasswordlessSudoExpiryGuard, SovereignAgentKind, WebAppSpec,
 };
 pub mod parrot_security;
 pub mod kali_security;
 pub mod antix_zorin_innovations;
 pub mod mint_innovations;
-pub mod tech_media_distro_innovations;
-pub mod tech_media_extended_innovations;
 
 pub use omarchy::*;
 
@@ -88,9 +82,6 @@ pub mod linux_bsd_distro_gaps;
 pub mod linux_bsd_distro_gaps_synthesis;
 pub use linux_bsd_distro_gaps_synthesis::*;
 pub mod linux_bsd_inspirations;
-pub use linux_bsd_inspirations::{
-    SovereignCrossDistroSubsystemOrchestrator,
-};
 
 pub mod linux_bsd_parity;
 pub mod linux_bsd_parity_extended;
@@ -112,8 +103,8 @@ pub mod power_network_tools;
 pub mod preseed;
 pub mod ready_to_use;
 pub mod recovery;
-pub mod specialized;
 pub mod sovereign_system_innovations;
+pub mod specialized;
 pub mod stable_components;
 pub mod tiny_core;
 pub mod visual_dashboard;
@@ -313,9 +304,6 @@ pub use linux_bsd_pinnacle_synthesis::{
     UrpmiMediaSource, UrpmiPackageRecord,
 };
 
-pub mod linux_bsd_ecosystem_synthesis;
-pub use linux_bsd_ecosystem_synthesis::*;
-
 pub mod sovereign_2028_distro_supremacy_engine;
 pub use sovereign_2028_distro_supremacy_engine::{
     BpfSchedExtPolicy, DirectScanoutFrame, EbpfSchedTask, FineIbtCallsiteGuard,
@@ -323,51 +311,6 @@ pub use sovereign_2028_distro_supremacy_engine::{
     SovereignEbpfSchedExtAiGovernor, SovereignFreeBsd15VnetXdpEngine,
     SovereignOpenBsd78FineIbtCfiGuard, SovereignSystemd258VmspawnEngine,
     SovereignWayland125DirectScanoutEngine, VnetDualStackInterface,
-};
-
-pub mod sovereign_2030_distro_supremacy_engine;
-pub use sovereign_2030_distro_supremacy_engine::{
-    DirectKmsFrame2030, NetlinkVnetJailSpec, OpenBsd80UnveilRule, QuantumSchedPolicy, QuantumSchedTask,
-    Sovereign2030DistroSupremacyMasterSuite, SovereignEbpfSchedExtQuantumPredictiveGovernor,
-    SovereignFreeBsd16NetlinkVnetJailEngine, SovereignOpenBsd80StrictPledgeUnveilLandlockEngine,
-    SovereignSystemd260SystemdExecAiSandboxingEngine, SovereignWayland126DirectKmsScanoutEngine,
-    SystemdExecAiProfile,
-};
-
-pub mod sovereign_2032_distro_supremacy_engine;
-pub use sovereign_2032_distro_supremacy_engine::{
-    BcachefsCxlExtent2032, DirectKmsFrame2032, FineIbtCallSiteRange2032, PqcHomedUserDirectory2032,
-    Sovereign2032DistroSupremacyMasterSuite, SovereignFreeBsd165VnetXdpCrdtEngine,
-    SovereignLinux618BcachefsCxlTieringEngine, SovereignOpenBsd82FineIbtPinsyscallGuard,
-    SovereignSystemd262PostQuantumHomedEngine, SovereignWayland128SubMillisecondScanoutEngine,
-    StorageTier2032, VnetJailSpec2032,
-};
-
-pub mod sovereign_2035_distro_supremacy_engine;
-pub use sovereign_2035_distro_supremacy_engine::{
-    BcachefsCxlExtent2035, DirectKmsFrame2035, FineIbtCallSiteRange2035, PqcHomedUserDirectory2035,
-    Sovereign2035DistroSupremacyMasterSuite, SovereignFreeBsd170VnetXdpCrdtEngine,
-    SovereignLinux70BcachefsCxlPoolEngine, SovereignOpenBsd85FineIbtPinsyscallGuard,
-    SovereignSystemd265QuantumSafeHomedEngine, SovereignWayland130SubMillisecondScanoutEngine,
-    StorageTier2035, VnetJailSpec2035,
-};
-
-pub mod sovereign_2040_distro_supremacy_engine;
-pub use sovereign_2040_distro_supremacy_engine::{
-    AutonomousServiceSpec2040, BcachefsOpticalExtent2040, DirectKmsFrame2040, HyperFineIbtRange2040,
-    QuantumVnetJailSpec2040, Sovereign2040DistroSupremacyMasterSuite,
-    SovereignFreeBsd180QuantumVnetXdpEngine, SovereignLinux80BcachefsOpticalMeshEngine,
-    SovereignOpenBsd90HyperFineIbtGuard, SovereignSystemd270AutonomousServiceEngine,
-    SovereignWayland135ZeroCopyDisplayEngine, StorageTier2040,
-};
-
-pub mod sovereign_2045_distro_supremacy_engine;
-pub use sovereign_2045_distro_supremacy_engine::{
-    AutonomousServiceSpec2045, BcachefsOpticalExtent2045, DirectKmsFrame2045, HyperFineIbtRange2045,
-    QuantumVnetJailSpec2045, Sovereign2045DistroSupremacyMasterSuite,
-    SovereignFreeBsd190QuantumVnetXdpMeshEngine, SovereignLinux90BcachefsQuantumPhotonicMeshEngine,
-    SovereignOpenBsd100HyperFineIbtShadowGuard, SovereignSystemd280AutonomousMeshEngine,
-    SovereignWayland140ZeroCopyDisplayEngine, StorageTier2045,
 };
 
 // ─── Omarchy Master Synthesis Suite ──────────────────────────────────────────
@@ -392,15 +335,3 @@ pub use linux_bsd_distro_strategic_innovations::{
     ExecGuardRecommendation, FedoraGreenbootHealthCheckEngine, ObfuscatedInputEvent,
     VanillaAbrootImageTransactionEngine, WhonixKloakInputObfuscationEngine, ZorinExecGuardSubsystem,
 };
-
-pub mod linux_bsd_distro_breakthroughs;
-pub use linux_bsd_distro_breakthroughs::*;
-
-pub mod missing_linux_bsd_components;
-pub use missing_linux_bsd_components::*;
-
-pub mod additional_linux_bsd_components;
-pub use additional_linux_bsd_components::*;
-
-pub mod sovereign_linux_bsd_distro_master_suite;
-pub use sovereign_linux_bsd_distro_master_suite::*;

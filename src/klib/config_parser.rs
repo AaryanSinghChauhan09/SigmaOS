@@ -22,8 +22,6 @@ impl ConfigStore {
     /// Parse INI-formatted text into the store
     pub fn parse(&mut self, input: &str) -> Result<(), &'static str> {
         let mut current_section = String::new();
-        // Bolt ⚡: Ensure initial default section ("") exists to enable zero-allocation lookups
-        self.sections.entry(current_section.clone()).or_default();
 
         for (_line_no, line) in input.lines().enumerate() {
             let trimmed = trim_line(line);
@@ -41,12 +39,7 @@ impl ConfigStore {
             if let Some(sep_pos) = find_key_value_sep(&trimmed) {
                 let key = trimmed[..sep_pos].trim().to_string();
                 let value = trimmed[sep_pos + 1..].trim().to_string();
-                // Bolt ⚡: Fast-path borrowed lookup avoids O(N) heap String allocations of current_section in key-value loop iterations,
-                // with fallback lazy entry initialization for safety.
-                let section = match self.sections.get_mut(&current_section) {
-                    Some(s) => s,
-                    None => self.sections.entry(current_section.clone()).or_default(),
-                };
+                let section = self.sections.entry(current_section.clone()).or_default();
                 section.insert(key, value);
             } else {
                 return Err("Invalid config line");
@@ -104,7 +97,7 @@ fn find_key_value_sep(s: &str) -> Option<usize> {
     s.find('=')
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

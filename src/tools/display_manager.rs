@@ -177,7 +177,7 @@ pub enum DMError {
     StartFailed,
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -4,6 +4,11 @@
 use std::string::String;
 use std::vec::Vec;
 
+#[cfg(test)]
+use std::string::String;
+#[cfg(test)]
+use std::vec::Vec;
+
 /// KDnuggets automated machine learning (AutoML) dataset preprocessor and model selector.
 #[derive(Debug, Clone)]
 pub struct KdnuggetsAutoMlPipelineEngine {

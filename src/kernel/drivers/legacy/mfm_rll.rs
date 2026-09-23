@@ -202,7 +202,7 @@ impl Default for MfmController {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

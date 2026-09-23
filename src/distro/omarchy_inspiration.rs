@@ -39,10 +39,8 @@ pub struct QuickshellWidget {
     pub widget_id: String,
     pub name: String,
     pub component_kind: ShellComponentKind,
-    pub section: String, // "left", "center", "right"
     pub position_index: u32,
     pub is_enabled: bool,
-    pub is_user_cloned: bool,
 }
 
 /// Unified Quickshell Desktop Engine (`shell.json` powered)
@@ -50,85 +48,36 @@ pub struct OmarchyQuickshellEngine {
     pub config_json: String,
     pub widgets: BTreeMap<String, QuickshellWidget>,
     pub active_layout_name: String,
-    pub user_config_path: String,
-    pub user_plugins_dir: String,
-    pub idle_screensaver_secs: u32,
-    pub idle_lock_secs: u32,
 }
 
 impl OmarchyQuickshellEngine {
     pub fn new(layout_name: &str) -> Self {
         let mut engine = Self {
-            config_json: format!(
-                "{{\"layout\": \"{}\", \"version\": \"4.0\", \"idle\": {{\"screensaver\": 300, \"lock\": 600}}}}",
-                layout_name
-            ),
+            config_json: format!("{{\"layout\": \"{}\", \"version\": \"4.0\"}}", layout_name),
             widgets: BTreeMap::new(),
             active_layout_name: layout_name.to_string(),
-            user_config_path: "~/.config/omarchy/shell.json".to_string(),
-            user_plugins_dir: "~/.config/omarchy/plugins/".to_string(),
-            idle_screensaver_secs: 300,
-            idle_lock_secs: 600,
         };
 
         // Default unified shell widgets replacing 8 separate legacy components
-        engine.register_widget("bar_clock", "System Clock", ShellComponentKind::TopBar, "right", 0);
-        engine.register_widget("bar_workspaces", "Workspace Switcher", ShellComponentKind::TopBar, "left", 0);
-        engine.register_widget("walker_launcher", "Walker Application Launcher", ShellComponentKind::AppLauncher, "center", 0);
-        engine.register_widget("mako_notifications", "Notification Daemon", ShellComponentKind::NotificationCenter, "right", 1);
-        engine.register_widget("hyprlock_screen", "Lock Screen", ShellComponentKind::LockScreen, "center", 0);
+        engine.register_widget("bar_clock", "System Clock", ShellComponentKind::TopBar, 0);
+        engine.register_widget("bar_workspaces", "Workspace Switcher", ShellComponentKind::TopBar, 1);
+        engine.register_widget("walker_launcher", "Walker Application Launcher", ShellComponentKind::AppLauncher, 0);
+        engine.register_widget("mako_notifications", "Notification Daemon", ShellComponentKind::NotificationCenter, 0);
+        engine.register_widget("hyprlock_screen", "Lock Screen", ShellComponentKind::LockScreen, 0);
         engine
     }
 
-    pub fn register_widget(&mut self, id: &str, name: &str, kind: ShellComponentKind, section: &str, pos: u32) {
+    pub fn register_widget(&mut self, id: &str, name: &str, kind: ShellComponentKind, pos: u32) {
         self.widgets.insert(
             id.to_string(),
             QuickshellWidget {
                 widget_id: id.to_string(),
                 name: name.to_string(),
                 component_kind: kind,
-                section: section.to_string(),
                 position_index: pos,
                 is_enabled: true,
-                is_user_cloned: false,
             },
         );
-    }
-
-    pub fn set_idle_timeouts(&mut self, screensaver_secs: u32, lock_secs: u32) {
-        self.idle_screensaver_secs = screensaver_secs;
-        self.idle_lock_secs = lock_secs;
-        self.sync_json();
-    }
-
-    pub fn move_bar_widget(&mut self, widget_id: &str, target_section: &str) -> Result<String, &'static str> {
-        if let Some(widget) = self.widgets.get_mut(widget_id) {
-            widget.section = target_section.to_string();
-            self.sync_json();
-            Ok(format!("Moved widget '{}' to section '{}'", widget_id, target_section))
-        } else {
-            Err("Widget not found")
-        }
-    }
-
-    pub fn clone_plugin(&mut self, widget_id: &str, username: &str) -> Result<String, &'static str> {
-        if let Some(widget) = self.widgets.remove(widget_id) {
-            let cloned_id = format!("{}.{}", username, widget.widget_id.trim_start_matches("omarchy."));
-            let cloned_widget = QuickshellWidget {
-                widget_id: cloned_id.clone(),
-                name: format!("{} ({})", widget.name, username),
-                component_kind: widget.component_kind,
-                section: widget.section,
-                position_index: widget.position_index,
-                is_enabled: widget.is_enabled,
-                is_user_cloned: true,
-            };
-            self.widgets.insert(cloned_id.clone(), cloned_widget);
-            self.sync_json();
-            Ok(format!("Cloned plugin '{}' -> '{}{}'", widget_id, self.user_plugins_dir, cloned_id))
-        } else {
-            Err("Plugin widget to clone not found")
-        }
     }
 
     pub fn update_shell_json(&mut self, json_str: &str) -> Result<usize, &'static str> {
@@ -139,23 +88,11 @@ impl OmarchyQuickshellEngine {
         Ok(self.widgets.len())
     }
 
-    fn sync_json(&mut self) {
-        self.config_json = format!(
-            "{{\"layout\": \"{}\", \"idle\": {{\"screensaver\": {}, \"lock\": {}}}, \"widgets\": {}}}",
-            self.active_layout_name,
-            self.idle_screensaver_secs,
-            self.idle_lock_secs,
-            self.widgets.len()
-        );
-    }
-
     pub fn render_shell_summary(&self) -> String {
         format!(
-            "Omarchy Quickshell [{}] managing {} unified components (Idle screensaver: {}s, lock: {}s)",
+            "Omarchy Quickshell [{}] managing {} unified components",
             self.active_layout_name,
-            self.widgets.len(),
-            self.idle_screensaver_secs,
-            self.idle_lock_secs
+            self.widgets.len()
         )
     }
 }
@@ -475,7 +412,6 @@ impl OmarchyDotfilesManagerEngine {
 #[derive(Debug, Clone)]
 pub struct CustomShortcut {
     pub keys: String,
-    pub description: String,
     pub command: String,
 }
 
@@ -487,42 +423,16 @@ pub struct OmarchyKeybindingsStudioEngine {
 impl OmarchyKeybindingsStudioEngine {
     pub fn new() -> Self {
         let mut engine = Self { bindings: Vec::new() };
-        engine.bind_keys("SUPER+RETURN", "Terminal", "kitty");
-        engine.bind_keys("SUPER+D", "App Launcher", "rofi -show drun");
-        engine.bind_keys("SUPER+F", "Fullscreen", "hyprctl dispatch fullscreen");
+        engine.bind_keys("SUPER+RETURN", "kitty");
+        engine.bind_keys("SUPER+D", "rofi -show drun");
         engine
     }
 
-    pub fn bind_keys(&mut self, keys: &str, desc: &str, cmd: &str) {
+    pub fn bind_keys(&mut self, keys: &str, cmd: &str) {
         self.bindings.push(CustomShortcut {
             keys: keys.to_string(),
-            description: desc.to_string(),
             command: cmd.to_string(),
         });
-    }
-
-    pub fn rebind_keys(&mut self, keys: &str, new_desc: &str, new_cmd: &str) -> Option<String> {
-        if let Some(pos) = self.bindings.iter().position(|b| b.keys == keys) {
-            let previous_cmd = self.bindings[pos].command.clone();
-            self.bindings[pos] = CustomShortcut {
-                keys: keys.to_string(),
-                description: new_desc.to_string(),
-                command: new_cmd.to_string(),
-            };
-            Some(previous_cmd)
-        } else {
-            self.bind_keys(keys, new_desc, new_cmd);
-            None
-        }
-    }
-
-    pub fn unbind_keys(&mut self, keys: &str) -> bool {
-        if let Some(pos) = self.bindings.iter().position(|b| b.keys == keys) {
-            self.bindings.remove(pos);
-            true
-        } else {
-            false
-        }
     }
 
     pub fn generate_hyprland_binds(&self) -> Vec<String> {
@@ -715,225 +625,6 @@ impl OmarchyLiveIsoBootstrapEngine {
 }
 
 
-/// Shell Plugin Kind (Kinds of Omarchy Quickshell Plugins)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum OmarchyShellPluginKind {
-    BarWidget,
-    Panel,
-    Overlay,
-    Menu,
-    Service,
-    Bar,
-}
-
-/// Omarchy Plugin Manifest (`manifest.json` schema v1)
-#[derive(Debug, Clone)]
-pub struct OmarchyPluginManifest {
-    pub schema_version: u32,
-    pub plugin_id: String,
-    pub name: String,
-    pub version: String,
-    pub kinds: Vec<OmarchyShellPluginKind>,
-    pub entry_point_qml: String,
-}
-
-/// Discovered Omarchy Shell Plugin instance
-#[derive(Debug, Clone)]
-pub struct OmarchyShellPlugin {
-    pub manifest: OmarchyPluginManifest,
-    pub is_first_party: bool,
-    pub is_enabled: bool,
-    pub is_keep_loaded: bool,
-    pub install_path: String,
-}
-
-/// Omarchy Quickshell Plugin Manager Engine (`omarchy plugin` CLI & Lifecycle Manager)
-#[derive(Debug, Clone)]
-pub struct OmarchyShellPluginManagerEngine {
-    pub plugins: BTreeMap<String, OmarchyShellPlugin>,
-    pub disabled_first_party_ids: Vec<String>,
-}
-
-impl OmarchyShellPluginManagerEngine {
-    pub fn new() -> Self {
-        let mut manager = Self {
-            plugins: BTreeMap::new(),
-            disabled_first_party_ids: Vec::new(),
-        };
-
-        // All 23 first-party Omarchy Quickshell plugins
-        manager.register_built_in("omarchy.bar", "Bar", "1.0.0", vec![OmarchyShellPluginKind::Bar], "bar/Bar.qml", false);
-        manager.register_built_in("omarchy.image-picker", "Image picker", "1.0.0", vec![OmarchyShellPluginKind::Overlay], "image-picker/ImagePicker.qml", true);
-        manager.register_built_in("omarchy.emojis", "Emojis", "1.0.0", vec![OmarchyShellPluginKind::Overlay], "emojis/Emojis.qml", false);
-        manager.register_built_in("omarchy.clipboard", "Clipboard mgr", "1.0.0", vec![OmarchyShellPluginKind::Overlay], "clipboard/Clipboard.qml", false);
-        manager.register_built_in("omarchy.reminders", "Reminders", "1.0.0", vec![OmarchyShellPluginKind::Overlay], "reminders/ReminderFlow.qml", false);
-        manager.register_built_in("omarchy.menu", "Omarchy menu", "1.0.0", vec![OmarchyShellPluginKind::Menu, OmarchyShellPluginKind::BarWidget], "menu/Menu.qml", false);
-        manager.register_built_in("omarchy.notifications", "Notifications", "1.0.0", vec![OmarchyShellPluginKind::Service], "notifications/Service.qml", false);
-        manager.register_built_in("omarchy.audio", "Audio", "1.0.0", vec![OmarchyShellPluginKind::BarWidget], "panels/audio/Panel.qml", false);
-        manager.register_built_in("omarchy.bluetooth", "Bluetooth", "1.0.0", vec![OmarchyShellPluginKind::BarWidget], "panels/bluetooth/Panel.qml", false);
-        manager.register_built_in("omarchy.clock", "Clock", "1.0.0", vec![OmarchyShellPluginKind::BarWidget], "panels/clock/BarWidget.qml", false);
-        manager.register_built_in("omarchy.monitor", "Monitor", "1.0.0", vec![OmarchyShellPluginKind::BarWidget], "panels/monitor/Panel.qml", false);
-        manager.register_built_in("omarchy.network", "Network", "1.0.0", vec![OmarchyShellPluginKind::BarWidget], "panels/network/Panel.qml", false);
-        manager.register_built_in("omarchy.power", "Power", "1.0.0", vec![OmarchyShellPluginKind::BarWidget], "panels/power/Panel.qml", false);
-        manager.register_built_in("omarchy.tailscale", "Tailscale", "1.0.0", vec![OmarchyShellPluginKind::BarWidget], "panels/tailscale/Panel.qml", false);
-        manager.register_built_in("omarchy.agents", "Agents", "1.0.0", vec![OmarchyShellPluginKind::BarWidget], "agents/Panel.qml", false);
-        manager.register_built_in("omarchy.weather", "Weather", "1.0.0", vec![OmarchyShellPluginKind::BarWidget], "panels/weather/BarWidget.qml", false);
-        manager.register_built_in("omarchy.media", "Media", "1.0.0", vec![OmarchyShellPluginKind::Service, OmarchyShellPluginKind::BarWidget], "services/media/Service.qml", false);
-        manager.register_built_in("omarchy.battery", "Battery", "1.0.0", vec![OmarchyShellPluginKind::Service], "services/battery/Service.qml", false);
-        manager.register_built_in("omarchy.idle", "Idle", "1.0.0", vec![OmarchyShellPluginKind::Service], "services/idle/Service.qml", false);
-        manager.register_built_in("omarchy.nightlight", "Night light", "1.0.0", vec![OmarchyShellPluginKind::Service], "services/nightlight/Service.qml", false);
-        manager.register_built_in("omarchy.lock", "Lock screen", "1.0.0", vec![OmarchyShellPluginKind::Service], "lock/Service.qml", true);
-        manager.register_built_in("omarchy.osd", "OSD", "1.0.0", vec![OmarchyShellPluginKind::Panel], "osd/Osd.qml", true);
-        manager.register_built_in("omarchy.polkit", "Polkit agent", "1.0.0", vec![OmarchyShellPluginKind::Service], "polkit/PolkitAgent.qml", false);
-
-        manager
-    }
-
-    pub fn register_built_in(
-        &mut self,
-        id: &str,
-        name: &str,
-        version: &str,
-        kinds: Vec<OmarchyShellPluginKind>,
-        entry: &str,
-        keep_loaded: bool,
-    ) {
-        let plugin = OmarchyShellPlugin {
-            manifest: OmarchyPluginManifest {
-                schema_version: 1,
-                plugin_id: id.to_string(),
-                name: name.to_string(),
-                version: version.to_string(),
-                kinds,
-                entry_point_qml: entry.to_string(),
-            },
-            is_first_party: true,
-            is_enabled: true,
-            is_keep_loaded: keep_loaded,
-            install_path: format!("$OMARCHY_PATH/shell/plugins/{}", id),
-        };
-        self.plugins.insert(id.to_string(), plugin);
-    }
-
-    pub fn summon_plugin(&self, plugin_id: &str, payload_json: &str) -> Result<String, &'static str> {
-        if let Some(plugin) = self.plugins.get(plugin_id) {
-            if !plugin.is_enabled {
-                return Err("Plugin is disabled");
-            }
-            Ok(format!("Summoned '{}' ({}) with payload bytes: {}", plugin.manifest.name, plugin_id, payload_json.len()))
-        } else {
-            Err("Plugin ID not found")
-        }
-    }
-
-    pub fn validate_plugin_manifest(&self, manifest: &OmarchyPluginManifest) -> Result<(), &'static str> {
-        if manifest.schema_version != 1 {
-            return Err("Invalid schema version (expected 1)");
-        }
-        if manifest.plugin_id.is_empty() || manifest.name.is_empty() {
-            return Err("Plugin ID or Name cannot be empty");
-        }
-        if manifest.plugin_id.starts_with("omarchy.") {
-            return Err("Reserved namespace 'omarchy.*' is only allowed for built-in plugins");
-        }
-        if manifest.entry_point_qml.is_empty() || manifest.entry_point_qml.contains("..") {
-            return Err("Entry point QML path must be a valid relative path without traversal");
-        }
-        if manifest.kinds.is_empty() {
-            return Err("Plugin must claim at least one kind");
-        }
-        Ok(())
-    }
-
-    pub fn add_plugin_from_git(&mut self, url: &str, manifest: OmarchyPluginManifest, enable_now: bool) -> Result<String, &'static str> {
-        self.validate_plugin_manifest(&manifest)?;
-        let id = manifest.plugin_id.clone();
-        if self.plugins.contains_key(&id) {
-            return Err("Plugin ID is already claimed");
-        }
-
-        let plugin = OmarchyShellPlugin {
-            manifest,
-            is_first_party: false,
-            is_enabled: enable_now,
-            is_keep_loaded: false,
-            install_path: format!("~/.config/omarchy/plugins/{}", id),
-        };
-
-        self.plugins.insert(id.clone(), plugin);
-        Ok(format!("Successfully cloned '{}' from {}", id, url))
-    }
-
-    pub fn clone_built_in(&mut self, built_in_id: &str, user_prefix: &str) -> Result<String, &'static str> {
-        if let Some(original) = self.plugins.get(built_in_id).cloned() {
-            if !original.is_first_party {
-                return Err("Can only clone built-in plugins");
-            }
-
-            let clone_id = format!("{}.{}", user_prefix, built_in_id.trim_start_matches("omarchy."));
-            let mut clone_manifest = original.manifest.clone();
-            clone_manifest.plugin_id = clone_id.clone();
-            clone_manifest.name = format!("My {}", original.manifest.name);
-
-            let cloned_plugin = OmarchyShellPlugin {
-                manifest: clone_manifest,
-                is_first_party: false,
-                is_enabled: true,
-                is_keep_loaded: original.is_keep_loaded,
-                install_path: format!("~/.config/omarchy/plugins/{}", clone_id),
-            };
-
-            self.plugins.insert(clone_id.clone(), cloned_plugin);
-            Ok(format!("Cloned {} -> {}", built_in_id, clone_id))
-        } else {
-            Err("Built-in plugin ID not found")
-        }
-    }
-
-    pub fn enable_plugin(&mut self, plugin_id: &str) -> Result<bool, &'static str> {
-        if let Some(plugin) = self.plugins.get_mut(plugin_id) {
-            plugin.is_enabled = true;
-            if plugin.is_first_party {
-                self.disabled_first_party_ids.retain(|id| id != plugin_id);
-            }
-            Ok(true)
-        } else {
-            Err("Plugin not found")
-        }
-    }
-
-    pub fn disable_plugin(&mut self, plugin_id: &str) -> Result<bool, &'static str> {
-        if let Some(plugin) = self.plugins.get_mut(plugin_id) {
-            plugin.is_enabled = false;
-            if plugin.is_first_party && !self.disabled_first_party_ids.contains(&plugin_id.to_string()) {
-                self.disabled_first_party_ids.push(plugin_id.to_string());
-            }
-            Ok(true)
-        } else {
-            Err("Plugin not found")
-        }
-    }
-
-    pub fn remove_plugin(&mut self, plugin_id: &str) -> Result<String, &'static str> {
-        if let Some(plugin) = self.plugins.get(plugin_id) {
-            if plugin.is_first_party {
-                return Err("Cannot remove first-party plugin; use disable instead");
-            }
-            let name = plugin.manifest.name.clone();
-            self.plugins.remove(plugin_id);
-            Ok(format!("Removed plugin '{}' ({})", name, plugin_id))
-        } else {
-            Err("Plugin not found")
-        }
-    }
-}
-
-impl Default for OmarchyShellPluginManagerEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 #[cfg(test)]
 mod omarchy_tests {
     use super::*;
@@ -950,18 +641,8 @@ mod omarchy_tests {
     #[test]
     fn test_omarchy_keybindings_studio() {
         let mut studio = OmarchyKeybindingsStudioEngine::new();
-        assert_eq!(studio.bindings.len(), 3);
-
-        // Rebind SUPER+F (was fullscreen) to file manager nautilus
-        let prev = studio.rebind_keys("SUPER+F", "File Manager", "nautilus");
-        assert_eq!(prev.unwrap(), "hyprctl dispatch fullscreen");
-
-        // Unbind SUPER+D
-        assert!(studio.unbind_keys("SUPER+D"));
         assert_eq!(studio.bindings.len(), 2);
-
-        // Bind new key
-        studio.bind_keys("SUPER+SHIFT+Q", "Exit Hyprland", "hyprctl dispatch exit");
+        studio.bind_keys("SUPER+SHIFT+Q", "hyprctl dispatch exit");
         let binds = studio.generate_hyprland_binds();
         assert_eq!(binds.len(), 3);
         assert!(binds[2].contains("SUPER+SHIFT+Q"));
@@ -1013,29 +694,8 @@ mod omarchy_tests {
     fn test_quickshell_engine() {
         let mut shell = OmarchyQuickshellEngine::new("quattro_pro");
         assert_eq!(shell.widgets.len(), 5);
-        assert_eq!(shell.idle_screensaver_secs, 300);
-        assert_eq!(shell.idle_lock_secs, 600);
-
-        // Test idle timeout updates
-        shell.set_idle_timeouts(180, 900);
-        assert_eq!(shell.idle_screensaver_secs, 180);
-        assert_eq!(shell.idle_lock_secs, 900);
-        assert!(shell.config_json.contains("\"screensaver\": 180"));
-
-        // Test bar widget section move
-        let res = shell.move_bar_widget("bar_clock", "center").unwrap();
-        assert!(res.contains("Moved widget 'bar_clock' to section 'center'"));
-        assert_eq!(shell.widgets.get("bar_clock").unwrap().section, "center");
-
-        // Test plugin cloning
-        shell.register_widget("omarchy.workspaces", "Workspaces", ShellComponentKind::TopBar, "left", 0);
-        let clone_res = shell.clone_plugin("omarchy.workspaces", "sovereign").unwrap();
-        assert!(clone_res.contains("Cloned plugin 'omarchy.workspaces'"));
-        assert!(shell.widgets.contains_key("sovereign.workspaces"));
-        assert!(shell.widgets.get("sovereign.workspaces").unwrap().is_user_cloned);
-
         assert!(shell.update_shell_json("{\"bar\": {\"height\": 32}}").is_ok());
-        assert!(shell.render_shell_summary().contains("6 unified components"));
+        assert!(shell.render_shell_summary().contains("5 unified components"));
     }
 
     #[test]
@@ -1113,44 +773,5 @@ mod omarchy_tests {
         let mut boot = OmarchyLiveIsoBootstrapEngine::new("/dev/nvme0n1");
         let res = boot.run_60s_bootstrap_installer().unwrap();
         assert!(res.contains("Omarchy live bootstrap installed"));
-    }
-
-    #[test]
-    fn test_omarchy_shell_plugin_manager_engine() {
-        let mut mgr = OmarchyShellPluginManagerEngine::new();
-        assert_eq!(mgr.plugins.len(), 23);
-
-        // Disabling first-party plugin
-        assert!(mgr.disable_plugin("omarchy.network").unwrap());
-        assert!(mgr.disabled_first_party_ids.contains(&"omarchy.network".to_string()));
-
-        // Summoning plugin
-        let summon_res = mgr.summon_plugin("omarchy.image-picker", "{\"imageDirs\":[\"/home/sovereign/Pictures\"]}").unwrap();
-        assert!(summon_res.contains("Summoned 'Image picker'"));
-
-        let img_picker = mgr.plugins.get("omarchy.image-picker").unwrap();
-        assert!(img_picker.is_keep_loaded);
-
-        // Cloning built-in plugin
-        let clone_res = mgr.clone_built_in("omarchy.clock", "dhh").unwrap();
-        assert!(clone_res.contains("Cloned omarchy.clock -> dhh.clock"));
-        assert!(mgr.plugins.contains_key("dhh.clock"));
-
-        // Third-party plugin git add & manifest validation
-        let manifest = OmarchyPluginManifest {
-            schema_version: 1,
-            plugin_id: "acme.weather".to_string(),
-            name: "Acme Weather Widget".to_string(),
-            version: "1.2.0".to_string(),
-            kinds: vec![OmarchyShellPluginKind::BarWidget],
-            entry_point_qml: "Weather.qml".to_string(),
-        };
-
-        assert!(mgr.add_plugin_from_git("https://github.com/acme/omarchy-weather.git", manifest, true).is_ok());
-        assert!(mgr.plugins.contains_key("acme.weather"));
-
-        // Removal of third-party plugin vs error on removing built-in
-        assert!(mgr.remove_plugin("acme.weather").is_ok());
-        assert!(mgr.remove_plugin("omarchy.clock").is_err());
     }
 }

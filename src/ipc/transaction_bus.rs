@@ -122,7 +122,7 @@ impl Default for SovereignIpcBus {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

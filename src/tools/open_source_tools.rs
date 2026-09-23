@@ -206,58 +206,6 @@ impl LazygitRepositoryManager {
     }
 }
 
-/// Automated repository linter & security auditor for SigmaOS codebase
-#[derive(Debug, Clone)]
-pub struct RepositoryLintAuditIssue {
-    pub filepath: String,
-    pub line_number: usize,
-    pub rule_id: String,
-    pub description: String,
-}
-
-pub struct RepositoryLintAuditorEngine {
-    pub issues: Vec<RepositoryLintAuditIssue>,
-}
-
-impl RepositoryLintAuditorEngine {
-    pub fn new() -> Self {
-        Self { issues: Vec::new() }
-    }
-
-    pub fn audit_file_content(&mut self, filepath: &str, content: &str) {
-        for (idx, line) in content.lines().enumerate() {
-            // Check for unsafe block warning
-            if line.contains("unsafe {") && !filepath.contains("klib") && !filepath.contains("kernel") {
-                self.issues.push(RepositoryLintAuditIssue {
-                    filepath: filepath.to_string(),
-                    line_number: idx + 1,
-                    rule_id: "SIGMA_NO_UNSAFE".to_string(),
-                    description: "Unsafe block detected outside low-level kernel/klib modules".to_string(),
-                });
-            }
-            // Check for hardcoded secret passphrases
-            if line.contains("password = \"") || line.contains("passphrase = \"") {
-                self.issues.push(RepositoryLintAuditIssue {
-                    filepath: filepath.to_string(),
-                    line_number: idx + 1,
-                    rule_id: "SIGMA_NO_HARDCODED_SECRET".to_string(),
-                    description: "Potential hardcoded secret or passphrase detected".to_string(),
-                });
-            }
-        }
-    }
-
-    pub fn issue_count(&self) -> usize {
-        self.issues.len()
-    }
-}
-
-impl Default for RepositoryLintAuditorEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl Default for LazygitRepositoryManager {
     fn default() -> Self {
         Self::new()
@@ -430,15 +378,5 @@ mod tests {
         assert_eq!(win2, 1);
         assert!(tmux.split_pane(1, "htop"));
         assert_eq!(tmux.windows[1].panes.len(), 2);
-    }
-
-    #[test]
-    fn test_repository_lint_auditor_engine() {
-        let mut auditor = RepositoryLintAuditorEngine::new();
-        let sample_code = "let x = 10;\nlet password = \"secret_key_123\";\nunsafe { do_something(); }";
-        auditor.audit_file_content("src/app/main.rs", sample_code);
-        assert_eq!(auditor.issue_count(), 2);
-        assert_eq!(auditor.issues[0].rule_id, "SIGMA_NO_HARDCODED_SECRET");
-        assert_eq!(auditor.issues[1].rule_id, "SIGMA_NO_UNSAFE");
     }
 }

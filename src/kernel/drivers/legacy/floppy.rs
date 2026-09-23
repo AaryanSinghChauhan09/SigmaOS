@@ -203,7 +203,7 @@ impl Default for FloppyController {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

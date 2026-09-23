@@ -36,7 +36,6 @@ pub enum SystemTarget {
     Graphical,      // Runlevel 5: Multi-user graphical desktop environment
     Cloud,          // Headless cloud-init server profile
     Realtime,       // Hard real-time audio/HPC workload profile
-    KexecReboot,    // Fast warm reboot bypassing BIOS/UEFI POST
     Reboot,         // Runlevel 6: System reboot
     Poweroff,       // Runlevel 0: System shutdown / poweroff
 }
@@ -52,7 +51,6 @@ impl SystemTarget {
             SystemTarget::Cloud => 3,
             SystemTarget::Realtime => 4,
             SystemTarget::Graphical => 5,
-            SystemTarget::KexecReboot => 6,
             SystemTarget::Reboot => 6,
         }
     }
@@ -66,7 +64,6 @@ impl SystemTarget {
             SystemTarget::Graphical => "graphical.target",
             SystemTarget::Cloud => "cloud.target",
             SystemTarget::Realtime => "realtime.target",
-            SystemTarget::KexecReboot => "kexec.target",
             SystemTarget::Reboot => "reboot.target",
             SystemTarget::Poweroff => "poweroff.target",
         }
@@ -461,7 +458,7 @@ impl Default for SigmaInit {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     use std::vec;

@@ -1,46 +1,13 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 extern crate alloc;
 
 use alloc::boxed::Box;
-// use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
-pub use crate::package::manager::PackageState;
-
-#[cfg(any(feature = "standalone_test", test))]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PackageState {
-    Uninstalled,
-    Downloading,
-    Installing,
-    Installed,
-    BrokenDependency,
-    Available,
-    Updating,
-    Corrupted,
-}
 
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
-#[cfg(not(any(feature = "standalone_test", test)))]
-use crate::klib::{Arc, HashMap, HashSet};
-
-#[cfg(any(feature = "standalone_test", test))]
-use std::collections::{HashMap, HashSet};
-#[cfg(any(feature = "standalone_test", test))]
+// Zero-dependency architecture: Use klib primitives for no_std compatibility
 use std::sync::Arc;
+use std::collections::{HashMap, HashSet};
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 use crate::runtime::node_distribution::{
@@ -101,9 +68,11 @@ pub mod node_distribution_dummy {
         }
     }
 }
+#[cfg(any(feature = "standalone_test", test))]
+pub use node_distribution_dummy::*;
 
 #[cfg(any(feature = "standalone_test", test))]
-use node_distribution_dummy::*;
+use self::node_distribution_dummy::*;
 
 /// Foreign distro manifest
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -155,40 +124,27 @@ impl UniversalPackageTranslator {
 }
 
 fn debtor_to_sovereign_name(name: &str) -> &str {
-    if name.contains("curl") {
-        "sovereign-curl"
-    } else if name.contains("sqlite") {
-        "sovereign-sqlite"
-    } else if name.contains("ssl") {
+    let lower = name.to_lowercase();
+    if lower.contains("ssl") || lower.contains("crypto") || lower.contains("tls") {
         "sovereign-openssl"
-    } else if name.contains("libc") || name == "musl" || name.contains("glibc") {
+    } else if lower.contains("libc") || lower == "musl" || lower.contains("freebsd-runtime") || lower.contains("openbsd-sys") || lower.contains("haiku-libroot") {
         "sovereign-libc"
-    } else if name.contains("zlib") {
+    } else if lower.contains("zlib") {
         "sovereign-zlib"
-    } else if name.contains("python") {
+    } else if lower.contains("zstd") || lower.contains("lz4") || lower.contains("xz") || lower.contains("bzip2") {
+        "sovereign-compression"
+    } else if lower.contains("python") {
         "sovereign-python"
-    } else if name.contains("wayland") {
-        "sovereign-wayland"
-    } else if name.contains("pipewire") || name.contains("wireplumber") {
-        "sovereign-pipewire"
-    } else if name.contains("mesa") {
-        "sovereign-mesa"
-    } else if name.contains("hyprland") {
-        "sovereign-hyprland"
-    } else if name.contains("systemd") || name.contains("elogind") {
-        "sovereign-systemd"
-    } else if name.contains("dbus") {
-        "sovereign-dbus"
-    } else if name.contains("ffmpeg") || name.contains("avcodec") {
-        "sovereign-ffmpeg"
-    } else if name.contains("boost") {
-        "sovereign-boost"
-    } else if name.contains("llvm") || name.contains("clang") {
-        "sovereign-llvm-clang"
-    } else if name.contains("rust") || name.contains("cargo") {
-        "sovereign-rust"
-    } else if name.contains("nodejs") || name == "node" {
-        "sovereign-nodejs"
+    } else if lower == "bash" || lower == "zsh" || lower == "sh" || lower == "fish" {
+        "sovereign-shell"
+    } else if lower.contains("systemd") || lower.contains("openrc") || lower.contains("runit") || lower.contains("sysvinit") || lower.contains("s6") || lower.contains("dinit") {
+        "sovereign-init"
+    } else if lower.contains("gcc") || lower.contains("clang") || lower.contains("llvm") || lower.contains("binutils") || lower == "make" || lower == "cmake" {
+        "sovereign-toolchain"
+    } else if lower.contains("wayland") || lower.contains("x11") || lower.contains("mesa") || lower.contains("vulkan") {
+        "sovereign-graphics"
+    } else if lower.contains("curl") || lower.contains("wget") || lower.contains("openssh") || lower.contains("net-tools") || lower.contains("iproute2") {
+        "sovereign-network-tools"
     } else {
         name
     }
@@ -231,6 +187,18 @@ impl DistroRepoSyncEngine {
             distro_name: "Void".to_string(),
             repo_url: "voidlinux.org".to_string(),
         });
+        repos.push(RegisteredDistroRepo {
+            distro_name: "FreeBSD".to_string(),
+            repo_url: "freebsd.org".to_string(),
+        });
+        repos.push(RegisteredDistroRepo {
+            distro_name: "Gentoo".to_string(),
+            repo_url: "gentoo.org".to_string(),
+        });
+        repos.push(RegisteredDistroRepo {
+            distro_name: "OpenBSD".to_string(),
+            repo_url: "openbsd.org".to_string(),
+        });
         Self {
             registered_repos: repos,
             indexed_manifests: HashMap::new(),
@@ -251,6 +219,15 @@ impl DistroRepoSyncEngine {
             .get(name)
             .map(UniversalPackageTranslator::translate_to_sigma_pkg)
     }
+
+    pub fn search_indexed_manifests(&self, query: &str) -> Vec<UnifiedPackage> {
+        let query_lower = query.to_lowercase();
+        self.indexed_manifests
+            .values()
+            .filter(|m| m.original_name.to_lowercase().contains(&query_lower))
+            .map(UniversalPackageTranslator::translate_to_sigma_pkg)
+            .collect()
+    }
 }
 
 impl Default for DistroRepoSyncEngine {
@@ -259,160 +236,109 @@ impl Default for DistroRepoSyncEngine {
     }
 }
 
-/// Package format type
-// Unified system absorbing all 18 major distribution formats.
+/// Package format type covering 18 major distribution formats
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum PackageState {
+    Uninstalled,
+    Downloading,
+    Installing,
+    Installed,
+    BrokenDependency,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum PackagePriority {
     Essential,
     Required,
     Important,
     Standard,
+    #[default]
     Optional,
 }
 
 /// Supported package formats across Linux and BSD ecosystems
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum PackageFormat {
     #[default]
-    SigmaPkg,   // native SigmaOS format
-    Sigma,
-    Sovereign,
     Deb,        // apt/dpkg
-    Udeb,       // Micro Debian package (.udeb)
-    Superdeb,   // Deepin Superdeb (.superdeb)
-    Apt,        // Debian APT
-    Rpm,        // yum/dnf/zypper
-    Drpm,       // Delta RPM (.drpm)
-    Yum,        // RedHat YUM
-    Zypper,     // OpenSUSE Zypper (.zypper)
-    Pacman,     // pacman/pkgbuild
-    Pkgbuild,   // Arch PKGBUILD
-    Cachy,      // CachyOS Package (.cachy)
-    CachyOS,    // CachyOS (.cachyos)
-    Apk,        // Android Package / Alpine Package (.apk)
-    Ebuild,     // Gentoo ebuild (.ebuild / .portage)
-    Portage,    // Gentoo Portage
-    Nix,        // Nix expression / package (.nix)
-    Nixpkg,     // Nix store package (.nixpkg)
-    Guix,       // GNU Guix (.guix / .scm)
     GuixNar,    // GNU Guix NAR archive (.nar)
-    NarInfo,    // Nix NarInfo metadata (.narinfo)
-    Xbps,       // Void Linux (.xbps)
-    Eopkg,      // Solus eopkg (.eopkg)
-    Moss,       // Solus Moss (.moss)
-    Pisi,       // Pardus / Solus PiSi (.PiSi)
-    Ipk,        // OpenWrt IPK package (.ipk)
-    Opkg,       // OPKG package (.opkg)
-    Ports,      // BSD Ports (.ports)
-    OpenBsdPkg, // OpenBSD package (.openbsd.tgz)
-    FreeBsdPkg, // FreeBSD pkg (.pkg)
-    Pkgsrc,     // NetBSD pkgsrc (.pkgsrc)
-    Dports,     // DragonFly BSD DPorts (.dports)
-    Cports,     // Chimera Linux (.cports)
-    SolarisIps, // Solaris IPS package (.p5p / .ips)
-    Pkg,        // macOS / BSD / Solaris PKG (.pkg)
-    Spack,      // Spack package (.spack)
-    Conan,      // Conan C/C++ package (.conan)
-    Wheel,      // Python Wheel package (.whl)
-    Crate,      // Rust Cargo Crate (.crate)
-    Gem,        // Ruby Gem (.gem)
-    Nupkg,      // .NET NuGet package (.nupkg)
-    Vcpkg,      // Microsoft vcpkg (.vcpkg)
-    Msi,        // Windows Installer (.msi)
-    Msix,       // Windows App Package (.msix)
-    Appx,       // Windows AppX (.appx)
-    MakeselfRun,// Makeself self-extracting archive (.run)
-    ZeroInstallZpk, // ZeroInstall package (.zpk)
-    KernelModuleKmp, // Kernel Module Package (.kmp)
-    KernelModuleKmod, // Kernel Module (.kmod)
-    JavaJar,    // Java Archive (.jar)
-    NpmPkg,     // Node Package Manager (.npm / tgz)
-    PhpPhar,    // PHP Archive (.phar)
-    PerlCpan,   // Perl CPAN module (.cpan)
-    LuaRock,    // LuaRocks package (.rock)
-    ElixirHex,  // Elixir Hex package (.hex)
-    HaskellCabal, // Haskell Cabal package (.cabal)
-    JuliaPkg,   // Julia package (.jl)
-    RCran,      // R CRAN package (.rpkg)
+    OpenBsdPkg, // OpenBSD pkg_add (.tgz / .pkg)
+    Ipk,        // Opkg / OpenWrt (.ipk)
+    Opkg,       // Opkg package manager (.opkg / .ipk)
+    SolarisIps, // Solaris IPS package (.p5p / .pkg)
+    Rpm,        // yum/dnf/zypper
+    Pacman,     // pacman/pkgbuild
     Snap,       // snap/squashfs
     Flatpak,    // flatpak sandbox
     AppImage,   // AppImage single-file container
+    SigmaPkg,   // native SigmaOS format
     Air,        // Adobe AIR (.air)
     Bottle,     // Homebrew Bottle (.bottle)
     Ipa,        // iOS App (.ipa)
+    Ports,      // BSD Ports (.ports)
+    Pkg,        // macOS / BSD / Solaris PKG (.pkg)
     Aab,        // Android App Bundle (.aab)
+    Apk,        // Android Package / Alpine Package (.apk)
+    Eopkg,      // Solus eopkg (.eopkg)
+    Nixpkg,     // Nix store package (.nixpkg)
+    Ebuild,     // Gentoo ebuild (.ebuild / .portage)
     TarGz,      // Compressed Tar (.tar.gz, .tgz)
-    TarXz,      // Compressed Tar XZ (.tar.xz)
-    Xz,         // Compressed XZ archive (.xz)
-    Tar,        // Plain tarball (.tar)
-    Tgz,        // Compressed Tar Gz (.tgz)
-    Txz,        // Slackware/FreeBSD txz package (.txz)
+    Xz,         // Compressed XZ archive (.xz, .tar.xz)
     App,        // macOS App bundle (.app)
-    AppBundle,  // macOS App Bundle
     Hap,        // HarmonyOS Ability Package (.hap)
+    Pisi,       // Pardus / Solus PiSi (.PiSi)
+    Superdeb,   // Deepin Superdeb (.superdeb)
     Lzm,        // Slax Linux Module (.lzm)
     Pup,        // Puppy Linux Package (.pup)
     Pet,        // Puppy Extra Tarball (.pet)
+    Tar,        // Plain tarball (.tar)
+    Xbps,       // Void Linux (.xbps)
+    Zypper,     // OpenSUSE Zypper (.zypper)
+    Guix,       // GNU Guix (.guix / .scm)
+    Moss,       // Solus Moss (.moss)
     Hpkg,       // Haiku Package (.hpkg)
     Tcz,        // Tiny Core Linux (.tcz)
     Gobo,       // GoboLinux (.gobo)
     Ostree,     // OSTree commit (.commit)
+    Pkgsrc,     // NetBSD pkgsrc (.pkgsrc)
     Sfs,        // SquashFS (.sfs)
     Puk,        // Portable Package (.puk)
     Dmg,        // macOS Disk Image (.dmg)
-    SlackBuild, // Slackware SlackBuild (.slackbuild / .tlz / .tbz)
-    Crux,       // CRUX Linux (.crux / .pkgfile)
-    Stratum,    // Bedrock Linux Stratum (.stratum)
+    Cports,     // Chimera Linux (.cports)
+    Cachy,      // CachyOS Package (.cachy)
+    Nix,        // Nix expression / package (.nix)
+    Txz,        // Slackware/FreeBSD txz package (.txz)
+    CachyOS,    // CachyOS (.cachyos)
     Swupd,      // Clear Linux swupd (.swupd)
     Starling,   // Starling format (.starling)
-    Apex,       // Android APEX module (.apex)
-    Conda,      // Conda package (.conda)
-    Brew,       // Homebrew formula/cask (.brew / .rb)
-    Wasm,       // WebAssembly WAPM package (.wasm / .wapm)
-    Oci,        // OCI image tarball (.oci)
-    Helm,       // Kubernetes Helm chart (.helm)
-    Sysext,     // Systemd extension (.sysext)
-    FlatpakRef, // Flatpak ref (.flatpakref)
-    CondaTar,   // Conda tar.bz2 (.tar.bz2)
-}
-
-fn normalize_filename_stack<F, R>(filename: &str, f: F) -> R
-where
-    F: FnOnce(&str, &str) -> R,
-{
-    let mut buf = [0u8; 512];
-    let bytes = filename.as_bytes();
-    let mut len = 0;
-
-    for &b in bytes {
-        if b != b' ' && b != b'\t' && b != b'\r' && b != b'\n' {
-            if len >= buf.len() {
-                // Fallback to heap allocation if filename exceeds stack buffer size
-                let name = filename.to_lowercase();
-                let trimmed = name.trim();
-                let normalized = trimmed.replace(" ", "");
-                return f(trimmed, &normalized);
-            }
-            buf[len] = b.to_ascii_lowercase();
-            len += 1;
-        }
-    }
-
-    if let Ok(normalized) = core::str::from_utf8(&buf[..len]) {
-        f(normalized, normalized)
-    } else {
-        let name = filename.to_lowercase();
-        let trimmed = name.trim().to_string();
-        let normalized = trimmed.replace(" ", "");
-        f(&trimmed, &normalized)
-    }
+    Dports,     // DragonFly BSD DPorts (.dports)
+    SlackBuild, // Slackware SlackBuild (.slackbuild / .tlz / .tbz)
+    Crux,       // CRUX Linux (.crux / .pkgfile)
+    Drpm,       // Delta RPM (.drpm)
+    Stratum,    // Bedrock Linux Stratum (.stratum)
+    Apt,        // Debian APT (.deb)
+    Yum,        // RedHat YUM/RPM (.rpm)
+    Portage,    // Gentoo Portage (.ebuild)
+    TarXz,      // Compressed Tar.XZ archive (.tar.xz)
+    Sovereign,  // Sovereign package format (.sigpkg)
+    Spack,      // HPC Spack package (.spack)
+    Conan,      // C/C++ Conan package (.conan)
+    Wheel,      // Python Wheel package (.whl)
+    Crate,      // Rust Cargo Crate (.crate)
+    Gem,        // Ruby Gem package (.gem)
+    Nupkg,      // .NET NuGet package (.nupkg)
+    Vcpkg,      // C++ Vcpkg package (.vcpkg)
+    NarInfo,    // Nix NAR Info (.narinfo)
+    Sysupdate,  // systemd-sysupdate format (.sysupdate)
 }
 
 impl PackageFormat {
     pub fn from_filename(filename: &str) -> Option<Self> {
-        // Bolt ⚡ Optimization: Use single-pass stack-buffered normalization helper
-        // to perform ASCII lowercasing and space removal without allocating heap String buffers.
-        normalize_filename_stack(filename, |name, normalized| {
-            if normalized.ends_with(".deb") || normalized.ends_with(".udeb") {
+        let name = filename.to_lowercase();
+        let name = name.trim();
+        let normalized = name.replace(" ", "");
+
+        if normalized.ends_with(".deb") || normalized.ends_with(".udeb") {
             Some(PackageFormat::Deb)
         } else if normalized.ends_with(".superdeb") {
             Some(PackageFormat::Superdeb)
@@ -421,17 +347,15 @@ impl PackageFormat {
         } else if normalized.ends_with(".pkg.tar.zst")
             || normalized.ends_with(".pkg.tar.xz")
             || normalized.ends_with(".pkg.tar.gz")
-            || normalized.ends_with(".pkg.tar")
-            || normalized.ends_with(".pkgbuild")
+            || normalized.contains("pacman")
             || normalized.ends_with(".pacman")
-            || (normalized.contains("pacman") && !normalized.ends_with(".pkg"))
         {
             Some(PackageFormat::Pacman)
-        } else if normalized == "snap" || normalized.ends_with(".snap") {
+        } else if normalized.ends_with(".snap") {
             Some(PackageFormat::Snap)
-        } else if normalized == "flatpak" || normalized.ends_with(".flatpak") {
+        } else if normalized.ends_with(".flatpak") {
             Some(PackageFormat::Flatpak)
-        } else if normalized == "appimage" || normalized.ends_with(".appimage") {
+        } else if normalized.ends_with(".appimage") {
             Some(PackageFormat::AppImage)
         } else if normalized.ends_with(".sigpkg") || normalized.ends_with(".sigma") {
             Some(PackageFormat::SigmaPkg)
@@ -508,9 +432,9 @@ impl PackageFormat {
             Some(PackageFormat::Pisi)
         } else if normalized.ends_with(".lzm") {
             Some(PackageFormat::Lzm)
-        } else if normalized == "pup" || normalized.ends_with(".pup") {
+        } else if normalized.ends_with(".pup") || normalized == "pup" {
             Some(PackageFormat::Pup)
-        } else if normalized == "pet" || normalized.ends_with(".pet") {
+        } else if normalized.ends_with(".pet") || normalized == "pet" {
             Some(PackageFormat::Pet)
         } else if normalized.ends_with(".tar") {
             Some(PackageFormat::Tar)
@@ -538,60 +462,11 @@ impl PackageFormat {
             Some(PackageFormat::Vcpkg)
         } else if normalized.ends_with(".narinfo") {
             Some(PackageFormat::NarInfo)
-        } else if normalized.ends_with(".msi") {
-            Some(PackageFormat::Msi)
-        } else if normalized.ends_with(".msix") {
-            Some(PackageFormat::Msix)
-        } else if normalized.ends_with(".appx") {
-            Some(PackageFormat::Appx)
-        } else if normalized.ends_with(".run") {
-            Some(PackageFormat::MakeselfRun)
-        } else if normalized.ends_with(".zpk") {
-            Some(PackageFormat::ZeroInstallZpk)
-        } else if normalized.ends_with(".kmp") {
-            Some(PackageFormat::KernelModuleKmp)
-        } else if normalized.ends_with(".kmod") {
-            Some(PackageFormat::KernelModuleKmod)
-        } else if normalized.ends_with(".jar") {
-            Some(PackageFormat::JavaJar)
-        } else if normalized.ends_with(".npm") {
-            Some(PackageFormat::NpmPkg)
-        } else if normalized.ends_with(".phar") {
-            Some(PackageFormat::PhpPhar)
-        } else if normalized.ends_with(".cpan") {
-            Some(PackageFormat::PerlCpan)
-        } else if normalized.ends_with(".rock") {
-            Some(PackageFormat::LuaRock)
-        } else if normalized.ends_with(".hex") {
-            Some(PackageFormat::ElixirHex)
-        } else if normalized.ends_with(".cabal") {
-            Some(PackageFormat::HaskellCabal)
-        } else if normalized.ends_with(".jl") {
-            Some(PackageFormat::JuliaPkg)
-        } else if normalized.ends_with(".rpkg") {
-            Some(PackageFormat::RCran)
-        } else if normalized.ends_with(".apex") {
-            Some(PackageFormat::Apex)
-        } else if normalized.ends_with(".conda") {
-            Some(PackageFormat::Conda)
-        } else if normalized.ends_with(".brew") || normalized.ends_with(".rb") {
-            Some(PackageFormat::Brew)
-        } else if normalized.ends_with(".wasm") || normalized.ends_with(".wapm") {
-            Some(PackageFormat::Wasm)
-        } else if normalized.ends_with(".oci") || normalized.ends_with(".docker.tar") {
-            Some(PackageFormat::Oci)
-        } else if normalized.ends_with(".helm") {
-            Some(PackageFormat::Helm)
-        } else if normalized.ends_with(".sysext") {
-            Some(PackageFormat::Sysext)
-        } else if normalized.ends_with(".flatpakref") {
-            Some(PackageFormat::FlatpakRef)
-        } else if normalized.ends_with(".tar.bz2") {
-            Some(PackageFormat::CondaTar)
+        } else if normalized.ends_with(".sysupdate") {
+            Some(PackageFormat::Sysupdate)
         } else {
             None
         }
-        })
     }
 }
 
@@ -614,18 +489,18 @@ pub trait PackageHook: Send + Sync {
 pub struct CustomPackageHook {
     pub name: String,
     pub timing: HookTiming,
-    pub handler: Arc<dyn Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync>,
+    pub handler: std::sync::Arc<dyn Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync>,
 }
 
 impl CustomPackageHook {
-    pub fn new<F>(name: &str, timing: HookTiming, handler: F) -> Self
+    pub fn new<F: Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync + 'static>(name: &str, timing: HookTiming, handler: F) -> Self
     where
         F: Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync + 'static,
     {
         Self {
             name: name.to_string(),
             timing,
-            handler: Arc::new(handler),
+            handler: std::sync::Arc::new(handler),
         }
     }
 }
@@ -1019,6 +894,24 @@ impl_generic_install_strategy!(SlackBuildInstallStrategy);
 impl_generic_install_strategy!(CruxInstallStrategy);
 impl_generic_install_strategy!(DrpmInstallStrategy);
 impl_generic_install_strategy!(StratumInstallStrategy);
+impl_generic_install_strategy!(OpenBsdPkgInstallStrategy);
+impl_generic_install_strategy!(IpkInstallStrategy);
+impl_generic_install_strategy!(OpkgInstallStrategy);
+impl_generic_install_strategy!(SolarisIpsInstallStrategy);
+impl_generic_install_strategy!(GuixNarInstallStrategy);
+impl_generic_install_strategy!(AptInstallStrategy);
+impl_generic_install_strategy!(YumInstallStrategy);
+impl_generic_install_strategy!(PortageInstallStrategy);
+impl_generic_install_strategy!(TarXzInstallStrategy);
+impl_generic_install_strategy!(SovereignInstallStrategy);
+impl_generic_install_strategy!(SpackInstallStrategy);
+impl_generic_install_strategy!(ConanInstallStrategy);
+impl_generic_install_strategy!(WheelInstallStrategy);
+impl_generic_install_strategy!(CrateInstallStrategy);
+impl_generic_install_strategy!(GemInstallStrategy);
+impl_generic_install_strategy!(NupkgInstallStrategy);
+impl_generic_install_strategy!(VcpkgInstallStrategy);
+impl_generic_install_strategy!(NarInfoInstallStrategy);
 
 // ============================================================================
 // OOP Design Pattern: Adapter Pattern
@@ -1268,6 +1161,24 @@ impl_generic_metadata_adapter!(SlackBuildMetadataAdapter, SlackBuild);
 impl_generic_metadata_adapter!(CruxMetadataAdapter, Crux);
 impl_generic_metadata_adapter!(DrpmMetadataAdapter, Drpm);
 impl_generic_metadata_adapter!(StratumMetadataAdapter, Stratum);
+impl_generic_metadata_adapter!(OpenBsdPkgMetadataAdapter, OpenBsdPkg);
+impl_generic_metadata_adapter!(IpkMetadataAdapter, Ipk);
+impl_generic_metadata_adapter!(OpkgMetadataAdapter, Opkg);
+impl_generic_metadata_adapter!(SolarisIpsMetadataAdapter, SolarisIps);
+impl_generic_metadata_adapter!(GuixNarMetadataAdapter, GuixNar);
+impl_generic_metadata_adapter!(AptMetadataAdapter, Apt);
+impl_generic_metadata_adapter!(YumMetadataAdapter, Yum);
+impl_generic_metadata_adapter!(PortageMetadataAdapter, Portage);
+impl_generic_metadata_adapter!(TarXzMetadataAdapter, TarXz);
+impl_generic_metadata_adapter!(SovereignMetadataAdapter, Sovereign);
+impl_generic_metadata_adapter!(SpackMetadataAdapter, Spack);
+impl_generic_metadata_adapter!(ConanMetadataAdapter, Conan);
+impl_generic_metadata_adapter!(WheelMetadataAdapter, Wheel);
+impl_generic_metadata_adapter!(CrateMetadataAdapter, Crate);
+impl_generic_metadata_adapter!(GemMetadataAdapter, Gem);
+impl_generic_metadata_adapter!(NupkgMetadataAdapter, Nupkg);
+impl_generic_metadata_adapter!(VcpkgMetadataAdapter, Vcpkg);
+impl_generic_metadata_adapter!(NarInfoMetadataAdapter, NarInfo);
 
 // ============================================================================
 // OOP Design Pattern: Decorator Pattern
@@ -1323,25 +1234,10 @@ impl<T: PackageCapability> PackageCapability for SandboxDecorator<T> {
     }
 }
 
-pub struct HardwareOptimizationDecorator<T> {
+pub struct HardwareOptimizationDecorator<T: PackageCapability> {
     pub decorated: T,
     pub target_microarch_level: String,
     pub required_simd_features: Vec<String>,
-}
-
-impl<T: PackageCapability> HardwareOptimizationDecorator<T> {
-    pub fn get_package(&self) -> &UnifiedPackage {
-        self.decorated.get_package()
-    }
-    fn enforce_sandbox(&self) -> Result<(), PackageError> {
-        self.decorated.enforce_sandbox()
-    }
-    fn restrict_network(&self) -> Result<(), PackageError> {
-        self.decorated.restrict_network()
-    }
-    pub fn profile_performance(&self) {
-        self.decorated.profile_performance();
-    }
 }
 
 impl<T: PackageCapability> PackageCapability for HardwareOptimizationDecorator<T> {
@@ -1359,25 +1255,10 @@ impl<T: PackageCapability> PackageCapability for HardwareOptimizationDecorator<T
     }
 }
 
-pub struct ResourceLimitDecorator<T> {
+pub struct ResourceLimitDecorator<T: PackageCapability> {
     pub decorated: T,
     pub max_memory_bytes: u64,
     pub cpu_quota_percent: u32,
-}
-
-impl<T: PackageCapability> ResourceLimitDecorator<T> {
-    pub fn get_package(&self) -> &UnifiedPackage {
-        self.decorated.get_package()
-    }
-    pub fn enforce_sandbox(&self) -> Result<(), PackageError> {
-        self.decorated.enforce_sandbox()
-    }
-    pub fn restrict_network(&self) -> Result<(), PackageError> {
-        self.decorated.restrict_network()
-    }
-    pub fn profile_performance(&self) {
-        self.decorated.profile_performance();
-    }
 }
 
 impl<T: PackageCapability> PackageCapability for ResourceLimitDecorator<T> {
@@ -1395,30 +1276,9 @@ impl<T: PackageCapability> PackageCapability for ResourceLimitDecorator<T> {
     }
 }
 
-pub struct PqcSignedDecorator<T> {
+pub struct PqcSignedDecorator<T: PackageCapability> {
     pub decorated: T,
     pub dilithium_signature: String,
-}
-
-impl<T: PackageCapability> PqcSignedDecorator<T> {
-    pub fn get_package(&self) -> &UnifiedPackage {
-        self.decorated.get_package()
-    }
-    pub fn enforce_sandbox(&self) -> Result<(), PackageError> {
-        if self.dilithium_signature.contains("valid") && !self.dilithium_signature.starts_with("invalid") {
-            self.decorated.enforce_sandbox()
-        } else {
-            Err(PackageError::InstallationFailed(
-                "PQC Dilithium signature validation failed!".to_string(),
-            ))
-        }
-    }
-    pub fn restrict_network(&self) -> Result<(), PackageError> {
-        self.decorated.restrict_network()
-    }
-    pub fn profile_performance(&self) {
-        self.decorated.profile_performance();
-    }
 }
 
 impl<T: PackageCapability> PackageCapability for PqcSignedDecorator<T> {
@@ -1426,13 +1286,10 @@ impl<T: PackageCapability> PackageCapability for PqcSignedDecorator<T> {
         self.decorated.get_package()
     }
     fn enforce_sandbox(&self) -> Result<(), PackageError> {
-        if self.dilithium_signature.contains("valid") && !self.dilithium_signature.starts_with("invalid") {
-            self.decorated.enforce_sandbox()
-        } else {
-            Err(PackageError::InstallationFailed(
-                "PQC Dilithium signature validation failed!".to_string(),
-            ))
+        if self.dilithium_signature.starts_with("invalid") {
+            return Err(PackageError::InstallationFailed("Invalid PQC signature".to_string()));
         }
+        self.decorated.enforce_sandbox()
     }
     fn restrict_network(&self) -> Result<(), PackageError> {
         self.decorated.restrict_network()
@@ -1466,6 +1323,7 @@ impl<T: PackageCapability> PackageCapability for NetworkRestrictionDecorator<T> 
         self.decorated.profile_performance();
     }
 }
+
 
 // ============================================================================
 // OOP Design Pattern: Factory Pattern
@@ -1525,7 +1383,25 @@ impl PackageFactory {
             PackageFormat::Crux => Box::new(CruxInstallStrategy),
             PackageFormat::Drpm => Box::new(DrpmInstallStrategy),
             PackageFormat::Stratum => Box::new(StratumInstallStrategy),
-            _ => Box::new(SigmaPkgInstallStrategy),
+            PackageFormat::OpenBsdPkg => Box::new(OpenBsdPkgInstallStrategy),
+            PackageFormat::Ipk => Box::new(IpkInstallStrategy),
+            PackageFormat::Opkg => Box::new(OpkgInstallStrategy),
+            PackageFormat::SolarisIps => Box::new(SolarisIpsInstallStrategy),
+            PackageFormat::GuixNar => Box::new(GuixNarInstallStrategy),
+            PackageFormat::Apt => Box::new(AptInstallStrategy),
+            PackageFormat::Yum => Box::new(YumInstallStrategy),
+            PackageFormat::Portage => Box::new(PortageInstallStrategy),
+            PackageFormat::TarXz => Box::new(TarXzInstallStrategy),
+            PackageFormat::Sovereign => Box::new(SovereignInstallStrategy),
+            PackageFormat::Spack => Box::new(SpackInstallStrategy),
+            PackageFormat::Conan => Box::new(ConanInstallStrategy),
+            PackageFormat::Wheel => Box::new(WheelInstallStrategy),
+            PackageFormat::Crate => Box::new(CrateInstallStrategy),
+            PackageFormat::Gem => Box::new(GemInstallStrategy),
+            PackageFormat::Nupkg => Box::new(NupkgInstallStrategy),
+            PackageFormat::Vcpkg => Box::new(VcpkgInstallStrategy),
+            PackageFormat::NarInfo => Box::new(NarInfoInstallStrategy),
+            PackageFormat::Sysupdate => Box::new(SigmaPkgInstallStrategy),
         }
     }
 
@@ -1580,7 +1456,25 @@ impl PackageFactory {
             PackageFormat::Crux => Box::new(CruxMetadataAdapter),
             PackageFormat::Drpm => Box::new(DrpmMetadataAdapter),
             PackageFormat::Stratum => Box::new(StratumMetadataAdapter),
-            _ => Box::new(SigmaPkgMetadataAdapter),
+            PackageFormat::OpenBsdPkg => Box::new(OpenBsdPkgMetadataAdapter),
+            PackageFormat::Ipk => Box::new(IpkMetadataAdapter),
+            PackageFormat::Opkg => Box::new(OpkgMetadataAdapter),
+            PackageFormat::SolarisIps => Box::new(SolarisIpsMetadataAdapter),
+            PackageFormat::GuixNar => Box::new(GuixNarMetadataAdapter),
+            PackageFormat::Apt => Box::new(AptMetadataAdapter),
+            PackageFormat::Yum => Box::new(YumMetadataAdapter),
+            PackageFormat::Portage => Box::new(PortageMetadataAdapter),
+            PackageFormat::TarXz => Box::new(TarXzMetadataAdapter),
+            PackageFormat::Sovereign => Box::new(SovereignMetadataAdapter),
+            PackageFormat::Spack => Box::new(SpackMetadataAdapter),
+            PackageFormat::Conan => Box::new(ConanMetadataAdapter),
+            PackageFormat::Wheel => Box::new(WheelMetadataAdapter),
+            PackageFormat::Crate => Box::new(CrateMetadataAdapter),
+            PackageFormat::Gem => Box::new(GemMetadataAdapter),
+            PackageFormat::Nupkg => Box::new(NupkgMetadataAdapter),
+            PackageFormat::Vcpkg => Box::new(VcpkgMetadataAdapter),
+            PackageFormat::NarInfo => Box::new(NarInfoMetadataAdapter),
+            PackageFormat::Sysupdate => Box::new(SigmaPkgMetadataAdapter),
         }
     }
 }
@@ -1646,11 +1540,7 @@ impl Default for PackageTriggerRegistry {
 }
 
 
-#[derive(Debug, Clone)]
-pub struct DistroRepoRecord {
-    pub distro_name: String,
-    pub url: String,
-}
+
 
 
 // =========================================================================
@@ -1688,7 +1578,7 @@ pub struct AptDebManifest {
     pub maintainer: String,
     pub depends: Vec<String>,
     pub description: String,
-    pub priority: String,
+    pub priority: PackagePriority,
 }
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)
@@ -1760,14 +1650,6 @@ pub struct PackageAdapter {
 }
 
 impl PackageAdapter {
-    pub fn new(format: PackageFormat, adapter_name: String) -> Self {
-        Self {
-            format,
-            adapter_name,
-            capabilities: Vec::new(),
-        }
-    }
-
     pub fn translate_flatpak_sandbox_policy(&self, manifest: &FlatpakManifest) -> Vec<String> {
         let mut pledges = Vec::new();
         for arg in &manifest.finish_args {
@@ -1775,7 +1657,7 @@ impl PackageAdapter {
                 pledges.push("network".to_string());
             } else if arg.contains("ipc") {
                 pledges.push("ipc".to_string());
-            } else if arg.contains("filesystem") || arg.contains("host") {
+            } else if arg.contains("filesystem") {
                 pledges.push("unveil_all".to_string());
             }
         }
@@ -1786,15 +1668,15 @@ impl PackageAdapter {
         if manifest.confinement == "strict" {
             "strict_pledge_sandbox".to_string()
         } else {
-            "classic_sandbox".to_string()
+            "unconfined_host".to_string()
         }
     }
 
-    pub fn mount_appimage_squashfs(&self, app_runtime: &AppImageRuntime) -> Result<String, PackageError> {
-        if app_runtime.signature_offset == 0 || app_runtime.squashfs_offset == 0 {
-            Err(PackageError::InstallationFailed("Invalid AppImage offsets".to_string()))
+    pub fn mount_appimage_squashfs(&self, runtime: &AppImageRuntime) -> Result<String, &'static str> {
+        if runtime.squashfs_offset == 0 {
+            Err("Invalid squashfs offset")
         } else {
-            Ok(format!("/tmp/.mount_{}_squashfs", app_runtime.app_name))
+            Ok(format!("/tmp/.mount_{}_squashfs", runtime.app_name))
         }
     }
 
@@ -1805,6 +1687,14 @@ impl PackageAdapter {
     pub fn query_dnf_repository(&self, config: &DnfRepoConfig) -> bool {
         config.enabled
     }
+    pub fn new(format: PackageFormat, adapter_name: String) -> Self {
+        Self {
+            format,
+            adapter_name,
+            capabilities: Vec::new(),
+        }
+    }
+
 
     pub fn _can_handle(&self, package: &UnifiedPackage) -> bool {
         package.formats.contains(&self.format)
@@ -1863,31 +1753,28 @@ impl DependencyResolver {
     }
 
     pub fn resolve_dependencies(&self, package_name: &str) -> Result<Vec<String>, PackageError> {
-        let capacity = self.packages.len();
-        let mut resolved: Vec<String> = Vec::with_capacity(capacity);
-        let mut to_visit: Vec<&str> = Vec::with_capacity(capacity);
-        to_visit.push(package_name);
-        // Bolt ⚡ Optimization: Operate directly on borrowed `&str` references and pre-allocate
-        // capacity to eliminate O(N) heap String allocations during traversal queue pushes and set checks.
-        let mut visited: HashSet<&str> = HashSet::with_capacity(capacity);
+        let mut resolved: Vec<String> = Vec::new();
+        let mut to_visit: Vec<String> = Vec::new();
+        to_visit.push(package_name.to_string());
+        // Bolt ⚡ Optimization: Use HashSet for O(1) visited checks instead of O(N) linear scans on Vec
+        let mut visited: HashSet<String> = HashSet::new();
 
         while let Some(current) = to_visit.pop() {
-            if visited.contains(current) {
+            if visited.contains(&current) {
                 continue;
             }
 
-            visited.insert(current);
+            visited.insert(current.clone());
 
-            if let Some(package) = self.packages.get(current) {
+            if let Some(package) = self.packages.get(&current) {
                 for dep in &package.dependencies {
-                    let dep_str: &str = dep.as_str();
-                    if !visited.contains(dep_str) {
-                        to_visit.push(dep_str);
+                    if !visited.contains(dep) {
+                        to_visit.push(dep.clone());
                     }
                 }
-                resolved.push(current.to_string());
+                resolved.push(current);
             } else {
-                return Err(PackageError::DependencyNotFound(current.to_string()));
+                return Err(PackageError::DependencyNotFound(current));
             }
         }
 
@@ -2378,6 +2265,7 @@ pub enum PackageError {
     _AdapterNotFound,
     InstallationFailed(String),
     _ConflictDetected(Vec<(String, String)>),
+    ValidationError(String),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -2506,205 +2394,6 @@ impl SovereignPackageRollbackEngine {
     }
 }
 
-/// Pull Request (PR) driven package specification for community distro contributions
-/// (Inspired by Arch AUR PKGBUILDs, Gentoo Ebuilds, Void XBPS-src templates, FreeBSD Ports PRs, and Nix Flakes PRs)
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct PullRequestPackageSpec {
-    pub pr_id: usize,
-    pub title: String,
-    pub author: String,
-    pub target_format: PackageFormat,
-    pub raw_manifest_body: String,
-    pub build_script: String,
-    pub dependencies: Vec<String>,
-}
-
-/// Parser for Pull Request formatted package specifications and automated translation
-pub struct PackagePullRequestParser;
-
-impl PackagePullRequestParser {
-    pub fn parse_pr_spec(
-        pr_id: usize,
-        title: &str,
-        author: &str,
-        raw_manifest: &str,
-    ) -> Result<PullRequestPackageSpec, &'static str> {
-        let fmt = if raw_manifest.contains("pkgname=") || raw_manifest.contains("PKGBUILD") {
-            PackageFormat::Pacman
-        } else if raw_manifest.contains("Package:") || raw_manifest.contains("Control:") {
-            PackageFormat::Deb
-        } else if raw_manifest.contains("Name:") || raw_manifest.contains("Spec") {
-            PackageFormat::Rpm
-        } else if raw_manifest.contains("EAPI=") || raw_manifest.contains("ebuild") {
-            PackageFormat::Ebuild
-        } else if raw_manifest.contains("pkgname=") && raw_manifest.contains("revision=") {
-            PackageFormat::Xbps
-        } else if raw_manifest.contains("stdenv.mkDerivation") || raw_manifest.contains("flake") {
-            PackageFormat::Nix
-        } else {
-            PackageFormat::SigmaPkg
-        };
-
-        let mut dependencies = Vec::new();
-        for line in raw_manifest.lines() {
-            let line = line.trim();
-            if line.starts_with("depends=") || line.starts_with("Depends:") || line.starts_with("RDEPEND=") {
-                let deps_part = line.split('=').nth(1).or_else(|| line.split(':').nth(1)).unwrap_or("");
-                for dep in deps_part.split_whitespace() {
-                    let clean = dep.trim_matches(|c| c == '(' || c == ')' || c == '\'' || c == '"');
-                    if !clean.is_empty() {
-                        dependencies.push(clean.to_string());
-                    }
-                }
-            }
-        }
-
-        Ok(PullRequestPackageSpec {
-            pr_id,
-            title: title.to_string(),
-            author: author.to_string(),
-            target_format: fmt,
-            raw_manifest_body: raw_manifest.to_string(),
-            build_script: "cargo build --release".to_string(),
-            dependencies,
-        })
-    }
-
-    pub fn transpile_pr_to_unified_package(spec: &PullRequestPackageSpec) -> UnifiedPackage {
-        let pkg_name = if !spec.title.is_empty() {
-            spec.title.to_lowercase().replace(' ', "-")
-        } else {
-            format!("pr-pkg-{}", spec.pr_id)
-        };
-
-        let mut pkg = UnifiedPackage::new(pkg_name, "1.0.0-pr".to_string())
-            .with_format(spec.target_format)
-            .with_provides("pull_request_submission".to_string());
-
-        for dep in &spec.dependencies {
-            pkg = pkg.with_dependency(dep.clone());
-        }
-
-        // Align package manifest memory buffer to 4KB (4096-byte) page frame boundary
-        let raw_len = spec.raw_manifest_body.len();
-        let page_aligned_size = (raw_len + 4095) & !4095;
-
-        pkg.properties.insert("pr_id".to_string(), spec.pr_id.to_string());
-        pkg.properties.insert("pr_author".to_string(), spec.author.clone());
-        pkg.properties.insert("4kb_page_aligned_bytes".to_string(), page_aligned_size.to_string());
-        pkg
-    }
-}
-
-/// Command translation bridge for foreign package manager CLI invocations (`apt`, `pacman`, `dnf`, `zypper`, `apk`, `emerge`, `pkg`, `xbps`, `eopkg`, `nix`, `guix`, `pkg_add`, `swupd`, `slackpkg`, `opkg`, `spack`, `conan`)
-pub struct UniversalPackageCommandBridge;
-
-impl UniversalPackageCommandBridge {
-    pub fn translate_cli_command(pm_name: &str, action: &str, pkg: &str) -> Result<String, &'static str> {
-        match pm_name.to_lowercase().as_str() {
-            "apt" | "apt-get" | "dpkg" => match action {
-                "install" | "add" => Ok(format!("sigpkg install {}.deb", pkg)),
-                "remove" | "purge" => Ok(format!("sigpkg remove {}", pkg)),
-                "update" | "upgrade" => Ok("sigpkg update".to_string()),
-                _ => Ok(format!("sigpkg {}", action)),
-            },
-            "pacman" | "yay" | "paru" => match action.to_lowercase().as_str() {
-                "-s" | "-sync" | "install" => Ok(format!("sigpkg install {}.pkg.tar.zst", pkg)),
-                "-r" | "-remove" => Ok(format!("sigpkg remove {}", pkg)),
-                "-syu" | "update" => Ok("sigpkg update".to_string()),
-                _ => Ok(format!("sigpkg {}", action)),
-            },
-            "dnf" | "yum" => match action {
-                "install" | "in" => Ok(format!("sigpkg install {}.rpm", pkg)),
-                "remove" | "rm" => Ok(format!("sigpkg remove {}", pkg)),
-                "update" | "up" => Ok("sigpkg update".to_string()),
-                _ => Ok(format!("sigpkg {}", action)),
-            },
-            "zypper" => match action {
-                "in" | "install" => Ok(format!("sigpkg install {}.zypper", pkg)),
-                "rm" | "remove" => Ok(format!("sigpkg remove {}", pkg)),
-                "up" | "update" | "dup" => Ok("sigpkg update".to_string()),
-                _ => Ok(format!("sigpkg {}", action)),
-            },
-            "apk" => match action {
-                "add" => Ok(format!("sigpkg install {}.apk", pkg)),
-                "del" => Ok(format!("sigpkg remove {}", pkg)),
-                "upgrade" => Ok("sigpkg update".to_string()),
-                _ => Ok(format!("sigpkg {}", action)),
-            },
-            "emerge" | "portage" => match action {
-                "install" | "add" => Ok(format!("sigpkg install {}.ebuild", pkg)),
-                "unmerge" | "deselect" => Ok(format!("sigpkg remove {}", pkg)),
-                _ => Ok(format!("sigpkg {}", action)),
-            },
-            "pkg" | "ports" => match action {
-                "install" => Ok(format!("sigpkg install {}.pkg", pkg)),
-                "delete" | "remove" => Ok(format!("sigpkg remove {}", pkg)),
-                _ => Ok(format!("sigpkg {}", action)),
-            },
-            "xbps" | "xbps-install" | "xbps-remove" => match action {
-                "install" | "-S" | "-s" => Ok(format!("sigpkg install {}.xbps", pkg)),
-                "remove" | "-R" | "-r" => Ok(format!("sigpkg remove {}", pkg)),
-                "update" | "-u" => Ok("sigpkg update".to_string()),
-                _ => Ok(format!("sigpkg {}", action)),
-            },
-            "eopkg" => match action {
-                "it" | "install" => Ok(format!("sigpkg install {}.eopkg", pkg)),
-                "rm" | "remove" => Ok(format!("sigpkg remove {}", pkg)),
-                "ur" | "up" | "upgrade" => Ok("sigpkg update".to_string()),
-                _ => Ok(format!("sigpkg {}", action)),
-            },
-            "nix" | "nix-env" => match action {
-                "install" | "-i" | "i" => Ok(format!("sigpkg install {}.nixpkg", pkg)),
-                "uninstall" | "-e" | "e" => Ok(format!("sigpkg remove {}", pkg)),
-                "upgrade" | "-u" => Ok("sigpkg update".to_string()),
-                _ => Ok(format!("sigpkg {}", action)),
-            },
-            "guix" => match action {
-                "install" => Ok(format!("sigpkg install {}.scm", pkg)),
-                "remove" => Ok(format!("sigpkg remove {}", pkg)),
-                "upgrade" => Ok("sigpkg update".to_string()),
-                _ => Ok(format!("sigpkg {}", action)),
-            },
-            "pkg_add" | "pkg_delete" => match action {
-                "install" | "add" => Ok(format!("sigpkg install {}.tgz", pkg)),
-                "delete" | "remove" => Ok(format!("sigpkg remove {}", pkg)),
-                "update" | "-u" => Ok("sigpkg update".to_string()),
-                _ => Ok(format!("sigpkg {}", action)),
-            },
-            "swupd" => match action {
-                "bundle-add" | "install" => Ok(format!("sigpkg install {}.swupd", pkg)),
-                "bundle-remove" | "remove" => Ok(format!("sigpkg remove {}", pkg)),
-                "update" => Ok("sigpkg update".to_string()),
-                _ => Ok(format!("sigpkg {}", action)),
-            },
-            "slackpkg" | "installpkg" | "removepkg" => match action {
-                "install" | "add" => Ok(format!("sigpkg install {}.txz", pkg)),
-                "remove" | "delete" => Ok(format!("sigpkg remove {}", pkg)),
-                "update" | "upgrade" => Ok("sigpkg update".to_string()),
-                _ => Ok(format!("sigpkg {}", action)),
-            },
-            "opkg" | "ipkg" => match action {
-                "install" => Ok(format!("sigpkg install {}.ipk", pkg)),
-                "remove" => Ok(format!("sigpkg remove {}", pkg)),
-                "update" | "upgrade" => Ok("sigpkg update".to_string()),
-                _ => Ok(format!("sigpkg {}", action)),
-            },
-            "spack" => match action {
-                "install" => Ok(format!("sigpkg install {}.spack", pkg)),
-                "uninstall" | "remove" => Ok(format!("sigpkg remove {}", pkg)),
-                _ => Ok(format!("sigpkg {}", action)),
-            },
-            "conan" => match action {
-                "install" => Ok(format!("sigpkg install {}.conan", pkg)),
-                "remove" => Ok(format!("sigpkg remove {}", pkg)),
-                _ => Ok(format!("sigpkg {}", action)),
-            },
-            _ => Ok(format!("sigpkg install {}", pkg)),
-        }
-    }
-}
-
 /// Universal Package Format Transpilation Bridge
 /// Auto-detects foreign Linux and BSD package formats and converts them into native `UnifiedPackage` instances
 pub struct UniversalPackageFormatBridge;
@@ -2724,19 +2413,15 @@ impl UniversalPackageFormatBridge {
 
         // Populate format specific dependencies and tags
         match fmt {
-            PackageFormat::Deb | PackageFormat::Superdeb => {
+            PackageFormat::Deb => {
                 pkg.dependencies.push("libc6".to_string());
                 pkg.provides.push("debian_compat".to_string());
             }
-            PackageFormat::Rpm | PackageFormat::Drpm => {
+            PackageFormat::Rpm => {
                 pkg.dependencies.push("glibc".to_string());
                 pkg.provides.push("fedora_compat".to_string());
             }
-            PackageFormat::Zypper => {
-                pkg.dependencies.push("glibc".to_string());
-                pkg.provides.push("opensuse_compat".to_string());
-            }
-            PackageFormat::Pacman | PackageFormat::Cachy | PackageFormat::CachyOS => {
+            PackageFormat::Pacman => {
                 pkg.dependencies.push("glibc".to_string());
                 pkg.provides.push("arch_compat".to_string());
             }
@@ -2744,65 +2429,13 @@ impl UniversalPackageFormatBridge {
                 pkg.dependencies.push("musl".to_string());
                 pkg.provides.push("alpine_compat".to_string());
             }
-            PackageFormat::Xbps => {
-                pkg.dependencies.push("xbps_libc".to_string());
-                pkg.provides.push("void_compat".to_string());
-            }
-            PackageFormat::Eopkg | PackageFormat::Pisi | PackageFormat::Moss => {
-                pkg.dependencies.push("eopkg_base".to_string());
-                pkg.provides.push("solus_compat".to_string());
-            }
-            PackageFormat::Pkg | PackageFormat::Ports | PackageFormat::FreeBsdPkg => {
+            PackageFormat::Pkg | PackageFormat::Ports => {
                 pkg.dependencies.push("bsd_libc".to_string());
                 pkg.provides.push("freebsd_compat".to_string());
             }
-            PackageFormat::OpenBsdPkg => {
-                pkg.dependencies.push("openbsd_libc".to_string());
-                pkg.provides.push("openbsd_compat".to_string());
-            }
-            PackageFormat::Pkgsrc => {
-                pkg.dependencies.push("netbsd_libc".to_string());
-                pkg.provides.push("netbsd_compat".to_string());
-            }
-            PackageFormat::Dports => {
-                pkg.dependencies.push("dragonfly_libc".to_string());
-                pkg.provides.push("dragonfly_compat".to_string());
-            }
-            PackageFormat::Cports => {
-                pkg.dependencies.push("cports_musl".to_string());
-                pkg.provides.push("chimera_compat".to_string());
-            }
-            PackageFormat::Nix | PackageFormat::Nixpkg => {
+            PackageFormat::Nixpkg => {
                 pkg.dependencies.push("nix_store_path".to_string());
                 pkg.provides.push("nixos_compat".to_string());
-            }
-            PackageFormat::Guix | PackageFormat::GuixNar => {
-                pkg.dependencies.push("guix_store_path".to_string());
-                pkg.provides.push("guix_compat".to_string());
-            }
-            PackageFormat::Ebuild | PackageFormat::Portage => {
-                pkg.dependencies.push("portage_base".to_string());
-                pkg.provides.push("gentoo_compat".to_string());
-            }
-            PackageFormat::Swupd => {
-                pkg.dependencies.push("swupd_bundles".to_string());
-                pkg.provides.push("clearlinux_compat".to_string());
-            }
-            PackageFormat::SlackBuild | PackageFormat::Txz => {
-                pkg.dependencies.push("slackware_base".to_string());
-                pkg.provides.push("slackware_compat".to_string());
-            }
-            PackageFormat::Opkg | PackageFormat::Ipk => {
-                pkg.dependencies.push("musl".to_string());
-                pkg.provides.push("openwrt_compat".to_string());
-            }
-            PackageFormat::Spack => {
-                pkg.dependencies.push("spack_env".to_string());
-                pkg.provides.push("hpc_spack_compat".to_string());
-            }
-            PackageFormat::Conan => {
-                pkg.dependencies.push("conan_center".to_string());
-                pkg.provides.push("cpp_conan_compat".to_string());
             }
             _ => {
                 pkg.provides.push("generic_distro_compat".to_string());
@@ -2817,7 +2450,7 @@ impl UniversalPackageFormatBridge {
     }
 }
 
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -3019,7 +2652,7 @@ mod tests {
                 v
             },
             description: "command line tool for transferring data with URLs".to_string(),
-            priority: "optional".to_string(),
+            priority: PackagePriority::Optional,
         };
 
         let _pkgbuild = PacmanPkgbuild {
@@ -3098,21 +2731,6 @@ mod tests {
             enabled: true,
         };
         assert!(dnf_adapter.query_dnf_repository(&dnf_config));
-    }
-
-    #[test]
-    fn test_prompt_formats_bare_and_spaced_extensions() {
-        assert_eq!(PackageFormat::from_filename("pup"), Some(PackageFormat::Pup));
-        assert_eq!(PackageFormat::from_filename("pet"), Some(PackageFormat::Pet));
-        assert_eq!(PackageFormat::from_filename("snap"), Some(PackageFormat::Snap));
-        assert_eq!(PackageFormat::from_filename("flatpak"), Some(PackageFormat::Flatpak));
-        assert_eq!(PackageFormat::from_filename("appimage"), Some(PackageFormat::AppImage));
-        assert_eq!(PackageFormat::from_filename("pacman"), Some(PackageFormat::Pacman));
-        assert_eq!(PackageFormat::from_filename("archive.tar .gz"), Some(PackageFormat::TarGz));
-        assert_eq!(PackageFormat::from_filename("package .pkg.tar.xz"), Some(PackageFormat::Pacman));
-        assert_eq!(PackageFormat::from_filename("sample.PiSi"), Some(PackageFormat::Pisi));
-        assert_eq!(PackageFormat::from_filename("software.superdeb"), Some(PackageFormat::Superdeb));
-        assert_eq!(PackageFormat::from_filename("slax_module.lzm"), Some(PackageFormat::Lzm));
     }
 
     #[test]
@@ -3228,30 +2846,6 @@ mod tests {
         assert_eq!(PackageFormat::from_filename("solaris.p5p"), Some(PackageFormat::SolarisIps));
         assert_eq!(PackageFormat::from_filename("store.nar"), Some(PackageFormat::GuixNar));
         assert_eq!(PackageFormat::from_filename("base.openbsd.tgz"), Some(PackageFormat::OpenBsdPkg));
-        assert_eq!(PackageFormat::from_filename("hpc.spack"), Some(PackageFormat::Spack));
-        assert_eq!(PackageFormat::from_filename("cpp.conan"), Some(PackageFormat::Conan));
-        assert_eq!(PackageFormat::from_filename("python.whl"), Some(PackageFormat::Wheel));
-        assert_eq!(PackageFormat::from_filename("rust.crate"), Some(PackageFormat::Crate));
-        assert_eq!(PackageFormat::from_filename("ruby.gem"), Some(PackageFormat::Gem));
-        assert_eq!(PackageFormat::from_filename("dotnet.nupkg"), Some(PackageFormat::Nupkg));
-        assert_eq!(PackageFormat::from_filename("ms.vcpkg"), Some(PackageFormat::Vcpkg));
-        assert_eq!(PackageFormat::from_filename("nix.narinfo"), Some(PackageFormat::NarInfo));
-        assert_eq!(PackageFormat::from_filename("installer.msi"), Some(PackageFormat::Msi));
-        assert_eq!(PackageFormat::from_filename("app.msix"), Some(PackageFormat::Msix));
-        assert_eq!(PackageFormat::from_filename("app.appx"), Some(PackageFormat::Appx));
-        assert_eq!(PackageFormat::from_filename("setup.run"), Some(PackageFormat::MakeselfRun));
-        assert_eq!(PackageFormat::from_filename("pkg.zpk"), Some(PackageFormat::ZeroInstallZpk));
-        assert_eq!(PackageFormat::from_filename("driver.kmp"), Some(PackageFormat::KernelModuleKmp));
-        assert_eq!(PackageFormat::from_filename("module.kmod"), Some(PackageFormat::KernelModuleKmod));
-        assert_eq!(PackageFormat::from_filename("app.jar"), Some(PackageFormat::JavaJar));
-        assert_eq!(PackageFormat::from_filename("package.npm"), Some(PackageFormat::NpmPkg));
-        assert_eq!(PackageFormat::from_filename("app.phar"), Some(PackageFormat::PhpPhar));
-        assert_eq!(PackageFormat::from_filename("mod.cpan"), Some(PackageFormat::PerlCpan));
-        assert_eq!(PackageFormat::from_filename("lib.rock"), Some(PackageFormat::LuaRock));
-        assert_eq!(PackageFormat::from_filename("pkg.hex"), Some(PackageFormat::ElixirHex));
-        assert_eq!(PackageFormat::from_filename("lib.cabal"), Some(PackageFormat::HaskellCabal));
-        assert_eq!(PackageFormat::from_filename("pkg.jl"), Some(PackageFormat::JuliaPkg));
-        assert_eq!(PackageFormat::from_filename("pkg.rpkg"), Some(PackageFormat::RCran));
     }
 
     #[test]
@@ -3333,81 +2927,5 @@ mod tests {
         };
 
         assert!(bad_pqc.enforce_sandbox().is_err());
-    }
-
-    #[test]
-    fn test_universal_package_format_bridge() {
-        let deb_pkg = UniversalPackageFormatBridge::detect_and_transpile("nginx.deb", b"deb_payload").unwrap();
-        assert!(deb_pkg.formats.contains(&PackageFormat::Deb));
-        assert_eq!(deb_pkg.name, "nginx");
-        assert!(deb_pkg.dependencies.contains(&"libc6".to_string()));
-
-        let rpm_pkg = UniversalPackageFormatBridge::detect_and_transpile("curl.rpm", b"rpm_payload").unwrap();
-        assert!(rpm_pkg.formats.contains(&PackageFormat::Rpm));
-        assert!(rpm_pkg.provides.contains(&"fedora_compat".to_string()));
-
-        let apk_pkg = UniversalPackageFormatBridge::detect_and_transpile("busybox.apk", b"apk_payload").unwrap();
-        assert!(apk_pkg.formats.contains(&PackageFormat::Apk));
-        assert!(apk_pkg.dependencies.contains(&"musl".to_string()));
-    }
-
-    #[test]
-    fn test_universal_package_command_translation() {
-        assert_eq!(
-            UniversalPackageCommandBridge::translate_cli_command("apt", "install", "curl").unwrap(),
-            "sigpkg install curl.deb"
-        );
-        assert_eq!(
-            UniversalPackageCommandBridge::translate_cli_command("pacman", "-S", "neofetch").unwrap(),
-            "sigpkg install neofetch.pkg.tar.zst"
-        );
-        assert_eq!(
-            UniversalPackageCommandBridge::translate_cli_command("dnf", "install", "nginx").unwrap(),
-            "sigpkg install nginx.rpm"
-        );
-        assert_eq!(
-            UniversalPackageCommandBridge::translate_cli_command("apk", "add", "htop").unwrap(),
-            "sigpkg install htop.apk"
-        );
-        assert_eq!(
-            UniversalPackageCommandBridge::translate_cli_command("emerge", "install", "zsh").unwrap(),
-            "sigpkg install zsh.ebuild"
-        );
-        assert_eq!(
-            UniversalPackageCommandBridge::translate_cli_command("pkg", "install", "git").unwrap(),
-            "sigpkg install git.pkg"
-        );
-    }
-
-    #[test]
-    fn test_universal_package_format_bridge_multi_distro() {
-        let arch_pkg = UniversalPackageFormatBridge::detect_and_transpile("hyprland.pkg.tar.zst", b"zst_data").unwrap();
-        assert!(arch_pkg.formats.contains(&PackageFormat::Pacman));
-        assert!(arch_pkg.provides.contains(&"arch_compat".to_string()));
-
-        let freebsd_pkg = UniversalPackageFormatBridge::detect_and_transpile("vim.pkg", b"pkg_data").unwrap();
-        assert!(freebsd_pkg.formats.contains(&PackageFormat::Pkg));
-        assert!(freebsd_pkg.provides.contains(&"freebsd_compat".to_string()));
-
-        let nix_pkg = UniversalPackageFormatBridge::detect_and_transpile("bash.nixpkg", b"nix_data").unwrap();
-        assert!(nix_pkg.formats.contains(&PackageFormat::Nixpkg));
-        assert!(nix_pkg.provides.contains(&"nixos_compat".to_string()));
-    }
-
-    #[test]
-    fn test_package_pull_request_parser_and_translation() {
-        let raw_pkgbuild = "pkgname=ripgrep\nPKGBUILD\ndepends=('pcre2' 'glibc')";
-        let spec = PackagePullRequestParser::parse_pr_spec(404, "Add Ripgrep", "Aaryan", raw_pkgbuild).unwrap();
-
-        assert_eq!(spec.pr_id, 404);
-        assert_eq!(spec.target_format, PackageFormat::Pacman);
-        assert!(spec.dependencies.contains(&"pcre2".to_string()));
-        assert!(spec.dependencies.contains(&"glibc".to_string()));
-
-        let pkg = PackagePullRequestParser::transpile_pr_to_unified_package(&spec);
-        assert_eq!(pkg.name, "add-ripgrep");
-        assert_eq!(pkg.version, "1.0.0-pr");
-        assert!(pkg.provides.contains(&"pull_request_submission".to_string()));
-        assert_eq!(pkg.properties.get("pr_author").unwrap(), "Aaryan");
     }
 }

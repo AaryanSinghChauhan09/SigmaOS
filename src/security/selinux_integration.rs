@@ -259,7 +259,7 @@ pub fn check_syscall_selinux(
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

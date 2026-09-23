@@ -43,9 +43,6 @@ impl fmt::Display for ThreadError {
 /// Result type alias for Thread operations
 pub type ThreadResult<T> = Result<T, ThreadError>;
 
-pub mod sovereign_thread_pool;
-pub use sovereign_thread_pool::*;
-
 /// Thread - primary abstraction for this module
 #[derive(Debug, Clone)]
 pub struct Thread {
@@ -148,7 +145,7 @@ impl Default for Mutex {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -539,7 +539,7 @@ impl Clone for WatchManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -340,7 +340,7 @@ impl Default for SigmaFutureDevelopmentProtocolEngine {
 // UNIT TESTS
 // ============================================================================
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

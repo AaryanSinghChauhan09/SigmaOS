@@ -2177,7 +2177,6 @@ pub struct RedoxOsSchemeHandlerEngine {
     pub next_fd: u32,
 }
 
-#[allow(dead_code)]
 impl RedoxOsSchemeHandlerEngine {
     pub fn new(scheme_name: &str) -> Self {
         Self {
@@ -2229,14 +2228,12 @@ impl RedoxOsSchemeHandlerEngine {
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[allow(dead_code)]
 pub struct GenodeCapability {
     pub cap_id: u64,
     pub service_name: String,
     pub local_name: String,
 }
 
-#[allow(dead_code)]
 pub struct GenodeCapabilityRouterEngine {
     pub capabilities: Vec<GenodeCapability>,
     pub active_sessions_count: u64,
@@ -2282,14 +2279,12 @@ impl Default for GenodeCapabilityRouterEngine {
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[allow(dead_code)]
 pub struct ZirconHandle {
     pub handle_val: u32,
     pub rights: u32, // e.g. ZX_RIGHT_READ | ZX_RIGHT_WRITE
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[allow(dead_code)]
 pub struct ZirconChannelMessage {
     pub txid: u32,
     pub ordinal: u64, // FIDL method ordinal
@@ -2297,7 +2292,6 @@ pub struct ZirconChannelMessage {
     pub handles: Vec<ZirconHandle>,
 }
 
-#[allow(dead_code)]
 pub struct FuchsiaZirconChannelEngine {
     pub channel_messages: Vec<ZirconChannelMessage>,
     pub handles: Vec<ZirconHandle>,
@@ -2350,14 +2344,12 @@ impl Default for FuchsiaZirconChannelEngine {
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[allow(dead_code)]
 pub struct XbpsTriggerHook {
     pub trigger_name: String, // e.g. "update-desktop-database", "fontconfig-cache"
     pub target_directory: String,
     pub is_executed: bool,
 }
 
-#[allow(dead_code)]
 pub struct VoidXbpsTriggerEngine {
     pub registered_triggers: Vec<XbpsTriggerHook>,
     pub executed_triggers_count: u64,
@@ -2409,7 +2401,6 @@ impl Default for VoidXbpsTriggerEngine {
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[allow(dead_code)]
 pub struct Apk3PackageManifest {
     pub pkg_name: String,
     pub version: String,
@@ -2417,7 +2408,6 @@ pub struct Apk3PackageManifest {
     pub ed25519_signature: Vec<u8>,
 }
 
-#[allow(dead_code)]
 pub struct AlpineApk3SignatureEngine {
     pub trusted_keys: Vec<Vec<u8>>,
     pub verified_packages_count: u64,
@@ -2462,7 +2452,6 @@ impl Default for AlpineApk3SignatureEngine {
 // =========================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[allow(dead_code)]
 pub enum IoUringOpcode {
     Nop,
     Readv,
@@ -2472,7 +2461,6 @@ pub enum IoUringOpcode {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[allow(dead_code)]
 pub struct IoUringSqEntry {
     pub user_data: u64,
     pub opcode: IoUringOpcode,
@@ -2482,14 +2470,12 @@ pub struct IoUringSqEntry {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[allow(dead_code)]
 pub struct IoUringCqEntry {
     pub user_data: u64,
     pub res: i32,
     pub flags: u32,
 }
 
-#[allow(dead_code)]
 pub struct SovereignIoUringEngine {
     pub sq_ring: Vec<IoUringSqEntry>,
     pub cq_ring: Vec<IoUringCqEntry>,
@@ -2557,7 +2543,6 @@ impl SovereignIoUringEngine {
 // =========================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[allow(dead_code)]
 pub enum GeomClassType {
     Stripe,
     Mirror,
@@ -2566,7 +2551,6 @@ pub enum GeomClassType {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[allow(dead_code)]
 pub enum GeomBioCmd {
     Read,
     Write,
@@ -2574,7 +2558,6 @@ pub enum GeomBioCmd {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[allow(dead_code)]
 pub struct GeomBioRequest {
     pub cmd: GeomBioCmd,
     pub offset: u64,
@@ -2583,7 +2566,6 @@ pub struct GeomBioRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[allow(dead_code)]
 pub struct GeomProvider {
     pub provider_name: String,
     pub class_type: GeomClassType,
@@ -2592,7 +2574,6 @@ pub struct GeomProvider {
     pub sub_providers: Vec<String>,
 }
 
-#[allow(dead_code)]
 pub struct FreeBsdGeomTopologyEngine {
     pub providers: Vec<GeomProvider>,
 }
@@ -2937,268 +2918,6 @@ impl LinuxSchedExtScxEngine {
 impl Default for LinuxSchedExtScxEngine {
     fn default() -> Self {
         Self::new(ScxSchedulerKind::BpfLand)
-    }
-}
-
-// 35. LINUX EBPF BTF & CO-RE RELOCATION ENGINE
-#[derive(Debug, Clone)]
-pub struct BtfMemberField {
-    pub name: String,
-    pub byte_offset: u32,
-    pub type_id: u32,
-}
-
-#[derive(Debug, Clone)]
-pub struct BtfTypeDescriptor {
-    pub type_id: u32,
-    pub name: String,
-    pub size_bytes: u32,
-    pub members: Vec<BtfMemberField>,
-}
-
-#[derive(Debug, Clone)]
-pub struct EbpfBtfCoreRelocationEngine {
-    pub types: BTreeMap<u32, BtfTypeDescriptor>,
-}
-
-impl EbpfBtfCoreRelocationEngine {
-    pub fn new() -> Self {
-        Self {
-            types: BTreeMap::new(),
-        }
-    }
-
-    pub fn register_type(&mut self, descriptor: BtfTypeDescriptor) {
-        self.types.insert(descriptor.type_id, descriptor);
-    }
-
-    pub fn relocate_field_offset(
-        &self,
-        _local_type_id: u32,
-        target_type_id: u32,
-        field_name: &str,
-    ) -> Result<u32, &'static str> {
-        let target_type = self
-            .types
-            .get(&target_type_id)
-            .ok_or("BTF: Target type ID not found")?;
-        let member = target_type
-            .members
-            .iter()
-            .find(|m| m.name == field_name)
-            .ok_or("BTF: Target field not found")?;
-        Ok(member.byte_offset)
-    }
-}
-
-impl Default for EbpfBtfCoreRelocationEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// 36. POSTGRESQL & DUCKDB BINARY WIRE PROTOCOL ENGINE
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum PgWireMessage {
-    StartupMessage { database: String, user: String },
-    Query(String),
-    CommandComplete(String),
-    ReadyForQuery,
-}
-
-#[derive(Debug, Clone)]
-pub struct PostgresWireProtocolEngine {
-    pub active_database: String,
-    pub active_user: String,
-}
-
-impl PostgresWireProtocolEngine {
-    pub fn new() -> Self {
-        Self {
-            active_database: String::new(),
-            active_user: String::new(),
-        }
-    }
-
-    pub fn decode_frame(&mut self, payload: &[u8]) -> Result<PgWireMessage, &'static str> {
-        if payload.is_empty() {
-            return Err("PG Wire: Empty payload");
-        }
-        match payload[0] {
-            b'Q' => {
-                let query = String::from_utf8_lossy(&payload[1..])
-                    .trim_matches('\0')
-                    .to_string();
-                Ok(PgWireMessage::Query(query))
-            }
-            0x00 if payload.len() >= 8 => {
-                self.active_database = "sigma_db".to_string();
-                self.active_user = "sigma_user".to_string();
-                Ok(PgWireMessage::StartupMessage {
-                    database: self.active_database.clone(),
-                    user: self.active_user.clone(),
-                })
-            }
-            _ => Ok(PgWireMessage::ReadyForQuery),
-        }
-    }
-
-    pub fn encode_data_row(&self, fields: &[&str]) -> Vec<u8> {
-        let mut row = Vec::new();
-        row.push(b'D');
-        row.push(fields.len() as u8);
-        for field in fields {
-            row.extend_from_slice(&(field.len() as u16).to_be_bytes());
-            row.extend_from_slice(field.as_bytes());
-        }
-        row
-    }
-}
-
-impl Default for PostgresWireProtocolEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// 37. CEPH CRUSH MAP DETERMINISTIC DATA PLACEMENT ENGINE
-#[derive(Debug, Clone)]
-pub struct CrushBucket {
-    pub id: u32,
-    pub name: String,
-    pub parent_rack_id: u32,
-    pub osd_id: u32,
-    pub weight: u32,
-}
-
-#[derive(Debug, Clone)]
-pub struct CephCrushMapPlacementEngine {
-    pub buckets: Vec<CrushBucket>,
-}
-
-impl CephCrushMapPlacementEngine {
-    pub fn new() -> Self {
-        Self {
-            buckets: Vec::new(),
-        }
-    }
-
-    pub fn add_osd(&mut self, id: u32, name: &str, rack_id: u32, osd_id: u32, weight: u32) {
-        self.buckets.push(CrushBucket {
-            id,
-            name: name.to_string(),
-            parent_rack_id: rack_id,
-            osd_id,
-            weight,
-        });
-    }
-
-    pub fn select_osd_replicas(&self, object_id: u64, replica_count: usize) -> Vec<u32> {
-        if self.buckets.is_empty() || replica_count == 0 {
-            return Vec::new();
-        }
-        let mut replicas = Vec::new();
-        for step in 0..replica_count {
-            let hash = object_id
-                .wrapping_mul(1103515245)
-                .wrapping_add(12345 + step as u64);
-            let idx = (hash as usize) % self.buckets.len();
-            let osd = self.buckets[idx].osd_id;
-            if !replicas.contains(&osd) {
-                replicas.push(osd);
-            }
-        }
-        replicas
-    }
-}
-
-impl Default for CephCrushMapPlacementEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// 38. NATS JETSTREAM DISTRIBUTED STREAMING ENGINE
-#[derive(Debug, Clone)]
-pub struct JetStreamMessage {
-    pub sequence: u64,
-    pub subject: String,
-    pub payload: Vec<u8>,
-}
-
-#[derive(Debug, Clone)]
-pub struct NatsJetStreamEngine {
-    pub stream_name: String,
-    pub messages: Vec<JetStreamMessage>,
-    pub next_sequence: u64,
-}
-
-impl NatsJetStreamEngine {
-    pub fn new(stream_name: &str) -> Self {
-        Self {
-            stream_name: stream_name.to_string(),
-            messages: Vec::new(),
-            next_sequence: 1,
-        }
-    }
-
-    pub fn publish(&mut self, subject: &str, payload: &[u8]) -> u64 {
-        let seq = self.next_sequence;
-        self.messages.push(JetStreamMessage {
-            sequence: seq,
-            subject: subject.to_string(),
-            payload: payload.to_vec(),
-        });
-        self.next_sequence += 1;
-        seq
-    }
-
-    pub fn fetch_after_sequence(&self, last_seq: u64) -> Vec<&JetStreamMessage> {
-        self.messages
-            .iter()
-            .filter(|m| m.sequence > last_seq)
-            .collect()
-    }
-}
-
-impl Default for NatsJetStreamEngine {
-    fn default() -> Self {
-        Self::new("default-stream")
-    }
-}
-
-// 39. CLICKHOUSE & DUCKDB VECTORIZED COLUMNAR EXECUTION ENGINE
-#[derive(Debug, Clone)]
-pub struct VectorizedChunk {
-    pub values: Vec<u64>,
-}
-
-#[derive(Debug, Clone)]
-pub struct ClickHouseDuckDbVectorizedEngine;
-
-impl ClickHouseDuckDbVectorizedEngine {
-    pub fn new() -> Self {
-        Self
-    }
-
-    pub fn filter_greater_than(&self, chunk: &VectorizedChunk, threshold: u64) -> VectorizedChunk {
-        let filtered = chunk
-            .values
-            .iter()
-            .copied()
-            .filter(|&v| v > threshold)
-            .collect();
-        VectorizedChunk { values: filtered }
-    }
-
-    pub fn sum(&self, chunk: &VectorizedChunk) -> u64 {
-        chunk.values.iter().sum()
-    }
-}
-
-impl Default for ClickHouseDuckDbVectorizedEngine {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -3912,72 +3631,6 @@ mod tests {
 
         assert_eq!(auditor.block_windows_telemetry_hosts(), 3);
     }
-
-    #[test]
-    fn test_open_source_supremacy_suite_new_evaluators() {
-        let mut suite = OpenSourceProjectSupremacySuite::new();
-        assert!(suite.evaluate_nix_flakes_reproducibility("sha256-abc123lockhash"));
-        assert!(!suite.evaluate_nix_flakes_reproducibility(""));
-
-        assert!(suite.evaluate_iceberg_delta_time_travel("telemetry_events", 42));
-        assert!(!suite.evaluate_iceberg_delta_time_travel("telemetry_events", 0));
-
-        assert!(suite.evaluate_cilium_mtls_policy(1001));
-        assert!(!suite.evaluate_cilium_mtls_policy(0));
-    }
-
-    #[test]
-    fn test_new_open_source_paradigm_engines() {
-        // 1. EbpfBtfCoreRelocationEngine
-        let mut btf = EbpfBtfCoreRelocationEngine::new();
-        btf.register_type(BtfTypeDescriptor {
-            type_id: 10,
-            name: "task_struct".to_string(),
-            size_bytes: 1024,
-            members: vec![BtfMemberField {
-                name: "pid".to_string(),
-                byte_offset: 128,
-                type_id: 1,
-            }],
-        });
-        assert_eq!(btf.relocate_field_offset(1, 10, "pid"), Ok(128));
-        assert!(btf.relocate_field_offset(1, 10, "comm").is_err());
-
-        // 2. PostgresWireProtocolEngine
-        let mut pg = PostgresWireProtocolEngine::new();
-        let query_frame = b"QSELECT * FROM users;\0";
-        let msg = pg.decode_frame(query_frame).unwrap();
-        assert_eq!(msg, PgWireMessage::Query("SELECT * FROM users;".to_string()));
-        let encoded_row = pg.encode_data_row(&["1", "alice"]);
-        assert_eq!(encoded_row[0], b'D');
-
-        // 3. CephCrushMapPlacementEngine
-        let mut crush = CephCrushMapPlacementEngine::new();
-        crush.add_osd(1, "osd-1", 100, 10, 100);
-        crush.add_osd(2, "osd-2", 100, 20, 100);
-        let osds = crush.select_osd_replicas(98765, 2);
-        assert!(!osds.is_empty());
-
-        // 4. NatsJetStreamEngine
-        let mut js = NatsJetStreamEngine::new("test-stream");
-        let seq1 = js.publish("orders.created", b"order-101");
-        assert_eq!(seq1, 1);
-        let fetched = js.fetch_after_sequence(0);
-        assert_eq!(fetched.len(), 1);
-
-        // 5. ClickHouseDuckDbVectorizedEngine
-        let vec_engine = ClickHouseDuckDbVectorizedEngine::new();
-        let chunk = VectorizedChunk {
-            values: vec![10, 20, 30, 40, 50],
-        };
-        let filtered = vec_engine.filter_greater_than(&chunk, 25);
-        assert_eq!(filtered.values, vec![30, 40, 50]);
-        assert_eq!(vec_engine.sum(&filtered), 120);
-
-        // Suite integration check
-        let suite = OpenSourceProjectSupremacySuite::new();
-        assert_eq!(suite.jetstream_engine.stream_name, "sigma-stream");
-    }
 }
 
 // =========================================================================
@@ -4051,7 +3704,6 @@ impl Default for SovereignNginxIngressRouter {
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq)]
-#[allow(dead_code)]
 pub struct MetricCounter {
     pub name: String,
     pub value: u64,
@@ -4137,11 +3789,6 @@ pub struct OpenSourceProjectSupremacySuite {
     pub pf_carp_engine: OpenBsdPfCarpStateEngine,
     pub arrow_engine: ApacheArrowVectorizedEngine,
     pub sched_ext_engine: LinuxSchedExtScxEngine,
-    pub btf_relocation_engine: EbpfBtfCoreRelocationEngine,
-    pub pg_wire_engine: PostgresWireProtocolEngine,
-    pub crush_placement_engine: CephCrushMapPlacementEngine,
-    pub jetstream_engine: NatsJetStreamEngine,
-    pub vectorized_exec_engine: ClickHouseDuckDbVectorizedEngine,
 }
 
 #[derive(Debug, Clone)]
@@ -4170,11 +3817,6 @@ impl OpenSourceProjectSupremacySuite {
             pf_carp_engine: OpenBsdPfCarpStateEngine::new(1, 1, 0),
             arrow_engine: ApacheArrowVectorizedEngine::new(),
             sched_ext_engine: LinuxSchedExtScxEngine::new(ScxSchedulerKind::BpfLand),
-            btf_relocation_engine: EbpfBtfCoreRelocationEngine::new(),
-            pg_wire_engine: PostgresWireProtocolEngine::new(),
-            crush_placement_engine: CephCrushMapPlacementEngine::new(),
-            jetstream_engine: NatsJetStreamEngine::new("sigma-stream"),
-            vectorized_exec_engine: ClickHouseDuckDbVectorizedEngine::new(),
         }
     }
 
@@ -4347,19 +3989,16 @@ impl OpenSourceProjectSupremacySuite {
         benchmark_score >= 1000 && feature_coverage_pct >= 90
     }
 
-    /// Nix Flakes & Guix Channels: Reproducible lockfile generation evaluation
-    pub fn evaluate_nix_flakes_reproducibility(&mut self, flake_lock_hash: &str) -> bool {
-        !flake_lock_hash.is_empty()
+    /// Helix / Neovim Inspired Modal Editor Quick Helper
+    pub fn open_sovereign_modal_editor(&self, initial_buffer: &str) -> crate::open_source_obsoletion::SovereignHelixModalEditorEngine {
+        let editor = crate::open_source_obsoletion::SovereignHelixModalEditorEngine::new("scratch", initial_buffer);
+        editor
     }
 
-    /// Apache Iceberg & Delta Lake: ACID tabular time-travel snapshot evaluation
-    pub fn evaluate_iceberg_delta_time_travel(&mut self, table_id: &str, snapshot_id: u64) -> bool {
-        !table_id.is_empty() && snapshot_id > 0
-    }
-
-    /// Cilium eBPF: Zero-trust transparent mTLS and packet policy evaluation
-    pub fn evaluate_cilium_mtls_policy(&mut self, identity_tag: u32) -> bool {
-        identity_tag > 0
+    /// Fastfetch System Info Quick Helper
+    pub fn render_fastfetch_summary(&self) -> String {
+        let ff = crate::open_source_obsoletion::SovereignFastfetchSysInfoEngine::new();
+        ff.render_ansi_banner()
     }
 }
 

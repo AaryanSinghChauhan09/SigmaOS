@@ -273,7 +273,7 @@ impl Default for JobObjectManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

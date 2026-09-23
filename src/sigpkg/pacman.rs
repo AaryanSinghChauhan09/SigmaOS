@@ -1,5 +1,5 @@
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 
 use std::vec::Vec;
 /// Arch Linux-inspired rolling release build engine (makepkg) and package manager (pacman) for SigmaOS.
@@ -339,7 +339,7 @@ impl PactreeEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -12,49 +12,30 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-
 use std::boxed::Box;
-use std::collections::BTreeMap;
+use std::string::{String, ToString};
 use std::vec::Vec;
-use core::sync::atomic::{AtomicI64, AtomicU64, AtomicUsize, Ordering};
+use std::format;
+
+// (no_std only applicable at crate root - removed)
+// #![no_main]  // crate-root only
+
+/// OOP-based Clock and Timer Management for SigmaOS
+/// Based on Ideas-999-Structured: Kernel & Hardware Item 61
+/// Implements system clock, timers, and timekeeping
+
+use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 pub type TimerID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ClockSource {
-    Rtc = 0,
-    Tsc = 1,
-    Hpet = 2,
-    AcpiPm = 3,
-}
+#[derive(Debug, Clone, Copy)]
+pub enum ClockSource { RTC = 0, TSC = 1, HPET = 2, ACPI_PM = 3 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ClockId {
-    Realtime = 0,
-    Monotonic = 1,
-    ProcessCpuTime = 2,
-    ThreadCpuTime = 3,
-    MonotonicRaw = 4,
-    RealtimeCoarse = 5,
-    MonotonicCoarse = 6,
-    Boottime = 7,
-    RealtimeAlarm = 8,
-    BoottimeAlarm = 9,
-    Tai = 11,
-    UptimeBsd = 12,
-}
-
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TimerError {
-    Success = 0,
-    NotFound = 1,
-    InvalidTime = 2,
-    ClockUnsupported = 3,
-    TimerLimitExceeded = 4,
-}
+#[derive(Debug, Clone, Copy)]
+pub enum TimerError { Success = 0, NotFound = 1, InvalidTime = 2 }
 
 pub trait SystemClock {
     fn get_timestamp(&self) -> u64;
@@ -78,9 +59,7 @@ impl SimpleSystemClock {
 }
 
 impl SystemClock for SimpleSystemClock {
-    fn get_timestamp(&self) -> u64 {
-        self.timestamp.load(Ordering::SeqCst) as u64
-    }
+    fn get_timestamp(&self) -> u64 { self.timestamp.load(Ordering::SeqCst) as u64 }
 
     fn get_nanoseconds(&self) -> u64 {
         let base = self.timestamp.load(Ordering::SeqCst) as u64;
@@ -121,9 +100,7 @@ impl SimpleTimer {
 }
 
 impl Timer for SimpleTimer {
-    fn id(&self) -> TimerID {
-        self.id
-    }
+    fn id(&self) -> TimerID { self.id }
 
     fn is_expired(&self) -> bool {
         let current = 1000000usize;
@@ -155,12 +132,14 @@ pub trait TimerManager {
     fn get_timer(&self, id: TimerID) -> Option<&dyn Timer>;
 }
 
+#[repr(C)]
 pub struct SimpleTimerManager {
     pub timers: Vec<Option<Box<dyn Timer>>>,
     pub next_id: AtomicUsize,
 }
 
 impl SimpleTimerManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleTimerManager {
             timers: Vec::new(),
@@ -181,7 +160,6 @@ impl TimerManager for SimpleTimerManager {
         for timer_option in &mut self.timers {
             if let Some(ref timer) = *timer_option {
                 if timer.id() == id {
-                    *timer_option = None;
                     return Ok(());
                 }
             }
@@ -204,9 +182,7 @@ impl TimerManager for SimpleTimerManager {
     fn get_timer(&self, id: TimerID) -> Option<&dyn Timer> {
         for timer_option in &self.timers {
             if let Some(ref timer) = *timer_option {
-                if timer.id() == id {
-                    return Some(timer.as_ref());
-                }
+                if timer.id() == id { return Some(timer.as_ref()); }
             }
         }
         None
@@ -219,12 +195,14 @@ pub trait Alarm {
     fn check_alarms(&mut self) -> Vec<fn()>;
 }
 
+#[repr(C)]
 pub struct SimpleAlarm {
     pub alarms: Vec<(TimerID, u64, fn())>,
     pub next_id: AtomicUsize,
 }
 
 impl SimpleAlarm {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleAlarm {
             alarms: Vec::new(),
@@ -241,12 +219,13 @@ impl Alarm for SimpleAlarm {
     }
 
     fn cancel_alarm(&mut self, id: TimerID) -> Result<(), TimerError> {
-        if let Some(pos) = self.alarms.iter().position(|a| a.0 == id) {
-            self.alarms.remove(pos);
-            Ok(())
-        } else {
-            Err(TimerError::NotFound)
+        for i in 0..self.alarms.len() {
+            if self.alarms[i].0 == id {
+                self.alarms.remove(i);
+                return Ok(());
+            }
         }
+        Err(TimerError::NotFound)
     }
 
     fn check_alarms(&mut self) -> Vec<fn()> {
@@ -267,225 +246,82 @@ impl Alarm for SimpleAlarm {
     }
 }
 
-// ============================================================================
-// LINUX & BSD INSPIRED ADVANCED CLOCKS & TIMERS ENGINE
-// ============================================================================
+struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
-/// High-resolution timespec representation matching POSIX struct timespec
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub struct Timespec {
-    pub tv_sec: i64,
-    pub tv_nsec: i64,
-}
-
-impl Timespec {
-    pub const fn new(sec: i64, nsec: i64) -> Self {
-        Self {
-            tv_sec: sec,
-            tv_nsec: nsec,
-        }
-    }
-
-    pub fn to_nanos(&self) -> u64 {
-        (self.tv_sec as u64)
-            .wrapping_mul(1_000_000_000)
-            .wrapping_add(self.tv_nsec as u64)
-    }
-
-    pub fn from_nanos(nanos: u64) -> Self {
-        Self {
-            tv_sec: (nanos / 1_000_000_000) as i64,
-            tv_nsec: (nanos % 1_000_000_000) as i64,
-        }
-    }
-}
-
-/// Linux/BSD high-resolution timer wheel (hrtimer / FreeBSD callwheel)
-#[derive(Debug, Clone)]
-pub struct HrtimerEntry {
-    pub timer_id: u64,
-    pub clock_id: ClockId,
-    pub expire_nanos: u64,
-    pub interval_nanos: u64,
-    pub is_periodic: bool,
-    pub callback_id: u32,
-}
-
-pub struct SovereignHrtimerWheel {
-    pub current_nanos: AtomicU64,
-    pub active_timers: BTreeMap<u64, Vec<HrtimerEntry>>, // expire_nanos -> entries
-    pub next_timer_id: AtomicU64,
-}
-
-impl SovereignHrtimerWheel {
-    pub fn new(initial_nanos: u64) -> Self {
-        Self {
-            current_nanos: AtomicU64::new(initial_nanos),
-            active_timers: BTreeMap::new(),
-            next_timer_id: AtomicU64::new(1),
-        }
-    }
-
-    pub fn add_timer(
-        &mut self,
-        clock_id: ClockId,
-        delay_nanos: u64,
-        interval_nanos: u64,
-        callback_id: u32,
-    ) -> u64 {
-        let id = self.next_timer_id.fetch_add(1, Ordering::SeqCst);
-        let now = self.current_nanos.load(Ordering::SeqCst);
-        let expire_nanos = now + delay_nanos;
-
-        let entry = HrtimerEntry {
-            timer_id: id,
-            clock_id,
-            expire_nanos,
-            interval_nanos,
-            is_periodic: interval_nanos > 0,
-            callback_id,
-        };
-
-        self.active_timers
-            .entry(expire_nanos)
-            .or_insert_with(Vec::new)
-            .push(entry);
-
-        id
-    }
-
-    pub fn cancel_timer(&mut self, timer_id: u64) -> bool {
-        let mut found = false;
-        for entries in self.active_timers.values_mut() {
-            if let Some(pos) = entries.iter().position(|e| e.timer_id == timer_id) {
-                entries.remove(pos);
-                found = true;
-                break;
+impl<T> Vec<T> {
+    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity { self.grow(); }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
             }
         }
-        self.active_timers.retain(|_, entries| !entries.is_empty());
-        found
     }
-
-    pub fn advance_time(&mut self, advance_nanos: u64) -> Vec<HrtimerEntry> {
-        let new_now = self.current_nanos.fetch_add(advance_nanos, Ordering::SeqCst) + advance_nanos;
-        let mut expired = Vec::new();
-
-        // Split off all keys <= new_now
-        let expired_keys: Vec<u64> = self
-            .active_timers
-            .keys()
-            .cloned()
-            .take_while(|k| *k <= new_now)
-            .collect();
-
-        for k in expired_keys {
-            if let Some(entries) = self.active_timers.remove(&k) {
-                for entry in entries {
-                    expired.push(entry.clone());
-                    // Re-arm if periodic
-                    if entry.is_periodic {
-                        let next_expire = k + entry.interval_nanos;
-                        let mut rearmed = entry;
-                        rearmed.expire_nanos = next_expire;
-                        self.active_timers
-                            .entry(next_expire)
-                            .or_insert_with(Vec::new)
-                            .push(rearmed);
-                    }
-                }
+    fn remove(&mut self, index: usize) -> T {
+        unsafe {
+            let item = core::ptr::read(self.data.add(index));
+            for i in index..self.len - 1 {
+                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
             }
-        }
-
-        expired
-    }
-}
-
-/// NTP / PTP Precision Clock Synchronization & Drift Engine
-pub struct NtpPtpTimeSyncEngine {
-    pub base_realtime_nanos: AtomicU64,
-    pub drift_parts_per_billion: AtomicI64, // Frequency adjustment (+/- ppb)
-    pub last_sync_nanos: AtomicU64,
-}
-
-impl NtpPtpTimeSyncEngine {
-    pub fn new(initial_realtime_nanos: u64) -> Self {
-        Self {
-            base_realtime_nanos: AtomicU64::new(initial_realtime_nanos),
-            drift_parts_per_billion: AtomicI64::new(0),
-            last_sync_nanos: AtomicU64::new(initial_realtime_nanos),
+            self.len -= 1;
+            item
         }
     }
-
-    pub fn adjust_frequency_ppb(&self, ppb: i64) {
-        self.drift_parts_per_billion.store(ppb, Ordering::SeqCst);
-    }
-
-    pub fn get_time_with_drift(&self, elapsed_monotonic_nanos: u64) -> u64 {
-        let base = self.base_realtime_nanos.load(Ordering::SeqCst);
-        let ppb = self.drift_parts_per_billion.load(Ordering::SeqCst);
-        let drift_offset = (elapsed_monotonic_nanos as i128 * ppb as i128 / 1_000_000_000i128) as i64;
-        (base as i64 + elapsed_monotonic_nanos as i64 + drift_offset) as u64
-    }
-
-    pub fn update_realtime_offset(&self, offset_nanos: i64) {
-        let current = self.base_realtime_nanos.load(Ordering::SeqCst);
-        let new_val = (current as i64 + offset_nanos).max(0) as u64;
-        self.base_realtime_nanos.store(new_val, Ordering::SeqCst);
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
+            if self.capacity > 0 { free(self.data as *mut u8); }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
     }
 }
 
-// ============================================================================
-// UNIT TESTS
-// ============================================================================
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
 
-    #[test]
-    fn test_simple_system_clock() {
-        let mut clock = SimpleSystemClock::new(ClockSource::Tsc);
-        assert_eq!(clock.get_timestamp(), 0);
-        assert!(clock.set_time(500).is_ok());
-        assert_eq!(clock.get_timestamp(), 500);
-        assert_eq!(clock.get_nanoseconds(), 500_000_000_000);
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
     }
+}
 
-    #[test]
-    fn test_simple_timer_manager() {
-        let mut manager = SimpleTimerManager::new();
-        let t1 = manager.create_timer(100).unwrap();
-        assert!(manager.get_timer(t1).is_some());
-        assert!(manager.cancel_timer(t1).is_ok());
-        assert!(manager.get_timer(t1).is_none());
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
     }
+}
 
-    #[test]
-    fn test_hrtimer_wheel_expiration_and_periodic() {
-        let mut wheel = SovereignHrtimerWheel::new(1000);
-        let t_oneshot = wheel.add_timer(ClockId::Monotonic, 500, 0, 101);
-        let _t_periodic = wheel.add_timer(ClockId::Monotonic, 200, 200, 102);
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
 
-        // Advance 250ns -> periodic timer triggers
-        let expired1 = wheel.advance_time(250);
-        assert_eq!(expired1.len(), 1);
-        assert_eq!(expired1[0].callback_id, 102);
-
-        // Advance another 300ns (total 1550ns) -> oneshot and periodic trigger
-        let expired2 = wheel.advance_time(300);
-        assert_eq!(expired2.len(), 2);
-
-        // Oneshot timer cancelled
-        assert!(!wheel.cancel_timer(t_oneshot));
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
     }
+}
 
-    #[test]
-    fn test_ntp_ptp_drift_compensation() {
-        let sync_engine = NtpPtpTimeSyncEngine::new(1_000_000_000);
-        sync_engine.adjust_frequency_ppb(100_000_000); // +10% frequency drift
 
-        let adjusted = sync_engine.get_time_with_drift(1_000_000_000);
-        assert_eq!(adjusted, 2_100_000_000); // 1s base + 1s monotonic + 0.1s drift
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
     }
 }

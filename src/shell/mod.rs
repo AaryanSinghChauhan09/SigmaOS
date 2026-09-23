@@ -7,22 +7,17 @@ pub mod command;
 pub mod intelligent_terminal;
 pub mod kimi_code_agent;
 pub mod multicall;
-pub mod posix_shell;
 pub mod repl;
 pub mod sigma_sh;
 pub mod sovereign_shell_parity;
 pub mod tech_media_shell_innovations;
 pub mod terminal_emulator;
-pub mod universal_cli_shell_system;
 pub mod zsh_bash_parity;
 
 pub use self::command::{ShellCommand, SimpleShellSession};
 pub use self::sigma_sh::*;
-pub use self::sovereign_shell_parity::*;
-pub use self::universal_cli_shell_system::*;
 pub use self::zsh_bash_parity::*;
 pub use self::repl::ShellRepl;
-pub use posix_shell::{PosixShell, ShellBuiltin, ShellOptions, ShellVar, ShellAlias, HistoryEntry, JobState, ShellJob};
 
 // FFI bindings to Nim SigmaShell
 extern "C" {

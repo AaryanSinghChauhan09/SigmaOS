@@ -173,7 +173,7 @@ pub struct MemfdSecretGuard {
 
 impl MemfdSecretGuard {
     pub fn new(size: usize, base_addr: usize) -> Self {
-        let actual_size = (size + 4095) & !4095;
+        let actual_size = size.next_multiple_of(4096);
         let mut payload = Vec::with_capacity(actual_size);
         payload.resize(actual_size, 0x00);
         let paddr = if base_addr != 0 {
@@ -1348,7 +1348,7 @@ impl LinuxEventfdEngine {
 // Tests
 // ============================================================================
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

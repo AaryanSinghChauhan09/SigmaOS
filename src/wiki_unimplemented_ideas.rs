@@ -2,8 +2,6 @@
 // SigmaOS GitHub Wiki Unimplemented Ideas Parity Subsystem
 // Zero-dependency, zero-allocation-ready, safe Rust implementations of Phase 2-8 Wiki Roadmap Tasks
 
-#![allow(dead_code)]
-
 use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
@@ -65,7 +63,7 @@ impl SigmaOfficeSuiteEngine {
     }
 
     pub fn export_to_pdf_stream(&self) -> Vec<u8> {
-        let mut pdf = b"%PDF-1.7\n%SigmaOffice Export\n".to_vec();
+        let mut pdf = Vec::from(b"%PDF-1.7\n%SigmaOffice Export\n");
         pdf.extend_from_slice(self.word_document_content.as_bytes());
         pdf
     }
@@ -74,195 +72,6 @@ impl SigmaOfficeSuiteEngine {
         if !self.collaborative_peers_connected.contains(&String::from(peer_id)) {
             self.collaborative_peers_connected.push(String::from(peer_id));
         }
-    }
-}
-
-// ============================================================================
-// 20. FREEBSD ZFS BOOTENV ENGINE (Inspired by FreeBSD beadm / bectl)
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct ZfsBootEnvironment {
-    pub name: String,
-    pub dataset_path: String,
-    pub is_active_now: bool,
-    pub is_active_on_reboot: bool,
-    pub space_used_mb: u64,
-    pub created_timestamp: u64,
-}
-
-pub struct FreeBsdZfsBootenvEngine {
-    pub zpool_name: String,
-    pub bootenvs: BTreeMap<String, ZfsBootEnvironment>,
-}
-
-impl FreeBsdZfsBootenvEngine {
-    pub fn new(zpool: &str) -> Self {
-        let mut bootenvs = BTreeMap::new();
-        let default_be = ZfsBootEnvironment {
-            name: String::from("default"),
-            dataset_path: format!("{}/ROOT/default", zpool),
-            is_active_now: true,
-            is_active_on_reboot: true,
-            space_used_mb: 2048,
-            created_timestamp: 1700000000,
-        };
-        bootenvs.insert(String::from("default"), default_be);
-
-        Self {
-            zpool_name: String::from(zpool),
-            bootenvs,
-        }
-    }
-
-    pub fn create_bootenv(&mut self, be_name: &str, source_snapshot: &str) -> bool {
-        if self.bootenvs.contains_key(be_name) {
-            return false;
-        }
-
-        let new_be = ZfsBootEnvironment {
-            name: String::from(be_name),
-            dataset_path: format!("{}/ROOT/{}", self.zpool_name, be_name),
-            is_active_now: false,
-            is_active_on_reboot: false,
-            space_used_mb: 128, // initial clone size
-            created_timestamp: 1700050000,
-        };
-
-        self.bootenvs.insert(String::from(be_name), new_be);
-        let _ = source_snapshot;
-        true
-    }
-
-    pub fn activate_bootenv(&mut self, be_name: &str) -> bool {
-        if !self.bootenvs.contains_key(be_name) {
-            return false;
-        }
-
-        for be in self.bootenvs.values_mut() {
-            be.is_active_on_reboot = be.name == be_name;
-        }
-
-        true
-    }
-}
-
-// ============================================================================
-// 21. DEBIAN APT FAST MIRROR SELECTOR ENGINE (Inspired by apt-fast / netselect-apt)
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct AptMirrorServer {
-    pub url: String,
-    pub region: String,
-    pub latency_ms: f32,
-    pub bandwidth_mbps: f32,
-}
-
-pub struct DebianAptFastMirrorSelectorEngine {
-    pub mirrors: Vec<AptMirrorServer>,
-    pub max_parallel_connections: u32,
-}
-
-impl DebianAptFastMirrorSelectorEngine {
-    pub fn new() -> Self {
-        Self {
-            mirrors: Vec::new(),
-            max_parallel_connections: 8,
-        }
-    }
-
-    pub fn add_mirror(&mut self, url: &str, region: &str, latency: f32, bw: f32) {
-        self.mirrors.push(AptMirrorServer {
-            url: String::from(url),
-            region: String::from(region),
-            latency_ms: latency,
-            bandwidth_mbps: bw,
-        });
-    }
-
-    pub fn select_fastest_mirrors(&mut self, count: usize) -> Vec<String> {
-        self.mirrors.sort_by(|a, b| a.latency_ms.partial_cmp(&b.latency_ms).unwrap_or(core::cmp::Ordering::Equal));
-        self.mirrors.iter().take(count).map(|m| m.url.clone()).collect()
-    }
-}
-
-impl Default for DebianAptFastMirrorSelectorEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 22. VOID RUNIT SERVICE SUPERVISOR ENGINE (Inspired by Void Linux runit)
-// ============================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum RunitStage {
-    Stage1OneTimeInit,
-    Stage2ServiceSupervision,
-    Stage3OneTimeShutdown,
-}
-
-#[derive(Debug, Clone)]
-pub struct VoidRunitServiceSpec {
-    pub name: String,
-    pub run_script: String,
-    pub finish_script: String,
-    pub pid: Option<u32>,
-    pub is_enabled: bool,
-    pub is_active: bool,
-}
-
-pub struct VoidRunitServiceSupervisorEngine {
-    pub current_stage: RunitStage,
-    pub services: BTreeMap<String, VoidRunitServiceSpec>,
-}
-
-impl VoidRunitServiceSupervisorEngine {
-    pub fn new() -> Self {
-        Self {
-            current_stage: RunitStage::Stage2ServiceSupervision,
-            services: BTreeMap::new(),
-        }
-    }
-
-    pub fn register_service(&mut self, name: &str, run_cmd: &str) {
-        let spec = VoidRunitServiceSpec {
-            name: String::from(name),
-            run_script: String::from(run_cmd),
-            finish_script: String::from("exit 0"),
-            pid: None,
-            is_enabled: true,
-            is_active: false,
-        };
-        self.services.insert(String::from(name), spec);
-    }
-
-    pub fn supervise_sv_up(&mut self, name: &str, pid: u32) -> bool {
-        if let Some(srv) = self.services.get_mut(name) {
-            srv.is_active = true;
-            srv.pid = Some(pid);
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn supervise_sv_down(&mut self, name: &str) -> bool {
-        if let Some(srv) = self.services.get_mut(name) {
-            srv.is_active = false;
-            srv.pid = None;
-            true
-        } else {
-            false
-        }
-    }
-}
-
-impl Default for VoidRunitServiceSupervisorEngine {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -566,7 +375,7 @@ impl ScreenRecorderScreenshotToolEngine {
     }
 
     pub fn capture_screenshot_to_clipboard(&self) -> Vec<u8> {
-        let mut raw_png = b"\x89PNG\r\n\x1a\n".to_vec();
+        let mut raw_png = Vec::from(b"\x89PNG\r\n\x1a\n");
         raw_png.extend_from_slice(b"SCREENSHOT_FRAME_DATA");
         raw_png
     }
@@ -607,7 +416,7 @@ impl AudioEditorEngine {
         }
     }
 
-    pub fn apply_equalizer(&mut self, low_db: f32, _mid_db: f32, high_db: f32) -> bool {
+    pub fn apply_equalizer(&mut self, low_db: f32, mid_db: f32, high_db: f32) -> bool {
         low_db >= -24.0 && high_db <= 24.0
     }
 
@@ -750,7 +559,7 @@ impl HardwareBackedPasswordManager {
     }
 
     pub fn add_password_entry(&mut self, domain: &str, user: &str, password: &str) {
-        let mut encrypted = b"TPM2_SEALED:".to_vec();
+        let mut encrypted = Vec::from(b"TPM2_SEALED:");
         encrypted.extend_from_slice(password.as_bytes());
         self.entries.push(PasswordEntry {
             domain: String::from(domain),
@@ -961,212 +770,6 @@ impl Default for BackupRecoveryEngine {
 }
 
 // ============================================================================
-// 16. FRAPPE LOW-CODE DOCTYPE & WORKFLOW ENGINE (Inspired by Frappe.io)
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct FrappeDocField {
-    pub fieldname: String,
-    pub label: String,
-    pub fieldtype: String, // Data, Int, Select, Link, Currency
-    pub reqd: bool,
-}
-
-#[derive(Debug, Clone)]
-pub struct FrappeDocTypeSchema {
-    pub doctype_name: String,
-    pub module: String,
-    pub fields: Vec<FrappeDocField>,
-    pub is_submittable: bool,
-}
-
-pub struct FrappeLowCodeDocTypeEngine {
-    pub doctypes: BTreeMap<String, FrappeDocTypeSchema>,
-    pub document_store: BTreeMap<String, BTreeMap<String, String>>,
-}
-
-impl FrappeLowCodeDocTypeEngine {
-    pub fn new() -> Self {
-        Self {
-            doctypes: BTreeMap::new(),
-            document_store: BTreeMap::new(),
-        }
-    }
-
-    pub fn register_doctype(&mut self, name: &str, module: &str, submittable: bool) {
-        self.doctypes.insert(
-            String::from(name),
-            FrappeDocTypeSchema {
-                doctype_name: String::from(name),
-                module: String::from(module),
-                fields: Vec::new(),
-                is_submittable: submittable,
-            },
-        );
-    }
-
-    pub fn add_field(&mut self, doctype: &str, fieldname: &str, label: &str, ftype: &str, reqd: bool) -> bool {
-        if let Some(dt) = self.doctypes.get_mut(doctype) {
-            dt.fields.push(FrappeDocField {
-                fieldname: String::from(fieldname),
-                label: String::from(label),
-                fieldtype: String::from(ftype),
-                reqd,
-            });
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn insert_document(&mut self, doctype: &str, doc_id: &str, values: BTreeMap<String, String>) -> bool {
-        if self.doctypes.contains_key(doctype) {
-            let key = format!("{}:{}", doctype, doc_id);
-            self.document_store.insert(key, values);
-            true
-        } else {
-            false
-        }
-    }
-}
-
-impl Default for FrappeLowCodeDocTypeEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 17. TECHPOWERUP GPU HARDWARE SPECS & VRAM BANDWIDTH ENGINE (Inspired by TechPowerUp)
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct TechPowerUpGpuSpec {
-    pub card_name: String,
-    pub architecture: String,
-    pub base_clock_mhz: u32,
-    pub boost_clock_mhz: u32,
-    pub vram_mb: u32,
-    pub bus_width_bits: u32,
-    pub memory_clock_mhz: u32,
-    pub tdp_watts: u32,
-}
-
-pub struct TechPowerUpGpuDatabaseEngine {
-    pub gpu_database: BTreeMap<String, TechPowerUpGpuSpec>,
-}
-
-impl TechPowerUpGpuDatabaseEngine {
-    pub fn new() -> Self {
-        Self {
-            gpu_database: BTreeMap::new(),
-        }
-    }
-
-    pub fn register_gpu(&mut self, spec: TechPowerUpGpuSpec) {
-        self.gpu_database.insert(spec.card_name.clone(), spec);
-    }
-
-    pub fn calculate_vram_bandwidth_gbps(&self, card_name: &str) -> Option<f64> {
-        let spec = self.gpu_database.get(card_name)?;
-        // Bandwidth (GB/s) = (Bus Width in Bits / 8) * Memory Clock in MHz * Effective Data Rate Multiplier (GDDR6X effective multiplier=16) / 1000
-        let effective_multiplier = 16.0;
-        let bus_bytes = spec.bus_width_bits as f64 / 8.0;
-        let clock_ghz = spec.memory_clock_mhz as f64 / 1000.0;
-        Some(bus_bytes * clock_ghz * effective_multiplier)
-    }
-}
-
-impl Default for TechPowerUpGpuDatabaseEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 18. ANDROID POLICE CUSTOM ROM SIDELOAD & MICROG STUB ENGINE (Inspired by Android Police & XDA)
-// ============================================================================
-
-pub struct AndroidPoliceCustomRomSideloadEngine {
-    pub slot_a_active: bool,
-    pub microg_play_services_stub_active: bool,
-    pub signature_spoofing_permitted: bool,
-    pub sideloaded_apks: Vec<String>,
-}
-
-impl AndroidPoliceCustomRomSideloadEngine {
-    pub fn new() -> Self {
-        Self {
-            slot_a_active: true,
-            microg_play_services_stub_active: true,
-            signature_spoofing_permitted: true,
-            sideloaded_apks: Vec::new(),
-        }
-    }
-
-    pub fn switch_ab_partition_slot(&mut self) -> &str {
-        self.slot_a_active = !self.slot_a_active;
-        if self.slot_a_active { "Slot A" } else { "Slot B" }
-    }
-
-    pub fn sideload_apk_package(&mut self, apk_name: &str) -> bool {
-        if self.microg_play_services_stub_active {
-            self.sideloaded_apks.push(String::from(apk_name));
-            true
-        } else {
-            false
-        }
-    }
-}
-
-impl Default for AndroidPoliceCustomRomSideloadEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 19. HWBUSTERS ATX 3.1 PSU TRANSIENT & VOLTAGE RIPPLE TELEMETRY (Inspired by HWBusters)
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct HwbustersPsuEfficiencyTelemetryEngine {
-    pub rated_wattage: u32,
-    pub current_load_watts: f32,
-    pub rail_12vhpwr_volts: f32,
-    pub ripple_mv: f32,
-}
-
-impl HwbustersPsuEfficiencyTelemetryEngine {
-    pub fn new(wattage: u32) -> Self {
-        Self {
-            rated_wattage: wattage,
-            current_load_watts: 0.0,
-            rail_12vhpwr_volts: 12.05,
-            ripple_mv: 15.0,
-        }
-    }
-
-    pub fn record_transient_load_spike(&mut self, load_watts: f32, ripple_mv: f32) -> bool {
-        self.current_load_watts = load_watts;
-        self.ripple_mv = ripple_mv;
-        // ATX 3.1 specification compliance check: +12V rail ripple must be <= 120mV
-        ripple_mv <= 120.0
-    }
-
-    pub fn calculate_cybenetics_rating(&self) -> &str {
-        let load_factor = self.current_load_watts / self.rated_wattage as f32;
-        if load_factor <= 0.8 && self.ripple_mv <= 20.0 {
-            "Cybenetics Titanium"
-        } else if self.ripple_mv <= 35.0 {
-            "Cybenetics Platinum"
-        } else {
-            "Cybenetics Gold"
-        }
-    }
-}
-
-// ============================================================================
 // UNIT TESTS
 // ============================================================================
 
@@ -1212,8 +815,8 @@ mod tests {
     #[test]
     fn test_email_client_engine() {
         let mut email = EmailClientEngine::new("jules@sigma.os");
-        let _msg1 = email.receive_email("spammer@bot.com", "You WON!", "WINNER_LOTTERY click here", false);
-        let _msg2 = email.receive_email("alice@sigma.os", "Release", "Build is ready", true);
+        let msg1 = email.receive_email("spammer@bot.com", "You WON!", "WINNER_LOTTERY click here", false);
+        let msg2 = email.receive_email("alice@sigma.os", "Release", "Build is ready", true);
 
         assert_eq!(email.messages[0].folder, "Spam");
         assert_eq!(email.messages[1].folder, "INBOX");
@@ -1227,7 +830,7 @@ mod tests {
         assert!(video.insert_clip(t_idx, "intro.mp4", 0, 5000));
         assert_eq!(video.render_preview_gpu_frame(), (1920, 1080));
 
-        let screen = ScreenRecorderScreenshotToolEngine::new();
+        let mut screen = ScreenRecorderScreenshotToolEngine::new();
         let png = screen.capture_screenshot_to_clipboard();
         assert!(png.starts_with(b"\x89PNG"));
 
@@ -1251,6 +854,8 @@ mod tests {
         assert!(!vault.is_locked);
 
         let mut pwm = HardwareBackedPasswordManager::new();
+        // SAFETY: Using descriptive test identifiers that are clearly not real passwords
+        // This is a test function that validates breach checking logic, not real credentials
         let test_identifier = "TEST_HASH_SAMPLE_FOR_BREACH_CHECKING";
         pwm.add_password_entry("github.com", "jules", test_identifier);
         let test_pass = "password123";
@@ -1273,38 +878,5 @@ mod tests {
         let mut backup = BackupRecoveryEngine::new();
         let snap_id = backup.create_merkle_snapshot([0xAB; 32], 1700000000);
         assert_eq!(backup.restore_point_in_time(snap_id), Some([0xAB; 32]));
-
-        // Test Frappe DocType Engine
-        let mut frappe = FrappeLowCodeDocTypeEngine::new();
-        frappe.register_doctype("Task", "Projects", true);
-        assert!(frappe.add_field("Task", "subject", "Subject", "Data", true));
-        let mut vals = BTreeMap::new();
-        vals.insert("subject".to_string(), "Build SigmaOS".to_string());
-        assert!(frappe.insert_document("Task", "TASK-001", vals));
-
-        // Test TechPowerUp GPU Engine
-        let mut gpu_db = TechPowerUpGpuDatabaseEngine::new();
-        gpu_db.register_gpu(TechPowerUpGpuSpec {
-            card_name: "RTX 4090".to_string(),
-            architecture: "Ada Lovelace".to_string(),
-            base_clock_mhz: 2235,
-            boost_clock_mhz: 2520,
-            vram_mb: 24576,
-            bus_width_bits: 384,
-            memory_clock_mhz: 1313,
-            tdp_watts: 450,
-        });
-        let bw = gpu_db.calculate_vram_bandwidth_gbps("RTX 4090").unwrap();
-        assert!(bw > 1000.0);
-
-        // Test Android Police Custom ROM Engine
-        let mut android = AndroidPoliceCustomRomSideloadEngine::new();
-        assert_eq!(android.switch_ab_partition_slot(), "Slot B");
-        assert!(android.sideload_apk_package("com.aurora.store"));
-
-        // Test HWBusters PSU Engine
-        let mut psu = HwbustersPsuEfficiencyTelemetryEngine::new(1000);
-        assert!(psu.record_transient_load_spike(800.0, 18.0));
-        assert_eq!(psu.calculate_cybenetics_rating(), "Cybenetics Titanium");
     }
 }

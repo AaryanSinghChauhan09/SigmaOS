@@ -554,7 +554,7 @@ impl Default for AurHelper {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

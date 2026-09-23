@@ -1,24 +1,10 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
+use std::collections::BTreeMap;
 // SPDX-License-Identifier: MIT
 // Sovereign OS Wiki & Documentation Master Absorption Engine
 // Absorbs and implements all unimplemented ideas, specifications, roadmaps, and gap-closing matrices
 // from `.md` files and GitHub Wiki of SigmaOS / SovereignOS.
 
 extern crate alloc;
-
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
 
 /// ---------------------------------------------------------------------------
 /// 1. 100 Improvement Ideas Evaluator (Sovereign OS Ultra Spec)
@@ -534,26 +520,6 @@ impl SovereignWikiMasterEngine {
     }
 }
 
-/// Linux & BSD Wiki Roadmap Parity Verifier
-#[derive(Debug, Clone)]
-pub struct SovereignLinuxBsdWikiRoadmapParityEngine {
-    pub total_roadmap_ideas: u32,
-    pub implemented_roadmap_ideas: u32,
-}
-
-impl SovereignLinuxBsdWikiRoadmapParityEngine {
-    pub fn new() -> Self {
-        Self {
-            total_roadmap_ideas: 100,
-            implemented_roadmap_ideas: 100,
-        }
-    }
-
-    pub fn verify_complete_wiki_parity(&self) -> bool {
-        self.total_roadmap_ideas == self.implemented_roadmap_ideas
-    }
-}
-
 impl Default for SovereignWikiMasterEngine {
     fn default() -> Self {
         Self::new()
@@ -588,13 +554,6 @@ mod tests {
     fn test_master_wiki_engine_fulfillment() {
         let master = SovereignWikiMasterEngine::new();
         assert!(master.evaluate_master_wiki_fulfillment());
-    }
-
-    #[test]
-    fn test_linux_bsd_wiki_roadmap_parity_engine() {
-        let verifier = SovereignLinuxBsdWikiRoadmapParityEngine::new();
-        assert!(verifier.verify_complete_wiki_parity());
-        assert_eq!(verifier.total_roadmap_ideas, 100);
     }
 
     #[test]

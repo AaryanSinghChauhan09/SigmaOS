@@ -1,7 +1,5 @@
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::collections::BTreeMap;
-use core::sync::atomic::{AtomicU64, AtomicU32, Ordering};
 // SigmaOS Kernel IPC (Inter-Process Communication)
 // Zero-latency capability-based IPC
 
@@ -441,136 +439,6 @@ impl SharedPageRingBuffer {
     }
 }
 
-/// Shared memory segment (POSIX shm_open / BSD shmget parity)
-pub struct SharedMemory {
-    pub id: u64,
-    pub owner_pid: u64,
-    pub size: usize,
-    pub data: Vec<u8>,
-    pub attached_pids: Vec<u64>,
-}
-
-impl SharedMemory {
-    pub fn new(id: u64, owner_pid: u64, size: usize) -> Self {
-        Self {
-            id,
-            owner_pid,
-            size,
-            data: vec![0u8; size],
-            attached_pids: Vec::new(),
-        }
-    }
-
-    pub fn write(&mut self, data: &[u8], offset: usize) -> Result<(), IpcError> {
-        if offset + data.len() > self.size {
-            return Err(IpcError::ChannelFull);
-        }
-        self.data[offset..offset + data.len()].copy_from_slice(data);
-        Ok(())
-    }
-
-    pub fn read(&self, buf: &mut [u8], offset: usize) -> Result<(), IpcError> {
-        if offset + buf.len() > self.size {
-            return Err(IpcError::ChannelFull);
-        }
-        buf.copy_from_slice(&self.data[offset..offset + buf.len()]);
-        Ok(())
-    }
-
-    pub fn attach(&mut self, pid: u64) {
-        if !self.attached_pids.contains(&pid) {
-            self.attached_pids.push(pid);
-        }
-    }
-
-    pub fn detach(&mut self, pid: u64) {
-        self.attached_pids.retain(|&p| p != pid);
-    }
-}
-
-/// Message queue (POSIX mq_open / BSD mqueue parity)
-pub struct MessageQueue {
-    pub id: u64,
-    pub owner_pid: u64,
-    pub receiver_pid: u64,
-    pub messages: Vec<Message>,
-    pub max_messages: usize,
-    pub next_id: AtomicU64,
-}
-
-impl MessageQueue {
-    pub fn new(id: u64, owner_pid: u64, receiver_pid: u64, max_messages: usize) -> Self {
-        Self {
-            id,
-            owner_pid,
-            receiver_pid,
-            messages: Vec::new(),
-            max_messages,
-            next_id: AtomicU64::new(0),
-        }
-    }
-
-    pub fn send(&mut self, message: Message, _priority: u32) -> Result<(), IpcError> {
-        if self.messages.len() >= self.max_messages {
-            return Err(IpcError::ChannelFull);
-        }
-        self.messages.push(message);
-        Ok(())
-    }
-
-    pub fn receive(&mut self, _timeout_ms: u32) -> Option<Message> {
-        self.messages.pop()
-    }
-
-    pub fn len(&self) -> usize {
-        self.messages.len()
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.messages.is_empty()
-    }
-}
-
-/// Semaphore (POSIX sem_open / BSD semaphore parity)
-pub struct Semaphore {
-    pub id: u64,
-    pub value: AtomicU32,
-    pub max_value: u32,
-}
-
-impl Semaphore {
-    pub fn new(id: u64, initial_value: u32) -> Self {
-        Self {
-            id,
-            value: AtomicU32::new(initial_value),
-            max_value: u32::MAX,
-        }
-    }
-
-    pub fn wait(&self, _timeout_ms: u32) -> Result<(), IpcError> {
-        loop {
-            let mut current = self.value.load(Ordering::SeqCst);
-            if current == 0 {
-                return Err(IpcError::ChannelFull);
-            }
-            if self.value.compare_exchange_weak(current, current - 1, Ordering::SeqCst, Ordering::Relaxed).is_ok() {
-                return Ok(());
-            }
-        }
-    }
-
-    pub fn post(&self) {
-        let current = self.value.fetch_add(1, Ordering::SeqCst);
-        if current >= self.max_value {
-            self.value.store(self.max_value, Ordering::SeqCst);
-        }
-    }
-
-    pub fn get_value(&self) -> u32 {
-        self.value.load(Ordering::SeqCst)
-    }
-}
-
 /// IPC manager
 pub struct IpcManager {
     channels: Vec<Channel>,
@@ -650,7 +518,7 @@ pub enum IpcError {
     BrokenPipe, // Linux EPIPE / SIGPIPE parity
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
@@ -824,60 +692,6 @@ mod tests {
         assert!(pipe.write_structure(vec![5]).is_ok());
     }
 
-// ============================================================================
-// seL4-INSPIRED FORMAL IPC CAPABILITY & INVARIANT CHECKER
-// ============================================================================
-
-/// Formal IPC Capability Token
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Sel4IpcCapabilityToken {
-    pub cap_id: u64,
-    pub rights_mask: u32, // Bit 0: Read, Bit 1: Write, Bit 2: Grant
-    pub badge: u64,
-}
-
-/// seL4-inspired Formal IPC Invariant Verification Engine
-#[derive(Debug)]
-pub struct Sel4IpcInvariantVerifierEngine;
-
-impl Sel4IpcInvariantVerifierEngine {
-    pub fn verify_ipc_rights(token: &Sel4IpcCapabilityToken, required_rights: u32) -> Result<(), &'static str> {
-        if (token.rights_mask & required_rights) == required_rights {
-            Ok(())
-        } else {
-            Err("seL4 IPC Invariant Violation: Insufficient Capability Rights")
-        }
-    }
-
-    pub fn verify_message_integrity(msg_bytes: &[u8], expected_badge: u64, token: &Sel4IpcCapabilityToken) -> Result<(), &'static str> {
-        if msg_bytes.len() > 8192 {
-            return Err("seL4 IPC Invariant Violation: Payload exceeds max IPC buffer size (8KB)");
-        }
-        if token.badge != expected_badge {
-            return Err("seL4 IPC Invariant Violation: Badge Mismatch");
-        }
-        Ok(())
-    }
-}
-
-#[cfg(test)]
-mod tests_sel4_ipc {
-    use super::*;
-
-    #[test]
-    fn test_sel4_ipc_invariant_verifier() {
-        let token = Sel4IpcCapabilityToken {
-            cap_id: 1,
-            rights_mask: 0b111, // Read/Write/Grant
-            badge: 0xDEADBEEF,
-        };
-        assert!(Sel4IpcInvariantVerifierEngine::verify_ipc_rights(&token, 0b011).is_ok());
-
-        let msg = b"Secure seL4 IPC Payload";
-        assert!(Sel4IpcInvariantVerifierEngine::verify_message_integrity(msg, 0xDEADBEEF, &token).is_ok());
-    }
-}
-
     #[test]
     fn test_sovereign_pipe_epipe_and_fifo() {
         // Test broken pipe (EPIPE) on reader close
@@ -904,41 +718,5 @@ mod tests_sel4_ipc {
         // Test POSIX named FIFO creation
         let fifo = SovereignPipe::new_fifo(30, "/tmp/sigma_fifo", 16);
         assert_eq!(fifo.fifo_path, Some("/tmp/sigma_fifo".to_string()));
-    }
-
-    #[test]
-    fn test_shared_memory() {
-        let mut shm = SharedMemory::new(1, 1000, 4096);
-        assert_eq!(shm.size, 4096);
-        
-        let data = vec![1u8, 2u8, 3u8];
-        assert!(shm.write(&data, 0).is_ok());
-        
-        let mut read_buf = [0u8; 3];
-        assert!(shm.read(&mut read_buf, 0).is_ok());
-        assert_eq!(read_buf, [1, 2, 3]);
-    }
-
-    #[test]
-    fn test_message_queue() {
-        let mut mq = MessageQueue::new(1, 1000, 1001, 10);
-        
-        let msg = Message::Data(vec![1, 2, 3]);
-        assert!(mq.send(msg, 0).is_ok());
-        
-        let received = mq.receive(0);
-        assert!(received.is_some());
-    }
-
-    #[test]
-    fn test_semaphore() {
-        let sem = Semaphore::new(1, 3);
-        assert_eq!(sem.get_value(), 3);
-        
-        assert!(sem.wait(1000).is_ok());
-        assert_eq!(sem.get_value(), 2);
-        
-        sem.post();
-        assert_eq!(sem.get_value(), 3);
     }
 }

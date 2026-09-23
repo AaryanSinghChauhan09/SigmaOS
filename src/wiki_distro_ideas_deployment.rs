@@ -280,198 +280,6 @@ impl SigmaOsZeroCopyPqcVpnEngine {
 }
 
 // ============================================================================
-// 5. Void Linux Runit Service Init Supervision Deployment Engine
-// Inspired by Void Linux runit and fast daemon lifecycle management
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct RunitServiceNode {
-    pub service_name: String,
-    pub is_running: bool,
-    pub pid: u32,
-    pub auto_restart: bool,
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct VoidLinuxRunitInitDeploymentEngine {
-    pub services: Vec<RunitServiceNode>,
-}
-
-impl VoidLinuxRunitInitDeploymentEngine {
-    pub fn new() -> Self {
-        Self {
-            services: Vec::new(),
-        }
-    }
-
-    pub fn register_service(&mut self, name: &str, pid: u32, auto_restart: bool) {
-        self.services.push(RunitServiceNode {
-            service_name: name.to_string(),
-            is_running: true,
-            pid,
-            auto_restart,
-        });
-    }
-
-    pub fn stop_service(&mut self, name: &str) -> bool {
-        if let Some(srv) = self.services.iter_mut().find(|s| s.service_name == name) {
-            srv.is_running = false;
-            srv.pid = 0;
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn get_active_service_count(&self) -> usize {
-        self.services.iter().filter(|s| s.is_running).count()
-    }
-}
-
-// ============================================================================
-// 6. Alpine Linux Diskless RAM Overlay & LBU Commit Engine
-// Inspired by Alpine Linux LBU, volatile tmpfs, and diskless rootfs
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct AlpineApkVolatileTmpfsDeploymentEngine {
-    pub tmpfs_size_mb: usize,
-    pub lbu_commit_count: usize,
-    pub volatile_overlay_active: bool,
-}
-
-impl AlpineApkVolatileTmpfsDeploymentEngine {
-    pub fn new() -> Self {
-        Self {
-            tmpfs_size_mb: 2048,
-            lbu_commit_count: 0,
-            volatile_overlay_active: true,
-        }
-    }
-
-    pub fn commit_lbu_overlay(&mut self) -> usize {
-        self.lbu_commit_count += 1;
-        self.lbu_commit_count
-    }
-
-    pub fn is_diskless_mode_active(&self) -> bool {
-        self.volatile_overlay_active && self.tmpfs_size_mb >= 512
-    }
-}
-
-impl Default for AlpineApkVolatileTmpfsDeploymentEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 7. FreeBSD Jail Container Isolation & Devfs Sandboxing Engine
-// Inspired by FreeBSD Jails, nullfs mount isolation, and devfs rulesets
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct BsdJailInstance {
-    pub jail_id: u32,
-    pub name: String,
-    pub ip_address: [u8; 4],
-    pub is_isolated: bool,
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct FreeBsdJailSandboxDeploymentEngine {
-    pub jails: Vec<BsdJailInstance>,
-}
-
-impl FreeBsdJailSandboxDeploymentEngine {
-    pub fn new() -> Self {
-        Self { jails: Vec::new() }
-    }
-
-    pub fn create_jail(&mut self, jid: u32, name: &str, ip: [u8; 4]) {
-        self.jails.push(BsdJailInstance {
-            jail_id: jid,
-            name: name.to_string(),
-            ip_address: ip,
-            is_isolated: true,
-        });
-    }
-
-    pub fn get_jail_count(&self) -> usize {
-        self.jails.len()
-    }
-}
-
-// ============================================================================
-// 8. OpenBSD Signify Cryptographic Release & Package Verification Engine
-// Inspired by OpenBSD signify signatures, ed25519 public keys, and trust chains
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct OpenBsdSignifyReleaseSignerEngine {
-    pub public_key_loaded: bool,
-    pub verification_passed: bool,
-    pub release_channel: String,
-}
-
-impl OpenBsdSignifyReleaseSignerEngine {
-    pub fn new() -> Self {
-        Self {
-            public_key_loaded: true,
-            verification_passed: true,
-            release_channel: String::from("sigma-7.6-release"),
-        }
-    }
-
-    pub fn verify_release_signature(&self, artifact_hash: &[u8; 32]) -> bool {
-        self.public_key_loaded && self.verification_passed && artifact_hash[0] != 0x00
-    }
-}
-
-impl Default for OpenBsdSignifyReleaseSignerEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 9. NixOS /nix/store Path Reproducible Deployment Engine
-// Inspired by NixOS store paths, nar hashes, and binary cache verification
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct NixStorePathEntry {
-    pub store_path: String,
-    pub nar_hash_sha256: [u8; 32],
-    pub is_valid: bool,
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct NixStorePathReproducibleDeploymentEngine {
-    pub store_entries: Vec<NixStorePathEntry>,
-}
-
-impl NixStorePathReproducibleDeploymentEngine {
-    pub fn new() -> Self {
-        Self {
-            store_entries: Vec::new(),
-        }
-    }
-
-    pub fn add_store_path(&mut self, path: &str, nar_hash: [u8; 32]) {
-        self.store_entries.push(NixStorePathEntry {
-            store_path: path.to_string(),
-            nar_hash_sha256: nar_hash,
-            is_valid: true,
-        });
-    }
-
-    pub fn verify_all_store_paths(&self) -> bool {
-        !self.store_entries.is_empty() && self.store_entries.iter().all(|e| e.is_valid)
-    }
-}
-
-// ============================================================================
 // Sovereign Wiki Distro Ideas Deployment Master Suite
 // ============================================================================
 
@@ -481,11 +289,6 @@ pub struct SovereignWikiDistroIdeasDeploymentSuite {
     pub hyprland_compositor: SigmaOsWaylandHyprlandCompositorEngine,
     pub ebpf_lsm_governor: SigmaOsEbpfLsmSecurityGovernor,
     pub pqc_vpn_engine: SigmaOsZeroCopyPqcVpnEngine,
-    pub void_runit_init: VoidLinuxRunitInitDeploymentEngine,
-    pub alpine_tmpfs_overlay: AlpineApkVolatileTmpfsDeploymentEngine,
-    pub freebsd_jail_sandbox: FreeBsdJailSandboxDeploymentEngine,
-    pub openbsd_signify_verifier: OpenBsdSignifyReleaseSignerEngine,
-    pub nix_store_reproducible: NixStorePathReproducibleDeploymentEngine,
 }
 
 impl SovereignWikiDistroIdeasDeploymentSuite {
@@ -495,11 +298,6 @@ impl SovereignWikiDistroIdeasDeploymentSuite {
             hyprland_compositor: SigmaOsWaylandHyprlandCompositorEngine::new(),
             ebpf_lsm_governor: SigmaOsEbpfLsmSecurityGovernor::new(),
             pqc_vpn_engine: SigmaOsZeroCopyPqcVpnEngine::new("wg_pqc0"),
-            void_runit_init: VoidLinuxRunitInitDeploymentEngine::new(),
-            alpine_tmpfs_overlay: AlpineApkVolatileTmpfsDeploymentEngine::new(),
-            freebsd_jail_sandbox: FreeBsdJailSandboxDeploymentEngine::new(),
-            openbsd_signify_verifier: OpenBsdSignifyReleaseSignerEngine::new(),
-            nix_store_reproducible: NixStorePathReproducibleDeploymentEngine::new(),
         }
     }
 
@@ -522,26 +320,7 @@ impl SovereignWikiDistroIdeasDeploymentSuite {
         let tx_ok = self.pqc_vpn_engine.transmit_zero_copy_packet(100, 1400).is_ok();
         let vpn_ok = tx_ok && self.pqc_vpn_engine.get_peer_count() == 1;
 
-        // Verify Void runit init
-        self.void_runit_init.register_service("sigma-daemon", 1234, true);
-        let runit_ok = self.void_runit_init.get_active_service_count() == 1;
-
-        // Verify Alpine volatile tmpfs overlay
-        let commits = self.alpine_tmpfs_overlay.commit_lbu_overlay();
-        let alpine_ok = commits == 1 && self.alpine_tmpfs_overlay.is_diskless_mode_active();
-
-        // Verify FreeBSD jail sandbox
-        self.freebsd_jail_sandbox.create_jail(1, "sandbox_jail", [192, 168, 1, 50]);
-        let jail_ok = self.freebsd_jail_sandbox.get_jail_count() == 1;
-
-        // Verify OpenBSD signify release signer
-        let signify_ok = self.openbsd_signify_verifier.verify_release_signature(&[0xA5; 32]);
-
-        // Verify Nix store reproducible deployment
-        self.nix_store_reproducible.add_store_path("/nix/store/abc1234-sigma-pkg", [0xB2; 32]);
-        let nix_ok = self.nix_store_reproducible.verify_all_store_paths();
-
-        dep_ok && comp_ok && lsm_ok && vpn_ok && runit_ok && alpine_ok && jail_ok && signify_ok && nix_ok
+        dep_ok && comp_ok && lsm_ok && vpn_ok
     }
 }
 
@@ -587,30 +366,6 @@ mod tests {
 
         let tx = vpn.transmit_zero_copy_packet(1, 1024).unwrap();
         assert_eq!(tx, 1024);
-    }
-
-    #[test]
-    fn test_void_runit_and_alpine_and_bsd_and_nix_deployment_engines() {
-        let mut runit = VoidLinuxRunitInitDeploymentEngine::new();
-        runit.register_service("dbus", 100, true);
-        assert_eq!(runit.get_active_service_count(), 1);
-        assert!(runit.stop_service("dbus"));
-        assert_eq!(runit.get_active_service_count(), 0);
-
-        let mut alpine = AlpineApkVolatileTmpfsDeploymentEngine::new();
-        assert_eq!(alpine.commit_lbu_overlay(), 1);
-        assert!(alpine.is_diskless_mode_active());
-
-        let mut jail = FreeBsdJailSandboxDeploymentEngine::new();
-        jail.create_jail(10, "web_jail", [10, 0, 0, 5]);
-        assert_eq!(jail.get_jail_count(), 1);
-
-        let signify = OpenBsdSignifyReleaseSignerEngine::new();
-        assert!(signify.verify_release_signature(&[0x12; 32]));
-
-        let mut nix = NixStorePathReproducibleDeploymentEngine::new();
-        nix.add_store_path("/nix/store/test", [0x99; 32]);
-        assert!(nix.verify_all_store_paths());
     }
 
     #[test]

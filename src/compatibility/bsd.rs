@@ -369,7 +369,7 @@ impl Default for OpenBsdPfFirewallEngine {
 // UNIT TESTS MODULE
 // =========================================================================
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

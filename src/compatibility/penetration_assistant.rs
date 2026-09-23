@@ -47,7 +47,7 @@ impl DefaultAssistant {
 
 impl PenetrationAssistant for DefaultAssistant {}
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

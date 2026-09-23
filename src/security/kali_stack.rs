@@ -261,7 +261,7 @@ impl DmesgLog {
 
         // Safe mock mapping in circular ring
         unsafe {
-            let buffer_ptr = core::ptr::addr_of!(self.buffer) as *mut u8;
+            let buffer_ptr = (&raw const self.buffer) as *mut u8;
             for i in 0..len {
                 let idx = (start + i) % 512;
                 core::ptr::write(buffer_ptr.add(idx), message[i]);

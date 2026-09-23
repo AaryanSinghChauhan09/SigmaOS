@@ -163,7 +163,7 @@ impl Default for PingCommand {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

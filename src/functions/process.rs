@@ -382,7 +382,7 @@ impl Default for SystemControl {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

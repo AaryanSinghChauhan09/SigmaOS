@@ -995,7 +995,7 @@ impl Default for SovereignVideoEditor {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

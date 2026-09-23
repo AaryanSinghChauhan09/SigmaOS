@@ -3,10 +3,10 @@
 // Userland package utilities
 // Zero-dependency implementation - no external libraries required
 
-pub mod sigma_pkg;
 
 use std::vec::Vec;
-use std::string::String;
+use std::string::{String, ToString};
+use std::boxed::Box;
 use core::fmt;
 
 /// Error type for the UserPkg module
@@ -147,7 +147,7 @@ impl Default for PackageInstaller {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     

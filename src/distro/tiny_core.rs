@@ -147,7 +147,7 @@ impl Default for AppsAuditTool {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

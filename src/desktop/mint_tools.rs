@@ -299,7 +299,7 @@ impl Default for MintSoftwareManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

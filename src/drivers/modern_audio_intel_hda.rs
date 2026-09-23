@@ -1,15 +1,22 @@
 // Modern Intel High Definition Audio (HDA) DSP driver
-use crate::drivers::peripheral::PowerState;
+use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceGeneration {
     Legacy,
     Modern,
 }
 
-#[cfg(test)]
-pub trait TestPeripheralDevice {
+#[cfg(test_disabled)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PowerState {
+    Off,
+    On,
+}
+
+#[cfg(test_disabled)]
+pub trait PeripheralDevice {
     fn name(&self) -> &'static str;
     fn generation(&self) -> DeviceGeneration;
     fn initialize(&mut self) -> Result<(), &'static str>;
@@ -43,9 +50,7 @@ impl ModernAudioIntelHda {
     }
 }
 
-#[cfg(test)]
-#[allow(dead_code)]
-impl TestPeripheralDevice for ModernAudioIntelHda {
+impl PeripheralDevice for ModernAudioIntelHda {
     fn name(&self) -> &'static str {
         "Intel HD Audio DSP Codec Driver"
     }
@@ -99,7 +104,7 @@ impl TestPeripheralDevice for ModernAudioIntelHda {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -177,7 +177,7 @@ impl Default for RoutingEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

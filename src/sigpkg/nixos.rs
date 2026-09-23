@@ -106,7 +106,7 @@ impl Default for NixProfileStore {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

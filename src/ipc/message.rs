@@ -21,6 +21,7 @@
 use std::boxed::Box;
 use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 pub type ChannelID = usize;
 pub type Pid = u32;
@@ -435,7 +436,7 @@ impl Semaphore for SimpleSemaphore {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

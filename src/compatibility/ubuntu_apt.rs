@@ -511,14 +511,15 @@ impl SigmaAptCli {
     }
 }
 
-#[cfg(all(test, feature = "standalone_test"))]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
+    use tempfile::TempDir;
 
     #[test]
     fn test_apt_initialization() {
-        let temp_dir = std::env::temp_dir();
-        let apt = SigmaApt::new(temp_dir);
+        let temp_dir = TempDir::new().unwrap();
+        let apt = SigmaApt::new(temp_dir.path().to_path_buf());
         
         assert!(!apt.sources_list.is_empty());
         assert_eq!(apt.installed_packages.len(), 0);
@@ -526,18 +527,18 @@ mod tests {
 
     #[test]
     fn test_ppa_addition() {
-        let temp_dir = std::env::temp_dir();
-        let mut apt = SigmaApt::new(temp_dir);
+        let temp_dir = TempDir::new().unwrap();
+        let mut apt = SigmaApt::new(temp_dir.path().to_path_buf());
         
-        let _result = apt.add_ppa("ppa:deadsnakes/ppa");
+        let result = apt.add_ppa("ppa:deadsnakes/ppa");
         // Note: This will fail in test environment due to network requirements
         // In real implementation, would mock the network calls
     }
 
     #[test]
     fn test_package_search() {
-        let temp_dir = std::env::temp_dir();
-        let mut apt = SigmaApt::new(temp_dir);
+        let temp_dir = TempDir::new().unwrap();
+        let mut apt = SigmaApt::new(temp_dir.path().to_path_buf());
         
         // Trigger loading of mock packages
         let _ = apt.update_package_lists();

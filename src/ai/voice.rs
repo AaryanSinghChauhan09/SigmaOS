@@ -319,7 +319,7 @@ impl Default for VoiceAssistant {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

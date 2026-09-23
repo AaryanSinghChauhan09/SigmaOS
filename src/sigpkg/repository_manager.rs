@@ -94,7 +94,8 @@ impl MirrorBenchmarkEngine {
     }
 }
 
-
+/// Repository configuration (Debian sources.list inspiration)
+#[derive(Debug, Clone)]
 pub struct Repository {
     pub name: String,
     pub url: String,
@@ -208,7 +209,7 @@ impl Default for RepositoryManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

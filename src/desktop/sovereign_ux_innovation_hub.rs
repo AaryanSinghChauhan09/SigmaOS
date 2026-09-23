@@ -1,10 +1,13 @@
 // SigmaOS Sovereign UX Innovation Hub
 // Inspired by leading open-source & OS tech publications (It's FOSS, 9to5Linux, Phoronix, MakeUseOf, How-To Geek, XDA, WindowsLatest, etc.)
-// Std-based implementation with zero external dependencies.
+// Pure #![no_std] compliant implementation with zero external dependencies using alloc primitives.
 
-use std::format;
-use std::string::{String, ToString};
-use std::vec::Vec;
+#![no_std]
+extern crate alloc;
+
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 /// 1. It's FOSS / MakeUseOf Inspired Quick Share & Timeshift Snapshot HUD
 /// Combines LocalSend/Warpinator peer-to-peer LAN transfers with Timeshift system restore snapshots.

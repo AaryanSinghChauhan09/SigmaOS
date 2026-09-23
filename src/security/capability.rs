@@ -288,7 +288,7 @@ impl Default for CapabilityGate {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

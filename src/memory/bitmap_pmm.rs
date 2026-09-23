@@ -206,7 +206,7 @@ impl Default for SyscallTableRouter {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

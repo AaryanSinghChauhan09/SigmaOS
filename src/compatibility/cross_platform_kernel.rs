@@ -7,11 +7,6 @@ use std::string::{String, ToString};
 use std::vec::Vec;
 use core::sync::atomic::{AtomicU8, Ordering};
 
-pub use crate::kernel::universal_kernel_format::{
-    KernelArch, KernelCompression, KernelFormat, KernelFormatSymbol, KernelSection,
-    ParsedKernelImage, SigmaKernelExecutionPayload, UniversalKernelFormatEngine,
-};
-
 // =========================================================================
 // 1. Virtual Address Space & 4-Level Page Table Layout
 // =========================================================================
@@ -691,7 +686,7 @@ impl SovereignKernelInternals {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

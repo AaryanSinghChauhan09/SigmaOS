@@ -3,8 +3,6 @@
 pub mod architecture;
 pub mod atomic_extended;
 pub mod cgroup_v2;
-pub mod cgroup_v2_controllers;
-pub use cgroup_v2_controllers::{CgroupController, CgroupControllerConfig, CgroupStats, CgroupV2, CgroupV2Manager};
 pub mod kqueue_event;
 pub mod cgroup_controllers;
 pub mod block_dev;
@@ -21,13 +19,8 @@ pub mod cpu_features;
 pub mod cpufreq;
 pub mod device;
 pub mod driver;
-pub mod drivers;
-pub mod drm;
 pub mod dtrace_compat;
 pub mod ebpf;
-pub mod structures;
-pub mod virtual_cpu;
-pub mod vmm_paging;
 pub mod ebpf_vm;
 pub mod ebpf_verification;
 pub mod exports;
@@ -37,147 +30,8 @@ pub mod generation_manager;
 pub mod io_uring;
 pub mod ipc;
 pub mod kqueue;
-pub mod livepatch;
-pub mod lockdep;
-pub mod module_loader;
-pub mod ebpf_program;
-pub mod cgroups;
-pub mod kobject;
-pub mod ftrace;
-pub mod perf;
-pub mod seccomp;
-pub mod iommu;
-pub mod interrupt;
-pub mod panic_nvram;
 pub mod linux_absorb;
-pub mod ebpf_jit;
-pub use ebpf_jit::*;
-pub mod elf_loader;
-pub use elf_loader::*;
-pub mod hypervisor;
-pub use hypervisor::*;
-pub mod preempt_rt;
-pub use preempt_rt::*;
-pub mod drm_gem;
-pub use drm_gem::*;
-pub mod entry;
-pub use entry::*;
-
-pub mod epoll;
-pub use epoll::{Epoll, EpollCtlOp, EpollEvent, EpollEventFlags};
-
-pub mod timerfd;
-pub use timerfd::{ClockId, TimerFd, TimerFlags, TimerSetting};
-
-pub mod signalfd;
-pub use signalfd::{Signal, SignalFd, SignalFdFlags, SignalMask, SigInfo};
-
-pub mod eventfd;
-pub use eventfd::{EventFd, EventFdFlags};
-
-pub mod pipe;
-pub use pipe::{Pipe, PipeFlags, PipePair};
-
-pub mod socket;
-pub use socket::{AddressFamily, Socket, SocketAddr, SocketManager, SocketProtocol, SocketState, SocketType};
-
-pub mod mount;
-pub use mount::{MountFlags, MountNamespace, MountPoint};
-
-pub mod shm;
-pub use shm::{ShmManager, ShmPerm, ShmSegment};
-
-pub mod msgqueue;
-pub use msgqueue::{Message, MessageQueue, MessageQueueManager, MsgQPerm};
-
-pub mod fd_table;
-pub use fd_table::{FdEntry, FdFlags, FdTable, FdTableManager};
-
-pub mod rlimit;
-pub use rlimit::{Rlimit, RlimitResource, ResourceLimits, ResourceLimitsManager};
-
-pub mod user_group_db;
-pub use user_group_db::{Group, User, UserGroupDatabase, UserGroupManager};
-
-pub mod process_group;
-pub use process_group::{ProcessGroup, ProcessGroupSessionManager, Session};
-
-pub mod ioctl;
-pub use ioctl::{IoctlDevice, IoctlManager, IoctlRequest, IoctlResponse};
-
-pub mod flock;
-pub use flock::{FileLock, FileLockManager, LockOp, LockType};
-
-pub mod sysfs;
-pub use sysfs::{SysfsEntry, SysfsFileType, SysfsManager};
-
-pub mod procfs;
-pub use procfs::{ProcessInfo, ProcfsManager};
-
-pub mod tmpfs;
-pub use tmpfs::{Tmpfs, TmpfsDirectory, TmpfsFile, TmpfsManager};
-
 pub mod linux_bsd_innovations;
-
-pub mod capabilities;
-pub use capabilities::{Capability, CapabilityId, CapabilityManager, CapabilitySet};
-
-pub mod futex;
-pub use futex::{Futex, FutexFlags, FutexManager, FutexOp, FutexWaiter};
-
-pub mod keyring;
-pub use keyring::{Key, KeyManager, KeyPayload, KeyPermissions, Keyring, KeyType};
-
-pub mod audit;
-pub use audit::{AuditEvent, AuditEventResult, AuditEventType, AuditLog, AuditManager};
-
-pub mod landlock;
-pub use landlock::{LandlockAccess, LandlockDomain, LandlockManager, LandlockRule, LandlockRuleset};
-
-pub mod capsicum;
-pub use capsicum::{CapsicumCapability, CapsicumManager, CapsicumMode, CapsicumRights, CapsicumSandbox};
-
-pub mod pledge;
-pub use pledge::{PledgeContext, PledgeManager, PledgePromise};
-
-pub mod unveil;
-pub use unveil::{UnveilContext, UnveilManager, UnveilOperation, UnveilPermissions, UnveilRule};
-
-pub mod bsd_jail;
-pub use bsd_jail::{BsdJail, BsdJailConfig, BsdJailManager};
-
-pub mod zfs;
-pub use zfs::{ZfsDataset, ZfsDatasetProperties, ZfsDatasetType, ZfsManager, ZfsPool, ZfsPoolConfig};
-
-pub mod btrfs;
-pub use btrfs::{BtrfsCompression, BtrfsFilesystem, BtrfsManager, BtrfsSubvolume, BtrfsSubvolumeType};
-
-pub mod overlay;
-pub use overlay::{OverlayConfig, OverlayFilesystem, OverlayLayer, OverlayLayerType, OverlayManager};
-
-pub mod user_group;
-pub use user_group::{FilePermissions as UserGroupFilePermissions};
-
-pub mod hostname;
-pub use hostname::HostnameManager;
-
-pub mod syslog;
-pub use syslog::{SyslogBuffer, SyslogEntry, SyslogFacility, SyslogManager, SyslogSeverity};
-
-pub mod cron;
-pub use cron::{CronField, CronJob, CronManager, CronSchedule};
-
-pub mod swap;
-pub use swap::{SwapDevice, SwapDeviceType, SwapManager, SwapPriority, SwapStats};
-
-pub mod resource;
-pub use resource::{CpuStats, DiskStats, MemoryStats, NetworkStats, ResourceMonitor};
-
-pub mod time;
-pub use time::{ClockSource, ClockSourceStats, SystemTime, TimeManager, Timezone};
-
-pub mod signal;
-pub use signal::{Signal, SignalDisposition, SignalHandler, SignalInfo, SignalManager, SignalMask};
 pub mod linux_parity;
 pub use linux_parity::{
     CmaRegion, KernelTimer, LinuxCmaAllocatorEngine, LinuxKernelTimerWheel,
@@ -185,8 +39,8 @@ pub use linux_parity::{
 };
 pub mod memory;
 pub mod meta;
+pub mod module_loader;
 pub mod namespaces;
-pub use namespaces::{Namespace, NamespaceId, NamespaceManager, NamespaceType};
 pub mod net;
 pub mod nextgen_breakthroughs;
 pub mod numa_allocator;
@@ -198,15 +52,11 @@ pub mod performance;
 pub mod pipes;
 pub mod process;
 pub mod policy_mechanism;
-pub mod rcu;
 pub mod roundrobin;
 pub mod sched;
 pub mod scheduler;
-pub mod subsystems;
-pub mod timer_subsystem;
-pub mod workqueue;
-pub mod wdk_core;
-pub use wdk_core::*;
+pub mod structures;
+pub mod virtual_cpu;
 
 pub use missing_linux_kernel_components::{
     BpfRingBufferStreamEngine, EpollCtlOp, EpollEvent, KernelAuditRecord, KernelAuditRecordType,
@@ -216,6 +66,7 @@ pub use missing_linux_kernel_components::{
     UffdRegisteredRange, UserfaultfdSubsystemEngine, VirtioBalloonDriverEngine,
 };
 pub mod traits;
+pub mod vmm_paging;
 
 #[allow(ambiguous_glob_reexports)]
 pub use architecture::*;
@@ -237,12 +88,12 @@ pub use generation_manager::{Generation, GenerationManager};
 pub use io_uring::{CompletionQueueEntry, IoUringEngine, IoUringOpcode, SubmissionQueueEntry};
 pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use crate::kernel::linux_bsd_innovations::{
-    AlpineHardenedEnv, AndroidBinderIpc, AndroidBroadcastReceiverRegistry,
+    AlpineHardenedEnv, AndroidBinderIpc, AndroidBroadcastReceiverRegistry, ArchUserRepoManager,
     BinderNode, BottomHalfKernelThread, BoundedBufferProducerConsumer, BroadcastReceiver,
     BsdPfStateTable, CapabilityDerivationTree, CarpSecurityRouter, CgroupResourceLimits, CowBlock,
     CowStorageEngine, CpuIsaMicroarch, DevlinkHealthReporter, DynamicLkmLoader, EbpfInstruction,
     EbpfRuntime, ExokernelHardwareMultiplexer, FastPacketFrame, FreeBsdCapsicumEngine,
-    FreeBsdGeomTopology, FreeBsdJail, FreeBsdVnetManager, FutexOp, FutexWaiter,
+    FreeBsdGeomTopology, FreeBsdJail, FreeBsdVfsNullfs, FreeBsdVnetManager, FutexOp, FutexWaiter,
     GcdDispatchQueue, GcdPriority, GcdTask, GentooUseFlags, GeomClass, GeomProvider,
     Hammer2PfsSnapshot, HammerBlockTransaction, HammerHistoryFilesystem, HurdTranslator,
     HybridKernelManager, HybridTask, IntelClearLinuxStatelessEngine, InteractiveHybridScheduler,
@@ -275,17 +126,12 @@ pub use meta::{
 pub use nextgen_breakthroughs::*;
 pub use paging::{PageTable, PageTableEntry, PageTableFlags, VirtualMemoryManagerV2};
 pub use roundrobin::{
-    RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRoundRobinSchedulerError,
+    RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError,
 };
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
 pub use vmm_paging::{PageTableManager, VirtualMemoryManager};
-// Note: linux_bsd_innovations types fully re-exported via `pub use crate::kernel::linux_bsd_innovations::*`
+// Note: linux_bsd_innovations types fully re-exported via `pub use crate::kernel::linux_bsd_innovations::*` above.
 pub use kqueue_event::{Kqueue, KqueueManager, Kevent, FilterType, FilterFlags, Interest};
-pub use module_loader::{ModuleId, ModuleState, ModuleDependency, ModuleMetadata, KernelModule, ModuleLoader};
-pub use ebpf_program::{
-    EbpfProgramType, EbpfInsnClass, EbpfInsn, EbpfRegister, EbpfMapType, EbpfMapDef,
-    EbpfProgram, EbpfVerifierState, EbpfVerifyError, EbpfVerifier, EbpfVm,
-};
 
 // ─── Phase 1: Safe-Rust Kernel Foundation — New Sovereign Modules ─────────────
 pub mod sigma_version;
@@ -294,17 +140,3 @@ pub mod xdp_engine_sovereign;
 
 // ─── Live Migration Engine (CRIU / QEMU inspired) ─────────────────────────────
 pub mod live_migration_engine;
-
-// ─── Universal Modular Kernel System ──────────────────────────────────────────
-pub mod universal_modular_system;
-pub use universal_modular_system::{
-    SovereignDriverManager, SovereignModularKernelEngine, SovereignNetworkStackManager,
-    SovereignPeripheralAccessManager, SovereignProcessControlManager, SovereignVfsStorageManager,
-};
-
-// ─── Boot & Kernel Foundations ────────────────────────────────────────────────
-pub mod boot_foundations;
-pub use boot_foundations::{
-    InterruptAndTimerSubsystem, KernelPanicCrashRecoveryEngine, PosixCoreSyscallAbiTable,
-    SmpCpuTopologyManager, UefiBootProtocolManager, UserKernelSpaceMemoryBoundary,
-};

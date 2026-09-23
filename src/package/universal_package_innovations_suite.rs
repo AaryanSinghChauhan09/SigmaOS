@@ -32,19 +32,8 @@ pub struct OrchestratedPackageResult {
 /// Sovereign Universal Package Orchestrator Engine synthesizing multi-format auto-detection,
 /// PQC/GPG signature verification, canonical dependency resolution, sandboxing translation,
 /// and atomic rollback snapshots across Linux and BSD ecosystems.
-#[cfg(not(feature = "standalone_test"))]
-use crate::package::linux_bsd_package_advancements::SovereignLinuxBsdPackageAdvancementsSuite;
-
-#[cfg(feature = "standalone_test")]
-#[path = "linux_bsd_package_advancements.rs"]
-pub mod linux_bsd_package_advancements;
-
-#[cfg(feature = "standalone_test")]
-pub use linux_bsd_package_advancements::SovereignLinuxBsdPackageAdvancementsSuite;
-
 pub struct SovereignUniversalPackageOrchestratorEngine {
     pub rollback_engine: SovereignPackageRollbackEngine,
-    pub advancements_suite: SovereignLinuxBsdPackageAdvancementsSuite,
     pub installed_packages: Vec<UnifiedPackage>,
 }
 
@@ -52,7 +41,6 @@ impl SovereignUniversalPackageOrchestratorEngine {
     pub fn new() -> Self {
         Self {
             rollback_engine: SovereignPackageRollbackEngine::new(),
-            advancements_suite: SovereignLinuxBsdPackageAdvancementsSuite::new(),
             installed_packages: Vec::new(),
         }
     }
@@ -88,66 +76,21 @@ impl SovereignUniversalPackageOrchestratorEngine {
 
         let mut canonical_deps = Vec::new();
         match fmt {
-            PackageFormat::Deb | PackageFormat::Superdeb => {
+            PackageFormat::Deb => {
                 canonical_deps.push("openssl".to_string());
                 canonical_deps.push("libc".to_string());
             }
-            PackageFormat::Rpm | PackageFormat::Drpm => {
+            PackageFormat::Rpm => {
                 canonical_deps.push("libc".to_string());
             }
-            PackageFormat::Zypper => {
-                canonical_deps.push("glibc".to_string());
-            }
-            PackageFormat::Pacman | PackageFormat::Cachy | PackageFormat::CachyOS => {
+            PackageFormat::Pacman | PackageFormat::Cachy => {
                 canonical_deps.push("glibc".to_string());
             }
             PackageFormat::Apk => {
                 canonical_deps.push("musl".to_string());
             }
-            PackageFormat::Xbps => {
-                canonical_deps.push("xbps_libc".to_string());
-            }
-            PackageFormat::Eopkg | PackageFormat::Pisi | PackageFormat::Moss => {
-                canonical_deps.push("eopkg_base".to_string());
-            }
-            PackageFormat::Pkg | PackageFormat::Ports | PackageFormat::FreeBsdPkg => {
+            PackageFormat::Pkg | PackageFormat::Ports | PackageFormat::OpenBsdPkg => {
                 canonical_deps.push("bsd-libc".to_string());
-            }
-            PackageFormat::OpenBsdPkg => {
-                canonical_deps.push("openbsd-libc".to_string());
-            }
-            PackageFormat::Pkgsrc => {
-                canonical_deps.push("netbsd-libc".to_string());
-            }
-            PackageFormat::Dports => {
-                canonical_deps.push("dragonfly-libc".to_string());
-            }
-            PackageFormat::Cports => {
-                canonical_deps.push("cports-musl".to_string());
-            }
-            PackageFormat::Nix | PackageFormat::Nixpkg => {
-                canonical_deps.push("nix-store-path".to_string());
-            }
-            PackageFormat::Guix | PackageFormat::GuixNar => {
-                canonical_deps.push("guix-store-path".to_string());
-            }
-            PackageFormat::Ebuild | PackageFormat::Portage => {
-                canonical_deps.push("portage-base".to_string());
-            }
-            PackageFormat::Swupd => {
-                canonical_deps.push("swupd-bundles".to_string());
-            }
-            PackageFormat::SlackBuild | PackageFormat::Txz => {
-                canonical_deps.push("slackware-base".to_string());
-            }
-            PackageFormat::Opkg | PackageFormat::Ipk => {
-                canonical_deps.push("musl".to_string());
-            }
-            PackageFormat::Spack => {
-                canonical_deps.push("spack-env".to_string());
-            }
-            PackageFormat::Conan => {
-                canonical_deps.push("conan-center".to_string());
             }
             _ => {
                 canonical_deps.push("base-system".to_string());
@@ -167,8 +110,6 @@ impl SovereignUniversalPackageOrchestratorEngine {
         for dep in &canonical_deps {
             pkg = pkg.with_dependency(dep.clone());
         }
-
-        self.advancements_suite.audit_and_enrich_package(&mut pkg)?;
 
         self.installed_packages.push(pkg);
 

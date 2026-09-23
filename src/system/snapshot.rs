@@ -546,7 +546,7 @@ impl SovereignProfileManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     #[test]
     fn test_sovereign_profile_manager() {

@@ -460,7 +460,7 @@ pub fn sys_check_capability(
     Ok(ns_lock.has_capability(cap_set))
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

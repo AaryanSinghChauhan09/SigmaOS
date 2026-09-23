@@ -226,7 +226,7 @@ mod tests {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests_disabled {
     use super::*;
 

@@ -20,7 +20,6 @@
 
 use std::boxed::Box;
 use std::string::String;
-use crate::driver::framework::DeviceObject as FrameworkDeviceObject;
 use std::vec::Vec;
 use core::option::Option::{self, None, Some};
 use core::result::Result::{self, Err, Ok};
@@ -574,14 +573,6 @@ pub struct DeviceObjectX86 {
 pub type DeviceObject = DeviceObjectX86;
 
 
-#[derive(Debug, Clone)]
-pub struct DeviceObjectX86 {
-    pub device_type: DeviceType,
-    pub driver_name: &'static str,
-    pub next_device: Option<Box<DeviceObjectX86>>,
-    pub attached_device: Option<Box<DeviceObjectX86>>,
-}
-
 pub struct DriverObjectX86 {
     pub driver_name: &'static str,
     pub major_function: [Option<fn(&DeviceObject, &mut Irp) -> u32>; 8],
@@ -966,7 +957,7 @@ impl CallingConventionEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

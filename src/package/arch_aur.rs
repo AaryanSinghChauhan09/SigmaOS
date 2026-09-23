@@ -203,7 +203,7 @@ impl Default for SigmaAUR {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

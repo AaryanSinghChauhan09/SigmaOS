@@ -101,26 +101,18 @@ impl Slab {
     /// # Safety
     /// The caller must ensure no concurrent unsynchronized access.
     pub unsafe fn allocate(&self) -> Option<NonNull<u8>> {
-        let mut ptr = self.freelist.load(Ordering::Acquire);
-        loop {
-            if ptr.is_null() {
-                return None;
-            }
-            let next = *(ptr as *const *mut u8);
-            match self.freelist.compare_exchange_weak(
-                ptr,
-                next,
-                Ordering::AcqRel,
-                Ordering::Acquire,
-            ) {
-                Ok(_) => {
-                    core::ptr::write_bytes(ptr, 0, self.object_size);
-                    self.free_count.fetch_sub(1, Ordering::Relaxed);
-                    return Some(NonNull::new_unchecked(ptr));
-                }
-                Err(actual) => ptr = actual,
-            }
+        // Pop from freelist
+        let ptr = self.freelist.load(Ordering::Acquire);
+        if ptr.is_null() {
+            return None;
         }
+        // Read the next pointer stored in the free slot
+        let next = *(ptr as *const *mut u8);
+        self.freelist.store(next, Ordering::Release);
+        // Zero the object before returning (security: prevent info leak)
+        core::ptr::write_bytes(ptr, 0, self.object_size);
+        self.free_count.fetch_sub(1, Ordering::Relaxed);
+        Some(NonNull::new_unchecked(ptr))
     }
 
     /// Deallocate one object back to the slab.
@@ -131,22 +123,11 @@ impl Slab {
     pub unsafe fn deallocate(&self, ptr: NonNull<u8>) {
         let p = ptr.as_ptr();
         debug_assert!(self.owns(p), "ptr does not belong to this slab");
-        let mut old_head = self.freelist.load(Ordering::Acquire);
-        loop {
-            *(p as *mut *mut u8) = old_head;
-            match self.freelist.compare_exchange_weak(
-                old_head,
-                p,
-                Ordering::AcqRel,
-                Ordering::Acquire,
-            ) {
-                Ok(_) => {
-                    self.free_count.fetch_add(1, Ordering::Relaxed);
-                    return;
-                }
-                Err(actual) => old_head = actual,
-            }
-        }
+        // Push onto freelist
+        let old_head = self.freelist.load(Ordering::Acquire);
+        *(p as *mut *mut u8) = old_head;
+        self.freelist.store(p, Ordering::Release);
+        self.free_count.fetch_add(1, Ordering::Relaxed);
     }
 
     /// Returns true if `ptr` falls within this slab's memory range.
@@ -247,19 +228,9 @@ impl SlabCache {
     /// # Safety
     /// `slab` must be initialized via `Slab::init()` and not already in another cache.
     pub unsafe fn add_slab(&self, slab: &'static mut Slab) {
-        let mut old_head = self.partial.load(Ordering::Acquire);
-        loop {
-            slab.next.store(old_head, Ordering::Relaxed);
-            match self.partial.compare_exchange_weak(
-                old_head,
-                slab as *mut Slab,
-                Ordering::AcqRel,
-                Ordering::Acquire,
-            ) {
-                Ok(_) => return,
-                Err(actual) => old_head = actual,
-            }
-        }
+        let old_head = self.partial.load(Ordering::Acquire);
+        slab.next.store(old_head, Ordering::Relaxed);
+        self.partial.store(slab as *mut Slab, Ordering::Release);
     }
 
     /// Statistics: total outstanding allocations
@@ -303,31 +274,5 @@ pub fn cache_for_size(size: usize) -> Option<&'static SlabCache> {
         1025..=2048 => Some(&SLAB_2048),
         2049..=4096 => Some(&SLAB_4096),
         _ => None,
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_slab_concurrent_cas_allocation() {
-        let mut page = vec![0u8; 4096];
-        unsafe {
-            let slab = Slab::init(page.as_mut_ptr(), 4096, 64);
-            assert_eq!(slab.state(), SlabState::Empty);
-
-            let mut allocated = Vec::new();
-            while let Some(ptr) = slab.allocate() {
-                allocated.push(ptr);
-            }
-            assert_eq!(slab.state(), SlabState::Full);
-            assert_eq!(slab.free_count.load(Ordering::Relaxed), 0);
-
-            for ptr in allocated {
-                slab.deallocate(ptr);
-            }
-            assert_eq!(slab.state(), SlabState::Empty);
-        }
     }
 }

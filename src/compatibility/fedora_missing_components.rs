@@ -653,7 +653,6 @@ impl Default for FedoraAnacondaKickstartEngine {
 pub struct FedoraSssdFreeIpaEngine {
     pub realm: String,
     pub enrolled_hosts: Vec<String>,
-    pub is_joined: bool,
 }
 
 impl FedoraSssdFreeIpaEngine {
@@ -661,20 +660,7 @@ impl FedoraSssdFreeIpaEngine {
         Self {
             realm: String::new(),
             enrolled_hosts: Vec::new(),
-            is_joined: false,
         }
-    }
-
-    pub fn join_realm(&mut self, realm: &str, server: &str) -> Result<(), &'static str> {
-        if realm.is_empty() || server.is_empty() {
-            return Err("FreeIPA/SSSD: Realm and server hostname cannot be empty");
-        }
-        self.realm = realm.to_string();
-        if !self.enrolled_hosts.contains(&server.to_string()) {
-            self.enrolled_hosts.push(server.to_string());
-        }
-        self.is_joined = true;
-        Ok(())
     }
 }
 

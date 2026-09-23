@@ -34,10 +34,6 @@ pub struct NotificationItem {
     pub timestamp: u64,
     pub is_read: bool,
     pub actions: Vec<String>,
-    pub glyph: Option<String>,
-    pub image_path: Option<String>,
-    pub exec_argv: Vec<String>,
-    pub replaces_id: Option<u64>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -82,52 +78,10 @@ impl AdvancedNotificationEngine {
         timestamp: u64,
         actions: &[&str],
     ) -> Option<u64> {
-        self.send_notification_extended(
-            app_name, title, body, category, urgency, timestamp, actions, None, None, &[], None
-        )
-    }
-
-    pub fn send_notification_extended(
-        &mut self,
-        app_name: &str,
-        title: &str,
-        body: &str,
-        category: NotificationCategory,
-        urgency: NotificationUrgency,
-        timestamp: u64,
-        actions: &[&str],
-        glyph: Option<&str>,
-        image_path: Option<&str>,
-        exec_argv: &[&str],
-        replaces_id: Option<u64>,
-    ) -> Option<u64> {
-        // Omarchy Do-Not-Disturb (DND) Punch-Through Evaluation Rules:
-        // 1. app_name == "omarchy-action" (user-action feedback toasts always pass)
-        // 2. urgency == Critical AND app_name == "notify-send" (bare-CLI emergency alerts always pass)
-        // 3. Otherwise standard allow_critical_override if urgency == Critical
+        // DND filtering check
         if self.dnd_config.enabled {
-            let is_omarchy_action = app_name == "omarchy-action";
-            let is_bare_cli_critical = urgency == NotificationUrgency::Critical && app_name == "notify-send";
-            let is_critical_override = self.dnd_config.allow_critical_override && urgency == NotificationUrgency::Critical;
-
-            if !(is_omarchy_action || is_bare_cli_critical || is_critical_override) {
+            if !(self.dnd_config.allow_critical_override && urgency == NotificationUrgency::Critical) {
                 return None; // Suppressed by Do-Not-Disturb
-            }
-        }
-
-        // Handle replaces_id update in-place without producing new ID signal
-        if let Some(repl_id) = replaces_id {
-            if let Some(existing) = self.history.iter_mut().find(|n| n.id == repl_id) {
-                existing.title = String::from(title);
-                existing.body = String::from(body);
-                existing.category = category;
-                existing.urgency = urgency;
-                existing.timestamp = timestamp;
-                existing.actions = actions.iter().map(|&a| String::from(a)).collect();
-                if let Some(g) = glyph { existing.glyph = Some(String::from(g)); }
-                if let Some(i) = image_path { existing.image_path = Some(String::from(i)); }
-                if !exec_argv.is_empty() { existing.exec_argv = exec_argv.iter().map(|&a| String::from(a)).collect(); }
-                return Some(repl_id);
             }
         }
 
@@ -144,10 +98,6 @@ impl AdvancedNotificationEngine {
             timestamp,
             is_read: false,
             actions: actions.iter().map(|&a| String::from(a)).collect(),
-            glyph: glyph.map(String::from),
-            image_path: image_path.map(String::from),
-            exec_argv: exec_argv.iter().map(|&a| String::from(a)).collect(),
-            replaces_id,
         };
 
         if self.history.len() >= self.max_history_capacity {
@@ -234,78 +184,5 @@ mod tests {
         assert!(crit.is_some());
 
         assert!(engine.mark_as_read(id1));
-    }
-
-    #[test]
-    fn test_omarchy_notification_rules() {
-        let mut engine = AdvancedNotificationEngine::new(50);
-        engine.set_dnd(true, false); // DND active, allow_critical_override disabled
-
-        // 1. omarchy-action toast MUST punch through DND
-        let action_id = engine.send_notification_extended(
-            "omarchy-action",
-            "Theme Changed",
-            "Switched to Nord theme",
-            NotificationCategory::System,
-            NotificationUrgency::Low,
-            1700000300,
-            &[],
-            Some("󰂚"),
-            None,
-            &["mpv", "--", "/usr/share/sounds/theme.wav"],
-            None,
-        );
-        assert!(action_id.is_some());
-
-        // 2. Critical notify-send toast MUST punch through DND
-        let cli_crit_id = engine.send_notification_extended(
-            "notify-send",
-            "Battery Emergency",
-            "Power level 2%",
-            NotificationCategory::System,
-            NotificationUrgency::Critical,
-            1700000400,
-            &[],
-            None,
-            None,
-            &[],
-            None,
-        );
-        assert!(cli_crit_id.is_some());
-
-        // 3. Normal chat app notification MUST be suppressed under DND
-        let chat_id = engine.send_notification_extended(
-            "Discord",
-            "New Message",
-            "Hey there",
-            NotificationCategory::Application,
-            NotificationUrgency::Normal,
-            1700000500,
-            &[],
-            None,
-            None,
-            &[],
-            None,
-        );
-        assert!(chat_id.is_none());
-
-        // 4. In-place replacement via replaces_id
-        let orig_id = action_id.unwrap();
-        let updated_id = engine.send_notification_extended(
-            "omarchy-action",
-            "Theme Changed",
-            "Switched to Gruvbox theme",
-            NotificationCategory::System,
-            NotificationUrgency::Low,
-            1700000600,
-            &[],
-            Some("󰂚"),
-            None,
-            &[],
-            Some(orig_id),
-        );
-        assert_eq!(updated_id, Some(orig_id));
-        let notif = engine.history().iter().find(|n| n.id == orig_id).unwrap();
-        assert_eq!(notif.body, "Switched to Gruvbox theme");
     }
 }

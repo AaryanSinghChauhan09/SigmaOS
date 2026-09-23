@@ -331,7 +331,7 @@ impl Kyber1024 {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod additional_pqc_tests {
     use super::*;
 

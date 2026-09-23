@@ -1,16 +1,6 @@
 // SigmaOS Compatibility Module
-
-use core::sync::atomic::{AtomicU64, Ordering};
-
 pub mod abi_extended;
 pub mod abi_translator;
-pub mod universal_app_interface;
-
-pub use universal_app_interface::{
-    SovereignLinuxulatorAbiBridge, OpenBsdPledgeUnveilApplicationInterface,
-    FreeBsdCapsicumCapabilityRightsInterface, SovereignUniversalAppInterfaceManager,
-    ApplicationPersonality,
-};
 pub mod absorb_tools;
 pub mod advanced_ecosystem;
 pub mod alpine_linux;
@@ -111,9 +101,6 @@ pub mod linux_network;
 pub mod linux_security;
 pub mod linux_standards;
 pub mod linuxulator;
-pub mod posix_signals;
-pub mod elf_dynamic_linker;
-pub mod pthreads;
 pub mod localsend;
 pub mod lubuntu;
 pub mod macos_darwin;
@@ -165,168 +152,6 @@ pub mod superiority;
 pub mod tiny_core;
 pub mod wsl;
 pub mod zorin;
-
-// ─── POSIX Compatibility Tiers ─────────────────────────────────────────────
-
-/// POSIX compatibility tier level
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum PosixTier {
-    /// Full POSIX.1-2008 compliance
-    Full,
-    /// POSIX.1-2001 compliance
-    Standard,
-    /// Basic POSIX (subset)
-    Basic,
-    /// Extended with Linux/BSD extensions
-    Extended,
-}
-
-/// POSIX syscall compatibility translation
-#[derive(Debug, Clone)]
-pub struct PosixSyscallTranslation {
-    pub original_syscall: u32,
-    pub translated_syscall: u32,
-    pub capability_required: bool,
-}
-
-/// POSIX compatibility layer
-#[derive(Debug)]
-pub struct PosixCompatibilityLayer {
-    pub tier: PosixTier,
-    pub translations: Vec<PosixSyscallTranslation>,
-    pub syscalls_translated: AtomicU64,
-}
-
-impl PosixCompatibilityLayer {
-    pub fn new(tier: PosixTier) -> Self {
-        PosixCompatibilityLayer {
-            tier,
-            translations: Vec::new(),
-            syscalls_translated: AtomicU64::new(0),
-        }
-    }
-
-    pub fn add_translation(&mut self, original: u32, translated: u32, capability_required: bool) {
-        self.translations.push(PosixSyscallTranslation {
-            original_syscall: original,
-            translated_syscall: translated,
-            capability_required,
-        });
-    }
-
-    pub fn translate_syscall(&self, syscall: u32) -> Option<u32> {
-        for translation in &self.translations {
-            if translation.original_syscall == syscall {
-                self.syscalls_translated.fetch_add(1, Ordering::SeqCst);
-                return Some(translation.translated_syscall);
-            }
-        }
-        None
-    }
-
-    pub fn get_translation_count(&self) -> u64 {
-        self.syscalls_translated.load(Ordering::SeqCst)
-    }
-}
-
-impl Default for PosixCompatibilityLayer {
-    fn default() -> Self {
-        Self::new(PosixTier::Standard)
-    }
-}
-
-// ─── FHS Overlay Management ─────────────────────────────────────────────────
-
-/// FHS (Filesystem Hierarchy Standard) path
-#[derive(Debug, Clone)]
-pub struct FhsPath {
-    pub original_path: String,
-    pub overlay_path: String,
-    pub capability_required: bool,
-}
-
-/// FHS overlay mount
-#[derive(Debug)]
-pub struct FhsOverlayMount {
-    pub mounts: Vec<FhsPath>,
-    pub mount_count: AtomicU64,
-}
-
-impl FhsOverlayMount {
-    pub fn new() -> Self {
-        FhsOverlayMount {
-            mounts: Vec::new(),
-            mount_count: AtomicU64::new(0),
-        }
-    }
-
-    pub fn add_mount(&mut self, original: &str, overlay: &str, capability_required: bool) {
-        self.mounts.push(FhsPath {
-            original_path: String::from(original),
-            overlay_path: String::from(overlay),
-            capability_required,
-        });
-        self.mount_count.fetch_add(1, Ordering::SeqCst);
-    }
-
-    pub fn resolve_path(&self, path: &str) -> Option<String> {
-        for mount in &self.mounts {
-            if path.starts_with(&mount.original_path) {
-                let relative = &path[mount.original_path.len()..];
-                return Some(format!("{}{}", mount.overlay_path, relative));
-            }
-        }
-        None
-    }
-
-    pub fn get_mount_count(&self) -> u64 {
-        self.mount_count.load(Ordering::SeqCst)
-    }
-
-    /// Add standard FHS paths (/bin, /etc, /usr/lib, /var)
-    pub fn add_standard_fhs(&mut self) {
-        self.add_mount("/bin", "/sigma/bin", true);
-        self.add_mount("/etc", "/sigma/etc", true);
-        self.add_mount("/usr/lib", "/sigma/lib", true);
-        self.add_mount("/var", "/sigma/var", true);
-        self.add_mount("/usr/share", "/sigma/share", true);
-        self.add_mount("/usr/local", "/sigma/local", true);
-    }
-}
-
-impl Default for FhsOverlayMount {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[cfg(test)]
-mod posix_tests {
-    use super::*;
-
-    #[test]
-    fn test_posix_compatibility_layer() {
-        let mut layer = PosixCompatibilityLayer::new(PosixTier::Full);
-        layer.add_translation(1, 100, true);
-        layer.add_translation(2, 200, false);
-
-        assert_eq!(layer.translate_syscall(1), Some(100));
-        assert_eq!(layer.translate_syscall(2), Some(200));
-        assert_eq!(layer.translate_syscall(3), None);
-        assert_eq!(layer.get_translation_count(), 2);
-    }
-
-    #[test]
-    fn test_fhs_overlay_mount() {
-        let mut fhs = FhsOverlayMount::new();
-        fhs.add_standard_fhs();
-
-        assert_eq!(fhs.resolve_path("/bin/bash"), Some("/sigma/bin/bash".to_string()));
-        assert_eq!(fhs.resolve_path("/etc/passwd"), Some("/sigma/etc/passwd".to_string()));
-        assert_eq!(fhs.resolve_path("/usr/lib/libc.so"), Some("/sigma/lib/libc.so".to_string()));
-        assert_eq!(fhs.get_mount_count(), 6);
-    }
-}
 
 pub use wsl::*;
 pub use zorin::*;
@@ -438,22 +263,6 @@ pub use linux_compat::{
     BsdKqueueMultiplexer, DistroTargetProfile, LinuxCompatSpec, LinuxElfLoaderShim,
     LinuxProcFsAdapter, LinuxSyscallNum, LinuxSyscallTranslator, OpenBsdPledgeUnveilFilter,
     TargetDistro,
-};
-pub use posix_signals::{
-    PosixSignal, SignalMask, SignalFlags, SignalHandler, SignalInfo, SignalAction,
-    SignalDispositionTable, ThreadSignalMask, PosixSignalDeliveryEngine, SigprocmaskOp,
-    SignalStats,
-};
-pub use elf_dynamic_linker::{
-    ElfClass, ElfData, ElfMachine, ElfType, PhType, DynTag, SymBind, SymType as ElfSymType, RelType,
-    ElfSymbol, ElfRelocation, SharedLibrary, GotEntry, PltEntry, ElfDynamicLinker,
-    LinkerStats,
-};
-pub use pthreads::{
-    PthreadT, PthreadAttr, DetachState, Scope, PthreadMutex, PthreadCond, PthreadRwlock,
-    ThreadStartRoutine, pthread_create, pthread_join, pthread_detach, pthread_exit,
-    pthread_equal, pthread_self, PthreadKey, pthread_key_create, pthread_key_delete,
-    pthread_setspecific, pthread_getspecific, pthread_atfork, PthreadBarrier,
 };
 pub use tiny_core::{FiletoolOverlay, FrugalLoader, TceLoader, TczExtension, TinyCoreBootConfig};
 

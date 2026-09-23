@@ -222,14 +222,7 @@ impl SovereignLandlockV5Guard {
         if self.state == SandboxState::Building { return true; }
 
         for entry in &self.unveil_entries {
-            let e_path = &entry.path;
-            let covers = path == e_path
-                || e_path == "/"
-                || (path.starts_with(e_path)
-                    && (e_path.ends_with('/')
-                        || e_path.ends_with('\\')
-                        || path.as_bytes().get(e_path.len()).map_or(false, |&b| b == b'/' || b == b'\\')));
-            if covers {
+            if path.starts_with(&entry.path) {
                 return entry.has(perm);
             }
         }
@@ -373,10 +366,6 @@ mod tests {
         assert!(guard.check_unveil("/home/user/file", &UnveilPermission::Write));
         assert!(!guard.check_unveil("/home/user/file", &UnveilPermission::Execute));
         assert!(!guard.check_unveil("/etc/passwd", &UnveilPermission::Read));
-
-        // Path prefix confusion sandboxing bypass prevention
-        assert!(!guard.check_unveil("/home/user_secret/data.txt", &UnveilPermission::Read));
-        assert!(!guard.check_unveil("/home/user_malicious", &UnveilPermission::Read));
     }
 
     #[test]

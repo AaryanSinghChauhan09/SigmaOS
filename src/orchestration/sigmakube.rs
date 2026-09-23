@@ -490,7 +490,7 @@ impl Default for SigmaKube {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

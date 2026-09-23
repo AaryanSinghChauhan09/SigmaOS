@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // Extended Cgroup v2 Controllers Implementation
 // Phase 9.5: Device, Hugetlb, RDMA, Pids, and Net_cls Controllers
 //
@@ -142,7 +133,7 @@ impl Controller for DeviceController {
         Ok(())
     }
 
-    fn update_setting(&mut self, key: &str, value: &str) -> Result<(), String> {
+    fn update_setting(&mut self, key: &str, _value: &str) -> Result<(), String> {
         match key {
             "allow" => {
                 // Parse device rule from value
@@ -294,7 +285,7 @@ impl Controller for HugetlbController {
 
             let limit: u64 = value.parse()
                 .map_err(|_| format!("Invalid limit value: {}", value))?;
-            
+
             self.set_limit(size, limit);
             Ok(())
         } else {

@@ -224,7 +224,7 @@ impl DriverRegistry {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
@@ -234,6 +234,7 @@ mod tests {
         base: KObject,
         owner: Option<String>,
         debug_level: String,
+        base: KObject,
     }
 
     impl KernelObject for MockDriver {

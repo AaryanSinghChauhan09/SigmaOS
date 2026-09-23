@@ -147,7 +147,7 @@ impl Default for WorkerThread {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     

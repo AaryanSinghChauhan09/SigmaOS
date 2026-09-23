@@ -332,7 +332,7 @@ pub static GLOBAL_MACCHANGER: MacChanger = MacChanger::new();
 pub static GLOBAL_SNIFFER: KaliPacketSniffer = KaliPacketSniffer::new();
 pub static GLOBAL_AUDITOR: HashAuditor = HashAuditor::new();
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

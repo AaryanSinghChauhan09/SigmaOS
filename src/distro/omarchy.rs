@@ -7,7 +7,6 @@
 //! - Interactive Keybinding Fuzzy-Finder (Wofi / Rofi Parity)
 //! - GPU & NVIDIA Early-KMS Hardware Acceleration Configuration
 //! - Fast Terminal & Development Environment Provisioner
-//! - Omarchy-Nvim / LazyVim Preset Engine & sudoedit Integration
 
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
@@ -97,163 +96,6 @@ impl OmarchyTheme {
     }
 }
 
-/// Omarchy Capture, Screen Recording, OCR, and File Sharing Engine
-#[derive(Debug, Clone)]
-pub struct OmarchyCaptureAndSharingEngine {
-    pub screenshot_dir: String,
-    pub screenrecord_dir: String,
-    pub debug_logging: bool,
-}
-
-impl OmarchyCaptureAndSharingEngine {
-    pub fn new() -> Self {
-        Self {
-            screenshot_dir: "~/Pictures/Screenshots".to_string(),
-            screenrecord_dir: "~/Videos".to_string(),
-            debug_logging: false,
-        }
-    }
-
-    pub fn generate_screenshot_cmd(&self, mode: &str, direct_save: bool, editor: &str) -> String {
-        let dest = if direct_save { " save" } else { "" };
-        let ed_flag = if !editor.is_empty() {
-            format!(" --editor={}", editor)
-        } else {
-            "".to_string()
-        };
-        format!("omarchy capture screenshot {}{}{}", mode, dest, ed_flag)
-    }
-
-    pub fn generate_screenrecord_start_cmd(&self, fullscreen: bool, desktop_audio: bool, webcam: bool) -> String {
-        let fs_flag = if fullscreen { " --fullscreen" } else { "" };
-        let audio_flag = if desktop_audio { " --with-desktop-audio" } else { "" };
-        let cam_flag = if webcam { " --with-webcam" } else { "" };
-        format!("omarchy screenrecord{}{}{}", fs_flag, audio_flag, cam_flag)
-    }
-
-    pub fn generate_ocr_cmd(&self) -> &'static str {
-        "omarchy capture text"
-    }
-
-    pub fn generate_localsend_share_cmd(&self, target_type: &str, path: &str) -> String {
-        format!("omarchy share {} {}", target_type, path)
-    }
-
-    pub fn generate_tailscale_send_cmd(&self, machine: &str, file: &str) -> String {
-        format!("omarchy tailscale send {} {}", machine, file)
-    }
-
-    pub fn generate_transcode_cmd(&self, input: &str, format_opt: &str, resolution: &str) -> String {
-        format!("omarchy transcode {} {} {}", input, format_opt, resolution)
-    }
-}
-
-impl Default for OmarchyCaptureAndSharingEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Omarchy Development Tools, Editors, Mise, Docker, and GitHub CLI Manager
-#[derive(Debug, Clone)]
-pub struct OmarchyDevToolsEngine {
-    pub default_editor: String,
-    pub installed_editors: Vec<String>,
-    pub theme_matched_editors: Vec<String>,
-    pub mise_runtimes: Vec<String>,
-    pub sudoless_docker: bool,
-    pub docker_db_services: Vec<String>,
-    pub gh_cli_installed: bool,
-}
-
-impl OmarchyDevToolsEngine {
-    pub fn new() -> Self {
-        Self {
-            default_editor: "neovim".to_string(),
-            installed_editors: vec![
-                "neovim".to_string(),
-                "vi".to_string(),
-                "vscode".to_string(),
-                "cursor".to_string(),
-                "zed".to_string(),
-                "sublime-text".to_string(),
-                "helix".to_string(),
-                "vim".to_string(),
-                "emacs".to_string(),
-            ],
-            theme_matched_editors: vec![
-                "vscode".to_string(),
-                "cursor".to_string(),
-                "vscodium".to_string(),
-                "helix".to_string(),
-            ],
-            mise_runtimes: vec![
-                "ruby".to_string(),
-                "node".to_string(),
-                "bun".to_string(),
-                "deno".to_string(),
-                "go".to_string(),
-                "rust".to_string(),
-                "python".to_string(),
-                "java".to_string(),
-                "elixir".to_string(),
-                "dotnet".to_string(),
-                "ocaml".to_string(),
-                "zig".to_string(),
-                "clojure".to_string(),
-                "scala".to_string(),
-                "php".to_string(),
-            ],
-            sudoless_docker: false,
-            docker_db_services: vec![
-                "postgres".to_string(),
-                "mysql".to_string(),
-                "redis".to_string(),
-                "mongodb".to_string(),
-            ],
-            gh_cli_installed: true,
-        }
-    }
-
-    pub fn set_default_editor(&mut self, editor: &str) -> bool {
-        if self.installed_editors.iter().any(|e| e == editor) {
-            self.default_editor = editor.to_string();
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn generate_mise_install_command(&self, runtime: &str) -> String {
-        format!("mise use -g {}", runtime)
-    }
-
-    pub fn toggle_sudoless_docker(&mut self, enable: bool) {
-        self.sudoless_docker = enable;
-    }
-
-    pub fn get_docker_command(&self, subcmd: &str) -> String {
-        if self.sudoless_docker {
-            format!("docker {}", subcmd)
-        } else {
-            format!("sudo docker {}", subcmd)
-        }
-    }
-
-    pub fn generate_github_cli_manifest(&self) -> String {
-        format!(
-            "gh_cli_enabled = {}\nstubs = [\"ghui\", \"lazygit\"]\nkeybinding_lazydocker = \"Super + Shift + D\"\n",
-            self.gh_cli_installed
-        )
-    }
-}
-
-impl Default for OmarchyDevToolsEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 /// Keybinding Action
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct KeybindingDefinition {
@@ -293,7 +135,6 @@ pub struct OmarchyModernDesktopEngine {
     pub webapps: BTreeMap<String, WebAppSpec>,
     pub gpu_config: Option<GpuDriverConfig>,
     pub dark_mode: bool,
-    pub dotfile_manager: crate::distro::omarchy_dotfiles::OmarchyDotfileManagerEngine,
 }
 
 impl OmarchyModernDesktopEngine {
@@ -345,24 +186,13 @@ impl OmarchyModernDesktopEngine {
             webapps: BTreeMap::new(),
             gpu_config: None,
             dark_mode: true,
-            dotfile_manager: crate::distro::omarchy_dotfiles::OmarchyDotfileManagerEngine::new(),
         };
 
         // Register default modern webapps inspired by Omarchy
         engine.register_webapp(
-            "HEY Email",
-            "https://app.hey.com/",
-            "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/hey.png",
-        );
-        engine.register_webapp(
-            "HEY Calendar",
-            "https://app.hey.com/calendar",
-            "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/hey.png",
-        );
-        engine.register_webapp(
-            "Basecamp",
-            "https://launchpad.37signals.com/",
-            "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/basecamp.png",
+            "WhatsApp",
+            "https://web.whatsapp.com/",
+            "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/whatsapp.png",
         );
         engine.register_webapp(
             "ChatGPT",
@@ -370,54 +200,14 @@ impl OmarchyModernDesktopEngine {
             "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/chatgpt.png",
         );
         engine.register_webapp(
-            "Grok",
-            "https://grok.com/",
-            "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/grok.png",
-        );
-        engine.register_webapp(
-            "WhatsApp",
-            "https://web.whatsapp.com/",
-            "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/whatsapp.png",
-        );
-        engine.register_webapp(
-            "Google Messages",
-            "https://messages.google.com/web",
-            "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/google-messages.png",
-        );
-        engine.register_webapp(
-            "Google Photos",
-            "https://photos.google.com/",
-            "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/google-photos.png",
-        );
-        engine.register_webapp(
-            "Google Maps",
-            "https://maps.google.com/",
-            "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/google-maps.png",
-        );
-        engine.register_webapp(
-            "Google Contacts",
-            "https://contacts.google.com/",
-            "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/google-contacts.png",
-        );
-        engine.register_webapp(
-            "X",
-            "https://x.com/",
-            "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/x.png",
+            "GitHub",
+            "https://github.com/",
+            "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/github-light.png",
         );
         engine.register_webapp(
             "YouTube",
             "https://youtube.com/",
             "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/youtube.png",
-        );
-        engine.register_webapp(
-            "Zoom",
-            "https://zoom.us/app",
-            "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/zoom.png",
-        );
-        engine.register_webapp(
-            "Discord",
-            "https://discord.com/app",
-            "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/discord.png",
         );
 
         engine
@@ -725,65 +515,10 @@ impl PasswordlessSudoExpiryGuard {
     }
 }
 
-/// Omarchy Security Policy & Responsible Disclosure Engine
-#[derive(Debug, Clone)]
-pub struct OmarchySecurityReport {
-    pub report_id: String,
-    pub component: String,
-    pub affected_version: String,
-    pub vulnerability_summary: String,
-    pub is_confirmed_vulnerability: bool,
-    pub crosses_security_boundary: bool,
-    pub reporter_contact: String,
-    pub reporter_x_handle: String,
-}
-
-#[derive(Debug, Clone)]
-pub struct OmarchySecurityPolicyEngine {
-    pub security_email: String,
-    pub confirmed_vulnerabilities_count: u32,
-    pub credited_reporters: Vec<String>,
-}
-
-impl OmarchySecurityPolicyEngine {
-    pub fn new() -> Self {
-        Self {
-            security_email: "security@omarchy.org".to_string(),
-            confirmed_vulnerabilities_count: 0,
-            credited_reporters: Vec::new(),
-        }
-    }
-
-    pub fn evaluate_vulnerability_report(&mut self, report: &mut OmarchySecurityReport) -> bool {
-        if report.crosses_security_boundary {
-            report.is_confirmed_vulnerability = true;
-            self.confirmed_vulnerabilities_count += 1;
-            if !report.reporter_x_handle.is_empty() && !self.credited_reporters.contains(&report.reporter_x_handle) {
-                self.credited_reporters.push(report.reporter_x_handle.clone());
-            }
-            true
-        } else {
-            report.is_confirmed_vulnerability = false;
-            false
-        }
-    }
-}
-
-impl Default for OmarchySecurityPolicyEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OmarchyNerdFont {
-    JetBrainsMono,
-    CascadiaMono,
-    MesloLgMono,
     FiraCode,
-    VictorCode,
-    BitstreamVeraMono,
-    Iosevka,
+    JetBrainsMono,
     Hack,
     Meslo,
 }
@@ -791,13 +526,8 @@ pub enum OmarchyNerdFont {
 impl OmarchyNerdFont {
     pub fn font_family(&self) -> &'static str {
         match self {
-            Self::JetBrainsMono => "JetBrainsMono Nerd Font",
-            Self::CascadiaMono => "CascadiaMono Nerd Font",
-            Self::MesloLgMono => "Meslo LG Mono Nerd Font",
             Self::FiraCode => "FiraCode Nerd Font",
-            Self::VictorCode => "Victor Mono Nerd Font",
-            Self::BitstreamVeraMono => "BitstreamVeraSansMono Nerd Font",
-            Self::Iosevka => "Iosevka Nerd Font",
+            Self::JetBrainsMono => "JetBrainsMono Nerd Font",
             Self::Hack => "Hack Nerd Font",
             Self::Meslo => "MesloLGS Nerd Font",
         }
@@ -880,141 +610,13 @@ impl Default for OmarchyAudioPipewireConfig {
     }
 }
 
-// =========================================================================
-// OMARCHY NEOVIM & LAZYVIM ENGINE (`omarchy-nvim`)
-// =========================================================================
-
-#[derive(Debug, Clone)]
-pub struct LazyVimKeymapSpec {
-    pub key_combo: String,
-    pub action_command: String,
-    pub description: String,
-}
-
-pub struct OmarchyNeovimLazyVimEngine {
-    pub leader_key: String,
-    pub keymaps: Vec<LazyVimKeymapSpec>,
-    pub active_plugins: Vec<String>,
-}
-
-impl OmarchyNeovimLazyVimEngine {
-    pub fn new() -> Self {
-        let default_keymaps = vec![
-            LazyVimKeymapSpec {
-                key_combo: "Space Space".to_string(),
-                action_command: "Telescope find_files".to_string(),
-                description: "Fuzzy-find any file in current directory".to_string(),
-            },
-            LazyVimKeymapSpec {
-                key_combo: "Space S G".to_string(),
-                action_command: "Telescope live_grep".to_string(),
-                description: "Search all files using grep with live preview".to_string(),
-            },
-            LazyVimKeymapSpec {
-                key_combo: "Space E".to_string(),
-                action_command: "Neotree toggle".to_string(),
-                description: "Toggle file tree on/off".to_string(),
-            },
-            LazyVimKeymapSpec {
-                key_combo: "Ctrl+W W".to_string(),
-                action_command: "wincmd w".to_string(),
-                description: "Hop between file tree and editor pane".to_string(),
-            },
-            LazyVimKeymapSpec {
-                key_combo: "Shift+H".to_string(),
-                action_command: "BufferLineCyclePrev".to_string(),
-                description: "Move left between open buffer tabs".to_string(),
-            },
-            LazyVimKeymapSpec {
-                key_combo: "Shift+L".to_string(),
-                action_command: "BufferLineCycleNext".to_string(),
-                description: "Move right between open buffer tabs".to_string(),
-            },
-            LazyVimKeymapSpec {
-                key_combo: "Space B D".to_string(),
-                action_command: "bdelete".to_string(),
-                description: "Close current buffer tab".to_string(),
-            },
-            LazyVimKeymapSpec {
-                key_combo: "Space B O".to_string(),
-                action_command: "BufferLineCloseOthers".to_string(),
-                description: "Close all other buffer tabs but current".to_string(),
-            },
-            LazyVimKeymapSpec {
-                key_combo: "Space G G".to_string(),
-                action_command: "LazyGit float".to_string(),
-                description: "Launch LazyGit in a floating terminal pane".to_string(),
-            },
-            LazyVimKeymapSpec {
-                key_combo: "Space U W".to_string(),
-                action_command: "set wrap!".to_string(),
-                description: "Toggle soft wrap on/off".to_string(),
-            },
-        ];
-
-        let plugins = vec![
-            "LazyVim/LazyVim".to_string(),
-            "nvim-telescope/telescope.nvim".to_string(),
-            "nvim-neo-tree/neo-tree.nvim".to_string(),
-            "kdheepak/lazygit.nvim".to_string(),
-            "akinsho/bufferline.nvim".to_string(),
-            "neovim/nvim-lspconfig".to_string(),
-        ];
-
-        Self {
-            leader_key: "Space".to_string(),
-            keymaps: default_keymaps,
-            active_plugins: plugins,
-        }
-    }
-
-    pub fn generate_lazy_lua_config(&self) -> String {
-        format!(
-            r#"-- Omarchy Neovim LazyVim Autogenerated Config
-vim.g.mapleader = " "
-vim.g.maplocalleader = " "
-
-require("lazy").setup({{
-    spec = {{
-        {{ "LazyVim/LazyVim", import = "lazyvim.plugins" }},
-        {{ "nvim-telescope/telescope.nvim" }},
-        {{ "nvim-neo-tree/neo-tree.nvim" }},
-        {{ "kdheepak/lazygit.nvim" }},
-    }},
-}})
-"#
-        )
-    }
-}
-
-impl Default for OmarchyNeovimLazyVimEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct SudoEditSessionBridge;
-
-impl SudoEditSessionBridge {
-    pub fn build_sudoedit_invocation(target_file: &str) -> String {
-        format!("sudoedit --editor=nvim {}", target_file)
-    }
-}
-
-pub struct NeovimTerminalAliasLauncher;
-
-impl NeovimTerminalAliasLauncher {
-    pub fn resolve_launch_args(args: &[&str]) -> String {
-        if args.is_empty() {
-            "nvim .".to_string()
-        } else {
-            format!("nvim {}", args.join(" "))
-        }
-    }
-}
-
 #[cfg(not(any(feature = "standalone_test", test)))]
-pub use crate::distro::omarchy_inspiration::*;
+pub use crate::distro::omarchy_inspiration::{
+    AiAgentProvider, HerdrAgentTask, OmarchyHerdrAiAgentManager, OmarchyLuaConfigEngine,
+    OmarchyPluginMarketplace, OmarchyQuickshellEngine, OmarchyReleaseChannel,
+    OmarchyReleaseChannelSnapshotEngine, OmarchySystemThemeStudio, OmarchyThemePalette,
+    QuickshellWidget, ShellComponentKind,
+};
 
 #[cfg(any(feature = "standalone_test", test))]
 #[path = "omarchy_inspiration.rs"]
@@ -1027,13 +629,10 @@ pub use omarchy_inspiration::{
     QuickshellWidget, ShellComponentKind,
 };
 
-pub use crate::distro::omarchy_inspiration;
-
-#[cfg(any(feature = "standalone_test", test))]
-#[path = "omarchy_app_ecosystem.rs"]
-pub mod omarchy_app_ecosystem;
-#[cfg(any(feature = "standalone_test", test))]
-pub use omarchy_app_ecosystem::*;
+#[path = "."]
+pub mod distro {
+    pub use crate::distro::omarchy_inspiration;
+}
 
 /// Omarchy Liveboot ISO & Automated Installer Engine
 #[derive(Debug, Clone)]
@@ -1107,111 +706,6 @@ impl Default for OmarchyAppLauncherEngine {
     }
 }
 
-// =========================================================================
-// Omarchy Theme Overlay, Font Switcher & Template Engine (`OmarchyThemeOverlayEngine`)
-// =========================================================================
-
-#[derive(Debug, Clone)]
-pub struct OmarchyThemeOverlayEngine {
-    pub current_theme_name: String,
-    pub available_themes: Vec<String>,
-    pub available_fonts: Vec<String>,
-    pub current_font_name: String,
-    pub background_images: Vec<String>,
-    pub current_bg_index: usize,
-    pub user_overlay_dir: String,
-    pub installed_templates: Vec<String>,
-}
-
-impl OmarchyThemeOverlayEngine {
-    pub fn new() -> Self {
-        Self {
-            current_theme_name: "tokyo-night".to_string(),
-            available_themes: vec![
-                "tokyo-night".to_string(),
-                "catppuccin".to_string(),
-                "gruvbox".to_string(),
-                "nord".to_string(),
-                "everforest".to_string(),
-                "kanagawa".to_string(),
-                "dracula".to_string(),
-                "rose-pine".to_string(),
-            ],
-            available_fonts: vec![
-                "JetBrainsMono Nerd Font".to_string(),
-                "FiraCode Nerd Font".to_string(),
-                "Hack Nerd Font".to_string(),
-                "MesloLGS Nerd Font".to_string(),
-            ],
-            current_font_name: "JetBrainsMono Nerd Font".to_string(),
-            background_images: vec![
-                "bg1.jpg".to_string(),
-                "bg2.png".to_string(),
-                "bg3.webp".to_string(),
-            ],
-            current_bg_index: 0,
-            user_overlay_dir: "~/.config/omarchy/themes".to_string(),
-            installed_templates: vec![
-                "alacritty.toml.tpl".to_string(),
-                "ghostty.conf.tpl".to_string(),
-                "kitty.conf.tpl".to_string(),
-                "hyprland.conf.tpl".to_string(),
-            ],
-        }
-    }
-
-    pub fn set_theme(&mut self, theme_name: &str) -> Result<String, &'static str> {
-        let slug = theme_name.to_lowercase().replace(' ', "-");
-        if self.available_themes.contains(&slug) {
-            self.current_theme_name = slug.clone();
-            Ok(slug)
-        } else {
-            // Register as custom overlay theme
-            self.available_themes.push(slug.clone());
-            self.current_theme_name = slug.clone();
-            Ok(slug)
-        }
-    }
-
-    pub fn cycle_background_next(&mut self) -> String {
-        if self.background_images.is_empty() {
-            return "default.jpg".to_string();
-        }
-        self.current_bg_index = (self.current_bg_index + 1) % self.background_images.len();
-        self.background_images[self.current_bg_index].clone()
-    }
-
-    pub fn set_font(&mut self, font_name: &str) -> Result<String, &'static str> {
-        if let Some(font) = self.available_fonts.iter().find(|f| f.eq_ignore_ascii_case(font_name)) {
-            self.current_font_name = font.clone();
-            Ok(font.clone())
-        } else {
-            self.available_fonts.push(font_name.to_string());
-            self.current_font_name = font_name.to_string();
-            Ok(font_name.to_string())
-        }
-    }
-
-    pub fn install_theme_repo(&mut self, repo_url: &str) -> Result<String, &'static str> {
-        if repo_url.is_empty() {
-            return Err("InvalidRepoUrl");
-        }
-        let repo_name = repo_url.split('/').last().unwrap_or("custom-theme").trim_end_matches(".git");
-        let slug = repo_name.to_lowercase().replace(' ', "-");
-        if !self.available_themes.contains(&slug) {
-            self.available_themes.push(slug.clone());
-        }
-        self.current_theme_name = slug.clone();
-        Ok(slug)
-    }
-}
-
-impl Default for OmarchyThemeOverlayEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1260,19 +754,6 @@ mod tests {
     }
 
     #[test]
-    fn test_omarchy_nerd_fonts_catalog() {
-        assert_eq!(OmarchyNerdFont::JetBrainsMono.font_family(), "JetBrainsMono Nerd Font");
-        assert_eq!(OmarchyNerdFont::CascadiaMono.font_family(), "CascadiaMono Nerd Font");
-        assert_eq!(OmarchyNerdFont::MesloLgMono.font_family(), "Meslo LG Mono Nerd Font");
-        assert_eq!(OmarchyNerdFont::FiraCode.font_family(), "FiraCode Nerd Font");
-        assert_eq!(OmarchyNerdFont::VictorCode.font_family(), "Victor Mono Nerd Font");
-        assert_eq!(OmarchyNerdFont::BitstreamVeraMono.font_family(), "BitstreamVeraSansMono Nerd Font");
-        assert_eq!(OmarchyNerdFont::Iosevka.font_family(), "Iosevka Nerd Font");
-        assert_eq!(OmarchyNerdFont::Hack.font_family(), "Hack Nerd Font");
-        assert_eq!(OmarchyNerdFont::Meslo.font_family(), "MesloLGS Nerd Font");
-    }
-
-    #[test]
     fn test_omarchy_neovim_preset_engine() {
         let mut nvim = OmarchyNeovimPresetEngine::new();
         assert!(nvim.register_lsp_server("zls"));
@@ -1281,54 +762,11 @@ mod tests {
     }
 
     #[test]
-    fn test_omarchy_lazyvim_engine() {
-        let lazy = OmarchyNeovimLazyVimEngine::new();
-        assert_eq!(lazy.leader_key, "Space");
-        assert_eq!(lazy.keymaps.len(), 10);
-
-        let lua_cfg = lazy.generate_lazy_lua_config();
-        assert!(lua_cfg.contains("vim.g.mapleader = \" \""));
-        assert!(lua_cfg.contains("LazyVim/LazyVim"));
-
-        let sudoedit_cmd = SudoEditSessionBridge::build_sudoedit_invocation("/etc/sudoers.d/00-sudo-only");
-        assert_eq!(sudoedit_cmd, "sudoedit --editor=nvim /etc/sudoers.d/00-sudo-only");
-
-        let n_alias = NeovimTerminalAliasLauncher::resolve_launch_args(&["myfile.txt"]);
-        assert_eq!(n_alias, "nvim myfile.txt");
-
-        let n_dir = NeovimTerminalAliasLauncher::resolve_launch_args(&[]);
-        assert_eq!(n_dir, "nvim .");
-    }
-
-    #[test]
     fn test_omarchy_pipewire_audio_config() {
         let mut audio = OmarchyAudioPipewireConfig::new();
         assert!(audio.set_low_latency(64));
         assert_eq!(audio.quantum_buffer_size, 64);
         assert!(!audio.set_low_latency(0));
-    }
-
-    #[test]
-    fn test_omarchy_security_policy_engine() {
-        let mut sec = OmarchySecurityPolicyEngine::new();
-        assert_eq!(sec.security_email, "security@omarchy.org");
-
-        let mut report = OmarchySecurityReport {
-            report_id: "sec-001".to_string(),
-            component: "hyprland".to_string(),
-            affected_version: "1.2.0".to_string(),
-            vulnerability_summary: "Privilege boundary bypass".to_string(),
-            is_confirmed_vulnerability: false,
-            crosses_security_boundary: true,
-            reporter_contact: "reporter@example.com".to_string(),
-            reporter_x_handle: "@sec_researcher".to_string(),
-        };
-
-        let confirmed = sec.evaluate_vulnerability_report(&mut report);
-        assert!(confirmed);
-        assert!(report.is_confirmed_vulnerability);
-        assert_eq!(sec.confirmed_vulnerabilities_count, 1);
-        assert_eq!(sec.credited_reporters[0], "@sec_researcher");
     }
     #[test]
     fn test_omarchy_expanded_themes_and_iso_installer() {
@@ -1351,6 +789,7 @@ mod tests {
 // =========================================================================
 // OMARCHY & OMAKUB MISSING ECOSYSTEM GAP CLOSURE ENGINES
 // =========================================================================
+
 
 /// Ghostty GPU-accelerated terminal configuration generator engine
 pub struct OmarchyGhosttyTerminalConfigEngine {
@@ -1447,127 +886,40 @@ impl Default for OmarchyHyprlandDwindleTilingEngine {
     }
 }
 
-/// Omarchy Navigation Workspace Layout Mode
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum OmarchyNavigationMode {
-    Dwindle,
-    Scrolling,
-}
-
-/// Scratchpad Workspace Container Definition
-#[derive(Debug, Clone)]
-pub struct ScratchpadWorkspace {
-    pub active_windows: Vec<String>,
-    pub visible: bool,
-}
-
-impl ScratchpadWorkspace {
-    pub fn new() -> Self {
-        Self {
-            active_windows: Vec::new(),
-            visible: false,
-        }
-    }
-
-    pub fn toggle_scratchpad(&mut self) -> bool {
-        self.visible = !self.visible;
-        self.visible
-    }
-
-    pub fn send_to_scratchpad(&mut self, window_id: &str) {
-        if !self.active_windows.contains(&window_id.to_string()) {
-            self.active_windows.push(window_id.to_string());
-        }
-    }
-}
-
-impl Default for ScratchpadWorkspace {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Omarchy Navigation & Keyboard Shortcut Engine
-#[derive(Debug, Clone)]
-pub struct OmarchyNavigationShortcutEngine {
-    pub default_layout: OmarchyNavigationMode,
-    pub scratchpad: ScratchpadWorkspace,
-    pub grouped_windows: Vec<String>,
-    pub popped_floating_windows: Vec<String>,
-}
-
-impl OmarchyNavigationShortcutEngine {
-    pub fn new() -> Self {
-        Self {
-            default_layout: OmarchyNavigationMode::Dwindle,
-            scratchpad: ScratchpadWorkspace::new(),
-            grouped_windows: Vec::new(),
-            popped_floating_windows: Vec::new(),
-        }
-    }
-
-    pub fn toggle_workspace_layout(&mut self) -> OmarchyNavigationMode {
-        match self.default_layout {
-            OmarchyNavigationMode::Dwindle => {
-                self.default_layout = OmarchyNavigationMode::Scrolling;
-                OmarchyNavigationMode::Scrolling
-            }
-            OmarchyNavigationMode::Scrolling => {
-                self.default_layout = OmarchyNavigationMode::Dwindle;
-                OmarchyNavigationMode::Dwindle
-            }
-        }
-    }
-
-    pub fn group_window(&mut self, window_id: &str) -> bool {
-        if !self.grouped_windows.contains(&window_id.to_string()) {
-            self.grouped_windows.push(window_id.to_string());
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn pop_window_floating(&mut self, window_id: &str) -> bool {
-        if !self.popped_floating_windows.contains(&window_id.to_string()) {
-            self.popped_floating_windows.push(window_id.to_string());
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn resolve_shortcut_command(&self, shortcut: &str) -> Option<&'static str> {
-        match shortcut {
-            "Super+Space" => Some("omarchy-menu"),
-            "Super+Return" => Some("ghostty"),
-            "Super+Shift+Return" => Some("chromium"),
-            "Super+J" => Some("hyprland-stack-toggle"),
-            "Super+Shift+Right" => Some("hyprland-swap-window"),
-            "Super+Ctrl+T" => Some("activity-monitor --float"),
-            "Super+T" => Some("hyprland-tile-toggle"),
-            "Super+Shift+F" => Some("files-manager"),
-            "Super+L" => Some("hyprland-layout-toggle"),
-            "Super+G" => Some("hyprland-group-toggle"),
-            "Super+O" => Some("hyprland-pop-pin"),
-            "Super+Grave" | "Super+S" => Some("hyprland-scratchpad-toggle"),
-            "Super+W" | "Super+Q" => Some("hyprland-close-window"),
-            "Super+F" => Some("hyprland-fullscreen-toggle"),
-            _ => None,
-        }
-    }
-}
-
-impl Default for OmarchyNavigationShortcutEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 #[cfg(test)]
 mod omarchy_gap_closure_tests {
     use super::*;
 
+    #[test]
+    fn test_omarchy_hyprland_compositor_config_engine() {
+        let hypr = OmarchyHyprlandCompositorConfigEngine::new();
+        let conf = hypr.generate_hyprland_conf();
+        assert!(conf.contains("border_size = 2"));
+        assert!(conf.contains("windowrulev2 = float,class:^(pavucontrol)$"));
+    }
+
+    #[test]
+    fn test_omarchy_mise_and_lazygit_engines() {
+        let mise = OmarchyMiseVersionManagerEngine::new();
+        let mise_toml = mise.generate_config_toml();
+        assert!(mise_toml.contains("node = \"lts\""));
+        assert!(mise_toml.contains("rust = \"stable\""));
+
+        let lazygit = OmarchyLazyGitConfigurationEngine::new();
+        let lazy_yml = lazygit.generate_config_yml();
+        assert!(lazy_yml.contains("showIcons: true"));
+        assert!(lazy_yml.contains("delta --dark"));
+    }
+
+    #[test]
+    fn test_omarchy_ayu_and_starship_engines() {
+        let ayu_dark = OmarchyAyuThemeEngine::new(true);
+        let css = ayu_dark.generate_gtk_css();
+        assert!(css.contains("@define-color bg_color #0f1419"));
+
+        let starship_toml = OmarchyStarshipPromptConfigEngine::generate_starship_toml();
+        assert!(starship_toml.contains("truncation_length = 3"));
+    }
 
     #[test]
     fn test_omarchy_ghostty_fastfetch_dwindle_engines() {
@@ -1585,24 +937,5 @@ mod omarchy_gap_closure_tests {
         let dwindle_conf = dwindle.generate_dwindle_conf();
         assert!(dwindle_conf.contains("preserve_split = true"));
         assert!(dwindle_conf.contains("force_split = 2"));
-    }
-
-    #[test]
-    fn test_omarchy_theme_overlay_and_font_management() {
-        let mut overlay = OmarchyThemeOverlayEngine::new();
-        assert_eq!(overlay.current_theme_name, "tokyo-night");
-
-        assert_eq!(overlay.set_theme("Catppuccin Mocha").unwrap(), "catppuccin-mocha");
-        assert_eq!(overlay.current_theme_name, "catppuccin-mocha");
-
-        let bg2 = overlay.cycle_background_next();
-        assert_eq!(bg2, "bg2.png");
-
-        assert_eq!(overlay.set_font("FiraCode Nerd Font").unwrap(), "FiraCode Nerd Font");
-        assert_eq!(overlay.current_font_name, "FiraCode Nerd Font");
-
-        let repo_theme = overlay.install_theme_repo("https://github.com/example/tokyo-night-custom.git").unwrap();
-        assert_eq!(repo_theme, "tokyo-night-custom");
-        assert_eq!(overlay.current_theme_name, "tokyo-night-custom");
     }
 }

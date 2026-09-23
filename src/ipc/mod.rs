@@ -51,24 +51,12 @@ pub use ipc_namespace::{
     IpcObjectId,
 };
 
-pub mod alpc;
-pub use alpc::*;
-
 pub mod dbus_sovereign;
 pub use dbus_sovereign::{SovereignDbusBus, DbusMessage, DbusMessageType, DbusValue, DbusMatchRule, DbusService, DbusName};
-
-pub mod sovereign_async_procedure_call;
-pub use sovereign_async_procedure_call::*;
 
 pub mod tech_media_std_streams_synthesis;
 pub use tech_media_std_streams_synthesis::{
     AnsiStreamColorizerEngine, LogLevel, PqcEncryptedStreamMultiplexerEngine,
     SovereignTechMediaStdStreamsSuite, StreamColorLevel, StructuredJsonLogStreamFormatter,
     ZeroCopySpliceTeeStreamEngine,
-};
-
-pub mod advanced_lpc;
-pub use advanced_lpc::{
-    LinuxBsdFastLpcBridgeEngine, AlpcSecurityToken, AlpcSecurityTokenVerifier,
-    AlpcZeroCopySharedSection, AlpcTransportMode, ALPC_MAX_INLINE_SIZE, ALPC_DEFAULT_SECTION_SIZE,
 };
