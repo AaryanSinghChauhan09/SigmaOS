@@ -161,8 +161,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxOmarchy
             | DistroSubsystemMode::LinuxPCLinuxOS
             | DistroSubsystemMode::LinuxSteamOS
-            | DistroSubsystemMode::LinuxVanillaOS
-            | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
+            | DistroSubsystemMode::BedrockLinux
+            | DistroSubsystemMode::LinuxVanillaOS => ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
@@ -289,61 +289,6 @@ impl SovereignUniversalDistroBridge {
                 | DistroSubsystemMode::SmartOs,
                 "/sys",
             ) => "/sys".to_string(),
-            (DistroSubsystemMode::LinuxNix, "/bin" | "/usr/bin") => "/run/current-system/sw/bin".to_string(),
-            (
-                DistroSubsystemMode::FreeBsd
-                | DistroSubsystemMode::OpenBsd
-                | DistroSubsystemMode::NetBsd
-                | DistroSubsystemMode::DragonFlyBsd
-                | DistroSubsystemMode::MidnightBsd
-                | DistroSubsystemMode::HardenedBsd
-                | DistroSubsystemMode::GhostBsd
-                | DistroSubsystemMode::NomadBsd
-                | DistroSubsystemMode::SmartOs,
-                "/bin" | "/usr/bin",
-            ) => "/usr/local/bin".to_string(),
-            (
-                DistroSubsystemMode::FreeBsd
-                | DistroSubsystemMode::OpenBsd
-                | DistroSubsystemMode::NetBsd
-                | DistroSubsystemMode::DragonFlyBsd
-                | DistroSubsystemMode::MidnightBsd
-                | DistroSubsystemMode::HardenedBsd
-                | DistroSubsystemMode::GhostBsd
-                | DistroSubsystemMode::NomadBsd
-                | DistroSubsystemMode::SmartOs,
-                "/usr/share",
-            ) => "/usr/local/share".to_string(),
-            (
-                DistroSubsystemMode::FreeBsd
-                | DistroSubsystemMode::GhostBsd
-                | DistroSubsystemMode::MidnightBsd
-                | DistroSubsystemMode::HardenedBsd,
-                "/home",
-            ) => "/usr/home".to_string(),
-            (DistroSubsystemMode::OpenBsd, "/etc/rc.conf") => "/etc/rc.conf.local".to_string(),
-            (
-                DistroSubsystemMode::FreeBsd
-                | DistroSubsystemMode::OpenBsd
-                | DistroSubsystemMode::NetBsd
-                | DistroSubsystemMode::DragonFlyBsd
-                | DistroSubsystemMode::MidnightBsd
-                | DistroSubsystemMode::HardenedBsd
-                | DistroSubsystemMode::GhostBsd
-                | DistroSubsystemMode::NomadBsd,
-                "/etc/pf.conf",
-            ) => "/etc/pf.conf".to_string(),
-            (
-                DistroSubsystemMode::LinuxArch
-                | DistroSubsystemMode::LinuxDebian
-                | DistroSubsystemMode::LinuxFedora
-                | DistroSubsystemMode::LinuxUbuntu
-                | DistroSubsystemMode::LinuxMint
-                | DistroSubsystemMode::LinuxAlpine
-                | DistroSubsystemMode::LinuxGentoo
-                | DistroSubsystemMode::LinuxVoid,
-                "/var/run",
-            ) => "/run".to_string(),
             _ => generic_path.to_string(),
         }
     }
@@ -465,8 +410,6 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxClear => format!("{}.bundle", input_pkg),
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::LinuxTinyCore => format!("{}.tcz", input_pkg),
-            DistroSubsystemMode::LinuxVanillaOS => format!("{}.apx", input_pkg),
-            DistroSubsystemMode::LinuxOpenWrt => format!("{}.ipk", input_pkg),
             DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::DragonFlyBsd
             | DistroSubsystemMode::MidnightBsd
@@ -480,8 +423,6 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::SmartOs => {
                 format!("{}.tgz", input_pkg)
             }
-            DistroSubsystemMode::LinuxVanillaOS => format!("{}.apx", input_pkg),
-            DistroSubsystemMode::LinuxOpenWrt => format!("{}.ipk", input_pkg),
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", input_pkg),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", input_pkg),
             DistroSubsystemMode::LinuxVanillaOS => format!("{}.apx", input_pkg),
@@ -539,8 +480,6 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxPuppy => format!("{}.pet", action),
             DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", action),
             DistroSubsystemMode::LinuxClear => format!("{}.bundle", action),
-            DistroSubsystemMode::LinuxVanillaOS => format!("{}.apx", action),
-            DistroSubsystemMode::LinuxOpenWrt => format!("{}.ipk", action),
             DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::DragonFlyBsd
             | DistroSubsystemMode::MidnightBsd
@@ -554,8 +493,6 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::SmartOs => format!("{}.tgz", action),
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", action),
             DistroSubsystemMode::LinuxTinyCore => format!("{}.tcz", action),
-            DistroSubsystemMode::LinuxVanillaOS => format!("{}.apx", action),
-            DistroSubsystemMode::LinuxOpenWrt => format!("{}.ipk", action),
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", action),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", action),
             DistroSubsystemMode::LinuxVanillaOS => format!("{}.apx", action),
@@ -2255,98 +2192,6 @@ impl Default for LandlockV5NetworkGuard {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct DistroSubsystemDagNode {
-    pub name: String,
-    pub dependencies: Vec<String>,
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct DistroSubsystemAcyclicDependencyGraph {
-    pub nodes: Vec<DistroSubsystemDagNode>,
-}
-
-impl DistroSubsystemAcyclicDependencyGraph {
-    pub fn new() -> Self {
-        Self { nodes: Vec::new() }
-    }
-
-    pub fn add_subsystem(&mut self, name: &str, dependencies: &[&str]) {
-        let deps = dependencies.iter().map(|s| s.to_string()).collect();
-        if let Some(existing) = self.nodes.iter_mut().find(|n| n.name == name) {
-            existing.dependencies = deps;
-        } else {
-            self.nodes.push(DistroSubsystemDagNode {
-                name: name.to_string(),
-                dependencies: deps,
-            });
-        }
-    }
-
-    pub fn has_cycle(&self) -> bool {
-        let mut visited = Vec::new();
-        let mut in_stack = Vec::new();
-
-        for node in &self.nodes {
-            if !visited.contains(&node.name) {
-                if self.dfs_cycle(&node.name, &mut visited, &mut in_stack) {
-                    return true;
-                }
-            }
-        }
-        false
-    }
-
-    fn dfs_cycle(&self, name: &str, visited: &mut Vec<String>, in_stack: &mut Vec<String>) -> bool {
-        visited.push(name.to_string());
-        in_stack.push(name.to_string());
-
-        if let Some(node) = self.nodes.iter().find(|n| n.name == name) {
-            for dep in &node.dependencies {
-                if !visited.contains(dep) {
-                    if self.dfs_cycle(dep, visited, in_stack) {
-                        return true;
-                    }
-                } else if in_stack.contains(dep) {
-                    return true;
-                }
-            }
-        }
-
-        in_stack.retain(|n| n != name);
-        false
-    }
-
-    pub fn topological_sort(&self) -> Result<Vec<String>, &'static str> {
-        if self.has_cycle() {
-            return Err("Acyclic graph dependency cycle detected");
-        }
-
-        let mut visited = Vec::new();
-        let mut order = Vec::new();
-
-        for node in &self.nodes {
-            if !visited.contains(&node.name) {
-                self.dfs_topo(&node.name, &mut visited, &mut order);
-            }
-        }
-
-        Ok(order)
-    }
-
-    fn dfs_topo(&self, name: &str, visited: &mut Vec<String>, order: &mut Vec<String>) {
-        visited.push(name.to_string());
-        if let Some(node) = self.nodes.iter().find(|n| n.name == name) {
-            for dep in &node.dependencies {
-                if !visited.contains(dep) {
-                    self.dfs_topo(dep, visited, order);
-                }
-            }
-        }
-        order.push(name.to_string());
-    }
-}
-
 pub struct SovereignCrossDistroSubsystemOrchestrator {
     pub bridge: SovereignUniversalDistroBridge,
     pub ipc_bridge: SovereignZeroCopyIpcBridge,
@@ -2354,21 +2199,11 @@ pub struct SovereignCrossDistroSubsystemOrchestrator {
     pub boot_bridge: SovereignMultiArchBootChainBridge,
     pub container_manager: SovereignCrossDistroContainerManager,
     pub syscall_translator: SovereignMultiArchSyscallTranslator,
-    pub dependency_dag: DistroSubsystemAcyclicDependencyGraph,
     pub active_subsystems: Vec<String>,
 }
 
 impl SovereignCrossDistroSubsystemOrchestrator {
     pub fn new(mode: DistroSubsystemMode) -> Self {
-        let mut dag = DistroSubsystemAcyclicDependencyGraph::new();
-        dag.add_subsystem("kernel", &[]);
-        dag.add_subsystem("vfs", &["kernel"]);
-        dag.add_subsystem("security", &["kernel"]);
-        dag.add_subsystem("init", &["vfs", "security"]);
-        dag.add_subsystem("network", &["init"]);
-        dag.add_subsystem("audio", &["init"]);
-        dag.add_subsystem("desktop", &["network", "audio"]);
-
         Self {
             bridge: SovereignUniversalDistroBridge::new(mode),
             ipc_bridge: SovereignZeroCopyIpcBridge::new(),
@@ -2376,13 +2211,8 @@ impl SovereignCrossDistroSubsystemOrchestrator {
             boot_bridge: SovereignMultiArchBootChainBridge::new(),
             container_manager: SovereignCrossDistroContainerManager::new(mode),
             syscall_translator: SovereignMultiArchSyscallTranslator::new(mode),
-            dependency_dag: dag,
             active_subsystems: Vec::new(),
         }
-    }
-
-    pub fn resolve_initialization_order(&self) -> Result<Vec<String>, &'static str> {
-        self.dependency_dag.topological_sort()
     }
 
     pub fn set_mode(&mut self, mode: DistroSubsystemMode) {
@@ -2596,8 +2426,6 @@ mod cross_subsystem_tests {
             DistroSubsystemMode::GhostBsd,
             DistroSubsystemMode::NomadBsd,
             DistroSubsystemMode::LinuxAlpineExtended,
-            DistroSubsystemMode::LinuxVanillaOS,
-            DistroSubsystemMode::LinuxOpenWrt,
         ];
 
         for m in modes {
@@ -2636,14 +2464,6 @@ mod cross_subsystem_tests {
         let ghost_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::GhostBsd);
         assert_eq!(ghost_bridge.translate_package_specifier("app"), "app.pkg");
         assert_eq!(ghost_bridge.get_supervisor_type(), ServiceSupervisorType::OpenRC);
-
-        let vanilla_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxVanillaOS);
-        assert_eq!(vanilla_bridge.translate_package_specifier("app"), "app.apx");
-        assert_eq!(vanilla_bridge.get_supervisor_type(), ServiceSupervisorType::Systemd);
-
-        let openwrt_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxOpenWrt);
-        assert_eq!(openwrt_bridge.translate_package_specifier("app"), "app.ipk");
-        assert_eq!(openwrt_bridge.get_supervisor_type(), ServiceSupervisorType::Runit);
     }
 
     #[test]
@@ -2677,36 +2497,11 @@ mod cross_subsystem_tests {
         assert!(sync_count.is_ok());
         assert_eq!(sync_count.unwrap(), 44);
 
-        let init_order = orchestrator.resolve_initialization_order();
-        assert!(init_order.is_ok());
-        let order = init_order.unwrap();
-        assert!(order.contains(&"kernel".to_string()));
-        assert!(order.contains(&"desktop".to_string()));
-
         let (supervisor, pkg_spec, vfs_etc, compatible) = orchestrator.query_subsystem_capabilities();
         assert_eq!(supervisor, ServiceSupervisorType::Smf);
         assert!(!pkg_spec.is_empty());
         assert!(!vfs_etc.is_empty());
         assert!(compatible);
-    }
-
-    #[test]
-    fn test_distro_subsystem_acyclic_dependency_graph() {
-        let mut dag = DistroSubsystemAcyclicDependencyGraph::new();
-        dag.add_subsystem("db", &[]);
-        dag.add_subsystem("backend", &["db"]);
-        dag.add_subsystem("frontend", &["backend"]);
-
-        assert!(!dag.has_cycle());
-        let topo_order = dag.topological_sort().unwrap();
-        assert_eq!(topo_order, vec!["db", "backend", "frontend"]);
-
-        // Test cycle detection
-        let mut cyclic_dag = DistroSubsystemAcyclicDependencyGraph::new();
-        cyclic_dag.add_subsystem("serviceA", &["serviceB"]);
-        cyclic_dag.add_subsystem("serviceB", &["serviceA"]);
-        assert!(cyclic_dag.has_cycle());
-        assert!(cyclic_dag.topological_sort().is_err());
     }
 
     #[test]
@@ -5794,16 +5589,12 @@ mod tests {
         assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.pkg");
         assert_eq!(bridge.get_supervisor_type(), ServiceSupervisorType::OpenRC);
         assert_eq!(bridge.translate_vfs_path("/etc"), "/usr/local/etc");
-        assert_eq!(bridge.translate_vfs_path("/bin"), "/usr/local/bin");
-        assert_eq!(bridge.translate_vfs_path("/home"), "/usr/home");
         assert!(bridge.enforce_security_isolation(101, "/jails/web").is_ok());
         assert!(bridge.active_jail.is_some());
         assert!(bridge.verify_all_subsystems_compatibility());
 
         bridge.set_subsystem_mode(DistroSubsystemMode::OpenBsd);
         assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.tgz");
-        assert_eq!(bridge.translate_vfs_path("/etc/rc.conf"), "/etc/rc.conf.local");
-        assert_eq!(bridge.translate_vfs_path("/etc/pf.conf"), "/etc/pf.conf");
         assert!(bridge.enforce_security_isolation(102, "/var/www").is_ok());
         assert!(bridge.verify_all_subsystems_compatibility());
 
