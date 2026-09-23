@@ -2,14 +2,7 @@
 // Inspired by TechCrunch, TechSpot, OpenSourceForU, Appuals, Android Authority, Android Police,
 // Geeky Gadgets, How-To Geek, Linux Foundation, The New Stack, PCMag, Windows Central/Latest, XDA Developers, ZDNet
 
-#[cfg(not(test))]
-use alloc::string::String;
-#[cfg(not(test))]
-use alloc::vec::Vec;
-
-#[cfg(test)]
 use std::string::String;
-#[cfg(test)]
 use std::vec::Vec;
 
 /// TechCrunch Open-Source Project Health & Startup Ecosystem Metrics

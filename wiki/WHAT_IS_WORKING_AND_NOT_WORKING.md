@@ -358,6 +358,14 @@ Recent GitHub Actions CI checks revealed key failure modes across workflow confi
 - **Root Cause**: Writing `1.0 - (1.0 + r).powf(-nper)` where `1.0 + r` has an ambiguous float type context.
 - **Fix Pattern**: Annotate float literals explicitly with type suffixes: `1.0f64 - (1.0f64 + r).powf(-nper)`.
 
+### Case 6: Non-Exhaustive Enum Match Arms & Duplicate Types (`E0004`, `E0119`, `E0599`)
+- **Symptom**: `error[E0004]: non-exhaustive patterns: DistroSubsystemMode::LinuxVanillaOS and DistroSubsystemMode::LinuxOpenWrt not covered` or `error[E0599]: no variant found for enum DistroSubsystemMode` or `error[E0119]: conflicting implementations of trait Debug for type modern_nvme::DeviceGeneration`.
+- **Root Cause**: Adding match arms or references to new enum variants in subsystem bridge methods before declaring them in `enum DistroSubsystemMode`, or defining the same struct/enum multiple times in different `#[cfg(test)]` blocks in the same module.
+- **Fix Pattern**:
+  1. Add missing variants (`LinuxVanillaOS`, `LinuxOpenWrt`) directly to `DistroSubsystemMode` in `src/distro/linux_bsd_inspirations.rs`.
+  2. Implement exhaustive match arms in `translate_package_specifier` and `dispatch_cross_subsystem_action`.
+  3. Delete duplicate struct/enum declarations (e.g. `DeviceGeneration` in `src/drivers/modern_nvme.rs`) to avoid conflicting trait implementation errors.
+
 ---
 
 ## 4. Production-Grade Safe Rust Code Blueprints (How To Fix It)
@@ -682,9 +690,12 @@ When working on any task in SigmaOS, AI agents **MUST** follow this 4-step workf
 2. **GitHub Actions Workflows (`.github/workflows/`):**
    - Replaced POSIX non-compliant `source $HOME/.cargo/env` commands with `. "$HOME/.cargo/env"` across `.github/workflows/04_desktop-environment-matrix.yml`, `.github/workflows/05_security-hardening-matrix.yml`, and `.github/workflows/08_compiler-kernel-matrix.yml`.
 
-3. **Verification & Test Status:**
-   - `./run_sigma_tests.sh`: **100% Passed** across all 22+ test suites.
-   - Documentation synchronization verified via SHA-256 parity across all 4 mirrors (`./`, `docs/`, `wiki/`, `wiki_repo/`).
+3. **Subsystem Parity & Test Suite Audit (March 2026 Update):**
+   - **Enum Variants & Cross-Distro Dispatch (`E0599`, `E0004`)**: Fixed missing `LinuxVanillaOS` and `LinuxOpenWrt` enum variants in `DistroSubsystemMode` within `src/distro/linux_bsd_inspirations.rs`, along with complete match arms in `get_supervisor_type`, `verify_subsystem_compatibility`, `translate_package_specifier`, and `dispatch_cross_subsystem_action`.
+   - **Driver Duplicate Struct Definitions (`E0119`)**: Removed duplicate `DeviceGeneration` enum definition from `src/drivers/modern_nvme.rs`.
+   - **Verification & Test Status:**
+     - `./run_sigma_tests.sh`: **100% Passed** across all 22+ test suites.
+     - SHA-256 hash parity verified across all documentation mirrors (`./`, `docs/`, `wiki/`, `wiki_repo/`, `WIKI/`, `wiki_content/`).
 
 ---
 *Guide synchronized and verified across root directory (`WHAT_IS_WORKING_AND_NOT_WORKING.md`), `docs/`, `wiki/`, `wiki_repo/`, `WIKI/`, and `wiki_content/`.*

@@ -430,7 +430,33 @@ impl TransactionJournal {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tempfile::TempDir;
+
+    struct TempDir {
+        path: PathBuf,
+    }
+
+    impl TempDir {
+        fn new() -> io::Result<Self> {
+            let mut path = std::env::temp_dir();
+            let nonce: u64 = SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_nanos() as u64;
+            path.push(format!("sigma_journal_test_{}", nonce));
+            fs::create_dir_all(&path)?;
+            Ok(Self { path })
+        }
+
+        fn path(&self) -> &Path {
+            &self.path
+        }
+    }
+
+    impl Drop for TempDir {
+        fn drop(&mut self) {
+            let _ = fs::remove_dir_all(&self.path);
+        }
+    }
 
     #[test]
     fn test_journal_creation() {

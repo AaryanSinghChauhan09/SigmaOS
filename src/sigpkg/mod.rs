@@ -7,9 +7,9 @@
 #![allow(non_camel_case_types)]
 #![allow(clippy::large_enum_variant)]
 #![allow(clippy::type_complexity)]
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 // SigmaPkg - SigmaOS Package Manager
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
@@ -78,20 +78,17 @@ pub use zero_alloc_resolver::{
     PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES,
 };
 pub use universal_adapter::{
-    PackageFormatAdapter, AdapterError,
+    AdapterError, AppImageContainer, FlatpakManifest, MappedScriptletHook,
+    PackageFormatAdapter, PackagePriority, PacmanPkgbuild, RpmSpecManifest, SigmaPkgHookType,
+    SnapcraftManifest, UniversalDependencyMapper, UniversalDryRunResult, UniversalDryRunSimulator,
+    UniversalFormatConverter, UniversalPackageAdapter, UniversalScriptletConverter,
 };
 pub use universal_oop_system::{
-    DebAdapter, RpmAdapter, PacmanAdapter, ApkAdapter, NixAdapter, EbuildAdapter, UniversalPackageManager,
+    ApkAdapter, DebAdapter, EbuildAdapter, NixAdapter, PacmanAdapter, RpmAdapter,
+    UniversalPackageManager,
 };
 pub use sovereign_sigpkg::*;
 pub use crate::package::sovereign_distro_package_master_suite::*;
-pub use universal_adapter::{
-    AppImageContainer, FlatpakManifest, MappedScriptletHook, PackageFormatAdapter,
-    PackagePriority, PacmanPkgbuild, RpmSpecManifest, SigmaPkgHookType, SnapcraftManifest,
-    UniversalDependencyMapper, UniversalDryRunResult, UniversalDryRunSimulator,
-    UniversalFormatConverter, UniversalPackageAdapter, UniversalScriptletConverter,
-};
-pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
 
 pub use alpine_apk_engine::{AlpineCommunityRepo, ApkIndexParser, ApkPackage};
 pub use arch_compat::{
@@ -111,6 +108,7 @@ pub use client::{
 };
 pub use daemon::{SigpkgDaemon, SyncStatus, UpdateAvailable};
 pub use debian_apt_engine::{AptRepository, DebPackage};
+pub use crate::package::AptDebManifest;
 pub use debian_defeater::{
     SovereignDeltaGenerator, SovereignMaintainerSandbox, SovereignMirrorSelector,
 };
@@ -146,9 +144,6 @@ pub use resolver::SatSolver;
 pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use store::{BsdPkgRepositoryMirror, ContentAddressedStore, GentooPortageUseFlagMask, NixOsHermeticCasStore};
 pub use transaction::Transaction;
-pub use universal_adapter::{
-    UniversalPackageAdapter,
-};
 pub use spec::{
     CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel, ManagerCapability, PackageCapability,
     PackageDependency, PackageError as SpecPackageError, PackageInfo,

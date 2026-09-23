@@ -17,7 +17,7 @@ pub enum VoiceGender {
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AccessibilityError {
+pub enum ScreenReaderError {
     Success = 0,
     NotFound = 1,
 }
@@ -79,7 +79,7 @@ impl Voice for SimpleVoice {
 }
 
 pub trait ScreenReader {
-    fn speak(&self, text: &[u8], voice_id: VoiceID) -> Result<(), AccessibilityError>;
+    fn speak(&self, text: &[u8], voice_id: VoiceID) -> Result<(), ScreenReaderError>;
     fn stop(&mut self);
     fn pause(&mut self);
     fn resume(&mut self);
@@ -103,11 +103,11 @@ impl SimpleScreenReader {
 }
 
 impl ScreenReader for SimpleScreenReader {
-    fn speak(&self, _text: &[u8], voice_id: VoiceID) -> Result<(), AccessibilityError> {
+    fn speak(&self, _text: &[u8], voice_id: VoiceID) -> Result<(), ScreenReaderError> {
         if self.get_voice(voice_id).is_some() {
             Ok(())
         } else {
-            Err(AccessibilityError::NotFound)
+            Err(ScreenReaderError::NotFound)
         }
     }
 
@@ -184,7 +184,7 @@ mod tests {
         assert_eq!(reader.speak(b"Hello", 42), Ok(()));
         assert_eq!(
             reader.speak(b"Hello", 999),
-            Err(AccessibilityError::NotFound)
+            Err(ScreenReaderError::NotFound)
         );
     }
 

@@ -161,13 +161,6 @@ impl AhciPort {
 
 #[cfg(test)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DeviceGeneration {
-    Legacy,
-    Modern,
-}
-
-#[cfg(test)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PowerState {
     Off,
     On,

@@ -1,14 +1,7 @@
 // SigmaOS Tech Media Distro Innovations Engine
 // Inspired by DistroWatch, 9to5Linux, MakeUseOf, LinuxTeck, Appuals, ZDNet, and DistroWatch
 
-#[cfg(not(test))]
-use alloc::string::String;
-#[cfg(not(test))]
-use alloc::vec::Vec;
-
-#[cfg(test)]
 use std::string::String;
-#[cfg(test)]
 use std::vec::Vec;
 
 /// DistroWatch page-hit ranking and distribution release tracker engine.

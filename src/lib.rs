@@ -17,6 +17,7 @@ pub mod ai;
 pub mod app;
 pub mod auth;
 pub mod automation;
+pub mod community;
 pub mod compatibility;
 pub mod container;
 pub mod customization;
@@ -29,6 +30,7 @@ pub mod drivers;
 pub mod crypto;
 pub mod filesystem;
 pub mod futuristic_modules;
+pub mod governance;
 pub mod iso;
 pub use iso::*;
 pub mod kernel;
@@ -274,7 +276,6 @@ pub use governance::{
 pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, Message, MemoryBlock, PAGE_SIZE,
     Priority, Process, ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler,
-    VirtualCpu,
     IoUringEngine, IoUringOpcode, SubmissionQueueEntry, CompletionQueueEntry,
     BoundedBufferProducerConsumer, SoftIrqType, BottomHalfKernelThread, BroadcastReceiver,
     AndroidBroadcastReceiverRegistry,
