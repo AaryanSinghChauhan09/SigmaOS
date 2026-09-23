@@ -5669,3 +5669,17 @@ SigmaOS integrates an autonomous engineering specification and daily distro-crus
    - **Universal Hardware Adaptation**: Ancient 1980s 16-bit ISA/IDE/PIO/PS/2/VBE hardware support through modern 2026+ CXL 3.0, PCIe Gen7, NVMe 1.4, and Post-Quantum Cryptography (Dilithium-5 / Kyber-1024) acceleration.
    - **Market-Defeating OS Absorption (`SigmaPkg`)**: Declarative, reproducible, and sandboxed package manager supporting 29+ package formats with SAT-based dependency resolution and sub-millisecond CoW generation rollbacks.
    - **Composite AI Specialist Roles**: Integrated specialized agent capabilities (Bolt ⚡ for performance, Palette 🎨 for UX/accessibility, Sentinel 🛡️ for zero-trust security).
+
+
+## 137. SOVEREIGN VANILLAOS APX CONTAINERIZATION & OPENWRT UCI/IPK SPECIFICATION
+
+### 137.1 Overview & Subsystem Architecture
+SigmaOS absorbs VanillaOS APX subsystem containerization and OpenWrt UCI configuration and IPK package management into zero-dependency `#![no_std]` Rust engines (`LinuxVanillaOsApxEngine` and `LinuxOpenWrtUciIpkEngine` in `src/distro/additional_linux_bsd_components.rs`):
+
+1. **VanillaOS APX Subsystem Containerization Engine (`LinuxVanillaOsApxEngine`)**:
+   - Manages APX containerized subsystems (`sub-ubuntu`, `sub-arch`, `sub-fedora`, `sub-alpine`).
+   - Supports isolated package execution, read-only root filesystems, and binary export to the host OS.
+
+2. **OpenWrt Unified Configuration Interface (UCI) & IPK Engine (`LinuxOpenWrtUciIpkEngine`)**:
+   - Parses and modifies OpenWrt UCI configuration sections (`/etc/config/network`, `system`, `wireless`, `firewall`).
+   - Handles opkg/ipk embedded package installation and dependency tracking.

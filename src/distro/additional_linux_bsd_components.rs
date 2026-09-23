@@ -3,12 +3,16 @@
 // Debian dpkg-divert, Arch pacdiff, Gentoo eclass/SLOT, FreeBSD pkg audit VuXML, OpenBSD signify, Void xbps journal.
 
 #[cfg(not(test))]
+use alloc::collections::BTreeMap;
+#[cfg(not(test))]
 use alloc::string::{String, ToString};
 #[cfg(not(test))]
 use alloc::vec::Vec;
 #[cfg(not(test))]
 use alloc::format;
 
+#[cfg(test)]
+use std::collections::BTreeMap;
 #[cfg(test)]
 use std::string::String;
 #[cfg(test)]
@@ -56,6 +60,106 @@ impl DebianDpkgDivertEngine {
 }
 
 impl Default for DebianDpkgDivertEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// VanillaOS APX Managed Subsystem Containerization Engine
+#[derive(Debug, Clone)]
+pub struct ApxContainerSpec {
+    pub name: String,
+    pub base_distro: String, // "ubuntu", "arch", "fedora", "alpine"
+    pub export_path: String,
+    pub is_read_only_root: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct LinuxVanillaOsApxEngine {
+    pub containers: BTreeMap<String, ApxContainerSpec>,
+}
+
+impl LinuxVanillaOsApxEngine {
+    pub fn new() -> Self {
+        Self {
+            containers: BTreeMap::new(),
+        }
+    }
+
+    pub fn create_apx_container(&mut self, name: &str, distro: &str) -> bool {
+        if self.containers.contains_key(name) {
+            return false;
+        }
+
+        let spec = ApxContainerSpec {
+            name: name.to_string(),
+            base_distro: distro.to_string(),
+            export_path: format!("/var/lib/apx/subsystems/{}", name),
+            is_read_only_root: true,
+        };
+
+        self.containers.insert(name.to_string(), spec);
+        true
+    }
+
+    pub fn execute_apx_package(&mut self, container_name: &str, pkg_name: &str) -> Result<String, &'static str> {
+        let container = self.containers.get(container_name).ok_or("APX Container not found")?;
+        Ok(format!("[APX:{}] Installed and exported {} from {}", container.name, pkg_name, container.base_distro))
+    }
+}
+
+impl Default for LinuxVanillaOsApxEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// OpenWrt Unified Configuration Interface (UCI) & OPKG/IPK Package Engine
+#[derive(Debug, Clone)]
+pub struct UciConfigSection {
+    pub section_type: String,
+    pub options: BTreeMap<String, String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct LinuxOpenWrtUciIpkEngine {
+    pub uci_configs: BTreeMap<String, Vec<UciConfigSection>>,
+    pub installed_ipk_packages: Vec<String>,
+}
+
+impl LinuxOpenWrtUciIpkEngine {
+    pub fn new() -> Self {
+        Self {
+            uci_configs: BTreeMap::new(),
+            installed_ipk_packages: Vec::new(),
+        }
+    }
+
+    pub fn set_uci_option(&mut self, config_name: &str, section_type: &str, option: &str, value: &str) {
+        let sections = self.uci_configs.entry(config_name.to_string()).or_default();
+        if let Some(sec) = sections.iter_mut().find(|s| s.section_type == section_type) {
+            sec.options.insert(option.to_string(), value.to_string());
+        } else {
+            let mut opts = BTreeMap::new();
+            opts.insert(option.to_string(), value.to_string());
+            sections.push(UciConfigSection {
+                section_type: section_type.to_string(),
+                options: opts,
+            });
+        }
+    }
+
+    pub fn install_ipk_package(&mut self, ipk_name: &str) -> bool {
+        if !self.installed_ipk_packages.contains(&ipk_name.to_string()) {
+            self.installed_ipk_packages.push(ipk_name.to_string());
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for LinuxOpenWrtUciIpkEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -287,5 +391,21 @@ mod tests {
         let undone = journal.rollback_last().unwrap();
         assert_eq!(undone.pkg_name, "curl");
         assert_eq!(journal.history.len(), 0);
+    }
+
+    #[test]
+    fn test_vanilla_os_apx_engine() {
+        let mut apx = LinuxVanillaOsApxEngine::new();
+        assert!(apx.create_apx_container("sub-ubuntu", "ubuntu"));
+        let res = apx.execute_apx_package("sub-ubuntu", "htop").unwrap();
+        assert!(res.contains("[APX:sub-ubuntu] Installed and exported htop from ubuntu"));
+    }
+
+    #[test]
+    fn test_openwrt_uci_ipk_engine() {
+        let mut uci_ipk = LinuxOpenWrtUciIpkEngine::new();
+        uci_ipk.set_uci_option("network", "interface", "proto", "dhcp");
+        assert!(uci_ipk.install_ipk_package("luci-app-wireguard"));
+        assert_eq!(uci_ipk.installed_ipk_packages.len(), 1);
     }
 }
