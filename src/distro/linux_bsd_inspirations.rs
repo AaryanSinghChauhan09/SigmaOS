@@ -83,6 +83,8 @@ pub enum DistroSubsystemMode {
     MidnightBsd,
     HardenedBsd,
     LinuxOmarchy,
+    LinuxVanillaOS,
+    LinuxOpenWrt,
     LinuxPCLinuxOS,
     LinuxSteamOS,
     GhostBsd,
@@ -159,9 +161,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxOmarchy
             | DistroSubsystemMode::LinuxPCLinuxOS
             | DistroSubsystemMode::LinuxSteamOS
-            | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
-
-            DistroSubsystemMode::LinuxSteamOS
+            | DistroSubsystemMode::BedrockLinux
             | DistroSubsystemMode::LinuxVanillaOS => ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
@@ -326,9 +326,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxKaOS
             | DistroSubsystemMode::LinuxOmarchy
             | DistroSubsystemMode::LinuxPCLinuxOS
-            | DistroSubsystemMode::LinuxSteamOS => supervisor == ServiceSupervisorType::Systemd,
-
-            DistroSubsystemMode::LinuxSteamOS
+            | DistroSubsystemMode::LinuxSteamOS
             | DistroSubsystemMode::LinuxVanillaOS => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
@@ -407,6 +405,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxPCLinuxOS => {
                 format!("{}.rpm", input_pkg)
             }
+            DistroSubsystemMode::LinuxVanillaOS => format!("{}.apx", input_pkg),
+            DistroSubsystemMode::LinuxOpenWrt => format!("{}.ipk", input_pkg),
             DistroSubsystemMode::LinuxPuppy => format!("{}.pet", input_pkg),
             DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", input_pkg),
             DistroSubsystemMode::LinuxClear => format!("{}.bundle", input_pkg),
@@ -477,6 +477,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxRocky
             | DistroSubsystemMode::LinuxNobara
             | DistroSubsystemMode::LinuxPCLinuxOS => format!("{}.rpm", action),
+            DistroSubsystemMode::LinuxVanillaOS => format!("{}.apx", action),
+            DistroSubsystemMode::LinuxOpenWrt => format!("{}.ipk", action),
             DistroSubsystemMode::LinuxPuppy => format!("{}.pet", action),
             DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", action),
             DistroSubsystemMode::LinuxClear => format!("{}.bundle", action),
