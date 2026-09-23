@@ -49,6 +49,10 @@ pub mod shell;
 pub mod sigpkg;
 pub mod storage;
 pub mod thread;
+pub use thread::{
+    SovereignTask, SovereignThreadPool, SovereignThreadPoolEngine, SovereignWorkerThread,
+    TaskPriority, TaskState, ThreadPoolKind,
+};
 pub mod vfs;
 pub use process::{
     AdvancedIpcHub, BsdRusage, CancellationType, CoreDumpMetadata, EventFd,
