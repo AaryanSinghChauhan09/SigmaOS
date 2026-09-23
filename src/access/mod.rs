@@ -7,16 +7,19 @@
 pub mod append_rights;
 pub mod control;
 
+#[cfg(not(feature = "standalone_test"))]
 pub use crate::filesystem::ext4_ntfs_security::{
     NtfsAce, NtfsDacl, NtfsSacl, NtfsSecurityDescriptor,
 };
+#[cfg(not(feature = "standalone_test"))]
+pub use crate::filesystem::ext4_ntfs_security::*;
+
 pub use control::{
     AccessControlMatrix, AclEntry, AclTag, AclType, CapBoundingSet, DacPermission, FilterPolicy,
     MacAddressFilter, MacSecurityLabel, PosixAcl, SensitivityLevel, ZeroTrustAccessGate,
 };
 pub use control::*;
 pub use append_rights::*;
-pub use crate::filesystem::ext4_ntfs_security::*;
 
 use std::string::{String, ToString};
 use std::vec::Vec;
