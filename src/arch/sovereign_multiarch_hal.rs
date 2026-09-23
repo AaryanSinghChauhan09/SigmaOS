@@ -208,6 +208,26 @@ pub struct SyscallAbiCallingConvention {
 pub struct SovereignSyscallAbiTranslator;
 
 impl SovereignSyscallAbiTranslator {
+    pub fn get_fast_trampoline_msr(arch: ArchitectureClass) -> Vec<(&'static str, u32)> {
+        match arch {
+            ArchitectureClass::X86_64 => vec![
+                ("IA32_STAR", 0xC000_0081),
+                ("IA32_LSTAR", 0xC000_0082),
+                ("IA32_FMASK", 0xC000_0084),
+                ("IA32_KERNEL_GS_BASE", 0xC000_0102),
+            ],
+            ArchitectureClass::AArch64 => vec![
+                ("TTBR1_EL1", 0x01),
+                ("VBAR_EL1", 0x02),
+            ],
+            ArchitectureClass::RiscV64 => vec![
+                ("STVEC", 0x05),
+                ("SSCRATCH", 0x40),
+            ],
+            _ => vec![("GENERIC_SYSCALL_ENTRY", 0x00)],
+        }
+    }
+
     pub fn get_calling_convention(arch: ArchitectureClass) -> SyscallAbiCallingConvention {
         match arch {
             ArchitectureClass::X86_32 => SyscallAbiCallingConvention {
@@ -326,6 +346,97 @@ pub enum VectorInstructionSet {
     FallbackScalar,
 }
 
+// =========================================================================
+// 4. SOVEREIGN 64-BIT ADDRESS SPACE LAYOUT ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AddressSpaceCanonicality {
+    CanonicalUser,
+    CanonicalKernel,
+    NonCanonicalHole,
+}
+
+#[derive(Debug, Clone)]
+pub struct Sovereign64BitAddressSpaceLayout {
+    pub arch: ArchitectureClass,
+    pub is_la57_enabled: bool,
+    pub user_va_start: u64,
+    pub user_va_end: u64,
+    pub kernel_va_start: u64,
+    pub kernel_va_end: u64,
+}
+
+impl Sovereign64BitAddressSpaceLayout {
+    pub fn new(arch: ArchitectureClass, is_la57_enabled: bool) -> Self {
+        let (user_end, kernel_start) = if is_la57_enabled {
+            (0x00FF_FFFF_FFFF_FFFF, 0xFF00_0000_0000_0000)
+        } else {
+            (0x0000_7FFF_FFFF_FFFF, 0xFFFF_8000_0000_0000)
+        };
+
+        Self {
+            arch,
+            is_la57_enabled,
+            user_va_start: 0x0000_0000_0000_0000,
+            user_va_end: user_end,
+            kernel_va_start: kernel_start,
+            kernel_va_end: 0xFFFF_FFFF_FFFF_FFFF,
+        }
+    }
+
+    pub fn classify_address(&self, va: u64) -> AddressSpaceCanonicality {
+        if va <= self.user_va_end {
+            AddressSpaceCanonicality::CanonicalUser
+        } else if va >= self.kernel_va_start {
+            AddressSpaceCanonicality::CanonicalKernel
+        } else {
+            AddressSpaceCanonicality::NonCanonicalHole
+        }
+    }
+}
+
+// =========================================================================
+// 5. SOVEREIGN 64-BIT ATOMIC & SIMD VECTOR REGISTER ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct Sovereign64BitAtomicAndSimdEngine {
+    pub arch: ArchitectureClass,
+    pub simd_state_size_bytes: usize,
+}
+
+impl Sovereign64BitAtomicAndSimdEngine {
+    pub fn new(arch: ArchitectureClass) -> Self {
+        let simd_state_size_bytes = match arch {
+            ArchitectureClass::X86_64 => 64 * 32, // AVX-512 ZMM0-ZMM31 (2048 bytes)
+            ArchitectureClass::AArch64 => 32 * 256, // ARM SVE2 Z0-Z31 (8192 bytes)
+            ArchitectureClass::RiscV64 => 32 * 128, // RISC-V V registers v0-v31 (4096 bytes)
+            _ => 32 * 16, // Default 128-bit vector register file
+        };
+
+        Self {
+            arch,
+            simd_state_size_bytes,
+        }
+    }
+
+    /// Emulates 128-bit atomic double-word compare-and-swap (cmpxchg16b parity)
+    pub fn compare_and_swap_u128(
+        &self,
+        target: &mut (u64, u64),
+        expected: (u64, u64),
+        desired: (u64, u64),
+    ) -> (bool, (u64, u64)) {
+        if *target == expected {
+            *target = desired;
+            (true, expected)
+        } else {
+            (false, *target)
+        }
+    }
+}
+
 pub struct SovereignSimdVectorDispatcher {
     pub preferred_isa: VectorInstructionSet,
 }
@@ -382,13 +493,53 @@ mod tests {
 
     #[test]
     fn test_multiarch_hal_arm64_riscv() {
-        let mut arm_hal = SovereignMultiArchHalEngine::new(ArchitectureClass::AArch64);
+        let arm_hal = SovereignMultiArchHalEngine::new(ArchitectureClass::AArch64);
         assert_eq!(arm_hal.get_root_register_name(), "TTBR0_EL1");
         assert!(arm_hal.vector_caps.has_neon);
 
-        let mut rv_hal = SovereignMultiArchHalEngine::new(ArchitectureClass::RiscV64);
+        let rv_hal = SovereignMultiArchHalEngine::new(ArchitectureClass::RiscV64);
         assert_eq!(rv_hal.get_root_register_name(), "SATP");
         assert!(rv_hal.vector_caps.has_riscv_v);
+    }
+
+    #[test]
+    fn test_64bit_address_space_layout_and_la57() {
+        let layout_48 = Sovereign64BitAddressSpaceLayout::new(ArchitectureClass::X86_64, false);
+        assert_eq!(layout_48.classify_address(0x0000_7FFF_FFFF_0000), AddressSpaceCanonicality::CanonicalUser);
+        assert_eq!(layout_48.classify_address(0xFFFF_8000_0000_0000), AddressSpaceCanonicality::CanonicalKernel);
+        assert_eq!(layout_48.classify_address(0x0000_8000_0000_0000), AddressSpaceCanonicality::NonCanonicalHole);
+
+        let layout_57 = Sovereign64BitAddressSpaceLayout::new(ArchitectureClass::X86_64, true);
+        assert_eq!(layout_57.classify_address(0x00FF_FFFF_FFFF_0000), AddressSpaceCanonicality::CanonicalUser);
+        assert_eq!(layout_57.classify_address(0xFF00_0000_0000_0000), AddressSpaceCanonicality::CanonicalKernel);
+    }
+
+    #[test]
+    fn test_64bit_atomic_and_simd_vector_state() {
+        let engine_x64 = Sovereign64BitAtomicAndSimdEngine::new(ArchitectureClass::X86_64);
+        assert_eq!(engine_x64.simd_state_size_bytes, 2048);
+
+        let mut pair = (0x1234_5678_9ABC_DEF0, 0x0000_0000_0000_0001);
+        let expected = (0x1234_5678_9ABC_DEF0, 0x0000_0000_0000_0001);
+        let desired = (0x9999_8888_7777_6666, 0x0000_0000_0000_0002);
+
+        let (success, old) = engine_x64.compare_and_swap_u128(&mut pair, expected, desired);
+        assert!(success);
+        assert_eq!(old, expected);
+        assert_eq!(pair, desired);
+
+        let engine_arm = Sovereign64BitAtomicAndSimdEngine::new(ArchitectureClass::AArch64);
+        assert_eq!(engine_arm.simd_state_size_bytes, 8192);
+    }
+
+    #[test]
+    fn test_64bit_fast_trampoline_msr() {
+        let msrs_x64 = SovereignSyscallAbiTranslator::get_fast_trampoline_msr(ArchitectureClass::X86_64);
+        assert_eq!(msrs_x64.len(), 4);
+        assert_eq!(msrs_x64[1].0, "IA32_LSTAR");
+
+        let msrs_arm = SovereignSyscallAbiTranslator::get_fast_trampoline_msr(ArchitectureClass::AArch64);
+        assert_eq!(msrs_arm[0].0, "TTBR1_EL1");
     }
 
     #[test]
