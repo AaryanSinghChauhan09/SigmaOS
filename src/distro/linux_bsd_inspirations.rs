@@ -161,10 +161,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxOmarchy
             | DistroSubsystemMode::LinuxPCLinuxOS
             | DistroSubsystemMode::LinuxSteamOS
+            | DistroSubsystemMode::LinuxVanillaOS
             | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
-
-            DistroSubsystemMode::LinuxSteamOS
-            | DistroSubsystemMode::LinuxVanillaOS => ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
@@ -328,9 +326,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxKaOS
             | DistroSubsystemMode::LinuxOmarchy
             | DistroSubsystemMode::LinuxPCLinuxOS
-            | DistroSubsystemMode::LinuxSteamOS => supervisor == ServiceSupervisorType::Systemd,
-
-            DistroSubsystemMode::LinuxSteamOS
+            | DistroSubsystemMode::LinuxSteamOS
             | DistroSubsystemMode::LinuxVanillaOS => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
@@ -429,6 +425,8 @@ impl SovereignUniversalDistroBridge {
             }
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", input_pkg),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", input_pkg),
+            DistroSubsystemMode::LinuxVanillaOS => format!("{}.deb", input_pkg),
+            DistroSubsystemMode::LinuxOpenWrt => format!("{}.ipk", input_pkg),
         }
     }
 
@@ -497,6 +495,8 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxTinyCore => format!("{}.tcz", action),
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", action),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", action),
+            DistroSubsystemMode::LinuxVanillaOS => format!("{}.deb", action),
+            DistroSubsystemMode::LinuxOpenWrt => format!("{}.ipk", action),
         };
 
         Ok(format!(
