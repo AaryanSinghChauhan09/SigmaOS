@@ -126,7 +126,43 @@ pub enum PackageFormat {
     Hpkg, SlackBuild, Pkgsrc, Moss, Tcz, Gobo, Ostree, Air, Bottle, Ipa, Ports, Aab, Hap, Superdeb,
     Lzm, Pup, Pet, Tar, TarGz, TarXz, AppBundle, Puk, Dmg, Cports, Dports, Ipk, Opkg, SolarisIps,
     GuixNar, NarInfo, OpenBsdPkg, Swupd, Stratum, Crux, Drpm, Sfs, Wheel, Crate, Gem, Nupkg, Vcpkg,
-    Spack, Conan, Sigma, Sysupdate, Starling, Sovereign, Eopkg,
+    Spack, Conan, Sigma, Sysupdate, Starling, Sovereign, Eopkg, Msi, MakeselfRun, KernelModuleKmod, PhpPhar,
+}
+
+#[cfg(feature = "standalone_test")]
+impl PackageFormat {
+    pub fn from_filename(filename: &str) -> Option<Self> {
+        let f = filename.to_lowercase();
+        if f.ends_with(".deb") { Some(Self::Apt) }
+        else if f.ends_with(".rpm") || f.ends_with(".spec") { Some(Self::Yum) }
+        else if f.ends_with(".pkg.tar.xz") || f.ends_with(".pkg.tar.zst") || f.ends_with("pkgbuild") { Some(Self::Pacman) }
+        else if f.ends_with(".apk") { Some(Self::Apk) }
+        else if f.ends_with(".xbps") { Some(Self::Xbps) }
+        else if f.ends_with(".ebuild") { Some(Self::Portage) }
+        else if f.ends_with(".hpkg") { Some(Self::Hpkg) }
+        else if f.ends_with(".air") { Some(Self::Air) }
+        else if f.ends_with(".bottle") { Some(Self::Bottle) }
+        else if f.ends_with(".ipa") { Some(Self::Ipa) }
+        else if f.ends_with(".ports") { Some(Self::Ports) }
+        else if f.ends_with(".pkg") { Some(Self::Pkg) }
+        else if f.ends_with(".aab") { Some(Self::Aab) }
+        else if f.ends_with(".appimage") { Some(Self::AppImage) }
+        else if f.ends_with(".eopkg") { Some(Self::Eopkg) }
+        else if f.ends_with(".hap") { Some(Self::Hap) }
+        else if f.ends_with(".lzm") { Some(Self::Lzm) }
+        else if f.ends_with(".pup") { Some(Self::Pup) }
+        else if f.ends_with(".pet") { Some(Self::Pet) }
+        else if f.ends_with(".moss") { Some(Self::Moss) }
+        else if f.ends_with(".tcz") { Some(Self::Tcz) }
+        else if f.ends_with(".gobo") { Some(Self::Gobo) }
+        else if f.ends_with(".ostree") { Some(Self::Ostree) }
+        else if f.ends_with(".pkgsrc") { Some(Self::Pkgsrc) }
+        else if f.ends_with(".sfs") { Some(Self::Sfs) }
+        else if f.ends_with(".puk") { Some(Self::Puk) }
+        else if f.ends_with(".dmg") { Some(Self::Dmg) }
+        else if f.ends_with(".cports") { Some(Self::Cports) }
+        else { None }
+    }
 }
 
 #[cfg(feature = "standalone_test")]
