@@ -78,7 +78,7 @@ pub use zero_alloc_resolver::{
     PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES,
 };
 pub use universal_adapter::{
-    PackageFormatAdapter, AdapterError,
+    PackageFormatAdapter, AdapterError, AptDebManifest,
 };
 pub use universal_oop_system::{
     DebAdapter, RpmAdapter, PacmanAdapter, ApkAdapter, NixAdapter, EbuildAdapter, UniversalPackageManager,

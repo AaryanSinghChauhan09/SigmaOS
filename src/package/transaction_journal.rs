@@ -430,12 +430,11 @@ impl TransactionJournal {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tempfile::TempDir;
+    use std::env::temp_dir;
 
     #[test]
     fn test_journal_creation() {
-        let temp_dir = TempDir::new().unwrap();
-        let journal_path = temp_dir.path().join("transactions.json");
+        let journal_path = temp_dir().join("sigma_test_transactions.json");
 
         let journal = TransactionJournal::new(&journal_path).unwrap();
         assert_eq!(journal.get_all_transactions().len(), 0);
@@ -443,8 +442,7 @@ mod tests {
 
     #[test]
     fn test_transaction_lifecycle() {
-        let temp_dir = TempDir::new().unwrap();
-        let journal_path = temp_dir.path().join("transactions.json");
+        let journal_path = temp_dir().join("sigma_test_transactions2.json");
 
         let mut journal = TransactionJournal::new(&journal_path).unwrap();
 
@@ -471,8 +469,7 @@ mod tests {
 
     #[test]
     fn test_package_history() {
-        let temp_dir = TempDir::new().unwrap();
-        let journal_path = temp_dir.path().join("transactions.json");
+        let journal_path = temp_dir().join("sigma_test_transactions3.json");
 
         let mut journal = TransactionJournal::new(&journal_path).unwrap();
 
