@@ -151,5 +151,7 @@ pub use crate::security::vulnerability::{SimpleVulnerability, SimpleVulnerabilit
 // ─── Capability Monitor (pledge + unveil + Capsicum) ─────────────────────────
 pub mod capability_monitor;
 pub mod sudo_engine;
+pub mod unified_access_control;
 
 pub use sudo_engine::*;
+pub use unified_access_control::*;
