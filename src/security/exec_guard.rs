@@ -201,15 +201,24 @@ impl ZorinExecGuardPolicyEngine {
             }
         }
 
-        // 4. Check developer path rules
+        // 4. Check developer path rules with strict component boundary verification
         if self.developer_mode.enabled {
             for rule in &self.path_rules {
-                if binary_path.starts_with(&rule.path_prefix) {
-                    if rule.allow_unsigned_execution {
-                        return ExecDecision::Allow {
-                            capabilities: rule.allowed_capabilities.clone(),
-                            trust_source: format!("Developer Workspace Rule: {}", rule.path_prefix),
-                        };
+                let prefix = &rule.path_prefix;
+                if binary_path.starts_with(prefix) {
+                    let is_exact = binary_path == prefix;
+                    let is_root = prefix == "/";
+                    let prefix_has_sep = prefix.ends_with('/') || prefix.ends_with('\\');
+                    let next_is_sep = binary_path.as_bytes().get(prefix.len()) == Some(&b'/')
+                        || binary_path.as_bytes().get(prefix.len()) == Some(&b'\\');
+
+                    if is_exact || is_root || prefix_has_sep || next_is_sep {
+                        if rule.allow_unsigned_execution {
+                            return ExecDecision::Allow {
+                                capabilities: rule.allowed_capabilities.clone(),
+                                trust_source: format!("Developer Workspace Rule: {}", rule.path_prefix),
+                            };
+                        }
                     }
                 }
             }
@@ -309,5 +318,30 @@ mod tests {
         } else {
             panic!("Expected HardDeny decision");
         }
+    }
+
+    #[test]
+    fn test_exec_guard_path_prefix_confusion_prevention() {
+        let mut engine = ZorinExecGuardPolicyEngine::new();
+
+        engine.add_path_rule(PathRule {
+            path_prefix: "/home/developer/app".to_string(),
+            allow_unsigned_execution: true,
+            enforce_strict_sandboxing: true,
+            allowed_capabilities: vec![ExecCapability::FileRead, ExecCapability::ProcessExec],
+            blocked_capabilities: vec![],
+        });
+
+        // Exact path match
+        let decision_exact = engine.evaluate_execution("/home/developer/app", None, None);
+        assert!(matches!(decision_exact, ExecDecision::Allow { .. }));
+
+        // Child path with separator boundary
+        let decision_child = engine.evaluate_execution("/home/developer/app/bin/runner", None, None);
+        assert!(matches!(decision_child, ExecDecision::Allow { .. }));
+
+        // Sibling path prefix confusion attack (e.g. /home/developer/app_evil/payload) must NOT match!
+        let decision_sibling = engine.evaluate_execution("/home/developer/app_evil/payload", None, None);
+        assert!(matches!(decision_sibling, ExecDecision::PromptDeveloper { .. }));
     }
 }
