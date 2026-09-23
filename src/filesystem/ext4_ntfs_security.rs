@@ -24,6 +24,19 @@ pub mod ext4_mode_bits {
     pub const S_IXOTH: u16 = 0o0001; // Others Execute
 }
 
+/// BSD File Flags (chflags) Access Bits
+pub mod bsd_file_flags {
+    pub const UF_NODUMP: u32 = 0x00000001;     // User: Do not dump file
+    pub const UF_IMMUTABLE: u32 = 0x00000002;  // User: File may not be changed
+    pub const UF_APPEND: u32 = 0x00000004;     // User: File may only be appended to
+    pub const UF_OPAQUE: u32 = 0x00000008;     // User: Directory is opaque for unionfs
+    pub const UF_NOUNLINK: u32 = 0x00000010;   // User: File may not be removed or renamed
+    pub const SF_ARCHIVED: u32 = 0x00010000;   // Superuser: File is archived
+    pub const SF_IMMUTABLE: u32 = 0x00020000;  // Superuser: File may not be changed
+    pub const SF_APPEND: u32 = 0x00040000;     // Superuser: File may only be appended to
+    pub const SF_NOUNLINK: u32 = 0x00100000;   // Superuser: File may not be removed or renamed
+}
+
 /// Ext4 Extent mapping block range to physical disk blocks
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Ext4Extent {
@@ -76,6 +89,7 @@ pub struct Ext4InodeMetadata {
     pub uid: u32,
     pub gid: u32,
     pub i_mode: u16,                       // 16-bit file type + permissions
+    pub bsd_flags: u32,                    // BSD file flags (UF_IMMUTABLE, SF_NOUNLINK, etc)
     pub extents: Vec<Ext4Extent>,          // Ext4 extent tree mapping
     pub xattrs: BTreeMap<String, Vec<u8>>, // Extended attributes e.g. "system.posix_acl_access"
 }
@@ -87,6 +101,7 @@ impl Ext4InodeMetadata {
             uid,
             gid,
             i_mode,
+            bsd_flags: 0,
             extents: Vec::new(),
             xattrs: BTreeMap::new(),
         }
@@ -131,6 +146,13 @@ impl Ext4InodeMetadata {
             if subject_uid == self.uid {
                 let owner_bits = (self.i_mode >> 6) & 0o7;
                 return (owner_bits & requested_mode) == requested_mode;
+            }
+        }
+
+        // Check BSD Immutable / Append-only flags
+        if (self.bsd_flags & (bsd_file_flags::UF_IMMUTABLE | bsd_file_flags::SF_IMMUTABLE)) != 0 {
+            if (requested_mode & (ext4_mode_bits::S_IWUSR | ext4_mode_bits::S_IWGRP | ext4_mode_bits::S_IWOTH)) != 0 {
+                return false; // Immutable flag blocks modifications
             }
         }
 
@@ -270,6 +292,10 @@ mod tests {
         // Set POSIX ACL Extended Attribute
         ext4.set_xattr("system.posix_acl_access", &[0x02, 0x00]);
         assert!(ext4.evaluate_ext4_access(1000, 1000, 0o7));
+
+        // Set BSD UF_IMMUTABLE flag
+        ext4.bsd_flags |= bsd_file_flags::UF_IMMUTABLE;
+        assert!(!ext4.evaluate_ext4_access(1000, 1000, ext4_mode_bits::S_IWUSR)); // Write blocked by immutable flag!
     }
 
     #[test]
