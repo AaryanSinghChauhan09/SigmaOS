@@ -23,6 +23,22 @@ pub enum PullRequestPackageFormat {
     VoidXbps,
     FreeBsdPorts,
     OpenBsdPorts,
+    NetBsdPkgsrc,
+    HaikuHpkg,
+    SlackwareSlackBuild,
+    ZypperSpec,
+    EopkgSpec,
+    MossPackage,
+    TczPackage,
+    GoboPackage,
+    OstreeCommit,
+    CportsPackage,
+    DportsPackage,
+    IpkPackage,
+    OpkgPackage,
+    SolarisIpsPackage,
+    SpackHpcPackage,
+    ConanCppPackage,
     NixFlake,
     GuixScheme,
     FlatpakApp,
@@ -42,6 +58,22 @@ impl PullRequestPackageFormat {
             Self::VoidXbps => "Void Linux XBPS Template",
             Self::FreeBsdPorts => "FreeBSD Ports Makefile",
             Self::OpenBsdPorts => "OpenBSD Ports Port",
+            Self::NetBsdPkgsrc => "NetBSD pkgsrc Package",
+            Self::HaikuHpkg => "Haiku .hpkg Package",
+            Self::SlackwareSlackBuild => "Slackware SlackBuild Script",
+            Self::ZypperSpec => "openSUSE Zypper Spec",
+            Self::EopkgSpec => "Solus Eopkg Spec",
+            Self::MossPackage => "Serpent OS Moss Package",
+            Self::TczPackage => "TinyCore TCZ Extension",
+            Self::GoboPackage => "GoboLinux Recipe Package",
+            Self::OstreeCommit => "OSTree Atomic Commit",
+            Self::CportsPackage => "Chimera Linux cports Recipe",
+            Self::DportsPackage => "DragonFly BSD DPorts Package",
+            Self::IpkPackage => "OpenWrt IPK Package",
+            Self::OpkgPackage => "Yocto OPKG Package",
+            Self::SolarisIpsPackage => "Solaris IPS Package",
+            Self::SpackHpcPackage => "Spack HPC Package",
+            Self::ConanCppPackage => "Conan C/C++ Package",
             Self::NixFlake => "Nix Flake / Derivation",
             Self::GuixScheme => "GNU Guix Scheme Package",
             Self::FlatpakApp => "Flatpak Application Bundle",
@@ -208,6 +240,34 @@ impl SovereignPackagePullRequestEngine {
 
         submission.status = PullRequestStatus::Translated;
         Ok(consolidated)
+    }
+
+    /// Computes a unified PR diff string comparing the raw manifest content of a PR against an existing manifest
+    pub fn generate_pr_diff(&self, pr_id: u64, old_manifest: &str) -> Result<String, &'static str> {
+        let submission = self.submissions.get(&pr_id).ok_or("PR ID not found")?;
+        let new_manifest = &submission.raw_manifest_content;
+
+        let mut diff = String::new();
+        diff.push_str(&format!("--- a/{}\n", submission.package_name));
+        diff.push_str(&format!("+++ b/{}\n", submission.package_name));
+
+        let old_lines: Vec<&str> = old_manifest.lines().collect();
+        let new_lines: Vec<&str> = new_manifest.lines().collect();
+
+        for line in &old_lines {
+            if !new_lines.contains(line) {
+                diff.push_str(&format!("- {}\n", line));
+            }
+        }
+        for line in &new_lines {
+            if !old_lines.contains(line) {
+                diff.push_str(&format!("+ {}\n", line));
+            } else {
+                diff.push_str(&format!("  {}\n", line));
+            }
+        }
+
+        Ok(diff)
     }
 
     /// Merges a translated package PR into the Sovereign package registry

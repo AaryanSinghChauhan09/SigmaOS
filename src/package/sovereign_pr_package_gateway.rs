@@ -183,12 +183,28 @@ impl MultiFormatPrTranspilationEngine {
         .with_format(PackageFormat::SigmaPkg)
         .with_provides(pr.package_name.clone());
 
-        // Parse foreign dependencies from manifest
+        // Parse foreign dependencies from manifest across all Linux & BSD package PR formats
         for line in pr.raw_manifest_content.lines() {
-            if line.starts_with("depends=") || line.starts_with("Depends:") || line.starts_with("DEPENDS=") {
-                let deps_part = line.split('=').nth(1).or_else(|| line.split(':').nth(1)).unwrap_or("");
+            let trimmed = line.trim();
+            if trimmed.starts_with("depends=")
+                || trimmed.starts_with("Depends:")
+                || trimmed.starts_with("DEPENDS=")
+                || trimmed.starts_with("requires=")
+                || trimmed.starts_with("Requires:")
+                || trimmed.starts_with("REQUIRES=")
+                || trimmed.starts_with("run_depends=")
+                || trimmed.starts_with("rdepend=")
+                || trimmed.starts_with("RDEPEND=")
+                || trimmed.starts_with("deps:")
+                || trimmed.starts_with("deps=")
+                || trimmed.starts_with("SLACK_REQUIRED=")
+            {
+                let deps_part = trimmed.split('=').nth(1).or_else(|| trimmed.split(':').nth(1)).unwrap_or("");
                 for dep in deps_part.split_whitespace() {
-                    sigma_pkg = sigma_pkg.with_dependency(dep.trim_matches(',').to_string());
+                    let cleaned = dep.trim_matches(|c| c == ',' || c == '\'' || c == '"' || c == '(' || c == ')');
+                    if !cleaned.is_empty() {
+                        sigma_pkg = sigma_pkg.with_dependency(cleaned.to_string());
+                    }
                 }
             }
         }
@@ -276,8 +292,20 @@ impl SovereignPrPackageGatewaySuite {
             "pkgname=ripgrep\npkgver=14.1.0\ndepends=glibc gcc-libs\n",
         );
 
-        let process_ok = self.process_pr_pipeline(101).is_ok();
-        results.insert("pr_package_pipeline".to_string(), process_ok);
+        self.submit_package_pr(
+            102,
+            "add nginx 1.26.0 rpm spec",
+            "fedora_maintainer",
+            PackageFormat::Rpm,
+            "nginx",
+            "1.26.0",
+            "BSD-2-Clause",
+            "Name: nginx\nVersion: 1.26.0\nRequires: openssl, zlib\n",
+        );
+
+        let process_ok1 = self.process_pr_pipeline(101).is_ok();
+        let process_ok2 = self.process_pr_pipeline(102).is_ok();
+        results.insert("pr_package_pipeline".to_string(), process_ok1 && process_ok2);
 
         if let Some(pr) = self.pr_registry.get(&101) {
             results.insert("pr_gating_approval".to_string(), pr.status == PackagePrStatus::MergedToRepository);
