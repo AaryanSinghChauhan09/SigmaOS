@@ -194,7 +194,7 @@ pub trait BlockDevice: Send + Sync {
 /// RAM-backed block device (for testing / ramdisk)
 pub struct RamDisk {
     name: String,
-    data: crate::klib::Vec<u8>,
+    data: Vec<u8>,
     sector_count: u64,
     reads: AtomicU64,
     writes: AtomicU64,
@@ -206,7 +206,7 @@ unsafe impl Sync for RamDisk {}
 impl RamDisk {
     pub fn new(name: &str, size_bytes: usize) -> Self {
         let sectors = (size_bytes / SECTOR_SIZE) as u64;
-        let mut data = crate::klib::Vec::with_capacity(size_bytes);
+        let mut data = Vec::with_capacity(size_bytes);
         for _ in 0..size_bytes {
             data.push(0);
         }
@@ -256,6 +256,111 @@ impl BlockDevice for RamDisk {
             self.data[offset + i] = data[i];
         }
         self.writes.fetch_add(1, Ordering::Relaxed);
+        Ok(data.len())
+    }
+}
+
+/// Loopback Block Device (inspired by Linux /dev/loopN and FreeBSD md memory disk)
+pub struct LoopBlockDevice {
+    name: String,
+    backing_store: Vec<u8>,
+    sector_count: u64,
+}
+
+impl LoopBlockDevice {
+    pub fn new(name: &str, backing_store: Vec<u8>) -> Self {
+        let sector_count = (backing_store.len() / SECTOR_SIZE) as u64;
+        Self {
+            name: name.to_string(),
+            backing_store,
+            sector_count,
+        }
+    }
+}
+
+impl BlockDevice for LoopBlockDevice {
+    fn name(&self) -> &str {
+        &self.name
+    }
+    fn sector_count(&self) -> u64 {
+        self.sector_count
+    }
+    fn read_sectors(&mut self, lba: u64, buf: &mut [u8]) -> Result<usize, &'static str> {
+        let offset = lba as usize * SECTOR_SIZE;
+        if offset + buf.len() > self.backing_store.len() {
+            return Err("LoopBlockDevice: read out of bounds");
+        }
+        buf.copy_from_slice(&self.backing_store[offset..offset + buf.len()]);
+        Ok(buf.len())
+    }
+    fn write_sectors(&mut self, lba: u64, data: &[u8]) -> Result<usize, &'static str> {
+        let offset = lba as usize * SECTOR_SIZE;
+        if offset + data.len() > self.backing_store.len() {
+            return Err("LoopBlockDevice: write out of bounds");
+        }
+        self.backing_store[offset..offset + data.len()].copy_from_slice(data);
+        Ok(data.len())
+    }
+}
+
+/// Compressed in-memory zram block device (inspired by Linux zram and FreeBSD md)
+pub struct ZramBlockDevice {
+    name: String,
+    sectors: BTreeMap<u64, Vec<u8>>,
+    sector_count: u64,
+}
+
+impl ZramBlockDevice {
+    pub fn new(name: &str, size_bytes: usize) -> Self {
+        let sector_count = (size_bytes / SECTOR_SIZE) as u64;
+        Self {
+            name: name.to_string(),
+            sectors: BTreeMap::new(),
+            sector_count,
+        }
+    }
+}
+
+impl BlockDevice for ZramBlockDevice {
+    fn name(&self) -> &str {
+        &self.name
+    }
+    fn sector_count(&self) -> u64 {
+        self.sector_count
+    }
+    fn read_sectors(&mut self, lba: u64, buf: &mut [u8]) -> Result<usize, &'static str> {
+        let requested_sectors = (buf.len() + SECTOR_SIZE - 1) / SECTOR_SIZE;
+        if lba + requested_sectors as u64 > self.sector_count {
+            return Err("ZramBlockDevice: read out of bounds");
+        }
+        for sec in 0..requested_sectors {
+            let current_lba = lba + sec as u64;
+            let dest_start = sec * SECTOR_SIZE;
+            let dest_end = (dest_start + SECTOR_SIZE).min(buf.len());
+            if let Some(sector_data) = self.sectors.get(&current_lba) {
+                let copy_len = dest_end - dest_start;
+                buf[dest_start..dest_end].copy_from_slice(&sector_data[..copy_len]);
+            } else {
+                for b in &mut buf[dest_start..dest_end] {
+                    *b = 0;
+                }
+            }
+        }
+        Ok(buf.len())
+    }
+    fn write_sectors(&mut self, lba: u64, data: &[u8]) -> Result<usize, &'static str> {
+        let write_sectors = (data.len() + SECTOR_SIZE - 1) / SECTOR_SIZE;
+        if lba + write_sectors as u64 > self.sector_count {
+            return Err("ZramBlockDevice: write out of bounds");
+        }
+        for sec in 0..write_sectors {
+            let current_lba = lba + sec as u64;
+            let src_start = sec * SECTOR_SIZE;
+            let src_end = (src_start + SECTOR_SIZE).min(data.len());
+            let mut sector_data = vec![0u8; SECTOR_SIZE];
+            sector_data[..src_end - src_start].copy_from_slice(&data[src_start..src_end]);
+            self.sectors.insert(current_lba, sector_data);
+        }
         Ok(data.len())
     }
 }
@@ -328,21 +433,33 @@ mod tests {
     #[test]
     fn test_ramdisk_rw() {
         let mut rd = RamDisk::new("ram0", 1024 * 1024); // 1MB
-        let write_data: Vec<u8> = crate::klib::time::SystemTime::now()
-            .duration_since(crate::klib::time::UNIX_EPOCH)
-            .as_nanos()
-            .to_le_bytes()
-            .iter()
-            .cycle()
-            .take(512)
-            .copied()
-            .collect();
+        let write_data: Vec<u8> = vec![0xaa; 512];
         rd.write_sectors(0, &write_data).unwrap();
         let mut read_buf = vec![0u8; 512];
         rd.read_sectors(0, &mut read_buf).unwrap();
         assert_eq!(read_buf[0], write_data[0]);
         assert_eq!(rd.reads(), 1);
         assert_eq!(rd.writes(), 1);
+    }
+
+    #[test]
+    fn test_loop_and_zram_block_devices() {
+        // LoopBlockDevice
+        let backing = vec![0u8; 4096];
+        let mut loop_dev = LoopBlockDevice::new("loop0", backing);
+        assert_eq!(loop_dev.sector_count(), 8);
+        assert_eq!(loop_dev.write_sectors(0, b"SigmaOS").unwrap(), 7);
+        let mut buf = [0u8; 7];
+        loop_dev.read_sectors(0, &mut buf).unwrap();
+        assert_eq!(&buf, b"SigmaOS");
+
+        // ZramBlockDevice
+        let mut zram_dev = ZramBlockDevice::new("zram0", 1024 * 1024);
+        assert_eq!(zram_dev.sector_count(), 2048);
+        zram_dev.write_sectors(10, b"CompressedData").unwrap();
+        let mut zbuf = [0u8; 14];
+        zram_dev.read_sectors(10, &mut zbuf).unwrap();
+        assert_eq!(&zbuf, b"CompressedData");
     }
 
     #[test]
@@ -368,15 +485,7 @@ mod tests {
         assert_eq!(mgr.device_count(), 1);
 
         let bio_id = mgr.next_bio_id();
-        let write_data: Vec<u8> = crate::klib::time::SystemTime::now()
-            .duration_since(crate::klib::time::UNIX_EPOCH)
-            .as_nanos()
-            .to_le_bytes()
-            .iter()
-            .cycle()
-            .take(512)
-            .copied()
-            .collect();
+        let write_data: Vec<u8> = vec![0xbb; 512];
         let write_bio = Bio::write(bio_id, 10, write_data);
         mgr.submit_bio(write_bio);
         let processed = mgr.process_pending();
