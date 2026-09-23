@@ -361,6 +361,15 @@ pub use sovereign_2040_distro_supremacy_engine::{
     SovereignWayland135ZeroCopyDisplayEngine, StorageTier2040,
 };
 
+pub mod sovereign_2045_distro_supremacy_engine;
+pub use sovereign_2045_distro_supremacy_engine::{
+    AutonomousServiceSpec2045, BcachefsOpticalExtent2045, DirectKmsFrame2045, HyperFineIbtRange2045,
+    QuantumVnetJailSpec2045, Sovereign2045DistroSupremacyMasterSuite,
+    SovereignFreeBsd190QuantumVnetXdpMeshEngine, SovereignLinux90BcachefsQuantumPhotonicMeshEngine,
+    SovereignOpenBsd100HyperFineIbtShadowGuard, SovereignSystemd280AutonomousMeshEngine,
+    SovereignWayland140ZeroCopyDisplayEngine, StorageTier2045,
+};
+
 // ─── Omarchy Master Synthesis Suite ──────────────────────────────────────────
 pub mod omarchy_master_synthesis;
 pub use omarchy_master_synthesis::{
