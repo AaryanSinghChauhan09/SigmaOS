@@ -5605,3 +5605,24 @@ SigmaOS guarantees absolute, zero-compromise hardware compatibility spanning eve
 2. **Daily Repository Intelligence Agents**:
    - **Sigma Updater**: Scans Linux/BSD open-source GitHub repositories daily for upstream kernel, driver, and security commits.
    - **Sigma Linux Distros Crusher**: Analyzes changes across major Linux/BSD distributions, formulates absorption specifications, and auto-synchronizes Wiki documentation across `WIKI/`, `wiki/`, and `wiki_repo/`.
+
+
+---
+
+## 128. SOVEREIGN ACYCLIC GRAPH DIRECTORY & ASYNC PROCEDURE CALL SPECIFICATION
+
+### 128.1 Sovereign Acyclic Graph Directory Engine (`SovereignAcyclicGraphDirectoryEngine`)
+SigmaOS implements a Directed Acyclic Graph (DAG) directory structure (`SovereignAcyclicGraphDirectoryEngine` in `src/filesystem/bsd_linux_innovations.rs`) inspired by Linux, Plan 9, Nix/Guix content-addressed storage (CAS), and BSD filesystems:
+1. **DAG Directory Hierarchy & Node Types**:
+   - Explicit node classification (`Root`, `Directory`, `RegularFile`, `Symlink`, `HardlinkRef`) with parent/children tracking vectors and content hash support.
+2. **Cycle Prevention & Reachability Verification**:
+   - Breadth-First Search (BFS) reachability checking (`is_reachable`) guaranteeing that hardlinks and symlink references cannot introduce cyclic directory loops.
+   - Fail-closed error handling (`Cycle detected: adding this link would create a cyclic directory loop`) preventing infinite VFS traversal loops.
+
+### 128.2 Sovereign Async Procedure Call Engine (`SovereignAsyncProcedureCallEngine`)
+SigmaOS implements a kernel and userland Asynchronous Procedure Call delivery queue (`SovereignAsyncProcedureCallEngine` in `src/filesystem/bsd_linux_innovations.rs`) inspired by Linux `io_uring` completion callbacks, Windows/NT APC queues, and FreeBSD asynchronous I/O (`aio`):
+1. **APC Modes & Priority Queueing**:
+   - Execution modes (`KernelMode`, `UserMode`, `SpecialKernelMode`) and priority levels (`Low`, `Normal`, `High`, `Critical`).
+   - Priority-sorted queueing ensuring critical kernel completion routines and interrupt handlers execute ahead of normal userland callbacks.
+2. **Targeted Thread Dispatching & Execution Tracking**:
+   - Thread-targeted APC queueing (`queue_apc`) and execution dispatching (`dispatch_apcs_for_thread`) with automatic retainer cleaning for completed items.
