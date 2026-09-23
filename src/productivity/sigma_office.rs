@@ -25,9 +25,6 @@ use crate::klib::HashMap;
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::HashMap;
 
-#[cfg(any(feature = "standalone_test", test))]
-use std::collections::HashMap;
-
 use sigma_types::{CapabilityToken, Result};
 
 /// Document type enumeration
@@ -924,11 +921,12 @@ impl SigmaOdfPackageEngine {
         let mut bytes = Vec::new();
         bytes.extend_from_slice(b"PK\x03\x04"); // Standard Zip Header
         bytes.extend_from_slice(b"mimetype");
-        let _mime: &[u8] = match self.kind {
+        let mime: &[u8] = match self.kind {
             OdfDocumentKind::TextOdt => b"application/vnd.oasis.opendocument.text",
             OdfDocumentKind::SpreadsheetOds => b"application/vnd.oasis.opendocument.spreadsheet",
             OdfDocumentKind::PresentationOdp => b"application/vnd.oasis.opendocument.presentation",
         };
+        bytes.extend_from_slice(mime);
         bytes.extend_from_slice(self.content_xml.as_bytes());
         bytes
     }
@@ -1599,6 +1597,706 @@ impl Default for SovereignEnterpriseCrmErpEngine {
     }
 }
 
+// ==========================================================
+// 10. Google Forms & Surveys Engine
+// ==========================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum QuestionType {
+    ShortAnswer,
+    MultipleChoice { options: Vec<String> },
+    Checkbox { options: Vec<String> },
+    Rating { min: u32, max: u32 },
+}
+
+#[derive(Debug, Clone)]
+pub struct FormQuestion {
+    pub question_id: u32,
+    pub prompt: String,
+    pub question_type: QuestionType,
+    pub required: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct FormResponse {
+    pub response_id: u32,
+    pub respondent_email: String,
+    pub answers: HashMap<u32, String>, // question_id -> answer_string
+}
+
+/// Google Forms / Surveys engine for data collection and spreadsheet export
+pub struct SovereignFormsSurveyEngine {
+    pub form_title: String,
+    pub questions: Vec<FormQuestion>,
+    pub responses: Vec<FormResponse>,
+    pub next_q_id: u32,
+    pub next_r_id: u32,
+}
+
+impl SovereignFormsSurveyEngine {
+    pub fn new(title: &str) -> Self {
+        Self {
+            form_title: title.to_string(),
+            questions: Vec::new(),
+            responses: Vec::new(),
+            next_q_id: 1,
+            next_r_id: 1,
+        }
+    }
+
+    pub fn add_question(&mut self, prompt: &str, question_type: QuestionType, required: bool) -> u32 {
+        let q_id = self.next_q_id;
+        self.next_q_id += 1;
+        self.questions.push(FormQuestion {
+            question_id: q_id,
+            prompt: prompt.to_string(),
+            question_type,
+            required,
+        });
+        q_id
+    }
+
+    pub fn submit_response(&mut self, respondent: &str, answers: HashMap<u32, String>) -> Result<u32> {
+        for q in &self.questions {
+            if q.required && !answers.contains_key(&q.question_id) {
+                return Err("Missing required question answer");
+            }
+        }
+        let r_id = self.next_r_id;
+        self.next_r_id += 1;
+        self.responses.push(FormResponse {
+            response_id: r_id,
+            respondent_email: respondent.to_string(),
+            answers,
+        });
+        Ok(r_id)
+    }
+
+    pub fn export_responses_to_spreadsheet(&self, spreadsheet: &mut SpreadsheetProcessor) -> Result<()> {
+        spreadsheet.set_cell(0, 0, CellValue::Text("Respondent".to_string()))?;
+        for (q_idx, q) in self.questions.iter().enumerate() {
+            spreadsheet.set_cell(0, (q_idx + 1) as u32, CellValue::Text(q.prompt.clone()))?;
+        }
+
+        for (r_idx, resp) in self.responses.iter().enumerate() {
+            let row = (r_idx + 1) as u32;
+            spreadsheet.set_cell(row, 0, CellValue::Text(resp.respondent_email.clone()))?;
+            for (q_idx, q) in self.questions.iter().enumerate() {
+                let ans = resp.answers.get(&q.question_id).cloned().unwrap_or_default();
+                spreadsheet.set_cell(row, (q_idx + 1) as u32, CellValue::Text(ans))?;
+            }
+        }
+        Ok(())
+    }
+}
+
+// ==========================================================
+// 11. Google Keep / Quick Notes & Web Clipper Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct QuickNoteItem {
+    pub note_id: u32,
+    pub title: String,
+    pub body: String,
+    pub pinned: bool,
+    pub labels: Vec<String>,
+    pub color_hex: String,
+    pub checklist: Vec<(String, bool)>, // (item_text, is_checked)
+    pub web_clipper_url: Option<String>,
+}
+
+/// Google Keep / Quick Notes & Web Clipper Engine
+pub struct SovereignQuickNotesEngine {
+    pub notes: Vec<QuickNoteItem>,
+    pub next_id: u32,
+}
+
+impl SovereignQuickNotesEngine {
+    pub fn new() -> Self {
+        Self {
+            notes: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn create_note(&mut self, title: &str, body: &str, color: &str) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.notes.push(QuickNoteItem {
+            note_id: id,
+            title: title.to_string(),
+            body: body.to_string(),
+            pinned: false,
+            labels: Vec::new(),
+            color_hex: color.to_string(),
+            checklist: Vec::new(),
+            web_clipper_url: None,
+        });
+        id
+    }
+
+    pub fn clip_web_snippet(&mut self, url: &str, title: &str, snippet: &str) -> u32 {
+        let id = self.create_note(title, snippet, "#FFFF88");
+        if let Some(note) = self.notes.iter_mut().find(|n| n.note_id == id) {
+            note.web_clipper_url = Some(url.to_string());
+            note.labels.push("WebClipper".to_string());
+        }
+        id
+    }
+
+    pub fn toggle_pin(&mut self, note_id: u32) -> bool {
+        if let Some(note) = self.notes.iter_mut().find(|n| n.note_id == note_id) {
+            note.pinned = !note.pinned;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for SovereignQuickNotesEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 12. Google Sites / Web Publisher Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub enum WebLayoutBlock {
+    Header { title: String, subtitle: String },
+    Paragraph { content: String },
+    EmbeddedDocument { doc_title: String, embed_url: String },
+    Image { src_url: String, alt_text: String },
+    ColumnGrid { columns: Vec<String> },
+}
+
+/// Google Sites / Web Publisher Engine
+pub struct SovereignWebPublisherEngine {
+    pub site_name: String,
+    pub theme_color: String,
+    pub blocks: Vec<WebLayoutBlock>,
+}
+
+impl SovereignWebPublisherEngine {
+    pub fn new(site_name: &str, theme_color: &str) -> Self {
+        Self {
+            site_name: site_name.to_string(),
+            theme_color: theme_color.to_string(),
+            blocks: Vec::new(),
+        }
+    }
+
+    pub fn add_block(&mut self, block: WebLayoutBlock) {
+        self.blocks.push(block);
+    }
+
+    pub fn render_html_site(&self) -> String {
+        let mut html = format!(
+            "<!DOCTYPE html><html><head><title>{}</title><style>body {{ font-family: sans-serif; primary-color: {}; }}</style></head><body>",
+            self.site_name, self.theme_color
+        );
+        for block in &self.blocks {
+            match block {
+                WebLayoutBlock::Header { title, subtitle } => {
+                    html.push_str(&format!("<header><h1>{}</h1><p>{}</p></header>", title, subtitle));
+                }
+                WebLayoutBlock::Paragraph { content } => {
+                    html.push_str(&format!("<p>{}</p>", content));
+                }
+                WebLayoutBlock::EmbeddedDocument { doc_title, embed_url } => {
+                    html.push_str(&format!("<div class=\"embed\"><h3>{}</h3><iframe src=\"{}\"></iframe></div>", doc_title, embed_url));
+                }
+                WebLayoutBlock::Image { src_url, alt_text } => {
+                    html.push_str(&format!("<img src=\"{}\" alt=\"{}\" />", src_url, alt_text));
+                }
+                WebLayoutBlock::ColumnGrid { columns } => {
+                    html.push_str("<div class=\"grid\">");
+                    for col in columns {
+                        html.push_str(&format!("<div class=\"col\">{}</div>", col));
+                    }
+                    html.push_str("</div>");
+                }
+            }
+        }
+        html.push_str("</body></html>");
+        html
+    }
+}
+
+// ==========================================================
+// 13. Microsoft Access / Low-Code Relational Database Engine
+// ==========================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DbColumnType {
+    Text,
+    Number,
+    Boolean,
+    Date,
+    ForeignRef { target_table: String },
+}
+
+#[derive(Debug, Clone)]
+pub struct DbTableColumn {
+    pub name: String,
+    pub col_type: DbColumnType,
+    pub primary_key: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct DbRow {
+    pub row_id: u64,
+    pub fields: HashMap<String, String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct DbTable {
+    pub table_name: String,
+    pub columns: Vec<DbTableColumn>,
+    pub rows: Vec<DbRow>,
+    pub next_row_id: u64,
+}
+
+/// Microsoft Access inspired Low-Code Relational Database Engine
+pub struct SovereignLowCodeDatabaseEngine {
+    pub database_name: String,
+    pub tables: HashMap<String, DbTable>,
+}
+
+impl SovereignLowCodeDatabaseEngine {
+    pub fn new(db_name: &str) -> Self {
+        Self {
+            database_name: db_name.to_string(),
+            tables: HashMap::new(),
+        }
+    }
+
+    pub fn create_table(&mut self, name: &str, columns: Vec<DbTableColumn>) {
+        self.tables.insert(
+            name.to_string(),
+            DbTable {
+                table_name: name.to_string(),
+                columns,
+                rows: Vec::new(),
+                next_row_id: 1,
+            },
+        );
+    }
+
+    pub fn insert_row(&mut self, table_name: &str, fields: HashMap<String, String>) -> Result<u64> {
+        if let Some(table) = self.tables.get_mut(table_name) {
+            let row_id = table.next_row_id;
+            table.next_row_id += 1;
+            table.rows.push(DbRow { row_id, fields });
+            Ok(row_id)
+        } else {
+            Err("Table not found")
+        }
+    }
+
+    pub fn query_filter(&self, table_name: &str, field_key: &str, field_val: &str) -> Vec<&DbRow> {
+        if let Some(table) = self.tables.get(table_name) {
+            table
+                .rows
+                .iter()
+                .filter(|r| r.fields.get(field_key).map(|v| v.as_str()) == Some(field_val))
+                .collect()
+        } else {
+            Vec::new()
+        }
+    }
+}
+
+// ==========================================================
+// 14. Microsoft Power Automate / Workflow Trigger Engine
+// ==========================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum WorkflowTrigger {
+    OnLeadCreated,
+    OnInvoicePaid,
+    OnEmailReceived { keyword: String },
+    OnScheduleCron { cron: String },
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum WorkflowAction {
+    SendNotification { message: String },
+    CreateTask { title: String },
+    UpdateStatus { new_status: String },
+    WebhookCall { url: String },
+}
+
+#[derive(Debug, Clone)]
+pub struct WorkflowRule {
+    pub rule_id: u32,
+    pub name: String,
+    pub trigger: WorkflowTrigger,
+    pub actions: Vec<WorkflowAction>,
+    pub enabled: bool,
+}
+
+/// Microsoft Power Automate inspired Integration & Workflow Engine
+pub struct SovereignIntegrationWorkflowEngine {
+    pub rules: Vec<WorkflowRule>,
+    pub next_id: u32,
+    pub execution_logs: Vec<String>,
+}
+
+impl SovereignIntegrationWorkflowEngine {
+    pub fn new() -> Self {
+        Self {
+            rules: Vec::new(),
+            next_id: 1,
+            execution_logs: Vec::new(),
+        }
+    }
+
+    pub fn register_rule(&mut self, name: &str, trigger: WorkflowTrigger, actions: Vec<WorkflowAction>) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.rules.push(WorkflowRule {
+            rule_id: id,
+            name: name.to_string(),
+            trigger,
+            actions,
+            enabled: true,
+        });
+        id
+    }
+
+    pub fn dispatch_event(&mut self, trigger_event: &WorkflowTrigger) -> usize {
+        let mut executed_count = 0;
+        let rules_to_run: Vec<WorkflowRule> = self
+            .rules
+            .iter()
+            .filter(|r| r.enabled && &r.trigger == trigger_event)
+            .cloned()
+            .collect();
+
+        for rule in rules_to_run {
+            for action in &rule.actions {
+                let log_msg = format!("Rule [{}] Executed Action: {:?}", rule.name, action);
+                self.execution_logs.push(log_msg);
+            }
+            executed_count += 1;
+        }
+        executed_count
+    }
+}
+
+impl Default for SovereignIntegrationWorkflowEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 15. Zoho Helpdesk SLA & Ticket Queue Engine
+// ==========================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum TicketPriority {
+    Low,
+    Medium,
+    High,
+    Urgent,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum TicketStatus {
+    Open,
+    InProgress,
+    PendingCustomer,
+    Resolved,
+    Closed,
+}
+
+#[derive(Debug, Clone)]
+pub struct HelpdeskTicket {
+    pub ticket_id: u32,
+    pub customer_email: String,
+    pub subject: String,
+    pub priority: TicketPriority,
+    pub status: TicketStatus,
+    pub assigned_agent: Option<String>,
+    pub sla_deadline_mins: u32,
+}
+
+/// Zoho Desk inspired Helpdesk SLA & Ticket Routing Engine
+pub struct SovereignHelpdeskSlaEngine {
+    pub tickets: Vec<HelpdeskTicket>,
+    pub next_id: u32,
+}
+
+impl SovereignHelpdeskSlaEngine {
+    pub fn new() -> Self {
+        Self {
+            tickets: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn create_ticket(&mut self, email: &str, subject: &str, priority: TicketPriority) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        let sla_mins = match priority {
+            TicketPriority::Urgent => 60,
+            TicketPriority::High => 240,
+            TicketPriority::Medium => 720,
+            TicketPriority::Low => 1440,
+        };
+
+        self.tickets.push(HelpdeskTicket {
+            ticket_id: id,
+            customer_email: email.to_string(),
+            subject: subject.to_string(),
+            priority,
+            status: TicketStatus::Open,
+            assigned_agent: None,
+            sla_deadline_mins: sla_mins,
+        });
+        id
+    }
+
+    pub fn assign_agent(&mut self, ticket_id: u32, agent: &str) -> bool {
+        if let Some(t) = self.tickets.iter_mut().find(|t| t.ticket_id == ticket_id) {
+            t.assigned_agent = Some(agent.to_string());
+            t.status = TicketStatus::InProgress;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for SovereignHelpdeskSlaEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 16. Salesforce / Zoho Marketing Cloud Drip Campaign Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct DripStep {
+    pub step_number: u32,
+    pub email_subject: String,
+    pub delay_days: u32,
+}
+
+/// Salesforce / Zoho Marketing Cloud Drip Campaign Engine
+pub struct SovereignMarketingCampaignEngine {
+    pub campaign_name: String,
+    pub target_segment: String,
+    pub drip_steps: Vec<DripStep>,
+    pub total_recipients: u32,
+    pub total_opened: u32,
+    pub total_clicked: u32,
+}
+
+impl SovereignMarketingCampaignEngine {
+    pub fn new(name: &str, segment: &str) -> Self {
+        Self {
+            campaign_name: name.to_string(),
+            target_segment: segment.to_string(),
+            drip_steps: Vec::new(),
+            total_recipients: 0,
+            total_opened: 0,
+            total_clicked: 0,
+        }
+    }
+
+    pub fn add_drip_step(&mut self, subject: &str, delay_days: u32) {
+        let step_num = (self.drip_steps.len() as u32) + 1;
+        self.drip_steps.push(DripStep {
+            step_number: step_num,
+            email_subject: subject.to_string(),
+            delay_days,
+        });
+    }
+
+    pub fn record_engagement(&mut self, recipients: u32, opened: u32, clicked: u32) {
+        self.total_recipients += recipients;
+        self.total_opened += opened;
+        self.total_clicked += clicked;
+    }
+
+    pub fn calculate_open_rate(&self) -> f64 {
+        if self.total_recipients == 0 {
+            0.0
+        } else {
+            (self.total_opened as f64) / (self.total_recipients as f64)
+        }
+    }
+}
+
+// ==========================================================
+// 17. Odoo / Bitrix24 Inventory & Warehouse Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct InventoryItem {
+    pub sku: String,
+    pub name: String,
+    pub unit_cost: f64,
+    pub quantity_on_hand: u32,
+    pub reorder_threshold: u32,
+    pub warehouse_location: String,
+}
+
+/// Odoo / Bitrix24 Inventory & Warehouse Engine
+pub struct SovereignInventoryWarehouseEngine {
+    pub items: HashMap<String, InventoryItem>,
+}
+
+impl SovereignInventoryWarehouseEngine {
+    pub fn new() -> Self {
+        Self {
+            items: HashMap::new(),
+        }
+    }
+
+    pub fn register_item(&mut self, item: InventoryItem) {
+        self.items.insert(item.sku.clone(), item);
+    }
+
+    pub fn transfer_stock(&mut self, sku: &str, new_location: &str, qty: u32) -> Result<bool> {
+        if let Some(item) = self.items.get_mut(sku) {
+            if item.quantity_on_hand >= qty {
+                item.warehouse_location = new_location.to_string();
+                Ok(true)
+            } else {
+                Err("Insufficient stock for transfer")
+            }
+        } else {
+            Err("SKU not found")
+        }
+    }
+
+    pub fn calculate_total_valuation(&self) -> f64 {
+        self.items
+            .values()
+            .map(|i| i.unit_cost * (i.quantity_on_hand as f64))
+            .sum()
+    }
+}
+
+impl Default for SovereignInventoryWarehouseEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 18. Odoo / Bitrix24 Workgroup Gantt Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct WorkgroupTask {
+    pub task_id: u32,
+    pub name: String,
+    pub start_day: u32,
+    pub duration_days: u32,
+    pub completion_percentage: u32,
+    pub dependencies: Vec<u32>, // IDs of prerequisite tasks
+}
+
+/// Odoo / Bitrix24 Workgroup Gantt Engine
+pub struct SovereignWorkgroupGanttEngine {
+    pub project_name: String,
+    pub tasks: Vec<WorkgroupTask>,
+    pub next_id: u32,
+}
+
+impl SovereignWorkgroupGanttEngine {
+    pub fn new(project_name: &str) -> Self {
+        Self {
+            project_name: project_name.to_string(),
+            tasks: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn add_task(&mut self, name: &str, start_day: u32, duration: u32, dependencies: Vec<u32>) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.tasks.push(WorkgroupTask {
+            task_id: id,
+            name: name.to_string(),
+            start_day,
+            duration_days: duration,
+            completion_percentage: 0,
+            dependencies,
+        });
+        id
+    }
+
+    pub fn calculate_project_completion(&self) -> f64 {
+        if self.tasks.is_empty() {
+            0.0
+        } else {
+            let total_comp: u32 = self.tasks.iter().map(|t| t.completion_percentage).sum();
+            (total_comp as f64) / (self.tasks.len() as f64)
+        }
+    }
+}
+
+// ==========================================================
+// 19. Bitrix24 Collaborative Vector Whiteboard Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub enum WhiteboardElementType {
+    StickyNote { text: String, color_hex: String },
+    Shape { shape_type: ShapeType, fill_color: [u8; 4] },
+    Text { content: String, font_size: u32 },
+    Connector { from_elem_id: u32, to_elem_id: u32 },
+}
+
+#[derive(Debug, Clone)]
+pub struct WhiteboardElement {
+    pub element_id: u32,
+    pub element_type: WhiteboardElementType,
+    pub position: (f32, f32),
+    pub size: (f32, f32),
+}
+
+/// Bitrix24 / Miro inspired Collaborative Vector Whiteboard Engine
+pub struct SovereignCollaborativeWhiteboardEngine {
+    pub board_name: String,
+    pub elements: Vec<WhiteboardElement>,
+    pub next_id: u32,
+}
+
+impl SovereignCollaborativeWhiteboardEngine {
+    pub fn new(board_name: &str) -> Self {
+        Self {
+            board_name: board_name.to_string(),
+            elements: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn add_element(&mut self, elem_type: WhiteboardElementType, pos: (f32, f32), size: (f32, f32)) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.elements.push(WhiteboardElement {
+            element_id: id,
+            element_type: elem_type,
+            position: pos,
+            size,
+        });
+        id
+    }
+}
+
 // Placeholder types for compilation
 mod sigma_types {
     pub type Result<T> = core::result::Result<T, &'static str>;
@@ -1846,5 +2544,103 @@ mod tests {
         let invoice = &crm_erp.invoices[0];
         assert_eq!(invoice.invoice_id, inv_id);
         assert!((invoice.calculate_total() - 55000.0).abs() < 1e-4);
+    }
+
+    #[test]
+    fn test_newly_implemented_suite_engines() {
+        let cap = sigma_types::CapabilityToken { id: 100 };
+
+        // 1. Google Forms & Surveys
+        let mut form_engine = SovereignFormsSurveyEngine::new("Customer Feedback");
+        let q1 = form_engine.add_question("How satisfied are you?", QuestionType::Rating { min: 1, max: 5 }, true);
+        let mut answers = HashMap::new();
+        answers.insert(q1, "5".to_string());
+        let resp_id = form_engine.submit_response("user@example.com", answers).unwrap();
+        assert_eq!(resp_id, 1);
+
+        let mut form_sheet = SpreadsheetProcessor::new("Form Responses".to_string(), cap.clone());
+        form_engine.export_responses_to_spreadsheet(&mut form_sheet).unwrap();
+        assert_eq!(form_sheet.get_cell(1, 0), Some(&CellValue::Text("user@example.com".to_string())));
+
+        // 2. Google Keep / Quick Notes
+        let mut notes_engine = SovereignQuickNotesEngine::new();
+        let n1 = notes_engine.create_note("Shopping List", "Milk, Eggs, Bread", "#FFFFFF");
+        assert!(notes_engine.toggle_pin(n1));
+        assert!(notes_engine.notes[0].pinned);
+
+        let _n2 = notes_engine.clip_web_snippet("https://sigmaos.org", "SigmaOS Docs", "Sovereign Microkernel");
+        assert_eq!(notes_engine.notes[1].web_clipper_url, Some("https://sigmaos.org".to_string()));
+
+        // 3. Google Sites / Web Publisher
+        let mut web_publisher = SovereignWebPublisherEngine::new("SigmaOS Portal", "#00AABB");
+        web_publisher.add_block(WebLayoutBlock::Header { title: "Welcome".to_string(), subtitle: "Sovereign Cloud".to_string() });
+        let html_out = web_publisher.render_html_site();
+        assert!(html_out.contains("<h1>Welcome</h1>"));
+
+        // 4. Microsoft Access Low-Code Database
+        let mut db_engine = SovereignLowCodeDatabaseEngine::new("EnterpriseDB");
+        db_engine.create_table("Employees", vec![
+            DbTableColumn { name: "emp_id".to_string(), col_type: DbColumnType::Text, primary_key: true },
+            DbTableColumn { name: "department".to_string(), col_type: DbColumnType::Text, primary_key: false },
+        ]);
+        let mut fields = HashMap::new();
+        fields.insert("emp_id".to_string(), "E1001".to_string());
+        fields.insert("department".to_string(), "Engineering".to_string());
+        db_engine.insert_row("Employees", fields).unwrap();
+
+        let eng_rows = db_engine.query_filter("Employees", "department", "Engineering");
+        assert_eq!(eng_rows.len(), 1);
+
+        // 5. Microsoft Power Automate Workflow
+        let mut workflow_engine = SovereignIntegrationWorkflowEngine::new();
+        workflow_engine.register_rule(
+            "Auto Notify Lead",
+            WorkflowTrigger::OnLeadCreated,
+            vec![WorkflowAction::SendNotification { message: "New Lead Created!".to_string() }],
+        );
+        let count = workflow_engine.dispatch_event(&WorkflowTrigger::OnLeadCreated);
+        assert_eq!(count, 1);
+        assert_eq!(workflow_engine.execution_logs.len(), 1);
+
+        // 6. Zoho Helpdesk SLA
+        let mut helpdesk = SovereignHelpdeskSlaEngine::new();
+        let t1 = helpdesk.create_ticket("client@corp.com", "Server Outage", TicketPriority::Urgent);
+        assert_eq!(helpdesk.tickets[0].sla_deadline_mins, 60);
+        assert!(helpdesk.assign_agent(t1, "Agent Smith"));
+
+        // 7. Marketing Cloud Drip Campaign
+        let mut drip_campaign = SovereignMarketingCampaignEngine::new("Q3 Onboarding", "New Users");
+        drip_campaign.add_drip_step("Welcome to SigmaOS", 0);
+        drip_campaign.record_engagement(100, 80, 40);
+        assert_eq!(drip_campaign.calculate_open_rate(), 0.80);
+
+        // 8. Odoo / Bitrix24 Inventory & Warehouse
+        let mut inventory = SovereignInventoryWarehouseEngine::new();
+        inventory.register_item(InventoryItem {
+            sku: "SKU-001".to_string(),
+            name: "Server Rack".to_string(),
+            unit_cost: 1500.0,
+            quantity_on_hand: 10,
+            reorder_threshold: 2,
+            warehouse_location: "Warehouse A".to_string(),
+        });
+        assert_eq!(inventory.calculate_total_valuation(), 15000.0);
+        assert!(inventory.transfer_stock("SKU-001", "Warehouse B", 5).unwrap());
+
+        // 9. Workgroup Gantt
+        let mut gantt = SovereignWorkgroupGanttEngine::new("Kernel Core v2");
+        let task1 = gantt.add_task("Architecture Spec", 1, 5, vec![]);
+        gantt.tasks[0].completion_percentage = 100;
+        let _task2 = gantt.add_task("Implementation", 6, 10, vec![task1]);
+        assert_eq!(gantt.calculate_project_completion(), 50.0);
+
+        // 10. Vector Whiteboard
+        let mut whiteboard = SovereignCollaborativeWhiteboardEngine::new("Brainstorming Canvas");
+        let wb_id = whiteboard.add_element(
+            WhiteboardElementType::StickyNote { text: "Focus on zero-dep".to_string(), color_hex: "#FFFF00".to_string() },
+            (10.0, 20.0),
+            (100.0, 100.0),
+        );
+        assert_eq!(wb_id, 1);
     }
 }
