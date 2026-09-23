@@ -1,69 +1,61 @@
-# SigmaOS Next Steps Guidelines & Operational Execution Handbook
+# SigmaOS Next Steps Guidelines & Development Roadmap
 
-## Executive Guidelines
-This document establishes the official operational guidelines, execution rules, and domain-by-domain action plan for continuous development on **SigmaOS**. All engineering efforts must strictly align with these guidelines and be committed directly to the `main` branch.
-
----
-
-## 1. Single Primary User Journey & PR Package Submissions
-SigmaOS adheres strictly to an opinionated, bootable desktop distribution workflow inspired by Omarchy Linux, Arch Linux AUR, Gentoo Portage, Void XBPS-src, FreeBSD Ports, and Nix Flakes:
-
-```
-ISO Boot → Live Media → Installer Wizard → First Boot Login → Zenith Desktop → App Launcher → Package Install (sigpkg / PR submission) → Theme Customization → Atomic OS Update → Rollback Safety Net
-```
-
-### Mandated Guidelines:
-1. **Zero Simulated Success Paths:** Every installer stage, package operation, and update process must execute real system operations or validate actual hardware state.
-2. **Pull Request Package Ingestion:** Package contributions in PR format (`PKGBUILD`, `Ebuild`, `deb control`, `spec`, `xbps template`, `flake`) are parsed via `PackagePullRequestParser` in `src/package/universal.rs` and translated automatically into native `UnifiedPackage` builds.
-3. **Standard Library in Userland:** Standard Rust (`std`) is canonical for Zenith desktop, package manager (`sigpkg`), installer, and core userland utilities.
-4. **`no_std` Microkernel Isolation:** Bare-metal kernel code (`src/kernel/`), bootloader, and low-level drivers remain strictly `#![no_std]`.
+## Overview & Architecture Goals
+This document outlines the canonical operational guidelines and next steps roadmap for **SigmaOS** (`https://github.com/AaryanSinghChauhan09/SigmaOS/`). SigmaOS combines the security, performance, and modularity of Linux v6.8+ and BSD distributions (FreeBSD 14, OpenBSD 7.4, NetBSD 10) into a sovereign, ultra-resilient operating system microkernel and userspace ecosystem.
 
 ---
 
-## 2. Tri-Agent Execution Guidelines
-
-### ⚡ Bolt Agent Guidelines (Performance & Efficiency)
-- Profile code before modifying ($O(N^2) \to O(N \log N)$ or zero-allocation buffers).
-- Target bottlenecks under heavy input loads.
-- Maintain critical learnings in `.jules/bolt.md`.
-- Keep performance changes under 50 lines with explicit benchmark justification.
-
-### 🛡️ Sentinel Agent Guidelines (Security & Compliance)
-- Enforce strict input validation on all VFS paths, network sockets, and syscall boundaries.
-- Replace dummy/mock security routines with real cryptography (Dilithium-5 / SHA3) and sandboxing (`pledge`/`unveil`).
-- Maintain critical security learnings in `.jules/sentinel.md`.
-
-### 🎨 Palette Agent Guidelines (UX & Accessibility)
-- Ensure WCAG 2.1 AA keyboard navigation, high-contrast visual focus indicators, and ARIA labels across all desktop components.
-- Polish interactive user flows in Zenith desktop and installer wizards.
-- Maintain critical UX learnings in `.jules/palette.md`.
+## 🎯 Strategic Priorities Hierarchy
+1. **Security (Primary):** Fail-secure design, post-quantum cryptography (Dilithium-5/Kyber-1024), default-deny execution policies (`ZorinExecGuardPolicyEngine`), and strict sandboxing (`Pledge`/`Unveil`/`Landlock`).
+2. **Stability (Secondary):** Zero runtime panics, sub-second Dual-Root A/B CoW snapshot rollbacks, watchdog hardware protection, and 100% test passing rates.
+3. **Performance (Tertiary):** Lock-free SPSC queue ring buffers, zero-copy socket/VFS splicing, SIMD memory copies, and $O(1)$ constant-time data structure lookups.
 
 ---
 
-## 3. Immediate Domain Action Plan
+## 📋 Comprehensive Task List & Guidelines
 
-### Domain A: Kernel & Microkernel Performance
-- Expand x86_64 eBPF JIT compiler for network packet filtering and system tracing.
-- Implement NUMA-aware page frame allocation in `src/kernel/vmm_paging.rs`.
+### 1. Code Quality & Testing Guidelines
+- **Zero Syntax & Warning Policy:** Maintain `#![deny(warnings)]` across release profiles.
+- **Modular Refactoring:** Decompose large files exceeding 1,000 lines (e.g. `src/package/universal.rs`) into clean sub-modules (`mod.rs`, `strategy.rs`, `adapter.rs`, `observer.rs`).
+- **Comprehensive Unit & Integration Testing:**
+  - Execute `pytest tests/` for Python integration and stress fuzzing.
+  - Run `rustc --test --edition=2021` standalone suites for kernel, security, and packaging modules.
 
-### Domain B: Universal Package System (`sigpkg`)
-- Completed Universal Linux & BSD Distro Package Synchronization Engine (`src/package/universal.rs` & `src/sigpkg/universal_oop_system.rs`) with expanded multi-distro dependency mappings, Strategy/Decorator/Observer/Command OOP patterns, and UDF pipeline filters.
-- Refactor `src/package/universal.rs` into a clean sub-module architecture (`src/package/universal/`).
-- Expand Pull Request package translation pipeline (`PackagePullRequestParser`) across Arch `.pkg.tar.zst`, Debian `.deb`, Fedora `.rpm`, Alpine `.apk`, Gentoo `.ebuild`, Void `.xbps`, FreeBSD `.pkg`, and Nix `.nix`.
+### 2. Performance & Optimization Guidelines
+- **Allocation Elimination in Hotpaths:** Operate directly on borrowed slices (`&str`, `&[u8]`) during string/log parsing, JSON serialization, and package conflict scans.
+- **Power-of-Two Masking:** Use bitwise AND indexing (`hash & (capacity - 1)`) for fixed-size hash tables and ring buffers.
+- **Hoisting Outer Map Queries:** Eliminate quadratic loop overhead by hoisting outer collection lookups in pair comparison routines.
 
-### Domain C: Security & Capability Controls
-- Extend `pledge()` and `unveil()` capability sandboxing across all userland core utilities.
-- Integrate TPM 2.0 PCR sealed keys into emergency shell authentication.
+### 3. Security & Compliance Standards
+- **Zero Secrets Trace:** Secrets must never be stored in plaintext. Derive passwords dynamically using Argon2/Dilithium or seal in TPM 2.0 PCR registers.
+- **Strict Boundary Path Validation:** Reject multi-dot path traversal variations (`...`, `....`), NUL bytes, and ASCII control characters (`< 32` or `127`) in all path inputs.
+- **Regulatory Standards:** Maintain full compliance with WCAG 2.1 AA (a11y focus rings & live regions), GDPR/HIPAA (encrypted VFS enclaves), and ISO 27001 (PQC signatures).
 
-### Domain D: Zenith Desktop & User Experience
-- Improve high-contrast theme support (`Ayu`, `GruvboxMaterial`, `MaterialOcean`) and focus outlines.
-- Add keyboard shortcut cheatsheet overlay in Zenith window manager.
+### 4. Object-Oriented Design & Pattern Standards
+- **Encapsulation:** Hide mutable state behind strictly validated getter/setter interfaces.
+- **Polymorphism & Abstraction:** Implement trait-based strategies (`InstallStrategy`, `ExecutableFormatRunner`) to allow transparent multi-distro and multi-architecture extensions.
+- **Design Patterns:** Apply Singleton, Factory, Observer, Command, Decorator, and Strategy design patterns consistently across new userland and kernel systems.
 
 ---
 
-## 4. Quality Assurance & Verification Workflow
-Before submitting any changes to `main`:
-1. Run `./run_sigma_tests.sh` to execute all native Rust test suites.
-2. Run `pytest tests/` to execute Python system integration tests.
-3. Ensure zero compiler warnings and clean lint checks.
-4. Execute synchronization tools (`scripts/sync_wiki.sh` or doc sync scripts) to synchronize plan documents across all documentation and wiki mirror directories (`./`, `docs/`, `wiki/`, `WIKI/`, `wiki_content/`, `wiki_repo/`).
+## 🚀 Chronological Next Steps Roadmap
+
+### Phase 1: Modular Packaging & CI Pipeline Hardening
+- [x] Integrate `PackagePullRequestParser` and `PullRequestPackageSpec` for transpiling community package PRs (AUR, Ebuild, Ports, Nix Flakes) into native `UnifiedPackage` specs.
+- [ ] Refactor `src/package/universal.rs` into `src/package/universal/` sub-module directory.
+- [ ] Expand automated GitHub Actions CI runners to validate PR package transpilation on every commit.
+
+### Phase 2: Post-Quantum Security & Boot Unification
+- [x] Deploy post-quantum Dilithium-5 / SHA3 package signature verifier in `src/sigpkg/verifier.rs`.
+- [ ] Connect TPM 2.0 PCR sealed secret unlocking to `src/kernel/boot_foundations.rs`.
+- [ ] Integrate `ZorinExecGuardPolicyEngine` capability checks directly into binary loader execution pipelines.
+
+### Phase 3: Desktop UX Polish & Accessibility
+- [x] Implement ARIA-compliant, high-contrast installer setup wizard in `src/installer/gui_wizard.rs`.
+- [ ] Add global `Escape` key overlay dismiss listeners and skip-to-content links across Zenith desktop Web UI components.
+- [ ] Enhance contrast ratio indicators for custom desktop GTK/Qt theme palettes.
+
+---
+
+## 🛠️ Direct Commit Policy (No Pull Requests)
+Per repository guidelines, **all master improvement plans, architectural blueprints, and operational handbook updates must be committed directly to the `main` branch**. Do not open pull requests (PRs) against this repository.
