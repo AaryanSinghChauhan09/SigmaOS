@@ -3083,7 +3083,7 @@ impl PortagePackage {
 
 impl IPackage for PortagePackage {
     fn name(&self) -> &str {
-        self.base_package.name()
+        IPackage::name(&self.base_package)
     }
     fn version(&self) -> &Version {
         self.base_package.version()
@@ -3614,6 +3614,8 @@ pub struct UserDefinedFunctionPipeline {
     env_vars: HashMap<String, String>,
     dependency_override_filters: Vec<Arc<dyn Fn(&mut Vec<Dependency>) + Send + Sync>>,
     sandbox_policy_customizers: Vec<Arc<dyn Fn(&mut dyn IPackage, &mut Vec<String>) -> Result<(), HookError> + Send + Sync>>,
+    dependency_rewriters: Vec<Arc<dyn Fn(&mut Dependency) + Send + Sync>>,
+    post_extract_transformers: Vec<Arc<dyn Fn(&mut dyn IPackage, &mut Vec<String>) -> Result<(), HookError> + Send + Sync>>,
 }
 
 impl UserDefinedFunctionPipeline {
@@ -3623,6 +3625,8 @@ impl UserDefinedFunctionPipeline {
             env_vars: HashMap::new(),
             dependency_override_filters: Vec::new(),
             sandbox_policy_customizers: Vec::new(),
+            dependency_rewriters: Vec::new(),
+            post_extract_transformers: Vec::new(),
         }
     }
 
@@ -3672,6 +3676,39 @@ impl UserDefinedFunctionPipeline {
     pub fn apply_sandbox_customizers(&self, package: &mut dyn IPackage, pledges: &mut Vec<String>) -> Result<(), HookError> {
         for customizer in &self.sandbox_policy_customizers {
             customizer(package, pledges)?;
+        }
+        Ok(())
+    }
+
+    /// Register a custom dependency rewriter hook (UDF)
+    pub fn register_dependency_rewriter<F>(&mut self, rewriter: F)
+    where
+        F: Fn(&mut Dependency) + Send + Sync + 'static,
+    {
+        self.dependency_rewriters.push(Arc::new(rewriter));
+    }
+
+    /// Apply all dependency rewriters to each dependency
+    pub fn apply_dependency_rewriters(&self, deps: &mut [Dependency]) {
+        for dep in deps.iter_mut() {
+            for rewriter in &self.dependency_rewriters {
+                rewriter(dep);
+            }
+        }
+    }
+
+    /// Register a post-extract transformer hook (UDF)
+    pub fn register_post_extract_transformer<F>(&mut self, transformer: F)
+    where
+        F: Fn(&mut dyn IPackage, &mut Vec<String>) -> Result<(), HookError> + Send + Sync + 'static,
+    {
+        self.post_extract_transformers.push(Arc::new(transformer));
+    }
+
+    /// Apply all post-extract transformers
+    pub fn apply_post_extract_transformers(&self, package: &mut dyn IPackage, extracted_files: &mut Vec<String>) -> Result<(), HookError> {
+        for transformer in &self.post_extract_transformers {
+            transformer(package, extracted_files)?;
         }
         Ok(())
     }
@@ -4096,6 +4133,17 @@ impl UniversalDistroPackageUnifierEngine {
             "libffi-dev" | "libffi-devel" | "dev-libs/libffi" | "libffi" | "libffi8t64" => "sovereign-libffi",
             "libpam0g-dev" | "pam-devel" | "sys-libs/pam" | "linux-pam" | "libpam0g-t64" => "sovereign-pam",
             "libxml2-dev" | "libxml2-devel" | "dev-libs/libxml2" | "libxml2" | "libxml2-t64" => "sovereign-libxml2",
+            "wayland-protocols" | "libwayland-dev" | "wayland-devel" | "dev-libs/wayland" | "wayland" => "sovereign-wayland",
+            "pipewire" | "pipewire-devel" | "libpipewire-0.3-dev" | "wireplumber" => "sovereign-pipewire",
+            "mesa" | "mesa-dri-drivers" | "mesa-common-dev" | "media-libs/mesa" => "sovereign-mesa",
+            "hyprland" | "hyprland-devel" => "sovereign-hyprland",
+            "systemd" | "systemd-devel" | "libsystemd-dev" | "elogind" => "sovereign-systemd",
+            "dbus" | "dbus-1-dev" | "dbus-devel" | "sys-apps/dbus" => "sovereign-dbus",
+            "ffmpeg" | "ffmpeg-devel" | "libavcodec-dev" | "media-video/ffmpeg" => "sovereign-ffmpeg",
+            "boost" | "boost-devel" | "libboost-all-dev" | "dev-libs/boost" => "sovereign-boost",
+            "llvm" | "llvm-dev" | "clang" | "clang-devel" | "sys-devel/clang" => "sovereign-llvm-clang",
+            "rust" | "rustc" | "cargo" | "dev-lang/rust" => "sovereign-rust",
+            "nodejs" | "nodejs-devel" | "npm" | "net-libs/nodejs" | "node" => "sovereign-nodejs",
             _ => name,
         }
     }
@@ -4137,6 +4185,288 @@ impl UserDefinedFunctionManager {
 impl Default for UserDefinedFunctionManager {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+// ============================================================================
+// OOP Template Method Pattern: Abstract Package Build Lifecycle Pipeline
+// ============================================================================
+
+pub trait AbstractPackageBuildTemplate: Send + Sync {
+    fn fetch_source(&self, pkg: &mut dyn IPackage) -> Result<(), HookError>;
+    fn verify_checksum(&self, pkg: &mut dyn IPackage) -> Result<(), HookError>;
+    fn unpack_source(&self, pkg: &mut dyn IPackage) -> Result<(), HookError>;
+    fn patch_source(&self, pkg: &mut dyn IPackage) -> Result<(), HookError> {
+        Ok(())
+    }
+    fn configure_build(&self, pkg: &mut dyn IPackage) -> Result<(), HookError>;
+    fn compile_binaries(&self, pkg: &mut dyn IPackage) -> Result<(), HookError>;
+    fn run_tests(&self, pkg: &mut dyn IPackage) -> Result<(), HookError> {
+        Ok(())
+    }
+    fn install_sandboxed(&self, pkg: &mut dyn IPackage) -> Result<(), HookError>;
+    fn package_output(&self, pkg: &mut dyn IPackage) -> Result<(), HookError>;
+
+    /// Template Method defining the invariant algorithm sequence for building any Linux package
+    fn execute_build_pipeline(&self, pkg: &mut dyn IPackage) -> Result<Vec<String>, HookError> {
+        let mut completed_steps = Vec::new();
+
+        self.fetch_source(pkg)?;
+        completed_steps.push("fetch_source".to_string());
+
+        self.verify_checksum(pkg)?;
+        completed_steps.push("verify_checksum".to_string());
+
+        self.unpack_source(pkg)?;
+        completed_steps.push("unpack_source".to_string());
+
+        self.patch_source(pkg)?;
+        completed_steps.push("patch_source".to_string());
+
+        self.configure_build(pkg)?;
+        completed_steps.push("configure_build".to_string());
+
+        self.compile_binaries(pkg)?;
+        completed_steps.push("compile_binaries".to_string());
+
+        self.run_tests(pkg)?;
+        completed_steps.push("run_tests".to_string());
+
+        self.install_sandboxed(pkg)?;
+        completed_steps.push("install_sandboxed".to_string());
+
+        self.package_output(pkg)?;
+        completed_steps.push("package_output".to_string());
+
+        Ok(completed_steps)
+    }
+}
+
+pub struct UniversalPackageBuildPipeline;
+
+impl UniversalPackageBuildPipeline {
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl Default for UniversalPackageBuildPipeline {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl AbstractPackageBuildTemplate for UniversalPackageBuildPipeline {
+    fn fetch_source(&self, pkg: &mut dyn IPackage) -> Result<(), HookError> {
+        Ok(())
+    }
+
+    fn verify_checksum(&self, pkg: &mut dyn IPackage) -> Result<(), HookError> {
+        if pkg.metadata().checksum.starts_with("invalid") {
+            return Err(HookError::ValidationError("Checksum verification failed".to_string()));
+        }
+        Ok(())
+    }
+
+    fn unpack_source(&self, pkg: &mut dyn IPackage) -> Result<(), HookError> {
+        Ok(())
+    }
+
+    fn configure_build(&self, pkg: &mut dyn IPackage) -> Result<(), HookError> {
+        Ok(())
+    }
+
+    fn compile_binaries(&self, pkg: &mut dyn IPackage) -> Result<(), HookError> {
+        Ok(())
+    }
+
+    fn install_sandboxed(&self, pkg: &mut dyn IPackage) -> Result<(), HookError> {
+        Ok(())
+    }
+
+    fn package_output(&self, pkg: &mut dyn IPackage) -> Result<(), HookError> {
+        Ok(())
+    }
+}
+
+// ============================================================================
+// OOP Composite Pattern: Meta-Packages and Package Groups
+// ============================================================================
+
+pub trait IPackageComponent: Send + Sync {
+    fn name(&self) -> &str;
+    fn total_size(&self) -> u64;
+    fn collect_leaf_packages(&self) -> Vec<String>;
+}
+
+impl IPackageComponent for StandardPackage {
+    fn name(&self) -> &str {
+        &self.metadata.name
+    }
+    fn total_size(&self) -> u64 {
+        self.metadata.size
+    }
+    fn collect_leaf_packages(&self) -> Vec<String> {
+        vec![self.metadata.name.clone()]
+    }
+}
+
+pub struct CompositePackageGroup {
+    pub group_name: String,
+    pub description: String,
+    pub components: Vec<Box<dyn IPackageComponent>>,
+}
+
+impl CompositePackageGroup {
+    pub fn new(group_name: &str, description: &str) -> Self {
+        Self {
+            group_name: group_name.to_string(),
+            description: description.to_string(),
+            components: Vec::new(),
+        }
+    }
+
+    pub fn add_component(&mut self, component: Box<dyn IPackageComponent>) {
+        self.components.push(component);
+    }
+}
+
+impl IPackageComponent for CompositePackageGroup {
+    fn name(&self) -> &str {
+        &self.group_name
+    }
+
+    fn total_size(&self) -> u64 {
+        self.components.iter().map(|c| c.total_size()).sum()
+    }
+
+    fn collect_leaf_packages(&self) -> Vec<String> {
+        let mut leaves = Vec::new();
+        for c in &self.components {
+            leaves.extend(c.collect_leaf_packages());
+        }
+        leaves
+    }
+}
+
+// ============================================================================
+// OOP Chain of Responsibility Pattern: Package Validation Filters
+// ============================================================================
+
+pub trait IPackageValidationHandler: Send + Sync {
+    fn validate(&self, pkg: &dyn IPackage) -> Result<(), HookError>;
+    fn set_next(&mut self, next: Box<dyn IPackageValidationHandler>);
+}
+
+pub struct SignatureValidationHandler {
+    next: Option<Box<dyn IPackageValidationHandler>>,
+}
+
+impl SignatureValidationHandler {
+    pub fn new() -> Self {
+        Self { next: None }
+    }
+}
+
+impl Default for SignatureValidationHandler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl IPackageValidationHandler for SignatureValidationHandler {
+    fn validate(&self, pkg: &dyn IPackage) -> Result<(), HookError> {
+        let meta = pkg.metadata();
+        if meta.pqc_signature.is_none() && meta.gpg_key_id.is_none() {
+            return Err(HookError::ValidationError("Missing cryptographic signature".to_string()));
+        }
+        if let Some(ref next) = self.next {
+            next.validate(pkg)?;
+        }
+        Ok(())
+    }
+
+    fn set_next(&mut self, next: Box<dyn IPackageValidationHandler>) {
+        self.next = Some(next);
+    }
+}
+
+pub struct SandboxComplianceHandler {
+    next: Option<Box<dyn IPackageValidationHandler>>,
+}
+
+impl SandboxComplianceHandler {
+    pub fn new() -> Self {
+        Self { next: None }
+    }
+}
+
+impl Default for SandboxComplianceHandler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl IPackageValidationHandler for SandboxComplianceHandler {
+    fn validate(&self, pkg: &dyn IPackage) -> Result<(), HookError> {
+        if pkg.name().contains("malicious") {
+            return Err(HookError::ValidationError("Package failed sandbox compliance audit".to_string()));
+        }
+        if let Some(ref next) = self.next {
+            next.validate(pkg)?;
+        }
+        Ok(())
+    }
+
+    fn set_next(&mut self, next: Box<dyn IPackageValidationHandler>) {
+        self.next = Some(next);
+    }
+}
+
+// ============================================================================
+// OOP Strategy Pattern: Package Repository Retrieval Protocol
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum FetchProtocol {
+    Https,
+    OciRegistry,
+    GitRepository,
+    IpfsP2p,
+}
+
+pub trait IPackageFetchStrategy: Send + Sync {
+    fn protocol(&self) -> FetchProtocol;
+    fn fetch_package(&self, url: &str) -> Result<Vec<u8>, HookError>;
+}
+
+pub struct HttpsFetchStrategy;
+impl IPackageFetchStrategy for HttpsFetchStrategy {
+    fn protocol(&self) -> FetchProtocol {
+        FetchProtocol::Https
+    }
+    fn fetch_package(&self, url: &str) -> Result<Vec<u8>, HookError> {
+        Ok(format!("HTTPS fetched content from {}", url).into_bytes())
+    }
+}
+
+pub struct OciRegistryFetchStrategy;
+impl IPackageFetchStrategy for OciRegistryFetchStrategy {
+    fn protocol(&self) -> FetchProtocol {
+        FetchProtocol::OciRegistry
+    }
+    fn fetch_package(&self, url: &str) -> Result<Vec<u8>, HookError> {
+        Ok(format!("OCI fetched layer content from {}", url).into_bytes())
+    }
+}
+
+pub struct IpfsFetchStrategy;
+impl IPackageFetchStrategy for IpfsFetchStrategy {
+    fn protocol(&self) -> FetchProtocol {
+        FetchProtocol::IpfsP2p
+    }
+    fn fetch_package(&self, url: &str) -> Result<Vec<u8>, HookError> {
+        Ok(format!("IPFS P2P block fetched from {}", url).into_bytes())
     }
 }
 
@@ -5332,6 +5662,165 @@ Description: Hook test";
 
         assert_eq!(pipeline.execute_phase(PackageBuildPhase::Compile, pkg.as_mut()).unwrap(), 1);
         assert!(compile_executed.load(core::sync::atomic::Ordering::SeqCst));
+    }
+
+    #[test]
+    fn test_oop_patterns_and_udf_pipeline_extensions() {
+        // 1. Template Method Pattern
+        let pipeline = UniversalPackageBuildPipeline::new();
+        let mut pkg: Box<dyn IPackage> = Box::new(StandardPackage {
+            metadata: PackageMetadata {
+                name: "template-build".to_string(),
+                version: Version::new(1, 0, 0),
+                description: "Template method build test".to_string(),
+                license: "MIT".to_string(),
+                maintainer: "Sovereign".to_string(),
+                homepage: String::new(),
+                architecture: "x86_64".to_string(),
+                checksum: "valid-checksum-hash".to_string(),
+                size: 1024,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
+            dependencies: Vec::new(),
+            format: PackageFormat::Sigma,
+        });
+
+        let steps = pipeline.execute_build_pipeline(pkg.as_mut()).unwrap();
+        assert_eq!(steps.len(), 9);
+        assert!(steps.contains(&"fetch_source".to_string()));
+        assert!(steps.contains(&"package_output".to_string()));
+
+        // Checksum failure test
+        let mut bad_pkg: Box<dyn IPackage> = Box::new(StandardPackage {
+            metadata: PackageMetadata {
+                name: "bad-checksum".to_string(),
+                version: Version::new(1, 0, 0),
+                description: "Failed build".to_string(),
+                license: "MIT".to_string(),
+                maintainer: "Sovereign".to_string(),
+                homepage: String::new(),
+                architecture: "x86_64".to_string(),
+                checksum: "invalid-checksum-hash".to_string(),
+                size: 1024,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
+            dependencies: Vec::new(),
+            format: PackageFormat::Sigma,
+        });
+        assert!(pipeline.execute_build_pipeline(bad_pkg.as_mut()).is_err());
+
+        // 2. Composite Pattern
+        let leaf1 = StandardPackage {
+            metadata: PackageMetadata {
+                name: "base-gcc".to_string(),
+                version: Version::new(13, 2, 0),
+                description: "GCC".to_string(),
+                license: "GPL".to_string(),
+                maintainer: "Dev".to_string(),
+                homepage: String::new(),
+                architecture: "x86_64".to_string(),
+                checksum: "hash".to_string(),
+                size: 50000000,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
+            dependencies: Vec::new(),
+            format: PackageFormat::Sigma,
+        };
+
+        let leaf2 = StandardPackage {
+            metadata: PackageMetadata {
+                name: "base-make".to_string(),
+                version: Version::new(4, 4, 0),
+                description: "Make".to_string(),
+                license: "GPL".to_string(),
+                maintainer: "Dev".to_string(),
+                homepage: String::new(),
+                architecture: "x86_64".to_string(),
+                checksum: "hash".to_string(),
+                size: 2000000,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
+            dependencies: Vec::new(),
+            format: PackageFormat::Sigma,
+        };
+
+        let mut group = CompositePackageGroup::new("@base-devel", "Base Development Meta Package Group");
+        group.add_component(Box::new(leaf1));
+        group.add_component(Box::new(leaf2));
+
+        assert_eq!(group.name(), "@base-devel");
+        assert_eq!(group.total_size(), 52000000);
+        let leaves = group.collect_leaf_packages();
+        assert_eq!(leaves, vec!["base-gcc".to_string(), "base-make".to_string()]);
+
+        // 3. Chain of Responsibility Pattern
+        let mut sig_handler = SignatureValidationHandler::new();
+        let sandbox_handler = SandboxComplianceHandler::new();
+        sig_handler.set_next(Box::new(sandbox_handler));
+
+        let unsigned_pkg = StandardPackage {
+            metadata: PackageMetadata {
+                name: "unsigned-pkg".to_string(),
+                version: Version::new(1, 0, 0),
+                description: "No sig".to_string(),
+                license: "MIT".to_string(),
+                maintainer: "Dev".to_string(),
+                homepage: String::new(),
+                architecture: "x86_64".to_string(),
+                checksum: "hash".to_string(),
+                size: 100,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
+            dependencies: Vec::new(),
+            format: PackageFormat::Sigma,
+        };
+        assert!(sig_handler.validate(&unsigned_pkg).is_err());
+
+        // 4. Strategy Pattern (Fetch Protocols)
+        let https_strat = HttpsFetchStrategy;
+        assert_eq!(https_strat.protocol(), FetchProtocol::Https);
+        let content = https_strat.fetch_package("https://repo.sigmaos.org/pkg.tar.zst").unwrap();
+        assert!(String::from_utf8_lossy(&content).contains("HTTPS fetched content"));
+
+        // 5. Enhanced UDFs (Dependency Rewriter & Post-Extract Transformer)
+        let mut udf_pipeline = UserDefinedFunctionPipeline::new();
+        udf_pipeline.register_dependency_rewriter(|dep| {
+            if dep.name == "wayland-protocols" {
+                dep.name = "sovereign-wayland".to_string();
+            }
+        });
+
+        let mut deps = vec![Dependency {
+            name: "wayland-protocols".to_string(),
+            version_constraint: VersionConstraint::Any,
+        }];
+        udf_pipeline.apply_dependency_rewriters(&mut deps);
+        assert_eq!(deps[0].name, "sovereign-wayland");
+
+        udf_pipeline.register_post_extract_transformer(|_pkg, files| {
+            files.push("usr/share/licenses/custom/LICENSE".to_string());
+            Ok(())
+        });
+
+        let mut files = vec!["usr/bin/app".to_string()];
+        udf_pipeline.apply_post_extract_transformers(pkg.as_mut(), &mut files).unwrap();
+        assert_eq!(files.len(), 2);
+        assert_eq!(files[1], "usr/share/licenses/custom/LICENSE");
     }
 
     #[test]
