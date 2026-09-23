@@ -17,7 +17,7 @@ use std::vec::Vec;
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
 #[cfg(not(feature = "standalone_test"))]
-use crate::package::AptDebManifest;
+pub use crate::package::AptDebManifest;
 #[cfg(not(feature = "standalone_test"))]
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 #[cfg(not(feature = "standalone_test"))]

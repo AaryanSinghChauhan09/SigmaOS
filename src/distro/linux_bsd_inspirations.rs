@@ -82,6 +82,12 @@ pub enum DistroSubsystemMode {
     LinuxKaOS,
     MidnightBsd,
     HardenedBsd,
+    LinuxOmarchy,
+    LinuxPCLinuxOS,
+    LinuxSteamOS,
+    GhostBsd,
+    NomadBsd,
+    LinuxAlpineExtended,
     LinuxVanillaOS,
     LinuxOpenWrt,
 }
@@ -152,8 +158,11 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxAsahi
             | DistroSubsystemMode::LinuxNobara
             | DistroSubsystemMode::LinuxKaOS
-            | DistroSubsystemMode::LinuxVanillaOS
-            | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
+            | DistroSubsystemMode::LinuxOmarchy
+            | DistroSubsystemMode::LinuxPCLinuxOS
+            | DistroSubsystemMode::LinuxSteamOS
+            | DistroSubsystemMode::BedrockLinux
+            | DistroSubsystemMode::LinuxVanillaOS => ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
@@ -161,13 +170,16 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::DragonFlyBsd
             | DistroSubsystemMode::MidnightBsd
-            | DistroSubsystemMode::HardenedBsd => ServiceSupervisorType::OpenRC,
+            | DistroSubsystemMode::HardenedBsd
+            | DistroSubsystemMode::GhostBsd
+            | DistroSubsystemMode::NomadBsd => ServiceSupervisorType::OpenRC,
 
             DistroSubsystemMode::LinuxAlpine
+            | DistroSubsystemMode::LinuxAlpineExtended
             | DistroSubsystemMode::LinuxVoid
             | DistroSubsystemMode::LinuxAntiX
-            | DistroSubsystemMode::LinuxOpenWrt
-            | DistroSubsystemMode::LinuxPostmarket => ServiceSupervisorType::Runit,
+            | DistroSubsystemMode::LinuxPostmarket
+            | DistroSubsystemMode::LinuxOpenWrt => ServiceSupervisorType::Runit,
 
             DistroSubsystemMode::LinuxPuppy => ServiceSupervisorType::Sysvinit,
 
@@ -219,18 +231,23 @@ impl SovereignUniversalDistroBridge {
                 DistroSubsystemMode::LinuxGaruda
                 | DistroSubsystemMode::LinuxEndeavour
                 | DistroSubsystemMode::LinuxManjaro
-                | DistroSubsystemMode::LinuxCachyOS,
+                | DistroSubsystemMode::LinuxCachyOS
+                | DistroSubsystemMode::LinuxOmarchy
+                | DistroSubsystemMode::LinuxSteamOS,
                 "/var/lib/pkg",
             ) => "/var/lib/pacman".to_string(),
-            (DistroSubsystemMode::LinuxAlpine, "/var/lib/pkg") => "/lib/apk/db".to_string(),
+            (DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxAlpineExtended, "/var/lib/pkg") => "/lib/apk/db".to_string(),
             (DistroSubsystemMode::LinuxVoid, "/var/lib/pkg") => "/var/db/xbps".to_string(),
+            (DistroSubsystemMode::LinuxOpenWrt, "/etc") => "/etc/config".to_string(),
             (
                 DistroSubsystemMode::FreeBsd
                 | DistroSubsystemMode::OpenBsd
                 | DistroSubsystemMode::NetBsd
                 | DistroSubsystemMode::DragonFlyBsd
                 | DistroSubsystemMode::MidnightBsd
-                | DistroSubsystemMode::HardenedBsd,
+                | DistroSubsystemMode::HardenedBsd
+                | DistroSubsystemMode::GhostBsd
+                | DistroSubsystemMode::NomadBsd,
                 "/var/lib/pkg",
             ) => "/var/db/pkg".to_string(),
             (
@@ -238,9 +255,15 @@ impl SovereignUniversalDistroBridge {
                 | DistroSubsystemMode::OpenBsd
                 | DistroSubsystemMode::NetBsd
                 | DistroSubsystemMode::DragonFlyBsd
+                | DistroSubsystemMode::GhostBsd
+                | DistroSubsystemMode::NomadBsd
                 | DistroSubsystemMode::SmartOs,
                 "/etc",
             ) => "/usr/local/etc".to_string(),
+            (
+                DistroSubsystemMode::GhostBsd | DistroSubsystemMode::NomadBsd,
+                "/var/log",
+            ) => "/var/log".to_string(),
             (DistroSubsystemMode::LinuxClear, "/etc") => "/usr/etc".to_string(),
             (
                 DistroSubsystemMode::FreeBsd
@@ -300,8 +323,13 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxDeepin
             | DistroSubsystemMode::LinuxAsahi
             | DistroSubsystemMode::LinuxNobara
-            | DistroSubsystemMode::LinuxVanillaOS
-            | DistroSubsystemMode::LinuxKaOS => supervisor == ServiceSupervisorType::Systemd,
+            | DistroSubsystemMode::LinuxKaOS
+            | DistroSubsystemMode::LinuxOmarchy
+            | DistroSubsystemMode::LinuxPCLinuxOS
+            | DistroSubsystemMode::LinuxSteamOS => supervisor == ServiceSupervisorType::Systemd,
+
+            DistroSubsystemMode::LinuxSteamOS
+            | DistroSubsystemMode::LinuxVanillaOS => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
@@ -309,13 +337,16 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::DragonFlyBsd
             | DistroSubsystemMode::MidnightBsd
-            | DistroSubsystemMode::HardenedBsd => supervisor == ServiceSupervisorType::OpenRC,
+            | DistroSubsystemMode::HardenedBsd
+            | DistroSubsystemMode::GhostBsd
+            | DistroSubsystemMode::NomadBsd => supervisor == ServiceSupervisorType::OpenRC,
 
             DistroSubsystemMode::LinuxAlpine
+            | DistroSubsystemMode::LinuxAlpineExtended
             | DistroSubsystemMode::LinuxVoid
             | DistroSubsystemMode::LinuxAntiX
-            | DistroSubsystemMode::LinuxOpenWrt
-            | DistroSubsystemMode::LinuxPostmarket => supervisor == ServiceSupervisorType::Runit,
+            | DistroSubsystemMode::LinuxPostmarket
+            | DistroSubsystemMode::LinuxOpenWrt => supervisor == ServiceSupervisorType::Runit,
 
             DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxGuix => {
                 supervisor == ServiceSupervisorType::Shepherd
@@ -354,14 +385,15 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxManjaro
             | DistroSubsystemMode::LinuxCachyOS
             | DistroSubsystemMode::LinuxAsahi
-            | DistroSubsystemMode::LinuxKaOS => format!("{}.pkg.tar.zst", input_pkg),
+            | DistroSubsystemMode::LinuxKaOS
+            | DistroSubsystemMode::LinuxOmarchy
+            | DistroSubsystemMode::LinuxSteamOS => format!("{}.pkg.tar.zst", input_pkg),
             DistroSubsystemMode::LinuxAlpine
+            | DistroSubsystemMode::LinuxAlpineExtended
             | DistroSubsystemMode::LinuxChimera
-            | DistroSubsystemMode::LinuxOpenWrt
             | DistroSubsystemMode::LinuxPostmarket => {
                 format!("{}.apk", input_pkg)
             }
-            DistroSubsystemMode::LinuxVanillaOS => format!("{}.apx", input_pkg),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", input_pkg),
             DistroSubsystemMode::LinuxNix => format!("{}.nix", input_pkg),
             DistroSubsystemMode::LinuxGuix => format!("{}.scm", input_pkg),
@@ -371,7 +403,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxMageia
             | DistroSubsystemMode::LinuxAlma
             | DistroSubsystemMode::LinuxRocky
-            | DistroSubsystemMode::LinuxNobara => {
+            | DistroSubsystemMode::LinuxNobara
+            | DistroSubsystemMode::LinuxPCLinuxOS => {
                 format!("{}.rpm", input_pkg)
             }
             DistroSubsystemMode::LinuxPuppy => format!("{}.pet", input_pkg),
@@ -382,7 +415,9 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::DragonFlyBsd
             | DistroSubsystemMode::MidnightBsd
-            | DistroSubsystemMode::HardenedBsd => {
+            | DistroSubsystemMode::HardenedBsd
+            | DistroSubsystemMode::GhostBsd
+            | DistroSubsystemMode::NomadBsd => {
                 format!("{}.pkg", input_pkg)
             }
             DistroSubsystemMode::OpenBsd
@@ -392,6 +427,8 @@ impl SovereignUniversalDistroBridge {
             }
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", input_pkg),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", input_pkg),
+            DistroSubsystemMode::LinuxVanillaOS => format!("{}.apx", input_pkg),
+            DistroSubsystemMode::LinuxOpenWrt => format!("{}.ipk", input_pkg),
         }
     }
 
@@ -422,14 +459,15 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxManjaro
             | DistroSubsystemMode::LinuxCachyOS
             | DistroSubsystemMode::LinuxAsahi
-            | DistroSubsystemMode::LinuxKaOS => format!("{}.pkg.tar.zst", action),
+            | DistroSubsystemMode::LinuxKaOS
+            | DistroSubsystemMode::LinuxOmarchy
+            | DistroSubsystemMode::LinuxSteamOS => format!("{}.pkg.tar.zst", action),
             DistroSubsystemMode::LinuxAlpine
+            | DistroSubsystemMode::LinuxAlpineExtended
             | DistroSubsystemMode::LinuxChimera
-            | DistroSubsystemMode::LinuxOpenWrt
             | DistroSubsystemMode::LinuxPostmarket => {
                 format!("{}.apk", action)
             }
-            DistroSubsystemMode::LinuxVanillaOS => format!("{}.apx", action),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", action),
             DistroSubsystemMode::LinuxNix => format!("{}.nix", action),
             DistroSubsystemMode::LinuxGuix => format!("{}.scm", action),
@@ -439,14 +477,17 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxMageia
             | DistroSubsystemMode::LinuxAlma
             | DistroSubsystemMode::LinuxRocky
-            | DistroSubsystemMode::LinuxNobara => format!("{}.rpm", action),
+            | DistroSubsystemMode::LinuxNobara
+            | DistroSubsystemMode::LinuxPCLinuxOS => format!("{}.rpm", action),
             DistroSubsystemMode::LinuxPuppy => format!("{}.pet", action),
             DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", action),
             DistroSubsystemMode::LinuxClear => format!("{}.bundle", action),
             DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::DragonFlyBsd
             | DistroSubsystemMode::MidnightBsd
-            | DistroSubsystemMode::HardenedBsd => {
+            | DistroSubsystemMode::HardenedBsd
+            | DistroSubsystemMode::GhostBsd
+            | DistroSubsystemMode::NomadBsd => {
                 format!("{}.pkg", action)
             }
             DistroSubsystemMode::OpenBsd
@@ -456,6 +497,8 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxTinyCore => format!("{}.tcz", action),
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", action),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", action),
+            DistroSubsystemMode::LinuxVanillaOS => format!("{}.apx", action),
+            DistroSubsystemMode::LinuxOpenWrt => format!("{}.ipk", action),
         };
 
         Ok(format!(
@@ -472,6 +515,10 @@ impl SovereignUniversalDistroBridge {
         match self.mode {
             DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::DragonFlyBsd
+            | DistroSubsystemMode::MidnightBsd
+            | DistroSubsystemMode::HardenedBsd
+            | DistroSubsystemMode::GhostBsd
+            | DistroSubsystemMode::NomadBsd
             | DistroSubsystemMode::SmartOs => {
                 let jail = FreeBSDJail::new(pid, root_path.to_string(), "sigma-jail".to_string());
                 self.active_jail = Some(jail);
@@ -2375,6 +2422,14 @@ mod cross_subsystem_tests {
             DistroSubsystemMode::LinuxKaOS,
             DistroSubsystemMode::MidnightBsd,
             DistroSubsystemMode::HardenedBsd,
+            DistroSubsystemMode::LinuxOmarchy,
+            DistroSubsystemMode::LinuxPCLinuxOS,
+            DistroSubsystemMode::LinuxSteamOS,
+            DistroSubsystemMode::GhostBsd,
+            DistroSubsystemMode::NomadBsd,
+            DistroSubsystemMode::LinuxAlpineExtended,
+            DistroSubsystemMode::LinuxVanillaOS,
+            DistroSubsystemMode::LinuxOpenWrt,
         ];
 
         for m in modes {
@@ -2401,6 +2456,18 @@ mod cross_subsystem_tests {
         let midnight_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::MidnightBsd);
         assert_eq!(midnight_bridge.translate_package_specifier("app"), "app.pkg");
         assert_eq!(midnight_bridge.get_supervisor_type(), ServiceSupervisorType::OpenRC);
+
+        let omarchy_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxOmarchy);
+        assert_eq!(omarchy_bridge.translate_package_specifier("app"), "app.pkg.tar.zst");
+        assert_eq!(omarchy_bridge.get_supervisor_type(), ServiceSupervisorType::Systemd);
+
+        let steamos_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxSteamOS);
+        assert_eq!(steamos_bridge.translate_package_specifier("app"), "app.pkg.tar.zst");
+        assert_eq!(steamos_bridge.get_supervisor_type(), ServiceSupervisorType::Systemd);
+
+        let ghost_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::GhostBsd);
+        assert_eq!(ghost_bridge.translate_package_specifier("app"), "app.pkg");
+        assert_eq!(ghost_bridge.get_supervisor_type(), ServiceSupervisorType::OpenRC);
     }
 
     #[test]

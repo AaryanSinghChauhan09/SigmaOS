@@ -9,6 +9,7 @@
 #![allow(clippy::type_complexity)]
 // SigmaOS Library
 // Core library for SigmaOS operating system
+extern crate alloc;
 
 // Core working modules
 pub mod open_source_os_gap_closure;
@@ -17,6 +18,7 @@ pub mod ai;
 pub mod app;
 pub mod auth;
 pub mod automation;
+pub mod community;
 pub mod compatibility;
 pub mod container;
 pub mod customization;
