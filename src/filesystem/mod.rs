@@ -15,8 +15,10 @@ pub mod support;
 pub mod vfs;
 pub mod sigma_fs;
 pub mod fhs_engine;
+pub mod modern_fs;
 
 pub use fhs_engine::*;
+pub use modern_fs::*;
 pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
 pub use crate::filesystem::vfs::{FileType, FsError, Inode, VirtualFilesystem, VfsError};
 // Removed non-existent vfs exports: FileDescriptor, FilePermissions
