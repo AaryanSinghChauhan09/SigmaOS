@@ -140,7 +140,7 @@ fi
 if [ -f "tests/test_string_parser_standalone.rs" ]; then
     echo "Running String, Config & TOML parser performance & correctness test suite..."
     mkdir -p build
-    rustc --test tests/test_string_parser_standalone.rs --edition=2021 -o build/string_parser_test
+    rustc --test tests/test_string_parser_standalone.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/string_parser_test
     ./build/string_parser_test
 fi
 
@@ -273,7 +273,7 @@ fi
 if [ -f "src/open_source_os_gap_closure.rs" ]; then
     echo "Running Open Source OS Gap Closure test suite..."
     mkdir -p build
-    rustc --test --edition=2021 src/open_source_os_gap_closure.rs -o build/test_open_source_gap_closure
+    rustc --test src/open_source_os_gap_closure.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_open_source_gap_closure
     ./build/test_open_source_gap_closure
 fi
 
