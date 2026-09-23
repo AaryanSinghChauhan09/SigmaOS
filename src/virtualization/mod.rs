@@ -9,6 +9,7 @@ pub mod oci_pod;
 pub mod orchestration;
 pub mod rancher;
 pub mod vm_manager;
+pub mod vendor_hardware;
 
 pub use kvm_vcpu::{
     FirecrackerMicroVmSupervisor, FreeBsdBhyveVirtioEngine, KvmExitCode, KvmMemoryRegion,
@@ -26,4 +27,8 @@ pub use oci_pod::{ContainerConfig, OciPod, OciPodManager, PodState};
 pub use rancher::{
     DaemonlessContainer, K3osOrchestrator, RancherError, RancherHarvesterVirtualMachineGovernor,
     RancherK3sEmbeddedClusterController, RancherSystemDockerEngine,
+};
+pub use vendor_hardware::{
+    AmdVmcbExecutionBlock, IntelVmcsExecutionState, MultiVendorVirtualizationEngine,
+    NvidiaVgpuMediatedInstance, VirtualizationVendorType,
 };
