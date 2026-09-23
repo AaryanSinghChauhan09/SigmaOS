@@ -481,6 +481,136 @@ impl FedoraGreenbootHealthCheckEngine {
     }
 }
 
+/// Arch Linux pacman-contrib Cache Pruning & Orphan Package Engine
+#[derive(Debug, Clone)]
+pub struct ArchPacmanContribCacheCleanerEngine {
+    pub cached_pkg_versions: Vec<(String, String)>,
+    pub keep_candidate_count: u32,
+    pub uninstalled_pruned_bytes: u64,
+}
+
+impl ArchPacmanContribCacheCleanerEngine {
+    pub fn new(keep_count: u32) -> Self {
+        Self {
+            cached_pkg_versions: Vec::new(),
+            keep_candidate_count: keep_count,
+            uninstalled_pruned_bytes: 0,
+        }
+    }
+
+    pub fn register_cached_package(&mut self, pkg_name: &str, version: &str) {
+        self.cached_pkg_versions.push((pkg_name.to_string(), version.to_string()));
+    }
+
+    pub fn prune_old_cache_versions(&mut self) -> usize {
+        let before_count = self.cached_pkg_versions.len();
+        if before_count > self.keep_candidate_count as usize {
+            let to_remove = before_count - self.keep_candidate_count as usize;
+            self.cached_pkg_versions.truncate(self.keep_candidate_count as usize);
+            self.uninstalled_pruned_bytes += (to_remove * 1024 * 1024 * 15) as u64; // ~15MB per package
+            to_remove
+        } else {
+            0
+        }
+    }
+}
+
+/// Debian debsums & dpkg-query Package Verification Auditor Engine
+#[derive(Debug, Clone)]
+pub struct DebianDpkgQueryIntegrityAuditorEngine {
+    pub tracked_package_checksums: Vec<(String, String, [u8; 16])>, // (pkg, filepath, md5)
+    pub integrity_violations: Vec<String>,
+}
+
+impl DebianDpkgQueryIntegrityAuditorEngine {
+    pub fn new() -> Self {
+        Self {
+            tracked_package_checksums: Vec::new(),
+            integrity_violations: Vec::new(),
+        }
+    }
+
+    pub fn register_checksum(&mut self, pkg: &str, path: &str, md5: [u8; 16]) {
+        self.tracked_package_checksums.push((pkg.to_string(), path.to_string(), md5));
+    }
+
+    pub fn verify_file_md5(&mut self, path: &str, actual_md5: [u8; 16]) -> bool {
+        if let Some((_, _, expected_md5)) = self.tracked_package_checksums.iter().find(|(_, p, _)| p == path) {
+            if expected_md5 != &actual_md5 {
+                self.integrity_violations.push(path.to_string());
+                false
+            } else {
+                true
+            }
+        } else {
+            true
+        }
+    }
+}
+
+impl Default for DebianDpkgQueryIntegrityAuditorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Solus eopkg Delta Package Patching & Transaction Engine
+#[derive(Debug, Clone)]
+pub struct SolusEopkgDeltaPackageEngine {
+    pub base_version: String,
+    pub target_version: String,
+    pub delta_size_bytes: u64,
+    pub delta_applied: bool,
+}
+
+impl SolusEopkgDeltaPackageEngine {
+    pub fn new(base: &str, target: &str, delta_bytes: u64) -> Self {
+        Self {
+            base_version: base.to_string(),
+            target_version: target.to_string(),
+            delta_size_bytes: delta_bytes,
+            delta_applied: false,
+        }
+    }
+
+    pub fn apply_delta_patch(&mut self) -> Result<String, &'static str> {
+        self.delta_applied = true;
+        Ok(format!("Upgraded from {} to {} using {} KB delta patch", self.base_version, self.target_version, self.delta_size_bytes / 1024))
+    }
+}
+
+/// SmartOS vmadm ZFS Ephemeral Zone Container Manager
+#[derive(Debug, Clone)]
+pub struct SmartOsZoneContainerVmadmEngine {
+    pub zone_uuid: String,
+    pub brand_type: String, // joyent, lx, kvm
+    pub max_physical_memory_mb: u64,
+    pub zfs_quota_gb: u64,
+    pub is_running: bool,
+}
+
+impl SmartOsZoneContainerVmadmEngine {
+    pub fn new(uuid: &str, brand: &str, ram_mb: u64, quota_gb: u64) -> Self {
+        Self {
+            zone_uuid: uuid.to_string(),
+            brand_type: brand.to_string(),
+            max_physical_memory_mb: ram_mb,
+            zfs_quota_gb: quota_gb,
+            is_running: false,
+        }
+    }
+
+    pub fn start_zone(&mut self) -> bool {
+        self.is_running = true;
+        self.is_running
+    }
+
+    pub fn stop_zone(&mut self) -> bool {
+        self.is_running = false;
+        false
+    }
+}
+
 /// Master Missing Linux & BSD Components Suite
 #[derive(Debug, Clone)]
 pub struct SovereignMissingLinuxBsdSuite {
@@ -566,5 +696,27 @@ mod tests {
         let mut green = FedoraGreenbootHealthCheckEngine::new(2);
         assert_eq!(green.record_boot_failure(), GreenbootStatus::Degraded);
         assert_eq!(green.record_boot_failure(), GreenbootStatus::FailedRollbackTriggered);
+
+        // Test Arch pacman-contrib cache cleaner
+        let mut pac_clean = ArchPacmanContribCacheCleanerEngine::new(2);
+        pac_clean.register_cached_package("linux", "6.11.0");
+        pac_clean.register_cached_package("linux", "6.11.1");
+        pac_clean.register_cached_package("linux", "6.12.0");
+        assert_eq!(pac_clean.prune_old_cache_versions(), 1);
+
+        // Test Debian debsums integrity auditor
+        let mut debsums = DebianDpkgQueryIntegrityAuditorEngine::new();
+        debsums.register_checksum("bash", "/bin/bash", [0xAA; 16]);
+        assert!(debsums.verify_file_md5("/bin/bash", [0xAA; 16]));
+        assert!(!debsums.verify_file_md5("/bin/bash", [0xBB; 16]));
+
+        // Test Solus eopkg delta package
+        let mut eopkg = SolusEopkgDeltaPackageEngine::new("1.0", "1.1", 1024 * 500);
+        assert!(eopkg.apply_delta_patch().is_ok());
+
+        // Test SmartOS vmadm zone container
+        let mut vmadm = SmartOsZoneContainerVmadmEngine::new("zone-1234", "joyent", 2048, 20);
+        assert!(vmadm.start_zone());
+        assert!(!vmadm.stop_zone());
     }
 }

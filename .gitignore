@@ -28,3 +28,4 @@ __pycache__/
 /test_universal
 /tests/sigma_test_runner
 *.png
+target/
