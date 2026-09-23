@@ -43,7 +43,6 @@ pub struct Version {
     pub patch: u64,
 }
 
-
 #[cfg(all(not(feature = "standalone_test"), not(test)))]
 use crate::klib::HashMap;
 
@@ -66,7 +65,16 @@ impl Version {
         }
     }
     pub fn parse(s: &str) -> Result<Self, &'static str> {
-        let clean: String = s.chars().map(|c| if c.is_ascii_digit() || c == '.' { c } else { ' ' }).collect();
+        let clean: String = s
+            .chars()
+            .map(|c| {
+                if c.is_ascii_digit() || c == '.' {
+                    c
+                } else {
+                    ' '
+                }
+            })
+            .collect();
         let first_num = clean.split_whitespace().next().unwrap_or("1.0.0");
         let parts: Vec<&str> = first_num.split('.').collect();
         let major = parts.get(0).and_then(|p| p.parse().ok()).unwrap_or(1);
@@ -101,7 +109,13 @@ pub struct Package {
 
 #[cfg(any(feature = "standalone_test", test))]
 impl Package {
-    pub fn new(name: String, version: Version, description: String, dependencies: Vec<Dependency>, checksum: String) -> Self {
+    pub fn new(
+        name: String,
+        version: Version,
+        description: String,
+        dependencies: Vec<Dependency>,
+        checksum: String,
+    ) -> Self {
         Self {
             name,
             version,
@@ -289,7 +303,10 @@ impl PackageFormat {
             Some(PackageFormat::OpenBsdPkg)
         } else if normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
             Some(PackageFormat::TarGz)
-        } else if normalized.ends_with(".txz") || normalized.ends_with(".tar.xz") || normalized.ends_with(".xz") {
+        } else if normalized.ends_with(".txz")
+            || normalized.ends_with(".tar.xz")
+            || normalized.ends_with(".xz")
+        {
             Some(PackageFormat::TarXz)
         } else if normalized.ends_with(".xbps") {
             Some(PackageFormat::Xbps)
@@ -319,7 +336,10 @@ impl PackageFormat {
             Some(PackageFormat::Cports)
         } else if normalized.ends_with(".dports") {
             Some(PackageFormat::Dports)
-        } else if normalized.ends_with(".slackbuild") || normalized.ends_with(".tlz") || normalized.ends_with(".tbz") {
+        } else if normalized.ends_with(".slackbuild")
+            || normalized.ends_with(".tlz")
+            || normalized.ends_with(".tbz")
+        {
             Some(PackageFormat::SlackBuild)
         } else if normalized.ends_with(".crux") || normalized.ends_with(".pkgfile") {
             Some(PackageFormat::Crux)
@@ -3613,7 +3633,9 @@ pub struct UserDefinedFunctionPipeline {
     closures: Vec<UserDefinedPhaseClosure>,
     env_vars: HashMap<String, String>,
     dependency_override_filters: Vec<Arc<dyn Fn(&mut Vec<Dependency>) + Send + Sync>>,
-    sandbox_policy_customizers: Vec<Arc<dyn Fn(&mut dyn IPackage, &mut Vec<String>) -> Result<(), HookError> + Send + Sync>>,
+    sandbox_policy_customizers: Vec<
+        Arc<dyn Fn(&mut dyn IPackage, &mut Vec<String>) -> Result<(), HookError> + Send + Sync>,
+    >,
 }
 
 impl UserDefinedFunctionPipeline {
@@ -3669,7 +3691,11 @@ impl UserDefinedFunctionPipeline {
     }
 
     /// Apply all sandbox policy customizers to a package
-    pub fn apply_sandbox_customizers(&self, package: &mut dyn IPackage, pledges: &mut Vec<String>) -> Result<(), HookError> {
+    pub fn apply_sandbox_customizers(
+        &self,
+        package: &mut dyn IPackage,
+        pledges: &mut Vec<String>,
+    ) -> Result<(), HookError> {
         for customizer in &self.sandbox_policy_customizers {
             customizer(package, pledges)?;
         }
@@ -3738,7 +3764,9 @@ impl SovereignAlternativesEngine {
     }
 
     pub fn get_active_alternative(&self, name: &str) -> Option<&str> {
-        self.active_selections.get(name).map(|s: &String| s.as_str())
+        self.active_selections
+            .get(name)
+            .map(|s: &String| s.as_str())
     }
 }
 
@@ -3816,7 +3844,9 @@ impl PortageSlotResolver {
 
     pub fn is_slot_compatible(&self, pkg_name: &str, target_slot: &str) -> bool {
         if let Some(slots) = self.installed_slots.get(pkg_name) {
-            slots.iter().any(|s: &PortageSlotInfo| s.slot == target_slot)
+            slots
+                .iter()
+                .any(|s: &PortageSlotInfo| s.slot == target_slot)
         } else {
             false
         }
@@ -4040,7 +4070,10 @@ impl UniversalDistroPackageUnifierEngine {
 
     /// Takes an IPackage from any external Linux distro format (Debian, RPM, Pacman, Ebuild, Apk, Nix, Flatpak, Snap, AppImage, Xbps, Zypper, etc.)
     /// and transforms it into a unified native Sigma package with normalized dependencies, expanded macros, and security audit wrappers.
-    pub fn unify_package(&self, foreign_package: &dyn IPackage) -> Result<Box<dyn IPackage>, ParseError> {
+    pub fn unify_package(
+        &self,
+        foreign_package: &dyn IPackage,
+    ) -> Result<Box<dyn IPackage>, ParseError> {
         let meta = foreign_package.metadata();
 
         // 1. Expand macros in description/paths if applicable
@@ -4051,7 +4084,11 @@ impl UniversalDistroPackageUnifierEngine {
 
         // Process conditional dependencies based on USE flags
         for cond_dep in foreign_package.conditional_dependencies() {
-            let flag_enabled = self.active_use_flags.get(&cond_dep.required_use_flag).copied().unwrap_or(false);
+            let flag_enabled = self
+                .active_use_flags
+                .get(&cond_dep.required_use_flag)
+                .copied()
+                .unwrap_or(false);
             if flag_enabled {
                 let mapped_name = self.map_dependency_name(&cond_dep.dependency.name);
                 unified_deps.push(Dependency {
@@ -4084,18 +4121,40 @@ impl UniversalDistroPackageUnifierEngine {
 
     pub fn map_dependency_name<'a>(&self, name: &'a str) -> &'a str {
         match name {
-            "libssl-dev" | "openssl-devel" | "dev-libs/openssl" | "openssl" | "openssl-dev" | "libssl3t64" | "openssl-libs" | "cachyos-v3-libssl" => "sovereign-openssl",
-            "libc6" | "glibc" | "sys-libs/glibc" | "musl" | "musl-dev" | "glibc-devel" | "glibc-common" | "libc6-dev" | "glibc-t64" => "sovereign-libc",
-            "zlib1g-dev" | "zlib-devel" | "sys-libs/zlib" | "zlib" | "zlib-dev" | "zlib-ng" => "sovereign-zlib",
-            "libcurl4-openssl-dev" | "curl-devel" | "net-misc/curl" | "curl" | "curl-dev" | "libcurl4t64" | "libcurl-minimal" => "sovereign-curl",
-            "libsqlite3-dev" | "sqlite-devel" | "dev-db/sqlite" | "sqlite" | "sqlite-dev" | "libsqlite3-0t64" | "sqlite-libs" => "sovereign-sqlite",
-            "libpq-dev" | "postgresql-devel" | "dev-db/postgresql" | "postgresql" | "postgresql-dev" | "libpq5" => "sovereign-postgresql",
-            "libglib2.0-dev" | "glib2-devel" | "dev-libs/glib" | "glib2" | "glib2-dev" | "libglib2.0-0t64" | "glib2-libs" => "sovereign-glib2",
-            "python3-dev" | "python3-devel" | "dev-lang/python" | "python3" | "python" | "python-dev" | "python-libs" => "sovereign-python",
-            "build-essential" | "base-devel" | "build-base" | "gcc-c++" | "gcc" => "sovereign-build-tools",
-            "libffi-dev" | "libffi-devel" | "dev-libs/libffi" | "libffi" | "libffi8t64" => "sovereign-libffi",
-            "libpam0g-dev" | "pam-devel" | "sys-libs/pam" | "linux-pam" | "libpam0g-t64" => "sovereign-pam",
-            "libxml2-dev" | "libxml2-devel" | "dev-libs/libxml2" | "libxml2" | "libxml2-t64" => "sovereign-libxml2",
+            "libssl-dev" | "openssl-devel" | "dev-libs/openssl" | "openssl" | "openssl-dev"
+            | "libssl3t64" | "openssl-libs" | "cachyos-v3-libssl" => "sovereign-openssl",
+            "libc6" | "glibc" | "sys-libs/glibc" | "musl" | "musl-dev" | "glibc-devel"
+            | "glibc-common" | "libc6-dev" | "glibc-t64" => "sovereign-libc",
+            "zlib1g-dev" | "zlib-devel" | "sys-libs/zlib" | "zlib" | "zlib-dev" | "zlib-ng" => {
+                "sovereign-zlib"
+            }
+            "libcurl4-openssl-dev"
+            | "curl-devel"
+            | "net-misc/curl"
+            | "curl"
+            | "curl-dev"
+            | "libcurl4t64"
+            | "libcurl-minimal" => "sovereign-curl",
+            "libsqlite3-dev" | "sqlite-devel" | "dev-db/sqlite" | "sqlite" | "sqlite-dev"
+            | "libsqlite3-0t64" | "sqlite-libs" => "sovereign-sqlite",
+            "libpq-dev" | "postgresql-devel" | "dev-db/postgresql" | "postgresql"
+            | "postgresql-dev" | "libpq5" => "sovereign-postgresql",
+            "libglib2.0-dev" | "glib2-devel" | "dev-libs/glib" | "glib2" | "glib2-dev"
+            | "libglib2.0-0t64" | "glib2-libs" => "sovereign-glib2",
+            "python3-dev" | "python3-devel" | "dev-lang/python" | "python3" | "python"
+            | "python-dev" | "python-libs" => "sovereign-python",
+            "build-essential" | "base-devel" | "build-base" | "gcc-c++" | "gcc" => {
+                "sovereign-build-tools"
+            }
+            "libffi-dev" | "libffi-devel" | "dev-libs/libffi" | "libffi" | "libffi8t64" => {
+                "sovereign-libffi"
+            }
+            "libpam0g-dev" | "pam-devel" | "sys-libs/pam" | "linux-pam" | "libpam0g-t64" => {
+                "sovereign-pam"
+            }
+            "libxml2-dev" | "libxml2-devel" | "dev-libs/libxml2" | "libxml2" | "libxml2-t64" => {
+                "sovereign-libxml2"
+            }
             _ => name,
         }
     }
@@ -4173,19 +4232,23 @@ impl UniversalDistroPackageFacade {
 
     /// Enable or disable a Portage-style USE flag in the facade
     pub fn set_use_flag(&mut self, flag: &str, enabled: bool) {
-        self.package_manager.active_use_flags.insert(flag.to_string(), enabled);
+        self.package_manager
+            .active_use_flags
+            .insert(flag.to_string(), enabled);
         self.unifier_engine.set_use_flag(flag, enabled);
     }
 
     /// Unify an incoming foreign package (Deb, Rpm, Ebuild, Pacman, etc.), run UDF hooks, and install
     pub fn unify_and_install(&mut self, source_pkg: &dyn IPackage) -> Result<String, String> {
         // 1. Unify foreign package format into standard Sovereign package with macro expansion & dependency normalization
-        let mut unified_pkg = self.unifier_engine
+        let mut unified_pkg = self
+            .unifier_engine
             .unify_package(source_pkg)
             .map_err(|e| format!("Package unification failed: {:?}", e))?;
 
         // 2. Execute user-defined function hooks on unified package
-        let _ran_hooks = self.udf_manager
+        let _ran_hooks = self
+            .udf_manager
             .run_hooks_on(unified_pkg.as_mut())
             .map_err(|e| format!("UDF hook execution failed: {:?}", e))?;
 
@@ -4219,7 +4282,10 @@ impl UniversalDistroPackageFacade {
 
     /// Query installed package by name
     pub fn query_package(&self, name: &str) -> Option<&dyn IPackage> {
-        self.package_manager.installed_packages.get(name).map(|boxed| boxed.as_ref())
+        self.package_manager
+            .installed_packages
+            .get(name)
+            .map(|boxed| boxed.as_ref())
     }
 }
 
@@ -5153,14 +5219,22 @@ Description: Hook test";
         assert!(unified.metadata().description.contains("/usr/bin/nginx"));
 
         // Normalized dependency mapping check
-        assert!(unified.dependencies().iter().any(|d| d.name == "sovereign-openssl"));
-        assert!(unified.dependencies().iter().any(|d| d.name == "sovereign-libc"));
+        assert!(unified
+            .dependencies()
+            .iter()
+            .any(|d| d.name == "sovereign-openssl"));
+        assert!(unified
+            .dependencies()
+            .iter()
+            .any(|d| d.name == "sovereign-libc"));
 
         // UserDefinedFunctionManager check
         let mut udf_mgr = UserDefinedFunctionManager::new();
         struct CustomSuffixHook;
         impl UserDefinedHook for CustomSuffixHook {
-            fn name(&self) -> &str { "suffix-hook" }
+            fn name(&self) -> &str {
+                "suffix-hook"
+            }
             fn execute(&self, pkg: &mut dyn IPackage) -> Result<(), HookError> {
                 pkg.metadata_mut().maintainer = "sovereign-built".to_string();
                 Ok(())
@@ -5208,14 +5282,19 @@ Description: Hook test";
         udf_mgr.pipeline.apply_dependency_filters(&mut deps);
         assert_eq!(deps[0].name, "sovereign-custom-lib");
 
-        udf_mgr.pipeline.register_sandbox_customizer(|_pkg, pledges| {
-            pledges.push("stdio".to_string());
-            pledges.push("rpath".to_string());
-            Ok(())
-        });
+        udf_mgr
+            .pipeline
+            .register_sandbox_customizer(|_pkg, pledges| {
+                pledges.push("stdio".to_string());
+                pledges.push("rpath".to_string());
+                Ok(())
+            });
 
         let mut pledges = Vec::new();
-        udf_mgr.pipeline.apply_sandbox_customizers(test_pkg.as_mut(), &mut pledges).unwrap();
+        udf_mgr
+            .pipeline
+            .apply_sandbox_customizers(test_pkg.as_mut(), &mut pledges)
+            .unwrap();
         assert_eq!(pledges, vec!["stdio".to_string(), "rpath".to_string()]);
     }
 
@@ -5268,23 +5347,53 @@ Description: Hook test";
     fn test_multi_distro_t64_and_dnf5_dependency_mappings() {
         let unifier = UniversalDistroPackageUnifierEngine::new();
 
-        assert_eq!(unifier.map_dependency_name("libssl3t64"), "sovereign-openssl");
-        assert_eq!(unifier.map_dependency_name("openssl-libs"), "sovereign-openssl");
-        assert_eq!(unifier.map_dependency_name("cachyos-v3-libssl"), "sovereign-openssl");
+        assert_eq!(
+            unifier.map_dependency_name("libssl3t64"),
+            "sovereign-openssl"
+        );
+        assert_eq!(
+            unifier.map_dependency_name("openssl-libs"),
+            "sovereign-openssl"
+        );
+        assert_eq!(
+            unifier.map_dependency_name("cachyos-v3-libssl"),
+            "sovereign-openssl"
+        );
 
         assert_eq!(unifier.map_dependency_name("glibc-t64"), "sovereign-libc");
-        assert_eq!(unifier.map_dependency_name("glibc-common"), "sovereign-libc");
+        assert_eq!(
+            unifier.map_dependency_name("glibc-common"),
+            "sovereign-libc"
+        );
 
         assert_eq!(unifier.map_dependency_name("libcurl4t64"), "sovereign-curl");
-        assert_eq!(unifier.map_dependency_name("libcurl-minimal"), "sovereign-curl");
+        assert_eq!(
+            unifier.map_dependency_name("libcurl-minimal"),
+            "sovereign-curl"
+        );
 
-        assert_eq!(unifier.map_dependency_name("libsqlite3-0t64"), "sovereign-sqlite");
-        assert_eq!(unifier.map_dependency_name("sqlite-libs"), "sovereign-sqlite");
+        assert_eq!(
+            unifier.map_dependency_name("libsqlite3-0t64"),
+            "sovereign-sqlite"
+        );
+        assert_eq!(
+            unifier.map_dependency_name("sqlite-libs"),
+            "sovereign-sqlite"
+        );
 
-        assert_eq!(unifier.map_dependency_name("libglib2.0-0t64"), "sovereign-glib2");
-        assert_eq!(unifier.map_dependency_name("libffi8t64"), "sovereign-libffi");
+        assert_eq!(
+            unifier.map_dependency_name("libglib2.0-0t64"),
+            "sovereign-glib2"
+        );
+        assert_eq!(
+            unifier.map_dependency_name("libffi8t64"),
+            "sovereign-libffi"
+        );
         assert_eq!(unifier.map_dependency_name("libpam0g-t64"), "sovereign-pam");
-        assert_eq!(unifier.map_dependency_name("libxml2-t64"), "sovereign-libxml2");
+        assert_eq!(
+            unifier.map_dependency_name("libxml2-t64"),
+            "sovereign-libxml2"
+        );
     }
 
     #[test]
@@ -5326,11 +5435,21 @@ Description: Hook test";
             format: PackageFormat::Sigma,
         });
 
-        assert_eq!(pipeline.execute_phase(PackageBuildPhase::Prepare, pkg.as_mut()).unwrap(), 1);
+        assert_eq!(
+            pipeline
+                .execute_phase(PackageBuildPhase::Prepare, pkg.as_mut())
+                .unwrap(),
+            1
+        );
         assert!(prepare_executed.load(core::sync::atomic::Ordering::SeqCst));
         assert!(!compile_executed.load(core::sync::atomic::Ordering::SeqCst));
 
-        assert_eq!(pipeline.execute_phase(PackageBuildPhase::Compile, pkg.as_mut()).unwrap(), 1);
+        assert_eq!(
+            pipeline
+                .execute_phase(PackageBuildPhase::Compile, pkg.as_mut())
+                .unwrap(),
+            1
+        );
         assert!(compile_executed.load(core::sync::atomic::Ordering::SeqCst));
     }
 
@@ -5340,7 +5459,9 @@ Description: Hook test";
 
         struct CustomFacadeHook;
         impl UserDefinedHook for CustomFacadeHook {
-            fn name(&self) -> &str { "facade-hook" }
+            fn name(&self) -> &str {
+                "facade-hook"
+            }
             fn execute(&self, pkg: &mut dyn IPackage) -> Result<(), HookError> {
                 pkg.metadata_mut().homepage = "https://sigmaos.org".to_string();
                 Ok(())
@@ -5387,12 +5508,10 @@ Description: Hook test";
                 gpg_key_id: None,
                 supported_architectures: Vec::new(),
             },
-            dependencies: vec![
-                Dependency {
-                    name: "libssl-dev".to_string(),
-                    version_constraint: VersionConstraint::Any,
-                },
-            ],
+            dependencies: vec![Dependency {
+                name: "libssl-dev".to_string(),
+                version_constraint: VersionConstraint::Any,
+            }],
             format: PackageFormat::Deb,
         });
 
@@ -5404,14 +5523,22 @@ Description: Hook test";
         assert_eq!(queried.metadata().homepage, "https://sigmaos.org");
 
         // Verify USE flag translation mapped dependency
-        assert!(queried.dependencies().iter().any(|d| d.name == "sovereign-openssl"));
+        assert!(queried
+            .dependencies()
+            .iter()
+            .any(|d| d.name == "sovereign-openssl"));
 
         // Test transaction rollback
         assert!(facade.rollback_last_transaction().is_ok());
 
         // Test Nix store garbage collection
-        facade.nix_gc_engine.register_path("/nix/store/a1-curl", vec!["/nix/store/b2-glibc".to_string()]);
-        facade.nix_gc_engine.register_path("/nix/store/c3-orphan", vec![]);
+        facade.nix_gc_engine.register_path(
+            "/nix/store/a1-curl",
+            vec!["/nix/store/b2-glibc".to_string()],
+        );
+        facade
+            .nix_gc_engine
+            .register_path("/nix/store/c3-orphan", vec![]);
         facade.nix_gc_engine.add_gc_root("/nix/store/a1-curl");
 
         let collected = facade.collect_nix_store_garbage();

@@ -19,13 +19,15 @@ use std::vec::Vec;
 #[cfg(not(feature = "standalone_test"))]
 use crate::package::AptDebManifest;
 #[cfg(not(feature = "standalone_test"))]
-use crate::sigpkg::{Dependency, Package, VersionConstraint};
+pub use crate::security::Permission;
 #[cfg(not(feature = "standalone_test"))]
 pub use crate::sigpkg::universal_engine::PackageFormat;
 #[cfg(not(feature = "standalone_test"))]
-use crate::sigpkg::universal_oop_system::{PackageMetadata, StandardPackage, UniversalPackageManager};
+use crate::sigpkg::universal_oop_system::{
+    PackageMetadata, StandardPackage, UniversalPackageManager,
+};
 #[cfg(not(feature = "standalone_test"))]
-pub use crate::security::Permission;
+use crate::sigpkg::{Dependency, Package, VersionConstraint};
 
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -72,14 +74,39 @@ impl core::fmt::Display for Version {
 #[cfg(feature = "standalone_test")]
 impl Version {
     pub fn new(major: u64, minor: u64, patch: u64) -> Self {
-        Self { major, minor, patch }
+        Self {
+            major,
+            minor,
+            patch,
+        }
     }
     pub fn parse(v: &str) -> Result<Self, &'static str> {
         let clean = v.split('-').next().unwrap_or(v);
         let mut parts = clean.split('.');
-        let major = parts.next().unwrap_or("0").chars().filter(|c| c.is_ascii_digit()).collect::<String>().parse().unwrap_or(1);
-        let minor = parts.next().unwrap_or("0").chars().filter(|c| c.is_ascii_digit()).collect::<String>().parse().unwrap_or(0);
-        let patch = parts.next().unwrap_or("0").chars().filter(|c| c.is_ascii_digit()).collect::<String>().parse().unwrap_or(0);
+        let major = parts
+            .next()
+            .unwrap_or("0")
+            .chars()
+            .filter(|c| c.is_ascii_digit())
+            .collect::<String>()
+            .parse()
+            .unwrap_or(1);
+        let minor = parts
+            .next()
+            .unwrap_or("0")
+            .chars()
+            .filter(|c| c.is_ascii_digit())
+            .collect::<String>()
+            .parse()
+            .unwrap_or(0);
+        let patch = parts
+            .next()
+            .unwrap_or("0")
+            .chars()
+            .filter(|c| c.is_ascii_digit())
+            .collect::<String>()
+            .parse()
+            .unwrap_or(0);
         Ok(Self::new(major, minor, patch))
     }
 }
@@ -114,19 +141,88 @@ pub struct Package {
 
 #[cfg(feature = "standalone_test")]
 impl Package {
-    pub fn new(name: String, version: Version, description: String, dependencies: Vec<Dependency>, checksum: String) -> Self {
-        Self { name, version, description, dependencies, checksum }
+    pub fn new(
+        name: String,
+        version: Version,
+        description: String,
+        dependencies: Vec<Dependency>,
+        checksum: String,
+    ) -> Self {
+        Self {
+            name,
+            version,
+            description,
+            dependencies,
+            checksum,
+        }
     }
 }
 
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PackageFormat {
-    Apt, Yum, Pacman, Apk, Pkg, Xbps, Zypper, Portage, Flatpak, Snap, AppImage, Pisi, Nix, Guix,
-    Hpkg, SlackBuild, Pkgsrc, Moss, Tcz, Gobo, Ostree, Air, Bottle, Ipa, Ports, Aab, Hap, Superdeb,
-    Lzm, Pup, Pet, Tar, TarGz, TarXz, AppBundle, Puk, Dmg, Cports, Dports, Ipk, Opkg, SolarisIps,
-    GuixNar, NarInfo, OpenBsdPkg, Swupd, Stratum, Crux, Drpm, Sfs, Wheel, Crate, Gem, Nupkg, Vcpkg,
-    Spack, Conan, Sigma, Sysupdate, Starling, Sovereign, Eopkg,
+    Apt,
+    Yum,
+    Pacman,
+    Apk,
+    Pkg,
+    Xbps,
+    Zypper,
+    Portage,
+    Flatpak,
+    Snap,
+    AppImage,
+    Pisi,
+    Nix,
+    Guix,
+    Hpkg,
+    SlackBuild,
+    Pkgsrc,
+    Moss,
+    Tcz,
+    Gobo,
+    Ostree,
+    Air,
+    Bottle,
+    Ipa,
+    Ports,
+    Aab,
+    Hap,
+    Superdeb,
+    Lzm,
+    Pup,
+    Pet,
+    Tar,
+    TarGz,
+    TarXz,
+    AppBundle,
+    Puk,
+    Dmg,
+    Cports,
+    Dports,
+    Ipk,
+    Opkg,
+    SolarisIps,
+    GuixNar,
+    NarInfo,
+    OpenBsdPkg,
+    Swupd,
+    Stratum,
+    Crux,
+    Drpm,
+    Sfs,
+    Wheel,
+    Crate,
+    Gem,
+    Nupkg,
+    Vcpkg,
+    Spack,
+    Conan,
+    Sigma,
+    Sysupdate,
+    Starling,
+    Sovereign,
+    Eopkg,
 }
 
 #[cfg(feature = "standalone_test")]
@@ -163,7 +259,9 @@ pub struct UniversalPackageManager {
 #[cfg(feature = "standalone_test")]
 impl UniversalPackageManager {
     pub fn new() -> Self {
-        Self { packages: Vec::new() }
+        Self {
+            packages: Vec::new(),
+        }
     }
     pub fn install_package(&mut self, pkg: Box<StandardPackage>) -> Result<(), &'static str> {
         self.packages.push(*pkg);
@@ -231,7 +329,6 @@ pub trait PackageFormatAdapter {
         Ok(Vec::new())
     }
 }
-
 
 #[derive(Debug, Clone)]
 pub struct FlatpakManifest {
@@ -725,26 +822,42 @@ impl UniversalPackageAdapter {
             }
             if line.starts_with("name") {
                 if let Some(pos) = line.find(' ') {
-                    name = line[pos + 1..].trim().trim_matches(|c| c == '"' || c == '\'' || c == ';').to_string();
+                    name = line[pos + 1..]
+                        .trim()
+                        .trim_matches(|c| c == '"' || c == '\'' || c == ';')
+                        .to_string();
                 }
             } else if line.starts_with("version") {
                 if let Some(pos) = line.find(' ') {
-                    version = line[pos + 1..].trim().trim_matches(|c| c == '"' || c == '\'' || c == ';').to_string();
+                    version = line[pos + 1..]
+                        .trim()
+                        .trim_matches(|c| c == '"' || c == '\'' || c == ';')
+                        .to_string();
                 }
             } else if line.starts_with("summary") {
                 if let Some(pos) = line.find(' ') {
-                    summary = line[pos + 1..].trim().trim_matches(|c| c == '"' || c == '\'' || c == ';').to_string();
+                    summary = line[pos + 1..]
+                        .trim()
+                        .trim_matches(|c| c == '"' || c == '\'' || c == ';')
+                        .to_string();
                 }
             } else if line.starts_with("architecture") {
                 if let Some(pos) = line.find(' ') {
-                    architecture = line[pos + 1..].trim().trim_matches(|c| c == '"' || c == '\'' || c == ';').to_string();
+                    architecture = line[pos + 1..]
+                        .trim()
+                        .trim_matches(|c| c == '"' || c == '\'' || c == ';')
+                        .to_string();
                 }
-            } else if line.starts_with("requires {") || line == "requires {" || line.starts_with("requires") {
+            } else if line.starts_with("requires {")
+                || line == "requires {"
+                || line.starts_with("requires")
+            {
                 in_requires_block = true;
             } else if line.starts_with('}') {
                 in_requires_block = false;
             } else if in_requires_block {
-                let clean_req = line.trim_matches(|c| c == '"' || c == '\'' || c == ',' || c == ';');
+                let clean_req =
+                    line.trim_matches(|c| c == '"' || c == '\'' || c == ',' || c == ';');
                 if !clean_req.is_empty() {
                     requires.push(clean_req.to_string());
                 }
@@ -817,7 +930,10 @@ impl UniversalPackageAdapter {
     }
 
     /// Parses FreeBSD UCL (+MANIFEST) pkg manifest
-    pub fn parse_freebsd_ucl_manifest(&self, text: &str) -> Result<FreeBsdUclManifest, &'static str> {
+    pub fn parse_freebsd_ucl_manifest(
+        &self,
+        text: &str,
+    ) -> Result<FreeBsdUclManifest, &'static str> {
         let mut name = String::new();
         let mut version = String::new();
         let mut comment = String::new();
@@ -847,7 +963,8 @@ impl UniversalPackageAdapter {
                 }
             } else if let Some(pos) = line.find(':') {
                 let key = line[..pos].trim();
-                let val = line[pos + 1..].trim_matches(|c| c == '"' || c == '\'' || c == ',' || c == ' ');
+                let val =
+                    line[pos + 1..].trim_matches(|c| c == '"' || c == '\'' || c == ',' || c == ' ');
                 match key {
                     "name" => name = val.to_string(),
                     "version" => version = val.to_string(),
@@ -870,7 +987,10 @@ impl UniversalPackageAdapter {
     }
 
     /// Parses OpenBSD +CONTENTS pkg manifest
-    pub fn parse_openbsd_contents(&self, text: &str) -> Result<OpenBsdContentsManifest, &'static str> {
+    pub fn parse_openbsd_contents(
+        &self,
+        text: &str,
+    ) -> Result<OpenBsdContentsManifest, &'static str> {
         let mut pkgname = String::new();
         let mut version = String::new();
         let mut comment = String::new();
@@ -1029,7 +1149,8 @@ impl UniversalPackageAdapter {
             }
             if let Some(pos) = line.find('=') {
                 let key = line[..pos].trim();
-                let val = line[pos + 1..].trim_matches(|c| c == '"' || c == '\'' || c == '(' || c == ')');
+                let val =
+                    line[pos + 1..].trim_matches(|c| c == '"' || c == '\'' || c == '(' || c == ')');
                 match key {
                     "PRGNAM" | "NAME" => name = val.to_string(),
                     "VERSION" | "VER" => version = val.to_string(),
@@ -1090,7 +1211,6 @@ impl UniversalPackageAdapter {
         }
         permissions
     }
-
 
     /// Detects package format based on file extension
     pub fn detect_format_by_extension(&self, filename: &str) -> Option<PackageFormat> {
@@ -1166,7 +1286,9 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::NarInfo) // Nix/Guix NarInfo substituter magic
         } else if data.starts_with(b"\xd0\xcf\x11\xe0") {
             Some(PackageFormat::Msi) // Windows OLE/MSI magic
-        } else if data.starts_with(b"#!/bin/sh\n# This script was generated using Makeself") || data.starts_with(b"# Makeself") {
+        } else if data.starts_with(b"#!/bin/sh\n# This script was generated using Makeself")
+            || data.starts_with(b"# Makeself")
+        {
             Some(PackageFormat::MakeselfRun) // Makeself runner magic
         } else if data.starts_with(b"\x7fELF") && data.len() > 16 && data[16] == 1 {
             Some(PackageFormat::KernelModuleKmod) // Relocatable ELF Kernel Module magic
@@ -1407,7 +1529,9 @@ impl UniversalPackageAdapter {
                         &slack.description,
                         &slack.slack_required,
                     )
-                } else if raw_text.contains("requires {") || (raw_text.contains("summary \"") && raw_text.contains("architecture ")) {
+                } else if raw_text.contains("requires {")
+                    || (raw_text.contains("summary \"") && raw_text.contains("architecture "))
+                {
                     let hpkg = self.parse_haiku_hpkg(raw_text)?;
                     self.translate_to_native_package(
                         &hpkg.name,
@@ -1851,16 +1975,15 @@ impl UniversalDependencyMapper {
         match clean {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl"
             | "dev-libs/openssl" => "openssl".to_string(),
-            "libc6" | "glibc" | "musl" | "musl-dev" | "musl-devel" | "devel/glibc" | "sys-libs/glibc" | "libc" => {
-                "libc".to_string()
-            }
+            "libc6" | "glibc" | "musl" | "musl-dev" | "musl-devel" | "devel/glibc"
+            | "sys-libs/glibc" | "libc" => "libc".to_string(),
             "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
                 "zlib".to_string()
             }
-            "python" | "python3" | "python3-dev" | "python3-devel" | "dev-lang/python" | "lang/python" => {
-                "python".to_string()
-            }
-            "curl" | "libcurl4" | "libcurl-devel" | "libcurl-dev" | "ftp/curl" | "net-misc/curl" => "curl".to_string(),
+            "python" | "python3" | "python3-dev" | "python3-devel" | "dev-lang/python"
+            | "lang/python" => "python".to_string(),
+            "curl" | "libcurl4" | "libcurl-devel" | "libcurl-dev" | "ftp/curl"
+            | "net-misc/curl" => "curl".to_string(),
             "bash" | "shells/bash" | "app-shells/bash" => "bash".to_string(),
             "libx11" | "x11-libs/libx11" | "x11-proto/xorgproto" => "libx11".to_string(),
             "wayland" | "dev-libs/wayland" => "wayland".to_string(),
@@ -1871,15 +1994,26 @@ impl UniversalDependencyMapper {
             "readline" | "sys-libs/readline" => "readline".to_string(),
             "xz" | "xz-utils" | "app-arch/xz-utils" => "xz".to_string(),
             "zstd" | "app-arch/zstd" => "zstd".to_string(),
-            "sqlite" | "sqlite3" | "libsqlite3-dev" | "sqlite-devel" | "databases/sqlite3" | "dev-db/sqlite" => "sqlite".to_string(),
-            "libpng" | "libpng-dev" | "libpng-devel" | "graphics/png" | "media-libs/libpng" => "libpng".to_string(),
-            "jpeg" | "libjpeg" | "libjpeg-turbo" | "libjpeg-devel" | "graphics/jpeg" => "jpeg".to_string(),
-            "systemd" | "systemd-libs" | "libsystemd-dev" | "systemd-devel" | "sys-apps/systemd" => "systemd".to_string(),
-            "llvm" | "llvm-dev" | "llvm-devel" | "devel/llvm" | "sys-devel/llvm" => "llvm".to_string(),
+            "sqlite" | "sqlite3" | "libsqlite3-dev" | "sqlite-devel" | "databases/sqlite3"
+            | "dev-db/sqlite" => "sqlite".to_string(),
+            "libpng" | "libpng-dev" | "libpng-devel" | "graphics/png" | "media-libs/libpng" => {
+                "libpng".to_string()
+            }
+            "jpeg" | "libjpeg" | "libjpeg-turbo" | "libjpeg-devel" | "graphics/jpeg" => {
+                "jpeg".to_string()
+            }
+            "systemd" | "systemd-libs" | "libsystemd-dev" | "systemd-devel"
+            | "sys-apps/systemd" => "systemd".to_string(),
+            "llvm" | "llvm-dev" | "llvm-devel" | "devel/llvm" | "sys-devel/llvm" => {
+                "llvm".to_string()
+            }
             "rust" | "rustc" | "lang/rust" | "dev-lang/rust" | "rust-dev" => "rust".to_string(),
-            "libxml2" | "libxml2-dev" | "libxml2-devel" | "textproc/libxml2" | "dev-libs/libxml2" => "libxml2".to_string(),
+            "libxml2" | "libxml2-dev" | "libxml2-devel" | "textproc/libxml2"
+            | "dev-libs/libxml2" => "libxml2".to_string(),
             "git" | "git-core" | "devel/git" | "dev-vcs/git" => "git".to_string(),
-            "ffmpeg" | "ffmpeg-devel" | "multimedia/ffmpeg" | "media-video/ffmpeg" => "ffmpeg".to_string(),
+            "ffmpeg" | "ffmpeg-devel" | "multimedia/ffmpeg" | "media-video/ffmpeg" => {
+                "ffmpeg".to_string()
+            }
             "gcc" | "gcc-c++" | "lang/gcc" | "sys-devel/gcc" => "gcc".to_string(),
             "clang" | "clang-tools-extra" | "lang/clang" | "sys-devel/clang" => "clang".to_string(),
             "cmake" | "devel/cmake" | "dev-build/cmake" => "cmake".to_string(),
@@ -1946,10 +2080,16 @@ impl UniversalScriptletConverter {
                 _ => None,
             },
             PackageFormat::Pkg | PackageFormat::Ports => match script_name {
-                "+POST_INSTALL" | "+INSTALL" | "pkg-post-install" | "post-install" => Some(SigmaPkgHookType::PostInstall),
+                "+POST_INSTALL" | "+INSTALL" | "pkg-post-install" | "post-install" => {
+                    Some(SigmaPkgHookType::PostInstall)
+                }
                 "+PRE_INSTALL" | "pre-install" => Some(SigmaPkgHookType::PreInstall),
-                "+POST_DEINSTALL" | "+DEINSTALL" | "post-deinstall" | "post-remove" => Some(SigmaPkgHookType::PostRemove),
-                "+PRE_DEINSTALL" | "pre-deinstall" | "pre-remove" => Some(SigmaPkgHookType::PreRemove),
+                "+POST_DEINSTALL" | "+DEINSTALL" | "post-deinstall" | "post-remove" => {
+                    Some(SigmaPkgHookType::PostRemove)
+                }
+                "+PRE_DEINSTALL" | "pre-deinstall" | "pre-remove" => {
+                    Some(SigmaPkgHookType::PreRemove)
+                }
                 _ => None,
             },
             PackageFormat::Pacman => match script_name {
@@ -2037,7 +2177,12 @@ impl UniversalSandboxCapabilityMatrix {
             } else if c == "x11" || c == "wayland" || c == "--socket=x11" || c == "--socket=wayland"
             {
                 perms.push(Permission::DisplayAccess);
-            } else if c == "system-observe" || c == "proc" || c == "sysctl" || c == "exec" || c == "execpromises" {
+            } else if c == "system-observe"
+                || c == "proc"
+                || c == "sysctl"
+                || c == "exec"
+                || c == "execpromises"
+            {
                 perms.push(Permission::ProcessExec);
             }
         }
@@ -2130,15 +2275,20 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pacman" | "yay" | "paru" | "pikaur" | "trizen" | "aura" | "arch" | "manjaro" | "cachy" | "cachyos" => {
+            "pacman" | "yay" | "paru" | "pikaur" | "trizen" | "aura" | "arch" | "manjaro"
+            | "cachy" | "cachyos" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
                         "-S" | "-Sy" | "install" => operation = UniversalPmOperation::Install,
                         "-R" | "-Rns" | "remove" => operation = UniversalPmOperation::Remove,
-                        "-Syu" | "-Syyu" | "update" | "upgrade" => operation = UniversalPmOperation::Upgrade,
+                        "-Syu" | "-Syyu" | "update" | "upgrade" => {
+                            operation = UniversalPmOperation::Upgrade
+                        }
                         "-Ss" | "-Qs" | "search" => operation = UniversalPmOperation::Search,
-                        "-Si" | "-Qi" | "info" | "query" => operation = UniversalPmOperation::QueryInfo,
+                        "-Si" | "-Qi" | "info" | "query" => {
+                            operation = UniversalPmOperation::QueryInfo
+                        }
                         "-Sc" | "-Scc" | "clean" => operation = UniversalPmOperation::CleanCache,
                         "--print" | "--dryrun" => dry_run = true,
                         arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
@@ -2147,7 +2297,8 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "dnf" | "yum" | "microdnf" | "rpm" | "fedora" | "rhel" | "centos" | "zypper" | "opensuse" | "suse" => {
+            "dnf" | "yum" | "microdnf" | "rpm" | "fedora" | "rhel" | "centos" | "zypper"
+            | "opensuse" | "suse" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2196,7 +2347,8 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkg" | "pkgsend" | "pkg_add" | "pkg_delete" | "pkg_info" | "freebsd" | "openbsd" | "netbsd" | "bsd" => {
+            "pkg" | "pkgsend" | "pkg_add" | "pkg_delete" | "pkg_info" | "freebsd" | "openbsd"
+            | "netbsd" | "bsd" => {
                 if pm == "pkg_delete" {
                     operation = UniversalPmOperation::Remove;
                 } else if pm == "pkg_info" {
@@ -2206,10 +2358,14 @@ impl UniversalPmCommandDispatcher {
                     while i < args.len() {
                         match args[i] {
                             "install" | "add" => operation = UniversalPmOperation::Install,
-                            "delete" | "remove" | "purge" => operation = UniversalPmOperation::Remove,
+                            "delete" | "remove" | "purge" => {
+                                operation = UniversalPmOperation::Remove
+                            }
                             "upgrade" | "update" => operation = UniversalPmOperation::Upgrade,
                             "search" => operation = UniversalPmOperation::Search,
-                            "info" | "query" | "status" => operation = UniversalPmOperation::QueryInfo,
+                            "info" | "query" | "status" => {
+                                operation = UniversalPmOperation::QueryInfo
+                            }
                             "-n" | "--dry-run" => dry_run = true,
                             arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
                             _ => {}
@@ -2219,7 +2375,13 @@ impl UniversalPmCommandDispatcher {
                 }
                 if target_packages.is_empty() {
                     for arg in args {
-                        if !arg.starts_with('-') && *arg != "install" && *arg != "add" && *arg != "delete" && *arg != "remove" && *arg != "upgrade" {
+                        if !arg.starts_with('-')
+                            && *arg != "install"
+                            && *arg != "add"
+                            && *arg != "delete"
+                            && *arg != "remove"
+                            && *arg != "upgrade"
+                        {
                             target_packages.push(arg.to_string());
                         }
                     }
@@ -2249,7 +2411,12 @@ impl UniversalPmCommandDispatcher {
                 for arg in args {
                     if *arg == "-n" || *arg == "--dry-run" {
                         dry_run = true;
-                    } else if !arg.starts_with('-') && target_packages.is_empty() && *arg != "install" && *arg != "remove" && *arg != "upgrade" {
+                    } else if !arg.starts_with('-')
+                        && target_packages.is_empty()
+                        && *arg != "install"
+                        && *arg != "remove"
+                        && *arg != "upgrade"
+                    {
                         target_packages.push(arg.to_string());
                     }
                 }
@@ -2293,7 +2460,18 @@ impl UniversalPmCommandDispatcher {
                 for arg in args {
                     if *arg == "-n" || *arg == "--dry-run" {
                         dry_run = true;
-                    } else if !arg.starts_with('-') && target_packages.is_empty() && *arg != "install" && *arg != "add" && *arg != "remove" && *arg != "purge" && *arg != "upgrade" && *arg != "update" && *arg != "search" && *arg != "info" && *arg != "query" {
+                    } else if !arg.starts_with('-')
+                        && target_packages.is_empty()
+                        && *arg != "install"
+                        && *arg != "add"
+                        && *arg != "remove"
+                        && *arg != "purge"
+                        && *arg != "upgrade"
+                        && *arg != "update"
+                        && *arg != "search"
+                        && *arg != "info"
+                        && *arg != "query"
+                    {
                         target_packages.push(arg.to_string());
                     }
                 }
@@ -2302,9 +2480,18 @@ impl UniversalPmCommandDispatcher {
                 let mut i = 0;
                 while i < args.len() {
                     let arg = args[i];
-                    if arg == "-C" || arg == "--unmerge" || arg == "--deselect" || arg == "delete" || arg == "remove" {
+                    if arg == "-C"
+                        || arg == "--unmerge"
+                        || arg == "--deselect"
+                        || arg == "delete"
+                        || arg == "remove"
+                    {
                         operation = UniversalPmOperation::Remove;
-                    } else if arg == "-u" || arg.contains('u') || arg == "--update" || arg == "upgrade" {
+                    } else if arg == "-u"
+                        || arg.contains('u')
+                        || arg == "--update"
+                        || arg == "upgrade"
+                    {
                         operation = UniversalPmOperation::Upgrade;
                     } else if arg == "-s" || arg == "--search" || arg == "search" {
                         operation = UniversalPmOperation::Search;
@@ -2315,7 +2502,13 @@ impl UniversalPmCommandDispatcher {
                     } else if !arg.starts_with('-') {
                         target_packages.push(arg.to_string());
                     }
-                    if arg.starts_with('-') && (arg.contains('p') || arg.contains('a') || arg == "--pretend" || arg == "--ask" || arg == "-n") {
+                    if arg.starts_with('-')
+                        && (arg.contains('p')
+                            || arg.contains('a')
+                            || arg == "--pretend"
+                            || arg == "--ask"
+                            || arg == "-n")
+                    {
                         dry_run = true;
                     }
                     i += 1;
@@ -2391,7 +2584,11 @@ impl UniversalPmCommandDispatcher {
                 }
                 if target_packages.is_empty() {
                     for arg in args {
-                        if !arg.starts_with('-') && *arg != "install" && *arg != "remove" && *arg != "upgrade" {
+                        if !arg.starts_with('-')
+                            && *arg != "install"
+                            && *arg != "remove"
+                            && *arg != "upgrade"
+                        {
                             target_packages.push(arg.to_string());
                         }
                     }
@@ -2401,8 +2598,12 @@ impl UniversalPmCommandDispatcher {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
-                        "install" | "in" | "it" | "bundle-add" | "add" => operation = UniversalPmOperation::Install,
-                        "uninstall" | "remove" | "rm" | "bundle-remove" => operation = UniversalPmOperation::Remove,
+                        "install" | "in" | "it" | "bundle-add" | "add" => {
+                            operation = UniversalPmOperation::Install
+                        }
+                        "uninstall" | "remove" | "rm" | "bundle-remove" => {
+                            operation = UniversalPmOperation::Remove
+                        }
                         "update" | "upgrade" | "ur" => operation = UniversalPmOperation::Upgrade,
                         "search" | "se" | "sr" => operation = UniversalPmOperation::Search,
                         "info" => operation = UniversalPmOperation::QueryInfo,
@@ -2743,7 +2944,10 @@ mod tests {
             Priority: essential
         "#;
         let parsed_essential = adapter.parse_apt_control(essential_text).unwrap();
-        assert_eq!(parsed_essential.priority, format!("{:?}", PackagePriority::Essential));
+        assert_eq!(
+            parsed_essential.priority,
+            format!("{:?}", PackagePriority::Essential)
+        );
 
         let native = adapter
             .translate_to_native_package(
@@ -3393,9 +3597,7 @@ mod tests {
         assert_eq!(nix_action.source_pm, "nix");
         assert_eq!(nix_action.operation, UniversalPmOperation::Install);
 
-        let eopkg_action = dispatcher
-            .dispatch_command("eopkg it vlc")
-            .unwrap();
+        let eopkg_action = dispatcher.dispatch_command("eopkg it vlc").unwrap();
         assert_eq!(eopkg_action.source_pm, "eopkg");
         assert_eq!(eopkg_action.operation, UniversalPmOperation::Install);
 
@@ -3410,17 +3612,23 @@ mod tests {
     fn test_foreign_pm_dispatcher_expanded_distros() {
         let dispatcher = UniversalPmCommandDispatcher::new();
 
-        let emerge_act = dispatcher.dispatch_command("emerge -uDN @world -p").unwrap();
+        let emerge_act = dispatcher
+            .dispatch_command("emerge -uDN @world -p")
+            .unwrap();
         assert_eq!(emerge_act.source_pm, "emerge");
         assert_eq!(emerge_act.operation, UniversalPmOperation::Upgrade);
         assert!(emerge_act.dry_run);
 
-        let nix_act = dispatcher.dispatch_command("nix-env -iA nixpkgs.git").unwrap();
+        let nix_act = dispatcher
+            .dispatch_command("nix-env -iA nixpkgs.git")
+            .unwrap();
         assert_eq!(nix_act.source_pm, "nix-env");
         assert_eq!(nix_act.operation, UniversalPmOperation::Install);
         assert_eq!(nix_act.target_packages, vec!["nixpkgs.git"]);
 
-        let flatpak_act = dispatcher.dispatch_command("flatpak install org.gimp.GIMP").unwrap();
+        let flatpak_act = dispatcher
+            .dispatch_command("flatpak install org.gimp.GIMP")
+            .unwrap();
         assert_eq!(flatpak_act.source_pm, "flatpak");
         assert_eq!(flatpak_act.operation, UniversalPmOperation::Install);
         assert_eq!(flatpak_act.target_packages, vec!["org.gimp.GIMP"]);
@@ -3430,17 +3638,23 @@ mod tests {
         assert_eq!(snap_act.operation, UniversalPmOperation::Remove);
         assert_eq!(snap_act.target_packages, vec!["vlc"]);
 
-        let slack_act = dispatcher.dispatch_command("slackpkg install htop").unwrap();
+        let slack_act = dispatcher
+            .dispatch_command("slackpkg install htop")
+            .unwrap();
         assert_eq!(slack_act.source_pm, "slackpkg");
         assert_eq!(slack_act.operation, UniversalPmOperation::Install);
         assert_eq!(slack_act.target_packages, vec!["htop"]);
 
-        let pkgman_act = dispatcher.dispatch_command("pkgman install haiku_dep").unwrap();
+        let pkgman_act = dispatcher
+            .dispatch_command("pkgman install haiku_dep")
+            .unwrap();
         assert_eq!(pkgman_act.source_pm, "pkgman");
         assert_eq!(pkgman_act.operation, UniversalPmOperation::Install);
         assert_eq!(pkgman_act.target_packages, vec!["haiku_dep"]);
 
-        let swupd_act = dispatcher.dispatch_command("swupd bundle-add os-core").unwrap();
+        let swupd_act = dispatcher
+            .dispatch_command("swupd bundle-add os-core")
+            .unwrap();
         assert_eq!(swupd_act.source_pm, "swupd");
         assert_eq!(swupd_act.operation, UniversalPmOperation::Install);
 
@@ -3473,7 +3687,9 @@ requires {
         assert_eq!(manifest.requires, vec!["haiku_core", "libssl"]);
 
         let mut engine = SigPkgUniversalBridgeEngine::new();
-        let pkg = engine.absorb_and_register("app.hpkg", hpkg_text.as_bytes()).unwrap();
+        let pkg = engine
+            .absorb_and_register("app.hpkg", hpkg_text.as_bytes())
+            .unwrap();
         assert_eq!(pkg.name, "haiku_dep");
         assert!(engine.is_package_registered("haiku_dep"));
     }
@@ -3501,7 +3717,8 @@ requires {
         assert_eq!(bsd_manifest.version, "8.4.0");
 
         // 4. OpenBSD +CONTENTS
-        let openbsd_contents = "@name htop-3.2.2\n@depend sysutils/lsof\n@comment interactive process viewer\n";
+        let openbsd_contents =
+            "@name htop-3.2.2\n@depend sysutils/lsof\n@comment interactive process viewer\n";
         let obsd_manifest = adapter.parse_openbsd_contents(openbsd_contents).unwrap();
         assert_eq!(obsd_manifest.pkgname, "htop");
         assert_eq!(obsd_manifest.version, "3.2.2");
@@ -3512,25 +3729,36 @@ requires {
         let dispatcher = UniversalPmCommandDispatcher::new();
         let dep_mapper = UniversalDependencyMapper::new();
 
-        let debian = dispatcher.dispatch_command("debian install git-core").unwrap();
+        let debian = dispatcher
+            .dispatch_command("debian install git-core")
+            .unwrap();
         assert_eq!(debian.source_pm, "debian");
         assert_eq!(debian.operation, UniversalPmOperation::Install);
         assert_eq!(debian.target_packages, vec!["git-core"]);
-        assert_eq!(dep_mapper.to_canonical_name(&debian.target_packages[0]), "git");
+        assert_eq!(
+            dep_mapper.to_canonical_name(&debian.target_packages[0]),
+            "git"
+        );
 
-        let arch = dispatcher.dispatch_command("arch -S --dryrun ffmpeg-devel").unwrap();
+        let arch = dispatcher
+            .dispatch_command("arch -S --dryrun ffmpeg-devel")
+            .unwrap();
         assert_eq!(arch.source_pm, "arch");
         assert_eq!(arch.operation, UniversalPmOperation::Install);
         assert!(arch.dry_run);
         assert_eq!(dep_mapper.to_canonical_name("ffmpeg-devel"), "ffmpeg");
 
-        let freebsd = dispatcher.dispatch_command("freebsd install -n lang/gcc").unwrap();
+        let freebsd = dispatcher
+            .dispatch_command("freebsd install -n lang/gcc")
+            .unwrap();
         assert_eq!(freebsd.source_pm, "freebsd");
         assert_eq!(freebsd.operation, UniversalPmOperation::Install);
         assert!(freebsd.dry_run);
         assert_eq!(dep_mapper.to_canonical_name("lang/gcc"), "gcc");
 
-        let void = dispatcher.dispatch_command("void install sys-apps/ripgrep").unwrap();
+        let void = dispatcher
+            .dispatch_command("void install sys-apps/ripgrep")
+            .unwrap();
         assert_eq!(void.source_pm, "void");
         assert_eq!(void.operation, UniversalPmOperation::Install);
         assert_eq!(dep_mapper.to_canonical_name("sys-apps/ripgrep"), "ripgrep");
