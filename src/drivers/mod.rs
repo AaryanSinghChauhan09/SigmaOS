@@ -11,6 +11,7 @@
 pub mod boot_init;
 pub mod dde;
 pub mod distro_device_expansion;
+pub mod scsi_sense;
 pub mod even_more_devices;
 pub mod flipper_gpio_sensor;
 pub mod gpu;
