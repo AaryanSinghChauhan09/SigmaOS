@@ -1,6 +1,5 @@
 
 use std::collections::BTreeMap;
-use std::format;
 use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
@@ -332,11 +331,205 @@ impl DmaRingBufferAllocator {
 // 6. SIGMA RESOURCE ALLOCATOR HUB
 // =========================================================================
 
+/// Linux CMA (Contiguous Memory Allocator) & BSD Physical Contiguous Memory Engine
+#[derive(Debug, Clone)]
+pub struct ContiguousFrameAllocator {
+    pub base_phys_addr: u64,
+    pub total_frames: usize,
+    pub frame_size_bytes: usize,
+    pub frame_bitmap: Vec<bool>,
+}
+
+impl ContiguousFrameAllocator {
+    pub fn new(base_phys_addr: u64, total_frames: usize, frame_size_bytes: usize) -> Self {
+        Self {
+            base_phys_addr,
+            total_frames,
+            frame_size_bytes,
+            frame_bitmap: vec![false; total_frames],
+        }
+    }
+
+    pub fn alloc_contiguous_frames(&mut self, count: usize) -> Result<u64, &'static str> {
+        if count == 0 || count > self.total_frames {
+            return Err("CMA: Invalid frame count requested");
+        }
+
+        let mut consecutive = 0;
+        let mut start_idx = 0;
+
+        for i in 0..self.total_frames {
+            if !self.frame_bitmap[i] {
+                if consecutive == 0 {
+                    start_idx = i;
+                }
+                consecutive += 1;
+                if consecutive == count {
+                    for j in start_idx..start_idx + count {
+                        self.frame_bitmap[j] = true;
+                    }
+                    return Ok(self.base_phys_addr + (start_idx * self.frame_size_bytes) as u64);
+                }
+            } else {
+                consecutive = 0;
+            }
+        }
+
+        Err("CMA: Contiguous frame allocation failed - space fragmented or exhausted")
+    }
+
+    pub fn free_contiguous_frames(&mut self, phys_addr: u64, count: usize) -> Result<(), &'static str> {
+        if phys_addr < self.base_phys_addr {
+            return Err("CMA: Address below base physical address");
+        }
+
+        let offset = (phys_addr - self.base_phys_addr) as usize;
+        if offset % self.frame_size_bytes != 0 {
+            return Err("CMA: Physical address unaligned to frame boundary");
+        }
+
+        let start_idx = offset / self.frame_size_bytes;
+        if start_idx + count > self.total_frames {
+            return Err("CMA: Frame range out of physical memory bounds");
+        }
+
+        for j in start_idx..start_idx + count {
+            self.frame_bitmap[j] = false;
+        }
+
+        Ok(())
+    }
+}
+
+/// Equal & Proportional Frame Allocator (OS Paging & Virtual Memory)
+#[derive(Debug, Clone)]
+pub struct ProcessFrameDemand {
+    pub pid: u32,
+    pub page_demand: usize,
+}
+
+#[derive(Debug, Clone)]
+pub struct FrameProportionalAllocator {
+    pub total_available_frames: usize,
+}
+
+impl FrameProportionalAllocator {
+    pub fn new(total_frames: usize) -> Self {
+        Self {
+            total_available_frames: total_frames,
+        }
+    }
+
+    /// Equal allocation: Divide total frames equally across active processes
+    pub fn allocate_equal_frames(&self, process_count: usize) -> usize {
+        if process_count == 0 {
+            0
+        } else {
+            self.total_available_frames / process_count
+        }
+    }
+
+    /// Proportional allocation: Allocate frames proportionally based on page demand ratio
+    pub fn allocate_proportional_frames(&self, demands: &[ProcessFrameDemand]) -> Vec<(u32, usize)> {
+        let total_demand: usize = demands.iter().map(|d| d.page_demand).sum();
+        if total_demand == 0 {
+            return demands.iter().map(|d| (d.pid, 0)).collect();
+        }
+
+        demands
+            .iter()
+            .map(|d| {
+                let allocated = (d.page_demand * self.total_available_frames) / total_demand;
+                (d.pid, allocated.max(1)) // Ensure minimum 1 frame per active process
+            })
+            .collect()
+    }
+}
+
+/// Linked Block & Indexed Block Allocator (File Systems & Secondary Storage)
+#[derive(Debug, Clone)]
+pub struct LinkedBlockNode {
+    pub block_id: u32,
+    pub next_block_id: Option<u32>,
+}
+
+#[derive(Debug, Clone)]
+pub struct LinkedIndexedBlockAllocator {
+    pub total_storage_blocks: usize,
+    pub index_table: BTreeMap<u32, Vec<u32>>,
+}
+
+impl LinkedIndexedBlockAllocator {
+    pub fn new(total_blocks: usize) -> Self {
+        Self {
+            total_storage_blocks: total_blocks,
+            index_table: BTreeMap::new(),
+        }
+    }
+
+    /// Allocate indexed block entry mapping logical file blocks to physical storage blocks
+    pub fn allocate_file_index_block(&mut self, file_id: u32, block_list: Vec<u32>) -> Result<(), &'static str> {
+        if block_list.iter().any(|&b| b as usize >= self.total_storage_blocks) {
+            return Err("IndexedBlockAllocator: Storage block index out of bounds");
+        }
+        self.index_table.insert(file_id, block_list);
+        Ok(())
+    }
+
+    /// Retrieve physical block for logical file offset via index table
+    pub fn resolve_logical_block(&self, file_id: u32, logical_offset: usize) -> Option<u32> {
+        self.index_table.get(&file_id).and_then(|blocks| blocks.get(logical_offset).copied())
+    }
+}
+
+/// Free-Frame Accountant (Tracks Free Frames Before and After Allocations)
+#[derive(Debug, Clone)]
+pub struct FreeFrameAccountant {
+    pub total_system_frames: usize,
+    pub free_frames_before: usize,
+    pub free_frames_after: usize,
+    pub secondary_storage_swap_pages: usize,
+}
+
+impl FreeFrameAccountant {
+    pub fn new(total_frames: usize, swap_pages: usize) -> Self {
+        Self {
+            total_system_frames: total_frames,
+            free_frames_before: total_frames,
+            free_frames_after: total_frames,
+            secondary_storage_swap_pages: swap_pages,
+        }
+    }
+
+    pub fn record_allocation_begin(&mut self, current_free: usize) {
+        self.free_frames_before = current_free;
+    }
+
+    pub fn record_allocation_end(&mut self, current_free: usize) -> usize {
+        self.free_frames_after = current_free;
+        if self.free_frames_before >= self.free_frames_after {
+            self.free_frames_before - self.free_frames_after
+        } else {
+            0
+        }
+    }
+
+    pub fn page_out_to_secondary_storage(&mut self, pages_count: usize) -> Result<usize, &'static str> {
+        if pages_count > self.secondary_storage_swap_pages {
+            return Err("FreeFrameAccountant: Secondary storage swap space exhausted");
+        }
+        self.secondary_storage_swap_pages -= pages_count;
+        Ok(self.secondary_storage_swap_pages)
+    }
+}
+
 /// Central Resource Allocator Hub unifying kernel memory, PCIe, Cgroups, and DMA allocators
 pub struct SigmaResourceAllocatorHub {
     pub pcie_allocator: PcieResourceAllocator,
     pub hardened_allocator: HardenedGuardPageAllocator,
     pub dma_allocator: DmaRingBufferAllocator,
+    pub cma_allocator: ContiguousFrameAllocator,
+    pub frame_accountant: FreeFrameAccountant,
 }
 
 impl SigmaResourceAllocatorHub {
@@ -345,6 +538,8 @@ impl SigmaResourceAllocatorHub {
             pcie_allocator: PcieResourceAllocator::new(0xE000_0000, 0x1000_0000_0000),
             hardened_allocator: HardenedGuardPageAllocator::new(0x7FFF_0000_0000, 4096),
             dma_allocator: DmaRingBufferAllocator::new(0x2000_0000),
+            cma_allocator: ContiguousFrameAllocator::new(0x4000_0000, 1024, 4096),
+            frame_accountant: FreeFrameAccountant::new(16384, 8192),
         }
     }
 }
@@ -432,5 +627,46 @@ mod tests {
         assert_eq!(ring.ring_id, 1);
         assert_eq!(ring.base_phys_addr, 0x2000_0000);
         assert_eq!(ring.buffer_size, 65536);
+    }
+
+    #[test]
+    fn test_contiguous_frame_allocator() {
+        let mut cma = ContiguousFrameAllocator::new(0x4000_0000, 100, 4096);
+        let addr = cma.alloc_contiguous_frames(4).unwrap();
+        assert_eq!(addr, 0x4000_0000);
+
+        assert!(cma.free_contiguous_frames(addr, 4).is_ok());
+    }
+
+    #[test]
+    fn test_frame_proportional_allocator() {
+        let prop = FrameProportionalAllocator::new(100);
+        assert_eq!(prop.allocate_equal_frames(4), 25);
+
+        let demands = vec![
+            ProcessFrameDemand { pid: 101, page_demand: 10 },
+            ProcessFrameDemand { pid: 102, page_demand: 30 },
+        ];
+        let allocs = prop.allocate_proportional_frames(&demands);
+        assert_eq!(allocs[0], (101, 25));
+        assert_eq!(allocs[1], (102, 75));
+    }
+
+    #[test]
+    fn test_linked_indexed_block_allocator() {
+        let mut idx_alloc = LinkedIndexedBlockAllocator::new(1000);
+        assert!(idx_alloc.allocate_file_index_block(1, vec![10, 11, 12, 13]).is_ok());
+        assert_eq!(idx_alloc.resolve_logical_block(1, 2), Some(12));
+    }
+
+    #[test]
+    fn test_free_frame_accountant() {
+        let mut acc = FreeFrameAccountant::new(1000, 500);
+        acc.record_allocation_begin(1000);
+        let allocated = acc.record_allocation_end(980);
+        assert_eq!(allocated, 20);
+
+        let swap_rem = acc.page_out_to_secondary_storage(100).unwrap();
+        assert_eq!(swap_rem, 400);
     }
 }

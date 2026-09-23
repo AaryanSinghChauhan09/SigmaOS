@@ -51,6 +51,9 @@ pub use ipc_namespace::{
     IpcObjectId,
 };
 
+pub mod alpc;
+pub use alpc::*;
+
 pub mod dbus_sovereign;
 pub use dbus_sovereign::{SovereignDbusBus, DbusMessage, DbusMessageType, DbusValue, DbusMatchRule, DbusService, DbusName};
 
