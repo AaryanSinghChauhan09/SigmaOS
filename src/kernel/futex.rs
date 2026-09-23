@@ -52,7 +52,7 @@ impl Default for FutexFlags {
 
 /// Futex waiter state
 #[derive(Debug)]
-pub struct FutexWaiter {
+struct FutexWaiter {
     address: u64,
     pid: u32,
     #[allow(dead_code)]

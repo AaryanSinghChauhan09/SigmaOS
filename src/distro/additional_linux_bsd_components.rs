@@ -2,8 +2,6 @@
 // Zero-dependency Rust #![no_std] / std implementation of strategic distro abstractions:
 // Debian dpkg-divert, Arch pacdiff, Gentoo eclass/SLOT, FreeBSD pkg audit VuXML, OpenBSD signify, Void xbps journal.
 
-extern crate alloc;
-
 #[cfg(not(test))]
 use alloc::string::{String, ToString};
 #[cfg(not(test))]

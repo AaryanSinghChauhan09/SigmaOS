@@ -2,8 +2,6 @@
 // Zero-dependency Rust #![no_std] / std implementation of strategic missing distro abstractions:
 // OpenSUSE YaST2, Void xbps-src, Alpine LBU, FreeBSD VNET, NetBSD Rump, OpenBSD Pledge/Unveil, NixOS Flakes.
 
-extern crate alloc;
-
 #[cfg(not(test))]
 use alloc::string::{String, ToString};
 #[cfg(not(test))]

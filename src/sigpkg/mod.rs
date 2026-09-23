@@ -7,12 +7,9 @@
 #![allow(non_camel_case_types)]
 #![allow(clippy::large_enum_variant)]
 #![allow(clippy::type_complexity)]
-extern crate alloc;
-
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-pub use crate::package::AptDebManifest;
 // SigmaPkg - SigmaOS Package Manager
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
