@@ -351,6 +351,45 @@ export function initContextMenu() {
   });
 }
 
+/**
+ * Initializes desktop dock keyboard shortcuts (Alt+F, Alt+T, Alt+O, Alt+S, Alt+M, Alt+D, F1, ?)
+ * to match tooltip/ARIA shortcut hints for WCAG 2.1 keyboard accessibility.
+ */
+export function initDockShortcutNavigation() {
+  if (typeof window === "undefined" || typeof document === "undefined") return;
+
+  const shortcutMap = {
+    "f": "File Manager",
+    "t": "OmniShell Terminal",
+    "o": "Observability Matrix",
+    "s": "Lattice Settings",
+    "m": "Marketplace",
+    "d": "Developer Portal",
+  };
+
+  document.addEventListener("keydown", (event) => {
+    const targetTag = event.target?.tagName?.toLowerCase();
+    if (targetTag === "input" || targetTag === "textarea" || event.target?.isContentEditable) {
+      return;
+    }
+
+    if (event.altKey && shortcutMap[event.key.toLowerCase()]) {
+      event.preventDefault();
+      const appName = shortcutMap[event.key.toLowerCase()];
+      const btn = SovereignDomSelector.selectAll(".dock-icon").find(
+        (b) => b.getAttribute("data-tooltip")?.includes(appName) || b.getAttribute("aria-label")?.includes(appName),
+      );
+      if (btn) btn.click();
+    } else if (event.key === "F1" || event.key === "?") {
+      event.preventDefault();
+      const helpBtn = SovereignDomSelector.selectAll(".dock-icon").find(
+        (b) => b.getAttribute("data-tooltip")?.includes("Help Matrix") || b.getAttribute("aria-label")?.includes("Help Matrix"),
+      );
+      if (helpBtn) helpBtn.click();
+    }
+  });
+}
+
 // Auto-initialize accessibility listeners when loaded in browser environments
 if (typeof window !== "undefined" && typeof document !== "undefined") {
   if (document.readyState === "loading") {
@@ -360,6 +399,7 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
       initTablistNavigation();
       initToggleSwitches();
       initEscapeKeyDismissal();
+      initDockShortcutNavigation();
       initMenuNavigation();
       initContextMenu();
     });
@@ -369,6 +409,7 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
     initTablistNavigation();
     initToggleSwitches();
     initEscapeKeyDismissal();
+    initDockShortcutNavigation();
     initMenuNavigation();
     initContextMenu();
   }
