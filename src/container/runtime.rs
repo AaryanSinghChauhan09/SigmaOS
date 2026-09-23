@@ -31,25 +31,6 @@ pub struct ContainerCapability {
     pub can_modify: bool,
 }
 
-#[derive(Debug, Clone)]
-pub struct SeccompProfile {
-    pub default_action: u32,
-    pub allowed_syscalls: Vec<u32>,
-}
-
-#[derive(Debug, Clone)]
-pub struct SeccompProfileV2 {
-    pub default_action: u32,
-    pub allowed_syscalls: Vec<u32>,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ContainerCapability {
-    pub can_start: bool,
-    pub can_stop: bool,
-    pub can_pause: bool,
-    pub can_modify: bool,
-}
 
 impl ContainerCapability {
     pub const fn new() -> Self {
@@ -837,9 +818,9 @@ impl Default for FlatpakSnapCompatLayer {
 #[cfg(not(target_os = "none"))]
 pub mod oci {
     extern crate alloc;
-    use crate::container::runtime::NamespaceConfig;
-    use crate::container::ContainerError;
-    use crate::container::ContainerState;
+    use super::NamespaceConfig;
+    use super::ContainerError;
+    use super::ContainerState;
     
     pub struct NamespaceSet {
         pub pidns: Option<usize>,
