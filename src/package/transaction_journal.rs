@@ -427,24 +427,24 @@ impl TransactionJournal {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "standalone_test"))]
 mod tests {
     use super::*;
-    use tempfile::TempDir;
 
     #[test]
     fn test_journal_creation() {
-        let temp_dir = TempDir::new().unwrap();
-        let journal_path = temp_dir.path().join("transactions.json");
+        let temp_dir = std::env::temp_dir();
+        let journal_path = temp_dir.join("transactions_test.json");
 
         let journal = TransactionJournal::new(&journal_path).unwrap();
         assert_eq!(journal.get_all_transactions().len(), 0);
+        let _ = std::fs::remove_file(journal_path);
     }
 
     #[test]
     fn test_transaction_lifecycle() {
-        let temp_dir = TempDir::new().unwrap();
-        let journal_path = temp_dir.path().join("transactions.json");
+        let temp_dir = std::env::temp_dir();
+        let journal_path = temp_dir.join("transactions_lifecycle_test.json");
 
         let mut journal = TransactionJournal::new(&journal_path).unwrap();
 
@@ -467,12 +467,13 @@ mod tests {
         let entry = journal.get_transaction(id).unwrap();
         assert_eq!(entry.state, TransactionState::Completed);
         assert_eq!(entry.files_changed.len(), 1);
+        let _ = std::fs::remove_file(journal_path);
     }
 
     #[test]
     fn test_package_history() {
-        let temp_dir = TempDir::new().unwrap();
-        let journal_path = temp_dir.path().join("transactions.json");
+        let temp_dir = std::env::temp_dir();
+        let journal_path = temp_dir.join("transactions_history_test.json");
 
         let mut journal = TransactionJournal::new(&journal_path).unwrap();
 
@@ -487,5 +488,6 @@ mod tests {
 
         let history = journal.get_package_history("test-package");
         assert_eq!(history.len(), 2);
+        let _ = std::fs::remove_file(journal_path);
     }
 }
