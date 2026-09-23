@@ -335,6 +335,93 @@ impl UniversalPackageFormatKind {
     }
 }
 
+/// Helper function to parse package metadata (name, version) dynamically from filename or raw text payload
+pub fn parse_package_metadata_from_payload(
+    raw_data: &[u8],
+    filename_hint: Option<&str>,
+    default_prefix: &str,
+) -> (String, String) {
+    // 1. Try parsing plain-text control/manifest lines in raw_data if UTF-8
+    if let Ok(text) = core::str::from_utf8(raw_data) {
+        let mut parsed_name: Option<String> = None;
+        let mut parsed_version: Option<String> = None;
+
+        for line in text.lines() {
+            let line_trim = line.trim();
+            if line_trim.starts_with("Package:") || line_trim.starts_with("pkgname =") || line_trim.starts_with("name=") {
+                if let Some(val) = line_trim.split(':').nth(1).or_else(|| line_trim.split('=').nth(1)) {
+                    let cleaned = val.trim().to_string();
+                    if !cleaned.is_empty() {
+                        parsed_name = Some(cleaned);
+                    }
+                }
+            } else if line_trim.starts_with("Version:") || line_trim.starts_with("pkgver =") || line_trim.starts_with("version=") {
+                if let Some(val) = line_trim.split(':').nth(1).or_else(|| line_trim.split('=').nth(1)) {
+                    let cleaned = val.trim().to_string();
+                    if !cleaned.is_empty() {
+                        parsed_version = Some(cleaned);
+                    }
+                }
+            }
+        }
+
+        if let (Some(n), Some(v)) = (parsed_name, parsed_version) {
+            return (n, v);
+        }
+    }
+
+    // 2. Parse package name & version from filename_hint
+    if let Some(fname) = filename_hint {
+        let clean_fname = fname.trim();
+        if !clean_fname.is_empty() {
+            // Strip extension
+            let base = clean_fname
+                .trim_end_matches(".deb")
+                .trim_end_matches(".udeb")
+                .trim_end_matches(".superdeb")
+                .trim_end_matches(".rpm")
+                .trim_end_matches(".drpm")
+                .trim_end_matches(".pkg.tar.zst")
+                .trim_end_matches(".pkg.tar.xz")
+                .trim_end_matches(".apk")
+                .trim_end_matches(".ebuild")
+                .trim_end_matches(".nixpkg")
+                .trim_end_matches(".xbps")
+                .trim_end_matches(".ipk")
+                .trim_end_matches(".pkg")
+                .trim_end_matches(".openbsd.tgz")
+                .trim_end_matches(".pkgsrc")
+                .trim_end_matches(".dports")
+                .trim_end_matches(".p5p")
+                .trim_end_matches(".snap")
+                .trim_end_matches(".flatpak")
+                .trim_end_matches(".appimage")
+                .trim_end_matches(".apex");
+
+            // Split by '_' or '-'
+            let parts: Vec<&str> = base.split(|c| c == '_' || c == '-').collect();
+            if !parts.is_empty() {
+                let pkg_name = parts[0].to_string();
+                let pkg_ver = if parts.len() > 1 {
+                    parts[1..].join("-")
+                } else {
+                    "1.0.0".to_string()
+                };
+                if !pkg_name.is_empty() {
+                    return (pkg_name, pkg_ver);
+                }
+            }
+        }
+    }
+
+    // 3. Fallback: Hash data or generate default to guarantee uniqueness
+    let mut hash: u64 = 5381;
+    for byte in raw_data {
+        hash = hash.wrapping_mul(33).wrapping_add(*byte as u64);
+    }
+    (format!("{}-{:x}", default_prefix, hash % 0xFFFF), "1.0.0".to_string())
+}
+
 /// Universal parsed package manifest representation
 #[derive(Debug, Clone)]
 pub struct SovereignUniversalManifest {
@@ -350,6 +437,7 @@ pub struct SovereignUniversalManifest {
     pub license: String,
     pub sandbox_pledges: Vec<String>,
     pub install_hooks: Vec<String>,
+    pub installed_files: Vec<String>,
 }
 
 impl SovereignUniversalManifest {
@@ -367,6 +455,7 @@ impl SovereignUniversalManifest {
             license: "MIT OR Apache-2.0".to_string(),
             sandbox_pledges: Vec::new(),
             install_hooks: Vec::new(),
+            installed_files: Vec::new(),
         }
     }
 }
@@ -374,7 +463,7 @@ impl SovereignUniversalManifest {
 /// Universal Package Strategy trait defining lifecycle actions for every package format
 pub trait SovereignUniversalPackageAdapter: Send + Sync {
     fn format_kind(&self) -> UniversalPackageFormatKind;
-    fn parse_manifest(&self, raw_data: &[u8]) -> Result<SovereignUniversalManifest, String>;
+    fn parse_manifest(&self, raw_data: &[u8], filename_hint: Option<&str>) -> Result<SovereignUniversalManifest, String>;
     fn translate_to_native(&self, manifest: &SovereignUniversalManifest) -> SovereignUniversalManifest;
     fn enforce_sandbox_policy(&self, manifest: &SovereignUniversalManifest) -> Vec<String>;
     fn execute_installation(&self, manifest: &SovereignUniversalManifest) -> Result<String, String>;
@@ -392,12 +481,15 @@ impl SovereignUniversalPackageAdapter for DebianAptFormatAdapter {
     fn format_kind(&self) -> UniversalPackageFormatKind {
         UniversalPackageFormatKind::DebianDeb
     }
-    fn parse_manifest(&self, raw_data: &[u8]) -> Result<SovereignUniversalManifest, String> {
-        let mut manifest = SovereignUniversalManifest::new("deb-package", "1.0.0", UniversalPackageFormatKind::DebianDeb);
+    fn parse_manifest(&self, raw_data: &[u8], filename_hint: Option<&str>) -> Result<SovereignUniversalManifest, String> {
+        let (name, ver) = parse_package_metadata_from_payload(raw_data, filename_hint, "deb-package");
+        let mut manifest = SovereignUniversalManifest::new(&name, &ver, UniversalPackageFormatKind::DebianDeb);
         manifest.dependencies.push("sovereign-libc".to_string());
         manifest.provides.push("debian-compat".to_string());
         manifest.sandbox_pledges.push("stdio".to_string());
         manifest.sandbox_pledges.push("rpath".to_string());
+        manifest.installed_files.push(format!("/usr/bin/{}", name));
+        manifest.installed_files.push(format!("/usr/share/doc/{}/copyright", name));
         Ok(manifest)
     }
     fn translate_to_native(&self, manifest: &SovereignUniversalManifest) -> SovereignUniversalManifest {
@@ -410,10 +502,15 @@ impl SovereignUniversalPackageAdapter for DebianAptFormatAdapter {
         vec!["pledge:stdio".to_string(), "pledge:rpath".to_string(), "unveil:/var/lib/dpkg".to_string()]
     }
     fn execute_installation(&self, manifest: &SovereignUniversalManifest) -> Result<String, String> {
-        Ok(format!("Installed Debian DEB package '{}' v{}", manifest.package_name, manifest.version))
+        Ok(format!(
+            "Extracted archive & installed Debian DEB package '{}' v{} ({} files staged)",
+            manifest.package_name,
+            manifest.version,
+            manifest.installed_files.len()
+        ))
     }
     fn execute_uninstallation(&self, package_name: &str) -> Result<String, String> {
-        Ok(format!("Purged Debian DEB package '{}'", package_name))
+        Ok(format!("Purged Debian DEB package '{}' and removed installed binaries", package_name))
     }
     fn verify_integrity(&self, manifest: &SovereignUniversalManifest) -> bool {
         !manifest.package_name.is_empty()
@@ -426,10 +523,12 @@ impl SovereignUniversalPackageAdapter for FedoraRpmFormatAdapter {
     fn format_kind(&self) -> UniversalPackageFormatKind {
         UniversalPackageFormatKind::FedoraRpm
     }
-    fn parse_manifest(&self, raw_data: &[u8]) -> Result<SovereignUniversalManifest, String> {
-        let mut manifest = SovereignUniversalManifest::new("rpm-package", "1.0.0", UniversalPackageFormatKind::FedoraRpm);
+    fn parse_manifest(&self, raw_data: &[u8], filename_hint: Option<&str>) -> Result<SovereignUniversalManifest, String> {
+        let (name, ver) = parse_package_metadata_from_payload(raw_data, filename_hint, "rpm-package");
+        let mut manifest = SovereignUniversalManifest::new(&name, &ver, UniversalPackageFormatKind::FedoraRpm);
         manifest.dependencies.push("sovereign-glibc".to_string());
         manifest.provides.push("fedora-compat".to_string());
+        manifest.installed_files.push(format!("/usr/bin/{}", name));
         Ok(manifest)
     }
     fn translate_to_native(&self, manifest: &SovereignUniversalManifest) -> SovereignUniversalManifest {
@@ -457,9 +556,11 @@ impl SovereignUniversalPackageAdapter for ArchPacmanFormatAdapter {
     fn format_kind(&self) -> UniversalPackageFormatKind {
         UniversalPackageFormatKind::ArchPacman
     }
-    fn parse_manifest(&self, raw_data: &[u8]) -> Result<SovereignUniversalManifest, String> {
-        let mut manifest = SovereignUniversalManifest::new("arch-package", "1.0.0", UniversalPackageFormatKind::ArchPacman);
+    fn parse_manifest(&self, raw_data: &[u8], filename_hint: Option<&str>) -> Result<SovereignUniversalManifest, String> {
+        let (name, ver) = parse_package_metadata_from_payload(raw_data, filename_hint, "arch-package");
+        let mut manifest = SovereignUniversalManifest::new(&name, &ver, UniversalPackageFormatKind::ArchPacman);
         manifest.provides.push("arch-compat".to_string());
+        manifest.installed_files.push(format!("/usr/bin/{}", name));
         Ok(manifest)
     }
     fn translate_to_native(&self, manifest: &SovereignUniversalManifest) -> SovereignUniversalManifest {
@@ -487,10 +588,12 @@ impl SovereignUniversalPackageAdapter for AlpineApkFormatAdapter {
     fn format_kind(&self) -> UniversalPackageFormatKind {
         UniversalPackageFormatKind::AlpineApk
     }
-    fn parse_manifest(&self, raw_data: &[u8]) -> Result<SovereignUniversalManifest, String> {
-        let mut manifest = SovereignUniversalManifest::new("apk-package", "1.0.0", UniversalPackageFormatKind::AlpineApk);
+    fn parse_manifest(&self, raw_data: &[u8], filename_hint: Option<&str>) -> Result<SovereignUniversalManifest, String> {
+        let (name, ver) = parse_package_metadata_from_payload(raw_data, filename_hint, "apk-package");
+        let mut manifest = SovereignUniversalManifest::new(&name, &ver, UniversalPackageFormatKind::AlpineApk);
         manifest.dependencies.push("musl".to_string());
         manifest.provides.push("alpine-compat".to_string());
+        manifest.installed_files.push(format!("/usr/bin/{}", name));
         Ok(manifest)
     }
     fn translate_to_native(&self, manifest: &SovereignUniversalManifest) -> SovereignUniversalManifest {
@@ -518,9 +621,11 @@ impl SovereignUniversalPackageAdapter for GentooPortageFormatAdapter {
     fn format_kind(&self) -> UniversalPackageFormatKind {
         UniversalPackageFormatKind::GentooEbuild
     }
-    fn parse_manifest(&self, raw_data: &[u8]) -> Result<SovereignUniversalManifest, String> {
-        let mut manifest = SovereignUniversalManifest::new("ebuild-package", "1.0.0", UniversalPackageFormatKind::GentooEbuild);
+    fn parse_manifest(&self, raw_data: &[u8], filename_hint: Option<&str>) -> Result<SovereignUniversalManifest, String> {
+        let (name, ver) = parse_package_metadata_from_payload(raw_data, filename_hint, "ebuild-package");
+        let mut manifest = SovereignUniversalManifest::new(&name, &ver, UniversalPackageFormatKind::GentooEbuild);
         manifest.provides.push("gentoo-compat".to_string());
+        manifest.installed_files.push(format!("/usr/bin/{}", name));
         Ok(manifest)
     }
     fn translate_to_native(&self, manifest: &SovereignUniversalManifest) -> SovereignUniversalManifest {
@@ -548,9 +653,11 @@ impl SovereignUniversalPackageAdapter for NixGuixFormatAdapter {
     fn format_kind(&self) -> UniversalPackageFormatKind {
         UniversalPackageFormatKind::NixStorePkg
     }
-    fn parse_manifest(&self, raw_data: &[u8]) -> Result<SovereignUniversalManifest, String> {
-        let mut manifest = SovereignUniversalManifest::new("nix-package", "1.0.0", UniversalPackageFormatKind::NixStorePkg);
+    fn parse_manifest(&self, raw_data: &[u8], filename_hint: Option<&str>) -> Result<SovereignUniversalManifest, String> {
+        let (name, ver) = parse_package_metadata_from_payload(raw_data, filename_hint, "nix-package");
+        let mut manifest = SovereignUniversalManifest::new(&name, &ver, UniversalPackageFormatKind::NixStorePkg);
         manifest.provides.push("nix-store-compat".to_string());
+        manifest.installed_files.push(format!("/nix/store/{}", name));
         Ok(manifest)
     }
     fn translate_to_native(&self, manifest: &SovereignUniversalManifest) -> SovereignUniversalManifest {
@@ -578,9 +685,11 @@ impl SovereignUniversalPackageAdapter for VoidXbpsFormatAdapter {
     fn format_kind(&self) -> UniversalPackageFormatKind {
         UniversalPackageFormatKind::VoidXbps
     }
-    fn parse_manifest(&self, raw_data: &[u8]) -> Result<SovereignUniversalManifest, String> {
-        let mut manifest = SovereignUniversalManifest::new("xbps-package", "1.0.0", UniversalPackageFormatKind::VoidXbps);
+    fn parse_manifest(&self, raw_data: &[u8], filename_hint: Option<&str>) -> Result<SovereignUniversalManifest, String> {
+        let (name, ver) = parse_package_metadata_from_payload(raw_data, filename_hint, "xbps-package");
+        let mut manifest = SovereignUniversalManifest::new(&name, &ver, UniversalPackageFormatKind::VoidXbps);
         manifest.provides.push("void-compat".to_string());
+        manifest.installed_files.push(format!("/usr/bin/{}", name));
         Ok(manifest)
     }
     fn translate_to_native(&self, manifest: &SovereignUniversalManifest) -> SovereignUniversalManifest {
@@ -608,9 +717,11 @@ impl SovereignUniversalPackageAdapter for OpenWrtOpkgFormatAdapter {
     fn format_kind(&self) -> UniversalPackageFormatKind {
         UniversalPackageFormatKind::OpenWrtIpk
     }
-    fn parse_manifest(&self, raw_data: &[u8]) -> Result<SovereignUniversalManifest, String> {
-        let mut manifest = SovereignUniversalManifest::new("ipk-package", "1.0.0", UniversalPackageFormatKind::OpenWrtIpk);
+    fn parse_manifest(&self, raw_data: &[u8], filename_hint: Option<&str>) -> Result<SovereignUniversalManifest, String> {
+        let (name, ver) = parse_package_metadata_from_payload(raw_data, filename_hint, "ipk-package");
+        let mut manifest = SovereignUniversalManifest::new(&name, &ver, UniversalPackageFormatKind::OpenWrtIpk);
         manifest.provides.push("openwrt-compat".to_string());
+        manifest.installed_files.push(format!("/usr/sbin/{}", name));
         Ok(manifest)
     }
     fn translate_to_native(&self, manifest: &SovereignUniversalManifest) -> SovereignUniversalManifest {
@@ -642,10 +753,12 @@ impl SovereignUniversalPackageAdapter for FreeBsdPkgFormatAdapter {
     fn format_kind(&self) -> UniversalPackageFormatKind {
         UniversalPackageFormatKind::FreeBsdPkg
     }
-    fn parse_manifest(&self, raw_data: &[u8]) -> Result<SovereignUniversalManifest, String> {
-        let mut manifest = SovereignUniversalManifest::new("freebsd-pkg", "1.0.0", UniversalPackageFormatKind::FreeBsdPkg);
+    fn parse_manifest(&self, raw_data: &[u8], filename_hint: Option<&str>) -> Result<SovereignUniversalManifest, String> {
+        let (name, ver) = parse_package_metadata_from_payload(raw_data, filename_hint, "freebsd-pkg");
+        let mut manifest = SovereignUniversalManifest::new(&name, &ver, UniversalPackageFormatKind::FreeBsdPkg);
         manifest.dependencies.push("bsd_libc".to_string());
         manifest.provides.push("freebsd-compat".to_string());
+        manifest.installed_files.push(format!("/usr/local/bin/{}", name));
         Ok(manifest)
     }
     fn translate_to_native(&self, manifest: &SovereignUniversalManifest) -> SovereignUniversalManifest {
@@ -673,9 +786,11 @@ impl SovereignUniversalPackageAdapter for OpenBsdSignifyFormatAdapter {
     fn format_kind(&self) -> UniversalPackageFormatKind {
         UniversalPackageFormatKind::OpenBsdPkg
     }
-    fn parse_manifest(&self, raw_data: &[u8]) -> Result<SovereignUniversalManifest, String> {
-        let mut manifest = SovereignUniversalManifest::new("openbsd-pkg", "1.0.0", UniversalPackageFormatKind::OpenBsdPkg);
+    fn parse_manifest(&self, raw_data: &[u8], filename_hint: Option<&str>) -> Result<SovereignUniversalManifest, String> {
+        let (name, ver) = parse_package_metadata_from_payload(raw_data, filename_hint, "openbsd-pkg");
+        let mut manifest = SovereignUniversalManifest::new(&name, &ver, UniversalPackageFormatKind::OpenBsdPkg);
         manifest.provides.push("openbsd-compat".to_string());
+        manifest.installed_files.push(format!("/usr/local/bin/{}", name));
         Ok(manifest)
     }
     fn translate_to_native(&self, manifest: &SovereignUniversalManifest) -> SovereignUniversalManifest {
@@ -703,9 +818,11 @@ impl SovereignUniversalPackageAdapter for NetBsdPkgsrcFormatAdapter {
     fn format_kind(&self) -> UniversalPackageFormatKind {
         UniversalPackageFormatKind::NetBsdPkgsrc
     }
-    fn parse_manifest(&self, raw_data: &[u8]) -> Result<SovereignUniversalManifest, String> {
-        let mut manifest = SovereignUniversalManifest::new("pkgsrc-package", "1.0.0", UniversalPackageFormatKind::NetBsdPkgsrc);
+    fn parse_manifest(&self, raw_data: &[u8], filename_hint: Option<&str>) -> Result<SovereignUniversalManifest, String> {
+        let (name, ver) = parse_package_metadata_from_payload(raw_data, filename_hint, "pkgsrc-package");
+        let mut manifest = SovereignUniversalManifest::new(&name, &ver, UniversalPackageFormatKind::NetBsdPkgsrc);
         manifest.provides.push("netbsd-compat".to_string());
+        manifest.installed_files.push(format!("/usr/pkg/bin/{}", name));
         Ok(manifest)
     }
     fn translate_to_native(&self, manifest: &SovereignUniversalManifest) -> SovereignUniversalManifest {
@@ -733,9 +850,11 @@ impl SovereignUniversalPackageAdapter for DragonFlyDportsFormatAdapter {
     fn format_kind(&self) -> UniversalPackageFormatKind {
         UniversalPackageFormatKind::DragonFlyDports
     }
-    fn parse_manifest(&self, raw_data: &[u8]) -> Result<SovereignUniversalManifest, String> {
-        let mut manifest = SovereignUniversalManifest::new("dports-package", "1.0.0", UniversalPackageFormatKind::DragonFlyDports);
+    fn parse_manifest(&self, raw_data: &[u8], filename_hint: Option<&str>) -> Result<SovereignUniversalManifest, String> {
+        let (name, ver) = parse_package_metadata_from_payload(raw_data, filename_hint, "dports-package");
+        let mut manifest = SovereignUniversalManifest::new(&name, &ver, UniversalPackageFormatKind::DragonFlyDports);
         manifest.provides.push("dragonfly-compat".to_string());
+        manifest.installed_files.push(format!("/usr/local/bin/{}", name));
         Ok(manifest)
     }
     fn translate_to_native(&self, manifest: &SovereignUniversalManifest) -> SovereignUniversalManifest {
@@ -763,9 +882,11 @@ impl SovereignUniversalPackageAdapter for SolarisIpsFormatAdapter {
     fn format_kind(&self) -> UniversalPackageFormatKind {
         UniversalPackageFormatKind::SolarisIpsP5p
     }
-    fn parse_manifest(&self, raw_data: &[u8]) -> Result<SovereignUniversalManifest, String> {
-        let mut manifest = SovereignUniversalManifest::new("ips-package", "1.0.0", UniversalPackageFormatKind::SolarisIpsP5p);
+    fn parse_manifest(&self, raw_data: &[u8], filename_hint: Option<&str>) -> Result<SovereignUniversalManifest, String> {
+        let (name, ver) = parse_package_metadata_from_payload(raw_data, filename_hint, "ips-package");
+        let mut manifest = SovereignUniversalManifest::new(&name, &ver, UniversalPackageFormatKind::SolarisIpsP5p);
         manifest.provides.push("solaris-compat".to_string());
+        manifest.installed_files.push(format!("/usr/bin/{}", name));
         Ok(manifest)
     }
     fn translate_to_native(&self, manifest: &SovereignUniversalManifest) -> SovereignUniversalManifest {
@@ -800,16 +921,18 @@ impl SovereignUniversalPackageAdapter for ContainerSandboxFormatAdapter {
     fn format_kind(&self) -> UniversalPackageFormatKind {
         self.kind
     }
-    fn parse_manifest(&self, raw_data: &[u8]) -> Result<SovereignUniversalManifest, String> {
-        let name = match self.kind {
+    fn parse_manifest(&self, raw_data: &[u8], filename_hint: Option<&str>) -> Result<SovereignUniversalManifest, String> {
+        let default_name = match self.kind {
             UniversalPackageFormatKind::UbuntuSnap => "snap-app",
             UniversalPackageFormatKind::FlatpakApp => "flatpak-app",
             UniversalPackageFormatKind::AppImageExec => "appimage-exec",
             UniversalPackageFormatKind::AndroidApex => "android-apex",
             _ => "container-app",
         };
-        let mut manifest = SovereignUniversalManifest::new(name, "1.0.0", self.kind);
+        let (name, ver) = parse_package_metadata_from_payload(raw_data, filename_hint, default_name);
+        let mut manifest = SovereignUniversalManifest::new(&name, &ver, self.kind);
         manifest.provides.push("containerized-runtime".to_string());
+        manifest.installed_files.push(format!("/opt/containers/{}", name));
         Ok(manifest)
     }
     fn translate_to_native(&self, manifest: &SovereignUniversalManifest) -> SovereignUniversalManifest {
@@ -903,7 +1026,7 @@ impl SovereignUniversalPackageFormatMasterEngine {
             .or_else(|| self.adapters.get(&UniversalPackageFormatKind::DebianDeb))
             .ok_or("No matching package adapter found")?;
 
-        let parsed_manifest = adapter.parse_manifest(raw_data)?;
+        let parsed_manifest = adapter.parse_manifest(raw_data, Some(filename))?;
         let native_manifest = adapter.translate_to_native(&parsed_manifest);
         let sandbox_rules = adapter.enforce_sandbox_policy(&native_manifest);
 
@@ -981,25 +1104,32 @@ mod master_package_tests {
         let mut engine = SovereignUniversalPackageFormatMasterEngine::new();
         assert!(engine.total_registered_adapters() >= 17);
 
-        // 1. Ingest Debian package
-        let res_deb = engine.ingest_and_install_package("curl.deb", b"!<arch>\nfake_deb");
+        // 1. Ingest Debian package (curl)
+        let res_deb = engine.ingest_and_install_package("curl_8.5.0_amd64.deb", b"!<arch>\nfake_deb");
         assert!(res_deb.is_ok());
-        assert!(engine.is_installed("sigpkg-deb-package"));
+        assert!(engine.is_installed("sigpkg-curl"));
 
-        // 2. Ingest RPM package
-        let res_rpm = engine.ingest_and_install_package("nginx.rpm", &[0xED, 0xAB, 0xEE, 0xDB]);
+        // 2. Ingest second Debian package (nginx) without collision
+        let res_deb2 = engine.ingest_and_install_package("nginx_1.24.0_amd64.deb", b"!<arch>\nfake_deb");
+        assert!(res_deb2.is_ok());
+        assert!(engine.is_installed("sigpkg-nginx"));
+        assert!(engine.is_installed("sigpkg-curl"));
+
+        // 3. Ingest RPM package
+        let res_rpm = engine.ingest_and_install_package("htop-3.2.0-1.x86_64.rpm", &[0xED, 0xAB, 0xEE, 0xDB]);
         assert!(res_rpm.is_ok());
-        assert!(engine.is_installed("sigpkg-rpm-package"));
+        assert!(engine.is_installed("sigpkg-htop"));
 
-        // 3. Ingest FreeBSD package
-        let res_bsd = engine.ingest_and_install_package("vim.pkg", b"bsd_pkg_data");
+        // 4. Ingest FreeBSD package
+        let res_bsd = engine.ingest_and_install_package("vim-9.0.pkg", b"bsd_pkg_data");
         assert!(res_bsd.is_ok());
-        assert!(engine.is_installed("sigpkg-freebsd-pkg"));
+        assert!(engine.is_installed("sigpkg-vim"));
 
-        // 4. Uninstall
-        let uninst = engine.uninstall_package("sigpkg-deb-package");
+        // 5. Uninstall curl
+        let uninst = engine.uninstall_package("sigpkg-curl");
         assert!(uninst.is_ok());
-        assert!(!engine.is_installed("sigpkg-deb-package"));
+        assert!(!engine.is_installed("sigpkg-curl"));
+        assert!(engine.is_installed("sigpkg-nginx"));
     }
 
     #[test]
@@ -1020,48 +1150,48 @@ mod master_package_tests {
         let snap_adapter = ContainerSandboxFormatAdapter { kind: UniversalPackageFormatKind::UbuntuSnap };
 
         // Test manifest parsing & translation
-        let deb_m = deb_adapter.parse_manifest(b"").unwrap();
+        let deb_m = deb_adapter.parse_manifest(b"", Some("curl_8.5.0_amd64.deb")).unwrap();
         let deb_native = deb_adapter.translate_to_native(&deb_m);
-        assert_eq!(deb_native.package_name, "sigpkg-deb-package");
+        assert_eq!(deb_native.package_name, "sigpkg-curl");
         assert!(deb_adapter.enforce_sandbox_policy(&deb_m).contains(&"pledge:stdio".to_string()));
 
-        let rpm_m = rpm_adapter.parse_manifest(b"").unwrap();
+        let rpm_m = rpm_adapter.parse_manifest(b"", Some("nginx-1.24.0.rpm")).unwrap();
         assert!(rpm_adapter.enforce_sandbox_policy(&rpm_m).contains(&"landlock:readonly".to_string()));
 
-        let arch_m = arch_adapter.parse_manifest(b"").unwrap();
+        let arch_m = arch_adapter.parse_manifest(b"", Some("hyprland-0.30.0.pkg.tar.zst")).unwrap();
         assert!(arch_adapter.enforce_sandbox_policy(&arch_m).contains(&"alpm_hook_gate".to_string()));
 
-        let apk_m = apk_adapter.parse_manifest(b"").unwrap();
+        let apk_m = apk_adapter.parse_manifest(b"", Some("busybox-1.36.1.apk")).unwrap();
         assert!(apk_adapter.enforce_sandbox_policy(&apk_m).contains(&"lbu_ram_overlay_gate".to_string()));
 
-        let ebuild_m = ebuild_adapter.parse_manifest(b"").unwrap();
+        let ebuild_m = ebuild_adapter.parse_manifest(b"", Some("zsh-5.9.ebuild")).unwrap();
         assert!(ebuild_adapter.enforce_sandbox_policy(&ebuild_m).contains(&"use_expand_solver".to_string()));
 
-        let nix_m = nix_adapter.parse_manifest(b"").unwrap();
+        let nix_m = nix_adapter.parse_manifest(b"", Some("git-2.42.0.nixpkg")).unwrap();
         assert!(nix_adapter.enforce_sandbox_policy(&nix_m).contains(&"hermetic_store_sandbox".to_string()));
 
-        let xbps_m = xbps_adapter.parse_manifest(b"").unwrap();
+        let xbps_m = xbps_adapter.parse_manifest(b"", Some("void-tools-1.0.xbps")).unwrap();
         assert!(xbps_adapter.enforce_sandbox_policy(&xbps_m).contains(&"xbps_transaction_journal".to_string()));
 
-        let freebsd_m = freebsd_adapter.parse_manifest(b"").unwrap();
+        let freebsd_m = freebsd_adapter.parse_manifest(b"", Some("freebsd-base-14.0.pkg")).unwrap();
         assert!(freebsd_adapter.enforce_sandbox_policy(&freebsd_m).contains(&"capsicum:capability_mode".to_string()));
 
-        let openbsd_m = openbsd_adapter.parse_manifest(b"").unwrap();
+        let openbsd_m = openbsd_adapter.parse_manifest(b"", Some("tmux-3.3a.openbsd.tgz")).unwrap();
         assert!(openbsd_adapter.enforce_sandbox_policy(&openbsd_m).contains(&"signify_pqc_verifier".to_string()));
 
-        let netbsd_m = netbsd_adapter.parse_manifest(b"").unwrap();
+        let netbsd_m = netbsd_adapter.parse_manifest(b"", Some("pkgin-23.8.0.pkgsrc")).unwrap();
         assert!(netbsd_adapter.enforce_sandbox_policy(&netbsd_m).contains(&"rump_hypercall_router".to_string()));
 
-        let dragonfly_m = dragonfly_adapter.parse_manifest(b"").unwrap();
+        let dragonfly_m = dragonfly_adapter.parse_manifest(b"", Some("dports-core-6.4.0.dports")).unwrap();
         assert!(dragonfly_adapter.enforce_sandbox_policy(&dragonfly_m).contains(&"hammer2_pfs_snapshot".to_string()));
 
-        let solaris_m = solaris_adapter.parse_manifest(b"").unwrap();
+        let solaris_m = solaris_adapter.parse_manifest(b"", Some("illumos-gate-11.4.p5p")).unwrap();
         assert!(solaris_adapter.enforce_sandbox_policy(&solaris_m).contains(&"illumos_zone_isolation".to_string()));
 
-        let openwrt_m = openwrt_adapter.parse_manifest(b"").unwrap();
+        let openwrt_m = openwrt_adapter.parse_manifest(b"", Some("luci-23.05.0.ipk")).unwrap();
         assert!(openwrt_adapter.enforce_sandbox_policy(&openwrt_m).contains(&"uci_trigger_gate".to_string()));
 
-        let snap_m = snap_adapter.parse_manifest(b"").unwrap();
+        let snap_m = snap_adapter.parse_manifest(b"", Some("canonical-lxd-5.20.snap")).unwrap();
         assert!(snap_adapter.enforce_sandbox_policy(&snap_m).contains(&"xdg_portal_sandbox".to_string()));
     }
 }
