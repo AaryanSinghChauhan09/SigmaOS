@@ -167,6 +167,28 @@ fn debtor_to_sovereign_name(name: &str) -> &str {
         "sovereign-zlib"
     } else if name.contains("python") {
         "sovereign-python"
+    } else if name.contains("wayland") {
+        "sovereign-wayland"
+    } else if name.contains("pipewire") || name.contains("wireplumber") {
+        "sovereign-pipewire"
+    } else if name.contains("mesa") {
+        "sovereign-mesa"
+    } else if name.contains("hyprland") {
+        "sovereign-hyprland"
+    } else if name.contains("systemd") || name.contains("elogind") {
+        "sovereign-systemd"
+    } else if name.contains("dbus") {
+        "sovereign-dbus"
+    } else if name.contains("ffmpeg") || name.contains("avcodec") {
+        "sovereign-ffmpeg"
+    } else if name.contains("boost") {
+        "sovereign-boost"
+    } else if name.contains("llvm") || name.contains("clang") {
+        "sovereign-llvm-clang"
+    } else if name.contains("rust") || name.contains("cargo") {
+        "sovereign-rust"
+    } else if name.contains("nodejs") || name == "node" {
+        "sovereign-nodejs"
     } else {
         name
     }
