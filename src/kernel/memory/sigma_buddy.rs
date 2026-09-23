@@ -187,7 +187,6 @@ impl BsdVmZoneAllocator {
 /// Wraps the klib buddy allocator and exposes a kernel-friendly interface.
 /// Integrates with the existing memory subsystem, migration types, CMA, and watermarks.
 /// Sovereign Atomic IPC Ring Buffer for lockless cross-shard message passing
-use std::vec::Vec;
 
 pub struct SovereignIpcBuffer {
     buffer: Vec<u8>,

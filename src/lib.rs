@@ -62,7 +62,6 @@ pub use process::{
     WNOHANG, WUNTRACED,
 };
 pub mod access;
-pub mod community;
 pub mod open_source_os_gap_closure;
 pub mod tools;
 pub use open_source_os_gap_closure::*;
