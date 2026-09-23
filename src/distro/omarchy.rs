@@ -1027,10 +1027,7 @@ pub use omarchy_inspiration::{
     QuickshellWidget, ShellComponentKind,
 };
 
-#[path = "."]
-pub mod distro {
-    pub use super::omarchy_inspiration;
-}
+pub use crate::distro::omarchy_inspiration;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[path = "omarchy_app_ecosystem.rs"]
