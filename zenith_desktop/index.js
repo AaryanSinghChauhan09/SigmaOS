@@ -295,6 +295,62 @@ export function initEscapeKeyDismissal() {
   });
 }
 
+/**
+ * Initializes desktop right-click context menu positioning, viewport boundary calculations,
+ * and WAI-ARIA accessibility state synchronization (aria-hidden, auto-focus).
+ */
+export function initContextMenu() {
+  if (typeof window === "undefined" || typeof document === "undefined") return;
+
+  if (!window.contextAction) {
+    window.contextAction = function () {
+      const contextMenu = document.getElementById("context-menu");
+      if (contextMenu) {
+        contextMenu.style.display = "none";
+        contextMenu.setAttribute("aria-hidden", "true");
+      }
+    };
+  }
+
+  document.addEventListener("contextmenu", (event) => {
+    const contextMenu = document.getElementById("context-menu");
+    if (!contextMenu) return;
+
+    const targetTag = event.target?.tagName?.toLowerCase();
+    if (targetTag === "input" || targetTag === "textarea" || event.target?.isContentEditable) {
+      return;
+    }
+
+    event.preventDefault();
+
+    contextMenu.style.display = "block";
+    contextMenu.setAttribute("aria-hidden", "false");
+
+    const menuWidth = contextMenu.offsetWidth || 180;
+    const menuHeight = contextMenu.offsetHeight || 150;
+    const posX = Math.min(event.clientX, window.innerWidth - menuWidth - 8);
+    const posY = Math.min(event.clientY, window.innerHeight - menuHeight - 8);
+
+    contextMenu.style.left = `${Math.max(0, posX)}px`;
+    contextMenu.style.top = `${Math.max(0, posY)}px`;
+
+    const firstItem = SovereignDomSelector.selectOne('[role="menuitem"]', contextMenu);
+    if (firstItem && typeof firstItem.focus === "function") {
+      firstItem.focus();
+    }
+  });
+
+  document.addEventListener("click", (event) => {
+    const contextMenu = document.getElementById("context-menu");
+    if (contextMenu && contextMenu.style.display === "block") {
+      if (!contextMenu.contains(event.target)) {
+        contextMenu.style.display = "none";
+        contextMenu.setAttribute("aria-hidden", "true");
+      }
+    }
+  });
+}
+
 // Auto-initialize accessibility listeners when loaded in browser environments
 if (typeof window !== "undefined" && typeof document !== "undefined") {
   if (document.readyState === "loading") {
@@ -305,6 +361,7 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
       initToggleSwitches();
       initEscapeKeyDismissal();
       initMenuNavigation();
+      initContextMenu();
     });
   } else {
     initKeyboardNavigation();
@@ -313,6 +370,7 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
     initToggleSwitches();
     initEscapeKeyDismissal();
     initMenuNavigation();
+    initContextMenu();
   }
 }
 
