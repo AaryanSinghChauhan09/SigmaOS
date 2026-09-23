@@ -54,6 +54,7 @@ SigmaOS Wiki Home
 │   └── Real Hardware & QEMU Support Matrix
 └── 7. Project Governance & Strategy
     ├── Strategic Execution Roadmap (`docs/ROADMAP.md`)
+    ├── Linux & BSD Hybrid Master Roadmap (`SIGMAOS_DISTRO_INSPIRED_MASTER_ROADMAP.md`)
     ├── Master Absorption & Tri-Agent Governance Plan (`SIGMAOS_TRI_AGENT_AND_500_REPOS_ABSORPTION_MASTER_PLAN.md`)
     ├── Architecture Decision Records (`docs/ARCHITECTURE_DECISIONS.md`)
     ├── Security Advisory & Vulnerability Reporting Policy
