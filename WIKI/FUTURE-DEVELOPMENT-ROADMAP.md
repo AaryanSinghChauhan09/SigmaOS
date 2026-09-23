@@ -5683,3 +5683,46 @@ SigmaOS absorbs VanillaOS APX subsystem containerization and OpenWrt UCI configu
 2. **OpenWrt Unified Configuration Interface (UCI) & IPK Engine (`LinuxOpenWrtUciIpkEngine`)**:
    - Parses and modifies OpenWrt UCI configuration sections (`/etc/config/network`, `system`, `wireless`, `firewall`).
    - Handles opkg/ipk embedded package installation and dependency tracking.
+
+
+## 138. SOVEREIGN HYBRID LINUX & BSD DISTRO ROADMAP SPECIFICATION
+
+### 138.1 Overview & Architectural Synthesis
+SigmaOS establishes an 11-pillar hybrid architecture combining Linux hardware compatibility and desktop tooling with BSD simplicity, clean defaults, and security discipline:
+
+1. **Base Philosophy**:
+   - Stable by default, modern when needed; declarative configuration where possible; fast atomic updates without system degradation; clear separation between core OS, applications, and user configuration.
+   - Debian/Ubuntu-like package stability + Arch-like rolling speed + Nix/immutable-style reproducibility + FreeBSD/OpenBSD clean defaults (`rc.conf`, `pf`, `pledge`, `unveil`).
+
+2. **Core System Foundation**:
+   - **Signed Package Manager**: PQC Dilithium-5 signed packages, multi-channel repos (stable, testing, unstable), SAT dependency resolution, sub-millisecond CoW snapshot rollback.
+   - **Init & Service Model**: Clean startup, explicit service dependency ordering, health checks, restart policies, and `rc.conf`-style declarative config.
+   - **Boot & Filesystem**: FHS-compliant layout (`/etc`, `/var`, `/srv`, `/home`), Secure Boot, GRUB/systemd-boot fallback entries, Btrfs/ZFS Copy-on-Write snapshots.
+   - **Atomic Update Model**: Dual-root A/B images, signed offline updates, emergency recovery shell tools.
+
+3. **Security-First Architecture**:
+   - Default `pf`-style stateful firewall, AppArmor/SELinux MAC hardening, mandatory capability permissions, read-only system partitions (`/usr`), automatic security patches, and application sandboxing (`Flatpak` / `apx`).
+
+4. **Modern Wayland Desktop Environment (Zenith)**:
+   - Wayland-first tiling compositor, XDG compliance, display & power management, consistent theming, integrated settings app, session & lock screen controls, notifications, and workspace HUD.
+
+5. **Curated Package Ecosystem**:
+   - Official curated repo, Flatpak sandbox support, LTS + rolling release tracks, package provenance attestation, and multi-category app management.
+
+6. **System Administration & User Ergonomics**:
+   - Unified GUI settings app with 1:1 CLI equivalence for user, service, network, storage, package, and backup administration.
+
+7. **Resilient Storage & Recovery**:
+   - Btrfs/ZFS generation snapshots, S.M.A.R.T. disk health monitoring, automated home directory backups, and system-image rollback.
+
+8. **Predictable Networking & Services**:
+   - NetworkManager equivalent, Wi-Fi 6E/7, VPNs (WireGuard), DNSSEC, local reverse proxying, and containerized testing environments.
+
+9. **Professional Developer Workflows**:
+   - Preinstalled language toolchains (Rust, Go, Python, Node, C/C++), Mise version manager, Git + CI tools, virtualization, and eBPF system tracing.
+
+10. **Release Discipline & Maintainability**:
+    - Stable, testing, and rolling release channels with versioned ISO releases, upgrade paths, and mirror infrastructure.
+
+11. **User Trust & Distro Identity**:
+    - Polished installer wizard, guided first-run onboarding, privacy controls, app recommendations, and real-time system health telemetry.
