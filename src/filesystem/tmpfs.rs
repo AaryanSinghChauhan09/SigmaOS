@@ -20,6 +20,19 @@ pub struct TmpfsConfig {
     pub mode: u32,         // Permissions (e.g. 0o1777 sticky-bit tmpfs)
 }
 
+impl TmpfsConfig {
+    /// Linux (/dev/shm) & BSD tmpfs 50% physical RAM limit rule
+    pub fn default_with_system_ram(total_ram_bytes: usize) -> Self {
+        Self {
+            max_bytes: total_ram_bytes / 2, // Linux & BSD 50% total RAM ceiling rule
+            max_inodes: MAX_TMPFS_INODES,
+            uid: 0,
+            gid: 0,
+            mode: 0o1777,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy)]
 pub struct TmpfsInode {
     pub id: usize,
@@ -50,6 +63,12 @@ impl TmpfsFileSystem {
             inodes: [None; MAX_TMPFS_INODES],
             next_inode_id: 1,
         }
+    }
+
+    /// Instantiate tmpfs filesystem enforcing the Linux & BSD 50% physical RAM ceiling rule
+    pub fn default_with_system_ram(total_ram_bytes: usize) -> Self {
+        let config = TmpfsConfig::default_with_system_ram(total_ram_bytes);
+        Self::new(config)
     }
 
     /// Create a new in-memory file or directory node (on-demand dynamic RAM allocation)
@@ -184,7 +203,7 @@ impl TmpfsFileSystem {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -287,5 +306,13 @@ mod tests {
         fs.swap_in_node(fid).unwrap();
         assert_eq!(fs.current_bytes_used, 4096);
         assert!(!fs.inodes[0].unwrap().is_swapbacked);
+    }
+
+    #[test]
+    fn test_tmpfs_50_percent_ram_rule() {
+        let total_ram = 16 * 1024 * 1024 * 1024; // 16 GB RAM
+        let fs = TmpfsFileSystem::default_with_system_ram(total_ram);
+
+        assert_eq!(fs.config.max_bytes, 8 * 1024 * 1024 * 1024); // 8 GB limit (50% rule)
     }
 }
