@@ -24,7 +24,10 @@
 use std::string::{String, ToString};
 use std::vec::Vec;
 
+#[cfg(not(feature = "standalone_test"))]
 use crate::klib::HashMap;
+#[cfg(feature = "standalone_test")]
+use std::collections::HashMap;
 
 /// Stub capability token for security-aware windowing
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -557,7 +560,7 @@ impl Default for ZenithCompositor {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
