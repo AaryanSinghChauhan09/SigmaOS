@@ -200,7 +200,7 @@ impl Default for UsbHidKeyboardDriver {
 }
 
 #[cfg(test)]
-mod tests {
+mod gaps_tests {
     use super::*;
 
     #[test]
@@ -1232,7 +1232,7 @@ mod tests {
 
     #[test]
     fn test_sovereign_dns_tls_resolver() {
-        let resolver = SovereignDnsTlsResolverEngine::new([1, 1, 1, 1]);
+        let mut resolver = SovereignDnsTlsResolverEngine::new([1, 1, 1, 1]);
         let localhost_ip = resolver.resolve_domain("localhost").unwrap();
         assert_eq!(localhost_ip, [127, 0, 0, 1]);
     }
