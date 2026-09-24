@@ -36,6 +36,11 @@ pub mod state;
 pub mod syslog;
 pub mod automation;
 pub mod user;
+pub mod abi;
+
+pub use abi::{
+    AbiType, SovereignSyscallAbiCompatibilityEngine, SyscallAbiResult, SyscallRegisters64,
+};
 
 pub use automation::{
     AutomationTask, AutomationTaskKind, SovereignAutomationEngine, TaskStatus,
@@ -59,8 +64,9 @@ pub use duplicate::{
 };
 pub use generation_manager::{Generation, GenerationManager};
 pub use memory::{
-    AllocationRecord, AllocationType, LeakDetectionStrategy, LeakLocation, LeakReport,
-    MemoryLeakDetector, ReferenceCountingDetector, TimeBasedDetector,
+    AllocationRecord, AllocationType, FiftyPercentRamTargetPool, LeakDetectionStrategy,
+    LeakLocation, LeakReport, MemoryLeakDetector, ReferenceCountingDetector,
+    SovereignFiftyPercentRamRuleEngine, TimeBasedDetector,
 };
 pub use optimizer::{
     CpuOptimization, IoOptimization, MemoryOptimization, NetworkOptimization, OptimizationError,

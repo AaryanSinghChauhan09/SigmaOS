@@ -1,359 +1,264 @@
-#![allow(non_camel_case_types)]
 // SPDX-License-Identifier: MIT
-// SigmaOS Package System Pull Request Gateway & Multi-Format PR Engine
-// (`src/package/sovereign_pr_package_gateway.rs`)
+// Sovereign Universal Package Manager Pull Request Gateway Engine
 //
-// Zero-dependency, `#![no_std]` compliant Rust PR packaging components inspired by:
-// - GitHub / Pagure / DistGit Package PR Workflows (Arch AUR, Fedora DistGit, Gentoo PRs, FreeBSD Ports PRs)
-// - Greenwave / Bodhi CI Gating (Automated CI test pass checks, license compliance, PQC signature verification)
-// - Multi-Format PR Transpiler (Transpiles .deb, .rpm, PKGBUILD, .ebuild, APKBUILD, .xbps, .nix PRs to .sigpkg)
-// - SovereignPrPackageGatewaySuite (Master coordinator unifying all PR package gateway engines)
+// Bridges Linux & BSD distro package managers (apt, pacman, dnf, zypper, apk, xbps, ebuild, pkg, nix, flatpak, snap, appimage)
+// into SigmaPkg via Pull Request workflow submission format.
 
-#[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
+
 use alloc::collections::BTreeMap;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::format;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
 
-#[cfg(any(feature = "standalone_test", test))]
-use std::collections::BTreeMap;
-#[cfg(any(feature = "standalone_test", test))]
-use std::format;
-#[cfg(any(feature = "standalone_test", test))]
-use std::string::{String, ToString};
-#[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
+use crate::package::pull_request_workflow::{
+    ConsolidatedSovereignPackage, PackagePullRequestSubmission, PullRequestPackageFormat,
+    PullRequestStatus, SovereignPackagePullRequestEngine,
+};
+use crate::package::universal::{
+    ForeignDistroManifest, PackageFormat, UnifiedPackage, UniversalPackageManager,
+};
 
-#[cfg(not(any(feature = "standalone_test", test)))]
-use super::universal::{PackageFormat, UnifiedPackage};
-
-#[cfg(any(feature = "standalone_test", test))]
-#[path = "universal.rs"]
-mod universal;
-#[cfg(any(feature = "standalone_test", test))]
-use universal::{PackageFormat, UnifiedPackage};
-
-// ============================================================================
-// 1. DISTRO PACKAGE PULL REQUEST MODEL
-// ============================================================================
-
-/// Package PR Status
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PackagePrStatus {
-    Submitted,
-    CiTesting,
-    Approved,
-    ChangesRequested,
-    MergedToRepository,
-    ClosedRejected,
-}
-
-/// Package Pull Request Entry
+/// Universal PR Gateway Entry mapping multi-distro package format metadata
 #[derive(Debug, Clone)]
-pub struct DistroPackagePullRequest {
-    pub pr_id: u32,
-    pub title: String,
+pub struct DistroPrGatewayEntry {
+    pub pr_id: u64,
     pub submitter: String,
-    pub source_format: PackageFormat,
+    pub distro_format: PullRequestPackageFormat,
     pub package_name: String,
-    pub version: String,
-    pub license: String,
-    pub raw_manifest_content: String,
-    pub status: PackagePrStatus,
-    pub comments: Vec<String>,
+    pub package_version: String,
+    pub dependencies: Vec<String>,
+    pub status: PullRequestStatus,
+    pub translated_sigpkg_name: String,
 }
 
-impl DistroPackagePullRequest {
-    pub fn new(
-        pr_id: u32,
-        title: &str,
-        submitter: &str,
-        format: PackageFormat,
-        pkg_name: &str,
-        version: &str,
-        license: &str,
-        manifest: &str,
-    ) -> Self {
-        Self {
-            pr_id,
-            title: title.to_string(),
-            submitter: submitter.to_string(),
-            source_format: format,
-            package_name: pkg_name.to_string(),
-            version: version.to_string(),
-            license: license.to_string(),
-            raw_manifest_content: manifest.to_string(),
-            status: PackagePrStatus::Submitted,
-            comments: Vec::new(),
-        }
-    }
-
-    pub fn add_comment(&mut self, author: &str, comment: &str) {
-        self.comments.push(format!("[{}] {}", author, comment));
-    }
+/// Sovereign Universal PR Gateway Engine
+/// Auto-converts incoming foreign distro PR submissions into sandboxed SigmaPkg packages
+#[derive(Debug)]
+pub struct SovereignUniversalPrGatewayEngine {
+    pub pr_engine: SovereignPackagePullRequestEngine,
+    pub package_manager: UniversalPackageManager,
+    pub pr_gateway_registry: BTreeMap<u64, DistroPrGatewayEntry>,
 }
 
-// ============================================================================
-// 2. PACKAGE PR CI GATING GOVERNOR
-// ============================================================================
-
-/// Greenwave / GitHub CI Gating Rule Evaluation
-pub struct PackagePrCiGatingGovernor {
-    pub allowed_licenses: Vec<String>,
-    pub require_pqc_signature: bool,
-    pub automated_ci_passed_prs: Vec<u32>,
-}
-
-impl PackagePrCiGatingGovernor {
-    pub fn new() -> Self {
-        Self {
-            allowed_licenses: vec![
-                "MIT".to_string(),
-                "BSD-2-Clause".to_string(),
-                "BSD-3-Clause".to_string(),
-                "GPL-2.0-or-later".to_string(),
-                "GPL-3.0-or-later".to_string(),
-                "Apache-2.0".to_string(),
-            ],
-            require_pqc_signature: true,
-            automated_ci_passed_prs: Vec::new(),
-        }
-    }
-
-    pub fn evaluate_pr_gating(&mut self, pr: &mut DistroPackagePullRequest) -> Result<bool, String> {
-        // 1. License compliance check
-        if !self.allowed_licenses.iter().any(|l| l == &pr.license) {
-            pr.status = PackagePrStatus::ChangesRequested;
-            let err = format!("CI Gating Failed: License '{}' not in allowed licenses", pr.license);
-            pr.add_comment("SigmaCI-Bot", &err);
-            return Err(err);
-        }
-
-        // 2. Manifest length & sanity check
-        if pr.raw_manifest_content.is_empty() {
-            pr.status = PackagePrStatus::ChangesRequested;
-            let err = "CI Gating Failed: Raw package manifest content is empty".to_string();
-            pr.add_comment("SigmaCI-Bot", &err);
-            return Err(err);
-        }
-
-        pr.status = PackagePrStatus::Approved;
-        pr.add_comment("SigmaCI-Bot", "CI Gating Passed: All tests, license checks, and build validations green!");
-        self.automated_ci_passed_prs.push(pr.pr_id);
-
-        Ok(true)
-    }
-}
-
-impl Default for PackagePrCiGatingGovernor {
+impl Default for SovereignUniversalPrGatewayEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
-// ============================================================================
-// 3. MULTI-FORMAT PACKAGE PR TRANSPILATION ENGINE
-// ============================================================================
-
-/// Transpiled Native `.sigpkg` Artifact from PR
-pub struct MultiFormatPrTranspilationEngine {
-    pub transpiled_count: usize,
-}
-
-impl MultiFormatPrTranspilationEngine {
-    pub fn new() -> Self {
-        Self { transpiled_count: 0 }
-    }
-
-    pub fn transpile_pr_to_sigpkg(
-        &mut self,
-        pr: &DistroPackagePullRequest,
-    ) -> Result<UnifiedPackage, String> {
-        if pr.status != PackagePrStatus::Approved && pr.status != PackagePrStatus::MergedToRepository {
-            return Err(format!("PR #{} is not approved for transpilation (status: {:?})", pr.pr_id, pr.status));
-        }
-
-        let mut sigma_pkg = UnifiedPackage::new(
-            format!("sigpkg-{}", pr.package_name),
-            pr.version.clone(),
-        )
-        .with_format(PackageFormat::SigmaPkg)
-        .with_provides(pr.package_name.clone());
-
-        // Parse foreign dependencies from manifest
-        for line in pr.raw_manifest_content.lines() {
-            let lower = line.to_lowercase();
-            if lower.starts_with("depends=")
-                || lower.starts_with("depends:")
-                || lower.starts_with("rdepends=")
-                || lower.starts_with("build-depends:")
-                || lower.starts_with("requires=")
-                || lower.starts_with("pkg_deps=")
-            {
-                let deps_part = line.split('=').nth(1).or_else(|| line.split(':').nth(1)).unwrap_or("");
-                for dep in deps_part.split_whitespace() {
-                    let cleaned = dep.trim_matches(|c| c == ',' || c == '"' || c == '\'' || c == '(' || c == ')');
-                    if !cleaned.is_empty() {
-                        sigma_pkg = sigma_pkg.with_dependency(cleaned.to_string());
-                    }
-                }
-            }
-        }
-
-        self.transpiled_count += 1;
-        Ok(sigma_pkg)
-    }
-}
-
-impl Default for MultiFormatPrTranspilationEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// MASTER PR PACKAGE GATEWAY COORDINATOR SUITE
-// ============================================================================
-
-/// Sovereign Master PR Package Gateway Suite
-pub struct SovereignPrPackageGatewaySuite {
-    pub pr_registry: BTreeMap<u32, DistroPackagePullRequest>,
-    pub gating_governor: PackagePrCiGatingGovernor,
-    pub transpiler: MultiFormatPrTranspilationEngine,
-}
-
-impl SovereignPrPackageGatewaySuite {
+impl SovereignUniversalPrGatewayEngine {
     pub fn new() -> Self {
         Self {
-            pr_registry: BTreeMap::new(),
-            gating_governor: PackagePrCiGatingGovernor::new(),
-            transpiler: MultiFormatPrTranspilationEngine::new(),
+            pr_engine: SovereignPackagePullRequestEngine::new(),
+            package_manager: UniversalPackageManager::new(),
+            pr_gateway_registry: BTreeMap::new(),
         }
     }
 
-    pub fn submit_package_pr(
+    /// Submits an incoming Linux or BSD distro package as a Pull Request to SigmaPkg
+    pub fn submit_distro_package_pr(
         &mut self,
-        pr_id: u32,
-        title: &str,
-        submitter: &str,
-        format: PackageFormat,
-        pkg_name: &str,
+        author: &str,
+        name: &str,
         version: &str,
-        license: &str,
-        manifest: &str,
-    ) -> u32 {
-        let pr = DistroPackagePullRequest::new(
-            pr_id, title, submitter, format, pkg_name, version, license, manifest,
+        format: PullRequestPackageFormat,
+        manifest_data: &str,
+        dependencies: &[&str],
+        pqc_signature: &[u8],
+    ) -> u64 {
+        let pr_id = self.pr_engine.submit_package_pr(
+            author,
+            name,
+            version,
+            format,
+            manifest_data,
+            dependencies,
+            pqc_signature,
         );
-        self.pr_registry.insert(pr_id, pr);
+
+        let entry = DistroPrGatewayEntry {
+            pr_id,
+            submitter: author.to_string(),
+            distro_format: format,
+            package_name: name.to_string(),
+            package_version: version.to_string(),
+            dependencies: dependencies.iter().map(|s| s.to_string()).collect(),
+            status: PullRequestStatus::Open,
+            translated_sigpkg_name: format!("sigpkg-{}", name),
+        };
+
+        self.pr_gateway_registry.insert(pr_id, entry);
         pr_id
     }
 
-    pub fn process_pr_pipeline(&mut self, pr_id: u32) -> Result<UnifiedPackage, String> {
-        let pr = self
-            .pr_registry
-            .get_mut(&pr_id)
-            .ok_or_else(|| format!("PR #{} not found", pr_id))?;
+    /// Validates PR dependencies using SAT solver and translates foreign manifest into SigmaPkg
+    pub fn validate_and_translate_pr(
+        &mut self,
+        pr_id: u64,
+    ) -> Result<ConsolidatedSovereignPackage, &'static str> {
+        self.pr_engine.validate_pr(pr_id)?;
+        let translated = self.pr_engine.translate_pr(pr_id)?;
 
-        // 1. Evaluate gating
-        self.gating_governor.evaluate_pr_gating(pr)?;
+        if let Some(entry) = self.pr_gateway_registry.get_mut(&pr_id) {
+            entry.status = PullRequestStatus::Translated;
+        }
 
-        // 2. Transpile to native sigpkg
-        let sigpkg = self.transpiler.transpile_pr_to_sigpkg(pr)?;
+        // Index in UniversalPackageManager as a foreign manifest
+        let manifest = ForeignDistroManifest {
+            raw_format: match translated.source_format {
+                PullRequestPackageFormat::DebianDeb => PackageFormat::Deb,
+                PullRequestPackageFormat::FedoraRpm => PackageFormat::Rpm,
+                PullRequestPackageFormat::ArchPkgbuild => PackageFormat::Pacman,
+                PullRequestPackageFormat::AlpineApk => PackageFormat::Apk,
+                PullRequestPackageFormat::GentooEbuild => PackageFormat::Ebuild,
+                PullRequestPackageFormat::VoidXbps => PackageFormat::Xbps,
+                PullRequestPackageFormat::FreeBsdPorts => PackageFormat::Ports,
+                PullRequestPackageFormat::OpenBsdPorts => PackageFormat::OpenBsdPkg,
+                PullRequestPackageFormat::NixFlake => PackageFormat::Nixpkg,
+                PullRequestPackageFormat::FlatpakApp => PackageFormat::Flatpak,
+                PullRequestPackageFormat::SnapPackage => PackageFormat::Snap,
+                PullRequestPackageFormat::AppImage => PackageFormat::AppImage,
+                _ => PackageFormat::SigmaPkg,
+            },
+            original_name: translated.name.clone(),
+            version: translated.version.clone(),
+            architecture: "x86_64".to_string(),
+            raw_dependencies: translated.resolved_dependencies.clone(),
+            raw_provides: alloc::vec![translated.name.clone()],
+            raw_conflicts: Vec::new(),
+            maintainer: "Sovereign PR Gateway".to_string(),
+        };
 
-        // 3. Mark PR merged
-        pr.status = PackagePrStatus::MergedToRepository;
-        pr.add_comment("SigmaOS-Bot", "PR successfully merged into sovereign package store!");
+        self.package_manager
+            .distro_repo_sync
+            .index_foreign_manifest(manifest);
 
+        Ok(translated)
+    }
+
+    /// Generates Git-style PR diff for manifest comparison
+    pub fn generate_distro_pr_diff(
+        &self,
+        pr_id: u64,
+        base_manifest: &str,
+    ) -> Result<String, &'static str> {
+        self.pr_engine.generate_pr_diff(pr_id, base_manifest)
+    }
+
+    /// Auto-merges an approved PR submission into the active SigmaPkg system registry
+    pub fn auto_merge_package_pr(
+        &mut self,
+        pr_id: u64,
+    ) -> Result<UnifiedPackage, &'static str> {
+        let consolidated = self.pr_engine.merge_pr(pr_id)?;
+
+        if let Some(entry) = self.pr_gateway_registry.get_mut(&pr_id) {
+            entry.status = PullRequestStatus::Merged;
+        }
+
+        let mut sigpkg = UnifiedPackage::new(
+            format!("sigpkg-{}", consolidated.name),
+            consolidated.version.clone(),
+        )
+        .with_format(PackageFormat::SigmaPkg)
+        .with_provides(consolidated.name.clone());
+
+        for dep in &consolidated.resolved_dependencies {
+            sigpkg = sigpkg.with_dependency(dep.clone());
+        }
+
+        self.package_manager.add_package(sigpkg.clone());
         Ok(sigpkg)
     }
 
-    pub fn verify_suite(&mut self) -> BTreeMap<String, bool> {
-        let mut results = BTreeMap::new();
-
-        // Submit test PRs across formats
-        self.submit_package_pr(
-            101,
-            "add ripgrep 14.1.0 PKGBUILD",
-            "arch_maintainer",
-            PackageFormat::Pacman,
-            "ripgrep",
-            "14.1.0",
-            "MIT",
-            "pkgname=ripgrep\npkgver=14.1.0\ndepends=glibc gcc-libs\n",
-        );
-
-        let process_ok = self.process_pr_pipeline(101).is_ok();
-        results.insert("pr_package_pipeline".to_string(), process_ok);
-
-        if let Some(pr) = self.pr_registry.get(&101) {
-            results.insert("pr_gating_approval".to_string(), pr.status == PackagePrStatus::MergedToRepository);
-            results.insert("pr_comment_logging".to_string(), !pr.comments.is_empty());
-        }
-
-        results
+    /// Search active and merged PRs by package name or author
+    pub fn search_distro_prs(&self, query: &str) -> Vec<DistroPrGatewayEntry> {
+        let q = query.to_lowercase();
+        self.pr_gateway_registry
+            .values()
+            .filter(|entry| {
+                entry.package_name.to_lowercase().contains(&q)
+                    || entry.submitter.to_lowercase().contains(&q)
+            })
+            .cloned()
+            .collect()
     }
 }
-
-impl Default for SovereignPrPackageGatewaySuite {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// UNIT TESTS
-// ============================================================================
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_distro_package_pr_submission() {
-        let mut pr = DistroPackagePullRequest::new(
-            1,
-            "Update nginx to 1.26.0",
-            "fedora_dev",
-            PackageFormat::Rpm,
+    fn test_sovereign_universal_pr_gateway_engine() {
+        let mut gateway = SovereignUniversalPrGatewayEngine::new();
+
+        // 1. Submit Debian package PR
+        let pr_deb = gateway.submit_distro_package_pr(
+            "alice",
             "nginx",
-            "1.26.0",
-            "BSD-2-Clause",
-            "Name: nginx\nVersion: 1.26.0\n",
+            "1.24.0",
+            PullRequestPackageFormat::DebianDeb,
+            "Package: nginx\nVersion: 1.24.0\nDepends: libc6, libssl3",
+            &["libc6", "libssl3"],
+            b"valid_pqc_signature_dilithium5",
         );
 
-        assert_eq!(pr.status, PackagePrStatus::Submitted);
-        pr.add_comment("reviewer1", "Looks good to me");
-        assert_eq!(pr.comments.len(), 1);
+        assert_eq!(pr_deb, 1);
+        let translated = gateway.validate_and_translate_pr(pr_deb).unwrap();
+        assert_eq!(translated.name, "nginx");
+
+        // 2. Generate PR diff
+        let diff = gateway
+            .generate_distro_pr_diff(pr_deb, "Package: nginx\nVersion: 1.22.0")
+            .unwrap();
+        assert!(diff.contains("- Version: 1.22.0"));
+        assert!(diff.contains("+ Version: 1.24.0"));
+
+        // 3. Auto-merge PR into SigmaPkg
+        let merged_sigpkg = gateway.auto_merge_package_pr(pr_deb).unwrap();
+        assert_eq!(merged_sigpkg.name, "sigpkg-nginx");
+        assert_eq!(merged_sigpkg.version, "1.24.0");
+
+        // 4. Search PRs
+        let search_res = gateway.search_distro_prs("nginx");
+        assert_eq!(search_res.len(), 1);
+        assert_eq!(search_res[0].status, PullRequestStatus::Merged);
     }
 
     #[test]
-    fn test_package_pr_ci_gating() {
-        let mut governor = PackagePrCiGatingGovernor::new();
-        let mut pr_valid = DistroPackagePullRequest::new(
-            2, "Add curl deb", "debian_dev", PackageFormat::Deb, "curl", "8.5.0", "MIT", "Package: curl\nVersion: 8.5.0\n",
-        );
+    fn test_sovereign_multi_distro_pr_formats() {
+        let mut gateway = SovereignUniversalPrGatewayEngine::new();
 
-        assert!(governor.evaluate_pr_gating(&mut pr_valid).is_ok());
-        assert_eq!(pr_valid.status, PackagePrStatus::Approved);
+        let submissions = [
+            ("bob", "ripgrep", "14.1.0", PullRequestPackageFormat::ArchPkgbuild, "pkgname=ripgrep", &["pcre2"][..]),
+            ("carol", "htop", "3.3.0", PullRequestPackageFormat::FedoraRpm, "Name: htop", &["ncurses"][..]),
+            ("dave", "curl", "8.5.0", PullRequestPackageFormat::AlpineApk, "P:curl", &["sovereign-openssl"][..]),
+            ("eve", "vlc", "3.0.20", PullRequestPackageFormat::VoidXbps, "pkgname=vlc", &["ffmpeg"][..]),
+            ("frank", "ffmpeg", "6.1.0", PullRequestPackageFormat::FreeBsdPorts, "PORTNAME=ffmpeg", &["libx264"][..]),
+            ("grace", "git", "2.43.0", PullRequestPackageFormat::NixFlake, "description = \"git\"", &["zlib"][..]),
+            ("heidi", "gimp", "2.10.36", PullRequestPackageFormat::FlatpakApp, "app-id: org.gimp.GIMP", &["babl"][..]),
+            ("ivan", "blender", "4.0.2", PullRequestPackageFormat::AppImage, "AppImage Blender", &["glibc"][..]),
+        ];
 
-        let mut pr_invalid_license = DistroPackagePullRequest::new(
-            3, "Add closed app", "prop_dev", PackageFormat::SigmaPkg, "closedApp", "1.0", "ProprietaryUnfree", "spec",
-        );
-        assert!(governor.evaluate_pr_gating(&mut pr_invalid_license).is_err());
-        assert_eq!(pr_invalid_license.status, PackagePrStatus::ChangesRequested);
-    }
+        for (author, name, ver, fmt, manifest, deps) in submissions {
+            let pr = gateway.submit_distro_package_pr(
+                author,
+                name,
+                ver,
+                fmt,
+                manifest,
+                deps,
+                b"valid_pqc_sig",
+            );
 
-    #[test]
-    fn test_pr_package_gateway_suite() {
-        let mut suite = SovereignPrPackageGatewaySuite::new();
-        let health = suite.verify_suite();
-        assert_eq!(health.len(), 3);
-        for (k, v) in health {
-            assert!(v, "PR Package Gateway suite health check failed for: {}", k);
+            let translated = gateway.validate_and_translate_pr(pr).unwrap();
+            assert_eq!(translated.name, name);
+
+            let merged = gateway.auto_merge_package_pr(pr).unwrap();
+            assert_eq!(merged.name, format!("sigpkg-{}", name));
         }
+
+        assert_eq!(gateway.pr_gateway_registry.len(), 8);
     }
 }
