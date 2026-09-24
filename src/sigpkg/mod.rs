@@ -76,6 +76,10 @@ pub use crate::package::sovereign_distro_package_matrix::*;
 pub mod sovereign_distro_package_advancements_v4;
 pub use sovereign_distro_package_advancements_v4::*;
 
+#[path = "../package/sovereign_pr_package_gateway.rs"]
+pub mod sovereign_pr_package_gateway;
+pub use sovereign_pr_package_gateway::*;
+
 #[path = "../package/bsd_linux_package_innovations.rs"]
 pub mod bsd_linux_package_innovations;
 pub use bsd_linux_package_innovations::{
