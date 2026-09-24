@@ -76,6 +76,10 @@ pub use crate::package::sovereign_distro_package_matrix::*;
 pub mod sovereign_distro_package_advancements_v3;
 pub use sovereign_distro_package_advancements_v3::*;
 
+#[path = "../package/sovereign_package_smp_engine.rs"]
+pub mod sovereign_package_smp_engine;
+pub use sovereign_package_smp_engine::*;
+
 #[path = "../package/bsd_linux_package_innovations.rs"]
 pub mod bsd_linux_package_innovations;
 pub use bsd_linux_package_innovations::{
