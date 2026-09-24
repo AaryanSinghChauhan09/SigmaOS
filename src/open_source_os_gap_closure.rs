@@ -3990,15 +3990,17 @@ impl OpenSourceProjectSupremacySuite {
     }
 
     /// Helix / Neovim Inspired Modal Editor Quick Helper
-    pub fn open_sovereign_modal_editor(&self, initial_buffer: &str) -> crate::open_source_obsoletion::SovereignHelixModalEditorEngine {
-        let editor = crate::open_source_obsoletion::SovereignHelixModalEditorEngine::new("scratch", initial_buffer);
-        editor
+    pub fn open_sovereign_modal_editor(&self, initial_buffer: &str) -> (String, String) {
+        let mut editor = crate::open_source_obsoletion::SovereignHelixModalEditorEngine::new("scratch", initial_buffer);
+        let filename = editor.filepath.clone();
+        let buf = editor.active_buffer.clone();
+        (filename, buf)
     }
 
     /// Fastfetch System Info Quick Helper
     pub fn render_fastfetch_summary(&self) -> String {
-        let ff = crate::open_source_obsoletion::SovereignFastfetchSysInfoEngine::new();
-        ff.render_ansi_banner()
+        let fetch = crate::tools::powertoys::FastfetchSystemInfoEngine::new();
+        fetch.render_fastfetch_summary()
     }
 }
 

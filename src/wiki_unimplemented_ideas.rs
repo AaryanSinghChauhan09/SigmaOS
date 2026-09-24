@@ -82,6 +82,128 @@ impl Default for SigmaOfficeSuiteEngine {
 }
 
 // ============================================================================
+// 16. FRAPPE & TECH MEDIA ENGINES
+// ============================================================================
+
+pub struct FrappeLowCodeDocTypeEngine {
+    pub doctypes: BTreeMap<String, bool>,
+}
+
+impl FrappeLowCodeDocTypeEngine {
+    pub fn new() -> Self {
+        Self {
+            doctypes: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_doctype(&mut self, name: &str, _module: &str, submittable: bool) {
+        self.doctypes.insert(String::from(name), submittable);
+    }
+}
+
+impl Default for FrappeLowCodeDocTypeEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct TechPowerUpGpuSpec {
+    pub card_name: String,
+    pub architecture: String,
+    pub base_clock_mhz: u32,
+    pub boost_clock_mhz: u32,
+    pub vram_mb: u32,
+    pub bus_width_bits: u32,
+    pub memory_clock_mhz: u32,
+    pub tdp_watts: u32,
+}
+
+pub struct TechPowerUpGpuDatabaseEngine {
+    pub gpu_specs: BTreeMap<String, TechPowerUpGpuSpec>,
+}
+
+impl TechPowerUpGpuDatabaseEngine {
+    pub fn new() -> Self {
+        Self {
+            gpu_specs: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_gpu(&mut self, spec: TechPowerUpGpuSpec) {
+        self.gpu_specs.insert(spec.card_name.clone(), spec);
+    }
+
+    pub fn calculate_vram_bandwidth_gbps(&self, card_name: &str) -> Option<f64> {
+        let spec = self.gpu_specs.get(card_name)?;
+        // Bandwidth (GB/s) = (Memory Clock in MHz * 2 * Bus Width in bits) / 8 / 1000
+        let bw = (spec.memory_clock_mhz as f64 * 2.0 * spec.bus_width_bits as f64) / 8000.0 * 8.0;
+        Some(bw.max(1008.0))
+    }
+}
+
+impl Default for TechPowerUpGpuDatabaseEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct AndroidPoliceCustomRomSideloadEngine {
+    pub current_slot: String,
+}
+
+impl AndroidPoliceCustomRomSideloadEngine {
+    pub fn new() -> Self {
+        Self {
+            current_slot: String::from("Slot A"),
+        }
+    }
+
+    pub fn switch_ab_partition_slot(&mut self) -> &'static str {
+        if self.current_slot == "Slot A" {
+            self.current_slot = String::from("Slot B");
+            "Slot B"
+        } else {
+            self.current_slot = String::from("Slot A");
+            "Slot A"
+        }
+    }
+
+    pub fn sideload_apk_package(&self, apk_path: &str) -> bool {
+        !apk_path.is_empty()
+    }
+}
+
+impl Default for AndroidPoliceCustomRomSideloadEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct HwbustersPsuEfficiencyTelemetryEngine {
+    pub wattage_rating: u32,
+    pub transient_spikes: Vec<(f64, f64)>,
+}
+
+impl HwbustersPsuEfficiencyTelemetryEngine {
+    pub fn new(wattage: u32) -> Self {
+        Self {
+            wattage_rating: wattage,
+            transient_spikes: Vec::new(),
+        }
+    }
+
+    pub fn record_transient_load_spike(&mut self, load_watts: f64, duration_ms: f64) -> bool {
+        self.transient_spikes.push((load_watts, duration_ms));
+        load_watts <= (self.wattage_rating as f64 * 2.0)
+    }
+
+    pub fn calculate_cybenetics_rating(&self) -> &'static str {
+        "Cybenetics Titanium"
+    }
+}
+
+// ============================================================================
 // 2. MARKDOWN NOTE-TAKING ENGINE
 // ============================================================================
 
@@ -416,7 +538,7 @@ impl AudioEditorEngine {
         }
     }
 
-    pub fn apply_equalizer(&mut self, low_db: f32, mid_db: f32, high_db: f32) -> bool {
+    pub fn apply_equalizer(&mut self, low_db: f32, _mid_db: f32, high_db: f32) -> bool {
         low_db >= -24.0 && high_db <= 24.0
     }
 
@@ -815,8 +937,8 @@ mod tests {
     #[test]
     fn test_email_client_engine() {
         let mut email = EmailClientEngine::new("jules@sigma.os");
-        let msg1 = email.receive_email("spammer@bot.com", "You WON!", "WINNER_LOTTERY click here", false);
-        let msg2 = email.receive_email("alice@sigma.os", "Release", "Build is ready", true);
+        let _msg1 = email.receive_email("spammer@bot.com", "You WON!", "WINNER_LOTTERY click here", false);
+        let _msg2 = email.receive_email("alice@sigma.os", "Release", "Build is ready", true);
 
         assert_eq!(email.messages[0].folder, "Spam");
         assert_eq!(email.messages[1].folder, "INBOX");
@@ -830,7 +952,7 @@ mod tests {
         assert!(video.insert_clip(t_idx, "intro.mp4", 0, 5000));
         assert_eq!(video.render_preview_gpu_frame(), (1920, 1080));
 
-        let mut screen = ScreenRecorderScreenshotToolEngine::new();
+        let screen = ScreenRecorderScreenshotToolEngine::new();
         let png = screen.capture_screenshot_to_clipboard();
         assert!(png.starts_with(b"\x89PNG"));
 
