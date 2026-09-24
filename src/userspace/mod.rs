@@ -169,3 +169,5 @@ mod tests {
         assert!(manager.get(0).is_some());
     }
 }
+pub mod init;
+pub mod shell;
