@@ -47,6 +47,10 @@ pub use support::{FilesystemError, FilesystemType, SimpleFilesystem, SimpleFiles
 pub use file_monitor::{
     EventFilter, FileEvent, FileEventType, WatchConfig, WatchId, WatchManager, EventId,
 };
+pub use sovereign_filesystem_hierarchy::{
+    EphemeralTmpfsMountGovernor, SovereignAtomicGenerationRootfsGuard, SovereignCanonicalFhsResolver,
+    SyntheticProcSysfsProvider,
+};
 pub use watch::{EventQueue, ThreadSafeEventQueue, RING_BUFFER_SIZE, COALESCE_WINDOW_MS};
 
 pub type FileDescriptor = i32;

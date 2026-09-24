@@ -206,6 +206,15 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_linux_bsd_distro_guideline_rules() {
+        let rules = LinuxBsdDistroGuidelineRules::new();
+        assert!(rules.evaluate_compliance(DistroGuidelineStandard::ArchPurity));
+        assert!(rules.evaluate_compliance(DistroGuidelineStandard::OpenBsdPledge));
+        assert!(rules.evaluate_compliance(DistroGuidelineStandard::DragonFlyHammer2));
+        assert_eq!(rules.compliance_score(), 99);
+    }
+
+    #[test]
     fn test_compliance_audit_logger() {
         let mut logger = ComplianceAuditLogger::new();
         logger.enable_framework(ComplianceFramework::HIPAA);

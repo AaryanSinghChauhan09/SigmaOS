@@ -1,6 +1,13 @@
 pub mod omarchy_inspiration;
 pub use omarchy_inspiration::*;
 pub mod omarchy;
+pub mod omarchy_advanced_parity;
+pub mod omarchy_future_roadmap;
+pub mod omarchy_inspiration;
+pub mod sovereign_gap_closure_master_suite;
+pub mod sovereign_open_source_distro_synthesis;
+pub mod sovereign_stack_replacements;
+pub mod sovereign_wiki_mint_omarchy_innovations;
 pub use omarchy::{
     FactoryResetGuardian, GpuDriverConfig, HardwareQuirkAdapter, KeybindingDefinition,
     OmarchyAudioPipewireConfig,
@@ -116,8 +123,8 @@ pub use clear_linux::{
     ClearLinuxStatelessEngine, ConfigLocation, ConfigState, SwupdBundle, SwupdUpdateManager,
 };
 pub use compliance::{
-    ComplianceAuditEvent, ComplianceAuditLogger, ComplianceFramework, TpmAttestationManager,
-    TpmPcrMeasurement,
+    ComplianceAuditEvent, ComplianceAuditLogger, ComplianceFramework, DistroGuidelineStandard,
+    LinuxBsdDistroGuidelineRules, TpmAttestationManager, TpmPcrMeasurement,
 };
 pub use sovereign_system_innovations::{
     AdaptiveWmOverlayController, EventWorkloadTask, ExtensibleSyscallHookGate, FirewallRule,

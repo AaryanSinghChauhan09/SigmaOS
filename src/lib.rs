@@ -41,6 +41,13 @@ pub mod runtime;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
+pub use sigpkg::{
+    SovereignUniversalPackageManagerInteropEngine, SovereignUniversalPackageTranslationBridge,
+};
+pub use filesystem::{
+    EphemeralTmpfsMountGovernor, SovereignAtomicGenerationRootfsGuard, SovereignCanonicalFhsResolver,
+    SyntheticProcSysfsProvider,
+};
 pub mod storage;
 pub mod thread;
 pub mod system;
