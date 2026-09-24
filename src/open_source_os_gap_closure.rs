@@ -2922,6 +2922,427 @@ impl Default for LinuxSchedExtScxEngine {
 }
 
 // =========================================================================
+// 35. OPENZFS STORAGE POOL MANAGEMENT ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ZfsPoolState {
+    Online,
+    Degraded,
+    Faulted,
+    Scrubbing,
+    Offline,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ZfsVdevType {
+    Disk,
+    Mirror,
+    Raidz1,
+    Raidz2,
+    Raidz3,
+    Spare,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ZfsVdev {
+    pub path: String,
+    pub vdev_type: ZfsVdevType,
+    pub faulted: bool,
+    pub bytes_read: u64,
+    pub bytes_written: u64,
+    pub checksum_errors: u64,
+}
+
+pub struct OpenZfsPoolManagementEngine {
+    pub pool_name: String,
+    pub vdevs: Vec<ZfsVdev>,
+    pub spares: Vec<ZfsVdev>,
+    pub state: ZfsPoolState,
+    pub scrub_progress_pct: f32,
+    pub total_capacity_bytes: u64,
+    pub allocated_bytes: u64,
+}
+
+impl OpenZfsPoolManagementEngine {
+    pub fn new(pool_name: &str, capacity_bytes: u64) -> Self {
+        Self {
+            pool_name: pool_name.to_string(),
+            vdevs: Vec::new(),
+            spares: Vec::new(),
+            state: ZfsPoolState::Online,
+            scrub_progress_pct: 0.0,
+            total_capacity_bytes: capacity_bytes,
+            allocated_bytes: 0,
+        }
+    }
+
+    pub fn add_vdev(&mut self, path: &str, vdev_type: ZfsVdevType) {
+        self.vdevs.push(ZfsVdev {
+            path: path.to_string(),
+            vdev_type,
+            faulted: false,
+            bytes_read: 0,
+            bytes_written: 0,
+            checksum_errors: 0,
+        });
+    }
+
+    pub fn add_hot_spare(&mut self, path: &str) {
+        self.spares.push(ZfsVdev {
+            path: path.to_string(),
+            vdev_type: ZfsVdevType::Spare,
+            faulted: false,
+            bytes_read: 0,
+            bytes_written: 0,
+            checksum_errors: 0,
+        });
+    }
+
+    pub fn mark_vdev_faulted(&mut self, path: &str) -> bool {
+        if let Some(vdev) = self.vdevs.iter_mut().find(|v| v.path == path) {
+            vdev.faulted = true;
+            self.evaluate_pool_health();
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn replace_faulted_vdev_with_spare(
+        &mut self,
+        faulted_path: &str,
+        spare_path: &str,
+    ) -> Result<(), &'static str> {
+        let spare_idx = self
+            .spares
+            .iter()
+            .position(|s| s.path == spare_path && !s.faulted)
+            .ok_or("ZFS: Specified hot spare device not available")?;
+
+        let vdev_idx = self
+            .vdevs
+            .iter()
+            .position(|v| v.path == faulted_path)
+            .ok_or("ZFS: Faulted vdev not found in pool")?;
+
+        let spare = self.spares.remove(spare_idx);
+        let orig_type = self.vdevs[vdev_idx].vdev_type;
+        self.vdevs[vdev_idx] = ZfsVdev {
+            path: spare.path,
+            vdev_type: orig_type,
+            faulted: false,
+            bytes_read: 0,
+            bytes_written: 0,
+            checksum_errors: 0,
+        };
+
+        self.evaluate_pool_health();
+        Ok(())
+    }
+
+    pub fn start_scrub(&mut self) -> bool {
+        if self.state == ZfsPoolState::Offline || self.state == ZfsPoolState::Faulted {
+            return false;
+        }
+        self.state = ZfsPoolState::Scrubbing;
+        self.scrub_progress_pct = 0.0;
+        true
+    }
+
+    pub fn advance_scrub(&mut self, delta_pct: f32) -> f32 {
+        if self.state == ZfsPoolState::Scrubbing {
+            self.scrub_progress_pct = (self.scrub_progress_pct + delta_pct).min(100.0);
+            if self.scrub_progress_pct >= 100.0 {
+                self.evaluate_pool_health();
+            }
+        }
+        self.scrub_progress_pct
+    }
+
+    pub fn evaluate_pool_health(&mut self) -> ZfsPoolState {
+        let faulted_count = self.vdevs.iter().filter(|v| v.faulted).count();
+        if faulted_count == 0 {
+            if self.scrub_progress_pct > 0.0 && self.scrub_progress_pct < 100.0 {
+                self.state = ZfsPoolState::Scrubbing;
+            } else {
+                self.state = ZfsPoolState::Online;
+            }
+        } else if faulted_count < self.vdevs.len() {
+            self.state = ZfsPoolState::Degraded;
+        } else {
+            self.state = ZfsPoolState::Faulted;
+        }
+        self.state
+    }
+
+    pub fn validate_raidz3_topology(&self) -> bool {
+        let raidz3_vdevs = self
+            .vdevs
+            .iter()
+            .filter(|v| v.vdev_type == ZfsVdevType::Raidz3)
+            .count();
+        raidz3_vdevs >= 5
+    }
+}
+
+impl Default for OpenZfsPoolManagementEngine {
+    fn default() -> Self {
+        Self::new("tank", 1_000_000_000_000)
+    }
+}
+
+// =========================================================================
+// 36. ANDROID BINDER IPC & ASHMEM ZERO-COPY ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AshmemRegion {
+    pub name: String,
+    pub size_bytes: usize,
+    pub pinned: bool,
+    pub prot_flags: u32,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BinderHalEndpoint {
+    pub interface_name: String,
+    pub handle_id: u32,
+    pub pid: u32,
+}
+
+pub struct AndroidBinderAshmemIpcEngine {
+    pub ashmem_regions: BTreeMap<String, AshmemRegion>,
+    pub hal_endpoints: BTreeMap<String, BinderHalEndpoint>,
+    pub death_listeners: Vec<(u32, String)>,
+    pub transaction_count: u64,
+}
+
+impl AndroidBinderAshmemIpcEngine {
+    pub fn new() -> Self {
+        Self {
+            ashmem_regions: BTreeMap::new(),
+            hal_endpoints: BTreeMap::new(),
+            death_listeners: Vec::new(),
+            transaction_count: 0,
+        }
+    }
+
+    pub fn create_ashmem_region(
+        &mut self,
+        name: &str,
+        size_bytes: usize,
+    ) -> Result<(), &'static str> {
+        if name.is_empty() || size_bytes == 0 {
+            return Err("Ashmem: Invalid region parameters");
+        }
+        self.ashmem_regions.insert(
+            name.to_string(),
+            AshmemRegion {
+                name: name.to_string(),
+                size_bytes,
+                pinned: true,
+                prot_flags: 0x7, // PROT_READ | PROT_WRITE | PROT_EXEC
+            },
+        );
+        Ok(())
+    }
+
+    pub fn set_ashmem_pin_status(
+        &mut self,
+        name: &str,
+        pinned: bool,
+    ) -> Result<bool, &'static str> {
+        if let Some(region) = self.ashmem_regions.get_mut(name) {
+            let prev = region.pinned;
+            region.pinned = pinned;
+            Ok(prev)
+        } else {
+            Err("Ashmem: Shared memory region not found")
+        }
+    }
+
+    pub fn register_hal_endpoint(&mut self, interface: &str, handle_id: u32, pid: u32) -> bool {
+        if interface.is_empty() || pid == 0 {
+            return false;
+        }
+        self.hal_endpoints.insert(
+            interface.to_string(),
+            BinderHalEndpoint {
+                interface_name: interface.to_string(),
+                handle_id,
+                pid,
+            },
+        );
+        true
+    }
+
+    pub fn lookup_hal_endpoint(&self, interface: &str) -> Option<&BinderHalEndpoint> {
+        self.hal_endpoints.get(interface)
+    }
+
+    pub fn register_death_recipient(&mut self, pid: u32, interface: &str) {
+        self.death_listeners.push((pid, interface.to_string()));
+    }
+
+    pub fn dispatch_death_notifications(&mut self, dead_pid: u32) -> Vec<String> {
+        let mut notified = Vec::new();
+        self.death_listeners.retain(|(pid, interface)| {
+            if *pid == dead_pid {
+                notified.push(interface.clone());
+                false
+            } else {
+                true
+            }
+        });
+
+        // Remove HAL endpoints associated with dead PID
+        self.hal_endpoints.retain(|_, ep| ep.pid != dead_pid);
+        notified
+    }
+
+    pub fn route_binder_transaction(
+        &mut self,
+        handle_id: u32,
+        payload: &[u8],
+    ) -> Result<usize, &'static str> {
+        let ep = self
+            .hal_endpoints
+            .values()
+            .find(|ep| ep.handle_id == handle_id)
+            .ok_or("Binder: Destination handle not registered")?;
+
+        if ep.pid == 0 {
+            return Err("Binder: Destination process is dead");
+        }
+
+        self.transaction_count += 1;
+        Ok(payload.len())
+    }
+}
+
+impl Default for AndroidBinderAshmemIpcEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 37. LINUX LANDLOCK LSM SECURITY SANDBOXING ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LandlockAbiVersion {
+    V1,
+    V2,
+    V3,
+    V4,
+    V5,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct LandlockPathAccess {
+    pub read: bool,
+    pub write: bool,
+    pub execute: bool,
+    pub truncate: bool,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct LandlockNetAccess {
+    pub bind_tcp: bool,
+    pub connect_tcp: bool,
+}
+
+pub struct LinuxLandlockLsmSecurityEngine {
+    pub supported_abi: LandlockAbiVersion,
+    pub path_rules: Vec<(String, LandlockPathAccess)>,
+    pub net_rules: Vec<(u16, LandlockNetAccess)>,
+    pub restricted_self: bool,
+}
+
+impl LinuxLandlockLsmSecurityEngine {
+    pub fn new(abi: LandlockAbiVersion) -> Self {
+        Self {
+            supported_abi: abi,
+            path_rules: Vec::new(),
+            net_rules: Vec::new(),
+            restricted_self: false,
+        }
+    }
+
+    pub fn add_path_rule(&mut self, path: &str, access: LandlockPathAccess) {
+        self.path_rules.push((path.to_string(), access));
+    }
+
+    pub fn add_net_rule(&mut self, port: u16, access: LandlockNetAccess) {
+        self.net_rules.push((port, access));
+    }
+
+    pub fn check_path_access(
+        &self,
+        path: &str,
+        req_read: bool,
+        req_write: bool,
+        req_exec: bool,
+    ) -> bool {
+        if !self.restricted_self {
+            return true;
+        }
+
+        for (rule_path, access) in &self.path_rules {
+            if path.starts_with(rule_path) {
+                if req_read && !access.read {
+                    return false;
+                }
+                if req_write && !access.write {
+                    return false;
+                }
+                if req_exec && !access.execute {
+                    return false;
+                }
+                return true;
+            }
+        }
+        false
+    }
+
+    pub fn check_net_access(&self, port: u16, req_bind: bool, req_connect: bool) -> bool {
+        if !self.restricted_self {
+            return true;
+        }
+
+        for &(rule_port, access) in &self.net_rules {
+            if rule_port == port {
+                if req_bind && !access.bind_tcp {
+                    return false;
+                }
+                if req_connect && !access.connect_tcp {
+                    return false;
+                }
+                return true;
+            }
+        }
+        false
+    }
+
+    pub fn restrict_self(&mut self) -> Result<(), &'static str> {
+        self.restricted_self = true;
+        Ok(())
+    }
+
+    pub fn is_restricted(&self) -> bool {
+        self.restricted_self
+    }
+}
+
+impl Default for LinuxLandlockLsmSecurityEngine {
+    fn default() -> Self {
+        Self::new(LandlockAbiVersion::V5)
+    }
+}
+
+// =========================================================================
 // UNIT TESTS
 // =========================================================================
 
@@ -3631,6 +4052,108 @@ mod tests {
 
         assert_eq!(auditor.block_windows_telemetry_hosts(), 3);
     }
+
+    #[test]
+    fn test_openzfs_pool_management_engine() {
+        let mut zfs = OpenZfsPoolManagementEngine::new("zroot", 5_000_000_000_000);
+        zfs.add_vdev("/dev/nvme0n1", ZfsVdevType::Raidz3);
+        zfs.add_vdev("/dev/nvme1n1", ZfsVdevType::Raidz3);
+        zfs.add_vdev("/dev/nvme2n1", ZfsVdevType::Raidz3);
+        zfs.add_vdev("/dev/nvme3n1", ZfsVdevType::Raidz3);
+        zfs.add_vdev("/dev/nvme4n1", ZfsVdevType::Raidz3);
+        zfs.add_hot_spare("/dev/nvme5n1");
+
+        assert!(zfs.validate_raidz3_topology());
+        assert_eq!(zfs.state, ZfsPoolState::Online);
+
+        assert!(zfs.mark_vdev_faulted("/dev/nvme0n1"));
+        assert_eq!(zfs.evaluate_pool_health(), ZfsPoolState::Degraded);
+
+        assert!(zfs
+            .replace_faulted_vdev_with_spare("/dev/nvme0n1", "/dev/nvme5n1")
+            .is_ok());
+        assert_eq!(zfs.evaluate_pool_health(), ZfsPoolState::Online);
+
+        assert!(zfs.start_scrub());
+        assert_eq!(zfs.advance_scrub(50.0), 50.0);
+        assert_eq!(zfs.state, ZfsPoolState::Scrubbing);
+        assert_eq!(zfs.advance_scrub(50.0), 100.0);
+        assert_eq!(zfs.state, ZfsPoolState::Online);
+    }
+
+    #[test]
+    fn test_android_binder_ashmem_ipc_engine() {
+        let mut binder = AndroidBinderAshmemIpcEngine::new();
+        assert!(binder
+            .create_ashmem_region("surface_flinger_buffer", 4096 * 2160 * 4)
+            .is_ok());
+        assert_eq!(
+            binder
+                .set_ashmem_pin_status("surface_flinger_buffer", false)
+                .unwrap(),
+            true
+        );
+
+        assert!(binder.register_hal_endpoint("android.hardware.graphics.allocator@4.0", 1001, 500));
+        assert_eq!(
+            binder
+                .lookup_hal_endpoint("android.hardware.graphics.allocator@4.0")
+                .unwrap()
+                .pid,
+            500
+        );
+
+        binder.register_death_recipient(500, "android.hardware.graphics.allocator@4.0");
+        assert_eq!(
+            binder.route_binder_transaction(1001, b"ALLOCATE_FRAMEBUFFER").unwrap(),
+            20
+        );
+
+        let notified = binder.dispatch_death_notifications(500);
+        assert_eq!(notified.len(), 1);
+        assert_eq!(notified[0], "android.hardware.graphics.allocator@4.0");
+        assert!(binder.lookup_hal_endpoint("android.hardware.graphics.allocator@4.0").is_none());
+    }
+
+    #[test]
+    fn test_linux_landlock_lsm_security_engine() {
+        let mut landlock = LinuxLandlockLsmSecurityEngine::new(LandlockAbiVersion::V5);
+        landlock.add_path_rule(
+            "/home/user",
+            LandlockPathAccess {
+                read: true,
+                write: true,
+                execute: false,
+                truncate: false,
+            },
+        );
+        landlock.add_net_rule(
+            443,
+            LandlockNetAccess {
+                bind_tcp: false,
+                connect_tcp: true,
+            },
+        );
+
+        // Before restriction, access is uninhibited
+        assert!(landlock.check_path_access("/etc/shadow", true, true, true));
+        assert!(landlock.check_net_access(80, true, true));
+
+        assert!(landlock.restrict_self().is_ok());
+        assert!(landlock.is_restricted());
+
+        // Allowed paths and operations
+        assert!(landlock.check_path_access("/home/user/doc.txt", true, true, false));
+        // Blocked path execution
+        assert!(!landlock.check_path_access("/home/user/script.sh", false, false, true));
+        // Unmapped path access denied
+        assert!(!landlock.check_path_access("/var/log/syslog", true, false, false));
+
+        // Network restrictions
+        assert!(landlock.check_net_access(443, false, true));
+        assert!(!landlock.check_net_access(443, true, false));
+        assert!(!landlock.check_net_access(80, false, true));
+    }
 }
 
 // =========================================================================
@@ -3789,6 +4312,9 @@ pub struct OpenSourceProjectSupremacySuite {
     pub pf_carp_engine: OpenBsdPfCarpStateEngine,
     pub arrow_engine: ApacheArrowVectorizedEngine,
     pub sched_ext_engine: LinuxSchedExtScxEngine,
+    pub openzfs_engine: OpenZfsPoolManagementEngine,
+    pub binder_ashmem_engine: AndroidBinderAshmemIpcEngine,
+    pub landlock_engine: LinuxLandlockLsmSecurityEngine,
 }
 
 #[derive(Debug, Clone)]
@@ -3817,6 +4343,9 @@ impl OpenSourceProjectSupremacySuite {
             pf_carp_engine: OpenBsdPfCarpStateEngine::new(1, 1, 0),
             arrow_engine: ApacheArrowVectorizedEngine::new(),
             sched_ext_engine: LinuxSchedExtScxEngine::new(ScxSchedulerKind::BpfLand),
+            openzfs_engine: OpenZfsPoolManagementEngine::new("rpool", 2_000_000_000_000),
+            binder_ashmem_engine: AndroidBinderAshmemIpcEngine::new(),
+            landlock_engine: LinuxLandlockLsmSecurityEngine::new(LandlockAbiVersion::V5),
         }
     }
 
