@@ -23,3 +23,8 @@ pub mod kevent_syscalls;
 pub mod uts_syscalls;
 pub mod user_syscalls;
 pub mod bpf_syscalls;
+pub mod posix_linux_bsd_api;
+
+pub use posix_linux_bsd_api::{
+    posix_errno, syscall_abi_numbers, PidFdDescriptor, PosixLinuxBsdApiDispatcher,
+};
