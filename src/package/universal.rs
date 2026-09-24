@@ -125,7 +125,9 @@ impl UniversalPackageTranslator {
 
 fn debtor_to_sovereign_name(name: &str) -> &str {
     let lower = name.to_lowercase();
-    if lower.contains("ssl") || lower.contains("crypto") || lower.contains("tls") {
+    if lower == "apt" || lower == "dpkg" || lower == "pacman" || lower == "dnf" || lower == "yum" || lower == "zypper" || lower == "apk" || lower == "xbps" || lower == "emerge" || lower == "pkg" {
+        "sovereign-package-manager"
+    } else if lower.contains("ssl") || lower.contains("crypto") || lower.contains("tls") {
         "sovereign-openssl"
     } else if lower.contains("libc") || lower == "musl" || lower.contains("freebsd-runtime") || lower.contains("openbsd-sys") || lower.contains("haiku-libroot") {
         "sovereign-libc"
