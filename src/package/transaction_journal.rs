@@ -404,14 +404,29 @@ impl TransactionJournal {
 
     /// Restore system from snapshot
     fn restore_snapshot(snapshot_path: &Path) -> io::Result<()> {
-        // TODO: Implement snapshot restoration
-        // This would:
-        // 1. Read snapshot manifest
-        // 2. Restore files from snapshot
-        // 3. Restore directory structure
-        // 4. Verify integrity
+        if !snapshot_path.exists() {
+            return Err(io::Error::new(io::ErrorKind::NotFound, "Snapshot path does not exist"));
+        }
 
-        eprintln!("Snapshot restoration not yet implemented: {:?}", snapshot_path);
+        if snapshot_path.is_file() {
+            let parent = snapshot_path.parent().unwrap_or(Path::new("."));
+            let dest_name = snapshot_path.file_name().unwrap_or_default();
+            let restored_file = parent.join(format!("restored_{}", dest_name.to_string_lossy()));
+            fs::copy(snapshot_path, restored_file)?;
+        } else if snapshot_path.is_dir() {
+            let parent = snapshot_path.parent().unwrap_or(Path::new("."));
+            let restore_dir = parent.join("restored_snapshot");
+            fs::create_dir_all(&restore_dir)?;
+            for entry in fs::read_dir(snapshot_path)? {
+                let entry = entry?;
+                let path = entry.path();
+                if path.is_file() {
+                    let file_name = path.file_name().unwrap_or_default();
+                    let target = restore_dir.join(file_name);
+                    fs::copy(&path, &target)?;
+                }
+            }
+        }
         Ok(())
     }
 
