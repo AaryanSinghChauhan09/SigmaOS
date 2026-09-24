@@ -69,3 +69,7 @@
 ## 2026-09-20 - Constant-Time $O(1)$ Plugin Name Retrieval via Cached Byte Lengths
 **Learning:** Querying plugin names via `Plugin::name()` on `SimplePlugin` performed an $O(N)$ zero-byte linear scan (`.position(|&b| b == 0)`) on every call. Storing `name_len: u8` during construction allows `SimplePlugin::name()` to retrieve the byte slice in $O(1)$ constant time without scanning the underlying 64-byte array.
 **Action:** Always store the slice byte length during struct initialization when working with fixed-size byte arrays (`[u8; N]`) to convert string/slice getter calls into $O(1)$ constant-time slice lookups.
+
+## 2026-09-25 - $O(1)$ Window Title Lookups via Cached Byte Length in Zenith Compositor
+**Learning:** Calling `Window::title()` on `SimpleWindow` in `src/desktop/zenith.rs` triggered an $O(N)$ zero-byte linear scan (`.position(|&b| b == 0)`) across its 128-byte title array on every window title query or compositing frame update. Caching `title_len: u8` during `SimpleWindow::new()` construction converts title slice lookups into $O(1)$ constant-time slice indexing (`&self.title[..self.title_len as usize]`), bypassing iterative array scanning.
+**Action:** Store the byte length (`title_len: u8`) during window or UI element construction to eliminate linear zero-byte scanning on repeated title access.

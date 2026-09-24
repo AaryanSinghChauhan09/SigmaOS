@@ -135,6 +135,7 @@ impl WindowCapability {
 pub struct SimpleWindow {
     pub id: WindowID,
     pub title: [u8; 128],
+    pub title_len: u8, // Caches title byte length to avoid O(N) linear scans on title lookups
     pub x: u32,
     pub y: u32,
     pub width: u32,
@@ -152,6 +153,7 @@ impl SimpleWindow {
         SimpleWindow {
             id,
             title: title_array,
+            title_len: title_len as u8,
             x: 100,
             y: 100,
             width: 800,
@@ -186,8 +188,8 @@ impl Window for SimpleWindow {
     }
 
     fn title(&self) -> &[u8] {
-        let len = self.title.iter().position(|&b| b == 0).unwrap_or(128);
-        &self.title[..len]
+        // O(1) constant-time slice lookup using cached title_len, avoiding O(N) zero-byte linear scan (.position(|&b| b == 0))
+        &self.title[..self.title_len as usize]
     }
 
     fn show(&mut self) -> Result<(), DesktopError> {
@@ -426,7 +428,7 @@ impl DesktopCompositor for SimpleDesktopCompositor {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
