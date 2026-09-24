@@ -56,3 +56,9 @@ pub use open_source_browser_innovations::{
     BraveShieldV2Engine, ContainerIdentity, FirefoxContainerIsolationEngine, HtmlDomNode,
     HtmlDomNodeType, ObliviousDohResolverEngine,
 };
+pub mod ethernet;
+pub mod arp;
+pub mod ipv4;
+pub mod udp;
+pub mod dhcp;
+pub mod dns;
