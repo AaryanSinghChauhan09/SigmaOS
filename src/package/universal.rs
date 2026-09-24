@@ -16,7 +16,6 @@ use crate::runtime::node_distribution::{
 
 #[cfg(any(feature = "standalone_test", test))]
 pub mod node_distribution_dummy {
-    use super::*;
     #[derive(Debug, Clone)]
     pub enum LibcFlavor {
         Musl,
@@ -70,9 +69,6 @@ pub mod node_distribution_dummy {
 }
 #[cfg(any(feature = "standalone_test", test))]
 pub use node_distribution_dummy::*;
-
-#[cfg(any(feature = "standalone_test", test))]
-use self::node_distribution_dummy::*;
 
 /// Foreign distro manifest
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -2249,6 +2245,17 @@ impl UniversalPackageManager {
 
         Ok(sigpkg)
     }
+
+    /// Automatically transpiles any foreign distro manifest (APT, Pacman, DNF, APK, XBPS, FreeBSD PKG)
+    /// into a native `UnifiedPackage` in SigmaPkg format and registers it into UniversalPackageManager.
+    pub fn transpile_foreign_to_sigpkg(
+        &mut self,
+        manifest: &ForeignDistroManifest,
+    ) -> Result<UnifiedPackage, PackageError> {
+        let sigpkg = UniversalPackageTranslator::translate_to_sigma_pkg(manifest);
+        self.add_package(sigpkg.clone());
+        Ok(sigpkg)
+    }
 }
 
 impl Default for UniversalPackageManager {
@@ -2561,6 +2568,28 @@ mod tests {
         assert!(installed
             .dependencies
             .contains(&"sovereign-libc".to_string()));
+    }
+
+    #[test]
+    fn test_transpile_foreign_to_sigpkg() {
+        let mut manager = UniversalPackageManager::new();
+
+        let pacman_manifest = ForeignDistroManifest {
+            raw_format: PackageFormat::Pacman,
+            original_name: "neovim".to_string(),
+            version: "0.9.5".to_string(),
+            architecture: "x86_64".to_string(),
+            raw_dependencies: vec!["libvterm".to_string()],
+            raw_provides: vec!["vim".to_string()],
+            raw_conflicts: vec!["neovim-qt".to_string()],
+            maintainer: "Arch Linux".to_string(),
+        };
+
+        let sigpkg = manager.transpile_foreign_to_sigpkg(&pacman_manifest).unwrap();
+        assert_eq!(sigpkg.name, "sigpkg-neovim");
+        assert_eq!(sigpkg.version, "0.9.5");
+        assert_eq!(sigpkg.formats[0], PackageFormat::SigmaPkg);
+        assert!(manager.get_package("sigpkg-neovim").is_some());
     }
 
     #[test]

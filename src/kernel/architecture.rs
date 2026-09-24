@@ -116,6 +116,110 @@ impl LookasideList {
     }
 }
 
+// 8. Symmetric Multiprocessing (SMP) Multi-Core Manager
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IpiKind {
+    Reschedule,
+    TlbFlush,
+    CallFunction,
+    Panic,
+}
+
+#[derive(Debug, Clone)]
+pub struct SmpCpuCore {
+    pub core_id: usize,
+    pub lapic_id: u32,
+    pub is_bsp: bool, // Bootstrap Processor (true for core 0)
+    pub is_online: bool,
+    pub current_irql: Irql,
+    pub active_task_count: usize,
+    pub received_ipis: Vec<IpiKind>,
+}
+
+pub struct SmpCpuCoreManager {
+    pub cores: Vec<SmpCpuCore>,
+    pub max_cores: usize,
+}
+
+impl SmpCpuCoreManager {
+    pub fn new(max_cores: usize) -> Self {
+        let mut manager = Self {
+            cores: Vec::new(),
+            max_cores,
+        };
+        // Core 0 is the Bootstrap Processor (BSP)
+        manager.cores.push(SmpCpuCore {
+            core_id: 0,
+            lapic_id: 0,
+            is_bsp: true,
+            is_online: true,
+            current_irql: Irql::PassiveLevel,
+            active_task_count: 0,
+            received_ipis: Vec::new(),
+        });
+        manager
+    }
+
+    pub fn bringup_ap_core(&mut self, core_id: usize, lapic_id: u32) -> Result<(), &'static str> {
+        if self.cores.len() >= self.max_cores {
+            return Err("Maximum CPU core limit reached");
+        }
+        if self.cores.iter().any(|c| c.core_id == core_id) {
+            return Err("Core ID already exists");
+        }
+
+        // Simulate x86_64 INIT-SIPI-SIPI or ARM64 PSCI AP bringup sequence
+        self.cores.push(SmpCpuCore {
+            core_id,
+            lapic_id,
+            is_bsp: false,
+            is_online: true,
+            current_irql: Irql::PassiveLevel,
+            active_task_count: 0,
+            received_ipis: Vec::new(),
+        });
+
+        Ok(())
+    }
+
+    pub fn dispatch_ipi(&mut self, target_core_id: Option<usize>, ipi: IpiKind) -> usize {
+        let mut count = 0;
+        for core in self.cores.iter_mut().filter(|c| c.is_online) {
+            if let Some(target) = target_core_id {
+                if core.core_id == target {
+                    core.received_ipis.push(ipi);
+                    count += 1;
+                    break;
+                }
+            } else {
+                // Broadcast IPI to all online cores
+                core.received_ipis.push(ipi);
+                count += 1;
+            }
+        }
+        count
+    }
+
+    pub fn select_least_loaded_core(&self) -> Option<usize> {
+        self.cores
+            .iter()
+            .filter(|c| c.is_online)
+            .min_by_key(|c| c.active_task_count)
+            .map(|c| c.core_id)
+    }
+
+    pub fn get_online_cores_count(&self) -> usize {
+        self.cores.iter().filter(|c| c.is_online).count()
+    }
+}
+
+impl Default for SmpCpuCoreManager {
+    fn default() -> Self {
+        Self::new(64)
+    }
+}
+
 // 7. Multi-Architecture HAL Abstractions (x86_32, x86_64, AArch64, RISC-V 32, RISC-V 64)
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
