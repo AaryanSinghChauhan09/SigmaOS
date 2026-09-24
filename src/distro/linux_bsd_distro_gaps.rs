@@ -199,35 +199,6 @@ impl Default for UsbHidKeyboardDriver {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_dynamic_devfs() {
-        let mut devfs = SovereignDynamicDevfsEngine::new();
-        assert!(devfs.add_uuid_symlink("sda", "disk/by-uuid/1234"));
-        assert!(devfs.lookup_node("disk/by-uuid/1234").is_some());
-    }
-
-    #[test]
-    fn test_stateful_nat() {
-        let mut nat = SovereignStatefulNatEngine::new([1, 2, 3, 4]);
-        let (ip, port) = nat.create_snat_mapping([10, 0, 0, 2], [8, 8, 8, 8], 1024, 80, 6);
-        assert_eq!(ip, [1, 2, 3, 4]);
-        assert_eq!(port, 1024);
-        let orig = nat.lookup_conntrack([1, 2, 3, 4], 1024);
-        assert_eq!(orig, Some(([10, 0, 0, 2], 1024)));
-    }
-
-    #[test]
-    fn test_journald_binary_storage() {
-        let mut storage = SovereignJournaldBinaryStorageEngine::new(10);
-        storage.log(1000, 3, "init", "Service started");
-        assert_eq!(storage.query_unit("init").len(), 1);
-        assert_eq!(storage.query_priority(3).len(), 1);
-    }
-}
 
 // ============================================================================
 // 3. Wireless (802.11ax / WPA3-SAE) & Bluetooth (BlueZ) Stack
@@ -1112,7 +1083,174 @@ pub type NatRule = ConntrackTableEntry;
 pub type NatRuleKind = NatType;
 
 // ============================================================================
-// 11. Universal Linux & BSD Distro Gap Resolver
+// 11. FreeBSD GEOM Class Device Topology Controller
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GeomClassKind {
+    Disk,
+    Mirror,
+    Stripe,
+    Partition,
+    Eli,
+}
+
+#[derive(Debug, Clone)]
+pub struct GeomProvider {
+    pub name: String,
+    pub class_kind: GeomClassKind,
+    pub media_size_bytes: u64,
+    pub sector_size: u32,
+    pub consumers_count: u32,
+}
+
+pub struct BsdGeomTopologyController {
+    pub providers: Vec<GeomProvider>,
+}
+
+impl BsdGeomTopologyController {
+    pub fn new() -> Self {
+        Self {
+            providers: Vec::new(),
+        }
+    }
+
+    pub fn register_provider(&mut self, name: &str, class_kind: GeomClassKind, size_bytes: u64, sector_size: u32) {
+        self.providers.push(GeomProvider {
+            name: String::from(name),
+            class_kind,
+            media_size_bytes: size_bytes,
+            sector_size,
+            consumers_count: 0,
+        });
+    }
+
+    pub fn attach_consumer(&mut self, provider_name: &str) -> Result<(), &'static str> {
+        let provider = self.providers.iter_mut().find(|p| p.name == provider_name).ok_or("GEOM provider not found")?;
+        provider.consumers_count += 1;
+        Ok(())
+    }
+}
+
+impl Default for BsdGeomTopologyController {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 12. Linux TUN/TAP Virtual Interface Engine
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TunTapMode {
+    Tun,
+    Tap,
+}
+
+#[derive(Debug, Clone)]
+pub struct TunTapInterface {
+    pub ifname: String,
+    pub mode: TunTapMode,
+    pub persistent: bool,
+    pub owner_uid: u32,
+}
+
+pub struct TunTapInterfaceEngine {
+    pub interfaces: Vec<TunTapInterface>,
+}
+
+impl TunTapInterfaceEngine {
+    pub fn new() -> Self {
+        Self {
+            interfaces: Vec::new(),
+        }
+    }
+
+    pub fn create_interface(&mut self, ifname: &str, mode: TunTapMode, owner_uid: u32) -> Result<String, &'static str> {
+        if self.interfaces.iter().any(|i| i.ifname == ifname) {
+            return Err("Interface name already exists");
+        }
+        self.interfaces.push(TunTapInterface {
+            ifname: String::from(ifname),
+            mode,
+            persistent: true,
+            owner_uid,
+        });
+        Ok(String::from(ifname))
+    }
+}
+
+impl Default for TunTapInterfaceEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 13. Linux cgroups v2 Unified Resource Controller Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct CgroupV2Node {
+    pub path: String,
+    pub memory_max_bytes: u64,
+    pub cpu_weight: u32,
+    pub pids_max: u32,
+    pub member_pids: Vec<u32>,
+}
+
+pub struct CgroupsV2ControllerEngine {
+    pub cgroups: Vec<CgroupV2Node>,
+}
+
+impl CgroupsV2ControllerEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            cgroups: Vec::new(),
+        };
+        // Root cgroup
+        engine.cgroups.push(CgroupV2Node {
+            path: String::from("/"),
+            memory_max_bytes: 0,
+            cpu_weight: 100,
+            pids_max: 0,
+            member_pids: Vec::new(),
+        });
+        engine
+    }
+
+    pub fn create_cgroup(&mut self, path: &str, memory_max_bytes: u64, cpu_weight: u32, pids_max: u32) -> Result<(), &'static str> {
+        if self.cgroups.iter().any(|c| c.path == path) {
+            return Err("Cgroup path already exists");
+        }
+        self.cgroups.push(CgroupV2Node {
+            path: String::from(path),
+            memory_max_bytes,
+            cpu_weight,
+            pids_max,
+            member_pids: Vec::new(),
+        });
+        Ok(())
+    }
+
+    pub fn attach_pid(&mut self, path: &str, pid: u32) -> Result<(), &'static str> {
+        let cgroup = self.cgroups.iter_mut().find(|c| c.path == path).ok_or("Cgroup path not found")?;
+        if !cgroup.member_pids.contains(&pid) {
+            cgroup.member_pids.push(pid);
+        }
+        Ok(())
+    }
+}
+
+impl Default for CgroupsV2ControllerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// Universal Linux & BSD Distro Gap Resolver
 // ============================================================================
 
 #[cfg(test)]
@@ -1232,7 +1370,7 @@ mod tests {
 
     #[test]
     fn test_sovereign_dns_tls_resolver() {
-        let resolver = SovereignDnsTlsResolverEngine::new([1, 1, 1, 1]);
+        let mut resolver = SovereignDnsTlsResolverEngine::new([1, 1, 1, 1]);
         let localhost_ip = resolver.resolve_domain("localhost").unwrap();
         assert_eq!(localhost_ip, [127, 0, 0, 1]);
     }
@@ -1257,5 +1395,34 @@ mod tests {
         resolver.faillock_guard.record_failure();
         resolver.faillock_guard.reset();
         assert!(!resolver.faillock_guard.is_locked);
+    }
+
+    #[test]
+    fn test_freebsd_geom_topology_controller() {
+        let mut geom = BsdGeomTopologyController::new();
+        geom.register_provider("ada0", GeomClassKind::Disk, 100_000_000, 512);
+        assert_eq!(geom.providers.len(), 1);
+        assert!(geom.attach_consumer("ada0").is_ok());
+        assert_eq!(geom.providers[0].consumers_count, 1);
+        assert!(geom.attach_consumer("nonexistent").is_err());
+    }
+
+    #[test]
+    fn test_tuntap_interface_engine() {
+        let mut tuntap = TunTapInterfaceEngine::new();
+        let name = tuntap.create_interface("tap0", TunTapMode::Tap, 1000).unwrap();
+        assert_eq!(name, "tap0");
+        assert_eq!(tuntap.interfaces.len(), 1);
+        assert!(tuntap.create_interface("tap0", TunTapMode::Tap, 1000).is_err());
+    }
+
+    #[test]
+    fn test_cgroups_v2_controller_engine() {
+        let mut cgroups = CgroupsV2ControllerEngine::new();
+        assert_eq!(cgroups.cgroups.len(), 1); // root cgroup
+        assert!(cgroups.create_cgroup("/system.slice", 1024 * 1024 * 512, 100, 1000).is_ok());
+        assert!(cgroups.attach_pid("/system.slice", 1234).is_ok());
+        assert_eq!(cgroups.cgroups[1].member_pids, vec![1234]);
+        assert!(cgroups.create_cgroup("/system.slice", 0, 0, 0).is_err());
     }
 }

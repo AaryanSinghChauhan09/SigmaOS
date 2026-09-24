@@ -26,6 +26,13 @@ pub enum ServiceStatus {
     Stopped,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SocketActivationSpec {
+    pub listen_port: u16,
+    pub protocol: String, // "tcp" or "udp"
+    pub fd_num: i32,
+}
+
 #[derive(Debug, Clone)]
 pub struct ServiceDescriptor {
     pub name: String,
@@ -36,6 +43,11 @@ pub struct ServiceDescriptor {
     pub status: ServiceStatus,
     pub pid: Option<u32>,
     pub restart_count: u32,
+    pub socket_activation: Option<SocketActivationSpec>,
+    pub watchdog_timeout_sec: u64,
+    pub last_watchdog_ping_sec: u64,
+    pub cpu_limit_percent: u32,
+    pub memory_limit_mb: u64,
 }
 
 impl ServiceDescriptor {
@@ -49,7 +61,32 @@ impl ServiceDescriptor {
             status: ServiceStatus::Inactive,
             pid: None,
             restart_count: 0,
+            socket_activation: None,
+            watchdog_timeout_sec: 0, // 0 = disabled
+            last_watchdog_ping_sec: 0,
+            cpu_limit_percent: 100,
+            memory_limit_mb: 0, // 0 = unlimited
         }
+    }
+
+    pub fn with_socket_activation(mut self, port: u16, protocol: &str, fd: i32) -> Self {
+        self.socket_activation = Some(SocketActivationSpec {
+            listen_port: port,
+            protocol: String::from(protocol),
+            fd_num: fd,
+        });
+        self
+    }
+
+    pub fn with_watchdog(mut self, timeout_sec: u64) -> Self {
+        self.watchdog_timeout_sec = timeout_sec;
+        self
+    }
+
+    pub fn with_resource_limits(mut self, cpu_pct: u32, mem_mb: u64) -> Self {
+        self.cpu_limit_percent = cpu_pct;
+        self.memory_limit_mb = mem_mb;
+        self
     }
 }
 
@@ -118,6 +155,48 @@ impl ServiceSupervisor {
             false
         }
     }
+
+    pub fn ping_watchdog(&mut self, name: &str, current_time_sec: u64) -> Result<(), &'static str> {
+        let service = self.services.get_mut(name).ok_or("Service not found")?;
+        service.last_watchdog_ping_sec = current_time_sec;
+        Ok(())
+    }
+
+    pub fn check_watchdog_probes(&mut self, current_time_sec: u64) -> Vec<String> {
+        let mut timed_out = Vec::new();
+        for (name, service) in self.services.iter_mut() {
+            if service.status == ServiceStatus::Running && service.watchdog_timeout_sec > 0 {
+                let elapsed = current_time_sec.saturating_sub(service.last_watchdog_ping_sec);
+                if elapsed > service.watchdog_timeout_sec {
+                    timed_out.push(name.clone());
+                }
+            }
+        }
+
+        for name in &timed_out {
+            self.handle_service_exit(name, -1);
+        }
+
+        timed_out
+    }
+
+    pub fn trigger_socket_activation(&mut self, port: u16) -> Result<u32, &'static str> {
+        let mut target_service = None;
+        for (name, service) in &self.services {
+            if let Some(ref sock) = service.socket_activation {
+                if sock.listen_port == port {
+                    target_service = Some(name.clone());
+                    break;
+                }
+            }
+        }
+
+        if let Some(name) = target_service {
+            self.start_service(&name)
+        } else {
+            Err("No service registered for socket activation on target port")
+        }
+    }
 }
 
 impl Default for ServiceSupervisor {
@@ -144,5 +223,46 @@ mod tests {
 
         let stopped = supervisor.stop_service("nginx");
         assert!(stopped.is_ok());
+    }
+
+    #[test]
+    fn test_socket_activation() {
+        let mut supervisor = ServiceSupervisor::new();
+        let svc = ServiceDescriptor::new("sshd", "/usr/sbin/sshd", RestartPolicy::Always)
+            .with_socket_activation(22, "tcp", 3)
+            .with_resource_limits(50, 512);
+
+        supervisor.register_service(svc);
+
+        assert_eq!(supervisor.services["sshd"].status, ServiceStatus::Inactive);
+
+        let pid = supervisor.trigger_socket_activation(22).unwrap();
+        assert!(pid >= 100);
+        assert_eq!(supervisor.services["sshd"].status, ServiceStatus::Running);
+
+        assert!(supervisor.trigger_socket_activation(80).is_err());
+    }
+
+    #[test]
+    fn test_watchdog_health_probes() {
+        let mut supervisor = ServiceSupervisor::new();
+        let svc = ServiceDescriptor::new("db_daemon", "/usr/bin/db", RestartPolicy::Always)
+            .with_watchdog(10); // 10s watchdog
+
+        supervisor.register_service(svc);
+        supervisor.start_service("db_daemon").unwrap();
+
+        // Initial ping at t=100
+        assert!(supervisor.ping_watchdog("db_daemon", 100).is_ok());
+
+        // Check at t=105 (elapsed 5s <= 10s) -> no timeout
+        let timed_out = supervisor.check_watchdog_probes(105);
+        assert!(timed_out.is_empty());
+
+        // Check at t=115 (elapsed 15s > 10s) -> timeout and automatic restart triggered!
+        let timed_out_late = supervisor.check_watchdog_probes(115);
+        assert_eq!(timed_out_late, vec!["db_daemon".to_string()]);
+        assert_eq!(supervisor.services["db_daemon"].restart_count, 1);
+        assert_eq!(supervisor.services["db_daemon"].status, ServiceStatus::Running);
     }
 }
