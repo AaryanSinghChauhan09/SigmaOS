@@ -1,90 +1,131 @@
-# SigmaOS Linux & BSD Distro Development Roadmap & Issue Matrix
+# SigmaOS Practical Distro-Inspired Master Roadmap
 
-This roadmap details prioritized development initiatives inspired by leading Linux & BSD distribution paradigms (Arch, Fedora, FreeBSD, OpenBSD, NixOS, Void Linux, Clear Linux, Haiku).
-
----
-
-## 🛡️ 1. Security & Sandboxing
-
-### 1.1 Per-Tab Capability Model (Pledge / Unveil / Capsicum)
-- **Status:** Implemented in `src/distro/wiki_ideas_implementation.rs` & `src/security/input_validation.rs`.
-- **Target:** Enforce least privilege process boundaries at launch time across Linux (seccomp/bpf), macOS (app sandbox), and BSDs (Capsicum/pledge/unveil).
-- **Metric:** 100% of renderer helper processes launched in sandboxed capability mode.
-
-### 1.2 SBOM Generation, Sigstore Cosign Signing & CVE Scanning
-- **Status:** Implemented in `.github/workflows/sbom-cosign-cve-scan-ci.yml` & `src/sigpkg/verifier.rs`.
-- **Target:** Automated SPDX/CycloneDX SBOM generation, Post-Quantum Dilithium-5 / Cosign signing, and vulnerability tracking via `SecurityAdvisoryTracker`.
-- **Metric:** Zero unmitigated critical CVEs in production release artifacts.
+> **Strategic Vision:** Borrow the best ideas from Linux and BSD without becoming a generic clone.
+> - **Linux Contributions:** Hardware support, driver ecosystem, rich package availability, modern desktop tooling, Wayland graphics stack.
+> - **BSD Contributions:** Simplicity, clean defaults, security discipline (pledge/unveil, pf firewall), predictable service management (`rc.conf`), ZFS/Btrfs boot environments, clear privilege boundaries.
+> - **Hybrid Formula:** Linux Kernel + BSD Service/Security Design + Debian Stability + Arch Velocity + Nix Reproducibility.
 
 ---
 
-## 🚀 2. Release Engineering & Atomic Updates
-
-### 2.1 Atomic Updates & One-Click Rollback (OSTree / Snapper Parity)
-- **Status:** Implemented in `src/compatibility/fedora.rs` (`FedoraOfflineUpdateEngine`) & `src/distro/wiki_ideas_implementation.rs` (Btrfs/Snapper recovery).
-- **Target:** Transactional offline system updates with instant subvolume rollback.
-- **Metric:** 100% update success rate with 0 bricked system states.
-
-### 2.2 Reproducible Build Verification Pipeline
-- **Status:** Implemented in `src/sigpkg/sovereign_sigpkg.rs` (`ReproducibleBuildContext`) & `src/arch_kernel_inspirations.rs`.
-- **Target:** Diffoscope-style bit-for-bit build verification normalized via `SOURCE_DATE_EPOCH`.
-- **Metric:** > 99% bit-for-bit binary reproducibility across release targets.
+## 🏛️ 1. Base Philosophy
+- **Stable by Default, Modern when Needed:** Production-worthy baseline with rolling edge channel option.
+- **Minimal, Not Barebones:** Clean defaults out of the box with zero unwanted bloatware.
+- **Secure Defaults Out of the Box:** Deny-by-default firewall (`pf`), default umask `0027`, AppArmor/Landlock process sandboxing.
+- **Declarative Configuration:** Unified system state governance (`login.conf`, `/etc/environment.d`, `rc.conf`).
+- **Transactional Updates:** Atomic upgrades with zero-downtime rollback capabilities.
+- **Strict Separation of Concerns:** Core OS (`/usr`), dynamic state (`/var`), system config (`/etc`), user data (`/home`).
 
 ---
 
-## ⚡ 3. Process Control & System Supervision
+## 🧩 2. Core System Layers & Architecture
+A desktop operating system requires a rock-solid system foundation.
 
-### 3.1 Void Linux Runit Supervisor & Automated Health Checks
-- **Status:** Implemented in `src/distro/void_runit.rs`.
-- **Target:** 3-stage process supervision with automated failure threshold detection and recovery.
-- **Metric:** < 100ms service restart latency on failure.
+### Package Management Subsystem (`sigpkg`)
+- **Cryptographic Trust:** Signed packages only (Dilithium-5 PQC + Ed25519 GPG).
+- **Multi-Format Interoperability:** Transpilation and CLI bridging for `apt`, `pacman`, `dnf`, `zypper`, `apk`, `xbps`, `ebuild`, `pkg`, `nix`.
+- **Dependency Resolution:** SemVer-aware constraint resolution with automatic conflict detection.
+- **Transactional Generations:** O(1) Btrfs/ZFS snapshot rollbacks (`sigpkg rollback <generation>`).
+- **Release Channels:** `stable`, `testing`, `unstable`/`rolling`.
 
-### 3.2 Linux Cgroups v2 & FreeBSD rctl Quota Enforcement
-- **Status:** Implemented in `src/memory/resource_allocator.rs` & `src/unimplemented_tools.rs`.
-- **Target:** Strict per-process memory, CPU, and IO bandwidth limits.
-- **Metric:** Zero system-wide out-of-memory (OOM) lockups under high render load.
+### Init & Service Management
+- **Supervisor & Service Model:** Declarative service units with dependency tracking, health checks, socket activation, and restart policies.
+- **BSD-Inspired Simplicity:** `rc.conf`-style toggle syntax for fast service governance.
 
----
-
-## 🖥️ 4. Native Desktop & JS Reduction
-
-### 4.1 Native WASM Desktop UI & Accessibility Engine
-- **Status:** Implemented in `zenith_desktop/src/lib.rs` & `src/desktop/web_wasm_bridge.rs`.
-- **Target:** Direct Rust/WASM event routing for keyboard focus, ARIA attributes, and DOM manipulation without JavaScript runtime overhead.
-- **Metric:** 0ms JavaScript event loop blockage during desktop navigation.
+### Boot, Filesystem & Updates
+- **Standard Hierarchy:** FHS-compliant `/etc`, `/var`, `/srv`, `/home`, `/sovereign/store`.
+- **Secure Boot & Fallbacks:** Signed EFI bootloaders with automated fallback entries.
+- **Atomic Upgrades:** A/B partition swapping or snapshot-based transactional migration (`sigma-update`).
 
 ---
 
-## 📑 5. Formal Strategic Roadmap (Next 2 Years)
+## 🛡️ 3. Security Discipline
+Security integrated as a foundational pillar rather than an add-on.
 
-### 🔹 Q4 2026 – Q2 2027
-- **Compatibility layers** → Seamless support for Linux/Windows apps.
-- **Immutable userland layers** → Atomic updates, eliminating dependency conflicts.
-- **Contributor charter** → Publish governance and contribution guidelines.
-- **Zenith desktop refinement** → Improve usability and polish.
-
-### 🔹 Q3 2027 – Q1 2028
-- **Shard implementation** → Roll out core shards (media, networking, storage).
-- **Firmware‑free drivers** → Replace opaque blobs with transparent Rust drivers.
-- **Composable boot sequences** → Scriptable boot flows for multi‑boot and encrypted startup.
-- **Clustered peripherals** → Enable device pooling across SigmaOS nodes.
-
-### 🔹 Q2 2028 – Q4 2028
-- **Programmable scheduler** → User‑defined scheduling policies.
-- **Network‑native OS state** → Pause a session on one device, resume seamlessly on another.
-- **Shards marketplace** → Curated ecosystem for modular SigmaOS apps.
-- **Temporal filesystem** → Native time‑travel for system state.
+- **Stateful Firewall:** Default `pf`-style packet filtering with sane desktop profiles.
+- **Mandatory Access Control:** Landlock v5 + AppArmor/SELinux system call filtering.
+- **Process Sandboxing:** OpenBSD `pledge()` and `unveil()` path restriction across userland binaries.
+- **Executable Protection:** Zorin Exec Guard path boundary verification to prevent sandboxing bypasses.
+- **Immutable Rootfs:** Read-only system partition mount overlays.
+- **Supply Chain Integrity:** Automated SBOM generation and CAS checksum verification.
 
 ---
 
-## ⚔️ 6. Strategy to Defeat Linux Distros
-- **Sovereignty over hardware** → Linux still depends on vendor blobs; SigmaOS must enforce firmware‑free drivers.
-- **Declarative simplicity** → Replace Linux’s fragmented package ecosystem with declarative manifests and immutable layers.
-- **Cluster‑native design** → Linux dominates servers, but SigmaOS can leap ahead by treating devices as pooled resources across nodes.
-- **Security by design** → Rust safety + OpenBSD‑style hardening = stronger guarantees than Linux.
-- **Unified vision** → Linux is fragmented across distros; SigmaOS must remain coherent, with shards as the single modular path.
+## 🖥️ 4. Modern Zenith Desktop Environment
+A coherent, Wayland-first desktop OS experience.
+
+- **Wayland-First Compositor:** Zenith compositor with GPU acceleration, dynamic tiling, and floating window management.
+- **Integrated Control Center:** System settings app managing displays, sound, network, power, updates, and themes.
+- **Polish & Consistency:** Integrated lock screen, session controls, notifications daemon, system tray, and app launcher.
+- **XDG Compliance:** Full XDG desktop portals, MIME type associations, and Wayland clipboard management.
 
 ---
 
-## 🌍 7. Outcome
-By 2028, SigmaOS will position itself as the **first sovereign OS**: modular, cluster‑native, firmware‑free, and declarative — offering clarity and resilience where Linux distros remain fragmented.
+## 📦 5. Software Ecosystem & Package Categories
+- **Curated Base Repository:** Core OS utilities, security tools, and system libraries.
+- **Containerized Apps:** Flatpak and AppImage integration out-of-the-box.
+- **Developer Toolchains:** Rust, Go, Python, Node.js, C/C++, Java, and Zig toolchains with version manager isolation (`mise`/`asdf`).
+- **Categorized Software Store:** GUI Apps, Dev Tools, System Utilities, Media/Productivity, Gaming & Creative.
+
+---
+
+## ⚙️ 6. System Administration & Ergonomics
+- **Dual GUI/CLI Parity:** Every GUI setting backed by a clean CLI equivalent tool (`sigma-ctl`, `sigpkg`, `timedatectl`).
+- **Unified Settings Manager:** User permissions, network profiles, storage mounts, power profiles, and backups.
+- **Comprehensive Documentation:** Manpages, interactive CLI guides (`sigma-help`), and offline documentation.
+
+---
+
+## 💾 7. Resilient Storage & Recovery
+- **Snapshot Infrastructure:** Btrfs / ZFS boot environments (`bectl` / Snapper parity).
+- **Disk Telemetry:** NVMe/SATA SMART disk health monitoring and thermal warnings.
+- **Backup & Recovery Suite:** Native snapshot restore and home directory backup utility (`sigma-backup`).
+
+---
+
+## 🌐 8. Predictable Networking & Connectivity
+- **Unified Network Manager:** Wi-Fi, Ethernet, WireGuard/Tailscale VPN, and DNS governance.
+- **Virtualization & Containers:** Native lightweight pod lifecycle (`Podman`/`Docker` parity) and MicroVM support (`Firecracker`).
+
+---
+
+## 🛠️ 9. Developer & Power-User Workflows
+- **Preinstalled Dev Stacks:** One-command environment bootstrap (`sigma-setup dev`).
+- **Neovim Omakase IDE:** Native preconfigured IDE (`sigma-nvim`) with LSP support.
+- **System Tracing & Debugging:** eBPF event tracing and system diagnostics (`htop`, `lsof`, `strace` parity).
+
+---
+
+## 🚀 10. Release Discipline & Maintenance
+- **Release Tracks:**
+  - `v1.0 Stable`: LTS base with conservative updates.
+  - `Testing`: Staged evaluation for upcoming point releases.
+  - `Nightly/Rolling`: Rolling edge updates for developers.
+- **Versioned ISO Distributions:** Bootable ISO media verified with Rufus/Ventoy checksums.
+
+---
+
+## 🗺️ 11. Implementation Phases & Milestones
+
+### Phase 1: Foundation Baseline
+- Universal Package Manager (`sigpkg`) with multi-distro format support.
+- Signed repository metadata and GPG keyring trust pipeline.
+- Service supervisor and atomic snapshot rollback engine.
+
+### Phase 2: Desktop Polish
+- Zenith Wayland compositor features and display configuration.
+- Unified Settings app and file manager (`sigma-fm`).
+- Input methods, power management, and desktop accessibility.
+
+### Phase 3: Security & Isolation
+- Default `pf` firewall rules and AppArmor/Landlock profiles.
+- OpenBSD pledge/unveil sandboxing for app execution.
+- Exec Guard path boundary verification.
+
+### Phase 4: Ecosystem & Tooling
+- Software Manager GUI (`sigpkg-gui`) and AppStream catalog integration.
+- Language version managers and developer environment presets.
+- Container and VM orchestration.
+
+### Phase 5: Production Release
+- Stable ISO build pipeline and automated release criteria checks.
+- Comprehensive user and developer documentation.

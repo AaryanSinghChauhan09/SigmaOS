@@ -15,7 +15,8 @@ SigmaOS synthesizes best-of-breed innovations from major Linux and BSD distribut
 * **Debian / Ubuntu:** `UbuntuAppArmorEngine`, `MultiArchAptPinningResolver`, `GStreamerPulseAudioPipeline`.
 * **Arch Linux:** `PacmanContribSuite`, `ArchWikiKnowledgeBaseEngine`, `YayParuAdapter`, `ArchTestingRepository`.
 * **NixOS:** `NixOsFlakesEngine`, `NixOsDeclarativeConfigEngine`, `SovereignNixGcEngine`.
-* **FreeBSD / OpenBSD / NetBSD:** `FreeBsdJailSandboxEngine`, `FreeBsdCapsicumEngine`, `OpenBsdUnveilFilter`, `NetBsdPkgsrcEngine`, `MpvFreeBsdSndioEngine`.
+* **FreeBSD / OpenBSD / NetBSD:** `FreeBsdJailSandboxEngine`, `FreeBsdCapsicumEngine`, `OpenBsdUnveilFilter`, `NetBsdPkgsrcEngine`, `MpvFreeBsdSndioEngine`, `SovereignBsdAudioDriver`.
+* **Hardware Drivers & Boot Systems:** `SovereignNvmeDriver` (NVMe passthrough queues), `SovereignXhciDriver` (USB xHCI transfer rings), `SovereignServiceManifest` (declarative init service manifests), and `GtkCssProvider` (programmatic Rust UI theme defaults).
 
 ## 3. Kernel Class Operation Vtable Architecture
 

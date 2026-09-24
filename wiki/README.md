@@ -1,47 +1,16 @@
-# 🚀 SigmaOS — Desktop Edition
+# SigmaOS Documentation Index
 
-SigmaOS is a secure, fast, opinionated Rust desktop operating system with atomic updates, capability-based applications, and a curated Zenith workflow.
+Welcome to the SigmaOS Desktop Edition documentation repository.
 
-Inspired by Omarchy Linux, SigmaOS evolves from a broad OS research platform into a **bootable, user-focused desktop distribution** with a clear, demonstrable path:
+## 🎯 Core Strategy & Product Specifications
+- [Product Vision](PRODUCT_VISION.md) — Strategic statement and Omarchy-inspired desktop principles.
+- [Release Criteria](RELEASE_CRITERIA.md) — Milestone quality gates for bootable desktop ISO releases.
+- [Hardware Support Matrix](SUPPORT_MATRIX.md) — QEMU reference platform and hardware targets.
+- [Master Roadmap](ROADMAP.md) — Chronological execution phases (M0 to M7).
+- [Practical Distro-Inspired Master Roadmap](SIGMA_OS_DISTRO_ROADMAP.md) — 11-pillar strategic blueprint combining Linux hardware support and BSD security discipline.
+- [Strategic Plan Inspired by Linux & BSD](SIGMAOS_STRATEGIC_DEVELOPMENT_PLAN_LINUX_BSD.md) — 5 core strategic pillars.
 
-```
-boot → install → login → Zenith desktop → package installation → update → rollback
-```
-
----
-
-## 📜 Key Engineering & Vision Documents
-- 🎯 **Product Vision & Manifesto**: [docs/PRODUCT_VISION.md](docs/PRODUCT_VISION.md)
-- 📋 **Release Criteria & Quality Gates**: [docs/RELEASE_CRITERIA.md](docs/RELEASE_CRITERIA.md)
-- 🖥️ **Hardware Support Matrix**: [docs/SUPPORT_MATRIX.md](docs/SUPPORT_MATRIX.md)
-- 🗺️ **Master Execution Roadmap**: [docs/ROADMAP.md](docs/ROADMAP.md)
-- 📦 **Universal Package System Plan**: [docs/UNIVERSAL_PACKAGE_SYSTEM_IMPLEMENTATION_PLAN.md](docs/UNIVERSAL_PACKAGE_SYSTEM_IMPLEMENTATION_PLAN.md)
-- ⚡ **Strategy vs Legacy Distros**: [docs/STRATEGY_TO_SURPASS_AND_DEFEAT_LINUX_BSD.md](docs/STRATEGY_TO_SURPASS_AND_DEFEAT_LINUX_BSD.md)
-
----
-
-## 🧩 Core Product Features
-- **Zenith Compositor & Keyboard-Driven Shell**: Responsive Wayland tiling desktop with Omarchy-inspired agentic steering (Bolt ⚡, Palette 🎨, Sentinel 🛡️).
-- **Atomic System Updates**: Dual-root A/B images (`mkosi` / `sysupdate`) with sub-second Copy-on-Write (CoW) rollback.
-- **Universal Package Engine (`sigpkg`)**: Native signed `.sigpkg` packages with support for 60+ Linux & BSD package extensions via containerized wrappers (`apx`).
-- **Zorin Exec Guard Security**: Default-deny capability permission model that intercepts untrusted binaries and recommends verified native or WebApp alternatives.
-- **Declarative System Preferences**: Simple, validated TOML preference profiles (`/system/profile.toml`, `/user/preferences.toml`).
-
----
-
-## 🛠️ Quick Start & Verification
-```bash
-# Build the core library
-cargo check --lib
-
-# Run native Rust test suites
-./run_sigma_tests.sh
-
-# Run Python integration & fuzz tests
-pytest tests/
-```
-
----
-
-## 📄 License
-SigmaOS is licensed under the [MIT License](LICENSE).
+## 📦 Package Engine & Technical Specs
+- [Universal Package System Implementation Plan](UNIVERSAL_PACKAGE_SYSTEM_IMPLEMENTATION_PLAN.md) — Universal packaging engine architecture.
+- [Strategy to Surpass & Defeat Linux/BSD](STRATEGY_TO_SURPASS_AND_DEFEAT_LINUX_BSD.md) — Competitive differentiators and memory safety guarantees.
+- [Linux Distro Parity Checklist](LINUX_DISTRO_PARITY_CHECKLIST.md) — Subsystem feature parity tracking.
