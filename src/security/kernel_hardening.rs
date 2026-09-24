@@ -497,3 +497,262 @@ impl HardenedSyscallDispatcher {
         self.syscall_rate_counter.store(0, Ordering::SeqCst);
     }
 }
+
+// =========================================================================
+// 5. User Mode (Ring 3) Hardware Isolation & Task State Segment (TSS) Engine
+// =========================================================================
+
+/// x86_64 Privilege Rings (0 = Kernel, 1 = Hypervisor, 2 = Drivers, 3 = Userland)
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum PrivilegeRing {
+    Ring0Kernel = 0,
+    Ring1Hypervisor = 1,
+    Ring2Drivers = 2,
+    Ring3Userland = 3,
+}
+
+/// x86_64 Hardware Task State Segment (TSS64) for Ring 3 -> Ring 0 Stack Switching & IST
+#[repr(C, packed)]
+#[derive(Debug, Clone, Copy)]
+pub struct TaskStateSegment64 {
+    pub reserved_0: u32,
+    pub rsp0: u64, // Privilege Level 0 (Ring 0) Stack Pointer for Sycall/Interrupt Entry
+    pub rsp1: u64,
+    pub rsp2: u64,
+    pub reserved_1: u64,
+    pub ist1: u64, // Interrupt Stack Table 1 (Double Fault Stack)
+    pub ist2: u64, // Interrupt Stack Table 2 (NMI Stack)
+    pub ist3: u64, // Interrupt Stack Table 3 (Machine Check Stack)
+    pub ist4: u64,
+    pub ist5: u64,
+    pub ist6: u64,
+    pub ist7: u64,
+    pub reserved_2: u64,
+    pub reserved_3: u16,
+    pub iomap_base: u16, // Offset to I/O Permission Bitmap
+}
+
+impl Default for TaskStateSegment64 {
+    fn default() -> Self {
+        Self {
+            reserved_0: 0,
+            rsp0: 0,
+            rsp1: 0,
+            rsp2: 0,
+            reserved_1: 0,
+            ist1: 0,
+            ist2: 0,
+            ist3: 0,
+            ist4: 0,
+            ist5: 0,
+            ist6: 0,
+            ist7: 0,
+            reserved_2: 0,
+            reserved_3: 0,
+            iomap_base: core::mem::size_of::<Self>() as u16,
+        }
+    }
+}
+
+/// Global Descriptor Table (GDT) Segment Descriptor
+#[repr(C, packed)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct GdtSegmentDescriptor {
+    pub limit_low: u16,
+    pub base_low: u16,
+    pub base_mid: u8,
+    pub access_byte: u8,
+    pub flags_limit_high: u8,
+    pub base_high: u8,
+}
+
+impl GdtSegmentDescriptor {
+    pub fn new_code_segment(ring: PrivilegeRing) -> Self {
+        let access = match ring {
+            PrivilegeRing::Ring0Kernel => 0x9A, // Present, Ring 0, Code, Executable, Readable
+            PrivilegeRing::Ring3Userland => 0xFA, // Present, Ring 3, Code, Executable, Readable
+            _ => 0xBA,
+        };
+        Self {
+            limit_low: 0xFFFF,
+            base_low: 0,
+            base_mid: 0,
+            access_byte: access,
+            flags_limit_high: 0xAF, // 64-bit Long Mode flag, 4KB granularity
+            base_high: 0,
+        }
+    }
+
+    pub fn new_data_segment(ring: PrivilegeRing) -> Self {
+        let access = match ring {
+            PrivilegeRing::Ring0Kernel => 0x92, // Present, Ring 0, Data, Writable
+            PrivilegeRing::Ring3Userland => 0xF2, // Present, Ring 3, Data, Writable
+            _ => 0xB2,
+        };
+        Self {
+            limit_low: 0xFFFF,
+            base_low: 0,
+            base_mid: 0,
+            access_byte: access,
+            flags_limit_high: 0xCF,
+            base_high: 0,
+        }
+    }
+}
+
+/// Sovereign User Mode (Ring 3) Hardware Isolation & TSS Engine
+/// Inspired by Linux and FreeBSD x86_64 GDT/TSS hardware ring separation
+#[derive(Debug)]
+pub struct SovereignRing3UserModeTssEngine {
+    pub tss: TaskStateSegment64,
+    pub current_ring: PrivilegeRing,
+    pub kernel_cs: u16,
+    pub kernel_ds: u16,
+    pub user_cs: u16,
+    pub user_ds: u16,
+    pub tss_selector: u16,
+    pub active_user_entry: u64,
+    pub active_user_rsp: u64,
+}
+
+impl SovereignRing3UserModeTssEngine {
+    pub fn new(kernel_rsp0: u64, double_fault_ist: u64) -> Self {
+        let mut tss = TaskStateSegment64::default();
+        tss.rsp0 = kernel_rsp0;
+        tss.ist1 = double_fault_ist;
+
+        Self {
+            tss,
+            current_ring: PrivilegeRing::Ring0Kernel,
+            kernel_cs: 0x08, // Ring 0 Kernel Code Selector (GDT Index 1, RPL 0)
+            kernel_ds: 0x10, // Ring 0 Kernel Data Selector (GDT Index 2, RPL 0)
+            user_cs: 0x23,   // Ring 3 User Code Selector (GDT Index 4, RPL 3 = 0x20 | 3)
+            user_ds: 0x2B,   // Ring 3 User Data Selector (GDT Index 5, RPL 3 = 0x28 | 3)
+            tss_selector: 0x30, // TSS Selector (GDT Index 6)
+            active_user_entry: 0,
+            active_user_rsp: 0,
+        }
+    }
+
+    /// Update Kernel Stack Pointer (RSP0) in TSS prior to returning to Ring 3
+    pub fn set_kernel_stack_rsp0(&mut self, rsp0: u64) {
+        self.tss.rsp0 = rsp0;
+    }
+
+    /// Configure Interrupt Stack Table (IST) stack pointer for dedicated exception handlers
+    pub fn set_interrupt_stack_table(
+        &mut self,
+        ist_index: usize,
+        ist_stack: u64,
+    ) -> Result<(), &'static str> {
+        match ist_index {
+            1 => self.tss.ist1 = ist_stack,
+            2 => self.tss.ist2 = ist_stack,
+            3 => self.tss.ist3 = ist_stack,
+            4 => self.tss.ist4 = ist_stack,
+            5 => self.tss.ist5 = ist_stack,
+            6 => self.tss.ist6 = ist_stack,
+            7 => self.tss.ist7 = ist_stack,
+            _ => return Err("Invalid IST index (must be 1..=7)"),
+        }
+        Ok(())
+    }
+
+    /// Calculates Segment Selector given GDT Index and Requested Privilege Level (RPL)
+    pub fn calculate_selector(index: u16, ring: PrivilegeRing) -> u16 {
+        (index << 3) | (ring as u16)
+    }
+
+    /// Prepares hardware transition parameters for entering Ring 3 user mode
+    pub fn switch_to_ring3_user_mode(
+        &mut self,
+        user_entry_point: u64,
+        user_rsp: u64,
+    ) -> Result<(u16, u16, u64, u64), &'static str> {
+        if user_entry_point == 0 || user_rsp == 0 {
+            return Err("Invalid NULL entry point or stack pointer for Ring 3 transition");
+        }
+
+        self.active_user_entry = user_entry_point;
+        self.active_user_rsp = user_rsp;
+        self.current_ring = PrivilegeRing::Ring3Userland;
+
+        // Returns (User CS, User DS, User RIP, User RSP)
+        Ok((self.user_cs, self.user_ds, user_entry_point, user_rsp))
+    }
+
+    /// Validates whether an instruction pointer and segment selector comply with Ring 3 user isolation
+    pub fn validate_ring3_isolation(&self, cs_selector: u16, rip: u64) -> bool {
+        let rpl = cs_selector & 0x3;
+        let is_user_rpl = rpl == (PrivilegeRing::Ring3Userland as u16);
+        let is_user_address = rip < 0x0000_8000_0000_0000; // Lower-half canonical user address space
+
+        is_user_rpl && is_user_address
+    }
+}
+
+impl Default for SovereignRing3UserModeTssEngine {
+    fn default() -> Self {
+        Self::new(0xFFFF_8000_000F_0000, 0xFFFF_8000_000F_F000)
+    }
+}
+
+#[cfg(test)]
+mod tests_tss {
+    use super::*;
+
+    #[test]
+    fn test_sovereign_ring3_user_mode_tss_engine() {
+        let mut engine = SovereignRing3UserModeTssEngine::new(0xFFFF_8000_0010_0000, 0xFFFF_8000_0020_0000);
+
+        assert_eq!(engine.tss.rsp0, 0xFFFF_8000_0010_0000);
+        assert_eq!(engine.tss.ist1, 0xFFFF_8000_0020_0000);
+        assert_eq!(engine.current_ring, PrivilegeRing::Ring0Kernel);
+
+        // Test updating rsp0
+        engine.set_kernel_stack_rsp0(0xFFFF_8000_0010_8000);
+        assert_eq!(engine.tss.rsp0, 0xFFFF_8000_0010_8000);
+
+        // Test IST configuration
+        assert!(engine.set_interrupt_stack_table(2, 0xFFFF_8000_0030_0000).is_ok());
+        assert_eq!(engine.tss.ist2, 0xFFFF_8000_0030_0000);
+
+        // Test Ring 3 transition preparation
+        let (user_cs, user_ds, user_rip, user_rsp) = engine
+            .switch_to_ring3_user_mode(0x0000_0000_0040_0000, 0x0000_7FFF_FFFF_0000)
+            .unwrap();
+
+        assert_eq!(user_cs, 0x23);
+        assert_eq!(user_ds, 0x2B);
+        assert_eq!(user_rip, 0x0000_0000_0040_0000);
+        assert_eq!(user_rsp, 0x0000_7FFF_FFFF_0000);
+        assert_eq!(engine.current_ring, PrivilegeRing::Ring3Userland);
+
+        // Test Ring 3 isolation validation
+        assert!(engine.validate_ring3_isolation(0x23, 0x0000_0000_0040_0000));
+        // Ring 0 CS (0x08) or Kernel RIP should fail user mode validation
+        assert!(!engine.validate_ring3_isolation(0x08, 0x0000_0000_0040_0000));
+        assert!(!engine.validate_ring3_isolation(0x23, 0xFFFF_8000_0000_0000));
+    }
+
+    #[test]
+    fn test_gdt_segment_descriptors() {
+        let kernel_code = GdtSegmentDescriptor::new_code_segment(PrivilegeRing::Ring0Kernel);
+        assert_eq!(kernel_code.access_byte, 0x9A);
+
+        let user_code = GdtSegmentDescriptor::new_code_segment(PrivilegeRing::Ring3Userland);
+        assert_eq!(user_code.access_byte, 0xFA);
+
+        let kernel_data = GdtSegmentDescriptor::new_data_segment(PrivilegeRing::Ring0Kernel);
+        assert_eq!(kernel_data.access_byte, 0x92);
+
+        let user_data = GdtSegmentDescriptor::new_data_segment(PrivilegeRing::Ring3Userland);
+        assert_eq!(user_data.access_byte, 0xF2);
+
+        let user_cs_sel = SovereignRing3UserModeTssEngine::calculate_selector(4, PrivilegeRing::Ring3Userland);
+        assert_eq!(user_cs_sel, 0x23);
+
+        let user_ds_sel = SovereignRing3UserModeTssEngine::calculate_selector(5, PrivilegeRing::Ring3Userland);
+        assert_eq!(user_ds_sel, 0x2B);
+    }
+}
