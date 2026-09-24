@@ -13,3 +13,7 @@
 ## 2026-10-01 - Standard `tabindex` Selector & WAI-ARIA Menu Navigation
 **Learning:** Query selectors for interactive focusable elements must target standard `[tabindex="0"]` (avoiding typos like `[tab-index="0"]`) to ensure keyboard listeners and focus indicators attach reliably, and `role="menu"` components require Arrow key (`ArrowDown`/`ArrowUp`) and `Home`/`End` listeners for WCAG 2.1 menu keyboard navigation.
 **Action:** Always include `[tabindex="0"]` in DOM query selectors for interactive controls and register `initMenuNavigation()` for `role="menu"` containers.
+
+## 2026-10-15 - Backing UI Tooltip & ARIA Shortcut Hints with Active Global Keydown Handlers
+**Learning:** Advertised keyboard shortcuts in UI tooltips (`data-tooltip`) and ARIA labels (`aria-label`, e.g., "Launch File Manager (Alt+F)") create an accessibility expectation for keyboard users that must be backed by active global keydown listeners in `zenith_desktop/index.js`, while bypassing key events when focus is inside editable form controls (`input`, `textarea`, `isContentEditable`).
+**Action:** Always ensure any keyboard shortcut hints presented in UI labels/tooltips are hooked up to active global keydown handlers during desktop initialization.
