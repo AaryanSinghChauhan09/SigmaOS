@@ -1,3 +1,13 @@
+## Star History
+
+<a href="https://www.star-history.com/?repos=aaryansinghchauhan09%2Fsigmaos&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=aaryansinghchauhan09/sigmaos&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=aaryansinghchauhan09/sigmaos&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=aaryansinghchauhan09/sigmaos&type=date&legend=top-left" />
+ </picture>
+</a>
+
 # 🚀 SigmaOS — Sovereign AI-Native Operating System
 
 <p align="center">
