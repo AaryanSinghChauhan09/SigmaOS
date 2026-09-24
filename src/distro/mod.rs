@@ -338,3 +338,8 @@ pub use linux_bsd_distro_strategic_innovations::{
 
 pub mod master_distro_kernel_synthesis;
 pub use master_distro_kernel_synthesis::*;
+
+pub mod tech_media_distro_innovations;
+pub use tech_media_distro_innovations::*;
+pub mod tech_media_extended_innovations;
+pub use tech_media_extended_innovations::*;
