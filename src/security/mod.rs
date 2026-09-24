@@ -152,3 +152,4 @@ pub use crate::security::vulnerability::{SimpleVulnerability, SimpleVulnerabilit
 
 // ─── Capability Monitor (pledge + unveil + Capsicum) ─────────────────────────
 pub mod capability_monitor;
+pub mod audit;
