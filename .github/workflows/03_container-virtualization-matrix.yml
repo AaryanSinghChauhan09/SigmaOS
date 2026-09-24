@@ -83,11 +83,11 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.2.2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Set up Docker buildx
         if: matrix.container == 'docker'
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@c237e3a73be1d5073e5bf0d4181958b4b7ad1a77 # v3.7.0
 
       - name: Build with ${{ matrix.container || matrix.vm }} ${{ matrix.version || matrix.image }}
         shell: bash
@@ -103,7 +103,7 @@ jobs:
 
       - name: Upload logs
         if: always()
-        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3 # v4.3.6
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
         with:
           name: ${{ matrix.container || matrix.vm }}-${{ matrix.version || matrix.image }}-logs
           path: logs/

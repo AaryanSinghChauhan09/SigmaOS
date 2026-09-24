@@ -25,8 +25,8 @@ use core::marker::PhantomData;
 pub const KERNEL_ESCALATION_TOKEN: &str = "test_kernel_token_replace_in_production";
 pub const MASTER_ADMIN_TOKEN: &str = "test_admin_token_replace_in_production";
 
-static mut KERNEL_ESCALATION_TOKEN_RUNTIME: Option<[u8; 32]> = None;
-static mut MASTER_ADMIN_TOKEN_RUNTIME: Option<[u8; 32]> = None;
+static KERNEL_ESCALATION_TOKEN_RUNTIME: std::sync::Mutex<Option<[u8; 32]>> = std::sync::Mutex::new(None);
+static MASTER_ADMIN_TOKEN_RUNTIME: std::sync::Mutex<Option<[u8; 32]>> = std::sync::Mutex::new(None);
 
 /// User-level privilege marker
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -43,21 +43,25 @@ pub struct SecurityAdminLevel;
 /// Initialize runtime security tokens (called at boot)
 /// In production, this generates cryptographically secure random tokens
 #[cfg(not(test))]
-pub unsafe fn initialize_security_tokens() {
+pub fn initialize_security_tokens() {
     // In real implementation, would use:
     // - getrandom() syscall
     // - Hardware RNG (RDRAND/RDSEED)
     // - /dev/urandom
     // For now, this is a placeholder that must be replaced
-    KERNEL_ESCALATION_TOKEN_RUNTIME = Some([0u8; 32]);
-    MASTER_ADMIN_TOKEN_RUNTIME = Some([0u8; 32]);
+    if let Ok(mut token_guard) = KERNEL_ESCALATION_TOKEN_RUNTIME.lock() {
+        *token_guard = Some([0u8; 32]);
+    }
+    if let Ok(mut admin_guard) = MASTER_ADMIN_TOKEN_RUNTIME.lock() {
+        *admin_guard = Some([0u8; 32]);
+    }
 }
 
 /// Validate kernel escalation token (non-test)
 #[cfg(not(test))]
 fn validate_kernel_token(token: &[u8]) -> bool {
-    unsafe {
-        if let Some(ref valid_token) = KERNEL_ESCALATION_TOKEN_RUNTIME {
+    if let Ok(guard) = KERNEL_ESCALATION_TOKEN_RUNTIME.lock() {
+        if let Some(ref valid_token) = *guard {
             // Constant-time comparison to prevent timing attacks
             if token.len() != valid_token.len() {
                 return false;
@@ -70,6 +74,8 @@ fn validate_kernel_token(token: &[u8]) -> bool {
         } else {
             false
         }
+    } else {
+        false
     }
 }
 
