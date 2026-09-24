@@ -4,7 +4,6 @@
 // FreeBSD capsicum/procdesc (pdfork, cap_rights_limit), and OpenBSD pledge/unveil.
 
 use std::collections::HashMap;
-use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
