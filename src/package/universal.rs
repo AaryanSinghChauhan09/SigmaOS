@@ -145,6 +145,18 @@ fn debtor_to_sovereign_name(name: &str) -> &str {
         "sovereign-graphics"
     } else if lower.contains("curl") || lower.contains("wget") || lower.contains("openssh") || lower.contains("net-tools") || lower.contains("iproute2") {
         "sovereign-network-tools"
+    } else if lower.contains("postgres") || lower.contains("mysql") || lower.contains("mariadb") || lower.contains("sqlite") {
+        "sovereign-database"
+    } else if lower.contains("docker") || lower.contains("podman") || lower.contains("qemu") || lower.contains("libvirt") || lower.contains("kvm") || lower.contains("containerd") {
+        "sovereign-virtualization"
+    } else if lower.contains("ffmpeg") || lower.contains("pipewire") || lower.contains("pulseaudio") || lower.contains("alsa") || lower.contains("gstreamer") || lower.contains("vlc") {
+        "sovereign-media-engine"
+    } else if lower.contains("gtk") || lower.contains("qt5") || lower.contains("qt6") || lower.contains("hyprland") || lower.contains("gnome") || lower.contains("kde") || lower.contains("wlroots") {
+        "sovereign-desktop-framework"
+    } else if lower.contains("node") || lower.contains("npm") || lower.contains("deno") || lower.contains("bun") || lower.contains("golang") || lower.contains("rust") {
+        "sovereign-app-runtime"
+    } else if lower.contains("ripgrep") || lower.contains("fd-find") || lower == "bat" || lower == "eza" || lower.contains("htop") || lower.contains("fastfetch") {
+        "sovereign-cli-suite"
     } else {
         name
     }
@@ -2533,7 +2545,7 @@ mod tests {
             original_name: "curl".to_string(),
             version: "8.5.0".to_string(),
             architecture: "amd64".to_string(),
-            raw_dependencies: vec!["libssl-dev".to_string(), "libc6".to_string()],
+            raw_dependencies: vec!["libssl-dev".to_string(), "libc6".to_string(), "postgresql-client".to_string(), "docker-ce".to_string(), "pipewire-audio".to_string()],
             raw_provides: vec!["http-client".to_string()],
             raw_conflicts: vec!["curl-legacy".to_string()],
             maintainer: "Debian Packagers".to_string(),
@@ -2546,6 +2558,18 @@ mod tests {
         );
         manager.add_package(
             UnifiedPackage::new("sovereign-libc".to_string(), "2.38.0".to_string())
+                .with_format(PackageFormat::SigmaPkg),
+        );
+        manager.add_package(
+            UnifiedPackage::new("sovereign-database".to_string(), "16.0.0".to_string())
+                .with_format(PackageFormat::SigmaPkg),
+        );
+        manager.add_package(
+            UnifiedPackage::new("sovereign-virtualization".to_string(), "25.0.0".to_string())
+                .with_format(PackageFormat::SigmaPkg),
+        );
+        manager.add_package(
+            UnifiedPackage::new("sovereign-media-engine".to_string(), "1.0.0".to_string())
                 .with_format(PackageFormat::SigmaPkg),
         );
 
@@ -2561,6 +2585,25 @@ mod tests {
         assert!(installed
             .dependencies
             .contains(&"sovereign-libc".to_string()));
+        assert!(installed
+            .dependencies
+            .contains(&"sovereign-database".to_string()));
+        assert!(installed
+            .dependencies
+            .contains(&"sovereign-virtualization".to_string()));
+        assert!(installed
+            .dependencies
+            .contains(&"sovereign-media-engine".to_string()));
+    }
+
+    #[test]
+    fn test_debtor_to_sovereign_name_mapping_categories() {
+        assert_eq!(debtor_to_sovereign_name("mariadb-server"), "sovereign-database");
+        assert_eq!(debtor_to_sovereign_name("qemu-system-x86"), "sovereign-virtualization");
+        assert_eq!(debtor_to_sovereign_name("ffmpeg-free"), "sovereign-media-engine");
+        assert_eq!(debtor_to_sovereign_name("hyprland-git"), "sovereign-desktop-framework");
+        assert_eq!(debtor_to_sovereign_name("rustc-nightly"), "sovereign-app-runtime");
+        assert_eq!(debtor_to_sovereign_name("ripgrep-all"), "sovereign-cli-suite");
     }
 
     #[test]
