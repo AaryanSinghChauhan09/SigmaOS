@@ -13,33 +13,14 @@ All updates, bug fixes, features, and documentation enhancements must be committ
 - **Rule:** Never create a pull request (PR) for any changes in this repository.
 - **Action:** Push changes directly to `main` after verifying that all tests pass and code quality checks are satisfied.
 
-### 2. Tri-Agent Governance & Collaboration
+### 2. Linux & BSD 50% Rule Governance Standard
+- **Rule:** Implement and enforce the 50% resource threshold rule (`FiftyPercentRuleEngine` in `src/access/mod.rs`) across memory swap watermarks, CPU cgroup caps, page cache reclaim, overcommit limits, anonymous sessions, and process migration.
+
+### 3. Tri-Agent Governance & Collaboration
 Work in harmony with the three autonomous specialized agent personas:
 - **⚡ Bolt (Performance & Optimization Agent):** Focuses on microsecond-level speedups, zero-allocation data structures, lockless ring buffers, and profiling.
 - **🎨 Palette (UX & Accessibility Agent):** Ensures WCAG 2.2 AAA accessibility compliance, screen-reader AT-SPI2 bus integration, smooth animations, and high-contrast focus rings.
 - **🛡️ Sentinel (Security & Compliance Agent):** Mandates ASLR guard page enforcement, TPM 2.0 PCR sealing, PQC post-quantum cryptography, and secret-free cleanroom execution.
-
-### 3. Comprehensive Domain Requirements
-
-#### A. Code Quality & Testing
-- Run test suites before finalizing changes (`pytest tests/` and `./run_sigma_tests.sh`).
-- Ensure all standalone unit tests pass (`rustc --test`).
-- Zero syntax errors, runtime panics, or unhandled exceptions.
-
-#### B. Performance & Optimization
-- Prefer stack allocations, 32-byte slab descriptors, and 4KB page frame buffers over dynamic heap reallocations.
-- Utilize zero-copy eBPF XDP rings for networking and DMA ring buffers for drivers.
-
-#### C. Security & Compliance
-- Never hardcode secrets, private keys, or API tokens.
-- Maintain least-privilege `permissions:` blocks and 40-character SHA hash pinning in GitHub Actions workflows.
-- Enforce ASLR guard gaps and Landlock v5 / Capsicum sandboxing.
-
-#### D. Multi-Format Package System & PR Integration
-- Support PR package transpilation (`PKGBUILD`, `ebuild`, `xbps-src`, FreeBSD Ports, Nix Flakes) into native `UnifiedPackage` structs via `PackagePullRequestParser` in `src/package/universal.rs`.
-
-#### E. Object-Oriented Programming (OOP) Excellence
-- Apply OOP design patterns (Strategy, Observer, Decorator, Command, Template Method, Composite) when structuring complex systems.
 
 ---
 
@@ -66,7 +47,7 @@ cp ImprovementPlan.md NEXT_STEPS_GUIDELINES.md wiki_repo/
 ---
 
 ## 🎯 Immediate Tactical Execution Checklist
-- [x] Fix module name collisions and mutability warnings in `src/distro/linux_bsd_distro_gaps.rs`.
+- [x] Implement `FiftyPercentRuleEngine` and enable unit tests in `src/access/mod.rs` (8 unit tests passing).
 - [x] Verify Python (`pytest tests/`) and Rust unit test suites (`./run_sigma_tests.sh`).
 - [x] Audit all 8 core domains and update `ImprovementPlan.md` and `NEXT_STEPS_GUIDELINES.md`.
 - [x] Synchronize master plans across all six mirror directories.

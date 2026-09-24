@@ -546,6 +546,107 @@ impl AnonymousAccessPolicy {
 }
 
 // ============================================================================
+// 8. Linux & BSD Fifty Percent (50%) Rule Engine
+// ============================================================================
+
+/// Fifty Percent Rule Resource Metric Category
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FiftyPercentResourceCategory {
+    RamSwapWatermark,        // Trigger swap when RAM usage reaches 50%
+    CpuCgroupQuota,          // Cap background task CPU bandwidth to 50%
+    PageCacheEviction,       // Reclaim 50% of dirty page cache under memory pressure
+    MemoryOvercommitLimit,   // Restrict virtual memory allocations to 50% overcommit
+    AnonymousSessionCap,     // Limit guest/anonymous logins to 50% of max user slots
+    ProcessMigrationBatch,   // Migrate up to 50% of runnable threads per NUMA balance tick
+}
+
+/// Linux & BSD Fifty Percent (50%) Rule Governance Engine
+#[derive(Debug, Clone)]
+pub struct FiftyPercentRuleEngine {
+    pub total_ram_mb: u64,
+    pub active_ram_mb: u64,
+    pub total_cpu_shares: u32,
+    pub active_cpu_shares: u32,
+    pub rule_enforcements_count: u64,
+}
+
+impl FiftyPercentRuleEngine {
+    pub fn new(total_ram_mb: u64, total_cpu_shares: u32) -> Self {
+        Self {
+            total_ram_mb,
+            active_ram_mb: 0,
+            total_cpu_shares,
+            active_cpu_shares: 0,
+            rule_enforcements_count: 0,
+        }
+    }
+
+    /// Evaluate whether a resource metric triggers the 50% rule threshold
+    pub fn is_fifty_percent_threshold_exceeded(
+        &self,
+        category: FiftyPercentResourceCategory,
+        current_value: u64,
+        total_value: u64,
+    ) -> bool {
+        if total_value == 0 {
+            return false;
+        }
+        let percentage = (current_value * 100) / total_value;
+        match category {
+            FiftyPercentResourceCategory::RamSwapWatermark => percentage >= 50,
+            FiftyPercentResourceCategory::CpuCgroupQuota => percentage > 50,
+            FiftyPercentResourceCategory::PageCacheEviction => percentage >= 50,
+            FiftyPercentResourceCategory::MemoryOvercommitLimit => percentage >= 50,
+            FiftyPercentResourceCategory::AnonymousSessionCap => percentage >= 50,
+            FiftyPercentResourceCategory::ProcessMigrationBatch => percentage >= 50,
+        }
+    }
+
+    /// Calculate the 50% quota cap for a given total capacity
+    pub fn calculate_50_percent_quota(&mut self, total_capacity: u64) -> u64 {
+        self.rule_enforcements_count += 1;
+        total_capacity / 2
+    }
+
+    /// Apply Linux vm.swappiness / FreeBSD vm.swap_idle_enabled 50% watermark swap trigger
+    pub fn enforce_50_percent_ram_swap_watermark(
+        &mut self,
+        used_ram_mb: u64,
+    ) -> AccessResult<bool> {
+        self.active_ram_mb = used_ram_mb;
+        if self.is_fifty_percent_threshold_exceeded(
+            FiftyPercentResourceCategory::RamSwapWatermark,
+            used_ram_mb,
+            self.total_ram_mb,
+        ) {
+            self.rule_enforcements_count += 1;
+            Ok(true) // Swapping activated
+        } else {
+            Ok(false)
+        }
+    }
+
+    /// Enforce cgroup v2 cpu.max 50% quota bandwidth cap
+    pub fn enforce_50_percent_cpu_quota(&mut self, requested_shares: u32) -> u32 {
+        let max_allowed = self.total_cpu_shares / 2;
+        if requested_shares > max_allowed {
+            self.rule_enforcements_count += 1;
+            self.active_cpu_shares = max_allowed;
+            max_allowed
+        } else {
+            self.active_cpu_shares = requested_shares;
+            requested_shares
+        }
+    }
+}
+
+impl Default for FiftyPercentRuleEngine {
+    fn default() -> Self {
+        Self::new(16384, 1024)
+    }
+}
+
+// ============================================================================
 // Access Manager
 // ============================================================================
 
@@ -556,6 +657,7 @@ pub struct AccessManager {
     initialized: bool,
     pub rat_controller: RemoteAccessController,
     pub anonymous_policy: AnonymousAccessPolicy,
+    pub fifty_percent_engine: FiftyPercentRuleEngine,
 }
 
 impl AccessManager {
@@ -566,6 +668,7 @@ impl AccessManager {
             initialized: false,
             rat_controller: RemoteAccessController::new(),
             anonymous_policy: AnonymousAccessPolicy::new(),
+            fifty_percent_engine: FiftyPercentRuleEngine::default(),
         }
     }
 
@@ -619,7 +722,7 @@ impl Default for AccessManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -716,5 +819,22 @@ mod tests {
             mig_ctrl.authorize_and_migrate(404, &unpriv_token, 1024),
             Err(AccessManagerError::PermissionDenied)
         );
+    }
+
+    #[test]
+    fn test_fifty_percent_rule_engine() {
+        let mut engine = FiftyPercentRuleEngine::new(16384, 1000);
+
+        // RAM Swap Watermark (8192 MB out of 16384 MB = 50%)
+        assert!(engine.enforce_50_percent_ram_swap_watermark(8192).unwrap());
+        assert!(!engine.enforce_50_percent_ram_swap_watermark(4000).unwrap());
+
+        // CPU Cgroup 50% Quota Throttling (Requested 800 shares -> capped at 500)
+        let allocated_shares = engine.enforce_50_percent_cpu_quota(800);
+        assert_eq!(allocated_shares, 500);
+
+        // General 50% quota calculation
+        assert_eq!(engine.calculate_50_percent_quota(100), 50);
+        assert!(engine.rule_enforcements_count >= 2);
     }
 }
