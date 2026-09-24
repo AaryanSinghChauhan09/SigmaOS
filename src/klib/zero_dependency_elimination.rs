@@ -13,7 +13,7 @@ use std::vec::Vec;
 use std::format;
 
 #[cfg(any(feature = "standalone_test", test))]
-use std::string::{String, ToString};
+use std::string::String;
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 #[cfg(any(feature = "standalone_test", test))]
