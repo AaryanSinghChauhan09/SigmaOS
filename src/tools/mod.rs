@@ -9,20 +9,17 @@ pub mod simple_scan;
 pub mod sovereign_commands;
 pub mod open_source_tools_engine;
 pub mod open_source_cli_tools_suite;
+pub mod open_source_tools_synthesis;
 pub mod tech_media_innovations;
 
 pub use tech_media_innovations::*;
 pub use open_source_tools_engine::*;
 pub use open_source_cli_tools_suite::*;
+pub use open_source_tools_synthesis::*;
 
 pub use open_source_tools_parity::{
-    BatSyntaxPagerEngine, BtopProcessNode, BtopSystemMonitorEngine, DufDiskFreeInfoEngine,
-    DufMountPoint, DustFastDuEngine, DustFolderUsage, EzaFileItem, EzaModernLsEngine,
-    FastfetchInfoEngine, FastfetchSysInfo, FdFastFindEngine, LauncherAppEntry,
-    NcduDiskUsageAnalyzerEngine, NcduNode, ProcsModernPsEngine, ProcsProcessEntry,
-    RipgrepRegexSearchEngine, RofiCommandHudEngine, SearchMatch, SovereignAbridgeTool,
-    SovereignXcpTool, StarshipPromptEngine, TldrCommandPage, TldrQuickPagesEngine,
-    XcpCopyProgress, ZoxideFastCdEngine, ZoxidePathEntry,
+    DufDeviceUsage, DufDiskUsageEngine, DustDirectoryTreeEngine, DustNode, FastfetchSysinfo,
+    ItsFossFastfetchSysinfoEngine, SimpleJqJsonQueryEngine,
 };
 
 pub use data_tools::{

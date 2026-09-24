@@ -2,6 +2,7 @@
 pub mod archive;
 pub mod file_monitor;
 pub mod watch;
+pub mod sovereign_filesystem_hierarchy;
 pub mod bsd_linux_innovations;
 pub mod cow_snapshot;
 pub mod defragmenter;

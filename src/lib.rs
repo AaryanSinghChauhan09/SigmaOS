@@ -28,6 +28,7 @@ pub mod futuristic_modules;
 pub mod kernel;
 pub mod klib;
 pub mod memory;
+pub use memory::low_level;
 pub mod network;
 pub mod observability;
 pub mod orchestration;

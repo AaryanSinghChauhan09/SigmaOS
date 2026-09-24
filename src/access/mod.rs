@@ -513,6 +513,17 @@ pub enum FiftyPercentRuleCategory {
     MemoryOvercommitLimit,  // Memory Overcommit 50% Cap
 }
 
+/// Fifty Percent Rule Resource Metric Category
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FiftyPercentResourceCategory {
+    RamSwapWatermark,        // Trigger swap when RAM usage reaches 50%
+    CpuCgroupQuota,          // Cap background task CPU bandwidth to 50%
+    PageCacheEviction,       // Reclaim 50% of dirty page cache under memory pressure
+    MemoryOvercommitLimit,   // Restrict virtual memory allocations to 50% overcommit
+    AnonymousSessionCap,     // Limit guest/anonymous logins to 50% of max user slots
+    ProcessMigrationBatch,   // Migrate up to 50% of runnable threads per NUMA balance tick
+}
+
 /// Linux & BSD Inspired 50% Resource Limit Rule Engine
 #[derive(Debug, Clone)]
 pub struct FiftyPercentRuleEngine {
@@ -521,16 +532,30 @@ pub struct FiftyPercentRuleEngine {
     pub max_cpu_quota_pct: u32,       // Default 50%
     pub page_cache_evict_pct: u32,    // Default 50%
     pub total_rule_violations: u64,
+    pub total_ram_mb: u64,
+    pub active_ram_mb: u64,
+    pub total_cpu_shares: u32,
+    pub active_cpu_shares: u32,
+    pub rule_enforcements_count: u64,
 }
 
 impl FiftyPercentRuleEngine {
     pub fn new() -> Self {
+        Self::new_with_params(16384, 1024)
+    }
+
+    pub fn new_with_params(total_ram_mb: u64, total_cpu_shares: u32) -> Self {
         Self {
             max_ram_usage_pct: 50,
             max_swap_usage_pct: 50,
             max_cpu_quota_pct: 50,
             page_cache_evict_pct: 50,
             total_rule_violations: 0,
+            total_ram_mb,
+            active_ram_mb: 0,
+            total_cpu_shares,
+            active_cpu_shares: 0,
+            rule_enforcements_count: 0,
         }
     }
 
@@ -572,95 +597,6 @@ impl FiftyPercentRuleEngine {
         }
         let cache_pct = (cache_bytes * 100) / total_ram_bytes;
         cache_pct >= (self.page_cache_evict_pct as u64)
-    }
-}
-
-impl Default for FiftyPercentRuleEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 8. Anonymous Access Policy
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct AnonymousAccessPolicy {
-    pub allow_guest_login: bool,
-    pub restricted_paths: Vec<String>,
-    pub max_anonymous_sessions: usize,
-    pub active_anonymous_sessions: usize,
-}
-
-impl AnonymousAccessPolicy {
-    pub fn new() -> Self {
-        Self {
-            allow_guest_login: true,
-            restricted_paths: std::vec![
-                "/etc/shadow".to_string(),
-                "/root".to_string(),
-                "/sys/kernel/security".to_string()
-            ],
-            max_anonymous_sessions: 5,
-            active_anonymous_sessions: 0,
-        }
-    }
-
-    pub fn create_guest_session(&mut self) -> AccessResult<SecurityAccessToken> {
-        if !self.allow_guest_login {
-            return Err(AccessManagerError::PermissionDenied);
-        }
-        if self.active_anonymous_sessions >= self.max_anonymous_sessions {
-            return Err(AccessManagerError::PermissionDenied);
-        }
-        self.active_anonymous_sessions += 1;
-        let token_id = 9000 + (self.active_anonymous_sessions as u64);
-        Ok(SecurityAccessToken::anonymous(token_id))
-    }
-
-    pub fn validate_path_access(&self, token: &SecurityAccessToken, path: &str) -> bool {
-        if !token.is_anonymous {
-            return true;
-        }
-        !self.restricted_paths.iter().any(|p| path.starts_with(p))
-    }
-}
-
-// ============================================================================
-// 8. Linux & BSD Fifty Percent (50%) Rule Engine
-// ============================================================================
-
-/// Fifty Percent Rule Resource Metric Category
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FiftyPercentResourceCategory {
-    RamSwapWatermark,        // Trigger swap when RAM usage reaches 50%
-    CpuCgroupQuota,          // Cap background task CPU bandwidth to 50%
-    PageCacheEviction,       // Reclaim 50% of dirty page cache under memory pressure
-    MemoryOvercommitLimit,   // Restrict virtual memory allocations to 50% overcommit
-    AnonymousSessionCap,     // Limit guest/anonymous logins to 50% of max user slots
-    ProcessMigrationBatch,   // Migrate up to 50% of runnable threads per NUMA balance tick
-}
-
-/// Linux & BSD Fifty Percent (50%) Rule Governance Engine
-#[derive(Debug, Clone)]
-pub struct FiftyPercentRuleEngine {
-    pub total_ram_mb: u64,
-    pub active_ram_mb: u64,
-    pub total_cpu_shares: u32,
-    pub active_cpu_shares: u32,
-    pub rule_enforcements_count: u64,
-}
-
-impl FiftyPercentRuleEngine {
-    pub fn new(total_ram_mb: u64, total_cpu_shares: u32) -> Self {
-        Self {
-            total_ram_mb,
-            active_ram_mb: 0,
-            total_cpu_shares,
-            active_cpu_shares: 0,
-            rule_enforcements_count: 0,
-        }
     }
 
     /// Evaluate whether a resource metric triggers the 50% rule threshold
@@ -724,7 +660,53 @@ impl FiftyPercentRuleEngine {
 
 impl Default for FiftyPercentRuleEngine {
     fn default() -> Self {
-        Self::new(16384, 1024)
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 8. Anonymous Access Policy
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct AnonymousAccessPolicy {
+    pub allow_guest_login: bool,
+    pub restricted_paths: Vec<String>,
+    pub max_anonymous_sessions: usize,
+    pub active_anonymous_sessions: usize,
+}
+
+impl AnonymousAccessPolicy {
+    pub fn new() -> Self {
+        Self {
+            allow_guest_login: true,
+            restricted_paths: std::vec![
+                "/etc/shadow".to_string(),
+                "/root".to_string(),
+                "/sys/kernel/security".to_string()
+            ],
+            max_anonymous_sessions: 5,
+            active_anonymous_sessions: 0,
+        }
+    }
+
+    pub fn create_guest_session(&mut self) -> AccessResult<SecurityAccessToken> {
+        if !self.allow_guest_login {
+            return Err(AccessManagerError::PermissionDenied);
+        }
+        if self.active_anonymous_sessions >= self.max_anonymous_sessions {
+            return Err(AccessManagerError::PermissionDenied);
+        }
+        self.active_anonymous_sessions += 1;
+        let token_id = 9000 + (self.active_anonymous_sessions as u64);
+        Ok(SecurityAccessToken::anonymous(token_id))
+    }
+
+    pub fn validate_path_access(&self, token: &SecurityAccessToken, path: &str) -> bool {
+        if !token.is_anonymous {
+            return true;
+        }
+        !self.restricted_paths.iter().any(|p| path.starts_with(p))
     }
 }
 
@@ -905,7 +887,7 @@ mod tests {
 
     #[test]
     fn test_fifty_percent_rule_engine() {
-        let mut engine = FiftyPercentRuleEngine::new(16384, 1000);
+        let mut engine = FiftyPercentRuleEngine::new_with_params(16384, 1000);
 
         // RAM Swap Watermark (8192 MB out of 16384 MB = 50%)
         assert!(engine.enforce_50_percent_ram_swap_watermark(8192).unwrap());
