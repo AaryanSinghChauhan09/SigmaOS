@@ -20,6 +20,7 @@ pub mod device;
 pub mod distro;
 pub mod driver;
 pub mod drivers;
+pub use drivers::sovereign_comprehensive_drivers::*;
 pub mod governance;
 pub mod crypto;
 pub mod filesystem;

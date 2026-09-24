@@ -25,7 +25,9 @@ pub mod printing;
 pub mod usb_hid;
 pub mod sovereign_driver_lifecycle;
 pub mod vesa;
+pub mod sovereign_comprehensive_drivers;
 
+pub use sovereign_comprehensive_drivers::*;
 pub use printing::{CupsIppPrintSpooler, LpdSpooler, PpdDriverMatcher, PrintJob, PrintJobState};
 
 pub use gpu::{GpuCommand, GpuDriver, GpuError};

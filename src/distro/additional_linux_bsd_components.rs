@@ -406,6 +406,134 @@ impl FreeBsdPoudriereBulkBuilderEngine {
     }
 }
 
+/// Alpine Linux abuild & APKBUILD Package Builder
+#[derive(Debug, Clone)]
+pub struct AlpineAbuildApkbuildEngine {
+    pub pkgname: String,
+    pub pkgver: String,
+    pub pkgrel: u32,
+    pub depends: Vec<String>,
+    pub makedepends: Vec<String>,
+}
+
+impl AlpineAbuildApkbuildEngine {
+    pub fn new(pkgname: &str, pkgver: &str, pkgrel: u32) -> Self {
+        Self {
+            pkgname: pkgname.to_string(),
+            pkgver: pkgver.to_string(),
+            pkgrel,
+            depends: Vec::new(),
+            makedepends: Vec::new(),
+        }
+    }
+
+    pub fn generate_apk_filename(&self) -> String {
+        format!("{}-{}-r{}.apk", self.pkgname, self.pkgver, self.pkgrel)
+    }
+}
+
+/// openSUSE Open Build Service (OBS) & KIWI Image Builder
+#[derive(Debug, Clone)]
+pub struct OpenSuseObsKiwiEngine {
+    pub project_name: String,
+    pub package_spec: String,
+    pub image_type: String, // "iso", "pxe", "oem", "docker"
+}
+
+impl OpenSuseObsKiwiEngine {
+    pub fn new(project: &str, image_type: &str) -> Self {
+        Self {
+            project_name: project.to_string(),
+            package_spec: format!("{}.kiwi", project),
+            image_type: image_type.to_string(),
+        }
+    }
+
+    pub fn build_kiwi_image(&self) -> String {
+        format!("{}.{}.raw", self.project_name, self.image_type)
+    }
+}
+
+/// Slackware SlackBuild Shell Package Script Engine
+#[derive(Debug, Clone)]
+pub struct SlackwareSlackbuildEngine {
+    pub prgnam: String,
+    pub version: String,
+    pub build: u32,
+    pub tag: String,
+}
+
+impl SlackwareSlackbuildEngine {
+    pub fn new(prgnam: &str, version: &str) -> Self {
+        Self {
+            prgnam: prgnam.to_string(),
+            version: version.to_string(),
+            build: 1,
+            tag: "_SBr".to_string(),
+        }
+    }
+
+    pub fn output_txz_filename(&self, arch: &str) -> String {
+        format!("{}-{}-{}{}{}.txz", self.prgnam, self.version, arch, self.build, self.tag)
+    }
+}
+
+/// OpenBSD syspatch Binary System Update Engine
+#[derive(Debug, Clone)]
+pub struct OpenBsdSyspatchSecurityEngine {
+    pub installed_patches: Vec<String>,
+    pub pending_patches: Vec<String>,
+}
+
+impl OpenBsdSyspatchSecurityEngine {
+    pub fn new() -> Self {
+        Self {
+            installed_patches: Vec::new(),
+            pending_patches: Vec::new(),
+        }
+    }
+
+    pub fn apply_patch(&mut self, patch_id: &str) -> bool {
+        if !self.installed_patches.contains(&patch_id.to_string()) {
+            self.installed_patches.push(patch_id.to_string());
+            self.pending_patches.retain(|p| p != patch_id);
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for OpenBsdSyspatchSecurityEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Gentoo Catalyst Stage3 / Stage4 Release Tarball Generator Engine
+#[derive(Debug, Clone)]
+pub struct GentooCatalystStage3Engine {
+    pub target_arch: String,
+    pub subarch: String,
+    pub profile: String,
+    pub snapshot_timestamp: String,
+}
+
+impl GentooCatalystStage3Engine {
+    pub fn new(arch: &str, subarch: &str, profile: &str) -> Self {
+        Self {
+            target_arch: arch.to_string(),
+            subarch: subarch.to_string(),
+            profile: profile.to_string(),
+            snapshot_timestamp: "20260330T120000Z".to_string(),
+        }
+    }
+
+    pub fn stage3_tarball_filename(&self) -> String {
+        format!("stage3-{}-{}-{}.tar.xz", self.subarch, self.profile, self.snapshot_timestamp)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -497,5 +625,27 @@ mod tests {
         let mut poudriere = FreeBsdPoudriereBulkBuilderEngine::new("14_1_amd64", "default");
         assert!(poudriere.build_port_package("security/openssl"));
         assert_eq!(poudriere.completed_packages.len(), 1);
+
+        // Test Alpine abuild APKBUILD
+        let abuild = AlpineAbuildApkbuildEngine::new("nginx", "1.26.0", 1);
+        assert_eq!(abuild.generate_apk_filename(), "nginx-1.26.0-r1.apk");
+
+        // Test openSUSE OBS KIWI image builder
+        let kiwi = OpenSuseObsKiwiEngine::new("sigmaos-openSUSE-Leap", "oem");
+        assert_eq!(kiwi.build_kiwi_image(), "sigmaos-openSUSE-Leap.oem.raw");
+
+        // Test Slackware SlackBuild script engine
+        let slack = SlackwareSlackbuildEngine::new("htop", "3.3.0");
+        assert_eq!(slack.output_txz_filename("x86_64"), "htop-3.3.0-x86_641_SBr.txz");
+
+        // Test OpenBSD syspatch security update engine
+        let mut syspatch = OpenBsdSyspatchSecurityEngine::new();
+        assert!(syspatch.apply_patch("001_kernel"));
+        assert!(!syspatch.apply_patch("001_kernel"));
+        assert_eq!(syspatch.installed_patches.len(), 1);
+
+        // Test Gentoo Catalyst stage3 release tarball generator
+        let catalyst = GentooCatalystStage3Engine::new("amd64", "x86-64-v3", "openrc");
+        assert!(catalyst.stage3_tarball_filename().contains("stage3-x86-64-v3-openrc-"));
     }
 }

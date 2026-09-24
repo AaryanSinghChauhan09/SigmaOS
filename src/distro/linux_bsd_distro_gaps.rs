@@ -1112,11 +1112,123 @@ pub type NatRule = ConntrackTableEntry;
 pub type NatRuleKind = NatType;
 
 // ============================================================================
-// 11. Universal Linux & BSD Distro Gap Resolver
+// 11. Multicore SMP Inter-Processor Interrupt (IPI) & IRQ Affinity Engine
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IpiCommandKind {
+    TlbShootdown,
+    FunctionCall,
+    Reschedule,
+    HaltCpu,
+}
+
+#[derive(Debug, Clone)]
+pub struct MulticoreSmpIpiRequest {
+    pub sender_cpu: u32,
+    pub target_cpu: u32,
+    pub command: IpiCommandKind,
+    pub payload_addr: u64,
+}
+
+pub struct MulticoreSmpInterruptEngine {
+    pub total_smp_cores: u32,
+    pub online_cores: Vec<u32>,
+    pub pending_ipis: Vec<MulticoreSmpIpiRequest>,
+    pub irq_affinity_map: std::collections::BTreeMap<u32, u64>, // irq_num -> cpu_mask
+}
+
+impl MulticoreSmpInterruptEngine {
+    pub fn new(total_cores: u32) -> Self {
+        let online = (0..total_cores).collect();
+        Self {
+            total_smp_cores: total_cores,
+            online_cores: online,
+            pending_ipis: Vec::new(),
+            irq_affinity_map: std::collections::BTreeMap::new(),
+        }
+    }
+
+    pub fn send_ipi_all_but_self(&mut self, sender_cpu: u32, command: IpiCommandKind, payload: u64) -> usize {
+        let mut count = 0;
+        for &cpu in &self.online_cores {
+            if cpu != sender_cpu {
+                self.pending_ipis.push(MulticoreSmpIpiRequest {
+                    sender_cpu,
+                    target_cpu: cpu,
+                    command,
+                    payload_addr: payload,
+                });
+                count += 1;
+            }
+        }
+        count
+    }
+
+    pub fn set_irq_smp_affinity(&mut self, irq: u32, cpu_affinity_mask: u64) {
+        self.irq_affinity_map.insert(irq, cpu_affinity_mask);
+    }
+
+    pub fn dispatch_pending_ipis_for_core(&mut self, target_cpu: u32) -> usize {
+        let initial_len = self.pending_ipis.len();
+        self.pending_ipis.retain(|ipi| ipi.target_cpu != target_cpu);
+        initial_len - self.pending_ipis.len()
+    }
+}
+
+impl Default for MulticoreSmpInterruptEngine {
+    fn default() -> Self {
+        Self::new(4)
+    }
+}
+
+// ============================================================================
+// 12. Multicore Performance Counter & DTrace Probe Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct MulticorePerfSample {
+    pub cpu_id: u32,
+    pub instructions_retired: u64,
+    pub cache_misses: u64,
+    pub branch_mispredictions: u64,
+}
+
+pub struct KernelPerfDtraceEngine {
+    pub active_probes_count: usize,
+    pub core_samples: Vec<MulticorePerfSample>,
+}
+
+impl KernelPerfDtraceEngine {
+    pub fn new() -> Self {
+        Self {
+            active_probes_count: 0,
+            core_samples: Vec::new(),
+        }
+    }
+
+    pub fn register_smp_dtrace_probe(&mut self, provider: &str, name: &str) {
+        let _ = (provider, name);
+        self.active_probes_count += 1;
+    }
+
+    pub fn record_smp_sample(&mut self, sample: MulticorePerfSample) {
+        self.core_samples.push(sample);
+    }
+}
+
+impl Default for KernelPerfDtraceEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 13. Universal Linux & BSD Distro Gap Resolver
 // ============================================================================
 
 #[cfg(test)]
-mod tests {
+mod tests_gaps {
     use super::*;
 
     #[test]
@@ -1232,7 +1344,7 @@ mod tests {
 
     #[test]
     fn test_sovereign_dns_tls_resolver() {
-        let resolver = SovereignDnsTlsResolverEngine::new([1, 1, 1, 1]);
+        let mut resolver = SovereignDnsTlsResolverEngine::new([1, 1, 1, 1]);
         let localhost_ip = resolver.resolve_domain("localhost").unwrap();
         assert_eq!(localhost_ip, [127, 0, 0, 1]);
     }
@@ -1257,5 +1369,37 @@ mod tests {
         resolver.faillock_guard.record_failure();
         resolver.faillock_guard.reset();
         assert!(!resolver.faillock_guard.is_locked);
+    }
+
+    #[test]
+    fn test_multicore_smp_interrupt_engine() {
+        let mut smp_irq = MulticoreSmpInterruptEngine::new(4);
+        assert_eq!(smp_irq.online_cores.len(), 4);
+
+        let sent = smp_irq.send_ipi_all_but_self(0, IpiCommandKind::TlbShootdown, 0x1000);
+        assert_eq!(sent, 3);
+        assert_eq!(smp_irq.pending_ipis.len(), 3);
+
+        smp_irq.set_irq_smp_affinity(16, 0x0F);
+        assert_eq!(smp_irq.irq_affinity_map.get(&16), Some(&0x0F));
+
+        let dispatched = smp_irq.dispatch_pending_ipis_for_core(1);
+        assert_eq!(dispatched, 1);
+        assert_eq!(smp_irq.pending_ipis.len(), 2);
+    }
+
+    #[test]
+    fn test_kernel_perf_dtrace_engine() {
+        let mut perf = KernelPerfDtraceEngine::new();
+        perf.register_smp_dtrace_probe("sched", "cpu_on");
+        assert_eq!(perf.active_probes_count, 1);
+
+        perf.record_smp_sample(MulticorePerfSample {
+            cpu_id: 0,
+            instructions_retired: 100000,
+            cache_misses: 50,
+            branch_mispredictions: 10,
+        });
+        assert_eq!(perf.core_samples.len(), 1);
     }
 }

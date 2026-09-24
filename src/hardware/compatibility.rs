@@ -118,6 +118,16 @@ pub trait HardwareDevice {
     fn support_status(&self) -> SupportStatus;
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LinuxBsdHardwareBusInfo {
+    pub bus_type: String, // "pci", "usb", "acpi", "virtio"
+    pub pci_vendor_id: u16,
+    pub pci_device_id: u16,
+    pub usb_vendor_id: u16,
+    pub usb_product_id: u16,
+    pub driver_alias: String, // e.g. "pci:v00008086d00001000sv*sd*bc*sc*i*", "usb:v046DpC52Bb*"
+}
+
 pub struct SimpleDevice {
     pub id: DeviceID,
     pub device_type: DeviceType,
@@ -125,6 +135,7 @@ pub struct SimpleDevice {
     pub device_id: u16,
     pub name: String,
     pub support_status: SupportStatus,
+    pub bus_info: Option<LinuxBsdHardwareBusInfo>,
 }
 
 impl SimpleDevice {
@@ -143,7 +154,13 @@ impl SimpleDevice {
             device_id,
             name: name.to_string(),
             support_status: status,
+            bus_info: None,
         }
+    }
+
+    pub fn with_bus_info(mut self, bus_info: LinuxBsdHardwareBusInfo) -> Self {
+        self.bus_info = Some(bus_info);
+        self
     }
 }
 
@@ -178,6 +195,7 @@ pub trait HardwareCompatibilityManager {
     fn find_by_vendor_device(&self, vendor_id: u16, device_id: u16) -> Option<DeviceID>;
     fn list_by_type(&self, device_type: DeviceType) -> Vec<DeviceID>;
     fn list_supported(&self) -> Vec<DeviceID>;
+    fn match_driver_by_alias(&self, alias_query: &str) -> Option<DeviceID>;
 }
 
 pub trait DriverManager {
@@ -519,6 +537,18 @@ impl HardwareCompatibilityManager for SimpleCompatibilityMatrix {
             .map(|d| d.id())
             .collect()
     }
+
+    fn match_driver_by_alias(&self, alias_query: &str) -> Option<DeviceID> {
+        self.devices.iter().find_map(|d| {
+            let vendor = d.vendor_id();
+            let dev = d.device_id();
+            if alias_query.contains(&format!("{:04x}", vendor)) && alias_query.contains(&format!("{:04x}", dev)) {
+                Some(d.id())
+            } else {
+                None
+            }
+        })
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -533,7 +563,7 @@ pub struct CompatibilityReport {
     pub results: Vec<(DeviceID, CompatibilityResult)>,
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -541,8 +571,8 @@ mod tests {
     fn test_compatibility_matrix() {
         let mut matrix = SimpleCompatibilityMatrix::new();
         matrix.seed_with_defaults();
-        assert_eq!(matrix.list_supported().len(), 7);
-        assert_eq!(matrix.list_by_type(DeviceType::WiFi).len(), 2);
+        assert_eq!(matrix.list_supported().len(), 14);
+        assert_eq!(matrix.list_by_type(DeviceType::WiFi).len(), 4);
     }
 
     #[test]
@@ -623,5 +653,36 @@ mod tests {
             .is_ok());
         assert_eq!(matrix.list_hotplug_history().len(), 1);
         assert_eq!(matrix.get_device(99).unwrap().name(), "HotplugDisk");
+    }
+
+    #[test]
+    fn test_linux_bsd_bus_info_and_alias_matching() {
+        let mut matrix = SimpleCompatibilityMatrix::new();
+        matrix.seed_with_defaults();
+
+        let bus_info = LinuxBsdHardwareBusInfo {
+            bus_type: "pci".to_string(),
+            pci_vendor_id: 0x8086,
+            pci_device_id: 0x2723,
+            usb_vendor_id: 0,
+            usb_product_id: 0,
+            driver_alias: "pci:v00008086d00002723sv*sd*bc*sc*i*".to_string(),
+        };
+
+        let dev = SimpleDevice::new(
+            100,
+            DeviceType::WiFi,
+            0x8086,
+            0x2723,
+            "Intel Wi-Fi 6 AX200",
+            SupportStatus::Supported,
+        )
+        .with_bus_info(bus_info.clone());
+
+        assert!(matrix.add_device(Box::new(dev)).is_ok());
+
+        let matched = matrix.match_driver_by_alias("pci:v00008086d00002723sv*sd*bc*sc*i*");
+        assert!(matched.is_some());
+        assert_eq!(matrix.get_device(matched.unwrap()).unwrap().vendor_id(), 0x8086);
     }
 }
