@@ -197,7 +197,21 @@ impl SovereignSandboxingRulesEngine {
     pub fn check_unveil(&self, app_name: &str, target_path: &str, req_perm: char) -> bool {
         if let Some(rules) = self.unveil_rules.get(app_name) {
             for rule in rules {
-                if target_path.starts_with(&rule.path) {
+                // Sentinel 🛡️ Hardening: Prevent path prefix confusion sandboxing bypasses
+                // Verify path equality, root path, trailing separator, or directory separator boundary
+                let matches = if target_path == rule.path {
+                    true
+                } else if rule.path == "/" {
+                    true
+                } else if target_path.starts_with(&rule.path) {
+                    rule.path.ends_with('/')
+                        || rule.path.ends_with('\\')
+                        || target_path[rule.path.len()..].starts_with('/')
+                        || target_path[rule.path.len()..].starts_with('\\')
+                } else {
+                    false
+                };
+                if matches {
                     return rule.permissions.contains(req_perm);
                 }
             }
@@ -533,7 +547,7 @@ impl Default for SovereignCapsicumRightsRules {
 // UNIT TESTS
 // =========================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -556,6 +570,28 @@ mod tests {
 
         assert!(sandbox.check_unveil("web_browser", "/home/user/.config/browser/cookies.db", 'r'));
         assert!(!sandbox.check_unveil("web_browser", "/etc/shadow", 'r'));
+    }
+
+    #[test]
+    fn test_unveil_path_prefix_confusion_prevention() {
+        let mut sandbox = SovereignSandboxingRulesEngine::new();
+        sandbox.add_unveil_profile(
+            "app",
+            vec![UnveilRule {
+                path: "/tmp".to_string(),
+                permissions: "rw".to_string(),
+            }],
+        );
+
+        // Exact match
+        assert!(sandbox.check_unveil("app", "/tmp", 'r'));
+        // Valid child path
+        assert!(sandbox.check_unveil("app", "/tmp/file.txt", 'r'));
+        assert!(sandbox.check_unveil("app", "/tmp/sub/dir", 'w'));
+
+        // Path prefix confusion attempts must be denied!
+        assert!(!sandbox.check_unveil("app", "/tmp_secret", 'r'));
+        assert!(!sandbox.check_unveil("app", "/tmp_evil/file.txt", 'w'));
     }
 
     #[test]
