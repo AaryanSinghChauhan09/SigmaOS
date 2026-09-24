@@ -211,16 +211,22 @@ impl UniversalPackageImporter {
             .iter()
             .map(|dep| {
                 let dep_lower = dep.to_lowercase();
-                if dep_lower.contains("ssl") || dep_lower.contains("crypto") {
+                if dep_lower.contains("ssl") || dep_lower.contains("crypto") || dep_lower.contains("gnutls") || dep_lower.contains("mbedtls") {
                     "sovereign-openssl".to_string()
-                } else if dep_lower.contains("libc") || dep_lower == "musl" || dep_lower.contains("freebsd-runtime") || dep_lower.contains("openbsd-sys") || dep_lower.contains("haiku-libroot") {
+                } else if dep_lower.contains("libc") || dep_lower == "musl" || dep_lower.contains("glibc") || dep_lower.contains("freebsd-runtime") || dep_lower.contains("openbsd-sys") || dep_lower.contains("haiku-libroot") || dep_lower.contains("pkgsrc-core") {
                     "sovereign-libc".to_string()
-                } else if dep_lower.contains("zlib") {
-                    "sovereign-zlib".to_string()
+                } else if dep_lower.contains("zlib") || dep_lower.contains("zstd") || dep_lower.contains("lz4") || dep_lower.contains("xz") || dep_lower.contains("bzip2") {
+                    "sovereign-compression".to_string()
                 } else if dep_lower.contains("python") {
                     "sovereign-python".to_string()
-                } else if dep_lower == "bash" || dep_lower == "zsh" || dep_lower == "sh" {
+                } else if dep_lower == "bash" || dep_lower == "zsh" || dep_lower == "fish" || dep_lower == "sh" {
                     "sovereign-shell".to_string()
+                } else if dep_lower.contains("systemd") || dep_lower.contains("openrc") || dep_lower.contains("runit") || dep_lower.contains("sysvinit") {
+                    "sovereign-init".to_string()
+                } else if dep_lower.contains("wayland") || dep_lower.contains("x11") || dep_lower.contains("mesa") || dep_lower.contains("vulkan") || dep_lower.contains("pipewire") || dep_lower.contains("pulseaudio") || dep_lower.contains("alsa") {
+                    "sovereign-media-graphics".to_string()
+                } else if dep_lower.contains("gcc") || dep_lower.contains("clang") || dep_lower.contains("llvm") || dep_lower.contains("binutils") || dep_lower.contains("make") || dep_lower.contains("cmake") {
+                    "sovereign-toolchain".to_string()
                 } else {
                     dep.clone()
                 }
@@ -334,6 +340,248 @@ impl ForeignRepoIndexParser {
                             current_deps.push(dep.to_string());
                         }
                     }
+                }
+            }
+            UniversalPackageFormat::ArchPacman => {
+                let mut current_name = String::new();
+                let mut current_ver = String::new();
+                let mut current_desc = String::new();
+                let mut current_deps = Vec::new();
+                let mut current_section = "";
+
+                for line in raw_index.lines() {
+                    let trimmed = line.trim();
+                    if trimmed.starts_with('%') && trimmed.ends_with('%') {
+                        let new_sec = &trimmed[1..trimmed.len() - 1];
+                        if (new_sec == "FILENAME" || new_sec == "NAME") && !current_name.is_empty() && (!current_ver.is_empty() || !current_desc.is_empty()) {
+                            packages.push(Package {
+                                name: current_name.clone(),
+                                version: if current_ver.is_empty() { "1.0.0".to_string() } else { current_ver.clone() },
+                                description: current_desc.clone(),
+                                dependencies: UniversalPackageImporter::translate_foreign_dependencies(&current_deps),
+                                conflicts: vec![],
+                                provides: vec![current_name.clone()],
+                                size: 4_000_000,
+                                installed_size: 12_000_000,
+                                url: None,
+                                license: "Arch-Standard".to_string(),
+                                groups: vec!["pacman-repo".to_string()],
+                                architecture: "x86_64".to_string(),
+                                repository: "pacman-index".to_string(),
+                            });
+                            current_name.clear();
+                            current_ver.clear();
+                            current_desc.clear();
+                            current_deps.clear();
+                        }
+                        current_section = new_sec;
+                        continue;
+                    }
+                    if trimmed.is_empty() {
+                        continue;
+                    }
+
+                    match current_section {
+                        "NAME" => current_name = trimmed.to_string(),
+                        "VERSION" => current_ver = trimmed.to_string(),
+                        "DESC" => current_desc = trimmed.to_string(),
+                        "DEPENDS" => current_deps.push(trimmed.split('>').next().unwrap_or(trimmed).split('=').next().unwrap_or(trimmed).trim().to_string()),
+                        _ => {}
+                    }
+                }
+                if !current_name.is_empty() {
+                    packages.push(Package {
+                        name: current_name.clone(),
+                        version: if current_ver.is_empty() { "1.0.0".to_string() } else { current_ver },
+                        description: current_desc,
+                        dependencies: UniversalPackageImporter::translate_foreign_dependencies(&current_deps),
+                        conflicts: vec![],
+                        provides: vec![current_name.clone()],
+                        size: 4_000_000,
+                        installed_size: 12_000_000,
+                        url: None,
+                        license: "Arch-Standard".to_string(),
+                        groups: vec!["pacman-repo".to_string()],
+                        architecture: "x86_64".to_string(),
+                        repository: "pacman-index".to_string(),
+                    });
+                }
+            }
+            UniversalPackageFormat::FedoraRpm => {
+                let mut current_name = String::new();
+                let mut current_ver = String::new();
+                let mut current_desc = String::new();
+                let mut current_deps = Vec::new();
+
+                for line in raw_index.lines() {
+                    let trimmed = line.trim();
+                    if trimmed.contains("<name>") && trimmed.contains("</name>") {
+                        if let (Some(s), Some(e)) = (trimmed.find("<name>"), trimmed.find("</name>")) {
+                            current_name = trimmed[s + 6..e].to_string();
+                        }
+                    } else if trimmed.contains("ver=\"") {
+                        if let Some(s) = trimmed.find("ver=\"") {
+                            let rest = &trimmed[s + 5..];
+                            if let Some(e) = rest.find('"') {
+                                current_ver = rest[..e].to_string();
+                            }
+                        }
+                    } else if trimmed.contains("<summary>") && trimmed.contains("</summary>") {
+                        if let (Some(s), Some(e)) = (trimmed.find("<summary>"), trimmed.find("</summary>")) {
+                            current_desc = trimmed[s + 9..e].to_string();
+                        }
+                    } else if trimmed.contains("<entry name=\"") {
+                        if let Some(s) = trimmed.find("<entry name=\"") {
+                            let rest = &trimmed[s + 13..];
+                            if let Some(e) = rest.find('"') {
+                                current_deps.push(rest[..e].to_string());
+                            }
+                        }
+                    } else if trimmed.contains("</package>") {
+                        if !current_name.is_empty() {
+                            packages.push(Package {
+                                name: current_name.clone(),
+                                version: if current_ver.is_empty() { "1.0.0".to_string() } else { current_ver.clone() },
+                                description: current_desc.clone(),
+                                dependencies: UniversalPackageImporter::translate_foreign_dependencies(&current_deps),
+                                conflicts: vec![],
+                                provides: vec![current_name.clone()],
+                                size: 6_000_000,
+                                installed_size: 18_000_000,
+                                url: None,
+                                license: "Fedora-Standard".to_string(),
+                                groups: vec!["rpm-repo".to_string()],
+                                architecture: "x86_64".to_string(),
+                                repository: "dnf-index".to_string(),
+                            });
+                            current_name.clear();
+                            current_ver.clear();
+                            current_desc.clear();
+                            current_deps.clear();
+                        }
+                    }
+                }
+            }
+            UniversalPackageFormat::VoidXbps => {
+                let mut current_name = String::new();
+                let mut current_ver = String::new();
+                let mut current_desc = String::new();
+                let mut current_deps = Vec::new();
+
+                for line in raw_index.lines() {
+                    let trimmed = line.trim();
+                    if trimmed.is_empty() {
+                        if !current_name.is_empty() {
+                            packages.push(Package {
+                                name: current_name.clone(),
+                                version: current_ver.clone(),
+                                description: current_desc.clone(),
+                                dependencies: UniversalPackageImporter::translate_foreign_dependencies(&current_deps),
+                                conflicts: vec![],
+                                provides: vec![current_name.clone()],
+                                size: 3_000_000,
+                                installed_size: 9_000_000,
+                                url: None,
+                                license: "Void-Standard".to_string(),
+                                groups: vec!["xbps-repo".to_string()],
+                                architecture: "x86_64".to_string(),
+                                repository: "xbps-index".to_string(),
+                            });
+                            current_name.clear();
+                            current_ver.clear();
+                            current_desc.clear();
+                            current_deps.clear();
+                        }
+                        continue;
+                    }
+
+                    if let Some(pos) = trimmed.find('=') {
+                        let key = trimmed[..pos].trim();
+                        let val = trimmed[pos + 1..].trim().trim_matches('"');
+                        match key {
+                            "pkgname" => current_name = val.to_string(),
+                            "version" => current_ver = val.to_string(),
+                            "short_desc" => current_desc = val.to_string(),
+                            "run_depends" => {
+                                for dep in val.split_whitespace() {
+                                    current_deps.push(dep.to_string());
+                                }
+                            }
+                            _ => {}
+                        }
+                    }
+                }
+            }
+            UniversalPackageFormat::FreeBsdPkg => {
+                let mut current_name = String::new();
+                let mut current_ver = String::new();
+                let mut current_desc = String::new();
+                let mut current_deps = Vec::new();
+
+                for line in raw_index.lines() {
+                    let trimmed = line.trim();
+                    if trimmed.is_empty() {
+                        if !current_name.is_empty() {
+                            packages.push(Package {
+                                name: current_name.clone(),
+                                version: if current_ver.is_empty() { "1.0.0".to_string() } else { current_ver.clone() },
+                                description: current_desc.clone(),
+                                dependencies: UniversalPackageImporter::translate_foreign_dependencies(&current_deps),
+                                conflicts: vec![],
+                                provides: vec![current_name.clone()],
+                                size: 5_000_000,
+                                installed_size: 15_000_000,
+                                url: None,
+                                license: "BSD-2-Clause".to_string(),
+                                groups: vec!["freebsd-repo".to_string()],
+                                architecture: "amd64".to_string(),
+                                repository: "freebsd-pkg-index".to_string(),
+                            });
+                            current_name.clear();
+                            current_ver.clear();
+                            current_desc.clear();
+                            current_deps.clear();
+                        }
+                        continue;
+                    }
+
+                    if trimmed.starts_with("name:") || trimmed.starts_with("\"name\":") {
+                        if let Some(pos) = trimmed.find(':') {
+                            current_name = trimmed[pos + 1..].trim().trim_matches(&['"', ',', ' '][..]).to_string();
+                        }
+                    } else if trimmed.starts_with("version:") || trimmed.starts_with("\"version\":") {
+                        if let Some(pos) = trimmed.find(':') {
+                            current_ver = trimmed[pos + 1..].trim().trim_matches(&['"', ',', ' '][..]).to_string();
+                        }
+                    } else if trimmed.starts_with("comment:") || trimmed.starts_with("\"comment\":") {
+                        if let Some(pos) = trimmed.find(':') {
+                            current_desc = trimmed[pos + 1..].trim().trim_matches(&['"', ',', ' '][..]).to_string();
+                        }
+                    } else if trimmed.contains("origin") {
+                        if let Some(pos) = trimmed.find(':') {
+                            let dep = trimmed[pos + 1..].trim().trim_matches(&['"', ',', ' '][..]);
+                            if !dep.is_empty() {
+                                current_deps.push(dep.to_string());
+                            }
+                        }
+                    }
+                }
+                if !current_name.is_empty() {
+                    packages.push(Package {
+                        name: current_name.clone(),
+                        version: if current_ver.is_empty() { "1.0.0".to_string() } else { current_ver },
+                        description: current_desc,
+                        dependencies: UniversalPackageImporter::translate_foreign_dependencies(&current_deps),
+                        conflicts: vec![],
+                        provides: vec![current_name.clone()],
+                        size: 5_000_000,
+                        installed_size: 15_000_000,
+                        url: None,
+                        license: "BSD-2-Clause".to_string(),
+                        groups: vec!["freebsd-repo".to_string()],
+                        architecture: "amd64".to_string(),
+                        repository: "freebsd-pkg-index".to_string(),
+                    });
                 }
             }
             _ => {
@@ -1028,17 +1276,52 @@ impl SigmaPkg {
 
         let mut action = "install";
         let mut target_packages = Vec::new();
+        let mut action_explicitly_set = false;
+
+        if pm == "xbps-install" {
+            action = "install";
+            action_explicitly_set = true;
+        } else if pm == "xbps-remove" || pm == "pkg_delete" {
+            action = "remove";
+            action_explicitly_set = true;
+        } else if pm == "xbps-query" {
+            action = "search";
+            action_explicitly_set = true;
+        } else if pm == "nix-env" {
+            if args.contains(&"-i") || args.contains(&"-iA") || args.contains(&"--install") {
+                action = "install";
+                action_explicitly_set = true;
+            } else if args.contains(&"-e") || args.contains(&"--uninstall") {
+                action = "remove";
+                action_explicitly_set = true;
+            } else if args.contains(&"-u") || args.contains(&"--upgrade") {
+                action = "upgrade";
+                action_explicitly_set = true;
+            } else if args.contains(&"-q") || args.contains(&"--query") {
+                action = "search";
+                action_explicitly_set = true;
+            }
+        }
 
         for arg in args {
-            if *arg == "install" || *arg == "-S" || *arg == "add" || *arg == "it" || *arg == "-i" {
-                action = "install";
-            } else if *arg == "remove" || *arg == "purge" || *arg == "-R" || *arg == "del" || *arg == "delete" || *arg == "rm" || *arg == "-C" || *arg == "--unmerge" {
-                action = "remove";
-            } else if *arg == "update" || *arg == "upgrade" || *arg == "-Syu" || *arg == "up" {
-                action = "upgrade";
-            } else if *arg == "search" || *arg == "-Ss" || *arg == "se" || *arg == "find" {
-                action = "search";
-            } else if !arg.starts_with('-') {
+            if !action_explicitly_set {
+                if *arg == "install" || *arg == "add" || *arg == "it" || *arg == "in" || *arg == "get" {
+                    action = "install";
+                } else if *arg == "-S" {
+                    if args.contains(&"-s") || args.contains(&"-ss") || args.contains(&"-Ss") || args.contains(&"-Si") {
+                        action = "search";
+                    } else {
+                        action = "install";
+                    }
+                } else if *arg == "remove" || *arg == "purge" || *arg == "-R" || *arg == "del" || *arg == "delete" || *arg == "rm" || *arg == "-C" || *arg == "--unmerge" || *arg == "erase" || *arg == "uninstall" {
+                    action = "remove";
+                } else if *arg == "update" || *arg == "upgrade" || *arg == "-Syu" || *arg == "up" || *arg == "dup" || *arg == "sync" {
+                    action = "upgrade";
+                } else if *arg == "search" || *arg == "-Ss" || *arg == "se" || *arg == "find" || *arg == "info" || *arg == "-Qi" || *arg == "-Si" || *arg == "show" {
+                    action = "search";
+                }
+            }
+            if !arg.starts_with('-') {
                 target_packages.push(arg.to_string());
             }
         }
@@ -1219,6 +1502,26 @@ mod tests {
         assert_eq!(apk_pkgs.len(), 2);
         assert_eq!(apk_pkgs[0].name, "musl");
         assert_eq!(apk_pkgs[1].name, "zstd");
+
+        let arch_desc = "%FILENAME%\nripgrep-13.0.0-1-x86_64.pkg.tar.zst\n\n%NAME%\nripgrep\n\n%VERSION%\n13.0.0-1\n\n%DESC%\nFast search tool\n\n%DEPENDS%\npcre2\n\n%FILENAME%\nfd-8.7.0-1-x86_64.pkg.tar.zst\n\n%NAME%\nfd\n\n%VERSION%\n8.7.0-1\n\n%DESC%\nSimple fast find alternative\n\n";
+        let arch_pkgs = ForeignRepoIndexParser::parse_index(UniversalPackageFormat::ArchPacman, arch_desc);
+        assert_eq!(arch_pkgs.len(), 2);
+        assert_eq!(arch_pkgs[0].name, "ripgrep");
+        assert_eq!(arch_pkgs[0].version, "13.0.0-1");
+        assert_eq!(arch_pkgs[1].name, "fd");
+        assert_eq!(arch_pkgs[1].version, "8.7.0-1");
+
+        let freebsd_index = "name: redis\nversion: 7.2.3\ncomment: Persistent key-value database\n\nname: nginx\nversion: 1.24.0\ncomment: HTTP server\n\n";
+        let freebsd_pkgs = ForeignRepoIndexParser::parse_index(UniversalPackageFormat::FreeBsdPkg, freebsd_index);
+        assert_eq!(freebsd_pkgs.len(), 2);
+        assert_eq!(freebsd_pkgs[0].name, "redis");
+        assert_eq!(freebsd_pkgs[1].name, "nginx");
+
+        let xbps_index = "pkgname=neovim\nversion=0.9.5_1\nshort_desc=Fork of Vim focused on extensibility\nrun_depends=\"glibc>=2.30 libunibilium>=2.0\"\n\n";
+        let xbps_pkgs = ForeignRepoIndexParser::parse_index(UniversalPackageFormat::VoidXbps, xbps_index);
+        assert_eq!(xbps_pkgs.len(), 1);
+        assert_eq!(xbps_pkgs[0].name, "neovim");
+        assert!(xbps_pkgs[0].dependencies.contains(&"sovereign-libc".to_string()));
     }
 
     #[test]
@@ -1301,5 +1604,26 @@ mod tests {
         let apk_res = pkg_mgr.execute_universal_cli_command("apk add musl-dev").unwrap();
         assert!(apk_res.contains("musl-dev"));
         assert!(pkg_mgr.local_packages.contains_key("musl-dev"));
+
+        let dnf_res = pkg_mgr.execute_universal_cli_command("dnf install htop").unwrap();
+        assert!(dnf_res.contains("htop"));
+        assert!(pkg_mgr.local_packages.contains_key("htop"));
+
+        let xbps_res = pkg_mgr.execute_universal_cli_command("xbps-install -S zstd").unwrap();
+        assert!(xbps_res.contains("zstd"));
+        assert!(pkg_mgr.local_packages.contains_key("zstd"));
+
+        let freebsd_res = pkg_mgr.execute_universal_cli_command("pkg install redis").unwrap();
+        assert!(freebsd_res.contains("redis"));
+        assert!(pkg_mgr.local_packages.contains_key("redis"));
+
+        let nix_res = pkg_mgr.execute_universal_cli_command("nix-env -iA nixpkgs.git").unwrap();
+        assert!(nix_res.contains("nixpkgs.git"));
+
+        let xbps_query_res = pkg_mgr.execute_universal_cli_command("xbps-query -S zstd").unwrap();
+        assert!(xbps_query_res.contains("Found"));
+
+        let pacman_search_res = pkg_mgr.execute_universal_cli_command("pacman -Ss nginx").unwrap();
+        assert!(pacman_search_res.contains("Found"));
     }
 }
