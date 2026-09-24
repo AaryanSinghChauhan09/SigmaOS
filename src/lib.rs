@@ -67,6 +67,8 @@ pub mod tools;
 pub use open_source_os_gap_closure::*;
 pub use tools::tech_media_extended_suite::*;
 pub use distro::sovereign_linux_bsd_master_synthesis::*;
+pub use distro::additional_linux_bsd_components::*;
+pub use distro::sovereign_media_and_distro_unimplemented_innovations::*;
 pub mod sovereign_wiki_master_engine;
 pub use sovereign_wiki_master_engine::*;
 pub mod open_source_obsoletion;

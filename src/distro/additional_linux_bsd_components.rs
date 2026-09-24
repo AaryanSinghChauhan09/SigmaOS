@@ -406,6 +406,167 @@ impl FreeBsdPoudriereBulkBuilderEngine {
     }
 }
 
+/// OpenBSD syspatch Binary Base System Security Patch Engine
+#[derive(Debug, Clone)]
+pub struct OpenBsdSyspatchEngine {
+    pub release_version: String,
+    pub installed_patches: Vec<String>,
+    pub pending_patches: Vec<String>,
+}
+
+impl OpenBsdSyspatchEngine {
+    pub fn new(release: &str) -> Self {
+        Self {
+            release_version: release.to_string(),
+            installed_patches: Vec::new(),
+            pending_patches: Vec::new(),
+        }
+    }
+
+    pub fn register_patch(&mut self, patch_id: &str) {
+        if !self.installed_patches.contains(&patch_id.to_string())
+            && !self.pending_patches.contains(&patch_id.to_string())
+        {
+            self.pending_patches.push(patch_id.to_string());
+        }
+    }
+
+    pub fn apply_all_patches(&mut self) -> usize {
+        let applied_count = self.pending_patches.len();
+        self.installed_patches.append(&mut self.pending_patches);
+        applied_count
+    }
+}
+
+/// NetBSD Rump Kernel Driver Isolation & Hypercall Execution Server Engine
+#[derive(Debug, Clone)]
+pub struct NetBsdRumpKernelServerEngine {
+    pub active_rump_servers: Vec<String>,
+    pub hypercall_count: u64,
+}
+
+impl NetBsdRumpKernelServerEngine {
+    pub fn new() -> Self {
+        Self {
+            active_rump_servers: Vec::new(),
+            hypercall_count: 0,
+        }
+    }
+
+    pub fn spawn_rump_server(&mut self, subsystem_driver: &str) -> Result<String, &'static str> {
+        if subsystem_driver.is_empty() {
+            return Err("Subsystem driver cannot be empty");
+        }
+        let srv = format!("rump_server_{}", subsystem_driver);
+        if !self.active_rump_servers.contains(&srv) {
+            self.active_rump_servers.push(srv.clone());
+        }
+        self.hypercall_count += 1;
+        Ok(srv)
+    }
+}
+
+impl Default for NetBsdRumpKernelServerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// DragonFly BSD HAMMER2 Pseudo-FileSystem (PFS) Snapshot & Multi-Master Replication Engine
+#[derive(Debug, Clone)]
+pub struct DragonFlyHammer2PfsEngine {
+    pub pool_name: String,
+    pub pfs_snapshots: Vec<String>,
+    pub replication_nodes: Vec<String>,
+}
+
+impl DragonFlyHammer2PfsEngine {
+    pub fn new(pool: &str) -> Self {
+        Self {
+            pool_name: pool.to_string(),
+            pfs_snapshots: Vec::new(),
+            replication_nodes: Vec::new(),
+        }
+    }
+
+    pub fn create_pfs_snapshot(&mut self, label: &str) -> String {
+        let snap_name = format!("@pfs_snap_{}", label);
+        if !self.pfs_snapshots.contains(&snap_name) {
+            self.pfs_snapshots.push(snap_name.clone());
+        }
+        snap_name
+    }
+
+    pub fn add_replication_node(&mut self, node_ip: &str) {
+        if !self.replication_nodes.contains(&node_ip.to_string()) {
+            self.replication_nodes.push(node_ip.to_string());
+        }
+    }
+}
+
+/// Alpine Linux Local Backup (lbu) apkovl Overlay State Manager
+#[derive(Debug, Clone)]
+pub struct AlpineLbuApkovlEngine {
+    pub media_mount_point: String,
+    pub tracked_overlay_files: Vec<String>,
+    pub apkovl_tarball: Option<String>,
+}
+
+impl AlpineLbuApkovlEngine {
+    pub fn new(mount: &str) -> Self {
+        Self {
+            media_mount_point: mount.to_string(),
+            tracked_overlay_files: Vec::new(),
+            apkovl_tarball: None,
+        }
+    }
+
+    pub fn track_config_file(&mut self, filepath: &str) {
+        if !self.tracked_overlay_files.contains(&filepath.to_string()) {
+            self.tracked_overlay_files.push(filepath.to_string());
+        }
+    }
+
+    pub fn commit_lbu_overlay(&mut self, hostname: &str) -> String {
+        let tarball_name = format!("{}/{}.apkovl.tar.gz", self.media_mount_point, hostname);
+        self.apkovl_tarball = Some(tarball_name.clone());
+        tarball_name
+    }
+}
+
+/// Nix Flakes Hermetic Pure Evaluation & Build Closure Engine
+#[derive(Debug, Clone)]
+pub struct NixFlakeHermeticBuildEngine {
+    pub flake_uri: String,
+    pub lock_file_hash: String,
+    pub evaluated_store_paths: Vec<String>,
+    pub is_pure: bool,
+}
+
+impl NixFlakeHermeticBuildEngine {
+    pub fn new(uri: &str, lock_hash: &str) -> Self {
+        Self {
+            flake_uri: uri.to_string(),
+            lock_file_hash: lock_hash.to_string(),
+            evaluated_store_paths: Vec::new(),
+            is_pure: true,
+        }
+    }
+
+    pub fn evaluate_flake_output(&mut self, output_attribute: &str) -> String {
+        let store_path = format!(
+            "/nix/store/{}-{}-{}",
+            &self.lock_file_hash[..8.min(self.lock_file_hash.len())],
+            output_attribute,
+            "pure-closure"
+        );
+        if !self.evaluated_store_paths.contains(&store_path) {
+            self.evaluated_store_paths.push(store_path.clone());
+        }
+        store_path
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -497,5 +658,32 @@ mod tests {
         let mut poudriere = FreeBsdPoudriereBulkBuilderEngine::new("14_1_amd64", "default");
         assert!(poudriere.build_port_package("security/openssl"));
         assert_eq!(poudriere.completed_packages.len(), 1);
+
+        // Test OpenBSD syspatch engine
+        let mut syspatch = OpenBsdSyspatchEngine::new("7.6");
+        syspatch.register_patch("001_kernel");
+        assert_eq!(syspatch.apply_all_patches(), 1);
+        assert_eq!(syspatch.installed_patches.len(), 1);
+
+        // Test NetBSD rump kernel server engine
+        let mut rump = NetBsdRumpKernelServerEngine::new();
+        let srv = rump.spawn_rump_server("ffs").unwrap();
+        assert_eq!(srv, "rump_server_ffs");
+
+        // Test DragonFly BSD HAMMER2 PFS engine
+        let mut h2 = DragonFlyHammer2PfsEngine::new("BOOT");
+        let snap = h2.create_pfs_snapshot("daily");
+        assert_eq!(snap, "@pfs_snap_daily");
+
+        // Test Alpine lbu apkovl engine
+        let mut lbu = AlpineLbuApkovlEngine::new("/media/sda1");
+        lbu.track_config_file("/etc/network/interfaces");
+        let apkovl = lbu.commit_lbu_overlay("sovereign-node");
+        assert_eq!(apkovl, "/media/sda1/sovereign-node.apkovl.tar.gz");
+
+        // Test Nix Flake hermetic build engine
+        let mut flake = NixFlakeHermeticBuildEngine::new("github:nixos/nixpkgs", "a1b2c3d4e5f67890");
+        let store_p = flake.evaluate_flake_output("packages.x86_64-linux.neovim");
+        assert!(store_p.contains("/nix/store/a1b2c3d4-packages.x86_64-linux.neovim-pure-closure"));
     }
 }
