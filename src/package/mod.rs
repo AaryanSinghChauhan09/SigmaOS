@@ -49,6 +49,8 @@ pub mod sovereign_distro_package_matrix;
 pub use sovereign_distro_package_matrix::*;
 pub mod universal_package_innovations_suite;
 pub use universal_package_innovations_suite::*;
+pub mod sovereign_distro_package_advancements_v4;
+pub use sovereign_distro_package_advancements_v4::*;
 
 pub use alpine_apk::{ApkPackage, ApkPackageManager, ApkRepository, ApkWorld};
 pub use arch_aur::{AURPackage, BuildError, SigmaAUR, PKGBUILD};
