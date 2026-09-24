@@ -619,7 +619,7 @@ impl Default for AccessManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
