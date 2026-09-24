@@ -47,11 +47,15 @@ pub use tmux::{
 pub use mind_map::{IndentedTextMindMapParserEngine, MindMapCreator, MindMapNode, MindMapLayout, NodeShape, NodeStyle, RelationshipConnection};
 
 pub use sigma_office::{
-    CellValue, DocumentNode, DocumentType, EnterpriseDeal, EnterpriseInvoice,
-    InlineDocComment, LiveCoAuthoringManager, LookerChartWidget, LookerMetricCard,
-    MacroExecutor, OdfDocumentKind, ParagraphStyle, PresentationProcessor,
-    SigmaFormulaParserEngine, SigmaOdfPackageEngine, SigmaOffice, SigmaSlideDetails,
-    SigmaSpellCheckerEngine, SigmaStyleThemeEngine, SigmaTrackChangesEngine,
-    SovereignCrmPipeline, SpreadsheetProcessor, SuggestionEdit,
-    TextProcessor, TypographyRenderer, VersionHistoryManager,
+    CellValue, DbColumnType, DbRow, DbTable, DbTableColumn, DocumentNode, DocumentType,
+    DripStep, EnterpriseDeal, EnterpriseInvoice, FormQuestion, FormResponse, HelpdeskTicket,
+    InlineDocComment, InventoryItem, LiveCoAuthoringManager, LookerChartWidget, LookerMetricCard,
+    MacroExecutor, OdfDocumentKind, ParagraphStyle, PresentationProcessor, QuestionType,
+    QuickNoteItem, SigmaFormulaParserEngine, SigmaOdfPackageEngine, SigmaOffice, SigmaSlideDetails,
+    SigmaSpellCheckerEngine, SigmaStyleThemeEngine, SigmaTrackChangesEngine, SovereignCollaborativeWhiteboardEngine,
+    SovereignCrmPipeline, SovereignFormsSurveyEngine, SovereignHelpdeskSlaEngine, SovereignIntegrationWorkflowEngine,
+    SovereignInventoryWarehouseEngine, SovereignLowCodeDatabaseEngine, SovereignMarketingCampaignEngine,
+    SovereignQuickNotesEngine, SovereignWebPublisherEngine, SovereignWorkgroupGanttEngine, SpreadsheetProcessor,
+    SuggestionEdit, TextProcessor, TicketPriority, TicketStatus, TypographyRenderer, VersionHistoryManager,
+    WebLayoutBlock, WhiteboardElement, WhiteboardElementType, WorkgroupTask, WorkflowAction, WorkflowRule, WorkflowTrigger,
 };
