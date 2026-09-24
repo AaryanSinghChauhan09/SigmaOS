@@ -72,6 +72,13 @@ if [ -f "src/distro/sovereign_linux_bsd_distro_master_suite.rs" ]; then
     ./build/distro_master_suite_test
 fi
 
+if [ -f "src/distro/sovereign_linux_bsd_master_synthesis.rs" ]; then
+    echo "Running Sovereign Linux & BSD Master Synthesis test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_linux_bsd_master_synthesis.rs --edition=2021 -o build/linux_bsd_master_synthesis_test
+    ./build/linux_bsd_master_synthesis_test
+fi
+
 if [ -f "src/network/approximation_proxy_firewall.rs" ]; then
     echo "Running Sovereign Approximation Proxy Firewall test suite..."
     mkdir -p build
