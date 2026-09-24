@@ -5,3 +5,4 @@
 pub mod posix_path;
 
 pub use posix_path::*;
+pub mod ramfs;
