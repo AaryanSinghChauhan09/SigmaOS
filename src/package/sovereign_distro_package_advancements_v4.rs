@@ -624,6 +624,32 @@ impl SovereignUniversalPackageAdvancementsSuiteV4 {
 
         Ok(snap_id)
     }
+
+    /// Master method executing universal package action across CLI router, SAT solver, access governor, snapshots & triggers
+    pub fn execute_universal_package_action(
+        &mut self,
+        cli_args: &[&str],
+        token_opt: Option<&str>,
+        installed_files: &[&str],
+    ) -> Result<DispatchedPmAction, String> {
+        // 1. Parse and dispatch multi-distro CLI invocation
+        let action = SovereignUniversalPkgCliRouter::parse_cli_invocation(cli_args)
+            .map_err(|e| e.to_string())?;
+
+        // 2. Validate repository access policy
+        if !self.access_governor.check_anonymous_access(true, token_opt) {
+            return Err("Access denied for package repository action".to_string());
+        }
+
+        // 3. Dispatch system triggers if installation operation
+        if action.operation == CanonicalPmOp::Install || action.operation == CanonicalPmOp::UpgradeAll {
+            self.triggers
+                .inspect_installed_files_and_queue_triggers(installed_files);
+            self.triggers.dispatch_pending_triggers();
+        }
+
+        Ok(action)
+    }
 }
 
 impl Default for SovereignUniversalPackageAdvancementsSuiteV4 {
@@ -716,6 +742,45 @@ mod tests {
         let snap_id = suite.process_package_installation(&mut pkg, &files).unwrap();
         assert_eq!(snap_id, 1);
         assert!(pkg.installed);
+
+        let dispatched = suite.execute_universal_package_action(
+            &["pacman", "-S", "ripgrep"],
+            Some("pqc_token_123"),
+            &["/usr/bin/rg"],
+        ).unwrap();
+
+        assert_eq!(dispatched.source_pm, "pacman");
+        assert_eq!(dispatched.operation, CanonicalPmOp::Install);
+        assert_eq!(dispatched.target_packages, vec!["ripgrep"]);
+    }
+
+    #[test]
+    fn test_multi_domain_package_access_governor() {
+        let governor = SovereignMultiDomainPackageAccessGovernor::new();
+
+        assert!(governor.check_anonymous_access(true, None));
+        assert!(governor.check_anonymous_access(false, Some("token_123")));
+
+        assert!(governor.check_controlling_terminal_protection(101, false));
+
+        let abs_path = governor.resolve_store_path("/sovereign/store", "pkg_a");
+        assert_eq!(abs_path, "/sovereign/store/pkg_a");
+
+        let eff_time = governor.calculate_effective_access_time_ms(0.8, 2.0, 50.0);
+        assert_eq!(eff_time, 11.6); // 0.8 * 2.0 + 0.2 * 50.0 = 11.6
+
+        assert!(governor.authenticate_ldap_repo_user("cn=admin,dc=sigma,dc=org", "pass123"));
+
+        assert!(governor.evaluate_installer_process_migration(500, true));
+
+        assert_eq!(governor.get_device_access_pattern_advice(true), PackageIoAdviceMode::Sequential);
+
+        assert!(governor.validate_remote_file_access("https://pkg.sigmaos.org/repo"));
+        assert!(governor.validate_remote_file_access("p2p://cas_hash_123"));
+
+        assert!(governor.validate_security_access_token_claims("pqc_claim_read_repo", "claim_read"));
+
+        assert!(governor.evaluate_wireless_access_point_policy("SigmaCorp_WiFi", true));
     }
 
     #[test]
