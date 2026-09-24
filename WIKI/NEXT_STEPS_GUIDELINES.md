@@ -13,14 +13,11 @@ All updates, bug fixes, features, and documentation enhancements must be committ
 - **Rule:** Never create a pull request (PR) for any changes in this repository.
 - **Action:** Push changes directly to `main` after verifying that all tests pass and code quality checks are satisfied.
 
-### 2. Linux & BSD 50% Rule Governance Standard
-- **Rule:** Implement and enforce the 50% resource threshold rule (`FiftyPercentRuleEngine` in `src/access/mod.rs`) across memory swap watermarks, CPU cgroup caps, page cache reclaim, overcommit limits, anonymous sessions, and process migration.
+### 2. User Mode (Ring 3) & TSS Standard
+- **Rule:** Enforce Ring 0 / Ring 3 privilege level transitions via `TaskStateSegment64` in `src/arch/cpu_sys.rs`. Ensure kernel stack pointers (`rsp0`) are updated before switching context to Ring 3 user mode.
 
-### 3. Tri-Agent Governance & Collaboration
-Work in harmony with the three autonomous specialized agent personas:
-- **⚡ Bolt (Performance & Optimization Agent):** Focuses on microsecond-level speedups, zero-allocation data structures, lockless ring buffers, and profiling.
-- **🎨 Palette (UX & Accessibility Agent):** Ensures WCAG 2.2 AAA accessibility compliance, screen-reader AT-SPI2 bus integration, smooth animations, and high-contrast focus rings.
-- **🛡️ Sentinel (Security & Compliance Agent):** Mandates ASLR guard page enforcement, TPM 2.0 PCR sealing, PQC post-quantum cryptography, and secret-free cleanroom execution.
+### 3. Linux & BSD 50% Rule Governance Standard
+- **Rule:** Implement and enforce the 50% resource threshold rule (`FiftyPercentRuleEngine` in `src/access/mod.rs`) across memory swap watermarks, CPU cgroup caps, page cache reclaim, overcommit limits, anonymous sessions, and process migration.
 
 ---
 
@@ -35,21 +32,13 @@ Whenever `ImprovementPlan.md` or `NEXT_STEPS_GUIDELINES.md` (or any core archite
 5. `wiki_content/`
 6. `wiki_repo/`
 
-### Mirror Sync Command Example:
-```bash
-cp ImprovementPlan.md NEXT_STEPS_GUIDELINES.md docs/
-cp ImprovementPlan.md NEXT_STEPS_GUIDELINES.md wiki/
-cp ImprovementPlan.md NEXT_STEPS_GUIDELINES.md WIKI/
-cp ImprovementPlan.md NEXT_STEPS_GUIDELINES.md wiki_content/
-cp ImprovementPlan.md NEXT_STEPS_GUIDELINES.md wiki_repo/
-```
-
 ---
 
 ## 🎯 Immediate Tactical Execution Checklist
+- [x] Implement `TaskStateSegment64` and Ring 3 transition routines in `src/arch/cpu_sys.rs` (5 unit tests passing).
+- [x] Enable and verify unit tests in `src/memory/segmentation_paging.rs` (3 unit tests passing).
 - [x] Implement `FiftyPercentRuleEngine` and enable unit tests in `src/access/mod.rs` (8 unit tests passing).
 - [x] Verify Python (`pytest tests/`) and Rust unit test suites (`./run_sigma_tests.sh`).
-- [x] Audit all 8 core domains and update `ImprovementPlan.md` and `NEXT_STEPS_GUIDELINES.md`.
 - [x] Synchronize master plans across all six mirror directories.
 - [x] Execute pre-commit verification steps.
 - [x] Commit and push directly to `main`.
