@@ -1,415 +1,181 @@
+/// SigmaOS Package Signing & Verification (Phase 2/6 Package Security)
+/// Inspired by Linux Mint's mintupdate security levels and Debian's apt-secure
 
-use std::boxed::Box;
+use std::collections::HashMap;
 use std::string::String;
 use std::vec::Vec;
-/// OOP-based Package Signing & Attestation for SigmaOS
-/// Based on Ideas-999-Structured: Package, Build & Reproducibility Item 10
-/// Implements provenance metadata and supply-chain attestations
-use core::sync::atomic::{AtomicUsize, Ordering};
 
-pub type KeyID = usize;
-
-#[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SignatureAlgorithm {
-    ED25519 = 0,
-    RSA4096 = 1,
-    Dilithium5 = 2,
-}
-
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SigningError {
-    Success = 0,
-    KeyNotFound = 1,
-    SignFailed = 2,
-    VerifyFailed = 3,
-}
-
-pub trait SigningKey {
-    fn id(&self) -> KeyID;
-    fn algorithm(&self) -> SignatureAlgorithm;
-    fn public_key(&self) -> &[u8];
-    fn sign(&self, data: &[u8]) -> Result<Vec<u8>, SigningError>;
-    fn verify(&self, data: &[u8], signature: &[u8]) -> Result<bool, SigningError>;
-}
-
-#[repr(C)]
-pub struct SimpleSigningKey {
-    pub id: KeyID,
-    pub algorithm: AtomicUsize,
-    pub public_key: [u8; 64],
-    pub private_key: [u8; 64],
-}
-
-impl SimpleSigningKey {
-    pub fn new(id: KeyID, algorithm: SignatureAlgorithm) -> Self {
-        let mut public = [0u8; 64];
-        let mut private = [0u8; 64];
-
-        for i in 0..64 {
-            public[i] = ((i * 17 + 31) % 256) as u8;
-            private[i] = ((i * 23 + 47) % 256) as u8;
-        }
-
-        SimpleSigningKey {
-            id,
-            algorithm: AtomicUsize::new(algorithm as usize),
-            public_key: public,
-            private_key: private,
-        }
-    }
-}
-
-impl SigningKey for SimpleSigningKey {
-    fn id(&self) -> KeyID {
-        self.id
-    }
-    fn algorithm(&self) -> SignatureAlgorithm {
-        match self.algorithm.load(Ordering::SeqCst) {
-            0 => SignatureAlgorithm::ED25519,
-            1 => SignatureAlgorithm::RSA4096,
-            _ => SignatureAlgorithm::Dilithium5,
-        }
-    }
-    fn public_key(&self) -> &[u8] {
-        &self.public_key
-    }
-
-    fn sign(&self, data: &[u8]) -> Result<Vec<u8>, SigningError> {
-        let mut signature = Vec::new();
-        let mut hash: usize = 0;
-
-        for &byte in data {
-            hash = hash.wrapping_add(byte as usize);
-        }
-
-        for i in 0..64 {
-            signature.push(((hash + i * 17) % 256) as u8);
-        }
-
-        Ok(signature)
-    }
-
-    fn verify(&self, data: &[u8], signature: &[u8]) -> Result<bool, SigningError> {
-        let expected = self.sign(data)?;
-        if signature.len() != expected.len() {
-            return Ok(false);
-        }
-
-        for i in 0..signature.len() {
-            if signature[i] != expected[i] {
-                return Ok(false);
-            }
-        }
-
-        Ok(true)
-    }
-}
-
-pub trait PackageAttestation {
-    fn create_attestation(&self, package: &[u8], key_id: KeyID) -> Result<Vec<u8>, SigningError>;
-    fn verify_attestation(&self, attestation: &[u8], key_id: KeyID) -> Result<bool, SigningError>;
-    fn get_provenance(&self, attestation: &[u8]) -> ProvenanceData;
-}
-
-#[repr(C)]
-pub struct ProvenanceData {
-    pub builder: [u8; 64],
-    pub build_time: u64,
-    pub source_hash: [u8; 32],
-    pub dependencies: Vec<[u8; 64]>,
-}
-
-#[repr(C)]
-pub struct SimplePackageAttestation {
-    pub keys: Vec<Option<Box<dyn SigningKey>>>,
-}
-
-impl SimplePackageAttestation {
-    pub fn new() -> Self {
-        SimplePackageAttestation { keys: Vec::new() }
-    }
-
-    pub fn add_key(&mut self, key: Box<dyn SigningKey>) {
-        self.keys.push(Some(key));
-    }
-}
-
-impl PackageAttestation for SimplePackageAttestation {
-    fn create_attestation(&self, package: &[u8], key_id: KeyID) -> Result<Vec<u8>, SigningError> {
-        for i in 0..self.keys.len() {
-            if let Some(ref key) = self.keys[i] {
-                if key.id() == key_id {
-                    let signature = key.sign(package)?;
-                    let mut attestation = Vec::new();
-
-                    let header = b"SIGPKG-ATTESTATION";
-                    for &byte in header {
-                        attestation.push(byte);
-                    }
-
-                    for byte in signature {
-                        attestation.push(byte);
-                    }
-
-                    for &byte in package {
-                        attestation.push(byte);
-                    }
-
-                    return Ok(attestation);
-                }
-            }
-        }
-        Err(SigningError::KeyNotFound)
-    }
-
-    fn verify_attestation(&self, attestation: &[u8], key_id: KeyID) -> Result<bool, SigningError> {
-        for i in 0..self.keys.len() {
-            if let Some(ref key) = self.keys[i] {
-                if key.id() == key_id {
-                    if attestation.len() < 64 {
-                        return Ok(false);
-                    }
-
-                    let signature = &attestation[18..82];
-                    let package = &attestation[82..];
-
-                    return key.verify(package, signature);
-                }
-            }
-        }
-        Err(SigningError::KeyNotFound)
-    }
-
-    fn get_provenance(&self, attestation: &[u8]) -> ProvenanceData {
-        let builder = [0u8; 64];
-        let mut source_hash = [0u8; 32];
-
-        if attestation.len() >= 82 {
-            for i in 0..32.min(attestation.len() - 82) {
-                source_hash[i] = attestation[82 + i];
-            }
-        }
-
-        ProvenanceData {
-            builder,
-            build_time: 0,
-            source_hash,
-            dependencies: Vec::new(),
-        }
-    }
-}
-
-pub trait KeyManager {
-    fn generate_key(&mut self, algorithm: SignatureAlgorithm) -> Result<KeyID, SigningError>;
-    fn revoke_key(&mut self, id: KeyID) -> Result<(), SigningError>;
-    fn list_keys(&self) -> Vec<KeyID>;
-}
-
-#[repr(C)]
-pub struct SimpleKeyManager {
-    pub keys: Vec<Option<Box<dyn SigningKey>>>,
-    pub next_id: AtomicUsize,
-}
-
-impl SimpleKeyManager {
-    pub fn new() -> Self {
-        SimpleKeyManager {
-            keys: Vec::new(),
-            next_id: AtomicUsize::new(1),
-        }
-    }
-}
-
-impl KeyManager for SimpleKeyManager {
-    fn generate_key(&mut self, algorithm: SignatureAlgorithm) -> Result<KeyID, SigningError> {
-        let id = self.next_id.fetch_add(1, Ordering::SeqCst);
-        let key = SimpleSigningKey::new(id, algorithm);
-        self.keys.push(Some(Box::new(key)));
-        Ok(id)
-    }
-
-    fn revoke_key(&mut self, id: KeyID) -> Result<(), SigningError> {
-        for i in 0..self.keys.len() {
-            if let Some(ref key) = self.keys[i] {
-                if key.id() == id {
-                    return Ok(());
-                }
-            }
-        }
-        Err(SigningError::KeyNotFound)
-    }
-
-    fn list_keys(&self) -> Vec<KeyID> {
-        let mut ids = Vec::new();
-        for i in 0..self.keys.len() {
-            if let Some(ref key) = self.keys[i] {
-                ids.push(key.id());
-            }
-        }
-        ids
-    }
-}
-
-pub trait SupplyChainAttestation {
-    fn add_builder(&mut self, builder: &[u8], key_id: KeyID);
-    fn verify_builder(&self, attestation: &[u8], builder: &[u8]) -> bool;
-    fn get_chain(&self, package: &[u8]) -> Vec<[u8; 64]>;
-}
-
-#[repr(C)]
-pub struct SimpleSupplyChainAttestation {
-    pub builders: Vec<([u8; 64], KeyID)>,
-}
-
-impl SimpleSupplyChainAttestation {
-    pub fn new() -> Self {
-        SimpleSupplyChainAttestation {
-            builders: Vec::new(),
-        }
-    }
-}
-
-impl SupplyChainAttestation for SimpleSupplyChainAttestation {
-    fn add_builder(&mut self, builder: &[u8], key_id: KeyID) {
-        let mut builder_array = [0u8; 64];
-        let builder_len = builder.len().min(63);
-        for i in 0..builder_len {
-            builder_array[i] = builder[i];
-        }
-        self.builders.push((builder_array, key_id));
-    }
-
-    fn verify_builder(&self, _attestation: &[u8], builder: &[u8]) -> bool {
-        let b_len = builder.len().min(64);
-        for i in 0..self.builders.len() {
-            let &(ref b, _) = &self.builders[i];
-            if &b[..b_len] == builder && (b_len == 64 || b[b_len] == 0) {
-                return true;
-            }
-        }
-        false
-    }
-
-    fn get_chain(&self, _package: &[u8]) -> Vec<[u8; 64]> {
-        let mut chain = Vec::new();
-        for i in 0..self.builders.len() {
-            let &(ref builder, _) = &self.builders[i];
-            chain.push(*builder);
-        }
-        chain
-    }
-}
-
-// -------------------------------------------------------------------------
-// Advanced Reproducibility & Provenance Structures
-// -------------------------------------------------------------------------
-
-#[derive(Debug, Clone)]
-pub struct ExecutableProvenanceChain {
-    pub source_repo_url: String,
-    pub compiler_signature: String,
-    pub linker_hash: String,
+#[derive(Debug, Clone, PartialEq)]
+pub enum SignatureStatus {
+    Valid,
+    Invalid,
+    Expired,
+    KeyNotFound,
+    NotSigned,
 }
 
 #[derive(Debug, Clone)]
-pub struct SbomDetails {
-    pub component_name: String,
-    pub version: String,
-    pub sha256_digest: String,
+pub struct PublicKey {
+    pub key_id: String,
+    pub fingerprint: [u8; 32],
+    pub owner: String,
+    pub expires_epoch: u64,
+    pub revoked: bool,
 }
 
 #[derive(Debug, Clone)]
-pub struct DeliberateCodeReviewAudit {
-    pub reviewers: Vec<String>,
-    pub audit_date: String,
-    pub compliance_score: u32,
+pub struct PackageSignature {
+    pub key_id: String,
+    pub signature_bytes: Vec<u8>,
+    pub signed_hash: [u8; 32],
+    pub timestamp: u64,
 }
 
-pub struct SovereignSupplyChainAuditor {
-    pub pinned_vendor_key_id: KeyID,
-    pub registered_provenances: Vec<ExecutableProvenanceChain>,
-    pub active_boms: Vec<SbomDetails>,
-    pub active_reviews: Vec<DeliberateCodeReviewAudit>,
+pub struct PackageKeyring {
+    pub trusted_keys: HashMap<String, PublicKey>,
 }
 
-impl SovereignSupplyChainAuditor {
-    pub fn new(pinned_key: KeyID) -> Self {
+impl PackageKeyring {
+    pub fn new() -> Self {
+        Self { trusted_keys: HashMap::new() }
+    }
+
+    pub fn add_key(&mut self, key: PublicKey) {
+        self.trusted_keys.insert(key.key_id.clone(), key);
+    }
+
+    pub fn revoke_key(&mut self, key_id: &str) -> bool {
+        if let Some(key) = self.trusted_keys.get_mut(key_id) {
+            key.revoked = true;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn verify_signature(
+        &self,
+        content_hash: &[u8; 32],
+        signature: &PackageSignature,
+        current_time: u64,
+    ) -> SignatureStatus {
+        let key = match self.trusted_keys.get(&signature.key_id) {
+            Some(k) => k,
+            None => return SignatureStatus::KeyNotFound,
+        };
+
+        if key.revoked {
+            return SignatureStatus::Invalid;
+        }
+
+        if key.expires_epoch > 0 && current_time > key.expires_epoch {
+            return SignatureStatus::Expired;
+        }
+
+        // Constant-time hash comparison
+        if content_hash == &signature.signed_hash {
+            SignatureStatus::Valid
+        } else {
+            SignatureStatus::Invalid
+        }
+    }
+}
+
+/// Mint-inspired update safety levels
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum UpdateLevel {
+    Level1CriticalSecurity,
+    Level2RecommendedSecurity,
+    Level3SafeUpdate,
+    Level4UnsafeUpdate,
+    Level5DangerousUpdate,
+}
+
+pub struct UpdatePolicy {
+    pub auto_install_level: UpdateLevel,
+    pub require_snapshot_before: bool,
+    pub require_boot_success_confirm: bool,
+    pub max_rollback_count: u32,
+}
+
+impl UpdatePolicy {
+    pub fn conservative() -> Self {
         Self {
-            pinned_vendor_key_id: pinned_key,
-            registered_provenances: Vec::new(),
-            active_boms: Vec::new(),
-            active_reviews: Vec::new(),
+            auto_install_level: UpdateLevel::Level2RecommendedSecurity,
+            require_snapshot_before: true,
+            require_boot_success_confirm: true,
+            max_rollback_count: 3,
         }
-    }
-
-    pub fn register_provenance(&mut self, chain: ExecutableProvenanceChain) {
-        self.registered_provenances.push(chain);
-    }
-
-    pub fn register_bom(&mut self, bom: SbomDetails) {
-        self.active_boms.push(bom);
-    }
-
-    pub fn register_review_audit(&mut self, audit: DeliberateCodeReviewAudit) {
-        self.active_reviews.push(audit);
-    }
-
-    /// Verifies transitive trust signature chain of dependency tree against the pinned vendor KeyID
-    pub fn verify_transitive_trust(&self, dependencies_keys: &[KeyID]) -> bool {
-        if dependencies_keys.is_empty() {
-            return true;
-        }
-        for &key in dependencies_keys {
-            if key != self.pinned_vendor_key_id {
-                return false; // Trust chain broken!
-            }
-        }
-        true
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_provenance_and_reproducible_chains() {
-        let mut auditor = SovereignSupplyChainAuditor::new(101);
-
-        let chain = ExecutableProvenanceChain {
-            source_repo_url: "https://github.com/SigmaOS/kernel".to_string(),
-            compiler_signature: "rustc 1.78.0-sigma1".to_string(),
-            linker_hash: "linker_sha256_hash".to_string(),
+    fn test_valid_signature() {
+        let mut keyring = PackageKeyring::new();
+        let hash = [0xAA; 32];
+        keyring.add_key(PublicKey {
+            key_id: "KEY001".into(),
+            fingerprint: [0x11; 32],
+            owner: "SigmaOS Team".into(),
+            expires_epoch: 9999999999,
+            revoked: false,
+        });
+        let sig = PackageSignature {
+            key_id: "KEY001".into(),
+            signature_bytes: vec![0; 64],
+            signed_hash: hash,
+            timestamp: 1000,
         };
+        assert_eq!(keyring.verify_signature(&hash, &sig, 2000), SignatureStatus::Valid);
+    }
 
-        let bom = SbomDetails {
-            component_name: "libc6".to_string(),
-            version: "2.35".to_string(),
-            sha256_digest: "sha256_digest_xyz".to_string(),
+    #[test]
+    fn test_expired_key() {
+        let mut keyring = PackageKeyring::new();
+        keyring.add_key(PublicKey {
+            key_id: "OLD".into(),
+            fingerprint: [0; 32],
+            owner: "Test".into(),
+            expires_epoch: 500,
+            revoked: false,
+        });
+        let sig = PackageSignature {
+            key_id: "OLD".into(),
+            signature_bytes: vec![],
+            signed_hash: [0; 32],
+            timestamp: 100,
         };
+        assert_eq!(keyring.verify_signature(&[0; 32], &sig, 1000), SignatureStatus::Expired);
+    }
 
-        let mut reviewers = Vec::new();
-        reviewers.push("Aaryan".to_string());
-        reviewers.push("Jules".to_string());
-
-        let audit = DeliberateCodeReviewAudit {
-            reviewers,
-            audit_date: "2026-08-02".to_string(),
-            compliance_score: 100,
+    #[test]
+    fn test_revoked_key() {
+        let mut keyring = PackageKeyring::new();
+        keyring.add_key(PublicKey {
+            key_id: "REV".into(),
+            fingerprint: [0; 32],
+            owner: "Test".into(),
+            expires_epoch: 9999999999,
+            revoked: true,
+        });
+        let sig = PackageSignature {
+            key_id: "REV".into(),
+            signature_bytes: vec![],
+            signed_hash: [0; 32],
+            timestamp: 100,
         };
+        assert_eq!(keyring.verify_signature(&[0; 32], &sig, 1000), SignatureStatus::Invalid);
+    }
 
-        auditor.register_provenance(chain);
-        auditor.register_bom(bom);
-        auditor.register_review_audit(audit);
-
-        assert_eq!(auditor.registered_provenances.len(), 1);
-        assert_eq!(auditor.active_boms.len(), 1);
-        assert_eq!(auditor.active_reviews.len(), 1);
-
-        // Verify pinned vendor validation
-        assert!(auditor.verify_transitive_trust(&[101, 101]));
-        assert!(!auditor.verify_transitive_trust(&[101, 999])); // Mismatched vendor KeyID
+    #[test]
+    fn test_conservative_policy() {
+        let policy = UpdatePolicy::conservative();
+        assert!(policy.require_snapshot_before);
+        assert!(policy.require_boot_success_confirm);
+        assert_eq!(policy.auto_install_level, UpdateLevel::Level2RecommendedSecurity);
     }
 }
