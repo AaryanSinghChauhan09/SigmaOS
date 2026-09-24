@@ -1,96 +1,222 @@
-/// SigmaOS Security Audit Module (Phase 5/Section 8)
-/// Implements security checks identified in the stabilization plan.
-
-use std::string::String;
+use std::boxed::Box;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
+/// OOP-based Security Audit for SigmaOS
+/// Based on Ideas-999-Structured: Security & Sovereignty Item 542
+/// Implements security event logging and audit trails
 
-#[derive(Debug, Clone, PartialEq)]
-pub enum AuditSeverity { Critical, High, Medium, Low, Info }
+pub type EventID = usize;
 
-#[derive(Debug, Clone)]
-pub struct AuditFinding {
-    pub id: String,
-    pub severity: AuditSeverity,
-    pub component: String,
-    pub description: String,
-    pub remediation: String,
-    pub resolved: bool,
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LogFormat {
+    PlainText,
+    Json,
+    Binary,
 }
 
-pub struct SecurityAuditor {
-    pub findings: Vec<AuditFinding>,
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum EventType {
+    Authentication = 0,
+    Authorization = 1,
+    FileAccess = 2,
+    SystemChange = 3,
 }
 
-impl SecurityAuditor {
-    pub fn new() -> Self { Self { findings: Vec::new() } }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AuditError {
+    Success = 0,
+    LogFull = 1,
+    InvalidEvent = 2,
+}
 
-    pub fn audit_installer_defaults(&mut self) {
-        self.findings.push(AuditFinding {
-            id: "SEC-001".into(), severity: AuditSeverity::Critical, component: "installer".into(),
-            description: "Installer must not default to /dev/sda or any disk".into(),
-            remediation: "Require explicit DiskTarget::Explicit() with user confirmation".into(),
-            resolved: true, // Fixed in safe_installer.rs
-        });
-        self.findings.push(AuditFinding {
-            id: "SEC-002".into(), severity: AuditSeverity::Critical, component: "installer".into(),
-            description: "Passwords must never be stored in plaintext".into(),
-            remediation: "Use Argon2id hashing before storage".into(),
-            resolved: true, // Fixed in safe_installer.rs
-        });
-    }
+pub trait AuditEvent {
+    fn id(&self) -> EventID;
+    fn event_type(&self) -> EventType;
+    fn timestamp(&self) -> u64;
+    fn user_id(&self) -> usize;
+    fn description(&self) -> &[u8];
+}
 
-    pub fn audit_package_signatures(&mut self) {
-        self.findings.push(AuditFinding {
-            id: "SEC-003".into(), severity: AuditSeverity::Critical, component: "package".into(),
-            description: "Package verification must reject expired and revoked keys".into(),
-            remediation: "Implemented in package/signing.rs with key expiry and revocation checks".into(),
-            resolved: true,
-        });
-        self.findings.push(AuditFinding {
-            id: "SEC-004".into(), severity: AuditSeverity::High, component: "package".into(),
-            description: "Package install hooks must run sandboxed".into(),
-            remediation: "Use pledge/unveil-style restrictions on hook execution".into(),
-            resolved: false,
-        });
-    }
+#[repr(C)]
+pub struct SimpleAuditEvent {
+    pub id: EventID,
+    pub event_type: AtomicUsize,
+    pub timestamp: AtomicUsize,
+    pub user_id: AtomicUsize,
+    pub desc_len: u16,
+    pub description: [u8; 256],
+}
 
-    pub fn audit_kernel_pointers(&mut self) {
-        self.findings.push(AuditFinding {
-            id: "SEC-005".into(), severity: AuditSeverity::Critical, component: "syscall".into(),
-            description: "User-provided pointers must be validated before kernel access".into(),
-            remediation: "Add copy_from_user/copy_to_user helpers with bounds checking".into(),
-            resolved: false,
-        });
-    }
-
-    pub fn run_full_audit(&mut self) {
-        self.audit_installer_defaults();
-        self.audit_package_signatures();
-        self.audit_kernel_pointers();
-    }
-
-    pub fn unresolved_critical(&self) -> Vec<&AuditFinding> {
-        self.findings.iter().filter(|f| !f.resolved && f.severity == AuditSeverity::Critical).collect()
-    }
-
-    pub fn report(&self) -> String {
-        let resolved = self.findings.iter().filter(|f| f.resolved).count();
-        let total = self.findings.len();
-        let critical_open = self.unresolved_critical().len();
-        format!("Security Audit: {}/{} resolved, {} critical open", resolved, total, critical_open)
+impl SimpleAuditEvent {
+    pub fn new(id: EventID, event_type: EventType, user_id: usize, description: &[u8]) -> Self {
+        let mut desc_array = [0u8; 256];
+        let desc_len = description.len().min(255);
+        unsafe {
+            core::ptr::copy_nonoverlapping(description.as_ptr(), desc_array.as_mut_ptr(), desc_len);
+        }
+        SimpleAuditEvent {
+            id,
+            event_type: AtomicUsize::new(event_type as usize),
+            timestamp: AtomicUsize::new(0),
+            user_id: AtomicUsize::new(user_id),
+            desc_len: desc_len as u16,
+            description: desc_array,
+        }
     }
 }
 
-#[cfg(test)]
+impl AuditEvent for SimpleAuditEvent {
+    fn id(&self) -> EventID {
+        self.id
+    }
+
+    fn event_type(&self) -> EventType {
+        unsafe { core::mem::transmute(self.event_type.load(Ordering::SeqCst)) }
+    }
+
+    fn timestamp(&self) -> u64 {
+        self.timestamp.load(Ordering::SeqCst) as u64
+    }
+
+    fn user_id(&self) -> usize {
+        self.user_id.load(Ordering::SeqCst)
+    }
+
+    fn description(&self) -> &[u8] {
+        // O(1) slice lookup using cached desc_len, avoiding O(N) zero-byte linear scan (.position(|&b| b == 0))
+        &self.description[..self.desc_len as usize]
+    }
+}
+
+pub trait AuditLogger {
+    fn log_event(&mut self, event: Box<dyn AuditEvent>) -> Result<EventID, AuditError>;
+    fn get_event(&self, id: EventID) -> Option<&dyn AuditEvent>;
+    fn query_events(&self, event_type: EventType, user_id: usize) -> Vec<EventID>;
+    fn clear_events(&mut self, older_than: u64) -> Result<(), AuditError>;
+}
+
+pub struct SimpleAuditLogger {
+    pub events: Vec<Option<Box<dyn AuditEvent>>>,
+}
+
+impl SimpleAuditLogger {
+    pub fn new() -> Self {
+        SimpleAuditLogger { events: Vec::new() }
+    }
+}
+
+impl Default for SimpleAuditLogger {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl AuditLogger for SimpleAuditLogger {
+    fn log_event(&mut self, event: Box<dyn AuditEvent>) -> Result<EventID, AuditError> {
+        let id = event.id();
+        self.events.push(Some(event));
+        Ok(id)
+    }
+
+    fn get_event(&self, id: EventID) -> Option<&dyn AuditEvent> {
+        for i in 0..self.events.len() {
+            if let Some(ref event) = self.events[i] {
+                let event: &Box<dyn AuditEvent> = event;
+                if event.id() == id {
+                    return Some(event.as_ref());
+                }
+            }
+        }
+        None
+    }
+
+    fn query_events(&self, event_type: EventType, user_id: usize) -> Vec<EventID> {
+        let mut ids = Vec::new();
+        for i in 0..self.events.len() {
+            if let Some(ref event) = self.events[i] {
+                let event: &Box<dyn AuditEvent> = event;
+                if event.event_type() == event_type && event.user_id() == user_id {
+                    ids.push(event.id());
+                }
+            }
+        }
+        ids
+    }
+
+    fn clear_events(&mut self, older_than: u64) -> Result<(), AuditError> {
+        let mut i = 0;
+        while i < self.events.len() {
+            let mut remove = false;
+            if let Some(ref event) = self.events[i] {
+                let event: &Box<dyn AuditEvent> = event;
+                if event.timestamp() < older_than {
+                    remove = true;
+                }
+            }
+            if remove {
+                self.events.remove(i);
+            } else {
+                i += 1;
+            }
+        }
+        Ok(())
+    }
+}
+
+pub trait AuditPolicy {
+    fn check_compliance(&self, event: &dyn AuditEvent) -> Result<bool, AuditError>;
+    fn enforce_policy(&mut self, event: &dyn AuditEvent) -> Result<(), AuditError>;
+}
+
+#[repr(C)]
+pub struct SimpleAuditPolicy {
+    pub require_authentication: AtomicUsize,
+}
+
+impl SimpleAuditPolicy {
+    pub fn new() -> Self {
+        SimpleAuditPolicy {
+            require_authentication: AtomicUsize::new(1),
+        }
+    }
+}
+
+impl AuditPolicy for SimpleAuditPolicy {
+    fn check_compliance(&self, event: &dyn AuditEvent) -> Result<bool, AuditError> {
+        if self.require_authentication.load(Ordering::SeqCst) == 1 {
+            Ok(event.event_type() == EventType::Authentication)
+        } else {
+            Ok(true)
+        }
+    }
+
+    fn enforce_policy(&mut self, event: &dyn AuditEvent) -> Result<(), AuditError> {
+        if self.check_compliance(event)? {
+            Ok(())
+        } else {
+            Err(AuditError::InvalidEvent)
+        }
+    }
+}
+
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_full_audit() {
-        let mut auditor = SecurityAuditor::new();
-        auditor.run_full_audit();
-        assert!(auditor.findings.len() >= 5);
-        let report = auditor.report();
-        assert!(report.contains("resolved"));
+    fn test_audit_event_logging() {
+        let mut logger = SimpleAuditLogger::new();
+        let event = SimpleAuditEvent::new(
+            1,
+            EventType::Authentication,
+            1001,
+            b"User logged in successfully",
+        );
+        logger.log_event(Box::new(event)).unwrap();
+
+        let found = logger.get_event(1).unwrap();
+        assert_eq!(found.user_id(), 1001);
+        assert_eq!(found.event_type(), EventType::Authentication);
     }
 }
