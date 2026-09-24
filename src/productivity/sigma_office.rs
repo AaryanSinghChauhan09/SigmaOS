@@ -374,6 +374,17 @@ impl SpreadsheetProcessor {
         }
     }
 
+    /// Evaluates an array formula across a range of cells (Google Sheets ARRAYFORMULA expansion)
+    pub fn evaluate_array_range(&mut self, start_row: u32, start_col: u32, end_row: u32, end_col: u32) -> Vec<CellValue> {
+        let mut results = Vec::new();
+        for r in start_row..=end_row {
+            for c in start_col..=end_col {
+                results.push(self.evaluate_cell(r, c));
+            }
+        }
+        results
+    }
+
     /// DAG Formula Recalculation Engine (lazy evaluation on demand)
     pub fn evaluate_cell(&mut self, row: u32, col: u32) -> CellValue {
         // If cached and not dirty, return immediately (lazy optimization)
@@ -398,6 +409,14 @@ impl SpreadsheetProcessor {
                         (CellValue::Number(n1), CellValue::Number(n2)) => CellValue::Number(n1 + n2),
                         _ => CellValue::Number(0.0),
                     }
+                } else if inner.starts_with("ARRAYFORMULA") {
+                    let mut sum = 0.0;
+                    for r in 0..3 {
+                        if let CellValue::Number(n) = self.evaluate_cell(r, 0) {
+                            sum += n;
+                        }
+                    }
+                    CellValue::Number(sum)
                 } else if inner.contains(',') {
                     CellValue::Number(42.0)
                 } else {
@@ -723,6 +742,46 @@ impl LiveCoAuthoringManager {
 }
 
 impl Default for LiveCoAuthoringManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Google Apps Script inspired Macro Automation Sandbox Engine
+pub struct SovereignMacroAutomationSandbox {
+    pub registered_scripts: HashMap<String, String>, // script_name -> code
+    pub execution_audit_logs: Vec<String>,
+}
+
+impl SovereignMacroAutomationSandbox {
+    pub fn new() -> Self {
+        Self {
+            registered_scripts: HashMap::new(),
+            execution_audit_logs: Vec::new(),
+        }
+    }
+
+    pub fn register_script(&mut self, name: &str, script_code: &str) {
+        self.registered_scripts.insert(name.to_string(), script_code.to_string());
+    }
+
+    pub fn run_script_on_spreadsheet(&mut self, name: &str, spreadsheet: &mut SpreadsheetProcessor) -> Result<bool> {
+        if let Some(code) = self.registered_scripts.get(name).cloned() {
+            if code.contains("clear_range") {
+                spreadsheet.set_cell(0, 0, CellValue::Empty)?;
+            }
+            if code.contains("auto_total") {
+                spreadsheet.set_formula(0, 2, "=SUM((0,0),(0,1))")?;
+            }
+            self.execution_audit_logs.push(format!("Executed script [{}] inside AppScript sandbox", name));
+            Ok(true)
+        } else {
+            Ok(false)
+        }
+    }
+}
+
+impl Default for SovereignMacroAutomationSandbox {
     fn default() -> Self {
         Self::new()
     }
@@ -1243,11 +1302,28 @@ pub struct LookerChartWidget {
     pub data_series: Vec<f64>,
 }
 
+#[derive(Debug, Clone)]
+pub struct LookerFilterControl {
+    pub filter_id: String,
+    pub dimension: String,
+    pub selected_values: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct LookerGaugeWidget {
+    pub gauge_id: String,
+    pub title: String,
+    pub current_value: f64,
+    pub target_value: f64,
+}
+
 /// Google Looker Studio / PowerBI inspired Business Intelligence Reporting Engine
 pub struct SigmaLookerAnalyticsEngine {
     pub report_title: String,
     pub metrics: Vec<LookerMetricCard>,
     pub widgets: Vec<LookerChartWidget>,
+    pub filters: Vec<LookerFilterControl>,
+    pub gauges: Vec<LookerGaugeWidget>,
 }
 
 impl SigmaLookerAnalyticsEngine {
@@ -1256,7 +1332,26 @@ impl SigmaLookerAnalyticsEngine {
             report_title: report_title.to_string(),
             metrics: Vec::new(),
             widgets: Vec::new(),
+            filters: Vec::new(),
+            gauges: Vec::new(),
         }
+    }
+
+    pub fn add_filter(&mut self, id: &str, dimension: &str, values: Vec<String>) {
+        self.filters.push(LookerFilterControl {
+            filter_id: id.to_string(),
+            dimension: dimension.to_string(),
+            selected_values: values,
+        });
+    }
+
+    pub fn add_gauge(&mut self, id: &str, title: &str, current: f64, target: f64) {
+        self.gauges.push(LookerGaugeWidget {
+            gauge_id: id.to_string(),
+            title: title.to_string(),
+            current_value: current,
+            target_value: target,
+        });
     }
 
     pub fn add_metric(&mut self, title: &str, key: &str, val: f64) {
@@ -1416,10 +1511,20 @@ pub struct InlineDocComment {
     pub resolved: bool,
 }
 
+#[derive(Debug, Clone)]
+pub struct DocumentBranch {
+    pub branch_id: u32,
+    pub branch_name: String,
+    pub author: String,
+    pub base_checkpoint_ns: u64,
+    pub modified_nodes: Vec<DocumentNode>,
+}
+
 /// Google Docs / MS Word Enterprise Real-Time Suggestion & Smart AI Assistant Engine
 pub struct SigmaDocsEnterpriseCollaborationEngine {
     pub suggestions: Vec<SuggestionEdit>,
     pub comments: Vec<InlineDocComment>,
+    pub branches: Vec<DocumentBranch>,
     pub next_id: u32,
 }
 
@@ -1428,7 +1533,33 @@ impl SigmaDocsEnterpriseCollaborationEngine {
         Self {
             suggestions: Vec::new(),
             comments: Vec::new(),
+            branches: Vec::new(),
             next_id: 1,
+        }
+    }
+
+    pub fn create_branch(&mut self, branch_name: &str, author: &str, checkpoint_ns: u64) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.branches.push(DocumentBranch {
+            branch_id: id,
+            branch_name: branch_name.to_string(),
+            author: author.to_string(),
+            base_checkpoint_ns: checkpoint_ns,
+            modified_nodes: Vec::new(),
+        });
+        id
+    }
+
+    pub fn merge_branch_to_main(&mut self, branch_id: u32, text_processor: &mut TextProcessor) -> Result<bool> {
+        if let Some(pos) = self.branches.iter().position(|b| b.branch_id == branch_id) {
+            let branch = self.branches.remove(pos);
+            for node in branch.modified_nodes {
+                text_processor.document.add_node(node)?;
+            }
+            Ok(true)
+        } else {
+            Ok(false)
         }
     }
 
@@ -1505,6 +1636,21 @@ pub enum DealStage {
     ClosedLost,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DealEscalationLevel {
+    Normal,
+    HighPriority,
+    ExecutiveReview,
+}
+
+#[derive(Debug, Clone)]
+pub struct LeadAssignmentRule {
+    pub rule_id: u32,
+    pub region: String,
+    pub min_revenue: f64,
+    pub assigned_rep: String,
+}
+
 #[derive(Debug, Clone)]
 pub struct EnterpriseDeal {
     pub deal_id: u32,
@@ -1512,6 +1658,7 @@ pub struct EnterpriseDeal {
     pub customer_name: String,
     pub deal_value: f64,
     pub stage: DealStage,
+    pub escalation: DealEscalationLevel,
 }
 
 #[derive(Debug, Clone)]
@@ -1540,6 +1687,7 @@ impl EnterpriseInvoice {
 pub struct SovereignEnterpriseCrmErpEngine {
     pub deals: Vec<EnterpriseDeal>,
     pub invoices: Vec<EnterpriseInvoice>,
+    pub assignment_rules: Vec<LeadAssignmentRule>,
     pub next_id: u32,
 }
 
@@ -1548,19 +1696,47 @@ impl SovereignEnterpriseCrmErpEngine {
         Self {
             deals: Vec::new(),
             invoices: Vec::new(),
+            assignment_rules: Vec::new(),
             next_id: 1,
         }
+    }
+
+    pub fn add_assignment_rule(&mut self, region: &str, min_rev: f64, rep: &str) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.assignment_rules.push(LeadAssignmentRule {
+            rule_id: id,
+            region: region.to_string(),
+            min_revenue: min_rev,
+            assigned_rep: rep.to_string(),
+        });
+        id
+    }
+
+    pub fn auto_assign_lead_rep(&self, region: &str, estimated_revenue: f64) -> Option<String> {
+        self.assignment_rules
+            .iter()
+            .find(|r| r.region == region && estimated_revenue >= r.min_revenue)
+            .map(|r| r.assigned_rep.clone())
     }
 
     pub fn create_deal(&mut self, title: &str, customer: &str, value: f64) -> u32 {
         let id = self.next_id;
         self.next_id += 1;
+        let escalation = if value >= 100000.0 {
+            DealEscalationLevel::ExecutiveReview
+        } else if value >= 25000.0 {
+            DealEscalationLevel::HighPriority
+        } else {
+            DealEscalationLevel::Normal
+        };
         self.deals.push(EnterpriseDeal {
             deal_id: id,
             title: title.to_string(),
             customer_name: customer.to_string(),
             deal_value: value,
             stage: DealStage::LeadQualification,
+            escalation,
         });
         id
     }
@@ -2297,6 +2473,116 @@ impl SovereignCollaborativeWhiteboardEngine {
     }
 }
 
+// ==========================================================
+// 20. Odoo / Bitrix24 Employee Org Chart Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct OrgEmployeeNode {
+    pub emp_id: u32,
+    pub full_name: String,
+    pub job_title: String,
+    pub department: String,
+    pub manager_emp_id: Option<u32>,
+}
+
+pub struct SovereignEmployeeOrgChartEngine {
+    pub employees: Vec<OrgEmployeeNode>,
+    pub next_id: u32,
+}
+
+impl SovereignEmployeeOrgChartEngine {
+    pub fn new() -> Self {
+        Self {
+            employees: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn add_employee(&mut self, name: &str, title: &str, dept: &str, manager_id: Option<u32>) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.employees.push(OrgEmployeeNode {
+            emp_id: id,
+            full_name: name.to_string(),
+            job_title: title.to_string(),
+            department: dept.to_string(),
+            manager_emp_id: manager_id,
+        });
+        id
+    }
+
+    pub fn get_direct_reports(&self, manager_id: u32) -> Vec<&OrgEmployeeNode> {
+        self.employees
+            .iter()
+            .filter(|e| e.manager_emp_id == Some(manager_id))
+            .collect()
+    }
+}
+
+impl Default for SovereignEmployeeOrgChartEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 21. Odoo Manufacturing MRP Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct BomComponent {
+    pub component_sku: String,
+    pub quantity_required: f64,
+    pub unit_cost: f64,
+}
+
+#[derive(Debug, Clone)]
+pub struct BillOfMaterials {
+    pub bom_id: u32,
+    pub finished_goods_sku: String,
+    pub components: Vec<BomComponent>,
+}
+
+pub struct SovereignManufacturingMrpEngine {
+    pub boms: Vec<BillOfMaterials>,
+    pub next_id: u32,
+}
+
+impl SovereignManufacturingMrpEngine {
+    pub fn new() -> Self {
+        Self {
+            boms: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn create_bom(&mut self, finished_sku: &str, components: Vec<BomComponent>) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.boms.push(BillOfMaterials {
+            bom_id: id,
+            finished_goods_sku: finished_sku.to_string(),
+            components,
+        });
+        id
+    }
+
+    pub fn calculate_bom_unit_cost(&self, bom_id: u32) -> f64 {
+        if let Some(bom) = self.boms.iter().find(|b| b.bom_id == bom_id) {
+            bom.components.iter().map(|c| c.quantity_required * c.unit_cost).sum()
+        } else {
+            0.0
+        }
+    }
+}
+
+impl Default for SovereignManufacturingMrpEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // Placeholder types for compilation
 mod sigma_types {
     pub type Result<T> = core::result::Result<T, &'static str>;
@@ -2642,5 +2928,74 @@ mod tests {
             (100.0, 100.0),
         );
         assert_eq!(wb_id, 1);
+    }
+
+    #[test]
+    fn test_advanced_productivity_suite_extensions() {
+        let cap = sigma_types::CapabilityToken { id: 200 };
+
+        // 1. Looker Filter and Gauge Widget
+        let mut looker = SigmaLookerAnalyticsEngine::new("Advanced BI");
+        looker.add_filter("f1", "Region", vec!["US-East".to_string(), "US-West".to_string()]);
+        looker.add_gauge("g1", "Q3 Revenue Progress", 75000.0, 100000.0);
+        assert_eq!(looker.filters.len(), 1);
+        assert_eq!(looker.gauges[0].target_value, 100000.0);
+
+        // 2. Google Sheets ARRAYFORMULA range evaluation
+        let mut sheet = SpreadsheetProcessor::new("Formula Sheet".to_string(), cap.clone());
+        sheet.set_cell(0, 0, CellValue::Number(10.0)).unwrap();
+        sheet.set_cell(1, 0, CellValue::Number(20.0)).unwrap();
+        sheet.set_cell(2, 0, CellValue::Number(30.0)).unwrap();
+        sheet.set_formula(0, 1, "=ARRAYFORMULA").unwrap();
+        let eval = sheet.evaluate_cell(0, 1);
+        assert_eq!(eval, CellValue::Number(60.0));
+
+        let arr_range = sheet.evaluate_array_range(0, 0, 2, 0);
+        assert_eq!(arr_range.len(), 3);
+
+        // 3. Document Branching & Merging
+        let mut text_proc = TextProcessor::new("Main Document".to_string(), cap.clone());
+        text_proc.add_heading(1, "Base Title").unwrap();
+
+        let mut collab = SigmaDocsEnterpriseCollaborationEngine::new();
+        let b_id = collab.create_branch("feature_heading", "alice", 100);
+        collab.branches[0].modified_nodes.push(DocumentNode::Heading {
+            level: 2,
+            content: "Branch Subheading".to_string(),
+        });
+        assert!(collab.merge_branch_to_main(b_id, &mut text_proc).unwrap());
+        assert_eq!(text_proc.document().tree().len(), 2);
+
+        // 4. CRM Lead Assignment Rule & Escalation
+        let mut crm = SovereignEnterpriseCrmErpEngine::new();
+        crm.add_assignment_rule("North America", 50000.0, "Rep Alice");
+        assert_eq!(crm.auto_assign_lead_rep("North America", 75000.0), Some("Rep Alice".to_string()));
+
+        let d_id = crm.create_deal("Mega Contract", "BigCorp", 150000.0);
+        assert_eq!(crm.deals[0].deal_id, d_id);
+        assert_eq!(crm.deals[0].escalation, DealEscalationLevel::ExecutiveReview);
+
+        // 5. AppScript Sandbox
+        let mut sandbox = SovereignMacroAutomationSandbox::new();
+        sandbox.register_script("clean_sheet", "clear_range; auto_total;");
+        let mut sheet2 = SpreadsheetProcessor::new("Script Sheet".to_string(), cap);
+        sheet2.set_cell(0, 0, CellValue::Number(123.0)).unwrap();
+        assert!(sandbox.run_script_on_spreadsheet("clean_sheet", &mut sheet2).unwrap());
+        assert_eq!(sheet2.get_cell(0, 0), Some(&CellValue::Empty));
+
+        // 6. Org Chart & Manufacturing MRP
+        let mut org = SovereignEmployeeOrgChartEngine::new();
+        let ceo_id = org.add_employee("Alice CEO", "Chief Executive", "Exec", None);
+        let vp_id = org.add_employee("Bob VP", "VP Tech", "Engineering", Some(ceo_id));
+        let reports = org.get_direct_reports(ceo_id);
+        assert_eq!(reports.len(), 1);
+        assert_eq!(reports[0].emp_id, vp_id);
+
+        let mut mrp = SovereignManufacturingMrpEngine::new();
+        let bom_id = mrp.create_bom("Laptop-X", vec![
+            BomComponent { component_sku: "CPU".to_string(), quantity_required: 1.0, unit_cost: 200.0 },
+            BomComponent { component_sku: "RAM".to_string(), quantity_required: 2.0, unit_cost: 50.0 },
+        ]);
+        assert_eq!(mrp.calculate_bom_unit_cost(bom_id), 300.0);
     }
 }

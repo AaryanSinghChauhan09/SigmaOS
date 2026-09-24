@@ -47,14 +47,14 @@ pub use tmux::{
 pub use mind_map::{IndentedTextMindMapParserEngine, MindMapCreator, MindMapNode, MindMapLayout, NodeShape, NodeStyle, RelationshipConnection};
 
 pub use sigma_office::{
-    CellValue, DbColumnType, DbRow, DbTable, DbTableColumn, DocumentNode, DocumentType,
+    CellValue, DbColumnType, DbRow, DbTable, DbTableColumn, DealEscalationLevel, DocumentBranch, DocumentNode, DocumentType,
     DripStep, EnterpriseDeal, EnterpriseInvoice, FormQuestion, FormResponse, HelpdeskTicket,
-    InlineDocComment, InventoryItem, LiveCoAuthoringManager, LookerChartWidget, LookerMetricCard,
-    MacroExecutor, OdfDocumentKind, ParagraphStyle, PresentationProcessor, QuestionType,
+    InlineDocComment, InventoryItem, LeadAssignmentRule, LiveCoAuthoringManager, LookerChartWidget, LookerFilterControl,
+    LookerGaugeWidget, LookerMetricCard, MacroExecutor, OdfDocumentKind, ParagraphStyle, PresentationProcessor, QuestionType,
     QuickNoteItem, SigmaFormulaParserEngine, SigmaOdfPackageEngine, SigmaOffice, SigmaSlideDetails,
     SigmaSpellCheckerEngine, SigmaStyleThemeEngine, SigmaTrackChangesEngine, SovereignCollaborativeWhiteboardEngine,
-    SovereignCrmPipeline, SovereignFormsSurveyEngine, SovereignHelpdeskSlaEngine, SovereignIntegrationWorkflowEngine,
-    SovereignInventoryWarehouseEngine, SovereignLowCodeDatabaseEngine, SovereignMarketingCampaignEngine,
+    SovereignCrmPipeline, SovereignEmployeeOrgChartEngine, SovereignFormsSurveyEngine, SovereignHelpdeskSlaEngine, SovereignIntegrationWorkflowEngine,
+    SovereignInventoryWarehouseEngine, SovereignLowCodeDatabaseEngine, SovereignMacroAutomationSandbox, SovereignManufacturingMrpEngine, SovereignMarketingCampaignEngine,
     SovereignQuickNotesEngine, SovereignWebPublisherEngine, SovereignWorkgroupGanttEngine, SpreadsheetProcessor,
     SuggestionEdit, TextProcessor, TicketPriority, TicketStatus, TypographyRenderer, VersionHistoryManager,
     WebLayoutBlock, WhiteboardElement, WhiteboardElementType, WorkgroupTask, WorkflowAction, WorkflowRule, WorkflowTrigger,
