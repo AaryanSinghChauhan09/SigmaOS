@@ -3076,6 +3076,27 @@ pub struct SovereignOpenSourceObsoletionOrchestrator {
     pub nats_jetstream: SovereignNatsJetstreamEngine,
     pub yazi_explorer: SovereignYaziTerminalFileExplorerEngine,
     pub supremacy_suite: open_source_os_gap_closure::OpenSourceProjectSupremacySuite,
+    pub scheme_router: SovereignSchemeRouter,
+    pub zircon_manager: SovereignZirconHandleManager,
+    pub serenity_async: SovereignSerenityAsyncEngine,
+    pub solaris_zone: SovereignSolarisZoneEngine,
+    pub nix_declarative: SovereignNixDeclarativeEngine,
+    pub qubes_isolation: SovereignQubesIsolationEngine,
+    pub linux_security_lsm: SovereignLinuxSecurityLsmEngine,
+    pub haiku_interface: SovereignHaikuInterfaceEngine,
+    pub firecracker_microvm: SovereignFirecrackerMicroVmManager,
+    pub tpm_attestation: SovereignTpmAttestationWorkflow,
+    pub sbom_generator: SovereignSbomGeneratorPipeline,
+    pub calamares_installer: SovereignCalamaresInstallerFramework,
+    pub pipewire_audio: SovereignPipeWireAudioEngine,
+    pub web3fs_ipfs: SovereignWeb3FsIpfsEngine,
+    pub wasm_cranelift: SovereignWasmCraneliftEngine,
+    pub reproducible_build_farm: SovereignReproducibleBuildFarm,
+    pub capsicum_sandbox: SovereignCapsicumSandbox,
+    pub wayland_compositor: SovereignWaylandCompositorEngine,
+    pub flatpak_sandbox: SovereignFlatpakAppImageSandbox,
+    pub btrfs_zfs_pool: SovereignBtrfsZfsStoragePool,
+    pub cockroach_store: SovereignCockroachDistributedStore,
     pub total_obsoleted_projects_count: u32,
 }
 
@@ -3125,7 +3146,28 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             nats_jetstream: SovereignNatsJetstreamEngine::new("system_events"),
             yazi_explorer: SovereignYaziTerminalFileExplorerEngine::new("/home/sovereign"),
             supremacy_suite: open_source_os_gap_closure::OpenSourceProjectSupremacySuite::new(),
-            total_obsoleted_projects_count: 60,
+            scheme_router: SovereignSchemeRouter::new(),
+            zircon_manager: SovereignZirconHandleManager::new(),
+            serenity_async: SovereignSerenityAsyncEngine::new(),
+            solaris_zone: SovereignSolarisZoneEngine::new(),
+            nix_declarative: SovereignNixDeclarativeEngine::new(),
+            qubes_isolation: SovereignQubesIsolationEngine::new(),
+            linux_security_lsm: SovereignLinuxSecurityLsmEngine::new(),
+            haiku_interface: SovereignHaikuInterfaceEngine::new(),
+            firecracker_microvm: SovereignFirecrackerMicroVmManager::new(),
+            tpm_attestation: SovereignTpmAttestationWorkflow::new(),
+            sbom_generator: SovereignSbomGeneratorPipeline::new(),
+            calamares_installer: SovereignCalamaresInstallerFramework::new(),
+            pipewire_audio: SovereignPipeWireAudioEngine::new(),
+            web3fs_ipfs: SovereignWeb3FsIpfsEngine::new(),
+            wasm_cranelift: SovereignWasmCraneliftEngine::new(),
+            reproducible_build_farm: SovereignReproducibleBuildFarm::new(),
+            capsicum_sandbox: SovereignCapsicumSandbox::new(),
+            wayland_compositor: SovereignWaylandCompositorEngine::new(),
+            flatpak_sandbox: SovereignFlatpakAppImageSandbox::new(),
+            btrfs_zfs_pool: SovereignBtrfsZfsStoragePool::new("sovereign_pool", 1_000_000_000_000),
+            cockroach_store: SovereignCockroachDistributedStore::new(1),
+            total_obsoleted_projects_count: 80,
         }
     }
 
@@ -3150,6 +3192,31 @@ impl SovereignOpenSourceObsoletionOrchestrator {
         self.observability
             .record_metric("cpu_utilization", 12.5, 1700000000);
         self.firewall.establish_pqc_vpn_tunnel(&[0x1D; 32]);
+
+        // Bootstrap additional integrated sovereign sub-engines
+        let _ = self.scheme_router.register_scheme("ipc");
+        let _ = self.zircon_manager.create_handle("channel", ZirconRights::Full, [0x01; 16]);
+        self.serenity_async.enqueue_task(1, "BOOT_EVENT", b"init_ready");
+        self.solaris_zone.register_probe("sovereign_kernel", "sys_boot");
+        let nix_hash = self.nix_declarative.build_derivation("sigmaos-core", &["gcc", "musl"]);
+        let _ = self.nix_declarative.switch_profile(&nix_hash);
+        self.qubes_isolation.create_domain("vault-domain", "black", false);
+        self.linux_security_lsm.add_landlock_rule("/system", 0b111);
+        self.haiku_interface.register_translator("ELF", "SOVEREIGN_BIN");
+        let _ = self.firecracker_microvm.launch_microvm("boot_microvm", 2, 512, "/boot/vmlinuz");
+        self.tpm_attestation.extend_pcr(0, b"boot_integrity_pcr");
+        self.sbom_generator.record_package("sigmaos-kernel", "6.12.0", "MIT");
+        self.pipewire_audio.register_node(100, "master_output", 48000);
+        let ipfs_cid = self.web3fs_ipfs.store_block(b"sovereign_genesis_manifest");
+        let _ = self.web3fs_ipfs.fetch_block(&ipfs_cid);
+        self.wasm_cranelift.load_wasm_bytecode("sovereign_runtime", b"\x00asm\x01\x00\x00\x00");
+        self.reproducible_build_farm.trigger_reproducible_build("job_01", "kernel", "sha256_root_hash");
+        self.capsicum_sandbox.limit_fd_rights(3, CapsicumCapRights { read: true, write: true, seek: true, fstat: true });
+        self.wayland_compositor.create_surface(1, "DesktopWorkspace", 1920, 1080);
+        self.flatpak_sandbox.register_bundle("org.sigmaos.CoreDesktop", "1.0");
+        let snap_id = self.btrfs_zfs_pool.create_instant_snapshot("genesis_snapshot", 1700000000);
+        assert_eq!(snap_id, 1);
+        self.cockroach_store.raft_put("cluster_state", b"initialized");
 
         Ok(format!(
             "Sovereign Stack Active: {} legacy open-source projects obsoleted",
@@ -5859,7 +5926,13 @@ mod tests {
     fn test_sovereign_orchestrator_bootstrap() {
         let mut orchestrator = SovereignOpenSourceObsoletionOrchestrator::new();
         let status = orchestrator.bootstrap_sovereign_stack().unwrap();
-        assert!(status.contains("60 legacy open-source projects obsoleted"));
+        assert!(status.contains("80 legacy open-source projects obsoleted"));
+        assert_eq!(orchestrator.total_obsoleted_projects_count, 80);
+        assert_eq!(orchestrator.serenity_async.processed_count, 0);
+        assert_eq!(orchestrator.serenity_async.task_queue.len(), 1);
+        assert_eq!(orchestrator.qubes_isolation.domains.len(), 1);
+        assert_eq!(orchestrator.pipewire_audio.nodes.len(), 1);
+        assert_eq!(orchestrator.wayland_compositor.surfaces.len(), 1);
     }
 
     #[test]
