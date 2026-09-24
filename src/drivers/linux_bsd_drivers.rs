@@ -1332,8 +1332,15 @@ impl SovereignDeviceManager {
     pub fn auto_probe_pci_device(&mut self, vendor_id: u16, device_id: u16) -> Result<String, &'static str> {
         let driver_name = match (vendor_id, device_id) {
             (0x1002, 0x731F) => "AMDGPU DRM/KMS Driver",
+            (0x1002, 0x744C) => "AMD RDNA 3 DCN 3.2 Display Driver",
+            (0x10de, 0x2484) => "NVIDIA Nouveau GSP DRM/KMS Driver",
+            (0x5143, 0x0001) => "Qualcomm Adreno DRM GPU Driver",
+            (0x14e4, 0x43a0) => "FreeBSD Broadcom bwn Wireless Driver",
+            (0x14e4, 0x43e5) => "Broadcom BCM Wi-Fi 6E/7 Driver",
+            (0x1af4, 0x1009) => "NetBSD VirtIO 9P2000.L Transport Driver",
             (0x1af4, 0x1050) => "VirtIO GPU 3D Display Driver",
             (0x8086, 0x125b) => "Intel igc 2.5GbE Ethernet Driver",
+            (0x1217, 0x8520) => "SDHCI ADMA2 eMMC Storage Driver",
             _ => "Generic PCI Device Driver",
         };
         self.bound_drivers.push((vendor_id, device_id, driver_name.to_string()));
@@ -1343,6 +1350,8 @@ impl SovereignDeviceManager {
     pub fn auto_probe_usb_device(&mut self, vendor_id: u16, product_id: u16) -> Result<String, &'static str> {
         let driver_name = match (vendor_id, product_id) {
             (0x056a, 0x037a) => "Wacom Precision Tablet Driver",
+            (0x046d, 0x0825) => "OpenBSD uvideo UVC Camera Driver",
+            (0x0a5c, 0x21e8) => "Broadcom BCM Bluetooth HCI Driver",
             _ => "Generic USB Device Driver",
         };
         self.bound_drivers.push((vendor_id, product_id, driver_name.to_string()));
@@ -1367,6 +1376,141 @@ impl RealtekR8169EthernetDriver {
 
     pub fn transmit_frame(&mut self, frame: &[u8]) -> Result<usize, &'static str> {
         Ok(frame.len())
+    }
+}
+
+// =========================================================================
+// 15. Linux & BSD Advanced Hardware Drivers (NVIDIA GSP, Mobile GPU, BCM Wi-Fi, Netgraph WG, SDHCI eMMC)
+// =========================================================================
+
+pub struct NvidiaNouveauGpuDriver {
+    pub card_id: u32,
+    pub gsp_firmware_loaded: bool,
+    pub active_crtc: bool,
+    pub gem_allocated_bytes: usize,
+}
+
+impl NvidiaNouveauGpuDriver {
+    pub fn new(card_id: u32) -> Self {
+        Self {
+            card_id,
+            gsp_firmware_loaded: false,
+            active_crtc: false,
+            gem_allocated_bytes: 0,
+        }
+    }
+
+    pub fn load_gsp_firmware(&mut self) -> Result<(), &'static str> {
+        self.gsp_firmware_loaded = true;
+        Ok(())
+    }
+
+    pub fn alloc_gem_buffer(&mut self, bytes: usize) -> u64 {
+        self.gem_allocated_bytes += bytes;
+        (self.gem_allocated_bytes as u64) / 4096
+    }
+}
+
+pub struct QualcommAdrenoMaliGpuDriver {
+    pub chip_id: u32,
+    pub ring_buffer_head: u32,
+    pub submitted_jobs: u32,
+}
+
+impl QualcommAdrenoMaliGpuDriver {
+    pub fn new(chip_id: u32) -> Self {
+        Self {
+            chip_id,
+            ring_buffer_head: 0,
+            submitted_jobs: 0,
+        }
+    }
+
+    pub fn submit_command_stream(&mut self, cmds: &[u32]) -> Result<u32, &'static str> {
+        self.ring_buffer_head += cmds.len() as u32;
+        self.submitted_jobs += 1;
+        Ok(self.submitted_jobs)
+    }
+}
+
+pub struct BroadcomBcmWifiDriver {
+    pub mac_address: [u8; 6],
+    pub is_connected: bool,
+    pub channel: u8,
+}
+
+impl BroadcomBcmWifiDriver {
+    pub fn new(mac: [u8; 6]) -> Self {
+        Self {
+            mac_address: mac,
+            is_connected: false,
+            channel: 36,
+        }
+    }
+
+    pub fn connect(&mut self, ssid: &str) -> Result<(), &'static str> {
+        if ssid.is_empty() {
+            return Err("Empty SSID");
+        }
+        self.is_connected = true;
+        Ok(())
+    }
+
+    pub fn transmit_ieee80211_frame(&mut self, frame: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_connected {
+            return Err("Station not associated");
+        }
+        Ok(frame.len())
+    }
+}
+
+pub struct BsdWgNetgraphHardwareDriver {
+    pub node_id: u32,
+    pub peer_public_key: [u8; 32],
+    pub hardware_crypto_offload: bool,
+}
+
+impl BsdWgNetgraphHardwareDriver {
+    pub fn new(node_id: u32, peer_public_key: [u8; 32]) -> Self {
+        Self {
+            node_id,
+            peer_public_key,
+            hardware_crypto_offload: true,
+        }
+    }
+
+    pub fn offload_packet_encrypt(&mut self, packet: &[u8]) -> Result<Vec<u8>, &'static str> {
+        let mut out = Vec::with_capacity(packet.len() + 16);
+        out.extend_from_slice(b"NETGRAPH_WG:");
+        out.extend_from_slice(packet);
+        Ok(out)
+    }
+}
+
+pub struct SdhciEmmcStorageDriver {
+    pub slot_id: u32,
+    pub is_hs400: bool,
+    pub sector_count: u64,
+}
+
+impl SdhciEmmcStorageDriver {
+    pub fn new(slot_id: u32, sector_count: u64) -> Self {
+        Self {
+            slot_id,
+            is_hs400: true,
+            sector_count,
+        }
+    }
+
+    pub fn execute_adma2_transfer(&mut self, lba: u64, blocks: u32, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        let bytes_needed = (blocks as usize) * 512;
+        if buffer.len() < bytes_needed {
+            return Err("Buffer underflow for ADMA2 descriptor");
+        }
+        if lba + (blocks as u64) > self.sector_count {
+            return Err("Out of bounds LBA access");
+        }
+        Ok(bytes_needed)
     }
 }
 
@@ -1740,8 +1884,8 @@ impl SocketCanDriver {
 // Unit Tests Module
 // =========================================================================
 
-#[cfg(test_disabled)]
-mod tests {
+#[cfg(test)]
+mod tests_linux_bsd_drivers {
     use super::*;
 
     #[test]
@@ -1903,13 +2047,13 @@ mod tests {
         let mut vsound = VirtioSoundDriver::new(2);
         assert!(vsound.start_playback().is_ok());
 
-        let r8169 = RealtekR8169EthernetDriver::new([0x00, 0xE0, 0x4C, 0x81, 0x69, 0x01]);
+        let mut r8169 = RealtekR8169EthernetDriver::new([0x00, 0xE0, 0x4C, 0x81, 0x69, 0x01]);
         assert_eq!(r8169.transmit_frame(&[0xFF; 64]).unwrap(), 64);
 
-        let igc = IntelIgcEthernetDriver::new([0x00, 0x1B, 0x21, 0x00, 0x12, 0x5B]);
+        let mut igc = IntelIgcEthernetDriver::new([0x00, 0x1B, 0x21, 0x00, 0x12, 0x5B]);
         assert_eq!(igc.transmit_queue(0, &[0xAA; 128]).unwrap(), 128);
 
-        let imu = LinuxIioImuSensorDriver::new("InvenSense MPU6050");
+        let mut imu = LinuxIioImuSensorDriver::new("InvenSense MPU6050");
         let read = imu.read_sensor_data(10, -20, 980);
         assert_eq!(read.accel_z_m_s2, 980);
     }
@@ -1969,5 +2113,45 @@ mod tests {
         assert_eq!(bound_gpu, "AMDGPU DRM/KMS Driver");
         assert_eq!(bound_net, "Intel igc 2.5GbE Ethernet Driver");
         assert_eq!(bound_usb, "Wacom Precision Tablet Driver");
+    }
+
+    #[test]
+    fn test_linux_bsd_advanced_hardware_drivers() {
+        // 1. NVIDIA Nouveau GSP
+        let mut nvidia = NvidiaNouveauGpuDriver::new(0);
+        assert!(nvidia.load_gsp_firmware().is_ok());
+        assert!(nvidia.gsp_firmware_loaded);
+        assert_eq!(nvidia.alloc_gem_buffer(16384), 4);
+
+        // 2. Qualcomm Adreno
+        let mut adreno = QualcommAdrenoMaliGpuDriver::new(0x630);
+        let job1 = adreno.submit_command_stream(&[0x1, 0x2, 0x3, 0x4]).unwrap();
+        assert_eq!(job1, 1);
+        assert_eq!(adreno.ring_buffer_head, 4);
+
+        // 3. Broadcom Wi-Fi
+        let mut bcm_wifi = BroadcomBcmWifiDriver::new([0x00, 0x10, 0x18, 0x22, 0x33, 0x44]);
+        assert!(bcm_wifi.transmit_ieee80211_frame(b"hello").is_err());
+        assert!(bcm_wifi.connect("Sigma_5G_Mesh").is_ok());
+        assert_eq!(bcm_wifi.transmit_ieee80211_frame(b"hello").unwrap(), 5);
+
+        // 4. Netgraph WireGuard
+        let mut wg = BsdWgNetgraphHardwareDriver::new(1, [0xFF; 32]);
+        let enc = wg.offload_packet_encrypt(b"secret_data").unwrap();
+        assert!(enc.starts_with(b"NETGRAPH_WG:"));
+
+        // 5. SDHCI eMMC
+        let mut emmc = SdhciEmmcStorageDriver::new(0, 1_000_000);
+        let mut buf = [0u8; 1024];
+        let bytes = emmc.execute_adma2_transfer(0, 2, &mut buf).unwrap();
+        assert_eq!(bytes, 1024);
+
+        // 6. Device Manager Auto-Probing
+        let mut dev_mgr = SovereignDeviceManager::new();
+        assert_eq!(dev_mgr.auto_probe_pci_device(0x10de, 0x2484).unwrap(), "NVIDIA Nouveau GSP DRM/KMS Driver");
+        assert_eq!(dev_mgr.auto_probe_pci_device(0x5143, 0x0001).unwrap(), "Qualcomm Adreno DRM GPU Driver");
+        assert_eq!(dev_mgr.auto_probe_pci_device(0x14e4, 0x43e5).unwrap(), "Broadcom BCM Wi-Fi 6E/7 Driver");
+        assert_eq!(dev_mgr.auto_probe_pci_device(0x1217, 0x8520).unwrap(), "SDHCI ADMA2 eMMC Storage Driver");
+        assert_eq!(dev_mgr.auto_probe_usb_device(0x0a5c, 0x21e8).unwrap(), "Broadcom BCM Bluetooth HCI Driver");
     }
 }

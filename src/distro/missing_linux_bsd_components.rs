@@ -2,7 +2,7 @@
 // Zero-dependency Rust #![no_std] / std implementation of strategic missing distro abstractions:
 // OpenSUSE YaST2, Void xbps-src, Alpine LBU, FreeBSD VNET, NetBSD Rump, OpenBSD Pledge/Unveil, NixOS Flakes.
 
-use std::string::{String, ToString};
+use std::string::String;
 use std::vec::Vec;
 use std::format;
 
