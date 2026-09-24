@@ -48,3 +48,23 @@ This document specifies the core architectural guidelines, packaging purity stan
 - **Content-Addressed Store (CAS):** Packages and build artifacts reside in immutable, hash-addressed storage locations with Merkle tree closure verification.
 - **Zero-Dependency `#![no_std]` Kernel Architecture:** Core OS components compile natively without external third-party dependencies.
 - **Instant Rollback Generations:** System configurations maintain atomic generation snapshots allowing sub-second differential state rollbacks.
+
+---
+
+## 7. Gentoo, CachyOS, & DragonFly BSD: Performance & CoW Resilience Guidelines
+- **Gentoo EAPI 8 USE Flags & CFLAGS Auto-Tuning:** Package specifications utilize granular USE flag conditional compilation and CHOST CFLAGS microarchitecture optimization targets.
+- **CachyOS BORE Scheduler & x86-64-v4 JIT:** Process scheduling employs Burst-Oriented Response Enhancer (BORE) latency scoring and SIMD JIT dispatching for x86-64-v1..v4 levels.
+- **DragonFly BSD HAMMER2 CoW & Netpoll:** Storage Engine uses multi-master Copy-on-Write FNV-1a block deduplication, emergency read-only snapshots, and per-CPU lockless netpoll packet rings.
+
+---
+
+## 8. openSUSE & Solus: Profile Automation & Delta Package Management Guidelines
+- **openSUSE AutoYaST XML Profile Automation:** Declarative system provisioning profiles specify selected patterns, packages, and network configurations for hands-off deployment.
+- **Solus eopkg Delta Package Management:** Bandwidth-efficient package upgrades use strictly monotonic delta revision validation (`new_revision > old_revision`) to construct binary diffs.
+
+---
+
+## 9. AI Agent & Contributor Task Execution Guidelines
+- **Zero-Dependency `#![no_std]` Strictness:** All kernel and distro core modules must maintain zero third-party dependencies and adhere to `#![no_std]` compatibility.
+- **Git Branch Naming Standard:** All developer and AI agent working branches must begin with the `jules-*` prefix (e.g. `jules-ahead-distro-supremacy`).
+- **Mandatory Practice Proactive Testing:** Every task change must include unit test verification executable via `rustc --test` or `./run_sigma_tests.sh` before submitting pull requests.

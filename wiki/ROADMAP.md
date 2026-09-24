@@ -16,6 +16,49 @@
 +-----------------------------------------------------------------------------------+
 ```
 
+---
+
+## 📅 Staged Rollout Timeline & Persona Expansion
+
+### 6 Months (v1.0 – Core Essentials)
+- **Lightweight Text Editor**: Quick edits out-of-the-box (`sigma-edit`).
+- **Universal Compression Utility**: Universal archive support (`.tar.gz`, `.tar.xz`, `.zip`, `.zst`, `.7z`).
+- **Network Diagnostics Engine**: Integrated utilities (`ping`, `curl`, `traceroute`, `netstat`).
+- **System Monitoring Dashboard**: Integrated resource view (`sigma-top` / Zenith HUD).
+- **Backup Snapshot Tool**: Btrfs/ZFS O(1) CAS generation checkpoints and rollback baseline (`sigpkg rollback`).
+
+---
+
+### 12 Months (v1.2 – Persona Expansion)
+- **Developer Persona**:
+  - File Conversion Utility (`sigma-convert` for code/media format conversions).
+  - Lightweight IDE overlay with LSP language server integration.
+- **Compliance Persona**:
+  - Universal Package Fetcher (`sigpkg fetch` for drivers and apps).
+  - Compliance Checklist Generator (automated CIS, ISO 27001, SOC2 reports).
+
+---
+
+### 18 Months (v1.5 – Differentiation Layer)
+- **Student Persona**:
+  - Productivity Micro-Tools (Pomodoro timer, checklist manager, quick notes).
+  - Flashcard/quiz overlay for interactive study.
+- **Gaming Persona**:
+  - GPU scheduler micro-tool for performance tuning.
+  - Network latency monitor for network optimization and bufferbloat reduction.
+
+---
+
+## 📊 Timeline Dashboard
+
+| Milestone | Key Tools & Capabilities | Target Persona | Impact & Strategy |
+|:---|:---|:---|:---|
+| **6 Months (v1.0)** | Text editor, compression, network diagnostics, monitoring, snapshot rollback | Core OS Baseline | **Completeness Baseline** |
+| **12 Months (v1.2)** | File converter, IDE overlay, package fetcher, compliance tools | Developer + Compliance | **Adoption Boost** |
+| **18 Months (v1.5)** | Productivity tools, flashcard/quiz overlay, GPU scheduler, latency monitor | Student + Gaming | **Market Differentiation** |
+
+---
+
 ## 🐧 Distro-Inspired Practical Roadmap & Architectural Formula
 
 ### 1. Base Philosophy & Hybrid Architecture

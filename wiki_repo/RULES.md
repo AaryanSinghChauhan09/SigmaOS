@@ -1,45 +1,39 @@
-# SigmaOS Master Architectural & Operational Rules
+# 📋 SigmaOS Contributor & AI Agent Task Rules & Execution Directives
 
-This document establishes the fundamental architectural, security, and contribution rules for SigmaOS, synthesized from leading Linux distributions (Arch, Debian, Fedora, NixOS) and BSD operating systems (OpenBSD, FreeBSD).
-
----
-
-## 1. Bare-Metal Zero-Dependency Rule (Linux & BSD Kernel Parity)
-- **Principle:** Core kernel modules, memory allocators, drivers, and fundamental userland tools must be written in bare-metal, zero-dependency, memory-safe Rust without relying on heavy external third-party libraries, legacy C++ codebases, or standard dynamic C runtimes (`glibc`/`musl`).
-- **Enforcement:** Crate root `#![no_std]` compliance; isolated `klib` collections.
+**Scope:** Developer & AI Agent Execution Guidelines, Quality Engineering, and Subsystem Integrity
 
 ---
 
-## 2. Least-Privilege & System Sandboxing Rule (OpenBSD Parity)
-- **Principle:** All system daemons, user utilities, and network-facing services must run under strict default-deny authorization.
-- **Enforcement:** Mandatory application of OpenBSD-style `pledge()` system call promises and `unveil()` filesystem path restrictions on process initialization.
+## 1. Contributor & AI Agent Mandatory Directives
 
----
+1. **Zero External Dependencies (`#![no_std]`)**:
+   - Every module added or modified in `src/` MUST maintain `#![no_std]` zero external crate dependency architecture.
+   - Do NOT add third-party crates to `Cargo.toml`. Utilize native Rust or `alloc::` primitives (`alloc::vec::Vec`, `alloc::string::String`, `alloc::format!`, `alloc::collections::BTreeMap`).
 
-## 3. Canonical Documentation Rule (Arch & FreeBSD Parity)
-- **Principle:** Documentation must follow the single-source-of-truth model. Every executable command or system daemon shipped in SigmaOS must maintain a corresponding man page under `docs/man/man1/` or `docs/man/man8/`.
-- **Enforcement:** PR reviews require man page updates for userland utility additions or command flag modifications.
+2. **Mandatory Git Branch Prefix**:
+   - Every git branch created by developers or AI agents MUST use the `jules-` prefix (e.g., `jules-kernel-scheduler`, `jules-pkg-adapter`).
 
----
+3. **Multi-Distro Interoperability & Security Gating**:
+   - Subsystem features must maintain compatibility across 25+ Linux and BSD distribution modes (`LinuxArch`, `LinuxDebian`, `LinuxFedora`, `FreeBsd`, `OpenBsd`, `NixOS`, `CachyOS`, `Omarchy`, etc.).
+   - All userland utilities must declare sandboxing bounds using OpenBSD `pledge()`/`unveil()`, Linux Landlock v5, or FreeBSD Capsicum capability rights.
 
-## 4. Deterministic Reproducible Build Rule (NixOS & Debian Parity)
-- **Principle:** Package compilations and ISO releases must yield 100% bit-for-bit identical binary output across independent build nodes.
-- **Enforcement:** `SOURCE_DATE_EPOCH` environment variable freezing, hermetic build sandboxing (`MakepkgSandbox`), and automated `diffoscope` binary equivalence audits.
+4. **Autonomous Testing & Self-Verification Protocol**:
+   - Modifying any Rust file requires standalone test execution:
+     `rustc --edition=2021 --test <file_path> -o build/test_bin && ./build/test_bin`
+   - Run the master test runner `./run_sigma_tests.sh` to ensure all native test runner stages pass cleanly.
 
----
+5. **AI Agent Pre-Commit Protocol**:
+   - AI agents must execute `pre_commit_instructions`, perform code review verification (`request_code_review`), record learnings (`initiate_memory_recording`), and finalize changes via `submit`.
 
-## 5. Subsystem Maintainer Governance Rule (Linux Kernel Parity)
-- **Principle:** Codebase modifications are reviewed and gated by designated subsystem maintainers according to `docs/MAINTAINERS.md`.
-- **Enforcement:** All pull requests require Developer Certificate of Origin (DCO `Signed-off-by`) trailers and automated CI test suite approval (`./run_sigma_tests.sh`).
+Inspired by Linux and BSD distribution maintenance protocols:
 
----
+## 2. Distribution Engineering Execution Rules
 
-## 6. Universal Package Transpilation Rule (Multi-Distro Parity)
-- **Principle:** Packages from foreign Linux and BSD package formats (`.deb`, `.rpm`, `.pkg.tar.zst`, `.apk`, `pkg`, `.xbps`, `.nix`) must be automatically detected, unpacked, and transpiled into native `SigmaPkg` format (`.sigpkg`) with zero manual conversion steps.
-- **Enforcement:** Implementation of `UniversalPackageFormatBridge` with automated format detection and sandbox isolation.
+Inspired by Linux and BSD distribution maintenance protocols:
 
----
-
-## 7. Universal Component & Driver Absorption Rule (Linux & BSD Hardware Parity)
-- **Principle:** Driver shards and system daemons inspired by Linux (`udev`, `systemd`, `cgroups v2`) or BSD (`devd`, `rc.d`, `Capsicum`, `PF`) must be modularly wrapped in `CrossOsDriverShim` and sandboxed within `SovereignModularDeviceSupportEngine`.
-- **Enforcement:** Capability-ring security isolation and DMA/IRQ sanity validation before hardware registration.
+1. **Cleanroom Chroots**: All package builds and core subsystem modifications must be verifiable in an isolated chroot / sandbox container.
+2. **Zero Unverified Dependencies**: All code additions must adhere strictly to `#![no_std]` zero external dependency requirements.
+3. **Reproducible Compilation**: Builds must yield byte-identical output given the same `SOURCE_DATE_EPOCH` and toolchain version.
+4. **Mandatory Branch Naming**: Every git branch MUST start with the `jules-` prefix (e.g. `jules-subsystem-improvements`).
+5. **Security Gating**: All new binaries and utilities must declare OpenBSD `pledge`/`unveil` privilege restrictions and FreeBSD `Capsicum` capability rights.
+6. **Pre-Commit Verification**: Before submitting changes, developers must call `pre_commit_instructions` and execute `./run_sigma_tests.sh`.

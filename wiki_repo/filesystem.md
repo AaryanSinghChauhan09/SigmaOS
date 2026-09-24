@@ -4,6 +4,55 @@
 
 SigmaOS implements a **Virtual Filesystem Switch (VFS)** layer that provides a unified interface to multiple filesystem backends. The VFS abstracts filesystem-specific operations and presents a POSIX-compatible interface to applications.
 
+---
+
+## 🔍 Hard Links & Variant Symlinks Subsystem Gap Analysis & Strategic Roadmap
+
+### Current Capabilities & Link Gaps
+SigmaOS VFS (`src/filesystem/vfs.rs`) supports POSIX inode reference counting (`link_count`/`hard_links_count`), hard link creation (`create_hard_link`), link-aware unlinking (`unlink`), and smart symlink resolution (`src/filesystem/smart_symlink.rs`). Achieving full parity with mature Linux (ext4, Btrfs, OverlayFS, `linkat`/`unlinkat`) and BSD (DragonFly BSD `varsyms`, OpenBSD `chflags`) filesystems requires addressing key gaps:
+
+1. **POSIX `linkat` / `unlinkat` Syscall Parity**: Directory-relative hard link creation and unlinking using dirfd handles, enforcing `EPERM` directory hard link protection.
+2. **BSD File Immutability Flags (`chflags`)**: Enforcing `nounlink` (file cannot be unlinked or renamed), `uchg`/`schg` (user/system immutable), and `uappnd`/`sappnd` (append-only) flags across VFS operations.
+3. **DragonFly BSD / OpenBSD Variant Symlinks (`varsyms`)**: Runtime variable expansion inside symlink target templates (`$SYS`, `$ARCH`, `$USER`, `$ZONE`, `$ENV`) to adapt symlink paths dynamically based on execution context.
+4. **Zero-Downtime Atomic Symlink Swaps**: Atomic symlink target replacement (`swap_symlink_atomic`) to prevent broken window states during package upgrades and blue/green deployments.
+5. **ELOOP Recursion & Cycle Guards**: Enforcing strict recursion limits (max depth 40) and circular symlink loop detection returning `ELOOP`.
+6. **Cross-Device Link Handling (`EXDEV`)**: Returning `EXDEV` when attempting hard link creation across distinct mount points while gracefully offering automatic fallback to symlink creation.
+
+---
+
+### 📊 Hard Links & Symlinks Gap Dashboard
+
+| Link Feature | Current State (SigmaOS) | Target State (Linux & BSD Standards) |
+|---|---|---|
+| **Hard Link Inode Counting** | Inode `link_count` tracking | Atomic reference count & link-aware deferred block freeing |
+| **Directory Hard Links** | Blocked | Enforced `EPERM` directory link protection |
+| **BSD File Flags (`chflags`)** | `nounlink` flag definition | Full `nounlink`, `uchg`, `schg`, `uappnd` VFS enforcement |
+| **Variant Symlinks (`varsyms`)** | Pattern resolver | Dynamic `$SYS`, `$ARCH`, `$USER`, `$ZONE` template expansion |
+| **Atomic Symlink Swapping** | Symlink target update | Atomic pointer swap (`swap_symlink_atomic`) for package updates |
+| **ELOOP Recursion Guard** | Symlink traversal limit | Strict depth 40 limit + visited set cycle loop detection |
+
+---
+
+### 🚀 3-Phase Hard Links & Symlinks Development Roadmap
+
+#### Phase 1: POSIX Hard Links & Link-Aware Unlinking (0–6 Months)
+- **POSIX `linkat` & `unlinkat` Parity**: Implement dirfd-relative hard link creation and unlinking syscalls.
+- **Atomic Inode Reference Counting**: Atomic increment/decrement of `link_count`, deferring block reclamation until `link_count == 0`.
+- **BSD `nounlink` Flag Enforcement**: Block file removal or renaming if `nounlink` or `schg`/`uchg` flags are active.
+- **Directory Link Protection**: Explicitly enforce `EPERM` when attempting hard links to directories.
+
+#### Phase 2: Variant Symlinks & Atomic Swaps (6–12 Months)
+- **Variant Symlinks (`varsyms`)**: Support dynamic template variable expansion (`$SYS`, `$ARCH`, `$USER`, `$ZONE`) during path resolution.
+- **Atomic Symlink Swapping**: Provide zero-downtime atomic symlink swap API (`swap_symlink_atomic`) for live system updates.
+- **Cross-Device Link Handling (`EXDEV`)**: Detect cross-filesystem mount boundaries and return `EXDEV` for hard links.
+
+#### Phase 3: Cross-Filesystem Link Emulation & ELOOP Cycle Guard (12–18 Months)
+- **ELOOP Recursion & Cycle Detection**: Track visited symlink inodes to return `ELOOP` upon circular loop detection.
+- **eBPF Link Audit Hooks**: Attach eBPF tracing probes to monitor link creation and unlinking operations.
+- **Immutable Root Integration**: Integrate link management with OverlayFS read-only root filesystems.
+
+---
+
 ## Supported Filesystems
 
 | Filesystem | Type | Status | Description |

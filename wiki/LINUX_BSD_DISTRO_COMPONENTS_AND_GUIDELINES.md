@@ -1,29 +1,8 @@
-# Linux & BSD Distribution Inspirations: System Components & Engineering Guidelines
+# Linux & BSD Distribution Inspirations: System Components & Engineering Guidelines for SigmaOS
 
-## Overview
-This wiki guide details Linux and BSD distribution-inspired components, architecture maps, and engineering guidelines for AI coding agents and developers working on SigmaOS. It covers cross-subsystem interoperability, foreign package adapters, container zones, security capability models, and zero-dependency `klib` guidelines.
+## Executive Overview & Architectural Philosophy
 
-## Distro Interoperability Matrix
-- **Arch Linux**: Pacman PKGBUILD parsing, makepkg clean chroot builds (`ApkChrootBuildSandboxEngine`).
-- **Debian / Fedora / Gentoo / Alpine / Void**: Control/SPEC/ebuild/APKINDEX/XBPS manifest parsing and dependency canonicalization (`UniversalDependencyMapper`).
-- **FreeBSD / OpenBSD / NetBSD**: UCL manifests, Capsicum descriptor rights, Soft Updates (`BsdSoftUpdatesEngine`), pledge/unveil sandboxing, rump kernels.
-- **Solaris / Illumos**: Zones container isolation (`SovereignZonesManager`) with proportional CPU share math (`calculate_cpu_percentage`) and VNIC networking.
-- **Haiku OS**: `.hpkg` packagefs manifest parsing (`HaikuHpkgManifest`).
-
-## Cross-Subsystem Bridge (`src/distro/linux_bsd_inspirations.rs`)
-```rust
-let mut bridge = SovereignUniversalDistroBridge::new();
-bridge.dispatch_cross_subsystem_operation(
-    LinuxBsdDistroMode::FreeBsd,
-    "security",
-    "capsicum_rights_limit",
-)?;
-```
-
-## Related Documents
-- `docs/LINUX_BSD_DISTRO_COMPONENTS_AND_GUIDELINES.md`
-- `docs/MASTER_LINUX_BSD_GAP_CLOSURE_STRATEGIC_PLAN.md`
-- `wiki/Home.md`
+SigmaOS leverages proven, battle-tested architectural concepts from major Linux and BSD distributions to build a sovereign, zero-dependency operating system written entirely in Rust (`#![no_std]`). Rather than fragmenting into hundreds of distinct distributions, SigmaOS unifies these paradigms into native, high-performance kernel subsystems and userland modules.
 
 This document serves as the master engineering reference and operational guidelines manual for AI coding agents and human developers building, extending, or maintaining distro-inspired components in SigmaOS.
 
@@ -31,26 +10,22 @@ This document serves as the master engineering reference and operational guideli
 
 ## 🧩 1. Distro Inspirations & Subsystem Mapping Matrix
 
-SigmaOS natively supports 25 distinct distribution subsystem modes via `DistroSubsystemMode`:
-
 | **Distribution / OS** | **Core Inspiration Paradigm** | **SigmaOS Native Implementation** |
 | :--- | :--- | :--- |
 | **Arch Linux** | Pacman package model, AUR, rolling releases, makepkg clean chroots | `src/sigpkg/universal_adapter.rs` (`PacmanPkgbuild`, `parse_pacman_pkgbuild`, `ApkChrootBuildSandboxEngine`) |
-| **Debian** | APT control metadata, DFSG package priority levels, sbuild reproducible builds | `AptDebManifest`, `PackagePriority` (`Essential`, `Required`, `Important`), `debian-sbuild-reproducible-ci.yml` |
-| **Alpine Linux** | APKINDEX manifests, musl libc lightweight containers, apk chroots | `ApkIndexManifest`, `parse_apkindex`, `ApkChrootBuildSandboxEngine` |
-| **NixOS** | Flakes, content-addressed store, declarative state reconciliation | `NixOsDeclarativeStateReconciliationEngine`, `NixOsPureStoreDerivationEngine` |
-| **Gentoo Linux** | Portage ebuild specs, USE flags, source-based compilation | `GentooEbuildMetadata`, `parse_gentoo_ebuild`, `GentooUseFlagEngine` |
 | **Fedora Linux** | RPM spec manifests, rpm-ostree atomic updates, Btrfs autodefrag | `RpmSpecManifest`, `AppImageContainer`, `BtrfsAutoDefragEngine` (`src/fs/btrfs.rs`) |
+| **Debian** | APT control metadata, DFSG package priority levels, sbuild reproducible builds | `AptDebManifest`, `PackagePriority` (`Essential`, `Required`, `Important`), `debian-sbuild-reproducible-ci.yml` |
+| **Gentoo Linux** | Portage ebuild specs, USE flags, source-based compilation | `GentooEbuildMetadata`, `parse_gentoo_ebuild`, `GentooUseFlagEngine` |
+| **Alpine Linux** | APKINDEX manifests, musl libc lightweight containers, apk chroots | `ApkIndexManifest`, `parse_apkindex`, `ApkChrootBuildSandboxEngine` |
 | **Void Linux** | XBPS control manifests, runit service supervision | `XbpsManifest`, `parse_xbps_manifest`, `void-runit-supervision-ci.yml` |
-| **openSUSE** | Snapper Btrfs CoW rollback, OBS Kiwi image creation | `SnapperBtrfsEngine`, `SnapperSnapshot`, `opensuse-obs-kiwi-ci.yml` |
-| **Solus Linux** | eopkg package manager, Dinit supervisor, Budgie desktop integration | `SolusEopkgBudgieEngine`, `Dinit` supervisor mapping |
-| **Clear Linux** | Stateless `/usr/etc` default configuration, ISA microarch auto-dispatch | `ClearLinuxIsaSelectorEngine`, `/usr/etc` VFS path translation |
-| **Slackware Linux** | txz packages, pkgtools BSD-style init scripts | `SlackwarePkgTools`, `SlackBuildCompiler`, `Sysvinit` supervisor mapping |
+| **NixOS / Guix** | Content-Addressed Storage (CAS) flakes, hermetic store, GC | `ContentAddressedFs` (`src/filesystem/sigmafs.rs`), `NixFlakeGcEngine` |
 | **FreeBSD** | UCL `+MANIFEST`, Capsicum descriptor rights, Soft Updates, VM zones, Jails | `FreeBsdUclManifest`, `BsdSoftUpdatesEngine`, `BsdVmZoneAllocator`, `FreeBsdJailsEngine` |
 | **OpenBSD** | `+CONTENTS` pkg, `pledge`/`unveil` capability sandboxing, `doas` elevation | `OpenBsdContentsManifest`, `pity_pledge`, `sigma_unveil`, `SovereignOpenBsdDoas` |
 | **NetBSD** | pkgsrc manifests, Rump kernels for component isolation | `NetBsdPkgsrcManifest`, `NetBsdRumpKernelEngine` |
 | **DragonFly BSD**| HAMMER2 pseudo-filesystems (PFS), fine-grained lockless VFS | `DragonFlyHammer2Engine` |
 | **Solaris / Illumos**| Zones container isolation, VNICs, DTrace dynamic tracing | `SovereignZonesManager`, `SovereignZone`, `configure_vnic`, `IllumosDTraceEngine` |
+| **Haiku OS** | `.hpkg` packagefs, BFS attributes, desktop responsiveness | `HaikuHpkgManifest`, `parse_haiku_hpkg` (`src/sigpkg/universal_adapter.rs`) |
+
 | **SmartOS** | SmartOS zones, rcd service supervision, bhyve virtualization | `SmartOs` distro mode, `rcd` supervisor mapping |
 | **Bedrock Linux** | Stratum filesystem virtualization, cross-subsystem package spec translation | `BedrockLinux` distro mode, `.stratum` specifier mapping |
 | **Pop!_OS** | System76 power governor profiles, COSMIC desktop window management | `System76PowerGovernor`, `PowerProfileMode` |
@@ -78,9 +53,9 @@ SigmaOS natively supports 25 distinct distribution subsystem modes via `DistroSu
                                  /                |                \
                                 /                 |                 \
             +-----------------------+   +-------------------+   +-----------------------+
-            | Packaging Subsystem   |   | Security Subsystem|   | Kernel & Hardware     |
+            | Packaging Subsystem   |   | Security Subsystem|   | Kernel & Memory       |
             | UniversalPackageAdapt |   | Pledge/Unveil     |   | BsdVmZoneAllocator    |
-            | SigPkgUniversalBridge |   | Capsicum / MAC    |   | 28 Expansion Drivers  |
+            | SigPkgUniversalBridge |   | Capsicum / MAC    |   | CachyBoreScheduler    |
             +-----------------------+   +-------------------+   +-----------------------+
                                 \                 |                 /
                                  \                |                /
@@ -90,44 +65,25 @@ SigmaOS natively supports 25 distinct distribution subsystem modes via `DistroSu
                                 +-----------------------------------+
 ```
 
-### Core Subsystem Dispatchers (`SovereignUniversalDistroBridge`)
+### Core Subsystem Bridges (`src/distro/linux_bsd_inspirations.rs`)
 
-The `SovereignUniversalDistroBridge` in `src/distro/linux_bsd_inspirations.rs` provides full cross-subsystem dispatching for all 32 core subsystems across all 25 distro modes:
+1. **`SovereignUniversalDistroBridge`**:
+   - `dispatch_cross_subsystem_operation(mode, target_subsystem, action)`: Central dispatcher routing operations across VFS, Init, Security, Memory, Network, UI, Process, Virt, and Audit subsystems under active Linux/BSD distribution modes.
 
-1. **`init`**: Supervisor dispatch (`Systemd`, `OpenRC`, `Runit`, `Shepherd`, `Dinit`, `Sysvinit`, `Smf`, `Rcd`).
-2. **`package`**: Universal package format specifier translation.
-3. **`vfs`**: Distro-aware path resolution (`/etc`, `/usr/etc`, `/etc/nixos`, `/var/lib/pkg`, `/nix/store`).
-4. **`security`**: OpenBSD `pledge`/`unveil`, FreeBSD Capsicum, Solaris Zones, Landlock LSM sandbox.
-5. **`storage`**: CoW filesystem self-healing checks (`bcachefs`, `Btrfs`, `ZFS`, `HAMMER2`).
-6. **`kernel`**: Task registration under Linux EEVDF or CachyOS BORE schedulers.
-7. **`network`**: eBPF/XDP zero-copy redirection, FreeBSD VNET, or Illumos Crossbow VNIC routing.
-8. **`graphics`**: Atomic DRM/KMS modesetting and display pipeline management.
-9. **`power`**: System76 power governor profiles (`HighPerformance`, `Balanced`, `BatterySaver`).
-10. **`audio`**: PipeWire graph audio routing or OpenBSD/NetBSD `sndio` audio server streams.
-11. **`ipc`**: Capsicum/Pledge descriptor passing or zero-copy ring pipe IPC.
-12. **`auth`**: systemd-homed, Linux PAM, and BSD-Auth authentication.
-13. **`audit`**: PaX W^X guard checks and eBPF security auditing.
-14. **`boot`**: systemd-boot, GRUB, and Multiboot2 boot loader configuration.
-15. **`container` / `containers`**: ApkChroot build sandboxes, OCI containers, FreeBSD Jails, and Solaris Zones.
-16. **`virtualization` / `virt`**: bhyve, KVM, QEMU, and VirtIO microVM hypervisors.
-17. **`input`**: libinput, evdev, and BSD wsmouse input event pipelines.
-18. **`thermal`**: Thermal zone regulation, CPU frequency capping, and cooling profiles.
-19. **`memory`**: KARL W^X memory page allocation and KASLR randomization.
-20. **`syscall`**: Syscall interface dispatcher table translation across Linux, BSD, and Illumos brand syscalls.
-21. **`device`**: udev, devfs, and sysfs peripheral device manager events.
-22. **`crypto`**: LUKS, GELI, OpenSSL, and LibreSSL cryptographic key engines.
-23. **`ai`**: QwenPaw and Herdr AI agent runtime task orchestration.
-24. **`monitoring`**: eBPF, Pressure Stall Information (PSI), ftrace, and ktrace observability monitors.
-25. **`desktop` / `ui`**: Zenith DE, COSMIC, Mint Cinnamon, and Omarchy Quickshell UI theme presets.
-26. **`compiler`**: Sandboxed compiler, GCC, Clang, and Arch ABS build farm pipelines.
-27. **`i18n`**: glibc, musl locale, and BSD NLS internationalization engines.
-28. **`bluetooth`**: BlueZ and Intel BT 5.3 USB LE HCI wireless stacks.
-29. **`firewall`**: nftables, OpenBSD PF, and FreeBSD IPFW stateful firewalls.
-30. **`diagnostics`**: dmesg, journalctl, and syslog diagnostic collector.
-31. **`recovery`**: Snapper CoW snapshots and ZFS bootenv system rollback recovery.
-32. **`time`**: Chrony and NTP clock synchronization.
+2. **Universal Foreign Package Adapter (`src/sigpkg/universal_adapter.rs`)**:
+   - `SigPkgUniversalBridgeEngine`: Converts foreign manifests (.deb, .rpm, PKGBUILD, .ebuild, .apk, .xbps, .hpkg, FreeBSD UCL) into native `Sigma-pkg` models.
+   - `UniversalDependencyMapper`: Canonicalizes foreign dependency names (`libssl-dev`, `openssl-devel`, `dev-libs/openssl`) to `openssl`.
+   - `UniversalSandboxCapabilityMatrix`: Translates Snap plugs and Flatpak finish-args into native SigmaOS Capability permissions.
+
+3. **Solaris Zones Manager (`src/kernel/linux_bsd_innovations.rs`)**:
+   - `SovereignZonesManager`: Manages isolated execution zones with proportional CPU share weight calculation (`calculate_cpu_percentage`) and virtual NIC IP binding (`configure_vnic`).
+
+4. **FreeBSD Soft Updates Metadata Dependency Engine**:
+   - `BsdSoftUpdatesEngine`: Enforces strict dependency ordering (`MetadataDependency`, `MetadataOp`) across inodes and data blocks for crash consistency.
 
 ---
+
+## 📏 3. Development Guidelines & Directives for AI Agents
 
 ## 🔌 3. Hardware Peripheral Driver Integration
 
@@ -186,12 +142,18 @@ SigmaOS achieves strategic and technical supremacy over conventional Linux and B
 1. **Zero-Dependency Core (`#![no_std]`) Rule**:
    - Kernel subsystems and `klib` utilities MUST NOT depend on external third-party C/C++ libraries or non-`alloc` crates. Use native safe Rust primitives in `src/klib/`.
 
+2. **Cross-Distro Mode Interoperability**:
+   - When introducing new kernel features or syscalls, add corresponding dispatch branches in `SovereignUniversalDistroBridge::dispatch_cross_subsystem_operation` to support all Linux and BSD distro modes.
+
 2. **Cross-Distro Subsystem Parity Mandate**:
    - Every newly implemented distro feature MUST register a corresponding dispatch branch inside `SovereignUniversalDistroBridge::dispatch_cross_subsystem_operation` across all 32 core subsystem categories.
 
 3. **Memory Safety & Execution Protection**:
    - Memory allocators MUST enforce strict W^X (Write XOR Execute) page permission boundaries (`SovereignKaslrWxAllocator`). Executable pages cannot be writable simultaneously.
    - Userland stack validation MUST verify stack pointers against registered `MAP_STACK` regions (`OpenBsdRetguardEngine`).
+
+4. **Testing & Verification**:
+   - Every distro-inspired component MUST include unit tests executable via `./run_sigma_tests.sh`.
 
 4. **Storage Reliability & Self-Healing Protocol**:
    - All multi-device array writes MUST compute 64-bit Fletcher-4 or CRC32c checksums. Scrub routines MUST automatically heal corrupted blocks from healthy mirrors or parity chunks (`SovereignRaidSelfHealer`).
@@ -203,6 +165,5 @@ SigmaOS achieves strategic and technical supremacy over conventional Linux and B
 
 ## Related Architectural References
 - `src/distro/linux_bsd_inspirations.rs` - Cross-subsystem universal distro bridge.
-- `src/drivers/distro_device_expansion.rs` - Hardware peripheral expansion drivers.
 - `src/sigpkg/universal_adapter.rs` - Universal package adapter and bridge engine.
 - `docs/MASTER_LINUX_BSD_GAP_CLOSURE_STRATEGIC_PLAN.md` - Master strategic roadmap.
