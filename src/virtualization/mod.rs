@@ -20,3 +20,7 @@ pub use rancher::{
     DaemonlessContainer, K3osOrchestrator, RancherError, RancherHarvesterVirtualMachineGovernor,
     RancherK3sEmbeddedClusterController, RancherSystemDockerEngine,
 };
+pub use vendor_hardware::{
+    AmdVmcbExecutionBlock, IntelVmcsExecutionState, MultiVendorVirtualizationEngine,
+    NvidiaVgpuMediatedInstance, VirtualizationVendorType,
+};
