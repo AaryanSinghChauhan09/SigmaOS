@@ -3,6 +3,7 @@ pub mod kvm_vcpu;
 pub mod oci_pod;
 pub mod orchestration;
 pub mod rancher;
+pub mod vendor_hardware;
 
 pub use kvm_vcpu::{
     KvmExitCode, KvmMemoryRegion, KvmVcpu, KvmVcpuRegisters, KvmVcpuSregs, VirtioDeviceBackend,

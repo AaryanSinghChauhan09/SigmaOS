@@ -3,7 +3,6 @@ pub use omarchy_inspiration::*;
 pub mod omarchy;
 pub mod omarchy_advanced_parity;
 pub mod omarchy_future_roadmap;
-pub mod omarchy_inspiration;
 pub mod sovereign_gap_closure_master_suite;
 pub mod sovereign_open_source_distro_synthesis;
 pub mod sovereign_stack_replacements;
@@ -21,8 +20,6 @@ pub mod antix_zorin_innovations;
 pub mod mint_innovations;
 
 pub use omarchy::*;
-
-pub mod omarchy_advanced_parity;
 pub use omarchy_advanced_parity::*;
 pub mod omarchy_app_ecosystem;
 pub use omarchy_app_ecosystem::*;
