@@ -8,6 +8,8 @@ pub use compatibility::{
     AcpiPowerState, CompatibilityError, CompatibilityReport,
     CompatibilityResult, DeviceID, DeviceType, SupportStatus,
     SimpleAcpiManager, SimpleCompatibilityMatrix, SimpleDevice, SimpleDiagnostics,
+    LinuxNvmeOverFabricsEngine, FreeBsdCamStorageEngine,
+    LinuxThunderboltDisplayPortTunnelEngine, OpenBsdUvideoWebcamEngine,
 };
 
 pub use tech_powerup_hardware_monitors::{

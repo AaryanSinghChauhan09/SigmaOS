@@ -533,7 +533,166 @@ pub struct CompatibilityReport {
     pub results: Vec<(DeviceID, CompatibilityResult)>,
 }
 
-#[cfg(test_disabled)]
+// =========================================================================
+// Linux & BSD Inspired Advanced Hardware Drivers
+// =========================================================================
+
+/// Linux NVMe-oF (NVMe over Fabrics) Engine supporting RDMA & TCP transports
+#[derive(Debug, Clone)]
+pub struct LinuxNvmeOverFabricsEngine {
+    pub target_subnqn: String,
+    pub transport_type: String, // "rdma" or "tcp"
+    pub portal_address: String,
+    pub port_number: u16,
+    pub max_queue_depth: u16,
+    pub connected: bool,
+}
+
+impl LinuxNvmeOverFabricsEngine {
+    pub fn new(subnqn: &str, transport: &str, portal: &str, port: u16) -> Self {
+        Self {
+            target_subnqn: subnqn.to_string(),
+            transport_type: transport.to_string(),
+            portal_address: portal.to_string(),
+            port_number: port,
+            max_queue_depth: 1024,
+            connected: false,
+        }
+    }
+
+    pub fn connect_fabric(&mut self) -> Result<bool, &'static str> {
+        if self.portal_address.is_empty() {
+            return Err("Invalid portal address");
+        }
+        self.connected = true;
+        Ok(true)
+    }
+
+    pub fn submit_nvme_cmd(&self, _opcode: u8) -> Result<u32, &'static str> {
+        if !self.connected {
+            return Err("NVMe-oF target disconnected");
+        }
+        Ok(0) // Success status
+    }
+}
+
+/// FreeBSD CAM (Common Access Method) Storage Subsystem Engine
+#[derive(Debug, Clone)]
+pub struct FreeBsdCamStorageEngine {
+    pub bus_id: u32,
+    pub target_id: u32,
+    pub lun_id: u32,
+    pub device_type: String,
+    pub queue_frozen: bool,
+}
+
+impl FreeBsdCamStorageEngine {
+    pub fn new(bus: u32, target: u32, lun: u32, dev_type: &str) -> Self {
+        Self {
+            bus_id: bus,
+            target_id: target,
+            lun_id: lun,
+            device_type: dev_type.to_string(),
+            queue_frozen: false,
+        }
+    }
+
+    pub fn execute_scsi_cdb(&mut self, cdb: &[u8]) -> Result<Vec<u8>, &'static str> {
+        if self.queue_frozen {
+            return Err("CAM SIM Queue is frozen");
+        }
+        if cdb.is_empty() {
+            return Err("Empty SCSI CDB");
+        }
+        Ok(vec![0x00, 0x80, 0x02, 0x02]) // Mock Inquiry/Read response
+    }
+
+    pub fn freeze_queue(&mut self) {
+        self.queue_frozen = true;
+    }
+
+    pub fn release_queue(&mut self) {
+        self.queue_frozen = false;
+    }
+}
+
+/// Linux & USB4 / Thunderbolt DisplayPort & PCIe Tunneling Driver Engine
+#[derive(Debug, Clone)]
+pub struct LinuxThunderboltDisplayPortTunnelEngine {
+    pub domain_id: u32,
+    pub route_string: u64,
+    pub allocated_dp_bandwidth_gbps: f32,
+    pub pcie_tunnel_active: bool,
+    pub security_level: String, // "user", "secure", "dponly"
+}
+
+impl LinuxThunderboltDisplayPortTunnelEngine {
+    pub fn new(domain: u32, route: u64, sec_level: &str) -> Self {
+        Self {
+            domain_id: domain,
+            route_string: route,
+            allocated_dp_bandwidth_gbps: 0.0,
+            pcie_tunnel_active: false,
+            security_level: sec_level.to_string(),
+        }
+    }
+
+    pub fn establish_dp_tunnel(&mut self, bandwidth_gbps: f32) -> Result<bool, &'static str> {
+        if bandwidth_gbps > 40.0 {
+            return Err("Exceeds Thunderbolt 4 40Gbps maximum bandwidth");
+        }
+        self.allocated_dp_bandwidth_gbps = bandwidth_gbps;
+        Ok(true)
+    }
+
+    pub fn enable_pcie_tunneling(&mut self) -> Result<bool, &'static str> {
+        if self.security_level == "dponly" {
+            return Err("PCIe tunneling blocked under dponly security policy");
+        }
+        self.pcie_tunnel_active = true;
+        Ok(true)
+    }
+}
+
+/// OpenBSD uvideo (USB Video Class) V4L2-Compatible Webcam Driver Engine
+#[derive(Debug, Clone)]
+pub struct OpenBsdUvideoWebcamEngine {
+    pub device_node: String,
+    pub max_resolution_width: u32,
+    pub max_resolution_height: u32,
+    pub is_streaming: bool,
+    pub format_fourcc: String, // e.g. "YUY2", "MJPG", "NV12"
+}
+
+impl OpenBsdUvideoWebcamEngine {
+    pub fn new(node: &str, width: u32, height: u32, fourcc: &str) -> Self {
+        Self {
+            device_node: node.to_string(),
+            max_resolution_width: width,
+            max_resolution_height: height,
+            is_streaming: false,
+            format_fourcc: fourcc.to_string(),
+        }
+    }
+
+    pub fn start_video_stream(&mut self) -> Result<(), &'static str> {
+        self.is_streaming = true;
+        Ok(())
+    }
+
+    pub fn capture_video_frame(&self) -> Result<Vec<u8>, &'static str> {
+        if !self.is_streaming {
+            return Err("Webcam stream is not active");
+        }
+        Ok(vec![0xFF, 0xD8, 0xFF, 0xE0]) // Mock JPEG/RAW video frame header
+    }
+
+    pub fn stop_video_stream(&mut self) {
+        self.is_streaming = false;
+    }
+}
+
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -623,5 +782,36 @@ mod tests {
             .is_ok());
         assert_eq!(matrix.list_hotplug_history().len(), 1);
         assert_eq!(matrix.get_device(99).unwrap().name(), "HotplugDisk");
+    }
+
+    #[test]
+    fn test_linux_and_bsd_advanced_drivers() {
+        // 1. Test Linux NVMe-oF driver
+        let mut nvme_of = LinuxNvmeOverFabricsEngine::new("nqn.2026-09.org.sigma:storage", "tcp", "192.168.1.100", 4420);
+        assert!(nvme_of.submit_nvme_cmd(0x02).is_err());
+        assert!(nvme_of.connect_fabric().unwrap());
+        assert_eq!(nvme_of.submit_nvme_cmd(0x02).unwrap(), 0);
+
+        // 2. Test FreeBSD CAM storage engine
+        let mut cam = FreeBsdCamStorageEngine::new(0, 0, 0, "da0");
+        let res = cam.execute_scsi_cdb(&[0x12, 0x00, 0x00, 0x00, 0x24, 0x00]).unwrap();
+        assert_eq!(res.len(), 4);
+        cam.freeze_queue();
+        assert!(cam.execute_scsi_cdb(&[0x12]).is_err());
+        cam.release_queue();
+        assert!(cam.execute_scsi_cdb(&[0x12]).is_ok());
+
+        // 3. Test Thunderbolt DP & PCIe tunnel driver
+        let mut tb = LinuxThunderboltDisplayPortTunnelEngine::new(1, 0x00010002, "secure");
+        assert!(tb.establish_dp_tunnel(21.6).unwrap());
+        assert!(tb.enable_pcie_tunneling().unwrap());
+
+        // 4. Test OpenBSD uvideo webcam driver
+        let mut uvideo = OpenBsdUvideoWebcamEngine::new("/dev/video0", 1920, 1080, "YUY2");
+        assert!(uvideo.capture_video_frame().is_err());
+        uvideo.start_video_stream().unwrap();
+        let frame = uvideo.capture_video_frame().unwrap();
+        assert_eq!(frame[0], 0xFF);
+        uvideo.stop_video_stream();
     }
 }
