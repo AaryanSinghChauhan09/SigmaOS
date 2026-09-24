@@ -628,7 +628,7 @@ impl AnonymousAccessPolicy {
 }
 
 // ============================================================================
-// 8. Linux & BSD Fifty Percent (50%) Rule Engine
+// 8. Linux & BSD Fifty Percent (50%) Rule Engine Extensions
 // ============================================================================
 
 /// Fifty Percent Rule Resource Metric Category
@@ -642,9 +642,9 @@ pub enum FiftyPercentResourceCategory {
     ProcessMigrationBatch,   // Migrate up to 50% of runnable threads per NUMA balance tick
 }
 
-/// Linux & BSD Fifty Percent (50%) Rule Governance Engine
+/// Extended struct for 50% rule governance
 #[derive(Debug, Clone)]
-pub struct FiftyPercentRuleEngine {
+pub struct FiftyPercentGovernanceEngine {
     pub total_ram_mb: u64,
     pub active_ram_mb: u64,
     pub total_cpu_shares: u32,
@@ -652,7 +652,7 @@ pub struct FiftyPercentRuleEngine {
     pub rule_enforcements_count: u64,
 }
 
-impl FiftyPercentRuleEngine {
+impl FiftyPercentGovernanceEngine {
     pub fn new(total_ram_mb: u64, total_cpu_shares: u32) -> Self {
         Self {
             total_ram_mb,
@@ -722,7 +722,7 @@ impl FiftyPercentRuleEngine {
     }
 }
 
-impl Default for FiftyPercentRuleEngine {
+impl Default for FiftyPercentGovernanceEngine {
     fn default() -> Self {
         Self::new(16384, 1024)
     }
@@ -904,8 +904,8 @@ mod tests {
     }
 
     #[test]
-    fn test_fifty_percent_rule_engine() {
-        let mut engine = FiftyPercentRuleEngine::new(16384, 1000);
+    fn test_fifty_percent_governance_engine() {
+        let mut engine = FiftyPercentGovernanceEngine::new(16384, 1000);
 
         // RAM Swap Watermark (8192 MB out of 16384 MB = 50%)
         assert!(engine.enforce_50_percent_ram_swap_watermark(8192).unwrap());
