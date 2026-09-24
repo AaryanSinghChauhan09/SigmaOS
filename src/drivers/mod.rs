@@ -64,3 +64,6 @@ pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
 
 pub use distro_device_expansion::*;
+
+pub mod sovereign_sound_hda_synthesis;
+pub use sovereign_sound_hda_synthesis::*;

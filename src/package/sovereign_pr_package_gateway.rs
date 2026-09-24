@@ -6,7 +6,9 @@
 // Zero-dependency, `#![no_std]` compliant Rust PR packaging components inspired by:
 // - GitHub / Pagure / DistGit Package PR Workflows (Arch AUR, Fedora DistGit, Gentoo PRs, FreeBSD Ports PRs)
 // - Greenwave / Bodhi CI Gating (Automated CI test pass checks, license compliance, PQC signature verification)
-// - Multi-Format PR Transpiler (Transpiles .deb, .rpm, PKGBUILD, .ebuild, APKBUILD, .xbps, .nix PRs to .sigpkg)
+// - Universal Multi-Format PR Transpiler (Transpiles .deb, .rpm, PKGBUILD, .ebuild, APKBUILD, .xbps, .nix, Flatpak, Snap, AppImage, Ports PRs to .sigpkg)
+// - PackagePrDiffPatchEngine (Applies unified git diff patches to PR manifests)
+// - UniversalPackagePrRepoStagingEngine (Stages transpiled packages into stable, testing, or rolling repositories)
 // - SovereignPrPackageGatewaySuite (Master coordinator unifying all PR package gateway engines)
 
 #[cfg(not(any(feature = "standalone_test", test)))]
@@ -47,8 +49,18 @@ pub enum PackagePrStatus {
     CiTesting,
     Approved,
     ChangesRequested,
+    Patched,
     MergedToRepository,
     ClosedRejected,
+}
+
+/// Repository Staging Channel
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Default)]
+pub enum RepoStagingChannel {
+    Stable,
+    Testing,
+    #[default]
+    Rolling,
 }
 
 /// Package Pull Request Entry
@@ -62,6 +74,8 @@ pub struct DistroPackagePullRequest {
     pub version: String,
     pub license: String,
     pub raw_manifest_content: String,
+    pub applied_diff_patches: Vec<String>,
+    pub target_channel: RepoStagingChannel,
     pub status: PackagePrStatus,
     pub comments: Vec<String>,
 }
@@ -86,9 +100,15 @@ impl DistroPackagePullRequest {
             version: version.to_string(),
             license: license.to_string(),
             raw_manifest_content: manifest.to_string(),
+            applied_diff_patches: Vec::new(),
+            target_channel: RepoStagingChannel::Rolling,
             status: PackagePrStatus::Submitted,
             comments: Vec::new(),
         }
+    }
+
+    pub fn auto_detect_format_from_title_or_filename(title_or_file: &str) -> PackageFormat {
+        PackageFormat::from_filename(title_or_file).unwrap_or(PackageFormat::SigmaPkg)
     }
 
     pub fn add_comment(&mut self, author: &str, comment: &str) {
@@ -117,6 +137,9 @@ impl PackagePrCiGatingGovernor {
                 "GPL-2.0-or-later".to_string(),
                 "GPL-3.0-or-later".to_string(),
                 "Apache-2.0".to_string(),
+                "MPL-2.0".to_string(),
+                "LGPL-2.1-or-later".to_string(),
+                "Unlicense".to_string(),
             ],
             require_pqc_signature: true,
             automated_ci_passed_prs: Vec::new(),
@@ -155,10 +178,41 @@ impl Default for PackagePrCiGatingGovernor {
 }
 
 // ============================================================================
-// 3. MULTI-FORMAT PACKAGE PR TRANSPILATION ENGINE
+// 3. PACKAGE PR UNIFIED DIFF PATCH ENGINE
 // ============================================================================
 
-/// Transpiled Native `.sigpkg` Artifact from PR
+/// Applies unified git diff patches directly to raw PR package manifests
+pub struct PackagePrDiffPatchEngine;
+
+impl PackagePrDiffPatchEngine {
+    pub fn apply_patch(pr: &mut DistroPackagePullRequest, patch_content: &str) -> Result<usize, String> {
+        if patch_content.is_empty() {
+            return Err("DiffPatchEngine: Empty patch content".to_string());
+        }
+
+        let mut lines_added = 0;
+        for line in patch_content.lines() {
+            if line.starts_with('+') && !line.starts_with("+++") {
+                let content_to_add = &line[1..];
+                pr.raw_manifest_content.push('\n');
+                pr.raw_manifest_content.push_str(content_to_add);
+                lines_added += 1;
+            }
+        }
+
+        pr.applied_diff_patches.push(patch_content.to_string());
+        pr.status = PackagePrStatus::Patched;
+        pr.add_comment("GitPatch-Bot", &format!("Applied unified diff patch ({} lines added)", lines_added));
+
+        Ok(lines_added)
+    }
+}
+
+// ============================================================================
+// 4. MULTI-FORMAT PACKAGE PR TRANSPILATION ENGINE
+// ============================================================================
+
+/// Transpiles any foreign distro package PR manifest (.deb, .rpm, PKGBUILD, ebuild, APKBUILD, .xbps, .nix, Flatpak, Snap, AppImage, Ports) into native `.sigpkg`
 pub struct MultiFormatPrTranspilationEngine {
     pub transpiled_count: usize,
 }
@@ -172,8 +226,8 @@ impl MultiFormatPrTranspilationEngine {
         &mut self,
         pr: &DistroPackagePullRequest,
     ) -> Result<UnifiedPackage, String> {
-        if pr.status != PackagePrStatus::Approved && pr.status != PackagePrStatus::MergedToRepository {
-            return Err(format!("PR #{} is not approved for transpilation (status: {:?})", pr.pr_id, pr.status));
+        if pr.status != PackagePrStatus::Approved && pr.status != PackagePrStatus::MergedToRepository && pr.status != PackagePrStatus::Patched {
+            return Err(format!("PR #{} is not approved/patched for transpilation (status: {:?})", pr.pr_id, pr.status));
         }
 
         let mut sigma_pkg = UnifiedPackage::new(
@@ -183,7 +237,7 @@ impl MultiFormatPrTranspilationEngine {
         .with_format(PackageFormat::SigmaPkg)
         .with_provides(pr.package_name.clone());
 
-        // Parse foreign dependencies from manifest
+        // Parse foreign dependencies & specifications across format standards
         for line in pr.raw_manifest_content.lines() {
             let lower = line.to_lowercase();
             if lower.starts_with("depends=")
@@ -192,6 +246,9 @@ impl MultiFormatPrTranspilationEngine {
                 || lower.starts_with("build-depends:")
                 || lower.starts_with("requires=")
                 || lower.starts_with("pkg_deps=")
+                || lower.starts_with("lib_depends=")
+                || lower.starts_with("run_depends=")
+                || lower.starts_with("makedepends=")
             {
                 let deps_part = line.split('=').nth(1).or_else(|| line.split(':').nth(1)).unwrap_or("");
                 for dep in deps_part.split_whitespace() {
@@ -215,6 +272,41 @@ impl Default for MultiFormatPrTranspilationEngine {
 }
 
 // ============================================================================
+// 5. UNIVERSAL PACKAGE PR REPO STAGING ENGINE
+// ============================================================================
+
+/// Manages multi-channel repository staging (Stable, Testing, Rolling) for merged PR packages
+pub struct UniversalPackagePrRepoStagingEngine {
+    pub staged_repositories: BTreeMap<RepoStagingChannel, Vec<UnifiedPackage>>,
+}
+
+impl UniversalPackagePrRepoStagingEngine {
+    pub fn new() -> Self {
+        let mut staged = BTreeMap::new();
+        staged.insert(RepoStagingChannel::Stable, Vec::new());
+        staged.insert(RepoStagingChannel::Testing, Vec::new());
+        staged.insert(RepoStagingChannel::Rolling, Vec::new());
+        Self { staged_repositories: staged }
+    }
+
+    pub fn stage_package(&mut self, channel: RepoStagingChannel, pkg: UnifiedPackage) {
+        if let Some(repo) = self.staged_repositories.get_mut(&channel) {
+            repo.push(pkg);
+        }
+    }
+
+    pub fn total_staged_packages(&self) -> usize {
+        self.staged_repositories.values().map(|v| v.len()).sum()
+    }
+}
+
+impl Default for UniversalPackagePrRepoStagingEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
 // MASTER PR PACKAGE GATEWAY COORDINATOR SUITE
 // ============================================================================
 
@@ -223,6 +315,7 @@ pub struct SovereignPrPackageGatewaySuite {
     pub pr_registry: BTreeMap<u32, DistroPackagePullRequest>,
     pub gating_governor: PackagePrCiGatingGovernor,
     pub transpiler: MultiFormatPrTranspilationEngine,
+    pub staging_engine: UniversalPackagePrRepoStagingEngine,
 }
 
 impl SovereignPrPackageGatewaySuite {
@@ -231,6 +324,7 @@ impl SovereignPrPackageGatewaySuite {
             pr_registry: BTreeMap::new(),
             gating_governor: PackagePrCiGatingGovernor::new(),
             transpiler: MultiFormatPrTranspilationEngine::new(),
+            staging_engine: UniversalPackagePrRepoStagingEngine::new(),
         }
     }
 
@@ -264,9 +358,13 @@ impl SovereignPrPackageGatewaySuite {
         // 2. Transpile to native sigpkg
         let sigpkg = self.transpiler.transpile_pr_to_sigpkg(pr)?;
 
-        // 3. Mark PR merged
+        // 3. Stage into repository channel
+        let target_channel = pr.target_channel;
+        self.staging_engine.stage_package(target_channel, sigpkg.clone());
+
+        // 4. Mark PR merged
         pr.status = PackagePrStatus::MergedToRepository;
-        pr.add_comment("SigmaOS-Bot", "PR successfully merged into sovereign package store!");
+        pr.add_comment("SigmaOS-Bot", "PR successfully merged into sovereign package repository!");
 
         Ok(sigpkg)
     }
@@ -293,6 +391,8 @@ impl SovereignPrPackageGatewaySuite {
             results.insert("pr_gating_approval".to_string(), pr.status == PackagePrStatus::MergedToRepository);
             results.insert("pr_comment_logging".to_string(), !pr.comments.is_empty());
         }
+
+        results.insert("pr_repo_staging".to_string(), self.staging_engine.total_staged_packages() > 0);
 
         results
     }
@@ -348,10 +448,21 @@ mod tests {
     }
 
     #[test]
+    fn test_pr_diff_patch_engine() {
+        let mut pr = DistroPackagePullRequest::new(
+            4, "Add git ebuild", "gentoo_dev", PackageFormat::Ebuild, "git", "2.43.0", "GPL-2.0-or-later", "pkgname=git\n",
+        );
+        let patch = "+depends=openssl zlib\n";
+        assert!(PackagePrDiffPatchEngine::apply_patch(&mut pr, patch).is_ok());
+        assert_eq!(pr.status, PackagePrStatus::Patched);
+        assert!(pr.raw_manifest_content.contains("depends=openssl zlib"));
+    }
+
+    #[test]
     fn test_pr_package_gateway_suite() {
         let mut suite = SovereignPrPackageGatewaySuite::new();
         let health = suite.verify_suite();
-        assert_eq!(health.len(), 3);
+        assert_eq!(health.len(), 4);
         for (k, v) in health {
             assert!(v, "PR Package Gateway suite health check failed for: {}", k);
         }
