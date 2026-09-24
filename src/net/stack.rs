@@ -20,8 +20,6 @@ use std::boxed::Box;
 
 use std::vec::Vec;
 
-use crate::filesystem::FsError;
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NetworkError {
     InitFailed,
