@@ -1,11 +1,46 @@
 // SigmaOS Universal Package Manager CLI & Adapter Integration Tests
 extern crate alloc;
 
-#[cfg(not(feature = "standalone_test"))]
-use sigmaos::sigpkg::*;
+pub mod klib {
+    pub mod collections {
+        pub use alloc::collections::BTreeMap as HashMap;
+    }
+}
 
-#[cfg(feature = "standalone_test")]
-use crate::sigpkg::*;
+#[path = "../src/package/universal.rs"]
+pub mod universal;
+
+pub mod package {
+    pub use crate::universal::*;
+}
+
+#[path = "../src/security/capability.rs"]
+pub mod capability;
+
+pub mod security {
+    pub use super::capability::*;
+}
+
+#[path = "../src/sigpkg/universal_engine.rs"]
+pub mod universal_engine;
+
+#[path = "../src/sigpkg/universal_oop_system.rs"]
+pub mod universal_oop_system;
+
+pub mod sigpkg {
+    pub use crate::security;
+    pub use crate::universal_engine;
+    pub use crate::universal_engine::PackageFormat;
+    pub use crate::universal_oop_system;
+    pub use crate::universal_adapter::*;
+
+    pub use crate::universal_oop_system::{Dependency, Package, Version, VersionConstraint};
+}
+
+#[path = "../src/sigpkg/universal_adapter.rs"]
+pub mod universal_adapter;
+
+use sigpkg::*;
 
 #[test]
 fn test_bsd_and_linux_manifest_parsers() {
