@@ -78,6 +78,12 @@ pub use forensics::*;
 pub use hardening::{
     MemoryProtectionState, RelroState, SecurityHardeningConfig, StackCanary,
 };
+pub use kernel_hardening::{
+    GdtSegmentDescriptor, HardenedSyscallDispatcher, HardenedSyscallError, MemoryAccessError,
+    PagePermissions, PledgePromise as KernelPledgePromise, PrivilegeRing,
+    RetpolineKptiMitigationEngine, SmepSmapEnforcer, SovereignKaslrEngine,
+    SovereignRing3UserModeTssEngine, SyscallCategory, TaskStateSegment64,
+};
 pub use intrusion::{
     AnomalyDetection, DetectionResult, DetectionRule, DetectionStrategy, EventType, IdsError,
     IntrusionDetectionSystem, RuleAction, SecurityEvent, Severity, SignatureDetection,
