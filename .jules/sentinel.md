@@ -1,3 +1,8 @@
+## 2026-09-25 - Path Prefix Confusion Sandboxing Bypass in BSD Hardening Unveil
+**Vulnerability:** `UnveilManager::check_access` in `src/security/bsd_hardening.rs` relied on `path.starts_with(&entry.path)` without verifying directory component boundaries (`/` or `\`). An attacker accessing a sibling directory sharing the path prefix (e.g., `/tmp_evil/file.txt` or `/tmp_secret`) inherited access permissions granted to `/tmp`.
+**Learning:** Checking string prefixes with `starts_with` without validating component boundary separators allows path prefix confusion sandboxing bypasses on sibling paths.
+**Prevention:** In filesystem unveil and access control rules, always enforce strict path boundary checks: verify `path == entry_path`, `entry_path == "/"`, `entry_path.ends_with('/') || entry_path.ends_with('\\')`, or that the character in `path` at index `entry_path.len()` is a directory separator (`/` or `\`).
+
 ## 2026-09-24 - Multi-Dot Segment Path Traversal Bypass in Single-Pass Path Validation
 **Vulnerability:** `validate_path` in `src/security/input_validation.rs` previously relied on 2-character lookaheads around directory separators (`b == b'.' && path[i + 1] == b'.'`). When an attacker supplied multi-dot path segments like `...` or `....` (e.g., `/.../etc/passwd`), the lookahead check evaluated `before_ok` or `after_ok` to false because adjacent characters were dots, allowing multi-dot traversal payloads to bypass path validation rules.
 **Learning:** Fixed lookaheads checking only for 2 dots (`..`) fail on multi-dot variations (`...`, `....`), which can lead to normalization and VFS directory traversal vulnerabilities.

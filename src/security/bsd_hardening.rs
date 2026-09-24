@@ -125,7 +125,7 @@ impl UnveilManager {
         Ok(())
     }
 
-    /// Check if path access is allowed
+    /// Check if path access is allowed with strict path boundary validation
     pub fn check_access(&self, path: &str, permission: UnveilPermission) -> bool {
         if !self.unveiled {
             return false;
@@ -133,7 +133,16 @@ impl UnveilManager {
 
         for entry in &self.entries {
             if path.starts_with(&entry.path) {
-                return entry.permissions.contains(&permission);
+                let e_len = entry.path.len();
+                let is_exact = path.len() == e_len;
+                let is_root = entry.path == "/";
+                let entry_has_sep = entry.path.ends_with('/') || entry.path.ends_with('\\');
+                let next_is_sep = path.as_bytes().get(e_len) == Some(&b'/')
+                    || path.as_bytes().get(e_len) == Some(&b'\\');
+
+                if is_exact || is_root || entry_has_sep || next_is_sep {
+                    return entry.permissions.contains(&permission);
+                }
             }
         }
 
@@ -399,7 +408,7 @@ impl Default for BsdHardeningSuite {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -420,6 +429,24 @@ mod tests {
         );
         unveil.unveil().unwrap();
         assert!(unveil.check_access("/tmp/file", UnveilPermission::Read));
+    }
+
+    #[test]
+    fn test_unveil_path_prefix_confusion_prevention() {
+        let mut unveil = UnveilManager::new();
+        unveil.add_unveil(
+            "/tmp".to_string(),
+            vec![UnveilPermission::Read, UnveilPermission::Write],
+        );
+        unveil.unveil().unwrap();
+
+        // Exact match
+        assert!(unveil.check_access("/tmp", UnveilPermission::Read));
+        // Subdirectory child match
+        assert!(unveil.check_access("/tmp/file.txt", UnveilPermission::Read));
+        // Path prefix confusion attack on sibling directory must be rejected
+        assert!(!unveil.check_access("/tmp_evil/file.txt", UnveilPermission::Read));
+        assert!(!unveil.check_access("/tmp_secret", UnveilPermission::Read));
     }
 
     #[test]
