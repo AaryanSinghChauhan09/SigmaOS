@@ -56,7 +56,7 @@ SigmaOS Wiki Home
 └── 7. Project Governance & Strategy
     ├── Strategic Execution Roadmap (`docs/ROADMAP.md`)
     ├── Linux & BSD Hybrid Master Roadmap (`SIGMAOS_DISTRO_INSPIRED_MASTER_ROADMAP.md`)
-    ├── Master Absorption & Tri-Agent Governance Plan (`SIGMAOS_TRI_AGENT_AND_500_REPOS_ABSORPTION_MASTER_PLAN.md`)
+    ├── Master Absorption & Tri-Agent Governance Plan (`SIGMAOS_MASTER_PLAN_TRI_AGENT_500_REPOS_ABSORPTION.md`)
     ├── Architecture Decision Records (`docs/ARCHITECTURE_DECISIONS.md`)
     ├── Security Advisory & Vulnerability Reporting Policy
     ├── Canonical Subsystem Status Matrix (`docs/PROJECT_STATUS.md`)
