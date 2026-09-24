@@ -1,4 +1,6 @@
 // SigmaOS Drivers Module
+pub mod serial;
+pub mod rtc;
 pub mod boot_init;
 pub mod dde;
 pub mod distro_device_expansion;

@@ -1,5 +1,7 @@
 #![allow(ambiguous_glob_reexports)]
 // SigmaOS Kernel Module
+pub mod panic_handler;
+pub mod kprintf;
 pub mod architecture;
 pub mod atomic_extended;
 pub mod cgroup_v2;
@@ -140,3 +142,6 @@ pub mod xdp_engine_sovereign;
 
 // ─── Live Migration Engine (CRIU / QEMU inspired) ─────────────────────────────
 pub mod live_migration_engine;
+
+pub mod low_level_hardware;
+pub use low_level_hardware::*;
