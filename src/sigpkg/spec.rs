@@ -47,6 +47,18 @@ pub struct PackageDependency {
     pub version_constraint: [u8; 32],
 }
 
+impl PackageDependency {
+    pub fn name(&self) -> &[u8] {
+        let len = self.name.iter().position(|&b| b == 0).unwrap_or(self.name.len());
+        &self.name[..len]
+    }
+
+    pub fn constraint(&self) -> &[u8] {
+        let len = self.version_constraint.iter().position(|&b| b == 0).unwrap_or(self.version_constraint.len());
+        &self.version_constraint[..len]
+    }
+}
+
 /// Package info
 #[repr(C)]
 pub struct PackageInfo {
@@ -178,14 +190,8 @@ impl SimplePackage {
         let name_len = name.len().min(63);
         let constraint_len = version_constraint.len().min(31);
 
-        unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
-            core::ptr::copy_nonoverlapping(
-                version_constraint.as_ptr(),
-                constraint_array.as_mut_ptr(),
-                constraint_len,
-            );
-        }
+        name_array[..name_len].copy_from_slice(&name[..name_len]);
+        constraint_array[..constraint_len].copy_from_slice(&version_constraint[..constraint_len]);
 
         self.dependencies.push(PackageDependency {
             name: name_array,
@@ -470,22 +476,15 @@ impl PackageManager for SimplePackageManager {
         let dependencies = package.dependencies();
 
         for dep in dependencies {
-            // Bolt performance optimization: hoist dependency name slicing outside the inner
-            // package candidate loop. Reduces zero-byte linear scans from O(D * P) to O(D).
-            let dep_name = dep.name;
-            let dep_len = dep_name
-                .iter()
-                .position(|&b| b == 0)
-                .unwrap_or(dep_name.len());
-            let dep_slice = &dep_name[..dep_len];
+            // Bolt performance optimization: hoist dependency name slice lookup outside candidate loop.
+            // Reduces zero-byte linear scans from O(D * P) to O(D).
+            let dep_slice = dep.name();
 
             let mut found = false;
             for package_option in &self.packages {
                 if let Some(ref pkg) = *package_option {
                     let p_ref: &dyn Package = pkg.as_ref();
                     let pkg_name = p_ref.name();
-                    // Bolt performance optimization: compare prefix and check for boundary or null terminator
-                    // instead of scanning the full candidate name buffer for zero bytes O(N).
                     if pkg_name.starts_with(dep_slice)
                         && (pkg_name.len() == dep_slice.len() || pkg_name[dep_slice.len()] == 0)
                     {
@@ -1005,12 +1004,7 @@ mod tests {
 
         let resolved = mgr.resolve_dependencies(&app_pkg).unwrap();
         assert_eq!(resolved.len(), 1);
-        let dep_name = resolved[0].name;
-        let dep_len = dep_name
-            .iter()
-            .position(|&b| b == 0)
-            .unwrap_or(dep_name.len());
-        assert_eq!(&dep_name[..dep_len], b"libssl");
+        assert_eq!(resolved[0].name(), b"libssl");
     }
 
     #[test]
