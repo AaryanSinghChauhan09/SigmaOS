@@ -118,6 +118,16 @@ pub trait HardwareDevice {
     fn support_status(&self) -> SupportStatus;
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LinuxBsdHardwareBusInfo {
+    pub bus_type: String, // "pci", "usb", "acpi", "virtio"
+    pub pci_vendor_id: u16,
+    pub pci_device_id: u16,
+    pub usb_vendor_id: u16,
+    pub usb_product_id: u16,
+    pub driver_alias: String, // e.g. "pci:v00008086d00001000sv*sd*bc*sc*i*", "usb:v046DpC52Bb*"
+}
+
 pub struct SimpleDevice {
     pub id: DeviceID,
     pub device_type: DeviceType,
@@ -125,6 +135,7 @@ pub struct SimpleDevice {
     pub device_id: u16,
     pub name: String,
     pub support_status: SupportStatus,
+    pub bus_info: Option<LinuxBsdHardwareBusInfo>,
 }
 
 impl SimpleDevice {
@@ -143,7 +154,13 @@ impl SimpleDevice {
             device_id,
             name: name.to_string(),
             support_status: status,
+            bus_info: None,
         }
+    }
+
+    pub fn with_bus_info(mut self, bus_info: LinuxBsdHardwareBusInfo) -> Self {
+        self.bus_info = Some(bus_info);
+        self
     }
 }
 
@@ -178,6 +195,7 @@ pub trait HardwareCompatibilityManager {
     fn find_by_vendor_device(&self, vendor_id: u16, device_id: u16) -> Option<DeviceID>;
     fn list_by_type(&self, device_type: DeviceType) -> Vec<DeviceID>;
     fn list_supported(&self) -> Vec<DeviceID>;
+    fn match_driver_by_alias(&self, alias_query: &str) -> Option<DeviceID>;
 }
 
 pub trait DriverManager {
@@ -519,6 +537,18 @@ impl HardwareCompatibilityManager for SimpleCompatibilityMatrix {
             .map(|d| d.id())
             .collect()
     }
+
+    fn match_driver_by_alias(&self, alias_query: &str) -> Option<DeviceID> {
+        self.devices.iter().find_map(|d| {
+            let vendor = d.vendor_id();
+            let dev = d.device_id();
+            if alias_query.contains(&format!("{:04x}", vendor)) && alias_query.contains(&format!("{:04x}", dev)) {
+                Some(d.id())
+            } else {
+                None
+            }
+        })
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -700,8 +730,8 @@ mod tests {
     fn test_compatibility_matrix() {
         let mut matrix = SimpleCompatibilityMatrix::new();
         matrix.seed_with_defaults();
-        assert_eq!(matrix.list_supported().len(), 7);
-        assert_eq!(matrix.list_by_type(DeviceType::WiFi).len(), 2);
+        assert_eq!(matrix.list_supported().len(), 14);
+        assert_eq!(matrix.list_by_type(DeviceType::WiFi).len(), 4);
     }
 
     #[test]

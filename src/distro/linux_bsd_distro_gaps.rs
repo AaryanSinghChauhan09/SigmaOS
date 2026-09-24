@@ -1254,7 +1254,7 @@ impl Default for CgroupsV2ControllerEngine {
 // ============================================================================
 
 #[cfg(test)]
-mod tests {
+mod tests_gaps {
     use super::*;
 
     #[test]
