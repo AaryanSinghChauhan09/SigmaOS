@@ -502,5 +502,82 @@ export function sanitizeUrl(urlStr) {
   return urlStr;
 }
 
+// =========================================================================
+// Window Management & Accessibility State Handlers
+// =========================================================================
+
+const APP_WIN_MAP = {
+  "file manager": "file-manager-win",
+  "omnishell": "terminal-win",
+  "sigma browser": "browser-win",
+  "observability matrix": "browser-win",
+  "ai assistant": "ai-assistant-win",
+  "neural core": "ai-assistant-win",
+  "lattice settings": "lattice-settings-win",
+  "utility nexus": "utility-nexus-win",
+  "pro tools": "utility-nexus-win",
+  "marketplace": "sigma-market-win",
+  "markup forge": "markup-forge-win",
+  "zenith installer": "markup-forge-win",
+  "dev portal": "dev-portal-win",
+  "developer portal": "dev-portal-win",
+  "emulator": "emulator-win",
+  "kernel emulator": "emulator-win",
+  "analytics": "analytics-win",
+  "build analytics": "analytics-win"
+};
+
+let topZIndex = 100;
+
+export function closeWindow(winId) {
+  const win = typeof winId === "string" ? document.getElementById(winId) : winId;
+  if (!win) return;
+  win.style.display = "none";
+  win.setAttribute("aria-hidden", "true");
+  win.classList.remove("active-focus");
+}
+
+export function maximizeWindow(winId) {
+  const win = typeof winId === "string" ? document.getElementById(winId) : winId;
+  if (!win) return;
+  const isMax = win.classList.toggle("maximized");
+  const maxBtn = SovereignDomSelector.selectOne(".control-dot.max", win);
+  if (maxBtn) {
+    const label = isMax ? "Restore Window" : "Maximize Window";
+    maxBtn.setAttribute("aria-label", label);
+    maxBtn.setAttribute("data-tooltip", isMax ? "Restore" : "Maximize");
+  }
+}
+
+export function launchApp(appName) {
+  const winId = APP_WIN_MAP[appName?.toLowerCase()] || appName;
+  const win = document.getElementById(winId);
+  if (!win) return;
+
+  const isHidden = win.style.display === "none" || (typeof getComputedStyle === "function" && getComputedStyle(win).display === "none");
+  if (isHidden) {
+    win.style.display = "flex";
+    win.setAttribute("aria-hidden", "false");
+    win.style.opacity = "1";
+    win.style.transform = "scale(1)";
+  }
+
+  topZIndex += 1;
+  win.style.zIndex = topZIndex;
+  SovereignDomSelector.selectAll(".window").forEach((w) => w.classList.remove("active-focus"));
+  win.classList.add("active-focus");
+
+  const focusable = SovereignDomSelector.selectOne('input, button, [tabindex="0"]', win);
+  if (focusable && typeof focusable.focus === "function") {
+    focusable.focus();
+  }
+}
+
+if (typeof window !== "undefined") {
+  window.closeWindow = closeWindow;
+  window.maximizeWindow = maximizeWindow;
+  window.launchApp = launchApp;
+}
+
 // Minimal dummy index file to export initialization and basic attributes
 export const version = "15.0.0";
