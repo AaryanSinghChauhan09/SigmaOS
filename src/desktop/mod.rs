@@ -75,3 +75,4 @@ pub use crate::desktop::sovereign_navigation_engine::{
 pub use weather_panel::{
     WeatherCondition, WeatherData, WeatherForecast, WeatherPanel,
 };
+pub mod mint_update_manager;
