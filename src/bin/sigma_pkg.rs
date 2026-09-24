@@ -150,6 +150,23 @@ mod tests {
         let void = dispatcher.dispatch_command("void install xbps").unwrap();
         assert_eq!(void.source_pm, "void");
         assert_eq!(void.operation, UniversalPmOperation::Install);
+
+        let zypper = dispatcher.dispatch_command("zypper in vlc").unwrap();
+        assert_eq!(zypper.source_pm, "zypper");
+        assert_eq!(zypper.operation, UniversalPmOperation::Install);
+
+        let emerge = dispatcher.dispatch_command("emerge -pv portage").unwrap();
+        assert_eq!(emerge.source_pm, "emerge");
+        assert_eq!(emerge.operation, UniversalPmOperation::Install);
+        assert!(emerge.dry_run);
+
+        let flatpak = dispatcher.dispatch_command("flatpak install org.gimp.GIMP").unwrap();
+        assert_eq!(flatpak.source_pm, "flatpak");
+        assert_eq!(flatpak.operation, UniversalPmOperation::Install);
+
+        let brew = dispatcher.dispatch_command("brew install wget").unwrap();
+        assert_eq!(brew.source_pm, "brew");
+        assert_eq!(brew.operation, UniversalPmOperation::Install);
     }
 
     #[test]

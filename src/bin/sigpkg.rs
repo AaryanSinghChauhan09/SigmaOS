@@ -8,6 +8,9 @@ use std::path::Path;
 use std::process::exit;
 
 use sigmaos::sigpkg::repository_manager::{Repository, RepositoryManager};
+use sigmaos::sigpkg::universal_adapter::{
+    SigPkgUniversalBridgeEngine, UniversalPackageTriggerEngine,
+};
 use sigmaos::sigpkg::{
     ContentAddressedStore, CryptoVerifier, DispatchedPmAction, Package, SigpkgDaemon,
     SovereignPackageSnapshotRollbackEngine, UniversalDependencyMapper, UniversalDryRunSimulator,
@@ -133,6 +136,23 @@ mod tests {
         let void = dispatcher.dispatch_command("void install xbps").unwrap();
         assert_eq!(void.source_pm, "void");
         assert_eq!(void.operation, UniversalPmOperation::Install);
+
+        let zypper = dispatcher.dispatch_command("zypper in vlc").unwrap();
+        assert_eq!(zypper.source_pm, "zypper");
+        assert_eq!(zypper.operation, UniversalPmOperation::Install);
+
+        let emerge = dispatcher.dispatch_command("emerge -pv portage").unwrap();
+        assert_eq!(emerge.source_pm, "emerge");
+        assert_eq!(emerge.operation, UniversalPmOperation::Install);
+        assert!(emerge.dry_run);
+
+        let flatpak = dispatcher.dispatch_command("flatpak install org.gimp.GIMP").unwrap();
+        assert_eq!(flatpak.source_pm, "flatpak");
+        assert_eq!(flatpak.operation, UniversalPmOperation::Install);
+
+        let brew = dispatcher.dispatch_command("brew install wget").unwrap();
+        assert_eq!(brew.source_pm, "brew");
+        assert_eq!(brew.operation, UniversalPmOperation::Install);
     }
 
     #[test]
@@ -229,7 +249,9 @@ fn cmd_install(args: &[String]) {
         exit(2);
     }
     let adapter = UniversalPackageAdapter::new();
+    let bridge = SigPkgUniversalBridgeEngine::new();
     let dep_mapper = UniversalDependencyMapper::new();
+    let mut trigger_engine = UniversalPackageTriggerEngine::new();
     let mut store = ContentAddressedStore::new("/var/lib/sigpkg/store".to_string());
 
     let mut forced_format: Option<sigmaos::sigpkg::universal_engine::PackageFormat> = None;
@@ -439,30 +461,38 @@ fn cmd_install(args: &[String]) {
                     exit(1);
                 }
             };
-            let text = String::from_utf8_lossy(&data);
-            match adapter.parse_and_translate_manifest(target, &text) {
-                Ok(mut parsed) => {
-                    parsed.name = dep_mapper.to_canonical_name(&parsed.name);
-                    for dep in &mut parsed.dependencies {
-                        dep.name = dep_mapper.to_canonical_name(&dep.name);
-                    }
-                    (parsed, data)
+            if let Ok(mut bridge_pkg) = bridge.convert_to_sigpkg(target, &data) {
+                bridge_pkg.name = dep_mapper.to_canonical_name(&bridge_pkg.name);
+                for dep in &mut bridge_pkg.dependencies {
+                    dep.name = dep_mapper.to_canonical_name(&dep.name);
                 }
-                Err(_) => {
-                    let name = path
-                        .file_stem()
-                        .map(|s| s.to_string_lossy().to_string())
-                        .unwrap_or_else(|| target.to_string());
-                    let clean_name = name.split('.').next().unwrap_or(&name).to_string();
-                    let canonical_name = dep_mapper.to_canonical_name(&clean_name);
-                    let pkg = Package::new(
-                        canonical_name,
-                        Version::parse("1.0.0").unwrap(),
-                        format!("Imported package from {}", target),
-                        Vec::new(),
-                        format!("sha256-{}", target),
-                    );
-                    (pkg, data)
+                (bridge_pkg, data)
+            } else {
+                let text = String::from_utf8_lossy(&data);
+                match adapter.parse_and_translate_manifest(target, &text) {
+                    Ok(mut parsed) => {
+                        parsed.name = dep_mapper.to_canonical_name(&parsed.name);
+                        for dep in &mut parsed.dependencies {
+                            dep.name = dep_mapper.to_canonical_name(&dep.name);
+                        }
+                        (parsed, data)
+                    }
+                    Err(_) => {
+                        let name = path
+                            .file_stem()
+                            .map(|s| s.to_string_lossy().to_string())
+                            .unwrap_or_else(|| target.to_string());
+                        let clean_name = name.split('.').next().unwrap_or(&name).to_string();
+                        let canonical_name = dep_mapper.to_canonical_name(&clean_name);
+                        let pkg = Package::new(
+                            canonical_name,
+                            Version::parse("1.0.0").unwrap(),
+                            format!("Imported package from {}", target),
+                            Vec::new(),
+                            format!("sha256-{}", target),
+                        );
+                        (pkg, data)
+                    }
                 }
             }
         } else {
@@ -486,6 +516,15 @@ fn cmd_install(args: &[String]) {
         match store.add(pkg, &raw_bytes) {
             Ok(hash) => {
                 println!("Installed {} (store hash {})", name, hash);
+                let sample_files = vec![
+                    format!("/usr/bin/{}", name),
+                    format!("/usr/lib/lib{}.so", name),
+                    format!("/usr/share/applications/{}.desktop", name),
+                ];
+                let triggers_run = trigger_engine.execute_triggers_for_files(&sample_files);
+                if !triggers_run.is_empty() {
+                    println!("  Executed {} system trigger hook(s)", triggers_run.len());
+                }
             }
             Err(err) => {
                 eprintln!("sigpkg: failed to install {}: {:?}", name, err);
@@ -572,9 +611,16 @@ fn cmd_remove(args: &[String]) {
     }
     let name = &args[0];
     let mut store = ContentAddressedStore::new("/var/lib/sigpkg/store".to_string());
+    let mut trigger_engine = UniversalPackageTriggerEngine::new();
+
     match store.remove(name) {
         Ok(()) => {
             println!("Removed {}", name);
+            let sample_files = vec![format!("/usr/bin/{}", name)];
+            let triggers_run = trigger_engine.execute_triggers_for_files(&sample_files);
+            if !triggers_run.is_empty() {
+                println!("  Executed {} system trigger hook(s)", triggers_run.len());
+            }
             exit(0);
         }
         Err(err) => {
