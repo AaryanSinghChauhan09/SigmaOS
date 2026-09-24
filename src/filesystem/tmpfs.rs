@@ -52,6 +52,20 @@ impl TmpfsFileSystem {
         }
     }
 
+    /// Initializes a default Tmpfs filesystem following the Linux & BSD 50% RAM rule
+    /// (default tmpfs size = 50% of total physical RAM unless overridden by size= option)
+    pub fn default_with_system_ram(total_ram_bytes: usize) -> Self {
+        let max_bytes = total_ram_bytes / 2; // 50% RAM rule (Linux /dev/shm & BSD tmpfs standard)
+        let config = TmpfsConfig {
+            max_bytes,
+            max_inodes: MAX_TMPFS_INODES,
+            uid: 0,
+            gid: 0,
+            mode: 0o1777, // sticky-bit world writable /tmp permissions
+        };
+        Self::new(config)
+    }
+
     /// Create a new in-memory file or directory node (on-demand dynamic RAM allocation)
     pub fn create_node(
         &mut self,
@@ -184,9 +198,17 @@ impl TmpfsFileSystem {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_linux_bsd_50_percent_ram_rule_tmpfs() {
+        let total_ram_bytes = 16 * 1024 * 1024 * 1024; // 16GB RAM
+        let tmpfs = TmpfsFileSystem::default_with_system_ram(total_ram_bytes);
+        assert_eq!(tmpfs.config.max_bytes, 8 * 1024 * 1024 * 1024); // 50% = 8GB
+        assert_eq!(tmpfs.config.mode, 0o1777);
+    }
 
     #[test]
     fn test_tmpfs_dynamic_allocation_limits() {
