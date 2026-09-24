@@ -115,3 +115,6 @@ pub use universal::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
+pub use crate::sigpkg::{
+    SovereignUniversalPackageManagerInteropEngine, SovereignUniversalPackageTranslationBridge,
+};

@@ -14,6 +14,7 @@ pub mod smart_symlink;
 pub mod support;
 pub mod vfs;
 pub mod ext4;
+pub mod sovereign_filesystem_hierarchy;
 pub use bsd_linux_innovations::{
     BsdSoftUpdatesEngine, GoboLinuxPathResolver, LinuxOverlayFsManager, LinuxProcSysfsEmulator,
     MetadataDependency, MetadataOp, OpenBsdMountEnforcer, SovereignFhsHierarchyEngine,
@@ -40,5 +41,9 @@ pub use crate::filesystem::vfs::{DirEntry, FileHandle, FileMode, VirtualFileSyst
 pub use ext4::{Ext4FileSystem, Ext4Superblock as Ext4SB, BlockGroupDescriptor};
 pub use file_monitor::{
     EventFilter, FileEvent, FileEventType, WatchConfig, WatchId, WatchManager, EventId,
+};
+pub use sovereign_filesystem_hierarchy::{
+    EphemeralTmpfsMountGovernor, SovereignAtomicGenerationRootfsGuard, SovereignCanonicalFhsResolver,
+    SyntheticProcSysfsProvider,
 };
 pub use watch::{EventQueue, ThreadSafeEventQueue, RING_BUFFER_SIZE, COALESCE_WINDOW_MS};

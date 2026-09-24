@@ -21,6 +21,4 @@ build/*
 *.elf
 test_runner
 wiki_push
-wiki/
-WIKI/
 __pycache__/

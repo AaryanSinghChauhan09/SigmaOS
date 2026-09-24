@@ -53,6 +53,8 @@ pub mod unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
+pub mod sovereign_portable_sandbox_engine;
+pub mod comprehensive_access_control;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use bsd_hardening::{
@@ -141,6 +143,22 @@ pub use vpn::{
 pub use vulnerability::{
     ExploitPayload, PenetrationAssistant, SecurityScanner, SimpleVulnerabilityScanner,
     VulnerabilityClass, VulnerabilityReport,
+};
+pub use comprehensive_access_control::{
+    AccessTokenType, EffectiveAccessTimePolicy, LdapDirectoryEntry, MemoryProtectionFlags,
+    ProcessMigrationRecord, SecurityAccessToken, SovereignComprehensiveAccessControlSuite,
+    SovereignLdapAccessEngine, WirelessAccessPoint,
+};
+pub use sovereign_portable_sandbox_engine::{
+    FilesystemPolicy, FreeBsdCapsicumJailBackend, LinuxLandlockSeccompBackend, NetworkPolicy,
+    OpenBsdPledgeUnveilBackend, SandboxBackend, SandboxError, SigmaOsNativeCapabilityBackend,
+    SovereignAclPermissionEnforcer, SovereignArgon2PasswordHasher, SovereignAuditLogIntegrityChain,
+    SovereignCapabilityInheritanceEngine, SovereignCveSecurityUpdateManager,
+    SovereignExecLoadPolicyEngine, SovereignFormalThreatModelEvaluator,
+    SovereignFuzzingBoundaryVerifier, SovereignKernelModuleSigningVerifier,
+    SovereignPamAuthPolicyEngine, SovereignPrivilegeSeparationManager,
+    SovereignSecretVaultEngine, SovereignSecureBootChainVerifier, SovereignUserGroupDatabase,
+    SyscallPolicy, UserPasswdEntry,
 };
 pub use seccomp::{SeccompAction, SeccompContext, SeccompFilter, SeccompManager, FilterRule, ArgumentConstraint, CompareOp};
 pub use syscall_filter::{FilterType, ProcessSyscallFilter, SyscallFilterManager, SyscallFilterPolicy};

@@ -61,6 +61,9 @@ pub mod universal_adapter;
 pub mod universal_engine;
 pub mod universal_oop_system;
 pub use universal_oop_system::*;
+pub use universal_engine::{
+    SovereignUniversalPackageManagerInteropEngine, SovereignUniversalPackageTranslationBridge,
+};
 pub mod verifier;
 pub mod zero_alloc_resolver;
 

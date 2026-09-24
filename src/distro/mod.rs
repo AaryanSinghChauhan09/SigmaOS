@@ -1,9 +1,62 @@
 pub mod omarchy;
+pub mod omarchy_advanced_parity;
+pub mod omarchy_future_roadmap;
+pub mod omarchy_inspiration;
+pub mod sovereign_gap_closure_master_suite;
+pub mod sovereign_open_source_distro_synthesis;
+pub mod sovereign_stack_replacements;
+pub mod sovereign_wiki_mint_omarchy_innovations;
 pub use omarchy::{
     FactoryResetGuardian, GpuDriverConfig, HardwareQuirkAdapter, KeybindingDefinition,
-    OmarchyAudioPipewireConfig, OmarchyModernDesktopEngine, OmarchyNerdFont, OmarchyNeovimPresetEngine,
+    OmarchyAudioPipewireConfig, OmarchyDotfilesStowProfileEngine, OmarchyHyprlandAnimCurveEngine,
+    OmarchyKeybindingsStudio, OmarchyModernDesktopEngine, OmarchyNerdFont, OmarchyNeovimPresetEngine,
     OmarchyTerminalFontConfig, OmarchyTheme, PasswordlessSudoExpiryGuard, SovereignAgentKind,
-    WebAppSpec,
+    StowPackageProfile, WebAppSpec,
+};
+pub use omarchy_advanced_parity::{
+    HyprlandLayoutType, Omarchy4HyprlandDynamicTilingManager, OmarchyGhosttyKittyFontStudio,
+    OmarchyLiveIsoInstallerBootstrap, OmarchyMasterParitySuite, OmarchyOmakaseNeovimLspEngine,
+    OmarchyWaybarStatusAppletStudio as Omarchy4WaybarStatusAppletStudio, WaybarModuleConfig,
+};
+pub use omarchy_future_roadmap::{
+    OmarchyEndUserManualRegistry, OmarchyManualChapter, OmarchyProductVisionMetrics,
+    OmarchyReleaseMilestone, OmarchyRoadmapPhase, SovereignOmarchyFutureRoadmapEngine,
+};
+pub use sovereign_gap_closure_master_suite::{
+    DemandPageStatus, SovereignAdaptiveZenithUiEngine, SovereignDemandPagingPageFaultEngine,
+    SovereignGapClosureMasterCoordinator, SovereignSelfHealingFaultToleranceGuard,
+    SovereignTopologyAwareCpuBalancer, SovereignUsbHidHotplugEngine, UsbDeviceEntry,
+};
+pub use sovereign_stack_replacements::{
+    GapRoadmapMilestone, ShellExecutionMode, SovereignDirectFbMirEngine,
+    SovereignDoasPrivilegeEngine, SovereignDropbearSshEngine, SovereignFishNushellShellEngine,
+    SovereignGapFillingRoadmapEngine, SovereignKritaPintaDust3dGraphicsEngine,
+    SovereignMdevDeviceManager, SovereignMidoriEpiphanyBraveBrowser, SovereignNfsCifsSharingEngine,
+    SovereignOnlyOfficeCollaboraEngine, SovereignOpenSourceVulkanDriverEngine,
+    SovereignRunitS6InitEngine, SovereignSnapBlocklyEduEngine, SovereignWidelandsFreeCivGameEngine,
+    SovereignZenithCompositorEngine, SovereignZinkGallium3dDriverEngine,
+};
+pub use sovereign_open_source_distro_synthesis::{
+    DebianCodeSearchBrowserEngine, FedoraAnityaBodhiWatcherEngine,
+    FreeBsdPoudriereArchSignstarEngine, LinuxMintWarpinatorMeshEngine, NomadBsdCachyosLiveBootEngine,
+    PoudriereBuildJob, SovereignOpenSourceDistroSynthesisSuite, UpstreamReleaseRecord,
+    WhonixKloakInputAnonymizerEngine, ZorinExecGuardInterceptionEngine,
+};
+pub use sovereign_wiki_mint_omarchy_innovations::{
+    IptvChannel, LinuxMintHypnotixIptvEngine, LinuxMintStickUsbFlasherEngine,
+    LinuxMintTimeshiftSnapshotEngine, LinuxMintWarpinatorLanEngine,
+    OmarchyHerdrAiAgentOrchestrator as OmarchyHerdrAiAgentOrchestratorEngine,
+    OmarchyQuickShellZenithEngine, OmarchyWalkerFuzzyLauncher as OmarchyWalkerFuzzyLauncherEngine,
+    SigmaOsWiki100IdeasMasterEngine, TimeshiftSnapshot, WarpinatorPeerNode,
+};
+pub use omarchy_inspiration::{
+    AiAgentProvider, HerdrAgentTask, MakoNotification, OmarchyHerdrAiAgentManager,
+    OmarchyHyprlandWorkspaceSnapLayoutEngine, OmarchyHyprlockGuardEngine, OmarchyLiveIsoBootstrapEngine,
+    OmarchyLuaConfigEngine, OmarchyMakoNotificationDaemonEngine, OmarchyNeovimPresetStudioEngine,
+    OmarchyPluginEntry, OmarchyPluginMarketplace, OmarchyQuickshellEngine, OmarchyReleaseChannel,
+    OmarchyReleaseChannelSnapshotEngine, OmarchySystemThemeStudio, OmarchyThemePalette,
+    OmarchyWalkerLauncherEngine, OmarchyWaybarAppletStudioEngine, OmarchyWaybarStatusAppletStudio,
+    PreflightSnapshot, QuickshellWidget, ShellComponentKind, WalkerAppEntry, WindowRule,
 };
 // SigmaOS Distro/Ecosystem Maturity Module
 pub mod arch_inspirations;
@@ -67,8 +120,8 @@ pub use clear_linux::{
     ClearLinuxStatelessEngine, ConfigLocation, ConfigState, SwupdBundle, SwupdUpdateManager,
 };
 pub use compliance::{
-    ComplianceAuditEvent, ComplianceAuditLogger, ComplianceFramework, TpmAttestationManager,
-    TpmPcrMeasurement,
+    ComplianceAuditEvent, ComplianceAuditLogger, ComplianceFramework, DistroGuidelineStandard,
+    LinuxBsdDistroGuidelineRules, TpmAttestationManager, TpmPcrMeasurement,
 };
 pub use sovereign_system_innovations::{
     AdaptiveWmOverlayController, EventWorkloadTask, ExtensibleSyscallHookGate, FirewallRule,
@@ -86,8 +139,9 @@ pub use void_runit::{
 pub mod sovereign_distro_dominance;
 
 pub use arch_parity::{
-    AlpmDatabase, AurClient, PkgBuild, SandboxedCompiler, SovereignSvntogitEngine,
-    SvntogitPackageRepo,
+    AlpmDatabase, ArchGpgKey, ArchMkinitcpioGeneratorEngine, ArchPacmanKeyringEngine,
+    ArchPowerpillParallelDownloadEngine, ArchReflectorMirrorlistEngine, AurClient, PkgBuild,
+    SandboxedCompiler, SovereignSvntogitEngine, SvntogitPackageRepo,
 };
 pub use certification::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
@@ -115,6 +169,13 @@ pub use gentoo::{
     GentooCatalystStageBuilder, GentooDistfilesDigestEngine, GentooKeywordsAcceptanceEngine,
     KeywordStatus, ManifestEntry, ManifestEntryType, OpenRcRunlevel, OpenRcRunlevelSupervisor,
     PortageEapi8PhaseEngine, SigmaBuildGraph, UseFlag,
+};
+pub use improvements::{
+    AlpineApkVolatileOverlayEngine, DragonFlyHammer2PfsEngine, FreeBsdPoudrierePortBuilder,
+    GentooEmergeCliEngine, GentooGccCflagsTunerEngine, GentooLaymanOverlayEngine,
+    Hammer2PfsSnapshot, IllumosDTraceTracingGovernor, MageiaUrpmiMediaManager,
+    OpenBsdPledgeUnveilSecurityGovernor, PoudrierePortJob, SolusEopkgPackageEngine,
+    VoidXbpsBinaryPackageEngine, VoidXbpsPackage,
 };
 pub use i18n::{ImeCandidate, InputMethodEngine, LanguagePack, LocaleManager, RegionalSettings};
 pub use linux_bsd_parity_extended::{

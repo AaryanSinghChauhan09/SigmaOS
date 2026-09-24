@@ -14,6 +14,11 @@ pub mod dashboard;
 pub mod desktop;
 pub mod device;
 pub mod driver;
+pub use drivers::sovereign_comprehensive_drivers::{
+    AppleM4DartAns2Driver, Cxl30MemoryPoolDriver, FreeBsdGeliDiskEncryptionDriver,
+    IntelXe2BattlemageGpuDriver, MediaTekMt7925Wifi7Driver, NvmeZnsComputationalStorageDriver,
+    OpenBsdDriverSandboxGuard, SovereignComprehensiveDriverSuite,
+};
 pub mod crypto;
 pub mod filesystem;
 pub mod futuristic_modules;
@@ -33,10 +38,20 @@ pub mod runtime;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
+pub use sigpkg::{
+    SovereignUniversalPackageManagerInteropEngine, SovereignUniversalPackageTranslationBridge,
+};
+pub use filesystem::{
+    EphemeralTmpfsMountGovernor, SovereignAtomicGenerationRootfsGuard, SovereignCanonicalFhsResolver,
+    SyntheticProcSysfsProvider,
+};
 pub mod storage;
 pub mod thread;
 pub use desktop::{
     Gnome46MutterEngine, KdePlasma6Engine, LuminaBsdDesktopEngine, SwayRegolithWmEngine, Xfce418Engine,
+    SovereignX11DesktopEnvironmentMasterSuite, SovereignX11DesktopPanelEngine,
+    SovereignX11ExtensionDispatchEngine, SovereignX11ThemeAndSessionManager,
+    SovereignX11WindowManagerEngine,
 };
 pub use process::{
     AdvancedIpcHub, BsdRusage, CancellationType, CoreDumpMetadata, EventFd,
@@ -59,9 +74,16 @@ pub mod unimplemented_tools;
 pub mod userland;
 
 pub use distro::{
+    DistroGuidelineStandard, LinuxBsdDistroGuidelineRules,
+    ArchMkinitcpioGeneratorEngine, ArchPacmanKeyringEngine, ArchPowerpillParallelDownloadEngine,
+    ArchReflectorMirrorlistEngine,
     missing_distro_innovations::{
         CompletionQueueEntry, IoUringEngine, IoUringOp, LinuxBsdSysctlEngine, SubmissionQueueEntry,
     },
+    AlpineApkVolatileOverlayEngine, DragonFlyHammer2PfsEngine, FreeBsdPoudrierePortBuilder,
+    GentooEmergeCliEngine, GentooGccCflagsTunerEngine, GentooLaymanOverlayEngine,
+    IllumosDTraceTracingGovernor, MageiaUrpmiMediaManager, OpenBsdPledgeUnveilSecurityGovernor,
+    SolusEopkgPackageEngine, VoidXbpsBinaryPackageEngine,
     ApkChrootBuildSandboxEngine, ClusterNodeRole, CpuGovernorMode,
     DragonFlyHammer2EmergencyCowEngine, FedoraSelinuxMlsMcsGovernor, FreeBsdGeomVdevTopology,
     GarudaZenPerformanceEngine, GentooPortageSlotOperatorEngine, GeomVdevNode,
@@ -74,8 +96,26 @@ pub use distro::{
     SovereignStatefulNatEngine, StoreClosurePackage, SystemGenerationRecord, ZfsPoolState,
     ZramCompressionAlgorithm, DebianMultiarchAptEngine, GarudaPerformanceTweakEngine,
     HardenedBsdPaxCfiEngine, NetBsdRumpUserlandEngine, SolusEopkgBudgieEngine,
-    OmarchyAudioPipewireConfig, OmarchyModernDesktopEngine, OmarchyNerdFont,
-    OmarchyNeovimPresetEngine, OmarchyTerminalFontConfig,
+    OmarchyAudioPipewireConfig, OmarchyDotfilesStowProfileEngine, OmarchyHyprlandAnimCurveEngine,
+    OmarchyKeybindingsStudio, OmarchyModernDesktopEngine, OmarchyNerdFont,
+    OmarchyNeovimPresetEngine, OmarchyTerminalFontConfig, OmarchyHyprlandWorkspaceSnapLayoutEngine,
+    OmarchyLiveIsoBootstrapEngine, OmarchyLuaConfigEngine, OmarchyNeovimPresetStudioEngine,
+    OmarchyWaybarAppletStudioEngine, OmarchyWalkerLauncherEngine, OmarchyHyprlockGuardEngine,
+    OmarchyMakoNotificationDaemonEngine, OmarchyWaybarStatusAppletStudio,
+    OmarchyEndUserManualRegistry, OmarchyManualChapter, OmarchyProductVisionMetrics,
+    OmarchyReleaseMilestone, OmarchyRoadmapPhase, SovereignOmarchyFutureRoadmapEngine,
+    LinuxMintHypnotixIptvEngine, LinuxMintStickUsbFlasherEngine,
+    LinuxMintTimeshiftSnapshotEngine, LinuxMintWarpinatorLanEngine,
+    OmarchyQuickShellZenithEngine, SigmaOsWiki100IdeasMasterEngine,
+    SovereignDoasPrivilegeEngine, SovereignFishNushellShellEngine, SovereignGapFillingRoadmapEngine,
+    SovereignOnlyOfficeCollaboraEngine, SovereignRunitS6InitEngine,
+    DebianCodeSearchBrowserEngine, FedoraAnityaBodhiWatcherEngine,
+    FreeBsdPoudriereArchSignstarEngine, LinuxMintWarpinatorMeshEngine, NomadBsdCachyosLiveBootEngine,
+    SovereignOpenSourceDistroSynthesisSuite, WhonixKloakInputAnonymizerEngine,
+    ZorinExecGuardInterceptionEngine, SovereignDemandPagingPageFaultEngine,
+    SovereignUsbHidHotplugEngine, SovereignTopologyAwareCpuBalancer,
+    SovereignSelfHealingFaultToleranceGuard, SovereignAdaptiveZenithUiEngine,
+    SovereignGapClosureMasterCoordinator,
 };
 
 pub use package::bsd_linux_package_innovations::{
@@ -106,6 +146,14 @@ pub use package::bsd_linux_package_innovations::{
 };
 
 pub use security::{
+    SandboxBackend, SandboxError, FilesystemPolicy, SyscallPolicy, NetworkPolicy,
+    LinuxLandlockSeccompBackend, OpenBsdPledgeUnveilBackend, FreeBsdCapsicumJailBackend,
+    SigmaOsNativeCapabilityBackend, SovereignPrivilegeSeparationManager, SovereignUserGroupDatabase,
+    SovereignArgon2PasswordHasher, SovereignPamAuthPolicyEngine, SovereignAclPermissionEnforcer,
+    SovereignCapabilityInheritanceEngine, SovereignExecLoadPolicyEngine,
+    SovereignSecureBootChainVerifier, SovereignKernelModuleSigningVerifier,
+    SovereignSecretVaultEngine, SovereignAuditLogIntegrityChain, SovereignCveSecurityUpdateManager,
+    SovereignFuzzingBoundaryVerifier, SovereignFormalThreatModelEvaluator,
     Dilithium5KernelSignatureVerifier, FedoraCryptoPolicyProfile, GksuAuthBackend,
     GksuDisplayServer, GksuExecutionRequest, GksuExecutionResult, GksuSecurityGuard,
     HardenedSyscallDispatcher, HardenedSyscallError, HybridPqcMeasurementEngine,
@@ -115,7 +163,9 @@ pub use security::{
     PiaServerRegion, PiaSplitTunnelGovernor, PiaStrictKillSwitch, PiaVpnManager,
     RetpolineKptiMitigationEngine, SmepSmapEnforcer, SovereignFirmitasAttestationEngine,
     SovereignKaslrEngine, SplitTunnelRule, Tpm2PcrBank, Tpm2PcrRegister, WifiFrameType,
-    TPM2_PCR_COUNT,
+    TPM2_PCR_COUNT, AccessTokenType, EffectiveAccessTimePolicy, LdapDirectoryEntry,
+    MemoryProtectionFlags, ProcessMigrationRecord, SecurityAccessToken,
+    SovereignComprehensiveAccessControlSuite, SovereignLdapAccessEngine, WirelessAccessPoint,
 };
 pub use unimplemented_features::{
     AlpineApkPackageIndex, Android15PrivateSpaceGovernor, AndroidApexContainerModuleEngine,

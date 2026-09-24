@@ -8,19 +8,19 @@ pub mod moksha;
 pub mod omarchy_omakase;
 pub mod pantheon;
 pub mod screensaver;
+pub mod sovereign_navigation_engine;
 pub mod web_wasm_bridge;
 pub mod zenith_compositor;
 pub mod ultimate_distro_desktop;
+pub mod x11_desktop_environment;
+
+pub use sovereign_navigation_engine::*;
 
 pub use ultimate_distro_desktop::{
     ContainerSplitDirection, Gnome46MutterEngine, KRunnerQueryResult, KdePlasma6Engine,
     LuminaBsdDesktopEngine, SwayRegolithWmEngine, SwayWorkspaceContainerNode, ThunarCustomAction,
     Xfce418Engine,
 };
-
-pub use web_wasm_bridge::*;
-
-pub use web_wasm_bridge::*;
 
 pub use web_wasm_bridge::*;
 
@@ -58,4 +58,11 @@ pub use zenith_compositor::{
 pub use omarchy_omakase::{
     AgenticWorkstationLayout, AgenticWorkstationOrchestrator, OmakasePresetConfig,
     OmarchySystemEngine, WorkstationPane, WorkstationPaneRole,
+};
+
+pub use x11_desktop_environment::{
+    SovereignX11DesktopEnvironmentMasterSuite, SovereignX11DesktopPanelEngine,
+    SovereignX11ExtensionDispatchEngine, SovereignX11ThemeAndSessionManager,
+    SovereignX11WindowManagerEngine, SystemTrayIconEntry, X11ExtensionType, X11LayoutMode,
+    X11WindowRecord, X11WindowState,
 };

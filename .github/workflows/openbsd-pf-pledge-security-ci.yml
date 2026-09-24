@@ -23,4 +23,5 @@ jobs:
 
       - name: Run OpenBSD Security Policies Test
         run: |
+          mkdir -p build
           ./run_sigma_tests.sh

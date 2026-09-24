@@ -116,7 +116,6 @@ fn test_universal_adapter_all_formats() {
         ZypperSpecManifest, SlackwarePkgManifest,
     };
 
-    use universal_adapter::Version;
     let adapter = UniversalPackageAdapter::new();
 
     // 1. FreeBSD UCL (+MANIFEST)

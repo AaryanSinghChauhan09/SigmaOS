@@ -114,6 +114,76 @@ if [ -f "src/security/input_validation.rs" ]; then
     ./build/input_val_test
 fi
 
+if [ -f "src/distro/omarchy_advanced_parity.rs" ]; then
+    echo "Running Omarchy 4 Advanced Parity test suite..."
+    mkdir -p build
+    rustc --test src/distro/omarchy_advanced_parity.rs --edition=2021 -o build/test_omarchy_parity
+    ./build/test_omarchy_parity
+fi
+
+if [ -f "src/distro/omarchy_future_roadmap.rs" ]; then
+    echo "Running Omarchy Future Roadmap test suite..."
+    mkdir -p build
+    rustc --test src/distro/omarchy_future_roadmap.rs --edition=2021 -o build/test_omarchy_roadmap
+    ./build/test_omarchy_roadmap
+fi
+
+if [ -f "src/distro/sovereign_wiki_mint_omarchy_innovations.rs" ]; then
+    echo "Running Sovereign Wiki, Mint & Omarchy Innovations test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_wiki_mint_omarchy_innovations.rs --edition=2021 -o build/test_wiki_mint_omarchy
+    ./build/test_wiki_mint_omarchy
+fi
+
+if [ -f "src/distro/sovereign_stack_replacements.rs" ]; then
+    echo "Running Sovereign Stack Replacements & Gap-Filling Roadmap test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_stack_replacements.rs --edition=2021 -o build/test_stack_replacements
+    ./build/test_stack_replacements
+fi
+
+if [ -f "src/distro/sovereign_open_source_distro_synthesis.rs" ]; then
+    echo "Running Sovereign Open Source Distro Synthesis test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_open_source_distro_synthesis.rs --edition=2021 -o build/test_open_source_synthesis
+    ./build/test_open_source_synthesis
+fi
+
+if [ -f "src/sigpkg/universal_engine.rs" ]; then
+    echo "Running Universal Package Manager Interop test suite..."
+    mkdir -p build
+    rustc --test src/sigpkg/universal_engine.rs --edition=2021 -o build/test_universal_engine
+    ./build/test_universal_engine
+fi
+
+if [ -f "src/filesystem/sovereign_filesystem_hierarchy.rs" ]; then
+    echo "Running Sovereign Filesystem Hierarchy test suite..."
+    mkdir -p build
+    rustc --test src/filesystem/sovereign_filesystem_hierarchy.rs --edition=2021 -o build/test_filesystem_hierarchy
+    ./build/test_filesystem_hierarchy
+fi
+
+if [ -f "src/distro/sovereign_gap_closure_master_suite.rs" ]; then
+    echo "Running Sovereign Gap Closure Master Suite test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_gap_closure_master_suite.rs --edition=2021 -o build/test_gap_closure_master
+    ./build/test_gap_closure_master
+fi
+
+if [ -f "src/security/sovereign_portable_sandbox_engine.rs" ]; then
+    echo "Running Sovereign Portable Sandbox Engine test suite..."
+    mkdir -p build
+    rustc --test src/security/sovereign_portable_sandbox_engine.rs --edition=2021 -o build/test_portable_sandbox
+    ./build/test_portable_sandbox
+fi
+
+if [ -f "src/desktop/x11_desktop_environment.rs" ]; then
+    echo "Running Sovereign X11 Desktop Environment test suite..."
+    mkdir -p build
+    rustc --test src/desktop/x11_desktop_environment.rs --edition=2021 -o build/test_x11_desktop
+    ./build/test_x11_desktop
+fi
+
 echo "Running Modular Python Test Suite (Unit, Integration, System, Stress, Fuzzing, Benchmarks)..."
 if command -v pytest &>/dev/null; then
   pytest tests/test_unit_core.py tests/test_integration_system.py tests/test_stress_fuzz_bench.py

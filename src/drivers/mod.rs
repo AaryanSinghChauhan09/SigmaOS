@@ -23,6 +23,13 @@ pub mod printing;
 pub mod usb_hid;
 pub mod sovereign_driver_lifecycle;
 pub mod vesa;
+pub mod sovereign_comprehensive_drivers;
+
+pub use sovereign_comprehensive_drivers::{
+    AppleM4DartAns2Driver, Cxl30MemoryPoolDriver, FreeBsdGeliDiskEncryptionDriver,
+    IntelXe2BattlemageGpuDriver, MediaTekMt7925Wifi7Driver, NvmeZnsComputationalStorageDriver,
+    OpenBsdDriverSandboxGuard, SovereignComprehensiveDriverSuite,
+};
 
 pub use printing::{CupsIppPrintSpooler, LpdSpooler, PpdDriverMatcher, PrintJob, PrintJobState};
 
