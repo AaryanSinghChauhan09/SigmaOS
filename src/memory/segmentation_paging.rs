@@ -1,7 +1,11 @@
 // Segmentation, Address Binding, Paging Translation & Executable Space Protection Subsystem for SigmaOS
 // Inspired by x86_64, ARM64, Linux, OpenBSD W^X, FreeBSD GEOM/UVM, and Windows NT memory paradigms.
 
+#[cfg(not(any(feature = "standalone_test", test)))]
 use crate::klib::HashMap;
+
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::HashMap;
 
 /// Processor execution rings
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -406,7 +410,7 @@ impl SegmentationPagingEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

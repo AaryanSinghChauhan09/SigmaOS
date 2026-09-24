@@ -17,6 +17,57 @@ pub enum SegmentType {
     TaskStateSegment,
 }
 
+/// x86_64 64-bit Task State Segment (TSS) structure (RFC x86_64 Architecture Manual)
+/// Holds kernel stack pointers (RSP0..RSP2) for Ring 3 -> Ring 0 transitions
+/// and Interrupt Stack Table (IST1..IST7) for double faults and NMI exceptions.
+#[derive(Debug, Clone, Copy)]
+#[repr(C, packed)]
+pub struct TaskStateSegment64 {
+    pub reserved_1: u32,
+    pub rsp0: u64, // Ring 0 Stack Pointer for hardware privilege switch
+    pub rsp1: u64, // Ring 1 Stack Pointer
+    pub rsp2: u64, // Ring 2 Stack Pointer
+    pub reserved_2: u64,
+    pub ist1: u64, // IST1: Double Fault Stack Pointer
+    pub ist2: u64, // IST2: NMI / MCE Stack Pointer
+    pub ist3: u64, // IST3: Debug Exception Stack
+    pub ist4: u64, // IST4
+    pub ist5: u64, // IST5
+    pub ist6: u64, // IST6
+    pub ist7: u64, // IST7
+    pub reserved_3: u64,
+    pub reserved_4: u16,
+    pub iomap_base: u16, // Offset to I/O Permission Bit Map
+}
+
+impl TaskStateSegment64 {
+    pub fn new() -> Self {
+        Self {
+            reserved_1: 0,
+            rsp0: 0xFFFF_8000_000F_0000, // Kernel Ring 0 initial stack top
+            rsp1: 0,
+            rsp2: 0,
+            reserved_2: 0,
+            ist1: 0xFFFF_8000_000E_0000, // Double fault stack
+            ist2: 0xFFFF_8000_000D_0000, // NMI stack
+            ist3: 0,
+            ist4: 0,
+            ist5: 0,
+            ist6: 0,
+            ist7: 0,
+            reserved_3: 0,
+            reserved_4: 0,
+            iomap_base: 0x68, // Default end of TSS
+        }
+    }
+}
+
+impl Default for TaskStateSegment64 {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Represents a Segment Descriptor in the GDT
 #[derive(Debug, Clone)]
 pub struct GdtDescriptor {
@@ -52,6 +103,8 @@ pub struct ProcessorInitSuite {
     pub gdt: Vec<GdtDescriptor>,
     pub idt: BTreeMap<u8, IdtGate>,
     pub memory_regions: Vec<VirtualMemoryRegion>,
+    pub tss: TaskStateSegment64,
+    pub active_ring: u8, // 0 = Ring 0 (Kernel), 3 = Ring 3 (User)
     pub cr0_wp_enabled: bool,  // Write Protect (prevents kernel writing to read-only pages)
     pub cr4_smep_enabled: bool, // Supervisor Mode Execution Prevention (prevents executing user code in ring 0)
     pub cr4_smap_enabled: bool, // Supervisor Mode Access Prevention (prevents accessing user data in ring 0)
@@ -65,6 +118,8 @@ impl ProcessorInitSuite {
             gdt: Vec::new(),
             idt: BTreeMap::new(),
             memory_regions: Self::default_virtual_memory_layout(),
+            tss: TaskStateSegment64::new(),
+            active_ring: 0,
             cr0_wp_enabled: false,
             cr4_smep_enabled: false,
             cr4_smap_enabled: false,
@@ -141,6 +196,29 @@ impl ProcessorInitSuite {
             flags: 0xCF,
             segment_type: SegmentType::UserData,
         });
+        // 5. Task State Segment (TSS) Descriptor for User Mode Ring 3 Stack Switch
+        self.gdt.push(GdtDescriptor {
+            limit: core::mem::size_of::<TaskStateSegment64>() as u32 - 1,
+            base: 0x8000_0000,
+            access_byte: 0x89, // 64-bit Available TSS (Present, Ring 0 DPL, Type 9)
+            flags: 0x00,
+            segment_type: SegmentType::TaskStateSegment,
+        });
+    }
+
+    /// Transition execution context to Ring 3 (User Mode)
+    pub fn enter_user_mode_ring3(&mut self, user_rsp: u64, kernel_rsp0: u64) -> Result<(), &'static str> {
+        if user_rsp >= 0xFFFF_8000_0000_0000 {
+            return Err("User mode RSP cannot reside in Ring 0 higher-half kernel memory");
+        }
+        self.tss.rsp0 = kernel_rsp0;
+        self.active_ring = 3;
+        Ok(())
+    }
+
+    /// Return execution from Ring 3 User Mode to Ring 0 Kernel Mode via SYSCALL or Interrupt
+    pub fn exit_user_mode_ring0(&mut self) {
+        self.active_ring = 0;
     }
 
     /// Configures the IDT with standard exception and hardware interrupt gates
@@ -209,7 +287,7 @@ impl FastSyscallDispatcher {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -220,9 +298,10 @@ mod tests {
 
         // Init GDT segments
         suite.initialize_gdt();
-        assert_eq!(suite.gdt.len(), 4);
+        assert_eq!(suite.gdt.len(), 5);
         assert_eq!(suite.gdt[0].segment_type, SegmentType::KernelCode);
         assert_eq!(suite.gdt[2].segment_type, SegmentType::UserCode);
+        assert_eq!(suite.gdt[4].segment_type, SegmentType::TaskStateSegment);
 
         // Register page fault interrupt handler
         suite.register_idt_gate(14, 0xFFFFFFFF80105000, 0x0E, 0);
@@ -279,5 +358,28 @@ mod tests {
         // Invalid syscall
         let invalid = dispatcher.dispatch_syscall(999, 0, 0);
         assert!(invalid.is_err());
+    }
+
+    #[test]
+    fn test_ring3_user_mode_tss_transition() {
+        let mut suite = ProcessorInitSuite::new();
+        suite.initialize_gdt();
+        assert_eq!(suite.active_ring, 0); // Ring 0 default
+
+        // Transition to Ring 3 User Mode with user stack 0x0000_7FFF_1000_0000
+        let user_rsp = 0x0000_7FFF_1000_0000;
+        let kernel_rsp0 = 0xFFFF_8000_000F_8000;
+        assert!(suite.enter_user_mode_ring3(user_rsp, kernel_rsp0).is_ok());
+        assert_eq!(suite.active_ring, 3);
+        let rsp0 = suite.tss.rsp0;
+        assert_eq!(rsp0, kernel_rsp0);
+
+        // Fail user mode entry if user RSP attempts to point to kernel address
+        let invalid_user_rsp = 0xFFFF_8000_0000_1000;
+        assert!(suite.enter_user_mode_ring3(invalid_user_rsp, kernel_rsp0).is_err());
+
+        // Exit Ring 3 back to Ring 0 Kernel Mode
+        suite.exit_user_mode_ring0();
+        assert_eq!(suite.active_ring, 0);
     }
 }
