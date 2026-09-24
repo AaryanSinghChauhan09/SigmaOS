@@ -114,16 +114,17 @@ impl CgroupManager {
             return Err(CgroupError::LimitExceeded); // Root cannot be deleted
         }
 
-        if !self.cgroups.contains_key(name) {
-            return Err(CgroupError::NotFound);
-        }
+        let target_group = match self.cgroups.get_str(name) {
+            Some(g) => g,
+            None => return Err(CgroupError::NotFound),
+        };
 
-        // Migrate PIDs to parent or root
-        let parent = self.cgroups.get(name).unwrap().parent_name.clone().unwrap_or(String::from("/"));
-        let pids_to_migrate = self.cgroups.get(name).unwrap().pids.clone();
+        // Leverage string slices and borrow lifetimes to migrate PIDs to parent or root without dynamic heap allocations
+        let parent_str = target_group.parent_name.as_deref().unwrap_or("/");
+        let pids_to_migrate = target_group.pids.clone();
 
         for pid in pids_to_migrate {
-            let _ = self.attach_pid(&parent, pid);
+            let _ = self.attach_pid(parent_str, pid);
         }
 
         self.cgroups.remove(name);
@@ -132,37 +133,35 @@ impl CgroupManager {
 
     /// Associate a process PID with a control group (migrates it from old group)
     pub fn attach_pid(&mut self, name: &str, pid: u64) -> Result<(), CgroupError> {
-        // Verify target cgroup exists
-        if !self.cgroups.contains_key(name) {
-            return Err(CgroupError::NotFound);
-        }
-
-        // Check task limit/process count limit in target cgroup
+        // Verify target cgroup exists and check task limit
         {
-            let target_group = self.cgroups.get(name).unwrap();
+            let target_group = match self.cgroups.get_str(name) {
+                Some(g) => g,
+                None => return Err(CgroupError::NotFound),
+            };
             if target_group.usage.pids_count >= target_group.limits.pids_max {
                 return Err(CgroupError::LimitExceeded);
             }
         }
 
-        // Remove from current cgroup if associated with any
-        let mut current_group_name = None;
+        // Remove from current cgroup if associated with any (use &str lookup to avoid String heap allocations)
+        let mut current_group_name: Option<&str> = None;
         for (gname, group) in &self.cgroups {
             if group.pids.contains(&pid) {
-                current_group_name = Some(gname.clone());
+                current_group_name = Some(gname.as_str());
                 break;
             }
         }
 
-        if let Some(ref old_name) = current_group_name {
-            if let Some(group) = self.cgroups.get_mut(old_name) {
+        if let Some(old_name) = current_group_name {
+            if let Some(group) = self.cgroups.get_mut_str(old_name) {
                 group.pids.retain(|&p| p != pid);
                 group.usage.pids_count = group.usage.pids_count.saturating_sub(1);
             }
         }
 
         // Insert into new cgroup
-        if let Some(group) = self.cgroups.get_mut(name) {
+        if let Some(group) = self.cgroups.get_mut_str(name) {
             group.pids.push(pid);
             group.usage.pids_count += 1;
         }
@@ -206,29 +205,29 @@ impl CgroupManager {
 
     /// Track CPU usage addition in ms
     pub fn track_cpu_usage(&mut self, pid: u64, duration_ms: u64) -> Result<(), CgroupError> {
-        let mut found_name = None;
+        let mut found_name: Option<&str> = None;
         for (name, group) in &self.cgroups {
             if group.pids.contains(&pid) {
-                found_name = Some(name.clone());
+                found_name = Some(name.as_str());
                 break;
             }
         }
 
-        if let Some(ref name) = found_name {
-            let mut curr = Some(name.clone());
+        if let Some(name) = found_name {
+            let mut curr: Option<&str> = Some(name);
             while let Some(cname) = curr {
-                let parent = if let Some(group) = self.cgroups.get_mut(&cname) {
+                let parent_ptr = if let Some(group) = self.cgroups.get_mut_str(cname) {
                     group.usage.cpu_usage_ms = group.usage.cpu_usage_ms.saturating_add(duration_ms);
-                    group.parent_name.clone()
+                    group.parent_name.as_deref()
                 } else {
                     None
                 };
-                curr = parent;
+                curr = parent_ptr;
             }
             Ok(())
         } else {
             // Un-grouped processes are accounted on Root
-            if let Some(group) = self.cgroups.get_mut("/") {
+            if let Some(group) = self.cgroups.get_mut_str("/") {
                 group.usage.cpu_usage_ms = group.usage.cpu_usage_ms.saturating_add(duration_ms);
             }
             Ok(())
@@ -237,39 +236,39 @@ impl CgroupManager {
 
     /// Track resource allocation (checks limits hierarchically)
     pub fn track_memory_alloc(&mut self, pid: u64, bytes: u64) -> Result<(), CgroupError> {
-        let mut found_name = None;
+        let mut found_name: Option<&str> = None;
         for (name, group) in &self.cgroups {
             if group.pids.contains(&pid) {
-                found_name = Some(name.clone());
+                found_name = Some(name.as_str());
                 break;
             }
         }
 
-        let name = found_name.unwrap_or(String::from("/"));
+        let name = found_name.unwrap_or("/");
 
-        // Dry run: check if any ancestor group exceeds its limits
-        let mut curr = Some(name.clone());
+        // Dry run: check if any ancestor group exceeds its limits (using borrowed &str references)
+        let mut curr: Option<&str> = Some(name);
         while let Some(cname) = curr {
-            if let Some(group) = self.cgroups.get(&cname) {
+            if let Some(group) = self.cgroups.get_str(cname) {
                 if group.usage.memory_usage_bytes.saturating_add(bytes) > group.limits.memory_max {
                     return Err(CgroupError::LimitExceeded);
                 }
-                curr = group.parent_name.clone();
+                curr = group.parent_name.as_deref();
             } else {
                 break;
             }
         }
 
-        // Apply allocations hierarchically
-        let mut curr = Some(name);
+        // Apply allocations hierarchically without heap String allocations
+        let mut curr: Option<&str> = Some(name);
         while let Some(cname) = curr {
-            let parent = if let Some(group) = self.cgroups.get_mut_str(&cname) {
+            let parent_ptr = if let Some(group) = self.cgroups.get_mut_str(cname) {
                 group.usage.memory_usage_bytes = group.usage.memory_usage_bytes.saturating_add(bytes);
-                group.parent_name.clone()
+                group.parent_name.as_deref()
             } else {
                 None
             };
-            curr = parent;
+            curr = parent_ptr;
         }
 
         Ok(())
@@ -277,26 +276,26 @@ impl CgroupManager {
 
     /// Track resource release (decrements hierarchically)
     pub fn track_memory_free(&mut self, pid: u64, bytes: u64) -> Result<(), CgroupError> {
-        let mut found_name = None;
+        let mut found_name: Option<&str> = None;
         for (name, group) in &self.cgroups {
             if group.pids.contains(&pid) {
-                found_name = Some(name.clone());
+                found_name = Some(name.as_str());
                 break;
             }
         }
 
-        let name = found_name.unwrap_or(String::from("/"));
+        let name = found_name.unwrap_or("/");
 
-        // Release hierarchically
-        let mut curr = Some(name);
+        // Release hierarchically using borrowed &str references
+        let mut curr: Option<&str> = Some(name);
         while let Some(cname) = curr {
-            let parent = if let Some(group) = self.cgroups.get_mut(&cname) {
+            let parent_ptr = if let Some(group) = self.cgroups.get_mut_str(cname) {
                 group.usage.memory_usage_bytes = group.usage.memory_usage_bytes.saturating_sub(bytes);
-                group.parent_name.clone()
+                group.parent_name.as_deref()
             } else {
                 None
             };
-            curr = parent;
+            curr = parent_ptr;
         }
 
         Ok(())

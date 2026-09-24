@@ -798,7 +798,7 @@ pub struct BsdSocketOptions {
     pub tcp_nodelay: bool,
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
