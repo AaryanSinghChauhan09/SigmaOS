@@ -114,6 +114,13 @@ if [ -f "src/iso/sovereign_rufus_installer_synthesis.rs" ]; then
     ./build/sovereign_rufus_test
 fi
 
+if [ -f "src/access/mod.rs" ]; then
+    echo "Running Sovereign Access Subsystem test suite..."
+    mkdir -p build
+    rustc --test src/access/mod.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/access_test
+    ./build/access_test
+fi
+
 echo "=== All SigmaOS Tests Passed ==="
 
 if [ -f "src/launch_ready/mod.rs" ]; then

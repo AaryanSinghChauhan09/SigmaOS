@@ -243,6 +243,10 @@ fn test_all_prompt_package_formats() {
         Some(PackageFormat::TarGz)
     );
     assert_eq!(
+        adapter.detect_format_by_extension("archive.tar .gz"),
+        Some(PackageFormat::TarGz)
+    );
+    assert_eq!(
         adapter.detect_format_by_extension("compressed.xz"),
         Some(PackageFormat::TarXz)
     );
