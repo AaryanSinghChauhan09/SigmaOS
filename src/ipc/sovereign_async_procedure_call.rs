@@ -200,18 +200,25 @@ impl SovereignAsyncProcedureCallEngine {
         }
     }
 
+    /// Evaluate POSIX thread cancellation point (`pthread_testcancel` parity)
+    pub fn evaluate_cancellation_point(&self, token_id: u64) -> bool {
+        if let Some(token) = self.cancellation_tokens.get(&token_id) {
+            token.is_cancelled && token.state == AsyncCancellationState::Enable
+        } else {
+            false
+        }
+    }
+
     /// Process all pending APC messages
     pub fn process_pending_apcs(&mut self) -> Vec<(u64, Result<Vec<u8>, String>)> {
         let mut results = Vec::new();
         let msgs = core::mem::take(&mut self.pending_messages);
 
         for msg in msgs {
-            // Check cancellation token state
-            if let Some(token) = self.cancellation_tokens.get(&msg.token_id) {
-                if token.is_cancelled {
-                    results.push((msg.msg_id, Err("Procedure call cancelled".to_string())));
-                    continue;
-                }
+            // Check cancellation token state & POSIX cancellation points
+            if self.evaluate_cancellation_point(msg.token_id) {
+                results.push((msg.msg_id, Err("Procedure call cancelled".to_string())));
+                continue;
             }
 
             if let Some(routine) = self.routines.get(&msg.procedure_name) {
@@ -289,6 +296,8 @@ mod apc_tests {
         // Cancel before processing
         let cancel_res = engine.cancel_async_operation(task_id);
         assert!(cancel_res.unwrap());
+
+        assert!(engine.evaluate_cancellation_point(task_id));
 
         let results = engine.process_pending_apcs();
         assert_eq!(results.len(), 0); // Removed from pending

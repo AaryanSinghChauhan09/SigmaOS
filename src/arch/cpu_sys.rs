@@ -198,7 +198,7 @@ impl ProcessorInitSuite {
         });
         // 5. Task State Segment (TSS) Descriptor for User Mode Ring 3 Stack Switch
         self.gdt.push(GdtDescriptor {
-            limit: std::mem::size_of::<TaskStateSegment64>() as u32 - 1,
+            limit: core::mem::size_of::<TaskStateSegment64>() as u32 - 1,
             base: 0x8000_0000,
             access_byte: 0x89, // 64-bit Available TSS (Present, Ring 0 DPL, Type 9)
             flags: 0x00,

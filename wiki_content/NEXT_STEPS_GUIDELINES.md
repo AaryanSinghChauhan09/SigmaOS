@@ -13,10 +13,13 @@ All updates, bug fixes, features, and documentation enhancements must be committ
 - **Rule:** Never create a pull request (PR) for any changes in this repository.
 - **Action:** Push changes directly to `main` after verifying that all tests pass and code quality checks are satisfied.
 
-### 2. User Mode (Ring 3) & TSS Standard
+### 2. Asynchronous Procedure Call (APC) & Cancellation Standard
+- **Rule:** Enforce POSIX cancellation points (`pthread_testcancel`) and `io_uring` async write cancellations via `SovereignAsyncProcedureCallEngine` in `src/ipc/sovereign_async_procedure_call.rs`.
+
+### 3. User Mode (Ring 3) & TSS Standard
 - **Rule:** Enforce Ring 0 / Ring 3 privilege level transitions via `TaskStateSegment64` in `src/arch/cpu_sys.rs`. Ensure kernel stack pointers (`rsp0`) are updated before switching context to Ring 3 user mode.
 
-### 3. Linux & BSD 50% Rule Governance Standard
+### 4. Linux & BSD 50% Rule Governance Standard
 - **Rule:** Implement and enforce the 50% resource threshold rule (`FiftyPercentRuleEngine` in `src/access/mod.rs`) across memory swap watermarks, CPU cgroup caps, page cache reclaim, overcommit limits, anonymous sessions, and process migration.
 
 ---
@@ -35,6 +38,7 @@ Whenever `ImprovementPlan.md` or `NEXT_STEPS_GUIDELINES.md` (or any core archite
 ---
 
 ## 🎯 Immediate Tactical Execution Checklist
+- [x] Enhance `SovereignAsyncProcedureCallEngine` with POSIX thread cancellation points (`src/ipc/sovereign_async_procedure_call.rs`, 3 unit tests passing).
 - [x] Implement `TaskStateSegment64` and Ring 3 transition routines in `src/arch/cpu_sys.rs` (5 unit tests passing).
 - [x] Enable and verify unit tests in `src/memory/segmentation_paging.rs` (3 unit tests passing).
 - [x] Implement `FiftyPercentRuleEngine` and enable unit tests in `src/access/mod.rs` (8 unit tests passing).
