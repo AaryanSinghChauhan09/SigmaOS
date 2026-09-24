@@ -258,7 +258,7 @@ mod tests {
 
     #[test]
     fn test_tech_media_distro_innovations() {
-        let mut suite = SovereignTechMediaDistroInnovationsSuite::new();
+        let suite = SovereignTechMediaDistroInnovationsSuite::new();
         assert!(suite.verify_suite());
         assert_eq!(suite.rank_tracker.get_top_ranked_distro(), "Debian");
         assert!(suite.release_matrix.is_kernel_up_to_date("6.12.0-sigma"));
