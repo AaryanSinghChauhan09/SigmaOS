@@ -156,22 +156,24 @@ impl PledgeManager {
             return false;
         }
 
-        // Reject URL-encoded traversal patterns (common in HTTP-facing code paths).
-        let lower = {
-            let mut buf = [0u8; 512];
-            let bytes = path.as_bytes();
-            let copy_len = bytes.len().min(buf.len());
-            buf[..copy_len].copy_from_slice(&bytes[..copy_len]);
-            // Lowercase the copy without alloc
-            for b in &mut buf[..copy_len] {
-                if *b >= b'A' && *b <= b'Z' {
-                    *b += 32;
-                }
-            }
-            buf
-        };
-        let lower_path = core::str::from_utf8(&lower[..path.len().min(512)]).unwrap_or("");
-        if lower_path.contains("%2e%2e") || lower_path.contains("%2f") || lower_path.contains("%5c") {
+        // Sentinel 🛡️ Security Hardening: Direct slice inspection without stack buffer truncation.
+        // Check for URL-encoded traversal patterns case-insensitively across the entire input length.
+        let bytes = path.as_bytes();
+        if bytes.windows(6).any(|w| {
+            w[0] == b'%'
+                && (w[1] == b'2')
+                && (w[2] == b'e' || w[2] == b'E')
+                && (w[3] == b'%')
+                && (w[4] == b'2')
+                && (w[5] == b'e' || w[5] == b'E')
+        }) {
+            return false;
+        }
+        if bytes.windows(3).any(|w| {
+            w[0] == b'%'
+                && ((w[1] == b'2' && (w[2] == b'f' || w[2] == b'F'))
+                    || (w[1] == b'5' && (w[2] == b'c' || w[2] == b'C')))
+        }) {
             return false;
         }
 
@@ -341,7 +343,7 @@ pub mod promises {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::promises::*;
     use super::*;
@@ -397,5 +399,29 @@ mod tests {
         assert!(manager.execpledge(exec_p).is_ok());
         assert!(manager.active_execpledge().is_some());
         assert!(manager.execpledge(stdio()).is_err()); // Already set
+    }
+
+    #[test]
+    fn test_unveil_validation_and_truncation_bypass_prevention() {
+        let mut manager = PledgeManager::new();
+        manager.unveil("/tmp", "rw").unwrap();
+
+        assert!(manager.validate_unveil_access("/tmp/file.txt", 'r'));
+        assert!(manager.validate_unveil_access("/tmp/sub/file.txt", 'w'));
+
+        // Reject directory traversal
+        assert!(!manager.validate_unveil_access("/tmp/../etc/passwd", 'r'));
+
+        // Reject null bytes
+        assert!(!manager.validate_unveil_access("/tmp/file.txt\0.jpg", 'r'));
+
+        // Reject URL-encoded traversal patterns within 512 bytes
+        assert!(!manager.validate_unveil_access("/tmp/%2e%2e/etc/passwd", 'r'));
+        assert!(!manager.validate_unveil_access("/tmp/%2Fetc/passwd", 'r'));
+
+        // Reject URL-encoded traversal patterns placed BEYOND 512 bytes (truncation attack mitigation)
+        let long_padding = "a".repeat(600);
+        let long_payload = format!("/tmp/{}/%2E%2E/etc/passwd", long_padding);
+        assert!(!manager.validate_unveil_access(&long_payload, 'r'));
     }
 }
