@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-use core::fmt;
+use std::fmt;
 use std::collections::HashMap;
 use std::string::String;
 use std::string::ToString;
@@ -13,6 +13,16 @@ pub const O_CREAT: u32 = 0o100;
 pub const O_EXCL: u32 = 0o200;
 pub const O_TRUNC: u32 = 0o1000;
 pub const O_APPEND: u32 = 0o2000;
+
+/// POSIX DAC Access Request Mode
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AccessMode {
+    Read = 0o4,
+    Write = 0o2,
+    Execute = 0o1,
+    ReadWrite = 0o6,
+    ReadExecute = 0o5,
+}
 
 /// BSD File Flags (chflags: nodump, uchg, schg, opaque, nounlink, sappnd, uappnd)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -163,6 +173,61 @@ impl Inode {
             data: Vec::new(),
             data_blocks: Vec::new(),
             entries: HashMap::new(),
+        }
+    }
+
+    /// Evaluates POSIX DAC permissions based on Effective UID (euid) and Effective GID (egid)
+    pub fn check_permission(&self, euid: u32, egid: u32, mode: AccessMode) -> Result<(), FsError> {
+        let req_mask = mode as u32;
+
+        // Root superuser (UID 0) override
+        if euid == 0 {
+            if (req_mask & 0o1) != 0 {
+                if self.mode.owner_execute || self.mode.group_execute || self.mode.other_execute {
+                    return Ok(());
+                } else {
+                    return Err(FsError::PermissionDenied);
+                }
+            }
+            return Ok(());
+        }
+
+        let is_owner = (euid as u64) == self.owner;
+        let is_group = (egid as u64) == self.group;
+
+        if is_owner {
+            let mut owner_bits = 0u32;
+            if self.mode.owner_read { owner_bits |= 0o4; }
+            if self.mode.owner_write { owner_bits |= 0o2; }
+            if self.mode.owner_execute { owner_bits |= 0o1; }
+
+            if (owner_bits & req_mask) == req_mask {
+                Ok(())
+            } else {
+                Err(FsError::PermissionDenied)
+            }
+        } else if is_group {
+            let mut group_bits = 0u32;
+            if self.mode.group_read { group_bits |= 0o4; }
+            if self.mode.group_write { group_bits |= 0o2; }
+            if self.mode.group_execute { group_bits |= 0o1; }
+
+            if (group_bits & req_mask) == req_mask {
+                Ok(())
+            } else {
+                Err(FsError::PermissionDenied)
+            }
+        } else {
+            let mut other_bits = 0u32;
+            if self.mode.other_read { other_bits |= 0o4; }
+            if self.mode.other_write { other_bits |= 0o2; }
+            if self.mode.other_execute { other_bits |= 0o1; }
+
+            if (other_bits & req_mask) == req_mask {
+                Ok(())
+            } else {
+                Err(FsError::PermissionDenied)
+            }
         }
     }
 }
@@ -554,6 +619,29 @@ impl VirtualFileSystem {
         inode.modified = 1716000000; // Simulated timestamp
 
         Ok(buffer.len())
+    }
+
+    /// Validates file access permissions for specified process euid/egid
+    pub fn check_access(&self, path: &str, euid: u32, egid: u32, mode: AccessMode) -> Result<(), FsError> {
+        let inode_num = self.resolve_path_inode(path)?;
+        let inode = self.inodes.get(&inode_num).ok_or(FsError::NotFound)?;
+        inode.check_permission(euid, egid, mode)
+    }
+
+    /// Read file with explicit UID/GID DAC permission validation
+    pub fn read_file_as_user(&mut self, fd: u64, buffer: &mut [u8], euid: u32, egid: u32) -> Result<usize, FsError> {
+        let file_descriptor = self.open_files.get_mut(&fd).ok_or(FsError::InvalidFd)?;
+        let inode = self.inodes.get(&file_descriptor.inode_number).ok_or(FsError::NotFound)?;
+        inode.check_permission(euid, egid, AccessMode::Read)?;
+        self.read_file(fd, buffer)
+    }
+
+    /// Write file with explicit UID/GID DAC permission validation
+    pub fn write_file_as_user(&mut self, fd: u64, buffer: &[u8], euid: u32, egid: u32) -> Result<usize, FsError> {
+        let file_descriptor = self.open_files.get_mut(&fd).ok_or(FsError::InvalidFd)?;
+        let inode = self.inodes.get(&file_descriptor.inode_number).ok_or(FsError::NotFound)?;
+        inode.check_permission(euid, egid, AccessMode::Write)?;
+        self.write_file(fd, buffer)
     }
 
     /// Read file guarded behind explicit capability token permission validation (Phase 2.1)
@@ -974,6 +1062,36 @@ mod tests {
             "/etc/passwd"
         );
         assert_eq!(vfs.canonicalize_path("/home/user", ".."), "/home");
+    }
+
+    #[test]
+    fn test_posix_uid_gid_dac_permissions() {
+        let mut vfs = VirtualFilesystem::new();
+        // Mode 0o750: owner rwx, group r-x, other ---
+        let file_id = vfs.create_file("secure.txt", 0o750, 0).unwrap();
+        if let Some(inode) = vfs.inodes.get_mut(&file_id) {
+            inode.owner = 1000;
+            inode.group = 1000;
+        }
+
+        let fd = vfs.open_file(file_id, O_RDWR).unwrap();
+        vfs.write_file(fd, b"secret_data").unwrap();
+
+        // Owner (1000, 1000) read & write -> OK
+        let mut buf = [0u8; 16];
+        assert!(vfs.read_file_as_user(fd, &mut buf, 1000, 1000).is_ok());
+
+        // Group member (1001, 1000) read -> OK, write -> Denied
+        assert!(vfs.read_file_as_user(fd, &mut buf, 1001, 1000).is_ok());
+        assert_eq!(vfs.write_file_as_user(fd, b"hack", 1001, 1000), Err(FsError::PermissionDenied));
+
+        // Other user (2000, 2000) read -> Denied, write -> Denied
+        assert_eq!(vfs.read_file_as_user(fd, &mut buf, 2000, 2000), Err(FsError::PermissionDenied));
+        assert_eq!(vfs.write_file_as_user(fd, b"hack", 2000, 2000), Err(FsError::PermissionDenied));
+
+        // Root superuser (0, 0) read & write -> OK
+        assert!(vfs.read_file_as_user(fd, &mut buf, 0, 0).is_ok());
+        assert!(vfs.write_file_as_user(fd, b"root_append", 0, 0).is_ok());
     }
 }
 
