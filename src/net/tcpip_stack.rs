@@ -376,6 +376,7 @@ pub struct TCPIPStack {
     next_fd: AtomicUsize,
     interface_mac: MACAddress,
     interface_ip: IPAddress,
+    pub ack_engine: AcknowledgementPacketEngine,
 }
 
 impl TCPIPStack {
@@ -385,6 +386,7 @@ impl TCPIPStack {
             next_fd: AtomicUsize::new(4),
             interface_mac: MACAddress::new(0, 0, 0, 0, 0, 0),
             interface_ip: IPAddress::new(0, 0, 0, 0),
+            ack_engine: AcknowledgementPacketEngine::new(),
         }
     }
 
@@ -774,10 +776,22 @@ pub unsafe fn close_socket(fd: usize) -> bool {
 }
 
 // External allocator functions
+#[cfg(not(test))]
 extern "C" {
     #[link_name = "alloc"]
     fn extern_alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+#[cfg(test)]
+unsafe fn extern_alloc(size: usize) -> *mut u8 {
+    let layout = std::alloc::Layout::from_size_align(size, 8).unwrap();
+    std::alloc::alloc(layout)
+}
+
+#[cfg(test)]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
 }
 
 // ============================================================================
