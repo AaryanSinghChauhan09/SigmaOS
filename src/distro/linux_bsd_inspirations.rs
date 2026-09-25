@@ -100,6 +100,11 @@ pub enum DistroSubsystemMode {
     SolarisOmniOS,
     NetBsdRump,
     OpenBsdHardened,
+    LinuxSerpentOS,
+    LinuxFedoraSilverblue,
+    LinuxEulerOS,
+    LinuxEuroLinux,
+    LinuxAnolis,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -177,6 +182,10 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxMX
             | DistroSubsystemMode::LinuxQubes
             | DistroSubsystemMode::LinuxEndless
+            | DistroSubsystemMode::LinuxFedoraSilverblue
+            | DistroSubsystemMode::LinuxEulerOS
+            | DistroSubsystemMode::LinuxEuroLinux
+            | DistroSubsystemMode::LinuxAnolis
             | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
@@ -359,6 +368,10 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxMX
             | DistroSubsystemMode::LinuxQubes
             | DistroSubsystemMode::LinuxEndless
+            | DistroSubsystemMode::LinuxFedoraSilverblue
+            | DistroSubsystemMode::LinuxEulerOS
+            | DistroSubsystemMode::LinuxEuroLinux
+            | DistroSubsystemMode::LinuxAnolis
             | DistroSubsystemMode::LinuxSteamOS => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo

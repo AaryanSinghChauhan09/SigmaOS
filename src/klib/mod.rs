@@ -52,6 +52,7 @@ pub mod uvm;
 pub mod zero_dependency_elimination;
 
 pub use arc::Arc;
+pub use collections::BTreeMap;
 pub use ring_buffer::{RingBuffer, HeapRingBuffer};
 pub use linked_list::{LinkedList, SList};
 pub use slab::{SlabCache, TypedSlabCache};
