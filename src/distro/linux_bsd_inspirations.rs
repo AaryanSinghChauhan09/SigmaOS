@@ -203,7 +203,9 @@ impl SovereignUniversalDistroBridge {
                 ServiceSupervisorType::Shepherd
             }
 
-            DistroSubsystemMode::LinuxSolus | DistroSubsystemMode::LinuxChimera => {
+            DistroSubsystemMode::LinuxSolus
+            | DistroSubsystemMode::LinuxChimera
+            | DistroSubsystemMode::LinuxSerpentOS => {
                 ServiceSupervisorType::Dinit
             }
             DistroSubsystemMode::LinuxSlackware
@@ -381,7 +383,9 @@ impl SovereignUniversalDistroBridge {
                 supervisor == ServiceSupervisorType::Shepherd
             }
 
-            DistroSubsystemMode::LinuxSolus | DistroSubsystemMode::LinuxChimera => {
+            DistroSubsystemMode::LinuxSolus
+            | DistroSubsystemMode::LinuxChimera
+            | DistroSubsystemMode::LinuxSerpentOS => {
                 supervisor == ServiceSupervisorType::Dinit
             }
             DistroSubsystemMode::LinuxSlackware
@@ -440,11 +444,15 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxRHEL
             | DistroSubsystemMode::LinuxQubes
             | DistroSubsystemMode::LinuxNobara
-            | DistroSubsystemMode::LinuxPCLinuxOS => {
+            | DistroSubsystemMode::LinuxPCLinuxOS
+            | DistroSubsystemMode::LinuxFedoraSilverblue
+            | DistroSubsystemMode::LinuxEulerOS
+            | DistroSubsystemMode::LinuxEuroLinux
+            | DistroSubsystemMode::LinuxAnolis => {
                 format!("{}.rpm", input_pkg)
             }
             DistroSubsystemMode::LinuxPuppy => format!("{}.pet", input_pkg),
-            DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", input_pkg),
+            DistroSubsystemMode::LinuxSolus | DistroSubsystemMode::LinuxSerpentOS => format!("{}.eopkg", input_pkg),
             DistroSubsystemMode::LinuxClear => format!("{}.bundle", input_pkg),
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::LinuxTinyCore => format!("{}.tcz", input_pkg),
@@ -523,9 +531,13 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxRHEL
             | DistroSubsystemMode::LinuxQubes
             | DistroSubsystemMode::LinuxNobara
-            | DistroSubsystemMode::LinuxPCLinuxOS => format!("{}.rpm", action),
+            | DistroSubsystemMode::LinuxPCLinuxOS
+            | DistroSubsystemMode::LinuxFedoraSilverblue
+            | DistroSubsystemMode::LinuxEulerOS
+            | DistroSubsystemMode::LinuxEuroLinux
+            | DistroSubsystemMode::LinuxAnolis => format!("{}.rpm", action),
             DistroSubsystemMode::LinuxPuppy => format!("{}.pet", action),
-            DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", action),
+            DistroSubsystemMode::LinuxSolus | DistroSubsystemMode::LinuxSerpentOS => format!("{}.eopkg", action),
             DistroSubsystemMode::LinuxClear => format!("{}.bundle", action),
             DistroSubsystemMode::LinuxEndless => format!("{}.flatpak", action),
             DistroSubsystemMode::LinuxTalos => format!("{}.yaml", action),
@@ -1070,7 +1082,7 @@ impl SovereignUniversalDistroBridge {
             "shell", "sigma-boot", "sigma_sandbox", "sigma_validation", "signal", "sigpkg", "smartcard", "storage",
             "support", "syscall", "system", "testing", "theming", "thermal", "thread", "time",
             "timer", "toolchain", "tools", "touchscreen", "tpm", "tracing", "ui", "update",
-            "usb", "userland", "userspace", "virt", "virtualization", "vm", "wireless", "workflow",
+            "usb", "userland", "userspace", "vfs", "virt", "virtualization", "vm", "wireless", "workflow",
             "zig",
         ];
 
@@ -1159,7 +1171,7 @@ impl SovereignUniversalDistroBridge {
             "shell", "sigma-boot", "sigma_sandbox", "sigma_validation", "signal", "sigpkg", "smartcard", "storage",
             "support", "syscall", "system", "testing", "theming", "thermal", "thread", "time",
             "timer", "toolchain", "tools", "touchscreen", "tpm", "tracing", "ui", "update",
-            "usb", "userland", "userspace", "virt", "virtualization", "vm", "wireless", "workflow",
+            "usb", "userland", "userspace", "vfs", "virt", "virtualization", "vm", "wireless", "workflow",
             "zig",
         ];
 
@@ -2655,7 +2667,7 @@ mod cross_subsystem_tests {
 
         let sync_count = orchestrator.synchronize_subsystem_pipeline();
         assert!(sync_count.is_ok());
-        assert_eq!(sync_count.unwrap(), 145);
+        assert_eq!(sync_count.unwrap(), 146);
 
         let (supervisor, pkg_spec, vfs_etc, compatible) = orchestrator.query_subsystem_capabilities();
         assert_eq!(supervisor, ServiceSupervisorType::Smf);
@@ -2666,7 +2678,7 @@ mod cross_subsystem_tests {
 
     #[test]
     fn test_all_144_subsystems_dispatch_and_matrix() {
-        let all_144 = [
+        let all_146 = [
             "access", "accessibility", "ai", "app", "arch", "audio", "audit", "auth",
             "automation", "backup", "bin", "bluetooth", "boot", "buildfarm", "camera", "cloud",
             "cluster", "community", "compatibility", "compliance", "compositor", "compression", "config", "container",
@@ -2684,12 +2696,12 @@ mod cross_subsystem_tests {
             "shell", "sigma-boot", "sigma_sandbox", "sigma_validation", "signal", "sigpkg", "smartcard", "storage",
             "support", "syscall", "system", "testing", "theming", "thermal", "thread", "time",
             "timer", "toolchain", "tools", "touchscreen", "tpm", "tracing", "ui", "update",
-            "usb", "userland", "userspace", "virt", "virtualization", "vm", "wireless", "workflow",
+            "usb", "userland", "userspace", "vfs", "virt", "virtualization", "vm", "wireless", "workflow",
             "zig",
         ];
 
         let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxArch);
-        for sub in all_144 {
+        for sub in all_146 {
             let res = bridge.dispatch_cross_subsystem_operation(sub, "test_action");
             assert!(res.is_ok(), "Subsystem '{}' dispatch failed", sub);
         }
@@ -2701,8 +2713,8 @@ mod cross_subsystem_tests {
     fn test_linux_bsd_interoperability_gateway_matrix_and_sync() {
         let mut gateway = LinuxBsdDistroSubsystemInteroperabilityGateway::new(DistroSubsystemMode::LinuxArch);
         let count = gateway.synchronize_and_audit_all_subsystems().unwrap();
-        assert_eq!(count, 145);
-        assert_eq!(gateway.audited_subsystems_count, 145);
+        assert_eq!(count, 146);
+        assert_eq!(gateway.audited_subsystems_count, 146);
 
         let res = gateway.orchestrate_subsystem("kernel", "sched_task");
         assert!(res.is_ok());
@@ -2710,7 +2722,7 @@ mod cross_subsystem_tests {
 
         gateway.set_distro_mode(DistroSubsystemMode::FreeBsd);
         let count_bsd = gateway.synchronize_and_audit_all_subsystems().unwrap();
-        assert_eq!(count_bsd, 145);
+        assert_eq!(count_bsd, 146);
 
         let (supervisor, pkg_spec, vfs_etc, compatible) = gateway.query_gateway_capability_matrix();
         assert_eq!(supervisor, ServiceSupervisorType::OpenRC);
