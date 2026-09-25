@@ -1,11 +1,9 @@
-use std::vec;
 // SigmaOS Linux Open vSwitch & BSD if_bridge Virtual Ethernet Switch Engine
 // MAC Forwarding Database (FDB), 802.1Q VLAN Tagging/Trunking, STP Spanning Tree, SPAN Mirroring, & LACP
 
 use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;
-use std::format;
 use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -149,8 +147,8 @@ impl VirtualSwitchEngine {
         }
 
         // 3. Evaluate 802.1Q VLAN Access vs Trunk rules
-        let active_vlan = match in_port.mode {
-            SwitchPortMode::Access { vlan_id: port_vlan } => port_vlan,
+        let active_vlan = match &in_port.mode {
+            SwitchPortMode::Access { vlan_id: port_vlan } => *port_vlan,
             SwitchPortMode::Trunk { allowed_vlans } => {
                 if let Some(v) = vlan_id {
                     if !allowed_vlans.contains(&v) {
@@ -183,7 +181,7 @@ impl VirtualSwitchEngine {
             }
 
             let p_vlan_match = match &p.mode {
-                SwitchPortMode::Access { vlan_id: port_vlan } => port_vlan == active_vlan,
+                SwitchPortMode::Access { vlan_id: port_vlan } => *port_vlan == active_vlan,
                 SwitchPortMode::Trunk { allowed_vlans } => allowed_vlans.contains(&active_vlan),
             };
 
@@ -196,7 +194,7 @@ impl VirtualSwitchEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -209,7 +207,7 @@ mod tests {
         let p1 = switch.add_port(br_id, "eth0", SwitchPortMode::Access { vlan_id: 10 }).unwrap();
         let p2 = switch.add_port(br_id, "eth1", SwitchPortMode::Access { vlan_id: 10 }).unwrap();
         // Add 1 port in Access VLAN 20
-        let p3 = switch.add_port(br_id, "eth2", SwitchPortMode::Access { vlan_id: 20 }).unwrap();
+        let _p3 = switch.add_port(br_id, "eth2", SwitchPortMode::Access { vlan_id: 20 }).unwrap();
 
         let mac_a = [0x00, 0x11, 0x22, 0x33, 0x44, 0x55];
         let mac_b = [0x00, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE];
