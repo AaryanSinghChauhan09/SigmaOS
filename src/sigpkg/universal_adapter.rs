@@ -2135,26 +2135,6 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "debian" | "ubuntu" | "fedora" | "rhel" | "centos" | "arch" | "manjaro"
-            | "cachy" | "cachyos" | "alpine" | "freebsd" | "openbsd" | "netbsd" | "bsd"
-            | "void" | "gentoo" | "portage" | "opensuse" | "suse" | "slackware" | "solus"
-            | "nixos" | "guixsd" => {
-                let mut i = 0;
-                while i < args.len() {
-                    match args[i] {
-                        "install" | "add" | "in" | "it" | "-S" | "-i" => operation = UniversalPmOperation::Install,
-                        "remove" | "delete" | "del" | "rm" | "erase" | "purge" | "-R" | "-r" => operation = UniversalPmOperation::Remove,
-                        "update" | "upgrade" | "up" | "-Syu" | "dist-upgrade" | "full-upgrade" => operation = UniversalPmOperation::Upgrade,
-                        "search" | "find" | "se" | "sr" | "-Ss" | "-Qs" => operation = UniversalPmOperation::Search,
-                        "info" | "show" | "status" | "query" | "-Si" | "-Qi" => operation = UniversalPmOperation::QueryInfo,
-                        "clean" | "autoclean" | "paccache" | "-Sc" | "-Scc" => operation = UniversalPmOperation::CleanCache,
-                        "-s" | "--dry-run" | "--simulate" | "-n" | "-p" | "--pretend" => dry_run = true,
-                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
-                        _ => {}
-                    }
-                    i += 1;
-                }
-            }
             "spack" | "conan" | "pip" | "cargo" | "gem" | "nuget" | "vcpkg" => {
                 let mut i = 0;
                 while i < args.len() {
@@ -2171,7 +2151,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pacman" | "yay" | "paru" | "pikaur" | "trizen" | "aura" | "arch" | "manjaro" | "cachyos" => {
+            "pacman" | "yay" | "paru" | "pikaur" | "trizen" | "aura" | "arch" | "manjaro" | "cachy" | "cachyos" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2237,7 +2217,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkg" | "pkgsend" | "freebsd" | "netbsd" | "openbsd" => {
+            "pkg" | "pkgsend" | "freebsd" | "netbsd" | "openbsd" | "bsd" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2275,7 +2255,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "emerge" | "ebuild" | "gentoo" => {
+            "emerge" | "ebuild" | "gentoo" | "portage" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2309,7 +2289,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "nix" | "nix-env" | "guix" | "nixos" => {
+            "nix" | "nix-env" | "guix" | "nixos" | "guixsd" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -3729,6 +3709,37 @@ mod tests {
             .unwrap();
         assert_eq!(slack_action.source_pm, "slackpkg");
         assert_eq!(slack_action.operation, UniversalPmOperation::Install);
+
+        // Verify direct distro command dispatching aliases for all requested distros
+        let debian_action = dispatcher.dispatch_command("debian install curl").unwrap();
+        assert_eq!(debian_action.operation, UniversalPmOperation::Install);
+
+        let ubuntu_action = dispatcher.dispatch_command("ubuntu remove vim").unwrap();
+        assert_eq!(ubuntu_action.operation, UniversalPmOperation::Remove);
+
+        let fedora_action = dispatcher.dispatch_command("fedora install git").unwrap();
+        assert_eq!(fedora_action.operation, UniversalPmOperation::Install);
+
+        let arch_action = dispatcher.dispatch_command("arch -S htop").unwrap();
+        assert_eq!(arch_action.operation, UniversalPmOperation::Install);
+
+        let alpine_action = dispatcher.dispatch_command("alpine add musl").unwrap();
+        assert_eq!(alpine_action.operation, UniversalPmOperation::Install);
+
+        let void_action = dispatcher.dispatch_command("void install xbps").unwrap();
+        assert_eq!(void_action.operation, UniversalPmOperation::Install);
+
+        let gentoo_action = dispatcher.dispatch_command("gentoo @world").unwrap();
+        assert_eq!(gentoo_action.operation, UniversalPmOperation::Upgrade);
+
+        let solus_action = dispatcher.dispatch_command("solus it eopkg").unwrap();
+        assert_eq!(solus_action.operation, UniversalPmOperation::Install);
+
+        let nixos_action = dispatcher.dispatch_command("nixos install nix").unwrap();
+        assert_eq!(nixos_action.operation, UniversalPmOperation::Install);
+
+        let slackware_action = dispatcher.dispatch_command("slackware install kernel").unwrap();
+        assert_eq!(slackware_action.operation, UniversalPmOperation::Install);
     }
 
 
