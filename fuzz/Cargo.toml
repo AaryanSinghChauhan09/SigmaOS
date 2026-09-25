@@ -18,3 +18,9 @@ name = "fuzz_package_parser"
 path = "fuzz_targets/fuzz_package_parser.rs"
 test = false
 doc = false
+
+[[bin]]
+name = "ipc_parser"
+path = "fuzz_targets/ipc_parser.rs"
+test = false
+doc = false
