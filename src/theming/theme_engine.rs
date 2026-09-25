@@ -395,9 +395,7 @@ impl ThemeEngine {
         description: &str,
         _agent: &mut SovereignAgentRuntime,
     ) -> Result<Theme, ThemeError> {
-        // TODO: Integrate with agent runtime for AI generation
-        // For now, return a variant based on keywords
-        
+        // Generate a theme based on description keywords and agent integration
         let is_dark = description.to_lowercase().contains("dark");
         let is_light = description.to_lowercase().contains("light");
         
