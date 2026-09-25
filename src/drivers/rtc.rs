@@ -293,6 +293,44 @@ impl DateTime {
     pub fn format_date(&self) -> String {
         format!("{:04}-{:02}-{:02}", self.year, self.month, self.day)
     }
+
+    /// Construct DateTime from Unix timestamp (seconds since 1970-01-01 00:00:00 UTC)
+    pub fn from_unix_timestamp(ts: u64) -> Self {
+        let seconds = (ts % 60) as u8;
+        let minutes = ((ts / 60) % 60) as u8;
+        let hours = ((ts / 3600) % 24) as u8;
+        let mut total_days = ts / 86400;
+
+        let mut year = 1970u16;
+        loop {
+            let days_in_year = if (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0) {
+                366
+            } else {
+                365
+            };
+            if total_days < days_in_year {
+                break;
+            }
+            total_days -= days_in_year;
+            year += 1;
+        }
+
+        let is_leap = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+        let days_per_month = [31, if is_leap { 29 } else { 28 }, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+        let mut month = 1u8;
+        for &m_days in &days_per_month {
+            if total_days < m_days as u64 {
+                break;
+            }
+            total_days -= m_days as u64;
+            month += 1;
+        }
+
+        let day = (total_days + 1) as u8;
+
+        Self::new(year, month, day, hours, minutes, seconds)
+    }
 }
 
 impl fmt::Display for DateTime {
@@ -655,6 +693,13 @@ mod tests {
         // 2000-01-01 00:00:00 UTC = 946684800
         let dt = DateTime::new(2000, 1, 1, 0, 0, 0);
         assert_eq!(dt.to_unix_timestamp(), 946684800);
+        let dt2 = DateTime::from_unix_timestamp(946684800);
+        assert_eq!(dt2.year, 2000);
+        assert_eq!(dt2.month, 1);
+        assert_eq!(dt2.day, 1);
+        assert_eq!(dt2.hours, 0);
+        assert_eq!(dt2.minutes, 0);
+        assert_eq!(dt2.seconds, 0);
     }
 
     #[test]
