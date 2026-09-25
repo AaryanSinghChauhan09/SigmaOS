@@ -4,6 +4,14 @@
 
 pub const MAX_TMPFS_INODES: usize = 32;
 
+/// Linux & BSD standard "50% rule" ratio for default tmpfs maximum RAM size allocation
+pub const TMPFS_DEFAULT_RAM_50_PERCENT_RATIO: f32 = 0.50;
+
+/// Compute default 50% physical RAM memory boundary for tmpfs mounts
+pub fn calculate_50_percent_ram_default(total_ram_bytes: usize) -> usize {
+    ((total_ram_bytes as f64) * (TMPFS_DEFAULT_RAM_50_PERCENT_RATIO as f64)) as usize
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TmpfsFileType {
     Regular,

@@ -12,6 +12,7 @@ pub mod irp_system;
 pub mod mapper;
 pub mod network_framework;
 pub mod nic_intel_e1000;
+pub mod nic_realtek_rtl8169;
 pub mod nvme_storage;
 pub mod pci_bus;
 pub mod pci_enumeration;
@@ -21,6 +22,7 @@ pub mod shims;
 pub mod ubuntu_common_drivers;
 pub mod vault;
 pub mod wifi_broadcom_bcm4318;
+pub mod wifi_intel_iwlwifi;
 
 pub use grid::{GridSlotType, PeripheralArchiveGrid};
 pub use driver_test_framework::{
@@ -37,11 +39,17 @@ pub use mapper::{DriverMapper, MapperCategory};
 pub use nic_intel_e1000::{
     IntelNicDriver, IntelNicPciDriver, DmaRing, RxDescriptor, TxDescriptor,
 };
+pub use nic_realtek_rtl8169::{
+    RealtekNicDriver, RealtekRtl8169PciDriver,
+};
 pub use nvme_storage::{
     NvmeController, NvmePciDriver, NvmeNamespace, QueuePair, NvmeCompletionEntry,
 };
 pub use wifi_broadcom_bcm4318::{
     BroadcomWifiDriver, BroadcomWifiPciDriver, WifiStandard, Band, AssociationState,
+};
+pub use wifi_intel_iwlwifi::{
+    IntelIwlwifiDriver, IntelIwlwifiPciDriver,
 };
 pub use pci_bus::{
     PciAddress, PciBarInfo, PciBarType, PciBusManager, PciDeviceNode, PciDriverMatchRule,

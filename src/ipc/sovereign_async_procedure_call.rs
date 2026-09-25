@@ -37,6 +37,26 @@ pub enum AsyncCancellationType {
     Asynchronous, // PTHREAD_CANCEL_ASYNCHRONOUS (immediate termination)
 }
 
+/// Priority level for Kernel Async Procedure Calls (Linux POSIX signal, FreeBSD `ast()`, NT Kernel APC)
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum KernelApcPriority {
+    UserMode = 0,
+    Normal = 1,
+    SpecialKernel = 2,
+    HighPriority = 3,
+}
+
+/// Enqueued Kernel/User Async Procedure Entry targeted at specific thread/process
+#[derive(Debug, Clone)]
+pub struct KernelApcEntry {
+    pub apc_id: u64,
+    pub target_thread_id: u64,
+    pub priority: KernelApcPriority,
+    pub routine_name: String,
+    pub payload: Vec<u8>,
+    pub is_kernel_mode: bool,
+}
+
 /// Cancellation Token for tracked async procedures & write operations
 #[derive(Debug, Clone)]
 pub struct SovereignCancellationToken {
@@ -99,6 +119,7 @@ pub struct SovereignAsyncProcedureCallEngine {
     pub routines: HashMap<String, SovereignApcRoutine>,
     pub pending_messages: Vec<SovereignApcMessage>,
     pub active_writes: HashMap<u64, SovereignAsyncWriteOp>,
+    pub kernel_apc_queue: Vec<KernelApcEntry>,
     pub next_id: u64,
     pub total_apcs_dispatched: u64,
     pub total_cancellations: u64,
@@ -111,10 +132,67 @@ impl SovereignAsyncProcedureCallEngine {
             routines: HashMap::new(),
             pending_messages: Vec::new(),
             active_writes: HashMap::new(),
+            kernel_apc_queue: Vec::new(),
             next_id: 1,
             total_apcs_dispatched: 0,
             total_cancellations: 0,
         }
+    }
+
+    /// Queue a targeted Kernel/User Async Procedure Call for a specific thread ID
+    pub fn queue_kernel_apc(
+        &mut self,
+        target_thread_id: u64,
+        priority: KernelApcPriority,
+        routine_name: &str,
+        payload: Vec<u8>,
+        is_kernel_mode: bool,
+    ) -> u64 {
+        let apc_id = self.next_id;
+        self.next_id += 1;
+
+        let entry = KernelApcEntry {
+            apc_id,
+            target_thread_id,
+            priority,
+            routine_name: routine_name.to_string(),
+            payload,
+            is_kernel_mode,
+        };
+
+        self.kernel_apc_queue.push(entry);
+        // Maintain priority ordering (highest priority first)
+        self.kernel_apc_queue.sort_by(|a, b| b.priority.cmp(&a.priority));
+
+        self.total_apcs_dispatched += 1;
+        apc_id
+    }
+
+    /// Deliver and execute targeted APCs for a specific thread ID upon context switch or interrupt exit
+    pub fn deliver_thread_apcs(&mut self, target_thread_id: u64) -> Vec<(u64, Result<Vec<u8>, String>)> {
+        let mut results = Vec::new();
+        let mut remaining = Vec::new();
+
+        let queue = core::mem::take(&mut self.kernel_apc_queue);
+
+        for entry in queue {
+            if entry.target_thread_id == target_thread_id {
+                if let Some(routine) = self.routines.get(&entry.routine_name) {
+                    let res = (routine.handler)(&entry.payload);
+                    results.push((entry.apc_id, res));
+                } else {
+                    results.push((
+                        entry.apc_id,
+                        Err(format!("Routine '{}' not found", entry.routine_name)),
+                    ));
+                }
+            } else {
+                remaining.push(entry);
+            }
+        }
+
+        self.kernel_apc_queue = remaining;
+        results
     }
 
     /// Register a named Async Procedure Call (APC) handler
@@ -301,6 +379,35 @@ mod apc_tests {
 
         let results = engine.process_pending_apcs();
         assert_eq!(results.len(), 0); // Removed from pending
+    }
+
+    #[test]
+    fn test_kernel_apc_priority_queueing_and_thread_delivery() {
+        let mut engine = SovereignAsyncProcedureCallEngine::new();
+
+        engine.register_procedure("sys_signal_handler", |input| {
+            Ok(b"sig_handled".to_vec())
+        });
+
+        // Queue normal user APC for Thread 42
+        let apc1 = engine.queue_kernel_apc(42, KernelApcPriority::UserMode, "sys_signal_handler", b"user".to_vec(), false);
+        // Queue high priority kernel APC for Thread 42
+        let apc2 = engine.queue_kernel_apc(42, KernelApcPriority::HighPriority, "sys_signal_handler", b"kernel".to_vec(), true);
+        // Queue APC for Thread 99
+        let apc3 = engine.queue_kernel_apc(99, KernelApcPriority::Normal, "sys_signal_handler", b"other".to_vec(), false);
+
+        // Deliver thread APCs for Thread 42
+        let delivered_42 = engine.deliver_thread_apcs(42);
+        assert_eq!(delivered_42.len(), 2);
+        // High priority APC delivered first
+        assert_eq!(delivered_42[0].0, apc2);
+        assert_eq!(delivered_42[1].0, apc1);
+
+        // Verify Thread 99 APC remains queued
+        assert_eq!(engine.kernel_apc_queue.len(), 1);
+        let delivered_99 = engine.deliver_thread_apcs(99);
+        assert_eq!(delivered_99.len(), 1);
+        assert_eq!(delivered_99[0].0, apc3);
     }
 
     #[test]

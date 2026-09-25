@@ -7,12 +7,18 @@
 pub mod append_rights;
 pub mod control;
 
+#[cfg(feature = "standalone_test")]
+#[path = "../filesystem/ext4_ntfs_security.rs"]
+pub mod ext4_ntfs_security;
+
 #[cfg(not(feature = "standalone_test"))]
 pub use crate::filesystem::ext4_ntfs_security::{
     NtfsAce, NtfsDacl, NtfsSacl, NtfsSecurityDescriptor,
 };
 #[cfg(not(feature = "standalone_test"))]
 pub use crate::filesystem::ext4_ntfs_security::*;
+#[cfg(feature = "standalone_test")]
+pub use ext4_ntfs_security::*;
 
 pub use control::{
     AccessControlMatrix, AclEntry, AclTag, AclType, CapBoundingSet, DacPermission, FilterPolicy,

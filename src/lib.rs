@@ -74,6 +74,7 @@ pub mod access;
 pub mod open_source_os_gap_closure;
 pub mod tools;
 pub use open_source_os_gap_closure::*;
+pub use kernel::tss_ring3_user_mode::*;
 pub use tools::tech_media_extended_suite::*;
 pub use distro::sovereign_linux_bsd_master_synthesis::*;
 pub use distro::additional_linux_bsd_components::*;
