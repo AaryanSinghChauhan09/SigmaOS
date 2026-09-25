@@ -2583,6 +2583,660 @@ impl Default for SovereignManufacturingMrpEngine {
     }
 }
 
+// ==========================================================
+// 22. Google Vids / AI Video Presentation Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct VidScene {
+    pub scene_id: u32,
+    pub title: String,
+    pub script_narration: String,
+    pub duration_seconds: u32,
+    pub layout: String,
+}
+
+/// Google Vids inspired AI Video Presentation & Storyboard Engine
+pub struct SovereignVidsPresentationEngine {
+    pub video_title: String,
+    pub scenes: Vec<VidScene>,
+    pub next_id: u32,
+}
+
+impl SovereignVidsPresentationEngine {
+    pub fn new(title: &str) -> Self {
+        Self {
+            video_title: title.to_string(),
+            scenes: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn add_scene(&mut self, title: &str, narration: &str, duration_sec: u32, layout: &str) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.scenes.push(VidScene {
+            scene_id: id,
+            title: title.to_string(),
+            script_narration: narration.to_string(),
+            duration_seconds: duration_sec,
+            layout: layout.to_string(),
+        });
+        id
+    }
+
+    pub fn calculate_total_runtime_seconds(&self) -> u32 {
+        self.scenes.iter().map(|s| s.duration_seconds).sum()
+    }
+}
+
+// ==========================================================
+// 23. Google Apps Script Trigger & Quota Engine
+// ==========================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ScriptTriggerEvent {
+    OnOpen,
+    OnEdit,
+    OnFormSubmit,
+    TimeDrivenCron(String),
+}
+
+#[derive(Debug, Clone)]
+pub struct ScriptExecutionRecord {
+    pub script_id: u32,
+    pub trigger_type: ScriptTriggerEvent,
+    pub timestamp: u64,
+    pub success: bool,
+}
+
+pub struct SovereignAppsScriptTriggerEngine {
+    pub daily_quota_max: u32,
+    pub executed_today: u32,
+    pub execution_history: Vec<ScriptExecutionRecord>,
+}
+
+impl SovereignAppsScriptTriggerEngine {
+    pub fn new(daily_quota: u32) -> Self {
+        Self {
+            daily_quota_max: daily_quota,
+            executed_today: 0,
+            execution_history: Vec::new(),
+        }
+    }
+
+    pub fn trigger_script(&mut self, script_id: u32, event: ScriptTriggerEvent) -> Result<bool> {
+        if self.executed_today >= self.daily_quota_max {
+            return Err("Daily Apps Script execution quota exceeded");
+        }
+        self.executed_today += 1;
+        self.execution_history.push(ScriptExecutionRecord {
+            script_id,
+            trigger_type: event,
+            timestamp: 1000 + self.executed_today as u64,
+            success: true,
+        });
+        Ok(true)
+    }
+}
+
+// ==========================================================
+// 24. Google Workspace Smart Canvas & Smart Chips Engine
+// ==========================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum SmartChipType {
+    PeopleChip { user_email: String, display_name: String },
+    FileChip { file_id: String, file_title: String },
+    DateChip { iso_date: String },
+    StatusChip { status_label: String, color_hex: String },
+    TaskChip { task_id: u32, assigned_user: String },
+}
+
+#[derive(Debug, Clone)]
+pub struct SmartChipNode {
+    pub chip_id: u32,
+    pub chip_type: SmartChipType,
+}
+
+pub struct SovereignSmartCanvasEngine {
+    pub chips: Vec<SmartChipNode>,
+    pub next_id: u32,
+}
+
+impl SovereignSmartCanvasEngine {
+    pub fn new() -> Self {
+        Self {
+            chips: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn insert_chip(&mut self, chip_type: SmartChipType) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.chips.push(SmartChipNode {
+            chip_id: id,
+            chip_type,
+        });
+        id
+    }
+
+    pub fn render_chip_tag(&self, chip_id: u32) -> Option<String> {
+        self.chips.iter().find(|c| c.chip_id == chip_id).map(|c| match &c.chip_type {
+            SmartChipType::PeopleChip { display_name, .. } => format!("@{}", display_name),
+            SmartChipType::FileChip { file_title, .. } => format!("[Doc: {}]", file_title),
+            SmartChipType::DateChip { iso_date } => format!("[Date: {}]", iso_date),
+            SmartChipType::StatusChip { status_label, .. } => format!("[Status: {}]", status_label),
+            SmartChipType::TaskChip { task_id, assigned_user } => format!("[Task #{}: {}]", task_id, assigned_user),
+        })
+    }
+}
+
+impl Default for SovereignSmartCanvasEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 25. Microsoft Visio Diagramming & UML Engine
+// ==========================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DiagramNodeType {
+    ProcessStep,
+    DecisionPoint,
+    StartEndNode,
+    UmlClass { class_name: String },
+    BpmnSwimlane { lane_name: String },
+}
+
+#[derive(Debug, Clone)]
+pub struct DiagramNode {
+    pub node_id: u32,
+    pub node_type: DiagramNodeType,
+    pub label: String,
+    pub position: (f32, f32),
+}
+
+#[derive(Debug, Clone)]
+pub struct DiagramConnector {
+    pub connector_id: u32,
+    pub from_node_id: u32,
+    pub to_node_id: u32,
+    pub line_label: String,
+}
+
+pub struct SovereignVisioDiagrammingEngine {
+    pub diagram_title: String,
+    pub nodes: Vec<DiagramNode>,
+    pub connectors: Vec<DiagramConnector>,
+    pub next_id: u32,
+}
+
+impl SovereignVisioDiagrammingEngine {
+    pub fn new(title: &str) -> Self {
+        Self {
+            diagram_title: title.to_string(),
+            nodes: Vec::new(),
+            connectors: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn add_node(&mut self, node_type: DiagramNodeType, label: &str, pos: (f32, f32)) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.nodes.push(DiagramNode {
+            node_id: id,
+            node_type,
+            label: label.to_string(),
+            position: pos,
+        });
+        id
+    }
+
+    pub fn connect_nodes(&mut self, from: u32, to: u32, line_label: &str) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.connectors.push(DiagramConnector {
+            connector_id: id,
+            from_node_id: from,
+            to_node_id: to,
+            line_label: line_label.to_string(),
+        });
+        id
+    }
+}
+
+// ==========================================================
+// 26. Microsoft Publisher / DTP Desktop Publishing Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct DtpPageLayout {
+    pub page_number: u32,
+    pub width_mm: f32,
+    pub height_mm: f32,
+    pub bleed_mm: f32,
+    pub columns_count: u32,
+    pub cmyk_color_mode: bool,
+}
+
+pub struct SovereignPublisherDtpEngine {
+    pub publication_title: String,
+    pub pages: Vec<DtpPageLayout>,
+}
+
+impl SovereignPublisherDtpEngine {
+    pub fn new(title: &str) -> Self {
+        Self {
+            publication_title: title.to_string(),
+            pages: Vec::new(),
+        }
+    }
+
+    pub fn add_page(&mut self, width_mm: f32, height_mm: f32, bleed: f32, cols: u32) -> u32 {
+        let p_num = (self.pages.len() as u32) + 1;
+        self.pages.push(DtpPageLayout {
+            page_number: p_num,
+            width_mm,
+            height_mm,
+            bleed_mm: bleed,
+            columns_count: cols,
+            cmyk_color_mode: true,
+        });
+        p_num
+    }
+}
+
+// ==========================================================
+// 27. Microsoft Loop / Portable Live-Sync Component Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct LoopComponent {
+    pub component_id: String,
+    pub title: String,
+    pub shared_data_json: String,
+    pub revision_seq: u64,
+}
+
+pub struct SovereignLoopPortableComponentEngine {
+    pub components: HashMap<String, LoopComponent>,
+}
+
+impl SovereignLoopPortableComponentEngine {
+    pub fn new() -> Self {
+        Self {
+            components: HashMap::new(),
+        }
+    }
+
+    pub fn register_component(&mut self, id: &str, title: &str, initial_json: &str) {
+        self.components.insert(
+            id.to_string(),
+            LoopComponent {
+                component_id: id.to_string(),
+                title: title.to_string(),
+                shared_data_json: initial_json.to_string(),
+                revision_seq: 1,
+            },
+        );
+    }
+
+    pub fn update_component_state(&mut self, id: &str, new_json: &str) -> Result<u64> {
+        if let Some(comp) = self.components.get_mut(id) {
+            comp.shared_data_json = new_json.to_string();
+            comp.revision_seq += 1;
+            Ok(comp.revision_seq)
+        } else {
+            Err("Loop component not found")
+        }
+    }
+}
+
+impl Default for SovereignLoopPortableComponentEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 28. Zoho Books / Tax & GST Multi-Entity Accounting Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct JournalEntryLine {
+    pub account_code: String,
+    pub debit_amount: f64,
+    pub credit_amount: f64,
+    pub tax_rate_percentage: f64,
+}
+
+#[derive(Debug, Clone)]
+pub struct MultiEntityJournalTransaction {
+    pub txn_id: u32,
+    pub entity_name: String,
+    pub lines: Vec<JournalEntryLine>,
+    pub timestamp: u64,
+}
+
+pub struct SovereignTaxGstAccountingEngine {
+    pub transactions: Vec<MultiEntityJournalTransaction>,
+    pub next_id: u32,
+}
+
+impl SovereignTaxGstAccountingEngine {
+    pub fn new() -> Self {
+        Self {
+            transactions: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn post_transaction(&mut self, entity: &str, lines: Vec<JournalEntryLine>) -> Result<u32> {
+        let debits: f64 = lines.iter().map(|l| l.debit_amount).sum();
+        let credits: f64 = lines.iter().map(|l| l.credit_amount).sum();
+        if (debits - credits).abs() > 0.001 {
+            return Err("Unbalanced debits and credits in journal entry");
+        }
+        let id = self.next_id;
+        self.next_id += 1;
+        self.transactions.push(MultiEntityJournalTransaction {
+            txn_id: id,
+            entity_name: entity.to_string(),
+            lines,
+            timestamp: 1000 + id as u64,
+        });
+        Ok(id)
+    }
+
+    pub fn calculate_total_tax_collected(&self, entity: &str) -> f64 {
+        self.transactions
+            .iter()
+            .filter(|t| t.entity_name == entity)
+            .flat_map(|t| &t.lines)
+            .map(|l| l.credit_amount * (l.tax_rate_percentage / 100.0))
+            .sum()
+    }
+}
+
+impl Default for SovereignTaxGstAccountingEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 29. Salesforce Service Cloud / Knowledge & SLA Escalation Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct KnowledgeArticle {
+    pub article_id: u32,
+    pub title: String,
+    pub body: String,
+    pub tags: Vec<String>,
+}
+
+pub struct SovereignServiceCloudKnowledgeEngine {
+    pub articles: Vec<KnowledgeArticle>,
+    pub next_id: u32,
+}
+
+impl SovereignServiceCloudKnowledgeEngine {
+    pub fn new() -> Self {
+        Self {
+            articles: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn add_article(&mut self, title: &str, body: &str, tags: Vec<String>) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.articles.push(KnowledgeArticle {
+            article_id: id,
+            title: title.to_string(),
+            body: body.to_string(),
+            tags,
+        });
+        id
+    }
+
+    pub fn search_knowledge_base(&self, query_tag: &str) -> Vec<&KnowledgeArticle> {
+        self.articles
+            .iter()
+            .filter(|a| a.tags.iter().any(|t| t.eq_ignore_ascii_case(query_tag)))
+            .collect()
+    }
+}
+
+impl Default for SovereignServiceCloudKnowledgeEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 30. Salesforce CPQ (Configure, Price, Quote) Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct CpqProductBundleItem {
+    pub product_sku: String,
+    pub unit_price: f64,
+    pub quantity: u32,
+    pub volume_discount_tier_percent: f64,
+}
+
+pub struct SovereignCpqEngine {
+    pub quote_title: String,
+    pub items: Vec<CpqProductBundleItem>,
+}
+
+impl SovereignCpqEngine {
+    pub fn new(quote_title: &str) -> Self {
+        Self {
+            quote_title: quote_title.to_string(),
+            items: Vec::new(),
+        }
+    }
+
+    pub fn add_bundle_item(&mut self, sku: &str, unit_price: f64, qty: u32) {
+        let discount = if qty >= 100 {
+            20.0
+        } else if qty >= 10 {
+            10.0
+        } else {
+            0.0
+        };
+        self.items.push(CpqProductBundleItem {
+            product_sku: sku.to_string(),
+            unit_price,
+            quantity: qty,
+            volume_discount_tier_percent: discount,
+        });
+    }
+
+    pub fn calculate_total_quote_value(&self) -> f64 {
+        self.items.iter().map(|item| {
+            let gross = item.unit_price * (item.quantity as f64);
+            gross * (1.0 - (item.volume_discount_tier_percent / 100.0))
+        }).sum()
+    }
+}
+
+// ==========================================================
+// 31. Odoo POS & Kitchen Display System (KDS) Engine
+// ==========================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum KdsTicketStatus {
+    Received,
+    InPreparation,
+    ReadyForService,
+    Served,
+}
+
+#[derive(Debug, Clone)]
+pub struct PosOrderItem {
+    pub item_name: String,
+    pub qty: u32,
+}
+
+#[derive(Debug, Clone)]
+pub struct KdsOrderTicket {
+    pub ticket_id: u32,
+    pub table_number: u32,
+    pub items: Vec<PosOrderItem>,
+    pub status: KdsTicketStatus,
+}
+
+pub struct SovereignPosKitchenDisplayEngine {
+    pub tickets: Vec<KdsOrderTicket>,
+    pub next_id: u32,
+}
+
+impl SovereignPosKitchenDisplayEngine {
+    pub fn new() -> Self {
+        Self {
+            tickets: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn place_order(&mut self, table_num: u32, items: Vec<PosOrderItem>) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.tickets.push(KdsOrderTicket {
+            ticket_id: id,
+            table_number: table_num,
+            items,
+            status: KdsTicketStatus::Received,
+        });
+        id
+    }
+
+    pub fn update_ticket_status(&mut self, ticket_id: u32, status: KdsTicketStatus) -> bool {
+        if let Some(t) = self.tickets.iter_mut().find(|t| t.ticket_id == ticket_id) {
+            t.status = status;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for SovereignPosKitchenDisplayEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 32. Bitrix24 PBX Telephony & Call Center Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct CallLogEntry {
+    pub call_id: u32,
+    pub caller_number: String,
+    pub agent_extension: String,
+    pub duration_seconds: u32,
+    pub ivr_path_selected: String,
+}
+
+pub struct SovereignPbxCallCenterEngine {
+    pub call_logs: Vec<CallLogEntry>,
+    pub next_id: u32,
+}
+
+impl SovereignPbxCallCenterEngine {
+    pub fn new() -> Self {
+        Self {
+            call_logs: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn record_call(&mut self, caller: &str, ext: &str, duration: u32, ivr: &str) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.call_logs.push(CallLogEntry {
+            call_id: id,
+            caller_number: caller.to_string(),
+            agent_extension: ext.to_string(),
+            duration_seconds: duration,
+            ivr_path_selected: ivr.to_string(),
+        });
+        id
+    }
+}
+
+impl Default for SovereignPbxCallCenterEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 33. Odoo Fleet & Field Service Management Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct FieldServiceJob {
+    pub job_id: u32,
+    pub vehicle_license_plate: String,
+    pub technician_name: String,
+    pub location_geofence: String,
+    pub completed: bool,
+}
+
+pub struct SovereignFleetFieldServiceEngine {
+    pub jobs: Vec<FieldServiceJob>,
+    pub next_id: u32,
+}
+
+impl SovereignFleetFieldServiceEngine {
+    pub fn new() -> Self {
+        Self {
+            jobs: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn dispatch_technician(&mut self, plate: &str, tech: &str, geofence: &str) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.jobs.push(FieldServiceJob {
+            job_id: id,
+            vehicle_license_plate: plate.to_string(),
+            technician_name: tech.to_string(),
+            location_geofence: geofence.to_string(),
+            completed: false,
+        });
+        id
+    }
+
+    pub fn complete_job(&mut self, job_id: u32) -> bool {
+        if let Some(j) = self.jobs.iter_mut().find(|j| j.job_id == job_id) {
+            j.completed = true;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for SovereignFleetFieldServiceEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // Placeholder types for compilation
 mod sigma_types {
     pub type Result<T> = core::result::Result<T, &'static str>;
@@ -2997,5 +3651,81 @@ mod tests {
             BomComponent { component_sku: "RAM".to_string(), quantity_required: 2.0, unit_cost: 50.0 },
         ]);
         assert_eq!(mrp.calculate_bom_unit_cost(bom_id), 300.0);
+    }
+
+    #[test]
+    fn test_suite_innovations_google_ms_zoho_salesforce_odoo_bitrix() {
+        // 1. Google Vids
+        let mut vids = SovereignVidsPresentationEngine::new("AI Product Demo");
+        let scene_id = vids.add_scene("Intro Scene", "Welcome to SigmaOS Vids", 15, "TwoColumn");
+        assert_eq!(scene_id, 1);
+        assert_eq!(vids.calculate_total_runtime_seconds(), 15);
+
+        // 2. Google Apps Script Trigger
+        let mut script_engine = SovereignAppsScriptTriggerEngine::new(50);
+        assert!(script_engine.trigger_script(101, ScriptTriggerEvent::OnEdit).unwrap());
+        assert_eq!(script_engine.executed_today, 1);
+
+        // 3. Google Smart Canvas
+        let mut canvas = SovereignSmartCanvasEngine::new();
+        let chip_id = canvas.insert_chip(SmartChipType::PeopleChip {
+            user_email: "alice@sigmaos.org".to_string(),
+            display_name: "Alice Engine Lead".to_string(),
+        });
+        assert_eq!(canvas.render_chip_tag(chip_id), Some("@Alice Engine Lead".to_string()));
+
+        // 4. Microsoft Visio Diagramming
+        let mut visio = SovereignVisioDiagrammingEngine::new("Kernel IPC Architecture");
+        let n1 = visio.add_node(DiagramNodeType::StartEndNode, "Userland Process", (10.0, 10.0));
+        let n2 = visio.add_node(DiagramNodeType::ProcessStep, "Syscall Handler", (10.0, 50.0));
+        let c_id = visio.connect_nodes(n1, n2, "Fast Trampoline");
+        assert_eq!(c_id, 3);
+
+        // 5. Microsoft Publisher DTP
+        let mut publisher = SovereignPublisherDtpEngine::new("SigmaOS Quarterly Magazine");
+        let p_num = publisher.add_page(210.0, 297.0, 3.0, 3);
+        assert_eq!(p_num, 1);
+
+        // 6. Microsoft Loop
+        let mut loop_engine = SovereignLoopPortableComponentEngine::new();
+        loop_engine.register_component("loop-101", "Action Items Table", "{\"status\": \"active\"}");
+        let seq = loop_engine.update_component_state("loop-101", "{\"status\": \"completed\"}").unwrap();
+        assert_eq!(seq, 2);
+
+        // 7. Zoho Books Tax & GST
+        let mut gst_engine = SovereignTaxGstAccountingEngine::new();
+        let txn_id = gst_engine.post_transaction("SigmaOS Corp", vec![
+            JournalEntryLine { account_code: "1000".to_string(), debit_amount: 1000.0, credit_amount: 0.0, tax_rate_percentage: 0.0 },
+            JournalEntryLine { account_code: "2000".to_string(), debit_amount: 0.0, credit_amount: 1000.0, tax_rate_percentage: 18.0 },
+        ]).unwrap();
+        assert_eq!(txn_id, 1);
+        assert_eq!(gst_engine.calculate_total_tax_collected("SigmaOS Corp"), 180.0);
+
+        // 8. Salesforce Service Cloud Knowledge
+        let mut service_cloud = SovereignServiceCloudKnowledgeEngine::new();
+        let art_id = service_cloud.add_article("Sovereign Sandboxing", "Pledge and unveil enforcement...", vec!["sandbox".to_string(), "security".to_string()]);
+        assert_eq!(art_id, 1);
+        assert_eq!(service_cloud.search_knowledge_base("sandbox").len(), 1);
+
+        // 9. Salesforce CPQ
+        let mut cpq = SovereignCpqEngine::new("Enterprise Deal Quote");
+        cpq.add_bundle_item("SIGMA-ENT-LIC", 500.0, 50);
+        let total = cpq.calculate_total_quote_value();
+        assert!((total - 22500.0).abs() < 1e-4); // 50 * 500 * (1 - 0.10)
+
+        // 10. Odoo POS & Kitchen Display System
+        let mut kds = SovereignPosKitchenDisplayEngine::new();
+        let t_id = kds.place_order(12, vec![PosOrderItem { item_name: "Coffee".to_string(), qty: 2 }]);
+        assert!(kds.update_ticket_status(t_id, KdsTicketStatus::ReadyForService));
+
+        // 11. Bitrix24 PBX Telephony
+        let mut pbx = SovereignPbxCallCenterEngine::new();
+        let call_id = pbx.record_call("+15550199", "EXT-104", 120, "Sales -> Representative");
+        assert_eq!(call_id, 1);
+
+        // 12. Odoo Fleet & Field Service
+        let mut fleet = SovereignFleetFieldServiceEngine::new();
+        let job_id = fleet.dispatch_technician("SIGMA-01", "Tech Bob", "Zone-A");
+        assert!(fleet.complete_job(job_id));
     }
 }
