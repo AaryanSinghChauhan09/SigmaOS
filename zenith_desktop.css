@@ -279,6 +279,17 @@ body {
 .window.active-focus {
     border-color: var(--border-bright);
     box-shadow: 0 35px 70px rgba(0, 0, 0, 0.7), 0 0 30px var(--accent-gold-glow);
+    opacity: 1;
+    transform: scale(1);
+}
+
+.window.maximized {
+    top: 50px !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: calc(100vh - 120px) !important;
+    border-radius: 0 !important;
+    transform: none !important;
 }
 
 .window-header {
