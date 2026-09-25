@@ -115,9 +115,18 @@ pub enum UniversalPackageFormatKind {
     RubyGem,
     DotnetNuget,
     HomebrewBottle,
+    AdobeAir,
+    AppleIpa,
+    MacOsApp,
+    SlaxLzm,
+    PuppyPup,
+    PuppyPet,
 
     // Core System & Fallback
     SigmaNativePkg,
+    GenericTarGz,
+    GenericTarXz,
+    GenericTar,
     GenericTarball,
 }
 
@@ -179,7 +188,16 @@ impl UniversalPackageFormatKind {
             Self::RubyGem => "Ruby Gem (.gem)",
             Self::DotnetNuget => ".NET NuGet Package (.nupkg)",
             Self::HomebrewBottle => "Homebrew Bottle (.bottle)",
+            Self::AdobeAir => "Adobe AIR App (.air)",
+            Self::AppleIpa => "iOS App Package (.ipa)",
+            Self::MacOsApp => "macOS App Bundle (.app)",
+            Self::SlaxLzm => "Slax LZM Module (.lzm)",
+            Self::PuppyPup => "Puppy Linux PUP (.pup)",
+            Self::PuppyPet => "Puppy Linux PET (.pet)",
             Self::SigmaNativePkg => "SigmaOS Native Merkle SigPkg (.sigpkg)",
+            Self::GenericTarGz => "Gzip Compressed Tarball (.tar.gz / .tgz)",
+            Self::GenericTarXz => "XZ Compressed Tarball (.tar.xz / .xz)",
+            Self::GenericTar => "Plain Tar Archive (.tar)",
             Self::GenericTarball => "Generic Compressed Tarball (.tar.gz)",
         }
     }
@@ -187,114 +205,132 @@ impl UniversalPackageFormatKind {
     /// Detect package format kind from filename extension and path hints
     pub fn from_filename(filename: &str) -> Self {
         let lower = filename.to_lowercase();
+        let trimmed = lower.trim();
+        let normalized = trimmed.replace(' ', "");
 
-        if lower.ends_with(".apex") {
+        if normalized.ends_with(".apex") {
             Self::AndroidApex
-        } else if lower.ends_with(".flatpakref") {
+        } else if normalized.ends_with(".flatpakref") {
             Self::FlatpakRef
-        } else if lower.ends_with(".flatpak") {
+        } else if normalized.ends_with(".flatpak") {
             Self::FlatpakApp
-        } else if lower.ends_with(".snap") {
+        } else if normalized.ends_with(".snap") {
             Self::UbuntuSnap
-        } else if lower.ends_with(".appimage") {
+        } else if normalized.ends_with(".appimage") {
             Self::AppImageExec
-        } else if lower.ends_with(".deb") {
+        } else if normalized.ends_with(".deb") {
             Self::DebianDeb
-        } else if lower.ends_with(".udeb") {
+        } else if normalized.ends_with(".udeb") {
             Self::DebianUdeb
-        } else if lower.ends_with(".superdeb") {
+        } else if normalized.ends_with(".superdeb") {
             Self::DeepinSuperdeb
-        } else if lower.ends_with(".drpm") {
+        } else if normalized.ends_with(".drpm") {
             Self::DeltaRpm
-        } else if lower.ends_with(".rpm") {
+        } else if normalized.ends_with(".rpm") {
             Self::FedoraRpm
-        } else if lower.ends_with(".zypper") {
+        } else if normalized.ends_with(".zypper") {
             Self::OpenSuseZypper
-        } else if lower.ends_with(".pkg.tar.zst") || lower.ends_with(".pkg.tar.xz") || lower.ends_with(".pkg.tar.gz") {
+        } else if normalized.ends_with(".pkg.tar.zst") || normalized.ends_with(".pkg.tar.xz") || normalized.ends_with(".pkg.tar.gz") {
             Self::ArchPacman
-        } else if lower.ends_with(".cachy") || lower.ends_with(".cachyos") {
+        } else if normalized.ends_with(".cachy") || normalized.ends_with(".cachyos") {
             Self::CachyOsPkg
-        } else if lower.ends_with(".aur") {
+        } else if normalized.ends_with(".aur") {
             Self::ArchAurRecipe
-        } else if lower.ends_with(".apkbuild") {
+        } else if normalized.ends_with(".apkbuild") {
             Self::AlpineAports
-        } else if lower.ends_with(".apk") {
+        } else if normalized.ends_with(".apk") {
             Self::AlpineApk
-        } else if lower.ends_with(".cports") {
+        } else if normalized.ends_with(".cports") {
             Self::ChimeraCports
-        } else if lower.ends_with(".ebuild") {
+        } else if normalized.ends_with(".portage") || normalized.ends_with(".ebuild") {
             Self::GentooEbuild
-        } else if lower.ends_with(".layman") {
+        } else if normalized.ends_with(".layman") {
             Self::GentooOverlay
-        } else if lower.ends_with(".nixpkg") {
+        } else if normalized.ends_with(".nixpkg") || normalized.ends_with(".nix") {
             Self::NixStorePkg
-        } else if lower.ends_with(".nix") {
-            Self::NixExpression
-        } else if lower.ends_with(".guix") || lower.ends_with(".scm") {
+        } else if normalized.ends_with(".guix") || normalized.ends_with(".scm") {
             Self::GuixScmPkg
-        } else if lower.ends_with(".nar") {
+        } else if normalized.ends_with(".nar") {
             Self::GuixNarArchive
-        } else if lower.ends_with(".narinfo") {
+        } else if normalized.ends_with(".narinfo") {
             Self::NixNarInfo
-        } else if lower.ends_with(".xbps-src") {
+        } else if normalized.ends_with(".xbps-src") {
             Self::VoidXbpsSrc
-        } else if lower.ends_with(".xbps") {
+        } else if normalized.ends_with(".xbps") {
             Self::VoidXbps
-        } else if lower.ends_with(".eopkg") {
+        } else if normalized.ends_with(".eopkg") {
             Self::SolusEopkg
-        } else if lower.ends_with(".moss") {
+        } else if normalized.ends_with(".moss") {
             Self::SerpentMoss
-        } else if lower.ends_with(".pisi") {
+        } else if normalized.ends_with(".pisi") {
             Self::PardusPisi
-        } else if lower.ends_with(".ipk") {
+        } else if normalized.ends_with(".ipk") {
             Self::OpenWrtIpk
-        } else if lower.ends_with(".opkg") {
+        } else if normalized.ends_with(".opkg") {
             Self::YoctoOpkg
-        } else if lower.ends_with(".ports") {
+        } else if normalized.ends_with(".ports") {
             Self::FreeBsdPorts
-        } else if lower.ends_with(".poudriere") {
+        } else if normalized.ends_with(".poudriere") {
             Self::FreeBsdPoudriere
-        } else if lower.ends_with(".sig.tgz") {
+        } else if normalized.ends_with(".sig.tgz") {
             Self::OpenBsdSignifyPkg
-        } else if lower.ends_with(".openbsd.tgz") {
+        } else if normalized.ends_with(".openbsd.tgz") {
             Self::OpenBsdPkg
-        } else if lower.ends_with(".pkgsrc") {
+        } else if normalized.ends_with(".pkgsrc") {
             Self::NetBsdPkgsrc
-        } else if lower.ends_with(".pkgin") {
+        } else if normalized.ends_with(".pkgin") {
             Self::NetBsdPkgin
-        } else if lower.ends_with(".dports") {
+        } else if normalized.ends_with(".dports") {
             Self::DragonFlyDports
-        } else if lower.ends_with(".hammer2") {
+        } else if normalized.ends_with(".hammer2") {
             Self::DragonFlyHammer2
-        } else if lower.ends_with(".p5p") || lower.ends_with(".ips") {
+        } else if normalized.ends_with(".p5p") || normalized.ends_with(".ips") {
             Self::SolarisIpsP5p
-        } else if lower.ends_with(".aab") {
+        } else if normalized.ends_with(".aab") {
             Self::AndroidAab
-        } else if lower.ends_with(".hap") {
+        } else if normalized.ends_with(".hap") {
             Self::HarmonyHap
-        } else if lower.ends_with(".oci") || lower.ends_with(".docker.tar") {
+        } else if normalized.ends_with(".oci") || normalized.ends_with(".docker.tar") {
             Self::OciContainerImage
-        } else if lower.ends_with(".sysext") || lower.ends_with(".raw") {
+        } else if normalized.ends_with(".sysext") || normalized.ends_with(".raw") {
             Self::SystemdSysext
-        } else if lower.ends_with(".spack") {
+        } else if normalized.ends_with(".spack") {
             Self::SpackHpc
-        } else if lower.ends_with(".conan") {
+        } else if normalized.ends_with(".conan") {
             Self::ConanCpp
-        } else if lower.ends_with(".whl") {
+        } else if normalized.ends_with(".whl") {
             Self::PythonWheel
-        } else if lower.ends_with(".conda") {
+        } else if normalized.ends_with(".conda") {
             Self::CondaPkg
-        } else if lower.ends_with(".crate") {
+        } else if normalized.ends_with(".crate") {
             Self::CargoCrate
-        } else if lower.ends_with(".gem") {
+        } else if normalized.ends_with(".gem") {
             Self::RubyGem
-        } else if lower.ends_with(".nupkg") {
+        } else if normalized.ends_with(".nupkg") {
             Self::DotnetNuget
-        } else if lower.ends_with(".bottle") {
+        } else if normalized.ends_with(".bottle") {
             Self::HomebrewBottle
-        } else if lower.ends_with(".sigpkg") || lower.ends_with(".sigma") {
+        } else if normalized.ends_with(".air") {
+            Self::AdobeAir
+        } else if normalized.ends_with(".ipa") {
+            Self::AppleIpa
+        } else if normalized.ends_with(".app") {
+            Self::MacOsApp
+        } else if normalized.ends_with(".lzm") {
+            Self::SlaxLzm
+        } else if normalized.ends_with(".pup") {
+            Self::PuppyPup
+        } else if normalized.ends_with(".pet") {
+            Self::PuppyPet
+        } else if normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
+            Self::GenericTarGz
+        } else if normalized.ends_with(".tar.xz") || normalized.ends_with(".xz") {
+            Self::GenericTarXz
+        } else if normalized.ends_with(".tar") {
+            Self::GenericTar
+        } else if normalized.ends_with(".sigpkg") || normalized.ends_with(".sigma") {
             Self::SigmaNativePkg
-        } else if lower.ends_with(".pkg") {
+        } else if normalized.ends_with(".pkg") {
             Self::FreeBsdPkg
         } else {
             Self::GenericTarball
@@ -1004,6 +1040,62 @@ impl SovereignUniversalPackageFormatMasterEngine {
             UniversalPackageFormatKind::AndroidApex,
             Box::new(ContainerSandboxFormatAdapter { kind: UniversalPackageFormatKind::AndroidApex }),
         );
+        self.adapters.insert(
+            UniversalPackageFormatKind::AdobeAir,
+            Box::new(ContainerSandboxFormatAdapter { kind: UniversalPackageFormatKind::AdobeAir }),
+        );
+        self.adapters.insert(
+            UniversalPackageFormatKind::AppleIpa,
+            Box::new(ContainerSandboxFormatAdapter { kind: UniversalPackageFormatKind::AppleIpa }),
+        );
+        self.adapters.insert(
+            UniversalPackageFormatKind::MacOsApp,
+            Box::new(ContainerSandboxFormatAdapter { kind: UniversalPackageFormatKind::MacOsApp }),
+        );
+        self.adapters.insert(
+            UniversalPackageFormatKind::SlaxLzm,
+            Box::new(ContainerSandboxFormatAdapter { kind: UniversalPackageFormatKind::SlaxLzm }),
+        );
+        self.adapters.insert(
+            UniversalPackageFormatKind::PuppyPup,
+            Box::new(ContainerSandboxFormatAdapter { kind: UniversalPackageFormatKind::PuppyPup }),
+        );
+        self.adapters.insert(
+            UniversalPackageFormatKind::PuppyPet,
+            Box::new(ContainerSandboxFormatAdapter { kind: UniversalPackageFormatKind::PuppyPet }),
+        );
+        self.adapters.insert(
+            UniversalPackageFormatKind::SolusEopkg,
+            Box::new(ContainerSandboxFormatAdapter { kind: UniversalPackageFormatKind::SolusEopkg }),
+        );
+        self.adapters.insert(
+            UniversalPackageFormatKind::PardusPisi,
+            Box::new(ContainerSandboxFormatAdapter { kind: UniversalPackageFormatKind::PardusPisi }),
+        );
+        self.adapters.insert(
+            UniversalPackageFormatKind::AndroidAab,
+            Box::new(ContainerSandboxFormatAdapter { kind: UniversalPackageFormatKind::AndroidAab }),
+        );
+        self.adapters.insert(
+            UniversalPackageFormatKind::HarmonyHap,
+            Box::new(ContainerSandboxFormatAdapter { kind: UniversalPackageFormatKind::HarmonyHap }),
+        );
+        self.adapters.insert(
+            UniversalPackageFormatKind::GenericTarGz,
+            Box::new(ContainerSandboxFormatAdapter { kind: UniversalPackageFormatKind::GenericTarGz }),
+        );
+        self.adapters.insert(
+            UniversalPackageFormatKind::GenericTarXz,
+            Box::new(ContainerSandboxFormatAdapter { kind: UniversalPackageFormatKind::GenericTarXz }),
+        );
+        self.adapters.insert(
+            UniversalPackageFormatKind::GenericTar,
+            Box::new(ContainerSandboxFormatAdapter { kind: UniversalPackageFormatKind::GenericTar }),
+        );
+        self.adapters.insert(
+            UniversalPackageFormatKind::DeepinSuperdeb,
+            Box::new(DebianAptFormatAdapter),
+        );
     }
 
     /// Auto-detect package format kind from filename or magic bytes
@@ -1085,7 +1177,9 @@ mod master_package_tests {
         assert_eq!(UniversalPackageFormatKind::from_filename("hyprland.pkg.tar.zst"), UniversalPackageFormatKind::ArchPacman);
         assert_eq!(UniversalPackageFormatKind::from_filename("htop.apk"), UniversalPackageFormatKind::AlpineApk);
         assert_eq!(UniversalPackageFormatKind::from_filename("zsh.ebuild"), UniversalPackageFormatKind::GentooEbuild);
+        assert_eq!(UniversalPackageFormatKind::from_filename("gentoo.portage"), UniversalPackageFormatKind::GentooEbuild);
         assert_eq!(UniversalPackageFormatKind::from_filename("bash.nixpkg"), UniversalPackageFormatKind::NixStorePkg);
+        assert_eq!(UniversalPackageFormatKind::from_filename("bash.nix"), UniversalPackageFormatKind::NixStorePkg);
         assert_eq!(UniversalPackageFormatKind::from_filename("vim.xbps"), UniversalPackageFormatKind::VoidXbps);
         assert_eq!(UniversalPackageFormatKind::from_filename("router.ipk"), UniversalPackageFormatKind::OpenWrtIpk);
         assert_eq!(UniversalPackageFormatKind::from_filename("bsd.pkg"), UniversalPackageFormatKind::FreeBsdPkg);
@@ -1097,6 +1191,23 @@ mod master_package_tests {
         assert_eq!(UniversalPackageFormatKind::from_filename("app.snap"), UniversalPackageFormatKind::UbuntuSnap);
         assert_eq!(UniversalPackageFormatKind::from_filename("app.flatpak"), UniversalPackageFormatKind::FlatpakApp);
         assert_eq!(UniversalPackageFormatKind::from_filename("app.appimage"), UniversalPackageFormatKind::AppImageExec);
+        assert_eq!(UniversalPackageFormatKind::from_filename("app.air"), UniversalPackageFormatKind::AdobeAir);
+        assert_eq!(UniversalPackageFormatKind::from_filename("brew.bottle"), UniversalPackageFormatKind::HomebrewBottle);
+        assert_eq!(UniversalPackageFormatKind::from_filename("app.ipa"), UniversalPackageFormatKind::AppleIpa);
+        assert_eq!(UniversalPackageFormatKind::from_filename("bsd.ports"), UniversalPackageFormatKind::FreeBsdPorts);
+        assert_eq!(UniversalPackageFormatKind::from_filename("app.aab"), UniversalPackageFormatKind::AndroidAab);
+        assert_eq!(UniversalPackageFormatKind::from_filename("solus.eopkg"), UniversalPackageFormatKind::SolusEopkg);
+        assert_eq!(UniversalPackageFormatKind::from_filename("archive.tar.gz"), UniversalPackageFormatKind::GenericTarGz);
+        assert_eq!(UniversalPackageFormatKind::from_filename("archive.tar .gz"), UniversalPackageFormatKind::GenericTarGz);
+        assert_eq!(UniversalPackageFormatKind::from_filename("compressed.xz"), UniversalPackageFormatKind::GenericTarXz);
+        assert_eq!(UniversalPackageFormatKind::from_filename("macos.app"), UniversalPackageFormatKind::MacOsApp);
+        assert_eq!(UniversalPackageFormatKind::from_filename("harmony.hap"), UniversalPackageFormatKind::HarmonyHap);
+        assert_eq!(UniversalPackageFormatKind::from_filename("pardus.pisi"), UniversalPackageFormatKind::PardusPisi);
+        assert_eq!(UniversalPackageFormatKind::from_filename("deepin.superdeb"), UniversalPackageFormatKind::DeepinSuperdeb);
+        assert_eq!(UniversalPackageFormatKind::from_filename("slax.lzm"), UniversalPackageFormatKind::SlaxLzm);
+        assert_eq!(UniversalPackageFormatKind::from_filename("puppy.pup"), UniversalPackageFormatKind::PuppyPup);
+        assert_eq!(UniversalPackageFormatKind::from_filename("plain.tar"), UniversalPackageFormatKind::GenericTar);
+        assert_eq!(UniversalPackageFormatKind::from_filename("puppy.pet"), UniversalPackageFormatKind::PuppyPet);
     }
 
     #[test]
