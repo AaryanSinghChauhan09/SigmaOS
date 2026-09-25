@@ -7,6 +7,7 @@
 pub mod append_rights;
 pub mod control;
 
+#[cfg(all(not(feature = "standalone_test"), not(test)))]
 pub use crate::filesystem::ext4_ntfs_security::{
     NtfsAce, NtfsDacl, NtfsSacl, NtfsSecurityDescriptor,
 };
@@ -16,6 +17,7 @@ pub use control::{
 };
 pub use control::*;
 pub use append_rights::*;
+#[cfg(all(not(feature = "standalone_test"), not(test)))]
 pub use crate::filesystem::ext4_ntfs_security::*;
 
 use std::string::{String, ToString};
@@ -497,7 +499,89 @@ impl ProcessMigrationControl {
 }
 
 // ============================================================================
-// 7. Anonymous Access Policy
+// 7. Linux & BSD Inspired 50% Resource Limit Rule Engine
+// ============================================================================
+
+/// 50% Resource Limit Policy Category
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FiftyPercentRuleCategory {
+    RamSwapWatermark,       // Memory / Swap 50% Usage Threshold
+    CpuQuotaCapping,        // Cgroups CPU 50% Quota Allocation
+    PageCacheEviction,      // Page Cache 50% RAM Eviction Trigger
+    AnonymousSessionCap,    // Anonymous Guest Session 50% Limit
+    MemoryOvercommitLimit,  // Memory Overcommit 50% Cap
+}
+
+/// Linux & BSD Inspired 50% Resource Limit Rule Engine
+#[derive(Debug, Clone)]
+pub struct FiftyPercentRuleEngine {
+    pub max_ram_usage_pct: u32,       // Default 50%
+    pub max_swap_usage_pct: u32,      // Default 50%
+    pub max_cpu_quota_pct: u32,       // Default 50%
+    pub page_cache_evict_pct: u32,    // Default 50%
+    pub total_rule_violations: u64,
+}
+
+impl FiftyPercentRuleEngine {
+    pub fn new() -> Self {
+        Self {
+            max_ram_usage_pct: 50,
+            max_swap_usage_pct: 50,
+            max_cpu_quota_pct: 50,
+            page_cache_evict_pct: 50,
+            total_rule_violations: 0,
+        }
+    }
+
+    /// Validate RAM or Swap 50% usage watermark rule
+    pub fn check_memory_50_percent_rule(&mut self, current_ram_usage_pct: u32, current_swap_usage_pct: u32) -> AccessResult<bool> {
+        if current_ram_usage_pct > self.max_ram_usage_pct || current_swap_usage_pct > self.max_swap_usage_pct {
+            self.total_rule_violations += 1;
+            return Err(AccessManagerError::OutOfMemory);
+        }
+        Ok(true)
+    }
+
+    /// Validate Cgroups 50% CPU quota capping rule for background tasks
+    pub fn check_cpu_50_percent_rule(&mut self, requested_cpu_quota_pct: u32) -> AccessResult<bool> {
+        if requested_cpu_quota_pct > self.max_cpu_quota_pct {
+            self.total_rule_violations += 1;
+            return Err(AccessManagerError::PermissionDenied);
+        }
+        Ok(true)
+    }
+
+    /// Validate Anonymous Guest session 50% limit rule
+    pub fn check_anonymous_session_50_percent_rule(&mut self, active_anon_sessions: usize, max_system_sessions: usize) -> AccessResult<bool> {
+        if max_system_sessions == 0 {
+            return Err(AccessManagerError::InvalidParam);
+        }
+        let anon_pct = (active_anon_sessions * 100) / max_system_sessions;
+        if anon_pct >= 50 {
+            self.total_rule_violations += 1;
+            return Err(AccessManagerError::PermissionDenied);
+        }
+        Ok(true)
+    }
+
+    /// Validate Page Cache 50% RAM eviction trigger rule
+    pub fn check_page_cache_50_percent_eviction(&mut self, cache_bytes: u64, total_ram_bytes: u64) -> bool {
+        if total_ram_bytes == 0 {
+            return false;
+        }
+        let cache_pct = (cache_bytes * 100) / total_ram_bytes;
+        cache_pct >= (self.page_cache_evict_pct as u64)
+    }
+}
+
+impl Default for FiftyPercentRuleEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 8. Anonymous Access Policy
 // ============================================================================
 
 #[derive(Debug, Clone)]
@@ -713,5 +797,28 @@ mod tests {
             mig_ctrl.authorize_and_migrate(404, &unpriv_token, 1024),
             Err(AccessManagerError::PermissionDenied)
         );
+    }
+
+    #[test]
+    fn test_fifty_percent_rule_engine() {
+        let mut rule_engine = FiftyPercentRuleEngine::new();
+
+        // Check RAM/Swap 50% Rule
+        assert_eq!(rule_engine.check_memory_50_percent_rule(40, 30), Ok(true));
+        assert_eq!(rule_engine.check_memory_50_percent_rule(60, 30), Err(AccessManagerError::OutOfMemory));
+        assert_eq!(rule_engine.total_rule_violations, 1);
+
+        // Check CPU Quota 50% Rule
+        assert_eq!(rule_engine.check_cpu_50_percent_rule(45), Ok(true));
+        assert_eq!(rule_engine.check_cpu_50_percent_rule(75), Err(AccessManagerError::PermissionDenied));
+        assert_eq!(rule_engine.total_rule_violations, 2);
+
+        // Check Anonymous Session 50% Rule
+        assert_eq!(rule_engine.check_anonymous_session_50_percent_rule(2, 10), Ok(true));
+        assert_eq!(rule_engine.check_anonymous_session_50_percent_rule(5, 10), Err(AccessManagerError::PermissionDenied));
+
+        // Check Page Cache 50% RAM Eviction Trigger
+        assert!(!rule_engine.check_page_cache_50_percent_eviction(400, 1000));
+        assert!(rule_engine.check_page_cache_50_percent_eviction(500, 1000));
     }
 }

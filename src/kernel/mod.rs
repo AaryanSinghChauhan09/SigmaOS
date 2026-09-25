@@ -343,3 +343,9 @@ pub use universal_kernel_format::{
 // ─── Hardware Boot-to-Userspace Path Subsystem ──────────────────────────────
 pub mod boot_to_userspace;
 pub use boot_to_userspace::*;
+
+pub mod bare_metal_target;
+pub use bare_metal_target::{
+    BareMetalGdtEntry, BareMetalTargetBootEngine, UefiMemoryDescriptor, UefiMemoryType,
+    COM1_PORT_BASE, VGA_FRAMEBUFFER_PHYS,
+};
