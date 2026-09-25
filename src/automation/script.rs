@@ -40,6 +40,7 @@ pub trait Script {
 pub struct SimpleScript {
     pub id: ScriptID,
     pub name: [u8; 128],
+    pub name_len: u8,
     pub language: AtomicUsize,
     pub source: Vec<u8>,
 }
@@ -58,6 +59,7 @@ impl SimpleScript {
         SimpleScript {
             id,
             name: name_array,
+            name_len: name_len as u8,
             language: AtomicUsize::new(language as usize),
             source: source_vec,
         }
@@ -70,8 +72,10 @@ impl Script for SimpleScript {
     }
 
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(128);
-        &self.name[..len]
+        // Bolt ⚡ Optimization: Store explicit name length on instantiation to eliminate
+        // O(N) zero-byte linear scanning (.position(|&b| b == 0)) on every script name query,
+        // reducing slice lookup to instantaneous O(1) constant time.
+        &self.name[..self.name_len as usize]
     }
 
     fn language(&self) -> ScriptLanguage {
@@ -219,7 +223,7 @@ pub trait ScriptAPI {
 }
 
 pub struct SimpleScriptAPI {
-    pub functions: Vec<([u8; 64], fn() -> Vec<u8>)>,
+    pub functions: Vec<([u8; 64], u8, fn() -> Vec<u8>)>,
 }
 
 impl SimpleScriptAPI {
@@ -243,13 +247,15 @@ impl ScriptAPI for SimpleScriptAPI {
         for i in 0..name_len {
             name_array[i] = name[i];
         }
-        self.functions.push((name_array, func));
+        self.functions.push((name_array, name_len as u8, func));
     }
 
     fn call_function(&self, name: &[u8]) -> Result<Vec<u8>, ScriptError> {
-        for &(ref func_name, func) in &self.functions {
-            let len = func_name.iter().position(|&b| b == 0).unwrap_or(64);
-            if &func_name[..len] == name {
+        for &(ref func_name, func_len, func) in &self.functions {
+            // Bolt ⚡ Optimization: Store explicit function name length on registration to eliminate
+            // O(N) zero-byte linear scanning (.position(|&b| b == 0)) on every function lookup,
+            // reducing slice comparison to instantaneous O(1) constant time.
+            if &func_name[..func_len as usize] == name {
                 return Ok(func());
             }
         }
@@ -453,9 +459,27 @@ impl Default for ScriptArgumentRouter {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_simple_script_and_api_cached_lengths() {
+        let script = SimpleScript::new(1, b"deploy.sh", ScriptLanguage::Shell, b"echo deploy");
+        assert_eq!(script.name(), b"deploy.sh");
+
+        fn dummy_func() -> Vec<u8> {
+            let mut v = Vec::new();
+            v.push(b'o');
+            v.push(b'k');
+            v
+        }
+
+        let mut api = SimpleScriptAPI::new();
+        api.register_function(b"status", dummy_func);
+        assert_eq!(api.call_function(b"status").unwrap(), b"ok");
+        assert_eq!(api.call_function(b"unknown").err(), Some(ScriptError::NotFound));
+    }
 
     #[test]
     fn test_script_positional_arguments_expansion() {
