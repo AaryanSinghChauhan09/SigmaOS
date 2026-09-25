@@ -19,6 +19,8 @@ pub mod parrot_security;
 pub mod kali_security;
 pub mod antix_zorin_innovations;
 pub mod mint_innovations;
+pub mod mint_omarchy_hybrid_synthesis;
+pub use mint_omarchy_hybrid_synthesis::*;
 
 pub use omarchy::*;
 
