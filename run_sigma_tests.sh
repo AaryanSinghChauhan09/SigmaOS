@@ -23,6 +23,13 @@ if [ -f "src/security/pledge.rs" ]; then
     ./build/pledge_test
 fi
 
+if [ -f "src/security/kernel_hardening.rs" ]; then
+    echo "Running kernel hardening and protection rings test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/security/kernel_hardening.rs -o build/kernel_hardening_test
+    ./build/kernel_hardening_test
+fi
+
 if [ -f "src/distro/linux_bsd_inspirations.rs" ]; then
     echo "Running Linux & BSD distro inspirations & subsystem bridge test suite..."
     mkdir -p build

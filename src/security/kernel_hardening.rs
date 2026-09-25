@@ -8,7 +8,14 @@
 //! 3. `HardenedSyscallDispatcher`: Multi-layered syscall security filtering (pledge/unveil, Capsicum rights, seccomp rules), argument pointer sanity checks, rate-limiting, and anomaly detection.
 //! 4. `RetpolineKptiMitigationEngine`: Spectre Variant 2 retpoline indirect branch thunk mitigations, Meltdown Kernel Page Table Isolation (KPTI) page table shadow page table switches, and stack canary integrity validation.
 
+#[cfg(not(feature = "standalone_test"))]
 use crate::klib::{HashMap, Vec};
+
+#[cfg(feature = "standalone_test")]
+use std::collections::HashMap;
+#[cfg(feature = "standalone_test")]
+use std::vec::Vec;
+
 use std::string::{String, ToString};
 
 use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
