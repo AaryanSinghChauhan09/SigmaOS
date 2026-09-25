@@ -32,15 +32,23 @@ impl ConfigStore {
 
             if trimmed.starts_with('[') && trimmed.ends_with(']') {
                 current_section = trimmed[1..trimmed.len() - 1].to_string();
-                self.sections.entry(current_section.clone()).or_default();
+                if !self.sections.contains_key(&current_section) {
+                    self.sections.insert(current_section.clone(), HashMap::new());
+                }
                 continue;
             }
 
             if let Some(sep_pos) = find_key_value_sep(&trimmed) {
                 let key = trimmed[..sep_pos].trim().to_string();
                 let value = trimmed[sep_pos + 1..].trim().to_string();
-                let section = self.sections.entry(current_section.clone()).or_default();
-                section.insert(key, value);
+                // Reuse existing entry or insert if not present, using get_mut to avoid extra allocation
+                if let Some(section) = self.sections.get_mut(&current_section) {
+                    section.insert(key, value);
+                } else {
+                    let mut section = HashMap::new();
+                    section.insert(key, value);
+                    self.sections.insert(current_section.clone(), section);
+                }
             } else {
                 return Err("Invalid config line");
             }
