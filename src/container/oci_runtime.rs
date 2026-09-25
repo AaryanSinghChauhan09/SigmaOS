@@ -239,7 +239,10 @@ pub trait ImageManager {
 
 #[repr(C)]
 pub struct SimpleImageManager {
-    pub images: Vec<([u8; 128], [u8; 32])>,
+    // Bolt ⚡ Optimization: Store explicit image name byte length alongside fixed array buffer
+    // to eliminate O(N) zero-byte linear scanning (.position(|&b| b == 0)) during image lookup/removal operations,
+    // reducing name slice evaluation to instantaneous O(1) constant time.
+    pub images: Vec<([u8; 128], u8, [u8; 32])>,
 }
 
 impl SimpleImageManager {
@@ -259,24 +262,42 @@ impl ImageManager for SimpleImageManager {
         for i in 0..32 {
             digest_array[i] = ((i * 17 + 31) % 256) as u8;
         }
-        self.images.push((name_array, digest_array));
+        self.images.push((name_array, name_len as u8, digest_array));
         Ok(())
     }
 
     fn list_images(&self) -> Vec<([u8; 128], [u8; 32])> {
-        self.images.clone()
+        let mut list = Vec::new();
+        for i in 0..self.images.len() {
+            let (arr, _, dig) = &self.images[i];
+            list.push((*arr, *dig));
+        }
+        list
     }
 
     fn remove_image(&mut self, name: &[u8], _tag: &[u8]) -> Result<(), ContainerError> {
         for i in 0..self.images.len() {
-            let img_name = &self.images[i].0;
-            let len = img_name.iter().position(|&b| b == 0).unwrap_or(128);
-            if &img_name[..len] == name {
+            let (img_name, name_len, _) = &self.images[i];
+            if &img_name[..*name_len as usize] == name {
                 self.images.remove(i);
                 return Ok(());
             }
         }
         Err(ContainerError::InvalidConfig)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_image_manager_o1_name_lookup() {
+        let mut mgr = SimpleImageManager::new();
+        assert!(mgr.pull_image(b"alpine:latest", b"latest").is_ok());
+        assert_eq!(mgr.list_images().len(), 1);
+        assert!(mgr.remove_image(b"alpine:latest", b"latest").is_ok());
+        assert_eq!(mgr.list_images().len(), 0);
     }
 }
 

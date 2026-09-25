@@ -66,6 +66,20 @@ impl Device for LegacyDevice {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_device_descriptor_o1_name_lookup() {
+        let capability = DeviceCapability::full();
+        let desc = DeviceDescriptor::new(101, b"virtio_net_0", DeviceType::Network, capability);
+        assert_eq!(desc.id, 101);
+        assert_eq!(desc.name(), b"virtio_net_0");
+        assert_eq!(desc.name_len, 12);
+    }
+}
+
 impl UnifiedPeripheral for LegacyDevice {
     fn query_channel(&self) -> PortAddress {
         PortAddress::PortIO(self.base_port)
