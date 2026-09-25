@@ -361,3 +361,6 @@ pub use sovereign_media_and_distro_unimplemented_innovations::*;
 
 pub mod sovereign_2050_distro_supremacy_engine;
 pub use sovereign_2050_distro_supremacy_engine::*;
+
+pub mod sovereign_2055_distro_supremacy_engine;
+pub use sovereign_2055_distro_supremacy_engine::*;
