@@ -47,6 +47,12 @@ pub mod universal;
 pub mod updater;
 pub mod sovereign_distro_package_matrix;
 pub use sovereign_distro_package_matrix::*;
+pub mod sovereign_distro_package_advancements_v5;
+pub use sovereign_distro_package_advancements_v5::*;
+pub mod sovereign_package_apc_engine;
+pub use sovereign_package_apc_engine::*;
+pub mod sovereign_package_access_engine;
+pub use sovereign_package_access_engine::*;
 pub mod universal_package_innovations_suite;
 pub use universal_package_innovations_suite::*;
 

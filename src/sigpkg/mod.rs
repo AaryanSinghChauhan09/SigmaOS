@@ -72,6 +72,18 @@ pub mod zero_alloc_resolver;
 
 pub use crate::package::sovereign_distro_package_matrix::*;
 
+#[path = "../package/sovereign_package_apc_engine.rs"]
+pub mod sovereign_package_apc_engine;
+pub use sovereign_package_apc_engine::*;
+
+#[path = "../package/sovereign_package_access_engine.rs"]
+pub mod sovereign_package_access_engine;
+pub use sovereign_package_access_engine::*;
+
+#[path = "../package/sovereign_distro_package_advancements_v5.rs"]
+pub mod sovereign_distro_package_advancements_v5;
+pub use sovereign_distro_package_advancements_v5::*;
+
 #[path = "../package/bsd_linux_package_innovations.rs"]
 pub mod bsd_linux_package_innovations;
 pub use bsd_linux_package_innovations::{
