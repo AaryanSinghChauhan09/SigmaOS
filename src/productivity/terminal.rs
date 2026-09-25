@@ -20,7 +20,7 @@ use std::format;
 // SigmaOS Integrated Terminal
 // OOP-based terminal emulator with shell integration
 
-use crate::klib::btreemap::BTreeMap;
+use std::collections::BTreeMap;
 
 /// Terminal session
 #[derive(Debug, Clone)]
@@ -31,6 +31,26 @@ pub struct TerminalSession {
     pub history: Vec<String>,
     pub env_vars: BTreeMap<String, String>,
     pub is_active: bool,
+    pub width_cols: usize,
+    pub height_rows: usize,
+}
+
+/// Helper to strip or process VT100/xterm ANSI escape sequences
+pub fn strip_ansi_codes(input: &str) -> String {
+    let mut result = String::new();
+    let mut in_escape = false;
+    for c in input.chars() {
+        if c == '\x1B' {
+            in_escape = true;
+        } else if in_escape {
+            if c.is_ascii_alphabetic() || c == 'm' || c == 'H' || c == 'J' {
+                in_escape = false;
+            }
+        } else {
+            result.push(c);
+        }
+    }
+    result
 }
 
 /// Shell type
@@ -272,6 +292,8 @@ impl IntegratedTerminal {
                 vars
             },
             is_active: true,
+            width_cols: 80,
+            height_rows: 24,
         };
 
         self.sessions.push(session);
@@ -387,26 +409,65 @@ pub enum TerminalError {
     ShellError(String),
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn test_bash_shell() {
-        let shell = BashShell;
+        let mut shell = BashShell;
         assert_eq!(shell.name(), "Bash");
+        let mut session = TerminalSession {
+            id: "s1".to_string(),
+            shell_type: ShellType::Bash,
+            working_directory: "/home/user".to_string(),
+            history: Vec::new(),
+            env_vars: BTreeMap::new(),
+            is_active: true,
+            width_cols: 80,
+            height_rows: 24,
+        };
+        let res = shell.execute("pwd", &mut session);
+        assert_eq!(res.exit_code, 0);
+        assert_eq!(res.stdout, "/home/user");
     }
 
     #[test]
     fn test_zsh_shell() {
-        let shell = ZshShell;
+        let mut shell = ZshShell;
         assert_eq!(shell.name(), "Zsh");
+        let mut session = TerminalSession {
+            id: "s2".to_string(),
+            shell_type: ShellType::Zsh,
+            working_directory: "/var/log".to_string(),
+            history: Vec::new(),
+            env_vars: BTreeMap::new(),
+            is_active: true,
+            width_cols: 80,
+            height_rows: 24,
+        };
+        let res = shell.execute("pwd", &mut session);
+        assert_eq!(res.exit_code, 0);
+        assert_eq!(res.stdout, "/var/log");
     }
 
     #[test]
     fn test_sigma_shell() {
-        let shell = SigmaShell;
+        let mut shell = SigmaShell;
         assert_eq!(shell.name(), "SigmaShell");
+        let mut session = TerminalSession {
+            id: "s3".to_string(),
+            shell_type: ShellType::SigmaShell,
+            working_directory: "/".to_string(),
+            history: Vec::new(),
+            env_vars: BTreeMap::new(),
+            is_active: true,
+            width_cols: 80,
+            height_rows: 24,
+        };
+        let res = shell.execute("security status", &mut session);
+        assert_eq!(res.exit_code, 0);
+        assert!(res.stdout.contains("Security Status: ENABLED"));
     }
 
     #[test]
@@ -419,8 +480,9 @@ mod tests {
     fn test_create_session() {
         let mut terminal = IntegratedTerminal::default();
         let session_id = terminal.create_session();
-        assert!(terminal.sessions.len() == 1);
+        assert_eq!(terminal.sessions.len(), 1);
         assert!(!session_id.is_empty());
+        assert_eq!(terminal.sessions[0].width_cols, 80);
     }
 
     #[test]
@@ -430,5 +492,12 @@ mod tests {
         let result = terminal.execute("sysinfo".to_string()).unwrap();
         assert_eq!(result.exit_code, 0);
         assert!(result.stdout.contains("SigmaOS"));
+    }
+
+    #[test]
+    fn test_strip_ansi_codes() {
+        let ansi_str = "\x1B[31mRed Text\x1B[0m";
+        let clean = strip_ansi_codes(ansi_str);
+        assert_eq!(clean, "Red Text");
     }
 }
