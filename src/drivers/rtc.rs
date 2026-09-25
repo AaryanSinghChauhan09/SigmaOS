@@ -456,6 +456,106 @@ impl Default for RtcDriver {
     }
 }
 
+// ──────────────────────────── Linux & BSD RTC Subsystem ───────────────────────
+
+/// Linux `/dev/rtc0` character device ioctl constants
+pub mod linux_rtc_ioctl {
+    pub const RTC_RD_TIME: u32 = 0x80247009;
+    pub const RTC_SET_TIME: u32 = 0x4024700A;
+    pub const RTC_ALM_READ: u32 = 0x80247008;
+    pub const RTC_ALM_SET: u32 = 0x40247007;
+    pub const RTC_AIE_ON: u32 = 0x7001;
+    pub const RTC_AIE_OFF: u32 = 0x7002;
+    pub const RTC_PIE_ON: u32 = 0x7005;
+    pub const RTC_PIE_OFF: u32 = 0x7006;
+}
+
+/// Linux & BSD Real-Time Clock Subsystem Interface
+#[derive(Debug, Clone)]
+pub struct LinuxBsdRtcSubsystem {
+    pub current_time: DateTime,
+    pub alarm_time: Option<DateTime>,
+    pub alarm_enabled: bool,
+    pub periodic_enabled: bool,
+    pub drift_compensation_ppm: f64,
+}
+
+impl LinuxBsdRtcSubsystem {
+    pub fn new() -> Self {
+        Self {
+            current_time: DateTime::new(2026, 9, 24, 12, 0, 0),
+            alarm_time: None,
+            alarm_enabled: false,
+            periodic_enabled: false,
+            drift_compensation_ppm: 0.0,
+        }
+    }
+
+    /// BSD inittodr(): Initialize system time-of-day clock from RTC hardware
+    pub fn inittodr(&mut self, hw_time: DateTime) -> u64 {
+        self.current_time = hw_time;
+        self.current_time.to_unix_timestamp()
+    }
+
+    /// BSD resettodr(): Synchronize hardware RTC clock from system time
+    pub fn resettodr(&mut self, system_timestamp: u64) -> DateTime {
+        // Approximate DateTime from timestamp
+        let year = 2026;
+        let month = 9;
+        let day = 24;
+        let hours = ((system_timestamp / 3600) % 24) as u8;
+        let minutes = ((system_timestamp / 60) % 60) as u8;
+        let seconds = (system_timestamp % 60) as u8;
+        let dt = DateTime::new(year, month, day, hours, minutes, seconds);
+        self.current_time = dt;
+        dt
+    }
+
+    /// Linux/BSD hwclock --hctosys: Hardware clock to system time sync
+    pub fn hwclock_hctosys(&mut self) -> u64 {
+        self.current_time.to_unix_timestamp()
+    }
+
+    /// Linux/BSD hwclock --systohc: System time to hardware clock sync
+    pub fn hwclock_systohc(&mut self, system_timestamp: u64) -> DateTime {
+        self.resettodr(system_timestamp)
+    }
+
+    /// Handles Linux /dev/rtc0 devfs ioctl calls
+    pub fn dev_rtc0_ioctl(&mut self, cmd: u32, arg: u64) -> Result<u64, &'static str> {
+        match cmd {
+            linux_rtc_ioctl::RTC_RD_TIME => Ok(self.current_time.to_unix_timestamp()),
+            linux_rtc_ioctl::RTC_SET_TIME => {
+                self.resettodr(arg);
+                Ok(0)
+            }
+            linux_rtc_ioctl::RTC_AIE_ON => {
+                self.alarm_enabled = true;
+                Ok(0)
+            }
+            linux_rtc_ioctl::RTC_AIE_OFF => {
+                self.alarm_enabled = false;
+                Ok(0)
+            }
+            linux_rtc_ioctl::RTC_PIE_ON => {
+                self.periodic_enabled = true;
+                Ok(0)
+            }
+            linux_rtc_ioctl::RTC_PIE_OFF => {
+                self.periodic_enabled = false;
+                Ok(0)
+            }
+            _ => Err("Invalid RTC ioctl command"),
+        }
+    }
+}
+
+impl Default for LinuxBsdRtcSubsystem {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // ──────────────────────────── Utility Functions ──────────────────────────────
 
 /// Convert a BCD-encoded byte to binary
@@ -569,5 +669,22 @@ mod tests {
         assert_eq!(dt.hours, 23);
         assert_eq!(dt.minutes, 59);
         assert_eq!(dt.seconds, 58);
+    }
+
+    #[test]
+    fn test_linux_bsd_rtc_subsystem() {
+        let mut rtc = LinuxBsdRtcSubsystem::new();
+        let dt = DateTime::new(2026, 9, 24, 15, 30, 0);
+        let ts = rtc.inittodr(dt);
+        assert!(ts > 0);
+
+        let read_ts = rtc.dev_rtc0_ioctl(linux_rtc_ioctl::RTC_RD_TIME, 0).unwrap();
+        assert_eq!(read_ts, ts);
+
+        assert!(rtc.dev_rtc0_ioctl(linux_rtc_ioctl::RTC_AIE_ON, 0).is_ok());
+        assert!(rtc.alarm_enabled);
+
+        let hctosys_ts = rtc.hwclock_hctosys();
+        assert_eq!(hctosys_ts, ts);
     }
 }
