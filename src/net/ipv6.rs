@@ -166,6 +166,39 @@ pub enum Ipv6ExtensionHeader {
     NoNextHeader,
 }
 
+pub struct Ipv6SlaacEngine;
+
+impl Ipv6SlaacEngine {
+    pub fn derive_eui64_link_local(mac: [u8; 6]) -> Ipv6Address {
+        let mut bytes = [0u8; 16];
+        bytes[0] = 0xfe;
+        bytes[1] = 0x80;
+        bytes[8] = mac[0] ^ 0x02;
+        bytes[9] = mac[1];
+        bytes[10] = mac[2];
+        bytes[11] = 0xff;
+        bytes[12] = 0xfe;
+        bytes[13] = mac[3];
+        bytes[14] = mac[4];
+        bytes[15] = mac[5];
+        Ipv6Address::new(bytes)
+    }
+
+    pub fn autoconfigure_global(prefix: &[u8; 8], mac: [u8; 6]) -> Ipv6Address {
+        let mut bytes = [0u8; 16];
+        bytes[..8].copy_from_slice(prefix);
+        bytes[8] = mac[0] ^ 0x02;
+        bytes[9] = mac[1];
+        bytes[10] = mac[2];
+        bytes[11] = 0xff;
+        bytes[12] = 0xfe;
+        bytes[13] = mac[3];
+        bytes[14] = mac[4];
+        bytes[15] = mac[5];
+        Ipv6Address::new(bytes)
+    }
+}
+
 // =========================================================================
 // ICMPv6 Core Protocol Handling
 // =========================================================================
@@ -594,7 +627,7 @@ impl Default for Ipv6Stack {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -729,6 +762,17 @@ mod tests {
         let pkt = Icmpv6Packet::new(Icmpv6Type::EchoRequest, 0, vec![1, 2, 3, 4]);
         let csum = pkt.calculate_pseudo_header_checksum(&src, &dst);
         assert_ne!(csum, 0);
+    }
+
+    #[test]
+    fn test_slaac_eui64_derivation() {
+        let mac = [0x00, 0x1A, 0x2B, 0x3C, 0x4D, 0x5E];
+        let link_local = Ipv6SlaacEngine::derive_eui64_link_local(mac);
+        assert_eq!(link_local.bytes[0], 0xfe);
+        assert_eq!(link_local.bytes[1], 0x80);
+        assert_eq!(link_local.bytes[8], 0x02);
+        assert_eq!(link_local.bytes[11], 0xff);
+        assert_eq!(link_local.bytes[12], 0xfe);
     }
 
     #[test]
