@@ -75,6 +75,15 @@ pub enum UniversalPackageFormat {
     AppImageBinary, // .AppImage
     SwupdClear,     // .swupd
     StarlingFormat, // .starling
+    MageiaUrpmi,    // .urpmi (urpmi)
+    PardusPisi,     // .pisi (PiSi)
+    PuppyPet,       // .pet (Puppy Linux)
+    SlaxLzm,        // .lzm (Slax)
+    CruxPkg,        // .crux.tar.gz (CRUX pkgadd)
+    DragonFlyDports,// .dports (DragonFly BSD DPorts)
+    BedrockStratum, // .stratum (Bedrock Linux)
+    SpackHpc,       // .spack (Spack HPC)
+    ConanCpp,       // .conan (Conan C++)
 }
 
 /// Importer/Converter engine mapping foreign Linux/BSD packages into SigmaPkg native representation
@@ -134,6 +143,22 @@ impl UniversalPackageImporter {
             Some(UniversalPackageFormat::SwupdClear)
         } else if filename.ends_with(".starling") {
             Some(UniversalPackageFormat::StarlingFormat)
+        } else if filename.ends_with(".urpmi") {
+            Some(UniversalPackageFormat::MageiaUrpmi)
+        } else if filename.ends_with(".pet") {
+            Some(UniversalPackageFormat::PuppyPet)
+        } else if filename.ends_with(".lzm") {
+            Some(UniversalPackageFormat::SlaxLzm)
+        } else if filename.ends_with(".crux.tar.gz") || filename.ends_with(".crux.pkg") {
+            Some(UniversalPackageFormat::CruxPkg)
+        } else if filename.ends_with(".dports") {
+            Some(UniversalPackageFormat::DragonFlyDports)
+        } else if filename.ends_with(".stratum") {
+            Some(UniversalPackageFormat::BedrockStratum)
+        } else if filename.ends_with(".spack") {
+            Some(UniversalPackageFormat::SpackHpc)
+        } else if filename.ends_with(".conan") {
+            Some(UniversalPackageFormat::ConanCpp)
         } else {
             None
         }
@@ -184,6 +209,15 @@ impl UniversalPackageImporter {
             UniversalPackageFormat::HarmonyHap => ("Apache-2.0", vec![]),
             UniversalPackageFormat::SwupdClear => ("Apache-2.0", vec!["glibc".to_string()]),
             UniversalPackageFormat::StarlingFormat => ("MIT", vec!["glibc".to_string()]),
+            UniversalPackageFormat::MageiaUrpmi => ("GPLv3+", vec!["glibc".to_string(), "libssl-devel".to_string()]),
+            UniversalPackageFormat::PardusPisi => ("GPLv2", vec!["glibc".to_string(), "openssl".to_string()]),
+            UniversalPackageFormat::PuppyPet => ("GPL", vec!["glibc".to_string()]),
+            UniversalPackageFormat::SlaxLzm => ("GPL", vec!["glibc".to_string()]),
+            UniversalPackageFormat::CruxPkg => ("BSD-2-Clause", vec!["glibc".to_string()]),
+            UniversalPackageFormat::DragonFlyDports => ("BSD-2-Clause", vec!["dragonfly-runtime".to_string(), "security/openssl".to_string()]),
+            UniversalPackageFormat::BedrockStratum => ("MIT", vec!["bedrock-core".to_string()]),
+            UniversalPackageFormat::SpackHpc => ("Apache-2.0", vec!["spack-runtime".to_string(), "openmpi".to_string()]),
+            UniversalPackageFormat::ConanCpp => ("MIT", vec!["conan-center".to_string()]),
         };
 
         let translated_deps = Self::translate_foreign_dependencies(&raw_deps);
@@ -213,19 +247,19 @@ impl UniversalPackageImporter {
                 let dep_lower = dep.to_lowercase();
                 if dep_lower.contains("ssl") || dep_lower.contains("crypto") || dep_lower.contains("gnutls") || dep_lower.contains("mbedtls") {
                     "sovereign-openssl".to_string()
-                } else if dep_lower.contains("libc") || dep_lower == "musl" || dep_lower.contains("glibc") || dep_lower.contains("freebsd-runtime") || dep_lower.contains("openbsd-sys") || dep_lower.contains("haiku-libroot") || dep_lower.contains("pkgsrc-core") {
+                } else if dep_lower.contains("libc") || dep_lower == "musl" || dep_lower.contains("glibc") || dep_lower.contains("freebsd-runtime") || dep_lower.contains("openbsd-sys") || dep_lower.contains("dragonfly-runtime") || dep_lower.contains("bedrock-core") || dep_lower.contains("haiku-libroot") || dep_lower.contains("pkgsrc-core") {
                     "sovereign-libc".to_string()
-                } else if dep_lower.contains("zlib") || dep_lower.contains("zstd") || dep_lower.contains("lz4") || dep_lower.contains("xz") || dep_lower.contains("bzip2") {
+                } else if dep_lower.contains("zlib") || dep_lower.contains("zstd") || dep_lower.contains("lz4") || dep_lower.contains("xz") || dep_lower.contains("bzip2") || dep_lower.contains("brotli") {
                     "sovereign-compression".to_string()
-                } else if dep_lower.contains("python") {
-                    "sovereign-python".to_string()
-                } else if dep_lower == "bash" || dep_lower == "zsh" || dep_lower == "fish" || dep_lower == "sh" {
+                } else if dep_lower.contains("python") || dep_lower.contains("perl") || dep_lower.contains("ruby") || dep_lower.contains("node") || dep_lower.contains("golang") || dep_lower.contains("rust") || dep_lower.contains("java") {
+                    "sovereign-runtime".to_string()
+                } else if dep_lower == "bash" || dep_lower == "zsh" || dep_lower == "fish" || dep_lower == "sh" || dep_lower == "ksh" || dep_lower == "tcsh" {
                     "sovereign-shell".to_string()
-                } else if dep_lower.contains("systemd") || dep_lower.contains("openrc") || dep_lower.contains("runit") || dep_lower.contains("sysvinit") {
+                } else if dep_lower.contains("systemd") || dep_lower.contains("openrc") || dep_lower.contains("runit") || dep_lower.contains("sysvinit") || dep_lower.contains("s6") || dep_lower.contains("dinit") {
                     "sovereign-init".to_string()
-                } else if dep_lower.contains("wayland") || dep_lower.contains("x11") || dep_lower.contains("mesa") || dep_lower.contains("vulkan") || dep_lower.contains("pipewire") || dep_lower.contains("pulseaudio") || dep_lower.contains("alsa") {
+                } else if dep_lower.contains("wayland") || dep_lower.contains("x11") || dep_lower.contains("mesa") || dep_lower.contains("vulkan") || dep_lower.contains("pipewire") || dep_lower.contains("pulseaudio") || dep_lower.contains("alsa") || dep_lower.contains("ffmpeg") {
                     "sovereign-media-graphics".to_string()
-                } else if dep_lower.contains("gcc") || dep_lower.contains("clang") || dep_lower.contains("llvm") || dep_lower.contains("binutils") || dep_lower.contains("make") || dep_lower.contains("cmake") {
+                } else if dep_lower.contains("gcc") || dep_lower.contains("clang") || dep_lower.contains("llvm") || dep_lower.contains("binutils") || dep_lower.contains("make") || dep_lower.contains("cmake") || dep_lower.contains("ninja") || dep_lower.contains("meson") {
                     "sovereign-toolchain".to_string()
                 } else {
                     dep.clone()
@@ -1579,6 +1613,38 @@ mod tests {
         assert_eq!(
             UniversalPackageImporter::autodetect_format("app.hap"),
             Some(UniversalPackageFormat::HarmonyHap)
+        );
+        assert_eq!(
+            UniversalPackageImporter::autodetect_format("app.urpmi"),
+            Some(UniversalPackageFormat::MageiaUrpmi)
+        );
+        assert_eq!(
+            UniversalPackageImporter::autodetect_format("app.pet"),
+            Some(UniversalPackageFormat::PuppyPet)
+        );
+        assert_eq!(
+            UniversalPackageImporter::autodetect_format("app.lzm"),
+            Some(UniversalPackageFormat::SlaxLzm)
+        );
+        assert_eq!(
+            UniversalPackageImporter::autodetect_format("app.crux.tar.gz"),
+            Some(UniversalPackageFormat::CruxPkg)
+        );
+        assert_eq!(
+            UniversalPackageImporter::autodetect_format("app.dports"),
+            Some(UniversalPackageFormat::DragonFlyDports)
+        );
+        assert_eq!(
+            UniversalPackageImporter::autodetect_format("app.stratum"),
+            Some(UniversalPackageFormat::BedrockStratum)
+        );
+        assert_eq!(
+            UniversalPackageImporter::autodetect_format("app.spack"),
+            Some(UniversalPackageFormat::SpackHpc)
+        );
+        assert_eq!(
+            UniversalPackageImporter::autodetect_format("app.conan"),
+            Some(UniversalPackageFormat::ConanCpp)
         );
     }
 

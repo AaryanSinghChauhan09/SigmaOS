@@ -179,6 +179,27 @@ fn test_universal_pm_command_dispatcher_all_distros() {
     let nixos_act = dispatcher.dispatch_command("nixos install firefox").unwrap();
     assert_eq!(nixos_act.source_pm, "nixos");
     assert_eq!(nixos_act.operation, UniversalPmOperation::Install);
+
+    // Additional Distros & Modern Package Managers
+    let urpmi_act = dispatcher.dispatch_command("urpmi install kernel").unwrap();
+    assert_eq!(urpmi_act.source_pm, "urpmi");
+    assert_eq!(urpmi_act.operation, UniversalPmOperation::Install);
+
+    let pisi_act = dispatcher.dispatch_command("pisi it python3").unwrap();
+    assert_eq!(pisi_act.source_pm, "pisi");
+    assert_eq!(pisi_act.operation, UniversalPmOperation::Install);
+
+    let spack_act = dispatcher.dispatch_command("spack install openmpi").unwrap();
+    assert_eq!(spack_act.source_pm, "spack");
+    assert_eq!(spack_act.operation, UniversalPmOperation::Install);
+
+    let conan_act = dispatcher.dispatch_command("conan install boost").unwrap();
+    assert_eq!(conan_act.source_pm, "conan");
+    assert_eq!(conan_act.operation, UniversalPmOperation::Install);
+
+    let kiss_act = dispatcher.dispatch_command("kiss build busybox").unwrap();
+    assert_eq!(kiss_act.source_pm, "kiss");
+    assert_eq!(kiss_act.operation, UniversalPmOperation::Install);
 }
 
 #[test]

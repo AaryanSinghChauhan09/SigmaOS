@@ -1847,7 +1847,8 @@ impl UniversalDependencyMapper {
         match clean {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl"
             | "dev-libs/openssl" => "openssl".to_string(),
-            "libc6" | "glibc" | "musl" | "musl-dev" | "devel/glibc" | "sys-libs/glibc" | "libc" => {
+            "libc6" | "glibc" | "musl" | "musl-dev" | "devel/glibc" | "sys-libs/glibc" | "libc"
+            | "freebsd-runtime" | "openbsd-sys" | "dragonfly-runtime" | "bedrock-core" | "haiku-libroot" | "pkgsrc-core" => {
                 "libc".to_string()
             }
             "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
@@ -1894,6 +1895,8 @@ impl UniversalDependencyMapper {
             "golang" | "go" | "dev-lang/go" => "go".to_string(),
             "ninja" | "ninja-build" | "dev-build/ninja" => "ninja".to_string(),
             "systemd" | "systemd-sysv" | "sys-apps/systemd" => "systemd".to_string(),
+            "openrc" | "sys-apps/openrc" => "openrc".to_string(),
+            "runit" => "runit".to_string(),
             "fastfetch" | "neofetch" => "fastfetch".to_string(),
             "btop" | "htop" => "btop".to_string(),
             "ripgrep" | "rg" => "ripgrep".to_string(),
