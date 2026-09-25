@@ -57,6 +57,19 @@ pub enum PullRequestPackageFormat {
     IosIpaBundle,
     AndroidAabPackage,
     HarmonyHapModule,
+    DeepinSuperdeb,
+    CachyOsPkg,
+    AdobeAir,
+    AppleIpa,
+    MacOsApp,
+    SlaxLzm,
+    PuppyPup,
+    OciContainerImage,
+    SystemdSysext,
+    PythonWheel,
+    CargoCrate,
+    RubyGem,
+    DotnetNuget,
 }
 
 impl PullRequestPackageFormat {
@@ -104,6 +117,19 @@ impl PullRequestPackageFormat {
             Self::IosIpaBundle => "iOS IPA Application Bundle",
             Self::AndroidAabPackage => "Android App Bundle / APK",
             Self::HarmonyHapModule => "OpenHarmony HAP Module",
+            Self::DeepinSuperdeb => "Deepin Superdeb Package",
+            Self::CachyOsPkg => "CachyOS x86-64 Microarch Package",
+            Self::AdobeAir => "Adobe AIR Package",
+            Self::AppleIpa => "iOS IPA Application Bundle",
+            Self::MacOsApp => "macOS Application Bundle",
+            Self::SlaxLzm => "Slax LZM Module",
+            Self::PuppyPup => "Puppy Linux PUP Package",
+            Self::OciContainerImage => "OCI Container Image",
+            Self::SystemdSysext => "Systemd System Extension",
+            Self::PythonWheel => "Python Wheel Package",
+            Self::CargoCrate => "Rust Cargo Crate",
+            Self::RubyGem => "Ruby Gem Package",
+            Self::DotnetNuget => ".NET NuGet Package",
         }
     }
 }
@@ -350,7 +376,7 @@ mod tests {
     }
 
     #[test]
-    fn test_all_20_pr_package_formats() {
+    fn test_all_expanded_pr_package_formats() {
         let formats = [
             PullRequestPackageFormat::DebianDeb,
             PullRequestPackageFormat::FedoraRpm,
@@ -372,6 +398,19 @@ mod tests {
             PullRequestPackageFormat::SlackwareTxz,
             PullRequestPackageFormat::ClearBundle,
             PullRequestPackageFormat::IllumosP5p,
+            PullRequestPackageFormat::DeepinSuperdeb,
+            PullRequestPackageFormat::CachyOsPkg,
+            PullRequestPackageFormat::AdobeAir,
+            PullRequestPackageFormat::AppleIpa,
+            PullRequestPackageFormat::MacOsApp,
+            PullRequestPackageFormat::SlaxLzm,
+            PullRequestPackageFormat::PuppyPup,
+            PullRequestPackageFormat::OciContainerImage,
+            PullRequestPackageFormat::SystemdSysext,
+            PullRequestPackageFormat::PythonWheel,
+            PullRequestPackageFormat::CargoCrate,
+            PullRequestPackageFormat::RubyGem,
+            PullRequestPackageFormat::DotnetNuget,
         ];
 
         let mut engine = SovereignPackagePullRequestEngine::new();
@@ -390,6 +429,6 @@ mod tests {
             let merged = engine.merge_pr(pr_id).unwrap();
             assert_eq!(merged.source_format, *fmt);
         }
-        assert_eq!(engine.merged_packages.len(), 20);
+        assert_eq!(engine.merged_packages.len(), formats.len());
     }
 }
