@@ -17,6 +17,7 @@ pub mod paging;
 pub mod segmentation_paging;
 pub mod tlb_associative;
 pub mod zone;
+pub mod huge_pages;
 
 pub use paging::{
     MemoryError, PageDirectory, PageDirectoryPointerTable, PageTable, PageTableEntry,
@@ -32,4 +33,8 @@ pub use segmentation_paging::{
 };
 pub use tlb_associative::{AssociativeTlbCache, TlbAssociativityMode, TlbEntry, TlbPageFlags};
 pub use zone::{BsdZoneAllocator, Slab, Zone, ZoneStats};
+pub use huge_pages::{
+    HugePageBlock, HugePageFlags, SovereignHugePageEngine, TransparentHugePageMode,
+    PAGE_SIZE_1GB, PAGE_SIZE_2MB, PAGE_SIZE_4KB,
+};
 pub use quota::{MemoryController, MemoryStats, MemoryUnit, OomEvent, OomPolicy, ProcessMemoryAccount, PageCacheStat};

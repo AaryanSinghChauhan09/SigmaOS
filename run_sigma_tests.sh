@@ -37,6 +37,20 @@ if [ -f "src/init/systemd_init.rs" ]; then
     ./build/systemd_test
 fi
 
+if [ -f "src/memory/huge_pages.rs" ]; then
+    echo "Running huge pages & transparent huge pages (THP) test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/memory/huge_pages.rs -o build/huge_pages_test
+    ./build/huge_pages_test
+fi
+
+if [ -f "src/memory/kswapd.rs" ]; then
+    echo "Running kswapd LRU page reclaim & ZRAM test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/memory/kswapd.rs -o build/kswapd_test
+    ./build/kswapd_test
+fi
+
 if [ -f "src/distro/linux_bsd_inspirations.rs" ]; then
     echo "Running Linux & BSD distro inspirations & subsystem bridge test suite..."
     mkdir -p build
