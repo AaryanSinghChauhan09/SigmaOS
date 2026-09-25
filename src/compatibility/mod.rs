@@ -20,6 +20,11 @@ pub mod chakra;
 pub mod chimera_linux;
 pub mod clear_linux;
 pub mod community_foundation;
+pub mod corelibs;
+pub use corelibs::{
+    CorelibsAbiFlavors, CorelibsConfig, CorelibsLibraryKind, CorelibsSymbol, CorelibsSymbolResolver,
+    SovereignCorelibsEngine,
+};
 pub mod constellation;
 pub mod constellation_mesh;
 pub mod cross_platform;
