@@ -1,5 +1,10 @@
 // SigmaOS Hardware and Bus Drivers Subsystem Mod
 
+pub mod sovereign_hardware;
+pub use sovereign_hardware::{
+    AcpiPowerThermalState, BusType, CpuTopology, HardwareDeviceDescriptor, HardwareDeviceKind,
+    HardwareTopology, SovereignUniversalHardwareAbstractionEngine,
+};
 pub mod compatibility;
 pub mod tech_powerup_hardware_monitors;
 pub mod win32;
