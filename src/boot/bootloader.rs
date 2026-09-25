@@ -147,6 +147,36 @@ impl UefiBootloader {
         self.kernel_loaded = true;
         Ok(0xFFFFFFFF80000000) // 64-bit Higher Half Kernel Entry Point
     }
+
+    /// Generates GRUB2 configuration (grub.cfg) for Multiboot2 & EFI boot entries
+    pub fn generate_grub_cfg(&self) -> String {
+        let mut cfg = String::from("set timeout=5\nset default=0\n\n");
+        cfg.push_str("menuentry 'SigmaOS Sovereign Microkernel' {\n");
+        cfg.push_str("    insmod gpt\n");
+        cfg.push_str("    insmod ext2\n");
+        cfg.push_str("    set root='hd0,gpt2'\n");
+        cfg.push_str(&format!(
+            "    multiboot2 /boot/kernel.elf console={} root={}\n",
+            self.cmdline.console, self.cmdline.root_device
+        ));
+        cfg.push_str("    module2 /boot/initramfs.cpio initramfs\n");
+        cfg.push_str("    boot\n");
+        cfg.push_str("}\n");
+        cfg
+    }
+
+    /// Verifies Multiboot2 header magic (0xE85250D6)
+    pub fn verify_multiboot2_header(&self, header_bytes: &[u8]) -> Result<bool, &'static str> {
+        if header_bytes.len() < 16 {
+            return Err("Multiboot2 header too short");
+        }
+        let magic = u32::from_le_bytes([header_bytes[0], header_bytes[1], header_bytes[2], header_bytes[3]]);
+        if magic == 0xE85250D6 {
+            Ok(true)
+        } else {
+            Err("Invalid Multiboot2 magic signature")
+        }
+    }
 }
 
 pub struct SovereignInstallerWizard {
@@ -170,7 +200,7 @@ impl SovereignInstallerWizard {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -180,8 +210,9 @@ mod tests {
         let header = vec![0u8; 512];
         assert_eq!(bootloader.parse_gpt_header(&header).unwrap(), 2);
 
-        let elf_header = b"\x7FELF_MOCK_KERNEL_BINARY_TEST";
-        let entry = bootloader.load_kernel_elf(elf_header).unwrap();
+        let mut elf_header = vec![0u8; 64];
+        elf_header[..4].copy_from_slice(b"\x7FELF");
+        let entry = bootloader.load_kernel_elf(&elf_header).unwrap();
         assert_eq!(entry, 0xFFFFFFFF80000000);
 
         let wizard = SovereignInstallerWizard::new("/dev/nvme0n1");
@@ -204,5 +235,20 @@ mod tests {
         let mut dtb = DeviceTreeBlob { compatible_nodes: Vec::new() };
         let node_count = dtb.parse_dtb(&[0u8; 32]).unwrap();
         assert_eq!(node_count, 2);
+    }
+
+    #[test]
+    fn test_grub_cfg_and_multiboot2_header() {
+        let bootloader = UefiBootloader::new(BootType::Multiboot2);
+        let cfg = bootloader.generate_grub_cfg();
+        assert!(cfg.contains("SigmaOS Sovereign Microkernel"));
+        assert!(cfg.contains("multiboot2 /boot/kernel.elf"));
+        assert!(cfg.contains("console=ttyS0"));
+
+        let multiboot2_bytes = [0xD6, 0x50, 0x52, 0xE8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        assert!(bootloader.verify_multiboot2_header(&multiboot2_bytes).unwrap());
+
+        let invalid_bytes = [0x00, 0x00, 0x00, 0x00, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        assert!(bootloader.verify_multiboot2_header(&invalid_bytes).is_err());
     }
 }
