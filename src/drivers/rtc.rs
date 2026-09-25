@@ -293,6 +293,44 @@ impl DateTime {
     pub fn format_date(&self) -> String {
         format!("{:04}-{:02}-{:02}", self.year, self.month, self.day)
     }
+
+    /// Construct DateTime from Unix timestamp (seconds since 1970-01-01 00:00:00 UTC)
+    pub fn from_unix_timestamp(ts: u64) -> Self {
+        let seconds = (ts % 60) as u8;
+        let minutes = ((ts / 60) % 60) as u8;
+        let hours = ((ts / 3600) % 24) as u8;
+        let mut total_days = ts / 86400;
+
+        let mut year = 1970u16;
+        loop {
+            let days_in_year = if (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0) {
+                366
+            } else {
+                365
+            };
+            if total_days < days_in_year {
+                break;
+            }
+            total_days -= days_in_year;
+            year += 1;
+        }
+
+        let is_leap = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+        let days_per_month = [31, if is_leap { 29 } else { 28 }, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+        let mut month = 1u8;
+        for &m_days in &days_per_month {
+            if total_days < m_days as u64 {
+                break;
+            }
+            total_days -= m_days as u64;
+            month += 1;
+        }
+
+        let day = (total_days + 1) as u8;
+
+        Self::new(year, month, day, hours, minutes, seconds)
+    }
 }
 
 impl fmt::Display for DateTime {
@@ -456,6 +494,99 @@ impl Default for RtcDriver {
     }
 }
 
+// ──────────────────────────── Linux & BSD RTC Subsystem ───────────────────────
+
+/// Linux `/dev/rtc0` character device ioctl constants
+pub mod linux_rtc_ioctl {
+    pub const RTC_RD_TIME: u32 = 0x80247009;
+    pub const RTC_SET_TIME: u32 = 0x4024700A;
+    pub const RTC_ALM_READ: u32 = 0x80247008;
+    pub const RTC_ALM_SET: u32 = 0x40247007;
+    pub const RTC_AIE_ON: u32 = 0x7001;
+    pub const RTC_AIE_OFF: u32 = 0x7002;
+    pub const RTC_PIE_ON: u32 = 0x7005;
+    pub const RTC_PIE_OFF: u32 = 0x7006;
+}
+
+/// Linux & BSD Real-Time Clock Subsystem Interface
+#[derive(Debug, Clone)]
+pub struct LinuxBsdRtcSubsystem {
+    pub current_time: DateTime,
+    pub alarm_time: Option<DateTime>,
+    pub alarm_enabled: bool,
+    pub periodic_enabled: bool,
+    pub drift_compensation_ppm: f64,
+}
+
+impl LinuxBsdRtcSubsystem {
+    pub fn new() -> Self {
+        Self {
+            current_time: DateTime::new(2026, 9, 24, 12, 0, 0),
+            alarm_time: None,
+            alarm_enabled: false,
+            periodic_enabled: false,
+            drift_compensation_ppm: 0.0,
+        }
+    }
+
+    /// BSD inittodr(): Initialize system time-of-day clock from RTC hardware
+    pub fn inittodr(&mut self, hw_time: DateTime) -> u64 {
+        self.current_time = hw_time;
+        self.current_time.to_unix_timestamp()
+    }
+
+    /// BSD resettodr(): Synchronize hardware RTC clock from system time
+    pub fn resettodr(&mut self, system_timestamp: u64) -> DateTime {
+        let dt = DateTime::from_unix_timestamp(system_timestamp);
+        self.current_time = dt;
+        dt
+    }
+
+    /// Linux/BSD hwclock --hctosys: Hardware clock to system time sync
+    pub fn hwclock_hctosys(&mut self) -> u64 {
+        self.current_time.to_unix_timestamp()
+    }
+
+    /// Linux/BSD hwclock --systohc: System time to hardware clock sync
+    pub fn hwclock_systohc(&mut self, system_timestamp: u64) -> DateTime {
+        self.resettodr(system_timestamp)
+    }
+
+    /// Handles Linux /dev/rtc0 devfs ioctl calls
+    pub fn dev_rtc0_ioctl(&mut self, cmd: u32, arg: u64) -> Result<u64, &'static str> {
+        match cmd {
+            linux_rtc_ioctl::RTC_RD_TIME => Ok(self.current_time.to_unix_timestamp()),
+            linux_rtc_ioctl::RTC_SET_TIME => {
+                self.resettodr(arg);
+                Ok(0)
+            }
+            linux_rtc_ioctl::RTC_AIE_ON => {
+                self.alarm_enabled = true;
+                Ok(0)
+            }
+            linux_rtc_ioctl::RTC_AIE_OFF => {
+                self.alarm_enabled = false;
+                Ok(0)
+            }
+            linux_rtc_ioctl::RTC_PIE_ON => {
+                self.periodic_enabled = true;
+                Ok(0)
+            }
+            linux_rtc_ioctl::RTC_PIE_OFF => {
+                self.periodic_enabled = false;
+                Ok(0)
+            }
+            _ => Err("Invalid RTC ioctl command"),
+        }
+    }
+}
+
+impl Default for LinuxBsdRtcSubsystem {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // ──────────────────────────── Utility Functions ──────────────────────────────
 
 /// Convert a BCD-encoded byte to binary
@@ -555,6 +686,13 @@ mod tests {
         // 2000-01-01 00:00:00 UTC = 946684800
         let dt = DateTime::new(2000, 1, 1, 0, 0, 0);
         assert_eq!(dt.to_unix_timestamp(), 946684800);
+        let dt2 = DateTime::from_unix_timestamp(946684800);
+        assert_eq!(dt2.year, 2000);
+        assert_eq!(dt2.month, 1);
+        assert_eq!(dt2.day, 1);
+        assert_eq!(dt2.hours, 0);
+        assert_eq!(dt2.minutes, 0);
+        assert_eq!(dt2.seconds, 0);
     }
 
     #[test]
@@ -569,5 +707,22 @@ mod tests {
         assert_eq!(dt.hours, 23);
         assert_eq!(dt.minutes, 59);
         assert_eq!(dt.seconds, 58);
+    }
+
+    #[test]
+    fn test_linux_bsd_rtc_subsystem() {
+        let mut rtc = LinuxBsdRtcSubsystem::new();
+        let dt = DateTime::new(2026, 9, 24, 15, 30, 0);
+        let ts = rtc.inittodr(dt);
+        assert!(ts > 0);
+
+        let read_ts = rtc.dev_rtc0_ioctl(linux_rtc_ioctl::RTC_RD_TIME, 0).unwrap();
+        assert_eq!(read_ts, ts);
+
+        assert!(rtc.dev_rtc0_ioctl(linux_rtc_ioctl::RTC_AIE_ON, 0).is_ok());
+        assert!(rtc.alarm_enabled);
+
+        let hctosys_ts = rtc.hwclock_hctosys();
+        assert_eq!(hctosys_ts, ts);
     }
 }
