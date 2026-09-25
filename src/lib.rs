@@ -42,6 +42,9 @@ pub mod runtime;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
+pub use package::{
+    SovereignUniversalPackageFormatMasterEngine, UniversalPackageFormatKind,
+};
 pub use sigpkg::{
     SovereignUniversalPackageManagerInteropEngine, SovereignUniversalPackageTranslationBridge,
 };
