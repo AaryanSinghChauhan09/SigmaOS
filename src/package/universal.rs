@@ -340,6 +340,27 @@ pub enum PackageFormat {
     Vcpkg,      // C++ Vcpkg package (.vcpkg)
     NarInfo,    // Nix NAR Info (.narinfo)
     Sysupdate,  // systemd-sysupdate format (.sysupdate)
+    Msi,        // Windows MSI/MSIX/AppX (.msi, .msix, .appx)
+    Apex,       // Android APEX Module (.apex)
+    Conda,      // Conda Package (.conda, .tar.bz2)
+    Helm,       // Kubernetes Helm Chart (.helm)
+    Sysext,     // systemd-sysext System Extension (.sysext)
+    FlatpakRef, // Flatpak ref bundle (.flatpakref)
+    Makeself,   // Makeself runnable installer (.run)
+    ZeroInstall,// ZeroInstall package (.zpk)
+    Kmod,       // Kernel Module package (.kmp, .kmod)
+    Jar,        // Java JAR package (.jar)
+    Npm,        // Node.js NPM package (.npm)
+    Phar,       // PHP Phar archive (.phar)
+    Cpan,       // Perl CPAN package (.cpan)
+    LuaRock,    // LuaRock package (.rock)
+    Hex,        // Elixir Hex package (.hex)
+    Cabal,      // Haskell Cabal package (.cabal)
+    JuliaPkg,   // Julia package (.jl)
+    CRan,       // R CRAN package (.rpkg)
+    Brew,       // Homebrew formula (.brew)
+    Wasm,       // WebAssembly component (.wasm)
+    Oci,        // OCI container image (.oci)
 }
 
 impl PackageFormat {
@@ -474,6 +495,48 @@ impl PackageFormat {
             Some(PackageFormat::NarInfo)
         } else if normalized.ends_with(".sysupdate") {
             Some(PackageFormat::Sysupdate)
+        } else if normalized.ends_with(".msi") || normalized.ends_with(".msix") || normalized.ends_with(".appx") {
+            Some(PackageFormat::Msi)
+        } else if normalized.ends_with(".apex") {
+            Some(PackageFormat::Apex)
+        } else if normalized.ends_with(".conda") || normalized.ends_with(".tar.bz2") {
+            Some(PackageFormat::Conda)
+        } else if normalized.ends_with(".helm") {
+            Some(PackageFormat::Helm)
+        } else if normalized.ends_with(".sysext") {
+            Some(PackageFormat::Sysext)
+        } else if normalized.ends_with(".flatpakref") || normalized.ends_with(".flatpakrepo") {
+            Some(PackageFormat::FlatpakRef)
+        } else if normalized.ends_with(".run") {
+            Some(PackageFormat::Makeself)
+        } else if normalized.ends_with(".zpk") {
+            Some(PackageFormat::ZeroInstall)
+        } else if normalized.ends_with(".kmp") || normalized.ends_with(".kmod") {
+            Some(PackageFormat::Kmod)
+        } else if normalized.ends_with(".jar") {
+            Some(PackageFormat::Jar)
+        } else if normalized.ends_with(".npm") {
+            Some(PackageFormat::Npm)
+        } else if normalized.ends_with(".phar") {
+            Some(PackageFormat::Phar)
+        } else if normalized.ends_with(".cpan") {
+            Some(PackageFormat::Cpan)
+        } else if normalized.ends_with(".rock") || normalized.ends_with(".rockspec") {
+            Some(PackageFormat::LuaRock)
+        } else if normalized.ends_with(".hex") {
+            Some(PackageFormat::Hex)
+        } else if normalized.ends_with(".cabal") {
+            Some(PackageFormat::Cabal)
+        } else if normalized.ends_with(".jl") {
+            Some(PackageFormat::JuliaPkg)
+        } else if normalized.ends_with(".rpkg") {
+            Some(PackageFormat::CRan)
+        } else if normalized.ends_with(".brew") {
+            Some(PackageFormat::Brew)
+        } else if normalized.ends_with(".wasm") || normalized.ends_with(".wit") {
+            Some(PackageFormat::Wasm)
+        } else if normalized.ends_with(".oci") {
+            Some(PackageFormat::Oci)
         } else {
             None
         }
@@ -922,6 +985,27 @@ impl_generic_install_strategy!(GemInstallStrategy);
 impl_generic_install_strategy!(NupkgInstallStrategy);
 impl_generic_install_strategy!(VcpkgInstallStrategy);
 impl_generic_install_strategy!(NarInfoInstallStrategy);
+impl_generic_install_strategy!(MsiInstallStrategy);
+impl_generic_install_strategy!(ApexInstallStrategy);
+impl_generic_install_strategy!(CondaInstallStrategy);
+impl_generic_install_strategy!(HelmInstallStrategy);
+impl_generic_install_strategy!(SysextInstallStrategy);
+impl_generic_install_strategy!(FlatpakRefInstallStrategy);
+impl_generic_install_strategy!(MakeselfInstallStrategy);
+impl_generic_install_strategy!(ZeroInstallInstallStrategy);
+impl_generic_install_strategy!(KmodInstallStrategy);
+impl_generic_install_strategy!(JarInstallStrategy);
+impl_generic_install_strategy!(NpmInstallStrategy);
+impl_generic_install_strategy!(PharInstallStrategy);
+impl_generic_install_strategy!(CpanInstallStrategy);
+impl_generic_install_strategy!(LuaRockInstallStrategy);
+impl_generic_install_strategy!(HexInstallStrategy);
+impl_generic_install_strategy!(CabalInstallStrategy);
+impl_generic_install_strategy!(JuliaPkgInstallStrategy);
+impl_generic_install_strategy!(CRanInstallStrategy);
+impl_generic_install_strategy!(BrewInstallStrategy);
+impl_generic_install_strategy!(WasmInstallStrategy);
+impl_generic_install_strategy!(OciInstallStrategy);
 
 // ============================================================================
 // OOP Design Pattern: Adapter Pattern
@@ -1189,6 +1273,27 @@ impl_generic_metadata_adapter!(GemMetadataAdapter, Gem);
 impl_generic_metadata_adapter!(NupkgMetadataAdapter, Nupkg);
 impl_generic_metadata_adapter!(VcpkgMetadataAdapter, Vcpkg);
 impl_generic_metadata_adapter!(NarInfoMetadataAdapter, NarInfo);
+impl_generic_metadata_adapter!(MsiMetadataAdapter, Msi);
+impl_generic_metadata_adapter!(ApexMetadataAdapter, Apex);
+impl_generic_metadata_adapter!(CondaMetadataAdapter, Conda);
+impl_generic_metadata_adapter!(HelmMetadataAdapter, Helm);
+impl_generic_metadata_adapter!(SysextMetadataAdapter, Sysext);
+impl_generic_metadata_adapter!(FlatpakRefMetadataAdapter, FlatpakRef);
+impl_generic_metadata_adapter!(MakeselfMetadataAdapter, Makeself);
+impl_generic_metadata_adapter!(ZeroInstallMetadataAdapter, ZeroInstall);
+impl_generic_metadata_adapter!(KmodMetadataAdapter, Kmod);
+impl_generic_metadata_adapter!(JarMetadataAdapter, Jar);
+impl_generic_metadata_adapter!(NpmMetadataAdapter, Npm);
+impl_generic_metadata_adapter!(PharMetadataAdapter, Phar);
+impl_generic_metadata_adapter!(CpanMetadataAdapter, Cpan);
+impl_generic_metadata_adapter!(LuaRockMetadataAdapter, LuaRock);
+impl_generic_metadata_adapter!(HexMetadataAdapter, Hex);
+impl_generic_metadata_adapter!(CabalMetadataAdapter, Cabal);
+impl_generic_metadata_adapter!(JuliaPkgMetadataAdapter, JuliaPkg);
+impl_generic_metadata_adapter!(CRanMetadataAdapter, CRan);
+impl_generic_metadata_adapter!(BrewMetadataAdapter, Brew);
+impl_generic_metadata_adapter!(WasmMetadataAdapter, Wasm);
+impl_generic_metadata_adapter!(OciMetadataAdapter, Oci);
 
 // ============================================================================
 // OOP Design Pattern: Decorator Pattern
@@ -1412,6 +1517,27 @@ impl PackageFactory {
             PackageFormat::Vcpkg => Box::new(VcpkgInstallStrategy),
             PackageFormat::NarInfo => Box::new(NarInfoInstallStrategy),
             PackageFormat::Sysupdate => Box::new(SigmaPkgInstallStrategy),
+            PackageFormat::Msi => Box::new(MsiInstallStrategy),
+            PackageFormat::Apex => Box::new(ApexInstallStrategy),
+            PackageFormat::Conda => Box::new(CondaInstallStrategy),
+            PackageFormat::Helm => Box::new(HelmInstallStrategy),
+            PackageFormat::Sysext => Box::new(SysextInstallStrategy),
+            PackageFormat::FlatpakRef => Box::new(FlatpakRefInstallStrategy),
+            PackageFormat::Makeself => Box::new(MakeselfInstallStrategy),
+            PackageFormat::ZeroInstall => Box::new(ZeroInstallInstallStrategy),
+            PackageFormat::Kmod => Box::new(KmodInstallStrategy),
+            PackageFormat::Jar => Box::new(JarInstallStrategy),
+            PackageFormat::Npm => Box::new(NpmInstallStrategy),
+            PackageFormat::Phar => Box::new(PharInstallStrategy),
+            PackageFormat::Cpan => Box::new(CpanInstallStrategy),
+            PackageFormat::LuaRock => Box::new(LuaRockInstallStrategy),
+            PackageFormat::Hex => Box::new(HexInstallStrategy),
+            PackageFormat::Cabal => Box::new(CabalInstallStrategy),
+            PackageFormat::JuliaPkg => Box::new(JuliaPkgInstallStrategy),
+            PackageFormat::CRan => Box::new(CRanInstallStrategy),
+            PackageFormat::Brew => Box::new(BrewInstallStrategy),
+            PackageFormat::Wasm => Box::new(WasmInstallStrategy),
+            PackageFormat::Oci => Box::new(OciInstallStrategy),
         }
     }
 
@@ -1485,6 +1611,27 @@ impl PackageFactory {
             PackageFormat::Vcpkg => Box::new(VcpkgMetadataAdapter),
             PackageFormat::NarInfo => Box::new(NarInfoMetadataAdapter),
             PackageFormat::Sysupdate => Box::new(SigmaPkgMetadataAdapter),
+            PackageFormat::Msi => Box::new(MsiMetadataAdapter),
+            PackageFormat::Apex => Box::new(ApexMetadataAdapter),
+            PackageFormat::Conda => Box::new(CondaMetadataAdapter),
+            PackageFormat::Helm => Box::new(HelmMetadataAdapter),
+            PackageFormat::Sysext => Box::new(SysextMetadataAdapter),
+            PackageFormat::FlatpakRef => Box::new(FlatpakRefMetadataAdapter),
+            PackageFormat::Makeself => Box::new(MakeselfMetadataAdapter),
+            PackageFormat::ZeroInstall => Box::new(ZeroInstallMetadataAdapter),
+            PackageFormat::Kmod => Box::new(KmodMetadataAdapter),
+            PackageFormat::Jar => Box::new(JarMetadataAdapter),
+            PackageFormat::Npm => Box::new(NpmMetadataAdapter),
+            PackageFormat::Phar => Box::new(PharMetadataAdapter),
+            PackageFormat::Cpan => Box::new(CpanMetadataAdapter),
+            PackageFormat::LuaRock => Box::new(LuaRockMetadataAdapter),
+            PackageFormat::Hex => Box::new(HexMetadataAdapter),
+            PackageFormat::Cabal => Box::new(CabalMetadataAdapter),
+            PackageFormat::JuliaPkg => Box::new(JuliaPkgMetadataAdapter),
+            PackageFormat::CRan => Box::new(CRanMetadataAdapter),
+            PackageFormat::Brew => Box::new(BrewMetadataAdapter),
+            PackageFormat::Wasm => Box::new(WasmMetadataAdapter),
+            PackageFormat::Oci => Box::new(OciMetadataAdapter),
         }
     }
 }
