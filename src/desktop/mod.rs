@@ -81,3 +81,5 @@ pub mod mint_backup_tool;
 pub mod compositor;
 pub mod launcher;
 pub mod notification;
+pub mod omarchy_dynamic_workspace_suite;
+pub use omarchy_dynamic_workspace_suite::*;
