@@ -699,7 +699,7 @@ impl FiftyPercentRuleEngine {
     }
 }
 
-impl Default for FiftyPercentRuleEngine {
+impl Default for FiftyPercentGovernanceEngine {
     fn default() -> Self {
         Self::new(16384, 1024)
     }

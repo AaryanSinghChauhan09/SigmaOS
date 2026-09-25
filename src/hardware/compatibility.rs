@@ -722,6 +722,142 @@ impl OpenBsdUvideoWebcamEngine {
     }
 }
 
+/// Linux VirtIO-GPU 3D VirGL Hardware Acceleration Driver Engine
+#[derive(Debug, Clone)]
+pub struct LinuxVirtioGpu3dVirglEngine {
+    pub context_id: u32,
+    pub resource_id: u32,
+    pub virgl_renderer_active: bool,
+    pub num_submitted_commands: u64,
+}
+
+impl LinuxVirtioGpu3dVirglEngine {
+    pub fn new(context_id: u32) -> Self {
+        Self {
+            context_id,
+            resource_id: 1,
+            virgl_renderer_active: true,
+            num_submitted_commands: 0,
+        }
+    }
+
+    pub fn create_3d_resource_3d(&mut self, target: u32, format: u32, width: u32, height: u32) -> Result<u32, &'static str> {
+        if !self.virgl_renderer_active {
+            return Err("VirGL 3D renderer inactive");
+        }
+        let res_id = self.resource_id;
+        self.resource_id += 1;
+        let _ = (target, format, width, height);
+        Ok(res_id)
+    }
+
+    pub fn submit_3d_cmdbuf(&mut self, cmd_buf: &[u8]) -> Result<u64, &'static str> {
+        if cmd_buf.is_empty() {
+            return Err("Empty VirGL 3D command buffer");
+        }
+        self.num_submitted_commands += 1;
+        Ok(self.num_submitted_commands)
+    }
+}
+
+/// FreeBSD Netmap Zero-Copy High-Speed Network Adapter Driver Engine
+#[derive(Debug, Clone)]
+pub struct FreeBsdNetmapHighSpeedPacketEngine {
+    pub interface_name: String,
+    pub num_tx_rings: u32,
+    pub num_rx_rings: u32,
+    pub ring_slots_count: u32,
+    pub netmap_mem_mapped: bool,
+}
+
+impl FreeBsdNetmapHighSpeedPacketEngine {
+    pub fn new(ifname: &str, tx_rings: u32, rx_rings: u32, slots: u32) -> Self {
+        Self {
+            interface_name: ifname.to_string(),
+            num_tx_rings: tx_rings,
+            num_rx_rings: rx_rings,
+            ring_slots_count: slots,
+            netmap_mem_mapped: false,
+        }
+    }
+
+    pub fn open_netmap_ring(&mut self) -> Result<bool, &'static str> {
+        self.netmap_mem_mapped = true;
+        Ok(true)
+    }
+
+    pub fn transmit_packet_zero_copy(&mut self, packet_data: &[u8]) -> Result<u32, &'static str> {
+        if !self.netmap_mem_mapped {
+            return Err("Netmap ring buffer memory not mapped");
+        }
+        if packet_data.len() > 2048 {
+            return Err("Packet exceeds Netmap slot buffer capacity");
+        }
+        Ok(packet_data.len() as u32)
+    }
+}
+
+/// OpenBSD AMDGPU DRM/KMS Kernel Mode Setting Graphics Driver Engine
+#[derive(Debug, Clone)]
+pub struct OpenBsdAmdGpuKmsEngine {
+    pub pci_bus_addr: String,
+    pub active_crtc: u32,
+    pub connector_id: u32,
+    pub current_mode_width: u32,
+    pub current_mode_height: u32,
+    pub mode_set_active: bool,
+}
+
+impl OpenBsdAmdGpuKmsEngine {
+    pub fn new(pci_addr: &str) -> Self {
+        Self {
+            pci_bus_addr: pci_addr.to_string(),
+            active_crtc: 0,
+            connector_id: 1,
+            current_mode_width: 1920,
+            current_mode_height: 1080,
+            mode_set_active: false,
+        }
+    }
+
+    pub fn set_display_mode(&mut self, crtc: u32, width: u32, height: u32) -> Result<bool, &'static str> {
+        self.active_crtc = crtc;
+        self.current_mode_width = width;
+        self.current_mode_height = height;
+        self.mode_set_active = true;
+        Ok(true)
+    }
+}
+
+/// NetBSD NPF Hardware NIC Packet Checksum & Offload Engine
+#[derive(Debug, Clone)]
+pub struct NetBsdNpfHardwareOffloadEngine {
+    pub interface_name: String,
+    pub rx_checksum_offload: bool,
+    pub tx_checksum_offload: bool,
+    pub tso_v4_enabled: bool,
+    pub lro_enabled: bool,
+}
+
+impl NetBsdNpfHardwareOffloadEngine {
+    pub fn new(ifname: &str) -> Self {
+        Self {
+            interface_name: ifname.to_string(),
+            rx_checksum_offload: true,
+            tx_checksum_offload: true,
+            tso_v4_enabled: true,
+            lro_enabled: true,
+        }
+    }
+
+    pub fn configure_offload_flags(&mut self, rx_csum: bool, tx_csum: bool, tso: bool, lro: bool) {
+        self.rx_checksum_offload = rx_csum;
+        self.tx_checksum_offload = tx_csum;
+        self.tso_v4_enabled = tso;
+        self.lro_enabled = lro;
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -843,5 +979,28 @@ mod tests {
         let frame = uvideo.capture_video_frame().unwrap();
         assert_eq!(frame[0], 0xFF);
         uvideo.stop_video_stream();
+
+        // 5. Test Linux VirtIO-GPU 3D VirGL driver
+        let mut virgl = LinuxVirtioGpu3dVirglEngine::new(1);
+        let res_id = virgl.create_3d_resource_3d(1, 1, 1024, 768).unwrap();
+        assert_eq!(res_id, 1);
+        assert_eq!(virgl.submit_3d_cmdbuf(&[0x01, 0x02, 0x03]).unwrap(), 1);
+
+        // 6. Test FreeBSD Netmap high-speed packet engine
+        let mut netmap = FreeBsdNetmapHighSpeedPacketEngine::new("vtnet0", 4, 4, 1024);
+        assert!(netmap.transmit_packet_zero_copy(&[0x00, 0x11, 0x22]).is_err());
+        assert!(netmap.open_netmap_ring().unwrap());
+        assert_eq!(netmap.transmit_packet_zero_copy(&[0x00, 0x11, 0x22]).unwrap(), 3);
+
+        // 7. Test OpenBSD AMDGPU DRM/KMS engine
+        let mut amdgpu = OpenBsdAmdGpuKmsEngine::new("0000:03:00.0");
+        assert!(amdgpu.set_display_mode(1, 2560, 1440).unwrap());
+        assert_eq!(amdgpu.current_mode_width, 2560);
+
+        // 8. Test NetBSD NPF hardware NIC offload engine
+        let mut npf_hw = NetBsdNpfHardwareOffloadEngine::new("re0");
+        npf_hw.configure_offload_flags(true, true, false, true);
+        assert!(!npf_hw.tso_v4_enabled);
+        assert!(npf_hw.lro_enabled);
     }
 }

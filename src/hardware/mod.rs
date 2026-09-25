@@ -10,6 +10,8 @@ pub use compatibility::{
     SimpleAcpiManager, SimpleCompatibilityMatrix, SimpleDevice, SimpleDiagnostics,
     LinuxNvmeOverFabricsEngine, FreeBsdCamStorageEngine,
     LinuxThunderboltDisplayPortTunnelEngine, OpenBsdUvideoWebcamEngine,
+    LinuxVirtioGpu3dVirglEngine, FreeBsdNetmapHighSpeedPacketEngine,
+    OpenBsdAmdGpuKmsEngine, NetBsdNpfHardwareOffloadEngine,
 };
 
 pub use tech_powerup_hardware_monitors::{
