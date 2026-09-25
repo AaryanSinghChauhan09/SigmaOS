@@ -89,3 +89,4 @@ pub mod wiki_unimplemented_ideas;
 pub use wiki_unimplemented_ideas::*;
 pub mod userland;
 pub mod arch;
+pub mod compiler;

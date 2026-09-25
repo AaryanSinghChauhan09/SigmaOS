@@ -1,3 +1,5 @@
+pub mod acpi;
+pub mod boot;
 pub mod cpu;
 pub mod gdt;
 pub mod idt;
@@ -10,4 +12,5 @@ pub fn initialize() {
     idt::init();
     paging::init();
     interrupts::enable();
+    acpi::init();
 }
