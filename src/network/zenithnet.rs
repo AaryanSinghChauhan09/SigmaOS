@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 /// SigmaOS: ZenithNet - Bare-Metal Networking Stack
 /// Implements TCP/IP, UDP, ARP, ICMP with zero-copy packet handling
+/// Enhanced with Linux netfilter and BSD firewall integration
 
 use std::collections::BTreeMap;
 use std::string::String;
@@ -340,6 +341,10 @@ pub enum NetworkError {
     ConnectionFailed,
     SocketError,
     BufferTooSmall,
+    Timeout,
+    ConnectionRefused,
+    ConnectionReset,
+    FirewallBlocked,
 }
 
 impl fmt::Display for NetworkError {
@@ -353,8 +358,68 @@ impl fmt::Display for NetworkError {
             Self::ConnectionFailed => write!(f, "Connection failed"),
             Self::SocketError => write!(f, "Socket error"),
             Self::BufferTooSmall => write!(f, "Buffer too small"),
+            Self::Timeout => write!(f, "Connection timeout"),
+            Self::ConnectionRefused => write!(f, "Connection refused"),
+            Self::ConnectionReset => write!(f, "Connection reset"),
+            Self::FirewallBlocked => write!(f, "Packet blocked by firewall"),
         }
     }
+}
+
+/// Firewall rule action (inspired by Linux iptables and BSD PF)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FirewallAction {
+    Accept,
+    Drop,
+    Reject,
+}
+
+/// Firewall rule (Linux netfilter-inspired)
+#[derive(Debug, Clone)]
+pub struct FirewallRule {
+    pub id: u32,
+    pub src_addr: Option<Ipv4Addr>,
+    pub src_mask: Option<Ipv4Addr>,
+    pub dst_addr: Option<Ipv4Addr>,
+    pub dst_mask: Option<Ipv4Addr>,
+    pub src_port: Option<u16>,
+    pub dst_port: Option<u16>,
+    pub protocol: Option<IpProtocol>,
+    pub action: FirewallAction,
+    pub enabled: bool,
+}
+
+/// TCP Connection (Linux socket-inspired)
+#[derive(Debug, Clone)]
+pub struct TcpConnection {
+    pub local_addr: Ipv4Addr,
+    pub local_port: u16,
+    pub remote_addr: Ipv4Addr,
+    pub remote_port: u16,
+    pub state: TcpState,
+    pub sequence: u32,
+    pub ack_sequence: u32,
+    pub window_size: u16,
+    pub receive_buffer: Vec<u8>,
+    pub send_buffer: Vec<u8>,
+    pub last_activity: u64, // timestamp
+}
+
+/// Socket (Linux/BSD socket API abstraction)
+#[derive(Debug, Clone)]
+pub struct NetworkSocket {
+    pub socket_id: u32,
+    pub domain: u32, // AF_INET, AF_INET6, etc.
+    pub socket_type: u32, // SOCK_STREAM, SOCK_DGRAM, etc.
+    pub protocol: u32, // IPPROTO_TCP, IPPROTO_UDP, etc.
+    pub bound_addr: Option<Ipv4Addr>,
+    pub bound_port: Option<u16>,
+    pub connected_addr: Option<Ipv4Addr>,
+    pub connected_port: Option<u16>,
+    pub tcp_connection: Option<TcpConnection>,
+    pub non_blocking: bool,
+    pub receive_timeout: Option<u64>, // milliseconds
+    pub send_timeout: Option<u64>, // milliseconds
 }
 
 /// ZenithNet - Main Networking Stack
@@ -362,6 +427,11 @@ pub struct ZenithNet {
     interfaces: BTreeMap<String, NetworkInterface>,
     routing_table: Vec<(Ipv4Addr, Ipv4Addr, String)>, // (dest, netmask, interface)
     arp_cache: BTreeMap<Ipv4Addr, MacAddr>,
+    firewall_rules: Vec<FirewallRule>,
+    tcp_connections: BTreeMap<u32, TcpConnection>, // connection_id -> connection
+    sockets: BTreeMap<u32, NetworkSocket>, // socket_id -> socket
+    next_socket_id: u32,
+    next_connection_id: u32,
 }
 
 impl ZenithNet {
@@ -370,6 +440,11 @@ impl ZenithNet {
             interfaces: BTreeMap::new(),
             routing_table: Vec::new(),
             arp_cache: BTreeMap::new(),
+            firewall_rules: Vec::new(),
+            tcp_connections: BTreeMap::new(),
+            sockets: BTreeMap::new(),
+            next_socket_id: 1,
+            next_connection_id: 1,
         }
     }
 
@@ -435,6 +510,256 @@ impl ZenithNet {
     /// Get interface count
     pub fn interface_count(&self) -> usize {
         self.interfaces.len()
+    }
+
+    // ========== Firewall Management (Linux iptables/BSD PF inspired) ==========
+
+    /// Add firewall rule
+    pub fn add_firewall_rule(&mut self, rule: FirewallRule) -> Result<(), NetworkError> {
+        self.firewall_rules.push(rule);
+        Ok(())
+    }
+
+    /// Remove firewall rule by ID
+    pub fn remove_firewall_rule(&mut self, rule_id: u32) -> Result<(), NetworkError> {
+        if let Some(pos) = self.firewall_rules.iter().position(|r| r.id == rule_id) {
+            self.firewall_rules.remove(pos);
+            Ok(())
+        } else {
+            Err(NetworkError::InterfaceNotFound) // Reuse error for simplicity
+        }
+    }
+
+    /// Check if packet should be allowed by firewall
+    pub fn check_firewall(&self, src_addr: Ipv4Addr, dst_addr: Ipv4Addr, src_port: u16, dst_port: u16, protocol: IpProtocol) -> Result<(), NetworkError> {
+        for rule in &self.firewall_rules {
+            if !rule.enabled {
+                continue;
+            }
+
+            // Check source address match
+            if let Some(rule_src) = rule.src_addr {
+                let rule_mask = rule.src_mask.unwrap_or(Ipv4Addr::new(255, 255, 255, 255));
+                if (src_addr.0 & rule_mask.0) != (rule_src.0 & rule_mask.0) {
+                    continue;
+                }
+            }
+
+            // Check destination address match
+            if let Some(rule_dst) = rule.dst_addr {
+                let rule_mask = rule.dst_mask.unwrap_or(Ipv4Addr::new(255, 255, 255, 255));
+                if (dst_addr.0 & rule_mask.0) != (rule_dst.0 & rule_mask.0) {
+                    continue;
+                }
+            }
+
+            // Check source port match
+            if let Some(rule_src_port) = rule.src_port {
+                if src_port != rule_src_port {
+                    continue;
+                }
+            }
+
+            // Check destination port match
+            if let Some(rule_dst_port) = rule.dst_port {
+                if dst_port != rule_dst_port {
+                    continue;
+                }
+            }
+
+            // Check protocol match
+            if let Some(rule_protocol) = rule.protocol {
+                if protocol != rule_protocol {
+                    continue;
+                }
+            }
+
+            // Rule matched - apply action
+            match rule.action {
+                FirewallAction::Accept => return Ok(()),
+                FirewallAction::Drop => return Err(NetworkError::FirewallBlocked),
+                FirewallAction::Reject => return Err(NetworkError::ConnectionRefused),
+            }
+        }
+
+        // Default allow if no rules matched
+        Ok(())
+    }
+
+    // ========== Socket Management (Linux/BSD socket API) ==========
+
+    /// Create a new socket
+    pub fn socket(&mut self, domain: u32, socket_type: u32, protocol: u32) -> Result<u32, NetworkError> {
+        let socket_id = self.next_socket_id;
+        self.next_socket_id += 1;
+
+        let socket = NetworkSocket {
+            socket_id,
+            domain,
+            socket_type,
+            protocol,
+            bound_addr: None,
+            bound_port: None,
+            connected_addr: None,
+            connected_port: None,
+            tcp_connection: None,
+            non_blocking: false,
+            receive_timeout: None,
+            send_timeout: None,
+        };
+
+        self.sockets.insert(socket_id, socket);
+        Ok(socket_id)
+    }
+
+    /// Bind socket to address and port
+    pub fn bind(&mut self, socket_id: u32, addr: Ipv4Addr, port: u16) -> Result<(), NetworkError> {
+        if let Some(socket) = self.sockets.get_mut(&socket_id) {
+            socket.bound_addr = Some(addr);
+            socket.bound_port = Some(port);
+            Ok(())
+        } else {
+            Err(NetworkError::SocketError)
+        }
+    }
+
+    /// Connect socket to remote address
+    pub fn connect(&mut self, socket_id: u32, remote_addr: Ipv4Addr, remote_port: u16) -> Result<(), NetworkError> {
+        if let Some(socket) = self.sockets.get_mut(&socket_id) {
+            if socket.socket_type != 1 { // SOCK_STREAM
+                return Err(NetworkError::SocketError);
+            }
+
+            // Create TCP connection
+            let connection_id = self.next_connection_id;
+            self.next_connection_id += 1;
+
+            let local_addr = socket.bound_addr.unwrap_or(Ipv4Addr::any());
+            let local_port = socket.bound_port.unwrap_or(0); // Let system assign
+
+            let tcp_connection = TcpConnection {
+                local_addr,
+                local_port,
+                remote_addr,
+                remote_port,
+                state: TcpState::SynSent,
+                sequence: 1000, // Initial sequence number
+                ack_sequence: 0,
+                window_size: 65535,
+                receive_buffer: Vec::new(),
+                send_buffer: Vec::new(),
+                last_activity: 0,
+            };
+
+            self.tcp_connections.insert(connection_id, tcp_connection);
+            socket.connected_addr = Some(remote_addr);
+            socket.connected_port = Some(remote_port);
+            socket.tcp_connection = Some(tcp_connection);
+
+            Ok(())
+        } else {
+            Err(NetworkError::SocketError)
+        }
+    }
+
+    /// Listen on socket (TCP server)
+    pub fn listen(&mut self, socket_id: u32, backlog: u32) -> Result<(), NetworkError> {
+        if let Some(socket) = self.sockets.get_mut(&socket_id) {
+            if socket.socket_type != 1 { // SOCK_STREAM
+                return Err(NetworkError::SocketError);
+            }
+
+            if let Some(ref mut conn) = socket.tcp_connection {
+                conn.state = TcpState::Listen;
+            } else {
+                // Create listening connection
+                let connection_id = self.next_connection_id;
+                self.next_connection_id += 1;
+
+                let tcp_connection = TcpConnection {
+                    local_addr: socket.bound_addr.unwrap_or(Ipv4Addr::any()),
+                    local_port: socket.bound_port.unwrap_or(0),
+                    remote_addr: Ipv4Addr::any(),
+                    remote_port: 0,
+                    state: TcpState::Listen,
+                    sequence: 0,
+                    ack_sequence: 0,
+                    window_size: 65535,
+                    receive_buffer: Vec::new(),
+                    send_buffer: Vec::new(),
+                    last_activity: 0,
+                };
+
+                self.tcp_connections.insert(connection_id, tcp_connection);
+                socket.tcp_connection = Some(tcp_connection);
+            }
+
+            Ok(())
+        } else {
+            Err(NetworkError::SocketError)
+        }
+    }
+
+    /// Set socket to non-blocking mode
+    pub fn set_non_blocking(&mut self, socket_id: u32, non_blocking: bool) -> Result<(), NetworkError> {
+        if let Some(socket) = self.sockets.get_mut(&socket_id) {
+            socket.non_blocking = non_blocking;
+            Ok(())
+        } else {
+            Err(NetworkError::SocketError)
+        }
+    }
+
+    /// Set socket receive timeout
+    pub fn set_receive_timeout(&mut self, socket_id: u32, timeout_ms: u64) -> Result<(), NetworkError> {
+        if let Some(socket) = self.sockets.get_mut(&socket_id) {
+            socket.receive_timeout = Some(timeout_ms);
+            Ok(())
+        } else {
+            Err(NetworkError::SocketError)
+        }
+    }
+
+    /// Close socket
+    pub fn close(&mut self, socket_id: u32) -> Result<(), NetworkError> {
+        if let Some(mut socket) = self.sockets.remove(&socket_id) {
+            if let Some(ref conn) = socket.tcp_connection {
+                // Clean up TCP connection
+                // In real implementation, send FIN packet
+            }
+            Ok(())
+        } else {
+            Err(NetworkError::SocketError)
+        }
+    }
+
+    // ========== TCP Connection Management ==========
+
+    /// Get TCP connection state
+    pub fn get_tcp_state(&self, connection_id: u32) -> Option<TcpState> {
+        self.tcp_connections.get(&connection_id).map(|conn| conn.state)
+    }
+
+    /// Update TCP connection state
+    pub fn set_tcp_state(&mut self, connection_id: u32, state: TcpState) -> Result<(), NetworkError> {
+        if let Some(conn) = self.tcp_connections.get_mut(&connection_id) {
+            conn.state = state;
+            Ok(())
+        } else {
+            Err(NetworkError::ConnectionFailed)
+        }
+    }
+
+    /// Get connection statistics
+    pub fn get_connection_stats(&self, connection_id: u32) -> Option<(u32, u32, u64, u64)> {
+        self.tcp_connections.get(&connection_id).map(|conn| {
+            (
+                conn.window_size,
+                conn.sequence,
+                conn.receive_buffer.len() as u64,
+                conn.send_buffer.len() as u64,
+            )
+        })
     }
 }
 
@@ -511,5 +836,151 @@ mod tests {
 
         net.arp_add(ip, mac);
         assert_eq!(net.arp_lookup(ip), Some(mac));
+    }
+
+    #[test]
+    fn test_firewall_rules() {
+        let mut net = ZenithNet::new();
+
+        // Add a rule to block traffic from 192.168.1.100
+        let rule = FirewallRule {
+            id: 1,
+            src_addr: Some(Ipv4Addr::new(192, 168, 1, 100)),
+            src_mask: Some(Ipv4Addr::new(255, 255, 255, 255)),
+            dst_addr: None,
+            dst_mask: None,
+            src_port: None,
+            dst_port: None,
+            protocol: None,
+            action: FirewallAction::Drop,
+            enabled: true,
+        };
+
+        net.add_firewall_rule(rule).unwrap();
+
+        // Test that the firewall blocks traffic from 192.168.1.100
+        let result = net.check_firewall(
+            Ipv4Addr::new(192, 168, 1, 100),
+            Ipv4Addr::new(192, 168, 1, 1),
+            1234,
+            80,
+            IpProtocol::Tcp,
+        );
+        assert_eq!(result, Err(NetworkError::FirewallBlocked));
+
+        // Test that traffic from other addresses is allowed
+        let result = net.check_firewall(
+            Ipv4Addr::new(192, 168, 1, 50),
+            Ipv4Addr::new(192, 168, 1, 1),
+            1234,
+            80,
+            IpProtocol::Tcp,
+        );
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_socket_creation() {
+        let mut net = ZenithNet::new();
+
+        // Create a TCP socket
+        let socket_id = net.socket(2, 1, 6).unwrap(); // AF_INET, SOCK_STREAM, IPPROTO_TCP
+        assert!(socket_id > 0);
+
+        // Bind the socket
+        let result = net.bind(socket_id, Ipv4Addr::new(0, 0, 0, 0), 8080);
+        assert!(result.is_ok());
+
+        // Set non-blocking mode
+        let result = net.set_non_blocking(socket_id, true);
+        assert!(result.is_ok());
+
+        // Set receive timeout
+        let result = net.set_receive_timeout(socket_id, 5000);
+        assert!(result.is_ok());
+
+        // Close the socket
+        let result = net.close(socket_id);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_tcp_connection() {
+        let mut net = ZenithNet::new();
+
+        // Create and bind socket
+        let socket_id = net.socket(2, 1, 6).unwrap();
+        net.bind(socket_id, Ipv4Addr::new(0, 0, 0, 0), 8080).unwrap();
+
+        // Connect to remote address
+        let result = net.connect(socket_id, Ipv4Addr::new(192, 168, 1, 100), 80);
+        assert!(result.is_ok());
+
+        // Check socket state
+        let socket = net.sockets.get(&socket_id).unwrap();
+        assert!(socket.connected_addr.is_some());
+        assert_eq!(socket.connected_port, Some(80));
+    }
+
+    #[test]
+    fn test_tcp_listen() {
+        let mut net = ZenithNet::new();
+
+        // Create and bind socket
+        let socket_id = net.socket(2, 1, 6).unwrap();
+        net.bind(socket_id, Ipv4Addr::new(0, 0, 0, 0), 80).unwrap();
+
+        // Set socket to listen mode
+        let result = net.listen(socket_id, 128);
+        assert!(result.is_ok());
+
+        // Check that the connection is in Listen state
+        let socket = net.sockets.get(&socket_id).unwrap();
+        if let Some(ref conn) = socket.tcp_connection {
+            assert_eq!(conn.state, TcpState::Listen);
+        } else {
+            panic!("TCP connection should exist");
+        }
+    }
+
+    #[test]
+    fn test_firewall_port_filtering() {
+        let mut net = ZenithNet::new();
+
+        // Add a rule to block port 22 (SSH)
+        let rule = FirewallRule {
+            id: 2,
+            src_addr: None,
+            src_mask: None,
+            dst_addr: None,
+            dst_mask: None,
+            src_port: None,
+            dst_port: Some(22),
+            protocol: Some(IpProtocol::Tcp),
+            action: FirewallAction::Drop,
+            enabled: true,
+        };
+
+        net.add_firewall_rule(rule).unwrap();
+
+        // Test that port 22 is blocked
+        let result = net.check_firewall(
+            Ipv4Addr::new(192, 168, 1, 50),
+            Ipv4Addr::new(192, 168, 1, 1),
+            1234,
+            22,
+            IpProtocol::Tcp,
+        );
+        assert_eq!(result, Err(NetworkError::FirewallBlocked));
+
+        // Test that other ports are allowed
+        let result = net.check_firewall(
+            Ipv4Addr::new(192, 168, 1, 50),
+            Ipv4Addr::new(192, 168, 1, 1),
+            1234,
+            80,
+            IpProtocol::Tcp,
+        );
+        assert!(result.is_ok());
     }
 }

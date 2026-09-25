@@ -10,6 +10,9 @@
 //! - Sway (i3-compatible Wayland compositor)
 //! - River (tag-based Wayland compositor)
 //! - macOS WindowServer (smooth animation, damage tracking)
+//! - GNOME Mutter (smooth animations, accessibility)
+//! - KDE Plasma (extensive widget system)
+//! - COSMIC (multi-threaded tiling)
 //!
 //! Architecture:
 //! - `WlDisplay` — top-level display object (singleton per compositor)
@@ -18,6 +21,7 @@
 //! - `WlOutput` — physical display output (DRM/KMS plane)
 //! - `WlSeat` — input device seat (keyboard, pointer, touch)
 //! - `ZenithCompositor` — main compositor state machine
+//! - Enhanced with GNOME accessibility, KDE customization, and COSMIC performance
 
 #![allow(dead_code)]
 
@@ -380,6 +384,42 @@ pub struct ZenithStats {
     pub total_damage_area: u64,
     pub pointer_events: u64,
     pub key_events: u64,
+    pub accessibility_events: u64, // GNOME-inspired screen reader events
+    pub widget_events: u64, // KDE-inspired widget interactions
+}
+
+/// Window tiling layout (COSMIC/i3-inspired)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TilingLayout {
+    Floating,
+    Stack,
+    Tabbed,
+    HorizontalSplit,
+    VerticalSplit,
+    Grid,
+}
+
+/// Accessibility mode (GNOME-inspired)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AccessibilityMode {
+    None,
+    HighContrast,
+    LargeText,
+    ScreenReader,
+    ReducedMotion,
+}
+
+/// Widget type (KDE-inspired)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WidgetType {
+    None,
+    Panel,
+    Dock,
+    Launcher,
+    Notification,
+    SystemTray,
+    Clock,
+    StatusIndicator,
 }
 
 /// Zenith Wayland Compositor — main compositor state
@@ -400,6 +440,18 @@ pub struct ZenithCompositor {
     pub stats: ZenithStats,
     /// Current frame timestamp (ms)
     pub frame_time_ms: u64,
+    /// Current tiling layout (COSMIC/i3-inspired)
+    pub tiling_layout: TilingLayout,
+    /// Accessibility mode (GNOME-inspired)
+    pub accessibility_mode: AccessibilityMode,
+    /// Active widgets (KDE-inspired)
+    pub active_widgets: BTreeMap<WlObjectId, WidgetType>,
+    /// Screen reader enabled (GNOME accessibility)
+    pub screen_reader_enabled: bool,
+    /// High contrast mode (GNOME accessibility)
+    pub high_contrast_mode: bool,
+    /// Animation speed multiplier (for reduced motion)
+    pub animation_speed: f32,
 }
 
 impl ZenithCompositor {
@@ -414,6 +466,12 @@ impl ZenithCompositor {
             pointer_focus: None,
             stats: ZenithStats::default(),
             frame_time_ms: 0,
+            tiling_layout: TilingLayout::Floating,
+            accessibility_mode: AccessibilityMode::None,
+            active_widgets: BTreeMap::new(),
+            screen_reader_enabled: false,
+            high_contrast_mode: false,
+            animation_speed: 1.0,
         }
     }
 
@@ -586,14 +644,225 @@ impl ZenithCompositor {
     pub fn status(&self) -> String {
         let mapped = self.surfaces.values().filter(|s| s.mapped).count();
         format!(
-            "Zenith | {} surfaces ({} mapped) | {} buffers | {} outputs | {} frames | {}fps target",
+            "Zenith | {} surfaces ({} mapped) | {} buffers | {} outputs | {} frames | {}fps target | Layout: {:?} | A11y: {:?}",
             self.surfaces.len(),
             mapped,
             self.buffers.len(),
             self.outputs.len(),
             self.stats.frames_rendered,
-            self.outputs.values().next().map(|o| o.current_mode.refresh_mhz / 1000).unwrap_or(60)
+            self.outputs.values().next().map(|o| o.current_mode.refresh_mhz / 1000).unwrap_or(60),
+            self.tiling_layout,
+            self.accessibility_mode
         )
+    }
+
+    // ========== GNOME Accessibility Features ==========
+
+    /// Set accessibility mode (GNOME-inspired)
+    pub fn set_accessibility_mode(&mut self, mode: AccessibilityMode) {
+        self.accessibility_mode = mode;
+        self.screen_reader_enabled = matches!(mode, AccessibilityMode::ScreenReader);
+        self.high_contrast_mode = matches!(mode, AccessibilityMode::HighContrast);
+
+        if matches!(mode, AccessibilityMode::ReducedMotion) {
+            self.animation_speed = 0.0; // Disable animations
+        } else {
+            self.animation_speed = 1.0; // Normal speed
+        }
+
+        self.stats.accessibility_events += 1;
+    }
+
+    /// Toggle screen reader (GNOME Orca-inspired)
+    pub fn toggle_screen_reader(&mut self) {
+        self.screen_reader_enabled = !self.screen_reader_enabled;
+        if self.screen_reader_enabled {
+            self.accessibility_mode = AccessibilityMode::ScreenReader;
+        } else if self.accessibility_mode == AccessibilityMode::ScreenReader {
+            self.accessibility_mode = AccessibilityMode::None;
+        }
+        self.stats.accessibility_events += 1;
+    }
+
+    /// Toggle high contrast mode (GNOME accessibility)
+    pub fn toggle_high_contrast(&mut self) {
+        self.high_contrast_mode = !self.high_contrast_mode;
+        if self.high_contrast_mode {
+            self.accessibility_mode = AccessibilityMode::HighContrast;
+        } else if self.accessibility_mode == AccessibilityMode::HighContrast {
+            self.accessibility_mode = AccessibilityMode::None;
+        }
+        self.stats.accessibility_events += 1;
+    }
+
+    /// Set animation speed (for reduced motion)
+    pub fn set_animation_speed(&mut self, speed: f32) {
+        self.animation_speed = speed.clamp(0.0, 2.0);
+        if self.animation_speed == 0.0 {
+            self.accessibility_mode = AccessibilityMode::ReducedMotion;
+        } else if self.accessibility_mode == AccessibilityMode::ReducedMotion {
+            self.accessibility_mode = AccessibilityMode::None;
+        }
+    }
+
+    // ========== KDE Widget System ==========
+
+    /// Add a widget (KDE-inspired)
+    pub fn add_widget(&mut self, surface_id: WlObjectId, widget_type: WidgetType) -> bool {
+        if self.surfaces.contains_key(&surface_id) {
+            self.active_widgets.insert(surface_id, widget_type);
+            self.stats.widget_events += 1;
+            true
+        } else {
+            false
+        }
+    }
+
+    /// Remove a widget
+    pub fn remove_widget(&mut self, surface_id: WlObjectId) -> bool {
+        if self.active_widgets.remove(&surface_id).is_some() {
+            self.stats.widget_events += 1;
+            true
+        } else {
+            false
+        }
+    }
+
+    /// Get widget type for a surface
+    pub fn get_widget_type(&self, surface_id: WlObjectId) -> Option<WidgetType> {
+        self.active_widgets.get(&surface_id).copied()
+    }
+
+    /// Get all widgets of a specific type
+    pub fn get_widgets_by_type(&self, widget_type: WidgetType) -> Vec<WlObjectId> {
+        self.active_widgets
+            .iter()
+            .filter(|(_, &wt)| wt == widget_type)
+            .map(|(&id, _)| id)
+            .collect()
+    }
+
+    // ========== COSMIC Tiling Features ==========
+
+    /// Set tiling layout (COSMIC/i3-inspired)
+    pub fn set_tiling_layout(&mut self, layout: TilingLayout) {
+        self.tiling_layout = layout;
+    }
+
+    /// Get current tiling layout
+    pub fn get_tiling_layout(&self) -> TilingLayout {
+        self.tiling_layout
+    }
+
+    /// Auto-tile surfaces (COSMIC-inspired)
+    pub fn auto_tile_surfaces(&mut self) {
+        if self.tiling_layout == TilingLayout::Floating {
+            return; // No auto-tiling in floating mode
+        }
+
+        let mut mapped_surfaces: Vec<_> = self.surfaces
+            .iter()
+            .filter(|(_, s)| s.mapped)
+            .map(|(id, s)| (*id, s.size))
+            .collect();
+
+        let output_size = self.outputs.values()
+            .next()
+            .map(|o| (o.current_mode.width, o.current_mode.height))
+            .unwrap_or((1920, 1080));
+
+        match self.tiling_layout {
+            TilingLayout::Grid => {
+                let cols = ((mapped_surfaces.len() as f32).sqrt().ceil() as u32).max(1);
+                let rows = ((mapped_surfaces.len() as f32) / cols as f32).ceil() as u32;
+
+                let tile_width = output_size.0 / cols;
+                let tile_height = output_size.1 / rows;
+
+                for (i, (id, _)) in mapped_surfaces.iter_mut().enumerate() {
+                    let col = (i as u32) % cols;
+                    let row = (i as u32) / cols;
+
+                    if let Some(surface) = self.surfaces.get_mut(id) {
+                        surface.position = WlPoint {
+                            x: (col * tile_width) as i32,
+                            y: (row * tile_height) as i32,
+                        };
+                        surface.size = WlSize {
+                            width: tile_width,
+                            height: tile_height,
+                        };
+                    }
+                }
+            }
+            TilingLayout::HorizontalSplit => {
+                let tile_height = output_size.1 / mapped_surfaces.len() as u32;
+                for (i, (id, _)) in mapped_surfaces.iter_mut().enumerate() {
+                    if let Some(surface) = self.surfaces.get_mut(id) {
+                        surface.position = WlPoint {
+                            x: 0,
+                            y: (i as u32 * tile_height) as i32,
+                        };
+                        surface.size = WlSize {
+                            width: output_size.0,
+                            height: tile_height,
+                        };
+                    }
+                }
+            }
+            TilingLayout::VerticalSplit => {
+                let tile_width = output_size.0 / mapped_surfaces.len() as u32;
+                for (i, (id, _)) in mapped_surfaces.iter_mut().enumerate() {
+                    if let Some(surface) = self.surfaces.get_mut(id) {
+                        surface.position = WlPoint {
+                            x: (i as u32 * tile_width) as i32,
+                            y: 0,
+                        };
+                        surface.size = WlSize {
+                            width: tile_width,
+                            height: output_size.1,
+                        };
+                    }
+                }
+            }
+            TilingLayout::Tabbed => {
+                // Stack all windows in the same position
+                for (id, _) in mapped_surfaces.iter_mut() {
+                    if let Some(surface) = self.surfaces.get_mut(id) {
+                        surface.position = WlPoint { x: 0, y: 0 };
+                        surface.size = WlSize {
+                            width: output_size.0,
+                            height: output_size.1,
+                        };
+                    }
+                }
+            }
+            _ => {} // Handle other layouts similarly
+        }
+    }
+
+    /// Get compositor capabilities
+    pub fn get_capabilities(&self) -> Vec<String> {
+        let mut caps = vec![
+            String::from("wayland"),
+            String::from("drm"),
+            String::from("damage_tracking"),
+        ];
+
+        if self.screen_reader_enabled {
+            caps.push(String::from("screen_reader"));
+        }
+        if self.high_contrast_mode {
+            caps.push(String::from("high_contrast"));
+        }
+        if self.tiling_layout != TilingLayout::Floating {
+            caps.push(String::from("tiling"));
+        }
+        if !self.active_widgets.is_empty() {
+            caps.push(String::from("widgets"));
+        }
+
+        caps
     }
 }
 
@@ -723,5 +992,128 @@ mod zenith_tests {
         let status = comp.status();
         assert!(status.contains("Zenith"));
         assert!(status.contains("0 surfaces"));
+    }
+
+    #[test]
+    fn test_accessibility_modes() {
+        let mut comp = setup();
+
+        // Test screen reader toggle
+        comp.toggle_screen_reader();
+        assert!(comp.screen_reader_enabled);
+        assert_eq!(comp.accessibility_mode, AccessibilityMode::ScreenReader);
+
+        comp.toggle_screen_reader();
+        assert!(!comp.screen_reader_enabled);
+
+        // Test high contrast toggle
+        comp.toggle_high_contrast();
+        assert!(comp.high_contrast_mode);
+        assert_eq!(comp.accessibility_mode, AccessibilityMode::HighContrast);
+
+        // Test reduced motion
+        comp.set_accessibility_mode(AccessibilityMode::ReducedMotion);
+        assert_eq!(comp.animation_speed, 0.0);
+
+        comp.set_animation_speed(1.5);
+        assert_eq!(comp.animation_speed, 1.5);
+        assert_ne!(comp.accessibility_mode, AccessibilityMode::ReducedMotion);
+    }
+
+    #[test]
+    fn test_widget_system() {
+        let mut comp = setup();
+        let surf_id = comp.create_surface(1);
+
+        // Add various widgets
+        assert!(comp.add_widget(surf_id, WidgetType::Panel));
+        assert!(comp.add_widget(surf_id, WidgetType::Clock));
+
+        // Check widget type
+        assert_eq!(comp.get_widget_type(surf_id), Some(WidgetType::Clock)); // Last added wins
+
+        // Get widgets by type
+        let clock_widgets = comp.get_widgets_by_type(WidgetType::Clock);
+        assert_eq!(clock_widgets.len(), 1);
+
+        // Remove widget
+        assert!(comp.remove_widget(surf_id));
+        assert_eq!(comp.get_widget_type(surf_id), None);
+    }
+
+    #[test]
+    fn test_tiling_layouts() {
+        let mut comp = setup();
+
+        // Test different tiling layouts
+        comp.set_tiling_layout(TilingLayout::Grid);
+        assert_eq!(comp.get_tiling_layout(), TilingLayout::Grid);
+
+        comp.set_tiling_layout(TilingLayout::HorizontalSplit);
+        assert_eq!(comp.get_tiling_layout(), TilingLayout::HorizontalSplit);
+
+        comp.set_tiling_layout(TilingLayout::Floating);
+        assert_eq!(comp.get_tiling_layout(), TilingLayout::Floating);
+    }
+
+    #[test]
+    fn test_auto_tiling() {
+        let mut comp = setup();
+        let output = WlOutput::new_1080p(999, "eDP-1");
+        comp.add_output(output);
+
+        // Create multiple surfaces
+        let surf1 = comp.create_surface(1);
+        let surf2 = comp.create_surface(2);
+        let surf3 = comp.create_surface(3);
+
+        // Attach buffers and commit
+        let buf1 = comp.create_buffer(800, 600, WlShmFormat::Argb8888);
+        let buf2 = comp.create_buffer(800, 600, WlShmFormat::Argb8888);
+        let buf3 = comp.create_buffer(800, 600, WlShmFormat::Argb8888);
+
+        comp.surface_attach_buffer(surf1, buf1);
+        comp.surface_commit(surf1);
+        comp.surface_attach_buffer(surf2, buf2);
+        comp.surface_commit(surf2);
+        comp.surface_attach_buffer(surf3, buf3);
+        comp.surface_commit(surf3);
+
+        // Set grid layout and auto-tile
+        comp.set_tiling_layout(TilingLayout::Grid);
+        comp.auto_tile_surfaces();
+
+        // Check that surfaces were tiled
+        let s1 = comp.surfaces.get(&surf1).unwrap();
+        let s2 = comp.surfaces.get(&surf2).unwrap();
+        let s3 = comp.surfaces.get(&surf3).unwrap();
+
+        // In grid layout, surfaces should be positioned differently
+        assert!(s1.position != s2.position || s1.position != s3.position);
+    }
+
+    #[test]
+    fn test_compositor_capabilities() {
+        let mut comp = setup();
+
+        let caps = comp.get_capabilities();
+        assert!(caps.contains(&String::from("wayland")));
+        assert!(caps.contains(&String::from("drm")));
+
+        // Enable screen reader
+        comp.toggle_screen_reader();
+        let caps = comp.get_capabilities();
+        assert!(caps.contains(&String::from("screen_reader")));
+
+        // Enable tiling
+        comp.set_tiling_layout(TilingLayout::Grid);
+        let caps = comp.get_capabilities();
+        assert!(caps.contains(&String::from("tiling")));
+
+        // Add widget
+        let surf_id = comp.create_surface(1);
+        comp.add_widget(surf_id, WidgetType::Panel);
+        let caps = comp.get_capabilities();
+        assert!(caps.contains(&String::from("widgets")));
     }
 }
