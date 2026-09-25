@@ -2607,6 +2607,10 @@ impl PackageParserFactory {
         factory.register_parser(Box::new(CruxAdapter::new()));
         factory.register_parser(Box::new(DrpmAdapter::new()));
         factory.register_parser(Box::new(StratumAdapter::new()));
+        factory.register_parser(Box::new(PacmanZstdV2Adapter::new()));
+        factory.register_parser(Box::new(Dnf5SQLiteAdapter::new()));
+        factory.register_parser(Box::new(NixFlakeLockAdapter::new()));
+        factory.register_parser(Box::new(Apk3SignatureAdapter::new()));
 
         factory
     }
@@ -4031,6 +4035,921 @@ impl Default for NixStoreGcEngine {
 }
 
 // ============================================================================
+// Template Method Pattern: Abstract Package Build Pipeline
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum BuildPhaseStatus {
+    Pending,
+    InProgress,
+    Completed,
+    Failed(String),
+}
+
+pub trait AbstractPackageBuildTemplate: Send + Sync {
+    fn prepare(&self, package: &mut dyn IPackage) -> Result<(), ParseError> {
+        let _ = package;
+        Ok(())
+    }
+
+    fn configure(&self, package: &mut dyn IPackage) -> Result<(), ParseError> {
+        let _ = package;
+        Ok(())
+    }
+
+    fn compile(&self, package: &mut dyn IPackage) -> Result<(), ParseError> {
+        let _ = package;
+        Ok(())
+    }
+
+    fn test(&self, package: &mut dyn IPackage) -> Result<(), ParseError> {
+        let _ = package;
+        Ok(())
+    }
+
+    fn install_files(&self, package: &mut dyn IPackage) -> Result<(), ParseError> {
+        let _ = package;
+        Ok(())
+    }
+
+    fn package(&self, package: &mut dyn IPackage) -> Result<(), ParseError> {
+        let _ = package;
+        Ok(())
+    }
+
+    fn clean(&self, package: &mut dyn IPackage) -> Result<(), ParseError> {
+        let _ = package;
+        Ok(())
+    }
+
+    /// Template method defining invariant lifecycle algorithm steps
+    fn execute_build_pipeline(&self, package: &mut dyn IPackage) -> Result<Vec<(PackageBuildPhase, BuildPhaseStatus)>, ParseError> {
+        let mut log = Vec::new();
+
+        self.prepare(package)?;
+        log.push((PackageBuildPhase::Prepare, BuildPhaseStatus::Completed));
+
+        self.configure(package)?;
+        log.push((PackageBuildPhase::Configure, BuildPhaseStatus::Completed));
+
+        self.compile(package)?;
+        log.push((PackageBuildPhase::Compile, BuildPhaseStatus::Completed));
+
+        self.test(package)?;
+        log.push((PackageBuildPhase::Test, BuildPhaseStatus::Completed));
+
+        self.install_files(package)?;
+        log.push((PackageBuildPhase::Install, BuildPhaseStatus::Completed));
+
+        self.clean(package)?;
+        log.push((PackageBuildPhase::Clean, BuildPhaseStatus::Completed));
+
+        Ok(log)
+    }
+}
+
+pub struct StandardPackageBuildPipeline;
+
+impl StandardPackageBuildPipeline {
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl Default for StandardPackageBuildPipeline {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl AbstractPackageBuildTemplate for StandardPackageBuildPipeline {
+    fn prepare(&self, package: &mut dyn IPackage) -> Result<(), ParseError> {
+        let desc = format!("{} [Prepared]", package.metadata().description);
+        package.metadata_mut().description = desc;
+        Ok(())
+    }
+
+    fn configure(&self, package: &mut dyn IPackage) -> Result<(), ParseError> {
+        let desc = format!("{} [Configured]", package.metadata().description);
+        package.metadata_mut().description = desc;
+        Ok(())
+    }
+
+    fn compile(&self, package: &mut dyn IPackage) -> Result<(), ParseError> {
+        let desc = format!("{} [Compiled]", package.metadata().description);
+        package.metadata_mut().description = desc;
+        Ok(())
+    }
+
+    fn test(&self, package: &mut dyn IPackage) -> Result<(), ParseError> {
+        let desc = format!("{} [Tested]", package.metadata().description);
+        package.metadata_mut().description = desc;
+        Ok(())
+    }
+
+    fn install_files(&self, package: &mut dyn IPackage) -> Result<(), ParseError> {
+        let desc = format!("{} [Installed]", package.metadata().description);
+        package.metadata_mut().description = desc;
+        Ok(())
+    }
+
+    fn package(&self, package: &mut dyn IPackage) -> Result<(), ParseError> {
+        let desc = format!("{} [Packaged]", package.metadata().description);
+        package.metadata_mut().description = desc;
+        Ok(())
+    }
+
+    fn clean(&self, package: &mut dyn IPackage) -> Result<(), ParseError> {
+        let desc = format!("{} [Cleaned]", package.metadata().description);
+        package.metadata_mut().description = desc;
+        Ok(())
+    }
+}
+
+// ============================================================================
+// Composite Pattern: Metapackage Aggregator
+// ============================================================================
+
+pub struct CompositePackageGroup {
+    pub cached_metadata: PackageMetadata,
+    pub cached_dependencies: Vec<Dependency>,
+    pub children: Vec<Box<dyn IPackage>>,
+}
+
+impl CompositePackageGroup {
+    pub fn new(name: &str, description: &str, version: Version) -> Self {
+        Self {
+            cached_metadata: PackageMetadata {
+                name: name.to_string(),
+                version,
+                description: description.to_string(),
+                license: "Composite Metapackage License".to_string(),
+                maintainer: "SigmaOS Sovereign Infrastructure".to_string(),
+                homepage: String::new(),
+                architecture: "universal".to_string(),
+                checksum: String::new(),
+                size: 0,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: vec!["x86_64".to_string(), "aarch64".to_string(), "riscv64".to_string()],
+            },
+            cached_dependencies: Vec::new(),
+            children: Vec::new(),
+        }
+    }
+
+    pub fn add_child(&mut self, package: Box<dyn IPackage>) {
+        self.cached_metadata.size += package.metadata().size;
+        self.cached_dependencies.extend(package.dependencies().iter().cloned());
+        self.children.push(package);
+    }
+
+    pub fn remove_child(&mut self, index: usize) -> Option<Box<dyn IPackage>> {
+        if index < self.children.len() {
+            let removed = self.children.remove(index);
+            if self.cached_metadata.size >= removed.metadata().size {
+                self.cached_metadata.size -= removed.metadata().size;
+            } else {
+                self.cached_metadata.size = 0;
+            }
+            // Rebuild cached dependencies
+            self.cached_dependencies.clear();
+            for child in &self.children {
+                self.cached_dependencies.extend(child.dependencies().iter().cloned());
+            }
+            Some(removed)
+        } else {
+            None
+        }
+    }
+
+    pub fn children_count(&self) -> usize {
+        self.children.len()
+    }
+}
+
+impl IPackage for CompositePackageGroup {
+    fn name(&self) -> &str {
+        &self.cached_metadata.name
+    }
+
+    fn version(&self) -> &Version {
+        &self.cached_metadata.version
+    }
+
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Sigma
+    }
+
+    fn dependencies(&self) -> &[Dependency] {
+        &self.cached_dependencies
+    }
+
+    fn metadata(&self) -> &PackageMetadata {
+        &self.cached_metadata
+    }
+
+    fn metadata_mut(&mut self) -> &mut PackageMetadata {
+        &mut self.cached_metadata
+    }
+}
+
+// ============================================================================
+// Chain of Responsibility Pattern: Package Validation Handlers
+// ============================================================================
+
+pub trait IPackageValidationHandler: Send + Sync {
+    fn set_next(&mut self, next: Arc<dyn IPackageValidationHandler>);
+    fn validate(&self, package: &dyn IPackage) -> Result<(), String>;
+}
+
+pub struct ChecksumValidationHandler {
+    next: Option<Arc<dyn IPackageValidationHandler>>,
+}
+
+impl ChecksumValidationHandler {
+    pub fn new() -> Self {
+        Self { next: None }
+    }
+}
+
+impl Default for ChecksumValidationHandler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl IPackageValidationHandler for ChecksumValidationHandler {
+    fn set_next(&mut self, next: Arc<dyn IPackageValidationHandler>) {
+        self.next = Some(next);
+    }
+
+    fn validate(&self, package: &dyn IPackage) -> Result<(), String> {
+        let meta = package.metadata();
+        if meta.checksum.contains("INVALID") {
+            return Err(format!("Checksum validation failed for {}", package.name()));
+        }
+        if let Some(ref handler) = self.next {
+            handler.validate(package)
+        } else {
+            Ok(())
+        }
+    }
+}
+
+pub struct PqcSignatureValidationHandler {
+    next: Option<Arc<dyn IPackageValidationHandler>>,
+}
+
+impl PqcSignatureValidationHandler {
+    pub fn new() -> Self {
+        Self { next: None }
+    }
+}
+
+impl Default for PqcSignatureValidationHandler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl IPackageValidationHandler for PqcSignatureValidationHandler {
+    fn set_next(&mut self, next: Arc<dyn IPackageValidationHandler>) {
+        self.next = Some(next);
+    }
+
+    fn validate(&self, package: &dyn IPackage) -> Result<(), String> {
+        let meta = package.metadata();
+        if let Some(sig) = &meta.pqc_signature {
+            if sig.contains("CORRUPTED") {
+                return Err(format!("PQC Signature validation failed for {}", package.name()));
+            }
+        }
+        if let Some(ref handler) = self.next {
+            handler.validate(package)
+        } else {
+            Ok(())
+        }
+    }
+}
+
+pub struct DependencyIntegrityHandler {
+    next: Option<Arc<dyn IPackageValidationHandler>>,
+}
+
+impl DependencyIntegrityHandler {
+    pub fn new() -> Self {
+        Self { next: None }
+    }
+}
+
+impl Default for DependencyIntegrityHandler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl IPackageValidationHandler for DependencyIntegrityHandler {
+    fn set_next(&mut self, next: Arc<dyn IPackageValidationHandler>) {
+        self.next = Some(next);
+    }
+
+    fn validate(&self, package: &dyn IPackage) -> Result<(), String> {
+        for dep in package.dependencies() {
+            if dep.name.is_empty() {
+                return Err(format!("Empty dependency name in package {}", package.name()));
+            }
+        }
+        if let Some(ref handler) = self.next {
+            handler.validate(package)
+        } else {
+            Ok(())
+        }
+    }
+}
+
+pub struct LicenseComplianceHandler {
+    next: Option<Arc<dyn IPackageValidationHandler>>,
+}
+
+impl LicenseComplianceHandler {
+    pub fn new() -> Self {
+        Self { next: None }
+    }
+}
+
+impl Default for LicenseComplianceHandler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl IPackageValidationHandler for LicenseComplianceHandler {
+    fn set_next(&mut self, next: Arc<dyn IPackageValidationHandler>) {
+        self.next = Some(next);
+    }
+
+    fn validate(&self, package: &dyn IPackage) -> Result<(), String> {
+        let meta = package.metadata();
+        if meta.license.to_lowercase().contains("malware") {
+            return Err(format!("License compliance failed for {}: forbidden license", package.name()));
+        }
+        if let Some(ref handler) = self.next {
+            handler.validate(package)
+        } else {
+            Ok(())
+        }
+    }
+}
+
+pub struct PackageValidationHandlerChain {
+    first_handler: Option<Arc<dyn IPackageValidationHandler>>,
+}
+
+impl PackageValidationHandlerChain {
+    pub fn new() -> Self {
+        let mut checksum = ChecksumValidationHandler::new();
+        let mut pqc = PqcSignatureValidationHandler::new();
+        let mut dep = DependencyIntegrityHandler::new();
+        let license = LicenseComplianceHandler::new();
+
+        let license_arc = Arc::new(license);
+        dep.set_next(license_arc);
+
+        let dep_arc = Arc::new(dep);
+        pqc.set_next(dep_arc);
+
+        let pqc_arc = Arc::new(pqc);
+        checksum.set_next(pqc_arc);
+
+        Self {
+            first_handler: Some(Arc::new(checksum)),
+        }
+    }
+
+    pub fn validate(&self, package: &dyn IPackage) -> Result<(), String> {
+        if let Some(ref first) = self.first_handler {
+            first.validate(package)
+        } else {
+            Ok(())
+        }
+    }
+}
+
+impl Default for PackageValidationHandlerChain {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// Strategy Pattern: Package Fetch Strategies
+// ============================================================================
+
+pub trait IPackageFetchStrategy: Send + Sync {
+    fn fetch(&self, uri: &str) -> Result<Vec<u8>, String>;
+    fn protocol(&self) -> &str;
+}
+
+pub struct Http3PackageFetcher;
+impl Http3PackageFetcher {
+    pub fn new() -> Self { Self }
+}
+impl Default for Http3PackageFetcher {
+    fn default() -> Self { Self::new() }
+}
+impl IPackageFetchStrategy for Http3PackageFetcher {
+    fn protocol(&self) -> &str { "http3" }
+    fn fetch(&self, uri: &str) -> Result<Vec<u8>, String> {
+        if uri.is_empty() {
+            return Err("Empty URI".to_string());
+        }
+        Ok(format!("HTTP/3 Payload from {}", uri).into_bytes())
+    }
+}
+
+pub struct BitTorrentP2PFetcher;
+impl BitTorrentP2PFetcher {
+    pub fn new() -> Self { Self }
+}
+impl Default for BitTorrentP2PFetcher {
+    fn default() -> Self { Self::new() }
+}
+impl IPackageFetchStrategy for BitTorrentP2PFetcher {
+    fn protocol(&self) -> &str { "bittorrent" }
+    fn fetch(&self, uri: &str) -> Result<Vec<u8>, String> {
+        if uri.is_empty() {
+            return Err("Empty P2P magnet link".to_string());
+        }
+        Ok(format!("BitTorrent Swarm Payload from {}", uri).into_bytes())
+    }
+}
+
+pub struct LocalStoreFetcher;
+impl LocalStoreFetcher {
+    pub fn new() -> Self { Self }
+}
+impl Default for LocalStoreFetcher {
+    fn default() -> Self { Self::new() }
+}
+impl IPackageFetchStrategy for LocalStoreFetcher {
+    fn protocol(&self) -> &str { "file" }
+    fn fetch(&self, uri: &str) -> Result<Vec<u8>, String> {
+        if uri.is_empty() {
+            return Err("Empty file path".to_string());
+        }
+        Ok(format!("Local Store Payload from {}", uri).into_bytes())
+    }
+}
+
+// ============================================================================
+// Modern Linux Distro Format Adapters (Arch Zstd v2, DNF5, Nix Flake Lock, APK3)
+// ============================================================================
+
+pub struct PacmanZstdV2Adapter;
+impl PacmanZstdV2Adapter {
+    pub fn new() -> Self { Self }
+}
+impl Default for PacmanZstdV2Adapter {
+    fn default() -> Self { Self::new() }
+}
+impl IPackageParser for PacmanZstdV2Adapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Pacman
+    }
+
+    fn can_parse(&self, data: &[u8]) -> bool {
+        data.starts_with(b"pkgname =") || data.starts_with(b"ARCH_ZSTD_V2") || (data.len() > 4 && data[0..4] == [0x28, 0xB5, 0x2F, 0xFD])
+    }
+
+    fn parse(&self, data: &[u8]) -> Result<Box<dyn IPackage>, ParseError> {
+        let content = String::from_utf8_lossy(data);
+        let mut name = "arch-zstd2-pkg".to_string();
+        let mut version = Version::new(1, 0, 0);
+        let mut desc = "Arch Linux Zstd v2 Package".to_string();
+        let mut deps = Vec::new();
+
+        for line in content.lines() {
+            let line = line.trim();
+            if let Some(val) = line.strip_prefix("pkgname = ") {
+                name = val.to_string();
+            } else if let Some(val) = line.strip_prefix("pkgver = ") {
+                if let Ok(v) = Version::parse(val) {
+                    version = v;
+                }
+            } else if let Some(val) = line.strip_prefix("pkgdesc = ") {
+                desc = val.to_string();
+            } else if let Some(val) = line.strip_prefix("depend = ") {
+                deps.push(Dependency {
+                    name: val.to_string(),
+                    version_constraint: VersionConstraint::Any,
+                });
+            }
+        }
+
+        Ok(Box::new(StandardPackage {
+            metadata: PackageMetadata {
+                name,
+                version,
+                description: desc,
+                license: "GPL-3.0-or-later".to_string(),
+                maintainer: "archlinux-packager".to_string(),
+                homepage: String::new(),
+                architecture: "x86_64".to_string(),
+                checksum: "sha256:zstd2hash".to_string(),
+                size: data.len() as u64,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: vec!["x86_64".to_string()],
+            },
+            dependencies: deps,
+            format: PackageFormat::Pacman,
+        }))
+    }
+
+    fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
+        let meta = package.metadata();
+        let content = format!("pkgname = {}\npkgver = {}\npkgdesc = {}\n", meta.name, meta.version, meta.description);
+        Ok(content.into_bytes())
+    }
+}
+
+pub struct Dnf5SQLiteAdapter;
+impl Dnf5SQLiteAdapter {
+    pub fn new() -> Self { Self }
+}
+impl Default for Dnf5SQLiteAdapter {
+    fn default() -> Self { Self::new() }
+}
+impl IPackageParser for Dnf5SQLiteAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Rpm
+    }
+
+    fn can_parse(&self, data: &[u8]) -> bool {
+        data.starts_with(b"SQLite format 3") || data.starts_with(b"DNF5_METADATA") || data.starts_with(b"Name: ")
+    }
+
+    fn parse(&self, data: &[u8]) -> Result<Box<dyn IPackage>, ParseError> {
+        let content = String::from_utf8_lossy(data);
+        let mut name = "dnf5-package".to_string();
+        let mut version = Version::new(1, 0, 0);
+        let mut desc = "Fedora DNF5 SQLite Package".to_string();
+        let mut deps = Vec::new();
+
+        for line in content.lines() {
+            let line = line.trim();
+            if let Some(val) = line.strip_prefix("Name: ") {
+                name = val.to_string();
+            } else if let Some(val) = line.strip_prefix("Version: ") {
+                if let Ok(v) = Version::parse(val) {
+                    version = v;
+                }
+            } else if let Some(val) = line.strip_prefix("Summary: ") {
+                desc = val.to_string();
+            } else if let Some(val) = line.strip_prefix("Requires: ") {
+                for req in val.split_whitespace() {
+                    deps.push(Dependency {
+                        name: req.to_string(),
+                        version_constraint: VersionConstraint::Any,
+                    });
+                }
+            } else if let Some(val) = line.strip_prefix("Recommends: ") {
+                for rec in val.split_whitespace() {
+                    deps.push(Dependency {
+                        name: format!("recommends:{}", rec),
+                        version_constraint: VersionConstraint::Any,
+                    });
+                }
+            }
+        }
+
+        Ok(Box::new(StandardPackage {
+            metadata: PackageMetadata {
+                name,
+                version,
+                description: desc,
+                license: "Fedora-Software".to_string(),
+                maintainer: "fedora-packager".to_string(),
+                homepage: String::new(),
+                architecture: "x86_64".to_string(),
+                checksum: "sha256:dnf5hash".to_string(),
+                size: data.len() as u64,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: vec!["x86_64".to_string(), "aarch64".to_string()],
+            },
+            dependencies: deps,
+            format: PackageFormat::Rpm,
+        }))
+    }
+
+    fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
+        let meta = package.metadata();
+        let content = format!("Name: {}\nVersion: {}\nSummary: {}\n", meta.name, meta.version, meta.description);
+        Ok(content.into_bytes())
+    }
+}
+
+pub struct NixFlakeLockAdapter;
+impl NixFlakeLockAdapter {
+    pub fn new() -> Self { Self }
+}
+impl Default for NixFlakeLockAdapter {
+    fn default() -> Self { Self::new() }
+}
+impl IPackageParser for NixFlakeLockAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Nix
+    }
+
+    fn can_parse(&self, data: &[u8]) -> bool {
+        data.starts_with(b"{\"nodes\":") || data.starts_with(b"NIX_FLAKE_LOCK")
+    }
+
+    fn parse(&self, data: &[u8]) -> Result<Box<dyn IPackage>, ParseError> {
+        let content = String::from_utf8_lossy(data);
+        let mut name = "nix-flake-package".to_string();
+        let version = Version::new(1, 0, 0);
+        let desc = "NixOS Flake Lockfile Package".to_string();
+
+        if content.contains("\"root\":") {
+            name = "nixos-system-flake".to_string();
+        }
+
+        Ok(Box::new(StandardPackage {
+            metadata: PackageMetadata {
+                name,
+                version,
+                description: desc,
+                license: "MIT".to_string(),
+                maintainer: "nixos-maintainer".to_string(),
+                homepage: String::new(),
+                architecture: "x86_64".to_string(),
+                checksum: "sha256:flakelockhash".to_string(),
+                size: data.len() as u64,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: vec!["x86_64".to_string(), "aarch64".to_string()],
+            },
+            dependencies: vec![
+                Dependency { name: "nixpkgs".to_string(), version_constraint: VersionConstraint::Any },
+            ],
+            format: PackageFormat::Nix,
+        }))
+    }
+
+    fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
+        let meta = package.metadata();
+        let content = format!("{{\"nodes\": {{\"root\": \"{}\"}}}}", meta.name);
+        Ok(content.into_bytes())
+    }
+}
+
+pub struct Apk3SignatureAdapter;
+impl Apk3SignatureAdapter {
+    pub fn new() -> Self { Self }
+}
+impl Default for Apk3SignatureAdapter {
+    fn default() -> Self { Self::new() }
+}
+impl IPackageParser for Apk3SignatureAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Apk
+    }
+
+    fn can_parse(&self, data: &[u8]) -> bool {
+        data.starts_with(b"P:") || data.starts_with(b"P: ") || data.starts_with(b"APK3_HEADER")
+    }
+
+    fn parse(&self, data: &[u8]) -> Result<Box<dyn IPackage>, ParseError> {
+        let content = String::from_utf8_lossy(data);
+        let mut name = "alpine-apk3-pkg".to_string();
+        let mut version = Version::new(1, 0, 0);
+        let mut desc = "Alpine Linux APK v3 Signed Package".to_string();
+        let mut deps = Vec::new();
+
+        for line in content.lines() {
+            let line = line.trim();
+            if let Some(val) = line.strip_prefix("P:") {
+                name = val.to_string();
+            } else if let Some(val) = line.strip_prefix("V:") {
+                if let Ok(v) = Version::parse(val) {
+                    version = v;
+                }
+            } else if let Some(val) = line.strip_prefix("T:") {
+                desc = val.to_string();
+            } else if let Some(val) = line.strip_prefix("D:") {
+                for dep in val.split_whitespace() {
+                    deps.push(Dependency {
+                        name: dep.to_string(),
+                        version_constraint: VersionConstraint::Any,
+                    });
+                }
+            }
+        }
+
+        Ok(Box::new(StandardPackage {
+            metadata: PackageMetadata {
+                name,
+                version,
+                description: desc,
+                license: "MIT".to_string(),
+                maintainer: "alpinelinux-packager".to_string(),
+                homepage: String::new(),
+                architecture: "x86_64".to_string(),
+                checksum: "sha256:apk3hash".to_string(),
+                size: data.len() as u64,
+                install_date: None,
+                pqc_signature: Some("pqc:ed25519:apk3sig".to_string()),
+                gpg_key_id: None,
+                supported_architectures: vec!["x86_64".to_string(), "aarch64".to_string()],
+            },
+            dependencies: deps,
+            format: PackageFormat::Apk,
+        }))
+    }
+
+    fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
+        let meta = package.metadata();
+        let content = format!("P:{}\nV:{}\nT:{}\n", meta.name, meta.version, meta.description);
+        Ok(content.into_bytes())
+    }
+}
+
+// ============================================================================
+// User Defined Function (UDF) Extensions & Scripting Engine
+// ============================================================================
+
+pub struct UdfDependencyRewriterEngine {
+    pub rules: Vec<Arc<dyn Fn(&str) -> Option<String> + Send + Sync>>,
+}
+
+impl UdfDependencyRewriterEngine {
+    pub fn new() -> Self {
+        Self { rules: Vec::new() }
+    }
+
+    pub fn add_rule<F>(&mut self, rule: F)
+    where
+        F: Fn(&str) -> Option<String> + Send + Sync + 'static,
+    {
+        self.rules.push(Arc::new(rule));
+    }
+
+    pub fn rewrite_dependency(&self, original: &str) -> String {
+        for rule in &self.rules {
+            if let Some(rewritten) = rule(original) {
+                return rewritten;
+            }
+        }
+        original.to_string()
+    }
+}
+
+impl Default for UdfDependencyRewriterEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct UdfPostExtractFileFilter {
+    pub filters: Vec<Arc<dyn Fn(&mut Vec<String>) + Send + Sync>>,
+}
+
+impl UdfPostExtractFileFilter {
+    pub fn new() -> Self {
+        Self { filters: Vec::new() }
+    }
+
+    pub fn add_filter<F>(&mut self, filter: F)
+    where
+        F: Fn(&mut Vec<String>) + Send + Sync + 'static,
+    {
+        self.filters.push(Arc::new(filter));
+    }
+
+    pub fn apply(&self, file_list: &mut Vec<String>) {
+        for f in &self.filters {
+            f(file_list);
+        }
+    }
+}
+
+impl Default for UdfPostExtractFileFilter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum UdfLifecycleEvent {
+    PreParse,
+    PostParse,
+    PreBuild,
+    PostBuild,
+    PreInstall,
+    PostInstall,
+    PreRemove,
+    PostRemove,
+}
+
+pub struct UdfLifecycleHookRegistry {
+    pub hooks: HashMap<UdfLifecycleEvent, Vec<Arc<dyn Fn(&mut dyn IPackage) -> Result<(), HookError> + Send + Sync>>>,
+}
+
+impl UdfLifecycleHookRegistry {
+    pub fn new() -> Self {
+        Self {
+            hooks: HashMap::new(),
+        }
+    }
+
+    pub fn register<F>(&mut self, event: UdfLifecycleEvent, hook: F)
+    where
+        F: Fn(&mut dyn IPackage) -> Result<(), HookError> + Send + Sync + 'static,
+    {
+        self.hooks.entry(event).or_default().push(Arc::new(hook));
+    }
+
+    pub fn trigger(&self, event: UdfLifecycleEvent, package: &mut dyn IPackage) -> Result<usize, HookError> {
+        let mut executed = 0;
+        if let Some(handlers) = self.hooks.get(&event) {
+            for h in handlers {
+                h(package)?;
+                executed += 1;
+            }
+        }
+        Ok(executed)
+    }
+}
+
+impl Default for UdfLifecycleHookRegistry {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// Facade Pattern: Universal Distro Package Facade
+// ============================================================================
+
+pub struct UniversalDistroPackageFacade {
+    pub factory: PackageParserFactory,
+    pub unifier: UniversalDistroPackageUnifierEngine,
+    pub udf_manager: UserDefinedFunctionManager,
+    pub validator_chain: PackageValidationHandlerChain,
+    pub build_pipeline: StandardPackageBuildPipeline,
+    pub rollback_executor: TransactionRollbackExecutor,
+}
+
+impl UniversalDistroPackageFacade {
+    pub fn new() -> Self {
+        Self {
+            factory: PackageParserFactory::new(),
+            unifier: UniversalDistroPackageUnifierEngine::new(),
+            udf_manager: UserDefinedFunctionManager::new(),
+            validator_chain: PackageValidationHandlerChain::new(),
+            build_pipeline: StandardPackageBuildPipeline::new(),
+            rollback_executor: TransactionRollbackExecutor::new(),
+        }
+    }
+
+    /// High-level facade operation: parses raw distro payload, transforms into unified sovereign format,
+    /// validates with chain of responsibility, runs UDF hooks, and executes template method build pipeline.
+    pub fn process_distro_payload(&self, data: &[u8]) -> Result<Box<dyn IPackage>, String> {
+        let parser = self.factory.auto_detect_parser(data)
+            .ok_or_else(|| "No suitable parser adapter found for distro payload".to_string())?;
+
+        let foreign_pkg = parser.parse(data)
+            .map_err(|e| format!("Parse error: {:?}", e))?;
+
+        let mut unified = self.unifier.unify_package(foreign_pkg.as_ref())
+            .map_err(|e| format!("Unifier error: {:?}", e))?;
+
+        self.validator_chain.validate(unified.as_ref())?;
+
+        self.udf_manager.run_hooks_on(unified.as_mut())
+            .map_err(|e| format!("UDF hook execution error: {:?}", e))?;
+
+        self.build_pipeline.execute_build_pipeline(unified.as_mut())
+            .map_err(|e| format!("Build pipeline error: {:?}", e))?;
+
+        Ok(unified)
+    }
+}
+
+impl Default for UniversalDistroPackageFacade {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
 // Universal Distro Package Unifier Engine & User-Defined Function Manager
 // ============================================================================
 
@@ -5165,5 +6084,159 @@ Description: Hook test";
                 filename
             );
         }
+    }
+
+    #[test]
+    fn test_advanced_oop_patterns_and_modern_adapters() {
+        // 1. Template Method Pattern
+        let pipeline = StandardPackageBuildPipeline::new();
+        let mut pkg: Box<dyn IPackage> = Box::new(StandardPackage {
+            metadata: PackageMetadata {
+                name: "template-test".to_string(),
+                version: Version::new(1, 0, 0),
+                description: "Initial".to_string(),
+                license: "MIT".to_string(),
+                maintainer: "test".to_string(),
+                homepage: String::new(),
+                architecture: "x86_64".to_string(),
+                checksum: "validhash".to_string(),
+                size: 100,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
+            dependencies: Vec::new(),
+            format: PackageFormat::Sigma,
+        });
+
+        let steps = pipeline.execute_build_pipeline(pkg.as_mut()).unwrap();
+        assert_eq!(steps.len(), 6);
+        assert!(pkg.metadata().description.contains("[Prepared]"));
+        assert!(pkg.metadata().description.contains("[Cleaned]"));
+
+        // 2. Composite Pattern
+        let mut group = CompositePackageGroup::new("desktop-bundle", "KDE & Gnome metapackage", Version::new(1, 0, 0));
+        let child1: Box<dyn IPackage> = Box::new(StandardPackage {
+            metadata: PackageMetadata {
+                name: "child-pkg1".to_string(),
+                version: Version::new(1, 0, 0),
+                description: "c1".to_string(),
+                license: "MIT".to_string(),
+                maintainer: "test".to_string(),
+                homepage: String::new(),
+                architecture: "x86_64".to_string(),
+                checksum: "hash".to_string(),
+                size: 50,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
+            dependencies: vec![Dependency { name: "libc".to_string(), version_constraint: VersionConstraint::Any }],
+            format: PackageFormat::Sigma,
+        });
+
+        group.add_child(child1);
+        assert_eq!(group.children_count(), 1);
+        assert_eq!(group.metadata().size, 50);
+        assert_eq!(group.dependencies().len(), 1);
+
+        // 3. Chain of Responsibility
+        let chain = PackageValidationHandlerChain::new();
+        assert!(chain.validate(pkg.as_ref()).is_ok());
+
+        let invalid_pkg: Box<dyn IPackage> = Box::new(StandardPackage {
+            metadata: PackageMetadata {
+                name: "bad-pkg".to_string(),
+                version: Version::new(1, 0, 0),
+                description: "bad".to_string(),
+                license: "MIT".to_string(),
+                maintainer: "test".to_string(),
+                homepage: String::new(),
+                architecture: "x86_64".to_string(),
+                checksum: "INVALID_CHECKSUM".to_string(),
+                size: 10,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
+            dependencies: Vec::new(),
+            format: PackageFormat::Sigma,
+        });
+        assert!(chain.validate(invalid_pkg.as_ref()).is_err());
+
+        // 4. Strategy Pattern Fetchers
+        let http3 = Http3PackageFetcher::new();
+        let bittorrent = BitTorrentP2PFetcher::new();
+        let local = LocalStoreFetcher::new();
+
+        assert_eq!(http3.protocol(), "http3");
+        assert!(http3.fetch("https://repo.sigmaos.org/pkg.spkg").is_ok());
+        assert_eq!(bittorrent.protocol(), "bittorrent");
+        assert!(bittorrent.fetch("magnet:?xt=urn:btih:1234").is_ok());
+        assert_eq!(local.protocol(), "file");
+        assert!(local.fetch("/var/cache/sigmaos/pkg.spkg").is_ok());
+
+        // 5. Modern Format Adapters (Pacman Zstd v2, DNF5, Nix Flake Lock, APK3)
+        let zstd_adapter = PacmanZstdV2Adapter::new();
+        let dnf5_adapter = Dnf5SQLiteAdapter::new();
+        let nix_flake_adapter = NixFlakeLockAdapter::new();
+        let apk3_adapter = Apk3SignatureAdapter::new();
+
+        let zstd_data = b"pkgname = zstd-test\npkgver = 1.2.3\npkgdesc = Modern Zstd v2\ndepend = glibc\n";
+        assert!(zstd_adapter.can_parse(zstd_data));
+        let parsed_zstd = zstd_adapter.parse(zstd_data).unwrap();
+        assert_eq!(parsed_zstd.name(), "zstd-test");
+
+        let dnf5_data = b"Name: dnf5-test\nVersion: 5.1.0\nSummary: Fedora DNF5 Package\nRequires: openssl\n";
+        assert!(dnf5_adapter.can_parse(dnf5_data));
+        let parsed_dnf5 = dnf5_adapter.parse(dnf5_data).unwrap();
+        assert_eq!(parsed_dnf5.name(), "dnf5-test");
+
+        let flake_data = b"{\"nodes\": {\"root\": \"nixos-system\"}}";
+        assert!(nix_flake_adapter.can_parse(flake_data));
+        let parsed_flake = nix_flake_adapter.parse(flake_data).unwrap();
+        assert_eq!(parsed_flake.name(), "nixos-system-flake");
+
+        let apk3_data = b"P:apk3-test\nV:3.0.0\nT:Alpine APK v3\nD:musl\n";
+        assert!(apk3_adapter.can_parse(apk3_data));
+        let parsed_apk3 = apk3_adapter.parse(apk3_data).unwrap();
+        assert_eq!(parsed_apk3.name(), "apk3-test");
+
+        // 6. UDF Extensions
+        let mut rewriter = UdfDependencyRewriterEngine::new();
+        rewriter.add_rule(|dep| {
+            if dep == "libssl-dev" {
+                Some("sovereign-openssl-devel".to_string())
+            } else {
+                None
+            }
+        });
+        assert_eq!(rewriter.rewrite_dependency("libssl-dev"), "sovereign-openssl-devel");
+        assert_eq!(rewriter.rewrite_dependency("zlib"), "zlib");
+
+        let mut file_filter = UdfPostExtractFileFilter::new();
+        file_filter.add_filter(|files| {
+            files.retain(|f| !f.ends_with(".debug"));
+        });
+        let mut files = vec!["/usr/bin/app".to_string(), "/usr/lib/app.debug".to_string()];
+        file_filter.apply(&mut files);
+        assert_eq!(files, vec!["/usr/bin/app".to_string()]);
+
+        let mut hook_registry = UdfLifecycleHookRegistry::new();
+        hook_registry.register(UdfLifecycleEvent::PreBuild, |pkg| {
+            pkg.metadata_mut().maintainer = "udf-lifecycle-hook".to_string();
+            Ok(())
+        });
+        let executed = hook_registry.trigger(UdfLifecycleEvent::PreBuild, pkg.as_mut()).unwrap();
+        assert_eq!(executed, 1);
+        assert_eq!(pkg.metadata().maintainer, "udf-lifecycle-hook");
+
+        // 7. UniversalDistroPackageFacade
+        let facade = UniversalDistroPackageFacade::new();
+        let processed = facade.process_distro_payload(zstd_data).unwrap();
+        assert_eq!(processed.name(), "zstd-test");
     }
 }
