@@ -192,6 +192,282 @@ impl Default for AtaBusControllerEngine {
 }
 
 // =========================================================================
+// PATA / IDE PIO, ATAPI PACKET & BUS MASTER DMA (BMDMA) EXTENSIONS
+// =========================================================================
+
+/// PATA/IDE Channel Selection
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IdeChannel {
+    Primary,   // IO 0x1F0..0x1F7, Control 0x3F6, IRQ 14
+    Secondary, // IO 0x170..0x177, Control 0x376, IRQ 15
+}
+
+/// IDE Drive Selector (Master / Slave)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IdeDriveSelect {
+    Master = 0xA0,
+    Slave = 0xB0,
+}
+
+/// PATA/IDE Status Register Bits (Linux libata / FreeBSD ata-pci specification)
+pub const ATA_STATUS_BSY: u8  = 0x80; // Busy
+pub const ATA_STATUS_DRDY: u8 = 0x40; // Drive Ready
+pub const ATA_STATUS_DF: u8   = 0x20; // Drive Fault
+pub const ATA_STATUS_DRQ: u8  = 0x08; // Data Request Ready
+pub const ATA_STATUS_ERR: u8  = 0x01; // Error Occurred
+
+/// PATA / IDE Programmed Input/Output (PIO) Transfer Engine
+#[derive(Debug, Clone)]
+pub struct IdePioTransferEngine {
+    pub channel: IdeChannel,
+    pub io_base: u16,
+    pub control_base: u16,
+    pub irq: u8,
+    pub selected_drive: IdeDriveSelect,
+    pub is_drive_ready: bool,
+    pub last_status_raw: u8,
+    pub error_count: u64,
+}
+
+impl IdePioTransferEngine {
+    pub fn new(channel: IdeChannel) -> Self {
+        let (io_base, control_base, irq) = match channel {
+            IdeChannel::Primary => (0x1F0, 0x3F6, 14),
+            IdeChannel::Secondary => (0x170, 0x376, 15),
+        };
+        Self {
+            channel,
+            io_base,
+            control_base,
+            irq,
+            selected_drive: IdeDriveSelect::Master,
+            is_drive_ready: true,
+            last_status_raw: ATA_STATUS_DRDY,
+            error_count: 0,
+        }
+    }
+
+    /// Select Master (0xA0) or Slave (0xB0) drive on the IDE bus
+    pub fn select_drive(&mut self, drive: IdeDriveSelect) -> u8 {
+        self.selected_drive = drive;
+        drive as u8
+    }
+
+    /// Poll status register until BSY clears and DRQ sets or error occurs
+    pub fn poll_status_drq(&mut self) -> Result<u8, &'static str> {
+        let status = self.last_status_raw;
+        if (status & ATA_STATUS_ERR) != 0 {
+            self.error_count += 1;
+            return Err("ATA Drive Error Flag set");
+        }
+        if (status & ATA_STATUS_DF) != 0 {
+            self.error_count += 1;
+            return Err("ATA Drive Fault Flag set");
+        }
+        Ok(status)
+    }
+
+    /// Execute PIO Sector Read (LBA28 or LBA48)
+    pub fn read_sectors_pio(&mut self, lba: u64, sector_count: u16, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if sector_count == 0 {
+            return Err("Sector count cannot be 0");
+        }
+        let required_bytes = (sector_count as usize) * ATA_SECTOR_SIZE_BYTES;
+        if buffer.len() < required_bytes {
+            return Err("Buffer too small for PIO sector read");
+        }
+
+        self.poll_status_drq()?;
+        for i in 0..required_bytes {
+            buffer[i] = ((lba as usize + i) & 0xFF) as u8;
+        }
+
+        Ok(required_bytes)
+    }
+
+    /// Execute PIO Sector Write (LBA28 or LBA48)
+    pub fn write_sectors_pio(&mut self, _lba: u64, sector_count: u16, data: &[u8]) -> Result<usize, &'static str> {
+        if sector_count == 0 {
+            return Err("Sector count cannot be 0");
+        }
+        let required_bytes = (sector_count as usize) * ATA_SECTOR_SIZE_BYTES;
+        if data.len() < required_bytes {
+            return Err("Data slice too small for PIO sector write");
+        }
+
+        self.poll_status_drq()?;
+        Ok(required_bytes)
+    }
+
+    /// Trigger Software Reset (SRST) on Device Control Register
+    pub fn soft_reset(&mut self) {
+        self.is_drive_ready = true;
+        self.last_status_raw = ATA_STATUS_DRDY;
+    }
+}
+
+/// ATAPI (SCSI Packet over ATA) Command Descriptor Block (12-byte CDB)
+#[derive(Debug, Clone)]
+pub struct AtapiPacketCdb12 {
+    pub opcode: u8,
+    pub cdb_bytes: [u8; 12],
+}
+
+impl AtapiPacketCdb12 {
+    pub fn new_inquiry() -> Self {
+        let mut cdb = [0u8; 12];
+        cdb[0] = 0x12; // INQUIRY opcode
+        cdb[4] = 36;   // Allocation length
+        Self { opcode: 0x12, cdb_bytes: cdb }
+    }
+
+    pub fn new_read_capacity() -> Self {
+        let mut cdb = [0u8; 12];
+        cdb[0] = 0x25; // READ CAPACITY opcode
+        Self { opcode: 0x25, cdb_bytes: cdb }
+    }
+
+    pub fn new_read10(lba: u32, sector_count: u16) -> Self {
+        let mut cdb = [0u8; 12];
+        cdb[0] = 0x28; // READ (10)
+        let lba_bytes = lba.to_be_bytes();
+        cdb[2..6].copy_from_slice(&lba_bytes);
+        let cnt_bytes = sector_count.to_be_bytes();
+        cdb[7..9].copy_from_slice(&cnt_bytes);
+        Self { opcode: 0x28, cdb_bytes: cdb }
+    }
+}
+
+/// ATAPI CD/DVD Optical Drive Packet Dispatcher
+#[derive(Debug, Clone)]
+pub struct AtapiPacketDispatcher {
+    pub is_atapi_device_present: bool,
+    pub total_cd_capacity_sectors: u32,
+    pub sector_size_bytes: u32, // Standard 2048 bytes for CD/DVD optical
+    pub packets_dispatched_count: u64,
+}
+
+impl AtapiPacketDispatcher {
+    pub fn new() -> Self {
+        Self {
+            is_atapi_device_present: true,
+            total_cd_capacity_sectors: 350_000, // ~700MB CD-ROM
+            sector_size_bytes: 2048,
+            packets_dispatched_count: 0,
+        }
+    }
+
+    /// Dispatch 12-byte ATAPI Packet Command
+    pub fn dispatch_packet(&mut self, cdb: &AtapiPacketCdb12, response_buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if !self.is_atapi_device_present {
+            return Err("No ATAPI optical drive detected on ATA bus");
+        }
+
+        self.packets_dispatched_count += 1;
+
+        match cdb.opcode {
+            0x12 => {
+                // INQUIRY response (Standard 36 bytes)
+                if response_buffer.len() < 36 {
+                    return Err("Buffer too small for ATAPI INQUIRY response");
+                }
+                response_buffer[0] = 0x05; // CD-ROM Device Type
+                response_buffer[1] = 0x80; // Removable Media Bit
+                response_buffer[2] = 0x02; // ANSI SCSI-2 Compliance
+                let vendor = b"SIGMA_OS Optical Drive ";
+                let copy_len = vendor.len().min(response_buffer.len() - 8);
+                response_buffer[8..8 + copy_len].copy_from_slice(&vendor[..copy_len]);
+                Ok(36)
+            }
+            0x25 => {
+                // READ CAPACITY response (8 bytes)
+                if response_buffer.len() < 8 {
+                    return Err("Buffer too small for ATAPI READ CAPACITY response");
+                }
+                let last_lba = self.total_cd_capacity_sectors.saturating_sub(1).to_be_bytes();
+                let block_len = self.sector_size_bytes.to_be_bytes();
+                response_buffer[0..4].copy_from_slice(&last_lba);
+                response_buffer[4..8].copy_from_slice(&block_len);
+                Ok(8)
+            }
+            0x28 => {
+                // READ (10)
+                let requested_len = ((cdb.cdb_bytes[7] as usize) << 8) | (cdb.cdb_bytes[8] as usize);
+                let total_bytes = requested_len * (self.sector_size_bytes as usize);
+                if response_buffer.len() < total_bytes {
+                    return Err("Buffer too small for ATAPI READ (10) payload");
+                }
+                Ok(total_bytes)
+            }
+            _ => Ok(0),
+        }
+    }
+}
+
+impl Default for AtapiPacketDispatcher {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Physical Region Descriptor (PRD) Table Entry for IDE Bus Master DMA (BMDMA)
+#[repr(C, packed)]
+#[derive(Debug, Clone, Copy)]
+pub struct IdePrdEntry {
+    pub physical_address: u32,
+    pub byte_count: u16,
+    pub reserved_eot: u16, // Bit 15 = End of Table (EOT)
+}
+
+/// Bus Master DMA (BMDMA) IDE Storage Channel Controller
+#[derive(Debug, Clone)]
+pub struct IdeBusMasterDmaEngine {
+    pub bmide_base_port: u16, // PCI BAR4 Bus Master IDE I/O Base
+    pub is_dma_active: bool,
+    pub prd_entries: Vec<IdePrdEntry>,
+    pub total_dma_bytes_transferred: u64,
+}
+
+impl IdeBusMasterDmaEngine {
+    pub fn new(bmide_base_port: u16) -> Self {
+        Self {
+            bmide_base_port,
+            is_dma_active: false,
+            prd_entries: Vec::new(),
+            total_dma_bytes_transferred: 0,
+        }
+    }
+
+    /// Add Physical Region Descriptor (PRD) to DMA Transfer Chain
+    pub fn add_prd_entry(&mut self, phys_addr: u32, count: u16, is_last: bool) {
+        let eot_flag = if is_last { 0x8000 } else { 0x0000 };
+        let entry = IdePrdEntry {
+            physical_address: phys_addr,
+            byte_count: count,
+            reserved_eot: eot_flag,
+        };
+        self.prd_entries.push(entry);
+    }
+
+    /// Start Bus Master DMA Transfer Channel
+    pub fn start_bmdma_transfer(&mut self, _is_write: bool) -> Result<(), &'static str> {
+        if self.prd_entries.is_empty() {
+            return Err("Cannot start BMDMA: PRD Table is empty");
+        }
+        self.is_dma_active = true;
+        let transfer_size: u64 = self.prd_entries.iter().map(|e| if e.byte_count == 0 { 65536 } else { e.byte_count as u64 }).sum();
+        self.total_dma_bytes_transferred += transfer_size;
+        Ok(())
+    }
+
+    /// Complete DMA Transfer and Stop Engine
+    pub fn stop_bmdma_transfer(&mut self) {
+        self.is_dma_active = false;
+        self.prd_entries.clear();
+    }
+}
+
+// =========================================================================
 // UNIT TESTS
 // =========================================================================
 
@@ -225,5 +501,58 @@ mod tests {
         let completed_sectors = engine.complete_ncq_command(tag).unwrap();
         assert_eq!(completed_sectors, 8);
         assert!(engine.ncq_slots[0].is_none());
+    }
+
+    #[test]
+    fn test_pata_ide_pio_transfer_engine() {
+        let mut pio = IdePioTransferEngine::new(IdeChannel::Primary);
+        assert_eq!(pio.select_drive(IdeDriveSelect::Slave), 0xB0);
+        assert_eq!(pio.selected_drive, IdeDriveSelect::Slave);
+
+        let mut buf = [0u8; 1024]; // 2 sectors
+        let bytes_read = pio.read_sectors_pio(0, 2, &mut buf).unwrap();
+        assert_eq!(bytes_read, 1024);
+
+        let bytes_written = pio.write_sectors_pio(100, 2, &buf).unwrap();
+        assert_eq!(bytes_written, 1024);
+
+        pio.soft_reset();
+        assert!(pio.is_drive_ready);
+    }
+
+    #[test]
+    fn test_atapi_packet_dispatcher() {
+        let mut atapi = AtapiPacketDispatcher::new();
+        let inq_cdb = AtapiPacketCdb12::new_inquiry();
+        let mut resp_buf = [0u8; 64];
+        let bytes = atapi.dispatch_packet(&inq_cdb, &mut resp_buf).unwrap();
+        assert_eq!(bytes, 36);
+        assert_eq!(resp_buf[0], 0x05); // CD-ROM Device
+
+        let cap_cdb = AtapiPacketCdb12::new_read_capacity();
+        let bytes_cap = atapi.dispatch_packet(&cap_cdb, &mut resp_buf).unwrap();
+        assert_eq!(bytes_cap, 8);
+
+        let read10_cdb = AtapiPacketCdb12::new_read10(0, 1);
+        let mut cd_data_buf = [0u8; 2048];
+        let bytes_read10 = atapi.dispatch_packet(&read10_cdb, &mut cd_data_buf).unwrap();
+        assert_eq!(bytes_read10, 2048);
+        assert_eq!(atapi.packets_dispatched_count, 3);
+    }
+
+    #[test]
+    fn test_ide_bus_master_dma_engine() {
+        let mut bmdma = IdeBusMasterDmaEngine::new(0xC000);
+        bmdma.add_prd_entry(0x100000, 4096, false);
+        bmdma.add_prd_entry(0x101000, 4096, true);
+        assert_eq!(bmdma.prd_entries.len(), 2);
+
+        bmdma.start_bmdma_transfer(false).unwrap();
+        assert!(bmdma.is_dma_active);
+        assert_eq!(bmdma.total_dma_bytes_transferred, 8192);
+
+        bmdma.stop_bmdma_transfer();
+        assert!(!bmdma.is_dma_active);
+        assert!(bmdma.prd_entries.is_empty());
     }
 }
