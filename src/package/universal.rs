@@ -155,6 +155,16 @@ fn debtor_to_sovereign_name(name: &str) -> &str {
         "sovereign-app-runtime"
     } else if lower.contains("ripgrep") || lower.contains("fd-find") || lower == "bat" || lower == "eza" || lower.contains("htop") || lower.contains("fastfetch") {
         "sovereign-cli-suite"
+    } else if lower.contains("torch") || lower.contains("tensorflow") || lower.contains("onnx") || lower.contains("llama") || lower.contains("cuda") || lower.contains("rocm") || lower.contains("vllm") || lower.contains("whisper") {
+        "sovereign-ai-runtime"
+    } else if lower.contains("linux") || lower.contains("kernel") || lower.contains("dkms") || lower.contains("kmod") || lower.contains("initramfs") || lower.contains("dracut") {
+        "sovereign-kernel-core"
+    } else if lower.contains("gnupg") || lower.contains("gpg") || lower.contains("wireguard") || lower.contains("openvpn") || lower.contains("nftables") || lower.contains("iptables") || lower.contains("apparmor") || lower.contains("selinux") {
+        "sovereign-security-suite"
+    } else if lower.contains("btrfs") || lower.contains("zfs") || lower.contains("e2fsprogs") || lower.contains("xfsprogs") || lower.contains("erofs") || lower.contains("bcachefs") || lower.contains("dosfstools") || lower.contains("ntfs") {
+        "sovereign-filesystem-suite"
+    } else if lower.contains("sddm") || lower.contains("gdm") || lower.contains("lightdm") || lower.contains("waybar") || lower.contains("rofi") || lower.contains("wofi") || lower.contains("sway") || lower.contains("dunst") || lower.contains("mako") {
+        "sovereign-desktop-shell"
     } else {
         name
     }
@@ -2960,6 +2970,11 @@ mod tests {
         assert_eq!(debtor_to_sovereign_name("hyprland-git"), "sovereign-desktop-framework");
         assert_eq!(debtor_to_sovereign_name("rustc-nightly"), "sovereign-app-runtime");
         assert_eq!(debtor_to_sovereign_name("ripgrep-all"), "sovereign-cli-suite");
+        assert_eq!(debtor_to_sovereign_name("pytorch-cuda"), "sovereign-ai-runtime");
+        assert_eq!(debtor_to_sovereign_name("linux-headers-generic"), "sovereign-kernel-core");
+        assert_eq!(debtor_to_sovereign_name("gnupg2"), "sovereign-security-suite");
+        assert_eq!(debtor_to_sovereign_name("btrfs-progs"), "sovereign-filesystem-suite");
+        assert_eq!(debtor_to_sovereign_name("waybar"), "sovereign-desktop-shell");
     }
 
     #[test]
