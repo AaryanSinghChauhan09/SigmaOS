@@ -47,6 +47,9 @@ pub mod universal;
 pub mod updater;
 pub mod sovereign_distro_package_matrix;
 pub use sovereign_distro_package_matrix::*;
+
+pub mod sovereign_universal_pm_pr_bridge;
+pub use sovereign_universal_pm_pr_bridge::*;
 pub mod universal_package_innovations_suite;
 pub use universal_package_innovations_suite::*;
 pub mod sovereign_distro_package_advancements_v3;
