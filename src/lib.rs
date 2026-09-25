@@ -86,6 +86,7 @@ pub use distro::sovereign_2050_distro_supremacy_engine::*;
 pub use distro::gobolinux_hierarchy::*;
 pub use kernel::distro_kernel_innovations::*;
 pub use memory::distro_memory_innovations::*;
+pub use drivers::acpi_devicetree_discovery::*;
 pub mod sovereign_wiki_master_engine;
 pub use sovereign_wiki_master_engine::*;
 pub mod open_source_obsoletion;
