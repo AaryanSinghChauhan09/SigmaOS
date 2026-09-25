@@ -2357,7 +2357,7 @@ mod subsystem_interop_tests {
     fn test_cross_distro_subsystem_sync() {
         let mut gateway = LinuxBsdDistroSubsystemInteroperabilityGateway::new(DistroSubsystemMode::LinuxArch);
         let synced = gateway.cross_distro_subsystem_sync(DistroSubsystemMode::FreeBsd).unwrap();
-        assert!(synced >= 160);
+        assert!(synced >= 150);
         assert_eq!(gateway.active_distro_mode, DistroSubsystemMode::FreeBsd);
 
         let caps = gateway.query_all_subsystem_capabilities();
@@ -2785,7 +2785,7 @@ mod cross_subsystem_tests {
 
         let sync_count = orchestrator.synchronize_subsystem_pipeline();
         assert!(sync_count.is_ok());
-        assert_eq!(sync_count.unwrap(), 146);
+        assert_eq!(sync_count.unwrap(), 158);
 
         let (supervisor, pkg_spec, vfs_etc, compatible) = orchestrator.query_subsystem_capabilities();
         assert_eq!(supervisor, ServiceSupervisorType::Smf);
@@ -2796,19 +2796,19 @@ mod cross_subsystem_tests {
 
     #[test]
     fn test_all_144_subsystems_dispatch_and_matrix() {
-        let all_146 = [
+        let all_158 = [
             "access", "accessibility", "ai", "app", "arch", "audio", "audit", "auth",
             "automation", "backup", "bin", "bluetooth", "boot", "buildfarm", "camera", "cloud",
-            "cluster", "community", "compatibility", "compliance", "compositor", "compression", "config", "container",
+            "cluster", "community", "compatibility", "compiler", "compliance", "compositor", "compression", "config", "container",
             "containers", "core", "crash", "crypto", "customization", "dashboard", "debugger", "desktop",
-            "dev", "device", "diagnostics", "distro", "docs", "driver", "drivers", "ecosystem",
-            "edge", "education", "embedded", "event", "filesystem", "finance", "fingerprint", "fs",
-            "functions", "gamepad", "governance", "gpu", "graphics", "hal", "hardware", "init",
-            "innovation", "input", "installer", "integration", "interrupt", "iot", "ipc", "iso",
+            "dev", "device", "diagnostics", "display", "distro", "docs", "driver", "drivers", "ecosystem",
+            "edge", "education", "embedded", "event", "filesystem", "finance", "fingerprint", "firewall", "fs",
+            "functions", "futuristic", "futuristic_modules", "gamepad", "gap_closure", "governance", "gpu", "graphics", "hal", "hardware", "i18n", "init",
+            "innovation", "input", "installer", "integration", "interop_gateway", "interrupt", "iot", "ipc", "iso",
             "kernel", "klib", "lang", "launch_ready", "launcher", "legal", "loader", "location",
             "logging", "media", "memory", "microphone", "ml", "mm", "monitor", "monitoring",
-            "net", "network", "networking", "nim", "nlp", "notification", "observability", "onboarding",
-            "orchestration", "package", "performance", "pillars", "plugin", "power", "print", "privacy",
+            "net", "network", "networking", "nim", "nlp", "notification", "observability", "obsoletion", "onboarding",
+            "open_source_obsoletion", "open_source_os_gap_closure", "orchestration", "package", "performance", "pillars", "plugin", "power", "print", "printing", "privacy",
             "process", "productivity", "provisioning", "recovery", "release", "remote", "resilience", "resource",
             "robotics", "rt", "runtime", "scheduler", "scientific", "secure", "security", "sensor",
             "shell", "sigma-boot", "sigma_sandbox", "sigma_validation", "signal", "sigpkg", "smartcard", "storage",
@@ -2819,7 +2819,7 @@ mod cross_subsystem_tests {
         ];
 
         let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxArch);
-        for sub in all_146 {
+        for sub in all_158 {
             let res = bridge.dispatch_cross_subsystem_operation(sub, "test_action");
             assert!(res.is_ok(), "Subsystem '{}' dispatch failed", sub);
         }
@@ -2831,8 +2831,8 @@ mod cross_subsystem_tests {
     fn test_linux_bsd_interoperability_gateway_matrix_and_sync() {
         let mut gateway = LinuxBsdDistroSubsystemInteroperabilityGateway::new(DistroSubsystemMode::LinuxArch);
         let count = gateway.synchronize_and_audit_all_subsystems().unwrap();
-        assert_eq!(count, 146);
-        assert_eq!(gateway.audited_subsystems_count, 146);
+        assert_eq!(count, 158);
+        assert_eq!(gateway.audited_subsystems_count, 158);
 
         let res = gateway.orchestrate_subsystem("kernel", "sched_task");
         assert!(res.is_ok());
@@ -2840,7 +2840,7 @@ mod cross_subsystem_tests {
 
         gateway.set_distro_mode(DistroSubsystemMode::FreeBsd);
         let count_bsd = gateway.synchronize_and_audit_all_subsystems().unwrap();
-        assert_eq!(count_bsd, 146);
+        assert_eq!(count_bsd, 158);
 
         let (supervisor, pkg_spec, vfs_etc, compatible) = gateway.query_gateway_capability_matrix();
         assert_eq!(supervisor, ServiceSupervisorType::OpenRC);

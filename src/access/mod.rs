@@ -589,10 +589,6 @@ pub struct FiftyPercentRuleEngine {
 }
 
 impl FiftyPercentRuleEngine {
-    pub fn new_with_params(total_ram_mb: u64, total_cpu_shares: u32) -> Self {
-        Self::new(total_ram_mb, total_cpu_shares)
-    }
-
     pub fn new(total_ram_mb: u64, total_cpu_shares: u32) -> Self {
         Self::new_with_params(total_ram_mb, total_cpu_shares)
     }
