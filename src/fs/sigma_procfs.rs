@@ -249,6 +249,8 @@ pub struct ProcfsMount {
     loadavg: (f64, f64, f64),
     /// Last PID assigned
     last_pid: u32,
+    /// Dynamic /proc/sys kernel tunables registry (sysctl)
+    sysctl_tunables: BTreeMap<String, String>,
 }
 
 /// A mount table entry for /proc/mounts.
@@ -284,6 +286,16 @@ impl ProcfsMount {
             device: "tmpfs".into(), mount_point: "/tmp".into(),
             fs_type: "tmpfs".into(), options: "rw,nosuid,nodev".into(),
         });
+        let mut sysctl_tunables = BTreeMap::new();
+        sysctl_tunables.insert("kernel/hostname".into(), hostname.into());
+        sysctl_tunables.insert("kernel/osrelease".into(), kernel_version.into());
+        sysctl_tunables.insert("kernel/ostype".into(), "SigmaOS".into());
+        sysctl_tunables.insert("kernel/pid_max".into(), "32768".into());
+        sysctl_tunables.insert("vm/swappiness".into(), "60".into());
+        sysctl_tunables.insert("vm/drop_caches".into(), "0".into());
+        sysctl_tunables.insert("net/ipv4/ip_forward".into(), "0".into());
+        sysctl_tunables.insert("fs/file-max".into(), "1048576".into());
+
         Self {
             uptime_secs: 0.0,
             cpuinfo: vec![ProcCpuInfo::default()],
@@ -296,6 +308,7 @@ impl ProcfsMount {
             hostname: hostname.into(),
             loadavg: (0.0, 0.0, 0.0),
             last_pid: 1,
+            sysctl_tunables,
         }
     }
 
@@ -332,6 +345,14 @@ impl ProcfsMount {
             "mounts"     => Ok(self.gen_mounts().into_bytes()),
             "version"    => Ok(self.gen_version().into_bytes()),
             "hostname" | "sys/kernel/hostname" => Ok(format!("{}\n", self.hostname).into_bytes()),
+            _ if path.starts_with("sys/") => {
+                let sys_key = path.trim_start_matches("sys/");
+                if let Some(val) = self.sysctl_tunables.get(sys_key) {
+                    Ok(format!("{}\n", val).into_bytes())
+                } else {
+                    Err("no such file or directory")
+                }
+            }
             _ if path.starts_with("net/") => self.read_net(path),
             _ => {
                 // Try to parse as PID path: "<pid>/..."
@@ -344,6 +365,24 @@ impl ProcfsMount {
                     Err("no such file or directory")
                 }
             }
+        }
+    }
+
+    /// Write data to dynamic /proc files (such as /proc/sys tunables).
+    pub fn write(&mut self, path: &str, data: &[u8]) -> Result<usize, &'static str> {
+        let path = path.trim_start_matches("/proc/").trim_start_matches('/');
+        let input_str = String::from_utf8_lossy(data).trim().to_string();
+
+        if path == "hostname" || path == "sys/kernel/hostname" {
+            self.hostname = input_str.clone();
+            self.sysctl_tunables.insert("kernel/hostname".into(), input_str);
+            Ok(data.len())
+        } else if path.starts_with("sys/") {
+            let sys_key = path.trim_start_matches("sys/").to_string();
+            self.sysctl_tunables.insert(sys_key, input_str);
+            Ok(data.len())
+        } else {
+            Err("permission denied or unwritable procfs entry")
         }
     }
 
@@ -602,5 +641,20 @@ mod tests {
         let entries = pfs.readdir("/proc").unwrap();
         assert!(entries.contains(&"cpuinfo".to_string()));
         assert!(entries.contains(&"1".to_string()));
+    }
+
+    #[test]
+    fn test_sysctl_read_write() {
+        let mut pfs = make_procfs();
+        let orig_swappiness = String::from_utf8(pfs.read("/proc/sys/vm/swappiness").unwrap()).unwrap();
+        assert_eq!(orig_swappiness.trim(), "60");
+
+        assert!(pfs.write("/proc/sys/vm/swappiness", b"10\n").is_ok());
+        let new_swappiness = String::from_utf8(pfs.read("/proc/sys/vm/swappiness").unwrap()).unwrap();
+        assert_eq!(new_swappiness.trim(), "10");
+
+        assert!(pfs.write("/proc/sys/kernel/hostname", b"sovereign-workstation\n").is_ok());
+        let hostname = String::from_utf8(pfs.read("/proc/hostname").unwrap()).unwrap();
+        assert_eq!(hostname.trim(), "sovereign-workstation");
     }
 }
