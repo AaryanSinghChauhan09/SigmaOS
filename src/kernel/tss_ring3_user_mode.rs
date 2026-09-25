@@ -4,7 +4,6 @@
 // Enhanced with additional BSD security features and Linux scheduler integration
 
 use std::vec::Vec;
-use std::string::String;
 use std::collections::BTreeMap;
 
 // ============================================================================

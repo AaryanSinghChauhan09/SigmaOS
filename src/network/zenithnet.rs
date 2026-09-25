@@ -651,7 +651,7 @@ impl ZenithNet {
                 last_activity: 0,
             };
 
-            self.tcp_connections.insert(connection_id, tcp_connection);
+            self.tcp_connections.insert(connection_id, tcp_connection.clone());
             socket.connected_addr = Some(remote_addr);
             socket.connected_port = Some(remote_port);
             socket.tcp_connection = Some(tcp_connection);
@@ -663,7 +663,7 @@ impl ZenithNet {
     }
 
     /// Listen on socket (TCP server)
-    pub fn listen(&mut self, socket_id: u32, backlog: u32) -> Result<(), NetworkError> {
+    pub fn listen(&mut self, socket_id: u32, _backlog: u32) -> Result<(), NetworkError> {
         if let Some(socket) = self.sockets.get_mut(&socket_id) {
             if socket.socket_type != 1 { // SOCK_STREAM
                 return Err(NetworkError::SocketError);
@@ -690,7 +690,7 @@ impl ZenithNet {
                     last_activity: 0,
                 };
 
-                self.tcp_connections.insert(connection_id, tcp_connection);
+                self.tcp_connections.insert(connection_id, tcp_connection.clone());
                 socket.tcp_connection = Some(tcp_connection);
             }
 
@@ -722,8 +722,8 @@ impl ZenithNet {
 
     /// Close socket
     pub fn close(&mut self, socket_id: u32) -> Result<(), NetworkError> {
-        if let Some(mut socket) = self.sockets.remove(&socket_id) {
-            if let Some(ref conn) = socket.tcp_connection {
+        if let Some(socket) = self.sockets.remove(&socket_id) {
+            if let Some(_conn) = socket.tcp_connection {
                 // Clean up TCP connection
                 // In real implementation, send FIN packet
             }
