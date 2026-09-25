@@ -22,11 +22,9 @@ rm -rf build/iso_root
 mkdir -p "$BUILD_DIR/boot/grub"
 mkdir -p "$BUILD_DIR/sigmaos/system"
 
-echo "[*] Building kernel payload (simulated)..."
-# In a real environment, this would be: cargo build --release --target x86_64-sigmaos
-cargo check --lib --quiet
-touch "$BUILD_DIR/boot/vmlinuz-sigmaos"
-echo "KERNEL_VERSION=0.1.0-alpha" > "$BUILD_DIR/boot/vmlinuz-sigmaos"
+echo "[*] Building real SigmaOS kernel binary..."
+cargo build --bin sigma_kernel --features microkernel
+cp target/debug/sigma_kernel "$BUILD_DIR/boot/vmlinuz-sigmaos"
 
 echo "[*] Generating initramfs (simulated)..."
 touch "$BUILD_DIR/boot/initramfs-sigmaos.img"

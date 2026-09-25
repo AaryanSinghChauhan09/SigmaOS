@@ -32,14 +32,7 @@ iso:
 	@echo "==> Building SigmaOS Desktop Preview ISO image..."
 	@mkdir -p build
 	@echo "Stage 1: Staging kernel, initramfs, and bootloader..."
-	@if [ -f "scripts/build_iso.sh" ]; then \
-		bash scripts/build_iso.sh; \
-	elif [ -f "build_iso.sh" ]; then \
-		bash build_iso.sh; \
-	else \
-		echo "SigmaOS Desktop Preview stub ISO generation (simulated target)"; \
-		touch build/sigmaos-desktop-preview.iso; \
-	fi
+	@bash scripts/build_iso.sh
 
 # 6. Run QEMU smoke test
 run:

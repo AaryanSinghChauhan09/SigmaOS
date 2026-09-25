@@ -278,6 +278,16 @@ impl SimpleVMM {
         self.vmas.push(vma);
     }
 
+    pub fn map_page(
+        &mut self,
+        virt: u64,
+        phys: u64,
+        writable: bool,
+        executable: bool,
+    ) -> Result<(), MemoryError> {
+        self.map_page_with_flags(VirtualAddress(virt), PhysicalAddress(phys), writable, executable)
+    }
+
     pub fn map_page_with_flags(
         &mut self,
         virt: VirtualAddress,
