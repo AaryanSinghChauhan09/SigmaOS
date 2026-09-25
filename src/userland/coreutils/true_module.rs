@@ -16,7 +16,7 @@ mod tests {
     fn test_true_returns_zero() {
         let result = Command::new("rustc")
             .arg("--edition=2021")
-            .arg("src/userland/coreutils/true.rs")
+            .arg("src/userland/coreutils/true_module.rs")
             .arg("-o")
             .arg("/tmp/sigma-true")
             .output();
