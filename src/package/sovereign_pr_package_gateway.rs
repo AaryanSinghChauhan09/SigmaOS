@@ -10,11 +10,11 @@ use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
-use crate::package::pull_request_workflow::{
-    ConsolidatedSovereignPackage, PackagePullRequestSubmission, PullRequestPackageFormat,
+use super::pull_request_workflow::{
+    ConsolidatedSovereignPackage, PullRequestPackageFormat,
     PullRequestStatus, SovereignPackagePullRequestEngine,
 };
-use crate::package::universal::{
+use super::universal::{
     ForeignDistroManifest, PackageFormat, UnifiedPackage, UniversalPackageManager,
 };
 
@@ -33,11 +33,19 @@ pub struct DistroPrGatewayEntry {
 
 /// Sovereign Universal PR Gateway Engine
 /// Auto-converts incoming foreign distro PR submissions into sandboxed SigmaPkg packages
-#[derive(Debug)]
 pub struct SovereignUniversalPrGatewayEngine {
     pub pr_engine: SovereignPackagePullRequestEngine,
     pub package_manager: UniversalPackageManager,
     pub pr_gateway_registry: BTreeMap<u64, DistroPrGatewayEntry>,
+}
+
+impl core::fmt::Debug for SovereignUniversalPrGatewayEngine {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_struct("SovereignUniversalPrGatewayEngine")
+            .field("pr_engine", &self.pr_engine)
+            .field("pr_gateway_registry", &self.pr_gateway_registry)
+            .finish()
+    }
 }
 
 impl Default for SovereignUniversalPrGatewayEngine {
@@ -96,7 +104,10 @@ impl SovereignUniversalPrGatewayEngine {
         &mut self,
         pr_id: u64,
     ) -> Result<ConsolidatedSovereignPackage, &'static str> {
-        self.pr_engine.validate_pr(pr_id)?;
+        if let Err(e) = self.pr_engine.validate_pr(pr_id) {
+            println!("validate_pr failed for pr_id {}: {}", pr_id, e);
+            return Err(e);
+        }
         let translated = self.pr_engine.translate_pr(pr_id)?;
 
         if let Some(entry) = self.pr_gateway_registry.get_mut(&pr_id) {
@@ -118,6 +129,17 @@ impl SovereignUniversalPrGatewayEngine {
                 PullRequestPackageFormat::FlatpakApp => PackageFormat::Flatpak,
                 PullRequestPackageFormat::SnapPackage => PackageFormat::Snap,
                 PullRequestPackageFormat::AppImage => PackageFormat::AppImage,
+                PullRequestPackageFormat::SwupdBundle | PullRequestPackageFormat::ClearBundle => PackageFormat::Swupd,
+                PullRequestPackageFormat::StarlingPackage => PackageFormat::Starling,
+                PullRequestPackageFormat::MacOsHomebrewBottle => PackageFormat::Bottle,
+                PullRequestPackageFormat::IosIpaBundle => PackageFormat::Ipa,
+                PullRequestPackageFormat::AndroidAabPackage => PackageFormat::Aab,
+                PullRequestPackageFormat::HarmonyHapModule => PackageFormat::Hap,
+                PullRequestPackageFormat::ZypperSpec => PackageFormat::Zypper,
+                PullRequestPackageFormat::EopkgSpec | PullRequestPackageFormat::SolusEopkg => PackageFormat::Eopkg,
+                PullRequestPackageFormat::IpkPackage | PullRequestPackageFormat::OpkgPackage | PullRequestPackageFormat::OpenWrtIpk => PackageFormat::Ipk,
+                PullRequestPackageFormat::TczPackage => PackageFormat::Tcz,
+                PullRequestPackageFormat::CportsPackage => PackageFormat::Cports,
                 _ => PackageFormat::SigmaPkg,
             },
             original_name: translated.name.clone(),
@@ -205,7 +227,10 @@ mod tests {
         );
 
         assert_eq!(pr_deb, 1);
-        let translated = gateway.validate_and_translate_pr(pr_deb).unwrap();
+        let translated = match gateway.validate_and_translate_pr(pr_deb) {
+            Ok(t) => t,
+            Err(e) => panic!("validate_and_translate_pr failed with error: {}", e),
+        };
         assert_eq!(translated.name, "nginx");
 
         // 2. Generate PR diff
@@ -239,6 +264,9 @@ mod tests {
             ("grace", "git", "2.43.0", PullRequestPackageFormat::NixFlake, "description = \"git\"", &["zlib"][..]),
             ("heidi", "gimp", "2.10.36", PullRequestPackageFormat::FlatpakApp, "app-id: org.gimp.GIMP", &["babl"][..]),
             ("ivan", "blender", "4.0.2", PullRequestPackageFormat::AppImage, "AppImage Blender", &["glibc"][..]),
+            ("jack", "sys-utils", "1.0.0", PullRequestPackageFormat::SwupdBundle, "Clear Swupd Bundle", &["glibc"][..]),
+            ("kate", "starling-app", "2.0.0", PullRequestPackageFormat::StarlingPackage, "Starling App", &["sovereign-core"][..]),
+            ("leo", "homebrew-tool", "3.0.0", PullRequestPackageFormat::MacOsHomebrewBottle, "Homebrew Bottle", &["openssl"][..]),
         ];
 
         for (author, name, ver, fmt, manifest, deps) in submissions {
