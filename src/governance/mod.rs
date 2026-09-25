@@ -7,8 +7,10 @@ pub mod okr;
 pub mod rfc;
 pub mod strategic_vision;
 pub mod future_protocol;
+pub mod sovereign_task_guidelines_wiki_sync_engine;
 
 pub use okr::*;
+pub use sovereign_task_guidelines_wiki_sync_engine::*;
 pub use strategic_vision::{
     AdaptiveWorkloadType, CommunityPackageAuditRecord, ComplianceAuditVerdict,
     RegulatedIndustryFramework, StrategicDifferentiationEngine, VisualDashboardOverlay,

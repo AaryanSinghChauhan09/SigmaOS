@@ -114,6 +114,55 @@ if [ -f "src/drivers/sovereign_trackpad_synthesis.rs" ]; then
     ./build/sovereign_trackpad_test
 fi
 
+if [ -f "src/drivers/sovereign_sound_hda_synthesis.rs" ]; then
+    echo "Running Sovereign Sound HDA Subsystem Synthesis test suite..."
+    mkdir -p build
+    rustc --test src/drivers/sovereign_sound_hda_synthesis.rs --edition=2021 -o build/sovereign_sound_hda_test
+    ./build/sovereign_sound_hda_test
+fi
+
+if [ -f "src/drivers/sovereign_distro_driver_suite.rs" ]; then
+    echo "Running Sovereign Universal Distro Driver Suite test suite..."
+    mkdir -p build
+    rustc --test src/drivers/sovereign_distro_driver_suite.rs --edition=2021 -o build/sovereign_distro_driver_test
+    ./build/sovereign_distro_driver_test
+fi
+
+if [ -f "src/access/sovereign_access_operations_suite.rs" ]; then
+    echo "Running Sovereign Access Operations Suite test suite..."
+    mkdir -p build
+    rustc --test src/access/sovereign_access_operations_suite.rs --edition=2021 -o build/sovereign_access_test
+    ./build/sovereign_access_test
+fi
+
+if [ -f "src/access/sovereign_access_matrix_expansion.rs" ]; then
+    echo "Running Sovereign Access Matrix Expansion test suite..."
+    mkdir -p build
+    rustc --test src/access/sovereign_access_matrix_expansion.rs --edition=2021 -o build/sovereign_access_matrix_test
+    ./build/sovereign_access_matrix_test
+fi
+
+if [ -f "src/governance/sovereign_task_guidelines_wiki_sync_engine.rs" ]; then
+    echo "Running Sovereign Task Guidelines & Wiki Sync Engine test suite..."
+    mkdir -p build
+    rustc --test src/governance/sovereign_task_guidelines_wiki_sync_engine.rs --edition=2021 -o build/sovereign_governance_wiki_test
+    ./build/sovereign_governance_wiki_test
+fi
+
+if [ -f "src/kernel/panic_handler.rs" ]; then
+    echo "Running Sovereign Kernel Panic & Crash Dump Subsystem test suite..."
+    mkdir -p build
+    rustc --test src/kernel/panic_handler.rs --edition=2021 -o build/sovereign_kernel_panic_test
+    ./build/sovereign_kernel_panic_test
+fi
+
+if [ -f "src/kernel/sovereign_smp_xhci_apc_synthesis.rs" ]; then
+    echo "Running Sovereign SMP Multi-Core, xHCI & APC Subsystem test suite..."
+    mkdir -p build
+    rustc --test src/kernel/sovereign_smp_xhci_apc_synthesis.rs --edition=2021 -o build/sovereign_smp_xhci_apc_test
+    ./build/sovereign_smp_xhci_apc_test
+fi
+
 if [ -f "src/iso/sovereign_rufus_installer_synthesis.rs" ]; then
     echo "Running Sovereign Rufus & ISOHybrid Installer Synthesis test suite..."
     mkdir -p build

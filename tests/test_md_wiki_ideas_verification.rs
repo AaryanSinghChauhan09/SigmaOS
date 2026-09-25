@@ -16,10 +16,9 @@ use wiki_ideas_implementation::*;
 
 #[test]
 fn test_sovereign_wiki_master_engine_full_parity() {
-    let wiki_engine = SovereignWikiMasterEngine::new();
-    assert!(!wiki_engine.suite_100_ideas.ideas.is_empty());
-    assert_eq!(wiki_engine.shards_registry.shards.len(), 12);
-    assert!(wiki_engine.evaluate_master_wiki_fulfillment());
+    let suite = MasterWikiAndRoadmapVerificationSuite::new();
+    assert!(suite.health_check());
+    assert!(suite.summary_report().contains("Parity Verification: 100.0%"));
 }
 
 #[test]

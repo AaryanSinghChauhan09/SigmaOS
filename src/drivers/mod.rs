@@ -84,3 +84,9 @@ pub use sovereign_usb_xhci::{
 };
 
 pub use distro_device_expansion::*;
+
+pub mod sovereign_sound_hda_synthesis;
+pub use sovereign_sound_hda_synthesis::*;
+
+pub mod sovereign_distro_driver_suite;
+pub use sovereign_distro_driver_suite::*;

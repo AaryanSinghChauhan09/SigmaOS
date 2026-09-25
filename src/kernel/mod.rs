@@ -1,6 +1,10 @@
 #![allow(ambiguous_glob_reexports)]
 // SigmaOS Kernel Module
 pub mod panic_handler;
+pub use panic_handler::*;
+
+pub mod sovereign_smp_xhci_apc_synthesis;
+pub use sovereign_smp_xhci_apc_synthesis::*;
 pub mod kprintf;
 pub mod architecture;
 pub mod atomic_extended;
