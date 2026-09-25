@@ -25,6 +25,7 @@ pub struct SovereignCanonicalFhsResolver {
 impl SovereignCanonicalFhsResolver {
     pub fn new() -> Self {
         let mut map = BTreeMap::new();
+        // Standard Linux usr-merge & FHS
         map.insert("/bin".to_string(), "/system/current/bin".to_string());
         map.insert("/sbin".to_string(), "/system/current/bin".to_string());
         map.insert("/usr/bin".to_string(), "/system/current/bin".to_string());
@@ -36,13 +37,40 @@ impl SovereignCanonicalFhsResolver {
         map.insert("/var".to_string(), "/state/var".to_string());
         map.insert("/opt".to_string(), "/state/opt".to_string());
 
+        // FreeBSD / DragonFly / GhostBSD / NomadBSD
+        map.insert("/usr/local/bin".to_string(), "/system/current/bin".to_string());
+        map.insert("/usr/local/sbin".to_string(), "/system/current/bin".to_string());
+        map.insert("/usr/local/etc".to_string(), "/state/etc".to_string());
+        map.insert("/usr/home".to_string(), "/home".to_string());
+
+        // NetBSD pkgsrc
+        map.insert("/usr/pkg/bin".to_string(), "/system/current/bin".to_string());
+        map.insert("/usr/pkg/sbin".to_string(), "/system/current/bin".to_string());
+        map.insert("/usr/pkg/etc".to_string(), "/state/etc".to_string());
+
+        // OpenBSD
+        map.insert("/usr/X11R6/bin".to_string(), "/system/current/bin".to_string());
+
+        // NixOS & Guix
+        map.insert("/nix/store".to_string(), "/system/store".to_string());
+        map.insert("/gnu/store".to_string(), "/system/store".to_string());
+
+        // Fedora OSTree / Silverblue
+        map.insert("/var/home".to_string(), "/home".to_string());
+        map.insert("/ostree/deploy".to_string(), "/system/deploy".to_string());
+
         Self { legacy_mappings: map }
     }
 
     pub fn resolve_path(&self, requested_path: &str) -> String {
-        for (legacy, canonical) in &self.legacy_mappings {
-            if requested_path == legacy || requested_path.starts_with(&format!("{}/", legacy)) {
-                return requested_path.replacen(legacy, canonical, 1);
+        let mut keys: Vec<&String> = self.legacy_mappings.keys().collect();
+        keys.sort_by(|a, b| b.len().cmp(&a.len()));
+
+        for legacy in keys {
+            if let Some(canonical) = self.legacy_mappings.get(legacy) {
+                if requested_path == legacy || requested_path.starts_with(&format!("{}/", legacy)) {
+                    return requested_path.replacen(legacy, canonical, 1);
+                }
             }
         }
         requested_path.to_string()
@@ -50,6 +78,50 @@ impl SovereignCanonicalFhsResolver {
 }
 
 impl Default for SovereignCanonicalFhsResolver {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Sovereign Multi-Distro FHS Hierarchy Engine
+#[derive(Debug, Clone)]
+pub struct SovereignMultiDistroFhsHierarchyEngine {
+    pub resolver: SovereignCanonicalFhsResolver,
+    pub strict_fhs_mode: bool,
+}
+
+impl SovereignMultiDistroFhsHierarchyEngine {
+    pub fn new() -> Self {
+        Self {
+            resolver: SovereignCanonicalFhsResolver::new(),
+            strict_fhs_mode: false,
+        }
+    }
+
+    pub fn resolve_distro_path(&self, distro_kind: &str, requested_path: &str) -> String {
+        let canonical = self.resolver.resolve_path(requested_path);
+        match distro_kind {
+            "freebsd" | "openbsd" | "netbsd" => {
+                if requested_path.starts_with("/etc/rc.d") {
+                    return requested_path.replacen("/etc", "/state/etc", 1);
+                }
+            }
+            "nixos" => {
+                if requested_path == "/etc/nixos" {
+                    return "/state/etc/nixos".to_string();
+                }
+            }
+            _ => {}
+        }
+        canonical
+    }
+
+    pub fn validate_fhs_compliance(&self, path: &str) -> bool {
+        !path.contains("//") && !path.contains("/./") && (path.starts_with('/') || path == ".")
+    }
+}
+
+impl Default for SovereignMultiDistroFhsHierarchyEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -191,6 +263,20 @@ mod tests {
         assert_eq!(resolver.resolve_path("/usr/bin/bash"), "/system/current/bin/bash");
         assert_eq!(resolver.resolve_path("/lib64/libc.so.6"), "/system/current/lib/libc.so.6");
         assert_eq!(resolver.resolve_path("/etc/os-release"), "/state/etc/os-release");
+        assert_eq!(resolver.resolve_path("/usr/local/etc/nginx.conf"), "/state/etc/nginx.conf");
+        assert_eq!(resolver.resolve_path("/usr/pkg/bin/pkgin"), "/system/current/bin/pkgin");
+        assert_eq!(resolver.resolve_path("/nix/store/abc-pkg"), "/system/store/abc-pkg");
+        assert_eq!(resolver.resolve_path("/var/home/jules"), "/home/jules");
+    }
+
+    #[test]
+    fn test_multi_distro_fhs_hierarchy_engine() {
+        let engine = SovereignMultiDistroFhsHierarchyEngine::new();
+        assert_eq!(engine.resolve_distro_path("freebsd", "/usr/local/etc/rc.conf"), "/state/etc/rc.conf");
+        assert_eq!(engine.resolve_distro_path("freebsd", "/etc/rc.d/netif"), "/state/etc/rc.d/netif");
+        assert_eq!(engine.resolve_distro_path("nixos", "/etc/nixos"), "/state/etc/nixos");
+        assert!(engine.validate_fhs_compliance("/usr/bin/env"));
+        assert!(!engine.validate_fhs_compliance("/usr//bin/env"));
     }
 
     #[test]
