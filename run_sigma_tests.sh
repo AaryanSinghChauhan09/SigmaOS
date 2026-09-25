@@ -30,6 +30,13 @@ if [ -f "src/security/kernel_hardening.rs" ]; then
     ./build/kernel_hardening_test
 fi
 
+if [ -f "src/init/systemd_init.rs" ]; then
+    echo "Running systemd init & service manager test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/init/systemd_init.rs -o build/systemd_test
+    ./build/systemd_test
+fi
+
 if [ -f "src/distro/linux_bsd_inspirations.rs" ]; then
     echo "Running Linux & BSD distro inspirations & subsystem bridge test suite..."
     mkdir -p build
