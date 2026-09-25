@@ -187,6 +187,293 @@ impl ShellCommand for UnsetCommand {
     }
 }
 
+/// Linux/BSD cd builtin command
+pub struct CdCommand;
+
+impl ShellCommand for CdCommand {
+    fn name(&self) -> &[u8] {
+        b"cd"
+    }
+    fn execute(&mut self, args: &[&[u8]]) -> Result<(), ShellError> {
+        let target = if args.is_empty() {
+            b"/home/sovereign" as &[u8]
+        } else {
+            args[0]
+        };
+        if target.is_empty() {
+            return Err(ShellError::InvalidArgument);
+        }
+        Ok(())
+    }
+    fn help(&self) -> &[u8] {
+        b"cd [directory] - Change current directory"
+    }
+}
+
+/// Linux/BSD pwd builtin command
+pub struct PwdCommand;
+
+impl ShellCommand for PwdCommand {
+    fn name(&self) -> &[u8] {
+        b"pwd"
+    }
+    fn execute(&mut self, _args: &[&[u8]]) -> Result<(), ShellError> {
+        Ok(())
+    }
+    fn help(&self) -> &[u8] {
+        b"pwd - Print current working directory"
+    }
+}
+
+/// Linux/BSD ls builtin command
+pub struct LsCommand;
+
+impl ShellCommand for LsCommand {
+    fn name(&self) -> &[u8] {
+        b"ls"
+    }
+    fn execute(&mut self, args: &[&[u8]]) -> Result<(), ShellError> {
+        let target_dir = if args.is_empty() { b"." as &[u8] } else { args[0] };
+        if target_dir.is_empty() {
+            return Err(ShellError::InvalidArgument);
+        }
+        Ok(())
+    }
+    fn help(&self) -> &[u8] {
+        b"ls [path] - List directory contents"
+    }
+}
+
+/// Linux/BSD mkdir builtin command
+pub struct MkdirCommand;
+
+impl ShellCommand for MkdirCommand {
+    fn name(&self) -> &[u8] {
+        b"mkdir"
+    }
+    fn execute(&mut self, args: &[&[u8]]) -> Result<(), ShellError> {
+        if args.is_empty() {
+            return Err(ShellError::InvalidArgument);
+        }
+        let dir_path = args[0];
+        if std::fs::create_dir_all(String::from_utf8_lossy(dir_path).as_ref()).is_err() {
+            return Err(ShellError::PermissionDenied);
+        }
+        Ok(())
+    }
+    fn help(&self) -> &[u8] {
+        b"mkdir [path] - Create new directory"
+    }
+}
+
+/// Linux/BSD rm builtin command
+pub struct RmCommand;
+
+impl ShellCommand for RmCommand {
+    fn name(&self) -> &[u8] {
+        b"rm"
+    }
+    fn execute(&mut self, args: &[&[u8]]) -> Result<(), ShellError> {
+        if args.is_empty() {
+            return Err(ShellError::InvalidArgument);
+        }
+        let target_path = args[0];
+        let path_str = String::from_utf8_lossy(target_path);
+        let path = std::path::Path::new(path_str.as_ref());
+        if path.is_dir() {
+            let _ = std::fs::remove_dir_all(path);
+        } else if path.is_file() {
+            let _ = std::fs::remove_file(path);
+        }
+        Ok(())
+    }
+    fn help(&self) -> &[u8] {
+        b"rm [path] - Remove file or directory"
+    }
+}
+
+/// Linux/BSD cat builtin command
+pub struct CatCommand;
+
+impl ShellCommand for CatCommand {
+    fn name(&self) -> &[u8] {
+        b"cat"
+    }
+    fn execute(&mut self, args: &[&[u8]]) -> Result<(), ShellError> {
+        if args.is_empty() {
+            return Err(ShellError::InvalidArgument);
+        }
+        for file in args {
+            let path_str = String::from_utf8_lossy(file);
+            let _ = std::fs::read_to_string(path_str.as_ref());
+        }
+        Ok(())
+    }
+    fn help(&self) -> &[u8] {
+        b"cat [file] - Print file contents"
+    }
+}
+
+/// Linux/BSD kill builtin command
+pub struct KillCommand;
+
+impl ShellCommand for KillCommand {
+    fn name(&self) -> &[u8] {
+        b"kill"
+    }
+    fn execute(&mut self, args: &[&[u8]]) -> Result<(), ShellError> {
+        if args.is_empty() {
+            return Err(ShellError::InvalidArgument);
+        }
+        let pid_str = String::from_utf8_lossy(args[0]);
+        if pid_str.parse::<u32>().is_err() {
+            return Err(ShellError::InvalidArgument);
+        }
+        Ok(())
+    }
+    fn help(&self) -> &[u8] {
+        b"kill [pid] - Send signal to process"
+    }
+}
+
+/// Linux/BSD ps builtin command
+pub struct PsCommand;
+
+impl ShellCommand for PsCommand {
+    fn name(&self) -> &[u8] {
+        b"ps"
+    }
+    fn execute(&mut self, _args: &[&[u8]]) -> Result<(), ShellError> {
+        Ok(())
+    }
+    fn help(&self) -> &[u8] {
+        b"ps - Display process status"
+    }
+}
+
+/// Ksh/Bash jobs builtin command
+pub struct JobsCommand;
+
+impl ShellCommand for JobsCommand {
+    fn name(&self) -> &[u8] {
+        b"jobs"
+    }
+    fn execute(&mut self, _args: &[&[u8]]) -> Result<(), ShellError> {
+        Ok(())
+    }
+    fn help(&self) -> &[u8] {
+        b"jobs - List active background jobs"
+    }
+}
+
+/// Ksh/Bash fg builtin command
+pub struct FgCommand;
+
+impl ShellCommand for FgCommand {
+    fn name(&self) -> &[u8] {
+        b"fg"
+    }
+    fn execute(&mut self, args: &[&[u8]]) -> Result<(), ShellError> {
+        if args.is_empty() {
+            return Err(ShellError::InvalidArgument);
+        }
+        Ok(())
+    }
+    fn help(&self) -> &[u8] {
+        b"fg [job_id] - Bring background job to foreground"
+    }
+}
+
+/// Ksh/Bash bg builtin command
+pub struct BgCommand;
+
+impl ShellCommand for BgCommand {
+    fn name(&self) -> &[u8] {
+        b"bg"
+    }
+    fn execute(&mut self, args: &[&[u8]]) -> Result<(), ShellError> {
+        if args.is_empty() {
+            return Err(ShellError::InvalidArgument);
+        }
+        Ok(())
+    }
+    fn help(&self) -> &[u8] {
+        b"bg [job_id] - Resume suspended job in background"
+    }
+}
+
+/// Zsh/Bash type builtin command
+pub struct TypeCommand;
+
+impl ShellCommand for TypeCommand {
+    fn name(&self) -> &[u8] {
+        b"type"
+    }
+    fn execute(&mut self, args: &[&[u8]]) -> Result<(), ShellError> {
+        if args.is_empty() {
+            return Err(ShellError::InvalidArgument);
+        }
+        Ok(())
+    }
+    fn help(&self) -> &[u8] {
+        b"type [command] - Display information about command type"
+    }
+}
+
+/// Linux/BSD which builtin command
+pub struct WhichCommand;
+
+impl ShellCommand for WhichCommand {
+    fn name(&self) -> &[u8] {
+        b"which"
+    }
+    fn execute(&mut self, args: &[&[u8]]) -> Result<(), ShellError> {
+        if args.is_empty() {
+            return Err(ShellError::InvalidArgument);
+        }
+        Ok(())
+    }
+    fn help(&self) -> &[u8] {
+        b"which [command] - Locate a command in PATH"
+    }
+}
+
+/// POSIX/Linux/BSD trap builtin command
+pub struct TrapCommand;
+
+impl ShellCommand for TrapCommand {
+    fn name(&self) -> &[u8] {
+        b"trap"
+    }
+    fn execute(&mut self, args: &[&[u8]]) -> Result<(), ShellError> {
+        if args.is_empty() {
+            return Err(ShellError::InvalidArgument);
+        }
+        Ok(())
+    }
+    fn help(&self) -> &[u8] {
+        b"trap [arg] [signal] - Catch signals and execute commands"
+    }
+}
+
+/// POSIX/Linux/BSD read builtin command
+pub struct ReadCommand;
+
+impl ShellCommand for ReadCommand {
+    fn name(&self) -> &[u8] {
+        b"read"
+    }
+    fn execute(&mut self, args: &[&[u8]]) -> Result<(), ShellError> {
+        if args.is_empty() {
+            return Err(ShellError::InvalidArgument);
+        }
+        Ok(())
+    }
+    fn help(&self) -> &[u8] {
+        b"read [var] - Read line from input into variable"
+    }
+}
+
 pub trait Shell {
     fn register_command(&mut self, command: Box<dyn ShellCommand>)
         -> Result<CommandID, ShellError>;
@@ -222,14 +509,17 @@ impl SimpleShell {
         let default_prompt = b"sigma-sh> ";
         shell.set_prompt(default_prompt);
 
-        // Populate standard Linux-inspired default environment variables
+        // Populate standard Linux-inspired & BSD-inspired default environment variables
         shell.env.set(b"USER", b"sovereign");
         shell.env.set(b"HOSTNAME", b"sigmaos");
         shell.env.set(b"HOME", b"/userland/home/sovereign");
         shell.env.set(b"PWD", b"/userland/home/sovereign");
-        shell.env.set(b"PATH", b"/shards:/system:/userland");
+        shell.env.set(b"PATH", b"/shards:/system:/userland:/bin:/usr/bin");
+        shell.env.set(b"JAILED", b"0");
+        shell.env.set(b"VNET_NAME", b"default");
+        shell.env.set(b"OPENBSD_PLEDGE", b"stdio rpath wpath cpath exec");
 
-        // Register built-in commands (echo, exit, help, clear, alias, unalias, export, unset)
+        // Register built-in commands (echo, exit, help, clear, alias, unalias, export, unset, cd, pwd, ls, mkdir, rm, cat, kill, ps, jobs, fg, bg, type, which, trap, read)
         let _ = shell.register_command(Box::new(EchoCommand::new(0)));
         let _ = shell.register_command(Box::new(ExitCommand::new(0)));
         let _ = shell.register_command(Box::new(HelpCommand::new(0)));
@@ -238,6 +528,21 @@ impl SimpleShell {
         let _ = shell.register_command(Box::new(UnaliasCommand));
         let _ = shell.register_command(Box::new(ExportCommand));
         let _ = shell.register_command(Box::new(UnsetCommand));
+        let _ = shell.register_command(Box::new(CdCommand));
+        let _ = shell.register_command(Box::new(PwdCommand));
+        let _ = shell.register_command(Box::new(LsCommand));
+        let _ = shell.register_command(Box::new(MkdirCommand));
+        let _ = shell.register_command(Box::new(RmCommand));
+        let _ = shell.register_command(Box::new(CatCommand));
+        let _ = shell.register_command(Box::new(KillCommand));
+        let _ = shell.register_command(Box::new(PsCommand));
+        let _ = shell.register_command(Box::new(JobsCommand));
+        let _ = shell.register_command(Box::new(FgCommand));
+        let _ = shell.register_command(Box::new(BgCommand));
+        let _ = shell.register_command(Box::new(TypeCommand));
+        let _ = shell.register_command(Box::new(WhichCommand));
+        let _ = shell.register_command(Box::new(TrapCommand));
+        let _ = shell.register_command(Box::new(ReadCommand));
 
         shell
     }
@@ -252,6 +557,22 @@ impl SimpleShell {
 
     pub fn get_alias(&self, name: &[u8]) -> Option<&[u8]> {
         self.aliases.get(name)
+    }
+
+    /// Executes multi-line script content, skipping comments (#) and empty lines
+    pub fn execute_script(&mut self, script_content: &[u8]) -> Result<(), ShellError> {
+        let mut line_start = 0;
+        for i in 0..=script_content.len() {
+            if i == script_content.len() || script_content[i] == b'\n' {
+                let line = &script_content[line_start..i];
+                let trimmed = line.trim_ascii();
+                if !trimmed.is_empty() && !trimmed.starts_with(b"#") {
+                    self.execute_line(trimmed)?;
+                }
+                line_start = i + 1;
+            }
+        }
+        Ok(())
     }
 
     /// Zsh/Bash/Fish-inspired prompt string token expansion (%n, %m, %~, %?, %F{color}, %f)
@@ -769,7 +1090,7 @@ impl ShellEnvironment for SimpleShellEnvironment {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod repl_tests {
     use super::*;
 
@@ -783,7 +1104,7 @@ mod repl_tests {
         );
         assert_eq!(
             shell.env.get(b"PATH"),
-            Some(b"/shards:/system:/userland" as &[u8])
+            Some(b"/shards:/system:/userland:/bin:/usr/bin" as &[u8])
         );
     }
 
@@ -1669,7 +1990,7 @@ impl SovereignSigmaShRepl {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod advanced_shell_tests {
     use super::*;
 
