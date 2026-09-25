@@ -114,6 +114,13 @@ if [ -f "src/network/approximation_proxy_firewall.rs" ]; then
     ./build/approximation_proxy_firewall_test
 fi
 
+if [ -f "src/network/nftables.rs" ]; then
+    echo "Running nftables & iptables packet filtering test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/network/nftables.rs -o build/nftables_test
+    ./build/nftables_test
+fi
+
 if [ -f "src/distro/linux_bsd_ecosystem_synthesis.rs" ]; then
     echo "Running Extended Linux & BSD Distro Ecosystem Synthesis test suite..."
     mkdir -p build

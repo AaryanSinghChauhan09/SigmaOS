@@ -1,13 +1,11 @@
-use std::vec;
-use std::format;
 // nftables-Inspired Modern Firewall Framework
 // Linux nftables provides a modern, flexible packet filtering framework with tables, chains, and rules
 
-
 use std::collections::BTreeMap;
+use std::format;
 use std::string::{String, ToString};
+use std::vec;
 use std::vec::Vec;
-use std::{format, vec};
 
 /// nftables-inspired table families
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -1031,7 +1029,7 @@ pub struct NftablesStats {
     pub total_connections: usize,
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
