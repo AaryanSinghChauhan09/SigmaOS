@@ -83,3 +83,16 @@ pub mod launcher;
 pub mod notification;
 pub mod omarchy_dynamic_workspace_suite;
 pub use omarchy_dynamic_workspace_suite::*;
+pub mod dev_workspace;
+pub mod localization;
+pub mod network_sharing;
+pub mod permission_portal;
+pub mod font_manager;
+pub mod onboarding_wizard;
+
+pub use permission_portal::*;
+pub use font_manager::*;
+pub use onboarding_wizard::*;
+pub mod display_manager;
+pub mod file_manager_extensions;
+pub mod system_tray;
