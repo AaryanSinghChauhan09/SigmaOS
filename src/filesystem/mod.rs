@@ -14,6 +14,7 @@ pub mod smart_symlink;
 pub mod support;
 pub mod vfs;
 pub mod sigma_fs;
+pub mod sovereign_filesystem_hierarchy;
 
 pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
 pub use crate::filesystem::vfs::{FileType, FsError, Inode, VirtualFilesystem, VfsError};
