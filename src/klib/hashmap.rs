@@ -149,28 +149,18 @@ where
 
         let hash = self.hash_key(&key);
         if self.buckets[hash].is_none() {
-            // No bucket yet — pre-allocate with capacity for 4 entries to avoid reallocations
             let mut bucket = Vec::with_capacity(4);
             bucket.push((key, value));
             self.buckets[hash] = Some(bucket);
             self.len += 1;
-            let bucket_ref = self.buckets[hash].as_mut().unwrap();
-            let last_idx = bucket_ref.len() - 1;
-            return &mut bucket_ref[last_idx].1;
+            return &mut self.buckets[hash].as_mut().unwrap()[0].1;
         }
 
         let bucket = self.buckets[hash].as_mut().unwrap();
-        let mut found_idx = None;
-        for (i, item) in bucket.iter().enumerate() {
-            if item.0 == key {
-                found_idx = Some(i);
-                break;
-            }
-        }
-
-        if let Some(idx) = found_idx {
-            bucket[idx].1 = value;
-            return &mut bucket[idx].1;
+        // Bolt ⚡: Single-pass linear position lookup avoids redundant enumerate/variable-assignment loops
+        if let Some(pos) = bucket.iter().position(|(k, _)| *k == key) {
+            bucket[pos].1 = value;
+            return &mut bucket[pos].1;
         }
 
         bucket.push((key, value));
