@@ -1,12 +1,47 @@
 // SigmaOS Linux Package & Driver Translation Subsystem
-// Zero-dependency, #![no_std] compliant, zero-allocation
+// Zero-dependency, zero-allocation
 // Integrates foreign Linux package frameworks (.deb, .rpm, pacman) directly with the SigmaOS Driver system.
 
+#[cfg(not(feature = "standalone_test"))]
 use crate::driver::framework::{
     DriverType, SimpleDriver,
 };
+#[cfg(not(feature = "standalone_test"))]
 use crate::package::PackageFormat;
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DriverType {
+    Net,
+    Block,
+    Char,
+}
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone)]
+pub struct SimpleDriver {
+    pub id: u32,
+    pub driver_type: DriverType,
+}
+
+#[cfg(feature = "standalone_test")]
+impl SimpleDriver {
+    pub fn new(id: u32, driver_type: DriverType) -> Self {
+        Self { id, driver_type }
+    }
+}
+
+#[cfg(feature = "standalone_test")]
+#[path = "universal.rs"]
+pub mod universal;
+
+#[cfg(feature = "standalone_test")]
+pub use universal::PackageFormat;
 use core::sync::atomic::{AtomicBool, Ordering};
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// User-Defined Function (UDF) for Package & Syscall Translation
 /// Dynamically translates foreign syscalls or I/O request codes to native SigmaOS drivers
@@ -71,7 +106,6 @@ impl LinuxDriverPackageTranslator for DebPackageDriverTranslator {
             "PackageTranslator: Converting Debian Package '{}' ({} bytes) to SigmaOS system driver.",
             self.name, self.payload_size
         );
-        // Return a provisioned driver for the translated package
         SimpleDriver::new(9901, DriverType::Net)
     }
 }
@@ -173,3 +207,144 @@ impl LinuxTranslationService {
 pub static GLOBAL_TRANSLATION_UDF: GenericLinuxTranslationUdf = GenericLinuxTranslationUdf;
 pub static GLOBAL_TRANSLATION_SERVICE: LinuxTranslationService =
     LinuxTranslationService::new(&GLOBAL_TRANSLATION_UDF);
+
+// =========================================================================
+// 1. PCIe / USB Modalias Matching Engine (`PackageModaliasMatcher`)
+// =========================================================================
+
+pub struct PackageModaliasMatcher {
+    pub modalias_database: BTreeMap<String, String>, // modalias pattern -> driver package
+}
+
+impl PackageModaliasMatcher {
+    pub fn new() -> Self {
+        let mut db = BTreeMap::new();
+        db.insert("pci:v000010DEd*".to_string(), "nvidia-open-dkms".to_string());
+        db.insert("pci:v00008086d*".to_string(), "intel-media-driver".to_string());
+        db.insert("pci:v00001002d*".to_string(), "amdgpu-pro".to_string());
+        db.insert("usb:v0bda:c811".to_string(), "realtek-rtl8852ae-dkms".to_string());
+        db.insert("pci:v000014E4d*".to_string(), "broadcom-wl-dkms".to_string());
+
+        Self { modalias_database: db }
+    }
+
+    pub fn match_hardware_modalias(&self, modalias: &str) -> Option<String> {
+        for (pattern, pkg) in &self.modalias_database {
+            if pattern.ends_with('*') {
+                let prefix = &pattern[..pattern.len() - 1];
+                if modalias.starts_with(prefix) {
+                    return Some(pkg.clone());
+                }
+            } else if modalias == pattern {
+                return Some(pkg.clone());
+            }
+        }
+        None
+    }
+}
+
+impl Default for PackageModaliasMatcher {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 2. DKMS Out-of-Tree Kernel Module Build Pipeline (`DkmsPackageBuildPipeline`)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DkmsDriverModuleSpec {
+    pub module_name: String,
+    pub module_version: String,
+    pub source_dir: String,
+    pub kernel_version: String,
+}
+
+pub struct DkmsPackageBuildPipeline;
+
+impl DkmsPackageBuildPipeline {
+    pub fn build_dkms_module(spec: &DkmsDriverModuleSpec) -> Result<String, &'static str> {
+        if spec.module_name.is_empty() || spec.kernel_version.is_empty() {
+            return Err("DKMS Pipeline: Invalid module spec or kernel version");
+        }
+        Ok(format!(
+            "dkms build -m {} -v {} -k {}",
+            spec.module_name, spec.module_version, spec.kernel_version
+        ))
+    }
+}
+
+// =========================================================================
+// 3. Modprobe & X11 Driver Configuration Generator (`DistroDriverConfigGenerator`)
+// =========================================================================
+
+pub struct DistroDriverConfigGenerator;
+
+impl DistroDriverConfigGenerator {
+    pub fn generate_modprobe_blacklist(blacklist_driver: &str) -> String {
+        format!(
+            "# SigmaOS Modprobe Driver Blacklist Config\n\
+            blacklist {}\n\
+            options {} modeset=0\n",
+            blacklist_driver, blacklist_driver
+        )
+    }
+
+    pub fn generate_xorg_gpu_config(driver_name: &str) -> String {
+        format!(
+            "# SigmaOS X11/Wayland Display Driver Config\n\
+            Section \"Device\"\n\
+                Identifier \"SigmaOS GPU\"\n\
+                Driver \"{}\"\n\
+                Option \"AccelMethod\" \"glamor\"\n\
+            EndSection\n",
+            driver_name
+        )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_modalias_matching() {
+        let matcher = PackageModaliasMatcher::new();
+        assert_eq!(
+            matcher.match_hardware_modalias("pci:v000010DEd00002204"),
+            Some("nvidia-open-dkms".to_string())
+        );
+        assert_eq!(
+            matcher.match_hardware_modalias("pci:v00008086d00004680"),
+            Some("intel-media-driver".to_string())
+        );
+        assert_eq!(
+            matcher.match_hardware_modalias("usb:v0bda:c811"),
+            Some("realtek-rtl8852ae-dkms".to_string())
+        );
+        assert_eq!(matcher.match_hardware_modalias("unknown:device"), None);
+    }
+
+    #[test]
+    fn test_dkms_build_pipeline() {
+        let spec = DkmsDriverModuleSpec {
+            module_name: "nvidia".to_string(),
+            module_version: "550.54.14".to_string(),
+            source_dir: "/usr/src/nvidia-550.54.14".to_string(),
+            kernel_version: "6.6.0-sovereign".to_string(),
+        };
+
+        let cmd = DkmsPackageBuildPipeline::build_dkms_module(&spec).unwrap();
+        assert!(cmd.contains("dkms build -m nvidia -v 550.54.14 -k 6.6.0-sovereign"));
+    }
+
+    #[test]
+    fn test_driver_config_generator() {
+        let blacklist = DistroDriverConfigGenerator::generate_modprobe_blacklist("nouveau");
+        assert!(blacklist.contains("blacklist nouveau"));
+
+        let xorg = DistroDriverConfigGenerator::generate_xorg_gpu_config("nvidia");
+        assert!(xorg.contains("Driver \"nvidia\""));
+    }
+}

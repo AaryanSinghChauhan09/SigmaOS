@@ -1,7 +1,8 @@
 // SigmaOS Package Repository Management
 // Linux & BSD distro-inspired package repository handling
 // Manages package repositories, sources, APT/DNF-style pinning, signature verification,
-// rankmirrors/reflector mirror failover, drpm delta indexes, and Nix/Guix content-addressed stores.
+// rankmirrors/reflector mirror failover, drpm delta indexes, USB xHCI, Intel HDA/SOF, GPU, Network Fabric & Storage RAID driver package detection,
+// and Nix/Guix content-addressed stores.
 
 #![cfg_attr(not(test), no_std)]
 
@@ -77,7 +78,6 @@ impl RepositorySignatureVerifier {
         if signature.len() < 32 {
             return false;
         }
-        // Simulated signature check: signature must incorporate index_sha256 XOR ed25519_public_key[0..16]
         let mut expected = [0u8; 16];
         for i in 0..16 {
             expected[i] = index_sha256[i] ^ self.ed25519_public_key[i];
@@ -143,7 +143,7 @@ pub struct DeltaPackageDescriptor {
 /// Delta repository index
 #[derive(Debug, Clone)]
 pub struct DeltaRepositoryIndex {
-    pub deltas: BTreeMap<String, Vec<DeltaPackageDescriptor>>, // package_name -> deltas
+    pub deltas: BTreeMap<String, Vec<DeltaPackageDescriptor>>,
 }
 
 impl DeltaRepositoryIndex {
@@ -182,7 +182,7 @@ impl Default for DeltaRepositoryIndex {
 /// Nix / Guix content-addressed package store index for zero-duplication package retrieval
 #[derive(Debug, Clone)]
 pub struct ContentAddressedRepoIndex {
-    pub hash_to_package: BTreeMap<String, String>, // sha256_store_hash -> package_spec
+    pub hash_to_package: BTreeMap<String, String>,
 }
 
 impl ContentAddressedRepoIndex {
@@ -205,6 +205,270 @@ impl ContentAddressedRepoIndex {
 impl Default for ContentAddressedRepoIndex {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+// =========================================================================
+// 1. USB xHCI Driver Package Detector (`UsbXhciDriverPackageDetector`)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum UsbControllerGen {
+    Usb2Ehci,
+    Usb3Xhci,
+    Usb4Thunderbolt4,
+}
+
+pub struct UsbXhciDriverPackageDetector;
+
+impl UsbXhciDriverPackageDetector {
+    pub fn match_usb_driver_package(controller_gen: UsbControllerGen) -> Vec<&'static str> {
+        match controller_gen {
+            UsbControllerGen::Usb4Thunderbolt4 => vec!["tb4-hcd", "xhci-hcd", "thunderbolt-net"],
+            UsbControllerGen::Usb3Xhci => vec!["xhci-hcd", "usb-storage", "uas"],
+            UsbControllerGen::Usb2Ehci => vec!["ehci-hcd", "usb-storage"],
+        }
+    }
+}
+
+// =========================================================================
+// 2. USB Firmware Package Downloader (`UsbFirmwarePackageDownloader`)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct UsbFirmwareBlobSpec {
+    pub vendor_name: String,
+    pub firmware_filename: String,
+    pub download_url: String,
+    pub sha256_checksum: String,
+}
+
+pub struct UsbFirmwarePackageDownloader {
+    pub registered_firmwares: BTreeMap<String, UsbFirmwareBlobSpec>,
+}
+
+impl UsbFirmwarePackageDownloader {
+    pub fn new() -> Self {
+        let mut map = BTreeMap::new();
+        map.insert(
+            "intel-bt".to_string(),
+            UsbFirmwareBlobSpec {
+                vendor_name: "Intel".to_string(),
+                firmware_filename: "intel/ibt-11-5.sfi".to_string(),
+                download_url: "https://packages.sigmaos.org/firmware/intel/ibt-11-5.sfi".to_string(),
+                sha256_checksum: "a1b2c3d4e5f6".to_string(),
+            },
+        );
+        map.insert(
+            "realtek-wifi".to_string(),
+            UsbFirmwareBlobSpec {
+                vendor_name: "Realtek".to_string(),
+                firmware_filename: "rtw88/rtw8852a_fw.bin".to_string(),
+                download_url: "https://packages.sigmaos.org/firmware/rtw8852a_fw.bin".to_string(),
+                sha256_checksum: "f6e5d4c3b2a1".to_string(),
+            },
+        );
+
+        Self { registered_firmwares: map }
+    }
+
+    pub fn query_firmware(&self, key: &str) -> Option<&UsbFirmwareBlobSpec> {
+        self.registered_firmwares.get(key)
+    }
+}
+
+impl Default for UsbFirmwarePackageDownloader {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 3. USB Hotplug Package Trigger Governor (`UsbHotplugPackageTriggerGovernor`)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct UsbDeviceUevent {
+    pub vendor_id: u16,
+    pub product_id: u16,
+    pub device_class: u8, // 0x03 = HID, 0x08 = Mass Storage, 0xE0 = Wireless
+}
+
+pub struct UsbHotplugPackageTriggerGovernor;
+
+impl UsbHotplugPackageTriggerGovernor {
+    pub fn resolve_package_trigger(event: &UsbDeviceUevent) -> &'static str {
+        match event.device_class {
+            0x03 => "usb-hid-input-utils",
+            0x08 => "udisks2-usb-storage",
+            0xE0 => "linux-firmware-wireless",
+            _ => "usbutils",
+        }
+    }
+}
+
+// =========================================================================
+// 4. Intel HDA / SOF Audio Codec Driver Package Detector
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AudioCodecVendor {
+    IntelSof,
+    RealtekAlc,
+    CirrusLogic,
+}
+
+pub struct IntelHdaAudioDriverPackageDetector;
+
+impl IntelHdaAudioDriverPackageDetector {
+    pub fn match_audio_driver_package(vendor: AudioCodecVendor) -> Vec<&'static str> {
+        match vendor {
+            AudioCodecVendor::IntelSof => vec!["sof-firmware", "alsa-ucm-conf", "pipewire-audio"],
+            AudioCodecVendor::RealtekAlc => vec!["alsa-ucm-conf", "pipewire-audio", "wireplumber"],
+            AudioCodecVendor::CirrusLogic => vec!["cirrus-cs35l41-firmware", "alsa-ucm-conf"],
+        }
+    }
+}
+
+// =========================================================================
+// 5. Intel HDA / SOF Audio Firmware Auto-Downloader
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AudioFirmwareBlobSpec {
+    pub codec_name: String,
+    pub firmware_filename: String,
+    pub sha256_checksum: String,
+}
+
+pub struct IntelHdaAudioFirmwareDownloader {
+    pub firmwares: BTreeMap<String, AudioFirmwareBlobSpec>,
+}
+
+impl IntelHdaAudioFirmwareDownloader {
+    pub fn new() -> Self {
+        let mut map = BTreeMap::new();
+        map.insert(
+            "intel-sof-alderlake".to_string(),
+            AudioFirmwareBlobSpec {
+                codec_name: "Intel Alder Lake SOF".to_string(),
+                firmware_filename: "intel/sof/sof-adl.ri".to_string(),
+                sha256_checksum: "c1d2e3f4a5b6".to_string(),
+            },
+        );
+        map.insert(
+            "cirrus-cs35l41".to_string(),
+            AudioFirmwareBlobSpec {
+                codec_name: "Cirrus Logic CS35L41 Smart Amp".to_string(),
+                firmware_filename: "cirrus/cs35l41-dsp1-spk-prot.bin".to_string(),
+                sha256_checksum: "e6f5d4c3b2a1".to_string(),
+            },
+        );
+
+        Self { firmwares: map }
+    }
+
+    pub fn query_audio_firmware(&self, key: &str) -> Option<&AudioFirmwareBlobSpec> {
+        self.firmwares.get(key)
+    }
+}
+
+impl Default for IntelHdaAudioFirmwareDownloader {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 6. Audio Hotplug Package Trigger Governor
+// =========================================================================
+
+pub struct AudioHotplugPackageTriggerGovernor;
+
+impl AudioHotplugPackageTriggerGovernor {
+    pub fn resolve_audio_trigger(event_type: &str) -> Vec<&'static str> {
+        match event_type {
+            "headphone_jack_plugged" => vec!["pipewire", "wireplumber"],
+            "hdmi_audio_connected" => vec!["pipewire", "alsa-utils"],
+            _ => vec!["alsa-ucm-conf"],
+        }
+    }
+}
+
+// =========================================================================
+// 7. Universal GPU & Display Driver Package Detector
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GpuHardwareArch {
+    NvidiaOpenGsp,
+    AmdRdna4,
+    IntelXe2,
+    ArmMaliPanthor,
+    AppleSiliconAgx,
+}
+
+pub struct UniversalGpuDriverPackageDetector;
+
+impl UniversalGpuDriverPackageDetector {
+    pub fn match_gpu_driver_packages(arch: GpuHardwareArch) -> Vec<&'static str> {
+        match arch {
+            GpuHardwareArch::NvidiaOpenGsp => vec!["nvidia-open-dkms", "nvidia-utils", "cuda-toolkit"],
+            GpuHardwareArch::AmdRdna4 => vec!["xf86-video-amdgpu", "vulkan-radeon", "rocm-hip-runtime"],
+            GpuHardwareArch::IntelXe2 => vec!["intel-media-driver", "vulkan-intel", "intel-compute-runtime"],
+            GpuHardwareArch::ArmMaliPanthor => vec!["mesa-vulkan-panfrost", "mali-firmware"],
+            GpuHardwareArch::AppleSiliconAgx => vec!["mesa-vulkan-asahi", "asahi-firmware-loader"],
+        }
+    }
+}
+
+// =========================================================================
+// 8. Universal 100G/400G Network Fabric Driver Detector
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NetworkFabricHardware {
+    MellanoxConnectX7,
+    IntelE810,
+    Realtek25G,
+    MediaTekWifi7,
+}
+
+pub struct UniversalNetworkFabricDriverDetector;
+
+impl UniversalNetworkFabricDriverDetector {
+    pub fn match_network_driver_packages(hw: NetworkFabricHardware) -> Vec<&'static str> {
+        match hw {
+            NetworkFabricHardware::MellanoxConnectX7 => vec!["mlx5-core-dkms", "rdma-core", "infiniband-diags"],
+            NetworkFabricHardware::IntelE810 => vec!["ice-driver-dkms", "intel-network-firmware"],
+            NetworkFabricHardware::Realtek25G => vec!["r8125-dkms"],
+            NetworkFabricHardware::MediaTekWifi7 => vec!["mt76-firmware", "wireless-regdb", "wpa_supplicant"],
+        }
+    }
+}
+
+// =========================================================================
+// 9. Universal Storage & RAID Controller Driver Detector
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum StorageRaidController {
+    MicrochipSmartRaid,
+    MegaRaidTriMode,
+    NvmeZns,
+    Cxl30Memory,
+}
+
+pub struct UniversalStorageRaidDriverDetector;
+
+impl UniversalStorageRaidDriverDetector {
+    pub fn match_storage_driver_packages(ctrl: StorageRaidController) -> Vec<&'static str> {
+        match ctrl {
+            StorageRaidController::MicrochipSmartRaid => vec!["smartpqi-dkms", "arcconf"],
+            StorageRaidController::MegaRaidTriMode => vec!["megaraid-sas-dkms", "storcli"],
+            StorageRaidController::NvmeZns => vec!["nvme-cli", "libzbd", "zoned-block-device-utils"],
+            StorageRaidController::Cxl30Memory => vec!["cxl-cli", "ndctl"],
+        }
     }
 }
 
@@ -368,7 +632,6 @@ impl RepositoryManager {
         if let Some(best) = repo.mirrors.iter().find(|m| m.is_active) {
             Ok(best.mirror_url.clone())
         } else {
-            // All mirrors failed, fallback to main repo URL
             Ok(repo.url.clone())
         }
     }
@@ -490,10 +753,10 @@ impl RepositoryManager {
 /// APT/DNF-Style Package Pinning Engine
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum PinPriority {
-    Exmittent = -1,  // Never install
-    Default = 500,   // Standard priority
-    Preferred = 990, // Preferred release / repository
-    Hold = 1001,     // Force hold on version
+    Exmittent = -1,
+    Default = 500,
+    Preferred = 990,
+    Hold = 1001,
 }
 
 impl PinPriority {
@@ -668,7 +931,7 @@ pub enum RepoError {
     TransactionError(String),
 }
 
-/// Mirror candidate with latency and reliability rating (Inspired by Arch Reflector & DNF fastestmirror)
+/// Mirror candidate with latency and reliability rating
 #[derive(Debug, Clone)]
 pub struct MirrorCandidate {
     pub url: String,
@@ -677,7 +940,7 @@ pub struct MirrorCandidate {
     pub enabled: bool,
 }
 
-/// Transactional Package History & Rollback (Inspired by DNF history & FreeBSD pkg rollback)
+/// Transactional Package History & Rollback
 #[derive(Debug, Clone)]
 pub enum TransactionAction {
     Install {
@@ -703,7 +966,7 @@ pub struct PackageTransaction {
     pub status_completed: bool,
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -760,7 +1023,6 @@ mod tests {
             "https://mirror1.sigmaos.org"
         );
 
-        // Fail mirror 1 to trigger failover
         sync_engine.mark_failure("https://mirror1.sigmaos.org");
 
         assert_eq!(
@@ -779,5 +1041,68 @@ mod tests {
         assert_eq!(rollback.len(), 1);
         assert_eq!(rollback[0].package_name, "bash");
         assert_eq!(rollback[0].action, "upgrade");
+    }
+
+    #[test]
+    fn test_usb_xhci_driver_detection() {
+        let drivers = UsbXhciDriverPackageDetector::match_usb_driver_package(UsbControllerGen::Usb3Xhci);
+        assert!(drivers.contains(&"xhci-hcd"));
+        assert!(drivers.contains(&"uas"));
+
+        let tb_drivers = UsbXhciDriverPackageDetector::match_usb_driver_package(UsbControllerGen::Usb4Thunderbolt4);
+        assert!(tb_drivers.contains(&"thunderbolt-net"));
+    }
+
+    #[test]
+    fn test_usb_firmware_downloader() {
+        let downloader = UsbFirmwarePackageDownloader::new();
+        let bt_fw = downloader.query_firmware("intel-bt").unwrap();
+        assert_eq!(bt_fw.vendor_name, "Intel");
+        assert!(bt_fw.firmware_filename.contains("ibt-11-5.sfi"));
+    }
+
+    #[test]
+    fn test_usb_hotplug_trigger() {
+        let event = UsbDeviceUevent {
+            vendor_id: 0x046d,
+            product_id: 0xc52b,
+            device_class: 0x03, // HID
+        };
+        let pkg = UsbHotplugPackageTriggerGovernor::resolve_package_trigger(&event);
+        assert_eq!(pkg, "usb-hid-input-utils");
+    }
+
+    #[test]
+    fn test_intel_hda_audio_driver_detection() {
+        let drivers = IntelHdaAudioDriverPackageDetector::match_audio_driver_package(AudioCodecVendor::IntelSof);
+        assert!(drivers.contains(&"sof-firmware"));
+        assert!(drivers.contains(&"pipewire-audio"));
+    }
+
+    #[test]
+    fn test_intel_hda_firmware_downloader() {
+        let downloader = IntelHdaAudioFirmwareDownloader::new();
+        let sof_fw = downloader.query_audio_firmware("intel-sof-alderlake").unwrap();
+        assert_eq!(sof_fw.codec_name, "Intel Alder Lake SOF");
+        assert!(sof_fw.firmware_filename.contains("sof-adl.ri"));
+    }
+
+    #[test]
+    fn test_audio_hotplug_trigger() {
+        let pkgs = AudioHotplugPackageTriggerGovernor::resolve_audio_trigger("headphone_jack_plugged");
+        assert!(pkgs.contains(&"pipewire"));
+        assert!(pkgs.contains(&"wireplumber"));
+    }
+
+    #[test]
+    fn test_universal_hardware_driver_detectors() {
+        let nvidia_pkgs = UniversalGpuDriverPackageDetector::match_gpu_driver_packages(GpuHardwareArch::NvidiaOpenGsp);
+        assert!(nvidia_pkgs.contains(&"nvidia-open-dkms"));
+
+        let mlx_pkgs = UniversalNetworkFabricDriverDetector::match_network_driver_packages(NetworkFabricHardware::MellanoxConnectX7);
+        assert!(mlx_pkgs.contains(&"mlx5-core-dkms"));
+
+        let raid_pkgs = UniversalStorageRaidDriverDetector::match_storage_driver_packages(StorageRaidController::MicrochipSmartRaid);
+        assert!(raid_pkgs.contains(&"smartpqi-dkms"));
     }
 }

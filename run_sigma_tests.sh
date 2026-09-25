@@ -193,6 +193,27 @@ if [ -f "src/package/sovereign_distro_package_innovations.rs" ]; then
     ./build/sovereign_innovations_test
 fi
 
+if [ -f "src/package/sovereign_package_apc_engine.rs" ]; then
+    echo "Running Sovereign Package Async Procedure Call (APC) test suite..."
+    mkdir -p build
+    rustc --test src/package/sovereign_package_apc_engine.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_apc_test
+    ./build/sovereign_apc_test
+fi
+
+if [ -f "src/package/sovereign_package_access_engine.rs" ]; then
+    echo "Running Sovereign Package Access & Security Token test suite..."
+    mkdir -p build
+    rustc --test src/package/sovereign_package_access_engine.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_access_test
+    ./build/sovereign_access_test
+fi
+
+if [ -f "src/package/sovereign_distro_package_advancements_v5.rs" ]; then
+    echo "Running Sovereign Distro Package Advancements Suite V5 test suite..."
+    mkdir -p build
+    rustc --test src/package/sovereign_distro_package_advancements_v5.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v5_test
+    ./build/sovereign_advancements_v5_test
+fi
+
 if [ -f "src/package/sovereign_distro_package_master_suite.rs" ]; then
     echo "Running Sovereign Distro Package Master Suite test suite..."
     mkdir -p build
