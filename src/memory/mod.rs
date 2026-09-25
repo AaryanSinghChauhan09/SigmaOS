@@ -33,3 +33,6 @@ pub use segmentation_paging::{
 pub use tlb_associative::{AssociativeTlbCache, TlbAssociativityMode, TlbEntry, TlbPageFlags};
 pub use zone::{BsdZoneAllocator, Slab, Zone, ZoneStats};
 pub use quota::{MemoryController, MemoryStats, MemoryUnit, OomEvent, OomPolicy, ProcessMemoryAccount, PageCacheStat};
+
+pub mod distro_memory_innovations;
+pub use distro_memory_innovations::*;
