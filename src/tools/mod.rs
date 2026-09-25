@@ -4,6 +4,7 @@ pub mod system_monitor;
 pub mod data_tools;
 pub mod display_manager;
 pub mod open_source_tools_parity;
+pub mod open_source_tools_synthesis;
 pub mod sigmatools;
 pub mod simple_scan;
 pub mod sovereign_commands;
