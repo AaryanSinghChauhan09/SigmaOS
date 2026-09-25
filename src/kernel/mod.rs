@@ -21,6 +21,7 @@ pub mod classic_os;
 pub mod component;
 pub mod console;
 pub mod missing_linux_kernel_components;
+pub mod distro_kernel_innovations;
 pub mod cpu_features;
 pub mod cpufreq;
 pub mod device;
@@ -71,6 +72,7 @@ pub use missing_linux_kernel_components::{
     LinuxSeccompBpfSyscallFilterEngine, MemcgProcessEntry, SeccompAction, UffdFaultEvent, UffdMode,
     UffdRegisteredRange, UserfaultfdSubsystemEngine, VirtioBalloonDriverEngine,
 };
+pub use distro_kernel_innovations::*;
 pub mod traits;
 pub mod vmm_paging;
 
