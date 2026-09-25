@@ -48,6 +48,7 @@ pub use support::{FilesystemError, FilesystemType, SimpleFilesystem, SimpleFiles
 pub use file_monitor::{
     EventFilter, FileEvent, FileEventType, WatchConfig, WatchId, WatchManager, EventId,
 };
+pub mod sovereign_filesystem_hierarchy;
 pub use sovereign_filesystem_hierarchy::{
     EphemeralTmpfsMountGovernor, SovereignAtomicGenerationRootfsGuard, SovereignCanonicalFhsResolver,
     SyntheticProcSysfsProvider,

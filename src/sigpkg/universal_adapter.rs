@@ -1897,10 +1897,17 @@ impl UniversalDependencyMapper {
             "fastfetch" | "neofetch" => "fastfetch".to_string(),
             "btop" | "htop" => "btop".to_string(),
             "ripgrep" | "rg" => "ripgrep".to_string(),
-            "bat" | "cat" => "bat".to_string(),
+            "bat" => "bat".to_string(),
             "fd" | "fd-find" => "fd".to_string(),
             "zoxide" => "zoxide".to_string(),
             "eza" | "exa" => "eza".to_string(),
+            "valgrind" | "gdb" | "strace" | "truss" | "ktrace" | "dtrace" => "debug-tools".to_string(),
+            "coreutils" | "bsdutils" | "uutils" => "coreutils".to_string(),
+            "iproute2" | "net-tools" | "ifconfig" => "iproute2".to_string(),
+            "polkit" | "doas" | "sudo" => "privilege-escalation".to_string(),
+            "wireguard" | "openvpn" | "tailscale" => "vpn".to_string(),
+            "hyprland" | "sway" | "i3" | "mutter" | "kwin" => "window-manager".to_string(),
+            "alacritty" | "kitty" | "foot" | "konsole" | "xterm" => "terminal-emulator".to_string(),
             _ => clean.to_string(),
         }
     }
