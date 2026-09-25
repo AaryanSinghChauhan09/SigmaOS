@@ -70,8 +70,10 @@ pub use sovereign_driver_lifecycle::{
 pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
 pub use ata_bus_controller::{
-    AhciNcqSlot, AtaBusControllerEngine, AtaBusType, AtaCommand, AtaDeviceIdentity, AHCI_MAX_NCQ_TAGS,
-    ATA_SECTOR_SIZE_BYTES,
+    AhciNcqSlot, AtaBusControllerEngine, AtaBusType, AtaCommand, AtaDeviceIdentity, AtapiPacketCdb12,
+    AtapiPacketDispatcher, IdeBusMasterDmaEngine, IdeChannel, IdeDriveSelect, IdePioTransferEngine, IdePrdEntry,
+    AHCI_MAX_NCQ_TAGS, ATA_SECTOR_SIZE_BYTES, ATA_STATUS_BSY, ATA_STATUS_DF, ATA_STATUS_DRQ, ATA_STATUS_DRDY,
+    ATA_STATUS_ERR,
 };
 pub use sovereign_hardware_expansion::{
     ExpandedHardwareClass, HardwareDriverState, SovereignHardwareDriverExpansionEngine,

@@ -131,8 +131,10 @@ pub use store::{
      GLOBAL_SOFTWARE_STORE,
 };
 pub use universal::{
-    AptDebManifest, ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
-    PackagePriority, PackageSource, UnifiedPackage, UniversalPackageManager,
+    AptDebManifest, ConflictResolution, DependencyResolver, FreeBsdVuXmlPoudriereAuditAdapter,
+    HomebrewBottleMacPortsAdapter, PackageAdapter, PackageError, PackageFormat, PackagePriority, PackageSource,
+    SovereignUniversalDistroPackageMasterGateway, UnifiedPackage, UniversalPackageManager,
+    ZypperYastRpmDeltaPackageAdapter,
 };
 pub use crate::sigpkg::{
     SovereignUniversalPackageManagerInteropEngine, SovereignUniversalPackageTranslationBridge,
