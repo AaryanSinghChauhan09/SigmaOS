@@ -86,6 +86,13 @@ if [ -f "src/distro/sovereign_open_source_distro_synthesis.rs" ]; then
     ./build/open_source_distro_synthesis_test
 fi
 
+if [ -f "src/distro/sovereign_media_and_distro_unimplemented_innovations.rs" ]; then
+    echo "Running Sovereign Media & Distro Unimplemented Innovations test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_media_and_distro_unimplemented_innovations.rs --edition=2021 -o build/media_distro_unimplemented_test
+    ./build/media_distro_unimplemented_test
+fi
+
 if [ -f "src/network/approximation_proxy_firewall.rs" ]; then
     echo "Running Sovereign Approximation Proxy Firewall test suite..."
     mkdir -p build

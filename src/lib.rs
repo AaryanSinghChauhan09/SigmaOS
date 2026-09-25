@@ -68,6 +68,7 @@ pub use open_source_os_gap_closure::*;
 pub use tools::tech_media_extended_suite::*;
 pub use distro::sovereign_linux_bsd_master_synthesis::*;
 pub use distro::sovereign_open_source_distro_synthesis::*;
+pub use distro::sovereign_media_and_distro_unimplemented_innovations::*;
 pub use drivers::sovereign_sound_hda_synthesis::*;
 pub use access::sovereign_access_operations_suite::*;
 pub use access::sovereign_access_matrix_expansion::*;
