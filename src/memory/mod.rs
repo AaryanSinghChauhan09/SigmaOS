@@ -17,7 +17,6 @@ pub mod paging;
 pub mod segmentation_paging;
 pub mod tlb_associative;
 pub mod zone;
-pub mod low_level;
 
 pub use paging::{
     MemoryError, PageDirectory, PageDirectoryPointerTable, PageTable, PageTableEntry,

@@ -576,7 +576,7 @@ pub struct FiftyPercentRuleEngine {
     pub rule_enforcements_count: u64,
 }
 
-impl FiftyPercentGovernanceEngine {
+impl FiftyPercentRuleEngine {
     pub fn new(total_ram_mb: u64, total_cpu_shares: u32) -> Self {
         Self {
             max_ram_usage_pct: 50,
@@ -592,7 +592,6 @@ impl FiftyPercentGovernanceEngine {
         }
     }
 
-    /// Validate RAM or Swap 50% usage watermark rule
     pub fn check_memory_50_percent_rule(&mut self, current_ram_usage_pct: u32, current_swap_usage_pct: u32) -> AccessResult<bool> {
         if current_ram_usage_pct > self.max_ram_usage_pct || current_swap_usage_pct > self.max_swap_usage_pct {
             self.total_rule_violations += 1;
@@ -601,7 +600,6 @@ impl FiftyPercentGovernanceEngine {
         Ok(true)
     }
 
-    /// Validate Cgroups 50% CPU quota capping rule for background tasks
     pub fn check_cpu_50_percent_rule(&mut self, requested_cpu_quota_pct: u32) -> AccessResult<bool> {
         if requested_cpu_quota_pct > self.max_cpu_quota_pct {
             self.total_rule_violations += 1;
@@ -610,7 +608,6 @@ impl FiftyPercentGovernanceEngine {
         Ok(true)
     }
 
-    /// Validate Anonymous Guest session 50% limit rule
     pub fn check_anonymous_session_50_percent_rule(&mut self, active_anon_sessions: usize, max_system_sessions: usize) -> AccessResult<bool> {
         if max_system_sessions == 0 {
             return Err(AccessManagerError::InvalidParam);
@@ -623,7 +620,6 @@ impl FiftyPercentGovernanceEngine {
         Ok(true)
     }
 
-    /// Validate Page Cache 50% RAM eviction trigger rule
     pub fn check_page_cache_50_percent_eviction(&mut self, cache_bytes: u64, total_ram_bytes: u64) -> bool {
         if total_ram_bytes == 0 {
             return false;
@@ -632,7 +628,6 @@ impl FiftyPercentGovernanceEngine {
         cache_pct >= (self.page_cache_evict_pct as u64)
     }
 
-    /// Evaluate whether a resource metric triggers the 50% rule threshold
     pub fn is_fifty_percent_threshold_exceeded(
         &self,
         category: FiftyPercentResourceCategory,
@@ -653,13 +648,11 @@ impl FiftyPercentGovernanceEngine {
         }
     }
 
-    /// Calculate the 50% quota cap for a given total capacity
     pub fn calculate_50_percent_quota(&mut self, total_capacity: u64) -> u64 {
         self.rule_enforcements_count += 1;
         total_capacity / 2
     }
 
-    /// Apply Linux vm.swappiness / FreeBSD vm.swap_idle_enabled 50% watermark swap trigger
     pub fn enforce_50_percent_ram_swap_watermark(
         &mut self,
         used_ram_mb: u64,
@@ -671,13 +664,12 @@ impl FiftyPercentGovernanceEngine {
             self.total_ram_mb,
         ) {
             self.rule_enforcements_count += 1;
-            Ok(true) // Swapping activated
+            Ok(true)
         } else {
             Ok(false)
         }
     }
 
-    /// Enforce cgroup v2 cpu.max 50% quota bandwidth cap
     pub fn enforce_50_percent_cpu_quota(&mut self, requested_shares: u32) -> u32 {
         let max_allowed = self.total_cpu_shares / 2;
         if requested_shares > max_allowed {
@@ -691,147 +683,9 @@ impl FiftyPercentGovernanceEngine {
     }
 }
 
-impl Default for FiftyPercentGovernanceEngine {
+impl Default for FiftyPercentRuleEngine {
     fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 8. Anonymous Access Policy
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct AnonymousAccessPolicy {
-    pub allow_guest_login: bool,
-    pub restricted_paths: Vec<String>,
-    pub max_anonymous_sessions: usize,
-    pub active_anonymous_sessions: usize,
-}
-
-impl AnonymousAccessPolicy {
-    pub fn new() -> Self {
-        Self {
-            allow_guest_login: true,
-            restricted_paths: std::vec![
-                "/etc/shadow".to_string(),
-                "/root".to_string(),
-                "/sys/kernel/security".to_string()
-            ],
-            max_anonymous_sessions: 5,
-            active_anonymous_sessions: 0,
-        }
-    }
-
-    pub fn create_guest_session(&mut self) -> AccessResult<SecurityAccessToken> {
-        if !self.allow_guest_login {
-            return Err(AccessManagerError::PermissionDenied);
-        }
-        if self.active_anonymous_sessions >= self.max_anonymous_sessions {
-            return Err(AccessManagerError::PermissionDenied);
-        }
-        self.active_anonymous_sessions += 1;
-        let token_id = 9000 + (self.active_anonymous_sessions as u64);
-        Ok(SecurityAccessToken::anonymous(token_id))
-    }
-
-    pub fn validate_path_access(&self, token: &SecurityAccessToken, path: &str) -> bool {
-        if !token.is_anonymous {
-            return true;
-        }
-        !self.restricted_paths.iter().any(|p| path.starts_with(p))
-    }
-}
-
-// ============================================================================
-// 8. Anonymous Access Policy
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct AnonymousAccessPolicy {
-    pub allow_guest_login: bool,
-    pub restricted_paths: Vec<String>,
-    pub max_anonymous_sessions: usize,
-    pub active_anonymous_sessions: usize,
-}
-
-impl AnonymousAccessPolicy {
-    pub fn new() -> Self {
-        Self {
-            allow_guest_login: true,
-            restricted_paths: std::vec![
-                "/etc/shadow".to_string(),
-                "/root".to_string(),
-                "/sys/kernel/security".to_string()
-            ],
-            max_anonymous_sessions: 5,
-            active_anonymous_sessions: 0,
-        }
-    }
-
-    pub fn create_guest_session(&mut self) -> AccessResult<SecurityAccessToken> {
-        if !self.allow_guest_login {
-            return Err(AccessManagerError::PermissionDenied);
-        }
-        if self.active_anonymous_sessions >= self.max_anonymous_sessions {
-            return Err(AccessManagerError::PermissionDenied);
-        }
-        self.active_anonymous_sessions += 1;
-        let token_id = 9000 + (self.active_anonymous_sessions as u64);
-        Ok(SecurityAccessToken::anonymous(token_id))
-    }
-
-    pub fn validate_path_access(&self, token: &SecurityAccessToken, path: &str) -> bool {
-        if !token.is_anonymous {
-            return true;
-        }
-        !self.restricted_paths.iter().any(|p| path.starts_with(p))
-    }
-}
-
-// ============================================================================
-// 8. Anonymous Access Policy
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct AnonymousAccessPolicy {
-    pub allow_guest_login: bool,
-    pub restricted_paths: Vec<String>,
-    pub max_anonymous_sessions: usize,
-    pub active_anonymous_sessions: usize,
-}
-
-impl AnonymousAccessPolicy {
-    pub fn new() -> Self {
-        Self {
-            allow_guest_login: true,
-            restricted_paths: std::vec![
-                "/etc/shadow".to_string(),
-                "/root".to_string(),
-                "/sys/kernel/security".to_string()
-            ],
-            max_anonymous_sessions: 5,
-            active_anonymous_sessions: 0,
-        }
-    }
-
-    pub fn create_guest_session(&mut self) -> AccessResult<SecurityAccessToken> {
-        if !self.allow_guest_login {
-            return Err(AccessManagerError::PermissionDenied);
-        }
-        if self.active_anonymous_sessions >= self.max_anonymous_sessions {
-            return Err(AccessManagerError::PermissionDenied);
-        }
-        self.active_anonymous_sessions += 1;
-        let token_id = 9000 + (self.active_anonymous_sessions as u64);
-        Ok(SecurityAccessToken::anonymous(token_id))
-    }
-
-    pub fn validate_path_access(&self, token: &SecurityAccessToken, path: &str) -> bool {
-        if !token.is_anonymous {
-            return true;
-        }
-        !self.restricted_paths.iter().any(|p| path.starts_with(p))
+        Self::new(16384, 1024)
     }
 }
 

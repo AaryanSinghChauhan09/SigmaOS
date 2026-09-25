@@ -516,11 +516,11 @@ pub const {} = struct {{
     id: u64,
     
     pub fn init() {} {{
-        return .{ { .id = 0 } };
+        return .{{ {{ .id = 0 }} }};
     }}
 }};
 "#,
-            spec.name, spec.description, spec.name, spec.name, spec.name
+            spec.name, spec.description, spec.name, spec.name
         )
     }
     

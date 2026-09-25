@@ -2,7 +2,6 @@
 pub mod archive;
 pub mod file_monitor;
 pub mod watch;
-pub mod sovereign_filesystem_hierarchy;
 pub mod bsd_linux_innovations;
 pub mod cow_snapshot;
 pub mod defragmenter;
@@ -15,7 +14,6 @@ pub mod smart_symlink;
 pub mod support;
 pub mod vfs;
 pub mod sigma_fs;
-pub mod sovereign_filesystem_hierarchy;
 
 pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
 pub use crate::filesystem::vfs::{FileType, FsError, Inode, VirtualFilesystem, VfsError};
