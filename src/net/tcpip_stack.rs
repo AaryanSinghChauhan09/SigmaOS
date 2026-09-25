@@ -880,6 +880,105 @@ impl Default for AcknowledgementPacketEngine {
 }
 
 // ============================================================================
+// Linux & BSD TCP Acknowledgement Packet Subsystem (SACK RFC 2018 & Delayed ACK)
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SackBlock {
+    pub left_edge: u32,
+    pub right_edge: u32,
+}
+
+#[derive(Debug, Clone)]
+pub struct AcknowledgementPacketEngine {
+    pub quick_ack_mode: bool,           // TCP_QUICKACK mode (Linux default)
+    pub delayed_ack_pending: bool,      // TCP_DELACK pending flag (BSD / Linux 40ms timer)
+    pub pending_ack_seq: u32,           // Sequence number to acknowledge
+    pub sack_blocks: Vec<SackBlock>,    // SACK blocks for out-of-order data (RFC 2018)
+    pub tx_ack_count: usize,
+}
+
+impl AcknowledgementPacketEngine {
+    pub fn new() -> Self {
+        Self {
+            quick_ack_mode: true,
+            delayed_ack_pending: false,
+            pending_ack_seq: 0,
+            sack_blocks: Vec::new(),
+            tx_ack_count: 0,
+        }
+    }
+
+    /// Construct an explicit TCP ACK segment response
+    pub fn build_ack_segment(
+        &mut self,
+        src_ip: IPAddress,
+        dest_ip: IPAddress,
+        src_port: u16,
+        dest_port: u16,
+        seq_num: u32,
+        ack_num: u32,
+        window: u16,
+    ) -> (IPPacket, TCPSegment) {
+        let mut tcp = TCPSegment::new();
+        tcp.src_port = src_port;
+        tcp.dest_port = dest_port;
+        tcp.sequence = seq_num;
+        tcp.acknowledgment = ack_num;
+        tcp.set_ack_flag();
+        tcp.window = window;
+
+        // Append SACK option if out-of-order blocks exist
+        if !self.sack_blocks.is_empty() {
+            let mut opt_idx = 0;
+            tcp.payload[opt_idx] = 1; // NOP
+            tcp.payload[opt_idx + 1] = 1; // NOP
+            tcp.payload[opt_idx + 2] = 5; // Option 5: SACK
+            tcp.payload[opt_idx + 3] = (2 + self.sack_blocks.len() * 8) as u8;
+            opt_idx += 4;
+
+            for block in &self.sack_blocks {
+                tcp.payload[opt_idx..opt_idx + 4].copy_from_slice(&block.left_edge.to_be_bytes());
+                tcp.payload[opt_idx + 4..opt_idx + 8].copy_from_slice(&block.right_edge.to_be_bytes());
+                opt_idx += 8;
+            }
+        }
+
+        let _chk = tcp.calculate_checksum(src_ip, dest_ip, 0);
+
+        let mut ip = IPPacket::new();
+        ip.src_ip = src_ip;
+        ip.dest_ip = dest_ip;
+        ip.protocol = 6; // TCP
+        ip.total_length = 40; // 20B IP + 20B TCP
+        let _ip_chk = ip.calculate_checksum();
+
+        self.tx_ack_count += 1;
+        self.delayed_ack_pending = false;
+
+        (ip, tcp)
+    }
+
+    /// Add a SACK out-of-order block (RFC 2018)
+    pub fn add_sack_block(&mut self, left: u32, right: u32) {
+        if self.sack_blocks.len() < 4 {
+            self.sack_blocks.push(SackBlock { left_edge: left, right_edge: right });
+        }
+    }
+
+    /// Clear all acknowledged SACK blocks
+    pub fn clear_sack_blocks(&mut self) {
+        self.sack_blocks.clear();
+    }
+}
+
+impl Default for AcknowledgementPacketEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
 // BBR (Bottleneck Bandwidth and RTT) Congestion Control & BSD Socket Options
 // ============================================================================
 
