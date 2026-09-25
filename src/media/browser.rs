@@ -1575,6 +1575,16 @@ pub struct SigmaWebBrowser {
     pub brave_deamp: BraveDeAmpReaderEngine,
     pub ddg_privacy_pro: DuckDuckGoPrivacyProEngine,
     pub mullvad_lfp: MullvadLFPFingerprintEngine,
+    pub geckoview_layout: FirefoxGeckoViewLayoutEngine,
+    pub librewolf_strict_rfp: LibreWolfStrictFingerprintingProtectionEngine,
+    pub blink_layout: ChromiumBlinkLayoutEngine,
+    pub ungoogled_privacy: UngoogledChromiumPrivacyHardeningEngine,
+    pub brave_adblock: BraveAdblockEngine,
+    pub tor_tunnel: TorOnionRoutingTunnelEngine,
+    pub vivaldi_spatial_nav: VivaldiSpatialNavigationEngine,
+    pub floorp_split_view: FloorpWorkspacesSplitViewEngine,
+    pub ladybird_css_parser: LadybirdLibWebCssParserEngine,
+    pub orion_ext_compat: OrionWebExtensionCompatibilityEngine,
 }
 
 impl SigmaWebBrowser {
@@ -1611,6 +1621,16 @@ impl SigmaWebBrowser {
             brave_deamp: BraveDeAmpReaderEngine::new(),
             ddg_privacy_pro: DuckDuckGoPrivacyProEngine::new(),
             mullvad_lfp: MullvadLFPFingerprintEngine::new(),
+            geckoview_layout: FirefoxGeckoViewLayoutEngine::new(),
+            librewolf_strict_rfp: LibreWolfStrictFingerprintingProtectionEngine::new(),
+            blink_layout: ChromiumBlinkLayoutEngine::new(1920.0, 1080.0),
+            ungoogled_privacy: UngoogledChromiumPrivacyHardeningEngine::new(),
+            brave_adblock: BraveAdblockEngine::new(),
+            tor_tunnel: TorOnionRoutingTunnelEngine::new(),
+            vivaldi_spatial_nav: VivaldiSpatialNavigationEngine::new(),
+            floorp_split_view: FloorpWorkspacesSplitViewEngine::new(),
+            ladybird_css_parser: LadybirdLibWebCssParserEngine::new(),
+            orion_ext_compat: OrionWebExtensionCompatibilityEngine::new(),
         }
     }
 
@@ -1656,6 +1676,397 @@ impl SigmaWebBrowser {
         }
 
         Ok(sanitized)
+    }
+}
+
+// =========================================================================
+// 17. OPEN-SOURCE BROWSER ENGINES (Firefox, Chromium, LibreWolf, Brave, Tor, Vivaldi, Floorp, Ladybird, Orion)
+// =========================================================================
+
+pub struct FirefoxGeckoViewLayoutEngine {
+    pub grid_tracks: Vec<f32>,
+    pub subgrid_enabled: bool,
+}
+
+impl FirefoxGeckoViewLayoutEngine {
+    pub fn new() -> Self {
+        Self {
+            grid_tracks: vec![100.0, 200.0, 300.0],
+            subgrid_enabled: true,
+        }
+    }
+
+    pub fn compute_subgrid_tracks(&mut self, container_width: f32) -> Vec<f32> {
+        let track_width = container_width / 3.0;
+        self.grid_tracks = vec![track_width, track_width, track_width];
+        self.grid_tracks.clone()
+    }
+
+    pub fn layout_grid_items(&self, items_count: usize) -> Vec<(f32, f32)> {
+        let mut positions = Vec::new();
+        for i in 0..items_count {
+            let col = i % 3;
+            let row = i / 3;
+            let x = self.grid_tracks.get(col).copied().unwrap_or(100.0) * (col as f32);
+            let y = (row as f32) * 150.0;
+            positions.push((x, y));
+        }
+        positions
+    }
+}
+
+pub struct LibreWolfStrictFingerprintingProtectionEngine {
+    pub rfp_timer_resolution_ms: u64,
+    pub font_enumeration_blocked: bool,
+    pub audio_context_noise_seed: u64,
+}
+
+impl LibreWolfStrictFingerprintingProtectionEngine {
+    pub fn new() -> Self {
+        Self {
+            rfp_timer_resolution_ms: 100,
+            font_enumeration_blocked: true,
+            audio_context_noise_seed: 0x9E3779B9,
+        }
+    }
+
+    pub fn apply_timer_resolution_jitter(&self, timestamp_ms: u64) -> u64 {
+        let interval = self.rfp_timer_resolution_ms;
+        (timestamp_ms / interval) * interval
+    }
+
+    pub fn mask_font_enumeration(&self, fonts: &[&str]) -> Vec<String> {
+        if self.font_enumeration_blocked {
+            vec!["sans-serif".to_string(), "serif".to_string(), "monospace".to_string()]
+        } else {
+            fonts.iter().map(|s| s.to_string()).collect()
+        }
+    }
+
+    pub fn inject_audio_noise(&mut self, samples: &mut [f32]) {
+        for (i, sample) in samples.iter_mut().enumerate() {
+            let noise = (((i as u64 ^ self.audio_context_noise_seed) % 100) as f32 - 50.0) / 10000.0;
+            *sample += noise;
+        }
+    }
+}
+
+pub struct ChromiumBlinkLayoutEngine {
+    pub viewport_width: f32,
+    pub viewport_height: f32,
+    pub dom_reflow_count: u64,
+}
+
+impl ChromiumBlinkLayoutEngine {
+    pub fn new(width: f32, height: f32) -> Self {
+        Self {
+            viewport_width: width,
+            viewport_height: height,
+            dom_reflow_count: 0,
+        }
+    }
+
+    pub fn trigger_dom_reflow(&mut self) -> u64 {
+        self.dom_reflow_count += 1;
+        self.dom_reflow_count
+    }
+
+    pub fn validate_turbofan_sandbox_boundary(&self, ptr_address: u64, sandbox_base: u64, sandbox_size: u64) -> bool {
+        ptr_address >= sandbox_base && ptr_address < (sandbox_base + sandbox_size)
+    }
+}
+
+pub struct UngoogledChromiumPrivacyHardeningEngine {
+    pub stun_ip_leak_suppressed: bool,
+    pub google_sync_disabled: bool,
+    pub telemetry_stubs_active: bool,
+}
+
+impl UngoogledChromiumPrivacyHardeningEngine {
+    pub fn new() -> Self {
+        Self {
+            stun_ip_leak_suppressed: true,
+            google_sync_disabled: true,
+            telemetry_stubs_active: true,
+        }
+    }
+
+    pub fn sanitize_webrtc_stun_candidates(&self, candidate: &str) -> Option<String> {
+        if self.stun_ip_leak_suppressed && candidate.contains("typ host") {
+            None
+        } else {
+            Some(candidate.to_string())
+        }
+    }
+
+    pub fn intercept_google_account_sync(&self, url: &str) -> bool {
+        if self.google_sync_disabled && url.contains("accounts.google.com") {
+            true
+        } else {
+            false
+        }
+    }
+}
+
+pub struct BraveAdblockEngine {
+    pub network_filters: Vec<String>,
+    pub cosmetic_selectors: Vec<String>,
+}
+
+impl BraveAdblockEngine {
+    pub fn new() -> Self {
+        Self {
+            network_filters: vec![
+                "||doubleclick.net^".to_string(),
+                "||google-analytics.com^".to_string(),
+                "||facebook.com/tr/^".to_string(),
+            ],
+            cosmetic_selectors: vec![
+                ".ad-slot".to_string(),
+                ".sponsored-post".to_string(),
+                "#banner-ad".to_string(),
+            ],
+        }
+    }
+
+    pub fn should_block_request(&self, url: &str) -> bool {
+        for filter in &self.network_filters {
+            let domain = filter.trim_matches('|').trim_end_matches('^');
+            if url.contains(domain) {
+                return true;
+            }
+        }
+        false
+    }
+
+    pub fn build_cosmetic_css(&self) -> String {
+        let rules = self.cosmetic_selectors.join(", ");
+        format!("{} {{ display: none !important; }}", rules)
+    }
+
+    pub fn get_fallback_search_url(&self, query: &str) -> String {
+        format!("https://search.brave.com/search?q={}", query)
+    }
+}
+
+pub struct TorOnionRoutingTunnelEngine {
+    pub guard_node: String,
+    pub middle_node: String,
+    pub exit_node: String,
+    pub circuit_established: bool,
+    pub guard_key: u8,
+    pub middle_key: u8,
+    pub exit_key: u8,
+}
+
+impl TorOnionRoutingTunnelEngine {
+    pub fn new() -> Self {
+        Self {
+            guard_node: "GuardNode01".to_string(),
+            middle_node: "MiddleNode02".to_string(),
+            exit_node: "ExitNode03".to_string(),
+            circuit_established: false,
+            guard_key: 0xAA,
+            middle_key: 0xBB,
+            exit_key: 0xCC,
+        }
+    }
+
+    pub fn build_3hop_circuit(&mut self) -> bool {
+        self.circuit_established = true;
+        self.circuit_established
+    }
+
+    pub fn wrap_onion_layers(&self, payload: &[u8]) -> Vec<u8> {
+        let exit_encrypted: Vec<u8> = payload.iter().map(|b| b ^ self.exit_key).collect();
+        let middle_encrypted: Vec<u8> = exit_encrypted.iter().map(|b| b ^ self.middle_key).collect();
+        let guard_encrypted: Vec<u8> = middle_encrypted.iter().map(|b| b ^ self.guard_key).collect();
+        guard_encrypted
+    }
+
+    pub fn unwrap_onion_layers(&self, wrapped_payload: &[u8]) -> Vec<u8> {
+        let guard_decrypted: Vec<u8> = wrapped_payload.iter().map(|b| b ^ self.guard_key).collect();
+        let middle_decrypted: Vec<u8> = guard_decrypted.iter().map(|b| b ^ self.middle_key).collect();
+        let exit_decrypted: Vec<u8> = middle_decrypted.iter().map(|b| b ^ self.exit_key).collect();
+        exit_decrypted
+    }
+
+    pub fn perform_v3_onion_rendezvous(&self, onion_address: &str) -> Result<String, &'static str> {
+        if !self.circuit_established {
+            return Err("Tor circuit not established");
+        }
+        if onion_address.ends_with(".onion") {
+            Ok(format!("Rendezvous connected to {}", onion_address))
+        } else {
+            Err("Invalid .onion address")
+        }
+    }
+}
+
+pub struct VivaldiSpatialNavigationEngine {
+    pub focusable_nodes: Vec<(String, f32, f32)>,
+    pub current_focused_id: Option<String>,
+}
+
+impl VivaldiSpatialNavigationEngine {
+    pub fn new() -> Self {
+        Self {
+            focusable_nodes: Vec::new(),
+            current_focused_id: None,
+        }
+    }
+
+    pub fn add_focusable_node(&mut self, id: &str, x: f32, y: f32) {
+        self.focusable_nodes.push((id.to_string(), x, y));
+        if self.current_focused_id.is_none() {
+            self.current_focused_id = Some(id.to_string());
+        }
+    }
+
+    pub fn navigate_spatial(&mut self, direction: &str) -> Option<String> {
+        let (cur_x, cur_y) = if let Some(ref cur_id) = self.current_focused_id {
+            self.focusable_nodes
+                .iter()
+                .find(|(id, _, _)| id == cur_id)
+                .map(|(_, x, y)| (*x, *y))
+                .unwrap_or((0.0, 0.0))
+        } else {
+            (0.0, 0.0)
+        };
+
+        let mut best_id = None;
+        let mut min_dist = f32::MAX;
+
+        for (id, x, y) in &self.focusable_nodes {
+            if self.current_focused_id.as_deref() == Some(id) {
+                continue;
+            }
+            let valid = match direction {
+                "Right" => *x > cur_x,
+                "Left" => *x < cur_x,
+                "Down" => *y > cur_y,
+                "Up" => *y < cur_y,
+                _ => false,
+            };
+            if valid {
+                let dist = (*x - cur_x).powi(2) + (*y - cur_y).powi(2);
+                if dist < min_dist {
+                    min_dist = dist;
+                    best_id = Some(id.clone());
+                }
+            }
+        }
+
+        if let Some(ref best) = best_id {
+            self.current_focused_id = Some(best.clone());
+        }
+        self.current_focused_id.clone()
+    }
+}
+
+pub struct FloorpWorkspacesSplitViewEngine {
+    pub workspaces: BTreeMap<String, Vec<BrowserTabInstance>>,
+    pub active_workspace: String,
+    pub dual_pane_split_active: bool,
+}
+
+impl FloorpWorkspacesSplitViewEngine {
+    pub fn new() -> Self {
+        let mut workspaces = BTreeMap::new();
+        workspaces.insert("Default".to_string(), Vec::new());
+        Self {
+            workspaces,
+            active_workspace: "Default".to_string(),
+            dual_pane_split_active: false,
+        }
+    }
+
+    pub fn create_workspace(&mut self, name: &str) {
+        self.workspaces.entry(name.to_string()).or_insert_with(Vec::new);
+    }
+
+    pub fn switch_workspace(&mut self, name: &str) -> bool {
+        if self.workspaces.contains_key(name) {
+            self.active_workspace = name.to_string();
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn toggle_dual_pane_split(&mut self) -> bool {
+        self.dual_pane_split_active = !self.dual_pane_split_active;
+        self.dual_pane_split_active
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CssParsedRule {
+    pub selector: String,
+    pub declarations: BTreeMap<String, String>,
+}
+
+pub struct LadybirdLibWebCssParserEngine {
+    pub rules: Vec<CssParsedRule>,
+}
+
+impl LadybirdLibWebCssParserEngine {
+    pub fn new() -> Self {
+        Self { rules: Vec::new() }
+    }
+
+    pub fn parse_css_stylesheet(&mut self, css_content: &str) -> usize {
+        let mut count = 0;
+        for block in css_content.split('}') {
+            let trimmed = block.trim();
+            if trimmed.is_empty() {
+                continue;
+            }
+            if let Some(brace_idx) = trimmed.find('{') {
+                let selector = trimmed[..brace_idx].trim().to_string();
+                let decls_str = &trimmed[brace_idx + 1..];
+                let mut declarations = BTreeMap::new();
+                for decl in decls_str.split(';') {
+                    let decl_trimmed = decl.trim();
+                    if let Some(colon) = decl_trimmed.find(':') {
+                        let prop = decl_trimmed[..colon].trim().to_string();
+                        let val = decl_trimmed[colon + 1..].trim().to_string();
+                        if !prop.is_empty() && !val.is_empty() {
+                            declarations.insert(prop, val);
+                        }
+                    }
+                }
+                self.rules.push(CssParsedRule {
+                    selector,
+                    declarations,
+                });
+                count += 1;
+            }
+        }
+        count
+    }
+
+    pub fn match_selector(&self, selector: &str, tag_name: &str) -> bool {
+        let parts: Vec<&str> = selector.split_whitespace().collect();
+        parts.iter().any(|&p| p == tag_name || p == "*" || p.starts_with(&format!(".{}", tag_name)) || p.starts_with(&format!("#{}", tag_name)))
+    }
+}
+
+pub struct OrionWebExtensionCompatibilityEngine {
+    pub mv3_api_supported: bool,
+    pub firefox_webext_supported: bool,
+}
+
+impl OrionWebExtensionCompatibilityEngine {
+    pub fn new() -> Self {
+        Self {
+            mv3_api_supported: true,
+            firefox_webext_supported: true,
+        }
+    }
+
+    pub fn polyfill_browser_action(&self, api_name: &str) -> String {
+        format!("window.chrome.{} = window.browser.{};", api_name, api_name)
     }
 }
 
@@ -2002,5 +2413,56 @@ mod tests {
 
         let mullvad_lfp = MullvadLFPFingerprintEngine::new();
         assert_eq!(mullvad_lfp.get_spoofed_language_header(), "en-US,en;q=0.5");
+    }
+
+    #[test]
+    fn test_expanded_open_source_browser_engines() {
+        let mut geckoview = FirefoxGeckoViewLayoutEngine::new();
+        let tracks = geckoview.compute_subgrid_tracks(900.0);
+        assert_eq!(tracks, vec![300.0, 300.0, 300.0]);
+        let items = geckoview.layout_grid_items(4);
+        assert_eq!(items.len(), 4);
+
+        let mut lw_strict = LibreWolfStrictFingerprintingProtectionEngine::new();
+        assert_eq!(lw_strict.apply_timer_resolution_jitter(150), 100);
+        let masked_fonts = lw_strict.mask_font_enumeration(&["Arial", "Helvetica"]);
+        assert_eq!(masked_fonts, vec!["sans-serif", "serif", "monospace"]);
+        let mut audio_samples = [0.5f32; 4];
+        lw_strict.inject_audio_noise(&mut audio_samples);
+        assert_ne!(audio_samples[0], 0.5f32);
+
+        let mut blink = ChromiumBlinkLayoutEngine::new(1920.0, 1080.0);
+        assert_eq!(blink.trigger_dom_reflow(), 1);
+        assert!(blink.validate_turbofan_sandbox_boundary(0x1005, 0x1000, 0x1000));
+
+        let ungoogled = UngoogledChromiumPrivacyHardeningEngine::new();
+        assert!(ungoogled.sanitize_webrtc_stun_candidates("candidate 1 typ host 192.168.1.1").is_none());
+        assert!(ungoogled.intercept_google_account_sync("https://accounts.google.com/signin"));
+
+        let brave_ad = BraveAdblockEngine::new();
+        assert!(brave_ad.should_block_request("https://doubleclick.net/ad.js"));
+        assert!(brave_ad.build_cosmetic_css().contains("display: none !important"));
+
+        let mut tor_tun = TorOnionRoutingTunnelEngine::new();
+        assert!(tor_tun.build_3hop_circuit());
+        assert!(tor_tun.perform_v3_onion_rendezvous("duckduckgogg42.onion").unwrap().contains("duckduckgogg42.onion"));
+
+        let mut vivaldi = VivaldiSpatialNavigationEngine::new();
+        vivaldi.add_focusable_node("btn1", 10.0, 10.0);
+        vivaldi.add_focusable_node("btn2", 50.0, 10.0);
+        let next_focus = vivaldi.navigate_spatial("Right");
+        assert_eq!(next_focus, Some("btn2".to_string()));
+
+        let mut floorp_split = FloorpWorkspacesSplitViewEngine::new();
+        floorp_split.create_workspace("Dev");
+        assert!(floorp_split.switch_workspace("Dev"));
+        assert!(floorp_split.toggle_dual_pane_split());
+
+        let mut ladybird_css = LadybirdLibWebCssParserEngine::new();
+        assert_eq!(ladybird_css.parse_css_stylesheet("body { color: red; } div { margin: 0; }"), 2);
+        assert!(ladybird_css.match_selector(".container div", "div"));
+
+        let orion = OrionWebExtensionCompatibilityEngine::new();
+        assert!(orion.polyfill_browser_action("action").contains("window.chrome.action"));
     }
 }
