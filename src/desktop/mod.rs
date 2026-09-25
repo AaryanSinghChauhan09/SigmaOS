@@ -76,6 +76,8 @@ pub use weather_panel::{
     WeatherCondition, WeatherData, WeatherForecast, WeatherPanel,
 };
 pub mod mint_update_manager;
+pub mod mint_software_store;
+pub mod mint_backup_tool;
 pub mod compositor;
 pub mod launcher;
 pub mod notification;
