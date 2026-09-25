@@ -368,6 +368,13 @@ if [ -f "src/distro/tech_media_distro_innovations.rs" ]; then
     ./build/tech_media_distro_test
 fi
 
+if [ -f "src/distro/sovereign_omni_tech_media_and_distro_synthesis.rs" ]; then
+    echo "Running Sovereign Omni Tech Media & Distro Synthesis test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/distro/sovereign_omni_tech_media_and_distro_synthesis.rs -o build/omni_tech_media_test
+    ./build/omni_tech_media_test
+fi
+
 if [ -f "src/open_source_os_gap_closure.rs" ]; then
     echo "Running Open Source OS Gap Closure test suite..."
     mkdir -p build
