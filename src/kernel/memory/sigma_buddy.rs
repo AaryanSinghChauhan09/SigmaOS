@@ -130,6 +130,128 @@ pub enum VmZone {
     HighMem,
 }
 
+/// Migration policies for physical memory zones (DMA32, Normal, HighMem)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ZoneFallbackPolicy {
+    StrictNoFallback,       // Fail allocation if requested zone is exhausted
+    FallbackToNormal,       // Fallback HighMem -> Normal
+    FallbackToDma32,        // Fallback Normal -> DMA32 (emergency only)
+    CascadingFallback,      // Cascading HighMem -> Normal -> DMA32
+}
+
+/// Zone Compaction and Reclaim Migration Policy
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ZoneMigrationPolicy {
+    pub fallback_policy: ZoneFallbackPolicy,
+    pub allow_cross_zone_migration: bool,
+    pub reclaim_watermark_pct: u8,
+    pub compaction_threshold_pct: u8,
+}
+
+impl ZoneMigrationPolicy {
+    pub fn default_kernel_policy() -> Self {
+        Self {
+            fallback_policy: ZoneFallbackPolicy::CascadingFallback,
+            allow_cross_zone_migration: true,
+            reclaim_watermark_pct: 10,
+            compaction_threshold_pct: 20,
+        }
+    }
+
+    pub fn strict_dma32_policy() -> Self {
+        Self {
+            fallback_policy: ZoneFallbackPolicy::StrictNoFallback,
+            allow_cross_zone_migration: false,
+            reclaim_watermark_pct: 5,
+            compaction_threshold_pct: 15,
+        }
+    }
+}
+
+/// Engine governing memory zone selection, fallback ordering, and page migration
+pub struct ZoneMigrationPolicyEngine {
+    pub policy: ZoneMigrationPolicy,
+}
+
+impl ZoneMigrationPolicyEngine {
+    pub fn new(policy: ZoneMigrationPolicy) -> Self {
+        Self { policy }
+    }
+
+    /// Selects optimal memory zone based on allocation request and zone availability
+    pub fn select_allocation_zone(
+        &self,
+        requested_zone: VmZone,
+        dma32_zone: &BsdVmZoneAllocator,
+        normal_zone: &BsdVmZoneAllocator,
+        highmem_zone: &BsdVmZoneAllocator,
+    ) -> Result<VmZone, &'static str> {
+        let is_zone_available = |z: &BsdVmZoneAllocator| z.free_pages.load(Ordering::SeqCst) > 0;
+
+        match requested_zone {
+            VmZone::Dma32 => {
+                if is_zone_available(dma32_zone) {
+                    Ok(VmZone::Dma32)
+                } else if self.policy.fallback_policy != ZoneFallbackPolicy::StrictNoFallback && is_zone_available(normal_zone) {
+                    Ok(VmZone::Normal)
+                } else {
+                    Err("Out of memory in DMA32 zone and fallback exhausted")
+                }
+            }
+            VmZone::Normal => {
+                if is_zone_available(normal_zone) {
+                    Ok(VmZone::Normal)
+                } else if self.policy.fallback_policy == ZoneFallbackPolicy::CascadingFallback || self.policy.fallback_policy == ZoneFallbackPolicy::FallbackToDma32 {
+                    if is_zone_available(dma32_zone) {
+                        Ok(VmZone::Dma32)
+                    } else {
+                        Err("Out of memory in Normal zone and DMA32 fallback exhausted")
+                    }
+                } else {
+                    Err("Out of memory in Normal zone")
+                }
+            }
+            VmZone::HighMem => {
+                if is_zone_available(highmem_zone) {
+                    Ok(VmZone::HighMem)
+                } else if self.policy.fallback_policy != ZoneFallbackPolicy::StrictNoFallback {
+                    if is_zone_available(normal_zone) {
+                        Ok(VmZone::Normal)
+                    } else if self.policy.fallback_policy == ZoneFallbackPolicy::CascadingFallback && is_zone_available(dma32_zone) {
+                        Ok(VmZone::Dma32)
+                    } else {
+                        Err("Out of memory in HighMem zone and all fallbacks exhausted")
+                    }
+                } else {
+                    Err("Out of memory in HighMem zone")
+                }
+            }
+        }
+    }
+
+    /// Migrates inactive pages from a source zone to a destination zone under memory pressure
+    pub fn migrate_pages(
+        &self,
+        from_zone: &BsdVmZoneAllocator,
+        to_zone: &BsdVmZoneAllocator,
+        count: usize,
+    ) -> Result<usize, &'static str> {
+        if !self.policy.allow_cross_zone_migration {
+            return Err("Cross-zone page migration disabled by policy");
+        }
+        let inactive = from_zone.inactive_pages.load(Ordering::SeqCst);
+        let migrate_count = count.min(inactive);
+        if migrate_count == 0 {
+            return Err("No inactive pages available for zone migration");
+        }
+        from_zone.inactive_pages.fetch_sub(migrate_count, Ordering::SeqCst);
+        from_zone.free_pages.fetch_add(migrate_count, Ordering::SeqCst);
+        to_zone.free_pages.fetch_sub(migrate_count, Ordering::SeqCst);
+        to_zone.active_pages.fetch_add(migrate_count, Ordering::SeqCst);
+        Ok(migrate_count)
+    }
+}
+
 pub struct BsdVmZoneAllocator {
     pub zone: VmZone,
     pub active_pages: AtomicUsize,
@@ -503,5 +625,23 @@ mod tests {
         assert_eq!(ipc.pop(), Some(0xBB));
         assert_eq!(ipc.pop(), None);
         assert!(ipc.is_empty());
+    }
+
+    #[test]
+    fn test_zone_migration_policy_and_fallback_engine() {
+        let policy = ZoneMigrationPolicy::default_kernel_policy();
+        let engine = ZoneMigrationPolicyEngine::new(policy);
+
+        let dma32 = BsdVmZoneAllocator::new(VmZone::Dma32, 0);
+        let normal = BsdVmZoneAllocator::new(VmZone::Normal, 100);
+        let highmem = BsdVmZoneAllocator::new(VmZone::HighMem, 0);
+
+        let selected = engine.select_allocation_zone(VmZone::HighMem, &dma32, &normal, &highmem).unwrap();
+        assert_eq!(selected, VmZone::Normal);
+
+        normal.inactive_pages.store(50, Ordering::SeqCst);
+        let migrated = engine.migrate_pages(&normal, &dma32, 20).unwrap();
+        assert_eq!(migrated, 20);
+        assert_eq!(normal.inactive_pages.load(Ordering::SeqCst), 30);
     }
 }

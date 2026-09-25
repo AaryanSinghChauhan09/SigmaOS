@@ -22,6 +22,273 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 use super::{BuddyAllocator as KernelBuddyAllocator, MemoryBlock, PAGE_SIZE};
 use crate::klib::buddy_allocator::{BuddyAllocator, SimpleBuddyAllocator};
 
+/// Linux-inspired Page Migration Types for Anti-Fragmentation Buddy Allocator
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum MigrateType {
+    Unmovable = 0,   // Kernel stacks, page tables, slab caches
+    Reclaimable = 1, // Dentry/inode caches (shrinkable)
+    Movable = 2,     // Anonymous userland memory & page cache
+    HighAtomic = 3,  // Emergency atomic allocations from interrupt context
+    Cma = 4,         // Contiguous Memory Allocator reserved physical region
+}
+
+/// FreeBSD VM inspired Physical Page Queue Categories
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum PageQueueType {
+    Active,
+    Inactive,
+    Wired,
+    Free,
+}
+
+/// Linux-inspired Memory Watermarks for Anti-Fragmentation Compaction & Reclaim
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WatermarkLevel {
+    WatermarkMin,  // Emergency allocations only
+    WatermarkLow,  // Triggers background kswapd reclaim
+    WatermarkHigh, // Healthy memory pool state
+}
+
+/// Evaluation result for memory watermarks
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct WatermarkStatus {
+    pub free_pages: usize,
+    pub min_pages: usize,
+    pub low_pages: usize,
+    pub high_pages: usize,
+    pub level: WatermarkLevel,
+    pub requires_compaction: bool,
+}
+
+/// FreeBSD UMA / VM Inspired Zone & Page Queue Allocator Glue
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum VmZone {
+    Normal,
+    Dma32,
+    HighMem,
+}
+
+/// Migration policies for physical memory zones (DMA32, Normal, HighMem)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ZoneFallbackPolicy {
+    StrictNoFallback,       // Fail allocation if requested zone is exhausted
+    FallbackToNormal,       // Fallback HighMem -> Normal
+    FallbackToDma32,        // Fallback Normal -> DMA32 (emergency only)
+    CascadingFallback,      // Cascading HighMem -> Normal -> DMA32
+}
+
+/// Zone Compaction and Reclaim Migration Policy
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ZoneMigrationPolicy {
+    pub fallback_policy: ZoneFallbackPolicy,
+    pub allow_cross_zone_migration: bool,
+    pub reclaim_watermark_pct: u8,
+    pub compaction_threshold_pct: u8,
+}
+
+impl ZoneMigrationPolicy {
+    pub fn default_kernel_policy() -> Self {
+        Self {
+            fallback_policy: ZoneFallbackPolicy::CascadingFallback,
+            allow_cross_zone_migration: true,
+            reclaim_watermark_pct: 10,
+            compaction_threshold_pct: 20,
+        }
+    }
+
+    pub fn strict_dma32_policy() -> Self {
+        Self {
+            fallback_policy: ZoneFallbackPolicy::StrictNoFallback,
+            allow_cross_zone_migration: false,
+            reclaim_watermark_pct: 5,
+            compaction_threshold_pct: 15,
+        }
+    }
+}
+
+/// Engine governing memory zone selection, fallback ordering, and page migration
+pub struct ZoneMigrationPolicyEngine {
+    pub policy: ZoneMigrationPolicy,
+}
+
+impl ZoneMigrationPolicyEngine {
+    pub fn new(policy: ZoneMigrationPolicy) -> Self {
+        Self { policy }
+    }
+
+    /// Selects optimal memory zone based on allocation request and zone availability
+    pub fn select_allocation_zone(
+        &self,
+        requested_zone: VmZone,
+        dma32_zone: &BsdVmZoneAllocator,
+        normal_zone: &BsdVmZoneAllocator,
+        highmem_zone: &BsdVmZoneAllocator,
+    ) -> Result<VmZone, &'static str> {
+        let is_zone_available = |z: &BsdVmZoneAllocator| z.free_pages.load(Ordering::SeqCst) > 0;
+
+        match requested_zone {
+            VmZone::Dma32 => {
+                if is_zone_available(dma32_zone) {
+                    Ok(VmZone::Dma32)
+                } else if self.policy.fallback_policy != ZoneFallbackPolicy::StrictNoFallback && is_zone_available(normal_zone) {
+                    Ok(VmZone::Normal)
+                } else {
+                    Err("Out of memory in DMA32 zone and fallback exhausted")
+                }
+            }
+            VmZone::Normal => {
+                if is_zone_available(normal_zone) {
+                    Ok(VmZone::Normal)
+                } else if self.policy.fallback_policy == ZoneFallbackPolicy::CascadingFallback || self.policy.fallback_policy == ZoneFallbackPolicy::FallbackToDma32 {
+                    if is_zone_available(dma32_zone) {
+                        Ok(VmZone::Dma32)
+                    } else {
+                        Err("Out of memory in Normal zone and DMA32 fallback exhausted")
+                    }
+                } else {
+                    Err("Out of memory in Normal zone")
+                }
+            }
+            VmZone::HighMem => {
+                if is_zone_available(highmem_zone) {
+                    Ok(VmZone::HighMem)
+                } else if self.policy.fallback_policy != ZoneFallbackPolicy::StrictNoFallback {
+                    if is_zone_available(normal_zone) {
+                        Ok(VmZone::Normal)
+                    } else if self.policy.fallback_policy == ZoneFallbackPolicy::CascadingFallback && is_zone_available(dma32_zone) {
+                        Ok(VmZone::Dma32)
+                    } else {
+                        Err("Out of memory in HighMem zone and all fallbacks exhausted")
+                    }
+                } else {
+                    Err("Out of memory in HighMem zone")
+                }
+            }
+        }
+    }
+
+    /// Migrates inactive pages from a source zone to a destination zone under memory pressure
+    pub fn migrate_pages(
+        &self,
+        from_zone: &BsdVmZoneAllocator,
+        to_zone: &BsdVmZoneAllocator,
+        count: usize,
+    ) -> Result<usize, &'static str> {
+        if !self.policy.allow_cross_zone_migration {
+            return Err("Cross-zone page migration disabled by policy");
+        }
+        let inactive = from_zone.inactive_pages.load(Ordering::SeqCst);
+        let migrate_count = count.min(inactive);
+        if migrate_count == 0 {
+            return Err("No inactive pages available for zone migration");
+        }
+        from_zone.inactive_pages.fetch_sub(migrate_count, Ordering::SeqCst);
+        from_zone.free_pages.fetch_add(migrate_count, Ordering::SeqCst);
+        to_zone.free_pages.fetch_sub(migrate_count, Ordering::SeqCst);
+        to_zone.active_pages.fetch_add(migrate_count, Ordering::SeqCst);
+        Ok(migrate_count)
+    }
+}
+
+pub struct BsdVmZoneAllocator {
+    pub zone: VmZone,
+    pub active_pages: AtomicUsize,
+    pub inactive_pages: AtomicUsize,
+    pub wired_pages: AtomicUsize,
+    pub free_pages: AtomicUsize,
+}
+
+impl BsdVmZoneAllocator {
+    pub fn new(zone: VmZone, initial_free_pages: usize) -> Self {
+        Self {
+            zone,
+            active_pages: AtomicUsize::new(0),
+            inactive_pages: AtomicUsize::new(0),
+            wired_pages: AtomicUsize::new(0),
+            free_pages: AtomicUsize::new(initial_free_pages),
+        }
+    }
+
+    /// Transitions pages between FreeBSD VM page queues
+    pub fn transition_queue(
+        &self,
+        from: PageQueueType,
+        to: PageQueueType,
+        count: usize,
+    ) -> Result<(), &'static str> {
+        let from_counter = match from {
+            PageQueueType::Active => &self.active_pages,
+            PageQueueType::Inactive => &self.inactive_pages,
+            PageQueueType::Wired => &self.wired_pages,
+            PageQueueType::Free => &self.free_pages,
+        };
+
+        let current = from_counter.load(Ordering::SeqCst);
+        if count > current {
+            return Err("BsdVmZone: Insufficient pages in source queue");
+        }
+
+        from_counter.fetch_sub(count, Ordering::SeqCst);
+
+        let to_counter = match to {
+            PageQueueType::Active => &self.active_pages,
+            PageQueueType::Inactive => &self.inactive_pages,
+            PageQueueType::Wired => &self.wired_pages,
+            PageQueueType::Free => &self.free_pages,
+        };
+
+        to_counter.fetch_add(count, Ordering::SeqCst);
+        Ok(())
+    }
+}
+
+pub struct CmaBuddyReservationGlue {
+    pub cma_base_addr: usize,
+    pub cma_total_pages: usize,
+    pub cma_used_pages: AtomicUsize,
+}
+
+impl CmaBuddyReservationGlue {
+    pub fn new(cma_base_addr: usize, cma_total_pages: usize) -> Self {
+        Self {
+            cma_base_addr,
+            cma_total_pages,
+            cma_used_pages: AtomicUsize::new(0),
+        }
+    }
+
+    pub fn allocate_contiguous(&self, count_pages: usize) -> Result<usize, &'static str> {
+        if count_pages == 0 || count_pages > self.cma_total_pages {
+            return Err("CMA: Requested count exceeds total reserved CMA pool");
+        }
+        let current = self.cma_used_pages.load(Ordering::SeqCst);
+        if current + count_pages > self.cma_total_pages {
+            return Err("CMA: Out of contiguous reserved memory");
+        }
+        let allocated_pfn = current;
+        self.cma_used_pages.fetch_add(count_pages, Ordering::SeqCst);
+        let phys_addr = self.cma_base_addr + (allocated_pfn * PAGE_SIZE);
+        Ok(phys_addr)
+    }
+
+    pub fn release_contiguous(
+        &self,
+        _phys_addr: usize,
+        count_pages: usize,
+    ) -> Result<(), &'static str> {
+        let current = self.cma_used_pages.load(Ordering::SeqCst);
+        if count_pages > current {
+            return Err("CMA: Cannot release more pages than currently allocated");
+        }
+        self.cma_used_pages.fetch_sub(count_pages, Ordering::SeqCst);
+        Ok(())
+    }
+
+    pub fn free_cma_pages(&self) -> usize {
+        self.cma_total_pages - self.cma_used_pages.load(Ordering::SeqCst)
+    }
+}
+
 
 /// SigmaOS Buddy Allocator Wrapper
 ///
