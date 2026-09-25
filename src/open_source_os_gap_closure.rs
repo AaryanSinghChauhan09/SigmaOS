@@ -3920,6 +3920,95 @@ mod tests {
     }
 
     #[test]
+    fn test_sovereign_fuse_filesystem_engine() {
+        let mut fuse = SovereignFuseFilesystemEngine::new("/mnt/fuse");
+        let init_resp = fuse.handle_init(FuseInitRequest {
+            major: 7,
+            minor: 31,
+            max_readahead: 65536,
+            flags: 0,
+        });
+        assert_eq!(init_resp.major, 7);
+        assert!(fuse.initialized);
+
+        let ino = fuse.add_node("config.json", 0o100644, b"{\"debug\": true}");
+        assert!(ino >= 2);
+
+        let entry = fuse.lookup("config.json").expect("File should exist");
+        assert_eq!(entry.ino, ino);
+        assert_eq!(entry.size, 15);
+
+        let data = fuse.read_inode(ino, 0, 100).expect("Read succeeds");
+        assert_eq!(data, b"{\"debug\": true}");
+
+        let written = fuse.write_inode(ino, 0, b"{\"debug\": false}").expect("Write succeeds");
+        assert_eq!(written, 16);
+        let updated_data = fuse.read_inode(ino, 0, 100).expect("Read updated");
+        assert_eq!(updated_data, b"{\"debug\": false}");
+
+        assert!(fuse.unmount());
+        assert!(!fuse.initialized);
+    }
+
+    #[test]
+    fn test_openbsd_sndio_audio_engine() {
+        let mut sndio = OpenBsdSndioAudioEngine::new("snd/0");
+        let stream_id = sndio.open_stream(SndioStreamConfig {
+            format: SndioAudioFormat::S16Le,
+            rate: 48000,
+            channels: 2,
+            app_name: "mpv".to_string(),
+        });
+        assert_eq!(stream_id, 1);
+
+        assert!(sndio.set_stream_volume(stream_id, 200));
+        let submitted = sndio.submit_audio_pcm(stream_id, &[0x12, 0x34, 0x56, 0x78]).expect("Submit PCM ok");
+        assert_eq!(submitted, 4);
+
+        let drained = sndio.flush_audio_buffer(stream_id);
+        assert_eq!(drained, 4);
+
+        assert!(sndio.stop_stream(stream_id));
+        assert!(!sndio.active_streams.get(&stream_id).unwrap().playing);
+    }
+
+    #[test]
+    fn test_xdg_mime_desktop_engine() {
+        let mut xdg = XdgMimeDesktopEngine::new();
+        xdg.register_mime_type("text/markdown", &["md", "markdown"], "Markdown Document");
+        xdg.register_desktop_entry("code.desktop", "VS Code", "code --new-window", &["text/markdown"]);
+
+        assert!(xdg.set_default_handler("text/markdown", "code.desktop"));
+
+        let detected_mime = xdg.detect_mime_type_by_filename("README.md");
+        assert_eq!(detected_mime, Some("text/markdown".to_string()));
+
+        let handler = xdg.query_default_handler("text/markdown").expect("Handler found");
+        assert_eq!(handler.desktop_id, "code.desktop");
+
+        let launch_cmd = xdg.generate_launch_command("README.md");
+        assert_eq!(launch_cmd, Some("code --new-window README.md".to_string()));
+    }
+
+    #[test]
+    fn test_open_source_project_supremacy_suite_fuse_sndio_xdg() {
+        let mut suite = OpenSourceProjectSupremacySuite::new();
+
+        assert!(suite.mount_fuse_filesystem("/mnt/custom_fuse"));
+        assert!(suite.fuse_engine.initialized);
+
+        let stream_id = suite.open_sndio_audio_stream("firefox", 44100, 2);
+        assert_eq!(stream_id, 1);
+
+        suite.xdg_mime_engine.register_mime_type("application/pdf", &["pdf"], "PDF Document");
+        suite.xdg_mime_engine.register_desktop_entry("zathura.desktop", "Zathura", "zathura", &["application/pdf"]);
+        suite.xdg_mime_engine.set_default_handler("application/pdf", "zathura.desktop");
+
+        let launch_cmd = suite.resolve_xdg_mime_handler("doc.pdf");
+        assert_eq!(launch_cmd, Some("zathura doc.pdf".to_string()));
+    }
+
+    #[test]
     fn test_sovereign_nginx_ingress_router() {
         let mut router = SovereignNginxIngressRouter::new();
         router.add_ingress_rule(
@@ -4290,7 +4379,344 @@ impl Default for SovereignOpenTelemetryMetricsCollector {
 }
 
 // =========================================================================
-// 15. SOVEREIGN OPEN SOURCE PROJECT SUPREMACY SUITE
+// 17. LINUX FUSE USERSPACE FILESYSTEM PROTOCOL ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FuseOpcode {
+    Init = 26,
+    Lookup = 1,
+    Forget = 2,
+    GetAttr = 3,
+    Open = 14,
+    Read = 15,
+    Write = 16,
+    Release = 18,
+    Destroy = 38,
+}
+
+#[derive(Debug, Clone)]
+pub struct FuseHeader {
+    pub unique: u64,
+    pub nodeid: u64,
+    pub opcode: FuseOpcode,
+}
+
+#[derive(Debug, Clone)]
+pub struct FuseInitRequest {
+    pub major: u32,
+    pub minor: u32,
+    pub max_readahead: u32,
+    pub flags: u32,
+}
+
+#[derive(Debug, Clone)]
+pub struct FuseInitResponse {
+    pub major: u32,
+    pub minor: u32,
+    pub max_write: u32,
+    pub flags: u32,
+}
+
+#[derive(Debug, Clone)]
+pub struct FuseEntry {
+    pub ino: u64,
+    pub size: u64,
+    pub mode: u32,
+    pub name: String,
+    pub data: Vec<u8>,
+}
+
+pub struct SovereignFuseFilesystemEngine {
+    pub mount_point: String,
+    pub initialized: bool,
+    pub proto_major: u32,
+    pub proto_minor: u32,
+    pub entries: BTreeMap<u64, FuseEntry>,
+    pub next_ino: u64,
+}
+
+impl SovereignFuseFilesystemEngine {
+    pub fn new(mount_point: &str) -> Self {
+        let mut entries = BTreeMap::new();
+        entries.insert(
+            1,
+            FuseEntry {
+                ino: 1,
+                size: 0,
+                mode: 0o040755,
+                name: "/".to_string(),
+                data: Vec::new(),
+            },
+        );
+        Self {
+            mount_point: mount_point.to_string(),
+            initialized: false,
+            proto_major: 7,
+            proto_minor: 31,
+            entries,
+            next_ino: 2,
+        }
+    }
+
+    pub fn handle_init(&mut self, req: FuseInitRequest) -> FuseInitResponse {
+        self.initialized = true;
+        FuseInitResponse {
+            major: self.proto_major,
+            minor: self.proto_minor,
+            max_write: 131072,
+            flags: req.flags,
+        }
+    }
+
+    pub fn add_node(&mut self, name: &str, mode: u32, data: &[u8]) -> u64 {
+        let ino = self.next_ino;
+        self.next_ino += 1;
+        self.entries.insert(
+            ino,
+            FuseEntry {
+                ino,
+                size: data.len() as u64,
+                mode,
+                name: name.to_string(),
+                data: data.to_vec(),
+            },
+        );
+        ino
+    }
+
+    pub fn lookup(&self, name: &str) -> Option<&FuseEntry> {
+        self.entries.values().find(|e| e.name == name)
+    }
+
+    pub fn read_inode(&self, ino: u64, offset: usize, size: usize) -> Result<Vec<u8>, &'static str> {
+        let entry = self.entries.get(&ino).ok_or("FUSE: Inode not found")?;
+        if offset >= entry.data.len() {
+            return Ok(Vec::new());
+        }
+        let end = (offset + size).min(entry.data.len());
+        Ok(entry.data[offset..end].to_vec())
+    }
+
+    pub fn write_inode(&mut self, ino: u64, offset: usize, buf: &[u8]) -> Result<usize, &'static str> {
+        let entry = self.entries.get_mut(&ino).ok_or("FUSE: Inode not found")?;
+        if offset + buf.len() > entry.data.len() {
+            entry.data.resize(offset + buf.len(), 0);
+        }
+        entry.data[offset..offset + buf.len()].copy_from_slice(buf);
+        entry.size = entry.data.len() as u64;
+        Ok(buf.len())
+    }
+
+    pub fn unmount(&mut self) -> bool {
+        self.initialized = false;
+        true
+    }
+}
+
+impl Default for SovereignFuseFilesystemEngine {
+    fn default() -> Self {
+        Self::new("/mnt/fuse")
+    }
+}
+
+// =========================================================================
+// 18. OPENBSD SNDIO AUDIO SERVER FRAMEWORK ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SndioAudioFormat {
+    S16Le,
+    S24Le,
+    S32Le,
+    F32Le,
+}
+
+#[derive(Debug, Clone)]
+pub struct SndioStreamConfig {
+    pub format: SndioAudioFormat,
+    pub rate: u32,
+    pub channels: u16,
+    pub app_name: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct SndioClientStream {
+    pub stream_id: u32,
+    pub config: SndioStreamConfig,
+    pub volume: u8,
+    pub buffer: Vec<u8>,
+    pub playing: bool,
+}
+
+pub struct OpenBsdSndioAudioEngine {
+    pub server_device: String,
+    pub active_streams: BTreeMap<u32, SndioClientStream>,
+    pub next_stream_id: u32,
+    pub master_volume: u8,
+}
+
+impl OpenBsdSndioAudioEngine {
+    pub fn new(server_device: &str) -> Self {
+        Self {
+            server_device: server_device.to_string(),
+            active_streams: BTreeMap::new(),
+            next_stream_id: 1,
+            master_volume: 200,
+        }
+    }
+
+    pub fn open_stream(&mut self, config: SndioStreamConfig) -> u32 {
+        let stream_id = self.next_stream_id;
+        self.next_stream_id += 1;
+        let stream = SndioClientStream {
+            stream_id,
+            config,
+            volume: 255,
+            buffer: Vec::new(),
+            playing: true,
+        };
+        self.active_streams.insert(stream_id, stream);
+        stream_id
+    }
+
+    pub fn set_stream_volume(&mut self, stream_id: u32, volume: u8) -> bool {
+        if let Some(stream) = self.active_streams.get_mut(&stream_id) {
+            stream.volume = volume;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn submit_audio_pcm(&mut self, stream_id: u32, pcm_samples: &[u8]) -> Result<usize, &'static str> {
+        let stream = self.active_streams.get_mut(&stream_id).ok_or("sndio: Stream ID not found")?;
+        stream.buffer.extend_from_slice(pcm_samples);
+        Ok(pcm_samples.len())
+    }
+
+    pub fn flush_audio_buffer(&mut self, stream_id: u32) -> usize {
+        if let Some(stream) = self.active_streams.get_mut(&stream_id) {
+            let drained = stream.buffer.len();
+            stream.buffer.clear();
+            drained
+        } else {
+            0
+        }
+    }
+
+    pub fn stop_stream(&mut self, stream_id: u32) -> bool {
+        if let Some(stream) = self.active_streams.get_mut(&stream_id) {
+            stream.playing = false;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for OpenBsdSndioAudioEngine {
+    fn default() -> Self {
+        Self::new("snd/0")
+    }
+}
+
+// =========================================================================
+// 19. FREEDESKTOP XDG MIME ASSOCIATION & APPLICATION REGISTRY ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct XdgMimeType {
+    pub mime_type: String,
+    pub file_extensions: Vec<String>,
+    pub comment: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct XdgDesktopEntry {
+    pub desktop_id: String,
+    pub name: String,
+    pub exec_command: String,
+    pub mime_types: Vec<String>,
+}
+
+pub struct XdgMimeDesktopEngine {
+    pub mime_types: BTreeMap<String, XdgMimeType>,
+    pub desktop_entries: BTreeMap<String, XdgDesktopEntry>,
+    pub mime_defaults: BTreeMap<String, String>,
+}
+
+impl XdgMimeDesktopEngine {
+    pub fn new() -> Self {
+        Self {
+            mime_types: BTreeMap::new(),
+            desktop_entries: BTreeMap::new(),
+            mime_defaults: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_mime_type(&mut self, mime_type: &str, extensions: &[&str], comment: &str) {
+        self.mime_types.insert(
+            mime_type.to_string(),
+            XdgMimeType {
+                mime_type: mime_type.to_string(),
+                file_extensions: extensions.iter().map(|s| s.to_string()).collect(),
+                comment: comment.to_string(),
+            },
+        );
+    }
+
+    pub fn register_desktop_entry(&mut self, desktop_id: &str, name: &str, exec: &str, mime_types: &[&str]) {
+        self.desktop_entries.insert(
+            desktop_id.to_string(),
+            XdgDesktopEntry {
+                desktop_id: desktop_id.to_string(),
+                name: name.to_string(),
+                exec_command: exec.to_string(),
+                mime_types: mime_types.iter().map(|s| s.to_string()).collect(),
+            },
+        );
+    }
+
+    pub fn set_default_handler(&mut self, mime_type: &str, desktop_id: &str) -> bool {
+        if self.desktop_entries.contains_key(desktop_id) {
+            self.mime_defaults.insert(mime_type.to_string(), desktop_id.to_string());
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn detect_mime_type_by_filename(&self, filename: &str) -> Option<String> {
+        let ext = filename.rfind('.').map(|idx| &filename[idx + 1..])?;
+        for entry in self.mime_types.values() {
+            if entry.file_extensions.iter().any(|e| e.eq_ignore_ascii_case(ext)) {
+                return Some(entry.mime_type.clone());
+            }
+        }
+        None
+    }
+
+    pub fn query_default_handler(&self, mime_type: &str) -> Option<&XdgDesktopEntry> {
+        let desktop_id = self.mime_defaults.get(mime_type)?;
+        self.desktop_entries.get(desktop_id)
+    }
+
+    pub fn generate_launch_command(&self, filename: &str) -> Option<String> {
+        let mime = self.detect_mime_type_by_filename(filename)?;
+        let app = self.query_default_handler(&mime)?;
+        Some(format!("{} {}", app.exec_command, filename))
+    }
+}
+
+impl Default for XdgMimeDesktopEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 20. SOVEREIGN OPEN SOURCE PROJECT SUPREMACY SUITE
 // =========================================================================
 
 /// Master Open Source Operating System & Cloud Infrastructure Supremacy Suite
@@ -4315,6 +4741,9 @@ pub struct OpenSourceProjectSupremacySuite {
     pub openzfs_engine: OpenZfsPoolManagementEngine,
     pub binder_ashmem_engine: AndroidBinderAshmemIpcEngine,
     pub landlock_engine: LinuxLandlockLsmSecurityEngine,
+    pub fuse_engine: SovereignFuseFilesystemEngine,
+    pub sndio_engine: OpenBsdSndioAudioEngine,
+    pub xdg_mime_engine: XdgMimeDesktopEngine,
 }
 
 #[derive(Debug, Clone)]
@@ -4346,6 +4775,9 @@ impl OpenSourceProjectSupremacySuite {
             openzfs_engine: OpenZfsPoolManagementEngine::new("rpool", 2_000_000_000_000),
             binder_ashmem_engine: AndroidBinderAshmemIpcEngine::new(),
             landlock_engine: LinuxLandlockLsmSecurityEngine::new(LandlockAbiVersion::V5),
+            fuse_engine: SovereignFuseFilesystemEngine::new("/mnt/fuse"),
+            sndio_engine: OpenBsdSndioAudioEngine::new("snd/0"),
+            xdg_mime_engine: XdgMimeDesktopEngine::new(),
         }
     }
 
@@ -4526,6 +4958,38 @@ impl OpenSourceProjectSupremacySuite {
     /// Fastfetch System Info Quick Helper
     pub fn render_fastfetch_summary(&self) -> String {
         "SigmaOS 6.12.0-sovereign-pqc\nMemory: 2048MB / 32768MB".to_string()
+    }
+
+    /// Linux: Mount and initialize FUSE userspace filesystem
+    pub fn mount_fuse_filesystem(&mut self, mount_point: &str) -> bool {
+        self.fuse_engine = SovereignFuseFilesystemEngine::new(mount_point);
+        let resp = self.fuse_engine.handle_init(FuseInitRequest {
+            major: 7,
+            minor: 31,
+            max_readahead: 131072,
+            flags: 0,
+        });
+        resp.major == 7 && self.fuse_engine.initialized
+    }
+
+    /// OpenBSD: Open and configure sndio client audio stream
+    pub fn open_sndio_audio_stream(
+        &mut self,
+        app_name: &str,
+        rate: u32,
+        channels: u16,
+    ) -> u32 {
+        self.sndio_engine.open_stream(SndioStreamConfig {
+            format: SndioAudioFormat::S16Le,
+            rate,
+            channels,
+            app_name: app_name.to_string(),
+        })
+    }
+
+    /// FreeDesktop: Resolve default application handler for MIME type
+    pub fn resolve_xdg_mime_handler(&self, filename: &str) -> Option<String> {
+        self.xdg_mime_engine.generate_launch_command(filename)
     }
 }
 
