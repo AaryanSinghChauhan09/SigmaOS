@@ -144,17 +144,28 @@ impl KernelConsole {
     }
 
     fn write_vga_char(&mut self, byte: u8) {
-        let x = self.cursor_x.load(Ordering::SeqCst);
-        let y = self.cursor_y.load(Ordering::SeqCst);
+        let mut x = self.cursor_x.load(Ordering::SeqCst);
+        let mut y = self.cursor_y.load(Ordering::SeqCst);
 
         match byte {
             b'\n' => {
-                self.cursor_x.store(0, Ordering::SeqCst);
-                let new_y = (y + 1) % self.vga_height;
-                self.cursor_y.store(new_y, Ordering::SeqCst);
+                x = 0;
+                y += 1;
             }
             b'\r' => {
-                self.cursor_x.store(0, Ordering::SeqCst);
+                x = 0;
+            }
+            b'\t' => {
+                x = (x + 8) & !7;
+                if x >= self.vga_width {
+                    x = 0;
+                    y += 1;
+                }
+            }
+            0x08 => {
+                if x > 0 {
+                    x -= 1;
+                }
             }
             _ => {
                 let offset = (y * self.vga_width + x) * 2;
@@ -163,14 +174,57 @@ impl KernelConsole {
                     self.vga_buffer.add(offset + 1).write_volatile(0x0F);
                 }
 
-                let new_x = (x + 1) % self.vga_width;
-                self.cursor_x.store(new_x, Ordering::SeqCst);
-                if new_x == 0 {
-                    let new_y = (y + 1) % self.vga_height;
-                    self.cursor_y.store(new_y, Ordering::SeqCst);
+                x += 1;
+                if x >= self.vga_width {
+                    x = 0;
+                    y += 1;
                 }
             }
         }
+
+        if y >= self.vga_height {
+            self.scroll_vga();
+            y = self.vga_height - 1;
+        }
+
+        self.cursor_x.store(x, Ordering::SeqCst);
+        self.cursor_y.store(y, Ordering::SeqCst);
+        self.update_vga_hardware_cursor(x, y);
+    }
+
+    /// Scrolls the VGA text frame buffer up by 1 row (Linux vgacon / FreeBSD syscons parity)
+    fn scroll_vga(&mut self) {
+        let row_bytes = self.vga_width * 2;
+        let last_row_start = (self.vga_height - 1) * row_bytes;
+
+        unsafe {
+            core::ptr::copy(
+                self.vga_buffer.add(row_bytes),
+                self.vga_buffer,
+                (self.vga_height - 1) * row_bytes,
+            );
+
+            for i in 0..self.vga_width {
+                let offset = last_row_start + i * 2;
+                self.vga_buffer.add(offset).write_volatile(b' ');
+                self.vga_buffer.add(offset + 1).write_volatile(0x07);
+            }
+        }
+    }
+
+    /// Synchronizes physical VGA hardware cursor position via CRTC registers (0x3D4/0x3D5)
+    fn update_vga_hardware_cursor(&self, x: usize, y: usize) {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        {
+            let pos = (y * self.vga_width + x) as u16;
+            unsafe {
+                core::arch::asm!("out dx, al", in("dx") 0x3D4u16, in("al") 0x0Eu8, options(nomem, nostack));
+                core::arch::asm!("out dx, al", in("dx") 0x3D5u16, in("al") (pos >> 8) as u8, options(nomem, nostack));
+                core::arch::asm!("out dx, al", in("dx") 0x3D4u16, in("al") 0x0Fu8, options(nomem, nostack));
+                core::arch::asm!("out dx, al", in("dx") 0x3D5u16, in("al") (pos & 0xFF) as u8, options(nomem, nostack));
+            }
+        }
+        let _ = (x, y);
     }
 
     fn write_framebuffer(&self, _message: &str) {}
@@ -258,7 +312,7 @@ pub fn klog(level: LogLevel, message: &str) {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -311,5 +365,42 @@ mod tests {
         let (x, y) = console.get_cursor();
         assert_eq!(x, 0);
         assert_eq!(y, 0);
+    }
+
+    #[test]
+    fn test_vga_tab_and_backspace() {
+        let mut console = KernelConsole::new();
+        console.initialize(ConsoleBackend::VGA).unwrap();
+        let start_y = console.get_cursor().1; // row 6 after banner
+
+        // Test tab stop calculation
+        console.write_vga_char(b'A');
+        assert_eq!(console.get_cursor(), (1, start_y));
+        console.write_vga_char(b'\t');
+        assert_eq!(console.get_cursor(), (8, start_y));
+
+        // Test backspace
+        console.write_vga_char(0x08);
+        assert_eq!(console.get_cursor(), (7, start_y));
+    }
+
+    #[test]
+    fn test_vga_scrolling() {
+        let mut console = KernelConsole::new();
+        console.initialize(ConsoleBackend::VGA).unwrap();
+
+        // Fill all 25 rows using println
+        for _row in 0..26 {
+            console.println(LogLevel::Info, "Line");
+        }
+
+        // Verify cursor clamped at bottom row 24
+        let (_x, y) = console.get_cursor();
+        assert_eq!(y, 24);
+
+        // Verify top character is 'L' from scrolled banner or lines
+        unsafe {
+            assert_eq!(*console.vga_buffer, b'L');
+        }
     }
 }

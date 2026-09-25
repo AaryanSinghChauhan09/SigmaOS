@@ -10,11 +10,31 @@ use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
+#[cfg(not(feature = "standalone_test"))]
 use crate::package::pull_request_workflow::{
     ConsolidatedSovereignPackage, PackagePullRequestSubmission, PullRequestPackageFormat,
     PullRequestStatus, SovereignPackagePullRequestEngine,
 };
+#[cfg(not(feature = "standalone_test"))]
 use crate::package::universal::{
+    ForeignDistroManifest, PackageFormat, UnifiedPackage, UniversalPackageManager,
+};
+
+#[cfg(feature = "standalone_test")]
+#[path = "pull_request_workflow.rs"]
+pub mod pull_request_workflow;
+
+#[cfg(feature = "standalone_test")]
+#[path = "universal.rs"]
+pub mod universal;
+
+#[cfg(feature = "standalone_test")]
+pub use pull_request_workflow::{
+    ConsolidatedSovereignPackage, PackagePullRequestSubmission, PullRequestPackageFormat,
+    PullRequestStatus, SovereignPackagePullRequestEngine,
+};
+#[cfg(feature = "standalone_test")]
+pub use universal::{
     ForeignDistroManifest, PackageFormat, UnifiedPackage, UniversalPackageManager,
 };
 
@@ -33,7 +53,6 @@ pub struct DistroPrGatewayEntry {
 
 /// Sovereign Universal PR Gateway Engine
 /// Auto-converts incoming foreign distro PR submissions into sandboxed SigmaPkg packages
-#[derive(Debug)]
 pub struct SovereignUniversalPrGatewayEngine {
     pub pr_engine: SovereignPackagePullRequestEngine,
     pub package_manager: UniversalPackageManager,
@@ -103,7 +122,7 @@ impl SovereignUniversalPrGatewayEngine {
             entry.status = PullRequestStatus::Translated;
         }
 
-        // Index in UniversalPackageManager as a foreign manifest
+        // Index in UniversalPackageManager as a foreign manifest across Linux and BSD formats
         let manifest = ForeignDistroManifest {
             raw_format: match translated.source_format {
                 PullRequestPackageFormat::DebianDeb => PackageFormat::Deb,
@@ -112,12 +131,22 @@ impl SovereignUniversalPrGatewayEngine {
                 PullRequestPackageFormat::AlpineApk => PackageFormat::Apk,
                 PullRequestPackageFormat::GentooEbuild => PackageFormat::Ebuild,
                 PullRequestPackageFormat::VoidXbps => PackageFormat::Xbps,
-                PullRequestPackageFormat::FreeBsdPorts => PackageFormat::Ports,
+                PullRequestPackageFormat::FreeBsdPorts | PullRequestPackageFormat::NetBsdPkgsrc | PullRequestPackageFormat::DportsPackage => PackageFormat::Ports,
                 PullRequestPackageFormat::OpenBsdPorts => PackageFormat::OpenBsdPkg,
                 PullRequestPackageFormat::NixFlake => PackageFormat::Nixpkg,
+                PullRequestPackageFormat::GuixScheme => PackageFormat::GuixNar,
                 PullRequestPackageFormat::FlatpakApp => PackageFormat::Flatpak,
                 PullRequestPackageFormat::SnapPackage => PackageFormat::Snap,
                 PullRequestPackageFormat::AppImage => PackageFormat::AppImage,
+                PullRequestPackageFormat::ZypperSpec => PackageFormat::Zypper,
+                PullRequestPackageFormat::EopkgSpec | PullRequestPackageFormat::SolusEopkg => PackageFormat::Eopkg,
+                PullRequestPackageFormat::OpenWrtIpk | PullRequestPackageFormat::IpkPackage => PackageFormat::Ipk,
+                PullRequestPackageFormat::OpkgPackage => PackageFormat::Opkg,
+                PullRequestPackageFormat::SolarisIpsPackage | PullRequestPackageFormat::IllumosP5p => PackageFormat::SolarisIps,
+                PullRequestPackageFormat::PuppyPet => PackageFormat::Pet,
+                PullRequestPackageFormat::SlackwareSlackBuild | PullRequestPackageFormat::SlackwareTxz => PackageFormat::TarGz,
+                PullRequestPackageFormat::HaikuHpkg => PackageFormat::Pkg,
+                PullRequestPackageFormat::NativeSigPkg => PackageFormat::SigmaPkg,
                 _ => PackageFormat::SigmaPkg,
             },
             original_name: translated.name.clone(),
@@ -239,6 +268,10 @@ mod tests {
             ("grace", "git", "2.43.0", PullRequestPackageFormat::NixFlake, "description = \"git\"", &["zlib"][..]),
             ("heidi", "gimp", "2.10.36", PullRequestPackageFormat::FlatpakApp, "app-id: org.gimp.GIMP", &["babl"][..]),
             ("ivan", "blender", "4.0.2", PullRequestPackageFormat::AppImage, "AppImage Blender", &["glibc"][..]),
+            ("judy", "bash", "5.2.21", PullRequestPackageFormat::NetBsdPkgsrc, "PKGNAME=bash", &["ncurses"][..]),
+            ("mallory", "python", "3.12.1", PullRequestPackageFormat::ZypperSpec, "Name: python3", &["readline"][..]),
+            ("oscar", "zsh", "5.9.0", PullRequestPackageFormat::GuixScheme, "define-public zsh", &["ncurses"][..]),
+            ("peggy", "nano", "7.2.0", PullRequestPackageFormat::OpenWrtIpk, "Package: nano", &["libncurses"][..]),
         ];
 
         for (author, name, ver, fmt, manifest, deps) in submissions {
@@ -259,6 +292,6 @@ mod tests {
             assert_eq!(merged.name, format!("sigpkg-{}", name));
         }
 
-        assert_eq!(gateway.pr_gateway_registry.len(), 8);
+        assert_eq!(gateway.pr_gateway_registry.len(), 12);
     }
 }
