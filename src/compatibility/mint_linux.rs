@@ -2022,6 +2022,169 @@ impl MintSystemMonitorHUD {
     }
 }
 
+/// Cinnamon System Tray & StatusNotifierItem (SNI) Applet Manager
+#[derive(Debug, Clone)]
+pub struct StatusNotifierItem {
+    pub id: String,
+    pub title: String,
+    pub icon_name: String,
+    pub is_visible: bool,
+}
+
+pub struct MintCinnamonAppletTrayEngine {
+    pub items: Vec<StatusNotifierItem>,
+}
+
+impl Default for MintCinnamonAppletTrayEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintCinnamonAppletTrayEngine {
+    pub fn new() -> Self {
+        Self { items: Vec::new() }
+    }
+
+    pub fn register_sni(&mut self, id: &str, title: &str, icon: &str) {
+        self.items.push(StatusNotifierItem {
+            id: id.to_string(),
+            title: title.to_string(),
+            icon_name: icon.to_string(),
+            is_visible: true,
+        });
+    }
+
+    pub fn get_visible_items(&self) -> Vec<&StatusNotifierItem> {
+        self.items.iter().filter(|i| i.is_visible).collect()
+    }
+}
+
+/// MintUpdate Repository Mirror Speed & Latency Benchmark Engine
+#[derive(Debug, Clone)]
+pub struct MirrorBenchmarkResult {
+    pub mirror_url: String,
+    pub latency_ms: u32,
+    pub speed_kbps: u32,
+    pub score: u32,
+}
+
+pub struct MintUpdateMirrorSpeedTester {
+    pub benchmark_results: Vec<MirrorBenchmarkResult>,
+}
+
+impl Default for MintUpdateMirrorSpeedTester {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintUpdateMirrorSpeedTester {
+    pub fn new() -> Self {
+        Self {
+            benchmark_results: Vec::new(),
+        }
+    }
+
+    pub fn test_mirror(&mut self, url: &str, latency: u32, speed: u32) {
+        let score = speed / (latency.max(1));
+        self.benchmark_results.push(MirrorBenchmarkResult {
+            mirror_url: url.to_string(),
+            latency_ms: latency,
+            speed_kbps: speed,
+            score,
+        });
+    }
+
+    pub fn get_fastest_mirror(&self) -> Option<&MirrorBenchmarkResult> {
+        self.benchmark_results.iter().max_by_key(|m| m.score)
+    }
+}
+
+/// MintInstall Category Taxonomy & Software Curator
+#[derive(Debug, Clone)]
+pub struct SoftwareCategoryInfo {
+    pub category_id: String,
+    pub display_name: String,
+    pub icon_name: String,
+    pub featured_app_ids: Vec<String>,
+}
+
+pub struct MintInstallPackageCategoriesCatalog {
+    pub categories: Vec<SoftwareCategoryInfo>,
+}
+
+impl Default for MintInstallPackageCategoriesCatalog {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintInstallPackageCategoriesCatalog {
+    pub fn new() -> Self {
+        let mut catalog = Self {
+            categories: Vec::new(),
+        };
+        catalog.categories.push(SoftwareCategoryInfo {
+            category_id: String::from("accessories"),
+            display_name: String::from("Accessories"),
+            icon_name: String::from("applications-accessories"),
+            featured_app_ids: vec![String::from("org.gnome.Calculator"), String::from("pix")],
+        });
+        catalog.categories.push(SoftwareCategoryInfo {
+            category_id: String::from("internet"),
+            display_name: String::from("Internet"),
+            icon_name: String::from("applications-internet"),
+            featured_app_ids: vec![String::from("firefox"), String::from("thunderbird")],
+        });
+        catalog
+    }
+
+    pub fn get_category(&self, id: &str) -> Option<&SoftwareCategoryInfo> {
+        self.categories.iter().find(|c| c.category_id == id)
+    }
+}
+
+/// Nemo File Manager Extension Engine (ColumnProvider & MenuProvider)
+#[derive(Debug, Clone)]
+pub struct NemoExtensionDescriptor {
+    pub name: String,
+    pub provides_columns: bool,
+    pub provides_menus: bool,
+    pub enabled: bool,
+}
+
+pub struct MintNemoExtensionManager {
+    pub extensions: Vec<NemoExtensionDescriptor>,
+}
+
+impl Default for MintNemoExtensionManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintNemoExtensionManager {
+    pub fn new() -> Self {
+        Self {
+            extensions: Vec::new(),
+        }
+    }
+
+    pub fn register_extension(&mut self, name: &str, columns: bool, menus: bool) {
+        self.extensions.push(NemoExtensionDescriptor {
+            name: name.to_string(),
+            provides_columns: columns,
+            provides_menus: menus,
+            enabled: true,
+        });
+    }
+
+    pub fn get_menu_providers(&self) -> Vec<&NemoExtensionDescriptor> {
+        self.extensions.iter().filter(|e| e.enabled && e.provides_menus).collect()
+    }
+}
+
 pub struct MintDriverManager {
     pub available_drivers: Vec<MintDriverInfo>,
 }
@@ -2077,6 +2240,42 @@ mod tests {
 
         notes.update_body(id1, "Buy apples, milk, & bread").unwrap();
         assert_eq!(notes.notes[0].body, "Buy apples, milk, & bread");
+    }
+
+    #[test]
+    fn test_mint_cinnamon_applet_tray_engine() {
+        let mut tray = MintCinnamonAppletTrayEngine::new();
+        tray.register_sni("org.gnome.Volume", "Volume Control", "audio-volume-high");
+        assert_eq!(tray.get_visible_items().len(), 1);
+        assert_eq!(tray.get_visible_items()[0].title, "Volume Control");
+    }
+
+    #[test]
+    fn test_mint_update_mirror_speed_tester() {
+        let mut tester = MintUpdateMirrorSpeedTester::new();
+        tester.test_mirror("https://mirror.us.mint.org", 20, 50000);
+        tester.test_mirror("https://mirror.eu.mint.org", 100, 20000);
+
+        let fastest = tester.get_fastest_mirror().unwrap();
+        assert_eq!(fastest.mirror_url, "https://mirror.us.mint.org");
+    }
+
+    #[test]
+    fn test_mint_install_package_categories_catalog() {
+        let catalog = MintInstallPackageCategoriesCatalog::new();
+        let internet = catalog.get_category("internet").unwrap();
+        assert_eq!(internet.display_name, "Internet");
+        assert!(internet.featured_app_ids.contains(&"firefox".to_string()));
+    }
+
+    #[test]
+    fn test_mint_nemo_extension_manager() {
+        let mut nemo_ext = MintNemoExtensionManager::new();
+        nemo_ext.register_extension("nemo-share", false, true);
+
+        let providers = nemo_ext.get_menu_providers();
+        assert_eq!(providers.len(), 1);
+        assert_eq!(providers[0].name, "nemo-share");
     }
 
     #[test]
