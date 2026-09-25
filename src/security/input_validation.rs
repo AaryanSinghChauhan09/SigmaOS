@@ -420,6 +420,40 @@ pub fn validate_port(port: u32) -> Result<(), ValidationError> {
     Ok(())
 }
 
+// ── MAC address ────────────────────────────────────────────────────────────
+
+/// Validate an IEEE 802 MAC address (48-bit hex format, e.g., "00:11:22:33:44:55" or "00-11-22-33-44-55").
+/// Enforces consistent delimiter usage (colons or hyphens) to prevent parser differential vulnerabilities.
+pub fn validate_mac_address(addr: &[u8]) -> Result<(), ValidationError> {
+    if addr.is_empty() {
+        return Err(ValidationError::EmptyInput);
+    }
+    if addr.len() != 17 {
+        if addr.len() > 17 {
+            return Err(ValidationError::TooLong);
+        } else {
+            return Err(ValidationError::InvalidChars);
+        }
+    }
+
+    let delim = addr[2];
+    if delim != b':' && delim != b'-' {
+        return Err(ValidationError::InvalidChars);
+    }
+
+    for i in 0..17 {
+        if i == 2 || i == 5 || i == 8 || i == 11 || i == 14 {
+            if addr[i] != delim {
+                return Err(ValidationError::InvalidChars);
+            }
+        } else if !addr[i].is_ascii_hexdigit() {
+            return Err(ValidationError::InvalidChars);
+        }
+    }
+
+    Ok(())
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 #[cfg(test)]
 mod tests {
@@ -646,5 +680,28 @@ mod tests {
         let mut out = [0u8; 20];
         let n = sanitize_for_log(input, &mut out);
         assert_eq!(&out[..n], b"hello?world?");
+    }
+
+    #[test]
+    fn test_mac_address_validation() {
+        assert_eq!(validate_mac_address(b"00:11:22:33:44:55"), Ok(()));
+        assert_eq!(validate_mac_address(b"AA-BB-CC-DD-EE-FF"), Ok(()));
+        assert_eq!(validate_mac_address(b"a1:b2:c3:d4:e5:f6"), Ok(()));
+
+        // Reject empty input
+        assert_eq!(validate_mac_address(b""), Err(ValidationError::EmptyInput));
+
+        // Reject incorrect lengths
+        assert_eq!(validate_mac_address(b"00:11:22:33:44"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_mac_address(b"00:11:22:33:44:55:66"), Err(ValidationError::TooLong));
+
+        // Reject non-hexadecimal characters
+        assert_eq!(validate_mac_address(b"00:11:22:33:44:ZZ"), Err(ValidationError::InvalidChars));
+
+        // Reject mixed delimiters to prevent parser differential security vulnerabilities
+        assert_eq!(validate_mac_address(b"00:11:22-33:44:55"), Err(ValidationError::InvalidChars));
+
+        // Reject invalid delimiters
+        assert_eq!(validate_mac_address(b"00.11.22.33.44.55"), Err(ValidationError::InvalidChars));
     }
 }
