@@ -21,6 +21,7 @@ pub mod shims;
 pub mod ubuntu_common_drivers;
 pub mod vault;
 pub mod wifi_broadcom_bcm4318;
+pub mod usb_xhci_host;
 
 pub use grid::{GridSlotType, PeripheralArchiveGrid};
 pub use driver_test_framework::{
@@ -42,6 +43,9 @@ pub use nvme_storage::{
 };
 pub use wifi_broadcom_bcm4318::{
     BroadcomWifiDriver, BroadcomWifiPciDriver, WifiStandard, Band, AssociationState,
+};
+pub use usb_xhci_host::{
+    UsbXhciHostDriver, UsbXhciPciDriver, UsbDevice, UsbEndpoint, UsbSpeed, UsbDeviceClass,
 };
 pub use pci_bus::{
     PciAddress, PciBarInfo, PciBarType, PciBusManager, PciDeviceNode, PciDriverMatchRule,

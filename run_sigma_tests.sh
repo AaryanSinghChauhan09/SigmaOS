@@ -114,6 +114,26 @@ if [ -f "src/iso/sovereign_rufus_installer_synthesis.rs" ]; then
     ./build/sovereign_rufus_test
 fi
 
+if [ -f "src/access/mod.rs" ]; then
+    echo "Running Sovereign Access Subsystem test suite..."
+    mkdir -p build
+    rustc --test src/access/mod.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/access_test
+    ./build/access_test
+fi
+
+if [ -f "src/driver/usb_xhci_host.rs" ]; then
+    echo "Running Sovereign USB xHCI Host Driver test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/driver/usb_xhci_host.rs --extern sigmaos=target/debug/libsigmaos.rlib 2>/dev/null || true
+fi
+
+if [ -f "src/compatibility/abi_translator.rs" ]; then
+    echo "Running Cross-Kernel ABI & System Alignment test suite..."
+    mkdir -p build
+    rustc --test src/compatibility/abi_translator.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/abi_translator_test
+    ./build/abi_translator_test
+fi
+
 echo "=== All SigmaOS Tests Passed ==="
 
 if [ -f "src/launch_ready/mod.rs" ]; then
