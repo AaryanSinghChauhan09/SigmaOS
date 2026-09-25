@@ -18,8 +18,8 @@ pub struct PciDeviceInfo {
 #[cfg(test)]
 pub trait PciDriver {
     fn name(&self) -> &'static str;
-    fn probe(&mut self, dev: &PciDeviceInfo) -> bool;
-    fn remove(&mut self, dev: &PciDeviceInfo);
+    fn probe(&mut self, dev: &PciDeviceInfo) -> Result<bool, &'static str>;
+    fn remove(&mut self, dev: &PciDeviceInfo) -> Result<(), &'static str>;
 }
 
 // ============================================================================
@@ -237,21 +237,22 @@ impl PciDriver for NvidiaGpuPciDriver {
         "nouveau-nvk-nvidia-gpu"
     }
 
-    fn probe(&mut self, dev: &PciDeviceInfo) -> bool {
+    fn probe(&mut self, dev: &PciDeviceInfo) -> Result<bool, &'static str> {
         if dev.vendor_id == NVIDIA_VENDOR_ID {
             let _ = self.inner.boot_gsp_firmware();
             let _ = self.inner.allocate_fifo_channel(0, 4096);
             self.inner.is_initialized = true;
-            true
+            Ok(true)
         } else {
-            false
+            Ok(false)
         }
     }
 
-    fn remove(&mut self, _dev: &PciDeviceInfo) {
+    fn remove(&mut self, _dev: &PciDeviceInfo) -> Result<(), &'static str> {
         self.inner.is_initialized = false;
         self.inner.active_channels.clear();
         self.inner.gem_buffers.clear();
+        Ok(())
     }
 }
 
@@ -292,11 +293,11 @@ mod tests {
             device_id: AMPERE_RTX_3080,
         };
 
-        assert!(pci_drv.probe(&dev));
+        assert_eq!(pci_drv.probe(&dev), Ok(true));
         assert!(pci_drv.inner.is_initialized);
         assert_eq!(pci_drv.inner.gsp_state, GspFirmwareState::Ready);
 
-        pci_drv.remove(&dev);
+        assert!(pci_drv.remove(&dev).is_ok());
         assert!(!pci_drv.inner.is_initialized);
     }
 }

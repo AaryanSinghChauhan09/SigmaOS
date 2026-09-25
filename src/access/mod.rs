@@ -589,10 +589,6 @@ pub struct FiftyPercentRuleEngine {
 }
 
 impl FiftyPercentRuleEngine {
-    pub fn new_with_params(total_ram_mb: u64, total_cpu_shares: u32) -> Self {
-        Self::new(total_ram_mb, total_cpu_shares)
-    }
-
     pub fn new(total_ram_mb: u64, total_cpu_shares: u32) -> Self {
         Self::new_with_params(total_ram_mb, total_cpu_shares)
     }
@@ -703,55 +699,11 @@ impl FiftyPercentRuleEngine {
     }
 }
 
-impl Default for FiftyPercentGovernanceEngine {
+pub type FiftyPercentGovernanceEngine = FiftyPercentRuleEngine;
+
+impl Default for FiftyPercentRuleEngine {
     fn default() -> Self {
         Self::new(16384, 1024)
-    }
-}
-
-// ============================================================================
-// 8. Anonymous Access Policy
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct AnonymousAccessPolicy {
-    pub allow_guest_login: bool,
-    pub restricted_paths: Vec<String>,
-    pub max_anonymous_sessions: usize,
-    pub active_anonymous_sessions: usize,
-}
-
-impl AnonymousAccessPolicy {
-    pub fn new() -> Self {
-        Self {
-            allow_guest_login: true,
-            restricted_paths: std::vec![
-                "/etc/shadow".to_string(),
-                "/root".to_string(),
-                "/sys/kernel/security".to_string()
-            ],
-            max_anonymous_sessions: 5,
-            active_anonymous_sessions: 0,
-        }
-    }
-
-    pub fn create_guest_session(&mut self) -> AccessResult<SecurityAccessToken> {
-        if !self.allow_guest_login {
-            return Err(AccessManagerError::PermissionDenied);
-        }
-        if self.active_anonymous_sessions >= self.max_anonymous_sessions {
-            return Err(AccessManagerError::PermissionDenied);
-        }
-        self.active_anonymous_sessions += 1;
-        let token_id = 9000 + (self.active_anonymous_sessions as u64);
-        Ok(SecurityAccessToken::anonymous(token_id))
-    }
-
-    pub fn validate_path_access(&self, token: &SecurityAccessToken, path: &str) -> bool {
-        if !token.is_anonymous {
-            return true;
-        }
-        !self.restricted_paths.iter().any(|p| path.starts_with(p))
     }
 }
 
