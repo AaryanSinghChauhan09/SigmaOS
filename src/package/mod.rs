@@ -55,6 +55,8 @@ pub mod sovereign_package_smp_engine;
 pub use sovereign_package_smp_engine::*;
 pub mod sovereign_distro_package_advancements_v4;
 pub use sovereign_distro_package_advancements_v4::*;
+pub mod sovereign_distro_package_advancements_v5;
+pub use sovereign_distro_package_advancements_v5::*;
 
 pub use alpine_apk::{ApkPackage, ApkPackageManager, ApkRepository, ApkWorld};
 pub use arch_aur::{AURPackage, BuildError, SigmaAUR, PKGBUILD};

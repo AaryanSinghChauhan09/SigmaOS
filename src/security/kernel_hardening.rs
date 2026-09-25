@@ -705,17 +705,21 @@ mod tests_tss {
     fn test_sovereign_ring3_user_mode_tss_engine() {
         let mut engine = SovereignRing3UserModeTssEngine::new(0xFFFF_8000_0010_0000, 0xFFFF_8000_0020_0000);
 
-        assert_eq!(engine.tss.rsp0, 0xFFFF_8000_0010_0000);
-        assert_eq!(engine.tss.ist1, 0xFFFF_8000_0020_0000);
+        let rsp0 = engine.tss.rsp0;
+        let ist1 = engine.tss.ist1;
+        assert_eq!(rsp0, 0xFFFF_8000_0010_0000);
+        assert_eq!(ist1, 0xFFFF_8000_0020_0000);
         assert_eq!(engine.current_ring, PrivilegeRing::Ring0Kernel);
 
         // Test updating rsp0
         engine.set_kernel_stack_rsp0(0xFFFF_8000_0010_8000);
-        assert_eq!(engine.tss.rsp0, 0xFFFF_8000_0010_8000);
+        let rsp0_new = engine.tss.rsp0;
+        assert_eq!(rsp0_new, 0xFFFF_8000_0010_8000);
 
         // Test IST configuration
         assert!(engine.set_interrupt_stack_table(2, 0xFFFF_8000_0030_0000).is_ok());
-        assert_eq!(engine.tss.ist2, 0xFFFF_8000_0030_0000);
+        let ist2_new = engine.tss.ist2;
+        assert_eq!(ist2_new, 0xFFFF_8000_0030_0000);
 
         // Test Ring 3 transition preparation
         let (user_cs, user_ds, user_rip, user_rsp) = engine
