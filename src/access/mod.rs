@@ -561,7 +561,7 @@ pub enum FiftyPercentResourceCategory {
     ProcessMigrationBatch,   // Migrate up to 50% of runnable threads per NUMA balance tick
 }
 
-/// Linux & BSD Fifty Percent (50%) Rule Governance Engine
+/// Extended struct for 50% rule governance
 #[derive(Debug, Clone)]
 pub struct FiftyPercentRuleEngine {
     pub max_ram_usage_pct: u32,       // Default 50%
@@ -576,7 +576,7 @@ pub struct FiftyPercentRuleEngine {
     pub rule_enforcements_count: u64,
 }
 
-impl FiftyPercentRuleEngine {
+impl FiftyPercentGovernanceEngine {
     pub fn new(total_ram_mb: u64, total_cpu_shares: u32) -> Self {
         Self {
             max_ram_usage_pct: 50,
@@ -691,7 +691,7 @@ impl FiftyPercentRuleEngine {
     }
 }
 
-impl Default for FiftyPercentRuleEngine {
+impl Default for FiftyPercentGovernanceEngine {
     fn default() -> Self {
         Self::new()
     }
