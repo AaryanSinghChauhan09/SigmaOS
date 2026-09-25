@@ -16,7 +16,7 @@ mod tests {
     fn test_false_returns_one() {
         let result = Command::new("rustc")
             .arg("--edition=2021")
-            .arg("src/userland/coreutils/false.rs")
+            .arg("src/userland/coreutils/false_module.rs")
             .arg("-o")
             .arg("/tmp/sigma-false")
             .output();
