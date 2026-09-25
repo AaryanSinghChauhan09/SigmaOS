@@ -51,6 +51,12 @@ pub enum PullRequestPackageFormat {
     SlackwareTxz,
     ClearBundle,
     IllumosP5p,
+    SwupdBundle,
+    StarlingPackage,
+    MacOsHomebrewBottle,
+    IosIpaBundle,
+    AndroidAabPackage,
+    HarmonyHapModule,
 }
 
 impl PullRequestPackageFormat {
@@ -92,6 +98,12 @@ impl PullRequestPackageFormat {
             Self::SlackwareTxz => "Slackware TXZ Package",
             Self::ClearBundle => "Clear Linux Swupd Bundle",
             Self::IllumosP5p => "Illumos/Solaris IPS p5p Package",
+            Self::SwupdBundle => "Clear Linux Swupd Bundle",
+            Self::StarlingPackage => "Starling Package Format",
+            Self::MacOsHomebrewBottle => "macOS Homebrew Bottle",
+            Self::IosIpaBundle => "iOS IPA Application Bundle",
+            Self::AndroidAabPackage => "Android App Bundle / APK",
+            Self::HarmonyHapModule => "OpenHarmony HAP Module",
         }
     }
 }

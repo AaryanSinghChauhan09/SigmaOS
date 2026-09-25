@@ -7,6 +7,8 @@ pub mod framework;
 pub mod gpu_framework;
 pub mod gpu_intel_i915;
 pub mod gpu_amd_rdna;
+pub mod gpu_nvidia_nouveau;
+pub mod gpu_drm_subsystem;
 pub mod grid;
 pub mod irp_system;
 pub mod mapper;
@@ -32,6 +34,16 @@ pub use gpu_intel_i915::{
 };
 pub use gpu_amd_rdna::{
     AmdGpuDriver, AmdGpuPciDriver, AmdGpuMemoryManager, DisplayConfiguration, GpxCommandQueue,
+};
+pub use gpu_nvidia_nouveau::{
+    NvidiaGpuDriver, NvidiaGpuPciDriver, NvidiaArchitecture, GspFirmwareState, FifoChannel,
+    NvidiaVramBuffer, NvidiaDisplayMode, NVIDIA_VENDOR_ID,
+};
+pub use gpu_drm_subsystem::{
+    DrmKmsSubsystemEngine, DrmNodeType, GemBufferObject, CrtcPipeline, DrmConnector,
+    AtomicKmsCommitState, AtomicProperty, DRM_IOCTL_VERSION, DRM_IOCTL_MODE_GETRESOURCES,
+    DRM_IOCTL_MODE_CREATE_DUMB, DRM_IOCTL_MODE_MAP_DUMB, DRM_IOCTL_MODE_DESTROY_DUMB,
+    DRM_IOCTL_MODE_ATOMIC_COMMIT, DRM_IOCTL_GEM_CLOSE,
 };
 pub use mapper::{DriverMapper, MapperCategory};
 pub use nic_intel_e1000::{
