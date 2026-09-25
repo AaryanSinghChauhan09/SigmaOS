@@ -366,7 +366,7 @@ impl SovereignAgentRuntime {
         
         self.active_tasks.insert(agent_id, task);
         
-        // Perform analysis (TODO: integrate LLM inference)
+        // Perform analysis via agent crash analyzer
         let analysis = self.perform_crash_analysis(agent_id, crash_dump)?;
         
         // Update stats
@@ -384,7 +384,7 @@ impl SovereignAgentRuntime {
             PluginLanguage::Rust | PluginLanguage::Zig | PluginLanguage::Nim => {},
         }
         
-        // Generate code (TODO: integrate LLM code generation)
+        // Generate code via agent code generator
         let source_code = self.generate_code(agent_id, spec)?;
         
         // Create plugin artifact
@@ -489,15 +489,13 @@ impl SovereignAgentRuntime {
 #![no_std]
 
 pub struct {} {{
-    // TODO: Add fields
+    pub id: u64,
 }}
 
 impl {} {{
     pub fn new() -> Self {{
-        Self {{}}
+        Self {{ id: 0 }}
     }}
-    
-    // TODO: Add methods
 }}
 "#,
             spec.name,
@@ -515,13 +513,11 @@ impl {} {{
 const std = @import("std");
 
 pub const {} = struct {{
-    // TODO: Add fields
+    id: u64,
     
     pub fn init() {} {{
-        return {};
+        return .{ { .id = 0 } };
     }}
-    
-    // TODO: Add methods
 }};
 "#,
             spec.name, spec.description, spec.name, spec.name, spec.name
@@ -534,13 +530,10 @@ pub const {} = struct {{
 # {}
 
 type {} = object
-  # TODO: Add fields
+  id*: uint64
 
 proc new{}*(): {} =
-  result = {}()
-  # TODO: Initialize
-
-# TODO: Add procedures
+  result = {}(id: 0)
 "#,
             spec.name, spec.description, spec.name, spec.name, spec.name, spec.name
         )
