@@ -21,6 +21,12 @@ pub use control::{
 pub use control::*;
 pub use append_rights::*;
 
+pub mod sovereign_access_operations_suite;
+pub use sovereign_access_operations_suite::*;
+
+pub mod sovereign_access_matrix_expansion;
+pub use sovereign_access_matrix_expansion::*;
+
 use std::string::{String, ToString};
 use std::vec::Vec;
 use core::fmt;

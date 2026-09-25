@@ -343,3 +343,9 @@ pub mod tech_media_distro_innovations;
 pub use tech_media_distro_innovations::*;
 pub mod tech_media_extended_innovations;
 pub use tech_media_extended_innovations::*;
+
+pub mod sovereign_linux_bsd_master_synthesis;
+pub use sovereign_linux_bsd_master_synthesis::*;
+
+pub mod sovereign_open_source_distro_synthesis;
+pub use sovereign_open_source_distro_synthesis::*;

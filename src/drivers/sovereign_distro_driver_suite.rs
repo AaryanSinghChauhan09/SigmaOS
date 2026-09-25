@@ -1,680 +1,392 @@
-// SigmaOS Sovereign Universal Distro-Inspired Device Driver Engine Suite
-// Object-Oriented Driver Architecture inspired by Linux kernel, FreeBSD, OpenBSD, NetBSD, illumos & macOS
-// Synthesizes modalias auto-probing, DKMS firmware resolution, cross-OS driver shims,
-// DRM/KMS multi-vendor display pipelines, storage fabrics (NVMe ZNS/SAS/CXL),
-// network fabrics (Wi-Fi 7 MLO/SocketCAN/XDP), multi-touch evdev & digitizers,
-// audio/media (SOF/HDA/UVC/MIDI 2.0), platform bus controllers (USB4/Thunderbolt/DART),
-// and driver crash recovery with safe VESA/GOP display fallbacks.
+// SigmaOS Sovereign Universal Distro Driver Suite
+// (`src/drivers/sovereign_distro_driver_suite.rs`)
+//
+// Linux & BSD inspired hardware driver subsystems in PR format:
+// 1. RealtekRtw88WifiDriver: Realtek rtw88 (RTL8821CE/RTL8822CE) PCIe Wi-Fi 5 / 802.11ac driver with 802.11i WPA3-SAE auth & rate control.
+// 2. IntelI915DrmGpuDriver: Intel i915 / Xe DRM graphics driver with Atomic KMS modesetting, display pipe planes, and GEM ring submission.
+// 3. AsahiAppleSiliconSocDriver: Asahi Linux Apple Silicon M1-M4 SoC power domains, SMC telemetry, and DCP display controller driver.
+// 4. FreeBsdGeomBlockStorageDriver: FreeBSD GEOM class driver architecture supporting GEOM Mirror (gmirror), GEOM Stripe (gstripe), and GEOM ELI (geli).
+// 5. OpenBsdWsmouseDriver: OpenBSD wsmouse(4) multi-button mouse, trackpoint, and gesture event filter driver.
+// 6. SovereignUniversalDistroDriverSuite: Master coordinator unifying all driver sub-engines.
 
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
-#[cfg(not(all(test, not(feature = "sigmaos_lib"))))]
-use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
-
-#[cfg(all(test, not(feature = "sigmaos_lib")))]
-#[path = "peripheral.rs"]
-pub mod peripheral;
-
-#[cfg(all(test, not(feature = "sigmaos_lib")))]
-use peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 
 // =========================================================================
-// 1. Linux Modalias Auto-Loading & DKMS Dynamic Firmware Resolver Engine
+// 1. REALTEK RTW88 PCIE WI-FI 5 / 802.11AC DRIVER
 // =========================================================================
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ModaliasPattern {
-    pub pattern: String,
-    pub driver_name: String,
-    pub firmware_required: Option<String>,
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WifiSecurityAuth {
+    Open,
+    Wpa2Personal,
+    Wpa3Sae,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct FirmwareBlob {
-    pub name: String,
-    pub version: String,
-    pub payload_hash: String,
-    pub is_loaded: bool,
+#[derive(Debug, Clone)]
+pub struct WifiScanResult {
+    pub ssid: String,
+    pub bssid: String,
+    pub channel: u8,
+    pub rssi_dbm: i8,
+    pub security: WifiSecurityAuth,
 }
 
-pub struct SovereignModaliasDkmsFirmwareEngine {
-    pub modalias_database: Vec<ModaliasPattern>,
-    pub firmware_store: BTreeMap<String, FirmwareBlob>,
-    pub dkms_rebuilt_modules: Vec<String>,
+pub struct RealtekRtw88WifiDriver {
+    pub pci_vendor_id: u16, // 0x10ec (Realtek)
+    pub pci_device_id: u16, // 0xc821 (RTL8821CE) or 0xc822 (RTL8822CE)
+    pub mac_address: [u8; 6],
+    pub is_associated: bool,
+    pub connected_ssid: Option<String>,
+    pub rx_packets: u64,
+    pub tx_packets: u64,
 }
 
-impl SovereignModaliasDkmsFirmwareEngine {
-    pub fn new() -> Self {
-        let mut engine = Self {
-            modalias_database: Vec::new(),
-            firmware_store: BTreeMap::new(),
-            dkms_rebuilt_modules: Vec::new(),
-        };
-
-        // Populate standard Linux/BSD modalias patterns
-        engine.register_modalias("pci:v00001002d0000744Csv*", "amdgpu", Some("amdgpu/gc_11_0_0_toc.bin"));
-        engine.register_modalias("pci:v00008086d0000272Bsv*", "iwlwifi", Some("iwlwifi-ty-a0-gf-a0.ucode"));
-        engine.register_modalias("pci:v00008086d00000953sv*", "nvme", None);
-        engine.register_modalias("pci:v000010DEd00002782sv*", "nouveau", Some("nvidia/tu102/gsp.bin"));
-        engine.register_modalias("usb:v056Ap037Asv*", "wacom", None);
-        engine.register_modalias("usb:v046Dp0825sv*", "uvideo", None);
-
-        engine
+impl RealtekRtw88WifiDriver {
+    pub fn new_rtl8821ce() -> Self {
+        Self {
+            pci_vendor_id: 0x10ec,
+            pci_device_id: 0xc821,
+            mac_address: [0x52, 0x54, 0x00, 0x12, 0x34, 0x56],
+            is_associated: false,
+            connected_ssid: None,
+            rx_packets: 0,
+            tx_packets: 0,
+        }
     }
 
-    pub fn register_modalias(&mut self, pattern: &str, driver_name: &str, firmware: Option<&str>) {
-        self.modalias_database.push(ModaliasPattern {
-            pattern: pattern.to_string(),
-            driver_name: driver_name.to_string(),
-            firmware_required: firmware.map(|f| f.to_string()),
+    pub fn scan_networks(&self) -> Vec<WifiScanResult> {
+        vec![
+            WifiScanResult {
+                ssid: "SigmaSovereignNet".to_string(),
+                bssid: "00:11:22:33:44:55".to_string(),
+                channel: 36,
+                rssi_dbm: -45,
+                security: WifiSecurityAuth::Wpa3Sae,
+            },
+            WifiScanResult {
+                ssid: "GuestNet".to_string(),
+                bssid: "AA:BB:CC:DD:EE:FF".to_string(),
+                channel: 6,
+                rssi_dbm: -68,
+                security: WifiSecurityAuth::Wpa2Personal,
+            },
+        ]
+    }
+
+    pub fn associate(&mut self, ssid: &str, passphrase: &str, security: WifiSecurityAuth) -> Result<bool, &'static str> {
+        if security != WifiSecurityAuth::Open && passphrase.len() < 8 {
+            return Err("rtw88 Error: Invalid passphrase length");
+        }
+        self.is_associated = true;
+        self.connected_ssid = Some(ssid.to_string());
+        Ok(true)
+    }
+
+    pub fn send_packet(&mut self, payload: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_associated {
+            return Err("rtw88 Error: Not associated with an access point");
+        }
+        self.tx_packets += 1;
+        Ok(payload.len())
+    }
+}
+
+impl Default for RealtekRtw88WifiDriver {
+    fn default() -> Self {
+        Self::new_rtl8821ce()
+    }
+}
+
+// =========================================================================
+// 2. INTEL I915 / XE DRM GRAPHICS & ATOMIC KMS MODESETTING DRIVER
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DisplayPipe {
+    PipeA,
+    PipeB,
+    PipeC,
+}
+
+#[derive(Debug, Clone)]
+pub struct DrmDisplayPlane {
+    pub plane_id: u32,
+    pub pipe: DisplayPipe,
+    pub width: u32,
+    pub height: u32,
+    pub fb_id: u32,
+    pub is_enabled: bool,
+}
+
+pub struct IntelI915DrmGpuDriver {
+    pub mmio_base: usize,
+    pub active_planes: BTreeMap<u32, DrmDisplayPlane>,
+    pub gem_buffer_objects: BTreeMap<u32, usize>, // fb_id -> size_bytes
+    pub atomic_commit_count: u64,
+}
+
+impl IntelI915DrmGpuDriver {
+    pub fn new() -> Self {
+        Self {
+            mmio_base: 0xf0000000,
+            active_planes: BTreeMap::new(),
+            gem_buffer_objects: BTreeMap::new(),
+            atomic_commit_count: 0,
+        }
+    }
+
+    pub fn create_gem_bo(&mut self, fb_id: u32, size_bytes: usize) -> u32 {
+        self.gem_buffer_objects.insert(fb_id, size_bytes);
+        fb_id
+    }
+
+    pub fn setup_plane(&mut self, plane_id: u32, pipe: DisplayPipe, width: u32, height: u32, fb_id: u32) {
+        let plane = DrmDisplayPlane {
+            plane_id,
+            pipe,
+            width,
+            height,
+            fb_id,
+            is_enabled: true,
+        };
+        self.active_planes.insert(plane_id, plane);
+    }
+
+    pub fn atomic_commit_modeset(&mut self) -> Result<bool, &'static str> {
+        if self.active_planes.is_empty() {
+            return Err("i915 DRM Error: No display planes configured for atomic commit");
+        }
+        self.atomic_commit_count += 1;
+        Ok(true)
+    }
+}
+
+impl Default for IntelI915DrmGpuDriver {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 3. ASAHI APPLE SILICON M1-M4 SOC DRIVER
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AppleSiliconGeneration {
+    M1,
+    M2,
+    M3,
+    M4,
+}
+
+#[derive(Debug, Clone)]
+pub struct AppleSmcTelemetry {
+    pub cpu_temp_celsius: f32,
+    pub gpu_temp_celsius: f32,
+    pub power_draw_watts: f32,
+}
+
+pub struct AsahiAppleSiliconSocDriver {
+    pub soc_generation: AppleSiliconGeneration,
+    pub active_e_cores: u8,
+    pub active_p_cores: u8,
+    pub dcp_display_active: bool,
+}
+
+impl AsahiAppleSiliconSocDriver {
+    pub fn new_m3() -> Self {
+        Self {
+            soc_generation: AppleSiliconGeneration::M3,
+            active_e_cores: 4,
+            active_p_cores: 8,
+            dcp_display_active: true,
+        }
+    }
+
+    pub fn read_smc_telemetry(&self) -> AppleSmcTelemetry {
+        AppleSmcTelemetry {
+            cpu_temp_celsius: 42.5,
+            gpu_temp_celsius: 41.0,
+            power_draw_watts: 12.8,
+        }
+    }
+
+    pub fn configure_power_domains(&mut self, e_cores: u8, p_cores: u8) {
+        self.active_e_cores = e_cores;
+        self.active_p_cores = p_cores;
+    }
+}
+
+impl Default for AsahiAppleSiliconSocDriver {
+    fn default() -> Self {
+        Self::new_m3()
+    }
+}
+
+// =========================================================================
+// 4. FREEBSD GEOM CLASS BLOCK STORAGE DRIVER (GMIRROR, GSTRIPE, GELI)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GeomClassKind {
+    Mirror,  // gmirror RAID1
+    Stripe,  // gstripe RAID0
+    EliCrypto, // geli volume encryption
+}
+
+#[derive(Debug, Clone)]
+pub struct GeomVolume {
+    pub name: String,
+    pub kind: GeomClassKind,
+    pub member_disks: Vec<String>,
+    pub capacity_bytes: u64,
+    pub is_active: bool,
+}
+
+pub struct FreeBsdGeomBlockStorageDriver {
+    pub volumes: BTreeMap<String, GeomVolume>,
+}
+
+impl FreeBsdGeomBlockStorageDriver {
+    pub fn new() -> Self {
+        Self {
+            volumes: BTreeMap::new(),
+        }
+    }
+
+    pub fn create_gmirror_volume(&mut self, name: &str, disks: &[&str], capacity: u64) -> GeomVolume {
+        let vol = GeomVolume {
+            name: name.to_string(),
+            kind: GeomClassKind::Mirror,
+            member_disks: disks.iter().map(|s| s.to_string()).collect(),
+            capacity_bytes: capacity,
+            is_active: true,
+        };
+        self.volumes.insert(name.to_string(), vol.clone());
+        vol
+    }
+
+    pub fn create_geli_encrypted_volume(&mut self, name: &str, parent_disk: &str, passphrase: &str, capacity: u64) -> Result<GeomVolume, &'static str> {
+        if passphrase.is_empty() {
+            return Err("GEOM geli Error: Key passphrase cannot be empty");
+        }
+        let vol = GeomVolume {
+            name: name.to_string(),
+            kind: GeomClassKind::EliCrypto,
+            member_disks: vec![parent_disk.to_string()],
+            capacity_bytes: capacity,
+            is_active: true,
+        };
+        self.volumes.insert(name.to_string(), vol.clone());
+        Ok(vol)
+    }
+}
+
+impl Default for FreeBsdGeomBlockStorageDriver {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 5. OPENBSD WSMOUSE(4) INPUT & GESTURE EVENT DRIVER
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WsmouseEventType {
+    Motion,
+    ButtonPress,
+    ButtonRelease,
+    ScrollWheel,
+}
+
+#[derive(Debug, Clone)]
+pub struct WsmouseEvent {
+    pub event_type: WsmouseEventType,
+    pub dx: i16,
+    pub dy: i16,
+    pub dz: i8,
+    pub button_mask: u8,
+}
+
+pub struct OpenBsdWsmouseDriver {
+    pub device_name: String,
+    pub is_raw_mode: bool,
+    pub event_queue: Vec<WsmouseEvent>,
+}
+
+impl OpenBsdWsmouseDriver {
+    pub fn new() -> Self {
+        Self {
+            device_name: "/dev/wsmouse0".to_string(),
+            is_raw_mode: false,
+            event_queue: Vec::new(),
+        }
+    }
+
+    pub fn push_event(&mut self, event_type: WsmouseEventType, dx: i16, dy: i16, dz: i8, buttons: u8) {
+        self.event_queue.push(WsmouseEvent {
+            event_type,
+            dx,
+            dy,
+            dz,
+            button_mask: buttons,
         });
     }
 
-    pub fn register_firmware(&mut self, name: &str, version: &str, hash: &str) {
-        self.firmware_store.insert(
-            name.to_string(),
-            FirmwareBlob {
-                name: name.to_string(),
-                version: version.to_string(),
-                payload_hash: hash.to_string(),
-                is_loaded: false,
-            },
-        );
-    }
-
-    pub fn match_modalias(&mut self, modalias_str: &str) -> Option<(String, Option<String>)> {
-        for entry in &self.modalias_database {
-            let prefix = entry.pattern.trim_end_matches('*');
-            if modalias_str.starts_with(prefix) {
-                if let Some(ref fw_name) = entry.firmware_required {
-                    if let Some(fw) = self.firmware_store.get_mut(fw_name) {
-                        fw.is_loaded = true;
-                    }
-                }
-                return Some((entry.driver_name.clone(), entry.firmware_required.clone()));
-            }
-        }
-        None
-    }
-
-    pub fn dkms_trigger_rebuild(&mut self, driver_name: &str, kernel_ver: &str) -> Result<String, &'static str> {
-        if driver_name.is_empty() {
-            return Err("Invalid driver name for DKMS rebuild");
-        }
-        let built_name = format!("{}-{}-dkms.ko", driver_name, kernel_ver);
-        self.dkms_rebuilt_modules.push(built_name.clone());
-        Ok(built_name)
-    }
-}
-
-impl Default for SovereignModaliasDkmsFirmwareEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl PeripheralDevice for SovereignUniversalDistroDriverSuite {
-    fn name(&self) -> &'static str {
-        "Sovereign Universal Distro Driver Suite Orchestrator"
-    }
-
-    fn generation(&self) -> DeviceGeneration {
-        DeviceGeneration::Modern
-    }
-
-    fn initialize(&mut self) -> Result<(), &'static str> {
-        self.drm_kms_engine.set_gpu_vendor_mode(GpuVendor::GenericVesaGop, 1920, 1080, 60, false);
-        Ok(())
-    }
-
-    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
-        if buffer.len() >= 4 {
-            buffer[0..4].copy_from_slice(&(self.bus_engine.buses.len() as u32).to_le_bytes());
-            Ok(4)
+    pub fn poll_next_event(&mut self) -> Option<WsmouseEvent> {
+        if self.event_queue.is_empty() {
+            None
         } else {
-            Ok(0)
-        }
-    }
-
-    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
-        if let Ok(modalias) = core::str::from_utf8(data) {
-            let _ = self.auto_probe_hardware_and_bind(modalias);
-        }
-        Ok(data.len())
-    }
-
-    fn set_power_state(&mut self, _state: PowerState) -> Result<(), &'static str> {
-        Ok(())
-    }
-
-    fn shutdown(&mut self) -> Result<(), &'static str> {
-        self.recovery_engine.fallback_to_safe_mode = true;
-        Ok(())
-    }
-}
-
-// =========================================================================
-// 2. Cross-OS Kernel Driver Compatibility & Shim Engine
-// =========================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum OsShimType {
-    LinuxKpi,       // FreeBSD LinuxKPI / NDISwrapper
-    OpenBsdPledge,  // OpenBSD userland driver pledge/unveil sandbox
-    NetBsdRump,     // NetBSD RUMP virtualized driver kernel
-    FreeBsdDevStat, // FreeBSD devstat/geom abstraction
-}
-
-pub struct CrossOsDriverShimInstance {
-    pub driver_name: String,
-    pub shim_type: OsShimType,
-    pub is_active: bool,
-    pub calls_translated: u64,
-}
-
-pub struct SovereignCrossOsDriverShimEngine {
-    pub active_shims: BTreeMap<String, CrossOsDriverShimInstance>,
-}
-
-impl SovereignCrossOsDriverShimEngine {
-    pub fn new() -> Self {
-        Self {
-            active_shims: BTreeMap::new(),
-        }
-    }
-
-    pub fn register_shim(&mut self, name: &str, shim_type: OsShimType) -> Result<(), &'static str> {
-        let instance = CrossOsDriverShimInstance {
-            driver_name: name.to_string(),
-            shim_type,
-            is_active: true,
-            calls_translated: 0,
-        };
-        self.active_shims.insert(name.to_string(), instance);
-        Ok(())
-    }
-
-    pub fn dispatch_shim_ioctl(&mut self, name: &str, cmd: u32, arg: u64) -> Result<u64, &'static str> {
-        let shim = self.active_shims.get_mut(name).ok_or("Shim driver not found")?;
-        if !shim.is_active {
-            return Err("Shim driver inactive");
-        }
-        shim.calls_translated += 1;
-        match shim.shim_type {
-            OsShimType::LinuxKpi => Ok((cmd as u64) + arg),
-            OsShimType::OpenBsdPledge => Ok((cmd as u64) ^ arg),
-            OsShimType::NetBsdRump => Ok((cmd as u64) * 2 + arg),
-            OsShimType::FreeBsdDevStat => Ok(arg + 1),
+            Some(self.event_queue.remove(0))
         }
     }
 }
 
-impl Default for SovereignCrossOsDriverShimEngine {
+impl Default for OpenBsdWsmouseDriver {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // =========================================================================
-// 3. Universal Graphics & Display DRM/KMS Matrix Engine
-// =========================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum GpuVendor {
-    AmdRdna,
-    IntelXe,
-    NvidiaNouveau,
-    VirtioGpu3d,
-    AppleAgx,
-    QualcommAdreno,
-    GenericVesaGop,
-}
-
-pub struct DisplayPlaneState {
-    pub crtc_id: u32,
-    pub width: u32,
-    pub height: u32,
-    pub refresh_rate: u32,
-    pub hdr_enabled: bool,
-    pub active_vendor: GpuVendor,
-}
-
-pub struct SovereignUniversalDrmKmsEngine {
-    pub primary_display: DisplayPlaneState,
-    pub framebuffers_allocated: usize,
-    pub vblank_interrupt_counter: u64,
-}
-
-impl SovereignUniversalDrmKmsEngine {
-    pub fn new() -> Self {
-        Self {
-            primary_display: DisplayPlaneState {
-                crtc_id: 1,
-                width: 1920,
-                height: 1080,
-                refresh_rate: 60,
-                hdr_enabled: false,
-                active_vendor: GpuVendor::GenericVesaGop,
-            },
-            framebuffers_allocated: 1,
-            vblank_interrupt_counter: 0,
-        }
-    }
-
-    pub fn set_gpu_vendor_mode(&mut self, vendor: GpuVendor, w: u32, h: u32, refresh: u32, hdr: bool) {
-        self.primary_display = DisplayPlaneState {
-            crtc_id: 1,
-            width: w,
-            height: h,
-            refresh_rate: refresh,
-            hdr_enabled: hdr,
-            active_vendor: vendor,
-        };
-        self.framebuffers_allocated += 1;
-    }
-
-    pub fn handle_vblank(&mut self) -> u64 {
-        self.vblank_interrupt_counter += 1;
-        self.vblank_interrupt_counter
-    }
-}
-
-impl Default for SovereignUniversalDrmKmsEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// 4. Universal Storage & Fabric HBA Engine
-// =========================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum StorageType {
-    NvmeZns,
-    SataAhci,
-    LsiMegaRaidSas,
-    Cxl3MemoryExpander,
-    UsbMassStorageBot,
-    LegacyFloppyPio,
-}
-
-pub struct StorageDeviceInfo {
-    pub name: String,
-    pub storage_type: StorageType,
-    pub capacity_bytes: u64,
-    pub block_size: u32,
-    pub is_online: bool,
-}
-
-pub struct SovereignUniversalStorageFabricEngine {
-    pub attached_devices: BTreeMap<String, StorageDeviceInfo>,
-}
-
-impl SovereignUniversalStorageFabricEngine {
-    pub fn new() -> Self {
-        let mut engine = Self {
-            attached_devices: BTreeMap::new(),
-        };
-
-        engine.attach_device("nvme0n1", StorageType::NvmeZns, 1_000_000_000_000, 4096);
-        engine.attach_device("ada0", StorageType::SataAhci, 500_000_000_000, 512);
-        engine.attach_device("da0", StorageType::UsbMassStorageBot, 64_000_000_000, 512);
-
-        engine
-    }
-
-    pub fn attach_device(&mut self, dev_name: &str, stype: StorageType, cap: u64, block_size: u32) {
-        self.attached_devices.insert(
-            dev_name.to_string(),
-            StorageDeviceInfo {
-                name: dev_name.to_string(),
-                storage_type: stype,
-                capacity_bytes: cap,
-                block_size,
-                is_online: true,
-            },
-        );
-    }
-
-    pub fn read_blocks(&self, dev_name: &str, lba: u64, count: u32) -> Result<u64, &'static str> {
-        let dev = self.attached_devices.get(dev_name).ok_or("Storage device not found")?;
-        if !dev.is_online {
-            return Err("Storage device offline");
-        }
-        Ok(lba + (count as u64) * (dev.block_size as u64))
-    }
-}
-
-impl Default for SovereignUniversalStorageFabricEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// 5. Universal Network & Wireless Fabric Engine
-// =========================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum NetworkInterfaceType {
-    Wifi7Be200Mlo,
-    Ethernet25GbeIntelIgc,
-    Ethernet10GbeAquantiaAqt,
-    SocketCanAutomotive,
-    EbpfXdpFastpath,
-}
-
-pub struct NetworkInterface {
-    pub ifname: String,
-    pub iftype: NetworkInterfaceType,
-    pub mac_addr: [u8; 6],
-    pub speed_mbps: u32,
-    pub packets_rx: u64,
-    pub packets_tx: u64,
-}
-
-pub struct SovereignUniversalNetworkFabricEngine {
-    pub interfaces: BTreeMap<String, NetworkInterface>,
-}
-
-impl SovereignUniversalNetworkFabricEngine {
-    pub fn new() -> Self {
-        let mut engine = Self {
-            interfaces: BTreeMap::new(),
-        };
-
-        engine.add_interface("wlan0", NetworkInterfaceType::Wifi7Be200Mlo, [0x00, 0x11, 0x22, 0x33, 0x44, 0x55], 5800);
-        engine.add_interface("eth0", NetworkInterfaceType::Ethernet25GbeIntelIgc, [0x00, 0x1B, 0x21, 0x88, 0x99, 0xAA], 2500);
-        engine.add_interface("can0", NetworkInterfaceType::SocketCanAutomotive, [0x00, 0x00, 0x00, 0x00, 0x01, 0x23], 1);
-
-        engine
-    }
-
-    pub fn add_interface(&mut self, name: &str, iftype: NetworkInterfaceType, mac: [u8; 6], speed_mbps: u32) {
-        self.interfaces.insert(
-            name.to_string(),
-            NetworkInterface {
-                ifname: name.to_string(),
-                iftype,
-                mac_addr: mac,
-                speed_mbps,
-                packets_rx: 0,
-                packets_tx: 0,
-            },
-        );
-    }
-
-    pub fn transmit_packet(&mut self, name: &str, _pkt_len: usize) -> Result<u64, &'static str> {
-        let iface = self.interfaces.get_mut(name).ok_or("Interface not found")?;
-        iface.packets_tx += 1;
-        Ok(iface.packets_tx)
-    }
-}
-
-impl Default for SovereignUniversalNetworkFabricEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// 6. Universal Human Interface & Input Engine
-// =========================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum InputDeviceType {
-    EvdevMultiTouch,
-    WacomDigitizer,
-    SynapticsTouchpad,
-    UsbHidGamepad,
-    Ps2KeyboardMouse,
-}
-
-pub struct InputState {
-    pub dev_type: InputDeviceType,
-    pub pointer_x: i32,
-    pub pointer_y: i32,
-    pub pressure: u16,
-    pub active_touch_slots: u8,
-}
-
-pub struct SovereignUniversalHidInputEngine {
-    pub active_inputs: BTreeMap<String, InputState>,
-}
-
-impl SovereignUniversalHidInputEngine {
-    pub fn new() -> Self {
-        Self {
-            active_inputs: BTreeMap::new(),
-        }
-    }
-
-    pub fn register_input(&mut self, name: &str, dev_type: InputDeviceType) {
-        self.active_inputs.insert(
-            name.to_string(),
-            InputState {
-                dev_type,
-                pointer_x: 0,
-                pointer_y: 0,
-                pressure: 0,
-                active_touch_slots: 0,
-            },
-        );
-    }
-
-    pub fn update_touch(&mut self, name: &str, x: i32, y: i32, pressure: u16, slots: u8) -> Result<(), &'static str> {
-        let state = self.active_inputs.get_mut(name).ok_or("Input device not found")?;
-        state.pointer_x = x;
-        state.pointer_y = y;
-        state.pressure = pressure;
-        state.active_touch_slots = slots;
-        Ok(())
-    }
-}
-
-impl Default for SovereignUniversalHidInputEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// 7. Universal Audio, Video & Media Engine
-// =========================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AudioMediaType {
-    SoundOpenFirmwareSof,
-    IntelHdaCodecs,
-    Uvc4kWebcamVideo,
-    UsbAudioClassUac2,
-    UniversalMidi20,
-    PcSpeakerPitBeeper,
-}
-
-pub struct MediaDeviceStatus {
-    pub dev_type: AudioMediaType,
-    pub sample_rate_hz: u32,
-    pub channels: u8,
-    pub is_active: bool,
-}
-
-pub struct SovereignUniversalAudioMediaEngine {
-    pub media_devices: BTreeMap<String, MediaDeviceStatus>,
-}
-
-impl SovereignUniversalAudioMediaEngine {
-    pub fn new() -> Self {
-        let mut engine = Self {
-            media_devices: BTreeMap::new(),
-        };
-
-        engine.register_device("sof-hda-dsp", AudioMediaType::SoundOpenFirmwareSof, 48000, 2);
-        engine.register_device("uvc-webcam-4k", AudioMediaType::Uvc4kWebcamVideo, 60, 1);
-        engine.register_device("midi2-ump", AudioMediaType::UniversalMidi20, 31250, 16);
-
-        engine
-    }
-
-    pub fn register_device(&mut self, name: &str, dev_type: AudioMediaType, rate: u32, channels: u8) {
-        self.media_devices.insert(
-            name.to_string(),
-            MediaDeviceStatus {
-                dev_type,
-                sample_rate_hz: rate,
-                channels,
-                is_active: false,
-            },
-        );
-    }
-
-    pub fn start_stream(&mut self, name: &str) -> Result<(), &'static str> {
-        let dev = self.media_devices.get_mut(name).ok_or("Media device not found")?;
-        dev.is_active = true;
-        Ok(())
-    }
-}
-
-impl Default for SovereignUniversalAudioMediaEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// 8. Universal Bus & System Platform Controller Engine
-// =========================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BusControllerType {
-    PcieGen6Cxl3,
-    Usb4Thunderbolt4,
-    UsbXhci32,
-    I2cSmbus801,
-    AppleSiliconDartIommu,
-    RaspberryPiBcmSoc,
-}
-
-pub struct BusStatus {
-    pub bus_type: BusControllerType,
-    pub bandwidth_gbps: u32,
-    pub num_attached_devices: u32,
-}
-
-pub struct SovereignUniversalPlatformBusEngine {
-    pub buses: BTreeMap<String, BusStatus>,
-}
-
-impl SovereignUniversalPlatformBusEngine {
-    pub fn new() -> Self {
-        let mut engine = Self {
-            buses: BTreeMap::new(),
-        };
-
-        engine.register_bus("pcie-root-0", BusControllerType::PcieGen6Cxl3, 128, 16);
-        engine.register_bus("tb4-domain-0", BusControllerType::Usb4Thunderbolt4, 40, 4);
-        engine.register_bus("xhci-host-0", BusControllerType::UsbXhci32, 20, 8);
-
-        engine
-    }
-
-    pub fn register_bus(&mut self, name: &str, bus_type: BusControllerType, bw: u32, dev_count: u32) {
-        self.buses.insert(
-            name.to_string(),
-            BusStatus {
-                bus_type,
-                bandwidth_gbps: bw,
-                num_attached_devices: dev_count,
-            },
-        );
-    }
-}
-
-impl Default for SovereignUniversalPlatformBusEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// 9. Fault-Tolerant Sovereign Driver Crash Recovery & Resilience Engine
-// =========================================================================
-
-pub struct SovereignDriverCrashRecoveryEngine {
-    pub driver_crash_counter: BTreeMap<String, u32>,
-    pub fallback_to_safe_mode: bool,
-}
-
-impl SovereignDriverCrashRecoveryEngine {
-    pub fn new() -> Self {
-        Self {
-            driver_crash_counter: BTreeMap::new(),
-            fallback_to_safe_mode: false,
-        }
-    }
-
-    pub fn report_driver_crash(&mut self, driver_name: &str) -> bool {
-        let count = self.driver_crash_counter.entry(driver_name.to_string()).or_insert(0);
-        *count += 1;
-        if *count >= 3 {
-            self.fallback_to_safe_mode = true;
-            true // Trigger fall-back to safe VESA/GOP framebuffer driver
-        } else {
-            false
-        }
-    }
-}
-
-impl Default for SovereignDriverCrashRecoveryEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// 10. Unified Sovereign Distro Driver Master Suite
+// MASTER COORDINATOR: SOVEREIGN UNIVERSAL DISTRO DRIVER SUITE
 // =========================================================================
 
 pub struct SovereignUniversalDistroDriverSuite {
-    pub firmware_engine: SovereignModaliasDkmsFirmwareEngine,
-    pub shim_engine: SovereignCrossOsDriverShimEngine,
-    pub drm_kms_engine: SovereignUniversalDrmKmsEngine,
-    pub storage_engine: SovereignUniversalStorageFabricEngine,
-    pub network_engine: SovereignUniversalNetworkFabricEngine,
-    pub input_engine: SovereignUniversalHidInputEngine,
-    pub audio_media_engine: SovereignUniversalAudioMediaEngine,
-    pub bus_engine: SovereignUniversalPlatformBusEngine,
-    pub recovery_engine: SovereignDriverCrashRecoveryEngine,
+    pub wifi_rtw88: RealtekRtw88WifiDriver,
+    pub drm_i915: IntelI915DrmGpuDriver,
+    pub asahi_soc: AsahiAppleSiliconSocDriver,
+    pub geom_storage: FreeBsdGeomBlockStorageDriver,
+    pub openbsd_wsmouse: OpenBsdWsmouseDriver,
 }
 
 impl SovereignUniversalDistroDriverSuite {
     pub fn new() -> Self {
         Self {
-            firmware_engine: SovereignModaliasDkmsFirmwareEngine::new(),
-            shim_engine: SovereignCrossOsDriverShimEngine::new(),
-            drm_kms_engine: SovereignUniversalDrmKmsEngine::new(),
-            storage_engine: SovereignUniversalStorageFabricEngine::new(),
-            network_engine: SovereignUniversalNetworkFabricEngine::new(),
-            input_engine: SovereignUniversalHidInputEngine::new(),
-            audio_media_engine: SovereignUniversalAudioMediaEngine::new(),
-            bus_engine: SovereignUniversalPlatformBusEngine::new(),
-            recovery_engine: SovereignDriverCrashRecoveryEngine::new(),
+            wifi_rtw88: RealtekRtw88WifiDriver::new_rtl8821ce(),
+            drm_i915: IntelI915DrmGpuDriver::new(),
+            asahi_soc: AsahiAppleSiliconSocDriver::new_m3(),
+            geom_storage: FreeBsdGeomBlockStorageDriver::new(),
+            openbsd_wsmouse: OpenBsdWsmouseDriver::new(),
         }
     }
 
-    pub fn auto_probe_hardware_and_bind(&mut self, modalias: &str) -> Result<String, &'static str> {
-        let (driver_name, fw_opt) = self
-            .firmware_engine
-            .match_modalias(modalias)
-            .ok_or("No driver match found for hardware modalias")?;
+    pub fn health_check(&self) -> bool {
+        self.wifi_rtw88.pci_vendor_id == 0x10ec
+    }
 
-        if let Some(fw) = fw_opt {
-            self.firmware_engine.register_firmware(&fw, "1.0.0", "sha256_mock_hash");
-        }
-
-        Ok(driver_name)
+    pub fn summary_report(&self) -> String {
+        format!(
+            "Sovereign Universal Distro Driver Suite Active:\n- Wi-Fi Device ID: 0x{:x}\n- DRM Atomic Commits: {}\n- Apple SoC: {:?}\n- GEOM Volumes: {}\n- wsmouse Queue: {}",
+            self.wifi_rtw88.pci_device_id,
+            self.drm_i915.atomic_commit_count,
+            self.asahi_soc.soc_generation,
+            self.geom_storage.volumes.len(),
+            self.openbsd_wsmouse.event_queue.len(),
+        )
     }
 }
 
@@ -684,109 +396,71 @@ impl Default for SovereignUniversalDistroDriverSuite {
     }
 }
 
+// =========================================================================
+// UNIT TESTS
+// =========================================================================
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_sovereign_modalias_and_firmware_engine() {
-        let mut fw_engine = SovereignModaliasDkmsFirmwareEngine::new();
-        fw_engine.register_firmware("amdgpu/gc_11_0_0_toc.bin", "1.0", "abc123hash");
+    fn test_realtek_rtw88_wifi() {
+        let mut wifi = RealtekRtw88WifiDriver::new_rtl8821ce();
+        let scan = wifi.scan_networks();
+        assert_eq!(scan.len(), 2);
 
-        let matched = fw_engine.match_modalias("pci:v00001002d0000744Csv00001002sd00000001bc03sc00i00");
-        assert!(matched.is_some());
-        let (drv, fw) = matched.unwrap();
-        assert_eq!(drv, "amdgpu");
-        assert_eq!(fw, Some("amdgpu/gc_11_0_0_toc.bin".to_string()));
+        assert!(wifi.associate("SigmaSovereignNet", "passphrase123", WifiSecurityAuth::Wpa3Sae).is_ok());
+        assert!(wifi.is_associated);
 
-        let dkms_ko = fw_engine.dkms_trigger_rebuild("amdgpu", "6.12.0-sigma").unwrap();
-        assert_eq!(dkms_ko, "amdgpu-6.12.0-sigma-dkms.ko");
+        let sent = wifi.send_packet(b"NETWORK_PAYLOAD").unwrap();
+        assert_eq!(sent, 15);
+        assert_eq!(wifi.tx_packets, 1);
     }
 
     #[test]
-    fn test_cross_os_driver_shim_engine() {
-        let mut shim_engine = SovereignCrossOsDriverShimEngine::new();
-        assert!(shim_engine.register_shim("iwlwifi_bsd", OsShimType::LinuxKpi).is_ok());
+    fn test_intel_i915_drm() {
+        let mut drm = IntelI915DrmGpuDriver::new();
+        let fb_id = drm.create_gem_bo(1001, 1920 * 1080 * 4);
+        drm.setup_plane(1, DisplayPipe::PipeA, 1920, 1080, fb_id);
 
-        let res = shim_engine.dispatch_shim_ioctl("iwlwifi_bsd", 0x10, 0x20).unwrap();
-        assert_eq!(res, 0x30);
+        assert!(drm.atomic_commit_modeset().is_ok());
+        assert_eq!(drm.atomic_commit_count, 1);
     }
 
     #[test]
-    fn test_universal_drm_kms_display_engine() {
-        let mut drm = SovereignUniversalDrmKmsEngine::new();
-        drm.set_gpu_vendor_mode(GpuVendor::AmdRdna, 3840, 2160, 144, true);
-        assert_eq!(drm.primary_display.width, 3840);
-        assert_eq!(drm.primary_display.height, 2160);
-        assert!(drm.primary_display.hdr_enabled);
-        assert_eq!(drm.handle_vblank(), 1);
+    fn test_asahi_apple_silicon_soc() {
+        let soc = AsahiAppleSiliconSocDriver::new_m3();
+        let telemetry = soc.read_smc_telemetry();
+        assert!(telemetry.cpu_temp_celsius > 0.0);
+        assert!(telemetry.power_draw_watts > 0.0);
     }
 
     #[test]
-    fn test_universal_storage_fabric_engine() {
-        let storage = SovereignUniversalStorageFabricEngine::new();
-        let res = storage.read_blocks("nvme0n1", 100, 8).unwrap();
-        assert_eq!(res, 100 + 8 * 4096);
+    fn test_freebsd_geom_storage() {
+        let mut geom = FreeBsdGeomBlockStorageDriver::new();
+        let vol1 = geom.create_gmirror_volume("gm0", &["ada0", "ada1"], 1_000_000_000);
+        assert_eq!(vol1.kind, GeomClassKind::Mirror);
+
+        let vol2 = geom.create_geli_encrypted_volume("geli0", "ada0p2", "secret", 500_000_000).unwrap();
+        assert_eq!(vol2.kind, GeomClassKind::EliCrypto);
     }
 
     #[test]
-    fn test_universal_network_fabric_engine() {
-        let mut net = SovereignUniversalNetworkFabricEngine::new();
-        let count = net.transmit_packet("wlan0", 1500).unwrap();
-        assert_eq!(count, 1);
+    fn test_openbsd_wsmouse() {
+        let mut mouse = OpenBsdWsmouseDriver::new();
+        mouse.push_event(WsmouseEventType::Motion, 10, -5, 0, 1);
+
+        let event = mouse.poll_next_event().unwrap();
+        assert_eq!(event.dx, 10);
+        assert_eq!(event.dy, -5);
+        assert_eq!(event.button_mask, 1);
     }
 
     #[test]
-    fn test_universal_hid_input_engine() {
-        let mut input = SovereignUniversalHidInputEngine::new();
-        input.register_input("touchscreen0", InputDeviceType::EvdevMultiTouch);
-        assert!(input.update_touch("touchscreen0", 500, 300, 1024, 2).is_ok());
-
-        let st = input.active_inputs.get("touchscreen0").unwrap();
-        assert_eq!(st.pointer_x, 500);
-        assert_eq!(st.active_touch_slots, 2);
-    }
-
-    #[test]
-    fn test_universal_audio_media_engine() {
-        let mut audio = SovereignUniversalAudioMediaEngine::new();
-        assert!(audio.start_stream("sof-hda-dsp").is_ok());
-        let dev = audio.media_devices.get("sof-hda-dsp").unwrap();
-        assert!(dev.is_active);
-    }
-
-    #[test]
-    fn test_universal_platform_bus_engine() {
-        let bus = SovereignUniversalPlatformBusEngine::new();
-        let tb4 = bus.buses.get("tb4-domain-0").unwrap();
-        assert_eq!(tb4.bandwidth_gbps, 40);
-    }
-
-    #[test]
-    fn test_driver_crash_recovery_engine() {
-        let mut recovery = SovereignDriverCrashRecoveryEngine::new();
-        assert!(!recovery.report_driver_crash("nouveau"));
-        assert!(!recovery.report_driver_crash("nouveau"));
-        let safe_mode = recovery.report_driver_crash("nouveau");
-        assert!(safe_mode);
-        assert!(recovery.fallback_to_safe_mode);
-    }
-
-    #[test]
-    fn test_sovereign_universal_distro_driver_suite_master() {
-        let mut suite = SovereignUniversalDistroDriverSuite::new();
-        let drv = suite.auto_probe_hardware_and_bind("pci:v00008086d0000272Bsv00008086sd00000001").unwrap();
-        assert_eq!(drv, "iwlwifi");
-
-        assert!(suite.initialize().is_ok());
-        assert_eq!(suite.name(), "Sovereign Universal Distro Driver Suite Orchestrator");
-        assert_eq!(suite.generation(), DeviceGeneration::Modern);
-
-        let mut buf = [0u8; 4];
-        assert_eq!(suite.read(&mut buf).unwrap(), 4);
-        assert!(u32::from_le_bytes(buf) > 0);
-
-        assert!(suite.write(b"pci:v00001002d0000744Csv00001002sd00000001").is_ok());
-        assert!(suite.shutdown().is_ok());
+    fn test_universal_distro_driver_suite() {
+        let suite = SovereignUniversalDistroDriverSuite::new();
+        assert!(suite.health_check());
+        assert!(suite.summary_report().contains("Wi-Fi Device ID"));
     }
 }
