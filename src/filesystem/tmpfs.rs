@@ -4,6 +4,14 @@
 
 pub const MAX_TMPFS_INODES: usize = 32;
 
+/// Linux & BSD standard "50% rule" ratio for default tmpfs maximum RAM size allocation
+pub const TMPFS_DEFAULT_RAM_50_PERCENT_RATIO: f32 = 0.50;
+
+/// Compute default 50% physical RAM memory boundary for tmpfs mounts
+pub fn calculate_50_percent_ram_default(total_ram_bytes: usize) -> usize {
+    ((total_ram_bytes as f64) * (TMPFS_DEFAULT_RAM_50_PERCENT_RATIO as f64)) as usize
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TmpfsFileType {
     Regular,
@@ -18,6 +26,19 @@ pub struct TmpfsConfig {
     pub uid: u32,          // Owner UID (default 0/root)
     pub gid: u32,          // Group GID (default 0/root)
     pub mode: u32,         // Permissions (e.g. 0o1777 sticky-bit tmpfs)
+}
+
+impl TmpfsConfig {
+    /// Create default tmpfs configuration using Linux & BSD "50% rule" (50% of total physical RAM)
+    pub fn default_with_ram(total_ram_bytes: usize) -> Self {
+        Self {
+            max_bytes: calculate_50_percent_ram_default(total_ram_bytes),
+            max_inodes: MAX_TMPFS_INODES,
+            uid: 0,
+            gid: 0,
+            mode: 0o1777, // sticky bit permissions
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -184,9 +205,20 @@ impl TmpfsFileSystem {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_tmpfs_50_percent_ram_default_rule() {
+        let total_ram_16gb = 16 * 1024 * 1024 * 1024; // 16 GB
+        let limit_50_percent = calculate_50_percent_ram_default(total_ram_16gb);
+        assert_eq!(limit_50_percent, 8 * 1024 * 1024 * 1024); // 8 GB
+
+        let config = TmpfsConfig::default_with_ram(total_ram_16gb);
+        assert_eq!(config.max_bytes, 8 * 1024 * 1024 * 1024);
+        assert_eq!(config.mode, 0o1777);
+    }
 
     #[test]
     fn test_tmpfs_dynamic_allocation_limits() {

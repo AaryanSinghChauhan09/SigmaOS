@@ -13,14 +13,43 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+#[cfg(not(any(feature = "standalone_test", test)))]
 use crate::kernel::subsystems::registry::{
     InitOrder, KernelSubsystem, SubsystemError, SubsystemPriority,
 };
+#[cfg(not(any(feature = "standalone_test", test)))]
+use crate::klib::VecDeque;
+
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::VecDeque;
+
+#[cfg(any(feature = "standalone_test", test))]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum InitOrder { CoreKernel }
+
+#[cfg(any(feature = "standalone_test", test))]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SubsystemPriority { High }
+
+#[cfg(any(feature = "standalone_test", test))]
+#[derive(Debug, Clone)]
+pub enum SubsystemError { InitializationFailed }
+
+#[cfg(any(feature = "standalone_test", test))]
+pub trait KernelSubsystem {
+    fn name(&self) -> &str;
+    fn version(&self) -> &str;
+    fn init_order(&self) -> InitOrder;
+    fn priority(&self) -> SubsystemPriority;
+    fn dependencies(&self) -> Vec<&'static str>;
+    fn initialize(&mut self) -> Result<(), SubsystemError>;
+    fn shutdown(&mut self) -> Result<(), SubsystemError>;
+}
+
 /// SigmaOS Legacy Driver — Intel 8042 PS/2 Controller + AT Keyboard + PS/2 Mouse
 /// Absorbs Linux drivers/input/serio/i8042.c and AT keyboard driver
 /// Handles: scancode sets 1/2/3, XT compatibility, PS/2 mouse Intellimouse protocol
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::klib::VecDeque;
 
 /// i8042 PS/2 controller I/O ports
 pub const I8042_DATA_PORT: u16 = 0x60;
@@ -370,7 +399,7 @@ impl Default for Ps2Controller {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

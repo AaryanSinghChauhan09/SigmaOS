@@ -69,3 +69,39 @@
 ## 2026-09-20 - Constant-Time $O(1)$ Plugin Name Retrieval via Cached Byte Lengths
 **Learning:** Querying plugin names via `Plugin::name()` on `SimplePlugin` performed an $O(N)$ zero-byte linear scan (`.position(|&b| b == 0)`) on every call. Storing `name_len: u8` during construction allows `SimplePlugin::name()` to retrieve the byte slice in $O(1)$ constant time without scanning the underlying 64-byte array.
 **Action:** Always store the slice byte length during struct initialization when working with fixed-size byte arrays (`[u8; N]`) to convert string/slice getter calls into $O(1)$ constant-time slice lookups.
+
+## 2026-09-25 - $O(1)$ Window Title Lookups via Cached Byte Length in Zenith Compositor
+**Learning:** Calling `Window::title()` on `SimpleWindow` in `src/desktop/zenith.rs` triggered an $O(N)$ zero-byte linear scan (`.position(|&b| b == 0)`) across its 128-byte title array on every window title query or compositing frame update. Caching `title_len: u8` during `SimpleWindow::new()` construction converts title slice lookups into $O(1)$ constant-time slice indexing (`&self.title[..self.title_len as usize]`), bypassing iterative array scanning.
+**Action:** Store the byte length (`title_len: u8`) during window or UI element construction to eliminate linear zero-byte scanning on repeated title access.
+
+## 2026-09-26 - Linux & BSD Inspired 50% RAM Allocation Rule for Sovereign Tmpfs Mounts
+**Learning:** Hardcoding static byte limits in virtual in-memory file systems (like `tmpfs`) causes system failure on low-memory hardware or severe RAM under-utilization on high-RAM servers. Following Linux kernel `mm/shmem.c` (`size=50%`) and BSD `mount_tmpfs` standards by introducing `calculate_50_percent_ram_default(total_ram_bytes)` ensures dynamically scaled, bounded RAM allocation limits without risk of OOM exhaustion or manual tuning.
+**Action:** Always compute default memory mount boundaries dynamically as a ratio (e.g. 50%) of detected physical RAM size.
+
+## 2026-09-27 - Priority-Ordered Kernel APC Queueing and Targeted Thread Delivery
+**Learning:** In asynchronous IPC systems (ALPC / Mach / POSIX signals), handling pending APCs on a flat FIFO basis fails to prioritize critical kernel-mode tasks over user-mode callbacks. Sorting enqueued APCs by priority (`KernelApcPriority`: `HighPriority`, `SpecialKernel`, `Normal`, `UserMode`) and filtering by `target_thread_id` during thread context switches enables sub-microsecond targeted execution of urgent signal and interrupt handlers while preserving un-targeted items in the queue.
+**Action:** Maintain priority ordering (`sort_by(|a, b| b.priority.cmp(&a.priority))`) when queueing kernel-level async procedure calls targeted at specific thread/process IDs.
+
+## 2026-09-28 - Zero-Copy Descriptor Allocation in Realtek Gigabit Network Drivers
+**Learning:** Implementing PCI network device drivers (Realtek RTL8169/8111) using static MMIO registers and `Box<RealtekNicDriver>` heap instances provides zero-copy DMA packet transfer compatibility without external hardware framework dependencies. Wrapping driver instances in standard `PciDriver` trait implementations allows seamless PCI bus enumeration (`VendorID: 0x10EC`) and hot-plug device registration across Linux and BSD kernel profiles.
+**Action:** Use standard `PciDriver` trait implementations and MMIO BAR structures when adding hardware drivers to ensure cross-OS subsystem interoperability.
+
+## 2026-09-29 - Cross-OS Wireless Driver Abstractions for Intel iwlwifi Devices
+**Learning:** Implementing Intel iwlwifi Wireless PCI drivers (`VendorID: 0x8086`, `AX200`/`AX210`/`7265`/`3165`) using native `AtomicBool` channel and power-saving controls wrapped in `Box<IntelIwlwifiDriver>` ensures zero-dependency hardware enumeration while supporting dual-band 2.4GHz / 5GHz IEEE 802.11ac/ax channel switching.
+**Action:** Model wireless network interface controllers with explicit channel boundaries and atomic power governance states.
+
+## 2026-09-30 - Conditional Relative Module Imports for Standalone Module Test Targets
+**Learning:** When compiling standalone unit tests with `rustc --test src/<module>/mod.rs`, referencing root-level crate paths (`use crate::filesystem::...`) fails because `rustc` treats the target file as the crate root. Configuring relative module path attributes (`#[path = "../filesystem/ext4_ntfs_security.rs"] pub mod ext4_ntfs_security;`) under `#[cfg(any(feature = "standalone_test", test))]` satisfies both host standalone compiler invocations and full crate integration builds without code duplication.
+**Action:** Always provide relative file path attributes (`#[path = "..."]`) for conditional cross-module imports when enabling standalone `rustc --test` module suites.
+
+## 2026-10-01 - Standard C Alignment for 64-bit Task State Segment (TSS) Structs
+**Learning:** Marking 64-bit Task State Segment (TSS) structs with `#[repr(C, packed)]` causes field reference alignment compiler errors (`error[E0793]: reference to field of packed struct is unaligned`) when accessing arrays like `tss.privilege_stack_table[0]` in assertions or memory copy routines. Standard C representation (`#[repr(C)]`) satisfies x86_64 CPU hardware descriptor alignment requirements while allowing safe reference creation and zero-overhead stack pointer initialization (`rsp0`).
+**Action:** Use `#[repr(C)]` rather than `#[repr(C, packed)]` when defining 64-bit TSS descriptors containing aligned array fields (`u64`).
+
+## 2026-10-02 - Intel 8042 PS/2 Scancode Translation and Modifier State Tracking
+**Learning:** Processing keyboard scancodes via set 1 make/break bitwise masks (`code & 0x80 != 0` for release) in the Intel 8042 PS/2 controller driver converts hardware key interrupts into structured `KeyEvent` stream events with real-time modifier tracking (`shift`, `ctrl`, `alt`) without allocating dynamic memory on keypress events.
+**Action:** Track keyboard modifier state atomically during scancode dispatch to populate key event structs in constant time.
+
+## 2026-10-03 - Distro-Specific CI Automation for SchedExt and SMF Subsystem Matrix Verification
+**Learning:** Adding dedicated GitHub Action workflows targeting distribution-specific kernel extensions (e.g. CachyOS B3FS/scx_sched_ext scheduler matrix in `cachyos-b3fs-scx-ci.yml` and Illumos SMF/DTrace in `illumos-smf-dtrace-ci.yml`) provides continuous validation for distro parity components without impacting standard core CI build times.
+**Action:** Isolate specialized distro kernel feature validation into modular, targeted GitHub Action workflows using `./run_sigma_tests.sh`.
