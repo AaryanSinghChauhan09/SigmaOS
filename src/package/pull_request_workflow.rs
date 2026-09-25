@@ -223,7 +223,7 @@ impl SovereignPackagePullRequestEngine {
     pub fn translate_pr(&mut self, pr_id: u64) -> Result<ConsolidatedSovereignPackage, &'static str> {
         let submission = self.submissions.get_mut(&pr_id).ok_or("PR ID not found")?;
 
-        if submission.status != PullRequestStatus::Validated {
+        if submission.status != PullRequestStatus::Validated && submission.status != PullRequestStatus::Translated {
             return Err("PR must be validated before translation");
         }
 
