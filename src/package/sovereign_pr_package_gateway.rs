@@ -59,6 +59,15 @@ pub struct SovereignUniversalPrGatewayEngine {
     pub pr_gateway_registry: BTreeMap<u64, DistroPrGatewayEntry>,
 }
 
+impl core::fmt::Debug for SovereignUniversalPrGatewayEngine {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_struct("SovereignUniversalPrGatewayEngine")
+            .field("pr_engine", &self.pr_engine)
+            .field("pr_gateway_registry", &self.pr_gateway_registry)
+            .finish()
+    }
+}
+
 impl Default for SovereignUniversalPrGatewayEngine {
     fn default() -> Self {
         Self::new()
@@ -115,7 +124,10 @@ impl SovereignUniversalPrGatewayEngine {
         &mut self,
         pr_id: u64,
     ) -> Result<ConsolidatedSovereignPackage, &'static str> {
-        self.pr_engine.validate_pr(pr_id)?;
+        if let Err(e) = self.pr_engine.validate_pr(pr_id) {
+            println!("validate_pr failed for pr_id {}: {}", pr_id, e);
+            return Err(e);
+        }
         let translated = self.pr_engine.translate_pr(pr_id)?;
 
         if let Some(entry) = self.pr_gateway_registry.get_mut(&pr_id) {
@@ -234,7 +246,10 @@ mod tests {
         );
 
         assert_eq!(pr_deb, 1);
-        let translated = gateway.validate_and_translate_pr(pr_deb).unwrap();
+        let translated = match gateway.validate_and_translate_pr(pr_deb) {
+            Ok(t) => t,
+            Err(e) => panic!("validate_and_translate_pr failed with error: {}", e),
+        };
         assert_eq!(translated.name, "nginx");
 
         // 2. Generate PR diff
