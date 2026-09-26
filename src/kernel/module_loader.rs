@@ -202,6 +202,24 @@ impl SovereignKernelModuleManager {
         Ok(base_address)
     }
 
+    /// Modprobe auto-loads module and all missing prerequisite dependencies
+    pub fn modprobe_load_with_deps(
+        &mut self,
+        name: &str,
+        version: &str,
+        license: &str,
+        deps: Vec<String>,
+        params: BTreeMap<String, String>,
+        size_bytes: usize,
+    ) -> Result<u64, String> {
+        for dep in &deps {
+            if !self.loaded_modules.contains_key(dep) {
+                let _ = self.load_module(dep, version, license, vec![], BTreeMap::new(), 4096)?;
+            }
+        }
+        self.load_module(name, version, license, deps, params, size_bytes)
+    }
+
     /// Safely unloads a kernel module (rmmod / kldunload parity)
     pub fn unload_module(&mut self, name: &str) -> Result<(), String> {
         let (ref_count, deps) = {
@@ -274,7 +292,7 @@ impl Default for SovereignKernelModuleManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -315,6 +333,27 @@ mod tests {
         // Now e1000e can be safely unloaded
         assert!(mgr.unload_module("e1000e").is_ok());
         assert_eq!(mgr.loaded_modules.len(), 0);
+    }
+
+    #[test]
+    fn test_modprobe_auto_dependency_loading() {
+        let mut mgr = SovereignKernelModuleManager::new();
+        let addr = mgr
+            .modprobe_load_with_deps(
+                "ext4",
+                "6.8.0",
+                "GPL",
+                vec![String::from("mbcache"), String::from("jbd2")],
+                BTreeMap::new(),
+                16384,
+            )
+            .unwrap();
+
+        assert!(addr > 0xFFFFFFFFC0000000);
+        assert!(mgr.loaded_modules.contains_key("mbcache"));
+        assert!(mgr.loaded_modules.contains_key("jbd2"));
+        assert!(mgr.loaded_modules.contains_key("ext4"));
+        assert_eq!(mgr.loaded_modules.len(), 3);
     }
 
     #[test]

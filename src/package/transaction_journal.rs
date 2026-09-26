@@ -235,10 +235,9 @@ impl TransactionJournal {
         let mut next_id = 0;
 
         // Parse simple text format
-        let current_entry_lines: Vec<&str> = content.lines().collect();
         let mut current_entry_lines: Vec<String> = Vec::new();
 
-        for line in current_entry_lines {
+        for line in content.lines() {
             if line.starts_with("id:") {
                 // New entry starts
                 if !current_entry_lines.is_empty() {
@@ -405,25 +404,63 @@ impl TransactionJournal {
     /// Restore system from snapshot
     fn restore_snapshot(snapshot_path: &Path) -> io::Result<()> {
         if !snapshot_path.exists() {
-            return Err(io::Error::new(io::ErrorKind::NotFound, "Snapshot path does not exist"));
+            return Err(io::Error::new(
+                io::ErrorKind::NotFound,
+                "Snapshot path does not exist",
+            ));
         }
 
-        if snapshot_path.is_file() {
-            let parent = snapshot_path.parent().unwrap_or(Path::new("."));
-            let dest_name = snapshot_path.file_name().unwrap_or_default();
-            let restored_file = parent.join(format!("restored_{}", dest_name.to_string_lossy()));
-            fs::copy(snapshot_path, restored_file)?;
-        } else if snapshot_path.is_dir() {
-            let parent = snapshot_path.parent().unwrap_or(Path::new("."));
-            let restore_dir = parent.join("restored_snapshot");
-            fs::create_dir_all(&restore_dir)?;
-            for entry in fs::read_dir(snapshot_path)? {
+        if snapshot_path.is_dir() {
+            let manifest_path = snapshot_path.join("manifest.txt");
+            if manifest_path.exists() {
+                let content = fs::read_to_string(&manifest_path)?;
+                for line in content.lines() {
+                    let line = line.trim();
+                    if line.is_empty() || line.starts_with('#') {
+                        continue;
+                    }
+                    let parts: Vec<&str> = line.splitn(2, ':').collect();
+                    if parts.len() == 2 {
+                        let rel_src = parts[0].trim();
+                        let target_dest = Path::new(parts[1].trim());
+                        let src_file = snapshot_path.join(rel_src);
+
+                        if src_file.exists() {
+                            if let Some(parent) = target_dest.parent() {
+                                fs::create_dir_all(parent)?;
+                            }
+                            fs::copy(&src_file, target_dest)?;
+                        }
+                    }
+                }
+            } else {
+                // If no manifest.txt exists, recursively restore directory contents
+                Self::copy_dir_recursive(snapshot_path, snapshot_path)?;
+            }
+        } else if let Some(parent) = snapshot_path.parent() {
+            let dest_file = parent.join("restored_file");
+            fs::copy(snapshot_path, dest_file)?;
+        }
+
+        Ok(())
+    }
+
+    /// Recursively copy directory tree
+    fn copy_dir_recursive(src: &Path, base: &Path) -> io::Result<()> {
+        if src.is_dir() {
+            for entry in fs::read_dir(src)? {
                 let entry = entry?;
                 let path = entry.path();
-                if path.is_file() {
-                    let file_name = path.file_name().unwrap_or_default();
-                    let target = restore_dir.join(file_name);
-                    fs::copy(&path, &target)?;
+                if path.is_dir() {
+                    Self::copy_dir_recursive(&path, base)?;
+                } else if path.file_name().map_or(false, |n| n != "manifest.txt") {
+                    if let Ok(rel) = path.strip_prefix(base) {
+                        let target = Path::new("/").join(rel);
+                        if let Some(parent) = target.parent() {
+                            let _ = fs::create_dir_all(parent);
+                        }
+                        let _ = fs::copy(&path, target);
+                    }
                 }
             }
         }
@@ -434,9 +471,9 @@ impl TransactionJournal {
     pub fn get_package_history(&self, package_name: &str) -> Vec<&TransactionEntry> {
         self.entries.iter()
             .filter(|e| match &e.operation {
-                TransactionOperation::Install { package_name, .. } => package_name == *package_name,
-                TransactionOperation::Remove { package_name } => package_name == *package_name,
-                TransactionOperation::Update { package_name, .. } => package_name == *package_name,
+                TransactionOperation::Install { package_name: ref name, .. } => name == package_name,
+                TransactionOperation::Remove { package_name: ref name } => name == package_name,
+                TransactionOperation::Update { package_name: ref name, .. } => name == package_name,
             })
             .collect()
     }
@@ -499,5 +536,27 @@ mod tests {
 
         let history = journal.get_package_history("test-package");
         assert_eq!(history.len(), 2);
+    }
+
+    #[test]
+    fn test_snapshot_restoration() {
+        let snap_dir = temp_dir().join("sigma_test_snap");
+        let dest_file = temp_dir().join("sigma_test_dest.txt");
+        let _ = fs::remove_dir_all(&snap_dir);
+        fs::create_dir_all(&snap_dir).unwrap();
+
+        let src_file = snap_dir.join("payload.txt");
+        fs::write(&src_file, "restored content").unwrap();
+
+        let manifest = snap_dir.join("manifest.txt");
+        fs::write(&manifest, format!("payload.txt:{}", dest_file.display())).unwrap();
+
+        TransactionJournal::restore_snapshot(&snap_dir).unwrap();
+
+        assert!(dest_file.exists());
+        assert_eq!(fs::read_to_string(&dest_file).unwrap(), "restored content");
+
+        let _ = fs::remove_file(&dest_file);
+        let _ = fs::remove_dir_all(&snap_dir);
     }
 }
