@@ -146,8 +146,13 @@ pub use tss_ring3_user_mode::{
 // ─── Phase 1: Safe-Rust Kernel Foundation — New Sovereign Modules ─────────────
 pub mod sigma_version;
 pub mod tss_ring3_user_mode;
+pub mod hardened_security_mitigations;
 pub mod sigma_kernel_autotuner_v2;
 pub mod xdp_engine_sovereign;
+
+pub use hardened_security_mitigations::{
+    CfiFunctionSignature, KptrRestrictLevel, SovereignHardenedSecurityMitigationsEngine,
+};
 
 // ─── Live Migration Engine (CRIU / QEMU inspired) ─────────────────────────────
 pub mod live_migration_engine;

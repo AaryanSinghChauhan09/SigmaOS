@@ -221,3 +221,30 @@ SigmaOS incorporates per-directory transparent file encryption inspired by Linux
    - `register_autofs_trigger`: Configures direct and indirect on-demand mount point triggers for storage devices.
    - `trigger_access`: Automatically mounts target storage volumes upon directory access.
    - `expire_idle_mounts`: Automatically unmounts idle volumes after configurable timeout intervals.
+
+---
+
+## SECTION 145: SOVEREIGN KERNEL SECURITY MITIGATIONS (KPTR_RESTRICT, DMESG_RESTRICT, BSD SYSCTL & CFI)
+
+```
++---------------------------------------------------------------------------------------------------------+
+|                SOVEREIGN HARDENED KERNEL SECURITY MITIGATIONS & CFI ENGINE                              |
++---------------------------------------------------------------------------------------------------------+
+|  [Linux Pointer Sanitization]   |  [BSD Sysctl Hardening]        |  [Forward-Edge CFI Engine]          |
+|  kptr_restrict (levels 0..2),   |  security.bsd.unprivileged_p,  |  indirect call signature checks,   |
+|  dmesg_restrict log isolation   |  security.bsd.hardlink_check   |  control flow hijack prevention   |
++---------------------------------------------------------------------------------------------------------+
+```
+
+### 1. Architectural Mission
+SigmaOS incorporates advanced kernel security mitigations inspired by Linux (`kptr_restrict`, `dmesg_restrict`) and BSD security sysctl parameters alongside forward-edge Control Flow Integrity (CFI) signature validation to prevent kernel address leakage, unprivileged log inspection, and control flow hijacking.
+
+### 2. Key Subsystem Capabilities
+1. **Linux Kernel Pointer & Log Restrictions**:
+   - `set_kptr_restrict`: Controls kernel pointer sanitization levels (ExposeRaw, ZeroNonRoot, ZeroAll) to eliminate info leaks.
+   - `set_dmesg_restrict` & `can_access_dmesg`: Restricts kernel dmesg ring buffer access exclusively to root/capabilities.
+2. **BSD Security Sysctl Hardening**:
+   - Hardlink check enforcement (`security.bsd.hardlink_check`) and unprivileged process debugging controls.
+3. **Control Flow Integrity (CFI) Engine**:
+   - `register_cfi_target`: Registers valid forward-edge indirect call target addresses and expected signature hashes.
+   - `validate_indirect_call`: Verifies target addresses and function signature hashes prior to dispatching indirect calls, trapping control flow hijack attempts.

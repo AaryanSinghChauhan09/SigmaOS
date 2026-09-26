@@ -76,6 +76,9 @@ pub use process::{
     SovereignProcess, SovereignProcessManager, SovereignProcessState, SubreaperProcessEntry,
     WaitStatus, ZeroCopyIpcChannel, WCONTINUED, WNOHANG, WUNTRACED,
 };
+pub use kernel::{
+    CfiFunctionSignature, KptrRestrictLevel, SovereignHardenedSecurityMitigationsEngine,
+};
 pub mod access;
 pub mod open_source_obsoletion;
 pub mod tools;
