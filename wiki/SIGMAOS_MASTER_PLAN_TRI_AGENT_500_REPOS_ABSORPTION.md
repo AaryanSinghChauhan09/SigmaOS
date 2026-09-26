@@ -220,3 +220,19 @@ Before submitting any code or documentation changes, all agents must complete th
 ---
 
 *End of Master Plan Specification.*
+
+---
+
+## AI Agent Maintenance Instructions
+
+**Purpose:** This page defines the Tri-Agent Governance Framework and the 500+ open-source repository absorption architecture for SigmaOS.
+
+**Maintenance Guidelines:**
+1. **Update Frequency:** Update whenever a new agent is added to the Tri-Agent Framework, new repositories are absorbed, or the absorption catalog changes.
+2. **Tri-Agent Framework:** Each agent entry must include: (a) core mission, (b) operational boundaries (Always Do / Ask First / Never Do), (c) philosophy, (d) journaling rules, and (e) daily process workflow. Update these sections when agent responsibilities change.
+3. **Absorption Catalog:** The "500+ Open-Source GitHub Repositories Absorption Catalog" must be updated when new repository categories are added or existing categories are reorganized. Each category must list representative repositories.
+4. **Six Pillars:** The "Six Pillars of Absorption Architecture" must reflect the current absorption strategy. Update the pillar descriptions when new absorption patterns are identified.
+5. **Version Number:** The document version (currently 4.0.0) must be incremented whenever significant changes are made to the framework or catalog.
+6. **Mirror Synchronization:** The "Synchronization & Multi-Mirror Parity" section must list all active documentation mirrors. Remove references to deleted mirrors (e.g., `WIKI/` and `wiki_repo/` after consolidation).
+7. **Pre-Commit Protocol:** The "Pre-Commit & Quality Assurance Protocol" must reflect the current CI/CD pipeline. Update the steps when new checks are added or existing checks are modified.
+8. **Sync Requirement:** After updating this file, propagate changes to `WIKI/` and `wiki_repo/` mirrors (if they still exist) and update the GitHub Wiki page via `gh api`.
