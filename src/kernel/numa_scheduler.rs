@@ -186,6 +186,7 @@ impl NumaNode {
 pub struct NumaScheduler {
     pub nodes: Vec<NumaNode>,
     pub dynamic_load_threshold: usize, // Load difference that triggers migration
+    pub distance_matrix: Vec<Vec<u32>>,  // Inter-node NUMA distance matrix SLIT (RFC / ACPI SLIT table)
 }
 
 impl NumaScheduler {
@@ -193,11 +194,40 @@ impl NumaScheduler {
         Self {
             nodes: Vec::new(),
             dynamic_load_threshold,
+            distance_matrix: Vec::new(),
         }
     }
 
     pub fn register_node(&mut self, node: NumaNode) {
         self.nodes.push(node);
+    }
+
+    /// Set inter-node distance (ACPI SLIT table style distance matrix)
+    pub fn set_node_distance(&mut self, from_node: usize, to_node: usize, distance: u32) {
+        let max_idx = from_node.max(to_node) + 1;
+        if self.distance_matrix.len() < max_idx {
+            self.distance_matrix.resize(max_idx, Vec::new());
+        }
+        for row in &mut self.distance_matrix {
+            if row.len() < max_idx {
+                row.resize(max_idx, 10); // Default local distance 10
+            }
+        }
+        self.distance_matrix[from_node][to_node] = distance;
+    }
+
+    /// Get NUMA distance between two nodes (default: 10 local, 20 remote)
+    pub fn get_node_distance(&self, from_node: usize, to_node: usize) -> u32 {
+        if from_node == to_node {
+            return 10;
+        }
+        if from_node < self.distance_matrix.len() && to_node < self.distance_matrix[from_node].len() {
+            let dist = self.distance_matrix[from_node][to_node];
+            if dist > 0 {
+                return dist;
+            }
+        }
+        20 // Default remote NUMA node distance
     }
 
     /// Schedule a task to the closest NUMA node based on core affinity overlaps
@@ -263,9 +293,27 @@ impl NumaScheduler {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_numa_distance_matrix() {
+        let mut scheduler = NumaScheduler::new(2);
+        scheduler.register_node(NumaNode::new(0, 0x0F, 0x00000, 0x3FFFF));
+        scheduler.register_node(NumaNode::new(1, 0xF0, 0x40000, 0x7FFFF));
+
+        // Local distance defaults to 10
+        assert_eq!(scheduler.get_node_distance(0, 0), 10);
+        assert_eq!(scheduler.get_node_distance(1, 1), 10);
+
+        // Remote distance defaults to 20
+        assert_eq!(scheduler.get_node_distance(0, 1), 20);
+
+        // Explicit SLIT distance
+        scheduler.set_node_distance(0, 1, 15);
+        assert_eq!(scheduler.get_node_distance(0, 1), 15);
+    }
 
     #[test]
     fn test_lock_free_queue_fifo() {

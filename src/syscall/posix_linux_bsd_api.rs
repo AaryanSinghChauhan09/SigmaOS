@@ -29,6 +29,7 @@ pub mod syscall_abi_numbers {
     pub const LINUX_SYS_PIDFD_OPEN: u64 = 434;
     pub const LINUX_SYS_MEMFD_SECRET: u64 = 447;
     pub const LINUX_SYS_IO_URING_SETUP: u64 = 425;
+    pub const LINUX_SYS_MSEAL: u64 = 462;
 
     // FreeBSD
     pub const FREEBSD_SYS_PDFORK: u64 = 518;
@@ -127,11 +128,31 @@ impl PosixLinuxBsdApiDispatcher {
         0
     }
 
+    /// Linux `io_uring_setup(u32 entries, struct io_uring_params *p)`
+    pub fn sys_io_uring_setup(&mut self, entries: u32, _flags: u32) -> i64 {
+        if entries == 0 || entries > 4096 {
+            return posix_errno::EINVAL;
+        }
+        let ring_fd = self.next_pidfd;
+        self.next_pidfd += 1;
+        ring_fd as i64
+    }
+
+    /// Linux `mseal(void *addr, size_t len, unsigned long flags)`
+    pub fn sys_mseal(&mut self, addr: u64, len: u64, flags: u32) -> i64 {
+        if addr == 0 || len == 0 || flags != 0 {
+            return posix_errno::EINVAL;
+        }
+        0 // Success
+    }
+
     /// Unified Syscall Dispatcher Entry Point
     pub fn dispatch_syscall(&mut self, sys_nr: u64, calling_pid: u32, arg1: u64, arg2: u64) -> i64 {
         match sys_nr {
             syscall_abi_numbers::LINUX_SYS_PIDFD_OPEN => self.sys_pidfd_open(arg1 as u32, arg2 as u32),
             syscall_abi_numbers::LINUX_SYS_MEMFD_SECRET => self.sys_memfd_secret(arg1 as u32),
+            syscall_abi_numbers::LINUX_SYS_IO_URING_SETUP => self.sys_io_uring_setup(arg1 as u32, arg2 as u32),
+            syscall_abi_numbers::LINUX_SYS_MSEAL => self.sys_mseal(arg1, arg2, 0),
             syscall_abi_numbers::FREEBSD_SYS_PDFORK => self.sys_pdfork(calling_pid, arg1 as u32),
             syscall_abi_numbers::OPENBSD_SYS_PLEDGE => self.sys_pledge(calling_pid, "stdio rpath wpath cpath"),
             syscall_abi_numbers::OPENBSD_SYS_UNVEIL => self.sys_unveil(calling_pid, "/usr/bin", "rx"),
@@ -182,6 +203,12 @@ mod tests {
         let mut api = PosixLinuxBsdApiDispatcher::new();
         let res = api.dispatch_syscall(syscall_abi_numbers::LINUX_SYS_MEMFD_SECRET, 100, 0, 0);
         assert!(res >= 100);
+
+        let ring_res = api.dispatch_syscall(syscall_abi_numbers::LINUX_SYS_IO_URING_SETUP, 100, 256, 0);
+        assert!(ring_res >= 100);
+
+        let mseal_res = api.dispatch_syscall(syscall_abi_numbers::LINUX_SYS_MSEAL, 100, 0x7fff0000, 4096);
+        assert_eq!(mseal_res, 0);
 
         let invalid_res = api.dispatch_syscall(9999, 100, 0, 0);
         assert_eq!(invalid_res, posix_errno::ENOSYS);
