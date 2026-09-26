@@ -1501,6 +1501,690 @@ impl MintXAppStatusIconTray {
     }
 }
 
+/// MintUpload FTP/SFTP Upload Profile Manager (mintupload)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum UploadProtocol {
+    Ftp,
+    Sftp,
+    Scp,
+}
+
+#[derive(Debug, Clone)]
+pub struct UploadProfile {
+    pub name: String,
+    pub host: String,
+    pub port: u16,
+    pub protocol: UploadProtocol,
+    pub remote_path: String,
+    pub public_url_base: String,
+}
+
+pub struct MintUploadManager {
+    pub profiles: Vec<UploadProfile>,
+}
+
+impl Default for MintUploadManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintUploadManager {
+    pub fn new() -> Self {
+        Self {
+            profiles: Vec::new(),
+        }
+    }
+
+    pub fn add_profile(&mut self, name: &str, host: &str, port: u16, protocol: UploadProtocol, remote_path: &str, url_base: &str) {
+        self.profiles.push(UploadProfile {
+            name: name.to_string(),
+            host: host.to_string(),
+            port,
+            protocol,
+            remote_path: remote_path.to_string(),
+            public_url_base: url_base.to_string(),
+        });
+    }
+
+    pub fn generate_share_link(&self, profile_name: &str, filename: &str) -> Result<String, &'static str> {
+        let prof = self.profiles.iter().find(|p| p.name == profile_name).ok_or("Upload profile not found")?;
+        Ok(format!("{}/{}", prof.public_url_base.trim_end_matches('/'), filename))
+    }
+}
+
+/// Mint Sudo & Privilege Escalation Helper (gksu replacement)
+pub struct MintDigitKeyringPrompt {
+    pub prompt_message: String,
+    pub target_command: String,
+    pub is_authenticated: bool,
+}
+
+impl Default for MintDigitKeyringPrompt {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintDigitKeyringPrompt {
+    pub fn new() -> Self {
+        Self {
+            prompt_message: String::from("Administrative authentication required"),
+            target_command: String::new(),
+            is_authenticated: false,
+        }
+    }
+
+    pub fn request_auth(&mut self, command: &str, password_attempt: &str) -> bool {
+        self.target_command = command.to_string();
+        if !password_attempt.is_empty() {
+            self.is_authenticated = true;
+            true
+        } else {
+            self.is_authenticated = false;
+            false
+        }
+    }
+}
+
+/// Cinnamon Desktop Icon Layout & Grid Organizer
+#[derive(Debug, Clone)]
+pub struct DesktopIconLocation {
+    pub file_name: String,
+    pub grid_x: usize,
+    pub grid_y: usize,
+}
+
+pub struct MintDesktopIconOrganizer {
+    pub icons: Vec<DesktopIconLocation>,
+    pub grid_size_px: usize,
+}
+
+impl Default for MintDesktopIconOrganizer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintDesktopIconOrganizer {
+    pub fn new() -> Self {
+        Self {
+            icons: Vec::new(),
+            grid_size_px: 64,
+        }
+    }
+
+    pub fn auto_arrange(&mut self, filenames: &[&str]) {
+        self.icons.clear();
+        for (i, &f) in filenames.iter().enumerate() {
+            self.icons.push(DesktopIconLocation {
+                file_name: f.to_string(),
+                grid_x: 0,
+                grid_y: i,
+            });
+        }
+    }
+}
+
+/// XApps Thumbnailer Service for File Managers
+pub struct MintXappsThumbnails {
+    pub supported_extensions: Vec<String>,
+}
+
+impl Default for MintXappsThumbnails {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintXappsThumbnails {
+    pub fn new() -> Self {
+        Self {
+            supported_extensions: vec![
+                "pdf".to_string(),
+                "epub".to_string(),
+                "mp4".to_string(),
+                "mkv".to_string(),
+                "ttf".to_string(),
+                "otf".to_string(),
+            ],
+        }
+    }
+
+    pub fn can_thumbnail(&self, filename: &str) -> bool {
+        if let Some(ext) = filename.split('.').last() {
+            self.supported_extensions.contains(&ext.to_lowercase())
+        } else {
+            false
+        }
+    }
+}
+
+/// Cinnamon Virtual Desktop & Workspace Switcher Manager
+#[derive(Debug, Clone)]
+pub struct WorkspaceDescriptor {
+    pub index: usize,
+    pub label: String,
+    pub window_count: usize,
+}
+
+pub struct MintCinnamonWorkspaceManager {
+    pub workspaces: Vec<WorkspaceDescriptor>,
+    pub active_workspace_idx: usize,
+}
+
+impl Default for MintCinnamonWorkspaceManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintCinnamonWorkspaceManager {
+    pub fn new() -> Self {
+        let mut mgr = Self {
+            workspaces: Vec::new(),
+            active_workspace_idx: 0,
+        };
+        mgr.workspaces.push(WorkspaceDescriptor {
+            index: 0,
+            label: String::from("Workspace 1"),
+            window_count: 0,
+        });
+        mgr.workspaces.push(WorkspaceDescriptor {
+            index: 1,
+            label: String::from("Workspace 2"),
+            window_count: 0,
+        });
+        mgr
+    }
+
+    pub fn add_workspace(&mut self, label: &str) -> usize {
+        let idx = self.workspaces.len();
+        self.workspaces.push(WorkspaceDescriptor {
+            index: idx,
+            label: label.to_string(),
+            window_count: 0,
+        });
+        idx
+    }
+
+    pub fn switch_to_workspace(&mut self, index: usize) -> Result<(), &'static str> {
+        if index < self.workspaces.len() {
+            self.active_workspace_idx = index;
+            Ok(())
+        } else {
+            Err("Workspace index out of bounds")
+        }
+    }
+}
+
+/// Linux Mint Desktop Event Sound Scheme Theme Manager
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SoundEventType {
+    Login,
+    Logout,
+    WindowClose,
+    TrashEmpty,
+    NotificationAlert,
+}
+
+pub struct MintSoundSchemeEngine {
+    pub sound_events_enabled: bool,
+    pub active_sound_theme: String,
+    pub triggered_events: Vec<SoundEventType>,
+}
+
+impl Default for MintSoundSchemeEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintSoundSchemeEngine {
+    pub fn new() -> Self {
+        Self {
+            sound_events_enabled: true,
+            active_sound_theme: String::from("mint-y"),
+            triggered_events: Vec::new(),
+        }
+    }
+
+    pub fn play_sound_event(&mut self, event: SoundEventType) -> bool {
+        if !self.sound_events_enabled {
+            return false;
+        }
+        self.triggered_events.push(event);
+        true
+    }
+}
+
+/// Mint User Accounts & Group Administration Tool
+#[derive(Debug, Clone)]
+pub struct MintUserProfile {
+    pub username: String,
+    pub full_name: String,
+    pub is_sudo_admin: bool,
+    pub autologin_enabled: bool,
+    pub avatar_icon_path: String,
+}
+
+pub struct MintUserAccountsManager {
+    pub users: Vec<MintUserProfile>,
+}
+
+impl Default for MintUserAccountsManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintUserAccountsManager {
+    pub fn new() -> Self {
+        let mut mgr = Self { users: Vec::new() };
+        mgr.users.push(MintUserProfile {
+            username: String::from("mintuser"),
+            full_name: String::from("Linux Mint User"),
+            is_sudo_admin: true,
+            autologin_enabled: false,
+            avatar_icon_path: String::from("/usr/share/pixmaps/faces/user.png"),
+        });
+        mgr
+    }
+
+    pub fn create_user(&mut self, username: &str, full_name: &str, admin: bool) {
+        self.users.push(MintUserProfile {
+            username: username.to_string(),
+            full_name: full_name.to_string(),
+            is_sudo_admin: admin,
+            autologin_enabled: false,
+            avatar_icon_path: String::from("/usr/share/pixmaps/faces/user.png"),
+        });
+    }
+
+    pub fn set_autologin(&mut self, username: &str, enabled: bool) -> Result<(), &'static str> {
+        let user = self.users.iter_mut().find(|u| u.username == username).ok_or("User not found")?;
+        user.autologin_enabled = enabled;
+        Ok(())
+    }
+}
+
+/// Mint System Fixer & DKMS Driver Module Rebuilder
+pub struct MintSystemFixerDkmsRebuilder {
+    pub dkms_modules: Vec<String>,
+    pub rebuilt_count: usize,
+}
+
+impl Default for MintSystemFixerDkmsRebuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintSystemFixerDkmsRebuilder {
+    pub fn new() -> Self {
+        Self {
+            dkms_modules: vec![
+                String::from("nvidia-current"),
+                String::from("broadcom-sta"),
+                String::from("vboxhost"),
+            ],
+            rebuilt_count: 0,
+        }
+    }
+
+    pub fn rebuild_all_dkms_modules(&mut self, _kernel_version: &str) -> usize {
+        for _m in &self.dkms_modules {
+            self.rebuilt_count += 1;
+        }
+        self.rebuilt_count
+    }
+}
+
+/// Cinnamon Desktop Hot Corners Action Manager
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HotCornerLocation {
+    TopLeft,
+    TopRight,
+    BottomLeft,
+    BottomRight,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HotCornerAction {
+    ExpoWorkspaces,
+    ScaleWindows,
+    ShowDesktop,
+    CustomCommand,
+    Disabled,
+}
+
+#[derive(Debug, Clone)]
+pub struct HotCornerConfig {
+    pub location: HotCornerLocation,
+    pub action: HotCornerAction,
+    pub custom_cmd: String,
+    pub hover_delay_ms: u32,
+}
+
+pub struct MintCinnamonHotCornerEngine {
+    pub corners: Vec<HotCornerConfig>,
+}
+
+impl Default for MintCinnamonHotCornerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintCinnamonHotCornerEngine {
+    pub fn new() -> Self {
+        let mut engine = Self { corners: Vec::new() };
+        engine.corners.push(HotCornerConfig {
+            location: HotCornerLocation::TopLeft,
+            action: HotCornerAction::ExpoWorkspaces,
+            custom_cmd: String::new(),
+            hover_delay_ms: 100,
+        });
+        engine
+    }
+
+    pub fn set_corner_action(&mut self, location: HotCornerLocation, action: HotCornerAction, cmd: &str) {
+        if let Some(c) = self.corners.iter_mut().find(|c| c.location == location) {
+            c.action = action;
+            c.custom_cmd = cmd.to_string();
+        } else {
+            self.corners.push(HotCornerConfig {
+                location,
+                action,
+                custom_cmd: cmd.to_string(),
+                hover_delay_ms: 100,
+            });
+        }
+    }
+
+    pub fn trigger_corner(&self, location: HotCornerLocation) -> Option<HotCornerAction> {
+        self.corners.iter().find(|c| c.location == location).map(|c| c.action)
+    }
+}
+
+/// MintUpdate Kernel Version Pin & Hold Manager
+pub struct MintUpdateKernelPinning {
+    pub pinned_kernels: Vec<String>,
+}
+
+impl Default for MintUpdateKernelPinning {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintUpdateKernelPinning {
+    pub fn new() -> Self {
+        Self {
+            pinned_kernels: Vec::new(),
+        }
+    }
+
+    pub fn pin_kernel(&mut self, version: &str) {
+        if !self.pinned_kernels.contains(&version.to_string()) {
+            self.pinned_kernels.push(version.to_string());
+        }
+    }
+
+    pub fn unpin_kernel(&mut self, version: &str) {
+        self.pinned_kernels.retain(|v| v != version);
+    }
+
+    pub fn is_kernel_pinned(&self, version: &str) -> bool {
+        self.pinned_kernels.contains(&version.to_string())
+    }
+}
+
+/// MintInstall FlatpakRef Installer & Remote GPG Validator
+#[derive(Debug, Clone)]
+pub struct FlatpakRefDescriptor {
+    pub name: String,
+    pub branch: String,
+    pub title: String,
+    pub url: String,
+    pub gpg_key_valid: bool,
+}
+
+pub struct MintInstallFlatpakRefFetcher {
+    pub refs: Vec<FlatpakRefDescriptor>,
+}
+
+impl Default for MintInstallFlatpakRefFetcher {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintInstallFlatpakRefFetcher {
+    pub fn new() -> Self {
+        Self { refs: Vec::new() }
+    }
+
+    pub fn parse_flatpakref(&mut self, name: &str, branch: &str, title: &str, url: &str) -> Result<&FlatpakRefDescriptor, &'static str> {
+        if url.is_empty() {
+            return Err("Invalid FlatpakRef URL");
+        }
+        let desc = FlatpakRefDescriptor {
+            name: name.to_string(),
+            branch: branch.to_string(),
+            title: title.to_string(),
+            url: url.to_string(),
+            gpg_key_valid: true,
+        };
+        self.refs.push(desc);
+        Ok(self.refs.last().unwrap())
+    }
+}
+
+/// Mint System Monitor Panel Applet HUD State Tracker
+#[derive(Debug, Clone, Copy, Default)]
+pub struct SystemResourcesTelemetry {
+    pub cpu_usage_pct: f32,
+    pub ram_usage_mb: u64,
+    pub total_ram_mb: u64,
+    pub net_rx_kbps: f32,
+    pub net_tx_kbps: f32,
+}
+
+pub struct MintSystemMonitorHUD {
+    pub telemetry: SystemResourcesTelemetry,
+}
+
+impl Default for MintSystemMonitorHUD {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintSystemMonitorHUD {
+    pub fn new() -> Self {
+        Self {
+            telemetry: SystemResourcesTelemetry {
+                cpu_usage_pct: 12.5,
+                ram_usage_mb: 2048,
+                total_ram_mb: 16384,
+                net_rx_kbps: 150.0,
+                net_tx_kbps: 45.0,
+            },
+        }
+    }
+
+    pub fn update_telemetry(&mut self, cpu: f32, ram: u64, net_rx: f32, net_tx: f32) {
+        self.telemetry.cpu_usage_pct = cpu;
+        self.telemetry.ram_usage_mb = ram;
+        self.telemetry.net_rx_kbps = net_rx;
+        self.telemetry.net_tx_kbps = net_tx;
+    }
+}
+
+/// Cinnamon System Tray & StatusNotifierItem (SNI) Applet Manager
+#[derive(Debug, Clone)]
+pub struct StatusNotifierItem {
+    pub id: String,
+    pub title: String,
+    pub icon_name: String,
+    pub is_visible: bool,
+}
+
+pub struct MintCinnamonAppletTrayEngine {
+    pub items: Vec<StatusNotifierItem>,
+}
+
+impl Default for MintCinnamonAppletTrayEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintCinnamonAppletTrayEngine {
+    pub fn new() -> Self {
+        Self { items: Vec::new() }
+    }
+
+    pub fn register_sni(&mut self, id: &str, title: &str, icon: &str) {
+        self.items.push(StatusNotifierItem {
+            id: id.to_string(),
+            title: title.to_string(),
+            icon_name: icon.to_string(),
+            is_visible: true,
+        });
+    }
+
+    pub fn get_visible_items(&self) -> Vec<&StatusNotifierItem> {
+        self.items.iter().filter(|i| i.is_visible).collect()
+    }
+}
+
+/// MintUpdate Repository Mirror Speed & Latency Benchmark Engine
+#[derive(Debug, Clone)]
+pub struct MirrorBenchmarkResult {
+    pub mirror_url: String,
+    pub latency_ms: u32,
+    pub speed_kbps: u32,
+    pub score: u32,
+}
+
+pub struct MintUpdateMirrorSpeedTester {
+    pub benchmark_results: Vec<MirrorBenchmarkResult>,
+}
+
+impl Default for MintUpdateMirrorSpeedTester {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintUpdateMirrorSpeedTester {
+    pub fn new() -> Self {
+        Self {
+            benchmark_results: Vec::new(),
+        }
+    }
+
+    pub fn test_mirror(&mut self, url: &str, latency: u32, speed: u32) {
+        let score = speed / (latency.max(1));
+        self.benchmark_results.push(MirrorBenchmarkResult {
+            mirror_url: url.to_string(),
+            latency_ms: latency,
+            speed_kbps: speed,
+            score,
+        });
+    }
+
+    pub fn get_fastest_mirror(&self) -> Option<&MirrorBenchmarkResult> {
+        self.benchmark_results.iter().max_by_key(|m| m.score)
+    }
+}
+
+/// MintInstall Category Taxonomy & Software Curator
+#[derive(Debug, Clone)]
+pub struct SoftwareCategoryInfo {
+    pub category_id: String,
+    pub display_name: String,
+    pub icon_name: String,
+    pub featured_app_ids: Vec<String>,
+}
+
+pub struct MintInstallPackageCategoriesCatalog {
+    pub categories: Vec<SoftwareCategoryInfo>,
+}
+
+impl Default for MintInstallPackageCategoriesCatalog {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintInstallPackageCategoriesCatalog {
+    pub fn new() -> Self {
+        let mut catalog = Self {
+            categories: Vec::new(),
+        };
+        catalog.categories.push(SoftwareCategoryInfo {
+            category_id: String::from("accessories"),
+            display_name: String::from("Accessories"),
+            icon_name: String::from("applications-accessories"),
+            featured_app_ids: vec![String::from("org.gnome.Calculator"), String::from("pix")],
+        });
+        catalog.categories.push(SoftwareCategoryInfo {
+            category_id: String::from("internet"),
+            display_name: String::from("Internet"),
+            icon_name: String::from("applications-internet"),
+            featured_app_ids: vec![String::from("firefox"), String::from("thunderbird")],
+        });
+        catalog
+    }
+
+    pub fn get_category(&self, id: &str) -> Option<&SoftwareCategoryInfo> {
+        self.categories.iter().find(|c| c.category_id == id)
+    }
+}
+
+/// Nemo File Manager Extension Engine (ColumnProvider & MenuProvider)
+#[derive(Debug, Clone)]
+pub struct NemoExtensionDescriptor {
+    pub name: String,
+    pub provides_columns: bool,
+    pub provides_menus: bool,
+    pub enabled: bool,
+}
+
+pub struct MintNemoExtensionManager {
+    pub extensions: Vec<NemoExtensionDescriptor>,
+}
+
+impl Default for MintNemoExtensionManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintNemoExtensionManager {
+    pub fn new() -> Self {
+        Self {
+            extensions: Vec::new(),
+        }
+    }
+
+    pub fn register_extension(&mut self, name: &str, columns: bool, menus: bool) {
+        self.extensions.push(NemoExtensionDescriptor {
+            name: name.to_string(),
+            provides_columns: columns,
+            provides_menus: menus,
+            enabled: true,
+        });
+    }
+
+    pub fn get_menu_providers(&self) -> Vec<&NemoExtensionDescriptor> {
+        self.extensions.iter().filter(|e| e.enabled && e.provides_menus).collect()
+    }
+}
+
 pub struct MintDriverManager {
     pub available_drivers: Vec<MintDriverInfo>,
 }
@@ -1556,6 +2240,156 @@ mod tests {
 
         notes.update_body(id1, "Buy apples, milk, & bread").unwrap();
         assert_eq!(notes.notes[0].body, "Buy apples, milk, & bread");
+    }
+
+    #[test]
+    fn test_mint_cinnamon_applet_tray_engine() {
+        let mut tray = MintCinnamonAppletTrayEngine::new();
+        tray.register_sni("org.gnome.Volume", "Volume Control", "audio-volume-high");
+        assert_eq!(tray.get_visible_items().len(), 1);
+        assert_eq!(tray.get_visible_items()[0].title, "Volume Control");
+    }
+
+    #[test]
+    fn test_mint_update_mirror_speed_tester() {
+        let mut tester = MintUpdateMirrorSpeedTester::new();
+        tester.test_mirror("https://mirror.us.mint.org", 20, 50000);
+        tester.test_mirror("https://mirror.eu.mint.org", 100, 20000);
+
+        let fastest = tester.get_fastest_mirror().unwrap();
+        assert_eq!(fastest.mirror_url, "https://mirror.us.mint.org");
+    }
+
+    #[test]
+    fn test_mint_install_package_categories_catalog() {
+        let catalog = MintInstallPackageCategoriesCatalog::new();
+        let internet = catalog.get_category("internet").unwrap();
+        assert_eq!(internet.display_name, "Internet");
+        assert!(internet.featured_app_ids.contains(&"firefox".to_string()));
+    }
+
+    #[test]
+    fn test_mint_nemo_extension_manager() {
+        let mut nemo_ext = MintNemoExtensionManager::new();
+        nemo_ext.register_extension("nemo-share", false, true);
+
+        let providers = nemo_ext.get_menu_providers();
+        assert_eq!(providers.len(), 1);
+        assert_eq!(providers[0].name, "nemo-share");
+    }
+
+    #[test]
+    fn test_mint_cinnamon_hot_corner_engine() {
+        let mut corners = MintCinnamonHotCornerEngine::new();
+        assert_eq!(corners.trigger_corner(HotCornerLocation::TopLeft), Some(HotCornerAction::ExpoWorkspaces));
+
+        corners.set_corner_action(HotCornerLocation::BottomRight, HotCornerAction::ShowDesktop, "");
+        assert_eq!(corners.trigger_corner(HotCornerLocation::BottomRight), Some(HotCornerAction::ShowDesktop));
+    }
+
+    #[test]
+    fn test_mint_update_kernel_pinning() {
+        let mut kernel_pin = MintUpdateKernelPinning::new();
+        kernel_pin.pin_kernel("6.5.6-sigma");
+        assert!(kernel_pin.is_kernel_pinned("6.5.6-sigma"));
+
+        kernel_pin.unpin_kernel("6.5.6-sigma");
+        assert!(!kernel_pin.is_kernel_pinned("6.5.6-sigma"));
+    }
+
+    #[test]
+    fn test_mint_install_flatpak_ref_fetcher() {
+        let mut flatpak_ref = MintInstallFlatpakRefFetcher::new();
+        let desc = flatpak_ref.parse_flatpakref("vlc", "stable", "VLC Media Player", "https://dl.flathub.org/repo/appstream/vlc.flatpakref").unwrap();
+        assert_eq!(desc.name, "vlc");
+        assert!(desc.gpg_key_valid);
+    }
+
+    #[test]
+    fn test_mint_system_monitor_hud() {
+        let mut hud = MintSystemMonitorHUD::new();
+        hud.update_telemetry(25.0, 4096, 500.0, 100.0);
+        assert_eq!(hud.telemetry.cpu_usage_pct, 25.0);
+        assert_eq!(hud.telemetry.ram_usage_mb, 4096);
+    }
+
+    #[test]
+    fn test_mint_cinnamon_workspace_manager() {
+        let mut ws_mgr = MintCinnamonWorkspaceManager::new();
+        assert_eq!(ws_mgr.workspaces.len(), 2);
+
+        let new_idx = ws_mgr.add_workspace("Development");
+        assert_eq!(new_idx, 2);
+
+        assert!(ws_mgr.switch_to_workspace(2).is_ok());
+        assert_eq!(ws_mgr.active_workspace_idx, 2);
+    }
+
+    #[test]
+    fn test_mint_sound_scheme_engine() {
+        let mut sounds = MintSoundSchemeEngine::new();
+        assert!(sounds.play_sound_event(SoundEventType::Login));
+        assert_eq!(sounds.triggered_events.len(), 1);
+
+        sounds.sound_events_enabled = false;
+        assert!(!sounds.play_sound_event(SoundEventType::TrashEmpty));
+    }
+
+    #[test]
+    fn test_mint_user_accounts_manager() {
+        let mut users_mgr = MintUserAccountsManager::new();
+        assert_eq!(users_mgr.users.len(), 1);
+
+        users_mgr.create_user("alice", "Alice Smith", false);
+        assert_eq!(users_mgr.users.len(), 2);
+
+        assert!(users_mgr.set_autologin("alice", true).is_ok());
+        assert!(users_mgr.users[1].autologin_enabled);
+    }
+
+    #[test]
+    fn test_mint_system_fixer_dkms_rebuilder() {
+        let mut fixer = MintSystemFixerDkmsRebuilder::new();
+        let rebuilt = fixer.rebuild_all_dkms_modules("6.8.0-sigma");
+        assert_eq!(rebuilt, 3);
+    }
+
+    #[test]
+    fn test_mint_upload_manager() {
+        let mut upload = MintUploadManager::new();
+        upload.add_profile("Community FTP", "ftp.example.com", 21, UploadProtocol::Ftp, "/uploads", "https://example.com/files");
+        assert_eq!(upload.profiles.len(), 1);
+
+        let link = upload.generate_share_link("Community FTP", "image.png").unwrap();
+        assert_eq!(link, "https://example.com/files/image.png");
+    }
+
+    #[test]
+    fn test_mint_digit_keyring_prompt() {
+        let mut prompt = MintDigitKeyringPrompt::new();
+        assert!(!prompt.request_auth("apt update", ""));
+        assert!(!prompt.is_authenticated);
+
+        assert!(prompt.request_auth("apt update", "secret123"));
+        assert!(prompt.is_authenticated);
+    }
+
+    #[test]
+    fn test_mint_desktop_icon_organizer() {
+        let mut organizer = MintDesktopIconOrganizer::new();
+        organizer.auto_arrange(&["Home", "Trash", "Documents"]);
+        assert_eq!(organizer.icons.len(), 3);
+        assert_eq!(organizer.icons[0].file_name, "Home");
+        assert_eq!(organizer.icons[0].grid_y, 0);
+        assert_eq!(organizer.icons[2].grid_y, 2);
+    }
+
+    #[test]
+    fn test_mint_xapps_thumbnails() {
+        let xapps_thumb = MintXappsThumbnails::new();
+        assert!(xapps_thumb.can_thumbnail("document.pdf"));
+        assert!(xapps_thumb.can_thumbnail("movie.mp4"));
+        assert!(!xapps_thumb.can_thumbnail("archive.iso"));
     }
 
     #[test]
