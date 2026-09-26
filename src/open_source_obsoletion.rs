@@ -3111,6 +3111,11 @@ pub struct SovereignOpenSourceObsoletionOrchestrator {
     pub fd_walker: SovereignFdDirectoryWalkerEngine,
     pub telescope_picker: SovereignTelescopeFuzzyPickerEngine,
     pub btop_monitor: SovereignBtopResourceMonitorEngine,
+    pub bcachefs: open_source_os_gap_closure::SovereignBcachefsTieredEngine,
+    pub bpf_lsm: open_source_os_gap_closure::SovereignLinuxBpfLsmEngine,
+    pub ghostty_terminal: open_source_os_gap_closure::SovereignGhosttyTextGridEngine,
+    pub valgrind_debugger: open_source_os_gap_closure::SovereignValgrindMemoryDebuggerEngine,
+    pub nebula_mesh: open_source_os_gap_closure::SovereignNebulaMeshVpnEngine,
     pub total_obsoleted_projects_count: u32,
 }
 
@@ -3121,6 +3126,9 @@ impl SovereignOpenSourceObsoletionOrchestrator {
 
         let mut ai_server = SovereignAiInferenceServer::new();
         ai_server.load_model("sovereign-ai-7b", 8192);
+
+        let mut bcachefs = open_source_os_gap_closure::SovereignBcachefsTieredEngine::new();
+        bcachefs.register_device(1, "/dev/nvme0n1", open_source_os_gap_closure::BcachefsTier::NvmeReadCache, 1_000_000_000_000);
 
         Self {
             vcs: SovereignVcsEngine::new(),
@@ -3186,7 +3194,12 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             fd_walker: SovereignFdDirectoryWalkerEngine::new(),
             telescope_picker: SovereignTelescopeFuzzyPickerEngine::new(),
             btop_monitor: SovereignBtopResourceMonitorEngine::new(),
-            total_obsoleted_projects_count: 85,
+            bcachefs,
+            bpf_lsm: open_source_os_gap_closure::SovereignLinuxBpfLsmEngine::new(),
+            ghostty_terminal: open_source_os_gap_closure::SovereignGhosttyTextGridEngine::new(80, 24),
+            valgrind_debugger: open_source_os_gap_closure::SovereignValgrindMemoryDebuggerEngine::new(),
+            nebula_mesh: open_source_os_gap_closure::SovereignNebulaMeshVpnEngine::new("orchestrator_node", "10.200.0.1"),
+            total_obsoleted_projects_count: 90,
         }
     }
 
@@ -3241,6 +3254,11 @@ impl SovereignOpenSourceObsoletionOrchestrator {
         self.fd_walker.add_entry("/src/main.rs", false, false, 1024);
         self.telescope_picker.add_item(1, "open_sovereign_terminal", "action", Some("function"));
         self.btop_monitor.record_core_telemetry(0, 15, 3600, 42);
+        let _ = self.bcachefs.allocate_extent(1, open_source_os_gap_closure::BcachefsTier::NvmeReadCache, 4096, true);
+        self.bpf_lsm.attach_hook_rule(open_source_os_gap_closure::BpfLsmHook::FileOpen, "/etc/shadow", false);
+        self.ghostty_terminal.write_char(0, 0, 'S', (255, 255, 255), (0, 0, 0));
+        self.valgrind_debugger.shadow_malloc(0x7fff0000, 1024);
+        let _ = self.nebula_mesh.perform_noise_handshake("lighthouse_01");
 
         Ok(format!(
             "Sovereign Stack Active: {} legacy open-source projects obsoleted",
@@ -6295,8 +6313,8 @@ mod tests {
     fn test_sovereign_orchestrator_bootstrap() {
         let mut orchestrator = SovereignOpenSourceObsoletionOrchestrator::new();
         let status = orchestrator.bootstrap_sovereign_stack().unwrap();
-        assert!(status.contains("85 legacy open-source projects obsoleted"));
-        assert_eq!(orchestrator.total_obsoleted_projects_count, 85);
+        assert!(status.contains("90 legacy open-source projects obsoleted"));
+        assert_eq!(orchestrator.total_obsoleted_projects_count, 90);
         assert_eq!(orchestrator.serenity_async.processed_count, 0);
         assert_eq!(orchestrator.serenity_async.task_queue.len(), 1);
         assert_eq!(orchestrator.qubes_isolation.domains.len(), 1);

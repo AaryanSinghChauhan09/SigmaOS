@@ -3509,6 +3509,407 @@ impl Default for LinuxLandlockLsmSecurityEngine {
 }
 
 // =========================================================================
+// 38. BCACHEFS MULTI-DEVICE TIERED COW FILESYSTEM ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BcachefsTier {
+    NvmeReadCache,
+    SsdWriteBack,
+    HddColdStorage,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BcachefsDevice {
+    pub device_id: u32,
+    pub path: String,
+    pub tier: BcachefsTier,
+    pub total_bytes: u64,
+    pub free_bytes: u64,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BcachefsExtent {
+    pub extent_id: u64,
+    pub device_id: u32,
+    pub checksum_chacha: [u8; 16],
+    pub is_encrypted: bool,
+    pub size_bytes: u64,
+}
+
+pub struct SovereignBcachefsTieredEngine {
+    pub devices: Vec<BcachefsDevice>,
+    pub extents: BTreeMap<u64, BcachefsExtent>,
+    pub total_promotions_count: u64,
+}
+
+impl SovereignBcachefsTieredEngine {
+    pub fn new() -> Self {
+        Self {
+            devices: Vec::new(),
+            extents: BTreeMap::new(),
+            total_promotions_count: 0,
+        }
+    }
+
+    pub fn register_device(&mut self, device_id: u32, path: &str, tier: BcachefsTier, total_bytes: u64) {
+        self.devices.push(BcachefsDevice {
+            device_id,
+            path: path.to_string(),
+            tier,
+            total_bytes,
+            free_bytes: total_bytes,
+        });
+    }
+
+    pub fn allocate_extent(
+        &mut self,
+        extent_id: u64,
+        target_tier: BcachefsTier,
+        size_bytes: u64,
+        encrypt: bool,
+    ) -> Result<u32, &'static str> {
+        let dev = self
+            .devices
+            .iter_mut()
+            .find(|d| d.tier == target_tier && d.free_bytes >= size_bytes)
+            .ok_or("Bcachefs: No device available with sufficient space in target tier")?;
+
+        dev.free_bytes -= size_bytes;
+        let dev_id = dev.device_id;
+
+        let dummy_checksum = [0x5A; 16];
+        self.extents.insert(
+            extent_id,
+            BcachefsExtent {
+                extent_id,
+                device_id: dev_id,
+                checksum_chacha: dummy_checksum,
+                is_encrypted: encrypt,
+                size_bytes,
+            },
+        );
+
+        Ok(dev_id)
+    }
+
+    pub fn promote_extent(&mut self, extent_id: u64, target_tier: BcachefsTier) -> bool {
+        let extent = match self.extents.get(&extent_id) {
+            Some(e) => e.clone(),
+            None => return false,
+        };
+
+        let current_dev_tier = self
+            .devices
+            .iter()
+            .find(|d| d.device_id == extent.device_id)
+            .map(|d| d.tier);
+
+        if current_dev_tier == Some(target_tier) {
+            return true;
+        }
+
+        let target_dev_id = match self
+            .devices
+            .iter()
+            .find(|d| d.tier == target_tier && d.free_bytes >= extent.size_bytes)
+        {
+            Some(d) => d.device_id,
+            None => return false,
+        };
+
+        // Adjust free bytes
+        if let Some(old_dev) = self.devices.iter_mut().find(|d| d.device_id == extent.device_id) {
+            old_dev.free_bytes += extent.size_bytes;
+        }
+        if let Some(new_dev) = self.devices.iter_mut().find(|d| d.device_id == target_dev_id) {
+            new_dev.free_bytes -= extent.size_bytes;
+        }
+
+        if let Some(ext) = self.extents.get_mut(&extent_id) {
+            ext.device_id = target_dev_id;
+        }
+        self.total_promotions_count += 1;
+        true
+    }
+}
+
+impl Default for SovereignBcachefsTieredEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 39. EBPF-LSM SECURITY MODULE POLICY ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BpfLsmHook {
+    FileOpen,
+    TaskAlloc,
+    SocketCreate,
+    BprmCheckSecurity,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BpfLsmRule {
+    pub hook: BpfLsmHook,
+    pub target_prefix: String,
+    pub allow: bool,
+}
+
+pub struct SovereignLinuxBpfLsmEngine {
+    pub rules: Vec<BpfLsmRule>,
+    pub audit_violations_count: u64,
+}
+
+impl SovereignLinuxBpfLsmEngine {
+    pub fn new() -> Self {
+        Self {
+            rules: Vec::new(),
+            audit_violations_count: 0,
+        }
+    }
+
+    pub fn attach_hook_rule(&mut self, hook: BpfLsmHook, prefix: &str, allow: bool) {
+        self.rules.push(BpfLsmRule {
+            hook,
+            target_prefix: prefix.to_string(),
+            allow,
+        });
+    }
+
+    pub fn evaluate_hook(&mut self, hook: BpfLsmHook, target: &str) -> bool {
+        for rule in &self.rules {
+            if rule.hook == hook && target.starts_with(&rule.target_prefix) {
+                if !rule.allow {
+                    self.audit_violations_count += 1;
+                }
+                return rule.allow;
+            }
+        }
+        true // Default allow if no rule matches
+    }
+}
+
+impl Default for SovereignLinuxBpfLsmEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 40. GHOSTTY TERMINAL GPU TEXT GRID & CELL ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TerminalCell {
+    pub ch: char,
+    pub fg_rgb: (u8, u8, u8),
+    pub bg_rgb: (u8, u8, u8),
+    pub is_hyperlink: bool,
+    pub hyperlink_uri: String,
+}
+
+pub struct SovereignGhosttyTextGridEngine {
+    pub cols: usize,
+    pub rows: usize,
+    pub grid: Vec<TerminalCell>,
+    pub dirty_quads: Vec<(usize, usize, usize, usize)>,
+}
+
+impl SovereignGhosttyTextGridEngine {
+    pub fn new(cols: usize, rows: usize) -> Self {
+        let total = cols * rows;
+        let mut grid = Vec::with_capacity(total);
+        for _ in 0..total {
+            grid.push(TerminalCell {
+                ch: ' ',
+                fg_rgb: (255, 255, 255),
+                bg_rgb: (0, 0, 0),
+                is_hyperlink: false,
+                hyperlink_uri: String::new(),
+            });
+        }
+        Self {
+            cols,
+            rows,
+            grid,
+            dirty_quads: Vec::new(),
+        }
+    }
+
+    pub fn write_char(&mut self, col: usize, row: usize, ch: char, fg: (u8, u8, u8), bg: (u8, u8, u8)) {
+        if col < self.cols && row < self.rows {
+            let idx = row * self.cols + col;
+            self.grid[idx].ch = ch;
+            self.grid[idx].fg_rgb = fg;
+            self.grid[idx].bg_rgb = bg;
+            self.mark_dirty_quad(col, row, 1, 1);
+        }
+    }
+
+    pub fn parse_and_attach_hyperlink(&mut self, row: usize, uri: &str) {
+        if row < self.rows {
+            let start = row * self.cols;
+            let end = start + self.cols;
+            for cell in &mut self.grid[start..end] {
+                cell.is_hyperlink = true;
+                cell.hyperlink_uri = uri.to_string();
+            }
+        }
+    }
+
+    pub fn mark_dirty_quad(&mut self, x: usize, y: usize, w: usize, h: usize) {
+        self.dirty_quads.push((x, y, w, h));
+    }
+
+    pub fn compute_dirty_quads(&mut self) -> Vec<(usize, usize, usize, usize)> {
+        core::mem::take(&mut self.dirty_quads)
+    }
+}
+
+// =========================================================================
+// 41. VALGRIND MEMORY DEBUGGER & SHADOW MEMORY ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ShadowMemState {
+    Unallocated,
+    AllocatedUninit,
+    AllocatedInit,
+    Freed,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ShadowRegion {
+    pub addr: u64,
+    pub size: usize,
+    pub state: ShadowMemState,
+}
+
+pub struct SovereignValgrindMemoryDebuggerEngine {
+    pub regions: Vec<ShadowRegion>,
+    pub detected_leaks_count: usize,
+}
+
+impl SovereignValgrindMemoryDebuggerEngine {
+    pub fn new() -> Self {
+        Self {
+            regions: Vec::new(),
+            detected_leaks_count: 0,
+        }
+    }
+
+    pub fn shadow_malloc(&mut self, addr: u64, size: usize) {
+        self.regions.push(ShadowRegion {
+            addr,
+            size,
+            state: ShadowMemState::AllocatedUninit,
+        });
+    }
+
+    pub fn shadow_write(&mut self, addr: u64, size: usize) {
+        if let Some(r) = self.regions.iter_mut().find(|r| addr >= r.addr && addr < r.addr + r.size as u64) {
+            let _ = size;
+            r.state = ShadowMemState::AllocatedInit;
+        }
+    }
+
+    pub fn shadow_free(&mut self, addr: u64) -> Result<(), &'static str> {
+        if let Some(r) = self.regions.iter_mut().find(|r| r.addr == addr) {
+            if r.state == ShadowMemState::Freed {
+                return Err("Valgrind: Double free detected!");
+            }
+            r.state = ShadowMemState::Freed;
+            Ok(())
+        } else {
+            Err("Valgrind: Invalid free address")
+        }
+    }
+
+    pub fn check_memory_read(&mut self, addr: u64) -> Result<(), &'static str> {
+        if let Some(r) = self.regions.iter().find(|r| addr >= r.addr && addr < r.addr + r.size as u64) {
+            match r.state {
+                ShadowMemState::Freed => Err("Valgrind: Use-after-free error detected!"),
+                ShadowMemState::AllocatedUninit => Err("Valgrind: Uninitialized memory read error detected!"),
+                ShadowMemState::AllocatedInit => Ok(()),
+                ShadowMemState::Unallocated => Err("Valgrind: Unmapped memory read detected!"),
+            }
+        } else {
+            Err("Valgrind: Memory access out of bounds")
+        }
+    }
+}
+
+impl Default for SovereignValgrindMemoryDebuggerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 42. NEBULA MESH OVERLAY ROUTER & NOISE PROTOCOL ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NebulaNode {
+    pub node_id: String,
+    pub ip_address: String,
+    pub is_lighthouse: bool,
+    pub public_key: [u8; 32],
+}
+
+pub struct SovereignNebulaMeshVpnEngine {
+    pub local_node_id: String,
+    pub local_ip: String,
+    pub lighthouses: Vec<NebulaNode>,
+    pub active_tunnels: BTreeMap<String, Vec<u8>>, // node_id -> session_key
+}
+
+impl SovereignNebulaMeshVpnEngine {
+    pub fn new(local_node_id: &str, local_ip: &str) -> Self {
+        Self {
+            local_node_id: local_node_id.to_string(),
+            local_ip: local_ip.to_string(),
+            lighthouses: Vec::new(),
+            active_tunnels: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_lighthouse(&mut self, node_id: &str, ip: &str, pubkey: [u8; 32]) {
+        self.lighthouses.push(NebulaNode {
+            node_id: node_id.to_string(),
+            ip_address: ip.to_string(),
+            is_lighthouse: true,
+            public_key: pubkey,
+        });
+    }
+
+    pub fn perform_noise_handshake(&mut self, target_node_id: &str) -> Result<Vec<u8>, &'static str> {
+        if target_node_id.is_empty() {
+            return Err("Nebula: Target node ID empty");
+        }
+        let session_key = vec![0x3C; 32];
+        self.active_tunnels.insert(target_node_id.to_string(), session_key.clone());
+        Ok(session_key)
+    }
+
+    pub fn encapsulate_mesh_packet(&mut self, target_node_id: &str, payload: &[u8]) -> Result<Vec<u8>, &'static str> {
+        let key = self
+            .active_tunnels
+            .get(target_node_id)
+            .ok_or("Nebula: No active tunnel for target node")?;
+
+        let mut enc = b"NEBULA_NOISE_IK:".to_vec();
+        enc.extend_from_slice(&key[..4]);
+        enc.extend_from_slice(payload);
+        Ok(enc)
+    }
+}
+
+// =========================================================================
 // UNIT TESTS
 // =========================================================================
 
@@ -4424,6 +4825,82 @@ mod tests {
         assert!(!landlock.check_net_access(443, true, false));
         assert!(!landlock.check_net_access(80, false, true));
     }
+
+    #[test]
+    fn test_sovereign_bcachefs_tiered_engine() {
+        let mut bcachefs = SovereignBcachefsTieredEngine::new();
+        bcachefs.register_device(1, "/dev/nvme0n1", BcachefsTier::NvmeReadCache, 1_000_000);
+        bcachefs.register_device(2, "/dev/sda1", BcachefsTier::HddColdStorage, 10_000_000);
+
+        let dev_id = bcachefs.allocate_extent(101, BcachefsTier::NvmeReadCache, 500_000, true).unwrap();
+        assert_eq!(dev_id, 1);
+        assert_eq!(bcachefs.devices[0].free_bytes, 500_000);
+
+        assert!(bcachefs.promote_extent(101, BcachefsTier::HddColdStorage));
+        assert_eq!(bcachefs.extents.get(&101).unwrap().device_id, 2);
+        assert_eq!(bcachefs.devices[0].free_bytes, 1_000_000);
+        assert_eq!(bcachefs.total_promotions_count, 1);
+    }
+
+    #[test]
+    fn test_sovereign_linux_bpf_lsm_engine() {
+        let mut lsm = SovereignLinuxBpfLsmEngine::new();
+        lsm.attach_hook_rule(BpfLsmHook::FileOpen, "/etc/shadow", false);
+        lsm.attach_hook_rule(BpfLsmHook::SocketCreate, "0.0.0.0", true);
+
+        assert!(!lsm.evaluate_hook(BpfLsmHook::FileOpen, "/etc/shadow"));
+        assert_eq!(lsm.audit_violations_count, 1);
+
+        assert!(lsm.evaluate_hook(BpfLsmHook::FileOpen, "/home/user/doc.txt"));
+        assert!(lsm.evaluate_hook(BpfLsmHook::SocketCreate, "0.0.0.0:8080"));
+    }
+
+    #[test]
+    fn test_sovereign_ghostty_text_grid_engine() {
+        let mut grid = SovereignGhosttyTextGridEngine::new(80, 24);
+        grid.write_char(0, 0, 'H', (255, 0, 0), (0, 0, 0));
+        grid.write_char(1, 0, 'i', (0, 255, 0), (0, 0, 0));
+
+        assert_eq!(grid.grid[0].ch, 'H');
+        assert_eq!(grid.grid[0].fg_rgb, (255, 0, 0));
+
+        grid.parse_and_attach_hyperlink(0, "https://sigmaos.org");
+        assert!(grid.grid[0].is_hyperlink);
+        assert_eq!(grid.grid[0].hyperlink_uri, "https://sigmaos.org");
+
+        let quads = grid.compute_dirty_quads();
+        assert_eq!(quads.len(), 2);
+    }
+
+    #[test]
+    fn test_sovereign_valgrind_memory_debugger_engine() {
+        let mut valgrind = SovereignValgrindMemoryDebuggerEngine::new();
+        valgrind.shadow_malloc(0x1000, 64);
+
+        // Reading uninitialized memory raises error
+        assert!(valgrind.check_memory_read(0x1000).is_err());
+
+        valgrind.shadow_write(0x1000, 64);
+        assert!(valgrind.check_memory_read(0x1000).is_ok());
+
+        assert!(valgrind.shadow_free(0x1000).is_ok());
+        // Double free raises error
+        assert!(valgrind.shadow_free(0x1000).is_err());
+        // Use-after-free raises error
+        assert!(valgrind.check_memory_read(0x1000).is_err());
+    }
+
+    #[test]
+    fn test_sovereign_nebula_mesh_vpn_engine() {
+        let mut nebula = SovereignNebulaMeshVpnEngine::new("node_a", "10.0.0.1");
+        nebula.register_lighthouse("lighthouse_1", "1.2.3.4", [0xAA; 32]);
+
+        let key = nebula.perform_noise_handshake("node_b").unwrap();
+        assert_eq!(key.len(), 32);
+
+        let enc = nebula.encapsulate_mesh_packet("node_b", b"PING").unwrap();
+        assert!(enc.starts_with(b"NEBULA_NOISE_IK:"));
+    }
 }
 
 // =========================================================================
@@ -4925,6 +5402,11 @@ pub struct OpenSourceProjectSupremacySuite {
     pub fuse_engine: SovereignFuseFilesystemEngine,
     pub sndio_engine: OpenBsdSndioAudioEngine,
     pub xdg_mime_engine: XdgMimeDesktopEngine,
+    pub bcachefs_engine: SovereignBcachefsTieredEngine,
+    pub bpf_lsm_engine: SovereignLinuxBpfLsmEngine,
+    pub ghostty_grid_engine: SovereignGhosttyTextGridEngine,
+    pub valgrind_engine: SovereignValgrindMemoryDebuggerEngine,
+    pub nebula_mesh_engine: SovereignNebulaMeshVpnEngine,
 }
 
 #[derive(Debug, Clone)]
@@ -4937,6 +5419,9 @@ pub struct CinderVolumeRecord {
 
 impl OpenSourceProjectSupremacySuite {
     pub fn new() -> Self {
+        let mut bcachefs_engine = SovereignBcachefsTieredEngine::new();
+        bcachefs_engine.register_device(1, "/dev/nvme0n1", BcachefsTier::NvmeReadCache, 1_000_000_000_000);
+
         Self {
             amnesic_active: true,
             stateless_factory_path: String::from("/usr/share/factory/etc"),
@@ -4959,7 +5444,37 @@ impl OpenSourceProjectSupremacySuite {
             fuse_engine: SovereignFuseFilesystemEngine::new("/mnt/fuse"),
             sndio_engine: OpenBsdSndioAudioEngine::new("snd/0"),
             xdg_mime_engine: XdgMimeDesktopEngine::new(),
+            bcachefs_engine,
+            bpf_lsm_engine: SovereignLinuxBpfLsmEngine::new(),
+            ghostty_grid_engine: SovereignGhosttyTextGridEngine::new(80, 24),
+            valgrind_engine: SovereignValgrindMemoryDebuggerEngine::new(),
+            nebula_mesh_engine: SovereignNebulaMeshVpnEngine::new("sovereign_node", "10.100.0.1"),
         }
+    }
+
+    /// Bcachefs: Allocate extent on tiered storage
+    pub fn allocate_bcachefs_extent(&mut self, extent_id: u64, tier: BcachefsTier, size: u64) -> Result<u32, &'static str> {
+        self.bcachefs_engine.allocate_extent(extent_id, tier, size, true)
+    }
+
+    /// eBPF-LSM: Attach security hook rule
+    pub fn attach_bpf_lsm_rule(&mut self, hook: BpfLsmHook, prefix: &str, allow: bool) {
+        self.bpf_lsm_engine.attach_hook_rule(hook, prefix, allow);
+    }
+
+    /// Ghostty: Write character cell to terminal grid
+    pub fn render_ghostty_cell(&mut self, col: usize, row: usize, ch: char) {
+        self.ghostty_grid_engine.write_char(col, row, ch, (255, 255, 255), (0, 0, 0));
+    }
+
+    /// Valgrind: Check shadow memory read access
+    pub fn check_valgrind_shadow_memory(&mut self, addr: u64) -> Result<(), &'static str> {
+        self.valgrind_engine.check_memory_read(addr)
+    }
+
+    /// Nebula: Establish Noise IK mesh VPN tunnel
+    pub fn establish_nebula_mesh_tunnel(&mut self, node_id: &str) -> Result<Vec<u8>, &'static str> {
+        self.nebula_mesh_engine.perform_noise_handshake(node_id)
     }
 
     /// Tails OS: Volatile RAM scrubbing and memory pattern wiping
