@@ -219,6 +219,127 @@ export function initHighContrastSupport() {
 }
 
 let lastFocusedElement = null;
+let activeCommandIndex = 0;
+
+export const SYSTEM_COMMANDS = [
+  { name: "📂 File Manager", action: () => launchApp("File Manager"), shortcut: "Alt+F" },
+  { name: "💻 OmniShell Terminal", action: () => launchApp("OmniShell"), shortcut: "Alt+T" },
+  { name: "📊 Observability Matrix", action: () => launchApp("Sigma Browser"), shortcut: "Alt+O" },
+  { name: "🧠 Neural Core", action: () => launchApp("AI Assistant") },
+  { name: "⚙️ Lattice Settings", action: () => launchApp("Lattice Settings"), shortcut: "Alt+S" },
+  { name: "🔧 Sovereign Pro Tools", action: () => launchApp("Utility Nexus") },
+  { name: "🛒 Shard Marketplace", action: () => launchApp("Marketplace"), shortcut: "Alt+M" },
+  { name: "📥 System Installer", action: () => launchApp("Markup Forge") },
+  { name: "📖 Developer Portal", action: () => launchApp("Dev Portal"), shortcut: "Alt+D" },
+  { name: "💿 Kernel Emulator", action: () => launchApp("Emulator") },
+  { name: "📈 Build Analytics", action: () => launchApp("Analytics") },
+  { name: "🔄 Force Refresh System", action: () => window.contextAction?.("refresh") },
+  { name: "🧹 Purge System Caches", action: () => window.contextAction?.("cleanup") },
+  { name: "🛡️ Attest System Security", action: () => window.contextAction?.("audit") },
+];
+
+export function renderCommandResults(query = "") {
+  if (typeof document === "undefined") return [];
+  const resultsContainer = document.getElementById("cmd-results");
+  if (!resultsContainer) return [];
+
+  const cleanQuery = query.trim().toLowerCase();
+  const filtered = SYSTEM_COMMANDS.filter((cmd) => cmd.name.toLowerCase().includes(cleanQuery));
+
+  resultsContainer.innerHTML = "";
+  if (filtered.length === 0) {
+    resultsContainer.innerHTML = '<div class="cmd-no-results" style="padding: 10px; color: var(--text-muted); font-size: 0.85rem;" role="status">No matching commands found</div>';
+    activeCommandIndex = -1;
+    return [];
+  }
+
+  if (activeCommandIndex >= filtered.length || activeCommandIndex < 0) {
+    activeCommandIndex = 0;
+  }
+
+  filtered.forEach((cmd, idx) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = `command-item${idx === activeCommandIndex ? " selected" : ""}`;
+    btn.role = "option";
+    btn.setAttribute("aria-selected", idx === activeCommandIndex ? "true" : "false");
+    btn.setAttribute("tabindex", "-1");
+
+    const nameSpan = document.createElement("span");
+    nameSpan.textContent = cmd.name;
+    btn.appendChild(nameSpan);
+
+    if (cmd.shortcut) {
+      const badge = document.createElement("span");
+      badge.className = "capsule-badge";
+      badge.style.fontSize = "0.65rem";
+      badge.textContent = cmd.shortcut;
+      btn.appendChild(badge);
+    }
+
+    btn.addEventListener("click", () => {
+      cmd.action();
+      closeCommandPalette();
+    });
+
+    resultsContainer.appendChild(btn);
+  });
+
+  return filtered;
+}
+
+export function closeCommandPalette() {
+  if (typeof document === "undefined") return;
+  const cmdPalette = document.getElementById("cmd-palette");
+  const cmdInput = document.getElementById("cmd-input");
+  if (cmdPalette) {
+    cmdPalette.classList.remove("active");
+    cmdPalette.setAttribute("aria-hidden", "true");
+  }
+  if (cmdInput) cmdInput.blur();
+  if (lastFocusedElement && typeof lastFocusedElement.focus === "function") {
+    lastFocusedElement.focus();
+    lastFocusedElement = null;
+  }
+}
+
+export function initCommandPalette() {
+  if (typeof document === "undefined") return;
+  const cmdInput = document.getElementById("cmd-input");
+  const cmdPalette = document.getElementById("cmd-palette");
+  if (!cmdInput || !cmdPalette) return;
+
+  cmdInput.addEventListener("input", (e) => {
+    activeCommandIndex = 0;
+    renderCommandResults(e.target.value);
+  });
+
+  cmdInput.addEventListener("keydown", (e) => {
+    const query = cmdInput.value;
+    const cleanQuery = query.trim().toLowerCase();
+    const filtered = SYSTEM_COMMANDS.filter((cmd) => cmd.name.toLowerCase().includes(cleanQuery));
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (filtered.length > 0) {
+        activeCommandIndex = (activeCommandIndex + 1) % filtered.length;
+        renderCommandResults(query);
+      }
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (filtered.length > 0) {
+        activeCommandIndex = (activeCommandIndex - 1 + filtered.length) % filtered.length;
+        renderCommandResults(query);
+      }
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (filtered.length > 0 && activeCommandIndex >= 0 && activeCommandIndex < filtered.length) {
+        filtered[activeCommandIndex].action();
+        closeCommandPalette();
+      }
+    }
+  });
+}
 
 /**
  * Initializes WAI-ARIA switch attributes (role="switch", aria-checked) on toggle switch inputs
@@ -253,7 +374,12 @@ export function initEscapeKeyDismissal() {
         if (isActive) {
           lastFocusedElement = document.activeElement;
           const cmdInput = document.getElementById("cmd-input");
-          if (cmdInput) cmdInput.focus();
+          if (cmdInput) {
+            cmdInput.value = "";
+            cmdInput.focus();
+            activeCommandIndex = 0;
+            renderCommandResults("");
+          }
         } else {
           const cmdInput = document.getElementById("cmd-input");
           if (cmdInput) cmdInput.blur();
@@ -398,6 +524,7 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
       initHighContrastSupport();
       initTablistNavigation();
       initToggleSwitches();
+      initCommandPalette();
       initEscapeKeyDismissal();
       initDockShortcutNavigation();
       initMenuNavigation();
@@ -408,6 +535,7 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
     initHighContrastSupport();
     initTablistNavigation();
     initToggleSwitches();
+    initCommandPalette();
     initEscapeKeyDismissal();
     initDockShortcutNavigation();
     initMenuNavigation();
@@ -577,6 +705,8 @@ if (typeof window !== "undefined") {
   window.closeWindow = closeWindow;
   window.maximizeWindow = maximizeWindow;
   window.launchApp = launchApp;
+  window.renderCommandResults = renderCommandResults;
+  window.initCommandPalette = initCommandPalette;
 }
 
 // Minimal dummy index file to export initialization and basic attributes

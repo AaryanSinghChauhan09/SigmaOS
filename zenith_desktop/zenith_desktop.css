@@ -727,9 +727,13 @@ input:checked + .slider:before {
     transition: var(--transition-fast);
 }
 
-.command-item:hover {
-    background: rgba(255, 255, 255, 0.05);
+.command-item:hover,
+.command-item:focus,
+.command-item.selected {
+    background: rgba(255, 255, 255, 0.08);
     color: var(--accent-gold);
+    outline: 2px solid var(--accent-gold);
+    outline-offset: -2px;
 }
 
 /* Right-Click Context Menu */
