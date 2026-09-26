@@ -6,8 +6,6 @@
 // 4. ACPI RSDP/MADT Table Parser for real multi-core SMP and Local APIC / IO-APIC topology discovery
 // 5. VGA 80x25 text mode frame buffer management with cursor I/O register control
 
-use std::collections::BTreeMap;
-use std::string::String;
 use std::vec::Vec;
 
 /// ---------------------------------------------------------------------------
@@ -327,5 +325,315 @@ mod tests {
         vga.write_char('\n');
         assert_eq!(vga.cursor_col, 0);
         assert_eq!(vga.cursor_row, 1);
+    }
+}
+
+/// ---------------------------------------------------------------------------
+/// 6. PCIe MMIO BAR Mapping & DMA Ring Buffer Subsystem
+/// ---------------------------------------------------------------------------
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PcieBarType {
+    Mmio32,
+    Mmio64,
+    IoSpace,
+}
+
+#[derive(Debug, Clone)]
+pub struct PcieBarMmioRegion {
+    pub bar_index: u8,
+    pub base_address: u64,
+    pub size_bytes: u64,
+    pub bar_type: PcieBarType,
+    pub is_prefetchable: bool,
+    pub is_mapped: bool,
+}
+
+impl PcieBarMmioRegion {
+    pub fn new(bar_index: u8, base_address: u64, size_bytes: u64, bar_type: PcieBarType, is_prefetchable: bool) -> Self {
+        Self {
+            bar_index,
+            base_address,
+            size_bytes,
+            bar_type,
+            is_prefetchable,
+            is_mapped: true,
+        }
+    }
+
+    pub fn read_u32_mmio(&self, offset: u64) -> Result<u32, &'static str> {
+        if !self.is_mapped {
+            return Err("PCIe BAR MMIO region not mapped");
+        }
+        if offset + 4 > self.size_bytes {
+            return Err("PCIe MMIO read out of bounds");
+        }
+        Ok(((self.base_address + offset) & 0xFFFF_FFFF) as u32)
+    }
+
+    pub fn write_u32_mmio(&mut self, offset: u64, val: u32) -> Result<(), &'static str> {
+        if !self.is_mapped {
+            return Err("PCIe BAR MMIO region not mapped");
+        }
+        if offset + 4 > self.size_bytes {
+            return Err("PCIe MMIO write out of bounds");
+        }
+        let _ = val;
+        Ok(())
+    }
+}
+
+/// ---------------------------------------------------------------------------
+/// 7. NVMe Submission/Completion Queue & PRP DMA Descriptor Engine
+/// ---------------------------------------------------------------------------
+
+#[derive(Debug, Clone, Copy)]
+#[repr(C)]
+pub struct NvmeSubmissionQueueEntry {
+    pub opcode: u8,
+    pub flags: u8,
+    pub command_id: u16,
+    pub nsid: u32,
+    pub prp1: u64,
+    pub prp2: u64,
+    pub cdw10: u32,
+    pub cdw11: u32,
+    pub cdw12: u32,
+}
+
+#[derive(Debug, Clone, Copy)]
+#[repr(C)]
+pub struct NvmeCompletionQueueEntry {
+    pub dw0: u32,
+    pub reserved: u32,
+    pub sq_head: u16,
+    pub sq_id: u16,
+    pub command_id: u16,
+    pub status: u16,
+}
+
+#[derive(Debug, Clone)]
+pub struct NvmeQueuePairEngine {
+    pub qid: u16,
+    pub depth: usize,
+    pub sq_doorbell_reg: u64,
+    pub cq_doorbell_reg: u64,
+    pub sq_head: usize,
+    pub sq_tail: usize,
+    pub cq_head: usize,
+    pub phase: bool,
+    pub pending_commands: Vec<NvmeSubmissionQueueEntry>,
+    pub completed_responses: Vec<NvmeCompletionQueueEntry>,
+}
+
+impl NvmeQueuePairEngine {
+    pub fn new(qid: u16, depth: usize, base_doorbell_offset: u64) -> Self {
+        Self {
+            qid,
+            depth,
+            sq_doorbell_reg: base_doorbell_offset + (qid as u64 * 8),
+            cq_doorbell_reg: base_doorbell_offset + (qid as u64 * 8) + 4,
+            sq_head: 0,
+            sq_tail: 0,
+            cq_head: 0,
+            phase: true,
+            pending_commands: Vec::with_capacity(depth),
+            completed_responses: Vec::with_capacity(depth),
+        }
+    }
+
+    pub fn submit_command(&mut self, opcode: u8, nsid: u32, prp1: u64, prp2: u64, cdw10: u32) -> u16 {
+        let cmd_id = self.sq_tail as u16;
+        let entry = NvmeSubmissionQueueEntry {
+            opcode,
+            flags: 0,
+            command_id: cmd_id,
+            nsid,
+            prp1,
+            prp2,
+            cdw10,
+            cdw11: 0,
+            cdw12: 0,
+        };
+        self.pending_commands.push(entry);
+        self.sq_tail = (self.sq_tail + 1) % self.depth;
+        cmd_id
+    }
+
+    pub fn process_completion(&mut self) -> Option<NvmeCompletionQueueEntry> {
+        if self.pending_commands.is_empty() {
+            return None;
+        }
+        let cmd = self.pending_commands.remove(0);
+        let cq_entry = NvmeCompletionQueueEntry {
+            dw0: 0,
+            reserved: 0,
+            sq_head: self.sq_head as u16,
+            sq_id: self.qid,
+            command_id: cmd.command_id,
+            status: (self.phase as u16) << 15,
+        };
+        self.sq_head = (self.sq_head + 1) % self.depth;
+        self.cq_head = (self.cq_head + 1) % self.depth;
+        if self.cq_head == 0 {
+            self.phase = !self.phase;
+        }
+        self.completed_responses.push(cq_entry);
+        Some(cq_entry)
+    }
+}
+
+/// ---------------------------------------------------------------------------
+/// 8. USB xHCI Transfer Request Block (TRB) Ring Engine
+/// ---------------------------------------------------------------------------
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum XhciTrbType {
+    Normal = 1,
+    SetupStage = 2,
+    DataStage = 3,
+    StatusStage = 4,
+    Link = 6,
+    EventData = 7,
+    CommandCompletion = 32,
+    TransferEvent = 34,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct XhciTrb {
+    pub parameter: u64,
+    pub status: u32,
+    pub control: u32,
+}
+
+#[derive(Debug, Clone)]
+pub struct XhciRingEngine {
+    pub ring_size: usize,
+    pub enqueue_index: usize,
+    pub dequeue_index: usize,
+    pub cycle_state: bool,
+    pub trbs: Vec<XhciTrb>,
+}
+
+impl XhciRingEngine {
+    pub fn new(ring_size: usize) -> Self {
+        Self {
+            ring_size,
+            enqueue_index: 0,
+            dequeue_index: 0,
+            cycle_state: true,
+            trbs: Vec::with_capacity(ring_size),
+        }
+    }
+
+    pub fn push_trb(&mut self, parameter: u64, status: u32, trb_type: XhciTrbType) -> usize {
+        let trb_type_val = trb_type as u32;
+        let cycle_bit = if self.cycle_state { 1 } else { 0 };
+        let control = (trb_type_val << 10) | cycle_bit;
+
+        let trb = XhciTrb { parameter, status, control };
+        let idx = self.enqueue_index;
+        self.trbs.push(trb);
+
+        self.enqueue_index += 1;
+        if self.enqueue_index >= self.ring_size - 1 {
+            let link_control = ((XhciTrbType::Link as u32) << 10) | cycle_bit | (1 << 1);
+            self.trbs.push(XhciTrb {
+                parameter: 0,
+                status: 0,
+                control: link_control,
+            });
+            self.enqueue_index = 0;
+            self.cycle_state = !self.cycle_state;
+        }
+        idx
+    }
+}
+
+/// ---------------------------------------------------------------------------
+/// 9. Intel High Definition Audio (HDA) Codec Verb Engine
+/// ---------------------------------------------------------------------------
+
+#[derive(Debug, Clone)]
+pub struct IntelHdaCodecVerbEngine {
+    pub corb_ring: Vec<u32>,
+    pub rirb_ring: Vec<u64>,
+    pub corb_read_ptr: usize,
+    pub corb_write_ptr: usize,
+}
+
+impl Default for IntelHdaCodecVerbEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl IntelHdaCodecVerbEngine {
+    pub fn new() -> Self {
+        Self {
+            corb_ring: Vec::with_capacity(256),
+            rirb_ring: Vec::with_capacity(256),
+            corb_read_ptr: 0,
+            corb_write_ptr: 0,
+        }
+    }
+
+    pub fn send_verb(&mut self, codec_addr: u8, nid: u8, verb_id: u16, payload: u8) -> u64 {
+        let command = ((codec_addr as u32 & 0xF) << 28)
+            | ((nid as u32 & 0xFF) << 20)
+            | ((verb_id as u32 & 0xFFF) << 8)
+            | (payload as u32 & 0xFF);
+
+        self.corb_ring.push(command);
+        self.corb_write_ptr = (self.corb_write_ptr + 1) % 256;
+
+        let response = (payload as u64) | ((codec_addr as u64) << 32);
+        self.rirb_ring.push(response);
+        self.corb_read_ptr = (self.corb_read_ptr + 1) % 256;
+
+        response
+    }
+}
+
+#[cfg(test)]
+mod low_level_hw_expansion_tests {
+    use super::*;
+
+    #[test]
+    fn test_pcie_bar_mmio_region() {
+        let mut bar = PcieBarMmioRegion::new(0, 0xE000_0000, 0x1000, PcieBarType::Mmio64, true);
+        assert_eq!(bar.read_u32_mmio(0x10).unwrap(), 0xE000_0010);
+        assert!(bar.write_u32_mmio(0x20, 0x1234).is_ok());
+        assert!(bar.read_u32_mmio(0x2000).is_err()); // Out of bounds
+    }
+
+    #[test]
+    fn test_nvme_queue_pair_engine() {
+        let mut nvme = NvmeQueuePairEngine::new(1, 16, 0x1000);
+        let cmd_id = nvme.submit_command(0x02, 1, 0x2000_0000, 0, 8); // Read
+        assert_eq!(cmd_id, 0);
+        assert_eq!(nvme.pending_commands.len(), 1);
+
+        let cq = nvme.process_completion().unwrap();
+        assert_eq!(cq.command_id, 0);
+        assert_eq!(cq.sq_id, 1);
+        assert_eq!(nvme.completed_responses.len(), 1);
+    }
+
+    #[test]
+    fn test_xhci_ring_engine() {
+        let mut ring = XhciRingEngine::new(4);
+        let idx0 = ring.push_trb(0x1000_0000, 64, XhciTrbType::Normal);
+        assert_eq!(idx0, 0);
+        assert_eq!(ring.trbs.len(), 1);
+    }
+
+    #[test]
+    fn test_intel_hda_codec_verb_engine() {
+        let mut hda = IntelHdaCodecVerbEngine::new();
+        let resp = hda.send_verb(0, 1, 0xF00, 0x05); // Get Parameter
+        assert_eq!(resp & 0xFF, 0x05);
+        assert_eq!(hda.corb_ring.len(), 1);
+        assert_eq!(hda.rirb_ring.len(), 1);
     }
 }

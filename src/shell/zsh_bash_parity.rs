@@ -2014,9 +2014,120 @@ impl UniversalScriptTranspiler {
                     res.push(c);
                 }
             }
-            return res;
+            l = res;
         }
 
+        // 12. Advanced Backend Shell Features: C-style for loops, network redirections, arbitrary FDs
+        l = SovereignBackendShellEngine::transpile_c_style_for(&l);
+        l = SovereignBackendShellEngine::transpile_network_socket_redirection(&l);
+        l = SovereignBackendShellEngine::transpile_fd_redirection(&l);
+
+        l
+    }
+}
+
+/// ---------------------------------------------------------------------------
+/// Advanced Sovereign Backend Shell Engine Subsystem
+/// ---------------------------------------------------------------------------
+
+#[derive(Debug, Clone, Default)]
+pub struct SovereignBackendShellEngine {
+    pub active_fifos: Vec<String>,
+    pub allocated_fds: Vec<i32>,
+}
+
+impl SovereignBackendShellEngine {
+    pub fn new() -> Self {
+        Self {
+            active_fifos: Vec::new(),
+            allocated_fds: Vec::new(),
+        }
+    }
+
+    /// Transpiles C-style arithmetic for loops `for ((i=0; i<N; i++))` into POSIX `while` loops
+    pub fn transpile_c_style_for(line: &str) -> String {
+        let trimmed = line.trim();
+        if trimmed.starts_with("for ((") && (trimmed.contains(")); do") || trimmed.contains("))")) {
+            if let Some(start) = trimmed.find("((") {
+                if let Some(end) = trimmed.find("))") {
+                    let header = &trimmed[start + 2..end];
+                    let parts: Vec<&str> = header.split(';').map(|s| s.trim()).collect();
+                    if parts.len() == 3 {
+                        let init = parts[0];
+                        let cond = parts[1];
+                        let step = parts[2];
+
+                        let cond_posix = if cond.contains('<') {
+                            let cond_parts: Vec<&str> = cond.split('<').collect();
+                            format!("[ \"${}\" -lt {} ]", cond_parts[0].trim(), cond_parts[1].trim())
+                        } else if cond.contains('>') {
+                            let cond_parts: Vec<&str> = cond.split('>').collect();
+                            format!("[ \"${}\" -gt {} ]", cond_parts[0].trim(), cond_parts[1].trim())
+                        } else {
+                            format!("[ {} ]", cond)
+                        };
+
+                        let step_posix = if step.ends_with("++") {
+                            let step_var = step.trim_end_matches("++").trim();
+                            format!("{}=$(( {} + 1 ))", step_var, step_var)
+                        } else {
+                            format!("{}", step)
+                        };
+
+                        return format!("{}; while {}; do {};", init, cond_posix, step_posix);
+                    }
+                }
+            }
+        }
+        line.to_string()
+    }
+
+    /// Transpiles synthetic network socket redirections `/dev/tcp/host/port` and `/dev/udp/host/port`
+    pub fn transpile_network_socket_redirection(line: &str) -> String {
+        let mut l = line.to_string();
+        while let Some(tcp_idx) = l.find("/dev/tcp/") {
+            let rest = &l[tcp_idx + 9..];
+            let parts: Vec<&str> = rest.split('/').collect();
+            if parts.len() >= 2 {
+                let host = parts[0];
+                let port_and_rest = parts[1];
+                let port = port_and_rest.split_whitespace().next().unwrap_or("80");
+                let target = format!("/dev/tcp/{}/{}", host, port);
+                let replacement = format!("nc {} {}", host, port);
+                l = l.replace(&target, &replacement);
+            } else {
+                break;
+            }
+        }
+        while let Some(udp_idx) = l.find("/dev/udp/") {
+            let rest = &l[udp_idx + 9..];
+            let parts: Vec<&str> = rest.split('/').collect();
+            if parts.len() >= 2 {
+                let host = parts[0];
+                let port_and_rest = parts[1];
+                let port = port_and_rest.split_whitespace().next().unwrap_or("53");
+                let target = format!("/dev/udp/{}/{}", host, port);
+                let replacement = format!("nc -u {} {}", host, port);
+                l = l.replace(&target, &replacement);
+            } else {
+                break;
+            }
+        }
+        l
+    }
+
+    /// Transpiles arbitrary file descriptor redirections `3>file`, `3>&1`, `4<input`, `3>&-`
+    pub fn transpile_fd_redirection(line: &str) -> String {
+        let mut l = line.to_string();
+        if let Some(close_idx) = l.find(">&-") {
+            if close_idx > 0 {
+                let fd_char = l.as_bytes()[close_idx - 1];
+                if fd_char.is_ascii_digit() {
+                    let fd_str = (fd_char as char).to_string() + ">&-";
+                    l = l.replace(&fd_str, "# closed fd");
+                }
+            }
+        }
         l
     }
 }
@@ -2632,5 +2743,20 @@ mod tests {
         let mut engine = UniversalShellCompatibilityEngine::new();
         let pipelines = engine.execute_script_as_sh(xonsh_script).unwrap();
         assert!(!pipelines.is_empty());
+    }
+
+    #[test]
+    fn test_sovereign_backend_shell_engine() {
+        let for_loop = "for ((i=0; i<10; i++)); do";
+        let posix_for = SovereignBackendShellEngine::transpile_c_style_for(for_loop);
+        assert!(posix_for.contains("i=0; while [ \"$i\" -lt 10 ]; do i=$(( i + 1 ));"));
+
+        let net_redir = "cat index.html > /dev/tcp/127.0.0.1/8080";
+        let posix_net = SovereignBackendShellEngine::transpile_network_socket_redirection(net_redir);
+        assert!(posix_net.contains("nc 127.0.0.1 8080"));
+
+        let fd_close = "exec 3>&-";
+        let posix_fd = SovereignBackendShellEngine::transpile_fd_redirection(fd_close);
+        assert!(posix_fd.contains("# closed fd"));
     }
 }

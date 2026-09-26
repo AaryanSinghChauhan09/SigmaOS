@@ -1,17 +1,18 @@
 // Bluetooth Host Controller Interface (HCI) Driver
 // Conforms to SigmaOS Unified Peripheral Architecture
 
+#[cfg(not(feature = "standalone_test"))]
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 
-#[cfg(test_disabled)]
+#[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceGeneration { Legacy, Modern }
 
-#[cfg(test_disabled)]
+#[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PowerState { Off, On }
 
-#[cfg(test_disabled)]
+#[cfg(feature = "standalone_test")]
 pub trait PeripheralDevice {
     fn name(&self) -> &'static str;
     fn generation(&self) -> DeviceGeneration;
@@ -163,7 +164,7 @@ impl PeripheralDevice for BluetoothHciDriver {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
