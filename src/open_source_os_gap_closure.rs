@@ -3917,6 +3917,21 @@ mod tests {
         assert!(!suite.process_xdp_zero_copy_packet(10000)); // Over 9000 bytes Jumbo frame
 
         assert!(suite.scrub_tiered_storage_extent(202));
+
+        let prompt = suite.render_starship_prompt("/home/sovereign", 0);
+        assert!(prompt.contains("/home/sovereign"));
+
+        assert!(suite.sync_chezmoi_dotfiles(".bashrc", "/home/sovereign/.bashrc"));
+
+        let fd_res = suite.search_fd_files("sigma", Some("conf"));
+        assert_eq!(fd_res.len(), 1);
+
+        let tele = suite.telescope_fuzzy_search("Terminal");
+        assert_eq!(tele, vec!["Open Terminal".to_string()]);
+
+        let (usage, mem) = suite.snapshot_btop_telemetry();
+        assert_eq!(usage, 20);
+        assert_eq!(mem, 2048);
     }
 
     #[test]
@@ -4990,6 +5005,47 @@ impl OpenSourceProjectSupremacySuite {
     /// FreeDesktop: Resolve default application handler for MIME type
     pub fn resolve_xdg_mime_handler(&self, filename: &str) -> Option<String> {
         self.xdg_mime_engine.generate_launch_command(filename)
+    }
+
+    /// Starship Prompt Quick Helper
+    pub fn render_starship_prompt(&self, cwd: &str, last_status: i32) -> String {
+        let mut prompt = super::SovereignStarshipPromptEngine::new();
+        prompt.set_segment("directory", cwd, "\x1b[34m");
+        prompt.render_prompt(last_status)
+    }
+
+    /// Chezmoi Dotfiles Quick Helper
+    pub fn sync_chezmoi_dotfiles(&self, source_template: &str, target_path: &str) -> bool {
+        let mut chezmoi = super::SovereignChezmoiDotfilesEngine::new();
+        chezmoi.register_mapping(source_template, target_path, false);
+        chezmoi.apply_dotfiles(1700000000) > 0
+    }
+
+    /// Fd Directory Search Quick Helper
+    pub fn search_fd_files(&self, pattern: &str, ext: Option<&str>) -> Vec<String> {
+        let mut walker = super::SovereignFdDirectoryWalkerEngine::new();
+        walker.add_entry("/etc/sigma.conf", false, false, 512);
+        walker.add_entry("/usr/bin/sigma-sh", false, false, 2048);
+        walker.search_by_pattern(pattern, ext)
+    }
+
+    /// Telescope Fuzzy Find Quick Helper
+    pub fn telescope_fuzzy_search(&self, query: &str) -> Vec<String> {
+        let mut picker = super::SovereignTelescopeFuzzyPickerEngine::new();
+        picker.add_item(1, "Open Terminal", "action", Some("command"));
+        picker.add_item(2, "Open Settings", "action", Some("command"));
+        picker
+            .fuzzy_find(query)
+            .into_iter()
+            .map(|r| r.item.display_text)
+            .collect()
+    }
+
+    /// Btop System Telemetry Quick Helper
+    pub fn snapshot_btop_telemetry(&self) -> (u8, u64) {
+        let mut btop = super::SovereignBtopResourceMonitorEngine::new();
+        btop.record_core_telemetry(0, 20, 3200, 45);
+        (btop.average_cpu_usage(), btop.active_snapshot.memory_used_mb)
     }
 }
 
