@@ -152,5 +152,8 @@ pub mod xdp_engine_sovereign;
 // ─── Live Migration Engine (CRIU / QEMU inspired) ─────────────────────────────
 pub mod live_migration_engine;
 
+pub mod sovereign_kernel_pr_gateway;
+pub use sovereign_kernel_pr_gateway::*;
+
 pub mod low_level_hardware;
 pub use low_level_hardware::*;
