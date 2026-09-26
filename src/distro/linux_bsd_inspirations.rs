@@ -1083,6 +1083,10 @@ impl SovereignUniversalDistroBridge {
             "super_matrix" | "universal_distro_super_matrix" => Ok(format!("Dispatched universal distro super matrix query for '{}' under distro mode '{:?}'", action, self.mode)),
             "interop_gateway" => Ok(format!("Dispatched interoperability gateway status query for '{}' under distro mode '{:?}'", action, self.mode)),
             "subsystem_sync" => Ok(format!("Dispatched cross-distro subsystem state synchronization for '{}' under distro mode '{:?}'", action, self.mode)),
+                        "dtrace_probes" => Ok(format!("Dispatched Illumos DTrace USDT dynamic tracing provider matrix for '{}' under distro mode '{:?}'", action, self.mode)),
+            "execpledge_unveil" => Ok(format!("Dispatched OpenBSD pledge exec & unveil_at sandboxing for '{}' under distro mode '{:?}'", action, self.mode)),
+            "sqpoll_accelerator" => Ok(format!("Dispatched Linux io_uring SQPOLL submission queue thread accelerator for '{}' under distro mode '{:?}'", action, self.mode)),
+            "vnet_isolation" => Ok(format!("Dispatched FreeBSD VNET network stack isolation for '{}' under distro mode '{:?}'", action, self.mode)),
             "saver" | "screensaver" => Ok(format!("Dispatched screensaver and power lock manager for '{}' under distro mode '{:?}'", action, self.mode)),
             _ => Err("Unknown target subsystem"),
         }
@@ -1092,23 +1096,26 @@ impl SovereignUniversalDistroBridge {
         let subsystems = [
             "access", "accessibility", "ai", "app", "arch", "audio", "audit", "auth",
             "automation", "backup", "bin", "bluetooth", "boot", "buildfarm", "camera", "cloud",
-            "cluster", "community", "compatibility", "compiler", "compliance", "compositor", "compression", "config", "container",
-            "containers", "core", "crash", "crypto", "customization", "dashboard", "debugger", "desktop",
-            "dev", "device", "diagnostics", "display", "distro", "docs", "driver", "drivers", "ecosystem",
-            "edge", "education", "embedded", "event", "filesystem", "finance", "fingerprint", "firewall", "fs",
-            "functions", "futuristic", "futuristic_modules", "gamepad", "gap_closure", "governance", "gpu", "graphics", "hal", "hardware", "i18n", "init",
-            "innovation", "input", "installer", "integration", "interop_gateway", "interrupt", "iot", "ipc", "iso",
-            "kernel", "klib", "lang", "launch_ready", "launcher", "legal", "loader", "location",
-            "logging", "media", "memory", "microphone", "ml", "mm", "monitor", "monitoring",
-            "net", "network", "networking", "nim", "nlp", "notification", "observability", "obsoletion", "onboarding",
-            "open_source_obsoletion", "open_source_os_gap_closure", "orchestration", "package", "performance", "pillars", "plugin", "power", "print", "printing", "privacy",
-            "process", "productivity", "provisioning", "recovery", "release", "remote", "resilience", "resource",
-            "robotics", "rt", "runtime", "saver", "scheduler", "scientific", "secure", "security", "sensor",
-            "shell", "sigma-boot", "sigma_sandbox", "sigma_validation", "signal", "sigpkg", "smartcard", "sovereign_wiki_master_engine", "storage",
-            "subsystem_sync", "super_matrix", "support", "syscall", "system", "telemetry", "testing", "theming", "thermal", "thread", "time",
-            "timer", "toolchain", "tools", "touchscreen", "tpm", "tracing", "ui", "unimplemented_features", "unimplemented_tools", "universal_distro_super_matrix", "update",
-            "usb", "userland", "userspace", "vfs", "virt", "virtualization", "vm", "wiki", "wiki_ideas", "wiki_unimplemented_ideas", "wireless", "workflow",
-            "zig",
+            "cluster", "community", "compatibility", "compiler", "compliance", "compositor", "compression", "config",
+            "container", "containers", "core", "crash", "crypto", "customization", "dashboard", "debugger",
+            "desktop", "dev", "device", "diagnostics", "display", "distro", "docs", "driver",
+            "drivers", "dtrace_probes", "ecosystem", "edge", "education", "embedded", "event", "execpledge_unveil",
+            "filesystem", "finance", "fingerprint", "firewall", "fs", "functions", "futuristic", "futuristic_modules",
+            "gamepad", "gap_closure", "governance", "gpu", "graphics", "hal", "hardware", "i18n",
+            "init", "innovation", "input", "installer", "integration", "interop_gateway", "interrupt", "iot",
+            "ipc", "iso", "kernel", "klib", "lang", "launch_ready", "launcher", "legal",
+            "loader", "location", "logging", "media", "memory", "microphone", "ml", "mm",
+            "monitor", "monitoring", "net", "network", "networking", "nim", "nlp", "notification",
+            "observability", "obsoletion", "onboarding", "open_source_obsoletion", "open_source_os_gap_closure", "orchestration", "package", "performance",
+            "pillars", "plugin", "power", "print", "printing", "privacy", "process", "productivity",
+            "provisioning", "recovery", "release", "remote", "resilience", "resource", "robotics", "rt",
+            "runtime", "saver", "scheduler", "scientific", "secure", "security", "sensor", "shell",
+            "sigma-boot", "sigma_sandbox", "sigma_validation", "signal", "sigpkg", "smartcard", "sovereign_wiki_master_engine", "sqpoll_accelerator",
+            "storage", "subsystem_sync", "super_matrix", "support", "syscall", "system", "telemetry", "testing",
+            "theming", "thermal", "thread", "time", "timer", "toolchain", "tools", "touchscreen",
+            "tpm", "tracing", "ui", "unimplemented_features", "unimplemented_tools", "universal_distro_super_matrix", "update", "usb",
+            "userland", "userspace", "vfs", "virt", "virtualization", "vm", "vnet_isolation", "wiki",
+            "wiki_ideas", "wiki_unimplemented_ideas", "wireless", "workflow", "zig",
         ];
 
         for sub in subsystems {
@@ -1182,23 +1189,26 @@ impl SovereignUniversalDistroBridge {
         let subsystems = [
             "access", "accessibility", "ai", "app", "arch", "audio", "audit", "auth",
             "automation", "backup", "bin", "bluetooth", "boot", "buildfarm", "camera", "cloud",
-            "cluster", "community", "compatibility", "compiler", "compliance", "compositor", "compression", "config", "container",
-            "containers", "core", "crash", "crypto", "customization", "dashboard", "debugger", "desktop",
-            "dev", "device", "diagnostics", "display", "distro", "docs", "driver", "drivers", "ecosystem",
-            "edge", "education", "embedded", "event", "filesystem", "finance", "fingerprint", "firewall", "fs",
-            "functions", "futuristic", "futuristic_modules", "gamepad", "gap_closure", "governance", "gpu", "graphics", "hal", "hardware", "i18n", "init",
-            "innovation", "input", "installer", "integration", "interop_gateway", "interrupt", "iot", "ipc", "iso",
-            "kernel", "klib", "lang", "launch_ready", "launcher", "legal", "loader", "location",
-            "logging", "media", "memory", "microphone", "ml", "mm", "monitor", "monitoring",
-            "net", "network", "networking", "nim", "nlp", "notification", "observability", "obsoletion", "onboarding",
-            "open_source_obsoletion", "open_source_os_gap_closure", "orchestration", "package", "performance", "pillars", "plugin", "power", "print", "printing", "privacy",
-            "process", "productivity", "provisioning", "recovery", "release", "remote", "resilience", "resource",
-            "robotics", "rt", "runtime", "scheduler", "scientific", "secure", "security", "sensor",
-            "shell", "sigma-boot", "sigma_sandbox", "sigma_validation", "signal", "sigpkg", "smartcard", "storage",
-            "support", "syscall", "system", "testing", "theming", "thermal", "thread", "time",
-            "timer", "toolchain", "tools", "touchscreen", "tpm", "tracing", "ui", "update",
-            "usb", "userland", "userspace", "vfs", "virt", "virtualization", "vm", "wireless", "workflow",
-            "zig",
+            "cluster", "community", "compatibility", "compiler", "compliance", "compositor", "compression", "config",
+            "container", "containers", "core", "crash", "crypto", "customization", "dashboard", "debugger",
+            "desktop", "dev", "device", "diagnostics", "display", "distro", "docs", "driver",
+            "drivers", "dtrace_probes", "ecosystem", "edge", "education", "embedded", "event", "execpledge_unveil",
+            "filesystem", "finance", "fingerprint", "firewall", "fs", "functions", "futuristic", "futuristic_modules",
+            "gamepad", "gap_closure", "governance", "gpu", "graphics", "hal", "hardware", "i18n",
+            "init", "innovation", "input", "installer", "integration", "interop_gateway", "interrupt", "iot",
+            "ipc", "iso", "kernel", "klib", "lang", "launch_ready", "launcher", "legal",
+            "loader", "location", "logging", "media", "memory", "microphone", "ml", "mm",
+            "monitor", "monitoring", "net", "network", "networking", "nim", "nlp", "notification",
+            "observability", "obsoletion", "onboarding", "open_source_obsoletion", "open_source_os_gap_closure", "orchestration", "package", "performance",
+            "pillars", "plugin", "power", "print", "printing", "privacy", "process", "productivity",
+            "provisioning", "recovery", "release", "remote", "resilience", "resource", "robotics", "rt",
+            "runtime", "saver", "scheduler", "scientific", "secure", "security", "sensor", "shell",
+            "sigma-boot", "sigma_sandbox", "sigma_validation", "signal", "sigpkg", "smartcard", "sovereign_wiki_master_engine", "sqpoll_accelerator",
+            "storage", "subsystem_sync", "super_matrix", "support", "syscall", "system", "telemetry", "testing",
+            "theming", "thermal", "thread", "time", "timer", "toolchain", "tools", "touchscreen",
+            "tpm", "tracing", "ui", "unimplemented_features", "unimplemented_tools", "universal_distro_super_matrix", "update", "usb",
+            "userland", "userspace", "vfs", "virt", "virtualization", "vm", "vnet_isolation", "wiki",
+            "wiki_ideas", "wiki_unimplemented_ideas", "wireless", "workflow", "zig",
         ];
 
         let mut count = 0;
@@ -1215,20 +1225,26 @@ impl SovereignUniversalDistroBridge {
         let subsystems = [
             "access", "accessibility", "ai", "app", "arch", "audio", "audit", "auth",
             "automation", "backup", "bin", "bluetooth", "boot", "buildfarm", "camera", "cloud",
-            "cluster", "community", "compatibility", "compiler", "compliance", "compositor", "compression", "config", "container",
-            "core", "crash", "crypto", "customization", "dashboard", "debugger", "desktop", "dev", "device", "diagnostics",
-            "display", "distro", "docs", "driver", "drivers", "ecosystem", "edge", "education", "embedded", "event",
-            "filesystem", "finance", "fingerprint", "firewall", "functions", "futuristic", "gamepad", "gap_closure", "governance",
-            "gpu", "graphics", "hal", "hardware", "i18n", "init", "innovation", "input", "installer", "integration",
-            "interrupt", "iot", "ipc", "iso", "kernel", "klib", "lang", "launch_ready", "launcher", "legal", "loader",
-            "location", "logging", "media", "memory", "microphone", "ml", "mm", "monitor", "monitoring", "net",
-            "network", "networking", "nim", "nlp", "notification", "observability", "obsoletion", "onboarding", "orchestration",
-            "package", "performance", "pillars", "plugin", "power", "print", "printing", "privacy", "process", "productivity",
-            "provisioning", "recovery", "release", "remote", "resilience", "resource", "robotics", "rt", "runtime", "saver",
-            "scheduler", "scientific", "secure", "security", "sensor", "shell", "signal", "sigpkg", "smartcard", "storage",
-            "support", "syscall", "system", "telemetry", "testing", "theming", "thermal", "thread", "time", "timer", "toolchain",
-            "tools", "touchscreen", "tpm", "tracing", "ui", "update", "usb", "userland", "vfs", "virtualization", "wiki",
-            "wireless", "workflow", "zig",
+            "cluster", "community", "compatibility", "compiler", "compliance", "compositor", "compression", "config",
+            "container", "containers", "core", "crash", "crypto", "customization", "dashboard", "debugger",
+            "desktop", "dev", "device", "diagnostics", "display", "distro", "docs", "driver",
+            "drivers", "dtrace_probes", "ecosystem", "edge", "education", "embedded", "event", "execpledge_unveil",
+            "filesystem", "finance", "fingerprint", "firewall", "fs", "functions", "futuristic", "futuristic_modules",
+            "gamepad", "gap_closure", "governance", "gpu", "graphics", "hal", "hardware", "i18n",
+            "init", "innovation", "input", "installer", "integration", "interop_gateway", "interrupt", "iot",
+            "ipc", "iso", "kernel", "klib", "lang", "launch_ready", "launcher", "legal",
+            "loader", "location", "logging", "media", "memory", "microphone", "ml", "mm",
+            "monitor", "monitoring", "net", "network", "networking", "nim", "nlp", "notification",
+            "observability", "obsoletion", "onboarding", "open_source_obsoletion", "open_source_os_gap_closure", "orchestration", "package", "performance",
+            "pillars", "plugin", "power", "print", "printing", "privacy", "process", "productivity",
+            "provisioning", "recovery", "release", "remote", "resilience", "resource", "robotics", "rt",
+            "runtime", "saver", "scheduler", "scientific", "secure", "security", "sensor", "shell",
+            "sigma-boot", "sigma_sandbox", "sigma_validation", "signal", "sigpkg", "smartcard", "sovereign_wiki_master_engine", "sqpoll_accelerator",
+            "storage", "subsystem_sync", "super_matrix", "support", "syscall", "system", "telemetry", "testing",
+            "theming", "thermal", "thread", "time", "timer", "toolchain", "tools", "touchscreen",
+            "tpm", "tracing", "ui", "unimplemented_features", "unimplemented_tools", "universal_distro_super_matrix", "update", "usb",
+            "userland", "userspace", "vfs", "virt", "virtualization", "vm", "vnet_isolation", "wiki",
+            "wiki_ideas", "wiki_unimplemented_ideas", "wireless", "workflow", "zig",
         ];
         subsystems.iter().map(|&s| (s, true, supervisor)).collect()
     }
@@ -2321,6 +2337,44 @@ impl Default for LandlockV5NetworkGuard {
 
 #[cfg(test)]
 mod subsystem_interop_tests {
+
+    #[test]
+    fn test_freebsd_vnet_isolation_engine() {
+        let mut vnet_engine = FreeBsdVnetIsolationEngine::new();
+        let v1 = vnet_engine.create_vnet_instance("jail_vnet1").unwrap();
+        let v2 = vnet_engine.create_vnet_instance("jail_vnet2").unwrap();
+
+        assert!(vnet_engine.move_interface_to_vnet(v1, "epair0a").is_ok());
+        assert!(vnet_engine.move_interface_to_vnet(v2, "epair0b").is_ok());
+
+        let bytes = vnet_engine.forward_inter_vnet_packet(v1, v2, 512).unwrap();
+        assert_eq!(bytes, 512);
+        assert_eq!(vnet_engine.forwarded_packets_count, 1);
+    }
+
+    #[test]
+    fn test_io_uring_sqpoll_accelerator() {
+        let mut sqpoll = IoUringSqpollAccelerator::new(0);
+        let sqe = SubmissionQueueEntry {
+            opcode: IoUringOpcode::Nop,
+            fd: 1,
+            offset: 0,
+            user_data: 99,
+            data: Vec::new(),
+        };
+
+        let depth = sqpoll.push_sqe_zero_syscall(sqe);
+        assert_eq!(depth, 1);
+        assert_eq!(sqpoll.state.poll_entries, 1);
+
+        let processed = sqpoll.poll_kernel_thread_batch();
+        assert_eq!(processed, 1);
+
+        let empty_processed = sqpoll.poll_kernel_thread_batch();
+        assert_eq!(empty_processed, 0);
+        assert!(sqpoll.state.sq_thread_idle);
+    }
+
     use super::*;
 
     #[test]
@@ -2785,7 +2839,7 @@ mod cross_subsystem_tests {
 
         let sync_count = orchestrator.synchronize_subsystem_pipeline();
         assert!(sync_count.is_ok());
-        assert_eq!(sync_count.unwrap(), 146);
+        assert_eq!(sync_count.unwrap(), 173);
 
         let (supervisor, pkg_spec, vfs_etc, compatible) = orchestrator.query_subsystem_capabilities();
         assert_eq!(supervisor, ServiceSupervisorType::Smf);
@@ -2796,30 +2850,33 @@ mod cross_subsystem_tests {
 
     #[test]
     fn test_all_144_subsystems_dispatch_and_matrix() {
-        let all_146 = [
+        let all_173 = [
             "access", "accessibility", "ai", "app", "arch", "audio", "audit", "auth",
             "automation", "backup", "bin", "bluetooth", "boot", "buildfarm", "camera", "cloud",
-            "cluster", "community", "compatibility", "compliance", "compositor", "compression", "config", "container",
-            "containers", "core", "crash", "crypto", "customization", "dashboard", "debugger", "desktop",
-            "dev", "device", "diagnostics", "distro", "docs", "driver", "drivers", "ecosystem",
-            "edge", "education", "embedded", "event", "filesystem", "finance", "fingerprint", "fs",
-            "functions", "gamepad", "governance", "gpu", "graphics", "hal", "hardware", "init",
-            "innovation", "input", "installer", "integration", "interrupt", "iot", "ipc", "iso",
-            "kernel", "klib", "lang", "launch_ready", "launcher", "legal", "loader", "location",
-            "logging", "media", "memory", "microphone", "ml", "mm", "monitor", "monitoring",
-            "net", "network", "networking", "nim", "nlp", "notification", "observability", "onboarding",
-            "orchestration", "package", "performance", "pillars", "plugin", "power", "print", "privacy",
-            "process", "productivity", "provisioning", "recovery", "release", "remote", "resilience", "resource",
-            "robotics", "rt", "runtime", "scheduler", "scientific", "secure", "security", "sensor",
-            "shell", "sigma-boot", "sigma_sandbox", "sigma_validation", "signal", "sigpkg", "smartcard", "storage",
-            "support", "syscall", "system", "testing", "theming", "thermal", "thread", "time",
-            "timer", "toolchain", "tools", "touchscreen", "tpm", "tracing", "ui", "update",
-            "usb", "userland", "userspace", "vfs", "virt", "virtualization", "vm", "wireless", "workflow",
-            "zig",
+            "cluster", "community", "compatibility", "compiler", "compliance", "compositor", "compression", "config",
+            "container", "containers", "core", "crash", "crypto", "customization", "dashboard", "debugger",
+            "desktop", "dev", "device", "diagnostics", "display", "distro", "docs", "driver",
+            "drivers", "dtrace_probes", "ecosystem", "edge", "education", "embedded", "event", "execpledge_unveil",
+            "filesystem", "finance", "fingerprint", "firewall", "fs", "functions", "futuristic", "futuristic_modules",
+            "gamepad", "gap_closure", "governance", "gpu", "graphics", "hal", "hardware", "i18n",
+            "init", "innovation", "input", "installer", "integration", "interop_gateway", "interrupt", "iot",
+            "ipc", "iso", "kernel", "klib", "lang", "launch_ready", "launcher", "legal",
+            "loader", "location", "logging", "media", "memory", "microphone", "ml", "mm",
+            "monitor", "monitoring", "net", "network", "networking", "nim", "nlp", "notification",
+            "observability", "obsoletion", "onboarding", "open_source_obsoletion", "open_source_os_gap_closure", "orchestration", "package", "performance",
+            "pillars", "plugin", "power", "print", "printing", "privacy", "process", "productivity",
+            "provisioning", "recovery", "release", "remote", "resilience", "resource", "robotics", "rt",
+            "runtime", "saver", "scheduler", "scientific", "secure", "security", "sensor", "shell",
+            "sigma-boot", "sigma_sandbox", "sigma_validation", "signal", "sigpkg", "smartcard", "sovereign_wiki_master_engine", "sqpoll_accelerator",
+            "storage", "subsystem_sync", "super_matrix", "support", "syscall", "system", "telemetry", "testing",
+            "theming", "thermal", "thread", "time", "timer", "toolchain", "tools", "touchscreen",
+            "tpm", "tracing", "ui", "unimplemented_features", "unimplemented_tools", "universal_distro_super_matrix", "update", "usb",
+            "userland", "userspace", "vfs", "virt", "virtualization", "vm", "vnet_isolation", "wiki",
+            "wiki_ideas", "wiki_unimplemented_ideas", "wireless", "workflow", "zig",
         ];
 
         let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxArch);
-        for sub in all_146 {
+        for sub in all_173 {
             let res = bridge.dispatch_cross_subsystem_operation(sub, "test_action");
             assert!(res.is_ok(), "Subsystem '{}' dispatch failed", sub);
         }
@@ -2831,8 +2888,8 @@ mod cross_subsystem_tests {
     fn test_linux_bsd_interoperability_gateway_matrix_and_sync() {
         let mut gateway = LinuxBsdDistroSubsystemInteroperabilityGateway::new(DistroSubsystemMode::LinuxArch);
         let count = gateway.synchronize_and_audit_all_subsystems().unwrap();
-        assert_eq!(count, 146);
-        assert_eq!(gateway.audited_subsystems_count, 146);
+        assert_eq!(count, 173);
+        assert_eq!(gateway.audited_subsystems_count, 173);
 
         let res = gateway.orchestrate_subsystem("kernel", "sched_task");
         assert!(res.is_ok());
@@ -2840,7 +2897,7 @@ mod cross_subsystem_tests {
 
         gateway.set_distro_mode(DistroSubsystemMode::FreeBsd);
         let count_bsd = gateway.synchronize_and_audit_all_subsystems().unwrap();
-        assert_eq!(count_bsd, 146);
+        assert_eq!(count_bsd, 173);
 
         let (supervisor, pkg_spec, vfs_etc, compatible) = gateway.query_gateway_capability_matrix();
         assert_eq!(supervisor, ServiceSupervisorType::OpenRC);
@@ -7511,5 +7568,130 @@ impl ShepherdServiceManager {
 impl Default for ShepherdServiceManager {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+
+// ==========================================
+// 42. FREEBSD VNET ISOLATION & LINUX IO_URING SQPOLL ENGINES
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct VnetInstance {
+    pub vnet_id: u32,
+    pub name: String,
+    pub interfaces: Vec<String>,
+    pub routing_table_entries: usize,
+    pub active: bool,
+}
+
+pub struct FreeBsdVnetIsolationEngine {
+    pub vnets: Vec<VnetInstance>,
+    pub forwarded_packets_count: u64,
+    pub next_vnet_id: u32,
+}
+
+impl FreeBsdVnetIsolationEngine {
+    pub fn new() -> Self {
+        Self {
+            vnets: Vec::new(),
+            forwarded_packets_count: 0,
+            next_vnet_id: 1,
+        }
+    }
+
+    pub fn create_vnet_instance(&mut self, name: &str) -> Result<u32, &'static str> {
+        if name.is_empty() {
+            return Err("VNET name cannot be empty");
+        }
+        let id = self.next_vnet_id;
+        self.next_vnet_id += 1;
+        self.vnets.push(VnetInstance {
+            vnet_id: id,
+            name: name.to_string(),
+            interfaces: vec!["lo0".to_string()],
+            routing_table_entries: 1,
+            active: true,
+        });
+        Ok(id)
+    }
+
+    pub fn move_interface_to_vnet(&mut self, vnet_id: u32, ifname: &str) -> Result<(), &'static str> {
+        let vnet = self.vnets.iter_mut().find(|v| v.vnet_id == vnet_id).ok_or("VNET instance not found")?;
+        if !vnet.active {
+            return Err("Cannot move interface to inactive VNET");
+        }
+        if !vnet.interfaces.contains(&ifname.to_string()) {
+            vnet.interfaces.push(ifname.to_string());
+        }
+        Ok(())
+    }
+
+    pub fn forward_inter_vnet_packet(&mut self, src_vnet_id: u32, dst_vnet_id: u32, payload_bytes: usize) -> Result<usize, &'static str> {
+        let src_exists = self.vnets.iter().any(|v| v.vnet_id == src_vnet_id && v.active);
+        let dst_exists = self.vnets.iter().any(|v| v.vnet_id == dst_vnet_id && v.active);
+        if !src_exists || !dst_exists {
+            return Err("Source or destination VNET instance not found or inactive");
+        }
+        self.forwarded_packets_count += 1;
+        Ok(payload_bytes)
+    }
+}
+
+impl Default for FreeBsdVnetIsolationEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SqpollThreadState {
+    pub poll_entries: usize,
+    pub sq_thread_idle: bool,
+    pub sq_wakeups: u64,
+    pub cpu_affinity: u32,
+}
+
+pub struct IoUringSqpollAccelerator {
+    pub state: SqpollThreadState,
+    pub submission_ring: Vec<SubmissionQueueEntry>,
+}
+
+impl IoUringSqpollAccelerator {
+    pub fn new(cpu_affinity: u32) -> Self {
+        Self {
+            state: SqpollThreadState {
+                poll_entries: 0,
+                sq_thread_idle: false,
+                sq_wakeups: 0,
+                cpu_affinity,
+            },
+            submission_ring: Vec::new(),
+        }
+    }
+
+    pub fn push_sqe_zero_syscall(&mut self, sqe: SubmissionQueueEntry) -> usize {
+        self.submission_ring.push(sqe);
+        self.state.poll_entries += 1;
+        if self.state.sq_thread_idle {
+            self.state.sq_thread_idle = false;
+            self.state.sq_wakeups += 1;
+        }
+        self.submission_ring.len()
+    }
+
+    pub fn poll_kernel_thread_batch(&mut self) -> usize {
+        let count = self.submission_ring.len();
+        self.submission_ring.clear();
+        if count == 0 {
+            self.state.sq_thread_idle = true;
+        }
+        count
+    }
+}
+
+impl Default for IoUringSqpollAccelerator {
+    fn default() -> Self {
+        Self::new(0)
     }
 }
