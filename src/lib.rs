@@ -134,6 +134,12 @@ pub mod input;
 pub mod integration;
 pub mod iot;
 pub mod ipc;
+pub use ipc::{
+    AsyncIoRingEngine, CompletionQueueEntry, IoOpCode, KqueueAioFilter,
+    LinuxBsdUniversalIoSubsystemEngine, OpenBsdIoPledgeRights, PosixAioControlBlock,
+    SubmissionQueueEntry, IORING_SETUP_CQSIZE, IORING_SETUP_IOPOLL, IORING_SETUP_SQPOLL,
+    IORING_SETUP_SQ_AFF,
+};
 pub mod iso;
 pub mod lang;
 pub mod launch_ready;

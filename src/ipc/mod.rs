@@ -38,7 +38,10 @@ pub use signals::{
 };
 
 pub use async_io::{
-    AsyncIoRingEngine, CompletionQueueEntry, IoOpCode, SubmissionQueueEntry,
+    AsyncIoRingEngine, CompletionQueueEntry, IoOpCode, KqueueAioFilter,
+    LinuxBsdUniversalIoSubsystemEngine, OpenBsdIoPledgeRights, PosixAioControlBlock,
+    SubmissionQueueEntry, IORING_SETUP_CQSIZE, IORING_SETUP_IOPOLL, IORING_SETUP_SQPOLL,
+    IORING_SETUP_SQ_AFF,
 };
 
 pub use std_streams::{
