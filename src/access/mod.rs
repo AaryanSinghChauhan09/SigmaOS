@@ -590,10 +590,6 @@ pub struct FiftyPercentRuleEngine {
 
 impl FiftyPercentRuleEngine {
     pub fn new(total_ram_mb: u64, total_cpu_shares: u32) -> Self {
-        Self::new_with_params(total_ram_mb, total_cpu_shares)
-    }
-
-    pub fn new_with_params(total_ram_mb: u64, total_cpu_shares: u32) -> Self {
         Self {
             max_ram_usage_pct: 50,
             max_swap_usage_pct: 50,
@@ -606,6 +602,10 @@ impl FiftyPercentRuleEngine {
             active_cpu_shares: 0,
             rule_enforcements_count: 0,
         }
+    }
+
+    pub fn new_with_params(total_ram_mb: u64, total_cpu_shares: u32) -> Self {
+        Self::new(total_ram_mb, total_cpu_shares)
     }
 
     pub fn check_memory_50_percent_rule(&mut self, current_ram_usage_pct: u32, current_swap_usage_pct: u32) -> AccessResult<bool> {
