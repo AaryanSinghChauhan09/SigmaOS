@@ -120,3 +120,131 @@ SigmaPkg is a declarative, reproducible, and sandboxed package manager capable o
 - **Failing Tests**: 0
 - **Test Pass Rate**: 100% (Verified via `./run_sigma_tests.sh`)
 - **Wiki Synchronization**: Synchronized across `WIKI/`, `wiki/`, and `wiki_repo/` targets.
+
+---
+
+## SECTION 142: SOVEREIGN AUTONOMOUS AI ENGINEERING SPECIFICATION, UNIVERSAL HARDWARE ADAPTATION & MARKET-DEFEATING OS ROADMAP
+
+```
++---------------------------------------------------------------------------------------------------------+
+|                    SIGMAOS AUTONOMOUS AI ENGINEERING & MARKET-DEFEATING ARCHITECTURE                    |
++---------------------------------------------------------------------------------------------------------+
+|  [Universal Hardware Adaptation Layer]  |  [SigmaPkg Universal Ingestion]  | [Zero-Dependency OOP Engine]  |
+|  1980s ISA/IDE/PIO -> 2026+ CXL/PCIe Gen7|  29+ Linux/BSD Package Ingestion| #![no_std] Bare-Metal Patterns|
++---------------------------------------------------------------------------------------------------------+
+|                            COMPOSITE AI SPECIALIST INTELLIGENCE AGENTS                                  |
+|  Bolt ⚡ (Performance)  | Palette 🎨 (Micro-UX) | Sentinel 🛡️ (Security) | Sigma Updater / Distro Crusher  |
++---------------------------------------------------------------------------------------------------------+
+```
+
+### 1. Architectural Mission & Core Principles
+SigmaOS is a from-scratch, zero-dependency, zero-trust, bare-metal operating system implemented exclusively in modern systems languages (Rust `#![no_std]`, Zig, Nim). It is designed to completely eliminate legacy Linux/BSD kernel fragmentation, POSIX context-switching overhead, and uncoordinated package ecosystem bloat.
+
+### 2. Universal Hardware Adaptation (1980s Ancient to 2026+ Modern Hardware)
+1. **Ancient 16-bit / 32-bit Legacy Hardware Layer**:
+   - **ISA & IDE/ATA PIO Driver**: Polled and IRQ-driven ATA disk controller with 28-bit LBA addressing.
+   - **VGA / VBE Framebuffer Driver**: Linear VESA BIOS Extension modes (1024x768 @ 32bpp) without external BIOS call dependency in 64-bit long mode.
+   - **PS/2 Controller Driver**: Dual-channel 8042 Keyboard and Mouse controller with lock-free ring-buffer event queues.
+2. **Ultra-Modern 2026+ Hardware Layer**:
+   - **NVMe 1.4/2.0 Controller**: Multi-queue submission/completion ring management, doorbell register MMIO mapping, zero-copy physical region page (PRP) lists.
+   - **xHCI USB 3.2 Controller**: Transfer/command/event ring management, slot assignment, and asynchronous TRB processing.
+   - **E1000 / E1000E & Realtek RTL8111/RTL8125**: Descriptor rings, hardware checksum offload, RSS queues, and zero-copy packet DMA buffers.
+   - **CXL 3.0 & PCIe Gen7**: Direct coherent memory pool mapping and hot-plug bus enumeration.
+
+### 3. Market-Defeating OS & Distro Strategy (`SigmaPkg`)
+- **Universal Package Ingestion**: Ingests packages across 29+ Linux and BSD package formats (`.deb`, `.rpm`, `PKGBUILD`, `.apk`, `ebuild`, `xbps`, FreeBSD/OpenBSD Ports, Nix Flakes, Guix Scheme, Flatpak, Snap, AppImage, `.ipk`, `.sigpkg`).
+- **Constraint SAT Solver**: Zero-dependency Boolean SAT dependency resolution engine ensuring deterministic conflict detection.
+- **Sub-Second Transactional Rollbacks**: Ext4+JBD2 and Btrfs/ZFS atomic snapshot integration allowing sub-50ms system state rollbacks.
+- **Pledge/Unveil Sandboxing**: Micro-container isolation for userland apps with capability-token privilege enforcement.
+
+### 4. Zenith Compositor & Micro-UX Integration
+- Direct bare-metal DRM/KMS framebuffer rendering bypassing Wayland protocol overhead and X11 network display server abstractions.
+- Absorbs clean distraction-free workflows (GNOME), radical widget modularity (KDE Plasma), safe multi-threaded tiling dynamics (COSMIC), and fluid animation timing curves (macOS/Windows).
+
+### 5. Composite AI Specialist Roles & Intelligence Agents
+- **Bolt ⚡ (Performance Specialist)**: Identifies and eliminates micro-bottlenecks, replacing $O(n^2)$ loops with $O(n)$ hash lookups and zero-copy abstractions.
+- **Palette 🎨 (Micro-UX Specialist)**: Enforces WCAG 2.1 AAA accessibility, keyboard focus states, ARIA labels, and intuitive system feedback.
+- **Sentinel 🛡️ (Security Specialist)**: Audits for buffer overflows, memory disclosure, capability leaks, and post-quantum cryptographic integrity (Kyber-1024 / Dilithium-5).
+- **Sigma Updater & Sigma Linux Distros Crusher Agents**: Daily monitor upstream changes in Linux Kernel, LLVM, GCC, systemd, and BSD distros, converting useful algorithms, drivers, and fixes into native SigmaOS modules.
+
+---
+
+## SECTION 143: SOVEREIGN PROCESS SUBSYSTEM INSPIRATION & ADVANCEMENTS (LINUX PIDFD, FREEBSD PROCDESC & SUBREAPER)
+
+```
++---------------------------------------------------------------------------------------------------------+
+|                  SOVEREIGN PIDFD, PROCDESC & SUBREAPER RE-PARENTING PROCESS ENGINE                      |
++---------------------------------------------------------------------------------------------------------+
+|  [Linux Pidfd Mechanics]       |  [FreeBSD Capsicum Procdesc]   |  [Ancestor Subreaper Re-parenting]   |
+|  pidfd_open, pidfd_send_signal |  pdfork, pdkill, pdwait,       |  PR_SET_CHILD_SUBREAPER,             |
+|  pidfd_getfd                   |  can_kill, can_getfd           |  PROC_REAP_ACQUIRE                   |
++---------------------------------------------------------------------------------------------------------+
+```
+
+### 1. Architectural Mission
+SigmaOS incorporates advanced process file-descriptor abstractions from Linux (`pidfd`) and FreeBSD Capsicum (`procdesc`), alongside ancestor Subreaper process tree re-parenting (`PR_SET_CHILD_SUBREAPER` / `PROC_REAP_ACQUIRE`) to eliminate PID race conditions and guarantee clean orphan process containment.
+
+### 2. Key Subsystem Capabilities
+1. **Linux `pidfd` Integration**:
+   - `pidfd_open`: Opens a file descriptor referring to a process by PID, preventing PID recycle race conditions.
+   - `pidfd_send_signal`: Sends signals to processes via file descriptors.
+   - `pidfd_getfd`: Duplicates target process file descriptors safely across capability boundaries.
+2. **FreeBSD Capsicum `procdesc` Capabilities**:
+   - `pdfork`: Atomically forks a new process and yields a capability-restricted process descriptor.
+   - Capability rights enforcement (`can_kill`, `can_wait`, `can_getfd`, `can_read_status`).
+3. **Subreaper Orphan Containment**:
+   - `set_subreaper`: Designates supervisor processes as subreapers (`PR_SET_CHILD_SUBREAPER`).
+   - `terminate_and_reparent_orphans`: Re-parents orphaned child processes to the nearest ancestor Subreaper instead of defaulting to init (PID 1).
+
+---
+
+## SECTION 144: SOVEREIGN FILESYSTEM SUBSYSTEM INSPIRATION & ADVANCEMENTS (LINUX FSCRYPT & KERNEL AUTOFS)
+
+```
++---------------------------------------------------------------------------------------------------------+
+|                  SOVEREIGN FSCRYPT ENCRYPTION & KERNEL AUTOFS MOUNT ENGINE                              |
++---------------------------------------------------------------------------------------------------------+
+|  [Linux fscrypt Transparent Policy] |  [Post-Quantum / XTS Encryption] |  [Autofs On-Demand Triggers]  |
+|  per-directory policy association,  |  AES-256-XTS & Kyber-1024 PQC    |  direct/indirect mount,       |
+|  encrypted inode contents & paths  |  stream transformation pass     |  idle timeout auto-unmounting |
++---------------------------------------------------------------------------------------------------------+
+```
+
+### 1. Architectural Mission
+SigmaOS incorporates per-directory transparent file encryption inspired by Linux `fscrypt` alongside kernel-level `autofs` on-demand mount point triggers and idle timeout unmounting to guarantee maximum storage privacy and automated volume mounting efficiency.
+
+### 2. Key Subsystem Capabilities
+1. **Linux `fscrypt` Transparent Directory Encryption**:
+   - `set_fscrypt_policy`: Associates transparent encryption policies (`AES-256-XTS`, `Kyber-1024-PQC`) with target directory inodes.
+   - `write_encrypted_file` & `read_decrypted_file`: Transparently encrypts and decrypts file data and filenames using policy master key descriptors.
+2. **Kernel `autofs` On-Demand Mount Triggers**:
+   - `register_autofs_trigger`: Configures direct and indirect on-demand mount point triggers for storage devices.
+   - `trigger_access`: Automatically mounts target storage volumes upon directory access.
+   - `expire_idle_mounts`: Automatically unmounts idle volumes after configurable timeout intervals.
+
+---
+
+## SECTION 145: SOVEREIGN KERNEL SECURITY MITIGATIONS (KPTR_RESTRICT, DMESG_RESTRICT, BSD SYSCTL & CFI)
+
+```
++---------------------------------------------------------------------------------------------------------+
+|                SOVEREIGN HARDENED KERNEL SECURITY MITIGATIONS & CFI ENGINE                              |
++---------------------------------------------------------------------------------------------------------+
+|  [Linux Pointer Sanitization]   |  [BSD Sysctl Hardening]        |  [Forward-Edge CFI Engine]          |
+|  kptr_restrict (levels 0..2),   |  security.bsd.unprivileged_p,  |  indirect call signature checks,   |
+|  dmesg_restrict log isolation   |  security.bsd.hardlink_check   |  control flow hijack prevention   |
++---------------------------------------------------------------------------------------------------------+
+```
+
+### 1. Architectural Mission
+SigmaOS incorporates advanced kernel security mitigations inspired by Linux (`kptr_restrict`, `dmesg_restrict`) and BSD security sysctl parameters alongside forward-edge Control Flow Integrity (CFI) signature validation to prevent kernel address leakage, unprivileged log inspection, and control flow hijacking.
+
+### 2. Key Subsystem Capabilities
+1. **Linux Kernel Pointer & Log Restrictions**:
+   - `set_kptr_restrict`: Controls kernel pointer sanitization levels (ExposeRaw, ZeroNonRoot, ZeroAll) to eliminate info leaks.
+   - `set_dmesg_restrict` & `can_access_dmesg`: Restricts kernel dmesg ring buffer access exclusively to root/capabilities.
+2. **BSD Security Sysctl Hardening**:
+   - Hardlink check enforcement (`security.bsd.hardlink_check`) and unprivileged process debugging controls.
+3. **Control Flow Integrity (CFI) Engine**:
+   - `register_cfi_target`: Registers valid forward-edge indirect call target addresses and expected signature hashes.
+   - `validate_indirect_call`: Verifies target addresses and function signature hashes prior to dispatching indirect calls, trapping control flow hijack attempts.

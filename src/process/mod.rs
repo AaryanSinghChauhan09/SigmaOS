@@ -9,9 +9,12 @@ pub mod spawn;
 pub mod manager;
 pub mod elf_loader;
 pub mod scheduler;
-pub mod sovereign_scheduler_governor;
+pub mod pidfd_procdesc_subreaper;
 
-pub use sovereign_scheduler_governor::*;
+pub use pidfd_procdesc_subreaper::{
+    ProcessDescriptorRights, ProcessFileDescriptor, SovereignPidfdProcdescEngine,
+    SubreaperProcessEntry,
+};
 
 pub use activity_manager::{
     ActivityManager, ActivityManager as ProcessActivityManager, ActivityState, AddressSpaceBinding,

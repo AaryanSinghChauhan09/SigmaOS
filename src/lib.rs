@@ -49,8 +49,10 @@ pub use sigpkg::{
     SovereignUniversalPackageManagerInteropEngine, SovereignUniversalPackageTranslationBridge,
 };
 pub use filesystem::{
-    EphemeralTmpfsMountGovernor, SovereignAtomicGenerationRootfsGuard, SovereignCanonicalFhsResolver,
-    SovereignMultiDistroFhsHierarchyEngine, SyntheticProcSysfsProvider,
+    AutofsMountTrigger, EphemeralTmpfsMountGovernor, FscryptInodeRecord, FscryptPolicy,
+    SovereignAtomicGenerationRootfsGuard, SovereignCanonicalFhsResolver,
+    SovereignFscryptAutofsEngine, SovereignMultiDistroFhsHierarchyEngine,
+    SyntheticProcSysfsProvider,
 };
 pub mod storage;
 pub mod thread;
@@ -68,10 +70,14 @@ pub use desktop::{
 pub use process::{
     AdvancedIpcHub, BsdRusage, CancellationType, CoreDumpMetadata, EventFd,
     JobControlLifecycleEngine, JobState, PosixMessage, PosixMessageQueue, ProcessCancelState,
-    ProcessCancellationAndTerminationManager, ProcessControlError, ProcessJobEntry,
-    ProcessVmReadWriteEngine, ProcessWaiterAndRusageCollector, SigQueuePayload, SovereignProcess,
-    SovereignProcessManager, SovereignProcessState, WaitStatus, ZeroCopyIpcChannel, WCONTINUED,
-    WNOHANG, WUNTRACED,
+    ProcessCancellationAndTerminationManager, ProcessControlError, ProcessDescriptorRights,
+    ProcessFileDescriptor, ProcessJobEntry, ProcessVmReadWriteEngine,
+    ProcessWaiterAndRusageCollector, SigQueuePayload, SovereignPidfdProcdescEngine,
+    SovereignProcess, SovereignProcessManager, SovereignProcessState, SubreaperProcessEntry,
+    WaitStatus, ZeroCopyIpcChannel, WCONTINUED, WNOHANG, WUNTRACED,
+};
+pub use kernel::{
+    CfiFunctionSignature, KptrRestrictLevel, SovereignHardenedSecurityMitigationsEngine,
 };
 pub mod access;
 pub mod open_source_obsoletion;
