@@ -2,6 +2,7 @@
 // Zero-dependency Rust #![no_std] / std implementation of strategic missing distro abstractions:
 // OpenSUSE YaST2, Void xbps-src, Alpine LBU, FreeBSD VNET, NetBSD Rump, OpenBSD Pledge/Unveil, NixOS Flakes.
 
+use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
 use std::format;
@@ -46,6 +47,258 @@ impl OpenSuseYast2ControlEngine {
 }
 
 impl Default for OpenSuseYast2ControlEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// 1. openSUSE Snapper Btrfs/ZFS Snapshot & Rollback Engine
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SnapperSnapshotType {
+    Single,
+    Pre,
+    Post,
+}
+
+#[derive(Debug, Clone)]
+pub struct SnapperSnapshot {
+    pub id: u32,
+    pub snapshot_type: SnapperSnapshotType,
+    pub pre_id: Option<u32>,
+    pub subvolume: String,
+    pub description: String,
+    pub timestamp_sec: u64,
+}
+
+#[derive(Debug, Clone)]
+pub struct OpenSuseSnapperRollbackEngine {
+    pub subvolume_path: String,
+    pub snapshots: Vec<SnapperSnapshot>,
+    pub active_snapshot_id: u32,
+    pub next_id: u32,
+}
+
+impl OpenSuseSnapperRollbackEngine {
+    pub fn new(subvolume_path: &str) -> Self {
+        let initial_snap = SnapperSnapshot {
+            id: 1,
+            snapshot_type: SnapperSnapshotType::Single,
+            pre_id: None,
+            subvolume: subvolume_path.to_string(),
+            description: String::from("Base system installation"),
+            timestamp_sec: 1700000000,
+        };
+        Self {
+            subvolume_path: subvolume_path.to_string(),
+            snapshots: vec![initial_snap],
+            active_snapshot_id: 1,
+            next_id: 2,
+        }
+    }
+
+    pub fn create_pre_snapshot(&mut self, description: &str, timestamp: u64) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.snapshots.push(SnapperSnapshot {
+            id,
+            snapshot_type: SnapperSnapshotType::Pre,
+            pre_id: None,
+            subvolume: format!("{}@snap_{}", self.subvolume_path, id),
+            description: description.to_string(),
+            timestamp_sec: timestamp,
+        });
+        id
+    }
+
+    pub fn create_post_snapshot(&mut self, pre_id: u32, description: &str, timestamp: u64) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.snapshots.push(SnapperSnapshot {
+            id,
+            snapshot_type: SnapperSnapshotType::Post,
+            pre_id: Some(pre_id),
+            subvolume: format!("{}@snap_{}", self.subvolume_path, id),
+            description: description.to_string(),
+            timestamp_sec: timestamp,
+        });
+        id
+    }
+
+    pub fn rollback_to_snapshot(&mut self, snapshot_id: u32) -> Result<String, &'static str> {
+        if let Some(snap) = self.snapshots.iter().find(|s| s.id == snapshot_id) {
+            self.active_snapshot_id = snap.id;
+            Ok(format!("Successfully rolled back system subvolume to snapshot {} ({})", snap.id, snap.description))
+        } else {
+            Err("Snapper: Target snapshot ID not found")
+        }
+    }
+}
+
+/// 2. Linux Bcachefs Multi-Device Tiered Storage & Scrubbing Engine
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BcachefsStorageTier {
+    NvmeCache,
+    SsdWriteback,
+    HddCapacity,
+}
+
+#[derive(Debug, Clone)]
+pub struct BcachefsDevice {
+    pub dev_path: String,
+    pub tier: BcachefsStorageTier,
+    pub capacity_bytes: u64,
+}
+
+#[derive(Debug, Clone)]
+pub struct LinuxBcachefsTieredStorageEngine {
+    pub devices: Vec<BcachefsDevice>,
+    pub total_extents_scrubbed: u64,
+    pub corrupted_extents_repaired: u64,
+}
+
+impl LinuxBcachefsTieredStorageEngine {
+    pub fn new() -> Self {
+        Self {
+            devices: Vec::new(),
+            total_extents_scrubbed: 0,
+            corrupted_extents_repaired: 0,
+        }
+    }
+
+    pub fn register_device(&mut self, dev_path: &str, tier: BcachefsStorageTier, capacity: u64) {
+        self.devices.push(BcachefsDevice {
+            dev_path: dev_path.to_string(),
+            tier,
+            capacity_bytes: capacity,
+        });
+    }
+
+    pub fn select_target_tier_for_write(&self, is_foreground_hot: bool) -> BcachefsStorageTier {
+        if is_foreground_hot && self.devices.iter().any(|d| d.tier == BcachefsStorageTier::NvmeCache) {
+            BcachefsStorageTier::NvmeCache
+        } else if self.devices.iter().any(|d| d.tier == BcachefsStorageTier::SsdWriteback) {
+            BcachefsStorageTier::SsdWriteback
+        } else {
+            BcachefsStorageTier::HddCapacity
+        }
+    }
+
+    pub fn scrub_extent_checksums(&mut self, extents_count: u64, simulate_checksum_error: bool) -> bool {
+        self.total_extents_scrubbed += extents_count;
+        if simulate_checksum_error {
+            self.corrupted_extents_repaired += 1;
+        }
+        true
+    }
+}
+
+impl Default for LinuxBcachefsTieredStorageEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// 3. NetBSD Veriexec In-Kernel Executable Fingerprint Integrity Engine
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum VeriexecEvalMode {
+    StrictLevel0, // Informational logging only
+    StrictLevel1, // Prevent execution of modified files
+    StrictLevel2, // Prevent execution + disallow file modification
+    StrictLevel3, // Lock veriexec table permanently
+}
+
+#[derive(Debug, Clone)]
+pub struct VeriexecEntry {
+    pub executable_path: String,
+    pub fingerprint_sha256: [u8; 32],
+    pub is_direct_exec_only: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct NetBsdVeriexecIntegrityEngine {
+    pub eval_mode: VeriexecEvalMode,
+    pub fingerprints: Vec<VeriexecEntry>,
+    pub total_evaluations: u64,
+    pub violations_blocked: u64,
+}
+
+impl NetBsdVeriexecIntegrityEngine {
+    pub fn new(eval_mode: VeriexecEvalMode) -> Self {
+        Self {
+            eval_mode,
+            fingerprints: Vec::new(),
+            total_evaluations: 0,
+            violations_blocked: 0,
+        }
+    }
+
+    pub fn register_fingerprint(&mut self, path: &str, fingerprint: [u8; 32], direct_exec_only: bool) {
+        self.fingerprints.push(VeriexecEntry {
+            executable_path: path.to_string(),
+            fingerprint_sha256: fingerprint,
+            is_direct_exec_only: direct_exec_only,
+        });
+    }
+
+    pub fn evaluate_exec_integrity(&mut self, path: &str, runtime_fingerprint: &[u8; 32]) -> Result<bool, &'static str> {
+        self.total_evaluations += 1;
+        if let Some(entry) = self.fingerprints.iter().find(|e| e.executable_path == path) {
+            if entry.fingerprint_sha256 == *runtime_fingerprint {
+                Ok(true)
+            } else {
+                self.violations_blocked += 1;
+                if self.eval_mode != VeriexecEvalMode::StrictLevel0 {
+                    Err("Veriexec: Executable fingerprint mismatch! Execution blocked.")
+                } else {
+                    Ok(false)
+                }
+            }
+        } else if self.eval_mode == VeriexecEvalMode::StrictLevel2 || self.eval_mode == VeriexecEvalMode::StrictLevel3 {
+            self.violations_blocked += 1;
+            Err("Veriexec: Unverified binary execution denied in strict mode.")
+        } else {
+            Ok(true)
+        }
+    }
+}
+
+/// 4. DragonFly BSD VarSyms Variable Symbolic Links Engine
+#[derive(Debug, Clone)]
+pub struct DragonFlyVarSymsEngine {
+    pub global_varsyms: BTreeMap<String, String>,
+    pub per_user_varsyms: BTreeMap<String, String>,
+}
+
+impl DragonFlyVarSymsEngine {
+    pub fn new() -> Self {
+        let mut globals = BTreeMap::new();
+        globals.insert(String::from("SYS"), String::from("x86_64-sigmaos"));
+        globals.insert(String::from("ARCH"), String::from("x86_64"));
+        Self {
+            global_varsyms: globals,
+            per_user_varsyms: BTreeMap::new(),
+        }
+    }
+
+    pub fn set_user_varsym(&mut self, name: &str, value: &str) {
+        self.per_user_varsyms.insert(name.to_string(), value.to_string());
+    }
+
+    pub fn expand_varsym_path(&self, target_path: &str) -> String {
+        let mut expanded = target_path.to_string();
+        for (k, v) in &self.per_user_varsyms {
+            let token = format!("${}", k);
+            expanded = expanded.replace(&token, v);
+        }
+        for (k, v) in &self.global_varsyms {
+            let token = format!("${}", k);
+            expanded = expanded.replace(&token, v);
+        }
+        expanded
+    }
+}
+
+impl Default for DragonFlyVarSymsEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -484,10 +737,24 @@ pub struct SovereignMissingLinuxBsdSuite {
     pub clear_stateless: ClearLinuxStatelessEngine,
     pub urpmi: MageiaUrpmiEngine,
     pub pax: HardenedBsdPaxGuardEngine,
+    pub snapper: OpenSuseSnapperRollbackEngine,
+    pub bcachefs: LinuxBcachefsTieredStorageEngine,
+    pub veriexec: NetBsdVeriexecIntegrityEngine,
+    pub varsyms: DragonFlyVarSymsEngine,
 }
 
 impl SovereignMissingLinuxBsdSuite {
     pub fn new() -> Self {
+        let mut veriexec = NetBsdVeriexecIntegrityEngine::new(VeriexecEvalMode::StrictLevel1);
+        veriexec.register_fingerprint("/bin/init", [0xAB; 32], true);
+
+        let mut bcachefs = LinuxBcachefsTieredStorageEngine::new();
+        bcachefs.register_device("/dev/nvme0n1", BcachefsStorageTier::NvmeCache, 512 * 1024 * 1024 * 1024);
+        bcachefs.register_device("/dev/sda", BcachefsStorageTier::HddCapacity, 2 * 1024 * 1024 * 1024 * 1024);
+
+        let mut varsyms = DragonFlyVarSymsEngine::new();
+        varsyms.set_user_varsym("USER", "sovereign");
+
         Self {
             yast2: OpenSuseYast2ControlEngine::new(),
             xbps_src: VoidXbpsSrcTemplateEngine::new("sigmaos-core", "1.0.0", 1, "gnu-configure"),
@@ -504,6 +771,10 @@ impl SovereignMissingLinuxBsdSuite {
             clear_stateless: ClearLinuxStatelessEngine::new(),
             urpmi: MageiaUrpmiEngine::new(),
             pax: HardenedBsdPaxGuardEngine::new(),
+            snapper: OpenSuseSnapperRollbackEngine::new("/.snapshots"),
+            bcachefs,
+            veriexec,
+            varsyms,
         }
     }
 
@@ -520,6 +791,12 @@ impl SovereignMissingLinuxBsdSuite {
         let reset_ok = self.clear_stateless.reset_etc_to_defaults();
         self.urpmi.add_media("nonfree/updates");
         let pax_ok = self.pax.enforce_pax_policy("/usr/bin/sigsudo");
+        let pre_snap_id = self.snapper.create_pre_snapshot("System Update Pre", 1700000100);
+        let post_snap_id = self.snapper.create_post_snapshot(pre_snap_id, "System Update Post", 1700000200);
+        let rollback_ok = self.snapper.rollback_to_snapshot(pre_snap_id).is_ok();
+        let tier = self.bcachefs.select_target_tier_for_write(true);
+        let veriexec_ok = self.veriexec.evaluate_exec_integrity("/bin/init", &[0xAB; 32]).unwrap_or(false);
+        let expanded_varsym = self.varsyms.expand_varsym_path("/home/$USER/data/$SYS");
 
         self.yast2.verify_module("yast2-hardware")
             && self.xbps_src.generate_xbps_binary().contains("sigmaos-core")
@@ -536,6 +813,11 @@ impl SovereignMissingLinuxBsdSuite {
             && reset_ok
             && self.urpmi.media_sources.len() == 3
             && pax_ok
+            && post_snap_id > pre_snap_id
+            && rollback_ok
+            && tier == BcachefsStorageTier::NvmeCache
+            && veriexec_ok
+            && expanded_varsym == "/home/sovereign/data/x86_64-sigmaos"
     }
 
     pub fn resolve_missing_components_for_subsystem(&mut self, subsystem: &str) -> String {
@@ -555,6 +837,10 @@ impl SovereignMissingLinuxBsdSuite {
             "clear" | "stateless" => format!("Stateless clean: {}", self.clear_stateless.is_stateless_clean),
             "urpmi" | "mageia" => format!("Media sources: {}", self.urpmi.media_sources.len()),
             "pax" | "hardened" => format!("PaX ASLR bits: {}", self.pax.aslr_entropy_bits),
+            "snapper" | "btrfs" => format!("Active snapshot ID: {}", self.snapper.active_snapshot_id),
+            "bcachefs" | "tiering" => format!("Devices in pool: {}", self.bcachefs.devices.len()),
+            "veriexec" | "integrity" => format!("Fingerprints tracked: {}", self.veriexec.fingerprints.len()),
+            "varsyms" | "symlink" => format!("Globals: {}, User: {}", self.varsyms.global_varsyms.len(), self.varsyms.per_user_varsyms.len()),
             _ => format!("Default resolver active for subsystem: {}", subsystem),
         }
     }
@@ -569,6 +855,74 @@ impl Default for SovereignMissingLinuxBsdSuite {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_opensuse_snapper_rollback() {
+        let mut snapper = OpenSuseSnapperRollbackEngine::new("/.snapshots");
+        assert_eq!(snapper.active_snapshot_id, 1);
+
+        let pre_id = snapper.create_pre_snapshot("Pre Zypper Update", 1700000010);
+        let post_id = snapper.create_post_snapshot(pre_id, "Post Zypper Update", 1700000020);
+        assert_eq!(pre_id, 2);
+        assert_eq!(post_id, 3);
+        assert_eq!(snapper.snapshots.len(), 3);
+
+        let rollback_res = snapper.rollback_to_snapshot(pre_id);
+        assert!(rollback_res.is_ok());
+        assert_eq!(snapper.active_snapshot_id, pre_id);
+
+        let invalid_rollback = snapper.rollback_to_snapshot(999);
+        assert!(invalid_rollback.is_err());
+    }
+
+    #[test]
+    fn test_linux_bcachefs_tiered_storage() {
+        let mut bcachefs = LinuxBcachefsTieredStorageEngine::new();
+        bcachefs.register_device("/dev/nvme0n1", BcachefsStorageTier::NvmeCache, 1_000_000_000_000);
+        bcachefs.register_device("/dev/sda1", BcachefsStorageTier::SsdWriteback, 2_000_000_000_000);
+        bcachefs.register_device("/dev/sdb1", BcachefsStorageTier::HddCapacity, 10_000_000_000_000);
+
+        let hot_tier = bcachefs.select_target_tier_for_write(true);
+        assert_eq!(hot_tier, BcachefsStorageTier::NvmeCache);
+
+        let cold_tier = bcachefs.select_target_tier_for_write(false);
+        assert_eq!(cold_tier, BcachefsStorageTier::SsdWriteback);
+
+        assert!(bcachefs.scrub_extent_checksums(1024, true));
+        assert_eq!(bcachefs.total_extents_scrubbed, 1024);
+        assert_eq!(bcachefs.corrupted_extents_repaired, 1);
+    }
+
+    #[test]
+    fn test_netbsd_veriexec_integrity() {
+        let mut veriexec = NetBsdVeriexecIntegrityEngine::new(VeriexecEvalMode::StrictLevel1);
+        let valid_hash = [0x5A; 32];
+        let invalid_hash = [0xFF; 32];
+
+        veriexec.register_fingerprint("/usr/bin/sigsudo", valid_hash, true);
+
+        let eval_valid = veriexec.evaluate_exec_integrity("/usr/bin/sigsudo", &valid_hash);
+        assert_eq!(eval_valid, Ok(true));
+
+        let eval_tampered = veriexec.evaluate_exec_integrity("/usr/bin/sigsudo", &invalid_hash);
+        assert!(eval_tampered.is_err());
+        assert_eq!(veriexec.violations_blocked, 1);
+
+        let eval_unregistered = veriexec.evaluate_exec_integrity("/usr/bin/untracked", &invalid_hash);
+        assert_eq!(eval_unregistered, Ok(true));
+    }
+
+    #[test]
+    fn test_dragonfly_varsyms() {
+        let mut varsyms = DragonFlyVarSymsEngine::new();
+        varsyms.set_user_varsym("USER", "jules");
+        varsyms.set_user_varsym("CONF", "production");
+
+        let raw_path = "/home/$USER/config/$CONF/$ARCH/$SYS";
+        let expanded = varsyms.expand_varsym_path(raw_path);
+
+        assert_eq!(expanded, "/home/jules/config/production/x86_64/x86_64-sigmaos");
+    }
 
     #[test]
     fn test_missing_linux_bsd_components_suite() {

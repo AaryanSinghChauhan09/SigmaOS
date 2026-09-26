@@ -12,15 +12,10 @@ use std::vec::Vec;
 
 
 
-#[cfg(feature = "obsoletion_test")]
+#[cfg(not(feature = "standalone_test"))]
+#[cfg(not(feature = "standalone_test"))]
 #[path = "open_source_os_gap_closure.rs"]
 pub mod open_source_os_gap_closure;
-
-#[cfg(all(not(feature = "obsoletion_test"), feature = "gap_closure_test"))]
-use super as open_source_os_gap_closure;
-
-#[cfg(all(not(feature = "obsoletion_test"), not(feature = "gap_closure_test")))]
-use crate::open_source_os_gap_closure;
 
 // =========================================================================
 // 1. SOVEREIGN VCS ENGINE (Superseding Git, GitHub CLI, Mercurial)
