@@ -220,6 +220,23 @@ impl TcpConnectionControlBlock {
             TcpConnectionState::Established | TcpConnectionState::FinWait1 | TcpConnectionState::FinWait2
         )
     }
+
+    /// Generate SYN Cookie (RFC 4987) for SYN flood protection
+    pub fn generate_syn_cookie(local: SocketAddr, remote: SocketAddr, secret_seed: u32) -> u32 {
+        let mut hash = secret_seed;
+        hash = hash.wrapping_add(local.ip.0[0] as u32 | ((local.ip.0[1] as u32) << 8));
+        hash = hash.wrapping_add((local.ip.0[2] as u32) << 16 | ((local.ip.0[3] as u32) << 24));
+        hash = hash.wrapping_add(remote.ip.0[0] as u32 | ((remote.ip.0[1] as u32) << 8));
+        hash = hash.wrapping_add((remote.ip.0[2] as u32) << 16 | ((remote.ip.0[3] as u32) << 24));
+        hash = hash.wrapping_add((local.port as u32) << 16 | (remote.port as u32));
+        hash ^ 0xA5A55A5A
+    }
+
+    /// Validate SYN Cookie response ACK sequence number
+    pub fn validate_syn_cookie(cookie: u32, local: SocketAddr, remote: SocketAddr, secret_seed: u32) -> bool {
+        let expected = Self::generate_syn_cookie(local, remote, secret_seed);
+        cookie == expected
+    }
 }
 
 // ============================================================================
@@ -806,5 +823,18 @@ mod tests {
         let port1 = arp.allocate_port();
         let port2 = arp.allocate_port();
         assert!(port2 > port1);
+    }
+
+    #[test]
+    fn test_tcp_syn_cookie_generation_and_validation() {
+        let local = SocketAddr::new_ipv4(80, [192, 168, 1, 1]);
+        let remote = SocketAddr::new_ipv4(54321, [10, 0, 0, 2]);
+        let seed = 0x98765432;
+
+        let cookie = TcpConnectionControlBlock::generate_syn_cookie(local, remote, seed);
+        assert!(TcpConnectionControlBlock::validate_syn_cookie(cookie, local, remote, seed));
+
+        let wrong_remote = SocketAddr::new_ipv4(54322, [10, 0, 0, 2]);
+        assert!(!TcpConnectionControlBlock::validate_syn_cookie(cookie, local, wrong_remote, seed));
     }
 }
