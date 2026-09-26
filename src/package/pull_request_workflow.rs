@@ -70,6 +70,11 @@ pub enum PullRequestPackageFormat {
     CargoCrate,
     RubyGem,
     DotnetNuget,
+    QemuQcow2VmImage,
+    RawDiskVmImage,
+    VagrantVmBox,
+    OvaVirtualAppliance,
+    VirtioGpuVmImage,
 }
 
 impl PullRequestPackageFormat {
@@ -130,6 +135,11 @@ impl PullRequestPackageFormat {
             Self::CargoCrate => "Rust Cargo Crate",
             Self::RubyGem => "Ruby Gem Package",
             Self::DotnetNuget => ".NET NuGet Package",
+            Self::QemuQcow2VmImage => "QEMU/KVM QCOW2 Virtual Machine Image",
+            Self::RawDiskVmImage => "Raw Disk Virtual Machine Image",
+            Self::VagrantVmBox => "Vagrant VM Box Package",
+            Self::OvaVirtualAppliance => "OVA/OVF Virtual Appliance",
+            Self::VirtioGpuVmImage => "VirtIO GPU Virtual Machine Image",
         }
     }
 }

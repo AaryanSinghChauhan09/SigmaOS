@@ -172,6 +172,11 @@ impl SovereignUniversalPrGatewayEngine {
                 PullRequestPackageFormat::SlackwareSlackBuild | PullRequestPackageFormat::SlackwareTxz => PackageFormat::TarGz,
                 PullRequestPackageFormat::HaikuHpkg => PackageFormat::Pkg,
                 PullRequestPackageFormat::NativeSigPkg => PackageFormat::SigmaPkg,
+                PullRequestPackageFormat::QemuQcow2VmImage
+                | PullRequestPackageFormat::RawDiskVmImage
+                | PullRequestPackageFormat::VagrantVmBox
+                | PullRequestPackageFormat::OvaVirtualAppliance
+                | PullRequestPackageFormat::VirtioGpuVmImage => PackageFormat::SigmaPkg,
                 _ => PackageFormat::SigmaPkg,
             },
             original_name: translated.name.clone(),
@@ -321,5 +326,36 @@ mod tests {
         }
 
         assert_eq!(gateway.pr_gateway_registry.len(), 12);
+    }
+
+    #[test]
+    fn test_virtual_machine_pr_package_submissions() {
+        let mut gateway = SovereignUniversalPrGatewayEngine::new();
+
+        let vm_submissions = [
+            ("dev1", "alpine-microvm", "3.19.0", PullRequestPackageFormat::QemuQcow2VmImage, "qcow2_format=3\ndisk_size=20G", &["qemu-kvm"][..]),
+            ("dev2", "ubuntu-cloud-init", "24.04.0", PullRequestPackageFormat::VagrantVmBox, "vagrant_box=ubuntu/jammy64", &["vagrant"][..]),
+            ("dev3", "freebsd-appliance", "14.0.0", PullRequestPackageFormat::OvaVirtualAppliance, "ovf_version=2.0\nram=4096", &["virtualbox"][..]),
+        ];
+
+        for (author, name, ver, fmt, manifest, deps) in vm_submissions {
+            let pr = gateway.submit_distro_package_pr(
+                author,
+                name,
+                ver,
+                fmt,
+                manifest,
+                deps,
+                b"pqc_vm_signature_dilithium5",
+            );
+
+            let translated = gateway.validate_and_translate_pr(pr).expect("VM PR translation failed");
+            assert_eq!(translated.name, name);
+
+            let merged = gateway.auto_merge_package_pr(pr).expect("VM PR merge failed");
+            assert_eq!(merged.name, format!("sigpkg-{}", name));
+        }
+
+        assert_eq!(gateway.search_distro_prs("microvm").len(), 1);
     }
 }
