@@ -1042,6 +1042,10 @@ pub enum ShellDialect {
     Ion,
     Rc,
     Elvish,
+    Xonsh,
+    Oil,
+    Es,
+    Bsh,
 }
 
 pub struct FishAbbreviationEngine {
@@ -1273,6 +1277,14 @@ impl UniversalShellCompatibilityEngine {
                     return ShellDialect::Rc;
                 } else if trimmed.contains("elvish") {
                     return ShellDialect::Elvish;
+                } else if trimmed.contains("xonsh") {
+                    return ShellDialect::Xonsh;
+                } else if trimmed.contains("oil") || trimmed.contains("ysh") {
+                    return ShellDialect::Oil;
+                } else if trimmed.contains("es") {
+                    return ShellDialect::Es;
+                } else if trimmed.contains("bsh") {
+                    return ShellDialect::Bsh;
                 } else if trimmed.contains("dash") {
                     return ShellDialect::Dash;
                 } else if trimmed.contains("sh") {
@@ -1323,6 +1335,7 @@ impl UniversalScriptTranspiler {
     pub fn transpile_to_posix_sh(script: &str, dialect: ShellDialect) -> String {
         let mut transpiled = String::new();
         let mut in_function = false;
+        let mut indent_stack: Vec<usize> = Vec::new();
 
         for line in script.lines() {
             let trimmed = line.trim();
@@ -1330,6 +1343,24 @@ impl UniversalScriptTranspiler {
             if trimmed.starts_with("#!") {
                 transpiled.push_str("#!/bin/sh\n");
                 continue;
+            }
+
+            if trimmed.is_empty() {
+                transpiled.push('\n');
+                continue;
+            }
+
+            // Indentation tracking for Pythonic / block-scoped dialects (e.g. Xonsh)
+            if dialect == ShellDialect::Xonsh {
+                let leading_spaces = line.len() - line.trim_start().len();
+                while let Some(&last_indent) = indent_stack.last() {
+                    if leading_spaces < last_indent {
+                        indent_stack.pop();
+                        transpiled.push_str("}\n");
+                    } else {
+                        break;
+                    }
+                }
             }
 
             let converted_line = match dialect {
@@ -1342,11 +1373,25 @@ impl UniversalScriptTranspiler {
                 ShellDialect::Ion => Self::transpile_ion_line(trimmed),
                 ShellDialect::Rc => Self::transpile_rc_line(trimmed),
                 ShellDialect::Elvish => Self::transpile_elvish_line(trimmed),
-                ShellDialect::Dash | ShellDialect::BsdSh => trimmed.to_string(),
+                ShellDialect::Xonsh => {
+                    let leading_spaces = line.len() - line.trim_start().len();
+                    if trimmed.ends_with(':') {
+                        indent_stack.push(leading_spaces + 2);
+                    }
+                    Self::transpile_xonsh_line(trimmed)
+                }
+                ShellDialect::Oil => Self::transpile_oil_line(trimmed),
+                ShellDialect::Es => Self::transpile_es_line(trimmed),
+                ShellDialect::Dash | ShellDialect::BsdSh | ShellDialect::Bsh => trimmed.to_string(),
             };
 
             transpiled.push_str(&converted_line);
             transpiled.push('\n');
+        }
+
+        while !indent_stack.is_empty() {
+            indent_stack.pop();
+            transpiled.push_str("}\n");
         }
 
         transpiled
@@ -1684,6 +1729,71 @@ impl UniversalScriptTranspiler {
             if let Some(space_idx) = rest.find(' ') {
                 let fn_name = &rest[..space_idx];
                 return format!("{}() {{", fn_name);
+            }
+        }
+        l.to_string()
+    }
+
+    fn transpile_xonsh_line(line: &str) -> String {
+        let l = line.trim();
+        if l.starts_with('$') && l.contains('=') {
+            let rest = l.trim_start_matches('$').trim();
+            if let Some(eq_idx) = rest.find('=') {
+                let var = rest[..eq_idx].trim();
+                let val = rest[eq_idx + 1..].trim();
+                return format!("export {}={}", var, val);
+            }
+        }
+        if l.starts_with("for ") && l.contains(" in range(") && l.ends_with(':') {
+            let rest = l.trim_start_matches("for ").trim_end_matches(':').trim();
+            if let (Some(var_end), Some(r_start), Some(r_end)) = (rest.find(" in "), rest.find("range("), rest.rfind(')')) {
+                let var = rest[..var_end].trim();
+                let num = rest[r_start + 6..r_end].trim();
+                return format!("for {} in $(seq 0 $(( {} - 1 ))); do", var, num);
+            }
+        }
+        if l.starts_with("def ") && l.ends_with(':') {
+            let rest = l.trim_start_matches("def ").trim_end_matches(':').trim();
+            let fn_name = rest.split('(').next().unwrap_or(rest).trim();
+            return format!("{}() {{", fn_name);
+        }
+        l.to_string()
+    }
+
+    fn transpile_oil_line(line: &str) -> String {
+        let l = line.trim();
+        if l.starts_with("var ") || l.starts_with("const ") || l.starts_with("setvar ") {
+            let rest = l.trim_start_matches("var ")
+                .trim_start_matches("const ")
+                .trim_start_matches("setvar ")
+                .trim();
+            if let Some(eq_idx) = rest.find('=') {
+                let var = rest[..eq_idx].trim();
+                let val = rest[eq_idx + 1..].trim();
+                return format!("{}={}", var, val);
+            }
+        }
+        if l.starts_with("proc ") {
+            let rest = l.trim_start_matches("proc ").trim();
+            let fn_name = rest.split_whitespace().next().unwrap_or(rest);
+            return format!("{}() {{", fn_name);
+        }
+        l.to_string()
+    }
+
+    fn transpile_es_line(line: &str) -> String {
+        let l = line.trim();
+        if l.starts_with("fn-") || l.contains(" = {") {
+            if let Some(eq_idx) = l.find(" = {") {
+                let fn_name = l[..eq_idx].trim_start_matches("fn-").trim();
+                return format!("{}() {{", fn_name);
+            }
+        }
+        if l.contains(" = (") && l.ends_with(')') {
+            if let Some(eq) = l.find(" = (") {
+                let var = l[..eq].trim();
+                let elems = l[eq + 4..l.len() - 1].trim();
+                return format!("{}=\"{}\"", var, elems);
             }
         }
         l.to_string()
@@ -2492,5 +2602,35 @@ mod tests {
         let posix_elvish = UniversalScriptTranspiler::transpile_to_posix_sh(elvish_script, ShellDialect::Elvish);
         assert!(posix_elvish.contains("export PATH=/bin"));
         assert!(posix_elvish.contains("setup() {"));
+    }
+
+    #[test]
+    fn test_universal_sh_dialect_transpilation() {
+        let xonsh_script = "#!/usr/bin/env xonsh\n$MODE = 'production'\ndef init():\n  echo start";
+        assert_eq!(UniversalShellCompatibilityEngine::detect_shebang_dialect(xonsh_script), ShellDialect::Xonsh);
+        let posix_xonsh = UniversalScriptTranspiler::transpile_to_posix_sh(xonsh_script, ShellDialect::Xonsh);
+        assert!(posix_xonsh.contains("export MODE='production'"));
+        assert!(posix_xonsh.contains("init() {"));
+
+        let oil_script = "#!/usr/bin/env ysh\nvar PORT = 8080\nproc run {\n  echo running\n}";
+        assert_eq!(UniversalShellCompatibilityEngine::detect_shebang_dialect(oil_script), ShellDialect::Oil);
+        let posix_oil = UniversalScriptTranspiler::transpile_to_posix_sh(oil_script, ShellDialect::Oil);
+        assert!(posix_oil.contains("PORT=8080"));
+        assert!(posix_oil.contains("run() {"));
+
+        let es_script = "#!/bin/es\nfn-deploy = {\n  echo deployed\n}\nports = ( 80 443 )";
+        assert_eq!(UniversalShellCompatibilityEngine::detect_shebang_dialect(es_script), ShellDialect::Es);
+        let posix_es = UniversalScriptTranspiler::transpile_to_posix_sh(es_script, ShellDialect::Es);
+        assert!(posix_es.contains("deploy() {"));
+        assert!(posix_es.contains("ports=\"80 443\""));
+
+        let bsh_script = "#!/bin/bsh\nexport BSH_ACTIVE=1";
+        assert_eq!(UniversalShellCompatibilityEngine::detect_shebang_dialect(bsh_script), ShellDialect::Bsh);
+        let posix_bsh = UniversalScriptTranspiler::transpile_to_posix_sh(bsh_script, ShellDialect::Bsh);
+        assert!(posix_bsh.contains("export BSH_ACTIVE=1"));
+
+        let mut engine = UniversalShellCompatibilityEngine::new();
+        let pipelines = engine.execute_script_as_sh(xonsh_script).unwrap();
+        assert!(!pipelines.is_empty());
     }
 }

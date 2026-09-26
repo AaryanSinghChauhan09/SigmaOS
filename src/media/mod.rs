@@ -20,15 +20,18 @@ pub use sovereign_screen_recorder::{
 };
 
 pub use browser::{
-    ArcBoostScript, ArcBrowserBoostEngine, BraveShieldsEngine, BrowserContainerType,
-    BrowserProcess, BrowserProcessType, BrowserTabInstance, ChromiumIpcChannelEngine,
-    ChromiumIpcMessage, DeclarativeNetRequestEngine, DnrActionType, DohEchEncryptionEngine,
-    DuckAssistPrivacyEngine, FirefoxContainerJarManager, GlobalPrivacyControl,
-    MullvadPrivacyIsolationEngine, OnionCircuitNode, QuantumWebRenderEngine,
-    ResistFingerprintingEngine, SearchEngineType, SearchSwitcher, SecureStorageContainer,
-    SigmaWebBrowser, SovereignBrowserEngine, TabMemoryOptimizer, TelemetryAndTrackerStripper,
-    TorCircuitManager, TorSecurityLevel, TrackerTrustGrade, UBlockOriginFilterEngine,
-    ZenWorkspaceTreeEngine,
+    ArcBoostScript, ArcBrowserBoostEngine, BraveAdblockEngine, BraveShieldsEngine,
+    BrowserContainerType, BrowserProcess, BrowserProcessType, BrowserTabInstance,
+    ChromiumBlinkLayoutEngine, ChromiumIpcChannelEngine, ChromiumIpcMessage,
+    DeclarativeNetRequestEngine, DnrActionType, DohEchEncryptionEngine, DuckAssistPrivacyEngine,
+    FirefoxContainerJarManager, FirefoxGeckoViewLayoutEngine, FloorpWorkspacesSplitViewEngine,
+    GlobalPrivacyControl, LadybirdLibWebCssParserEngine,
+    LibreWolfStrictFingerprintingProtectionEngine, MullvadPrivacyIsolationEngine, OnionCircuitNode,
+    OrionWebExtensionCompatibilityEngine, QuantumWebRenderEngine, ResistFingerprintingEngine,
+    SearchEngineType, SearchSwitcher, SecureStorageContainer, SigmaWebBrowser,
+    SovereignBrowserEngine, TabMemoryOptimizer, TelemetryAndTrackerStripper, TorCircuitManager,
+    TorOnionRoutingTunnelEngine, TorSecurityLevel, TrackerTrustGrade, UBlockOriginFilterEngine,
+    UngoogledChromiumPrivacyHardeningEngine, VivaldiSpatialNavigationEngine, ZenWorkspaceTreeEngine,
 };
 
 pub use sovereign_video_player::{
