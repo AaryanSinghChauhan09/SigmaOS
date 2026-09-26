@@ -17,6 +17,8 @@ pub mod paging;
 pub mod segmentation_paging;
 pub mod tlb_associative;
 pub mod zone;
+pub mod sovereign_address_translation;
+pub use sovereign_address_translation::*;
 
 pub use paging::{
     MemoryError, PageDirectory, PageDirectoryPointerTable, PageTable, PageTableEntry,
