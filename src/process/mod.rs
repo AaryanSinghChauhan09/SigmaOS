@@ -9,6 +9,9 @@ pub mod spawn;
 pub mod manager;
 pub mod elf_loader;
 pub mod scheduler;
+pub mod sovereign_scheduler_governor;
+
+pub use sovereign_scheduler_governor::*;
 
 pub use activity_manager::{
     ActivityManager, ActivityManager as ProcessActivityManager, ActivityState, AddressSpaceBinding,
