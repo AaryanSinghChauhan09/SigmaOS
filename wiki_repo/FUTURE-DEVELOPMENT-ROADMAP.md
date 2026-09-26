@@ -166,3 +166,32 @@ SigmaOS is a from-scratch, zero-dependency, zero-trust, bare-metal operating sys
 - **Palette 🎨 (Micro-UX Specialist)**: Enforces WCAG 2.1 AAA accessibility, keyboard focus states, ARIA labels, and intuitive system feedback.
 - **Sentinel 🛡️ (Security Specialist)**: Audits for buffer overflows, memory disclosure, capability leaks, and post-quantum cryptographic integrity (Kyber-1024 / Dilithium-5).
 - **Sigma Updater & Sigma Linux Distros Crusher Agents**: Daily monitor upstream changes in Linux Kernel, LLVM, GCC, systemd, and BSD distros, converting useful algorithms, drivers, and fixes into native SigmaOS modules.
+
+---
+
+## SECTION 143: SOVEREIGN PROCESS SUBSYSTEM INSPIRATION & ADVANCEMENTS (LINUX PIDFD, FREEBSD PROCDESC & SUBREAPER)
+
+```
++---------------------------------------------------------------------------------------------------------+
+|                  SOVEREIGN PIDFD, PROCDESC & SUBREAPER RE-PARENTING PROCESS ENGINE                      |
++---------------------------------------------------------------------------------------------------------+
+|  [Linux Pidfd Mechanics]       |  [FreeBSD Capsicum Procdesc]   |  [Ancestor Subreaper Re-parenting]   |
+|  pidfd_open, pidfd_send_signal |  pdfork, pdkill, pdwait,       |  PR_SET_CHILD_SUBREAPER,             |
+|  pidfd_getfd                   |  can_kill, can_getfd           |  PROC_REAP_ACQUIRE                   |
++---------------------------------------------------------------------------------------------------------+
+```
+
+### 1. Architectural Mission
+SigmaOS incorporates advanced process file-descriptor abstractions from Linux (`pidfd`) and FreeBSD Capsicum (`procdesc`), alongside ancestor Subreaper process tree re-parenting (`PR_SET_CHILD_SUBREAPER` / `PROC_REAP_ACQUIRE`) to eliminate PID race conditions and guarantee clean orphan process containment.
+
+### 2. Key Subsystem Capabilities
+1. **Linux `pidfd` Integration**:
+   - `pidfd_open`: Opens a file descriptor referring to a process by PID, preventing PID recycle race conditions.
+   - `pidfd_send_signal`: Sends signals to processes via file descriptors.
+   - `pidfd_getfd`: Duplicates target process file descriptors safely across capability boundaries.
+2. **FreeBSD Capsicum `procdesc` Capabilities**:
+   - `pdfork`: Atomically forks a new process and yields a capability-restricted process descriptor.
+   - Capability rights enforcement (`can_kill`, `can_wait`, `can_getfd`, `can_read_status`).
+3. **Subreaper Orphan Containment**:
+   - `set_subreaper`: Designates supervisor processes as subreapers (`PR_SET_CHILD_SUBREAPER`).
+   - `terminate_and_reparent_orphans`: Re-parents orphaned child processes to the nearest ancestor Subreaper instead of defaulting to init (PID 1).
