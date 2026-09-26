@@ -2,6 +2,7 @@
 // Firmware, PCI scanning, and early system initialization
 
 pub mod boot_snapshot;
+pub mod bootloader;
 pub mod bridge_grid;
 pub mod firmware;
 pub mod firmware_bridge;
@@ -13,6 +14,7 @@ pub mod post;
 pub mod secure;
 pub mod sigma_boot;
 pub mod sigma_bootloader;
+pub mod sovereign_multi_distro_bootloader;
 pub mod uefi;
 pub mod verified;
 
@@ -43,4 +45,9 @@ pub use uefi::{
     AcpiParser, BootError, GopFramebuffer, GopSplashCanvas, MicrokernelProfile,
     MultiKernelBootSelector, SecureBoot, SimpleSecureBoot, SimpleUEFIBootloader,
     SovereignBootWatchdog, UEFIBootloader, UsbHostController,
+};
+
+pub use sovereign_multi_distro_bootloader::{
+    BootloaderKind, FreeBsdLoaderConfig, LimineBootEntry, LimineConfig, OpenBsdBootConfig,
+    RefindMenuEntry, SovereignMultiDistroBootloaderEngine, SystemdBootBlsEntry, UniversalBootEntry,
 };
