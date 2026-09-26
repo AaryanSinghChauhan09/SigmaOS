@@ -96,6 +96,60 @@ impl Termios {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_termios_defaults_and_tty_creation() {
+        let termios = Termios::default();
+        assert_eq!(termios.c_cc[VINTR], 3); // Ctrl-C
+        assert_eq!(termios.c_cc[VERASE], 127); // Backspace
+        assert_eq!(termios.c_cc[VEOF], 4); // Ctrl-D
+
+        let mut tty1 = Tty::new();
+        let tty2 = Tty::new();
+        assert_ne!(tty1.id, tty2.id);
+        assert_eq!(tty1.winsize.ws_row, 24);
+        assert_eq!(tty1.winsize.ws_col, 80);
+
+        tty1.winsize.ws_row = 50;
+        tty1.winsize.ws_col = 120;
+        let mut ws = Winsize { ws_row: 0, ws_col: 0, ws_xpixel: 0, ws_ypixel: 0 };
+        assert!(tty1.ioctl(TIOCGWINSZ, &mut ws as *mut Winsize as usize).is_ok());
+        assert_eq!(ws.ws_row, 50);
+        assert_eq!(ws.ws_col, 120);
+    }
+
+    #[test]
+    fn test_canonical_line_editing_and_signals() {
+        let mut tty = Tty::new();
+
+        // Type "hello" then Backspace then "p\n" -> "hellp\n"
+        tty.receive_input(b"hello\x7fp\n");
+        let mut buf = [0u8; 16];
+        let n = tty.read(&mut buf);
+        assert_eq!(&buf[..n], b"hellp\n");
+
+        // Test signal input Ctrl-C
+        tty.receive_input(&[3]);
+        let mut out_buf = [0u8; 16];
+        let mut out_idx = 0;
+        while let Some(b) = tty.output_buffer.pop_front() {
+            out_buf[out_idx] = b;
+            out_idx += 1;
+        }
+        assert!(String::from_utf8_lossy(&out_buf[..out_idx]).contains("^C"));
+    }
+
+    #[test]
+    fn test_tty_write_output_processing() {
+        let mut tty = Tty::new();
+        tty.write(b"Line 1\nLine 2");
+        assert_eq!(tty.output_buffer.len(), 14); // \n expands to \r\n (6 + 2 + 6 = 14)
+    }
+}
+
 pub struct Tty {
     pub id: usize,
     pub input_buffer: VecDeque<u8>,
