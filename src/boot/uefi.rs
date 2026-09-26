@@ -369,6 +369,28 @@ impl Default for MultiKernelBootSelector {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_uefi_nvram_variable_store() {
+        let mut store = UefiVariableStore::new();
+
+        // Default variables
+        let boot_order = store.get_variable("BootOrder").unwrap();
+        assert_eq!(boot_order, &[0x00, 0x01, 0x00, 0x02]);
+
+        let secure_boot = store.get_variable("SecureBoot").unwrap();
+        assert_eq!(secure_boot, &[0x01]);
+
+        // Custom BootNext variable set
+        store.set_variable("BootNext", &[0x00, 0x02]);
+        let boot_next = store.get_variable("BootNext").unwrap();
+        assert_eq!(boot_next, &[0x00, 0x02]);
+    }
+}
+
 // ==============================================================================
 // 5. Sovereign Boot Watchdog (systemd-style watchdog timeout supervisor)
 // ==============================================================================
@@ -448,5 +470,40 @@ impl<'a, T> IntoIterator for &'a mut UefiVec<T> {
     fn into_iter(self) -> Self::IntoIter {
         use core::ops::DerefMut;
         self.deref_mut().iter_mut()
+    }
+}
+
+// ==============================================================================
+// UEFI NVRAM Runtime Variable Services (GetVariable / SetVariable)
+// ==============================================================================
+
+#[derive(Debug, Clone)]
+pub struct UefiVariableStore {
+    pub variables: std::collections::BTreeMap<String, Vec<u8>>,
+}
+
+impl UefiVariableStore {
+    pub fn new() -> Self {
+        let mut store = Self {
+            variables: std::collections::BTreeMap::new(),
+        };
+        // Initialize default UEFI BootOrder and SecureBoot variables
+        store.set_variable("BootOrder", &[0x00, 0x01, 0x00, 0x02]);
+        store.set_variable("SecureBoot", &[0x01]);
+        store
+    }
+
+    pub fn set_variable(&mut self, name: &str, data: &[u8]) {
+        self.variables.insert(name.to_string(), data.to_vec());
+    }
+
+    pub fn get_variable(&self, name: &str) -> Option<&Vec<u8>> {
+        self.variables.get(name)
+    }
+}
+
+impl Default for UefiVariableStore {
+    fn default() -> Self {
+        Self::new()
     }
 }
