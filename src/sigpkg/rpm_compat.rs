@@ -14,6 +14,7 @@ pub enum PackageSourceFormat {
 #[derive(Debug, Clone)]
 pub struct SpecMetadata {
     pub name: [u8; 32],
+    pub name_len: u8,
     pub version: [u8; 16],
     pub release: [u8; 16],
     pub license: [u8; 32],
@@ -24,11 +25,14 @@ impl SpecMetadata {
     pub fn new(name: &[u8], version: &[u8]) -> Self {
         let mut name_arr = [0u8; 32];
         let mut ver_arr = [0u8; 16];
-        name_arr[..name.len().min(31)].copy_from_slice(&name[..name.len().min(31)]);
-        ver_arr[..version.len().min(15)].copy_from_slice(&version[..version.len().min(15)]);
+        let name_len = name.len().min(31);
+        let ver_len = version.len().min(15);
+        name_arr[..name_len].copy_from_slice(&name[..name_len]);
+        ver_arr[..ver_len].copy_from_slice(&version[..ver_len]);
 
         SpecMetadata {
             name: name_arr,
+            name_len: name_len as u8,
             version: ver_arr,
             release: [0; 16],
             license: [0; 32],
@@ -70,12 +74,16 @@ impl RpmPackageTranslator {
         }
 
         let mut output_pkg = [0u8; 64];
-        let name_len = self
-            .spec_meta
-            .name
-            .iter()
-            .position(|&b| b == 0)
-            .unwrap_or(32);
+        // Bolt performance optimization: use cached name_len for O(1) constant time lookup instead of O(N) zero-byte scan
+        let name_len = if self.spec_meta.name_len > 0 {
+            self.spec_meta.name_len as usize
+        } else {
+            self.spec_meta
+                .name
+                .iter()
+                .position(|&b| b == 0)
+                .unwrap_or(32)
+        };
         output_pkg[..name_len].copy_from_slice(&self.spec_meta.name[..name_len]);
 
         let compat_suffix = b"-converted-sigpkg";
@@ -87,7 +95,7 @@ impl RpmPackageTranslator {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
