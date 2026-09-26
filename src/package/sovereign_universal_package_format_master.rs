@@ -450,12 +450,13 @@ pub fn parse_package_metadata_from_payload(
         }
     }
 
-    // 3. Fallback: Hash data or generate default to guarantee uniqueness
-    let mut hash: u64 = 5381;
-    for byte in raw_data {
-        hash = hash.wrapping_mul(33).wrapping_add(*byte as u64);
+    // 3. Fallback: Zero-dependency FNV-1a hash algorithm over raw_data bytes
+    let mut hash: u64 = 0xcbf29ce484222325;
+    for &byte in raw_data {
+        hash ^= byte as u64;
+        hash = hash.wrapping_mul(0x100000001b3);
     }
-    (format!("{}-{:x}", default_prefix, hash % 0xFFFF), "1.0.0".to_string())
+    (format!("{}-{:04x}", default_prefix, hash % 0xFFFF), "1.0.0".to_string())
 }
 
 /// Universal parsed package manifest representation
