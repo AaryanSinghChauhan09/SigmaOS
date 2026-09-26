@@ -44,18 +44,48 @@ pub trait Package {
 #[derive(Debug, Clone, Copy)]
 pub struct PackageDependency {
     pub name: [u8; 64],
+    pub name_len: u8,
     pub version_constraint: [u8; 32],
+    pub constraint_len: u8,
 }
 
 impl PackageDependency {
+    pub fn new(name: &[u8], version_constraint: &[u8]) -> Self {
+        let mut name_array = [0u8; 64];
+        let mut constraint_array = [0u8; 32];
+
+        let name_len = name.len().min(63);
+        let constraint_len = version_constraint.len().min(31);
+
+        name_array[..name_len].copy_from_slice(&name[..name_len]);
+        constraint_array[..constraint_len].copy_from_slice(&version_constraint[..constraint_len]);
+
+        PackageDependency {
+            name: name_array,
+            name_len: name_len as u8,
+            version_constraint: constraint_array,
+            constraint_len: constraint_len as u8,
+        }
+    }
+
     pub fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(self.name.len());
-        &self.name[..len]
+        // Bolt performance optimization: use cached name_len for O(1) constant time lookup instead of O(N) zero-byte scan
+        if self.name_len > 0 {
+            &self.name[..self.name_len as usize]
+        } else {
+            let len = self.name.iter().position(|&b| b == 0).unwrap_or(self.name.len());
+            &self.name[..len]
+        }
     }
 
     pub fn constraint(&self) -> &[u8] {
-        let len = self.version_constraint.iter().position(|&b| b == 0).unwrap_or(self.version_constraint.len());
-        &self.version_constraint[..len]
+        // Bolt performance optimization: use cached constraint_len for O(1) constant time lookup instead of O(N) zero-byte scan
+        if self.constraint_len > 0 {
+            &self.version_constraint[..self.constraint_len as usize]
+        } else {
+            let len = self.version_constraint.iter().position(|&b| b == 0).unwrap_or(self.version_constraint.len());
+            &self.version_constraint[..len]
+        }
     }
 }
 
@@ -184,19 +214,7 @@ impl SimplePackage {
     }
 
     pub fn add_dependency(&mut self, name: &[u8], version_constraint: &[u8]) {
-        let mut name_array = [0u8; 64];
-        let mut constraint_array = [0u8; 32];
-
-        let name_len = name.len().min(63);
-        let constraint_len = version_constraint.len().min(31);
-
-        name_array[..name_len].copy_from_slice(&name[..name_len]);
-        constraint_array[..constraint_len].copy_from_slice(&version_constraint[..constraint_len]);
-
-        self.dependencies.push(PackageDependency {
-            name: name_array,
-            version_constraint: constraint_array,
-        });
+        self.dependencies.push(PackageDependency::new(name, version_constraint));
     }
 }
 
