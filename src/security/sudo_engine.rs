@@ -87,9 +87,25 @@ impl SovereignSudoEngine {
         SudoAuthResult::PermissionDenied
     }
 
-    /// Sanitizes environment variables for elevated execution
+    /// Sanitizes environment variables for elevated execution to prevent privilege escalation
     pub fn sanitize_environment(&self, env_keys: &[&str]) -> Vec<String> {
-        let dangerous_keys = ["LD_PRELOAD", "LD_LIBRARY_PATH", "PYTHONPATH", "RUBYLIB"];
+        let dangerous_keys = [
+            "LD_PRELOAD",
+            "LD_LIBRARY_PATH",
+            "LD_AUDIT",
+            "PYTHONPATH",
+            "RUBYLIB",
+            "PERL5LIB",
+            "PERL5OPT",
+            "IFS",
+            "NODE_OPTIONS",
+            "DYLD_LIBRARY_PATH",
+            "DYLD_INSERT_LIBRARIES",
+            "GTK_PATH",
+            "QT_PLUGIN_PATH",
+            "BASH_ENV",
+            "ENV",
+        ];
         env_keys
             .iter()
             .filter(|&&k| !dangerous_keys.contains(&k))
@@ -133,8 +149,21 @@ mod tests {
         assert_eq!(res_unauth, SudoAuthResult::PermissionDenied);
 
         // Test environment sanitization
-        let clean_env = engine.sanitize_environment(&["PATH", "LD_PRELOAD", "HOME"]);
+        let clean_env = engine.sanitize_environment(&[
+            "PATH",
+            "LD_PRELOAD",
+            "LD_AUDIT",
+            "PERL5LIB",
+            "IFS",
+            "NODE_OPTIONS",
+            "HOME",
+        ]);
         assert!(clean_env.contains(&String::from("PATH")));
+        assert!(clean_env.contains(&String::from("HOME")));
         assert!(!clean_env.contains(&String::from("LD_PRELOAD")));
+        assert!(!clean_env.contains(&String::from("LD_AUDIT")));
+        assert!(!clean_env.contains(&String::from("PERL5LIB")));
+        assert!(!clean_env.contains(&String::from("IFS")));
+        assert!(!clean_env.contains(&String::from("NODE_OPTIONS")));
     }
 }
