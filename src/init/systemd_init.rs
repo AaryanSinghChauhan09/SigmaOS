@@ -2,7 +2,6 @@ use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::collections::BTreeMap;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Systemd-Grade Init and Target State Engine for SigmaOS
@@ -1981,7 +1980,7 @@ extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
 }
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -157,7 +157,7 @@ impl Default for ZramPagePool {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -23,6 +23,34 @@ if [ -f "src/security/pledge.rs" ]; then
     ./build/pledge_test
 fi
 
+if [ -f "src/security/kernel_hardening.rs" ]; then
+    echo "Running kernel hardening and protection rings test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/security/kernel_hardening.rs -o build/kernel_hardening_test
+    ./build/kernel_hardening_test
+fi
+
+if [ -f "src/init/systemd_init.rs" ]; then
+    echo "Running systemd init & service manager test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/init/systemd_init.rs -o build/systemd_test
+    ./build/systemd_test
+fi
+
+if [ -f "src/memory/huge_pages.rs" ]; then
+    echo "Running huge pages & transparent huge pages (THP) test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/memory/huge_pages.rs -o build/huge_pages_test
+    ./build/huge_pages_test
+fi
+
+if [ -f "src/memory/kswapd.rs" ]; then
+    echo "Running kswapd LRU page reclaim & ZRAM test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/memory/kswapd.rs -o build/kswapd_test
+    ./build/kswapd_test
+fi
+
 if [ -f "src/distro/linux_bsd_inspirations.rs" ]; then
     echo "Running Linux & BSD distro inspirations & subsystem bridge test suite..."
     mkdir -p build
@@ -84,6 +112,13 @@ if [ -f "src/network/approximation_proxy_firewall.rs" ]; then
     mkdir -p build
     rustc --test src/network/approximation_proxy_firewall.rs --edition=2021 -o build/approximation_proxy_firewall_test
     ./build/approximation_proxy_firewall_test
+fi
+
+if [ -f "src/network/nftables.rs" ]; then
+    echo "Running nftables & iptables packet filtering test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/network/nftables.rs -o build/nftables_test
+    ./build/nftables_test
 fi
 
 if [ -f "src/distro/linux_bsd_ecosystem_synthesis.rs" ]; then
