@@ -15,9 +15,15 @@ pub mod cgroups;
 pub mod kswapd;
 pub mod paging;
 pub mod segmentation_paging;
+pub mod sigma_buddy;
 pub mod tlb_associative;
 pub mod zone;
 pub mod huge_pages;
+
+pub use sigma_buddy::{
+    BsdVmZoneAllocator, MigrateType, PageQueueType, VmZone, WatermarkLevel, WatermarkStatus,
+    ZoneFallbackPolicy, ZoneMigrationPolicy, ZoneMigrationPolicyEngine,
+};
 
 pub use paging::{
     MemoryError, PageDirectory, PageDirectoryPointerTable, PageTable, PageTableEntry,

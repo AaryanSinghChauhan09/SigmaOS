@@ -50,7 +50,7 @@ pub use file_monitor::{
 pub mod sovereign_filesystem_hierarchy;
 pub use sovereign_filesystem_hierarchy::{
     EphemeralTmpfsMountGovernor, SovereignAtomicGenerationRootfsGuard, SovereignCanonicalFhsResolver,
-    SyntheticProcSysfsProvider,
+    SovereignMultiDistroFhsHierarchyEngine, SyntheticProcSysfsProvider,
 };
 pub use watch::{EventQueue, ThreadSafeEventQueue, RING_BUFFER_SIZE, COALESCE_WINDOW_MS};
 

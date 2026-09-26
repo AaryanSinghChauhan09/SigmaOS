@@ -21,7 +21,7 @@ use std::vec;
 use std::string::String;
 use std::vec::Vec;
 use std::format;
-use core::fmt;
+use std::fmt;
 
 /// India Stack service types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -374,7 +374,7 @@ impl Default for IndiaStackClient {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

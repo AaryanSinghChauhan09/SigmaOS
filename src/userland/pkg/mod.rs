@@ -7,7 +7,7 @@
 use std::vec::Vec;
 use std::string::{String, ToString};
 use std::boxed::Box;
-use core::fmt;
+use std::fmt;
 
 /// Error type for the UserPkg module
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -147,7 +147,7 @@ impl Default for PackageInstaller {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     
