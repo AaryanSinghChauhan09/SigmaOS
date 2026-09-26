@@ -1,5 +1,6 @@
 // SigmaOS Security Subsystem
 pub mod capability;
+pub mod hardware_privilege;
 pub mod pqc_enclave;
 pub mod governance;
 pub mod audit;
@@ -153,3 +154,5 @@ pub use crate::security::vulnerability::{SimpleVulnerability, SimpleVulnerabilit
 // ─── Capability Monitor (pledge + unveil + Capsicum) ─────────────────────────
 pub mod capability_monitor;
 pub mod phase_audit;
+
+pub use hardware_privilege::*;
