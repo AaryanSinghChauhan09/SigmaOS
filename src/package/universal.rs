@@ -121,39 +121,39 @@ impl UniversalPackageTranslator {
 
 fn debtor_to_sovereign_name(name: &str) -> &str {
     let lower = name.to_lowercase();
-    if lower == "apt" || lower == "dpkg" || lower == "pacman" || lower == "dnf" || lower == "yum" || lower == "zypper" || lower == "apk" || lower == "xbps" || lower == "emerge" || lower == "pkg" {
+    if lower == "apt" || lower == "dpkg" || lower == "pacman" || lower == "dnf" || lower == "yum" || lower == "zypper" || lower == "apk" || lower == "xbps" || lower == "emerge" || lower == "pkg" || lower == "swupd" || lower == "eopkg" || lower == "nix" || lower == "guix" {
         "sovereign-package-manager"
-    } else if lower.contains("ssl") || lower.contains("crypto") || lower.contains("tls") {
+    } else if lower.contains("ssl") || lower.contains("crypto") || lower.contains("tls") || lower.contains("gnutls") || lower.contains("mbedtls") {
         "sovereign-openssl"
-    } else if lower.contains("libc") || lower == "musl" || lower.contains("freebsd-runtime") || lower.contains("openbsd-sys") || lower.contains("haiku-libroot") {
+    } else if lower.contains("libc") || lower == "musl" || lower.contains("glibc") || lower.contains("freebsd-runtime") || lower.contains("openbsd-sys") || lower.contains("haiku-libroot") || lower.contains("uclibc") {
         "sovereign-libc"
     } else if lower.contains("zlib") {
         "sovereign-zlib"
-    } else if lower.contains("zstd") || lower.contains("lz4") || lower.contains("xz") || lower.contains("bzip2") {
+    } else if lower.contains("zstd") || lower.contains("lz4") || lower.contains("xz") || lower.contains("bzip2") || lower.contains("bzip") || lower.contains("brotli") || lower.contains("lzo") {
         "sovereign-compression"
-    } else if lower.contains("python") {
+    } else if lower.contains("python") || lower.contains("pypy") {
         "sovereign-python"
-    } else if lower == "bash" || lower == "zsh" || lower == "sh" || lower == "fish" {
+    } else if lower == "bash" || lower == "zsh" || lower == "sh" || lower == "fish" || lower == "dash" || lower == "tcsh" || lower == "ksh" {
         "sovereign-shell"
-    } else if lower.contains("systemd") || lower.contains("openrc") || lower.contains("runit") || lower.contains("sysvinit") || lower.contains("s6") || lower.contains("dinit") {
+    } else if lower.contains("systemd") || lower.contains("openrc") || lower.contains("runit") || lower.contains("sysvinit") || lower.contains("s6") || lower.contains("dinit") || lower.contains("elogind") {
         "sovereign-init"
-    } else if lower.contains("gcc") || lower.contains("clang") || lower.contains("llvm") || lower.contains("binutils") || lower == "make" || lower == "cmake" {
+    } else if lower.contains("gcc") || lower.contains("clang") || lower.contains("llvm") || lower.contains("binutils") || lower == "make" || lower == "cmake" || lower == "ninja" || lower == "meson" {
         "sovereign-toolchain"
-    } else if lower.contains("wayland") || lower.contains("x11") || lower.contains("mesa") || lower.contains("vulkan") {
+    } else if lower.contains("wayland") || lower.contains("x11") || lower.contains("mesa") || lower.contains("vulkan") || lower.contains("libx11") || lower.contains("xcb") || lower.contains("egl") {
         "sovereign-graphics"
-    } else if lower.contains("curl") || lower.contains("wget") || lower.contains("openssh") || lower.contains("net-tools") || lower.contains("iproute2") {
+    } else if lower.contains("curl") || lower.contains("wget") || lower.contains("openssh") || lower.contains("net-tools") || lower.contains("iproute2") || lower.contains("bind-tools") {
         "sovereign-network-tools"
-    } else if lower.contains("postgres") || lower.contains("mysql") || lower.contains("mariadb") || lower.contains("sqlite") {
+    } else if lower.contains("postgres") || lower.contains("mysql") || lower.contains("mariadb") || lower.contains("sqlite") || lower.contains("redis") || lower.contains("mongodb") {
         "sovereign-database"
-    } else if lower.contains("docker") || lower.contains("podman") || lower.contains("qemu") || lower.contains("libvirt") || lower.contains("kvm") || lower.contains("containerd") {
+    } else if lower.contains("docker") || lower.contains("podman") || lower.contains("qemu") || lower.contains("libvirt") || lower.contains("kvm") || lower.contains("containerd") || lower.contains("lxc") {
         "sovereign-virtualization"
-    } else if lower.contains("ffmpeg") || lower.contains("pipewire") || lower.contains("pulseaudio") || lower.contains("alsa") || lower.contains("gstreamer") || lower.contains("vlc") {
+    } else if lower.contains("ffmpeg") || lower.contains("pipewire") || lower.contains("pulseaudio") || lower.contains("alsa") || lower.contains("gstreamer") || lower.contains("vlc") || lower.contains("jack") {
         "sovereign-media-engine"
     } else if lower.contains("gtk") || lower.contains("qt5") || lower.contains("qt6") || lower.contains("hyprland") || lower.contains("gnome") || lower.contains("kde") || lower.contains("wlroots") {
         "sovereign-desktop-framework"
-    } else if lower.contains("node") || lower.contains("npm") || lower.contains("deno") || lower.contains("bun") || lower.contains("golang") || lower.contains("rust") {
+    } else if lower.contains("node") || lower.contains("npm") || lower.contains("deno") || lower.contains("bun") || lower.contains("golang") || lower.contains("rust") || lower.contains("ruby") || lower.contains("perl") || lower.contains("lua") {
         "sovereign-app-runtime"
-    } else if lower.contains("ripgrep") || lower.contains("fd-find") || lower == "bat" || lower == "eza" || lower.contains("htop") || lower.contains("fastfetch") {
+    } else if lower.contains("ripgrep") || lower.contains("fd-find") || lower == "bat" || lower == "eza" || lower.contains("htop") || lower.contains("fastfetch") || lower == "fd" || lower == "rg" {
         "sovereign-cli-suite"
     } else if lower.contains("torch") || lower.contains("tensorflow") || lower.contains("onnx") || lower.contains("llama") || lower.contains("cuda") || lower.contains("rocm") || lower.contains("vllm") || lower.contains("whisper") {
         "sovereign-ai-runtime"
