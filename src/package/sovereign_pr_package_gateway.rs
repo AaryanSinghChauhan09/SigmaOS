@@ -140,7 +140,18 @@ impl SovereignUniversalPrGatewayEngine {
                 PullRequestPackageFormat::DebianDeb => PackageFormat::Deb,
                 PullRequestPackageFormat::DeepinSuperdeb => PackageFormat::Superdeb,
                 PullRequestPackageFormat::FedoraRpm => PackageFormat::Rpm,
-                PullRequestPackageFormat::ArchPkgbuild | PullRequestPackageFormat::CachyOsPkg => PackageFormat::Pacman,
+                PullRequestPackageFormat::ArchPkgbuild
+                | PullRequestPackageFormat::CachyOsPkg
+                | PullRequestPackageFormat::ArchInstallProfile
+                | PullRequestPackageFormat::ArchMkinitcpioHook
+                | PullRequestPackageFormat::ArchPacmanConfRepo
+                | PullRequestPackageFormat::ArchPacmanKeyring
+                | PullRequestPackageFormat::ArchAurRpcV5Package
+                | PullRequestPackageFormat::ArchPacstrapRecipe
+                | PullRequestPackageFormat::ArchChrootSpec
+                | PullRequestPackageFormat::ArchAuditVulnerability
+                | PullRequestPackageFormat::ArchNamcapLinterReport
+                | PullRequestPackageFormat::ArchMakepkgConfProfile => PackageFormat::Pacman,
                 PullRequestPackageFormat::AlpineApk => PackageFormat::Apk,
                 PullRequestPackageFormat::GentooEbuild => PackageFormat::Ebuild,
                 PullRequestPackageFormat::VoidXbps => PackageFormat::Xbps,
@@ -357,5 +368,43 @@ mod tests {
         }
 
         assert_eq!(gateway.search_distro_prs("microvm").len(), 1);
+    }
+
+    #[test]
+    fn test_arch_linux_ecosystem_component_pr_gateway() {
+        let mut gateway = SovereignUniversalPrGatewayEngine::new();
+
+        let arch_components = [
+            ("archinstall-profile", "1.0.0", PullRequestPackageFormat::ArchInstallProfile, "profile_type=minimal", &["base"][..]),
+            ("mkinitcpio-hook", "1.0.0", PullRequestPackageFormat::ArchMkinitcpioHook, "HOOKS=(base udev autodetect modconf block filesystems fsck)", &["mkinitcpio"][..]),
+            ("pacman-conf-repo", "6.1.0", PullRequestPackageFormat::ArchPacmanConfRepo, "[custom-repo]\nSigLevel = Required DatabaseOptional", &["pacman"][..]),
+            ("pacman-keyring", "2026.01", PullRequestPackageFormat::ArchPacmanKeyring, "keyid=0xABCDEF", &["archlinux-keyring"][..]),
+            ("aur-rpc-pkg", "5.0.0", PullRequestPackageFormat::ArchAurRpcV5Package, "Name=yay", &["pacman"][..]),
+            ("pacstrap-profile", "1.0.0", PullRequestPackageFormat::ArchPacstrapRecipe, "PACSTRAP_PKGS=(base linux)", &["arch-install-scripts"][..]),
+            ("arch-chroot-spec", "1.0.0", PullRequestPackageFormat::ArchChrootSpec, "CHROOT_PATH=/mnt", &["arch-install-scripts"][..]),
+            ("arch-audit-cve", "1.0.0", PullRequestPackageFormat::ArchAuditVulnerability, "CVE-2026-9999", &["arch-audit"][..]),
+            ("namcap-linter", "3.5.0", PullRequestPackageFormat::ArchNamcapLinterReport, "PKGBUILD_AUDIT=PASS", &["namcap"][..]),
+            ("makepkg-conf", "6.1.0", PullRequestPackageFormat::ArchMakepkgConfProfile, "MAKEFLAGS=\"-j$(nproc)\"", &["pacman"][..]),
+        ];
+
+        for (name, ver, fmt, manifest, deps) in arch_components {
+            let pr = gateway.submit_distro_package_pr(
+                "arch_dev",
+                name,
+                ver,
+                fmt,
+                manifest,
+                deps,
+                b"pqc_arch_comp_sig",
+            );
+
+            let translated = gateway.validate_and_translate_pr(pr).expect("Arch component PR translation failed");
+            assert_eq!(translated.name, name);
+
+            let merged = gateway.auto_merge_package_pr(pr).expect("Arch component PR merge failed");
+            assert_eq!(merged.name, format!("sigpkg-{}", name));
+        }
+
+        assert_eq!(gateway.pr_gateway_registry.len(), 10);
     }
 }

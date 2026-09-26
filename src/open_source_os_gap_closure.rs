@@ -5175,15 +5175,15 @@ impl OpenSourceProjectSupremacySuite {
 
     /// Starship Prompt Quick Helper
     pub fn render_starship_prompt(&self, cwd: &str, last_status: i32) -> String {
-        #[cfg(not(feature = "standalone_test"))]
+        #[cfg(not(any(feature = "standalone_test", feature = "gap_closure_test")))]
         use super::{SovereignStarshipPromptEngine};
-        #[cfg(not(feature = "standalone_test"))]
+        #[cfg(not(any(feature = "standalone_test", feature = "gap_closure_test")))]
         {
             let mut prompt = SovereignStarshipPromptEngine::new();
             prompt.set_segment("directory", cwd, "\x1b[34m");
             prompt.render_prompt(last_status)
         }
-        #[cfg(feature = "standalone_test")]
+        #[cfg(any(feature = "standalone_test", feature = "gap_closure_test"))]
         {
             format!("Starship Prompt ({}) [{}]", cwd, last_status)
         }
@@ -5191,15 +5191,15 @@ impl OpenSourceProjectSupremacySuite {
 
     /// Chezmoi Dotfiles Quick Helper
     pub fn sync_chezmoi_dotfiles(&self, source_template: &str, target_path: &str) -> bool {
-        #[cfg(not(feature = "standalone_test"))]
+        #[cfg(not(any(feature = "standalone_test", feature = "gap_closure_test")))]
         use super::{SovereignChezmoiDotfilesEngine};
-        #[cfg(not(feature = "standalone_test"))]
+        #[cfg(not(any(feature = "standalone_test", feature = "gap_closure_test")))]
         {
             let mut chezmoi = SovereignChezmoiDotfilesEngine::new();
             chezmoi.register_mapping(source_template, target_path, false);
             chezmoi.apply_dotfiles(1700000000) > 0
         }
-        #[cfg(feature = "standalone_test")]
+        #[cfg(any(feature = "standalone_test", feature = "gap_closure_test"))]
         {
             let _ = (source_template, target_path);
             true
@@ -5208,16 +5208,16 @@ impl OpenSourceProjectSupremacySuite {
 
     /// Fd Directory Search Quick Helper
     pub fn search_fd_files(&self, pattern: &str, ext: Option<&str>) -> Vec<String> {
-        #[cfg(not(feature = "standalone_test"))]
+        #[cfg(not(any(feature = "standalone_test", feature = "gap_closure_test")))]
         use super::{SovereignFdDirectoryWalkerEngine};
-        #[cfg(not(feature = "standalone_test"))]
+        #[cfg(not(any(feature = "standalone_test", feature = "gap_closure_test")))]
         {
             let mut walker = SovereignFdDirectoryWalkerEngine::new();
             walker.add_entry("/etc/sigma.conf", false, false, 512);
             walker.add_entry("/usr/bin/sigma-sh", false, false, 2048);
             walker.search_by_pattern(pattern, ext)
         }
-        #[cfg(feature = "standalone_test")]
+        #[cfg(any(feature = "standalone_test", feature = "gap_closure_test"))]
         {
             let _ = (pattern, ext);
             vec!["/etc/sigma.conf".to_string()]
@@ -5226,9 +5226,9 @@ impl OpenSourceProjectSupremacySuite {
 
     /// Telescope Fuzzy Find Quick Helper
     pub fn telescope_fuzzy_search(&self, query: &str) -> Vec<String> {
-        #[cfg(not(feature = "standalone_test"))]
+        #[cfg(not(any(feature = "standalone_test", feature = "gap_closure_test")))]
         use super::{SovereignTelescopeFuzzyPickerEngine};
-        #[cfg(not(feature = "standalone_test"))]
+        #[cfg(not(any(feature = "standalone_test", feature = "gap_closure_test")))]
         {
             let mut picker = SovereignTelescopeFuzzyPickerEngine::new();
             picker.add_item(1, "Open Terminal", "action", Some("command"));
@@ -5239,7 +5239,7 @@ impl OpenSourceProjectSupremacySuite {
                 .map(|r| r.item.display_text)
                 .collect()
         }
-        #[cfg(feature = "standalone_test")]
+        #[cfg(any(feature = "standalone_test", feature = "gap_closure_test"))]
         {
             let _ = query;
             vec!["Open Terminal".to_string()]
@@ -5248,15 +5248,15 @@ impl OpenSourceProjectSupremacySuite {
 
     /// Btop System Telemetry Quick Helper
     pub fn snapshot_btop_telemetry(&self) -> (u8, u64) {
-        #[cfg(not(feature = "standalone_test"))]
+        #[cfg(not(any(feature = "standalone_test", feature = "gap_closure_test")))]
         use super::{SovereignBtopResourceMonitorEngine};
-        #[cfg(not(feature = "standalone_test"))]
+        #[cfg(not(any(feature = "standalone_test", feature = "gap_closure_test")))]
         {
             let mut btop = SovereignBtopResourceMonitorEngine::new();
             btop.record_core_telemetry(0, 20, 3200, 45);
             (btop.average_cpu_usage(), btop.active_snapshot.memory_used_mb)
         }
-        #[cfg(feature = "standalone_test")]
+        #[cfg(any(feature = "standalone_test", feature = "gap_closure_test"))]
         {
             (20, 2048)
         }

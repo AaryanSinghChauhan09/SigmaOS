@@ -75,6 +75,16 @@ pub enum PullRequestPackageFormat {
     VagrantVmBox,
     OvaVirtualAppliance,
     VirtioGpuVmImage,
+    ArchInstallProfile,
+    ArchMkinitcpioHook,
+    ArchPacmanConfRepo,
+    ArchPacmanKeyring,
+    ArchAurRpcV5Package,
+    ArchPacstrapRecipe,
+    ArchChrootSpec,
+    ArchAuditVulnerability,
+    ArchNamcapLinterReport,
+    ArchMakepkgConfProfile,
 }
 
 impl PullRequestPackageFormat {
@@ -83,6 +93,16 @@ impl PullRequestPackageFormat {
             Self::DebianDeb => "Debian .deb Package",
             Self::FedoraRpm => "Fedora/RHEL .rpm Package",
             Self::ArchPkgbuild => "Arch Linux PKGBUILD Script",
+            Self::ArchInstallProfile => "Arch Linux archinstall Profile Script",
+            Self::ArchMkinitcpioHook => "Arch Linux mkinitcpio Initramfs Hook",
+            Self::ArchPacmanConfRepo => "Arch Linux pacman.conf Repository Directives",
+            Self::ArchPacmanKeyring => "Arch Linux pacman-key PGP/PQC Keyring Entry",
+            Self::ArchAurRpcV5Package => "Arch User Repository (AUR) RPC v5 Metadata",
+            Self::ArchPacstrapRecipe => "Arch Linux pacstrap Chroot Deployment Profile",
+            Self::ArchChrootSpec => "Arch Linux arch-chroot Isolation Specification",
+            Self::ArchAuditVulnerability => "Arch Linux arch-audit Security Vulnerability Record",
+            Self::ArchNamcapLinterReport => "Arch Linux namcap Package Auditor Linter Report",
+            Self::ArchMakepkgConfProfile => "Arch Linux makepkg.conf Compiler Optimization Specs",
             Self::AlpineApk => "Alpine Linux .apk Package",
             Self::GentooEbuild => "Gentoo Portage .ebuild Script",
             Self::VoidXbps => "Void Linux XBPS Template",
@@ -342,6 +362,72 @@ impl SovereignPackagePullRequestEngine {
     }
 }
 
+/// Specialized Arch Linux Component PR Gateway Engine
+/// Audits, translates, and merges missing Arch Linux system components directly into SigmaOS
+#[derive(Debug, Clone)]
+pub struct ArchLinuxComponentPullRequestGatewayEngine {
+    pub pr_engine: SovereignPackagePullRequestEngine,
+    pub arch_component_registry: BTreeMap<String, ConsolidatedSovereignPackage>,
+}
+
+impl Default for ArchLinuxComponentPullRequestGatewayEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl ArchLinuxComponentPullRequestGatewayEngine {
+    pub fn new() -> Self {
+        Self {
+            pr_engine: SovereignPackagePullRequestEngine::new(),
+            arch_component_registry: BTreeMap::new(),
+        }
+    }
+
+    /// Submits an Arch Linux system component PR
+    pub fn submit_arch_component_pr(
+        &mut self,
+        author: &str,
+        component_name: &str,
+        version: &str,
+        format: PullRequestPackageFormat,
+        spec_content: &str,
+        deps: &[&str],
+        pqc_signature: &[u8],
+    ) -> u64 {
+        self.pr_engine.submit_package_pr(
+            author,
+            component_name,
+            version,
+            format,
+            spec_content,
+            deps,
+            pqc_signature,
+        )
+    }
+
+    /// Validates SAT dependencies and PQC signature for an Arch component PR
+    pub fn validate_arch_component(&mut self, pr_id: u64) -> Result<bool, &'static str> {
+        self.pr_engine.validate_pr(pr_id)
+    }
+
+    /// Generates unified diff for an Arch component PR
+    pub fn generate_arch_component_diff(
+        &self,
+        pr_id: u64,
+        base_spec: &str,
+    ) -> Result<String, &'static str> {
+        self.pr_engine.generate_pr_diff(pr_id, base_spec)
+    }
+
+    /// Auto-merges an Arch component PR into active Arch component registry
+    pub fn merge_arch_component(&mut self, pr_id: u64) -> Result<ConsolidatedSovereignPackage, &'static str> {
+        let consolidated = self.pr_engine.merge_pr(pr_id)?;
+        self.arch_component_registry.insert(consolidated.name.clone(), consolidated.clone());
+        Ok(consolidated)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -440,5 +526,46 @@ mod tests {
             assert_eq!(merged.source_format, *fmt);
         }
         assert_eq!(engine.merged_packages.len(), formats.len());
+    }
+
+    #[test]
+    fn test_arch_linux_component_pr_gateway_engine() {
+        let mut arch_gateway = ArchLinuxComponentPullRequestGatewayEngine::new();
+
+        let arch_components = [
+            ("archinstall-minimal", "3.0.0", PullRequestPackageFormat::ArchInstallProfile, "profile=minimal\ndesktop=sway", &["sway"][..]),
+            ("mkinitcpio-kms-hook", "1.0.0", PullRequestPackageFormat::ArchMkinitcpioHook, "BUILD() {\n  add_module kms\n}", &["mkinitcpio"][..]),
+            ("pacman-core-repo", "6.1.0", PullRequestPackageFormat::ArchPacmanConfRepo, "[core]\nServer = https://geo.mirror.pkg.archlinux.org/$repo/os/$arch", &["pacman"][..]),
+            ("archlinux-keyring-pqc", "2026.01.01", PullRequestPackageFormat::ArchPacmanKeyring, "keyid=0x12345678\nalgorithm=dilithium5", &["gnupg"][..]),
+            ("aur-rpc-hyprland", "0.40.0", PullRequestPackageFormat::ArchAurRpcV5Package, "{\"Name\":\"hyprland\",\"Version\":\"0.40.0\"}", &["wayland"][..]),
+            ("pacstrap-base-system", "1.0.0", PullRequestPackageFormat::ArchPacstrapRecipe, "packages=('base' 'linux' 'linux-firmware')", &["pacman"][..]),
+            ("arch-chroot-mount-spec", "1.0.0", PullRequestPackageFormat::ArchChrootSpec, "mount_bind=/dev\nmount_proc=/proc", &["util-linux"][..]),
+            ("arch-audit-cve-tracker", "2026.1", PullRequestPackageFormat::ArchAuditVulnerability, "cve=CVE-2026-1234\nseverity=high", &["arch-audit"][..]),
+            ("namcap-pkgbuild-auditor", "3.5.0", PullRequestPackageFormat::ArchNamcapLinterReport, "rule=PKGBUILD\nstatus=passed", &["namcap"][..]),
+            ("makepkg-opt-flags", "6.1.0", PullRequestPackageFormat::ArchMakepkgConfProfile, "CFLAGS=\"-O3 -march=x86-64-v3\"", &["gcc"][..]),
+        ];
+
+        for (author_comp, ver, fmt, spec, deps) in arch_components {
+            assert!(!fmt.name().is_empty());
+            let pr_id = arch_gateway.submit_arch_component_pr(
+                "arch_maintainer",
+                author_comp,
+                ver,
+                fmt,
+                spec,
+                deps,
+                b"pqc_arch_signature_dilithium5",
+            );
+
+            assert!(arch_gateway.validate_arch_component(pr_id).unwrap());
+            let diff = arch_gateway.generate_arch_component_diff(pr_id, "old_spec_data").unwrap();
+            assert!(diff.contains(&format!("+++ b/{}", author_comp)));
+
+            let merged = arch_gateway.merge_arch_component(pr_id).unwrap();
+            assert_eq!(merged.name, author_comp);
+            assert_eq!(merged.source_format, fmt);
+        }
+
+        assert_eq!(arch_gateway.arch_component_registry.len(), 10);
     }
 }
