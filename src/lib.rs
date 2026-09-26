@@ -49,8 +49,10 @@ pub use sigpkg::{
     SovereignUniversalPackageManagerInteropEngine, SovereignUniversalPackageTranslationBridge,
 };
 pub use filesystem::{
-    EphemeralTmpfsMountGovernor, SovereignAtomicGenerationRootfsGuard, SovereignCanonicalFhsResolver,
-    SovereignMultiDistroFhsHierarchyEngine, SyntheticProcSysfsProvider,
+    AutofsMountTrigger, EphemeralTmpfsMountGovernor, FscryptInodeRecord, FscryptPolicy,
+    SovereignAtomicGenerationRootfsGuard, SovereignCanonicalFhsResolver,
+    SovereignFscryptAutofsEngine, SovereignMultiDistroFhsHierarchyEngine,
+    SyntheticProcSysfsProvider,
 };
 pub mod storage;
 pub mod thread;

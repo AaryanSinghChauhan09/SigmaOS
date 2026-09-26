@@ -195,3 +195,29 @@ SigmaOS incorporates advanced process file-descriptor abstractions from Linux (`
 3. **Subreaper Orphan Containment**:
    - `set_subreaper`: Designates supervisor processes as subreapers (`PR_SET_CHILD_SUBREAPER`).
    - `terminate_and_reparent_orphans`: Re-parents orphaned child processes to the nearest ancestor Subreaper instead of defaulting to init (PID 1).
+
+---
+
+## SECTION 144: SOVEREIGN FILESYSTEM SUBSYSTEM INSPIRATION & ADVANCEMENTS (LINUX FSCRYPT & KERNEL AUTOFS)
+
+```
++---------------------------------------------------------------------------------------------------------+
+|                  SOVEREIGN FSCRYPT ENCRYPTION & KERNEL AUTOFS MOUNT ENGINE                              |
++---------------------------------------------------------------------------------------------------------+
+|  [Linux fscrypt Transparent Policy] |  [Post-Quantum / XTS Encryption] |  [Autofs On-Demand Triggers]  |
+|  per-directory policy association,  |  AES-256-XTS & Kyber-1024 PQC    |  direct/indirect mount,       |
+|  encrypted inode contents & paths  |  stream transformation pass     |  idle timeout auto-unmounting |
++---------------------------------------------------------------------------------------------------------+
+```
+
+### 1. Architectural Mission
+SigmaOS incorporates per-directory transparent file encryption inspired by Linux `fscrypt` alongside kernel-level `autofs` on-demand mount point triggers and idle timeout unmounting to guarantee maximum storage privacy and automated volume mounting efficiency.
+
+### 2. Key Subsystem Capabilities
+1. **Linux `fscrypt` Transparent Directory Encryption**:
+   - `set_fscrypt_policy`: Associates transparent encryption policies (`AES-256-XTS`, `Kyber-1024-PQC`) with target directory inodes.
+   - `write_encrypted_file` & `read_decrypted_file`: Transparently encrypts and decrypts file data and filenames using policy master key descriptors.
+2. **Kernel `autofs` On-Demand Mount Triggers**:
+   - `register_autofs_trigger`: Configures direct and indirect on-demand mount point triggers for storage devices.
+   - `trigger_access`: Automatically mounts target storage volumes upon directory access.
+   - `expire_idle_mounts`: Automatically unmounts idle volumes after configurable timeout intervals.

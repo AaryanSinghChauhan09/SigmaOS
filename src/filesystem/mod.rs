@@ -48,9 +48,13 @@ pub use file_monitor::{
     EventFilter, FileEvent, FileEventType, WatchConfig, WatchId, WatchManager, EventId,
 };
 pub mod sovereign_filesystem_hierarchy;
+pub mod fscrypt_autofs;
 pub use sovereign_filesystem_hierarchy::{
     EphemeralTmpfsMountGovernor, SovereignAtomicGenerationRootfsGuard, SovereignCanonicalFhsResolver,
     SovereignMultiDistroFhsHierarchyEngine, SyntheticProcSysfsProvider,
+};
+pub use fscrypt_autofs::{
+    AutofsMountTrigger, FscryptInodeRecord, FscryptPolicy, SovereignFscryptAutofsEngine,
 };
 pub use watch::{EventQueue, ThreadSafeEventQueue, RING_BUFFER_SIZE, COALESCE_WINDOW_MS};
 
