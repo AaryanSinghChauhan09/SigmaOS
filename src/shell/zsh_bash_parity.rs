@@ -495,6 +495,24 @@ impl BashParameterExpansion {
             return val.len().to_string();
         }
 
+        // 1a. ${VAR@U}, ${VAR@L}, ${VAR@Q}, ${VAR@A}, ${VAR@E} - Bash 5.0+ parameter transformations
+        if inner.contains('@') {
+            let parts: Vec<&str> = inner.split('@').collect();
+            if parts.len() == 2 {
+                let var_name = parts[0];
+                let transform = parts[1];
+                let val = env.get(var_name).cloned().unwrap_or_default();
+                match transform {
+                    "U" => return val.to_uppercase(),
+                    "L" => return val.to_lowercase(),
+                    "Q" => return format!("'{}'", val.replace('\'', "'\\''")),
+                    "A" => return format!("{}='{}'", var_name, val),
+                    "E" => return val.replace("\\n", "\n").replace("\\t", "\t"),
+                    _ => {}
+                }
+            }
+        }
+
         // 1b. ${VAR^^} - uppercase conversion
         if inner.ends_with("^^") {
             let var_name = &inner[..inner.len() - 2];
@@ -1328,6 +1346,26 @@ impl UniversalShellCompatibilityEngine {
     }
 }
 
+pub struct SovereignUniversalShellBridgeEngine;
+
+impl SovereignUniversalShellBridgeEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Executes multi-dialect shell scripts universally as POSIX `/bin/sh` pipelines
+    pub fn execute_universal_script(
+        &self,
+        script: &str,
+    ) -> Result<(ShellDialect, String, Vec<ShellPipeline>), &'static str> {
+        let mut compat_engine = UniversalShellCompatibilityEngine::new();
+        let dialect = UniversalShellCompatibilityEngine::detect_shebang_dialect(script);
+        let transpiled_sh = UniversalScriptTranspiler::transpile_to_posix_sh(script, dialect);
+        let pipelines = compat_engine.execute_script_as_sh(script)?;
+        Ok((dialect, transpiled_sh, pipelines))
+    }
+}
+
 pub struct UniversalScriptTranspiler;
 
 impl UniversalScriptTranspiler {
@@ -1400,9 +1438,27 @@ impl UniversalScriptTranspiler {
     fn transpile_fish_line(line: &str, in_function: &mut bool) -> String {
         let mut l = line.to_string();
 
-        // 0. Fish begin ... end block or while loop
+        // 0. Fish begin ... end block, if / else if / else / end conditionals, or while loop
         if l == "begin" {
             return "{".to_string();
+        }
+        if l.starts_with("if ") && !l.contains("; then") {
+            let cond = l.trim_start_matches("if ").trim();
+            return format!("if {}; then", cond);
+        }
+        if l.starts_with("else if ") && !l.contains("; then") {
+            let cond = l.trim_start_matches("else if ").trim();
+            return format!("elif {}; then", cond);
+        }
+        if l == "else" {
+            return "else".to_string();
+        }
+        if l == "end" {
+            if *in_function {
+                *in_function = false;
+                return "}".to_string();
+            }
+            return "fi".to_string();
         }
         if l.starts_with("fish_add_path ") {
             let path = l.trim_start_matches("fish_add_path ").trim().trim_matches('"').trim_matches('\'');
@@ -1555,6 +1611,26 @@ impl UniversalScriptTranspiler {
 
     fn transpile_tcsh_line(line: &str) -> String {
         let l = line.to_string();
+
+        // 0. Tcsh switch/case/endsw block
+        if l.starts_with("switch (") && l.ends_with(')') {
+            let var = l.trim_start_matches("switch (").trim_end_matches(')').trim();
+            return format!("case {} in", var);
+        }
+        if l.starts_with("switch ( ") && l.ends_with(" )") {
+            let var = l.trim_start_matches("switch (").trim_end_matches(')').trim();
+            return format!("case {} in", var);
+        }
+        if l.starts_with("case ") && l.ends_with(':') {
+            let pat = l.trim_start_matches("case ").trim_end_matches(':').trim();
+            return format!("  {};;", pat);
+        }
+        if l == "default:" {
+            return "  *);;".to_string();
+        }
+        if l == "endsw" {
+            return "esac".to_string();
+        }
 
         // 0. Tcsh 'set path = ( ... )' -> 'export PATH=...'
         if l.starts_with("set path = (") || l.starts_with("set path =(") {
@@ -1868,6 +1944,41 @@ impl UniversalScriptTranspiler {
         if l.starts_with("coproc ") {
             let sub = l.trim_start_matches("coproc ").trim();
             return format!("{} &", sub);
+        }
+
+        // 0h. Bash C-style arithmetic for loop: for ((i=0; i<N; i++)); do
+        if l.starts_with("for ((") {
+            return SovereignBackendShellEngine::transpile_c_style_for(&l);
+        }
+
+        // 0i. Network socket redirection: /dev/tcp/host/port
+        if l.contains("/dev/tcp/") || l.contains("/dev/udp/") {
+            l = SovereignBackendShellEngine::transpile_network_socket_redirection(&l);
+        }
+
+        // 0j. Here-string: cmd <<< "string" -> echo "string" | cmd
+        if l.contains("<<<") {
+            if let Some(pos) = l.find("<<<") {
+                let cmd = l[..pos].trim();
+                let string_arg = l[pos + 3..].trim();
+                l = format!("echo {} | {}", string_arg, cmd);
+            }
+        }
+
+        // 0k. Zsh split / join / line modifiers: ${(f)var}, ${(s::)var}, ${(z)var}
+        if l.contains("${(f)") {
+            l = l.replace("${(f)", "${");
+        }
+        if l.contains("${(z)") {
+            l = l.replace("${(z)", "${");
+        }
+        if l.contains("${(s:") {
+            if let Some(idx) = l.find("${(s:") {
+                if let Some(end) = l[idx..].find(")}") {
+                    let full_expr = &l[idx..idx + end + 2];
+                    l = l.replace(full_expr, "$var");
+                }
+            }
         }
 
         // 1. Process substitution: <(cmd) or >(cmd) -> subshell evaluation bridge
@@ -2743,6 +2854,22 @@ mod tests {
         let mut engine = UniversalShellCompatibilityEngine::new();
         let pipelines = engine.execute_script_as_sh(xonsh_script).unwrap();
         assert!(!pipelines.is_empty());
+
+        let bridge = SovereignUniversalShellBridgeEngine::new();
+        let fish_cond_script = "#!/usr/bin/env fish\nif test -d /tmp\n  echo dir_exists\nelse if test -f /tmp/foo\n  echo file_exists\nelse\n  echo none\nend";
+        let (dialect, transpiled, pipelines_bridge) = bridge.execute_universal_script(fish_cond_script).unwrap();
+        assert_eq!(dialect, ShellDialect::Fish);
+        assert!(transpiled.contains("if test -d /tmp; then"));
+        assert!(transpiled.contains("elif test -f /tmp/foo; then"));
+        assert!(transpiled.contains("else"));
+        assert!(transpiled.contains("fi"));
+        assert!(!pipelines_bridge.is_empty());
+
+        let mut env_transforms = BTreeMap::new();
+        env_transforms.insert("GREETING".to_string(), "hello world".to_string());
+        assert_eq!(BashParameterExpansion::expand("${GREETING@U}", &env_transforms), "HELLO WORLD");
+        assert_eq!(BashParameterExpansion::expand("${GREETING@Q}", &env_transforms), "'hello world'");
+        assert_eq!(BashParameterExpansion::expand("${GREETING@A}", &env_transforms), "GREETING='hello world'");
     }
 
     #[test]
