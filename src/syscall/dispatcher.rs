@@ -225,8 +225,8 @@ impl SyscallDispatcher {
 
 /// Syscall handlers
 unsafe fn handle_read(args: &SyscallArgs, _capability: Capability) -> SyscallResult {
-    let fd = args.arg0;
-    let buffer = args.arg1 as *mut u8;
+    let _fd = args.arg0;
+    let _buffer = args.arg1 as *mut u8;
     let size = args.arg2;
 
     // In a real implementation, this would call the file I/O system
@@ -235,8 +235,8 @@ unsafe fn handle_read(args: &SyscallArgs, _capability: Capability) -> SyscallRes
 }
 
 unsafe fn handle_write(args: &SyscallArgs, _capability: Capability) -> SyscallResult {
-    let fd = args.arg0;
-    let buffer = args.arg1 as *const u8;
+    let _fd = args.arg0;
+    let _buffer = args.arg1 as *const u8;
     let size = args.arg2;
 
     // In a real implementation, this would call the file I/O system
@@ -245,9 +245,9 @@ unsafe fn handle_write(args: &SyscallArgs, _capability: Capability) -> SyscallRe
 }
 
 unsafe fn handle_open(args: &SyscallArgs, _capability: Capability) -> SyscallResult {
-    let path = args.arg0 as *const u8;
-    let flags = args.arg1;
-    let mode = args.arg2;
+    let _path = args.arg0 as *const u8;
+    let _flags = args.arg1;
+    let _mode = args.arg2;
 
     // In a real implementation, this would call the file I/O system
     // For now, return a fake fd
@@ -255,7 +255,7 @@ unsafe fn handle_open(args: &SyscallArgs, _capability: Capability) -> SyscallRes
 }
 
 unsafe fn handle_close(args: &SyscallArgs, _capability: Capability) -> SyscallResult {
-    let fd = args.arg0;
+    let _fd = args.arg0;
 
     // In a real implementation, this would call the file I/O system
     // For now, return success
@@ -263,23 +263,23 @@ unsafe fn handle_close(args: &SyscallArgs, _capability: Capability) -> SyscallRe
 }
 
 unsafe fn handle_exit(args: &SyscallArgs, _capability: Capability) -> SyscallResult {
-    let exit_code = args.arg0 as i32;
+    let _exit_code = args.arg0 as i32;
 
     // In a real implementation, this would terminate the process
     // For now, loop forever
     loop {}
 }
 
-unsafe fn handle_fork(args: &SyscallArgs, _capability: Capability) -> SyscallResult {
+unsafe fn handle_fork(_args: &SyscallArgs, _capability: Capability) -> SyscallResult {
     // In a real implementation, this would fork the process
     // For now, return 0 (child)
     SyscallResult::success(0)
 }
 
 unsafe fn handle_execve(args: &SyscallArgs, _capability: Capability) -> SyscallResult {
-    let path = args.arg0 as *const u8;
-    let argv = args.arg1 as *const *const u8;
-    let envp = args.arg2 as *const *const u8;
+    let _path = args.arg0 as *const u8;
+    let _argv = args.arg1 as *const *const u8;
+    let _envp = args.arg2 as *const *const u8;
 
     // In a real implementation, this would execute the program
     // For now, return error
@@ -287,9 +287,9 @@ unsafe fn handle_execve(args: &SyscallArgs, _capability: Capability) -> SyscallR
 }
 
 unsafe fn handle_socket(args: &SyscallArgs, _capability: Capability) -> SyscallResult {
-    let domain = args.arg0;
-    let type_ = args.arg1;
-    let protocol = args.arg2;
+    let _domain = args.arg0;
+    let _type_ = args.arg1;
+    let _protocol = args.arg2;
 
     // In a real implementation, this would create a socket
     // For now, return a fake fd
@@ -297,9 +297,9 @@ unsafe fn handle_socket(args: &SyscallArgs, _capability: Capability) -> SyscallR
 }
 
 unsafe fn handle_connect(args: &SyscallArgs, _capability: Capability) -> SyscallResult {
-    let fd = args.arg0;
-    let addr = args.arg1 as *const u8;
-    let addrlen = args.arg2;
+    let _fd = args.arg0;
+    let _addr = args.arg1 as *const u8;
+    let _addrlen = args.arg2;
 
     // In a real implementation, this would connect the socket
     // For now, return success
