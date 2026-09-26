@@ -65,9 +65,9 @@ impl SimpleFingerprintTemplate {
 impl FingerprintTemplate for SimpleFingerprintTemplate {
     fn id(&self) -> FingerID { self.id }
     fn data(&self) -> &[u8] {
-        // Bolt ⚡ Optimization: Store explicit template byte length on instantiation to eliminate
-        // O(N) zero-byte linear scanning (.position(|&b| b == 0)) on every fingerprint template data access,
-        // reducing slice lookup to instantaneous O(1) constant time.
+        // Bolt ⚡ Optimization: Utilize precomputed data_len stored on instantiation
+        // to eliminate O(N) zero-byte linear scanning (.position(|&b| b == 0)) on every
+        // fingerprint template data access, reducing slice lookup to instantaneous O(1) constant time.
         &self.data[..self.data_len as usize]
     }
     fn quality(&self) -> u32 { self.quality.load(Ordering::SeqCst) as u32 }
@@ -228,7 +228,7 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -238,7 +238,19 @@ mod tests {
         let template = SimpleFingerprintTemplate::new(1, raw_data, 95);
         assert_eq!(template.id(), 1);
         assert_eq!(template.data(), raw_data);
+        assert_eq!(template.data_len as usize, raw_data.len());
         assert_eq!(template.quality(), 95);
+    }
+
+    #[test]
+    fn test_simple_fingerprint_template_with_binary_zeros() {
+        // Binary fingerprint templates can contain internal null bytes (0x00)
+        let binary_data = &[0x12, 0x00, 0x34, 0x56, 0x00, 0x78];
+        let template = SimpleFingerprintTemplate::new(2, binary_data, 88);
+        assert_eq!(template.id(), 2);
+        assert_eq!(template.data(), binary_data);
+        assert_eq!(template.data_len as usize, binary_data.len());
+        assert_eq!(template.quality(), 88);
     }
 
     #[test]
