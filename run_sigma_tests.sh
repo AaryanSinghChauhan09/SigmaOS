@@ -423,3 +423,10 @@ if [ -f "src/open_source_obsoletion.rs" ]; then
     rustc src/open_source_obsoletion.rs --crate-type=lib --test --edition=2021 -o build/test_open_source_obsoletion
     ./build/test_open_source_obsoletion
 fi
+
+if [ -f "src/boot/grub_engine.rs" ]; then
+    echo "Running GRUB2 & BSD Loader engine test suite..."
+    mkdir -p build
+    rustc --test src/boot/grub_engine.rs --edition=2021 -o build/test_grub_engine
+    ./build/test_grub_engine
+fi
