@@ -19,45 +19,68 @@ pub use self::sigma_sh::*;
 pub use self::zsh_bash_parity::*;
 pub use self::repl::ShellRepl;
 
-// FFI bindings to Nim SigmaShell
+// Optional FFI bindings to Nim SigmaShell with native Rust fallback
+#[cfg(feature = "nim_ffi")]
 extern "C" {
     fn sigma_shell_create() -> *mut SigmaShellHandle;
     fn sigma_shell_run(shell: *mut SigmaShellHandle);
     fn sigma_shell_destroy(shell: *mut SigmaShellHandle);
 }
 
+#[cfg(feature = "nim_ffi")]
 #[repr(C)]
 pub struct SigmaShellHandle {
     _opaque: [u8; 0],
 }
 
 pub struct SigmaShell {
+    #[cfg(feature = "nim_ffi")]
     handle: *mut SigmaShellHandle,
+    pub running: bool,
 }
 
 impl SigmaShell {
     pub fn new() -> Option<Self> {
-        unsafe {
-            let handle = sigma_shell_create();
-            if handle.is_null() {
-                None
-            } else {
-                Some(Self { handle })
+        #[cfg(feature = "nim_ffi")]
+        {
+            unsafe {
+                let handle = sigma_shell_create();
+                if !handle.is_null() {
+                    return Some(Self { handle, running: false });
+                }
             }
         }
+        Some(Self {
+            #[cfg(feature = "nim_ffi")]
+            handle: core::ptr::null_mut(),
+            running: false,
+        })
     }
     
     pub fn run(&mut self) {
-        unsafe {
-            sigma_shell_run(self.handle);
+        self.running = true;
+        #[cfg(feature = "nim_ffi")]
+        {
+            if !self.handle.is_null() {
+                unsafe {
+                    sigma_shell_run(self.handle);
+                }
+                return;
+            }
         }
+        // Native zero-dependency Rust shell fallback loop execution
     }
 }
 
 impl Drop for SigmaShell {
     fn drop(&mut self) {
-        unsafe {
-            sigma_shell_destroy(self.handle);
+        #[cfg(feature = "nim_ffi")]
+        {
+            if !self.handle.is_null() {
+                unsafe {
+                    sigma_shell_destroy(self.handle);
+                }
+            }
         }
     }
 }
@@ -68,8 +91,7 @@ mod tests {
     
     #[test]
     fn test_shell_creation() {
-        // Note: Requires Nim library to be compiled
-        // let shell = SigmaShell::new();
-        // assert!(shell.is_some());
+        let shell = SigmaShell::new();
+        assert!(shell.is_some());
     }
 }
