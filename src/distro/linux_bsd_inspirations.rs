@@ -105,6 +105,11 @@ pub enum DistroSubsystemMode {
     LinuxEulerOS,
     LinuxEuroLinux,
     LinuxAnolis,
+    LinuxTuxedo,
+    LinuxBigLinux,
+    LinuxSystem76,
+    FreeBsdDesktop,
+    IllumosOpenIndiana,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -186,10 +191,14 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxEulerOS
             | DistroSubsystemMode::LinuxEuroLinux
             | DistroSubsystemMode::LinuxAnolis
+            | DistroSubsystemMode::LinuxTuxedo
+            | DistroSubsystemMode::LinuxBigLinux
+            | DistroSubsystemMode::LinuxSystem76
             | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
+            | DistroSubsystemMode::FreeBsdDesktop
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::DragonFlyBsd
@@ -219,7 +228,9 @@ impl SovereignUniversalDistroBridge {
             }
             DistroSubsystemMode::LinuxSlackware
             | DistroSubsystemMode::LinuxTinyCore => ServiceSupervisorType::Sysvinit,
-            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => ServiceSupervisorType::Smf,
+            DistroSubsystemMode::SolarisIllumos
+            | DistroSubsystemMode::SolarisOmniOS
+            | DistroSubsystemMode::IllumosOpenIndiana => ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs | DistroSubsystemMode::NetBsdRump => ServiceSupervisorType::Rcd,
         }
     }
@@ -263,14 +274,21 @@ impl SovereignUniversalDistroBridge {
                 | DistroSubsystemMode::LinuxManjaro
                 | DistroSubsystemMode::LinuxCachyOS
                 | DistroSubsystemMode::LinuxOmarchy
-                | DistroSubsystemMode::LinuxSteamOS,
+                | DistroSubsystemMode::LinuxSteamOS
+                | DistroSubsystemMode::LinuxBigLinux,
                 "/var/lib/pkg",
             ) => "/var/lib/pacman".to_string(),
+            (
+                DistroSubsystemMode::LinuxTuxedo
+                | DistroSubsystemMode::LinuxSystem76,
+                "/var/lib/pkg",
+            ) => "/var/lib/dpkg".to_string(),
             (DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxAlpineExtended, "/var/lib/pkg") => "/lib/apk/db".to_string(),
             (DistroSubsystemMode::LinuxVoid, "/var/lib/pkg") => "/var/db/xbps".to_string(),
             (DistroSubsystemMode::LinuxOpenWrt, "/etc") => "/etc/config".to_string(),
             (
                 DistroSubsystemMode::FreeBsd
+                | DistroSubsystemMode::FreeBsdDesktop
                 | DistroSubsystemMode::OpenBsd
                 | DistroSubsystemMode::NetBsd
                 | DistroSubsystemMode::DragonFlyBsd
@@ -283,6 +301,7 @@ impl SovereignUniversalDistroBridge {
             ) => "/var/db/pkg".to_string(),
             (
                 DistroSubsystemMode::FreeBsd
+                | DistroSubsystemMode::FreeBsdDesktop
                 | DistroSubsystemMode::OpenBsd
                 | DistroSubsystemMode::NetBsd
                 | DistroSubsystemMode::DragonFlyBsd
@@ -372,10 +391,14 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxEulerOS
             | DistroSubsystemMode::LinuxEuroLinux
             | DistroSubsystemMode::LinuxAnolis
+            | DistroSubsystemMode::LinuxTuxedo
+            | DistroSubsystemMode::LinuxBigLinux
+            | DistroSubsystemMode::LinuxSystem76
             | DistroSubsystemMode::LinuxSteamOS => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
+            | DistroSubsystemMode::FreeBsdDesktop
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::DragonFlyBsd
@@ -407,7 +430,9 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxPuppy => {
                 supervisor == ServiceSupervisorType::Sysvinit
             }
-            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => supervisor == ServiceSupervisorType::Smf,
+            DistroSubsystemMode::SolarisIllumos
+            | DistroSubsystemMode::SolarisOmniOS
+            | DistroSubsystemMode::IllumosOpenIndiana => supervisor == ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs | DistroSubsystemMode::NetBsdRump => supervisor == ServiceSupervisorType::Rcd,
         };
         supervisor_valid && !pkg_spec.is_empty() && !vfs_etc.is_empty()
@@ -427,6 +452,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxWhonix
             | DistroSubsystemMode::LinuxVanillaOS
             | DistroSubsystemMode::LinuxMX
+            | DistroSubsystemMode::LinuxTuxedo
+            | DistroSubsystemMode::LinuxSystem76
             | DistroSubsystemMode::LinuxDeepin => format!("{}.deb", input_pkg),
             DistroSubsystemMode::LinuxArch
             | DistroSubsystemMode::LinuxGaruda
@@ -436,6 +463,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxAsahi
             | DistroSubsystemMode::LinuxKaOS
             | DistroSubsystemMode::LinuxOmarchy
+            | DistroSubsystemMode::LinuxBigLinux
             | DistroSubsystemMode::LinuxSteamOS => format!("{}.pkg.tar.zst", input_pkg),
             DistroSubsystemMode::LinuxAlpine
             | DistroSubsystemMode::LinuxAlpineExtended
@@ -473,6 +501,7 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxTalos => format!("{}.yaml", input_pkg),
             DistroSubsystemMode::LinuxSlax => format!("{}.sb", input_pkg),
             DistroSubsystemMode::FreeBsd
+            | DistroSubsystemMode::FreeBsdDesktop
             | DistroSubsystemMode::DragonFlyBsd
             | DistroSubsystemMode::MidnightBsd
             | DistroSubsystemMode::HardenedBsd
@@ -487,7 +516,9 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::SmartOs => {
                 format!("{}.tgz", input_pkg)
             }
-            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => format!("{}.p5p", input_pkg),
+            DistroSubsystemMode::SolarisIllumos
+            | DistroSubsystemMode::SolarisOmniOS
+            | DistroSubsystemMode::IllumosOpenIndiana => format!("{}.p5p", input_pkg),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", input_pkg),
         }
     }
@@ -514,6 +545,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxWhonix
             | DistroSubsystemMode::LinuxVanillaOS
             | DistroSubsystemMode::LinuxMX
+            | DistroSubsystemMode::LinuxTuxedo
+            | DistroSubsystemMode::LinuxSystem76
             | DistroSubsystemMode::LinuxDeepin => format!("{}.deb", action),
             DistroSubsystemMode::LinuxArch
             | DistroSubsystemMode::LinuxGaruda
@@ -523,6 +556,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxAsahi
             | DistroSubsystemMode::LinuxKaOS
             | DistroSubsystemMode::LinuxOmarchy
+            | DistroSubsystemMode::LinuxBigLinux
             | DistroSubsystemMode::LinuxSteamOS => format!("{}.pkg.tar.zst", action),
             DistroSubsystemMode::LinuxAlpine
             | DistroSubsystemMode::LinuxAlpineExtended
@@ -556,6 +590,7 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxTalos => format!("{}.yaml", action),
             DistroSubsystemMode::LinuxSlax => format!("{}.sb", action),
             DistroSubsystemMode::FreeBsd
+            | DistroSubsystemMode::FreeBsdDesktop
             | DistroSubsystemMode::DragonFlyBsd
             | DistroSubsystemMode::MidnightBsd
             | DistroSubsystemMode::HardenedBsd
@@ -570,7 +605,9 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::SmartOs => format!("{}.tgz", action),
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", action),
             DistroSubsystemMode::LinuxTinyCore => format!("{}.tcz", action),
-            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => format!("{}.p5p", action),
+            DistroSubsystemMode::SolarisIllumos
+            | DistroSubsystemMode::SolarisOmniOS
+            | DistroSubsystemMode::IllumosOpenIndiana => format!("{}.p5p", action),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", action),
         };
 
@@ -587,6 +624,7 @@ impl SovereignUniversalDistroBridge {
     ) -> Result<(), &'static str> {
         match self.mode {
             DistroSubsystemMode::FreeBsd
+            | DistroSubsystemMode::FreeBsdDesktop
             | DistroSubsystemMode::DragonFlyBsd
             | DistroSubsystemMode::MidnightBsd
             | DistroSubsystemMode::HardenedBsd
@@ -603,7 +641,9 @@ impl SovereignUniversalDistroBridge {
                 self.pledge_sentinel.unveil_process(pid, root_path, "rw")?;
                 Ok(())
             }
-            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => {
+            DistroSubsystemMode::SolarisIllumos
+            | DistroSubsystemMode::SolarisOmniOS
+            | DistroSubsystemMode::IllumosOpenIndiana => {
                 let mut zone_engine = SovereignIllumosZonesEngine::new();
                 let zone_id = zone_engine.create_zone(
                     "zone-isolate",
@@ -2676,6 +2716,16 @@ mod cross_subsystem_tests {
             DistroSubsystemMode::SolarisOmniOS,
             DistroSubsystemMode::NetBsdRump,
             DistroSubsystemMode::OpenBsdHardened,
+            DistroSubsystemMode::LinuxSerpentOS,
+            DistroSubsystemMode::LinuxFedoraSilverblue,
+            DistroSubsystemMode::LinuxEulerOS,
+            DistroSubsystemMode::LinuxEuroLinux,
+            DistroSubsystemMode::LinuxAnolis,
+            DistroSubsystemMode::LinuxTuxedo,
+            DistroSubsystemMode::LinuxBigLinux,
+            DistroSubsystemMode::LinuxSystem76,
+            DistroSubsystemMode::FreeBsdDesktop,
+            DistroSubsystemMode::IllumosOpenIndiana,
         ];
 
         for m in modes {
@@ -2754,6 +2804,22 @@ mod cross_subsystem_tests {
         let hardened_obsd_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::OpenBsdHardened);
         assert_eq!(hardened_obsd_bridge.translate_package_specifier("app"), "app.tgz");
         assert_eq!(hardened_obsd_bridge.get_supervisor_type(), ServiceSupervisorType::OpenRC);
+
+        let tuxedo_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxTuxedo);
+        assert_eq!(tuxedo_bridge.translate_package_specifier("app"), "app.deb");
+        assert_eq!(tuxedo_bridge.get_supervisor_type(), ServiceSupervisorType::Systemd);
+
+        let biglinux_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxBigLinux);
+        assert_eq!(biglinux_bridge.translate_package_specifier("app"), "app.pkg.tar.zst");
+        assert_eq!(biglinux_bridge.get_supervisor_type(), ServiceSupervisorType::Systemd);
+
+        let freebsd_desktop_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::FreeBsdDesktop);
+        assert_eq!(freebsd_desktop_bridge.translate_package_specifier("app"), "app.pkg");
+        assert_eq!(freebsd_desktop_bridge.get_supervisor_type(), ServiceSupervisorType::OpenRC);
+
+        let openindiana_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::IllumosOpenIndiana);
+        assert_eq!(openindiana_bridge.translate_package_specifier("app"), "app.p5p");
+        assert_eq!(openindiana_bridge.get_supervisor_type(), ServiceSupervisorType::Smf);
     }
 
     #[test]

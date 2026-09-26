@@ -29,6 +29,10 @@ use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
 
+#[cfg(feature = "standalone_test")]
+#[path = "open_source_obsoletion.rs"]
+pub mod open_source_obsoletion;
+
 // =========================================================================
 // 1. PLAN 9 FROM BELL LABS / 9FRONT (9P2000 RPC & rfork Namespace Isolation)
 // =========================================================================

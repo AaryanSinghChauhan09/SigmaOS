@@ -466,6 +466,70 @@ impl Default for HardenedBsdPaxGuardEngine {
     }
 }
 
+/// Tuxedo Control Center Hardware Profile & Fan Control Engine
+#[derive(Debug, Clone)]
+pub struct TuxedoControlCenterEngine {
+    pub active_profile: String,
+    pub fan_speed_rpm: u32,
+    pub thermal_limit_celsius: u32,
+}
+
+impl TuxedoControlCenterEngine {
+    pub fn new() -> Self {
+        Self {
+            active_profile: String::from("performance"),
+            fan_speed_rpm: 3500,
+            thermal_limit_celsius: 85,
+        }
+    }
+
+    pub fn set_profile(&mut self, profile: &str) {
+        self.active_profile = String::from(profile);
+        if profile == "cool_and_quiet" {
+            self.fan_speed_rpm = 2000;
+            self.thermal_limit_celsius = 70;
+        } else if profile == "performance" {
+            self.fan_speed_rpm = 4500;
+            self.thermal_limit_celsius = 90;
+        }
+    }
+}
+
+impl Default for TuxedoControlCenterEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// System76 COSMIC Scheduler & Power Daemon Engine
+#[derive(Debug, Clone)]
+pub struct System76CosmicPowerEngine {
+    pub graphics_mode: String,
+    pub power_profile: String,
+    pub battery_threshold_pct: u8,
+}
+
+impl System76CosmicPowerEngine {
+    pub fn new() -> Self {
+        Self {
+            graphics_mode: String::from("hybrid"),
+            power_profile: String::from("balanced"),
+            battery_threshold_pct: 80,
+        }
+    }
+
+    pub fn switch_graphics(&mut self, mode: &str) -> bool {
+        self.graphics_mode = String::from(mode);
+        true
+    }
+}
+
+impl Default for System76CosmicPowerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Master Missing Linux & BSD Components Suite
 #[derive(Debug, Clone)]
 pub struct SovereignMissingLinuxBsdSuite {
@@ -484,6 +548,8 @@ pub struct SovereignMissingLinuxBsdSuite {
     pub clear_stateless: ClearLinuxStatelessEngine,
     pub urpmi: MageiaUrpmiEngine,
     pub pax: HardenedBsdPaxGuardEngine,
+    pub tuxedo: TuxedoControlCenterEngine,
+    pub system76: System76CosmicPowerEngine,
 }
 
 impl SovereignMissingLinuxBsdSuite {
@@ -504,6 +570,8 @@ impl SovereignMissingLinuxBsdSuite {
             clear_stateless: ClearLinuxStatelessEngine::new(),
             urpmi: MageiaUrpmiEngine::new(),
             pax: HardenedBsdPaxGuardEngine::new(),
+            tuxedo: TuxedoControlCenterEngine::new(),
+            system76: System76CosmicPowerEngine::new(),
         }
     }
 
@@ -520,6 +588,8 @@ impl SovereignMissingLinuxBsdSuite {
         let reset_ok = self.clear_stateless.reset_etc_to_defaults();
         self.urpmi.add_media("nonfree/updates");
         let pax_ok = self.pax.enforce_pax_policy("/usr/bin/sigsudo");
+        self.tuxedo.set_profile("cool_and_quiet");
+        let sys76_ok = self.system76.switch_graphics("discrete");
 
         self.yast2.verify_module("yast2-hardware")
             && self.xbps_src.generate_xbps_binary().contains("sigmaos-core")
@@ -536,6 +606,8 @@ impl SovereignMissingLinuxBsdSuite {
             && reset_ok
             && self.urpmi.media_sources.len() == 3
             && pax_ok
+            && self.tuxedo.fan_speed_rpm == 2000
+            && sys76_ok
     }
 
     pub fn resolve_missing_components_for_subsystem(&mut self, subsystem: &str) -> String {
@@ -555,6 +627,8 @@ impl SovereignMissingLinuxBsdSuite {
             "clear" | "stateless" => format!("Stateless clean: {}", self.clear_stateless.is_stateless_clean),
             "urpmi" | "mageia" => format!("Media sources: {}", self.urpmi.media_sources.len()),
             "pax" | "hardened" => format!("PaX ASLR bits: {}", self.pax.aslr_entropy_bits),
+            "tuxedo" | "hardware_control" => format!("Tuxedo profile: {}, fan RPM: {}", self.tuxedo.active_profile, self.tuxedo.fan_speed_rpm),
+            "system76" | "cosmic_power" => format!("System76 graphics: {}, power: {}", self.system76.graphics_mode, self.system76.power_profile),
             _ => format!("Default resolver active for subsystem: {}", subsystem),
         }
     }
