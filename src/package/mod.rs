@@ -49,6 +49,8 @@ pub mod sovereign_distro_package_matrix;
 pub use sovereign_distro_package_matrix::*;
 pub mod sovereign_distro_package_advancements_v5;
 pub use sovereign_distro_package_advancements_v5::*;
+pub mod sovereign_distro_package_advancements_v6;
+pub use sovereign_distro_package_advancements_v6::*;
 pub mod sovereign_package_apc_engine;
 pub use sovereign_package_apc_engine::*;
 pub mod sovereign_package_access_engine;
