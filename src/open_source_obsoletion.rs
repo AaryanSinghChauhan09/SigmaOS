@@ -12,8 +12,16 @@ use std::vec::Vec;
 
 
 
+#[cfg(not(feature = "standalone_test"))]
+#[cfg(not(feature = "standalone_test"))]
 #[path = "open_source_os_gap_closure.rs"]
 pub mod open_source_os_gap_closure;
+
+#[cfg(not(feature = "standalone_test"))]
+use open_source_os_gap_closure::*;
+
+#[cfg(feature = "standalone_test")]
+use crate::*;
 
 // =========================================================================
 // 1. SOVEREIGN VCS ENGINE (Superseding Git, GitHub CLI, Mercurial)
@@ -3077,7 +3085,7 @@ pub struct SovereignOpenSourceObsoletionOrchestrator {
     pub fzf_finder: SovereignFzfFuzzyFinderEngine,
     pub nats_jetstream: SovereignNatsJetstreamEngine,
     pub yazi_explorer: SovereignYaziTerminalFileExplorerEngine,
-    pub supremacy_suite: open_source_os_gap_closure::OpenSourceProjectSupremacySuite,
+    pub supremacy_suite: OpenSourceProjectSupremacySuite,
     pub scheme_router: SovereignSchemeRouter,
     pub zircon_manager: SovereignZirconHandleManager,
     pub serenity_async: SovereignSerenityAsyncEngine,
@@ -3152,7 +3160,7 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             fzf_finder: SovereignFzfFuzzyFinderEngine::new(vec!["/bin/bash".to_string(), "/usr/bin/zsh".to_string()]),
             nats_jetstream: SovereignNatsJetstreamEngine::new("system_events"),
             yazi_explorer: SovereignYaziTerminalFileExplorerEngine::new("/home/sovereign"),
-            supremacy_suite: open_source_os_gap_closure::OpenSourceProjectSupremacySuite::new(),
+            supremacy_suite: OpenSourceProjectSupremacySuite::new(),
             scheme_router: SovereignSchemeRouter::new(),
             zircon_manager: SovereignZirconHandleManager::new(),
             serenity_async: SovereignSerenityAsyncEngine::new(),
