@@ -10,8 +10,10 @@ use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
+
+
 #[path = "open_source_os_gap_closure.rs"]
-mod open_source_os_gap_closure;
+pub mod open_source_os_gap_closure;
 
 // =========================================================================
 // 1. SOVEREIGN VCS ENGINE (Superseding Git, GitHub CLI, Mercurial)

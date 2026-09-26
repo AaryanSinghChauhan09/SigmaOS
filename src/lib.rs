@@ -74,9 +74,9 @@ pub use process::{
     WNOHANG, WUNTRACED,
 };
 pub mod access;
-pub mod open_source_os_gap_closure;
+pub mod open_source_obsoletion;
 pub mod tools;
-pub use open_source_os_gap_closure::*;
+pub use open_source_obsoletion::open_source_os_gap_closure::*;
 pub use kernel::tss_ring3_user_mode::*;
 pub use tools::tech_media_extended_suite::*;
 pub use distro::sovereign_linux_bsd_master_synthesis::*;
@@ -87,7 +87,6 @@ pub use distro::sovereign_2055_distro_supremacy_engine::*;
 pub use distro::sovereign_2060_distro_supremacy_engine::*;
 pub mod sovereign_wiki_master_engine;
 pub use sovereign_wiki_master_engine::*;
-pub mod open_source_obsoletion;
 pub mod unimplemented_features;
 pub mod unimplemented_tools;
 pub mod wiki_unimplemented_ideas;
