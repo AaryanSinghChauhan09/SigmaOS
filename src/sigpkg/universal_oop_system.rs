@@ -2550,14 +2550,14 @@ impl IPackage for StandardPackage {
 
 /// Factory for creating package parsers
 pub struct PackageParserFactory {
-    parsers: HashMap<PackageFormat, Box<dyn IPackageParser>>,
+    parsers: Vec<Box<dyn IPackageParser>>,
 }
 
 impl PackageParserFactory {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut factory = Self {
-            parsers: HashMap::new(),
+            parsers: Vec::new(),
         };
 
         // Register built-in parsers
@@ -2611,23 +2611,29 @@ impl PackageParserFactory {
         factory.register_parser(Box::new(Dnf5SQLiteAdapter::new()));
         factory.register_parser(Box::new(NixFlakeLockAdapter::new()));
         factory.register_parser(Box::new(Apk3SignatureAdapter::new()));
+        factory.register_parser(Box::new(PortageEbuildV2Adapter::new()));
+        factory.register_parser(Box::new(XbpsZstdAdapter::new()));
+        factory.register_parser(Box::new(SwupdBundleAdapter::new()));
+        factory.register_parser(Box::new(CachyOSMicroarchAdapter::new()));
+        factory.register_parser(Box::new(OpkgIpkAdapter::new()));
+        factory.register_parser(Box::new(BsdPkgPortsAdapter::new()));
 
         factory
     }
 
     pub fn register_parser(&mut self, parser: Box<dyn IPackageParser>) {
-        self.parsers.insert(parser.format(), parser);
+        self.parsers.push(parser);
     }
 
     pub fn get_parser(&self, format: PackageFormat) -> Option<&dyn IPackageParser> {
         self.parsers
-            .get(&format)
-            .map(|p: &Box<dyn IPackageParser>| p.as_ref())
+            .iter()
+            .find(|p| p.format() == format)
+            .map(|p| p.as_ref())
     }
 
     pub fn auto_detect_parser(&self, data: &[u8]) -> Option<&dyn IPackageParser> {
-        for parser in self.parsers.values() {
-            let parser: &Box<dyn IPackageParser> = parser;
+        for parser in &self.parsers {
             let p_ref: &dyn IPackageParser = parser.as_ref();
             if p_ref.can_parse(data) {
                 return Some(p_ref);
@@ -4576,6 +4582,432 @@ impl IPackageParser for PacmanZstdV2Adapter {
     }
 }
 
+pub struct PortageEbuildV2Adapter;
+impl PortageEbuildV2Adapter {
+    pub fn new() -> Self { Self }
+}
+impl Default for PortageEbuildV2Adapter {
+    fn default() -> Self { Self::new() }
+}
+impl IPackageParser for PortageEbuildV2Adapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Ebuild
+    }
+
+    fn can_parse(&self, data: &[u8]) -> bool {
+        let content = String::from_utf8_lossy(data);
+        content.contains("EAPI=") || content.contains("inherit ")
+    }
+
+    fn parse(&self, data: &[u8]) -> Result<Box<dyn IPackage>, ParseError> {
+        let content = String::from_utf8_lossy(data);
+        let mut name = "gentoo-ebuild-v2".to_string();
+        let mut version = Version::new(2, 0, 0);
+        let mut desc = "Gentoo Portage Ebuild v2 Package".to_string();
+        let mut deps = Vec::new();
+
+        for line in content.lines() {
+            let line = line.trim();
+            if line.starts_with("PN=") {
+                name = line[3..].trim_matches('"').to_string();
+            } else if line.starts_with("PV=") {
+                if let Ok(v) = Version::parse(line[3..].trim_matches('"')) {
+                    version = v;
+                }
+            } else if line.starts_with("DESCRIPTION=") {
+                desc = line[12..].trim_matches('"').to_string();
+            } else if line.starts_with("RDEPEND=") {
+                let deps_str = line[8..].trim_matches('"');
+                for dep in deps_str.split_whitespace() {
+                    deps.push(Dependency {
+                        name: dep.to_string(),
+                        version_constraint: VersionConstraint::Any,
+                    });
+                }
+            }
+        }
+
+        Ok(Box::new(StandardPackage {
+            metadata: PackageMetadata {
+                name,
+                version,
+                description: desc,
+                license: "GPL-2.0-only".to_string(),
+                maintainer: "gentoo-packager".to_string(),
+                homepage: String::new(),
+                architecture: "amd64".to_string(),
+                checksum: "sha256:ebuildv2hash".to_string(),
+                size: data.len() as u64,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: vec!["amd64".to_string(), "arm64".to_string()],
+            },
+            dependencies: deps,
+            format: PackageFormat::Ebuild,
+        }))
+    }
+
+    fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
+        let meta = package.metadata();
+        let content = format!("EAPI=8\nPN=\"{}\"\nPV=\"{}\"\nDESCRIPTION=\"{}\"\n", meta.name, meta.version, meta.description);
+        Ok(content.into_bytes())
+    }
+}
+
+pub struct XbpsZstdAdapter;
+impl XbpsZstdAdapter {
+    pub fn new() -> Self { Self }
+}
+impl Default for XbpsZstdAdapter {
+    fn default() -> Self { Self::new() }
+}
+impl IPackageParser for XbpsZstdAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Xbps
+    }
+
+    fn can_parse(&self, data: &[u8]) -> bool {
+        let content = String::from_utf8_lossy(data);
+        content.contains("architecture=") || content.contains("XBPS_ZSTD_INDEX")
+    }
+
+    fn parse(&self, data: &[u8]) -> Result<Box<dyn IPackage>, ParseError> {
+        let content = String::from_utf8_lossy(data);
+        let mut name = "void-xbps-pkg".to_string();
+        let mut version = Version::new(1, 0, 0);
+        let mut desc = "Void Linux XBPS Zstd Package".to_string();
+        let mut deps = Vec::new();
+
+        for line in content.lines() {
+            let line = line.trim();
+            if let Some(val) = line.strip_prefix("pkgname=") {
+                name = val.trim_matches('"').to_string();
+            } else if let Some(val) = line.strip_prefix("version=") {
+                if let Ok(v) = Version::parse(val.trim_matches('"')) {
+                    version = v;
+                }
+            } else if let Some(val) = line.strip_prefix("short_desc=") {
+                desc = val.trim_matches('"').to_string();
+            } else if let Some(val) = line.strip_prefix("run_depends=") {
+                for dep in val.trim_matches('"').split_whitespace() {
+                    deps.push(Dependency {
+                        name: dep.to_string(),
+                        version_constraint: VersionConstraint::Any,
+                    });
+                }
+            }
+        }
+
+        Ok(Box::new(StandardPackage {
+            metadata: PackageMetadata {
+                name,
+                version,
+                description: desc,
+                license: "BSD-2-Clause".to_string(),
+                maintainer: "void-packager".to_string(),
+                homepage: String::new(),
+                architecture: "x86_64".to_string(),
+                checksum: "sha256:xbpszstdhash".to_string(),
+                size: data.len() as u64,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: vec!["x86_64".to_string(), "aarch64".to_string()],
+            },
+            dependencies: deps,
+            format: PackageFormat::Xbps,
+        }))
+    }
+
+    fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
+        let meta = package.metadata();
+        let content = format!("pkgname=\"{}\"\nversion=\"{}\"\nshort_desc=\"{}\"\n", meta.name, meta.version, meta.description);
+        Ok(content.into_bytes())
+    }
+}
+
+pub struct SwupdBundleAdapter;
+impl SwupdBundleAdapter {
+    pub fn new() -> Self { Self }
+}
+impl Default for SwupdBundleAdapter {
+    fn default() -> Self { Self::new() }
+}
+impl IPackageParser for SwupdBundleAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Sigma
+    }
+
+    fn can_parse(&self, data: &[u8]) -> bool {
+        let content = String::from_utf8_lossy(data);
+        content.contains("MANIFEST") && content.contains("BUNDLE:")
+    }
+
+    fn parse(&self, data: &[u8]) -> Result<Box<dyn IPackage>, ParseError> {
+        let content = String::from_utf8_lossy(data);
+        let mut name = "clearlinux-swupd-bundle".to_string();
+        let mut version = Version::new(1, 0, 0);
+        let mut desc = "Clear Linux Swupd Stateless Bundle".to_string();
+
+        for line in content.lines() {
+            let line = line.trim();
+            if let Some(val) = line.strip_prefix("BUNDLE: ") {
+                name = val.to_string();
+            } else if let Some(val) = line.strip_prefix("VERSION: ") {
+                if let Ok(v) = Version::parse(val) {
+                    version = v;
+                }
+            } else if let Some(val) = line.strip_prefix("SUMMARY: ") {
+                desc = val.to_string();
+            }
+        }
+
+        Ok(Box::new(StandardPackage {
+            metadata: PackageMetadata {
+                name,
+                version,
+                description: desc,
+                license: "ClearLinux-Proprietary-Open".to_string(),
+                maintainer: "clearlinux-team".to_string(),
+                homepage: String::new(),
+                architecture: "x86_64_v3".to_string(),
+                checksum: "sha256:swupdhash".to_string(),
+                size: data.len() as u64,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: vec!["x86_64_v3".to_string(), "x86_64_v4".to_string()],
+            },
+            dependencies: Vec::new(),
+            format: PackageFormat::Sigma,
+        }))
+    }
+
+    fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
+        let meta = package.metadata();
+        let content = format!("MANIFEST 100\nBUNDLE: {}\nVERSION: {}\nSUMMARY: {}\n", meta.name, meta.version, meta.description);
+        Ok(content.into_bytes())
+    }
+}
+
+pub struct CachyOSMicroarchAdapter;
+impl CachyOSMicroarchAdapter {
+    pub fn new() -> Self { Self }
+}
+impl Default for CachyOSMicroarchAdapter {
+    fn default() -> Self { Self::new() }
+}
+impl IPackageParser for CachyOSMicroarchAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Pacman
+    }
+
+    fn can_parse(&self, data: &[u8]) -> bool {
+        let content = String::from_utf8_lossy(data);
+        content.contains("cachyos-v3") || content.contains("cachyos-v4") || content.contains("arch = x86_64_v3")
+    }
+
+    fn parse(&self, data: &[u8]) -> Result<Box<dyn IPackage>, ParseError> {
+        let content = String::from_utf8_lossy(data);
+        let mut name = "cachyos-pkg".to_string();
+        let mut version = Version::new(1, 0, 0);
+        let mut desc = "CachyOS x86_64 ISA Optimized Package".to_string();
+        let mut deps = Vec::new();
+
+        for line in content.lines() {
+            let line = line.trim();
+            if let Some(val) = line.strip_prefix("pkgname = ") {
+                name = val.to_string();
+            } else if let Some(val) = line.strip_prefix("pkgver = ") {
+                if let Ok(v) = Version::parse(val) {
+                    version = v;
+                }
+            } else if let Some(val) = line.strip_prefix("pkgdesc = ") {
+                desc = val.to_string();
+            } else if let Some(val) = line.strip_prefix("depend = ") {
+                deps.push(Dependency {
+                    name: val.to_string(),
+                    version_constraint: VersionConstraint::Any,
+                });
+            }
+        }
+
+        Ok(Box::new(StandardPackage {
+            metadata: PackageMetadata {
+                name,
+                version,
+                description: desc,
+                license: "GPL-3.0-or-later".to_string(),
+                maintainer: "cachyos-team".to_string(),
+                homepage: String::new(),
+                architecture: "x86_64_v3".to_string(),
+                checksum: "sha256:cachyhash".to_string(),
+                size: data.len() as u64,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: vec!["x86_64_v3".to_string(), "x86_64_v4".to_string()],
+            },
+            dependencies: deps,
+            format: PackageFormat::Pacman,
+        }))
+    }
+
+    fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
+        let meta = package.metadata();
+        let content = format!("pkgname = {}\npkgver = {}\npkgdesc = {}\narch = x86_64_v3\n", meta.name, meta.version, meta.description);
+        Ok(content.into_bytes())
+    }
+}
+
+pub struct OpkgIpkAdapter;
+impl OpkgIpkAdapter {
+    pub fn new() -> Self { Self }
+}
+impl Default for OpkgIpkAdapter {
+    fn default() -> Self { Self::new() }
+}
+impl IPackageParser for OpkgIpkAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Ipk
+    }
+
+    fn can_parse(&self, data: &[u8]) -> bool {
+        let content = String::from_utf8_lossy(data);
+        content.contains("Package:") && content.contains("Architecture:") && (content.contains("openwrt") || content.contains("opkg"))
+    }
+
+    fn parse(&self, data: &[u8]) -> Result<Box<dyn IPackage>, ParseError> {
+        let content = String::from_utf8_lossy(data);
+        let mut name = "openwrt-opkg".to_string();
+        let mut version = Version::new(1, 0, 0);
+        let mut desc = "OpenWrt / OPKG Control File Package".to_string();
+        let mut deps = Vec::new();
+
+        for line in content.lines() {
+            let line = line.trim();
+            if let Some(val) = line.strip_prefix("Package: ") {
+                name = val.to_string();
+            } else if let Some(val) = line.strip_prefix("Version: ") {
+                if let Ok(v) = Version::parse(val) {
+                    version = v;
+                }
+            } else if let Some(val) = line.strip_prefix("Description: ") {
+                desc = val.to_string();
+            } else if let Some(val) = line.strip_prefix("Depends: ") {
+                for dep in val.split(',') {
+                    let dep_clean = dep.trim();
+                    if !dep_clean.is_empty() {
+                        deps.push(Dependency {
+                            name: dep_clean.to_string(),
+                            version_constraint: VersionConstraint::Any,
+                        });
+                    }
+                }
+            }
+        }
+
+        Ok(Box::new(StandardPackage {
+            metadata: PackageMetadata {
+                name,
+                version,
+                description: desc,
+                license: "GPL-2.0-only".to_string(),
+                maintainer: "openwrt-team".to_string(),
+                homepage: String::new(),
+                architecture: "mips_24kc".to_string(),
+                checksum: "sha256:ipkhash".to_string(),
+                size: data.len() as u64,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: vec!["mips_24kc".to_string(), "aarch64".to_string(), "x86_64".to_string()],
+            },
+            dependencies: deps,
+            format: PackageFormat::Ipk,
+        }))
+    }
+
+    fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
+        let meta = package.metadata();
+        let content = format!("Package: {}\nVersion: {}\nDescription: {}\nArchitecture: mips_24kc\n", meta.name, meta.version, meta.description);
+        Ok(content.into_bytes())
+    }
+}
+
+pub struct BsdPkgPortsAdapter;
+impl BsdPkgPortsAdapter {
+    pub fn new() -> Self { Self }
+}
+impl Default for BsdPkgPortsAdapter {
+    fn default() -> Self { Self::new() }
+}
+impl IPackageParser for BsdPkgPortsAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Pkg
+    }
+
+    fn can_parse(&self, data: &[u8]) -> bool {
+        let content = String::from_utf8_lossy(data);
+        content.contains("+MANIFEST") || content.contains("name: ") && content.contains("origin: ")
+    }
+
+    fn parse(&self, data: &[u8]) -> Result<Box<dyn IPackage>, ParseError> {
+        let content = String::from_utf8_lossy(data);
+        let mut name = "bsd-pkg".to_string();
+        let mut version = Version::new(1, 0, 0);
+        let mut desc = "FreeBSD / OpenBSD Ports & PKG Package".to_string();
+        let mut deps = Vec::new();
+
+        for line in content.lines() {
+            let line = line.trim();
+            if let Some(val) = line.strip_prefix("name: ") {
+                name = val.trim_matches('"').to_string();
+            } else if let Some(val) = line.strip_prefix("version: ") {
+                if let Ok(v) = Version::parse(val.trim_matches('"')) {
+                    version = v;
+                }
+            } else if let Some(val) = line.strip_prefix("comment: ") {
+                desc = val.trim_matches('"').to_string();
+            } else if let Some(val) = line.strip_prefix("deps: ") {
+                for dep in val.split_whitespace() {
+                    deps.push(Dependency {
+                        name: dep.to_string(),
+                        version_constraint: VersionConstraint::Any,
+                    });
+                }
+            }
+        }
+
+        Ok(Box::new(StandardPackage {
+            metadata: PackageMetadata {
+                name,
+                version,
+                description: desc,
+                license: "BSD-2-Clause".to_string(),
+                maintainer: "freebsd-ports".to_string(),
+                homepage: String::new(),
+                architecture: "freebsd:14:x86:64".to_string(),
+                checksum: "sha256:bsdpkghash".to_string(),
+                size: data.len() as u64,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: vec!["freebsd:14:x86:64".to_string()],
+            },
+            dependencies: deps,
+            format: PackageFormat::Pkg,
+        }))
+    }
+
+    fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
+        let meta = package.metadata();
+        let content = format!("name: \"{}\"\nversion: \"{}\"\ncomment: \"{}\"\n", meta.name, meta.version, meta.description);
+        Ok(content.into_bytes())
+    }
+}
+
 pub struct Dnf5SQLiteAdapter;
 impl Dnf5SQLiteAdapter {
     pub fn new() -> Self { Self }
@@ -6179,11 +6611,17 @@ Description: Hook test";
         assert_eq!(local.protocol(), "file");
         assert!(local.fetch("/var/cache/sigmaos/pkg.spkg").is_ok());
 
-        // 5. Modern Format Adapters (Pacman Zstd v2, DNF5, Nix Flake Lock, APK3)
+        // 5. Modern Format Adapters (Pacman Zstd v2, DNF5, Nix Flake Lock, APK3, Portage Ebuild v2, XBPS Zstd, Swupd, CachyOS, OPKG, BSD PKG)
         let zstd_adapter = PacmanZstdV2Adapter::new();
         let dnf5_adapter = Dnf5SQLiteAdapter::new();
         let nix_flake_adapter = NixFlakeLockAdapter::new();
         let apk3_adapter = Apk3SignatureAdapter::new();
+        let ebuild_v2_adapter = PortageEbuildV2Adapter::new();
+        let xbps_zstd_adapter = XbpsZstdAdapter::new();
+        let swupd_adapter = SwupdBundleAdapter::new();
+        let cachyos_adapter = CachyOSMicroarchAdapter::new();
+        let opkg_adapter = OpkgIpkAdapter::new();
+        let bsd_pkg_adapter = BsdPkgPortsAdapter::new();
 
         let zstd_data = b"pkgname = zstd-test\npkgver = 1.2.3\npkgdesc = Modern Zstd v2\ndepend = glibc\n";
         assert!(zstd_adapter.can_parse(zstd_data));
@@ -6204,6 +6642,36 @@ Description: Hook test";
         assert!(apk3_adapter.can_parse(apk3_data));
         let parsed_apk3 = apk3_adapter.parse(apk3_data).unwrap();
         assert_eq!(parsed_apk3.name(), "apk3-test");
+
+        let ebuild_data = b"EAPI=8\nPN=\"gentoo-test\"\nPV=\"2.1.0\"\nDESCRIPTION=\"Ebuild v2\"\nRDEPEND=\"openssl\"\n";
+        assert!(ebuild_v2_adapter.can_parse(ebuild_data));
+        let parsed_ebuild = ebuild_v2_adapter.parse(ebuild_data).unwrap();
+        assert_eq!(parsed_ebuild.name(), "gentoo-test");
+
+        let xbps_data = b"pkgname=\"xbps-test\"\nversion=\"1.0.0\"\nshort_desc=\"Void Zstd\"\narchitecture=\"x86_64\"\n";
+        assert!(xbps_zstd_adapter.can_parse(xbps_data));
+        let parsed_xbps = xbps_zstd_adapter.parse(xbps_data).unwrap();
+        assert_eq!(parsed_xbps.name(), "xbps-test");
+
+        let swupd_data = b"MANIFEST 100\nBUNDLE: desktop-autostart\nVERSION: 42000\nSUMMARY: Clear Linux Bundle\n";
+        assert!(swupd_adapter.can_parse(swupd_data));
+        let parsed_swupd = swupd_adapter.parse(swupd_data).unwrap();
+        assert_eq!(parsed_swupd.name(), "desktop-autostart");
+
+        let cachy_data = b"pkgname = cachy-kernel\npkgver = 6.8.1\npkgdesc = CachyOS kernel\ncachyos-v3\n";
+        assert!(cachyos_adapter.can_parse(cachy_data));
+        let parsed_cachy = cachyos_adapter.parse(cachy_data).unwrap();
+        assert_eq!(parsed_cachy.name(), "cachy-kernel");
+
+        let opkg_data = b"Package: openwrt-mesh\nVersion: 1.0.0\nDescription: OpenWrt mesh\nArchitecture: mips_24kc\n";
+        assert!(opkg_adapter.can_parse(opkg_data));
+        let parsed_opkg = opkg_adapter.parse(opkg_data).unwrap();
+        assert_eq!(parsed_opkg.name(), "openwrt-mesh");
+
+        let bsd_data = b"+MANIFEST\nname: \"freebsd-shell\"\nversion: \"14.0\"\ncomment: \"FreeBSD Shell\"\norigin: \"shells/zsh\"\n";
+        assert!(bsd_pkg_adapter.can_parse(bsd_data));
+        let parsed_bsd = bsd_pkg_adapter.parse(bsd_data).unwrap();
+        assert_eq!(parsed_bsd.name(), "freebsd-shell");
 
         // 6. UDF Extensions
         let mut rewriter = UdfDependencyRewriterEngine::new();
