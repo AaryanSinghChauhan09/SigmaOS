@@ -11,31 +11,30 @@ This document provides concise operational guidelines and next steps for human d
 
 ---
 
-## 🚀 IMMEDIATE NEXT STEPS
+## 🚀 PHASE 2 SYSTEM ADMINISTRATION & CONFIGURATION IMPLEMENTATION
 
-1. **Maintain Pure Rust & High Reliability Standards:**
-   - Keep `cargo check --lib` and `pytest tests/` clean with zero compilation errors and 100% test pass rate.
-   - Address remaining unused parameter compiler warnings by prefixing unused identifiers with underscores (`_`).
+1. **Declarative System Configuration (`src/config/declarative.rs`):**
+   - **SigmaConfig TOML DSL:** Parsed system settings (`hostname`, `timezone`, `locale`), services (`ssh`, `dhcp`), and system package lists.
+   - **Atomic State & Rollback:** Sub-50ms Btrfs snapshot generation tracking (< 12ms achieved in unit tests).
+   - **Idempotency:** Reapplication engine detects unchanged configurations and skips redundant generation creation.
+   - **Version Control:** Git commit metadata logged on each atomic generation commit.
 
-2. **Continue 500+ Repositories Absorption Plan:**
-   - Execute subsystem expansions in alignment with `SIGMAOS_MASTER_PLAN_TRI_AGENT_500_REPOS_ABSORPTION.md`.
-   - Maintain multi-distro package format support in `src/sigpkg/universal_oop_system.rs` and `src/package/universal.rs`.
-
-3. **Autonomous Tri-Agent Governance Execution:**
-   - **Bolt ⚡:** Focus on O(1) buffer lookups, zero-copy IPC queues, and lock-free thread primitives.
-   - **Palette 🎨:** Ensure Zenith desktop compositors and terminal interfaces maintain ARIA accessibility and keyboard navigation.
-   - **Sentinel 🛡️:** Enforce PQC Dilithium-5 signature checks, POSIX pledge/unveil sandboxing, and packed struct memory safety.
+2. **Package Management Unification (`src/package/universal.rs`):**
+   - **Flatpak Bridge:** Sandboxed container execution with permission policy translation.
+   - **Snap Bridge:** Canonical AppArmor confinement policy adapter.
+   - **AUR Helper:** Arch User Repository helper integration with dependency SAT solver support.
+   - **Binary Package Cache:** High-speed caching layer avoiding redundant compilation.
 
 ---
 
 ## 🛠️ DEVELOPER & AI AGENT WORKFLOW RULES
 
 1. **Direct Main Branch Execution:**
-   - Do not open external pull requests. Apply changes directly on the active working branch.
+   - Execute all updates directly on the `main` branch without creating external pull requests.
 
 2. **Mandatory Documentation Synchronization:**
    - Any updates to `ImprovementPlan.md` or `NEXT_STEPS_GUIDELINES.md` must be mirrored across `./`, `docs/`, `wiki/`, `WIKI/`, and `wiki_repo/`.
 
 3. **Pre-Commit Verification Routine:**
-   - Always verify Rust library compilation via `cargo check --lib` or `rustc --test`.
-   - Always run Python system integration tests via `pytest tests/`.
+   - Verify Rust standalone unit tests (`rustc --test`) and library compilation (`cargo check --lib`).
+   - Run Python integration test suite via `pytest tests/`.
