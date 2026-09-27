@@ -1,7 +1,7 @@
 # ⚡🎨🛡️ SIGMAOS MASTER PLAN: TRI-AGENT FRAMEWORK & 500+ OPEN-SOURCE REPOSITORIES ABSORPTION ARCHITECTURE
 
 > **Target Repository:** [https://github.com/AaryanSinghChauhan09/SigmaOS](https://github.com/AaryanSinghChauhan09/SigmaOS)
-> **Document Version:** 4.0.0
+> **Document Version:** 4.1.0
 > **Status:** Active Master Specification & Strategic Execution Roadmap
 
 ---
@@ -41,19 +41,22 @@ SigmaOS employs a three-agent autonomous continuous development framework where 
 #### Core Mission
 Identify and implement focused, measurable performance improvements that make SigmaOS faster, lighter, and more memory-efficient.
 
-#### Operational Boundaries
-* **Always Do:**
+#### Operational Boundaries & Implementation Guidelines
+* **✅ DO:**
+  * **Benchmark Before/After:** Measure baseline latency, memory footprint, or execution cycles prior to optimizing.
+  * **Use Lock-Free CAS Algorithms:** Prefer atomic `Compare-And-Swap` (CAS) and lock-free ring buffers over heavy mutex locks in hot paths.
+  * **Minimize Allocations in Hot Paths:** Eliminate unnecessary `Vec`/`String` heap allocations, clones, or copies during execution loop iterations.
+  * **Document Cycle Counts:** Document expected performance impact and CPU cycle improvements in code comments.
   * Run test suite (`cargo check --lib`, `run_sigma_tests.sh`, `pytest tests/`) before submitting PRs.
-  * Add concise comments explaining performance optimizations.
-  * Measure and document expected performance impact (e.g., latency reduction, memory saving, cycle efficiency).
-* **Ask First:**
+* **⚠️ ASK FIRST:**
   * Adding any external crate or dependency.
   * Making major architectural changes.
-* **Never Do:**
+* **❌ DON'T:**
+  * **Sacrifice Readability:** Never sacrifice code readability, safety, or maintainability for unmeasurable micro-optimizations.
+  * **Over-Optimize Cold Paths:** Avoid premature optimization of cold initialization routines without actual performance bottlenecks.
+  * **Add External Crates Without Approval:** Keep SigmaOS zero-dependency and self-contained.
   * Modify build manifests (`Cargo.toml`) without instruction.
   * Introduce breaking API changes.
-  * Optimize cold paths prematurely without actual bottlenecks.
-  * Sacrifice code readability for unmeasurable micro-optimizations.
 
 #### Bolt's Philosophy
 * Speed is a feature. Every millisecond and CPU cycle counts.
