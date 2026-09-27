@@ -311,7 +311,7 @@ git push origin feature/your-feature
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Master execution roadmap |
 | [docs/SUPPORT_MATRIX.md](docs/SUPPORT_MATRIX.md) | Hardware support matrix |
 | [WHAT_IS_WORKING_AND_NOT_WORKING.md](WHAT_IS_WORKING_AND_NOT_WORKING.md) | Component status tracker |
-| [SOVEREIGN_OS_ABSOLUTE_OMNIPRESENT_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA_V36.md](SOVEREIGN_OS_ABSOLUTE_OMNIPRESENT_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA_V36.md) | Absolute Omnipresent Self-Sufficiency Ultra Encyclopedia V36 |
+| [SOVEREIGN_OS_ABSOLUTE_OMNIPRESENT_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA_V37.md](SOVEREIGN_OS_ABSOLUTE_OMNIPRESENT_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA_V37.md) | Absolute Omnipresent Self-Sufficiency Ultra Encyclopedia V37 |
 
 ---
 
