@@ -179,7 +179,7 @@ impl GpioDriver {
         };
         
         self.write_gpio_register(register_offset, bit_offset, value);
-        self.configured_pins.store(self.configured_pins.load(Ordering::SeqCst, Ordering::SeqCst)) + 1);
+        self.configured_pins.fetch_add(1, Ordering::SeqCst);
         
         Ok(())
     }
@@ -197,10 +197,10 @@ impl GpioDriver {
         
         if state {
             self.write_gpio_register(register_offset, bit_offset, 1);
-            self.pin_states.store(self.pin_states.load(Ordering::SeqCst, Ordering::SeqCst)) | (1 << pin));
+            self.pin_states.fetch_or(1 << pin, Ordering::SeqCst);
         } else {
             self.write_gpio_register(register_offset, bit_offset, 1);
-            self.pin_states.store(self.pin_states.load(Ordering::SeqCst, Ordering::SeqCst)) & !(1 << pin));
+            self.pin_states.fetch_and(!(1 << pin), Ordering::SeqCst);
         }
         
         Ok(())

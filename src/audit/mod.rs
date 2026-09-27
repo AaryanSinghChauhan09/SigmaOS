@@ -335,7 +335,7 @@ impl AuditCollectorBus {
         }
 
         self.audit_cycles_run.fetch_add(1, Ordering::SeqCst);
-        self.last_cycle_time.store(self.get_current_time(, Ordering::SeqCst), Ordering::SeqCst);
+        self.last_cycle_time.store(self.get_current_time(), Ordering::SeqCst);
 
         true
     }
