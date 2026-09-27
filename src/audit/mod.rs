@@ -93,7 +93,17 @@ impl MemoryAuditShard {
         }
     }
 
+    /// Get current timestamp using RDTSC
+    /// 
+    /// # Safety
+    /// RDTSC is a CPU instruction that reads the time-stamp counter.
+    /// This is safe to call in user-space but may have security implications
+    /// as it can be used for timing attacks. In production, use a proper
+    /// system call for time measurement.
     fn get_current_time(&self) -> u64 {
+        // SAFETY: RDTSC is a supported instruction on x86/x64 processors.
+        // The assembly block uses safe register binding and does not modify
+        // memory or dereference pointers.
         unsafe {
             let mut low: u32;
             let mut high: u32;
@@ -185,7 +195,17 @@ impl SandboxAuditShard {
         self.process_pledge_table.load(Ordering::SeqCst) & bit
     }
 
+    /// Get current timestamp using RDTSC
+    /// 
+    /// # Safety
+    /// RDTSC is a CPU instruction that reads the time-stamp counter.
+    /// This is safe to call in user-space but may have security implications
+    /// as it can be used for timing attacks. In production, use a proper
+    /// system call for time measurement.
     fn get_current_time(&self) -> u64 {
+        // SAFETY: RDTSC is a supported instruction on x86/x64 processors.
+        // The assembly block uses safe register binding and does not modify
+        // memory or dereference pointers.
         unsafe {
             let mut low: u32;
             let mut high: u32;
@@ -340,7 +360,17 @@ impl AuditCollectorBus {
         true
     }
 
+    /// Get current timestamp using RDTSC
+    /// 
+    /// # Safety
+    /// RDTSC is a CPU instruction that reads the time-stamp counter.
+    /// This is safe to call in user-space but may have security implications
+    /// as it can be used for timing attacks. In production, use a proper
+    /// system call for time measurement.
     fn get_current_time(&self) -> u64 {
+        // SAFETY: RDTSC is a supported instruction on x86/x64 processors.
+        // The assembly block uses safe register binding and does not modify
+        // memory or dereference pointers.
         unsafe {
             let mut low: u32;
             let mut high: u32;

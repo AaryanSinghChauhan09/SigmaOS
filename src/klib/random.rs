@@ -62,27 +62,25 @@ impl Default for XorShiftRng {
     }
 }
 
-/// Global RNG instance (would be properly initialized in real kernel)
-static mut GLOBAL_RNG: Option<XorShiftRng> = None;
+/// Global RNG instance (thread-safe with OnceLock)
+static GLOBAL_RNG: std::sync::OnceLock<std::sync::Mutex<XorShiftRng>> = std::sync::OnceLock::new();
 
 /// Initialize the global RNG
 pub fn init_global_rng(seed: u64) {
-    unsafe {
-        GLOBAL_RNG = Some(XorShiftRng::new(seed));
-    }
+    GLOBAL_RNG.get_or_init(|| std::sync::Mutex::new(XorShiftRng::new(seed)));
 }
 
 /// Get a random u64 using the global RNG
 pub fn random_u64() -> u64 {
-    unsafe {
-        match &*(&raw const GLOBAL_RNG) {
-            Some(rng) => rng.gen_u64(),
-            None => {
-                // Fallback if not initialized
-                0x123456789ABCDEF0
-            }
+    if let Some(rng_mutex) = GLOBAL_RNG.get() {
+        if let Ok(rng) = rng_mutex.lock() {
+            return rng.gen_u64();
         }
     }
+    // Fallback if not initialized - use a hardware-based or better source in production
+    // WARNING: This fallback is NOT cryptographically secure
+    // In production, always initialize with init_global_rng() using a proper entropy source
+    0x123456789ABCDEF0
 }
 
 /// Get a random u32 using the global RNG

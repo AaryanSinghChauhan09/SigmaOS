@@ -221,6 +221,12 @@ impl GpioDriver {
         Ok(state == 1)
     }
 
+    /// Write to a memory-mapped GPIO register
+    /// 
+    /// # Safety
+    /// In production, this would use unsafe write_volatile to write to
+    /// hardware registers. The address must be a valid MMIO region and
+    /// the caller must ensure proper synchronization with the hardware.
     fn write_gpio_register(&self, offset: u32, bit_offset: u32, value: u32) {
         // Simulated memory-mapped register write
         let address = self.base_address + offset;
@@ -228,6 +234,12 @@ impl GpioDriver {
         // In real implementation: unsafe { write_volatile(address as *mut u32, ...) }
     }
 
+    /// Read from a memory-mapped GPIO register
+    /// 
+    /// # Safety
+    /// In production, this would use unsafe read_volatile to read from
+    /// hardware registers. The address must be a valid MMIO region and
+    /// the caller must ensure proper synchronization with the hardware.
     fn read_gpio_register(&self, offset: u32) -> u32 {
         // Simulated memory-mapped register read
         let address = self.base_address + offset;
