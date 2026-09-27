@@ -1438,7 +1438,13 @@ impl UniversalScriptTranspiler {
     fn transpile_fish_line(line: &str, in_function: &mut bool) -> String {
         let mut l = line.to_string();
 
-        // 0. Fish begin ... end block, if / else if / else / end conditionals, or while loop
+        // 0. Fish status checks, begin ... end block, if / else if / else / end conditionals, or while loop
+        if l == "status is-interactive" || l == "status --is-interactive" {
+            return "[ -t 0 ]".to_string();
+        }
+        if l == "status is-login" || l == "status --is-login" {
+            return "case $- in *i*) true;; *) false;; esac".to_string();
+        }
         if l == "begin" {
             return "{".to_string();
         }
@@ -1476,8 +1482,17 @@ impl UniversalScriptTranspiler {
             }
         }
 
-        // 2. Fish string ops (replace, match, sub, split, join)
-        if l.starts_with("string replace ") {
+        // 2. Fish string ops (replace, match, sub, split, join, collect, lower, upper, pad)
+        if l.starts_with("string replace -r ") || l.starts_with("string replace --regex ") {
+            let rest = l.trim_start_matches("string replace -r ").trim_start_matches("string replace --regex ").trim();
+            let parts: Vec<&str> = rest.split_whitespace().collect();
+            if parts.len() >= 3 {
+                let pat = parts[0].trim_matches('"').trim_matches('\'');
+                let rep = parts[1].trim_matches('"').trim_matches('\'');
+                let target = parts[2..].join(" ");
+                return format!("echo {} | sed -E 's/{}/{}/g'", target, pat, rep);
+            }
+        } else if l.starts_with("string replace ") {
             let rest = l.trim_start_matches("string replace ").trim();
             let parts: Vec<&str> = rest.split_whitespace().collect();
             if parts.len() >= 3 {
@@ -1494,6 +1509,15 @@ impl UniversalScriptTranspiler {
                 let target = parts[1..].join(" ");
                 return format!("echo {} | grep -E {}", target, pat);
             }
+        } else if l.starts_with("string lower ") {
+            let rest = l.trim_start_matches("string lower ").trim();
+            return format!("echo {} | tr '[:upper:]' '[:lower:]'", rest);
+        } else if l.starts_with("string upper ") {
+            let rest = l.trim_start_matches("string upper ").trim();
+            return format!("echo {} | tr '[:lower:]' '[:upper:]'", rest);
+        } else if l.starts_with("string collect ") {
+            let rest = l.trim_start_matches("string collect ").trim();
+            return format!("echo -n {}", rest);
         } else if l.starts_with("string sub ") {
             let rest = l.trim_start_matches("string sub ").trim();
             return format!("echo {} | cut -c1-50", rest);
@@ -1559,27 +1583,44 @@ impl UniversalScriptTranspiler {
         }
 
         // 7. Fish 'set -g VAR val' or 'set -l VAR val' or 'set VAR val' -> 'VAR=val' / 'export VAR=val'
-        if l.starts_with("set -x ") || l.starts_with("set -gx ") {
-            let rest = l
-                .trim_start_matches("set -x ")
-                .trim_start_matches("set -gx ");
-            if let Some(space_idx) = rest.find(' ') {
-                let var = &rest[..space_idx];
-                let val = &rest[space_idx + 1..];
-                return format!("export {}={}", var, val);
+        let export_prefixes = ["set -gx ", "set -Ux ", "set -Lx ", "set -x "];
+        let mut is_export = false;
+        let mut matched_rest: Option<&str> = None;
+
+        for prefix in &export_prefixes {
+            if l.starts_with(prefix) {
+                is_export = true;
+                matched_rest = Some(&l[prefix.len()..]);
+                break;
             }
-        } else if l.starts_with("set -e ") || l.starts_with("set -e") {
-            let var = l.trim_start_matches("set -e ").trim_start_matches("set -e").trim();
+        }
+
+        if is_export {
+            if let Some(rest) = matched_rest {
+                if let Some(space_idx) = rest.find(' ') {
+                    let var = &rest[..space_idx];
+                    let val = &rest[space_idx + 1..];
+                    return format!("export {}={}", var, val);
+                }
+            }
+        } else if l.starts_with("set -e ") || l == "set -e" {
+            let var = l.trim_start_matches("set -e ").trim();
             return format!("unset {}", var);
-        } else if l.starts_with("set -l ") || l.starts_with("set -g ") || l.starts_with("set ") {
-            let rest = l
-                .trim_start_matches("set -l ")
-                .trim_start_matches("set -g ")
-                .trim_start_matches("set ");
-            if let Some(space_idx) = rest.find(' ') {
-                let var = &rest[..space_idx];
-                let val = &rest[space_idx + 1..];
-                return format!("{}={}", var, val);
+        } else if l.starts_with("set -q ") {
+            let var = l.trim_start_matches("set -q ").trim();
+            return format!("[ -n \"${{{}}}\" ]", var);
+        } else {
+            let assign_prefixes = ["set -l ", "set -g ", "set -U ", "set "];
+            for prefix in &assign_prefixes {
+                if l.starts_with(prefix) {
+                    let rest = &l[prefix.len()..];
+                    if let Some(space_idx) = rest.find(' ') {
+                        let var = &rest[..space_idx];
+                        let val = &rest[space_idx + 1..];
+                        return format!("{}={}", var, val);
+                    }
+                    break;
+                }
             }
         }
 
@@ -1611,6 +1652,21 @@ impl UniversalScriptTranspiler {
 
     fn transpile_tcsh_line(line: &str) -> String {
         let l = line.to_string();
+
+        // 0. Tcsh 'if ( -f file )' or 'if ( -d dir )' check
+        if l.starts_with("if ( -f ") || l.starts_with("if ( -d ") || l.starts_with("if ( -e ") {
+            if let Some(open) = l.find('(') {
+                if let Some(close) = l.find(')') {
+                    let cond = l[open + 1..close].trim();
+                    let rest = l[close + 1..].trim();
+                    if rest.starts_with("then") {
+                        return format!("if [ {} ]; then", cond);
+                    } else if !rest.is_empty() {
+                        return format!("if [ {} ]; then {}; fi", cond, rest);
+                    }
+                }
+            }
+        }
 
         // 0. Tcsh switch/case/endsw block
         if l.starts_with("switch (") && l.ends_with(')') {
@@ -1910,10 +1966,11 @@ impl UniversalScriptTranspiler {
             }
         }
 
-        // 0c. Bash declare -a / declare -A -> var=...
-        if l.starts_with("declare -a ") || l.starts_with("declare -A ") || l.starts_with("declare ") {
+        // 0c. Bash declare -a / declare -A / declare -i -> var=...
+        if l.starts_with("declare -a ") || l.starts_with("declare -A ") || l.starts_with("declare -i ") || l.starts_with("declare ") {
             let rest = l.trim_start_matches("declare -a ")
                 .trim_start_matches("declare -A ")
+                .trim_start_matches("declare -i ")
                 .trim_start_matches("declare ")
                 .trim();
             if let Some(eq_idx) = rest.find('=') {
@@ -1921,6 +1978,17 @@ impl UniversalScriptTranspiler {
                 let val = rest[eq_idx + 1..].trim().trim_matches('(').trim_matches(')');
                 return format!("{}=\"{}\"", var, val);
             }
+        }
+
+        // 0c2. Bash mapfile / readarray -> while read -r line
+        if l.starts_with("mapfile ") || l.starts_with("readarray ") {
+            let var = l.trim_start_matches("mapfile ").trim_start_matches("readarray ").trim();
+            let clean_var = if var.contains(' ') {
+                var.split_whitespace().last().unwrap_or("LINES")
+            } else {
+                var
+            };
+            return format!("{}=\"$(cat)\"", clean_var);
         }
 
         // 0d. Zsh ${(A)var=...} -> var=...
@@ -2828,6 +2896,20 @@ mod tests {
 
     #[test]
     fn test_universal_sh_dialect_transpilation() {
+        let fish_more = "status is-interactive\nstring lower HELLO\nset -q PATH\nstring replace -r 'a+' 'b' 'aaa'";
+        let posix_fish_more = UniversalScriptTranspiler::transpile_to_posix_sh(fish_more, ShellDialect::Fish);
+        assert!(posix_fish_more.contains("[ -t 0 ]"));
+        assert!(posix_fish_more.contains("echo HELLO | tr '[:upper:]' '[:lower:]'"));
+        assert!(posix_fish_more.contains("[ -n \"${PATH}\" ]"));
+        assert!(posix_fish_more.contains("sed -E 's/a+/b/g'"));
+
+        let tcsh_file = "if ( -f /etc/sigmaos ) then\n  echo found\nendif";
+        let posix_tcsh_file = UniversalScriptTranspiler::transpile_to_posix_sh(tcsh_file, ShellDialect::Tcsh);
+        assert!(posix_tcsh_file.contains("if [ -f /etc/sigmaos ]; then"));
+
+        let bash_mapfile = "mapfile my_lines";
+        let posix_mapfile = UniversalScriptTranspiler::transpile_to_posix_sh(bash_mapfile, ShellDialect::Bash);
+        assert!(posix_mapfile.contains("my_lines=\"$(cat)\""));
         let xonsh_script = "#!/usr/bin/env xonsh\n$MODE = 'production'\ndef init():\n  echo start";
         assert_eq!(UniversalShellCompatibilityEngine::detect_shebang_dialect(xonsh_script), ShellDialect::Xonsh);
         let posix_xonsh = UniversalScriptTranspiler::transpile_to_posix_sh(xonsh_script, ShellDialect::Xonsh);

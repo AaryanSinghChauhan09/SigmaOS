@@ -2475,17 +2475,90 @@ mod tests {
         let (grid_count, reflow_count) = suite.compute_multi_engine_layout(900.0, 600.0);
         assert_eq!(grid_count, 3);
         assert_eq!(reflow_count, 1);
+
+        assert_eq!(suite.quantum_style.resolve_css_var("var(--primary-bg)"), "#1e1e2e");
+        assert!(suite.quantum_style.evaluate_media_query("(prefers-color-scheme: dark)"));
+
+        let decompressed = suite.v8_auditor.decompress_tagged_pointer(0x0080);
+        assert_eq!(decompressed, 0x1000_0000_0080);
+        assert!(!suite.v8_auditor.audit_v8_jit_memory_page(true, true)); // W^X violation
+        assert!(suite.v8_auditor.audit_v8_jit_memory_page(false, true)); // Executable only
+    }
+}
+
+// =========================================================================
+// 23. ADVANCED OPEN-SOURCE BROWSER ARCHITECTURE ENGINES
+// =========================================================================
+
+pub struct FirefoxQuantumStyleSystemEngine {
+    pub css_variables: BTreeMap<String, String>,
+    pub prefers_dark_mode: bool,
+}
+
+impl FirefoxQuantumStyleSystemEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        let mut vars = BTreeMap::new();
+        vars.insert("--primary-bg".to_string(), "#1e1e2e".to_string());
+        vars.insert("--text-color".to_string(), "#cdd6f4".to_string());
+        Self {
+            css_variables: vars,
+            prefers_dark_mode: true,
+        }
+    }
+
+    pub fn resolve_css_var(&self, var_expr: &str) -> String {
+        let clean = var_expr.trim_start_matches("var(").trim_end_matches(')').trim();
+        self.css_variables.get(clean).cloned().unwrap_or_else(|| String::from("inherit"))
+    }
+
+    pub fn evaluate_media_query(&self, query: &str) -> bool {
+        if query.contains("prefers-color-scheme: dark") {
+            self.prefers_dark_mode
+        } else {
+            true
+        }
+    }
+}
+
+pub struct ChromiumV8JitSandboxAuditorEngine {
+    pub pointer_compression_base: u64,
+    pub is_wx_enforced: bool,
+}
+
+impl ChromiumV8JitSandboxAuditorEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            pointer_compression_base: 0x1000_0000_0000,
+            is_wx_enforced: true,
+        }
+    }
+
+    pub fn decompress_tagged_pointer(&self, compressed_32bit_offset: u32) -> u64 {
+        self.pointer_compression_base + (compressed_32bit_offset as u64)
+    }
+
+    pub fn audit_v8_jit_memory_page(&self, is_writable: bool, is_executable: bool) -> bool {
+        if self.is_wx_enforced && is_writable && is_executable {
+            return false; // W^X violation detected!
+        }
+        true
     }
 }
 
 pub struct SovereignOpenSourceBrowserSuiteEngine {
     pub browser: SigmaWebBrowser,
+    pub quantum_style: FirefoxQuantumStyleSystemEngine,
+    pub v8_auditor: ChromiumV8JitSandboxAuditorEngine,
 }
 
 impl SovereignOpenSourceBrowserSuiteEngine {
     pub fn new() -> Self {
         Self {
             browser: SigmaWebBrowser::new(),
+            quantum_style: FirefoxQuantumStyleSystemEngine::new(),
+            v8_auditor: ChromiumV8JitSandboxAuditorEngine::new(),
         }
     }
 
