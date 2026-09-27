@@ -23,6 +23,8 @@ pub mod sigmafs;
 // pub mod support;
 // pub mod vfs;
 pub mod xfs;
+pub mod fscrypt;
+pub mod autofs;
 
 pub use btrfs::{
     BtrfsExtent, BtrfsFilesystem, BtrfsSnapshot, BtrfsSubvolume, ChecksumType,
@@ -35,6 +37,14 @@ pub use sigmafs::{
 pub use xfs::{
     AllocationStrategy, XfsAllocationGroup, XfsExtent, XfsFilesystem, XfsInode, XfsJournal,
     XfsState,
+};
+
+pub use fscrypt::{
+    EncryptionPolicy, EncryptionContext, FscryptManager,
+};
+
+pub use autofs::{
+    MountTriggerType, MountPoint, AutoFsManager,
 };
 
 pub mod bcachefs_sovereign;

@@ -356,7 +356,7 @@ impl PciDriver for BroadcomWifiPciDriver {
 
         // Check for known WiFi device IDs
         let supported = match device.device_id {
-            BCM4318 | BCM4311 | BCM4313 | BCM43142 | BCM43455 | BCM4356 | CYW89820 | CYW54591 => {
+            BCM4318 | BCM4311 | BCM4313 | BCM43142 | BCM43455 | BCM4356 | CYW89820 => {
                 true
             }
             _ => false,
