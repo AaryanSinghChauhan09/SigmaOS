@@ -1,7 +1,28 @@
 // Modern high-performance NVMe PCIe block storage & AHCI SATA Controller Driver
 // Conforms to SigmaOS Unified Peripheral Architecture
+// Enhanced with NVMe 1.4/2.0 multi-queue support
 
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
+use std::vec::Vec;
+
+/// NVMe Command Opcode
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NvmeOpcode {
+    Flush = 0x00,
+    Write = 0x01,
+    Read = 0x02,
+    WriteUncorrectable = 0x04,
+    Compare = 0x05,
+    WriteZeroes = 0x08,
+    DatasetManagement = 0x09,
+    SecuritySend = 0x11,
+    SecurityReceive = 0x12,
+    GetLogPage = 0x02,
+    Identify = 0x06,
+    Abort = 0x08,
+    FirmwareActivate = 0x10,
+    FirmwareImageDownload = 0x11,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct NvmeCmd {
@@ -9,47 +30,74 @@ pub struct NvmeCmd {
     pub nsid: u32,
     pub prp1: u64,
     pub prp2: u64,
+    pub cdw10: u32,
+    pub cdw11: u32,
 }
 
+/// NVMe Submission Queue with multi-queue support
 pub struct NvmeSubmissionQueue {
+    pub id: u16,
     pub size: usize,
     pub head: usize,
     pub tail: usize,
+    pub phase: bool,
+    pub commands: Vec<NvmeCmd>,
 }
 
 impl NvmeSubmissionQueue {
-    pub fn new(size: usize) -> Self {
+    pub fn new(id: u16, size: usize) -> Self {
         Self {
+            id,
             size,
             head: 0,
             tail: 0,
+            phase: true,
+            commands: vec![NvmeCmd {
+                opcode: 0,
+                nsid: 0,
+                prp1: 0,
+                prp2: 0,
+                cdw10: 0,
+                cdw11: 0,
+            }; size],
         }
     }
 
     /// Submits a command and increments the doorbell tail pointer (doorbell write)
-    pub fn submit_command(&mut self, _cmd: NvmeCmd) -> Result<usize, &'static str> {
+    pub fn submit_command(&mut self, cmd: NvmeCmd) -> Result<usize, &'static str> {
         let next_tail = (self.tail + 1) % self.size;
         if next_tail == self.head {
             return Err("Submission queue is full");
         }
+        self.commands[self.tail] = cmd;
         let submitted_idx = self.tail;
         self.tail = next_tail;
         Ok(submitted_idx)
     }
+
+    /// Ring the submission queue doorbell
+    pub fn ring_doorbell(&mut self) -> u32 {
+        self.tail as u32
+    }
 }
 
+/// NVMe Completion Queue with phase tracking
 pub struct NvmeCompletionQueue {
+    pub id: u16,
     pub size: usize,
     pub head: usize,
     pub phase: bool,
+    pub interrupt_vector: u16,
 }
 
 impl NvmeCompletionQueue {
-    pub fn new(size: usize) -> Self {
+    pub fn new(id: u16, size: usize, interrupt_vector: u16) -> Self {
         Self {
+            id,
             size,
             head: 0,
             phase: true,
+            interrupt_vector,
         }
     }
 
@@ -61,6 +109,26 @@ impl NvmeCompletionQueue {
             self.phase = !self.phase; // phase bit flips on wrap
         }
         (reaped_head, self.phase)
+    }
+
+    /// Get the interrupt vector for this completion queue
+    pub fn interrupt_vector(&self) -> u16 {
+        self.interrupt_vector
+    }
+}
+
+/// NVMe Queue Pair (submission + completion)
+pub struct NvmeQueuePair {
+    pub submission: NvmeSubmissionQueue,
+    pub completion: NvmeCompletionQueue,
+}
+
+impl NvmeQueuePair {
+    pub fn new(sq_id: u16, cq_id: u16, size: usize, interrupt_vector: u16) -> Self {
+        Self {
+            submission: NvmeSubmissionQueue::new(sq_id, size),
+            completion: NvmeCompletionQueue::new(cq_id, size, interrupt_vector),
+        }
     }
 }
 
@@ -142,21 +210,21 @@ impl AhciPort {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceGeneration {
     Legacy,
     Modern,
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PowerState {
     Off,
     On,
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 pub trait PeripheralDevice {
     fn name(&self) -> &'static str;
     fn generation(&self) -> DeviceGeneration;
@@ -285,13 +353,15 @@ impl PeripheralDevice for AhciStorageDriver {
     }
 }
 
-/// PCIe NVMe Solid-State Block Driver
+/// PCIe NVMe Solid-State Block Driver with multi-queue support
 pub struct ModernNvmeDriver {
     pub is_initialized: bool,
     pub power_state: PowerState,
     pub lba_count: u64,
-    pub submission_doorbell: u32,
-    pub completion_doorbell: u32,
+    pub namespace_id: u32,
+    pub queue_pairs: Vec<NvmeQueuePair>,
+    pub admin_queue: NvmeQueuePair,
+    pub max_queue_depth: u16,
 }
 
 impl ModernNvmeDriver {
@@ -300,8 +370,10 @@ impl ModernNvmeDriver {
             is_initialized: false,
             power_state: PowerState::Off,
             lba_count,
-            submission_doorbell: 0,
-            completion_doorbell: 0,
+            namespace_id: 1,
+            queue_pairs: Vec::new(),
+            admin_queue: NvmeQueuePair::new(0, 0, 64, 0),
+            max_queue_depth: 64,
         }
     }
 
@@ -309,9 +381,85 @@ impl ModernNvmeDriver {
         self.lba_count
     }
 
+    /// Create I/O queue pair
+    pub fn create_io_queue(&mut self, sq_id: u16, cq_id: u16, interrupt_vector: u16) -> Result<(), &'static str> {
+        if self.queue_pairs.len() >= 65535 {
+            return Err("Maximum number of queues reached");
+        }
+        let qp = NvmeQueuePair::new(sq_id, cq_id, self.max_queue_depth as usize, interrupt_vector);
+        self.queue_pairs.push(qp);
+        Ok(())
+    }
+
+    /// Submit NVMe read command to I/O queue
+    pub fn submit_read(
+        &mut self,
+        queue_index: usize,
+        lba: u64,
+        sectors: u32,
+        prp1: u64,
+        prp2: u64,
+    ) -> Result<usize, &'static str> {
+        if queue_index >= self.queue_pairs.len() {
+            return Err("Invalid queue index");
+        }
+
+        let cmd = NvmeCmd {
+            opcode: NvmeOpcode::Read as u8,
+            nsid: self.namespace_id,
+            prp1,
+            prp2,
+            cdw10: lba as u32,
+            cdw11: (lba >> 32) as u32,
+        };
+
+        self.queue_pairs[queue_index].submission.submit_command(cmd)
+    }
+
+    /// Submit NVMe write command to I/O queue
+    pub fn submit_write(
+        &mut self,
+        queue_index: usize,
+        lba: u64,
+        sectors: u32,
+        prp1: u64,
+        prp2: u64,
+    ) -> Result<usize, &'static str> {
+        if queue_index >= self.queue_pairs.len() {
+            return Err("Invalid queue index");
+        }
+
+        let cmd = NvmeCmd {
+            opcode: NvmeOpcode::Write as u8,
+            nsid: self.namespace_id,
+            prp1,
+            prp2,
+            cdw10: lba as u32,
+            cdw11: (lba >> 32) as u32,
+        };
+
+        self.queue_pairs[queue_index].submission.submit_command(cmd)
+    }
+
     /// Ring NVMe Submission Queue Doorbell
-    pub fn ring_submission_doorbell(&mut self, tail_ptr: u32) {
-        self.submission_doorbell = tail_ptr;
+    pub fn ring_submission_doorbell(&mut self, queue_index: usize) -> Result<u32, &'static str> {
+        if queue_index >= self.queue_pairs.len() {
+            return Err("Invalid queue index");
+        }
+        Ok(self.queue_pairs[queue_index].submission.ring_doorbell())
+    }
+
+    /// Reap completion from I/O queue
+    pub fn reap_completion(&mut self, queue_index: usize) -> Result<(usize, bool), &'static str> {
+        if queue_index >= self.queue_pairs.len() {
+            return Err("Invalid queue index");
+        }
+        Ok(self.queue_pairs[queue_index].completion.reap_completion())
+    }
+
+    /// Get number of I/O queue pairs
+    pub fn queue_count(&self) -> usize {
+        self.queue_pairs.len()
     }
 }
 
@@ -369,7 +517,7 @@ impl PeripheralDevice for ModernNvmeDriver {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -382,6 +530,64 @@ mod tests {
         assert_eq!(driver.generation(), DeviceGeneration::Modern);
         assert_eq!(driver.write(&[1, 2, 3]).unwrap(), 3);
         driver.shutdown().unwrap();
+    }
+
+    #[test]
+    fn test_ahci_sata_driver() {
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_nvme_lifecycle() {
+        let mut driver = ModernNvmeDriver::new(2048);
+        assert!(driver.read(&mut [0; 10]).is_err());
+        driver.initialize().unwrap();
+        assert_eq!(driver.name(), "PCIe NVMe Solid-State Block Driver");
+        assert_eq!(driver.generation(), DeviceGeneration::Modern);
+        assert_eq!(driver.write(&[1, 2, 3]).unwrap(), 3);
+        driver.shutdown().unwrap();
+    }
+
+    #[test]
+    fn test_nvme_multi_queue() {
+        let mut driver = ModernNvmeDriver::new(2048);
+        driver.initialize().unwrap();
+        
+        // Create I/O queue pair
+        assert!(driver.create_io_queue(1, 1, 1).is_ok());
+        assert_eq!(driver.queue_count(), 1);
+        
+        // Submit read command
+        let result = driver.submit_read(0, 0, 1, 0x1000, 0);
+        assert!(result.is_ok());
+        
+        // Ring doorbell
+        let tail = driver.ring_submission_doorbell(0);
+        assert!(tail.is_ok());
+        
+        // Reap completion
+        let completion = driver.reap_completion(0);
+        assert!(completion.is_ok());
+    }
+
+    #[test]
+    fn test_nvme_queue_operations() {
+        let qp = NvmeQueuePair::new(1, 1, 64, 1);
+        assert_eq!(qp.completion.interrupt_vector(), 1);
+        
+        let cmd = NvmeCmd {
+            opcode: NvmeOpcode::Read as u8,
+            nsid: 1,
+            prp1: 0x1000,
+            prp2: 0,
+            cdw10: 0,
+            cdw11: 0,
+        };
+        
+        let mut qp = qp;
+        assert!(qp.submission.submit_command(cmd).is_ok());
+        assert_eq!(qp.submission.ring_doorbell(), 1);
     }
 
     #[test]
