@@ -18,6 +18,8 @@
 
 pub mod btrfs;
 // pub mod filesystem;
+pub mod btrfs_send_receive;
+pub use btrfs_send_receive::{BtrfsSendOp, BtrfsSendCommand, BtrfsSendStream, BtrfsReceiveContext, BtrfsSubvolume, BtrfsSendReceiveManager};
 pub mod sigmacas;
 pub mod sigmafs;
 // pub mod support;
