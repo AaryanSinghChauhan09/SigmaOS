@@ -1,28 +1,28 @@
 // Simple random number generator for SigmaOS
 // Reduces dependency on external rand crate
 
-use core::cell::Cell;
+use core::sync::atomic::{AtomicU64, Ordering};
 
 /// Simple XORShift PRNG implementation
 pub struct XorShiftRng {
-    state: Cell<u64>,
+    state: AtomicU64,
 }
 
 impl XorShiftRng {
     /// Create a new RNG with a seed
     pub fn new(seed: u64) -> Self {
         Self {
-            state: Cell::new(seed),
+            state: AtomicU64::new(seed),
         }
     }
 
     /// Generate a random u64
     pub fn gen_u64(&self) -> u64 {
-        let mut state = self.state.get();
+        let mut state = self.state.load(Ordering::SeqCst);
         state ^= state >> 12;
         state ^= state << 25;
         state ^= state >> 27;
-        self.state.set(state);
+        self.state.store(state, Ordering::SeqCst);
         state
     }
 

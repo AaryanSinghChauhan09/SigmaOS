@@ -4,8 +4,7 @@
 // Enhanced with real enforcement capabilities for Linux/BSD parity
 
 
-use core::cell::Cell;
-use core::sync::atomic::{AtomicU64, Ordering};
+use core::sync::atomic::{AtomicU32, AtomicU64, AtomicBool, Ordering};
 
 /// Audit log entry types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -40,33 +39,33 @@ pub enum AuditSeverity {
 
 /// Memory audit shard for W^X enforcement
 pub struct MemoryAuditShard {
-    pub violations_detected: Cell<u32>,
-    pub last_scan_time: Cell<u64>,
-    pub page_walker_enabled: Cell<bool>,
-    pub wwx_violations: Cell<u32>,
+    pub violations_detected: AtomicU32,
+    pub last_scan_time: AtomicU64,
+    pub page_walker_enabled: AtomicBool,
+    pub wwx_violations: AtomicU32,
 }
 
 impl MemoryAuditShard {
     pub const fn new() -> Self {
         Self {
-            violations_detected: Cell::new(0),
-            last_scan_time: Cell::new(0),
-            page_walker_enabled: Cell::new(true),
-            wwx_violations: Cell::new(0),
+            violations_detected: AtomicU32::new(0),
+            last_scan_time: AtomicU64::new(0),
+            page_walker_enabled: AtomicBool::new(true),
+            wwx_violations: AtomicU32::new(0),
         }
     }
 
     pub fn scan_page_tables(&self) -> bool {
-        if !self.page_walker_enabled.get() {
+        if !self.page_walker_enabled.load(Ordering::SeqCst) {
             return true;
         }
 
         let current_time = self.get_current_time();
         let violations = self.walk_page_tables();
         
-        self.wwx_violations.set(violations);
-        self.violations_detected.set(self.violations_detected.get() + violations);
-        self.last_scan_time.set(current_time);
+        self.wwx_violations.store(violations, Ordering::SeqCst);
+        self.violations_detected.fetch_add(violations, Ordering::SeqCst);
+        self.last_scan_time.store(current_time, Ordering::SeqCst);
 
         violations == 0
     }
@@ -110,11 +109,11 @@ impl MemoryAuditShard {
     }
 
     pub fn set_page_walker_enabled(&self, enabled: bool) {
-        self.page_walker_enabled.set(enabled);
+        self.page_walker_enabled.store(enabled, Ordering::SeqCst);
     }
 
     pub fn get_violation_stats(&self) -> (u32, u32) {
-        (self.violations_detected.get(), self.wwx_violations.get())
+        (self.violations_detected.load(Ordering::SeqCst)), self.wwx_violations.load(Ordering::SeqCst)))
     }
 }
 
@@ -137,7 +136,7 @@ impl SandboxAuditShard {
     }
 
     pub fn log_blocked_syscall(&self, _syscall_number: usize, process_id: usize) {
-        self.blocked_syscalls.set(self.blocked_syscalls.get() + 1);
+        self.blocked_syscalls.store(self.blocked_syscalls.load(Ordering::SeqCst, Ordering::SeqCst)) + 1);
         
         let entry = AuditEntry {
             event_type: AuditEventType::SyscallBlocked,
@@ -151,14 +150,14 @@ impl SandboxAuditShard {
     }
 
     pub fn check_pledge_compliance(&self, process_id: usize, requested_permissions: u64) -> bool {
-        if !self.active_monitoring.get() {
+        if !self.active_monitoring.load(Ordering::SeqCst)) {
             return true;
         }
 
         let current_pledges = self.get_process_pledges(process_id);
         
         if (requested_permissions & !current_pledges) != 0 {
-            self.pledge_violations.set(self.pledge_violations.get() + 1);
+            self.pledge_violations.store(self.pledge_violations.load(Ordering::SeqCst, Ordering::SeqCst)) + 1);
             
             let entry = AuditEntry {
                 event_type: AuditEventType::SandboxViolation,
@@ -177,13 +176,13 @@ impl SandboxAuditShard {
 
     pub fn set_process_pledges(&self, process_id: usize, _permissions: u64) {
         let bit = 1u64 << (process_id % 64);
-        let current = self.process_pledge_table.get();
-        self.process_pledge_table.set(current | bit);
+        let current = self.process_pledge_table.load(Ordering::SeqCst));
+        self.process_pledge_table.store(current | bit, Ordering::SeqCst);
     }
 
     fn get_process_pledges(&self, process_id: usize) -> u64 {
         let bit = 1u64 << (process_id % 64);
-        self.process_pledge_table.get() & bit
+        self.process_pledge_table.load(Ordering::SeqCst)) & bit
     }
 
     fn get_current_time(&self) -> u64 {
@@ -206,11 +205,11 @@ impl SandboxAuditShard {
     }
 
     pub fn set_active_monitoring(&self, active: bool) {
-        self.active_monitoring.set(active);
+        self.active_monitoring.store(active, Ordering::SeqCst);
     }
 
     pub fn get_stats(&self) -> (u32, u32) {
-        (self.blocked_syscalls.get(), self.pledge_violations.get())
+        (self.blocked_syscalls.load(Ordering::SeqCst)), self.pledge_violations.load(Ordering::SeqCst)))
     }
 }
 
@@ -233,16 +232,16 @@ impl CryptoAuditShard {
     }
 
     pub fn sign_entry(&self, entry: &AuditEntry) -> bool {
-        if !self.pqc_enabled.get() {
+        if !self.pqc_enabled.load(Ordering::SeqCst)) {
             return true;
         }
 
         let signature_success = self.generate_dilithium_signature(entry);
         
         if signature_success {
-            self.signed_entries.set(self.signed_entries.get() + 1);
+            self.signed_entries.store(self.signed_entries.load(Ordering::SeqCst, Ordering::SeqCst)) + 1);
         } else {
-            self.signature_failures.set(self.signature_failures.get() + 1);
+            self.signature_failures.store(self.signature_failures.load(Ordering::SeqCst, Ordering::SeqCst)) + 1);
         }
         
         signature_success
@@ -271,15 +270,15 @@ impl CryptoAuditShard {
     }
 
     pub fn set_pqc_enabled(&self, enabled: bool) {
-        self.pqc_enabled.set(enabled);
+        self.pqc_enabled.store(enabled, Ordering::SeqCst);
     }
 
     pub fn set_signing_key_id(&self, key_id: usize) {
-        self.signing_key_id.set(key_id);
+        self.signing_key_id.store(key_id, Ordering::SeqCst);
     }
 
     pub fn get_stats(&self) -> (u32, u32) {
-        (self.signed_entries.get(), self.signature_failures.get())
+        (self.signed_entries.load(Ordering::SeqCst)), self.signature_failures.load(Ordering::SeqCst)))
     }
 }
 
@@ -336,7 +335,7 @@ impl AuditCollectorBus {
         }
 
         self.audit_cycles_run.fetch_add(1, Ordering::SeqCst);
-        self.last_cycle_time.store(self.get_current_time(), Ordering::SeqCst);
+        self.last_cycle_time.store(self.get_current_time(, Ordering::SeqCst), Ordering::SeqCst);
 
         true
     }

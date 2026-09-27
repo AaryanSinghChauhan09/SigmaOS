@@ -1,7 +1,7 @@
 // SigmaOS Custom Time Implementation
 // Reduces dependency on std::time by providing custom implementations
 
-use core::cell::Cell;
+use core::sync::atomic::{AtomicU64, AtomicU32, Ordering};
 
 /// Custom timestamp for OS timekeeping
 #[derive(Debug, Clone, Copy)]
@@ -111,31 +111,37 @@ impl SigmaDuration {
 
 /// Timer for measuring time intervals
 pub struct SigmaTimer {
-    pub start_time: Cell<SigmaTimestamp>,
-    pub elapsed: Cell<SigmaDuration>,
+    pub start_time: AtomicU64,
+    pub elapsed_seconds: AtomicU64,
+    pub elapsed_nanos: AtomicU32,
 }
 
 impl SigmaTimer {
     pub fn new() -> Self {
         SigmaTimer {
-            start_time: Cell::new(SigmaTimestamp::now()),
-            elapsed: Cell::new(SigmaDuration::new(0, 0)),
+            start_time: AtomicU64::new(0),
+            elapsed_seconds: AtomicU64::new(0),
+            elapsed_nanos: AtomicU32::new(0),
         }
     }
 
     /// Start the timer
     pub fn start(&self) {
-        self.start_time.set(SigmaTimestamp::now());
+        let now = SigmaTimestamp::now();
+        let time_val = (now.seconds << 32) | now.nanoseconds as u64;
+        self.start_time.store(time_val, Ordering::SeqCst);
     }
 
     /// Stop the timer and get elapsed time
     pub fn stop(&self) -> SigmaDuration {
         let now = SigmaTimestamp::now();
-        let start = self.start_time.get();
+        let start_val = self.start_time.load(Ordering::SeqCst);
+        let start_seconds = start_val >> 32;
+        let start_nanos = (start_val & 0xFFFFFFFF) as u32;
 
         // Calculate elapsed time
-        let mut elapsed_seconds = now.seconds - start.seconds;
-        let mut elapsed_nanos = now.nanoseconds as i64 - start.nanoseconds as i64;
+        let mut elapsed_seconds = now.seconds - start_seconds;
+        let mut elapsed_nanos = now.nanoseconds as i64 - start_nanos as i64;
 
         if elapsed_nanos < 0 {
             elapsed_seconds -= 1;
@@ -147,18 +153,21 @@ impl SigmaTimer {
             nanoseconds: elapsed_nanos as u32,
         };
 
-        self.elapsed.set(elapsed);
+        self.elapsed_seconds.store(elapsed_seconds, Ordering::SeqCst);
+        self.elapsed_nanos.store(elapsed_nanos as u32, Ordering::SeqCst);
         elapsed
     }
 
     /// Get elapsed time without stopping
     pub fn elapsed(&self) -> SigmaDuration {
         let now = SigmaTimestamp::now();
-        let start = self.start_time.get();
+        let start_val = self.start_time.load(Ordering::SeqCst);
+        let start_seconds = start_val >> 32;
+        let start_nanos = (start_val & 0xFFFFFFFF) as u32;
 
         // Calculate elapsed time
-        let mut elapsed_seconds = now.seconds - start.seconds;
-        let mut elapsed_nanos = now.nanoseconds as i64 - start.nanoseconds as i64;
+        let mut elapsed_seconds = now.seconds - start_seconds;
+        let mut elapsed_nanos = now.nanoseconds as i64 - start_nanos as i64;
 
         if elapsed_nanos < 0 {
             elapsed_seconds -= 1;
@@ -173,8 +182,11 @@ impl SigmaTimer {
 
     /// Reset the timer
     pub fn reset(&self) {
-        self.start_time.set(SigmaTimestamp::now());
-        self.elapsed.set(SigmaDuration::new(0, 0));
+        let now = SigmaTimestamp::now();
+        let time_val = (now.seconds << 32) | now.nanoseconds as u64;
+        self.start_time.store(time_val, Ordering::SeqCst);
+        self.elapsed_seconds.store(0, Ordering::SeqCst);
+        self.elapsed_nanos.store(0, Ordering::SeqCst);
     }
 }
 
