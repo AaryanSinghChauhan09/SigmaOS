@@ -250,6 +250,8 @@ User Application
 - [ ] ACPI power management
 - [ ] Self-hosting compiler toolchain
 
+For the phased strategic plan (desktop/UX, declarative configuration, hardware, developer tooling, security, and ecosystem), see the [Omarchy-Inspired Development Roadmap](docs/OMARCHY_INSPIRED_DEVELOPMENT_ROADMAP.md).
+
 ---
 
 ## 🧪 Testing
@@ -309,6 +311,7 @@ git push origin feature/your-feature
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Detailed system architecture guide |
 | [docs/PRODUCT_VISION.md](docs/PRODUCT_VISION.md) | Product vision and manifesto |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Master execution roadmap |
+| [docs/OMARCHY_INSPIRED_DEVELOPMENT_ROADMAP.md](docs/OMARCHY_INSPIRED_DEVELOPMENT_ROADMAP.md) | Phased, Omarchy-inspired development roadmap (desktop, config, hardware, tooling, security, ecosystem) |
 | [docs/SUPPORT_MATRIX.md](docs/SUPPORT_MATRIX.md) | Hardware support matrix |
 | [WHAT_IS_WORKING_AND_NOT_WORKING.md](WHAT_IS_WORKING_AND_NOT_WORKING.md) | Component status tracker |
 
