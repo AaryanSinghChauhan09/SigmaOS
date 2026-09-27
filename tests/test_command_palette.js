@@ -55,7 +55,12 @@ global.document = {
     return el;
   },
   getElementById: (id) => mockElements[id] || createMockElement(id),
-  querySelectorAll: () => []
+  querySelectorAll: (selector) => {
+    if (selector === ".window") {
+      return Object.values(mockElements).filter((el) => el.classList.contains("window"));
+    }
+    return [];
+  }
 };
 
 // Test 1: Full command list rendering and ARIA combobox attributes
@@ -87,4 +92,26 @@ assert.strictEqual(cmdInputEl.getAttribute("aria-activedescendant"), undefined, 
 zenith.closeCommandPalette();
 assert.strictEqual(cmdInputEl.getAttribute("aria-expanded"), "false", "Expected aria-expanded to be 'false' on close");
 
-console.log("All Command Palette UX tests passed successfully!");
+// Test 5: initWindowFocus attaches event listeners and raises zIndex on mousedown/focusin
+const win1 = createMockElement("win1");
+win1.classList.add("window");
+const win2 = createMockElement("win2");
+win2.classList.add("window");
+
+zenith.initWindowFocus();
+
+// Simulate mousedown on win1
+win1.dispatchEvent({ type: "mousedown" });
+assert.strictEqual(win1.classList.contains("active-focus"), true, "win1 should have active-focus on mousedown");
+assert.strictEqual(win2.classList.contains("active-focus"), false, "win2 should not have active-focus when win1 is focused");
+const win1ZIndex = Number(win1.style.zIndex);
+
+// Simulate focusin on win2
+win2.dispatchEvent({ type: "focusin" });
+assert.strictEqual(win2.classList.contains("active-focus"), true, "win2 should have active-focus on focusin");
+assert.strictEqual(win1.classList.contains("active-focus"), false, "win1 should lose active-focus when win2 receives focus");
+assert.strictEqual(Number(win2.style.zIndex) > win1ZIndex, true, "win2 zIndex should be higher than win1 zIndex");
+
+console.log("✓ Window focus elevation test passed!");
+
+console.log("All Command Palette & Window UX tests passed successfully!");

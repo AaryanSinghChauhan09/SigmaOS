@@ -545,6 +545,25 @@ export function initDockShortcutNavigation() {
   });
 }
 
+/**
+ * Initializes click-to-raise and focus-to-raise behavior for desktop windows.
+ * Elevates z-index and sets active focus state when clicking or focusing inside a window.
+ */
+export function initWindowFocus() {
+  if (typeof document === "undefined") return;
+  const windows = SovereignDomSelector.selectAll(".window");
+  windows.forEach((win) => {
+    const raiseWindow = () => {
+      topZIndex += 1;
+      win.style.zIndex = topZIndex;
+      SovereignDomSelector.selectAll(".window").forEach((w) => w.classList.remove("active-focus"));
+      win.classList.add("active-focus");
+    };
+    win.addEventListener("mousedown", raiseWindow);
+    win.addEventListener("focusin", raiseWindow);
+  });
+}
+
 // Auto-initialize accessibility listeners when loaded in browser environments
 if (typeof window !== "undefined" && typeof document !== "undefined") {
   if (document.readyState === "loading") {
@@ -558,6 +577,7 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
       initDockShortcutNavigation();
       initMenuNavigation();
       initContextMenu();
+      initWindowFocus();
     });
   } else {
     initKeyboardNavigation();
@@ -569,6 +589,7 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
     initDockShortcutNavigation();
     initMenuNavigation();
     initContextMenu();
+    initWindowFocus();
   }
 }
 
