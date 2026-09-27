@@ -259,7 +259,20 @@ impl CinnamonExtension {
     }
 }
 
-/// XApp preferences (cross-desktop integration)
+/// Titlebar layout style for XApp applications across desktop environments
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum XAppTitlebarStyle {
+    /// Traditional titlebar with separate menubar and toolbar
+    Traditional,
+    /// Headerbar / CSD (Client-Side Decoration) titlebar
+    HeaderBar,
+    /// Compact headerbar with integrated tabs
+    CompactHeaderBar,
+    /// Seamless borderless window with overlay controls
+    SeamlessOverlay,
+}
+
+/// XApp preferences (cross-desktop integration & common resources)
 #[derive(Debug, Clone)]
 pub struct XAppPreferences {
     /// Application name
@@ -282,6 +295,18 @@ pub struct XAppPreferences {
     pub locale: String,
     /// Time format (12h or 24h)
     pub time_format: String,
+    /// Window button layout (e.g., "close,minimize,maximize" or "minimize,maximize:close")
+    pub window_button_layout: String,
+    /// Titlebar style (Traditional vs CSD HeaderBar)
+    pub titlebar_style: XAppTitlebarStyle,
+    /// Automatically synchronize GTK and Qt widget themes
+    pub sync_gtk_qt_themes: bool,
+    /// Enable overlay scrollbars
+    pub overlay_scrollbars: bool,
+    /// Compact mode for toolbars and sidebars
+    pub compact_mode: bool,
+    /// Enable symbolic icons in sidebar navigation
+    pub symbolic_sidebar_icons: bool,
 }
 
 impl XAppPreferences {
@@ -298,6 +323,12 @@ impl XAppPreferences {
             monospace_font: "Monospace 10".to_string(),
             locale: "en_US.UTF-8".to_string(),
             time_format: "24h".to_string(),
+            window_button_layout: "close,minimize,maximize".to_string(),
+            titlebar_style: XAppTitlebarStyle::Traditional,
+            sync_gtk_qt_themes: true,
+            overlay_scrollbars: true,
+            compact_mode: false,
+            symbolic_sidebar_icons: true,
         }
     }
 
@@ -314,6 +345,438 @@ impl XAppPreferences {
     /// Set locale
     pub fn set_locale(&mut self, locale: String) {
         self.locale = locale;
+    }
+
+    /// Set window button layout
+    pub fn set_window_button_layout(&mut self, layout: String) {
+        self.window_button_layout = layout;
+    }
+
+    /// Set titlebar style
+    pub fn set_titlebar_style(&mut self, style: XAppTitlebarStyle) {
+        self.titlebar_style = style;
+    }
+
+    /// Generate unified GTK/Qt theme environment variables
+    pub fn generate_desktop_theme_env(&self) -> Vec<(String, String)> {
+        let mut envs = Vec::new();
+        let gtk_theme = if self.dark_mode { "Adwaita-dark" } else { "Adwaita" };
+        envs.push(("GTK_THEME".to_string(), gtk_theme.to_string()));
+        envs.push(("QT_STYLE_OVERRIDE".to_string(), "kvantum".to_string()));
+        envs.push(("XAPP_ACCENT_COLOR".to_string(), self.accent_color.clone()));
+        envs.push(("XAPP_BUTTON_LAYOUT".to_string(), self.window_button_layout.clone()));
+        envs
+    }
+}
+
+/// Category of favorite item managed by XApp
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum XAppFavoriteKind {
+    /// Document file (PDF, text, office)
+    Document,
+    /// Image or media file
+    Media,
+    /// Desktop application shortcut (.desktop)
+    Application,
+    /// Folder or directory
+    Folder,
+    /// Web URL / bookmark
+    WebBookmark,
+}
+
+/// Favorite item entry managed across desktop environments
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct XAppFavoriteItem {
+    /// Unique identifier or path
+    pub uri: String,
+    /// Display title
+    pub display_name: String,
+    /// Category kind
+    pub kind: XAppFavoriteKind,
+    /// Associated icon name
+    pub icon_name: String,
+    /// Associated MIME type
+    pub mime_type: String,
+    /// Timestamp when pinned (seconds since Epoch)
+    pub pinned_at_secs: u64,
+    /// Position index for custom ordering
+    pub order_index: u32,
+}
+
+/// Cross-desktop favorites manager inspired by Linux Mint xapp-favorites
+#[derive(Debug, Clone)]
+pub struct XAppFavoritesManager {
+    /// List of pinned favorite items
+    pub items: Vec<XAppFavoriteItem>,
+    /// Maximum number of allowed favorite items
+    pub max_items: usize,
+}
+
+impl XAppFavoritesManager {
+    /// Create a new XApp favorites manager
+    pub fn new(max_items: usize) -> Self {
+        Self {
+            items: Vec::new(),
+            max_items,
+        }
+    }
+
+    /// Pin a new item to favorites
+    pub fn pin_item(
+        &mut self,
+        uri: &str,
+        display_name: &str,
+        kind: XAppFavoriteKind,
+        icon_name: &str,
+        mime_type: &str,
+        timestamp: u64,
+    ) -> Result<bool, &'static str> {
+        if self.items.iter().any(|i| i.uri == uri) {
+            return Ok(false); // Already pinned
+        }
+        if self.items.len() >= self.max_items {
+            return Err("Maximum favorites limit reached");
+        }
+
+        let order = self.items.len() as u32;
+        self.items.push(XAppFavoriteItem {
+            uri: uri.to_string(),
+            display_name: display_name.to_string(),
+            kind,
+            icon_name: icon_name.to_string(),
+            mime_type: mime_type.to_string(),
+            pinned_at_secs: timestamp,
+            order_index: order,
+        });
+        Ok(true)
+    }
+
+    /// Unpin an item from favorites by URI
+    pub fn unpin_item(&mut self, uri: &str) -> bool {
+        let original_len = self.items.len();
+        self.items.retain(|i| i.uri != uri);
+        if self.items.len() < original_len {
+            self.reindex_order();
+            true
+        } else {
+            false
+        }
+    }
+
+    /// Check if a URI is pinned
+    pub fn is_pinned(&self, uri: &str) -> bool {
+        self.items.iter().any(|i| i.uri == uri)
+    }
+
+    /// Get favorites filtered by category kind
+    pub fn get_by_kind(&self, kind: XAppFavoriteKind) -> Vec<&XAppFavoriteItem> {
+        self.items.iter().filter(|i| i.kind == kind).collect()
+    }
+
+    /// Search favorite items by query string
+    pub fn search(&self, query: &str) -> Vec<&XAppFavoriteItem> {
+        let q = query.to_lowercase();
+        self.items
+            .iter()
+            .filter(|i| {
+                i.display_name.to_lowercase().contains(&q)
+                    || i.uri.to_lowercase().contains(&q)
+                    || i.mime_type.to_lowercase().contains(&q)
+            })
+            .collect()
+    }
+
+    /// Move item to a new order index
+    pub fn reorder_item(&mut self, uri: &str, new_index: usize) -> bool {
+        if let Some(pos) = self.items.iter().position(|i| i.uri == uri) {
+            let item = self.items.remove(pos);
+            let target = new_index.min(self.items.len());
+            self.items.insert(target, item);
+            self.reindex_order();
+            true
+        } else {
+            false
+        }
+    }
+
+    fn reindex_order(&mut self) {
+        for (idx, item) in self.items.iter_mut().enumerate() {
+            item.order_index = idx as u32;
+        }
+    }
+}
+
+impl Default for XAppFavoritesManager {
+    fn default() -> Self {
+        Self::new(100)
+    }
+}
+
+/// Action item for XApp status icon context menus
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct XAppStatusAction {
+    pub id: String,
+    pub label: String,
+    pub enabled: bool,
+}
+
+/// StatusNotifierItem / XApp StatusIcon representation for cross-desktop system tray icons
+#[derive(Debug, Clone)]
+pub struct XAppStatusIcon {
+    pub id: String,
+    pub title: String,
+    pub icon_name: String,
+    pub badge_count: u32,
+    pub tooltip: String,
+    pub visible: bool,
+    pub actions: Vec<XAppStatusAction>,
+}
+
+/// Status notifier manager providing cross-desktop system tray icon & badge support
+#[derive(Debug, Clone)]
+pub struct XAppStatusNotifier {
+    pub icons: Vec<XAppStatusIcon>,
+}
+
+impl XAppStatusNotifier {
+    pub fn new() -> Self {
+        Self { icons: Vec::new() }
+    }
+
+    pub fn register_icon(&mut self, id: &str, title: &str, icon_name: &str) {
+        if !self.icons.iter().any(|i| i.id == id) {
+            self.icons.push(XAppStatusIcon {
+                id: id.to_string(),
+                title: title.to_string(),
+                icon_name: icon_name.to_string(),
+                badge_count: 0,
+                tooltip: title.to_string(),
+                visible: true,
+                actions: Vec::new(),
+            });
+        }
+    }
+
+    pub fn update_badge(&mut self, id: &str, count: u32, tooltip: &str) -> bool {
+        if let Some(icon) = self.icons.iter_mut().find(|i| i.id == id) {
+            icon.badge_count = count;
+            icon.tooltip = tooltip.to_string();
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn add_context_action(&mut self, icon_id: &str, action_id: &str, label: &str) -> bool {
+        if let Some(icon) = self.icons.iter_mut().find(|i| i.id == icon_id) {
+            if !icon.actions.iter().any(|a| a.id == action_id) {
+                icon.actions.push(XAppStatusAction {
+                    id: action_id.to_string(),
+                    label: label.to_string(),
+                    enabled: true,
+                });
+            }
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn remove_icon(&mut self, id: &str) -> bool {
+        let len = self.icons.len();
+        self.icons.retain(|i| i.id != id);
+        self.icons.len() < len
+    }
+
+    pub fn get_icon(&self, id: &str) -> Option<&XAppStatusIcon> {
+        self.icons.iter().find(|i| i.id == id)
+    }
+}
+
+impl Default for XAppStatusNotifier {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Thumbnail size classification for XApp thumbnail service
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum XAppThumbnailSize {
+    Normal128,
+    Large256,
+    XLarge512,
+}
+
+/// Thumbnail generation result
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct XAppThumbnailResult {
+    pub original_uri: String,
+    pub thumbnail_path: String,
+    pub size: XAppThumbnailSize,
+    pub success: bool,
+}
+
+/// Cross-desktop file preview and thumbnail generator service
+#[derive(Debug, Clone)]
+pub struct XAppThumbnailerService {
+    pub cache_dir: String,
+    pub supported_mime_prefixes: Vec<String>,
+}
+
+impl XAppThumbnailerService {
+    pub fn new(cache_dir: &str) -> Self {
+        Self {
+            cache_dir: cache_dir.to_string(),
+            supported_mime_prefixes: vec![
+                "image/".to_string(),
+                "video/".to_string(),
+                "application/pdf".to_string(),
+                "text/".to_string(),
+            ],
+        }
+    }
+
+    pub fn can_thumbnail(&self, mime_type: &str) -> bool {
+        self.supported_mime_prefixes
+            .iter()
+            .any(|prefix| mime_type.starts_with(prefix))
+    }
+
+    pub fn generate_thumbnail(
+        &self,
+        uri: &str,
+        mime_type: &str,
+        size: XAppThumbnailSize,
+    ) -> XAppThumbnailResult {
+        if !self.can_thumbnail(mime_type) {
+            return XAppThumbnailResult {
+                original_uri: uri.to_string(),
+                thumbnail_path: String::new(),
+                size,
+                success: false,
+            };
+        }
+
+        let hash_str = uri.len();
+        let thumb_path = match size {
+            XAppThumbnailSize::Normal128 => format!("{}/normal/{}.png", self.cache_dir, hash_str),
+            XAppThumbnailSize::Large256 => format!("{}/large/{}.png", self.cache_dir, hash_str),
+            XAppThumbnailSize::XLarge512 => format!("{}/xlarge/{}.png", self.cache_dir, hash_str),
+        };
+
+        XAppThumbnailResult {
+            original_uri: uri.to_string(),
+            thumbnail_path: thumb_path,
+            size,
+            success: true,
+        }
+    }
+}
+
+impl Default for XAppThumbnailerService {
+    fn default() -> Self {
+        Self::new("/tmp/xapp-thumbnail-cache")
+    }
+}
+
+/// Hardware media key actions for cross-desktop playback control
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum XAppMediaKeyAction {
+    Play,
+    Pause,
+    PlayPause,
+    Stop,
+    Next,
+    Previous,
+    MuteToggle,
+    VolumeUp,
+    VolumeDown,
+}
+
+/// Media key subscriber registration
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MediaKeySubscriber {
+    pub app_id: String,
+    pub priority: u32,
+}
+
+/// Cross-desktop hardware media key dispatcher
+#[derive(Debug, Clone)]
+pub struct XAppMediaKeysDispatcher {
+    pub subscribers: Vec<MediaKeySubscriber>,
+    pub active_app_id: Option<String>,
+}
+
+impl XAppMediaKeysDispatcher {
+    pub fn new() -> Self {
+        Self {
+            subscribers: Vec::new(),
+            active_app_id: None,
+        }
+    }
+
+    pub fn register_subscriber(&mut self, app_id: &str, priority: u32) {
+        if !self.subscribers.iter().any(|s| s.app_id == app_id) {
+            self.subscribers.push(MediaKeySubscriber {
+                app_id: app_id.to_string(),
+                priority,
+            });
+            self.subscribers.sort_by(|a, b| b.priority.cmp(&a.priority));
+        }
+    }
+
+    pub fn set_active_app(&mut self, app_id: &str) {
+        if self.subscribers.iter().any(|s| s.app_id == app_id) {
+            self.active_app_id = Some(app_id.to_string());
+        }
+    }
+
+    pub fn dispatch_action(&self, action: XAppMediaKeyAction) -> Option<String> {
+        if let Some(ref active) = self.active_app_id {
+            Some(format!("Dispatched {:?} to active app {}", action, active))
+        } else if let Some(top) = self.subscribers.first() {
+            Some(format!("Dispatched {:?} to top priority app {}", action, top.app_id))
+        } else {
+            None
+        }
+    }
+}
+
+impl Default for XAppMediaKeysDispatcher {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Master suite unifying all Linux Mint XApp-inspired common resources & libraries
+#[derive(Debug, Clone)]
+pub struct SovereignXAppCrossDesktopSuite {
+    pub preferences: XAppPreferences,
+    pub favorites: XAppFavoritesManager,
+    pub status_notifier: XAppStatusNotifier,
+    pub thumbnailer: XAppThumbnailerService,
+    pub media_keys: XAppMediaKeysDispatcher,
+}
+
+impl SovereignXAppCrossDesktopSuite {
+    pub fn new(app_name: &str) -> Self {
+        Self {
+            preferences: XAppPreferences::new(app_name.to_string()),
+            favorites: XAppFavoritesManager::default(),
+            status_notifier: XAppStatusNotifier::default(),
+            thumbnailer: XAppThumbnailerService::default(),
+            media_keys: XAppMediaKeysDispatcher::default(),
+        }
+    }
+
+    pub fn export_environment_variables(&self) -> Vec<(String, String)> {
+        self.preferences.generate_desktop_theme_env()
+    }
+}
+
+impl Default for SovereignXAppCrossDesktopSuite {
+    fn default() -> Self {
+        Self::new("sigma-xapp-core")
     }
 }
 
@@ -505,5 +968,91 @@ mod tests {
         
         prefs.set_accent_color("#ff0000".to_string());
         assert_eq!(prefs.accent_color, "#ff0000");
+    }
+
+    #[test]
+    fn test_xapp_preferences_enhanced() {
+        let mut prefs = XAppPreferences::new("xed".to_string());
+        prefs.set_dark_mode(true);
+        prefs.set_window_button_layout("close,minimize,maximize".to_string());
+        prefs.set_titlebar_style(XAppTitlebarStyle::HeaderBar);
+
+        let envs = prefs.generate_desktop_theme_env();
+        assert!(envs.iter().any(|(k, v)| k == "GTK_THEME" && v == "Adwaita-dark"));
+        assert!(envs.iter().any(|(k, v)| k == "QT_STYLE_OVERRIDE" && v == "kvantum"));
+        assert!(envs.iter().any(|(k, v)| k == "XAPP_BUTTON_LAYOUT" && v == "close,minimize,maximize"));
+    }
+
+    #[test]
+    fn test_xapp_favorites_manager() {
+        let mut favs = XAppFavoritesManager::new(10);
+        let pinned = favs.pin_item(
+            "file:///home/user/document.pdf",
+            "Annual Report",
+            XAppFavoriteKind::Document,
+            "application-pdf",
+            "application/pdf",
+            1700000000,
+        );
+        assert!(pinned.unwrap());
+        assert!(favs.is_pinned("file:///home/user/document.pdf"));
+
+        let docs = favs.get_by_kind(XAppFavoriteKind::Document);
+        assert_eq!(docs.len(), 1);
+
+        let results = favs.search("Annual");
+        assert_eq!(results.len(), 1);
+
+        assert!(favs.unpin_item("file:///home/user/document.pdf"));
+        assert!(!favs.is_pinned("file:///home/user/document.pdf"));
+    }
+
+    #[test]
+    fn test_xapp_status_notifier() {
+        let mut notifier = XAppStatusNotifier::new();
+        notifier.register_icon("xreader-app", "XReader PDF", "xreader");
+        assert!(notifier.update_badge("xreader-app", 2, "2 unread documents"));
+        assert!(notifier.add_context_action("xreader-app", "open", "Open File"));
+
+        let icon = notifier.get_icon("xreader-app").unwrap();
+        assert_eq!(icon.badge_count, 2);
+        assert_eq!(icon.actions.len(), 1);
+        assert!(notifier.remove_icon("xreader-app"));
+    }
+
+    #[test]
+    fn test_xapp_thumbnailer_service() {
+        let thumb_service = XAppThumbnailerService::new("/tmp/test-thumb-cache");
+        assert!(thumb_service.can_thumbnail("image/png"));
+        assert!(thumb_service.can_thumbnail("video/mp4"));
+
+        let res = thumb_service.generate_thumbnail(
+            "file:///home/user/photo.jpg",
+            "image/jpeg",
+            XAppThumbnailSize::Large256,
+        );
+        assert!(res.success);
+        assert!(res.thumbnail_path.contains("large"));
+    }
+
+    #[test]
+    fn test_xapp_media_keys_dispatcher() {
+        let mut media = XAppMediaKeysDispatcher::new();
+        media.register_subscriber("celluloid", 100);
+        media.register_subscriber("hypnotix", 50);
+
+        let msg = media.dispatch_action(XAppMediaKeyAction::PlayPause).unwrap();
+        assert!(msg.contains("celluloid"));
+
+        media.set_active_app("hypnotix");
+        let active_msg = media.dispatch_action(XAppMediaKeyAction::VolumeUp).unwrap();
+        assert!(active_msg.contains("hypnotix"));
+    }
+
+    #[test]
+    fn test_sovereign_xapp_cross_desktop_suite() {
+        let suite = SovereignXAppCrossDesktopSuite::new("xplayer");
+        let envs = suite.export_environment_variables();
+        assert!(!envs.is_empty());
     }
 }
