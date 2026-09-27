@@ -112,7 +112,7 @@ impl Default for PqcVpnTunnel {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -126,7 +126,7 @@ mod tests {
         assert!(vpn.is_encrypted.load(Ordering::SeqCst));
 
         let data = b"Secure payload";
-        let encrypted = vpn.send_encrypted_payload(data).unwrap();
+        let encrypted = vpn.send_encrypted_payload(data);
         assert!(encrypted.starts_with(b"PQC_ENCRYPTED_HEADER:"));
     }
 
