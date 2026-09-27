@@ -228,6 +228,7 @@ pub trait DiagnosticsManager {
 
 /// Diagnostics statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct DiagnosticsStats {
     pub total_sensors: usize,
     pub active_sensors: usize,
