@@ -7,6 +7,11 @@ use alloc::vec::Vec;
 pub mod alpine_apk_engine;
 pub mod arch_compat;
 pub mod arch_pacman_engine;
+pub use arch_pacman_engine::{
+    AlpmHookWhen, AlpmHookOperation, SovereignAlpmHook, SovereignAlpmHookDispatcher,
+    SovereignPkgbuild, SovereignPkgbuildRunner, SovereignPacmanDbVerifier,
+    SovereignAurPackage, SovereignAurRpcEngine,
+};
 pub mod aur;
 pub mod aur_helper;
 pub mod aurweb;
@@ -139,10 +144,6 @@ pub use alpine_apk_engine::{AlpineCommunityRepo, ApkIndexParser, ApkPackage};
 pub use arch_compat::{
     AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder,
     PacmanDbAdapter, RollingSyncManager, SvnPackageMetadata, SvntogitMigrationEngine,
-};
-pub use arch_pacman_engine::{
-    AURHelper, ArchBuildSystem, ArchPacmanPackage, DependencyTreeVisualizer, PacmanCacheCleaner,
-    PacmanDatabase, PacnewDiffManager, PkgbuildChecksumUpdater, SafeUpdateChecker,
 };
 pub use aur_rules::{
     AurLintFinding, AurRuleEngine, AurSandboxPolicy, LintSeverity, MakepkgBuildResult,
