@@ -40,6 +40,8 @@ pub mod linux_absorb;
 pub mod linux_bsd_innovations;
 pub mod sovereign_linux_bsd_innovations;
 pub use sovereign_linux_bsd_innovations::*;
+pub mod sovereign_software_engineering_paradigms;
+pub use sovereign_software_engineering_paradigms::*;
 pub mod linux_parity;
 pub use linux_parity::{
     CmaRegion, KernelTimer, LinuxCmaAllocatorEngine, LinuxKernelTimerWheel,
