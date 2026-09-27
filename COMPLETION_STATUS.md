@@ -103,6 +103,16 @@
 - **Renamed**: FUTURE-DEVELOPMENT-ROADMAP.md to 11-Roadmap.md
 - **Removed**: Obsolete wiki files replaced by organized structure
 
+### 13. Security Hardening (CodeQL Findings)
+- **Replaced**: Unsafe static mut GLOBAL_RNG with thread-safe OnceLock<Mutex<...>>
+- **Replaced**: Unsafe static mut GLOBAL_DIR_STACK with thread-safe OnceLock<Mutex<...>>
+- **Removed**: Raw pointers from shell command structures
+- **Added**: Safety documentation to RDTSC usage (timing attack warnings)
+- **Added**: Safety documentation to GPIO register access
+- **Fixed**: Test configuration (test_disabled to test)
+- **Added**: Warnings about non-cryptographically secure fallback values
+- **Addressed**: Unsafe static mut and undefined behavior findings
+
 ## ⚠️ Outstanding Issues
 
 ### Compilation Status
@@ -116,7 +126,7 @@
 
 ### Security Scanning
 - **Status**: Partially addressed through security hardening
-- **Completed**: Removed hardcoded keys, added kernel mitigations, implemented capability-based security
+- **Completed**: Removed hardcoded keys, added kernel mitigations, implemented capability-based security, replaced unsafe static mut with thread-safe primitives, added safety documentation
 - **Remaining**: CodeQL findings would require dedicated security audit session
 - **Priority**: High (per original requirements)
 
@@ -157,7 +167,7 @@
 | Ensure Rust/Zig/Nim only | ✅ Complete | Audit confirms compliance |
 | Remove redundant branches | ✅ Complete | Only main remains |
 | Consolidate wiki | ✅ Complete | Single wiki/ directory |
-| Fix security issues | ⚠️ Partial | Removed hardcoded keys, added mitigations |
+| Fix security issues | ⚠️ Partial | Removed hardcoded keys, added mitigations, replaced unsafe static mut, added safety documentation |
 | Implement unimplemented ideas | ⚠️ Partial | Implemented 5 roadmap features + hardware drivers |
 | Transfer to GitHub Wiki | ⚠️ Pending | Requires API access |
 
