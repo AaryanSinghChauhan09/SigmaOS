@@ -69,7 +69,7 @@ impl SigmaConfig {
         }
     }
 
-    /// Parse simple key-value TOML lines into a SigmaConfig instance
+    /// Parse simple key-value and array TOML lines into a SigmaConfig instance
     pub fn parse_toml_dsl(toml_str: &str) -> Self {
         let mut config = Self::default_workstation();
 
@@ -85,14 +85,27 @@ impl SigmaConfig {
             }
             if let Some((key, val)) = trimmed.split_once('=') {
                 let key = key.trim();
-                let val = val.trim().trim_matches('"');
+                let val = val.trim();
                 match (current_section, key) {
-                    ("system", "hostname") => config.system.hostname = val.to_string(),
-                    ("system", "timezone") => config.system.timezone = val.to_string(),
-                    ("system", "locale") => config.system.locale = val.to_string(),
+                    ("system", "hostname") => config.system.hostname = val.trim_matches('"').to_string(),
+                    ("system", "timezone") => config.system.timezone = val.trim_matches('"').to_string(),
+                    ("system", "locale") => config.system.locale = val.trim_matches('"').to_string(),
                     ("services", "ssh.enabled") => config.services.ssh.enabled = val.parse().unwrap_or(true),
                     ("services", "ssh.port") => config.services.ssh.port = val.parse().unwrap_or(22),
                     ("services", "dhcp.enabled") => config.services.dhcp.enabled = val.parse().unwrap_or(true),
+                    ("packages", "system_packages") => {
+                        if val.starts_with('[') && val.ends_with(']') {
+                            let inner = &val[1..val.len() - 1];
+                            let items: Vec<String> = inner
+                                .split(',')
+                                .map(|s| s.trim().trim_matches('"').to_string())
+                                .filter(|s| !s.is_empty())
+                                .collect();
+                            if !items.is_empty() {
+                                config.packages.system_packages = items;
+                            }
+                        }
+                    }
                     _ => {}
                 }
             }
@@ -232,7 +245,7 @@ impl ConfigManager {
 
     /// Instant sub-50ms Btrfs snapshot rollback
     pub fn rollback(&mut self, target_generation_id: u32) -> Result<u64, &'static str> {
-        let start_ts = 0u64; // Benchmark timer simulation
+        let _start_ts = 0u64; // Benchmark timer simulation
         if let Some(_target) = self.generations.iter().find(|g| g.generation_id == target_generation_id) {
             for g in &mut self.generations {
                 if g.generation_id == target_generation_id {
@@ -286,11 +299,15 @@ mod tests {
         ssh.enabled = true
         ssh.port = 22
         dhcp.enabled = true
+
+        [packages]
+        system_packages = ["git", "neovim", "firefox", "syncthing"]
         "#;
 
         let parsed = SigmaConfig::parse_toml_dsl(toml_sample);
         assert_eq!(parsed.system.hostname, "sigma-workstation");
         assert_eq!(parsed.services.ssh.port, 22);
+        assert_eq!(parsed.packages.system_packages, vec!["git", "neovim", "firefox", "syncthing"]);
 
         let mut mgr = ConfigManager::new("workstation");
         let (gen_id1, changed1) = mgr.apply_config_idempotent(parsed.clone(), 1718920000);
