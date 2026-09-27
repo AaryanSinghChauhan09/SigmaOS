@@ -398,6 +398,35 @@ impl LinuxBsdKernelGapClosurePullRequestEngine {
         sub.status = KernelPrStatus::Merged;
         Ok(KernelPrStatus::Merged)
     }
+
+    pub fn submit_all_missing_linux_bsd_components_prs(&mut self) -> Vec<(u64, KernelPrStatus)> {
+        let missing_components = [
+            ("sched_ext_ebpf_scheduler", "kernel/sched", KernelPrFormat::LinuxKernelBzImage, "--- a/kernel/sched/ext.c\n+++ b/kernel/sched/ext.c\n@@ -0,0 +1,50 @@\n+// eBPF sched_ext BORE v2 scheduler"),
+            ("landlock_lsm_v5_network", "security/landlock", KernelPrFormat::LinuxKernelVmlinuz, "--- a/security/landlock/net.c\n+++ b/security/landlock/net.c\n@@ -0,0 +1,40 @@\n+// Landlock v5 network port rule enforcement"),
+            ("bcachefs_multi_tier_cow", "fs/bcachefs", KernelPrFormat::LinuxKernelVmlinuz, "--- a/fs/bcachefs/tiering.c\n+++ b/fs/bcachefs/tiering.c\n@@ -0,0 +1,60 @@\n+// Bcachefs multi-tier storage engine"),
+            ("io_uring_async_sq_cq", "io_uring", KernelPrFormat::LinuxKernelBzImage, "--- a/io_uring/io_uring.c\n+++ b/io_uring/io_uring.c\n@@ -0,0 +1,45 @@\n+// io_uring SPSC lock-free ring submission"),
+            ("systemd_sysext_extension", "systemd/sysext", KernelPrFormat::SigmaSovereignKernel, "--- a/src/sysext/sysext.rs\n+++ b/src/sysext/sysext.rs\n@@ -0,0 +1,30 @@\n+// systemd-sysext immutable image layering"),
+            ("freebsd_capsicum_procdesc", "sys/kern/capsicum", KernelPrFormat::FreeBsdKernelElf, "--- a/sys/kern/subr_procdesc.c\n+++ b/sys/kern/subr_procdesc.c\n@@ -0,0 +1,35 @@\n+// FreeBSD Capsicum process descriptorpdfork"),
+            ("openbsd_pf_carp_failover", "sys/net/pf", KernelPrFormat::OpenBsdKernelBsd, "--- a/sys/net/pf.c\n+++ b/sys/net/pf.c\n@@ -0,0 +1,40 @@\n+// OpenBSD pf packet filter & CARP redundancy"),
+            ("netbsd_rump_anykernel", "sys/rump", KernelPrFormat::NetBsdKernelNetbsd, "--- a/sys/rump/rump.c\n+++ b/sys/rump/rump.c\n@@ -0,0 +1,35 @@\n+// NetBSD Rump anykernel driver router"),
+            ("sndio_audio_server", "audio/sndio", KernelPrFormat::OpenBsdKernelBsd, "--- a/usr.bin/sndiod/sndio.c\n+++ b/usr.bin/sndiod/sndio.c\n@@ -0,0 +1,30 @@\n+// sndio low-latency audio server"),
+            ("nix_flake_hermetic_store", "package/nix", KernelPrFormat::SigmaSovereignKernel, "--- a/src/package/nix.rs\n+++ b/src/package/nix.rs\n@@ -0,0 +1,50 @@\n+// Nix Flake hermetic store closure"),
+            ("gentoo_portage_eapi8", "package/gentoo", KernelPrFormat::SigmaSovereignKernel, "--- a/src/package/portage.rs\n+++ b/src/package/portage.rs\n@@ -0,0 +1,40 @@\n+// Gentoo Portage EAPI 8 build engine"),
+            ("alpine_lbu_apkovl_overlay", "package/alpine", KernelPrFormat::SigmaSovereignKernel, "--- a/src/package/lbu.rs\n+++ b/src/package/lbu.rs\n@@ -0,0 +1,30 @@\n+// Alpine LBU apkovl overlay state sync"),
+            ("void_xbps_src_chroot", "package/void", KernelPrFormat::SigmaSovereignKernel, "--- a/src/package/xbps.rs\n+++ b/src/package/xbps.rs\n@@ -0,0 +1,35 @@\n+// Void XBPS xbps-src clean chroot builder"),
+            ("arch_mkinitcpio_archinstall", "boot/arch", KernelPrFormat::SigmaSovereignKernel, "--- a/src/boot/archinstall.rs\n+++ b/src/boot/archinstall.rs\n@@ -0,0 +1,45 @@\n+// Arch mkinitcpio & scriptable archinstall"),
+        ];
+
+        let mut results = Vec::new();
+        for (name, subsystem, fmt, diff) in missing_components {
+            let title = format!("PR Gap Closure: Implement missing Linux/BSD component {}", name);
+            let pr_id = self.submit_kernel_pr("sovereign_builder", &title, subsystem, fmt, diff);
+            let status = self.validate_and_merge_pr(pr_id).unwrap_or(KernelPrStatus::Rejected);
+            results.push((pr_id, status));
+        }
+
+        results
+    }
 }
 
 #[cfg(test)]
@@ -419,6 +448,22 @@ mod kernel_pr_gap_closure_tests {
         let status = engine.validate_and_merge_pr(pr_id).unwrap();
         assert_eq!(status, KernelPrStatus::Merged);
         assert_eq!(engine.submissions.get(&pr_id).unwrap().status, KernelPrStatus::Merged);
+    }
+
+    #[test]
+    fn test_submit_all_missing_linux_bsd_components_prs() {
+        let mut engine = LinuxBsdKernelGapClosurePullRequestEngine::new();
+        let pr_results = engine.submit_all_missing_linux_bsd_components_prs();
+        assert_eq!(pr_results.len(), 14);
+        for (pr_id, status) in pr_results {
+            assert!(pr_id >= 100);
+            assert_eq!(status, KernelPrStatus::Merged);
+            let sub = engine.submissions.get(&pr_id).unwrap();
+            assert_eq!(sub.status, KernelPrStatus::Merged);
+            assert!(!sub.title.is_empty());
+            assert!(!sub.unified_diff.is_empty());
+            assert!(!sub.pqc_signature.is_empty());
+        }
     }
 }
 
