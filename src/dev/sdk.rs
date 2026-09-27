@@ -187,7 +187,6 @@ pub trait SDK {
 /// SDK statistics
 #[repr(C)]
 pub struct SDKStats {
-#[derive(Debug, Clone, Copy)]
     pub total_apis: usize,
     pub active_apis: usize,
     pub total_calls: u64,

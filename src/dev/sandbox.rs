@@ -275,7 +275,6 @@ pub trait SandboxManager {
 
 /// Sandbox statistics
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
 pub struct SandboxStats {
     pub total_sandboxes: usize,
     pub running_sandboxes: usize,
