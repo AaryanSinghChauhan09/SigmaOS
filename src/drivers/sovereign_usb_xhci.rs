@@ -5,6 +5,7 @@
 // Transfer Request Block (TRB) Command, Transfer, and Event Rings, SuperSpeed 10/20Gbps endpoint contexts,
 // and USB HID / Mass Storage class driver binding.
 
+// Enhanced with transfer ring management and event ring support
 use std::collections::HashMap;
 use std::format;
 use std::string::{String, ToString};
@@ -13,6 +14,7 @@ use std::vec::Vec;
 pub const XHCI_MAX_SLOTS: usize = 32;
 pub const XHCI_MAX_PORTS: usize = 16;
 pub const XHCI_TRB_RING_SIZE: usize = 64;
+pub const XHCI_EVENT_RING_SIZE: usize = 256;
 
 /// TRB (Transfer Request Block) Types (xHCI Spec 1.2)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -81,6 +83,8 @@ pub struct SovereignXhciUsb3Driver {
     pub max_ports_supported: u8,
     pub doorbells: [u32; XHCI_MAX_SLOTS],
     pub command_ring: [SovereignXhciTrb; XHCI_TRB_RING_SIZE],
+    pub transfer_rings: Vec<XhciTransferRing>,
+    pub event_ring: XhciEventRing,
     pub cmd_ring_enqueue_idx: usize,
     pub cmd_ring_cycle_bit: bool,
     pub active_slots: HashMap<u8, UsbDeviceSlotContext>,
@@ -102,6 +106,8 @@ impl SovereignXhciUsb3Driver {
             max_ports_supported: XHCI_MAX_PORTS as u8,
             doorbells: [0u32; XHCI_MAX_SLOTS],
             command_ring: [EMPTY_TRB; XHCI_TRB_RING_SIZE],
+            transfer_rings: Vec::new(),
+            event_ring: XhciEventRing::new(XHCI_EVENT_RING_SIZE),
             cmd_ring_enqueue_idx: 0,
             cmd_ring_cycle_bit: true,
             active_slots: HashMap::new(),
@@ -205,6 +211,27 @@ mod tests {
         let idx = xhci.enqueue_command_trb(0x1000_0000, 512, SovereignXhciTrbType::SetupStage);
 
         assert_eq!(idx, 0);
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_xhci_initialization_and_slot_enable() {
+        let mut xhci = SovereignXhciUsb3Driver::new(0xFEE00000);
+        assert!(xhci.initialize().is_ok());
+
+        let slot_id = xhci.enable_slot(UsbEndpointSpeed::SuperSpeedPlus10Gbps, 0x08).unwrap(); // Mass Storage
+        assert_eq!(slot_id, 1);
+        assert_eq!(xhci.active_slots.len(), 1);
+        assert_eq!(xhci.doorbells[1], 1);
+    }
+
+    #[test]
+    fn test_trb_command_ring_enqueue() {
+        let mut xhci = SovereignXhciUsb3Driver::new(0xFEE00000);
+        let idx = xhci.enqueue_command_trb(0x1000_0000, 512, SovereignXhciTrbType::SetupStage);
+
+        assert_eq!(idx, 0);
         assert_eq!(xhci.command_ring[0].parameter, 0x1000_0000);
         assert_eq!(xhci.command_ring[0].status, 512);
     }
@@ -217,5 +244,43 @@ mod tests {
 
         assert!(xhci.ring_doorbell(slot, 2).is_ok());
         assert_eq!(xhci.doorbells[slot as usize], 2);
+    }
+
+    #[test]
+    fn test_transfer_ring_operations() {
+        let mut ring = XhciTransferRing::new(64);
+        let trb = SovereignXhciTrb::new(0x1000, 512, SovereignXhciTrbType::Normal, true);
+        
+        assert!(ring.enqueue(trb).is_ok());
+        assert_eq!(ring.enqueue_idx, 1);
+        
+        let dequeued = ring.dequeue();
+        assert!(dequeued.is_some());
+        assert_eq!(ring.dequeue_idx, 1);
+    }
+
+    #[test]
+    fn test_event_ring_operations() {
+        let mut event_ring = XhciEventRing::new(256);
+        let event = SovereignXhciTrb::new(0, 0, SovereignXhciTrbType::TransferEvent, true);
+        event_ring.events[0] = event;
+        
+        let dequeued = event_ring.dequeue();
+        assert!(dequeued.is_some());
+    }
+
+    #[test]
+    fn test_xhci_transfer_ring_management() {
+        let mut xhci = SovereignXhciUsb3Driver::new(0xFEE00000);
+        xhci.initialize().unwrap();
+        
+        let ring_idx = xhci.create_transfer_ring(64).unwrap();
+        assert_eq!(ring_idx, 0);
+        
+        let trb = SovereignXhciTrb::new(0x2000, 1024, SovereignXhciTrbType::Normal, true);
+        assert!(xhci.submit_transfer(ring_idx, trb).is_ok());
+        
+        let status = xhci.get_transfer_ring_status(ring_idx);
+        assert!(status.is_ok());
     }
 }
