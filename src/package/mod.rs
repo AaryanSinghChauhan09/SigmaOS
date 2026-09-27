@@ -45,6 +45,8 @@ pub mod spac;
 pub mod store;
 pub mod universal;
 pub mod updater;
+pub mod pacman_mirrors;
+pub use pacman_mirrors::*;
 pub mod sovereign_distro_package_matrix;
 pub use sovereign_distro_package_matrix::*;
 pub mod sovereign_distro_package_advancements_v5;
