@@ -115,15 +115,26 @@ impl GksuSecurityGuard {
         input_env: &[(String, String)],
         allowed_keys: &[String],
     ) -> Vec<(String, String)> {
+        let dangerous_keys = [
+            "LD_PRELOAD",
+            "LD_LIBRARY_PATH",
+            "LD_AUDIT",
+            "LD_DEBUG",
+            "GCONV_PATH",
+            "DYLD_INSERT_LIBRARIES",
+            "DYLD_LIBRARY_PATH",
+            "PYTHONPATH",
+            "RUBYLIB",
+            "PERL5LIB",
+            "NODE_PATH",
+            "BASH_ENV",
+            "ENV",
+            "IFS",
+        ];
         let mut clean_env = Vec::new();
         for (k, v) in input_env {
             // Dangerous variables stripped automatically
-            if k == "LD_PRELOAD"
-                || k == "LD_LIBRARY_PATH"
-                || k == "PYTHONPATH"
-                || k == "RUBYLIB"
-                || k == "PERL5LIB"
-            {
+            if dangerous_keys.contains(&k.as_str()) {
                 continue;
             }
 
@@ -541,15 +552,19 @@ mod tests {
         let raw_env = vec![
             ("PATH".to_string(), "/usr/bin:/bin".to_string()),
             ("LD_PRELOAD".to_string(), "/tmp/malicious.so".to_string()),
+            ("GCONV_PATH".to_string(), "/tmp/pwnkit".to_string()),
+            ("LD_AUDIT".to_string(), "/tmp/audit.so".to_string()),
             ("PYTHONPATH".to_string(), "/tmp/hack".to_string()),
             ("LANG".to_string(), "en_US.UTF-8".to_string()),
         ];
 
-        let allowed = vec!["PATH".to_string(), "LANG".to_string()];
+        let allowed = vec!["PATH".to_string(), "GCONV_PATH".to_string(), "LANG".to_string()];
         let clean = GksuSecurityGuard::sanitize_environment(&raw_env, &allowed);
 
         assert_eq!(clean.len(), 2);
         assert!(!clean.iter().any(|(k, _)| k == "LD_PRELOAD"));
+        assert!(!clean.iter().any(|(k, _)| k == "GCONV_PATH"));
+        assert!(!clean.iter().any(|(k, _)| k == "LD_AUDIT"));
         assert!(!clean.iter().any(|(k, _)| k == "PYTHONPATH"));
     }
 

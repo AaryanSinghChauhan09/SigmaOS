@@ -28,6 +28,7 @@ pub mod vesa;
 pub mod ata_bus_controller;
 pub mod sovereign_hardware_expansion;
 pub mod sovereign_usb_xhci;
+pub mod sovereign_comprehensive_drivers;
 
 pub use sovereign_comprehensive_drivers::*;
 pub use printing::{CupsIppPrintSpooler, LpdSpooler, PpdDriverMatcher, PrintJob, PrintJobState};

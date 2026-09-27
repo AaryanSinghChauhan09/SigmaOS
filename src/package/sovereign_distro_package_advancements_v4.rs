@@ -782,33 +782,4 @@ mod tests {
 
         assert!(governor.evaluate_wireless_access_point_policy("SigmaCorp_WiFi", true));
     }
-
-    #[test]
-    fn test_multi_domain_package_access_governor() {
-        let governor = SovereignMultiDomainPackageAccessGovernor::new();
-
-        assert!(governor.check_anonymous_access(true, None));
-        assert!(governor.check_anonymous_access(false, Some("token_123")));
-
-        assert!(governor.check_controlling_terminal_protection(101, false));
-
-        let abs_path = governor.resolve_store_path("/sovereign/store", "pkg_a");
-        assert_eq!(abs_path, "/sovereign/store/pkg_a");
-
-        let eff_time = governor.calculate_effective_access_time_ms(0.8, 2.0, 50.0);
-        assert_eq!(eff_time, 11.6); // 0.8 * 2.0 + 0.2 * 50.0 = 11.6
-
-        assert!(governor.authenticate_ldap_repo_user("cn=admin,dc=sigma,dc=org", "pass123"));
-
-        assert!(governor.evaluate_installer_process_migration(500, true));
-
-        assert_eq!(governor.get_device_access_pattern_advice(true), PackageIoAdviceMode::Sequential);
-
-        assert!(governor.validate_remote_file_access("https://pkg.sigmaos.org/repo"));
-        assert!(governor.validate_remote_file_access("p2p://cas_hash_123"));
-
-        assert!(governor.validate_security_access_token_claims("pqc_claim_read_repo", "claim_read"));
-
-        assert!(governor.evaluate_wireless_access_point_policy("SigmaCorp_WiFi", true));
-    }
 }
