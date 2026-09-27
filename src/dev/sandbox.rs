@@ -34,7 +34,6 @@ pub type SandboxID = usize;
 /// Sandbox state
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SandboxState {
     Creating = 0,
     Running = 1,

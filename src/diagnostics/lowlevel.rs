@@ -33,7 +33,6 @@ pub type SensorID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SensorType { Temperature = 0, Voltage = 1, Current = 2, Power = 3, Fan = 4 }
 
 impl SensorType {
