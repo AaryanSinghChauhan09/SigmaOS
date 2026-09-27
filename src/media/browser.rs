@@ -2465,4 +2465,45 @@ mod tests {
         let orion = OrionWebExtensionCompatibilityEngine::new();
         assert!(orion.polyfill_browser_action("action").contains("window.chrome.action"));
     }
+
+    #[test]
+    fn test_sovereign_open_source_browser_suite_engine() {
+        let mut suite = SovereignOpenSourceBrowserSuiteEngine::new();
+        assert!(!suite.evaluate_network_request_safety("https://doubleclick.net/ad.js"));
+        assert!(suite.evaluate_network_request_safety("https://example.com/index.html"));
+
+        let (grid_count, reflow_count) = suite.compute_multi_engine_layout(900.0, 600.0);
+        assert_eq!(grid_count, 3);
+        assert_eq!(reflow_count, 1);
+    }
+}
+
+pub struct SovereignOpenSourceBrowserSuiteEngine {
+    pub browser: SigmaWebBrowser,
+}
+
+impl SovereignOpenSourceBrowserSuiteEngine {
+    pub fn new() -> Self {
+        Self {
+            browser: SigmaWebBrowser::new(),
+        }
+    }
+
+    /// Evaluates network request safety across Brave Shields, uBlock Origin, and LibreWolf rules
+    pub fn evaluate_network_request_safety(&self, url: &str) -> bool {
+        if self.browser.brave_adblock.should_block_request(url) {
+            return false;
+        }
+        if self.browser.stripper.should_block_telemetry(url) {
+            return false;
+        }
+        true
+    }
+
+    /// Renders multi-engine layout box computation given width and height
+    pub fn compute_multi_engine_layout(&mut self, width: f32, _height: f32) -> (usize, usize) {
+        let grid_tracks = self.browser.geckoview_layout.compute_subgrid_tracks(width);
+        let dom_reflows = self.browser.blink_layout.trigger_dom_reflow() as usize;
+        (grid_tracks.len(), dom_reflows)
+    }
 }
