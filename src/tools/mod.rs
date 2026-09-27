@@ -60,3 +60,6 @@ pub use tech_media_extended_suite::{
 pub mod dependency_reduction;
 pub use dependency_reduction::*;
 pub mod community_missing_tools;
+
+pub mod mint_usb_writer;
+pub use mint_usb_writer::*;
