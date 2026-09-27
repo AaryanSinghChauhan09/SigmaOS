@@ -5,6 +5,7 @@
 // - Module parameters parsing (modprobe option overrides)
 // - Module reference counting and safe unloading
 // - Kernel symbol export table (EXPORT_SYMBOL parity)
+// - Modular Kernel Subsystems and Hybrid Security Extensions
 
 use std::collections::BTreeMap;
 use std::format;
@@ -19,6 +20,35 @@ pub enum ModuleState {
     Unloading,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum SubsystemKind {
+    Storage,
+    Networking,
+    DisplayGpu,
+    SecurityLsm,
+    Filesystem,
+    Input,
+    Virtualization,
+    Custom,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DriverCapability {
+    DirectDmaAccess,
+    InterruptHandling,
+    RawPortIo,
+    KernelMemoryMap,
+    SecurityHookOverride,
+}
+
+#[derive(Debug, Clone)]
+pub struct HybridSecurityExtension {
+    pub name: String,
+    pub hook_type: String, // "syscall_intercept", "file_access", "net_filter"
+    pub priority: u32,
+    pub active: bool,
+}
+
 #[derive(Debug, Clone)]
 pub struct KernelSymbol {
     pub name: String,
@@ -29,12 +59,14 @@ pub struct KernelSymbol {
 #[derive(Debug, Clone)]
 pub struct KernelModule {
     pub name: String,
+    pub subsystem: SubsystemKind,
     pub version: String,
     pub author: String,
     pub license: String,
     pub state: ModuleState,
     pub ref_count: usize,
     pub dependencies: Vec<String>,
+    pub capabilities: Vec<DriverCapability>,
     pub parameters: BTreeMap<String, String>,
     pub exported_symbols: Vec<KernelSymbol>,
     pub base_address: u64,
@@ -74,6 +106,7 @@ pub struct SovereignKernelModuleManager {
     pub loaded_modules: BTreeMap<String, KernelModule>,
     pub kernel_symbol_table: BTreeMap<String, KernelSymbol>,
     pub device_alias_map: Vec<(DeviceBusType, String)>, // Alias -> ModuleName
+    pub security_extensions: Vec<HybridSecurityExtension>,
     pub taint_flags: Vec<TaintFlag>,
     next_load_address: u64,
 }
@@ -111,6 +144,7 @@ impl SovereignKernelModuleManager {
             loaded_modules: BTreeMap::new(),
             kernel_symbol_table: symbol_table,
             device_alias_map: Vec::new(),
+            security_extensions: Vec::new(),
             taint_flags: Vec::new(),
             next_load_address: 0xFFFFFFFFC0000000, // Standard Linux module load region
         }
@@ -140,6 +174,26 @@ impl SovereignKernelModuleManager {
             && (sig.algorithm == "Ed25519" || sig.algorithm == "Dilithium5")
     }
 
+    /// Register a hybrid security extension
+    pub fn register_security_extension(&mut self, ext: HybridSecurityExtension) -> bool {
+        if self.security_extensions.iter().any(|e| e.name == ext.name) {
+            return false;
+        }
+        self.security_extensions.push(ext);
+        self.security_extensions.sort_by(|a, b| b.priority.cmp(&a.priority));
+        true
+    }
+
+    /// Evaluates hybrid security hooks for process operations
+    pub fn evaluate_security_hook(&self, hook_type: &str) -> bool {
+        for ext in &self.security_extensions {
+            if ext.active && ext.hook_type == hook_type {
+                return true;
+            }
+        }
+        false
+    }
+
     /// Registers a core kernel symbol export (EXPORT_SYMBOL parity)
     pub fn export_kernel_symbol(&mut self, name: &str, address: u64, gpl_only: bool) {
         let sym = KernelSymbol {
@@ -160,8 +214,37 @@ impl SovereignKernelModuleManager {
         params: BTreeMap<String, String>,
         size_bytes: usize,
     ) -> Result<u64, String> {
+        self.load_module_with_subsystem(
+            name,
+            SubsystemKind::Custom,
+            version,
+            license,
+            deps,
+            vec![],
+            params,
+            size_bytes,
+        )
+    }
+
+    /// Dynamically loads a kernel module with specific subsystem and capability requirements
+    pub fn load_module_with_subsystem(
+        &mut self,
+        name: &str,
+        subsystem: SubsystemKind,
+        version: &str,
+        license: &str,
+        deps: Vec<String>,
+        capabilities: Vec<DriverCapability>,
+        params: BTreeMap<String, String>,
+        size_bytes: usize,
+    ) -> Result<u64, String> {
         if self.loaded_modules.contains_key(name) {
             return Err(format!("Module {} is already loaded", name));
+        }
+
+        // Check license compatibility and taint if proprietary
+        if license != "GPL" && license != "GPL-2.0" && license != "BSD" && license != "Dual MIT/GPL" {
+            self.add_taint(TaintFlag::GPLIncompatible);
         }
 
         // Verify dependencies
@@ -186,12 +269,14 @@ impl SovereignKernelModuleManager {
 
         let module = KernelModule {
             name: name.to_string(),
+            subsystem,
             version: version.to_string(),
             author: String::from("SigmaOS Team"),
             license: license.to_string(),
             state: ModuleState::Live,
             ref_count: 0,
             dependencies: deps,
+            capabilities,
             parameters: params,
             exported_symbols: Vec::new(),
             base_address,
@@ -377,5 +462,39 @@ mod tests {
             key_id: String::from("key-1"),
         };
         assert!(mgr.verify_signature(&sig));
+    }
+
+    #[test]
+    fn test_modular_subsystems_and_hybrid_security_extensions() {
+        let mut mgr = SovereignKernelModuleManager::new();
+
+        // Load network driver with subsystem and capabilities
+        let addr = mgr
+            .load_module_with_subsystem(
+                "virtio_net",
+                SubsystemKind::Networking,
+                "1.0.0",
+                "GPL",
+                vec![],
+                vec![DriverCapability::DirectDmaAccess, DriverCapability::InterruptHandling],
+                BTreeMap::new(),
+                12288,
+            )
+            .unwrap();
+        assert!(addr >= 0xFFFFFFFFC0000000);
+        let mod_entry = mgr.loaded_modules.get("virtio_net").unwrap();
+        assert_eq!(mod_entry.subsystem, SubsystemKind::Networking);
+        assert!(mod_entry.capabilities.contains(&DriverCapability::DirectDmaAccess));
+
+        // Register hybrid security extension
+        let ext = HybridSecurityExtension {
+            name: String::from("sigma_lsm_guard"),
+            hook_type: String::from("syscall_intercept"),
+            priority: 10,
+            active: true,
+        };
+        assert!(mgr.register_security_extension(ext));
+        assert!(mgr.evaluate_security_hook("syscall_intercept"));
+        assert!(!mgr.evaluate_security_hook("file_access"));
     }
 }

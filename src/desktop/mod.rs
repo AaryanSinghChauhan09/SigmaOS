@@ -6,6 +6,8 @@ pub mod mate_betsy;
 pub mod mint_tools;
 pub mod moksha;
 pub mod omarchy_omakase;
+pub mod omarchy_tui_dashboard;
+pub use omarchy_tui_dashboard::*;
 pub mod pantheon;
 pub mod screensaver;
 pub mod sovereign_navigation_engine;

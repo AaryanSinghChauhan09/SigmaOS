@@ -15,3 +15,6 @@
 
 pub mod sandbox;
 pub mod sdk;
+pub mod sigma_ide_developer_experience;
+
+pub use sigma_ide_developer_experience::*;
