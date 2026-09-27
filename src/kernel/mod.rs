@@ -153,7 +153,7 @@ pub mod sigma_kernel_autotuner_v2;
 pub mod xdp_engine_sovereign;
 
 pub use hardened_security_mitigations::{
-    CfiFunctionSignature, KptrRestrictLevel, SovereignHardenedSecurityMitigationsEngine,
+    CfiFunctionSignature, SovereignHardenedSecurityMitigationsEngine,
 };
 
 // ─── Live Migration Engine (CRIU / QEMU inspired) ─────────────────────────────
@@ -164,3 +164,8 @@ pub use sovereign_kernel_pr_gateway::*;
 
 pub mod low_level_hardware;
 pub use low_level_hardware::*;
+
+pub mod kptr_restrict;
+pub use kptr_restrict::{
+    KptrRestrictLevel, DmesgRestrictLevel, KernelSecurityMitigations, get_security_mitigations,
+};
