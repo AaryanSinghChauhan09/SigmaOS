@@ -46,8 +46,8 @@ Before completing any development step or committing changes:
    - `./` (Root)
    - `docs/`
    - `wiki/`
-   - `WIKI/`
-   - `wiki_repo/`
+
+
 
 ---
 
@@ -73,4 +73,4 @@ Before completing any development step or committing changes:
 4. **Zero Dependency Rule:** The "Zero Dependency Philosophy" section must be updated if the allowed dependency list changes. Currently only `core` and `alloc` are allowed.
 5. **Immediate Tasks:** The "Recommended Immediate Tasks" section should be reviewed weekly. Move completed tasks to a "Completed Tasks" section at the bottom with completion dates.
 6. **Mirror Synchronization:** The "Synchronize Documentation Mirrors" step must list all active mirror directories. Remove references to deleted mirrors (e.g., `WIKI/` and `wiki_repo/` after consolidation).
-7. **Sync Requirement:** After updating this file, propagate changes to `WIKI/` and `wiki_repo/` mirrors (if they still exist) and update the GitHub Wiki page via `gh api`.
+7. **Sync Requirement:** After updating this file, propagate changes to the `wiki/` directory and update the GitHub Wiki page via `gh api`.

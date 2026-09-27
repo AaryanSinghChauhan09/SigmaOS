@@ -118,7 +118,7 @@ SigmaOS is a sovereign, AI-native operating system kernel and desktop ecosystem 
 
 1. **Maintain Clean Compilation:** Ensure all future module updates pass `cargo check --lib` and `./run_sigma_tests.sh`.
 2. **Expand Tri-Agent Journals:** Update `.jules/bolt.md`, `.jules/palette.md`, and `.jules/sentinel.md` with every daily optimization iteration.
-3. **Continuous Integration:** Keep all documentation and wiki mirrors (`./`, `docs/`, `wiki/`, `WIKI/`, `wiki_repo/`) synchronized.
+3. **Continuous Integration:** Keep all documentation and wiki mirrors (`./`, `docs/`, `wiki/`) synchronized.
 
 ---
 
@@ -134,4 +134,4 @@ SigmaOS is a sovereign, AI-native operating system kernel and desktop ecosystem 
 5. **Security Findings:** Security-related findings must include CVE references (if applicable), affected versions, and verification steps for the fix.
 6. **Summary Matrix:** The "Priority Ranking & Summary Matrix" at the end must be updated to reflect the current state of all action items. Sort by priority (High first).
 7. **Tri-Agent Journals:** After completing any action item, update the corresponding agent journal (`.jules/bolt.md`, `.jules/palette.md`, `.jules/sentinel.md`) with key learnings.
-8. **Sync Requirement:** After updating this file, propagate changes to `WIKI/` and `wiki_repo/` mirrors (if they still exist) and update the GitHub Wiki page via `gh api`.
+8. **Sync Requirement:** After updating this file, propagate changes to `wiki/` directory and update the GitHub Wiki page via `gh api`.
