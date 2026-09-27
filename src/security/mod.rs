@@ -1,4 +1,5 @@
 // SigmaOS Security Subsystem
+pub mod memory_protection;
 pub mod capability;
 pub mod hardware_privilege;
 pub mod pqc_enclave;
@@ -161,3 +162,4 @@ pub use hardware_privilege::*;
 pub use capsicum::{
     CapRight, CapMode, CapEntry, CapabilitySandbox,
 };
+pub use memory_protection::{MemoryProtectionManager, MemoryProtectionMode, AslrConfig, StackCanaryConfig};
