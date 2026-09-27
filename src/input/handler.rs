@@ -29,7 +29,7 @@ use core::mem;
 
 /// Input device type
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InputDeviceType {
     Keyboard = 0,
     Mouse = 1,
@@ -50,7 +50,7 @@ pub trait InputEvent {
 
 /// Input event type
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InputEventType {
     KeyPress = 0,
     KeyRelease = 1,
@@ -75,7 +75,7 @@ pub struct KeyEvent {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct KeyModifiers {
     pub shift: bool,
     pub ctrl: bool,
@@ -130,7 +130,7 @@ pub struct MouseEvent {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct MouseButtons {
     pub left: bool,
     pub right: bool,
@@ -180,7 +180,7 @@ pub trait InputHandler {
 
 /// Input result
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InputResult {
     Handled = 0,
     Ignored = 1,
@@ -207,7 +207,7 @@ impl InputHandlerInfo {
 
 /// Handler type
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum HandlerType {
     Keyboard = 0,
     Mouse = 1,
@@ -227,7 +227,7 @@ pub enum Priority {
 
 /// Handler capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct HandlerCapability {
     pub can_handle: bool,
     pub can_block: bool,
@@ -320,7 +320,7 @@ pub trait InputManager {
 
 /// Input error types
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InputError {
     Success = 0,
     HandlerNotFound = 1,
@@ -341,7 +341,7 @@ pub struct InputDevice {
 
 /// Device capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct DeviceCapability {
     pub can_enable: bool,
     pub can_disable: bool,
@@ -438,7 +438,7 @@ pub struct SimpleInputManager {
 
 /// Manager capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ManagerCapability {
     pub can_register_handlers: bool,
     pub can_unregister_handlers: bool,
