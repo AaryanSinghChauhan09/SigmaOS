@@ -780,6 +780,289 @@ impl Default for SovereignXAppCrossDesktopSuite {
     }
 }
 
+/// Target selection requirements for Cinnamon Spices Context Menu Actions (.nemo_action)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CinnamonActionTarget {
+    /// Action applies to exactly one file
+    SingleFile,
+    /// Action applies to one or more files
+    MultipleFiles,
+    /// Action applies to directory target
+    Directory,
+    /// Action applies anywhere in file manager background or selection
+    Any,
+}
+
+/// Dynamic condition required for a Cinnamon Spices Action to be active
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum CinnamonActionCondition {
+    /// MIME type match list (e.g., ["image/png", "text/*"])
+    MimeTypesMatch(Vec<String>),
+    /// File extension match list (e.g., ["jpg", "pdf", "zip"])
+    FileExtensionsMatch(Vec<String>),
+    /// Target must be a directory
+    IsDirectory,
+    /// Executable binary must exist in PATH
+    ExecExists(String),
+    /// Target file/folder path must exist
+    PathExists(String),
+}
+
+/// Context menu action inspired by Linux Mint `cinnamon-spices-actions` (.nemo_action)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CinnamonAction {
+    /// Action identifier / filename
+    pub id: String,
+    /// Human readable name displayed in context menu
+    pub name: String,
+    /// Tooltip description
+    pub comment: String,
+    /// Associated icon name
+    pub icon_name: String,
+    /// Execution command pattern (supports %F, %f, %U, %d)
+    pub exec_pattern: String,
+    /// Target selection type
+    pub target: CinnamonActionTarget,
+    /// Conditions required for action activation
+    pub conditions: Vec<CinnamonActionCondition>,
+    /// Whether action is currently enabled
+    pub enabled: bool,
+    /// Stock location or user installed spice priority
+    pub is_user_spice: bool,
+}
+
+impl CinnamonAction {
+    /// Create a new Cinnamon action
+    pub fn new(id: &str, name: &str, exec_pattern: &str) -> Self {
+        Self {
+            id: id.to_string(),
+            name: name.to_string(),
+            comment: String::new(),
+            icon_name: "system-run".to_string(),
+            exec_pattern: exec_pattern.to_string(),
+            target: CinnamonActionTarget::Any,
+            conditions: Vec::new(),
+            enabled: true,
+            is_user_spice: false,
+        }
+    }
+
+    /// Expand execution command pattern given selected file targets and directory
+    pub fn expand_command(&self, selected_paths: &[&str], current_dir: &str) -> String {
+        let first = selected_paths.first().copied().unwrap_or("");
+        let all_files = selected_paths.join(" ");
+
+        let mut cmd = self.exec_pattern.clone();
+        cmd = cmd.replace("%f", first);
+        cmd = cmd.replace("%F", &all_files);
+        cmd = cmd.replace("%d", current_dir);
+        cmd = cmd.replace("%U", &format!("file://{}", first));
+        cmd
+    }
+
+    /// Evaluate whether this action is applicable to a given selection and MIME list
+    pub fn is_applicable(&self, selected_paths: &[&str], mime_types: &[&str]) -> bool {
+        if !self.enabled {
+            return false;
+        }
+
+        // Check target count match
+        match self.target {
+            CinnamonActionTarget::SingleFile => {
+                if selected_paths.len() != 1 {
+                    return false;
+                }
+            }
+            CinnamonActionTarget::MultipleFiles => {
+                if selected_paths.is_empty() {
+                    return false;
+                }
+            }
+            CinnamonActionTarget::Directory => {
+                if selected_paths.len() != 1 || !mime_types.iter().any(|m| *m == "inode/directory") {
+                    return false;
+                }
+            }
+            CinnamonActionTarget::Any => {}
+        }
+
+        // Check conditions
+        for cond in &self.conditions {
+            match cond {
+                CinnamonActionCondition::MimeTypesMatch(expected_mimes) => {
+                    let matches = mime_types.iter().any(|m| {
+                        expected_mimes.iter().any(|expected| {
+                            if expected.ends_with("/*") {
+                                let prefix = &expected[..expected.len() - 2];
+                                m.starts_with(prefix)
+                            } else {
+                                m == expected
+                            }
+                        })
+                    });
+                    if !matches {
+                        return false;
+                    }
+                }
+                CinnamonActionCondition::FileExtensionsMatch(expected_exts) => {
+                    let matches = selected_paths.iter().any(|p| {
+                        p.split('.').last().map(|ext| {
+                            expected_exts.iter().any(|e| e.eq_ignore_ascii_case(ext))
+                        }).unwrap_or(false)
+                    });
+                    if !matches {
+                        return false;
+                    }
+                }
+                CinnamonActionCondition::IsDirectory => {
+                    if !mime_types.iter().any(|m| *m == "inode/directory") {
+                        return false;
+                    }
+                }
+                CinnamonActionCondition::ExecExists(_binary) => {
+                    // In simulation / no_std environment, treat as matched
+                }
+                CinnamonActionCondition::PathExists(_path) => {
+                    // In simulation / no_std environment, treat as matched
+                }
+            }
+        }
+
+        true
+    }
+}
+
+/// Manager for Cinnamon Spices Actions (`cinnamon-spices-actions` / Nemo actions)
+#[derive(Debug, Clone)]
+pub struct CinnamonSpicesActionManager {
+    /// Collection of registered actions
+    pub actions: Vec<CinnamonAction>,
+    /// System actions path (~/.local/share/nemo/actions or /usr/share/nemo/actions)
+    pub actions_directory: String,
+}
+
+impl CinnamonSpicesActionManager {
+    /// Create a new Cinnamon Spices Action Manager
+    pub fn new(actions_directory: &str) -> Self {
+        Self {
+            actions: Vec::new(),
+            actions_directory: actions_directory.to_string(),
+        }
+    }
+
+    /// Register a new action
+    pub fn register_action(&mut self, action: CinnamonAction) {
+        self.actions.retain(|a| a.id != action.id);
+        self.actions.push(action);
+    }
+
+    /// Parse a simulated `.nemo_action` configuration block into a `CinnamonAction`
+    pub fn parse_nemo_action_spec(&mut self, spec_lines: &[&str]) -> Result<&CinnamonAction, &'static str> {
+        let mut id = String::new();
+        let mut name = String::new();
+        let mut comment = String::new();
+        let mut icon = "system-run".to_string();
+        let mut exec = String::new();
+        let mut conditions = Vec::new();
+        let mut target = CinnamonActionTarget::Any;
+
+        for line in spec_lines {
+            let line = line.trim();
+            if line.is_empty() || line.starts_with('#') || line.starts_with('[') {
+                continue;
+            }
+            if let Some((key, val)) = line.split_once('=') {
+                let k = key.trim();
+                let v = val.trim();
+                match k {
+                    "Id" | "Name" => {
+                        if k == "Id" {
+                            id = v.to_string();
+                        } else {
+                            name = v.to_string();
+                        }
+                    }
+                    "Comment" => comment = v.to_string(),
+                    "Icon-Name" => icon = v.to_string(),
+                    "Exec" => exec = v.to_string(),
+                    "Selection" => match v {
+                        "s" | "1" => target = CinnamonActionTarget::SingleFile,
+                        "m" | "multiple" => target = CinnamonActionTarget::MultipleFiles,
+                        "dir" | "directory" => target = CinnamonActionTarget::Directory,
+                        _ => target = CinnamonActionTarget::Any,
+                    },
+                    "Mimetypes" => {
+                        let mimes: Vec<String> = v
+                            .split(';')
+                            .map(|m| m.trim().to_string())
+                            .filter(|m| !m.is_empty() && m != "all")
+                            .collect();
+                        if !mimes.is_empty() {
+                            conditions.push(CinnamonActionCondition::MimeTypesMatch(mimes));
+                        }
+                    }
+                    "Extensions" => {
+                        let exts: Vec<String> = v
+                            .split(';')
+                            .map(|e| e.trim().to_string())
+                            .filter(|e| !e.is_empty())
+                            .collect();
+                        if !exts.is_empty() {
+                            conditions.push(CinnamonActionCondition::FileExtensionsMatch(exts));
+                        }
+                    }
+                    _ => {}
+                }
+            }
+        }
+
+        if id.is_empty() || exec.is_empty() {
+            return Err("Missing required Id or Exec key in .nemo_action spec");
+        }
+
+        let mut action = CinnamonAction::new(&id, if name.is_empty() { &id } else { &name }, &exec);
+        action.comment = comment;
+        action.icon_name = icon;
+        action.target = target;
+        action.conditions = conditions;
+
+        self.register_action(action);
+        Ok(self.actions.last().unwrap())
+    }
+
+    /// Query actions applicable for selected file paths and their MIME types
+    pub fn get_applicable_actions(
+        &self,
+        selected_paths: &[&str],
+        mime_types: &[&str],
+    ) -> Vec<&CinnamonAction> {
+        self.actions
+            .iter()
+            .filter(|a| a.is_applicable(selected_paths, mime_types))
+            .collect()
+    }
+
+    /// Execute action and return expanded command string
+    pub fn execute_action(
+        &self,
+        action_id: &str,
+        selected_paths: &[&str],
+        current_dir: &str,
+    ) -> Result<String, &'static str> {
+        if let Some(action) = self.actions.iter().find(|a| a.id == action_id) {
+            Ok(action.expand_command(selected_paths, current_dir))
+        } else {
+            Err("Action ID not found")
+        }
+    }
+}
+
+impl Default for CinnamonSpicesActionManager {
+    fn default() -> Self {
+        Self::new("~/.local/share/nemo/actions")
+    }
+}
+
 /// Cinnamon Desktop Manager - manages Cinnamon desktop environment
 #[derive(Debug)]
 pub struct CinnamonDesktopManager {
@@ -1054,5 +1337,67 @@ mod tests {
         let suite = SovereignXAppCrossDesktopSuite::new("xplayer");
         let envs = suite.export_environment_variables();
         assert!(!envs.is_empty());
+    }
+
+    #[test]
+    fn test_cinnamon_spices_action_registration_and_evaluation() {
+        let mut mgr = CinnamonSpicesActionManager::default();
+
+        let spec = &[
+            "[Nemo Action]",
+            "Id=set-as-wallpaper",
+            "Name=Set as Wallpaper",
+            "Comment=Set image as desktop background",
+            "Exec=cinnamon-wallpaper-set %f",
+            "Selection=s",
+            "Mimetypes=image/*;",
+        ];
+
+        let action = mgr.parse_nemo_action_spec(spec).unwrap();
+        assert_eq!(action.id, "set-as-wallpaper");
+        assert_eq!(action.target, CinnamonActionTarget::SingleFile);
+
+        let active = mgr.get_applicable_actions(&["/home/user/photo.png"], &["image/png"]);
+        assert_eq!(active.len(), 1);
+        assert_eq!(active[0].id, "set-as-wallpaper");
+
+        let inactive = mgr.get_applicable_actions(&["/home/user/doc.pdf"], &["application/pdf"]);
+        assert_eq!(inactive.len(), 0);
+    }
+
+    #[test]
+    fn test_cinnamon_action_command_expansion() {
+        let action = CinnamonAction::new(
+            "open-terminal-here",
+            "Open Terminal Here",
+            "gnome-terminal --working-directory=%d -e %F",
+        );
+
+        let expanded = action.expand_command(
+            &["/tmp/file1.txt", "/tmp/file2.txt"],
+            "/tmp",
+        );
+        assert_eq!(expanded, "gnome-terminal --working-directory=/tmp -e /tmp/file1.txt /tmp/file2.txt");
+    }
+
+    #[test]
+    fn test_cinnamon_action_conditions() {
+        let mut mgr = CinnamonSpicesActionManager::default();
+
+        let spec = &[
+            "Id=extract-archive",
+            "Name=Extract Archive Here",
+            "Exec=file-roller --extract-here %F",
+            "Selection=m",
+            "Extensions=zip;tar.gz;7z;",
+        ];
+
+        let _action = mgr.parse_nemo_action_spec(spec).unwrap();
+        let applicable = mgr.get_applicable_actions(
+            &["/tmp/archive.zip", "/tmp/data.tar.gz"],
+            &["application/zip", "application/gzip"],
+        );
+        assert_eq!(applicable.len(), 1);
+        assert_eq!(applicable[0].id, "extract-archive");
     }
 }
