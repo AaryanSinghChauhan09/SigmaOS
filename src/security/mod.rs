@@ -9,6 +9,7 @@ pub mod sigma_pledge;
 pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
+pub mod capsicum;
 
 // SigmaOS Security Subsystem
 pub mod seccomp;
@@ -156,3 +157,7 @@ pub mod capability_monitor;
 pub mod phase_audit;
 
 pub use hardware_privilege::*;
+
+pub use capsicum::{
+    CapRight, CapMode, CapEntry, CapabilitySandbox,
+};
