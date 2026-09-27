@@ -15,3 +15,6 @@
 
 pub mod handler;
 pub mod keyboard;
+pub mod omarchy_keyboard_shortcuts;
+
+pub use omarchy_keyboard_shortcuts::*;
