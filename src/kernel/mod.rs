@@ -169,3 +169,8 @@ pub mod kptr_restrict;
 pub use kptr_restrict::{
     KptrRestrictLevel, DmesgRestrictLevel, KernelSecurityMitigations, get_security_mitigations,
 };
+
+pub mod procfs_linux;
+pub use procfs_linux::{
+    ProcessInfo, ProcessState, ProcFs,
+};
