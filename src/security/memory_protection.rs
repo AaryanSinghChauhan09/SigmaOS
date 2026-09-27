@@ -10,7 +10,10 @@ pub enum MemoryProtectionMode {
     None = 0,
     StackCanaries = 1,
     ASLR = 2,
-    Full = 3, // Both ASLR and stack canaries
+    SmepSmap = 4,
+    DepNx = 8,
+    RopProtection = 16,
+    Full = 31, // All protections enabled
 }
 
 /// Address Space Layout Randomization configuration
@@ -49,19 +52,58 @@ impl Default for StackCanaryConfig {
     }
 }
 
+/// SMEP and SMAP CPU configuration flags
+#[derive(Debug, Clone)]
+pub struct SmepSmapConfig {
+    pub smep_enabled: bool, // Supervisor Mode Execution Prevention
+    pub smap_enabled: bool, // Supervisor Mode Access Prevention
+    pub allow_user_access_toggle: bool, // Temporary STAC/CLAC user access toggle
+}
+
+impl Default for SmepSmapConfig {
+    fn default() -> Self {
+        Self {
+            smep_enabled: true,
+            smap_enabled: true,
+            allow_user_access_toggle: false,
+        }
+    }
+}
+
+/// DEP / NX (No-Execute) page permission configuration
+#[derive(Debug, Clone)]
+pub struct DepNxConfig {
+    pub enabled: bool,
+    pub enforce_w_xor_x: bool, // W^X (Write XOR Execute)
+}
+
+impl Default for DepNxConfig {
+    fn default() -> Self {
+        Self {
+            enabled: true,
+            enforce_w_xor_x: true,
+        }
+    }
+}
+
 /// Memory protection manager
 pub struct MemoryProtectionManager {
     pub mode: MemoryProtectionMode,
     pub aslr_config: AslrConfig,
     pub stack_canary_config: StackCanaryConfig,
+    pub smep_smap_config: SmepSmapConfig,
+    pub dep_nx_config: DepNxConfig,
     pub aslr_offset: AtomicU64,
     pub stack_canary_map: HashMap<usize, u64>,
+    pub shadow_stack: HashMap<usize, u64>, // ROP shadow stack tracking return addresses
 }
 
 impl MemoryProtectionManager {
     pub fn new(mode: MemoryProtectionMode) -> Self {
         let aslr_config = AslrConfig::default();
         let stack_canary_config = StackCanaryConfig::default();
+        let smep_smap_config = SmepSmapConfig::default();
+        let dep_nx_config = DepNxConfig::default();
         
         // Generate random ASLR offset if enabled
         let aslr_offset = if mode == MemoryProtectionMode::ASLR || mode == MemoryProtectionMode::Full {
@@ -74,9 +116,68 @@ impl MemoryProtectionManager {
             mode,
             aslr_config,
             stack_canary_config,
+            smep_smap_config,
+            dep_nx_config,
             aslr_offset,
             stack_canary_map: HashMap::new(),
+            shadow_stack: HashMap::new(),
         }
+    }
+
+    /// SMEP check: Verify supervisor mode cannot execute user-space code page
+    pub fn verify_smep(&self, target_address: u64, is_user_page: bool) -> Result<(), &'static str> {
+        if (self.mode == MemoryProtectionMode::SmepSmap || self.mode == MemoryProtectionMode::Full)
+            && self.smep_smap_config.smep_enabled
+            && is_user_page
+        {
+            return Err("SMEP Violation: Attempted supervisor execution of user-space memory page");
+        }
+        Ok(())
+    }
+
+    /// SMAP check: Verify supervisor mode cannot access user-space data page without STAC
+    pub fn verify_smap(&self, target_address: u64, is_user_page: bool, user_access_allowed: bool) -> Result<(), &'static str> {
+        if (self.mode == MemoryProtectionMode::SmepSmap || self.mode == MemoryProtectionMode::Full)
+            && self.smep_smap_config.smap_enabled
+            && is_user_page
+            && !user_access_allowed
+        {
+            return Err("SMAP Violation: Unsanitized supervisor access to user-space memory page");
+        }
+        Ok(())
+    }
+
+    /// DEP / NX check: Verify page permissions conform to No-Execute and W^X policies
+    pub fn verify_dep_nx(&self, is_writable: bool, is_executable: bool) -> Result<(), &'static str> {
+        if (self.mode == MemoryProtectionMode::DepNx || self.mode == MemoryProtectionMode::Full)
+            && self.dep_nx_config.enabled
+        {
+            if self.dep_nx_config.enforce_w_xor_x && is_writable && is_executable {
+                return Err("DEP/NX W^X Violation: Memory page cannot be both writable and executable");
+            }
+        }
+        Ok(())
+    }
+
+    /// ROP Shadow Stack: Push return address onto shadow stack
+    pub fn push_shadow_stack(&mut self, thread_id: usize, return_address: u64) {
+        if self.mode == MemoryProtectionMode::RopProtection || self.mode == MemoryProtectionMode::Full {
+            self.shadow_stack.insert(thread_id, return_address);
+        }
+    }
+
+    /// ROP Shadow Stack: Verify return address against shadow stack entry
+    pub fn verify_shadow_stack(&mut self, thread_id: usize, actual_return_address: u64) -> Result<(), &'static str> {
+        if self.mode == MemoryProtectionMode::RopProtection || self.mode == MemoryProtectionMode::Full {
+            if let Some(expected_return_address) = self.shadow_stack.remove(&thread_id) {
+                if expected_return_address != actual_return_address {
+                    return Err("ROP Protection Violation: Return address mismatch on shadow stack");
+                }
+            } else {
+                return Err("ROP Protection Violation: Missing shadow stack frame");
+            }
+        }
+        Ok(())
     }
 
     /// Generate a random offset for ASLR
@@ -218,5 +319,37 @@ mod tests {
         manager.re_randomize_aslr();
         let new_offset = manager.get_aslr_offset();
         assert_ne!(initial_offset, new_offset);
+    }
+
+    #[test]
+    fn test_smep_smap_verification() {
+        let manager = MemoryProtectionManager::new(MemoryProtectionMode::SmepSmap);
+        assert!(manager.verify_smep(0x100000, false).is_ok());
+        assert!(manager.verify_smep(0x100000, true).is_err()); // User page execution blocked
+
+        assert!(manager.verify_smap(0x100000, false, false).is_ok());
+        assert!(manager.verify_smap(0x100000, true, false).is_err()); // User page access without STAC blocked
+        assert!(manager.verify_smap(0x100000, true, true).is_ok());  // STAC enabled
+    }
+
+    #[test]
+    fn test_dep_nx_verification() {
+        let manager = MemoryProtectionManager::new(MemoryProtectionMode::DepNx);
+        assert!(manager.verify_dep_nx(false, true).is_ok());  // RX page
+        assert!(manager.verify_dep_nx(true, false).is_ok());  // RW page
+        assert!(manager.verify_dep_nx(true, true).is_err());   // RWX W^X violation
+    }
+
+    #[test]
+    fn test_rop_shadow_stack() {
+        let mut manager = MemoryProtectionManager::new(MemoryProtectionMode::RopProtection);
+        let thread_id = 1;
+        let ret_addr = 0x40001000;
+
+        manager.push_shadow_stack(thread_id, ret_addr);
+        assert!(manager.verify_shadow_stack(thread_id, ret_addr).is_ok());
+
+        manager.push_shadow_stack(thread_id, ret_addr);
+        assert!(manager.verify_shadow_stack(thread_id, 0x40002000).is_err());
     }
 }
