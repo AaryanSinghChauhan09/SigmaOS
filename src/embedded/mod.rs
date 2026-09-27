@@ -7,8 +7,9 @@
 use std::string::{String, ToString};
 use std::vec::Vec;
 use std::format;
+use std::sync::Mutex;
 
-use core::sync::atomic::{AtomicU32, AtomicBool, Ordering};
+use core::sync::atomic::{AtomicU32, AtomicBool, AtomicUsize, Ordering};
 
 /// Peripheral device types for embedded systems
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -53,11 +54,11 @@ pub enum PlatformProfile {
 impl HardwareAbstractionLayer {
     pub const fn new() -> Self {
         Self {
-            initialized: Cell::new(false),
-            platform_profile: Cell::new(PlatformProfile::Unknown),
-            cpu_id: Cell::new(0),
-            memory_size: Cell::new(0),
-            board_revision: Cell::new(0),
+            initialized: AtomicBool::new(false),
+            platform_profile: AtomicU32::new(PlatformProfile::Unknown as u32),
+            cpu_id: AtomicU32::new(0),
+            memory_size: AtomicU32::new(0),
+            board_revision: AtomicU32::new(0),
         }
     }
 
@@ -148,19 +149,19 @@ impl HardwareAbstractionLayer {
 
 /// Enhanced GPIO driver with real register access
 pub struct GpioDriver {
-    pub pin_count: Cell<u32>,
-    pub configured_pins: Cell<u32>,
+    pub pin_count: AtomicU32,
+    pub configured_pins: AtomicU32,
     pub base_address: u32,
-    pub pin_states: Cell<u32>, // Bitmask of pin states
+    pub pin_states: AtomicU32, // Bitmask of pin states
 }
 
 impl GpioDriver {
     pub fn new(base_address: u32) -> Self {
         Self {
-            pin_count: Cell::new(0),
-            configured_pins: Cell::new(0),
+            pin_count: AtomicU32::new(0),
+            configured_pins: AtomicU32::new(0),
             base_address,
-            pin_states: Cell::new(0),
+            pin_states: AtomicU32::new(0),
         }
     }
 
@@ -272,7 +273,7 @@ impl PeripheralDevice for GpioDriver {
 pub struct PeripheralManager {
     pub devices: AtomicU32,
     pub active_drivers: AtomicU32,
-    pub discovered_peripherals: Cell<Vec<PeripheralInfo>>,
+    pub discovered_peripherals: Mutex<Vec<PeripheralInfo>>,
 }
 
 #[derive(Debug, Clone)]
@@ -284,11 +285,11 @@ pub struct PeripheralInfo {
 }
 
 impl PeripheralManager {
-    pub const fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             devices: AtomicU32::new(0),
             active_drivers: AtomicU32::new(0),
-            discovered_peripherals: Cell::new(Vec::new()),
+            discovered_peripherals: Mutex::new(Vec::new()),
         }
     }
 
@@ -301,7 +302,7 @@ impl PeripheralManager {
         peripherals.extend(self.scan_spi());
         peripherals.extend(self.scan_i2c());
         
-        self.devices.store(peripherals.len(, Ordering::SeqCst) as u32, Ordering::SeqCst);
+        self.devices.store(peripherals.len() as u32, Ordering::SeqCst);
         Ok(peripherals)
     }
 

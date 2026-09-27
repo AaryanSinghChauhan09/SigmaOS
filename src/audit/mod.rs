@@ -4,7 +4,7 @@
 // Enhanced with real enforcement capabilities for Linux/BSD parity
 
 
-use core::sync::atomic::{AtomicU32, AtomicU64, AtomicBool, Ordering};
+use core::sync::atomic::{AtomicU32, AtomicU64, AtomicBool, AtomicUsize, Ordering};
 
 /// Audit log entry types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -119,24 +119,24 @@ impl MemoryAuditShard {
 
 /// Sandbox audit shard for pledge/unveil monitoring
 pub struct SandboxAuditShard {
-    pub blocked_syscalls: Cell<u32>,
-    pub pledge_violations: Cell<u32>,
-    pub process_pledge_table: Cell<u64>,
-    pub active_monitoring: Cell<bool>,
+    pub blocked_syscalls: AtomicU32,
+    pub pledge_violations: AtomicU32,
+    pub process_pledge_table: AtomicU64,
+    pub active_monitoring: AtomicBool,
 }
 
 impl SandboxAuditShard {
     pub const fn new() -> Self {
         Self {
-            blocked_syscalls: Cell::new(0),
-            pledge_violations: Cell::new(0),
-            process_pledge_table: Cell::new(0),
-            active_monitoring: Cell::new(true),
+            blocked_syscalls: AtomicU32::new(0),
+            pledge_violations: AtomicU32::new(0),
+            process_pledge_table: AtomicU64::new(0),
+            active_monitoring: AtomicBool::new(true),
         }
     }
 
     pub fn log_blocked_syscall(&self, _syscall_number: usize, process_id: usize) {
-        self.blocked_syscalls.store(self.blocked_syscalls.load(Ordering::SeqCst, Ordering::SeqCst)) + 1);
+        self.blocked_syscalls.fetch_add(1, Ordering::SeqCst);
         
         let entry = AuditEntry {
             event_type: AuditEventType::SyscallBlocked,
@@ -150,14 +150,14 @@ impl SandboxAuditShard {
     }
 
     pub fn check_pledge_compliance(&self, process_id: usize, requested_permissions: u64) -> bool {
-        if !self.active_monitoring.load(Ordering::SeqCst)) {
+        if !self.active_monitoring.load(Ordering::SeqCst) {
             return true;
         }
 
         let current_pledges = self.get_process_pledges(process_id);
         
         if (requested_permissions & !current_pledges) != 0 {
-            self.pledge_violations.store(self.pledge_violations.load(Ordering::SeqCst, Ordering::SeqCst)) + 1);
+            self.pledge_violations.fetch_add(1, Ordering::SeqCst);
             
             let entry = AuditEntry {
                 event_type: AuditEventType::SandboxViolation,
@@ -209,39 +209,39 @@ impl SandboxAuditShard {
     }
 
     pub fn get_stats(&self) -> (u32, u32) {
-        (self.blocked_syscalls.load(Ordering::SeqCst)), self.pledge_violations.load(Ordering::SeqCst)))
+        (self.blocked_syscalls.load(Ordering::SeqCst), self.pledge_violations.load(Ordering::SeqCst))
     }
 }
 
 /// Cryptographic audit shard for PQC signatures
 pub struct CryptoAuditShard {
-    pub signed_entries: Cell<u32>,
-    pub signature_failures: Cell<u32>,
-    pub pqc_enabled: Cell<bool>,
-    pub signing_key_id: Cell<usize>,
+    pub signed_entries: AtomicU32,
+    pub signature_failures: AtomicU32,
+    pub pqc_enabled: AtomicBool,
+    pub signing_key_id: AtomicUsize,
 }
 
 impl CryptoAuditShard {
     pub const fn new() -> Self {
         Self {
-            signed_entries: Cell::new(0),
-            signature_failures: Cell::new(0),
-            pqc_enabled: Cell::new(true),
-            signing_key_id: Cell::new(0),
+            signed_entries: AtomicU32::new(0),
+            signature_failures: AtomicU32::new(0),
+            pqc_enabled: AtomicBool::new(true),
+            signing_key_id: AtomicUsize::new(0),
         }
     }
 
     pub fn sign_entry(&self, entry: &AuditEntry) -> bool {
-        if !self.pqc_enabled.load(Ordering::SeqCst)) {
+        if !self.pqc_enabled.load(Ordering::SeqCst) {
             return true;
         }
 
         let signature_success = self.generate_dilithium_signature(entry);
         
         if signature_success {
-            self.signed_entries.store(self.signed_entries.load(Ordering::SeqCst, Ordering::SeqCst)) + 1);
+            self.signed_entries.fetch_add(1, Ordering::SeqCst);
         } else {
-            self.signature_failures.store(self.signature_failures.load(Ordering::SeqCst, Ordering::SeqCst)) + 1);
+            self.signature_failures.fetch_add(1, Ordering::SeqCst);
         }
         
         signature_success
@@ -278,7 +278,7 @@ impl CryptoAuditShard {
     }
 
     pub fn get_stats(&self) -> (u32, u32) {
-        (self.signed_entries.load(Ordering::SeqCst)), self.signature_failures.load(Ordering::SeqCst)))
+        (self.signed_entries.load(Ordering::SeqCst), self.signature_failures.load(Ordering::SeqCst))
     }
 }
 
