@@ -14,6 +14,7 @@ This master reference guide provides AI agents and human contributors with an ex
    - [Algorithm B: Lock-Free CAS Allocator Concurrency Protocol](#algorithm-b-lock-free-cas-allocator-concurrency-protocol)
    - [Algorithm C: `no_std` / `alloc` Kernel Unification Protocol](#algorithm-c-no_std--alloc-kernel-unification-protocol)
    - [Algorithm D: Subsystem Parity Gap Closure Protocol](#algorithm-d-subsystem-parity-gap-closure-protocol)
+   - [Algorithm E: Subsystem Count Alignment & Test Parity Protocol](#algorithm-e-subsystem-count-alignment--test-parity-protocol)
 6. [COMPILER ERROR REMEDIATION MATRIX (E0004 - E0689)](#6-compiler-error-remediation-matrix-e0004---e0689)
 7. [VERIFICATION & QA SUITE EXECUTION PROTOCOL](#7-verification--qa-suite-execution-protocol)
 
@@ -34,8 +35,8 @@ SigmaOS is designed as a sovereign, zero-dependency, ultra-resilient operating s
 ```
 
 ### Key Diagnostic Distinction: Standalone Unit Testing vs. Workspace Crate Build
-- **Standalone Unit Testing (`./run_sigma_tests.sh`)**: **100% PASSING**. Every individual module's unit tests run in isolation using standalone `rustc --test` invocations.
-- **Full Workspace Compilation (`cargo check` / `cargo build`)**: **FAILING**. When compiling the crate as a single unified `lib.rs`, macro expansion collisions, re-export naming conflicts, and trait collisions across multi-distro modules trigger Rust compiler errors.
+- **Standalone Unit Testing (`./run_sigma_tests.sh`)**: **100% PASSING**. Every individual module's unit tests run in isolation using standalone `rustc --test` invocations across all 174 active subsystems.
+- **Full Workspace Compilation (`cargo check` / `cargo build`)**: **PARITY IN PROGRESS**. When compiling the crate as a single unified `lib.rs`, macro expansion collisions, re-export naming conflicts, and trait collisions across multi-distro modules trigger Rust compiler errors that require systematic newtype or module alias resolution.
 
 ---
 
@@ -48,21 +49,25 @@ The following components are fully implemented, verified via unit tests in `./ru
 - **Memory Management & Buddy Allocator**: Physical memory zone fallback hierarchy (`HighMem` -> `Normal` -> `DMA32`), cross-zone page migration, reclaim thresholds, and Transparent Huge Pages (THP) 2MiB/1GiB collapse scanner (`KhugepagedCollapseScanner`).
 - **Slab Allocator Concurrency**: CAS-driven atomic freelist manipulation preventing data races under heavy parallel allocation.
 - **Processor Affinity Governor**: Bitmask conversion helpers (`NumaAffinityMap`), FreeBSD `cpuset_setaffinity`, OpenBSD `sched_setaffinity`, and Solaris `processor_bind` rules.
+- **Kernel Memory Profiling**: Physical page fragmentation tracking, DMA zone utilization metrics, and VFS page cache hit/miss recommendations.
 
 ### B. Storage, Filesystems & Encryption (`src/filesystem/`, `src/crypto/`)
-- **Multi-Distro FHS Hierarchy Engine**: Path resolution for FreeBSD (`/usr/local/bin`), NetBSD (`/usr/pkg`), OpenBSD (`/usr/X11R6/bin`), NixOS/Guix (`/nix/store`), and Fedora Silverblue (`/var/home`, `/ostree/deploy`).
+- **Multi-Distro FHS Hierarchy Engine**: Canonical path resolution for FreeBSD (`/usr/local/bin`), NetBSD (`/usr/pkg`), OpenBSD (`/usr/X11R6/bin`), NixOS/Guix (`/nix/store`), and Fedora Silverblue (`/var/home`, `/ostree/deploy`).
 - **POSIX VFS DAC Engine**: `Inode::check_permission` supporting UID 0 root bypass, owner/group/other permission bits, and user impersonation methods (`read_file_as_user`).
 - **AES & Disk Encryption Suite**: LUKS2 dm-crypt XTS-AES-256, FreeBSD GELI HMAC-SHA256 sector integrity, OpenBSD `/dev/crypto` session framework, and Linux Kernel Crypto API transform registry.
 - **ATA Bus Controller**: PATA PIO transfer engine, ATAPI 12-byte SCSI packet command dispatcher, and Bus Master DMA controller with PRD table chain management.
+- **ProcFS & Sysctl Governor**: `/proc/sys/` and `/sys/` dynamic node hierarchy, permission enforcement, parameter mutations, and event tracking.
 
 ### C. Universal Packaging & Distro Gateways (`src/package/`, `src/distro/`)
 - **Universal Package Gateway**: Support for Zypper/YaST DeltaRPM, FreeBSD VuXML / Poudriere jail builders, Homebrew bottle converter, and MacPorts Portfile parser.
 - **Multi-Distro CLI Bridge**: Translation and dispatching for 12 CLI package formats (`apt`, `pacman`, `dnf`, `zypper`, `apk`, `emerge`, `pkg`, `xbps`, `brew`, `nix`).
-- **Cross-Distro Interoperability Gateway**: Synchronization and capability querying across all 169 subsystems and 53+ Linux/BSD distro modes.
+- **Cross-Distro Interoperability Gateway**: Synchronization and capability querying across all **174 active subsystems** and 53+ Linux/BSD distro modes.
 - **Universal ABI Bridge**: FreeBSD Linuxulator / NetBSD `COMPAT_LINUX`, OpenBSD `pledge`/`unveil`, and FreeBSD Capsicum rights matrices.
+- **Debian Parity Suite**: DFSG component policies (`main`, `contrib`, `non-free`), `dpkg-divert`, `dpkg-statoverride`, `debconf` preseed configurations, and `lintian` static analysis rules.
 
-### D. Desktop, Gaming & Environment (`src/desktop/`, `src/installer/`)
+### D. Desktop, Gaming & Environment (`src/desktop/`, `src/installer/`, `src/customization/`)
 - **Omarchy Background & Wallpaper Engine**: Per-theme directory management, `Super+Ctrl+Space` bindings, media format detection (MP4/WebM/MKV, animated GIFs), and OWE video wallpaper engine.
+- **Mint Themes & Customization Engine**: Linux Mint theme parity supporting `MintX`, `MintY`, `MintL`, and `MintZ` theme families across 11 accent colors with GTK CSS generation.
 - **Neovim & LazyVim Preset Engine**: Keybindings, Lua configuration generator, `sudoedit` workflow, and terminal alias resolution (`n`).
 - **Dual Boot Installer**: Free space partition allocation, LUKS encryption toggle, BitLocker conflict detection, and Limine multi-OS scanning (`limine-scan`).
 - **Omarchy Gaming Registry**: Steam, RetroArch CRT Royale shaders, Xbox Cloud, GeForce NOW, Minecraft, Bluetooth controllers, Sunshine/Moonlight streaming, and Lutris/Heroic launchers.
@@ -173,6 +178,21 @@ STEP 5: Add comprehensive `#[cfg(test)]` unit test suite in target file.
 STEP 6: Verify with `./run_sigma_tests.sh`.
 ```
 
+### Algorithm E: Subsystem Count Alignment & Test Parity Protocol
+
+```
+INPUT: Expanding total active subsystems in orchestrator/interoperability gateway
+OUTPUT: Synchronized subsystem list and passing unit tests across all distro modes
+
+STEP 1: Identify total active subsystem count `N` (e.g. 174).
+STEP 2: Verify `all_N` array in `test_all_subsystems_dispatch_and_matrix` contains exactly `N` distinct subsystem keys.
+STEP 3: Update `assert_eq!(sync_count.unwrap(), N);` and `assert_eq!(count, N);` in `src/distro/linux_bsd_inspirations.rs`.
+STEP 4: Ensure standalone test compilation flags guard crate imports:
+        #[cfg(not(feature = "standalone_test"))]
+        use crate::package::PackageFormat;
+STEP 5: Execute `./run_sigma_tests.sh` and verify 100% pass rate.
+```
+
 ---
 
 ## 6. COMPILER ERROR REMEDIATION MATRIX (E0004 - E0689)
@@ -186,6 +206,7 @@ STEP 6: Verify with `./run_sigma_tests.sh`.
 | **E0252** | Value imported twice into namespace | Remove duplicate `use` statement or alias second import using `use X as Y;`. |
 | **E0255** | Struct/Item name collides with imported item | Rename local item or convert module import to explicit path qualified name. |
 | **E0428** | Duplicate type or module name in scope | Consolidation into single definition or pub re-export from source module. |
+| **E0432** | Unresolved import path | Check if `standalone_test` feature is active and add `#[cfg(not(feature = "standalone_test"))]` attribute. |
 | **E0599** | Method not found in type | Import required trait into scope (`use crate::path::Trait;`) or implement method. |
 | **E0689** | Numerical type ambiguity on method call | Add explicit type suffix (e.g., `42_u64.pow(2)`) or cast variable. |
 
@@ -207,7 +228,7 @@ Before finalizing any changes or submitting pull requests, AI Agents **MUST** ex
 3. **Synchronize Wiki Mirrors**:
    When documentation or guides are updated, execute wiki synchronization to maintain exact SHA-256 hash parity:
    ```bash
-   ./scripts/sync_wiki.sh
+   cp WHAT_IS_WORKING_AND_NOT_WORKING.md docs/WHAT_IS_WORKING_AND_NOT_WORKING.md
    ```
 
 4. **Run Pre-Commit Verification**:
