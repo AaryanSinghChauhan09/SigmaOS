@@ -29,6 +29,7 @@ use core::mem;
 
 /// Input device type
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InputDeviceType {
     Keyboard = 0,
@@ -50,6 +51,7 @@ pub trait InputEvent {
 
 /// Input event type
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InputEventType {
     KeyPress = 0,
@@ -66,6 +68,7 @@ pub enum InputEventType {
 
 /// Keyboard event (OOP: Concrete event class)
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct KeyEvent {
     pub timestamp: u64,
     pub device_id: usize,
@@ -75,6 +78,7 @@ pub struct KeyEvent {
 }
 
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct KeyModifiers {
     pub shift: bool,
@@ -120,6 +124,7 @@ impl InputEvent for KeyEvent {
 
 /// Mouse event (OOP: Concrete event class)
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct MouseEvent {
     pub timestamp: u64,
     pub device_id: usize,
@@ -130,6 +135,7 @@ pub struct MouseEvent {
 }
 
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct MouseButtons {
     pub left: bool,
@@ -180,6 +186,7 @@ pub trait InputHandler {
 
 /// Input result
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InputResult {
     Handled = 0,
@@ -189,6 +196,7 @@ pub enum InputResult {
 
 /// Input handler info
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct InputHandlerInfo {
     pub handler_type: HandlerType,
     pub priority: Priority,
@@ -207,6 +215,7 @@ impl InputHandlerInfo {
 
 /// Handler type
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum HandlerType {
     Keyboard = 0,
@@ -217,6 +226,7 @@ pub enum HandlerType {
 
 /// Priority level
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Priority {
     Low = 0,
@@ -227,6 +237,7 @@ pub enum Priority {
 
 /// Handler capability
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct HandlerCapability {
     pub can_handle: bool,
@@ -320,6 +331,7 @@ pub trait InputManager {
 
 /// Input error types
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InputError {
     Success = 0,
@@ -331,6 +343,7 @@ pub enum InputError {
 
 /// Input device (OOP: Device object)
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct InputDevice {
     pub id: usize,
     pub device_type: InputDeviceType,
@@ -341,6 +354,7 @@ pub struct InputDevice {
 
 /// Device capability
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct DeviceCapability {
     pub can_enable: bool,
@@ -407,6 +421,7 @@ impl InputDevice {
 
 /// Input statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct InputStats {
     pub total_events: u64,
     pub handled_events: u64,
@@ -438,6 +453,7 @@ pub struct SimpleInputManager {
 
 /// Manager capability
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ManagerCapability {
     pub can_register_handlers: bool,
