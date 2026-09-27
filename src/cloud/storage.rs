@@ -14,7 +14,7 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
 use std::string::{String, ToString};
-use std::vec::Vec;
+
 use std::format;
 
 // (no_std only applicable at crate root - removed)
@@ -300,10 +300,10 @@ impl CloudProvider for SimpleCloudProvider {
     fn is_connected(&self) -> bool { self.connected.load(Ordering::SeqCst) == 1 }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct CustomVec<T> { data: *mut T, len: usize, capacity: usize }
 
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+impl<T> CustomVec<T> {
+    fn new() -> Self { CustomVec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
     fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity { self.grow(); }
@@ -328,7 +328,7 @@ impl<T> Vec<T> {
 extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 
 
-impl<T> core::ops::Deref for Vec<T> {
+impl<T> core::ops::Deref for CustomVec<T> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {
         if self.data.is_null() {
@@ -339,7 +339,7 @@ impl<T> core::ops::Deref for Vec<T> {
     }
 }
 
-impl<T> core::ops::DerefMut for Vec<T> {
+impl<T> core::ops::DerefMut for CustomVec<T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         if self.data.is_null() {
             &mut []
@@ -349,7 +349,7 @@ impl<T> core::ops::DerefMut for Vec<T> {
     }
 }
 
-impl<'a, T> IntoIterator for &'a Vec<T> {
+impl<'a, T> IntoIterator for &'a CustomVec<T> {
     type Item = &'a T;
     type IntoIter = core::slice::Iter<'a, T>;
 
@@ -359,7 +359,7 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
 }
 
 
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
+impl<'a, T> IntoIterator for &'a mut CustomVec<T> {
     type Item = &'a mut T;
     type IntoIter = core::slice::IterMut<'a, T>;
 

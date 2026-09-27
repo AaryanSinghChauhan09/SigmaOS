@@ -14,7 +14,6 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
 use std::string::{String, ToString};
-use std::vec::Vec;
 use std::format;
 
 // (no_std only applicable at crate root - removed)
@@ -25,7 +24,7 @@ use std::format;
 /// No dependency on external input frameworks
 
 use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use core::mem;
 
 /// Input device type
@@ -431,8 +430,8 @@ impl InputStats {
 
 /// Simple input manager (OOP: Concrete manager class)
 pub struct SimpleInputManager {
-    handlers: Vec<Option<Box<dyn InputHandler>>>,
-    devices: Vec<Option<NonNull<InputDevice>>>,
+    handlers: CustomVec<Option<Box<dyn InputHandler>>>,
+    devices: CustomVec<Option<NonNull<InputDevice>>>,
     stats: InputStats,
     capability: ManagerCapability,
 }
@@ -471,8 +470,8 @@ impl ManagerCapability {
 impl SimpleInputManager {
     pub fn new(capability: ManagerCapability) -> Self {
         SimpleInputManager {
-            handlers: Vec::new(),
-            devices: Vec::new(),
+            handlers: CustomVec::new(),
+            devices: CustomVec::new(),
             stats: InputStats::new(),
             capability,
         }
@@ -607,16 +606,16 @@ fn get_current_time() -> u64 {
     }
 }
 
-/// Simple Vec implementation for no_std
-struct Vec<T> {
+/// Simple CustomVec implementation for no_std
+struct CustomVec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
-impl<T> Vec<T> {
+impl<T> CustomVec<T> {
     fn new() -> Self {
-        Vec {
+        CustomVec {
             data: core::ptr::null_mut(),
             len: 0,
             capacity: 0,
@@ -666,7 +665,7 @@ extern "C" {
 }
 
 
-impl<T> core::ops::Deref for Vec<T> {
+impl<T> core::ops::Deref for CustomVec<T> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {
         if self.data.is_null() {
@@ -677,7 +676,7 @@ impl<T> core::ops::Deref for Vec<T> {
     }
 }
 
-impl<T> core::ops::DerefMut for Vec<T> {
+impl<T> core::ops::DerefMut for CustomVec<T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         if self.data.is_null() {
             &mut []
@@ -687,7 +686,7 @@ impl<T> core::ops::DerefMut for Vec<T> {
     }
 }
 
-impl<'a, T> IntoIterator for &'a Vec<T> {
+impl<'a, T> IntoIterator for &'a CustomVec<T> {
     type Item = &'a T;
     type IntoIter = core::slice::Iter<'a, T>;
 
@@ -698,7 +697,7 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
 }
 
 
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
+impl<'a, T> IntoIterator for &'a mut CustomVec<T> {
     type Item = &'a mut T;
     type IntoIter = core::slice::IterMut<'a, T>;
 

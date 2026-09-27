@@ -14,7 +14,6 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
 use std::string::{String, ToString};
-use std::vec::Vec;
 use std::format;
 
 // (no_std only applicable at crate root - removed)
@@ -279,7 +278,7 @@ impl ResourceStats {
 
 /// Simple resource manager (OOP: Concrete manager class)
 pub struct SimpleResourceManager {
-    resources: Vec<Option<Box<dyn Resource>>>,
+    resources: std::vec::Vec<Option<Box<dyn Resource>>>,
     next_id: AtomicUsize,
     stats: ResourceStats,
     capability: ManagerCapability,
@@ -319,7 +318,7 @@ impl ManagerCapability {
 impl SimpleResourceManager {
     pub fn new(capability: ManagerCapability) -> Self {
         SimpleResourceManager {
-            resources: Vec::new(),
+            resources: std::vec::Vec::new(),
             next_id: AtomicUsize::new(1),
             stats: ResourceStats::new(),
             capability,
@@ -437,16 +436,16 @@ impl ResourceManager for SimpleResourceManager {
     }
 }
 
-/// Simple Vec implementation for no_std
-struct Vec<T> {
+/// Simple CustomVec implementation for no_std
+struct CustomVec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
-impl<T> Vec<T> {
+impl<T> CustomVec<T> {
     fn new() -> Self {
-        Vec {
+        CustomVec {
             data: core::ptr::null_mut(),
             len: 0,
             capacity: 0,
@@ -496,7 +495,7 @@ extern "C" {
 }
 
 
-impl<T> core::ops::Deref for Vec<T> {
+impl<T> core::ops::Deref for CustomVec<T> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {
         if self.data.is_null() {
@@ -507,7 +506,7 @@ impl<T> core::ops::Deref for Vec<T> {
     }
 }
 
-impl<T> core::ops::DerefMut for Vec<T> {
+impl<T> core::ops::DerefMut for CustomVec<T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         if self.data.is_null() {
             &mut []
@@ -517,7 +516,7 @@ impl<T> core::ops::DerefMut for Vec<T> {
     }
 }
 
-impl<'a, T> IntoIterator for &'a Vec<T> {
+impl<'a, T> IntoIterator for &'a CustomVec<T> {
     type Item = &'a T;
     type IntoIter = core::slice::Iter<'a, T>;
 
@@ -528,7 +527,7 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
 }
 
 
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
+impl<'a, T> IntoIterator for &'a mut CustomVec<T> {
     type Item = &'a mut T;
     type IntoIter = core::slice::IterMut<'a, T>;
 

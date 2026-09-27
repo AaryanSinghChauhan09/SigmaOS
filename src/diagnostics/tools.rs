@@ -14,8 +14,10 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
 use std::string::{String, ToString};
-use std::vec::Vec;
 use std::format;
+
+// Re-export std::vec::Vec for external use
+pub use std::vec::Vec;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
@@ -395,15 +397,15 @@ impl DiagnosticsManager for SimpleDiagnosticsManager {
 }
 
 /// Simple Vec implementation for no_std
-struct Vec<T> {
+struct CustomVec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
-impl<T> Vec<T> {
+impl<T> CustomVec<T> {
     fn new() -> Self {
-        Vec {
+        CustomVec {
             data: core::ptr::null_mut(),
             len: 0,
             capacity: 0,
@@ -453,7 +455,7 @@ extern "C" {
 }
 
 
-impl<T> core::ops::Deref for Vec<T> {
+impl<T> core::ops::Deref for CustomVec<T> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {
         if self.data.is_null() {
@@ -464,7 +466,7 @@ impl<T> core::ops::Deref for Vec<T> {
     }
 }
 
-impl<T> core::ops::DerefMut for Vec<T> {
+impl<T> core::ops::DerefMut for CustomVec<T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         if self.data.is_null() {
             &mut []
@@ -474,7 +476,7 @@ impl<T> core::ops::DerefMut for Vec<T> {
     }
 }
 
-impl<'a, T> IntoIterator for &'a Vec<T> {
+impl<'a, T> IntoIterator for &'a CustomVec<T> {
     type Item = &'a T;
     type IntoIter = core::slice::Iter<'a, T>;
 
@@ -485,7 +487,7 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
 }
 
 
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
+impl<'a, T> IntoIterator for &'a mut CustomVec<T> {
     type Item = &'a mut T;
     type IntoIter = core::slice::IterMut<'a, T>;
 

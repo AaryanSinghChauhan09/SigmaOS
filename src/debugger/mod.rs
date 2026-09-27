@@ -37,37 +37,6 @@ impl DebianDbgsymPackage {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct Breakpoint {
-    pub address: u64,
-    pub breakpoint_type: BreakpointType,
-    pub enabled: bool,
-    pub hit_count: u32,
-}
-
-impl Breakpoint {
-    pub fn new(address: u64, breakpoint_type: BreakpointType) -> Self {
-        Self {
-            address,
-            breakpoint_type,
-            enabled: true,
-            hit_count: 0,
-        }
-    }
-
-    pub fn enable(&mut self) {
-        self.enabled = true;
-    }
-
-    pub fn disable(&mut self) {
-        self.enabled = false;
-    }
-
-    pub fn hit(&mut self) {
-        self.hit_count += 1;
-    }
-}
-
 /// Debugger state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DebuggerState {

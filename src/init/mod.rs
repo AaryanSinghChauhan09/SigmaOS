@@ -13,18 +13,6 @@ pub use service_innovations_engine::{
     ZeroTrustServiceHardeningEngine,
 };
 
-pub use service_innovations_engine::{
-    BenchmarkScore, LinuxNewsPressTechFeedsEngine, PowerTelemetryReading,
-    SystemHealthDiagnosticService, TechMediaBenchmarkAggregator, TechNewsFeedItem,
-    ZeroTrustServiceHardeningEngine,
-};
-
-pub use service_innovations_engine::{
-    BenchmarkScore, LinuxNewsPressTechFeedsEngine, PowerTelemetryReading,
-    SystemHealthDiagnosticService, TechMediaBenchmarkAggregator, TechNewsFeedItem,
-    ZeroTrustServiceHardeningEngine,
-};
-
 pub use init_abstraction::*;
 pub use runit::*;
 pub use s6::*;

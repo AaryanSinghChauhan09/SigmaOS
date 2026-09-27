@@ -18,7 +18,7 @@ pub use monitoring::{
     SystemInfo, HardwareInfo,
 };
 pub use network::{
-    NetworkInterface, InterfaceState, IPAddress, AddressFamily, Route, Rule, RuleAction,
+    NetworkInterface, InterfaceState, IPAddress, AddressFamily, Route, Rule,
     NetworkConfig, PingResult, TracerouteHop, NetworkDiagnostics, NetworkStats,
     InterfaceStats, DriverInfo, LinkSettings, Duplex, EthTool, NetworkError,
 };

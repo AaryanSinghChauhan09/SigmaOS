@@ -83,13 +83,13 @@ impl NlpEngine {
 
 /// Manager for Nlp resources
 #[derive(Debug)]
-pub struct NlpResult {
+pub struct NlpManager {
     resources: Vec<NlpEngine>,
     initialized: bool,
 }
 
-impl NlpResult {
-    /// Create a new NlpResult
+impl NlpManager {
+    /// Create a new NlpManager
     pub fn new() -> Self {
         Self {
             resources: Vec::new(),
@@ -141,7 +141,7 @@ impl NlpResult {
     }
 }
 
-impl Default for NlpResult {
+impl Default for NlpManager {
     fn default() -> Self {
         Self::new()
     }
@@ -153,7 +153,7 @@ mod tests {
     
     #[test]
     fn test_nlp_manager_init() {
-        let mut manager = NlpResult::new();
+        let mut manager = NlpManager::new();
         assert!(!manager.is_initialized());
         assert!(manager.init().is_ok());
         assert!(manager.is_initialized());
@@ -161,7 +161,7 @@ mod tests {
     
     #[test]
     fn test_nlp_resource_add() {
-        let mut manager = NlpResult::new();
+        let mut manager = NlpManager::new();
         manager.init().unwrap();
         let resource = NlpEngine::new("test");
         let id = manager.add(resource).unwrap();

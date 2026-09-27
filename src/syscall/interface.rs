@@ -26,6 +26,13 @@ pub type SyscallID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
+pub enum SyscallType {
+    Read,
+    Write,
+    Open,
+    Close,
+}
+
 impl SyscallType {
     /// Safe conversion from usize discriminant value
     pub fn from_usize(val: usize) -> Self {

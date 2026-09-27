@@ -13,8 +13,8 @@ pub use outreach::{
 
 pub use ncert_maths::{
     NcertClassGrade, NcertMathsDomain, NcertChapterSpec, NcertMathsFormulaRepository,
-    Phase5E, NcertLessonPlanStep, NcertLessonPlan, NcertLessonPlanGenerator,
-    NcertQuestionType, BloomsTaxonomyLevel, NcertQuestion, NcertQuestionBankManager,
+    Phase5E, NcertLessonPlanStep, NcertLessonPlanGenerator,
+    NcertQuestionType, NcertQuestion, NcertQuestionBankManager,
     StepByStepSolution, NcertStepByStepSolutionSolver, StudentAssessmentEntry,
     NcertTeacherAnalyticsEngine,
 };

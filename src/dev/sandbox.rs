@@ -14,7 +14,6 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
 use std::string::{String, ToString};
-use std::vec::Vec;
 use std::format;
 
 // (no_std only applicable at crate root - removed)
@@ -269,7 +268,7 @@ pub trait SandboxManager {
     /// Get sandbox
     fn get_sandbox(&self, id: SandboxID) -> Option<&dyn Sandbox>;
     /// List sandboxes
-    fn list_sandboxes(&self) -> Vec<SandboxID>;
+    fn list_sandboxes(&self) -> std::vec::Vec<SandboxID>;
     /// Get manager statistics
     fn stats(&self) -> SandboxStats;
 }
@@ -297,7 +296,7 @@ impl SandboxStats {
 
 /// Simple sandbox manager (OOP: Concrete manager class)
 pub struct SimpleSandboxManager {
-    sandboxes: Vec<Option<Box<dyn Sandbox>>>,
+    sandboxes: std::vec::Vec<Option<Box<dyn Sandbox>>>,
     next_id: AtomicUsize,
     stats: SandboxStats,
     capability: ManagerCapability,
@@ -334,7 +333,7 @@ impl ManagerCapability {
 impl SimpleSandboxManager {
     pub fn new(capability: ManagerCapability) -> Self {
         SimpleSandboxManager {
-            sandboxes: Vec::new(),
+            sandboxes: std::vec::Vec::new(),
             next_id: AtomicUsize::new(1),
             stats: SandboxStats::new(),
             capability,
@@ -431,8 +430,8 @@ impl SandboxManager for SimpleSandboxManager {
         None
     }
 
-    fn list_sandboxes(&self) -> Vec<SandboxID> {
-        let mut ids = Vec::new();
+    fn list_sandboxes(&self) -> std::vec::Vec<SandboxID> {
+        let mut ids = std::vec::Vec::new();
         for sandbox_option in &self.sandboxes {
             if let Some(ref sandbox) = *sandbox_option {
                 ids.push(sandbox.id());
@@ -460,15 +459,15 @@ impl SimpleSandboxManager {
 }
 
 /// Simple Vec implementation for no_std
-struct Vec<T> {
+struct CustomVec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
-impl<T> Vec<T> {
+impl<T> CustomVec<T> {
     fn new() -> Self {
-        Vec {
+        CustomVec {
             data: core::ptr::null_mut(),
             len: 0,
             capacity: 0,
@@ -518,7 +517,7 @@ extern "C" {
 }
 
 
-impl<T> core::ops::Deref for Vec<T> {
+impl<T> core::ops::Deref for CustomVec<T> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {
         if self.data.is_null() {
@@ -529,7 +528,7 @@ impl<T> core::ops::Deref for Vec<T> {
     }
 }
 
-impl<T> core::ops::DerefMut for Vec<T> {
+impl<T> core::ops::DerefMut for CustomVec<T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         if self.data.is_null() {
             &mut []
@@ -539,7 +538,7 @@ impl<T> core::ops::DerefMut for Vec<T> {
     }
 }
 
-impl<'a, T> IntoIterator for &'a Vec<T> {
+impl<'a, T> IntoIterator for &'a CustomVec<T> {
     type Item = &'a T;
     type IntoIter = core::slice::Iter<'a, T>;
 
@@ -550,7 +549,7 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
 }
 
 
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
+impl<'a, T> IntoIterator for &'a mut CustomVec<T> {
     type Item = &'a mut T;
     type IntoIter = core::slice::IterMut<'a, T>;
 

@@ -94,13 +94,13 @@ impl TpmDriver {
 
 /// Manager for Tpm resources
 #[derive(Debug)]
-pub struct TpmKey {
+pub struct TpmManager {
     resources: Vec<TpmDriver>,
     initialized: bool,
 }
 
-impl TpmKey {
-    /// Create a new TpmKey
+impl TpmManager {
+    /// Create a new TpmManager
     pub fn new() -> Self {
         Self {
             resources: Vec::new(),
@@ -152,7 +152,7 @@ impl TpmKey {
     }
 }
 
-impl Default for TpmKey {
+impl Default for TpmManager {
     fn default() -> Self {
         Self::new()
     }
@@ -164,7 +164,7 @@ mod tests {
     
     #[test]
     fn test_tpm_manager_init() {
-        let mut manager = TpmKey::new();
+        let mut manager = TpmManager::new();
         assert!(!manager.is_initialized());
         assert!(manager.init().is_ok());
         assert!(manager.is_initialized());
@@ -172,7 +172,7 @@ mod tests {
     
     #[test]
     fn test_tpm_resource_add() {
-        let mut manager = TpmKey::new();
+        let mut manager = TpmManager::new();
         manager.init().unwrap();
         let resource = TpmDriver::new("test");
         let id = manager.add(resource).unwrap();

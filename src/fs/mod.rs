@@ -25,7 +25,7 @@ pub mod sigmafs;
 pub mod xfs;
 
 pub use btrfs::{
-    BtrfsExtent, BtrfsFilesystem, BtrfsSnapshot, BtrfsSubvolume, ChecksumType, CompressionType,
+    BtrfsExtent, BtrfsFilesystem, BtrfsSnapshot, BtrfsSubvolume, ChecksumType,
 };
 pub use sigmacas::{CasBlock, SigmaFsCasEngine, DILITHIUM5_SIGNATURE_SIZE, SHA256_HASH_SIZE};
 pub use sigmafs::{
@@ -38,7 +38,7 @@ pub use xfs::{
 };
 
 pub mod bcachefs_sovereign;
-pub use bcachefs_sovereign::{SovereignBcachefsVolume, BcachefsInode, BcachefsExtent, BcachefsSnapshot, ChecksumAlgorithm, CompressionType, sovereign_crc32c};
+pub use bcachefs_sovereign::{SovereignBcachefsVolume, BcachefsInode, BcachefsExtent, BcachefsSnapshot, ChecksumAlgorithm, sovereign_crc32c};
 
 pub mod overlayfs_sovereign;
 pub use overlayfs_sovereign::{SovereignOverlayFs, OverlayLayer, OverlayEntry, OverlayEntryKind};

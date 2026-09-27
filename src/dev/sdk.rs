@@ -14,7 +14,6 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
 use std::string::{String, ToString};
-use std::vec::Vec;
 use std::format;
 
 // (no_std only applicable at crate root - removed)
@@ -41,7 +40,7 @@ pub trait API {
     /// Get API version
     fn version(&self) -> (u32, u32, u32);
     /// Call API
-    fn call(&mut self, params: &[u8]) -> Result<Vec<u8>, SDKError>;
+    fn call(&mut self, params: &[u8]) -> Result<std::vec::Vec<u8>, SDKError>;
     /// Get API info
     fn info(&self) -> APIInfo;
 }
@@ -143,13 +142,13 @@ impl API for SimpleAPI {
         self.version
     }
 
-    fn call(&mut self, _params: &[u8]) -> Result<Vec<u8>, SDKError> {
+    fn call(&mut self, _params: &[u8]) -> Result<std::vec::Vec<u8>, SDKError> {
         if !self.capability.can_call {
             return Err(SDKError::PermissionDenied);
         }
 
         // In a real implementation, this would execute the API
-        let mut response = Vec::new();
+        let mut response = std::vec::Vec::new();
         let success_msg = b"API call successful";
         
         for byte in success_msg {
@@ -176,11 +175,11 @@ pub trait SDK {
     /// Unregister API
     fn unregister_api(&mut self, id: APIID) -> Result<(), SDKError>;
     /// Call API
-    fn call_api(&mut self, id: APIID, params: &[u8]) -> Result<Vec<u8>, SDKError>;
+    fn call_api(&mut self, id: APIID, params: &[u8]) -> Result<std::vec::Vec<u8>, SDKError>;
     /// Get API
     fn get_api(&self, id: APIID) -> Option<&dyn API>;
     /// List APIs
-    fn list_apis(&self) -> Vec<APIID>;
+    fn list_apis(&self) -> std::vec::Vec<APIID>;
     /// Get SDK statistics
     fn stats(&self) -> SDKStats;
 }
@@ -206,7 +205,7 @@ impl SDKStats {
 
 /// Simple SDK (OOP: Concrete SDK class)
 pub struct SimpleSDK {
-    apis: Vec<Option<Box<dyn API>>>,
+    apis: std::vec::Vec<Option<Box<dyn API>>>,
     next_id: AtomicUsize,
     stats: SDKStats,
     capability: SDKCapability,
@@ -240,7 +239,7 @@ impl SDKCapability {
 impl SimpleSDK {
     pub fn new(capability: SDKCapability) -> Self {
         SimpleSDK {
-            apis: Vec::new(),
+            apis: std::vec::Vec::new(),
             next_id: AtomicUsize::new(1),
             stats: SDKStats::new(),
             capability,
@@ -286,7 +285,7 @@ impl SDK for SimpleSDK {
         }
     }
 
-    fn call_api(&mut self, id: APIID, params: &[u8]) -> Result<Vec<u8>, SDKError> {
+    fn call_api(&mut self, id: APIID, params: &[u8]) -> Result<std::vec::Vec<u8>, SDKError> {
         if !self.capability.can_call {
             return Err(SDKError::PermissionDenied);
         }
@@ -314,8 +313,8 @@ impl SDK for SimpleSDK {
         None
     }
 
-    fn list_apis(&self) -> Vec<APIID> {
-        let mut ids = Vec::new();
+    fn list_apis(&self) -> std::vec::Vec<APIID> {
+        let mut ids = std::vec::Vec::new();
         for api_option in &self.apis {
             if let Some(ref api) = *api_option {
                 ids.push(api.id());
@@ -330,15 +329,15 @@ impl SDK for SimpleSDK {
 }
 
 /// Simple Vec implementation for no_std
-struct Vec<T> {
+struct CustomVec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
-impl<T> Vec<T> {
+impl<T> CustomVec<T> {
     fn new() -> Self {
-        Vec {
+        CustomVec {
             data: core::ptr::null_mut(),
             len: 0,
             capacity: 0,
@@ -388,7 +387,7 @@ extern "C" {
 }
 
 
-impl<T> core::ops::Deref for Vec<T> {
+impl<T> core::ops::Deref for CustomVec<T> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {
         if self.data.is_null() {
@@ -399,7 +398,7 @@ impl<T> core::ops::Deref for Vec<T> {
     }
 }
 
-impl<T> core::ops::DerefMut for Vec<T> {
+impl<T> core::ops::DerefMut for CustomVec<T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         if self.data.is_null() {
             &mut []
@@ -409,7 +408,7 @@ impl<T> core::ops::DerefMut for Vec<T> {
     }
 }
 
-impl<'a, T> IntoIterator for &'a Vec<T> {
+impl<'a, T> IntoIterator for &'a CustomVec<T> {
     type Item = &'a T;
     type IntoIter = core::slice::Iter<'a, T>;
 
@@ -420,7 +419,7 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
 }
 
 
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
+impl<'a, T> IntoIterator for &'a mut CustomVec<T> {
     type Item = &'a mut T;
     type IntoIter = core::slice::IterMut<'a, T>;
 

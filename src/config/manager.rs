@@ -13,7 +13,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::string::{String, ToString};
-use std::vec::Vec;
 use std::format;
 
 // (no_std only applicable at crate root - removed)
@@ -126,7 +125,7 @@ impl ConfigEntry {
 #[repr(C)]
 pub struct ConfigSection {
     pub name: [u8; 64],
-    pub entries: Vec<Option<ConfigEntry>>,
+    pub entries: std::vec::Vec<Option<ConfigEntry>>,
     pub capability: SectionCapability,
 }
 
@@ -168,7 +167,7 @@ impl ConfigSection {
 
         ConfigSection {
             name: name_array,
-            entries: Vec::new(),
+            entries: std::vec::Vec::new(),
             capability,
         }
     }
@@ -269,7 +268,7 @@ pub trait ConfigManager {
     /// Load configuration
     fn load(&mut self, _data: &[u8]) -> Result<(), ConfigError>;
     /// Save configuration
-    fn save(&self) -> Result<Vec<u8>, ConfigError>;
+    fn save(&self) -> Result<std::vec::Vec<u8>, ConfigError>;
     /// Get manager statistics
     fn stats(&self) -> ConfigStats;
 }
@@ -329,14 +328,14 @@ impl ManagerCapability {
 
 /// Simple configuration manager (OOP: Concrete manager class)
 pub struct SimpleConfigManager {
-    sections: Vec<Option<ConfigSection>>,
+    sections: std::vec::Vec<Option<ConfigSection>>,
     capability: ManagerCapability,
 }
 
 impl SimpleConfigManager {
     pub fn new(capability: ManagerCapability) -> Self {
         SimpleConfigManager {
-            sections: Vec::new(),
+            sections: std::vec::Vec::new(),
             capability,
         }
     }
@@ -443,14 +442,14 @@ impl ConfigManager for SimpleConfigManager {
         Ok(())
     }
 
-    fn save(&self) -> Result<Vec<u8>, ConfigError> {
+    fn save(&self) -> Result<std::vec::Vec<u8>, ConfigError> {
         if !self.capability.can_save {
             return Err(ConfigError::PermissionDenied);
         }
 
         // In a real implementation, this would serialize configuration
         // For now, return empty vector
-        Ok(Vec::new())
+        Ok(std::vec::Vec::new())
     }
 
     fn stats(&self) -> ConfigStats {
@@ -469,15 +468,15 @@ impl ConfigManager for SimpleConfigManager {
 }
 
 /// Simple Vec implementation for no_std
-struct Vec<T> {
+struct CustomVec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
-impl<T> Vec<T> {
+impl<T> CustomVec<T> {
     fn new() -> Self {
-        Vec {
+        CustomVec {
             data: core::ptr::null_mut(),
             len: 0,
             capacity: 0,
@@ -536,7 +535,7 @@ extern "C" {
 }
 
 
-impl<T> core::ops::Deref for Vec<T> {
+impl<T> core::ops::Deref for CustomVec<T> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {
         if self.data.is_null() {
@@ -547,7 +546,7 @@ impl<T> core::ops::Deref for Vec<T> {
     }
 }
 
-impl<T> core::ops::DerefMut for Vec<T> {
+impl<T> core::ops::DerefMut for CustomVec<T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         if self.data.is_null() {
             &mut []
@@ -557,7 +556,7 @@ impl<T> core::ops::DerefMut for Vec<T> {
     }
 }
 
-impl<'a, T> IntoIterator for &'a Vec<T> {
+impl<'a, T> IntoIterator for &'a CustomVec<T> {
     type Item = &'a T;
     type IntoIter = core::slice::Iter<'a, T>;
 
@@ -568,7 +567,7 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
 }
 
 
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
+impl<'a, T> IntoIterator for &'a mut CustomVec<T> {
     type Item = &'a mut T;
     type IntoIter = core::slice::IterMut<'a, T>;
 
