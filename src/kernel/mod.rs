@@ -168,6 +168,8 @@ pub use low_level_hardware::*;
 pub mod kptr_restrict;
 pub mod pidfd;
 pub use pidfd::{PidFd, PidFdCapabilities, ProcDesc, ProcDescCapabilities, SubreaperEntry, PidfdProcDescManager};
+pub mod cfi;
+pub use cfi::{CfiEngine, CfiTarget, CfiViolation};
 pub use kptr_restrict::{
     KptrRestrictLevel, DmesgRestrictLevel, KernelSecurityMitigations, get_security_mitigations,
 };
