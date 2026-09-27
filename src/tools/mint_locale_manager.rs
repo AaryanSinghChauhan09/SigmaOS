@@ -287,6 +287,179 @@ impl Default for MintLocaleManager {
     }
 }
 
+// ============================================================================
+// MINTLOCALE ENHANCEMENTS: INPUT METHODS, DICTIONARIES, PREVIEWS & LOCALED
+// ============================================================================
+
+/// Supported Input Method Frameworks for non-Latin and CJK text input (mintlocale IM selector parity).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum InputMethodFramework {
+    Fcitx5,
+    IBus,
+    Uim,
+    Gcin,
+    NativeSigmaIm,
+}
+
+impl InputMethodFramework {
+    /// Generates environment variable settings for GTK, Qt, and X11 input method integration.
+    pub fn get_env_vars(&self) -> Vec<(String, String)> {
+        match self {
+            InputMethodFramework::Fcitx5 => vec![
+                ("GTK_IM_MODULE".to_string(), "fcitx".to_string()),
+                ("QT_IM_MODULE".to_string(), "fcitx".to_string()),
+                ("XMODIFIERS".to_string(), "@im=fcitx".to_string()),
+            ],
+            InputMethodFramework::IBus => vec![
+                ("GTK_IM_MODULE".to_string(), "ibus".to_string()),
+                ("QT_IM_MODULE".to_string(), "ibus".to_string()),
+                ("XMODIFIERS".to_string(), "@im=ibus".to_string()),
+            ],
+            InputMethodFramework::Uim => vec![
+                ("GTK_IM_MODULE".to_string(), "uim".to_string()),
+                ("QT_IM_MODULE".to_string(), "uim".to_string()),
+                ("XMODIFIERS".to_string(), "@im=uim".to_string()),
+            ],
+            InputMethodFramework::Gcin => vec![
+                ("GTK_IM_MODULE".to_string(), "gcin".to_string()),
+                ("QT_IM_MODULE".to_string(), "gcin".to_string()),
+                ("XMODIFIERS".to_string(), "@im=gcin".to_string()),
+            ],
+            InputMethodFramework::NativeSigmaIm => vec![
+                ("GTK_IM_MODULE".to_string(), "sigma_im".to_string()),
+                ("QT_IM_MODULE".to_string(), "sigma_im".to_string()),
+                ("XMODIFIERS".to_string(), "@im=sigma_im".to_string()),
+            ],
+        }
+    }
+}
+
+/// Category of language support packages (dictionaries, fonts, input methods).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LanguageComponentCategory {
+    SpellcheckerHunspell,
+    SpellcheckerAspell,
+    DictionaryMySpell,
+    FontPackage,
+    InputMethodEngine,
+}
+
+/// Language support component entry.
+#[derive(Debug, Clone)]
+pub struct LanguageComponent {
+    pub language_code: String,
+    pub package_name: String,
+    pub category: LanguageComponentCategory,
+    pub installed: bool,
+}
+
+/// Audits installed packages and identifies missing spellchecking dictionaries, fonts, and input methods.
+pub struct MissingLanguageComponentAuditor {
+    pub components: Vec<LanguageComponent>,
+}
+
+impl MissingLanguageComponentAuditor {
+    pub fn new() -> Self {
+        Self { components: Vec::new() }
+    }
+
+    pub fn register_component(&mut self, component: LanguageComponent) {
+        self.components.push(component);
+    }
+
+    /// Returns all uninstalled packages required for full language support for a given language code.
+    pub fn find_missing_components(&self, lang_code: &str) -> Vec<LanguageComponent> {
+        self.components
+            .iter()
+            .filter(|c| c.language_code == lang_code && !c.installed)
+            .cloned()
+            .collect()
+    }
+}
+
+impl Default for MissingLanguageComponentAuditor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Live preview formatter for date, time, currency, numbers, and paper size based on regional locale.
+pub struct LocaleFormatPreview;
+
+impl LocaleFormatPreview {
+    /// Renders a sample formatted currency string for a given locale code.
+    pub fn preview_currency(locale_code: &str, amount: f64) -> String {
+        if locale_code.starts_with("fr_") || locale_code.starts_with("de_") || locale_code.starts_with("es_") {
+            format!("{:.2} €", amount)
+        } else if locale_code.starts_with("en_GB") {
+            format!("£{:.2}", amount)
+        } else if locale_code.starts_with("ja_") || locale_code.starts_with("zh_") {
+            format!("¥{:.0}", amount)
+        } else {
+            format!("${:.2}", amount)
+        }
+    }
+
+    /// Renders a sample date format string for a given locale code.
+    pub fn preview_date(locale_code: &str) -> String {
+        if locale_code.starts_with("en_US") {
+            "12/31/2026".to_string()
+        } else if locale_code.starts_with("de_") || locale_code.starts_with("ru_") {
+            "31.12.2026".to_string()
+        } else if locale_code.starts_with("ja_") || locale_code.starts_with("zh_") {
+            "2026/12/31".to_string()
+        } else {
+            "31/12/2026".to_string()
+        }
+    }
+
+    /// Returns standard paper size for the locale (e.g. Letter for US/Canada, A4 elsewhere).
+    pub fn preview_paper_size(locale_code: &str) -> &'static str {
+        if locale_code.starts_with("en_US") || locale_code.starts_with("en_CA") {
+            "Letter"
+        } else {
+            "A4"
+        }
+    }
+}
+
+/// Configuration generator for `/etc/locale.conf`, `/etc/default/locale`, and systemd `org.freedesktop.locale1` DBus interface.
+pub struct SystemdLocaledConfigGenerator;
+
+impl SystemdLocaledConfigGenerator {
+    /// Generates content for `/etc/locale.conf` or `/etc/default/locale`.
+    pub fn generate_etc_locale_conf(manager: &MintLocaleManager) -> String {
+        let mut lines = Vec::new();
+        if let Some(default_lang) = manager.get_default_locale() {
+            lines.push(format!("LANG={}", default_lang));
+        } else {
+            lines.push("LANG=en_US.UTF-8".to_string());
+        }
+
+        for (setting_type, val) in &manager.settings {
+            if *setting_type != LocaleSettingType::System {
+                lines.push(format!("{}={}", setting_type.env_var(), val));
+            }
+        }
+
+        lines.join("\n")
+    }
+
+    /// Generates systemd-localed DBus method call parameters for `SetLocale`.
+    pub fn generate_dbus_set_locale_args(manager: &MintLocaleManager) -> Vec<String> {
+        let mut args = Vec::new();
+        if let Some(default_lang) = manager.get_default_locale() {
+            args.push(format!("LANG={}", default_lang));
+        }
+        for (setting_type, val) in &manager.settings {
+            if *setting_type != LocaleSettingType::System {
+                args.push(format!("{}={}", setting_type.env_var(), val));
+            }
+        }
+        args
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -401,5 +574,69 @@ mod tests {
         
         let result = manager.remove_locale("en_US.UTF-8");
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_input_method_framework_config() {
+        let fcitx = InputMethodFramework::Fcitx5;
+        let envs = fcitx.get_env_vars();
+        assert_eq!(envs.len(), 3);
+        assert_eq!(envs[0], ("GTK_IM_MODULE".to_string(), "fcitx".to_string()));
+        assert_eq!(envs[1], ("QT_IM_MODULE".to_string(), "fcitx".to_string()));
+        assert_eq!(envs[2], ("XMODIFIERS".to_string(), "@im=fcitx".to_string()));
+
+        let ibus = InputMethodFramework::IBus;
+        let ibus_envs = ibus.get_env_vars();
+        assert_eq!(ibus_envs[0].1, "ibus");
+    }
+
+    #[test]
+    fn test_missing_component_auditor() {
+        let mut auditor = MissingLanguageComponentAuditor::new();
+        auditor.register_component(LanguageComponent {
+            language_code: "fr".to_string(),
+            package_name: "hunspell-fr".to_string(),
+            category: LanguageComponentCategory::SpellcheckerHunspell,
+            installed: false,
+        });
+        auditor.register_component(LanguageComponent {
+            language_code: "fr".to_string(),
+            package_name: "fonts-freefont-ttf".to_string(),
+            category: LanguageComponentCategory::FontPackage,
+            installed: true,
+        });
+
+        let missing = auditor.find_missing_components("fr");
+        assert_eq!(missing.len(), 1);
+        assert_eq!(missing[0].package_name, "hunspell-fr");
+    }
+
+    #[test]
+    fn test_locale_format_preview() {
+        assert_eq!(LocaleFormatPreview::preview_currency("fr_FR.UTF-8", 1234.56), "1234.56 €");
+        assert_eq!(LocaleFormatPreview::preview_currency("en_GB.UTF-8", 1234.56), "£1234.56");
+        assert_eq!(LocaleFormatPreview::preview_currency("en_US.UTF-8", 1234.56), "$1234.56");
+
+        assert_eq!(LocaleFormatPreview::preview_date("en_US.UTF-8"), "12/31/2026");
+        assert_eq!(LocaleFormatPreview::preview_date("de_DE.UTF-8"), "31.12.2026");
+
+        assert_eq!(LocaleFormatPreview::preview_paper_size("en_US.UTF-8"), "Letter");
+        assert_eq!(LocaleFormatPreview::preview_paper_size("fr_FR.UTF-8"), "A4");
+    }
+
+    #[test]
+    fn test_systemd_localed_config_gen() {
+        let mut manager = MintLocaleManager::new();
+        manager.set_default_locale("en_US.UTF-8".to_string());
+        manager.set_locale_setting(LocaleSettingType::Time, "de_DE.UTF-8".to_string());
+
+        let conf = SystemdLocaledConfigGenerator::generate_etc_locale_conf(&manager);
+        assert!(conf.contains("LANG=en_US.UTF-8"));
+        assert!(conf.contains("LC_TIME=de_DE.UTF-8"));
+
+        let dbus_args = SystemdLocaledConfigGenerator::generate_dbus_set_locale_args(&manager);
+        assert_eq!(dbus_args.len(), 2);
+        assert!(dbus_args.contains(&"LANG=en_US.UTF-8".to_string()));
+        assert!(dbus_args.contains(&"LC_TIME=de_DE.UTF-8".to_string()));
     }
 }
