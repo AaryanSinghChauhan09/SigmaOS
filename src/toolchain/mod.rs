@@ -4,3 +4,4 @@ pub mod capsule;
 pub mod codex;
 pub mod cross_compile;
 pub mod self_host;
+pub mod sovereign_omarchy_dev_tools;
