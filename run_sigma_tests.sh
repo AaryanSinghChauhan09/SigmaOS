@@ -435,3 +435,4 @@ if [ -f "src/boot/grub_engine.rs" ]; then
     rustc --test src/boot/grub_engine.rs --edition=2021 -o build/test_grub_engine
     ./build/test_grub_engine
 fi
+fi
