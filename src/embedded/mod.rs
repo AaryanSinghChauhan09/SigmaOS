@@ -144,6 +144,9 @@ impl HardwareAbstractionLayer {
             x if x == PlatformProfile::GenericAArch64 as u32 => "Generic AArch64",
             _ => "Unknown Platform",
         }
+    }
+}
+
 /// Enhanced GPIO driver with real register access
 pub struct GpioDriver {
     pub pin_count: AtomicU32,
