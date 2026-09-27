@@ -113,7 +113,7 @@ impl MemoryAuditShard {
     }
 
     pub fn get_violation_stats(&self) -> (u32, u32) {
-        (self.violations_detected.load(Ordering::SeqCst), self.wwx_violations.load(Ordering::SeqCst)
+        (self.violations_detected.load(Ordering::SeqCst), self.wwx_violations.load(Ordering::SeqCst))
     }
 }
 
@@ -209,7 +209,7 @@ impl SandboxAuditShard {
     }
 
     pub fn get_stats(&self) -> (u32, u32) {
-        (self.blocked_syscalls.load(Ordering::SeqCst), self.pledge_violations.load(Ordering::SeqCst)
+        (self.blocked_syscalls.load(Ordering::SeqCst), self.pledge_violations.load(Ordering::SeqCst))
     }
 }
 
@@ -278,7 +278,7 @@ impl CryptoAuditShard {
     }
 
     pub fn get_stats(&self) -> (u32, u32) {
-        (self.signed_entries.load(Ordering::SeqCst), self.signature_failures.load(Ordering::SeqCst)
+        (self.signed_entries.load(Ordering::SeqCst), self.signature_failures.load(Ordering::SeqCst))
     }
 }
 

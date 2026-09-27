@@ -138,15 +138,12 @@ impl HardwareAbstractionLayer {
 
     pub fn get_platform_name(&self) -> &'static str {
         match self.platform_profile.load(Ordering::SeqCst) {
-            PlatformProfile::RaspberryPi => "Raspberry Pi",
-            PlatformProfile::BeagleBone => "BeagleBone Black",
-            PlatformProfile::GenericARM => "Generic ARM",
-            PlatformProfile::GenericAArch64 => "Generic AArch64",
-            PlatformProfile::Unknown => "Unknown Platform",
+            x if x == PlatformProfile::RaspberryPi as u32 => "Raspberry Pi",
+            x if x == PlatformProfile::BeagleBone as u32 => "BeagleBone Black",
+            x if x == PlatformProfile::GenericARM as u32 => "Generic ARM",
+            x if x == PlatformProfile::GenericAArch64 as u32 => "Generic AArch64",
+            _ => "Unknown Platform",
         }
-    }
-}
-
 /// Enhanced GPIO driver with real register access
 pub struct GpioDriver {
     pub pin_count: AtomicU32,
