@@ -170,7 +170,7 @@ impl PackageFormat {
             Some(PackageFormat::Pacman)
         } else if normalized.ends_with(".dports") {
             Some(PackageFormat::Dports)
-        } else if name.ends_with(".slackbuild") || name.ends_with(".tlz") || name.ends_with(".tbz") {
+        } else if normalized.ends_with(".slackbuild") || normalized.ends_with(".tlz") || normalized.ends_with(".tbz") {
             Some(PackageFormat::SlackBuild)
         } else if normalized.ends_with(".crux") || normalized.ends_with(".pkgfile") {
             Some(PackageFormat::Crux)
@@ -184,9 +184,9 @@ impl PackageFormat {
             Some(PackageFormat::Pisi)
         } else if normalized.ends_with(".lzm") {
             Some(PackageFormat::Lzm)
-        } else if normalized.ends_with(".pup") {
+        } else if normalized.ends_with(".pup") || normalized == "pup" {
             Some(PackageFormat::Pup)
-        } else if normalized.ends_with(".pet") {
+        } else if normalized.ends_with(".pet") || normalized == "pet" {
             Some(PackageFormat::Pet)
         } else if normalized.ends_with(".tar") {
             Some(PackageFormat::Tar)
