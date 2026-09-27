@@ -90,7 +90,7 @@ impl KernelSecurityMitigations {
 
     /// Check if kernel pointer should be sanitized
     pub fn should_sanitize_pointer(&self) -> bool {
-        matches!(self.get_kptr_restrict(), KptrRestrictRestricted | KptrRestrictStrict)
+        matches!(self.get_kptr_restrict(), KptrRestrictLevel::Restricted | KptrRestrictLevel::Strict)
     }
 
     /// Sanitize kernel pointer for display

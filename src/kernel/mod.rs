@@ -172,5 +172,5 @@ pub use kptr_restrict::{
 
 pub mod procfs_linux;
 pub use procfs_linux::{
-    ProcessInfo, ProcessState, ProcFs,
+    ProcessInfo, ProcFs,
 };

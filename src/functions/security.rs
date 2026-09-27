@@ -6,6 +6,8 @@
 use std::vec::Vec;
 use std::string::{String, ToString};
 
+use crate::security::RuleAction;
+
 /// Firewall zone
 #[derive(Debug, Clone)]
 pub struct FirewallZone {
