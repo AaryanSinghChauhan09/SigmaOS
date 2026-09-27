@@ -113,6 +113,44 @@
 - **Added**: Warnings about non-cryptographically secure fallback values
 - **Addressed**: Unsafe static mut and undefined behavior findings
 
+### 14. Hardware Driver Enhancements (Advanced)
+- **Enhanced**: PCIe driver with CXL 3.0 support
+- **Added**: PCIe Gen7 link generation support (Gen1-Gen7)
+- **Added**: CXL memory pool initialization and hot-plug scanning
+- **Added**: Device capability detection (MSI-X, PTM, AER, CXL)
+- **Implemented**: CXL device filtering and MSI-X configuration
+- **Enhanced**: NVMe driver with multi-queue support (NVMe 1.4/2.0)
+- **Added**: NVMe queue pairs (submission + completion)
+- **Implemented**: Multi-queue I/O with admin and I/O queues
+- **Added**: NVMe command opcodes (Read, Write, Flush, etc.)
+- **Enhanced**: xHCI USB 3.2 driver with transfer and event rings
+- **Implemented**: XhciTransferRing for endpoint I/O
+- **Implemented**: XhciEventRing for completion handling
+- **Added**: Transfer ring creation and submission methods
+- **Enhanced**: E1000 Ethernet driver with advanced descriptor rings
+- **Implemented**: DescriptorRing generic structure for zero-copy
+- **Added**: MSI-X interrupt vector configuration
+- **Replaced**: Static arrays with Vec-based descriptor rings
+- **Added**: Ring status monitoring and capacity tracking
+
+### 15. Kernel Scheduler Improvements
+- **Enhanced**: Energy-aware scheduler with CPU frequency scaling
+- **Added**: CpuFrequency enum with 5 frequency states (Min to Max)
+- **Implemented**: Power factor calculation for energy consumption
+- **Added**: ThermalState enum for thermal management
+- **Implemented**: Automatic thermal throttling and frequency adjustment
+- **Added**: Priority-based task scheduling with energy awareness
+- **Implemented**: Combined battery/thermal energy budget calculation
+- **Added**: Comprehensive tests for thermal and frequency management
+
+### 16. Networking Stack Enhancements
+- **Implemented**: Connection tracking for NAT/firewall support
+- **Added**: ConnTrackEntry with protocol and state tracking
+- **Implemented**: ConnTrackState enum (New, Established, Related, Closing, Closed)
+- **Added**: ConnTrackTable with lookup, add, update, remove operations
+- **Implemented**: Timeout-based connection expiration cleanup
+- **Enhanced**: NAT/firewall capabilities for security
+
 ## ⚠️ Outstanding Issues
 
 ### Compilation Status
@@ -167,8 +205,8 @@
 | Ensure Rust/Zig/Nim only | ✅ Complete | Audit confirms compliance |
 | Remove redundant branches | ✅ Complete | Only main remains |
 | Consolidate wiki | ✅ Complete | Single wiki/ directory |
-| Fix security issues | ⚠️ Partial | Removed hardcoded keys, added mitigations, replaced unsafe static mut, added safety documentation |
-| Implement unimplemented ideas | ⚠️ Partial | Implemented 5 roadmap features + hardware drivers |
+| Fix security issues | ⚠️ Partial | Removed hardcoded keys, added mitigations, replaced unsafe static mut, added safety documentation, implemented thermal throttling |
+| Implement unimplemented ideas | ⚠️ Partial | Implemented roadmap features: hardware drivers, scheduler, networking |
 | Transfer to GitHub Wiki | ⚠️ Pending | Requires API access |
 
 ## 🔄 Continuous Sync Status
