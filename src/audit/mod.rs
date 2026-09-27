@@ -113,7 +113,7 @@ impl MemoryAuditShard {
     }
 
     pub fn get_violation_stats(&self) -> (u32, u32) {
-        (self.violations_detected.load(Ordering::SeqCst), self.wwx_violations.load(Ordering::SeqCst))
+        (self.violations_detected.load(Ordering::SeqCst), self.wwx_violations.load(Ordering::SeqCst)
     }
 }
 
@@ -176,13 +176,13 @@ impl SandboxAuditShard {
 
     pub fn set_process_pledges(&self, process_id: usize, _permissions: u64) {
         let bit = 1u64 << (process_id % 64);
-        let current = self.process_pledge_table.load(Ordering::SeqCst));
+        let current = self.process_pledge_table.load(Ordering::SeqCst);
         self.process_pledge_table.store(current | bit, Ordering::SeqCst);
     }
 
     fn get_process_pledges(&self, process_id: usize) -> u64 {
         let bit = 1u64 << (process_id % 64);
-        self.process_pledge_table.load(Ordering::SeqCst)) & bit
+        self.process_pledge_table.load(Ordering::SeqCst) & bit
     }
 
     fn get_current_time(&self) -> u64 {
@@ -209,7 +209,7 @@ impl SandboxAuditShard {
     }
 
     pub fn get_stats(&self) -> (u32, u32) {
-        (self.blocked_syscalls.load(Ordering::SeqCst), self.pledge_violations.load(Ordering::SeqCst))
+        (self.blocked_syscalls.load(Ordering::SeqCst), self.pledge_violations.load(Ordering::SeqCst)
     }
 }
 
@@ -278,7 +278,7 @@ impl CryptoAuditShard {
     }
 
     pub fn get_stats(&self) -> (u32, u32) {
-        (self.signed_entries.load(Ordering::SeqCst), self.signature_failures.load(Ordering::SeqCst))
+        (self.signed_entries.load(Ordering::SeqCst), self.signature_failures.load(Ordering::SeqCst)
     }
 }
 

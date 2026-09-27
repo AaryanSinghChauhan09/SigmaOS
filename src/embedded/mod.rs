@@ -130,14 +130,14 @@ impl HardwareAbstractionLayer {
 
     pub fn get_cpu_info(&self) -> (u32, u32, u32) {
         (
-            self.cpu_id.load(Ordering::SeqCst)),
-            self.memory_size.load(Ordering::SeqCst)),
-            self.board_revision.load(Ordering::SeqCst)),
+            self.cpu_id.load(Ordering::SeqCst),
+            self.memory_size.load(Ordering::SeqCst),
+            self.board_revision.load(Ordering::SeqCst),
         )
     }
 
     pub fn get_platform_name(&self) -> &'static str {
-        match self.platform_profile.load(Ordering::SeqCst)) {
+        match self.platform_profile.load(Ordering::SeqCst) {
             PlatformProfile::RaspberryPi => "Raspberry Pi",
             PlatformProfile::BeagleBone => "BeagleBone Black",
             PlatformProfile::GenericARM => "Generic ARM",
@@ -166,7 +166,7 @@ impl GpioDriver {
     }
 
     pub fn set_pin_direction(&mut self, pin: u32, direction: GpioDirection) -> Result<(), EmbeddedError> {
-        if pin >= self.pin_count.load(Ordering::SeqCst)) {
+        if pin >= self.pin_count.load(Ordering::SeqCst) {
             return Err(EmbeddedError::InvalidAddress);
         }
 
@@ -188,7 +188,7 @@ impl GpioDriver {
     }
 
     pub fn set_pin_state(&mut self, pin: u32, state: bool) -> Result<(), EmbeddedError> {
-        if pin >= self.pin_count.load(Ordering::SeqCst)) {
+        if pin >= self.pin_count.load(Ordering::SeqCst) {
             return Err(EmbeddedError::InvalidAddress);
         }
 
@@ -210,14 +210,14 @@ impl GpioDriver {
     }
 
     pub fn get_pin_state(&self, pin: u32) -> Result<bool, EmbeddedError> {
-        if pin >= self.pin_count.load(Ordering::SeqCst)) {
+        if pin >= self.pin_count.load(Ordering::SeqCst) {
             return Err(EmbeddedError::InvalidAddress);
         }
 
         // In real implementation, this would read from GPLEV registers
         // For Raspberry Pi: GPLEV0 at base + 0x34
         
-        let state = (self.pin_states.load(Ordering::SeqCst)) >> pin) & 1;
+        let state = (self.pin_states.load(Ordering::SeqCst) >> pin) & 1;
         Ok(state == 1)
     }
 
@@ -453,8 +453,8 @@ impl EmbeddedSubsystem {
     pub fn get_hal_info(&self) -> (&'static str, u32, u32) {
         (
             self.hal.get_platform_name(),
-            self.hal.cpu_id.load(Ordering::SeqCst)),
-            self.hal.memory_size.load(Ordering::SeqCst)),
+            self.hal.cpu_id.load(Ordering::SeqCst),
+            self.hal.memory_size.load(Ordering::SeqCst),
         )
     }
 
@@ -473,9 +473,9 @@ mod tests {
     #[test]
     fn test_hal_initialization() {
         let hal = HardwareAbstractionLayer::new();
-        assert!(!hal.initialized.load(Ordering::SeqCst)));
+        assert!(!hal.initialized.load(Ordering::SeqCst));
         assert!(hal.initialize().is_ok());
-        assert!(hal.initialized.load(Ordering::SeqCst)));
+        assert!(hal.initialized.load(Ordering::SeqCst));
         assert_eq!(hal.get_platform_name(), "Raspberry Pi");
     }
 
@@ -484,7 +484,7 @@ mod tests {
         let mut gpio = GpioDriver::new(0x20200000);
         assert!(gpio.initialize().is_ok());
         assert_eq!(gpio.peripheral_type(), PeripheralType::GPIO);
-        assert_eq!(gpio.pin_count.load(Ordering::SeqCst)), 40);
+        assert_eq!(gpio.pin_count.load(Ordering::SeqCst), 40);
         
         assert!(gpio.set_pin_direction(0, GpioDirection::Output).is_ok());
         assert!(gpio.set_pin_state(0, true).is_ok());
