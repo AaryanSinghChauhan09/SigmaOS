@@ -922,6 +922,36 @@ impl MissingDistroComponentsEngine {
             "DragonFly BSD",
             ComponentParityStatus::Implemented,
         );
+        engine.register_component(
+            "AppArmor Profile Confinement",
+            "Ubuntu",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "NixOS Flakes Input Lock",
+            "NixOS",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "pkgsrc License Compliance",
+            "NetBSD",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "Veriexec Executable Fingerprints",
+            "NetBSD",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "XBPS RSA/Ed25519 Signatures",
+            "Void Linux",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "Bodhi & Greenwave CI Gating",
+            "Fedora",
+            ComponentParityStatus::Implemented,
+        );
 
         engine
     }
@@ -1933,6 +1963,211 @@ impl AppArmorPathRuleEngine {
     }
 }
 
+// =========================================================================
+// FEDORA BODHI & GREENWAVE PACKAGE KARMA CI GATING ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BodhiUpdateStatus {
+    Testing,
+    Stable,
+    Obsolete,
+}
+
+#[derive(Debug, Clone)]
+pub struct BodhiPackageUpdate {
+    pub update_id: String,
+    pub package_name: String,
+    pub version: String,
+    pub karma: i32,
+    pub greenwave_ci_passed: bool,
+    pub status: BodhiUpdateStatus,
+}
+
+pub struct FedoraBodhiGreenwaveGateEngine {
+    pub updates: BTreeMap<String, BodhiPackageUpdate>,
+    pub required_karma_threshold: i32,
+}
+
+impl FedoraBodhiGreenwaveGateEngine {
+    pub fn new(karma_threshold: i32) -> Self {
+        Self {
+            updates: BTreeMap::new(),
+            required_karma_threshold: karma_threshold,
+        }
+    }
+
+    pub fn submit_update(&mut self, update_id: &str, pkg_name: &str, version: &str) {
+        let update = BodhiPackageUpdate {
+            update_id: update_id.to_string(),
+            package_name: pkg_name.to_string(),
+            version: version.to_string(),
+            karma: 0,
+            greenwave_ci_passed: false,
+            status: BodhiUpdateStatus::Testing,
+        };
+        self.updates.insert(update_id.to_string(), update);
+    }
+
+    pub fn add_karma_vote(&mut self, update_id: &str, delta: i32) -> Result<i32, &'static str> {
+        let update = self.updates.get_mut(update_id).ok_or("Bodhi update not found")?;
+        update.karma += delta;
+        Ok(update.karma)
+    }
+
+    pub fn set_greenwave_ci_status(&mut self, update_id: &str, passed: bool) -> Result<(), &'static str> {
+        let update = self.updates.get_mut(update_id).ok_or("Bodhi update not found")?;
+        update.greenwave_ci_passed = passed;
+        Ok(())
+    }
+
+    pub fn promote_to_stable_if_gated(&mut self, update_id: &str) -> Result<bool, &'static str> {
+        let update = self.updates.get_mut(update_id).ok_or("Bodhi update not found")?;
+        if update.karma >= self.required_karma_threshold && update.greenwave_ci_passed {
+            update.status = BodhiUpdateStatus::Stable;
+            Ok(true)
+        } else {
+            Ok(false)
+        }
+    }
+}
+
+impl Default for FedoraBodhiGreenwaveGateEngine {
+    fn default() -> Self {
+        Self::new(3)
+    }
+}
+
+// =========================================================================
+// ALPINE APKOVL DISKLESS RAM PERSISTENCE ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct ApkovlOverlayArchive {
+    pub hostname: String,
+    pub file_paths: Vec<String>,
+    pub hmac_signature: u64,
+}
+
+pub struct AlpineApkovlPersistenceEngine {
+    pub active_overlay: Option<ApkovlOverlayArchive>,
+    pub secret_key: u64,
+}
+
+impl AlpineApkovlPersistenceEngine {
+    pub fn new(secret_key: u64) -> Self {
+        Self {
+            active_overlay: None,
+            secret_key,
+        }
+    }
+
+    pub fn compute_hmac(&self, hostname: &str, paths: &[String]) -> u64 {
+        let mut hash = self.secret_key ^ 0xcbf29ce484222325;
+        for &b in hostname.as_bytes() {
+            hash ^= b as u64;
+            hash = hash.wrapping_mul(0x100000001b3);
+        }
+        for p in paths {
+            for &b in p.as_bytes() {
+                hash ^= b as u64;
+                hash = hash.wrapping_mul(0x100000001b3);
+            }
+        }
+        hash
+    }
+
+    pub fn save_apkovl_overlay(&mut self, hostname: &str, paths: &[&str]) -> u64 {
+        let path_strings: Vec<String> = paths.iter().map(|s| s.to_string()).collect();
+        let hmac = self.compute_hmac(hostname, &path_strings);
+        let overlay = ApkovlOverlayArchive {
+            hostname: hostname.to_string(),
+            file_paths: path_strings,
+            hmac_signature: hmac,
+        };
+        self.active_overlay = Some(overlay);
+        hmac
+    }
+
+    pub fn restore_apkovl_overlay(&self) -> Result<usize, &'static str> {
+        let overlay = self.active_overlay.as_ref().ok_or("No apkovl overlay found")?;
+        let expected_hmac = self.compute_hmac(&overlay.hostname, &overlay.file_paths);
+        if overlay.hmac_signature != expected_hmac {
+            return Err("Alpine apkovl: HMAC signature verification failed");
+        }
+        Ok(overlay.file_paths.len())
+    }
+}
+
+impl Default for AlpineApkovlPersistenceEngine {
+    fn default() -> Self {
+        Self::new(0x0123456789ABCDEF)
+    }
+}
+
+// =========================================================================
+// OPENBSD ALTQ / PF QUALITY OF SERVICE (QOS) TRAFFIC SHAPER
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AltqSchedulerKind {
+    Hfsc, // Hierarchical Fair Service Curve
+    Cbq,  // Class-Based Queueing
+    Priq, // Priority Queueing
+}
+
+#[derive(Debug, Clone)]
+pub struct AltqQueueNode {
+    pub queue_name: String,
+    pub bandwidth_kbps: u32,
+    pub priority: u8,
+    pub parent_queue: Option<String>,
+}
+
+pub struct OpenBsdAltqPfQosEngine {
+    pub scheduler: AltqSchedulerKind,
+    pub interface_bandwidth_kbps: u32,
+    pub queues: BTreeMap<String, AltqQueueNode>,
+}
+
+impl OpenBsdAltqPfQosEngine {
+    pub fn new(scheduler: AltqSchedulerKind, interface_bw_kbps: u32) -> Self {
+        Self {
+            scheduler,
+            interface_bandwidth_kbps: interface_bw_kbps,
+            queues: BTreeMap::new(),
+        }
+    }
+
+    pub fn add_queue(&mut self, name: &str, bw_kbps: u32, priority: u8, parent: Option<&str>) -> Result<(), &'static str> {
+        if bw_kbps > self.interface_bandwidth_kbps {
+            return Err("ALTQ: Queue bandwidth exceeds interface bandwidth");
+        }
+        let queue = AltqQueueNode {
+            queue_name: name.to_string(),
+            bandwidth_kbps: bw_kbps,
+            priority,
+            parent_queue: parent.map(|s| s.to_string()),
+        };
+        self.queues.insert(name.to_string(), queue);
+        Ok(())
+    }
+
+    pub fn select_egress_queue(&self, tos_priority: u8) -> Option<String> {
+        self.queues
+            .values()
+            .filter(|q| q.priority <= tos_priority)
+            .max_by_key(|q| q.priority)
+            .map(|q| q.queue_name.clone())
+    }
+}
+
+impl Default for OpenBsdAltqPfQosEngine {
+    fn default() -> Self {
+        Self::new(AltqSchedulerKind::Hfsc, 100_000)
+    }
+}
+
 impl Default for AppArmorPathRuleEngine {
     fn default() -> Self {
         Self::new()
@@ -2312,10 +2547,48 @@ mod tests {
     #[test]
     fn test_missing_distro_components_engine() {
         let engine = MissingDistroComponentsEngine::new();
-        assert_eq!(engine.records.len(), 14);
-        assert_eq!(engine.total_components_count(), 14);
-        assert_eq!(engine.implemented_components_count(), 14);
+        assert_eq!(engine.records.len(), 20);
+        assert_eq!(engine.total_components_count(), 20);
+        assert_eq!(engine.implemented_components_count(), 20);
         assert!(engine.is_all_components_implemented());
+    }
+
+    #[test]
+    fn test_fedora_bodhi_greenwave_gate_engine() {
+        let mut bodhi = FedoraBodhiGreenwaveGateEngine::new(3);
+        bodhi.submit_update("FEDORA-2026-1001", "kernel", "6.12.0");
+
+        // Gating should fail before karma and CI
+        assert_eq!(bodhi.promote_to_stable_if_gated("FEDORA-2026-1001").unwrap(), false);
+
+        bodhi.add_karma_vote("FEDORA-2026-1001", 3).unwrap();
+        bodhi.set_greenwave_ci_status("FEDORA-2026-1001", true).unwrap();
+
+        // Gating succeeds
+        assert_eq!(bodhi.promote_to_stable_if_gated("FEDORA-2026-1001").unwrap(), true);
+        assert_eq!(bodhi.updates.get("FEDORA-2026-1001").unwrap().status, BodhiUpdateStatus::Stable);
+    }
+
+    #[test]
+    fn test_alpine_apkovl_persistence_engine() {
+        let mut apkovl = AlpineApkovlPersistenceEngine::new(0xDEADBEEF);
+        let paths = vec!["/etc/network/interfaces", "/etc/apk/world"];
+        let hmac = apkovl.save_apkovl_overlay("alpine-node-1", &paths);
+        assert_ne!(hmac, 0);
+
+        let restored_count = apkovl.restore_apkovl_overlay().unwrap();
+        assert_eq!(restored_count, 2);
+    }
+
+    #[test]
+    fn test_openbsd_altq_pf_qos_engine() {
+        let mut qos = OpenBsdAltqPfQosEngine::new(AltqSchedulerKind::Hfsc, 100_000);
+        qos.add_queue("root", 100_000, 0, None).unwrap();
+        qos.add_queue("ssh", 10_000, 7, Some("root")).unwrap();
+        qos.add_queue("bulk", 50_000, 1, Some("root")).unwrap();
+
+        let selected = qos.select_egress_queue(5).unwrap();
+        assert_eq!(selected, "bulk");
     }
 
     #[test]
