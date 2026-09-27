@@ -203,9 +203,10 @@
 | Remove irrelevant workflows | ✅ Complete | 21 distro workflows removed |
 | Implement agent instructions | ✅ Complete | AGENTS.md created |
 | Ensure Rust/Zig/Nim only | ✅ Complete | Audit confirms compliance |
-| Remove redundant branches | ✅ Complete | Only main remains |
+| Remove redundant branches | ✅ Complete | Only main remains (deleted 40+ branches) |
 | Consolidate wiki | ✅ Complete | Single wiki/ directory |
-| Fix security issues | ⚠️ Partial | Removed hardcoded keys, added mitigations, replaced unsafe static mut, added safety documentation, implemented thermal throttling |
+| Close and merge PRs | ✅ Complete | Closed 9 PRs, consolidated to main |
+| Fix security issues | ⚠️ Partial | Removed hardcoded keys, added mitigations, replaced unsafe static mut, added safety documentation, implemented thermal throttling, connection tracking |
 | Implement unimplemented ideas | ⚠️ Partial | Implemented roadmap features: hardware drivers, scheduler, networking |
 | Transfer to GitHub Wiki | ⚠️ Pending | Requires API access |
 
