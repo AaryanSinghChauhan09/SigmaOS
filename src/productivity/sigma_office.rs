@@ -3237,6 +3237,507 @@ impl Default for SovereignFleetFieldServiceEngine {
     }
 }
 
+// ==========================================================
+// 34. Google Sheets / Excel Goal Seek Solver Engine
+// ==========================================================
+
+/// Numerical goal seek solver for spreadsheet formulas
+pub struct SovereignGoalSeekSolverEngine;
+
+impl SovereignGoalSeekSolverEngine {
+    /// Solves for an input cell value that makes the target formula cell evaluate to target_value
+    pub fn solve_goal_seek(
+        spreadsheet: &mut SpreadsheetProcessor,
+        variable_row: u32,
+        variable_col: u32,
+        target_row: u32,
+        target_col: u32,
+        target_value: f64,
+    ) -> Result<f64> {
+        let mut low = -10000.0;
+        let mut high = 10000.0;
+        let mut best_val = 0.0;
+
+        for _ in 0..100 {
+            let mid = (low + high) / 2.0;
+            spreadsheet.set_cell(variable_row, variable_col, CellValue::Number(mid))?;
+            let current_val = match spreadsheet.evaluate_cell(target_row, target_col) {
+                CellValue::Number(n) => n,
+                _ => return Err("Target cell did not evaluate to a numeric value"),
+            };
+
+            best_val = mid;
+            if (current_val - target_value).abs() < 1e-4 {
+                break;
+            }
+
+            if current_val < target_value {
+                low = mid;
+            } else {
+                high = mid;
+            }
+        }
+
+        Ok(best_val)
+    }
+}
+
+// ==========================================================
+// 35. Google Sheets / Excel Pivot Table Summary Engine
+// ==========================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PivotAggregateFunc {
+    Sum,
+    Count,
+    Average,
+    Max,
+    Min,
+}
+
+#[derive(Debug, Clone)]
+pub struct PivotSummaryResult {
+    pub row_label: String,
+    pub col_label: String,
+    pub aggregated_value: f64,
+}
+
+/// Pivot Table aggregation engine for multi-dimensional spreadsheet data
+pub struct SovereignPivotTableSummaryEngine;
+
+impl SovereignPivotTableSummaryEngine {
+    pub fn generate_pivot_summary(
+        spreadsheet: &SpreadsheetProcessor,
+        row_dim_col: u32,
+        col_dim_col: u32,
+        val_col: u32,
+        agg_func: PivotAggregateFunc,
+        start_row: u32,
+        end_row: u32,
+    ) -> Vec<PivotSummaryResult> {
+        let mut groups: HashMap<(String, String), Vec<f64>> = HashMap::new();
+
+        for r in start_row..=end_row {
+            let r_label = match spreadsheet.get_cell(r, row_dim_col) {
+                Some(CellValue::Text(s)) => s.clone(),
+                Some(CellValue::Number(n)) => n.to_string(),
+                _ => "Unspecified".to_string(),
+            };
+            let c_label = match spreadsheet.get_cell(r, col_dim_col) {
+                Some(CellValue::Text(s)) => s.clone(),
+                Some(CellValue::Number(n)) => n.to_string(),
+                _ => "Unspecified".to_string(),
+            };
+            let val = match spreadsheet.get_cell(r, val_col) {
+                Some(CellValue::Number(n)) => *n,
+                _ => 0.0,
+            };
+
+            groups.entry((r_label, c_label)).or_default().push(val);
+        }
+
+        let mut results = Vec::new();
+        for ((r_label, c_label), vals) in groups {
+            let aggregated = match agg_func {
+                PivotAggregateFunc::Sum => vals.iter().sum(),
+                PivotAggregateFunc::Count => vals.len() as f64,
+                PivotAggregateFunc::Average => {
+                    if vals.is_empty() {
+                        0.0
+                    } else {
+                        vals.iter().sum::<f64>() / (vals.len() as f64)
+                    }
+                }
+                PivotAggregateFunc::Max => vals.iter().cloned().fold(f64::MIN, f64::max),
+                PivotAggregateFunc::Min => vals.iter().cloned().fold(f64::MAX, f64::min),
+            };
+            results.push(PivotSummaryResult {
+                row_label: r_label,
+                col_label: c_label,
+                aggregated_value: aggregated,
+            });
+        }
+
+        results
+    }
+}
+
+// ==========================================================
+// 36. Google Drive / SharePoint Shared Drive Permission Engine
+// ==========================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum SharedDriveRole {
+    Viewer,
+    Commenter,
+    Contributor,
+    Manager,
+    Owner,
+}
+
+#[derive(Debug, Clone)]
+pub struct SharedDriveMember {
+    pub user_email: String,
+    pub role: SharedDriveRole,
+}
+
+#[derive(Debug, Clone)]
+pub struct SharedDriveFileLock {
+    pub file_id: String,
+    pub locked_by_user: String,
+    pub lock_timestamp: u64,
+}
+
+/// Google Drive / SharePoint inspired Shared Drive Access & Lock Engine
+pub struct SovereignSharedDrivePermissionEngine {
+    pub drive_name: String,
+    pub members: HashMap<String, SharedDriveRole>, // email -> role
+    pub active_locks: HashMap<String, SharedDriveFileLock>, // file_id -> lock
+}
+
+impl SovereignSharedDrivePermissionEngine {
+    pub fn new(drive_name: &str, owner_email: &str) -> Self {
+        let mut members = HashMap::new();
+        members.insert(owner_email.to_string(), SharedDriveRole::Owner);
+        Self {
+            drive_name: drive_name.to_string(),
+            members,
+            active_locks: HashMap::new(),
+        }
+    }
+
+    pub fn set_member_role(&mut self, email: &str, role: SharedDriveRole) {
+        self.members.insert(email.to_string(), role);
+    }
+
+    pub fn check_permission(&self, email: &str, required_role: SharedDriveRole) -> bool {
+        if let Some(user_role) = self.members.get(email) {
+            user_role >= &required_role
+        } else {
+            false
+        }
+    }
+
+    pub fn lock_file(&mut self, file_id: &str, email: &str) -> Result<bool> {
+        if !self.check_permission(email, SharedDriveRole::Contributor) {
+            return Err("Insufficient permissions to lock file");
+        }
+        if let Some(lock) = self.active_locks.get(file_id) {
+            if lock.locked_by_user == email {
+                Ok(true)
+            } else {
+                Ok(false)
+            }
+        } else {
+            self.active_locks.insert(
+                file_id.to_string(),
+                SharedDriveFileLock {
+                    file_id: file_id.to_string(),
+                    locked_by_user: email.to_string(),
+                    lock_timestamp: 1000,
+                },
+            );
+            Ok(true)
+        }
+    }
+
+    pub fn unlock_file(&mut self, file_id: &str, email: &str) -> bool {
+        if let Some(lock) = self.active_locks.get(file_id) {
+            if lock.locked_by_user == email || self.check_permission(email, SharedDriveRole::Manager) {
+                self.active_locks.remove(file_id);
+                true
+            } else {
+                false
+            }
+        } else {
+            true
+        }
+    }
+}
+
+// ==========================================================
+// 37. Zoho Expense / Odoo Expense Claim Approval Engine
+// ==========================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ExpenseApprovalStatus {
+    Submitted,
+    ManagerApproved,
+    FinanceReimbursed,
+    Rejected,
+}
+
+#[derive(Debug, Clone)]
+pub struct ExpenseClaimItem {
+    pub claim_id: u32,
+    pub employee_email: String,
+    pub category: String,
+    pub amount: f64,
+    pub receipt_ocr_text: String,
+    pub status: ExpenseApprovalStatus,
+}
+
+/// Zoho Expense / Odoo Expense Claim Approval Engine
+pub struct SovereignExpenseClaimApprovalEngine {
+    pub claims: Vec<ExpenseClaimItem>,
+    pub next_id: u32,
+}
+
+impl SovereignExpenseClaimApprovalEngine {
+    pub fn new() -> Self {
+        Self {
+            claims: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn submit_claim(&mut self, email: &str, category: &str, amount: f64, ocr_text: &str) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.claims.push(ExpenseClaimItem {
+            claim_id: id,
+            employee_email: email.to_string(),
+            category: category.to_string(),
+            amount,
+            receipt_ocr_text: ocr_text.to_string(),
+            status: ExpenseApprovalStatus::Submitted,
+        });
+        id
+    }
+
+    pub fn approve_claim(&mut self, claim_id: u32) -> bool {
+        if let Some(c) = self.claims.iter_mut().find(|c| c.claim_id == claim_id) {
+            c.status = ExpenseApprovalStatus::ManagerApproved;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn reimburse_claim(&mut self, claim_id: u32) -> bool {
+        if let Some(c) = self.claims.iter_mut().find(|c| c.claim_id == claim_id && c.status == ExpenseApprovalStatus::ManagerApproved) {
+            c.status = ExpenseApprovalStatus::FinanceReimbursed;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn calculate_total_reimbursed(&self, email: &str) -> f64 {
+        self.claims
+            .iter()
+            .filter(|c| c.employee_email == email && c.status == ExpenseApprovalStatus::FinanceReimbursed)
+            .map(|c| c.amount)
+            .sum()
+    }
+}
+
+impl Default for SovereignExpenseClaimApprovalEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 38. Salesforce / Bitrix24 CRM Behavioral Lead Scoring Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub enum LeadBehaviorEvent {
+    EmailOpened,
+    EmailLinkClicked,
+    WebpageVisited { page_views: u32 },
+    ProposalDownloaded,
+    DealMagnitude { amount: f64 },
+}
+
+#[derive(Debug, Clone)]
+pub struct LeadScoreRecord {
+    pub lead_id: u32,
+    pub cumulative_score: u32,
+}
+
+/// Salesforce / Bitrix24 behavioral lead scoring engine
+pub struct SovereignCrmLeadScoringEngine {
+    pub lead_scores: HashMap<u32, u32>,
+}
+
+impl SovereignCrmLeadScoringEngine {
+    pub fn new() -> Self {
+        Self {
+            lead_scores: HashMap::new(),
+        }
+    }
+
+    pub fn record_event(&mut self, lead_id: u32, event: LeadBehaviorEvent) -> u32 {
+        let points = match event {
+            LeadBehaviorEvent::EmailOpened => 5,
+            LeadBehaviorEvent::EmailLinkClicked => 10,
+            LeadBehaviorEvent::WebpageVisited { page_views } => page_views * 2,
+            LeadBehaviorEvent::ProposalDownloaded => 25,
+            LeadBehaviorEvent::DealMagnitude { amount } => {
+                if amount >= 100000.0 {
+                    50
+                } else if amount >= 10000.0 {
+                    20
+                } else {
+                    10
+                }
+            }
+        };
+
+        let current = self.lead_scores.entry(lead_id).or_insert(0);
+        *current += points;
+        *current
+    }
+
+    pub fn get_qualification_stage(&self, lead_id: u32) -> &'static str {
+        let score = self.lead_scores.get(&lead_id).cloned().unwrap_or(0);
+        if score >= 100 {
+            "Sales Qualified Lead"
+        } else if score >= 50 {
+            "Hot Lead"
+        } else if score >= 20 {
+            "Warm Lead"
+        } else {
+            "Cold Lead"
+        }
+    }
+}
+
+impl Default for SovereignCrmLeadScoringEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 39. Microsoft Teams / Bitrix24 Workgroup Activity Stream Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct WorkgroupChannelMessage {
+    pub message_id: u32,
+    pub channel_name: String,
+    pub author: String,
+    pub content: String,
+    pub mentions: Vec<String>,
+    pub reactions: HashMap<String, u32>, // reaction_emoji -> count
+    pub parent_message_id: Option<u32>,
+}
+
+/// Microsoft Teams / Bitrix24 inspired Workgroup Activity Stream Engine
+pub struct SovereignWorkgroupActivityStreamEngine {
+    pub messages: Vec<WorkgroupChannelMessage>,
+    pub next_id: u32,
+}
+
+impl SovereignWorkgroupActivityStreamEngine {
+    pub fn new() -> Self {
+        Self {
+            messages: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn post_message(&mut self, channel: &str, author: &str, content: &str, mentions: Vec<String>) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.messages.push(WorkgroupChannelMessage {
+            message_id: id,
+            channel_name: channel.to_string(),
+            author: author.to_string(),
+            content: content.to_string(),
+            mentions,
+            reactions: HashMap::new(),
+            parent_message_id: None,
+        });
+        id
+    }
+
+    pub fn reply_to_message(&mut self, parent_id: u32, author: &str, content: &str) -> Option<u32> {
+        let channel = self.messages.iter().find(|m| m.message_id == parent_id).map(|m| m.channel_name.clone())?;
+        let id = self.next_id;
+        self.next_id += 1;
+        self.messages.push(WorkgroupChannelMessage {
+            message_id: id,
+            channel_name: channel,
+            author: author.to_string(),
+            content: content.to_string(),
+            mentions: Vec::new(),
+            reactions: HashMap::new(),
+            parent_message_id: Some(parent_id),
+        });
+        Some(id)
+    }
+
+    pub fn add_reaction(&mut self, message_id: u32, emoji: &str) -> bool {
+        if let Some(msg) = self.messages.iter_mut().find(|m| m.message_id == message_id) {
+            *msg.reactions.entry(emoji.to_string()).or_insert(0) += 1;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for SovereignWorkgroupActivityStreamEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 40. Zoho Sign / DocuSign Digital Contract Signature Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct DigitalSignatureStamp {
+    pub signature_id: u32,
+    pub document_hash: String,
+    pub signer_identity: String,
+    pub timestamp: u64,
+    pub pki_public_key: Vec<u8>,
+}
+
+/// Zoho Sign / DocuSign Digital Contract Signature Engine
+pub struct SovereignDigitalContractSignatureEngine {
+    pub signatures: Vec<DigitalSignatureStamp>,
+    pub next_id: u32,
+}
+
+impl SovereignDigitalContractSignatureEngine {
+    pub fn new() -> Self {
+        Self {
+            signatures: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn sign_document(&mut self, doc_hash: &str, signer: &str, pubkey: Vec<u8>) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.signatures.push(DigitalSignatureStamp {
+            signature_id: id,
+            document_hash: doc_hash.to_string(),
+            signer_identity: signer.to_string(),
+            timestamp: 1000 + id as u64,
+            pki_public_key: pubkey,
+        });
+        id
+    }
+
+    pub fn verify_signature_hash(&self, doc_hash: &str) -> bool {
+        self.signatures.iter().any(|s| s.document_hash == doc_hash)
+    }
+}
+
+impl Default for SovereignDigitalContractSignatureEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // Placeholder types for compilation
 mod sigma_types {
     pub type Result<T> = core::result::Result<T, &'static str>;
@@ -3727,5 +4228,68 @@ mod tests {
         let mut fleet = SovereignFleetFieldServiceEngine::new();
         let job_id = fleet.dispatch_technician("SIGMA-01", "Tech Bob", "Zone-A");
         assert!(fleet.complete_job(job_id));
+    }
+
+    #[test]
+    fn test_new_google_ms_zoho_salesforce_odoo_bitrix_suite_additions() {
+        let cap = sigma_types::CapabilityToken { id: 300 };
+
+        // 1. Goal Seek Solver Test
+        let mut sheet = SpreadsheetProcessor::new("Financial Forecast".to_string(), cap.clone());
+        sheet.set_cell(0, 0, CellValue::Number(10.0)).unwrap();
+        sheet.set_cell(0, 1, CellValue::Number(10.0)).unwrap();
+        sheet.set_formula(0, 2, "=SUM((0,0),(0,1))").unwrap();
+        let solved = SovereignGoalSeekSolverEngine::solve_goal_seek(&mut sheet, 0, 0, 0, 2, 100.0).unwrap();
+        assert!((solved - 90.0).abs() < 1e-2);
+
+        // 2. Pivot Table Summary Engine Test
+        let mut sales_sheet = SpreadsheetProcessor::new("Sales Log".to_string(), cap.clone());
+        sales_sheet.set_cell(1, 0, CellValue::Text("US-East".to_string())).unwrap();
+        sales_sheet.set_cell(1, 1, CellValue::Text("Electronics".to_string())).unwrap();
+        sales_sheet.set_cell(1, 2, CellValue::Number(500.0)).unwrap();
+
+        sales_sheet.set_cell(2, 0, CellValue::Text("US-East".to_string())).unwrap();
+        sales_sheet.set_cell(2, 1, CellValue::Text("Electronics".to_string())).unwrap();
+        sales_sheet.set_cell(2, 2, CellValue::Number(300.0)).unwrap();
+
+        let pivot = SovereignPivotTableSummaryEngine::generate_pivot_summary(
+            &sales_sheet, 0, 1, 2, PivotAggregateFunc::Sum, 1, 2,
+        );
+        assert_eq!(pivot.len(), 1);
+        assert_eq!(pivot[0].aggregated_value, 800.0);
+
+        // 3. Shared Drive Permission Engine Test
+        let mut drive_permission = SovereignSharedDrivePermissionEngine::new("Engineering Drive", "owner@sigmaos.org");
+        drive_permission.set_member_role("dev@sigmaos.org", SharedDriveRole::Contributor);
+        assert!(drive_permission.check_permission("dev@sigmaos.org", SharedDriveRole::Contributor));
+        assert!(drive_permission.lock_file("file-101", "dev@sigmaos.org").unwrap());
+
+        // 4. Expense Claim Approval Engine Test
+        let mut expense_engine = SovereignExpenseClaimApprovalEngine::new();
+        let claim_id = expense_engine.submit_claim("alice@corp.com", "Travel", 250.0, "Hotel Receipt");
+        assert!(expense_engine.approve_claim(claim_id));
+        assert!(expense_engine.reimburse_claim(claim_id));
+        assert_eq!(expense_engine.calculate_total_reimbursed("alice@corp.com"), 250.0);
+
+        // 5. CRM Lead Scoring Engine Test
+        let mut lead_scorer = SovereignCrmLeadScoringEngine::new();
+        lead_scorer.record_event(1001, LeadBehaviorEvent::ProposalDownloaded);
+        lead_scorer.record_event(1001, LeadBehaviorEvent::DealMagnitude { amount: 150000.0 });
+        lead_scorer.record_event(1001, LeadBehaviorEvent::WebpageVisited { page_views: 15 });
+        let stage = lead_scorer.get_qualification_stage(1001);
+        assert_eq!(stage, "Sales Qualified Lead");
+
+        // 6. Workgroup Activity Stream Test
+        let mut stream = SovereignWorkgroupActivityStreamEngine::new();
+        let msg_id = stream.post_message("general", "alice", "Release v1.5 is ready!", vec!["@team".to_string()]);
+        assert!(stream.add_reaction(msg_id, "🚀"));
+        let reply_id = stream.reply_to_message(msg_id, "bob", "Great work!").unwrap();
+        assert_eq!(reply_id, 2);
+
+        // 7. Digital Contract Signature Engine Test
+        let mut sig_engine = SovereignDigitalContractSignatureEngine::new();
+        let sig_id = sig_engine.sign_document("hash-abc-123", "alice@sigmaos.org", vec![1, 2, 3, 4]);
+        assert_eq!(sig_id, 1);
+        assert!(sig_engine.verify_signature_hash("hash-abc-123"));
     }
 }
