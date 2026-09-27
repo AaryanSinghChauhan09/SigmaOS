@@ -33,6 +33,193 @@ impl CinnamonThemeConfig {
     }
 }
 
+/// Linux Mint `mint-x-icons` Parity Icon Color Variant
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MintXIconVariant {
+    ClassicGreen,
+    Aqua,
+    Blue,
+    Brown,
+    Dark,
+    Grey,
+    Orange,
+    Pink,
+    Purple,
+    Red,
+    Sand,
+    Teal,
+}
+
+impl MintXIconVariant {
+    pub fn theme_name(&self) -> &'static str {
+        match self {
+            MintXIconVariant::ClassicGreen => "Mint-X",
+            MintXIconVariant::Aqua => "Mint-X-Aqua",
+            MintXIconVariant::Blue => "Mint-X-Blue",
+            MintXIconVariant::Brown => "Mint-X-Brown",
+            MintXIconVariant::Dark => "Mint-X-Dark",
+            MintXIconVariant::Grey => "Mint-X-Grey",
+            MintXIconVariant::Orange => "Mint-X-Orange",
+            MintXIconVariant::Pink => "Mint-X-Pink",
+            MintXIconVariant::Purple => "Mint-X-Purple",
+            MintXIconVariant::Red => "Mint-X-Red",
+            MintXIconVariant::Sand => "Mint-X-Sand",
+            MintXIconVariant::Teal => "Mint-X-Teal",
+        }
+    }
+}
+
+/// XDG Icon Category Directory
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IconDirectoryCategory {
+    Actions,
+    Apps,
+    Categories,
+    Devices,
+    Emblems,
+    Mimetypes,
+    Places,
+    Status,
+}
+
+impl IconDirectoryCategory {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            IconDirectoryCategory::Actions => "actions",
+            IconDirectoryCategory::Apps => "apps",
+            IconDirectoryCategory::Categories => "categories",
+            IconDirectoryCategory::Devices => "devices",
+            IconDirectoryCategory::Emblems => "emblems",
+            IconDirectoryCategory::Mimetypes => "mimetypes",
+            IconDirectoryCategory::Places => "places",
+            IconDirectoryCategory::Status => "status",
+        }
+    }
+}
+
+/// Icon Descriptor Entry in Mint-X Theme Catalog
+#[derive(Debug, Clone)]
+pub struct MintXIconEntry {
+    pub name: String,
+    pub category: IconDirectoryCategory,
+    pub size_px: u16,
+    pub is_symbolic: bool,
+    pub relative_path: String,
+}
+
+/// Linux Mint `mint-x-icons` Parity Icon Theme Engine
+pub struct MintXIconThemeEngine {
+    pub active_variant: MintXIconVariant,
+    pub inherits_base: Vec<String>,
+    pub icon_catalog: Vec<MintXIconEntry>,
+    pub cache_valid: bool,
+}
+
+impl MintXIconThemeEngine {
+    pub fn new(variant: MintXIconVariant) -> Self {
+        let mut engine = Self {
+            active_variant: variant,
+            inherits_base: vec![
+                "Mint-X".to_string(),
+                "Mint-Y".to_string(),
+                "gnome".to_string(),
+                "hicolor".to_string(),
+            ],
+            icon_catalog: Vec::new(),
+            cache_valid: false,
+        };
+        engine.seed_default_mint_x_icons();
+        engine
+    }
+
+    fn seed_default_mint_x_icons(&mut self) {
+        let default_icons = [
+            ("folder", IconDirectoryCategory::Places, 48, false, "places/48/folder.png"),
+            ("folder-home", IconDirectoryCategory::Places, 48, false, "places/48/folder-home.png"),
+            ("user-desktop", IconDirectoryCategory::Places, 48, false, "places/48/user-desktop.png"),
+            ("system-file-manager", IconDirectoryCategory::Apps, 48, false, "apps/48/system-file-manager.png"),
+            ("terminal", IconDirectoryCategory::Apps, 48, false, "apps/48/terminal.png"),
+            ("text-editor", IconDirectoryCategory::Apps, 48, false, "apps/48/text-editor.png"),
+            ("edit-cut", IconDirectoryCategory::Actions, 16, false, "actions/16/edit-cut.png"),
+            ("edit-copy", IconDirectoryCategory::Actions, 16, false, "actions/16/edit-copy.png"),
+            ("folder-symbolic", IconDirectoryCategory::Places, 16, true, "places/symbolic/folder-symbolic.svg"),
+            ("network-workgroup", IconDirectoryCategory::Places, 48, false, "places/48/network-workgroup.png"),
+            ("drive-harddisk", IconDirectoryCategory::Devices, 48, false, "devices/48/drive-harddisk.png"),
+            ("computer", IconDirectoryCategory::Places, 48, false, "places/48/computer.png"),
+        ];
+
+        for (name, category, size, symbolic, rel_path) in default_icons {
+            self.icon_catalog.push(MintXIconEntry {
+                name: name.to_string(),
+                category,
+                size_px: size,
+                is_symbolic: symbolic,
+                relative_path: format!("/usr/share/icons/{}/{}", self.active_variant.theme_name(), rel_path),
+            });
+        }
+        self.cache_valid = true;
+    }
+
+    pub fn set_variant(&mut self, variant: MintXIconVariant) {
+        self.active_variant = variant;
+        self.cache_valid = false;
+        self.rebuild_icon_cache();
+    }
+
+    pub fn rebuild_icon_cache(&mut self) {
+        for entry in self.icon_catalog.iter_mut() {
+            let parts: Vec<&str> = entry.relative_path.split('/').collect();
+            if parts.len() >= 5 {
+                entry.relative_path = format!(
+                    "/usr/share/icons/{}/{}",
+                    self.active_variant.theme_name(),
+                    parts[5..].join("/")
+                );
+            }
+        }
+        self.cache_valid = true;
+    }
+
+    pub fn lookup_icon(&self, icon_name: &str, size_px: u16) -> Option<String> {
+        // Try exact match by name and size
+        if let Some(entry) = self
+            .icon_catalog
+            .iter()
+            .find(|e| e.name == icon_name && e.size_px == size_px)
+        {
+            return Some(entry.relative_path.clone());
+        }
+
+        // Fallback to closest size match
+        if let Some(entry) = self.icon_catalog.iter().find(|e| e.name == icon_name) {
+            return Some(entry.relative_path.clone());
+        }
+
+        // Fallback to symbolic icon
+        let symbolic_name = format!("{}-symbolic", icon_name);
+        if let Some(entry) = self.icon_catalog.iter().find(|e| e.name == symbolic_name) {
+            return Some(entry.relative_path.clone());
+        }
+
+        None
+    }
+
+    pub fn export_index_theme(&self) -> String {
+        format!(
+            "[Icon Theme]\nName={}\nComment=Smooth Mint-X icon theme for SigmaOS and Cinnamon\nInherits={}\nDirectories={}\n\n[places/48]\nSize=48\nContext=Places\nType=Fixed\n",
+            self.active_variant.theme_name(),
+            self.inherits_base.join(","),
+            "places/48,apps/48,actions/16,devices/48,places/symbolic"
+        )
+    }
+}
+
+impl Default for MintXIconThemeEngine {
+    fn default() -> Self {
+        Self::new(MintXIconVariant::ClassicGreen)
+    }
+}
+
 impl Default for CinnamonThemeConfig {
     fn default() -> Self {
         Self::new()
@@ -188,5 +375,29 @@ mod tests {
         let manager = MintUpdateSafetyManager::new();
         assert!(manager.evaluate_package_update("curl", UpdateSafetyLevel::Level1Certified));
         assert!(!manager.evaluate_package_update("experimental-driver", UpdateSafetyLevel::Level5Dangerous));
+    }
+
+    #[test]
+    fn test_mint_x_icon_theme_engine() {
+        let mut icon_engine = MintXIconThemeEngine::new(MintXIconVariant::ClassicGreen);
+        assert_eq!(icon_engine.active_variant.theme_name(), "Mint-X");
+
+        let folder_path = icon_engine.lookup_icon("folder", 48).unwrap();
+        assert!(folder_path.contains("/usr/share/icons/Mint-X/places/48/folder.png"));
+
+        // Change color variant to Aqua
+        icon_engine.set_variant(MintXIconVariant::Aqua);
+        assert_eq!(icon_engine.active_variant.theme_name(), "Mint-X-Aqua");
+
+        let folder_aqua = icon_engine.lookup_icon("folder", 48).unwrap();
+        assert!(folder_aqua.contains("/usr/share/icons/Mint-X-Aqua/places/48/folder.png"));
+
+        // Symbolic fallback
+        let sym_path = icon_engine.lookup_icon("folder", 16).unwrap();
+        assert!(sym_path.contains("folder-symbolic.svg"));
+
+        let index_file = icon_engine.export_index_theme();
+        assert!(index_file.contains("Name=Mint-X-Aqua"));
+        assert!(index_file.contains("Inherits=Mint-X,Mint-Y,gnome,hicolor"));
     }
 }
