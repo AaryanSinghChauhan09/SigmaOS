@@ -2,9 +2,11 @@
 
 Thank you for contributing to **SigmaOS**! This document provides development guidelines, code quality standards, and contribution workflows inspired by Linux kernel maintainers and BSD distribution standards.
 
+For detailed rules on kernel development, sandboxing, error handling, and PR requirements, please refer to the comprehensive [SIGMAOS_DEVELOPMENT_RULES_AND_GUIDELINES.md](SIGMAOS_DEVELOPMENT_RULES_AND_GUIDELINES.md).
+
 ---
 
-## 📜 Rules for Contributors
+## 📜 Core Rules for Contributors
 
 ### 1. **Zero External Dependencies Policy**
 - SigmaOS strictly adheres to a **zero-dependency `#![no_std]`** design philosophy across kernel, hardware abstractions, and system services.
@@ -25,18 +27,19 @@ Thank you for contributing to **SigmaOS**! This document provides development gu
 - Branch names should follow descriptive prefixes (`feat/`, `fix/`, `docs/`, `security/`, `perf/`, `jules-`).
 - Keep commits atomic, well-tested, and accompanied by clear commit messages adhering to standard git conventions (50-char subject, blank line, body).
 
-### 3. **Linux & BSD Distribution Engineering Guidelines**
-- **Cross-Distro Interoperability**: Components taking inspiration from Linux and BSD distributions (Arch ALPM, Debian sbuild, Fedora DNF, Gentoo Portage, CachyOS BORE, FreeBSD Ports/Capsicum, OpenBSD Pledge/Unveil, NixOS Flakes/CAS) must maintain clean interfaces and support cross-subsystem event routing.
-- **Security Sandboxing**: Application modules must declare sandboxing bounds using OpenBSD `pledge()`/`unveil()`, Linux Landlock v5, FreeBSD Capsicum capabilities, or Fedora SELinux MLS/MCS rules.
+---
 
-### 4. **Testing, Autonomous Verification & Pre-Commit Protocols**
-- **Standalone Module Testing**: Modified files must be verified using standalone unit test compilation:
-  ```bash
-  rustc --edition=2021 --test <file_path> -o build/test_bin && ./build/test_bin
-  ```
-- **Master Test Runner Execution**: Before submitting any pull request or finalizing AI agent turns, execute `./run_sigma_tests.sh` to verify all test stages pass cleanly.
-- **AI Agent Pre-Commit Protocol**: AI agents must execute `pre_commit_instructions`, verify test binaries, obtain code review confirmation (`request_code_review`), record learnings (`initiate_memory_recording`), and submit via `submit`.
+## 📋 Pull Request Checklist & Pre-Commit Protocol
 
-### 5. **Code Review & Quality Assurance**
-- Every pull request requires double maintainer review.
-- PR commit messages must follow standard conventions: short subject line (50 chars max), blank line, and descriptive body outlining changes and testing results.
+Before opening a pull request or submitting code changes:
+
+1. **Verify Standalone Test Compilation:**
+   ```bash
+   mkdir -p build && rustc --edition=2021 --test <file_path> -o build/test_mod && ./build/test_bin
+   ```
+2. **Execute Full Test Suite:**
+   ```bash
+   ./run_sigma_tests.sh
+   ```
+3. **Check Formatting & Quality:** Ensure `cargo fmt` standards are maintained and no unhandled panics or unwraps exist in production paths.
+4. **Follow PR Guidelines:** Follow the detailed steps in [SIGMAOS_DEVELOPMENT_RULES_AND_GUIDELINES.md](SIGMAOS_DEVELOPMENT_RULES_AND_GUIDELINES.md).
