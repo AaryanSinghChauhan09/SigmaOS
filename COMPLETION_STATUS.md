@@ -45,6 +45,33 @@
 - **Impact**: Reduced complexity from O(D * P * N) to O(D * P) in sigpkg spec
 - **File**: `src/sigpkg/spec.rs`
 
+### 8. Roadmap Feature Implementation
+- **Implemented**: fscrypt module with per-directory transparent encryption
+  - AES-256-XTS and Kyber-1024 PQC encryption policies
+  - File encryption context management
+- **Implemented**: autofs module for on-demand mount point triggers
+  - Direct/indirect mount trigger types
+  - Idle timeout auto-unmounting functionality
+- **Implemented**: Kernel security mitigations (KPTR_RESTRICT, DMESG_RESTRICT)
+  - Kernel pointer exposure prevention
+  - Sensitive message filtering
+  - Module loading control
+- **Implemented**: Linux-compatible procfs
+  - Process information in /proc/[pid]/stat
+  - /proc/meminfo, /proc/cpuinfo, /proc/cmdline, /proc/version
+- **Implemented**: Capability-based security framework (Capsicum-inspired)
+  - Fine-grained resource permissions (read, write, execute, network)
+  - Sandbox modes (Unrestricted, Restricted, Strict)
+  - Path-based capability access control
+
+### 9. Security Hardening
+- **Removed**: Hardcoded cryptographic keys in PQC enclave
+- **Removed**: Hardcoded keys in PQC VPN module
+- **Removed**: Hardcoded XOR constants in shared secret derivation
+- **Added**: Security warnings indicating need for cryptographically secure RNG
+- **Fixed**: Unreachable pattern warnings in BCM4318 WiFi driver
+- **Fixed**: Unreachable pattern in smart_symlink.rs using matches! macro
+
 ## ⚠️ Outstanding Issues
 
 ### Compilation Status
@@ -97,8 +124,8 @@
 | Ensure Rust/Zig/Nim only | ✅ Complete | Audit confirms compliance |
 | Remove redundant branches | ✅ Complete | Only main remains |
 | Consolidate wiki | ✅ Complete | Single wiki/ directory |
-| Fix security issues | ⚠️ Pending | Requires dedicated audit |
-| Implement unimplemented ideas | ⚠️ Pending | Large scope, requires planning |
+| Fix security issues | ⚠️ Partial | Removed hardcoded keys, added mitigations |
+| Implement unimplemented ideas | ⚠️ Partial | Implemented 5 roadmap features |
 | Transfer to GitHub Wiki | ⚠️ Pending | Requires API access |
 
 ## 🔄 Continuous Sync Status
