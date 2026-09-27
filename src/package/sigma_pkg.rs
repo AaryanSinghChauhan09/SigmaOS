@@ -1627,6 +1627,20 @@ impl SigmaPkg {
         } else if pm == "installpkg" {
             action = "install";
             action_explicitly_set = true;
+        } else if pm == "swupd" {
+            if args.contains(&"bundle-add") {
+                action = "install";
+                action_explicitly_set = true;
+            } else if args.contains(&"bundle-remove") {
+                action = "remove";
+                action_explicitly_set = true;
+            } else if args.contains(&"update") {
+                action = "upgrade";
+                action_explicitly_set = true;
+            } else if args.contains(&"search") {
+                action = "search";
+                action_explicitly_set = true;
+            }
         } else if pm == "nix-env" {
             if args.contains(&"-i") || args.contains(&"-iA") || args.contains(&"--install") {
                 action = "install";
@@ -1645,9 +1659,9 @@ impl SigmaPkg {
 
         for arg in args {
             if !action_explicitly_set {
-                if *arg == "install" || *arg == "add" || *arg == "it" || *arg == "in" || *arg == "get" || *arg == "b" || *arg == "build" {
+                if *arg == "install" || *arg == "add" || *arg == "it" || *arg == "in" || *arg == "get" || *arg == "b" || *arg == "build" || *arg == "groupinstall" || *arg == "bundle-add" {
                     action = "install";
-                } else if *arg == "-S" {
+                } else if *arg == "-S" || *arg == "-Sy" || *arg == "-Syy" {
                     if args.contains(&"-s") || args.contains(&"-ss") || args.contains(&"-Ss") || args.contains(&"-Si") {
                         action = "search";
                     } else if args.contains(&"-u") || args.contains(&"-yyu") || args.contains(&"-yu") {
@@ -1657,7 +1671,7 @@ impl SigmaPkg {
                     }
                 } else if *arg == "-Qi" || *arg == "-Si" || *arg == "info" || *arg == "show" || *arg == "status" {
                     action = "query_info";
-                } else if *arg == "remove" || *arg == "purge" || *arg == "-R" || *arg == "del" || *arg == "delete" || *arg == "rm" || *arg == "-C" || *arg == "--unmerge" || *arg == "erase" || *arg == "uninstall" || *arg == "deselect" {
+                } else if *arg == "remove" || *arg == "purge" || *arg == "-R" || *arg == "del" || *arg == "delete" || *arg == "rm" || *arg == "-C" || *arg == "--unmerge" || *arg == "erase" || *arg == "uninstall" || *arg == "deselect" || *arg == "bundle-remove" {
                     action = "remove";
                 } else if *arg == "update" || *arg == "upgrade" || *arg == "-Syu" || *arg == "-Syyu" || *arg == "up" || *arg == "dup" || *arg == "sync" || *arg == "@world" {
                     action = "upgrade";
@@ -1665,7 +1679,7 @@ impl SigmaPkg {
                     action = "search";
                 }
             }
-            if !arg.starts_with('-') && *arg != "install" && *arg != "remove" && *arg != "add" && *arg != "del" && *arg != "delete" && *arg != "purge" && *arg != "update" && *arg != "upgrade" && *arg != "search" && *arg != "find" && *arg != "show" && *arg != "info" && *arg != "it" && *arg != "in" && *arg != "rm" && *arg != "up" && *arg != "se" && *arg != "sr" {
+            if !arg.starts_with('-') && *arg != "install" && *arg != "remove" && *arg != "add" && *arg != "del" && *arg != "delete" && *arg != "purge" && *arg != "update" && *arg != "upgrade" && *arg != "search" && *arg != "find" && *arg != "show" && *arg != "info" && *arg != "it" && *arg != "in" && *arg != "rm" && *arg != "up" && *arg != "se" && *arg != "sr" && *arg != "groupinstall" && *arg != "bundle-add" && *arg != "bundle-remove" {
                 target_packages.push(arg.to_string());
             }
         }
@@ -2044,6 +2058,15 @@ mod tests {
 
         let info_res = pkg_mgr.execute_universal_cli_command("apt show musl-dev").unwrap();
         assert!(info_res.contains("musl-dev"));
+
+        let swupd_res = pkg_mgr.execute_universal_cli_command("swupd bundle-add sysadmin-basic").unwrap();
+        assert!(swupd_res.contains("sysadmin-basic"));
+
+        let dnf_group = pkg_mgr.execute_universal_cli_command("dnf groupinstall development-tools").unwrap();
+        assert!(dnf_group.contains("development-tools"));
+
+        let pac_sy = pkg_mgr.execute_universal_cli_command("pacman -Sy gcc").unwrap();
+        assert!(pac_sy.contains("gcc"));
     }
 
     #[test]
