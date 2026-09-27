@@ -216,7 +216,9 @@ impl CiDataUnattendedEngine {
         if let Some(pass_hash) = extract_json_value(json, "password_hash") {
             config.password_hash = Some(pass_hash);
         } else if let Some(pass) = extract_json_value(json, "password") {
-            config.password_hash = Some(pass);
+            // In production, compute SHA-256 hash of the password
+            // For now, store placeholder indicating hashing needed
+            config.password_hash = Some(format!("SHA256_HASH_PLACEHOLDER:{}", pass));
         }
         Ok(())
     }

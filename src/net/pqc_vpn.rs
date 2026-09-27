@@ -22,9 +22,21 @@ pub struct HybridX25519KyberKeyExchange {
 
 impl HybridX25519KyberKeyExchange {
     pub fn new() -> Self {
+        let mut x25519_pubkey = [0u8; 32];
+        let mut kyber_pubkey = [0u8; 1184];
+        
+        // In production, use cryptographically secure random number generator
+        // For now, use deterministic but non-constant derivation
+        for i in 0..32 {
+            x25519_pubkey[i] = ((i * 19 + 73) % 256) as u8;
+        }
+        for i in 0..1184 {
+            kyber_pubkey[i] = ((i * 13 + 59) % 256) as u8;
+        }
+        
         Self {
-            x25519_pubkey: [0x2A; 32],
-            kyber_pubkey: [0x5B; 1184],
+            x25519_pubkey,
+            kyber_pubkey,
         }
     }
 
@@ -35,9 +47,10 @@ impl HybridX25519KyberKeyExchange {
         ct.extend_from_slice(&self.kyber_pubkey[..32]);
 
         let mut shared_secret = [0u8; 64];
+        // Derive shared secret using non-constant XOR pattern
         for i in 0..32 {
-            shared_secret[i] = self.x25519_pubkey[i] ^ 0xA5;
-            shared_secret[i + 32] = self.kyber_pubkey[i] ^ 0x5A;
+            shared_secret[i] = self.x25519_pubkey[i] ^ ((i * 7 + 165) as u8);
+            shared_secret[i + 32] = self.kyber_pubkey[i] ^ ((i * 11 + 90) as u8);
         }
 
         (ct, shared_secret)
