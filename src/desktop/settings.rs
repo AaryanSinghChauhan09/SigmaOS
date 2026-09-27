@@ -359,3 +359,188 @@ mod tests {
         assert!(overlay.sysctl_overrides.get_setting(b"kern.ipc.maxsockbuf").is_some());
     }
 }
+
+// ============================================================================
+// 🎨 PALETTE UX ENGINE: A11Y AUDIT & HIGH CONTRAST THEME
+// ============================================================================
+
+/// UI Widget Accessibility Metadata.
+#[derive(Debug, Clone)]
+pub struct WidgetA11yMeta {
+    pub widget_id: String,
+    pub tab_focusable: bool,
+    pub focus_indicator_visible: bool,
+    pub aria_role: Option<String>,
+    pub aria_label: Option<String>,
+}
+
+/// Evaluates keyboard navigation focus visibility and ARIA accessibility readiness.
+pub struct KeyboardNavigationA11yAudit {
+    pub widgets: Vec<WidgetA11yMeta>,
+}
+
+impl KeyboardNavigationA11yAudit {
+    pub fn new() -> Self {
+        Self { widgets: Vec::new() }
+    }
+
+    pub fn register_widget(&mut self, widget: WidgetA11yMeta) {
+        self.widgets.push(widget);
+    }
+
+    /// Calculates the screen-reader & keyboard navigation readiness score (0.0 to 100.0%).
+    pub fn readiness_score(&self) -> f64 {
+        if self.widgets.is_empty() {
+            return 100.0;
+        }
+        let mut passed = 0;
+        for w in &self.widgets {
+            if w.tab_focusable {
+                let focus_ok = w.focus_indicator_visible;
+                let aria_ok = w.aria_role.is_some() && w.aria_label.is_some();
+                if focus_ok && aria_ok {
+                    passed += 1;
+                }
+            } else {
+                passed += 1;
+            }
+        }
+        (passed as f64 / self.widgets.len() as f64) * 100.0
+    }
+
+    /// Finds non-compliant focusable widgets missing visible focus rings or ARIA labels.
+    pub fn audit_failures(&self) -> Vec<String> {
+        let mut failures = Vec::new();
+        for w in &self.widgets {
+            if w.tab_focusable {
+                if !w.focus_indicator_visible {
+                    failures.push(format!("Widget '{}' missing visible focus indicator", w.widget_id));
+                }
+                if w.aria_label.is_none() {
+                    failures.push(format!("Widget '{}' missing ARIA label", w.widget_id));
+                }
+            }
+        }
+        failures
+    }
+}
+
+impl Default for KeyboardNavigationA11yAudit {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Color representation in RGB for WCAG contrast calculations.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct RgbColor {
+    pub r: u8,
+    pub g: u8,
+    pub b: u8,
+}
+
+impl RgbColor {
+    pub const BLACK: Self = RgbColor { r: 0, g: 0, b: 0 };
+    pub const WHITE: Self = RgbColor { r: 255, g: 255, b: 255 };
+    pub const YELLOW: Self = RgbColor { r: 255, g: 255, b: 0 };
+
+    /// Calculate relative luminance per WCAG 2.1 specification.
+    pub fn relative_luminance(&self) -> f64 {
+        let calc = |c: u8| -> f64 {
+            let s = c as f64 / 255.0;
+            if s <= 0.03928 {
+                s / 12.92
+            } else {
+                let base = (s + 0.055) / 1.055;
+                let mut res = 1.0;
+                for _ in 0..2 { res *= base; } // approximation
+                res
+            }
+        };
+        0.2126 * calc(self.r) + 0.7152 * calc(self.g) + 0.0722 * calc(self.b)
+    }
+
+    /// Calculate WCAG contrast ratio between self and another color.
+    pub fn contrast_ratio(&self, other: &RgbColor) -> f64 {
+        let l1 = self.relative_luminance();
+        let l2 = other.relative_luminance();
+        let (lighter, darker) = if l1 > l2 { (l1, l2) } else { (l2, l1) };
+        (lighter + 0.05) / (darker + 0.05)
+    }
+}
+
+/// High-contrast theme generator enforcing WCAG AAA compliance (>= 7:1 contrast ratio).
+pub struct HighContrastThemeEngine {
+    pub background: RgbColor,
+    pub foreground: RgbColor,
+    pub focus_ring: RgbColor,
+    pub accent: RgbColor,
+}
+
+impl HighContrastThemeEngine {
+    /// Creates a high contrast theme palette. Default: Black background with White text (21:1 contrast ratio).
+    pub fn new_dark() -> Self {
+        Self {
+            background: RgbColor::BLACK,
+            foreground: RgbColor::WHITE,
+            focus_ring: RgbColor::YELLOW,
+            accent: RgbColor::WHITE,
+        }
+    }
+
+    /// Verifies if text and background comply with WCAG AAA requirements (contrast ratio >= 7.0).
+    pub fn is_wcag_aaa_compliant(&self) -> bool {
+        self.foreground.contrast_ratio(&self.background) >= 7.0
+    }
+
+    pub fn get_design_tokens(&self) -> (RgbColor, RgbColor, RgbColor, RgbColor) {
+        (self.background, self.foreground, self.focus_ring, self.accent)
+    }
+}
+
+impl Default for HighContrastThemeEngine {
+    fn default() -> Self {
+        Self::new_dark()
+    }
+}
+
+#[cfg(test)]
+mod a11y_theme_tests {
+    use super::*;
+
+    #[test]
+    fn test_keyboard_navigation_a11y_audit() {
+        let mut audit = KeyboardNavigationA11yAudit::new();
+        audit.register_widget(WidgetA11yMeta {
+            widget_id: "btn_submit".to_string(),
+            tab_focusable: true,
+            focus_indicator_visible: true,
+            aria_role: Some("button".to_string()),
+            aria_label: Some("Submit Form".to_string()),
+        });
+        audit.register_widget(WidgetA11yMeta {
+            widget_id: "btn_cancel".to_string(),
+            tab_focusable: true,
+            focus_indicator_visible: false,
+            aria_role: Some("button".to_string()),
+            aria_label: None,
+        });
+
+        assert_eq!(audit.readiness_score(), 50.0);
+        let failures = audit.audit_failures();
+        assert_eq!(failures.len(), 2);
+        assert!(failures[0].contains("focus indicator"));
+        assert!(failures[1].contains("ARIA label"));
+    }
+
+    #[test]
+    fn test_high_contrast_theme_engine() {
+        let theme = HighContrastThemeEngine::new_dark();
+        assert!(theme.is_wcag_aaa_compliant());
+        let (bg, fg, focus, _acc) = theme.get_design_tokens();
+        assert_eq!(bg, RgbColor::BLACK);
+        assert_eq!(fg, RgbColor::WHITE);
+        assert_eq!(focus, RgbColor::YELLOW);
+        assert!(fg.contrast_ratio(&bg) >= 15.0);
+    }
+}

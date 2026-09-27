@@ -1239,10 +1239,10 @@ impl SovereignUniversalDistroBridge {
             "open_source_obsoletion", "open_source_os_gap_closure", "orchestration", "package", "performance", "phase_l_plans", "pillars", "pledge", "plugin", "power", "print", "printing", "privacy",
             "process", "productivity", "provisioning", "recovery", "release", "remote", "resilience", "resource",
             "robotics", "rt", "runtime", "saver", "scheduler", "scientific", "secure", "security", "sensor",
-            "shell", "sigma-boot", "sigma_sandbox", "sigma_validation", "signal", "sigpkg", "slab", "smartcard", "storage",
-            "support", "syscall", "system", "tech_media_reexports", "telemetry", "testing", "theming", "thermal", "thread", "time",
-            "timeline_innovations", "timer", "toolchain", "tools", "touchscreen", "tpm", "tracing", "ui", "update",
-            "usb", "userland", "userspace", "vfs", "virt", "virtualization", "vm", "wiki", "wiki_distro_ideas_deployment", "wireless", "workflow",
+            "shell", "sigma-boot", "sigma_sandbox", "sigma_validation", "signal", "sigpkg", "slab", "smartcard", "sovereign_wiki_master_engine", "storage",
+            "subsystem_sync", "super_matrix", "support", "syscall", "system", "tech_media_reexports", "telemetry", "testing", "theming", "thermal", "thread", "time",
+            "timeline_innovations", "timer", "toolchain", "tools", "touchscreen", "tpm", "tracing", "ui", "unimplemented_features", "unimplemented_tools", "universal_distro_super_matrix", "update",
+            "usb", "userland", "userspace", "vfs", "virt", "virtualization", "vm", "wiki", "wiki_distro_ideas_deployment", "wiki_ideas", "wiki_unimplemented_ideas", "wireless", "workflow",
             "zig",
         ];
 
@@ -1261,19 +1261,22 @@ impl SovereignUniversalDistroBridge {
             "access", "accessibility", "ai", "app", "arch", "arch_kernel", "audio", "audit", "auth",
             "automation", "backup", "bin", "bluetooth", "boot", "buddy", "buildfarm", "camera", "cloud",
             "cluster", "community", "compatibility", "compiler", "compliance", "compositor", "compression", "config", "container",
-            "core", "crash", "crypto", "customization", "dashboard", "debugger", "desktop", "dev", "device", "diagnostics",
-            "display", "distro", "distro_innovations", "distro_inspirations", "docs", "driver", "drivers", "ecosystem", "edge", "education", "embedded", "event",
-            "expanded_wiki_innovations", "extended_distro_matrix", "filesystem", "finance", "fingerprint", "firewall", "functions", "futuristic", "gamepad", "gap_closure", "governance",
-            "gpu", "graphics", "hal", "hardware", "i18n", "init", "innovation", "input", "installer", "integration",
-            "interrupt", "iot", "ipc", "iso", "kernel", "klib", "lang", "launch_ready", "launcher", "legal", "linuxmint_inspirations", "loader",
-            "location", "logging", "media", "memory", "microphone", "ml", "mm", "monitor", "monitoring", "net",
-            "network", "networking", "nim", "nlp", "notification", "observability", "obsoletion", "onboarding", "orchestration",
-            "package", "performance", "phase_l_plans", "pillars", "pledge", "plugin", "power", "print", "printing", "privacy", "process", "productivity",
-            "provisioning", "recovery", "release", "remote", "resilience", "resource", "robotics", "rt", "runtime", "saver",
-            "scheduler", "scientific", "secure", "security", "sensor", "shell", "signal", "sigpkg", "slab", "smartcard", "storage",
-            "support", "syscall", "system", "tech_media_reexports", "telemetry", "testing", "theming", "thermal", "thread", "time", "timeline_innovations", "timer", "toolchain",
-            "tools", "touchscreen", "tpm", "tracing", "ui", "update", "usb", "userland", "vfs", "virtualization", "wiki", "wiki_distro_ideas_deployment",
-            "wireless", "workflow", "zig",
+            "containers", "core", "crash", "crypto", "customization", "dashboard", "debugger", "desktop",
+            "dev", "device", "diagnostics", "display", "distro", "distro_innovations", "distro_inspirations", "docs", "driver", "drivers", "ecosystem",
+            "edge", "education", "embedded", "event", "expanded_wiki_innovations", "extended_distro_matrix", "filesystem", "finance", "fingerprint", "firewall", "fs",
+            "functions", "futuristic", "futuristic_modules", "gamepad", "gap_closure", "governance", "gpu", "graphics", "hal", "hardware", "i18n", "init",
+            "innovation", "input", "installer", "integration", "interop_gateway", "interrupt", "iot", "ipc", "iso",
+            "kernel", "klib", "lang", "launch_ready", "launcher", "legal", "linuxmint_inspirations", "loader", "location",
+            "logging", "media", "memory", "microphone", "ml", "mm", "monitor", "monitoring",
+            "net", "network", "networking", "nim", "nlp", "notification", "observability", "obsoletion", "onboarding",
+            "open_source_obsoletion", "open_source_os_gap_closure", "orchestration", "package", "performance", "phase_l_plans", "pillars", "pledge", "plugin", "power", "print", "printing", "privacy",
+            "process", "productivity", "provisioning", "recovery", "release", "remote", "resilience", "resource",
+            "robotics", "rt", "runtime", "saver", "scheduler", "scientific", "secure", "security", "sensor",
+            "shell", "sigma-boot", "sigma_sandbox", "sigma_validation", "signal", "sigpkg", "slab", "smartcard", "sovereign_wiki_master_engine", "storage",
+            "subsystem_sync", "super_matrix", "support", "syscall", "system", "tech_media_reexports", "telemetry", "testing", "theming", "thermal", "thread", "time",
+            "timeline_innovations", "timer", "toolchain", "tools", "touchscreen", "tpm", "tracing", "ui", "unimplemented_features", "unimplemented_tools", "universal_distro_super_matrix", "update",
+            "usb", "userland", "userspace", "vfs", "virt", "virtualization", "vm", "wiki", "wiki_distro_ideas_deployment", "wiki_ideas", "wiki_unimplemented_ideas", "wireless", "workflow",
+            "zig",
         ];
         subsystems.iter().map(|&s| (s, true, supervisor)).collect()
     }
@@ -2831,8 +2834,7 @@ mod cross_subsystem_tests {
 
         let sync_count = orchestrator.synchronize_subsystem_pipeline();
         assert!(sync_count.is_ok());
-        assert_eq!(sync_count.unwrap(), 174);
-        assert_eq!(sync_count.unwrap(), 158);
+        assert_eq!(sync_count.unwrap(), 182);
 
         let (supervisor, pkg_spec, vfs_etc, compatible) = orchestrator.query_subsystem_capabilities();
         assert_eq!(supervisor, ServiceSupervisorType::Smf);
@@ -2878,10 +2880,8 @@ mod cross_subsystem_tests {
     fn test_linux_bsd_interoperability_gateway_matrix_and_sync() {
         let mut gateway = LinuxBsdDistroSubsystemInteroperabilityGateway::new(DistroSubsystemMode::LinuxArch);
         let count = gateway.synchronize_and_audit_all_subsystems().unwrap();
-        assert_eq!(count, 174);
-        assert_eq!(gateway.audited_subsystems_count, 174);
-        assert_eq!(count, 158);
-        assert_eq!(gateway.audited_subsystems_count, 158);
+        assert_eq!(count, 182);
+        assert_eq!(gateway.audited_subsystems_count, 182);
 
         let res = gateway.orchestrate_subsystem("kernel", "sched_task");
         assert!(res.is_ok());
@@ -2889,8 +2889,8 @@ mod cross_subsystem_tests {
 
         gateway.set_distro_mode(DistroSubsystemMode::FreeBsd);
         let count_bsd = gateway.synchronize_and_audit_all_subsystems().unwrap();
-        assert_eq!(count_bsd, 174);
-        assert_eq!(count_bsd, 158);
+        assert_eq!(count_bsd, 182);
+        assert_eq!(gateway.audited_subsystems_count, 182);
 
         let (supervisor, pkg_spec, vfs_etc, compatible) = gateway.query_gateway_capability_matrix();
         assert_eq!(supervisor, ServiceSupervisorType::OpenRC);

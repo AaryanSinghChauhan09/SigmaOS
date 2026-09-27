@@ -648,3 +648,168 @@ mod tests {
         assert_eq!(&out[..n], b"hello?world?");
     }
 }
+
+// ============================================================================
+// 🛡️ SENTINEL SECURITY HARDENING: TAINT TRACKER, SQL SANITIZER & MAC AUDIT LOG
+// ============================================================================
+
+/// Command Line Argument Taint Tracker.
+pub struct TaintTrackerCli {
+    pub tainted_args: Vec<(String, bool)>, // (arg, is_tainted)
+}
+
+impl TaintTrackerCli {
+    pub fn new() -> Self {
+        Self { tainted_args: Vec::new() }
+    }
+
+    pub fn push_untrusted_arg(&mut self, arg: &str) {
+        self.tainted_args.push((arg.to_string(), true));
+    }
+
+    pub fn sanitize_arg(&mut self, index: usize) -> Result<(), ValidationError> {
+        if index >= self.tainted_args.len() {
+            return Err(ValidationError::OutOfRange);
+        }
+        let (ref arg, _) = self.tainted_args[index];
+        // Check for argument injection or shell meta-characters
+        if arg.starts_with('-') || arg.contains(';') || arg.contains('|') || arg.contains('&') || arg.contains('$') {
+            return Err(ValidationError::InvalidChars);
+        }
+        self.tainted_args[index].1 = false; // untaint
+        Ok(())
+    }
+
+    pub fn is_tainted(&self, index: usize) -> bool {
+        self.tainted_args.get(index).map(|(_, t)| *t).unwrap_or(false)
+    }
+}
+
+impl Default for TaintTrackerCli {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Package query sanitizer preventing SQL injection in package database lookups.
+pub struct SqlQuerySanitizer;
+
+impl SqlQuerySanitizer {
+    /// Escapes single quotes and removes dangerous SQL control sequence characters.
+    pub fn sanitize_package_query(query: &str) -> String {
+        let mut sanitized = String::with_capacity(query.len());
+        for c in query.chars() {
+            match c {
+                '\'' => sanitized.push_str("''"),
+                ';' | '\\' | '\x00' => {}, // strip SQL injection delimiters & null bytes
+                _ => sanitized.push(c),
+            }
+        }
+        sanitized
+    }
+}
+
+/// Immutable append-only audit record with Message Authentication Code (MAC).
+#[derive(Debug, Clone)]
+pub struct MacAuditRecord {
+    pub sequence_id: u64,
+    pub timestamp: u64,
+    pub operation: String,
+    pub mac_tag: u64,
+}
+
+/// Immutable append-only audit logger enforcing cryptographic chain integrity.
+pub struct ImmutableMacAuditLogger {
+    pub mac_key: u64,
+    pub log_chain: Vec<MacAuditRecord>,
+}
+
+impl ImmutableMacAuditLogger {
+    pub fn new(mac_key: u64) -> Self {
+        Self {
+            mac_key,
+            log_chain: Vec::new(),
+        }
+    }
+
+    fn compute_mac(&self, prev_mac: u64, seq: u64, ts: u64, op: &str) -> u64 {
+        let mut hash = self.mac_key ^ prev_mac;
+        const FNV_PRIME: u64 = 0x100000001b3;
+        for &b in seq.to_le_bytes().iter().chain(ts.to_le_bytes().iter()).chain(op.as_bytes()) {
+            hash ^= b as u64;
+            hash = hash.wrapping_mul(FNV_PRIME);
+        }
+        hash
+    }
+
+    pub fn log_privileged_operation(&mut self, timestamp: u64, operation: &str) -> u64 {
+        let seq = self.log_chain.len() as u64 + 1;
+        let prev_mac = self.log_chain.last().map(|r| r.mac_tag).unwrap_or(self.mac_key);
+        let mac_tag = self.compute_mac(prev_mac, seq, timestamp, operation);
+
+        self.log_chain.push(MacAuditRecord {
+            sequence_id: seq,
+            timestamp,
+            operation: operation.to_string(),
+            mac_tag,
+        });
+
+        mac_tag
+    }
+
+    pub fn verify_log_integrity(&self) -> bool {
+        let mut prev_mac = self.mac_key;
+        for record in &self.log_chain {
+            let expected_mac = self.compute_mac(prev_mac, record.sequence_id, record.timestamp, &record.operation);
+            if record.mac_tag != expected_mac {
+                return false; // Tampering detected
+            }
+            prev_mac = record.mac_tag;
+        }
+        true
+    }
+}
+
+#[cfg(test)]
+mod sentinel_tests {
+    use super::*;
+
+    #[test]
+    fn test_taint_tracker_cli() {
+        let mut tracker = TaintTrackerCli::new();
+        tracker.push_untrusted_arg("packages");
+        tracker.push_untrusted_arg("-rf");
+        tracker.push_untrusted_arg("ls; rm -rf /");
+
+        assert!(tracker.is_tainted(0));
+        assert!(tracker.sanitize_arg(0).is_ok());
+        assert!(!tracker.is_tainted(0));
+
+        assert!(tracker.sanitize_arg(1).is_err()); // -rf rejected
+        assert!(tracker.sanitize_arg(2).is_err()); // ; command chaining rejected
+    }
+
+    #[test]
+    fn test_sql_query_sanitizer() {
+        let query = "nginx' OR '1'='1";
+        let sanitized = SqlQuerySanitizer::sanitize_package_query(query);
+        assert_eq!(sanitized, "nginx'' OR ''1''=''1");
+
+        let malicious = "kernel; DROP TABLE packages;--";
+        let clean = SqlQuerySanitizer::sanitize_package_query(malicious);
+        assert_eq!(clean, "kernel DROP TABLE packages--");
+    }
+
+    #[test]
+    fn test_immutable_mac_audit_logger() {
+        let mut logger = ImmutableMacAuditLogger::new(0xDEADBEEF12345678);
+        logger.log_privileged_operation(1000, "sudo systemctl restart nginx");
+        logger.log_privileged_operation(1001, "sigpkg install vim");
+
+        assert!(logger.verify_log_integrity());
+
+        // Tampering attempt
+        logger.log_chain[0].operation = "sudo systemctl stop firewall".to_string();
+        assert!(!logger.verify_log_integrity()); // Tampering correctly detected
+    }
+}

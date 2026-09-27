@@ -32,8 +32,8 @@ use core::mem;
 pub type SandboxID = usize;
 
 /// Sandbox state
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SandboxState {
     Creating = 0,
     Running = 1,
@@ -275,6 +275,7 @@ pub trait SandboxManager {
 
 /// Sandbox statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct SandboxStats {
     pub total_sandboxes: usize,
     pub running_sandboxes: usize,

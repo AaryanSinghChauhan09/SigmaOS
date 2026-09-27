@@ -36,7 +36,7 @@ pub type SensorID = usize;
 
 /// Sensor type
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SensorType {
     CPU = 0,
     Memory = 1,
@@ -228,6 +228,7 @@ pub trait DiagnosticsManager {
 
 /// Diagnostics statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct DiagnosticsStats {
     pub total_sensors: usize,
     pub active_sensors: usize,
@@ -494,5 +495,187 @@ impl<'a, T> IntoIterator for &'a mut CustomVec<T> {
     fn into_iter(self) -> Self::IntoIter {
         use core::ops::DerefMut;
         self.deref_mut().iter_mut()
+    }
+}
+
+// ============================================================================
+// ⚡ BOLT PERFORMANCE ENGINE: KERNEL MEMORY & VFS CACHE PROFILERS
+// ============================================================================
+
+/// Analyzes kernel heap fragmentation and allocation latency percentiles.
+pub struct KernelMemoryLayoutAnalyzer {
+    pub total_heap_bytes: usize,
+    pub allocated_bytes: usize,
+    pub free_block_count: usize,
+    pub largest_free_block_bytes: usize,
+    pub latency_samples_ns: Vec<u64>,
+}
+
+impl KernelMemoryLayoutAnalyzer {
+    pub fn new(total_heap_bytes: usize) -> Self {
+        Self {
+            total_heap_bytes,
+            allocated_bytes: 0,
+            free_block_count: 1,
+            largest_free_block_bytes: total_heap_bytes,
+            latency_samples_ns: Vec::new(),
+        }
+    }
+
+    pub fn record_allocation_event(&mut self, size_bytes: usize, latency_ns: u64) {
+        self.allocated_bytes = self.allocated_bytes.saturating_add(size_bytes);
+        self.latency_samples_ns.push(latency_ns);
+    }
+
+    pub fn update_fragmentation_state(&mut self, free_blocks: usize, largest_free_bytes: usize) {
+        self.free_block_count = free_blocks;
+        self.largest_free_block_bytes = largest_free_bytes;
+    }
+
+    /// Computes heap fragmentation ratio as a percentage (0.0% = no fragmentation, 100.0% = severely fragmented).
+    pub fn fragmentation_score(&self) -> f64 {
+        let free_bytes = self.total_heap_bytes.saturating_sub(self.allocated_bytes);
+        if free_bytes == 0 || self.largest_free_block_bytes >= free_bytes {
+            0.0
+        } else {
+            (1.0 - (self.largest_free_block_bytes as f64 / free_bytes as f64)) * 100.0
+        }
+    }
+
+    /// Computes latency percentiles (p50, p95, p99) in nanoseconds.
+    pub fn latency_percentiles(&self) -> (u64, u64, u64) {
+        if self.latency_samples_ns.is_empty() {
+            return (0, 0, 0);
+        }
+        let mut sorted = self.latency_samples_ns.clone();
+        sorted.sort();
+        let len = sorted.len();
+        let p50 = sorted[(len * 50 / 100).min(len - 1)];
+        let p95 = sorted[(len * 95 / 100).min(len - 1)];
+        let p99 = sorted[(len * 99 / 100).min(len - 1)];
+        (p50, p95, p99)
+    }
+}
+
+/// Profile entry for filesystem page cache warmth metrics.
+#[derive(Debug, Clone)]
+pub struct VfsFsCacheStats {
+    pub mount_point: String,
+    pub hits: u64,
+    pub misses: u64,
+}
+
+/// Tracks page cache hit rates per filesystem and generates automated optimization suggestions.
+pub struct VfsCacheWarmthProfiler {
+    pub stats: Vec<VfsFsCacheStats>,
+}
+
+impl VfsCacheWarmthProfiler {
+    pub fn new() -> Self {
+        Self { stats: Vec::new() }
+    }
+
+    pub fn record_cache_access(&mut self, mount_point: &str, hit: bool) {
+        if let Some(entry) = self.stats.iter_mut().find(|s| s.mount_point == mount_point) {
+            if hit {
+                entry.hits += 1;
+            } else {
+                entry.misses += 1;
+            }
+        } else {
+            self.stats.push(VfsFsCacheStats {
+                mount_point: mount_point.to_string(),
+                hits: if hit { 1 } else { 0 },
+                misses: if hit { 0 } else { 1 },
+            });
+        }
+    }
+
+    /// Calculates page cache hit rate for a given mount point (0.0 to 100.0%).
+    pub fn hit_rate(&self, mount_point: &str) -> f64 {
+        if let Some(entry) = self.stats.iter().find(|s| s.mount_point == mount_point) {
+            let total = entry.hits + entry.misses;
+            if total == 0 {
+                100.0
+            } else {
+                (entry.hits as f64 / total as f64) * 100.0
+            }
+        } else {
+            100.0
+        }
+    }
+
+    /// Generates optimization suggestions for filesystems with cache hit rates below 80%.
+    pub fn generate_optimization_suggestions(&self) -> Vec<String> {
+        let mut suggestions = Vec::new();
+        for entry in &self.stats {
+            let total = entry.hits + entry.misses;
+            if total > 0 {
+                let rate = (entry.hits as f64 / total as f64) * 100.0;
+                if rate < 80.0 {
+                    suggestions.push(format!(
+                        "Low page cache hit rate ({:.1}%) on '{}': pre-warm read-ahead buffers",
+                        rate, entry.mount_point
+                    ));
+                }
+            }
+        }
+        suggestions
+    }
+}
+
+impl Default for VfsCacheWarmthProfiler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ── Unit Tests ─────────────────────────────────────────────────────────────
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_kernel_memory_layout_analyzer() {
+        let mut analyzer = KernelMemoryLayoutAnalyzer::new(1024 * 1024); // 1 MB heap
+        analyzer.record_allocation_event(512 * 1024, 150);
+        analyzer.record_allocation_event(256 * 1024, 220);
+        analyzer.record_allocation_event(128 * 1024, 500);
+
+        analyzer.update_fragmentation_state(4, 64 * 1024); // 4 blocks, largest is 64KB out of 128KB free
+        let frag = analyzer.fragmentation_score();
+        assert!(frag > 0.0);
+        assert!(frag <= 100.0);
+
+        let (p50, p95, p99) = analyzer.latency_percentiles();
+        assert!(p50 > 0);
+        assert!(p95 >= p50);
+        assert!(p99 >= p95);
+    }
+
+    #[test]
+    fn test_vfs_cache_warmth_profiler() {
+        let mut profiler = VfsCacheWarmthProfiler::new();
+        for _ in 0..90 {
+            profiler.record_cache_access("/", true);
+        }
+        for _ in 0..10 {
+            profiler.record_cache_access("/", false);
+        }
+
+        for _ in 0..30 {
+            profiler.record_cache_access("/var", true);
+        }
+        for _ in 0..70 {
+            profiler.record_cache_access("/var", false);
+        }
+
+        assert_eq!(profiler.hit_rate("/"), 90.0);
+        assert_eq!(profiler.hit_rate("/var"), 30.0);
+
+        let suggestions = profiler.generate_optimization_suggestions();
+        assert_eq!(suggestions.len(), 1);
+        assert!(suggestions[0].contains("/var"));
+        assert!(suggestions[0].contains("30.0%"));
     }
 }
