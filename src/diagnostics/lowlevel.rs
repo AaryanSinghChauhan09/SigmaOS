@@ -204,6 +204,7 @@ pub trait SMARTMonitor {
 
 #[repr(C)]
 pub struct SMARTData {
+#[derive(Debug, Clone, Copy)]
     pub temperature: u8,
     pub reallocated_sectors: u16,
     pub pending_sectors: u16,
