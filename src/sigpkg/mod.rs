@@ -8,9 +8,12 @@ pub mod alpine_apk_engine;
 pub mod arch_compat;
 pub mod arch_pacman_engine;
 pub use arch_pacman_engine::{
-    AlpmHookWhen, AlpmHookOperation, SovereignAlpmHook, SovereignAlpmHookDispatcher,
-    SovereignPkgbuild, SovereignPkgbuildRunner, SovereignPacmanDbVerifier,
-    SovereignAurPackage, SovereignAurRpcEngine,
+    AURHelper, ArchBuildSystem, ArchPacmanPackage, DependencyTreeVisualizer, PacmanCacheCleaner,
+    PacmanDatabase, PacnewDiffManager, PkgbuildChecksumUpdater, SafeUpdateChecker,
+};
+pub mod omarchy_universal_package_bridge;
+pub use omarchy_universal_package_bridge::{
+    CuratedPackageSpec, PackageBackendKind, SovereignOmarchyPackageBridgeEngine,
 };
 pub mod aur;
 pub mod aur_helper;
