@@ -631,6 +631,861 @@ impl Default for TypographyRenderer {
     }
 }
 
+// ============================================================================
+// Google Workspace & Microsoft 365 Innovations
+// ============================================================================
+
+/// Conditional formatting rule condition types
+#[derive(Debug, Clone, PartialEq)]
+pub enum HighlightRuleType {
+    GreaterThan(f64),
+    LessThan(f64),
+    EqualsNumber(f64),
+    TextContains(String),
+}
+
+/// Conditional formatting rule specification
+#[derive(Debug, Clone)]
+pub struct ConditionalFormatRuleSpec {
+    pub rule_type: HighlightRuleType,
+    pub background_color_hex: String,
+    pub text_color_hex: String,
+}
+
+/// Data validation criteria types
+#[derive(Debug, Clone, PartialEq)]
+pub enum ValidationRuleType {
+    List(Vec<String>),
+    NumberRange { min: f64, max: f64 },
+    CustomFormula(String),
+}
+
+/// Data validation specification
+#[derive(Debug, Clone)]
+pub struct DataValidationSpec {
+    pub rule_type: ValidationRuleType,
+    pub allow_invalid: bool,
+    pub error_message: String,
+}
+
+/// Google Sheets / MS Excel Conditional Formatting and Data Validation Engine
+#[derive(Debug, Default, Clone)]
+pub struct SovereignConditionalFormattingDataValidationEngine;
+
+impl SovereignConditionalFormattingDataValidationEngine {
+    /// Evaluates cell value against formatting rules and returns (bg_color, text_color) if matched
+    pub fn apply_conditional_formatting(
+        cell: &CellValue,
+        rules: &[ConditionalFormatRuleSpec],
+    ) -> Option<(String, String)> {
+        for rule in rules {
+            let matched = match (&rule.rule_type, cell) {
+                (HighlightRuleType::GreaterThan(val), CellValue::Number(num)) => num > val,
+                (HighlightRuleType::LessThan(val), CellValue::Number(num)) => num < val,
+                (HighlightRuleType::EqualsNumber(val), CellValue::Number(num)) => (num - val).abs() < 1e-6,
+                (HighlightRuleType::TextContains(txt), CellValue::Text(val)) => val.contains(txt),
+                _ => false,
+            };
+            if matched {
+                return Some((rule.background_color_hex.clone(), rule.text_color_hex.clone()));
+            }
+        }
+        None
+    }
+
+    /// Validates cell value against validation criteria
+    pub fn validate_cell_value(cell: &CellValue, spec: &DataValidationSpec) -> core::result::Result<(), String> {
+        let valid = match (&spec.rule_type, cell) {
+            (ValidationRuleType::List(options), CellValue::Text(val)) => options.contains(val),
+            (ValidationRuleType::NumberRange { min, max }, CellValue::Number(num)) => num >= min && num <= max,
+            (ValidationRuleType::CustomFormula(_), _) => true,
+            _ => false,
+        };
+
+        if valid || spec.allow_invalid {
+            Ok(())
+        } else {
+            Err(spec.error_message.clone())
+        }
+    }
+}
+
+/// Smart Document Template for variable merging and Mail Merge automation
+#[derive(Debug, Clone)]
+pub struct SmartDocumentTemplate {
+    pub template_name: String,
+    pub raw_text: String,
+    pub fields: HashMap<String, String>,
+}
+
+/// Google Docs / MS Word Dynamic Smart Document Template Engine
+#[derive(Debug, Clone)]
+pub struct SovereignSmartDocumentTemplateEngine {
+    pub template: SmartDocumentTemplate,
+}
+
+impl SovereignSmartDocumentTemplateEngine {
+    pub fn new(template_name: impl Into<String>, raw_text: impl Into<String>) -> Self {
+        Self {
+            template: SmartDocumentTemplate {
+                template_name: template_name.into(),
+                raw_text: raw_text.into(),
+                fields: HashMap::new(),
+            },
+        }
+    }
+
+    pub fn set_field(&mut self, key: impl Into<String>, value: impl Into<String>) {
+        self.template.fields.insert(key.into(), value.into());
+    }
+
+    pub fn render_document_text(&self) -> String {
+        let mut rendered = self.template.raw_text.clone();
+        for (k, v) in &self.template.fields {
+            let tag = format!("{{{{{}}}}}", k);
+            rendered = rendered.replace(&tag, v);
+        }
+        rendered
+    }
+
+    pub fn merge_to_text_processor(&self, cap: CapabilityToken) -> TextProcessor {
+        let text = self.render_document_text();
+        let mut proc = TextProcessor::new(self.template.template_name.clone(), cap);
+        let _ = proc.add_paragraph();
+        let _ = proc.add_text(&text, false, false);
+        proc
+    }
+}
+
+/// CMS Page Block Types for Google Sites style web creation
+#[derive(Debug, Clone)]
+pub enum CmsBlockType {
+    Header { title: String, subtitle: String },
+    Paragraph { text: String },
+    FeatureGrid { features: Vec<(String, String)> },
+    CallToAction { button_text: String, link_url: String },
+}
+
+/// Landing page block entry
+#[derive(Debug, Clone)]
+pub struct LandingPageBlock {
+    pub id: usize,
+    pub block_type: CmsBlockType,
+}
+
+/// Sovereign Landing Page CMS Engine inspired by Google Sites & Webflow
+#[derive(Debug, Clone)]
+pub struct SovereignLandingPageCmsEngine {
+    pub page_title: String,
+    pub meta_description: String,
+    pub blocks: Vec<LandingPageBlock>,
+    next_id: usize,
+}
+
+impl SovereignLandingPageCmsEngine {
+    pub fn new(page_title: impl Into<String>, meta_description: impl Into<String>) -> Self {
+        Self {
+            page_title: page_title.into(),
+            meta_description: meta_description.into(),
+            blocks: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn add_block(&mut self, block_type: CmsBlockType) -> usize {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.blocks.push(LandingPageBlock { id, block_type });
+        id
+    }
+
+    pub fn generate_html_export(&self) -> String {
+        let mut html = format!(
+            "<!DOCTYPE html><html><head><title>{}</title><meta name=\"description\" content=\"{}\"></head><body>",
+            self.page_title, self.meta_description
+        );
+
+        for block in &self.blocks {
+            match &block.block_type {
+                CmsBlockType::Header { title, subtitle } => {
+                    html.push_str(&format!("<header><h1>{}</h1><p>{}</p></header>", title, subtitle));
+                }
+                CmsBlockType::Paragraph { text } => {
+                    html.push_str(&format!("<p>{}</p>", text));
+                }
+                CmsBlockType::FeatureGrid { features } => {
+                    html.push_str("<div class=\"features\">");
+                    for (name, desc) in features {
+                        html.push_str(&format!("<div class=\"feature\"><h3>{}</h3><p>{}</p></div>", name, desc));
+                    }
+                    html.push_str("</div>");
+                }
+                CmsBlockType::CallToAction { button_text, link_url } => {
+                    html.push_str(&format!("<a href=\"{}\" class=\"btn\">{}</a>", link_url, button_text));
+                }
+            }
+        }
+
+        html.push_str("</body></html>");
+        html
+    }
+}
+
+/// Relationship Cardinality for Power BI Data Modeling
+#[derive(Debug, Clone, PartialEq)]
+pub enum RelationCardinality {
+    OneToOne,
+    OneToMany,
+    ManyToMany,
+}
+
+/// Table Relationship specification
+#[derive(Debug, Clone)]
+pub struct TableRelationship {
+    pub from_table: String,
+    pub from_column: String,
+    pub to_table: String,
+    pub to_column: String,
+    pub cardinality: RelationCardinality,
+}
+
+/// DAX Measure Aggregation Types
+#[derive(Debug, Clone)]
+pub enum DaxMeasureType {
+    Sum(String),
+    Average(String),
+    DistinctCount(String),
+    Count(String),
+}
+
+/// DAX Measure specification
+#[derive(Debug, Clone)]
+pub struct DaxMeasure {
+    pub measure_name: String,
+    pub target_table: String,
+    pub measure_type: DaxMeasureType,
+}
+
+/// Sovereign Power BI / Looker Studio Data Modeling Engine
+#[derive(Debug, Default, Clone)]
+pub struct SovereignPowerBiDataModelingEngine {
+    pub tables: HashMap<String, DbTable>,
+    pub relationships: Vec<TableRelationship>,
+    pub measures: Vec<DaxMeasure>,
+}
+
+impl SovereignPowerBiDataModelingEngine {
+    pub fn new() -> Self {
+        Self {
+            tables: HashMap::new(),
+            relationships: Vec::new(),
+            measures: Vec::new(),
+        }
+    }
+
+    pub fn register_table(&mut self, table: DbTable) {
+        self.tables.insert(table.table_name.clone(), table);
+    }
+
+    pub fn add_relationship(&mut self, relationship: TableRelationship) {
+        self.relationships.push(relationship);
+    }
+
+    pub fn add_measure(&mut self, measure: DaxMeasure) {
+        self.measures.push(measure);
+    }
+
+    pub fn evaluate_measure(&self, measure_name: &str) -> Option<f64> {
+        let measure = self.measures.iter().find(|m| m.measure_name == measure_name)?;
+        let table = self.tables.get(&measure.target_table)?;
+
+        match &measure.measure_type {
+            DaxMeasureType::Sum(col_name) => {
+                let sum: f64 = table
+                    .rows
+                    .iter()
+                    .filter_map(|r| r.fields.get(col_name))
+                    .filter_map(|v| v.parse::<f64>().ok())
+                    .sum();
+                Some(sum)
+            }
+            DaxMeasureType::Average(col_name) => {
+                let numbers: Vec<f64> = table
+                    .rows
+                    .iter()
+                    .filter_map(|r| r.fields.get(col_name))
+                    .filter_map(|v| v.parse::<f64>().ok())
+                    .collect();
+                if numbers.is_empty() {
+                    None
+                } else {
+                    Some(numbers.iter().sum::<f64>() / numbers.len() as f64)
+                }
+            }
+            DaxMeasureType::Count(_) => Some(table.rows.len() as f64),
+            DaxMeasureType::DistinctCount(col_name) => {
+                let mut distinct = std::collections::HashSet::new();
+                for r in &table.rows {
+                    if let Some(v) = r.fields.get(col_name) {
+                        distinct.insert(v.clone());
+                    }
+                }
+                Some(distinct.len() as f64)
+            }
+        }
+    }
+}
+
+/// Viva Engage / Yammer Community Post
+#[derive(Debug, Clone)]
+pub struct CommunityPost {
+    pub id: usize,
+    pub author: String,
+    pub title: String,
+    pub content: String,
+    pub upvotes: u32,
+    pub reactions: Vec<String>,
+    pub comments_count: u32,
+}
+
+/// Sovereign Viva Engage / Bitrix24 Community Feed Hub
+#[derive(Debug, Clone)]
+pub struct SovereignVivaCommunityHubEngine {
+    pub community_name: String,
+    pub posts: Vec<CommunityPost>,
+    pub praise_awards: Vec<(String, String, String)>, // (sender, recipient, badge)
+    next_id: usize,
+}
+
+impl SovereignVivaCommunityHubEngine {
+    pub fn new(community_name: impl Into<String>) -> Self {
+        Self {
+            community_name: community_name.into(),
+            posts: Vec::new(),
+            praise_awards: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn create_post(&mut self, author: &str, title: &str, content: &str) -> usize {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.posts.push(CommunityPost {
+            id,
+            author: author.to_string(),
+            title: title.to_string(),
+            content: content.to_string(),
+            upvotes: 0,
+            reactions: Vec::new(),
+            comments_count: 0,
+        });
+        id
+    }
+
+    pub fn upvote_post(&mut self, post_id: usize) -> bool {
+        if let Some(post) = self.posts.iter_mut().find(|p| p.id == post_id) {
+            post.upvotes += 1;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn send_praise(&mut self, sender: &str, recipient: &str, badge_type: &str) {
+        self.praise_awards.push((sender.to_string(), recipient.to_string(), badge_type.to_string()));
+    }
+
+    pub fn calculate_community_engagement_score(&self) -> f64 {
+        let total_upvotes: u32 = self.posts.iter().map(|p| p.upvotes).sum();
+        let total_praise = self.praise_awards.len() as u32;
+        (total_upvotes * 2 + total_praise * 5 + self.posts.len() as u32 * 3) as f64
+    }
+}
+
+// ============================================================================
+// Zoho, Salesforce, Odoo, and Bitrix24 Innovations
+// ============================================================================
+
+/// Subscription Billing Cycle
+#[derive(Debug, Clone, PartialEq)]
+pub enum BillingCycle {
+    Monthly,
+    Quarterly,
+    Annual,
+}
+
+/// Subscription Plan Specification
+#[derive(Debug, Clone)]
+pub struct SubscriptionPlan {
+    pub plan_id: String,
+    pub plan_name: String,
+    pub recurring_fee: f64,
+    pub cycle: BillingCycle,
+}
+
+/// Customer Subscription Record
+#[derive(Debug, Clone)]
+pub struct CustomerSubscription {
+    pub sub_id: usize,
+    pub customer_email: String,
+    pub plan_id: String,
+    pub active: bool,
+    pub total_billed: f64,
+}
+
+/// Sovereign Zoho Billing / Stripe Invoicing Subscription Engine
+#[derive(Debug, Default, Clone)]
+pub struct SovereignSubscriptionBillingEngine {
+    pub plans: Vec<SubscriptionPlan>,
+    pub subscriptions: Vec<CustomerSubscription>,
+    next_sub_id: usize,
+}
+
+impl SovereignSubscriptionBillingEngine {
+    pub fn new() -> Self {
+        Self {
+            plans: Vec::new(),
+            subscriptions: Vec::new(),
+            next_sub_id: 1,
+        }
+    }
+
+    pub fn create_plan(&mut self, plan_id: &str, plan_name: &str, fee: f64, cycle: BillingCycle) {
+        self.plans.push(SubscriptionPlan {
+            plan_id: plan_id.to_string(),
+            plan_name: plan_name.to_string(),
+            recurring_fee: fee,
+            cycle,
+        });
+    }
+
+    pub fn subscribe_customer(&mut self, customer_email: &str, plan_id: &str) -> Option<usize> {
+        let _plan = self.plans.iter().find(|p| p.plan_id == plan_id)?;
+        let sub_id = self.next_sub_id;
+        self.next_sub_id += 1;
+        self.subscriptions.push(CustomerSubscription {
+            sub_id,
+            customer_email: customer_email.to_string(),
+            plan_id: plan_id.to_string(),
+            active: true,
+            total_billed: 0.0,
+        });
+        Some(sub_id)
+    }
+
+    pub fn process_recurring_billing_run(&mut self) -> f64 {
+        let mut total_mrr = 0.0;
+        for sub in self.subscriptions.iter_mut().filter(|s| s.active) {
+            if let Some(plan) = self.plans.iter().find(|p| p.plan_id == sub.plan_id) {
+                sub.total_billed += plan.recurring_fee;
+                total_mrr += match plan.cycle {
+                    BillingCycle::Monthly => plan.recurring_fee,
+                    BillingCycle::Quarterly => plan.recurring_fee / 3.0,
+                    BillingCycle::Annual => plan.recurring_fee / 12.0,
+                };
+            }
+        }
+        total_mrr
+    }
+}
+
+/// Sprint Lifecycle Status
+#[derive(Debug, Clone, PartialEq)]
+pub enum SprintStatus {
+    Planning,
+    Active,
+    Completed,
+}
+
+/// Agile User Story Node
+#[derive(Debug, Clone)]
+pub struct UserStory {
+    pub story_id: usize,
+    pub title: String,
+    pub story_points: u32,
+    pub completed: bool,
+}
+
+/// Agile Sprint Node
+#[derive(Debug, Clone)]
+pub struct Sprint {
+    pub sprint_id: usize,
+    pub sprint_name: String,
+    pub stories: Vec<UserStory>,
+    pub status: SprintStatus,
+}
+
+/// Sovereign Zoho Projects / Jira Agile Sprint Board Engine
+#[derive(Debug, Default, Clone)]
+pub struct SovereignAgileSprintBoardEngine {
+    pub sprints: Vec<Sprint>,
+    pub backlog: Vec<UserStory>,
+    next_story_id: usize,
+    next_sprint_id: usize,
+}
+
+impl SovereignAgileSprintBoardEngine {
+    pub fn new() -> Self {
+        Self {
+            sprints: Vec::new(),
+            backlog: Vec::new(),
+            next_story_id: 1,
+            next_sprint_id: 1,
+        }
+    }
+
+    pub fn add_story_to_backlog(&mut self, title: &str, story_points: u32) -> usize {
+        let id = self.next_story_id;
+        self.next_story_id += 1;
+        self.backlog.push(UserStory {
+            story_id: id,
+            title: title.to_string(),
+            story_points,
+            completed: false,
+        });
+        id
+    }
+
+    pub fn create_sprint(&mut self, sprint_name: &str) -> usize {
+        let id = self.next_sprint_id;
+        self.next_sprint_id += 1;
+        self.sprints.push(Sprint {
+            sprint_id: id,
+            sprint_name: sprint_name.to_string(),
+            stories: Vec::new(),
+            status: SprintStatus::Planning,
+        });
+        id
+    }
+
+    pub fn move_story_to_sprint(&mut self, story_id: usize, sprint_id: usize) -> bool {
+        let backlog_pos = self.backlog.iter().position(|s| s.story_id == story_id);
+        if let Some(pos) = backlog_pos {
+            let story = self.backlog.remove(pos);
+            if let Some(sprint) = self.sprints.iter_mut().find(|s| s.sprint_id == sprint_id) {
+                sprint.stories.push(story);
+                return true;
+            }
+        }
+        false
+    }
+
+    pub fn complete_story(&mut self, story_id: usize) -> bool {
+        for sprint in &mut self.sprints {
+            for story in &mut sprint.stories {
+                if story.story_id == story_id {
+                    story.completed = true;
+                    return true;
+                }
+            }
+        }
+        false
+    }
+
+    pub fn calculate_sprint_velocity(&self, sprint_id: usize) -> u32 {
+        if let Some(sprint) = self.sprints.iter().find(|s| s.sprint_id == sprint_id) {
+            sprint.stories.iter().filter(|s| s.completed).map(|s| s.story_points).sum()
+        } else {
+            0
+        }
+    }
+}
+
+/// Enterprise Sales Territory Node
+#[derive(Debug, Clone)]
+pub struct SalesTerritory {
+    pub territory_id: usize,
+    pub territory_name: String,
+    pub parent_id: Option<usize>,
+    pub quota: f64,
+    pub assigned_reps: Vec<String>,
+    pub actual_revenue: f64,
+}
+
+/// Sovereign Salesforce Enterprise Territory Management Engine
+#[derive(Debug, Default, Clone)]
+pub struct SovereignTerritoryManagementEngine {
+    pub territories: Vec<SalesTerritory>,
+    next_id: usize,
+}
+
+impl SovereignTerritoryManagementEngine {
+    pub fn new() -> Self {
+        Self {
+            territories: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn create_territory(&mut self, territory_name: &str, parent_id: Option<usize>, quota: f64) -> usize {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.territories.push(SalesTerritory {
+            territory_id: id,
+            territory_name: territory_name.to_string(),
+            parent_id,
+            quota,
+            assigned_reps: Vec::new(),
+            actual_revenue: 0.0,
+        });
+        id
+    }
+
+    pub fn assign_rep(&mut self, territory_id: usize, rep_name: &str) -> bool {
+        if let Some(t) = self.territories.iter_mut().find(|t| t.territory_id == territory_id) {
+            t.assigned_reps.push(rep_name.to_string());
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn record_territory_sale(&mut self, territory_id: usize, amount: f64) -> bool {
+        if let Some(t) = self.territories.iter_mut().find(|t| t.territory_id == territory_id) {
+            t.actual_revenue += amount;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn calculate_territory_quota_attainment(&self, territory_id: usize) -> Option<f64> {
+        let t = self.territories.iter().find(|t| t.territory_id == territory_id)?;
+        if t.quota == 0.0 {
+            Some(0.0)
+        } else {
+            Some((t.actual_revenue / t.quota) * 100.0)
+        }
+    }
+}
+
+/// Customer Journey Node Type
+#[derive(Debug, Clone)]
+pub enum JourneyNodeType {
+    EntryTrigger(String),
+    DelayDays(u32),
+    DecisionSplit { condition_field: String, target_val: String },
+    SendEmailAction { subject: String },
+    UpdateCrmStageAction { new_stage: String },
+}
+
+/// Journey Node Entry
+#[derive(Debug, Clone)]
+pub struct JourneyNode {
+    pub node_id: usize,
+    pub node_type: JourneyNodeType,
+    pub next_node_id: Option<usize>,
+}
+
+/// Customer Journey Specification
+#[derive(Debug, Clone)]
+pub struct CustomerJourney {
+    pub journey_id: usize,
+    pub journey_name: String,
+    pub nodes: Vec<JourneyNode>,
+}
+
+/// Sovereign Salesforce Marketing Cloud Journey Builder Engine
+#[derive(Debug, Default, Clone)]
+pub struct SovereignCustomerJourneyBuilderEngine {
+    pub journeys: Vec<CustomerJourney>,
+    next_journey_id: usize,
+    next_node_id: usize,
+}
+
+impl SovereignCustomerJourneyBuilderEngine {
+    pub fn new() -> Self {
+        Self {
+            journeys: Vec::new(),
+            next_journey_id: 1,
+            next_node_id: 1,
+        }
+    }
+
+    pub fn create_journey(&mut self, journey_name: &str) -> usize {
+        let id = self.next_journey_id;
+        self.next_journey_id += 1;
+        self.journeys.push(CustomerJourney {
+            journey_id: id,
+            journey_name: journey_name.to_string(),
+            nodes: Vec::new(),
+        });
+        id
+    }
+
+    pub fn add_node(&mut self, journey_id: usize, node_type: JourneyNodeType, next_node_id: Option<usize>) -> Option<usize> {
+        let node_id = self.next_node_id;
+        self.next_node_id += 1;
+        let journey = self.journeys.iter_mut().find(|j| j.journey_id == journey_id)?;
+        journey.nodes.push(JourneyNode {
+            node_id,
+            node_type,
+            next_node_id,
+        });
+        Some(node_id)
+    }
+
+    pub fn simulate_customer_path(&self, journey_id: usize, customer_data: &HashMap<String, String>) -> Vec<usize> {
+        let mut path = Vec::new();
+        let journey = match self.journeys.iter().find(|j| j.journey_id == journey_id) {
+            Some(j) => j,
+            None => return path,
+        };
+
+        if journey.nodes.is_empty() {
+            return path;
+        }
+
+        let mut current_node_id = Some(journey.nodes[0].node_id);
+
+        while let Some(nid) = current_node_id {
+            path.push(nid);
+            let node = match journey.nodes.iter().find(|n| n.node_id == nid) {
+                Some(n) => n,
+                None => break,
+            };
+
+            match &node.node_type {
+                JourneyNodeType::DecisionSplit { condition_field, target_val } => {
+                    let matched = customer_data.get(condition_field) == Some(target_val);
+                    if matched {
+                        current_node_id = node.next_node_id;
+                    } else {
+                        current_node_id = None; // terminate branch if condition not met
+                    }
+                }
+                _ => {
+                    current_node_id = node.next_node_id;
+                }
+            }
+        }
+
+        path
+    }
+}
+
+/// Odoo MRP Work Center
+#[derive(Debug, Clone)]
+pub struct WorkCenter {
+    pub center_id: usize,
+    pub name: String,
+    pub capacity_hours_per_day: f64,
+    pub hourly_rate: f64,
+}
+
+/// Routing Step for Product SKU
+#[derive(Debug, Clone)]
+pub struct RoutingStep {
+    pub step_number: u32,
+    pub work_center_id: usize,
+    pub setup_time_hours: f64,
+    pub unit_run_time_hours: f64,
+}
+
+/// Sovereign Odoo MRP Work Center and Routing Engine
+#[derive(Debug, Default, Clone)]
+pub struct SovereignWorkCenterRoutingEngine {
+    pub work_centers: Vec<WorkCenter>,
+    pub routing_sequences: HashMap<String, Vec<RoutingStep>>,
+    next_center_id: usize,
+}
+
+impl SovereignWorkCenterRoutingEngine {
+    pub fn new() -> Self {
+        Self {
+            work_centers: Vec::new(),
+            routing_sequences: HashMap::new(),
+            next_center_id: 1,
+        }
+    }
+
+    pub fn add_work_center(&mut self, name: &str, capacity_hours: f64, hourly_rate: f64) -> usize {
+        let id = self.next_center_id;
+        self.next_center_id += 1;
+        self.work_centers.push(WorkCenter {
+            center_id: id,
+            name: name.to_string(),
+            capacity_hours_per_day: capacity_hours,
+            hourly_rate,
+        });
+        id
+    }
+
+    pub fn add_routing_step(&mut self, product_sku: &str, step: RoutingStep) {
+        self.routing_sequences
+            .entry(product_sku.to_string())
+            .or_default()
+            .push(step);
+    }
+
+    pub fn calculate_production_time_and_cost(&self, product_sku: &str, units: f64) -> Option<(f64, f64)> {
+        let steps = self.routing_sequences.get(product_sku)?;
+        let mut total_hours = 0.0;
+        let mut total_cost = 0.0;
+
+        for step in steps {
+            let center = self.work_centers.iter().find(|wc| wc.center_id == step.work_center_id)?;
+            let step_hours = step.setup_time_hours + (step.unit_run_time_hours * units);
+            let step_cost = step_hours * center.hourly_rate;
+
+            total_hours += step_hours;
+            total_cost += step_cost;
+        }
+
+        Some((total_hours, total_cost))
+    }
+}
+
+/// Bitrix24 Bot Auto Response Rule
+#[derive(Debug, Clone)]
+pub struct BotAutoResponseRule {
+    pub keyword: String,
+    pub response_message: String,
+    pub auto_escalate_to_human: bool,
+}
+
+/// Sovereign Bitrix24 Automated CRM Bot Engine
+#[derive(Debug, Clone)]
+pub struct SovereignAutomatedCrmBotEngine {
+    pub bot_name: String,
+    pub rules: Vec<BotAutoResponseRule>,
+    pub handled_conversations_count: u32,
+}
+
+impl SovereignAutomatedCrmBotEngine {
+    pub fn new(bot_name: impl Into<String>) -> Self {
+        Self {
+            bot_name: bot_name.into(),
+            rules: Vec::new(),
+            handled_conversations_count: 0,
+        }
+    }
+
+    pub fn add_rule(&mut self, keyword: &str, response_message: &str, auto_escalate: bool) {
+        self.rules.push(BotAutoResponseRule {
+            keyword: keyword.to_lowercase(),
+            response_message: response_message.to_string(),
+            auto_escalate_to_human: auto_escalate,
+        });
+    }
+
+    pub fn process_incoming_message(&mut self, message: &str) -> (String, bool) {
+        self.handled_conversations_count += 1;
+        let msg_lower = message.to_lowercase();
+
+        for rule in &self.rules {
+            if msg_lower.contains(&rule.keyword) {
+                return (rule.response_message.clone(), rule.auto_escalate_to_human);
+            }
+        }
+
+        (
+            "I'm sorry, I didn't understand that. Transferring to a representative...".to_string(),
+            true,
+        )
+    }
+}
+
 /// SigmaOffice main application interface
 pub struct SigmaOffice {
     documents: Vec<SigmaDocument>,
@@ -4291,5 +5146,154 @@ mod tests {
         let sig_id = sig_engine.sign_document("hash-abc-123", "alice@sigmaos.org", vec![1, 2, 3, 4]);
         assert_eq!(sig_id, 1);
         assert!(sig_engine.verify_signature_hash("hash-abc-123"));
+    }
+
+    #[test]
+    fn test_google_ms_zoho_salesforce_odoo_bitrix_suite_innovations() {
+        let cap = sigma_types::CapabilityToken { id: 400 };
+
+        // 1. Conditional Formatting & Data Validation
+        let rules = vec![ConditionalFormatRuleSpec {
+            rule_type: HighlightRuleType::GreaterThan(100.0),
+            background_color_hex: "#ffcccc".to_string(),
+            text_color_hex: "#990000".to_string(),
+        }];
+        let formatted = SovereignConditionalFormattingDataValidationEngine::apply_conditional_formatting(
+            &CellValue::Number(150.0),
+            &rules,
+        );
+        assert_eq!(formatted, Some(("#ffcccc".to_string(), "#990000".to_string())));
+
+        let val_spec = DataValidationSpec {
+            rule_type: ValidationRuleType::List(vec!["Approved".to_string(), "Pending".to_string()]),
+            allow_invalid: false,
+            error_message: "Invalid status".to_string(),
+        };
+        assert!(SovereignConditionalFormattingDataValidationEngine::validate_cell_value(
+            &CellValue::Text("Approved".to_string()),
+            &val_spec
+        ).is_ok());
+
+        // 2. Smart Document Template
+        let mut tpl_engine = SovereignSmartDocumentTemplateEngine::new(
+            "Service Agreement",
+            "Agreement between {{client}} and {{vendor}} for ${{amount}}.",
+        );
+        tpl_engine.set_field("client", "Acme Corp");
+        tpl_engine.set_field("vendor", "SigmaOS Systems");
+        tpl_engine.set_field("amount", "5000");
+        let rendered_doc = tpl_engine.render_document_text();
+        assert_eq!(rendered_doc, "Agreement between Acme Corp and SigmaOS Systems for $5000.");
+        let text_proc = tpl_engine.merge_to_text_processor(cap.clone());
+        assert_eq!(text_proc.document().title(), "Service Agreement");
+
+        // 3. Landing Page CMS
+        let mut cms = SovereignLandingPageCmsEngine::new("SigmaOS Enterprise", "Next-Gen Operating System");
+        cms.add_block(CmsBlockType::Header {
+            title: "Welcome".to_string(),
+            subtitle: "Sovereign Computing".to_string(),
+        });
+        cms.add_block(CmsBlockType::CallToAction {
+            button_text: "Get Started".to_string(),
+            link_url: "https://sigmaos.org".to_string(),
+        });
+        let html = cms.generate_html_export();
+        assert!(html.contains("<h1>Welcome</h1>"));
+        assert!(html.contains("href=\"https://sigmaos.org\""));
+
+        // 4. Power BI Data Modeling
+        let mut data_model = SovereignPowerBiDataModelingEngine::new();
+        let mut sales_table = DbTable {
+            table_name: "Sales".to_string(),
+            columns: vec![
+                DbTableColumn { name: "SaleID".to_string(), col_type: DbColumnType::Number, primary_key: true },
+                DbTableColumn { name: "Amount".to_string(), col_type: DbColumnType::Number, primary_key: false },
+            ],
+            rows: Vec::new(),
+            next_row_id: 1,
+        };
+        let mut r1_fields = HashMap::new();
+        r1_fields.insert("SaleID".to_string(), "1".to_string());
+        r1_fields.insert("Amount".to_string(), "200".to_string());
+        sales_table.rows.push(DbRow { row_id: 1, fields: r1_fields });
+
+        let mut r2_fields = HashMap::new();
+        r2_fields.insert("SaleID".to_string(), "2".to_string());
+        r2_fields.insert("Amount".to_string(), "300".to_string());
+        sales_table.rows.push(DbRow { row_id: 2, fields: r2_fields });
+
+        data_model.register_table(sales_table);
+        data_model.add_measure(DaxMeasure {
+            measure_name: "Total Sales".to_string(),
+            target_table: "Sales".to_string(),
+            measure_type: DaxMeasureType::Sum("Amount".to_string()),
+        });
+        assert_eq!(data_model.evaluate_measure("Total Sales"), Some(500.0));
+
+        // 5. Viva Community Hub
+        let mut hub = SovereignVivaCommunityHubEngine::new("Engineering Community");
+        let post_id = hub.create_post("alice", "Kernel Update", "Version 2.0 release candidate is live.");
+        assert!(hub.upvote_post(post_id));
+        hub.send_praise("bob", "alice", "Innovation Champion");
+        let score = hub.calculate_community_engagement_score();
+        assert!(score > 0.0);
+
+        // 6. Subscription Billing
+        let mut billing = SovereignSubscriptionBillingEngine::new();
+        billing.create_plan("PLAN-PRO", "Pro Tier", 99.0, BillingCycle::Monthly);
+        let sub_id = billing.subscribe_customer("user@corp.com", "PLAN-PRO").unwrap();
+        assert_eq!(sub_id, 1);
+        let mrr = billing.process_recurring_billing_run();
+        assert_eq!(mrr, 99.0);
+
+        // 7. Agile Sprint Board
+        let mut sprint_board = SovereignAgileSprintBoardEngine::new();
+        let story_id = sprint_board.add_story_to_backlog("Implement eBPF verifier", 8);
+        let sprint_id = sprint_board.create_sprint("Sprint 24");
+        assert!(sprint_board.move_story_to_sprint(story_id, sprint_id));
+        assert!(sprint_board.complete_story(story_id));
+        assert_eq!(sprint_board.calculate_sprint_velocity(sprint_id), 8);
+
+        // 8. Territory Management
+        let mut territory_engine = SovereignTerritoryManagementEngine::new();
+        let t_id = territory_engine.create_territory("EMEA", None, 100000.0);
+        territory_engine.assign_rep(t_id, "Alice EMEA");
+        territory_engine.record_territory_sale(t_id, 75000.0);
+        let attainment = territory_engine.calculate_territory_quota_attainment(t_id).unwrap();
+        assert_eq!(attainment, 75.0);
+
+        // 9. Customer Journey Builder
+        let mut journey_engine = SovereignCustomerJourneyBuilderEngine::new();
+        let j_id = journey_engine.create_journey("Onboarding Flow");
+        let n1 = journey_engine.add_node(j_id, JourneyNodeType::EntryTrigger("UserSignUp".to_string()), Some(2)).unwrap();
+        let _n2 = journey_engine.add_node(j_id, JourneyNodeType::DecisionSplit {
+            condition_field: "plan".to_string(),
+            target_val: "enterprise".to_string(),
+        }, None).unwrap();
+
+        let mut cust_data = HashMap::new();
+        cust_data.insert("plan".to_string(), "enterprise".to_string());
+        let path = journey_engine.simulate_customer_path(j_id, &cust_data);
+        assert_eq!(path.len(), 2);
+        assert_eq!(path[0], n1);
+
+        // 10. Work Center Routing & CRM Bot
+        let mut routing_engine = SovereignWorkCenterRoutingEngine::new();
+        let wc_id = routing_engine.add_work_center("Assembly Station 1", 8.0, 50.0);
+        routing_engine.add_routing_step("SKU-SERVER-X", RoutingStep {
+            step_number: 1,
+            work_center_id: wc_id,
+            setup_time_hours: 1.0,
+            unit_run_time_hours: 0.5,
+        });
+        let (total_time, total_cost) = routing_engine.calculate_production_time_and_cost("SKU-SERVER-X", 10.0).unwrap();
+        assert_eq!(total_time, 6.0); // 1 + 10 * 0.5 = 6 hours
+        assert_eq!(total_cost, 300.0); // 6 * 50 = $300
+
+        let mut crm_bot = SovereignAutomatedCrmBotEngine::new("SigmaBot");
+        crm_bot.add_rule("pricing", "Our plans start at $99/mo.", false);
+        let (resp, esc) = crm_bot.process_incoming_message("What is your pricing model?");
+        assert_eq!(resp, "Our plans start at $99/mo.");
+        assert!(!esc);
     }
 }
