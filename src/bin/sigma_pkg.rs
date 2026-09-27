@@ -7,6 +7,161 @@ use std::fs;
 use std::path::Path;
 use std::process::exit;
 
+#[cfg(feature = "standalone_test")]
+#[path = "../package/universal.rs"]
+pub mod package_universal;
+
+#[cfg(feature = "standalone_test")]
+#[path = "../sigpkg/universal_adapter.rs"]
+pub mod sigpkg_universal_adapter;
+
+#[cfg(feature = "standalone_test")]
+pub mod sigmaos {
+    pub mod sigpkg {
+        pub use crate::sigpkg_universal_adapter::*;
+        pub mod repository_manager {
+            #[derive(Debug, Clone)]
+            pub struct Repository {
+                pub name: String,
+                pub url: String,
+                pub components: Vec<String>,
+            }
+            impl Repository {
+                pub fn new(name: &str, url: &str) -> Self {
+                    Self {
+                        name: name.to_string(),
+                        url: url.to_string(),
+                        components: Vec::new(),
+                    }
+                }
+            }
+            pub struct RepositoryManager {
+                pub repos: Vec<Repository>,
+            }
+            impl RepositoryManager {
+                pub fn new() -> Self {
+                    Self { repos: Vec::new() }
+                }
+                pub fn add_repository(&mut self, repo: Repository) {
+                    self.repos.push(repo);
+                }
+                pub fn list_repositories(&self) -> Vec<Repository> {
+                    self.repos.clone()
+                }
+                pub fn select_best_mirror(&self, _repo: &str) -> Result<String, String> {
+                    Ok("https://mirror.sigmaos.dev/best".to_string())
+                }
+            }
+        }
+        pub mod universal_adapter {
+            pub use crate::sigpkg_universal_adapter::*;
+        }
+        pub mod universal_engine {
+            pub use crate::sigpkg_universal_adapter::PackageFormat;
+        }
+        #[derive(Debug, Clone)]
+        pub struct ContentAddressedStore {
+            pub root: String,
+            pub pkgs: Vec<crate::sigpkg_universal_adapter::Package>,
+        }
+        impl ContentAddressedStore {
+            pub fn new(root: String) -> Self {
+                Self {
+                    root,
+                    pkgs: Vec::new(),
+                }
+            }
+            pub fn add(
+                &mut self,
+                pkg: crate::sigpkg_universal_adapter::Package,
+                _bytes: &[u8],
+            ) -> Result<String, String> {
+                let name = pkg.name.clone();
+                self.pkgs.push(pkg);
+                Ok(format!("hash-{}", name))
+            }
+            pub fn remove(&mut self, name: &str) -> Result<(), String> {
+                self.pkgs.retain(|p| p.name != name);
+                Ok(())
+            }
+            pub fn get(&self, name: &str) -> Option<&crate::sigpkg_universal_adapter::Package> {
+                self.pkgs.iter().find(|p| p.name == name)
+            }
+            pub fn list(&self) -> Vec<&crate::sigpkg_universal_adapter::Package> {
+                self.pkgs.iter().collect()
+            }
+        }
+        pub struct CryptoVerifier;
+        impl CryptoVerifier {
+            pub fn new() -> Self {
+                CryptoVerifier
+            }
+            pub fn verify(
+                &self,
+                _pkg: &crate::sigpkg_universal_adapter::Package,
+                _keys: &[u8],
+                _sig: &[u8],
+            ) -> Result<bool, String> {
+                Ok(true)
+            }
+            pub fn sign(&self, _key: &str, _payload: &[u8]) -> Vec<u8> {
+                vec![0x01]
+            }
+        }
+        #[derive(Debug)]
+        pub enum SyncStatus {
+            Synced { hash: String },
+            Failed { reason: String },
+        }
+        pub struct SigpkgDaemon {
+            pub url: String,
+        }
+        impl SigpkgDaemon {
+            pub fn new(url: &str) -> Self {
+                Self {
+                    url: url.to_string(),
+                }
+            }
+            pub fn default() -> Self {
+                Self::new("https://repo.sigmaos.dev")
+            }
+            pub fn add_trusted_key(&mut self, _key: &str) {}
+            pub fn verifier(&self) -> CryptoVerifier {
+                CryptoVerifier
+            }
+            pub fn sync_repository(&mut self, _payload: &[u8], _sig: &[u8]) -> SyncStatus {
+                SyncStatus::Synced {
+                    hash: "ok".to_string(),
+                }
+            }
+            pub fn gc_store(&mut self) -> usize {
+                0
+            }
+            pub fn status_line(&self) -> String {
+                "Daemon active".to_string()
+            }
+        }
+        pub struct SovereignPackageSnapshotRollbackEngine {
+            pub gen: u32,
+        }
+        impl SovereignPackageSnapshotRollbackEngine {
+            pub fn new() -> Self {
+                Self { gen: 1 }
+            }
+            pub fn create_snapshot(&mut self, _desc: &str) -> u32 {
+                self.gen += 1;
+                self.gen
+            }
+            pub fn rollback_to_snapshot(&mut self, _gen: u32) -> Result<(), String> {
+                Ok(())
+            }
+        }
+    }
+}
+
+#[cfg(feature = "standalone_test")]
+pub use sigmaos::sigpkg;
+
 use sigmaos::sigpkg::repository_manager::{Repository, RepositoryManager};
 use sigmaos::sigpkg::universal_adapter::{
     SigPkgUniversalBridgeEngine, UniversalPackageTriggerEngine,
@@ -466,7 +621,7 @@ fn cmd_install(args: &[String]) {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::TarXz)
             }
             "--app" | "--appbundle" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::AppBundle)
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::App)
             }
             "--puk" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Puk)
@@ -538,7 +693,7 @@ fn cmd_install(args: &[String]) {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Conan)
             }
             "--sigma" | "--sigpkg" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Sigma)
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::SigmaPkg)
             }
             "--sysupdate" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Sysupdate)

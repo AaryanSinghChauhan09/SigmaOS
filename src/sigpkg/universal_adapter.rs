@@ -7,35 +7,130 @@ use std::vec::Vec;
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
-use crate::sigpkg::{Dependency, Package, VersionConstraint};
+#[cfg(not(feature = "standalone_test"))]
+use crate::sigpkg::{Dependency, Package, VersionConstraint, Version};
+#[cfg(not(feature = "standalone_test"))]
 pub use crate::package::AptDebManifest;
+#[cfg(not(feature = "standalone_test"))]
 pub use crate::package::PackagePriority;
-pub use crate::sigpkg::Version;
+#[cfg(not(feature = "standalone_test"))]
 pub use crate::sigpkg::universal_engine::PackageFormat;
-
-
-#[cfg(feature = "standalone_test")]
-pub use crate::universal_oop_system;
-
-
-
-#[cfg(any(feature = "standalone_test", test))]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Permission {
-    NetworkTcp,
-    NetworkUdp,
-    FileRead,
-    FileWrite,
-    ProcessExec,
-    AudioPlayback,
-    DisplayAccess,
-    Ipc,
-    ProcessControl,
-    Execute,
-}
-
 #[cfg(not(feature = "standalone_test"))]
 pub use crate::security::Permission;
+
+#[cfg(feature = "standalone_test")]
+#[path = "../package/universal.rs"]
+pub mod package_universal;
+
+#[cfg(feature = "standalone_test")]
+pub mod standalone_mocks {
+    pub use super::package_universal::*;
+
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+    pub enum Permission {
+        NetworkTcp, NetworkUdp, FileRead, FileWrite, ProcessExec, AudioPlayback,
+        DisplayAccess, Ipc, ProcessControl, Execute,
+    }
+
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    pub struct Version {
+        pub major: u64, pub minor: u64, pub patch: u64,
+    }
+    impl Version {
+        pub fn new(major: u64, minor: u64, patch: u64) -> Self { Self { major, minor, patch } }
+        pub fn parse(s: &str) -> Result<Self, &'static str> {
+            let clean = s.split('-').next().unwrap_or(s);
+            let mut parts = clean.split('.');
+            let maj = parts.next().unwrap_or("0").parse().unwrap_or(0);
+            let min = parts.next().unwrap_or("0").parse().unwrap_or(0);
+            let pat = parts.next().unwrap_or("0").parse().unwrap_or(0);
+            Ok(Version::new(maj, min, pat))
+        }
+    }
+    impl core::fmt::Display for Version {
+        fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+            write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
+        }
+    }
+
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub struct Dependency {
+        pub name: String,
+        pub version_constraint: VersionConstraint,
+    }
+
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+    pub enum VersionConstraint {
+        Exact(Version), GreaterThan(Version), LessThan(Version),
+        GreaterOrEqual(Version), LessOrEqual(Version), Any,
+    }
+
+    #[derive(Debug, Clone)]
+    pub struct Package {
+        pub name: String,
+        pub version: Version,
+        pub description: String,
+        pub dependencies: Vec<Dependency>,
+        pub checksum: String,
+        pub mirrors: Vec<String>,
+    }
+    impl Package {
+        pub fn new(name: String, version: Version, description: String, dependencies: Vec<Dependency>, checksum: String) -> Self {
+            Self { name, version, description, dependencies, checksum, mirrors: Vec::new() }
+        }
+    }
+
+    pub mod sigpkg {
+        pub use crate::package_universal::*;
+        pub use super::{Package, Dependency, VersionConstraint, Version};
+        pub mod universal_engine {
+            pub use crate::package_universal::PackageFormat;
+        }
+        pub mod universal_oop_system {
+            pub use crate::package_universal::*;
+            pub use super::{Version, PackageFormat};
+            #[derive(Debug, Clone)]
+            pub struct PackageMetadata {
+                pub name: String, pub version: Version, pub description: String,
+                pub license: String, pub maintainer: String, pub homepage: String,
+                pub architecture: String, pub checksum: String, pub size: u64,
+                pub install_date: Option<u64>, pub pqc_signature: Option<String>,
+                pub gpg_key_id: Option<String>, pub supported_architectures: Vec<String>,
+            }
+            #[derive(Debug, Clone)]
+            pub struct StandardPackage {
+                pub metadata: PackageMetadata,
+                pub dependencies: Vec<String>,
+                pub format: PackageFormat,
+            }
+            pub struct UniversalPackageManager {
+                pub inner: crate::package_universal::UniversalPackageManager,
+            }
+            impl UniversalPackageManager {
+                pub fn new() -> Self {
+                    Self { inner: crate::package_universal::UniversalPackageManager::new() }
+                }
+                pub fn install_package(&mut self, pkg: Box<StandardPackage>) -> Result<(), ()> {
+                    let mut u = crate::package_universal::UnifiedPackage::new(pkg.metadata.name.clone(), pkg.metadata.version.to_string());
+                    u.checksum = pkg.metadata.checksum;
+                    self.inner.add_package(u);
+                    Ok(())
+                }
+                pub fn get_package(&self, name: &str) -> Option<&crate::package_universal::UnifiedPackage> {
+                    self.inner.get_package(name)
+                }
+            }
+        }
+    }
+    pub mod package {
+        pub use crate::package_universal::*;
+    }
+    pub mod security {
+        pub use super::Permission;
+    }
+}
+#[cfg(feature = "standalone_test")]
+pub use standalone_mocks::*;
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -1250,7 +1345,7 @@ impl UniversalPackageAdapter {
             | Some(PackageFormat::Ipa)
             | Some(PackageFormat::Aab)
             | Some(PackageFormat::Hap)
-            | Some(PackageFormat::AppBundle)
+            | Some(PackageFormat::App)
             | Some(PackageFormat::Lzm)
             | Some(PackageFormat::Pup)
             | Some(PackageFormat::Pet)
@@ -1260,7 +1355,7 @@ impl UniversalPackageAdapter {
             | Some(PackageFormat::AppImage)
             | Some(PackageFormat::Nix)
             | Some(PackageFormat::Guix)
-            | Some(PackageFormat::Sigma)
+            | Some(PackageFormat::SigmaPkg)
             | Some(PackageFormat::Moss)
             | Some(PackageFormat::Tcz)
             | Some(PackageFormat::Gobo)
@@ -1570,16 +1665,21 @@ impl Default for UniversalServerImageAdapter {
 /// Universal Package Bridge Engine for SigmaOS
 /// Seamlessly converts foreign Linux/BSD packages (.deb, PKGBUILD, .spec, .apk, .ebuild, .ports, etc.)
 /// into native Sigma-pkg models, mapping dependencies, sandboxing capabilities, and registering with Universal PM.
+#[cfg(not(feature = "standalone_test"))]
+use crate::sigpkg::universal_oop_system;
+#[cfg(feature = "standalone_test")]
+use standalone_mocks::sigpkg::universal_oop_system;
+
 pub struct SigPkgUniversalBridgeEngine {
     adapter: UniversalPackageAdapter,
-    pm: crate::sigpkg::universal_oop_system::UniversalPackageManager,
+    pm: universal_oop_system::UniversalPackageManager,
 }
 
 impl SigPkgUniversalBridgeEngine {
     pub fn new() -> Self {
         Self {
             adapter: UniversalPackageAdapter::new(),
-            pm: crate::sigpkg::universal_oop_system::UniversalPackageManager::new(),
+            pm: universal_oop_system::UniversalPackageManager::new(),
         }
     }
 
@@ -1727,8 +1827,8 @@ impl SigPkgUniversalBridgeEngine {
         raw_data: &[u8],
     ) -> Result<Package, &'static str> {
         let native_pkg = self.convert_to_sigpkg(filename, raw_data)?;
-        let standard_pkg = crate::sigpkg::universal_oop_system::StandardPackage {
-            metadata: crate::sigpkg::universal_oop_system::PackageMetadata {
+        let standard_pkg = universal_oop_system::StandardPackage {
+            metadata: universal_oop_system::PackageMetadata {
                 name: native_pkg.name.clone(),
                 version: native_pkg.version.clone(),
                 description: native_pkg.description.clone(),
@@ -1744,7 +1844,7 @@ impl SigPkgUniversalBridgeEngine {
                 supported_architectures: Vec::new(),
             },
             dependencies: Vec::new(),
-            format: crate::sigpkg::universal_oop_system::PackageFormat::Sigma,
+            format: universal_oop_system::PackageFormat::SigmaPkg,
         };
         let _ = self.pm.install_package(Box::new(standard_pkg));
         Ok(native_pkg)
