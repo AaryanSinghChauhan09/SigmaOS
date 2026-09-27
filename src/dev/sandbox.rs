@@ -33,7 +33,7 @@ pub type SandboxID = usize;
 
 /// Sandbox state
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SandboxState {
     Creating = 0,
     Running = 1,
@@ -64,7 +64,7 @@ pub trait Sandbox {
 
 /// Sandbox error types
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SandboxError {
     Success = 0,
     AlreadyRunning = 1,
@@ -100,7 +100,7 @@ impl SandboxInfo {
 
 /// Sandbox capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SandboxCapability {
     pub can_start: bool,
     pub can_stop: bool,
@@ -304,7 +304,7 @@ pub struct SimpleSandboxManager {
 
 /// Manager capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ManagerCapability {
     pub can_create: bool,
     pub can_destroy: bool,
