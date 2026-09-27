@@ -2617,6 +2617,10 @@ impl PackageParserFactory {
         factory.register_parser(Box::new(CachyOSMicroarchAdapter::new()));
         factory.register_parser(Box::new(OpkgIpkAdapter::new()));
         factory.register_parser(Box::new(BsdPkgPortsAdapter::new()));
+        factory.register_parser(Box::new(OmarchyArchPacmanCustomRepoAdapter::new()));
+        factory.register_parser(Box::new(BedrockStratumHijackAdapter::new()));
+        factory.register_parser(Box::new(SystemdSysextSysoverOverlayAdapter::new()));
+        factory.register_parser(Box::new(DistroboxPodmanContainerPackageAdapter::new()));
 
         factory
     }
@@ -5382,6 +5386,513 @@ impl Default for UniversalDistroPackageFacade {
 }
 
 // ============================================================================
+// Advanced OOP Design Patterns: Flyweight, State, Proxy, Builder
+// ============================================================================
+
+pub struct PackageMetadataFlyweightFactory {
+    shared_strings: HashMap<String, Arc<String>>,
+}
+
+impl PackageMetadataFlyweightFactory {
+    pub fn new() -> Self {
+        Self {
+            shared_strings: HashMap::new(),
+        }
+    }
+
+    pub fn get_or_intern(&mut self, text: &str) -> Arc<String> {
+        if let Some(shared) = self.shared_strings.get(text) {
+            Arc::clone(shared)
+        } else {
+            let arc = Arc::new(text.to_string());
+            self.shared_strings.insert(text.to_string(), Arc::clone(&arc));
+            arc
+        }
+    }
+
+    pub fn pool_size(&self) -> usize {
+        self.shared_strings.len()
+    }
+}
+
+impl Default for PackageMetadataFlyweightFactory {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PackageLifecycleState {
+    Uninstalled,
+    Downloading,
+    Verifying,
+    Installing,
+    Installed,
+    Failed,
+}
+
+pub trait IPackageState: Send + Sync {
+    fn state(&self) -> PackageLifecycleState;
+    fn can_transition_to(&self, target: PackageLifecycleState) -> bool;
+}
+
+pub struct UninstalledState;
+impl IPackageState for UninstalledState {
+    fn state(&self) -> PackageLifecycleState { PackageLifecycleState::Uninstalled }
+    fn can_transition_to(&self, target: PackageLifecycleState) -> bool {
+        matches!(target, PackageLifecycleState::Downloading | PackageLifecycleState::Failed)
+    }
+}
+
+pub struct DownloadingState;
+impl IPackageState for DownloadingState {
+    fn state(&self) -> PackageLifecycleState { PackageLifecycleState::Downloading }
+    fn can_transition_to(&self, target: PackageLifecycleState) -> bool {
+        matches!(target, PackageLifecycleState::Verifying | PackageLifecycleState::Failed)
+    }
+}
+
+pub struct VerifyingState;
+impl IPackageState for VerifyingState {
+    fn state(&self) -> PackageLifecycleState { PackageLifecycleState::Verifying }
+    fn can_transition_to(&self, target: PackageLifecycleState) -> bool {
+        matches!(target, PackageLifecycleState::Installing | PackageLifecycleState::Failed)
+    }
+}
+
+pub struct InstallingState;
+impl IPackageState for InstallingState {
+    fn state(&self) -> PackageLifecycleState { PackageLifecycleState::Installing }
+    fn can_transition_to(&self, target: PackageLifecycleState) -> bool {
+        matches!(target, PackageLifecycleState::Installed | PackageLifecycleState::Failed)
+    }
+}
+
+pub struct InstalledState;
+impl IPackageState for InstalledState {
+    fn state(&self) -> PackageLifecycleState { PackageLifecycleState::Installed }
+    fn can_transition_to(&self, target: PackageLifecycleState) -> bool {
+        matches!(target, PackageLifecycleState::Uninstalled | PackageLifecycleState::Failed)
+    }
+}
+
+pub struct FailedState;
+impl IPackageState for FailedState {
+    fn state(&self) -> PackageLifecycleState { PackageLifecycleState::Failed }
+    fn can_transition_to(&self, target: PackageLifecycleState) -> bool {
+        matches!(target, PackageLifecycleState::Uninstalled | PackageLifecycleState::Downloading)
+    }
+}
+
+pub struct PackageStateContext {
+    current_state: Box<dyn IPackageState>,
+}
+
+impl PackageStateContext {
+    pub fn new() -> Self {
+        Self {
+            current_state: Box::new(UninstalledState),
+        }
+    }
+
+    pub fn state(&self) -> PackageLifecycleState {
+        self.current_state.state()
+    }
+
+    pub fn transition_to(&mut self, target: PackageLifecycleState) -> Result<(), &'static str> {
+        if !self.current_state.can_transition_to(target) {
+            return Err("Invalid package state transition");
+        }
+        self.current_state = match target {
+            PackageLifecycleState::Uninstalled => Box::new(UninstalledState),
+            PackageLifecycleState::Downloading => Box::new(DownloadingState),
+            PackageLifecycleState::Verifying => Box::new(VerifyingState),
+            PackageLifecycleState::Installing => Box::new(InstallingState),
+            PackageLifecycleState::Installed => Box::new(InstalledState),
+            PackageLifecycleState::Failed => Box::new(FailedState),
+        };
+        Ok(())
+    }
+}
+
+impl Default for PackageStateContext {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct LazyPackagePayloadProxy {
+    metadata: PackageMetadata,
+    dependencies: Vec<Dependency>,
+    format: PackageFormat,
+    lazy_payload_loader: Arc<dyn Fn() -> Vec<u8> + Send + Sync>,
+    cached_payload: std::sync::Mutex<Option<Vec<u8>>>,
+}
+
+impl LazyPackagePayloadProxy {
+    pub fn new<F>(metadata: PackageMetadata, dependencies: Vec<Dependency>, format: PackageFormat, loader: F) -> Self
+    where
+        F: Fn() -> Vec<u8> + Send + Sync + 'static,
+    {
+        Self {
+            metadata,
+            dependencies,
+            format,
+            lazy_payload_loader: Arc::new(loader),
+            cached_payload: std::sync::Mutex::new(None),
+        }
+    }
+
+    pub fn get_payload(&self) -> Vec<u8> {
+        let mut guard = self.cached_payload.lock().unwrap();
+        if let Some(ref payload) = *guard {
+            payload.clone()
+        } else {
+            let loaded = (self.lazy_payload_loader)();
+            *guard = Some(loaded.clone());
+            loaded
+        }
+    }
+}
+
+impl IPackage for LazyPackagePayloadProxy {
+    fn name(&self) -> &str { &self.metadata.name }
+    fn version(&self) -> &Version { &self.metadata.version }
+    fn dependencies(&self) -> &[Dependency] { &self.dependencies }
+    fn format(&self) -> PackageFormat { self.format }
+    fn metadata(&self) -> &PackageMetadata { &self.metadata }
+    fn metadata_mut(&mut self) -> &mut PackageMetadata { &mut self.metadata }
+}
+
+pub struct UniversalPackageBuilder {
+    name: String,
+    version: Version,
+    description: String,
+    license: String,
+    maintainer: String,
+    homepage: String,
+    architecture: String,
+    checksum: String,
+    size: u64,
+    dependencies: Vec<Dependency>,
+    format: PackageFormat,
+}
+
+impl UniversalPackageBuilder {
+    pub fn new(name: &str, version: Version) -> Self {
+        Self {
+            name: name.to_string(),
+            version,
+            description: String::new(),
+            license: "GPL-3.0-or-later".to_string(),
+            maintainer: "SigmaOS Developer".to_string(),
+            homepage: String::new(),
+            architecture: "x86_64".to_string(),
+            checksum: String::new(),
+            size: 0,
+            dependencies: Vec::new(),
+            format: PackageFormat::Sigma,
+        }
+    }
+
+    pub fn description(mut self, desc: &str) -> Self {
+        self.description = desc.to_string();
+        self
+    }
+
+    pub fn license(mut self, lic: &str) -> Self {
+        self.license = lic.to_string();
+        self
+    }
+
+    pub fn format(mut self, fmt: PackageFormat) -> Self {
+        self.format = fmt;
+        self
+    }
+
+    pub fn add_dependency(mut self, name: &str) -> Self {
+        self.dependencies.push(Dependency {
+            name: name.to_string(),
+            version_constraint: VersionConstraint::Any,
+        });
+        self
+    }
+
+    pub fn build(self) -> StandardPackage {
+        StandardPackage {
+            metadata: PackageMetadata {
+                name: self.name,
+                version: self.version,
+                description: self.description,
+                license: self.license,
+                maintainer: self.maintainer,
+                homepage: self.homepage,
+                architecture: self.architecture,
+                checksum: self.checksum,
+                size: self.size,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
+            dependencies: self.dependencies,
+            format: self.format,
+        }
+    }
+}
+
+// ============================================================================
+// Advanced Linux Distro Adapters: Omarchy, Bedrock, Systemd-Sysext, Distrobox
+// ============================================================================
+
+pub struct OmarchyArchPacmanCustomRepoAdapter;
+impl OmarchyArchPacmanCustomRepoAdapter {
+    pub fn new() -> Self { Self }
+}
+impl Default for OmarchyArchPacmanCustomRepoAdapter {
+    fn default() -> Self { Self::new() }
+}
+impl IPackageParser for OmarchyArchPacmanCustomRepoAdapter {
+    fn format(&self) -> PackageFormat { PackageFormat::Pacman }
+    fn can_parse(&self, data: &[u8]) -> bool {
+        let content = String::from_utf8_lossy(data);
+        content.contains("OMARCHY_REPO") || content.contains("hyprland-omarchy")
+    }
+    fn parse(&self, data: &[u8]) -> Result<Box<dyn IPackage>, ParseError> {
+        let content = String::from_utf8_lossy(data);
+        let mut name = "omarchy-component".to_string();
+        let mut version = Version::new(1, 0, 0);
+        let desc = "Omarchy Linux Hyprland/Wayland Package".to_string();
+        for line in content.lines() {
+            let line = line.trim();
+            if let Some(val) = line.strip_prefix("pkgname = ") {
+                name = val.to_string();
+            } else if let Some(val) = line.strip_prefix("pkgver = ") {
+                if let Ok(v) = Version::parse(val) { version = v; }
+            }
+        }
+        Ok(Box::new(StandardPackage {
+            metadata: PackageMetadata {
+                name, version, description: desc, license: "GPL-3.0".to_string(),
+                maintainer: "omarchy-team".to_string(), homepage: String::new(),
+                architecture: "x86_64".to_string(), checksum: "sha256:omarchy".to_string(),
+                size: data.len() as u64, install_date: None, pqc_signature: None,
+                gpg_key_id: None, supported_architectures: vec!["x86_64".to_string()],
+            },
+            dependencies: vec![Dependency { name: "hyprland".to_string(), version_constraint: VersionConstraint::Any }],
+            format: PackageFormat::Pacman,
+        }))
+    }
+    fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
+        let meta = package.metadata();
+        Ok(format!("OMARCHY_REPO\npkgname = {}\npkgver = {}\n", meta.name, meta.version).into_bytes())
+    }
+}
+
+pub struct BedrockStratumHijackAdapter;
+impl BedrockStratumHijackAdapter {
+    pub fn new() -> Self { Self }
+}
+impl Default for BedrockStratumHijackAdapter {
+    fn default() -> Self { Self::new() }
+}
+impl IPackageParser for BedrockStratumHijackAdapter {
+    fn format(&self) -> PackageFormat { PackageFormat::Stratum }
+    fn can_parse(&self, data: &[u8]) -> bool {
+        let content = String::from_utf8_lossy(data);
+        content.contains("BEDROCK_STRATUM") || content.contains("stratum =")
+    }
+    fn parse(&self, data: &[u8]) -> Result<Box<dyn IPackage>, ParseError> {
+        let content = String::from_utf8_lossy(data);
+        let mut name = "bedrock-stratum-pkg".to_string();
+        let version = Version::new(1, 0, 0);
+        let desc = "Bedrock Linux Multi-Distro Stratum Virtualized Package".to_string();
+        for line in content.lines() {
+            let line = line.trim();
+            if let Some(val) = line.strip_prefix("stratum = ") {
+                name = format!("stratum-{}", val);
+            }
+        }
+        Ok(Box::new(StandardPackage {
+            metadata: PackageMetadata {
+                name, version, description: desc, license: "GPL-2.0".to_string(),
+                maintainer: "bedrock-team".to_string(), homepage: String::new(),
+                architecture: "x86_64".to_string(), checksum: "sha256:stratum".to_string(),
+                size: data.len() as u64, install_date: None, pqc_signature: None,
+                gpg_key_id: None, supported_architectures: vec!["x86_64".to_string()],
+            },
+            dependencies: Vec::new(),
+            format: PackageFormat::Stratum,
+        }))
+    }
+    fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
+        let meta = package.metadata();
+        Ok(format!("BEDROCK_STRATUM\nstratum = {}\n", meta.name).into_bytes())
+    }
+}
+
+pub struct SystemdSysextSysoverOverlayAdapter;
+impl SystemdSysextSysoverOverlayAdapter {
+    pub fn new() -> Self { Self }
+}
+impl Default for SystemdSysextSysoverOverlayAdapter {
+    fn default() -> Self { Self::new() }
+}
+impl IPackageParser for SystemdSysextSysoverOverlayAdapter {
+    fn format(&self) -> PackageFormat { PackageFormat::Sysupdate }
+    fn can_parse(&self, data: &[u8]) -> bool {
+        let content = String::from_utf8_lossy(data);
+        content.contains("extension-release") || content.contains("SYSEXT_NAME=")
+    }
+    fn parse(&self, data: &[u8]) -> Result<Box<dyn IPackage>, ParseError> {
+        let content = String::from_utf8_lossy(data);
+        let mut name = "systemd-sysext".to_string();
+        let version = Version::new(1, 0, 0);
+        let desc = "Systemd System Extension Overlay Image".to_string();
+        for line in content.lines() {
+            let line = line.trim();
+            if let Some(val) = line.strip_prefix("SYSEXT_NAME=") {
+                name = val.trim_matches('"').to_string();
+            }
+        }
+        Ok(Box::new(StandardPackage {
+            metadata: PackageMetadata {
+                name, version, description: desc, license: "LGPL-2.1".to_string(),
+                maintainer: "systemd-sysext".to_string(), homepage: String::new(),
+                architecture: "x86_64".to_string(), checksum: "sha256:sysext".to_string(),
+                size: data.len() as u64, install_date: None, pqc_signature: None,
+                gpg_key_id: None, supported_architectures: vec!["x86_64".to_string()],
+            },
+            dependencies: Vec::new(),
+            format: PackageFormat::Sysupdate,
+        }))
+    }
+    fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
+        let meta = package.metadata();
+        Ok(format!("extension-release\nSYSEXT_NAME=\"{}\"\n", meta.name).into_bytes())
+    }
+}
+
+pub struct DistroboxPodmanContainerPackageAdapter;
+impl DistroboxPodmanContainerPackageAdapter {
+    pub fn new() -> Self { Self }
+}
+impl Default for DistroboxPodmanContainerPackageAdapter {
+    fn default() -> Self { Self::new() }
+}
+impl IPackageParser for DistroboxPodmanContainerPackageAdapter {
+    fn format(&self) -> PackageFormat { PackageFormat::Sigma }
+    fn can_parse(&self, data: &[u8]) -> bool {
+        let content = String::from_utf8_lossy(data);
+        content.contains("distrobox_manifest") || content.contains("image=")
+    }
+    fn parse(&self, data: &[u8]) -> Result<Box<dyn IPackage>, ParseError> {
+        let content = String::from_utf8_lossy(data);
+        let mut name = "distrobox-app".to_string();
+        let version = Version::new(1, 0, 0);
+        let desc = "Containerized Distrobox GUI Package Application".to_string();
+        for line in content.lines() {
+            let line = line.trim();
+            if let Some(val) = line.strip_prefix("app_name=") {
+                name = val.to_string();
+            }
+        }
+        Ok(Box::new(StandardPackage {
+            metadata: PackageMetadata {
+                name, version, description: desc, license: "GPL-3.0".to_string(),
+                maintainer: "distrobox-packager".to_string(), homepage: String::new(),
+                architecture: "x86_64".to_string(), checksum: "sha256:distrobox".to_string(),
+                size: data.len() as u64, install_date: None, pqc_signature: None,
+                gpg_key_id: None, supported_architectures: vec!["x86_64".to_string()],
+            },
+            dependencies: vec![Dependency { name: "podman".to_string(), version_constraint: VersionConstraint::Any }],
+            format: PackageFormat::Sigma,
+        }))
+    }
+    fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
+        let meta = package.metadata();
+        Ok(format!("distrobox_manifest\napp_name={}\n", meta.name).into_bytes())
+    }
+}
+
+// ============================================================================
+// Advanced User Defined Function (UDF) Engines: Patch, Environment, Solver
+// ============================================================================
+
+pub struct UdfPackagePatchTransformerEngine {
+    pub patch_closures: Vec<Arc<dyn Fn(&str) -> String + Send + Sync>>,
+}
+
+impl UdfPackagePatchTransformerEngine {
+    pub fn new() -> Self { Self { patch_closures: Vec::new() } }
+    pub fn add_transformer<F>(&mut self, transformer: F)
+    where
+        F: Fn(&str) -> String + Send + Sync + 'static,
+    {
+        self.patch_closures.push(Arc::new(transformer));
+    }
+    pub fn apply_patch_transformations(&self, patch_diff: &str) -> String {
+        let mut current = patch_diff.to_string();
+        for closure in &self.patch_closures {
+            current = closure(&current);
+        }
+        current
+    }
+}
+
+impl Default for UdfPackagePatchTransformerEngine {
+    fn default() -> Self { Self::new() }
+}
+
+pub struct UdfEnvironmentSanitizerEngine {
+    pub environment_rules: Vec<Arc<dyn Fn(&mut HashMap<String, String>) + Send + Sync>>,
+}
+
+impl UdfEnvironmentSanitizerEngine {
+    pub fn new() -> Self { Self { environment_rules: Vec::new() } }
+    pub fn add_rule<F>(&mut self, rule: F)
+    where
+        F: Fn(&mut HashMap<String, String>) + Send + Sync + 'static,
+    {
+        self.environment_rules.push(Arc::new(rule));
+    }
+    pub fn sanitize_environment(&self, env: &mut HashMap<String, String>) {
+        for rule in &self.environment_rules {
+            rule(env);
+        }
+    }
+}
+
+impl Default for UdfEnvironmentSanitizerEngine {
+    fn default() -> Self { Self::new() }
+}
+
+pub struct UdfCustomConstraintSolverFilter {
+    pub constraint_weights: Vec<Arc<dyn Fn(&Dependency) -> i32 + Send + Sync>>,
+}
+
+impl UdfCustomConstraintSolverFilter {
+    pub fn new() -> Self { Self { constraint_weights: Vec::new() } }
+    pub fn add_scorer<F>(&mut self, weight_func: F)
+    where
+        F: Fn(&Dependency) -> i32 + Send + Sync + 'static,
+    {
+        self.constraint_weights.push(Arc::new(weight_func));
+    }
+    pub fn calculate_score(&self, dep: &Dependency) -> i32 {
+        let mut total = 0;
+        for func in &self.constraint_weights {
+            total += func(dep);
+        }
+        total
+    }
+}
+
+impl Default for UdfCustomConstraintSolverFilter {
+    fn default() -> Self { Self::new() }
+}
+
+// ============================================================================
 // Universal Distro Package Unifier Engine & User-Defined Function Manager
 // ============================================================================
 
@@ -6706,5 +7217,89 @@ Description: Hook test";
         let facade = UniversalDistroPackageFacade::new();
         let processed = facade.process_distro_payload(zstd_data).unwrap();
         assert_eq!(processed.name(), "zstd-test");
+    }
+
+    #[test]
+    fn test_flyweight_state_proxy_builder_and_new_distro_adapters() {
+        // 1. Flyweight Pattern
+        let mut flyweight = PackageMetadataFlyweightFactory::new();
+        let s1 = flyweight.get_or_intern("GPL-3.0-or-later");
+        let s2 = flyweight.get_or_intern("GPL-3.0-or-later");
+        assert!(Arc::ptr_eq(&s1, &s2));
+        assert_eq!(flyweight.pool_size(), 1);
+
+        // 2. State Pattern
+        let mut state_ctx = PackageStateContext::new();
+        assert_eq!(state_ctx.state(), PackageLifecycleState::Uninstalled);
+        assert!(state_ctx.transition_to(PackageLifecycleState::Downloading).is_ok());
+        assert_eq!(state_ctx.state(), PackageLifecycleState::Downloading);
+        assert!(state_ctx.transition_to(PackageLifecycleState::Verifying).is_ok());
+        assert!(state_ctx.transition_to(PackageLifecycleState::Installing).is_ok());
+        assert!(state_ctx.transition_to(PackageLifecycleState::Installed).is_ok());
+        assert!(state_ctx.transition_to(PackageLifecycleState::Installing).is_err()); // Invalid transition
+
+        // 3. Builder Pattern
+        let built_pkg = UniversalPackageBuilder::new("builder-pkg", Version::new(2, 0, 0))
+            .description("Built with UniversalPackageBuilder")
+            .license("MIT")
+            .format(PackageFormat::Sigma)
+            .add_dependency("sovereign-libc")
+            .build();
+        assert_eq!(built_pkg.name(), "builder-pkg");
+        assert_eq!(built_pkg.dependencies().len(), 1);
+
+        // 4. Proxy Pattern
+        let meta = built_pkg.metadata().clone();
+        let proxy = LazyPackagePayloadProxy::new(meta, built_pkg.dependencies().to_vec(), PackageFormat::Sigma, || {
+            vec![0xDE, 0xAD, 0xBE, 0xEF]
+        });
+        assert_eq!(proxy.name(), "builder-pkg");
+        assert_eq!(proxy.get_payload(), vec![0xDE, 0xAD, 0xBE, 0xEF]);
+
+        // 5. New Distro Adapters
+        let omarchy = OmarchyArchPacmanCustomRepoAdapter::new();
+        let bedrock = BedrockStratumHijackAdapter::new();
+        let sysext = SystemdSysextSysoverOverlayAdapter::new();
+        let distrobox = DistroboxPodmanContainerPackageAdapter::new();
+
+        let omarchy_data = b"OMARCHY_REPO\npkgname = omarchy-desktop\npkgver = 1.0.0\n";
+        assert!(omarchy.can_parse(omarchy_data));
+        let omarchy_pkg = omarchy.parse(omarchy_data).unwrap();
+        assert_eq!(omarchy_pkg.name(), "omarchy-desktop");
+
+        let bedrock_data = b"BEDROCK_STRATUM\nstratum = arch\n";
+        assert!(bedrock.can_parse(bedrock_data));
+        let bedrock_pkg = bedrock.parse(bedrock_data).unwrap();
+        assert_eq!(bedrock_pkg.name(), "stratum-arch");
+
+        let sysext_data = b"extension-release\nSYSEXT_NAME=\"custom-sys\"\n";
+        assert!(sysext.can_parse(sysext_data));
+        let sysext_pkg = sysext.parse(sysext_data).unwrap();
+        assert_eq!(sysext_pkg.name(), "custom-sys");
+
+        let distrobox_data = b"distrobox_manifest\napp_name=ubuntu-gui\n";
+        assert!(distrobox.can_parse(distrobox_data));
+        let distrobox_pkg = distrobox.parse(distrobox_data).unwrap();
+        assert_eq!(distrobox_pkg.name(), "ubuntu-gui");
+
+        // 6. New UDF Engines
+        let mut patch_transformer = UdfPackagePatchTransformerEngine::new();
+        patch_transformer.add_transformer(|patch| patch.replace("old_func", "new_func"));
+        assert_eq!(patch_transformer.apply_patch_transformations("void old_func();"), "void new_func();");
+
+        let mut env_sanitizer = UdfEnvironmentSanitizerEngine::new();
+        env_sanitizer.add_rule(|env| {
+            env.insert("SIGMA_BUILD".to_string(), "1".to_string());
+        });
+        let mut env = HashMap::new();
+        env_sanitizer.sanitize_environment(&mut env);
+        assert_eq!(env.get("SIGMA_BUILD"), Some(&"1".to_string()));
+
+        let mut solver_filter = UdfCustomConstraintSolverFilter::new();
+        solver_filter.add_scorer(|dep| if dep.name.contains("sovereign") { 10 } else { 0 });
+        let dep1 = Dependency { name: "sovereign-libc".to_string(), version_constraint: VersionConstraint::Any };
+        let dep2 = Dependency { name: "foreign-lib".to_string(), version_constraint: VersionConstraint::Any };
+        assert_eq!(solver_filter.calculate_score(&dep1), 10);
+        assert_eq!(solver_filter.calculate_score(&dep2), 0);
     }
 }

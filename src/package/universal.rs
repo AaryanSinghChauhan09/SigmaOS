@@ -123,7 +123,7 @@ fn debtor_to_sovereign_name(name: &str) -> &str {
     let lower = name.to_lowercase();
     if lower == "apt" || lower == "dpkg" || lower == "pacman" || lower == "dnf" || lower == "yum" || lower == "zypper" || lower == "apk" || lower == "xbps" || lower == "emerge" || lower == "pkg" || lower == "swupd" || lower == "eopkg" || lower == "nix" || lower == "guix" {
         "sovereign-package-manager"
-    } else if lower.contains("ssl") || lower.contains("crypto") || lower.contains("tls") || lower.contains("gnutls") || lower.contains("mbedtls") {
+    } else if lower.contains("ssl") || lower.contains("crypto") || lower.contains("tls") || lower.contains("gnutls") || lower.contains("mbedtls") || lower.contains("dilithium") || lower.contains("kyber") || lower.contains("oqs") {
         "sovereign-openssl"
     } else if lower.contains("libc") || lower == "musl" || lower.contains("glibc") || lower.contains("freebsd-runtime") || lower.contains("openbsd-sys") || lower.contains("haiku-libroot") || lower.contains("uclibc") {
         "sovereign-libc"
