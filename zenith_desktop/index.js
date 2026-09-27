@@ -246,9 +246,18 @@ export function renderCommandResults(query = "") {
   const cleanQuery = query.trim().toLowerCase();
   const filtered = SYSTEM_COMMANDS.filter((cmd) => cmd.name.toLowerCase().includes(cleanQuery));
 
-  resultsContainer.innerHTML = "";
+  while (resultsContainer.firstChild) {
+    resultsContainer.removeChild(resultsContainer.firstChild);
+  }
   if (filtered.length === 0) {
-    resultsContainer.innerHTML = '<div class="cmd-no-results" style="padding: 10px; color: var(--text-muted); font-size: 0.85rem;" role="status">No matching commands found</div>';
+    const noResults = document.createElement("div");
+    noResults.className = "cmd-no-results";
+    noResults.style.padding = "10px";
+    noResults.style.color = "var(--text-muted)";
+    noResults.style.fontSize = "0.85rem";
+    noResults.setAttribute("role", "status");
+    noResults.textContent = "No matching commands found";
+    resultsContainer.appendChild(noResults);
     activeCommandIndex = -1;
     return [];
   }
