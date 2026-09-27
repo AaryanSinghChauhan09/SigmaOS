@@ -36,7 +36,7 @@ pub type SensorID = usize;
 
 /// Sensor type
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum SensorType {
     CPU = 0,
     Memory = 1,
@@ -62,7 +62,7 @@ pub trait Sensor {
 
 /// Diagnostics error types
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum DiagnosticsError {
     Success = 0,
     SensorNotFound = 1,
@@ -96,7 +96,7 @@ impl SensorInfo {
 
 /// Sensor capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub struct SensorCapability {
     pub can_read: bool,
     pub can_reset: bool,
@@ -255,7 +255,7 @@ pub struct SimpleDiagnosticsManager {
 
 /// Manager capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub struct ManagerCapability {
     pub can_register: bool,
     pub can_read: bool,
