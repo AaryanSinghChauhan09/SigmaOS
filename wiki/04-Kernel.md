@@ -1,19 +1,28 @@
-# Kernel
+# Kernel & Linux/BSD Innovations
 
-SigmaOS kernel is a microkernel-inspired design with modular subsystems.
+SigmaOS kernel is a microkernel-inspired design with modular subsystems, enhanced with native OpenBSD, NetBSD, FreeBSD, and Linux innovations.
 
 ## Kernel Architecture
 
 ### Core Components
 
-- **Task Scheduler**: CPU scheduling with multiple algorithms (CFS, RT, IDLE)
-- **Memory Management**: Buddy allocator, slab allocator, transparent huge pages
-- **IPC**: Inter-process communication with shared memory and message queues
-- **VFS**: Virtual filesystem layer with pluggable filesystem drivers
-- **Security**: Capability-based security, pledge/unveil sandboxing
-- **Drivers**: Hardware abstraction layer for device drivers
+- **Task Scheduler**: CPU scheduling with multiple algorithms (CFS, RT, EEVDF, BORE, IDLE)
+- **Memory Management**: Buddy allocator, slab allocator, transparent huge pages, MGLRU page aging
+- **IPC**: Inter-process communication with zero-copy shared memory, message queues, and Android Binder IPC
+- **VFS**: Virtual filesystem layer with pluggable filesystem drivers (Btrfs, ZFS, F2FS, EROFS, OverlayFS)
+- **Security**: Capability-based security, OpenBSD pledge/unveil sandboxing, eBPF CO-RE filters
+- **Drivers**: Hardware abstraction layer for PCIe, NVMe 2.0 multi-queue, USB 3.2/USB4 xHCI, Wi-Fi 7 MLO
 
-## Kernel Modules
+## Implemented Linux & BSD Innovations Engine
+
+SigmaOS natively integrates core capabilities from top BSD and Linux kernels:
+
+- **OpenBSD Pledge & Unveil Capability Hardening (`PledgeUnveilEnforcer`)**: System call restriction and file path scoping.
+- **NetBSD Rump Kernel Subsystem Isolates (`RumpKernelIsolateLauncher`)**: Lightweight userland driver/fs process sandboxes.
+- **Linux eBPF CO-RE Bytecode Validator (`EbpfCoReValidator`)**: Portable eBPF validation with BPF Type Format (BTF) relocations.
+- **FreeBSD VNET Jail Virtual Network Stack (`FreeBsdVnetJailStack`)**: Dedicated virtual network interface stacks per jail container.
+
+## Kernel Modules & Management
 
 ### Loading Modules
 
@@ -51,100 +60,9 @@ sysctl kernel.hostname="new-hostname"
 echo "kernel.hostname=new-hostname" >> /etc/sysctl.conf
 ```
 
-## Process Management
-
-### Process Monitoring
-
-View process information:
-
-```bash
-# List all processes
-sigps aux
-
-# Show process tree
-sigps tree
-
-# Show process details
-sigps show pid
-```
-
-### Process Control
-
-```bash
-# Kill process
-sigkill pid
-
-# Set process priority
-renice priority pid
-
-# Run process with nice level
-nice -n 10 command
-```
-
-## Memory Management
-
-### Memory Information
-
-View memory usage:
-
-```bash
-# Show memory statistics
-sigmem stat
-
-# Show memory map for process
-sigmem map pid
-
-# Show swap usage
-sigmem swap
-```
-
-### Transparent Huge Pages
-
-Configure huge pages:
-
-```bash
-# Enable huge pages
-echo 1 > /proc/sys/vm/nr_hugepages
-
-# Set huge page size
-echo 2048 > /proc/sys/vm/hugepages_treat_as
-```
-
-## Filesystem Encryption
-
-### fscrypt
-
-Enable per-directory encryption:
-
-```bash
-# Create encrypted directory
-fscrypt encrypt /path/to/directory
-
-# Lock directory
-fscrypt lock /path/to/directory
-
-# Unlock directory
-fscrypt unlock /path/to/directory
-```
-
-### AutoFS
-
-Configure on-demand mounting:
-
-```bash
-# Register mount trigger
-autofs register /mnt/data /dev/sda1 ext4
-
-# Trigger mount
-autofs trigger /mnt/data
-
-# Configure idle timeout
-autofs set-timeout /mnt/data 300
-```
-
 ## Security Mitigations
 
-### Kernel Pointer Restriction
+### Kernel Pointer Restriction & Mitigation
 
 Restrict kernel pointer exposure:
 
@@ -154,79 +72,6 @@ sysctl kernel.kptr_restrict=2
 
 # Set dmesg_restrict level
 sysctl kernel.dmesg_restrict=1
-```
-
-### Module Loading Control
-
-Control kernel module loading:
-
-```bash
-# Disable module loading
-sysctl kernel.modules_disabled=1
-
-# Enable module loading
-sysctl kernel.modules_disabled=0
-```
-
-## Device Drivers
-
-### PCI/PCIe
-
-Manage PCIe devices:
-
-```bash
-# List PCIe devices
-sigpci list
-
-# Scan for new devices
-sigpci scan
-
-# Configure device
-sigpci configure bus:device:function
-```
-
-### NVMe
-
-Manage NVMe storage:
-
-```bash
-# List NVMe devices
-sgnvme list
-
-# Format NVMe device
-sgnvme format /dev/nvme0n1
-
-# Show NVMe SMART data
-sgnvme smart /dev/nvme0n1
-```
-
-## Kernel Debugging
-
-### System Logs
-
-View kernel logs:
-
-```bash
-# View kernel messages
-dmesg
-
-# View systemd journal
-journalctl -k
-
-# Follow kernel logs
-journalctl -kf
-```
-
-### Kernel Debugging
-
-Enable kernel debugging:
-
-```bash
-# Enable debug symbols
-echo 1 > /proc/sys/kernel/sysrq
-
-# Trigger sysrq
-echo t > /proc/sysrq-trigger
 ```
 
 ## Next Steps
