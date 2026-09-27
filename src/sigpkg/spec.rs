@@ -69,7 +69,7 @@ impl PackageDependency {
     }
 
     pub fn name(&self) -> &[u8] {
-        // Bolt performance optimization: use cached name_len for O(1) constant time lookup instead of O(N) zero-byte scan
+        // Bolt performance optimization: use cached name_len for O(1) constant-time lookup when populated, safely falling back to linear zero-byte scan if uninitialized.
         if self.name_len > 0 {
             &self.name[..self.name_len as usize]
         } else {
@@ -79,7 +79,7 @@ impl PackageDependency {
     }
 
     pub fn constraint(&self) -> &[u8] {
-        // Bolt performance optimization: use cached constraint_len for O(1) constant time lookup instead of O(N) zero-byte scan
+        // Bolt performance optimization: use cached constraint_len for O(1) constant-time lookup when populated, safely falling back to linear zero-byte scan if uninitialized.
         if self.constraint_len > 0 {
             &self.version_constraint[..self.constraint_len as usize]
         } else {
