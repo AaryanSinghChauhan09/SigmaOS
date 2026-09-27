@@ -366,3 +366,159 @@ impl QdiscManager {
         self.qdiscs.push(qdisc);
     }
 }
+
+/// Connection tracking entry for NAT/firewall support
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ConnTrackEntry {
+    pub protocol: u8, // IPPROTO_TCP, IPPROTO_UDP, etc.
+    pub src_addr: u32,
+    pub src_port: u16,
+    pub dst_addr: u32,
+    pub dst_port: u16,
+    pub state: ConnTrackState,
+    pub timeout: u64,
+    pub last_seen: u64,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ConnTrackState {
+    New,
+    Established,
+    Related,
+    Closing,
+    Closed,
+}
+
+impl ConnTrackEntry {
+    pub fn new(protocol: u8, src_addr: u32, src_port: u16, dst_addr: u32, dst_port: u16) -> Self {
+        Self {
+            protocol,
+            src_addr,
+            src_port,
+            dst_addr,
+            dst_port,
+            state: ConnTrackState::New,
+            timeout: 300, // 5 minutes default
+            last_seen: 0,
+        }
+    }
+
+    pub fn update_state(&mut self, new_state: ConnTrackState) {
+        self.state = new_state;
+        self.last_seen = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_secs();
+    }
+
+    pub fn is_expired(&self) -> bool {
+        let now = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_secs();
+        now - self.last_seen > self.timeout
+    }
+}
+
+/// Connection tracking table
+pub struct ConnTrackTable {
+    pub entries: Vec<ConnTrackEntry>,
+    pub max_entries: usize,
+}
+
+impl ConnTrackTable {
+    pub fn new(max_entries: usize) -> Self {
+        Self {
+            entries: Vec::new(),
+            max_entries,
+        }
+    }
+
+    pub fn lookup(&self, protocol: u8, src_addr: u32, src_port: u16, dst_addr: u32, dst_port: u16) -> Option<usize> {
+        self.entries.iter().position(|entry| {
+            entry.protocol == protocol
+                && entry.src_addr == src_addr
+                && entry.src_port == src_port
+                && entry.dst_addr == dst_addr
+                && entry.dst_port == dst_port
+        })
+    }
+
+    pub fn add(&mut self, entry: ConnTrackEntry) -> Result<(), &'static str> {
+        if self.entries.len() >= self.max_entries {
+            return Err("Connection tracking table is full");
+        }
+        self.entries.push(entry);
+        Ok(())
+    }
+
+    pub fn update(&mut self, index: usize, new_state: ConnTrackState) {
+        if index < self.entries.len() {
+            self.entries[index].update_state(new_state);
+        }
+    }
+
+    pub fn remove(&mut self, index: usize) {
+        if index < self.entries.len() {
+            self.entries.remove(index);
+        }
+    }
+
+    pub fn cleanup_expired(&mut self) -> usize {
+        let initial_len = self.entries.len();
+        self.entries.retain(|entry| !entry.is_expired());
+        initial_len - self.entries.len()
+    }
+
+    pub fn entry_count(&self) -> usize {
+        self.entries.len()
+    }
+}
+
+#[cfg(test)]
+mod conntrack_tests {
+    use super::*;
+
+    #[test]
+    fn test_conntrack_entry_creation() {
+        let entry = ConnTrackEntry::new(6, 0x0A000001, 12345, 0x0B000002, 80);
+        assert_eq!(entry.state, ConnTrackState::New);
+        assert_eq!(entry.protocol, 6);
+    }
+
+    #[test]
+    fn test_conntrack_table_lookup() {
+        let mut table = ConnTrackTable::new(100);
+        let entry = ConnTrackEntry::new(6, 0x0A000001, 12345, 0x0B000002, 80);
+        table.add(entry).unwrap();
+
+        let idx = table.lookup(6, 0x0A000001, 12345, 0x0B000002, 80);
+        assert!(idx.is_some());
+        assert_eq!(idx.unwrap(), 0);
+    }
+
+    #[test]
+    fn test_conntrack_state_update() {
+        let mut table = ConnTrackTable::new(100);
+        let entry = ConnTrackEntry::new(6, 0x0A000001, 12345, 0x0B000002, 80);
+        table.add(entry).unwrap();
+
+        table.update(0, ConnTrackState::Established);
+        assert_eq!(table.entries[0].state, ConnTrackState::Established);
+    }
+
+    #[test]
+    fn test_conntrack_cleanup() {
+        let mut table = ConnTrackTable::new(100);
+        let entry = ConnTrackEntry::new(6, 0x0A000001, 12345, 0x0B000002, 80);
+        table.add(entry).unwrap();
+
+        // Simulate expiration
+        table.entries[0].last_seen = 0;
+        table.entries[0].timeout = 1;
+
+        let cleaned = table.cleanup_expired();
+        assert_eq!(cleaned, 1);
+        assert_eq!(table.entry_count(), 0);
+    }
+}

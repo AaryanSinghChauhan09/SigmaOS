@@ -20,6 +20,7 @@ pub use torrent::{
 };
 
 pub use stack::{
+    ConnTrackEntry, ConnTrackState, ConnTrackTable,
     BbrCongestionControl, CongestionControl, NFAction, NetDevice, Netfilter, NetfilterRule,
     PfifoFast, Qdisc, QdiscManager, RenoCongestionControl, SkBuff, Socket,
 };
