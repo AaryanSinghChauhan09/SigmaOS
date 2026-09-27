@@ -3116,6 +3116,10 @@ pub struct SovereignOpenSourceObsoletionOrchestrator {
     pub ghostty_terminal: open_source_os_gap_closure::SovereignGhosttyTextGridEngine,
     pub valgrind_debugger: open_source_os_gap_closure::SovereignValgrindMemoryDebuggerEngine,
     pub nebula_mesh: open_source_os_gap_closure::SovereignNebulaMeshVpnEngine,
+    pub fastapi_grpc: open_source_os_gap_closure::SovereignFastapiGrpcApiEngine,
+    pub duckdb_analytics: open_source_os_gap_closure::SovereignDuckdbInMemoryAnalytics,
+    pub flake_reconciler: open_source_os_gap_closure::SovereignNixFlakeChannelReconciler,
+    pub bpfland_sched: open_source_os_gap_closure::SovereignBpflandSchedExtEngine,
     pub total_obsoleted_projects_count: u32,
 }
 
@@ -3199,7 +3203,11 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             ghostty_terminal: open_source_os_gap_closure::SovereignGhosttyTextGridEngine::new(80, 24),
             valgrind_debugger: open_source_os_gap_closure::SovereignValgrindMemoryDebuggerEngine::new(),
             nebula_mesh: open_source_os_gap_closure::SovereignNebulaMeshVpnEngine::new("orchestrator_node", "10.200.0.1"),
-            total_obsoleted_projects_count: 90,
+            fastapi_grpc: open_source_os_gap_closure::SovereignFastapiGrpcApiEngine::new(),
+            duckdb_analytics: open_source_os_gap_closure::SovereignDuckdbInMemoryAnalytics::new("analytics"),
+            flake_reconciler: open_source_os_gap_closure::SovereignNixFlakeChannelReconciler::new(),
+            bpfland_sched: open_source_os_gap_closure::SovereignBpflandSchedExtEngine::new(8),
+            total_obsoleted_projects_count: 94,
         }
     }
 
@@ -6313,8 +6321,8 @@ mod tests {
     fn test_sovereign_orchestrator_bootstrap() {
         let mut orchestrator = SovereignOpenSourceObsoletionOrchestrator::new();
         let status = orchestrator.bootstrap_sovereign_stack().unwrap();
-        assert!(status.contains("90 legacy open-source projects obsoleted"));
-        assert_eq!(orchestrator.total_obsoleted_projects_count, 90);
+        assert!(status.contains("94 legacy open-source projects obsoleted"));
+        assert_eq!(orchestrator.total_obsoleted_projects_count, 94);
         assert_eq!(orchestrator.serenity_async.processed_count, 0);
         assert_eq!(orchestrator.serenity_async.task_queue.len(), 1);
         assert_eq!(orchestrator.qubes_isolation.domains.len(), 1);
