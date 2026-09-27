@@ -125,11 +125,18 @@ impl SovereignDeadlockLockdepVerifier {
 
     fn detect_circular_wait(&self, start_pid: u32, current_holding_pid: u32) -> bool {
         let mut curr = current_holding_pid;
+        let mut visited = Vec::new();
+        visited.push(curr);
+
         while let Some(&req_res) = self.waiting_locks.get(&curr) {
             if let Some(&next_holding_pid) = self.held_locks.get(&req_res) {
                 if next_holding_pid == start_pid {
                     return true; // Circular dependency graph detected
                 }
+                if visited.contains(&next_holding_pid) {
+                    break; // Non-start cycle detected, prevent infinite loop
+                }
+                visited.push(next_holding_pid);
                 curr = next_holding_pid;
             } else {
                 break;
