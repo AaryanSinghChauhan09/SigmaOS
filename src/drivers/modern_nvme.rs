@@ -533,23 +533,6 @@ mod tests {
     }
 
     #[test]
-    fn test_ahci_sata_driver() {
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_nvme_lifecycle() {
-        let mut driver = ModernNvmeDriver::new(2048);
-        assert!(driver.read(&mut [0; 10]).is_err());
-        driver.initialize().unwrap();
-        assert_eq!(driver.name(), "PCIe NVMe Solid-State Block Driver");
-        assert_eq!(driver.generation(), DeviceGeneration::Modern);
-        assert_eq!(driver.write(&[1, 2, 3]).unwrap(), 3);
-        driver.shutdown().unwrap();
-    }
-
-    #[test]
     fn test_nvme_multi_queue() {
         let mut driver = ModernNvmeDriver::new(2048);
         driver.initialize().unwrap();

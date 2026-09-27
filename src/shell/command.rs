@@ -648,9 +648,9 @@ impl SimpleCommandRegistry {
         self.commands.push(Some(Box::new(type_cmd)));
 
         // Register pushd, popd, dirs commands using thread-safe global stack
-        self.commands.push(Some(Box::new(PushdCommand)));
-        self.commands.push(Some(Box::new(PopdCommand)));
-        self.commands.push(Some(Box::new(DirsCommand)));
+        self.commands.push(Some(Box::new(PushdCommand {})));
+        self.commands.push(Some(Box::new(PopdCommand {})));
+        self.commands.push(Some(Box::new(DirsCommand {})));
     }
 
     pub fn get_mut<'a>(&'a mut self, name: &[u8]) -> Option<&'a mut (dyn ShellCommand + 'a)> {

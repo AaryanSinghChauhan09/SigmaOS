@@ -64,6 +64,72 @@ pub enum UsbEndpointSpeed {
     SuperSpeedPlus20Gbps = 6,
 }
 
+/// Transfer Ring for endpoint I/O
+#[derive(Debug, Clone)]
+pub struct XhciTransferRing {
+    pub trbs: Vec<SovereignXhciTrb>,
+    pub enqueue_idx: usize,
+    pub dequeue_idx: usize,
+    pub cycle_bit: bool,
+}
+
+impl XhciTransferRing {
+    pub fn new(size: usize) -> Self {
+        Self {
+            trbs: vec![SovereignXhciTrb::new(0, 0, SovereignXhciTrbType::Normal, false); size],
+            enqueue_idx: 0,
+            dequeue_idx: 0,
+            cycle_bit: true,
+        }
+    }
+
+    pub fn enqueue(&mut self, trb: SovereignXhciTrb) -> Result<usize, &'static str> {
+        let next_idx = (self.enqueue_idx + 1) % self.trbs.len();
+        if next_idx == self.dequeue_idx {
+            return Err("Transfer ring is full");
+        }
+        self.trbs[self.enqueue_idx] = trb;
+        let idx = self.enqueue_idx;
+        self.enqueue_idx = next_idx;
+        Ok(idx)
+    }
+
+    pub fn dequeue(&mut self) -> Option<SovereignXhciTrb> {
+        if self.dequeue_idx == self.enqueue_idx {
+            return None;
+        }
+        let trb = self.trbs[self.dequeue_idx];
+        self.dequeue_idx = (self.dequeue_idx + 1) % self.trbs.len();
+        Some(trb)
+    }
+}
+
+/// Event Ring for completion handling
+#[derive(Debug, Clone)]
+pub struct XhciEventRing {
+    pub events: Vec<SovereignXhciTrb>,
+    pub dequeue_idx: usize,
+    pub cycle_bit: bool,
+}
+
+impl XhciEventRing {
+    pub fn new(size: usize) -> Self {
+        Self {
+            events: vec![SovereignXhciTrb::new(0, 0, SovereignXhciTrbType::TransferEvent, false); size],
+            dequeue_idx: 0,
+            cycle_bit: true,
+        }
+    }
+
+    pub fn dequeue(&mut self) -> Option<SovereignXhciTrb> {
+        if self.dequeue_idx >= self.events.len() {
+            return None;
+        }
+        let event = self.events[self.dequeue_idx];
+        self.dequeue_idx += 1;
+        Some(event)
+    }
+}
 /// USB Device Slot & Endpoint Context
 #[derive(Debug, Clone)]
 pub struct UsbDeviceSlotContext {
@@ -190,6 +256,7 @@ impl Default for SovereignXhciUsb3Driver {
 // UNIT TESTS
 // =========================================================================
 
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -199,28 +266,7 @@ mod tests {
         let mut xhci = SovereignXhciUsb3Driver::new(0xFEE00000);
         assert!(xhci.initialize().is_ok());
 
-        let slot_id = xhci.enable_slot(UsbEndpointSpeed::SuperSpeedPlus10Gbps, 0x08).unwrap(); // Mass Storage
-        assert_eq!(slot_id, 1);
-        assert_eq!(xhci.active_slots.len(), 1);
-        assert_eq!(xhci.doorbells[1], 1);
-    }
-
-    #[test]
-    fn test_trb_command_ring_enqueue() {
-        let mut xhci = SovereignXhciUsb3Driver::new(0xFEE00000);
-        let idx = xhci.enqueue_command_trb(0x1000_0000, 512, SovereignXhciTrbType::SetupStage);
-
-        assert_eq!(idx, 0);
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_xhci_initialization_and_slot_enable() {
-        let mut xhci = SovereignXhciUsb3Driver::new(0xFEE00000);
-        assert!(xhci.initialize().is_ok());
-
-        let slot_id = xhci.enable_slot(UsbEndpointSpeed::SuperSpeedPlus10Gbps, 0x08).unwrap(); // Mass Storage
+        let slot_id = xhci.enable_slot(UsbEndpointSpeed::SuperSpeedPlus10Gbps, 0x08).unwrap();
         assert_eq!(slot_id, 1);
         assert_eq!(xhci.active_slots.len(), 1);
         assert_eq!(xhci.doorbells[1], 1);
@@ -240,7 +286,7 @@ mod tests {
     fn test_ring_doorbell() {
         let mut xhci = SovereignXhciUsb3Driver::new(0xFEE00000);
         xhci.initialize().unwrap();
-        let slot = xhci.enable_slot(UsbEndpointSpeed::SuperSpeed5Gbps, 0x03).unwrap(); // HID
+        let slot = xhci.enable_slot(UsbEndpointSpeed::SuperSpeed5Gbps, 0x03).unwrap();
 
         assert!(xhci.ring_doorbell(slot, 2).is_ok());
         assert_eq!(xhci.doorbells[slot as usize], 2);
