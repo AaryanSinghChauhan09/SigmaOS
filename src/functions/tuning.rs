@@ -148,17 +148,17 @@ impl IOTuner {
         self.io_classes.push(io_class);
     }
 
-    pub fn set_io_scheduler(&mut self, device: &str, scheduler: IOScheduler) -> Result<(), TuningError> {
+    pub fn set_io_scheduler(&mut self, _device: &str, _scheduler: IOScheduler) -> Result<(), TuningError> {
         // Set I/O scheduler for device
         Ok(())
     }
 
-    pub fn set_io_priority(&mut self, pid: u32, priority: u32) -> Result<(), TuningError> {
+    pub fn set_io_priority(&mut self, _pid: u32, _priority: u32) -> Result<(), TuningError> {
         // Set I/O priority for process
         Ok(())
     }
 
-    pub fn limit_io_bandwidth(&mut self, device: &str, rate: u64) -> Result<(), TuningError> {
+    pub fn limit_io_bandwidth(&mut self, _device: &str, _rate: u64) -> Result<(), TuningError> {
         // Limit I/O bandwidth
         Ok(())
     }
@@ -257,17 +257,17 @@ impl NetworkTuner {
         self.filters.push(filter);
     }
 
-    pub fn configure_qos(&mut self, interface: &str) -> Result<(), TuningError> {
+    pub fn configure_qos(&mut self, _interface: &str) -> Result<(), TuningError> {
         // Configure QoS for interface
         Ok(())
     }
 
-    pub fn limit_bandwidth(&mut self, interface: &str, rate: u64) -> Result<(), TuningError> {
+    pub fn limit_bandwidth(&mut self, _interface: &str, _rate: u64) -> Result<(), TuningError> {
         // Limit bandwidth for interface
         Ok(())
     }
 
-    pub fn enable_priority_queuing(&mut self, interface: &str) -> Result<(), TuningError> {
+    pub fn enable_priority_queuing(&mut self, _interface: &str) -> Result<(), TuningError> {
         // Enable priority queuing
         Ok(())
     }

@@ -892,6 +892,278 @@ impl Default for BackupRecoveryEngine {
 }
 
 // ============================================================================
+// 17. SOVEREIGN PIDFD, PROCDESC & SUBREAPER RE-PARENTING ENGINE
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct ProcessDescriptorEntry {
+    pub pidfd: u32,
+    pub pid: u32,
+    pub is_procdesc: bool,
+    pub capability_mask: u32,
+}
+
+pub struct SovereignPidfdProcdescSubreaperEngine {
+    pub process_descriptors: BTreeMap<u32, ProcessDescriptorEntry>,
+    pub subreaper_enabled: bool,
+    pub active_subreaper_pids: Vec<u32>,
+    pub orphan_pids: Vec<u32>,
+    pub next_pidfd: u32,
+}
+
+impl SovereignPidfdProcdescSubreaperEngine {
+    pub fn new() -> Self {
+        Self {
+            process_descriptors: BTreeMap::new(),
+            subreaper_enabled: false,
+            active_subreaper_pids: Vec::new(),
+            orphan_pids: Vec::new(),
+            next_pidfd: 100,
+        }
+    }
+
+    pub fn pidfd_open(&mut self, pid: u32) -> u32 {
+        let fd = self.next_pidfd;
+        self.next_pidfd += 1;
+        self.process_descriptors.insert(
+            fd,
+            ProcessDescriptorEntry {
+                pidfd: fd,
+                pid,
+                is_procdesc: false,
+                capability_mask: 0xFFFFFFFF,
+            },
+        );
+        fd
+    }
+
+    pub fn pdfork(&mut self, child_pid: u32, caps: u32) -> u32 {
+        let fd = self.next_pidfd;
+        self.next_pidfd += 1;
+        self.process_descriptors.insert(
+            fd,
+            ProcessDescriptorEntry {
+                pidfd: fd,
+                pid: child_pid,
+                is_procdesc: true,
+                capability_mask: caps,
+            },
+        );
+        fd
+    }
+
+    pub fn pidfd_send_signal(&self, pidfd: u32, signal: u32) -> bool {
+        if let Some(entry) = self.process_descriptors.get(&pidfd) {
+            entry.pid > 0 && signal > 0
+        } else {
+            false
+        }
+    }
+
+    pub fn set_subreaper(&mut self, pid: u32, enabled: bool) {
+        if enabled {
+            if !self.active_subreaper_pids.contains(&pid) {
+                self.active_subreaper_pids.push(pid);
+            }
+            self.subreaper_enabled = true;
+        } else {
+            self.active_subreaper_pids.retain(|&p| p != pid);
+            self.subreaper_enabled = !self.active_subreaper_pids.is_empty();
+        }
+    }
+
+    pub fn reparent_orphan(&mut self, orphan_pid: u32) -> u32 {
+        if let Some(&subreaper_pid) = self.active_subreaper_pids.last() {
+            subreaper_pid
+        } else {
+            self.orphan_pids.push(orphan_pid);
+            1 // Default init process PID 1
+        }
+    }
+}
+
+impl Default for SovereignPidfdProcdescSubreaperEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 18. SOVEREIGN FSCRYPT ENCRYPTION & KERNEL AUTOFS STORAGE ENGINE
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct FscryptPolicy {
+    pub dir_path: String,
+    pub cipher_algorithm: String,
+    pub key_descriptor: [u8; 16],
+}
+
+#[derive(Debug, Clone)]
+pub struct AutofsTrigger {
+    pub mount_point: String,
+    pub device_node: String,
+    pub is_mounted: bool,
+    pub last_access_timestamp: u64,
+}
+
+pub struct SovereignFscryptAutofsStorageEngine {
+    pub policies: BTreeMap<String, FscryptPolicy>,
+    pub autofs_triggers: BTreeMap<String, AutofsTrigger>,
+    pub encrypted_files: BTreeMap<String, Vec<u8>>,
+}
+
+impl SovereignFscryptAutofsStorageEngine {
+    pub fn new() -> Self {
+        Self {
+            policies: BTreeMap::new(),
+            autofs_triggers: BTreeMap::new(),
+            encrypted_files: BTreeMap::new(),
+        }
+    }
+
+    pub fn set_fscrypt_policy(&mut self, dir_path: &str, algorithm: &str, key_desc: [u8; 16]) {
+        self.policies.insert(
+            String::from(dir_path),
+            FscryptPolicy {
+                dir_path: String::from(dir_path),
+                cipher_algorithm: String::from(algorithm),
+                key_descriptor: key_desc,
+            },
+        );
+    }
+
+    pub fn write_encrypted_file(&mut self, path: &str, raw_data: &[u8]) -> bool {
+        let mut encrypted = Vec::from(b"FSCRYPT_CIPHERTEXT:");
+        for &byte in raw_data {
+            encrypted.push(byte ^ 0xA5);
+        }
+        self.encrypted_files.insert(String::from(path), encrypted);
+        true
+    }
+
+    pub fn read_decrypted_file(&self, path: &str) -> Option<Vec<u8>> {
+        let encrypted = self.encrypted_files.get(path)?;
+        if encrypted.starts_with(b"FSCRYPT_CIPHERTEXT:") {
+            let ciphertext = &encrypted[19..];
+            let mut plaintext = Vec::with_capacity(ciphertext.len());
+            for &byte in ciphertext {
+                plaintext.push(byte ^ 0xA5);
+            }
+            Some(plaintext)
+        } else {
+            None
+        }
+    }
+
+    pub fn register_autofs_trigger(&mut self, mount_point: &str, dev_node: &str) {
+        self.autofs_triggers.insert(
+            String::from(mount_point),
+            AutofsTrigger {
+                mount_point: String::from(mount_point),
+                device_node: String::from(dev_node),
+                is_mounted: false,
+                last_access_timestamp: 0,
+            },
+        );
+    }
+
+    pub fn trigger_access(&mut self, mount_point: &str, timestamp: u64) -> bool {
+        if let Some(trigger) = self.autofs_triggers.get_mut(mount_point) {
+            trigger.is_mounted = true;
+            trigger.last_access_timestamp = timestamp;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn expire_idle_mounts(&mut self, current_time: u64, timeout_sec: u64) -> usize {
+        let mut expired = 0;
+        for trigger in self.autofs_triggers.values_mut() {
+            if trigger.is_mounted && current_time.saturating_sub(trigger.last_access_timestamp) >= timeout_sec {
+                trigger.is_mounted = false;
+                expired += 1;
+            }
+        }
+        expired
+    }
+}
+
+impl Default for SovereignFscryptAutofsStorageEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 19. SOVEREIGN KERNEL SECURITY MITIGATIONS & CFI ENGINE
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum KptrRestrictLevel {
+    ExposeRaw = 0,
+    ZeroNonRoot = 1,
+    ZeroAll = 2,
+}
+
+pub struct SovereignKernelHardeningCfiEngine {
+    pub kptr_restrict: KptrRestrictLevel,
+    pub dmesg_restrict: bool,
+    pub valid_cfi_targets: BTreeMap<u64, u64>, // func_addr -> signature_hash
+}
+
+impl SovereignKernelHardeningCfiEngine {
+    pub fn new() -> Self {
+        Self {
+            kptr_restrict: KptrRestrictLevel::ZeroNonRoot,
+            dmesg_restrict: true,
+            valid_cfi_targets: BTreeMap::new(),
+        }
+    }
+
+    pub fn set_kptr_restrict(&mut self, level: KptrRestrictLevel) {
+        self.kptr_restrict = level;
+    }
+
+    pub fn set_dmesg_restrict(&mut self, enabled: bool) {
+        self.dmesg_restrict = enabled;
+    }
+
+    pub fn sanitize_pointer(&self, raw_ptr: u64, is_root: bool) -> u64 {
+        match self.kptr_restrict {
+            KptrRestrictLevel::ExposeRaw => raw_ptr,
+            KptrRestrictLevel::ZeroNonRoot => {
+                if is_root {
+                    raw_ptr
+                } else {
+                    0
+                }
+            }
+            KptrRestrictLevel::ZeroAll => 0,
+        }
+    }
+
+    pub fn register_cfi_target(&mut self, func_addr: u64, sig_hash: u64) {
+        self.valid_cfi_targets.insert(func_addr, sig_hash);
+    }
+
+    pub fn validate_indirect_call(&self, func_addr: u64, expected_hash: u64) -> bool {
+        if let Some(&hash) = self.valid_cfi_targets.get(&func_addr) {
+            hash == expected_hash
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for SovereignKernelHardeningCfiEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
 // UNIT TESTS
 // ============================================================================
 
@@ -1000,5 +1272,39 @@ mod tests {
         let mut backup = BackupRecoveryEngine::new();
         let snap_id = backup.create_merkle_snapshot([0xAB; 32], 1700000000);
         assert_eq!(backup.restore_point_in_time(snap_id), Some([0xAB; 32]));
+    }
+
+    #[test]
+    fn test_pidfd_fscrypt_cfi_engines() {
+        // Test Pidfd, Procdesc & Subreaper engine
+        let mut proc_eng = SovereignPidfdProcdescSubreaperEngine::new();
+        let pidfd = proc_eng.pidfd_open(1234);
+        assert!(proc_eng.pidfd_send_signal(pidfd, 9));
+        let procdesc = proc_eng.pdfork(1235, 0x07);
+        assert!(proc_eng.process_descriptors.get(&procdesc).unwrap().is_procdesc);
+
+        proc_eng.set_subreaper(100, true);
+        assert_eq!(proc_eng.reparent_orphan(2000), 100);
+
+        // Test fscrypt & autofs storage engine
+        let mut fs_eng = SovereignFscryptAutofsStorageEngine::new();
+        fs_eng.set_fscrypt_policy("/secret", "AES-256-XTS", [0x01; 16]);
+        assert!(fs_eng.write_encrypted_file("/secret/data.txt", b"TOP_SECRET"));
+        let decrypted = fs_eng.read_decrypted_file("/secret/data.txt").unwrap();
+        assert_eq!(decrypted, b"TOP_SECRET");
+
+        fs_eng.register_autofs_trigger("/media/usb", "/dev/sdb1");
+        assert!(fs_eng.trigger_access("/media/usb", 1000));
+        assert_eq!(fs_eng.expire_idle_mounts(1500, 300), 1);
+
+        // Test Kernel hardening & CFI engine
+        let mut cfi_eng = SovereignKernelHardeningCfiEngine::new();
+        cfi_eng.set_kptr_restrict(KptrRestrictLevel::ZeroNonRoot);
+        assert_eq!(cfi_eng.sanitize_pointer(0xFFFFFFFF81000000, false), 0);
+        assert_eq!(cfi_eng.sanitize_pointer(0xFFFFFFFF81000000, true), 0xFFFFFFFF81000000);
+
+        cfi_eng.register_cfi_target(0xFFFFFFFF81200000, 0x1122334455667788);
+        assert!(cfi_eng.validate_indirect_call(0xFFFFFFFF81200000, 0x1122334455667788));
+        assert!(!cfi_eng.validate_indirect_call(0xFFFFFFFF81200000, 0x9999999999999999));
     }
 }

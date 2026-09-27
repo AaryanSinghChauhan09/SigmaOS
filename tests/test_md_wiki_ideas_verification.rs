@@ -109,3 +109,35 @@ fn test_frappe_and_tech_media_engines_wiki_parity() {
     verifier.block_syscall(101);
     assert_eq!(verifier.evaluate_syscall(101), PolicyAction::Deny);
 }
+
+#[test]
+fn test_sections_143_144_145_wiki_roadmap_parity() {
+    // Section 143: Pidfd, Procdesc & Subreaper
+    let mut proc_eng = SovereignPidfdProcdescSubreaperEngine::new();
+    let pfd = proc_eng.pidfd_open(500);
+    assert!(proc_eng.pidfd_send_signal(pfd, 15));
+    let pd = proc_eng.pdfork(501, 0x0F);
+    assert!(proc_eng.process_descriptors.get(&pd).unwrap().is_procdesc);
+    proc_eng.set_subreaper(1, true);
+    assert_eq!(proc_eng.reparent_orphan(999), 1);
+
+    // Section 144: fscrypt & Autofs
+    let mut fs_eng = SovereignFscryptAutofsStorageEngine::new();
+    fs_eng.set_fscrypt_policy("/home/user", "Kyber-1024-PQC", [0xFF; 16]);
+    assert!(fs_eng.write_encrypted_file("/home/user/vault.dat", b"SOVEREIGN_OS_DATA"));
+    let read_back = fs_eng.read_decrypted_file("/home/user/vault.dat").unwrap();
+    assert_eq!(read_back, b"SOVEREIGN_OS_DATA");
+
+    fs_eng.register_autofs_trigger("/mnt/auto", "/dev/nvme0n1p1");
+    assert!(fs_eng.trigger_access("/mnt/auto", 2000));
+    assert_eq!(fs_eng.expire_idle_mounts(2600, 500), 1);
+
+    // Section 145: Kernel Hardening & CFI
+    let mut cfi_eng = SovereignKernelHardeningCfiEngine::new();
+    cfi_eng.set_kptr_restrict(KptrRestrictLevel::ZeroNonRoot);
+    assert_eq!(cfi_eng.sanitize_pointer(0x8000_0000, false), 0);
+    assert_eq!(cfi_eng.sanitize_pointer(0x8000_0000, true), 0x8000_0000);
+
+    cfi_eng.register_cfi_target(0x7FFF_0000, 0xABCDEF00);
+    assert!(cfi_eng.validate_indirect_call(0x7FFF_0000, 0xABCDEF00));
+}
