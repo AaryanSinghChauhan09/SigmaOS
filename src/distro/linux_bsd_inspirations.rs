@@ -2832,7 +2832,6 @@ mod cross_subsystem_tests {
         let sync_count = orchestrator.synchronize_subsystem_pipeline();
         assert!(sync_count.is_ok());
         assert_eq!(sync_count.unwrap(), 174);
-        assert_eq!(sync_count.unwrap(), 158);
 
         let (supervisor, pkg_spec, vfs_etc, compatible) = orchestrator.query_subsystem_capabilities();
         assert_eq!(supervisor, ServiceSupervisorType::Smf);
@@ -2880,8 +2879,6 @@ mod cross_subsystem_tests {
         let count = gateway.synchronize_and_audit_all_subsystems().unwrap();
         assert_eq!(count, 174);
         assert_eq!(gateway.audited_subsystems_count, 174);
-        assert_eq!(count, 158);
-        assert_eq!(gateway.audited_subsystems_count, 158);
 
         let res = gateway.orchestrate_subsystem("kernel", "sched_task");
         assert!(res.is_ok());
@@ -2890,7 +2887,7 @@ mod cross_subsystem_tests {
         gateway.set_distro_mode(DistroSubsystemMode::FreeBsd);
         let count_bsd = gateway.synchronize_and_audit_all_subsystems().unwrap();
         assert_eq!(count_bsd, 174);
-        assert_eq!(count_bsd, 158);
+        assert_eq!(gateway.audited_subsystems_count, 174);
 
         let (supervisor, pkg_spec, vfs_etc, compatible) = gateway.query_gateway_capability_matrix();
         assert_eq!(supervisor, ServiceSupervisorType::OpenRC);
