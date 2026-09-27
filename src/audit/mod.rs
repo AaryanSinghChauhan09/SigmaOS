@@ -113,7 +113,7 @@ impl MemoryAuditShard {
     }
 
     pub fn get_violation_stats(&self) -> (u32, u32) {
-        (self.violations_detected.load(Ordering::SeqCst)), self.wwx_violations.load(Ordering::SeqCst)))
+        (self.violations_detected.load(Ordering::SeqCst), self.wwx_violations.load(Ordering::SeqCst))
     }
 }
 
