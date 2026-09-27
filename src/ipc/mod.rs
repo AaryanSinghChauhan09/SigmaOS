@@ -22,6 +22,7 @@ pub mod async_io;
 pub mod std_streams;
 pub mod ipc_namespace;
 pub mod sovereign_async_procedure_call;
+pub mod helenos_async;
 
 pub use ipc::{
     IPCEndpoint, IPCError, IPCType, IPCInfo, IPCCapability,
@@ -56,8 +57,10 @@ pub use ipc_namespace::{
 };
 
 pub use sovereign_async_procedure_call::{
-    ApcDeliveryMode, AsyncProcedureCallDescriptor, SovereignAsyncProcedureCallEngine,
+    SovereignAsyncProcedureCallEngine,
 };
+
+pub use helenos_async::{HelenAsyncSystem, HelenMessage, HelenIpcError};
 
 pub mod dbus_sovereign;
 pub use dbus_sovereign::{SovereignDbusBus, DbusMessage, DbusMessageType, DbusValue, DbusMatchRule, DbusService, DbusName};

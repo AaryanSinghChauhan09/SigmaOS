@@ -136,7 +136,7 @@ impl SandboxAuditShard {
         }
     }
 
-    pub fn log_blocked_syscall(&self, syscall_number: usize, process_id: usize) {
+    pub fn log_blocked_syscall(&self, _syscall_number: usize, process_id: usize) {
         self.blocked_syscalls.set(self.blocked_syscalls.get() + 1);
         
         let entry = AuditEntry {
@@ -175,7 +175,7 @@ impl SandboxAuditShard {
         true
     }
 
-    pub fn set_process_pledges(&self, process_id: usize, permissions: u64) {
+    pub fn set_process_pledges(&self, process_id: usize, _permissions: u64) {
         let bit = 1u64 << (process_id % 64);
         let current = self.process_pledge_table.get();
         self.process_pledge_table.set(current | bit);

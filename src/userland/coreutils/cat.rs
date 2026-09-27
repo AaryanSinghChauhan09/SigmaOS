@@ -2,7 +2,7 @@
 //! POSIX-compatible cat implementation
 
 use std::fs::File;
-use std::io::{self, Read, Write};
+use std::io::{self, Read};
 use std::path::Path;
 
 /// Concatenate and print files
@@ -13,7 +13,7 @@ pub fn run(paths: &[String], show_number: bool, show_ends: bool) -> Result<(), S
         if path == "-" {
             // Read from stdin
             let stdin = io::stdin();
-            let mut stdout = io::stdout();
+            let stdout = io::stdout();
             copy_with_options(&mut stdin.lock(), &mut stdout.lock(), show_number, show_ends)?;
         } else {
             let mut file = File::open(path_obj).map_err(|e| format!("cat: {}: {}", path, e))?;

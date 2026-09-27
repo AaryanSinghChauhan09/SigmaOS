@@ -9,16 +9,9 @@ use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
-#[cfg(not(feature = "standalone_test"))]
-use crate::kernel::universal_kernel_format::{
-    KernelFormat, ParsedKernelImage, UniversalKernelFormatEngine,
-};
-
-#[cfg(feature = "standalone_test")]
 #[path = "universal_kernel_format.rs"]
 pub mod universal_kernel_format;
 
-#[cfg(feature = "standalone_test")]
 pub use universal_kernel_format::{
     KernelFormat, ParsedKernelImage, UniversalKernelFormatEngine,
 };

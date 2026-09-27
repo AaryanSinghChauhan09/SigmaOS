@@ -57,7 +57,7 @@ impl HardwarePic8259 {
         }
     }
 
-    pub fn remap(&mut self, offset1: u8, offset2: u8) {
+    pub fn remap(&mut self, offset1: u8, _offset2: u8) {
         self.remapped_offset = offset1;
         // In real hardware: ICW1, ICW2, ICW3, ICW4 sequence to ports 0x20, 0x21, 0xA0, 0xA1
     }
@@ -199,7 +199,7 @@ impl LinuxSyscallDispatcher {
         }
     }
 
-    pub fn dispatch(&mut self, nr: u64, arg1: u64, arg2: u64, arg3: u64) -> i64 {
+    pub fn dispatch(&mut self, nr: u64, _arg1: u64, _arg2: u64, arg3: u64) -> i64 {
         self.calls_processed += 1;
         match nr {
             0 => arg3 as i64,      // read: returns bytes read

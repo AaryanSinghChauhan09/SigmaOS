@@ -1,5 +1,5 @@
 use crate::klib::hash::SimpleHasher;
-use core::hash::{Hash, Hasher};
+use core::hash::Hash;
 use core::mem::MaybeUninit;
 
 /// A lightweight, allocation-free, fixed-size association grid map.

@@ -2,7 +2,7 @@
 // Phase 9.4 Part 2-3: sys_bpf() Syscall with Program Loading, Verification, and Execution
 
 use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, OnceLock};
 use crate::kernel::ebpf_vm::{BpfInstruction, BpfVm};
 use crate::kernel::ebpf_verification::{BpfProgramVerifier, VerificationReport};
 
@@ -203,10 +203,12 @@ impl Default for BpfProgramRegistry {
 }
 
 /// Global BPF program registry (thread-safe)
-lazy_static::lazy_static! {
-    static ref GLOBAL_BPF_REGISTRY: Arc<Mutex<BpfProgramRegistry>> = {
+static GLOBAL_BPF_REGISTRY: OnceLock<Arc<Mutex<BpfProgramRegistry>>> = OnceLock::new();
+
+fn get_global_bpf_registry() -> Arc<Mutex<BpfProgramRegistry>> {
+    GLOBAL_BPF_REGISTRY.get_or_init(|| {
         Arc::new(Mutex::new(BpfProgramRegistry::new()))
-    };
+    }).clone()
 }
 
 /// sys_bpf syscall - main entry point for BPF operations
@@ -295,7 +297,7 @@ fn sys_bpf_prog_load(
         BpfInstruction::Return,
     ];
 
-    let mut registry = GLOBAL_BPF_REGISTRY.lock().unwrap();
+    let mut registry = get_global_bpf_registry().lock().unwrap();
     let fd = registry.load_program(
         prog_type,
         instructions,

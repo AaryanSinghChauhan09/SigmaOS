@@ -23,10 +23,11 @@ pub use network::{
     InterfaceStats, DriverInfo, LinkSettings, Duplex, EthTool, NetworkError,
 };
 pub use security::{
-    FirewallZone, PortRule, FirewallService, FirewallRule, RuleAction, FirewallManager,
+    FirewallZone, PortRule, FirewallService, FirewallRule, FirewallManager,
     SELinuxMode, SELinuxBoolean, SELinuxContext, SELinuxManager,
     SSHKey, SSHKeyType, SSHKeyManager, AuthorizedKey, KnownHost, SecurityError,
 };
+pub use network::RuleAction;
 pub use storage::{
     BlockDevice, Partition, PartitionType, FilesystemInfo, BlockDeviceManager, DeviceStats,
     Disk, PartitionTableType, PartitionTable, PartitionManager,

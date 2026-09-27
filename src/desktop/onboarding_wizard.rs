@@ -42,7 +42,7 @@ pub enum ThemeVariant {
 pub struct ThemeSelector;
 
 impl ThemeSelector {
-    pub fn apply_theme(variant: ThemeVariant, accent_color: &str) {
+    pub fn apply_theme(_variant: ThemeVariant, _accent_color: &str) {
         // apply theme settings
     }
 }
@@ -57,7 +57,7 @@ pub enum DesktopLayoutVariant {
 pub struct LayoutSelector;
 
 impl LayoutSelector {
-    pub fn apply_layout(variant: DesktopLayoutVariant) {
+    pub fn apply_layout(_variant: DesktopLayoutVariant) {
         // apply layout settings
     }
 }

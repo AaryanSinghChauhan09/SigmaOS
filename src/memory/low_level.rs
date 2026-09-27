@@ -419,7 +419,7 @@ impl MinimalPosixSyscallMatrix {
         }
     }
 
-    pub fn execute(&self, syscall_nr: u64, arg1: u64, arg2: u64, arg3: u64, arg4: u64) -> i64 {
+    pub fn execute(&self, syscall_nr: u64, arg1: u64, _arg2: u64, arg3: u64, _arg4: u64) -> i64 {
         match syscall_nr {
             posix_syscall_nr::SYS_READ => arg3 as i64,
             posix_syscall_nr::SYS_WRITE => arg3 as i64,

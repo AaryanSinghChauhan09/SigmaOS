@@ -47,6 +47,7 @@ pub mod memory;
 pub mod meta;
 pub mod module_loader;
 pub mod namespaces;
+pub mod uts_namespace;
 pub mod net;
 pub mod nextgen_breakthroughs;
 pub mod numa_allocator;
@@ -136,6 +137,7 @@ pub use roundrobin::{
 };
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
 pub use vmm_paging::{PageTableManager, VirtualMemoryManager};
+pub use uts_namespace::{UtsNamespaceManager, NamespaceId};
 // Note: linux_bsd_innovations types fully re-exported via `pub use crate::kernel::linux_bsd_innovations::*` above.
 pub use kqueue_event::{Kqueue, KqueueManager, Kevent, FilterType, FilterFlags, Interest};
 pub use tss_ring3_user_mode::{

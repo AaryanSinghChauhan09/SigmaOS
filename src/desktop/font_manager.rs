@@ -44,7 +44,7 @@ impl FontCache {
     pub fn generate(&mut self, dirs: &[PathBuf]) {
         // Simulating font discovery
         for _dir in dirs {
-            let mut family = FontFamily {
+            let family = FontFamily {
                 name: "DetectedSans".to_string(),
                 styles: vec!["Regular".to_string(), "Bold".to_string()],
                 file_paths: vec![],

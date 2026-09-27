@@ -2,12 +2,7 @@
 //! KVM acceleration, Qcow2 image overlays, VFIO IOMMU device assignment,
 //! VirtIO virtqueues, live migration, and nested virtualization
 
-#[cfg(not(feature = "standalone_test"))]
-use crate::klib::{String, ToString, Vec};
-
-#[cfg(feature = "standalone_test")]
 use std::string::{String, ToString};
-#[cfg(feature = "standalone_test")]
 use std::vec::Vec;
 
 /// Hypervisor type
