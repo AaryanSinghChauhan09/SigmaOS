@@ -437,3 +437,10 @@ if [ -f "src/boot/grub_engine.rs" ]; then
     rustc --test src/boot/grub_engine.rs --edition=2021 -o build/test_grub_engine
     ./build/test_grub_engine
 fi
+
+if [ -f "src/workflow/mod.rs" ]; then
+    echo "Running Workflow & Linux Mint GitHub Actions test suite..."
+    mkdir -p build
+    rustc --test src/workflow/mod.rs --edition=2021 -o build/test_workflow
+    ./build/test_workflow
+fi
