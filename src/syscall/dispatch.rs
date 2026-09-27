@@ -36,13 +36,16 @@ pub trait SyscallHandler {
 
 #[repr(C)]
 pub struct SimpleSyscallDispatcher {
-    pub handlers: [Option<Box<dyn SyscallHandler>>; 64],
+    pub handlers: Vec<Option<Box<dyn SyscallHandler>>>,
 }
 
 impl SimpleSyscallDispatcher {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        let mut handlers: [Option<Box<dyn SyscallHandler>>; 64] = [None; 64];
+        let mut handlers: Vec<Option<Box<dyn SyscallHandler>>> = Vec::with_capacity(64);
+        for _ in 0..64 {
+            handlers.push(None);
+        }
         handlers[1] = Some(Box::new(ExitHandler::new()));
         handlers[2] = Some(Box::new(ReadHandler::new()));
         handlers[3] = Some(Box::new(WriteHandler::new()));
@@ -85,10 +88,10 @@ impl SimpleSyscallDispatcher {
 
 impl SyscallHandler for SimpleSyscallDispatcher {
     fn handle(&mut self, num: SyscallNumber, args: &[usize]) -> Result<usize, SyscallError> {
-        if num >= 64 {
+        if num as usize >= self.handlers.len() {
             return Err(SyscallError::InvalidSyscall);
         }
-        if let Some(ref mut handler) = self.handlers[num] {
+        if let Some(ref mut handler) = self.handlers[num as usize] {
             handler.handle(num, args)
         } else {
             Err(SyscallError::InvalidSyscall)

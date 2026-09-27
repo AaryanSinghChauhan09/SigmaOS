@@ -53,6 +53,7 @@ impl CgroupUsage {
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct Cgroup {
     pub name: String,
     pub parent_name: Option<String>,

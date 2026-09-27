@@ -91,7 +91,7 @@ impl Default for VerificationReport {
 /// eBPF Program Verifier
 pub struct BpfProgramVerifier {
     program: Vec<BpfInstruction>,
-    report: VerificationReport,
+    pub report: VerificationReport,
 }
 
 impl BpfProgramVerifier {
