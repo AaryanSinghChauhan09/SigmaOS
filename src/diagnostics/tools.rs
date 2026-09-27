@@ -37,6 +37,7 @@ pub type SensorID = usize;
 /// Sensor type
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SensorType {
     CPU = 0,
     Memory = 1,
