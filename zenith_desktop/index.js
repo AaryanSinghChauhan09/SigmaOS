@@ -241,6 +241,7 @@ export const SYSTEM_COMMANDS = [
 export function renderCommandResults(query = "") {
   if (typeof document === "undefined") return [];
   const resultsContainer = document.getElementById("cmd-results");
+  const cmdInput = document.getElementById("cmd-input");
   if (!resultsContainer) return [];
 
   const cleanQuery = query.trim().toLowerCase();
@@ -259,6 +260,7 @@ export function renderCommandResults(query = "") {
     noResults.textContent = "No matching commands found";
     resultsContainer.appendChild(noResults);
     activeCommandIndex = -1;
+    if (cmdInput) cmdInput.removeAttribute("aria-activedescendant");
     return [];
   }
 
@@ -266,9 +268,14 @@ export function renderCommandResults(query = "") {
     activeCommandIndex = 0;
   }
 
+  if (cmdInput) {
+    cmdInput.setAttribute("aria-activedescendant", `cmd-option-${activeCommandIndex}`);
+  }
+
   filtered.forEach((cmd, idx) => {
     const btn = document.createElement("button");
     btn.type = "button";
+    btn.id = `cmd-option-${idx}`;
     btn.className = `command-item${idx === activeCommandIndex ? " selected" : ""}`;
     btn.role = "option";
     btn.setAttribute("aria-selected", idx === activeCommandIndex ? "true" : "false");
@@ -292,6 +299,10 @@ export function renderCommandResults(query = "") {
     });
 
     resultsContainer.appendChild(btn);
+
+    if (idx === activeCommandIndex && typeof btn.scrollIntoView === "function") {
+      btn.scrollIntoView({ block: "nearest" });
+    }
   });
 
   return filtered;
@@ -305,7 +316,11 @@ export function closeCommandPalette() {
     cmdPalette.classList.remove("active");
     cmdPalette.setAttribute("aria-hidden", "true");
   }
-  if (cmdInput) cmdInput.blur();
+  if (cmdInput) {
+    cmdInput.setAttribute("aria-expanded", "false");
+    cmdInput.removeAttribute("aria-activedescendant");
+    cmdInput.blur();
+  }
   if (lastFocusedElement && typeof lastFocusedElement.focus === "function") {
     lastFocusedElement.focus();
     lastFocusedElement = null;
@@ -384,6 +399,7 @@ export function initEscapeKeyDismissal() {
           lastFocusedElement = document.activeElement;
           const cmdInput = document.getElementById("cmd-input");
           if (cmdInput) {
+            cmdInput.setAttribute("aria-expanded", "true");
             cmdInput.value = "";
             cmdInput.focus();
             activeCommandIndex = 0;
@@ -391,7 +407,11 @@ export function initEscapeKeyDismissal() {
           }
         } else {
           const cmdInput = document.getElementById("cmd-input");
-          if (cmdInput) cmdInput.blur();
+          if (cmdInput) {
+            cmdInput.setAttribute("aria-expanded", "false");
+            cmdInput.removeAttribute("aria-activedescendant");
+            cmdInput.blur();
+          }
           if (lastFocusedElement && typeof lastFocusedElement.focus === "function") {
             lastFocusedElement.focus();
             lastFocusedElement = null;
