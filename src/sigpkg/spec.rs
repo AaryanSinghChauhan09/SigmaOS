@@ -69,7 +69,7 @@ impl PackageDependency {
     }
 
     pub fn name(&self) -> &[u8] {
-        // Bolt performance optimization: use cached name_len for O(1) constant time lookup instead of O(N) zero-byte scan
+        // Bolt performance optimization: use cached name_len for O(1) constant-time lookup when populated, safely falling back to linear zero-byte scan if uninitialized.
         if self.name_len > 0 {
             &self.name[..self.name_len as usize]
         } else {
@@ -79,7 +79,7 @@ impl PackageDependency {
     }
 
     pub fn constraint(&self) -> &[u8] {
-        // Bolt performance optimization: use cached constraint_len for O(1) constant time lookup instead of O(N) zero-byte scan
+        // Bolt performance optimization: use cached constraint_len for O(1) constant-time lookup when populated, safely falling back to linear zero-byte scan if uninitialized.
         if self.constraint_len > 0 {
             &self.version_constraint[..self.constraint_len as usize]
         } else {
@@ -495,7 +495,7 @@ impl PackageManager for SimplePackageManager {
 
         for dep in dependencies {
             // Bolt performance optimization: hoist dependency name slice lookup outside candidate loop.
-            // Reduces zero-byte linear scans from O(D * P) to O(D).
+            // Reduces zero-byte linear scans from O(D * P) to O(D), using safe bounds-checked boundary matching (`get().map_or(true, ...)`).
             let dep_slice = dep.name();
 
             let mut found = false;
@@ -504,7 +504,7 @@ impl PackageManager for SimplePackageManager {
                     let p_ref: &dyn Package = pkg.as_ref();
                     let pkg_name = p_ref.name();
                     if pkg_name.starts_with(dep_slice)
-                        && (pkg_name.len() == dep_slice.len() || pkg_name[dep_slice.len()] == 0)
+                        && pkg_name.get(dep_slice.len()).map_or(true, |&b| b == 0)
                     {
                         found = true;
                         break;
