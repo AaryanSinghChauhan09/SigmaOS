@@ -233,6 +233,33 @@ tune2fs -O lazy_itable_init /dev/sda1
 echo 30 > /sys/fs/btrfs/sda1/commit_interval_secs
 ```
 
+## B-tree Implementation
+
+### B-tree Operations
+
+Linux Btrfs-inspired B-tree structures:
+
+```bash
+# Create B-tree
+btree create 4
+
+# Insert key-value pair
+btree insert 1 1 0 "data"
+
+# Search for key
+btree search 1 1 0
+
+# Get node count
+btree count
+```
+
+### B-tree Features
+
+- **Internal Nodes**: Index nodes for navigation
+- **Leaf Nodes**: Data nodes storing key-value pairs
+- **Automatic Splitting**: Node splitting when full
+- **Balancing**: Automatic tree balancing
+
 ## Next Steps
 
 - [Networking](06-Networking.md) - Network configuration

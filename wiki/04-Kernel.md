@@ -247,6 +247,81 @@ Linux syscall compatibility layer:
 # - And many more
 ```
 
+## Process Scheduler
+
+### CFS Scheduler
+
+Linux CFS-inspired Completely Fair Scheduler:
+
+```bash
+# Create process
+scheduler create normal 0
+
+# Pick next task
+scheduler pick-next
+
+# Update vruntime
+scheduler update-vruntime 1 1000
+
+# Put task to sleep
+scheduler sleep 1
+
+# Wake up task
+scheduler wake 1
+```
+
+### Scheduler Types
+
+- **CFS**: vruntime-based fair scheduling
+- **RT**: Priority-based real-time scheduling
+- **Energy-Aware**: Thermal-aware with frequency scaling
+
+### Energy-Aware Scheduling
+
+```bash
+# Update thermal state
+scheduler thermal-state 85
+
+# Get CPU frequency
+scheduler frequency
+
+# Get thermal state
+scheduler thermal
+```
+
+## Interrupt Handling
+
+### Interrupt Controller
+
+Linux and BSD-inspired interrupt handling:
+
+```bash
+# Allocate interrupt vector
+interrupt allocate irq
+
+# Register handler
+interrupt register 32 handler
+
+# Enable interrupt
+interrupt enable 32
+
+# Handle interrupt
+interrupt handle 32
+
+# Register IRQ
+interrupt register-irq 1 edge
+
+# Enable IRQ
+interrupt enable-irq 1
+```
+
+### Interrupt Types
+
+- **Exception**: Processor exceptions
+- **IRQ**: Hardware interrupts
+- **Software Interrupt**: Software-generated interrupts
+- **Trap**: Debugging traps
+
 ## Process Descriptors
 
 ### Pidfd/Procdesc

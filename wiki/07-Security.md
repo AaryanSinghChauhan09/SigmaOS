@@ -244,6 +244,36 @@ sigboot enroll-key /path/to/key.der
 sigboot verify
 ```
 
+## Address Sanitizer
+
+### ASan Memory Error Detection
+
+ASan-inspired memory error detection:
+
+```bash
+# Create address sanitizer
+asan create 16
+
+# Allocate memory with redzones
+asan allocate 100
+
+# Check valid access
+asan check 0x1000 50
+
+# Free memory
+asan free 0x1000
+
+# Get shadow memory
+asan shadow 0x1000
+```
+
+### Detection Capabilities
+
+- **Buffer Overflow**: Redzone-based overflow detection
+- **Use-After-Free**: Freed memory tracking
+- **Stack Corruption**: Canary verification
+- **Shadow Memory**: Memory state tracking
+
 ## Bluetooth GATT
 
 ### GATT Client
