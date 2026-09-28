@@ -37,6 +37,7 @@ pub mod nix_guix;
 pub mod paccache;
 pub mod pactree;
 pub mod repository;
+pub mod repository_config;
 pub mod resolver;
 pub mod sandbox;
 pub mod sigma_pkg;
@@ -138,6 +139,7 @@ pub use repository::{
     PackageTransactionJournal, PinPriority, RepoError, RepositoryManager, RepositoryMetadata,
     TransactionJournalEntry,
 };
+pub use repository_config::{RepoConfig, RepositoryConfigManager};
 pub use store::{
     SigmaSoftwareStore, SoftwareRegistryEntry, /* StoreApp, StoreError, */ // store module not available
      GLOBAL_SOFTWARE_STORE,
