@@ -156,6 +156,13 @@ if [ -f "src/drivers/sovereign_sound_hda_synthesis.rs" ]; then
     ./build/sovereign_sound_hda_test
 fi
 
+if [ -f "src/hal/stable_interfaces.rs" ]; then
+    echo "Running Stable HAL Interfaces test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/hal/stable_interfaces.rs -o build/test_stable_hal_interfaces
+    ./build/test_stable_hal_interfaces
+fi
+
 if [ -f "src/drivers/sovereign_hardware_roadmap.rs" ]; then
     echo "Running Sovereign Hardware Roadmap & Driver Isolation test suite..."
     mkdir -p build
