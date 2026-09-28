@@ -656,7 +656,7 @@ impl SovereignDistroPackageAdvancementsSuiteV2 {
 
     pub fn audit_and_enrich_package(&mut self, pkg: &mut UnifiedPackage) -> Result<(), &'static str> {
         // Gatekeeper check via FreeBSD VuXML CVE DB
-        let (blocked, reason) = self.freebsd.evaluate_security_gatekeeper(&pkg.name);
+        let (blocked, _reason) = self.freebsd.evaluate_security_gatekeeper(&pkg.name);
         if blocked {
             return Err("Package blocked by VuXML security gatekeeper");
         }

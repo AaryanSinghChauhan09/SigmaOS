@@ -84,7 +84,7 @@ impl LockdepSubsystem {
         }
 
         // Check for circular dependency
-        for (&held_class_id, &held_class) in &self.held_locks {
+        for (&held_class_id, _held_class) in &self.held_locks {
             if self.would_circular(held_class_id, class_id) {
                 return Err(LockdepError::CircularDependency);
             }

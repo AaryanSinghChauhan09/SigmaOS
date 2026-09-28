@@ -155,7 +155,7 @@ impl FreeBsdPkgAuditVuxmlEngine {
         });
     }
 
-    pub fn check_vulnerability(&self, pkg_name: &str, version: &str) -> Option<&VuxmlAdvisory> {
+    pub fn check_vulnerability(&self, pkg_name: &str, _version: &str) -> Option<&VuxmlAdvisory> {
         self.advisories.iter().find(|a| a.pkg_name == pkg_name)
     }
 }

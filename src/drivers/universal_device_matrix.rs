@@ -163,7 +163,7 @@ impl Serial16550UartDriver {
         }
     }
 
-    pub fn transmit_byte(&mut self, byte: u8) -> bool {
+    pub fn transmit_byte(&mut self, _byte: u8) -> bool {
         self.power_state == PowerState::FullOn
     }
 }
@@ -422,7 +422,7 @@ impl IntelWiWifi7Driver {
         }
     }
 
-    pub fn establish_mlo_connection(&mut self, ssid: &str) -> bool {
+    pub fn establish_mlo_connection(&mut self, _ssid: &str) -> bool {
         if self.power_state == PowerState::FullOn {
             self.mlo_link_active = true;
             true
