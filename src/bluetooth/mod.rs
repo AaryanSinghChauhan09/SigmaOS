@@ -9,6 +9,9 @@ use std::vec::Vec;
 use std::string::String;
 use core::fmt;
 
+pub mod gatt;
+pub use gatt::{GattClient, GattDevice, GattService, GattCharacteristic};
+
 /// Error type for the Bluetooth module
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum BluetoothError {
