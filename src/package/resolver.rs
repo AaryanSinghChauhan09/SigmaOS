@@ -45,6 +45,7 @@ pub struct SimpleDependency {
     pub package_id: PackageID,
     pub deps: Vec<PackageID>,
     pub version: [u8; 32],
+    pub version_len: u8,
 }
 
 impl SimpleDependency {
@@ -62,6 +63,7 @@ impl SimpleDependency {
             package_id: id,
             deps: Vec::new(),
             version: version_array,
+            version_len: version_len as u8,
         }
     }
 }
@@ -74,7 +76,8 @@ impl Dependency for SimpleDependency {
         self.deps.clone()
     }
     fn version(&self) -> &[u8] {
-        let len = self.version.iter().position(|&b| b == 0).unwrap_or(32);
+        // O(1) constant-time slice lookup using cached version_len, avoiding O(N) zero-byte linear scan (.position(|&b| b == 0))
+        let len = (self.version_len as usize).min(32);
         &self.version[..len]
     }
 }
@@ -246,6 +249,7 @@ pub enum ConstraintType {
 pub struct SimpleVersionConstraint {
     pub constraint_type: ConstraintType,
     pub version: [u8; 32],
+    pub version_len: u8,
 }
 
 impl SimpleVersionConstraint {
@@ -262,13 +266,15 @@ impl SimpleVersionConstraint {
         SimpleVersionConstraint {
             constraint_type,
             version: version_array,
+            version_len: version_len as u8,
         }
     }
 }
 
 impl VersionConstraint for SimpleVersionConstraint {
     fn satisfies(&self, version: &[u8]) -> bool {
-        let len = self.version.iter().position(|&b| b == 0).unwrap_or(32);
+        // O(1) constant-time slice lookup using cached version_len, avoiding O(N) zero-byte linear scan (.position(|&b| b == 0))
+        let len = (self.version_len as usize).min(32);
         let constraint_version = &self.version[..len];
 
         match self.constraint_type {
@@ -288,6 +294,44 @@ impl VersionConstraint for SimpleVersionConstraint {
             ConstraintType::GreaterEqual => b">=",
             ConstraintType::LessEqual => b"<=",
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_simple_dependency_version() {
+        let dep = SimpleDependency::new(1, b"1.2.3");
+        assert_eq!(dep.package_id(), 1);
+        assert_eq!(dep.version(), b"1.2.3");
+    }
+
+    #[test]
+    fn test_simple_version_constraint_satisfies() {
+        let constraint_eq = SimpleVersionConstraint::new(ConstraintType::Exact, b"2.0.0");
+        assert!(constraint_eq.satisfies(b"2.0.0"));
+        assert!(!constraint_eq.satisfies(b"2.0.1"));
+
+        let constraint_gte = SimpleVersionConstraint::new(ConstraintType::GreaterEqual, b"1.5.0");
+        assert!(constraint_gte.satisfies(b"1.5.0"));
+        assert!(constraint_gte.satisfies(b"2.0.0"));
+        assert!(!constraint_gte.satisfies(b"1.4.9"));
+    }
+
+    #[test]
+    fn test_simple_dependency_resolver() {
+        let mut resolver = SimpleDependencyResolver::new();
+        let mut dep1 = SimpleDependency::new(1, b"1.0");
+        dep1.deps.push(2);
+        let dep2 = SimpleDependency::new(2, b"1.0");
+
+        resolver.add_dependency(Box::new(dep1)).unwrap();
+        resolver.add_dependency(Box::new(dep2)).unwrap();
+
+        let resolved = resolver.resolve(1).unwrap();
+        assert_eq!(resolved, vec![2, 1]);
     }
 }
 
