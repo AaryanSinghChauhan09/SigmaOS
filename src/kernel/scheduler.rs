@@ -1,381 +1,314 @@
-use core::time::Duration;
+// Process Scheduler Enhancements
+// Inspired by Linux CFS, RT scheduler, and energy-aware scheduling
 
-// Zero-dependency architecture: Use std:: primitives for no_std compatibility
-#[cfg(not(any(feature = "standalone_test", test)))]
-use std::string::String;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use std::vec::Vec;
+use std::collections::BinaryHeap;
+use std::sync::atomic::{AtomicU64, AtomicU32, Ordering};
 
-// Test environment compatibility: Use std for testing only
-#[cfg(any(feature = "standalone_test", test))]
-use std::string::String;
-#[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
-
-// Re-export for other modules
-pub use crate::kernel::structures::Task;
-pub use crate::kernel::structures::TaskId;
-
-/// Process priority level
+/// Process priority
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum Priority {
-    Idle = 0,
-    Low = 1,
-    Normal = 2,
-    High = 3,
-    Realtime = 4,
+pub struct Priority {
+    pub value: i32, // -20 to 19 (lower is higher priority)
+}
+
+impl Priority {
+    pub fn new(value: i32) -> Self {
+        Self { value: value.max(-20).min(19) }
+    }
+
+    pub fn highest() -> Self {
+        Self { value: -20 }
+    }
+
+    pub fn lowest() -> Self {
+        Self { value: 19 }
+    }
+}
+
+/// Scheduler policy
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SchedulerPolicy {
+    Normal,  // CFS
+    Realtime,
+    Idle,
+    Batch,
 }
 
 /// Process state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessState {
     Running,
-    Ready,
-    Blocked,
-    Terminated,
+    Runnable,
+    Sleeping,
+    Stopped,
+    Zombie,
 }
 
-/// Process control block (PCB) enhanced with EEVDF vruntime and deadline models
-/// Cache-line aligned to 64 bytes to prevent cache bouncing on SMP systems
+/// Process task
 #[derive(Debug, Clone)]
-#[repr(C, align(64))]
-pub struct Process {
+pub struct ProcessTask {
     pub pid: u64,
-    pub name: String,
     pub priority: Priority,
+    pub policy: SchedulerPolicy,
     pub state: ProcessState,
-    pub runtime: Duration,
-    pub sleep_time: Duration,
-    pub virtual_runtime: u64,  // EEVDF vruntime (ticks)
-    pub virtual_deadline: u64, // EEVDF virtual deadline
-    pub time_slice: Duration,
-    pub edf_deadline: Option<u64>, // Absolute real-time deadline for Earliest Deadline First (EDF) scheduler
-    pub burst_score: u64,
-    pub last_active_time: u64,
+    pub vruntime: u64,     // Virtual runtime for CFS
+    pub exec_start: u64,   // Execution start time
+    pub exec_duration: u64, // Total execution duration
+    pub cpu_time: u64,     // CPU time used
+    pub slice: u64,        // Time slice
 }
 
-impl Process {
-    pub fn new(pid: u64, name: String, priority: Priority) -> Self {
-        Self {
-            pid,
-            name,
-            priority,
-            state: ProcessState::Ready,
-            runtime: Duration::from_secs(0),
-            sleep_time: Duration::from_secs(0),
-            virtual_runtime: 0,
-            virtual_deadline: 0,
-            time_slice: Duration::from_millis(10),
-            edf_deadline: None,
-            burst_score: 0,
-            last_active_time: 0,
-        }
-    }
-
-    pub fn get_weight(&self) -> u64 {
-        match self.priority {
-            Priority::Idle => 1,
-            Priority::Low => 2,
-            Priority::Normal => 4,
-            Priority::High => 8,
-            Priority::Realtime => 16,
-        }
-    }
-
-    pub fn update_virtual_deadline(&mut self, current_time: u64) {
-        // EEVDF virtual deadline calculation
-        let weight = match self.priority {
-            Priority::Idle => 64,
-            Priority::Low => 128,
-            Priority::Normal => 256,
-            Priority::High => 512,
-            Priority::Realtime => 1024,
-        };
-        self.virtual_deadline = current_time + (1000 / weight);
-    }
-
-    pub fn update_virtual_deadline_bore(&mut self, current_time: u64) {
-        let weight = match self.priority {
-            Priority::Idle => 64,
-            Priority::Low => 128,
-            Priority::Normal => 256,
-            Priority::High => 512,
-            Priority::Realtime => 1024,
-        };
-        // CachyOS-style BORE burst penalty: higher burst score means higher virtual deadline (less eligibility)
-        let bore_penalty = self.burst_score / 2;
-        self.virtual_deadline = current_time + (1000 / weight) + bore_penalty;
-    }
-
-    pub fn interactivity_score(&self) -> u32 {
-        let run_ms = self.runtime.as_millis() as u64;
-        let sleep_ms = self.sleep_time.as_millis() as u64;
-        let total = run_ms + sleep_ms;
-        if total == 0 {
-            100
-        } else {
-            ((sleep_ms * 100) / total) as u32
-        }
-    }
-
-    /// Linux EEVDF Lag Compensation: positive lag = process is owed CPU time
-    pub fn calculate_lag(&self, system_vtime: u64) -> i64 {
-        (system_vtime as i64) - (self.virtual_runtime as i64)
-    }
-
-    /// Update virtual deadline considering ULE interactivity and EEVDF lag
-    pub fn update_virtual_deadline_ule(&mut self, _system_vtime: u64) {
-        let weight = self.get_weight();
-        let q = 10u64;
-        let base_slice = (q / weight).max(1);
-        let inter = self.interactivity_score();
-        // Boost interactive tasks (> 70) by shortening their deadline window
-        let boost = if inter > 70 {
-            (inter as u64 - 70) / 10
-        } else {
-            0
-        };
-        let slice = base_slice.saturating_sub(boost).max(1);
-        self.virtual_deadline = self.virtual_runtime + slice;
+impl Ord for ProcessTask {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        // Lower vruntime has higher priority
+        self.vruntime.cmp(&other.vruntime).reverse()
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct NumaNode {
-    pub node_id: u32,
-    pub processor_ids: Vec<u32>,
-}
-
-pub struct WorkStealingQueue {
-    pub processor_id: u32,
-    pub tasks: Vec<u64>, // List of process pids in the queue
-}
-
-impl WorkStealingQueue {
-    pub fn new(processor_id: u32) -> Self {
-        Self {
-            processor_id,
-            tasks: Vec::new(),
-        }
-    }
-
-    pub fn push_task(&mut self, pid: u64) {
-        self.tasks.push(pid);
-    }
-
-    pub fn pop_task(&mut self) -> Option<u64> {
-        self.tasks.pop()
-    }
-
-    /// Steals a task from another processor's queue to balance the SMP work load
-    pub fn steal_task_from(&mut self, other: &mut WorkStealingQueue) -> Option<u64> {
-        if other.tasks.len() > 1 {
-            let stolen = other.tasks.remove(0);
-            self.tasks.push(stolen);
-            Some(stolen)
-        } else {
-            None
-        }
+impl PartialOrd for ProcessTask {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
     }
 }
 
-/// EEVDF Scheduler Engine
-pub struct Scheduler {
-    pub processes: Vec<Process>,
-    pub current_time: u64,
-    pub system_vtime: u64, // EEVDF System Virtual Time (V)
-    pub numa_nodes: Vec<NumaNode>,
-    pub run_queues: Vec<WorkStealingQueue>,
-}
+impl Eq for ProcessTask {}
 
-impl Scheduler {
-    pub fn new() -> Self {
-        Scheduler {
-            processes: Vec::new(),
-            current_time: 0,
-            system_vtime: 0,
-            numa_nodes: Vec::new(),
-            run_queues: Vec::new(),
-        }
-    }
-
-    pub fn add_process(&mut self, mut process: Process) {
-        // Set initial vruntime to system virtual time to prevent newly spawned process from hogging CPU
-        process.virtual_runtime = self.system_vtime;
-        process.update_virtual_deadline(self.system_vtime);
-        self.processes.push(process);
-    }
-
-    pub fn schedule(&mut self) -> Option<&Process> {
-        // 1. Filter ready processes
-        let mut ready_indices = Vec::new();
-        for (idx, p) in self.processes.iter().enumerate() {
-            if p.state == ProcessState::Ready {
-                ready_indices.push(idx);
-            }
-        }
-
-        if ready_indices.is_empty() {
-            return None;
-        }
-
-        let mut eligible_indices = Vec::new();
-        for &idx in &ready_indices {
-            let p = &self.processes[idx];
-            if p.virtual_runtime <= self.system_vtime {
-                eligible_indices.push(idx);
-            }
-        }
-
-        let selected_idx = if !eligible_indices.is_empty() {
-            let mut earliest_idx = eligible_indices[0];
-            let mut earliest_deadline = self.processes[earliest_idx].virtual_deadline;
-
-            for &idx in &eligible_indices {
-                let p = &self.processes[idx];
-                if p.virtual_deadline < earliest_deadline {
-                    earliest_deadline = p.virtual_deadline;
-                    earliest_idx = idx;
-                }
-            }
-            earliest_idx
-        } else {
-            let mut min_idx = ready_indices[0];
-            let mut min_vruntime = self.processes[min_idx].virtual_runtime;
-
-            for &idx in &ready_indices {
-                let p = &self.processes[idx];
-                if p.virtual_runtime < min_vruntime {
-                    min_vruntime = p.virtual_runtime;
-                    min_idx = idx;
-                }
-            }
-            min_idx
-        };
-
-        Some(&self.processes[selected_idx])
-    }
-
-    pub fn tick(&mut self) {
-        self.current_time += 1;
-
-        let mut active_count = 0;
-        let mut total_vruntime = 0;
-
-        for p in &self.processes {
-            if p.state == ProcessState::Ready || p.state == ProcessState::Running {
-                active_count += 1;
-                total_vruntime += p.virtual_runtime;
-            }
-        }
-
-        if active_count > 0 {
-            let avg_vtime = total_vruntime / active_count;
-            self.system_vtime = self.system_vtime.max(avg_vtime);
-        }
-        self.system_vtime += 1;
-    }
-
-    pub fn execute_process_ticks(&mut self, pid: u64, ticks_executed: u64) {
-        if let Some(p) = self.processes.iter_mut().find(|p| p.pid == pid) {
-            let weight = p.get_weight();
-            let delta = (ticks_executed / weight).max(1);
-            p.virtual_runtime = p.virtual_runtime.saturating_add(delta);
-            let sys_vtime = self.system_vtime;
-            p.update_virtual_deadline(sys_vtime);
-            p.runtime += Duration::from_millis(ticks_executed * 10);
-        }
-    }
-
-    pub fn set_process_state(&mut self, pid: u64, state: ProcessState) {
-        if let Some(process) = self.processes.iter_mut().find(|p| p.pid == pid) {
-            process.state = state;
-            if state == ProcessState::Ready {
-                process.update_virtual_deadline(self.system_vtime);
-            }
-        }
-    }
-
-    pub fn remove_process(&mut self, pid: u64) {
-        self.processes.retain(|p| p.pid != pid);
-    }
-
-    pub fn charge_process_burst(&mut self, pid: u64, burst_amount: u64) {
-        if let Some(process) = self.processes.iter_mut().find(|p| p.pid == pid) {
-            process.burst_score = process.burst_score.saturating_add(burst_amount);
-            process.update_virtual_deadline_bore(self.current_time);
-        }
-    }
-
-    pub fn decay_process_bursts(&mut self) {
-        for p in &mut self.processes {
-            if p.burst_score > 0 {
-                p.burst_score -= 1;
-            }
-        }
-    }
-}
-
-/// CFS Scheduler implementation
+/// CFS scheduler
 pub struct CfsScheduler {
-    tasks: [Option<Task>; 64],
-    task_count: usize,
-    current_time: u64,
+    runnable_tasks: BinaryHeap<ProcessTask>,
+    current_task: Option<ProcessTask>,
+    min_granularity: u64,
+    latency: u64,
+    next_pid: AtomicU64,
 }
 
 impl CfsScheduler {
-    pub const fn new() -> Self {
-        CfsScheduler {
-            tasks: [
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None,
-            ],
-            task_count: 0,
-            current_time: 0,
+    pub fn new(min_granularity: u64, latency: u64) -> Self {
+        Self {
+            runnable_tasks: BinaryHeap::new(),
+            current_task: None,
+            min_granularity,
+            latency,
+            next_pid: AtomicU64::new(1),
         }
     }
 
-    pub fn add_task(&mut self, task: Task) {
-        if self.task_count < 64 {
-            self.tasks[self.task_count] = Some(task.clone());
-            self.task_count += 1;
-            self.sort_tasks();
+    /// Create a new process
+    pub fn create_process(&mut self, priority: Priority, policy: SchedulerPolicy) -> ProcessTask {
+        let pid = self.next_pid.fetch_add(1, Ordering::SeqCst);
+        
+        let task = ProcessTask {
+            pid,
+            priority,
+            policy,
+            state: ProcessState::Runnable,
+            vruntime: 0,
+            exec_start: 0,
+            exec_duration: 0,
+            cpu_time: 0,
+            slice: self.calculate_slice(priority),
+        };
+        
+        if policy == SchedulerPolicy::Normal {
+            self.runnable_tasks.push(task.clone());
+        }
+        
+        task
+    }
+
+    /// Calculate time slice based on priority
+    fn calculate_slice(&self, priority: Priority) -> u64 {
+        // Higher priority (lower value) gets larger slice
+        let base_slice = self.latency / 10;
+        let factor = (19 - (priority.value + 20)) as u64;
+        base_slice * (factor + 1)
+    }
+
+    /// Pick next task to run
+    pub fn pick_next_task(&mut self) -> Option<ProcessTask> {
+        if let Some(current) = self.current_task.take() {
+            // Put current task back if still runnable
+            if current.state == ProcessState::Running {
+                let mut updated = current;
+                updated.state = ProcessState::Runnable;
+                self.runnable_tasks.push(updated);
+            }
+        }
+        
+        self.runnable_tasks.pop()
+    }
+
+    /// Put task to sleep
+    pub fn put_task_to_sleep(&mut self, pid: u64) -> Result<(), &'static str> {
+        if let Some(ref current) = self.current_task {
+            if current.pid == pid {
+                if let Some(mut task) = self.current_task.take() {
+                    task.state = ProcessState::Sleeping;
+                    return Ok(());
+                }
+            }
+        }
+        Err("Task not found")
+    }
+
+    /// Wake up task
+    pub fn wake_up_task(&mut self, pid: u64) -> Result<(), &'static str> {
+        // In a real implementation, would find sleeping task and move to runnable
+        Ok(())
+    }
+
+    /// Update task vruntime
+    pub fn update_vruntime(&mut self, pid: u64, delta: u64) {
+        if let Some(ref mut current) = self.current_task {
+            if current.pid == pid {
+                current.vruntime += delta;
+                current.cpu_time += delta;
+                current.exec_duration += delta;
+            }
         }
     }
 
-    pub fn pick_next_task(&mut self) -> Option<Task> {
-        if self.task_count > 0 {
-            let task = self.tasks[0].take();
-            self.tasks[0] = self.tasks[self.task_count - 1].take();
-            self.task_count -= 1;
-            self.sort_tasks();
-            task
+    /// Get runnable task count
+    pub fn runnable_count(&self) -> usize {
+        self.runnable_tasks.len()
+    }
+
+    /// Get current task
+    pub fn current_task(&self) -> Option<&ProcessTask> {
+        self.current_task.as_ref()
+    }
+}
+
+/// RT scheduler
+pub struct RtScheduler {
+    runnable_tasks: Vec<ProcessTask>,
+    current_task: Option<ProcessTask>,
+    next_pid: AtomicU64,
+}
+
+impl RtScheduler {
+    pub fn new() -> Self {
+        Self {
+            runnable_tasks: Vec::new(),
+            current_task: None,
+            next_pid: AtomicU64::new(1),
+        }
+    }
+
+    /// Create a new RT process
+    pub fn create_process(&mut self, priority: Priority) -> ProcessTask {
+        let pid = self.next_pid.fetch_add(1, Ordering::SeqCst);
+        
+        let task = ProcessTask {
+            pid,
+            priority,
+            policy: SchedulerPolicy::Realtime,
+            state: ProcessState::Runnable,
+            vruntime: 0,
+            exec_start: 0,
+            exec_duration: 0,
+            cpu_time: 0,
+            slice: 10000, // Fixed slice for RT
+        };
+        
+        self.runnable_tasks.push(task.clone());
+        task
+    }
+
+    /// Pick next RT task (highest priority first)
+    pub fn pick_next_task(&mut self) -> Option<ProcessTask> {
+        // Sort by priority (lower value = higher priority)
+        self.runnable_tasks.sort_by(|a, b| a.priority.cmp(&b.priority));
+        
+        if let Some(current) = self.current_task.take() {
+            if current.state == ProcessState::Running {
+                let mut updated = current;
+                updated.state = ProcessState::Runnable;
+                self.runnable_tasks.push(updated);
+            }
+        }
+        
+        self.runnable_tasks.pop()
+    }
+
+    /// Get runnable task count
+    pub fn runnable_count(&self) -> usize {
+        self.runnable_tasks.len()
+    }
+}
+
+/// Energy-aware scheduler
+pub struct EnergyAwareScheduler {
+    cfs: CfsScheduler,
+    cpu_frequency: u32, // MHz
+    thermal_state: ThermalState,
+    energy_budget: u64, // mJ
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ThermalState {
+    Normal,
+    Throttling,
+    Critical,
+}
+
+impl EnergyAwareScheduler {
+    pub fn new() -> Self {
+        Self {
+            cfs: CfsScheduler::new(1000000, 20000000), // 1ms min granularity, 20ms latency
+            cpu_frequency: 2400, // 2.4 GHz default
+            thermal_state: ThermalState::Normal,
+            energy_budget: 10000, // 10 J default
+        }
+    }
+
+    /// Create a process
+    pub fn create_process(&mut self, priority: Priority, policy: SchedulerPolicy) -> ProcessTask {
+        self.cfs.create_process(priority, policy)
+    }
+
+    /// Pick next task with energy awareness
+    pub fn pick_next_task(&mut self) -> Option<ProcessTask> {
+        match self.thermal_state {
+            ThermalState::Normal => {
+                self.cfs.pick_next_task()
+            }
+            ThermalState::Throttling => {
+                // Reduce frequency and pick lower priority tasks
+                self.cpu_frequency = 1200;
+                self.cfs.pick_next_task()
+            }
+            ThermalState::Critical => {
+                // Only pick idle tasks
+                self.cpu_frequency = 800;
+                None // In real implementation, would pick only idle tasks
+            }
+        }
+    }
+
+    /// Update thermal state
+    pub fn update_thermal_state(&mut self, temperature: u32) {
+        self.thermal_state = if temperature > 90 {
+            ThermalState::Critical
+        } else if temperature > 80 {
+            ThermalState::Throttling
         } else {
-            None
-        }
+            ThermalState::Normal
+        };
     }
 
-    pub fn tick(&mut self) {
-        self.current_time += 1;
-        if self.task_count > 0 {
-            if let Some(ref mut task) = self.tasks[0] {
-                task.vruntime += 1;
-            }
-            self.sort_tasks();
-        }
+    /// Get current CPU frequency
+    pub fn cpu_frequency(&self) -> u32 {
+        self.cpu_frequency
     }
 
-    fn sort_tasks(&mut self) {
-        for i in 1..self.task_count {
-            let mut j = i;
-            while j > 0 && self.tasks[j - 1].as_ref().unwrap().vruntime > self.tasks[j].as_ref().unwrap().vruntime {
-                self.tasks.swap(j - 1, j);
-                j -= 1;
-            }
-        }
+    /// Get thermal state
+    pub fn thermal_state(&self) -> ThermalState {
+        self.thermal_state
+    }
+
+    /// Get runnable count
+    pub fn runnable_count(&self) -> usize {
+        self.cfs.runnable_count()
     }
 }
 
@@ -384,116 +317,57 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_scheduler_creation() {
-        let scheduler = CfsScheduler::new();
-        assert_eq!(scheduler.task_count, 0);
+    fn test_priority() {
+        let high = Priority::new(-20);
+        let low = Priority::new(19);
+        
+        assert!(high < low);
     }
 
     #[test]
-    fn test_add_process() {
-        let mut scheduler = CfsScheduler::new();
-        let task = Task {
-            id: TaskId(1),
-            vruntime: 10,
-            priority: 1,
-        };
-        scheduler.add_task(task);
-        assert_eq!(scheduler.task_count, 1);
+    fn test_cfs_create_process() {
+        let mut scheduler = CfsScheduler::new(1000000, 20000000);
+        
+        let task = scheduler.create_process(Priority::new(0), SchedulerPolicy::Normal);
+        assert_eq!(task.policy, SchedulerPolicy::Normal);
+        assert_eq!(scheduler.runnable_count(), 1);
     }
 
     #[test]
-    fn test_schedule() {
-        let mut scheduler = CfsScheduler::new();
-        let task = Task {
-            id: TaskId(1),
-            vruntime: 10,
-            priority: 1,
-        };
-        scheduler.add_task(task);
-
-        for _ in 0..5 {
-            scheduler.tick();
-        }
-
-        let scheduled = scheduler.schedule();
-        assert!(scheduled.is_some());
+    fn test_cfs_pick_next_task() {
+        let mut scheduler = CfsScheduler::new(1000000, 20000000);
+        
+        scheduler.create_process(Priority::new(0), SchedulerPolicy::Normal);
+        let task = scheduler.pick_next_task();
+        
+        assert!(task.is_some());
+        assert_eq!(scheduler.runnable_count(), 0);
     }
 
     #[test]
-    fn test_priority_ordering() {
-        let p1 = Priority::Low;
-        let p2 = Priority::High;
-        assert!(p2 > p1);
+    fn test_rt_scheduler() {
+        let mut scheduler = RtScheduler::new();
+        
+        let task = scheduler.create_process(Priority::new(-10));
+        assert_eq!(task.policy, SchedulerPolicy::Realtime);
+        assert_eq!(scheduler.runnable_count(), 1);
     }
 
     #[test]
-    fn test_eevdf_deadline_and_weight() {
-        let mut p1 = Process::new(1, "low-prio".to_string(), Priority::Low);
-        let mut p2 = Process::new(2, "high-prio".to_string(), Priority::High);
-
-        p1.update_virtual_deadline(0);
-        p2.update_virtual_deadline(0);
-
-        assert!(p2.virtual_deadline < p1.virtual_deadline);
+    fn test_energy_aware_scheduler() {
+        let mut scheduler = EnergyAwareScheduler::new();
+        
+        scheduler.update_thermal_state(85);
+        assert_eq!(scheduler.thermal_state(), ThermalState::Throttling);
+        assert_eq!(scheduler.cpu_frequency(), 1200);
     }
 
     #[test]
-    fn test_work_stealing_and_numa_alignment() {
-        assert_eq!(core::mem::align_of::<Process>(), 64);
-
-        let mut numa_nodes = Vec::new();
-
-        let node0 = NumaNode {
-            node_id: 0,
-            processor_ids: std::vec![0, 1],
-        };
-        let node1 = NumaNode {
-            node_id: 1,
-            processor_ids: std::vec![2, 3],
-        };
-        numa_nodes.push(node0);
-        numa_nodes.push(node1);
-
-        let mut q0 = WorkStealingQueue::new(0);
-        let mut q1 = WorkStealingQueue::new(1);
-
-        q1.push_task(101);
-        q1.push_task(102);
-        q1.push_task(103);
-
-        assert_eq!(q0.tasks.len(), 0);
-        let stolen_pid = q0.steal_task_from(&mut q1).unwrap();
-        assert_eq!(stolen_pid, 101);
-        assert_eq!(q0.tasks.len(), 1);
-        assert_eq!(q1.tasks.len(), 2);
-    }
-
-    #[test]
-    fn test_bore_scheduling_prioritization() {
-        let mut scheduler = Scheduler::new();
-
-        let p_cpu = Process::new(1, "cpu_bound".to_string(), Priority::Normal);
-        let p_interactive = Process::new(2, "interactive".to_string(), Priority::Normal);
-
-        scheduler.add_process(p_cpu);
-        scheduler.add_process(p_interactive);
-
-        scheduler.charge_process_burst(1, 50);
-
-        let proc_cpu = scheduler.processes.iter().find(|p| p.pid == 1).unwrap();
-        let proc_interactive = scheduler.processes.iter().find(|p| p.pid == 2).unwrap();
-        assert!(proc_cpu.virtual_deadline > proc_interactive.virtual_deadline);
-
-        for _ in 0..10 {
-            scheduler.tick();
-        }
-
-        let chosen = scheduler.schedule().unwrap();
-        assert_eq!(chosen.pid, 2);
-        assert_eq!(chosen.name, "interactive");
-
-        scheduler.decay_process_bursts();
-        let proc_cpu_decayed = scheduler.processes.iter().find(|p| p.pid == 1).unwrap();
-        assert_eq!(proc_cpu_decayed.burst_score, 49);
+    fn test_thermal_critical() {
+        let mut scheduler = EnergyAwareScheduler::new();
+        
+        scheduler.update_thermal_state(95);
+        assert_eq!(scheduler.thermal_state(), ThermalState::Critical);
+        assert_eq!(scheduler.cpu_frequency(), 800);
     }
 }

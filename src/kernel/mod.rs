@@ -171,6 +171,8 @@ pub use pidfd::{PidFd, PidFdCapabilities, ProcDesc, ProcDescCapabilities, Subrea
 pub mod cfi;
 pub mod interrupt;
 pub use interrupt::{InterruptController, InterruptVector, InterruptType, InterruptDescriptor, IrqLine, IrqTriggerType};
+pub mod scheduler;
+pub use scheduler::{CfsScheduler, RtScheduler, EnergyAwareScheduler, ProcessTask, Priority, SchedulerPolicy, ProcessState, ThermalState};
 pub use cfi::{CfiEngine, CfiTarget, CfiViolation};
 pub use kptr_restrict::{
     KptrRestrictLevel, DmesgRestrictLevel, KernelSecurityMitigations, get_security_mitigations,
