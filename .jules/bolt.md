@@ -1,5 +1,9 @@
 # Bolt's Journal
 
+## 2026-10-15 - Subsystem Static Slice Consolidation & Length Tracking
+**Learning:** In cross-subsystem gateways and path permission checkers (like OpenBSD Unveil and Linux Landlock LSM), defining a canonical `pub const ALL_DISTRO_SUBSYSTEMS: &[&str]` static slice eliminates stack array re-allocations across Gateway matrix checks. In path resolution loops, tracking `best_len: usize` directly avoids calling `Option::unwrap` and `.len()` on every matching iteration.
+**Action:** Consolidate repeated static string arrays into a single static constant slice, and maintain explicit `best_len: usize` counters in prefix matching loops.
+
 ## 2026-09-27 - Safe Slice Boundary Matching for Package Dependency Resolution
 **Learning:** Hoisting dependency name lookups outside of candidate loops in package managers reduces linear zero-byte scans from O(D * P) to O(D). When matching package names against dependency name slices across trait boundaries (where candidate names may be trimmed slices or fixed-width null-padded buffers), using `.get(dep_len).map_or(true, |&b| b == 0)` ensures safe, panic-free boundary checking.
 **Action:** Always hoist invariant slice lookups out of inner loops and use `slice.get(len).map_or(true, ...)` for safe null-padded slice boundary matching.

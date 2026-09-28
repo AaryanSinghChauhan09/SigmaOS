@@ -35,6 +35,28 @@ use universal_distro_super_matrix::UniversalDistroSuperMatrix;
 // 0. SOVEREIGN UNIVERSAL DISTRO BRIDGE
 // ==========================================
 
+pub const ALL_DISTRO_SUBSYSTEMS: &[&str] = &[
+    "access", "accessibility", "ai", "app", "arch", "arch_kernel", "audio", "audit", "auth",
+    "automation", "backup", "bin", "bluetooth", "boot", "buddy", "buildfarm", "camera", "cloud",
+    "cluster", "community", "compatibility", "compiler", "compliance", "compositor", "compression", "config", "container",
+    "containers", "core", "crash", "crypto", "customization", "dashboard", "debugger", "desktop",
+    "dev", "device", "diagnostics", "display", "distro", "distro_innovations", "distro_inspirations", "docs", "driver", "drivers", "ecosystem",
+    "edge", "education", "embedded", "event", "expanded_wiki_innovations", "extended_distro_matrix", "filesystem", "finance", "fingerprint", "firewall", "fs",
+    "functions", "futuristic", "futuristic_modules", "gamepad", "gap_closure", "governance", "gpu", "graphics", "hal", "hardware", "i18n", "init",
+    "innovation", "input", "installer", "integration", "interop_gateway", "interrupt", "iot", "ipc", "iso",
+    "kernel", "klib", "lang", "launch_ready", "launcher", "legal", "linuxmint_inspirations", "loader", "location",
+    "logging", "media", "memory", "microphone", "ml", "mm", "monitor", "monitoring",
+    "net", "network", "networking", "nim", "nlp", "notification", "observability", "obsoletion", "onboarding",
+    "open_source_obsoletion", "open_source_os_gap_closure", "orchestration", "package", "performance", "phase_l_plans", "pillars", "pledge", "plugin", "power", "print", "printing", "privacy",
+    "process", "productivity", "provisioning", "recovery", "release", "remote", "resilience", "resource",
+    "robotics", "rt", "runtime", "saver", "scheduler", "scientific", "secure", "security", "sensor",
+    "shell", "sigma-boot", "sigma_sandbox", "sigma_validation", "signal", "sigpkg", "slab", "smartcard", "sovereign_wiki_master_engine", "storage",
+    "subsystem_sync", "super_matrix", "support", "syscall", "system", "tech_media_reexports", "telemetry", "testing", "theming", "thermal", "thread", "time",
+    "timeline_innovations", "timer", "toolchain", "tools", "touchscreen", "tpm", "tracing", "ui", "unimplemented_features", "unimplemented_tools", "universal_distro_super_matrix", "update",
+    "usb", "userland", "userspace", "vfs", "virt", "virtualization", "vm", "wiki", "wiki_distro_ideas_deployment", "wiki_ideas", "wiki_unimplemented_ideas", "wireless", "workflow",
+    "zig",
+];
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DistroSubsystemMode {
     LinuxArch,
@@ -1134,29 +1156,7 @@ impl SovereignUniversalDistroBridge {
     }
 
     pub fn verify_all_subsystems_compatibility_matrix(&mut self) -> bool {
-        let subsystems = [
-            "access", "accessibility", "ai", "app", "arch", "arch_kernel", "audio", "audit", "auth",
-            "automation", "backup", "bin", "bluetooth", "boot", "buddy", "buildfarm", "camera", "cloud",
-            "cluster", "community", "compatibility", "compiler", "compliance", "compositor", "compression", "config", "container",
-            "containers", "core", "crash", "crypto", "customization", "dashboard", "debugger", "desktop",
-            "dev", "device", "diagnostics", "display", "distro", "distro_innovations", "distro_inspirations", "docs", "driver", "drivers", "ecosystem",
-            "edge", "education", "embedded", "event", "expanded_wiki_innovations", "extended_distro_matrix", "filesystem", "finance", "fingerprint", "firewall", "fs",
-            "functions", "futuristic", "futuristic_modules", "gamepad", "gap_closure", "governance", "gpu", "graphics", "hal", "hardware", "i18n", "init",
-            "innovation", "input", "installer", "integration", "interop_gateway", "interrupt", "iot", "ipc", "iso",
-            "kernel", "klib", "lang", "launch_ready", "launcher", "legal", "linuxmint_inspirations", "loader", "location",
-            "logging", "media", "memory", "microphone", "ml", "mm", "monitor", "monitoring",
-            "net", "network", "networking", "nim", "nlp", "notification", "observability", "obsoletion", "onboarding",
-            "open_source_obsoletion", "open_source_os_gap_closure", "orchestration", "package", "performance", "phase_l_plans", "pillars", "pledge", "plugin", "power", "print", "printing", "privacy",
-            "process", "productivity", "provisioning", "recovery", "release", "remote", "resilience", "resource",
-            "robotics", "rt", "runtime", "saver", "scheduler", "scientific", "secure", "security", "sensor",
-            "shell", "sigma-boot", "sigma_sandbox", "sigma_validation", "signal", "sigpkg", "slab", "smartcard", "sovereign_wiki_master_engine", "storage",
-            "subsystem_sync", "super_matrix", "support", "syscall", "system", "tech_media_reexports", "telemetry", "testing", "theming", "thermal", "thread", "time",
-            "timeline_innovations", "timer", "toolchain", "tools", "touchscreen", "tpm", "tracing", "ui", "unimplemented_features", "unimplemented_tools", "universal_distro_super_matrix", "update",
-            "usb", "userland", "userspace", "vfs", "virt", "virtualization", "vm", "wiki", "wiki_distro_ideas_deployment", "wiki_ideas", "wiki_unimplemented_ideas", "wireless", "workflow",
-            "zig",
-        ];
-
-        for sub in subsystems {
+        for &sub in ALL_DISTRO_SUBSYSTEMS {
             if let Err(e) = self.dispatch_cross_subsystem_operation(sub, "/tmp/test_action") {
                 println!("Subsystem '{}' failed under distro mode '{:?}': {}", sub, self.mode, e);
                 return false;
@@ -1224,30 +1224,8 @@ impl SovereignUniversalDistroBridge {
     }
 
     pub fn synchronize_all_distro_subsystems(&mut self) -> Result<usize, &'static str> {
-        let subsystems = [
-            "access", "accessibility", "ai", "app", "arch", "arch_kernel", "audio", "audit", "auth",
-            "automation", "backup", "bin", "bluetooth", "boot", "buddy", "buildfarm", "camera", "cloud",
-            "cluster", "community", "compatibility", "compiler", "compliance", "compositor", "compression", "config", "container",
-            "containers", "core", "crash", "crypto", "customization", "dashboard", "debugger", "desktop",
-            "dev", "device", "diagnostics", "display", "distro", "distro_innovations", "distro_inspirations", "docs", "driver", "drivers", "ecosystem",
-            "edge", "education", "embedded", "event", "expanded_wiki_innovations", "extended_distro_matrix", "filesystem", "finance", "fingerprint", "firewall", "fs",
-            "functions", "futuristic", "futuristic_modules", "gamepad", "gap_closure", "governance", "gpu", "graphics", "hal", "hardware", "i18n", "init",
-            "innovation", "input", "installer", "integration", "interop_gateway", "interrupt", "iot", "ipc", "iso",
-            "kernel", "klib", "lang", "launch_ready", "launcher", "legal", "linuxmint_inspirations", "loader", "location",
-            "logging", "media", "memory", "microphone", "ml", "mm", "monitor", "monitoring",
-            "net", "network", "networking", "nim", "nlp", "notification", "observability", "obsoletion", "onboarding",
-            "open_source_obsoletion", "open_source_os_gap_closure", "orchestration", "package", "performance", "phase_l_plans", "pillars", "pledge", "plugin", "power", "print", "printing", "privacy",
-            "process", "productivity", "provisioning", "recovery", "release", "remote", "resilience", "resource",
-            "robotics", "rt", "runtime", "saver", "scheduler", "scientific", "secure", "security", "sensor",
-            "shell", "sigma-boot", "sigma_sandbox", "sigma_validation", "signal", "sigpkg", "slab", "smartcard", "storage",
-            "support", "syscall", "system", "tech_media_reexports", "telemetry", "testing", "theming", "thermal", "thread", "time",
-            "timeline_innovations", "timer", "toolchain", "tools", "touchscreen", "tpm", "tracing", "ui", "update",
-            "usb", "userland", "userspace", "vfs", "virt", "virtualization", "vm", "wiki", "wiki_distro_ideas_deployment", "wireless", "workflow",
-            "zig",
-        ];
-
         let mut count = 0;
-        for sub in subsystems {
+        for &sub in ALL_DISTRO_SUBSYSTEMS {
             if self.dispatch_cross_subsystem_operation(sub, "sync_state").is_ok() {
                 count += 1;
             }
@@ -1257,25 +1235,7 @@ impl SovereignUniversalDistroBridge {
 
     pub fn query_all_subsystem_capabilities(&self) -> Vec<(&'static str, bool, ServiceSupervisorType)> {
         let supervisor = self.get_supervisor_type();
-        let subsystems = [
-            "access", "accessibility", "ai", "app", "arch", "arch_kernel", "audio", "audit", "auth",
-            "automation", "backup", "bin", "bluetooth", "boot", "buddy", "buildfarm", "camera", "cloud",
-            "cluster", "community", "compatibility", "compiler", "compliance", "compositor", "compression", "config", "container",
-            "core", "crash", "crypto", "customization", "dashboard", "debugger", "desktop", "dev", "device", "diagnostics",
-            "display", "distro", "distro_innovations", "distro_inspirations", "docs", "driver", "drivers", "ecosystem", "edge", "education", "embedded", "event",
-            "expanded_wiki_innovations", "extended_distro_matrix", "filesystem", "finance", "fingerprint", "firewall", "functions", "futuristic", "gamepad", "gap_closure", "governance",
-            "gpu", "graphics", "hal", "hardware", "i18n", "init", "innovation", "input", "installer", "integration",
-            "interrupt", "iot", "ipc", "iso", "kernel", "klib", "lang", "launch_ready", "launcher", "legal", "linuxmint_inspirations", "loader",
-            "location", "logging", "media", "memory", "microphone", "ml", "mm", "monitor", "monitoring", "net",
-            "network", "networking", "nim", "nlp", "notification", "observability", "obsoletion", "onboarding", "orchestration",
-            "package", "performance", "phase_l_plans", "pillars", "pledge", "plugin", "power", "print", "printing", "privacy", "process", "productivity",
-            "provisioning", "recovery", "release", "remote", "resilience", "resource", "robotics", "rt", "runtime", "saver",
-            "scheduler", "scientific", "secure", "security", "sensor", "shell", "signal", "sigpkg", "slab", "smartcard", "storage",
-            "support", "syscall", "system", "tech_media_reexports", "telemetry", "testing", "theming", "thermal", "thread", "time", "timeline_innovations", "timer", "toolchain",
-            "tools", "touchscreen", "tpm", "tracing", "ui", "update", "usb", "userland", "vfs", "virtualization", "wiki", "wiki_distro_ideas_deployment",
-            "wireless", "workflow", "zig",
-        ];
-        subsystems.iter().map(|&s| (s, true, supervisor)).collect()
+        ALL_DISTRO_SUBSYSTEMS.iter().map(|&s| (s, true, supervisor)).collect()
     }
 
     pub fn cross_distro_subsystem_sync(&mut self, target_distro: DistroSubsystemMode) -> Result<usize, &'static str> {
@@ -1778,18 +1738,19 @@ impl OpenBSDUnveil {
             path.to_string()
         };
 
-        // Find the best matching prefix
-        let mut best_match: Option<&str> = None;
+        // Find the best matching prefix (track best_len to avoid option unwrap in loop)
+        let mut best_len: usize = 0;
         let mut best_perms: Option<&str> = None;
 
         for (unveiled_path, perms) in &self.mappings {
+            let u_len = unveiled_path.len();
             if cleaned_path == *unveiled_path
                 || (cleaned_path.starts_with(unveiled_path)
                     && (unveiled_path == "/"
-                        || cleaned_path.as_bytes().get(unveiled_path.len()) == Some(&b'/')))
+                        || cleaned_path.as_bytes().get(u_len) == Some(&b'/')))
             {
-                if best_match.is_none() || unveiled_path.len() > best_match.unwrap().len() {
-                    best_match = Some(unveiled_path);
+                if best_perms.is_none() || u_len > best_len {
+                    best_len = u_len;
                     best_perms = Some(perms);
                 }
             }
@@ -2402,8 +2363,7 @@ mod subsystem_interop_tests {
     fn test_cross_distro_subsystem_sync() {
         let mut gateway = LinuxBsdDistroSubsystemInteroperabilityGateway::new(DistroSubsystemMode::LinuxArch);
         let synced = gateway.cross_distro_subsystem_sync(DistroSubsystemMode::FreeBsd).unwrap();
-        assert!(synced >= 150);
-        assert!(synced >= 158);
+        assert_eq!(synced, ALL_DISTRO_SUBSYSTEMS.len());
         assert_eq!(gateway.active_distro_mode, DistroSubsystemMode::FreeBsd);
 
         let caps = gateway.query_all_subsystem_capabilities();
@@ -2602,20 +2562,17 @@ impl SovereignLandlockLsm {
         }
 
         let mut best_match: Option<&LandlockRule> = None;
+        let mut best_len: usize = 0;
 
         for rule in &self.rules {
+            let r_len = rule.path.len();
             if path == rule.path
                 || (path.starts_with(&rule.path)
-                    && (rule.path == "/" || path.as_bytes().get(rule.path.len()) == Some(&b'/')))
+                    && (rule.path == "/" || path.as_bytes().get(r_len) == Some(&b'/')))
             {
-                match best_match {
-                    Some(best) if rule.path.len() > best.path.len() => {
-                        best_match = Some(rule);
-                    }
-                    None => {
-                        best_match = Some(rule);
-                    }
-                    _ => {}
+                if best_match.is_none() || r_len > best_len {
+                    best_len = r_len;
+                    best_match = Some(rule);
                 }
             }
         }
@@ -2831,8 +2788,7 @@ mod cross_subsystem_tests {
 
         let sync_count = orchestrator.synchronize_subsystem_pipeline();
         assert!(sync_count.is_ok());
-        assert_eq!(sync_count.unwrap(), 174);
-        assert_eq!(sync_count.unwrap(), 158);
+        assert_eq!(sync_count.unwrap(), ALL_DISTRO_SUBSYSTEMS.len());
 
         let (supervisor, pkg_spec, vfs_etc, compatible) = orchestrator.query_subsystem_capabilities();
         assert_eq!(supervisor, ServiceSupervisorType::Smf);
@@ -2878,10 +2834,8 @@ mod cross_subsystem_tests {
     fn test_linux_bsd_interoperability_gateway_matrix_and_sync() {
         let mut gateway = LinuxBsdDistroSubsystemInteroperabilityGateway::new(DistroSubsystemMode::LinuxArch);
         let count = gateway.synchronize_and_audit_all_subsystems().unwrap();
-        assert_eq!(count, 174);
-        assert_eq!(gateway.audited_subsystems_count, 174);
-        assert_eq!(count, 158);
-        assert_eq!(gateway.audited_subsystems_count, 158);
+        assert_eq!(count, ALL_DISTRO_SUBSYSTEMS.len());
+        assert_eq!(gateway.audited_subsystems_count, ALL_DISTRO_SUBSYSTEMS.len());
 
         let res = gateway.orchestrate_subsystem("kernel", "sched_task");
         assert!(res.is_ok());
@@ -2889,8 +2843,8 @@ mod cross_subsystem_tests {
 
         gateway.set_distro_mode(DistroSubsystemMode::FreeBsd);
         let count_bsd = gateway.synchronize_and_audit_all_subsystems().unwrap();
-        assert_eq!(count_bsd, 174);
-        assert_eq!(count_bsd, 158);
+        assert_eq!(count_bsd, ALL_DISTRO_SUBSYSTEMS.len());
+        assert_eq!(gateway.audited_subsystems_count, ALL_DISTRO_SUBSYSTEMS.len());
 
         let (supervisor, pkg_spec, vfs_etc, compatible) = gateway.query_gateway_capability_matrix();
         assert_eq!(supervisor, ServiceSupervisorType::OpenRC);
