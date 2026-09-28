@@ -29,3 +29,4 @@ __pycache__/
 /tests/sigma_test_runner
 *.png
 target/
+wiki_repo/
