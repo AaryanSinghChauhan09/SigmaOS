@@ -1,6 +1,11 @@
 // SigmaOS Security Subsystem
 pub mod capability;
 pub mod hardware_privilege;
+pub mod hardware_device_permissioning;
+pub use hardware_device_permissioning::{
+    DeviceAccessRequest, DeviceCategory, DeviceForwardingMap, DevicePermissionState,
+    SovereignHardwareDevicePermissioningEngine,
+};
 pub mod pqc_enclave;
 pub mod governance;
 pub mod audit;
