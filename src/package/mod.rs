@@ -24,6 +24,8 @@ pub mod checkupdates;
 pub mod debian;
 pub mod debian_apt;
 pub mod debian_translator;
+pub mod declarative_app;
+pub use declarative_app::*;
 pub mod dependency_graph;
 pub mod dependency_resolver;
 pub mod fedora_dnf;

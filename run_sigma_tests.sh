@@ -256,6 +256,13 @@ if [ -f "src/distro/arch_missing_components.rs" ]; then
     ./build/arch_missing_test
 fi
 
+if [ -f "src/package/declarative_app.rs" ]; then
+    echo "Running Declarative App & Sigmactl App Manager Engine test suite..."
+    mkdir -p build
+    rustc --test src/package/declarative_app.rs --edition=2021 -o build/declarative_app_test
+    ./build/declarative_app_test
+fi
+
 if [ -f "src/package/universal.rs" ]; then
     echo "Running Universal Package Manager multi-distro test suite..."
     mkdir -p build
