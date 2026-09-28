@@ -44,7 +44,8 @@ pub mod security;
 pub mod shell;
 pub mod sigpkg;
 pub use package::{
-    SovereignUniversalPackageFormatMasterEngine, UniversalPackageFormatKind,
+    SovereignDistroPackageAdvancementsSuiteV8, SovereignUniversalPackageFormatMasterEngine,
+    UniversalPackageFormatKind,
 };
 pub use sigpkg::{
     SovereignUniversalPackageManagerInteropEngine, SovereignUniversalPackageTranslationBridge,
