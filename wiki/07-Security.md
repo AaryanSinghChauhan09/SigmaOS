@@ -244,6 +244,39 @@ sigboot enroll-key /path/to/key.der
 sigboot verify
 ```
 
+## Bluetooth GATT
+
+### GATT Client
+
+Linux BlueZ-inspired GATT implementation:
+
+```bash
+# Connect to device
+gatt connect "00:11:22:33:44:55" "Test Device"
+
+# Discover services
+gatt discover-services 1
+
+# Discover characteristics
+gatt discover-characteristics 1 1
+
+# Read characteristic
+gatt read 1 1
+
+# Write characteristic
+gatt write 1 1 "data"
+
+# Disconnect
+gatt disconnect 1
+```
+
+### GATT Operations
+
+- **Service Discovery**: Discover available services
+- **Characteristic Discovery**: Discover service characteristics
+- **Read**: Read characteristic value
+- **Write**: Write characteristic value
+
 ## Next Steps
 
 - [Desktop](08-Desktop.md) - Desktop security settings

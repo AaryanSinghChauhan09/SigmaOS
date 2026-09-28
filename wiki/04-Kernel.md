@@ -229,6 +229,70 @@ echo 1 > /proc/sys/kernel/sysrq
 echo t > /proc/sysrq-trigger
 ```
 
+## Linux-Compatible Syscalls
+
+### Syscall Compatibility
+
+Linux syscall compatibility layer:
+
+```bash
+# Use Linux syscalls directly
+# via compatibility layer
+
+# Standard Linux syscalls supported:
+# - read, write, open, close
+# - fork, clone, execve, exit
+# - mkdir, rmdir, unlink, chmod
+# - getpid, getppid
+# - And many more
+```
+
+## Process Descriptors
+
+### Pidfd/Procdesc
+
+Linux pidfd and FreeBSD Capsicum procdesc integration:
+
+```bash
+# Open pidfd for process
+pidfd_open pid > /proc/self/fd/3
+
+# Send signal via pidfd
+pidfd_send_signal 3 SIGTERM
+
+# Get file descriptor from process
+pidfd_getfd 3 4
+```
+
+### Subreaper
+
+Orphan process containment:
+
+```bash
+# Set process as subreaper
+prctl --set-child-subreaper 1
+
+# Reparent orphans
+# Automatically handled by kernel
+```
+
+## Control Flow Integrity
+
+### CFI Engine
+
+Forward-edge CFI for control flow hijacking prevention:
+
+```bash
+# Register CFI target
+cfi register 0x1000 function_name
+
+# Validate indirect call
+cfi validate 0x2000 0x1000
+
+# View violations
+cfi violations
+```
+
 ## Next Steps
 
 - [Filesystems](05-Filesystems.md) - Filesystem management

@@ -175,6 +175,70 @@ sigma-a11y enable sticky-keys
 sigma-a11y enable slow-keys
 ```
 
+## Tiling Window Manager
+
+### Tiling Layouts
+
+COSMIC-inspired safe multi-threaded tiling:
+
+```bash
+# Create workspace
+tiling create-workspace "1" spiral
+
+# Add window to workspace
+tiling add-window 1 0 0 800 600
+
+# Switch layout
+tiling set-layout 1 grid
+
+# Switch workspace
+tiling switch-workspace 2
+```
+
+### Layout Types
+
+Available tiling layouts:
+- **Spiral**: Spiral arrangement of windows
+- **Monocle**: Single focused window fullscreen
+- **Columns**: Vertical column layout
+- **Rows**: Horizontal row layout
+- **Grid**: Grid-based layout
+
+## Gamepad Input
+
+### Gamepad Support
+
+Linux evdev and Xbox controller support:
+
+```bash
+# Register gamepad
+gamepad register "Xbox Controller" 0x045e 0x028e
+
+# Handle button press
+gamepad button-press 1 A
+
+# Handle button release
+gamepad button-release 1 A
+
+# Handle axis movement
+gamepad axis-move 1 LeftStickX 100
+
+# Get button state
+gamepad get-button 1 A
+
+# Get axis value
+gamepad get-axis 1 LeftStickX
+```
+
+### Supported Buttons
+
+- A, B, X, Y
+- Left/Right Bumper
+- Left/Right Trigger
+- Back, Start
+- Left/Right Stick
+- D-Pad (Up, Down, Left, Right)
+
 ## Next Steps
 
 - [Packaging](09-Packaging.md) - Package management
