@@ -219,7 +219,7 @@ impl WiFiManager {
     }
 
     pub fn connect(&mut self, ssid: &str) -> Result<(), WirelessError> {
-        if let Some(profile) = self.profiles.iter().find(|p| p.ssid == ssid) {
+        if let Some(_profile) = self.profiles.iter().find(|p| p.ssid == ssid) {
             self.state = WiFiState::Connecting;
             self.current_network = Some(ssid.to_string());
             self.state = WiFiState::Connected;
@@ -234,7 +234,7 @@ impl WiFiManager {
         self.current_network = None;
     }
 
-    pub fn create_hotspot(&mut self, ssid: &str, password: &str) -> Result<(), WirelessError> {
+    pub fn create_hotspot(&mut self, _ssid: &str, _password: &str) -> Result<(), WirelessError> {
         // Create WiFi hotspot
         Ok(())
     }

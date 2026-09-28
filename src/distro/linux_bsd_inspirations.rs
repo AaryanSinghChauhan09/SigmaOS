@@ -2364,6 +2364,243 @@ impl Default for LandlockV5NetworkGuard {
     }
 }
 
+// ==========================================
+// 42. NIX FLAKES DECLARATIVE LOCKFILE & INPUTS RESOLUTION ENGINE
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct FlakeInput {
+    pub name: String,
+    pub url: String,
+    pub rev: String,
+    pub is_flake: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct FlakeLockNode {
+    pub key: String,
+    pub inputs: Vec<String>,
+    pub revision: String,
+}
+
+pub struct SovereignNixFlakeEngine {
+    pub inputs: Vec<FlakeInput>,
+    pub lock_nodes: Vec<FlakeLockNode>,
+    pub root_flake_id: String,
+}
+
+impl SovereignNixFlakeEngine {
+    pub fn new(root_flake_id: &str) -> Self {
+        Self {
+            inputs: Vec::new(),
+            lock_nodes: Vec::new(),
+            root_flake_id: root_flake_id.to_string(),
+        }
+    }
+
+    pub fn add_input(&mut self, name: &str, url: &str, rev: &str, is_flake: bool) {
+        self.inputs.push(FlakeInput {
+            name: name.to_string(),
+            url: url.to_string(),
+            rev: rev.to_string(),
+            is_flake,
+        });
+    }
+
+    pub fn lock_flake_input(&mut self, key: &str, inputs: &[&str], revision: &str) {
+        let input_keys = inputs.iter().map(|s| s.to_string()).collect();
+        self.lock_nodes.push(FlakeLockNode {
+            key: key.to_string(),
+            inputs: input_keys,
+            revision: revision.to_string(),
+        });
+    }
+
+    pub fn resolve_flake_closure(&self, start_key: &str) -> Result<Vec<String>, &'static str> {
+        let mut closure = Vec::new();
+        let mut stack = vec![start_key.to_string()];
+
+        while let Some(current) = stack.pop() {
+            if closure.contains(&current) {
+                continue;
+            }
+            closure.push(current.clone());
+
+            if let Some(node) = self.lock_nodes.iter().find(|n| n.key == current) {
+                for input in &node.inputs {
+                    if !closure.contains(input) {
+                        stack.push(input.clone());
+                    }
+                }
+            }
+        }
+
+        Ok(closure)
+    }
+}
+
+impl Default for SovereignNixFlakeEngine {
+    fn default() -> Self {
+        Self::new("root")
+    }
+}
+
+// ==========================================
+// 43. FREEBSD CAPSICUM PROT_EXEC MEMORY RIGHTS GUARD
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CapsicumMemoryRights {
+    pub cap_mmap_read: bool,
+    pub cap_mmap_write: bool,
+    pub cap_mmap_exec: bool,
+    pub in_capability_mode: bool,
+}
+
+pub struct SovereignCapsicumProtExecGuard {
+    pub fd_rights: Vec<(i32, CapsicumMemoryRights)>,
+    pub violations: Vec<String>,
+}
+
+impl SovereignCapsicumProtExecGuard {
+    pub fn new() -> Self {
+        Self {
+            fd_rights: Vec::new(),
+            violations: Vec::new(),
+        }
+    }
+
+    pub fn register_fd_rights(&mut self, fd: i32, read: bool, write: bool, exec: bool) {
+        let rights = CapsicumMemoryRights {
+            cap_mmap_read: read,
+            cap_mmap_write: write,
+            cap_mmap_exec: exec,
+            in_capability_mode: true,
+        };
+        self.fd_rights.push((fd, rights));
+    }
+
+    pub fn validate_mmap_prot_exec(&mut self, fd: i32, prot_exec: bool) -> Result<(), &'static str> {
+        if let Some((_, rights)) = self.fd_rights.iter().find(|(f, _)| *f == fd) {
+            if prot_exec && !rights.cap_mmap_exec {
+                let msg = format!("Capsicum Violation: PROT_EXEC mmap denied for FD {}", fd);
+                self.violations.push(msg);
+                return Err("Capsicum PROT_EXEC Violation");
+            }
+        }
+        Ok(())
+    }
+}
+
+impl Default for SovereignCapsicumProtExecGuard {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 44. CACHYOS eBPF BORE SCHEDULER INTERACTIVE LATENCY PREDICTOR
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct LatencyPredictionSample {
+    pub task_id: u64,
+    pub historical_burst_ns: Vec<u64>,
+    pub predicted_latency_ns: u64,
+}
+
+pub struct SovereignBoreLatencyPredictor {
+    pub samples: Vec<LatencyPredictionSample>,
+}
+
+impl SovereignBoreLatencyPredictor {
+    pub fn new() -> Self {
+        Self {
+            samples: Vec::new(),
+        }
+    }
+
+    pub fn record_task_burst(&mut self, task_id: u64, burst_ns: u64) {
+        if let Some(sample) = self.samples.iter_mut().find(|s| s.task_id == task_id) {
+            sample.historical_burst_ns.push(burst_ns);
+            let avg: u64 = sample.historical_burst_ns.iter().sum::<u64>() / (sample.historical_burst_ns.len() as u64);
+            sample.predicted_latency_ns = avg;
+        } else {
+            self.samples.push(LatencyPredictionSample {
+                task_id,
+                historical_burst_ns: vec![burst_ns],
+                predicted_latency_ns: burst_ns,
+            });
+        }
+    }
+
+    pub fn predict_interactive_quantum(&self, task_id: u64, base_quantum_ns: u64) -> u64 {
+        if let Some(sample) = self.samples.iter().find(|s| s.task_id == task_id) {
+            if sample.predicted_latency_ns < 2_000_000 {
+                base_quantum_ns / 2
+            } else {
+                base_quantum_ns * 2
+            }
+        } else {
+            base_quantum_ns
+        }
+    }
+}
+
+impl Default for SovereignBoreLatencyPredictor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
+mod open_source_innovations_tests {
+    use super::*;
+
+    #[test]
+    fn test_sovereign_nix_flake_engine() {
+        let mut engine = SovereignNixFlakeEngine::new("my-system-flake");
+        engine.add_input("nixpkgs", "github:NixOS/nixpkgs/nixos-unstable", "rev123", true);
+        engine.add_input("home-manager", "github:nix-community/home-manager", "rev456", true);
+
+        engine.lock_flake_input("my-system-flake", &["nixpkgs", "home-manager"], "lock-rev1");
+        engine.lock_flake_input("home-manager", &["nixpkgs"], "lock-rev2");
+        engine.lock_flake_input("nixpkgs", &[], "lock-rev3");
+
+        let closure = engine.resolve_flake_closure("my-system-flake").unwrap();
+        assert!(closure.contains(&"my-system-flake".to_string()));
+        assert!(closure.contains(&"nixpkgs".to_string()));
+        assert!(closure.contains(&"home-manager".to_string()));
+    }
+
+    #[test]
+    fn test_sovereign_capsicum_prot_exec_guard() {
+        let mut guard = SovereignCapsicumProtExecGuard::new();
+        guard.register_fd_rights(10, true, true, false); // No PROT_EXEC right
+        guard.register_fd_rights(11, true, false, true); // Has PROT_EXEC right
+
+        assert!(guard.validate_mmap_prot_exec(10, false).is_ok());
+        assert!(guard.validate_mmap_prot_exec(10, true).is_err());
+        assert_eq!(guard.violations.len(), 1);
+
+        assert!(guard.validate_mmap_prot_exec(11, true).is_ok());
+    }
+
+    #[test]
+    fn test_sovereign_bore_latency_predictor() {
+        let mut predictor = SovereignBoreLatencyPredictor::new();
+        predictor.record_task_burst(100, 1_000_000); // 1ms fast interactive task
+        predictor.record_task_burst(100, 1_500_000); // 1.5ms avg
+
+        let q1 = predictor.predict_interactive_quantum(100, 10_000_000);
+        assert_eq!(q1, 5_000_000); // reduced quantum for interactive response
+
+        predictor.record_task_burst(200, 20_000_000); // batch task
+        let q2 = predictor.predict_interactive_quantum(200, 10_000_000);
+        assert_eq!(q2, 20_000_000); // increased quantum for throughput
+    }
+}
+
 #[cfg(test)]
 mod subsystem_interop_tests {
     use super::*;
@@ -2832,7 +3069,6 @@ mod cross_subsystem_tests {
         let sync_count = orchestrator.synchronize_subsystem_pipeline();
         assert!(sync_count.is_ok());
         assert_eq!(sync_count.unwrap(), 174);
-        assert_eq!(sync_count.unwrap(), 158);
 
         let (supervisor, pkg_spec, vfs_etc, compatible) = orchestrator.query_subsystem_capabilities();
         assert_eq!(supervisor, ServiceSupervisorType::Smf);
@@ -2880,8 +3116,6 @@ mod cross_subsystem_tests {
         let count = gateway.synchronize_and_audit_all_subsystems().unwrap();
         assert_eq!(count, 174);
         assert_eq!(gateway.audited_subsystems_count, 174);
-        assert_eq!(count, 158);
-        assert_eq!(gateway.audited_subsystems_count, 158);
 
         let res = gateway.orchestrate_subsystem("kernel", "sched_task");
         assert!(res.is_ok());
@@ -2890,7 +3124,6 @@ mod cross_subsystem_tests {
         gateway.set_distro_mode(DistroSubsystemMode::FreeBsd);
         let count_bsd = gateway.synchronize_and_audit_all_subsystems().unwrap();
         assert_eq!(count_bsd, 174);
-        assert_eq!(count_bsd, 158);
 
         let (supervisor, pkg_spec, vfs_etc, compatible) = gateway.query_gateway_capability_matrix();
         assert_eq!(supervisor, ServiceSupervisorType::OpenRC);

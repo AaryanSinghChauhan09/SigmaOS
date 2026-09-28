@@ -144,26 +144,21 @@ pub enum LinuxSyscallNumber {
     SchedGetparam = 145,
     SchedSetattr = 146,
     SchedGetattr = 147,
-    SchedYield = 148,
     SchedGetPriorityMax = 149,
     SchedSetpriority = 150,
-    Mlock = 150,
-    Munlock = 151,
-    Mlockall = 152,
-    Munlockall = 153,
-    Vhangup = 154,
-    PivotRoot = 155,
+    Mlock = 151,
+    Munlock = 152,
+    Mlockall = 153,
+    Munlockall = 154,
+    Vhangup = 155,
+    PivotRoot = 156,
     Prctl = 157,
-    ArchPrctl = 165,
+    ArchPrctl = 158,
     Adjtimex = 159,
     Settimeofday = 164,
-    Getpid = 172,
-    Getppid = 173,
-    Getpgid = 174,
     Mount = 165,
     Umount = 166,
     Setdomainname = 171,
-    Uname = 160,
 }
 
 /// Linux file open flags
@@ -227,7 +222,7 @@ impl LinuxFdTable {
     }
 
     /// Allocate a new file descriptor
-    pub fn allocate(&self, path: String, flags: LinuxOpenFlags) -> u64 {
+    pub fn allocate(&mut self, path: String, flags: LinuxOpenFlags) -> u64 {
         let fd = self.next_fd.fetch_add(1, Ordering::SeqCst);
         let entry = LinuxFdEntry {
             fd,
@@ -297,7 +292,7 @@ impl LinuxProcessTable {
     }
 
     /// Create a new process
-    pub fn create(&self, ppid: u64, name: String) -> u64 {
+    pub fn create(&mut self, ppid: u64, name: String) -> u64 {
         let pid = self.next_pid.fetch_add(1, Ordering::SeqCst);
         let process = LinuxProcess {
             pid,
@@ -360,7 +355,7 @@ impl LinuxSyscallDispatcher {
     }
 
     /// Dispatch a Linux syscall
-    pub fn dispatch(&self, syscall_num: u64, args: &[u64]) -> Result<u64, &'static str> {
+    pub fn dispatch(&mut self, syscall_num: u64, args: &[u64]) -> Result<u64, &'static str> {
         self.syscall_count.fetch_add(1, Ordering::SeqCst);
 
         match syscall_num {
@@ -524,7 +519,7 @@ mod tests {
 
     #[test]
     fn test_fd_table() {
-        let table = LinuxFdTable::new();
+        let mut table = LinuxFdTable::new();
         let path = "/tmp/test".to_string();
         let flags = LinuxOpenFlags::from_u32(0x02);
         
@@ -538,7 +533,7 @@ mod tests {
 
     #[test]
     fn test_process_table() {
-        let table = LinuxProcessTable::new();
+        let mut table = LinuxProcessTable::new();
         let pid = table.create(0, "test".to_string());
         
         assert_eq!(pid, 1);
@@ -549,7 +544,7 @@ mod tests {
 
     #[test]
     fn test_syscall_dispatcher() {
-        let dispatcher = LinuxSyscallDispatcher::new();
+        let mut dispatcher = LinuxSyscallDispatcher::new();
         
         // Test getpid
         let pid = dispatcher.dispatch(LinuxSyscallNumber::Getpid as u64, &[]).unwrap();
@@ -568,7 +563,7 @@ mod tests {
 
     #[test]
     fn test_syscall_count() {
-        let dispatcher = LinuxSyscallDispatcher::new();
+        let mut dispatcher = LinuxSyscallDispatcher::new();
         
         dispatcher.dispatch(LinuxSyscallNumber::Getpid as u64, &[]).unwrap();
         dispatcher.dispatch(LinuxSyscallNumber::Getppid as u64, &[]).unwrap();

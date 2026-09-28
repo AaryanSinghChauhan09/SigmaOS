@@ -189,7 +189,6 @@ impl Phone {
 
 /// IRQ registration for interrupt-driven notifications
 #[repr(C)]
-#[derive(Debug, Clone)]
 pub struct IrqRegistration {
     pub irq: IrqNumber,
     pub answerbox_id: AnswerboxId,
@@ -443,7 +442,7 @@ impl HelenIpcManager {
 
         // Also add to answerbox's registered IRQs
         if let Some(answerbox) = self.answerboxes.get_mut(&answerbox_id) {
-            answerbox.registered_irqs.push(registration.clone());
+            answerbox.registered_irqs.push(IrqRegistration::new(irq, answerbox_id));
             Ok(())
         } else {
             Err(HelenIpcError::AnswerboxNotFound)
@@ -557,26 +556,29 @@ impl HelenIpcManager {
         }
 
         // Disconnect from notification channels
-        if let Some(answerbox) = self.answerboxes.values_mut().find(|a| a.task_id == task_id) {
-            for irq_reg in &answerbox.registered_irqs {
-                let _ = self.unregister_irq(irq_reg.irq);
-            }
-            answerbox.registered_irqs.clear();
+        let irqs_to_unregister: Vec<IrqNumber> = if let Some(answerbox) = self.answerboxes.values().find(|a| a.task_id == task_id) {
+            answerbox.registered_irqs.iter().map(|r| r.irq).collect()
+        } else {
+            Vec::new()
+        };
+        for irq in irqs_to_unregister {
+            let _ = self.unregister_irq(irq);
         }
 
         // Answer all unanswered messages with error
+        let mut dispatched_to_answer: Vec<HelenMessage> = Vec::new();
         if let Some(answerbox) = self.answerboxes.values_mut().find(|a| a.task_id == task_id) {
-            for mut msg in answerbox.dispatched_queue.drain(..) {
-                msg.method = 0xFFFFFFFFFFFFFFFE; // Error code
-                if let Some(phone) = self.phones.get(&msg.phone_id) {
-                    if let Some(origin_answerbox_id) = phone.connected_answerbox {
-                        if let Some(origin_answerbox) = self.answerboxes.get_mut(&origin_answerbox_id) {
-                            origin_answerbox.answer_queue.push(msg);
-                        }
+            dispatched_to_answer = answerbox.dispatched_queue.drain(..).collect();
+        }
+        for mut msg in dispatched_to_answer {
+            msg.method = 0xFFFFFFFFFFFFFFFE; // Error code
+            if let Some(phone) = self.phones.get(&msg.phone_id) {
+                if let Some(origin_answerbox_id) = phone.connected_answerbox {
+                    if let Some(origin_answerbox) = self.answerboxes.get_mut(&origin_answerbox_id) {
+                        origin_answerbox.answer_queue.push(msg);
                     }
                 }
             }
-            answerbox.dispatched_queue.clear();
         }
     }
 }

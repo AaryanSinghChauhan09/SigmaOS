@@ -162,7 +162,7 @@ impl InotifyInstance {
         mask: u32,
     ) -> Result<WatchDescriptor, String> {
         // Convert mask to event types
-        let inotify_mask = mask as u32;
+        let _inotify_mask = mask as u32;
         let event_types = InotifyMask::AllEvents.to_event_types();
 
         // Create filter from mask

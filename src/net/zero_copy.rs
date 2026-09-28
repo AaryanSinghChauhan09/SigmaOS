@@ -207,7 +207,7 @@ impl ZeroCopyRingBuffer {
     }
 
     /// Enqueue a packet
-    pub fn enqueue(&self, packet: ZeroCopyPacket) -> Result<(), &'static str> {
+    pub fn enqueue(&mut self, packet: ZeroCopyPacket) -> Result<(), &'static str> {
         let tail = self.tail.load(Ordering::SeqCst);
         let head = self.head.load(Ordering::SeqCst);
         
@@ -221,7 +221,7 @@ impl ZeroCopyRingBuffer {
     }
 
     /// Dequeue a packet
-    pub fn dequeue(&self) -> Option<ZeroCopyPacket> {
+    pub fn dequeue(&mut self) -> Option<ZeroCopyPacket> {
         let head = self.head.load(Ordering::SeqCst);
         let tail = self.tail.load(Ordering::SeqCst);
 
@@ -318,7 +318,7 @@ mod tests {
 
     #[test]
     fn test_ring_buffer() {
-        let ring = ZeroCopyRingBuffer::new(8);
+        let mut ring = ZeroCopyRingBuffer::new(8);
         
         let buffer = ZeroCopyBuffer::new(vec![1, 2, 3]);
         let packet = ZeroCopyPacket::new(buffer, 0, 3);
@@ -333,7 +333,7 @@ mod tests {
 
     #[test]
     fn test_ring_buffer_full() {
-        let ring = ZeroCopyRingBuffer::new(2);
+        let mut ring = ZeroCopyRingBuffer::new(2);
         
         let buffer1 = ZeroCopyBuffer::new(vec![1]);
         let packet1 = ZeroCopyPacket::new(buffer1, 0, 1);

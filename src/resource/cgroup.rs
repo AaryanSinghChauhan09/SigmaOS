@@ -145,17 +145,17 @@ impl CgroupManager {
             }
         }
 
-        // Remove from current cgroup if associated with any (use &str lookup to avoid String heap allocations)
-        let mut current_group_name: Option<&str> = None;
+        // Remove from current cgroup if associated with any
+        let mut current_group_name: Option<String> = None;
         for (gname, group) in &self.cgroups {
             if group.pids.contains(&pid) {
-                current_group_name = Some(gname.as_str());
+                current_group_name = Some(gname.clone());
                 break;
             }
         }
 
         if let Some(old_name) = current_group_name {
-            if let Some(group) = self.cgroups.get_mut_str(old_name) {
+            if let Some(group) = self.cgroups.get_mut_str(&old_name) {
                 group.pids.retain(|&p| p != pid);
                 group.usage.pids_count = group.usage.pids_count.saturating_sub(1);
             }
@@ -215,15 +215,15 @@ impl CgroupManager {
         }
 
         if let Some(name) = found_name {
-            let mut curr: Option<&str> = Some(name);
+            let mut curr: Option<String> = Some(String::from(name));
             while let Some(cname) = curr {
-                let parent_ptr = if let Some(group) = self.cgroups.get_mut_str(cname) {
+                let parent_str = if let Some(group) = self.cgroups.get_mut_str(&cname) {
                     group.usage.cpu_usage_ms = group.usage.cpu_usage_ms.saturating_add(duration_ms);
-                    group.parent_name.as_deref()
+                    group.parent_name.clone()
                 } else {
                     None
                 };
-                curr = parent_ptr;
+                curr = parent_str;
             }
             Ok(())
         } else {
@@ -247,29 +247,29 @@ impl CgroupManager {
 
         let name = found_name.unwrap_or("/");
 
-        // Dry run: check if any ancestor group exceeds its limits (using borrowed &str references)
-        let mut curr: Option<&str> = Some(name);
+        // Dry run: check if any ancestor group exceeds its limits
+        let mut curr: Option<String> = Some(String::from(name));
         while let Some(cname) = curr {
-            if let Some(group) = self.cgroups.get_str(cname) {
+            if let Some(group) = self.cgroups.get_str(&cname) {
                 if group.usage.memory_usage_bytes.saturating_add(bytes) > group.limits.memory_max {
                     return Err(CgroupError::LimitExceeded);
                 }
-                curr = group.parent_name.as_deref();
+                curr = group.parent_name.clone();
             } else {
                 break;
             }
         }
 
-        // Apply allocations hierarchically without heap String allocations
-        let mut curr: Option<&str> = Some(name);
+        // Apply allocations hierarchically
+        let mut curr: Option<String> = Some(String::from(name));
         while let Some(cname) = curr {
-            let parent_ptr = if let Some(group) = self.cgroups.get_mut_str(cname) {
+            let parent_str = if let Some(group) = self.cgroups.get_mut_str(&cname) {
                 group.usage.memory_usage_bytes = group.usage.memory_usage_bytes.saturating_add(bytes);
-                group.parent_name.as_deref()
+                group.parent_name.clone()
             } else {
                 None
             };
-            curr = parent_ptr;
+            curr = parent_str;
         }
 
         Ok(())
@@ -287,16 +287,16 @@ impl CgroupManager {
 
         let name = found_name.unwrap_or("/");
 
-        // Release hierarchically using borrowed &str references
-        let mut curr: Option<&str> = Some(name);
+        // Release hierarchically
+        let mut curr: Option<String> = Some(String::from(name));
         while let Some(cname) = curr {
-            let parent_ptr = if let Some(group) = self.cgroups.get_mut_str(cname) {
+            let parent_str = if let Some(group) = self.cgroups.get_mut_str(&cname) {
                 group.usage.memory_usage_bytes = group.usage.memory_usage_bytes.saturating_sub(bytes);
-                group.parent_name.as_deref()
+                group.parent_name.clone()
             } else {
                 None
             };
-            curr = parent_ptr;
+            curr = parent_str;
         }
 
         Ok(())
