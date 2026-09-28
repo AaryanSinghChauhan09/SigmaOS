@@ -19,10 +19,9 @@
 pub mod btrfs;
 // pub mod filesystem;
 pub mod btrfs_send_receive;
-pub mod btree;
 pub mod vfs;
-pub use btree::{BTree, BTreeNode, BTreeKey, BTreeItem, BTreeNodeType};
 pub use btrfs_send_receive::{BtrfsSendOp, BtrfsSendCommand, BtrfsSendStream, BtrfsReceiveContext, BtrfsSubvolume, BtrfsSendReceiveManager};
+pub use btrfs::{BtrfsExtent, BtrfsFilesystem, BtrfsSnapshot, ChecksumType};
 pub mod sigmacas;
 pub mod sigmafs;
 // pub mod support;
@@ -30,10 +29,6 @@ pub mod sigmafs;
 pub mod xfs;
 pub mod fscrypt;
 pub mod autofs;
-
-pub use btrfs::{
-    BtrfsExtent, BtrfsFilesystem, BtrfsSnapshot, ChecksumType,
-};
 pub use sigmacas::{CasBlock, SigmaFsCasEngine, DILITHIUM5_SIGNATURE_SIZE, SHA256_HASH_SIZE};
 pub use sigmafs::{
     AhciSataController, BlockStorageDevice, BlockStorageError, JournalBlock, JournalBlockType,
