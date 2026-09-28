@@ -63,6 +63,7 @@ pub mod roundrobin;
 pub mod sched;
 pub mod scheduler;
 pub mod sysfs;
+pub mod namespaces;
 pub mod structures;
 pub mod virtual_cpu;
 
@@ -185,3 +186,4 @@ pub use procfs_linux::{
     ProcessInfo, ProcFs,
 };
 pub use sysfs::{Sysfs, SysfsKobject, SysfsAttribute, SysfsAttributeType};
+pub use namespaces::{NamespaceManager, Namespace, NamespaceId, NamespaceType, UserNamespace, MountNamespace, PidNamespace, MountPoint};
