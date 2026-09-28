@@ -14,6 +14,7 @@ pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
 pub mod capsicum;
+pub mod pledge_unveil;
 
 // SigmaOS Security Subsystem
 pub mod seccomp;
@@ -165,3 +166,4 @@ pub use capsicum::{
     CapRight, CapMode, CapEntry, CapabilitySandbox,
 };
 pub use memory_protection::{MemoryProtectionManager, MemoryProtectionMode, AslrConfig, StackCanaryConfig};
+pub use pledge_unveil::{PledgePromise as OpenBsdPledgePromise, PledgeSandbox, UnveilPermission, UnveilSandbox, Sandbox};
