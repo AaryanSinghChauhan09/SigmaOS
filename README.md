@@ -345,7 +345,7 @@ SigmaOS provides comprehensive guidelines for AI agents working on various compo
 
 ### Component Agent Documentation
 
-Located in `docs/components/`, each subsystem has specialized guidelines:
+Located in `Agents/`, each subsystem has specialized guidelines:
 
 - **KERNEL_AGENTS.md** - Core kernel subsystems (scheduling, interrupts, syscalls)
 - **MEMORY_AGENTS.md** - Memory management (buddy allocator, slab allocator, paging)
@@ -379,7 +379,30 @@ These agent guidelines enable SigmaOS to continuously improve by:
 - Maintaining zero-dependency philosophy
 - Ensuring security and performance excellence
 
-For detailed agent guidelines, see [AGENTS.md](AGENTS.md) and the component-specific files in [docs/components/](docs/components/).
+For detailed agent guidelines, see [AGENTS.md](AGENTS.md) and the component-specific files in [Agents/](Agents/).
+
+---
+
+
+## 🗺️ Future Development Plan
+
+SigmaOS has a comprehensive 30-month development plan drawing inspiration from Linux, FreeBSD, and OpenBSD distributions. The plan is organized into 10 phases covering kernel subsystems, memory management, networking, filesystems, security, desktop environment, hardware support, package management, virtualization, and development tools.
+
+### Key Focus Areas
+
+- **Phase 1-3**: Kernel enhancements, memory management, networking stack
+- **Phase 4-6**: Filesystems, security hardening, desktop environment
+- **Phase 7-9**: Hardware support, package management, virtualization
+- **Phase 10**: Development tools and profiling
+
+### Open Source Inspiration
+
+Each phase incorporates best practices from:
+- **Linux**: CFS scheduler, io_uring, eBPF, XDP, SELinux, AppArmor
+- **FreeBSD**: Capsicum, Jails, ZFS, GEOM, bhyve, DTrace
+- **OpenBSD**: pledge/unveil, PF, CARP, W^X, LibreSSL
+
+For detailed information, see [FUTURE_DEVELOPMENT_PLAN.md](FUTURE_DEVELOPMENT_PLAN.md).
 
 ---
 
