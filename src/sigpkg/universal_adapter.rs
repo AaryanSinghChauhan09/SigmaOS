@@ -19,23 +19,6 @@ pub use crate::universal_oop_system;
 
 
 
-#[cfg(any(feature = "standalone_test", test))]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Permission {
-    NetworkTcp,
-    NetworkUdp,
-    FileRead,
-    FileWrite,
-    ProcessExec,
-    AudioPlayback,
-    DisplayAccess,
-    Ipc,
-    ProcessControl,
-    Execute,
-}
-
-#[cfg(not(feature = "standalone_test"))]
-pub use crate::security::Permission;
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)
 #[derive(Debug, Clone, PartialEq, Eq)]
