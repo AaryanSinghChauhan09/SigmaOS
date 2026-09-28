@@ -41,7 +41,7 @@ use crate::package::universal::{PackageFormat, UnifiedPackage};
 pub mod universal;
 
 #[cfg(feature = "standalone_test")]
-pub use universal::{PackageError, UnifiedPackage};
+pub use universal::{PackageError, PackageFormat, UnifiedPackage};
 
 // =========================================================================
 // 1. Cross-Distro Manifest Normalizer & DPLL SAT Solver
@@ -66,20 +66,26 @@ impl SovereignUniversalManifestNormalizerSatSolver {
         }
     }
 
-    /// Normalizes foreign dependency package names into canonical SigmaOS capabilities
+    /// Normalizes foreign dependency package names into canonical SigmaOS capabilities.
+    /// Uses zero-allocation ASCII substring window matching (`eq_ignore_ascii_case`)
+    /// to eliminate temporary `String` heap allocations on every dependency resolution loop.
     pub fn normalize_dependency_name(foreign_name: &str) -> String {
-        let lower = foreign_name.to_lowercase();
-        if lower.contains("ssl") || lower.contains("crypto") || lower.contains("tls") {
+        let contains_ic = |sub: &str| -> bool {
+            let sub_b = sub.as_bytes();
+            foreign_name.as_bytes().windows(sub_b.len()).any(|w| w.eq_ignore_ascii_case(sub_b))
+        };
+
+        if contains_ic("ssl") || contains_ic("crypto") || contains_ic("tls") {
             "sovereign-openssl".to_string()
-        } else if lower.contains("libc") || lower == "musl" || lower.contains("glibc") {
+        } else if contains_ic("libc") || foreign_name.eq_ignore_ascii_case("musl") || contains_ic("glibc") {
             "sovereign-libc".to_string()
-        } else if lower.contains("zlib") || lower.contains("zstd") || lower.contains("xz") {
+        } else if contains_ic("zlib") || contains_ic("zstd") || contains_ic("xz") {
             "sovereign-compression".to_string()
-        } else if lower.contains("python") {
+        } else if contains_ic("python") {
             "sovereign-python".to_string()
-        } else if lower.contains("wayland") || lower.contains("x11") || lower.contains("mesa") {
+        } else if contains_ic("wayland") || contains_ic("x11") || contains_ic("mesa") {
             "sovereign-graphics".to_string()
-        } else if lower.contains("curl") || lower.contains("wget") || lower.contains("net") {
+        } else if contains_ic("curl") || contains_ic("wget") || contains_ic("net") {
             "sovereign-network-tools".to_string()
         } else {
             foreign_name.to_string()
