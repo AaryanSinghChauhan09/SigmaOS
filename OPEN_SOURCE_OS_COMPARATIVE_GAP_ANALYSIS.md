@@ -22,9 +22,52 @@ While SigmaOS provides a high-performance bare-metal Rust kernel with modular ab
 | **Module System** | ✅ Loadable Kernel Modules (`kmod`) | ✅ Dynamic Kernel Modules (`kld`) | Static compiled kernel | ❌ Monolithic static binary | ❌ No `kmod` loader |
 | **Device Drivers** | 100,000+ LOC (thousands of devices) | 50,000+ LOC | 40,000+ LOC | ~5-10 drivers (UART, RTC, ATA, xHCI) | ❌ 99% driver gap |
 | **Hardware Permissions** | ✅ udev, logind, Flatpak portals | ✅ devd, MAC policies | ✅ pledge/unveil, bioctl | ❌ Raw root device access only | ❌ Missing portal model |
+| **Desktop & UI** | ✅ GNOME, KDE, COSMIC, Wayland | ✅ KDE, XFCE, Wayland | ✅ Xenocara, cwm | ⚠️ Zenith compositor & TUI stubs | ⚠️ Phase 2 req. |
 | **Atomic Updates & Recovery** | ✅ OSTree, A/B Android, Nix generations | ✅ freebsd-update, ZFS boot environments | ✅ syspatch, signify | ⚠️ sigpkg SAT & A/B stubs | ⚠️ Partial / Stubs |
 | **Build Foundation & Purity** | Monolithic C / musl / glibc | Monolithic C / libc | Monolithic C / libc | `#![no_std]` Rust / 0 external deps | ⚠️ Unification Sprint Req. |
 | **Security Hardening** | Multi-LSM (SELinux, AppArmor, Landlock) | MAC Framework, Capsicum | Pledge, Unveil, KARL, W^X | Framework stubs & rule engines | ⚠️ Validation only |
+
+---
+
+## 🎨 Phase 2 — User Interface & Zenith Desktop Environment Gap Analysis (Months 2–3)
+
+### Goal & Parity Objectives
+Complete the desktop environment with unified system configuration, desktop panel widgets, file management, and a notification daemon.
+
+```
++-----------------------------------------------------------------------------------+
+|                            ZENITH UNIFIED COMPOSITOR                              |
+|   (Direct Bare-Metal Graphics / Zero X11/Wayland Architectural Dependencies)       |
++-----------------------------------------------------------------------------------+
+|  [Settings Panel]     [File Manager]       [Panel & System Tray]  [Notification Daemon] |
+|  Display, Keys, Theme  Browse, Copy, Delete Clock, Volume, Battery  Popups & Actions    |
++-----------------------------------------------------------------------------------+
+```
+
+### 1. Settings Panel Applet (Estimated: 3 Weeks)
+- **Display Configuration UI**: Resolution selection, refresh rate, HiDPI scaling factor, and multi-monitor display layout mapping.
+- **Keyboard Shortcuts Editor**: Dynamic Hyprland-inspired keybinding remapper, chorded sequence binding, and typematic delay/repeat rate configuration.
+- **Theme Switcher**: Live Omakase theme palette switcher (TokyoNight, Catppuccin, Nord, Gruvbox, RosePine) updating Zenith colors dynamically.
+- **Locale & Language Settings**: System locale selection (`i18n`), UTF-8 font loading, and keyboard layout translation.
+
+### 2. File Manager Subsystem (Estimated: 3 Weeks)
+- **Filesystem Browsing**: TUI (`yazi` style) and Zenith GUI file tree views.
+- **File Operations**: Asynchronous copy, move, delete operations with transactional progress indicators.
+- **Drag-and-Drop Support**: Direct window-to-window drag-and-drop file payload passing.
+- **Permissions Display**: POSIX file mode bits (`chmod`), UID/GID ownership (`chown`), and extended attribute display.
+
+### 3. Panel & System Tray (Estimated: 2 Weeks)
+- **Clock Widget**: Real-time CMOS RTC / NTP synchronized digital clock display.
+- **Volume Control Applet**: PipeWire / ALSA audio volume slider with mute toggles.
+- **Network Indicator**: Network status widget displaying Ethernet/Wi-Fi link state and IP configuration.
+- **Laptop Battery Status**: ACPI battery capacity gauge, power draw telemetry, and thermal governor status.
+
+### 4. Notification Daemon (Estimated: 1 Week)
+- **Popup Notifications**: `org.freedesktop.Notifications` compatible popup overlay rendering.
+- **Action Buttons**: Interactive notification action callbacks (e.g. "Dismiss", "Reply", "View").
+- **Sound Playback**: Asynchronous alert audio playback via PipeWire ALSA emulation.
+
+**Phase 2 Milestone**: Full desktop environment with complete interactive UI configuration.
 
 ---
 
