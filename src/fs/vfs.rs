@@ -306,7 +306,7 @@ impl Vfs {
     }
 
     /// Get basename
-    fn get_basename(&self, path: &str) -> &str {
+    fn get_basename<'a>(&self, path: &'a str) -> &'a str {
         path.rfind('/').map(|i| &path[i + 1..]).unwrap_or(path)
     }
 
