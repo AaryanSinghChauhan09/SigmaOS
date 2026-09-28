@@ -21,7 +21,39 @@ While SigmaOS provides a high-performance bare-metal Rust kernel with modular ab
 | **Threading Model** | ✅ NPTL (`clone(2)` thread groups) | ✅ 1:1 `libthr` / `kse` | ✅ 1:1 `rthreads` | ❌ Single-threaded per process | ❌ Missing kernel threads |
 | **Module System** | ✅ Loadable Kernel Modules (`kmod`) | ✅ Dynamic Kernel Modules (`kld`) | Static compiled kernel | ❌ Monolithic static binary | ❌ No `kmod` loader |
 | **Device Drivers** | 100,000+ LOC (thousands of devices) | 50,000+ LOC | 40,000+ LOC | ~5-10 drivers (UART, RTC, ATA, xHCI) | ❌ 99% driver gap |
+| **Hardware Permissions** | ✅ udev, logind, Flatpak portals | ✅ devd, MAC policies | ✅ pledge/unveil, bioctl | ❌ Raw root device access only | ❌ Missing portal model |
 | **Security Hardening** | Multi-LSM (SELinux, AppArmor, Landlock) | MAC Framework, Capsicum | Pledge, Unveil, KARL, W^X | Framework stubs & rule engines | ⚠️ Validation only |
+
+---
+
+## 🔒 Focus Gap: Hardware Abstraction & Device Permissions Model (USB, Camera, Mic, Mounts)
+
+### 1. Gap Summary
+- **Summary**: Modern operating systems mediate low-level hardware device access (USB endpoints, camera streams, audio capture, serial ports, and volume mounts) using user-consent portals and dynamically assigned device node permissions (`/dev/bus/usb/*`, `/dev/video*`, `/dev/snd/*`). In SigmaOS, device nodes are currently exposed globally or via static root permissions without fine-grained per-application hardware permissioning portals.
+
+### 2. Why It Matters
+- Unprivileged user applications or WASM micro-containers require safe, controlled access to physical hardware (e.g., webcams, USB security keys, smartcards, external storage) without exposing raw root device nodes (`/dev/sda`, `/dev/mem`, `/dev/bus/usb`) or granting full host access. Without a device permissions portal, any application with device read/write access could eavesdrop on microphone audio or read raw disk blocks.
+
+### 3. Detailed Implementation Architecture Blueprint
+- **Native Helper + Device Portal Pattern**:
+  1. Applications request device access via IPC portal protocol (`org.sigmaos.portal.DeviceAccess`).
+  2. The portal service displays an interactive UI/TUI consent prompt presenting rationale to the user (e.g. "Sigma Browser requests access to USB YubiKey").
+  3. Upon user approval, the kernel/portal dynamically passes filtered device file descriptors (`pidfd_getfd` / capability token passing) or creates isolated `devtmpfs` cgroup device nodes (`cgroup.devices`) mapped into the application sandbox/container.
+- **Per-Process USB Filtering & Forwarding**:
+  1. Leverage `libusb` host controller endpoint virtualization.
+  2. Implement per-process USB packet filtering in kernel space, restricting application USB transfers strictly to granted Vendor ID / Product ID (VID/PID) endpoints while blocking USB mass storage or raw control requests on restricted interfaces.
+- **Dynamic Mount Permissioning**:
+  1. Unprivileged volume mounting via `udisks2`-style helper daemon with Polkit policy enforcement, auto-mounting volumes under isolated sandbox namespaces (`/media/$USER/$LABEL`).
+
+### 4. Open-Source Software (OSS) Inspirations
+- **Flatpak & `xdg-desktop-portal`**: Device access portal requesting camera/microphone/device access via D-Bus portals.
+- **`libusb` & `udev` / `systemd-logind`**: Dynamic device ACL management (`uaccess` tag) assigning file descriptor permissions to active user sessions.
+- **Android Runtime Permission Model**: Granular dynamic permission prompts (`CAMERA`, `RECORD_AUDIO`, `ACCESS_FINE_LOCATION`).
+- **Qubes OS `sys-usb`**: Micro-VM isolation for USB host controllers forwarding specific USB devices securely to target AppVMs.
+
+### 5. Priority & Effort Estimation
+- **Priority**: High (Crucial for desktop security and sandboxed app execution).
+- **Effort**: Medium-to-High (Requires integration between kernel `devtmpfs`, capability file descriptor passing, and Zenith desktop portal UI).
 
 ---
 
