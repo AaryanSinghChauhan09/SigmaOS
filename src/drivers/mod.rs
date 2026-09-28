@@ -90,3 +90,6 @@ pub use sovereign_sound_hda_synthesis::*;
 
 pub mod sovereign_distro_driver_suite;
 pub use sovereign_distro_driver_suite::*;
+
+pub mod firmware;
+pub use firmware::*;
