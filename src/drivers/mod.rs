@@ -90,3 +90,31 @@ pub use sovereign_sound_hda_synthesis::*;
 
 pub mod sovereign_distro_driver_suite;
 pub use sovereign_distro_driver_suite::*;
+
+pub mod adapters {
+    pub mod linux_c_shim;
+}
+pub mod linux_absorption {
+    pub mod gpu {
+        pub mod intel_xe;
+    }
+    pub mod net {
+        pub mod iwlwifi;
+    }
+}
+pub mod freebsd_absorption {
+    pub mod encryption {
+        pub mod geli_disk;
+    }
+}
+pub mod openbsd_absorption {
+    pub mod input {
+        pub mod wsmouse;
+    }
+}
+pub mod firmware {
+    pub mod registry;
+}
+
+pub mod sovereign_driver_absorption_framework;
+pub use sovereign_driver_absorption_framework::*;
