@@ -1,5 +1,7 @@
 // SigmaOS Security Subsystem
 pub mod memory_protection;
+pub mod address_sanitizer;
+pub use address_sanitizer::{AddressSanitizer, MemoryRegion};
 pub mod capability;
 pub mod hardware_privilege;
 pub mod pqc_enclave;
