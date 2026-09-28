@@ -462,11 +462,13 @@ impl HelenIpcManager {
             registration.set_top_half_handler(handler);
         }
 
+        // Clone before moving to irq_registrations
+        let registration_clone = registration.clone();
         self.irq_registrations.insert(irq, registration);
 
         // Also add to answerbox's registered IRQs
         if let Some(answerbox) = self.answerboxes.get_mut(&answerbox_id) {
-            answerbox.registered_irqs.push(registration.clone());
+            answerbox.registered_irqs.push(registration_clone);
             Ok(())
         } else {
             Err(HelenIpcError::AnswerboxNotFound)
@@ -580,16 +582,28 @@ impl HelenIpcManager {
         }
 
         // Disconnect from notification channels
-        if let Some(answerbox) = self.answerboxes.values_mut().find(|a| a.task_id == task_id) {
-            for irq_reg in &answerbox.registered_irqs {
-                let _ = self.unregister_irq(irq_reg.irq);
+        let irqs_to_unregister: Vec<IrqNumber> = {
+            if let Some(answerbox) = self.answerboxes.values().find(|a| a.task_id == task_id) {
+                answerbox.registered_irqs.iter().map(|r| r.irq).collect()
+            } else {
+                Vec::new()
             }
+        };
+
+        for irq in irqs_to_unregister {
+            let _ = self.unregister_irq(irq);
+        }
+
+        if let Some(answerbox) = self.answerboxes.values_mut().find(|a| a.task_id == task_id) {
             answerbox.registered_irqs.clear();
         }
 
         // Answer all unanswered messages with error
         if let Some(answerbox) = self.answerboxes.values_mut().find(|a| a.task_id == task_id) {
-            for mut msg in answerbox.dispatched_queue.drain(..) {
+            let messages_to_answer: Vec<_> = answerbox.dispatched_queue.drain(..).collect();
+            drop(answerbox);
+
+            for mut msg in messages_to_answer {
                 msg.method = 0xFFFFFFFFFFFFFFFE; // Error code
                 if let Some(phone) = self.phones.get(&msg.phone_id) {
                     if let Some(origin_answerbox_id) = phone.connected_answerbox {
@@ -599,7 +613,10 @@ impl HelenIpcManager {
                     }
                 }
             }
-            answerbox.dispatched_queue.clear();
+
+            if let Some(answerbox) = self.answerboxes.values_mut().find(|a| a.task_id == task_id) {
+                answerbox.dispatched_queue.clear();
+            }
         }
     }
 }

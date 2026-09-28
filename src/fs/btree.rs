@@ -167,7 +167,10 @@ impl BTree {
                 let pos = parent.keys.binary_search(&key).unwrap_or_else(|e| e);
                 parent.keys.insert(pos, key);
                 parent.children.insert(pos + 1, right_id);
-                
+
+                let needs_split = parent.keys.len() > self.max_keys;
+                drop(parent);
+
                 // Update parent references
                 if let Some(left) = self.nodes.get_mut(&left_id) {
                     left.parent = Some(pid);
@@ -175,9 +178,9 @@ impl BTree {
                 if let Some(right) = self.nodes.get_mut(&right_id) {
                     right.parent = Some(pid);
                 }
-                
+
                 // Check if parent needs to split
-                if parent.keys.len() > self.max_keys {
+                if needs_split {
                     self.split_internal(pid);
                 }
             }
