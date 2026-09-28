@@ -17,6 +17,7 @@ pub mod paging;
 pub mod segmentation_paging;
 pub mod tlb_associative;
 pub mod zone;
+pub mod allocator;
 pub mod sovereign_address_translation;
 pub use sovereign_address_translation::*;
 
@@ -35,3 +36,4 @@ pub use segmentation_paging::{
 pub use tlb_associative::{AssociativeTlbCache, TlbAssociativityMode, TlbEntry, TlbPageFlags};
 pub use zone::{BsdZoneAllocator, Slab, Zone, ZoneStats};
 pub use quota::{MemoryController, MemoryStats, MemoryUnit, OomEvent, OomPolicy, ProcessMemoryAccount, PageCacheStat};
+pub use allocator::{BuddyAllocator, SlabAllocator, SlabCache, MemoryBlock, SlabObject};
