@@ -1,311 +1,398 @@
-use std::boxed::Box;
-use std::string::{String, ToString};
-use std::vec::Vec;
-use std::format;
+// Virtual Filesystem (VFS) Layer
+// Inspired by Linux VFS for unified filesystem abstraction
 
-/// OOP-based Virtual Filesystem for SigmaOS
-/// Based on Ideas-999-Structured: Kernel & Hardware Item 41
-/// Implements VFS layer with mount points and file operations
+use std::collections::HashMap;
+use std::sync::atomic::{AtomicU64, Ordering};
 
-use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
-
-pub type InodeID = usize;
-pub type MountID = usize;
-
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum FileType { Regular = 0, Directory = 1, Symlink = 2, Device = 3 }
-
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum VFSError { Success = 0, NotFound = 1, PermissionDenied = 2, IsDirectory = 3 }
-
-pub trait Inode {
-    fn id(&self) -> InodeID;
-    fn file_type(&self) -> FileType;
-    fn size(&self) -> usize;
-    fn permissions(&self) -> u16;
+/// File type
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FileType {
+    Regular,
+    Directory,
+    Symlink,
+    CharacterDevice,
+    BlockDevice,
+    NamedPipe,
+    Socket,
 }
 
-#[repr(C)]
-pub struct SimpleInode {
-    pub id: InodeID,
-    pub file_type: AtomicUsize,
-    pub size: AtomicUsize,
-    pub permissions: AtomicUsize,
+/// File permissions
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct FilePermissions {
+    pub read: bool,
+    pub write: bool,
+    pub execute: bool,
 }
 
-impl SimpleInode {
-    pub fn new(id: InodeID, file_type: FileType, size: usize, permissions: u16) -> Self {
-        SimpleInode {
-            id,
-            file_type: AtomicUsize::new(file_type as usize),
-            size: AtomicUsize::new(size),
-            permissions: AtomicUsize::new(permissions as usize),
-        }
+impl FilePermissions {
+    pub fn new(read: bool, write: bool, execute: bool) -> Self {
+        Self { read, write, execute }
+    }
+
+    pub fn as_mode(&self) -> u32 {
+        let mut mode = 0u32;
+        if self.read { mode |= 0o400; }
+        if self.write { mode |= 0o200; }
+        if self.execute { mode |= 0o100; }
+        mode
     }
 }
 
-impl Inode for SimpleInode {
-    fn id(&self) -> InodeID { self.id }
-    fn file_type(&self) -> FileType { unsafe { core::mem::transmute(self.file_type.load(Ordering::SeqCst)) } }
-    fn size(&self) -> usize { self.size.load(Ordering::SeqCst) }
-    fn permissions(&self) -> u16 { self.permissions.load(Ordering::SeqCst) as u16 }
+/// VFS inode
+#[derive(Debug, Clone)]
+pub struct VfsInode {
+    pub inode_number: u64,
+    pub file_type: FileType,
+    pub permissions: FilePermissions,
+    pub size: u64,
+    pub links: u32,
+    pub uid: u32,
+    pub gid: u32,
+    pub data: Vec<u8>,
 }
 
-pub trait Filesystem {
-    fn mount_id(&self) -> MountID;
-    fn read_inode(&self, inode_id: InodeID) -> Option<&dyn Inode>;
-    fn read_data(&self, inode_id: InodeID, offset: usize, buffer: &mut [u8]) -> Result<usize, VFSError>;
-    fn write_data(&mut self, inode_id: InodeID, offset: usize, data: &[u8]) -> Result<usize, VFSError>;
+/// VFS dentry (directory entry)
+#[derive(Debug, Clone)]
+pub struct VfsDentry {
+    pub name: String,
+    pub inode: u64,
+    pub parent: Option<u64>,
 }
 
-#[repr(C)]
-pub struct SimpleFilesystem {
-    pub mount_id: MountID,
-    pub inodes: Vec<Option<Box<dyn Inode>>>,
-    pub data: Vec<Vec<u8>>,
+/// VFS superblock
+#[derive(Debug, Clone)]
+pub struct VfsSuperblock {
+    pub filesystem_type: String,
+    pub root_inode: u64,
+    pub total_inodes: u64,
+    pub free_inodes: u64,
+    pub total_blocks: u64,
+    pub free_blocks: u64,
 }
 
-impl SimpleFilesystem {
-    pub fn new(mount_id: MountID) -> Self {
-        SimpleFilesystem {
-            mount_id,
-            inodes: Vec::new(),
-            data: Vec::new(),
-        }
-    }
+/// VFS file
+#[derive(Debug, Clone)]
+pub struct VfsFile {
+    pub inode: u64,
+    pub offset: u64,
+    pub flags: u32,
 }
 
-impl Filesystem for SimpleFilesystem {
-    fn mount_id(&self) -> MountID { self.mount_id }
-
-    fn read_inode(&self, inode_id: InodeID) -> Option<&dyn Inode> {
-        if inode_id > 0 && inode_id <= self.inodes.len() {
-            if let Some(ref inode) = self.inodes[inode_id - 1] {
-                return Some(inode.as_ref());
-            }
-        }
-        None
-    }
-
-    fn read_data(&self, inode_id: InodeID, offset: usize, buffer: &mut [u8]) -> Result<usize, VFSError> {
-        if inode_id > 0 && inode_id <= self.data.len() {
-            let data = &self.data[inode_id - 1];
-            let end = (offset + buffer.len()).min(data.len());
-            for i in 0..buffer.len() {
-                if offset + i < end {
-                    buffer[i] = data[offset + i];
-                }
-            }
-            Ok(end - offset)
-        } else {
-            Err(VFSError::NotFound)
-        }
-    }
-
-    fn write_data(&mut self, inode_id: InodeID, offset: usize, data: &[u8]) -> Result<usize, VFSError> {
-        if inode_id > 0 && inode_id <= self.data.len() {
-            let file_data = &mut self.data[inode_id - 1];
-            let end = (offset + data.len()).max(file_data.len());
-            while file_data.len() < end {
-                file_data.push(0u8);
-            }
-            for i in 0..data.len() {
-                if offset + i < file_data.len() {
-                    file_data[offset + i] = data[i];
-                }
-            }
-            Ok(data.len())
-        } else {
-            Err(VFSError::NotFound)
-        }
-    }
+/// VFS mount point
+#[derive(Debug, Clone)]
+pub struct VfsMount {
+    pub mount_point: String,
+    pub filesystem_type: String,
+    pub root_inode: u64,
+    pub device: String,
 }
 
-pub trait VFS {
-    fn mount(&mut self, fs: Box<dyn Filesystem>, mount_point: &[u8]) -> Result<MountID, VFSError>;
-    fn unmount(&mut self, mount_id: MountID) -> Result<(), VFSError>;
-    fn resolve_path(&self, path: &[u8]) -> Result<(MountID, InodeID), VFSError>;
-    fn open_file(&mut self, path: &[u8], flags: u32) -> Result<usize, VFSError>;
+/// VFS
+pub struct Vfs {
+    next_inode: AtomicU64,
+    inodes: HashMap<u64, VfsInode>,
+    dentries: HashMap<u64, Vec<VfsDentry>>,
+    superblocks: HashMap<u64, VfsSuperblock>,
+    mounts: Vec<VfsMount>,
+    root_inode: u64,
 }
 
-#[repr(C)]
-pub struct SimpleVFS {
-    pub filesystems: Vec<Option<Box<dyn Filesystem>>>,
-    pub mount_points: Vec<(MountID, [u8; 256])>,
-    pub next_id: AtomicUsize,
-}
-
-impl SimpleVFS {
+impl Vfs {
     pub fn new() -> Self {
-        SimpleVFS {
-            filesystems: Vec::new(),
-            mount_points: Vec::new(),
-            next_id: AtomicUsize::new(1),
+        let mut vfs = Self {
+            next_inode: AtomicU64::new(1),
+            inodes: HashMap::new(),
+            dentries: HashMap::new(),
+            superblocks: HashMap::new(),
+            mounts: Vec::new(),
+            root_inode: 1,
+        };
+        
+        // Create root directory
+        let root_inode = VfsInode {
+            inode_number: 1,
+            file_type: FileType::Directory,
+            permissions: FilePermissions::new(true, true, true),
+            size: 0,
+            links: 2,
+            uid: 0,
+            gid: 0,
+            data: Vec::new(),
+        };
+        
+        vfs.inodes.insert(1, root_inode);
+        vfs.dentries.insert(1, Vec::new());
+        
+        vfs
+    }
+
+    /// Create a new inode
+    pub fn create_inode(&mut self, file_type: FileType, permissions: FilePermissions) -> u64 {
+        let inode_number = self.next_inode.fetch_add(1, Ordering::SeqCst);
+        
+        let inode = VfsInode {
+            inode_number,
+            file_type,
+            permissions,
+            size: 0,
+            links: 1,
+            uid: 0,
+            gid: 0,
+            data: Vec::new(),
+        };
+        
+        self.inodes.insert(inode_number, inode);
+        self.dentries.insert(inode_number, Vec::new());
+        
+        inode_number
+    }
+
+    /// Lookup inode by path
+    pub fn lookup(&self, path: &str) -> Option<u64> {
+        if path == "/" || path == "" {
+            return Some(self.root_inode);
         }
-    }
-}
-
-impl VFS for SimpleVFS {
-    fn mount(&mut self, fs: Box<dyn Filesystem>, mount_point: &[u8]) -> Result<MountID, VFSError> {
-        let id = self.next_id.fetch_add(1, Ordering::SeqCst);
-        let mut mount_array = [0u8; 256];
-        let mount_len = mount_point.len().min(255);
-        for i in 0..mount_len {
-            mount_array[i] = mount_point[i];
+        
+        let components: Vec<&str> = path.split('/').filter(|s| !s.is_empty()).collect();
+        let mut current_inode = self.root_inode;
+        
+        for component in components {
+            let dentries = self.dentries.get(&current_inode)?;
+            
+            let dentry = dentries.iter().find(|d| d.name == component)?;
+            current_inode = dentry.inode;
         }
-        self.filesystems.push(Some(fs));
-        self.mount_points.push((id, mount_array));
-        Ok(id)
+        
+        Some(current_inode)
     }
 
-    fn unmount(&mut self, mount_id: MountID) -> Result<(), VFSError> {
-        for i in 0..self.filesystems.len() {
-            if let Some(ref fs) = self.filesystems[i] {
-                if fs.mount_id() == mount_id {
-                    return Ok(());
-                }
-            }
+    /// Create a directory
+    pub fn mkdir(&mut self, path: &str, permissions: FilePermissions) -> Result<u64, &'static str> {
+        let parent_path = self.get_parent_path(path)?;
+        let parent_inode = self.lookup(&parent_path).ok_or("Parent not found")?;
+        
+        let dir_name = self.get_basename(path);
+        let new_inode = self.create_inode(FileType::Directory, permissions);
+        
+        let dentry = VfsDentry {
+            name: dir_name.to_string(),
+            inode: new_inode,
+            parent: Some(parent_inode),
+        };
+        
+        if let Some(dentries) = self.dentries.get_mut(&parent_inode) {
+            dentries.push(dentry);
         }
-        Err(VFSError::NotFound)
+        
+        Ok(new_inode)
     }
 
-    fn resolve_path(&self, path: &[u8]) -> Result<(MountID, InodeID), VFSError> {
-        for &(mount_id, ref mount_point) in &self.mount_points {
-            let mount_len = mount_point.iter().position(|&b| b == 0).unwrap_or(256);
-            if path.starts_with(&mount_point[..mount_len]) {
-                return Ok((mount_id, 1));
-            }
+    /// Create a file
+    pub fn create(&mut self, path: &str, permissions: FilePermissions) -> Result<u64, &'static str> {
+        let parent_path = self.get_parent_path(path)?;
+        let parent_inode = self.lookup(&parent_path).ok_or("Parent not found")?;
+        
+        let file_name = self.get_basename(path);
+        let new_inode = self.create_inode(FileType::Regular, permissions);
+        
+        let dentry = VfsDentry {
+            name: file_name.to_string(),
+            inode: new_inode,
+            parent: Some(parent_inode),
+        };
+        
+        if let Some(dentries) = self.dentries.get_mut(&parent_inode) {
+            dentries.push(dentry);
         }
-        Err(VFSError::NotFound)
+        
+        Ok(new_inode)
     }
 
-    fn open_file(&mut self, path: &[u8], _flags: u32) -> Result<usize, VFSError> {
-        let (mount_id, inode_id) = self.resolve_path(path)?;
-        Ok(mount_id * 10000 + inode_id)
-    }
-}
-
-pub trait FileDescriptor {
-    fn fd(&self) -> usize;
-    fn mount_id(&self) -> MountID;
-    fn inode_id(&self) -> InodeID;
-    fn offset(&self) -> usize;
-    fn set_offset(&mut self, offset: usize);
-}
-
-#[repr(C)]
-pub struct SimpleFileDescriptor {
-    pub fd: usize,
-    pub mount_id: MountID,
-    pub inode_id: InodeID,
-    pub offset: AtomicUsize,
-}
-
-impl SimpleFileDescriptor {
-    pub fn new(fd: usize, mount_id: MountID, inode_id: InodeID) -> Self {
-        SimpleFileDescriptor {
-            fd,
-            mount_id,
-            inode_id,
-            offset: AtomicUsize::new(0),
+    /// Read from file
+    pub fn read(&self, inode: u64, offset: u64, size: usize) -> Result<Vec<u8>, &'static str> {
+        let file = self.inodes.get(&inode).ok_or("Inode not found")?;
+        
+        if file.file_type != FileType::Regular {
+            return Err("Not a regular file");
         }
-    }
-}
-
-impl FileDescriptor for SimpleFileDescriptor {
-    fn fd(&self) -> usize { self.fd }
-    fn mount_id(&self) -> MountID { self.mount_id }
-    fn inode_id(&self) -> InodeID { self.inode_id }
-    fn offset(&self) -> usize { self.offset.load(Ordering::SeqCst) }
-
-    fn set_offset(&mut self, offset: usize) {
-        self.offset.store(offset, Ordering::SeqCst);
-    }
-}
-
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
+        
+        let start = offset as usize;
+        let end = (offset as usize + size).min(file.data.len());
+        
+        if start >= file.data.len() {
+            return Ok(Vec::new());
         }
+        
+        Ok(file.data[start..end].to_vec())
     }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
+
+    /// Write to file
+    pub fn write(&mut self, inode: u64, offset: u64, data: &[u8]) -> Result<usize, &'static str> {
+        let file = self.inodes.get_mut(&inode).ok_or("Inode not found")?;
+        
+        if file.file_type != FileType::Regular {
+            return Err("Not a regular file");
         }
+        
+        let start = offset as usize;
+        
+        if start + data.len() > file.data.len() {
+            file.data.resize(start + data.len(), 0);
+        }
+        
+        file.data[start..start + data.len()].copy_from_slice(data);
+        file.size = file.data.len() as u64;
+        
+        Ok(data.len())
     }
-}
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+    /// List directory entries
+    pub fn readdir(&self, inode: u64) -> Result<Vec<String>, &'static str> {
+        let file = self.inodes.get(&inode).ok_or("Inode not found")?;
+        
+        if file.file_type != FileType::Directory {
+            return Err("Not a directory");
+        }
+        
+        let dentries = self.dentries.get(&inode).ok_or("No dentries")?;
+        
+        Ok(dentries.iter().map(|d| d.name.clone()).collect())
+    }
 
+    /// Get inode attributes
+    pub fn getattr(&self, inode: u64) -> Result<&VfsInode, &'static str> {
+        self.inodes.get(&inode).ok_or("Inode not found")
+    }
 
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
+    /// Mount a filesystem
+    pub fn mount(&mut self, mount_point: String, filesystem_type: String, device: String) -> Result<(), &'static str> {
+        let parent_inode = self.lookup(&mount_point).ok_or("Mount point not found")?;
+        
+        let superblock = VfsSuperblock {
+            filesystem_type: filesystem_type.clone(),
+            root_inode: parent_inode,
+            total_inodes: 1000,
+            free_inodes: 1000,
+            total_blocks: 10000,
+            free_blocks: 10000,
+        };
+        
+        let sb_id = self.next_inode.fetch_add(1, Ordering::SeqCst);
+        self.superblocks.insert(sb_id, superblock);
+        
+        let mount = VfsMount {
+            mount_point,
+            filesystem_type,
+            root_inode: parent_inode,
+            device,
+        };
+        
+        self.mounts.push(mount);
+        Ok(())
+    }
+
+    /// Get parent path
+    fn get_parent_path(&self, path: &str) -> Result<String, &'static str> {
+        if path == "/" {
+            return Err("Root has no parent");
+        }
+        
+        let last_slash = path.rfind('/').unwrap_or(0);
+        if last_slash == 0 {
+            Ok("/".to_string())
         } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+            Ok(path[..last_slash].to_string())
         }
     }
-}
 
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
+    /// Get basename
+    fn get_basename(&self, path: &str) -> &str {
+        path.rfind('/').map(|i| &path[i + 1..]).unwrap_or(path)
+    }
+
+    /// Get inode count
+    pub fn inode_count(&self) -> usize {
+        self.inodes.len()
+    }
+
+    /// Get mount count
+    pub fn mount_count(&self) -> usize {
+        self.mounts.len()
     }
 }
 
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
+    #[test]
+    fn test_vfs_create() {
+        let vfs = Vfs::new();
+        
+        assert_eq!(vfs.inode_count(), 1);
     }
-}
 
+    #[test]
+    fn test_mkdir() {
+        let mut vfs = Vfs::new();
+        
+        let perms = FilePermissions::new(true, true, true);
+        let inode = vfs.mkdir("/test", perms).unwrap();
+        
+        assert!(inode > 1);
+        assert_eq!(vfs.inode_count(), 2);
+    }
 
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
+    #[test]
+    fn test_create_file() {
+        let mut vfs = Vfs::new();
+        
+        let perms = FilePermissions::new(true, true, false);
+        let inode = vfs.create("/test.txt", perms).unwrap();
+        
+        assert!(inode > 1);
+    }
 
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
+    #[test]
+    fn test_write_read() {
+        let mut vfs = Vfs::new();
+        
+        let perms = FilePermissions::new(true, true, false);
+        let inode = vfs.create("/test.txt", perms).unwrap();
+        
+        vfs.write(inode, 0, b"Hello, World!").unwrap();
+        
+        let data = vfs.read(inode, 0, 13).unwrap();
+        assert_eq!(data, b"Hello, World!");
+    }
+
+    #[test]
+    fn test_readdir() {
+        let mut vfs = Vfs::new();
+        
+        let perms = FilePermissions::new(true, true, true);
+        vfs.mkdir("/test", perms).unwrap();
+        
+        let entries = vfs.readdir(1).unwrap();
+        assert!(entries.contains(&"test".to_string()));
+    }
+
+    #[test]
+    fn test_lookup() {
+        let mut vfs = Vfs::new();
+        
+        let perms = FilePermissions::new(true, true, true);
+        vfs.mkdir("/test", perms).unwrap();
+        
+        let inode = vfs.lookup("/test").unwrap();
+        assert!(inode > 1);
+    }
+
+    #[test]
+    fn test_mount() {
+        let mut vfs = Vfs::new();
+        
+        vfs.mount("/".to_string(), "ext4".to_string(), "/dev/sda1".to_string()).unwrap();
+        assert_eq!(vfs.mount_count(), 1);
     }
 }

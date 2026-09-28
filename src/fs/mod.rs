@@ -20,6 +20,7 @@ pub mod btrfs;
 // pub mod filesystem;
 pub mod btrfs_send_receive;
 pub mod btree;
+pub mod vfs;
 pub use btree::{BTree, BTreeNode, BTreeKey, BTreeItem, BTreeNodeType};
 pub use btrfs_send_receive::{BtrfsSendOp, BtrfsSendCommand, BtrfsSendStream, BtrfsReceiveContext, BtrfsSubvolume, BtrfsSendReceiveManager};
 pub mod sigmacas;
@@ -62,3 +63,4 @@ pub use zfs_arc_sovereign::{SovereignZfsArc, ArcBufferHeader};
 
 pub mod fanotify_sovereign;
 pub use fanotify_sovereign::{SovereignFanotifyGroup, FanotifyEvent, FanotifyEventKind, FanotifyResponse, FanotifyMark};
+pub use vfs::{Vfs, VfsInode, VfsDentry, VfsSuperblock, VfsFile, VfsMount, FileType, FilePermissions};
