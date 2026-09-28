@@ -45,7 +45,7 @@ pub enum InotifyMask {
     /// Writable file was closed
     CloseWrite = 8,
     /// Non-writable file was closed
-    CloseNoWrite = 16,
+    CloseNoWrite = 0x20000,
     /// File/directory was created
     Create = 256,
     /// File/directory was deleted

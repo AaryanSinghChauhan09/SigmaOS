@@ -17,11 +17,11 @@ pub enum NvmeOpcode {
     DatasetManagement = 0x09,
     SecuritySend = 0x11,
     SecurityReceive = 0x12,
-    GetLogPage = 0x02,
+    GetLogPage = 0x0A,
     Identify = 0x06,
-    Abort = 0x08,
+    Abort = 0x0B,
     FirmwareActivate = 0x10,
-    FirmwareImageDownload = 0x11,
+    FirmwareImageDownload = 0x15,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
