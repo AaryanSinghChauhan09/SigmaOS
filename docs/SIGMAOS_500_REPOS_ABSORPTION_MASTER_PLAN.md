@@ -1,7 +1,7 @@
 # ⚡🎨🛡️ SIGMAOS MASTER PLAN: TRI-AGENT FRAMEWORK & 500+ OPEN-SOURCE REPOSITORIES ABSORPTION ARCHITECTURE
 
 > **Target Repository:** [https://github.com/AaryanSinghChauhan09/SigmaOS](https://github.com/AaryanSinghChauhan09/SigmaOS)
-> **Document Version:** 4.1.0
+> **Document Version:** 4.2.0
 > **Status:** Active Master Specification & Strategic Execution Roadmap
 
 ---
@@ -58,82 +58,32 @@ Identify and implement focused, measurable performance improvements that make Si
   * Modify build manifests (`Cargo.toml`) without instruction.
   * Introduce breaking API changes.
 
-#### Bolt's Philosophy
-* Speed is a feature. Every millisecond and CPU cycle counts.
-* **Measure first, optimize second.**
-* Never sacrifice maintainability or correctness for micro-optimizations.
+---
 
-#### Journaling Rules (`.jules/bolt.md`)
-Record **only** critical insights, such as:
-* Codebase-specific performance bottlenecks.
-* Optimizations that unexpectedly failed or regressed latency.
-* Rejected optimizations with valuable architectural lessons.
+## 🛡️ PART 2: MANDATORY OPEN-SOURCE ABSORPTION POLICY
 
-#### Daily Process Workflow
-1. **🔍 PROFILE:** Identify lock contention, inefficient memory layouts, redundant allocations, unnecessary clones, O(N²) iterations, missing zero-copy abstractions, or unindexed lookups.
-2. **⚡ SELECT:** Pick a high-impact optimization cleanly implementable in < 50 lines.
-3. **🔧 OPTIMIZE:** Write clean, self-explaining, lock-free or memory-efficient code.
-4. **✅ VERIFY:** Run cargo tests, benchmark benchmarks, and verify functional correctness.
-5. **🎁 PRESENT:** Submit PR with title format `⚡ Bolt: [performance improvement]`.
+Before importing code or specifications from external open-source projects into **SigmaOS**, all developers, contributors, and AI agents must strictly adhere to this **Absorption Policy**.
+
+### 📋 Mandatory 8-Point Component Review Checklist
+1. **Source Repository & Exact Commit/Tag:** Full URL and git SHA-1 commit hash / release tag of upstream source.
+2. **License Compatibility Review:** Verification of license terms (MIT, Apache 2.0, GPL-2.0, BSD-2/3-Clause, MPL) and preservation of copyright notices.
+3. **Dependency & API Inventory:** Detailed inventory of required kernel/sys call interfaces, C symbols, and crate requirements.
+4. **Hardware Architecture Support Declaration:** Specification of target architectures (x86_64, ARM64, RISC-V 64).
+5. **Rust / `#![no_std]` Compatibility Classification:** Classification as core `#![no_std]` kernel space or `alloc`/`std` userland space.
+6. **Security & Privilege Requirements:** Required privilege ring (Ring 0, Ring 3, eBPF sandbox, capability flags).
+7. **Testing Matrix:** Verification across Unit tests, Integration tests, QEMU microVM emulation, and real hardware targets.
+8. **Maintainer & Update Ownership:** Designated agent or maintainer responsible for upstream sync and vulnerability patching.
+
+### 🚫 Forbidden Direct Imports
+- Raw Linux kernel C drivers into Ring 0 without a safe Rust isolation shim.
+- Proprietary firmware or redistributable binary blobs without explicit permission/license compliance.
+- Copyleft GPL code into MIT/Apache-only components without preserving license obligations.
+- User-space code or libraries directly into kernel space (`#![no_std]` boundary violation).
+- Monolithic framework abstractions that conflict with SigmaOS’s existing VFS, scheduler, memory, or driver models.
 
 ---
 
-### 🎨 2. PALETTE: THE UX & ACCESSIBILITY AGENT
-
-#### Core Mission
-Enhance Zenith Desktop, Web UI, and CLI user interfaces with accessible, intuitive, and delightful user interactions.
-
-#### Operational Boundaries
-* **Always Do:**
-  * Test keyboard navigation and focus visibility.
-  * Add proper ARIA labels, roles, and contrast guarantees.
-  * Maintain clean separation between styling and application state.
-  * Keep changes strictly under 50 lines.
-* **Ask First:**
-  * Major UI design or global design token changes.
-* **Never Do:**
-  * Make complete page/component redesigns without approval.
-  * Add heavy UI dependencies.
-  * Change core performance or security backend logic.
-
-#### Palette's Philosophy
-* Users notice micro-details.
-* Accessibility (a11y) is mandatory, not optional.
-* Every interaction should feel smooth, responsive, and clear.
-
-#### Journaling Rules (`.jules/palette.md`)
-Record critical UX/a11y insights, such as component-specific contrast issues, keyboard focus bugs, or reusable accessibility patterns.
-
----
-
-### 🛡️ 3. SENTINEL: THE SECURITY & HARDENING AGENT
-
-#### Core Mission
-Protect SigmaOS kernel and userland from security vulnerabilities, privilege escalation, memory unsafety, and data leaks.
-
-#### Operational Boundaries
-* **Always Do:**
-  * Run full security verification and regression test suites.
-  * Validate and sanitize all userland inputs at system call boundaries.
-  * Use constant-time cryptography and memory zeroization.
-  * Keep fixes focused and under 50 lines.
-* **Ask First:**
-  * Modifying authentication, capabilities, or access control models.
-* **Never Do:**
-  * Commit API keys, tokens, or hardcoded secrets.
-  * Expose raw kernel stack traces or memory addresses to userland.
-
-#### Sentinel's Philosophy
-* Security is foundational.
-* Defense in depth: validate at every boundary.
-* Fail safely and zeroize sensitive memory immediately.
-
-#### Journaling Rules (`.jules/sentinel.md`)
-Record critical security learnings, vulnerability patterns, and mitigation strategies.
-
----
-
-## 🌐 PART 2: 500+ OPEN-SOURCE GITHUB REPOSITORIES ABSORPTION CATALOG
+## 🌐 PART 3: 500+ OPEN-SOURCE GITHUB REPOSITORIES ABSORPTION CATALOG
 
 SigmaOS systematically absorbs architectural designs, core algorithms, CLI capabilities, and features from over 500 top-tier open-source projects across 20 distinct system domains:
 
@@ -163,62 +113,6 @@ SigmaOS systematically absorbs architectural designs, core algorithms, CLI capab
 | 20. Advanced Tracing & Debugging (eBPF/BCC, bpftrace, strace, gdb, Valgrind, perf) |
 +-----------------------------------------------------------------------------------+
 ```
-
----
-
-## 🏛️ PART 3: SIX PILLARS OF ABSORPTION ARCHITECTURE
-
-Each absorbed repository is broken down and integrated across six distinct engineering pillars:
-
-```
-                        +---------------------------------------+
-                        |  SigmaOS Repository Absorption Engine |
-                        +---------------------------------------+
-                                           |
-    +-----------------+--------------------+--------------------+-----------------+
-    |                 |                    |                    |                 |
-    v                 v                    v                    v                 v
-[1. Functions]   [2. Features]     [3. Architecture]     [4. Design]       [5. UI/UX]
-Functions &      Capabilities &    System Modularity    Principles &       Interfaces &
-Syscalls         Tools             & IPC                Patterns           Accessibility
-
-                                           |
-                                           v
-                                   [6. Algorithms]
-                                   Data Structures &
-                                   Core Math Logic
-```
-
-1. **Functions:** Direct POSIX, Linux, and BSD syscall implementations (e.g., `io_uring`, `pledge`, `unveil`, `memfd_secret`, `copy_file_range`).
-2. **Features:** Userland commands, network daemons, system diagnostic utilities, and desktop app features.
-3. **Architectural Ideas:** Immutable root filesystems, eBPF-driven safety filters, declarative configuration state engines, and zero-trust capability models.
-4. **Design & Principles:** Musl-like minimal memory footprints, Unix KISS philosophy, functional immutability (Nix/Guix), and microkernel fault isolation (seL4/Genode).
-5. **UI & UX:** Zenith Desktop window compositor effects, keyboard-first navigation shortcuts, ARIA-accessible web controls, and rich TUI dashboards (htop/glances style).
-6. **Core Algorithms:** B-tree/LSM-tree storage layouts, EEVDF CPU scheduling, MGLRU memory page eviction, and Dilithium-5 post-quantum signatures.
-
----
-
-## 🔄 PART 4: SYNCHRONIZATION & MULTI-MIRROR PARITY
-
-To guarantee documentation integrity, this master plan and all associated improvement guides are synchronized continuously across all repository documentation mirrors:
-
-* `./SIGMAOS_MASTER_PLAN_TRI_AGENT_500_REPOS_ABSORPTION.md`
-* `./ImprovementPlan.md`
-* `./docs/SIGMAOS_500_REPOS_ABSORPTION_MASTER_PLAN.md`
-* `./wiki/Home.md`
-* `./WIKI/Home.md`
-* `./wiki_repo/Home.md`
-
----
-
-## 🚀 PART 5: PRE-COMMIT & QUALITY ASSURANCE PROTOCOL
-
-Before submitting any code or documentation changes, all agents must complete the pre-commit protocol:
-
-1. **Static Analysis & Compilation:** Execute `cargo check --lib` to ensure zero compilation warnings or errors.
-2. **Unit Test Verification:** Run target module unit tests using `rustc --test` or `cargo test`.
-3. **Integration Test Suite:** Run `./run_sigma_tests.sh` and `pytest tests/` to confirm 100% test pass rate.
-4. **Mirror Parity Check:** Confirm that all modified documentation is reflected across `docs/`, `wiki/`, `WIKI/`, and `wiki_repo/`.
 
 ---
 
