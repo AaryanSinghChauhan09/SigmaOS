@@ -23,6 +23,8 @@ pub mod std_streams;
 pub mod ipc_namespace;
 pub mod sovereign_async_procedure_call;
 pub mod helenos_async;
+pub mod bus;
+pub use bus::{IpcBus, IpcMessage, BusName, BusEndpoint, MessageType};
 
 pub use ipc::{
     IPCEndpoint, IPCError, IPCType, IPCInfo, IPCCapability,
@@ -71,3 +73,5 @@ pub use tech_media_std_streams_synthesis::{
     SovereignTechMediaStdStreamsSuite, StreamColorLevel, StructuredJsonLogStreamFormatter,
     ZeroCopySpliceTeeStreamEngine,
 };
+pub mod bus;
+pub use bus::{IpcBus, IpcMessage, BusName, BusEndpoint, MessageType};
