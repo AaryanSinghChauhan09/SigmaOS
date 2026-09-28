@@ -3738,6 +3738,713 @@ impl Default for SovereignDigitalContractSignatureEngine {
     }
 }
 
+/// Google Sheets Conditional Formatting & Data Validation Engine
+#[derive(Debug, Clone, PartialEq)]
+pub enum ConditionalFormatStyle {
+    Highlight { bg_color: String, text_color: String },
+    BoldText,
+}
+
+#[derive(Debug, Clone)]
+pub enum FormatRuleCondition {
+    GreaterThan(f64),
+    LessThan(f64),
+    Equals(f64),
+    TextContains(String),
+}
+
+#[derive(Debug, Clone)]
+pub struct ConditionalFormatRule {
+    pub rule_id: u32,
+    pub range: (usize, usize, usize, usize),
+    pub condition: FormatRuleCondition,
+    pub style: ConditionalFormatStyle,
+}
+
+#[derive(Debug, Clone)]
+pub enum ValidationRuleType {
+    ListFromOptions(Vec<String>),
+    NumberRange(f64, f64),
+}
+
+#[derive(Debug, Clone)]
+pub struct DataValidationRule {
+    pub rule_id: u32,
+    pub row: usize,
+    pub col: usize,
+    pub validation_type: ValidationRuleType,
+    pub error_message: String,
+}
+
+pub struct SovereignConditionalFormattingDataValidationEngine {
+    pub format_rules: Vec<ConditionalFormatRule>,
+    pub validation_rules: Vec<DataValidationRule>,
+    pub next_rule_id: u32,
+}
+
+impl SovereignConditionalFormattingDataValidationEngine {
+    pub fn new() -> Self {
+        Self {
+            format_rules: Vec::new(),
+            validation_rules: Vec::new(),
+            next_rule_id: 1,
+        }
+    }
+
+    pub fn add_conditional_rule(
+        &mut self,
+        range: (usize, usize, usize, usize),
+        condition: FormatRuleCondition,
+        style: ConditionalFormatStyle,
+    ) -> u32 {
+        let id = self.next_rule_id;
+        self.next_rule_id += 1;
+        self.format_rules.push(ConditionalFormatRule { rule_id: id, range, condition, style });
+        id
+    }
+
+    pub fn add_validation_rule(
+        &mut self,
+        row: usize,
+        col: usize,
+        validation_type: ValidationRuleType,
+        error_message: String,
+    ) -> u32 {
+        let id = self.next_rule_id;
+        self.next_rule_id += 1;
+        self.validation_rules.push(DataValidationRule { rule_id: id, row, col, validation_type, error_message });
+        id
+    }
+
+    pub fn evaluate_cell_style(&self, row: usize, col: usize, val: &CellValue) -> Option<ConditionalFormatStyle> {
+        for rule in &self.format_rules {
+            if row >= rule.range.0 && row <= rule.range.2 && col >= rule.range.1 && col <= rule.range.3 {
+                let matches = match (&rule.condition, val) {
+                    (FormatRuleCondition::GreaterThan(threshold), CellValue::Number(n)) => n > threshold,
+                    (FormatRuleCondition::LessThan(threshold), CellValue::Number(n)) => n < threshold,
+                    (FormatRuleCondition::Equals(threshold), CellValue::Number(n)) => (n - threshold).abs() < 1e-6,
+                    (FormatRuleCondition::TextContains(sub), CellValue::Text(t)) => t.contains(sub),
+                    _ => false,
+                };
+                if matches {
+                    return Some(rule.style.clone());
+                }
+            }
+        }
+        None
+    }
+
+    pub fn validate_input(&self, row: usize, col: usize, val: &CellValue) -> core::result::Result<(), String> {
+        for rule in &self.validation_rules {
+            if rule.row == row && rule.col == col {
+                match (&rule.validation_type, val) {
+                    (ValidationRuleType::ListFromOptions(opts), CellValue::Text(t)) => {
+                        if !opts.contains(t) {
+                            return Err(rule.error_message.clone());
+                        }
+                    }
+                    (ValidationRuleType::NumberRange(min, max), CellValue::Number(n)) => {
+                        if n < min || n > max {
+                            return Err(rule.error_message.clone());
+                        }
+                    }
+                    _ => return Err("Type mismatch for validation rule".to_string()),
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl Default for SovereignConditionalFormattingDataValidationEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Google Docs Smart Document Template Engine
+#[derive(Debug, Clone)]
+pub struct SmartDocumentTemplate {
+    pub template_id: String,
+    pub title: String,
+    pub content_template: String,
+}
+
+pub struct SovereignSmartDocumentTemplateEngine {
+    pub templates: HashMap<String, SmartDocumentTemplate>,
+}
+
+impl SovereignSmartDocumentTemplateEngine {
+    pub fn new() -> Self {
+        Self { templates: HashMap::new() }
+    }
+
+    pub fn register_template(&mut self, template_id: &str, title: &str, content_template: &str) {
+        self.templates.insert(
+            template_id.to_string(),
+            SmartDocumentTemplate {
+                template_id: template_id.to_string(),
+                title: title.to_string(),
+                content_template: content_template.to_string(),
+            },
+        );
+    }
+
+    pub fn render_template(&self, template_id: &str, vars: &HashMap<String, String>) -> Option<String> {
+        let tpl = self.templates.get(template_id)?;
+        let mut rendered = tpl.content_template.clone();
+        for (k, v) in vars {
+            let key_pattern = format!("{{{{{}}}}}", k);
+            rendered = rendered.replace(&key_pattern, v);
+        }
+        Some(rendered)
+    }
+}
+
+impl Default for SovereignSmartDocumentTemplateEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Google Sites Landing Page & CMS Builder Engine
+#[derive(Debug, Clone)]
+pub enum CmsBlockType {
+    HeroBanner { title: String, subtitle: String },
+    TextSection { content: String },
+    CallToAction { button_text: String, target_url: String },
+}
+
+#[derive(Debug, Clone)]
+pub struct CmsPage {
+    pub page_id: u32,
+    pub title: String,
+    pub slug: String,
+    pub blocks: Vec<CmsBlockType>,
+    pub published: bool,
+}
+
+pub struct SovereignLandingPageCmsEngine {
+    pub pages: Vec<CmsPage>,
+    pub next_page_id: u32,
+}
+
+impl SovereignLandingPageCmsEngine {
+    pub fn new() -> Self {
+        Self { pages: Vec::new(), next_page_id: 1 }
+    }
+
+    pub fn create_page(&mut self, title: &str, slug: &str) -> u32 {
+        let id = self.next_page_id;
+        self.next_page_id += 1;
+        self.pages.push(CmsPage {
+            page_id: id,
+            title: title.to_string(),
+            slug: slug.to_string(),
+            blocks: Vec::new(),
+            published: false,
+        });
+        id
+    }
+
+    pub fn add_block(&mut self, page_id: u32, block: CmsBlockType) -> bool {
+        if let Some(page) = self.pages.iter_mut().find(|p| p.page_id == page_id) {
+            page.blocks.push(block);
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn render_html(&self, page_id: u32) -> Option<String> {
+        let page = self.pages.iter().find(|p| p.page_id == page_id)?;
+        let mut html = format!("<!DOCTYPE html><html><head><title>{}</title></head><body>", page.title);
+        for block in &page.blocks {
+            match block {
+                CmsBlockType::HeroBanner { title, subtitle } => {
+                    html.push_str(&format!("<header><h1>{}</h1><p>{}</p></header>", title, subtitle));
+                }
+                CmsBlockType::TextSection { content } => {
+                    html.push_str(&format!("<section><p>{}</p></section>", content));
+                }
+                CmsBlockType::CallToAction { button_text, target_url } => {
+                    html.push_str(&format!("<a href=\"{}\" class=\"btn\">{}</a>", target_url, button_text));
+                }
+            }
+        }
+        html.push_str("</body></html>");
+        Some(html)
+    }
+}
+
+impl Default for SovereignLandingPageCmsEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Microsoft Power BI Data Modeling & DAX Engine
+#[derive(Debug, Clone)]
+pub struct PowerBiRelationship {
+    pub from_table: String,
+    pub from_col: String,
+    pub to_table: String,
+    pub to_col: String,
+}
+
+#[derive(Debug, Clone)]
+pub enum MeasureAggFunc {
+    Sum,
+    Average,
+    Count,
+}
+
+pub struct SovereignPowerBiDataModelingEngine {
+    pub tables: HashMap<String, Vec<HashMap<String, f64>>>,
+    pub relationships: Vec<PowerBiRelationship>,
+}
+
+impl SovereignPowerBiDataModelingEngine {
+    pub fn new() -> Self {
+        Self {
+            tables: HashMap::new(),
+            relationships: Vec::new(),
+        }
+    }
+
+    pub fn add_table_data(&mut self, table_name: &str, rows: Vec<HashMap<String, f64>>) {
+        self.tables.insert(table_name.to_string(), rows);
+    }
+
+    pub fn add_relationship(&mut self, rel: PowerBiRelationship) {
+        self.relationships.push(rel);
+    }
+
+    pub fn evaluate_measure(&self, table_name: &str, col_name: &str, agg: MeasureAggFunc) -> Option<f64> {
+        let rows = self.tables.get(table_name)?;
+        if rows.is_empty() {
+            return Some(0.0);
+        }
+        let values: Vec<f64> = rows.iter().filter_map(|r| r.get(col_name).copied()).collect();
+        if values.is_empty() {
+            return Some(0.0);
+        }
+
+        match agg {
+            MeasureAggFunc::Sum => Some(values.iter().sum()),
+            MeasureAggFunc::Average => Some(values.iter().sum::<f64>() / values.len() as f64),
+            MeasureAggFunc::Count => Some(values.len() as f64),
+        }
+    }
+}
+
+impl Default for SovereignPowerBiDataModelingEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Microsoft Viva Engage Enterprise Community Hub Engine
+#[derive(Debug, Clone)]
+pub enum PraiseBadge {
+    TeamPlayer,
+    Innovation,
+    Leadership,
+}
+
+#[derive(Debug, Clone)]
+pub struct VivaCommunityPost {
+    pub post_id: u32,
+    pub channel: String,
+    pub author: String,
+    pub title: String,
+    pub content: String,
+    pub badge: Option<PraiseBadge>,
+    pub upvotes: u32,
+}
+
+pub struct SovereignVivaCommunityHubEngine {
+    pub posts: Vec<VivaCommunityPost>,
+    pub next_post_id: u32,
+}
+
+impl SovereignVivaCommunityHubEngine {
+    pub fn new() -> Self {
+        Self { posts: Vec::new(), next_post_id: 1 }
+    }
+
+    pub fn post_announcement(
+        &mut self,
+        channel: &str,
+        author: &str,
+        title: &str,
+        content: &str,
+        badge: Option<PraiseBadge>,
+    ) -> u32 {
+        let id = self.next_post_id;
+        self.next_post_id += 1;
+        self.posts.push(VivaCommunityPost {
+            post_id: id,
+            channel: channel.to_string(),
+            author: author.to_string(),
+            title: title.to_string(),
+            content: content.to_string(),
+            badge,
+            upvotes: 0,
+        });
+        id
+    }
+
+    pub fn upvote_post(&mut self, post_id: u32) -> bool {
+        if let Some(post) = self.posts.iter_mut().find(|p| p.post_id == post_id) {
+            post.upvotes += 1;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for SovereignVivaCommunityHubEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Zoho Subscriptions Billing Engine
+#[derive(Debug, Clone)]
+pub struct SubscriptionPlan {
+    pub plan_id: String,
+    pub name: String,
+    pub monthly_fee: f64,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum SubscriptionStatus {
+    Active,
+    PastDue,
+    Canceled,
+}
+
+#[derive(Debug, Clone)]
+pub struct CustomerSubscription {
+    pub sub_id: u32,
+    pub customer_email: String,
+    pub plan_id: String,
+    pub status: SubscriptionStatus,
+}
+
+pub struct SovereignSubscriptionBillingEngine {
+    pub plans: HashMap<String, SubscriptionPlan>,
+    pub subscriptions: Vec<CustomerSubscription>,
+    pub next_sub_id: u32,
+}
+
+impl SovereignSubscriptionBillingEngine {
+    pub fn new() -> Self {
+        Self {
+            plans: HashMap::new(),
+            subscriptions: Vec::new(),
+            next_sub_id: 1,
+        }
+    }
+
+    pub fn register_plan(&mut self, plan_id: &str, name: &str, fee: f64) {
+        self.plans.insert(
+            plan_id.to_string(),
+            SubscriptionPlan {
+                plan_id: plan_id.to_string(),
+                name: name.to_string(),
+                monthly_fee: fee,
+            },
+        );
+    }
+
+    pub fn subscribe(&mut self, customer_email: &str, plan_id: &str) -> Option<u32> {
+        if self.plans.contains_key(plan_id) {
+            let id = self.next_sub_id;
+            self.next_sub_id += 1;
+            self.subscriptions.push(CustomerSubscription {
+                sub_id: id,
+                customer_email: customer_email.to_string(),
+                plan_id: plan_id.to_string(),
+                status: SubscriptionStatus::Active,
+            });
+            Some(id)
+        } else {
+            None
+        }
+    }
+
+    pub fn process_billing_charge(&mut self, sub_id: u32) -> core::result::Result<f64, String> {
+        if let Some(sub) = self.subscriptions.iter_mut().find(|s| s.sub_id == sub_id) {
+            if sub.status == SubscriptionStatus::Canceled {
+                return Err("Subscription is canceled".to_string());
+            }
+            if let Some(plan) = self.plans.get(&sub.plan_id) {
+                Ok(plan.monthly_fee)
+            } else {
+                Err("Plan not found".to_string())
+            }
+        } else {
+            Err("Subscription not found".to_string())
+        }
+    }
+}
+
+impl Default for SovereignSubscriptionBillingEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Zoho Projects / Agile Sprint Board Engine
+#[derive(Debug, Clone, PartialEq)]
+pub enum ItemStatus {
+    Backlog,
+    InDevelopment,
+    InReview,
+    Done,
+}
+
+#[derive(Debug, Clone)]
+pub struct SprintItem {
+    pub item_id: u32,
+    pub title: String,
+    pub story_points: u32,
+    pub status: ItemStatus,
+}
+
+pub struct SovereignAgileSprintBoardEngine {
+    pub items: Vec<SprintItem>,
+    pub next_item_id: u32,
+}
+
+impl SovereignAgileSprintBoardEngine {
+    pub fn new() -> Self {
+        Self { items: Vec::new(), next_item_id: 1 }
+    }
+
+    pub fn add_item(&mut self, title: &str, points: u32) -> u32 {
+        let id = self.next_item_id;
+        self.next_item_id += 1;
+        self.items.push(SprintItem {
+            item_id: id,
+            title: title.to_string(),
+            story_points: points,
+            status: ItemStatus::Backlog,
+        });
+        id
+    }
+
+    pub fn update_status(&mut self, item_id: u32, status: ItemStatus) -> bool {
+        if let Some(item) = self.items.iter_mut().find(|i| i.item_id == item_id) {
+            item.status = status;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn calculate_completed_velocity(&self) -> u32 {
+        self.items.iter().filter(|i| i.status == ItemStatus::Done).map(|i| i.story_points).sum()
+    }
+}
+
+impl Default for SovereignAgileSprintBoardEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Salesforce Sales Territory Management Engine
+#[derive(Debug, Clone)]
+pub struct SalesTerritory {
+    pub territory_id: u32,
+    pub name: String,
+    pub zip_prefixes: Vec<String>,
+    pub quota: f64,
+}
+
+pub struct SovereignTerritoryManagementEngine {
+    pub territories: Vec<SalesTerritory>,
+    pub next_id: u32,
+}
+
+impl SovereignTerritoryManagementEngine {
+    pub fn new() -> Self {
+        Self { territories: Vec::new(), next_id: 1 }
+    }
+
+    pub fn add_territory(&mut self, name: &str, zip_prefixes: Vec<String>, quota: f64) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.territories.push(SalesTerritory { territory_id: id, name: name.to_string(), zip_prefixes, quota });
+        id
+    }
+
+    pub fn route_zip(&self, zip_code: &str) -> Option<u32> {
+        for t in &self.territories {
+            if t.zip_prefixes.iter().any(|prefix| zip_code.starts_with(prefix)) {
+                return Some(t.territory_id);
+            }
+        }
+        None
+    }
+}
+
+impl Default for SovereignTerritoryManagementEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Salesforce Customer Journey Builder Engine
+#[derive(Debug, Clone)]
+pub enum JourneyStep {
+    TriggerEmail(String),
+    WaitDelayDays(u32),
+    ConditionCheck(String),
+}
+
+#[derive(Debug, Clone)]
+pub struct CustomerJourney {
+    pub journey_id: u32,
+    pub name: String,
+    pub steps: Vec<JourneyStep>,
+}
+
+pub struct SovereignCustomerJourneyBuilderEngine {
+    pub journeys: Vec<CustomerJourney>,
+    pub enrolled_contacts: HashMap<String, (u32, usize)>,
+    pub next_id: u32,
+}
+
+impl SovereignCustomerJourneyBuilderEngine {
+    pub fn new() -> Self {
+        Self { journeys: Vec::new(), enrolled_contacts: HashMap::new(), next_id: 1 }
+    }
+
+    pub fn create_journey(&mut self, name: &str, steps: Vec<JourneyStep>) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.journeys.push(CustomerJourney { journey_id: id, name: name.to_string(), steps });
+        id
+    }
+
+    pub fn enroll_contact(&mut self, email: &str, journey_id: u32) -> bool {
+        if self.journeys.iter().any(|j| j.journey_id == journey_id) {
+            self.enrolled_contacts.insert(email.to_string(), (journey_id, 0));
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn advance_contact(&mut self, email: &str) -> Option<JourneyStep> {
+        let (j_id, step_idx) = self.enrolled_contacts.get_mut(email)?;
+        let journey = self.journeys.iter().find(|j| j.journey_id == *j_id)?;
+        if *step_idx < journey.steps.len() {
+            let current_step = journey.steps[*step_idx].clone();
+            *step_idx += 1;
+            Some(current_step)
+        } else {
+            None
+        }
+    }
+}
+
+impl Default for SovereignCustomerJourneyBuilderEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Odoo Manufacturing Work Center Routing Engine
+#[derive(Debug, Clone)]
+pub struct WorkCenter {
+    pub center_id: u32,
+    pub name: String,
+    pub hourly_cost: f64,
+    pub setup_time_mins: f64,
+}
+
+pub struct SovereignWorkCenterRoutingEngine {
+    pub work_centers: Vec<WorkCenter>,
+    pub next_id: u32,
+}
+
+impl SovereignWorkCenterRoutingEngine {
+    pub fn new() -> Self {
+        Self { work_centers: Vec::new(), next_id: 1 }
+    }
+
+    pub fn add_work_center(&mut self, name: &str, hourly_cost: f64, setup_time_mins: f64) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.work_centers.push(WorkCenter { center_id: id, name: name.to_string(), hourly_cost, setup_time_mins });
+        id
+    }
+
+    pub fn calculate_operation_cost(&self, center_id: u32, run_time_mins: f64) -> Option<f64> {
+        let center = self.work_centers.iter().find(|w| w.center_id == center_id)?;
+        let total_hours = (center.setup_time_mins + run_time_mins) / 60.0;
+        Some(total_hours * center.hourly_cost)
+    }
+}
+
+impl Default for SovereignWorkCenterRoutingEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Bitrix24 Automated Conversational CRM Chatbot Engine
+#[derive(Debug, Clone)]
+pub struct CrmBotIntent {
+    pub intent_id: u32,
+    pub keyword: String,
+    pub auto_reply: String,
+}
+
+pub struct SovereignAutomatedCrmBotEngine {
+    pub intents: Vec<CrmBotIntent>,
+    pub next_id: u32,
+}
+
+impl SovereignAutomatedCrmBotEngine {
+    pub fn new() -> Self {
+        Self { intents: Vec::new(), next_id: 1 }
+    }
+
+    pub fn add_intent(&mut self, keyword: &str, auto_reply: &str) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.intents.push(CrmBotIntent {
+            intent_id: id,
+            keyword: keyword.to_lowercase(),
+            auto_reply: auto_reply.to_string(),
+        });
+        id
+    }
+
+    pub fn process_message(&self, msg: &str) -> String {
+        let lower = msg.to_lowercase();
+        for intent in &self.intents {
+            if lower.contains(&intent.keyword) {
+                return intent.auto_reply.clone();
+            }
+        }
+        "Thank you for contacting support. An agent will be with you shortly.".to_string()
+    }
+}
+
+impl Default for SovereignAutomatedCrmBotEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // Placeholder types for compilation
 mod sigma_types {
     pub type Result<T> = core::result::Result<T, &'static str>;
@@ -4291,5 +4998,112 @@ mod tests {
         let sig_id = sig_engine.sign_document("hash-abc-123", "alice@sigmaos.org", vec![1, 2, 3, 4]);
         assert_eq!(sig_id, 1);
         assert!(sig_engine.verify_signature_hash("hash-abc-123"));
+    }
+
+    #[test]
+    fn test_google_ms_zoho_salesforce_odoo_bitrix_unification_engines() {
+        // 1. Google Sheets Conditional Formatting & Data Validation Engine
+        let mut cond_engine = SovereignConditionalFormattingDataValidationEngine::new();
+        let rule_id = cond_engine.add_conditional_rule(
+            (0, 0, 10, 10),
+            FormatRuleCondition::GreaterThan(100.0),
+            ConditionalFormatStyle::Highlight { bg_color: "green".to_string(), text_color: "white".to_string() },
+        );
+        assert_eq!(rule_id, 1);
+        let style = cond_engine.evaluate_cell_style(1, 1, &CellValue::Number(150.0));
+        assert_eq!(
+            style,
+            Some(ConditionalFormatStyle::Highlight { bg_color: "green".to_string(), text_color: "white".to_string() })
+        );
+
+        let val_id = cond_engine.add_validation_rule(
+            0,
+            0,
+            ValidationRuleType::ListFromOptions(vec!["Approved".to_string(), "Pending".to_string()]),
+            "Must select Approved or Pending".to_string(),
+        );
+        assert_eq!(val_id, 2);
+        assert!(cond_engine.validate_input(0, 0, &CellValue::Text("Approved".to_string())).is_ok());
+        assert!(cond_engine.validate_input(0, 0, &CellValue::Text("Rejected".to_string())).is_err());
+
+        // 2. Google Docs Smart Document Template Engine
+        let mut tpl_engine = SovereignSmartDocumentTemplateEngine::new();
+        tpl_engine.register_template("welcome-email", "Welcome Email", "Hello {{name}}, welcome to {{company}}!");
+        let mut vars = HashMap::new();
+        vars.insert("name".to_string(), "Alice".to_string());
+        vars.insert("company".to_string(), "SigmaOS".to_string());
+        let rendered = tpl_engine.render_template("welcome-email", &vars).unwrap();
+        assert_eq!(rendered, "Hello Alice, welcome to SigmaOS!");
+
+        // 3. Google Sites Landing Page CMS Engine
+        let mut cms_engine = SovereignLandingPageCmsEngine::new();
+        let p_id = cms_engine.create_page("Home Page", "home");
+        assert_eq!(p_id, 1);
+        cms_engine.add_block(p_id, CmsBlockType::HeroBanner { title: "Welcome".to_string(), subtitle: "Sovereign Desktop".to_string() });
+        let html = cms_engine.render_html(p_id).unwrap();
+        assert!(html.contains("<h1>Welcome</h1>"));
+
+        // 4. Microsoft Power BI Data Modeling Engine
+        let mut bi_engine = SovereignPowerBiDataModelingEngine::new();
+        let mut row1 = HashMap::new();
+        row1.insert("revenue".to_string(), 1000.0);
+        let mut row2 = HashMap::new();
+        row2.insert("revenue".to_string(), 2000.0);
+        bi_engine.add_table_data("Sales", vec![row1, row2]);
+        let total_rev = bi_engine.evaluate_measure("Sales", "revenue", MeasureAggFunc::Sum).unwrap();
+        assert_eq!(total_rev, 3000.0);
+
+        // 5. Microsoft Viva Engage Community Hub Engine
+        let mut viva_engine = SovereignVivaCommunityHubEngine::new();
+        let post_id = viva_engine.post_announcement("General", "Alice", "Q3 Target Achieved!", "We reached 100% of our goal.", Some(PraiseBadge::Innovation));
+        assert_eq!(post_id, 1);
+        assert!(viva_engine.upvote_post(post_id));
+
+        // 6. Zoho Subscriptions Billing Engine
+        let mut sub_engine = SovereignSubscriptionBillingEngine::new();
+        sub_engine.register_plan("pro-monthly", "Pro Plan", 29.99);
+        let sub_id = sub_engine.subscribe("alice@sigmaos.org", "pro-monthly").unwrap();
+        assert_eq!(sub_id, 1);
+        let charge = sub_engine.process_billing_charge(sub_id).unwrap();
+        assert_eq!(charge, 29.99);
+
+        // 7. Zoho Projects / Agile Sprint Board Engine
+        let mut sprint_engine = SovereignAgileSprintBoardEngine::new();
+        let item1 = sprint_engine.add_item("Implement Audio Stack", 5);
+        let _item2 = sprint_engine.add_item("Refactor Graphics Engine", 8);
+        assert_eq!(item1, 1);
+        assert!(sprint_engine.update_status(item1, ItemStatus::Done));
+        assert_eq!(sprint_engine.calculate_completed_velocity(), 5);
+
+        // 8. Salesforce Sales Territory Management Engine
+        let mut territory_engine = SovereignTerritoryManagementEngine::new();
+        let t_id = territory_engine.add_territory("US West", vec!["90".to_string(), "91".to_string(), "92".to_string()], 1000000.0);
+        assert_eq!(t_id, 1);
+        assert_eq!(territory_engine.route_zip("90210"), Some(1));
+
+        // 9. Salesforce Customer Journey Builder Engine
+        let mut journey_engine = SovereignCustomerJourneyBuilderEngine::new();
+        let j_id = journey_engine.create_journey("Onboarding Journey", vec![
+            JourneyStep::TriggerEmail("welcome@sigmaos.org".to_string()),
+            JourneyStep::WaitDelayDays(3),
+            JourneyStep::ConditionCheck("is_active".to_string()),
+        ]);
+        assert_eq!(j_id, 1);
+        assert!(journey_engine.enroll_contact("user@domain.com", j_id));
+        let step1 = journey_engine.advance_contact("user@domain.com");
+        assert!(matches!(step1, Some(JourneyStep::TriggerEmail(_))));
+
+        // 10. Odoo Manufacturing Work Center Routing Engine
+        let mut routing_engine = SovereignWorkCenterRoutingEngine::new();
+        let wc_id = routing_engine.add_work_center("CNC Machining", 120.0, 15.0);
+        assert_eq!(wc_id, 1);
+        let cost = routing_engine.calculate_operation_cost(wc_id, 45.0).unwrap();
+        assert_eq!(cost, 120.0); // (15 + 45)/60 * 120 = 1 * 120 = 120.0
+
+        // 11. Bitrix24 Automated Conversational CRM Chatbot Engine
+        let mut bot_engine = SovereignAutomatedCrmBotEngine::new();
+        bot_engine.add_intent("pricing", "Our plans start at $10/mo.");
+        let reply = bot_engine.process_message("What is your pricing model?");
+        assert_eq!(reply, "Our plans start at $10/mo.");
     }
 }
