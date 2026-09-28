@@ -8,6 +8,8 @@ use crate::driver::framework::{
 };
 #[cfg(not(feature = "standalone_test"))]
 use crate::package::PackageFormat;
+#[cfg(not(feature = "standalone_test"))]
+use std::sync::atomic::{AtomicBool, Ordering};
 
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -36,8 +38,10 @@ impl SimpleDriver {
 pub mod universal;
 
 #[cfg(feature = "standalone_test")]
-pub use universal::PackageFormat;
 use core::sync::atomic::{AtomicBool, Ordering};
+#[cfg(feature = "standalone_test")]
+use std::collections::BTreeMap;
+#[cfg(not(feature = "standalone_test"))]
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};

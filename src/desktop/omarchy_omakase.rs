@@ -547,5 +547,4 @@ mod tests {
         assert_eq!(pwa.instances.len(), 1);
     }
 
-    #[test]
 }

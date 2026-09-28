@@ -12,6 +12,7 @@ pub use crate::package::AptDebManifest;
 pub use crate::package::PackagePriority;
 pub use crate::sigpkg::Version;
 pub use crate::sigpkg::universal_engine::PackageFormat;
+pub use crate::security::Permission;
 
 
 #[cfg(feature = "standalone_test")]

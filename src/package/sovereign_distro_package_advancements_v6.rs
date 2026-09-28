@@ -29,9 +29,6 @@ use std::string::{String, ToString};
 #[cfg(not(feature = "standalone_test"))]
 use std::vec::Vec;
 
-#[cfg(not(feature = "standalone_test"))]
-use crate::package::PackageFormat;
-
 #[cfg(feature = "standalone_test")]
 use alloc::collections::{BTreeMap, BTreeSet};
 #[cfg(feature = "standalone_test")]
@@ -49,7 +46,7 @@ use crate::package::universal::{PackageError, PackageFormat, UnifiedPackage};
 pub mod universal;
 
 #[cfg(feature = "standalone_test")]
-pub use universal::{PackageError, PackageFormat, UnifiedPackage};
+pub use universal::{PackageError, UnifiedPackage};
 
 // =========================================================================
 // 1. Profile-Guided & Feedback-Driven Optimization Governor

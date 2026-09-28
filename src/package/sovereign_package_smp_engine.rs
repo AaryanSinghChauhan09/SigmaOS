@@ -38,7 +38,7 @@ use crate::package::universal::UnifiedPackage;
 pub mod universal;
 
 #[cfg(feature = "standalone_test")]
-pub use universal::{PackageError, PackageFormat, UnifiedPackage};
+pub use universal::{PackageError, UnifiedPackage};
 
 // =========================================================================
 // 1. Gentoo Portage & Nix `MAKEOPTS="-jN"` Multi-Core Build Scheduler

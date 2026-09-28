@@ -41,7 +41,7 @@ use crate::package::universal::{PackageFormat, UnifiedPackage};
 pub mod universal;
 
 #[cfg(feature = "standalone_test")]
-pub use universal::{PackageError, PackageFormat, UnifiedPackage};
+pub use universal::{PackageError, UnifiedPackage};
 
 // =========================================================================
 // 1. Cross-Distro Manifest Normalizer & DPLL SAT Solver
