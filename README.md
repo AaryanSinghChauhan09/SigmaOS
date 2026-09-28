@@ -307,6 +307,7 @@ git push origin feature/your-feature
 | Document | Description |
 |----------|-------------|
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Detailed system architecture guide |
+| [docs/OPEN_SOURCE_OS_COMPARATIVE_GAP_ANALYSIS.md](docs/OPEN_SOURCE_OS_COMPARATIVE_GAP_ANALYSIS.md) | Comprehensive Open-Source OS Comparative Gap Analysis |
 | [docs/PRODUCT_VISION.md](docs/PRODUCT_VISION.md) | Product vision and manifesto |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Master execution roadmap |
 | [docs/SUPPORT_MATRIX.md](docs/SUPPORT_MATRIX.md) | Hardware support matrix |

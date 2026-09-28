@@ -202,6 +202,7 @@ Each phase will be measured against:
 
 ## References
 
+- SigmaOS Open-Source OS Comparative Gap Analysis: `docs/OPEN_SOURCE_OS_COMPARATIVE_GAP_ANALYSIS.md`
 - Linux Kernel Documentation: https://www.kernel.org/doc/html/latest/
 - FreeBSD Handbook: https://www.freebsd.org/doc/handbook/
 - OpenBSD FAQ: https://www.openbsd.org/faq/
