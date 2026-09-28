@@ -247,6 +247,38 @@ Linux syscall compatibility layer:
 # - And many more
 ```
 
+## Sysfs - Kernel Parameters
+
+### Sysfs Operations
+
+Linux sysfs-inspired kernel parameter management:
+
+```bash
+# Create kobject
+sysfs create-kobject /kernel
+
+# Add attribute
+sysfs add-attr hostname sigmaos
+
+# Read attribute
+sysfs read /kernel/hostname
+
+# Write attribute
+sysfs write /kernel/hostname newhost
+
+# List children
+sysfs list /kernel
+```
+
+### Standard Parameters
+
+- **kernel.hostname**: System hostname
+- **kernel.osrelease**: OS release version
+- **kernel.version**: Kernel version
+- **vm.swappiness**: VM swappiness parameter
+- **vm.dirty_ratio**: Dirty page ratio
+- **net.ipv4.ip_forward**: IP forwarding
+
 ## Process Scheduler
 
 ### CFS Scheduler

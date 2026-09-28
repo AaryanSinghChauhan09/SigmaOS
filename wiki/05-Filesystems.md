@@ -233,6 +233,40 @@ tune2fs -O lazy_itable_init /dev/sda1
 echo 30 > /sys/fs/btrfs/sda1/commit_interval_secs
 ```
 
+## Virtual Filesystem (VFS)
+
+### VFS Operations
+
+Linux VFS-inspired unified filesystem abstraction:
+
+```bash
+# Create directory
+vfs mkdir /test 0755
+
+# Create file
+vfs create /test.txt 0644
+
+# Write to file
+vfs write /test.txt "Hello, World!"
+
+# Read from file
+vfs read /test.txt
+
+# List directory
+vfs readdir /
+
+# Lookup path
+vfs lookup /test
+```
+
+### VFS Features
+
+- **Inode Management**: Unified inode allocation and tracking
+- **Dentry Cache**: Directory entry caching for fast lookups
+- **Mount Points**: Filesystem mounting and unmounting
+- **Path Resolution**: Hierarchical path lookup
+- **File I/O**: Unified read/write operations
+
 ## B-tree Implementation
 
 ### B-tree Operations

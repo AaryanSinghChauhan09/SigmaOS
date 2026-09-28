@@ -244,6 +244,47 @@ sigboot enroll-key /path/to/key.der
 sigboot verify
 ```
 
+## Capability-Based Security
+
+### Capability Enforcement
+
+Linux capabilities and BSD Capsicum-inspired access control:
+
+```bash
+# Create security context
+cap create-context
+
+# Grant capability
+cap grant 1 chown
+
+# Revoke capability
+cap revoke 1 chown
+
+# Check access
+cap check 1 file write
+
+# Promote capability
+cap promote 1 dac_override
+```
+
+### Capabilities
+
+- **Chown**: Change file ownership
+- **DacOverride**: Override DAC permissions
+- **Kill**: Send signals to processes
+- **NetBindService**: Bind privileged ports
+- **NetAdmin**: Network administration
+- **SysAdmin**: System administration
+- And many more Linux capabilities
+
+### Resource Types
+
+- **File**: File access (read, write, execute)
+- **Socket**: Socket operations (bind, connect, listen)
+- **Process**: Process operations (delete, signal)
+- **Network**: Network operations
+- **System**: System-level operations
+
 ## Address Sanitizer
 
 ### ASan Memory Error Detection
