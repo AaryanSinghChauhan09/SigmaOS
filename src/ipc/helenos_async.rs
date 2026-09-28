@@ -189,13 +189,36 @@ impl Phone {
 
 /// IRQ registration for interrupt-driven notifications
 #[repr(C)]
-#[derive(Debug)]
 pub struct IrqRegistration {
     pub irq: IrqNumber,
     pub answerbox_id: AnswerboxId,
     pub top_half_handler: Option<Box<dyn TopHalfHandler>>,
     pub enabled: AtomicBool,
     pub counter: AtomicUsize,
+}
+
+impl Clone for IrqRegistration {
+    fn clone(&self) -> Self {
+        Self {
+            irq: self.irq,
+            answerbox_id: self.answerbox_id,
+            top_half_handler: None, // Cannot clone trait object
+            enabled: AtomicBool::new(self.enabled.load(Ordering::SeqCst)),
+            counter: AtomicUsize::new(self.counter.load(Ordering::SeqCst)),
+        }
+    }
+}
+
+impl std::fmt::Debug for IrqRegistration {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("IrqRegistration")
+            .field("irq", &self.irq)
+            .field("answerbox_id", &self.answerbox_id)
+            .field("has_handler", &self.top_half_handler.is_some())
+            .field("enabled", &self.enabled.load(Ordering::SeqCst))
+            .field("counter", &self.counter.load(Ordering::SeqCst))
+            .finish()
+    }
 }
 
 impl IrqRegistration {
