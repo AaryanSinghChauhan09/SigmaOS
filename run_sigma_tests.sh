@@ -156,6 +156,13 @@ if [ -f "src/drivers/sovereign_sound_hda_synthesis.rs" ]; then
     ./build/sovereign_sound_hda_test
 fi
 
+if [ -f "src/drivers/sovereign_hardware_roadmap.rs" ]; then
+    echo "Running Sovereign Hardware Roadmap & Driver Isolation test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/drivers/sovereign_hardware_roadmap.rs -o build/test_sovereign_hardware_roadmap
+    ./build/test_sovereign_hardware_roadmap
+fi
+
 if [ -f "src/drivers/sovereign_distro_driver_suite.rs" ]; then
     echo "Running Sovereign Universal Distro Driver Suite test suite..."
     mkdir -p build
