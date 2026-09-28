@@ -15,3 +15,5 @@
 
 pub mod handler;
 pub mod keyboard;
+pub mod gamepad;
+pub use gamepad::{GamepadManager, GamepadDevice, GamepadEvent, GamepadButton, GamepadAxis, GamepadEventType};
