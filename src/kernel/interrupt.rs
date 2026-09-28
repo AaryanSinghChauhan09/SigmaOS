@@ -1,240 +1,242 @@
-// SPDX-License-Identifier: MIT
-// SigmaOS Interrupt Subsystem
-// Interrupt handling and management inspired by Linux IRQ subsystem
+// Interrupt Handling Framework
+// Inspired by Linux and BSD interrupt handling with IDT and IRQ management
 
-#![allow(dead_code)]
-
-use std::collections::BTreeMap;
+use std::collections::HashMap;
 use std::sync::atomic::{AtomicU64, AtomicU32, Ordering};
 
-/// Interrupt number
-pub type IrqNumber = u32;
-
 /// Interrupt vector
-pub type IrqVector = u32;
-
-/// Interrupt handler type
-pub type IrqHandler = fn(IrqNumber) -> Result<(), &'static str>;
-
-/// Interrupt flags
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct IrqFlags {
-    pub disabled: bool,
-    pub shared: bool,
-    pub level_triggered: bool,
+pub struct InterruptVector {
+    pub number: u8,
+    pub type_id: InterruptType,
 }
 
-impl IrqFlags {
-    pub fn new(disabled: bool, shared: bool, level_triggered: bool) -> Self {
-        IrqFlags {
-            disabled,
-            shared,
-            level_triggered,
-        }
-    }
+/// Interrupt type
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum InterruptType {
+    Exception,
+    Irq,
+    SoftwareInterrupt,
+    Trap,
 }
+
+/// Interrupt handler function type
+pub type InterruptHandler = fn(InterruptVector, u64) -> ();
 
 /// Interrupt descriptor
-#[derive(Debug)]
-pub struct IrqDescriptor {
-    pub irq: IrqNumber,
-    pub vector: IrqVector,
-    pub handler: Option<IrqHandler>,
-    pub flags: IrqFlags,
-    pub name: String,
-    pub count: AtomicU64,
-    pub spurious_count: AtomicU32,
+#[derive(Debug, Clone)]
+pub struct InterruptDescriptor {
+    pub vector: InterruptVector,
+    pub handler: Option<InterruptHandler>,
+    pub handler_data: u64,
+    pub enabled: bool,
+    pub count: AtomicU32,
 }
 
-impl IrqDescriptor {
-    pub fn new(irq: IrqNumber, vector: IrqVector, name: String, flags: IrqFlags) -> Self {
-        IrqDescriptor {
-            irq,
-            vector,
-            handler: None,
-            flags,
-            name,
-            count: AtomicU64::new(0),
-            spurious_count: AtomicU32::new(0),
-        }
-    }
+/// IRQ line
+#[derive(Debug, Clone)]
+pub struct IrqLine {
+    pub number: u32,
+    pub trigger_type: IrqTriggerType,
+    pub handler: Option<InterruptHandler>,
+    pub handler_data: u64,
+    pub enabled: bool,
+    pub pending: bool,
+}
 
-    pub fn set_handler(&mut self, handler: IrqHandler) {
-        self.handler = Some(handler);
-    }
-
-    pub fn increment_count(&self) {
-        self.count.fetch_add(1, Ordering::SeqCst);
-    }
-
-    pub fn increment_spurious(&self) {
-        self.spurious_count.fetch_add(1, Ordering::SeqCst);
-    }
-
-    pub fn get_count(&self) -> u64 {
-        self.count.load(Ordering::SeqCst)
-    }
-
-    pub fn get_spurious_count(&self) -> u32 {
-        self.spurious_count.load(Ordering::SeqCst)
-    }
+/// IRQ trigger type
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IrqTriggerType {
+    Edge,
+    Level,
 }
 
 /// Interrupt controller
-#[derive(Debug)]
 pub struct InterruptController {
-    pub name: String,
-    pub irq_base: IrqNumber,
-    pub irq_count: u32,
-    pub enabled: AtomicU32, // 0 = disabled, 1 = enabled
+    next_vector: AtomicU8,
+    descriptors: HashMap<u8, InterruptDescriptor>,
+    irq_lines: HashMap<u32, IrqLine>,
+    interrupt_count: AtomicU64,
 }
 
 impl InterruptController {
-    pub fn new(name: String, irq_base: IrqNumber, irq_count: u32) -> Self {
-        InterruptController {
-            name,
-            irq_base,
-            irq_count,
-            enabled: AtomicU32::new(1),
-        }
-    }
-
-    pub fn enable(&self) {
-        self.enabled.store(1, Ordering::SeqCst);
-    }
-
-    pub fn disable(&self) {
-        self.enabled.store(0, Ordering::SeqCst);
-    }
-
-    pub fn is_enabled(&self) -> bool {
-        self.enabled.load(Ordering::SeqCst) == 1
-    }
-
-    pub fn handles_irq(&self, irq: IrqNumber) -> bool {
-        irq >= self.irq_base && irq < self.irq_base + self.irq_count
-    }
-}
-
-/// Interrupt subsystem
-#[derive(Debug)]
-pub struct InterruptSubsystem {
-    irqs: BTreeMap<IrqNumber, IrqDescriptor>,
-    controllers: BTreeMap<String, InterruptController>,
-    next_vector: AtomicU32,
-    global_enable: AtomicU32, // 0 = disabled, 1 = enabled
-}
-
-impl InterruptSubsystem {
     pub fn new() -> Self {
-        InterruptSubsystem {
-            irqs: BTreeMap::new(),
-            controllers: BTreeMap::new(),
-            next_vector: AtomicU32::new(32),
-            global_enable: AtomicU32::new(1),
+        Self {
+            next_vector: AtomicU8::new(32), // Start from 32 (exceptions use 0-31)
+            descriptors: HashMap::new(),
+            irq_lines: HashMap::new(),
+            interrupt_count: AtomicU64::new(0),
         }
     }
 
-    /// Register an interrupt controller
-    pub fn register_controller(&mut self, controller: InterruptController) {
-        self.controllers.insert(controller.name.clone(), controller);
-    }
-
-    /// Request an IRQ
-    pub fn request_irq(&mut self, irq: IrqNumber, name: String, flags: IrqFlags) -> Result<IrqVector, &'static str> {
-        if self.irqs.contains_key(&irq) {
-            return Err("IRQ already in use");
+    /// Allocate an interrupt vector
+    pub fn allocate_vector(&self, int_type: InterruptType) -> InterruptVector {
+        let number = self.next_vector.fetch_add(1, Ordering::SeqCst);
+        
+        InterruptVector {
+            number,
+            type_id: int_type,
         }
-
-        let vector = self.next_vector.fetch_add(1, Ordering::SeqCst);
-        let descriptor = IrqDescriptor::new(irq, vector, name, flags);
-        self.irqs.insert(irq, descriptor);
-        Ok(vector)
     }
 
-    /// Free an IRQ
-    pub fn free_irq(&mut self, irq: IrqNumber) -> Result<(), &'static str> {
-        self.irqs.remove(&irq).ok_or("IRQ not found")?;
+    /// Register an interrupt handler
+    pub fn register_handler(&mut self, vector: InterruptVector, handler: InterruptHandler, data: u64) -> Result<(), &'static str> {
+        let descriptor = InterruptDescriptor {
+            vector,
+            handler: Some(handler),
+            handler_data: data,
+            enabled: true,
+            count: AtomicU32::new(0),
+        };
+        
+        self.descriptors.insert(vector.number, descriptor);
         Ok(())
     }
 
-    /// Set IRQ handler
-    pub fn set_irq_handler(&mut self, irq: IrqNumber, handler: IrqHandler) -> Result<(), &'static str> {
-        let descriptor = self.irqs.get_mut(&irq).ok_or("IRQ not found")?;
-        descriptor.set_handler(handler);
+    /// Unregister an interrupt handler
+    pub fn unregister_handler(&mut self, vector: InterruptVector) -> Result<(), &'static str> {
+        if let Some(desc) = self.descriptors.get_mut(&vector.number) {
+            desc.handler = None;
+            desc.enabled = false;
+            Ok(())
+        } else {
+            Err("Interrupt descriptor not found")
+        }
+    }
+
+    /// Enable an interrupt
+    pub fn enable_interrupt(&mut self, vector: InterruptVector) -> Result<(), &'static str> {
+        if let Some(desc) = self.descriptors.get_mut(&vector.number) {
+            desc.enabled = true;
+            Ok(())
+        } else {
+            Err("Interrupt descriptor not found")
+        }
+    }
+
+    /// Disable an interrupt
+    pub fn disable_interrupt(&mut self, vector: InterruptVector) -> Result<(), &'static str> {
+        if let Some(desc) = self.descriptors.get_mut(&vector.number) {
+            desc.enabled = false;
+            Ok(())
+        } else {
+            Err("Interrupt descriptor not found")
+        }
+    }
+
+    /// Register an IRQ line
+    pub fn register_irq(&mut self, irq: u32, trigger_type: IrqTriggerType) -> Result<(), &'static str> {
+        if self.irq_lines.contains_key(&irq) {
+            return Err("IRQ already registered");
+        }
+        
+        let irq_line = IrqLine {
+            number: irq,
+            trigger_type,
+            handler: None,
+            handler_data: 0,
+            enabled: false,
+            pending: false,
+        };
+        
+        self.irq_lines.insert(irq, irq_line);
         Ok(())
+    }
+
+    /// Register IRQ handler
+    pub fn register_irq_handler(&mut self, irq: u32, handler: InterruptHandler, data: u64) -> Result<(), &'static str> {
+        if let Some(irq_line) = self.irq_lines.get_mut(&irq) {
+            irq_line.handler = Some(handler);
+            irq_line.handler_data = data;
+            Ok(())
+        } else {
+            Err("IRQ not found")
+        }
     }
 
     /// Enable IRQ
-    pub fn enable_irq(&mut self, irq: IrqNumber) -> Result<(), &'static str> {
-        let descriptor = self.irqs.get_mut(&irq).ok_or("IRQ not found")?;
-        descriptor.flags.disabled = false;
-        Ok(())
+    pub fn enable_irq(&mut self, irq: u32) -> Result<(), &'static str> {
+        if let Some(irq_line) = self.irq_lines.get_mut(&irq) {
+            irq_line.enabled = true;
+            Ok(())
+        } else {
+            Err("IRQ not found")
+        }
     }
 
     /// Disable IRQ
-    pub fn disable_irq(&mut self, irq: IrqNumber) -> Result<(), &'static str> {
-        let descriptor = self.irqs.get_mut(&irq).ok_or("IRQ not found")?;
-        descriptor.flags.disabled = true;
-        Ok(())
+    pub fn disable_irq(&mut self, irq: u32) -> Result<(), &'static str> {
+        if let Some(irq_line) = self.irq_lines.get_mut(&irq) {
+            irq_line.enabled = false;
+            Ok(())
+        } else {
+            Err("IRQ not found")
+        }
     }
 
-    /// Handle interrupt
-    pub fn handle_interrupt(&mut self, irq: IrqNumber) -> Result<(), &'static str> {
-        if !self.is_global_enabled() {
-            return Err("Interrupts globally disabled");
-        }
-
-        let descriptor = self.irqs.get(&irq).ok_or("IRQ not found")?;
+    /// Handle an interrupt
+    pub fn handle_interrupt(&mut self, vector: InterruptVector) -> Result<(), &'static str> {
+        self.interrupt_count.fetch_add(1, Ordering::SeqCst);
         
-        if descriptor.flags.disabled {
-            return Err("IRQ is disabled");
+        if let Some(desc) = self.descriptors.get_mut(&vector.number) {
+            if !desc.enabled {
+                return Err("Interrupt disabled");
+            }
+            
+            desc.count.fetch_add(1, Ordering::SeqCst);
+            
+            if let Some(handler) = desc.handler {
+                handler(vector, desc.handler_data);
+            }
+            
+            Ok(())
+        } else {
+            Err("Interrupt descriptor not found")
         }
+    }
 
-        descriptor.increment_count();
-
-        if let Some(handler) = descriptor.handler {
-            handler(irq)?;
+    /// Handle an IRQ
+    pub fn handle_irq(&mut self, irq: u32) -> Result<(), &'static str> {
+        if let Some(irq_line) = self.irq_lines.get_mut(&irq) {
+            if !irq_line.enabled {
+                return Err("IRQ disabled");
+            }
+            
+            irq_line.pending = false;
+            
+            if let Some(handler) = irq_line.handler {
+                handler(InterruptVector { number: irq as u8, type_id: InterruptType::Irq }, irq_line.handler_data);
+            }
+            
+            Ok(())
+        } else {
+            Err("IRQ not found")
         }
-
-        Ok(())
     }
 
-    /// Enable all interrupts globally
-    pub fn enable_all(&self) {
-        self.global_enable.store(1, Ordering::SeqCst);
+    /// Get interrupt count
+    pub fn interrupt_count(&self) -> u64 {
+        self.interrupt_count.load(Ordering::SeqCst)
     }
 
-    /// Disable all interrupts globally
-    pub fn disable_all(&self) {
-        self.global_enable.store(0, Ordering::SeqCst);
+    /// Get descriptor by vector
+    pub fn get_descriptor(&self, vector: u8) -> Option<&InterruptDescriptor> {
+        self.descriptors.get(&vector)
     }
 
-    /// Check if interrupts are globally enabled
-    pub fn is_global_enabled(&self) -> bool {
-        self.global_enable.load(Ordering::SeqCst) == 1
+    /// Get IRQ line
+    pub fn get_irq_line(&self, irq: u32) -> Option<&IrqLine> {
+        self.irq_lines.get(&irq)
+    }
+
+    /// Get descriptor count
+    pub fn descriptor_count(&self) -> usize {
+        self.descriptors.len()
     }
 
     /// Get IRQ count
     pub fn irq_count(&self) -> usize {
-        self.irqs.len()
-    }
-
-    /// Get controller count
-    pub fn controller_count(&self) -> usize {
-        self.controllers.len()
-    }
-
-    /// Get IRQ statistics
-    pub fn get_irq_stats(&self, irq: IrqNumber) -> Option<(u64, u32)> {
-        let descriptor = self.irqs.get(&irq)?;
-        Some((descriptor.get_count(), descriptor.get_spurious_count()))
-    }
-}
-
-impl Default for InterruptSubsystem {
-    fn default() -> Self {
-        Self::new()
+        self.irq_lines.len()
     }
 }
 
@@ -243,72 +245,65 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_interrupt_controller_registration() {
-        let mut subsystem = InterruptSubsystem::new();
+    fn test_allocate_vector() {
+        let controller = InterruptController::new();
         
-        let controller = InterruptController::new("PIC".to_string(), 0, 16);
-        subsystem.register_controller(controller);
-        
-        assert_eq!(subsystem.controller_count(), 1);
+        let vector = controller.allocate_vector(InterruptType::Irq);
+        assert_eq!(vector.number, 32);
     }
 
     #[test]
-    fn test_irq_request() {
-        let mut subsystem = InterruptSubsystem::new();
+    fn test_register_handler() {
+        let mut controller = InterruptController::new();
         
-        let flags = IrqFlags::new(false, false, true);
-        let vector = subsystem.request_irq(1, "test".to_string(), flags).unwrap();
+        let vector = controller.allocate_vector(InterruptType::Irq);
+        let handler: InterruptHandler = |_, _| {};
         
-        assert!(vector >= 32);
-        assert_eq!(subsystem.irq_count(), 1);
+        assert!(controller.register_handler(vector, handler, 0).is_ok());
+        assert_eq!(controller.descriptor_count(), 1);
+    }
+
+    #[test]
+    fn test_enable_disable_interrupt() {
+        let mut controller = InterruptController::new();
+        
+        let vector = controller.allocate_vector(InterruptType::Irq);
+        let handler: InterruptHandler = |_, _| {};
+        
+        controller.register_handler(vector, handler, 0).unwrap();
+        assert!(controller.disable_interrupt(vector).is_ok());
+        assert!(controller.enable_interrupt(vector).is_ok());
+    }
+
+    #[test]
+    fn test_register_irq() {
+        let mut controller = InterruptController::new();
+        
+        assert!(controller.register_irq(1, IrqTriggerType::Edge).is_ok());
+        assert_eq!(controller.irq_count(), 1);
     }
 
     #[test]
     fn test_irq_handler() {
-        let mut subsystem = InterruptSubsystem::new();
+        let mut controller = InterruptController::new();
         
-        let flags = IrqFlags::new(false, false, true);
-        subsystem.request_irq(1, "test".to_string(), flags).unwrap();
+        controller.register_irq(1, IrqTriggerType::Edge).unwrap();
+        let handler: InterruptHandler = |_, _| {};
         
-        let handler: IrqHandler = |_irq| Ok(());
-        subsystem.set_irq_handler(1, handler).unwrap();
+        assert!(controller.register_irq_handler(1, handler, 0).is_ok());
+        assert!(controller.enable_irq(1).is_ok());
     }
 
     #[test]
-    fn test_irq_enable_disable() {
-        let mut subsystem = InterruptSubsystem::new();
+    fn test_handle_interrupt() {
+        let mut controller = InterruptController::new();
         
-        let flags = IrqFlags::new(false, false, true);
-        subsystem.request_irq(1, "test".to_string(), flags).unwrap();
+        let vector = controller.allocate_vector(InterruptType::Irq);
+        let handler: InterruptHandler = |_, _| {};
         
-        subsystem.disable_irq(1).unwrap();
-        subsystem.enable_irq(1).unwrap();
-    }
-
-    #[test]
-    fn test_interrupt_handling() {
-        let mut subsystem = InterruptSubsystem::new();
+        controller.register_handler(vector, handler, 0).unwrap();
+        assert!(controller.handle_interrupt(vector).is_ok());
         
-        let flags = IrqFlags::new(false, false, true);
-        subsystem.request_irq(1, "test".to_string(), flags).unwrap();
-        
-        let handler: IrqHandler = |_irq| Ok(());
-        subsystem.set_irq_handler(1, handler).unwrap();
-        
-        subsystem.handle_interrupt(1).unwrap();
-        
-        let stats = subsystem.get_irq_stats(1).unwrap();
-        assert_eq!(stats.0, 1); // count
-    }
-
-    #[test]
-    fn test_global_enable_disable() {
-        let subsystem = InterruptSubsystem::new();
-        
-        subsystem.disable_all();
-        assert!(!subsystem.is_global_enabled());
-        
-        subsystem.enable_all();
-        assert!(subsystem.is_global_enabled());
+        assert_eq!(controller.interrupt_count(), 1);
     }
 }

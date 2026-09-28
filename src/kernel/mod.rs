@@ -169,6 +169,8 @@ pub mod kptr_restrict;
 pub mod pidfd;
 pub use pidfd::{PidFd, PidFdCapabilities, ProcDesc, ProcDescCapabilities, SubreaperEntry, PidfdProcDescManager};
 pub mod cfi;
+pub mod interrupt;
+pub use interrupt::{InterruptController, InterruptVector, InterruptType, InterruptDescriptor, IrqLine, IrqTriggerType};
 pub use cfi::{CfiEngine, CfiTarget, CfiViolation};
 pub use kptr_restrict::{
     KptrRestrictLevel, DmesgRestrictLevel, KernelSecurityMitigations, get_security_mitigations,
