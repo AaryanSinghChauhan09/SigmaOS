@@ -105,14 +105,12 @@ impl MemoryAuditShard {
         // The assembly block uses safe register binding and does not modify
         // memory or dereference pointers.
         unsafe {
-            let mut low: u32;
-            let mut high: u32;
+            let low: u32;
+            let high: u32;
             core::arch::asm!(
                 "rdtsc",
-                "mov {}, eax",
-                "mov {}, edx",
-                out(reg) low,
-                out(reg) high,
+                out("eax") low,
+                out("edx") high,
             );
             ((high as u64) << 32) | (low as u64)
         }
@@ -207,14 +205,12 @@ impl SandboxAuditShard {
         // The assembly block uses safe register binding and does not modify
         // memory or dereference pointers.
         unsafe {
-            let mut low: u32;
-            let mut high: u32;
+            let low: u32;
+            let high: u32;
             core::arch::asm!(
                 "rdtsc",
-                "mov {}, eax",
-                "mov {}, edx",
-                out(reg) low,
-                out(reg) high,
+                out("eax") low,
+                out("edx") high,
             );
             ((high as u64) << 32) | (low as u64)
         }
@@ -372,14 +368,12 @@ impl AuditCollectorBus {
         // The assembly block uses safe register binding and does not modify
         // memory or dereference pointers.
         unsafe {
-            let mut low: u32;
-            let mut high: u32;
+            let low: u32;
+            let high: u32;
             core::arch::asm!(
                 "rdtsc",
-                "mov {}, eax",
-                "mov {}, edx",
-                out(reg) low,
-                out(reg) high,
+                out("eax") low,
+                out("edx") high,
             );
             ((high as u64) << 32) | (low as u64)
         }
