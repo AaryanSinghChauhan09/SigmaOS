@@ -50,7 +50,7 @@ pub struct IoController {
 }
 
 /// PIDs controller settings
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct PidsController {
     pub max: u64,          // Maximum number of PIDs
     pub current: AtomicU64, // Current number of PIDs
