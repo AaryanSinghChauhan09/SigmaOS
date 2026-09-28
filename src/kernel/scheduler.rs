@@ -22,6 +22,27 @@ impl Priority {
     pub fn lowest() -> Self {
         Self { value: 19 }
     }
+
+    // Common priority levels for compatibility
+    pub fn realtime() -> Self {
+        Self { value: -20 }
+    }
+
+    pub fn high() -> Self {
+        Self { value: -10 }
+    }
+
+    pub fn normal() -> Self {
+        Self { value: 0 }
+    }
+
+    pub fn low() -> Self {
+        Self { value: 10 }
+    }
+
+    pub fn idle() -> Self {
+        Self { value: 19 }
+    }
 }
 
 /// Scheduler policy
@@ -38,13 +59,15 @@ pub enum SchedulerPolicy {
 pub enum ProcessState {
     Running,
     Runnable,
+    Ready, // Alias for Runnable for compatibility
     Sleeping,
     Stopped,
     Zombie,
+    Blocked, // For compatibility
 }
 
 /// Process task
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ProcessTask {
     pub pid: u64,
     pub priority: Priority,
@@ -56,21 +79,6 @@ pub struct ProcessTask {
     pub cpu_time: u64,     // CPU time used
     pub slice: u64,        // Time slice
 }
-
-impl Ord for ProcessTask {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        // Lower vruntime has higher priority
-        self.vruntime.cmp(&other.vruntime).reverse()
-    }
-}
-
-impl PartialOrd for ProcessTask {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-impl Eq for ProcessTask {}
 
 /// CFS scheduler
 pub struct CfsScheduler {

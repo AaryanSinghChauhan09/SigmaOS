@@ -26,6 +26,9 @@ pub enum NamespaceError {
     InvalidType,
     PermissionDenied,
     AlreadyExists,
+    InvalidNamespaceId,
+    ProcessNotInNamespace,
+    NamespaceFull,
 }
 
 /// Kernel namespace trait for compatibility
@@ -78,6 +81,12 @@ pub fn next_namespace_id() -> NamespaceId {
 /// Namespace ID
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct NamespaceId(pub u64);
+
+impl NamespaceId {
+    pub fn raw(&self) -> u64 {
+        self.0
+    }
+}
 
 /// User namespace
 #[derive(Debug, Clone)]
