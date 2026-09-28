@@ -8,16 +8,49 @@ license = "MIT OR GPL-2.0"
 repository = "https://github.com/AaryanSinghChauhan09/SigmaOS"
 
 [dependencies]
-# Core dependencies (minimal as per SigmaOS philosophy)
+# Zero external C dependencies for kernel space
 
 [dev-dependencies]
 # Test dependencies
 
 [features]
-default = []
+# 3-Tier Architecture Feature Gates
+default = ["kernel-tier", "services-tier"]
+
+# Tier 1: Core Kernel (no_std)
+kernel-tier = []
+
+# Tier 2: Core OS Services
+services-tier = [
+    "kernel-tier",
+    "filesystem",
+    "ipc",
+    "networking",
+    "security",
+]
+
+# Tier 3: Userland, Desktop, AI & Virtualization
+full = [
+    "services-tier",
+    "userland",
+    "desktop",
+    "ai",
+    "virtualization",
+]
+
+# Individual Subsystems
+filesystem = []
+ipc = []
+networking = []
+security = []
+userland = []
 desktop = []
-drivers = []
 ai = []
+virtualization = []
+
+# Legacy feature compatibility flags
+core-build = ["kernel-tier"]
+full-build = ["full"]
 microkernel = ["core-shards"]
 core-shards = []
 rtos = ["realtime"]
@@ -26,12 +59,7 @@ cloud = ["cloud-init"]
 cloud-init = []
 wasm = []
 browser = ["wasm"]
-# Build features
-core-build = []  # Core kernel components (VFS, Process, Network)
-full-build = ["core-build"]  # Full build with all modules
-# Opt-in feature consumed by src/klib/custom_allocator.rs via cfg(feature = "...").
-custom_alloc_error_handler = []
-standalone_test = []
+
 # Storage & Performance Matrix features
 cache-lfu = []
 cache-arc = []
@@ -53,7 +81,7 @@ capsicum = []
 seccomp-strict = []
 smack = []
 
-# Desktop environment features
+# Desktop Environment features
 gnome = []
 kde = []
 xfce = []
@@ -64,7 +92,6 @@ wayland = []
 mir = []
 x11 = []
 
-# Storage & Performance matrix features
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = [
     'cfg(custom_alloc_error_handler)',
