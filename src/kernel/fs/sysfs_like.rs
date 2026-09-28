@@ -19,14 +19,14 @@ use std::format;
 use crate::klib::btreemap::BTreeMap;
 use std::string::{String, ToString};
 
-pub struct SysfsAttribute {
+pub struct SysfsLikeAttribute {
     pub name: String,
     pub value: String,
 }
 
 pub struct SysfsDeviceNode {
     pub name: String,
-    pub attributes: BTreeMap<String, String>,
+    pub attributes: BTreeMap<String, SysfsLikeAttribute>,
 }
 
 pub struct SysfsTree {
@@ -62,7 +62,10 @@ impl SysfsTree {
             .devices
             .get_mut(&path)
             .ok_or("Device not found in sysfs")?;
-        node.attributes.insert(attr.to_string(), value.to_string());
+        node.attributes.insert(attr.to_string(), SysfsLikeAttribute {
+            name: attr.to_string(),
+            value: value.to_string(),
+        });
         Ok(())
     }
 
@@ -75,7 +78,7 @@ impl SysfsTree {
         let path = format!("/sys/class/{}/{}", class, name);
         let node = self.devices.get(&path).ok_or("Device not found in sysfs")?;
         let value = node.attributes.get(attr).ok_or("Attribute not found")?;
-        Ok(value.clone())
+        Ok(value.value.clone())
     }
 }
 

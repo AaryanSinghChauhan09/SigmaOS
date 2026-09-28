@@ -39,6 +39,7 @@ pub mod kqueue;
 pub mod linux_absorb;
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
+pub mod sysfs_manager;
 pub use linux_parity::{
     CmaRegion, KernelTimer, LinuxCmaAllocatorEngine, LinuxKernelTimerWheel,
     LinuxKernelWorkqueueEngine, LinuxRcuSynchronizationEngine, RcuCallback, WorkItem,
@@ -62,7 +63,6 @@ pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod sched;
 pub mod scheduler;
-pub mod sysfs;
 pub mod structures;
 pub mod virtual_cpu;
 
@@ -181,4 +181,4 @@ pub mod procfs_linux;
 pub use procfs_linux::{
     ProcessInfo, ProcFs,
 };
-pub use sysfs::{Sysfs, SysfsKobject, SysfsAttribute, SysfsAttributeType};
+pub use sysfs_manager::{Sysfs, SysfsKobject, SysfsAttribute};
