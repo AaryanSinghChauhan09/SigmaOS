@@ -26,6 +26,7 @@ cloud = ["cloud-init"]
 cloud-init = []
 wasm = []
 browser = ["wasm"]
+test_disabled = []
 # Build features
 core-build = []  # Core kernel components (VFS, Process, Network)
 full-build = ["core-build"]  # Full build with all modules
