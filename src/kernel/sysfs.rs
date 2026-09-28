@@ -1,281 +1,246 @@
-// Linux-inspired sysfs for kernel object representation
-// Provides sysfs for kernel object introspection
+// Sysfs - Kernel Parameter Management
+// Inspired by Linux sysfs for kernel parameter exposure
 
 use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
+use std::sync::atomic::{AtomicU64, AtomicU32, Ordering};
 
-/// Sysfs file type
+/// Sysfs attribute type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SysfsFileType {
-    Regular,
-    Directory,
-    Symlink,
+pub enum SysfsAttributeType {
+    String,
+    Integer,
+    Boolean,
+    Hex,
 }
 
-/// Sysfs entry
+/// Sysfs attribute
 #[derive(Debug, Clone)]
-pub struct SysfsEntry {
+pub struct SysfsAttribute {
     pub name: String,
-    pub file_type: SysfsFileType,
-    pub data: Vec<u8>,
-    pub children: HashMap<String, SysfsEntry>,
+    pub attr_type: SysfsAttributeType,
+    pub value: String,
+    pub permissions: u32, // 0444, 0644, etc.
+    pub writable: bool,
 }
 
-impl SysfsEntry {
-    pub fn new(name: String, file_type: SysfsFileType) -> Self {
-        Self {
-            name,
-            file_type,
-            data: Vec::new(),
-            children: HashMap::new(),
-        }
-    }
-
-    /// Add child entry
-    pub fn add_child(&mut self, entry: SysfsEntry) -> Result<(), String> {
-        if self.children.contains_key(&entry.name) {
-            return Err(format!("Child {} already exists", entry.name));
-        }
-
-        self.children.insert(entry.name.clone(), entry);
-        Ok(())
-    }
-
-    /// Remove child entry
-    pub fn remove_child(&mut self, name: &str) -> Result<(), String> {
-        match self.children.remove(name) {
-            Some(_) => Ok(()),
-            None => Err(format!("Child {} not found", name)),
-        }
-    }
-
-    /// Get child entry
-    pub fn get_child(&self, name: &str) -> Option<&SysfsEntry> {
-        self.children.get(name)
-    }
-
-    /// Set data
-    pub fn set_data(&mut self, data: Vec<u8>) {
-        self.data = data;
-    }
-
-    /// Get data
-    pub fn get_data(&self) -> &[u8] {
-        &self.data
-    }
-
-    /// Get child count
-    pub fn child_count(&self) -> usize {
-        self.children.len()
-    }
+/// Sysfs kobject (kernel object)
+#[derive(Debug, Clone)]
+pub struct SysfsKobject {
+    pub name: String,
+    pub parent: Option<u64>,
+    pub attributes: HashMap<String, SysfsAttribute>,
+    pub children: Vec<u64>,
 }
 
-/// Sysfs manager for system-wide sysfs management
-pub struct SysfsManager {
-    pub root: Arc<Mutex<SysfsEntry>>,
+/// Sysfs directory
+pub struct Sysfs {
+    next_kobject_id: AtomicU64,
+    kobjects: HashMap<u64, SysfsKobject>,
+    root_kobject: u64,
 }
 
-impl SysfsManager {
+impl Sysfs {
     pub fn new() -> Self {
-        let root = SysfsEntry::new("sys".to_string(), SysfsFileType::Directory);
-        Self {
-            root: Arc::new(Mutex::new(root)),
+        let mut sysfs = Self {
+            next_kobject_id: AtomicU64::new(1),
+            kobjects: HashMap::new(),
+            root_kobject: 1,
+        };
+        
+        // Create root kobject
+        let root = SysfsKobject {
+            name: "sys".to_string(),
+            parent: None,
+            attributes: HashMap::new(),
+            children: Vec::new(),
+        };
+        
+        sysfs.kobjects.insert(1, root);
+        sysfs
+    }
+
+    /// Create a kobject
+    pub fn create_kobject(&mut self, name: String, parent_id: Option<u64>) -> u64 {
+        let id = self.next_kobject_id.fetch_add(1, Ordering::SeqCst);
+        
+        let kobject = SysfsKobject {
+            name,
+            parent: parent_id,
+            attributes: HashMap::new(),
+            children: Vec::new(),
+        };
+        
+        if let Some(parent) = parent_id {
+            if let Some(parent_kobj) = self.kobjects.get_mut(&parent) {
+                parent_kobj.children.push(id);
+            }
+        }
+        
+        self.kobjects.insert(id, kobject);
+        id
+    }
+
+    /// Add an attribute to a kobject
+    pub fn add_attribute(&mut self, kobject_id: u64, attr: SysfsAttribute) -> Result<(), &'static str> {
+        if let Some(kobject) = self.kobjects.get_mut(&kobject_id) {
+            kobject.attributes.insert(attr.name.clone(), attr);
+            Ok(())
+        } else {
+            Err("Kobject not found")
         }
     }
 
-    /// Create directory
-    pub fn create_directory(&self, path: &str) -> Result<(), String> {
-        let parts: Vec<String> = path.split('/').filter(|s| !s.is_empty()).map(|s| s.to_string()).collect();
-        if parts.is_empty() {
-            return Err("Invalid path".to_string());
+    /// Read an attribute
+    pub fn read_attribute(&self, kobject_id: u64, attr_name: &str) -> Result<String, &'static str> {
+        let kobject = self.kobjects.get(&kobject_id).ok_or("Kobject not found")?;
+        let attr = kobject.attributes.get(attr_name).ok_or("Attribute not found")?;
+        Ok(attr.value.clone())
+    }
+
+    /// Write an attribute
+    pub fn write_attribute(&mut self, kobject_id: u64, attr_name: &str, value: String) -> Result<(), &'static str> {
+        let kobject = self.kobjects.get_mut(&kobject_id).ok_or("Kobject not found")?;
+        let attr = kobject.attributes.get_mut(attr_name).ok_or("Attribute not found")?;
+        
+        if !attr.writable {
+            return Err("Attribute is read-only");
         }
-
-        let mut root = self.root.lock().unwrap();
-        let mut current = &mut *root;
-
-        for (i, part) in parts.iter().enumerate() {
-            let is_last = i == parts.len() - 1;
-
-            let exists = current.children.contains_key(part);
-            if exists {
-                let child = current.children.get_mut(part).unwrap();
-                if is_last && child.file_type != SysfsFileType::Directory {
-                    return Err(format!("{} is not a directory", path));
-                }
-                current = child;
-            } else {
-                if is_last {
-                    let new_entry = SysfsEntry::new(part.clone(), SysfsFileType::Directory);
-                    current.children.insert(part.clone(), new_entry);
-                } else {
-                    let new_entry = SysfsEntry::new(part.clone(), SysfsFileType::Directory);
-                    current.children.insert(part.clone(), new_entry);
-                    current = current.children.get_mut(part).unwrap();
-                }
-            }
-        }
-
+        
+        attr.value = value;
         Ok(())
     }
 
-    /// Create file
-    pub fn create_file(&self, path: &str, data: Vec<u8>) -> Result<(), String> {
-        let parts: Vec<String> = path.split('/').filter(|s| !s.is_empty()).map(|s| s.to_string()).collect();
-        if parts.is_empty() {
-            return Err("Invalid path".to_string());
+    /// Lookup kobject by path
+    pub fn lookup(&self, path: &str) -> Option<u64> {
+        if path == "/" || path == "" {
+            return Some(self.root_kobject);
         }
-
-        let filename = parts.last().unwrap();
-        let dir_path: Vec<String> = parts[..parts.len() - 1].to_vec();
-        let dir_path_str = dir_path.join("/");
-
-        let mut root = self.root.lock().unwrap();
-        let mut current = &mut *root;
-
-        // Navigate to directory
-        for part in &dir_path {
-            if current.children.contains_key(part) {
-                current = current.children.get_mut(part).unwrap();
-            } else {
-                return Err(format!("Directory {} not found", dir_path_str));
-            }
+        
+        let components: Vec<&str> = path.split('/').filter(|s| !s.is_empty()).collect();
+        let mut current_id = self.root_kobject;
+        
+        for component in components {
+            let kobject = self.kobjects.get(&current_id)?;
+            
+            let child_id = kobject.children.iter()
+                .find(|&&id| {
+                    if let Some(child) = self.kobjects.get(&id) {
+                        child.name == component
+                    } else {
+                        false
+                    }
+                })
+                .copied()?;
+            
+            current_id = child_id;
         }
-
-        // Create file
-        let mut new_entry = SysfsEntry::new(filename.clone(), SysfsFileType::Regular);
-        new_entry.set_data(data);
-        current.children.insert(filename.clone(), new_entry);
-
-        Ok(())
+        
+        Some(current_id)
     }
 
-    /// Read file
-    pub fn read_file(&self, path: &str) -> Result<Vec<u8>, String> {
-        let parts: Vec<String> = path.split('/').filter(|s| !s.is_empty()).map(|s| s.to_string()).collect();
-        if parts.is_empty() {
-            return Err("Invalid path".to_string());
-        }
-
-        let filename = parts.last().unwrap();
-        let dir_path: Vec<String> = parts[..parts.len() - 1].to_vec();
-        let dir_path_str = dir_path.join("/");
-
-        let root = self.root.lock().unwrap();
-        let mut current = &*root;
-
-        // Navigate to directory
-        for part in &dir_path {
-            if current.children.contains_key(part) {
-                current = current.children.get(part).unwrap();
-            } else {
-                return Err(format!("Directory {} not found", dir_path_str));
+    /// Get kobject children
+    pub fn get_children(&self, kobject_id: u64) -> Vec<&SysfsKobject> {
+        let kobject = self.kobjects.get(&kobject);
+        
+        match kobject {
+            Some(kobj) => {
+                kobj.children.iter()
+                    .filter_map(|&id| self.kobjects.get(&id))
+                    .collect()
             }
-        }
-
-        // Read file
-        match current.children.get(filename) {
-            Some(entry) => {
-                if entry.file_type == SysfsFileType::Regular {
-                    Ok(entry.get_data().to_vec())
-                } else {
-                    Err(format!("{} is not a regular file", path))
-                }
-            }
-            None => Err(format!("File {} not found", path)),
+            None => Vec::new(),
         }
     }
 
-    /// Write file
-    pub fn write_file(&self, path: &str, data: Vec<u8>) -> Result<(), String> {
-        let parts: Vec<String> = path.split('/').filter(|s| !s.is_empty()).map(|s| s.to_string()).collect();
-        if parts.is_empty() {
-            return Err("Invalid path".to_string());
-        }
-
-        let filename = parts.last().unwrap();
-        let dir_path: Vec<String> = parts[..parts.len() - 1].to_vec();
-        let dir_path_str = dir_path.join("/");
-
-        let mut root = self.root.lock().unwrap();
-        let mut current = &mut *root;
-
-        // Navigate to directory
-        for part in &dir_path {
-            if current.children.contains_key(part) {
-                current = current.children.get_mut(part).unwrap();
-            } else {
-                return Err(format!("Directory {} not found", dir_path_str));
+    /// Get kobject attributes
+    pub fn get_attributes(&self, kobject_id: u64) -> Vec<&SysfsAttribute> {
+        let kobject = self.kobjects.get(&kobject_id);
+        
+        match kobject {
+            Some(kobj) => {
+                kobj.attributes.values().collect()
             }
-        }
-
-        // Write file
-        match current.children.get_mut(filename) {
-            Some(entry) => {
-                if entry.file_type == SysfsFileType::Regular {
-                    entry.set_data(data);
-                    Ok(())
-                } else {
-                    Err(format!("{} is not a regular file", path))
-                }
-            }
-            None => Err(format!("File {} not found", path)),
+            None => Vec::new(),
         }
     }
 
-    /// Remove entry
-    pub fn remove(&self, path: &str) -> Result<(), String> {
-        let parts: Vec<String> = path.split('/').filter(|s| !s.is_empty()).map(|s| s.to_string()).collect();
-        if parts.is_empty() {
-            return Err("Invalid path".to_string());
-        }
-
-        let filename = parts.last().unwrap();
-        let dir_path: Vec<String> = parts[..parts.len() - 1].to_vec();
-        let dir_path_str = dir_path.join("/");
-
-        let mut root = self.root.lock().unwrap();
-        let mut current = &mut *root;
-
-        // Navigate to directory
-        for part in &dir_path {
-            if current.children.contains_key(part) {
-                current = current.children.get_mut(part).unwrap();
-            } else {
-                return Err(format!("Directory {} not found", dir_path_str));
-            }
-        }
-
-        // Remove entry
-        current.remove_child(filename)
+    /// Create standard kernel parameters
+    pub fn create_kernel_params(&mut self) {
+        // Create kernel directory
+        let kernel_id = self.create_kobject("kernel".to_string(), Some(self.root_kobject));
+        
+        // Add hostname attribute
+        self.add_attribute(kernel_id, SysfsAttribute {
+            name: "hostname".to_string(),
+            attr_type: SysfsAttributeType::String,
+            value: "sigmaos".to_string(),
+            permissions: 0o644,
+            writable: true,
+        }).unwrap();
+        
+        // Add osrelease attribute
+        self.add_attribute(kernel_id, SysfsAttribute {
+            name: "osrelease".to_string(),
+            attr_type: SysfsAttributeType::String,
+            value: "1.0.0".to_string(),
+            permissions: 0o444,
+            writable: false,
+        }).unwrap();
+        
+        // Add version attribute
+        self.add_attribute(kernel_id, SysfsAttribute {
+            name: "version".to_string(),
+            attr_type: SysfsAttributeType::String,
+            value: "#1 SMP".to_string(),
+            permissions: 0o444,
+            writable: false,
+        }).unwrap();
+        
+        // Create vm directory
+        let vm_id = self.create_kobject("vm".to_string(), Some(self.root_kobject));
+        
+        // Add swappiness attribute
+        self.add_attribute(vm_id, SysfsAttribute {
+            name: "swappiness".to_string(),
+            attr_type: SysfsAttributeType::Integer,
+            value: "60".to_string(),
+            permissions: 0o644,
+            writable: true,
+        }).unwrap();
+        
+        // Add dirty_ratio attribute
+        self.add_attribute(vm_id, SysfsAttribute {
+            name: "dirty_ratio".to_string(),
+            attr_type: SysfsAttributeType::Integer,
+            value: "20".to_string(),
+            permissions: 0o644,
+            writable: true,
+        }).unwrap();
+        
+        // Create net directory
+        let net_id = self.create_kobject("net".to_string(), Some(self.root_kobject));
+        
+        // Add ipv4 directory
+        let ipv4_id = self.create_kobject("ipv4".to_string(), Some(net_id));
+        
+        // Add ip_forward attribute
+        self.add_attribute(ipv4_id, SysfsAttribute {
+            name: "ip_forward".to_string(),
+            attr_type: SysfsAttributeType::Integer,
+            value: "0".to_string(),
+            permissions: 0o644,
+            writable: true,
+        }).unwrap();
     }
 
-    /// List directory
-    pub fn list_directory(&self, path: &str) -> Result<Vec<String>, String> {
-        let parts: Vec<String> = path.split('/').filter(|s| !s.is_empty()).map(|s| s.to_string()).collect();
-
-        let root = self.root.lock().unwrap();
-        let mut current = &*root;
-
-        // Navigate to directory
-        for part in &parts {
-            if current.children.contains_key(part) {
-                current = current.children.get(part).unwrap();
-            } else {
-                return Err(format!("Directory {} not found", path));
-            }
-        }
-
-        if current.file_type != SysfsFileType::Directory {
-            return Err(format!("{} is not a directory", path));
-        }
-
-        Ok(current.children.keys().cloned().collect())
+    /// Get kobject count
+    pub fn kobject_count(&self) -> usize {
+        self.kobjects.len()
     }
-}
 
-impl Default for SysfsManager {
-    fn default() -> Self {
-        Self::new()
+    /// Get root kobject
+    pub fn root_kobject(&self) -> u64 {
+        self.root_kobject
     }
 }
 
@@ -284,100 +249,93 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_sysfs_entry() {
-        let entry = SysfsEntry::new("test".to_string(), SysfsFileType::Regular);
-        assert_eq!(entry.name, "test");
-        assert_eq!(entry.file_type, SysfsFileType::Regular);
+    fn test_create_kobject() {
+        let mut sysfs = Sysfs::new();
+        
+        let id = sysfs.create_kobject("test".to_string(), Some(1));
+        assert_eq!(id, 2);
+        assert_eq!(sysfs.kobject_count(), 2);
     }
 
     #[test]
-    fn test_sysfs_entry_add_child() {
-        let mut entry = SysfsEntry::new("parent".to_string(), SysfsFileType::Directory);
-        let child = SysfsEntry::new("child".to_string(), SysfsFileType::Regular);
-
-        entry.add_child(child).unwrap();
-        assert_eq!(entry.child_count(), 1);
+    fn test_add_attribute() {
+        let mut sysfs = Sysfs::new();
+        
+        let id = sysfs.create_kobject("test".to_string(), Some(1));
+        
+        let attr = SysfsAttribute {
+            name: "attr1".to_string(),
+            attr_type: SysfsAttributeType::String,
+            value: "value1".to_string(),
+            permissions: 0o644,
+            writable: true,
+        };
+        
+        assert!(sysfs.add_attribute(id, attr).is_ok());
     }
 
     #[test]
-    fn test_sysfs_entry_set_data() {
-        let mut entry = SysfsEntry::new("test".to_string(), SysfsFileType::Regular);
-        entry.set_data(b"Hello".to_vec());
-
-        assert_eq!(entry.get_data(), b"Hello");
+    fn test_read_write_attribute() {
+        let mut sysfs = Sysfs::new();
+        
+        let id = sysfs.create_kobject("test".to_string(), Some(1));
+        
+        let attr = SysfsAttribute {
+            name: "attr1".to_string(),
+            attr_type: SysfsAttributeType::String,
+            value: "value1".to_string(),
+            permissions: 0o644,
+            writable: true,
+        };
+        
+        sysfs.add_attribute(id, attr).unwrap();
+        
+        let value = sysfs.read_attribute(id, "attr1").unwrap();
+        assert_eq!(value, "value1");
+        
+        sysfs.write_attribute(id, "attr1", "value2".to_string()).unwrap();
+        
+        let value = sysfs.read_attribute(id, "attr1").unwrap();
+        assert_eq!(value, "value2");
     }
 
     #[test]
-    fn test_sysfs_manager() {
-        let manager = SysfsManager::new();
-        assert_eq!(manager.root.lock().unwrap().name, "sys");
+    fn test_lookup() {
+        let mut sysfs = Sysfs::new();
+        
+        let id = sysfs.create_kobject("test".to_string(), Some(1));
+        
+        let found_id = sysfs.lookup("/test").unwrap();
+        assert_eq!(found_id, id);
     }
 
     #[test]
-    fn test_sysfs_manager_create_directory() {
-        let manager = SysfsManager::new();
-        manager.create_directory("kernel").unwrap();
-
-        let root = manager.root.lock().unwrap();
-        assert!(root.children.contains_key("kernel"));
+    fn test_kernel_params() {
+        let mut sysfs = Sysfs::new();
+        
+        sysfs.create_kernel_params();
+        
+        let kernel_id = sysfs.lookup("/kernel").unwrap();
+        let hostname = sysfs.read_attribute(kernel_id, "hostname").unwrap();
+        assert_eq!(hostname, "sigmaos");
     }
 
     #[test]
-    fn test_sysfs_manager_create_file() {
-        let manager = SysfsManager::new();
-        manager.create_directory("kernel").unwrap();
-        manager.create_file("kernel/version", b"1.0".to_vec()).unwrap();
-
-        let data = manager.read_file("kernel/version").unwrap();
-        assert_eq!(data, b"1.0");
-    }
-
-    #[test]
-    fn test_sysfs_manager_read_file() {
-        let manager = SysfsManager::new();
-        manager.create_directory("kernel").unwrap();
-        manager.create_file("kernel/version", b"1.0".to_vec()).unwrap();
-
-        let data = manager.read_file("kernel/version").unwrap();
-        assert_eq!(data, b"1.0");
-    }
-
-    #[test]
-    fn test_sysfs_manager_write_file() {
-        let manager = SysfsManager::new();
-        manager.create_directory("kernel").unwrap();
-        manager.create_file("kernel/version", b"1.0".to_vec()).unwrap();
-        manager.write_file("kernel/version", b"2.0".to_vec()).unwrap();
-
-        let data = manager.read_file("kernel/version").unwrap();
-        assert_eq!(data, b"2.0");
-    }
-
-    #[test]
-    fn test_sysfs_manager_list_directory() {
-        let manager = SysfsManager::new();
-        manager.create_directory("kernel").unwrap();
-        manager.create_file("kernel/version", b"1.0".to_vec()).unwrap();
-
-        let entries = manager.list_directory("kernel").unwrap();
-        assert!(entries.contains(&"version".to_string()));
-    }
-
-    #[test]
-    fn test_sysfs_manager_remove() {
-        let manager = SysfsManager::new();
-        manager.create_directory("kernel").unwrap();
-        manager.create_file("kernel/version", b"1.0".to_vec()).unwrap();
-        manager.remove("kernel/version").unwrap();
-
-        let entries = manager.list_directory("kernel").unwrap();
-        assert!(!entries.contains(&"version".to_string()));
-    }
-
-    #[test]
-    fn test_sysfs_manager_invalid() {
-        let manager = SysfsManager::new();
-        assert!(manager.read_file("nonexistent").is_err());
-        assert!(manager.write_file("nonexistent", b"test".to_vec()).is_err());
+    fn test_readonly_attribute() {
+        let mut sysfs = Sysfs::new();
+        
+        let id = sysfs.create_kobject("test".to_string(), Some(1));
+        
+        let attr = SysfsAttribute {
+            name: "attr1".to_string(),
+            attr_type: SysfsAttributeType::String,
+            value: "value1".to_string(),
+            permissions: 0o444,
+            writable: false,
+        };
+        
+        sysfs.add_attribute(id, attr).unwrap();
+        
+        assert!(sysfs.write_attribute(id, "attr1", "value2".to_string()).is_err());
     }
 }

@@ -62,6 +62,7 @@ pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod sched;
 pub mod scheduler;
+pub mod sysfs;
 pub mod structures;
 pub mod virtual_cpu;
 
@@ -172,6 +173,7 @@ pub mod cfi;
 pub mod interrupt;
 pub use interrupt::{InterruptController, InterruptVector, InterruptType, InterruptDescriptor, IrqLine, IrqTriggerType};
 pub mod scheduler;
+pub mod sysfs;
 pub use scheduler::{CfsScheduler, RtScheduler, EnergyAwareScheduler, ProcessTask, Priority, SchedulerPolicy, ProcessState, ThermalState};
 pub use cfi::{CfiEngine, CfiTarget, CfiViolation};
 pub use kptr_restrict::{
@@ -182,3 +184,4 @@ pub mod procfs_linux;
 pub use procfs_linux::{
     ProcessInfo, ProcFs,
 };
+pub use sysfs::{Sysfs, SysfsKobject, SysfsAttribute, SysfsAttributeType};
