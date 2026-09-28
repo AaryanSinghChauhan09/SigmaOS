@@ -2828,6 +2828,79 @@ impl Default for SovereignUniversalDistroPackageMasterGateway {
     }
 }
 
+// ============================================================================
+// EXPANDED USER-DEFINED FUNCTION (UDF) PIPELINE ENGINES FOR UNIVERSAL PM
+// ============================================================================
+
+/// UDF Dynamic Package Patch & Transformation Engine
+#[derive(Debug, Clone, Default)]
+pub struct UdfPackagePatchTransformerEngine {
+    pub patch_count: usize,
+    pub active_filters: Vec<String>,
+}
+
+impl UdfPackagePatchTransformerEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn apply_patch(&mut self, pkg: &mut UnifiedPackage, patch_diff: &str) {
+        self.patch_count += 1;
+        pkg.properties.insert(format!("udf_patch_{}", self.patch_count), patch_diff.to_string());
+    }
+}
+
+/// UDF Sandbox Environment Sanitizer Engine
+#[derive(Debug, Clone, Default)]
+pub struct UdfEnvironmentSanitizerEngine {
+    pub sanitized_vars_count: usize,
+    pub safe_env: HashMap<String, String>,
+}
+
+impl UdfEnvironmentSanitizerEngine {
+    pub fn new() -> Self {
+        let mut safe_env = HashMap::new();
+        safe_env.insert("PATH".to_string(), "/usr/bin:/bin".to_string());
+        safe_env.insert("LANG".to_string(), "C.UTF-8".to_string());
+        Self {
+            sanitized_vars_count: 2,
+            safe_env,
+        }
+    }
+
+    pub fn sanitize_env(&mut self, incoming_env: HashMap<String, String>) -> HashMap<String, String> {
+        let mut sanitized = self.safe_env.clone();
+        for (k, v) in incoming_env {
+            if k.starts_with("SIGMA_") || k == "FLAGS" {
+                sanitized.insert(k, v);
+                self.sanitized_vars_count += 1;
+            }
+        }
+        sanitized
+    }
+}
+
+/// UDF SAT Dependency Solver Constraint Filter
+#[derive(Debug, Clone, Default)]
+pub struct UdfCustomConstraintSolverFilter {
+    pub blacklisted_packages: HashSet<String>,
+    pub required_flags: Vec<String>,
+}
+
+impl UdfCustomConstraintSolverFilter {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn is_package_permitted(&self, pkg_name: &str) -> bool {
+        !self.blacklisted_packages.contains(pkg_name)
+    }
+
+    pub fn add_blacklist(&mut self, pkg_name: &str) {
+        self.blacklisted_packages.insert(pkg_name.to_string());
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -3418,5 +3491,30 @@ mod tests {
         assert!(pkg3.formats.contains(&PackageFormat::Tar));
 
         assert_eq!(gateway.total_packages_processed, 3);
+    }
+
+    #[test]
+    fn test_udf_pipeline_engines_in_universal_package() {
+        // UDF Patch Transformer
+        let mut transformer = UdfPackagePatchTransformerEngine::new();
+        let mut pkg = UnifiedPackage::new("patch-test".to_string(), "1.0.0".to_string());
+        transformer.apply_patch(&mut pkg, "--- a/main.c\n+++ b/main.c\n@@ -1 +1 @@\n-old\n+new");
+        assert_eq!(transformer.patch_count, 1);
+        assert!(pkg.properties.contains_key("udf_patch_1"));
+
+        // UDF Environment Sanitizer
+        let mut sanitizer = UdfEnvironmentSanitizerEngine::new();
+        let mut dirty_env = HashMap::new();
+        dirty_env.insert("LD_PRELOAD".to_string(), "/tmp/hack.so".to_string());
+        dirty_env.insert("SIGMA_OPTIMIZE".to_string(), "O3".to_string());
+        let clean_env = sanitizer.sanitize_env(dirty_env);
+        assert!(!clean_env.contains_key("LD_PRELOAD"));
+        assert_eq!(clean_env.get("SIGMA_OPTIMIZE").unwrap(), "O3");
+
+        // UDF Constraint Filter
+        let mut filter = UdfCustomConstraintSolverFilter::new();
+        filter.add_blacklist("insecure-ssl");
+        assert!(filter.is_package_permitted("openssl"));
+        assert!(!filter.is_package_permitted("insecure-ssl"));
     }
 }
