@@ -1,357 +1,364 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
+// Capability-Based Security Enforcement
+// Inspired by Linux capabilities and BSD Capsicum for fine-grained access control
 
-// Android-Style: Runtime Capability Token Guard and Security Delegate
-// Enforces runtime permissions using isolated CapabilityTokens
-// Enhanced with Linux POSIX-style capabilities and OpenBSD-style pledge security systems
+use std::collections::HashMap;
+use std::sync::atomic::{AtomicU64, Ordering};
 
-// (no_std only applicable at crate root - removed)
-
-pub const PORT_ALLOW_TCP: u16 = 80;
-pub const PORT_ALLOW_SSL: u16 = 443;
-pub const MAX_TOKENS: usize = 32;
-
-// Standard Linux-style POSIX Capability bit positions
-pub const CAP_NET_BIND_SERVICE_BIT: u32 = 10; // Allow binding to ports < 1024
-pub const CAP_SYS_ADMIN_BIT: u32 = 21; // Full administrator privileges
-pub const CAP_SYS_CHROOT_BIT: u32 = 18; // Allow chroot system call
-pub const CAP_SYS_PTRACE_BIT: u32 = 19; // Allow debugging/tracing other processes
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct CapabilityToken {
-    pub process_id: u32,
-    pub is_network_allowed: bool,
-    pub is_fs_read_allowed: bool,
-    pub is_fs_write_allowed: bool,
-    pub allowed_ports: [u16; 8],
-    pub port_count: usize,
-    /// Linux-style POSIX capability bitmask
-    pub posix_capabilities: u64,
-    /// OpenBSD-style promised categories (bitmask representing stdio, rpath, wpath, inet, proc, exec)
-    pub pledged_promises: u32,
+/// Linux capability
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum LinuxCapability {
+    Chown,
+    DacOverride,
+    DacReadSearch,
+    Fowner,
+    Fsetid,
+    Kill,
+    Setgid,
+    Setuid,
+    Setpcap,
+    LinuxImmutable,
+    NetBindService,
+    NetBroadcast,
+    NetAdmin,
+    NetRaw,
+    IpcLock,
+    IpcOwner,
+    SysModule,
+    SysRawio,
+    SysChroot,
+    SysPtrace,
+    SysPacct,
+    SysAdmin,
+    SysBoot,
+    SysNice,
+    SysResource,
+    SysTime,
+    SysTtyConfig,
+    Mknod,
+    Lease,
+    AuditWrite,
+    AuditControl,
+    Setfcap,
+    MacOverride,
+    MacAdmin,
+    Syslog,
+    WakeAlarm,
+    BlockSuspend,
+    AuditRead,
 }
 
-impl CapabilityToken {
-    pub fn new(process_id: u32) -> Self {
-        Self {
-            process_id,
-            is_network_allowed: false,
-            is_fs_read_allowed: false,
-            is_fs_write_allowed: false,
-            allowed_ports: [0; 8],
-            port_count: 0,
-            posix_capabilities: 0,
-            pledged_promises: 0xFFFFFFFF, // All promises allowed by default until pledge is called
-        }
-    }
-
-    pub fn allow_network(mut self) -> Self {
-        self.is_network_allowed = true;
-        self
-    }
-
-    pub fn allow_fs_read(mut self) -> Self {
-        self.is_fs_read_allowed = true;
-        self
-    }
-
-    pub fn allow_fs_write(mut self) -> Self {
-        self.is_fs_write_allowed = true;
-        self
-    }
-
-    pub fn add_port(mut self, port: u16) -> Self {
-        if self.port_count < 8 {
-            self.allowed_ports[self.port_count] = port;
-            self.port_count += 1;
-        }
-        self
-    }
-
-    pub fn has_port(&self, port: u16) -> bool {
-        for i in 0..self.port_count {
-            if self.allowed_ports[i] == port {
-                return true;
-            }
-        }
-        false
-    }
-
-    /// Linux-style: Grants specific POSIX capability (e.g. CAP_NET_BIND_SERVICE_BIT)
-    pub fn grant_posix_capability(mut self, cap: u32) -> Self {
-        if cap < 64 {
-            self.posix_capabilities |= 1 << cap;
-        }
-        self
-    }
-
-    /// Linux-style: Checks if a specific POSIX capability is active
-    pub fn has_posix_capability(&self, cap: u32) -> bool {
-        if cap >= 64 {
-            return false;
-        }
-        (self.posix_capabilities & (1 << cap)) != 0
-    }
-
-    /// OpenBSD-style: Dynamically restricts promised operations (pledge system call)
-    /// Once pledged, a process can never regain promises. It can only further drop privileges.
-    pub fn pledge(&mut self, promises: &[&str]) {
-        let mut new_promises = 0;
-        for &promise in promises {
-            match promise {
-                "stdio" => new_promises |= 1 << 0,
-                "rpath" => new_promises |= 1 << 1,
-                "wpath" => new_promises |= 1 << 2,
-                "inet" => new_promises |= 1 << 3,
-                "proc" => new_promises |= 1 << 4,
-                "exec" => new_promises |= 1 << 5,
-                _ => {}
-            }
-        }
-        // Intersect with existing promises to ensure privileges can only be dropped
-        self.pledged_promises &= new_promises;
-    }
-
-    /// OpenBSD-style: Validates promised operation
-    pub fn validate_pledge_operation(&self, promise: &str) -> bool {
-        let bit = match promise {
-            "stdio" => 1 << 0,
-            "rpath" => 1 << 1,
-            "wpath" => 1 << 2,
-            "inet" => 1 << 3,
-            "proc" => 1 << 4,
-            "exec" => 1 << 5,
-            _ => return false,
-        };
-        (self.pledged_promises & bit) != 0
-    }
+/// Capability set
+#[derive(Debug, Clone)]
+pub struct CapabilitySet {
+    pub capabilities: HashMap<LinuxCapability, bool>,
 }
 
-pub struct SecurityEnforcer {
-    pub tokens: [Option<CapabilityToken>; MAX_TOKENS],
-}
-
-impl SecurityEnforcer {
-    #[allow(clippy::new_without_default)]
+impl CapabilitySet {
     pub fn new() -> Self {
         Self {
-            tokens: [None; MAX_TOKENS],
+            capabilities: HashMap::new(),
         }
     }
 
-    pub fn assign_token(&mut self, token: CapabilityToken) -> Result<(), &'static str> {
-        for slot in self.tokens.iter_mut() {
-            if slot.is_none() {
-                *slot = Some(token);
-                return Ok(());
-            }
-        }
-        Err("Security sandbox token slots filled")
+    /// Add a capability
+    pub fn add(&mut self, cap: LinuxCapability) {
+        self.capabilities.insert(cap, true);
     }
 
-    /// Verifies if a specific transaction is permitted by process capabilities
-    pub fn validate_filesystem_access(&self, pid: u32, write_required: bool) -> bool {
-        if let Some(token) = self.find_token(pid) {
-            // Check OpenBSD-style pledge first
-            if write_required {
-                if !token.validate_pledge_operation("wpath") {
-                    return false;
-                }
-                token.is_fs_write_allowed
-            } else {
-                if !token.validate_pledge_operation("rpath") {
-                    return false;
-                }
-                token.is_fs_read_allowed
-            }
-        } else {
-            false // No capability token assigned -> Deny by default
+    /// Remove a capability
+    pub fn remove(&mut self, cap: LinuxCapability) {
+        self.capabilities.insert(cap, false);
+    }
+
+    /// Check if capability is present
+    pub fn has(&self, cap: LinuxCapability) -> bool {
+        self.capabilities.get(&cap).copied().unwrap_or(false)
+    }
+
+    /// Clear all capabilities
+    pub fn clear(&mut self) {
+        self.capabilities.clear();
+    }
+
+    /// Get capability count
+    pub fn count(&self) -> usize {
+        self.capabilities.values().filter(|&&v| v).count()
+    }
+}
+
+/// Security context with capabilities
+#[derive(Debug, Clone)]
+pub struct SecurityContext {
+    pub id: u64,
+    pub capabilities: CapabilitySet,
+    pub effective: CapabilitySet,
+    pub permitted: CapabilitySet,
+    pub inheritable: CapabilitySet,
+}
+
+impl SecurityContext {
+    pub fn new(id: u64) -> Self {
+        Self {
+            id,
+            capabilities: CapabilitySet::new(),
+            effective: CapabilitySet::new(),
+            permitted: CapabilitySet::new(),
+            inheritable: CapabilitySet::new(),
         }
     }
 
-    pub fn validate_network_access(&self, pid: u32, port: u16) -> bool {
-        if let Some(token) = self.find_token(pid) {
-            // Check OpenBSD-style pledge first
-            if !token.validate_pledge_operation("inet") {
-                return false;
-            }
-            if port < 1024 && !token.has_posix_capability(CAP_NET_BIND_SERVICE_BIT) {
-                return false; // Guard standard privileged ports unless CAP_NET_BIND_SERVICE_BIT is set
-            }
-            if token.is_network_allowed {
-                // Check if port is in allowed list or is standard HTTP/HTTPS
-                token.has_port(port) || port == PORT_ALLOW_TCP || port == PORT_ALLOW_SSL
-            } else {
-                false
-            }
+    /// Check if operation is allowed
+    pub fn check(&self, cap: LinuxCapability) -> bool {
+        self.effective.has(cap)
+    }
+
+    /// Add capability to effective set
+    pub fn add_effective(&mut self, cap: LinuxCapability) {
+        self.effective.add(cap);
+    }
+
+    /// Add capability to permitted set
+    pub fn add_permitted(&mut self, cap: LinuxCapability) {
+        self.permitted.add(cap);
+    }
+
+    /// Add capability to inheritable set
+    pub fn add_inheritable(&mut self, cap: LinuxCapability) {
+        self.inheritable.add(cap);
+    }
+
+    /// Promote from permitted to effective
+    pub fn promote(&mut self, cap: LinuxCapability) -> bool {
+        if self.permitted.has(cap) {
+            self.effective.add(cap);
+            true
         } else {
             false
         }
     }
 
-    /// Revoke a process's capability token
-    pub fn revoke_token(&mut self, pid: u32) -> Result<(), &'static str> {
-        for slot in self.tokens.iter_mut() {
-            if let Some(ref token) = *slot {
-                if token.process_id == pid {
-                    *slot = None;
-                    return Ok(());
-                }
-            }
-        }
-        Err("Process capability token not found")
-    }
-
-    pub fn find_token(&self, pid: u32) -> Option<&CapabilityToken> {
-        for slot in self.tokens.iter() {
-            if let Some(ref token) = slot {
-                if token.process_id == pid {
-                    return Some(token);
-                }
-            }
-        }
-        None
-    }
-
-    pub fn find_token_mut(&mut self, pid: u32) -> Option<&mut CapabilityToken> {
-        for slot in self.tokens.iter_mut() {
-            if let Some(ref mut token) = slot {
-                if token.process_id == pid {
-                    return Some(token);
-                }
-            }
-        }
-        None
-    }
-
-    /// Get the total number of active tokens
-    pub fn active_token_count(&self) -> usize {
-        self.tokens.iter().filter(|slot| slot.is_some()).count()
+    /// Drop all capabilities
+    pub fn drop_all(&mut self) {
+        self.effective.clear();
+        self.permitted.clear();
+        self.inheritable.clear();
     }
 }
 
-impl Default for SecurityEnforcer {
-    fn default() -> Self {
-        Self::new()
+/// Resource type for capability check
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ResourceType {
+    File,
+    Socket,
+    Process,
+    Network,
+    System,
+}
+
+/// Resource access permission
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ResourcePermission {
+    Read,
+    Write,
+    Execute,
+    Create,
+    Delete,
+    Bind,
+    Connect,
+    Listen,
+}
+
+/// Capability enforcer
+pub struct CapabilityEnforcer {
+    contexts: HashMap<u64, SecurityContext>,
+    next_context_id: AtomicU64,
+    default_policy: CapabilitySet,
+}
+
+impl CapabilityEnforcer {
+    pub fn new() -> Self {
+        Self {
+            contexts: HashMap::new(),
+            next_context_id: AtomicU64::new(1),
+            default_policy: CapabilitySet::new(),
+        }
+    }
+
+    /// Create a new security context
+    pub fn create_context(&mut self) -> SecurityContext {
+        let id = self.next_context_id.fetch_add(1, Ordering::SeqCst);
+        
+        let context = SecurityContext::new(id);
+        self.contexts.insert(id, context.clone());
+        
+        context
+    }
+
+    /// Get a security context
+    pub fn get_context(&self, id: u64) -> Option<&SecurityContext> {
+        self.contexts.get(&id)
+    }
+
+    /// Get mutable security context
+    pub fn get_context_mut(&mut self, id: u64) -> Option<&mut SecurityContext> {
+        self.contexts.get_mut(&id)
+    }
+
+    /// Check resource access
+    pub fn check_access(&self, context_id: u64, resource: ResourceType, permission: ResourcePermission) -> bool {
+        let context = self.contexts.get(&context_id);
+        
+        match context {
+            Some(ctx) => {
+                match (resource, permission) {
+                    (ResourceType::File, ResourcePermission::Read) => {
+                        ctx.check(LinuxCapability::DacReadSearch) || ctx.check(LinuxCapability::DacOverride)
+                    }
+                    (ResourceType::File, ResourcePermission::Write) => {
+                        ctx.check(LinuxCapability::DacOverride)
+                    }
+                    (ResourceType::File, ResourcePermission::Execute) => {
+                        ctx.check(LinuxCapability::DacOverride)
+                    }
+                    (ResourceType::Process, ResourcePermission::Delete) => {
+                        ctx.check(LinuxCapability::Kill)
+                    }
+                    (ResourceType::Network, ResourcePermission::Bind) => {
+                        ctx.check(LinuxCapability::NetBindService) || ctx.check(LinuxCapability::NetAdmin)
+                    }
+                    (ResourceType::Network, ResourcePermission::Connect) => {
+                        ctx.check(LinuxCapability::NetRaw) || ctx.check(LinuxCapability::NetAdmin)
+                    }
+                    (ResourceType::System, _) => {
+                        ctx.check(LinuxCapability::SysAdmin)
+                    }
+                    _ => false,
+                }
+            }
+            None => false,
+        }
+    }
+
+    /// Grant capability to context
+    pub fn grant(&mut self, context_id: u64, cap: LinuxCapability) -> Result<(), &'static str> {
+        if let Some(context) = self.contexts.get_mut(&context_id) {
+            context.add_permitted(cap);
+            context.add_effective(cap);
+            Ok(())
+        } else {
+            Err("Context not found")
+        }
+    }
+
+    /// Revoke capability from context
+    pub fn revoke(&mut self, context_id: u64, cap: LinuxCapability) -> Result<(), &'static str> {
+        if let Some(context) = self.contexts.get_mut(&context_id) {
+            context.effective.remove(cap);
+            context.permitted.remove(cap);
+            Ok(())
+        } else {
+            Err("Context not found")
+        }
+    }
+
+    /// Set default policy
+    pub fn set_default_policy(&mut self, cap: LinuxCapability, allowed: bool) {
+        if allowed {
+            self.default_policy.add(cap);
+        } else {
+            self.default_policy.remove(cap);
+        }
+    }
+
+    /// Get context count
+    pub fn context_count(&self) -> usize {
+        self.contexts.len()
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_android_runtime_permission_enforcement() {
-        let mut enforcer = SecurityEnforcer::new();
-
-        // 1. Process 101 - Sandboxed web application (restricted read, allowed network)
-        let web_app_token = CapabilityToken::new(101)
-            .allow_network()
-            .grant_posix_capability(CAP_NET_BIND_SERVICE_BIT)
-            .allow_fs_read()
-            .grant_posix_capability(CAP_NET_BIND_SERVICE_BIT)
-            .add_port(80)
-            .add_port(443);
-
-        assert!(enforcer.assign_token(web_app_token).is_ok());
-
-        // File system accesses checks
-        assert!(enforcer.validate_filesystem_access(101, false)); // Reads allowed
-        assert!(!enforcer.validate_filesystem_access(101, true)); // Writes blocked!
-
-        // Network accesses checks
-        assert!(enforcer.validate_network_access(101, 80)); // Allow standard HTTP
-        assert!(enforcer.validate_network_access(101, 443)); // Allow HTTPS
-        assert!(!enforcer.validate_network_access(101, 22)); // Block SSH accesses!
+    fn test_capability_set() {
+        let mut set = CapabilitySet::new();
+        
+        set.add(LinuxCapability::Chown);
+        assert!(set.has(LinuxCapability::Chown));
+        assert_eq!(set.count(), 1);
+        
+        set.remove(LinuxCapability::Chown);
+        assert!(!set.has(LinuxCapability::Chown));
     }
 
     #[test]
-    fn test_token_revocation() {
-        let mut enforcer = SecurityEnforcer::new();
-
-        let token = CapabilityToken::new(101)
-            .allow_network()
-            .grant_posix_capability(CAP_NET_BIND_SERVICE_BIT);
-        enforcer.assign_token(token).unwrap();
-
-        assert!(enforcer.validate_network_access(101, 80));
-        assert!(enforcer.revoke_token(101).is_ok());
-        assert!(!enforcer.validate_network_access(101, 80));
+    fn test_security_context() {
+        let mut ctx = SecurityContext::new(1);
+        
+        ctx.add_permitted(LinuxCapability::Chown);
+        assert!(ctx.promote(LinuxCapability::Chown));
+        assert!(ctx.check(LinuxCapability::Chown));
     }
 
     #[test]
-    fn test_custom_port_allowed() {
-        let mut enforcer = SecurityEnforcer::new();
-
-        let token = CapabilityToken::new(101).allow_network().add_port(8080);
-
-        enforcer.assign_token(token).unwrap();
-
-        assert!(enforcer.validate_network_access(101, 8080));
-        assert!(!enforcer.validate_network_access(101, 9090));
+    fn test_create_context() {
+        let mut enforcer = CapabilityEnforcer::new();
+        
+        let ctx = enforcer.create_context();
+        assert_eq!(ctx.id, 1);
+        assert_eq!(enforcer.context_count(), 1);
     }
 
     #[test]
-    fn test_default_deny() {
-        let enforcer = SecurityEnforcer::new();
-
-        // Process without token should be denied
-        assert!(!enforcer.validate_filesystem_access(999, false));
-        assert!(!enforcer.validate_network_access(999, 80));
+    fn test_grant_revoke() {
+        let mut enforcer = CapabilityEnforcer::new();
+        
+        let ctx = enforcer.create_context();
+        
+        assert!(enforcer.grant(ctx.id, LinuxCapability::Chown).is_ok());
+        assert!(enforcer.revoke(ctx.id, LinuxCapability::Chown).is_ok());
     }
 
     #[test]
-    fn test_linux_posix_capabilities() {
-        let mut enforcer = SecurityEnforcer::new();
-
-        // Web server binding to privileged port 80 without administrative capabilities
-        let mut token = CapabilityToken::new(201).allow_network();
-        // Standard user processes can't bind port < 1024
-        enforcer.assign_token(token).unwrap();
-        assert!(!enforcer.validate_network_access(201, 80));
-
-        // Adding CAP_NET_BIND_SERVICE_BIT grants port 80 access
-        enforcer.revoke_token(201).unwrap();
-        token = CapabilityToken::new(201)
-            .allow_network()
-            .grant_posix_capability(CAP_NET_BIND_SERVICE_BIT);
-        enforcer.assign_token(token).unwrap();
-        assert!(enforcer.validate_network_access(201, 80));
-        assert!(enforcer
-            .find_token(201)
-            .unwrap()
-            .has_posix_capability(CAP_NET_BIND_SERVICE_BIT));
+    fn test_check_access() {
+        let mut enforcer = CapabilityEnforcer::new();
+        
+        let ctx = enforcer.create_context();
+        enforcer.grant(ctx.id, LinuxCapability::DacOverride).unwrap();
+        
+        assert!(enforcer.check_access(ctx.id, ResourceType::File, ResourcePermission::Write));
     }
 
     #[test]
-    fn test_openbsd_pledge_restrictions() {
-        let mut enforcer = SecurityEnforcer::new();
+    fn test_check_access_denied() {
+        let mut enforcer = CapabilityEnforcer::new();
+        
+        let ctx = enforcer.create_context();
+        
+        // No capabilities - should be denied
+        assert!(!enforcer.check_access(ctx.id, ResourceType::File, ResourcePermission::Write));
+    }
 
-        // Standard process having full file access
-        let mut token = CapabilityToken::new(301).allow_fs_read().allow_fs_write();
-        enforcer.assign_token(token).unwrap();
-        assert!(enforcer.validate_filesystem_access(301, false)); // read ok
-        assert!(enforcer.validate_filesystem_access(301, true)); // write ok
+    #[test]
+    fn test_network_access() {
+        let mut enforcer = CapabilityEnforcer::new();
+        
+        let ctx = enforcer.create_context();
+        enforcer.grant(ctx.id, LinuxCapability::NetBindService).unwrap();
+        
+        assert!(enforcer.check_access(ctx.id, ResourceType::Network, ResourcePermission::Bind));
+    }
 
-        // Call pledge: drops write-promises ("wpath" is dropped)
-        enforcer
-            .find_token_mut(301)
-            .unwrap()
-            .pledge(&["stdio", "rpath"]);
-
-        assert!(enforcer.validate_filesystem_access(301, false)); // read remains ok
-        assert!(!enforcer.validate_filesystem_access(301, true)); // write blocked! (pledged stdio,rpath)
+    #[test]
+    fn test_drop_all() {
+        let mut ctx = SecurityContext::new(1);
+        
+        ctx.add_permitted(LinuxCapability::Chown);
+        ctx.add_effective(LinuxCapability::Chown);
+        
+        ctx.drop_all();
+        
+        assert!(!ctx.check(LinuxCapability::Chown));
     }
 }

@@ -1,6 +1,7 @@
 // SigmaOS Security Subsystem
 pub mod memory_protection;
 pub mod address_sanitizer;
+pub mod capability_enforcer;
 pub use address_sanitizer::{AddressSanitizer, MemoryRegion};
 pub mod capability;
 pub mod hardware_privilege;
@@ -165,3 +166,4 @@ pub use capsicum::{
     CapRight, CapMode, CapEntry, CapabilitySandbox,
 };
 pub use memory_protection::{MemoryProtectionManager, MemoryProtectionMode, AslrConfig, StackCanaryConfig};
+pub use capability_enforcer::{CapabilityEnforcer, SecurityContext, CapabilitySet, LinuxCapability, ResourceType, ResourcePermission};
