@@ -29,6 +29,7 @@ use std::string::{String, ToString};
 #[cfg(not(feature = "standalone_test"))]
 use std::vec::Vec;
 
+#[cfg(not(feature = "standalone_test"))]
 use crate::package::PackageFormat;
 
 #[cfg(feature = "standalone_test")]
@@ -41,7 +42,7 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 #[cfg(not(feature = "standalone_test"))]
-use crate::package::universal::UnifiedPackage;
+use crate::package::universal::{PackageError, PackageFormat, UnifiedPackage};
 
 #[cfg(feature = "standalone_test")]
 #[path = "universal.rs"]

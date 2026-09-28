@@ -303,6 +303,8 @@ if [ -f "src/package/sovereign_distro_package_advancements_v6.rs" ]; then
     mkdir -p build
     rustc --test src/package/sovereign_distro_package_advancements_v6.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v6_test
     ./build/sovereign_advancements_v6_test
+fi
+
 if [ -f "src/package/sovereign_distro_package_advancements_v7.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V7 test suite..."
     mkdir -p build
@@ -435,3 +437,5 @@ if [ -f "src/boot/grub_engine.rs" ]; then
     rustc --test src/boot/grub_engine.rs --edition=2021 -o build/test_grub_engine
     ./build/test_grub_engine
 fi
+
+echo "All SigmaOS test suites completed."
