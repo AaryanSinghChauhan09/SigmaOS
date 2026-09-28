@@ -7,7 +7,7 @@
 use std::string::{String, ToString};
 use std::vec::Vec;
 use std::format;
-use std::sync::Mutex;
+use std::sync::{Mutex, OnceLock};
 
 use core::sync::atomic::{AtomicU32, AtomicBool, AtomicUsize, Ordering};
 
@@ -436,7 +436,7 @@ pub struct EmbeddedSubsystem {
 }
 
 impl EmbeddedSubsystem {
-    pub const fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             hal: HardwareAbstractionLayer::new(),
             peripheral_manager: PeripheralManager::new(),
@@ -476,7 +476,11 @@ impl EmbeddedSubsystem {
 }
 
 /// Global embedded subsystem
-pub static GLOBAL_EMBEDDED_SUBSYSTEM: EmbeddedSubsystem = EmbeddedSubsystem::new();
+pub static GLOBAL_EMBEDDED_SUBSYSTEM: OnceLock<EmbeddedSubsystem> = OnceLock::new();
+
+pub fn get_global_embedded_subsystem() -> &'static EmbeddedSubsystem {
+    GLOBAL_EMBEDDED_SUBSYSTEM.get_or_init(|| EmbeddedSubsystem::new())
+}
 
 #[cfg(test_disabled)]
 mod tests {

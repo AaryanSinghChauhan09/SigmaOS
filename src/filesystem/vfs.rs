@@ -623,7 +623,7 @@ impl VirtualFileSystem {
 
     /// Validates file access permissions for specified process euid/egid
     pub fn check_access(&self, path: &str, euid: u32, egid: u32, mode: AccessMode) -> Result<(), FsError> {
-        let inode_num = self.resolve_path_inode(path)?;
+        let inode_num = self.resolve_path(path)?;
         let inode = self.inodes.get(&inode_num).ok_or(FsError::NotFound)?;
         inode.check_permission(euid, egid, mode)
     }

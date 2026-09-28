@@ -222,7 +222,7 @@ impl LinuxFdTable {
     }
 
     /// Allocate a new file descriptor
-    pub fn allocate(&self, path: String, flags: LinuxOpenFlags) -> u64 {
+    pub fn allocate(&mut self, path: String, flags: LinuxOpenFlags) -> u64 {
         let fd = self.next_fd.fetch_add(1, Ordering::SeqCst);
         let entry = LinuxFdEntry {
             fd,
@@ -292,7 +292,7 @@ impl LinuxProcessTable {
     }
 
     /// Create a new process
-    pub fn create(&self, ppid: u64, name: String) -> u64 {
+    pub fn create(&mut self, ppid: u64, name: String) -> u64 {
         let pid = self.next_pid.fetch_add(1, Ordering::SeqCst);
         let process = LinuxProcess {
             pid,
@@ -355,7 +355,7 @@ impl LinuxSyscallDispatcher {
     }
 
     /// Dispatch a Linux syscall
-    pub fn dispatch(&self, syscall_num: u64, args: &[u64]) -> Result<u64, &'static str> {
+    pub fn dispatch(&mut self, syscall_num: u64, args: &[u64]) -> Result<u64, &'static str> {
         self.syscall_count.fetch_add(1, Ordering::SeqCst);
 
         match syscall_num {

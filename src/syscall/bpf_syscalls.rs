@@ -297,7 +297,8 @@ fn sys_bpf_prog_load(
         BpfInstruction::Return,
     ];
 
-    let mut registry = get_global_bpf_registry().lock().unwrap();
+    let bpf_registry = get_global_bpf_registry();
+    let mut registry = bpf_registry.lock().unwrap();
     let fd = registry.load_program(
         prog_type,
         instructions,

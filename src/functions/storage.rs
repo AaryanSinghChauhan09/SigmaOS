@@ -221,7 +221,8 @@ impl PartitionManager {
     }
 
     pub fn create_partition(&mut self, disk: &str, partition_type: PartitionType, size: u64) -> Result<String, StorageError> {
-        let partition = Partition::new(&format!("{}p1", disk.split('/').last()), disk, partition_type);
+        let disk_name = disk.split('/').last().unwrap_or(disk);
+        let mut partition = Partition::new(&format!("{}p1", disk_name), disk, partition_type);
         partition.size = size;
         let id = partition.name.clone();
         self.partitions.push(partition);

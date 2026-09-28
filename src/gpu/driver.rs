@@ -103,7 +103,7 @@ impl GPUManager for SimpleGPUManager {
 
     fn get_primary_gpu(&self) -> Option<&dyn GPUDevice> {
         if !self.gpus.is_empty() {
-            if let Some(ref gpu) = self.gpus.data()[0] {
+            if let Some(ref gpu) = &self.gpus[0] {
                 return Some(gpu.as_ref());
             }
         }
@@ -113,7 +113,7 @@ impl GPUManager for SimpleGPUManager {
     fn list_gpus(&self) -> Vec<GPUDeviceID> {
         let mut ids = Vec::new();
         for i in 0..self.gpus.len() {
-            if let Some(ref gpu) = self.gpus.data()[i] {
+            if let Some(ref gpu) = &self.gpus[i] {
                 ids.push(gpu.id());
             }
         }
@@ -154,7 +154,7 @@ impl Framebuffer for SimpleFramebuffer {
 
     fn bind_framebuffer(&mut self, fb_id: usize) -> Result<(), GPUError> {
         for i in 0..self.framebuffers.len() {
-            let &(id, _, _, _) = &self.framebuffers.data()[i];
+            let &(id, _, _, _) = &self.framebuffers[i];
             if id == fb_id {
                 self.current.store(fb_id, Ordering::SeqCst);
                 return Ok(());
@@ -210,7 +210,7 @@ impl RenderPipeline for SimpleRenderPipeline {
 
     fn bind_pipeline(&mut self, pipeline_id: usize) -> Result<(), GPUError> {
         for i in 0..self.pipelines.len() {
-            let &(id, _, _) = &self.pipelines.data()[i];
+            let &(id, _, _) = &self.pipelines[i];
             if id == pipeline_id {
                 self.current.store(pipeline_id, Ordering::SeqCst);
                 return Ok(());

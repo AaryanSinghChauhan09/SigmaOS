@@ -218,10 +218,10 @@ impl ZeroCopyRingBuffer {
     }
 
     /// Enqueue a packet
-    pub fn enqueue(&self, packet: ZeroCopyPacket) -> Result<(), &'static str> {
+    pub fn enqueue(&mut self, packet: ZeroCopyPacket) -> Result<(), &'static str> {
         let tail = self.tail.load(Ordering::SeqCst);
         let head = self.head.load(Ordering::SeqCst);
-        
+
         if (tail + 1) % self.capacity == head {
             return Err("Ring buffer is full");
         }
@@ -232,7 +232,7 @@ impl ZeroCopyRingBuffer {
     }
 
     /// Dequeue a packet
-    pub fn dequeue(&self) -> Option<ZeroCopyPacket> {
+    pub fn dequeue(&mut self) -> Option<ZeroCopyPacket> {
         let head = self.head.load(Ordering::SeqCst);
         let tail = self.tail.load(Ordering::SeqCst);
 

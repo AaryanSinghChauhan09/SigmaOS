@@ -137,26 +137,25 @@ pub struct IntegrationHandle {
 }
 
 /// Integration error types
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum IntegrationError {
-    Success = 0,
-    IpcError = 1,
-    LanguageError = 2,
-    TerminalError = 3,
-    NotFound = 4,
-    PermissionDenied = 5,
+    Success,
+    IpcError(HelenIpcError),
+    LanguageError(KurokoError),
+    TerminalError(String),
+    NotFound,
+    PermissionDenied,
 }
 
 impl From<HelenIpcError> for IntegrationError {
-    fn from(_error: HelenIpcError) -> Self {
-        IntegrationError::IpcError
+    fn from(error: HelenIpcError) -> Self {
+        IntegrationError::IpcError(error)
     }
 }
 
 impl From<KurokoError> for IntegrationError {
-    fn from(_error: KurokoError) -> Self {
-        IntegrationError::LanguageError
+    fn from(error: KurokoError) -> Self {
+        IntegrationError::LanguageError(error)
     }
 }
 

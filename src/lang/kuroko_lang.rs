@@ -82,7 +82,7 @@ impl KurokoValue {
 
 /// Kuroko-style object with attributes
 #[repr(C)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct KurokoObject {
     pub class_name: String,
     pub attributes: BTreeMap<String, KurokoValue>,
@@ -195,6 +195,7 @@ impl Instruction {
 
 /// Compiled code object (function/module)
 #[repr(C)]
+#[derive(Clone)]
 pub struct CodeObject {
     pub name: String,
     pub bytecode: Vec<Instruction>,
@@ -579,7 +580,7 @@ impl KurokoCompiler {
         self.consume(TokenType::Newline, "Expect newline after function definition")?;
         
         // Create new code object for function
-        let func_code = CodeObject::new(&name.lexeme);
+        let mut func_code = CodeObject::new(&name.lexeme);
         func_code.parameters = parameters;
         let func_index = self.code_objects.len();
         self.code_objects.push(func_code);
@@ -956,7 +957,7 @@ impl KurokoVM {
 
     fn run(&mut self) -> Result<KurokoValue, KurokoError> {
         loop {
-            let frame = self.current_frame.last().ok_or(KurokoError::RuntimeError)?;
+            let frame = self.current_frame.last_mut().ok_or(KurokoError::RuntimeError)?;
             let code = self.code_objects.get(frame.code_index).ok_or(KurokoError::RuntimeError)?;
             
             if frame.ip >= code.bytecode.len() {
@@ -1156,7 +1157,7 @@ impl KurokoVM {
         }
     }
 
-    fn value_to_string(&self, value: &KurokoValue) -> String {
+    pub fn value_to_string(&self, value: &KurokoValue) -> String {
         match value {
             KurokoValue::Nil => "nil".to_string(),
             KurokoValue::Bool(b) => b.to_string(),
@@ -1165,11 +1166,11 @@ impl KurokoVM {
             KurokoValue::String(s) => s.clone(),
             KurokoValue::List(l) => {
                 let items: Vec<String> = l.iter().map(|v| self.value_to_string(v)).collect();
-                format!("[{}]", format!("{}/{}", items, ", "))
+                format!("[{}]", items.join(", "))
             }
             KurokoValue::Dict(d) => {
                 let items: Vec<String> = d.iter().map(|(k, v)| format!("{}: {}", k, self.value_to_string(v))).collect();
-                format!("{{{}}}", format!("{}/{}", items, ", "))
+                format!("{{{}}}", items.join(", "))
             }
             KurokoValue::Function(_) => "<function>".to_string(),
             KurokoValue::BuiltinFunction(_) => "<builtin>".to_string(),

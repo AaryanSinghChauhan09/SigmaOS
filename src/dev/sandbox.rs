@@ -171,8 +171,13 @@ impl SimpleSandbox {
     }
 
     pub fn get_state(&self) -> SandboxState {
-        unsafe {
-            core::mem::transmute(self.state.load(Ordering::SeqCst))
+        match self.state.load(Ordering::SeqCst) {
+            0 => SandboxState::Creating,
+            1 => SandboxState::Running,
+            2 => SandboxState::Paused,
+            3 => SandboxState::Stopped,
+            4 => SandboxState::Failed,
+            _ => SandboxState::Failed,
         }
     }
 

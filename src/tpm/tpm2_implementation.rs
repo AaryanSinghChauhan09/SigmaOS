@@ -579,9 +579,3 @@ mod tests {
         assert_eq!(header.command_code, parsed.command_code);
     }
 }
-
-impl From<TpmError> for TpmError {
-    fn from(err: TpmError) -> Self {
-        err
-    }
-}

@@ -224,10 +224,10 @@ impl TcpConnectionControlBlock {
     /// Generate SYN Cookie (RFC 4987) for SYN flood protection
     pub fn generate_syn_cookie(local: SocketAddr, remote: SocketAddr, secret_seed: u32) -> u32 {
         let mut hash = secret_seed;
-        hash = hash.wrapping_add(local.ip.0[0] as u32 | ((local.ip.0[1] as u32) << 8));
-        hash = hash.wrapping_add((local.ip.0[2] as u32) << 16 | ((local.ip.0[3] as u32) << 24));
-        hash = hash.wrapping_add(remote.ip.0[0] as u32 | ((remote.ip.0[1] as u32) << 8));
-        hash = hash.wrapping_add((remote.ip.0[2] as u32) << 16 | ((remote.ip.0[3] as u32) << 24));
+        hash = hash.wrapping_add(local.addr[0] as u32 | ((local.addr[1] as u32) << 8));
+        hash = hash.wrapping_add((local.addr[2] as u32) << 16 | ((local.addr[3] as u32) << 24));
+        hash = hash.wrapping_add(remote.addr[0] as u32 | ((remote.addr[1] as u32) << 8));
+        hash = hash.wrapping_add((remote.addr[2] as u32) << 16 | ((remote.addr[3] as u32) << 24));
         hash = hash.wrapping_add((local.port as u32) << 16 | (remote.port as u32));
         hash ^ 0xA5A55A5A
     }

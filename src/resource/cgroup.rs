@@ -121,11 +121,11 @@ impl CgroupManager {
         };
 
         // Leverage string slices and borrow lifetimes to migrate PIDs to parent or root without dynamic heap allocations
-        let parent_str = target_group.parent_name.as_deref().unwrap_or("/");
+        let parent_str = target_group.parent_name.as_deref().unwrap_or("/").to_string();
         let pids_to_migrate = target_group.pids.clone();
 
         for pid in pids_to_migrate {
-            let _ = self.attach_pid(parent_str, pid);
+            let _ = self.attach_pid(&parent_str, pid);
         }
 
         self.cgroups.remove(name);
@@ -146,16 +146,16 @@ impl CgroupManager {
         }
 
         // Remove from current cgroup if associated with any (use &str lookup to avoid String heap allocations)
-        let mut current_group_name: Option<&str> = None;
+        let mut current_group_name: Option<String> = None;
         for (gname, group) in &self.cgroups {
             if group.pids.contains(&pid) {
-                current_group_name = Some(gname.as_str());
+                current_group_name = Some(gname.clone());
                 break;
             }
         }
 
         if let Some(old_name) = current_group_name {
-            if let Some(group) = self.cgroups.get_mut_str(old_name) {
+            if let Some(group) = self.cgroups.get_mut_str(&old_name) {
                 group.pids.retain(|&p| p != pid);
                 group.usage.pids_count = group.usage.pids_count.saturating_sub(1);
             }
@@ -215,11 +215,11 @@ impl CgroupManager {
         }
 
         if let Some(name) = found_name {
-            let mut curr: Option<&str> = Some(name);
+            let mut curr: Option<String> = Some(name.to_string());
             while let Some(cname) = curr {
-                let parent_ptr = if let Some(group) = self.cgroups.get_mut_str(cname) {
+                let parent_ptr = if let Some(group) = self.cgroups.get_mut_str(&cname) {
                     group.usage.cpu_usage_ms = group.usage.cpu_usage_ms.saturating_add(duration_ms);
-                    group.parent_name.as_deref()
+                    group.parent_name.clone()
                 } else {
                     None
                 };
@@ -261,11 +261,11 @@ impl CgroupManager {
         }
 
         // Apply allocations hierarchically without heap String allocations
-        let mut curr: Option<&str> = Some(name);
+        let mut curr: Option<String> = Some(name.to_string());
         while let Some(cname) = curr {
-            let parent_ptr = if let Some(group) = self.cgroups.get_mut_str(cname) {
+            let parent_ptr = if let Some(group) = self.cgroups.get_mut_str(&cname) {
                 group.usage.memory_usage_bytes = group.usage.memory_usage_bytes.saturating_add(bytes);
-                group.parent_name.as_deref()
+                group.parent_name.clone()
             } else {
                 None
             };
@@ -285,14 +285,14 @@ impl CgroupManager {
             }
         }
 
-        let name = found_name.unwrap_or("/");
+        let name = found_name.unwrap_or("/").to_string();
 
         // Release hierarchically using borrowed &str references
-        let mut curr: Option<&str> = Some(name);
+        let mut curr: Option<String> = Some(name);
         while let Some(cname) = curr {
-            let parent_ptr = if let Some(group) = self.cgroups.get_mut_str(cname) {
+            let parent_ptr = if let Some(group) = self.cgroups.get_mut_str(&cname) {
                 group.usage.memory_usage_bytes = group.usage.memory_usage_bytes.saturating_sub(bytes);
-                group.parent_name.as_deref()
+                group.parent_name.clone()
             } else {
                 None
             };
