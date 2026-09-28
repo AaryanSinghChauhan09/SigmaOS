@@ -11,6 +11,12 @@ pub struct Priority {
 }
 
 impl Priority {
+    pub const Realtime: Self = Self { value: -20 };
+    pub const High: Self = Self { value: -10 };
+    pub const Normal: Self = Self { value: 0 };
+    pub const Low: Self = Self { value: 10 };
+    pub const Idle: Self = Self { value: 19 };
+
     pub fn new(value: i32) -> Self {
         Self { value: value.max(-20).min(19) }
     }
@@ -57,13 +63,21 @@ pub enum SchedulerPolicy {
 /// Process state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessState {
+    New,
     Running,
     Runnable,
-    Ready, // Alias for Runnable for compatibility
     Sleeping,
     Stopped,
     Zombie,
+    BlockedWaiting,
+    BlockedSuspended,
     Blocked, // For compatibility
+}
+
+impl ProcessState {
+    // Compatibility aliases
+    pub const Ready: Self = ProcessState::Runnable;
+    pub const Blocked: Self = ProcessState::Sleeping;
 }
 
 /// Process task

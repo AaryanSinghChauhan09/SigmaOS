@@ -12,17 +12,8 @@ use core::sync::atomic::{AtomicU64, Ordering};
 
 pub const PAGE_SIZE: usize = 4096;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ProcessState {
-    New,
-    Ready,
-    Running,
-    Blocked,
-    BlockedWaiting,
-    BlockedSuspended,
-    Stopped,
-    Zombie,
-}
+// Use ProcessState from scheduler module
+pub use crate::kernel::scheduler::ProcessState;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BlockReason {
@@ -36,6 +27,12 @@ pub enum BlockReason {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ProcessId(pub u64);
+
+impl std::fmt::Display for ProcessId {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ThreadId(pub u64);
@@ -110,28 +107,29 @@ pub struct Process {
     pub session_id: u64,
     pub uid: u32,
     pub gid: u32,
-    
+
     pub state: ProcessState,
     pub page_table_phys: usize,
-    
+
     pub open_files: BTreeMap<u64, usize>,
-    
+
     // Signals
     pub sig_pending: u64,
     pub sig_mask: u64,
     pub sig_actions: [SigAction; 64],
-    
+
     // Memory stats
     pub brk: usize,
     pub start_brk: usize,
     pub mmap_base: usize,
-    
+
     pub exit_code: Option<i32>,
     pub name: String,
-    
+
     pub cwd: String,
     pub block_reason: Option<BlockReason>,
     pub is_suspended: bool,
+    pub priority: crate::kernel::scheduler::Priority,
 }
 
 static NEXT_PID: AtomicU64 = AtomicU64::new(1);
@@ -161,6 +159,7 @@ impl Process {
             cwd: String::from("/"),
             block_reason: None,
             is_suspended: false,
+            priority: crate::kernel::scheduler::Priority::Normal,
         }
     }
 
