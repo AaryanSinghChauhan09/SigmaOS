@@ -8,11 +8,72 @@ While SigmaOS provides a high-performance bare-metal Rust kernel with modular ab
 
 ---
 
-## 1. Linux Kernel & Linux Distributions (Linux 6.x, Arch, Fedora, NixOS, Alpine, CachyOS)
+## 📊 Core Component Comparison Table: Linux vs. FreeBSD vs. OpenBSD vs. SigmaOS
 
-### A. Kernel & Hardware Subsystems
+| Component | Linux | FreeBSD | OpenBSD | SigmaOS Status | Parity Gap |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Syscalls** | 450+ POSIX & Linux syscalls | 450+ BSD syscalls | 450+ BSD syscalls | ~50 POSIX handlers | ❌ 90% gap |
+| **Process Management** | ✅ Full `fork`, `execve`, `pidfd`, subreaper | ✅ Full `pdfork`, `procdesc`, capsicum | ✅ Full `fork`, `execve`, rthreads | ⚠️ `fork`/`execve` stubs | ⚠️ Partial |
+| **Memory Management** | ✅ Full VMM, demand paging, mmap, swap | ✅ Full VM subsystem, swap | ✅ Full UVM subsystem, swap | ⚠️ Buddy/Slab, identity page stubs | ⚠️ Partial |
+| **Filesystems** | 30+ (ext4, btrfs, xfs, zfs, overlay...) | UFS2, ZFS native | UFS/FFS, ext2 | 2-3 (RamFS, FAT16, DevFS) | ⚠️ 90% gap |
+| **Networking Stack** | ✅ Full TCP/IP, IPv6, QUIC, eBPF/XDP | ✅ Full TCP/IP, VNET, ipfw | ✅ Full TCP/IP, PF packet filter | ❌ Basic UDP/IPv4 packet handling | ❌ Missing TCP stack |
+| **IPC Infrastructure** | Pipes, signals, Unix sockets, SysV, Futex | Pipes, signals, Unix sockets, SysV | Pipes, signals, Unix sockets, SysV | Futex & basic channels only | ❌ Missing IPC suite |
+| **Threading Model** | ✅ NPTL (`clone(2)` thread groups) | ✅ 1:1 `libthr` / `kse` | ✅ 1:1 `rthreads` | ❌ Single-threaded per process | ❌ Missing kernel threads |
+| **Module System** | ✅ Loadable Kernel Modules (`kmod`) | ✅ Dynamic Kernel Modules (`kld`) | Static compiled kernel | ❌ Monolithic static binary | ❌ No `kmod` loader |
+| **Device Drivers** | 100,000+ LOC (thousands of devices) | 50,000+ LOC | 40,000+ LOC | ~5-10 drivers (UART, RTC, ATA, xHCI) | ❌ 99% driver gap |
+| **Security Hardening** | Multi-LSM (SELinux, AppArmor, Landlock) | MAC Framework, Capsicum | Pledge, Unveil, KARL, W^X | Framework stubs & rule engines | ⚠️ Validation only |
+
+---
+
+## Technical Subsystem Breakdown
+
+### 1. System Calls & Kernel Dispatcher (❌ 90% Gap)
+- **Linux/BSD**: Standard Linux kernel exposes 450+ system calls (`io_uring_setup`, `epoll_create`, `pidfd_open`, `memfd_secret`, `mseal`, `clone3`, etc.). FreeBSD and OpenBSD expose 450+ BSD-native syscall vectors.
+- **SigmaOS**: Implements ~50 POSIX-compatible system call handlers (`read`, `write`, `open`, `close`, `exit`, `fork`, `execve`, `waitpid`, `stat`, `mmap`, `brk`). Advanced asynchronous I/O (`io_uring`), process file descriptors (`pidfd`), and memory sealing (`mseal`) are currently translated or stubbed.
+
+### 2. Process Management & Scheduler (⚠️ Partial)
+- **Linux/BSD**: Complete process lifecycle governance with parent-child tree tracking, signal dispatching (`SIGCHLD`, `SIGKILL`, `SIGSTOP`), subreaper orphan containment (`PR_SET_CHILD_SUBREAPER`), and capability process descriptors (`pidfd`/`procdesc`).
+- **SigmaOS**: Implements `fork()` with copy-on-write `MemoryContext`, process state transitions (`Ready`, `Running`, `Blocked`, `Zombie`), and priority/CFS schedulers. However, real signal delivery masks, process group sessions (`getsid`/`setpgid`), and thread group leadership are stubbed.
+
+### 3. Memory Management & VMM (⚠️ Partial)
+- **Linux/BSD**: Production Virtual Memory Manager (VMM/UVM) supporting demand paging, copy-on-write page fault handling, file-backed/anonymous `mmap`, swap space paging, kswapd LRU eviction, and Transparent Huge Pages (THP).
+- **SigmaOS**: Working Physical Memory Manager (Buddy Allocator), Slab Cache, DMA ring buffer, and identity 4-level paging (PML4). Advanced demand paging from swap disk and active page eviction under memory pressure are in prototype status.
+
+### 4. Filesystem Layer (⚠️ 90% Gap)
+- **Linux/BSD**: Linux supports 30+ production filesystems (Ext4, Btrfs, XFS, OpenZFS, F2FS, OverlayFS, SquashFS). FreeBSD features native ZFS and UFS2. OpenBSD uses FFS.
+- **SigmaOS**: Working VFS with RamFS, FAT16/32, and DevFS (`/dev`). Ext4 JBD2 journaling and Btrfs/ZFS-inspired memory structures are implemented, but full block-level ZPOOL import, RAID-Z parity, and btrfs subvolume mounting are missing.
+
+### 5. Networking Stack (❌ Missing Full TCP/IP)
+- **Linux/BSD**: Complete dual-stack IPv4/IPv6 networking engine, full TCP state machine (SYN/ACK, sliding window, congestion control algorithms BBR/Cubic), UDP, ICMP, IPsec, and packet filtering (eBPF/XDP, iptables/nftables, PF, ipfw).
+- **SigmaOS**: Basic UDP socket binding and IPv4 packet serialization over Ethernet drivers. The full TCP state machine (three-way handshake, retransmission timers, window scaling, TCP congestion control) is missing on bare metal.
+
+### 6. Inter-Process Communication (IPC) (❌ Missing Complete IPC)
+- **Linux/BSD**: Rich IPC primitives including POSIX message queues (`mq_open`), System V shared memory/semaphores (`shmget`, `semop`), Unix domain sockets (`AF_UNIX`), anonymous/named pipes (`mkfifo`), and real-time signals.
+- **SigmaOS**: Supports atomic futex locks and lock-free SPSC/MPMC channel primitives. Complete Unix domain socket passing, POSIX message queues, and System V IPC primitives are missing.
+
+### 7. Threading Model (❌ Missing Kernel Threads)
+- **Linux/BSD**: Native POSIX Threads (NPTL) via `clone(2)` with shared virtual memory space, signal handlers, and file descriptor tables. FreeBSD uses 1:1 `libthr`. OpenBSD uses `rthreads`.
+- **SigmaOS**: Processes are single-threaded task execution units. Multi-threaded execution within a single address space (kernel thread pool scheduling) is missing.
+
+### 8. Module Loader Subsystem (❌ Missing Dynamic Kernel Modules)
+- **Linux/BSD**: Dynamic Loadable Kernel Modules (`insmod`, `rmmod`, `modprobe`) capable of dynamically linking ELF `.ko` objects into kernel memory at runtime.
+- **SigmaOS**: The kernel is compiled as a monolithic static binary image. Kernel module registry stubs exist, but runtime ELF `.ko` binary loading and symbol relocation are missing.
+
+### 9. Hardware Device Drivers (❌ 99% Driver Gap)
+- **Linux/BSD**: Over 100,000 lines of hardware driver code supporting tens of thousands of GPUs, network cards, Wi-Fi chipsets, USB devices, sound codecs, and storage controllers.
+- **SigmaOS**: ~5-10 basic native drivers (UART 16550 Serial, CMOS RTC Clock, VGA Text/VESA Framebuffer, PS/2 Keyboard/Mouse, ATA/IDE PIO Mode, basic NVMe, xHCI TRB ring processing, and E1000 Ethernet). Native drivers for modern GPUs (NVIDIA/AMD/Intel 3D acceleration), Wi-Fi 6/7 chipsets, USB Audio/Video, and Bluetooth are missing.
+
+### 10. Security Hardening (⚠️ Framework Only)
+- **Linux/BSD**: Production security systems enforced across all processes (Linux SELinux/AppArmor/Landlock LSMs; FreeBSD Capsicum rights; OpenBSD system-wide `pledge` and `unveil` restrictions).
+- **SigmaOS**: Security rule engines and pledge/unveil validation logic are implemented in Rust modules, but system-wide enforcement across all userland binaries and coreutils by default is missing.
+
+---
+
+## 11. Extended Comparative Gap Analysis Across OS Families
+
+### A. Linux Kernel & Distributions (Linux 6.x, Arch, Fedora, NixOS, Alpine, CachyOS)
 - **Display Server & Hardware GPU Acceleration (DRM/KMS & Mesa Driver Pipeline)**:
-  - *Linux*: Native, full-fledged Kernel Mode Setting (KMS), Direct Rendering Manager (DRM), atomic display commits, and open-source/vendor drivers (AMDGPU RADV/ANV, Intel Xe/i915, NVIDIA Open GPU / GSP firmware).
+  - *Linux*: Native Kernel Mode Setting (KMS), Direct Rendering Manager (DRM), atomic display commits, and open-source/vendor drivers (AMDGPU RADV/ANV, Intel Xe/i915, NVIDIA Open GPU / GSP firmware).
   - *SigmaOS Gap*: SigmaOS relies on basic VBE/VGA linear framebuffers, VirtIO-GPU 3D stubs, and Mesa NVK zero-copy shims. Direct hardware-accelerated 3D rendering pipeline for physical GPUs without fallback or hypervisor interface is missing.
 - **Wi-Fi & Wireless Stack (mac80211 / cfg80211 / MLO / WPA3)**:
   - *Linux*: Full `mac80211` framework supporting 802.11ax/be Multi-Link Operation (MLO), WPA3 Enterprise/SAE authentication, and native firmware loading for Intel `iwlwifi`, Realtek, and Qualcomm `ath11k`/`ath12k`.
@@ -20,145 +81,24 @@ While SigmaOS provides a high-performance bare-metal Rust kernel with modular ab
 - **USB Subsystem Stack (EHCI/OHCI/UHCI, USB-C Power Delivery, USB4/Thunderbolt)**:
   - *Linux*: Complete USB device class drivers (HID, Mass Storage, UVC Video, Audio, Serial, CDC-ECM) across xHCI/EHCI controllers, USB-C PD state machines, and Thunderbolt/USB4 tunneling.
   - *SigmaOS Gap*: Basic xHCI transfer ring processing is implemented, but legacy USB 1.1/2.0 controllers (UHCI/OHCI/EHCI), USB Video Class (UVC), USB Audio Class (UAC2), USB-C Power Delivery negotiation, and USB4/Thunderbolt PCIe tunneling are missing.
-- **Cgroups v2 Resource Management Hierarchy**:
-  - *Linux*: Unified cgroups v2 tree enforcing CPU bandwidth (`cpu.max`), memory limits with page cache reclamation (`memory.max`, `memory.high`), block I/O throttling (`io.weight`), and process tree limits (`pids.max`).
-  - *SigmaOS Gap*: SigmaOS implements basic resource limit rules, but lacks a full cgroups v2 kernel controller interface attached to the task scheduler and page allocator.
-- **Kernel Live Patching (Kpatch / Ksplice)**:
-  - *Linux*: Function-level dynamic binary redirection (`ftrace`-backed live patching) allowing zero-downtime security updates.
-  - *SigmaOS Gap*: Unimplemented in SigmaOS.
 
-### B. Userspace & Distro Architecture
-- **Dynamic ELF Loader & Shared Library Runtime (`ld-linux.so`)**:
-  - *Linux*: Full dynamic linker supporting shared libraries (`.so`), symbol versioning (`GLIBC_2.34`), thread-local storage (`TLS` / `FS_BASE`), dynamic relocation types (`R_X86_64_GLOB_DAT`, `R_X86_64_JUMP_SLOT`), and `dlopen()`/`dlsym()`.
-  - *SigmaOS Gap*: SigmaOS loader is primarily static ELF64 binary parsing. Dynamic link-time relocation of external C shared objects on bare metal is missing.
-- **Pure Declarative Package Store Architecture (NixOS / Guix)**:
-  - *NixOS / Guix*: Hermetic store path isolation (`/nix/store/<hash>-package`), deterministic content-addressed dependency graphs, and environment derivation builds.
-  - *SigmaOS Gap*: `sigpkg` provides multi-format package parsing and SAT dependency resolution, but lacks a hermetic store sandboxing filesystem build engine like Nix/Guix.
+### B. BSD Family (FreeBSD, OpenBSD, NetBSD, DragonFly BSD)
+- **FreeBSD Native ZFS & Bhyve**: Full ZPOOL v5000 multi-disk RAID-Z1/Z2/Z3 storage and in-kernel Bhyve hypervisor missing on bare metal.
+- **OpenBSD KARL & System-Wide Pledge**: Re-linking kernel binaries randomly on every boot (KARL) and default pledge/unveil sandboxing missing across all userland services.
+- **NetBSD Rump Kernels & DragonFly HAMMER2**: Running kernel drivers as isolated userland components (Rump) and HAMMER2 multi-master distributed CoW cluster replication missing.
 
----
+### C. Illumos / Solaris Family (SmartOS, OmniOS, OpenIndiana)
+- **DTrace Dynamic Tracing**: In-kernel dynamic instrumentation framework with D script provider probes (`dtrace -s`) missing in kernel space.
+- **Crossbow Virtual Networking & FMA**: VNICs, Virtual Switches, flow-based bandwidth control, and Fault Management Architecture (FMA) self-healing telemetry engine missing.
 
-## 2. BSD Family (FreeBSD 14+, OpenBSD 7.5+, NetBSD 10+, DragonFly BSD 6.x)
-
-### A. FreeBSD
-- **Native ZFS Subsystem (ZPOOL v5000 / RAID-Z3 / ARC / ZIL)**:
-  - *FreeBSD*: Full kernel-native ZFS implementation featuring multi-disk pool management, RAID-Z1/Z2/Z3 parity, Intent Log (ZIL), Adaptive Replacement Cache (ARC), snapshot cloning, and native dataset encryption.
-  - *SigmaOS Gap*: SigmaOS features ZFS-inspired memory ARC structures, but lacks native block-level ZPOOL import, export, resilvering, RAID-Z parity calculations, and dataset scrubbing.
-- **Hypervisor Infrastructure (Bhyve)**:
-  - *FreeBSD*: In-kernel hypervisor (`bhyve`) supporting hardware-assisted virtualization (VT-x/AMD-V), VirtIO devices, and guest PCI passthrough.
-  - *SigmaOS Gap*: SigmaOS has VM manager abstractions, but lacks a bare-metal kernel hypervisor module equal to Bhyve or KVM.
-- **GEOM Storage Layer & VNET Stack Virtualization**:
-  - *FreeBSD*: Modular GEOM storage transformation pipeline (striping, mirroring, encryption, label management) and per-jail isolated VNET network stacks.
-  - *SigmaOS Gap*: VNET network stack virtualization per container is missing.
-
-### B. OpenBSD
-- **System-Wide Pledge & Unveil Enforcement**:
-  - *OpenBSD*: Every binary in userland (shell, utilities, daemons) explicitly restricts its system call access via `pledge(2)` and filesystem visibility via `unveil(2)` upon startup.
-  - *SigmaOS Gap*: SigmaOS includes pledge/unveil validation logic in security modules, but does not enforce pledge/unveil restrictions across all coreutils and system services by default.
-- **KARL (Kernel Address Randomized Link)**:
-  - *OpenBSD*: Re-links kernel binaries randomly on every boot so every installed system runs a unique kernel binary layout.
-  - *SigmaOS Gap*: Unimplemented in SigmaOS.
-
-### C. NetBSD & DragonFly BSD
-- **Rump Kernels (NetBSD)**:
-  - *NetBSD*: Architecture allowing kernel drivers and filesystems to run as user-space processes or embedded components without modification.
-  - *SigmaOS Gap*: Drivers in SigmaOS are embedded directly into kernel space or userland stubs without a formal Rump Kernel abstraction.
-- **HAMMER2 Distributed Storage Engine (DragonFly BSD)**:
-  - *DragonFly BSD*: Multi-master distributed CoW filesystem with directory sub-tree snapshots, instant history access, and cluster replication.
-  - *SigmaOS Gap*: SigmaOS contains HAMMER2 driver abstractions, but lacks full HAMMER2 cluster synchronization and multi-master replication protocols.
-
----
-
-## 3. Illumos / Solaris Family (SmartOS, OmniOS, OpenIndiana)
-
-- **DTrace Dynamic Tracing Framework**:
-  - *Illumos*: In-kernel DTrace framework providing safe, zero-overhead dynamic instrumentation across kernel functions, syscalls, lock contention, and userland code via D script provider probes (`dtrace -s`).
-  - *SigmaOS Gap*: SigmaOS lacks a dynamic tracing framework and D compiler/probe dispatcher in kernel space.
-- **Crossbow Virtual Networking Architecture**:
-  - *Illumos*: Virtual Switches, VNICs (Virtual Network Interface Cards), hardware ring allocation, and flow-based bandwidth control per container/zone.
-  - *SigmaOS Gap*: Unimplemented in SigmaOS.
-- **Fault Management Architecture (FMA)**:
-  - *Illumos*: Self-healing telemetry engine diagnosing CPU/RAM hardware faults, automatically isolating failing memory banks or CPU cores.
-  - *SigmaOS Gap*: Unimplemented in SigmaOS.
-
----
-
-## 4. Haiku OS / BeOS
-
-- **Extended Attribute Database Queries on BFS (Be File System)**:
-  - *Haiku*: Extended attributes attached to files (e.g. `META:title`, `META:artist`) indexed in real time, enabling OS-wide SQL-like file queries (`query "META:title == 'Sigma*'"`).
-  - *SigmaOS Gap*: Extended attribute indexing and attribute query engine are missing in SigmaOS.
-- **Native Object-Oriented C++/Rust Application & Media Kit**:
-  - *Haiku*: Multithreaded message loops (`BApplication`, `BWindow`, `BView`) with direct GUI event queue dispatching and node-based low-latency Media Kit (`BMediaNode`) audio/video processing pipeline.
-  - *SigmaOS Gap*: Zenith compositor handles display rendering, but lacks an OS-level object-oriented application kit and real-time audio/video media routing framework.
-
----
-
-## 5. SerenityOS
-
-- **Custom Userland GUI Toolkit & IPC Protocol Compiler**:
-  - *SerenityOS*: Built-from-scratch desktop suite (LibGUI, LibGFX) with IPC protocol compiler generating typed C++ client/server interfaces for window management and rendering.
-  - *SigmaOS Gap*: SigmaOS lacks a native IPC protocol generator/compiler and typed widget rendering toolkit for userland application development.
-
----
-
-## 6. Redox OS
-
-- **URL-Based Microkernel Scheme Infrastructure**:
-  - *Redox*: Microkernel design where every system resource is a URL scheme handled by user-space daemons (`file:`, `tcp:`, `udp:`, `display:`, `pts:`, `log:`).
-  - *SigmaOS Gap*: SigmaOS uses a monolithic kernel model with POSIX VFS paths rather than a pure microkernel URL scheme architecture.
-- **Redox `relibc` POSIX Runtime**:
-  - *Redox*: Full POSIX C standard library written in Rust (`relibc`) allowing native execution of standard C binaries.
-  - *SigmaOS Gap*: SigmaOS uses minimal C library shims (`src/userland/libc/`) rather than a full C standard library runtime.
-
----
-
-## 7. Plan 9 from Bell Labs
-
-- **9P Protocol Everywhere & Per-Process Name Space Isolation**:
-  - *Plan 9*: Every resource, driver, and window (`rio`) is exposed via the 9P2000 protocol, mounted into customized per-process synthetic name spaces using `bind` and `mount`.
-  - *SigmaOS Gap*: SigmaOS uses standard POSIX file descriptors and VFS mounting rather than 9P protocol RPC abstractions across all subsystems.
-
----
-
-## 8. Fuchsia OS (Google)
-
-- **Zircon Capability Handles & FIDL Asynchronous Protocol Messaging**:
-  - *Fuchsia*: Microkernel handles for Channels, Sockets, Fifos, VMOs (Virtual Memory Objects), governed by explicit capability masks and FIDL (Fuchsia Interface Definition Language) message IPC pipelines.
-  - *SigmaOS Gap*: Unimplemented in SigmaOS.
-- **Component Framework v2 (CFv2)**:
-  - *Fuchsia*: Tree of sandboxed components where capability routing (e.g., exposing network or storage) must be explicitly declared and routed via component manifests.
-  - *SigmaOS Gap*: Unimplemented in SigmaOS.
-
----
-
-## 9. Android OS (AOSP)
-
-- **Binder IPC & Ashmem / DMA-BUF Memory Sharing**:
-  - *Android*: High-performance kernel-assisted IPC (`/dev/binder`) with thread pool management, reference counting, parcel serialization, and zero-copy shared memory (`ashmem` / `dm-buf`) for camera/graphics buffers.
-  - *SigmaOS Gap*: Unimplemented in SigmaOS.
-
----
-
-## 10. TempleOS
-
-- **HolyC JIT Compiler / Unified Ring 0 Environment / CDoc Hybrid Format**:
-  - *TempleOS*: JIT-compiled C-like system environment operating entirely in 64-bit Ring 0 with unified address space, instant command-line graphics compilation, and text-graphics interactive document format (`CDoc`).
-  - *SigmaOS Gap*: SigmaOS maintains privilege separation between Ring 0 kernel and Ring 3 userland rather than a single-address-space JIT operating system.
-
----
-
-## Summary Matrix of Major Parity Gaps
-
-| Subsystem / Feature | Linux | FreeBSD | OpenBSD | Illumos | Haiku | Redox | SigmaOS Current Status |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Native Hardware 3D GPU Acceleration (DRM/KMS)** | ✅ Full | ✅ Full | ✅ Partial | ✅ Partial | ✅ Partial | ❌ Stub | ⚠️ Basic VBE/VirtIO stubs |
-| **802.11be Wi-Fi / MLO & WPA3 Enterprise** | ✅ Full | ⚠️ Partial | ⚠️ Partial | ❌ Missing | ❌ Missing | ❌ Missing | ⚠️ Broadcom stubs only |
-| **USB 3.x / USB4 / Thunderbolt Tunneling** | ✅ Full | ✅ Full | ✅ Partial | ✅ Partial | ⚠️ Partial | ⚠️ Basic | ⚠️ xHCI TRB basics |
-| **Full ZFS Storage Subsystem (ZPOOL/RAIDZ)** | ✅ ZFSonLinux | ✅ Native | ❌ Missing | ✅ Native | ❌ Missing | ❌ Missing | ⚠️ ARC memory structures only |
-| **Dynamic Tracing Engine (DTrace / eBPF JIT)** | ✅ eBPF | ✅ DTrace | ❌ Missing | ✅ DTrace | ❌ Missing | ❌ Missing | ❌ Missing in kernel space |
-| **System-Wide Pledge & Unveil Enforcement** | ❌ Landlock | ❌ Capsicum | ✅ Native | ❌ Missing | ❌ Missing | ❌ Schemes | ⚠️ Validation logic only |
-| **Pure Microkernel Schemes / IPC Compiler** | ❌ Monolithic | ❌ Monolithic| ❌ Monolithic| ❌ Monolithic| ❌ Monolithic| ✅ Native | ❌ Monolithic Rust kernel |
-| **Full Dynamic C Shared Library Loader (`ld-linux`)** | ✅ Full | ✅ Full | ✅ Full | ✅ Full | ✅ Full | ⚠️ relibc | ⚠️ Static ELF64 binaries |
+### D. Other Operating System Paradigms (Haiku, SerenityOS, Redox, Plan 9, Fuchsia, Android, TempleOS)
+- **Haiku**: Extended attribute SQL-like file query engine on BFS (`query`) and node-based Media Kit missing.
+- **SerenityOS**: Typed IPC protocol compiler for userland GUI applications missing.
+- **Redox OS**: Pure microkernel URL scheme architecture (`file:`, `tcp:`, `display:`) missing (SigmaOS uses monolithic POSIX VFS model).
+- **Plan 9**: Everything is a 9P2000 service mounted in per-process synthetic name spaces using `bind`/`mount`.
+- **Fuchsia OS**: Zircon capability handles (Channels, Sockets, Fifos, VMOs) and Component Framework v2 (CFv2) capability routing missing.
+- **Android OS**: Kernel-assisted Binder IPC (`/dev/binder`) and Ashmem/DMA-BUF memory sharing missing.
+- **TempleOS**: 64-bit Ring 0 single-address-space JIT compiler and interactive CDoc document format missing.
 
 ---
 *Document generated as part of SigmaOS Comparative OS Gap Analysis.*
