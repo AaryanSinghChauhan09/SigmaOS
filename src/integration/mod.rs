@@ -74,12 +74,12 @@ impl SigmaIntegration {
         let call_id = self.async_system.ipc_manager.next_call_id.fetch_add(
             1, core::sync::atomic::Ordering::SeqCst
         );
-        
-        let ipc_message = HelenMessage::new(100, call_id, from_tab_id as u64);
-        
+
+        let ipc_message = HelenMessage::new(100, call_id, from_tab_id);
+
         // Process the message content
         if !message.is_empty() {
-            self.async_system.ipc_manager.send_async(to_phone_id as u64, ipc_message)
+            self.async_system.ipc_manager.send_async(to_phone_id, ipc_message)
                 .map_err(|e| IntegrationError::IpcError(e))?;
         }
         
@@ -98,11 +98,11 @@ impl SigmaIntegration {
     }
 
     /// Create split terminal panes with async coordination
-    pub fn create_split_terminal(&mut self, _parent_tab_id: usize, _direction: bool) 
+    pub fn create_split_terminal(&mut self, _parent_tab_id: usize, _direction: bool)
         -> Result<usize, IntegrationError> {
-        
+
         // Terminal split functionality temporarily disabled
-        Err(IntegrationError::TerminalError)
+        Err(IntegrationError::TerminalError("Terminal split not implemented".to_string()))
     }
 
     /// Run Kuroko script with async IPC capabilities

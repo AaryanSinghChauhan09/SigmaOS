@@ -239,7 +239,7 @@ impl LinuxFdTable {
         if fd < 3 {
             return Err("Cannot close standard file descriptor");
         }
-        self.entries.remove(&fd).ok_or("File descriptor not found")
+        self.entries.remove(&fd).map(|_| ()).ok_or("File descriptor not found")
     }
 
     /// Get file descriptor entry

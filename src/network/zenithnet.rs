@@ -754,7 +754,7 @@ impl ZenithNet {
     pub fn get_connection_stats(&self, connection_id: u32) -> Option<(u32, u32, u64, u64)> {
         self.tcp_connections.get(&connection_id).map(|conn| {
             (
-                conn.window_size,
+                conn.window_size as u32,
                 conn.sequence,
                 conn.receive_buffer.len() as u64,
                 conn.send_buffer.len() as u64,

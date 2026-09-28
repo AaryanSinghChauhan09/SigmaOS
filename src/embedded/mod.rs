@@ -72,7 +72,7 @@ impl HardwareAbstractionLayer {
 
     pub fn detect_platform(&self) -> PlatformProfile {
         let platform = self.read_board_info();
-        self.platform_profile.store(platform, Ordering::SeqCst);
+        self.platform_profile.store(platform as u32, Ordering::SeqCst);
         platform
     }
 

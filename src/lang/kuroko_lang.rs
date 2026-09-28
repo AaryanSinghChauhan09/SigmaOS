@@ -562,25 +562,26 @@ impl KurokoCompiler {
 
     fn compile_function(&mut self) -> Result<(), KurokoError> {
         let name = self.consume(TokenType::Identifier, "Expect function name")?;
-        
+        let name_lexeme = name.lexeme.clone();
+
         self.consume(TokenType::LeftParen, "Expect '(' after function name")?;
-        
+
         // Parameters
         let mut parameters = Vec::new();
         if !self.check(TokenType::RightParen) {
             loop {
                 let param = self.consume(TokenType::Identifier, "Expect parameter name")?;
                 parameters.push(param.lexeme.clone());
-                
+
                 if !self.match_token(TokenType::Comma) { break; }
             }
         }
-        
+
         self.consume(TokenType::RightParen, "Expect ')' after parameters")?;
         self.consume(TokenType::Newline, "Expect newline after function definition")?;
-        
+
         // Create new code object for function
-        let mut func_code = CodeObject::new(&name.lexeme);
+        let mut func_code = CodeObject::new(&name_lexeme);
         func_code.parameters = parameters;
         let func_index = self.code_objects.len();
         self.code_objects.push(func_code);
@@ -816,11 +817,11 @@ impl KurokoCompiler {
         if self.match_token(TokenType::Minus) || self.match_token(TokenType::Not) {
             let operator = self.previous().token_type;
             self.compile_unary()?;
-            
+
             match operator {
-                TokenType::Minus => self.emit_opcode(Opcode::Subtract, 0), // Negate
-                TokenType::Not => self.emit_opcode(Opcode::Not, 0),
-                _ => {}
+                TokenType::Minus => { self.emit_opcode(Opcode::Subtract, 0); Ok(()) }, // Negate
+                TokenType::Not => { self.emit_opcode(Opcode::Not, 0); Ok(()) },
+                _ => Ok(()),
             }
         } else {
             self.compile_primary()

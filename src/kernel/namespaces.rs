@@ -68,7 +68,7 @@ impl KernelNamespace for Namespace {
 }
 
 /// Maximum PIDs per namespace
-pub const MAX_PIDS_PER_NAMESPACE: u64 = 32768;
+pub const MAX_PIDS_PER_NAMESPACE: u32 = 32768;
 
 /// Global namespace ID counter
 static NEXT_NAMESPACE_ID: AtomicU64 = AtomicU64::new(1);

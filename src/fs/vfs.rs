@@ -170,20 +170,20 @@ impl Vfs {
     pub fn mkdir(&mut self, path: &str, permissions: FilePermissions) -> Result<u64, &'static str> {
         let parent_path = self.get_parent_path(path)?;
         let parent_inode = self.lookup(&parent_path).ok_or("Parent not found")?;
-        
-        let dir_name = self.get_basename(path);
+
+        let dir_name = self.get_basename(path).to_string();
         let new_inode = self.create_inode(FileType::Directory, permissions);
-        
+
         let dentry = VfsDentry {
-            name: dir_name.to_string(),
+            name: dir_name,
             inode: new_inode,
             parent: Some(parent_inode),
         };
-        
+
         if let Some(dentries) = self.dentries.get_mut(&parent_inode) {
             dentries.push(dentry);
         }
-        
+
         Ok(new_inode)
     }
 
@@ -191,12 +191,12 @@ impl Vfs {
     pub fn create(&mut self, path: &str, permissions: FilePermissions) -> Result<u64, &'static str> {
         let parent_path = self.get_parent_path(path)?;
         let parent_inode = self.lookup(&parent_path).ok_or("Parent not found")?;
-        
-        let file_name = self.get_basename(path);
+
+        let file_name = self.get_basename(path).to_string();
         let new_inode = self.create_inode(FileType::Regular, permissions);
         
         let dentry = VfsDentry {
-            name: file_name.to_string(),
+            name: file_name,
             inode: new_inode,
             parent: Some(parent_inode),
         };
