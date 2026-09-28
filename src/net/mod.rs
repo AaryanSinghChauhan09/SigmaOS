@@ -65,5 +65,7 @@ pub mod dhcp;
 
 pub mod zero_copy;
 pub mod packet_filter;
+pub mod congestion;
+pub use congestion::{CongestionControlManager, CongestionControlType, CongestionState, CongestionWindow, RenoCongestionControl, CubicCongestionControl, BbrCongestionControl};
 pub use packet_filter::{PacketFilter, PfRule, PfAction, PfProtocol, Packet};
 pub use zero_copy::{ZeroCopyBuffer, ZeroCopyBufferPool, ZeroCopyPacket, ZeroCopyRingBuffer, PacketMetadata};
