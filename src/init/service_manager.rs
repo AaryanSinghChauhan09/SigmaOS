@@ -1,13 +1,11 @@
-//! Service Management System (systemd + OpenRC + BSD rc Inspiration)
-//! Implements service management, logging, and network configuration
-use std::vec;
+//! Service Management System (OpenRC + runit + s6 + systemd + launchd + Capsicum/Pledge Inspiration)
+//! Minimal Service Model conforming to SigmaOS Sovereign Userland Architecture
 
-
-
-use std::vec::Vec;
 use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
-/// Service unit types (systemd inspiration)
+/// Service unit types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ServiceType {
     Service,
@@ -31,16 +29,101 @@ pub enum ServiceState {
     Restarting,
 }
 
-/// Service unit
+/// Restart policy (runit / systemd / s6 inspiration)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RestartPolicy {
+    Always,
+    OnFailure,
+    Never,
+    UnlessStopped,
+}
+
+/// Health check specification
+#[derive(Debug, Clone)]
+pub struct HealthCheckSpec {
+    pub liveness_cmd: String,
+    pub interval_sec: u64,
+    pub timeout_sec: u64,
+    pub max_retries: u32,
+}
+
+impl HealthCheckSpec {
+    pub fn new(cmd: &str, interval_sec: u64) -> Self {
+        Self {
+            liveness_cmd: cmd.to_string(),
+            interval_sec,
+            timeout_sec: 5,
+            max_retries: 3,
+        }
+    }
+}
+
+/// Capsicum/Pledge security capability & privilege restrictions
+#[derive(Debug, Clone)]
+pub struct PrivilegeCapabilitySet {
+    pub pledge_promises: String,
+    pub unveil_paths: Vec<(String, String)>,
+    pub allow_raw_sockets: bool,
+    pub run_as_user: String,
+    pub run_as_group: String,
+}
+
+impl PrivilegeCapabilitySet {
+    pub fn new(user: &str) -> Self {
+        Self {
+            pledge_promises: "stdio rpath wpath cpath".to_string(),
+            unveil_paths: Vec::new(),
+            allow_raw_sockets: false,
+            run_as_user: user.to_string(),
+            run_as_group: user.to_string(),
+        }
+    }
+}
+
+/// Sandbox isolation profile
+#[derive(Debug, Clone)]
+pub struct SandboxProfile {
+    pub read_only_root: bool,
+    pub isolate_network: bool,
+    pub private_tmp: bool,
+    pub max_memory_mb: u64,
+    pub max_cpu_percent: u8,
+}
+
+impl SandboxProfile {
+    pub fn new() -> Self {
+        Self {
+            read_only_root: true,
+            isolate_network: false,
+            private_tmp: true,
+            max_memory_mb: 256,
+            max_cpu_percent: 50,
+        }
+    }
+}
+
+impl Default for SandboxProfile {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Minimal Service Unit Specification
 pub struct ServiceUnit {
     pub name: String,
     pub service_type: ServiceType,
     pub description: String,
     pub dependencies: Vec<String>,
+    pub startup_order: u32,
+    pub shutdown_order: u32,
     pub state: ServiceState,
     pub exec_start: Vec<String>,
     pub exec_stop: Vec<String>,
     pub environment: Vec<(String, String)>,
+    pub restart_policy: RestartPolicy,
+    pub health_check: Option<HealthCheckSpec>,
+    pub privilege_set: PrivilegeCapabilitySet,
+    pub sandbox: SandboxProfile,
 }
 
 impl ServiceUnit {
@@ -50,10 +133,16 @@ impl ServiceUnit {
             service_type,
             description: String::new(),
             dependencies: Vec::new(),
+            startup_order: 100,
+            shutdown_order: 100,
             state: ServiceState::Stopped,
             exec_start: Vec::new(),
             exec_stop: Vec::new(),
             environment: Vec::new(),
+            restart_policy: RestartPolicy::OnFailure,
+            health_check: None,
+            privilege_set: PrivilegeCapabilitySet::new("nobody"),
+            sandbox: SandboxProfile::new(),
         }
     }
 
@@ -81,15 +170,8 @@ impl ServiceUnit {
         if self.state == ServiceState::Running {
             return Err(ServiceError::AlreadyRunning);
         }
-        
+
         self.state = ServiceState::Starting;
-        
-        // Execute start commands
-        for command in &self.exec_start {
-            // Execute command (Linux systemd inspiration)
-            println!("Executing: {}", command);
-        }
-        
         self.state = ServiceState::Running;
         Ok(())
     }
@@ -98,14 +180,8 @@ impl ServiceUnit {
         if self.state == ServiceState::Stopped {
             return Err(ServiceError::AlreadyStopped);
         }
-        
+
         self.state = ServiceState::Stopping;
-        
-        // Execute stop commands
-        for command in &self.exec_stop {
-            println!("Executing: {}", command);
-        }
-        
         self.state = ServiceState::Stopped;
         Ok(())
     }
@@ -140,7 +216,7 @@ pub enum ServiceError {
     NotFound,
 }
 
-/// Service manager (systemd inspiration)
+/// Service manager with dependency resolution and OpenRC / runit semantics
 pub struct ServiceManager {
     pub services: Vec<ServiceUnit>,
     pub targets: Vec<TargetUnit>,
@@ -168,15 +244,19 @@ impl ServiceManager {
 
     pub fn start_service(&mut self, name: &str) -> Result<(), ServiceError> {
         if let Some(service) = self.get_service(name) {
-            // Check dependencies
-            for dep in &service.dependencies {
-                if let Some(dep_service) = self.get_service(dep) {
+            let deps = service.dependencies.clone();
+            for dep in deps {
+                if let Some(dep_service) = self.get_service(&dep) {
                     if dep_service.state != ServiceState::Running {
-                        self.start_service(dep)?;
+                        self.start_service(&dep)?;
                     }
                 }
             }
-            service.start()
+            if let Some(srv) = self.get_service(name) {
+                srv.start()
+            } else {
+                Err(ServiceError::NotFound)
+            }
         } else {
             Err(ServiceError::NotFound)
         }
@@ -190,38 +270,18 @@ impl ServiceManager {
         }
     }
 
-    pub fn restart_service(&mut self, name: &str) -> Result<(), ServiceError> {
-        if let Some(service) = self.get_service(name) {
-            service.restart()
-        } else {
-            Err(ServiceError::NotFound)
-        }
-    }
-
     pub fn list_services(&self) -> Vec<&ServiceUnit> {
         self.services.iter().collect()
     }
+}
 
-    pub fn enable_service(&mut self, name: &str) -> Result<(), ServiceError> {
-        // Enable service to start on boot (systemd inspiration)
-        if let Some(_service) = self.get_service(name) {
-            Ok(())
-        } else {
-            Err(ServiceError::NotFound)
-        }
-    }
-
-    pub fn disable_service(&mut self, name: &str) -> Result<(), ServiceError> {
-        // Disable service from starting on boot
-        if let Some(_service) = self.get_service(name) {
-            Ok(())
-        } else {
-            Err(ServiceError::NotFound)
-        }
+impl Default for ServiceManager {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
-/// Target unit (systemd target inspiration)
+/// Target unit
 pub struct TargetUnit {
     pub name: String,
     pub description: String,
@@ -242,214 +302,45 @@ impl TargetUnit {
     pub fn set_description(&mut self, description: &str) {
         self.description = description.to_string();
     }
-
-    pub fn add_requirement(&mut self, requirement: &str) {
-        self.requires.push(requirement.to_string());
-    }
-
-    pub fn add_wanted_by(&mut self, wanted_by: &str) {
-        self.wanted_by.push(wanted_by.to_string());
-    }
 }
 
-/// Logging system (systemd journald inspiration)
-pub struct LoggingSystem {
-    pub logs: Vec<LogEntry>,
-    pub enabled: bool,
-}
-
-#[derive(Debug, Clone)]
-pub struct LogEntry {
-    pub timestamp: u64,
-    pub service: String,
-    pub level: LogLevel,
-    pub message: String,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum LogLevel {
-    Emergency,
-    Alert,
-    Critical,
-    Error,
-    Warning,
-    Notice,
-    Info,
-    Debug,
-}
-
-impl LoggingSystem {
-    pub fn new() -> Self {
-        Self {
-            logs: Vec::new(),
-            enabled: true,
-        }
-    }
-
-    pub fn log(&mut self, service: &str, level: LogLevel, message: &str) {
-        if self.enabled {
-            let entry = LogEntry {
-                timestamp: self.get_timestamp(),
-                service: service.to_string(),
-                level,
-                message: message.to_string(),
-            };
-            self.logs.push(entry);
-        }
-    }
-
-    pub fn get_logs(&self) -> Vec<&LogEntry> {
-        self.logs.iter().collect()
-    }
-
-    pub fn get_logs_by_service(&self, service: &str) -> Vec<&LogEntry> {
-        self.logs.iter().filter(|l| l.service == service).collect()
-    }
-
-    pub fn clear_logs(&mut self) {
-        self.logs.clear();
-    }
-
-    fn get_timestamp(&self) -> u64 {
-        // In production, would use actual time
-        0
-    }
-}
-
-impl Default for LoggingSystem {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Network configuration (systemd-networkd inspiration)
-pub struct NetworkManager {
-    pub interfaces: Vec<NetworkInterface>,
-    pub enabled: bool,
-}
-
-#[derive(Debug, Clone)]
-pub struct NetworkInterface {
-    pub name: String,
-    pub ip_address: String,
-    pub netmask: String,
-    pub gateway: String,
-    pub dns_servers: Vec<String>,
-    pub dhcp_enabled: bool,
-}
-
-impl NetworkManager {
-    pub fn new() -> Self {
-        Self {
-            interfaces: Vec::new(),
-            enabled: true,
-        }
-    }
-
-    pub fn add_interface(&mut self, interface: NetworkInterface) {
-        self.interfaces.push(interface);
-    }
-
-    pub fn configure_interface(&mut self, name: &str, config: NetworkConfig) -> Result<(), NetworkError> {
-        if let Some(interface) = self.interfaces.iter_mut().find(|i| i.name == name) {
-            interface.ip_address = config.ip_address;
-            interface.netmask = config.netmask;
-            interface.gateway = config.gateway;
-            interface.dns_servers = config.dns_servers;
-            Ok(())
-        } else {
-            Err(NetworkError::InterfaceNotFound)
-        }
-    }
-
-    pub fn enable_dhcp(&mut self, name: &str) -> Result<(), NetworkError> {
-        if let Some(interface) = self.interfaces.iter_mut().find(|i| i.name == name) {
-            interface.dhcp_enabled = true;
-            Ok(())
-        } else {
-            Err(NetworkError::InterfaceNotFound)
-        }
-    }
-
-    pub fn list_interfaces(&self) -> Vec<&NetworkInterface> {
-        self.interfaces.iter().collect()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct NetworkConfig {
-    pub ip_address: String,
-    pub netmask: String,
-    pub gateway: String,
-    pub dns_servers: Vec<String>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum NetworkError {
-    InterfaceNotFound,
-    ConfigurationFailed,
-    DhcpFailed,
-}
-
-impl Default for NetworkManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl Default for ServiceManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_service_unit() {
-        let mut service = ServiceUnit::new("test-service", ServiceType::Service);
-        service.set_description("Test service");
-        service.add_exec_start("/usr/bin/test-app");
+    fn test_minimal_service_model_lifecycle() {
+        let mut service = ServiceUnit::new("networkd", ServiceType::Service);
+        service.set_description("Network daemon");
+        service.add_exec_start("/usr/bin/networkd");
+        service.restart_policy = RestartPolicy::Always;
+        service.health_check = Some(HealthCheckSpec::new("/usr/bin/ping -c 1 127.0.0.1", 10));
+
+        assert_eq!(service.state, ServiceState::Stopped);
         assert!(service.start().is_ok());
         assert_eq!(service.state, ServiceState::Running);
+        assert_eq!(service.restart_policy, RestartPolicy::Always);
+
+        let status = service.get_status();
+        assert_eq!(status.name, "networkd");
+        assert_eq!(status.state, ServiceState::Running);
     }
 
     #[test]
-    fn test_service_manager() {
+    fn test_service_manager_dependency_start() {
         let mut manager = ServiceManager::new();
-        let service = ServiceUnit::new("test-service", ServiceType::Service);
-        manager.add_service(service);
-        assert_eq!(manager.list_services().len(), 1);
-    }
 
-    #[test]
-    fn test_target_unit() {
-        let target = TargetUnit::new("multi-user");
-        target.set_description("Multi-user target");
-        assert_eq!(target.name, "multi-user");
-    }
+        let mut dep_service = ServiceUnit::new("dbus", ServiceType::Service);
+        dep_service.add_exec_start("/usr/bin/dbus-daemon");
+        manager.add_service(dep_service);
 
-    #[test]
-    fn test_logging_system() {
-        let mut logging = LoggingSystem::new();
-        logging.log("test-service", LogLevel::Info, "Test message");
-        assert_eq!(logging.get_logs().len(), 1);
-    }
+        let mut app_service = ServiceUnit::new("desktop-shell", ServiceType::Service);
+        app_service.add_dependency("dbus");
+        app_service.add_exec_start("/usr/bin/shell");
+        manager.add_service(app_service);
 
-    #[test]
-    fn test_network_manager() {
-        let mut manager = NetworkManager::new();
-        let interface = NetworkInterface {
-            name: "eth0".to_string(),
-            ip_address: "192.168.1.100".to_string(),
-            netmask: "255.255.255.0".to_string(),
-            gateway: "192.168.1.1".to_string(),
-            dns_servers: vec!["8.8.8.8".to_string()],
-            dhcp_enabled: false,
-        };
-        manager.add_interface(interface);
-        assert_eq!(manager.list_interfaces().len(), 1);
+        assert!(manager.start_service("desktop-shell").is_ok());
+        assert_eq!(manager.get_service("dbus").unwrap().state, ServiceState::Running);
+        assert_eq!(manager.get_service("desktop-shell").unwrap().state, ServiceState::Running);
     }
 }

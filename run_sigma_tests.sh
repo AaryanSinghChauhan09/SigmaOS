@@ -156,6 +156,13 @@ if [ -f "src/drivers/sovereign_sound_hda_synthesis.rs" ]; then
     ./build/sovereign_sound_hda_test
 fi
 
+if [ -f "src/init/service_manager.rs" ]; then
+    echo "Running Minimal Service Model & Init Service Manager test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/init/service_manager.rs -o build/test_init_service_manager
+    ./build/test_init_service_manager
+fi
+
 if [ -f "src/hal/stable_interfaces.rs" ]; then
     echo "Running Stable HAL Interfaces test suite..."
     mkdir -p build
