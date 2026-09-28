@@ -2,6 +2,7 @@
 // Conforms to SigmaOS Unified Peripheral Architecture
 // Enhanced with NVMe 1.4/2.0 multi-queue support
 
+#[cfg(not(test))]
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 use std::vec::Vec;
 

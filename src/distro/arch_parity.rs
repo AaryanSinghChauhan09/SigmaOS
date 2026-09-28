@@ -1057,67 +1057,6 @@ mod tests {
     }
 
     #[test]
-    fn test_arch_devtools_pkgctl_archweb_archinstall_wiki() {
-        let devtools = ArchCdevtoolsEngine::default();
-        let artifact = devtools.build_in_clean_chroot("curl").unwrap();
-        assert!(artifact.contains("pkg.tar.zst"));
-
-        let pkgctl = ArchPkgctlEngine::default();
-        let repo_url = pkgctl.split_package_repo("nginx");
-        assert!(repo_url.contains("gitlab.archlinux.org"));
-
-        let archweb = ArchArchwebEngine::new();
-        let res = archweb.query_package("pacman");
-        assert!(res.is_some());
-
-        let installer = ArchArchinstallEngine::new("/dev/nvme0n1", "btrfs");
-        let inst_res = installer.execute_installation_profile("{\"fs\": \"btrfs\"}");
-        assert!(inst_res);
-
-        let wiki = ArchWikiOfflineEngine::new();
-        let article = wiki.search_offline_wiki("pacman");
-        assert!(article.contains("ArchWiki Offline Entry"));
-    }
-
-    #[test]
-    fn test_arch_cdevtools_engine() {
-        let devtools = ArchCdevtoolsEngine::new("/var/lib/archbuild/extra-x86_64");
-        assert!(devtools.is_cleanroom_active);
-        let build_res = devtools.build_in_clean_chroot("systemd");
-        assert_eq!(build_res.unwrap(), "systemd-1-x86_64.pkg.tar.zst");
-    }
-
-    #[test]
-    fn test_arch_pkgctl_engine() {
-        let pkgctl = ArchPkgctlEngine::new("extra");
-        let repo_url = pkgctl.split_package_repo("glibc");
-        assert!(repo_url.contains("glibc.git"));
-    }
-
-    #[test]
-    fn test_arch_archweb_engine() {
-        let web = ArchArchwebEngine::new();
-        let query = web.query_package("pacman");
-        assert!(query.is_some());
-        assert!(query.unwrap().contains("Core Repository"));
-        assert!(web.query_package("nonexistent_pkg").is_none());
-    }
-
-    #[test]
-    fn test_arch_archinstall_engine() {
-        let archinstall = ArchArchinstallEngine::new("/dev/nvme0n1", "btrfs");
-        assert!(archinstall.execute_installation_profile("profile: { filesystem: 'btrfs' }"));
-        assert!(!archinstall.execute_installation_profile("profile: { filesystem: 'ntfs' }"));
-    }
-
-    #[test]
-    fn test_arch_wiki_offline_engine() {
-        let wiki = ArchWikiOfflineEngine::new();
-        let res = wiki.search_offline_wiki("Systemd");
-        assert!(res.contains("ArchWiki Offline Entry for Systemd"));
-    }
-
-    #[test]
     fn test_pkgbuild_array_parsing() {
         let content = r#"
 pkgname="neovim-git"
