@@ -23,7 +23,7 @@ pub enum CgroupController {
 }
 
 /// Memory controller settings
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct MemoryController {
     pub limit: u64,        // Memory limit in bytes
     pub swap_limit: u64,   // Swap limit in bytes
@@ -32,7 +32,7 @@ pub struct MemoryController {
 }
 
 /// CPU controller settings
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct CpuController {
     pub shares: u64,        // CPU shares (weight)
     pub max: Option<u64>,   // Maximum CPU time (quota)

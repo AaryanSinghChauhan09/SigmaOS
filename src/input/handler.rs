@@ -334,7 +334,7 @@ pub enum InputError {
 
 /// Input device (OOP: Device object)
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Copy)]
 pub struct InputDevice {
     pub id: usize,
     pub device_type: InputDeviceType,

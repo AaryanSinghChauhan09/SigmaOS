@@ -5,7 +5,7 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::vec::Vec;
 
 /// Zero-copy buffer handle
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct ZeroCopyBuffer {
     pub data: Vec<u8>,
     pub ref_count: AtomicUsize,

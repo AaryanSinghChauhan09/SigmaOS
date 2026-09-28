@@ -115,7 +115,7 @@ pub struct MountPoint {
 }
 
 /// PID namespace
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct PidNamespace {
     pub id: NamespaceId,
     pub parent: Option<NamespaceId>,

@@ -189,7 +189,7 @@ impl Phone {
 
 /// IRQ registration for interrupt-driven notifications
 #[repr(C)]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct IrqRegistration {
     pub irq: IrqNumber,
     pub answerbox_id: AnswerboxId,

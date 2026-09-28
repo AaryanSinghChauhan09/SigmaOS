@@ -24,7 +24,7 @@ pub enum InterruptType {
 pub type InterruptHandler = fn(InterruptVector, u64) -> ();
 
 /// Interrupt descriptor
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct InterruptDescriptor {
     pub vector: InterruptVector,
     pub handler: Option<InterruptHandler>,
