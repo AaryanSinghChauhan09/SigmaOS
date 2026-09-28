@@ -2,12 +2,15 @@
 // Inspired by libusb, udev, Flatpak device portals, and Android permission models.
 // Provides native portal-based mediation for USB, Camera, Microphone, Mounts, and Serial devices.
 
-use std::collections::HashMap;
-use std::string::{String, ToString};
-use std::vec::Vec;
+extern crate alloc;
+
+use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 /// Hardware Device Class Category
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum DeviceCategory {
     UsbDevice,
     Camera,
@@ -49,7 +52,7 @@ pub struct DeviceForwardingMap {
 
 /// Sovereign Hardware & Device Permissioning Engine
 pub struct SovereignHardwareDevicePermissioningEngine {
-    pub access_requests: HashMap<u64, DeviceAccessRequest>,
+    pub access_requests: BTreeMap<u64, DeviceAccessRequest>,
     pub active_forwarding_maps: Vec<DeviceForwardingMap>,
     pub next_request_id: u64,
 }
@@ -57,7 +60,7 @@ pub struct SovereignHardwareDevicePermissioningEngine {
 impl SovereignHardwareDevicePermissioningEngine {
     pub fn new() -> Self {
         Self {
-            access_requests: HashMap::new(),
+            access_requests: BTreeMap::new(),
             active_forwarding_maps: Vec::new(),
             next_request_id: 1000,
         }

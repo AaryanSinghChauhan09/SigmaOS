@@ -2,12 +2,15 @@
 // Supports compiling software from source:
 // Integrates GCC, Clang, Rustc, Make, CMake, Autoconf, Libtool, and Pkg-Config.
 
-use std::collections::HashMap;
-use std::string::{String, ToString};
-use std::vec::Vec;
+extern crate alloc;
+
+use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 /// Compiler Tool Kind
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum CompilerToolKind {
     Gcc,
     Clang,
@@ -40,15 +43,15 @@ pub struct PkgConfigLibrarySpec {
 
 /// Sovereign Compiler Toolchain Support Engine
 pub struct SovereignCompilerToolchainEngine {
-    pub registered_tools: HashMap<CompilerToolKind, ToolchainToolInfo>,
-    pub pkg_config_db: HashMap<String, PkgConfigLibrarySpec>,
+    pub registered_tools: BTreeMap<CompilerToolKind, ToolchainToolInfo>,
+    pub pkg_config_db: BTreeMap<String, PkgConfigLibrarySpec>,
 }
 
 impl SovereignCompilerToolchainEngine {
     pub fn new() -> Self {
         let mut engine = Self {
-            registered_tools: HashMap::new(),
-            pkg_config_db: HashMap::new(),
+            registered_tools: BTreeMap::new(),
+            pkg_config_db: BTreeMap::new(),
         };
         engine.register_default_tools();
         engine.seed_default_pkgconfig_specs();

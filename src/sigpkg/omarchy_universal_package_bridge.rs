@@ -3,12 +3,15 @@
 // for Arch (libalpm/pacman), Fedora (libdnf/rpm), NixOS (nix), and OCI containers (podman),
 // alongside self-hosted Cachix/Nix binary caching and GPG-signed SBOM attestation generators.
 
-use std::collections::HashMap;
-use std::string::{String, ToString};
-use std::vec::Vec;
+extern crate alloc;
+
+use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 /// Backend Package System Kind
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum PackageBackendKind {
     ArchLibalpm,
     FedoraLibdnf,
@@ -23,7 +26,7 @@ pub struct CuratedPackageSpec {
     pub name: String,
     pub category: String, // "editor", "toolchain", "shell", "tui", "browser", "desktop"
     pub is_essential: bool,
-    pub backend_mapping: HashMap<PackageBackendKind, String>,
+    pub backend_mapping: BTreeMap<PackageBackendKind, String>,
 }
 
 pub struct SovereignOmarchyPackageBridgeEngine {
@@ -99,7 +102,7 @@ impl SovereignOmarchyPackageBridgeEngine {
         ];
 
         for (name, category) in essential_tools {
-            let mut mappings = HashMap::new();
+            let mut mappings = BTreeMap::new();
             mappings.insert(PackageBackendKind::ArchLibalpm, name.to_string());
             mappings.insert(PackageBackendKind::FedoraLibdnf, name.to_string());
             mappings.insert(PackageBackendKind::NixFlake, format!("nixpkgs#{}", name));

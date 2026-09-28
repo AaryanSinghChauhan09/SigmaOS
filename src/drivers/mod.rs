@@ -30,6 +30,17 @@ pub mod sovereign_hardware_expansion;
 pub mod sovereign_usb_xhci;
 pub mod sovereign_comprehensive_drivers;
 
+pub mod adapters;
+pub use adapters::*;
+pub mod linux_absorption;
+pub use linux_absorption::*;
+pub mod freebsd_absorption;
+pub use freebsd_absorption::*;
+pub mod openbsd_absorption;
+pub use openbsd_absorption::*;
+pub mod firmware;
+pub use firmware::registry::*;
+
 pub use sovereign_comprehensive_drivers::*;
 pub use printing::{CupsIppPrintSpooler, LpdSpooler, PpdDriverMatcher, PrintJob, PrintJobState};
 
