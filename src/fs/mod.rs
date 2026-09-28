@@ -19,6 +19,8 @@
 pub mod btrfs;
 // pub mod filesystem;
 pub mod btrfs_send_receive;
+pub mod btree;
+pub use btree::{BTree, BTreeNode, BTreeKey, BTreeItem, BTreeNodeType};
 pub use btrfs_send_receive::{BtrfsSendOp, BtrfsSendCommand, BtrfsSendStream, BtrfsReceiveContext, BtrfsSubvolume, BtrfsSendReceiveManager};
 pub mod sigmacas;
 pub mod sigmafs;
