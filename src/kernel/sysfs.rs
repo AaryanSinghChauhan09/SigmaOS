@@ -140,7 +140,7 @@ impl Sysfs {
 
     /// Get kobject children
     pub fn get_children(&self, kobject_id: u64) -> Vec<&SysfsKobject> {
-        let kobject = self.kobjects.get(&kobject);
+        let kobject = self.kobjects.get(&kobject_id);
         
         match kobject {
             Some(kobj) => {

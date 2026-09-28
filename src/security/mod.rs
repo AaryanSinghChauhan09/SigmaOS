@@ -165,4 +165,3 @@ pub use capsicum::{
     CapRight, CapMode, CapEntry, CapabilitySandbox,
 };
 pub use memory_protection::{MemoryProtectionManager, MemoryProtectionMode, AslrConfig, StackCanaryConfig};
-pub use capability_enforcer::{CapabilityEnforcer, CapabilitySet, ResourceType, ResourcePermission};

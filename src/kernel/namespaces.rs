@@ -28,8 +28,26 @@ pub enum NamespaceError {
     AlreadyExists,
 }
 
-/// Alias for compatibility
-pub use Namespace as KernelNamespace;
+/// Kernel namespace trait for compatibility
+pub trait KernelNamespace {
+    fn namespace_id(&self) -> NamespaceId;
+    fn namespace_type(&self) -> KernelNamespaceType;
+    fn ref_count(&self) -> u32;
+}
+
+impl KernelNamespace for Namespace {
+    fn namespace_id(&self) -> NamespaceId {
+        self.id
+    }
+
+    fn namespace_type(&self) -> KernelNamespaceType {
+        self.namespace_type
+    }
+
+    fn ref_count(&self) -> u32 {
+        1 // Namespace doesn't have ref_count, return default
+    }
+}
 
 /// Maximum PIDs per namespace
 pub const MAX_PIDS_PER_NAMESPACE: u64 = 32768;

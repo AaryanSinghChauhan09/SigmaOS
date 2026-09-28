@@ -226,7 +226,7 @@ impl RoundRobinScheduler {
     }
 
     /// POSIX SCHED_RR scheduling with strict static priority tier preemption
-    pub fn schedule_on_cpu(&mut self, cpu_id: u8) -> Option<&Process> {
+    pub fn schedule_on_cpu(&mut self, cpu_id: u8) -> Option<&ProcessTask> {
         if self.processes.is_empty() {
             return None;
         }
@@ -309,7 +309,7 @@ impl RoundRobinScheduler {
         false
     }
 
-    pub fn schedule(&mut self) -> Option<&Process> {
+    pub fn schedule(&mut self) -> Option<&ProcessTask> {
         self.schedule_on_cpu(0)
     }
 
