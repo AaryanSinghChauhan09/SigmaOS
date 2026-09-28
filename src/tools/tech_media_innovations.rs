@@ -820,6 +820,9 @@ impl HowToGeekGuideSystemEngine {
         mappings.insert("list running processes".to_string(), "htop".to_string());
         mappings.insert("check disk space".to_string(), "duf".to_string());
         mappings.insert("search text in files".to_string(), "rg 'pattern'".to_string());
+        mappings.insert("check memory usage".to_string(), "free -h".to_string());
+        mappings.insert("view system logs".to_string(), "journalctl -xe".to_string());
+        mappings.insert("find large files".to_string(), "find / -size +100M".to_string());
         Self { command_mappings: mappings }
     }
 

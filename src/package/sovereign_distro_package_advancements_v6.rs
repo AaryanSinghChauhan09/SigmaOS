@@ -29,8 +29,6 @@ use std::string::{String, ToString};
 #[cfg(not(feature = "standalone_test"))]
 use std::vec::Vec;
 
-use crate::package::PackageFormat;
-
 #[cfg(feature = "standalone_test")]
 use alloc::collections::{BTreeMap, BTreeSet};
 #[cfg(feature = "standalone_test")]
@@ -39,6 +37,9 @@ use alloc::format;
 use alloc::string::{String, ToString};
 #[cfg(feature = "standalone_test")]
 use alloc::vec::Vec;
+
+#[cfg(not(feature = "standalone_test"))]
+use crate::package::PackageFormat;
 
 #[cfg(not(feature = "standalone_test"))]
 use crate::package::universal::UnifiedPackage;
