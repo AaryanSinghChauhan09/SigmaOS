@@ -1,5 +1,7 @@
 pub mod mobile_variant;
 pub use mobile_variant::*;
+pub mod tiling;
+pub use tiling::{TilingWindowManager, TilingWindow, Workspace, TilingLayout, WindowArea};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
