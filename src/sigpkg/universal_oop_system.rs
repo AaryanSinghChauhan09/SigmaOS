@@ -247,6 +247,20 @@ pub enum PackageFormat {
     Vcpkg,
     NarInfo,
     Sysupdate,
+    Tazpkg,
+    Sif,
+    Slp,
+    Winget,
+    Scoop,
+    Choco,
+    Pixi,
+    Nimble,
+    ZigPkg,
+    SwiftPkg,
+    Dub,
+    Opam,
+    Shard,
+    Plt,
 }
 
 impl PackageFormat {
@@ -375,6 +389,34 @@ impl PackageFormat {
             Some(PackageFormat::NarInfo)
         } else if normalized.ends_with(".sysupdate") {
             Some(PackageFormat::Sysupdate)
+        } else if normalized.ends_with(".tazpkg") {
+            Some(PackageFormat::Tazpkg)
+        } else if normalized.ends_with(".sif") {
+            Some(PackageFormat::Sif)
+        } else if normalized.ends_with(".slp") {
+            Some(PackageFormat::Slp)
+        } else if normalized.ends_with(".winget") || normalized.ends_with(".winget.yaml") {
+            Some(PackageFormat::Winget)
+        } else if normalized.ends_with(".scoop") || normalized.ends_with(".scoop.json") {
+            Some(PackageFormat::Scoop)
+        } else if normalized.ends_with(".choco") {
+            Some(PackageFormat::Choco)
+        } else if normalized.ends_with(".pixi") {
+            Some(PackageFormat::Pixi)
+        } else if normalized.ends_with(".nimble") {
+            Some(PackageFormat::Nimble)
+        } else if normalized.ends_with(".zig") || normalized == "build.zig.zon" {
+            Some(PackageFormat::ZigPkg)
+        } else if normalized.ends_with(".swift") || normalized == "package.swift" {
+            Some(PackageFormat::SwiftPkg)
+        } else if normalized.ends_with(".dub") {
+            Some(PackageFormat::Dub)
+        } else if normalized.ends_with(".opam") {
+            Some(PackageFormat::Opam)
+        } else if normalized.ends_with(".shard") {
+            Some(PackageFormat::Shard)
+        } else if normalized.ends_with(".plt") || normalized.ends_with(".raco") {
+            Some(PackageFormat::Plt)
         } else {
             None
         }

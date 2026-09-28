@@ -121,6 +121,20 @@ pub enum UniversalPackageFormatKind {
     SlaxLzm,
     PuppyPup,
     PuppyPet,
+    Tazpkg,
+    Sif,
+    Slp,
+    Winget,
+    Scoop,
+    Choco,
+    Pixi,
+    Nimble,
+    ZigPkg,
+    SwiftPkg,
+    Dub,
+    Opam,
+    Shard,
+    Plt,
 
     // Core System & Fallback
     SigmaNativePkg,
@@ -194,6 +208,20 @@ impl UniversalPackageFormatKind {
             Self::SlaxLzm => "Slax LZM Module (.lzm)",
             Self::PuppyPup => "Puppy Linux PUP (.pup)",
             Self::PuppyPet => "Puppy Linux PET (.pet)",
+            Self::Tazpkg => "SliTaz Tazpkg (.tazpkg)",
+            Self::Sif => "Singularity/Apptainer SIF (.sif)",
+            Self::Slp => "Stampede Linux Package (.slp)",
+            Self::Winget => "Windows Package Manager (.winget)",
+            Self::Scoop => "Scoop App (.scoop)",
+            Self::Choco => "Chocolatey Package (.choco)",
+            Self::Pixi => "Conda/Pixi Package (.pixi)",
+            Self::Nimble => "Nimble Package (.nimble)",
+            Self::ZigPkg => "Zig Package (.zig)",
+            Self::SwiftPkg => "Swift Package (.swift)",
+            Self::Dub => "D Language Package (.dub)",
+            Self::Opam => "OCaml OPAM (.opam)",
+            Self::Shard => "Crystal Shard (.shard)",
+            Self::Plt => "Racket Package (.plt)",
             Self::SigmaNativePkg => "SigmaOS Native Merkle SigPkg (.sigpkg)",
             Self::GenericTarGz => "Gzip Compressed Tarball (.tar.gz / .tgz)",
             Self::GenericTarXz => "XZ Compressed Tarball (.tar.xz / .xz)",
@@ -322,6 +350,34 @@ impl UniversalPackageFormatKind {
             Self::PuppyPup
         } else if normalized.ends_with(".pet") {
             Self::PuppyPet
+        } else if normalized.ends_with(".tazpkg") {
+            Self::Tazpkg
+        } else if normalized.ends_with(".sif") {
+            Self::Sif
+        } else if normalized.ends_with(".slp") {
+            Self::Slp
+        } else if normalized.ends_with(".winget") || normalized.ends_with(".winget.yaml") {
+            Self::Winget
+        } else if normalized.ends_with(".scoop") || normalized.ends_with(".scoop.json") {
+            Self::Scoop
+        } else if normalized.ends_with(".choco") {
+            Self::Choco
+        } else if normalized.ends_with(".pixi") {
+            Self::Pixi
+        } else if normalized.ends_with(".nimble") {
+            Self::Nimble
+        } else if normalized.ends_with(".zig") || normalized == "build.zig.zon" {
+            Self::ZigPkg
+        } else if normalized.ends_with(".swift") || normalized == "package.swift" {
+            Self::SwiftPkg
+        } else if normalized.ends_with(".dub") {
+            Self::Dub
+        } else if normalized.ends_with(".opam") {
+            Self::Opam
+        } else if normalized.ends_with(".shard") {
+            Self::Shard
+        } else if normalized.ends_with(".plt") || normalized.ends_with(".raco") {
+            Self::Plt
         } else if normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
             Self::GenericTarGz
         } else if normalized.ends_with(".tar.xz") || normalized.ends_with(".xz") {
@@ -1097,6 +1153,62 @@ impl SovereignUniversalPackageFormatMasterEngine {
             UniversalPackageFormatKind::DeepinSuperdeb,
             Box::new(DebianAptFormatAdapter),
         );
+        self.adapters.insert(
+            UniversalPackageFormatKind::Tazpkg,
+            Box::new(ContainerSandboxFormatAdapter { kind: UniversalPackageFormatKind::Tazpkg }),
+        );
+        self.adapters.insert(
+            UniversalPackageFormatKind::Sif,
+            Box::new(ContainerSandboxFormatAdapter { kind: UniversalPackageFormatKind::Sif }),
+        );
+        self.adapters.insert(
+            UniversalPackageFormatKind::Slp,
+            Box::new(ContainerSandboxFormatAdapter { kind: UniversalPackageFormatKind::Slp }),
+        );
+        self.adapters.insert(
+            UniversalPackageFormatKind::Winget,
+            Box::new(ContainerSandboxFormatAdapter { kind: UniversalPackageFormatKind::Winget }),
+        );
+        self.adapters.insert(
+            UniversalPackageFormatKind::Scoop,
+            Box::new(ContainerSandboxFormatAdapter { kind: UniversalPackageFormatKind::Scoop }),
+        );
+        self.adapters.insert(
+            UniversalPackageFormatKind::Choco,
+            Box::new(ContainerSandboxFormatAdapter { kind: UniversalPackageFormatKind::Choco }),
+        );
+        self.adapters.insert(
+            UniversalPackageFormatKind::Pixi,
+            Box::new(ContainerSandboxFormatAdapter { kind: UniversalPackageFormatKind::Pixi }),
+        );
+        self.adapters.insert(
+            UniversalPackageFormatKind::Nimble,
+            Box::new(ContainerSandboxFormatAdapter { kind: UniversalPackageFormatKind::Nimble }),
+        );
+        self.adapters.insert(
+            UniversalPackageFormatKind::ZigPkg,
+            Box::new(ContainerSandboxFormatAdapter { kind: UniversalPackageFormatKind::ZigPkg }),
+        );
+        self.adapters.insert(
+            UniversalPackageFormatKind::SwiftPkg,
+            Box::new(ContainerSandboxFormatAdapter { kind: UniversalPackageFormatKind::SwiftPkg }),
+        );
+        self.adapters.insert(
+            UniversalPackageFormatKind::Dub,
+            Box::new(ContainerSandboxFormatAdapter { kind: UniversalPackageFormatKind::Dub }),
+        );
+        self.adapters.insert(
+            UniversalPackageFormatKind::Opam,
+            Box::new(ContainerSandboxFormatAdapter { kind: UniversalPackageFormatKind::Opam }),
+        );
+        self.adapters.insert(
+            UniversalPackageFormatKind::Shard,
+            Box::new(ContainerSandboxFormatAdapter { kind: UniversalPackageFormatKind::Shard }),
+        );
+        self.adapters.insert(
+            UniversalPackageFormatKind::Plt,
+            Box::new(ContainerSandboxFormatAdapter { kind: UniversalPackageFormatKind::Plt }),
+        );
     }
 
     /// Auto-detect package format kind from filename or magic bytes
@@ -1209,6 +1321,20 @@ mod master_package_tests {
         assert_eq!(UniversalPackageFormatKind::from_filename("puppy.pup"), UniversalPackageFormatKind::PuppyPup);
         assert_eq!(UniversalPackageFormatKind::from_filename("plain.tar"), UniversalPackageFormatKind::GenericTar);
         assert_eq!(UniversalPackageFormatKind::from_filename("puppy.pet"), UniversalPackageFormatKind::PuppyPet);
+        assert_eq!(UniversalPackageFormatKind::from_filename("slitaz.tazpkg"), UniversalPackageFormatKind::Tazpkg);
+        assert_eq!(UniversalPackageFormatKind::from_filename("container.sif"), UniversalPackageFormatKind::Sif);
+        assert_eq!(UniversalPackageFormatKind::from_filename("stampede.slp"), UniversalPackageFormatKind::Slp);
+        assert_eq!(UniversalPackageFormatKind::from_filename("app.winget"), UniversalPackageFormatKind::Winget);
+        assert_eq!(UniversalPackageFormatKind::from_filename("app.scoop"), UniversalPackageFormatKind::Scoop);
+        assert_eq!(UniversalPackageFormatKind::from_filename("app.choco"), UniversalPackageFormatKind::Choco);
+        assert_eq!(UniversalPackageFormatKind::from_filename("env.pixi"), UniversalPackageFormatKind::Pixi);
+        assert_eq!(UniversalPackageFormatKind::from_filename("pkg.nimble"), UniversalPackageFormatKind::Nimble);
+        assert_eq!(UniversalPackageFormatKind::from_filename("build.zig"), UniversalPackageFormatKind::ZigPkg);
+        assert_eq!(UniversalPackageFormatKind::from_filename("package.swift"), UniversalPackageFormatKind::SwiftPkg);
+        assert_eq!(UniversalPackageFormatKind::from_filename("app.dub"), UniversalPackageFormatKind::Dub);
+        assert_eq!(UniversalPackageFormatKind::from_filename("lib.opam"), UniversalPackageFormatKind::Opam);
+        assert_eq!(UniversalPackageFormatKind::from_filename("app.shard"), UniversalPackageFormatKind::Shard);
+        assert_eq!(UniversalPackageFormatKind::from_filename("pkg.plt"), UniversalPackageFormatKind::Plt);
     }
 
     #[test]
