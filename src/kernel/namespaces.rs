@@ -33,6 +33,9 @@ pub trait KernelNamespace {
     fn namespace_id(&self) -> NamespaceId;
     fn namespace_type(&self) -> KernelNamespaceType;
     fn ref_count(&self) -> u32;
+    fn increment_ref(&self);
+    fn decrement_ref(&self);
+    fn metadata(&self) -> String;
 }
 
 impl KernelNamespace for Namespace {
@@ -46,6 +49,18 @@ impl KernelNamespace for Namespace {
 
     fn ref_count(&self) -> u32 {
         1 // Namespace doesn't have ref_count, return default
+    }
+
+    fn increment_ref(&self) {
+        // Namespace doesn't have ref_count, no-op
+    }
+
+    fn decrement_ref(&self) {
+        // Namespace doesn't have ref_count, no-op
+    }
+
+    fn metadata(&self) -> String {
+        format!("Namespace {{ id: {:?}, type: {:?} }}", self.id, self.namespace_type)
     }
 }
 

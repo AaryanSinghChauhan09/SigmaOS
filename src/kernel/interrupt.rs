@@ -2,7 +2,7 @@
 // Inspired by Linux and BSD interrupt handling with IDT and IRQ management
 
 use std::collections::HashMap;
-use std::sync::atomic::{AtomicU64, AtomicU32, Ordering};
+use std::sync::atomic::{AtomicU64, AtomicU32, AtomicU8, Ordering};
 
 /// Interrupt vector
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
