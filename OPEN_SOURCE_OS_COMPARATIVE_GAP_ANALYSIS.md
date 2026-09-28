@@ -23,7 +23,31 @@ While SigmaOS provides a high-performance bare-metal Rust kernel with modular ab
 | **Device Drivers** | 100,000+ LOC (thousands of devices) | 50,000+ LOC | 40,000+ LOC | ~5-10 drivers (UART, RTC, ATA, xHCI) | ❌ 99% driver gap |
 | **Hardware Permissions** | ✅ udev, logind, Flatpak portals | ✅ devd, MAC policies | ✅ pledge/unveil, bioctl | ❌ Raw root device access only | ❌ Missing portal model |
 | **Atomic Updates & Recovery** | ✅ OSTree, A/B Android, Nix generations | ✅ freebsd-update, ZFS boot environments | ✅ syspatch, signify | ⚠️ sigpkg SAT & A/B stubs | ⚠️ Partial / Stubs |
+| **Build Foundation & Purity** | Monolithic C / musl / glibc | Monolithic C / libc | Monolithic C / libc | `#![no_std]` Rust / 0 external deps | ⚠️ Unification Sprint Req. |
 | **Security Hardening** | Multi-LSM (SELinux, AppArmor, Landlock) | MAC Framework, Capsicum | Pledge, Unveil, KARL, W^X | Framework stubs & rule engines | ⚠️ Validation only |
+
+---
+
+## 🛠️ Immediate Priority: Build Foundation & `#![no_std]` Unification Strategy
+
+### 1. Module Unification Sprint
+To resolve workspace compilation collisions when building `src/lib.rs` across all System Shards, the following actions are established:
+- **Inventory Duplicate Definitions**: Trace all duplicate struct, enum, and trait definitions across multi-distro modules (e.g. `FiftyPercentRuleEngine`) using `grep -rn "^(pub )?struct Name" src/`.
+- **Canonical Re-Exports**: Preserve the canonical implementation in its primary domain module and convert secondary definitions to `pub use crate::canonical_module::Name;`.
+- **Macro Expansion Disambiguation**: Isolate multi-distro syscall and ioctl macro match arms using feature flag guards to eliminate duplicate arm errors.
+
+### 2. `#![no_std]` Boundary & Allocation Audit
+- **Standard Library Replacement Protocol**:
+  ```bash
+  sed -i 's/use std::vec::Vec/use alloc::vec::Vec/g' $FILE
+  sed -i 's/use std::string::String/use alloc::string::String/g' $FILE
+  sed -i 's/use std::collections::HashMap/use alloc::collections::BTreeMap/g' $FILE
+  ```
+- **Interrupt Context Bounds**: Enforce zero-allocation in raw hardware IRQ handlers (`src/drivers/`, `src/interrupt/`).
+- **Memory Safety**: Restrict raw pointer operations to safe atomic wrappers or explicitly audited `unsafe {}` blocks in physical memory allocators.
+
+### 3. Zero-Dependency Verification
+- Guarantee absolute zero external crate dependencies in `Cargo.toml` via `cargo tree --depth 1 | grep -v "sigmaos"`. Every data structure (`BTreeMap`, `Vec`, `String`, ring buffers) is implemented natively in `src/klib/`.
 
 ---
 
