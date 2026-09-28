@@ -12,6 +12,17 @@ pub struct ZeroCopyBuffer {
     pub id: u64,
 }
 
+impl Clone for ZeroCopyBuffer {
+    fn clone(&self) -> Self {
+        self.ref_count.fetch_add(1, Ordering::SeqCst);
+        Self {
+            data: self.data.clone(),
+            ref_count: AtomicUsize::new(self.ref_count.load(Ordering::SeqCst)),
+            id: self.id,
+        }
+    }
+}
+
 impl ZeroCopyBuffer {
     pub fn new(data: Vec<u8>) -> Self {
         let id = std::time::SystemTime::now()
