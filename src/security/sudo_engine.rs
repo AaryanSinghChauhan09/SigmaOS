@@ -87,12 +87,12 @@ impl SovereignSudoEngine {
         SudoAuthResult::PermissionDenied
     }
 
-    /// Sanitizes environment variables for elevated execution
+    /// Sanitizes environment variables for elevated execution.
+    /// Uses O(1) constant-time direct pattern matching rather than linear array searches.
     pub fn sanitize_environment(&self, env_keys: &[&str]) -> Vec<String> {
-        let dangerous_keys = ["LD_PRELOAD", "LD_LIBRARY_PATH", "PYTHONPATH", "RUBYLIB"];
         env_keys
             .iter()
-            .filter(|&&k| !dangerous_keys.contains(&k))
+            .filter(|&&k| !matches!(k, "LD_PRELOAD" | "LD_LIBRARY_PATH" | "PYTHONPATH" | "RUBYLIB"))
             .map(|&k| String::from(k))
             .collect()
     }
