@@ -27,9 +27,6 @@ pub mod kernel_hardening;
 pub mod user_namespace;
 
 pub mod bridge;
-pub mod capability_enforcer;
-pub mod seccomp_filter;
-pub mod keys;
 pub mod capability_token;
 pub mod cleaner;
 pub mod clipboard;
