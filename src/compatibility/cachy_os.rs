@@ -691,7 +691,10 @@ impl CachyOsSchedExtFramework {
     }
 }
 
+#[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
     fn test_cachyos_chwd_gpu_engine() {
         let mut nvidia_v3 = CachyOsChwdGpuHardwareEngine::new(GpuVendor::Nvidia, 3);

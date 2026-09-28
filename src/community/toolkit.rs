@@ -282,8 +282,9 @@ impl Default for SecurityProfileTemplateStore {
     }
 }
 
+#[cfg(test)]
 mod tests {
-    
+    use super::*;
 
     #[test]
     fn test_community_handbook_and_recipes() {
