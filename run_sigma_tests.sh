@@ -107,6 +107,13 @@ if [ -f "src/distro/sovereign_linux_bsd_master_synthesis.rs" ]; then
     ./build/linux_bsd_master_synthesis_test
 fi
 
+if [ -f "src/distro/sovereign_linux_bsd_distro_next_gen_innovations.rs" ]; then
+    echo "Running Next-Gen Sovereign Linux & BSD Distro Innovations test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_linux_bsd_distro_next_gen_innovations.rs --edition=2021 -o build/test_next_gen_distro
+    ./build/test_next_gen_distro
+fi
+
 if [ -f "src/network/approximation_proxy_firewall.rs" ]; then
     echo "Running Sovereign Approximation Proxy Firewall test suite..."
     mkdir -p build
@@ -303,6 +310,7 @@ if [ -f "src/package/sovereign_distro_package_advancements_v6.rs" ]; then
     mkdir -p build
     rustc --test src/package/sovereign_distro_package_advancements_v6.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v6_test
     ./build/sovereign_advancements_v6_test
+fi
 if [ -f "src/package/sovereign_distro_package_advancements_v7.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V7 test suite..."
     mkdir -p build
