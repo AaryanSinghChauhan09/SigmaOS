@@ -60,3 +60,6 @@ pub use tech_media_extended_suite::{
 pub mod dependency_reduction;
 pub use dependency_reduction::*;
 pub mod community_missing_tools;
+
+pub mod sovereign_dev_terminal_git_ci_engine;
+pub use sovereign_dev_terminal_git_ci_engine::*;
