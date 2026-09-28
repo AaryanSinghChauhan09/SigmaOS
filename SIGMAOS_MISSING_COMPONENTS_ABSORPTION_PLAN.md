@@ -136,18 +136,43 @@ Implementation progression: VirtIO-Block → ATA PIO → AHCI SATA → NVMe.
 
 ---
 
-## 8. PHASE 6 — AUDIO & POWER MANAGEMENT
+## 8. CRITICAL: DEPENDENCIES & CRATE MANAGEMENT
+
+### 8.1 Zero-Dependency Philosophy
+SigmaOS's core strength is **complete autonomy**. Do NOT absorb components that require:
+- External cryptography crates
+- External HTTP clients
+- Heavy serialization frameworks
+- Heavy async runtimes
+
+**Adaptation Workflow:**
+1. Extract algorithm specifications from source projects.
+2. Implement natively in safe Rust within SigmaOS (`klib` / core modules).
+3. Use `#![no_std]` primitives only for kernel Ring 0 space.
+
+### 8.2 Dependency Checklist
+For every absorbed component, verify:
+- [x] Zero external crates in kernel code.
+- [x] Userland can use 1–2 permissively licensed crates (if strictly justified).
+- [x] All crypto uses SigmaOS's own Safe-Rust implementations.
+- [x] Network protocols implemented from RFC specs, not crate wrappers.
+- [x] Compression (Zstd, gzip) implemented in standalone native modules.
+- [x] CI rejects pull requests adding external kernel dependencies.
+
+---
+
+## 9. PHASE 6 — AUDIO & POWER MANAGEMENT
 *Priority: High*
 
-### 8.1 Intel HDA & BSD Sound
+### 9.1 Intel HDA & BSD Sound
 - PCI discovery, CORB/RIRB ring buffers, codec discovery, PCM stream streaming (`SovereignBsdAudioDriver`).
 
-### 8.2 ACPI Power Management
+### 9.2 ACPI Power Management
 - RSDP / RSDT / MADT parsing, FADT power states (S0, S3 sleep, S5 poweroff), battery and thermal zone monitoring.
 
 ---
 
-## 9. PHASE 7 — WI-FI & ADVANCED WIRELESS
+## 10. PHASE 7 — WI-FI & ADVANCED WIRELESS
 *Priority: Medium*
 
 ### Strategy & Progression
@@ -158,10 +183,10 @@ Implementation progression: VirtIO-Block → ATA PIO → AHCI SATA → NVMe.
 
 ---
 
-## 10. PHASE 8 — SECURITY & DRIVER ISOLATION
+## 11. PHASE 8 — SECURITY & DRIVER ISOLATION
 *Priority: Critical*
 
-### 10.1 Driver Isolation Matrix
+### 11.1 Driver Isolation Matrix
 | Driver Class | Execution Domain |
 | :--- | :--- |
 | **Boot, Serial, Interrupts** | Ring 0 Kernel |
@@ -171,7 +196,7 @@ Implementation progression: VirtIO-Block → ATA PIO → AHCI SATA → NVMe.
 
 ---
 
-## 11. PHASE 9 — INIT, SERVICES & USERLAND
+## 12. PHASE 9 — INIT, SERVICES & USERLAND
 *Priority: High*
 
 ### Minimal Service Model (`src/init/service_manager.rs`)
@@ -184,7 +209,7 @@ Implementation progression: VirtIO-Block → ATA PIO → AHCI SATA → NVMe.
 
 ---
 
-## 12. PHASE 10 — PACKAGE, ATOMIC UPDATES & RECOVERY
+## 13. PHASE 10 — PACKAGE, ATOMIC UPDATES & RECOVERY
 *Priority: High*
 
 ### `sigmactl` Package & App Manager (`src/package/declarative_app.rs`)
@@ -195,7 +220,7 @@ Implementation progression: VirtIO-Block → ATA PIO → AHCI SATA → NVMe.
 
 ---
 
-## 13. MILESTONE SCHEDULE & ACCEPTANCE CRITERIA
+## 14. MILESTONE SCHEDULE & ACCEPTANCE CRITERIA
 
 ```
 +---------------------------------------------------------------------------------------+
