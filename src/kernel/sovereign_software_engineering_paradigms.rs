@@ -2,10 +2,12 @@
 // Demonstrates clean code, OOP principles (Encapsulation, Abstraction, Polymorphism, Composition),
 // SOLID guidelines (SRP, OCP, LSP, ISP, DIP), Design by Contract (DbC), and Concurrency/Deadlock Detection.
 
-use std::boxed::Box;
-use std::collections::HashMap;
-use std::string::{String, ToString};
-use std::vec::Vec;
+extern crate alloc;
+
+use alloc::boxed::Box;
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 // =========================================================================
 // 1. SOLID: INTERFACE SEGREGATION PRINCIPLE (ISP) & ABSTRACTION
@@ -88,15 +90,15 @@ pub struct ResourceLockRequest {
 }
 
 pub struct SovereignDeadlockLockdepVerifier {
-    pub held_locks: HashMap<u32, u32>,       // resource_id -> process_id
-    pub waiting_locks: HashMap<u32, u32>,    // process_id -> resource_id requested
+    pub held_locks: BTreeMap<u32, u32>,       // resource_id -> process_id
+    pub waiting_locks: BTreeMap<u32, u32>,    // process_id -> resource_id requested
 }
 
 impl SovereignDeadlockLockdepVerifier {
     pub fn new() -> Self {
         Self {
-            held_locks: HashMap::new(),
-            waiting_locks: HashMap::new(),
+            held_locks: BTreeMap::new(),
+            waiting_locks: BTreeMap::new(),
         }
     }
 

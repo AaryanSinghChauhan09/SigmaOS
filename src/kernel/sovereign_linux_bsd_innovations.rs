@@ -5,12 +5,14 @@
 // 3. Linux eBPF CO-RE (Compile Once - Run Everywhere) Bytecode Validator
 // 4. FreeBSD VNET Jail Virtual Network Stack Isolation
 
-use std::collections::HashMap;
-use std::string::{String, ToString};
-use std::vec::Vec;
+extern crate alloc;
+
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 /// OpenBSD Pledge Promise Categories
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum SovereignPledgePromise {
     Stdio,
     Rpath,
@@ -29,7 +31,7 @@ pub struct PledgeUnveilEnforcer {
     pub process_id: u32,
     pub pledged_promises: Vec<SovereignPledgePromise>,
     pub is_pledged: bool,
-    pub unveiled_paths: HashMap<String, String>, // path -> permissions ("r", "rw", "rx", "c")
+    pub unveiled_paths: BTreeMap<String, String>, // path -> permissions ("r", "rw", "rx", "c")
 }
 
 impl PledgeUnveilEnforcer {
@@ -38,7 +40,7 @@ impl PledgeUnveilEnforcer {
             process_id,
             pledged_promises: Vec::new(),
             is_pledged: false,
-            unveiled_paths: HashMap::new(),
+            unveiled_paths: BTreeMap::new(),
         }
     }
 
