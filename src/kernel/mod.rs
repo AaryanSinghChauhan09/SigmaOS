@@ -136,7 +136,6 @@ pub use paging::{PageTable, PageTableEntry, PageTableFlags, VirtualMemoryManager
 pub use roundrobin::{
     RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError,
 };
-pub use scheduler::{Priority, Process, ProcessState, Scheduler};
 pub use vmm_paging::{PageTableManager, VirtualMemoryManager};
 pub use uts_namespace::{UtsNamespaceManager, NamespaceId};
 // Note: linux_bsd_innovations types fully re-exported via `pub use crate::kernel::linux_bsd_innovations::*` above.
@@ -172,7 +171,7 @@ pub use pidfd::{PidFd, PidFdCapabilities, ProcDesc, ProcDescCapabilities, Subrea
 pub mod cfi;
 pub mod interrupt;
 pub use interrupt::{InterruptController, InterruptVector, InterruptType, InterruptDescriptor, IrqLine, IrqTriggerType};
-pub use scheduler::{CfsScheduler, RtScheduler, EnergyAwareScheduler, ProcessTask, Priority, SchedulerPolicy, ProcessState, ThermalState};
+pub use scheduler::{CfsScheduler, RtScheduler, ProcessTask, Priority, SchedulerPolicy, ProcessState, ThermalState};
 pub use cfi::{CfiEngine, CfiTarget, CfiViolation};
 pub use kptr_restrict::{
     KptrRestrictLevel, DmesgRestrictLevel, KernelSecurityMitigations, get_security_mitigations,
@@ -183,4 +182,3 @@ pub use procfs_linux::{
     ProcessInfo, ProcFs,
 };
 pub use sysfs::{Sysfs, SysfsKobject, SysfsAttribute, SysfsAttributeType};
-pub use namespaces::{NamespaceManager, Namespace, NamespaceId, NamespaceType, UserNamespace, MountNamespace, PidNamespace, MountPoint};

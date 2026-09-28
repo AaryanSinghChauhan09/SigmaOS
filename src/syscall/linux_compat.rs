@@ -144,7 +144,6 @@ pub enum LinuxSyscallNumber {
     SchedGetparam = 145,
     SchedSetattr = 146,
     SchedGetattr = 147,
-    SchedYield = 148,
     SchedGetPriorityMax = 149,
     SchedSetpriority = 150,
     Mlock = 150,
@@ -157,13 +156,9 @@ pub enum LinuxSyscallNumber {
     ArchPrctl = 165,
     Adjtimex = 159,
     Settimeofday = 164,
-    Getpid = 172,
-    Getppid = 173,
-    Getpgid = 174,
     Mount = 165,
     Umount = 166,
     Setdomainname = 171,
-    Uname = 160,
 }
 
 /// Linux file open flags

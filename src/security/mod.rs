@@ -2,8 +2,6 @@
 pub mod memory_protection;
 pub mod address_sanitizer;
 pub mod capability_enforcer;
-pub mod seccomp_filter;
-pub mod keys;
 pub use address_sanitizer::{AddressSanitizer, MemoryRegion};
 pub mod capability;
 pub mod hardware_privilege;
@@ -167,6 +165,4 @@ pub use capsicum::{
     CapRight, CapMode, CapEntry, CapabilitySandbox,
 };
 pub use memory_protection::{MemoryProtectionManager, MemoryProtectionMode, AslrConfig, StackCanaryConfig};
-pub use capability_enforcer::{CapabilityEnforcer, SecurityContext, CapabilitySet, LinuxCapability, ResourceType, ResourcePermission};
-pub use seccomp_filter::{SeccompManager, SeccompFilter, SeccompRule, SeccompAction, SeccompCmpOp, SeccompArgFilter};
-pub use keys::{KeyManager, Keyring, Key, KeyType, KeyDescription};
+pub use capability_enforcer::{CapabilityEnforcer, CapabilitySet, ResourceType, ResourcePermission};

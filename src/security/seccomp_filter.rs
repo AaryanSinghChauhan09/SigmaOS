@@ -91,7 +91,7 @@ impl SeccompFilter {
             if rule.syscall_number == syscall_number {
                 // Check argument filters
                 let matches = rule.arg_filters.iter().all(|filter| {
-                    let arg_value = if filter.arg_num as usize < args.len() {
+                    let arg_value = if (filter.arg_num as usize) < args.len() {
                         args[filter.arg_num as usize]
                     } else {
                         0

@@ -16,6 +16,24 @@ pub enum NamespaceType {
     Cgroup,
 }
 
+// Alias for compatibility
+pub use NamespaceType as KernelNamespaceType;
+
+/// Namespace error
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum NamespaceError {
+    NotFound,
+    InvalidType,
+    PermissionDenied,
+    AlreadyExists,
+}
+
+/// Alias for compatibility
+pub use Namespace as KernelNamespace;
+
+/// Maximum PIDs per namespace
+pub const MAX_PIDS_PER_NAMESPACE: u64 = 32768;
+
 /// Namespace ID
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct NamespaceId(pub u64);
@@ -124,6 +142,11 @@ impl NamespaceManager {
         manager.initial_namespaces.insert(NamespaceType::Pid, pid_id);
 
         manager
+    }
+
+    /// Get next namespace ID
+    pub fn next_namespace_id(&self) -> NamespaceId {
+        NamespaceId(self.next_id.load(Ordering::SeqCst))
     }
 
     /// Create a new namespace

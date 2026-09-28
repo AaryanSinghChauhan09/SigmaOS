@@ -1,7 +1,7 @@
 // SigmaOS Round-Robin Scheduler
 // Enhanced priority-aware round-robin with process yielding and context tracking
 
-use crate::kernel::scheduler::{Priority, Process, ProcessState};
+use crate::kernel::scheduler::{Priority, ProcessState, ProcessTask};
 use std::string::String;
 use std::vec::Vec;
 
@@ -95,7 +95,7 @@ impl CpuContext {
 /// Extended process entry that includes context and yields tracking
 #[derive(Debug, Clone)]
 pub struct ScheduledProcess {
-    pub process: Process,
+    pub process: ProcessTask,
     pub context: CpuContext,
     pub yield_requested: bool,
     pub cpu_time_used: u64,
@@ -109,7 +109,7 @@ pub struct ScheduledProcess {
 }
 
 impl ScheduledProcess {
-    pub fn new(process: Process) -> Self {
+    pub fn new(process: ProcessTask) -> Self {
         let posix_rt_priority = match process.priority {
             Priority::Realtime => 99,
             Priority::High => 70,
@@ -217,7 +217,7 @@ impl RoundRobinScheduler {
         }
     }
 
-    pub fn add_process(&mut self, process: Process) -> Result<(), SchedulerError> {
+    pub fn add_process(&mut self, process: ProcessTask) -> Result<(), SchedulerError> {
         if self.processes.len() >= self.config.max_processes {
             return Err(SchedulerError::TooManyProcesses);
         }

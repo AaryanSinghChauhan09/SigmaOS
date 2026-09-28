@@ -32,7 +32,7 @@ pub mod fscrypt;
 pub mod autofs;
 
 pub use btrfs::{
-    BtrfsExtent, BtrfsFilesystem, BtrfsSnapshot, BtrfsSubvolume, ChecksumType,
+    BtrfsExtent, BtrfsFilesystem, BtrfsSnapshot, ChecksumType,
 };
 pub use sigmacas::{CasBlock, SigmaFsCasEngine, DILITHIUM5_SIGNATURE_SIZE, SHA256_HASH_SIZE};
 pub use sigmafs::{

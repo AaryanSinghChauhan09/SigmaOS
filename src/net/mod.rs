@@ -21,8 +21,8 @@ pub use torrent::{
 
 pub use stack::{
     ConnTrackEntry, ConnTrackState, ConnTrackTable,
-    BbrCongestionControl, CongestionControl, NFAction, NetDevice, Netfilter, NetfilterRule,
-    PfifoFast, Qdisc, QdiscManager, RenoCongestionControl, SkBuff, Socket,
+    CongestionControl, NFAction, NetDevice, Netfilter, NetfilterRule,
+    PfifoFast, Qdisc, QdiscManager, SkBuff, Socket,
 };
 
 pub use tcp_ip_implementation::{
@@ -31,8 +31,8 @@ pub use tcp_ip_implementation::{
 };
 
 pub use network_namespace::{
-    NetworkNamespace, NetworkNamespaceId, NetworkInterface, Route as NamespaceRoute, FirewallRule, FirewallAction,
-    VirtualBridge, NetworkNamespaceManager,
+    NetworkNamespace, NetworkNamespaceId, NetworkInterface, Route as NamespaceRoute,
+    VirtualBridge,
 };
 
 pub use network_syscalls::{
@@ -67,7 +67,7 @@ pub mod zero_copy;
 pub mod packet_filter;
 pub mod congestion;
 pub mod namespace;
-pub use namespace::{NetworkNamespaceManager, NetworkNamespace, NetworkNamespaceId, NetworkInterface, InterfaceState, InterfaceAddress, NetworkRoute, FirewallRule, FirewallAction};
-pub use congestion::{CongestionControlManager, CongestionControlType, CongestionState, CongestionWindow, RenoCongestionControl, CubicCongestionControl, BbrCongestionControl};
+pub use namespace::{InterfaceState, InterfaceAddress, NetworkRoute, FirewallRule, FirewallAction};
+pub use congestion::{CongestionControlManager, CongestionControlType, CongestionState, CongestionWindow, CubicCongestionControl};
 pub use packet_filter::{PacketFilter, PfRule, PfAction, PfProtocol, Packet};
 pub use zero_copy::{ZeroCopyBuffer, ZeroCopyBufferPool, ZeroCopyPacket, ZeroCopyRingBuffer, PacketMetadata};
