@@ -110,20 +110,34 @@ impl GksuSecurityGuard {
         self.sensitive_buffer.clear();
     }
 
-    /// Sanitize environment variables before spawning privileged process
+    /// Sanitize environment variables before spawning privileged process.
+    /// Filters out dynamic linker/loader, locale conversion, interpreter libraries,
+    /// and shell startup control variables to prevent privilege escalation attacks.
     pub fn sanitize_environment(
         input_env: &[(String, String)],
         allowed_keys: &[String],
     ) -> Vec<(String, String)> {
+        let dangerous_keys = [
+            "LD_PRELOAD",
+            "LD_LIBRARY_PATH",
+            "LD_AUDIT",
+            "LD_DEBUG",
+            "DYLD_INSERT_LIBRARIES",
+            "DYLD_LIBRARY_PATH",
+            "GCONV_PATH",
+            "PYTHONPATH",
+            "RUBYLIB",
+            "PERL5LIB",
+            "NODE_PATH",
+            "BASH_ENV",
+            "ENV",
+            "IFS",
+        ];
+
         let mut clean_env = Vec::new();
         for (k, v) in input_env {
-            // Dangerous variables stripped automatically
-            if k == "LD_PRELOAD"
-                || k == "LD_LIBRARY_PATH"
-                || k == "PYTHONPATH"
-                || k == "RUBYLIB"
-                || k == "PERL5LIB"
-            {
+            // Dangerous variables stripped automatically regardless of allowed list
+            if dangerous_keys.contains(&k.as_str()) {
                 continue;
             }
 

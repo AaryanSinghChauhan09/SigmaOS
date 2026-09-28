@@ -87,9 +87,27 @@ impl SovereignSudoEngine {
         SudoAuthResult::PermissionDenied
     }
 
-    /// Sanitizes environment variables for elevated execution
+    /// Sanitizes environment variables for elevated execution.
+    /// Filters out dynamic linker/loader, locale conversion, interpreter libraries,
+    /// and shell startup control variables to prevent privilege escalation attacks
+    /// (such as CVE-2021-4034 Pkexec GCONV_PATH exploitation and LD_AUDIT hijacking).
     pub fn sanitize_environment(&self, env_keys: &[&str]) -> Vec<String> {
-        let dangerous_keys = ["LD_PRELOAD", "LD_LIBRARY_PATH", "PYTHONPATH", "RUBYLIB"];
+        let dangerous_keys = [
+            "LD_PRELOAD",
+            "LD_LIBRARY_PATH",
+            "LD_AUDIT",
+            "LD_DEBUG",
+            "DYLD_INSERT_LIBRARIES",
+            "DYLD_LIBRARY_PATH",
+            "GCONV_PATH",
+            "PYTHONPATH",
+            "RUBYLIB",
+            "PERL5LIB",
+            "NODE_PATH",
+            "BASH_ENV",
+            "ENV",
+            "IFS",
+        ];
         env_keys
             .iter()
             .filter(|&&k| !dangerous_keys.contains(&k))
@@ -133,8 +151,21 @@ mod tests {
         assert_eq!(res_unauth, SudoAuthResult::PermissionDenied);
 
         // Test environment sanitization
-        let clean_env = engine.sanitize_environment(&["PATH", "LD_PRELOAD", "HOME"]);
+        let clean_env = engine.sanitize_environment(&[
+            "PATH",
+            "LD_PRELOAD",
+            "GCONV_PATH",
+            "LD_AUDIT",
+            "BASH_ENV",
+            "DYLD_INSERT_LIBRARIES",
+            "HOME",
+        ]);
         assert!(clean_env.contains(&String::from("PATH")));
+        assert!(clean_env.contains(&String::from("HOME")));
         assert!(!clean_env.contains(&String::from("LD_PRELOAD")));
+        assert!(!clean_env.contains(&String::from("GCONV_PATH")));
+        assert!(!clean_env.contains(&String::from("LD_AUDIT")));
+        assert!(!clean_env.contains(&String::from("BASH_ENV")));
+        assert!(!clean_env.contains(&String::from("DYLD_INSERT_LIBRARIES")));
     }
 }
