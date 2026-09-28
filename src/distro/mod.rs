@@ -371,3 +371,6 @@ pub use sovereign_2055_distro_supremacy_engine::*;
 
 pub mod sovereign_2060_distro_supremacy_engine;
 pub use sovereign_2060_distro_supremacy_engine::*;
+
+pub mod sovereign_medium_priority_master_suite;
+pub use sovereign_medium_priority_master_suite::*;
