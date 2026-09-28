@@ -1361,7 +1361,7 @@ impl SovereignUniversalShellBridgeEngine {
         let mut compat_engine = UniversalShellCompatibilityEngine::new();
         let dialect = UniversalShellCompatibilityEngine::detect_shebang_dialect(script);
         let transpiled_sh = UniversalScriptTranspiler::transpile_to_posix_sh(script, dialect);
-        let pipelines = compat_engine.execute_script_as_sh(script)?;
+        let pipelines = compat_engine.execute_script_as_sh(&transpiled_sh)?;
         Ok((dialect, transpiled_sh, pipelines))
     }
 }
