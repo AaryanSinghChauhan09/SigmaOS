@@ -377,6 +377,9 @@ impl Default for SecurityTestFramework {
 }
 
 /// Fuzzing test framework
+pub mod sovereign_testing_and_validation_framework;
+pub use sovereign_testing_and_validation_framework::*;
+
 pub struct FuzzingTestFramework {
     pub fuzzers: Vec<Fuzzer>,
 }
