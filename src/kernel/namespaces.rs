@@ -34,6 +34,14 @@ pub use Namespace as KernelNamespace;
 /// Maximum PIDs per namespace
 pub const MAX_PIDS_PER_NAMESPACE: u64 = 32768;
 
+/// Global namespace ID counter
+static NEXT_NAMESPACE_ID: AtomicU64 = AtomicU64::new(1);
+
+/// Get next namespace ID (free function for compatibility)
+pub fn next_namespace_id() -> NamespaceId {
+    NamespaceId(NEXT_NAMESPACE_ID.fetch_add(1, Ordering::SeqCst))
+}
+
 /// Namespace ID
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct NamespaceId(pub u64);

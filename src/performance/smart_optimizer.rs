@@ -2,7 +2,8 @@
 // Zero-dependency, #![no_std] compliant, zero-allocation
 // Dynamically tunes CPU cores, compacts memory page fragmentation, and adjusts disk I/O priorities under live workloads.
 
-use crate::kernel::{Priority, Process, ProcessState};
+use crate::kernel::{Priority, ProcessState};
+use crate::kernel::process::Process;
 use core::sync::atomic::{AtomicBool, AtomicU8, AtomicUsize, Ordering};
 
 // 1. CPU Core Thread-Priority Optimizer
