@@ -3,8 +3,33 @@
 
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex, OnceLock};
+#[cfg(not(feature = "standalone_test"))]
 use crate::kernel::ebpf_vm::{BpfInstruction, BpfVm};
+#[cfg(not(feature = "standalone_test"))]
 use crate::kernel::ebpf_verification::{BpfProgramVerifier, VerificationReport};
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum BpfInstruction { LoadImm64 { dst_reg: u8, imm64: u64 }, Return }
+#[cfg(feature = "standalone_test")]
+pub struct BpfVm;
+#[cfg(feature = "standalone_test")]
+impl BpfVm {
+    pub fn new() -> Self { Self }
+    pub fn load_program(&mut self, _inst: Vec<BpfInstruction>) -> Result<(), String> { Ok(()) }
+    pub fn run(&mut self) -> Result<u64, String> { Ok(0) }
+}
+#[cfg(feature = "standalone_test")]
+pub struct BpfProgramVerifier { pub report: VerificationReport }
+#[cfg(feature = "standalone_test")]
+pub struct VerificationReport { pub is_valid: bool, pub errors: Vec<String> }
+#[cfg(feature = "standalone_test")]
+impl BpfProgramVerifier {
+    pub fn new(_inst: Vec<BpfInstruction>) -> Self {
+        Self { report: VerificationReport { is_valid: true, errors: Vec::new() } }
+    }
+    pub fn verify(&mut self) -> Result<&VerificationReport, String> { Ok(&self.report) }
+}
 
 /// BPF syscall commands
 #[repr(u32)]
@@ -297,7 +322,8 @@ fn sys_bpf_prog_load(
         BpfInstruction::Return,
     ];
 
-    let mut registry = get_global_bpf_registry().lock().unwrap();
+    let registry_arc = get_global_bpf_registry();
+    let mut registry = registry_arc.lock().unwrap();
     let fd = registry.load_program(
         prog_type,
         instructions,

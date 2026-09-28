@@ -1957,6 +1957,15 @@ pub struct SovereignWebPublisherEngine {
     pub blocks: Vec<WebLayoutBlock>,
 }
 
+fn escape_html(input: &str) -> String {
+    input
+        .replace('&', "&amp;")
+        .replace('<', "&lt;")
+        .replace('>', "&gt;")
+        .replace('"', "&quot;")
+        .replace('\'', "&#39;")
+}
+
 impl SovereignWebPublisherEngine {
     pub fn new(site_name: &str, theme_color: &str) -> Self {
         Self {
@@ -1973,26 +1982,26 @@ impl SovereignWebPublisherEngine {
     pub fn render_html_site(&self) -> String {
         let mut html = format!(
             "<!DOCTYPE html><html><head><title>{}</title><style>body {{ font-family: sans-serif; primary-color: {}; }}</style></head><body>",
-            self.site_name, self.theme_color
+            escape_html(&self.site_name), escape_html(&self.theme_color)
         );
         for block in &self.blocks {
             match block {
                 WebLayoutBlock::Header { title, subtitle } => {
-                    html.push_str(&format!("<header><h1>{}</h1><p>{}</p></header>", title, subtitle));
+                    html.push_str(&format!("<header><h1>{}</h1><p>{}</p></header>", escape_html(title), escape_html(subtitle)));
                 }
                 WebLayoutBlock::Paragraph { content } => {
-                    html.push_str(&format!("<p>{}</p>", content));
+                    html.push_str(&format!("<p>{}</p>", escape_html(content)));
                 }
                 WebLayoutBlock::EmbeddedDocument { doc_title, embed_url } => {
-                    html.push_str(&format!("<div class=\"embed\"><h3>{}</h3><iframe src=\"{}\"></iframe></div>", doc_title, embed_url));
+                    html.push_str(&format!("<div class=\"embed\"><h3>{}</h3><iframe src=\"{}\"></iframe></div>", escape_html(doc_title), escape_html(embed_url)));
                 }
                 WebLayoutBlock::Image { src_url, alt_text } => {
-                    html.push_str(&format!("<img src=\"{}\" alt=\"{}\" />", src_url, alt_text));
+                    html.push_str(&format!("<img src=\"{}\" alt=\"{}\" />", escape_html(src_url), escape_html(alt_text)));
                 }
                 WebLayoutBlock::ColumnGrid { columns } => {
                     html.push_str("<div class=\"grid\">");
                     for col in columns {
-                        html.push_str(&format!("<div class=\"col\">{}</div>", col));
+                        html.push_str(&format!("<div class=\"col\">{}</div>", escape_html(col)));
                     }
                     html.push_str("</div>");
                 }
