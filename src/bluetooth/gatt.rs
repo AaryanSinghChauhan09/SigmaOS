@@ -2,7 +2,7 @@
 // Inspired by Linux BlueZ GATT implementation
 
 use std::collections::HashMap;
-use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::atomic::{AtomicU64, AtomicU16, Ordering};
 
 /// GATT characteristic
 #[derive(Debug, Clone)]

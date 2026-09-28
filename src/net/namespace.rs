@@ -156,7 +156,7 @@ impl NetworkNamespaceManager {
         let mut manager = Self {
             namespaces: HashMap::new(),
             next_id: AtomicU64::new(2),
-            initial_namespace,
+            initial_namespace: initial_id,
         };
         
         // Create initial namespace
