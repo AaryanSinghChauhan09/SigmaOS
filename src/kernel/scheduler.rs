@@ -94,6 +94,19 @@ pub struct ProcessTask {
     pub slice: u64,        // Time slice
 }
 
+impl Ord for ProcessTask {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        // Lower vruntime has higher priority
+        self.vruntime.cmp(&other.vruntime).reverse()
+    }
+}
+
+impl PartialOrd for ProcessTask {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
 /// CFS scheduler
 pub struct CfsScheduler {
     runnable_tasks: BinaryHeap<ProcessTask>,

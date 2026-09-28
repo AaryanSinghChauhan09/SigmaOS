@@ -110,12 +110,13 @@ pub struct ScheduledProcess {
 
 impl ScheduledProcess {
     pub fn new(process: ProcessTask) -> Self {
-        let posix_rt_priority = match process.priority {
-            Priority::Realtime => 99,
-            Priority::High => 70,
-            Priority::Normal => 50,
-            Priority::Low => 20,
-            Priority::Idle => 1,
+        let posix_rt_priority = match process.priority.value {
+            -20 => 99,  // Realtime
+            -10 => 70,  // High
+            0 => 50,    // Normal
+            10 => 20,   // Low
+            19 => 1,    // Idle
+            _ => 50,    // Default to Normal
         };
         Self {
             process,
@@ -157,12 +158,13 @@ impl ScheduledProcess {
 
     /// Priority-based weight: higher priority gets a larger time slice multiplier
     pub fn time_slice_ticks(&self, base_slice: u64) -> u64 {
-        let multiplier: u64 = match self.process.priority {
-            Priority::Realtime => 8,
-            Priority::High => 4,
-            Priority::Normal => 2,
-            Priority::Low => 1,
-            Priority::Idle => 1, // Idle still gets a minimal slice
+        let multiplier: u64 = match self.process.priority.value {
+            -20 => 8,  // Realtime
+            -10 => 4,  // High
+            0 => 2,    // Normal
+            10 => 1,   // Low
+            19 => 1,   // Idle
+            _ => 2,    // Default to Normal
         };
         let boost = if self.interactive_score > 50 {
             2
