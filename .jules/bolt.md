@@ -15,3 +15,7 @@
 ## 2026-03-31 - HashMap entry vs get_mut in INI parsing
 **Learning:** In custom HashMap implementations or tight loops, using `get_mut` after checking/inserting section keys avoids re-allocating new String keys on every key-value line pair.
 **Action:** Always check if a section map reference can be borrowed mutably via `get_mut` before falling back to `insert` with cloned section keys.
+
+## 2026-03-31 - Zero-Allocation ASCII Substring Matching for High-Frequency Searches
+**Learning:** Calling `.to_lowercase()` on `String` fields during query matching or fuzzy scoring allocates new heap-backed `String` instances on every comparison across candidate entries. Implementing `starts_with_ignore_ascii_case` and byte-slice window matching (`contains_ignore_ascii_case`) with `eq_ignore_ascii_case` avoids all intermediate `String` allocations, keeping high-frequency search paths completely allocation-free.
+**Action:** Use zero-allocation ASCII window byte matching instead of `.to_lowercase()` in search filtering and fuzzy scoring loops.

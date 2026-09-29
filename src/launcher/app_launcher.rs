@@ -15,9 +15,35 @@
 extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::vec;
 use alloc::collections::BTreeMap;
 use alloc::format;
 use core::fmt;
+
+/// Case-insensitive ASCII prefix check without heap allocation.
+#[inline]
+fn starts_with_ignore_ascii_case(haystack: &str, needle: &str) -> bool {
+    let h_bytes = haystack.as_bytes();
+    let n_bytes = needle.as_bytes();
+    if n_bytes.len() > h_bytes.len() {
+        return false;
+    }
+    h_bytes[..n_bytes.len()].eq_ignore_ascii_case(n_bytes)
+}
+
+/// Case-insensitive ASCII substring search using window matching without heap allocation.
+#[inline]
+fn contains_ignore_ascii_case(haystack: &str, needle: &str) -> bool {
+    let n_bytes = needle.as_bytes();
+    if n_bytes.is_empty() {
+        return true;
+    }
+    let h_bytes = haystack.as_bytes();
+    if n_bytes.len() > h_bytes.len() {
+        return false;
+    }
+    h_bytes.windows(n_bytes.len()).any(|w| w.eq_ignore_ascii_case(n_bytes))
+}
 
 /// Application entry
 #[derive(Debug, Clone)]
@@ -56,28 +82,23 @@ impl AppEntry {
     }
     
     pub fn matches_query(&self, query: &str) -> bool {
-        let query = query.to_lowercase();
-        
-        // Check name
-        if self.name.to_lowercase().contains(&query) {
+        // Bolt: Zero-allocation ASCII substring matching prevents heap overhead during high-frequency searches.
+        if contains_ignore_ascii_case(&self.name, query) {
             return true;
         }
         
-        // Check description
-        if self.description.to_lowercase().contains(&query) {
+        if contains_ignore_ascii_case(&self.description, query) {
             return true;
         }
         
-        // Check keywords
         for keyword in &self.keywords {
-            if keyword.to_lowercase().contains(&query) {
+            if contains_ignore_ascii_case(keyword, query) {
                 return true;
             }
         }
         
-        // Check categories
         for category in &self.categories {
-            if category.to_lowercase().contains(&query) {
+            if contains_ignore_ascii_case(category, query) {
                 return true;
             }
         }
@@ -86,32 +107,29 @@ impl AppEntry {
     }
     
     pub fn fuzzy_score(&self, query: &str) -> i32 {
-        let query = query.to_lowercase();
-        let name = self.name.to_lowercase();
-        
-        if name == query {
+        // Bolt: Zero-allocation ASCII matching for fuzzy score calculation without String allocations.
+        if self.name.eq_ignore_ascii_case(query) {
             return 1000;  // Exact match
         }
         
-        if name.starts_with(&query) {
+        if starts_with_ignore_ascii_case(&self.name, query) {
             return 900;  // Prefix match
         }
         
-        if name.contains(&query) {
+        if contains_ignore_ascii_case(&self.name, query) {
             return 800;  // Substring match
         }
         
         // Check word boundaries
-        let words: Vec<&str> = name.split_whitespace().collect();
-        for word in words {
-            if word.starts_with(&query) {
+        for word in self.name.split_whitespace() {
+            if starts_with_ignore_ascii_case(word, query) {
                 return 700;  // Word start match
             }
         }
         
         // Keyword match
         for keyword in &self.keywords {
-            if keyword.to_lowercase().contains(&query) {
+            if contains_ignore_ascii_case(keyword, query) {
                 return 600;
             }
         }
@@ -306,12 +324,12 @@ impl AppLauncher {
     }
     
     pub fn search_commands(&self, query: &str) -> Vec<Command> {
-        let query = query.to_lowercase();
         let mut results = Vec::new();
         
+        // Bolt: Zero-allocation ASCII substring matching for command palette searches.
         for command in &self.commands {
-            if command.name.to_lowercase().contains(&query) ||
-               command.description.to_lowercase().contains(&query) {
+            if contains_ignore_ascii_case(&command.name, query) ||
+               contains_ignore_ascii_case(&command.description, query) {
                 results.push(command.clone());
             }
         }
