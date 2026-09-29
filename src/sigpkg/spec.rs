@@ -367,15 +367,18 @@ impl SimplePackageManager {
     }
 
     /// Bolt ⚡ Performance Optimization: Fast index lookup by package name.
-    /// Supports both exact slice equality and null-terminated byte array matching,
-    /// eliminating redundant loop boilerplate across package manager operations.
+    /// Hoists target name zero-byte trimming outside of candidate loop and uses
+    /// safe null-padded slice boundary matching, eliminating linear zero-byte scans inside the loop.
     #[inline]
     fn find_package_index(&self, name: &[u8]) -> Option<usize> {
+        let target_len = name.iter().position(|&b| b == 0).unwrap_or(name.len());
+        let target_name = &name[..target_len];
+
         self.packages.iter().position(|package_option| {
             if let Some(ref package) = *package_option {
                 let pkg_name = package.as_ref().name();
-                pkg_name.starts_with(name)
-                    && (pkg_name.len() == name.len() || pkg_name[name.len()] == 0)
+                pkg_name.starts_with(target_name)
+                    && pkg_name.get(target_len).map_or(true, |&b| b == 0)
             } else {
                 false
             }
