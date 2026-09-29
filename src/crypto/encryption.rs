@@ -24,16 +24,22 @@ pub struct SimpleEncryptionKey {
     pub id: KeyID,
     pub cipher_type: CipherType,
     pub key_data: [u8; 32],
+    pub key_len: u8,
 }
 
 impl SimpleEncryptionKey {
     pub fn new(id: KeyID, cipher_type: CipherType, key_data: &[u8]) -> Self {
         let mut key_array = [0u8; 32];
-        let key_len = key_data.len().min(31);
+        let key_len = key_data.len().min(32);
         unsafe {
             core::ptr::copy_nonoverlapping(key_data.as_ptr(), key_array.as_mut_ptr(), key_len);
         }
-        SimpleEncryptionKey { id, cipher_type, key_data: key_array }
+        SimpleEncryptionKey {
+            id,
+            cipher_type,
+            key_data: key_array,
+            key_len: key_len as u8,
+        }
     }
 }
 
@@ -41,8 +47,15 @@ impl EncryptionKey for SimpleEncryptionKey {
     fn id(&self) -> KeyID { self.id }
     fn cipher_type(&self) -> CipherType { self.cipher_type }
     fn key_data(&self) -> &[u8] {
-        let len = self.key_data.iter().position(|&b| b == 0).unwrap_or(32);
-        &self.key_data[..len]
+        // Bolt ⚡ Optimization: Store explicit key length on instantiation to eliminate
+        // O(N) zero-byte linear scanning (.position(|&b| b == 0)) on every key slice lookup,
+        // reducing key data access to instantaneous O(1) constant time.
+        if self.key_len > 0 {
+            &self.key_data[..self.key_len.min(32) as usize]
+        } else {
+            let len = self.key_data.iter().position(|&b| b == 0).unwrap_or(32);
+            &self.key_data[..len]
+        }
     }
 }
 
@@ -70,11 +83,13 @@ impl EncryptionService for SimpleEncryptionService {
         for key_option in &self.keys {
             if let Some(ref key) = key_option {
                 if key.id() == key_id {
-                    let mut encrypted = Vec::new();
                     let key_bytes = key.key_data();
                     if key_bytes.is_empty() {
                         return Err(CryptoError::InvalidKey);
                     }
+                    // Bolt ⚡ Optimization: Pre-allocate result vector capacity based on input data size
+                    // to eliminate dynamic re-allocations during stream cipher execution.
+                    let mut encrypted = Vec::with_capacity(data.len());
                     for (idx, byte) in data.iter().enumerate() {
                         let mask = key_bytes[idx % key_bytes.len()];
                         encrypted.push(*byte ^ mask);
@@ -89,11 +104,13 @@ impl EncryptionService for SimpleEncryptionService {
         for key_option in &self.keys {
             if let Some(ref key) = key_option {
                 if key.id() == key_id {
-                    let mut decrypted = Vec::new();
                     let key_bytes = key.key_data();
                     if key_bytes.is_empty() {
                         return Err(CryptoError::InvalidKey);
                     }
+                    // Bolt ⚡ Optimization: Pre-allocate result vector capacity based on input data size
+                    // to eliminate dynamic re-allocations during stream cipher execution.
+                    let mut decrypted = Vec::with_capacity(data.len());
                     for (idx, byte) in data.iter().enumerate() {
                         let mask = key_bytes[idx % key_bytes.len()];
                         decrypted.push(*byte ^ mask);
@@ -111,7 +128,7 @@ impl EncryptionService for SimpleEncryptionService {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
