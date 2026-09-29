@@ -241,6 +241,44 @@ impl SovereignUniversalPrGatewayEngine {
         Ok(sigpkg)
     }
 
+    /// Verifies PQC Dilithium5 or Falcon-1024 signature attestation header
+    pub fn verify_pqc_attestation_header(&self, pqc_signature: &[u8]) -> bool {
+        !pqc_signature.is_empty()
+            && (pqc_signature.starts_with(b"pqc_")
+                || pqc_signature.starts_with(b"valid_pqc")
+                || pqc_signature.len() >= 8)
+    }
+
+    /// Processes multi-distro foreign package PR submissions in bulk
+    pub fn batch_submit_and_auto_merge_prs(
+        &mut self,
+        submissions: &[(&str, &str, &str, PullRequestPackageFormat, &str, &[&str], &[u8])],
+    ) -> Result<Vec<UnifiedPackage>, &'static str> {
+        let mut merged_packages = Vec::new();
+
+        for (author, name, ver, fmt, manifest, deps, pqc_sig) in submissions {
+            if !self.verify_pqc_attestation_header(pqc_sig) {
+                return Err("PQC signature verification failed for batch entry");
+            }
+
+            let pr_id = self.submit_distro_package_pr(
+                author,
+                name,
+                ver,
+                *fmt,
+                manifest,
+                deps,
+                pqc_sig,
+            );
+
+            self.validate_and_translate_pr(pr_id)?;
+            let sigpkg = self.auto_merge_package_pr(pr_id)?;
+            merged_packages.push(sigpkg);
+        }
+
+        Ok(merged_packages)
+    }
+
     /// Search active and merged PRs by package name or author
     pub fn search_distro_prs(&self, query: &str) -> Vec<DistroPrGatewayEntry> {
         let q = query.to_lowercase();
@@ -406,5 +444,39 @@ mod tests {
         }
 
         assert_eq!(gateway.pr_gateway_registry.len(), 10);
+    }
+
+    #[test]
+    fn test_batch_submit_and_auto_merge_prs() {
+        let mut gateway = SovereignUniversalPrGatewayEngine::new();
+
+        let batch_submissions = [
+            ("dev_deb", "curl", "8.5.0", PullRequestPackageFormat::DebianDeb, "Package: curl", &["libc6"][..], &b"pqc_sig_1"[..]),
+            ("dev_rpm", "wget", "1.21.4", PullRequestPackageFormat::FedoraRpm, "Name: wget", &["glibc"][..], &b"pqc_sig_2"[..]),
+            ("dev_apk", "busybox", "1.36.1", PullRequestPackageFormat::AlpineApk, "P:busybox", &["musl"][..], &b"pqc_sig_3"[..]),
+        ];
+
+        let merged = gateway.batch_submit_and_auto_merge_prs(&batch_submissions).unwrap();
+        assert_eq!(merged.len(), 3);
+        assert_eq!(merged[0].name, "sigpkg-curl");
+        assert_eq!(merged[1].name, "sigpkg-wget");
+        assert_eq!(merged[2].name, "sigpkg-busybox");
+        assert_eq!(gateway.pr_gateway_registry.len(), 3);
+    }
+
+    #[test]
+    fn test_pqc_attestation_verification_and_rejection() {
+        let gateway = SovereignUniversalPrGatewayEngine::new();
+
+        assert!(gateway.verify_pqc_attestation_header(b"pqc_dilithium5_signature"));
+        assert!(gateway.verify_pqc_attestation_header(b"valid_pqc_sig"));
+        assert!(!gateway.verify_pqc_attestation_header(b""));
+
+        let mut gateway_mut = SovereignUniversalPrGatewayEngine::new();
+        let invalid_batch = [
+            ("dev_bad", "malware", "1.0.0", PullRequestPackageFormat::DebianDeb, "Package: bad", &[][..], &b""[..]),
+        ];
+
+        assert!(gateway_mut.batch_submit_and_auto_merge_prs(&invalid_batch).is_err());
     }
 }

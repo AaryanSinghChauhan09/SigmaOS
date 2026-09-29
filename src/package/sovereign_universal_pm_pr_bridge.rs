@@ -107,6 +107,113 @@ pub struct UniversalPrPackageTransaction {
     pub commit_hash: String,
 }
 
+/// Foreign CLI Command Translation Spec
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct UniversalCliTranslation {
+    pub source_pm: &'static str,
+    pub package_name: String,
+    pub target_format: UniversalDistroPackageFormat,
+    pub generated_manifest: String,
+    pub inferred_dependencies: Vec<String>,
+}
+
+/// Universal CLI Command Bridge for foreign Linux & BSD package managers
+#[derive(Debug, Clone)]
+pub struct UniversalCliCommandBridge;
+
+impl UniversalCliCommandBridge {
+    pub fn parse_command(cmd: &str) -> Option<UniversalCliTranslation> {
+        let parts: Vec<&str> = cmd.split_whitespace().collect();
+        if parts.is_empty() {
+            return None;
+        }
+
+        match parts[0] {
+            "apt" | "apt-get" => {
+                let pkg = parts.iter().skip_while(|&&p| p != "install").nth(1)?;
+                Some(UniversalCliTranslation {
+                    source_pm: "apt",
+                    package_name: pkg.to_string(),
+                    target_format: UniversalDistroPackageFormat::AptDeb,
+                    generated_manifest: format!("Package: {}\nVersion: 1.0.0\nSection: main\nDepends: libc6", pkg),
+                    inferred_dependencies: vec!["libc6".to_string()],
+                })
+            }
+            "pacman" => {
+                let pkg = parts.last()?;
+                Some(UniversalCliTranslation {
+                    source_pm: "pacman",
+                    package_name: pkg.to_string(),
+                    target_format: UniversalDistroPackageFormat::PacmanPkg,
+                    generated_manifest: format!("pkgname = {}\npkgver = 1.0.0\ndepend = glibc", pkg),
+                    inferred_dependencies: vec!["glibc".to_string()],
+                })
+            }
+            "dnf" | "yum" | "zypper" => {
+                let pkg = parts.last()?;
+                Some(UniversalCliTranslation {
+                    source_pm: "dnf",
+                    package_name: pkg.to_string(),
+                    target_format: UniversalDistroPackageFormat::DnfRpm,
+                    generated_manifest: format!("Name: {}\nVersion: 1.0.0\nRequires: openssl", pkg),
+                    inferred_dependencies: vec!["openssl".to_string()],
+                })
+            }
+            "apk" => {
+                let pkg = parts.last()?;
+                Some(UniversalCliTranslation {
+                    source_pm: "apk",
+                    package_name: pkg.to_string(),
+                    target_format: UniversalDistroPackageFormat::AlpineApk,
+                    generated_manifest: format!("P:{}\nV:1.0.0\nD:musl", pkg),
+                    inferred_dependencies: vec!["musl".to_string()],
+                })
+            }
+            "xbps-install" => {
+                let pkg = parts.last()?;
+                Some(UniversalCliTranslation {
+                    source_pm: "xbps",
+                    package_name: pkg.to_string(),
+                    target_format: UniversalDistroPackageFormat::VoidXbps,
+                    generated_manifest: format!("pkgname={}\nversion=1.0.0\nrun_depend=glibc", pkg),
+                    inferred_dependencies: vec!["glibc".to_string()],
+                })
+            }
+            "emerge" => {
+                let pkg = parts.last()?;
+                Some(UniversalCliTranslation {
+                    source_pm: "portage",
+                    package_name: pkg.to_string(),
+                    target_format: UniversalDistroPackageFormat::GentooEbuild,
+                    generated_manifest: format!("EAPI=8\nDESCRIPTION=\"{}\"\nRDEPEND=\"sys-libs/glibc\"", pkg),
+                    inferred_dependencies: vec!["sys-libs/glibc".to_string()],
+                })
+            }
+            "pkg" => {
+                let pkg = parts.last()?;
+                Some(UniversalCliTranslation {
+                    source_pm: "pkg",
+                    package_name: pkg.to_string(),
+                    target_format: UniversalDistroPackageFormat::BsdPkg,
+                    generated_manifest: format!("name: {}\nversion: 1.0.0\ndeps: {{ libc: {{ origin: \"devel/libc\" }} }}", pkg),
+                    inferred_dependencies: vec!["libc".to_string()],
+                })
+            }
+            "nix" | "nix-env" => {
+                let pkg = parts.last()?;
+                Some(UniversalCliTranslation {
+                    source_pm: "nix",
+                    package_name: pkg.to_string(),
+                    target_format: UniversalDistroPackageFormat::NixFlake,
+                    generated_manifest: format!("{{ description = \"{}\"; outputs = {{ self, nixpkgs }}: {{ }}; }}", pkg),
+                    inferred_dependencies: vec!["stdenv".to_string()],
+                })
+            }
+            _ => None,
+        }
+    }
+}
+
 /// Sovereign Universal Package Manager PR Bridge Engine
 #[derive(Debug)]
 pub struct SovereignUniversalPmPrBridgeEngine {
@@ -124,6 +231,29 @@ impl SovereignUniversalPmPrBridgeEngine {
             total_prs_submitted: 0,
             total_prs_merged: 0,
         }
+    }
+
+    /// Translates a foreign package manager CLI invocation and submits it as a PR transaction
+    pub fn translate_and_submit_cli_command(
+        &mut self,
+        submitter: &str,
+        cli_command: &str,
+        pqc_sig_bytes: &[u8],
+    ) -> Result<u64, &'static str> {
+        let translation = UniversalCliCommandBridge::parse_command(cli_command)
+            .ok_or("Unsupported foreign package manager CLI command")?;
+
+        let deps_refs: Vec<&str> = translation.inferred_dependencies.iter().map(|s| s.as_str()).collect();
+
+        Ok(self.submit_foreign_package_pr(
+            submitter,
+            &translation.package_name,
+            "1.0.0",
+            translation.target_format,
+            &translation.generated_manifest,
+            &deps_refs,
+            pqc_sig_bytes,
+        ))
     }
 
     /// Submits a foreign distro package as a PR to `sigma-pkg`
@@ -302,5 +432,48 @@ mod tests {
 
         assert!(bridge.validate_sat_pr_dependencies(pr_conflict).is_err());
         assert_eq!(bridge.pr_transactions[&pr_conflict].status, UniversalPrStatus::Rejected);
+    }
+
+    #[test]
+    fn test_universal_cli_command_bridge_translation() {
+        let test_cases = [
+            ("apt install htop", UniversalDistroPackageFormat::AptDeb, "htop"),
+            ("pacman -S neofetch", UniversalDistroPackageFormat::PacmanPkg, "neofetch"),
+            ("dnf install curl", UniversalDistroPackageFormat::DnfRpm, "curl"),
+            ("apk add bash", UniversalDistroPackageFormat::AlpineApk, "bash"),
+            ("xbps-install -S git", UniversalDistroPackageFormat::VoidXbps, "git"),
+            ("emerge --ask gcc", UniversalDistroPackageFormat::GentooEbuild, "gcc"),
+            ("pkg install vim", UniversalDistroPackageFormat::BsdPkg, "vim"),
+            ("nix profile install nixpkgs#ripgrep", UniversalDistroPackageFormat::NixFlake, "nixpkgs#ripgrep"),
+        ];
+
+        let mut bridge = SovereignUniversalPmPrBridgeEngine::new();
+
+        for (cmd, expected_fmt, expected_pkg) in test_cases {
+            let pr_id = bridge.translate_and_submit_cli_command("user", cmd, b"pqc_sig").unwrap();
+            assert!(pr_id > 0);
+            let tx = &bridge.pr_transactions[&pr_id];
+            assert_eq!(tx.manifest.original_format, expected_fmt);
+            assert_eq!(tx.manifest.name, expected_pkg);
+        }
+    }
+
+    #[test]
+    fn test_full_pr_submission_to_sigpkg_merge_workflow() {
+        let mut bridge = SovereignUniversalPmPrBridgeEngine::new();
+
+        let pr_id = bridge.translate_and_submit_cli_command(
+            "maintainer",
+            "apt install ripgrep",
+            b"pqc_sig_dilithium5",
+        ).unwrap();
+
+        assert!(bridge.validate_sat_pr_dependencies(pr_id).unwrap());
+        let sigpkg_name = bridge.convert_to_canonical_sigpkg(pr_id).unwrap();
+        assert_eq!(sigpkg_name, "sigpkg-ripgrep");
+
+        let merged_manifest = bridge.merge_pr_to_sigma_pkg(pr_id).unwrap();
+        assert_eq!(merged_manifest.name, "ripgrep");
+        assert_eq!(bridge.active_sigpkg_registry.len(), 1);
     }
 }
