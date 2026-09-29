@@ -46,6 +46,13 @@ pub enum UniversalDistroPackageFormat {
     FlatpakApp,
     SnapApp,
     AppImage,
+    SolusEopkg,
+    OpenWrtIpk,
+    SlackwareSlackbuild,
+    HomebrewBottle,
+    WindowsMsiAppx,
+    GuixScheme,
+    SerpentStone,
     NativeSigPkg,
 }
 
@@ -63,6 +70,13 @@ impl UniversalDistroPackageFormat {
             Self::FlatpakApp => "flatpak (.flatpakref)",
             Self::SnapApp => "snap (.snap)",
             Self::AppImage => "appimage (.AppImage)",
+            Self::SolusEopkg => "eopkg (.eopkg)",
+            Self::OpenWrtIpk => "opkg (.ipk)",
+            Self::SlackwareSlackbuild => "slackware (SlackBuild / .txz)",
+            Self::HomebrewBottle => "homebrew (.bottle.tar.gz)",
+            Self::WindowsMsiAppx => "winget (.msi / .appx)",
+            Self::GuixScheme => "guix (.scm / derivation)",
+            Self::SerpentStone => "moss (.stone)",
             Self::NativeSigPkg => "sigma-pkg (.sigpkg)",
         }
     }
@@ -263,6 +277,13 @@ mod tests {
             (UniversalDistroPackageFormat::FlatpakApp, "flatpak-app", &["org.freedesktop.Sdk"][..]),
             (UniversalDistroPackageFormat::SnapApp, "snap-app", &["core22"][..]),
             (UniversalDistroPackageFormat::AppImage, "appimage-app", &["fuse"][..]),
+            (UniversalDistroPackageFormat::SolusEopkg, "solus-app", &["glibc"][..]),
+            (UniversalDistroPackageFormat::OpenWrtIpk, "openwrt-app", &["libc"][..]),
+            (UniversalDistroPackageFormat::SlackwareSlackbuild, "slack-app", &["glibc"][..]),
+            (UniversalDistroPackageFormat::HomebrewBottle, "brew-app", &["openssl"][..]),
+            (UniversalDistroPackageFormat::WindowsMsiAppx, "winget-app", &["vcruntime"][..]),
+            (UniversalDistroPackageFormat::GuixScheme, "guix-app", &["guix-stdenv"][..]),
+            (UniversalDistroPackageFormat::SerpentStone, "stone-app", &["glibc"][..]),
         ];
 
         let mut bridge = SovereignUniversalPmPrBridgeEngine::new();
@@ -283,7 +304,7 @@ mod tests {
             assert_eq!(manifest.original_format, fmt);
         }
 
-        assert_eq!(bridge.total_prs_merged, 10);
+        assert_eq!(bridge.total_prs_merged, 17);
     }
 
     #[test]

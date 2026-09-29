@@ -92,6 +92,8 @@ pub use distro::sovereign_media_and_distro_unimplemented_innovations::*;
 pub use distro::sovereign_2050_distro_supremacy_engine::*;
 pub use distro::sovereign_2055_distro_supremacy_engine::*;
 pub use distro::sovereign_2060_distro_supremacy_engine::*;
+pub use distro::sovereign_2065_distro_supremacy_engine::*;
+pub use distro::sovereign_github_wiki_complete_deployment::*;
 pub mod sovereign_wiki_master_engine;
 pub use sovereign_wiki_master_engine::*;
 pub mod unimplemented_features;
