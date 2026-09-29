@@ -8,6 +8,7 @@ pub mod network_namespace;
 pub mod network_syscalls;
 pub mod linux_bsd_network_innovations;
 pub mod network_config;
+pub mod diagnostics;
 
 pub use linux_bsd_network_innovations::{
     BbrState, CongestionAlgorithm, FreeBsdNetgraphGraphRouter, LinuxBbrCongestionEngine,
@@ -71,5 +72,9 @@ pub mod namespace;
 pub use namespace::{InterfaceState, InterfaceAddress, NetworkRoute, FirewallRule, FirewallAction};
 pub use congestion::{CongestionControlManager, CongestionControlType, CongestionState, CongestionWindow, CubicCongestionControl};
 pub use packet_filter::{PacketFilter, PfRule, PfAction, PfProtocol, Packet};
+pub use diagnostics::{
+    PingResult, TraceRouteHop, TraceRouteResult, DnsLookupResult, NetworkStats,
+    NetworkConnection, BandwidthUsage, NetworkDiagnostics,
+};
 pub use zero_copy::{ZeroCopyBuffer, ZeroCopyBufferPool, ZeroCopyPacket, ZeroCopyRingBuffer, PacketMetadata};
 pub use network_config::{InterfaceConfig, InterfaceType, ConfigMethod, NetworkConfigManager};
