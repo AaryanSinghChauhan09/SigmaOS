@@ -51,4 +51,4 @@ These agent guidelines enable SigmaOS to continuously improve by:
 - Maintaining zero-dependency philosophy
 - Ensuring security and performance excellence
 
-For detailed agent guidelines, see the component-specific files in the [Agents/](Agents/) folder.
+For detailed agent guidelines, see the component-specific files in the docs contributing directory.
