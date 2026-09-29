@@ -63,6 +63,12 @@
   - Fine-grained resource permissions (read, write, execute, network)
   - Sandbox modes (Unrestricted, Restricted, Strict)
   - Path-based capability access control
+- **Implemented**: System service manager
+  - Service state tracking (Stopped, Starting, Running, Stopping, Failed)
+  - Service types (System, User, Socket)
+  - Restart policies (Never, OnFailure, Always)
+  - Dependency management and startup ordering
+  - SSH and firewall service registration helpers
 
 ### 9. Security Hardening
 - **Removed**: Hardcoded cryptographic keys in PQC enclave

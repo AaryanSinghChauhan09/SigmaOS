@@ -37,6 +37,7 @@ pub mod syslog;
 pub mod automation;
 pub mod user;
 pub mod abi;
+pub mod service_manager;
 
 pub use abi::{
     AbiType, SovereignSyscallAbiCompatibilityEngine, SyscallAbiResult, SyscallRegisters64,
@@ -107,3 +108,7 @@ pub use state::{
 };
 pub use syslog::{LogAction, LogEntry, LogFacility, LogLevel, LogRule, SyslogError, SyslogManager};
 pub use user::{Group, ShadowEntry, SudoPolicyEngine, SudoersRule, User, UserError, UserManager};
+pub use service_manager::{
+    SystemServiceState, SystemServiceType, SystemRestartPolicy, 
+    SystemServiceConfig, SystemService, SystemServiceManager,
+};
