@@ -311,6 +311,7 @@ git push origin feature/your-feature
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Master execution roadmap |
 | [docs/SUPPORT_MATRIX.md](docs/SUPPORT_MATRIX.md) | Hardware support matrix |
 | [WHAT_IS_WORKING_AND_NOT_WORKING.md](WHAT_IS_WORKING_AND_NOT_WORKING.md) | Component status tracker |
+| [docs/OPEN_SOURCE_OS_COMPARATIVE_GAP_ANALYSIS.md](docs/OPEN_SOURCE_OS_COMPARATIVE_GAP_ANALYSIS.md) | Quantitative comparative gap analysis vs 20+ open source OS projects |
 
 ---
 
