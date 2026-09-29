@@ -13,11 +13,10 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::vec;
 use alloc::collections::BTreeMap;
-use alloc::format;
+use alloc::string::String;
+use alloc::vec;
+use alloc::vec::Vec;
 use core::fmt;
 
 /// Case-insensitive ASCII prefix check without heap allocation.
@@ -42,7 +41,9 @@ fn contains_ignore_ascii_case(haystack: &str, needle: &str) -> bool {
     if n_bytes.len() > h_bytes.len() {
         return false;
     }
-    h_bytes.windows(n_bytes.len()).any(|w| w.eq_ignore_ascii_case(n_bytes))
+    h_bytes
+        .windows(n_bytes.len())
+        .any(|w| w.eq_ignore_ascii_case(n_bytes))
 }
 
 /// Application entry
@@ -75,66 +76,66 @@ impl AppEntry {
             pinned: false,
         }
     }
-    
+
     fn generate_id(name: &str) -> String {
         // Simple ID generation from name
         name.to_lowercase().replace(" ", "-")
     }
-    
+
     pub fn matches_query(&self, query: &str) -> bool {
         // Bolt: Zero-allocation ASCII substring matching prevents heap overhead during high-frequency searches.
         if contains_ignore_ascii_case(&self.name, query) {
             return true;
         }
-        
+
         if contains_ignore_ascii_case(&self.description, query) {
             return true;
         }
-        
+
         for keyword in &self.keywords {
             if contains_ignore_ascii_case(keyword, query) {
                 return true;
             }
         }
-        
+
         for category in &self.categories {
             if contains_ignore_ascii_case(category, query) {
                 return true;
             }
         }
-        
+
         false
     }
-    
+
     pub fn fuzzy_score(&self, query: &str) -> i32 {
         // Bolt: Zero-allocation ASCII matching for fuzzy score calculation without String allocations.
         if self.name.eq_ignore_ascii_case(query) {
-            return 1000;  // Exact match
+            return 1000; // Exact match
         }
-        
+
         if starts_with_ignore_ascii_case(&self.name, query) {
-            return 900;  // Prefix match
+            return 900; // Prefix match
         }
-        
+
         if contains_ignore_ascii_case(&self.name, query) {
-            return 800;  // Substring match
+            return 800; // Substring match
         }
-        
+
         // Check word boundaries
         for word in self.name.split_whitespace() {
             if starts_with_ignore_ascii_case(word, query) {
-                return 700;  // Word start match
+                return 700; // Word start match
             }
         }
-        
+
         // Keyword match
         for keyword in &self.keywords {
             if contains_ignore_ascii_case(keyword, query) {
                 return 600;
             }
         }
-        
-        0  // No match
+
+        0 // No match
     }
 }
 
@@ -197,27 +198,27 @@ impl AppLauncher {
             max_recent: 10,
         }
     }
-    
+
     pub fn register_app(&mut self, app: AppEntry) {
         if app.pinned {
             self.pinned_apps.push(app.id.clone());
         }
         self.apps.insert(app.id.clone(), app);
     }
-    
+
     pub fn unregister_app(&mut self, id: &str) {
         self.apps.remove(id);
         self.pinned_apps.retain(|app_id| app_id != id);
         self.recent_apps.retain(|app_id| app_id != id);
     }
-    
+
     pub fn register_command(&mut self, command: Command) {
         self.commands.push(command);
     }
-    
+
     pub fn search(&self, query: &str) -> Vec<SearchResult> {
         let mut results = Vec::new();
-        
+
         // Search apps
         for app in self.apps.values() {
             let score = app.fuzzy_score(query);
@@ -229,7 +230,7 @@ impl AppLauncher {
                 } else {
                     MatchType::Fuzzy
                 };
-                
+
                 results.push(SearchResult {
                     app: app.clone(),
                     score,
@@ -237,106 +238,107 @@ impl AppLauncher {
                 });
             }
         }
-        
+
         // Sort by score (descending)
         results.sort_by(|a, b| b.score.cmp(&a.score));
-        
+
         results
     }
-    
+
     pub fn get_recent_apps(&self) -> Vec<AppEntry> {
         let mut recent = Vec::new();
-        
+
         for app_id in &self.recent_apps {
             if let Some(app) = self.apps.get(app_id) {
                 recent.push(app.clone());
             }
         }
-        
+
         recent
     }
-    
+
     pub fn get_pinned_apps(&self) -> Vec<AppEntry> {
         let mut pinned = Vec::new();
-        
+
         for app_id in &self.pinned_apps {
             if let Some(app) = self.apps.get(app_id) {
                 pinned.push(app.clone());
             }
         }
-        
+
         pinned
     }
-    
+
     pub fn get_suggested_apps(&self) -> Vec<AppEntry> {
         let mut suggested = Vec::new();
-        
+
         // Get most frequently used apps
         let mut sorted_apps: Vec<&AppEntry> = self.apps.values().collect();
         sorted_apps.sort_by(|a, b| b.use_count.cmp(&a.use_count));
-        
+
         for app in sorted_apps.iter().take(5) {
             suggested.push((*app).clone());
         }
-        
+
         suggested
     }
-    
+
     pub fn launch_app(&mut self, id: &str) -> Result<(), LauncherError> {
         let app = self.apps.get_mut(id).ok_or(LauncherError::AppNotFound)?;
-        
+
         // Update stats
         app.use_count += 1;
         app.last_used = Self::get_time();
-        
+
         // Update recent apps
         self.recent_apps.retain(|app_id| app_id != id);
         self.recent_apps.insert(0, id.into());
-        
+
         if self.recent_apps.len() > self.max_recent {
             self.recent_apps.truncate(self.max_recent);
         }
-        
+
         // In real implementation, would spawn process
         Ok(())
     }
-    
+
     pub fn pin_app(&mut self, id: &str) -> Result<(), LauncherError> {
         let app = self.apps.get_mut(id).ok_or(LauncherError::AppNotFound)?;
-        
+
         if !app.pinned {
             app.pinned = true;
             self.pinned_apps.push(id.into());
         }
-        
+
         Ok(())
     }
-    
+
     pub fn unpin_app(&mut self, id: &str) -> Result<(), LauncherError> {
         let app = self.apps.get_mut(id).ok_or(LauncherError::AppNotFound)?;
-        
+
         if app.pinned {
             app.pinned = false;
             self.pinned_apps.retain(|app_id| app_id != id);
         }
-        
+
         Ok(())
     }
-    
+
     pub fn search_commands(&self, query: &str) -> Vec<Command> {
         let mut results = Vec::new();
-        
+
         // Bolt: Zero-allocation ASCII substring matching for command palette searches.
         for command in &self.commands {
-            if contains_ignore_ascii_case(&command.name, query) ||
-               contains_ignore_ascii_case(&command.description, query) {
+            if contains_ignore_ascii_case(&command.name, query)
+                || contains_ignore_ascii_case(&command.description, query)
+            {
                 results.push(command.clone());
             }
         }
-        
+
         results
     }
-    
+
     fn get_time() -> u64 {
         // In real implementation, would get actual timestamp
         0
@@ -370,7 +372,7 @@ impl fmt::Display for LauncherError {
 /// Initialize default apps
 pub fn init_default_apps() -> AppLauncher {
     let mut launcher = AppLauncher::new();
-    
+
     // Register default apps
     let mut browser = AppEntry::new("Sigma Browser", "/usr/bin/sigma-browser");
     browser.description = "Privacy-focused web browser".into();
@@ -378,33 +380,33 @@ pub fn init_default_apps() -> AppLauncher {
     browser.keywords = vec!["web".into(), "internet".into(), "browser".into()];
     browser.pinned = true;
     launcher.register_app(browser);
-    
+
     let mut terminal = AppEntry::new("Sigma Terminal", "/usr/bin/sigma-terminal");
     terminal.description = "GPU-accelerated terminal emulator".into();
     terminal.categories = vec!["System".into(), "TerminalEmulator".into()];
     terminal.keywords = vec!["shell".into(), "command".into(), "cli".into()];
     terminal.pinned = true;
     launcher.register_app(terminal);
-    
+
     let mut files = AppEntry::new("Sigma Files", "/usr/bin/sigma-files");
     files.description = "Advanced file manager".into();
     files.categories = vec!["System".into(), "FileManager".into()];
     files.keywords = vec!["folder".into(), "directory".into(), "explorer".into()];
     files.pinned = true;
     launcher.register_app(files);
-    
+
     let mut code = AppEntry::new("Sigma Code", "/usr/bin/sigma-code");
     code.description = "AI-powered code editor".into();
     code.categories = vec!["Development".into(), "TextEditor".into()];
     code.keywords = vec!["editor".into(), "coding".into(), "ide".into()];
     launcher.register_app(code);
-    
+
     let mut settings = AppEntry::new("Settings", "/usr/bin/sigma-settings");
     settings.description = "System settings".into();
     settings.categories = vec!["System".into(), "Settings".into()];
     settings.keywords = vec!["preferences".into(), "config".into(), "control".into()];
     launcher.register_app(settings);
-    
+
     // Register default commands
     launcher.register_command(Command {
         id: "screenshot".into(),
@@ -413,7 +415,7 @@ pub fn init_default_apps() -> AppLauncher {
         shortcut: Some("Super+Shift+S".into()),
         action: CommandAction::Screenshot,
     });
-    
+
     launcher.register_command(Command {
         id: "lock".into(),
         name: "Lock Screen".into(),
@@ -421,7 +423,7 @@ pub fn init_default_apps() -> AppLauncher {
         shortcut: Some("Super+L".into()),
         action: CommandAction::LockScreen,
     });
-    
+
     launcher.register_command(Command {
         id: "theme".into(),
         name: "Toggle Theme".into(),
@@ -429,72 +431,72 @@ pub fn init_default_apps() -> AppLauncher {
         shortcut: Some("Super+T".into()),
         action: CommandAction::ToggleTheme,
     });
-    
+
     launcher
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_app_entry() {
         let mut app = AppEntry::new("Test App", "/usr/bin/test");
         app.keywords.push("testing".into());
-        
+
         assert!(app.matches_query("test"));
         assert!(app.matches_query("testing"));
         assert!(!app.matches_query("nonexistent"));
     }
-    
+
     #[test]
     fn test_fuzzy_search() {
         let app = AppEntry::new("Firefox Browser", "/usr/bin/firefox");
-        
-        assert_eq!(app.fuzzy_score("firefox browser"), 1000);  // Exact
-        assert_eq!(app.fuzzy_score("firefox"), 900);  // Prefix
-        assert!(app.fuzzy_score("fox") > 0);  // Fuzzy
+
+        assert_eq!(app.fuzzy_score("firefox browser"), 1000); // Exact
+        assert_eq!(app.fuzzy_score("firefox"), 900); // Prefix
+        assert!(app.fuzzy_score("fox") > 0); // Fuzzy
     }
-    
+
     #[test]
     fn test_launcher() {
         let mut launcher = AppLauncher::new();
-        
+
         let app = AppEntry::new("Test App", "/usr/bin/test");
         launcher.register_app(app);
-        
+
         let results = launcher.search("test");
         assert_eq!(results.len(), 1);
         assert_eq!(results[0].app.name, "Test App");
     }
-    
+
     #[test]
     fn test_recent_apps() {
         let mut launcher = AppLauncher::new();
-        
+
         let app1 = AppEntry::new("App 1", "/usr/bin/app1");
         let app2 = AppEntry::new("App 2", "/usr/bin/app2");
-        
+
         launcher.register_app(app1);
         launcher.register_app(app2);
-        
+
         launcher.launch_app("app-1").unwrap();
         launcher.launch_app("app-2").unwrap();
-        
+
         let recent = launcher.get_recent_apps();
         assert_eq!(recent.len(), 2);
-        assert_eq!(recent[0].name, "App 2");  // Most recent first
+        assert_eq!(recent[0].name, "App 2"); // Most recent first
     }
-    
+
     #[test]
     fn test_pinned_apps() {
         let mut launcher = AppLauncher::new();
-        
+
         let app = AppEntry::new("Pinned App", "/usr/bin/pinned");
         launcher.register_app(app);
-        
+
         launcher.pin_app("pinned-app").unwrap();
-        
+
         let pinned = launcher.get_pinned_apps();
         assert_eq!(pinned.len(), 1);
         assert_eq!(pinned[0].name, "Pinned App");
