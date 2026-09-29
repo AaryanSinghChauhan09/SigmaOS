@@ -20,6 +20,7 @@ pub mod arch_aur;
 pub mod aur_integration;
 pub mod bsd_linux_package_innovations;
 pub mod cache;
+pub mod cleanup;
 pub mod checkupdates;
 pub mod debian;
 pub mod debian_apt;
@@ -142,6 +143,10 @@ pub use repository::{
     TransactionJournalEntry,
 };
 pub use repository_config::{RepoConfig, RepositoryConfigManager};
+pub use cleanup::{
+    CleanupOperation, CleanupResult, OrphanPackage, CachedPackage, OldPackageVersion,
+    PackageCleanupManager,
+};
 pub use store::{
     SigmaSoftwareStore, SoftwareRegistryEntry, /* StoreApp, StoreError, */ // store module not available
      GLOBAL_SOFTWARE_STORE,
