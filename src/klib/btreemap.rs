@@ -15,10 +15,6 @@ where
     entries: Vec<(K, V)>,
 }
 
-
-
-
-
 impl<K, V> Clone for BTreeMap<K, V>
 where
     K: PartialEq + Clone + Ord,
@@ -30,10 +26,6 @@ where
         }
     }
 }
-
-
-
-
 
 pub enum Entry<'a, K: 'a + PartialEq + Clone + Ord, V: 'a + Clone> {
     Occupied(OccupiedEntry<'a, K, V>),
@@ -89,7 +81,11 @@ where
     /// Optimized by Bolt ⚡: replaces O(N) linear iteration with O(log N) binary search (`binary_search_by`),
     /// finding the exact match or sorted insertion index in logarithmic time.
     pub fn insert(&mut self, key: K, value: V) {
-        match self.entries.as_slice().binary_search_by(|entry| entry.0.cmp(&key)) {
+        match self
+            .entries
+            .as_slice()
+            .binary_search_by(|entry| entry.0.cmp(&key))
+        {
             Ok(idx) => {
                 self.entries[idx] = (key, value);
             }
@@ -101,7 +97,11 @@ where
 
     /// Optimized by Bolt ⚡: uses O(log N) binary search to locate occupied entry index or target vacant index.
     pub fn entry(&mut self, key: K) -> Entry<'_, K, V> {
-        match self.entries.as_slice().binary_search_by(|entry| entry.0.cmp(&key)) {
+        match self
+            .entries
+            .as_slice()
+            .binary_search_by(|entry| entry.0.cmp(&key))
+        {
             Ok(idx) => Entry::Occupied(OccupiedEntry {
                 map: self,
                 index: idx,
@@ -116,7 +116,11 @@ where
         K: Borrow<Q>,
         Q: Ord,
     {
-        if let Ok(idx) = self.entries.as_slice().binary_search_by(|entry| entry.0.borrow().cmp(key)) {
+        if let Ok(idx) = self
+            .entries
+            .as_slice()
+            .binary_search_by(|entry| entry.0.borrow().cmp(key))
+        {
             Some(&self.entries[idx].1)
         } else {
             None
@@ -129,7 +133,11 @@ where
         K: Borrow<Q>,
         Q: Ord,
     {
-        if let Ok(idx) = self.entries.as_slice().binary_search_by(|entry| entry.0.borrow().cmp(key)) {
+        if let Ok(idx) = self
+            .entries
+            .as_slice()
+            .binary_search_by(|entry| entry.0.borrow().cmp(key))
+        {
             Some(&mut self.entries[idx].1)
         } else {
             None
@@ -142,7 +150,11 @@ where
         K: Borrow<Q>,
         Q: Ord,
     {
-        if let Ok(idx) = self.entries.as_slice().binary_search_by(|entry| entry.0.borrow().cmp(key)) {
+        if let Ok(idx) = self
+            .entries
+            .as_slice()
+            .binary_search_by(|entry| entry.0.borrow().cmp(key))
+        {
             Some(self.entries.remove(idx).1)
         } else {
             None
@@ -154,7 +166,11 @@ where
     where
         K: core::convert::AsRef<str>,
     {
-        if let Ok(idx) = self.entries.as_slice().binary_search_by(|entry| entry.0.as_ref().cmp(key)) {
+        if let Ok(idx) = self
+            .entries
+            .as_slice()
+            .binary_search_by(|entry| entry.0.as_ref().cmp(key))
+        {
             Some(self.entries.remove(idx).1)
         } else {
             None
@@ -175,7 +191,10 @@ where
     where
         K: core::convert::AsRef<str>,
     {
-        self.entries.as_slice().binary_search_by(|entry| entry.0.as_ref().cmp(key)).is_ok()
+        self.entries
+            .as_slice()
+            .binary_search_by(|entry| entry.0.as_ref().cmp(key))
+            .is_ok()
     }
 
     /// Optimized by Bolt ⚡: replaces O(N) linear iteration with O(log N) binary search lookup.
@@ -183,7 +202,11 @@ where
     where
         K: core::convert::AsRef<str>,
     {
-        if let Ok(idx) = self.entries.as_slice().binary_search_by(|entry| entry.0.as_ref().cmp(key)) {
+        if let Ok(idx) = self
+            .entries
+            .as_slice()
+            .binary_search_by(|entry| entry.0.as_ref().cmp(key))
+        {
             Some(&self.entries[idx].1)
         } else {
             None
@@ -195,7 +218,11 @@ where
     where
         K: core::convert::AsRef<str>,
     {
-        if let Ok(idx) = self.entries.as_slice().binary_search_by(|entry| entry.0.as_ref().cmp(key)) {
+        if let Ok(idx) = self
+            .entries
+            .as_slice()
+            .binary_search_by(|entry| entry.0.as_ref().cmp(key))
+        {
             Some(&mut self.entries[idx].1)
         } else {
             None
