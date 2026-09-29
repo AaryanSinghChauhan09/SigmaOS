@@ -54,7 +54,16 @@ impl Version {
         }
     }
     pub fn parse(s: &str) -> Result<Self, &'static str> {
-        let clean: String = s.chars().map(|c| if c.is_ascii_digit() || c == '.' { c } else { ' ' }).collect();
+        let clean: String = s
+            .chars()
+            .map(|c| {
+                if c.is_ascii_digit() || c == '.' {
+                    c
+                } else {
+                    ' '
+                }
+            })
+            .collect();
         let first_num = clean.split_whitespace().next().unwrap_or("1.0.0");
         let parts: Vec<&str> = first_num.split('.').collect();
         let major = parts.get(0).and_then(|p| p.parse().ok()).unwrap_or(1);
@@ -89,7 +98,13 @@ pub struct Package {
 
 #[cfg(feature = "standalone_test")]
 impl Package {
-    pub fn new(name: String, version: Version, description: String, dependencies: Vec<Dependency>, checksum: String) -> Self {
+    pub fn new(
+        name: String,
+        version: Version,
+        description: String,
+        dependencies: Vec<Dependency>,
+        checksum: String,
+    ) -> Self {
         Self {
             name,
             version,
@@ -296,7 +311,10 @@ impl PackageFormat {
             Some(PackageFormat::OpenBsdPkg)
         } else if normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
             Some(PackageFormat::TarGz)
-        } else if normalized.ends_with(".txz") || normalized.ends_with(".tar.xz") || normalized.ends_with(".xz") {
+        } else if normalized.ends_with(".txz")
+            || normalized.ends_with(".tar.xz")
+            || normalized.ends_with(".xz")
+        {
             Some(PackageFormat::TarXz)
         } else if normalized.ends_with(".xbps") {
             Some(PackageFormat::Xbps)
@@ -326,7 +344,10 @@ impl PackageFormat {
             Some(PackageFormat::Cports)
         } else if normalized.ends_with(".dports") {
             Some(PackageFormat::Dports)
-        } else if normalized.ends_with(".slackbuild") || normalized.ends_with(".tlz") || normalized.ends_with(".tbz") {
+        } else if normalized.ends_with(".slackbuild")
+            || normalized.ends_with(".tlz")
+            || normalized.ends_with(".tbz")
+        {
             Some(PackageFormat::SlackBuild)
         } else if normalized.ends_with(".crux") || normalized.ends_with(".pkgfile") {
             Some(PackageFormat::Crux)
@@ -2676,7 +2697,9 @@ pub trait IPackageDeltaStrategy: Send + Sync {
 
 pub struct DnfDeltaRpmStrategy;
 impl IPackageDeltaStrategy for DnfDeltaRpmStrategy {
-    fn name(&self) -> &str { "drpm" }
+    fn name(&self) -> &str {
+        "drpm"
+    }
     fn apply(&self, source: &[u8], patch: &[u8]) -> Result<Vec<u8>, &'static str> {
         let mut out = source.to_vec();
         out.extend_from_slice(patch);
@@ -2701,7 +2724,9 @@ impl IPackageDeltaStrategy for DnfDeltaRpmStrategy {
 
 pub struct SovereignBinaryDeltaStrategy;
 impl IPackageDeltaStrategy for SovereignBinaryDeltaStrategy {
-    fn name(&self) -> &str { "moss-stone-delta" }
+    fn name(&self) -> &str {
+        "moss-stone-delta"
+    }
     fn apply(&self, _source: &[u8], patch: &[u8]) -> Result<Vec<u8>, &'static str> {
         Ok(patch.to_vec())
     }
@@ -2722,7 +2747,9 @@ impl IPackageDeltaStrategy for SovereignBinaryDeltaStrategy {
 
 pub struct ZstdChunkedDeltaStrategy;
 impl IPackageDeltaStrategy for ZstdChunkedDeltaStrategy {
-    fn name(&self) -> &str { "zstd-chunked" }
+    fn name(&self) -> &str {
+        "zstd-chunked"
+    }
     fn apply(&self, _source: &[u8], patch: &[u8]) -> Result<Vec<u8>, &'static str> {
         Ok(patch.to_vec())
     }
@@ -3358,8 +3385,7 @@ impl DebianTriggerManager {
         let mut executed_count = 0;
         for trigger in &self.triggers {
             if let Some(matched_paths) = self.activated_triggers.get(trigger.trigger_name()) {
-                let paths_ref: Vec<&str> =
-                    matched_paths.iter().map(|s| s.as_str()).collect();
+                let paths_ref: Vec<&str> = matched_paths.iter().map(|s| s.as_str()).collect();
                 trigger.execute(&paths_ref)?;
                 executed_count += 1;
             }
@@ -3493,7 +3519,6 @@ impl SandboxedPackageDecorator {
             unveil_paths,
         }
     }
-
 }
 
 impl IPackage for SandboxedPackageDecorator {
@@ -3761,7 +3786,9 @@ impl SovereignAlternativesEngine {
     }
 
     pub fn get_active_alternative(&self, name: &str) -> Option<&str> {
-        self.active_selections.get(name).map(|s: &String| s.as_str())
+        self.active_selections
+            .get(name)
+            .map(|s: &String| s.as_str())
     }
 }
 
@@ -3794,7 +3821,6 @@ impl DebianDiverterEngine {
             path
         }
     }
-
 }
 
 impl Default for DebianDiverterEngine {
@@ -3840,7 +3866,9 @@ impl PortageSlotResolver {
 
     pub fn is_slot_compatible(&self, pkg_name: &str, target_slot: &str) -> bool {
         if let Some(slots) = self.installed_slots.get(pkg_name) {
-            slots.iter().any(|s: &PortageSlotInfo| s.slot == target_slot)
+            slots
+                .iter()
+                .any(|s: &PortageSlotInfo| s.slot == target_slot)
         } else {
             false
         }
@@ -4086,7 +4114,10 @@ pub trait AbstractPackageBuildTemplate: Send + Sync {
     }
 
     /// Template method defining invariant lifecycle algorithm steps
-    fn execute_build_pipeline(&self, package: &mut dyn IPackage) -> Result<Vec<(PackageBuildPhase, BuildPhaseStatus)>, ParseError> {
+    fn execute_build_pipeline(
+        &self,
+        package: &mut dyn IPackage,
+    ) -> Result<Vec<(PackageBuildPhase, BuildPhaseStatus)>, ParseError> {
         let mut log = Vec::new();
 
         self.prepare(package)?;
@@ -4195,7 +4226,11 @@ impl CompositePackageGroup {
                 install_date: None,
                 pqc_signature: None,
                 gpg_key_id: None,
-                supported_architectures: vec!["x86_64".to_string(), "aarch64".to_string(), "riscv64".to_string()],
+                supported_architectures: vec![
+                    "x86_64".to_string(),
+                    "aarch64".to_string(),
+                    "riscv64".to_string(),
+                ],
             },
             cached_dependencies: Vec::new(),
             children: Vec::new(),
@@ -4204,7 +4239,8 @@ impl CompositePackageGroup {
 
     pub fn add_child(&mut self, package: Box<dyn IPackage>) {
         self.cached_metadata.size += package.metadata().size;
-        self.cached_dependencies.extend(package.dependencies().iter().cloned());
+        self.cached_dependencies
+            .extend(package.dependencies().iter().cloned());
         self.children.push(package);
     }
 
@@ -4219,7 +4255,8 @@ impl CompositePackageGroup {
             // Rebuild cached dependencies
             self.cached_dependencies.clear();
             for child in &self.children {
-                self.cached_dependencies.extend(child.dependencies().iter().cloned());
+                self.cached_dependencies
+                    .extend(child.dependencies().iter().cloned());
             }
             Some(removed)
         } else {
@@ -4326,7 +4363,10 @@ impl IPackageValidationHandler for PqcSignatureValidationHandler {
         let meta = package.metadata();
         if let Some(sig) = &meta.pqc_signature {
             if sig.contains("CORRUPTED") {
-                return Err(format!("PQC Signature validation failed for {}", package.name()));
+                return Err(format!(
+                    "PQC Signature validation failed for {}",
+                    package.name()
+                ));
             }
         }
         if let Some(ref handler) = self.next {
@@ -4361,7 +4401,10 @@ impl IPackageValidationHandler for DependencyIntegrityHandler {
     fn validate(&self, package: &dyn IPackage) -> Result<(), String> {
         for dep in package.dependencies() {
             if dep.name.is_empty() {
-                return Err(format!("Empty dependency name in package {}", package.name()));
+                return Err(format!(
+                    "Empty dependency name in package {}",
+                    package.name()
+                ));
             }
         }
         if let Some(ref handler) = self.next {
@@ -4396,7 +4439,10 @@ impl IPackageValidationHandler for LicenseComplianceHandler {
     fn validate(&self, package: &dyn IPackage) -> Result<(), String> {
         let meta = package.metadata();
         if meta.license.to_lowercase().contains("malware") {
-            return Err(format!("License compliance failed for {}: forbidden license", package.name()));
+            return Err(format!(
+                "License compliance failed for {}: forbidden license",
+                package.name()
+            ));
         }
         if let Some(ref handler) = self.next {
             handler.validate(package)
@@ -4457,13 +4503,19 @@ pub trait IPackageFetchStrategy: Send + Sync {
 
 pub struct Http3PackageFetcher;
 impl Http3PackageFetcher {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
 }
 impl Default for Http3PackageFetcher {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 impl IPackageFetchStrategy for Http3PackageFetcher {
-    fn protocol(&self) -> &str { "http3" }
+    fn protocol(&self) -> &str {
+        "http3"
+    }
     fn fetch(&self, uri: &str) -> Result<Vec<u8>, String> {
         if uri.is_empty() {
             return Err("Empty URI".to_string());
@@ -4474,13 +4526,19 @@ impl IPackageFetchStrategy for Http3PackageFetcher {
 
 pub struct BitTorrentP2PFetcher;
 impl BitTorrentP2PFetcher {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
 }
 impl Default for BitTorrentP2PFetcher {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 impl IPackageFetchStrategy for BitTorrentP2PFetcher {
-    fn protocol(&self) -> &str { "bittorrent" }
+    fn protocol(&self) -> &str {
+        "bittorrent"
+    }
     fn fetch(&self, uri: &str) -> Result<Vec<u8>, String> {
         if uri.is_empty() {
             return Err("Empty P2P magnet link".to_string());
@@ -4491,13 +4549,19 @@ impl IPackageFetchStrategy for BitTorrentP2PFetcher {
 
 pub struct LocalStoreFetcher;
 impl LocalStoreFetcher {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
 }
 impl Default for LocalStoreFetcher {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 impl IPackageFetchStrategy for LocalStoreFetcher {
-    fn protocol(&self) -> &str { "file" }
+    fn protocol(&self) -> &str {
+        "file"
+    }
     fn fetch(&self, uri: &str) -> Result<Vec<u8>, String> {
         if uri.is_empty() {
             return Err("Empty file path".to_string());
@@ -4512,10 +4576,14 @@ impl IPackageFetchStrategy for LocalStoreFetcher {
 
 pub struct PacmanZstdV2Adapter;
 impl PacmanZstdV2Adapter {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
 }
 impl Default for PacmanZstdV2Adapter {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 impl IPackageParser for PacmanZstdV2Adapter {
     fn format(&self) -> PackageFormat {
@@ -4523,7 +4591,9 @@ impl IPackageParser for PacmanZstdV2Adapter {
     }
 
     fn can_parse(&self, data: &[u8]) -> bool {
-        data.starts_with(b"pkgname =") || data.starts_with(b"ARCH_ZSTD_V2") || (data.len() > 4 && data[0..4] == [0x28, 0xB5, 0x2F, 0xFD])
+        data.starts_with(b"pkgname =")
+            || data.starts_with(b"ARCH_ZSTD_V2")
+            || (data.len() > 4 && data[0..4] == [0x28, 0xB5, 0x2F, 0xFD])
     }
 
     fn parse(&self, data: &[u8]) -> Result<Box<dyn IPackage>, ParseError> {
@@ -4574,17 +4644,24 @@ impl IPackageParser for PacmanZstdV2Adapter {
 
     fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
         let meta = package.metadata();
-        let content = format!("pkgname = {}\npkgver = {}\npkgdesc = {}\n", meta.name, meta.version, meta.description);
+        let content = format!(
+            "pkgname = {}\npkgver = {}\npkgdesc = {}\n",
+            meta.name, meta.version, meta.description
+        );
         Ok(content.into_bytes())
     }
 }
 
 pub struct PortageEbuildV2Adapter;
 impl PortageEbuildV2Adapter {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
 }
 impl Default for PortageEbuildV2Adapter {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 impl IPackageParser for PortageEbuildV2Adapter {
     fn format(&self) -> PackageFormat {
@@ -4647,17 +4724,24 @@ impl IPackageParser for PortageEbuildV2Adapter {
 
     fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
         let meta = package.metadata();
-        let content = format!("EAPI=8\nPN=\"{}\"\nPV=\"{}\"\nDESCRIPTION=\"{}\"\n", meta.name, meta.version, meta.description);
+        let content = format!(
+            "EAPI=8\nPN=\"{}\"\nPV=\"{}\"\nDESCRIPTION=\"{}\"\n",
+            meta.name, meta.version, meta.description
+        );
         Ok(content.into_bytes())
     }
 }
 
 pub struct XbpsZstdAdapter;
 impl XbpsZstdAdapter {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
 }
 impl Default for XbpsZstdAdapter {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 impl IPackageParser for XbpsZstdAdapter {
     fn format(&self) -> PackageFormat {
@@ -4719,17 +4803,24 @@ impl IPackageParser for XbpsZstdAdapter {
 
     fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
         let meta = package.metadata();
-        let content = format!("pkgname=\"{}\"\nversion=\"{}\"\nshort_desc=\"{}\"\n", meta.name, meta.version, meta.description);
+        let content = format!(
+            "pkgname=\"{}\"\nversion=\"{}\"\nshort_desc=\"{}\"\n",
+            meta.name, meta.version, meta.description
+        );
         Ok(content.into_bytes())
     }
 }
 
 pub struct SwupdBundleAdapter;
 impl SwupdBundleAdapter {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
 }
 impl Default for SwupdBundleAdapter {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 impl IPackageParser for SwupdBundleAdapter {
     fn format(&self) -> PackageFormat {
@@ -4783,17 +4874,24 @@ impl IPackageParser for SwupdBundleAdapter {
 
     fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
         let meta = package.metadata();
-        let content = format!("MANIFEST 100\nBUNDLE: {}\nVERSION: {}\nSUMMARY: {}\n", meta.name, meta.version, meta.description);
+        let content = format!(
+            "MANIFEST 100\nBUNDLE: {}\nVERSION: {}\nSUMMARY: {}\n",
+            meta.name, meta.version, meta.description
+        );
         Ok(content.into_bytes())
     }
 }
 
 pub struct CachyOSMicroarchAdapter;
 impl CachyOSMicroarchAdapter {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
 }
 impl Default for CachyOSMicroarchAdapter {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 impl IPackageParser for CachyOSMicroarchAdapter {
     fn format(&self) -> PackageFormat {
@@ -4802,7 +4900,9 @@ impl IPackageParser for CachyOSMicroarchAdapter {
 
     fn can_parse(&self, data: &[u8]) -> bool {
         let content = String::from_utf8_lossy(data);
-        content.contains("cachyos-v3") || content.contains("cachyos-v4") || content.contains("arch = x86_64_v3")
+        content.contains("cachyos-v3")
+            || content.contains("cachyos-v4")
+            || content.contains("arch = x86_64_v3")
     }
 
     fn parse(&self, data: &[u8]) -> Result<Box<dyn IPackage>, ParseError> {
@@ -4853,17 +4953,24 @@ impl IPackageParser for CachyOSMicroarchAdapter {
 
     fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
         let meta = package.metadata();
-        let content = format!("pkgname = {}\npkgver = {}\npkgdesc = {}\narch = x86_64_v3\n", meta.name, meta.version, meta.description);
+        let content = format!(
+            "pkgname = {}\npkgver = {}\npkgdesc = {}\narch = x86_64_v3\n",
+            meta.name, meta.version, meta.description
+        );
         Ok(content.into_bytes())
     }
 }
 
 pub struct OpkgIpkAdapter;
 impl OpkgIpkAdapter {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
 }
 impl Default for OpkgIpkAdapter {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 impl IPackageParser for OpkgIpkAdapter {
     fn format(&self) -> PackageFormat {
@@ -4872,7 +4979,9 @@ impl IPackageParser for OpkgIpkAdapter {
 
     fn can_parse(&self, data: &[u8]) -> bool {
         let content = String::from_utf8_lossy(data);
-        content.contains("Package:") && content.contains("Architecture:") && (content.contains("openwrt") || content.contains("opkg"))
+        content.contains("Package:")
+            && content.contains("Architecture:")
+            && (content.contains("openwrt") || content.contains("opkg"))
     }
 
     fn parse(&self, data: &[u8]) -> Result<Box<dyn IPackage>, ParseError> {
@@ -4919,7 +5028,11 @@ impl IPackageParser for OpkgIpkAdapter {
                 install_date: None,
                 pqc_signature: None,
                 gpg_key_id: None,
-                supported_architectures: vec!["mips_24kc".to_string(), "aarch64".to_string(), "x86_64".to_string()],
+                supported_architectures: vec![
+                    "mips_24kc".to_string(),
+                    "aarch64".to_string(),
+                    "x86_64".to_string(),
+                ],
             },
             dependencies: deps,
             format: PackageFormat::Ipk,
@@ -4928,17 +5041,24 @@ impl IPackageParser for OpkgIpkAdapter {
 
     fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
         let meta = package.metadata();
-        let content = format!("Package: {}\nVersion: {}\nDescription: {}\nArchitecture: mips_24kc\n", meta.name, meta.version, meta.description);
+        let content = format!(
+            "Package: {}\nVersion: {}\nDescription: {}\nArchitecture: mips_24kc\n",
+            meta.name, meta.version, meta.description
+        );
         Ok(content.into_bytes())
     }
 }
 
 pub struct BsdPkgPortsAdapter;
 impl BsdPkgPortsAdapter {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
 }
 impl Default for BsdPkgPortsAdapter {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 impl IPackageParser for BsdPkgPortsAdapter {
     fn format(&self) -> PackageFormat {
@@ -5000,17 +5120,24 @@ impl IPackageParser for BsdPkgPortsAdapter {
 
     fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
         let meta = package.metadata();
-        let content = format!("name: \"{}\"\nversion: \"{}\"\ncomment: \"{}\"\n", meta.name, meta.version, meta.description);
+        let content = format!(
+            "name: \"{}\"\nversion: \"{}\"\ncomment: \"{}\"\n",
+            meta.name, meta.version, meta.description
+        );
         Ok(content.into_bytes())
     }
 }
 
 pub struct Dnf5SQLiteAdapter;
 impl Dnf5SQLiteAdapter {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
 }
 impl Default for Dnf5SQLiteAdapter {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 impl IPackageParser for Dnf5SQLiteAdapter {
     fn format(&self) -> PackageFormat {
@@ -5018,7 +5145,9 @@ impl IPackageParser for Dnf5SQLiteAdapter {
     }
 
     fn can_parse(&self, data: &[u8]) -> bool {
-        data.starts_with(b"SQLite format 3") || data.starts_with(b"DNF5_METADATA") || data.starts_with(b"Name: ")
+        data.starts_with(b"SQLite format 3")
+            || data.starts_with(b"DNF5_METADATA")
+            || data.starts_with(b"Name: ")
     }
 
     fn parse(&self, data: &[u8]) -> Result<Box<dyn IPackage>, ParseError> {
@@ -5078,17 +5207,24 @@ impl IPackageParser for Dnf5SQLiteAdapter {
 
     fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
         let meta = package.metadata();
-        let content = format!("Name: {}\nVersion: {}\nSummary: {}\n", meta.name, meta.version, meta.description);
+        let content = format!(
+            "Name: {}\nVersion: {}\nSummary: {}\n",
+            meta.name, meta.version, meta.description
+        );
         Ok(content.into_bytes())
     }
 }
 
 pub struct NixFlakeLockAdapter;
 impl NixFlakeLockAdapter {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
 }
 impl Default for NixFlakeLockAdapter {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 impl IPackageParser for NixFlakeLockAdapter {
     fn format(&self) -> PackageFormat {
@@ -5125,9 +5261,10 @@ impl IPackageParser for NixFlakeLockAdapter {
                 gpg_key_id: None,
                 supported_architectures: vec!["x86_64".to_string(), "aarch64".to_string()],
             },
-            dependencies: vec![
-                Dependency { name: "nixpkgs".to_string(), version_constraint: VersionConstraint::Any },
-            ],
+            dependencies: vec![Dependency {
+                name: "nixpkgs".to_string(),
+                version_constraint: VersionConstraint::Any,
+            }],
             format: PackageFormat::Nix,
         }))
     }
@@ -5141,10 +5278,14 @@ impl IPackageParser for NixFlakeLockAdapter {
 
 pub struct Apk3SignatureAdapter;
 impl Apk3SignatureAdapter {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
 }
 impl Default for Apk3SignatureAdapter {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 impl IPackageParser for Apk3SignatureAdapter {
     fn format(&self) -> PackageFormat {
@@ -5205,7 +5346,10 @@ impl IPackageParser for Apk3SignatureAdapter {
 
     fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
         let meta = package.metadata();
-        let content = format!("P:{}\nV:{}\nT:{}\n", meta.name, meta.version, meta.description);
+        let content = format!(
+            "P:{}\nV:{}\nT:{}\n",
+            meta.name, meta.version, meta.description
+        );
         Ok(content.into_bytes())
     }
 }
@@ -5252,7 +5396,9 @@ pub struct UdfPostExtractFileFilter {
 
 impl UdfPostExtractFileFilter {
     pub fn new() -> Self {
-        Self { filters: Vec::new() }
+        Self {
+            filters: Vec::new(),
+        }
     }
 
     pub fn add_filter<F>(&mut self, filter: F)
@@ -5288,7 +5434,10 @@ pub enum UdfLifecycleEvent {
 }
 
 pub struct UdfLifecycleHookRegistry {
-    pub hooks: HashMap<UdfLifecycleEvent, Vec<Arc<dyn Fn(&mut dyn IPackage) -> Result<(), HookError> + Send + Sync>>>,
+    pub hooks: HashMap<
+        UdfLifecycleEvent,
+        Vec<Arc<dyn Fn(&mut dyn IPackage) -> Result<(), HookError> + Send + Sync>>,
+    >,
 }
 
 impl UdfLifecycleHookRegistry {
@@ -5305,7 +5454,11 @@ impl UdfLifecycleHookRegistry {
         self.hooks.entry(event).or_default().push(Arc::new(hook));
     }
 
-    pub fn trigger(&self, event: UdfLifecycleEvent, package: &mut dyn IPackage) -> Result<usize, HookError> {
+    pub fn trigger(
+        &self,
+        event: UdfLifecycleEvent,
+        package: &mut dyn IPackage,
+    ) -> Result<usize, HookError> {
         let mut executed = 0;
         if let Some(handlers) = self.hooks.get(&event) {
             for h in handlers {
@@ -5342,15 +5495,26 @@ pub struct UniversalDistroPackageMediator {
 
 impl UniversalDistroPackageMediator {
     pub fn new() -> Self {
-        Self { history: Vec::new() }
+        Self {
+            history: Vec::new(),
+        }
     }
 
     pub fn notify(&mut self, sender: &str, event: MediatorEvent) -> Result<String, &'static str> {
         let log = match &event {
-            MediatorEvent::PackageParsed(name) => format!("[Mediator] Sender '{}': Parsed package {}", sender, name),
-            MediatorEvent::PackageValidated(name) => format!("[Mediator] Sender '{}': Validated package {}", sender, name),
-            MediatorEvent::PackageInstalled(name) => format!("[Mediator] Sender '{}': Installed package {}", sender, name),
-            MediatorEvent::PackageRolledBack(name) => format!("[Mediator] Sender '{}': Rolled back package {}", sender, name),
+            MediatorEvent::PackageParsed(name) => {
+                format!("[Mediator] Sender '{}': Parsed package {}", sender, name)
+            }
+            MediatorEvent::PackageValidated(name) => {
+                format!("[Mediator] Sender '{}': Validated package {}", sender, name)
+            }
+            MediatorEvent::PackageInstalled(name) => {
+                format!("[Mediator] Sender '{}': Installed package {}", sender, name)
+            }
+            MediatorEvent::PackageRolledBack(name) => format!(
+                "[Mediator] Sender '{}': Rolled back package {}",
+                sender, name
+            ),
         };
         self.history.push(event);
         Ok(log)
@@ -5377,7 +5541,10 @@ pub struct SecurityAuditVisitor {
 
 impl SecurityAuditVisitor {
     pub fn new() -> Self {
-        Self { audited_count: 0, vulnerabilities_found: 0 }
+        Self {
+            audited_count: 0,
+            vulnerabilities_found: 0,
+        }
     }
 }
 
@@ -5415,7 +5582,10 @@ pub struct LicenseScannerVisitor {
 
 impl LicenseScannerVisitor {
     pub fn new() -> Self {
-        Self { copyleft_count: 0, permissive_count: 0 }
+        Self {
+            copyleft_count: 0,
+            permissive_count: 0,
+        }
     }
 }
 
@@ -5452,7 +5622,10 @@ pub struct FootprintMetricsVisitor {
 
 impl FootprintMetricsVisitor {
     pub fn new() -> Self {
-        Self { total_installed_bytes: 0, total_file_count: 0 }
+        Self {
+            total_installed_bytes: 0,
+            total_file_count: 0,
+        }
     }
 }
 
@@ -5545,18 +5718,32 @@ pub struct PackageMetadataFlyweightFactory {
 
 impl PackageMetadataFlyweightFactory {
     pub fn new() -> Self {
-        Self { pool: HashMap::new() }
+        Self {
+            pool: HashMap::new(),
+        }
     }
 
-    pub fn get_flyweight(&mut self, license: &str, maintainer: &str, architecture: &str) -> Arc<PackageMetadataFlyweight> {
-        let key = (license.to_string(), maintainer.to_string(), architecture.to_string());
-        self.pool.entry(key.clone()).or_insert_with(|| {
-            Arc::new(PackageMetadataFlyweight {
-                license: key.0,
-                maintainer: key.1,
-                architecture: key.2,
+    pub fn get_flyweight(
+        &mut self,
+        license: &str,
+        maintainer: &str,
+        architecture: &str,
+    ) -> Arc<PackageMetadataFlyweight> {
+        let key = (
+            license.to_string(),
+            maintainer.to_string(),
+            architecture.to_string(),
+        );
+        self.pool
+            .entry(key.clone())
+            .or_insert_with(|| {
+                Arc::new(PackageMetadataFlyweight {
+                    license: key.0,
+                    maintainer: key.1,
+                    architecture: key.2,
+                })
             })
-        }).clone()
+            .clone()
     }
 
     pub fn pool_size(&self) -> usize {
@@ -5588,13 +5775,19 @@ pub struct PackageStateMachine {
 
 impl PackageStateMachine {
     pub fn new() -> Self {
-        Self { current_state: PackageLifecycleState::Uninstalled }
+        Self {
+            current_state: PackageLifecycleState::Uninstalled,
+        }
     }
 
     pub fn transition_to(&mut self, new_state: PackageLifecycleState) -> Result<(), &'static str> {
         let valid = match (self.current_state, new_state) {
-            (PackageLifecycleState::Uninstalled, PackageLifecycleState::ResolvingDependencies) => true,
-            (PackageLifecycleState::ResolvingDependencies, PackageLifecycleState::Downloading) => true,
+            (PackageLifecycleState::Uninstalled, PackageLifecycleState::ResolvingDependencies) => {
+                true
+            }
+            (PackageLifecycleState::ResolvingDependencies, PackageLifecycleState::Downloading) => {
+                true
+            }
             (PackageLifecycleState::Downloading, PackageLifecycleState::Validating) => true,
             (PackageLifecycleState::Validating, PackageLifecycleState::Installing) => true,
             (PackageLifecycleState::Installing, PackageLifecycleState::Installed) => true,
@@ -5641,7 +5834,8 @@ impl LazyPackageLoadProxy {
 
     pub fn load_if_needed(&mut self, factory: &PackageParserFactory) -> Result<(), ParseError> {
         if self.inner_package.is_none() {
-            let parser = factory.get_parser(self.format)
+            let parser = factory
+                .get_parser(self.format)
                 .ok_or_else(|| ParseError::UnsupportedFormat(self.format))?;
             let pkg = parser.parse(&self.raw_data)?;
             self.inner_package = Some(pkg);
@@ -5736,14 +5930,18 @@ impl UniversalPackageBuilder {
 
 pub struct BedrockStratumAdapter;
 impl BedrockStratumAdapter {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
     pub fn resolve_stratum_path(&self, stratum: &str, relative_path: &str) -> String {
         format!("/bedrock/strata/{}{}", stratum, relative_path)
     }
 }
 
 impl Default for BedrockStratumAdapter {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 pub struct DistroboxOciAdapter {
@@ -5752,7 +5950,9 @@ pub struct DistroboxOciAdapter {
 
 impl DistroboxOciAdapter {
     pub fn new() -> Self {
-        Self { exported_binaries: Vec::new() }
+        Self {
+            exported_binaries: Vec::new(),
+        }
     }
 
     pub fn export_binary_shim(&mut self, container_name: &str, binary: &str) -> String {
@@ -5763,7 +5963,9 @@ impl DistroboxOciAdapter {
 }
 
 impl Default for DistroboxOciAdapter {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 pub struct SystemdSysextAdapter {
@@ -5772,7 +5974,9 @@ pub struct SystemdSysextAdapter {
 
 impl SystemdSysextAdapter {
     pub fn new() -> Self {
-        Self { extensions: Vec::new() }
+        Self {
+            extensions: Vec::new(),
+        }
     }
 
     pub fn mount_extension(&mut self, extension_name: &str) -> Result<String, &'static str> {
@@ -5783,12 +5987,16 @@ impl SystemdSysextAdapter {
 }
 
 impl Default for SystemdSysextAdapter {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 pub struct OmarchyPackageBridgeAdapter;
 impl OmarchyPackageBridgeAdapter {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
     pub fn bridge_package(&self, package_name: &str) -> String {
         match package_name {
             "hyprland" | "sway" | "wayfire" => "sovereign-desktop-shell".to_string(),
@@ -5800,7 +6008,9 @@ impl OmarchyPackageBridgeAdapter {
 }
 
 impl Default for OmarchyPackageBridgeAdapter {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // ============================================================================
@@ -5834,7 +6044,9 @@ impl UdfCustomScriptletEngine {
 }
 
 impl Default for UdfCustomScriptletEngine {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 pub struct UdfPackageConflictResolverEngine {
@@ -5843,7 +6055,9 @@ pub struct UdfPackageConflictResolverEngine {
 
 impl UdfPackageConflictResolverEngine {
     pub fn new() -> Self {
-        Self { conflict_rules: Vec::new() }
+        Self {
+            conflict_rules: Vec::new(),
+        }
     }
 
     pub fn add_conflict_rule<F>(&mut self, rule: F)
@@ -5864,7 +6078,9 @@ impl UdfPackageConflictResolverEngine {
 }
 
 impl Default for UdfPackageConflictResolverEngine {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 pub struct UdfPackageArchiveTransformerEngine {
@@ -5873,7 +6089,9 @@ pub struct UdfPackageArchiveTransformerEngine {
 
 impl UdfPackageArchiveTransformerEngine {
     pub fn new() -> Self {
-        Self { transformers: Vec::new() }
+        Self {
+            transformers: Vec::new(),
+        }
     }
 
     pub fn add_transformer<F>(&mut self, transformer: F)
@@ -5893,7 +6111,9 @@ impl UdfPackageArchiveTransformerEngine {
 }
 
 impl Default for UdfPackageArchiveTransformerEngine {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // ============================================================================
@@ -5924,21 +6144,28 @@ impl UniversalDistroPackageFacade {
     /// High-level facade operation: parses raw distro payload, transforms into unified sovereign format,
     /// validates with chain of responsibility, runs UDF hooks, and executes template method build pipeline.
     pub fn process_distro_payload(&self, data: &[u8]) -> Result<Box<dyn IPackage>, String> {
-        let parser = self.factory.auto_detect_parser(data)
+        let parser = self
+            .factory
+            .auto_detect_parser(data)
             .ok_or_else(|| "No suitable parser adapter found for distro payload".to_string())?;
 
-        let foreign_pkg = parser.parse(data)
+        let foreign_pkg = parser
+            .parse(data)
             .map_err(|e| format!("Parse error: {:?}", e))?;
 
-        let mut unified = self.unifier.unify_package(foreign_pkg.as_ref())
+        let mut unified = self
+            .unifier
+            .unify_package(foreign_pkg.as_ref())
             .map_err(|e| format!("Unifier error: {:?}", e))?;
 
         self.validator_chain.validate(unified.as_ref())?;
 
-        self.udf_manager.run_hooks_on(unified.as_mut())
+        self.udf_manager
+            .run_hooks_on(unified.as_mut())
             .map_err(|e| format!("UDF hook execution error: {:?}", e))?;
 
-        self.build_pipeline.execute_build_pipeline(unified.as_mut())
+        self.build_pipeline
+            .execute_build_pipeline(unified.as_mut())
             .map_err(|e| format!("Build pipeline error: {:?}", e))?;
 
         Ok(unified)
@@ -5972,7 +6199,10 @@ impl UniversalDistroPackageUnifierEngine {
 
     /// Takes an IPackage from any external Linux distro format (Debian, RPM, Pacman, Ebuild, Apk, Nix, Flatpak, Snap, AppImage, Xbps, Zypper, etc.)
     /// and transforms it into a unified native Sigma package with normalized dependencies, expanded macros, and security audit wrappers.
-    pub fn unify_package(&self, foreign_package: &dyn IPackage) -> Result<Box<dyn IPackage>, ParseError> {
+    pub fn unify_package(
+        &self,
+        foreign_package: &dyn IPackage,
+    ) -> Result<Box<dyn IPackage>, ParseError> {
         let meta = foreign_package.metadata();
 
         // Generate 32-byte cacheline aligned header descriptor for fast memory slab allocation
@@ -5997,29 +6227,60 @@ impl UniversalDistroPackageUnifierEngine {
         let mut unified_deps = Vec::new();
         for dep in foreign_package.dependencies() {
             let lower = dep.name.to_lowercase();
-            let mapped_name = if lower.contains("ssl") || lower.contains("crypto") || lower.contains("tls") {
-                "sovereign-openssl".to_string()
-            } else if lower.contains("libc") || lower == "musl" || lower.contains("freebsd-runtime") || lower.contains("openbsd-sys") || lower.contains("haiku-libroot") {
-                "sovereign-libc".to_string()
-            } else if lower.contains("zlib") {
-                "sovereign-zlib".to_string()
-            } else if lower.contains("zstd") || lower.contains("lz4") || lower.contains("xz") || lower.contains("bzip2") {
-                "sovereign-compression".to_string()
-            } else if lower.contains("python") {
-                "sovereign-python".to_string()
-            } else if lower == "bash" || lower == "zsh" || lower == "sh" || lower == "fish" {
-                "sovereign-shell".to_string()
-            } else if lower.contains("systemd") || lower.contains("openrc") || lower.contains("runit") || lower.contains("sysvinit") || lower.contains("s6") || lower.contains("dinit") {
-                "sovereign-init".to_string()
-            } else if lower.contains("gcc") || lower.contains("clang") || lower.contains("llvm") || lower.contains("binutils") || lower == "make" || lower == "cmake" {
-                "sovereign-toolchain".to_string()
-            } else if lower.contains("wayland") || lower.contains("x11") || lower.contains("mesa") || lower.contains("vulkan") {
-                "sovereign-graphics".to_string()
-            } else if lower.contains("curl") || lower.contains("wget") || lower.contains("openssh") || lower.contains("net-tools") || lower.contains("iproute2") {
-                "sovereign-network-tools".to_string()
-            } else {
-                dep.name.clone()
-            };
+            let mapped_name =
+                if lower.contains("ssl") || lower.contains("crypto") || lower.contains("tls") {
+                    "sovereign-openssl".to_string()
+                } else if lower.contains("libc")
+                    || lower == "musl"
+                    || lower.contains("freebsd-runtime")
+                    || lower.contains("openbsd-sys")
+                    || lower.contains("haiku-libroot")
+                {
+                    "sovereign-libc".to_string()
+                } else if lower.contains("zlib") {
+                    "sovereign-zlib".to_string()
+                } else if lower.contains("zstd")
+                    || lower.contains("lz4")
+                    || lower.contains("xz")
+                    || lower.contains("bzip2")
+                {
+                    "sovereign-compression".to_string()
+                } else if lower.contains("python") {
+                    "sovereign-python".to_string()
+                } else if lower == "bash" || lower == "zsh" || lower == "sh" || lower == "fish" {
+                    "sovereign-shell".to_string()
+                } else if lower.contains("systemd")
+                    || lower.contains("openrc")
+                    || lower.contains("runit")
+                    || lower.contains("sysvinit")
+                    || lower.contains("s6")
+                    || lower.contains("dinit")
+                {
+                    "sovereign-init".to_string()
+                } else if lower.contains("gcc")
+                    || lower.contains("clang")
+                    || lower.contains("llvm")
+                    || lower.contains("binutils")
+                    || lower == "make"
+                    || lower == "cmake"
+                {
+                    "sovereign-toolchain".to_string()
+                } else if lower.contains("wayland")
+                    || lower.contains("x11")
+                    || lower.contains("mesa")
+                    || lower.contains("vulkan")
+                {
+                    "sovereign-graphics".to_string()
+                } else if lower.contains("curl")
+                    || lower.contains("wget")
+                    || lower.contains("openssh")
+                    || lower.contains("net-tools")
+                    || lower.contains("iproute2")
+                {
+                    "sovereign-network-tools".to_string()
+                } else {
+                    dep.name.clone()
+                };
             unified_deps.push(Dependency {
                 name: mapped_name,
                 version_constraint: dep.version_constraint,
@@ -7003,14 +7264,22 @@ Description: Hook test";
         assert!(unified.metadata().description.contains("/usr/bin/nginx"));
 
         // Normalized dependency mapping check
-        assert!(unified.dependencies().iter().any(|d| d.name == "sovereign-openssl"));
-        assert!(unified.dependencies().iter().any(|d| d.name == "sovereign-libc"));
+        assert!(unified
+            .dependencies()
+            .iter()
+            .any(|d| d.name == "sovereign-openssl"));
+        assert!(unified
+            .dependencies()
+            .iter()
+            .any(|d| d.name == "sovereign-libc"));
 
         // UserDefinedFunctionManager check
         let mut udf_mgr = UserDefinedFunctionManager::new();
         struct CustomSuffixHook;
         impl UserDefinedHook for CustomSuffixHook {
-            fn name(&self) -> &str { "suffix-hook" }
+            fn name(&self) -> &str {
+                "suffix-hook"
+            }
             fn execute(&self, pkg: &mut dyn IPackage) -> Result<(), HookError> {
                 pkg.metadata_mut().maintainer = "sovereign-built".to_string();
                 Ok(())
@@ -7118,7 +7387,11 @@ Description: Hook test";
         assert!(pkg.metadata().description.contains("[Cleaned]"));
 
         // 2. Composite Pattern
-        let mut group = CompositePackageGroup::new("desktop-bundle", "KDE & Gnome metapackage", Version::new(1, 0, 0));
+        let mut group = CompositePackageGroup::new(
+            "desktop-bundle",
+            "KDE & Gnome metapackage",
+            Version::new(1, 0, 0),
+        );
         let child1: Box<dyn IPackage> = Box::new(StandardPackage {
             metadata: PackageMetadata {
                 name: "child-pkg1".to_string(),
@@ -7135,7 +7408,10 @@ Description: Hook test";
                 gpg_key_id: None,
                 supported_architectures: Vec::new(),
             },
-            dependencies: vec![Dependency { name: "libc".to_string(), version_constraint: VersionConstraint::Any }],
+            dependencies: vec![Dependency {
+                name: "libc".to_string(),
+                version_constraint: VersionConstraint::Any,
+            }],
             format: PackageFormat::Sigma,
         });
 
@@ -7193,12 +7469,14 @@ Description: Hook test";
         let opkg_adapter = OpkgIpkAdapter::new();
         let bsd_pkg_adapter = BsdPkgPortsAdapter::new();
 
-        let zstd_data = b"pkgname = zstd-test\npkgver = 1.2.3\npkgdesc = Modern Zstd v2\ndepend = glibc\n";
+        let zstd_data =
+            b"pkgname = zstd-test\npkgver = 1.2.3\npkgdesc = Modern Zstd v2\ndepend = glibc\n";
         assert!(zstd_adapter.can_parse(zstd_data));
         let parsed_zstd = zstd_adapter.parse(zstd_data).unwrap();
         assert_eq!(parsed_zstd.name(), "zstd-test");
 
-        let dnf5_data = b"Name: dnf5-test\nVersion: 5.1.0\nSummary: Fedora DNF5 Package\nRequires: openssl\n";
+        let dnf5_data =
+            b"Name: dnf5-test\nVersion: 5.1.0\nSummary: Fedora DNF5 Package\nRequires: openssl\n";
         assert!(dnf5_adapter.can_parse(dnf5_data));
         let parsed_dnf5 = dnf5_adapter.parse(dnf5_data).unwrap();
         assert_eq!(parsed_dnf5.name(), "dnf5-test");
@@ -7228,7 +7506,8 @@ Description: Hook test";
         let parsed_swupd = swupd_adapter.parse(swupd_data).unwrap();
         assert_eq!(parsed_swupd.name(), "desktop-autostart");
 
-        let cachy_data = b"pkgname = cachy-kernel\npkgver = 6.8.1\npkgdesc = CachyOS kernel\ncachyos-v3\n";
+        let cachy_data =
+            b"pkgname = cachy-kernel\npkgver = 6.8.1\npkgdesc = CachyOS kernel\ncachyos-v3\n";
         assert!(cachyos_adapter.can_parse(cachy_data));
         let parsed_cachy = cachyos_adapter.parse(cachy_data).unwrap();
         assert_eq!(parsed_cachy.name(), "cachy-kernel");
@@ -7252,7 +7531,10 @@ Description: Hook test";
                 None
             }
         });
-        assert_eq!(rewriter.rewrite_dependency("libssl-dev"), "sovereign-openssl-devel");
+        assert_eq!(
+            rewriter.rewrite_dependency("libssl-dev"),
+            "sovereign-openssl-devel"
+        );
         assert_eq!(rewriter.rewrite_dependency("zlib"), "zlib");
 
         let mut file_filter = UdfPostExtractFileFilter::new();
@@ -7268,7 +7550,9 @@ Description: Hook test";
             pkg.metadata_mut().maintainer = "udf-lifecycle-hook".to_string();
             Ok(())
         });
-        let executed = hook_registry.trigger(UdfLifecycleEvent::PreBuild, pkg.as_mut()).unwrap();
+        let executed = hook_registry
+            .trigger(UdfLifecycleEvent::PreBuild, pkg.as_mut())
+            .unwrap();
         assert_eq!(executed, 1);
         assert_eq!(pkg.metadata().maintainer, "udf-lifecycle-hook");
 
@@ -7282,7 +7566,12 @@ Description: Hook test";
     fn test_comprehensive_oop_mediator_visitor_memento_flyweight_state_proxy_builder() {
         // 1. Mediator Pattern
         let mut mediator = UniversalDistroPackageMediator::new();
-        let msg = mediator.notify("TestRunner", MediatorEvent::PackageParsed("htop".to_string())).unwrap();
+        let msg = mediator
+            .notify(
+                "TestRunner",
+                MediatorEvent::PackageParsed("htop".to_string()),
+            )
+            .unwrap();
         assert!(msg.contains("Parsed package htop"));
 
         // 2. Visitor Pattern
@@ -7313,7 +7602,11 @@ Description: Hook test";
 
         // 3. Memento Pattern & SystemStateCaretaker
         let mut caretaker = SystemStateCaretaker::new();
-        caretaker.save_state(1, vec!["bash".to_string(), "coreutils".to_string()], 1700000000);
+        caretaker.save_state(
+            1,
+            vec!["bash".to_string(), "coreutils".to_string()],
+            1700000000,
+        );
         assert_eq!(caretaker.mementos.len(), 1);
 
         let undone = caretaker.undo().unwrap();
@@ -7333,17 +7626,35 @@ Description: Hook test";
 
         // 5. State Pattern & StateMachine
         let mut state_machine = PackageStateMachine::new();
-        assert_eq!(state_machine.current_state, PackageLifecycleState::Uninstalled);
+        assert_eq!(
+            state_machine.current_state,
+            PackageLifecycleState::Uninstalled
+        );
 
-        assert!(state_machine.transition_to(PackageLifecycleState::ResolvingDependencies).is_ok());
-        assert!(state_machine.transition_to(PackageLifecycleState::Downloading).is_ok());
-        assert!(state_machine.transition_to(PackageLifecycleState::Validating).is_ok());
-        assert!(state_machine.transition_to(PackageLifecycleState::Installing).is_ok());
-        assert!(state_machine.transition_to(PackageLifecycleState::Installed).is_ok());
-        assert_eq!(state_machine.current_state, PackageLifecycleState::Installed);
+        assert!(state_machine
+            .transition_to(PackageLifecycleState::ResolvingDependencies)
+            .is_ok());
+        assert!(state_machine
+            .transition_to(PackageLifecycleState::Downloading)
+            .is_ok());
+        assert!(state_machine
+            .transition_to(PackageLifecycleState::Validating)
+            .is_ok());
+        assert!(state_machine
+            .transition_to(PackageLifecycleState::Installing)
+            .is_ok());
+        assert!(state_machine
+            .transition_to(PackageLifecycleState::Installed)
+            .is_ok());
+        assert_eq!(
+            state_machine.current_state,
+            PackageLifecycleState::Installed
+        );
 
         // Invalid transition test
-        assert!(state_machine.transition_to(PackageLifecycleState::Downloading).is_err());
+        assert!(state_machine
+            .transition_to(PackageLifecycleState::Downloading)
+            .is_err());
 
         // 6. Proxy Pattern (Lazy Package Load Proxy)
         let factory = PackageParserFactory::new();
@@ -7391,7 +7702,10 @@ Description: Hook test";
 
         // 4. Omarchy Package Bridge
         let omarchy = OmarchyPackageBridgeAdapter::new();
-        assert_eq!(omarchy.bridge_package("hyprland"), "sovereign-desktop-shell");
+        assert_eq!(
+            omarchy.bridge_package("hyprland"),
+            "sovereign-desktop-shell"
+        );
         assert_eq!(omarchy.bridge_package("custom-tool"), "custom-tool");
     }
 
@@ -7412,7 +7726,10 @@ Description: Hook test";
                 None
             }
         });
-        assert_eq!(conflict_resolver.resolve_conflict("legacy-libc", "sovereign-libc"), "sovereign-libc");
+        assert_eq!(
+            conflict_resolver.resolve_conflict("legacy-libc", "sovereign-libc"),
+            "sovereign-libc"
+        );
 
         // 3. UDF Package Archive Transformer Engine
         let mut archive_transformer = UdfPackageArchiveTransformerEngine::new();
