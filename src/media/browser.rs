@@ -2475,6 +2475,15 @@ mod tests {
         let (grid_count, reflow_count) = suite.compute_multi_engine_layout(900.0, 600.0);
         assert_eq!(grid_count, 3);
         assert_eq!(reflow_count, 1);
+
+        let audit = suite.run_comprehensive_browser_suite_audit("https://example.com/index.html");
+        assert_eq!(audit.get("network_request_safety"), Some(&"true".to_string()));
+        assert_eq!(audit.get("firefox_gecko_subgrid_tracks"), Some(&"3".to_string()));
+        assert_eq!(audit.get("chromium_blink_dom_reflow"), Some(&"2".to_string()));
+        assert_eq!(audit.get("brave_cname_uncloaked"), Some(&"tracking.doubleclick.net".to_string()));
+        assert_eq!(audit.get("librewolf_canvas_noise_enabled"), Some(&"true".to_string()));
+        assert_eq!(audit.get("tor_javascript_allowed"), Some(&"true".to_string()));
+        assert_eq!(audit.get("mullvad_tab_proxy"), Some(&"direct://".to_string()));
     }
 }
 
@@ -2505,5 +2514,33 @@ impl SovereignOpenSourceBrowserSuiteEngine {
         let grid_tracks = self.browser.geckoview_layout.compute_subgrid_tracks(width);
         let dom_reflows = self.browser.blink_layout.trigger_dom_reflow() as usize;
         (grid_tracks.len(), dom_reflows)
+    }
+
+    /// Performs comprehensive open-source web browser privacy, security, and layout audit
+    pub fn run_comprehensive_browser_suite_audit(&mut self, target_url: &str) -> BTreeMap<String, String> {
+        let mut results = BTreeMap::new();
+
+        let safe = self.evaluate_network_request_safety(target_url);
+        results.insert("network_request_safety".to_string(), safe.to_string());
+
+        let gecko_tracks = self.browser.geckoview_layout.compute_subgrid_tracks(1024.0).len();
+        results.insert("firefox_gecko_subgrid_tracks".to_string(), gecko_tracks.to_string());
+
+        let blink_reflow = self.browser.blink_layout.trigger_dom_reflow();
+        results.insert("chromium_blink_dom_reflow".to_string(), blink_reflow.to_string());
+
+        let uncloaked = self.browser.brave_shields.resolve_cname_uncloak("metrics.example.com");
+        results.insert("brave_cname_uncloaked".to_string(), uncloaked);
+
+        let librewolf_canvas_noise = self.browser.librewolf_hardening.canvas_fingerprint_noise_enabled;
+        results.insert("librewolf_canvas_noise_enabled".to_string(), librewolf_canvas_noise.to_string());
+
+        let tor_js_allowed = self.browser.tor_manager.is_javascript_allowed(true);
+        results.insert("tor_javascript_allowed".to_string(), tor_js_allowed.to_string());
+
+        let mullvad_proxy = self.browser.mullvad_isolation.get_tab_proxy(1);
+        results.insert("mullvad_tab_proxy".to_string(), mullvad_proxy);
+
+        results
     }
 }
