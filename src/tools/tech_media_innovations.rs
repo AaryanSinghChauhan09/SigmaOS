@@ -1003,6 +1003,186 @@ impl AppualsTroubleshootingEngine {
 }
 
 // ============================================================================
+// 15. Linux.org Kernel & Scheduler Tuning Engine
+// Inspired by Linux.org
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct LinuxOrgKernelTuningEngine {
+    pub swappiness: u8,
+    pub dirty_ratio: u8,
+    pub dirty_background_ratio: u8,
+    pub preempt_mode: String,
+    pub scheduler_latency_ms: u32,
+}
+
+impl LinuxOrgKernelTuningEngine {
+    pub fn new() -> Self {
+        Self {
+            swappiness: 10,
+            dirty_ratio: 20,
+            dirty_background_ratio: 5,
+            preempt_mode: "PREEMPT_RT".to_string(),
+            scheduler_latency_ms: 2,
+        }
+    }
+
+    pub fn tune_sysctl_parameters(&mut self, swappiness: u8, dirty: u8) {
+        self.swappiness = swappiness;
+        self.dirty_ratio = dirty;
+    }
+
+    pub fn is_realtime_optimized(&self) -> bool {
+        self.preempt_mode == "PREEMPT_RT" && self.swappiness <= 10 && self.scheduler_latency_ms <= 5
+    }
+}
+
+// ============================================================================
+// 16. MakeUseOf Desktop & App Optimization Engine
+// Inspired by MakeUseOf
+// ============================================================================
+
+#[derive(Debug, Clone, Default)]
+pub struct MakeUseOfDesktopOptimizationEngine {
+    pub active_de: String,
+    pub memory_threshold_mb: usize,
+    pub disabled_services_count: u32,
+}
+
+impl MakeUseOfDesktopOptimizationEngine {
+    pub fn new() -> Self {
+        Self {
+            active_de: "Zenith-Wayland-Minimal".to_string(),
+            memory_threshold_mb: 512,
+            disabled_services_count: 8,
+        }
+    }
+
+    pub fn trim_desktop_memory(&self, available_ram_mb: usize) -> usize {
+        if available_ram_mb < self.memory_threshold_mb {
+            128
+        } else {
+            0
+        }
+    }
+
+    pub fn is_low_resource_profile(&self) -> bool {
+        self.disabled_services_count >= 5 && self.active_de.contains("Minimal")
+    }
+}
+
+// ============================================================================
+// 17. ZDNet Enterprise Hardening & Zero-Trust Auditor
+// Inspired by ZDNet
+// ============================================================================
+
+#[derive(Debug, Clone, Default)]
+pub struct ZdnetEnterpriseHardeningEngine {
+    pub ssh_root_login_disabled: bool,
+    pub password_auth_disabled: bool,
+    pub fail2ban_active: bool,
+    pub security_audit_score: u8,
+}
+
+impl ZdnetEnterpriseHardeningEngine {
+    pub fn new() -> Self {
+        Self {
+            ssh_root_login_disabled: true,
+            password_auth_disabled: true,
+            fail2ban_active: true,
+            security_audit_score: 98,
+        }
+    }
+
+    pub fn run_hardening_audit(&self) -> bool {
+        self.ssh_root_login_disabled
+            && self.password_auth_disabled
+            && self.fail2ban_active
+            && self.security_audit_score >= 90
+    }
+}
+
+// ============================================================================
+// 18. MarkTechPost Local RAG & Vector Embeddings Engine
+// Inspired by MarkTechPost
+// ============================================================================
+
+#[derive(Debug, Clone, Default)]
+pub struct MarkTechPostVectorEngine {
+    pub vector_dimensions: usize,
+    pub similarity_metric: String,
+    pub quantized: bool,
+}
+
+impl MarkTechPostVectorEngine {
+    pub fn new() -> Self {
+        Self {
+            vector_dimensions: 384,
+            similarity_metric: "Cosine".to_string(),
+            quantized: true,
+        }
+    }
+
+    pub fn compute_cosine_similarity(&self, v1: &[f32], v2: &[f32]) -> f32 {
+        if v1.len() != v2.len() || v1.is_empty() {
+            return 0.0;
+        }
+        let mut dot = 0.0f32;
+        let mut norm_a = 0.0f32;
+        let mut norm_b = 0.0f32;
+        for i in 0..v1.len() {
+            dot += v1[i] * v2[i];
+            norm_a += v1[i] * v1[i];
+            norm_b += v2[i] * v2[i];
+        }
+        if norm_a == 0.0 || norm_b == 0.0 {
+            0.0
+        } else {
+            dot / (norm_a.sqrt() * norm_b.sqrt())
+        }
+    }
+
+    pub fn is_rag_accelerated(&self) -> bool {
+        self.quantized && self.vector_dimensions >= 128
+    }
+}
+
+// ============================================================================
+// 19. TechPowerUp GPU Telemetry & Thermal Protection Engine
+// Inspired by TechPowerUp
+// ============================================================================
+
+#[derive(Debug, Clone, Default)]
+pub struct TechPowerUpGpuTelemetryEngine {
+    pub vram_temp_c: f32,
+    pub vrm_temp_c: f32,
+    pub clock_mhz: u32,
+    pub power_limit_pct: u8,
+}
+
+impl TechPowerUpGpuTelemetryEngine {
+    pub fn new() -> Self {
+        Self {
+            vram_temp_c: 68.0,
+            vrm_temp_c: 72.0,
+            clock_mhz: 2450,
+            power_limit_pct: 100,
+        }
+    }
+
+    pub fn is_thermal_safe(&self) -> bool {
+        self.vram_temp_c < 95.0 && self.vrm_temp_c < 105.0
+    }
+
+    pub fn enforce_vrm_thermal_guard(&mut self) -> u32 {
+        if self.vrm_temp_c > 100.0 {
+            self.clock_mhz = (self.clock_mhz as f32 * 0.8) as u32;
+        }
+        self.clock_mhz
+    }
+}
+
+// ============================================================================
 // Sovereign Tech Media Master Suite
 // ============================================================================
 
@@ -1026,6 +1206,11 @@ pub struct SovereignTechMediaMasterSuite {
     pub linuxteck: LinuxTeckSysadminToolkitEngine,
     pub os4u: OpenSourceForUModularEngine,
     pub appuals: AppualsTroubleshootingEngine,
+    pub linux_org: LinuxOrgKernelTuningEngine,
+    pub makeuseof: MakeUseOfDesktopOptimizationEngine,
+    pub zdnet: ZdnetEnterpriseHardeningEngine,
+    pub marktechpost: MarkTechPostVectorEngine,
+    pub techpowerup: TechPowerUpGpuTelemetryEngine,
 }
 
 impl SovereignTechMediaMasterSuite {
@@ -1049,6 +1234,11 @@ impl SovereignTechMediaMasterSuite {
             linuxteck: LinuxTeckSysadminToolkitEngine::new(),
             os4u: OpenSourceForUModularEngine::new(),
             appuals: AppualsTroubleshootingEngine::new(),
+            linux_org: LinuxOrgKernelTuningEngine::new(),
+            makeuseof: MakeUseOfDesktopOptimizationEngine::new(),
+            zdnet: ZdnetEnterpriseHardeningEngine::new(),
+            marktechpost: MarkTechPostVectorEngine::new(),
+            techpowerup: TechPowerUpGpuTelemetryEngine::new(),
         }
     }
 
@@ -1098,6 +1288,11 @@ impl SovereignTechMediaMasterSuite {
         let linuxteck_ok = self.linuxteck.run_sysadmin_audit();
         let os4u_ok = self.os4u.verify_modular_security();
         let appuals_ok = self.appuals.resolve_diagnostic(1001).contains("1001");
+        let linux_org_ok = self.linux_org.is_realtime_optimized();
+        let makeuseof_ok = self.makeuseof.is_low_resource_profile();
+        let zdnet_ok = self.zdnet.run_hardening_audit();
+        let marktechpost_ok = self.marktechpost.is_rag_accelerated();
+        let techpowerup_ok = self.techpowerup.is_thermal_safe();
 
         feeds_ok
             && telemetry_ok
@@ -1114,6 +1309,11 @@ impl SovereignTechMediaMasterSuite {
             && linuxteck_ok
             && os4u_ok
             && appuals_ok
+            && linux_org_ok
+            && makeuseof_ok
+            && zdnet_ok
+            && marktechpost_ok
+            && techpowerup_ok
     }
 }
 
@@ -1275,6 +1475,32 @@ mod tests {
 
         let de_gov = monitor.apply_makeuseof_lightweight_de_memory_governor(256);
         assert_eq!(de_gov, "Zenith-Minimal-Tiling");
+    }
+
+    #[test]
+    fn test_additional_tech_media_portal_engines() {
+        let mut linux_org = LinuxOrgKernelTuningEngine::new();
+        assert!(linux_org.is_realtime_optimized());
+        linux_org.tune_sysctl_parameters(5, 15);
+        assert_eq!(linux_org.swappiness, 5);
+
+        let makeuseof = MakeUseOfDesktopOptimizationEngine::new();
+        assert!(makeuseof.is_low_resource_profile());
+        assert_eq!(makeuseof.trim_desktop_memory(256), 128);
+
+        let zdnet = ZdnetEnterpriseHardeningEngine::new();
+        assert!(zdnet.run_hardening_audit());
+
+        let marktechpost = MarkTechPostVectorEngine::new();
+        assert!(marktechpost.is_rag_accelerated());
+        let sim = marktechpost.compute_cosine_similarity(&[1.0, 0.0], &[1.0, 0.0]);
+        assert!((sim - 1.0).abs() < 1e-4);
+
+        let mut gpu = TechPowerUpGpuTelemetryEngine::new();
+        assert!(gpu.is_thermal_safe());
+        gpu.vrm_temp_c = 105.0;
+        let throttled_clock = gpu.enforce_vrm_thermal_guard();
+        assert_eq!(throttled_clock, 1960);
     }
 
     #[test]
