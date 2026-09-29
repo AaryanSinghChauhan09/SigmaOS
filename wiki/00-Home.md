@@ -35,6 +35,7 @@ SigmaOS systematically extracts functions, features, architectural models, desig
 
 ## Master Specification Files
 
+- [Master AI Agent Algorithm Diagnostics & Fix Guide](WHAT_IS_WORKING_AND_NOT_WORKING.md)
 - [Tri-Agent & 500 Repos Master Plan](../docs/SIGMAOS_500_REPOS_TRI_AGENT_ABSORPTION_MASTER_PLAN.md)
 - [Improvement Plan & Technical Audit](../ImprovementPlan.md)
 
