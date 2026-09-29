@@ -433,6 +433,22 @@ The SigmaOS repository has been successfully consolidated from a fragmented stat
   - kill_process, set_priority, set_nice operations
   - Comprehensive unit tests for all monitoring functionality
 
+- **Filesystem Monitor** (src/fs/monitor.rs)
+  - Implements Wiki 05-Filesystems.md filesystem monitoring specifications
+  - DiskUsage with mount point, device, fs type, total/used/available size, usage percent
+  - DirectorySize with path, size, file count, directory count
+  - InodeUsage with total/used/free inodes and usage percent
+  - FsCheckStatus enum (Clean, ErrorsFound, ErrorsFixed, Failed)
+  - FsCheckResult with check status, errors found/fixed, and output
+  - FilesystemMonitor with disk usage, directory sizes, and inode usage tracking
+  - check_filesystem for Ext4/Btrfs filesystem checks with force option
+  - get_high_usage_disks and get_high_inode_usage for threshold-based alerts
+  - get_total_disk_usage, get_total_disk_capacity, get_overall_usage_percent
+  - scan_directory for directory size analysis with max_depth
+  - count_files for file counting in directories
+  - get_statistics for comprehensive filesystem statistics
+  - Comprehensive unit tests for all monitoring functionality
+
 - **Namespaces** (src/kernel/namespaces.rs)
   - NamespaceManager for namespace management
   - Namespace with type-specific support (User, Mount, PID, Network, IPC, Uts, Cgroup)
