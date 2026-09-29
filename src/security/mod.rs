@@ -8,6 +8,7 @@ pub mod hardware_privilege;
 pub mod pqc_enclave;
 pub mod governance;
 pub mod audit;
+pub mod system_audit;
 pub mod bsd_hardening;
 pub mod sigma_pledge;
 pub mod sigma_unveil;
@@ -62,6 +63,10 @@ pub use landlock::{LandlockEngine, LandlockPathBeneathAttr, LandlockRuleset};
 pub mod landlock_sovereign;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
+pub use system_audit::{
+    AuditEventType as SystemAuditEventType, AuditEvent as SystemAuditEvent, AuditRule, AuditAction, AuditConfig,
+    SystemAuditManager,
+};
 pub use bsd_hardening::{
     AslrEngine, BsdHardeningSuite, CapsicumCapability, CapsicumManager, MemoryPermission,
     PaxMprotect, PledgeManager as BsdPledgeManager, PledgePromise as BsdPledgePromise,
