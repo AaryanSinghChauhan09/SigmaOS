@@ -532,6 +532,23 @@ The SigmaOS repository has been successfully consolidated from a fragmented stat
   - is_directory_encrypted, is_device_encrypted for status checking
   - Comprehensive unit tests for all encryption functionality
 
+- **Kernel Module Loading Control** (src/kernel/module_loading_control.rs)
+  - Implements Wiki 07-Security.md kernel module loading control specifications
+  - ModuleLoadingState enum (Enabled, Disabled, Restricted)
+  - ModuleLoadingPolicy enum (AllowAll, AllowSigned, AllowWhitelist, DenyAll)
+  - KernelModule with name, version, loaded status, signature verification, load time
+  - ModuleLoadingRule with module name, allowed flag, signature requirement, description
+  - KernelModuleLoadingController with module loading management
+  - set_loading_state, set_loading_policy, set_signature_checking
+  - enable_module_loading, disable_module_loading
+  - add_rule, remove_rule, get_rule for rule management
+  - can_load_module for loading permission checking
+  - register_module, load_module, unload_module for module lifecycle
+  - list_loaded_modules, list_all_modules, list_rules for listing
+  - get_statistics for module loading statistics
+  - is_loading_enabled, is_loading_disabled for state checking
+  - Comprehensive unit tests for all module loading control functionality
+
 - **Namespaces** (src/kernel/namespaces.rs)
   - NamespaceManager for namespace management
   - Namespace with type-specific support (User, Mount, PID, Network, IPC, Uts, Cgroup)

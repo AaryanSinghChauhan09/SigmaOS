@@ -48,6 +48,7 @@ pub use linux_parity::{
 pub mod memory;
 pub mod meta;
 pub mod module_loader;
+pub mod module_loading_control;
 pub mod module_tools;
 pub mod namespaces;
 pub mod uts_namespace;
@@ -182,6 +183,10 @@ pub use kptr_restrict::{
 pub use process_monitor::{
     MonitoredProcessState, ProcessEntry, ProcessTreeNode, ProcessFilter, ProcessSortField,
     ProcessMonitor,
+};
+pub use module_loading_control::{
+    ModuleLoadingState, ModuleLoadingPolicy, KernelModule as ModuleLoadingKernelModule, ModuleLoadingRule,
+    KernelModuleLoadingController,
 };
 
 pub mod procfs_linux;
