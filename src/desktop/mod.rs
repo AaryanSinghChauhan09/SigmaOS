@@ -3,10 +3,15 @@ pub use mobile_variant::*;
 pub mod tiling;
 pub use tiling::{TilingWindowManager, TilingWindow, Workspace, TilingLayout, WindowArea};
 pub mod onboarding;
+pub mod shortcuts;
 
 pub use onboarding::{
     Language, Region, OnboardingStep, DesktopTheme, PrivacySettings,
     OnboardingConfig, OnboardingWizard,
+};
+pub use shortcuts::{
+    KeyModifier, KeyAction, KeyboardShortcut, ShortcutCategory, ShortcutConfig,
+    KeyboardShortcutsManager,
 };
 
 // SigmaOS Desktop Module
