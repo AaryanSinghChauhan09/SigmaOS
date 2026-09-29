@@ -2541,6 +2541,12 @@ impl SovereignOpenSourceBrowserSuiteEngine {
         let mullvad_proxy = self.browser.mullvad_isolation.get_tab_proxy(1);
         results.insert("mullvad_tab_proxy".to_string(), mullvad_proxy);
 
+        let duck_grade = format!("{:?}", self.browser.duck_assist.evaluate_domain_grade("duckduckgo.com"));
+        results.insert("duckduckgo_trust_grade".to_string(), duck_grade);
+
+        let v8_sandbox_valid = self.browser.blink_layout.validate_turbofan_sandbox_boundary(0x1008, 0x1000, 0x1000);
+        results.insert("v8_turbofan_sandbox_valid".to_string(), v8_sandbox_valid.to_string());
+
         results
     }
 }
