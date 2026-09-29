@@ -484,6 +484,22 @@ The SigmaOS repository has been successfully consolidated from a fragmented stat
   - reset_to_defaults for restoring default shortcuts
   - Comprehensive unit tests for all shortcut functionality
 
+- **Development Testing Framework** (src/development/testing.rs)
+  - Implements Wiki 10-Development.md testing specifications
+  - TestType enum (Unit, Integration, Standalone)
+  - TestStatus enum (Pending, Running, Passed, Failed, Skipped)
+  - TestResult with test name, type, status, duration, output, error message
+  - TestSuite with name, type, and test collection
+  - TestConfig with verbose, nocapture, fail_fast, timeout_seconds settings
+  - DevelopmentTestingFramework with test suite management
+  - create_unit_test_suite, create_integration_test_suite, create_standalone_test_suite
+  - run_all_tests, run_unit_tests, run_integration_tests, run_standalone_tests
+  - get_statistics for comprehensive test statistics
+  - get_test_command for generating cargo test commands
+  - get_specific_test_command for running specific tests
+  - list_all_tests, list_failed_tests for test listing
+  - Comprehensive unit tests for all testing functionality
+
 - **Namespaces** (src/kernel/namespaces.rs)
   - NamespaceManager for namespace management
   - Namespace with type-specific support (User, Mount, PID, Network, IPC, Uts, Cgroup)

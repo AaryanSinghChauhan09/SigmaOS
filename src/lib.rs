@@ -18,6 +18,7 @@ pub mod contributing;
 pub mod customization;
 pub mod dashboard;
 pub mod desktop;
+pub mod development;
 pub mod device;
 pub mod distro;
 pub mod driver;
