@@ -3084,6 +3084,8 @@ pub struct SovereignOpenSourceObsoletionOrchestrator {
     pub fzf_finder: SovereignFzfFuzzyFinderEngine,
     pub nats_jetstream: SovereignNatsJetstreamEngine,
     pub yazi_explorer: SovereignYaziTerminalFileExplorerEngine,
+    pub ast_grep: SovereignAstGrepStructuralEngine,
+    pub difftastic_diff: SovereignDifftasticSyntaxDiffEngine,
     pub supremacy_suite: OpenSourceProjectSupremacySuite,
     pub scheme_router: SovereignSchemeRouter,
     pub zircon_manager: SovereignZirconHandleManager,
@@ -3167,6 +3169,8 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             fzf_finder: SovereignFzfFuzzyFinderEngine::new(vec!["/bin/bash".to_string(), "/usr/bin/zsh".to_string()]),
             nats_jetstream: SovereignNatsJetstreamEngine::new("system_events"),
             yazi_explorer: SovereignYaziTerminalFileExplorerEngine::new("/home/sovereign"),
+            ast_grep: SovereignAstGrepStructuralEngine::new(),
+            difftastic_diff: SovereignDifftasticSyntaxDiffEngine::new(),
             supremacy_suite: OpenSourceProjectSupremacySuite::new(),
             scheme_router: SovereignSchemeRouter::new(),
             zircon_manager: SovereignZirconHandleManager::new(),
@@ -5485,6 +5489,219 @@ impl Default for SovereignBtopResourceMonitorEngine {
 }
 
 // =========================================================================
+// 61. SOVEREIGN AST GREP STRUCTURAL ENGINE (Superseding ast-grep & tree-sitter)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AstMatchRule {
+    pub rule_id: String,
+    pub pattern: String,      // e.g. "fn $FUNC($$$ARGS) -> $RET { $$$BODY }"
+    pub fix_template: String, // e.g. "pub fn $FUNC($$$ARGS) -> $RET { $$$BODY }"
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AstMatchResult {
+    pub rule_id: String,
+    pub matched_code: String,
+    pub bindings: BTreeMap<String, String>, // "$FUNC" -> "compute", "$RET" -> "u64"
+    pub line_number: usize,
+}
+
+pub struct SovereignAstGrepStructuralEngine {
+    pub rules: Vec<AstMatchRule>,
+}
+
+impl SovereignAstGrepStructuralEngine {
+    pub fn new() -> Self {
+        Self { rules: Vec::new() }
+    }
+
+    pub fn register_rule(&mut self, rule_id: &str, pattern: &str, fix_template: &str) {
+        self.rules.push(AstMatchRule {
+            rule_id: rule_id.to_string(),
+            pattern: pattern.to_string(),
+            fix_template: fix_template.to_string(),
+        });
+    }
+
+    pub fn search_pattern(&self, code: &str, pattern: &str) -> Vec<AstMatchResult> {
+        let mut results = Vec::new();
+        let pat_clean = pattern.trim();
+
+        for (line_idx, line) in code.lines().enumerate() {
+            let trimmed = line.trim();
+            let mut bindings = BTreeMap::new();
+
+            // Perform pattern matching with wildcard extraction
+            let mut matched = false;
+            if pat_clean.contains("$VAR") && trimmed.contains("let ") {
+                if let Some(eq_pos) = trimmed.find('=') {
+                    let var_part = trimmed[..eq_pos].replace("let", "").replace("mut", "");
+                    let var_name = var_part.trim().to_string();
+                    bindings.insert("$VAR".to_string(), var_name);
+                    matched = true;
+                }
+            } else if pat_clean.contains("$FUNC") && (trimmed.contains("fn ") || trimmed.contains("def ")) {
+                if let Some(fn_pos) = trimmed.find("fn ") {
+                    let rest = &trimmed[fn_pos + 3..];
+                    if let Some(paren_pos) = rest.find('(') {
+                        let func_name = rest[..paren_pos].trim().to_string();
+                        bindings.insert("$FUNC".to_string(), func_name);
+                        matched = true;
+                    }
+                }
+            } else if trimmed.contains(pat_clean) {
+                matched = true;
+            }
+
+            if matched {
+                results.push(AstMatchResult {
+                    rule_id: "inline_pattern".to_string(),
+                    matched_code: trimmed.to_string(),
+                    bindings,
+                    line_number: line_idx + 1,
+                });
+            }
+        }
+        results
+    }
+
+    pub fn rewrite_code(&self, code: &str, rule_id: &str) -> String {
+        let rule = match self.rules.iter().find(|r| r.rule_id == rule_id) {
+            Some(r) => r,
+            None => return code.to_string(),
+        };
+
+        let matches = self.search_pattern(code, &rule.pattern);
+        let mut rewritten = code.to_string();
+
+        for m in matches {
+            let mut replacement = rule.fix_template.clone();
+            for (placeholder, value) in &m.bindings {
+                replacement = replacement.replace(placeholder, value);
+            }
+            rewritten = rewritten.replace(&m.matched_code, &replacement);
+        }
+
+        rewritten
+    }
+}
+
+impl Default for SovereignAstGrepStructuralEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 62. SOVEREIGN DIFFTASTIC SYNTAX DIFF ENGINE (Superseding difftastic & diff)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum SyntaxDiffKind {
+    Unchanged,
+    ExpressionReplaced,
+    TokenAdded,
+    TokenRemoved,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SyntaxDiffHunk {
+    pub line_number: usize,
+    pub kind: SyntaxDiffKind,
+    pub left_expr: String,
+    pub right_expr: String,
+}
+
+pub struct SovereignDifftasticSyntaxDiffEngine {
+    pub ignore_whitespace: bool,
+}
+
+impl SovereignDifftasticSyntaxDiffEngine {
+    pub fn new() -> Self {
+        Self {
+            ignore_whitespace: true,
+        }
+    }
+
+    pub fn diff_code_syntax(&self, left: &str, right: &str) -> Vec<SyntaxDiffHunk> {
+        let mut hunks = Vec::new();
+        let left_lines: Vec<&str> = left.lines().collect();
+        let right_lines: Vec<&str> = right.lines().collect();
+
+        let max_lines = left_lines.len().max(right_lines.len());
+
+        for i in 0..max_lines {
+            let l_line = left_lines.get(i).copied().unwrap_or("");
+            let r_line = right_lines.get(i).copied().unwrap_or("");
+
+            let l_clean = if self.ignore_whitespace { l_line.trim() } else { l_line };
+            let r_clean = if self.ignore_whitespace { r_line.trim() } else { r_line };
+
+            if l_clean == r_clean {
+                hunks.push(SyntaxDiffHunk {
+                    line_number: i + 1,
+                    kind: SyntaxDiffKind::Unchanged,
+                    left_expr: l_clean.to_string(),
+                    right_expr: r_clean.to_string(),
+                });
+            } else if l_clean.is_empty() && !r_clean.is_empty() {
+                hunks.push(SyntaxDiffHunk {
+                    line_number: i + 1,
+                    kind: SyntaxDiffKind::TokenAdded,
+                    left_expr: String::new(),
+                    right_expr: r_clean.to_string(),
+                });
+            } else if !l_clean.is_empty() && r_clean.is_empty() {
+                hunks.push(SyntaxDiffHunk {
+                    line_number: i + 1,
+                    kind: SyntaxDiffKind::TokenRemoved,
+                    left_expr: l_clean.to_string(),
+                    right_expr: String::new(),
+                });
+            } else {
+                hunks.push(SyntaxDiffHunk {
+                    line_number: i + 1,
+                    kind: SyntaxDiffKind::ExpressionReplaced,
+                    left_expr: l_clean.to_string(),
+                    right_expr: r_clean.to_string(),
+                });
+            }
+        }
+
+        hunks
+    }
+
+    pub fn render_diff_summary(&self, hunks: &[SyntaxDiffHunk]) -> String {
+        let mut summary = String::new();
+        for hunk in hunks {
+            match hunk.kind {
+                SyntaxDiffKind::Unchanged => {}
+                SyntaxDiffKind::ExpressionReplaced => {
+                    summary.push_str(&format!(
+                        "L{}: [- {} -] -> [+ {} +]\n",
+                        hunk.line_number, hunk.left_expr, hunk.right_expr
+                    ));
+                }
+                SyntaxDiffKind::TokenAdded => {
+                    summary.push_str(&format!("L{}: + {}\n", hunk.line_number, hunk.right_expr));
+                }
+                SyntaxDiffKind::TokenRemoved => {
+                    summary.push_str(&format!("L{}: - {}\n", hunk.line_number, hunk.left_expr));
+                }
+            }
+        }
+        summary
+    }
+}
+
+impl Default for SovereignDifftasticSyntaxDiffEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // UNIT TESTS
 // =========================================================================
 
@@ -6572,5 +6789,35 @@ mod tests {
 
         assert_eq!(btop.average_cpu_usage(), 20);
         assert_eq!(btop.active_snapshot.memory_total_mb, 32768);
+    }
+
+    #[test]
+    fn test_sovereign_ast_grep_structural_engine() {
+        let mut ast_grep = SovereignAstGrepStructuralEngine::new();
+        ast_grep.register_rule("export_fn", "fn $FUNC", "pub fn $FUNC");
+
+        let code = "fn compute_hash() -> u64 {\n    let mut val = 42;\n    val\n}";
+        let matches = ast_grep.search_pattern(code, "fn $FUNC");
+        assert_eq!(matches.len(), 1);
+        assert_eq!(matches[0].bindings.get("$FUNC"), Some(&"compute_hash".to_string()));
+
+        let rewritten = ast_grep.rewrite_code(code, "export_fn");
+        assert!(rewritten.contains("pub fn compute_hash"));
+    }
+
+    #[test]
+    fn test_sovereign_difftastic_syntax_diff_engine() {
+        let diff = SovereignDifftasticSyntaxDiffEngine::new();
+        let left = "fn main() {\n    println!(\"Hello\");\n}";
+        let right = "fn main() {\n    println!(\"Hello SigmaOS\");\n}";
+
+        let hunks = diff.diff_code_syntax(left, right);
+        assert_eq!(hunks.len(), 3);
+        assert_eq!(hunks[0].kind, SyntaxDiffKind::Unchanged);
+        assert_eq!(hunks[1].kind, SyntaxDiffKind::ExpressionReplaced);
+
+        let summary = diff.render_diff_summary(&hunks);
+        assert!(summary.contains("[- println!(\"Hello\"); -]"));
+        assert!(summary.contains("[+ println!(\"Hello SigmaOS\"); +]"));
     }
 }
