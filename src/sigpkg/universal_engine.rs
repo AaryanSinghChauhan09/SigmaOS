@@ -2302,21 +2302,13 @@ impl ParallelMirrorFetcher {
 
     /// Ranks mirrors by latency and selects the fastest active mirror for parallel chunk download
     pub fn select_fastest_mirror(&self) -> Option<String> {
-        let mut active_mirrors: Vec<&MirrorNode> =
-            self.mirrors.iter().filter(|m| m.is_active).collect();
-        // Direct zero-dependency bubble sort implementation
-        let len = active_mirrors.len();
-        if len == 0 {
-            return None;
-        }
-        for i in 0..len {
-            for j in 0..len - 1 - i {
-                if active_mirrors[j].latency_ms > active_mirrors[j + 1].latency_ms {
-                    active_mirrors.swap(j, j + 1);
-                }
-            }
-        }
-        active_mirrors.first().map(|m| m.url.clone())
+        // Bolt ⚡ Optimization: Replace O(N^2) bubble sort and heap vector allocation with an O(N) min_by_key linear scan
+        // over active mirrors, reducing mirror selection latency from O(N^2) to O(N) without heap allocation.
+        self.mirrors
+            .iter()
+            .filter(|m| m.is_active)
+            .min_by_key(|m| m.latency_ms)
+            .map(|m| m.url.clone())
     }
 }
 
