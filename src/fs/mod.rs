@@ -20,6 +20,7 @@ pub mod btrfs;
 // pub mod filesystem;
 pub mod btrfs_send_receive;
 pub mod vfs;
+pub mod fstab;
 pub use btrfs_send_receive::{BtrfsSendOp, BtrfsSendCommand, BtrfsSendStream, BtrfsReceiveContext, BtrfsSubvolume, BtrfsSendReceiveManager};
 pub use btrfs::{BtrfsExtent, BtrfsFilesystem, BtrfsSnapshot, ChecksumType};
 pub mod sigmacas;
@@ -45,6 +46,10 @@ pub use fscrypt::{
 
 pub use autofs::{
     MountTriggerType, MountPoint, AutoFsManager,
+};
+
+pub use fstab::{
+    FsType, MountOption, FstabEntry, FstabManager,
 };
 
 pub mod bcachefs_sovereign;
