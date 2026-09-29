@@ -356,6 +356,33 @@ The SigmaOS repository has been successfully consolidated from a fragmented stat
   - Available languages and regions for selection
   - Configuration validation with error reporting
 
+- **AutoFS Manager** (src/fs/autofs_manager.rs)
+  - Implements Wiki 04-Kernel.md AutoFS specifications
+  - AutoFsTrigger: mount point, device, fs_type, options
+  - AutoFsState: Idle, Triggered, Mounted, Failed
+  - AutoFsEntry: trigger with state, last access, idle timeout
+  - AutoFsManager: register, trigger, mount, unmount, set timeout, unregister
+  - Idle timeout detection and automatic unmount
+  - List entries, mounted, and idle mounts
+  - Cleanup idle mounts in one operation
+  - Enable/disable AutoFS functionality
+  - Statistics tracking (total, mounted, idle, triggered, failed)
+  - Mount/unmount command generation
+
+- **Kernel Pointer Restriction** (src/kernel/kptr_restrict.rs)
+  - Implements Wiki 04-Kernel.md kernel pointer restriction specifications
+  - KptrRestrictLevel: None, Restricted, Hidden with u32 conversion
+  - KptrRestrict: pointer visibility control, masking, sysctl integration
+  - DmesgRestrictLevel: None, Restricted
+  - DmesgRestrict: dmesg visibility control, sysctl integration
+  - KernelSecurityParams: unified security parameter manager
+  - Module loading control (modules_disabled)
+  - Security level detection (Low, Medium, High, Maximum)
+  - Security profile management (maximize, minimize, default hardening)
+  - Sysctl configuration generation and application
+  - CAP_SYSLOG capability-based access control
+  - Pointer masking for security-sensitive contexts
+
 - **Namespaces** (src/kernel/namespaces.rs)
   - NamespaceManager for namespace management
   - Namespace with type-specific support (User, Mount, PID, Network, IPC, Uts, Cgroup)
@@ -404,7 +431,7 @@ All changes committed and pushed to GitHub main branch.
 - **Branches**: 1 (main only)
 - **Pull Requests**: 0 (all closed)
 - **Wiki Pages**: 15 (organized by topic)
-- **Features Implemented**: 37+ major subsystems
+- **Features Implemented**: 39+ major subsystems
 - **All changes**: Committed and pushed to GitHub
 
 ## Session 5 Completion Summary (2026-09-29)
@@ -419,6 +446,8 @@ All changes committed and pushed to GitHub main branch.
 - ✅ Implemented capability-based security from Wiki 07-Security.md
 - ✅ Implemented installation manager from Wiki 01-Installation.md
 - ✅ Implemented onboarding wizard from Wiki 02-Getting-Started.md
+- ✅ Implemented AutoFS manager from Wiki 04-Kernel.md
+- ✅ Implemented kernel pointer restriction from Wiki 04-Kernel.md
 - ✅ Updated COMPLETION_STATUS.md with new implementations
 - ✅ All changes committed and pushed to GitHub main branch
 
@@ -426,7 +455,7 @@ All changes committed and pushed to GitHub main branch.
 - **Branches**: 1 (main only)
 - **Pull Requests**: 0 (all closed)
 - **Wiki Pages**: 15 (organized by topic)
-- **Features Implemented**: 37+ major subsystems
+- **Features Implemented**: 39+ major subsystems
 - **Compilation**: cargo check --lib passes with 0 errors
 - **Test Suite**: run_sigma_tests.sh passes
 - **GitHub Sync**: Fully synchronized
