@@ -2364,6 +2364,142 @@ impl Default for LandlockV5NetworkGuard {
     }
 }
 
+// ==========================================
+// 42. SOVEREIGN SUBSYSTEM DISTRO EVENT ROUTER & INSPIRATION LEAP ENGINE
+// ==========================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SubsystemDistroEvent {
+    pub source_subsystem: String,
+    pub target_subsystem: String,
+    pub event_type: String,
+    pub payload: String,
+    pub active_mode: DistroSubsystemMode,
+}
+
+pub struct SovereignSubsystemDistroEventRouter {
+    pub gateway: LinuxBsdDistroSubsystemInteroperabilityGateway,
+    pub event_history: Vec<SubsystemDistroEvent>,
+}
+
+impl SovereignSubsystemDistroEventRouter {
+    pub fn new(mode: DistroSubsystemMode) -> Self {
+        Self {
+            gateway: LinuxBsdDistroSubsystemInteroperabilityGateway::new(mode),
+            event_history: Vec::new(),
+        }
+    }
+
+    pub fn route_event(
+        &mut self,
+        source: &str,
+        target: &str,
+        event_type: &str,
+        payload: &str,
+    ) -> Result<String, &'static str> {
+        let dispatch_msg = self.gateway.orchestrate_subsystem(target, payload)?;
+        let event = SubsystemDistroEvent {
+            source_subsystem: source.to_string(),
+            target_subsystem: target.to_string(),
+            event_type: event_type.to_string(),
+            payload: payload.to_string(),
+            active_mode: self.gateway.active_distro_mode,
+        };
+        self.event_history.push(event);
+        Ok(dispatch_msg)
+    }
+
+    pub fn set_distro_mode(&mut self, mode: DistroSubsystemMode) {
+        self.gateway.set_distro_mode(mode);
+    }
+}
+
+impl Default for SovereignSubsystemDistroEventRouter {
+    fn default() -> Self {
+        Self::new(DistroSubsystemMode::LinuxArch)
+    }
+}
+
+pub struct SovereignDistroInspirationLeapEngine {
+    pub router: SovereignSubsystemDistroEventRouter,
+    pub active_inspirations: Vec<String>,
+}
+
+impl SovereignDistroInspirationLeapEngine {
+    pub fn new(mode: DistroSubsystemMode) -> Self {
+        let mut engine = Self {
+            router: SovereignSubsystemDistroEventRouter::new(mode),
+            active_inspirations: Vec::new(),
+        };
+
+        engine.active_inspirations.extend(vec![
+            "Arch-ALPM-Rolling-Release".to_string(),
+            "Debian-Apt-Pinning-Multiarch".to_string(),
+            "Fedora-OSTree-Atomic-Deployments".to_string(),
+            "NixOS-Guix-CAS-Pure-Generations".to_string(),
+            "Alpine-Musl-Apk-Overlays".to_string(),
+            "Gentoo-Portage-USE-Flag-Governor".to_string(),
+            "CachyOS-BORE-v2-eBPF-Scheduler".to_string(),
+            "ClearLinux-Microarch-JIT-Tuner".to_string(),
+            "FreeBSD-Jails-VNET-ZFS-CoW".to_string(),
+            "OpenBSD-Pledge-Unveil-KARL-WX".to_string(),
+            "NetBSD-Rump-Anykernel-Driver-Router".to_string(),
+            "DragonFlyBSD-HAMMER2-MVCC-B-Tree".to_string(),
+            "Solaris-DTrace-Crossbow-VNICs".to_string(),
+        ]);
+
+        engine
+    }
+
+    pub fn set_distro_mode(&mut self, mode: DistroSubsystemMode) {
+        self.router.set_distro_mode(mode);
+    }
+
+    pub fn synchronize_all_subsystems(&mut self) -> Result<usize, &'static str> {
+        self.router.gateway.synchronize_and_audit_all_subsystems()
+    }
+
+    pub fn audit_subsystem_readiness(&mut self) -> (usize, bool) {
+        let count = self.synchronize_all_subsystems().unwrap_or(0);
+        let valid = self.router.gateway.orchestrator.verify_full_subsystem_matrix();
+        (count, valid)
+    }
+}
+
+impl Default for SovereignDistroInspirationLeapEngine {
+    fn default() -> Self {
+        Self::new(DistroSubsystemMode::LinuxArch)
+    }
+}
+
+#[cfg(test)]
+mod inspiration_leap_tests {
+    use super::*;
+
+    #[test]
+    fn test_event_router_and_inspiration_leap_engine() {
+        let mut leap_engine = SovereignDistroInspirationLeapEngine::new(DistroSubsystemMode::LinuxArch);
+        assert_eq!(leap_engine.active_inspirations.len(), 13);
+
+        let (count, valid) = leap_engine.audit_subsystem_readiness();
+        assert_eq!(count, 174);
+        assert!(valid);
+
+        let res = leap_engine.router.route_event("process", "memory", "alloc_page", "0x1000");
+        assert!(res.is_ok());
+        assert!(res.unwrap().contains("KARL W^X memory page allocation"));
+
+        leap_engine.set_distro_mode(DistroSubsystemMode::FreeBsd);
+        let res_bsd = leap_engine.router.route_event("network", "network", "vnet_route", "em0");
+        assert!(res_bsd.is_ok());
+        assert!(res_bsd.unwrap().contains("VNET network stack routing"));
+
+        let (count_bsd, valid_bsd) = leap_engine.audit_subsystem_readiness();
+        assert_eq!(count_bsd, 174);
+        assert!(valid_bsd);
+    }
+}
+
 #[cfg(test)]
 mod subsystem_interop_tests {
     use super::*;
