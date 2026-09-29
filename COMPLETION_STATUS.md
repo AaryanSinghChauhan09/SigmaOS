@@ -332,6 +332,30 @@ The SigmaOS repository has been successfully consolidated from a fragmented stat
   - Fine-grained resource permission management
   - Standard capabilities for typical processes
 
+- **Installation Manager** (src/installer/installation.rs)
+  - Implements Wiki 01-Installation.md installation specifications
+  - Architecture: X86_64, ARM64, X86, ARM with 64-bit detection
+  - SystemRequirements: min/recommended RAM and storage, UEFI/Secure Boot support
+  - InstallationMethod: BareMetal, VirtualMachine, DualBoot
+  - VmType: QEMU, VirtualBox, VMware with default memory/storage
+  - InstallationConfig: method, architecture, VM type, memory, storage, KVM, graphics
+  - InstallationManager: compatibility checking, command generation, validation
+  - QEMU command generation with KVM and graphics support
+  - DD command generation for bare metal installation
+  - Configuration validation with error reporting
+
+- **Onboarding Wizard** (src/desktop/onboarding.rs)
+  - Implements Wiki 02-Getting-Started.md onboarding specifications
+  - Language: code, name, native_name with built-in languages (EN, ES, FR, DE, JA, ZH)
+  - Region: code, name, timezone with built-in regions (US, EU, UK, JP, CN)
+  - OnboardingStep: LanguageAndRegion, NetworkConfiguration, UserAccountSetup, DesktopThemeSelection, PrivacySettings, Complete
+  - DesktopTheme: Light, Dark, Auto
+  - PrivacySettings: usage data, crash reports, location services, automatic updates
+  - OnboardingConfig: language, region, username, display name, hostname, theme, privacy settings
+  - OnboardingWizard: step navigation, validation, progress tracking, completion
+  - Available languages and regions for selection
+  - Configuration validation with error reporting
+
 - **Namespaces** (src/kernel/namespaces.rs)
   - NamespaceManager for namespace management
   - Namespace with type-specific support (User, Mount, PID, Network, IPC, Uts, Cgroup)
@@ -380,7 +404,7 @@ All changes committed and pushed to GitHub main branch.
 - **Branches**: 1 (main only)
 - **Pull Requests**: 0 (all closed)
 - **Wiki Pages**: 15 (organized by topic)
-- **Features Implemented**: 35+ major subsystems
+- **Features Implemented**: 37+ major subsystems
 - **All changes**: Committed and pushed to GitHub
 
 ## Session 5 Completion Summary (2026-09-29)
@@ -393,6 +417,8 @@ All changes committed and pushed to GitHub main branch.
 - ✅ Implemented Fstab configuration manager from Wiki 05-Filesystems.md
 - ✅ Implemented kernel module development tools from Wiki 10-Development.md
 - ✅ Implemented capability-based security from Wiki 07-Security.md
+- ✅ Implemented installation manager from Wiki 01-Installation.md
+- ✅ Implemented onboarding wizard from Wiki 02-Getting-Started.md
 - ✅ Updated COMPLETION_STATUS.md with new implementations
 - ✅ All changes committed and pushed to GitHub main branch
 
@@ -400,7 +426,7 @@ All changes committed and pushed to GitHub main branch.
 - **Branches**: 1 (main only)
 - **Pull Requests**: 0 (all closed)
 - **Wiki Pages**: 15 (organized by topic)
-- **Features Implemented**: 35+ major subsystems
+- **Features Implemented**: 37+ major subsystems
 - **Compilation**: cargo check --lib passes with 0 errors
 - **Test Suite**: run_sigma_tests.sh passes
 - **GitHub Sync**: Fully synchronized
@@ -408,7 +434,7 @@ All changes committed and pushed to GitHub main branch.
 
 ### Pending Tasks
 - ⚠️ cargo test has 207 test compilation errors (unimplemented Linux/BSD components)
-- ⚠️ 1259 warnings remain (mostly cfg(test_disabled), unused variables, imports)
+- ⚠️ 1262 warnings remain (mostly cfg(test_disabled), unused variables, imports)
 - ⚠️ 23 CodeQL alerts remain (all rust/unused-variable, low severity)
 
 ## Overall Completion Summary
