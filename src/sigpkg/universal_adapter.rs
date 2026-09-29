@@ -176,6 +176,25 @@ pub struct SlackwarePkgManifest {
     pub slack_required: Vec<String>,
 }
 
+/// Description of DNF/Yum Primary Repomd XML manifest entry
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DnfPrimaryXmlManifest {
+    pub name: String,
+    pub version: String,
+    pub arch: String,
+    pub summary: String,
+    pub requires: Vec<String>,
+}
+
+/// Description of Nix expression manifest
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NixExpressionManifest {
+    pub pname: String,
+    pub version: String,
+    pub description: String,
+    pub build_inputs: Vec<String>,
+}
+
 pub struct UniversalPackageAdapter;
 
 impl UniversalPackageAdapter {
@@ -929,6 +948,131 @@ impl UniversalPackageAdapter {
             version,
             description,
             slack_required,
+        })
+    }
+
+    /// Parses Fedora/DNF repomd primary XML manifest text
+    pub fn parse_dnf_primary_xml(&self, text: &str) -> Result<DnfPrimaryXmlManifest, &'static str> {
+        let mut name = String::new();
+        let mut version = String::new();
+        let mut arch = String::from("x86_64");
+        let mut summary = String::new();
+        let mut requires = Vec::new();
+
+        let mut in_entry = false;
+        for line in text.lines() {
+            let line = line.trim();
+            if line.contains("<package") || line.contains("<package type=") {
+                in_entry = true;
+            }
+            if !in_entry {
+                continue;
+            }
+            if line.starts_with("<name>") && line.ends_with("</name>") {
+                name = line["<name>".len()..line.len() - "</name>".len()].trim().to_string();
+            } else if line.starts_with("<summary>") && line.ends_with("</summary>") {
+                summary = line["<summary>".len()..line.len() - "</summary>".len()].trim().to_string();
+            } else if line.contains("ver=") {
+                if let Some(pos) = line.find("ver=\"") {
+                    let rest = &line[pos + 5..];
+                    if let Some(end) = rest.find('"') {
+                        version = rest[..end].to_string();
+                    }
+                }
+            } else if line.contains("arch=") {
+                if let Some(pos) = line.find("arch=\"") {
+                    let rest = &line[pos + 6..];
+                    if let Some(end) = rest.find('"') {
+                        arch = rest[..end].to_string();
+                    }
+                }
+            } else if line.contains("<rpm:entry name=\"") {
+                if let Some(pos) = line.find("name=\"") {
+                    let rest = &line[pos + 6..];
+                    if let Some(end) = rest.find('"') {
+                        let dep_name = &rest[..end];
+                        if !dep_name.starts_with("rpmlib(") && !dep_name.starts_with("config(") {
+                            requires.push(dep_name.to_string());
+                        }
+                    }
+                }
+            }
+        }
+
+        if name.is_empty() {
+            return Err("Invalid DNF primary XML: missing <name>");
+        }
+        if version.is_empty() {
+            version = "1.0.0".to_string();
+        }
+
+        Ok(DnfPrimaryXmlManifest {
+            name,
+            version,
+            arch,
+            summary,
+            requires,
+        })
+    }
+
+    /// Parses Nix expression text (`default.nix` / `package.nix`)
+    pub fn parse_nix_expression(&self, text: &str) -> Result<NixExpressionManifest, &'static str> {
+        let mut pname = String::new();
+        let mut version = String::new();
+        let mut description = String::new();
+        let mut build_inputs = Vec::new();
+
+        let mut in_inputs = false;
+        for line in text.lines() {
+            let line = line.trim();
+            if line.is_empty() || line.starts_with('#') {
+                continue;
+            }
+            if line.starts_with("pname =") || line.starts_with("name =") {
+                if let Some(pos) = line.find('=') {
+                    pname = line[pos + 1..]
+                        .trim()
+                        .trim_matches(|c| c == '"' || c == '\'' || c == ';' || c == ' ')
+                        .to_string();
+                }
+            } else if line.starts_with("version =") {
+                if let Some(pos) = line.find('=') {
+                    version = line[pos + 1..]
+                        .trim()
+                        .trim_matches(|c| c == '"' || c == '\'' || c == ';' || c == ' ')
+                        .to_string();
+                }
+            } else if line.starts_with("description =") {
+                if let Some(pos) = line.find('=') {
+                    description = line[pos + 1..]
+                        .trim()
+                        .trim_matches(|c| c == '"' || c == '\'' || c == ';' || c == ' ')
+                        .to_string();
+                }
+            } else if line.starts_with("buildInputs =") || line.starts_with("propagatedBuildInputs =") {
+                in_inputs = true;
+            } else if line.contains(']') && in_inputs {
+                in_inputs = false;
+            } else if in_inputs {
+                let cleaned = line.trim_matches(|c| c == '[' || c == ']' || c == ';' || c == ' ');
+                for input in cleaned.split_whitespace() {
+                    build_inputs.push(input.to_string());
+                }
+            }
+        }
+
+        if pname.is_empty() {
+            pname = "nix-pkg".to_string();
+        }
+        if version.is_empty() {
+            version = "1.0.0".to_string();
+        }
+
+        Ok(NixExpressionManifest {
+            pname,
+            version,
+            description,
+            build_inputs,
         })
     }
 
@@ -1830,13 +1974,17 @@ impl UniversalDependencyMapper {
 
         match clean {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl"
-            | "dev-libs/openssl" => "openssl".to_string(),
+            | "dev-libs/openssl" | "libgnutls-dev" | "gnutls-devel" | "mbedtls-devel" | "libmbedtls-dev" => "openssl".to_string(),
             "libc6" | "glibc" | "musl" | "musl-dev" | "devel/glibc" | "sys-libs/glibc" | "libc"
-            | "freebsd-runtime" | "openbsd-sys" | "dragonfly-runtime" | "bedrock-core" | "haiku-libroot" | "pkgsrc-core" => {
+            | "freebsd-runtime" | "openbsd-sys" | "dragonfly-runtime" | "bedrock-core" | "haiku-libroot" | "pkgsrc-core"
+            | "libm" | "libpthread" | "libdl" | "librt" | "libutil" => {
                 "libc".to_string()
             }
             "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
                 "zlib".to_string()
+            }
+            "bzip2" | "libbz2-dev" | "bzip2-devel" | "brotli" | "libbrotli-dev" | "lzo" | "liblzo2-dev" => {
+                "compression".to_string()
             }
             "python" | "python3" | "python3-dev" | "python3-devel" | "python3-base" | "python-core" | "dev-lang/python"
             | "lang/python" => "python".to_string(),
@@ -1897,6 +2045,8 @@ impl UniversalDependencyMapper {
             "wireguard" | "openvpn" | "tailscale" => "vpn".to_string(),
             "hyprland" | "sway" | "i3" | "mutter" | "kwin" => "window-manager".to_string(),
             "alacritty" | "kitty" | "foot" | "konsole" | "xterm" => "terminal-emulator".to_string(),
+            "docker" | "podman" | "containerd" | "cri-o" | "lxc" => "container-runtime".to_string(),
+            "cuda" | "rocm" | "onnxruntime" | "libtorch" | "tensorflow" | "vllm" => "ai-runtime".to_string(),
             _ => clean.to_string(),
         }
     }
@@ -2026,6 +2176,8 @@ impl UniversalSandboxCapabilityMatrix {
                 || c == "--share=network"
                 || c == "inet"
                 || c == "inet6"
+                || c == "cap_net"
+                || c == "cap_net_bind_service"
             {
                 perms.push(Permission::NetworkTcp);
                 perms.push(Permission::NetworkUdp);
@@ -2035,6 +2187,12 @@ impl UniversalSandboxCapabilityMatrix {
                 || c == "rpath"
                 || c == "wpath"
                 || c == "cpath"
+                || c == "landlock_read"
+                || c == "landlock_write"
+                || c == "cap_read"
+                || c == "cap_write"
+                || c == "unveil_r"
+                || c == "unveil_rw"
             {
                 perms.push(Permission::FileRead);
                 perms.push(Permission::FileWrite);

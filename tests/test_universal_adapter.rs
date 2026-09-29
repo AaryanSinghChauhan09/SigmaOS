@@ -364,3 +364,41 @@ fn test_all_unified_package_formats_resolution() {
         assert_eq!(pkg.name, "demo");
     }
 }
+
+#[test]
+fn test_dnf_xml_and_nix_expression_parsing() {
+    use universal_adapter::UniversalPackageAdapter;
+
+    let adapter = UniversalPackageAdapter::new();
+
+    let dnf_xml = r#"
+    <package type="rpm">
+      <name>fedorautils</name>
+      <summary>Fedora System Maintenance Utility</summary>
+      <version ver="1.2.3"/>
+      <architecture arch="x86_64"/>
+      <rpm:entry name="glibc"/>
+      <rpm:entry name="libssl-dev"/>
+    </package>
+    "#;
+
+    let parsed_dnf = adapter.parse_dnf_primary_xml(dnf_xml).unwrap();
+    assert_eq!(parsed_dnf.name, "fedorautils");
+    assert_eq!(parsed_dnf.version, "1.2.3");
+    assert_eq!(parsed_dnf.requires, vec!["glibc", "libssl-dev"]);
+
+    let nix_expr = r#"
+    pname = "sigma-cli"
+    version = "2.0.0"
+    description = "SigmaOS command line tools"
+    buildInputs = [
+      pkgs.openssl
+      pkgs.zlib
+    ]
+    "#;
+
+    let parsed_nix = adapter.parse_nix_expression(nix_expr).unwrap();
+    assert_eq!(parsed_nix.pname, "sigma-cli");
+    assert_eq!(parsed_nix.version, "2.0.0");
+    assert_eq!(parsed_nix.build_inputs, vec!["pkgs.openssl", "pkgs.zlib"]);
+}
