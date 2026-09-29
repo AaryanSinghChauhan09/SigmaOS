@@ -30,6 +30,7 @@ pub mod sigmafs;
 pub mod xfs;
 pub mod fscrypt;
 pub mod autofs;
+pub mod autofs_manager;
 pub use sigmacas::{CasBlock, SigmaFsCasEngine, DILITHIUM5_SIGNATURE_SIZE, SHA256_HASH_SIZE};
 pub use sigmafs::{
     AhciSataController, BlockStorageDevice, BlockStorageError, JournalBlock, JournalBlockType,
@@ -46,6 +47,11 @@ pub use fscrypt::{
 
 pub use autofs::{
     MountTriggerType, MountPoint, AutoFsManager,
+};
+
+pub use autofs_manager::{
+    AutoFsTrigger, AutoFsState, AutoFsEntry, AutoFsManager as AutoFsManagerNew,
+    AutoFsStats,
 };
 
 pub use fstab::{
