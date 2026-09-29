@@ -27,6 +27,7 @@ pub mod user_namespace;
 
 pub mod bridge;
 pub mod capability_token;
+pub mod capability_based_security;
 pub mod cleaner;
 pub mod clipboard;
 pub mod deobfuscation;
@@ -150,6 +151,9 @@ pub use vpn::{
     PiaSplitTunnelGovernor, PiaStrictKillSwitch, PiaVpnManager, SecureVpnClient, SplitTunnelRule,
     VpnConfig, VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics,
     WireGuardHandler,
+};
+pub use capability_based_security::{
+    CapabilityType, CapabilityGrant, CapabilityManager,
 };
 pub use crate::security::vulnerability::{
     ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
