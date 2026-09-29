@@ -1626,7 +1626,7 @@ impl Default for SigmaDocsEnterpriseCollaborationEngine {
 // 9. Salesforce / Zoho CRM / Odoo / Bitrix24 Enterprise Engine
 // ==========================================================
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum DealStage {
     LeadQualification,
     NeedsAnalysis,
@@ -4445,6 +4445,390 @@ impl Default for SovereignAutomatedCrmBotEngine {
     }
 }
 
+// ==========================================================
+// 41. Google Sheets / Excel Advanced Financial & Lookup Formula Engine
+// ==========================================================
+
+pub struct SovereignFinancialLookupFormulaEngine;
+
+impl SovereignFinancialLookupFormulaEngine {
+    /// Simulates VLOOKUP: search for lookup_key in key_col, returning value from target_col
+    pub fn vlookup(
+        spreadsheet: &SpreadsheetProcessor,
+        lookup_key: &str,
+        key_col: u32,
+        target_col: u32,
+        start_row: u32,
+        end_row: u32,
+    ) -> Option<CellValue> {
+        for r in start_row..=end_row {
+            if let Some(cell_val) = spreadsheet.get_cell(r, key_col) {
+                let cell_key = match cell_val {
+                    CellValue::Text(s) => s.clone(),
+                    CellValue::Number(n) => n.to_string(),
+                    CellValue::Boolean(b) => b.to_string(),
+                    CellValue::Empty | CellValue::Formula(_) => String::new(),
+                };
+                if cell_key == lookup_key {
+                    return spreadsheet.get_cell(r, target_col).cloned();
+                }
+            }
+        }
+        None
+    }
+
+    /// PMT: Calculates loan payment amount given rate per period, total periods (nper), and principal (pv)
+    pub fn calculate_pmt(rate: f64, nper: u32, pv: f64) -> f64 {
+        if rate == 0.0 {
+            return -pv / (nper as f64);
+        }
+        let pmt = (pv * rate) / (1.0 - (1.0 + rate).powi(-(nper as i32)));
+        -pmt
+    }
+
+    /// NPV: Calculates Net Present Value given rate and cash flows
+    pub fn calculate_npv(rate: f64, cash_flows: &[f64]) -> f64 {
+        let mut npv = 0.0;
+        for (i, &cf) in cash_flows.iter().enumerate() {
+            npv += cf / (1.0 + rate).powi((i + 1) as i32);
+        }
+        npv
+    }
+
+    /// SLN: Calculates Straight-Line Depreciation
+    pub fn calculate_sln(cost: f64, salvage: f64, life: f64) -> f64 {
+        if life <= 0.0 {
+            0.0
+        } else {
+            (cost - salvage) / life
+        }
+    }
+}
+
+// ==========================================================
+// 42. Google Drawings / MS Visio Vector Canvas & Layer Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct VectorCanvasShape {
+    pub shape_id: u32,
+    pub shape_type: ShapeType,
+    pub bounds: (f32, f32, f32, f32), // x, y, width, height
+    pub fill_rgba: [u8; 4],
+    pub stroke_rgba: [u8; 4],
+    pub z_index: u32,
+    pub group_id: Option<u32>,
+}
+
+pub struct SovereignVectorDiagrammingCanvasEngine {
+    pub shapes: Vec<VectorCanvasShape>,
+    pub next_id: u32,
+}
+
+impl SovereignVectorDiagrammingCanvasEngine {
+    pub fn new() -> Self {
+        Self {
+            shapes: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn add_shape(
+        &mut self,
+        shape_type: ShapeType,
+        bounds: (f32, f32, f32, f32),
+        fill: [u8; 4],
+        stroke: [u8; 4],
+    ) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        let z = self.shapes.len() as u32;
+        self.shapes.push(VectorCanvasShape {
+            shape_id: id,
+            shape_type,
+            bounds,
+            fill_rgba: fill,
+            stroke_rgba: stroke,
+            z_index: z,
+            group_id: None,
+        });
+        id
+    }
+
+    pub fn group_shapes(&mut self, shape_ids: &[u32], group_id: u32) {
+        for s in &mut self.shapes {
+            if shape_ids.contains(&s.shape_id) {
+                s.group_id = Some(group_id);
+            }
+        }
+    }
+
+    pub fn bring_to_front(&mut self, shape_id: u32) {
+        let max_z = self.shapes.iter().map(|s| s.z_index).max().unwrap_or(0);
+        if let Some(s) = self.shapes.iter_mut().find(|s| s.shape_id == shape_id) {
+            s.z_index = max_z + 1;
+        }
+    }
+}
+
+impl Default for SovereignVectorDiagrammingCanvasEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 43. Salesforce Einstein AI Weighted Revenue Forecasting Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct OpportunityStageProbability {
+    pub stage: DealStage,
+    pub default_win_probability: f64,
+}
+
+pub struct SovereignEinsteinAiForecastingEngine {
+    pub stage_probabilities: HashMap<DealStage, f64>,
+}
+
+impl SovereignEinsteinAiForecastingEngine {
+    pub fn new() -> Self {
+        let mut map = HashMap::new();
+        map.insert(DealStage::LeadQualification, 0.10);
+        map.insert(DealStage::NeedsAnalysis, 0.25);
+        map.insert(DealStage::ProposalSent, 0.50);
+        map.insert(DealStage::Negotiation, 0.80);
+        map.insert(DealStage::ClosedWon, 1.00);
+        map.insert(DealStage::ClosedLost, 0.00);
+        Self { stage_probabilities: map }
+    }
+
+    pub fn calculate_weighted_pipeline_forecast(&self, crm_engine: &SovereignEnterpriseCrmErpEngine) -> f64 {
+        let mut total_weighted = 0.0;
+        for deal in &crm_engine.deals {
+            let prob = self.stage_probabilities.get(&deal.stage).cloned().unwrap_or(0.0);
+            total_weighted += deal.deal_value * prob;
+        }
+        total_weighted
+    }
+}
+
+impl Default for SovereignEinsteinAiForecastingEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 44. Odoo MRP Shop Floor Work Order Execution Engine
+// ==========================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum WorkOrderStatus {
+    Pending,
+    InProduction,
+    QualityCheck,
+    Completed,
+    Blocked,
+}
+
+#[derive(Debug, Clone)]
+pub struct ShopFloorWorkOrder {
+    pub work_order_id: u32,
+    pub finished_sku: String,
+    pub qty_to_produce: u32,
+    pub workstation_id: u32,
+    pub status: WorkOrderStatus,
+    pub elapsed_seconds: u32,
+    pub quality_passed: Option<bool>,
+}
+
+pub struct SovereignShopFloorWorkOrderEngine {
+    pub work_orders: Vec<ShopFloorWorkOrder>,
+    pub next_id: u32,
+}
+
+impl SovereignShopFloorWorkOrderEngine {
+    pub fn new() -> Self {
+        Self {
+            work_orders: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn create_work_order(&mut self, sku: &str, qty: u32, workstation_id: u32) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.work_orders.push(ShopFloorWorkOrder {
+            work_order_id: id,
+            finished_sku: sku.to_string(),
+            qty_to_produce: qty,
+            workstation_id,
+            status: WorkOrderStatus::Pending,
+            elapsed_seconds: 0,
+            quality_passed: None,
+        });
+        id
+    }
+
+    pub fn start_production(&mut self, wo_id: u32) -> bool {
+        if let Some(wo) = self.work_orders.iter_mut().find(|w| w.work_order_id == wo_id) {
+            wo.status = WorkOrderStatus::InProduction;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn record_work_time(&mut self, wo_id: u32, seconds: u32) -> bool {
+        if let Some(wo) = self.work_orders.iter_mut().find(|w| w.work_order_id == wo_id) {
+            wo.elapsed_seconds += seconds;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn complete_quality_check(&mut self, wo_id: u32, passed: bool) -> bool {
+        if let Some(wo) = self.work_orders.iter_mut().find(|w| w.work_order_id == wo_id) {
+            wo.quality_passed = Some(passed);
+            wo.status = if passed { WorkOrderStatus::Completed } else { WorkOrderStatus::Blocked };
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for SovereignShopFloorWorkOrderEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 45. Bitrix24 / Teams Interactive IVR & Workgroup Polls Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct WorkgroupPollOption {
+    pub option_id: u32,
+    pub text: String,
+    pub votes: u32,
+}
+
+#[derive(Debug, Clone)]
+pub struct WorkgroupPoll {
+    pub poll_id: u32,
+    pub question: String,
+    pub options: Vec<WorkgroupPollOption>,
+}
+
+pub struct SovereignIvrCallRoutingPollsEngine {
+    pub polls: Vec<WorkgroupPoll>,
+    pub next_poll_id: u32,
+}
+
+impl SovereignIvrCallRoutingPollsEngine {
+    pub fn new() -> Self {
+        Self {
+            polls: Vec::new(),
+            next_poll_id: 1,
+        }
+    }
+
+    pub fn create_poll(&mut self, question: &str, options_text: Vec<String>) -> u32 {
+        let pid = self.next_poll_id;
+        self.next_poll_id += 1;
+        let mut opts = Vec::new();
+        for (idx, txt) in options_text.into_iter().enumerate() {
+            opts.push(WorkgroupPollOption {
+                option_id: (idx + 1) as u32,
+                text: txt,
+                votes: 0,
+            });
+        }
+        self.polls.push(WorkgroupPoll {
+            poll_id: pid,
+            question: question.to_string(),
+            options: opts,
+        });
+        pid
+    }
+
+    pub fn vote_poll(&mut self, poll_id: u32, option_id: u32) -> bool {
+        if let Some(poll) = self.polls.iter_mut().find(|p| p.poll_id == poll_id) {
+            if let Some(opt) = poll.options.iter_mut().find(|o| o.option_id == option_id) {
+                opt.votes += 1;
+                return true;
+            }
+        }
+        false
+    }
+}
+
+impl Default for SovereignIvrCallRoutingPollsEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 46. Zoho Books Recurring Billing & Overdue Penalty Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct RecurringInvoiceProfile {
+    pub profile_id: u32,
+    pub customer_email: String,
+    pub base_amount: f64,
+    pub interval_days: u32,
+    pub overdue_penalty_rate_percent: f64,
+}
+
+pub struct SovereignRecurringBillingAutomationEngine {
+    pub profiles: Vec<RecurringInvoiceProfile>,
+    pub next_id: u32,
+}
+
+impl SovereignRecurringBillingAutomationEngine {
+    pub fn new() -> Self {
+        Self {
+            profiles: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn create_profile(&mut self, email: &str, amount: f64, days: u32, penalty_rate: f64) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.profiles.push(RecurringInvoiceProfile {
+            profile_id: id,
+            customer_email: email.to_string(),
+            base_amount: amount,
+            interval_days: days,
+            overdue_penalty_rate_percent: penalty_rate,
+        });
+        id
+    }
+
+    pub fn calculate_overdue_invoice_total(&self, profile_id: u32, days_overdue: u32) -> Option<f64> {
+        let profile = self.profiles.iter().find(|p| p.profile_id == profile_id)?;
+        if days_overdue == 0 {
+            Some(profile.base_amount)
+        } else {
+            let penalty = profile.base_amount * (profile.overdue_penalty_rate_percent / 100.0) * (days_overdue as f64 / 30.0);
+            Some(profile.base_amount + penalty)
+        }
+    }
+}
+
+impl Default for SovereignRecurringBillingAutomationEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // Placeholder types for compilation
 mod sigma_types {
     pub type Result<T> = core::result::Result<T, &'static str>;
@@ -5105,5 +5489,69 @@ mod tests {
         bot_engine.add_intent("pricing", "Our plans start at $10/mo.");
         let reply = bot_engine.process_message("What is your pricing model?");
         assert_eq!(reply, "Our plans start at $10/mo.");
+    }
+
+    #[test]
+    fn test_new_suite_engines_financial_vector_forecasting_mrp_ivr_billing() {
+        let cap = sigma_types::CapabilityToken { id: 400 };
+
+        // 1. Financial & Lookup Formulas
+        let mut sheet = SpreadsheetProcessor::new("Financial Modeling".to_string(), cap);
+        sheet.set_cell(1, 0, CellValue::Text("SKU-100".to_string())).unwrap();
+        sheet.set_cell(1, 1, CellValue::Number(299.99)).unwrap();
+        sheet.set_cell(2, 0, CellValue::Text("SKU-200".to_string())).unwrap();
+        sheet.set_cell(2, 1, CellValue::Number(499.99)).unwrap();
+
+        let price_cell = SovereignFinancialLookupFormulaEngine::vlookup(&sheet, "SKU-200", 0, 1, 1, 2);
+        assert_eq!(price_cell, Some(CellValue::Number(499.99)));
+
+        let pmt = SovereignFinancialLookupFormulaEngine::calculate_pmt(0.05 / 12.0, 360, 200000.0);
+        assert!((pmt.abs() - 1073.64).abs() < 1.0);
+
+        let npv = SovereignFinancialLookupFormulaEngine::calculate_npv(0.10, &[100.0, 200.0, 300.0]);
+        assert!((npv - 481.59).abs() < 1e-1);
+
+        let sln = SovereignFinancialLookupFormulaEngine::calculate_sln(10000.0, 1000.0, 5.0);
+        assert_eq!(sln, 1800.0);
+
+        // 2. Vector Canvas Diagramming
+        let mut canvas = SovereignVectorDiagrammingCanvasEngine::new();
+        let s1 = canvas.add_shape(ShapeType::Rectangle, (0.0, 0.0, 50.0, 50.0), [255, 0, 0, 255], [0, 0, 0, 255]);
+        let s2 = canvas.add_shape(ShapeType::Circle, (20.0, 20.0, 30.0, 30.0), [0, 255, 0, 255], [0, 0, 0, 255]);
+        canvas.group_shapes(&[s1, s2], 101);
+        canvas.bring_to_front(s1);
+        assert_eq!(canvas.shapes[0].group_id, Some(101));
+        assert_eq!(canvas.shapes[0].z_index, 2);
+
+        // 3. Salesforce Einstein AI Forecasting
+        let mut crm = SovereignEnterpriseCrmErpEngine::new();
+        let d1 = crm.create_deal("Deal A", "Cust A", 100000.0);
+        let d2 = crm.create_deal("Deal B", "Cust B", 50000.0);
+        crm.update_deal_stage(d1, DealStage::ProposalSent); // 50%
+        crm.update_deal_stage(d2, DealStage::Negotiation); // 80%
+
+        let einstein = SovereignEinsteinAiForecastingEngine::new();
+        let forecast = einstein.calculate_weighted_pipeline_forecast(&crm);
+        assert_eq!(forecast, 90000.0); // 100k*0.5 + 50k*0.8 = 50k + 40k = 90k
+
+        // 4. Odoo MRP Shop Floor Execution
+        let mut shop_floor = SovereignShopFloorWorkOrderEngine::new();
+        let wo_id = shop_floor.create_work_order("MOT-01", 10, 1);
+        assert!(shop_floor.start_production(wo_id));
+        assert!(shop_floor.record_work_time(wo_id, 3600));
+        assert!(shop_floor.complete_quality_check(wo_id, true));
+        assert_eq!(shop_floor.work_orders[0].status, WorkOrderStatus::Completed);
+
+        // 5. Bitrix24 / Teams Polls
+        let mut ivr_polls = SovereignIvrCallRoutingPollsEngine::new();
+        let poll_id = ivr_polls.create_poll("Preferred Sprint Length?", vec!["1 Week".to_string(), "2 Weeks".to_string()]);
+        assert!(ivr_polls.vote_poll(poll_id, 2));
+        assert_eq!(ivr_polls.polls[0].options[1].votes, 1);
+
+        // 6. Zoho Books Recurring Billing
+        let mut recurring = SovereignRecurringBillingAutomationEngine::new();
+        let prof_id = recurring.create_profile("sub@corp.com", 1000.0, 30, 5.0);
+        let total_due = recurring.calculate_overdue_invoice_total(prof_id, 60).unwrap();
+        assert_eq!(total_due, 1100.0); // 1000 + (1000 * 0.05 * 2) = 1100
     }
 }

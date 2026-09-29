@@ -81,4 +81,8 @@ pub use sigma_office::{
     SuggestionEdit, TextProcessor, TicketPriority, TicketStatus, TypographyRenderer, ValidationRuleType,
     VersionHistoryManager, VidScene, VivaCommunityPost, WebLayoutBlock, WhiteboardElement, WhiteboardElementType,
     WorkCenter, WorkgroupChannelMessage, WorkgroupTask, WorkflowAction, WorkflowRule, WorkflowTrigger,
+    OpportunityStageProbability, RecurringInvoiceProfile, ShopFloorWorkOrder, SovereignEinsteinAiForecastingEngine,
+    SovereignFinancialLookupFormulaEngine, SovereignIvrCallRoutingPollsEngine, SovereignRecurringBillingAutomationEngine,
+    SovereignShopFloorWorkOrderEngine, SovereignVectorDiagrammingCanvasEngine, VectorCanvasShape, WorkOrderStatus,
+    WorkgroupPoll, WorkgroupPollOption,
 };
