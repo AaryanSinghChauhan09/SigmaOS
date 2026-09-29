@@ -9,6 +9,7 @@ pub mod network_syscalls;
 pub mod linux_bsd_network_innovations;
 pub mod network_config;
 pub mod diagnostics;
+pub mod bonding;
 
 pub use linux_bsd_network_innovations::{
     BbrState, CongestionAlgorithm, FreeBsdNetgraphGraphRouter, LinuxBbrCongestionEngine,
@@ -78,3 +79,6 @@ pub use diagnostics::{
 };
 pub use zero_copy::{ZeroCopyBuffer, ZeroCopyBufferPool, ZeroCopyPacket, ZeroCopyRingBuffer, PacketMetadata};
 pub use network_config::{InterfaceConfig, InterfaceType, ConfigMethod, NetworkConfigManager};
+pub use bonding::{
+    BondingMode, BondStatus, SlaveInterface, BondInterface, NetworkBondingManager,
+};
