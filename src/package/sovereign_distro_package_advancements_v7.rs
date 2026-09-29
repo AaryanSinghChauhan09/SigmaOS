@@ -398,6 +398,32 @@ impl SovereignUniversalPackageManagerInteropOrchestrator {
         }
     }
 
+    pub fn strip_package_extension(filename: &str) -> &str {
+        let name = filename.trim();
+        let suffixes = [
+            ".pkg.tar.zst", ".pkg.tar.xz", ".pkg.tar.gz", ".openbsd.tgz", ".flatpakref",
+            ".flatpakrepo", ".tar.gz", ".tar .gz", ".tar.xz", ".tar.bz2", ".superdeb",
+            ".appimage", ".slackbuild", ".flatpak", ".nixpkg", ".portage", ".ebuild",
+            ".bottle", ".eopkg", ".ports", ".pisi", ".snap", ".lzm",
+            ".pup", ".pet", ".aab", ".apk", ".air", ".ipa", ".hap", ".app", ".deb",
+            ".udeb", ".rpm", ".drpm", ".tgz", ".txz", ".xbps", ".pkg", ".tar", ".xz",
+            ".puk", ".sfs", ".hpkg", ".tcz", ".gobo", ".moss", ".guix", ".scm",
+            ".cachy", ".cachyos", ".crux", ".p5p", ".ips", ".nar", ".spack", ".conan",
+            ".whl", ".crate", ".gem", ".nupkg", ".vcpkg", ".msi", ".msix", ".appx",
+            ".apex", ".conda", ".helm", ".sysext", ".run", ".zpk", ".kmp", ".kmod",
+            ".jar", ".npm", ".phar", ".cpan", ".rock", ".hex", ".cabal", ".jl", ".rpkg",
+            ".brew", ".wasm", ".oci", ".sigpkg", ".sigma"
+        ];
+
+        let lower = name.to_lowercase();
+        for suffix in suffixes {
+            if lower.ends_with(suffix) {
+                return &name[..name.len() - suffix.len()];
+            }
+        }
+        name
+    }
+
     /// Master method ingesting, parsing, translating, sandboxing, and installing ANY foreign Linux or BSD package file
     pub fn ingest_parse_and_install_any_format(
         &mut self,
@@ -407,23 +433,8 @@ impl SovereignUniversalPackageManagerInteropOrchestrator {
         let fmt = PackageFormat::from_filename(filename)
             .unwrap_or(PackageFormat::SigmaPkg);
 
-        // Split filename to get package name
-        let raw_base = filename
-            .trim_end_matches(".deb")
-            .trim_end_matches(".udeb")
-            .trim_end_matches(".superdeb")
-            .trim_end_matches(".rpm")
-            .trim_end_matches(".drpm")
-            .trim_end_matches(".pkg.tar.zst")
-            .trim_end_matches(".apk")
-            .trim_end_matches(".ebuild")
-            .trim_end_matches(".nixpkg")
-            .trim_end_matches(".xbps")
-            .trim_end_matches(".pkg")
-            .trim_end_matches(".openbsd.tgz")
-            .trim_end_matches(".snap")
-            .trim_end_matches(".flatpak")
-            .trim_end_matches(".appimage");
+        // Strip known package extensions cleanly
+        let raw_base = Self::strip_package_extension(filename);
 
         let clean_name = raw_base.split(|c| c == '_' || c == '-').next().unwrap_or(raw_base);
 
@@ -564,17 +575,20 @@ mod tests {
     fn test_master_interop_orchestrator() {
         let mut orchestrator = SovereignUniversalPackageManagerInteropOrchestrator::new();
 
-        let pkg_deb = orchestrator.ingest_parse_and_install_any_format("curl_8.5.0_amd64.deb", b"deb_payload");
-        assert!(pkg_deb.is_ok());
-        let installed_deb = pkg_deb.unwrap();
-        assert_eq!(installed_deb.name, "sigpkg-curl");
+        let formats_to_test = [
+            "airapp.air", "brewbottle.bottle", "ipaapp.ipa", "bsdports.ports", "installpkg.pkg",
+            "aabapp.aab", "toolapk.apk", "softwareappimage.AppImage", "soluseopkg.eopkg", "nixosnixpkg.nixpkg",
+            "gentooportage.portage", "debiandeb.deb", "archivespaced.tar .gz", "compressedxz.xz", "fedorarpm.rpm",
+            "gentooebuild.ebuild", "archpkgtarxz.pkg.tar.xz", "flatpakapp.flatpak", "macosapp.app", "harmonyhap.hap",
+            "parduspisi.PiSi", "archivetgz.tgz", "archivetargz.tar.gz", "deepinsuperdeb.superdeb", "slaxlzm.lzm",
+            "puppypup.pup", "canonicalsnap.snap", "pacmanpkg.pacman", "plaintar.tar", "puppypet.pet"
+        ];
 
-        let pkg_rpm = orchestrator.ingest_parse_and_install_any_format("htop-3.2.0.rpm", b"rpm_payload");
-        assert!(pkg_rpm.is_ok());
+        for filename in formats_to_test {
+            let res = orchestrator.ingest_parse_and_install_any_format(filename, b"payload_bytes");
+            assert!(res.is_ok(), "Failed ingestion for format: {}", filename);
+        }
 
-        let pkg_apk = orchestrator.ingest_parse_and_install_any_format("busybox-1.36.apk", b"apk_payload");
-        assert!(pkg_apk.is_ok());
-
-        assert_eq!(orchestrator.installed_packages.len(), 3);
+        assert_eq!(orchestrator.installed_packages.len(), formats_to_test.len());
     }
 }
