@@ -175,7 +175,8 @@ pub use interrupt::{InterruptController, InterruptVector, InterruptType, Interru
 pub use scheduler::{CfsScheduler, RtScheduler, ProcessTask, Priority, SchedulerPolicy, ProcessState, ThermalState};
 pub use cfi::{CfiEngine, CfiTarget, CfiViolation};
 pub use kptr_restrict::{
-    KptrRestrictLevel, DmesgRestrictLevel, KernelSecurityMitigations, get_security_mitigations,
+    KptrRestrictLevel, DmesgRestrictLevel,
+    KptrRestrict, DmesgRestrict, KernelSecurityParams, SecurityLevel,
 };
 
 pub mod procfs_linux;
