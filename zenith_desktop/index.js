@@ -545,6 +545,25 @@ export function initDockShortcutNavigation() {
   });
 }
 
+/**
+ * Initializes desktop window click-to-raise and focus-to-raise event handlers on .window elements
+ * to elevate zIndex and manage .active-focus state for keyboard and mouse accessibility.
+ */
+export function initWindowFocus() {
+  const windows = SovereignDomSelector.selectAll(".window");
+  windows.forEach((win) => {
+    const raiseWindow = () => {
+      topZIndex += 1;
+      win.style.zIndex = topZIndex;
+      windows.forEach((w) => w.classList.remove("active-focus"));
+      win.classList.add("active-focus");
+    };
+
+    win.addEventListener("mousedown", raiseWindow);
+    win.addEventListener("focusin", raiseWindow);
+  });
+}
+
 // Auto-initialize accessibility listeners when loaded in browser environments
 if (typeof window !== "undefined" && typeof document !== "undefined") {
   if (document.readyState === "loading") {
@@ -558,6 +577,7 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
       initDockShortcutNavigation();
       initMenuNavigation();
       initContextMenu();
+      initWindowFocus();
     });
   } else {
     initKeyboardNavigation();
@@ -569,6 +589,7 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
     initDockShortcutNavigation();
     initMenuNavigation();
     initContextMenu();
+    initWindowFocus();
   }
 }
 
@@ -736,6 +757,7 @@ if (typeof window !== "undefined") {
   window.launchApp = launchApp;
   window.renderCommandResults = renderCommandResults;
   window.initCommandPalette = initCommandPalette;
+  window.initWindowFocus = initWindowFocus;
 }
 
 // Minimal dummy index file to export initialization and basic attributes
