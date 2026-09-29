@@ -1,5 +1,9 @@
 # Bolt's Journal
 
+## 2026-03-31 - Zero-Allocation O(N) Min Selection over O(N^2) Sorting
+**Learning:** Selecting a single minimum/maximum element from a collection (such as latency ranking across network mirrors or priority queues) using sorting algorithms (like bubble sort or `sort_by`) allocates temporary vectors and takes O(N^2) or O(N log N) time. Using `.min_by_key(...)` or `.max_by_key(...)` directly on the filtered iterator executes in linear O(N) time with zero heap allocations.
+**Action:** Replace sorting loops with `.min_by_key(...)` or `.max_by_key(...)` when only the single extremum element is required.
+
 ## 2026-09-27 - Safe Slice Boundary Matching for Package Dependency Resolution
 **Learning:** Hoisting dependency name lookups outside of candidate loops in package managers reduces linear zero-byte scans from O(D * P) to O(D). When matching package names against dependency name slices across trait boundaries (where candidate names may be trimmed slices or fixed-width null-padded buffers), using `.get(dep_len).map_or(true, |&b| b == 0)` ensures safe, panic-free boundary checking.
 **Action:** Always hoist invariant slice lookups out of inner loops and use `slice.get(len).map_or(true, ...)` for safe null-padded slice boundary matching.
