@@ -87,4 +87,28 @@ assert.strictEqual(cmdInputEl.getAttribute("aria-activedescendant"), undefined, 
 zenith.closeCommandPalette();
 assert.strictEqual(cmdInputEl.getAttribute("aria-expanded"), "false", "Expected aria-expanded to be 'false' on close");
 
-console.log("All Command Palette UX tests passed successfully!");
+// Test 5: initWindowFocus attaches handlers and elevates zIndex / active-focus
+const win1 = createMockElement("win1");
+win1.classList.add("window");
+const win2 = createMockElement("win2");
+win2.classList.add("window");
+
+global.document.querySelectorAll = (selector) => {
+  if (selector === ".window") return [win1, win2];
+  return [];
+};
+
+zenith.initWindowFocus();
+
+win1.dispatchEvent({ type: "mousedown" });
+assert.strictEqual(win1.classList.contains("active-focus"), true, "Expected win1 to have active-focus on mousedown");
+assert.strictEqual(win2.classList.contains("active-focus"), false, "Expected win2 to not have active-focus when win1 is focused");
+
+const z1 = Number(win1.style.zIndex);
+win2.dispatchEvent({ type: "focusin" });
+assert.strictEqual(win2.classList.contains("active-focus"), true, "Expected win2 to have active-focus on focusin");
+assert.strictEqual(win1.classList.contains("active-focus"), false, "Expected win1 active-focus to be removed when win2 is focused");
+assert.strictEqual(Number(win2.style.zIndex) > z1, true, "Expected win2 zIndex to be elevated above win1 zIndex");
+console.log("✓ Window focus elevation and active-focus state verified successfully!");
+
+console.log("All Command Palette & Desktop UX tests passed successfully!");
