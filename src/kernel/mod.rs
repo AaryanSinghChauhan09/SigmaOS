@@ -47,6 +47,7 @@ pub use linux_parity::{
 pub mod memory;
 pub mod meta;
 pub mod module_loader;
+pub mod module_tools;
 pub mod namespaces;
 pub mod uts_namespace;
 pub mod net;
@@ -182,3 +183,7 @@ pub use procfs_linux::{
     ProcessInfo, ProcFs,
 };
 pub use sysfs_manager::{Sysfs, SysfsKobject, SysfsAttribute};
+pub use module_tools::{
+    KernelModuleMetadata, KernelModuleConfig, ModuleParameter, KernelModuleSkeleton,
+    KernelModuleBuilder, BuildType, OptimizationLevel, KernelModuleLoader, KernelModuleManager,
+};
