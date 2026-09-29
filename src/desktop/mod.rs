@@ -13,6 +13,7 @@ pub mod screensaver;
 pub mod sovereign_navigation_engine;
 pub mod web_wasm_bridge;
 pub mod zenith_compositor;
+pub mod zenith_config;
 pub mod ultimate_distro_desktop;
 pub mod wayland_protocol;
 pub mod sovereign_ux_innovation_hub;
@@ -66,6 +67,11 @@ pub use moksha::{
 pub use zenith_compositor::{
     DamageRegion, InputEvent, InputEventData, InputEventType, Output, Surface, SurfaceType,
     WindowGeometry, WindowState, ZenithCompositor, ZenithWindow,
+};
+
+pub use zenith_config::{
+    CompositorBackend, CompositorConfig, InputConfig, AppearanceConfig, ZenithConfig,
+    OutputScale, Theme, MouseAcceleration,
 };
 
 pub use crate::desktop::sovereign_navigation_engine::{
