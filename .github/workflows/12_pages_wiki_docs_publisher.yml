@@ -1,0 +1,60 @@
+name: "12: GitHub Pages, Wiki & Documentation Publisher"
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'docs/**'
+      - 'wiki/**'
+      - 'README.md'
+      - '.github/workflows/12_pages_wiki_docs_publisher.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy-docs:
+    name: Build & Publish GitHub Pages & Wiki Site
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Verify Documentation & Wiki Sync Engine
+        run: |
+          mkdir -p build
+          rustc --test src/governance/sovereign_task_guidelines_wiki_sync_engine.rs --edition=2021 -o build/test_wiki_sync
+          ./build/test_wiki_sync
+
+      - name: Generate Static HTML Site Artifacts
+        run: |
+          mkdir -p _site
+          cp README.md _site/index.html || true
+          cp -r docs/* _site/ || true
+          echo "SigmaOS System Architecture & Distribution Documentation Site" > _site/README.txt
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '_site'
+
+  deploy-github-pages:
+    name: Deploy to GitHub Pages
+    needs: build-and-deploy-docs
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
