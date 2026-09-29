@@ -2712,6 +2712,8 @@ mod cross_subsystem_tests {
             DistroSubsystemMode::GhostBsd,
             DistroSubsystemMode::NomadBsd,
             DistroSubsystemMode::LinuxAlpineExtended,
+            DistroSubsystemMode::LinuxVanillaOS,
+            DistroSubsystemMode::LinuxOpenWrt,
             DistroSubsystemMode::LinuxOracle,
             DistroSubsystemMode::LinuxRHEL,
             DistroSubsystemMode::LinuxMX,
@@ -2722,6 +2724,16 @@ mod cross_subsystem_tests {
             DistroSubsystemMode::SolarisOmniOS,
             DistroSubsystemMode::NetBsdRump,
             DistroSubsystemMode::OpenBsdHardened,
+            DistroSubsystemMode::LinuxSerpentOS,
+            DistroSubsystemMode::LinuxFedoraSilverblue,
+            DistroSubsystemMode::LinuxEulerOS,
+            DistroSubsystemMode::LinuxEuroLinux,
+            DistroSubsystemMode::LinuxAnolis,
+            DistroSubsystemMode::LinuxBazzite,
+            DistroSubsystemMode::LinuxBlendOS,
+            DistroSubsystemMode::LinuxDietPi,
+            DistroSubsystemMode::LinuxRegolith,
+            DistroSubsystemMode::LinuxOpenMandriva,
         ];
 
         for m in modes {
