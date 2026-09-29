@@ -9,6 +9,7 @@ pub mod pqc_enclave;
 pub mod governance;
 pub mod audit;
 pub mod system_audit;
+pub mod filesystem_encryption;
 pub mod bsd_hardening;
 pub mod sigma_pledge;
 pub mod sigma_unveil;
@@ -66,6 +67,10 @@ pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use system_audit::{
     AuditEventType as SystemAuditEventType, AuditEvent as SystemAuditEvent, AuditRule, AuditAction, AuditConfig,
     SystemAuditManager,
+};
+pub use filesystem_encryption::{
+    EncryptionType as FsEncryptionType, EncryptionAlgorithm as FsEncryptionAlgorithm, EncryptionStatus as FsEncryptionStatus, FscryptDirectory, LuksDevice,
+    FilesystemEncryptionManager,
 };
 pub use bsd_hardening::{
     AslrEngine, BsdHardeningSuite, CapsicumCapability, CapsicumManager, MemoryPermission,

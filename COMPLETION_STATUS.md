@@ -516,6 +516,22 @@ The SigmaOS repository has been successfully consolidated from a fragmented stat
   - get_statistics for bonding statistics
   - Comprehensive unit tests for all bonding functionality
 
+- **Filesystem Encryption Manager** (src/security/filesystem_encryption.rs)
+  - Implements Wiki 07-Security.md filesystem encryption specifications
+  - EncryptionType enum (Fscrypt, Luks)
+  - EncryptionAlgorithm enum (Aes256Xts, Aes256Gcm, Chacha20Poly1305)
+  - EncryptionStatus enum (Unencrypted, Encrypted, Locked, Unlocked)
+  - FscryptDirectory with path, status, algorithm, and key descriptor
+  - LuksDevice with device path, mapper name, status, algorithm, and key slot
+  - FilesystemEncryptionManager with encryption management
+  - encrypt_directory, lock_directory, unlock_directory for fscrypt
+  - format_luks_device, open_luks_device, close_luks_device for LUKS
+  - get_directory, get_luks_device for device/directory lookup
+  - list_directories, list_luks_devices for listing
+  - get_statistics for encryption statistics
+  - is_directory_encrypted, is_device_encrypted for status checking
+  - Comprehensive unit tests for all encryption functionality
+
 - **Namespaces** (src/kernel/namespaces.rs)
   - NamespaceManager for namespace management
   - Namespace with type-specific support (User, Mount, PID, Network, IPC, Uts, Cgroup)
