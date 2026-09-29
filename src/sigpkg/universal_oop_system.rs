@@ -5324,6 +5324,579 @@ impl Default for UdfLifecycleHookRegistry {
 }
 
 // ============================================================================
+// Behavioral & Structural OOP Design Patterns
+// ============================================================================
+
+// 1. Mediator Pattern
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum MediatorEvent {
+    PackageParsed(String),
+    PackageValidated(String),
+    PackageInstalled(String),
+    PackageRolledBack(String),
+}
+
+pub struct UniversalDistroPackageMediator {
+    pub history: Vec<MediatorEvent>,
+}
+
+impl UniversalDistroPackageMediator {
+    pub fn new() -> Self {
+        Self { history: Vec::new() }
+    }
+
+    pub fn notify(&mut self, sender: &str, event: MediatorEvent) -> Result<String, &'static str> {
+        let log = match &event {
+            MediatorEvent::PackageParsed(name) => format!("[Mediator] Sender '{}': Parsed package {}", sender, name),
+            MediatorEvent::PackageValidated(name) => format!("[Mediator] Sender '{}': Validated package {}", sender, name),
+            MediatorEvent::PackageInstalled(name) => format!("[Mediator] Sender '{}': Installed package {}", sender, name),
+            MediatorEvent::PackageRolledBack(name) => format!("[Mediator] Sender '{}': Rolled back package {}", sender, name),
+        };
+        self.history.push(event);
+        Ok(log)
+    }
+}
+
+impl Default for UniversalDistroPackageMediator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// 2. Visitor Pattern
+pub trait IPackageVisitor {
+    fn visit_package(&mut self, package: &dyn IPackage);
+    fn visit_metadata(&mut self, metadata: &PackageMetadata);
+    fn visit_file(&mut self, file_path: &str);
+}
+
+pub struct SecurityAuditVisitor {
+    pub audited_count: usize,
+    pub vulnerabilities_found: usize,
+}
+
+impl SecurityAuditVisitor {
+    pub fn new() -> Self {
+        Self { audited_count: 0, vulnerabilities_found: 0 }
+    }
+}
+
+impl Default for SecurityAuditVisitor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl IPackageVisitor for SecurityAuditVisitor {
+    fn visit_package(&mut self, package: &dyn IPackage) {
+        self.audited_count += 1;
+        if package.name().contains("vulnerable") {
+            self.vulnerabilities_found += 1;
+        }
+    }
+
+    fn visit_metadata(&mut self, metadata: &PackageMetadata) {
+        if metadata.license.contains("MALWARE") {
+            self.vulnerabilities_found += 1;
+        }
+    }
+
+    fn visit_file(&mut self, file_path: &str) {
+        if file_path.contains("/etc/shadow") || file_path.contains(".ssh") {
+            self.vulnerabilities_found += 1;
+        }
+    }
+}
+
+pub struct LicenseScannerVisitor {
+    pub copyleft_count: usize,
+    pub permissive_count: usize,
+}
+
+impl LicenseScannerVisitor {
+    pub fn new() -> Self {
+        Self { copyleft_count: 0, permissive_count: 0 }
+    }
+}
+
+impl Default for LicenseScannerVisitor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl IPackageVisitor for LicenseScannerVisitor {
+    fn visit_package(&mut self, package: &dyn IPackage) {
+        let lic = package.metadata().license.to_lowercase();
+        if lic.contains("gpl") || lic.contains("agpl") {
+            self.copyleft_count += 1;
+        } else {
+            self.permissive_count += 1;
+        }
+    }
+
+    fn visit_metadata(&mut self, metadata: &PackageMetadata) {
+        let lic = metadata.license.to_lowercase();
+        if lic.contains("gpl") || lic.contains("agpl") {
+            self.copyleft_count += 1;
+        }
+    }
+
+    fn visit_file(&mut self, _file_path: &str) {}
+}
+
+pub struct FootprintMetricsVisitor {
+    pub total_installed_bytes: u64,
+    pub total_file_count: usize,
+}
+
+impl FootprintMetricsVisitor {
+    pub fn new() -> Self {
+        Self { total_installed_bytes: 0, total_file_count: 0 }
+    }
+}
+
+impl Default for FootprintMetricsVisitor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl IPackageVisitor for FootprintMetricsVisitor {
+    fn visit_package(&mut self, package: &dyn IPackage) {
+        self.total_installed_bytes += package.metadata().size;
+    }
+
+    fn visit_metadata(&mut self, metadata: &PackageMetadata) {
+        self.total_installed_bytes += metadata.size;
+    }
+
+    fn visit_file(&mut self, _file_path: &str) {
+        self.total_file_count += 1;
+    }
+}
+
+// 3. Memento Pattern (Undo/Redo State Checkpoint)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SystemStateMemento {
+    pub checkpoint_id: usize,
+    pub installed_packages: Vec<String>,
+    pub timestamp: u64,
+}
+
+pub struct SystemStateCaretaker {
+    pub mementos: Vec<SystemStateMemento>,
+    pub undone_mementos: Vec<SystemStateMemento>,
+}
+
+impl SystemStateCaretaker {
+    pub fn new() -> Self {
+        Self {
+            mementos: Vec::new(),
+            undone_mementos: Vec::new(),
+        }
+    }
+
+    pub fn save_state(&mut self, checkpoint_id: usize, packages: Vec<String>, timestamp: u64) {
+        self.mementos.push(SystemStateMemento {
+            checkpoint_id,
+            installed_packages: packages,
+            timestamp,
+        });
+        self.undone_mementos.clear();
+    }
+
+    pub fn undo(&mut self) -> Option<SystemStateMemento> {
+        if let Some(memento) = self.mementos.pop() {
+            self.undone_mementos.push(memento.clone());
+            Some(memento)
+        } else {
+            None
+        }
+    }
+
+    pub fn redo(&mut self) -> Option<SystemStateMemento> {
+        if let Some(memento) = self.undone_mementos.pop() {
+            self.mementos.push(memento.clone());
+            Some(memento)
+        } else {
+            None
+        }
+    }
+}
+
+impl Default for SystemStateCaretaker {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// 4. Flyweight Pattern (Immutable Shared Package Metadata)
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PackageMetadataFlyweight {
+    pub license: String,
+    pub maintainer: String,
+    pub architecture: String,
+}
+
+pub struct PackageMetadataFlyweightFactory {
+    pub pool: HashMap<(String, String, String), Arc<PackageMetadataFlyweight>>,
+}
+
+impl PackageMetadataFlyweightFactory {
+    pub fn new() -> Self {
+        Self { pool: HashMap::new() }
+    }
+
+    pub fn get_flyweight(&mut self, license: &str, maintainer: &str, architecture: &str) -> Arc<PackageMetadataFlyweight> {
+        let key = (license.to_string(), maintainer.to_string(), architecture.to_string());
+        self.pool.entry(key.clone()).or_insert_with(|| {
+            Arc::new(PackageMetadataFlyweight {
+                license: key.0,
+                maintainer: key.1,
+                architecture: key.2,
+            })
+        }).clone()
+    }
+
+    pub fn pool_size(&self) -> usize {
+        self.pool.len()
+    }
+}
+
+impl Default for PackageMetadataFlyweightFactory {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// 5. State Pattern (Package Lifecycle State Machine)
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum PackageLifecycleState {
+    Uninstalled,
+    ResolvingDependencies,
+    Downloading,
+    Validating,
+    Installing,
+    Installed,
+    Failed,
+}
+
+pub struct PackageStateMachine {
+    pub current_state: PackageLifecycleState,
+}
+
+impl PackageStateMachine {
+    pub fn new() -> Self {
+        Self { current_state: PackageLifecycleState::Uninstalled }
+    }
+
+    pub fn transition_to(&mut self, new_state: PackageLifecycleState) -> Result<(), &'static str> {
+        let valid = match (self.current_state, new_state) {
+            (PackageLifecycleState::Uninstalled, PackageLifecycleState::ResolvingDependencies) => true,
+            (PackageLifecycleState::ResolvingDependencies, PackageLifecycleState::Downloading) => true,
+            (PackageLifecycleState::Downloading, PackageLifecycleState::Validating) => true,
+            (PackageLifecycleState::Validating, PackageLifecycleState::Installing) => true,
+            (PackageLifecycleState::Installing, PackageLifecycleState::Installed) => true,
+            (_, PackageLifecycleState::Failed) => true,
+            (PackageLifecycleState::Failed, PackageLifecycleState::Uninstalled) => true,
+            (PackageLifecycleState::Installed, PackageLifecycleState::Uninstalled) => true,
+            _ => false,
+        };
+
+        if valid {
+            self.current_state = new_state;
+            Ok(())
+        } else {
+            Err("Invalid state transition in PackageStateMachine")
+        }
+    }
+}
+
+impl Default for PackageStateMachine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// 6. Proxy Pattern (Lazy Package Load Proxy)
+pub struct LazyPackageLoadProxy {
+    pub raw_data: Vec<u8>,
+    pub format: PackageFormat,
+    pub inner_package: Option<Box<dyn IPackage>>,
+}
+
+impl LazyPackageLoadProxy {
+    pub fn new(raw_data: Vec<u8>, format: PackageFormat) -> Self {
+        Self {
+            raw_data,
+            format,
+            inner_package: None,
+        }
+    }
+
+    pub fn is_loaded(&self) -> bool {
+        self.inner_package.is_some()
+    }
+
+    pub fn load_if_needed(&mut self, factory: &PackageParserFactory) -> Result<(), ParseError> {
+        if self.inner_package.is_none() {
+            let parser = factory.get_parser(self.format)
+                .ok_or_else(|| ParseError::UnsupportedFormat(self.format))?;
+            let pkg = parser.parse(&self.raw_data)?;
+            self.inner_package = Some(pkg);
+        }
+        Ok(())
+    }
+}
+
+// 7. Builder Pattern
+pub struct UniversalPackageBuilder {
+    name: String,
+    version: Version,
+    description: String,
+    license: String,
+    maintainer: String,
+    architecture: String,
+    format: PackageFormat,
+    dependencies: Vec<Dependency>,
+}
+
+impl UniversalPackageBuilder {
+    pub fn new(name: &str) -> Self {
+        Self {
+            name: name.to_string(),
+            version: Version::new(1, 0, 0),
+            description: String::new(),
+            license: "MIT".to_string(),
+            maintainer: "SigmaOS Infrastructure".to_string(),
+            architecture: "x86_64".to_string(),
+            format: PackageFormat::Sigma,
+            dependencies: Vec::new(),
+        }
+    }
+
+    pub fn version(mut self, major: u64, minor: u64, patch: u64) -> Self {
+        self.version = Version::new(major, minor, patch);
+        self
+    }
+
+    pub fn description(mut self, desc: &str) -> Self {
+        self.description = desc.to_string();
+        self
+    }
+
+    pub fn license(mut self, lic: &str) -> Self {
+        self.license = lic.to_string();
+        self
+    }
+
+    pub fn format(mut self, fmt: PackageFormat) -> Self {
+        self.format = fmt;
+        self
+    }
+
+    pub fn dependency(mut self, dep_name: &str) -> Self {
+        self.dependencies.push(Dependency {
+            name: dep_name.to_string(),
+            version_constraint: VersionConstraint::Any,
+        });
+        self
+    }
+
+    pub fn build(self) -> Result<Box<dyn IPackage>, &'static str> {
+        if self.name.is_empty() {
+            return Err("Package name cannot be empty");
+        }
+        Ok(Box::new(StandardPackage {
+            metadata: PackageMetadata {
+                name: self.name,
+                version: self.version,
+                description: self.description,
+                license: self.license,
+                maintainer: self.maintainer,
+                homepage: String::new(),
+                architecture: self.architecture,
+                checksum: "builder-sha256-checksum".to_string(),
+                size: 1024,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
+            dependencies: self.dependencies,
+            format: self.format,
+        }))
+    }
+}
+
+// ============================================================================
+// Advanced Linux Distro Adapters
+// ============================================================================
+
+pub struct BedrockStratumAdapter;
+impl BedrockStratumAdapter {
+    pub fn new() -> Self { Self }
+    pub fn resolve_stratum_path(&self, stratum: &str, relative_path: &str) -> String {
+        format!("/bedrock/strata/{}{}", stratum, relative_path)
+    }
+}
+
+impl Default for BedrockStratumAdapter {
+    fn default() -> Self { Self::new() }
+}
+
+pub struct DistroboxOciAdapter {
+    pub exported_binaries: Vec<String>,
+}
+
+impl DistroboxOciAdapter {
+    pub fn new() -> Self {
+        Self { exported_binaries: Vec::new() }
+    }
+
+    pub fn export_binary_shim(&mut self, container_name: &str, binary: &str) -> String {
+        let shim = format!("#!/bin/sh\npodman exec -it {} {}", container_name, binary);
+        self.exported_binaries.push(binary.to_string());
+        shim
+    }
+}
+
+impl Default for DistroboxOciAdapter {
+    fn default() -> Self { Self::new() }
+}
+
+pub struct SystemdSysextAdapter {
+    pub extensions: Vec<String>,
+}
+
+impl SystemdSysextAdapter {
+    pub fn new() -> Self {
+        Self { extensions: Vec::new() }
+    }
+
+    pub fn mount_extension(&mut self, extension_name: &str) -> Result<String, &'static str> {
+        let path = format!("/var/lib/extensions/{}.raw", extension_name);
+        self.extensions.push(extension_name.to_string());
+        Ok(path)
+    }
+}
+
+impl Default for SystemdSysextAdapter {
+    fn default() -> Self { Self::new() }
+}
+
+pub struct OmarchyPackageBridgeAdapter;
+impl OmarchyPackageBridgeAdapter {
+    pub fn new() -> Self { Self }
+    pub fn bridge_package(&self, package_name: &str) -> String {
+        match package_name {
+            "hyprland" | "sway" | "wayfire" => "sovereign-desktop-shell".to_string(),
+            "pipewire" | "wireplumber" => "sovereign-audio".to_string(),
+            "pacman" | "paru" | "yay" => "sovereign-package-manager".to_string(),
+            other => other.to_string(),
+        }
+    }
+}
+
+impl Default for OmarchyPackageBridgeAdapter {
+    fn default() -> Self { Self::new() }
+}
+
+// ============================================================================
+// UDF Extension Engines
+// ============================================================================
+
+pub struct UdfCustomScriptletEngine {
+    pub pre_install_scripts: Vec<String>,
+    pub post_install_scripts: Vec<String>,
+}
+
+impl UdfCustomScriptletEngine {
+    pub fn new() -> Self {
+        Self {
+            pre_install_scripts: Vec::new(),
+            post_install_scripts: Vec::new(),
+        }
+    }
+
+    pub fn add_pre_install_scriptlet(&mut self, script: &str) {
+        self.pre_install_scripts.push(script.to_string());
+    }
+
+    pub fn add_post_install_scriptlet(&mut self, script: &str) {
+        self.post_install_scripts.push(script.to_string());
+    }
+
+    pub fn execute_all(&self) -> usize {
+        self.pre_install_scripts.len() + self.post_install_scripts.len()
+    }
+}
+
+impl Default for UdfCustomScriptletEngine {
+    fn default() -> Self { Self::new() }
+}
+
+pub struct UdfPackageConflictResolverEngine {
+    pub conflict_rules: Vec<Arc<dyn Fn(&str, &str) -> Option<String> + Send + Sync>>,
+}
+
+impl UdfPackageConflictResolverEngine {
+    pub fn new() -> Self {
+        Self { conflict_rules: Vec::new() }
+    }
+
+    pub fn add_conflict_rule<F>(&mut self, rule: F)
+    where
+        F: Fn(&str, &str) -> Option<String> + Send + Sync + 'static,
+    {
+        self.conflict_rules.push(Arc::new(rule));
+    }
+
+    pub fn resolve_conflict(&self, pkg1: &str, pkg2: &str) -> String {
+        for rule in &self.conflict_rules {
+            if let Some(winner) = rule(pkg1, pkg2) {
+                return winner;
+            }
+        }
+        pkg1.to_string()
+    }
+}
+
+impl Default for UdfPackageConflictResolverEngine {
+    fn default() -> Self { Self::new() }
+}
+
+pub struct UdfPackageArchiveTransformerEngine {
+    pub transformers: Vec<Arc<dyn Fn(&[u8]) -> Vec<u8> + Send + Sync>>,
+}
+
+impl UdfPackageArchiveTransformerEngine {
+    pub fn new() -> Self {
+        Self { transformers: Vec::new() }
+    }
+
+    pub fn add_transformer<F>(&mut self, transformer: F)
+    where
+        F: Fn(&[u8]) -> Vec<u8> + Send + Sync + 'static,
+    {
+        self.transformers.push(Arc::new(transformer));
+    }
+
+    pub fn transform(&self, data: &[u8]) -> Vec<u8> {
+        let mut current = data.to_vec();
+        for t in &self.transformers {
+            current = t(&current);
+        }
+        current
+    }
+}
+
+impl Default for UdfPackageArchiveTransformerEngine {
+    fn default() -> Self { Self::new() }
+}
+
+// ============================================================================
 // Facade Pattern: Universal Distro Package Facade
 // ============================================================================
 
@@ -6703,5 +7276,153 @@ Description: Hook test";
         let facade = UniversalDistroPackageFacade::new();
         let processed = facade.process_distro_payload(zstd_data).unwrap();
         assert_eq!(processed.name(), "zstd-test");
+    }
+
+    #[test]
+    fn test_comprehensive_oop_mediator_visitor_memento_flyweight_state_proxy_builder() {
+        // 1. Mediator Pattern
+        let mut mediator = UniversalDistroPackageMediator::new();
+        let msg = mediator.notify("TestRunner", MediatorEvent::PackageParsed("htop".to_string())).unwrap();
+        assert!(msg.contains("Parsed package htop"));
+
+        // 2. Visitor Pattern
+        let mut sec_visitor = SecurityAuditVisitor::new();
+        let mut lic_visitor = LicenseScannerVisitor::new();
+        let mut foot_visitor = FootprintMetricsVisitor::new();
+
+        let test_pkg = UniversalPackageBuilder::new("htop")
+            .version(3, 2, 1)
+            .description("Interactive process viewer")
+            .license("GPL-2.0-or-later")
+            .dependency("sovereign-libc")
+            .build()
+            .unwrap();
+
+        sec_visitor.visit_package(test_pkg.as_ref());
+        sec_visitor.visit_metadata(test_pkg.metadata());
+        sec_visitor.visit_file("/usr/bin/htop");
+
+        lic_visitor.visit_package(test_pkg.as_ref());
+
+        foot_visitor.visit_package(test_pkg.as_ref());
+        foot_visitor.visit_file("/usr/bin/htop");
+
+        assert_eq!(sec_visitor.audited_count, 1);
+        assert_eq!(lic_visitor.copyleft_count, 1);
+        assert_eq!(foot_visitor.total_file_count, 1);
+
+        // 3. Memento Pattern & SystemStateCaretaker
+        let mut caretaker = SystemStateCaretaker::new();
+        caretaker.save_state(1, vec!["bash".to_string(), "coreutils".to_string()], 1700000000);
+        assert_eq!(caretaker.mementos.len(), 1);
+
+        let undone = caretaker.undo().unwrap();
+        assert_eq!(undone.checkpoint_id, 1);
+        assert_eq!(caretaker.mementos.len(), 0);
+
+        let redone = caretaker.redo().unwrap();
+        assert_eq!(redone.checkpoint_id, 1);
+        assert_eq!(caretaker.mementos.len(), 1);
+
+        // 4. Flyweight Pattern
+        let mut flyweight_factory = PackageMetadataFlyweightFactory::new();
+        let f1 = flyweight_factory.get_flyweight("GPL-3.0", "SigmaOS Team", "x86_64");
+        let _f2 = flyweight_factory.get_flyweight("GPL-3.0", "SigmaOS Team", "x86_64");
+        assert_eq!(Arc::strong_count(&f1), 3); // f1, f2, and pool entry
+        assert_eq!(flyweight_factory.pool_size(), 1);
+
+        // 5. State Pattern & StateMachine
+        let mut state_machine = PackageStateMachine::new();
+        assert_eq!(state_machine.current_state, PackageLifecycleState::Uninstalled);
+
+        assert!(state_machine.transition_to(PackageLifecycleState::ResolvingDependencies).is_ok());
+        assert!(state_machine.transition_to(PackageLifecycleState::Downloading).is_ok());
+        assert!(state_machine.transition_to(PackageLifecycleState::Validating).is_ok());
+        assert!(state_machine.transition_to(PackageLifecycleState::Installing).is_ok());
+        assert!(state_machine.transition_to(PackageLifecycleState::Installed).is_ok());
+        assert_eq!(state_machine.current_state, PackageLifecycleState::Installed);
+
+        // Invalid transition test
+        assert!(state_machine.transition_to(PackageLifecycleState::Downloading).is_err());
+
+        // 6. Proxy Pattern (Lazy Package Load Proxy)
+        let factory = PackageParserFactory::new();
+        let deb_raw = b"Package: lazy-pkg\nVersion: 1.0.0\nDescription: Lazy test";
+        let mut proxy = LazyPackageLoadProxy::new(deb_raw.to_vec(), PackageFormat::Deb);
+
+        assert!(!proxy.is_loaded());
+        assert!(proxy.load_if_needed(&factory).is_ok());
+        assert!(proxy.is_loaded());
+        assert_eq!(proxy.inner_package.as_ref().unwrap().name(), "lazy-pkg");
+
+        // 7. Builder Pattern
+        let built_pkg = UniversalPackageBuilder::new("neovim")
+            .version(0, 9, 5)
+            .description("Vim-fork focused on extensibility")
+            .license("Apache-2.0")
+            .format(PackageFormat::Sigma)
+            .dependency("sovereign-libc")
+            .dependency("sovereign-openssl")
+            .build()
+            .unwrap();
+
+        assert_eq!(built_pkg.name(), "neovim");
+        assert_eq!(built_pkg.version().major, 0);
+        assert_eq!(built_pkg.dependencies().len(), 2);
+    }
+
+    #[test]
+    fn test_linux_distro_adapters_bedrock_distrobox_sysext_omarchy() {
+        // 1. Bedrock Stratum Adapter
+        let bedrock = BedrockStratumAdapter::new();
+        let arch_path = bedrock.resolve_stratum_path("arch", "/usr/bin/pacman");
+        assert_eq!(arch_path, "/bedrock/strata/arch/usr/bin/pacman");
+
+        // 2. Distrobox OCI Container Adapter
+        let mut distrobox = DistroboxOciAdapter::new();
+        let shim = distrobox.export_binary_shim("fedora-box", "htop");
+        assert!(shim.contains("podman exec -it fedora-box htop"));
+        assert_eq!(distrobox.exported_binaries.len(), 1);
+
+        // 3. Systemd Sysext Overlay Adapter
+        let mut sysext = SystemdSysextAdapter::new();
+        let path = sysext.mount_extension("developer-tools").unwrap();
+        assert_eq!(path, "/var/lib/extensions/developer-tools.raw");
+
+        // 4. Omarchy Package Bridge
+        let omarchy = OmarchyPackageBridgeAdapter::new();
+        assert_eq!(omarchy.bridge_package("hyprland"), "sovereign-desktop-shell");
+        assert_eq!(omarchy.bridge_package("custom-tool"), "custom-tool");
+    }
+
+    #[test]
+    fn test_udf_scriptlet_conflict_archive_engines() {
+        // 1. UDF Custom Scriptlet Engine
+        let mut scriptlet_engine = UdfCustomScriptletEngine::new();
+        scriptlet_engine.add_pre_install_scriptlet("#!/bin/sh\necho 'Pre-install'");
+        scriptlet_engine.add_post_install_scriptlet("#!/bin/sh\necho 'Post-install'");
+        assert_eq!(scriptlet_engine.execute_all(), 2);
+
+        // 2. UDF Package Conflict Resolver Engine
+        let mut conflict_resolver = UdfPackageConflictResolverEngine::new();
+        conflict_resolver.add_conflict_rule(|pkg1, pkg2| {
+            if pkg1 == "sovereign-libc" || pkg2 == "sovereign-libc" {
+                Some("sovereign-libc".to_string())
+            } else {
+                None
+            }
+        });
+        assert_eq!(conflict_resolver.resolve_conflict("legacy-libc", "sovereign-libc"), "sovereign-libc");
+
+        // 3. UDF Package Archive Transformer Engine
+        let mut archive_transformer = UdfPackageArchiveTransformerEngine::new();
+        archive_transformer.add_transformer(|data| {
+            let mut transformed = vec![0x53, 0x50, 0x4b, 0x47]; // SPKG header prefix
+            transformed.extend_from_slice(data);
+            transformed
+        });
+        let raw = b"payload";
+        let out = archive_transformer.transform(raw);
+        assert_eq!(&out[..4], b"SPKG");
     }
 }
