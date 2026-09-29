@@ -538,10 +538,16 @@ impl SovereignCpuRegisters {
     #[cfg(all(target_arch = "x86_64", target_os = "none"))]
     pub fn rdmsr(&self, msr: u32) -> u64 {
         unsafe {
-            let low: u32;
-            let high: u32;
-            core::arch::asm!("rdmsr", in("ecx") msr, out("eax") low, out("edx") high);
-            ((high as u64) << 32) | (low as u64)
+            let low: u64;
+            let high: u64;
+            core::arch::asm!(
+                "rdmsr",
+                in("rcx") msr as u64,
+                out("rax") low,
+                out("rdx") high,
+                options(nomem, nostack, preserves_flags)
+            );
+            ((high & 0xFFFF_FFFF) << 32) | (low & 0xFFFF_FFFF)
         }
     }
 
@@ -559,9 +565,15 @@ impl SovereignCpuRegisters {
     #[cfg(all(target_arch = "x86_64", target_os = "none"))]
     pub fn wrmsr(&self, msr: u32, val: u64) {
         unsafe {
-            let low = val as u32;
-            let high = (val >> 32) as u32;
-            core::arch::asm!("wrmsr", in("ecx") msr, in("eax") low, in("edx") high);
+            let low = val & 0xFFFF_FFFF;
+            let high = val >> 32;
+            core::arch::asm!(
+                "wrmsr",
+                in("rcx") msr as u64,
+                in("rax") low,
+                in("rdx") high,
+                options(nomem, nostack, preserves_flags)
+            );
         }
     }
 
@@ -689,10 +701,16 @@ impl SovereignXcr0State {
     pub fn read_xcr0(&mut self) -> u64 {
         #[cfg(all(target_arch = "x86_64", target_os = "none"))]
         unsafe {
-            let low: u32;
-            let high: u32;
-            core::arch::asm!("xgetbv", in("ecx") 0, out("eax") low, out("edx") high);
-            let val = ((high as u64) << 32) | (low as u64);
+            let low: u64;
+            let high: u64;
+            core::arch::asm!(
+                "xgetbv",
+                in("rcx") 0u64,
+                out("rax") low,
+                out("rdx") high,
+                options(nomem, nostack, preserves_flags)
+            );
+            let val = ((high & 0xFFFF_FFFF) << 32) | (low & 0xFFFF_FFFF);
             self.parse_xcr0(val);
             val
         }

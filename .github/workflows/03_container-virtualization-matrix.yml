@@ -87,7 +87,7 @@ jobs:
 
       - name: Set up Docker buildx
         if: matrix.container == 'docker'
-        uses: docker/setup-buildx-action@c237e3a73be1d5073e5bf0d4181958b4b7ad1a77 # v3.7.0
+        uses: docker/setup-buildx-action@v3 # v3.7.0
 
       - name: Build with ${{ matrix.container || matrix.vm }} ${{ matrix.version || matrix.image }}
         shell: bash

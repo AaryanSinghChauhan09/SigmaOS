@@ -48,6 +48,7 @@ pub use package::{
 pub use sigpkg::{
     SovereignUniversalPackageManagerInteropEngine, SovereignUniversalPackageTranslationBridge,
 };
+pub use package::sovereign_universal_package_interop_engine::*;
 pub use filesystem::{
     AutofsMountTrigger, EphemeralTmpfsMountGovernor, FscryptInodeRecord, FscryptPolicy,
     SovereignAtomicGenerationRootfsGuard, SovereignCanonicalFhsResolver,
