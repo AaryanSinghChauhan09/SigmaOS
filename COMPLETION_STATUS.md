@@ -69,6 +69,12 @@
   - Restart policies (Never, OnFailure, Always)
   - Dependency management and startup ordering
   - SSH and firewall service registration helpers
+- **Implemented**: Address Sanitizer (ASan) memory error detection
+  - Redzone-based buffer overflow detection
+  - Use-after-free tracking with shadow memory
+  - Stack corruption detection with canary verification
+  - Memory allocation with quarantine
+  - Comprehensive statistics tracking
 
 ### 9. Security Hardening
 - **Removed**: Hardcoded cryptographic keys in PQC enclave

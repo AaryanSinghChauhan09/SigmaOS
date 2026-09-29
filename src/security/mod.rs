@@ -2,7 +2,9 @@
 pub mod memory_protection;
 pub mod address_sanitizer;
 pub mod capability_enforcer;
-pub use address_sanitizer::{AddressSanitizer, MemoryRegion};
+pub use address_sanitizer::{
+    AddressSanitizer, AsanRegion, AsanConfig, AsanStatistics, ShadowState,
+};
 pub mod capability;
 pub mod hardware_privilege;
 pub mod pqc_enclave;
