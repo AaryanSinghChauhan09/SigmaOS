@@ -12,6 +12,7 @@ pub mod cgroup_v2;
 pub mod kqueue_event;
 pub mod cgroup_controllers;
 pub mod block_dev;
+pub mod process_monitor;
 pub mod bore;
 pub mod breakthrough;
 pub mod breakthroughs;
@@ -177,6 +178,10 @@ pub use cfi::{CfiEngine, CfiTarget, CfiViolation};
 pub use kptr_restrict::{
     KptrRestrictLevel, DmesgRestrictLevel,
     KptrRestrict, DmesgRestrict, KernelSecurityParams, SecurityLevel,
+};
+pub use process_monitor::{
+    MonitoredProcessState, ProcessEntry, ProcessTreeNode, ProcessFilter, ProcessSortField,
+    ProcessMonitor,
 };
 
 pub mod procfs_linux;

@@ -420,6 +420,19 @@ The SigmaOS repository has been successfully consolidated from a fragmented stat
   - Statistics reporting for cleanable space
   - Comprehensive unit tests for all cleanup functionality
 
+- **Process Monitor** (src/kernel/process_monitor.rs)
+  - Implements Wiki 04-Kernel.md process monitoring specifications
+  - MonitoredProcessState enum (Running, Sleeping, Waiting, Stopped, Zombie, Dead)
+  - ProcessEntry with PID, PPID, UID, GID, state, name, command, CPU, memory, runtime, priority, nice, threads
+  - ProcessTreeNode for hierarchical process tree representation
+  - ProcessFilter for filtering processes (All, Running, Sleeping, Stopped, Zombie, ByUser, ByName)
+  - ProcessSortField for sorting (Pid, Name, Cpu, Memory, Runtime, Priority)
+  - ProcessMonitor with process listing, filtering, sorting, and tree building
+  - show_process for detailed process information
+  - get_statistics for process statistics (total, running, sleeping, stopped, zombie, CPU, memory)
+  - kill_process, set_priority, set_nice operations
+  - Comprehensive unit tests for all monitoring functionality
+
 - **Namespaces** (src/kernel/namespaces.rs)
   - NamespaceManager for namespace management
   - Namespace with type-specific support (User, Mount, PID, Network, IPC, Uts, Cgroup)
