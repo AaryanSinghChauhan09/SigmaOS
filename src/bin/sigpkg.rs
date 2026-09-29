@@ -27,6 +27,7 @@ fn usage() -> ! {
          \x20 sigpkg convert <file>                Dry-run convert foreign package manifest & print metadata\n\
          \x20 sigpkg dispatch \"<foreign cmd>\"       Dispatch raw foreign PM command (apt, pacman, dnf, apk, pkg, emerge, nix, etc.)\n\
          \x20 sigpkg apt|dnf|pacman|apk|pkg|zypper|xbps|emerge|eopkg|nix|guix|pkgin|slackpkg <cmd> Foreign PM command alias\n\
+         \x20 sigpkg debian|fedora|arch|alpine|freebsd|openbsd|netbsd|void|gentoo|opensuse <cmd> Distro PM command alias\n\
          \x20 sigpkg remove <package>              Remove a package from the store\n\
          \x20 sigpkg search <package>              Show a stored package's metadata\n\
          \x20 sigpkg status                        List stored packages and counts\n\
@@ -61,7 +62,10 @@ fn main() {
         | "xbps-query" | "emerge" | "ebuild" | "eopkg" | "moss" | "nix" | "nix-env" | "guix"
         | "slackpkg" | "installpkg" | "removepkg" | "kiss" | "cpt" | "spack" | "conan"
         | "pip" | "cargo" | "gem" | "nuget" | "vcpkg" | "brew" | "flatpak" | "snap"
-        | "opkg" | "ipkg" | "pkgman" | "swupd" | "slapt-get" | "urpmi" | "pisi" => {
+        | "opkg" | "ipkg" | "pkgman" | "swupd" | "slapt-get" | "urpmi" | "pisi" | "debian"
+        | "ubuntu" | "fedora" | "rhel" | "centos" | "arch" | "manjaro" | "cachy" | "cachyos"
+        | "alpine" | "freebsd" | "openbsd" | "netbsd" | "bsd" | "void" | "gentoo" | "portage"
+        | "opensuse" | "suse" | "slackware" | "solus" | "nixos" | "guixsd" => {
             cmd_foreign_pm(&args[0], &args[1..])
         }
         "remove" => cmd_remove(&args[1..]),
@@ -199,18 +203,59 @@ fn cmd_foreign_pm(pm_name: &str, args: &[String]) {
     }
 }
 
+fn format_flag_for_source_pm(source_pm: &str) -> Option<&'static str> {
+    match source_pm.to_lowercase().as_str() {
+        "apt" | "apt-get" | "dpkg" | "debian" | "ubuntu" => Some("--apt"),
+        "dnf" | "yum" | "microdnf" | "rpm" | "fedora" | "rhel" | "centos" | "urpmi" => Some("--dnf"),
+        "pacman" | "yay" | "paru" | "pikaur" | "trizen" | "aura" | "arch" | "manjaro" | "cachy" | "cachyos" => Some("--pacman"),
+        "apk" | "alpine" => Some("--apk"),
+        "pkg" | "freebsd" | "bsd" => Some("--pkg"),
+        "openbsd" => Some("--openbsd"),
+        "netbsd" | "pkgin" | "pkgsrc" | "pkg_delete" | "pkg_add" | "pkg_info" => Some("--pkgsrc"),
+        "zypper" | "opensuse" | "suse" => Some("--zypper"),
+        "xbps" | "xbps-install" | "xbps-remove" | "xbps-query" | "void" => Some("--xbps"),
+        "emerge" | "ebuild" | "gentoo" | "portage" => Some("--ebuild"),
+        "eopkg" | "solus" | "pisi" => Some("--eopkg"),
+        "moss" => Some("--moss"),
+        "nix" | "nix-env" | "nix-shell" | "nixos" => Some("--nix"),
+        "guix" | "guixsd" => Some("--guix"),
+        "slackpkg" | "installpkg" | "removepkg" | "slackware" | "slapt-get" | "kiss" | "cpt" => Some("--slackware"),
+        "haiku" | "hpkg" | "pkgman" => Some("--haiku"),
+        "flatpak" => Some("--flatpak"),
+        "snap" => Some("--snap"),
+        "appimage" => Some("--appimage"),
+        "pip" => Some("--wheel"),
+        "cargo" => Some("--crate"),
+        "gem" => Some("--gem"),
+        "nuget" => Some("--nupkg"),
+        "vcpkg" => Some("--vcpkg"),
+        "spack" => Some("--spack"),
+        "conan" => Some("--conan"),
+        "brew" => Some("--bottle"),
+        "opkg" | "ipkg" => Some("--opkg"),
+        "swupd" => Some("--swupd"),
+        _ => None,
+    }
+}
+
 fn execute_dispatched_action(action: DispatchedPmAction) {
     println!(
         "Translated foreign PM command [{}] -> Canonical Action: {:?} (Dry-Run: {})",
         action.source_pm, action.operation, action.dry_run
     );
+    let mut targets_with_fmt = Vec::new();
+    if let Some(flag) = format_flag_for_source_pm(&action.source_pm) {
+        targets_with_fmt.push(flag.to_string());
+    }
+    targets_with_fmt.extend(action.target_packages.clone());
+
     match action.operation {
         UniversalPmOperation::Install => {
             if action.target_packages.is_empty() {
                 println!("No target packages specified for installation.");
                 exit(0);
             }
-            cmd_install(&action.target_packages);
+            cmd_install(&targets_with_fmt);
         }
         UniversalPmOperation::Remove => {
             if action.target_packages.is_empty() {

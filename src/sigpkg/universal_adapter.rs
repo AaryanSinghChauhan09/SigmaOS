@@ -1838,40 +1838,42 @@ impl UniversalDependencyMapper {
             "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
                 "zlib".to_string()
             }
-            "python" | "python3" | "python3-dev" | "python3-devel" | "dev-lang/python"
+            "python" | "python3" | "python3-dev" | "python3-devel" | "python3-base" | "python-core" | "dev-lang/python"
             | "lang/python" => "python".to_string(),
-            "curl" | "libcurl4" | "libcurl-devel" | "libcurl-dev" | "ftp/curl"
+            "curl" | "libcurl" | "libcurl4" | "libcurl-devel" | "libcurl-dev" | "ftp/curl"
             | "net-misc/curl" => "curl".to_string(),
-            "bash" | "shells/bash" | "app-shells/bash" => "bash".to_string(),
+            "bash" | "bash-completion" | "shells/bash" | "app-shells/bash" => "bash".to_string(),
             "libx11"
             | "libx11-dev"
             | "libx11-devel"
             | "x11-libs/libx11"
             | "x11-proto/xorgproto"
             | "xorg-x11-server" => "libx11".to_string(),
-            "wayland" | "wayland-devel" | "wayland-dev" | "dev-libs/wayland" => {
+            "wayland" | "wayland-devel" | "wayland-dev" | "libwayland-client" | "libwayland-server" | "wayland-protocols" | "dev-libs/wayland" => {
                 "wayland".to_string()
             }
-            "pipewire" | "media-video/pipewire" | "pipewire-devel" => "pipewire".to_string(),
-            "dbus" | "dbus-devel" | "sys-apps/dbus" => "dbus".to_string(),
+            "pipewire" | "media-video/pipewire" | "pipewire-devel" | "libpipewire-0.3-dev" | "pipewire-media-session" => "pipewire".to_string(),
+            "dbus" | "dbus-devel" | "dbus-daemon" | "libdbus-1-3" | "dbus-x11" | "sys-apps/dbus" => "dbus".to_string(),
             "pkgconf" | "pkg-config" | "pkgconfig" | "dev-util/pkgconf" => "pkgconf".to_string(),
             "ncurses" | "ncurses-devel" | "ncursesw" | "sys-libs/ncurses" => "ncurses".to_string(),
             "readline" | "readline-devel" | "sys-libs/readline" => "readline".to_string(),
             "xz" | "xz-utils" | "liblzma-dev" | "app-arch/xz-utils" => "xz".to_string(),
-            "zstd" | "libzstd-dev" | "libzstd-devel" | "app-arch/zstd" => "zstd".to_string(),
-            "sqlite" | "sqlite3" | "libsqlite3-dev" | "sqlite-devel" | "dev-db/sqlite" => {
+            "zstd" | "libzstd" | "libzstd1" | "libzstd-dev" | "libzstd-devel" | "zstd-devel" | "app-arch/zstd" => "zstd".to_string(),
+            "sqlite" | "sqlite3" | "libsqlite3-0" | "libsqlite3-dev" | "sqlite-devel" | "sqlite-dev" | "dev-db/sqlite" => {
                 "sqlite".to_string()
             }
             "gtk3" | "libgtk-3-dev" | "gtk3-devel" | "x11-toolkits/gtk30" => "gtk3".to_string(),
+            "gtk4" | "libgtk-4-dev" | "gtk4-devel" | "x11-toolkits/gtk40" => "gtk4".to_string(),
             "qt5" | "qt5-base" | "qt5-base-devel" | "libqt5core5a" => "qt5".to_string(),
+            "qt6" | "qt6-base" | "qt6-base-devel" => "qt6".to_string(),
             "llvm" | "llvm-dev" | "llvm-devel" | "sys-devel/llvm" => "llvm".to_string(),
             "gcc" | "gcc-c++" | "sys-devel/gcc" => "gcc".to_string(),
             "libffi" | "libffi-dev" | "libffi-devel" | "dev-libs/libffi" => "libffi".to_string(),
             "glib" | "glib2" | "glib2-devel" | "libglib2.0-dev" | "dev-libs/glib" => "glib".to_string(),
             "pcre" | "pcre2" | "libpcre2-dev" | "pcre2-devel" | "dev-libs/libpcre2" => "pcre".to_string(),
             "libuv" | "libuv-dev" | "libuv-devel" | "dev-libs/libuv" => "libuv".to_string(),
-            "openssh" | "openssh-server" | "net-misc/openssh" => "openssh".to_string(),
-            "mesa" | "mesa-dev" | "mesa-libgl-devel" | "media-libs/mesa" => "mesa".to_string(),
+            "openssh" | "openssh-server" | "openssh-client" | "sshd" | "net-misc/openssh" => "openssh".to_string(),
+            "mesa" | "mesa-dev" | "mesa-libgl-devel" | "libgl1-mesa-dev" | "mesa-vulkan-drivers" | "mesa-dri-drivers" | "media-libs/mesa" => "mesa".to_string(),
             "git" | "git-base" | "dev-vcs/git" => "git".to_string(),
             "cmake" | "dev-build/cmake" => "cmake".to_string(),
             "ffmpeg" | "libffmpeg-dev" | "media-video/ffmpeg" => "ffmpeg".to_string(),
