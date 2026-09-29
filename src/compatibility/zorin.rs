@@ -545,23 +545,20 @@ mod tests {
 
     #[test]
     fn test_zorin_grid_tiling_sound_and_taskbar() {
-        let grid = ZorinGridWindowTilingEngine::new(1920, 1080);
-        let left_rect = grid.calculate_snap_rect(ZorinSnapPosition::LeftHalf);
+        let grid = ZorinGridDesktopManager::new(2);
+        let left_rect = grid.calculate_window_bounds(ZorinSnapPosition::LeftHalf, 1920, 1080);
         assert_eq!(left_rect, (0, 0, 960, 1080));
 
-        let top_right_rect = grid.calculate_snap_rect(ZorinSnapPosition::TopRight);
+        let top_right_rect = grid.calculate_window_bounds(ZorinSnapPosition::TopRight, 1920, 1080);
         assert_eq!(top_right_rect, (960, 0, 960, 540));
 
-        let sound_mgr = ZorinSoundManager::new();
-        let login_sound = sound_mgr.get_sound_file_path("desktop-login");
-        assert_eq!(
-            login_sound,
-            "/usr/share/sounds/zorin/stereo/desktop-login.ogg"
-        );
+        let mut sound = ZorinSoundThemeManager::new();
+        sound.enable_amplification_boost(true);
+        sound.set_volume(120);
+        assert_eq!(sound.master_volume_percent.load(core::sync::atomic::Ordering::SeqCst), 120);
 
-        let taskbar = ZorinTaskbarCustomizer::new();
-        let css = taskbar.generate_panel_css();
-        assert!(css.contains(".zorin-panel"));
-        assert!(css.contains("icon-size: 32px"));
+        let mut bar = ZorinIntellihideTaskbar::new();
+        bar.update_window_overlap(true);
+        assert!(bar.is_hidden);
     }
 }
