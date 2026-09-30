@@ -188,6 +188,11 @@ past a buffer.
 dry-run mode is only a simulation; real account creation returns an error
 until an audited password-hashing provider is integrated.
 
+The emergency shell gate does not keep a plaintext password or accept a
+signature based on fixed magic bytes. Its password and signature checks remain
+unavailable until vetted verification providers are integrated, so shell
+access fails closed.
+
 The exported PAM model currently fails closed: without a secure random source
 and an audited password hashing provider, it will not register users or
 authenticate credentials. `security::crypto_utils::SecureRandom` and its
