@@ -10,7 +10,9 @@ use std::string::ToString;
 
 use sigmaos::arch::x86_64;
 use sigmaos::compatibility::{OpenRcManager, OpenRcRunlevel, OpenRcService};
-use sigmaos::kernel::{BuddyAllocator, Priority, Process, RoundRobinScheduler as Scheduler};
+use sigmaos::kernel::process::Process;
+use sigmaos::kernel::scheduler::ProcessTask;
+use sigmaos::kernel::{BuddyAllocator, Priority, RoundRobinScheduler as Scheduler};
 use sigmaos::memory::paging::SimpleVMM;
 
 pub static EARLY_CPU_STATE: core::sync::atomic::AtomicUsize = AtomicUsize::new(0);
@@ -32,8 +34,8 @@ pub fn start_kernel(
     EARLY_CPU_STATE.store(2, Ordering::SeqCst);
 
     // Stage 3: Scheduler bootstrap
-    let idle_proc = Process::new(0, "idle".to_string(), Priority::Idle);
-    scheduler.add_process(idle_proc);
+    let idle_task = ProcessTask::new(0, "idle".to_string(), Priority::Idle);
+    scheduler.add_process(idle_task);
 
     // Stage 4: Open early userland runlevels (OpenRC)
     let udev = OpenRcService::new("udev").with_runlevel(OpenRcRunlevel::SingleUser);
