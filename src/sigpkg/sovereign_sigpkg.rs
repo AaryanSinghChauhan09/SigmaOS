@@ -1,5 +1,3 @@
-
-
 // Sovereign Sigpkg - Complete 20-Pillar Package, Build & Reproducibility System for SigmaOS
 // Inspired by Nix/Guix, Arch Linux, Debian, Fedora, FreeBSD Ports, and Alpine Linux
 

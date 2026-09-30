@@ -1,11 +1,11 @@
 // OOP-based Native UI Toolkit for SigmaOS
 // Implements GTK3/GTK4 inspired UI toolkit using OOP principles with traits, structs, and GLib-style signals.
 
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Widget ID
 pub type WidgetID = usize;

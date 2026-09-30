@@ -75,7 +75,12 @@ impl RealtekRtw88WifiDriver {
         ]
     }
 
-    pub fn associate(&mut self, ssid: &str, passphrase: &str, security: WifiSecurityAuth) -> Result<bool, &'static str> {
+    pub fn associate(
+        &mut self,
+        ssid: &str,
+        passphrase: &str,
+        security: WifiSecurityAuth,
+    ) -> Result<bool, &'static str> {
         if security != WifiSecurityAuth::Open && passphrase.len() < 8 {
             return Err("rtw88 Error: Invalid passphrase length");
         }
@@ -142,7 +147,14 @@ impl IntelI915DrmGpuDriver {
         fb_id
     }
 
-    pub fn setup_plane(&mut self, plane_id: u32, pipe: DisplayPipe, width: u32, height: u32, fb_id: u32) {
+    pub fn setup_plane(
+        &mut self,
+        plane_id: u32,
+        pipe: DisplayPipe,
+        width: u32,
+        height: u32,
+        fb_id: u32,
+    ) {
         let plane = DrmDisplayPlane {
             plane_id,
             pipe,
@@ -231,8 +243,8 @@ impl Default for AsahiAppleSiliconSocDriver {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GeomClassKind {
-    Mirror,  // gmirror RAID1
-    Stripe,  // gstripe RAID0
+    Mirror,    // gmirror RAID1
+    Stripe,    // gstripe RAID0
     EliCrypto, // geli volume encryption
 }
 
@@ -256,7 +268,12 @@ impl FreeBsdGeomBlockStorageDriver {
         }
     }
 
-    pub fn create_gmirror_volume(&mut self, name: &str, disks: &[&str], capacity: u64) -> GeomVolume {
+    pub fn create_gmirror_volume(
+        &mut self,
+        name: &str,
+        disks: &[&str],
+        capacity: u64,
+    ) -> GeomVolume {
         let vol = GeomVolume {
             name: name.to_string(),
             kind: GeomClassKind::Mirror,
@@ -268,7 +285,13 @@ impl FreeBsdGeomBlockStorageDriver {
         vol
     }
 
-    pub fn create_geli_encrypted_volume(&mut self, name: &str, parent_disk: &str, passphrase: &str, capacity: u64) -> Result<GeomVolume, &'static str> {
+    pub fn create_geli_encrypted_volume(
+        &mut self,
+        name: &str,
+        parent_disk: &str,
+        passphrase: &str,
+        capacity: u64,
+    ) -> Result<GeomVolume, &'static str> {
         if passphrase.is_empty() {
             return Err("GEOM geli Error: Key passphrase cannot be empty");
         }
@@ -326,7 +349,14 @@ impl OpenBsdWsmouseDriver {
         }
     }
 
-    pub fn push_event(&mut self, event_type: WsmouseEventType, dx: i16, dy: i16, dz: i8, buttons: u8) {
+    pub fn push_event(
+        &mut self,
+        event_type: WsmouseEventType,
+        dx: i16,
+        dy: i16,
+        dz: i8,
+        buttons: u8,
+    ) {
         self.event_queue.push(WsmouseEvent {
             event_type,
             dx,
@@ -410,7 +440,13 @@ mod tests {
         let scan = wifi.scan_networks();
         assert_eq!(scan.len(), 2);
 
-        assert!(wifi.associate("SigmaSovereignNet", "passphrase123", WifiSecurityAuth::Wpa3Sae).is_ok());
+        assert!(wifi
+            .associate(
+                "SigmaSovereignNet",
+                "passphrase123",
+                WifiSecurityAuth::Wpa3Sae
+            )
+            .is_ok());
         assert!(wifi.is_associated);
 
         let sent = wifi.send_packet(b"NETWORK_PAYLOAD").unwrap();
@@ -442,7 +478,9 @@ mod tests {
         let vol1 = geom.create_gmirror_volume("gm0", &["ada0", "ada1"], 1_000_000_000);
         assert_eq!(vol1.kind, GeomClassKind::Mirror);
 
-        let vol2 = geom.create_geli_encrypted_volume("geli0", "ada0p2", "secret", 500_000_000).unwrap();
+        let vol2 = geom
+            .create_geli_encrypted_volume("geli0", "ada0p2", "secret", 500_000_000)
+            .unwrap();
         assert_eq!(vol2.kind, GeomClassKind::EliCrypto);
     }
 

@@ -6,8 +6,6 @@
 //! - `MintUpdateSafetyManager`: Tiered package update safety policy levels (1..5) with kernel protection
 //! - `MintstickUsbFormatterEngine`: Low-level USB image writer, ISO burner, and FAT32/exFAT formatter
 
-
-
 /// Cinnamon Desktop Theme Configuration
 #[derive(Debug, Clone)]
 pub struct CinnamonThemeConfig {
@@ -82,7 +80,10 @@ impl TimeshiftBtrfsRsyncEngine {
 
     pub fn rollback(&mut self, snapshot_id: &str) -> Result<String, &'static str> {
         if self.snapshots.iter().any(|s| s.snapshot_id == snapshot_id) {
-            Ok(format!("Timeshift: System successfully restored to snapshot '{}'", snapshot_id))
+            Ok(format!(
+                "Timeshift: System successfully restored to snapshot '{}'",
+                snapshot_id
+            ))
         } else {
             Err("Target snapshot ID not found")
         }
@@ -187,6 +188,7 @@ mod tests {
     fn test_mint_update_safety_manager() {
         let manager = MintUpdateSafetyManager::new();
         assert!(manager.evaluate_package_update("curl", UpdateSafetyLevel::Level1Certified));
-        assert!(!manager.evaluate_package_update("experimental-driver", UpdateSafetyLevel::Level5Dangerous));
+        assert!(!manager
+            .evaluate_package_update("experimental-driver", UpdateSafetyLevel::Level5Dangerous));
     }
 }

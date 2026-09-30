@@ -1,8 +1,8 @@
 // POSIX Path Resolution and VFS (Virtual File System)
 // Implements POSIX path resolution, normalization, and VFS abstraction
 
-use std::path::{Path, PathBuf};
 use std::collections::HashMap;
+use std::path::{Path, PathBuf};
 
 /// VFS inode identifier
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -57,7 +57,13 @@ pub trait VfsOperations {
     fn mkdir(&mut self, parent: VfsInode, name: &str, mode: u32) -> Result<VfsInode, String>;
     fn unlink(&mut self, parent: VfsInode, name: &str) -> Result<(), String>;
     fn rmdir(&mut self, parent: VfsInode, name: &str) -> Result<(), String>;
-    fn rename(&mut self, old_parent: VfsInode, old_name: &str, new_parent: VfsInode, new_name: &str) -> Result<(), String>;
+    fn rename(
+        &mut self,
+        old_parent: VfsInode,
+        old_name: &str,
+        new_parent: VfsInode,
+        new_name: &str,
+    ) -> Result<(), String>;
     fn getattr(&self, inode: VfsInode) -> Result<VfsFileAttr, String>;
     fn setattr(&mut self, inode: VfsInode, attr: VfsFileAttr) -> Result<(), String>;
     fn read(&self, inode: VfsInode, offset: u64, buf: &mut [u8]) -> Result<usize, String>;
@@ -89,17 +95,20 @@ impl MemoryVfs {
 
         // Create root directory
         let root_inode = VfsInode::new(0);
-        vfs.inodes.insert(root_inode, VfsFileAttr {
-            inode: root_inode,
-            file_type: VfsFileType::Directory,
-            size: 0,
-            mode: 0o755,
-            uid: 0,
-            gid: 0,
-            atime: 0,
-            mtime: 0,
-            ctime: 0,
-        });
+        vfs.inodes.insert(
+            root_inode,
+            VfsFileAttr {
+                inode: root_inode,
+                file_type: VfsFileType::Directory,
+                size: 0,
+                mode: 0o755,
+                uid: 0,
+                gid: 0,
+                atime: 0,
+                mtime: 0,
+                ctime: 0,
+            },
+        );
         vfs.directories.insert(root_inode, Vec::new());
 
         vfs
@@ -120,7 +129,9 @@ impl Default for MemoryVfs {
 
 impl VfsOperations for MemoryVfs {
     fn lookup(&self, parent: VfsInode, name: &str) -> Result<VfsInode, String> {
-        let entries = self.directories.get(&parent)
+        let entries = self
+            .directories
+            .get(&parent)
             .ok_or_else(|| format!("Parent inode not found"))?;
 
         for entry in entries {
@@ -135,17 +146,20 @@ impl VfsOperations for MemoryVfs {
     fn create(&mut self, parent: VfsInode, name: &str, mode: u32) -> Result<VfsInode, String> {
         let inode = self.allocate_inode();
 
-        self.inodes.insert(inode, VfsFileAttr {
+        self.inodes.insert(
             inode,
-            file_type: VfsFileType::RegularFile,
-            size: 0,
-            mode,
-            uid: 0,
-            gid: 0,
-            atime: 0,
-            mtime: 0,
-            ctime: 0,
-        });
+            VfsFileAttr {
+                inode,
+                file_type: VfsFileType::RegularFile,
+                size: 0,
+                mode,
+                uid: 0,
+                gid: 0,
+                atime: 0,
+                mtime: 0,
+                ctime: 0,
+            },
+        );
 
         self.data.insert(inode, Vec::new());
 
@@ -163,17 +177,20 @@ impl VfsOperations for MemoryVfs {
     fn mkdir(&mut self, parent: VfsInode, name: &str, mode: u32) -> Result<VfsInode, String> {
         let inode = self.allocate_inode();
 
-        self.inodes.insert(inode, VfsFileAttr {
+        self.inodes.insert(
             inode,
-            file_type: VfsFileType::Directory,
-            size: 0,
-            mode,
-            uid: 0,
-            gid: 0,
-            atime: 0,
-            mtime: 0,
-            ctime: 0,
-        });
+            VfsFileAttr {
+                inode,
+                file_type: VfsFileType::Directory,
+                size: 0,
+                mode,
+                uid: 0,
+                gid: 0,
+                atime: 0,
+                mtime: 0,
+                ctime: 0,
+            },
+        );
 
         self.directories.insert(inode, Vec::new());
 
@@ -212,7 +229,13 @@ impl VfsOperations for MemoryVfs {
         Ok(())
     }
 
-    fn rename(&mut self, old_parent: VfsInode, old_name: &str, new_parent: VfsInode, new_name: &str) -> Result<(), String> {
+    fn rename(
+        &mut self,
+        old_parent: VfsInode,
+        old_name: &str,
+        new_parent: VfsInode,
+        new_name: &str,
+    ) -> Result<(), String> {
         let inode = self.lookup(old_parent, old_name)?;
 
         // Remove from old parent
@@ -221,7 +244,9 @@ impl VfsOperations for MemoryVfs {
         }
 
         // Add to new parent
-        let file_type = self.inodes.get(&inode)
+        let file_type = self
+            .inodes
+            .get(&inode)
             .map(|attr| attr.file_type)
             .unwrap_or(VfsFileType::RegularFile);
 
@@ -237,7 +262,8 @@ impl VfsOperations for MemoryVfs {
     }
 
     fn getattr(&self, inode: VfsInode) -> Result<VfsFileAttr, String> {
-        self.inodes.get(&inode)
+        self.inodes
+            .get(&inode)
             .cloned()
             .ok_or_else(|| format!("Inode not found"))
     }
@@ -248,7 +274,9 @@ impl VfsOperations for MemoryVfs {
     }
 
     fn read(&self, inode: VfsInode, offset: u64, buf: &mut [u8]) -> Result<usize, String> {
-        let data = self.data.get(&inode)
+        let data = self
+            .data
+            .get(&inode)
             .ok_or_else(|| format!("Inode not found"))?;
 
         let offset = offset as usize;
@@ -263,7 +291,9 @@ impl VfsOperations for MemoryVfs {
     }
 
     fn write(&mut self, inode: VfsInode, offset: u64, buf: &[u8]) -> Result<usize, String> {
-        let data = self.data.get_mut(&inode)
+        let data = self
+            .data
+            .get_mut(&inode)
             .ok_or_else(|| format!("Inode not found"))?;
 
         let offset = offset as usize;
@@ -282,7 +312,8 @@ impl VfsOperations for MemoryVfs {
     }
 
     fn readdir(&self, inode: VfsInode) -> Result<Vec<VfsDirEntry>, String> {
-        self.directories.get(&inode)
+        self.directories
+            .get(&inode)
             .cloned()
             .ok_or_else(|| format!("Directory not found"))
     }
@@ -290,17 +321,20 @@ impl VfsOperations for MemoryVfs {
     fn symlink(&mut self, parent: VfsInode, name: &str, target: &str) -> Result<VfsInode, String> {
         let inode = self.allocate_inode();
 
-        self.inodes.insert(inode, VfsFileAttr {
+        self.inodes.insert(
             inode,
-            file_type: VfsFileType::SymbolicLink,
-            size: target.len() as u64,
-            mode: 0o777,
-            uid: 0,
-            gid: 0,
-            atime: 0,
-            mtime: 0,
-            ctime: 0,
-        });
+            VfsFileAttr {
+                inode,
+                file_type: VfsFileType::SymbolicLink,
+                size: target.len() as u64,
+                mode: 0o777,
+                uid: 0,
+                gid: 0,
+                atime: 0,
+                mtime: 0,
+                ctime: 0,
+            },
+        );
 
         self.symlinks.insert(inode, target.to_string());
 
@@ -316,7 +350,8 @@ impl VfsOperations for MemoryVfs {
     }
 
     fn readlink(&self, inode: VfsInode) -> Result<String, String> {
-        self.symlinks.get(&inode)
+        self.symlinks
+            .get(&inode)
             .cloned()
             .ok_or_else(|| format!("Symlink not found"))
     }

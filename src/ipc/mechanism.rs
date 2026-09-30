@@ -18,19 +18,26 @@
 
 // (no_std only applicable at crate root - removed)
 
-use std::boxed::Box;
-use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
+use core::sync::atomic::{AtomicUsize, Ordering};
+use std::boxed::Box;
 
 pub type ChannelID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ChannelType { MessageQueue = 0, SharedMemory = 1, Pipe = 2 }
+pub enum ChannelType {
+    MessageQueue = 0,
+    SharedMemory = 1,
+    Pipe = 2,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ChannelState { Closed = 0, Open = 1 }
+pub enum ChannelState {
+    Closed = 0,
+    Open = 1,
+}
 
 pub trait Channel {
     fn id(&self) -> ChannelID;
@@ -43,7 +50,11 @@ pub trait Channel {
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum IPCError { Success = 0, SendFailed = 1, ReceiveFailed = 2 }
+pub enum IPCError {
+    Success = 0,
+    SendFailed = 1,
+    ReceiveFailed = 2,
+}
 
 #[repr(C)]
 pub struct SimpleChannel {
@@ -67,8 +78,12 @@ impl SimpleChannel {
 }
 
 impl Channel for SimpleChannel {
-    fn id(&self) -> ChannelID { self.id }
-    fn channel_type(&self) -> ChannelType { self.channel_type }
+    fn id(&self) -> ChannelID {
+        self.id
+    }
+    fn channel_type(&self) -> ChannelType {
+        self.channel_type
+    }
     fn state(&self) -> ChannelState {
         match self.state.load(Ordering::SeqCst) {
             0 => ChannelState::Closed,
@@ -76,18 +91,23 @@ impl Channel for SimpleChannel {
         }
     }
     fn close(&mut self) {
-        self.state.store(ChannelState::Closed as usize, Ordering::SeqCst);
+        self.state
+            .store(ChannelState::Closed as usize, Ordering::SeqCst);
     }
     fn send(&mut self, data: &[u8]) -> Result<(), IPCError> {
         let bytes = data.len().min(4096);
-        unsafe { core::ptr::copy_nonoverlapping(data.as_ptr(), self.buffer.as_mut_ptr(), bytes); }
+        unsafe {
+            core::ptr::copy_nonoverlapping(data.as_ptr(), self.buffer.as_mut_ptr(), bytes);
+        }
         self.buffer_size.store(bytes, Ordering::SeqCst);
         Ok(())
     }
     fn receive(&mut self, buffer: &mut [u8]) -> Result<usize, IPCError> {
         let size = self.buffer_size.load(Ordering::SeqCst);
         let bytes = buffer.len().min(size);
-        unsafe { core::ptr::copy_nonoverlapping(self.buffer.as_ptr(), buffer.as_mut_ptr(), bytes); }
+        unsafe {
+            core::ptr::copy_nonoverlapping(self.buffer.as_ptr(), buffer.as_mut_ptr(), bytes);
+        }
         Ok(bytes)
     }
 }
@@ -105,7 +125,12 @@ pub struct SimpleIPCMechanism {
 
 impl SimpleIPCMechanism {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { SimpleIPCMechanism { channels: Vec::new(), next_id: AtomicUsize::new(1) } }
+    pub fn new() -> Self {
+        SimpleIPCMechanism {
+            channels: Vec::new(),
+            next_id: AtomicUsize::new(1),
+        }
+    }
 }
 
 impl IPCMechanism for SimpleIPCMechanism {
@@ -129,20 +154,34 @@ impl IPCMechanism for SimpleIPCMechanism {
     fn get_channel(&self, id: ChannelID) -> Option<&dyn Channel> {
         for channel_option in &self.channels {
             if let Some(ref channel) = *channel_option {
-                if channel.id() == id { return Some(channel.as_ref()); }
+                if channel.id() == id {
+                    return Some(channel.as_ref());
+                }
             }
         }
         None
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -150,18 +189,29 @@ impl<T> Vec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];

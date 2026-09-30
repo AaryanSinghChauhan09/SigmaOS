@@ -29,7 +29,7 @@ impl ZeroCopyBuffer {
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap_or_default()
             .as_nanos() as u64;
-        
+
         Self {
             data,
             ref_count: AtomicUsize::new(1),
@@ -99,7 +99,7 @@ impl ZeroCopyBufferPool {
     /// Allocate a new buffer from the pool
     pub fn allocate(&self) -> Result<ZeroCopyBuffer, &'static str> {
         let idx = self.next_id.fetch_add(1, Ordering::SeqCst) % self.max_buffers;
-        
+
         // Create new buffer with zero-initialized data
         let data = vec![0u8; self.buffer_size];
         Ok(ZeroCopyBuffer::new(data))
@@ -227,7 +227,8 @@ impl ZeroCopyRingBuffer {
         }
 
         self.packets[tail] = Some(packet);
-        self.tail.store((tail + 1) % self.capacity, Ordering::SeqCst);
+        self.tail
+            .store((tail + 1) % self.capacity, Ordering::SeqCst);
         Ok(())
     }
 
@@ -241,7 +242,8 @@ impl ZeroCopyRingBuffer {
         }
 
         let packet = self.packets[head].take();
-        self.head.store((head + 1) % self.capacity, Ordering::SeqCst);
+        self.head
+            .store((head + 1) % self.capacity, Ordering::SeqCst);
         packet
     }
 
@@ -249,7 +251,7 @@ impl ZeroCopyRingBuffer {
     pub fn len(&self) -> usize {
         let head = self.head.load(Ordering::SeqCst);
         let tail = self.tail.load(Ordering::SeqCst);
-        
+
         if tail >= head {
             tail - head
         } else {
@@ -281,7 +283,7 @@ mod tests {
     fn test_zero_copy_buffer() {
         let data = vec![1u8, 2, 3, 4, 5];
         let buffer = ZeroCopyBuffer::new(data);
-        
+
         assert_eq!(buffer.len(), 5);
         assert_eq!(buffer.ref_count(), 1);
         assert_eq!(buffer.as_slice(), &[1, 2, 3, 4, 5]);
@@ -291,10 +293,10 @@ mod tests {
     fn test_reference_counting() {
         let buffer = ZeroCopyBuffer::new(vec![1, 2, 3]);
         assert_eq!(buffer.ref_count(), 1);
-        
+
         buffer.inc_ref();
         assert_eq!(buffer.ref_count(), 2);
-        
+
         assert_eq!(buffer.dec_ref(), 1);
         assert_eq!(buffer.ref_count(), 1);
     }
@@ -302,7 +304,7 @@ mod tests {
     #[test]
     fn test_buffer_pool() {
         let pool = ZeroCopyBufferPool::new(16, 1024);
-        
+
         let buffer = pool.allocate().unwrap();
         assert_eq!(buffer.len(), 1024);
         assert_eq!(pool.allocated_count(), 0); // Not tracked in this simple implementation
@@ -312,7 +314,7 @@ mod tests {
     fn test_buffer_pool_with_data() {
         let pool = ZeroCopyBufferPool::new(16, 1024);
         let data = vec![1u8, 2, 3];
-        
+
         let buffer = pool.allocate_with_data(data).unwrap();
         assert_eq!(buffer.len(), 3);
         assert_eq!(buffer.as_slice(), &[1, 2, 3]);
@@ -322,7 +324,7 @@ mod tests {
     fn test_zero_copy_packet() {
         let buffer = ZeroCopyBuffer::new(vec![1, 2, 3, 4, 5]);
         let packet = ZeroCopyPacket::new(buffer, 1, 3);
-        
+
         assert_eq!(packet.len(), 3);
         assert_eq!(packet.data(), &[2, 3, 4]);
     }
@@ -330,13 +332,13 @@ mod tests {
     #[test]
     fn test_ring_buffer() {
         let ring = ZeroCopyRingBuffer::new(8);
-        
+
         let buffer = ZeroCopyBuffer::new(vec![1, 2, 3]);
         let packet = ZeroCopyPacket::new(buffer, 0, 3);
-        
+
         assert!(ring.enqueue(packet).is_ok());
         assert_eq!(ring.len(), 1);
-        
+
         let dequeued = ring.dequeue();
         assert!(dequeued.is_some());
         assert_eq!(ring.len(), 0);
@@ -345,13 +347,13 @@ mod tests {
     #[test]
     fn test_ring_buffer_full() {
         let ring = ZeroCopyRingBuffer::new(2);
-        
+
         let buffer1 = ZeroCopyBuffer::new(vec![1]);
         let packet1 = ZeroCopyPacket::new(buffer1, 0, 1);
-        
+
         let buffer2 = ZeroCopyBuffer::new(vec![2]);
         let packet2 = ZeroCopyPacket::new(buffer2, 0, 1);
-        
+
         assert!(ring.enqueue(packet1).is_ok());
         assert!(ring.enqueue(packet2).is_ok());
         assert!(ring.is_full());

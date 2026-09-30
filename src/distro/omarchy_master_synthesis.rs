@@ -12,9 +12,9 @@
 #![allow(dead_code)]
 
 use std::collections::BTreeMap;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 /// Desktop Shell Element Types
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -83,9 +83,18 @@ impl Default for OmarchyQuickShellBridge {
         let mut elements = BTreeMap::new();
         elements.insert("top_bar".to_string(), ShellElementType::TopBar);
         elements.insert("launcher".to_string(), ShellElementType::AppLauncher);
-        elements.insert("quick_settings".to_string(), ShellElementType::ControlCenter);
-        elements.insert("notifications".to_string(), ShellElementType::NotificationCenter);
-        elements.insert("workspaces".to_string(), ShellElementType::WorkspaceSwitcher);
+        elements.insert(
+            "quick_settings".to_string(),
+            ShellElementType::ControlCenter,
+        );
+        elements.insert(
+            "notifications".to_string(),
+            ShellElementType::NotificationCenter,
+        );
+        elements.insert(
+            "workspaces".to_string(),
+            ShellElementType::WorkspaceSwitcher,
+        );
 
         Self {
             elements,
@@ -146,7 +155,12 @@ impl OmarchyThemeLiveEngine {
         self.active_palette = new_palette;
         self.targets
             .iter()
-            .map(|t| format!("Dispatched live reload signal to target '{}' [theme: {}]", t, self.active_palette.name))
+            .map(|t| {
+                format!(
+                    "Dispatched live reload signal to target '{}' [theme: {}]",
+                    t, self.active_palette.name
+                )
+            })
             .collect()
     }
 }
@@ -230,7 +244,9 @@ mod tests {
     #[test]
     fn test_quickshell_layer_shell_spec() {
         let bridge = OmarchyQuickShellBridge::default();
-        let spec = bridge.generate_layer_shell_spec("top_bar").expect("top_bar exists");
+        let spec = bridge
+            .generate_layer_shell_spec("top_bar")
+            .expect("top_bar exists");
         assert!(spec.contains("TopBar"));
         assert!(spec.contains("blur: 16"));
     }

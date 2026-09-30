@@ -13,9 +13,9 @@
 
 extern crate alloc;
 use alloc::boxed::Box;
+use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
 use core::fmt;
 
 use crate::theming::{Color, Theme};
@@ -95,15 +95,30 @@ pub struct Spacing {
 
 impl Spacing {
     pub const fn zero() -> Self {
-        Self { top: 0, right: 0, bottom: 0, left: 0 }
+        Self {
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0,
+        }
     }
-    
+
     pub const fn all(value: u32) -> Self {
-        Self { top: value, right: value, bottom: value, left: value }
+        Self {
+            top: value,
+            right: value,
+            bottom: value,
+            left: value,
+        }
     }
-    
+
     pub const fn symmetric(vertical: u32, horizontal: u32) -> Self {
-        Self { top: vertical, right: horizontal, bottom: vertical, left: horizontal }
+        Self {
+            top: vertical,
+            right: horizontal,
+            bottom: vertical,
+            left: horizontal,
+        }
     }
 }
 
@@ -247,7 +262,7 @@ impl WidgetBuilder {
             NEXT_ID += 1;
             id
         };
-        
+
         Self {
             widget: Widget {
                 id,
@@ -260,68 +275,68 @@ impl WidgetBuilder {
             },
         }
     }
-    
+
     pub fn width(mut self, width: Dimension) -> Self {
         self.widget.layout.width = width;
         self
     }
-    
+
     pub fn height(mut self, height: Dimension) -> Self {
         self.widget.layout.height = height;
         self
     }
-    
+
     pub fn padding(mut self, padding: Spacing) -> Self {
         self.widget.layout.padding = padding;
         self
     }
-    
+
     pub fn margin(mut self, margin: Spacing) -> Self {
         self.widget.layout.margin = margin;
         self
     }
-    
+
     pub fn background(mut self, color: Color) -> Self {
         self.widget.style.background = color;
         self
     }
-    
+
     pub fn foreground(mut self, color: Color) -> Self {
         self.widget.style.foreground = color;
         self
     }
-    
+
     pub fn border(mut self, width: u32, color: Color) -> Self {
         self.widget.style.border_width = width;
         self.widget.style.border_color = color;
         self
     }
-    
+
     pub fn border_radius(mut self, radius: u32) -> Self {
         self.widget.style.border_radius = radius;
         self
     }
-    
+
     pub fn font_size(mut self, size: u32) -> Self {
         self.widget.style.font_size = size;
         self
     }
-    
+
     pub fn on(mut self, event_type: EventType, handler: EventHandler) -> Self {
         self.widget.event_handlers.insert(event_type, handler);
         self
     }
-    
+
     pub fn child(mut self, child: Widget) -> Self {
         self.widget.children.push(child);
         self
     }
-    
+
     pub fn children(mut self, children: Vec<Widget>) -> Self {
         self.widget.children.extend(children);
         self
     }
-    
+
     pub fn build(self) -> Widget {
         self.widget
     }
@@ -342,55 +357,59 @@ impl WidgetApi {
             focused_widget: None,
         }
     }
-    
+
     pub fn set_root(&mut self, widget: Widget) {
         self.root = Some(widget);
     }
-    
+
     pub fn get_root(&self) -> Option<&Widget> {
         self.root.as_ref()
     }
-    
+
     pub fn get_root_mut(&mut self) -> Option<&mut Widget> {
         self.root.as_mut()
     }
-    
+
     pub fn find_widget(&self, id: WidgetId) -> Option<&Widget> {
-        self.root.as_ref().and_then(|root| Self::find_widget_recursive(root, id))
+        self.root
+            .as_ref()
+            .and_then(|root| Self::find_widget_recursive(root, id))
     }
-    
+
     fn find_widget_recursive(widget: &Widget, id: WidgetId) -> Option<&Widget> {
         if widget.id == id {
             return Some(widget);
         }
-        
+
         for child in &widget.children {
             if let Some(found) = Self::find_widget_recursive(child, id) {
                 return Some(found);
             }
         }
-        
+
         None
     }
-    
+
     pub fn find_widget_mut(&mut self, id: WidgetId) -> Option<&mut Widget> {
-        self.root.as_mut().and_then(|root| Self::find_widget_mut_recursive(root, id))
+        self.root
+            .as_mut()
+            .and_then(|root| Self::find_widget_mut_recursive(root, id))
     }
-    
+
     fn find_widget_mut_recursive(widget: &mut Widget, id: WidgetId) -> Option<&mut Widget> {
         if widget.id == id {
             return Some(widget);
         }
-        
+
         for child in &mut widget.children {
             if let Some(found) = Self::find_widget_mut_recursive(child, id) {
                 return Some(found);
             }
         }
-        
+
         None
     }
-    
+
     pub fn dispatch_event(&mut self, event: Event) {
         if let Some(widget) = self.find_widget_mut(event.target) {
             if let Some(handler) = widget.event_handlers.get(&event.event_type) {
@@ -398,7 +417,7 @@ impl WidgetApi {
             }
         }
     }
-    
+
     pub fn set_focus(&mut self, id: WidgetId) {
         // Clear previous focus
         if let Some(old_id) = self.focused_widget {
@@ -406,23 +425,23 @@ impl WidgetApi {
                 widget.state.focused = false;
             }
         }
-        
+
         // Set new focus
         if let Some(widget) = self.find_widget_mut(id) {
             widget.state.focused = true;
             self.focused_widget = Some(id);
         }
     }
-    
+
     pub fn apply_theme(&mut self, theme: Theme) {
         self.theme = theme;
-        
+
         // Update all widgets with theme colors
         if let Some(root) = self.root.as_mut() {
             Self::apply_theme_recursive(root, &self.theme);
         }
     }
-    
+
     fn apply_theme_recursive(widget: &mut Widget, theme: &Theme) {
         // Apply theme colors based on widget type
         match &widget.kind {
@@ -446,7 +465,7 @@ impl WidgetApi {
             }
             _ => {}
         }
-        
+
         // Apply to children
         for child in &mut widget.children {
             Self::apply_theme_recursive(child, theme);
@@ -457,41 +476,41 @@ impl WidgetApi {
 /// Convenience functions for common widgets
 pub mod widgets {
     use super::*;
-    
+
     pub fn container() -> WidgetBuilder {
         WidgetBuilder::new(WidgetKind::Container)
     }
-    
+
     pub fn text(content: &str) -> WidgetBuilder {
         WidgetBuilder::new(WidgetKind::Text(content.into()))
     }
-    
+
     pub fn button(label: &str) -> WidgetBuilder {
         WidgetBuilder::new(WidgetKind::Button(label.into()))
             .padding(Spacing::symmetric(8, 16))
             .border_radius(4)
     }
-    
+
     pub fn input(placeholder: &str) -> WidgetBuilder {
         WidgetBuilder::new(WidgetKind::Input(placeholder.into()))
             .padding(Spacing::all(8))
             .width(Dimension::Fill)
     }
-    
+
     pub fn scroll() -> WidgetBuilder {
         WidgetBuilder::new(WidgetKind::Scroll)
             .width(Dimension::Fill)
             .height(Dimension::Fill)
     }
-    
+
     pub fn list() -> WidgetBuilder {
         WidgetBuilder::new(WidgetKind::List)
     }
-    
+
     pub fn grid() -> WidgetBuilder {
         WidgetBuilder::new(WidgetKind::Grid)
     }
-    
+
     pub fn stack() -> WidgetBuilder {
         WidgetBuilder::new(WidgetKind::Stack)
     }
@@ -499,9 +518,9 @@ pub mod widgets {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use super::widgets::*;
-    
+    use super::*;
+
     #[test]
     fn test_widget_builder() {
         let widget = container()
@@ -510,25 +529,22 @@ mod tests {
             .padding(Spacing::all(10))
             .background(Color::rgb(255, 0, 0))
             .build();
-        
+
         assert_eq!(widget.layout.width, Dimension::Px(100));
         assert_eq!(widget.layout.height, Dimension::Px(100));
         assert_eq!(widget.style.background, Color::rgb(255, 0, 0));
     }
-    
+
     #[test]
     fn test_widget_hierarchy() {
         let child1 = text("Hello").build();
         let child2 = button("Click").build();
-        
-        let parent = container()
-            .child(child1)
-            .child(child2)
-            .build();
-        
+
+        let parent = container().child(child1).child(child2).build();
+
         assert_eq!(parent.children.len(), 2);
     }
-    
+
     #[test]
     fn test_widget_api() {
         let theme = Theme {
@@ -540,16 +556,14 @@ mod tests {
             shadows: crate::theming::Shadows::default(),
             animations: crate::theming::Animations::default(),
         };
-        
+
         let mut api = WidgetApi::new(theme);
-        
-        let root = container()
-            .child(text("Test").build())
-            .build();
-        
+
+        let root = container().child(text("Test").build()).build();
+
         let root_id = root.id;
         api.set_root(root);
-        
+
         assert!(api.find_widget(root_id).is_some());
     }
 }

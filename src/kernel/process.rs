@@ -4,11 +4,10 @@
 // Includes POSIX threads, complete states, signals, ELF loading stubs, context switching,
 // and advanced blocked process states (BlockedWaiting, BlockedSuspended, WaitChannels).
 
-
+use core::sync::atomic::{AtomicU64, Ordering};
 use std::collections::{BTreeMap, VecDeque};
 use std::string::String;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicU64, Ordering};
 
 pub const PAGE_SIZE: usize = 4096;
 
@@ -40,19 +39,51 @@ pub struct ThreadId(pub u64);
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct TrapFrame {
-    pub rax: u64, pub rbx: u64, pub rcx: u64, pub rdx: u64,
-    pub rbp: u64, pub rsi: u64, pub rdi: u64, pub r8: u64,
-    pub r9: u64, pub r10: u64, pub r11: u64, pub r12: u64,
-    pub r13: u64, pub r14: u64, pub r15: u64,
-    pub rip: u64, pub cs: u64, pub rflags: u64, pub rsp: u64, pub ss: u64,
+    pub rax: u64,
+    pub rbx: u64,
+    pub rcx: u64,
+    pub rdx: u64,
+    pub rbp: u64,
+    pub rsi: u64,
+    pub rdi: u64,
+    pub r8: u64,
+    pub r9: u64,
+    pub r10: u64,
+    pub r11: u64,
+    pub r12: u64,
+    pub r13: u64,
+    pub r14: u64,
+    pub r15: u64,
+    pub rip: u64,
+    pub cs: u64,
+    pub rflags: u64,
+    pub rsp: u64,
+    pub ss: u64,
 }
 
 impl TrapFrame {
     pub fn new() -> Self {
         Self {
-            rax: 0, rbx: 0, rcx: 0, rdx: 0, rbp: 0, rsi: 0, rdi: 0,
-            r8: 0, r9: 0, r10: 0, r11: 0, r12: 0, r13: 0, r14: 0, r15: 0,
-            rip: 0, cs: 0x2B, rflags: 0x202, rsp: 0, ss: 0x23,
+            rax: 0,
+            rbx: 0,
+            rcx: 0,
+            rdx: 0,
+            rbp: 0,
+            rsi: 0,
+            rdi: 0,
+            r8: 0,
+            r9: 0,
+            r10: 0,
+            r11: 0,
+            r12: 0,
+            r13: 0,
+            r14: 0,
+            r15: 0,
+            rip: 0,
+            cs: 0x2B,
+            rflags: 0x202,
+            rsp: 0,
+            ss: 0x23,
         }
     }
 }
@@ -150,7 +181,11 @@ impl Process {
             open_files: BTreeMap::new(),
             sig_pending: 0,
             sig_mask: 0,
-            sig_actions: core::array::from_fn(|_| SigAction { handler: 0, mask: 0, flags: 0 }),
+            sig_actions: core::array::from_fn(|_| SigAction {
+                handler: 0,
+                mask: 0,
+                flags: 0,
+            }),
             brk: 0x40000000,
             start_brk: 0x40000000,
             mmap_base: 0x700000000000,
@@ -263,7 +298,7 @@ impl ProcessManager {
     pub fn add_process(&mut self, p: Process) {
         self.processes.insert(p.pid, p);
     }
-    
+
     pub fn add_thread(&mut self, mut t: Thread) {
         t.state = ProcessState::Ready;
         self.ready_queue.push_back(t.tid);
@@ -295,7 +330,12 @@ impl ProcessManager {
         }
     }
 
-    pub fn block_thread_on_channel(&mut self, tid: ThreadId, wchan_id: u64, reason: BlockReason) -> Result<(), &'static str> {
+    pub fn block_thread_on_channel(
+        &mut self,
+        tid: ThreadId,
+        wchan_id: u64,
+        reason: BlockReason,
+    ) -> Result<(), &'static str> {
         let t = self.threads.get_mut(&tid).ok_or("Thread not found")?;
         t.state = ProcessState::BlockedWaiting;
         t.block_reason = Some(reason);
@@ -304,7 +344,10 @@ impl ProcessManager {
             p.transition_to_blocked(reason);
         }
 
-        self.wait_channels.entry(wchan_id).or_default().push_back(tid);
+        self.wait_channels
+            .entry(wchan_id)
+            .or_default()
+            .push_back(tid);
         Ok(())
     }
 
@@ -328,14 +371,21 @@ impl ProcessManager {
         awakened
     }
 
-    pub fn waitpid(&mut self, ppid: ProcessId, pid: Option<ProcessId>, current_tid: ThreadId) -> Option<i32> {
+    pub fn waitpid(
+        &mut self,
+        ppid: ProcessId,
+        pid: Option<ProcessId>,
+        current_tid: ThreadId,
+    ) -> Option<i32> {
         let parent = self.processes.get(&ppid)?;
         let children = parent.children.clone();
-        
+
         // Check for any zombie child
         for &cpid in &children {
             if let Some(child_pid) = pid {
-                if child_pid != cpid { continue; }
+                if child_pid != cpid {
+                    continue;
+                }
             }
             if let Some(child) = self.processes.get(&cpid) {
                 if child.state == ProcessState::Zombie {
@@ -349,15 +399,15 @@ impl ProcessManager {
         // None are zombies, block the current thread
         let q = self.wait_queues.entry(ppid).or_default();
         q.push_back(current_tid);
-        
+
         if let Some(t) = self.threads.get_mut(&current_tid) {
             t.state = ProcessState::BlockedWaiting;
             t.block_reason = Some(BlockReason::ChannelWait);
         }
-        
+
         None
     }
-    
+
     fn cleanup_zombie(&mut self, pid: ProcessId) {
         if let Some(p) = self.processes.remove(&pid) {
             if let Some(parent) = self.processes.get_mut(&p.ppid) {
@@ -397,28 +447,32 @@ impl ProcessManager {
             }
         }
     }
-    
+
     pub fn exec(&mut self, pid: ProcessId, elf_data: &[u8]) -> Result<u64, &'static str> {
         if elf_data.len() < core::mem::size_of::<Elf64Ehdr>() {
             return Err("Invalid ELF header");
         }
-        
+
         let ehdr = unsafe { &*(elf_data.as_ptr() as *const Elf64Ehdr) };
         if ehdr.e_ident[0..4] != [0x7F, b'E', b'L', b'F'] {
             return Err("Not an ELF file");
         }
-        
+
         if ehdr.e_type != 2 && ehdr.e_type != 3 {
             return Err("Unsupported ELF type");
         }
-        
+
         let p = self.processes.get_mut(&pid).ok_or("Process not found")?;
-        
+
         p.brk = 0x40000000;
         p.start_brk = 0x40000000;
         p.mmap_base = 0x700000000000;
-        p.sig_actions = core::array::from_fn(|_| SigAction { handler: 0, mask: 0, flags: 0 });
-        
+        p.sig_actions = core::array::from_fn(|_| SigAction {
+            handler: 0,
+            mask: 0,
+            flags: 0,
+        });
+
         Ok(ehdr.e_entry)
     }
 }
@@ -444,7 +498,9 @@ mod tests {
         pm.add_thread(thread);
 
         // Block on I/O channel
-        assert!(pm.block_thread_on_channel(ThreadId(101), 0x55, BlockReason::IoWait).is_ok());
+        assert!(pm
+            .block_thread_on_channel(ThreadId(101), 0x55, BlockReason::IoWait)
+            .is_ok());
         let p = pm.get_process(pid).unwrap();
         assert_eq!(p.state, ProcessState::BlockedWaiting);
         assert_eq!(p.block_reason, Some(BlockReason::IoWait));

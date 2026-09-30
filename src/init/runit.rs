@@ -1,10 +1,10 @@
 // Runit Supervision Engine for SigmaOS
 // Location: src/init/runit.rs
 
+use super::init_abstraction::{InitError, InitSystem, InitSystemType, ServiceStatus};
+use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
-use std::collections::BTreeMap;
-use super::init_abstraction::{InitSystem, InitSystemType, ServiceStatus, InitError};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RunitStage {
@@ -86,7 +86,10 @@ impl InitSystem for RunitInit {
     }
 
     fn service_status(&self, name: &str) -> ServiceStatus {
-        self.services.get(name).map(|s| s.status).unwrap_or(ServiceStatus::Unknown)
+        self.services
+            .get(name)
+            .map(|s| s.status)
+            .unwrap_or(ServiceStatus::Unknown)
     }
 
     fn enable_service(&mut self, name: &str) -> Result<(), InitError> {

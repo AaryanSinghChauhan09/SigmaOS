@@ -67,14 +67,14 @@ impl TilingWindowManager {
     /// Create a workspace
     pub fn create_workspace(&mut self, name: String, layout: TilingLayout) -> Workspace {
         let id = self.next_workspace_id.fetch_add(1, Ordering::SeqCst);
-        
+
         let workspace = Workspace {
             id,
             name,
             layout,
             gaps: 8,
         };
-        
+
         self.workspaces.insert(id, workspace.clone());
         workspace
     }
@@ -82,7 +82,7 @@ impl TilingWindowManager {
     /// Add a window to workspace
     pub fn add_window(&mut self, workspace_id: u64, area: WindowArea) -> TilingWindow {
         let id = self.next_window_id.fetch_add(1, Ordering::SeqCst);
-        
+
         let window = TilingWindow {
             id,
             workspace_id,
@@ -90,7 +90,7 @@ impl TilingWindowManager {
             is_floating: false,
             is_fullscreen: false,
         };
-        
+
         self.windows.insert(id, window.clone());
         self.rearrange_workspace(workspace_id);
         window
@@ -117,7 +117,8 @@ impl TilingWindowManager {
             return;
         };
 
-        let window_ids: Vec<u64> = self.windows
+        let window_ids: Vec<u64> = self
+            .windows
             .values()
             .filter(|w| w.workspace_id == workspace_id && !w.is_floating && !w.is_fullscreen)
             .map(|w| w.id)
@@ -141,11 +142,11 @@ impl TilingWindowManager {
         // Simplified spiral layout
         let screen_width = 1920u32;
         let screen_height = 1080u32;
-        
+
         for (i, window) in windows.iter().enumerate() {
             let x = (i as u32 * 50) % (screen_width - 200);
             let y = (i as u32 * 50) % (screen_height - 200);
-            
+
             if let Some(w) = self.windows.get_mut(&window.id) {
                 w.area = WindowArea {
                     x: x as i32 + gaps as i32,
@@ -161,7 +162,7 @@ impl TilingWindowManager {
         // Monocle: single focused window takes full screen
         let screen_width = 1920u32;
         let screen_height = 1080u32;
-        
+
         for window in windows {
             if let Some(w) = self.windows.get_mut(&window.id) {
                 w.area = WindowArea {
@@ -293,12 +294,12 @@ impl TilingWindowManager {
         let screen_width = 1920u32;
         let screen_height = 1080u32;
         let count = windows.len() as u32;
-        
+
         let col_width = (screen_width - gaps * (count + 1)) / count;
-        
+
         for (i, window) in windows.iter().enumerate() {
             let x = gaps + (i as u32 * (col_width + gaps));
-            
+
             if let Some(w) = self.windows.get_mut(&window.id) {
                 w.area = WindowArea {
                     x: x as i32,
@@ -314,12 +315,12 @@ impl TilingWindowManager {
         let screen_width = 1920u32;
         let screen_height = 1080u32;
         let count = windows.len() as u32;
-        
+
         let row_height = (screen_height - gaps * (count + 1)) / count;
-        
+
         for (i, window) in windows.iter().enumerate() {
             let y = gaps + (i as u32 * (row_height + gaps));
-            
+
             if let Some(w) = self.windows.get_mut(&window.id) {
                 w.area = WindowArea {
                     x: gaps as i32,
@@ -335,20 +336,20 @@ impl TilingWindowManager {
         let screen_width = 1920u32;
         let screen_height = 1080u32;
         let count = windows.len();
-        
+
         let cols = (count as f32).sqrt().ceil() as u32;
         let rows = (count as f32 / cols as f32).ceil() as u32;
-        
+
         let cell_width = (screen_width - gaps * (cols + 1)) / cols;
         let cell_height = (screen_height - gaps * (rows + 1)) / rows;
-        
+
         for (i, window) in windows.iter().enumerate() {
             let col = (i as u32) % cols;
             let row = (i as u32) / cols;
-            
+
             let x = gaps + col * (cell_width + gaps);
             let y = gaps + row * (cell_height + gaps);
-            
+
             if let Some(w) = self.windows.get_mut(&window.id) {
                 w.area = WindowArea {
                     x: x as i32,
@@ -371,7 +372,11 @@ impl TilingWindowManager {
     }
 
     /// Set workspace layout
-    pub fn set_layout(&mut self, workspace_id: u64, layout: TilingLayout) -> Result<(), &'static str> {
+    pub fn set_layout(
+        &mut self,
+        workspace_id: u64,
+        layout: TilingLayout,
+    ) -> Result<(), &'static str> {
         if let Some(workspace) = self.workspaces.get_mut(&workspace_id) {
             workspace.layout = layout;
             self.rearrange_workspace(workspace_id);
@@ -422,7 +427,7 @@ mod tests {
     #[test]
     fn test_create_workspace() {
         let mut manager = TilingWindowManager::new();
-        
+
         let workspace = manager.create_workspace("1".to_string(), TilingLayout::Spiral);
         assert_eq!(workspace.id, 1);
         assert_eq!(manager.workspace_count(), 1);
@@ -431,10 +436,15 @@ mod tests {
     #[test]
     fn test_add_window() {
         let mut manager = TilingWindowManager::new();
-        
+
         let workspace = manager.create_workspace("1".to_string(), TilingLayout::Spiral);
-        let area = WindowArea { x: 0, y: 0, width: 800, height: 600 };
-        
+        let area = WindowArea {
+            x: 0,
+            y: 0,
+            width: 800,
+            height: 600,
+        };
+
         let window = manager.add_window(workspace.id, area);
         assert_eq!(window.id, 1);
         assert_eq!(manager.window_count(), 1);
@@ -443,10 +453,15 @@ mod tests {
     #[test]
     fn test_remove_window() {
         let mut manager = TilingWindowManager::new();
-        
+
         let workspace = manager.create_workspace("1".to_string(), TilingLayout::Spiral);
-        let area = WindowArea { x: 0, y: 0, width: 800, height: 600 };
-        
+        let area = WindowArea {
+            x: 0,
+            y: 0,
+            width: 800,
+            height: 600,
+        };
+
         let window = manager.add_window(workspace.id, area);
         assert!(manager.remove_window(window.id).is_ok());
         assert_eq!(manager.window_count(), 0);
@@ -455,17 +470,17 @@ mod tests {
     #[test]
     fn test_switch_workspace() {
         let mut manager = TilingWindowManager::new();
-        
+
         manager.create_workspace("1".to_string(), TilingLayout::Spiral);
         manager.create_workspace("2".to_string(), TilingLayout::Monocle);
-        
+
         assert!(manager.switch_workspace(2).is_ok());
     }
 
     #[test]
     fn test_set_layout() {
         let mut manager = TilingWindowManager::new();
-        
+
         let workspace = manager.create_workspace("1".to_string(), TilingLayout::Spiral);
         assert!(manager.set_layout(workspace.id, TilingLayout::Grid).is_ok());
     }

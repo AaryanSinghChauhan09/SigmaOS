@@ -1,10 +1,9 @@
-use std::collections::{BTreeSet, BTreeMap};
+use std::collections::{BTreeMap, BTreeSet};
 use std::string::String;
 use std::vec::Vec;
 // SigmaOS APT (Advanced Package Tool) Implementation
 // Implements Debian-style package management for SigmaOS
 // Inspired by Debian's APT for advanced package operations
-
 
 /// APT error types
 #[derive(Debug, Clone)]

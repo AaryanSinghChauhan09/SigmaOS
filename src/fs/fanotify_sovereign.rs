@@ -4,8 +4,6 @@
 #![allow(clippy::new_without_default)]
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-
-
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
@@ -20,12 +18,12 @@ use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FanotifyEventKind {
-    Access,      // FAN_ACCESS: File was accessed (read)
-    Modify,      // FAN_MODIFY: File was modified (written)
-    Open,        // FAN_OPEN: File was opened
-    CloseWrite,  // FAN_CLOSE_WRITE: Writable file was closed
-    OpenPerm,    // FAN_OPEN_PERM: Permission to open file requested
-    AccessPerm,  // FAN_ACCESS_PERM: Permission to read file requested
+    Access,     // FAN_ACCESS: File was accessed (read)
+    Modify,     // FAN_MODIFY: File was modified (written)
+    Open,       // FAN_OPEN: File was opened
+    CloseWrite, // FAN_CLOSE_WRITE: Writable file was closed
+    OpenPerm,   // FAN_OPEN_PERM: Permission to open file requested
+    AccessPerm, // FAN_ACCESS_PERM: Permission to read file requested
 }
 
 // ─── fanotify Response ────────────────────────────────────────────────────────
@@ -101,9 +99,9 @@ impl SovereignFanotifyGroup {
 
     /// Check if path is watched for a given event kind
     pub fn is_watched(&self, path: &str, kind: FanotifyEventKind) -> bool {
-        self.marks.iter().any(|m| {
-            (path.starts_with(&m.path) || m.path == "*") && m.mask.contains(&kind)
-        })
+        self.marks
+            .iter()
+            .any(|m| (path.starts_with(&m.path) || m.path == "*") && m.mask.contains(&kind))
     }
 
     /// Notify file activity
@@ -111,7 +109,8 @@ impl SovereignFanotifyGroup {
         if self.is_watched(path, kind) {
             let id = self.next_event_id;
             self.next_event_id = self.next_event_id.saturating_add(1);
-            self.event_queue.push(FanotifyEvent::new(id, kind, pid, path));
+            self.event_queue
+                .push(FanotifyEvent::new(id, kind, pid, path));
             Some(id)
         } else {
             None
@@ -119,7 +118,12 @@ impl SovereignFanotifyGroup {
     }
 
     /// Check permission hook (blocking open/access until user space responds)
-    pub fn check_permission(&mut self, kind: FanotifyEventKind, pid: u32, path: &str) -> Result<(), i32> {
+    pub fn check_permission(
+        &mut self,
+        kind: FanotifyEventKind,
+        pid: u32,
+        path: &str,
+    ) -> Result<(), i32> {
         if !self.is_watched(path, kind) {
             return Ok(()); // Not marked for permission checks
         }
@@ -128,7 +132,8 @@ impl SovereignFanotifyGroup {
         self.next_event_id = self.next_event_id.saturating_add(1);
 
         // Queue permission event
-        self.event_queue.push(FanotifyEvent::new(event_id, kind, pid, path));
+        self.event_queue
+            .push(FanotifyEvent::new(event_id, kind, pid, path));
 
         // Default heuristic: If path is in /etc/forbidden, deny; otherwise allow
         if path.contains("forbidden") || path.contains("malware") {
@@ -158,7 +163,11 @@ mod tests {
     #[test]
     fn test_fanotify_mark_and_watch() {
         let mut fan = SovereignFanotifyGroup::new(1);
-        fan.mark_path("/home/user", false, vec![FanotifyEventKind::Access, FanotifyEventKind::Modify]);
+        fan.mark_path(
+            "/home/user",
+            false,
+            vec![FanotifyEventKind::Access, FanotifyEventKind::Modify],
+        );
 
         assert!(fan.is_watched("/home/user/document.txt", FanotifyEventKind::Access));
         assert!(fan.is_watched("/home/user/document.txt", FanotifyEventKind::Modify));
@@ -185,7 +194,9 @@ mod tests {
         let mut fan = SovereignFanotifyGroup::new(1);
         fan.mark_path("/data", false, vec![FanotifyEventKind::OpenPerm]);
 
-        assert!(fan.check_permission(FanotifyEventKind::OpenPerm, 200, "/data/report.pdf").is_ok());
+        assert!(fan
+            .check_permission(FanotifyEventKind::OpenPerm, 200, "/data/report.pdf")
+            .is_ok());
         assert_eq!(fan.permissions_allowed, 1);
         assert_eq!(fan.permissions_blocked, 0);
     }
@@ -195,7 +206,8 @@ mod tests {
         let mut fan = SovereignFanotifyGroup::new(1);
         fan.mark_path("/tmp", false, vec![FanotifyEventKind::OpenPerm]);
 
-        let res = fan.check_permission(FanotifyEventKind::OpenPerm, 666, "/tmp/malware_payload.bin");
+        let res =
+            fan.check_permission(FanotifyEventKind::OpenPerm, 666, "/tmp/malware_payload.bin");
         assert_eq!(res, Err(-1)); // Denied
         assert_eq!(fan.permissions_blocked, 1);
     }

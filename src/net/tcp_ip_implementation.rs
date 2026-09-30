@@ -2,10 +2,10 @@
 // SigmaOS Functional TCP/IP Network Stack Implementation
 // Full-featured IPv4/TCP/UDP protocol suite with modern congestion control
 
-use std::collections::BTreeMap;
-use std::vec::Vec;
 use core::sync::atomic::{AtomicU16, Ordering};
 use core::time::Duration;
+use std::collections::BTreeMap;
+use std::vec::Vec;
 
 use super::stack::{NetworkError, SocketAddr};
 
@@ -150,10 +150,10 @@ pub struct TcpConnectionControlBlock {
     recv_buffer_ptr: usize,
 
     // Congestion control
-    cwnd: u32,           // Congestion window
-    ssthresh: u32,       // Slow start threshold
-    mss: u32,            // Maximum segment size
-    rtt: Duration,       // Round-trip time estimate
+    cwnd: u32,     // Congestion window
+    ssthresh: u32, // Slow start threshold
+    mss: u32,      // Maximum segment size
+    rtt: Duration, // Round-trip time estimate
     retransmit_count: u32,
 
     // Connection metadata
@@ -217,7 +217,9 @@ impl TcpConnectionControlBlock {
     pub fn can_receive(&self) -> bool {
         matches!(
             self.state,
-            TcpConnectionState::Established | TcpConnectionState::FinWait1 | TcpConnectionState::FinWait2
+            TcpConnectionState::Established
+                | TcpConnectionState::FinWait1
+                | TcpConnectionState::FinWait2
         )
     }
 
@@ -233,7 +235,12 @@ impl TcpConnectionControlBlock {
     }
 
     /// Validate SYN Cookie response ACK sequence number
-    pub fn validate_syn_cookie(cookie: u32, local: SocketAddr, remote: SocketAddr, secret_seed: u32) -> bool {
+    pub fn validate_syn_cookie(
+        cookie: u32,
+        local: SocketAddr,
+        remote: SocketAddr,
+        secret_seed: u32,
+    ) -> bool {
         let expected = Self::generate_syn_cookie(local, remote, secret_seed);
         cookie == expected
     }
@@ -450,9 +457,7 @@ pub struct RoutingTable {
 
 impl RoutingTable {
     pub fn new() -> Self {
-        RoutingTable {
-            routes: Vec::new(),
-        }
+        RoutingTable { routes: Vec::new() }
     }
 
     pub fn add_route(&mut self, dest: IPv4Address, mask: IPv4Address, gw: IPv4Address) {
@@ -646,7 +651,11 @@ impl TcpIpStack {
         self.interface_mac = mac;
     }
 
-    pub fn socket(&mut self, socket_type: SocketType, _protocol: SocketProtocol) -> Result<u32, NetworkError> {
+    pub fn socket(
+        &mut self,
+        socket_type: SocketType,
+        _protocol: SocketProtocol,
+    ) -> Result<u32, NetworkError> {
         let socket_id = self.next_socket_id;
         self.next_socket_id += 1;
 
@@ -770,7 +779,9 @@ mod tests {
     #[test]
     fn test_tcp_socket_creation() {
         let mut stack = TcpIpStack::new();
-        let socket_id = stack.socket(SocketType::Stream, SocketProtocol::Tcp).unwrap();
+        let socket_id = stack
+            .socket(SocketType::Stream, SocketProtocol::Tcp)
+            .unwrap();
         assert!(socket_id > 0);
     }
 
@@ -832,9 +843,16 @@ mod tests {
         let seed = 0x98765432;
 
         let cookie = TcpConnectionControlBlock::generate_syn_cookie(local, remote, seed);
-        assert!(TcpConnectionControlBlock::validate_syn_cookie(cookie, local, remote, seed));
+        assert!(TcpConnectionControlBlock::validate_syn_cookie(
+            cookie, local, remote, seed
+        ));
 
         let wrong_remote = SocketAddr::new_ipv4(54322, [10, 0, 0, 2]);
-        assert!(!TcpConnectionControlBlock::validate_syn_cookie(cookie, local, wrong_remote, seed));
+        assert!(!TcpConnectionControlBlock::validate_syn_cookie(
+            cookie,
+            local,
+            wrong_remote,
+            seed
+        ));
     }
 }
