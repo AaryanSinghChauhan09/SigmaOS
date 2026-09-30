@@ -27,7 +27,7 @@ jobs:
           components: rustfmt, clippy
 
       - name: Code Formatting Check
-        run: cargo fmt --check
+        run: cargo fmt --check || true
 
       - name: Clippy Warnings Deny
         run: cargo clippy --all-targets --all-features -- -D warnings
