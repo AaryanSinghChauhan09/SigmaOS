@@ -208,6 +208,11 @@ sharing are likewise unavailable without audited password hashing or trusted
 directory and authenticated transport providers. Policy checks and nonempty
 passwords, PINs, or ticket bytes do not authenticate an identity.
 
+The PAM compatibility engine no longer treats a process environment value as
+a credential, and the PIA VPN model does not turn caller input into an API
+token or report a connected tunnel. Both remain unavailable until real
+providers and authenticated transport are integrated.
+
 The exported PAM model currently fails closed: without a secure random source
 and an audited password hashing provider, it will not register users or
 authenticate credentials. `security::crypto_utils::SecureRandom` and its
