@@ -204,6 +204,12 @@ signature based on fixed magic bytes. Its password and signature checks remain
 unavailable until vetted verification providers are integrated, so shell
 access fails closed.
 
+`auth::SimpleUser` has no password verifier and always returns
+`AuthError::ProviderUnavailable` for non-locked accounts. The single-user
+maintenance login likewise remains locked until a trusted password verifier
+exists. The stored byte arrays are compatibility placeholders, not hashes, and
+must not be used as credentials.
+
 The Fedora Cockpit and FreeIPA compatibility models do not authenticate
 sessions or mint Kerberos tickets without trusted Cockpit/KDC integrations.
 They reject authentication and token verification rather than treating any
