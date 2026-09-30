@@ -3,9 +3,9 @@
 // Multiboot2 header parsing, Device Tree (DTB) blob parsing, initrd/initramfs RAM disk,
 // kernel cmdline parsing, kernel ELF loading, page table initialization, and automated installer wizard.
 
+use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BootType {
@@ -63,7 +63,9 @@ pub struct InitramfsExtractor {
 
 impl InitramfsExtractor {
     pub fn new() -> Self {
-        Self { loaded_modules: Vec::new() }
+        Self {
+            loaded_modules: Vec::new(),
+        }
     }
 
     pub fn extract_cpio_archive(&mut self, cpio_bytes: &[u8]) -> usize {
@@ -71,7 +73,8 @@ impl InitramfsExtractor {
             return 0;
         }
         self.loaded_modules.push("init".to_string());
-        self.loaded_modules.push("lib/modules/sovereign.ko".to_string());
+        self.loaded_modules
+            .push("lib/modules/sovereign.ko".to_string());
         self.loaded_modules.len()
     }
 }
@@ -113,7 +116,9 @@ impl UefiBootloader {
             gpt_partitions: Vec::new(),
             cmdline: KernelCmdlineOptions::parse("console=ttyS0 quiet root=/dev/nvme0n1p2"),
             initramfs: InitramfsExtractor::new(),
-            dtb: DeviceTreeBlob { compatible_nodes: Vec::new() },
+            dtb: DeviceTreeBlob {
+                compatible_nodes: Vec::new(),
+            },
             kernel_loaded: false,
         }
     }
@@ -170,7 +175,12 @@ impl UefiBootloader {
         if header_bytes.len() < 16 {
             return Err("Multiboot2 header too short");
         }
-        let magic = u32::from_le_bytes([header_bytes[0], header_bytes[1], header_bytes[2], header_bytes[3]]);
+        let magic = u32::from_le_bytes([
+            header_bytes[0],
+            header_bytes[1],
+            header_bytes[2],
+            header_bytes[3],
+        ]);
         if magic == 0xE85250D6 {
             Ok(true)
         } else {
@@ -196,7 +206,10 @@ impl SovereignInstallerWizard {
         if self.target_disk.is_empty() {
             return Err("No installation target disk specified");
         }
-        Ok(format!("Successfully deployed SigmaOS image with LUKS2 encryption onto {}", self.target_disk))
+        Ok(format!(
+            "Successfully deployed SigmaOS image with LUKS2 encryption onto {}",
+            self.target_disk
+        ))
     }
 }
 
@@ -232,7 +245,9 @@ mod tests {
         let count = extractor.extract_cpio_archive(b"CPIO_RAMDISK_HEADER_TEST");
         assert_eq!(count, 2);
 
-        let mut dtb = DeviceTreeBlob { compatible_nodes: Vec::new() };
+        let mut dtb = DeviceTreeBlob {
+            compatible_nodes: Vec::new(),
+        };
         let node_count = dtb.parse_dtb(&[0u8; 32]).unwrap();
         assert_eq!(node_count, 2);
     }
@@ -246,7 +261,9 @@ mod tests {
         assert!(cfg.contains("console=ttyS0"));
 
         let multiboot2_bytes = [0xD6, 0x50, 0x52, 0xE8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        assert!(bootloader.verify_multiboot2_header(&multiboot2_bytes).unwrap());
+        assert!(bootloader
+            .verify_multiboot2_header(&multiboot2_bytes)
+            .unwrap());
 
         let invalid_bytes = [0x00, 0x00, 0x00, 0x00, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         assert!(bootloader.verify_multiboot2_header(&invalid_bytes).is_err());

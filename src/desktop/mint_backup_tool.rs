@@ -64,7 +64,13 @@ impl MintBackupToolEngine {
     }
 
     /// Add a software package to the system manifest
-    pub fn register_installed_package(&mut self, name: &str, version: &str, repo: &str, is_explicit: bool) {
+    pub fn register_installed_package(
+        &mut self,
+        name: &str,
+        version: &str,
+        repo: &str,
+        is_explicit: bool,
+    ) {
         self.tracked_installed_packages.push(PackageSelectionEntry {
             package_name: name.to_string(),
             version: version.to_string(),
@@ -78,7 +84,10 @@ impl MintBackupToolEngine {
         let mut out = String::from("# SigmaOS Installed Software Manifest\n# Format: PackageName Version Origin Explicit\n");
         for pkg in &self.tracked_installed_packages {
             if pkg.is_user_explicit {
-                out.push_str(&format!("{} {} {} explicit\n", pkg.package_name, pkg.version, pkg.origin_repo));
+                out.push_str(&format!(
+                    "{} {} {} explicit\n",
+                    pkg.package_name, pkg.version, pkg.origin_repo
+                ));
             }
         }
         out
@@ -103,7 +112,8 @@ impl MintBackupToolEngine {
             total_files_count: 1420 - custom_exclusions.len() * 10,
             uncompressed_bytes: 4_800_000_000,
             compressed_bytes: 1_920_000_000,
-            sha256_checksum: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855".into(),
+            sha256_checksum: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                .into(),
         };
 
         self.past_backups.push(header.clone());

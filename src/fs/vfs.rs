@@ -26,14 +26,24 @@ pub struct FilePermissions {
 
 impl FilePermissions {
     pub fn new(read: bool, write: bool, execute: bool) -> Self {
-        Self { read, write, execute }
+        Self {
+            read,
+            write,
+            execute,
+        }
     }
 
     pub fn as_mode(&self) -> u32 {
         let mut mode = 0u32;
-        if self.read { mode |= 0o400; }
-        if self.write { mode |= 0o200; }
-        if self.execute { mode |= 0o100; }
+        if self.read {
+            mode |= 0o400;
+        }
+        if self.write {
+            mode |= 0o200;
+        }
+        if self.execute {
+            mode |= 0o100;
+        }
         mode
     }
 }
@@ -100,14 +110,14 @@ pub struct Vfs {
 impl Vfs {
     pub fn new() -> Self {
         let mut vfs = Self {
-            next_inode: AtomicU64::new(1),
+            next_inode: AtomicU64::new(2),
             inodes: HashMap::new(),
             dentries: HashMap::new(),
             superblocks: HashMap::new(),
             mounts: Vec::new(),
             root_inode: 1,
         };
-        
+
         // Create root directory
         let root_inode = VfsInode {
             inode_number: 1,
@@ -119,17 +129,17 @@ impl Vfs {
             gid: 0,
             data: Vec::new(),
         };
-        
+
         vfs.inodes.insert(1, root_inode);
         vfs.dentries.insert(1, Vec::new());
-        
+
         vfs
     }
 
     /// Create a new inode
     pub fn create_inode(&mut self, file_type: FileType, permissions: FilePermissions) -> u64 {
         let inode_number = self.next_inode.fetch_add(1, Ordering::SeqCst);
-        
+
         let inode = VfsInode {
             inode_number,
             file_type,
@@ -140,10 +150,10 @@ impl Vfs {
             gid: 0,
             data: Vec::new(),
         };
-        
+
         self.inodes.insert(inode_number, inode);
         self.dentries.insert(inode_number, Vec::new());
-        
+
         inode_number
     }
 
@@ -152,17 +162,17 @@ impl Vfs {
         if path == "/" || path == "" {
             return Some(self.root_inode);
         }
-        
+
         let components: Vec<&str> = path.split('/').filter(|s| !s.is_empty()).collect();
         let mut current_inode = self.root_inode;
-        
+
         for component in components {
             let dentries = self.dentries.get(&current_inode)?;
-            
+
             let dentry = dentries.iter().find(|d| d.name == component)?;
             current_inode = dentry.inode;
         }
-        
+
         Some(current_inode)
     }
 
@@ -188,74 +198,78 @@ impl Vfs {
     }
 
     /// Create a file
-    pub fn create(&mut self, path: &str, permissions: FilePermissions) -> Result<u64, &'static str> {
+    pub fn create(
+        &mut self,
+        path: &str,
+        permissions: FilePermissions,
+    ) -> Result<u64, &'static str> {
         let parent_path = self.get_parent_path(path)?;
         let parent_inode = self.lookup(&parent_path).ok_or("Parent not found")?;
 
         let file_name = self.get_basename(path).to_string();
         let new_inode = self.create_inode(FileType::Regular, permissions);
-        
+
         let dentry = VfsDentry {
             name: file_name,
             inode: new_inode,
             parent: Some(parent_inode),
         };
-        
+
         if let Some(dentries) = self.dentries.get_mut(&parent_inode) {
             dentries.push(dentry);
         }
-        
+
         Ok(new_inode)
     }
 
     /// Read from file
     pub fn read(&self, inode: u64, offset: u64, size: usize) -> Result<Vec<u8>, &'static str> {
         let file = self.inodes.get(&inode).ok_or("Inode not found")?;
-        
+
         if file.file_type != FileType::Regular {
             return Err("Not a regular file");
         }
-        
+
         let start = offset as usize;
         let end = (offset as usize + size).min(file.data.len());
-        
+
         if start >= file.data.len() {
             return Ok(Vec::new());
         }
-        
+
         Ok(file.data[start..end].to_vec())
     }
 
     /// Write to file
     pub fn write(&mut self, inode: u64, offset: u64, data: &[u8]) -> Result<usize, &'static str> {
         let file = self.inodes.get_mut(&inode).ok_or("Inode not found")?;
-        
+
         if file.file_type != FileType::Regular {
             return Err("Not a regular file");
         }
-        
+
         let start = offset as usize;
-        
+
         if start + data.len() > file.data.len() {
             file.data.resize(start + data.len(), 0);
         }
-        
+
         file.data[start..start + data.len()].copy_from_slice(data);
         file.size = file.data.len() as u64;
-        
+
         Ok(data.len())
     }
 
     /// List directory entries
     pub fn readdir(&self, inode: u64) -> Result<Vec<String>, &'static str> {
         let file = self.inodes.get(&inode).ok_or("Inode not found")?;
-        
+
         if file.file_type != FileType::Directory {
             return Err("Not a directory");
         }
-        
+
         let dentries = self.dentries.get(&inode).ok_or("No dentries")?;
-        
+
         Ok(dentries.iter().map(|d| d.name.clone()).collect())
     }
 
@@ -265,9 +279,14 @@ impl Vfs {
     }
 
     /// Mount a filesystem
-    pub fn mount(&mut self, mount_point: String, filesystem_type: String, device: String) -> Result<(), &'static str> {
+    pub fn mount(
+        &mut self,
+        mount_point: String,
+        filesystem_type: String,
+        device: String,
+    ) -> Result<(), &'static str> {
         let parent_inode = self.lookup(&mount_point).ok_or("Mount point not found")?;
-        
+
         let superblock = VfsSuperblock {
             filesystem_type: filesystem_type.clone(),
             root_inode: parent_inode,
@@ -276,17 +295,17 @@ impl Vfs {
             total_blocks: 10000,
             free_blocks: 10000,
         };
-        
+
         let sb_id = self.next_inode.fetch_add(1, Ordering::SeqCst);
         self.superblocks.insert(sb_id, superblock);
-        
+
         let mount = VfsMount {
             mount_point,
             filesystem_type,
             root_inode: parent_inode,
             device,
         };
-        
+
         self.mounts.push(mount);
         Ok(())
     }
@@ -296,7 +315,7 @@ impl Vfs {
         if path == "/" {
             return Err("Root has no parent");
         }
-        
+
         let last_slash = path.rfind('/').unwrap_or(0);
         if last_slash == 0 {
             Ok("/".to_string())
@@ -328,17 +347,17 @@ mod tests {
     #[test]
     fn test_vfs_create() {
         let vfs = Vfs::new();
-        
+
         assert_eq!(vfs.inode_count(), 1);
     }
 
     #[test]
     fn test_mkdir() {
         let mut vfs = Vfs::new();
-        
+
         let perms = FilePermissions::new(true, true, true);
         let inode = vfs.mkdir("/test", perms).unwrap();
-        
+
         assert!(inode > 1);
         assert_eq!(vfs.inode_count(), 2);
     }
@@ -346,22 +365,22 @@ mod tests {
     #[test]
     fn test_create_file() {
         let mut vfs = Vfs::new();
-        
+
         let perms = FilePermissions::new(true, true, false);
         let inode = vfs.create("/test.txt", perms).unwrap();
-        
+
         assert!(inode > 1);
     }
 
     #[test]
     fn test_write_read() {
         let mut vfs = Vfs::new();
-        
+
         let perms = FilePermissions::new(true, true, false);
         let inode = vfs.create("/test.txt", perms).unwrap();
-        
+
         vfs.write(inode, 0, b"Hello, World!").unwrap();
-        
+
         let data = vfs.read(inode, 0, 13).unwrap();
         assert_eq!(data, b"Hello, World!");
     }
@@ -369,10 +388,10 @@ mod tests {
     #[test]
     fn test_readdir() {
         let mut vfs = Vfs::new();
-        
+
         let perms = FilePermissions::new(true, true, true);
         vfs.mkdir("/test", perms).unwrap();
-        
+
         let entries = vfs.readdir(1).unwrap();
         assert!(entries.contains(&"test".to_string()));
     }
@@ -380,10 +399,10 @@ mod tests {
     #[test]
     fn test_lookup() {
         let mut vfs = Vfs::new();
-        
+
         let perms = FilePermissions::new(true, true, true);
         vfs.mkdir("/test", perms).unwrap();
-        
+
         let inode = vfs.lookup("/test").unwrap();
         assert!(inode > 1);
     }
@@ -391,8 +410,9 @@ mod tests {
     #[test]
     fn test_mount() {
         let mut vfs = Vfs::new();
-        
-        vfs.mount("/".to_string(), "ext4".to_string(), "/dev/sda1".to_string()).unwrap();
+
+        vfs.mount("/".to_string(), "ext4".to_string(), "/dev/sda1".to_string())
+            .unwrap();
         assert_eq!(vfs.mount_count(), 1);
     }
 }

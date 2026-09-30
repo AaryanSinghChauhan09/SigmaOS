@@ -1,11 +1,8 @@
+use core::sync::atomic::AtomicUsize;
 /// OCI-Compliant Container Pod and Namespace Manager
 /// Manages pod configurations, limits, shared namespaces, and container orchestration
 /// to easily match and exceed Fedora's native Podman/Kubernetes setups.
-
-
-
 use std::vec::Vec;
-use core::sync::atomic::AtomicUsize;
 
 pub type PodID = usize;
 pub type ContainerID = usize;
@@ -104,7 +101,11 @@ impl OciPodManager {
 }
 
 #[cfg(target_os = "none")]
-pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+pub struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 #[cfg(target_os = "none")]
 impl<T: Clone> Clone for Vec<T> {

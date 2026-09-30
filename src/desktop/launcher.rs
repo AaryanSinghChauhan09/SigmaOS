@@ -96,13 +96,48 @@ impl CommandPalette {
 
     /// Register default Omarchy-style system power and desktop commands
     fn register_default_system_actions(&mut self) {
-        self.register_action(":lock", "Lock Screen (hyprlock / sigma-lock)", "sigma-lock", "system-lock-screen");
-        self.register_action(":reboot", "Restart the Operating System", "systemctl reboot", "system-reboot");
-        self.register_action(":poweroff", "Shut Down the Computer", "systemctl poweroff", "system-shutdown");
-        self.register_action(":suspend", "Suspend to RAM (Sleep)", "systemctl suspend", "system-suspend");
-        self.register_action(":screenshot", "Capture Screen or Selection", "grim -g $(slurp)", "camera-photo");
-        self.register_action(":reload-theme", "Hot-reload Dynamic Wallpaper Theme", "wallust run", "preferences-desktop-theme");
-        self.register_action(":terminal", "Spawn Scratchpad Terminal", "alacritty --class scratchpad", "utilities-terminal");
+        self.register_action(
+            ":lock",
+            "Lock Screen (hyprlock / sigma-lock)",
+            "sigma-lock",
+            "system-lock-screen",
+        );
+        self.register_action(
+            ":reboot",
+            "Restart the Operating System",
+            "systemctl reboot",
+            "system-reboot",
+        );
+        self.register_action(
+            ":poweroff",
+            "Shut Down the Computer",
+            "systemctl poweroff",
+            "system-shutdown",
+        );
+        self.register_action(
+            ":suspend",
+            "Suspend to RAM (Sleep)",
+            "systemctl suspend",
+            "system-suspend",
+        );
+        self.register_action(
+            ":screenshot",
+            "Capture Screen or Selection",
+            "grim -g $(slurp)",
+            "camera-photo",
+        );
+        self.register_action(
+            ":reload-theme",
+            "Hot-reload Dynamic Wallpaper Theme",
+            "wallust run",
+            "preferences-desktop-theme",
+        );
+        self.register_action(
+            ":terminal",
+            "Spawn Scratchpad Terminal",
+            "alacritty --class scratchpad",
+            "utilities-terminal",
+        );
     }
 
     /// Register an application entry
@@ -146,20 +181,28 @@ impl CommandPalette {
         let trimmed = input.trim();
         if trimmed.is_empty() {
             // Return top frequent apps if no query
-            return self.apps.iter().take(8).map(|app| SearchResultItem {
-                title: app.name.clone(),
-                subtitle: app.category.clone(),
-                icon: app.icon.clone(),
-                action_payload: app.exec_path.clone(),
-                mode: LauncherMode::Application,
-                score: 100 + app.launch_count as i32,
-            }).collect();
+            return self
+                .apps
+                .iter()
+                .take(8)
+                .map(|app| SearchResultItem {
+                    title: app.name.clone(),
+                    subtitle: app.category.clone(),
+                    icon: app.icon.clone(),
+                    action_payload: app.exec_path.clone(),
+                    mode: LauncherMode::Application,
+                    score: 100 + app.launch_count as i32,
+                })
+                .collect();
         }
 
         let mut results = Vec::new();
 
         // 1. Inline Calculator mode: triggered if starts with "=" or starts with a digit/math operator
-        if trimmed.starts_with('=') || (trimmed.chars().next().map_or(false, |c| c.is_ascii_digit()) && trimmed.contains(['+', '-', '*', '/'])) {
+        if trimmed.starts_with('=')
+            || (trimmed.chars().next().map_or(false, |c| c.is_ascii_digit())
+                && trimmed.contains(['+', '-', '*', '/']))
+        {
             let expr = trimmed.trim_start_matches('=').trim();
             if let Some(val) = Self::evaluate_math_expr(expr) {
                 results.push(SearchResultItem {
@@ -177,7 +220,9 @@ impl CommandPalette {
         if trimmed.starts_with(':') {
             let action_q = trimmed.to_lowercase();
             for act in &self.system_actions {
-                if act.trigger.to_lowercase().contains(&action_q) || act.description.to_lowercase().contains(&action_q) {
+                if act.trigger.to_lowercase().contains(&action_q)
+                    || act.description.to_lowercase().contains(&action_q)
+                {
                     results.push(SearchResultItem {
                         title: act.trigger.clone(),
                         subtitle: act.description.clone(),
@@ -193,10 +238,15 @@ impl CommandPalette {
         // 3. Window Switcher: search open running windows
         let q_lower = trimmed.to_lowercase();
         for win in &self.open_windows {
-            if win.title.to_lowercase().contains(&q_lower) || win.app_class.to_lowercase().contains(&q_lower) {
+            if win.title.to_lowercase().contains(&q_lower)
+                || win.app_class.to_lowercase().contains(&q_lower)
+            {
                 results.push(SearchResultItem {
                     title: win.title.clone(),
-                    subtitle: format!("Switch to [{}] on Workspace {}", win.app_class, win.workspace_id),
+                    subtitle: format!(
+                        "Switch to [{}] on Workspace {}",
+                        win.app_class, win.workspace_id
+                    ),
                     icon: "window".to_string(),
                     action_payload: format!("focus:{}", win.window_id),
                     mode: LauncherMode::WindowSwitcher,
@@ -207,7 +257,10 @@ impl CommandPalette {
 
         // 4. Clipboard History: if query starts with "cb " or contains clipboard snippets
         if trimmed.starts_with("cb ") || trimmed.starts_with("clip ") {
-            let cb_q = trimmed.trim_start_matches("cb ").trim_start_matches("clip ").to_lowercase();
+            let cb_q = trimmed
+                .trim_start_matches("cb ")
+                .trim_start_matches("clip ")
+                .to_lowercase();
             for snippet in &self.clipboard_history {
                 if snippet.content.to_lowercase().contains(&cb_q) {
                     let preview = if snippet.content.len() > 60 {
@@ -238,7 +291,11 @@ impl CommandPalette {
                 score = 800;
             } else if name_lower.contains(&q_lower) {
                 score = 500;
-            } else if app.keywords.iter().any(|k| k.to_lowercase().contains(&q_lower)) {
+            } else if app
+                .keywords
+                .iter()
+                .any(|k| k.to_lowercase().contains(&q_lower))
+            {
                 score = 300;
             }
 
@@ -263,16 +320,20 @@ impl CommandPalette {
     /// Legacy fuzzy search compatibility wrapper
     pub fn fuzzy_search(&self, query: &str) -> Vec<&LauncherEntry> {
         let q = query.to_lowercase();
-        let mut matched: Vec<(&LauncherEntry, usize)> = self.apps.iter().filter_map(|e| {
-            let name_lower = e.name.to_lowercase();
-            if name_lower.contains(&q) {
-                Some((e, name_lower.find(&q).unwrap_or(usize::MAX)))
-            } else if e.keywords.iter().any(|k| k.to_lowercase().contains(&q)) {
-                Some((e, 1000))
-            } else {
-                None
-            }
-        }).collect();
+        let mut matched: Vec<(&LauncherEntry, usize)> = self
+            .apps
+            .iter()
+            .filter_map(|e| {
+                let name_lower = e.name.to_lowercase();
+                if name_lower.contains(&q) {
+                    Some((e, name_lower.find(&q).unwrap_or(usize::MAX)))
+                } else if e.keywords.iter().any(|k| k.to_lowercase().contains(&q)) {
+                    Some((e, 1000))
+                } else {
+                    None
+                }
+            })
+            .collect();
         matched.sort_by_key(|(_, score)| *score);
         matched.into_iter().map(|(e, _)| e).collect()
     }
@@ -291,7 +352,8 @@ impl CommandPalette {
             return Some(left + right);
         }
         if let Some(pos) = clean.rfind('-') {
-            if pos > 0 { // Avoid unary minus
+            if pos > 0 {
+                // Avoid unary minus
                 let left = Self::evaluate_math_expr(&clean[..pos])?;
                 let right = Self::evaluate_math_expr(&clean[pos + 1..])?;
                 return Some(left - right);
@@ -371,16 +433,17 @@ mod tests {
     #[test]
     fn test_window_switcher_and_clipboard() {
         let mut palette = CommandPalette::new();
-        palette.sync_open_windows(vec![
-            WindowEntry {
-                window_id: 101,
-                title: "Firefox — GitHub".into(),
-                app_class: "firefox".into(),
-                workspace_id: 2,
-                is_focused: false,
-            }
-        ]);
-        palette.push_clipboard("https://github.com/AaryanSinghChauhan09/SigmaOS", 1700000000);
+        palette.sync_open_windows(vec![WindowEntry {
+            window_id: 101,
+            title: "Firefox — GitHub".into(),
+            app_class: "firefox".into(),
+            workspace_id: 2,
+            is_focused: false,
+        }]);
+        palette.push_clipboard(
+            "https://github.com/AaryanSinghChauhan09/SigmaOS",
+            1700000000,
+        );
 
         let win_results = palette.query("Firefox");
         assert_eq!(win_results.len(), 1);

@@ -84,7 +84,10 @@ impl PermissionPortal {
     }
 
     pub fn set_policy(&mut self, app_id: &str, permission: Permission, policy: PermissionPolicy) {
-        let app_map = self.app_policies.entry(app_id.to_string()).or_insert_with(HashMap::new);
+        let app_map = self
+            .app_policies
+            .entry(app_id.to_string())
+            .or_insert_with(HashMap::new);
         app_map.insert(permission, policy);
     }
 
@@ -94,7 +97,7 @@ impl PermissionPortal {
                 return policy.clone();
             }
         }
-        
+
         match self.profile {
             PermissionProfile::Strict => PermissionPolicy::AskAlways,
             PermissionProfile::Standard => PermissionPolicy::AskOnce,
@@ -105,11 +108,13 @@ impl PermissionPortal {
 
     pub fn request_permission(&mut self, request: &PortalRequest) -> bool {
         let policy = self.get_policy(&request.app_id, &request.permission);
-        
+
         let granted = match policy {
             PermissionPolicy::Allow => true,
             PermissionPolicy::Deny => false,
-            PermissionPolicy::AskOnce | PermissionPolicy::AskAlways | PermissionPolicy::AllowTemporary(_) => {
+            PermissionPolicy::AskOnce
+            | PermissionPolicy::AskAlways
+            | PermissionPolicy::AllowTemporary(_) => {
                 // In a real system, this would trigger a UI prompt.
                 // For logic purposes, let's say it's true if the justification is provided.
                 !request.justification.is_empty()
@@ -137,7 +142,11 @@ impl FlatpakPermissionAuditor {
     pub fn scan_app_permissions(app_id: &str) -> Vec<Permission> {
         // Stub implementation simulating flatpak overrides or info
         if app_id == "org.mozilla.firefox" {
-            vec![Permission::Network, Permission::DisplayServer, Permission::Camera]
+            vec![
+                Permission::Network,
+                Permission::DisplayServer,
+                Permission::Camera,
+            ]
         } else {
             vec![]
         }
@@ -151,13 +160,20 @@ mod tests {
     #[test]
     fn test_strict_profile_default() {
         let portal = PermissionPortal::new(PermissionProfile::Strict);
-        assert_eq!(portal.get_policy("test.app", &Permission::Camera), PermissionPolicy::AskAlways);
+        assert_eq!(
+            portal.get_policy("test.app", &Permission::Camera),
+            PermissionPolicy::AskAlways
+        );
     }
 
     #[test]
     fn test_set_custom_policy() {
         let mut portal = PermissionPortal::new(PermissionProfile::Standard);
-        portal.set_policy("org.mozilla.firefox", Permission::Network, PermissionPolicy::Allow);
+        portal.set_policy(
+            "org.mozilla.firefox",
+            Permission::Network,
+            PermissionPolicy::Allow,
+        );
         assert_eq!(
             portal.get_policy("org.mozilla.firefox", &Permission::Network),
             PermissionPolicy::Allow
@@ -168,14 +184,14 @@ mod tests {
     fn test_request_permission_allow() {
         let mut portal = PermissionPortal::new(PermissionProfile::Standard);
         portal.set_policy("test.app", Permission::Microphone, PermissionPolicy::Allow);
-        
+
         let req = PortalRequest {
             app_id: "test.app".to_string(),
             permission: Permission::Microphone,
             timestamp: SystemTime::now(),
             justification: String::new(),
         };
-        
+
         assert!(portal.request_permission(&req));
         assert_eq!(portal.get_logs().len(), 1);
         assert!(portal.get_logs()[0].granted);
@@ -185,21 +201,21 @@ mod tests {
     fn test_request_permission_deny() {
         let mut portal = PermissionPortal::new(PermissionProfile::Standard);
         portal.set_policy("test.app", Permission::Filesystem, PermissionPolicy::Deny);
-        
+
         let req = PortalRequest {
             app_id: "test.app".to_string(),
             permission: Permission::Filesystem,
             timestamp: SystemTime::now(),
             justification: "Need access".to_string(),
         };
-        
+
         assert!(!portal.request_permission(&req));
     }
 
     #[test]
     fn test_request_permission_ask_with_justification() {
         let mut portal = PermissionPortal::new(PermissionProfile::Strict);
-        
+
         let req = PortalRequest {
             app_id: "test.app".to_string(),
             permission: Permission::Geolocation,
@@ -213,7 +229,7 @@ mod tests {
 #[cfg(test)]
 mod more_tests {
     use super::*;
-    
+
     #[test]
     fn test_geolocation() {
         let mut portal = PermissionPortal::new(PermissionProfile::Strict);

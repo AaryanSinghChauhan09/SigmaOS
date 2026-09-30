@@ -2,7 +2,7 @@
 // Inspired by Linux cgroup v2 for unified resource management
 
 use std::collections::HashMap;
-use std::sync::atomic::{AtomicU64, AtomicU32, Ordering};
+use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 
 /// Cgroup controller type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -34,25 +34,25 @@ pub struct MemoryController {
 /// CPU controller settings
 #[derive(Debug)]
 pub struct CpuController {
-    pub shares: u64,        // CPU shares (weight)
-    pub max: Option<u64>,   // Maximum CPU time (quota)
-    pub period: u64,        // Period in microseconds
-    pub rt_runtime: u64,   // Realtime runtime
+    pub shares: u64,      // CPU shares (weight)
+    pub max: Option<u64>, // Maximum CPU time (quota)
+    pub period: u64,      // Period in microseconds
+    pub rt_runtime: u64,  // Realtime runtime
 }
 
 /// IO controller settings
 #[derive(Debug, Clone)]
 pub struct IoController {
-    pub weight: u16,       // IO weight
-    pub max: Option<u64>,   // Maximum IO rate
-    pub read_bps: u64,     // Read bytes per second
-    pub write_bps: u64,    // Write bytes per second
+    pub weight: u16,      // IO weight
+    pub max: Option<u64>, // Maximum IO rate
+    pub read_bps: u64,    // Read bytes per second
+    pub write_bps: u64,   // Write bytes per second
 }
 
 /// PIDs controller settings
 #[derive(Debug)]
 pub struct PidsController {
-    pub max: u64,          // Maximum number of PIDs
+    pub max: u64,           // Maximum number of PIDs
     pub current: AtomicU64, // Current number of PIDs
 }
 
@@ -76,7 +76,7 @@ impl CgroupControllerTrait for MemoryController {
     fn as_any(&self) -> &dyn std::any::Any {
         self
     }
-    
+
     fn name(&self) -> &str {
         "memory"
     }
@@ -86,7 +86,7 @@ impl CgroupControllerTrait for CpuController {
     fn as_any(&self) -> &dyn std::any::Any {
         self
     }
-    
+
     fn name(&self) -> &str {
         "cpu"
     }
@@ -96,7 +96,7 @@ impl CgroupControllerTrait for IoController {
     fn as_any(&self) -> &dyn std::any::Any {
         self
     }
-    
+
     fn name(&self) -> &str {
         "io"
     }
@@ -106,7 +106,7 @@ impl CgroupControllerTrait for PidsController {
     fn as_any(&self) -> &dyn std::any::Any {
         self
     }
-    
+
     fn name(&self) -> &str {
         "pids"
     }
@@ -140,7 +140,11 @@ impl CgroupV2 {
     }
 
     /// Add a controller
-    pub fn add_controller(&mut self, controller: CgroupController, trait_obj: Box<dyn CgroupControllerTrait>) {
+    pub fn add_controller(
+        &mut self,
+        controller: CgroupController,
+        trait_obj: Box<dyn CgroupControllerTrait>,
+    ) {
         self.controllers.insert(controller, trait_obj);
     }
 
@@ -165,7 +169,10 @@ impl CgroupV2 {
     }
 
     /// Get controller by type
-    pub fn get_controller(&self, controller: CgroupController) -> Option<&dyn CgroupControllerTrait> {
+    pub fn get_controller(
+        &self,
+        controller: CgroupController,
+    ) -> Option<&dyn CgroupControllerTrait> {
         self.controllers.get(&controller).map(|c| c.as_ref())
     }
 
@@ -202,33 +209,37 @@ impl CgroupV2Manager {
             cgroups: HashMap::new(),
             root_cgroup: "/".to_string(),
         };
-        
+
         // Create root cgroup
         let root = CgroupV2::new("/".to_string(), None);
         manager.cgroups.insert("/".to_string(), root);
-        
+
         manager
     }
 
     /// Create a cgroup
-    pub fn create_cgroup(&mut self, name: String, parent: Option<String>) -> Result<(), &'static str> {
+    pub fn create_cgroup(
+        &mut self,
+        name: String,
+        parent: Option<String>,
+    ) -> Result<(), &'static str> {
         if self.cgroups.contains_key(&name) {
             return Err("Cgroup already exists");
         }
-        
+
         if let Some(ref parent_name) = parent {
             if !self.cgroups.contains_key(parent_name) {
                 return Err("Parent cgroup not found");
             }
-            
+
             if let Some(parent_cgroup) = self.cgroups.get_mut(parent_name) {
                 parent_cgroup.add_child(name.clone());
             }
         }
-        
+
         let cgroup = CgroupV2::new(name.clone(), parent);
         self.cgroups.insert(name, cgroup);
-        
+
         Ok(())
     }
 
@@ -237,15 +248,15 @@ impl CgroupV2Manager {
         if name == &self.root_cgroup {
             return Err("Cannot delete root cgroup");
         }
-        
+
         let cgroup = self.cgroups.remove(name).ok_or("Cgroup not found")?;
-        
+
         if let Some(ref parent_name) = cgroup.parent {
             if let Some(parent_cgroup) = self.cgroups.get_mut(parent_name) {
                 parent_cgroup.remove_child(name);
             }
         }
-        
+
         Ok(())
     }
 
@@ -260,52 +271,74 @@ impl CgroupV2Manager {
     }
 
     /// Add memory controller to cgroup
-    pub fn add_memory_controller(&mut self, cgroup_name: &str, limit: u64, swap_limit: u64) -> Result<(), &'static str> {
-        let cgroup = self.cgroups.get_mut(cgroup_name).ok_or("Cgroup not found")?;
-        
+    pub fn add_memory_controller(
+        &mut self,
+        cgroup_name: &str,
+        limit: u64,
+        swap_limit: u64,
+    ) -> Result<(), &'static str> {
+        let cgroup = self
+            .cgroups
+            .get_mut(cgroup_name)
+            .ok_or("Cgroup not found")?;
+
         let memory_controller = MemoryController {
             limit,
             swap_limit,
             oom_control: true,
             usage: AtomicU64::new(0),
         };
-        
+
         cgroup.add_controller(CgroupController::Memory, Box::new(memory_controller));
         Ok(())
     }
 
     /// Add CPU controller to cgroup
-    pub fn add_cpu_controller(&mut self, cgroup_name: &str, shares: u64, max: Option<u64>) -> Result<(), &'static str> {
-        let cgroup = self.cgroups.get_mut(cgroup_name).ok_or("Cgroup not found")?;
-        
+    pub fn add_cpu_controller(
+        &mut self,
+        cgroup_name: &str,
+        shares: u64,
+        max: Option<u64>,
+    ) -> Result<(), &'static str> {
+        let cgroup = self
+            .cgroups
+            .get_mut(cgroup_name)
+            .ok_or("Cgroup not found")?;
+
         let cpu_controller = CpuController {
             shares,
             max,
             period: 100000, // 100ms default
             rt_runtime: 0,
         };
-        
+
         cgroup.add_controller(CgroupController::Cpu, Box::new(cpu_controller));
         Ok(())
     }
 
     /// Add PIDs controller to cgroup
     pub fn add_pids_controller(&mut self, cgroup_name: &str, max: u64) -> Result<(), &'static str> {
-        let cgroup = self.cgroups.get_mut(cgroup_name).ok_or("Cgroup not found")?;
-        
+        let cgroup = self
+            .cgroups
+            .get_mut(cgroup_name)
+            .ok_or("Cgroup not found")?;
+
         let pids_controller = PidsController {
             max,
             current: AtomicU64::new(0),
         };
-        
+
         cgroup.add_controller(CgroupController::Pids, Box::new(pids_controller));
         Ok(())
     }
 
     /// Move process to cgroup
     pub fn move_process(&mut self, cgroup_name: &str, pid: u64) -> Result<(), &'static str> {
-        let cgroup = self.cgroups.get_mut(cgroup_name).ok_or("Cgroup not found")?;
-        
+        let cgroup = self
+            .cgroups
+            .get_mut(cgroup_name)
+            .ok_or("Cgroup not found")?;
+
         cgroup.add_process(pid);
         Ok(())
     }
@@ -328,16 +361,20 @@ mod tests {
     #[test]
     fn test_create_cgroup() {
         let mut manager = CgroupV2Manager::new();
-        
-        assert!(manager.create_cgroup("/test".to_string(), Some("/".to_string())).is_ok());
+
+        assert!(manager
+            .create_cgroup("/test".to_string(), Some("/".to_string()))
+            .is_ok());
         assert_eq!(manager.cgroup_count(), 2);
     }
 
     #[test]
     fn test_delete_cgroup() {
         let mut manager = CgroupV2Manager::new();
-        
-        manager.create_cgroup("/test".to_string(), Some("/".to_string())).unwrap();
+
+        manager
+            .create_cgroup("/test".to_string(), Some("/".to_string()))
+            .unwrap();
         assert!(manager.delete_cgroup("/test").is_ok());
         assert_eq!(manager.cgroup_count(), 1);
     }
@@ -345,41 +382,53 @@ mod tests {
     #[test]
     fn test_delete_root() {
         let mut manager = CgroupV2Manager::new();
-        
+
         assert!(manager.delete_cgroup("/").is_err());
     }
 
     #[test]
     fn test_add_memory_controller() {
         let mut manager = CgroupV2Manager::new();
-        
-        manager.create_cgroup("/test".to_string(), Some("/".to_string())).unwrap();
-        assert!(manager.add_memory_controller("/test", 1024 * 1024 * 1024, 512 * 1024 * 1024).is_ok());
+
+        manager
+            .create_cgroup("/test".to_string(), Some("/".to_string()))
+            .unwrap();
+        assert!(manager
+            .add_memory_controller("/test", 1024 * 1024 * 1024, 512 * 1024 * 1024)
+            .is_ok());
     }
 
     #[test]
     fn test_add_cpu_controller() {
         let mut manager = CgroupV2Manager::new();
-        
-        manager.create_cgroup("/test".to_string(), Some("/".to_string())).unwrap();
-        assert!(manager.add_cpu_controller("/test", 1024, Some(500000)).is_ok());
+
+        manager
+            .create_cgroup("/test".to_string(), Some("/".to_string()))
+            .unwrap();
+        assert!(manager
+            .add_cpu_controller("/test", 1024, Some(500000))
+            .is_ok());
     }
 
     #[test]
     fn test_add_pids_controller() {
         let mut manager = CgroupV2Manager::new();
-        
-        manager.create_cgroup("/test".to_string(), Some("/".to_string())).unwrap();
+
+        manager
+            .create_cgroup("/test".to_string(), Some("/".to_string()))
+            .unwrap();
         assert!(manager.add_pids_controller("/test", 100).is_ok());
     }
 
     #[test]
     fn test_move_process() {
         let mut manager = CgroupV2Manager::new();
-        
-        manager.create_cgroup("/test".to_string(), Some("/".to_string())).unwrap();
+
+        manager
+            .create_cgroup("/test".to_string(), Some("/".to_string()))
+            .unwrap();
         assert!(manager.move_process("/test", 1234).is_ok());
-        
+
         let cgroup = manager.get_cgroup("/test").unwrap();
         assert_eq!(cgroup.process_count(), 1);
     }
@@ -387,13 +436,15 @@ mod tests {
     #[test]
     fn test_enable_disable() {
         let mut manager = CgroupV2Manager::new();
-        
-        manager.create_cgroup("/test".to_string(), Some("/".to_string())).unwrap();
-        
+
+        manager
+            .create_cgroup("/test".to_string(), Some("/".to_string()))
+            .unwrap();
+
         let cgroup = manager.get_cgroup_mut("/test").unwrap();
         cgroup.disable();
         assert!(!cgroup.enabled);
-        
+
         cgroup.enable();
         assert!(cgroup.enabled);
     }

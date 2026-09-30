@@ -1,12 +1,10 @@
-
+use core::sync::atomic::{AtomicUsize, Ordering};
 /// OOP-based Power Management Stack for SigmaOS
 /// Implements power management using OOP principles with traits and structs
 /// No dependency on external power management frameworks
 /// Based on Roadmap Item 8: Power management stack
-
 use std::boxed::Box;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Power profile
 #[repr(C)]
@@ -99,7 +97,7 @@ impl PowerCapability {
 /// Simple power manager (OOP: Concrete power class)
 #[repr(C)]
 pub struct SimplePowerManager {
-    pub profile: AtomicUsize, // PowerProfile as usize
+    pub profile: AtomicUsize,      // PowerProfile as usize
     pub cpu_governor: AtomicUsize, // CPUGovernor as usize
     pub cpu_frequency: AtomicUsize,
     pub capability: PowerCapability,

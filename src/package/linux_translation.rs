@@ -3,9 +3,7 @@
 // Integrates foreign Linux package frameworks (.deb, .rpm, pacman) directly with the SigmaOS Driver system.
 
 #[cfg(not(feature = "standalone_test"))]
-use crate::driver::framework::{
-    DriverType, SimpleDriver,
-};
+use crate::driver::framework::{DriverType, SimpleDriver};
 #[cfg(not(feature = "standalone_test"))]
 use crate::package::PackageFormat;
 #[cfg(not(feature = "standalone_test"))]
@@ -223,13 +221,27 @@ pub struct PackageModaliasMatcher {
 impl PackageModaliasMatcher {
     pub fn new() -> Self {
         let mut db = BTreeMap::new();
-        db.insert("pci:v000010DEd*".to_string(), "nvidia-open-dkms".to_string());
-        db.insert("pci:v00008086d*".to_string(), "intel-media-driver".to_string());
+        db.insert(
+            "pci:v000010DEd*".to_string(),
+            "nvidia-open-dkms".to_string(),
+        );
+        db.insert(
+            "pci:v00008086d*".to_string(),
+            "intel-media-driver".to_string(),
+        );
         db.insert("pci:v00001002d*".to_string(), "amdgpu-pro".to_string());
-        db.insert("usb:v0bda:c811".to_string(), "realtek-rtl8852ae-dkms".to_string());
-        db.insert("pci:v000014E4d*".to_string(), "broadcom-wl-dkms".to_string());
+        db.insert(
+            "usb:v0bda:c811".to_string(),
+            "realtek-rtl8852ae-dkms".to_string(),
+        );
+        db.insert(
+            "pci:v000014E4d*".to_string(),
+            "broadcom-wl-dkms".to_string(),
+        );
 
-        Self { modalias_database: db }
+        Self {
+            modalias_database: db,
+        }
     }
 
     pub fn match_hardware_modalias(&self, modalias: &str) -> Option<String> {

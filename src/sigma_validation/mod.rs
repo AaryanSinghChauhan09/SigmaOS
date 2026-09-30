@@ -3,11 +3,10 @@
 // System validation and verification
 // Zero-dependency implementation - no external libraries required
 
-
-use std::vec::Vec;
-use std::string::{String, ToString};
-use std::boxed::Box;
 use core::fmt;
+use std::boxed::Box;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Error type for the SigmaValidation module
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -62,19 +61,19 @@ impl Validator {
             enabled: false,
         }
     }
-    
+
     /// Enable this resource
     pub fn enable(&mut self) -> SigmaValidationResult<()> {
         self.enabled = true;
         Ok(())
     }
-    
+
     /// Disable this resource
     pub fn disable(&mut self) -> SigmaValidationResult<()> {
         self.enabled = false;
         Ok(())
     }
-    
+
     /// Check if enabled
     pub fn is_enabled(&self) -> bool {
         self.enabled
@@ -96,13 +95,13 @@ impl ValidationResult {
             initialized: false,
         }
     }
-    
+
     /// Initialize the SigmaValidation subsystem
     pub fn init(&mut self) -> SigmaValidationResult<()> {
         self.initialized = true;
         Ok(())
     }
-    
+
     /// Add a resource
     pub fn add(&mut self, resource: Validator) -> SigmaValidationResult<u64> {
         if !self.initialized {
@@ -112,27 +111,27 @@ impl ValidationResult {
         self.resources.push(resource);
         Ok(id)
     }
-    
+
     /// Get resource by ID
     pub fn get(&self, id: u64) -> Option<&Validator> {
         self.resources.get(id as usize)
     }
-    
+
     /// Get mutable resource by ID
     pub fn get_mut(&mut self, id: u64) -> Option<&mut Validator> {
         self.resources.get_mut(id as usize)
     }
-    
+
     /// List all resources
     pub fn list(&self) -> &[Validator] {
         &self.resources
     }
-    
+
     /// Check if initialized
     pub fn is_initialized(&self) -> bool {
         self.initialized
     }
-    
+
     /// Shutdown the subsystem
     pub fn shutdown(&mut self) -> SigmaValidationResult<()> {
         self.initialized = false;
@@ -150,7 +149,7 @@ impl Default for ValidationResult {
 #[cfg(test_disabled)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_sigmavalidation_manager_init() {
         let mut manager = ValidationResult::new();
@@ -158,7 +157,7 @@ mod tests {
         assert!(manager.init().is_ok());
         assert!(manager.is_initialized());
     }
-    
+
     #[test]
     fn test_sigmavalidation_resource_add() {
         let mut manager = ValidationResult::new();

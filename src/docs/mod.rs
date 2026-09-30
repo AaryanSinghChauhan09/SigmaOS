@@ -6,7 +6,6 @@
 pub mod knowledgebase;
 pub use knowledgebase::*;
 
-
 use std::collections::BTreeMap;
 use std::format;
 use std::string::String;
