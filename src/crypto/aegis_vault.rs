@@ -20,7 +20,7 @@ pub enum AegisVaultError {
 pub struct AegisEncryptedContainer {
     pub magic: [u8; 4], // b"AEGIS"
     pub version: u16,
-    pub salt: [u8; 16],
+    pub kdf_salt: [u8; 16],
     pub nonce: [u8; 12],
     pub compressed_len: u64,
     pub uncompressed_len: u64,
@@ -197,7 +197,7 @@ impl AegisVaultEncryptionCompressionEngine {
         Ok(AegisEncryptedContainer {
             magic: [b'A', b'E', b'G', b'S'],
             version: 1,
-            salt: kdf_entropy_seed,
+            kdf_salt: kdf_entropy_seed,
             nonce,
             compressed_len: compressed.len() as u64,
             uncompressed_len: raw_data.len() as u64,
@@ -223,7 +223,7 @@ impl AegisVaultEncryptionCompressionEngine {
         }
 
         // 1. Re-derive key from code + salt
-        let derived_key = self.derive_master_vault_key(unique_special_code, &container.salt)?;
+        let derived_key = self.derive_master_vault_key(unique_special_code, &container.kdf_salt)?;
 
         // 2. Verify Kyber ciphertext encapsulation
         for i in 0..32 {

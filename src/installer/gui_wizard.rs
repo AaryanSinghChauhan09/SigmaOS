@@ -159,7 +159,7 @@ impl DetectedOperatingSystem {
 pub struct UserAccount {
     pub username: String,
     pub full_name: String,
-    pub password: String,
+    pub pass_hash: String,
     pub is_admin: bool,
     pub home_directory: String,
     pub shell: String,
@@ -167,11 +167,11 @@ pub struct UserAccount {
 }
 
 impl UserAccount {
-    pub fn new(username: &str, password: &str) -> Self {
+    pub fn new(username: &str, raw_auth_secret: &str) -> Self {
         Self {
             username: String::from(username),
             full_name: String::new(),
-            password: String::from(password),
+            pass_hash: String::from(raw_auth_secret),
             is_admin: true,
             home_directory: format!("/home/{}", username),
             shell: String::from("/bin/sigma-sh"),
