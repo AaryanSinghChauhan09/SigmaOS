@@ -98,7 +98,10 @@ pub struct IndentedTextMindMapParserEngine;
 
 impl IndentedTextMindMapParserEngine {
     /// Parses tab or 2/4-space indented text into a structured MindMapCreator
-    pub fn parse_indented_text(title: &str, indented_input: &str) -> Result<MindMapCreator, &'static str> {
+    pub fn parse_indented_text(
+        title: &str,
+        indented_input: &str,
+    ) -> Result<MindMapCreator, &'static str> {
         let lines: Vec<&str> = indented_input
             .lines()
             .map(|l| l.trim_end())
@@ -109,14 +112,20 @@ impl IndentedTextMindMapParserEngine {
             return Err("Indented text input cannot be empty");
         }
 
-        let root_topic = lines[0].trim().trim_start_matches("- ").trim_start_matches("* ");
+        let root_topic = lines[0]
+            .trim()
+            .trim_start_matches("- ")
+            .trim_start_matches("* ");
         let mut map = MindMapCreator::new(title, root_topic);
 
         let mut stack: Vec<(usize, String)> = vec![(0, map.root_node_id.clone())];
 
         for (idx, line) in lines.iter().enumerate().skip(1) {
             let indent_level = Self::calc_indent_level(line);
-            let topic = line.trim().trim_start_matches("- ").trim_start_matches("* ");
+            let topic = line
+                .trim()
+                .trim_start_matches("- ")
+                .trim_start_matches("* ");
             let node_id = format!("node_{}", idx);
 
             while stack.len() > 1 && stack.last().unwrap().0 >= indent_level {
@@ -164,10 +173,7 @@ impl MindMapCreator {
 
     /// Parses an indented outline text (NiceMind, XMind, Markdown list format) into a MindMapCreator structure.
     pub fn import_from_indented_text(map_title: &str, text: &str) -> Result<Self, &'static str> {
-        let lines: Vec<&str> = text
-            .lines()
-            .filter(|l| !l.trim().is_empty())
-            .collect();
+        let lines: Vec<&str> = text.lines().filter(|l| !l.trim().is_empty()).collect();
 
         if lines.is_empty() {
             return Err("Input text is empty");
@@ -205,7 +211,14 @@ impl MindMapCreator {
         };
 
         let (_, root_topic) = parse_line(lines[0]);
-        let mut map = MindMapCreator::new(map_title, if root_topic.is_empty() { map_title } else { &root_topic });
+        let mut map = MindMapCreator::new(
+            map_title,
+            if root_topic.is_empty() {
+                map_title
+            } else {
+                &root_topic
+            },
+        );
 
         let mut node_counter = 1usize;
         // Stack storing (indent_level, node_id)
@@ -502,7 +515,6 @@ SigmaOS Architecture
     }
 }
 
-
 #[cfg(test)]
 mod mindmap_parser_tests {
     use super::*;
@@ -510,7 +522,8 @@ mod mindmap_parser_tests {
     #[test]
     fn test_indented_text_mindmap_parser() {
         let input = "Sovereign OS Architecture\n\t- Kernel Core\n\t\t- Scheduler\n\t\t- Memory Manager\n\t- Desktop Zenith\n\t\t- Tiling WM";
-        let map = IndentedTextMindMapParserEngine::parse_indented_text("SigmaOS Mindmap", input).unwrap();
+        let map =
+            IndentedTextMindMapParserEngine::parse_indented_text("SigmaOS Mindmap", input).unwrap();
 
         assert_eq!(map.map_title, "SigmaOS Mindmap");
         assert_eq!(map.nodes.len(), 6);

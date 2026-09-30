@@ -720,4 +720,3 @@ impl Device for SimpleBlockDevice {
         Ok(())
     }
 }
-

@@ -68,7 +68,8 @@ impl SovereignFscryptAutofsEngine {
             flags: 0,
         };
 
-        self.policies.insert(String::from(policy_id), policy.clone());
+        self.policies
+            .insert(String::from(policy_id), policy.clone());
         Ok(policy)
     }
 
@@ -80,7 +81,10 @@ impl SovereignFscryptAutofsEngine {
         policy_id: &str,
         plaintext: &[u8],
     ) -> Result<usize, &'static str> {
-        let policy = self.policies.get(policy_id).ok_or("ENOENT: Policy not found")?;
+        let policy = self
+            .policies
+            .get(policy_id)
+            .ok_or("ENOENT: Policy not found")?;
 
         // Simple XOR stream transformation representing XTS / PQC encryption pass
         let key_bytes = policy.master_key_descriptor.as_bytes();
@@ -106,8 +110,14 @@ impl SovereignFscryptAutofsEngine {
 
     /// Decrypt file data using the associated fscrypt policy key
     pub fn read_decrypted_file(&self, inode_id: u64) -> Result<Vec<u8>, &'static str> {
-        let record = self.inodes.get(&inode_id).ok_or("ENOENT: Inode not found")?;
-        let policy = self.policies.get(&record.policy_id).ok_or("ENOKEY: Key locked or policy missing")?;
+        let record = self
+            .inodes
+            .get(&inode_id)
+            .ok_or("ENOENT: Inode not found")?;
+        let policy = self
+            .policies
+            .get(&record.policy_id)
+            .ok_or("ENOKEY: Key locked or policy missing")?;
 
         let key_bytes = policy.master_key_descriptor.as_bytes();
         let mut plaintext = Vec::with_capacity(record.raw_data_ciphertext.len());
@@ -141,7 +151,11 @@ impl SovereignFscryptAutofsEngine {
     }
 
     /// Trigger on-demand mounting upon filesystem access at `mount_point`
-    pub fn trigger_access(&mut self, mount_point: &str, current_time_sec: u64) -> Result<String, &'static str> {
+    pub fn trigger_access(
+        &mut self,
+        mount_point: &str,
+        current_time_sec: u64,
+    ) -> Result<String, &'static str> {
         let trigger = self
             .autofs_triggers
             .get_mut(mount_point)

@@ -2,10 +2,8 @@
 //! Block device management, partition manager, and filesystem tools
 use std::format;
 
-
-
-use std::vec::Vec;
 use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Block device
 #[derive(Debug, Clone)]
@@ -133,7 +131,10 @@ impl BlockDeviceManager {
     }
 
     pub fn get_partitions_by_device(&self, device: &str) -> Vec<&Partition> {
-        self.partitions.iter().filter(|p| p.device == device).collect()
+        self.partitions
+            .iter()
+            .filter(|p| p.device == device)
+            .collect()
     }
 
     pub fn get_device_stats(&self) -> DeviceStats {
@@ -210,7 +211,11 @@ impl PartitionManager {
         self.disks.push(disk);
     }
 
-    pub fn create_partition_table(&mut self, disk: &str, table_type: PartitionTableType) -> Result<(), StorageError> {
+    pub fn create_partition_table(
+        &mut self,
+        disk: &str,
+        table_type: PartitionTableType,
+    ) -> Result<(), StorageError> {
         let table = PartitionTable {
             disk: disk.to_string(),
             table_type,
@@ -220,7 +225,12 @@ impl PartitionManager {
         Ok(())
     }
 
-    pub fn create_partition(&mut self, disk: &str, partition_type: PartitionType, size: u64) -> Result<String, StorageError> {
+    pub fn create_partition(
+        &mut self,
+        disk: &str,
+        partition_type: PartitionType,
+        size: u64,
+    ) -> Result<String, StorageError> {
         let disk_name = disk.split('/').last().unwrap_or(disk);
         let mut partition = Partition::new(&format!("{}p1", disk_name), disk, partition_type);
         partition.size = size;
@@ -273,7 +283,12 @@ impl FilesystemManager {
         Ok(())
     }
 
-    pub fn mount(&mut self, device: &str, mount_point: &str, options: Vec<String>) -> Result<(), StorageError> {
+    pub fn mount(
+        &mut self,
+        device: &str,
+        mount_point: &str,
+        options: Vec<String>,
+    ) -> Result<(), StorageError> {
         let mount = MountPoint {
             device: device.to_string(),
             mount_point: mount_point.to_string(),

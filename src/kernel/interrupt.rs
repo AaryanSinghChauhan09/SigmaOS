@@ -2,7 +2,7 @@
 // Inspired by Linux and BSD interrupt handling with IDT and IRQ management
 
 use std::collections::HashMap;
-use std::sync::atomic::{AtomicU64, AtomicU32, AtomicU8, Ordering};
+use std::sync::atomic::{AtomicU32, AtomicU64, AtomicU8, Ordering};
 
 /// Interrupt vector
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -72,7 +72,7 @@ impl InterruptController {
     /// Allocate an interrupt vector
     pub fn allocate_vector(&self, int_type: InterruptType) -> InterruptVector {
         let number = self.next_vector.fetch_add(1, Ordering::SeqCst);
-        
+
         InterruptVector {
             number,
             type_id: int_type,
@@ -80,7 +80,12 @@ impl InterruptController {
     }
 
     /// Register an interrupt handler
-    pub fn register_handler(&mut self, vector: InterruptVector, handler: InterruptHandler, data: u64) -> Result<(), &'static str> {
+    pub fn register_handler(
+        &mut self,
+        vector: InterruptVector,
+        handler: InterruptHandler,
+        data: u64,
+    ) -> Result<(), &'static str> {
         let descriptor = InterruptDescriptor {
             vector,
             handler: Some(handler),
@@ -88,7 +93,7 @@ impl InterruptController {
             enabled: true,
             count: AtomicU32::new(0),
         };
-        
+
         self.descriptors.insert(vector.number, descriptor);
         Ok(())
     }
@@ -125,11 +130,15 @@ impl InterruptController {
     }
 
     /// Register an IRQ line
-    pub fn register_irq(&mut self, irq: u32, trigger_type: IrqTriggerType) -> Result<(), &'static str> {
+    pub fn register_irq(
+        &mut self,
+        irq: u32,
+        trigger_type: IrqTriggerType,
+    ) -> Result<(), &'static str> {
         if self.irq_lines.contains_key(&irq) {
             return Err("IRQ already registered");
         }
-        
+
         let irq_line = IrqLine {
             number: irq,
             trigger_type,
@@ -138,13 +147,18 @@ impl InterruptController {
             enabled: false,
             pending: false,
         };
-        
+
         self.irq_lines.insert(irq, irq_line);
         Ok(())
     }
 
     /// Register IRQ handler
-    pub fn register_irq_handler(&mut self, irq: u32, handler: InterruptHandler, data: u64) -> Result<(), &'static str> {
+    pub fn register_irq_handler(
+        &mut self,
+        irq: u32,
+        handler: InterruptHandler,
+        data: u64,
+    ) -> Result<(), &'static str> {
         if let Some(irq_line) = self.irq_lines.get_mut(&irq) {
             irq_line.handler = Some(handler);
             irq_line.handler_data = data;
@@ -177,18 +191,18 @@ impl InterruptController {
     /// Handle an interrupt
     pub fn handle_interrupt(&mut self, vector: InterruptVector) -> Result<(), &'static str> {
         self.interrupt_count.fetch_add(1, Ordering::SeqCst);
-        
+
         if let Some(desc) = self.descriptors.get_mut(&vector.number) {
             if !desc.enabled {
                 return Err("Interrupt disabled");
             }
-            
+
             desc.count.fetch_add(1, Ordering::SeqCst);
-            
+
             if let Some(handler) = desc.handler {
                 handler(vector, desc.handler_data);
             }
-            
+
             Ok(())
         } else {
             Err("Interrupt descriptor not found")
@@ -201,13 +215,19 @@ impl InterruptController {
             if !irq_line.enabled {
                 return Err("IRQ disabled");
             }
-            
+
             irq_line.pending = false;
-            
+
             if let Some(handler) = irq_line.handler {
-                handler(InterruptVector { number: irq as u8, type_id: InterruptType::Irq }, irq_line.handler_data);
+                handler(
+                    InterruptVector {
+                        number: irq as u8,
+                        type_id: InterruptType::Irq,
+                    },
+                    irq_line.handler_data,
+                );
             }
-            
+
             Ok(())
         } else {
             Err("IRQ not found")
@@ -247,7 +267,7 @@ mod tests {
     #[test]
     fn test_allocate_vector() {
         let controller = InterruptController::new();
-        
+
         let vector = controller.allocate_vector(InterruptType::Irq);
         assert_eq!(vector.number, 32);
     }
@@ -255,10 +275,10 @@ mod tests {
     #[test]
     fn test_register_handler() {
         let mut controller = InterruptController::new();
-        
+
         let vector = controller.allocate_vector(InterruptType::Irq);
         let handler: InterruptHandler = |_, _| {};
-        
+
         assert!(controller.register_handler(vector, handler, 0).is_ok());
         assert_eq!(controller.descriptor_count(), 1);
     }
@@ -266,10 +286,10 @@ mod tests {
     #[test]
     fn test_enable_disable_interrupt() {
         let mut controller = InterruptController::new();
-        
+
         let vector = controller.allocate_vector(InterruptType::Irq);
         let handler: InterruptHandler = |_, _| {};
-        
+
         controller.register_handler(vector, handler, 0).unwrap();
         assert!(controller.disable_interrupt(vector).is_ok());
         assert!(controller.enable_interrupt(vector).is_ok());
@@ -278,7 +298,7 @@ mod tests {
     #[test]
     fn test_register_irq() {
         let mut controller = InterruptController::new();
-        
+
         assert!(controller.register_irq(1, IrqTriggerType::Edge).is_ok());
         assert_eq!(controller.irq_count(), 1);
     }
@@ -286,10 +306,10 @@ mod tests {
     #[test]
     fn test_irq_handler() {
         let mut controller = InterruptController::new();
-        
+
         controller.register_irq(1, IrqTriggerType::Edge).unwrap();
         let handler: InterruptHandler = |_, _| {};
-        
+
         assert!(controller.register_irq_handler(1, handler, 0).is_ok());
         assert!(controller.enable_irq(1).is_ok());
     }
@@ -297,13 +317,13 @@ mod tests {
     #[test]
     fn test_handle_interrupt() {
         let mut controller = InterruptController::new();
-        
+
         let vector = controller.allocate_vector(InterruptType::Irq);
         let handler: InterruptHandler = |_, _| {};
-        
+
         controller.register_handler(vector, handler, 0).unwrap();
         assert!(controller.handle_interrupt(vector).is_ok());
-        
+
         assert_eq!(controller.interrupt_count(), 1);
     }
 }

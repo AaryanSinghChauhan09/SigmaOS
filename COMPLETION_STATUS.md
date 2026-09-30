@@ -89,6 +89,14 @@
   - Rights limiting and revocation
   - Sandbox mode management (Unrestricted, Restricted, Sandbox)
   - Comprehensive statistics tracking
+- **Implemented**: Seccomp-BPF filter compilation engine from AGENT.md
+  - Seccomp comparison operations (Eq, Ne, Gt, Ge, Lt, Le, MaskedEq)
+  - Seccomp actions (Allow, Kill, Trap, Errno, Trace, Log)
+  - BPF instruction set (Load, Jump, Return, Register transfer)
+  - Seccomp rules with argument filtering
+  - Argument filters with mask support
+  - Filter compilation to BPF instructions
+  - Comprehensive statistics tracking
 
 ### 9. Security Hardening
 - **Removed**: Hardcoded cryptographic keys in PQC enclave

@@ -14,7 +14,12 @@ pub fn run(paths: &[String], show_number: bool, show_ends: bool) -> Result<(), S
             // Read from stdin
             let stdin = io::stdin();
             let stdout = io::stdout();
-            copy_with_options(&mut stdin.lock(), &mut stdout.lock(), show_number, show_ends)?;
+            copy_with_options(
+                &mut stdin.lock(),
+                &mut stdout.lock(),
+                show_number,
+                show_ends,
+            )?;
         } else {
             let mut file = File::open(path_obj).map_err(|e| format!("cat: {}: {}", path, e))?;
             let stdout = io::stdout();
@@ -40,14 +45,18 @@ where
     let mut line_number = 1;
 
     loop {
-        let n = reader.read(&mut buffer).map_err(|e| format!("cat: {}", e))?;
+        let n = reader
+            .read(&mut buffer)
+            .map_err(|e| format!("cat: {}", e))?;
         if n == 0 {
             break;
         }
 
         if show_number {
             let line_str = format!("{:6} ", line_number);
-            writer.write_all(line_str.as_bytes()).map_err(|e| format!("cat: {}", e))?;
+            writer
+                .write_all(line_str.as_bytes())
+                .map_err(|e| format!("cat: {}", e))?;
             line_number += 1;
         }
 
@@ -55,11 +64,21 @@ where
             // Add $ at end of lines
             let modified: Vec<u8> = buffer[..n]
                 .iter()
-                .flat_map(|&b| if b == b'\n' { vec![b'$', b'\n'] } else { vec![b] })
+                .flat_map(|&b| {
+                    if b == b'\n' {
+                        vec![b'$', b'\n']
+                    } else {
+                        vec![b]
+                    }
+                })
                 .collect();
-            writer.write_all(&modified).map_err(|e| format!("cat: {}", e))?;
+            writer
+                .write_all(&modified)
+                .map_err(|e| format!("cat: {}", e))?;
         } else {
-            writer.write_all(&buffer[..n]).map_err(|e| format!("cat: {}", e))?;
+            writer
+                .write_all(&buffer[..n])
+                .map_err(|e| format!("cat: {}", e))?;
         }
     }
 

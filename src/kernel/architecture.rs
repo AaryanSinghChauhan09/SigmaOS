@@ -536,7 +536,6 @@ impl S390xHal {
     }
 }
 
-
 pub struct MemoryDescriptorList {
     pub virtual_address: usize,
     pub byte_count: usize,

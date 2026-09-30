@@ -19,10 +19,10 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::format;
 
+use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::collections::VecDeque;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GPUVendor {
