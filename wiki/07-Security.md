@@ -16,14 +16,13 @@ SigmaOS implements multiple layers of security:
 4. Filesystem encryption interfaces; audited providers are not integrated
 5. Network security models, which require runtime and protocol review
 
-### Ready-to-use distro login model
+### System user credential storage
 
-`distro::InteractiveUserEnvironment` is exported, but there is no trusted
-credential verifier integrated. `authenticate_and_login` therefore returns
-the same unavailable error for all credentials and does not create a session;
-the default root account has no placeholder password hash. AI agents must
-preserve this fail-closed behavior until a vetted verifier and account-state
-backend are integrated and reviewed.
+`system::UserManager` does not have a vetted password-hashing provider. Its
+`set_password` returns `UserError::CryptoUnavailable` without modifying user
+or shadow records, and `verify_password` always denies. Existing demonstration
+hashes are not accepted. AI agents must preserve this fail-closed behavior and
+reject or reset legacy weak hashes if a trusted provider is later integrated.
 
 ## Pledge/Unveil Sandbox
 
@@ -204,6 +203,23 @@ The emergency shell gate does not keep a plaintext password or accept a
 signature based on fixed magic bytes. Its password and signature checks remain
 unavailable until vetted verification providers are integrated, so shell
 access fails closed.
+
+`auth::SimpleUser` has no password verifier and always returns
+`AuthError::ProviderUnavailable` for non-locked accounts. The single-user
+maintenance login likewise remains locked until a trusted password verifier
+exists. The stored byte arrays are compatibility placeholders, not hashes, and
+must not be used as credentials.
+AI agents maintaining these paths must preserve denial for all credentials and
+keep maintenance access locked until an audited password-hashing verifier and
+account-state backend are integrated. Update this guidance with any future
+provider change; never substitute direct byte or prefix comparisons.
+
+`distro::InteractiveUserEnvironment` is exported, but it has no trusted
+credential verifier. `authenticate_and_login` returns the same unavailable
+error for every credential and does not create a session; the default root
+account has no placeholder password hash. AI agents must preserve this
+fail-closed behavior until a vetted verifier and account-state backend are
+integrated and reviewed.
 
 The Fedora Cockpit and FreeIPA compatibility models do not authenticate
 sessions or mint Kerberos tickets without trusted Cockpit/KDC integrations.
