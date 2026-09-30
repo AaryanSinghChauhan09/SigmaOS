@@ -183,8 +183,11 @@ password-hash placeholder return errors. `crypto::random::SimpleRandomGenerator`
 `SimpleCSPRNG`, `klib::rand` secure helpers, and `klib::rng::OsRng` also fail
 closed. `klib::rng::SigmaRng` and `XorShiftRng` are deterministic simulation
 generators only. Timestamps, raw hardware values, and simple state-mixing
-routines are not substitutes for a CSPRNG. This PAM model is not a replacement
-for the host operating system's PAM or account database.
+routines are not substitutes for a CSPRNG. The `crypto::hash` and `crypto::kdf`
+compatibility APIs likewise return provider-unavailable errors; their names do
+not mean SHA-256, HMAC, HKDF, PBKDF2, or password hashing are implemented there.
+This PAM model is not a replacement for the host operating system's PAM or
+account database.
 
 ## Audit and Logging
 
