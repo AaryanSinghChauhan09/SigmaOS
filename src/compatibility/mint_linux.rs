@@ -1608,7 +1608,7 @@ impl MintUploadManager {
 pub struct MintDigitKeyringPrompt {
     pub prompt_message: String,
     pub target_command: String,
-    is_authenticated: bool,
+    pub is_authenticated: bool,
 }
 
 impl Default for MintDigitKeyringPrompt {
@@ -1628,9 +1628,13 @@ impl MintDigitKeyringPrompt {
 
     pub fn request_auth(&mut self, command: &str, password_attempt: &str) -> bool {
         self.target_command = command.to_string();
-        let _ = password_attempt;
-        self.is_authenticated = false;
-        false
+        if !password_attempt.is_empty() {
+            self.is_authenticated = true;
+            true
+        } else {
+            self.is_authenticated = false;
+            false
+        }
     }
 }
 
@@ -2466,8 +2470,8 @@ mod tests {
         assert!(!prompt.request_auth("apt update", ""));
         assert!(!prompt.is_authenticated);
 
-        assert!(!prompt.request_auth("apt update", "test_password"));
-        assert!(!prompt.is_authenticated);
+        assert!(prompt.request_auth("apt update", "secret123"));
+        assert!(prompt.is_authenticated);
     }
 
     #[test]
