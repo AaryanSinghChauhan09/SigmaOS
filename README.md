@@ -310,6 +310,7 @@ git push origin feature/your-feature
 | [docs/PRODUCT_VISION.md](docs/PRODUCT_VISION.md) | Product vision and manifesto |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Master execution roadmap |
 | [docs/SUPPORT_MATRIX.md](docs/SUPPORT_MATRIX.md) | Hardware support matrix |
+| [docs/OPEN_SOURCE_OS_COMPARATIVE_GAP_ANALYSIS.md](docs/OPEN_SOURCE_OS_COMPARATIVE_GAP_ANALYSIS.md) | Comparative open-source OS feature gap analysis |
 | [WHAT_IS_WORKING_AND_NOT_WORKING.md](WHAT_IS_WORKING_AND_NOT_WORKING.md) | Component status tracker |
 
 ---
