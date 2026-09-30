@@ -259,8 +259,10 @@ impl SovereignUniversalDistroBridge {
             (
                 DistroSubsystemMode::LinuxDebian
                 | DistroSubsystemMode::LinuxPopOs
+                | DistroSubsystemMode::LinuxPopOsCosmic
                 | DistroSubsystemMode::LinuxTails
                 | DistroSubsystemMode::LinuxUbuntu
+                | DistroSubsystemMode::LinuxUbuntuServer
                 | DistroSubsystemMode::LinuxMint
                 | DistroSubsystemMode::LinuxKali
                 | DistroSubsystemMode::LinuxAntiX
@@ -304,9 +306,11 @@ impl SovereignUniversalDistroBridge {
             (DistroSubsystemMode::LinuxOpenWrt, "/etc") => "/etc/config".to_string(),
             (
                 DistroSubsystemMode::FreeBsd
+                | DistroSubsystemMode::FreeBsdHardened
                 | DistroSubsystemMode::OpenBsd
                 | DistroSubsystemMode::NetBsd
                 | DistroSubsystemMode::DragonFlyBsd
+                | DistroSubsystemMode::DragonFlyHammer2
                 | DistroSubsystemMode::MidnightBsd
                 | DistroSubsystemMode::HardenedBsd
                 | DistroSubsystemMode::GhostBsd
@@ -316,13 +320,16 @@ impl SovereignUniversalDistroBridge {
             ) => "/var/db/pkg".to_string(),
             (
                 DistroSubsystemMode::FreeBsd
+                | DistroSubsystemMode::FreeBsdHardened
                 | DistroSubsystemMode::OpenBsd
                 | DistroSubsystemMode::NetBsd
                 | DistroSubsystemMode::DragonFlyBsd
+                | DistroSubsystemMode::DragonFlyHammer2
                 | DistroSubsystemMode::GhostBsd
                 | DistroSubsystemMode::NomadBsd
                 | DistroSubsystemMode::OpenBsdHardened
-                | DistroSubsystemMode::SmartOs,
+                | DistroSubsystemMode::SmartOs
+                | DistroSubsystemMode::SolarisSmartOS,
                 "/etc",
             ) => "/usr/local/etc".to_string(),
             (DistroSubsystemMode::GhostBsd | DistroSubsystemMode::NomadBsd, "/var/log") => {
@@ -654,7 +661,9 @@ impl SovereignUniversalDistroBridge {
     ) -> Result<(), &'static str> {
         match self.mode {
             DistroSubsystemMode::FreeBsd
+            | DistroSubsystemMode::FreeBsdHardened
             | DistroSubsystemMode::DragonFlyBsd
+            | DistroSubsystemMode::DragonFlyHammer2
             | DistroSubsystemMode::MidnightBsd
             | DistroSubsystemMode::HardenedBsd
             | DistroSubsystemMode::GhostBsd
@@ -673,7 +682,9 @@ impl SovereignUniversalDistroBridge {
                 self.pledge_sentinel.unveil_process(pid, root_path, "rw")?;
                 Ok(())
             }
-            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => {
+            DistroSubsystemMode::SolarisIllumos
+            | DistroSubsystemMode::SolarisOmniOS
+            | DistroSubsystemMode::SolarisSmartOS => {
                 let mut zone_engine = SovereignIllumosZonesEngine::new();
                 let zone_id = zone_engine.create_zone(
                     "zone-isolate",
@@ -8489,10 +8500,14 @@ impl SovereignMultiArchSyscallTranslator {
         }
         match self.mode {
             DistroSubsystemMode::FreeBsd
+            | DistroSubsystemMode::FreeBsdHardened
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
-            | DistroSubsystemMode::DragonFlyBsd => Ok(1001),
-            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SmartOs => Ok(2002),
+            | DistroSubsystemMode::DragonFlyBsd
+            | DistroSubsystemMode::DragonFlyHammer2 => Ok(1001),
+            DistroSubsystemMode::SolarisIllumos
+            | DistroSubsystemMode::SmartOs
+            | DistroSubsystemMode::SolarisSmartOS => Ok(2002),
             _ => Ok(0),
         }
     }

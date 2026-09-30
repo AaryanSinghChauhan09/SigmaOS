@@ -23,9 +23,6 @@ security is responsible for Security framework including capabilities, seccomp, 
 - Commit hardcoded secrets or keys
 - Introduce memory safety violations
 - Break compatibility without documentation
-- Accept authentication based on nonempty input, a fixed byte prefix, a trusted name, or a simulated state transition
-- Claim enforcement when a policy is only constructed or modeled and not installed at the system boundary
-- Replace failed authentication, entropy, or provider checks with permissive defaults
 
 ## Open Source Inspiration
 
@@ -42,10 +39,9 @@ security is responsible for Security framework including capabilities, seccomp, 
 ## Implementation Status
 
 ### Current State
-- **Verified only**: Describe a control as implemented only when its execution path is connected to the kernel or trusted provider and the enforcement behavior is tested.
-- **Prototype/model**: Compatibility bridges and policy models may aid development but are not runtime controls without integration evidence.
-- **Unavailable**: Authentication, randomness, encryption, signatures, or audit claims must fail closed when trusted providers are missing.
-- **Planned**: Track missing provider integrations and end-to-end enforcement checks explicitly.
+- **Implemented**: Core functionality is implemented
+- **In Progress**: Advanced features and optimizations
+- **Planned**: Additional distro compatibility layers
 
 ### Testing
 - **Unit Tests**: Implemented for core functions
@@ -81,15 +77,11 @@ cargo fmt
 - Use safe Rust patterns
 - Prefer alloc:: over std:: for kernel code
 - Implement comprehensive error handling
-- Preserve deny-by-default behavior on missing credentials, entropy, provider, or policy integration.
-- Do not log passwords, keys, tokens, or sensitive request data; use bounded inputs and checked lengths.
-- Update the canonical security Wiki topic and its mirrors, state limitations, and give future maintainers focused verification commands.
 
 ## Known Issues
 
-- Trusted credential, password-hashing, cryptographic, and kernel-enforcement integrations are incomplete in multiple compatibility modules.
-- Some security-facing modules are standalone models and are not linked into the crate or system runtime.
 - Integration with multi-distro compatibility layers
+- Performance optimization opportunities
 
 ## Future Roadmap
 

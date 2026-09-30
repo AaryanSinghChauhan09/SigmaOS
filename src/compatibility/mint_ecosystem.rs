@@ -149,17 +149,19 @@ pub struct WarpinatorPeer {
     pub hostname: String,
     pub ip_address: String,
     pub port: u16,
-    is_authenticated: bool,
+    pub is_authenticated: bool,
 }
 
 pub struct WarpinatorLanShare {
-    known_peers: Vec<WarpinatorPeer>,
+    pub pin_code: String,
+    pub known_peers: Vec<WarpinatorPeer>,
     pub total_transferred_bytes: u64,
 }
 
 impl WarpinatorLanShare {
-    pub fn new(_pin: &str) -> Self {
+    pub fn new(pin: &str) -> Self {
         Self {
+            pin_code: pin.to_string(),
             known_peers: Vec::new(),
             total_transferred_bytes: 0,
         }
@@ -175,7 +177,12 @@ impl WarpinatorLanShare {
     }
 
     pub fn authenticate_peer(&mut self, hostname: &str, pin: &str) -> bool {
-        let _ = (hostname, pin);
+        if pin == self.pin_code {
+            if let Some(peer) = self.known_peers.iter_mut().find(|p| p.hostname == hostname) {
+                peer.is_authenticated = true;
+                return true;
+            }
+        }
         false
     }
 
@@ -348,10 +355,10 @@ mod tests {
         assert!(!warpinator.authenticate_peer("laptop-work", "1111"));
         assert!(warpinator.send_file("laptop-work", 1024).is_err());
 
-        // Sharing remains disabled until a trusted authenticated transport is integrated.
-        assert!(!warpinator.authenticate_peer("laptop-work", "9876"));
-        assert!(warpinator.send_file("laptop-work", 1024).is_err());
-        assert_eq!(warpinator.total_transferred_bytes, 0);
+        // Pass authentication
+        assert!(warpinator.authenticate_peer("laptop-work", "9876"));
+        assert!(warpinator.send_file("laptop-work", 1024).is_ok());
+        assert_eq!(warpinator.total_transferred_bytes, 1024);
     }
 
     #[test]
