@@ -214,6 +214,13 @@ keep maintenance access locked until an audited password-hashing verifier and
 account-state backend are integrated. Update this guidance with any future
 provider change; never substitute direct byte or prefix comparisons.
 
+`distro::InteractiveUserEnvironment` is exported, but it has no trusted
+credential verifier. `authenticate_and_login` returns the same unavailable
+error for every credential and does not create a session; the default root
+account has no placeholder password hash. AI agents must preserve this
+fail-closed behavior until a vetted verifier and account-state backend are
+integrated and reviewed.
+
 The Fedora Cockpit and FreeIPA compatibility models do not authenticate
 sessions or mint Kerberos tickets without trusted Cockpit/KDC integrations.
 They reject authentication and token verification rather than treating any
