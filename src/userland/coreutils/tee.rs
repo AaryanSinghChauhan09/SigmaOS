@@ -33,7 +33,9 @@ pub fn run(file_paths: &[String], opts: TeeOptions) -> Result<String, String> {
     let mut captured_output = Vec::new();
 
     loop {
-        let bytes_read = handle.read(&mut buffer).map_err(|e| format!("tee: {}", e))?;
+        let bytes_read = handle
+            .read(&mut buffer)
+            .map_err(|e| format!("tee: {}", e))?;
         if bytes_read == 0 {
             break;
         }

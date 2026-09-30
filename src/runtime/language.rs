@@ -16,11 +16,11 @@
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// OOP-based Language Runtime Management for SigmaOS
 /// Based on Ideas-999-Structured: Package, Build & Reproducibility Item 14

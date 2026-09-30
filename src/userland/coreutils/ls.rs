@@ -17,7 +17,10 @@ pub fn run(path: &str, _long_format: bool, all: bool) -> Result<Vec<FileInfo>, S
     let dir_path = Path::new(path);
 
     if !dir_path.exists() {
-        return Err(format!("ls: cannot access '{}': No such file or directory", path));
+        return Err(format!(
+            "ls: cannot access '{}': No such file or directory",
+            path
+        ));
     }
 
     if dir_path.is_file() {

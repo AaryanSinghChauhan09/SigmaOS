@@ -188,13 +188,27 @@ impl LinuxOpenFlags {
 
     pub fn as_u32(&self) -> u32 {
         let mut flags = 0u32;
-        if self.read_only { flags |= 0x01; }
-        if self.write_only { flags |= 0x02; }
-        if self.read_write { flags |= 0x02; }
-        if self.create { flags |= 0x40; }
-        if self.truncate { flags |= 0x200; }
-        if self.append { flags |= 0x400; }
-        if self.nonblock { flags |= 0x800; }
+        if self.read_only {
+            flags |= 0x01;
+        }
+        if self.write_only {
+            flags |= 0x02;
+        }
+        if self.read_write {
+            flags |= 0x02;
+        }
+        if self.create {
+            flags |= 0x40;
+        }
+        if self.truncate {
+            flags |= 0x200;
+        }
+        if self.append {
+            flags |= 0x400;
+        }
+        if self.nonblock {
+            flags |= 0x800;
+        }
         flags
     }
 }
@@ -239,7 +253,10 @@ impl LinuxFdTable {
         if fd < 3 {
             return Err("Cannot close standard file descriptor");
         }
-        self.entries.remove(&fd).map(|_| ()).ok_or("File descriptor not found")
+        self.entries
+            .remove(&fd)
+            .map(|_| ())
+            .ok_or("File descriptor not found")
     }
 
     /// Get file descriptor entry
@@ -381,7 +398,7 @@ impl LinuxSyscallDispatcher {
         let fd = args[0];
         let _buf = args[1];
         let _count = args[2];
-        
+
         if let Some(_entry) = self.fd_table.get(fd) {
             Ok(0) // Simulated success
         } else {
@@ -393,7 +410,7 @@ impl LinuxSyscallDispatcher {
         let fd = args[0];
         let _buf = args[1];
         let _count = args[2];
-        
+
         if let Some(_entry) = self.fd_table.get(fd) {
             Ok(0) // Simulated success
         } else {
@@ -405,11 +422,11 @@ impl LinuxSyscallDispatcher {
         let path_ptr = args[0];
         let flags = args[1] as u32;
         let _mode = args[2];
-        
+
         // Simulated path from pointer
         let path = format!("/proc/self/fd/{}", path_ptr);
         let linux_flags = LinuxOpenFlags::from_u32(flags);
-        
+
         let fd = self.fd_table.allocate(path, linux_flags);
         Ok(fd)
     }
@@ -434,7 +451,7 @@ impl LinuxSyscallDispatcher {
         let _parent_tidptr = args[2];
         let _child_tidptr = args[3];
         let _tls = args[4];
-        
+
         let ppid = self.process_table.get_pid();
         let pid = self.process_table.create(ppid, "clone".to_string());
         Ok(pid)
@@ -450,7 +467,7 @@ impl LinuxSyscallDispatcher {
         let _filename = args[0];
         let _argv = args[1];
         let _envp = args[2];
-        
+
         // Simulated exec - update process name
         if let Some(process) = self.process_table.get_mut(self.process_table.get_pid()) {
             process.name = "execve".to_string();
@@ -511,7 +528,7 @@ mod tests {
         let flags = LinuxOpenFlags::from_u32(0x02 | 0x40);
         assert!(flags.write_only);
         assert!(flags.create);
-        
+
         let back = flags.as_u32();
         assert!(back & 0x02 != 0);
         assert!(back & 0x40 != 0);
@@ -522,11 +539,11 @@ mod tests {
         let table = LinuxFdTable::new();
         let path = "/tmp/test".to_string();
         let flags = LinuxOpenFlags::from_u32(0x02);
-        
+
         let fd = table.allocate(path, flags);
         assert!(fd >= 3);
         assert_eq!(table.count(), 1);
-        
+
         assert!(table.close(fd).is_ok());
         assert_eq!(table.count(), 0);
     }
@@ -535,7 +552,7 @@ mod tests {
     fn test_process_table() {
         let table = LinuxProcessTable::new();
         let pid = table.create(0, "test".to_string());
-        
+
         assert_eq!(pid, 1);
         assert_eq!(table.get_pid(), 1);
         assert_eq!(table.get_ppid(), 0);
@@ -545,29 +562,39 @@ mod tests {
     #[test]
     fn test_syscall_dispatcher() {
         let dispatcher = LinuxSyscallDispatcher::new();
-        
+
         // Test getpid
-        let pid = dispatcher.dispatch(LinuxSyscallNumber::Getpid as u64, &[]).unwrap();
+        let pid = dispatcher
+            .dispatch(LinuxSyscallNumber::Getpid as u64, &[])
+            .unwrap();
         assert_eq!(pid, 1);
-        
+
         // Test getppid
-        let ppid = dispatcher.dispatch(LinuxSyscallNumber::Getppid as u64, &[]).unwrap();
+        let ppid = dispatcher
+            .dispatch(LinuxSyscallNumber::Getppid as u64, &[])
+            .unwrap();
         assert_eq!(ppid, 0);
-        
+
         // Test fork
-        let child_pid = dispatcher.dispatch(LinuxSyscallNumber::Fork as u64, &[]).unwrap();
+        let child_pid = dispatcher
+            .dispatch(LinuxSyscallNumber::Fork as u64, &[])
+            .unwrap();
         assert_eq!(child_pid, 2);
-        
+
         assert_eq!(dispatcher.process_count(), 2);
     }
 
     #[test]
     fn test_syscall_count() {
         let dispatcher = LinuxSyscallDispatcher::new();
-        
-        dispatcher.dispatch(LinuxSyscallNumber::Getpid as u64, &[]).unwrap();
-        dispatcher.dispatch(LinuxSyscallNumber::Getppid as u64, &[]).unwrap();
-        
+
+        dispatcher
+            .dispatch(LinuxSyscallNumber::Getpid as u64, &[])
+            .unwrap();
+        dispatcher
+            .dispatch(LinuxSyscallNumber::Getppid as u64, &[])
+            .unwrap();
+
         assert_eq!(dispatcher.syscall_count(), 2);
     }
 }

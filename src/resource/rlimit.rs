@@ -1,20 +1,19 @@
 // BSD-style Resource Limits (rlimits) for SigmaOS
 // Implements process-specific soft and hard limits on system resources.
 
-
 use std::collections::BTreeMap;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ResourceLimitType {
-    CpuTime = 0,       // CPU time in seconds
-    FileSize = 1,      // Maximum file size in bytes
-    DataSize = 2,      // Maximum data segment (heap) size in bytes
-    StackSize = 3,     // Maximum stack size in bytes
-    CoreSize = 4,      // Maximum core file size in bytes
-    NoFile = 5,        // Maximum number of open files
-    AddressSpace = 6,  // Maximum address space (virtual memory) in bytes
-    MaxProcesses = 7,  // Maximum processes per user/session
+    CpuTime = 0,      // CPU time in seconds
+    FileSize = 1,     // Maximum file size in bytes
+    DataSize = 2,     // Maximum data segment (heap) size in bytes
+    StackSize = 3,    // Maximum stack size in bytes
+    CoreSize = 4,     // Maximum core file size in bytes
+    NoFile = 5,       // Maximum number of open files
+    AddressSpace = 6, // Maximum address space (virtual memory) in bytes
+    MaxProcesses = 7, // Maximum processes per user/session
 }
 
 #[repr(C)]
@@ -69,9 +68,18 @@ impl ProcessResourceLimiter {
     pub fn register_process(&mut self, pid: u64) {
         let mut limits = BTreeMap::new();
         limits.insert(ResourceLimitType::CpuTime, RLimit::unlimited());
-        limits.insert(ResourceLimitType::FileSize, RLimit::new(10 * 1024 * 1024, 100 * 1024 * 1024)); // 10MB / 100MB
-        limits.insert(ResourceLimitType::DataSize, RLimit::new(64 * 1024 * 1024, 256 * 1024 * 1024)); // 64MB / 256MB
-        limits.insert(ResourceLimitType::StackSize, RLimit::new(8 * 1024 * 1024, 32 * 1024 * 1024)); // 8MB / 32MB
+        limits.insert(
+            ResourceLimitType::FileSize,
+            RLimit::new(10 * 1024 * 1024, 100 * 1024 * 1024),
+        ); // 10MB / 100MB
+        limits.insert(
+            ResourceLimitType::DataSize,
+            RLimit::new(64 * 1024 * 1024, 256 * 1024 * 1024),
+        ); // 64MB / 256MB
+        limits.insert(
+            ResourceLimitType::StackSize,
+            RLimit::new(8 * 1024 * 1024, 32 * 1024 * 1024),
+        ); // 8MB / 32MB
         limits.insert(ResourceLimitType::CoreSize, RLimit::new(0, 1024 * 1024)); // 0 / 1MB
         limits.insert(ResourceLimitType::NoFile, RLimit::new(256, 1024)); // 256 / 1024 FDs
         limits.insert(ResourceLimitType::AddressSpace, RLimit::unlimited());
@@ -123,8 +131,16 @@ impl ProcessResourceLimiter {
         limit_type: ResourceLimitType,
         amount: u64,
     ) -> Result<(), RLimitError> {
-        let limit = *self.process_limits.get(&pid).ok_or(RLimitError::NotFound)?.get(&limit_type).ok_or(RLimitError::NotFound)?;
-        let usage_map = self.current_usage.get_mut(&pid).ok_or(RLimitError::NotFound)?;
+        let limit = *self
+            .process_limits
+            .get(&pid)
+            .ok_or(RLimitError::NotFound)?
+            .get(&limit_type)
+            .ok_or(RLimitError::NotFound)?;
+        let usage_map = self
+            .current_usage
+            .get_mut(&pid)
+            .ok_or(RLimitError::NotFound)?;
         let current = usage_map.get(&limit_type).cloned().unwrap_or(0);
 
         let new_usage = current.saturating_add(amount);
@@ -137,8 +153,16 @@ impl ProcessResourceLimiter {
     }
 
     /// Subtract/release usage for `pid`
-    pub fn release_usage(&mut self, pid: u64, limit_type: ResourceLimitType, amount: u64) -> Result<(), RLimitError> {
-        let usage_map = self.current_usage.get_mut(&pid).ok_or(RLimitError::NotFound)?;
+    pub fn release_usage(
+        &mut self,
+        pid: u64,
+        limit_type: ResourceLimitType,
+        amount: u64,
+    ) -> Result<(), RLimitError> {
+        let usage_map = self
+            .current_usage
+            .get_mut(&pid)
+            .ok_or(RLimitError::NotFound)?;
         let current = usage_map.get(&limit_type).cloned().unwrap_or(0);
         let new_usage = current.saturating_sub(amount);
         usage_map.insert(limit_type, new_usage);
@@ -206,10 +230,16 @@ mod tests {
         limiter.register_process(42);
 
         // Set max files limit to 3 / 5
-        assert_eq!(limiter.set_limit(42, ResourceLimitType::NoFile, 3, 5, false), Ok(()));
+        assert_eq!(
+            limiter.set_limit(42, ResourceLimitType::NoFile, 3, 5, false),
+            Ok(())
+        );
 
         // Add 2 file descriptors - should succeed
-        assert_eq!(limiter.check_and_add_usage(42, ResourceLimitType::NoFile, 2), Ok(()));
+        assert_eq!(
+            limiter.check_and_add_usage(42, ResourceLimitType::NoFile, 2),
+            Ok(())
+        );
         assert_eq!(limiter.get_usage(42, ResourceLimitType::NoFile), 2);
 
         // Adding 2 more would be 4, which exceeds soft limit (3) - should fail
@@ -220,11 +250,17 @@ mod tests {
         assert_eq!(limiter.get_usage(42, ResourceLimitType::NoFile), 2); // usage unchanged
 
         // Release 1 file descriptor
-        assert_eq!(limiter.release_usage(42, ResourceLimitType::NoFile, 1), Ok(()));
+        assert_eq!(
+            limiter.release_usage(42, ResourceLimitType::NoFile, 1),
+            Ok(())
+        );
         assert_eq!(limiter.get_usage(42, ResourceLimitType::NoFile), 1);
 
         // Now adding 2 more works because 1 + 2 = 3 <= soft limit (3)
-        assert_eq!(limiter.check_and_add_usage(42, ResourceLimitType::NoFile, 2), Ok(()));
+        assert_eq!(
+            limiter.check_and_add_usage(42, ResourceLimitType::NoFile, 2),
+            Ok(())
+        );
         assert_eq!(limiter.get_usage(42, ResourceLimitType::NoFile), 3);
     }
 }
