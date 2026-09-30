@@ -18,6 +18,22 @@ use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
+const MAX_LOG_MESSAGE_BYTES: usize = 64 * 1024;
+const MAX_LOG_HISTORY_ENTRIES: usize = 1024;
+const MAX_LOG_FILE_BYTES: u64 = 64 * 1024 * 1024;
+const MAX_LOG_CHANNELS: usize = 1024;
+const MAX_CORE_DUMP_EVENTS: usize = 1024;
+
+fn is_safe_component(value: &str) -> bool {
+    !value.is_empty()
+        && value.len() <= 64
+        && value != "."
+        && value != ".."
+        && value
+            .bytes()
+            .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'-' | b'_' | b'.'))
+}
+
 /// 1. Gentoo Portage World Set, Depclean & Preserved-Libs Engine
 #[derive(Debug, Clone)]
 pub struct GentooPortageWorldDepcleanEngine {
@@ -191,15 +207,28 @@ impl OpenSuseSnapperAutoYastEngine {
         id
     }
 
-    pub fn compare_snapshots(&self, snapshot_a: u64, snapshot_b: u64) -> Vec<String> {
-        let mut diffs = Vec::new();
-        if let Some(sb) = self.snapshots.get(&snapshot_b) {
-            for file in &sb.changed_files {
-                diffs.push(format!("Modified in snap #{}: {}", snapshot_b, file));
-            }
+    pub fn compare_snapshots(
+        &self,
+        snapshot_a: u64,
+        snapshot_b: u64,
+    ) -> Result<Vec<String>, &'static str> {
+        let earlier = self
+            .snapshots
+            .get(&snapshot_a)
+            .ok_or("Snapper error: Earlier snapshot does not exist")?;
+        let later = self
+            .snapshots
+            .get(&snapshot_b)
+            .ok_or("Snapper error: Later snapshot does not exist")?;
+        if later.pre_id != Some(earlier.id) {
+            return Err("Snapper error: Snapshots are not a recorded pre/post pair");
         }
-        let _ = snapshot_a;
-        diffs
+
+        Ok(later
+            .changed_files
+            .iter()
+            .map(|file| format!("Modified in snap #{}: {}", snapshot_b, file))
+            .collect())
     }
 
     pub fn perform_rollback(&mut self, target_snapshot_id: u64) -> Result<String, &'static str> {
@@ -299,6 +328,9 @@ impl FreeBsdBectlZfsBootEnvEngine {
     }
 
     pub fn create_be(&mut self, be_name: &str, timestamp: u64) -> Result<String, &'static str> {
+        if !is_safe_component(be_name) {
+            return Err("bectl error: Invalid boot environment name");
+        }
         if self.boot_environments.contains_key(be_name) {
             return Err("bectl error: Boot environment already exists");
         }
@@ -329,6 +361,13 @@ impl FreeBsdBectlZfsBootEnvEngine {
     }
 
     pub fn mount_be(&mut self, be_name: &str, mountpoint: &str) -> Result<String, &'static str> {
+        if !mountpoint.starts_with('/')
+            || mountpoint.as_bytes().contains(&0)
+            || mountpoint.split('/').any(|part| part == "..")
+            || mountpoint.len() > 4096
+        {
+            return Err("bectl error: Invalid mountpoint");
+        }
         let be = self
             .boot_environments
             .get_mut(be_name)
@@ -439,16 +478,25 @@ impl VoidRunitSvlogdCoreDumpEngine {
         service_name: &str,
         max_file_size_bytes: u64,
         max_files_retained: usize,
-    ) {
+    ) -> Result<(), &'static str> {
+        if !is_safe_component(service_name) {
+            return Err("svlogd error: Invalid service name");
+        }
+        if !self.log_channels.contains_key(service_name)
+            && self.log_channels.len() >= MAX_LOG_CHANNELS
+        {
+            return Err("svlogd error: Log channel limit reached");
+        }
         let channel = SvlogdLogChannel {
             service_name: service_name.to_string(),
-            max_file_size_bytes,
-            max_files_retained,
+            max_file_size_bytes: max_file_size_bytes.clamp(1, MAX_LOG_FILE_BYTES),
+            max_files_retained: max_files_retained.clamp(1, MAX_LOG_HISTORY_ENTRIES),
             active_file_path: format!("/var/log/{}/current", service_name),
             total_bytes_logged: 0,
             log_entries: Vec::new(),
         };
         self.log_channels.insert(service_name.to_string(), channel);
+        Ok(())
     }
 
     pub fn write_log_entry(
@@ -457,18 +505,40 @@ impl VoidRunitSvlogdCoreDumpEngine {
         message: &str,
         timestamp: u64,
     ) -> Result<(), &'static str> {
+        if message.len() > MAX_LOG_MESSAGE_BYTES {
+            return Err("svlogd error: Log entry exceeds configured input limit");
+        }
         let channel = self
             .log_channels
             .get_mut(service_name)
             .ok_or("svlogd error: Log channel for service not found")?;
 
         let entry = format!("@{:016x} {}", timestamp, message);
-        channel.total_bytes_logged += entry.len() as u64;
-        channel.log_entries.push(entry);
-
-        if channel.total_bytes_logged > channel.max_file_size_bytes {
-            self.rotate_logs_if_needed(service_name)?;
+        let entry_bytes =
+            u64::try_from(entry.len()).map_err(|_| "svlogd error: Log entry length overflow")?;
+        if entry_bytes > channel.max_file_size_bytes {
+            return Err("svlogd error: Log entry exceeds configured file size");
         }
+        if channel
+            .total_bytes_logged
+            .checked_add(entry_bytes)
+            .ok_or("svlogd error: Log byte counter overflow")?
+            > channel.max_file_size_bytes
+        {
+            channel.total_bytes_logged = 0;
+        }
+        if channel.log_entries.len() >= channel.max_files_retained {
+            channel.log_entries.remove(0);
+        }
+        channel
+            .log_entries
+            .try_reserve(1)
+            .map_err(|_| "svlogd error: Unable to reserve log entry")?;
+        channel.total_bytes_logged = channel
+            .total_bytes_logged
+            .checked_add(entry_bytes)
+            .ok_or("svlogd error: Log byte counter overflow")?;
+        channel.log_entries.push(entry);
         Ok(())
     }
 
@@ -491,7 +561,22 @@ impl VoidRunitSvlogdCoreDumpEngine {
         sig: i32,
         core_bytes: u64,
         timestamp: u64,
-    ) -> String {
+    ) -> Result<String, &'static str> {
+        if exe_path.is_empty()
+            || exe_path.len() > 1024
+            || exe_path
+                .as_bytes()
+                .iter()
+                .any(|byte| byte.is_ascii_control())
+        {
+            return Err("core dump error: Invalid executable path");
+        }
+        if self.recorded_core_dumps.len() >= MAX_CORE_DUMP_EVENTS {
+            self.recorded_core_dumps.remove(0);
+        }
+        self.recorded_core_dumps
+            .try_reserve(1)
+            .map_err(|_| "core dump error: Unable to reserve event")?;
         let dump_path = format!(
             "/var/crash/core.{}.{}.{}",
             exe_path.replace('/', "_"),
@@ -507,7 +592,7 @@ impl VoidRunitSvlogdCoreDumpEngine {
             timestamp,
         };
         self.recorded_core_dumps.push(event);
-        dump_path
+        Ok(dump_path)
     }
 
     pub fn get_core_dumps(&self) -> &[CoreDumpEvent] {
@@ -762,8 +847,9 @@ mod tests {
             &["/boot/vmlinuz", "/etc/os-release"],
         );
 
-        let diffs = snapper.compare_snapshots(pre_id, post_id);
+        let diffs = snapper.compare_snapshots(pre_id, post_id).unwrap();
         assert_eq!(diffs.len(), 2);
+        assert!(snapper.compare_snapshots(post_id, pre_id).is_err());
 
         let res = snapper.perform_rollback(pre_id);
         assert!(res.is_ok());
@@ -780,10 +866,13 @@ mod tests {
     #[test]
     fn test_freebsd_bectl_zfs_boot_env() {
         let mut bectl = FreeBsdBectlZfsBootEnvEngine::new();
+        assert!(bectl.create_be("../escape", 0).is_err());
+        assert!(bectl.create_be("bad/name", 0).is_err());
         bectl.create_be("patch-1.0.1", 1672532000).unwrap();
         assert_eq!(bectl.list_bes().len(), 2);
 
         bectl.mount_be("patch-1.0.1", "/mnt/patch").unwrap();
+        assert!(bectl.mount_be("patch-1.0.1", "/mnt/../host").is_err());
         assert_eq!(
             bectl
                 .boot_environments
@@ -820,10 +909,18 @@ mod tests {
     #[test]
     fn test_void_runit_svlogd_core_dump() {
         let mut void_engine = VoidRunitSvlogdCoreDumpEngine::new();
-        void_engine.register_service_logger("nginx", 1024, 5);
+        void_engine
+            .register_service_logger("nginx", 1024, 5)
+            .unwrap();
         void_engine
             .write_log_entry("nginx", "Worker process started", 1672531200)
             .unwrap();
+        assert!(void_engine
+            .write_log_entry("nginx", &"x".repeat(MAX_LOG_MESSAGE_BYTES + 1), 0)
+            .is_err());
+        assert!(void_engine
+            .register_service_logger("../../outside", 1024, 5)
+            .is_err());
 
         assert_eq!(
             void_engine
@@ -835,8 +932,13 @@ mod tests {
             1
         );
 
-        let path = void_engine.record_core_dump(1337, "/usr/bin/nginx", 11, 4096000, 1672531300);
+        let path = void_engine
+            .record_core_dump(1337, "/usr/bin/nginx", 11, 4096000, 1672531300)
+            .unwrap();
         assert!(path.contains("1337"));
+        assert!(void_engine
+            .record_core_dump(0, "bad\npath", 11, 0, 0)
+            .is_err());
         assert_eq!(void_engine.get_core_dumps().len(), 1);
     }
 
