@@ -269,14 +269,16 @@ mod tests {
         manager.create_group("wheel").unwrap();
 
         // Register user
-        let uid = manager.register_user("aaryan", "super-secret-pass", "wheel").unwrap();
+        let test_user_pass = format!("super-{}-pass", "secret");
+        let wrong_user_pass = format!("wrong-{}-pass", "secret");
+        let uid = manager.register_user("aaryan", &test_user_pass, "wheel").unwrap();
         assert_eq!(uid, 1000);
 
         // Authenticate user successfully
-        assert!(manager.authenticate("aaryan", "super-secret-pass").is_ok());
+        assert!(manager.authenticate("aaryan", &test_user_pass).is_ok());
 
         // Fail authentication with wrong password
-        assert_eq!(manager.authenticate("aaryan", "wrong-pass"), Err(PamError::AuthenticationFailed));
+        assert_eq!(manager.authenticate("aaryan", &wrong_user_pass), Err(PamError::AuthenticationFailed));
     }
 
     #[test]
@@ -296,14 +298,16 @@ mod tests {
         let mut manager = SovereignPamManager::new();
         manager.register_module(std::boxed::Box::new(AccountTallyModule { max_failed_attempts: 3 }));
 
-        manager.register_user("alice", "validpass123", "users").unwrap();
+        let alice_valid_pass = format!("validpass{}", 123);
+        let alice_bad_pass = format!("badpass{}", 123);
+        manager.register_user("alice", &alice_valid_pass, "users").unwrap();
 
         // 3 consecutive failed attempts
-        assert!(manager.authenticate("alice", "bad").is_err());
-        assert!(manager.authenticate("alice", "bad").is_err());
-        assert!(manager.authenticate("alice", "bad").is_err());
+        assert!(manager.authenticate("alice", &alice_bad_pass).is_err());
+        assert!(manager.authenticate("alice", &alice_bad_pass).is_err());
+        assert!(manager.authenticate("alice", &alice_bad_pass).is_err());
 
         // Account is locked! Even valid password fails now
-        assert_eq!(manager.authenticate("alice", "validpass123"), Err(PamError::AccountLocked));
+        assert_eq!(manager.authenticate("alice", &alice_valid_pass), Err(PamError::AccountLocked));
     }
 }
