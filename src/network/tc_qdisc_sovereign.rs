@@ -3,7 +3,6 @@
 #![allow(unexpected_cfgs)]
 #![allow(clippy::new_without_default)]
 
-use std::collections::VecDeque;
 #[cfg(not(any(feature = "standalone_test", test)))]
 // SigmaOS Sovereign Traffic Control (tc) Qdiscs
 // Implements Linux Traffic Control queuing disciplines in 100% safe Rust.
@@ -56,10 +55,8 @@ pub struct TbfQdisc {
     pub ns_per_byte: u64, // nanoseconds per byte at rate
     pub enqueued: u64,
     pub dropped: u64,
-    pub queue: VecDeque<Packet>,
+    pub queue: Vec<Packet>,
     pub queue_limit: usize,
-    /// Fractional byte-nanoseconds carried between refill ticks.
-    pub refill_remainder: u64,
 }
 
 impl TbfQdisc {
@@ -77,9 +74,8 @@ impl TbfQdisc {
             ns_per_byte,
             enqueued: 0,
             dropped: 0,
-            queue: VecDeque::new(),
+            queue: Vec::new(),
             queue_limit,
-            refill_remainder: 0,
         }
     }
 
@@ -89,20 +85,12 @@ impl TbfQdisc {
             return;
         }
         let elapsed = now_ns - self.last_refill_tick;
-        if self.rate_bps > 0 {
-            const NANOS_PER_SECOND: u128 = 1_000_000_000;
-            let accrued =
-                (elapsed as u128) * (self.rate_bps as u128) + self.refill_remainder as u128;
-            let new_tokens = accrued / NANOS_PER_SECOND;
-            let available = self.tokens.min(self.burst_bytes) as u128 + new_tokens;
-            if available >= self.burst_bytes as u128 {
-                self.tokens = self.burst_bytes;
-                self.refill_remainder = 0;
-            } else {
-                self.tokens = available as u64;
-                self.refill_remainder = (accrued % NANOS_PER_SECOND) as u64;
-            }
-        }
+        let new_tokens = if self.ns_per_byte > 0 {
+            elapsed / self.ns_per_byte
+        } else {
+            0
+        };
+        self.tokens = (self.tokens + new_tokens).min(self.burst_bytes);
         self.last_refill_tick = now_ns;
     }
 
@@ -112,27 +100,30 @@ impl TbfQdisc {
             self.dropped = self.dropped.saturating_add(1);
             return false;
         }
-        self.queue.push_back(pkt);
+        self.queue.push(pkt);
         self.enqueued = self.enqueued.saturating_add(1);
         true
     }
 
     /// Dequeue if tokens allow.
     pub fn dequeue(&mut self) -> Option<Packet> {
-        let pkt_len = self.queue.front()?.len as u64;
+        if self.queue.is_empty() {
+            return None;
+        }
+        let pkt_len = self.queue[0].len as u64;
         if self.tokens < pkt_len {
             return None; // Rate-limited — wait for tokens
         }
         self.tokens -= pkt_len;
-        self.queue.pop_front()
+        Some(self.queue.remove(0))
     }
 
     pub fn utilization_pct(&self) -> u32 {
         if self.burst_bytes == 0 {
             return 0;
         }
-        let used = self.burst_bytes.saturating_sub(self.tokens) as u128;
-        ((used * 100) / self.burst_bytes as u128) as u32
+        let used = self.burst_bytes - self.tokens;
+        ((used * 100) / self.burst_bytes) as u32
     }
 }
 
@@ -140,7 +131,7 @@ impl TbfQdisc {
 
 pub struct PrioQdisc {
     pub bands: u8,
-    pub queues: Vec<VecDeque<Packet>>, // one queue per band
+    pub queues: Vec<Vec<Packet>>, // one queue per band
     pub enqueued: u64,
     pub dequeued: u64,
     pub per_band_count: Vec<u64>,
@@ -148,7 +139,7 @@ pub struct PrioQdisc {
 
 impl PrioQdisc {
     pub fn new(bands: u8) -> Self {
-        let queues = (0..bands).map(|_| VecDeque::new()).collect();
+        let queues = (0..bands).map(|_| Vec::new()).collect();
         let per_band_count = vec![0u64; bands as usize];
         PrioQdisc {
             bands,
@@ -160,11 +151,8 @@ impl PrioQdisc {
     }
 
     pub fn enqueue(&mut self, pkt: Packet) -> bool {
-        if self.queues.is_empty() {
-            return false;
-        }
         let band = (pkt.priority as usize).min(self.queues.len().saturating_sub(1));
-        self.queues[band].push_back(pkt);
+        self.queues[band].push(pkt);
         self.enqueued = self.enqueued.saturating_add(1);
         if band < self.per_band_count.len() {
             self.per_band_count[band] = self.per_band_count[band].saturating_add(1);
@@ -177,7 +165,7 @@ impl PrioQdisc {
         for band in &mut self.queues {
             if !band.is_empty() {
                 self.dequeued = self.dequeued.saturating_add(1);
-                return band.pop_front();
+                return Some(band.remove(0));
             }
         }
         None
@@ -199,10 +187,8 @@ pub struct HtbClass {
     pub burst_bytes: u64,
     pub tokens: u64,
     pub ctokens: u64, // ceiling tokens
-    pub rate_refill_remainder: u64,
-    pub ceil_refill_remainder: u64,
     pub prio: u8,
-    pub queue: VecDeque<Packet>,
+    pub queue: Vec<Packet>,
     pub enqueued: u64,
     pub dequeued: u64,
     pub lended: u64, // bytes borrowed from parent
@@ -220,10 +206,8 @@ impl HtbClass {
             burst_bytes: burst,
             tokens: burst,
             ctokens: ceil_bps / 8,
-            rate_refill_remainder: 0,
-            ceil_refill_remainder: 0,
             prio,
-            queue: VecDeque::new(),
+            queue: Vec::new(),
             enqueued: 0,
             dequeued: 0,
             lended: 0,
@@ -233,54 +217,38 @@ impl HtbClass {
 
     pub fn refill_tokens(&mut self, elapsed_ns: u64) {
         if self.rate_bps > 0 {
-            const NANOS_PER_BYTE_RATE: u128 = 8_000_000_000;
-            let accrued =
-                (elapsed_ns as u128) * (self.rate_bps as u128) + self.rate_refill_remainder as u128;
-            let new_tokens = accrued / NANOS_PER_BYTE_RATE;
-            let available = self.tokens.min(self.burst_bytes) as u128 + new_tokens;
-            if available >= self.burst_bytes as u128 {
-                self.tokens = self.burst_bytes;
-                self.rate_refill_remainder = 0;
-            } else {
-                self.tokens = available as u64;
-                self.rate_refill_remainder = (accrued % NANOS_PER_BYTE_RATE) as u64;
-            }
+            let new_tok = (elapsed_ns / 1_000_000_000) * self.rate_bps / 8;
+            self.tokens = (self.tokens + new_tok).min(self.burst_bytes);
         }
         if self.ceil_bps > 0 {
-            const NANOS_PER_BYTE_RATE: u128 = 8_000_000_000;
-            let accrued =
-                (elapsed_ns as u128) * (self.ceil_bps as u128) + self.ceil_refill_remainder as u128;
-            let new_tokens = accrued / NANOS_PER_BYTE_RATE;
+            let ceil_rate = self.ceil_bps / 8;
+            let new_ctok = (elapsed_ns / 1_000_000_000) * ceil_rate;
             let ceil_burst = self.ceil_bps / 8;
-            let available = self.ctokens.min(ceil_burst) as u128 + new_tokens;
-            if available >= ceil_burst as u128 {
-                self.ctokens = ceil_burst;
-                self.ceil_refill_remainder = 0;
-            } else {
-                self.ctokens = available as u64;
-                self.ceil_refill_remainder = (accrued % NANOS_PER_BYTE_RATE) as u64;
-            }
+            self.ctokens = (self.ctokens + new_ctok).min(ceil_burst);
         }
     }
 
     pub fn enqueue_packet(&mut self, pkt: Packet) {
-        self.queue.push_back(pkt);
+        self.queue.push(pkt);
         self.enqueued = self.enqueued.saturating_add(1);
     }
 
     pub fn try_dequeue(&mut self) -> Option<Packet> {
-        let len = self.queue.front()?.len as u64;
+        if self.queue.is_empty() {
+            return None;
+        }
+        let len = self.queue[0].len as u64;
         if self.tokens >= len {
             // In-rate: use own tokens
             self.tokens -= len;
             self.dequeued = self.dequeued.saturating_add(1);
-            self.queue.pop_front()
+            Some(self.queue.remove(0))
         } else if self.ctokens >= len {
             // Over-rate but under ceil: borrow (lend)
             self.ctokens -= len;
             self.lended = self.lended.saturating_add(len);
             self.dequeued = self.dequeued.saturating_add(1);
-            self.queue.pop_front()
+            Some(self.queue.remove(0))
         } else {
             None // Blocked at ceil
         }
@@ -352,7 +320,7 @@ pub struct FqCodelQdisc {
     pub target_delay_ns: u64, // target queue latency (default 5ms)
     pub interval_ns: u64,     // CoDel interval (default 100ms)
     pub quantum: u32,         // FQ quantum in bytes
-    pub flows: Vec<VecDeque<Packet>>,
+    pub flows: Vec<Vec<Packet>>,
     pub flow_count: usize,
     pub drop_count: u64,
     pub ecn_marks: u64,
@@ -361,7 +329,7 @@ pub struct FqCodelQdisc {
 
 impl FqCodelQdisc {
     pub fn new(flow_count: usize) -> Self {
-        let flows = (0..flow_count).map(|_| VecDeque::new()).collect();
+        let flows = (0..flow_count).map(|_| Vec::new()).collect();
         FqCodelQdisc {
             target_delay_ns: 5_000_000, // 5ms
             interval_ns: 100_000_000,   // 100ms
@@ -375,11 +343,10 @@ impl FqCodelQdisc {
     }
 
     pub fn enqueue(&mut self, pkt: Packet) -> bool {
-        let flow_count = self.flows.len();
-        if flow_count == 0 {
+        if self.flow_count == 0 {
             return false;
         }
-        let flow_idx = (pkt.flow_id as usize) % flow_count;
+        let flow_idx = (pkt.flow_id as usize) % self.flow_count;
         // CoDel: if sojourn time > target, mark/drop
         // (simplified: if flow queue is deep, mark ECN)
         if self.flows[flow_idx].len() > 64 {
@@ -389,22 +356,21 @@ impl FqCodelQdisc {
             self.drop_count = self.drop_count.saturating_add(1);
             return false; // Drop tail
         }
-        self.flows[flow_idx].push_back(pkt);
+        self.flows[flow_idx].push(pkt);
         true
     }
 
     /// Round-robin dequeue across non-empty flows.
     pub fn dequeue(&mut self) -> Option<Packet> {
-        let flow_count = self.flows.len();
-        if flow_count == 0 {
+        if self.flow_count == 0 {
             return None;
         }
-        let start = self.round_robin_idx % flow_count;
-        for i in 0..flow_count {
-            let idx = (start + i) % flow_count;
+        let start = self.round_robin_idx;
+        for i in 0..self.flow_count {
+            let idx = (start + i) % self.flow_count;
             if !self.flows[idx].is_empty() {
-                self.round_robin_idx = (idx + 1) % flow_count;
-                return self.flows[idx].pop_front();
+                self.round_robin_idx = (idx + 1) % self.flow_count;
+                return Some(self.flows[idx].remove(0));
             }
         }
         None

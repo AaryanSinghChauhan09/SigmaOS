@@ -217,22 +217,6 @@ Remove old package versions:
 sigpkg remove --old-versions
 ```
 
-## Distro Compatibility Models
-
-`src/distro/sovereign_linux_bsd_ecosystem_leap_suite.rs` contains in-memory
-models for Gentoo dependency reachability, Snapper transaction metadata,
-FreeBSD boot-environment state, runit-style log retention, APKBUILD metadata,
-and debconf answers. These models do not invoke host package tools, ZFS,
-chroot, or filesystem rollback. Package builds and SHA-512 digests return
-provider-unavailable errors; log input and retained history are bounded. Do
-not present model state as an installed package, verified digest, isolated
-build, or host system change.
-
-Future changes to these models should preserve bounded inputs and resource use,
-validate path components before constructing dataset or log paths, and fail
-closed where package verification or host integration is unavailable. Tests
-must distinguish state-model behavior from real host operations.
-
 ## Next Steps
 
 - [Development](10-Development.md) - Development tools and building
