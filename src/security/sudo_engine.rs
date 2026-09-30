@@ -21,6 +21,24 @@ pub enum SudoAuthResult {
     PermissionDenied,
 }
 
+fn is_allowed_environment_key(key: &str) -> bool {
+    if matches!(key, "TERM" | "LANG") {
+        return true;
+    }
+
+    match key.strip_prefix("LC_") {
+        Some(suffix) => {
+            !suffix.is_empty()
+                && suffix.bytes().all(|byte| {
+                    byte.is_ascii_uppercase()
+                        || byte.is_ascii_digit()
+                        || byte == b'_'
+                })
+        }
+        None => false,
+    }
+}
+
 /// Sudoers & Doas Rule Entry
 #[derive(Debug, Clone)]
 pub struct SudoRule {
@@ -87,24 +105,12 @@ impl SovereignSudoEngine {
         SudoAuthResult::PermissionDenied
     }
 
-    /// Sanitizes environment variables for elevated execution
+    /// Keeps only explicitly permitted environment variable names for elevated execution.
+    /// This does not validate associated values; the executor must set trusted PATH and HOME values.
     pub fn sanitize_environment(&self, env_keys: &[&str]) -> Vec<String> {
-        let dangerous_keys = [
-            "LD_PRELOAD",
-            "LD_LIBRARY_PATH",
-            "PYTHONPATH",
-            "RUBYLIB",
-            "PERL5LIB",
-            "IFS",
-            "ENV",
-            "SHELL",
-            "RESOLV_MULTI",
-            "NODE_OPTIONS",
-            "BASH_ENV",
-        ];
         env_keys
             .iter()
-            .filter(|&&k| !dangerous_keys.contains(&k))
+            .filter(|&&key| is_allowed_environment_key(key))
             .map(|&k| String::from(k))
             .collect()
     }
@@ -146,20 +152,29 @@ mod tests {
 
         // Test environment sanitization
         let clean_env = engine.sanitize_environment(&[
-            "PATH",
+            "TERM",
+            "LANG",
+            "LC_CTYPE",
             "LD_PRELOAD",
             "HOME",
+            "GCONV_PATH",
             "PERL5LIB",
             "IFS",
             "NODE_OPTIONS",
             "BASH_ENV",
+            "LC_BAD-NAME",
         ]);
-        assert!(clean_env.contains(&String::from("PATH")));
-        assert!(clean_env.contains(&String::from("HOME")));
+        assert!(clean_env.contains(&String::from("TERM")));
+        assert!(clean_env.contains(&String::from("LANG")));
+        assert!(clean_env.contains(&String::from("LC_CTYPE")));
+        assert!(!clean_env.contains(&String::from("PATH")));
+        assert!(!clean_env.contains(&String::from("HOME")));
         assert!(!clean_env.contains(&String::from("LD_PRELOAD")));
+        assert!(!clean_env.contains(&String::from("GCONV_PATH")));
         assert!(!clean_env.contains(&String::from("PERL5LIB")));
         assert!(!clean_env.contains(&String::from("IFS")));
         assert!(!clean_env.contains(&String::from("NODE_OPTIONS")));
         assert!(!clean_env.contains(&String::from("BASH_ENV")));
+        assert!(!clean_env.contains(&String::from("LC_BAD-NAME")));
     }
 }
