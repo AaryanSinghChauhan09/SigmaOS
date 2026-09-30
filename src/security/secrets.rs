@@ -1,3 +1,6 @@
+//! Prototype secret-manager API only. This module has no audited encryption
+//! provider and must not be used as secure secret storage.
+
 use std::boxed::Box;
 use std::vec::Vec;
 
@@ -43,6 +46,7 @@ pub enum SecretError {
     DecryptionFailed = 3,
     InvalidKey = 4,
     PermissionDenied = 5,
+    CryptoUnavailable = 6,
 }
 
 /// Secret info
@@ -173,15 +177,7 @@ impl Secret for SimpleSecret {
             return Err(SecretError::EncryptionFailed);
         }
 
-        for (b, &k) in self.data[..self.data_len]
-            .iter_mut()
-            .zip(key.iter().cycle())
-        {
-            *b ^= k;
-        }
-
-        self.is_encrypted.store(true, Ordering::SeqCst);
-        Ok(())
+        Err(SecretError::CryptoUnavailable)
     }
 
     fn decrypt(&mut self, key: &[u8]) -> Result<(), SecretError> {
@@ -197,15 +193,7 @@ impl Secret for SimpleSecret {
             return Err(SecretError::DecryptionFailed);
         }
 
-        for (b, &k) in self.data[..self.data_len]
-            .iter_mut()
-            .zip(key.iter().cycle())
-        {
-            *b ^= k;
-        }
-
-        self.is_encrypted.store(false, Ordering::SeqCst);
-        Ok(())
+        Err(SecretError::CryptoUnavailable)
     }
 
     fn info(&self) -> SecretInfo {
@@ -413,17 +401,20 @@ mod tests {
     }
 
     #[test]
-    fn test_secret_encryption_and_decryption() {
+    fn secret_encryption_and_decryption_fail_closed_without_a_provider() {
         let secret_cap = SecretCapability::full();
         let mut secret = SimpleSecret::new(1, b"my_api_key", SecretType::APIKey, secret_cap);
         secret.set_data(b"secret_payload_12345");
 
         let key = b"super_secret_key";
-        assert!(secret.encrypt(key).is_ok());
-        assert_ne!(secret.get_data(), b"secret_payload_12345");
-
-        assert!(secret.decrypt(key).is_ok());
+        assert_eq!(secret.encrypt(key), Err(SecretError::CryptoUnavailable));
         assert_eq!(secret.get_data(), b"secret_payload_12345");
+        assert!(!secret.is_encrypted.load(Ordering::SeqCst));
+
+        secret.is_encrypted.store(true, Ordering::SeqCst);
+        assert_eq!(secret.decrypt(key), Err(SecretError::CryptoUnavailable));
+        assert_eq!(secret.get_data(), b"secret_payload_12345");
+        assert!(secret.is_encrypted.load(Ordering::SeqCst));
     }
 
     #[test]
