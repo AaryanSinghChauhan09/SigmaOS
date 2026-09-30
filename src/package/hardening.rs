@@ -155,9 +155,8 @@ pub struct SovereignBootAsmGenerator;
 impl SovereignBootAsmGenerator {
     pub fn generate_boot_assembly(arch: TargetBootArch, mode: BootMode) -> String {
         match (arch, mode) {
-            (TargetBootArch::X86_64, BootMode::BiosMbr16) => {
-                String::from(
-                    "; SigmaOS Stage-1 16-Bit Real Mode MBR Boot Assembly\n\
+            (TargetBootArch::X86_64, BootMode::BiosMbr16) => String::from(
+                "; SigmaOS Stage-1 16-Bit Real Mode MBR Boot Assembly\n\
                     [bits 16]\n\
                     [org 0x7c00]\n\
                     start:\n\
@@ -188,12 +187,10 @@ impl SovereignBootAsmGenerator {
                     boot_drive: db 0\n\
                     msg: db 'SigmaOS Booting...', 13, 10, 0\n\
                     times 510-($-$$) db 0\n\
-                    dw 0xaa55\n"
-                )
-            }
-            (TargetBootArch::X86_64, BootMode::UefiLong64) => {
-                String::from(
-                    "; SigmaOS x86-64 64-Bit Long Mode Multiboot2 / UEFI Kernel Entry Assembly\n\
+                    dw 0xaa55\n",
+            ),
+            (TargetBootArch::X86_64, BootMode::UefiLong64) => String::from(
+                "; SigmaOS x86-64 64-Bit Long Mode Multiboot2 / UEFI Kernel Entry Assembly\n\
                     [bits 64]\n\
                     [global _start]\n\
                     _start:\n\
@@ -206,12 +203,10 @@ impl SovereignBootAsmGenerator {
                         jmp .halt\n\
                     section .bss\n\
                     resb 16384 ; 16 KB Kernel Stack\n\
-                    kernel_stack_top:\n"
-                )
-            }
-            (TargetBootArch::AArch64, _) => {
-                String::from(
-                    "// SigmaOS ARM64 / AArch64 Exception Level 1 Kernel Entry Assembly\n\
+                    kernel_stack_top:\n",
+            ),
+            (TargetBootArch::AArch64, _) => String::from(
+                "// SigmaOS ARM64 / AArch64 Exception Level 1 Kernel Entry Assembly\n\
                     .global _start\n\
                     _start:\n\
                         mrs x0, CurrentEL\n\
@@ -228,12 +223,10 @@ impl SovereignBootAsmGenerator {
                         bl sovereign_aarch64_kernel_main\n\
                     .spin:\n\
                         wfe\n\
-                        b .spin\n"
-                )
-            }
-            (TargetBootArch::RiscV64, _) => {
-                String::from(
-                    "# SigmaOS RISC-V 64-Bit Supervisor Mode Kernel Entry Assembly\n\
+                        b .spin\n",
+            ),
+            (TargetBootArch::RiscV64, _) => String::from(
+                "# SigmaOS RISC-V 64-Bit Supervisor Mode Kernel Entry Assembly\n\
                     .global _start\n\
                     _start:\n\
                         csrw sie, zero\n\
@@ -241,18 +234,15 @@ impl SovereignBootAsmGenerator {
                         call sovereign_riscv_kernel_main\n\
                     1:\n\
                         wfi\n\
-                        j 1b\n"
-                )
-            }
-            _ => {
-                String::from(
-                    "; SigmaOS Generic Protected Mode 32-Bit Assembly Entry\n\
+                        j 1b\n",
+            ),
+            _ => String::from(
+                "; SigmaOS Generic Protected Mode 32-Bit Assembly Entry\n\
                     [bits 32]\n\
                     mov ax, 0x10\n\
                     mov ds, ax\n\
-                    call sovereign_pm32_entry\n"
-                )
-            }
+                    call sovereign_pm32_entry\n",
+            ),
         }
     }
 }
@@ -375,24 +365,37 @@ mod tests {
 
     #[test]
     fn test_boot_asm_generator() {
-        let mbr = SovereignBootAsmGenerator::generate_boot_assembly(TargetBootArch::X86_64, BootMode::BiosMbr16);
+        let mbr = SovereignBootAsmGenerator::generate_boot_assembly(
+            TargetBootArch::X86_64,
+            BootMode::BiosMbr16,
+        );
         assert!(mbr.contains("[bits 16]"));
         assert!(mbr.contains("0xaa55"));
 
-        let uefi = SovereignBootAsmGenerator::generate_boot_assembly(TargetBootArch::X86_64, BootMode::UefiLong64);
+        let uefi = SovereignBootAsmGenerator::generate_boot_assembly(
+            TargetBootArch::X86_64,
+            BootMode::UefiLong64,
+        );
         assert!(uefi.contains("[bits 64]"));
 
-        let arm = SovereignBootAsmGenerator::generate_boot_assembly(TargetBootArch::AArch64, BootMode::UefiLong64);
+        let arm = SovereignBootAsmGenerator::generate_boot_assembly(
+            TargetBootArch::AArch64,
+            BootMode::UefiLong64,
+        );
         assert!(arm.contains("CurrentEL"));
     }
 
     #[test]
     fn test_bootloader_deployer() {
-        let grub = SovereignBootloaderPackageDeployer::generate_grub2_config("6.6.0", "/dev/nvme0n1p2");
+        let grub =
+            SovereignBootloaderPackageDeployer::generate_grub2_config("6.6.0", "/dev/nvme0n1p2");
         assert!(grub.contains("vmlinuz-6.6.0"));
         assert!(grub.contains("root=/dev/nvme0n1p2"));
 
-        let sysd = SovereignBootloaderPackageDeployer::generate_systemd_boot_entry("6.6.0", "/dev/nvme0n1p2");
+        let sysd = SovereignBootloaderPackageDeployer::generate_systemd_boot_entry(
+            "6.6.0",
+            "/dev/nvme0n1p2",
+        );
         assert!(sysd.contains("vmlinuz-6.6.0"));
     }
 

@@ -435,7 +435,6 @@ impl Default for PlugAndPlayHardwareManager {
 }
 
 mod tests {
-    
 
     #[test]
     fn test_service_manager() {

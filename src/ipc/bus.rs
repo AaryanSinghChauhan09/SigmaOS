@@ -66,13 +66,13 @@ impl IpcBus {
     /// Register a bus endpoint
     pub fn register_endpoint(&mut self, owner: u64, interfaces: Vec<String>) -> BusEndpoint {
         let id = self.next_endpoint_id.fetch_add(1, Ordering::SeqCst);
-        
+
         let endpoint = BusEndpoint {
             id,
             owner,
             interfaces,
         };
-        
+
         self.endpoints.insert(id, endpoint.clone());
         endpoint
     }
@@ -93,13 +93,13 @@ impl IpcBus {
         if self.bus_names.contains_key(&name) {
             return Err("Name already requested");
         }
-        
+
         let bus_name = BusName {
             name: name.clone(),
             owner,
             unique: false,
         };
-        
+
         self.bus_names.insert(name, bus_name);
         Ok(())
     }
@@ -123,10 +123,10 @@ impl IpcBus {
         let id = self.next_message_id.fetch_add(1, Ordering::SeqCst);
         let mut new_message = message;
         new_message.id = id;
-        
+
         self.messages.push(new_message);
         self.message_count.fetch_add(1, Ordering::SeqCst);
-        
+
         Ok(id)
     }
 
@@ -134,9 +134,7 @@ impl IpcBus {
     pub fn get_messages(&self, endpoint_id: u64) -> Vec<&IpcMessage> {
         self.messages
             .iter()
-            .filter(|m| {
-                m.destination == Some(endpoint_id) || m.destination.is_none()
-            })
+            .filter(|m| m.destination == Some(endpoint_id) || m.destination.is_none())
             .collect()
     }
 
@@ -179,7 +177,7 @@ mod tests {
     #[test]
     fn test_register_endpoint() {
         let mut bus = IpcBus::new();
-        
+
         let endpoint = bus.register_endpoint(1, vec!["test.interface".to_string()]);
         assert_eq!(endpoint.id, 1);
         assert_eq!(bus.endpoint_count(), 1);
@@ -188,7 +186,7 @@ mod tests {
     #[test]
     fn test_request_name() {
         let mut bus = IpcBus::new();
-        
+
         assert!(bus.request_name("org.test".to_string(), 1).is_ok());
         assert_eq!(bus.get_name_owner("org.test"), Some(1));
     }
@@ -196,7 +194,7 @@ mod tests {
     #[test]
     fn test_send_message() {
         let mut bus = IpcBus::new();
-        
+
         let message = IpcMessage {
             id: 0,
             message_type: MessageType::MethodCall,
@@ -206,7 +204,7 @@ mod tests {
             member: "TestMethod".to_string(),
             parameters: vec!["param1".to_string()],
         };
-        
+
         let id = bus.send_message(message).unwrap();
         assert_eq!(id, 1);
         assert_eq!(bus.message_count(), 1);
@@ -215,7 +213,7 @@ mod tests {
     #[test]
     fn test_get_messages() {
         let mut bus = IpcBus::new();
-        
+
         let message = IpcMessage {
             id: 0,
             message_type: MessageType::MethodCall,
@@ -225,9 +223,9 @@ mod tests {
             member: "TestMethod".to_string(),
             parameters: vec!["param1".to_string()],
         };
-        
+
         bus.send_message(message);
-        
+
         let messages = bus.get_messages(2);
         assert_eq!(messages.len(), 1);
     }
@@ -235,7 +233,7 @@ mod tests {
     #[test]
     fn test_release_name() {
         let mut bus = IpcBus::new();
-        
+
         bus.request_name("org.test".to_string(), 1).unwrap();
         assert!(bus.release_name("org.test".to_string(), 1).is_ok());
         assert!(bus.get_name_owner("org.test").is_none());
@@ -244,10 +242,11 @@ mod tests {
     #[test]
     fn test_unregister_endpoint() {
         let mut bus = IpcBus::new();
-        
+
         let endpoint = bus.register_endpoint(1, vec!["test.interface".to_string()]);
-        bus.request_name("org.test".to_string(), endpoint.id).unwrap();
-        
+        bus.request_name("org.test".to_string(), endpoint.id)
+            .unwrap();
+
         assert!(bus.unregister_endpoint(endpoint.id).is_ok());
         assert_eq!(bus.endpoint_count(), 0);
         assert!(bus.get_name_owner("org.test").is_none());

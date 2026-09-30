@@ -142,7 +142,13 @@ mod tests {
     fn test_tr_o1_lookup_benchmark() {
         // Verify O(N + M) performance on large string input
         let large_input = "abcdefghijklmnopqrstuvwxyz".repeat(500);
-        let res = run(&large_input, "abcdefghijklmnopqrstuvwxyz", Some("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), TrOptions::default()).unwrap();
+        let res = run(
+            &large_input,
+            "abcdefghijklmnopqrstuvwxyz",
+            Some("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
+            TrOptions::default(),
+        )
+        .unwrap();
         assert_eq!(res.len(), large_input.len());
         assert!(res.starts_with("ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
     }

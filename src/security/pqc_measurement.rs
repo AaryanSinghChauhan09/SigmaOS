@@ -2,9 +2,9 @@
 // Combines Kyber-1024 KEM with a firmware measurement hash chain
 // for secure-boot / measured-boot narrative
 
-use std::vec::Vec;
 use crate::klib::merkle::{MerkleAccumulator, MerkleHash};
 use crate::security::pqc_enclave::KyberKem;
+use std::vec::Vec;
 
 /// Hybrid PQC signature state combining lattice-based KEM with firmware measurements
 pub struct HybridPqcMeasurementEngine {

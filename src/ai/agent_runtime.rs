@@ -8,13 +8,12 @@
 // - Memory-safe (Rust vs Python/JS)
 // - Microkernel isolation
 
-
 extern crate alloc;
 use alloc::collections::BTreeMap;
-use alloc::vec::Vec;
+use alloc::format;
 use alloc::string::String;
 use alloc::vec;
-use alloc::format;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU64, Ordering};
 
 use crate::kernel::process::ProcessId;
@@ -22,13 +21,17 @@ use crate::kernel::process::ProcessId;
 #[derive(Debug, Clone)]
 pub struct LandlockV5Guard;
 impl LandlockV5Guard {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
 }
 
 #[derive(Debug, Clone)]
 pub struct CapsicumRights;
 impl CapsicumRights {
-    pub fn empty() -> Self { Self }
+    pub fn empty() -> Self {
+        Self
+    }
 }
 
 /// Unique identifier for AI agents in the kernel
@@ -47,25 +50,25 @@ impl AgentId {
 pub enum AgentCapability {
     /// Analyze kernel crashes, panics, and core dumps
     SystemAnalysis,
-    
+
     /// Generate Rust/Zig/Nim code (plugins, themes, tools)
     CodeGeneration,
-    
+
     /// Modify system configuration (declarative)
     Configuration,
-    
+
     /// Debug running processes and diagnose issues
     Debugging,
-    
+
     /// Provide context-aware documentation and help
     Documentation,
-    
+
     /// Monitor performance and optimize resources
     Performance,
-    
+
     /// Manage security policies and permissions
     Security,
-    
+
     /// Handle network protocols and services
     Networking,
 }
@@ -73,22 +76,22 @@ pub enum AgentCapability {
 /// Agent execution priority (for BORE/EEVDF scheduler)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum AgentPriority {
-    Critical = 0,   // Crash analysis, security incidents
-    High = 1,       // User-facing tasks, code generation
-    Normal = 2,     // Background optimization
-    Low = 3,        // Idle-time tasks
+    Critical = 0, // Crash analysis, security incidents
+    High = 1,     // User-facing tasks, code generation
+    Normal = 2,   // Background optimization
+    Low = 3,      // Idle-time tasks
 }
 
 /// Agent state machine
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AgentState {
-    Created,        // Allocated but not started
-    Initializing,   // Loading model/context
-    Ready,          // Waiting for tasks
-    Running,        // Executing task
-    Suspended,      // Paused (low memory/power)
-    Terminated,     // Clean shutdown
-    Crashed,        // Fault (isolated)
+    Created,      // Allocated but not started
+    Initializing, // Loading model/context
+    Ready,        // Waiting for tasks
+    Running,      // Executing task
+    Suspended,    // Paused (low memory/power)
+    Terminated,   // Clean shutdown
+    Crashed,      // Fault (isolated)
 }
 
 /// Agent process descriptor (kernel-level)
@@ -127,15 +130,15 @@ impl AgentSandbox {
             file_descriptors: Vec::new(),
         }
     }
-    
+
     pub fn allow_read_path(&mut self, path: String) {
         self.unveil_paths.push((path, 0x01)); // R
     }
-    
+
     pub fn allow_write_path(&mut self, path: String) {
         self.unveil_paths.push((path, 0x02)); // W
     }
-    
+
     pub fn allow_exec_path(&mut self, path: String) {
         self.unveil_paths.push((path, 0x04)); // X
     }
@@ -161,21 +164,21 @@ impl AgentKernelBridge {
             can_gpu_access: false,
         }
     }
-    
+
     pub fn code_generator() -> Self {
         Self {
-            can_spawn_process: true,  // rustc, zig, nim
+            can_spawn_process: true, // rustc, zig, nim
             can_read_memory: false,
-            can_modify_files: true,   // Generate code files
+            can_modify_files: true, // Generate code files
             can_network_access: false,
             can_gpu_access: false,
         }
     }
-    
+
     pub fn system_analyzer() -> Self {
         Self {
             can_spawn_process: false,
-            can_read_memory: true,    // Read crash dumps
+            can_read_memory: true, // Read crash dumps
             can_modify_files: false,
             can_network_access: false,
             can_gpu_access: false,
@@ -309,7 +312,7 @@ impl SovereignAgentRuntime {
             performance_stats: AgentPerformanceStats::default(),
         }
     }
-    
+
     /// Spawn new agent with specific capability
     pub fn spawn_agent(
         &mut self,
@@ -317,17 +320,17 @@ impl SovereignAgentRuntime {
         priority: AgentPriority,
     ) -> Result<AgentId, AgentError> {
         let agent_id = AgentId::new();
-        
+
         // Create sandbox based on capability
         let sandbox = AgentSandbox::new_strict();
-        
+
         // Create kernel bridge with appropriate permissions
         let kernel_bridge = match capability {
             AgentCapability::CodeGeneration => AgentKernelBridge::code_generator(),
             AgentCapability::SystemAnalysis => AgentKernelBridge::system_analyzer(),
             _ => AgentKernelBridge::minimal(),
         };
-        
+
         let agent = AgentProcess {
             id: agent_id,
             capability,
@@ -337,25 +340,25 @@ impl SovereignAgentRuntime {
             kernel_bridge,
             process_id: None,
             memory_quota: 512 * 1024 * 1024, // 512 MB
-            cpu_quota: 1_000_000_000, // 1 second per second
+            cpu_quota: 1_000_000_000,        // 1 second per second
         };
-        
+
         self.agents.insert(agent_id, agent);
-        
+
         // Register in capability index
         self.capability_registry
             .entry(capability)
             .or_insert_with(Vec::new)
             .push(agent_id);
-        
+
         Ok(agent_id)
     }
-    
+
     /// Analyze crash dump (Omarchy equivalent: crash notification → agent)
     pub fn analyze_crash(&mut self, crash_dump: &CrashDump) -> Result<AgentReport, AgentError> {
         // Find available system analysis agent
         let agent_id = self.find_agent_for_capability(AgentCapability::SystemAnalysis)?;
-        
+
         // Create analysis task
         let task = AgentTask {
             agent_id,
@@ -363,30 +366,30 @@ impl SovereignAgentRuntime {
             start_time: self.current_time_ns(),
             input_size: crash_dump.backtrace.len(),
         };
-        
+
         self.active_tasks.insert(agent_id, task);
-        
+
         // Perform analysis via agent crash analyzer
         let analysis = self.perform_crash_analysis(agent_id, crash_dump)?;
-        
+
         // Update stats
         self.performance_stats.total_tasks += 1;
-        
+
         Ok(analysis)
     }
-    
+
     /// Generate plugin from specification
     pub fn generate_plugin(&mut self, spec: &PluginSpec) -> Result<Plugin, AgentError> {
         let agent_id = self.find_agent_for_capability(AgentCapability::CodeGeneration)?;
-        
+
         // Validate language constraint (Rust/Zig/Nim only)
         match spec.language {
-            PluginLanguage::Rust | PluginLanguage::Zig | PluginLanguage::Nim => {},
+            PluginLanguage::Rust | PluginLanguage::Zig | PluginLanguage::Nim => {}
         }
-        
+
         // Generate code via agent code generator
         let source_code = self.generate_code(agent_id, spec)?;
-        
+
         // Create plugin artifact
         let plugin = Plugin {
             spec: spec.clone(),
@@ -401,48 +404,51 @@ impl SovereignAgentRuntime {
                 permissions: Vec::new(),
             },
         };
-        
+
         Ok(plugin)
     }
-    
+
     /// Configure system based on user intent
     pub fn configure_system(&mut self, intent: &UserIntent) -> Result<ConfigDiff, AgentError> {
         let agent_id = self.find_agent_for_capability(AgentCapability::Configuration)?;
-        
+
         // Analyze intent and generate config changes
         let diff = self.analyze_intent(agent_id, intent)?;
-        
+
         Ok(diff)
     }
-    
+
     /// Terminate agent and cleanup resources
     pub fn terminate_agent(&mut self, agent_id: AgentId) -> Result<(), AgentError> {
         if let Some(mut agent) = self.agents.remove(&agent_id) {
             agent.state = AgentState::Terminated;
-            
+
             // Remove from capability registry
             if let Some(agents) = self.capability_registry.get_mut(&agent.capability) {
                 agents.retain(|&id| id != agent_id);
             }
-            
+
             // Remove active task
             self.active_tasks.remove(&agent_id);
-            
+
             Ok(())
         } else {
             Err(AgentError::InvalidAgentId)
         }
     }
-    
+
     // Internal helpers
-    
-    fn find_agent_for_capability(&self, capability: AgentCapability) -> Result<AgentId, AgentError> {
+
+    fn find_agent_for_capability(
+        &self,
+        capability: AgentCapability,
+    ) -> Result<AgentId, AgentError> {
         self.capability_registry
             .get(&capability)
             .and_then(|agents| agents.first().copied())
             .ok_or(AgentError::NoAgentAvailable)
     }
-    
+
     fn perform_crash_analysis(
         &self,
         _agent_id: AgentId,
@@ -453,8 +459,7 @@ impl SovereignAgentRuntime {
             task_type: "crash_analysis".into(),
             analysis: format!(
                 "Process {} crashed with signal {}. Backtrace analysis in progress.",
-                crash_dump.process_id.0,
-                crash_dump.signal
+                crash_dump.process_id.0, crash_dump.signal
             ),
             recommendations: vec![
                 "Check for null pointer dereference".into(),
@@ -466,21 +471,17 @@ impl SovereignAgentRuntime {
             processing_time_ms: 150,
         })
     }
-    
-    fn generate_code(
-        &self,
-        _agent_id: AgentId,
-        spec: &PluginSpec,
-    ) -> Result<String, AgentError> {
+
+    fn generate_code(&self, _agent_id: AgentId, spec: &PluginSpec) -> Result<String, AgentError> {
         let template = match spec.language {
             PluginLanguage::Rust => self.generate_rust_template(spec),
             PluginLanguage::Zig => self.generate_zig_template(spec),
             PluginLanguage::Nim => self.generate_nim_template(spec),
         };
-        
+
         Ok(template)
     }
-    
+
     fn generate_rust_template(&self, spec: &PluginSpec) -> String {
         format!(
             r#"// {}
@@ -498,13 +499,10 @@ impl {} {{
     }}
 }}
 "#,
-            spec.name,
-            spec.description,
-            spec.name,
-            spec.name
+            spec.name, spec.description, spec.name, spec.name
         )
     }
-    
+
     fn generate_zig_template(&self, spec: &PluginSpec) -> String {
         format!(
             r#"// {}
@@ -523,7 +521,7 @@ pub const {} = struct {{
             spec.name, spec.description, spec.name, spec.name
         )
     }
-    
+
     fn generate_nim_template(&self, spec: &PluginSpec) -> String {
         format!(
             r#"# {}
@@ -538,7 +536,7 @@ proc new{}*(): {} =
             spec.name, spec.description, spec.name, spec.name, spec.name, spec.name
         )
     }
-    
+
     fn analyze_intent(
         &self,
         _agent_id: AgentId,
@@ -550,7 +548,7 @@ proc new{}*(): {} =
             requires_reboot: false,
         })
     }
-    
+
     fn current_time_ns(&self) -> u64 {
         0
     }
@@ -568,30 +566,27 @@ pub enum AgentError {
     AnalysisFailed,
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_agent_spawn() {
         let mut runtime = SovereignAgentRuntime::new();
-        let agent_id = runtime.spawn_agent(
-            AgentCapability::SystemAnalysis,
-            AgentPriority::High
-        ).unwrap();
-        
+        let agent_id = runtime
+            .spawn_agent(AgentCapability::SystemAnalysis, AgentPriority::High)
+            .unwrap();
+
         assert!(runtime.agents.contains_key(&agent_id));
     }
-    
+
     #[test]
     fn test_crash_analysis() {
         let mut runtime = SovereignAgentRuntime::new();
-        let _agent_id = runtime.spawn_agent(
-            AgentCapability::SystemAnalysis,
-            AgentPriority::Critical
-        ).unwrap();
-        
+        let _agent_id = runtime
+            .spawn_agent(AgentCapability::SystemAnalysis, AgentPriority::Critical)
+            .unwrap();
+
         let crash_dump = CrashDump {
             process_id: ProcessId(1234),
             signal: 11, // SIGSEGV
@@ -600,19 +595,18 @@ mod tests {
             register_state: vec![],
             timestamp: 0,
         };
-        
+
         let report = runtime.analyze_crash(&crash_dump).unwrap();
         assert!(!report.recommendations.is_empty());
     }
-    
+
     #[test]
     fn test_plugin_generation() {
         let mut runtime = SovereignAgentRuntime::new();
-        let _agent_id = runtime.spawn_agent(
-            AgentCapability::CodeGeneration,
-            AgentPriority::Normal
-        ).unwrap();
-        
+        let _agent_id = runtime
+            .spawn_agent(AgentCapability::CodeGeneration, AgentPriority::Normal)
+            .unwrap();
+
         let spec = PluginSpec {
             name: "TestWidget".into(),
             description: "A test widget".into(),
@@ -620,7 +614,7 @@ mod tests {
             target: PluginTarget::Shell,
             features: vec![],
         };
-        
+
         let plugin = runtime.generate_plugin(&spec).unwrap();
         assert!(!plugin.source_code.is_empty());
     }

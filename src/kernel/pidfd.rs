@@ -127,7 +127,7 @@ impl PidfdProcDescManager {
     /// Send signal via pidfd
     pub fn pidfd_send_signal(&self, fd: u64, signal: u32) -> Result<(), &'static str> {
         let pidfd = self.pidfds.get(&fd).ok_or("Pidfd not found")?;
-        
+
         if !pidfd.capabilities.can_send_signal {
             return Err("Insufficient capabilities to send signal");
         }
@@ -139,7 +139,7 @@ impl PidfdProcDescManager {
     /// Get file descriptor from target process via pidfd
     pub fn pidfd_getfd(&self, fd: u64, target_fd: u32) -> Result<u32, &'static str> {
         let pidfd = self.pidfds.get(&fd).ok_or("Pidfd not found")?;
-        
+
         if !pidfd.capabilities.can_get_fd {
             return Err("Insufficient capabilities to get fd");
         }
@@ -149,18 +149,22 @@ impl PidfdProcDescManager {
     }
 
     /// Fork with procdesc (FreeBSD pdfork-inspired)
-    pub fn pdfork(&mut self, parent_pid: u64, capabilities: ProcDescCapabilities) -> Result<(u64, ProcDesc), &'static str> {
+    pub fn pdfork(
+        &mut self,
+        parent_pid: u64,
+        capabilities: ProcDescCapabilities,
+    ) -> Result<(u64, ProcDesc), &'static str> {
         let pid = self.next_pid.fetch_add(1, Ordering::SeqCst);
-        
-        let procdesc = ProcDesc {
-            pid,
-            capabilities,
-        };
+
+        let procdesc = ProcDesc { pid, capabilities };
 
         self.procdescs.insert(pid, procdesc.clone());
-        
+
         // Add to process tree
-        self.process_tree.entry(parent_pid).or_insert_with(Vec::new).push(pid);
+        self.process_tree
+            .entry(parent_pid)
+            .or_insert_with(Vec::new)
+            .push(pid);
 
         Ok((pid, procdesc))
     }
@@ -168,7 +172,7 @@ impl PidfdProcDescManager {
     /// Kill process via procdesc
     pub fn pdkill(&self, pid: u64, signal: u32) -> Result<(), &'static str> {
         let procdesc = self.procdescs.get(&pid).ok_or("Procdesc not found")?;
-        
+
         if !procdesc.capabilities.can_kill {
             return Err("Insufficient capabilities to kill");
         }
@@ -180,7 +184,7 @@ impl PidfdProcDescManager {
     /// Wait for process via procdesc
     pub fn pdwait(&self, pid: u64) -> Result<u32, &'static str> {
         let procdesc = self.procdescs.get(&pid).ok_or("Procdesc not found")?;
-        
+
         if !procdesc.capabilities.can_wait {
             return Err("Insufficient capabilities to wait");
         }
@@ -196,7 +200,7 @@ impl PidfdProcDescManager {
             is_subreaper: true,
             parent_pid: self.find_parent(pid),
         };
-        
+
         self.subreapers.insert(pid, entry);
         Ok(())
     }
@@ -214,11 +218,11 @@ impl PidfdProcDescManager {
     /// Reparent orphans to nearest subreaper
     pub fn reparent_orphans(&mut self, orphan_pid: u64) -> Result<u64, &'static str> {
         let current_parent = self.find_parent(orphan_pid);
-        
+
         // Find nearest subreaper ancestor
         let mut subreaper_pid = 0u64;
         let mut temp_pid = current_parent;
-        
+
         while temp_pid != 0 {
             if let Some(entry) = self.subreapers.get(&temp_pid) {
                 if entry.is_subreaper {
@@ -237,8 +241,11 @@ impl PidfdProcDescManager {
         if let Some(children) = self.process_tree.get_mut(&current_parent) {
             children.retain(|p| *p != orphan_pid);
         }
-        
-        self.process_tree.entry(subreaper_pid).or_insert_with(Vec::new).push(orphan_pid);
+
+        self.process_tree
+            .entry(subreaper_pid)
+            .or_insert_with(Vec::new)
+            .push(orphan_pid);
 
         Ok(subreaper_pid)
     }
@@ -271,7 +278,7 @@ mod tests {
     #[test]
     fn test_pidfd_open() {
         let manager = PidfdProcDescManager::new();
-        
+
         let pidfd = manager.pidfd_open(1, 0x01).unwrap();
         assert_eq!(pidfd.pid, 1);
         assert!(pidfd.capabilities.can_send_signal);
@@ -281,7 +288,7 @@ mod tests {
     #[test]
     fn test_pidfd_send_signal() {
         let manager = PidfdProcDescManager::new();
-        
+
         let pidfd = manager.pidfd_open(1, 0x01).unwrap();
         assert!(manager.pidfd_send_signal(pidfd.fd, 9).is_ok());
     }
@@ -289,7 +296,7 @@ mod tests {
     #[test]
     fn test_pidfd_restricted() {
         let manager = PidfdProcDescManager::new();
-        
+
         let pidfd = manager.pidfd_open(1, 0x00).unwrap();
         assert!(!pidfd.capabilities.can_send_signal);
         assert!(manager.pidfd_send_signal(pidfd.fd, 9).is_err());
@@ -298,7 +305,7 @@ mod tests {
     #[test]
     fn test_pdfork() {
         let mut manager = PidfdProcDescManager::new();
-        
+
         let (pid, procdesc) = manager.pdfork(0, ProcDescCapabilities::full()).unwrap();
         assert_eq!(pid, 1);
         assert!(procdesc.capabilities.can_kill);
@@ -308,7 +315,7 @@ mod tests {
     #[test]
     fn test_pdkill() {
         let mut manager = PidfdProcDescManager::new();
-        
+
         let (pid, _) = manager.pdfork(0, ProcDescCapabilities::full()).unwrap();
         assert!(manager.pdkill(pid, 9).is_ok());
     }
@@ -316,7 +323,7 @@ mod tests {
     #[test]
     fn test_subreaper() {
         let mut manager = PidfdProcDescManager::new();
-        
+
         assert!(manager.set_subreaper(1).is_ok());
         assert_eq!(manager.subreaper_count(), 1);
     }
@@ -324,14 +331,14 @@ mod tests {
     #[test]
     fn test_reparent_orphans() {
         let mut manager = PidfdProcDescManager::new();
-        
+
         // Create process tree: 0 -> 1 -> 2
         manager.pdfork(0, ProcDescCapabilities::full());
         manager.pdfork(1, ProcDescCapabilities::full());
-        
+
         // Set pid 1 as subreaper
         manager.set_subreaper(1).unwrap();
-        
+
         // Reparent orphan 2 to subreaper 1
         let new_parent = manager.reparent_orphans(2).unwrap();
         assert_eq!(new_parent, 1);
@@ -340,10 +347,10 @@ mod tests {
     #[test]
     fn test_process_tree() {
         let mut manager = PidfdProcDescManager::new();
-        
+
         manager.pdfork(0, ProcDescCapabilities::full());
         manager.pdfork(0, ProcDescCapabilities::full());
-        
+
         let children = manager.get_children(0);
         assert_eq!(children.len(), 2);
     }

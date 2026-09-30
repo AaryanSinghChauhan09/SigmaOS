@@ -106,54 +106,75 @@ impl WeatherPanel {
     /// Display current weather in text-based format
     pub fn display_current_weather(&self) -> String {
         let mut output = String::from("=== Weather Panel ===\n\n");
-        
+
         match &self.current_weather {
             Some(weather) => {
                 output.push_str(&format!("Location: {}\n", weather.location));
-                output.push_str(&format!("Condition: {}\n", self.condition_to_string(&weather.condition)));
-                
+                output.push_str(&format!(
+                    "Condition: {}\n",
+                    self.condition_to_string(&weather.condition)
+                ));
+
                 if self.units_metric {
-                    output.push_str(&format!("Temperature: {:.1}°C\n", weather.temperature_celsius));
+                    output.push_str(&format!(
+                        "Temperature: {:.1}°C\n",
+                        weather.temperature_celsius
+                    ));
                 } else {
-                    output.push_str(&format!("Temperature: {:.1}°F\n", weather.temperature_fahrenheit));
+                    output.push_str(&format!(
+                        "Temperature: {:.1}°F\n",
+                        weather.temperature_fahrenheit
+                    ));
                 }
-                
+
                 output.push_str(&format!("Humidity: {}%\n", weather.humidity_percent));
                 output.push_str(&format!("Wind Speed: {:.1} km/h\n", weather.wind_speed_kmh));
-                output.push_str(&format!("Updated: {}\n", self.format_timestamp(weather.timestamp)));
+                output.push_str(&format!(
+                    "Updated: {}\n",
+                    self.format_timestamp(weather.timestamp)
+                ));
             }
             None => {
                 output.push_str("No weather data available.\n");
             }
         }
-        
+
         output
     }
 
     /// Display forecast in text-based format
     pub fn display_forecast(&self) -> String {
         let mut output = String::from("=== Weather Forecast ===\n\n");
-        
+
         if self.forecast.is_empty() {
             output.push_str("No forecast data available.\n");
             return output;
         }
-        
+
         for (i, forecast) in self.forecast.iter().enumerate() {
             output.push_str(&format!("{}. {}\n", i + 1, forecast.date));
-            
+
             if self.units_metric {
                 output.push_str(&format!("   High: {:.1}°C\n", forecast.high_temp_celsius));
                 output.push_str(&format!("   Low: {:.1}°C\n", forecast.low_temp_celsius));
             } else {
-                output.push_str(&format!("   High: {:.1}°F\n", self.celsius_to_fahrenheit(forecast.high_temp_celsius)));
-                output.push_str(&format!("   Low: {:.1}°F\n", self.celsius_to_fahrenheit(forecast.low_temp_celsius)));
+                output.push_str(&format!(
+                    "   High: {:.1}°F\n",
+                    self.celsius_to_fahrenheit(forecast.high_temp_celsius)
+                ));
+                output.push_str(&format!(
+                    "   Low: {:.1}°F\n",
+                    self.celsius_to_fahrenheit(forecast.low_temp_celsius)
+                ));
             }
-            
-            output.push_str(&format!("   Condition: {}\n", self.condition_to_string(&forecast.condition)));
+
+            output.push_str(&format!(
+                "   Condition: {}\n",
+                self.condition_to_string(&forecast.condition)
+            ));
             output.push_str("\n");
         }
-        
+
         output.push_str(&format!("Total: {} days\n", self.forecast.len()));
         output
     }
@@ -233,7 +254,7 @@ mod tests {
             condition: WeatherCondition::Sunny,
             timestamp: 0,
         };
-        
+
         panel.update_current_weather(weather);
         assert!(panel.current_weather.is_some());
     }
@@ -241,17 +262,17 @@ mod tests {
     #[test]
     fn test_forecast_management() {
         let mut panel = WeatherPanel::new();
-        
+
         let forecast = WeatherForecast {
             date: String::from("2024-01-01"),
             high_temp_celsius: 25.0,
             low_temp_celsius: 15.0,
             condition: WeatherCondition::Sunny,
         };
-        
+
         panel.add_forecast(forecast);
         assert_eq!(panel.forecast.len(), 1);
-        
+
         panel.clear_forecast();
         assert!(panel.forecast.is_empty());
     }
@@ -259,7 +280,7 @@ mod tests {
     #[test]
     fn test_units_toggle() {
         let mut panel = WeatherPanel::new();
-        
+
         assert!(panel.units_metric);
         panel.set_imperial_units();
         assert!(!panel.units_metric);
@@ -270,10 +291,10 @@ mod tests {
     #[test]
     fn test_temperature_conversion() {
         let panel = WeatherPanel::new();
-        
+
         let celsius = panel.fahrenheit_to_celsius(68.0);
         assert!((celsius - 20.0).abs() < 0.1);
-        
+
         let fahrenheit = panel.celsius_to_fahrenheit(20.0);
         assert!((fahrenheit - 68.0).abs() < 0.1);
     }
@@ -290,13 +311,13 @@ mod tests {
             condition: WeatherCondition::Sunny,
             timestamp: 0,
         };
-        
+
         panel.update_current_weather(weather);
-        
+
         panel.set_metric_units();
         let temp_c = panel.get_current_temperature();
         assert_eq!(temp_c, Some(20.0));
-        
+
         panel.set_imperial_units();
         let temp_f = panel.get_current_temperature();
         assert_eq!(temp_f, Some(68.0));
@@ -306,7 +327,7 @@ mod tests {
     fn test_display_output() {
         let mut panel = WeatherPanel::new();
         panel.set_location("San Francisco");
-        
+
         let weather = WeatherData {
             location: String::from("San Francisco"),
             temperature_celsius: 20.0,
@@ -316,9 +337,9 @@ mod tests {
             condition: WeatherCondition::Sunny,
             timestamp: 0,
         };
-        
+
         panel.update_current_weather(weather);
-        
+
         let output = panel.display_current_weather();
         assert!(output.contains("San Francisco"));
         assert!(output.contains("Sunny"));
@@ -328,16 +349,16 @@ mod tests {
     #[test]
     fn test_forecast_display() {
         let mut panel = WeatherPanel::new();
-        
+
         let forecast = WeatherForecast {
             date: String::from("2024-01-01"),
             high_temp_celsius: 25.0,
             low_temp_celsius: 15.0,
             condition: WeatherCondition::Sunny,
         };
-        
+
         panel.add_forecast(forecast);
-        
+
         let output = panel.display_forecast();
         assert!(output.contains("2024-01-01"));
         assert!(output.contains("25.0°C"));

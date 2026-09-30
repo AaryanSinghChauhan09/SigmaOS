@@ -3,21 +3,19 @@
 // legacy C++, Python, Shell, HTML, and CSS runtime dependencies.
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-
-
+use std::format;
+#[cfg(not(any(feature = "standalone_test", test)))]
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::vec::Vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use std::format;
 
+#[cfg(any(feature = "standalone_test", test))]
+use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
-#[cfg(any(feature = "standalone_test", test))]
-use std::format;
 
 // ============================================================
 // § 1. C++ USERLAND SERVICE REDUCTION
@@ -35,7 +33,11 @@ impl NativeRustInitProcess {
         Self {
             pid: 1,
             is_running: true,
-            active_daemons: vec!["sigma_claw_daemon", "sigma_voice_daemon", "sigma_update_daemon"],
+            active_daemons: vec![
+                "sigma_claw_daemon",
+                "sigma_voice_daemon",
+                "sigma_update_daemon",
+            ],
         }
     }
 
@@ -97,8 +99,16 @@ impl NativeRustCompetitorScanner {
     pub fn new() -> Self {
         Self {
             scanned_distros: vec![
-                "Arch Linux", "Debian", "Alpine", "NixOS", "Gentoo",
-                "Fedora", "Void Linux", "FreeBSD", "OpenBSD", "NetBSD"
+                "Arch Linux",
+                "Debian",
+                "Alpine",
+                "NixOS",
+                "Gentoo",
+                "Fedora",
+                "Void Linux",
+                "FreeBSD",
+                "OpenBSD",
+                "NetBSD",
             ],
         }
     }
@@ -132,7 +142,9 @@ pub struct PythonDependencyReducer {
 
 impl PythonDependencyReducer {
     pub fn new() -> Self {
-        Self { scanner: NativeRustCompetitorScanner::new() }
+        Self {
+            scanner: NativeRustCompetitorScanner::new(),
+        }
     }
 }
 
@@ -187,7 +199,10 @@ impl NativeRustShellCommandExec {
     }
 
     pub fn execute_native(&self, args: &[&str]) -> String {
-        format!("NativeRustShellExec[{}]: executed args {:?}", self.command_name, args)
+        format!(
+            "NativeRustShellExec[{}]: executed args {:?}",
+            self.command_name, args
+        )
     }
 }
 
@@ -292,9 +307,17 @@ impl SovereignCssEliminationEngine {
     }
 
     /// Replaces external .css file load with compiled zero-copy Rust widget style
-    pub fn substitute_css_file_load(&mut self, _css_filepath: &str, selector: &str) -> NativeWidgetStyle {
+    pub fn substitute_css_file_load(
+        &mut self,
+        _css_filepath: &str,
+        selector: &str,
+    ) -> NativeWidgetStyle {
         self.css_files_substituted_count += 1;
-        if let Some(style) = self.compiled_styles.iter().find(|s| s.selector_name == selector) {
+        if let Some(style) = self
+            .compiled_styles
+            .iter()
+            .find(|s| s.selector_name == selector)
+        {
             style.clone()
         } else {
             NativeWidgetStyle {
@@ -343,7 +366,9 @@ impl SovereignCssEliminationEngine {
             ansi.push_str("\x1B[36m");
         }
 
-        if rule_lower.contains("background: black") || rule_lower.contains("background-color: black") {
+        if rule_lower.contains("background: black")
+            || rule_lower.contains("background-color: black")
+        {
             ansi.push_str("\x1B[40m");
         }
 
@@ -437,7 +462,9 @@ mod tests {
         let res = builder.build_iso_image();
         assert!(res.contains("SigmaOS-v1.0"));
 
-        let is_valid = NativeRustNoStdValidator::validate_no_std_invariant("#![no_std]\n#[cfg(test)]\nuse std::vec::Vec;");
+        let is_valid = NativeRustNoStdValidator::validate_no_std_invariant(
+            "#![no_std]\n#[cfg(test)]\nuse std::vec::Vec;",
+        );
         assert!(is_valid);
     }
 
@@ -471,7 +498,7 @@ mod tests {
         // 3. Test CSS to ANSI terminal escape conversion
         let css_rule = "color: red; background: black; font-weight: bold;";
         let ansi_escapes = engine.convert_css_to_ansi_terminal_escapes(css_rule);
-        assert!(ansi_escapes.contains("\x1B[1m"));  // Bold
+        assert!(ansi_escapes.contains("\x1B[1m")); // Bold
         assert!(ansi_escapes.contains("\x1B[31m")); // Red
         assert!(ansi_escapes.contains("\x1B[40m")); // Black background
     }

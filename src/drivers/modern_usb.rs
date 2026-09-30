@@ -3,8 +3,8 @@
 
 extern crate alloc;
 
-use alloc::vec::Vec;
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
+use alloc::vec::Vec;
 
 /// xHCI Transfer Request Block (TRB) Types
 #[repr(u8)]
@@ -78,7 +78,12 @@ impl XhciTransferRing {
         }
     }
 
-    pub fn enqueue_trb(&mut self, trb_type: XhciTrbType, param: u64, len: u32) -> Result<usize, &'static str> {
+    pub fn enqueue_trb(
+        &mut self,
+        trb_type: XhciTrbType,
+        param: u64,
+        len: u32,
+    ) -> Result<usize, &'static str> {
         if self.trbs.is_empty() {
             return Err("xHCI: Ring buffer empty");
         }
@@ -168,7 +173,8 @@ impl ModernUsbController {
         if slot_id == 0 || slot_id > self.max_slots || (self.active_slots & (1 << slot_id)) == 0 {
             return Err("Invalid or inactive xHCI slot");
         }
-        self.transfer_ring.enqueue_trb(XhciTrbType::AddressDeviceCmd, slot_id as u64, 0)?;
+        self.transfer_ring
+            .enqueue_trb(XhciTrbType::AddressDeviceCmd, slot_id as u64, 0)?;
         Ok(())
     }
 }
