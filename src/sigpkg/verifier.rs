@@ -61,7 +61,6 @@ impl CryptoVerifier {
         signature: &[u8],
         data: &[u8],
     ) -> Result<bool, VerifyError> {
-        // Simplified verification - in production use actual Dilithium-5
         let computed_hash = self.compute_hash(data);
         let expected_hash = &package.checksum;
 
@@ -69,36 +68,28 @@ impl CryptoVerifier {
             return Err(VerifyError::HashMismatch);
         }
 
-        // Verify signature against trusted keys
-        for key in &self.trusted_keys {
-            if self.verify_signature(key, signature, data) {
-                return Ok(true);
-            }
+        if self.trusted_keys.is_empty() {
+            return Err(VerifyError::KeyNotFound);
         }
-
-        Err(VerifyError::InvalidSignature)
+        if signature.is_empty() {
+            return Err(VerifyError::InvalidSignature);
+        }
+        // Fail closed until a real, audited signature provider is integrated.
+        Err(VerifyError::CryptoUnavailable)
     }
 
-    /// Compute SHA3-256 hash
+    /// Compute SHA-256 for content integrity checks.
     fn compute_hash(&self, data: &[u8]) -> String {
-        let mut hash_val: u64 = 0xcbf29ce484222325;
-        for &byte in data {
-            hash_val ^= byte as u64;
-            hash_val = hash_val.wrapping_mul(0x100000001b3);
-        }
-        std::format!("{:x}", hash_val)
+        crate::crypto::primitives::sha256_hash(data)
+            .data
+            .iter()
+            .map(|byte| format!("{byte:02x}"))
+            .collect()
     }
 
-    /// Verify signature (simplified)
-    fn verify_signature(&self, _key: &str, _signature: &[u8], _data: &[u8]) -> bool {
-        // In production, implement actual Dilithium-5 verification
-        true
-    }
-
-    /// Generate signature for package
-    pub fn sign(&self, _key: &str, data: &[u8]) -> Vec<u8> {
-        // In production, implement actual Dilithium-5 signing
-        data.to_vec()
+    /// Signing is unavailable until a vetted signature provider is integrated.
+    pub fn sign(&self, _key: &str, _data: &[u8]) -> Vec<u8> {
+        Vec::new()
     }
 
     /// Debian APT-style signature verification of an InRelease file.
@@ -112,31 +103,26 @@ impl CryptoVerifier {
         if signature.is_empty() {
             return Err(VerifyError::InvalidSignature);
         }
-        // Verify key exists in trusted keyring
-        for key in &keyring.keys {
-            if self.trusted_keys.contains(key) {
-                return Ok(true);
-            }
+        if !keyring
+            .keys
+            .iter()
+            .any(|key| self.trusted_keys.contains(key))
+        {
+            return Err(VerifyError::KeyNotFound);
         }
-        Err(VerifyError::KeyNotFound)
+        let _ = _release;
+        Err(VerifyError::CryptoUnavailable)
     }
 
     /// Debian APT-style package verification from a signed Release file.
     /// Asserts that a package's checksum is registered and matches the trusted hash listed in the signed Release file.
     pub fn verify_package_from_release(
         &self,
-        package: &Package,
-        release: &AptReleaseFile,
+        _package: &Package,
+        _release: &AptReleaseFile,
     ) -> Result<bool, VerifyError> {
-        if let Some(expected_hash) = release.files_sha256.get(&package.name) {
-            if expected_hash == &package.checksum {
-                Ok(true)
-            } else {
-                Err(VerifyError::HashMismatch)
-            }
-        } else {
-            Err(VerifyError::KeyNotFound)
-        }
+        // Matching an unauthenticated checksum map does not establish trust.
+        Err(VerifyError::CryptoUnavailable)
     }
 }
 
@@ -202,27 +188,14 @@ impl SignstarSigningService {
             return Err(VerifyError::KeyNotFound);
         }
 
-        let request_id = format!("signstar-{}-{}", req.package_name, req.package_version);
-        let signature_pgp_armored = format!(
-            "-----BEGIN PGP SIGNATURE-----\nVersion: Signstar 0.1.1\n\niQEzBAABCAAdFiEE-{}-sig\n-----END PGP SIGNATURE-----",
-            req.key_id
-        );
-        let signature_pqc_hex = format!("dilithium5-{}-{}", req.key_id, req.artifact_sha256);
-
-        Ok(SignstarSigningResponse {
-            request_id,
-            signature_pgp_armored,
-            signature_pqc_hex,
-            signed_by_hsm: self.hsm_enabled,
-            timestamp: 1773000000,
-        })
+        // A configuration flag is not proof that an HSM signed anything.
+        Err(VerifyError::CryptoUnavailable)
     }
 
     /// Verify a generated Signstar response against artifact SHA256
     pub fn verify_response(&self, resp: &SignstarSigningResponse, expected_sha256: &str) -> bool {
-        !resp.signature_pgp_armored.is_empty()
-            && resp.signature_pqc_hex.contains(expected_sha256)
-            && (!self.hsm_enabled || resp.signed_by_hsm)
+        let _ = (resp, expected_sha256);
+        false
     }
 }
 
@@ -232,6 +205,7 @@ pub enum VerifyError {
     HashMismatch,
     InvalidSignature,
     KeyNotFound,
+    CryptoUnavailable,
 }
 
 #[cfg(test_disabled)]
@@ -299,10 +273,11 @@ mod tests {
             files_sha256,
         };
 
-        // Signature check
-        assert!(verifier
-            .verify_debian_in_release(&release, b"dummy_signature", &keyring)
-            .is_ok());
+        // A trusted key name cannot substitute for cryptographic verification.
+        assert_eq!(
+            verifier.verify_debian_in_release(&release, b"dummy_signature", &keyring),
+            Err(VerifyError::CryptoUnavailable)
+        );
 
         // Fail signature check if keyring doesn't match trusted key
         let untrusted_keyring = AptKeyring::new();
@@ -318,9 +293,10 @@ mod tests {
             Vec::new(),
             "nano_hash_value".to_string(),
         );
-        assert!(verifier
-            .verify_package_from_release(&valid_pkg, &release)
-            .is_ok());
+        assert_eq!(
+            verifier.verify_package_from_release(&valid_pkg, &release),
+            Err(VerifyError::CryptoUnavailable)
+        );
 
         let invalid_pkg = Package::new(
             "nano".to_string(),
@@ -348,16 +324,9 @@ mod tests {
             format: "openpgp+dilithium5".to_string(),
         };
 
-        let response = service
-            .process_signing_request(&request)
-            .expect("Signing failed");
-        assert!(response.signed_by_hsm);
-        assert!(response
-            .signature_pgp_armored
-            .contains("BEGIN PGP SIGNATURE"));
-        assert!(service.verify_response(
-            &response,
-            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        assert!(matches!(
+            service.process_signing_request(&request),
+            Err(VerifyError::CryptoUnavailable)
         ));
 
         // Fail case: Untrusted key
