@@ -107,7 +107,9 @@ impl SovereignSystemd400AutonomousNeuralMeshEngine {
     pub fn activate_service(&mut self, service_name: &str, signature_bytes: &[u8]) -> bool {
         let sig_digest = fnv1a_2065_digest(signature_bytes);
         if let Some(service) = self.services.get_mut(service_name) {
-            if service.pqc_dilithium_signature_fingerprint == sig_digest || !signature_bytes.is_empty() {
+            if service.pqc_dilithium_signature_fingerprint == sig_digest
+                || !signature_bytes.is_empty()
+            {
                 service.is_active = true;
                 self.pqc_signature_verifications += 1;
                 true
@@ -404,7 +406,9 @@ impl Sovereign2065DistroSupremacyMasterSuite {
     pub fn new() -> Self {
         Self {
             systemd400_engine: SovereignSystemd400AutonomousNeuralMeshEngine::new(),
-            linux150_engine: SovereignLinux150BcachefsQuantumPhotonicMeshEngine::new(10 * 1024 * 1024 * 1024 * 1024),
+            linux150_engine: SovereignLinux150BcachefsQuantumPhotonicMeshEngine::new(
+                10 * 1024 * 1024 * 1024 * 1024,
+            ),
             openbsd150_guard: SovereignOpenBsd150QuantumFineIbtGuard::new(),
             freebsd250_engine: SovereignFreeBsd250QuantumVnetXdpMeshEngine::new(),
             wayland400_engine: SovereignWayland400ZeroCopyDisplayEngine::new(),
@@ -413,12 +417,26 @@ impl Sovereign2065DistroSupremacyMasterSuite {
 
     /// Compute 2065 Distro Supremacy Index (0 - 100)
     pub fn compute_2065_distro_supremacy_index(&mut self) -> u32 {
-        self.systemd400_engine.register_autonomous_service("init", "/sbin/init", 0xFF);
+        self.systemd400_engine
+            .register_autonomous_service("init", "/sbin/init", 0xFF);
         self.systemd400_engine.activate_service("init", b"sig");
-        self.linux150_engine.allocate_photonic_extent(1, "/photonic", StorageTier2065::CxlPhotonicMeshTier10, 1024 * 1024);
-        self.openbsd150_guard.register_quantum_ibt_region("kernel", 0x1000, 0x5000);
-        self.freebsd250_engine.spawn_quantum_vnet_jail(1, "jail2065", [127, 0, 0, 1], [0; 16], 0xFF);
-        self.wayland400_engine.submit_zero_copy_frame(1, 3840, 2160);
+        self.linux150_engine.allocate_photonic_extent(
+            1,
+            "/photonic",
+            StorageTier2065::CxlPhotonicMeshTier10,
+            1024 * 1024,
+        );
+        self.openbsd150_guard
+            .register_quantum_ibt_region("kernel", 0x1000, 0x5000);
+        self.freebsd250_engine.spawn_quantum_vnet_jail(
+            1,
+            "jail2065",
+            [127, 0, 0, 1],
+            [0; 16],
+            0xFF,
+        );
+        self.wayland400_engine
+            .submit_zero_copy_frame(1, 3840, 2160);
 
         100
     }
@@ -444,8 +462,14 @@ mod tests {
 
     #[test]
     fn test_bcachefs_photonic_mesh_engine_2065() {
-        let mut engine = SovereignLinux150BcachefsQuantumPhotonicMeshEngine::new(1024 * 1024 * 1024 * 1024);
-        engine.allocate_photonic_extent(100, "/data/mesh2065", StorageTier2065::UltraFastSsdCoW, 16384);
+        let mut engine =
+            SovereignLinux150BcachefsQuantumPhotonicMeshEngine::new(1024 * 1024 * 1024 * 1024);
+        engine.allocate_photonic_extent(
+            100,
+            "/data/mesh2065",
+            StorageTier2065::UltraFastSsdCoW,
+            16384,
+        );
         assert!(engine.promote_to_photonic_mesh(100));
         assert_eq!(engine.zstd_compaction_events, 1);
         assert!(engine.deduplicated_bytes > 0);
@@ -465,13 +489,7 @@ mod tests {
     #[test]
     fn test_freebsd250_quantum_vnet_xdp_mesh_engine() {
         let mut engine = SovereignFreeBsd250QuantumVnetXdpMeshEngine::new();
-        engine.spawn_quantum_vnet_jail(
-            5,
-            "quantum_jail_2065",
-            [10, 10, 0, 1],
-            [0; 16],
-            0xFF,
-        );
+        engine.spawn_quantum_vnet_jail(5, "quantum_jail_2065", [10, 10, 0, 1], [0; 16], 0xFF);
         assert!(engine.process_xdp_quantum_packet(5, 4096));
         assert_eq!(engine.zero_copy_packets_processed, 1);
         assert_eq!(engine.pqc_mesh_tunnels_established, 1);
