@@ -204,18 +204,15 @@ pub struct ZeroCopyRingBuffer {
     packets: Vec<Option<ZeroCopyPacket>>,
     head: AtomicUsize,
     tail: AtomicUsize,
-    count: AtomicUsize,
     capacity: usize,
 }
 
 impl ZeroCopyRingBuffer {
     pub fn new(capacity: usize) -> Self {
-        let capacity = capacity.max(1);
         Self {
             packets: vec![None; capacity],
             head: AtomicUsize::new(0),
             tail: AtomicUsize::new(0),
-            count: AtomicUsize::new(0),
             capacity,
         }
     }
@@ -223,34 +220,43 @@ impl ZeroCopyRingBuffer {
     /// Enqueue a packet
     pub fn enqueue(&mut self, packet: ZeroCopyPacket) -> Result<(), &'static str> {
         let tail = self.tail.load(Ordering::SeqCst);
-        if self.count.load(Ordering::SeqCst) == self.capacity {
+        let head = self.head.load(Ordering::SeqCst);
+
+        if (tail + 1) % self.capacity == head {
             return Err("Ring buffer is full");
         }
 
         self.packets[tail] = Some(packet);
         self.tail
             .store((tail + 1) % self.capacity, Ordering::SeqCst);
-        self.count.fetch_add(1, Ordering::SeqCst);
         Ok(())
     }
 
     /// Dequeue a packet
     pub fn dequeue(&mut self) -> Option<ZeroCopyPacket> {
         let head = self.head.load(Ordering::SeqCst);
-        if self.count.load(Ordering::SeqCst) == 0 {
+        let tail = self.tail.load(Ordering::SeqCst);
+
+        if head == tail {
             return None;
         }
 
         let packet = self.packets[head].take();
         self.head
             .store((head + 1) % self.capacity, Ordering::SeqCst);
-        self.count.fetch_sub(1, Ordering::SeqCst);
         packet
     }
 
     /// Get number of packets in ring
     pub fn len(&self) -> usize {
-        self.count.load(Ordering::SeqCst)
+        let head = self.head.load(Ordering::SeqCst);
+        let tail = self.tail.load(Ordering::SeqCst);
+
+        if tail >= head {
+            tail - head
+        } else {
+            self.capacity - head + tail
+        }
     }
 
     /// Check if ring is empty
@@ -325,7 +331,7 @@ mod tests {
 
     #[test]
     fn test_ring_buffer() {
-        let mut ring = ZeroCopyRingBuffer::new(8);
+        let ring = ZeroCopyRingBuffer::new(8);
 
         let buffer = ZeroCopyBuffer::new(vec![1, 2, 3]);
         let packet = ZeroCopyPacket::new(buffer, 0, 3);
@@ -340,7 +346,7 @@ mod tests {
 
     #[test]
     fn test_ring_buffer_full() {
-        let mut ring = ZeroCopyRingBuffer::new(2);
+        let ring = ZeroCopyRingBuffer::new(2);
 
         let buffer1 = ZeroCopyBuffer::new(vec![1]);
         let packet1 = ZeroCopyPacket::new(buffer1, 0, 1);

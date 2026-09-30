@@ -167,9 +167,13 @@ impl Sysfs {
     }
 
     pub fn read(&self, path: &str) -> Option<String> {
-        let relative = path.strip_prefix(&self.root_path)?.strip_prefix('/')?;
-        let (object, attr_name) = relative.rsplit_once('/')?;
-        let kobject_path = format!("{}/{}", self.root_path, object);
+        let parts: Vec<&str> = path.split('/').collect();
+        if parts.len() < 3 {
+            return None;
+        }
+
+        let kobject_path = format!("/{}", parts[1]);
+        let attr_name = parts[2];
 
         if let Some(kobject) = self.kobjects.get(&kobject_path) {
             if let Some(attr) = kobject.get_attribute(attr_name) {
@@ -180,16 +184,13 @@ impl Sysfs {
     }
 
     pub fn write(&mut self, path: &str, value: &str) -> bool {
-        let Some(relative) = path
-            .strip_prefix(&self.root_path)
-            .and_then(|p| p.strip_prefix('/'))
-        else {
+        let parts: Vec<&str> = path.split('/').collect();
+        if parts.len() < 3 {
             return false;
-        };
-        let Some((object, attr_name)) = relative.rsplit_once('/') else {
-            return false;
-        };
-        let kobject_path = format!("{}/{}", self.root_path, object);
+        }
+
+        let kobject_path = format!("/{}", parts[1]);
+        let attr_name = parts[2];
 
         if let Some(kobject) = self.kobjects.get_mut(&kobject_path) {
             if let Some(attr) = kobject.get_attribute_mut(attr_name) {
@@ -323,7 +324,7 @@ mod tests {
 
     #[test]
     fn test_sysfs_attribute_readonly() {
-        let mut attr = SysfsAttribute::new(String::from("test"), String::from("value"), false);
+        let attr = SysfsAttribute::new(String::from("test"), String::from("value"), false);
         assert!(!attr.write(String::from("new")));
         assert_eq!(attr.read(), "value");
     }

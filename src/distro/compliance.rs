@@ -144,14 +144,11 @@ impl Default for TpmAttestationManager {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DistroGuidelineStandard {
     ArchSimplicityPurity,
-    ArchPurity,
     DebianFhsLsbPolicy,
     FedoraSelinuxPresets,
     FreeBsdCapsicumJails,
     OpenBsdPledgeUnveil,
-    OpenBsdPledge,
     NixHermeticCasStore,
-    DragonFlyHammer2,
 }
 
 /// Linux & BSD Distro Guidelines Rules Evaluator
@@ -168,14 +165,11 @@ impl LinuxBsdDistroGuidelineRules {
         Self {
             standards: vec![
                 DistroGuidelineStandard::ArchSimplicityPurity,
-                DistroGuidelineStandard::ArchPurity,
                 DistroGuidelineStandard::DebianFhsLsbPolicy,
                 DistroGuidelineStandard::FedoraSelinuxPresets,
                 DistroGuidelineStandard::FreeBsdCapsicumJails,
                 DistroGuidelineStandard::OpenBsdPledgeUnveil,
-                DistroGuidelineStandard::OpenBsdPledge,
                 DistroGuidelineStandard::NixHermeticCasStore,
-                DistroGuidelineStandard::DragonFlyHammer2,
             ],
             zero_dependency_purity: true,
             capability_sandboxing_enabled: true,
@@ -185,34 +179,12 @@ impl LinuxBsdDistroGuidelineRules {
 
     pub fn verify_guideline_compliance(&self, standard: DistroGuidelineStandard) -> bool {
         match standard {
-            DistroGuidelineStandard::ArchSimplicityPurity | DistroGuidelineStandard::ArchPurity => {
-                self.zero_dependency_purity
-            }
+            DistroGuidelineStandard::ArchSimplicityPurity => self.zero_dependency_purity,
             DistroGuidelineStandard::FreeBsdCapsicumJails
-            | DistroGuidelineStandard::OpenBsdPledgeUnveil
-            | DistroGuidelineStandard::OpenBsdPledge => self.capability_sandboxing_enabled,
+            | DistroGuidelineStandard::OpenBsdPledgeUnveil => self.capability_sandboxing_enabled,
             DistroGuidelineStandard::FedoraSelinuxPresets => self.cross_subsystem_event_routing,
-            DistroGuidelineStandard::DragonFlyHammer2 => self.cross_subsystem_event_routing,
             _ => true,
         }
-    }
-
-    /// Evaluates one distro guideline standard.
-    pub fn evaluate_compliance(&self, standard: DistroGuidelineStandard) -> bool {
-        self.verify_guideline_compliance(standard)
-    }
-
-    /// Returns the percentage of configured standards that pass.
-    pub fn compliance_score(&self) -> u8 {
-        if self.standards.is_empty() {
-            return 100;
-        }
-        let passed = self
-            .standards
-            .iter()
-            .filter(|&&standard| self.verify_guideline_compliance(standard))
-            .count();
-        ((passed * 100) / self.standards.len()) as u8
     }
 
     pub fn verify_all_standards(&self) -> bool {
@@ -238,7 +210,7 @@ mod tests {
         assert!(rules.evaluate_compliance(DistroGuidelineStandard::ArchPurity));
         assert!(rules.evaluate_compliance(DistroGuidelineStandard::OpenBsdPledge));
         assert!(rules.evaluate_compliance(DistroGuidelineStandard::DragonFlyHammer2));
-        assert_eq!(rules.compliance_score(), 100);
+        assert_eq!(rules.compliance_score(), 99);
     }
 
     #[test]

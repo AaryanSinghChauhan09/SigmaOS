@@ -110,7 +110,7 @@ pub struct Vfs {
 impl Vfs {
     pub fn new() -> Self {
         let mut vfs = Self {
-            next_inode: AtomicU64::new(2),
+            next_inode: AtomicU64::new(1),
             inodes: HashMap::new(),
             dentries: HashMap::new(),
             superblocks: HashMap::new(),

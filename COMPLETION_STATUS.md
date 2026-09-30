@@ -75,28 +75,6 @@
   - Stack corruption detection with canary verification
   - Memory allocation with quarantine
   - Comprehensive statistics tracking
-- **Implemented**: Tiling Window Manager from Wiki 08-Desktop.md
-  - COSMIC-inspired safe multi-threaded tiling
-  - Layout types: Spiral, Monocle, Columns, Rows, Grid
-  - Workspace management with layout switching
-  - Window geometry and focus management
-  - Floating window support
-  - Comprehensive statistics tracking
-- **Implemented**: FreeBSD Capsicum capability wrappers from AGENT.md
-  - Fine-grained file descriptor rights (READ, WRITE, EXECUTE, SEEK, MMAP, etc.)
-  - Network rights (BIND, CONNECT, LISTEN, ACCEPT, SEND, RECV)
-  - Capability entry management with rights checking
-  - Rights limiting and revocation
-  - Sandbox mode management (Unrestricted, Restricted, Sandbox)
-  - Comprehensive statistics tracking
-- **Implemented**: Seccomp-BPF filter compilation engine from AGENT.md
-  - Seccomp comparison operations (Eq, Ne, Gt, Ge, Lt, Le, MaskedEq)
-  - Seccomp actions (Allow, Kill, Trap, Errno, Trace, Log)
-  - BPF instruction set (Load, Jump, Return, Register transfer)
-  - Seccomp rules with argument filtering
-  - Argument filters with mask support
-  - Filter compilation to BPF instructions
-  - Comprehensive statistics tracking
 
 ### 9. Security Hardening
 - **Removed**: Hardcoded cryptographic keys in PQC enclave

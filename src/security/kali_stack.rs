@@ -495,7 +495,6 @@ impl KaliJohnTheRipperCracker {
 }
 
 mod tests {
-    use super::*;
 
     #[test]
     fn test_kali_john_the_ripper_cracker() {

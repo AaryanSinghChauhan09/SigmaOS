@@ -435,7 +435,6 @@ impl Default for PlugAndPlayHardwareManager {
 }
 
 mod tests {
-    use super::*;
 
     #[test]
     fn test_service_manager() {

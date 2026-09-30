@@ -17,7 +17,6 @@ pub struct MemoryBlock {
 pub struct BuddyAllocator {
     total_memory: usize,
     min_block_size: usize,
-    base_address: u64,
     max_order: usize,
     free_lists: Vec<Vec<MemoryBlock>>,
     allocated_blocks: HashMap<u64, MemoryBlock>,
@@ -33,9 +32,8 @@ impl BuddyAllocator {
         let mut free_lists = vec![Vec::new(); max_order + 1];
 
         // Initialize with one large block
-        let base_address = min_block_size as u64;
         let initial_block = MemoryBlock {
-            start: base_address,
+            start: 0,
             size: total_memory,
             allocated: false,
             order: max_order,
@@ -45,7 +43,6 @@ impl BuddyAllocator {
         Self {
             total_memory,
             min_block_size,
-            base_address,
             max_order,
             free_lists,
             allocated_blocks: HashMap::new(),
@@ -146,9 +143,7 @@ impl BuddyAllocator {
 
     /// Merge block with its buddy
     fn merge_buddy(&mut self, block: MemoryBlock) {
-        let block_size = (self.min_block_size as u64) << block.order;
-        let relative_start = block.start.saturating_sub(self.base_address);
-        let buddy_address = self.base_address + (relative_start ^ block_size);
+        let buddy_address = block.start ^ (1 << block.order);
 
         // Find buddy in free list
         for order in block.order..self.max_order {
@@ -265,8 +260,7 @@ impl SlabCache {
     /// Grow slab cache
     fn grow_slab(&mut self) {
         let base_address =
-            (self.slabs.len() as u64 * self.object_size as u64 * self.objects_per_slab as u64)
-                + self.object_size as u64;
+            self.slabs.len() as u64 * self.object_size as u64 * self.objects_per_slab as u64;
 
         let mut slab = Vec::new();
         for i in 0..self.objects_per_slab {

@@ -9,7 +9,6 @@ pub mod audit;
 pub mod bsd_hardening;
 pub mod capability;
 pub mod capsicum;
-pub mod capsicum_wrapper;
 pub mod filesystem_encryption;
 pub mod governance;
 pub mod hardware_privilege;
@@ -27,7 +26,6 @@ pub mod hardening;
 pub mod kernel_hardening;
 pub mod seccomp;
 pub mod seccomp_ebpf;
-pub mod seccomp_filter;
 pub mod syscall_filter;
 pub mod user_namespace;
 
@@ -179,17 +177,9 @@ pub mod phase_audit;
 pub use hardware_privilege::*;
 
 pub use capsicum::{CapEntry, CapMode, CapRight, CapabilitySandbox};
-pub use capsicum_wrapper::{
-    CapRights, CapSandboxMode, CapsicumFdEntry, CapsicumManager as CapsicumWrapperManager,
-    CapsicumStatistics,
-};
 pub use memory_protection::{
     AslrConfig, MemoryProtectionManager, MemoryProtectionMode, StackCanaryConfig,
 };
 pub use pledge_unveil::{
     PledgePromise as OpenBsdPledgePromise, PledgeSandbox, Sandbox, UnveilPermission, UnveilSandbox,
-};
-pub use seccomp_filter::{
-    BpfInstruction, SeccompAction, SeccompArgFilter, SeccompCompareOp, SeccompCompileError,
-    SeccompCompiler, SeccompRule, SeccompStatistics,
 };

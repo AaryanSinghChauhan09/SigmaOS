@@ -519,9 +519,7 @@ impl SigmaBootSequencer {
 
             // Complete all parallel services — the stage clock advances by the max estimated time
             let max_elapsed = estimated_times.iter().map(|(_, t)| *t).max().unwrap_or(0);
-            let mut completion_order = estimated_times.clone();
-            completion_order.sort_by_key(|(_, elapsed)| *elapsed);
-            for (name, est) in &completion_order {
+            for (name, est) in &estimated_times {
                 self.complete_service(name, *est);
             }
             self.clock_ms += max_elapsed;

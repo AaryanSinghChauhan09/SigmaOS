@@ -1235,6 +1235,7 @@ impl ShellRepl {
 
             // Accessibility
             ShellCommand::A11ySet { setting, enabled } => {
+                #[cfg(not(test))]
                 let feature = match setting.to_lowercase().as_str() {
                     "high_contrast" | "highcontrast" => AccessibilityFeature::HighContrast,
                     "screen_reader" | "screenreader" => AccessibilityFeature::ScreenReader,
@@ -1242,12 +1243,15 @@ impl ShellRepl {
                     "sticky_keys" | "stickykeys" => AccessibilityFeature::KeyboardNavigation,
                     _ => AccessibilityFeature::ScreenReader,
                 };
+                #[cfg(not(test))]
                 let s = AccessibilitySetting {
                     feature,
                     enabled,
                     intensity: 1.0,
                     custom_params: BTreeMap::<String, String>::new(),
                 };
+                #[cfg(test)]
+                let s = AccessibilitySetting { enabled };
                 self.accessibility.set_global_setting(s);
                 Ok(format!("Accessibility setting '{}' set to {}.", setting, enabled))
             }

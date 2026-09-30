@@ -169,7 +169,7 @@ mod tests {
     #[test]
     fn test_add_repository() {
         let mut manager = RepositoryConfigManager::new();
-        let mut custom = RepoConfig::new(
+        let custom = RepoConfig::new(
             String::from("custom"),
             String::from("https://custom.repo.org"),
         );
@@ -227,7 +227,7 @@ mod tests {
     #[test]
     fn test_repository_priority() {
         let mut manager = RepositoryConfigManager::new();
-        let mut custom = RepoConfig::new(
+        let custom = RepoConfig::new(
             String::from("custom"),
             String::from("https://custom.repo.org"),
         );

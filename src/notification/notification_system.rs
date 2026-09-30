@@ -220,10 +220,12 @@ impl NotificationSystem {
             return id;
         }
 
-        // Store before sorting so the priority comparator can see the new entry.
-        self.notifications.insert(id, notification);
+        // Add to queue based on priority
         self.queue.push(id);
         self.sort_queue();
+
+        // Store notification
+        self.notifications.insert(id, notification);
 
         // Trim history if needed
         if self.history.len() >= self.max_history {
@@ -261,7 +263,7 @@ impl NotificationSystem {
             let notif_b = self.notifications.get(b);
 
             match (notif_a, notif_b) {
-                (Some(a), Some(b)) => a.priority.cmp(&b.priority),
+                (Some(a), Some(b)) => b.priority.cmp(&a.priority),
                 _ => core::cmp::Ordering::Equal,
             }
         });

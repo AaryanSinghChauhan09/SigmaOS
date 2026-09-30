@@ -50,7 +50,7 @@ impl CongestionWindow {
     /// Decrease congestion window on loss
     pub fn decrease(&mut self) {
         self.ssthresh = self.cwnd / 2;
-        self.cwnd = self.min_cwnd;
+        self.cwnd = self.ssthresh.max(self.min_cwnd);
     }
 
     /// Slow start

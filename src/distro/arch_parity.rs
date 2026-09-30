@@ -1026,7 +1026,7 @@ mod tests {
             .unwrap();
         assert!(cmd.contains("arch-nspawn"));
 
-        let mut pkgctl = ArchPkgctlEngine::new("core");
+        let mut pkgctl = ArchPkgctlEngine::new();
         let repo_url = pkgctl.clone_pkg_repo("nginx");
         assert!(repo_url.contains("gitlab.archlinux.org"));
 
@@ -1034,7 +1034,7 @@ mod tests {
         let res = archweb.search("pacman");
         assert_eq!(res.len(), 1);
 
-        let mut installer = ArchArchinstallEngine::new("/dev/nvme0n1", "ext4");
+        let mut installer = ArchArchinstallEngine::new();
         installer.set_config("/dev/nvme0n1", "desktop", "sovereign");
         let inst_cmd = installer.execute_installation().unwrap();
         assert!(inst_cmd.contains("archinstall"));

@@ -60,17 +60,6 @@ impl RunitService {
         self
     }
 
-    /// Adds a service dependency once, preserving insertion order.
-    pub fn add_dependency(&mut self, name: &str) {
-        if !self
-            .dependencies
-            .iter()
-            .any(|dependency| dependency == name)
-        {
-            self.dependencies.push(name.to_string());
-        }
-    }
-
     pub fn start(&mut self) -> bool {
         if self.status == RunitServiceStatus::Running {
             return true;

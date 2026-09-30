@@ -1,10 +1,7 @@
 pub mod mobile_variant;
 pub use mobile_variant::*;
 pub mod tiling;
-pub use tiling::{
-    TiledWindow, TilingLayout, TilingStatistics, TilingWindowGeometry, TilingWindowManager,
-    Workspace as TilingWorkspace,
-};
+pub use tiling::{TilingLayout, TilingWindow, TilingWindowManager, WindowArea, Workspace};
 pub mod onboarding;
 pub mod shortcuts;
 

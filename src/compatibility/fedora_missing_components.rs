@@ -667,7 +667,6 @@ impl Default for FedoraAnacondaKickstartEngine {
 pub struct FedoraSssdFreeIpaEngine {
     pub realm: String,
     pub enrolled_hosts: Vec<String>,
-    pub is_joined: bool,
 }
 
 impl FedoraSssdFreeIpaEngine {
@@ -675,22 +674,7 @@ impl FedoraSssdFreeIpaEngine {
         Self {
             realm: String::new(),
             enrolled_hosts: Vec::new(),
-            is_joined: false,
         }
-    }
-
-    /// Join an IPA realm and record the enrolled host after validating names.
-    pub fn join_realm(&mut self, realm: &str, host: &str) -> Result<(), &'static str> {
-        if realm.is_empty() || host.is_empty() || !host.ends_with(realm) {
-            return Err("SSSD realm and host must be valid DNS names in the same realm");
-        }
-        self.realm = realm.to_ascii_lowercase();
-        let host = host.to_ascii_lowercase();
-        if !self.enrolled_hosts.contains(&host) {
-            self.enrolled_hosts.push(host);
-        }
-        self.is_joined = true;
-        Ok(())
     }
 }
 
