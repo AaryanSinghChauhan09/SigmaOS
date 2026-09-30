@@ -16,6 +16,10 @@ SigmaOS implements multiple layers of security:
 4. Filesystem encryption interfaces; audited providers are not integrated
 5. Network security models, which require runtime and protocol review
 
+### Password-manager prototype
+
+`src/security/password.rs` is an in-memory API model, not a usable password vault. It does not persist `vault_path`; encryption/decryption, generated passwords, built-in fingerprint/Face ID checks, and direct `unlock` fail closed because there is no audited crypto, CSPRNG, biometric, or authentication provider. The constructor clears and discards its supplied key, and add/update clear the owned plaintext input buffer on failure or after processing. Caller-owned copies are unaffected. A caller-supplied `BiometricAuth` implementation remains responsible for real authentication before it can unlock the in-memory model. Auto-lock uses elapsed monotonic time. Do not store real credentials with this component. AI agents maintaining it must keep unavailable providers fail-closed and preserve best-effort input clearing; do not enable storage or authentication until audited providers and persistence are integrated and verified.
+
 ## Pledge/Unveil Sandbox
 
 ### Pledge
