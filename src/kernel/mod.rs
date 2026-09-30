@@ -180,6 +180,7 @@ pub use kptr_restrict::{
     KptrRestrictLevel, DmesgRestrictLevel,
     KptrRestrict, DmesgRestrict, KernelSecurityParams, SecurityLevel,
 };
+pub use process::{Process, ProcessId, ProcessManager};
 pub use process_monitor::{
     MonitoredProcessState, ProcessEntry, ProcessTreeNode, ProcessFilter, ProcessSortField,
     ProcessMonitor,
