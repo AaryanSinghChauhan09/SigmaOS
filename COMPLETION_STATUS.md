@@ -2,8 +2,7 @@
 
 **Snapshot date:** 2026-09-30
 **Remote:** `AaryanSinghChauhan09/SigmaOS`
-**Latest committed code snapshot:** `7568e9f847`
-**Local changes:** RNG and crypto-audit hardening are in progress and not yet committed.
+**Latest committed code snapshot:** `15c8f62bf5`
 
 This file records verified work and known limitations. It does not claim that SigmaOS matches Linux or BSD feature parity, is production-ready, or has completed every roadmap idea.
 
@@ -29,7 +28,7 @@ This file records verified work and known limitations. It does not claim that Si
 
 - `cargo fmt --check` passed after the latest local changes.
 - Focused library tests passed for `tr` (5), PQC empty-input handling (2), distro authentication (11), package lookup (3), launcher search (6), AES fail-closed behavior (2), XOR encryption (1), vault adapters (1), secret manager (3), unavailable PQC provider (1), secure randomness/password hashing failure (1), PAM registration fail-closed behavior (1), and clipboard plaintext labeling (1).
-- Focused RNG and simulated-audit fail-closed tests are being run for the current uncommitted change.
+- Focused fail-closed tests passed for the RNG and simulated audit; the combined security fail-closed filter passed 7 tests.
 - `cargo check --lib` passed earlier in this work; later code changes were compiled by the focused library test builds.
 - `./run_sigma_tests.sh` passed in an earlier verification run. Python `pytest` could not run because `pytest` is not installed in the environment.
 - GitHub Actions for the latest `main` commit were queued when this snapshot was written. Their results are not yet known; check the current run list before relying on CI status.
