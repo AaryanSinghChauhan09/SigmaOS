@@ -241,7 +241,10 @@ impl SovereignPackagePullRequestEngine {
         self.next_pr_id += 1;
 
         let mut meta = BTreeMap::new();
-        meta.insert("submitted_at".to_string(), "2026-09-21T00:00:00Z".to_string());
+        meta.insert(
+            "submitted_at".to_string(),
+            "2026-09-21T00:00:00Z".to_string(),
+        );
         meta.insert("format_name".to_string(), format.name().to_string());
 
         let submission = PackagePullRequestSubmission {
@@ -288,10 +291,15 @@ impl SovereignPackagePullRequestEngine {
     }
 
     /// Translates a validated PR package into a unified Sovereign Package object
-    pub fn translate_pr(&mut self, pr_id: u64) -> Result<ConsolidatedSovereignPackage, &'static str> {
+    pub fn translate_pr(
+        &mut self,
+        pr_id: u64,
+    ) -> Result<ConsolidatedSovereignPackage, &'static str> {
         let submission = self.submissions.get_mut(&pr_id).ok_or("PR ID not found")?;
 
-        if submission.status != PullRequestStatus::Validated && submission.status != PullRequestStatus::Translated {
+        if submission.status != PullRequestStatus::Validated
+            && submission.status != PullRequestStatus::Translated
+        {
             return Err("PR must be validated before translation");
         }
 
@@ -304,7 +312,10 @@ impl SovereignPackagePullRequestEngine {
             .map(|dep| format!("sigma-compat-{}", dep))
             .collect();
 
-        let package_id = format!("{}-{}-{}", submission.package_name, submission.package_version, pr_id);
+        let package_id = format!(
+            "{}-{}-{}",
+            submission.package_name, submission.package_version, pr_id
+        );
         let commit_hash = format!("sha256:{:016x}", pr_id * 0xDEADC0DE);
 
         let consolidated = ConsolidatedSovereignPackage {
@@ -356,7 +367,10 @@ impl SovereignPackagePullRequestEngine {
         let submission = self.submissions.get_mut(&pr_id).ok_or("PR ID not found")?;
 
         submission.status = PullRequestStatus::Merged;
-        self.merged_packages.insert(translated_package.package_id.clone(), translated_package.clone());
+        self.merged_packages.insert(
+            translated_package.package_id.clone(),
+            translated_package.clone(),
+        );
 
         Ok(translated_package)
     }
@@ -421,9 +435,13 @@ impl ArchLinuxComponentPullRequestGatewayEngine {
     }
 
     /// Auto-merges an Arch component PR into active Arch component registry
-    pub fn merge_arch_component(&mut self, pr_id: u64) -> Result<ConsolidatedSovereignPackage, &'static str> {
+    pub fn merge_arch_component(
+        &mut self,
+        pr_id: u64,
+    ) -> Result<ConsolidatedSovereignPackage, &'static str> {
         let consolidated = self.pr_engine.merge_pr(pr_id)?;
-        self.arch_component_registry.insert(consolidated.name.clone(), consolidated.clone());
+        self.arch_component_registry
+            .insert(consolidated.name.clone(), consolidated.clone());
         Ok(consolidated)
     }
 }
@@ -533,16 +551,76 @@ mod tests {
         let mut arch_gateway = ArchLinuxComponentPullRequestGatewayEngine::new();
 
         let arch_components = [
-            ("archinstall-minimal", "3.0.0", PullRequestPackageFormat::ArchInstallProfile, "profile=minimal\ndesktop=sway", &["sway"][..]),
-            ("mkinitcpio-kms-hook", "1.0.0", PullRequestPackageFormat::ArchMkinitcpioHook, "BUILD() {\n  add_module kms\n}", &["mkinitcpio"][..]),
-            ("pacman-core-repo", "6.1.0", PullRequestPackageFormat::ArchPacmanConfRepo, "[core]\nServer = https://geo.mirror.pkg.archlinux.org/$repo/os/$arch", &["pacman"][..]),
-            ("archlinux-keyring-pqc", "2026.01.01", PullRequestPackageFormat::ArchPacmanKeyring, "keyid=0x12345678\nalgorithm=dilithium5", &["gnupg"][..]),
-            ("aur-rpc-hyprland", "0.40.0", PullRequestPackageFormat::ArchAurRpcV5Package, "{\"Name\":\"hyprland\",\"Version\":\"0.40.0\"}", &["wayland"][..]),
-            ("pacstrap-base-system", "1.0.0", PullRequestPackageFormat::ArchPacstrapRecipe, "packages=('base' 'linux' 'linux-firmware')", &["pacman"][..]),
-            ("arch-chroot-mount-spec", "1.0.0", PullRequestPackageFormat::ArchChrootSpec, "mount_bind=/dev\nmount_proc=/proc", &["util-linux"][..]),
-            ("arch-audit-cve-tracker", "2026.1", PullRequestPackageFormat::ArchAuditVulnerability, "cve=CVE-2026-1234\nseverity=high", &["arch-audit"][..]),
-            ("namcap-pkgbuild-auditor", "3.5.0", PullRequestPackageFormat::ArchNamcapLinterReport, "rule=PKGBUILD\nstatus=passed", &["namcap"][..]),
-            ("makepkg-opt-flags", "6.1.0", PullRequestPackageFormat::ArchMakepkgConfProfile, "CFLAGS=\"-O3 -march=x86-64-v3\"", &["gcc"][..]),
+            (
+                "archinstall-minimal",
+                "3.0.0",
+                PullRequestPackageFormat::ArchInstallProfile,
+                "profile=minimal\ndesktop=sway",
+                &["sway"][..],
+            ),
+            (
+                "mkinitcpio-kms-hook",
+                "1.0.0",
+                PullRequestPackageFormat::ArchMkinitcpioHook,
+                "BUILD() {\n  add_module kms\n}",
+                &["mkinitcpio"][..],
+            ),
+            (
+                "pacman-core-repo",
+                "6.1.0",
+                PullRequestPackageFormat::ArchPacmanConfRepo,
+                "[core]\nServer = https://geo.mirror.pkg.archlinux.org/$repo/os/$arch",
+                &["pacman"][..],
+            ),
+            (
+                "archlinux-keyring-pqc",
+                "2026.01.01",
+                PullRequestPackageFormat::ArchPacmanKeyring,
+                "keyid=0x12345678\nalgorithm=dilithium5",
+                &["gnupg"][..],
+            ),
+            (
+                "aur-rpc-hyprland",
+                "0.40.0",
+                PullRequestPackageFormat::ArchAurRpcV5Package,
+                "{\"Name\":\"hyprland\",\"Version\":\"0.40.0\"}",
+                &["wayland"][..],
+            ),
+            (
+                "pacstrap-base-system",
+                "1.0.0",
+                PullRequestPackageFormat::ArchPacstrapRecipe,
+                "packages=('base' 'linux' 'linux-firmware')",
+                &["pacman"][..],
+            ),
+            (
+                "arch-chroot-mount-spec",
+                "1.0.0",
+                PullRequestPackageFormat::ArchChrootSpec,
+                "mount_bind=/dev\nmount_proc=/proc",
+                &["util-linux"][..],
+            ),
+            (
+                "arch-audit-cve-tracker",
+                "2026.1",
+                PullRequestPackageFormat::ArchAuditVulnerability,
+                "cve=CVE-2026-1234\nseverity=high",
+                &["arch-audit"][..],
+            ),
+            (
+                "namcap-pkgbuild-auditor",
+                "3.5.0",
+                PullRequestPackageFormat::ArchNamcapLinterReport,
+                "rule=PKGBUILD\nstatus=passed",
+                &["namcap"][..],
+            ),
+            (
+                "makepkg-opt-flags",
+                "6.1.0",
+                PullRequestPackageFormat::ArchMakepkgConfProfile,
+                "CFLAGS=\"-O3 -march=x86-64-v3\"",
+                &["gcc"][..],
+            ),
         ];
 
         for (author_comp, ver, fmt, spec, deps) in arch_components {
@@ -558,7 +636,9 @@ mod tests {
             );
 
             assert!(arch_gateway.validate_arch_component(pr_id).unwrap());
-            let diff = arch_gateway.generate_arch_component_diff(pr_id, "old_spec_data").unwrap();
+            let diff = arch_gateway
+                .generate_arch_component_diff(pr_id, "old_spec_data")
+                .unwrap();
             assert!(diff.contains(&format!("+++ b/{}", author_comp)));
 
             let merged = arch_gateway.merge_arch_component(pr_id).unwrap();

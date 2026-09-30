@@ -9,17 +9,17 @@
 // SigmaOS Memory Module
 // Virtual memory management, paging, physical memory allocation, and TLB caching
 
-pub mod low_level;
-pub mod quota;
+pub mod allocator;
 pub mod cgroups;
 pub mod kswapd;
+pub mod low_level;
 pub mod paging;
+pub mod quota;
 pub mod segmentation_paging;
+pub mod sovereign_address_translation;
+pub mod thp;
 pub mod tlb_associative;
 pub mod zone;
-pub mod allocator;
-pub mod thp;
-pub mod sovereign_address_translation;
 pub use sovereign_address_translation::*;
 
 pub use paging::{
@@ -27,15 +27,18 @@ pub use paging::{
     PhysicalAddress, SimpleVMM, VirtualAddress, PAGE_SIZE_BYTES, PAGE_TABLE_ENTRIES,
 };
 
+pub use allocator::{BuddyAllocator, MemoryBlock, SlabAllocator, SlabCache, SlabObject};
 pub use cgroups::{MemCgroup, MemCgroupManager};
 pub use kswapd::{LinuxKswapd, PageState};
+pub use quota::{
+    MemoryController, MemoryStats, MemoryUnit, OomEvent, OomPolicy, PageCacheStat,
+    ProcessMemoryAccount,
+};
 pub use segmentation_paging::{
     AddressBindingMode, AddressType, AslrEntropyConfig, CpuRing, ExecutableAddressBinding,
     RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, SegmentationPagingEngine,
     SpaceProtectionFlags, SystemControlRegisters,
 };
+pub use thp::{HugePageAllocation, HugePageSize, ThpManager, ThpPolicy, ThpStats};
 pub use tlb_associative::{AssociativeTlbCache, TlbAssociativityMode, TlbEntry, TlbPageFlags};
 pub use zone::{BsdZoneAllocator, Slab, Zone, ZoneStats};
-pub use quota::{MemoryController, MemoryStats, MemoryUnit, OomEvent, OomPolicy, ProcessMemoryAccount, PageCacheStat};
-pub use allocator::{BuddyAllocator, SlabAllocator, SlabCache, MemoryBlock, SlabObject};
-pub use thp::{ThpManager, HugePageAllocation, HugePageSize, ThpPolicy, ThpStats};

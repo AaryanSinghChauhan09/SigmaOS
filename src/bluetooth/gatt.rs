@@ -2,7 +2,7 @@
 // Inspired by Linux BlueZ GATT implementation
 
 use std::collections::HashMap;
-use std::sync::atomic::{AtomicU64, AtomicU16, Ordering};
+use std::sync::atomic::{AtomicU16, AtomicU64, Ordering};
 
 /// GATT characteristic
 #[derive(Debug, Clone)]
@@ -50,7 +50,7 @@ impl GattClient {
     /// Connect to a GATT device
     pub fn connect(&mut self, mac_address: String, name: String) -> GattDevice {
         let id = self.next_device_id.fetch_add(1, Ordering::SeqCst);
-        
+
         let device = GattDevice {
             id,
             mac_address,
@@ -58,7 +58,7 @@ impl GattClient {
             connected: true,
             services: Vec::new(),
         };
-        
+
         self.devices.insert(id, device.clone());
         device
     }
@@ -82,7 +82,7 @@ impl GattClient {
                 handle: self.next_handle.fetch_add(1, Ordering::SeqCst),
                 characteristics: Vec::new(),
             };
-            
+
             device.services.push(service);
             Ok(())
         } else {
@@ -91,9 +91,17 @@ impl GattClient {
     }
 
     /// Discover characteristics
-    pub fn discover_characteristics(&mut self, device_id: u64, service_handle: u16) -> Result<(), &'static str> {
+    pub fn discover_characteristics(
+        &mut self,
+        device_id: u64,
+        service_handle: u16,
+    ) -> Result<(), &'static str> {
         if let Some(device) = self.devices.get_mut(&device_id) {
-            if let Some(service) = device.services.iter_mut().find(|s| s.handle == service_handle) {
+            if let Some(service) = device
+                .services
+                .iter_mut()
+                .find(|s| s.handle == service_handle)
+            {
                 // Simulated characteristic discovery
                 let characteristic = GattCharacteristic {
                     uuid: "00002a00-0000-1000-8000-00805f9b34fb".to_string(), // Device Name
@@ -101,7 +109,7 @@ impl GattClient {
                     properties: 0x02, // Read
                     value: Vec::new(),
                 };
-                
+
                 service.characteristics.push(characteristic);
                 Ok(())
             } else {
@@ -113,7 +121,11 @@ impl GattClient {
     }
 
     /// Read characteristic value
-    pub fn read_characteristic(&self, device_id: u64, handle: u16) -> Result<Vec<u8>, &'static str> {
+    pub fn read_characteristic(
+        &self,
+        device_id: u64,
+        handle: u16,
+    ) -> Result<Vec<u8>, &'static str> {
         if let Some(device) = self.devices.get(&device_id) {
             for service in &device.services {
                 if let Some(char) = service.characteristics.iter().find(|c| c.handle == handle) {
@@ -127,10 +139,19 @@ impl GattClient {
     }
 
     /// Write characteristic value
-    pub fn write_characteristic(&mut self, device_id: u64, handle: u16, value: Vec<u8>) -> Result<(), &'static str> {
+    pub fn write_characteristic(
+        &mut self,
+        device_id: u64,
+        handle: u16,
+        value: Vec<u8>,
+    ) -> Result<(), &'static str> {
         if let Some(device) = self.devices.get_mut(&device_id) {
             for service in &mut device.services {
-                if let Some(char) = service.characteristics.iter_mut().find(|c| c.handle == handle) {
+                if let Some(char) = service
+                    .characteristics
+                    .iter_mut()
+                    .find(|c| c.handle == handle)
+                {
                     char.value = value;
                     return Ok(());
                 }
@@ -164,7 +185,7 @@ mod tests {
     #[test]
     fn test_connect() {
         let mut client = GattClient::new();
-        
+
         let device = client.connect("00:11:22:33:44:55".to_string(), "Test Device".to_string());
         assert_eq!(device.id, 1);
         assert!(device.connected);
@@ -174,10 +195,10 @@ mod tests {
     #[test]
     fn test_disconnect() {
         let mut client = GattClient::new();
-        
+
         let device = client.connect("00:11:22:33:44:55".to_string(), "Test Device".to_string());
         assert!(client.disconnect(device.id).is_ok());
-        
+
         let d = client.get_device(device.id).unwrap();
         assert!(!d.connected);
     }
@@ -185,10 +206,10 @@ mod tests {
     #[test]
     fn test_discover_services() {
         let mut client = GattClient::new();
-        
+
         let device = client.connect("00:11:22:33:44:55".to_string(), "Test Device".to_string());
         assert!(client.discover_services(device.id).is_ok());
-        
+
         let d = client.get_device(device.id).unwrap();
         assert_eq!(d.services.len(), 1);
     }
@@ -196,29 +217,36 @@ mod tests {
     #[test]
     fn test_discover_characteristics() {
         let mut client = GattClient::new();
-        
+
         let device = client.connect("00:11:22:33:44:55".to_string(), "Test Device".to_string());
         client.discover_services(device.id).unwrap();
-        
+
         let service_handle = client.get_device(device.id).unwrap().services[0].handle;
-        assert!(client.discover_characteristics(device.id, service_handle).is_ok());
+        assert!(client
+            .discover_characteristics(device.id, service_handle)
+            .is_ok());
     }
 
     #[test]
     fn test_write_read_characteristic() {
         let mut client = GattClient::new();
-        
+
         let device = client.connect("00:11:22:33:44:55".to_string(), "Test Device".to_string());
         client.discover_services(device.id).unwrap();
-        
+
         let service_handle = client.get_device(device.id).unwrap().services[0].handle;
-        client.discover_characteristics(device.id, service_handle).unwrap();
-        
-        let char_handle = client.get_device(device.id).unwrap().services[0].characteristics[0].handle;
+        client
+            .discover_characteristics(device.id, service_handle)
+            .unwrap();
+
+        let char_handle =
+            client.get_device(device.id).unwrap().services[0].characteristics[0].handle;
         let value = vec![1, 2, 3, 4];
-        
-        assert!(client.write_characteristic(device.id, char_handle, value.clone()).is_ok());
-        
+
+        assert!(client
+            .write_characteristic(device.id, char_handle, value.clone())
+            .is_ok());
+
         let read_value = client.read_characteristic(device.id, char_handle).unwrap();
         assert_eq!(read_value, value);
     }

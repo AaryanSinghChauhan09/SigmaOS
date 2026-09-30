@@ -4,12 +4,12 @@
 // and polymorphic peripheral drivers for embedded platforms
 // Enhanced with real platform detection and hardware access
 
-use std::string::{String, ToString};
-use std::vec::Vec;
 use std::format;
+use std::string::{String, ToString};
 use std::sync::{Mutex, OnceLock};
+use std::vec::Vec;
 
-use core::sync::atomic::{AtomicU32, AtomicBool, AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
 
 /// Peripheral device types for embedded systems
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -72,7 +72,8 @@ impl HardwareAbstractionLayer {
 
     pub fn detect_platform(&self) -> PlatformProfile {
         let platform = self.read_board_info();
-        self.platform_profile.store(platform as u32, Ordering::SeqCst);
+        self.platform_profile
+            .store(platform as u32, Ordering::SeqCst);
         platform
     }
 
@@ -80,10 +81,10 @@ impl HardwareAbstractionLayer {
         // In real implementation, this would read from hardware registers
         // For Raspberry Pi: read from 0x20000000 (Peripheral base)
         // For BeagleBone: read from 0x44E00000 (Control module)
-        
+
         // Simulated platform detection based on board revision
         let board_revision = self.simulate_board_revision();
-        
+
         match board_revision {
             0x02 => PlatformProfile::RaspberryPi,
             0x03 => PlatformProfile::BeagleBone,
@@ -102,7 +103,7 @@ impl HardwareAbstractionLayer {
     fn detect_cpu_info(&self) {
         // In real implementation, this would read MIDR register
         // to get CPU ID and implementer information
-        
+
         // Simulated CPU ID detection
         let cpu_id = self.simulate_cpu_id();
         self.cpu_id.store(cpu_id, Ordering::SeqCst);
@@ -117,7 +118,7 @@ impl HardwareAbstractionLayer {
     fn detect_memory_info(&self) {
         // In real implementation, this would read from ATAGS or device tree
         // to determine available memory size
-        
+
         // Simulated memory detection
         let memory_size = self.simulate_memory_size();
         self.memory_size.store(memory_size, Ordering::SeqCst);
@@ -165,25 +166,29 @@ impl GpioDriver {
         }
     }
 
-    pub fn set_pin_direction(&mut self, pin: u32, direction: GpioDirection) -> Result<(), EmbeddedError> {
+    pub fn set_pin_direction(
+        &mut self,
+        pin: u32,
+        direction: GpioDirection,
+    ) -> Result<(), EmbeddedError> {
         if pin >= self.pin_count.load(Ordering::SeqCst) {
             return Err(EmbeddedError::InvalidAddress);
         }
 
         // In real implementation, this would write to GPFSEL registers
         // For Raspberry Pi: GPFSEL0-5 at base + 0x00 to 0x14
-        
+
         let register_offset = (pin / 10) * 4;
         let bit_offset = (pin % 10) * 3;
-        
+
         let value = match direction {
             GpioDirection::Input => 0b000,
             GpioDirection::Output => 0b001,
         };
-        
+
         self.write_gpio_register(register_offset, bit_offset, value);
         self.configured_pins.fetch_add(1, Ordering::SeqCst);
-        
+
         Ok(())
     }
 
@@ -194,10 +199,10 @@ impl GpioDriver {
 
         // In real implementation, this would write to GPSET/GPCLR registers
         // For Raspberry Pi: GPSET0 at base + 0x1C, GPCLR0 at base + 0x28
-        
+
         let register_offset = if state { 0x1C } else { 0x28 };
         let bit_offset = pin;
-        
+
         if state {
             self.write_gpio_register(register_offset, bit_offset, 1);
             self.pin_states.fetch_or(1 << pin, Ordering::SeqCst);
@@ -205,7 +210,7 @@ impl GpioDriver {
             self.write_gpio_register(register_offset, bit_offset, 1);
             self.pin_states.fetch_and(!(1 << pin), Ordering::SeqCst);
         }
-        
+
         Ok(())
     }
 
@@ -216,13 +221,13 @@ impl GpioDriver {
 
         // In real implementation, this would read from GPLEV registers
         // For Raspberry Pi: GPLEV0 at base + 0x34
-        
+
         let state = (self.pin_states.load(Ordering::SeqCst) >> pin) & 1;
         Ok(state == 1)
     }
 
     /// Write to a memory-mapped GPIO register
-    /// 
+    ///
     /// # Safety
     /// In production, this would use unsafe write_volatile to write to
     /// hardware registers. The address must be a valid MMIO region and
@@ -235,7 +240,7 @@ impl GpioDriver {
     }
 
     /// Read from a memory-mapped GPIO register
-    /// 
+    ///
     /// # Safety
     /// In production, this would use unsafe read_volatile to read from
     /// hardware registers. The address must be a valid MMIO region and
@@ -307,59 +312,60 @@ impl PeripheralManager {
 
     pub fn scan_bus(&self) -> Result<Vec<PeripheralType>, EmbeddedError> {
         let mut peripherals = Vec::new();
-        
+
         // Scan for common peripherals at known addresses
         peripherals.extend(self.scan_gpio());
         peripherals.extend(self.scan_uart());
         peripherals.extend(self.scan_spi());
         peripherals.extend(self.scan_i2c());
-        
-        self.devices.store(peripherals.len() as u32, Ordering::SeqCst);
+
+        self.devices
+            .store(peripherals.len() as u32, Ordering::SeqCst);
         Ok(peripherals)
     }
 
     fn scan_gpio(&self) -> Vec<PeripheralType> {
         // Check for GPIO at known addresses
         let mut found = Vec::new();
-        
+
         // Raspberry Pi GPIO at 0x20200000 (legacy) or 0x3F200000 (newer)
         if self.check_address_range(0x20200000) || self.check_address_range(0x3F200000) {
             found.push(PeripheralType::GPIO);
         }
-        
+
         found
     }
 
     fn scan_uart(&self) -> Vec<PeripheralType> {
         let mut found = Vec::new();
-        
+
         // Raspberry Pi UART at 0x20201000
         if self.check_address_range(0x20201000) {
             found.push(PeripheralType::UART);
         }
-        
+
         found
     }
 
     fn scan_spi(&self) -> Vec<PeripheralType> {
         let mut found = Vec::new();
-        
+
         // Raspberry Pi SPI at 0x20204000
         if self.check_address_range(0x20204000) {
             found.push(PeripheralType::SPI);
         }
-        
+
         found
     }
 
     fn scan_i2c(&self) -> Vec<PeripheralType> {
         let mut found = Vec::new();
-        
+
         // Raspberry Pi I2C at 0x20205000
         if self.check_address_range(0x20205000) {
             found.push(PeripheralType::I2C);
         }
-        
+
         found
     }
 
@@ -371,15 +377,18 @@ impl PeripheralManager {
 
     pub fn load_driver(&self, peripheral: PeripheralType) -> Result<(), EmbeddedError> {
         let info = self.get_peripheral_info(peripheral)?;
-        
+
         // In real implementation, this would load the appropriate driver
         // and initialize it with the correct base address and IRQ
-        
+
         self.active_drivers.fetch_add(1, Ordering::SeqCst);
         Ok(())
     }
 
-    fn get_peripheral_info(&self, peripheral: PeripheralType) -> Result<PeripheralInfo, EmbeddedError> {
+    fn get_peripheral_info(
+        &self,
+        peripheral: PeripheralType,
+    ) -> Result<PeripheralInfo, EmbeddedError> {
         match peripheral {
             PeripheralType::GPIO => Ok(PeripheralInfo {
                 peripheral_type: PeripheralType::GPIO,
@@ -447,10 +456,10 @@ impl EmbeddedSubsystem {
     pub fn initialize(&mut self) -> Result<(), EmbeddedError> {
         self.hal.initialize()?;
         let peripherals = self.peripheral_manager.scan_bus()?;
-        
+
         for peripheral in peripherals {
             self.peripheral_manager.load_driver(peripheral)?;
-            
+
             // Initialize GPIO driver if found
             if peripheral == PeripheralType::GPIO {
                 let mut gpio = GpioDriver::new(0x20200000);
@@ -458,7 +467,7 @@ impl EmbeddedSubsystem {
                 self.gpio_driver = Some(gpio);
             }
         }
-        
+
         Ok(())
     }
 
@@ -501,7 +510,7 @@ mod tests {
         assert!(gpio.initialize().is_ok());
         assert_eq!(gpio.peripheral_type(), PeripheralType::GPIO);
         assert_eq!(gpio.pin_count.load(Ordering::SeqCst), 40);
-        
+
         assert!(gpio.set_pin_direction(0, GpioDirection::Output).is_ok());
         assert!(gpio.set_pin_state(0, true).is_ok());
         assert!(gpio.get_pin_state(0).unwrap());
@@ -511,10 +520,10 @@ mod tests {
     fn test_peripheral_manager() {
         let manager = PeripheralManager::new();
         let peripherals = manager.scan_bus().unwrap();
-        
+
         assert!(!peripherals.is_empty());
         assert!(manager.load_driver(PeripheralType::GPIO).is_ok());
-        
+
         let stats = manager.get_stats();
         assert!(stats.0 > 0);
         assert!(stats.1 > 0);
@@ -524,7 +533,7 @@ mod tests {
     fn test_embedded_subsystem() {
         let mut subsystem = EmbeddedSubsystem::new();
         assert!(subsystem.initialize().is_ok());
-        
+
         let (platform, cpu_id, memory) = subsystem.get_hal_info();
         assert_eq!(platform, "Raspberry Pi");
         assert!(cpu_id != 0);
@@ -535,7 +544,7 @@ mod tests {
     fn test_gpio_pin_limits() {
         let mut gpio = GpioDriver::new(0x20200000);
         gpio.initialize().unwrap();
-        
+
         assert!(gpio.set_pin_direction(50, GpioDirection::Output).is_err());
         assert!(gpio.set_pin_state(50, true).is_err());
     }

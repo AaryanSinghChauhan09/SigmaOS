@@ -13,19 +13,18 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
-use std::string::{String, ToString};
 use std::format;
+use std::string::{String, ToString};
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
 /// OOP-based Resource Manager for SigmaOS
 /// Implements resource management using OOP principles with traits and structs
 /// No dependency on external resource frameworks
-
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
-use core::mem;
 
 /// Resource ID
 pub type ResourceID = usize;
@@ -130,7 +129,11 @@ pub struct SimpleResource {
 }
 
 impl SimpleResource {
-    pub fn new(id: ResourceID, resource_type: ResourceType, capability: ResourceCapability) -> Self {
+    pub fn new(
+        id: ResourceID,
+        resource_type: ResourceType,
+        capability: ResourceCapability,
+    ) -> Self {
         SimpleResource {
             id,
             resource_type,
@@ -163,7 +166,8 @@ impl SimpleResource {
     }
 
     pub unsafe fn get_data(&self) -> Option<&[u8]> {
-        self.data.map(|ptr| core::slice::from_raw_parts(ptr.as_ptr(), self.data_size))
+        self.data
+            .map(|ptr| core::slice::from_raw_parts(ptr.as_ptr(), self.data_size))
     }
 
     pub fn increment_ref(&self) {
@@ -239,7 +243,10 @@ impl Drop for SimpleResource {
 /// Resource manager trait (OOP interface)
 pub trait ResourceManager {
     /// Register resource
-    fn register_resource(&mut self, resource: Box<dyn Resource>) -> Result<ResourceID, ResourceError>;
+    fn register_resource(
+        &mut self,
+        resource: Box<dyn Resource>,
+    ) -> Result<ResourceID, ResourceError>;
     /// Unregister resource
     fn unregister_resource(&mut self, id: ResourceID) -> Result<(), ResourceError>;
     /// Acquire resource
@@ -327,7 +334,10 @@ impl SimpleResourceManager {
 }
 
 impl ResourceManager for SimpleResourceManager {
-    fn register_resource(&mut self, resource: Box<dyn Resource>) -> Result<ResourceID, ResourceError> {
+    fn register_resource(
+        &mut self,
+        resource: Box<dyn Resource>,
+    ) -> Result<ResourceID, ResourceError> {
         if !self.capability.can_register {
             return Err(ResourceError::PermissionDenied);
         }
@@ -470,7 +480,11 @@ impl<T> CustomVec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {
@@ -493,7 +507,6 @@ extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
 }
-
 
 impl<T> core::ops::Deref for CustomVec<T> {
     type Target = [T];
@@ -525,7 +538,6 @@ impl<'a, T> IntoIterator for &'a CustomVec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut CustomVec<T> {
     type Item = &'a mut T;

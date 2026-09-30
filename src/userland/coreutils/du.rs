@@ -5,11 +5,19 @@ use std::fs;
 use std::path::Path;
 
 /// Estimate disk usage
-pub fn run(path: &str, _human_readable: bool, all: bool, summarize: bool) -> Result<Vec<(String, u64)>, String> {
+pub fn run(
+    path: &str,
+    _human_readable: bool,
+    all: bool,
+    summarize: bool,
+) -> Result<Vec<(String, u64)>, String> {
     let path_obj = Path::new(path);
 
     if !path_obj.exists() {
-        return Err(format!("du: cannot access '{}': No such file or directory", path));
+        return Err(format!(
+            "du: cannot access '{}': No such file or directory",
+            path
+        ));
     }
 
     let mut results = Vec::new();

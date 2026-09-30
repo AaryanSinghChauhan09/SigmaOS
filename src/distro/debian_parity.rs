@@ -2,8 +2,8 @@
 // Implements Debian packaging system, APT, and Ubuntu-specific features
 
 use crate::klib::Vec;
-use std::string::String;
 use core::cell::Cell;
+use std::string::String;
 
 /// Debian package management with APT parity
 pub struct DebianPackageManager {

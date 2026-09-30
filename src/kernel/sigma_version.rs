@@ -8,9 +8,9 @@
 #![allow(dead_code)]
 
 use std::collections::BTreeMap;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 // ─── Version Constants (Linux-style) ──────────────────────────────────────────
 
@@ -31,8 +31,11 @@ pub const fn sigma_version_code(major: u32, minor: u32, patch: u32) -> u64 {
     ((major as u64) << 32) | ((minor as u64) << 16) | (patch as u64)
 }
 
-pub const SIGMAOS_VERSION_CODE: u64 =
-    sigma_version_code(SIGMAOS_VERSION_MAJOR, SIGMAOS_VERSION_MINOR, SIGMAOS_VERSION_PATCH);
+pub const SIGMAOS_VERSION_CODE: u64 = sigma_version_code(
+    SIGMAOS_VERSION_MAJOR,
+    SIGMAOS_VERSION_MINOR,
+    SIGMAOS_VERSION_PATCH,
+);
 
 // ─── Release Type ─────────────────────────────────────────────────────────────
 
@@ -149,7 +152,10 @@ impl SigmaOsVersion {
 
     /// Check if this is a stable release
     pub fn is_stable(&self) -> bool {
-        matches!(self.release_type, ReleaseType::Stable | ReleaseType::Lts { .. })
+        matches!(
+            self.release_type,
+            ReleaseType::Stable | ReleaseType::Lts { .. }
+        )
     }
 }
 
@@ -201,7 +207,9 @@ impl KernelFeature {
             KernelFeature::IoUring => "io_uring Async I/O",
             KernelFeature::EbpfRuntime => "eBPF VM Runtime",
             KernelFeature::XdpNetworking => "XDP Zero-Copy Networking",
-            KernelFeature::PostQuantumCrypto => "Post-Quantum Cryptography (Kyber-1024/Dilithium-5)",
+            KernelFeature::PostQuantumCrypto => {
+                "Post-Quantum Cryptography (Kyber-1024/Dilithium-5)"
+            }
             KernelFeature::LandlockLsmV5 => "Landlock LSM v5 Filesystem/Network Sandbox",
             KernelFeature::PledgeEnforcement => "OpenBSD pledge() Capability Gates",
             KernelFeature::UnveilEnforcement => "OpenBSD unveil() Filesystem Restriction",
@@ -514,7 +522,10 @@ mod version_tests {
         assert_eq!(ReleaseType::ReleaseCandidate(3).suffix(), "-rc3");
         assert_eq!(ReleaseType::Stable.suffix(), "");
         assert_eq!(
-            ReleaseType::Lts { supported_until: String::from("2030-01") }.suffix(),
+            ReleaseType::Lts {
+                supported_until: String::from("2030-01")
+            }
+            .suffix(),
             "-lts(2030-01)"
         );
     }

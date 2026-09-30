@@ -255,7 +255,8 @@ impl UsbFirmwarePackageDownloader {
             UsbFirmwareBlobSpec {
                 vendor_name: "Intel".to_string(),
                 firmware_filename: "intel/ibt-11-5.sfi".to_string(),
-                download_url: "https://packages.sigmaos.org/firmware/intel/ibt-11-5.sfi".to_string(),
+                download_url: "https://packages.sigmaos.org/firmware/intel/ibt-11-5.sfi"
+                    .to_string(),
                 sha256_checksum: "a1b2c3d4e5f6".to_string(),
             },
         );
@@ -269,7 +270,9 @@ impl UsbFirmwarePackageDownloader {
             },
         );
 
-        Self { registered_firmwares: map }
+        Self {
+            registered_firmwares: map,
+        }
     }
 
     pub fn query_firmware(&self, key: &str) -> Option<&UsbFirmwareBlobSpec> {
@@ -413,9 +416,17 @@ pub struct UniversalGpuDriverPackageDetector;
 impl UniversalGpuDriverPackageDetector {
     pub fn match_gpu_driver_packages(arch: GpuHardwareArch) -> Vec<&'static str> {
         match arch {
-            GpuHardwareArch::NvidiaOpenGsp => vec!["nvidia-open-dkms", "nvidia-utils", "cuda-toolkit"],
-            GpuHardwareArch::AmdRdna4 => vec!["xf86-video-amdgpu", "vulkan-radeon", "rocm-hip-runtime"],
-            GpuHardwareArch::IntelXe2 => vec!["intel-media-driver", "vulkan-intel", "intel-compute-runtime"],
+            GpuHardwareArch::NvidiaOpenGsp => {
+                vec!["nvidia-open-dkms", "nvidia-utils", "cuda-toolkit"]
+            }
+            GpuHardwareArch::AmdRdna4 => {
+                vec!["xf86-video-amdgpu", "vulkan-radeon", "rocm-hip-runtime"]
+            }
+            GpuHardwareArch::IntelXe2 => vec![
+                "intel-media-driver",
+                "vulkan-intel",
+                "intel-compute-runtime",
+            ],
             GpuHardwareArch::ArmMaliPanthor => vec!["mesa-vulkan-panfrost", "mali-firmware"],
             GpuHardwareArch::AppleSiliconAgx => vec!["mesa-vulkan-asahi", "asahi-firmware-loader"],
         }
@@ -439,10 +450,14 @@ pub struct UniversalNetworkFabricDriverDetector;
 impl UniversalNetworkFabricDriverDetector {
     pub fn match_network_driver_packages(hw: NetworkFabricHardware) -> Vec<&'static str> {
         match hw {
-            NetworkFabricHardware::MellanoxConnectX7 => vec!["mlx5-core-dkms", "rdma-core", "infiniband-diags"],
+            NetworkFabricHardware::MellanoxConnectX7 => {
+                vec!["mlx5-core-dkms", "rdma-core", "infiniband-diags"]
+            }
             NetworkFabricHardware::IntelE810 => vec!["ice-driver-dkms", "intel-network-firmware"],
             NetworkFabricHardware::Realtek25G => vec!["r8125-dkms"],
-            NetworkFabricHardware::MediaTekWifi7 => vec!["mt76-firmware", "wireless-regdb", "wpa_supplicant"],
+            NetworkFabricHardware::MediaTekWifi7 => {
+                vec!["mt76-firmware", "wireless-regdb", "wpa_supplicant"]
+            }
         }
     }
 }
@@ -466,7 +481,9 @@ impl UniversalStorageRaidDriverDetector {
         match ctrl {
             StorageRaidController::MicrochipSmartRaid => vec!["smartpqi-dkms", "arcconf"],
             StorageRaidController::MegaRaidTriMode => vec!["megaraid-sas-dkms", "storcli"],
-            StorageRaidController::NvmeZns => vec!["nvme-cli", "libzbd", "zoned-block-device-utils"],
+            StorageRaidController::NvmeZns => {
+                vec!["nvme-cli", "libzbd", "zoned-block-device-utils"]
+            }
             StorageRaidController::Cxl30Memory => vec!["cxl-cli", "ndctl"],
         }
     }
@@ -1045,11 +1062,14 @@ mod tests {
 
     #[test]
     fn test_usb_xhci_driver_detection() {
-        let drivers = UsbXhciDriverPackageDetector::match_usb_driver_package(UsbControllerGen::Usb3Xhci);
+        let drivers =
+            UsbXhciDriverPackageDetector::match_usb_driver_package(UsbControllerGen::Usb3Xhci);
         assert!(drivers.contains(&"xhci-hcd"));
         assert!(drivers.contains(&"uas"));
 
-        let tb_drivers = UsbXhciDriverPackageDetector::match_usb_driver_package(UsbControllerGen::Usb4Thunderbolt4);
+        let tb_drivers = UsbXhciDriverPackageDetector::match_usb_driver_package(
+            UsbControllerGen::Usb4Thunderbolt4,
+        );
         assert!(tb_drivers.contains(&"thunderbolt-net"));
     }
 
@@ -1074,7 +1094,9 @@ mod tests {
 
     #[test]
     fn test_intel_hda_audio_driver_detection() {
-        let drivers = IntelHdaAudioDriverPackageDetector::match_audio_driver_package(AudioCodecVendor::IntelSof);
+        let drivers = IntelHdaAudioDriverPackageDetector::match_audio_driver_package(
+            AudioCodecVendor::IntelSof,
+        );
         assert!(drivers.contains(&"sof-firmware"));
         assert!(drivers.contains(&"pipewire-audio"));
     }
@@ -1082,27 +1104,36 @@ mod tests {
     #[test]
     fn test_intel_hda_firmware_downloader() {
         let downloader = IntelHdaAudioFirmwareDownloader::new();
-        let sof_fw = downloader.query_audio_firmware("intel-sof-alderlake").unwrap();
+        let sof_fw = downloader
+            .query_audio_firmware("intel-sof-alderlake")
+            .unwrap();
         assert_eq!(sof_fw.codec_name, "Intel Alder Lake SOF");
         assert!(sof_fw.firmware_filename.contains("sof-adl.ri"));
     }
 
     #[test]
     fn test_audio_hotplug_trigger() {
-        let pkgs = AudioHotplugPackageTriggerGovernor::resolve_audio_trigger("headphone_jack_plugged");
+        let pkgs =
+            AudioHotplugPackageTriggerGovernor::resolve_audio_trigger("headphone_jack_plugged");
         assert!(pkgs.contains(&"pipewire"));
         assert!(pkgs.contains(&"wireplumber"));
     }
 
     #[test]
     fn test_universal_hardware_driver_detectors() {
-        let nvidia_pkgs = UniversalGpuDriverPackageDetector::match_gpu_driver_packages(GpuHardwareArch::NvidiaOpenGsp);
+        let nvidia_pkgs = UniversalGpuDriverPackageDetector::match_gpu_driver_packages(
+            GpuHardwareArch::NvidiaOpenGsp,
+        );
         assert!(nvidia_pkgs.contains(&"nvidia-open-dkms"));
 
-        let mlx_pkgs = UniversalNetworkFabricDriverDetector::match_network_driver_packages(NetworkFabricHardware::MellanoxConnectX7);
+        let mlx_pkgs = UniversalNetworkFabricDriverDetector::match_network_driver_packages(
+            NetworkFabricHardware::MellanoxConnectX7,
+        );
         assert!(mlx_pkgs.contains(&"mlx5-core-dkms"));
 
-        let raid_pkgs = UniversalStorageRaidDriverDetector::match_storage_driver_packages(StorageRaidController::MicrochipSmartRaid);
+        let raid_pkgs = UniversalStorageRaidDriverDetector::match_storage_driver_packages(
+            StorageRaidController::MicrochipSmartRaid,
+        );
         assert!(raid_pkgs.contains(&"smartpqi-dkms"));
     }
 }

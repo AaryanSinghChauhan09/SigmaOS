@@ -1,10 +1,8 @@
 //! Process Management Functions (systemd/ps Inspiration)
 //! Service manager, process manager, and system control
 
-
-
-use std::vec::Vec;
 use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Service state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -167,7 +165,10 @@ impl ServiceManager {
     }
 
     pub fn get_running_services(&self) -> Vec<&Service> {
-        self.services.iter().filter(|s| s.state == ServiceState::Running).collect()
+        self.services
+            .iter()
+            .filter(|s| s.state == ServiceState::Running)
+            .collect()
     }
 }
 
@@ -277,7 +278,10 @@ impl ProcessManager {
     }
 
     pub fn get_process_tree(&self, pid: u32) -> Vec<&Process> {
-        self.processes.iter().filter(|p| p.parent_pid == Some(pid)).collect()
+        self.processes
+            .iter()
+            .filter(|p| p.parent_pid == Some(pid))
+            .collect()
     }
 
     pub fn get_threads_by_pid(&self, pid: u32) -> Vec<&Thread> {
@@ -285,15 +289,20 @@ impl ProcessManager {
     }
 
     pub fn get_open_files_by_pid(&self, pid: u32) -> Vec<&FileDescriptor> {
-        self.file_descriptors.iter().filter(|f| f.pid == pid).collect()
+        self.file_descriptors
+            .iter()
+            .filter(|f| f.pid == pid)
+            .collect()
     }
 
     pub fn sort_by_cpu(&mut self) {
-        self.processes.sort_by(|a, b| b.cpu_usage.partial_cmp(&a.cpu_usage).unwrap());
+        self.processes
+            .sort_by(|a, b| b.cpu_usage.partial_cmp(&a.cpu_usage).unwrap());
     }
 
     pub fn sort_by_memory(&mut self) {
-        self.processes.sort_by(|a, b| b.memory_usage.cmp(&a.memory_usage));
+        self.processes
+            .sort_by(|a, b| b.memory_usage.cmp(&a.memory_usage));
     }
 }
 

@@ -15,8 +15,8 @@
 
 // (no_std only applicable at crate root - removed)
 
-use std::vec::Vec;
 use std::vec;
+use std::vec::Vec;
 
 /// A high-performance `// #![no_std]  // crate-root only` Linear Algebra and Numeric Solver Engine
 /// Designed to replace GNU Octave, MATLAB, and GROMACS dependencies.
@@ -92,17 +92,24 @@ pub struct MolecularDynamics;
 
 impl MolecularDynamics {
     /// Velocity Verlet integration for n-body simulation
-    pub fn verlet_step(pos: &mut [f64], vel: &mut [f64], acc: &mut [f64], mass: f64, force: f64, dt: f64) {
+    pub fn verlet_step(
+        pos: &mut [f64],
+        vel: &mut [f64],
+        acc: &mut [f64],
+        mass: f64,
+        force: f64,
+        dt: f64,
+    ) {
         for i in 0..pos.len() {
             // Update position
             pos[i] += vel[i] * dt + 0.5 * acc[i] * dt * dt;
-            
+
             // Calculate new acceleration (F = ma)
             let new_acc = force / mass;
-            
+
             // Update velocity
             vel[i] += 0.5 * (acc[i] + new_acc) * dt;
-            
+
             // Store new acceleration
             acc[i] = new_acc;
         }
@@ -139,12 +146,14 @@ mod tests {
     #[test]
     fn test_rk4_integration() {
         // Simple ODE: dy/dt = y
-        fn exp_derivative(_t: f64, y: f64) -> f64 { y }
-        
+        fn exp_derivative(_t: f64, y: f64) -> f64 {
+            y
+        }
+
         let mut y = 1.0;
         let dt = 0.1;
         y = NumericIntegration::rk4_step(exp_derivative, 0.0, y, dt);
-        
+
         // Exact solution is e^0.1 ~ 1.1051709
         assert!((y - 1.10517).abs() < 0.0001);
     }
@@ -154,10 +163,10 @@ mod tests {
         let mut pos = vec![0.0];
         let mut vel = vec![0.0];
         let mut acc = vec![0.0];
-        
+
         // Apply constant force of 10.0 to a 1.0kg mass for 1 second
         MolecularDynamics::verlet_step(&mut pos, &mut vel, &mut acc, 1.0, 10.0, 1.0);
-        
+
         assert_eq!(pos[0], 0.0);
         assert_eq!(acc[0], 10.0);
         assert_eq!(vel[0], 5.0);

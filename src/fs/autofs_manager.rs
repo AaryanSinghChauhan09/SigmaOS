@@ -36,14 +36,14 @@ impl AutoFsTrigger {
 
     pub fn generate_mount_command(&self) -> String {
         let mut cmd = format!("mount -t {} {}", self.fs_type, self.device);
-        
+
         if !self.options.is_empty() {
             cmd.push_str(" -o ");
             cmd.push_str(&self.options.join(","));
         }
-        
+
         cmd.push_str(&format!(" {}", self.mount_point));
-        
+
         cmd
     }
 
@@ -159,7 +159,13 @@ impl AutoFsManager {
         true
     }
 
-    pub fn register_with_timeout(&mut self, mount_point: String, device: String, fs_type: String, timeout: u32) -> bool {
+    pub fn register_with_timeout(
+        &mut self,
+        mount_point: String,
+        device: String,
+        fs_type: String,
+        timeout: u32,
+    ) -> bool {
         let trigger = AutoFsTrigger::new(mount_point, device, fs_type);
         let entry = AutoFsEntry::new(trigger, timeout);
         self.entries.push(entry);
@@ -167,7 +173,11 @@ impl AutoFsManager {
     }
 
     pub fn trigger(&mut self, mount_point: &str) -> Result<String, String> {
-        if let Some(entry) = self.entries.iter_mut().find(|e| e.trigger.mount_point == mount_point) {
+        if let Some(entry) = self
+            .entries
+            .iter_mut()
+            .find(|e| e.trigger.mount_point == mount_point)
+        {
             entry.trigger();
             Ok(String::from("Triggered successfully"))
         } else {
@@ -176,25 +186,43 @@ impl AutoFsManager {
     }
 
     pub fn mount(&mut self, mount_point: &str) -> Result<String, String> {
-        if let Some(entry) = self.entries.iter_mut().find(|e| e.trigger.mount_point == mount_point) {
+        if let Some(entry) = self
+            .entries
+            .iter_mut()
+            .find(|e| e.trigger.mount_point == mount_point)
+        {
             entry.mount();
-            Ok(format!("Mounted: {}", entry.trigger.generate_mount_command()))
+            Ok(format!(
+                "Mounted: {}",
+                entry.trigger.generate_mount_command()
+            ))
         } else {
             Err(String::from("Mount point not found"))
         }
     }
 
     pub fn unmount(&mut self, mount_point: &str) -> Result<String, String> {
-        if let Some(entry) = self.entries.iter_mut().find(|e| e.trigger.mount_point == mount_point) {
+        if let Some(entry) = self
+            .entries
+            .iter_mut()
+            .find(|e| e.trigger.mount_point == mount_point)
+        {
             entry.unmount();
-            Ok(format!("Unmounted: {}", entry.trigger.generate_umount_command()))
+            Ok(format!(
+                "Unmounted: {}",
+                entry.trigger.generate_umount_command()
+            ))
         } else {
             Err(String::from("Mount point not found"))
         }
     }
 
     pub fn set_timeout(&mut self, mount_point: &str, timeout: u32) -> Result<String, String> {
-        if let Some(entry) = self.entries.iter_mut().find(|e| e.trigger.mount_point == mount_point) {
+        if let Some(entry) = self
+            .entries
+            .iter_mut()
+            .find(|e| e.trigger.mount_point == mount_point)
+        {
             entry.idle_timeout_seconds = timeout;
             Ok(String::from("Timeout updated"))
         } else {
@@ -204,33 +232,48 @@ impl AutoFsManager {
 
     pub fn unregister(&mut self, mount_point: &str) -> bool {
         let original_len = self.entries.len();
-        self.entries.retain(|e| e.trigger.mount_point != mount_point);
+        self.entries
+            .retain(|e| e.trigger.mount_point != mount_point);
         original_len > self.entries.len()
     }
 
     pub fn get_entry(&self, mount_point: &str) -> Option<&AutoFsEntry> {
-        self.entries.iter().find(|e| e.trigger.mount_point == mount_point)
+        self.entries
+            .iter()
+            .find(|e| e.trigger.mount_point == mount_point)
     }
 
     pub fn get_entry_mut(&mut self, mount_point: &str) -> Option<&mut AutoFsEntry> {
-        self.entries.iter_mut().find(|e| e.trigger.mount_point == mount_point)
+        self.entries
+            .iter_mut()
+            .find(|e| e.trigger.mount_point == mount_point)
     }
 
     pub fn list_entries(&self) -> Vec<String> {
-        self.entries.iter()
-            .map(|e| format!("{} - {} ({})", e.trigger.mount_point, e.trigger.device, e.state.as_str()))
+        self.entries
+            .iter()
+            .map(|e| {
+                format!(
+                    "{} - {} ({})",
+                    e.trigger.mount_point,
+                    e.trigger.device,
+                    e.state.as_str()
+                )
+            })
             .collect()
     }
 
     pub fn list_mounted(&self) -> Vec<String> {
-        self.entries.iter()
+        self.entries
+            .iter()
             .filter(|e| e.state == AutoFsState::Mounted)
             .map(|e| e.trigger.mount_point.clone())
             .collect()
     }
 
     pub fn list_idle(&self, current_timestamp: u64) -> Vec<String> {
-        self.entries.iter()
+        self.entries
+            .iter()
             .filter(|e| e.should_unmount(current_timestamp))
             .map(|e| e.trigger.mount_point.clone())
             .collect()
@@ -238,14 +281,14 @@ impl AutoFsManager {
 
     pub fn cleanup_idle(&mut self, current_timestamp: u64) -> Vec<String> {
         let mut unmounted = Vec::new();
-        
+
         for entry in self.entries.iter_mut() {
             if entry.should_unmount(current_timestamp) {
                 entry.unmount();
                 unmounted.push(entry.trigger.mount_point.clone());
             }
         }
-        
+
         unmounted
     }
 
@@ -262,11 +305,27 @@ impl AutoFsManager {
     }
 
     pub fn get_stats(&self) -> AutoFsStats {
-        let mounted = self.entries.iter().filter(|e| e.state == AutoFsState::Mounted).count();
-        let idle = self.entries.iter().filter(|e| e.state == AutoFsState::Idle).count();
-        let triggered = self.entries.iter().filter(|e| e.state == AutoFsState::Triggered).count();
-        let failed = self.entries.iter().filter(|e| e.state == AutoFsState::Failed).count();
-        
+        let mounted = self
+            .entries
+            .iter()
+            .filter(|e| e.state == AutoFsState::Mounted)
+            .count();
+        let idle = self
+            .entries
+            .iter()
+            .filter(|e| e.state == AutoFsState::Idle)
+            .count();
+        let triggered = self
+            .entries
+            .iter()
+            .filter(|e| e.state == AutoFsState::Triggered)
+            .count();
+        let failed = self
+            .entries
+            .iter()
+            .filter(|e| e.state == AutoFsState::Failed)
+            .count();
+
         AutoFsStats {
             total_entries: self.entries.len(),
             mounted,
@@ -309,7 +368,7 @@ mod tests {
             String::from("/dev/sda1"),
             String::from("ext4"),
         );
-        
+
         assert_eq!(trigger.mount_point, "/mnt/data");
         assert_eq!(trigger.device, "/dev/sda1");
         assert_eq!(trigger.fs_type, "ext4");
@@ -321,8 +380,9 @@ mod tests {
             String::from("/mnt/data"),
             String::from("/dev/sda1"),
             String::from("ext4"),
-        ).with_option(String::from("noatime"));
-        
+        )
+        .with_option(String::from("noatime"));
+
         assert!(trigger.options.contains(&String::from("noatime")));
     }
 
@@ -333,7 +393,7 @@ mod tests {
             String::from("/dev/sda1"),
             String::from("ext4"),
         );
-        
+
         let cmd = trigger.generate_mount_command();
         assert!(cmd.contains("mount -t ext4 /dev/sda1"));
         assert!(cmd.contains("/mnt/data"));
@@ -346,7 +406,7 @@ mod tests {
             String::from("/dev/sda1"),
             String::from("ext4"),
         );
-        
+
         let cmd = trigger.generate_umount_command();
         assert_eq!(cmd, "umount /mnt/data");
     }
@@ -367,7 +427,7 @@ mod tests {
             String::from("ext4"),
         );
         let entry = AutoFsEntry::new(trigger, 300);
-        
+
         assert_eq!(entry.state, AutoFsState::Idle);
         assert_eq!(entry.idle_timeout_seconds, 300);
     }
@@ -380,13 +440,13 @@ mod tests {
             String::from("ext4"),
         );
         let mut entry = AutoFsEntry::new(trigger, 300);
-        
+
         entry.trigger();
         assert_eq!(entry.state, AutoFsState::Triggered);
-        
+
         entry.mount();
         assert_eq!(entry.state, AutoFsState::Mounted);
-        
+
         entry.unmount();
         assert_eq!(entry.state, AutoFsState::Idle);
     }
@@ -399,13 +459,13 @@ mod tests {
             String::from("ext4"),
         );
         let mut entry = AutoFsEntry::new(trigger, 300);
-        
+
         assert!(entry.is_idle(1000));
-        
+
         entry.mount();
         entry.update_access(1000);
         assert!(!entry.is_idle(1200)); // 200 seconds ago
-        
+
         assert!(entry.is_idle(2000)); // 1000 seconds ago (over 300 timeout)
     }
 
@@ -417,13 +477,13 @@ mod tests {
             String::from("ext4"),
         );
         let mut entry = AutoFsEntry::new(trigger, 300);
-        
+
         assert!(!entry.should_unmount(1000));
-        
+
         entry.mount();
         entry.update_access(1000);
         assert!(!entry.should_unmount(1200));
-        
+
         assert!(entry.should_unmount(2000));
     }
 
@@ -442,7 +502,7 @@ mod tests {
             String::from("/dev/sda1"),
             String::from("ext4"),
         ));
-        
+
         assert_eq!(manager.entries.len(), 1);
     }
 
@@ -455,7 +515,7 @@ mod tests {
             String::from("ext4"),
             600,
         ));
-        
+
         assert_eq!(manager.entries.first().unwrap().idle_timeout_seconds, 600);
     }
 
@@ -467,9 +527,12 @@ mod tests {
             String::from("/dev/sda1"),
             String::from("ext4"),
         );
-        
+
         assert!(manager.trigger("/mnt/data").is_ok());
-        assert_eq!(manager.entries.first().unwrap().state, AutoFsState::Triggered);
+        assert_eq!(
+            manager.entries.first().unwrap().state,
+            AutoFsState::Triggered
+        );
     }
 
     #[test]
@@ -480,7 +543,7 @@ mod tests {
             String::from("/dev/sda1"),
             String::from("ext4"),
         );
-        
+
         assert!(manager.mount("/mnt/data").is_ok());
         assert_eq!(manager.entries.first().unwrap().state, AutoFsState::Mounted);
     }
@@ -494,7 +557,7 @@ mod tests {
             String::from("ext4"),
         );
         manager.mount("/mnt/data");
-        
+
         assert!(manager.unmount("/mnt/data").is_ok());
         assert_eq!(manager.entries.first().unwrap().state, AutoFsState::Idle);
     }
@@ -507,7 +570,7 @@ mod tests {
             String::from("/dev/sda1"),
             String::from("ext4"),
         );
-        
+
         assert!(manager.set_timeout("/mnt/data", 600).is_ok());
         assert_eq!(manager.entries.first().unwrap().idle_timeout_seconds, 600);
     }
@@ -520,7 +583,7 @@ mod tests {
             String::from("/dev/sda1"),
             String::from("ext4"),
         );
-        
+
         assert!(manager.unregister("/mnt/data"));
         assert_eq!(manager.entries.len(), 0);
     }
@@ -533,7 +596,7 @@ mod tests {
             String::from("/dev/sda1"),
             String::from("ext4"),
         );
-        
+
         let entries = manager.list_entries();
         assert_eq!(entries.len(), 1);
         assert!(entries[0].contains("/mnt/data"));
@@ -548,7 +611,7 @@ mod tests {
             String::from("ext4"),
         );
         manager.mount("/mnt/data");
-        
+
         let mounted = manager.list_mounted();
         assert_eq!(mounted.len(), 1);
         assert_eq!(mounted[0], "/mnt/data");
@@ -563,7 +626,7 @@ mod tests {
             String::from("ext4"),
         );
         manager.mount("/mnt/data");
-        
+
         // Simulate idle timeout
         let unmounted = manager.cleanup_idle(10000);
         assert_eq!(unmounted.len(), 1);
@@ -574,10 +637,10 @@ mod tests {
     fn test_autofs_manager_enable_disable() {
         let mut manager = AutoFsManager::new();
         assert!(manager.is_enabled());
-        
+
         manager.disable();
         assert!(!manager.is_enabled());
-        
+
         manager.enable();
         assert!(manager.is_enabled());
     }
@@ -591,7 +654,7 @@ mod tests {
             String::from("ext4"),
         );
         manager.mount("/mnt/data");
-        
+
         let stats = manager.get_stats();
         assert_eq!(stats.total_entries, 1);
         assert_eq!(stats.mounted, 1);
@@ -608,7 +671,7 @@ mod tests {
             failed: 0,
             enabled: true,
         };
-        
+
         let summary = stats.as_summary();
         assert!(summary.contains("5 total"));
         assert!(summary.contains("2 mounted"));
