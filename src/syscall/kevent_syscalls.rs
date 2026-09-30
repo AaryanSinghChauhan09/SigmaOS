@@ -51,9 +51,7 @@ impl KeventSyscall {
         }
 
         // Get events
-        let events = self
-            .manager
-            .kevent_get(fd, nevents.min(MAX_KEVENT_EVENTS))?;
+        let events = self.manager.kevent_get(fd, nevents.min(MAX_KEVENT_EVENTS))?;
         Ok(events)
     }
 

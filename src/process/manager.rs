@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
-use core::fmt;
 /// SigmaOS: Process Manager
 /// Manages process creation, termination, scheduling, and inter-process communication
+
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use core::fmt;
 
 /// Process State
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -169,10 +170,7 @@ impl ProcessManager {
             return Err(ProcessError::TooManyProcesses);
         }
 
-        let parent = self
-            .processes
-            .get(&ppid)
-            .ok_or(ProcessError::ProcessNotFound)?;
+        let parent = self.processes.get(&ppid).ok_or(ProcessError::ProcessNotFound)?;
         let new_pid = self.next_pid;
         self.next_pid += 1;
 

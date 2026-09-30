@@ -2,8 +2,8 @@
 //! /proc filesystem for process information and kernel statistics
 //! Inspired by Linux procfs with SigmaOS-specific enhancements
 
-use std::string::String;
 use std::vec::Vec;
+use std::string::String;
 
 /// Process information available in /proc
 #[derive(Debug, Clone)]
@@ -67,16 +67,14 @@ impl ProcFs {
                 ProcessState::Zombie => 'Z',
                 ProcessState::Dead => 'X',
             };
-            Some(format!(
-                "{} ({}) {} {} {} {} {}",
+            Some(format!("{} ({}) {} {} {} {} {}",
                 pid,
                 process.name,
                 state_char,
                 process.parent_pid,
                 process.uid,
                 process.gid,
-                process.command_line
-            ))
+                process.command_line))
         } else {
             None
         }

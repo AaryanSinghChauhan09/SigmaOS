@@ -297,8 +297,9 @@ impl SerialPort {
         );
 
         // Step 3: Set data format (clears DLAB)
-        let line_ctrl =
-            self.config.data_bits as u8 | self.config.stop_bits as u8 | self.config.parity as u8;
+        let line_ctrl = self.config.data_bits as u8
+            | self.config.stop_bits as u8
+            | self.config.parity as u8;
         io.write_port(self.reg(UartRegister::LineControl), line_ctrl);
 
         // Step 4: Enable FIFO, clear buffers, 14-byte trigger threshold

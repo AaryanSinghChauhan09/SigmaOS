@@ -226,10 +226,7 @@ mod tests {
 
         let phoronix_news = news.get_articles_by_portal("Phoronix");
         assert_eq!(phoronix_news.len(), 1);
-        assert_eq!(
-            phoronix_news[0].article_title,
-            "Linux 6.12 Benchmarks Released"
-        );
+        assert_eq!(phoronix_news[0].article_title, "Linux 6.12 Benchmarks Released");
     }
 
     #[test]

@@ -80,7 +80,15 @@ impl SimulatedCmosIo {
     }
 
     /// Set a specific time for testing
-    pub fn set_time(&mut self, year: u16, month: u8, day: u8, hour: u8, min: u8, sec: u8) {
+    pub fn set_time(
+        &mut self,
+        year: u16,
+        month: u8,
+        day: u8,
+        hour: u8,
+        min: u8,
+        sec: u8,
+    ) {
         let to_bcd = |v: u8| -> u8 { ((v / 10) << 4) | (v % 10) };
         self.registers[cmos_reg::SECONDS as usize] = to_bcd(sec);
         self.registers[cmos_reg::MINUTES as usize] = to_bcd(min);
@@ -131,7 +139,14 @@ pub struct DateTime {
 
 impl DateTime {
     /// Create a new DateTime
-    pub fn new(year: u16, month: u8, day: u8, hours: u8, minutes: u8, seconds: u8) -> Self {
+    pub fn new(
+        year: u16,
+        month: u8,
+        day: u8,
+        hours: u8,
+        minutes: u8,
+        seconds: u8,
+    ) -> Self {
         Self {
             seconds,
             minutes,
@@ -301,20 +316,7 @@ impl DateTime {
         }
 
         let is_leap = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
-        let days_per_month = [
-            31,
-            if is_leap { 29 } else { 28 },
-            31,
-            30,
-            31,
-            30,
-            31,
-            31,
-            30,
-            31,
-            30,
-            31,
-        ];
+        let days_per_month = [31, if is_leap { 29 } else { 28 }, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
         let mut month = 1u8;
         for &m_days in &days_per_month {

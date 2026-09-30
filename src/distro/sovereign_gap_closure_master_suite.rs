@@ -45,10 +45,7 @@ impl SovereignDemandPagingPageFaultEngine {
         self.page_fault_count += 1;
         let page_frame = virt_addr & !0xFFF;
         self.page_table.insert(page_frame, DemandPageStatus::InRam);
-        format!(
-            "Handled Demand Page Fault at {:#X} -> Mapped into RAM (Faults: {})",
-            page_frame, self.page_fault_count
-        )
+        format!("Handled Demand Page Fault at {:#X} -> Mapped into RAM (Faults: {})", page_frame, self.page_fault_count)
     }
 }
 
@@ -90,18 +87,10 @@ impl SovereignUsbHidHotplugEngine {
             },
         ];
 
-        Self {
-            connected_devices: default_devices,
-        }
+        Self { connected_devices: default_devices }
     }
 
-    pub fn trigger_hotplug_event(
-        &mut self,
-        vid: u16,
-        pid: u16,
-        class: &str,
-        connect: bool,
-    ) -> String {
+    pub fn trigger_hotplug_event(&mut self, vid: u16, pid: u16, class: &str, connect: bool) -> String {
         if connect {
             self.connected_devices.push(UsbDeviceEntry {
                 vendor_id: vid,
@@ -109,13 +98,9 @@ impl SovereignUsbHidHotplugEngine {
                 device_class: class.to_string(),
                 is_connected: true,
             });
-            format!(
-                "Hotplug Attach: Device {:#06X}:{:#06X} ({})",
-                vid, pid, class
-            )
+            format!("Hotplug Attach: Device {:#06X}:{:#06X} ({})", vid, pid, class)
         } else {
-            self.connected_devices
-                .retain(|d| !(d.vendor_id == vid && d.product_id == pid));
+            self.connected_devices.retain(|d| !(d.vendor_id == vid && d.product_id == pid));
             format!("Hotplug Detach: Device {:#06X}:{:#06X}", vid, pid)
         }
     }
@@ -165,10 +150,7 @@ impl SovereignTopologyAwareCpuBalancer {
             self.core_load_pct[min_load_idx] += 30;
         }
 
-        format!(
-            "Rebalanced NUMA Core {} -> Core {}",
-            max_load_idx, min_load_idx
-        )
+        format!("Rebalanced NUMA Core {} -> Core {}", max_load_idx, min_load_idx)
     }
 }
 
@@ -194,16 +176,10 @@ impl SovereignSelfHealingFaultToleranceGuard {
     }
 
     pub fn handle_driver_crash(&mut self, driver_name: &str) -> String {
-        let count = self
-            .driver_failures
-            .entry(driver_name.to_string())
-            .or_insert(0);
+        let count = self.driver_failures.entry(driver_name.to_string()).or_insert(0);
         *count += 1;
         self.restarted_drivers.push(driver_name.to_string());
-        format!(
-            "Self-Healing Guard: Restarted crashed driver {} (Attempt {})",
-            driver_name, count
-        )
+        format!("Self-Healing Guard: Restarted crashed driver {} (Attempt {})", driver_name, count)
     }
 }
 
@@ -233,10 +209,7 @@ impl SovereignAdaptiveZenithUiEngine {
     pub fn adapt_ui_layout(&mut self, is_mobile_touch: bool, scale: f32) -> String {
         self.is_touch_mode = is_mobile_touch;
         self.dpi_scaling_factor = scale;
-        format!(
-            "Adapted Zenith UI: Touch={}, Scale={}x",
-            self.is_touch_mode, self.dpi_scaling_factor
-        )
+        format!("Adapted Zenith UI: Touch={}, Scale={}x", self.is_touch_mode, self.dpi_scaling_factor)
     }
 }
 

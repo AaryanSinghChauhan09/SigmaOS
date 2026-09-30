@@ -13,8 +13,8 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
-use std::format;
 use std::string::{String, ToString};
+use std::format;
 
 // Re-export std::vec::Vec for external use
 pub use std::vec::Vec;
@@ -22,23 +22,18 @@ pub use std::vec::Vec;
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
-use core::mem;
 /// OOP-based Low-level Diagnostics Tools for SigmaOS
 /// Based on Ideas-999-Structured: Core System Item 16
 /// Implements hardware health, SMART, thermal, and power telemetry
+
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 pub type SensorID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SensorType {
-    Temperature = 0,
-    Voltage = 1,
-    Current = 2,
-    Power = 3,
-    Fan = 4,
-}
+pub enum SensorType { Temperature = 0, Voltage = 1, Current = 2, Power = 3, Fan = 4 }
 
 impl SensorType {
     /// Safe conversion from usize without unsafe transmute
@@ -56,12 +51,7 @@ impl SensorType {
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum HealthStatus {
-    Healthy = 0,
-    Warning = 1,
-    Critical = 2,
-    Unknown = 3,
-}
+pub enum HealthStatus { Healthy = 0, Warning = 1, Critical = 2, Unknown = 3 }
 
 pub trait Sensor {
     fn id(&self) -> SensorID;
@@ -101,19 +91,13 @@ impl SimpleSensor {
 }
 
 impl Sensor for SimpleSensor {
-    fn id(&self) -> SensorID {
-        self.id
-    }
-    fn sensor_type(&self) -> SensorType {
-        SensorType::from_usize(self.sensor_type.load(Ordering::SeqCst))
-    }
+    fn id(&self) -> SensorID { self.id }
+    fn sensor_type(&self) -> SensorType { SensorType::from_usize(self.sensor_type.load(Ordering::SeqCst)) }
     fn name(&self) -> &[u8] {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-    fn read_value(&self) -> i32 {
-        self.value.load(Ordering::SeqCst) as i32
-    }
+    fn read_value(&self) -> i32 { self.value.load(Ordering::SeqCst) as i32 }
     fn get_unit(&self) -> &[u8] {
         let len = self.unit.iter().position(|&b| b == 0).unwrap_or(16);
         &self.unit[..len]
@@ -147,21 +131,11 @@ impl SimpleThermalMonitor {
     }
 
     pub fn seed_with_defaults(&mut self) {
-        let cpu_temp = SimpleSensor::new(
-            self.next_id.fetch_add(1, Ordering::SeqCst),
-            SensorType::Temperature,
-            b"CPU Core 0",
-            b"C",
-        );
+        let cpu_temp = SimpleSensor::new(self.next_id.fetch_add(1, Ordering::SeqCst), SensorType::Temperature, b"CPU Core 0", b"C");
         cpu_temp.value.store(45, Ordering::SeqCst);
         self.sensors.push(Some(Box::new(cpu_temp)));
 
-        let gpu_temp = SimpleSensor::new(
-            self.next_id.fetch_add(1, Ordering::SeqCst),
-            SensorType::Temperature,
-            b"GPU Core",
-            b"C",
-        );
+        let gpu_temp = SimpleSensor::new(self.next_id.fetch_add(1, Ordering::SeqCst), SensorType::Temperature, b"GPU Core", b"C");
         gpu_temp.value.store(55, Ordering::SeqCst);
         self.sensors.push(Some(Box::new(gpu_temp)));
     }
@@ -191,9 +165,7 @@ impl ThermalMonitor for SimpleThermalMonitor {
             if let Some(ref sensor) = *sensor_option {
                 if sensor.sensor_type() == SensorType::Temperature {
                     let val = sensor.read_value();
-                    if val > max {
-                        max = val;
-                    }
+                    if val > max { max = val; }
                 }
             }
         }
@@ -315,13 +287,7 @@ impl SimplePowerTelemetry {
         for i in 0..name_len {
             name_array[i] = name[i];
         }
-        self.rails.push((
-            name_array,
-            (
-                AtomicUsize::new(voltage as usize),
-                AtomicUsize::new(current as usize),
-            ),
-        ));
+        self.rails.push((name_array, (AtomicUsize::new(voltage as usize), AtomicUsize::new(current as usize))));
     }
 }
 
@@ -352,13 +318,9 @@ impl PowerTelemetry for SimplePowerTelemetry {
 
     fn calculate_efficiency(&self) -> u32 {
         let total_power = self.total_power.load(Ordering::SeqCst) as u32;
-        if total_power == 0 {
-            return 0;
-        }
+        if total_power == 0 { return 0; }
         let input_power = total_power * 110 / 100;
-        if input_power == 0 {
-            return 0;
-        }
+        if input_power == 0 { return 0; }
         (total_power * 100) / input_power
     }
 }
@@ -376,16 +338,8 @@ pub struct SimpleDiagnosticsReport {
 }
 
 impl SimpleDiagnosticsReport {
-    pub fn new(
-        thermal: SimpleThermalMonitor,
-        smart: SimpleSMARTMonitor,
-        power: SimplePowerTelemetry,
-    ) -> Self {
-        SimpleDiagnosticsReport {
-            thermal,
-            smart,
-            power,
-        }
+    pub fn new(thermal: SimpleThermalMonitor, smart: SimpleSMARTMonitor, power: SimplePowerTelemetry) -> Self {
+        SimpleDiagnosticsReport { thermal, smart, power }
     }
 }
 
@@ -394,14 +348,10 @@ impl DiagnosticsReport for SimpleDiagnosticsReport {
         let mut report = CustomVec::new();
 
         let header = b"=== SigmaOS Diagnostics Report ===\n";
-        for &byte in header {
-            report.push(byte);
-        }
+        for &byte in header { report.push(byte); }
 
         let thermal_header = b"\nThermal Status:\n";
-        for &byte in thermal_header {
-            report.push(byte);
-        }
+        for &byte in thermal_header { report.push(byte); }
         let max_temp = self.thermal.get_max_temperature();
         let temp_str = [b'0' + (max_temp / 10) as u8, b'0' + (max_temp % 10) as u8];
         report.push(b' ');
@@ -416,9 +366,7 @@ impl DiagnosticsReport for SimpleDiagnosticsReport {
         report.push(b'\n');
 
         let power_header = b"\nPower Consumption:\n";
-        for &byte in power_header {
-            report.push(byte);
-        }
+        for &byte in power_header { report.push(byte); }
         let power = self.power.get_power_consumption();
         report.push(b' ');
         report.push(b'T');
@@ -446,25 +394,13 @@ impl DiagnosticsReport for SimpleDiagnosticsReport {
     }
 }
 
-struct CustomVec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
+struct CustomVec<T> { data: *mut T, len: usize, capacity: usize }
 
 impl<T> CustomVec<T> {
-    fn new() -> Self {
-        CustomVec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
+    fn new() -> Self { CustomVec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
+            if self.len >= self.capacity { self.grow(); }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -472,29 +408,19 @@ impl<T> CustomVec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
+            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
+            if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+
 
 impl<T> core::ops::Deref for CustomVec<T> {
     type Target = [T];
@@ -526,6 +452,7 @@ impl<'a, T> IntoIterator for &'a CustomVec<T> {
         self.deref().iter()
     }
 }
+
 
 impl<'a, T> IntoIterator for &'a mut CustomVec<T> {
     type Item = &'a mut T;

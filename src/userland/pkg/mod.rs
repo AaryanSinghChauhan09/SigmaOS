@@ -3,10 +3,11 @@
 // Userland package utilities
 // Zero-dependency implementation - no external libraries required
 
+
+use std::vec::Vec;
+use std::string::{String, ToString};
 use std::boxed::Box;
 use std::fmt;
-use std::string::{String, ToString};
-use std::vec::Vec;
 
 /// Error type for the UserPkg module
 #[derive(Debug, Clone, PartialEq, Eq)]

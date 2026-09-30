@@ -1,30 +1,23 @@
 #![cfg_attr(target_os = "none", no_main)]
 
-use core::sync::atomic::{AtomicUsize, Ordering};
 /// OOP-based Cloud Sync for SigmaOS
 /// Based on Ideas-999-Structured: Cloud & Remote Item 936
 /// Implements cloud synchronization
+
+
 use std::boxed::Box;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type SyncID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum SyncStatus {
-    Idle = 0,
-    Syncing = 1,
-    Completed = 2,
-    Error = 3,
-}
+pub enum SyncStatus { Idle = 0, Syncing = 1, Completed = 2, Error = 3 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum SyncError {
-    Success = 0,
-    NotFound = 1,
-    SyncFailed = 2,
-}
+pub enum SyncError { Success = 0, NotFound = 1, SyncFailed = 2 }
 
 pub trait SyncItem {
     fn id(&self) -> SyncID;
@@ -48,16 +41,8 @@ impl SimpleSyncItem {
         let local_len = local_path.len().min(255);
         let remote_len = remote_path.len().min(255);
         unsafe {
-            core::ptr::copy_nonoverlapping(
-                local_path.as_ptr(),
-                local_array.as_mut_ptr(),
-                local_len,
-            );
-            core::ptr::copy_nonoverlapping(
-                remote_path.as_ptr(),
-                remote_array.as_mut_ptr(),
-                remote_len,
-            );
+            core::ptr::copy_nonoverlapping(local_path.as_ptr(), local_array.as_mut_ptr(), local_len);
+            core::ptr::copy_nonoverlapping(remote_path.as_ptr(), remote_array.as_mut_ptr(), remote_len);
         }
         SimpleSyncItem {
             id,
@@ -69,9 +54,7 @@ impl SimpleSyncItem {
 }
 
 impl SyncItem for SimpleSyncItem {
-    fn id(&self) -> SyncID {
-        self.id
-    }
+    fn id(&self) -> SyncID { self.id }
     fn local_path(&self) -> &[u8] {
         let len = self.local_path.iter().position(|&b| b == 0).unwrap_or(256);
         &self.local_path[..len]
@@ -124,8 +107,7 @@ impl SimpleCloudSync {
     }
 
     pub fn set_bandwidth_limit(&mut self, limit_kbps: u32) {
-        self.max_bandwidth_limit_kbps
-            .store(limit_kbps as usize, Ordering::SeqCst);
+        self.max_bandwidth_limit_kbps.store(limit_kbps as usize, Ordering::SeqCst);
     }
 
     pub fn set_retry_limit(&mut self, limit: u32) {
@@ -213,9 +195,7 @@ impl AutoSync for SimpleAutoSync {
         self.enabled.store(0, Ordering::SeqCst);
     }
 
-    fn is_auto_enabled(&self) -> bool {
-        self.enabled.load(Ordering::SeqCst) == 1
-    }
+    fn is_auto_enabled(&self) -> bool { self.enabled.load(Ordering::SeqCst) == 1 }
 }
 
 #[cfg(test_disabled)]

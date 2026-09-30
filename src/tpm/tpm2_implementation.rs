@@ -2,10 +2,10 @@
 // SigmaOS TPM 2.0 Functional Implementation
 // Complete TPM 2.0 command/response handling, PCR management, key operations
 
-use core::sync::atomic::{AtomicU32, Ordering};
+use std::vec::Vec;
 use std::boxed::Box;
 use std::string::String;
-use std::vec::Vec;
+use core::sync::atomic::{AtomicU32, Ordering};
 
 use crate::tpm::{TpmError, TpmResult};
 
@@ -45,14 +45,14 @@ pub const TPM_SU_CLEAR: u16 = 0x0000;
 pub const TPM_SU_STATE: u16 = 0x0001;
 
 // PCR Indices
-pub const TPM_PCR_0: usize = 0; // BIOS/UEFI
-pub const TPM_PCR_1: usize = 1; // Configuration
-pub const TPM_PCR_2: usize = 2; // Option ROM Code
-pub const TPM_PCR_3: usize = 3; // Option ROM Config
-pub const TPM_PCR_4: usize = 4; // Boot Loader
-pub const TPM_PCR_5: usize = 5; // GPT/MBR
-pub const TPM_PCR_6: usize = 6; // Resume
-pub const TPM_PCR_7: usize = 7; // Event Log
+pub const TPM_PCR_0: usize = 0;   // BIOS/UEFI
+pub const TPM_PCR_1: usize = 1;   // Configuration
+pub const TPM_PCR_2: usize = 2;   // Option ROM Code
+pub const TPM_PCR_3: usize = 3;   // Option ROM Config
+pub const TPM_PCR_4: usize = 4;   // Boot Loader
+pub const TPM_PCR_5: usize = 5;   // GPT/MBR
+pub const TPM_PCR_6: usize = 6;   // Resume
+pub const TPM_PCR_7: usize = 7;   // Event Log
 pub const TPM_PCR_COUNT: usize = 24;
 
 // Hash Algorithms

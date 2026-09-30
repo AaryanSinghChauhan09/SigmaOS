@@ -29,9 +29,7 @@ pub struct TranslationCatalog {
 
 impl TranslationCatalog {
     pub fn new() -> Self {
-        Self {
-            messages: HashMap::new(),
-        }
+        Self { messages: HashMap::new() }
     }
     pub fn add_message(&mut self, key: &str, value: &str) {
         self.messages.insert(key.to_string(), value.to_string());
@@ -45,14 +43,8 @@ pub struct InputMethodFramework {
     pub active_engine: String,
 }
 impl InputMethodFramework {
-    pub fn new() -> Self {
-        Self {
-            active_engine: "ibus".to_string(),
-        }
-    }
-    pub fn switch_engine(&mut self, engine: &str) {
-        self.active_engine = engine.to_string();
-    }
+    pub fn new() -> Self { Self { active_engine: "ibus".to_string() } }
+    pub fn switch_engine(&mut self, engine: &str) { self.active_engine = engine.to_string(); }
 }
 
 pub struct DateTimeFormatter {
@@ -78,15 +70,8 @@ pub struct KeyboardLayoutManager {
     pub current_index: usize,
 }
 impl KeyboardLayoutManager {
-    pub fn new() -> Self {
-        Self {
-            layouts: vec!["us".to_string()],
-            current_index: 0,
-        }
-    }
-    pub fn add_layout(&mut self, layout: &str) {
-        self.layouts.push(layout.to_string());
-    }
+    pub fn new() -> Self { Self { layouts: vec!["us".to_string()], current_index: 0 } }
+    pub fn add_layout(&mut self, layout: &str) { self.layouts.push(layout.to_string()); }
     pub fn switch_next(&mut self) {
         if !self.layouts.is_empty() {
             self.current_index = (self.current_index + 1) % self.layouts.len();
@@ -98,9 +83,7 @@ pub struct SpellChecker {
     pub language: String,
 }
 impl SpellChecker {
-    pub fn check(&self, word: &str) -> bool {
-        word != "teh"
-    }
+    pub fn check(&self, word: &str) -> bool { word != "teh" }
 }
 
 pub struct FontFallbackResolver;
@@ -150,9 +133,7 @@ mod tests {
 
     #[test]
     fn test_spell_checker() {
-        let sc = SpellChecker {
-            language: "en".to_string(),
-        };
+        let sc = SpellChecker { language: "en".to_string() };
         assert!(sc.check("the"));
         assert!(!sc.check("teh"));
     }

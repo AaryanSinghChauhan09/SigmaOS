@@ -4,12 +4,12 @@
 // and polymorphic peripheral drivers for embedded platforms
 // Enhanced with real platform detection and hardware access
 
-use std::format;
 use std::string::{String, ToString};
-use std::sync::{Mutex, OnceLock};
 use std::vec::Vec;
+use std::format;
+use std::sync::{Mutex, OnceLock};
 
-use core::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicU32, AtomicBool, AtomicUsize, Ordering};
 
 /// Peripheral device types for embedded systems
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -72,8 +72,7 @@ impl HardwareAbstractionLayer {
 
     pub fn detect_platform(&self) -> PlatformProfile {
         let platform = self.read_board_info();
-        self.platform_profile
-            .store(platform as u32, Ordering::SeqCst);
+        self.platform_profile.store(platform as u32, Ordering::SeqCst);
         platform
     }
 
@@ -166,11 +165,7 @@ impl GpioDriver {
         }
     }
 
-    pub fn set_pin_direction(
-        &mut self,
-        pin: u32,
-        direction: GpioDirection,
-    ) -> Result<(), EmbeddedError> {
+    pub fn set_pin_direction(&mut self, pin: u32, direction: GpioDirection) -> Result<(), EmbeddedError> {
         if pin >= self.pin_count.load(Ordering::SeqCst) {
             return Err(EmbeddedError::InvalidAddress);
         }
@@ -319,8 +314,7 @@ impl PeripheralManager {
         peripherals.extend(self.scan_spi());
         peripherals.extend(self.scan_i2c());
 
-        self.devices
-            .store(peripherals.len() as u32, Ordering::SeqCst);
+        self.devices.store(peripherals.len() as u32, Ordering::SeqCst);
         Ok(peripherals)
     }
 
@@ -385,10 +379,7 @@ impl PeripheralManager {
         Ok(())
     }
 
-    fn get_peripheral_info(
-        &self,
-        peripheral: PeripheralType,
-    ) -> Result<PeripheralInfo, EmbeddedError> {
+    fn get_peripheral_info(&self, peripheral: PeripheralType) -> Result<PeripheralInfo, EmbeddedError> {
         match peripheral {
             PeripheralType::GPIO => Ok(PeripheralInfo {
                 peripheral_type: PeripheralType::GPIO,

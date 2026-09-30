@@ -4,18 +4,22 @@
 #![allow(clippy::new_without_default)]
 
 #[cfg(not(any(feature = "standalone_test", test)))]
+
+
 // SigmaOS Sovereign Landlock Filesystem Sandboxing
 // Implements Linux Landlock v5 + OpenBSD unveil + FreeBSD Capsicum hybrid
 // in 100% safe Rust with no external dependencies.
 //
 // Landlock was mainlined in Linux 5.13 (June 2021). This is a pure-Rust
 // in-kernel reference implementation of the access-control matrix.
+
+
 #[cfg(any(feature = "standalone_test", test))]
-use std::string::{String, ToString};
-#[cfg(not(any(feature = "standalone_test", test)))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::vec::Vec;
 
@@ -25,28 +29,32 @@ use std::vec::Vec;
 pub struct LandlockFsRights(u32);
 
 impl LandlockFsRights {
-    pub const EXECUTE: LandlockFsRights = LandlockFsRights(1 << 0);
-    pub const WRITE_FILE: LandlockFsRights = LandlockFsRights(1 << 1);
-    pub const READ_FILE: LandlockFsRights = LandlockFsRights(1 << 2);
-    pub const READ_DIR: LandlockFsRights = LandlockFsRights(1 << 3);
-    pub const REMOVE_DIR: LandlockFsRights = LandlockFsRights(1 << 4);
-    pub const REMOVE_FILE: LandlockFsRights = LandlockFsRights(1 << 5);
-    pub const MAKE_CHAR: LandlockFsRights = LandlockFsRights(1 << 6);
-    pub const MAKE_DIR: LandlockFsRights = LandlockFsRights(1 << 7);
-    pub const MAKE_REG: LandlockFsRights = LandlockFsRights(1 << 8);
-    pub const MAKE_SOCK: LandlockFsRights = LandlockFsRights(1 << 9);
-    pub const MAKE_FIFO: LandlockFsRights = LandlockFsRights(1 << 10);
-    pub const MAKE_BLOCK: LandlockFsRights = LandlockFsRights(1 << 11);
-    pub const MAKE_SYM: LandlockFsRights = LandlockFsRights(1 << 12);
-    pub const REFER: LandlockFsRights = LandlockFsRights(1 << 13);
-    pub const TRUNCATE: LandlockFsRights = LandlockFsRights(1 << 14);
-    pub const IOCTL_DEV: LandlockFsRights = LandlockFsRights(1 << 15);
+    pub const EXECUTE:         LandlockFsRights = LandlockFsRights(1 << 0);
+    pub const WRITE_FILE:      LandlockFsRights = LandlockFsRights(1 << 1);
+    pub const READ_FILE:       LandlockFsRights = LandlockFsRights(1 << 2);
+    pub const READ_DIR:        LandlockFsRights = LandlockFsRights(1 << 3);
+    pub const REMOVE_DIR:      LandlockFsRights = LandlockFsRights(1 << 4);
+    pub const REMOVE_FILE:     LandlockFsRights = LandlockFsRights(1 << 5);
+    pub const MAKE_CHAR:       LandlockFsRights = LandlockFsRights(1 << 6);
+    pub const MAKE_DIR:        LandlockFsRights = LandlockFsRights(1 << 7);
+    pub const MAKE_REG:        LandlockFsRights = LandlockFsRights(1 << 8);
+    pub const MAKE_SOCK:       LandlockFsRights = LandlockFsRights(1 << 9);
+    pub const MAKE_FIFO:       LandlockFsRights = LandlockFsRights(1 << 10);
+    pub const MAKE_BLOCK:      LandlockFsRights = LandlockFsRights(1 << 11);
+    pub const MAKE_SYM:        LandlockFsRights = LandlockFsRights(1 << 12);
+    pub const REFER:           LandlockFsRights = LandlockFsRights(1 << 13);
+    pub const TRUNCATE:        LandlockFsRights = LandlockFsRights(1 << 14);
+    pub const IOCTL_DEV:       LandlockFsRights = LandlockFsRights(1 << 15);
     // v5 additions
-    pub const BIND_TCP: LandlockFsRights = LandlockFsRights(1 << 16);
-    pub const CONNECT_TCP: LandlockFsRights = LandlockFsRights(1 << 17);
+    pub const BIND_TCP:        LandlockFsRights = LandlockFsRights(1 << 16);
+    pub const CONNECT_TCP:     LandlockFsRights = LandlockFsRights(1 << 17);
 
-    pub const READ_ONLY: LandlockFsRights = LandlockFsRights((1 << 2) | (1 << 3));
-    pub const READ_WRITE: LandlockFsRights = LandlockFsRights((1 << 1) | (1 << 2) | (1 << 3));
+    pub const READ_ONLY: LandlockFsRights = LandlockFsRights(
+        (1 << 2) | (1 << 3)
+    );
+    pub const READ_WRITE: LandlockFsRights = LandlockFsRights(
+        (1 << 1) | (1 << 2) | (1 << 3)
+    );
     pub const NONE: LandlockFsRights = LandlockFsRights(0);
 
     pub fn contains(self, other: LandlockFsRights) -> bool {
@@ -57,9 +65,7 @@ impl LandlockFsRights {
         LandlockFsRights(self.0 | other.0)
     }
 
-    pub fn bits(self) -> u32 {
-        self.0
-    }
+    pub fn bits(self) -> u32 { self.0 }
 }
 
 // ─── Path Rule (mirrors landlock_path_beneath_attr) ──────────────────────────
@@ -83,14 +89,11 @@ impl LandlockPathRule {
     /// Returns true if the given target path falls under this rule's scope.
     pub fn matches(&self, target: &str) -> bool {
         if self.recursive {
-            target == self.path
-                || target.starts_with(&{
-                    let mut p = self.path.clone();
-                    if !p.ends_with('/') {
-                        p.push('/');
-                    }
-                    p
-                })
+            target == self.path || target.starts_with(&{
+                let mut p = self.path.clone();
+                if !p.ends_with('/') { p.push('/'); }
+                p
+            })
         } else {
             target == self.path
         }
@@ -122,13 +125,10 @@ impl UnveilEntry {
                 'w' => permissions.push(UnveilPermission::Write),
                 'x' => permissions.push(UnveilPermission::Execute),
                 'c' => permissions.push(UnveilPermission::Create),
-                _ => {}
+                _   => {}
             }
         }
-        UnveilEntry {
-            path: path.to_string(),
-            permissions,
-        }
+        UnveilEntry { path: path.to_string(), permissions }
     }
 
     pub fn has(&self, perm: &UnveilPermission) -> bool {
@@ -170,18 +170,14 @@ impl SovereignLandlockV5Guard {
 
     /// Add a Landlock path-beneath rule
     pub fn add_rule(&mut self, rule: LandlockPathRule) -> bool {
-        if self.state != SandboxState::Building {
-            return false;
-        }
+        if self.state != SandboxState::Building { return false; }
         self.path_rules.push(rule);
         true
     }
 
     /// Add an OpenBSD-style unveil entry
     pub fn unveil(&mut self, path: &str, perms: &str) -> bool {
-        if self.state != SandboxState::Building {
-            return false;
-        }
+        if self.state != SandboxState::Building { return false; }
         self.unveil_entries.push(UnveilEntry::new(path, perms));
         true
     }
@@ -189,9 +185,7 @@ impl SovereignLandlockV5Guard {
     /// Enforce the sandbox — transitions to Enforced state.
     /// After this, no new rules can be added (matches Landlock behavior).
     pub fn enforce(&mut self, no_new_privs: bool) -> bool {
-        if self.state != SandboxState::Building {
-            return false;
-        }
+        if self.state != SandboxState::Building { return false; }
         self.no_new_privs = no_new_privs;
         self.state = SandboxState::Enforced;
         true
@@ -199,9 +193,7 @@ impl SovereignLandlockV5Guard {
 
     /// Check if a filesystem access is allowed under current sandbox.
     pub fn check_fs_access(&mut self, path: &str, rights: LandlockFsRights) -> bool {
-        if self.state == SandboxState::Building {
-            return true;
-        } // Not yet enforced
+        if self.state == SandboxState::Building { return true; } // Not yet enforced
 
         // Find the most-specific matching rule
         let mut best_match: Option<&LandlockPathRule> = None;
@@ -216,7 +208,7 @@ impl SovereignLandlockV5Guard {
 
         let allowed = match best_match {
             Some(rule) => rule.allowed_access.contains(rights),
-            None => false, // Default-deny if no rule matches
+            None       => false, // Default-deny if no rule matches
         };
 
         if !allowed {
@@ -227,9 +219,7 @@ impl SovereignLandlockV5Guard {
 
     /// Check unveil permissions
     pub fn check_unveil(&self, path: &str, perm: &UnveilPermission) -> bool {
-        if self.state == SandboxState::Building {
-            return true;
-        }
+        if self.state == SandboxState::Building { return true; }
 
         for entry in &self.unveil_entries {
             if path.starts_with(&entry.path) {
@@ -249,11 +239,7 @@ impl SovereignLandlockV5Guard {
         let bits = rights.bits();
         for nibble in (0..8).rev() {
             let n = (bits >> (nibble * 4)) & 0xF;
-            let ch = if n < 10 {
-                b'0' + n as u8
-            } else {
-                b'a' + (n - 10) as u8
-            };
+            let ch = if n < 10 { b'0' + n as u8 } else { b'a' + (n - 10) as u8 };
             msg.push(ch as char);
         }
         if self.violation_log.len() < 256 {
@@ -284,16 +270,16 @@ impl CapsicumRights {
         CapsicumRights(0)
     }
 
-    pub const CAP_READ: CapsicumRights = CapsicumRights(1 << 0);
-    pub const CAP_WRITE: CapsicumRights = CapsicumRights(1 << 1);
-    pub const CAP_SEEK: CapsicumRights = CapsicumRights(1 << 2);
-    pub const CAP_FCNTL: CapsicumRights = CapsicumRights(1 << 3);
-    pub const CAP_FSTAT: CapsicumRights = CapsicumRights(1 << 4);
-    pub const CAP_MMAP: CapsicumRights = CapsicumRights(1 << 5);
-    pub const CAP_FTRUNCATE: CapsicumRights = CapsicumRights(1 << 6);
-    pub const CAP_CONNECT: CapsicumRights = CapsicumRights(1 << 7);
-    pub const CAP_ACCEPT: CapsicumRights = CapsicumRights(1 << 8);
-    pub const NONE: CapsicumRights = CapsicumRights(0);
+    pub const CAP_READ:     CapsicumRights = CapsicumRights(1 << 0);
+    pub const CAP_WRITE:    CapsicumRights = CapsicumRights(1 << 1);
+    pub const CAP_SEEK:     CapsicumRights = CapsicumRights(1 << 2);
+    pub const CAP_FCNTL:    CapsicumRights = CapsicumRights(1 << 3);
+    pub const CAP_FSTAT:    CapsicumRights = CapsicumRights(1 << 4);
+    pub const CAP_MMAP:     CapsicumRights = CapsicumRights(1 << 5);
+    pub const CAP_FTRUNCATE:CapsicumRights = CapsicumRights(1 << 6);
+    pub const CAP_CONNECT:  CapsicumRights = CapsicumRights(1 << 7);
+    pub const CAP_ACCEPT:   CapsicumRights = CapsicumRights(1 << 8);
+    pub const NONE:         CapsicumRights = CapsicumRights(0);
 
     pub fn contains(self, other: CapsicumRights) -> bool {
         (self.0 & other.0) == other.0
@@ -313,11 +299,7 @@ pub struct CapsicumFdDescriptor {
 
 impl CapsicumFdDescriptor {
     pub fn new(fd: u32, rights: CapsicumRights) -> Self {
-        CapsicumFdDescriptor {
-            fd,
-            rights,
-            in_capability_mode: false,
-        }
+        CapsicumFdDescriptor { fd, rights, in_capability_mode: false }
     }
 
     /// Enter capability mode — cap_enter() equivalent
@@ -327,9 +309,7 @@ impl CapsicumFdDescriptor {
 
     /// Check if operation is allowed
     pub fn check(&self, required: CapsicumRights) -> bool {
-        if !self.in_capability_mode {
-            return true;
-        }
+        if !self.in_capability_mode { return true; }
         self.rights.contains(required)
     }
 
@@ -356,16 +336,8 @@ mod tests {
     #[test]
     fn test_landlock_sandbox_enforce_and_check() {
         let mut guard = SovereignLandlockV5Guard::new(5);
-        guard.add_rule(LandlockPathRule::new(
-            "/etc",
-            LandlockFsRights::READ_ONLY,
-            true,
-        ));
-        guard.add_rule(LandlockPathRule::new(
-            "/tmp",
-            LandlockFsRights::READ_WRITE,
-            true,
-        ));
+        guard.add_rule(LandlockPathRule::new("/etc", LandlockFsRights::READ_ONLY, true));
+        guard.add_rule(LandlockPathRule::new("/tmp", LandlockFsRights::READ_WRITE, true));
         guard.enforce(true);
 
         assert!(guard.check_fs_access("/etc/hostname", LandlockFsRights::READ_FILE));
@@ -400,9 +372,9 @@ mod tests {
     fn test_capsicum_capability_mode() {
         let mut fd = CapsicumFdDescriptor::new(
             3,
-            CapsicumRights::CAP_READ.restrict(CapsicumRights(
-                CapsicumRights::CAP_READ.0 | CapsicumRights::CAP_FSTAT.0,
-            )),
+            CapsicumRights::CAP_READ.restrict(
+                CapsicumRights(CapsicumRights::CAP_READ.0 | CapsicumRights::CAP_FSTAT.0)
+            )
         );
         // Before capability mode: all allowed
         assert!(fd.check(CapsicumRights::CAP_WRITE));
@@ -416,16 +388,10 @@ mod tests {
     fn test_rights_restriction_monotonic() {
         let mut fd = CapsicumFdDescriptor::new(
             5,
-            CapsicumRights(
-                CapsicumRights::CAP_READ.0
-                    | CapsicumRights::CAP_WRITE.0
-                    | CapsicumRights::CAP_SEEK.0,
-            ),
+            CapsicumRights(CapsicumRights::CAP_READ.0 | CapsicumRights::CAP_WRITE.0 | CapsicumRights::CAP_SEEK.0)
         );
         fd.enter_capability_mode();
-        fd.limit_rights(CapsicumRights(
-            CapsicumRights::CAP_READ.0 | CapsicumRights::CAP_SEEK.0,
-        ));
+        fd.limit_rights(CapsicumRights(CapsicumRights::CAP_READ.0 | CapsicumRights::CAP_SEEK.0));
         assert!(fd.check(CapsicumRights::CAP_READ));
         assert!(!fd.check(CapsicumRights::CAP_WRITE)); // restricted away
     }

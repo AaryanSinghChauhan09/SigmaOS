@@ -59,12 +59,7 @@ pub struct ModuleParameter {
 }
 
 impl ModuleParameter {
-    pub fn new(
-        name: String,
-        param_type: String,
-        description: String,
-        default_value: String,
-    ) -> Self {
+    pub fn new(name: String, param_type: String, description: String, default_value: String) -> Self {
         ModuleParameter {
             name,
             param_type,
@@ -399,7 +394,7 @@ mod tests {
 
     #[test]
     fn test_kernel_module_manager() {
-        let mut manager = KernelModuleManager::new(String::from("test_module"));
+        let manager = KernelModuleManager::new(String::from("test_module"));
         let code = manager.create_module();
         assert!(code.contains("test_module"));
     }
@@ -426,19 +421,19 @@ mod tests {
 
     #[test]
     fn test_build_types() {
-        let builder_debug =
-            KernelModuleBuilder::new(String::from("test")).with_build_type(BuildType::Debug);
+        let builder_debug = KernelModuleBuilder::new(String::from("test"))
+            .with_build_type(BuildType::Debug);
         assert_eq!(builder_debug.build_type, BuildType::Debug);
 
-        let builder_release =
-            KernelModuleBuilder::new(String::from("test")).with_build_type(BuildType::Release);
+        let builder_release = KernelModuleBuilder::new(String::from("test"))
+            .with_build_type(BuildType::Release);
         assert_eq!(builder_release.build_type, BuildType::Release);
     }
 
     #[test]
     fn test_optimization_levels() {
-        let builder =
-            KernelModuleBuilder::new(String::from("test")).with_optimization(OptimizationLevel::O3);
+        let builder = KernelModuleBuilder::new(String::from("test"))
+            .with_optimization(OptimizationLevel::O3);
         assert_eq!(builder.optimization_level, OptimizationLevel::O3);
     }
 }

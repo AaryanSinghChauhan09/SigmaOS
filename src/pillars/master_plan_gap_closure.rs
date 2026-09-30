@@ -108,8 +108,7 @@ impl CryptographicBootChainEngine {
     }
 
     pub fn measure_stage(&mut self, stage_name: &str, hash_hex: &str) {
-        self.pcr_measurements
-            .push(format!("{}:{}", stage_name, hash_hex));
+        self.pcr_measurements.push(format!("{}:{}", stage_name, hash_hex));
     }
 
     pub fn verify_boot_integrity(&self) -> bool {
@@ -139,8 +138,7 @@ impl ShardsMarketplaceEngine {
     }
 
     pub fn publish_shard(&mut self, manifest: ShardAppManifest) {
-        self.marketplace_shards
-            .insert(manifest.app_id.clone(), manifest);
+        self.marketplace_shards.insert(manifest.app_id.clone(), manifest);
     }
 }
 

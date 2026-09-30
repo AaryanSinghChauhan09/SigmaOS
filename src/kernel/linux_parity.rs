@@ -1,8 +1,8 @@
-use core::sync::atomic::{AtomicU32, AtomicU64, AtomicUsize, Ordering};
 /// Sovereign Linux Kernel Parity Subsystem for SigmaOS
 /// Clean-room implementation of Linux io_uring, memfd_secret, BPF LSM, and Page Folios
 /// Designed for bare-metal zero-dependency performance and zero-trust security
 use std::vec::Vec;
+use core::sync::atomic::{AtomicU32, AtomicU64, AtomicUsize, Ordering};
 
 // ============================================================================
 // 1. Linux io_uring Asynchronous Ring Buffer Engine (KernelIoUringEngine)
@@ -436,11 +436,7 @@ impl LinuxKernelTimerWheel {
     }
 
     pub fn del_timer(&mut self, timer_id: usize) -> bool {
-        if let Some(timer) = self
-            .active_timers
-            .iter_mut()
-            .find(|t| t.timer_id == timer_id)
-        {
+        if let Some(timer) = self.active_timers.iter_mut().find(|t| t.timer_id == timer_id) {
             timer.is_active = false;
             true
         } else {

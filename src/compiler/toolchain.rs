@@ -316,7 +316,10 @@ mod tests {
 
     #[test]
     fn test_full_pipeline() {
-        let result = SigmaToolchain::compile_source("fn main() -> i64 { return 42 }", "test.sg");
+        let result = SigmaToolchain::compile_source(
+            "fn main() -> i64 { return 42 }",
+            "test.sg",
+        );
         assert!(result.success);
         assert!(result.assembly.is_some());
         let asm = result.assembly.unwrap();
@@ -326,15 +329,20 @@ mod tests {
 
     #[test]
     fn test_check_only() {
-        let result =
-            SigmaToolchain::check_source("fn add(a: i32, b: i32) -> i32 { return a }", "test.sg");
+        let result = SigmaToolchain::check_source(
+            "fn add(a: i32, b: i32) -> i32 { return a }",
+            "test.sg",
+        );
         assert!(result.success);
         assert!(result.assembly.is_none());
     }
 
     #[test]
     fn test_lex_error() {
-        let result = SigmaToolchain::compile_source("fn main() { let x = `invalid` }", "test.sg");
+        let result = SigmaToolchain::compile_source(
+            "fn main() { let x = `invalid` }",
+            "test.sg",
+        );
         assert!(!result.success);
         assert_eq!(result.errors[0].phase, CompilePhase::Lexing);
     }

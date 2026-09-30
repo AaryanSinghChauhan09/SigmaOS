@@ -2,7 +2,7 @@
 // Inspired by Linux and BSD interrupt handling with IDT and IRQ management
 
 use std::collections::HashMap;
-use std::sync::atomic::{AtomicU32, AtomicU64, AtomicU8, Ordering};
+use std::sync::atomic::{AtomicU64, AtomicU32, AtomicU8, Ordering};
 
 /// Interrupt vector
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -80,12 +80,7 @@ impl InterruptController {
     }
 
     /// Register an interrupt handler
-    pub fn register_handler(
-        &mut self,
-        vector: InterruptVector,
-        handler: InterruptHandler,
-        data: u64,
-    ) -> Result<(), &'static str> {
+    pub fn register_handler(&mut self, vector: InterruptVector, handler: InterruptHandler, data: u64) -> Result<(), &'static str> {
         let descriptor = InterruptDescriptor {
             vector,
             handler: Some(handler),
@@ -130,11 +125,7 @@ impl InterruptController {
     }
 
     /// Register an IRQ line
-    pub fn register_irq(
-        &mut self,
-        irq: u32,
-        trigger_type: IrqTriggerType,
-    ) -> Result<(), &'static str> {
+    pub fn register_irq(&mut self, irq: u32, trigger_type: IrqTriggerType) -> Result<(), &'static str> {
         if self.irq_lines.contains_key(&irq) {
             return Err("IRQ already registered");
         }
@@ -153,12 +144,7 @@ impl InterruptController {
     }
 
     /// Register IRQ handler
-    pub fn register_irq_handler(
-        &mut self,
-        irq: u32,
-        handler: InterruptHandler,
-        data: u64,
-    ) -> Result<(), &'static str> {
+    pub fn register_irq_handler(&mut self, irq: u32, handler: InterruptHandler, data: u64) -> Result<(), &'static str> {
         if let Some(irq_line) = self.irq_lines.get_mut(&irq) {
             irq_line.handler = Some(handler);
             irq_line.handler_data = data;
@@ -219,13 +205,7 @@ impl InterruptController {
             irq_line.pending = false;
 
             if let Some(handler) = irq_line.handler {
-                handler(
-                    InterruptVector {
-                        number: irq as u8,
-                        type_id: InterruptType::Irq,
-                    },
-                    irq_line.handler_data,
-                );
+                handler(InterruptVector { number: irq as u8, type_id: InterruptType::Irq }, irq_line.handler_data);
             }
 
             Ok(())

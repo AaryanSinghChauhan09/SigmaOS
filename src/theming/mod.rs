@@ -6,6 +6,15 @@
 pub mod theme_engine;
 
 pub use theme_engine::{
-    Animations, Borders, Color, ColorScheme, Shadow, Shadows, Spacing, Theme, ThemeEngine,
-    ThemeError, Typography,
+    Color,
+    Theme,
+    ColorScheme,
+    Typography,
+    Spacing,
+    Borders,
+    Shadows,
+    Shadow,
+    Animations,
+    ThemeEngine,
+    ThemeError,
 };
