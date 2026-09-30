@@ -101,8 +101,8 @@ impl UmemPool {
         if self.total_chunks == 0 {
             return 0;
         }
-        let used = self.total_chunks - self.free_count;
-        (used * 100) / self.total_chunks
+        let used = self.total_chunks.saturating_sub(self.free_count) as u64;
+        ((used * 100) / self.total_chunks as u64) as u32
     }
 }
 
