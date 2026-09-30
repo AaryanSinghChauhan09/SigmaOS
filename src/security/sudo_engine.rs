@@ -2,11 +2,11 @@
 // Zero-dependency Rust #![no_std] / std implementation of privilege delegation & authentication.
 
 #[cfg(not(test))]
+use alloc::format;
+#[cfg(not(test))]
 use alloc::string::{String, ToString};
 #[cfg(not(test))]
 use alloc::vec::Vec;
-#[cfg(not(test))]
-use alloc::format;
 
 #[cfg(test)]
 use std::string::String;
@@ -22,21 +22,24 @@ pub enum SudoAuthResult {
 }
 
 fn is_allowed_environment_key(key: &str) -> bool {
-    if matches!(key, "TERM" | "LANG") {
-        return true;
-    }
-
-    match key.strip_prefix("LC_") {
-        Some(suffix) => {
-            !suffix.is_empty()
-                && suffix.bytes().all(|byte| {
-                    byte.is_ascii_uppercase()
-                        || byte.is_ascii_digit()
-                        || byte == b'_'
-                })
-        }
-        None => false,
-    }
+    matches!(
+        key,
+        "TERM"
+            | "LANG"
+            | "LC_ALL"
+            | "LC_ADDRESS"
+            | "LC_COLLATE"
+            | "LC_CTYPE"
+            | "LC_IDENTIFICATION"
+            | "LC_MEASUREMENT"
+            | "LC_MESSAGES"
+            | "LC_MONETARY"
+            | "LC_NAME"
+            | "LC_NUMERIC"
+            | "LC_PAPER"
+            | "LC_TELEPHONE"
+            | "LC_TIME"
+    )
 }
 
 /// Sudoers & Doas Rule Entry
@@ -81,7 +84,13 @@ impl SovereignSudoEngine {
     }
 
     /// Evaluates if a user is authorized to run a command as a target user
-    pub fn authorize(&self, user: &str, groups: &[&str], target_user: &str, command: &str) -> SudoAuthResult {
+    pub fn authorize(
+        &self,
+        user: &str,
+        groups: &[&str],
+        target_user: &str,
+        command: &str,
+    ) -> SudoAuthResult {
         for rule in &self.rules {
             let entity_match = if rule.entity.starts_with('%') || rule.entity.starts_with(':') {
                 let group_name = &rule.entity[1..];
@@ -162,6 +171,7 @@ mod tests {
             "IFS",
             "NODE_OPTIONS",
             "BASH_ENV",
+            "LC_CUSTOM",
             "LC_BAD-NAME",
         ]);
         assert!(clean_env.contains(&String::from("TERM")));
@@ -175,6 +185,7 @@ mod tests {
         assert!(!clean_env.contains(&String::from("IFS")));
         assert!(!clean_env.contains(&String::from("NODE_OPTIONS")));
         assert!(!clean_env.contains(&String::from("BASH_ENV")));
+        assert!(!clean_env.contains(&String::from("LC_CUSTOM")));
         assert!(!clean_env.contains(&String::from("LC_BAD-NAME")));
     }
 }
