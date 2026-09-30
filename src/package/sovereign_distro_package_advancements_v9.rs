@@ -435,10 +435,8 @@ impl SovereignDistroPackageAdvancementsSuiteV9 {
     ) -> Result<(), String> {
         pkg.properties
             .insert("v9_advancements_processed".to_string(), "true".to_string());
-        pkg.properties.insert(
-            "v9_stateless_architecture".to_string(),
-            "enabled".to_string(),
-        );
+        pkg.properties
+            .insert("v9_stateless_architecture".to_string(), "enabled".to_string());
         Ok(())
     }
 }
