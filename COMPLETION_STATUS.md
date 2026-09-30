@@ -2,7 +2,7 @@
 
 **Snapshot date:** 2026-09-30
 **Remote:** `AaryanSinghChauhan09/SigmaOS`
-**Latest verified code snapshot:** `1e714810b7`
+**Latest verified code snapshot:** `68c98b7de0` (PR #1752 review branch; not yet merged to `main`)
 
 This file records verified work and known limitations. It does not claim that SigmaOS matches Linux or BSD feature parity, is production-ready, or has completed every roadmap idea.
 
@@ -42,6 +42,7 @@ This file records verified work and known limitations. It does not claim that Si
 - Focused fail-closed tests passed for the RNG and simulated audit; the combined security fail-closed filter passed 7 tests.
 - The complete library suite passed after the RNG, sodium, hash, KDF, PQC, and FDE changes: 3,177 passed, 0 failed.
 - The complete library suite passed with the primitive changes: 3,179 passed, 0 failed. `cargo fmt --check` and `git diff --check` also passed.
+- The V9 package module's focused tests passed (4), its standalone suite passed (26), and its full library suite passed (3,183 tests, 0 failed) after merging current `main` into the review branch.
 - The focused fail-closed encryption-service test passed after removing the unnecessary pointer copy.
 - All four `SafeInstaller` unit tests passed after removing the fake password hash.
 - The emergency-gate module is currently not linked into the crate; it was compiled directly with `rustc --test`, and its fail-closed test passed.
