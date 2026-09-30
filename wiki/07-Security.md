@@ -16,6 +16,10 @@ SigmaOS implements multiple layers of security:
 4. Filesystem encryption interfaces; audited providers are not integrated
 5. Network security models, which require runtime and protocol review
 
+`src/security/kali_stack.rs` contains in-process models, not host PAM, sudo, iptables, swap, or kernel dmesg enforcement. Its password-authentication provider is unavailable and sudo must deny elevation; its firewall model uses first-match, default-deny behavior but is not attached to a host packet path. Do not rely on these types as operating-system security controls.
+
+AI agents maintaining this file must preserve fail-closed authentication, protocol length validation, first-match default-deny firewall behavior, synchronized log writes, and atomic swap-capacity accounting. Do not reintroduce credential comparisons as authentication without an audited provider.
+
 ## Pledge/Unveil Sandbox
 
 ### Pledge
