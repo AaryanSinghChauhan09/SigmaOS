@@ -82,8 +82,7 @@ impl ThpManager {
     pub fn free(&mut self, addr: u64) -> Result<(), &'static str> {
         let alloc_id = self.find_allocation_by_addr(addr)?;
 
-        if let Some(mut allocation) = self.allocations.remove(&alloc_id) {
-            allocation.allocated = false;
+        if self.allocations.remove(&alloc_id).is_some() {
             Ok(())
         } else {
             Err("Allocation not found")
@@ -98,7 +97,7 @@ impl ThpManager {
 
         let alloc_id = self.find_allocation_by_addr(addr)?;
 
-        if let Some(allocation) = self.allocations.get_mut(&alloc_id) {
+        if let Some(_allocation) = self.allocations.get_mut(&alloc_id) {
             // Simulated collapse - in real implementation would
             // coalesce adjacent small pages into a huge page
             Ok(())
