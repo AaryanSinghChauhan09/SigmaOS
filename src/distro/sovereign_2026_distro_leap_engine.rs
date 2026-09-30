@@ -461,8 +461,13 @@ impl Sovereign2026DistroSuperiorityMasterEngine {
             score += 10;
         }
 
-        self.openbsd_hardening.lock_unveil(UnveilLockState::ImmutableSealed);
-        if self.openbsd_hardening.attempt_unveil_mutation("/etc").is_err() {
+        self.openbsd_hardening
+            .lock_unveil(UnveilLockState::ImmutableSealed);
+        if self
+            .openbsd_hardening
+            .attempt_unveil_mutation("/etc")
+            .is_err()
+        {
             score += 10;
         }
 
@@ -472,7 +477,10 @@ impl Sovereign2026DistroSuperiorityMasterEngine {
         }
 
         let sig = b"DILITHIUM5_PQC_SIGNATURE_PAYLOAD";
-        if self.pqc_verifier.verify_apk_v3_pqc_signature("sigmaos-base", sig) {
+        if self
+            .pqc_verifier
+            .verify_apk_v3_pqc_signature("sigmaos-base", sig)
+        {
             score += 10;
         }
 
@@ -498,7 +506,12 @@ mod tests {
     fn test_sched_ext_bore_v2_governor() {
         let mut gov = SovereignSchedExtBoreV2Governor::new();
         gov.register_task(10, "gui_shell", WorkloadLatencyClass::InteractiveGui, 2000);
-        gov.register_task(11, "audio_server", WorkloadLatencyClass::RealtimeAudioVideo, 1000);
+        gov.register_task(
+            11,
+            "audio_server",
+            WorkloadLatencyClass::RealtimeAudioVideo,
+            1000,
+        );
 
         let active = gov.dispatch_next_task().unwrap();
         assert_eq!(active, 11); // Realtime audio video task dispatched first
@@ -545,9 +558,8 @@ mod tests {
 
     #[test]
     fn test_cachyos_microarch_v4_pqc_verifier() {
-        let mut verifier = SovereignCachyosMicroarchV4PqcVerifier::new(
-            MicroarchIsaTarget::X86_64V4Avx512,
-        );
+        let mut verifier =
+            SovereignCachyosMicroarchV4PqcVerifier::new(MicroarchIsaTarget::X86_64V4Avx512);
         let sig = b"DILITHIUM5_SIG_TEST_BYTES";
         assert!(verifier.verify_apk_v3_pqc_signature("kernel-core", sig));
         assert_eq!(verifier.verified_apk_pqc_signatures, 1);

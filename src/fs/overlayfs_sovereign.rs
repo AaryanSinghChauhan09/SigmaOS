@@ -4,8 +4,6 @@
 #![allow(clippy::new_without_default)]
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-
-
 // SigmaOS Sovereign OverlayFS
 // Implements Linux overlayfs (overlay2) union filesystem in 100% safe Rust.
 //
@@ -16,14 +14,12 @@
 //   - upper: read-write writable layer
 //   - work:  internal scratch directory (opaque whiteouts)
 //   - merged: unified view
-
-
 #[cfg(any(feature = "standalone_test", test))]
+use std::string::{String, ToString};
+#[cfg(not(any(feature = "standalone_test", test)))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::vec::Vec;
 
@@ -34,18 +30,18 @@ pub enum OverlayEntryKind {
     Regular,
     Directory,
     Symlink,
-    Whiteout,   // deletion marker — hides file from lower layer
-    Opaque,     // directory was deleted and re-created in upper
+    Whiteout, // deletion marker — hides file from lower layer
+    Opaque,   // directory was deleted and re-created in upper
 }
 
 #[derive(Debug, Clone)]
 pub struct OverlayEntry {
     pub path: String,
     pub kind: OverlayEntryKind,
-    pub content: Vec<u8>,    // file content (simplified, not chunked)
+    pub content: Vec<u8>, // file content (simplified, not chunked)
     pub symlink_target: Option<String>,
     pub size: u64,
-    pub modified: bool,       // true if in upper layer
+    pub modified: bool, // true if in upper layer
 }
 
 impl OverlayEntry {
@@ -105,11 +101,21 @@ pub struct OverlayLayer {
 
 impl OverlayLayer {
     pub fn new_lower(id: &str) -> Self {
-        OverlayLayer { id: id.to_string(), entries: Vec::new(), writable: false, size_bytes: 0 }
+        OverlayLayer {
+            id: id.to_string(),
+            entries: Vec::new(),
+            writable: false,
+            size_bytes: 0,
+        }
     }
 
     pub fn new_upper(id: &str) -> Self {
-        OverlayLayer { id: id.to_string(), entries: Vec::new(), writable: true, size_bytes: 0 }
+        OverlayLayer {
+            id: id.to_string(),
+            entries: Vec::new(),
+            writable: true,
+            size_bytes: 0,
+        }
     }
 
     pub fn add_entry(&mut self, entry: OverlayEntry) {
@@ -133,9 +139,9 @@ impl OverlayLayer {
 // ─── Sovereign OverlayFS ──────────────────────────────────────────────────────
 
 pub struct SovereignOverlayFs {
-    pub lower_layers: Vec<OverlayLayer>,  // ordered: [topmost, ..., bottommost]
+    pub lower_layers: Vec<OverlayLayer>, // ordered: [topmost, ..., bottommost]
     pub upper_layer: OverlayLayer,
-    pub copy_up_count: u64,   // number of copy-up operations performed
+    pub copy_up_count: u64, // number of copy-up operations performed
     pub write_count: u64,
     pub lookup_count: u64,
 }
@@ -186,9 +192,7 @@ impl SovereignOverlayFs {
 
         // If file exists in lower but not upper, copy-up first
         if !self.upper_layer.contains(path) {
-            let lower_entry = self.lower_layers.iter()
-                .find_map(|l| l.get(path))
-                .cloned();
+            let lower_entry = self.lower_layers.iter().find_map(|l| l.get(path)).cloned();
 
             if let Some(mut entry) = lower_entry {
                 // Copy-up: clone entry to upper layer
@@ -260,7 +264,11 @@ impl SovereignOverlayFs {
     }
 
     pub fn upper_diff_count(&self) -> usize {
-        self.upper_layer.entries.iter().filter(|e| e.modified).count()
+        self.upper_layer
+            .entries
+            .iter()
+            .filter(|e| e.modified)
+            .count()
     }
 }
 
@@ -302,8 +310,12 @@ mod tests {
         let mut overlay = setup_overlay();
         overlay.delete("/etc/passwd");
         assert!(overlay.lookup("/etc/passwd").is_none()); // Whiteout hides it
-        // Whiteout present in upper
-        assert!(overlay.upper_layer.entries.iter().any(|e| e.path == "/etc/passwd" && e.kind == OverlayEntryKind::Whiteout));
+                                                          // Whiteout present in upper
+        assert!(overlay
+            .upper_layer
+            .entries
+            .iter()
+            .any(|e| e.path == "/etc/passwd" && e.kind == OverlayEntryKind::Whiteout));
     }
 
     #[test]
@@ -319,7 +331,7 @@ mod tests {
     fn test_overlay_merged_listing() {
         let mut overlay = setup_overlay();
         overlay.write("/etc/sigma.conf", b"sigma=1"); // new in upper
-        overlay.delete("/etc/passwd");               // whiteout
+        overlay.delete("/etc/passwd"); // whiteout
         let merged = overlay.list_merged();
         assert!(merged.contains(&"/etc/hosts".to_string()));
         assert!(merged.contains(&"/etc/sigma.conf".to_string()));

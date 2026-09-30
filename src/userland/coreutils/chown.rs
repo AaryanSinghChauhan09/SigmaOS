@@ -5,11 +5,19 @@ use std::fs;
 use std::path::Path;
 
 /// Change file owner and group
-pub fn run(path: &str, owner: Option<&str>, group: Option<&str>, recursive: bool) -> Result<(), String> {
+pub fn run(
+    path: &str,
+    owner: Option<&str>,
+    group: Option<&str>,
+    recursive: bool,
+) -> Result<(), String> {
     let path_obj = Path::new(path);
 
     if !path_obj.exists() {
-        return Err(format!("chown: cannot access '{}': No such file or directory", path));
+        return Err(format!(
+            "chown: cannot access '{}': No such file or directory",
+            path
+        ));
     }
 
     // Note: Real chown requires root privileges and syscall to change ownership
@@ -36,7 +44,11 @@ fn change_ownership(path: &Path, owner: Option<&str>, group: Option<&str>) -> Re
 }
 
 /// Change ownership recursively
-fn change_ownership_recursive(path: &Path, owner: Option<&str>, group: Option<&str>) -> Result<(), String> {
+fn change_ownership_recursive(
+    path: &Path,
+    owner: Option<&str>,
+    group: Option<&str>,
+) -> Result<(), String> {
     change_ownership(path, owner, group)?;
 
     for entry in fs::read_dir(path).map_err(|e| format!("chown: {}", e))? {

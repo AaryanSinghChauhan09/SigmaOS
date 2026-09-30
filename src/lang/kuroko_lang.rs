@@ -25,14 +25,13 @@
 //! - Async/await support for OS operations
 use std::format;
 
-
-use std::vec::Vec;
-use std::boxed::Box;
-use std::string::{String, ToString};
-use std::collections::BTreeMap;
-use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 use core::ptr::NonNull;
+use core::sync::atomic::{AtomicUsize, Ordering};
+use std::boxed::Box;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Kuroko-style value types (dynamic typing)
 #[repr(C)]
@@ -118,13 +117,13 @@ pub enum Opcode {
     LoadInteger,
     LoadFloat,
     LoadString,
-    
+
     // Stack operations
     Pop,
     Dup,
     Swap,
     Rotate,
-    
+
     // Variables
     LoadLocal,
     StoreLocal,
@@ -132,7 +131,7 @@ pub enum Opcode {
     StoreGlobal,
     LoadAttr,
     StoreAttr,
-    
+
     // Control flow
     Jump,
     JumpIfFalse,
@@ -141,7 +140,7 @@ pub enum Opcode {
     Loop,
     Call,
     Return,
-    
+
     // Operations
     Add,
     Subtract,
@@ -149,7 +148,7 @@ pub enum Opcode {
     Divide,
     Modulo,
     Power,
-    
+
     // Comparison
     Equal,
     NotEqual,
@@ -157,23 +156,23 @@ pub enum Opcode {
     LessEqual,
     Greater,
     GreaterEqual,
-    
+
     // Logical
     And,
     Or,
     Not,
-    
+
     // Collections
     BuildList,
     BuildDict,
     GetIndex,
     SetIndex,
-    
+
     // OS integration
     Syscall,
     AsyncCall,
     Await,
-    
+
     // Meta
     Print,
     Input,
@@ -254,7 +253,7 @@ pub enum TokenType {
     Integer,
     Float,
     String,
-    
+
     // Identifiers and keywords
     Identifier,
     Def,
@@ -273,7 +272,7 @@ pub enum TokenType {
     False,
     Async,
     Await,
-    
+
     // Operators
     Plus,
     Minus,
@@ -290,7 +289,7 @@ pub enum TokenType {
     Assign,
     PlusAssign,
     MinusAssign,
-    
+
     // Delimiters
     LeftParen,
     RightParen,
@@ -301,7 +300,7 @@ pub enum TokenType {
     Comma,
     Colon,
     Dot,
-    
+
     // Special
     Newline,
     EOF,
@@ -348,21 +347,21 @@ impl KurokoCompiler {
     pub fn compile(&mut self, source: &str) -> Result<CodeObject, KurokoError> {
         // Tokenize
         self.tokens = self.tokenize(source)?;
-        
+
         // Create main module code object
         let main_code = CodeObject::new("__main__");
         self.code_objects.push(main_code);
         self.current_code = 0;
-        
+
         // Parse and compile
         while !self.is_at_end() {
             self.compile_declaration()?;
         }
-        
+
         // Emit return nil at end
         self.emit_opcode(Opcode::LoadNil, 0);
         self.emit_opcode(Opcode::Return, 0);
-        
+
         Ok(self.code_objects[0].clone())
     }
 
@@ -370,29 +369,73 @@ impl KurokoCompiler {
         let mut tokens = Vec::new();
         let mut chars = source.chars().peekable();
         let mut line = 1;
-        
+
         while let Some(&ch) = chars.peek() {
             match ch {
-                ' ' | '\t' | '\r' => { chars.next(); }
-                '\n' => { 
+                ' ' | '\t' | '\r' => {
+                    chars.next();
+                }
+                '\n' => {
                     tokens.push(Token::new(TokenType::Newline, "\n", line));
                     line += 1;
-                    chars.next(); 
+                    chars.next();
                 }
-                '(' => { tokens.push(Token::new(TokenType::LeftParen, "(", line)); chars.next(); }
-                ')' => { tokens.push(Token::new(TokenType::RightParen, ")", line)); chars.next(); }
-                '[' => { tokens.push(Token::new(TokenType::LeftBracket, "[", line)); chars.next(); }
-                ']' => { tokens.push(Token::new(TokenType::RightBracket, "]", line)); chars.next(); }
-                '{' => { tokens.push(Token::new(TokenType::LeftBrace, "{", line)); chars.next(); }
-                '}' => { tokens.push(Token::new(TokenType::RightBrace, "}", line)); chars.next(); }
-                ',' => { tokens.push(Token::new(TokenType::Comma, ",", line)); chars.next(); }
-                ':' => { tokens.push(Token::new(TokenType::Colon, ":", line)); chars.next(); }
-                '.' => { tokens.push(Token::new(TokenType::Dot, ".", line)); chars.next(); }
-                '+' => { tokens.push(Token::new(TokenType::Plus, "+", line)); chars.next(); }
-                '-' => { tokens.push(Token::new(TokenType::Minus, "-", line)); chars.next(); }
-                '*' => { tokens.push(Token::new(TokenType::Multiply, "*", line)); chars.next(); }
-                '/' => { tokens.push(Token::new(TokenType::Divide, "/", line)); chars.next(); }
-                '%' => { tokens.push(Token::new(TokenType::Modulo, "%", line)); chars.next(); }
+                '(' => {
+                    tokens.push(Token::new(TokenType::LeftParen, "(", line));
+                    chars.next();
+                }
+                ')' => {
+                    tokens.push(Token::new(TokenType::RightParen, ")", line));
+                    chars.next();
+                }
+                '[' => {
+                    tokens.push(Token::new(TokenType::LeftBracket, "[", line));
+                    chars.next();
+                }
+                ']' => {
+                    tokens.push(Token::new(TokenType::RightBracket, "]", line));
+                    chars.next();
+                }
+                '{' => {
+                    tokens.push(Token::new(TokenType::LeftBrace, "{", line));
+                    chars.next();
+                }
+                '}' => {
+                    tokens.push(Token::new(TokenType::RightBrace, "}", line));
+                    chars.next();
+                }
+                ',' => {
+                    tokens.push(Token::new(TokenType::Comma, ",", line));
+                    chars.next();
+                }
+                ':' => {
+                    tokens.push(Token::new(TokenType::Colon, ":", line));
+                    chars.next();
+                }
+                '.' => {
+                    tokens.push(Token::new(TokenType::Dot, ".", line));
+                    chars.next();
+                }
+                '+' => {
+                    tokens.push(Token::new(TokenType::Plus, "+", line));
+                    chars.next();
+                }
+                '-' => {
+                    tokens.push(Token::new(TokenType::Minus, "-", line));
+                    chars.next();
+                }
+                '*' => {
+                    tokens.push(Token::new(TokenType::Multiply, "*", line));
+                    chars.next();
+                }
+                '/' => {
+                    tokens.push(Token::new(TokenType::Divide, "/", line));
+                    chars.next();
+                }
+                '%' => {
+                    tokens.push(Token::new(TokenType::Modulo, "%", line));
+                    chars.next();
+                }
                 '=' => {
                     chars.next();
                     if chars.peek() == Some(&'=') {
@@ -447,7 +490,9 @@ impl KurokoCompiler {
                     let mut is_float = false;
                     while let Some(&ch) = chars.peek() {
                         if ch.is_digit(10) || ch == '.' {
-                            if ch == '.' { is_float = true; }
+                            if ch == '.' {
+                                is_float = true;
+                            }
                             number.push(ch);
                             chars.next();
                         } else {
@@ -470,7 +515,7 @@ impl KurokoCompiler {
                             break;
                         }
                     }
-                    
+
                     let token_type = match identifier.as_str() {
                         "nil" => TokenType::Nil,
                         "true" => TokenType::True,
@@ -491,7 +536,7 @@ impl KurokoCompiler {
                         "await" => TokenType::Await,
                         _ => TokenType::Identifier,
                     };
-                    
+
                     tokens.push(Token::new(token_type, &identifier, line));
                 }
                 _ => {
@@ -499,14 +544,13 @@ impl KurokoCompiler {
                 }
             }
         }
-        
+
         tokens.push(Token::new(TokenType::EOF, "", line));
         Ok(tokens)
     }
 
     fn is_at_end(&self) -> bool {
-        self.current >= self.tokens.len() || 
-        self.tokens[self.current].token_type == TokenType::EOF
+        self.current >= self.tokens.len() || self.tokens[self.current].token_type == TokenType::EOF
     }
 
     fn advance(&mut self) -> &Token {
@@ -525,7 +569,9 @@ impl KurokoCompiler {
     }
 
     fn check(&self, token_type: TokenType) -> bool {
-        if self.is_at_end() { return false; }
+        if self.is_at_end() {
+            return false;
+        }
         self.peek().token_type == token_type
     }
 
@@ -573,43 +619,49 @@ impl KurokoCompiler {
                 let param = self.consume(TokenType::Identifier, "Expect parameter name")?;
                 parameters.push(param.lexeme.clone());
 
-                if !self.match_token(TokenType::Comma) { break; }
+                if !self.match_token(TokenType::Comma) {
+                    break;
+                }
             }
         }
 
         self.consume(TokenType::RightParen, "Expect ')' after parameters")?;
-        self.consume(TokenType::Newline, "Expect newline after function definition")?;
+        self.consume(
+            TokenType::Newline,
+            "Expect newline after function definition",
+        )?;
 
         // Create new code object for function
         let mut func_code = CodeObject::new(&name_lexeme);
         func_code.parameters = parameters;
         let func_index = self.code_objects.len();
         self.code_objects.push(func_code);
-        
+
         // Save current code and switch to function
         let saved_code = self.current_code;
         self.current_code = func_index;
-        
+
         // Compile function body
-        while !self.check(TokenType::EOF) && 
-              !self.check(TokenType::Def) && 
-              self.previous().token_type != TokenType::Newline {
+        while !self.check(TokenType::EOF)
+            && !self.check(TokenType::Def)
+            && self.previous().token_type != TokenType::Newline
+        {
             self.compile_statement()?;
         }
-        
+
         // Emit return
         self.emit_opcode(Opcode::LoadNil, 0);
         self.emit_opcode(Opcode::Return, 0);
-        
+
         // Restore current code
         self.current_code = saved_code;
-        
+
         // Emit function constant and store
         let func_value = KurokoValue::Function(func_index);
         let const_index = self.add_constant(func_value);
         self.emit_opcode(Opcode::LoadInteger, const_index as i64);
         self.emit_opcode(Opcode::StoreGlobal, 0); // Store in global scope
-        
+
         Ok(())
     }
 
@@ -638,23 +690,23 @@ impl KurokoCompiler {
         self.compile_expression()?;
         self.consume(TokenType::RightParen, "Expect ')' after condition")?;
         self.consume(TokenType::Newline, "Expect newline after if")?;
-        
+
         // Emit jump if false
         let jump_index = self.current_bytecode_len();
         self.emit_opcode(Opcode::JumpIfFalse, 0);
-        
+
         // Compile then branch
         while !self.check(TokenType::Else) && !self.check(TokenType::EOF) {
             self.compile_statement()?;
         }
-        
+
         // Emit jump over else branch
         let else_jump = self.current_bytecode_len();
         self.emit_opcode(Opcode::Jump, 0);
-        
+
         // Patch jump if false
         self.patch_jump(jump_index);
-        
+
         // Compile else branch if present
         if self.match_token(TokenType::Else) {
             self.consume(TokenType::Newline, "Expect newline after else")?;
@@ -662,39 +714,39 @@ impl KurokoCompiler {
                 self.compile_statement()?;
             }
         }
-        
+
         // Patch else jump
         self.patch_jump(else_jump);
-        
+
         Ok(())
     }
 
     fn compile_while(&mut self) -> Result<(), KurokoError> {
         let loop_start = self.current_bytecode_len();
         self.loop_depth += 1;
-        
+
         self.consume(TokenType::LeftParen, "Expect '(' after 'while'")?;
         self.compile_expression()?;
         self.consume(TokenType::RightParen, "Expect ')' after condition")?;
         self.consume(TokenType::Newline, "Expect newline after while")?;
-        
+
         // Emit jump if false
         let jump_index = self.current_bytecode_len();
         self.emit_opcode(Opcode::JumpIfFalse, 0);
-        
+
         // Compile loop body
         while !self.check(TokenType::EOF) && !self.check(TokenType::Break) {
             self.compile_statement()?;
         }
-        
+
         // Emit loop back
         self.emit_opcode(Opcode::Jump, loop_start as i64);
-        
+
         // Patch jump if false
         self.patch_jump(jump_index);
-        
+
         self.loop_depth -= 1;
-        
+
         Ok(())
     }
 
@@ -753,7 +805,7 @@ impl KurokoCompiler {
         while self.match_token(TokenType::Equal) || self.match_token(TokenType::NotEqual) {
             let operator = self.previous().token_type;
             self.compile_comparison()?;
-            
+
             match operator {
                 TokenType::Equal => self.emit_opcode(Opcode::Equal, 0),
                 TokenType::NotEqual => self.emit_opcode(Opcode::NotEqual, 0),
@@ -765,11 +817,14 @@ impl KurokoCompiler {
 
     fn compile_comparison(&mut self) -> Result<(), KurokoError> {
         self.compile_term()?;
-        while self.match_token(TokenType::Less) || self.match_token(TokenType::LessEqual) ||
-              self.match_token(TokenType::Greater) || self.match_token(TokenType::GreaterEqual) {
+        while self.match_token(TokenType::Less)
+            || self.match_token(TokenType::LessEqual)
+            || self.match_token(TokenType::Greater)
+            || self.match_token(TokenType::GreaterEqual)
+        {
             let operator = self.previous().token_type;
             self.compile_term()?;
-            
+
             match operator {
                 TokenType::Less => self.emit_opcode(Opcode::Less, 0),
                 TokenType::LessEqual => self.emit_opcode(Opcode::LessEqual, 0),
@@ -786,7 +841,7 @@ impl KurokoCompiler {
         while self.match_token(TokenType::Plus) || self.match_token(TokenType::Minus) {
             let operator = self.previous().token_type;
             self.compile_factor()?;
-            
+
             match operator {
                 TokenType::Plus => self.emit_opcode(Opcode::Add, 0),
                 TokenType::Minus => self.emit_opcode(Opcode::Subtract, 0),
@@ -798,11 +853,13 @@ impl KurokoCompiler {
 
     fn compile_factor(&mut self) -> Result<(), KurokoError> {
         self.compile_unary()?;
-        while self.match_token(TokenType::Multiply) || self.match_token(TokenType::Divide) || 
-              self.match_token(TokenType::Modulo) {
+        while self.match_token(TokenType::Multiply)
+            || self.match_token(TokenType::Divide)
+            || self.match_token(TokenType::Modulo)
+        {
             let operator = self.previous().token_type;
             self.compile_unary()?;
-            
+
             match operator {
                 TokenType::Multiply => self.emit_opcode(Opcode::Multiply, 0),
                 TokenType::Divide => self.emit_opcode(Opcode::Divide, 0),
@@ -819,8 +876,14 @@ impl KurokoCompiler {
             self.compile_unary()?;
 
             match operator {
-                TokenType::Minus => { self.emit_opcode(Opcode::Subtract, 0); Ok(()) }, // Negate
-                TokenType::Not => { self.emit_opcode(Opcode::Not, 0); Ok(()) },
+                TokenType::Minus => {
+                    self.emit_opcode(Opcode::Subtract, 0);
+                    Ok(())
+                } // Negate
+                TokenType::Not => {
+                    self.emit_opcode(Opcode::Not, 0);
+                    Ok(())
+                }
                 _ => Ok(()),
             }
         } else {
@@ -857,7 +920,7 @@ impl KurokoCompiler {
         } else {
             return Err(KurokoError::SyntaxError);
         }
-        
+
         self.compile_call()
     }
 
@@ -868,7 +931,9 @@ impl KurokoCompiler {
                 loop {
                     self.compile_expression()?;
                     arg_count += 1;
-                    if !self.match_token(TokenType::Comma) { break; }
+                    if !self.match_token(TokenType::Comma) {
+                        break;
+                    }
                 }
             }
             self.consume(TokenType::RightParen, "Expect ')' after arguments")?;
@@ -926,67 +991,85 @@ impl KurokoVM {
             current_frame: Vec::new(),
             builtin_functions: BTreeMap::new(),
         };
-        
+
         // Register builtin functions
         vm.register_builtins();
         vm
     }
 
     fn register_builtins(&mut self) {
-        self.builtin_functions.insert("print".to_string(), builtin_print);
-        self.builtin_functions.insert("input".to_string(), builtin_input);
-        self.builtin_functions.insert("len".to_string(), builtin_len);
-        self.builtin_functions.insert("type".to_string(), builtin_type);
+        self.builtin_functions
+            .insert("print".to_string(), builtin_print);
+        self.builtin_functions
+            .insert("input".to_string(), builtin_input);
+        self.builtin_functions
+            .insert("len".to_string(), builtin_len);
+        self.builtin_functions
+            .insert("type".to_string(), builtin_type);
     }
 
     pub fn interpret(&mut self, code: CodeObject) -> Result<KurokoValue, KurokoError> {
         self.code_objects.push(code);
         let code_index = self.code_objects.len() - 1;
-        
+
         let frame = VMFrame {
             code_index,
             ip: 0,
             locals: Vec::new(),
         };
         self.current_frame.push(frame);
-        
+
         let result = self.run();
-        
+
         self.current_frame.pop();
         result
     }
 
     fn run(&mut self) -> Result<KurokoValue, KurokoError> {
         loop {
-            let frame = self.current_frame.last_mut().ok_or(KurokoError::RuntimeError)?;
-            let code = self.code_objects.get(frame.code_index).ok_or(KurokoError::RuntimeError)?;
-            
+            let frame = self
+                .current_frame
+                .last_mut()
+                .ok_or(KurokoError::RuntimeError)?;
+            let code = self
+                .code_objects
+                .get(frame.code_index)
+                .ok_or(KurokoError::RuntimeError)?;
+
             if frame.ip >= code.bytecode.len() {
                 break;
             }
-            
+
             let instruction = code.bytecode[frame.ip];
             frame.ip += 1;
-            
+
             match instruction.opcode {
                 Opcode::LoadNil => self.stack.push(KurokoValue::Nil),
                 Opcode::LoadBool => self.stack.push(KurokoValue::Bool(instruction.operand != 0)),
                 Opcode::LoadInteger => {
-                    if let Some(KurokoValue::Integer(val)) = code.constants.get(instruction.operand as usize) {
+                    if let Some(KurokoValue::Integer(val)) =
+                        code.constants.get(instruction.operand as usize)
+                    {
                         self.stack.push(KurokoValue::Integer(*val));
                     }
                 }
                 Opcode::LoadFloat => {
-                    if let Some(KurokoValue::Float(val)) = code.constants.get(instruction.operand as usize) {
+                    if let Some(KurokoValue::Float(val)) =
+                        code.constants.get(instruction.operand as usize)
+                    {
                         self.stack.push(KurokoValue::Float(*val));
                     }
                 }
                 Opcode::LoadString => {
-                    if let Some(KurokoValue::String(val)) = code.constants.get(instruction.operand as usize) {
+                    if let Some(KurokoValue::String(val)) =
+                        code.constants.get(instruction.operand as usize)
+                    {
                         self.stack.push(KurokoValue::String(val.clone()));
                     }
                 }
-                Opcode::Pop => { self.stack.pop(); }
+                Opcode::Pop => {
+                    self.stack.pop();
+                }
                 Opcode::Add => {
                     let b = self.stack.pop().ok_or(KurokoError::StackUnderflow)?;
                     let a = self.stack.pop().ok_or(KurokoError::StackUnderflow)?;
@@ -1044,9 +1127,10 @@ impl KurokoVM {
                 }
                 Opcode::Call => {
                     let arg_count = instruction.operand as usize;
-                    let args: Vec<KurokoValue> = self.stack.drain(self.stack.len() - arg_count..).collect();
+                    let args: Vec<KurokoValue> =
+                        self.stack.drain(self.stack.len() - arg_count..).collect();
                     let function = self.stack.pop().ok_or(KurokoError::StackUnderflow)?;
-                    
+
                     let result = self.call_function(function, args)?;
                     self.stack.push(result);
                 }
@@ -1060,7 +1144,7 @@ impl KurokoVM {
                 _ => {}
             }
         }
-        
+
         Ok(self.stack.pop().unwrap_or(KurokoValue::Nil))
     }
 
@@ -1068,9 +1152,15 @@ impl KurokoVM {
         match (a, b) {
             (KurokoValue::Integer(x), KurokoValue::Integer(y)) => Ok(KurokoValue::Integer(x + y)),
             (KurokoValue::Float(x), KurokoValue::Float(y)) => Ok(KurokoValue::Float(x + y)),
-            (KurokoValue::Integer(x), KurokoValue::Float(y)) => Ok(KurokoValue::Float(x as f64 + y)),
-            (KurokoValue::Float(x), KurokoValue::Integer(y)) => Ok(KurokoValue::Float(x + y as f64)),
-            (KurokoValue::String(x), KurokoValue::String(y)) => Ok(KurokoValue::String(format!("{}{}", x, y))),
+            (KurokoValue::Integer(x), KurokoValue::Float(y)) => {
+                Ok(KurokoValue::Float(x as f64 + y))
+            }
+            (KurokoValue::Float(x), KurokoValue::Integer(y)) => {
+                Ok(KurokoValue::Float(x + y as f64))
+            }
+            (KurokoValue::String(x), KurokoValue::String(y)) => {
+                Ok(KurokoValue::String(format!("{}{}", x, y)))
+            }
             _ => Err(KurokoError::TypeError),
         }
     }
@@ -1079,8 +1169,12 @@ impl KurokoVM {
         match (a, b) {
             (KurokoValue::Integer(x), KurokoValue::Integer(y)) => Ok(KurokoValue::Integer(x - y)),
             (KurokoValue::Float(x), KurokoValue::Float(y)) => Ok(KurokoValue::Float(x - y)),
-            (KurokoValue::Integer(x), KurokoValue::Float(y)) => Ok(KurokoValue::Float(x as f64 - y)),
-            (KurokoValue::Float(x), KurokoValue::Integer(y)) => Ok(KurokoValue::Float(x - y as f64)),
+            (KurokoValue::Integer(x), KurokoValue::Float(y)) => {
+                Ok(KurokoValue::Float(x as f64 - y))
+            }
+            (KurokoValue::Float(x), KurokoValue::Integer(y)) => {
+                Ok(KurokoValue::Float(x - y as f64))
+            }
             _ => Err(KurokoError::TypeError),
         }
     }
@@ -1089,8 +1183,12 @@ impl KurokoVM {
         match (a, b) {
             (KurokoValue::Integer(x), KurokoValue::Integer(y)) => Ok(KurokoValue::Integer(x * y)),
             (KurokoValue::Float(x), KurokoValue::Float(y)) => Ok(KurokoValue::Float(x * y)),
-            (KurokoValue::Integer(x), KurokoValue::Float(y)) => Ok(KurokoValue::Float(x as f64 * y)),
-            (KurokoValue::Float(x), KurokoValue::Integer(y)) => Ok(KurokoValue::Float(x * y as f64)),
+            (KurokoValue::Integer(x), KurokoValue::Float(y)) => {
+                Ok(KurokoValue::Float(x as f64 * y))
+            }
+            (KurokoValue::Float(x), KurokoValue::Integer(y)) => {
+                Ok(KurokoValue::Float(x * y as f64))
+            }
             _ => Err(KurokoError::TypeError),
         }
     }
@@ -1098,19 +1196,27 @@ impl KurokoVM {
     fn divide_values(&self, a: KurokoValue, b: KurokoValue) -> Result<KurokoValue, KurokoError> {
         match (a, b) {
             (KurokoValue::Integer(x), KurokoValue::Integer(y)) => {
-                if y == 0 { return Err(KurokoError::ValueError); }
+                if y == 0 {
+                    return Err(KurokoError::ValueError);
+                }
                 Ok(KurokoValue::Integer(x / y))
             }
             (KurokoValue::Float(x), KurokoValue::Float(y)) => {
-                if y == 0.0 { return Err(KurokoError::ValueError); }
+                if y == 0.0 {
+                    return Err(KurokoError::ValueError);
+                }
                 Ok(KurokoValue::Float(x / y))
             }
             (KurokoValue::Integer(x), KurokoValue::Float(y)) => {
-                if y == 0.0 { return Err(KurokoError::ValueError); }
+                if y == 0.0 {
+                    return Err(KurokoError::ValueError);
+                }
                 Ok(KurokoValue::Float(x as f64 / y))
             }
             (KurokoValue::Float(x), KurokoValue::Integer(y)) => {
-                if y == 0 { return Err(KurokoError::ValueError); }
+                if y == 0 {
+                    return Err(KurokoError::ValueError);
+                }
                 Ok(KurokoValue::Float(x / y as f64))
             }
             _ => Err(KurokoError::TypeError),
@@ -1121,8 +1227,12 @@ impl KurokoVM {
         match (a, b) {
             (KurokoValue::Integer(x), KurokoValue::Integer(y)) => Ok(KurokoValue::Bool(x < y)),
             (KurokoValue::Float(x), KurokoValue::Float(y)) => Ok(KurokoValue::Bool(x < y)),
-            (KurokoValue::Integer(x), KurokoValue::Float(y)) => Ok(KurokoValue::Bool((x as f64) < y)),
-            (KurokoValue::Float(x), KurokoValue::Integer(y)) => Ok(KurokoValue::Bool(x < (y as f64))),
+            (KurokoValue::Integer(x), KurokoValue::Float(y)) => {
+                Ok(KurokoValue::Bool((x as f64) < y))
+            }
+            (KurokoValue::Float(x), KurokoValue::Integer(y)) => {
+                Ok(KurokoValue::Bool(x < (y as f64)))
+            }
             _ => Err(KurokoError::TypeError),
         }
     }
@@ -1131,17 +1241,23 @@ impl KurokoVM {
         match (a, b) {
             (KurokoValue::Integer(x), KurokoValue::Integer(y)) => Ok(KurokoValue::Bool(x > y)),
             (KurokoValue::Float(x), KurokoValue::Float(y)) => Ok(KurokoValue::Bool(x > y)),
-            (KurokoValue::Integer(x), KurokoValue::Float(y)) => Ok(KurokoValue::Bool((x as f64) > y)),
-            (KurokoValue::Float(x), KurokoValue::Integer(y)) => Ok(KurokoValue::Bool(x > (y as f64))),
+            (KurokoValue::Integer(x), KurokoValue::Float(y)) => {
+                Ok(KurokoValue::Bool((x as f64) > y))
+            }
+            (KurokoValue::Float(x), KurokoValue::Integer(y)) => {
+                Ok(KurokoValue::Bool(x > (y as f64)))
+            }
             _ => Err(KurokoError::TypeError),
         }
     }
 
-    fn call_function(&mut self, function: KurokoValue, args: Vec<KurokoValue>) -> Result<KurokoValue, KurokoError> {
+    fn call_function(
+        &mut self,
+        function: KurokoValue,
+        args: Vec<KurokoValue>,
+    ) -> Result<KurokoValue, KurokoError> {
         match function {
-            KurokoValue::BuiltinFunction(fn_ptr) => {
-                fn_ptr(self, args)
-            }
+            KurokoValue::BuiltinFunction(fn_ptr) => fn_ptr(self, args),
             KurokoValue::Function(code_index) => {
                 // Execute user-defined function
                 let frame = VMFrame {
@@ -1170,7 +1286,10 @@ impl KurokoVM {
                 format!("[{}]", items.join(", "))
             }
             KurokoValue::Dict(d) => {
-                let items: Vec<String> = d.iter().map(|(k, v)| format!("{}: {}", k, self.value_to_string(v))).collect();
+                let items: Vec<String> = d
+                    .iter()
+                    .map(|(k, v)| format!("{}: {}", k, self.value_to_string(v)))
+                    .collect();
                 format!("{{{}}}", items.join(", "))
             }
             KurokoValue::Function(_) => "<function>".to_string(),
@@ -1199,7 +1318,7 @@ fn builtin_input(vm: &mut KurokoVM, args: Vec<KurokoValue>) -> Result<KurokoValu
     if !args.is_empty() {
         print!("{}", vm.value_to_string(&args[0]));
     }
-    
+
     // In a real implementation, this would read from stdin
     // For now, return a mock input
     Ok(KurokoValue::String("user_input".to_string()))
@@ -1209,7 +1328,7 @@ fn builtin_len(_vm: &mut KurokoVM, args: Vec<KurokoValue>) -> Result<KurokoValue
     if args.len() != 1 {
         return Err(KurokoError::ValueError);
     }
-    
+
     match &args[0] {
         KurokoValue::String(s) => Ok(KurokoValue::Integer(s.len() as i64)),
         KurokoValue::List(l) => Ok(KurokoValue::Integer(l.len() as i64)),
@@ -1222,7 +1341,7 @@ fn builtin_type(_vm: &mut KurokoVM, args: Vec<KurokoValue>) -> Result<KurokoValu
     if args.len() != 1 {
         return Err(KurokoError::ValueError);
     }
-    
+
     Ok(KurokoValue::String(args[0].type_name().to_string()))
 }
 
@@ -1242,12 +1361,10 @@ impl KurokoREPL {
 
     pub fn run_line(&mut self, line: &str) -> Result<String, KurokoError> {
         match self.compiler.compile(line) {
-            Ok(code) => {
-                match self.vm.interpret(code) {
-                    Ok(result) => Ok(self.vm.value_to_string(&result)),
-                    Err(e) => Err(e),
-                }
-            }
+            Ok(code) => match self.vm.interpret(code) {
+                Ok(result) => Ok(self.vm.value_to_string(&result)),
+                Err(e) => Err(e),
+            },
             Err(e) => Err(e),
         }
     }
@@ -1255,16 +1372,16 @@ impl KurokoREPL {
     pub fn run(&mut self) {
         println!("SigmaOS Kuroko REPL v1.0");
         println!("Type 'exit' to quit");
-        
+
         loop {
             print!(">>> ");
             // In real implementation, read from stdin
             let input = "print(42)"; // Mock input
-            
+
             if input.trim() == "exit" {
                 break;
             }
-            
+
             match self.run_line(input) {
                 Ok(result) => println!("{}", result),
                 Err(e) => println!("Error: {:?}", e),
@@ -1287,10 +1404,10 @@ mod tests {
     fn test_basic_arithmetic() {
         let mut compiler = KurokoCompiler::new();
         let code = compiler.compile("1 + 2").unwrap();
-        
+
         let mut vm = KurokoVM::new();
         let result = vm.interpret(code).unwrap();
-        
+
         assert_eq!(result, KurokoValue::Integer(3));
     }
 
@@ -1298,10 +1415,10 @@ mod tests {
     fn test_string_concatenation() {
         let mut compiler = KurokoCompiler::new();
         let code = compiler.compile("\"hello\" + \" world\"").unwrap();
-        
+
         let mut vm = KurokoVM::new();
         let result = vm.interpret(code).unwrap();
-        
+
         assert_eq!(result, KurokoValue::String("hello world".to_string()));
     }
 
@@ -1309,10 +1426,10 @@ mod tests {
     fn test_boolean_operations() {
         let mut compiler = KurokoCompiler::new();
         let code = compiler.compile("true and false").unwrap();
-        
+
         let mut vm = KurokoVM::new();
         let result = vm.interpret(code).unwrap();
-        
+
         assert_eq!(result, KurokoValue::Bool(false));
     }
 
@@ -1320,10 +1437,10 @@ mod tests {
     fn test_comparison() {
         let mut compiler = KurokoCompiler::new();
         let code = compiler.compile("5 > 3").unwrap();
-        
+
         let mut vm = KurokoVM::new();
         let result = vm.interpret(code).unwrap();
-        
+
         assert_eq!(result, KurokoValue::Bool(true));
     }
 
@@ -1331,10 +1448,10 @@ mod tests {
     fn test_builtin_print() {
         let mut compiler = KurokoCompiler::new();
         let code = compiler.compile("print(42)").unwrap();
-        
+
         let mut vm = KurokoVM::new();
         let result = vm.interpret(code).unwrap();
-        
+
         assert_eq!(result, KurokoValue::Nil);
     }
 }

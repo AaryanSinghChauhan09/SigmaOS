@@ -1,21 +1,28 @@
-
+use core::sync::atomic::{AtomicUsize, Ordering};
 /// OOP-based Battery Management for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 251
 /// Implements battery monitoring and power management
-
 use std::boxed::Box;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type BatteryID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BatteryState { Charging = 0, Discharging = 1, Full = 2, NotPresent = 3 }
+pub enum BatteryState {
+    Charging = 0,
+    Discharging = 1,
+    Full = 2,
+    NotPresent = 3,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum BatteryError { Success = 0, NotFound = 1, ReadFailed = 2 }
+pub enum BatteryError {
+    Success = 0,
+    NotFound = 1,
+    ReadFailed = 2,
+}
 
 pub trait Battery {
     fn id(&self) -> BatteryID;
@@ -51,11 +58,21 @@ impl SimpleBattery {
 }
 
 impl Battery for SimpleBattery {
-    fn id(&self) -> BatteryID { self.id }
-    fn capacity(&self) -> u32 { self.capacity.load(Ordering::SeqCst) as u32 }
-    fn current_charge(&self) -> u32 { self.current_charge.load(Ordering::SeqCst) as u32 }
-    fn set_current_charge(&self, charge: u32) { self.current_charge.store(charge as usize, Ordering::SeqCst); }
-    fn voltage(&self) -> u32 { self.voltage.load(Ordering::SeqCst) as u32 }
+    fn id(&self) -> BatteryID {
+        self.id
+    }
+    fn capacity(&self) -> u32 {
+        self.capacity.load(Ordering::SeqCst) as u32
+    }
+    fn current_charge(&self) -> u32 {
+        self.current_charge.load(Ordering::SeqCst) as u32
+    }
+    fn set_current_charge(&self, charge: u32) {
+        self.current_charge.store(charge as usize, Ordering::SeqCst);
+    }
+    fn voltage(&self) -> u32 {
+        self.voltage.load(Ordering::SeqCst) as u32
+    }
     fn state(&self) -> BatteryState {
         match self.state.load(Ordering::SeqCst) {
             0 => BatteryState::Charging,
@@ -64,7 +81,9 @@ impl Battery for SimpleBattery {
             _ => BatteryState::NotPresent,
         }
     }
-    fn health(&self) -> u32 { self.health.load(Ordering::SeqCst) as u32 }
+    fn health(&self) -> u32 {
+        self.health.load(Ordering::SeqCst) as u32
+    }
 }
 
 pub trait BatteryManager {
@@ -116,7 +135,9 @@ impl BatteryManager for SimpleBatteryManager {
     fn get_battery(&self, id: BatteryID) -> Option<&dyn Battery> {
         for battery_option in &self.batteries {
             if let Some(ref battery) = *battery_option {
-                if battery.id() == id { return Some(battery.as_ref()); }
+                if battery.id() == id {
+                    return Some(battery.as_ref());
+                }
             }
         }
         None
@@ -167,12 +188,15 @@ impl SimplePowerSaver {
 
 impl PowerSaver for SimplePowerSaver {
     fn enable_power_saver(&mut self, enabled: bool) {
-        self.enabled.store(if enabled { 1 } else { 0 }, Ordering::SeqCst);
+        self.enabled
+            .store(if enabled { 1 } else { 0 }, Ordering::SeqCst);
     }
 
     fn set_threshold(&mut self, threshold: u32) {
         self.threshold.store(threshold as usize, Ordering::SeqCst);
     }
 
-    fn get_threshold(&self) -> u32 { self.threshold.load(Ordering::SeqCst) as u32 }
+    fn get_threshold(&self) -> u32 {
+        self.threshold.load(Ordering::SeqCst) as u32
+    }
 }

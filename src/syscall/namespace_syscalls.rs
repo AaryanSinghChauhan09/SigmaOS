@@ -19,8 +19,8 @@
 //! - Capability checking
 //! - Reference counting
 
-use std::sync::{Arc, Mutex};
 use std::collections::BTreeMap;
+use std::sync::{Arc, Mutex};
 
 /// Linux-compatible namespace flags
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -200,8 +200,15 @@ impl NamespaceRegistry {
     }
 
     /// Register a new PID namespace
-    pub fn register_pid_namespace(&self, ns_id: u64, owner_pid: u32) -> Result<(), NamespaceSyscallError> {
-        let mut namespaces = self.pid_namespaces.lock().map_err(|_| NamespaceSyscallError::NoMemory)?;
+    pub fn register_pid_namespace(
+        &self,
+        ns_id: u64,
+        owner_pid: u32,
+    ) -> Result<(), NamespaceSyscallError> {
+        let mut namespaces = self
+            .pid_namespaces
+            .lock()
+            .map_err(|_| NamespaceSyscallError::NoMemory)?;
 
         if namespaces.contains_key(&ns_id) {
             return Err(NamespaceSyscallError::InvalidArgument);
@@ -221,8 +228,15 @@ impl NamespaceRegistry {
     }
 
     /// Register a new IPC namespace
-    pub fn register_ipc_namespace(&self, ns_id: u64, owner_pid: u32) -> Result<(), NamespaceSyscallError> {
-        let mut namespaces = self.ipc_namespaces.lock().map_err(|_| NamespaceSyscallError::NoMemory)?;
+    pub fn register_ipc_namespace(
+        &self,
+        ns_id: u64,
+        owner_pid: u32,
+    ) -> Result<(), NamespaceSyscallError> {
+        let mut namespaces = self
+            .ipc_namespaces
+            .lock()
+            .map_err(|_| NamespaceSyscallError::NoMemory)?;
 
         if namespaces.contains_key(&ns_id) {
             return Err(NamespaceSyscallError::InvalidArgument);
@@ -242,8 +256,15 @@ impl NamespaceRegistry {
     }
 
     /// Register a new mount namespace
-    pub fn register_mount_namespace(&self, ns_id: u64, owner_pid: u32) -> Result<(), NamespaceSyscallError> {
-        let mut namespaces = self.mount_namespaces.lock().map_err(|_| NamespaceSyscallError::NoMemory)?;
+    pub fn register_mount_namespace(
+        &self,
+        ns_id: u64,
+        owner_pid: u32,
+    ) -> Result<(), NamespaceSyscallError> {
+        let mut namespaces = self
+            .mount_namespaces
+            .lock()
+            .map_err(|_| NamespaceSyscallError::NoMemory)?;
 
         if namespaces.contains_key(&ns_id) {
             return Err(NamespaceSyscallError::InvalidArgument);
@@ -312,7 +333,11 @@ impl NamespaceRegistry {
             _ => return false,
         };
 
-        ns_map.lock().ok().map(|ns| ns.contains_key(&ns_id)).unwrap_or(false)
+        ns_map
+            .lock()
+            .ok()
+            .map(|ns| ns.contains_key(&ns_id))
+            .unwrap_or(false)
     }
 }
 
@@ -320,7 +345,9 @@ impl NamespaceRegistry {
 pub fn get_namespace_registry() -> Arc<Mutex<NamespaceRegistry>> {
     use std::sync::OnceLock;
     static REGISTRY: OnceLock<Arc<Mutex<NamespaceRegistry>>> = OnceLock::new();
-    REGISTRY.get_or_init(|| Arc::new(Mutex::new(NamespaceRegistry::new()))).clone()
+    REGISTRY
+        .get_or_init(|| Arc::new(Mutex::new(NamespaceRegistry::new())))
+        .clone()
 }
 
 /// Process namespace context
@@ -342,7 +369,10 @@ impl ProcessNamespaceContext {
     }
 
     /// Create context from clone flags
-    pub fn from_clone_flags(flags: CloneFlags, base_context: &ProcessNamespaceContext) -> Result<Self, NamespaceSyscallError> {
+    pub fn from_clone_flags(
+        flags: CloneFlags,
+        base_context: &ProcessNamespaceContext,
+    ) -> Result<Self, NamespaceSyscallError> {
         let mut context = base_context.clone();
 
         if flags.clone_newpid() {
@@ -417,7 +447,11 @@ pub fn sys_clone(
     let ns_config = NamespaceCreateConfig::from_clone_flags(clone_flags);
 
     // Check for unsupported namespace types
-    if clone_flags.clone_newnet() || clone_flags.clone_newuser() || clone_flags.clone_newuts() || clone_flags.clone_newcgroup() {
+    if clone_flags.clone_newnet()
+        || clone_flags.clone_newuser()
+        || clone_flags.clone_newuts()
+        || clone_flags.clone_newcgroup()
+    {
         return NamespaceSyscallError::NotSupported.code() as i64;
     }
 
@@ -448,7 +482,10 @@ pub fn sys_clone(
 
         if ns_config.create_mount_ns {
             let ns_id = ProcessNamespaceContext::allocate_namespace_id();
-            if reg.register_mount_namespace(ns_id, child_pid as u32).is_err() {
+            if reg
+                .register_mount_namespace(ns_id, child_pid as u32)
+                .is_err()
+            {
                 return NamespaceSyscallError::NoMemory.code() as i64;
             }
         }
@@ -496,7 +533,10 @@ pub fn sys_unshare(flags: u32) -> i64 {
     if unshare_flags.unshare_newpid() {
         let ns_id = ProcessNamespaceContext::allocate_namespace_id();
         let current_pid = 1; // Would be actual PID in real implementation
-        if reg.register_pid_namespace(ns_id, current_pid as u32).is_err() {
+        if reg
+            .register_pid_namespace(ns_id, current_pid as u32)
+            .is_err()
+        {
             return NamespaceSyscallError::NoMemory.code() as i64;
         }
     }
@@ -504,7 +544,10 @@ pub fn sys_unshare(flags: u32) -> i64 {
     if unshare_flags.unshare_newipc() {
         let ns_id = ProcessNamespaceContext::allocate_namespace_id();
         let current_pid = 1;
-        if reg.register_ipc_namespace(ns_id, current_pid as u32).is_err() {
+        if reg
+            .register_ipc_namespace(ns_id, current_pid as u32)
+            .is_err()
+        {
             return NamespaceSyscallError::NoMemory.code() as i64;
         }
     }
@@ -512,7 +555,10 @@ pub fn sys_unshare(flags: u32) -> i64 {
     if unshare_flags.unshare_newns() {
         let ns_id = ProcessNamespaceContext::allocate_namespace_id();
         let current_pid = 1;
-        if reg.register_mount_namespace(ns_id, current_pid as u32).is_err() {
+        if reg
+            .register_mount_namespace(ns_id, current_pid as u32)
+            .is_err()
+        {
             return NamespaceSyscallError::NoMemory.code() as i64;
         }
     }
@@ -709,13 +755,25 @@ mod tests {
 
     #[test]
     fn test_sys_clone_with_namespace_flags() {
-        let result = sys_clone(0x20000000 | 0x08000000, std::ptr::null_mut(), std::ptr::null_mut(), std::ptr::null_mut(), 0);
+        let result = sys_clone(
+            0x20000000 | 0x08000000,
+            std::ptr::null_mut(),
+            std::ptr::null_mut(),
+            std::ptr::null_mut(),
+            0,
+        );
         assert!(result > 0); // Should return child PID
     }
 
     #[test]
     fn test_sys_clone_invalid_stack() {
-        let result = sys_clone(0, std::ptr::null_mut(), std::ptr::null_mut(), std::ptr::null_mut(), 0);
+        let result = sys_clone(
+            0,
+            std::ptr::null_mut(),
+            std::ptr::null_mut(),
+            std::ptr::null_mut(),
+            0,
+        );
         assert!(result < 0); // Should return error
     }
 

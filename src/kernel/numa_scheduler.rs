@@ -186,7 +186,7 @@ impl NumaNode {
 pub struct NumaScheduler {
     pub nodes: Vec<NumaNode>,
     pub dynamic_load_threshold: usize, // Load difference that triggers migration
-    pub distance_matrix: Vec<Vec<u32>>,  // Inter-node NUMA distance matrix SLIT (RFC / ACPI SLIT table)
+    pub distance_matrix: Vec<Vec<u32>>, // Inter-node NUMA distance matrix SLIT (RFC / ACPI SLIT table)
 }
 
 impl NumaScheduler {
@@ -221,7 +221,8 @@ impl NumaScheduler {
         if from_node == to_node {
             return 10;
         }
-        if from_node < self.distance_matrix.len() && to_node < self.distance_matrix[from_node].len() {
+        if from_node < self.distance_matrix.len() && to_node < self.distance_matrix[from_node].len()
+        {
             let dist = self.distance_matrix[from_node][to_node];
             if dist > 0 {
                 return dist;

@@ -1,8 +1,8 @@
 // SigmaOS Omarchy Final Gap Closure Subsystem
 // Zero-dependency Rust implementation covering Chromium Ozone Wayland PWA launchers, Wofi/Rofi fuzzy finder keybindings, NVIDIA Early KMS module flags, and Fail-Closed Sudo Expiry guards.
 
-use std::string::String;
 use crate::klib::vec::Vec;
+use std::string::String;
 
 /// Chromium Ozone Wayland PWA Spec
 #[derive(Debug, Clone)]
@@ -37,16 +37,19 @@ impl OmarchyOzonewaylandChromiumEngine {
     }
 
     pub fn generate_pwa_exec_command(&self, app_name: &str) -> Option<String> {
-        self.registered_pwas.iter().find(|p| p.app_name == app_name).map(|p| {
-            let mut cmd = String::from("chromium ");
-            cmd.push_str(&self.ozone_platform_flag);
-            cmd.push_str(" --app=\"");
-            cmd.push_str(&p.target_url);
-            cmd.push_str("\" --class=\"");
-            cmd.push_str(&p.custom_class);
-            cmd.push_str("\"");
-            cmd
-        })
+        self.registered_pwas
+            .iter()
+            .find(|p| p.app_name == app_name)
+            .map(|p| {
+                let mut cmd = String::from("chromium ");
+                cmd.push_str(&self.ozone_platform_flag);
+                cmd.push_str(" --app=\"");
+                cmd.push_str(&p.target_url);
+                cmd.push_str("\" --class=\"");
+                cmd.push_str(&p.custom_class);
+                cmd.push_str("\"");
+                cmd
+            })
     }
 }
 
@@ -194,7 +197,9 @@ impl SovereignOmarchyFinalGapClosureSuite {
     }
 
     pub fn verify_suite(&self) -> bool {
-        self.pwa_launcher.generate_pwa_exec_command("ChatGPT").is_some()
+        self.pwa_launcher
+            .generate_pwa_exec_command("ChatGPT")
+            .is_some()
             && !self.wofi_guide.format_wofi_dmenu_input().is_empty()
             && !self.nvidia_kms.render_mkinitcpio_modules_conf().is_empty()
             && self.sudo_guard.validate_sudo_privilege(100)

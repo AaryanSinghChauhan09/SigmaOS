@@ -6,11 +6,11 @@
 use std::format;
 
 use std::boxed::Box;
-use std::vec::Vec;
 use std::string::String;
+use std::vec::Vec;
 
-use crate::ipc::helenos_async::{HelenAsyncSystem, HelenMessage, HelenIpcError};
-use crate::lang::kuroko_lang::{KurokoVM, KurokoValue, KurokoError};
+use crate::ipc::helenos_async::{HelenAsyncSystem, HelenIpcError, HelenMessage};
+use crate::lang::kuroko_lang::{KurokoError, KurokoVM, KurokoValue};
 // Terminal module integration temporarily disabled pending terminal tab implementation
 // use crate::desktop::terminal::{TabManager, TerminalTab, TerminalError};
 
@@ -33,14 +33,17 @@ impl SigmaIntegration {
     }
 
     /// Initialize integration for a new task/process
-    pub fn initialize_task(&mut self, task_id: usize) -> Result<IntegrationHandle, IntegrationError> {
+    pub fn initialize_task(
+        &mut self,
+        task_id: usize,
+    ) -> Result<IntegrationHandle, IntegrationError> {
         // Initialize async IPC
         let (answerbox_id, phone_id) = self.async_system.initialize_task(task_id);
-        
+
         // Terminal integration temporarily disabled
         let terminal_id = task_id;
         let tab_id = task_id; // Use task_id as fallback tab_id
-        
+
         Ok(IntegrationHandle {
             task_id,
             answerbox_id,
@@ -51,71 +54,95 @@ impl SigmaIntegration {
     }
 
     /// Execute Kuroko code with terminal integration
-    pub fn execute_kuroko_with_terminal(&mut self, code: &str, _tab_id: usize) 
-        -> Result<String, IntegrationError> {
-        
+    pub fn execute_kuroko_with_terminal(
+        &mut self,
+        code: &str,
+        _tab_id: usize,
+    ) -> Result<String, IntegrationError> {
         // Compile and execute Kuroko code
         let mut compiler = crate::lang::kuroko_lang::KurokoCompiler::new();
-        let code_object = compiler.compile(code)
+        let code_object = compiler
+            .compile(code)
             .map_err(|e| IntegrationError::LanguageError(e))?;
-        
-        let result = self.kuroko_vm.interpret(code_object)
+
+        let result = self
+            .kuroko_vm
+            .interpret(code_object)
             .map_err(|e| IntegrationError::LanguageError(e))?;
-        
+
         // Terminal output temporarily disabled
         let output = self.kuroko_vm.value_to_string(&result);
         Ok(output)
     }
 
     /// Send async message from terminal to another task
-    pub fn send_terminal_message(&mut self, from_tab_id: usize, to_phone_id: usize, 
-                                  message: &str) -> Result<(), IntegrationError> {
-        
-        let call_id = self.async_system.ipc_manager.next_call_id.fetch_add(
-            1, core::sync::atomic::Ordering::SeqCst
-        );
+    pub fn send_terminal_message(
+        &mut self,
+        from_tab_id: usize,
+        to_phone_id: usize,
+        message: &str,
+    ) -> Result<(), IntegrationError> {
+        let call_id = self
+            .async_system
+            .ipc_manager
+            .next_call_id
+            .fetch_add(1, core::sync::atomic::Ordering::SeqCst);
 
         let ipc_message = HelenMessage::new(100, call_id, from_tab_id);
 
         // Process the message content
         if !message.is_empty() {
-            self.async_system.ipc_manager.send_async(to_phone_id, ipc_message)
+            self.async_system
+                .ipc_manager
+                .send_async(to_phone_id, ipc_message)
                 .map_err(|e| IntegrationError::IpcError(e))?;
         }
-        
+
         Ok(())
     }
 
     /// Handle interrupt notification and update terminal
-    pub fn handle_interrupt_for_terminal(&mut self, irq: u32, _tab_id: usize) 
-        -> Result<(), IntegrationError> {
-        
-        self.async_system.ipc_manager.handle_interrupt(irq)
+    pub fn handle_interrupt_for_terminal(
+        &mut self,
+        irq: u32,
+        _tab_id: usize,
+    ) -> Result<(), IntegrationError> {
+        self.async_system
+            .ipc_manager
+            .handle_interrupt(irq)
             .map_err(|e| IntegrationError::IpcError(e))?;
-        
+
         // Terminal update temporarily disabled
         Ok(())
     }
 
     /// Create split terminal panes with async coordination
-    pub fn create_split_terminal(&mut self, _parent_tab_id: usize, _direction: bool)
-        -> Result<usize, IntegrationError> {
-
+    pub fn create_split_terminal(
+        &mut self,
+        _parent_tab_id: usize,
+        _direction: bool,
+    ) -> Result<usize, IntegrationError> {
         // Terminal split functionality temporarily disabled
-        Err(IntegrationError::TerminalError("Terminal split not implemented".to_string()))
+        Err(IntegrationError::TerminalError(
+            "Terminal split not implemented".to_string(),
+        ))
     }
 
     /// Run Kuroko script with async IPC capabilities
-    pub fn run_async_kuroko_script(&mut self, script: &str, _task_id: usize) 
-        -> Result<KurokoValue, IntegrationError> {
-        
+    pub fn run_async_kuroko_script(
+        &mut self,
+        script: &str,
+        _task_id: usize,
+    ) -> Result<KurokoValue, IntegrationError> {
         // This would involve registering async functions in Kuroko
         // For now, just execute normally
         let mut compiler = crate::lang::kuroko_lang::KurokoCompiler::new();
-        let code_object = compiler.compile(script)
+        let code_object = compiler
+            .compile(script)
             .map_err(|e| IntegrationError::LanguageError(e))?;
-        
-        self.kuroko_vm.interpret(code_object)
+
+        self.kuroko_vm
+            .interpret(code_object)
             .map_err(|e| IntegrationError::LanguageError(e))
     }
 }
@@ -224,7 +251,7 @@ mod tests {
     fn test_integration_initialization() {
         let mut integration = SigmaIntegration::new();
         let handle = integration.initialize_task(1).unwrap();
-        
+
         assert_eq!(handle.task_id, 1);
         // Terminal tab test temporarily disabled
         // assert!(handle.tab_id > 0);
@@ -234,7 +261,7 @@ mod tests {
     fn test_kuroko_terminal_integration() {
         let mut integration = SigmaIntegration::new();
         let handle = integration.initialize_task(1).unwrap();
-        
+
         let result = integration.execute_kuroko_with_terminal("1 + 1", handle.tab_id);
         assert!(result.is_ok());
     }
@@ -244,7 +271,7 @@ mod tests {
     // fn test_split_terminal_creation() {
     //     let mut integration = SigmaIntegration::new();
     //     let handle = integration.initialize_task(1).unwrap();
-    //     
+    //
     //     let new_tab_id = integration.create_split_terminal(handle.tab_id, true);
     //     assert!(new_tab_id.is_ok());
     // }
@@ -253,7 +280,7 @@ mod tests {
     fn test_os_integration_manager() {
         let mut manager = OSIntegrationManager::new();
         let id = manager.create_integration();
-        
+
         assert_eq!(id, 0);
         assert!(manager.get_integration(id).is_some());
     }

@@ -13,7 +13,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-
 pub mod crash;
 pub mod lowlevel;
 pub mod tools;

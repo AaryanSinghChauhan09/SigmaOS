@@ -190,12 +190,10 @@ impl NcertScienceTeacherSuite {
                 String::from("Capacitors and Capacitance"),
                 String::from("Dielectrics and Polarization"),
             ],
-            practical_experiments: vec![
-                String::from("Charging and discharging of a capacitor"),
-            ],
-            learning_objectives: vec![
-                String::from("Derive expression for energy stored in a parallel plate capacitor"),
-            ],
+            practical_experiments: vec![String::from("Charging and discharging of a capacitor")],
+            learning_objectives: vec![String::from(
+                "Derive expression for energy stored in a parallel plate capacitor",
+            )],
         });
     }
 
@@ -267,7 +265,11 @@ impl NcertScienceTeacherSuite {
     }
 
     /// Generates a standardized NCERT Pedagogy 5E Lesson Plan for Teachers
-    pub fn generate_lesson_plan(&self, chapter_title: &str, grade: NcertGrade) -> Result<NcertLessonPlan, &'static str> {
+    pub fn generate_lesson_plan(
+        &self,
+        chapter_title: &str,
+        grade: NcertGrade,
+    ) -> Result<NcertLessonPlan, &'static str> {
         let topic = self
             .curriculum_database
             .iter()
@@ -280,12 +282,18 @@ impl NcertScienceTeacherSuite {
             duration_minutes: 45,
             learning_objectives: topic.learning_objectives.clone(),
             required_lab_apparatus: topic.practical_experiments.clone(),
-            teaching_methodology: String::from("NCERT 5E Model (Engage, Explore, Explain, Elaborate, Evaluate)"),
+            teaching_methodology: String::from(
+                "NCERT 5E Model (Engage, Explore, Explain, Elaborate, Evaluate)",
+            ),
             step_by_step_pedagogy: vec![
                 String::from("Engage (5m): Show real-world phenomenon video or demonstration"),
                 String::from("Explore (10m): Hands-on group activity or Virtual Lab simulation"),
-                String::from("Explain (15m): Concept derivation and NCERT textbook diagram analysis"),
-                String::from("Elaborate (10m): Numerical problem solving & daily life applications"),
+                String::from(
+                    "Explain (15m): Concept derivation and NCERT textbook diagram analysis",
+                ),
+                String::from(
+                    "Elaborate (10m): Numerical problem solving & daily life applications",
+                ),
                 String::from("Evaluate (5m): Formative exit ticket questions"),
             ],
             assessment_rubric: vec![
@@ -302,7 +310,11 @@ impl NcertScienceTeacherSuite {
     }
 
     /// Generates a custom CBSE pattern Question Paper with answer key & marking scheme
-    pub fn generate_exam_paper(&self, grade: NcertGrade, total_marks: u32) -> (String, Vec<NcertQuestionItem>) {
+    pub fn generate_exam_paper(
+        &self,
+        grade: NcertGrade,
+        total_marks: u32,
+    ) -> (String, Vec<NcertQuestionItem>) {
         let matching_questions: Vec<NcertQuestionItem> = self
             .question_bank
             .iter()

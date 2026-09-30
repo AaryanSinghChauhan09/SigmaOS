@@ -53,14 +53,17 @@ impl NvmeSubmissionQueue {
             head: 0,
             tail: 0,
             phase: true,
-            commands: vec![NvmeCmd {
-                opcode: 0,
-                nsid: 0,
-                prp1: 0,
-                prp2: 0,
-                cdw10: 0,
-                cdw11: 0,
-            }; size],
+            commands: vec![
+                NvmeCmd {
+                    opcode: 0,
+                    nsid: 0,
+                    prp1: 0,
+                    prp2: 0,
+                    cdw10: 0,
+                    cdw11: 0,
+                };
+                size
+            ],
         }
     }
 
@@ -169,8 +172,6 @@ pub struct AhciCommandHeader {
 }
 
 pub type AhciCommandHeaderV3 = AhciCommandHeader;
-
-
 
 /// Simulated AHCI Port MMIO Register Map
 pub struct AhciPort {
@@ -383,11 +384,21 @@ impl ModernNvmeDriver {
     }
 
     /// Create I/O queue pair
-    pub fn create_io_queue(&mut self, sq_id: u16, cq_id: u16, interrupt_vector: u16) -> Result<(), &'static str> {
+    pub fn create_io_queue(
+        &mut self,
+        sq_id: u16,
+        cq_id: u16,
+        interrupt_vector: u16,
+    ) -> Result<(), &'static str> {
         if self.queue_pairs.len() >= 65535 {
             return Err("Maximum number of queues reached");
         }
-        let qp = NvmeQueuePair::new(sq_id, cq_id, self.max_queue_depth as usize, interrupt_vector);
+        let qp = NvmeQueuePair::new(
+            sq_id,
+            cq_id,
+            self.max_queue_depth as usize,
+            interrupt_vector,
+        );
         self.queue_pairs.push(qp);
         Ok(())
     }
@@ -537,19 +548,19 @@ mod tests {
     fn test_nvme_multi_queue() {
         let mut driver = ModernNvmeDriver::new(2048);
         driver.initialize().unwrap();
-        
+
         // Create I/O queue pair
         assert!(driver.create_io_queue(1, 1, 1).is_ok());
         assert_eq!(driver.queue_count(), 1);
-        
+
         // Submit read command
         let result = driver.submit_read(0, 0, 1, 0x1000, 0);
         assert!(result.is_ok());
-        
+
         // Ring doorbell
         let tail = driver.ring_submission_doorbell(0);
         assert!(tail.is_ok());
-        
+
         // Reap completion
         let completion = driver.reap_completion(0);
         assert!(completion.is_ok());
@@ -559,7 +570,7 @@ mod tests {
     fn test_nvme_queue_operations() {
         let qp = NvmeQueuePair::new(1, 1, 64, 1);
         assert_eq!(qp.completion.interrupt_vector(), 1);
-        
+
         let cmd = NvmeCmd {
             opcode: NvmeOpcode::Read as u8,
             nsid: 1,
@@ -568,7 +579,7 @@ mod tests {
             cdw10: 0,
             cdw11: 0,
         };
-        
+
         let mut qp = qp;
         assert!(qp.submission.submit_command(cmd).is_ok());
         assert_eq!(qp.submission.ring_doorbell(), 1);

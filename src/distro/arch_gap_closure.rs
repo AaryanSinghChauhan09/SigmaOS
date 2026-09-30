@@ -180,14 +180,20 @@ impl ArchPacmanHooksManagerEngine {
             },
         ];
 
-        Self { hooks: sample_hooks }
+        Self {
+            hooks: sample_hooks,
+        }
     }
 
     pub fn trigger_hooks(&mut self, when: HookWhen, modified_packages: &[&str]) -> usize {
         let mut executed_count = 0;
         for hook in &mut self.hooks {
             if hook.when == when && !hook.has_executed {
-                if hook.target_packages.iter().any(|tp| modified_packages.contains(&tp.as_str())) {
+                if hook
+                    .target_packages
+                    .iter()
+                    .any(|tp| modified_packages.contains(&tp.as_str()))
+                {
                     hook.has_executed = true;
                     executed_count += 1;
                 }
@@ -230,21 +236,17 @@ pub struct ArchSysusersTmpfilesGeneratorEngine {
 
 impl ArchSysusersTmpfilesGeneratorEngine {
     pub fn new() -> Self {
-        let sysusers = vec![
-            SysuserRule {
-                username: "http".to_string(),
-                uid: 33,
-                home_dir: "/srv/http".to_string(),
-            },
-        ];
-        let tmpfiles = vec![
-            TmpfileRule {
-                path: "/var/log/nginx".to_string(),
-                mode: "0755".to_string(),
-                user: "http".to_string(),
-                group: "http".to_string(),
-            },
-        ];
+        let sysusers = vec![SysuserRule {
+            username: "http".to_string(),
+            uid: 33,
+            home_dir: "/srv/http".to_string(),
+        }];
+        let tmpfiles = vec![TmpfileRule {
+            path: "/var/log/nginx".to_string(),
+            mode: "0755".to_string(),
+            user: "http".to_string(),
+            group: "http".to_string(),
+        }];
 
         Self { sysusers, tmpfiles }
     }
@@ -344,11 +346,14 @@ impl SovereignArchGapClosureSuite {
         let cache_ok = freed == 1000 && self.paccache.cached_packages.len() == 2;
 
         // Verify Hooks
-        let executed = self.hooks.trigger_hooks(HookWhen::PostTransaction, &["linux"]);
+        let executed = self
+            .hooks
+            .trigger_hooks(HookWhen::PostTransaction, &["linux"]);
         let hook_ok = executed >= 1;
 
         // Verify Sysusers/Tmpfiles
-        let sys_ok = self.sysusers_tmpfiles.provision_sysusers() == 1 && self.sysusers_tmpfiles.provision_tmpfiles() == 1;
+        let sys_ok = self.sysusers_tmpfiles.provision_sysusers() == 1
+            && self.sysusers_tmpfiles.provision_tmpfiles() == 1;
 
         // Verify Archiso
         let iso_out = self.archiso.build_live_iso();

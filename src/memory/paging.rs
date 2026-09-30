@@ -285,7 +285,12 @@ impl SimpleVMM {
         writable: bool,
         executable: bool,
     ) -> Result<(), MemoryError> {
-        self.map_page_with_flags(VirtualAddress(virt), PhysicalAddress(phys), writable, executable)
+        self.map_page_with_flags(
+            VirtualAddress(virt),
+            PhysicalAddress(phys),
+            writable,
+            executable,
+        )
     }
 
     pub fn map_page_with_flags(
@@ -327,8 +332,6 @@ impl SimpleVMM {
 
         Ok(())
     }
-
-
 
     /// Maps a 2MB Huge Page (at the Page Directory level)
     pub fn map_huge_2mb(
@@ -508,7 +511,8 @@ impl SimpleVMM {
                 // Decompress page and map it back on demand (zram decompression swap-in)
                 let decompressed_phys = PhysicalAddress(virt.0); // mapped back
                 self.zram_pool.remove(i);
-                self.map_page_with_flags(virt, decompressed_phys, true, false).unwrap();
+                self.map_page_with_flags(virt, decompressed_phys, true, false)
+                    .unwrap();
                 return Ok(decompressed_phys);
             }
         }

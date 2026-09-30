@@ -191,7 +191,13 @@ impl PopOsSystem76PowerAndAutoTileEngine {
         }
     }
 
-    pub fn tile_window(&mut self, window_id: u64, title: &str, display_width: u32, display_height: u32) {
+    pub fn tile_window(
+        &mut self,
+        window_id: u64,
+        title: &str,
+        display_width: u32,
+        display_height: u32,
+    ) {
         let count = self.tiled_windows.len() + 1;
         let new_width = display_width / (count as u32);
 
@@ -271,7 +277,10 @@ impl OpenBsdIkedSlaacPrivacyEngine {
             active: true,
         };
         self.active_sas.insert(sa_id.to_string(), sa);
-        format!("iked: Established IKEv2 SA '{}' [{}] <-> [{}]", sa_id, local, remote)
+        format!(
+            "iked: Established IKEv2 SA '{}' [{}] <-> [{}]",
+            sa_id, local, remote
+        )
     }
 
     pub fn generate_slaac_privacy_address(
@@ -282,7 +291,12 @@ impl OpenBsdIkedSlaacPrivacyEngine {
     ) -> String {
         // RFC 4941 temporary SLAAC address generation simulation
         let host_hash = (current_time_sec ^ 0xFEED_FACE) % 0xFFFF;
-        let ipv6 = format!("{}:{:04x}:{:04x}", prefix.trim_end_matches("::"), host_hash, host_hash + 1);
+        let ipv6 = format!(
+            "{}:{:04x}:{:04x}",
+            prefix.trim_end_matches("::"),
+            host_hash,
+            host_hash + 1
+        );
 
         let record = SlaacPrivacyAddressRecord {
             interface_name: iface.to_string(),
@@ -339,9 +353,16 @@ impl SlackwarePkgtoolSboEngine {
     }
 
     pub fn installpkg(&mut self, pkg_filename: &str) -> Result<String, String> {
-        let parts: Vec<&str> = pkg_filename.trim_end_matches(".txz").trim_end_matches(".tgz").split('-').collect();
+        let parts: Vec<&str> = pkg_filename
+            .trim_end_matches(".txz")
+            .trim_end_matches(".tgz")
+            .split('-')
+            .collect();
         if parts.len() < 4 {
-            return Err(format!("pkgtool: Invalid Slackware package name structure '{}'", pkg_filename));
+            return Err(format!(
+                "pkgtool: Invalid Slackware package name structure '{}'",
+                pkg_filename
+            ));
         }
 
         let name = parts[0];
@@ -354,12 +375,22 @@ impl SlackwarePkgtoolSboEngine {
             version: version.to_string(),
             arch: arch.to_string(),
             build: build.to_string(),
-            compressed_format: if pkg_filename.ends_with(".txz") { "txz".to_string() } else { "tgz".to_string() },
-            installed_files: vec![format!("/usr/bin/{}", name), format!("/usr/man/man1/{}.1.gz", name)],
+            compressed_format: if pkg_filename.ends_with(".txz") {
+                "txz".to_string()
+            } else {
+                "tgz".to_string()
+            },
+            installed_files: vec![
+                format!("/usr/bin/{}", name),
+                format!("/usr/man/man1/{}.1.gz", name),
+            ],
         };
 
         self.package_db.insert(name.to_string(), record);
-        Ok(format!("pkgtool: Package '{}' version '{}' installed successfully", name, version))
+        Ok(format!(
+            "pkgtool: Package '{}' version '{}' installed successfully",
+            name, version
+        ))
     }
 
     pub fn parse_slackbuild_recipe(&self, script_content: &str) -> Option<SlackBuildRecipeSpec> {
@@ -370,11 +401,24 @@ impl SlackwarePkgtoolSboEngine {
         for line in script_content.lines() {
             let trimmed = line.trim();
             if trimmed.starts_with("PRGNAM=") {
-                prgnam = trimmed.trim_start_matches("PRGNAM=").trim_matches('"').trim_matches('\'').to_string();
+                prgnam = trimmed
+                    .trim_start_matches("PRGNAM=")
+                    .trim_matches('"')
+                    .trim_matches('\'')
+                    .to_string();
             } else if trimmed.starts_with("VERSION=") {
-                version = trimmed.trim_start_matches("VERSION=").trim_matches('"').trim_matches('\'').to_string();
+                version = trimmed
+                    .trim_start_matches("VERSION=")
+                    .trim_matches('"')
+                    .trim_matches('\'')
+                    .to_string();
             } else if trimmed.starts_with("BUILD=") {
-                if let Ok(num) = trimmed.trim_start_matches("BUILD=").trim_matches('"').trim_matches('\'').parse::<u32>() {
+                if let Ok(num) = trimmed
+                    .trim_start_matches("BUILD=")
+                    .trim_matches('"')
+                    .trim_matches('\'')
+                    .parse::<u32>()
+                {
                     build_num = num;
                 }
             }
@@ -513,8 +557,14 @@ mod tests {
 
         let start_res = chimera.start_dinit_service("pipewire");
         assert!(start_res.is_ok());
-        assert_eq!(chimera.get_service_state("pipewire"), Some(DinitServiceState::Started));
-        assert!(chimera.compat_spec.cflags.contains(&"-fsanitize=safe-stack".to_string()));
+        assert_eq!(
+            chimera.get_service_state("pipewire"),
+            Some(DinitServiceState::Started)
+        );
+        assert!(chimera
+            .compat_spec
+            .cflags
+            .contains(&"-fsanitize=safe-stack".to_string()));
     }
 
     #[test]
@@ -536,7 +586,8 @@ mod tests {
     #[test]
     fn test_openbsd_ikedslaac_engine() {
         let mut iked = OpenBsdIkedSlaacPrivacyEngine::new();
-        let sa_msg = iked.establish_ikev2_sa("vpn0", "192.168.1.1", "10.0.0.1", "chacha20-poly1305");
+        let sa_msg =
+            iked.establish_ikev2_sa("vpn0", "192.168.1.1", "10.0.0.1", "chacha20-poly1305");
         assert!(sa_msg.contains("vpn0"));
 
         let ipv6_addr = iked.generate_slaac_privacy_address("em0", "2001:db8::", 1700000000);
@@ -551,7 +602,8 @@ mod tests {
         assert!(inst_res.is_ok());
         assert!(slack.package_db.contains_key("htop"));
 
-        let recipe = slack.parse_slackbuild_recipe("PRGNAM=\"neofetch\"\nVERSION=\"7.1.0\"\nBUILD=2\n");
+        let recipe =
+            slack.parse_slackbuild_recipe("PRGNAM=\"neofetch\"\nVERSION=\"7.1.0\"\nBUILD=2\n");
         assert!(recipe.is_some());
         let spec = recipe.unwrap();
         assert_eq!(spec.prgnam, "neofetch");

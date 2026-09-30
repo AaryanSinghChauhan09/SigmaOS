@@ -1,4 +1,3 @@
-
 /// OOP-based Socket API for SigmaOS
 /// Based on Ideas-999-Structured: Networking & Communication Item 771
 /// Implements socket creation, BSD-style Socket Options, and network communication
@@ -36,9 +35,9 @@ pub enum SocketError {
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SocketOption {
-    ReuseAddr = 0,     // SO_REUSEADDR
-    ReusePort = 1,     // SO_REUSEPORT
-    KeepAlive = 2,     // SO_KEEPALIVE
+    ReuseAddr = 0,      // SO_REUSEADDR
+    ReusePort = 1,      // SO_REUSEPORT
+    KeepAlive = 2,      // SO_KEEPALIVE
     ReceiveTimeout = 3, // SO_RCVTIMEO
     SendTimeout = 4,    // SO_SNDTIMEO
 }
@@ -47,9 +46,9 @@ pub enum SocketOption {
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SocketAddrIn {
-    pub sin_family: u16,      // AF_INET
-    pub sin_port: u16,        // Network port
-    pub sin_addr: [u8; 4],    // IPv4 Address (e.g., 127.0.0.1)
+    pub sin_family: u16,   // AF_INET
+    pub sin_port: u16,     // Network port
+    pub sin_addr: [u8; 4], // IPv4 Address (e.g., 127.0.0.1)
 }
 
 impl SocketAddrIn {
@@ -127,11 +126,13 @@ impl Socket for SimpleSocket {
     }
 
     fn set_bound(&mut self, bound: bool) {
-        self.bound.store(if bound { 1 } else { 0 }, Ordering::SeqCst);
+        self.bound
+            .store(if bound { 1 } else { 0 }, Ordering::SeqCst);
     }
 
     fn set_connected(&mut self, connected: bool) {
-        self.connected.store(if connected { 1 } else { 0 }, Ordering::SeqCst);
+        self.connected
+            .store(if connected { 1 } else { 0 }, Ordering::SeqCst);
     }
 
     fn set_opt(&mut self, option: SocketOption, value: u32) -> Result<(), SocketError> {
