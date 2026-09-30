@@ -237,6 +237,19 @@ cleared. AI agents must preserve unavailable-provider errors and buffer
 clearing, and must not enable real storage or authentication without reviewed
 crypto, randomness, biometric, and persistence integrations.
 
+`src/security/cleaner.rs` provides bounded overwrites of caller memory and a
+policy check for exactly `127.0.0.1:<configured Tor port>`; neither guarantees
+erasure from storage or configures a host firewall. EXIF removal returns
+`MetadataScrubError::ParserUnavailable` without changing input until a
+format-aware parser is integrated. RAM overwrite rounds are bounded. AI agents
+must preserve these limits and fail-closed metadata behavior.
+
+`src/security/secrets.rs::SimpleSecret` clears its fixed buffer before
+replacement and uses volatile writes for its owned buffers on drop. This is
+best-effort clearing only; it cannot erase caller copies or guarantee system-
+wide zeroization, and the component is not secure storage. Preserve this scope
+and do not describe it as encrypted storage without an audited provider.
+
 The Fedora Cockpit and FreeIPA compatibility models do not authenticate
 sessions or mint Kerberos tickets without trusted Cockpit/KDC integrations.
 They reject authentication and token verification rather than treating any
