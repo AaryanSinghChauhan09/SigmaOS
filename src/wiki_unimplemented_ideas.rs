@@ -654,17 +654,20 @@ impl Default for AdvancedSandboxingEngine {
 
 pub struct EncryptedFileVaultEngine {
     pub luks2_container_path: String,
-    pub biometric_unlock_enabled: bool,
-    pub is_locked: bool,
+    is_locked: bool,
 }
 
 impl EncryptedFileVaultEngine {
     pub fn new(path: &str) -> Self {
         Self {
             luks2_container_path: String::from(path),
-            biometric_unlock_enabled: false,
             is_locked: true,
         }
+    }
+
+    /// Returns whether this model remains locked.
+    pub fn is_locked(&self) -> bool {
+        self.is_locked
     }
 
     pub fn unlock_vault_with_biometric(
@@ -692,7 +695,7 @@ pub struct PasswordEntry {
 }
 
 pub struct HardwareBackedPasswordManager {
-    pub entries: Vec<PasswordEntry>,
+    entries: Vec<PasswordEntry>,
 }
 
 impl HardwareBackedPasswordManager {
@@ -700,6 +703,11 @@ impl HardwareBackedPasswordManager {
         Self {
             entries: Vec::new(),
         }
+    }
+
+    /// Returns the number of entries stored by this manager.
+    pub fn entry_count(&self) -> usize {
+        self.entries.len()
     }
 
     pub fn add_password_entry(
@@ -1284,14 +1292,14 @@ mod tests {
             vault.unlock_vault_with_biometric(true),
             Err("biometric provider unavailable")
         );
-        assert!(vault.is_locked);
+        assert!(vault.is_locked());
 
         let mut pwm = HardwareBackedPasswordManager::new();
         assert_eq!(
             pwm.add_password_entry("", "", ""),
             Err("TPM sealing provider unavailable")
         );
-        assert!(pwm.entries.is_empty());
+        assert_eq!(pwm.entry_count(), 0);
         assert_eq!(
             pwm.check_haveibeenpwned_breach(""),
             Err("password breach lookup provider unavailable")

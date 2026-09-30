@@ -94,12 +94,12 @@ fn test_security_vault_and_systemd_parity() {
         vault.unlock_vault_with_biometric(true),
         Err("biometric provider unavailable")
     );
-    assert!(vault.is_locked);
+    assert!(vault.is_locked());
     vault.auto_lock_on_blank();
 
     let mut pm = HardwareBackedPasswordManager::new();
     assert!(pm.add_password_entry("", "", "").is_err());
-    assert!(pm.entries.is_empty());
+    assert_eq!(pm.entry_count(), 0);
     assert!(pm.check_haveibeenpwned_breach("").is_err());
 
     let mut systemd = SovereignSystemdParityEngine::new();
