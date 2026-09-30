@@ -213,6 +213,13 @@ a credential, and the PIA VPN model does not turn caller input into an API
 token or report a connected tunnel. Both remain unavailable until real
 providers and authenticated transport are integrated.
 
+The WireGuard and OpenVPN adapters also reject connection attempts because
+they do not implement handshakes, key exchange, packet protection, or tunnel
+setup. Their previous success responses were simulated and must not be read
+as a secure VPN connection. The unavailable WireGuard adapter and Warpinator
+model no longer retain the private-key strings or PIN supplied to their
+constructors.
+
 The exported PAM model currently fails closed: without a secure random source
 and an audited password hashing provider, it will not register users or
 authenticate credentials. `security::crypto_utils::SecureRandom` and its
