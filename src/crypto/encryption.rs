@@ -2,8 +2,9 @@ use std::vec::Vec;
 
 use std::boxed::Box;
 
-/// OOP-based Encryption Service for SigmaOS
+/// Prototype encryption service API for SigmaOS.
 /// Based on Roadmap Item 15: Encryption service
+/// The former XOR-based transform was not encryption; operations now fail closed.
 use core::sync::atomic::AtomicUsize;
 
 pub type KeyID = usize;
@@ -79,6 +80,7 @@ pub enum CryptoError {
     KeyNotFound = 1,
     EncryptionFailed = 2,
     InvalidKey = 3,
+    CryptoUnavailable = 4,
 }
 
 pub struct SimpleEncryptionService {
@@ -104,14 +106,8 @@ impl EncryptionService for SimpleEncryptionService {
                     if key_bytes.is_empty() {
                         return Err(CryptoError::InvalidKey);
                     }
-                    // Bolt ⚡ Optimization: Pre-allocate result vector capacity based on input data size
-                    // to eliminate dynamic re-allocations during stream cipher execution.
-                    let mut encrypted = Vec::with_capacity(data.len());
-                    for (idx, byte) in data.iter().enumerate() {
-                        let mask = key_bytes[idx % key_bytes.len()];
-                        encrypted.push(*byte ^ mask);
-                    }
-                    return Ok(encrypted);
+                    let _ = data;
+                    return Err(CryptoError::CryptoUnavailable);
                 }
             }
         }
@@ -125,14 +121,8 @@ impl EncryptionService for SimpleEncryptionService {
                     if key_bytes.is_empty() {
                         return Err(CryptoError::InvalidKey);
                     }
-                    // Bolt ⚡ Optimization: Pre-allocate result vector capacity based on input data size
-                    // to eliminate dynamic re-allocations during stream cipher execution.
-                    let mut decrypted = Vec::with_capacity(data.len());
-                    for (idx, byte) in data.iter().enumerate() {
-                        let mask = key_bytes[idx % key_bytes.len()];
-                        decrypted.push(*byte ^ mask);
-                    }
-                    return Ok(decrypted);
+                    let _ = data;
+                    return Err(CryptoError::CryptoUnavailable);
                 }
             }
         }
@@ -150,7 +140,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_encryption_service_no_dynamic_derived_keys() {
+    fn encryption_service_fails_closed_without_a_crypto_provider() {
         let mut service = SimpleEncryptionService::new();
         // Use a customized key that is NOT 0x42
         let key_data = b"MY_CUSTOM_SECRET_KEY_FOR_TESTS";
@@ -158,14 +148,13 @@ mod tests {
         service.add_key(Box::new(key)).unwrap();
 
         let plaintext = b"Hello, World!";
-        let ciphertext = service.encrypt(plaintext, 101).unwrap();
-
-        // Ensure it did not use the hardcoded 0x42 constant
-        let bad_ciphertext: Vec<u8> = plaintext.iter().map(|&b| b ^ 0x42).collect();
-        assert_ne!(ciphertext, bad_ciphertext);
-
-        // Decrypt and verify
-        let decrypted = service.decrypt(&ciphertext, 101).unwrap();
-        assert_eq!(decrypted, plaintext);
+        assert!(matches!(
+            service.encrypt(plaintext, 101),
+            Err(CryptoError::CryptoUnavailable)
+        ));
+        assert!(matches!(
+            service.decrypt(plaintext, 101),
+            Err(CryptoError::CryptoUnavailable)
+        ));
     }
 }
