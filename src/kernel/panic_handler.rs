@@ -59,32 +59,81 @@ impl CpuRegisterDump {
              RIP={:016X} RFLAGS={:016X}\n\
              CS={:04X} DS={:04X} ES={:04X} FS={:04X} GS={:04X} SS={:04X}\n\
              CR0={:016X} CR2={:016X} CR3={:016X} CR4={:016X}",
-            self.rax, self.rbx, self.rcx, self.rdx,
-            self.rsi, self.rdi, self.rbp, self.rsp,
-            self.r8, self.r9, self.r10, self.r11,
-            self.r12, self.r13, self.r14, self.r15,
-            self.rip, self.rflags,
-            self.cs, self.ds, self.es, self.fs, self.gs, self.ss,
-            self.cr0, self.cr2, self.cr3, self.cr4,
+            self.rax,
+            self.rbx,
+            self.rcx,
+            self.rdx,
+            self.rsi,
+            self.rdi,
+            self.rbp,
+            self.rsp,
+            self.r8,
+            self.r9,
+            self.r10,
+            self.r11,
+            self.r12,
+            self.r13,
+            self.r14,
+            self.r15,
+            self.rip,
+            self.rflags,
+            self.cs,
+            self.ds,
+            self.es,
+            self.fs,
+            self.gs,
+            self.ss,
+            self.cr0,
+            self.cr2,
+            self.cr3,
+            self.cr4,
         )
     }
 
     pub fn decode_rflags(&self) -> String {
         let mut flags = Vec::new();
-        if self.rflags & (1 << 0) != 0 { flags.push("CF"); }
-        if self.rflags & (1 << 2) != 0 { flags.push("PF"); }
-        if self.rflags & (1 << 4) != 0 { flags.push("AF"); }
-        if self.rflags & (1 << 6) != 0 { flags.push("ZF"); }
-        if self.rflags & (1 << 7) != 0 { flags.push("SF"); }
-        if self.rflags & (1 << 8) != 0 { flags.push("TF"); }
-        if self.rflags & (1 << 9) != 0 { flags.push("IF"); }
-        if self.rflags & (1 << 10) != 0 { flags.push("DF"); }
-        if self.rflags & (1 << 11) != 0 { flags.push("OF"); }
-        if self.rflags & (1 << 14) != 0 { flags.push("NT"); }
-        if self.rflags & (1 << 16) != 0 { flags.push("RF"); }
-        if self.rflags & (1 << 17) != 0 { flags.push("VM"); }
-        if self.rflags & (1 << 18) != 0 { flags.push("AC"); }
-        if self.rflags & (1 << 21) != 0 { flags.push("ID"); }
+        if self.rflags & (1 << 0) != 0 {
+            flags.push("CF");
+        }
+        if self.rflags & (1 << 2) != 0 {
+            flags.push("PF");
+        }
+        if self.rflags & (1 << 4) != 0 {
+            flags.push("AF");
+        }
+        if self.rflags & (1 << 6) != 0 {
+            flags.push("ZF");
+        }
+        if self.rflags & (1 << 7) != 0 {
+            flags.push("SF");
+        }
+        if self.rflags & (1 << 8) != 0 {
+            flags.push("TF");
+        }
+        if self.rflags & (1 << 9) != 0 {
+            flags.push("IF");
+        }
+        if self.rflags & (1 << 10) != 0 {
+            flags.push("DF");
+        }
+        if self.rflags & (1 << 11) != 0 {
+            flags.push("OF");
+        }
+        if self.rflags & (1 << 14) != 0 {
+            flags.push("NT");
+        }
+        if self.rflags & (1 << 16) != 0 {
+            flags.push("RF");
+        }
+        if self.rflags & (1 << 17) != 0 {
+            flags.push("VM");
+        }
+        if self.rflags & (1 << 18) != 0 {
+            flags.push("AC");
+        }
+        if self.rflags & (1 << 21) != 0 {
+            flags.push("ID");
+        }
         format!("RFLAGS: [{}]", flags.join(" "))
     }
 }
@@ -141,13 +190,22 @@ pub struct PanicInfo {
 
 impl fmt::Display for PanicInfo {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        writeln!(f, "═══════════════════════════════════════════════════════════")?;
+        writeln!(
+            f,
+            "═══════════════════════════════════════════════════════════"
+        )?;
         writeln!(f, "                    KERNEL PANIC #{}", self.panic_number)?;
-        writeln!(f, "═══════════════════════════════════════════════════════════")?;
+        writeln!(
+            f,
+            "═══════════════════════════════════════════════════════════"
+        )?;
         writeln!(f)?;
 
         if self.nested {
-            writeln!(f, "!!! NESTED PANIC - panic occurred inside panic handler !!!")?;
+            writeln!(
+                f,
+                "!!! NESTED PANIC - panic occurred inside panic handler !!!"
+            )?;
             writeln!(f)?;
         }
 
@@ -184,7 +242,10 @@ impl fmt::Display for PanicInfo {
             writeln!(f)?;
         }
 
-        writeln!(f, "═══════════════════════════════════════════════════════════")?;
+        writeln!(
+            f,
+            "═══════════════════════════════════════════════════════════"
+        )?;
         writeln!(f, "System halted. Please reboot.")?;
         Ok(())
     }
@@ -640,7 +701,11 @@ impl SovereignKernelPanicSuite {
     pub fn new() -> Self {
         let mut notifier_chain = LinuxPanicNotifierChain::new();
         notifier_chain.register_notifier(1, "kexec_crashdump_trigger", PanicNotifierPriority::High);
-        notifier_chain.register_notifier(2, "thermal_panic_shutdown", PanicNotifierPriority::Normal);
+        notifier_chain.register_notifier(
+            2,
+            "thermal_panic_shutdown",
+            PanicNotifierPriority::Normal,
+        );
 
         Self {
             panic_handler: PanicHandler::new(),
@@ -747,6 +812,8 @@ mod tests {
     fn test_sovereign_kernel_panic_suite() {
         let suite = SovereignKernelPanicSuite::new();
         assert!(suite.health_check());
-        assert!(suite.summary_report().contains("Sovereign Kernel Panic Suite Active"));
+        assert!(suite
+            .summary_report()
+            .contains("Sovereign Kernel Panic Suite Active"));
     }
 }

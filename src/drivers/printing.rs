@@ -42,7 +42,13 @@ impl CupsIppPrintSpooler {
         }
     }
 
-    pub fn submit_ipp_job(&mut self, title: &str, owner: &str, pages: u32, payload: &[u8]) -> Result<u32, &'static str> {
+    pub fn submit_ipp_job(
+        &mut self,
+        title: &str,
+        owner: &str,
+        pages: u32,
+        payload: &[u8],
+    ) -> Result<u32, &'static str> {
         if !self.is_accepting_jobs {
             return Err("CUPS IPP: Printer is currently rejecting jobs");
         }
@@ -111,7 +117,12 @@ impl LpdSpooler {
         }
     }
 
-    pub fn receive_control_file(&mut self, job_id: u32, title: &str, owner: &str) -> Result<(), &'static str> {
+    pub fn receive_control_file(
+        &mut self,
+        job_id: u32,
+        title: &str,
+        owner: &str,
+    ) -> Result<(), &'static str> {
         self.queued_jobs.push(PrintJob {
             job_id,
             title: title.to_string(),
@@ -147,7 +158,9 @@ pub struct PpdDriverMatcher {
 
 impl PpdDriverMatcher {
     pub fn new() -> Self {
-        let mut matcher = Self { drivers: Vec::new() };
+        let mut matcher = Self {
+            drivers: Vec::new(),
+        };
         matcher.add_driver("HP LaserJet", "hp-laserjet-postscript.ppd");
         matcher.add_driver("Epson EcoTank", "epson-inkjet-escpr.ppd");
         matcher.add_driver("Canon PIXMA", "canon-pixma-bjc.ppd");
@@ -155,7 +168,8 @@ impl PpdDriverMatcher {
     }
 
     pub fn add_driver(&mut self, pattern: &str, ppd_file: &str) {
-        self.drivers.push((pattern.to_string(), ppd_file.to_string()));
+        self.drivers
+            .push((pattern.to_string(), ppd_file.to_string()));
     }
 
     pub fn match_ppd(&self, device_name: &str) -> String {
@@ -197,7 +211,9 @@ mod tests {
     #[test]
     fn test_cups_ipp_spooler() {
         let mut cups = CupsIppPrintSpooler::new("office_printer");
-        let id = cups.submit_ipp_job("report.pdf", "alice", 5, b"%PDF-1.5...").unwrap();
+        let id = cups
+            .submit_ipp_job("report.pdf", "alice", 5, b"%PDF-1.5...")
+            .unwrap();
         assert_eq!(id, 1);
         assert_eq!(cups.jobs.get(&id).unwrap().state, PrintJobState::Pending);
 
@@ -217,7 +233,13 @@ mod tests {
     #[test]
     fn test_ppd_matcher() {
         let matcher = PpdDriverMatcher::new();
-        assert_eq!(matcher.match_ppd("HP LaserJet Pro M404n"), "hp-laserjet-postscript.ppd");
-        assert_eq!(matcher.match_ppd("Unknown USB Printer"), "generic-postscript.ppd");
+        assert_eq!(
+            matcher.match_ppd("HP LaserJet Pro M404n"),
+            "hp-laserjet-postscript.ppd"
+        );
+        assert_eq!(
+            matcher.match_ppd("Unknown USB Printer"),
+            "generic-postscript.ppd"
+        );
     }
 }

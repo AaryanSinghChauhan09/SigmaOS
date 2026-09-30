@@ -201,28 +201,31 @@ impl InstallationConfig {
 
     pub fn generate_qemu_command(&self) -> String {
         let mut cmd = String::from("qemu-system-");
-        
+
         match self.architecture {
             Architecture::X86_64 => cmd.push_str("x86_64"),
             Architecture::ARM64 => cmd.push_str("aarch64"),
             Architecture::X86 => cmd.push_str("i386"),
             Architecture::ARM => cmd.push_str("arm"),
         }
-        
+
         cmd.push_str(&format!(" -m {}", self.memory_mb));
         cmd.push_str(&format!(" -smp {}", self.memory_mb / 2048));
-        cmd.push_str(&format!(" -drive file=sigmaos.qcow2,format=qcow2,size={}G", self.storage_gb));
-        
+        cmd.push_str(&format!(
+            " -drive file=sigmaos.qcow2,format=qcow2,size={}G",
+            self.storage_gb
+        ));
+
         if self.enable_kvm {
             cmd.push_str(" -enable-kvm");
         }
-        
+
         if self.enable_graphics {
             cmd.push_str(" -display gtk");
         }
-        
+
         cmd.push_str(" -net nic,model=virtio -net user");
-        
+
         cmd
     }
 
@@ -291,12 +294,14 @@ impl InstallationManager {
                         VmType::VMware => Ok(String::from("Create VM and mount ISO")),
                     }
                 } else {
-                    Err(String::from("VM type not specified for virtual machine installation"))
+                    Err(String::from(
+                        "VM type not specified for virtual machine installation",
+                    ))
                 }
             }
-            InstallationMethod::DualBoot => {
-                Ok(String::from("Run installer and use automatic partition detection"))
-            }
+            InstallationMethod::DualBoot => Ok(String::from(
+                "Run installer and use automatic partition detection",
+            )),
         }
     }
 
@@ -332,8 +337,8 @@ mod tests {
         assert_eq!(Architecture::from_str("x86_64"), Architecture::X86_64);
         assert_eq!(Architecture::from_str("arm64"), Architecture::ARM64);
         assert_eq!(Architecture::from_str("x86"), Architecture::X86);
-        assert_eq!(Architecture::is_64bit(Architecture::X86_64), true);
-        assert_eq!(Architecture::is_64bit(Architecture::X86), false);
+        assert!(Architecture::X86_64.is_64bit());
+        assert!(!Architecture::X86.is_64bit());
     }
 
     #[test]
@@ -355,9 +360,18 @@ mod tests {
 
     #[test]
     fn test_installation_method_from_str() {
-        assert_eq!(InstallationMethod::from_str("bare metal"), InstallationMethod::BareMetal);
-        assert_eq!(InstallationMethod::from_str("virtual machine"), InstallationMethod::VirtualMachine);
-        assert_eq!(InstallationMethod::from_str("dual boot"), InstallationMethod::DualBoot);
+        assert_eq!(
+            InstallationMethod::from_str("bare metal"),
+            InstallationMethod::BareMetal
+        );
+        assert_eq!(
+            InstallationMethod::from_str("virtual machine"),
+            InstallationMethod::VirtualMachine
+        );
+        assert_eq!(
+            InstallationMethod::from_str("dual boot"),
+            InstallationMethod::DualBoot
+        );
     }
 
     #[test]
@@ -375,21 +389,18 @@ mod tests {
 
     #[test]
     fn test_installation_config_creation() {
-        let config = InstallationConfig::new(
-            InstallationMethod::VirtualMachine,
-            Architecture::X86_64,
-        );
+        let config =
+            InstallationConfig::new(InstallationMethod::VirtualMachine, Architecture::X86_64);
         assert_eq!(config.method, InstallationMethod::VirtualMachine);
         assert_eq!(config.architecture, Architecture::X86_64);
     }
 
     #[test]
     fn test_installation_config_with_vm_type() {
-        let config = InstallationConfig::new(
-            InstallationMethod::VirtualMachine,
-            Architecture::X86_64,
-        ).with_vm_type(VmType::QEMU);
-        
+        let config =
+            InstallationConfig::new(InstallationMethod::VirtualMachine, Architecture::X86_64)
+                .with_vm_type(VmType::QEMU);
+
         assert_eq!(config.vm_type, Some(VmType::QEMU));
         assert_eq!(config.memory_mb, 4096);
         assert_eq!(config.storage_gb, 64);
@@ -397,21 +408,19 @@ mod tests {
 
     #[test]
     fn test_installation_config_with_memory() {
-        let config = InstallationConfig::new(
-            InstallationMethod::VirtualMachine,
-            Architecture::X86_64,
-        ).with_memory(8192);
-        
+        let config =
+            InstallationConfig::new(InstallationMethod::VirtualMachine, Architecture::X86_64)
+                .with_memory(8192);
+
         assert_eq!(config.memory_mb, 8192);
     }
 
     #[test]
     fn test_generate_qemu_command() {
-        let config = InstallationConfig::new(
-            InstallationMethod::VirtualMachine,
-            Architecture::X86_64,
-        ).with_vm_type(VmType::QEMU);
-        
+        let config =
+            InstallationConfig::new(InstallationMethod::VirtualMachine, Architecture::X86_64)
+                .with_vm_type(VmType::QEMU);
+
         let cmd = config.generate_qemu_command();
         assert!(cmd.contains("qemu-system-x86_64"));
         assert!(cmd.contains("-m 4096"));
@@ -422,7 +431,7 @@ mod tests {
     fn test_generate_dd_command() {
         let config = InstallationConfig::default();
         let cmd = config.generate_dd_command("sigmaos.iso", "/dev/sdX");
-        
+
         assert!(cmd.contains("dd if=sigmaos.iso"));
         assert!(cmd.contains("of=/dev/sdX"));
         assert!(cmd.contains("bs=4M"));
@@ -432,11 +441,10 @@ mod tests {
     fn test_installation_config_validate() {
         let config = InstallationConfig::default();
         assert!(config.validate().is_ok());
-        
-        let invalid_config = InstallationConfig::new(
-            InstallationMethod::BareMetal,
-            Architecture::X86_64,
-        ).with_memory(512);
+
+        let invalid_config =
+            InstallationConfig::new(InstallationMethod::BareMetal, Architecture::X86_64)
+                .with_memory(512);
         assert!(invalid_config.validate().is_err());
     }
 
@@ -455,12 +463,11 @@ mod tests {
 
     #[test]
     fn test_installation_manager_get_command() {
-        let config = InstallationConfig::new(
-            InstallationMethod::VirtualMachine,
-            Architecture::X86_64,
-        ).with_vm_type(VmType::QEMU);
+        let config =
+            InstallationConfig::new(InstallationMethod::VirtualMachine, Architecture::X86_64)
+                .with_vm_type(VmType::QEMU);
         let manager = InstallationManager::new(config);
-        
+
         let cmd = manager.get_installation_command().unwrap();
         assert!(cmd.contains("qemu-system-x86_64"));
     }
@@ -475,7 +482,7 @@ mod tests {
     fn test_installation_manager_requirements_summary() {
         let manager = InstallationManager::new(InstallationConfig::default());
         let summary = manager.get_requirements_summary();
-        
+
         assert!(summary.contains("Minimum: 2GB RAM"));
         assert!(summary.contains("Recommended: 8GB RAM"));
     }

@@ -108,15 +108,24 @@ impl TestSuite {
     }
 
     pub fn get_passed_count(&self) -> usize {
-        self.tests.iter().filter(|t| t.status == TestStatus::Passed).count()
+        self.tests
+            .iter()
+            .filter(|t| t.status == TestStatus::Passed)
+            .count()
     }
 
     pub fn get_failed_count(&self) -> usize {
-        self.tests.iter().filter(|t| t.status == TestStatus::Failed).count()
+        self.tests
+            .iter()
+            .filter(|t| t.status == TestStatus::Failed)
+            .count()
     }
 
     pub fn get_skipped_count(&self) -> usize {
-        self.tests.iter().filter(|t| t.status == TestStatus::Skipped).count()
+        self.tests
+            .iter()
+            .filter(|t| t.status == TestStatus::Skipped)
+            .count()
     }
 
     pub fn get_total_duration_ms(&self) -> u64 {
@@ -193,30 +202,33 @@ impl DevelopmentTestingFramework {
 
     pub fn run_all_tests(&self) -> Vec<TestResult> {
         let mut all_results = Vec::new();
-        
+
         for suite in &self.test_suites {
             all_results.extend(suite.tests.clone());
         }
-        
+
         all_results
     }
 
     pub fn run_unit_tests(&self) -> Vec<TestResult> {
-        self.test_suites.iter()
+        self.test_suites
+            .iter()
             .filter(|s| s.test_type == TestType::Unit)
             .flat_map(|s| s.tests.clone())
             .collect()
     }
 
     pub fn run_integration_tests(&self) -> Vec<TestResult> {
-        self.test_suites.iter()
+        self.test_suites
+            .iter()
             .filter(|s| s.test_type == TestType::Integration)
             .flat_map(|s| s.tests.clone())
             .collect()
     }
 
     pub fn run_standalone_tests(&self) -> Vec<TestResult> {
-        self.test_suites.iter()
+        self.test_suites
+            .iter()
             .filter(|s| s.test_type == TestType::Standalone)
             .flat_map(|s| s.tests.clone())
             .collect()
@@ -224,33 +236,41 @@ impl DevelopmentTestingFramework {
 
     pub fn get_statistics(&self) -> String {
         let mut stats = String::from("Development Testing Statistics:\n");
-        
+
         let total_tests: usize = self.test_suites.iter().map(|s| s.tests.len()).sum();
         let passed: usize = self.test_suites.iter().map(|s| s.get_passed_count()).sum();
         let failed: usize = self.test_suites.iter().map(|s| s.get_failed_count()).sum();
         let skipped: usize = self.test_suites.iter().map(|s| s.get_skipped_count()).sum();
-        let total_duration: u64 = self.test_suites.iter().map(|s| s.get_total_duration_ms()).sum();
-        
+        let total_duration: u64 = self
+            .test_suites
+            .iter()
+            .map(|s| s.get_total_duration_ms())
+            .sum();
+
         stats.push_str(&format!("Total test suites: {}\n", self.test_suites.len()));
         stats.push_str(&format!("Total tests: {}\n", total_tests));
         stats.push_str(&format!("Passed: {}\n", passed));
         stats.push_str(&format!("Failed: {}\n", failed));
         stats.push_str(&format!("Skipped: {}\n", skipped));
-        stats.push_str(&format!("Success rate: {:.1}%\n", (passed as f64 / total_tests as f64) * 100.0));
+        stats.push_str(&format!(
+            "Success rate: {:.1}%\n",
+            (passed as f64 / total_tests as f64) * 100.0
+        ));
         stats.push_str(&format!("Total duration: {}ms\n", total_duration));
-        
+
         if self.config.verbose {
             stats.push_str("\nPer-suite statistics:\n");
             for suite in &self.test_suites {
-                stats.push_str(&format!("  {}: {}/{} passed ({}ms)\n", 
-                    suite.name, 
-                    suite.get_passed_count(), 
+                stats.push_str(&format!(
+                    "  {}: {}/{} passed ({}ms)\n",
+                    suite.name,
+                    suite.get_passed_count(),
                     suite.tests.len(),
                     suite.get_total_duration_ms()
                 ));
             }
         }
-        
+
         stats
     }
 
@@ -273,9 +293,7 @@ impl DevelopmentTestingFramework {
                 }
                 cmd
             }
-            TestType::Standalone => {
-                String::from("./run_sigma_tests.sh")
-            }
+            TestType::Standalone => String::from("./run_sigma_tests.sh"),
         }
     }
 
@@ -284,17 +302,34 @@ impl DevelopmentTestingFramework {
     }
 
     pub fn list_all_tests(&self) -> Vec<String> {
-        self.test_suites.iter()
-            .flat_map(|s| s.tests.iter().map(|t| format!("{}::{} ({})", s.name, t.test_name, t.test_type.as_str())))
+        self.test_suites
+            .iter()
+            .flat_map(|s| {
+                s.tests
+                    .iter()
+                    .map(|t| format!("{}::{} ({})", s.name, t.test_name, t.test_type.as_str()))
+            })
             .collect()
     }
 
     pub fn list_failed_tests(&self) -> Vec<String> {
-        self.test_suites.iter()
-            .flat_map(|s| s.tests.iter()
-                .filter(|t| t.status == TestStatus::Failed)
-                .map(|t| format!("{}::{} - {}", s.name, t.test_name, t.error_message.as_ref().unwrap_or(&String::from("Unknown error"))))
-            )
+        self.test_suites
+            .iter()
+            .flat_map(|s| {
+                s.tests
+                    .iter()
+                    .filter(|t| t.status == TestStatus::Failed)
+                    .map(|t| {
+                        format!(
+                            "{}::{} - {}",
+                            s.name,
+                            t.test_name,
+                            t.error_message
+                                .as_ref()
+                                .unwrap_or(&String::from("Unknown error"))
+                        )
+                    })
+            })
             .collect()
     }
 
@@ -396,7 +431,7 @@ mod tests {
         test.passed(100, String::new());
         suite.add_test(test);
         framework.test_suites[0] = suite;
-        
+
         let stats = framework.get_statistics();
         assert!(stats.contains("Total test suites: 1"));
         assert!(stats.contains("Total tests: 1"));

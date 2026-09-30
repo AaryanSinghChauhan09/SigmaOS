@@ -83,7 +83,11 @@ impl SmpMultiCoreSchedulerEngine {
         }
     }
 
-    pub fn send_ipi(&mut self, target_cpu_id: u32, vector: IpiVector) -> Result<bool, &'static str> {
+    pub fn send_ipi(
+        &mut self,
+        target_cpu_id: u32,
+        vector: IpiVector,
+    ) -> Result<bool, &'static str> {
         if let Some(core) = self.cores.get(&target_cpu_id) {
             if core.state == CpuCoreState::Offline {
                 return Err("SMP Error: Target CPU is offline");
@@ -189,7 +193,13 @@ impl UsbXhciHostControllerDriver {
         Ok(slot_id)
     }
 
-    pub fn submit_transfer_trb(&mut self, slot_id: u8, buffer_phys: u64, length: u32, trb_type: TrbType) -> Result<usize, &'static str> {
+    pub fn submit_transfer_trb(
+        &mut self,
+        slot_id: u8,
+        buffer_phys: u64,
+        length: u32,
+        trb_type: TrbType,
+    ) -> Result<usize, &'static str> {
         if !self.slots.contains_key(&slot_id) {
             return Err("xHCI Error: Invalid device slot ID");
         }
@@ -248,7 +258,14 @@ impl KernelAsyncProcedureCallEngine {
         }
     }
 
-    pub fn queue_apc(&mut self, pid: usize, mode: ApcMode, prio: u8, callback: u64, arg: u64) -> u64 {
+    pub fn queue_apc(
+        &mut self,
+        pid: usize,
+        mode: ApcMode,
+        prio: u8,
+        callback: u64,
+        arg: u64,
+    ) -> u64 {
         let apc_id = self.next_apc_id;
         self.next_apc_id += 1;
 
@@ -266,7 +283,11 @@ impl KernelAsyncProcedureCallEngine {
         apc_id
     }
 
-    pub fn dispatch_pending_apcs_for_process(&mut self, pid: usize, current_mode: ApcMode) -> usize {
+    pub fn dispatch_pending_apcs_for_process(
+        &mut self,
+        pid: usize,
+        current_mode: ApcMode,
+    ) -> usize {
         let mut dispatched = 0;
         for apc in self.apc_queue.iter_mut() {
             if apc.target_pid == pid && apc.mode == current_mode && !apc.is_executed {
@@ -351,7 +372,9 @@ mod tests {
         let slot1 = xhci.enable_device_slot(1, 4).unwrap(); // SuperSpeed
         assert_eq!(slot1, 1);
 
-        let trb_bytes = xhci.submit_transfer_trb(1, 0x10000, 4096, TrbType::NormalTransfer).unwrap();
+        let trb_bytes = xhci
+            .submit_transfer_trb(1, 0x10000, 4096, TrbType::NormalTransfer)
+            .unwrap();
         assert_eq!(trb_bytes, 4096);
         assert_eq!(xhci.executed_trbs_count, 2);
     }

@@ -16,7 +16,6 @@
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
-
 /// SHA-256 hash
 #[repr(C)]
 pub struct SHA256Hash {
@@ -26,9 +25,7 @@ pub struct SHA256Hash {
 impl SHA256Hash {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        SHA256Hash {
-            data: [0; 32],
-        }
+        SHA256Hash { data: [0; 32] }
     }
 
     pub fn as_bytes(&self) -> &[u8; 32] {
@@ -49,8 +46,8 @@ impl SHA256 {
     pub fn new() -> Self {
         SHA256 {
             state: [
-                0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
-                0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19,
+                0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab,
+                0x5be0cd19,
             ],
             buffer: [0; 64],
             buffer_len: 0,
@@ -72,7 +69,8 @@ impl SHA256 {
                 offset += space;
             } else {
                 // Copy remaining to buffer
-                self.buffer[self.buffer_len..self.buffer_len + remaining].copy_from_slice(&data[offset..]);
+                self.buffer[self.buffer_len..self.buffer_len + remaining]
+                    .copy_from_slice(&data[offset..]);
                 self.buffer_len += remaining;
                 offset += remaining;
             }
@@ -84,10 +82,9 @@ impl SHA256 {
         // Append padding
         let bit_len = self.total_len * 8;
         let padding = [
-            0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0,
         ];
 
         let mut offset = 0;
@@ -136,7 +133,10 @@ impl SHA256 {
         for i in 16..64 {
             let s0 = sigma1(w[i - 2]);
             let s1 = sigma0(w[i - 15]);
-            w[i] = w[i - 16].wrapping_add(s0).wrapping_add(w[i - 7]).wrapping_add(s1);
+            w[i] = w[i - 16]
+                .wrapping_add(s0)
+                .wrapping_add(w[i - 7])
+                .wrapping_add(s1);
         }
 
         // Initialize working variables
@@ -151,7 +151,8 @@ impl SHA256 {
 
         // Compression function
         for i in 0..64 {
-            let t1 = h.wrapping_add(big_sigma1(e))
+            let t1 = h
+                .wrapping_add(big_sigma1(e))
                 .wrapping_add(ch(e, f, g))
                 .wrapping_add(K[i])
                 .wrapping_add(w[i]);
@@ -225,15 +226,11 @@ pub struct AES256Key {
 impl AES256Key {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        AES256Key {
-            data: [0; 32],
-        }
+        AES256Key { data: [0; 32] }
     }
 
     pub fn from_bytes(bytes: &[u8; 32]) -> Self {
-        AES256Key {
-            data: *bytes,
-        }
+        AES256Key { data: *bytes }
     }
 }
 
@@ -246,15 +243,11 @@ pub struct AES256Block {
 impl AES256Block {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        AES256Block {
-            data: [0; 16],
-        }
+        AES256Block { data: [0; 16] }
     }
 
     pub fn from_bytes(bytes: &[u8; 16]) -> Self {
-        AES256Block {
-            data: *bytes,
-        }
+        AES256Block { data: *bytes }
     }
 }
 
@@ -391,9 +384,10 @@ pub fn random_bytes(buf: &mut [u8]) {
             seed ^= stack_ptr;
 
             // 4. Additional chaotic mixing with prime constants
-            seed = seed.wrapping_mul(0x5851f42d4c957f2d)
-                   .wrapping_add(0xbf58476d1ce4e5b9)
-                   .rotate_left(13);
+            seed = seed
+                .wrapping_mul(0x5851f42d4c957f2d)
+                .wrapping_add(0xbf58476d1ce4e5b9)
+                .rotate_left(13);
 
             // 5. Final mixing
             seed = seed.wrapping_mul(0x94d049bb133111eb);

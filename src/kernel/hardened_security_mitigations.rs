@@ -10,9 +10,9 @@ use std::vec::Vec;
 /// Kernel Pointer Restriction Mode (`/proc/sys/kernel/kptr_restrict`)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KptrRestrictLevel {
-    ExposeRaw = 0,         // %px exposes raw kernel addresses
-    ZeroNonRoot = 1,       // Kernel pointers zeroed out for unprivileged callers
-    ZeroAll = 2,           // Kernel pointers zeroed out for all callers (hardened)
+    ExposeRaw = 0,   // %px exposes raw kernel addresses
+    ZeroNonRoot = 1, // Kernel pointers zeroed out for unprivileged callers
+    ZeroAll = 2,     // Kernel pointers zeroed out for all callers (hardened)
 }
 
 /// Control Flow Integrity (CFI) indirect call signature
@@ -90,7 +90,11 @@ impl SovereignHardenedSecurityMitigationsEngine {
     }
 
     /// Validate a forward-edge indirect function call against registered CFI signatures
-    pub fn validate_indirect_call(&self, target_address: usize, actual_hash: u64) -> Result<String, &'static str> {
+    pub fn validate_indirect_call(
+        &self,
+        target_address: usize,
+        actual_hash: u64,
+    ) -> Result<String, &'static str> {
         let sig = self
             .cfi_signatures
             .get(&target_address)
@@ -127,8 +131,14 @@ mod tests {
 
         // 2. Change to ZeroNonRoot
         engine.set_kptr_restrict(KptrRestrictLevel::ZeroNonRoot);
-        assert_eq!(engine.format_kptr(0xffffffff81000000, false), "0x0000000000000000");
-        assert_eq!(engine.format_kptr(0xffffffff81000000, true), "0xffffffff81000000");
+        assert_eq!(
+            engine.format_kptr(0xffffffff81000000, false),
+            "0x0000000000000000"
+        );
+        assert_eq!(
+            engine.format_kptr(0xffffffff81000000, true),
+            "0xffffffff81000000"
+        );
 
         // 3. Verify dmesg restriction
         assert!(engine.can_access_dmesg(true));

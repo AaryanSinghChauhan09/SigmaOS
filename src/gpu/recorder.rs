@@ -1,12 +1,12 @@
-use std::vec;
-use std::string::{String, ToString};
-use std::vec::Vec;
 use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 // GPU Screen Recorder Integration for SigmaOS
 // Real-time GPU-accelerated screen capture and sandbox security controls for benchmarking and visualization.
 
-use core::sync::atomic::{AtomicUsize, Ordering};
 use crate::security::CapabilityToken;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FrameFormat {
@@ -45,7 +45,12 @@ pub struct GpuScreenRecorder {
 }
 
 impl GpuScreenRecorder {
-    pub fn new(width: usize, height: usize, target_format: FrameFormat, permissions: CapabilityToken) -> Self {
+    pub fn new(
+        width: usize,
+        height: usize,
+        target_format: FrameFormat,
+        permissions: CapabilityToken,
+    ) -> Self {
         let frame_size = match target_format {
             FrameFormat::Rgb888 => width * height * 3,
             FrameFormat::Yuv420p | FrameFormat::Nv12 => (width * height * 3) / 2, // 1.5 bytes per pixel
@@ -91,7 +96,11 @@ impl GpuScreenRecorder {
 
     /// Push a raw RGB frame to be converted and stored.
     /// Employs lock-free double-buffer swapping mechanism to prevent blocking graphics threads.
-    pub fn capture_frame(&mut self, raw_rgb: &[u8], timestamp_ms: u64) -> Result<RecordedFrame, String> {
+    pub fn capture_frame(
+        &mut self,
+        raw_rgb: &[u8],
+        timestamp_ms: u64,
+    ) -> Result<RecordedFrame, String> {
         if !self.stats.is_recording {
             return Err("Recorder is not active".to_string());
         }

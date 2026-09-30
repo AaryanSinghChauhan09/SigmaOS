@@ -70,7 +70,12 @@ impl ArchMakepkgEngine {
 
     /// Synthesizes package file name (e.g., pkgname-pkgver-pkgrel-arch.pkg.tar.zst)
     pub fn build_target_filename(&self) -> String {
-        let arch_str = self.spec.arch.first().cloned().unwrap_or_else(|| "x86_64".to_string());
+        let arch_str = self
+            .spec
+            .arch
+            .first()
+            .cloned()
+            .unwrap_or_else(|| "x86_64".to_string());
         format!(
             "{}-{}-{}-{}.pkg.tar.zst",
             self.spec.pkgname, self.spec.pkgver, self.spec.pkgrel, arch_str
@@ -116,7 +121,8 @@ impl ArchNamcapLinterEngine {
                 warnings.push(NamcapLintWarning {
                     line_number: Some(idx + 1),
                     rule_id: "fhs-usr-local".to_string(),
-                    message: "FHS Violation: Arch packages must not install into /usr/local".to_string(),
+                    message: "FHS Violation: Arch packages must not install into /usr/local"
+                        .to_string(),
                 });
             }
         }
@@ -295,7 +301,8 @@ impl ArchNewsAdvisoryFeedEngine {
                 pub_date: "2024-04-01".to_string(),
                 requires_manual_intervention: true,
                 affected_packages: vec!["python".to_string(), "python-pip".to_string()],
-                description: "User must run pacman -Syu --overwrite '/usr/lib/python3.12/*'".to_string(),
+                description: "User must run pacman -Syu --overwrite '/usr/lib/python3.12/*'"
+                    .to_string(),
             },
             ArchNewsItem {
                 title: "Linux kernel 6.8 released in core".to_string(),
@@ -305,7 +312,9 @@ impl ArchNewsAdvisoryFeedEngine {
                 description: "Standard Linux kernel release update.".to_string(),
             },
         ];
-        Self { news_feed: sample_news }
+        Self {
+            news_feed: sample_news,
+        }
     }
 
     /// Checks if any pending news items require manual intervention before system upgrade
@@ -313,7 +322,11 @@ impl ArchNewsAdvisoryFeedEngine {
         let mut critical_news = Vec::new();
         for item in &self.news_feed {
             if item.requires_manual_intervention {
-                if item.affected_packages.iter().any(|p| upgrade_packages.contains(&p.as_str())) {
+                if item
+                    .affected_packages
+                    .iter()
+                    .any(|p| upgrade_packages.contains(&p.as_str()))
+                {
                     critical_news.push(item.clone());
                 }
             }
@@ -386,11 +399,17 @@ impl ArchPacmanConflictResolverEngine {
         let mut map = BTreeMap::new();
         map.insert("/usr/bin/bash".to_string(), "bash".to_string());
         map.insert("/usr/bin/python".to_string(), "python".to_string());
-        Self { installed_file_map: map }
+        Self {
+            installed_file_map: map,
+        }
     }
 
     /// Checks for file collisions when installing a new package
-    pub fn detect_collisions(&self, new_package: &str, new_files: &[&str]) -> Vec<PacmanFileCollision> {
+    pub fn detect_collisions(
+        &self,
+        new_package: &str,
+        new_files: &[&str],
+    ) -> Vec<PacmanFileCollision> {
         let mut collisions = Vec::new();
         for &file in new_files {
             if let Some(existing_owner) = self.installed_file_map.get(file) {
@@ -433,7 +452,10 @@ mod tests {
         };
 
         let makepkg = ArchMakepkgEngine::new(spec);
-        assert_eq!(makepkg.build_target_filename(), "neofetch-7.1.0-1-x86_64.pkg.tar.zst");
+        assert_eq!(
+            makepkg.build_target_filename(),
+            "neofetch-7.1.0-1-x86_64.pkg.tar.zst"
+        );
         assert!(makepkg.generate_pkginfo().contains("pkgname = neofetch"));
     }
 
@@ -486,7 +508,10 @@ mod tests {
 
         assert!(ArchVercmpVersionComparisonEngine::compare_versions("1:1.0-1", "0:2.0-1") > 0);
         assert!(ArchVercmpVersionComparisonEngine::compare_versions("2.38-1", "2.38-2") < 0);
-        assert_eq!(ArchVercmpVersionComparisonEngine::compare_versions("2.38-1", "2.38-1"), 0);
+        assert_eq!(
+            ArchVercmpVersionComparisonEngine::compare_versions("2.38-1", "2.38-1"),
+            0
+        );
     }
 
     #[test]

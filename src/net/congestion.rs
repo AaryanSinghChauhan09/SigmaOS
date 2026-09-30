@@ -1,7 +1,7 @@
 // Congestion Control Algorithms
 // Inspired by Linux TCP congestion control (BBR, CUBIC, Reno, etc.)
 
-use std::sync::atomic::{AtomicU64, AtomicU32, Ordering};
+use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 
 /// Congestion control algorithm type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -26,16 +26,16 @@ pub enum CongestionState {
 /// Congestion window
 #[derive(Debug, Clone)]
 pub struct CongestionWindow {
-    pub cwnd: u32,      // Congestion window (bytes)
-    pub ssthresh: u32,  // Slow start threshold
-    pub min_cwnd: u32,  // Minimum congestion window
-    pub max_cwnd: u32,  // Maximum congestion window
+    pub cwnd: u32,     // Congestion window (bytes)
+    pub ssthresh: u32, // Slow start threshold
+    pub min_cwnd: u32, // Minimum congestion window
+    pub max_cwnd: u32, // Maximum congestion window
 }
 
 impl CongestionWindow {
     pub fn new() -> Self {
         Self {
-            cwnd: 10 * 1460,  // Initial cwnd (10 MSS)
+            cwnd: 10 * 1460, // Initial cwnd (10 MSS)
             ssthresh: u32::MAX,
             min_cwnd: 2 * 1460,
             max_cwnd: u32::MAX,
@@ -50,7 +50,7 @@ impl CongestionWindow {
     /// Decrease congestion window on loss
     pub fn decrease(&mut self) {
         self.ssthresh = self.cwnd / 2;
-        self.cwnd = self.ssthresh.max(self.min_cwnd);
+        self.cwnd = self.min_cwnd;
     }
 
     /// Slow start
@@ -85,13 +85,14 @@ impl RenoCongestionControl {
             // New ACK
             self.next_seq = ack_seq + 1;
             self.dup_acks = 0;
-            
+
             match self.state {
                 CongestionState::Open => {
                     if self.cwnd.cwnd < self.cwnd.ssthresh {
                         self.cwnd.slow_start(acked_bytes);
                     } else {
-                        self.cwnd.increase(acked_bytes * acked_bytes / self.cwnd.cwnd);
+                        self.cwnd
+                            .increase(acked_bytes * acked_bytes / self.cwnd.cwnd);
                     }
                 }
                 CongestionState::Recovery => {
@@ -102,7 +103,7 @@ impl RenoCongestionControl {
         } else {
             // Duplicate ACK
             self.dup_acks += 1;
-            
+
             if self.dup_acks == 3 {
                 // Triple duplicate ACK
                 self.cwnd.decrease();
@@ -131,7 +132,7 @@ pub struct CubicCongestionControl {
     pub w_last_max: u32,
     pub epoch_start: u64,
     pub origin_point: u32,
-    pub c: f64,  // CUBIC parameter
+    pub c: f64, // CUBIC parameter
 }
 
 impl CubicCongestionControl {
@@ -148,7 +149,7 @@ impl CubicCongestionControl {
 
     /// Calculate CUBIC window
     fn cubic_cwnd(&self, time_since_epoch: u64) -> u32 {
-        let t = time_since_epoch as f64 / 1000.0;  // Convert to seconds
+        let t = time_since_epoch as f64 / 1000.0; // Convert to seconds
         let delta = (self.c * t.powi(3)).powf(1.0 / 3.0);
         (self.origin_point as f64 + delta) as u32
     }
@@ -158,7 +159,7 @@ impl CubicCongestionControl {
         if self.state == CongestionState::Open {
             let time_since_epoch = current_time - self.epoch_start;
             let target_cwnd = self.cubic_cwnd(time_since_epoch);
-            
+
             if self.cwnd.cwnd < target_cwnd {
                 self.cwnd.increase(acked_bytes);
             }
@@ -224,17 +225,17 @@ impl BbrCongestionControl {
     pub fn update_pacing_rate(&mut self) {
         // BBR uses BDP * gain
         let bdp = (self.max_bw * self.min_rtt as u64) / 1000;
-        self.pacing_rate = bdp * 3 / 2;  // 1.5x gain
+        self.pacing_rate = bdp * 3 / 2; // 1.5x gain
     }
 
     /// On ACK received
     pub fn on_ack(&mut self, bytes_acked: u64, rtt_sample: u32) {
         self.update_rtt(rtt_sample);
         self.update_pacing_rate();
-        
+
         // BBR adjusts cwnd based on BDP
         let bdp = (self.max_bw * self.min_rtt as u64) / 1000;
-        self.cwnd.cwnd = bdp as u32 * 2;  // 2x BDP
+        self.cwnd.cwnd = bdp as u32 * 2; // 2x BDP
     }
 
     /// Get current cwnd
@@ -308,10 +309,10 @@ mod tests {
     #[test]
     fn test_congestion_window() {
         let mut cwnd = CongestionWindow::new();
-        
+
         cwnd.increase(1460);
         assert!(cwnd.cwnd > 10 * 1460);
-        
+
         cwnd.decrease();
         assert!(cwnd.cwnd < cwnd.ssthresh);
     }
@@ -319,10 +320,10 @@ mod tests {
     #[test]
     fn test_reno_congestion() {
         let mut reno = RenoCongestionControl::new();
-        
+
         reno.on_ack(1, 1460);
         assert_eq!(reno.state, CongestionState::Open);
-        
+
         reno.on_timeout();
         assert_eq!(reno.state, CongestionState::Loss);
     }
@@ -330,7 +331,7 @@ mod tests {
     #[test]
     fn test_cubic_congestion() {
         let mut cubic = CubicCongestionControl::new();
-        
+
         cubic.on_congestion(0);
         assert_eq!(cubic.state, CongestionState::Recovery);
     }
@@ -338,11 +339,11 @@ mod tests {
     #[test]
     fn test_bbr_congestion() {
         let mut bbr = BbrCongestionControl::new();
-        
+
         bbr.update_bw(10000, 100);
         bbr.update_rtt(50000);
         bbr.update_pacing_rate();
-        
+
         assert!(bbr.pacing_rate > 0);
     }
 
@@ -350,9 +351,9 @@ mod tests {
     fn test_congestion_manager() {
         let mut manager = CongestionControlManager::new(CongestionControlType::Reno);
         manager.init();
-        
+
         assert!(manager.cwnd() > 0);
-        
+
         manager.switch_algorithm(CongestionControlType::Bbr);
         assert_eq!(manager.algorithm, CongestionControlType::Bbr);
     }

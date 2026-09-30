@@ -24,10 +24,14 @@ impl UdpHeader {
 
     pub fn serialize(&self) -> [u8; 8] {
         [
-            (self.src_port >> 8) as u8, (self.src_port & 0xFF) as u8,
-            (self.dst_port >> 8) as u8, (self.dst_port & 0xFF) as u8,
-            (self.length >> 8) as u8, (self.length & 0xFF) as u8,
-            (self.checksum >> 8) as u8, (self.checksum & 0xFF) as u8,
+            (self.src_port >> 8) as u8,
+            (self.src_port & 0xFF) as u8,
+            (self.dst_port >> 8) as u8,
+            (self.dst_port & 0xFF) as u8,
+            (self.length >> 8) as u8,
+            (self.length & 0xFF) as u8,
+            (self.checksum >> 8) as u8,
+            (self.checksum & 0xFF) as u8,
         ]
     }
 }
@@ -38,7 +42,12 @@ mod tests {
 
     #[test]
     fn test_udp_roundtrip() {
-        let hdr = UdpHeader { src_port: 12345, dst_port: 53, length: 20, checksum: 0 };
+        let hdr = UdpHeader {
+            src_port: 12345,
+            dst_port: 53,
+            length: 20,
+            checksum: 0,
+        };
         let serialized = hdr.serialize();
         let parsed = UdpHeader::parse(&serialized).unwrap();
         assert_eq!(parsed.src_port, 12345);

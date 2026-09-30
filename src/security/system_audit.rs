@@ -163,16 +163,23 @@ impl SystemAuditManager {
         self.rules.push(rule);
     }
 
-    pub fn log_event(&mut self, event_type: AuditEventType, user_id: u32, resource: String, action: String, result: String) -> u64 {
+    pub fn log_event(
+        &mut self,
+        event_type: AuditEventType,
+        user_id: u32,
+        resource: String,
+        action: String,
+        result: String,
+    ) -> u64 {
         let mut event = AuditEvent::new(self.next_event_id, event_type, user_id);
         event.resource = resource;
         event.action = action;
         event.result = result;
-        
+
         let id = event.id;
         self.events.push(event);
         self.next_event_id += 1;
-        
+
         id
     }
 
@@ -186,14 +193,19 @@ impl SystemAuditManager {
         )
     }
 
-    pub fn log_security_event(&mut self, event_type: AuditEventType, user_id: u32, details: String) -> u64 {
+    pub fn log_security_event(
+        &mut self,
+        event_type: AuditEventType,
+        user_id: u32,
+        details: String,
+    ) -> u64 {
         let mut event = AuditEvent::new(self.next_event_id, event_type, user_id);
         event.details = details;
-        
+
         let id = event.id;
         self.events.push(event);
         self.next_event_id += 1;
-        
+
         id
     }
 
@@ -202,21 +214,24 @@ impl SystemAuditManager {
     }
 
     pub fn query_events(&self, event_type: AuditEventType) -> Vec<AuditEvent> {
-        self.events.iter()
+        self.events
+            .iter()
             .filter(|e| e.event_type == event_type)
             .cloned()
             .collect()
     }
 
     pub fn query_user_events(&self, user_id: u32) -> Vec<AuditEvent> {
-        self.events.iter()
+        self.events
+            .iter()
             .filter(|e| e.user_id == user_id)
             .cloned()
             .collect()
     }
 
     pub fn query_file_access(&self, path: &str) -> Vec<AuditEvent> {
-        self.events.iter()
+        self.events
+            .iter()
             .filter(|e| e.event_type == AuditEventType::FileAccess && e.resource.contains(path))
             .cloned()
             .collect()
@@ -228,7 +243,8 @@ impl SystemAuditManager {
     }
 
     pub fn list_security_events(&self) -> Vec<AuditEvent> {
-        self.events.iter()
+        self.events
+            .iter()
             .filter(|e| e.event_type == AuditEventType::SecurityViolation)
             .cloned()
             .collect()
@@ -242,15 +258,27 @@ impl SystemAuditManager {
         let mut stats = String::from("Audit Statistics:\n");
         stats.push_str(&format!("Total events: {}\n", self.events.len()));
         stats.push_str(&format!("Rules configured: {}\n", self.rules.len()));
-        
-        let auth_count = self.events.iter().filter(|e| e.event_type == AuditEventType::Authentication).count();
-        let file_count = self.events.iter().filter(|e| e.event_type == AuditEventType::FileAccess).count();
-        let security_count = self.events.iter().filter(|e| e.event_type == AuditEventType::SecurityViolation).count();
-        
+
+        let auth_count = self
+            .events
+            .iter()
+            .filter(|e| e.event_type == AuditEventType::Authentication)
+            .count();
+        let file_count = self
+            .events
+            .iter()
+            .filter(|e| e.event_type == AuditEventType::FileAccess)
+            .count();
+        let security_count = self
+            .events
+            .iter()
+            .filter(|e| e.event_type == AuditEventType::SecurityViolation)
+            .count();
+
         stats.push_str(&format!("Authentication events: {}\n", auth_count));
         stats.push_str(&format!("File access events: {}\n", file_count));
         stats.push_str(&format!("Security violations: {}\n", security_count));
-        
+
         stats
     }
 
@@ -258,18 +286,21 @@ impl SystemAuditManager {
         let mut log = String::from("Audit Log Export:\n");
         log.push_str(&format!("Log file: {}\n", self.config.log_file));
         log.push_str(&format!("Log level: {}\n", self.config.log_level));
-        log.push_str(&format!("Retention: {} days\n\n", self.config.retention_days));
-        
+        log.push_str(&format!(
+            "Retention: {} days\n\n",
+            self.config.retention_days
+        ));
+
         for event in &self.events {
             log.push_str(&format!("{}\n", event.get_summary()));
         }
-        
+
         log
     }
 
     pub fn check_rules(&self, event: &AuditEvent) -> Vec<AuditAction> {
         let mut actions = Vec::new();
-        
+
         for rule in &self.rules {
             if rule.event == event.event_type.as_str() {
                 if event.resource.contains(&rule.path) || rule.path.is_empty() {
@@ -277,7 +308,7 @@ impl SystemAuditManager {
                 }
             }
         }
-        
+
         actions
     }
 
@@ -313,7 +344,7 @@ mod tests {
         event.resource = String::from("/etc/passwd");
         event.action = String::from("read");
         event.result = String::from("success");
-        
+
         let summary = event.get_summary();
         assert!(summary.contains("file_access"));
         assert!(summary.contains("/etc/passwd"));
@@ -361,7 +392,7 @@ mod tests {
             String::from("attempt"),
             String::from("success"),
         );
-        
+
         assert_eq!(id, 1);
         assert_eq!(manager.events.len(), 1);
     }
@@ -370,7 +401,7 @@ mod tests {
     fn test_system_audit_manager_log_file_access() {
         let mut manager = SystemAuditManager::new();
         let id = manager.log_file_access(String::from("/etc/passwd"), 1000, String::from("read"));
-        
+
         assert_eq!(id, 1);
         assert_eq!(manager.events.len(), 1);
     }
@@ -385,7 +416,7 @@ mod tests {
             String::from("attempt"),
             String::from("success"),
         );
-        
+
         let event = manager.get_event(1);
         assert!(event.is_some());
         assert_eq!(event.unwrap().user_id, 1000);
@@ -401,7 +432,7 @@ mod tests {
             String::from("attempt"),
             String::from("success"),
         );
-        
+
         let auth_events = manager.query_events(AuditEventType::Authentication);
         assert_eq!(auth_events.len(), 1);
     }
@@ -416,7 +447,7 @@ mod tests {
             String::from("attempt"),
             String::from("success"),
         );
-        
+
         let user_events = manager.query_user_events(1000);
         assert_eq!(user_events.len(), 1);
     }
@@ -425,7 +456,7 @@ mod tests {
     fn test_system_audit_manager_query_file_access() {
         let mut manager = SystemAuditManager::new();
         manager.log_file_access(String::from("/etc/passwd"), 1000, String::from("read"));
-        
+
         let file_events = manager.query_file_access("/etc/passwd");
         assert_eq!(file_events.len(), 1);
     }
@@ -447,7 +478,7 @@ mod tests {
             String::from("read"),
             String::from("success"),
         );
-        
+
         let recent = manager.list_recent_events(1);
         assert_eq!(recent.len(), 1);
     }
@@ -462,7 +493,7 @@ mod tests {
             String::from("attempt"),
             String::from("success"),
         );
-        
+
         let stats = manager.get_statistics();
         assert!(stats.contains("Total events: 1"));
     }
@@ -475,7 +506,7 @@ mod tests {
             String::from("/etc/shadow"),
             AuditAction::Log,
         ));
-        
+
         assert_eq!(manager.rules.len(), 1);
     }
 
@@ -487,10 +518,10 @@ mod tests {
             String::from("/etc/shadow"),
             AuditAction::Log,
         ));
-        
+
         let mut event = AuditEvent::new(1, AuditEventType::FileAccess, 1000);
         event.resource = String::from("/etc/shadow");
-        
+
         let actions = manager.check_rules(&event);
         assert_eq!(actions.len(), 1);
     }

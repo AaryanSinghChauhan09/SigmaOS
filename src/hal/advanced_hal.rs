@@ -3,7 +3,6 @@
 //! hotplug events, and device tree enumeration.
 use std::vec;
 
-
 use std::string::{String, ToString};
 use std::vec::Vec;
 
@@ -124,7 +123,9 @@ mod tests {
         });
 
         let dev = HardwareDevice {
-            syspath: "/sys/devices/pci0000:00/0000:00:1f.2/ata1/host0/target0:0:0/0:0:0:0/block/sda".to_string(),
+            syspath:
+                "/sys/devices/pci0000:00/0000:00:1f.2/ata1/host0/target0:0:0/0:0:0:0/block/sda"
+                    .to_string(),
             devpath: "/dev/sda".to_string(),
             subsystem: "block".to_string(),
             category: DeviceCategory::Storage,

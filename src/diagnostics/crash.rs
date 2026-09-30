@@ -12,30 +12,14 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use core::ptr;
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
-
+use std::vec::Vec;
 /// OOP-based Crash Reporting Pipeline for SigmaOS
 /// Implements crash reporting using OOP principles with traits and structs
 /// Inspired by Linux (coredump(5), ABRT, Apport) and FreeBSD (coredump(5))
 /// Based on Roadmap Item 14: Crash reporting pipeline
-
-#[cfg(not(test))]
-use core::ptr::{self, NonNull};
-#[cfg(not(test))]
-use core::sync::atomic::{AtomicUsize, Ordering};
-#[cfg(not(test))]
-use core::mem;
-#[cfg(not(test))]
-use core::ops::{Deref, DerefMut};
-
-#[cfg(test_disabled)]
-use core::ptr::{self, NonNull};
-#[cfg(test_disabled)]
-use core::sync::atomic::{AtomicUsize, Ordering};
-#[cfg(test_disabled)]
-use core::mem;
-#[cfg(test_disabled)]
-use core::ops::{Deref, DerefMut};
 
 /// Report ID
 pub type ReportID = usize;
@@ -72,9 +56,18 @@ pub struct CoredumpRegisterState {
 impl CoredumpRegisterState {
     pub fn zero() -> Self {
         CoredumpRegisterState {
-            rax: 0, rbx: 0, rcx: 0, rdx: 0,
-            rsi: 0, rdi: 0, rbp: 0, rsp: 0,
-            rip: 0, rflags: 0, cs: 0, ss: 0,
+            rax: 0,
+            rbx: 0,
+            rcx: 0,
+            rdx: 0,
+            rsi: 0,
+            rdi: 0,
+            rbp: 0,
+            rsp: 0,
+            rip: 0,
+            rflags: 0,
+            cs: 0,
+            ss: 0,
         }
     }
 }
@@ -87,7 +80,7 @@ pub struct Elf64CoredumpHeader {
     pub class_type: u8, // 2 = 64-bit
     pub endianness: u8, // 1 = Little Endian
     pub version: u8,
-    pub abi: u8,        // 0 = System V, 3 = Linux, 9 = FreeBSD
+    pub abi: u8, // 0 = System V, 3 = Linux, 9 = FreeBSD
     pub pid: u32,
     pub signal: u32,
     pub fault_address: u64,
@@ -96,7 +89,12 @@ pub struct Elf64CoredumpHeader {
 }
 
 impl Elf64CoredumpHeader {
-    pub fn new(pid: u32, signal: u32, fault_address: u64, registers: CoredumpRegisterState) -> Self {
+    pub fn new(
+        pid: u32,
+        signal: u32,
+        fault_address: u64,
+        registers: CoredumpRegisterState,
+    ) -> Self {
         Elf64CoredumpHeader {
             magic: [0x7f, b'E', b'L', b'F'],
             class_type: 2,
@@ -135,7 +133,11 @@ impl AutomatedCoredump {
     pub fn new(header: Elf64CoredumpHeader) -> Self {
         AutomatedCoredump {
             header,
-            segments: [CoredumpSegment { vaddr: 0, memsz: 0, flags: 0 }; 8],
+            segments: [CoredumpSegment {
+                vaddr: 0,
+                memsz: 0,
+                flags: 0,
+            }; 8],
             segment_count: 0,
             memory_dump: [0u8; 2048],
             dump_size: 0,
@@ -144,7 +146,11 @@ impl AutomatedCoredump {
 
     pub fn add_segment(&mut self, vaddr: u64, memsz: u64, flags: u32, data: &[u8]) {
         if self.segment_count < 8 {
-            self.segments[self.segment_count] = CoredumpSegment { vaddr, memsz, flags };
+            self.segments[self.segment_count] = CoredumpSegment {
+                vaddr,
+                memsz,
+                flags,
+            };
             self.segment_count += 1;
         }
 
@@ -215,7 +221,9 @@ impl AnonymizedBugReportEngine {
         let mut hash = [0u8; 32];
         let mut seed = (rip ^ (signal as u64)).wrapping_mul(0x9E3779B97F4A7C15);
         for byte in app {
-            seed = seed.wrapping_add(*byte as u64).wrapping_mul(0xBF58476D1CE4E5B9);
+            seed = seed
+                .wrapping_add(*byte as u64)
+                .wrapping_mul(0xBF58476D1CE4E5B9);
         }
 
         for i in 0..32 {
@@ -347,7 +355,12 @@ pub struct SimpleCrashReport {
 }
 
 impl SimpleCrashReport {
-    pub fn new(id: ReportID, application: &[u8], severity: CrashSeverity, capability: ReportCapability) -> Self {
+    pub fn new(
+        id: ReportID,
+        application: &[u8],
+        severity: CrashSeverity,
+        capability: ReportCapability,
+    ) -> Self {
         let mut app_array = [0u8; 64];
         let app_len = application.len().min(63);
 
@@ -430,7 +443,11 @@ impl CrashReport for SimpleCrashReport {
 /// Crash pipeline trait (OOP interface)
 pub trait CrashPipeline {
     /// Create report
-    fn create_report(&mut self, application: &[u8], severity: CrashSeverity) -> Result<ReportID, CrashError>;
+    fn create_report(
+        &mut self,
+        application: &[u8],
+        severity: CrashSeverity,
+    ) -> Result<ReportID, CrashError>;
     /// Delete report
     fn delete_report(&mut self, id: ReportID) -> Result<(), CrashError>;
     /// Get report
@@ -438,7 +455,10 @@ pub trait CrashPipeline {
     /// List reports by application
     fn list_reports(&self, application: &[u8]) -> Vec<ReportID>;
     /// Generate anonymized bug report
-    fn generate_anonymized_bug_report(&self, id: ReportID) -> Result<AnonymizedBugReport, CrashError>;
+    fn generate_anonymized_bug_report(
+        &self,
+        id: ReportID,
+    ) -> Result<AnonymizedBugReport, CrashError>;
     /// Get pipeline statistics
     fn stats(&self) -> CrashStats;
 }
@@ -515,7 +535,11 @@ impl SimpleCrashPipeline {
 }
 
 impl CrashPipeline for SimpleCrashPipeline {
-    fn create_report(&mut self, application: &[u8], severity: CrashSeverity) -> Result<ReportID, CrashError> {
+    fn create_report(
+        &mut self,
+        application: &[u8],
+        severity: CrashSeverity,
+    ) -> Result<ReportID, CrashError> {
         if !self.capability.can_create {
             return Err(CrashError::PermissionDenied);
         }
@@ -581,13 +605,18 @@ impl CrashPipeline for SimpleCrashPipeline {
         ids
     }
 
-    fn generate_anonymized_bug_report(&self, id: ReportID) -> Result<AnonymizedBugReport, CrashError> {
+    fn generate_anonymized_bug_report(
+        &self,
+        id: ReportID,
+    ) -> Result<AnonymizedBugReport, CrashError> {
         let report = self.get_report(id).ok_or(CrashError::ReportNotFound)?;
         let app = report.application();
         let message = report.message();
         let coredump = report.coredump();
 
-        Ok(AnonymizedBugReportEngine::generate_report(id, app, message, coredump))
+        Ok(AnonymizedBugReportEngine::generate_report(
+            id, app, message, coredump,
+        ))
     }
 
     fn stats(&self) -> CrashStats {
@@ -601,116 +630,6 @@ fn get_current_time() -> u64 {
     unsafe {
         COUNTER += 1_000_000;
         COUNTER
-    }
-}
-
-/// Simple Vec implementation for no_std
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-
-            if self.capacity > self.len {
-                ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-
-    fn len(&self) -> usize {
-        self.len
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-// External allocator functions
-#[cfg(not(test))]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-#[cfg(test_disabled)]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc, Layout};
-    let layout = Layout::from_size_align_unchecked(size, 8);
-    std::alloc::alloc(layout)
-}
-
-#[cfg(test_disabled)]
-unsafe fn free(_ptr: *mut u8) {
-    // No-op for test stub allocation
-}
-
-impl<T> Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &[T] {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut [T] {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.deref().iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.deref_mut().iter_mut()
     }
 }
 

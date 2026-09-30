@@ -1,8 +1,8 @@
+pub mod declarative;
 pub mod loader;
 pub mod manager;
-pub mod declarative;
 
 pub use declarative::{
-    SystemConfig, NetworkConfig, DesktopConfig, SecurityConfig, KernelConfig, PerformanceConfig,
-    SigmaOsConfig,
+    DesktopConfig, KernelConfig, NetworkConfig, PerformanceConfig, SecurityConfig, SigmaOsConfig,
+    SystemConfig,
 };
