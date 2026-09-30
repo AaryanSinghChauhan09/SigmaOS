@@ -30,11 +30,31 @@ pub fn run(input: &str, set1: &str, set2: Option<&str>, opts: TrOptions) -> Resu
         }
 
         let last_target = *target_chars.last().unwrap_or(&' ');
+        // Keep ASCII lookups allocation-free, and use a map for the remaining
+        // Unicode characters. `or_insert` preserves tr's first-match behavior
+        // when set1 contains duplicates.
+        let mut ascii_map = [None; 128];
+        let mut unicode_map = std::collections::HashMap::new();
+        for (index, source) in src_chars.iter().copied().enumerate() {
+            if source.is_ascii() {
+                let slot = &mut ascii_map[source as usize];
+                if slot.is_none() {
+                    *slot = Some(index);
+                }
+            } else {
+                unicode_map.entry(source).or_insert(index);
+            }
+        }
 
         let translated: String = input
             .chars()
             .map(|c| {
-                if let Some(pos) = src_chars.iter().position(|&sc| sc == c) {
+                let pos = if c.is_ascii() {
+                    ascii_map[c as usize]
+                } else {
+                    unicode_map.get(&c).copied()
+                };
+                if let Some(pos) = pos {
                     *target_chars.get(pos).unwrap_or(&last_target)
                 } else {
                     c
@@ -89,5 +109,23 @@ mod tests {
         };
         let res = run("hello world", "lo", None, opts).unwrap();
         assert_eq!(res, "he wrd");
+    }
+
+    #[test]
+    fn translation_preserves_first_duplicate_source_mapping() {
+        let res = run("a", "aba", Some("xyz"), TrOptions::default()).unwrap();
+        assert_eq!(res, "x");
+    }
+
+    #[test]
+    fn translation_handles_unicode_sets() {
+        let res = run("λ🙂x", "λ🙂", Some("αβ"), TrOptions::default()).unwrap();
+        assert_eq!(res, "αβx");
+    }
+
+    #[test]
+    fn translation_uses_last_target_for_short_target_set() {
+        let res = run("abc", "abc", Some("x"), TrOptions::default()).unwrap();
+        assert_eq!(res, "xxx");
     }
 }
