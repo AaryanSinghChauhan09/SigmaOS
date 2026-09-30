@@ -522,7 +522,7 @@ impl PiaStrictKillSwitch {
 /// Main Private Internet Access (PIA) Configuration and Management Engine
 pub struct PiaVpnManager {
     pub username: String,
-    pub auth_token: Option<String>,
+    auth_token: Option<String>,
     pub regions: Vec<PiaServerRegion>,
     pub active_region: Option<PiaServerRegion>,
     pub port_forwarding: PiaPortForwardingEngine,
@@ -615,13 +615,11 @@ impl PiaVpnManager {
 
     /// Authenticate via API token
     pub fn authenticate(&mut self, password_or_token: &str) -> Result<(), VpnError> {
-        if password_or_token.is_empty() {
-            return Err(VpnError::AuthenticationFailed(
-                "Empty PIA token".to_string(),
-            ));
-        }
-        self.auth_token = Some(format!("pia_tok_{}", password_or_token));
-        Ok(())
+        let _ = password_or_token;
+        self.auth_token = None;
+        Err(VpnError::AuthenticationFailed(
+            "PIA authentication provider unavailable".to_string(),
+        ))
     }
 
     /// Connect to active or optimal PIA region
@@ -670,6 +668,20 @@ impl PiaVpnManager {
         self.kill_switch.lift();
         self.state = ConnectionState::Disconnected;
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod authentication_fail_closed_tests {
+    use super::*;
+
+    #[test]
+    fn pia_authentication_and_connection_fail_closed_without_provider() {
+        let mut manager = PiaVpnManager::new("test_user");
+        manager.populate_default_regions();
+        assert!(manager.authenticate("test_token").is_err());
+        assert!(manager.connect(0).is_err());
+        assert_eq!(manager.state, ConnectionState::Disconnected);
     }
 }
 
