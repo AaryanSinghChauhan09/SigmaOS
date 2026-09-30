@@ -1472,14 +1472,16 @@ impl ShellRepl {
             }
 
             ShellCommand::Script { code } => {
-                let mut compat = crate::shell::zsh_bash_parity::UniversalShellCompatibilityEngine::new();
+                let mut engine = crate::shell::zsh_bash_parity::SovereignUniversalBsdLinuxShellEngine::new();
                 for (k, v) in &self.variables {
-                    compat.environment.push((k.clone(), v.clone()));
+                    engine.compat_engine.environment.push((k.clone(), v.clone()));
                 }
-                match compat.execute_script_as_sh(&code) {
-                    Ok(pipelines) => Ok(format!(
-                        "Successfully transpiled and parsed script ({} pipelines executed).",
-                        pipelines.len()
+                match engine.execute_bsd_linux_script(&code) {
+                    Ok((dialect, _posix_sh, pipelines, warnings)) => Ok(format!(
+                        "Successfully transpiled and parsed {:?} script ({} pipelines executed, {} POSIX compliance warnings).",
+                        dialect,
+                        pipelines.len(),
+                        warnings.len()
                     )),
                     Err(e) => Err(format!("Script execution error: {}", e)),
                 }
