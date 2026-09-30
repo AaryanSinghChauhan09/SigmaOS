@@ -5803,6 +5803,254 @@ impl Default for OmarchyPackageBridgeAdapter {
     fn default() -> Self { Self::new() }
 }
 
+pub struct UrpmiRpmAdapter;
+impl UrpmiRpmAdapter {
+    pub fn new() -> Self { Self }
+    pub fn parse_synthesis_hdr(&self, synthesis_line: &str) -> Option<(String, String, String)> {
+        let parts: Vec<&str> = synthesis_line.split('@').collect();
+        if parts.len() >= 2 {
+            let name_ver = parts[1];
+            let deps = if parts.len() >= 3 { parts[2] } else { "" };
+            Some((name_ver.to_string(), deps.to_string(), "rpm-synthesis".to_string()))
+        } else {
+            None
+        }
+    }
+}
+
+impl Default for UrpmiRpmAdapter {
+    fn default() -> Self { Self::new() }
+}
+
+pub struct AptRpmAdapter;
+impl AptRpmAdapter {
+    pub fn new() -> Self { Self }
+    pub fn translate_apt_rpm_release(&self, line: &str) -> Option<(String, String)> {
+        if line.contains("Component:") {
+            let comp = line.split("Component:").nth(1)?.split(',').next()?.trim();
+            Some(("component".to_string(), comp.to_string()))
+        } else {
+            None
+        }
+    }
+}
+
+impl Default for AptRpmAdapter {
+    fn default() -> Self { Self::new() }
+}
+
+pub struct ManjaroBranchSyncAdapter {
+    pub current_branch: String,
+}
+
+impl ManjaroBranchSyncAdapter {
+    pub fn new() -> Self {
+        Self { current_branch: "stable".to_string() }
+    }
+    pub fn switch_branch(&mut self, branch: &str) -> String {
+        self.current_branch = branch.to_string();
+        format!("https://repo.manjaro.org/repo/{}/", branch)
+    }
+}
+
+impl Default for ManjaroBranchSyncAdapter {
+    fn default() -> Self { Self::new() }
+}
+
+pub struct PopOsSystem76Adapter;
+impl PopOsSystem76Adapter {
+    pub fn new() -> Self { Self }
+    pub fn is_system76_hardware_driver(&self, pkg: &str) -> bool {
+        pkg.starts_with("system76-") || pkg.contains("pop-desktop") || pkg.contains("system76-driver")
+    }
+}
+
+impl Default for PopOsSystem76Adapter {
+    fn default() -> Self { Self::new() }
+}
+
+pub struct NixFlakeProfileGcAdapter {
+    pub profiles_cleaned: usize,
+}
+
+impl NixFlakeProfileGcAdapter {
+    pub fn new() -> Self {
+        Self { profiles_cleaned: 0 }
+    }
+    pub fn garbage_collect_generations(&mut self, keep_last: usize) -> usize {
+        let freed = if keep_last < 5 { 5 - keep_last } else { 1 };
+        self.profiles_cleaned += freed;
+        freed
+    }
+}
+
+impl Default for NixFlakeProfileGcAdapter {
+    fn default() -> Self { Self::new() }
+}
+
+// ============================================================================
+// Behavioral & Structural OOP Design Patterns (Interpreter, Iterator, Bridge)
+// ============================================================================
+
+pub trait QueryExpr: Send + Sync {
+    fn interpret(&self, package: &dyn IPackage) -> bool;
+}
+
+pub struct EqualsExpr {
+    pub key: String,
+    pub value: String,
+}
+
+impl EqualsExpr {
+    pub fn new(key: impl Into<String>, value: impl Into<String>) -> Self {
+        Self { key: key.into(), value: value.into() }
+    }
+}
+
+impl QueryExpr for EqualsExpr {
+    fn interpret(&self, package: &dyn IPackage) -> bool {
+        match self.key.as_str() {
+            "name" => package.name() == self.value,
+            "license" => package.metadata().license == self.value,
+            "maintainer" => package.metadata().maintainer == self.value,
+            _ => false,
+        }
+    }
+}
+
+pub struct AndExpr {
+    pub left: Box<dyn QueryExpr>,
+    pub right: Box<dyn QueryExpr>,
+}
+
+impl AndExpr {
+    pub fn new(left: Box<dyn QueryExpr>, right: Box<dyn QueryExpr>) -> Self {
+        Self { left, right }
+    }
+}
+
+impl QueryExpr for AndExpr {
+    fn interpret(&self, package: &dyn IPackage) -> bool {
+        self.left.interpret(package) && self.right.interpret(package)
+    }
+}
+
+pub struct OrExpr {
+    pub left: Box<dyn QueryExpr>,
+    pub right: Box<dyn QueryExpr>,
+}
+
+impl OrExpr {
+    pub fn new(left: Box<dyn QueryExpr>, right: Box<dyn QueryExpr>) -> Self {
+        Self { left, right }
+    }
+}
+
+impl QueryExpr for OrExpr {
+    fn interpret(&self, package: &dyn IPackage) -> bool {
+        self.left.interpret(package) || self.right.interpret(package)
+    }
+}
+
+pub struct PackageQueryInterpreter {
+    pub root_expr: Option<Box<dyn QueryExpr>>,
+}
+
+impl PackageQueryInterpreter {
+    pub fn new(expr: Box<dyn QueryExpr>) -> Self {
+        Self { root_expr: Some(expr) }
+    }
+
+    pub fn matches(&self, package: &dyn IPackage) -> bool {
+        if let Some(ref expr) = self.root_expr {
+            expr.interpret(package)
+        } else {
+            true
+        }
+    }
+}
+
+pub struct UniversalPackageIterator<'a> {
+    pub packages: &'a [Box<dyn IPackage>],
+    pub index: usize,
+}
+
+impl<'a> UniversalPackageIterator<'a> {
+    pub fn new(packages: &'a [Box<dyn IPackage>]) -> Self {
+        Self { packages, index: 0 }
+    }
+}
+
+impl<'a> Iterator for UniversalPackageIterator<'a> {
+    type Item = &'a dyn IPackage;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.packages.len() {
+            let pkg = self.packages[self.index].as_ref();
+            self.index += 1;
+            Some(pkg)
+        } else {
+            None
+        }
+    }
+}
+
+pub struct PackageFilterIterator<'a> {
+    pub inner: UniversalPackageIterator<'a>,
+    pub interpreter: &'a PackageQueryInterpreter,
+}
+
+impl<'a> PackageFilterIterator<'a> {
+    pub fn new(inner: UniversalPackageIterator<'a>, interpreter: &'a PackageQueryInterpreter) -> Self {
+        Self { inner, interpreter }
+    }
+}
+
+impl<'a> Iterator for PackageFilterIterator<'a> {
+    type Item = &'a dyn IPackage;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        while let Some(pkg) = self.inner.next() {
+            if self.interpreter.matches(pkg) {
+                return Some(pkg);
+            }
+        }
+        None
+    }
+}
+
+pub trait SandboxBackend: Send + Sync {
+    fn execute_in_sandbox(&self, command: &str, package: &dyn IPackage) -> Result<String, String>;
+}
+
+pub struct BubblewrapSandboxBackend;
+impl SandboxBackend for BubblewrapSandboxBackend {
+    fn execute_in_sandbox(&self, command: &str, package: &dyn IPackage) -> Result<String, String> {
+        Ok(format!("bwrap --unshare-all --ro-bind / / {} (pkg: {})", command, package.name()))
+    }
+}
+
+pub struct ChrootSandboxBackend;
+impl SandboxBackend for ChrootSandboxBackend {
+    fn execute_in_sandbox(&self, command: &str, package: &dyn IPackage) -> Result<String, String> {
+        Ok(format!("chroot /var/lib/sigma/jail {} (pkg: {})", command, package.name()))
+    }
+}
+
+pub struct PackageExecutionBridge {
+    pub sandbox: Box<dyn SandboxBackend>,
+}
+
+impl PackageExecutionBridge {
+    pub fn new(sandbox: Box<dyn SandboxBackend>) -> Self {
+        Self { sandbox }
+    }
+
+    pub fn run_package_task(&self, command: &str, package: &dyn IPackage) -> Result<String, String> {
+        self.sandbox.execute_in_sandbox(command, package)
+    }
+}
+
 // ============================================================================
 // UDF Extension Engines
 // ============================================================================
@@ -5893,6 +6141,92 @@ impl UdfPackageArchiveTransformerEngine {
 }
 
 impl Default for UdfPackageArchiveTransformerEngine {
+    fn default() -> Self { Self::new() }
+}
+
+pub struct UdfCustomConstraintSolverFilter {
+    pub preference_filters: Vec<Arc<dyn Fn(&str) -> i32 + Send + Sync>>,
+}
+
+impl UdfCustomConstraintSolverFilter {
+    pub fn new() -> Self {
+        Self { preference_filters: Vec::new() }
+    }
+
+    pub fn add_preference_filter<F>(&mut self, filter: F)
+    where
+        F: Fn(&str) -> i32 + Send + Sync + 'static,
+    {
+        self.preference_filters.push(Arc::new(filter));
+    }
+
+    pub fn score_package_candidate(&self, pkg_name: &str) -> i32 {
+        let mut score = 0;
+        for filter in &self.preference_filters {
+            score += filter(pkg_name);
+        }
+        score
+    }
+}
+
+impl Default for UdfCustomConstraintSolverFilter {
+    fn default() -> Self { Self::new() }
+}
+
+pub struct UdfEnvironmentSanitizerEngine {
+    pub denied_env_vars: Vec<String>,
+}
+
+impl UdfEnvironmentSanitizerEngine {
+    pub fn new() -> Self {
+        Self {
+            denied_env_vars: vec![
+                "LD_PRELOAD".to_string(),
+                "LD_LIBRARY_PATH".to_string(),
+                "DYLD_INSERT_LIBRARIES".to_string(),
+            ],
+        }
+    }
+
+    pub fn sanitize_env_var(&self, var_name: &str, value: &str) -> Option<String> {
+        if self.denied_env_vars.iter().any(|denied| denied == var_name) {
+            None
+        } else {
+            Some(value.to_string())
+        }
+    }
+}
+
+impl Default for UdfEnvironmentSanitizerEngine {
+    fn default() -> Self { Self::new() }
+}
+
+pub struct UdfPackagePatchTransformerEngine {
+    pub patch_hooks: Vec<Arc<dyn Fn(&str, &str) -> String + Send + Sync>>,
+}
+
+impl UdfPackagePatchTransformerEngine {
+    pub fn new() -> Self {
+        Self { patch_hooks: Vec::new() }
+    }
+
+    pub fn add_patch_hook<F>(&mut self, hook: F)
+    where
+        F: Fn(&str, &str) -> String + Send + Sync + 'static,
+    {
+        self.patch_hooks.push(Arc::new(hook));
+    }
+
+    pub fn apply_patches(&self, pkg_name: &str, source_code: &str) -> String {
+        let mut current = source_code.to_string();
+        for hook in &self.patch_hooks {
+            current = hook(pkg_name, &current);
+        }
+        current
+    }
+}
+
+impl Default for UdfPackagePatchTransformerEngine {
     fn default() -> Self { Self::new() }
 }
 
@@ -7424,5 +7758,76 @@ Description: Hook test";
         let raw = b"payload";
         let out = archive_transformer.transform(raw);
         assert_eq!(&out[..4], b"SPKG");
+    }
+
+    #[test]
+    fn test_new_distro_adapters_and_oop_patterns() {
+        // 1. Urpmi RPM Adapter
+        let urpmi = UrpmiRpmAdapter::new();
+        let (namever, deps, fmt) = urpmi.parse_synthesis_hdr("synthesis@htop-3.2.0-1.x86_64@libc.so.6@").unwrap();
+        assert_eq!(namever, "htop-3.2.0-1.x86_64");
+        assert_eq!(deps, "libc.so.6");
+        assert_eq!(fmt, "rpm-synthesis");
+
+        // 2. APT-RPM Adapter
+        let apt_rpm = AptRpmAdapter::new();
+        let (k, v) = apt_rpm.translate_apt_rpm_release("Component: main, Architecture: x86_64").unwrap();
+        assert_eq!(k, "component");
+        assert_eq!(v, "main");
+
+        // 3. Manjaro Branch Sync Adapter
+        let mut manjaro = ManjaroBranchSyncAdapter::new();
+        let repo_url = manjaro.switch_branch("testing");
+        assert_eq!(repo_url, "https://repo.manjaro.org/repo/testing/");
+
+        // 4. Pop!_OS System76 Driver Adapter
+        let pop = PopOsSystem76Adapter::new();
+        assert!(pop.is_system76_hardware_driver("system76-driver-nvidia"));
+        assert!(!pop.is_system76_hardware_driver("gnome-calculator"));
+
+        // 5. Nix Flake Profile GC Adapter
+        let mut nix_gc = NixFlakeProfileGcAdapter::new();
+        let freed = nix_gc.garbage_collect_generations(2);
+        assert_eq!(freed, 3);
+
+        // 6. Interpreter Pattern
+        let pkg = UniversalPackageBuilder::new("curl")
+            .version(8, 5, 0)
+            .license("MIT")
+            .build()
+            .unwrap();
+
+        let name_eq = Box::new(EqualsExpr::new("name", "curl"));
+        let lic_eq = Box::new(EqualsExpr::new("license", "MIT"));
+        let and_expr = Box::new(AndExpr::new(name_eq, lic_eq));
+        let interpreter = PackageQueryInterpreter::new(and_expr);
+        assert!(interpreter.matches(pkg.as_ref()));
+
+        // 7. Iterator Pattern
+        let pkgs: Vec<Box<dyn IPackage>> = vec![pkg];
+        let iter = UniversalPackageIterator::new(&pkgs);
+        let mut filter_iter = PackageFilterIterator::new(iter, &interpreter);
+        assert!(filter_iter.next().is_some());
+
+        // 8. Bridge Pattern (Sandbox Execution Bridge)
+        let bwrap = Box::new(BubblewrapSandboxBackend);
+        let bridge = PackageExecutionBridge::new(bwrap);
+        let sample_pkg = UniversalPackageBuilder::new("test").build().unwrap();
+        let res = bridge.run_package_task("ls -la", sample_pkg.as_ref()).unwrap();
+        assert!(res.contains("bwrap"));
+
+        // 9. UDF Extensions (Constraint Solver Filter, Env Sanitizer, Patch Transformer)
+        let mut filter = UdfCustomConstraintSolverFilter::new();
+        filter.add_preference_filter(|p| if p.starts_with("sovereign-") { 100 } else { 0 });
+        assert_eq!(filter.score_package_candidate("sovereign-libc"), 100);
+
+        let sanitizer = UdfEnvironmentSanitizerEngine::new();
+        assert!(sanitizer.sanitize_env_var("LD_PRELOAD", "/lib/malicious.so").is_none());
+        assert_eq!(sanitizer.sanitize_env_var("PATH", "/usr/bin").unwrap(), "/usr/bin");
+
+        let mut patcher = UdfPackagePatchTransformerEngine::new();
+        patcher.add_patch_hook(|pkg, src| format!("// Patched for {}\n{}", pkg, src));
+        let patched = patcher.apply_patches("zlib", "int main() {}");
+        assert!(patched.contains("Patched for zlib"));
     }
 }
