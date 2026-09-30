@@ -25,7 +25,7 @@ use std::vec::Vec;
 // Implements Strategy Pattern, Adapter Pattern, and Factory Pattern
 
 #[cfg(not(feature = "standalone_test"))]
-pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
 use std::sync::Arc;
 
