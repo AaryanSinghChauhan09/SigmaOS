@@ -198,6 +198,10 @@ sessions or mint Kerberos tickets without trusted Cockpit/KDC integrations.
 They reject authentication and token verification rather than treating any
 nonempty token as proof of identity.
 
+LDAP bind and package-repository LDAP/PAM compatibility methods also deny
+access until a trusted credential provider is integrated. These models must
+not be used as substitutes for host authentication services.
+
 The exported PAM model currently fails closed: without a secure random source
 and an audited password hashing provider, it will not register users or
 authenticate credentials. `security::crypto_utils::SecureRandom` and its
@@ -210,6 +214,10 @@ compatibility APIs likewise return provider-unavailable errors; their names do
 not mean SHA-256, HMAC, HKDF, PBKDF2, or password hashing are implemented there.
 This PAM model is not a replacement for the host operating system's PAM or
 account database.
+
+The lightweight LDAP bind model and package-repository LDAP/PAM authentication
+helper also deny access until trusted providers are integrated. They do not
+validate credentials or replace host LDAP/PAM services.
 
 ## Audit and Logging
 
