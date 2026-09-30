@@ -179,8 +179,10 @@ integration exist.
 The exported PAM model currently fails closed: without a secure random source
 and an audited password hashing provider, it will not register users or
 authenticate credentials. `security::crypto_utils::SecureRandom` and its
-password-hash placeholder return errors. This module is not a replacement for
-the host operating system's PAM or account database.
+password-hash placeholder return errors. `crypto::random::SimpleRandomGenerator`
+and `SimpleCSPRNG` also fail closed; timestamps, raw hardware values, and simple
+state-mixing routines are not substitutes for a CSPRNG. This PAM model is not a
+replacement for the host operating system's PAM or account database.
 
 ## Audit and Logging
 

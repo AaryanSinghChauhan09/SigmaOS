@@ -2,8 +2,8 @@
 
 **Snapshot date:** 2026-09-30
 **Remote:** `AaryanSinghChauhan09/SigmaOS`
-**Latest committed code snapshot:** `0d7ebe0fd5`
-**Local changes:** PQC, PAM/randomness, clipboard, and security-documentation hardening are in progress and not yet committed.
+**Latest committed code snapshot:** `7568e9f847`
+**Local changes:** RNG and crypto-audit hardening are in progress and not yet committed.
 
 This file records verified work and known limitations. It does not claim that SigmaOS matches Linux or BSD feature parity, is production-ready, or has completed every roadmap idea.
 
@@ -20,6 +20,7 @@ This file records verified work and known limitations. It does not claim that Si
 - Disabled placeholder ML-DSA/ML-KEM operations that returned zero-filled key material or accepted every signature; provider absence now returns errors.
 - Exported the PAM and crypto utility modules, then made random generation and password hashing fail closed without audited providers. User registration does not persist an account when those providers are unavailable.
 - Made the clipboard default explicitly plaintext, prevented it from marking plaintext as encrypted, and disabled its XOR prototype.
+- Disabled timestamp/hardware-mixed pseudo-random output, reported hardware entropy unavailable instead of fabricating values, and made the simulated crypto audit report no verified algorithms.
 - Made cross-distro authentication fail closed because no trusted credential provider exists.
 - Made SigmaPkg signature verification fail closed because no vetted signature provider is integrated; SHA-256 is used only for content integrity.
 - Updated security status in `wiki/07-Security.md` and its `WIKI/` mirror. The remote GitHub Wiki still needs syncing after authentication is restored.
@@ -28,6 +29,7 @@ This file records verified work and known limitations. It does not claim that Si
 
 - `cargo fmt --check` passed after the latest local changes.
 - Focused library tests passed for `tr` (5), PQC empty-input handling (2), distro authentication (11), package lookup (3), launcher search (6), AES fail-closed behavior (2), XOR encryption (1), vault adapters (1), secret manager (3), unavailable PQC provider (1), secure randomness/password hashing failure (1), PAM registration fail-closed behavior (1), and clipboard plaintext labeling (1).
+- Focused RNG and simulated-audit fail-closed tests are being run for the current uncommitted change.
 - `cargo check --lib` passed earlier in this work; later code changes were compiled by the focused library test builds.
 - `./run_sigma_tests.sh` passed in an earlier verification run. Python `pytest` could not run because `pytest` is not installed in the environment.
 - GitHub Actions for the latest `main` commit were queued when this snapshot was written. Their results are not yet known; check the current run list before relying on CI status.
