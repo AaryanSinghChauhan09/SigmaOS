@@ -153,15 +153,13 @@ pub struct WarpinatorPeer {
 }
 
 pub struct WarpinatorLanShare {
-    pin_code: String,
     known_peers: Vec<WarpinatorPeer>,
     pub total_transferred_bytes: u64,
 }
 
 impl WarpinatorLanShare {
-    pub fn new(pin: &str) -> Self {
+    pub fn new(_pin: &str) -> Self {
         Self {
-            pin_code: pin.to_string(),
             known_peers: Vec::new(),
             total_transferred_bytes: 0,
         }
