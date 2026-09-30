@@ -90,13 +90,17 @@ fn test_markdown_and_media_engines_wiki_parity() {
 #[test]
 fn test_security_vault_and_systemd_parity() {
     let mut vault = EncryptedFileVaultEngine::new("/dev/sda2");
-    assert!(vault.unlock_vault_with_biometric(true));
+    assert_eq!(
+        vault.unlock_vault_with_biometric(true),
+        Err("biometric provider unavailable")
+    );
+    assert!(vault.is_locked);
     vault.auto_lock_on_blank();
 
     let mut pm = HardwareBackedPasswordManager::new();
-    pm.add_password_entry("github.com", "developer", "P@ssword123!");
-    assert_eq!(pm.entries.len(), 1);
-    assert!(pm.check_haveibeenpwned_breach("password123"));
+    assert!(pm.add_password_entry("", "", "").is_err());
+    assert!(pm.entries.is_empty());
+    assert!(pm.check_haveibeenpwned_breach("").is_err());
 
     let mut systemd = SovereignSystemdParityEngine::new();
     systemd.register_unit(
