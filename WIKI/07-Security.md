@@ -198,6 +198,10 @@ sessions or mint Kerberos tickets without trusted Cockpit/KDC integrations.
 They reject authentication and token verification rather than treating any
 nonempty token as proof of identity.
 
+LDAP bind and package-repository LDAP/PAM compatibility methods also deny
+access until a trusted credential provider is integrated. These models must
+not be used as substitutes for host authentication services.
+
 The exported PAM model currently fails closed: without a secure random source
 and an audited password hashing provider, it will not register users or
 authenticate credentials. `security::crypto_utils::SecureRandom` and its
@@ -210,6 +214,10 @@ compatibility APIs likewise return provider-unavailable errors; their names do
 not mean SHA-256, HMAC, HKDF, PBKDF2, or password hashing are implemented there.
 This PAM model is not a replacement for the host operating system's PAM or
 account database.
+
+The lightweight LDAP bind model and package-repository LDAP/PAM authentication
+helper also deny access until trusted providers are integrated. They do not
+validate credentials or replace host LDAP/PAM services.
 
 ## Audit and Logging
 
@@ -377,7 +385,7 @@ gatt disconnect 1
 
 SigmaPkg currently computes SHA-256 digests for content integrity, but its signature verifier and signing service have no vetted cryptographic provider. They return `CryptoUnavailable` or an empty signature and reject signed metadata; a trusted key name or matching checksum alone is not proof of authenticity. Do not use these APIs to approve packages or updates until real signature verification and end-to-end trust-chain checks are integrated.
 
-The API-shaped compatibility layer in `src/crypto/libsodium.rs`, `src/crypto/aes.rs`, `src/crypto/encryption.rs`, `src/crypto/postquantum.rs`, the vault adapters in `src/security/vault.rs`, the secret manager in `src/security/secrets.rs`, and the PQC routines in `src/crypto/pqc_dilithium.rs` are not audited production implementations. They must not protect real data, credentials, updates, or network sessions. In `libsodium.rs`, `sodium_init` reports unavailable, and cryptographic operations return `ProviderNotIntegrated`; those APIs do not implement libsodium algorithms. The PQC/HKDF and FDE placeholders likewise return provider-unavailable errors. AES-shaped, XOR-based, vault, and secret encryption APIs also fail closed until audited providers are integrated. The secret manager can still hold in-memory plaintext and is not secure storage. The separate `src/crypto/advanced_encryption_standard.rs` file is not wired into the crypto module and contains simulated transformations.
+The API-shaped compatibility layer in `src/crypto/libsodium.rs`, `src/crypto/aes.rs`, `src/crypto/encryption.rs`, `src/crypto/postquantum.rs`, the vault adapters in `src/security/vault.rs`, the secret manager in `src/security/secrets.rs`, and the PQC routines in `src/crypto/pqc_dilithium.rs` are not audited production implementations. They must not protect real data, credentials, updates, or network sessions. In `libsodium.rs`, `sodium_init` reports unavailable, and cryptographic operations return `ProviderNotIntegrated`; those APIs do not implement libsodium algorithms. The PQC/HKDF and FDE placeholders likewise return provider-unavailable errors. AES-shaped, XOR-based, vault, and secret encryption APIs also fail closed until audited providers are integrated. The `src/crypto/aegis_vault.rs` key derivation, encryption, and decryption entry points now return `CryptoProviderUnavailable`; its compression helpers are separate and are not cryptographic. Aegis decompression rejects output above 64 MiB. The secret manager can still hold in-memory plaintext and is not secure storage. The separate `src/crypto/advanced_encryption_standard.rs` file is not wired into the crypto module and contains simulated transformations.
 
 The clipboard's XOR strategy also fails closed. The default clipboard mode is explicitly plaintext (`SecurityLevel::None`) and does not label copied text as encrypted. Selecting an encryption level without an audited provider returns an error.
 
