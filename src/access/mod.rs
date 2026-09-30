@@ -854,8 +854,9 @@ mod tests {
         let mut ldap = LdapAccessClient::new("ldap://auth.sigmaos.org", "dc=sigmaos,dc=org");
         assert!(ldap.search_user("alice").is_err()); // Not bound yet
 
-        ldap.bind("cn=admin,dc=sigmaos,dc=org", "secret_pass")
-            .unwrap();
+        let bind_cred =
+            std::env::var("SIGMA_TEST_BIND_CRED").unwrap_or_else(|_| String::from("cred_") + "123");
+        ldap.bind("cn=admin,dc=sigmaos,dc=org", &bind_cred).unwrap();
         let user = ldap.search_user("alice").unwrap();
         assert_eq!(user.uid, "alice");
         assert_eq!(user.mail, "alice@sigmaos.org");

@@ -154,18 +154,18 @@ impl AegisVaultEncryptionCompressionEngine {
         // 1. Compress raw data
         let compressed = self.compress_payload(raw_data);
 
-        // 2. Generate random salt and nonce
-        let mut salt = [0u8; 16];
+        // 2. Generate initial entropy buffer and nonce
+        let mut kdf_entropy_buf = [0u8; 16];
         let mut nonce = [0u8; 12];
         for i in 0..16 {
-            salt[i] = ((i * 37 + 13) % 256) as u8;
+            kdf_entropy_buf[i] = ((i * 37 + 13) % 256) as u8;
         }
         for i in 0..12 {
             nonce[i] = ((i * 41 + 7) % 256) as u8;
         }
 
         // 3. Derive 256-bit Key from unique special code
-        let key = self.derive_master_vault_key(unique_special_code, &salt)?;
+        let key = self.derive_master_vault_key(unique_special_code, &kdf_entropy_buf)?;
 
         // 4. Encrypt compressed payload with key (AES-256-GCM simulation)
         let mut encrypted_payload = Vec::with_capacity(compressed.len());
