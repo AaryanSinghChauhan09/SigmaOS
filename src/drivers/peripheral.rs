@@ -3,9 +3,10 @@
 // Improved with Windows Driver Model (WDM), WDF/KMDF/UMDF concepts,
 // Filter/Minifilter drivers, I/O Request Packets (IRPs), and Plug-and-Play (PnP) states.
 
-use core::sync::atomic::{AtomicUsize, Ordering};
+
 use std::boxed::Box;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Defines the generation of a peripheral device
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

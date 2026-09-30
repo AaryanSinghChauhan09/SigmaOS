@@ -254,24 +254,11 @@ pub enum Pattern {
 /// Binary operators.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BinaryOp {
-    Add,
-    Sub,
-    Mul,
-    Div,
-    Mod,
-    Eq,
-    NotEq,
-    Lt,
-    LtEq,
-    Gt,
-    GtEq,
-    And,
-    Or,
-    BitAnd,
-    BitOr,
-    BitXor,
-    Shl,
-    Shr,
+    Add, Sub, Mul, Div, Mod,
+    Eq, NotEq, Lt, LtEq, Gt, GtEq,
+    And, Or,
+    BitAnd, BitOr, BitXor,
+    Shl, Shr,
 }
 
 /// Unary operators.
@@ -289,23 +276,11 @@ pub enum UnaryOp {
 pub enum TypeExpr {
     Named(String),
     Generic(String, Vec<TypeExpr>),
-    Reference {
-        mutable: bool,
-        inner: Box<TypeExpr>,
-    },
-    Pointer {
-        mutable: bool,
-        inner: Box<TypeExpr>,
-    },
-    Array {
-        element: Box<TypeExpr>,
-        size: Option<u64>,
-    },
+    Reference { mutable: bool, inner: Box<TypeExpr> },
+    Pointer { mutable: bool, inner: Box<TypeExpr> },
+    Array { element: Box<TypeExpr>, size: Option<u64> },
     Tuple(Vec<TypeExpr>),
-    Function {
-        params: Vec<TypeExpr>,
-        ret: Box<TypeExpr>,
-    },
+    Function { params: Vec<TypeExpr>, ret: Box<TypeExpr> },
     Infer,
     Unit,
 }
@@ -354,14 +329,21 @@ impl Parser {
             Some(TokenKind::Keyword(Keyword::Struct)) => {
                 Ok(Item::StructDef(self.parse_struct(is_pub)?))
             }
-            Some(TokenKind::Keyword(Keyword::Enum)) => Ok(Item::EnumDef(self.parse_enum(is_pub)?)),
+            Some(TokenKind::Keyword(Keyword::Enum)) => {
+                Ok(Item::EnumDef(self.parse_enum(is_pub)?))
+            }
             Some(TokenKind::Keyword(Keyword::Trait)) => {
                 Ok(Item::TraitDef(self.parse_trait(is_pub)?))
             }
-            Some(TokenKind::Keyword(Keyword::Impl)) => Ok(Item::ImplBlock(self.parse_impl()?)),
-            Some(TokenKind::Keyword(Keyword::Const))
-            | Some(TokenKind::Keyword(Keyword::Static)) => Ok(Item::ConstDef(self.parse_const()?)),
-            Some(TokenKind::Keyword(Keyword::Use)) => Ok(Item::UseDecl(self.parse_use()?)),
+            Some(TokenKind::Keyword(Keyword::Impl)) => {
+                Ok(Item::ImplBlock(self.parse_impl()?))
+            }
+            Some(TokenKind::Keyword(Keyword::Const)) | Some(TokenKind::Keyword(Keyword::Static)) => {
+                Ok(Item::ConstDef(self.parse_const()?))
+            }
+            Some(TokenKind::Keyword(Keyword::Use)) => {
+                Ok(Item::UseDecl(self.parse_use()?))
+            }
             Some(TokenKind::Keyword(Keyword::Mod)) => {
                 self.advance();
                 let name = self.expect_ident()?;
@@ -427,12 +409,7 @@ impl Parser {
             None
         };
 
-        Ok(FunctionSig {
-            name,
-            params,
-            return_type,
-            span,
-        })
+        Ok(FunctionSig { name, params, return_type, span })
     }
 
     fn parse_param_list(&mut self) -> Result<Vec<(String, TypeExpr)>, ParseError> {
@@ -475,12 +452,7 @@ impl Parser {
             self.skip_newlines();
         }
         self.expect(TokenKind::RBrace)?;
-        Ok(StructDef {
-            name,
-            fields,
-            is_pub,
-            span,
-        })
+        Ok(StructDef { name, fields, is_pub, span })
     }
 
     fn parse_enum(&mut self, is_pub: bool) -> Result<EnumDef, ParseError> {
@@ -507,10 +479,7 @@ impl Parser {
             } else {
                 None
             };
-            variants.push(EnumVariant {
-                name: vname,
-                fields,
-            });
+            variants.push(EnumVariant { name: vname, fields });
             self.skip_newlines();
             if self.check(TokenKind::Comma) {
                 self.advance();
@@ -518,12 +487,7 @@ impl Parser {
             self.skip_newlines();
         }
         self.expect(TokenKind::RBrace)?;
-        Ok(EnumDef {
-            name,
-            variants,
-            is_pub,
-            span,
-        })
+        Ok(EnumDef { name, variants, is_pub, span })
     }
 
     fn parse_trait(&mut self, is_pub: bool) -> Result<TraitDef, ParseError> {
@@ -538,12 +502,7 @@ impl Parser {
             self.skip_newlines();
         }
         self.expect(TokenKind::RBrace)?;
-        Ok(TraitDef {
-            name,
-            methods,
-            is_pub,
-            span,
-        })
+        Ok(TraitDef { name, methods, is_pub, span })
     }
 
     fn parse_impl(&mut self) -> Result<ImplBlock, ParseError> {
@@ -585,12 +544,7 @@ impl Parser {
         let ty = self.parse_type()?;
         self.expect(TokenKind::Eq)?;
         let value = self.parse_expr()?;
-        Ok(ConstDef {
-            name,
-            ty,
-            value,
-            span,
-        })
+        Ok(ConstDef { name, ty, value, span })
     }
 
     fn parse_use(&mut self) -> Result<UseDecl, ParseError> {
@@ -628,15 +582,11 @@ impl Parser {
                     || self.check(TokenKind::Semicolon)
                     || self.check(TokenKind::RBrace)
                 {
-                    if self.check(TokenKind::Semicolon) {
-                        self.advance();
-                    }
+                    if self.check(TokenKind::Semicolon) { self.advance(); }
                     Ok(Stmt::Return(None, span))
                 } else {
                     let val = self.parse_expr()?;
-                    if self.check(TokenKind::Semicolon) {
-                        self.advance();
-                    }
+                    if self.check(TokenKind::Semicolon) { self.advance(); }
                     Ok(Stmt::Return(Some(val), span))
                 }
             }
@@ -655,11 +605,7 @@ impl Parser {
                 self.advance();
                 let condition = self.parse_expr()?;
                 let body = self.parse_block()?;
-                Ok(Stmt::While {
-                    condition,
-                    body,
-                    span,
-                })
+                Ok(Stmt::While { condition, body, span })
             }
             Some(TokenKind::Keyword(Keyword::For)) => {
                 let span = self.current_span();
@@ -668,12 +614,7 @@ impl Parser {
                 self.expect_keyword(Keyword::In)?;
                 let iterable = self.parse_expr()?;
                 let body = self.parse_block()?;
-                Ok(Stmt::For {
-                    variable,
-                    iterable,
-                    body,
-                    span,
-                })
+                Ok(Stmt::For { variable, iterable, body, span })
             }
             Some(TokenKind::Keyword(Keyword::Loop)) => {
                 let span = self.current_span();
@@ -714,13 +655,7 @@ impl Parser {
         if self.check(TokenKind::Semicolon) {
             self.advance();
         }
-        Ok(Stmt::Let {
-            name,
-            mutable,
-            ty,
-            value,
-            span,
-        })
+        Ok(Stmt::Let { name, mutable, ty, value, span })
     }
 
     // ── Expression Parsing (Pratt-style precedence climbing) ─────────
@@ -850,51 +785,31 @@ impl Parser {
                 let span = self.current_span();
                 self.advance();
                 let operand = self.parse_unary()?;
-                Ok(Expr::Unary {
-                    op: UnaryOp::Neg,
-                    operand: Box::new(operand),
-                    span,
-                })
+                Ok(Expr::Unary { op: UnaryOp::Neg, operand: Box::new(operand), span })
             }
             Some(TokenKind::Bang) => {
                 let span = self.current_span();
                 self.advance();
                 let operand = self.parse_unary()?;
-                Ok(Expr::Unary {
-                    op: UnaryOp::Not,
-                    operand: Box::new(operand),
-                    span,
-                })
+                Ok(Expr::Unary { op: UnaryOp::Not, operand: Box::new(operand), span })
             }
             Some(TokenKind::Tilde) => {
                 let span = self.current_span();
                 self.advance();
                 let operand = self.parse_unary()?;
-                Ok(Expr::Unary {
-                    op: UnaryOp::BitNot,
-                    operand: Box::new(operand),
-                    span,
-                })
+                Ok(Expr::Unary { op: UnaryOp::BitNot, operand: Box::new(operand), span })
             }
             Some(TokenKind::Ampersand) => {
                 let span = self.current_span();
                 self.advance();
                 let operand = self.parse_unary()?;
-                Ok(Expr::Unary {
-                    op: UnaryOp::Ref,
-                    operand: Box::new(operand),
-                    span,
-                })
+                Ok(Expr::Unary { op: UnaryOp::Ref, operand: Box::new(operand), span })
             }
             Some(TokenKind::Star) => {
                 let span = self.current_span();
                 self.advance();
                 let operand = self.parse_unary()?;
-                Ok(Expr::Unary {
-                    op: UnaryOp::Deref,
-                    operand: Box::new(operand),
-                    span,
-                })
+                Ok(Expr::Unary { op: UnaryOp::Deref, operand: Box::new(operand), span })
             }
             _ => self.parse_postfix(),
         }
@@ -1153,10 +1068,7 @@ impl Parser {
                     self.advance();
                 }
                 let inner = self.parse_type()?;
-                Ok(TypeExpr::Reference {
-                    mutable,
-                    inner: Box::new(inner),
-                })
+                Ok(TypeExpr::Reference { mutable, inner: Box::new(inner) })
             }
             Some(TokenKind::Star) => {
                 self.advance();
@@ -1165,10 +1077,7 @@ impl Parser {
                     self.advance();
                 }
                 let inner = self.parse_type()?;
-                Ok(TypeExpr::Pointer {
-                    mutable,
-                    inner: Box::new(inner),
-                })
+                Ok(TypeExpr::Pointer { mutable, inner: Box::new(inner) })
             }
             Some(TokenKind::LBracket) => {
                 self.advance();
@@ -1186,10 +1095,7 @@ impl Parser {
                     None
                 };
                 self.expect(TokenKind::RBracket)?;
-                Ok(TypeExpr::Array {
-                    element: Box::new(element),
-                    size,
-                })
+                Ok(TypeExpr::Array { element: Box::new(element), size })
             }
             Some(TokenKind::LParen) => {
                 self.advance();
@@ -1228,7 +1134,9 @@ impl Parser {
                     Ok(TypeExpr::Named(name))
                 }
             }
-            _ => Ok(TypeExpr::Infer),
+            _ => {
+                Ok(TypeExpr::Infer)
+            }
         }
     }
 
@@ -1294,10 +1202,7 @@ impl Parser {
     }
 
     fn skip_newlines(&mut self) {
-        while matches!(
-            self.peek_kind(),
-            Some(TokenKind::Newline) | Some(TokenKind::Semicolon)
-        ) {
+        while matches!(self.peek_kind(), Some(TokenKind::Newline) | Some(TokenKind::Semicolon)) {
             self.advance();
         }
     }
@@ -1353,13 +1258,15 @@ mod tests {
     fn test_parse_let_binding() {
         let prog = parse("fn test() { let mut x: i32 = 10 }").unwrap();
         match &prog.items[0] {
-            Item::Function(f) => match &f.body.stmts[0] {
-                Stmt::Let { name, mutable, .. } => {
-                    assert_eq!(name, "x");
-                    assert!(*mutable);
+            Item::Function(f) => {
+                match &f.body.stmts[0] {
+                    Stmt::Let { name, mutable, .. } => {
+                        assert_eq!(name, "x");
+                        assert!(*mutable);
+                    }
+                    _ => panic!("expected let"),
                 }
-                _ => panic!("expected let"),
-            },
+            }
             _ => panic!("expected function"),
         }
     }

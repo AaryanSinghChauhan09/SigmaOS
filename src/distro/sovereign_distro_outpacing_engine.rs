@@ -66,19 +66,12 @@ impl SovereignSystemd256ParityAndBeyondEngine {
     }
 
     /// Execute `run0` style polkit/pty privilege escalation without sudo SUID binaries
-    pub fn execute_run0_command(
-        &mut self,
-        target_user: &str,
-        command: &str,
-    ) -> Result<String, &'static str> {
+    pub fn execute_run0_command(&mut self, target_user: &str, command: &str) -> Result<String, &'static str> {
         if command.is_empty() {
             return Err("Empty command provided to run0 launcher");
         }
         self.run0_escalations_count += 1;
-        Ok(format!(
-            "run0 [user: {}] -> Executed '{}' via systemd-pty-forwarder",
-            target_user, command
-        ))
+        Ok(format!("run0 [user: {}] -> Executed '{}' via systemd-pty-forwarder", target_user, command))
     }
 
     /// Dispatch Varlink IPC message call
@@ -166,8 +159,7 @@ impl SovereignOpenBsd76PledgeUnveilAdvancementEngine {
         if path.is_empty() {
             return Err("Path cannot be empty for unveil");
         }
-        self.unveiled_paths
-            .insert(path.to_string(), permissions.to_string());
+        self.unveiled_paths.insert(path.to_string(), permissions.to_string());
         Ok(())
     }
 
@@ -267,8 +259,7 @@ impl SovereignWayland123ExplicitSyncEngine {
     /// Flush completed frames whose release point has passed
     pub fn flush_completed_frames(&mut self, current_gpu_timeline: u64) -> usize {
         let initial_len = self.active_frames.len();
-        self.active_frames
-            .retain(|f| f.release_point > current_gpu_timeline);
+        self.active_frames.retain(|f| f.release_point > current_gpu_timeline);
         initial_len - self.active_frames.len()
     }
 }
@@ -476,11 +467,7 @@ impl SovereignMasterOutpacingSuite {
         let mut score = 50u32; // Base baseline parity score
 
         // Systemd 256 run0 and varlink capability (+10)
-        if self
-            .systemd256_engine
-            .execute_run0_command("root", "whoami")
-            .is_ok()
-        {
+        if self.systemd256_engine.execute_run0_command("root", "whoami").is_ok() {
             score += 10;
         }
 
@@ -490,22 +477,19 @@ impl SovereignMasterOutpacingSuite {
         }
 
         // Wayland 1.23 explicit sync pipeline (+10)
-        self.wayland123_engine
-            .submit_explicit_sync_frame(1, 100, 200, false, 100);
+        self.wayland123_engine.submit_explicit_sync_frame(1, 100, 200, false, 100);
         if self.wayland123_engine.total_synced_frames > 0 {
             score += 10;
         }
 
         // FreeBSD 14.1 VNET jail (+10)
-        self.freebsd141_engine
-            .create_vnet_jail(1, "web_jail", "/jails/web", "vnet0");
+        self.freebsd141_engine.create_vnet_jail(1, "web_jail", "/jails/web", "vnet0");
         if !self.freebsd141_engine.jails.is_empty() {
             score += 10;
         }
 
         // Linux 6.12 Bcachefs multi-tier storage (+10)
-        self.bcachefs_engine
-            .write_extent(1, StorageDeviceTier::HotNvme, b"DATA");
+        self.bcachefs_engine.write_extent(1, StorageDeviceTier::HotNvme, b"DATA");
         if !self.bcachefs_engine.extents.is_empty() {
             score += 10;
         }
@@ -534,16 +518,10 @@ mod tests {
         let res = engine.execute_run0_command("root", "ls -la").unwrap();
         assert!(res.contains("run0 [user: root]"));
 
-        let msg_id =
-            engine.dispatch_varlink_message("org.systemd.UserDatabase.GetUser", "{\"uid\":0}");
+        let msg_id = engine.dispatch_varlink_message("org.systemd.UserDatabase.GetUser", "{\"uid\":0}");
         assert_eq!(msg_id, 1);
 
-        engine.register_vpick_image(
-            "sigmaos-base",
-            "1.0.0",
-            "x86_64",
-            "/var/images/sigma-1.0.raw",
-        );
+        engine.register_vpick_image("sigmaos-base", "1.0.0", "x86_64", "/var/images/sigma-1.0.raw");
         let picked = engine.vpick_best_image("sigmaos-base", "x86_64").unwrap();
         assert_eq!(picked.version, "1.0.0");
     }
@@ -591,10 +569,7 @@ mod tests {
         engine.write_extent(500, StorageDeviceTier::ColdHdd, payload);
 
         assert!(engine.promote_extent_to_hot(500));
-        assert_eq!(
-            engine.extents.get(&500).unwrap().device_tier,
-            StorageDeviceTier::HotNvme
-        );
+        assert_eq!(engine.extents.get(&500).unwrap().device_tier, StorageDeviceTier::HotNvme);
 
         let corrupt_payload = b"CORRUPT_PAYLOAD_DATA";
         assert!(engine.scrub_and_self_heal(500, corrupt_payload));

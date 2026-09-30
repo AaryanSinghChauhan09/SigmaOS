@@ -1,9 +1,9 @@
 // BPF-Seccomp Integration - Advanced Syscall Filtering
 // Phase 9.6: BPF-based Seccomp Filter Implementation with Syscall Argument Inspection
 
-use crate::kernel::ebpf_verification::BpfProgramVerifier;
-use crate::kernel::ebpf_vm::BpfInstruction;
 use std::collections::HashMap;
+use crate::kernel::ebpf_vm::BpfInstruction;
+use crate::kernel::ebpf_verification::BpfProgramVerifier;
 
 /// Seccomp filter decision
 #[repr(u32)]
@@ -33,10 +33,7 @@ impl SyscallInfo {
     }
 
     pub fn with_args(syscall_number: u32, args: [u64; 6]) -> Self {
-        SyscallInfo {
-            syscall_number,
-            args,
-        }
+        SyscallInfo { syscall_number, args }
     }
 }
 
@@ -81,8 +78,7 @@ pub struct BpfSeccompFilter {
 impl BpfSeccompFilter {
     pub fn new(program: Vec<BpfInstruction>, name: String) -> Result<Self, String> {
         let mut verifier = BpfProgramVerifier::new(program.clone());
-        let report = verifier
-            .verify()
+        let report = verifier.verify()
             .map_err(|e| format!("Program verification failed: {}", e))?;
 
         if !report.is_valid {
@@ -115,10 +111,7 @@ impl BpfSeccompFilter {
         &self.filter_name
     }
 
-    pub fn execute_filter(
-        &mut self,
-        _syscall_info: &SyscallInfo,
-    ) -> Result<BpfFilterResult, String> {
+    pub fn execute_filter(&mut self, _syscall_info: &SyscallInfo) -> Result<BpfFilterResult, String> {
         if !self.program_loaded {
             return Err("Filter program not loaded".to_string());
         }
@@ -246,10 +239,7 @@ mod tests {
     fn test_bpf_seccomp_filter_context() {
         let mut context = BpfSeccompFilterContext::new();
         let program = vec![
-            BpfInstruction::LoadImm64 {
-                dst_reg: 0,
-                imm64: 0,
-            },
+            BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 0 },
             BpfInstruction::Return,
         ];
 

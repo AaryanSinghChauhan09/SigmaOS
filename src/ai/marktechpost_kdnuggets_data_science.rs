@@ -135,10 +135,7 @@ mod tests {
     fn test_marktechpost_kdnuggets_data_science() {
         let mut suite = SovereignAiDataSciencePipelineSuite::new();
         assert!(suite.verify_suite());
-        assert_eq!(
-            suite.vector_index.query_nearest_vectors(10, 3),
-            vec![10, 11, 12]
-        );
+        assert_eq!(suite.vector_index.query_nearest_vectors(10, 3), vec![10, 11, 12]);
         assert!(suite.enterprise_ai.is_ready_for_production());
     }
 }

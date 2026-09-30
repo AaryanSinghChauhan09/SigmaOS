@@ -2,9 +2,10 @@ use std::format;
 // Sovereign Podcast Recording & RSS Publishing Engine
 // Inspired by GarageBand and Anchor, providing multi-track recording, mastering filters, and iTunes XML feed generation.
 
-use core::sync::atomic::{AtomicBool, Ordering};
+
 use std::string::String;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicBool, Ordering};
 
 /// A recorded audio clip segment
 #[derive(Debug, Clone)]
@@ -60,29 +61,12 @@ impl AudioTrack {
 /// Dynamic mastering effects matching GarageBand tools
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum AudioMasteringEffect {
-    NoiseGate {
-        threshold_db: f32,
-    },
-    Limiter {
-        threshold_db: f32,
-    },
-    Reverb {
-        room_size: f32,
-    },
-    Equalizer {
-        bass_gain: f32,
-        treble_gain: f32,
-    },
-    Compressor {
-        threshold_db: f32,
-        ratio: f32,
-        attack_ms: f32,
-        release_ms: f32,
-    },
-    DeEsser {
-        frequency_hz: f32,
-        threshold_db: f32,
-    },
+    NoiseGate { threshold_db: f32 },
+    Limiter { threshold_db: f32 },
+    Reverb { room_size: f32 },
+    Equalizer { bass_gain: f32, treble_gain: f32 },
+    Compressor { threshold_db: f32, ratio: f32, attack_ms: f32, release_ms: f32 },
+    DeEsser { frequency_hz: f32, threshold_db: f32 },
 }
 
 /// Podcast Publisher details matching Anchor XML metadata spec
@@ -293,11 +277,7 @@ impl PodcastRecorder {
                         mixed_sample = mixed_sample.signum() * amp_limit; // Clamp peak
                     }
                 }
-                AudioMasteringEffect::Compressor {
-                    threshold_db,
-                    ratio,
-                    ..
-                } => {
+                AudioMasteringEffect::Compressor { threshold_db, ratio, .. } => {
                     let amp_thresh = 10.0f32.powf(threshold_db / 20.0);
                     if mixed_sample.abs() > amp_thresh {
                         let excess = mixed_sample.abs() - amp_thresh;

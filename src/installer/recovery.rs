@@ -1,23 +1,14 @@
 /// SigmaOS Recovery Manager (Phase 3)
 /// Inspired by Linux Mint's Timeshift and GRUB recovery entries.
+
 use std::string::String;
 use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub enum RecoveryMode {
-    RescueShell,
-    RollbackLast,
-    SystemRepair,
-    BootRepair,
-}
+pub enum RecoveryMode { RescueShell, RollbackLast, SystemRepair, BootRepair }
 
 #[derive(Debug, Clone)]
-pub struct Snapshot {
-    pub id: String,
-    pub timestamp: u64,
-    pub description: String,
-    pub verified: bool,
-}
+pub struct Snapshot { pub id: String, pub timestamp: u64, pub description: String, pub verified: bool }
 
 pub struct RecoveryManager {
     pub snapshots: Vec<Snapshot>,
@@ -28,38 +19,24 @@ pub struct RecoveryManager {
 
 impl RecoveryManager {
     pub fn new(max: usize) -> Self {
-        Self {
-            snapshots: Vec::new(),
-            boot_success_confirmed: false,
-            current_boot_snapshot_id: None,
-            max_snapshots: max,
-        }
+        Self { snapshots: Vec::new(), boot_success_confirmed: false, current_boot_snapshot_id: None, max_snapshots: max }
     }
 
     pub fn create_snapshot(&mut self, id: &str, ts: u64, desc: &str) {
         if self.snapshots.len() >= self.max_snapshots {
             self.snapshots.remove(0); // FIFO rotation
         }
-        self.snapshots.push(Snapshot {
-            id: id.into(),
-            timestamp: ts,
-            description: desc.into(),
-            verified: true,
-        });
+        self.snapshots.push(Snapshot { id: id.into(), timestamp: ts, description: desc.into(), verified: true });
     }
 
-    pub fn confirm_boot_success(&mut self) {
-        self.boot_success_confirmed = true;
-    }
+    pub fn confirm_boot_success(&mut self) { self.boot_success_confirmed = true; }
 
     pub fn should_auto_rollback(&self) -> bool {
         !self.boot_success_confirmed && self.current_boot_snapshot_id.is_some()
     }
 
     pub fn rollback_to_last(&mut self) -> Result<&Snapshot, &'static str> {
-        self.snapshots
-            .last()
-            .ok_or("No snapshots available for rollback")
+        self.snapshots.last().ok_or("No snapshots available for rollback")
     }
 
     pub fn enter_recovery(&self, mode: RecoveryMode) -> String {

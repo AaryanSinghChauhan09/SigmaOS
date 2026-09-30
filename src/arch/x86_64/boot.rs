@@ -12,8 +12,8 @@
 
 extern crate alloc;
 
-use alloc::string::String;
 use alloc::vec::Vec;
+use alloc::string::String;
 
 /// Multiboot2 Header Magic constant
 pub const MULTIBOOT2_MAGIC: u32 = 0xE85250D6;
@@ -62,9 +62,9 @@ pub struct BareMetalBootInfo {
     pub initramfs_base: u64,
     pub initramfs_size: u64,
     pub higher_half_offset: u64,
-    pub kernel_cmdline: String,     // Linux-inspired kernel command line
+    pub kernel_cmdline: String, // Linux-inspired kernel command line
     pub acpi_revision: Option<u32>, // ACPI table revision
-    pub smp_enabled: bool,          // SMP support detection
+    pub smp_enabled: bool, // SMP support detection
     pub apic_physical_address: Option<u64>, // Local APIC base address
 }
 
@@ -197,12 +197,8 @@ impl BareMetalBootEngine {
     }
 
     /// Calculate memory regions by type
-    pub fn get_memory_regions_by_type(
-        &self,
-        region_type: MemoryRegionType,
-    ) -> Vec<&MemoryMapEntry> {
-        self.boot_info
-            .memory_map
+    pub fn get_memory_regions_by_type(&self, region_type: MemoryRegionType) -> Vec<&MemoryMapEntry> {
+        self.boot_info.memory_map
             .iter()
             .filter(|e| e.region_type == region_type)
             .collect()
@@ -215,8 +211,8 @@ impl BareMetalBootEngine {
 
     /// Check if boot is in UEFI mode
     pub fn is_uefi_boot(&self) -> bool {
-        self.boot_info.bootloader_name.contains("UEFI")
-            || self.boot_info.bootloader_name.contains("Limine")
+        self.boot_info.bootloader_name.contains("UEFI") ||
+        self.boot_info.bootloader_name.contains("Limine")
     }
 
     /// Generate boot banner (BSD-inspired)
@@ -224,13 +220,7 @@ impl BareMetalBootEngine {
         let memory_mb = self.get_total_memory_mb();
         let fb_info = self.get_framebuffer_info();
         let fb_str = if let Some(fb) = fb_info {
-            format!(
-                "{}x{}x{} @ {}bpp",
-                fb.width,
-                fb.height,
-                fb.pitch_bytes / fb.width,
-                fb.bpp
-            )
+            format!("{}x{}x{} @ {}bpp", fb.width, fb.height, fb.pitch_bytes / fb.width, fb.bpp)
         } else {
             String::from("No framebuffer")
         };
@@ -247,11 +237,7 @@ impl BareMetalBootEngine {
             memory_mb,
             fb_str,
             self.boot_info.acpi_revision.unwrap_or(0),
-            if self.boot_info.smp_enabled {
-                "enabled"
-            } else {
-                "disabled"
-            },
+            if self.boot_info.smp_enabled { "enabled" } else { "disabled" },
             self.boot_info.higher_half_offset
         )
     }
@@ -284,10 +270,7 @@ mod tests {
         assert!(engine.has_cmdline_param("quiet"));
         assert!(engine.has_cmdline_param("splash"));
 
-        assert_eq!(
-            engine.parse_cmdline_param("root"),
-            Some(String::from("live:CDROM"))
-        );
+        assert_eq!(engine.parse_cmdline_param("root"), Some(String::from("live:CDROM")));
         assert_eq!(engine.parse_cmdline_param("nonexistent"), None);
     }
 

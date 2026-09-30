@@ -61,12 +61,7 @@ impl SequentialDirectRelativeAccessTimeEvaluator {
         }
     }
 
-    pub fn evaluate_access_latency(
-        &mut self,
-        mode: AccessDeviceMode,
-        is_write: bool,
-        offset_delta: u64,
-    ) -> u64 {
+    pub fn evaluate_access_latency(&mut self, mode: AccessDeviceMode, is_write: bool, offset_delta: u64) -> u64 {
         if is_write {
             self.metrics.total_writes += 1;
         } else {
@@ -78,9 +73,7 @@ impl SequentialDirectRelativeAccessTimeEvaluator {
             (MemoryDeviceKind::SystemRam, _) => self.base_latency_ns,
             (MemoryDeviceKind::NvmeSsd, AccessDeviceMode::Sequential) => self.base_latency_ns,
             (MemoryDeviceKind::NvmeSsd, AccessDeviceMode::Direct) => self.base_latency_ns + 5,
-            (MemoryDeviceKind::NvmeSsd, AccessDeviceMode::Relative) => {
-                self.base_latency_ns + (offset_delta / 1024)
-            }
+            (MemoryDeviceKind::NvmeSsd, AccessDeviceMode::Relative) => self.base_latency_ns + (offset_delta / 1024),
             (MemoryDeviceKind::NvmeSsd, AccessDeviceMode::Random) => self.base_latency_ns + 50,
             (MemoryDeviceKind::TapeStream, AccessDeviceMode::Sequential) => self.base_latency_ns,
             (MemoryDeviceKind::TapeStream, _) => self.base_latency_ns + 5000 + offset_delta,
@@ -164,11 +157,7 @@ impl LdapAnonymousAuthManager {
         Ok("cn=anonymous".to_string())
     }
 
-    pub fn bind_authenticated(
-        &mut self,
-        bind_dn: &str,
-        secret: &str,
-    ) -> Result<String, &'static str> {
+    pub fn bind_authenticated(&mut self, bind_dn: &str, secret: &str) -> Result<String, &'static str> {
         if secret.is_empty() {
             return Err("LDAP Error: Empty password");
         }
@@ -241,12 +230,7 @@ impl RemoteFileAndRatSessionGovernor {
         }
     }
 
-    pub fn mount_remote_file(
-        &mut self,
-        protocol: RemoteProtocol,
-        path: &str,
-        write_perm: bool,
-    ) -> u64 {
+    pub fn mount_remote_file(&mut self, protocol: RemoteProtocol, path: &str, write_perm: bool) -> u64 {
         let id = self.next_id;
         self.next_id += 1;
 
@@ -322,9 +306,7 @@ impl ProcessMemoryMigrationProtectionEngine {
     pub fn migrate_process(&self, pid: u32, target_node_id: u32) -> Result<u32, &'static str> {
         if let Some(mode) = self.process_protections.get(&pid) {
             if *mode == MemoryProtectionMode::KernelProtected {
-                return Err(
-                    "Memory Migration Violation: Process is kernel protected against migration",
-                );
+                return Err("Memory Migration Violation: Process is kernel protected against migration");
             }
         }
 
@@ -421,10 +403,7 @@ pub struct SovereignAccessSubsystemMasterSuite {
 impl SovereignAccessSubsystemMasterSuite {
     pub fn new() -> Self {
         Self {
-            time_evaluator: SequentialDirectRelativeAccessTimeEvaluator::new(
-                MemoryDeviceKind::NvmeSsd,
-                10,
-            ),
+            time_evaluator: SequentialDirectRelativeAccessTimeEvaluator::new(MemoryDeviceKind::NvmeSsd, 10),
             ldap_auth: LdapAnonymousAuthManager::new("dc=sigmaos,dc=org"),
             remote_governor: RemoteFileAndRatSessionGovernor::new(),
             migration_protection: ProcessMemoryMigrationProtectionEngine::new(),
@@ -465,8 +444,7 @@ mod tests {
 
     #[test]
     fn test_access_time_evaluator() {
-        let mut eval =
-            SequentialDirectRelativeAccessTimeEvaluator::new(MemoryDeviceKind::NvmeSsd, 10);
+        let mut eval = SequentialDirectRelativeAccessTimeEvaluator::new(MemoryDeviceKind::NvmeSsd, 10);
         let seq_lat = eval.evaluate_access_latency(AccessDeviceMode::Sequential, false, 0);
         let rand_lat = eval.evaluate_access_latency(AccessDeviceMode::Random, true, 1024);
 
@@ -487,9 +465,7 @@ mod tests {
         // Admin search fails under anonymous bind
         assert!(ldap.search_directory("admin").is_err());
 
-        assert!(ldap
-            .bind_authenticated("uid=admin,dc=sigmaos,dc=org", "pass")
-            .is_ok());
+        assert!(ldap.bind_authenticated("uid=admin,dc=sigmaos,dc=org", "pass").is_ok());
         let admin = ldap.search_directory("admin").unwrap();
         assert_eq!(admin.uid, "admin");
     }
@@ -528,8 +504,6 @@ mod tests {
     fn test_access_subsystem_suite() {
         let suite = SovereignAccessSubsystemMasterSuite::new();
         assert!(suite.health_check());
-        assert!(suite
-            .summary_report()
-            .contains("Sovereign Access Subsystem Active"));
+        assert!(suite.summary_report().contains("Sovereign Access Subsystem Active"));
     }
 }

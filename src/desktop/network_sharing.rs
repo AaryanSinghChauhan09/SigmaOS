@@ -5,29 +5,17 @@ pub struct SambaShareManager {
 }
 
 impl SambaShareManager {
-    pub fn new() -> Self {
-        Self { shares: Vec::new() }
-    }
-    pub fn create_share(&mut self, path: &str) {
-        self.shares.push(path.to_string());
-    }
-    pub fn delete_share(&mut self, path: &str) {
-        self.shares.retain(|s| s != path);
-    }
+    pub fn new() -> Self { Self { shares: Vec::new() } }
+    pub fn create_share(&mut self, path: &str) { self.shares.push(path.to_string()); }
+    pub fn delete_share(&mut self, path: &str) { self.shares.retain(|s| s != path); }
 }
 
 pub struct NfsExportManager {
     exports: Vec<String>,
 }
 impl NfsExportManager {
-    pub fn new() -> Self {
-        Self {
-            exports: Vec::new(),
-        }
-    }
-    pub fn add_export(&mut self, path: &str) {
-        self.exports.push(path.to_string());
-    }
+    pub fn new() -> Self { Self { exports: Vec::new() } }
+    pub fn add_export(&mut self, path: &str) { self.exports.push(path.to_string()); }
 }
 
 pub struct AvahiServiceBrowser;
@@ -39,48 +27,32 @@ impl AvahiServiceBrowser {
 
 pub struct NetworkBrowser;
 impl NetworkBrowser {
-    pub fn list_shares(&self) -> Vec<String> {
-        vec!["smb://server/share".to_string()]
-    }
+    pub fn list_shares(&self) -> Vec<String> { vec!["smb://server/share".to_string()] }
 }
 
 pub struct SshfsMount;
 impl SshfsMount {
-    pub fn mount(&self, _host: &str, _path: &str, _mountpoint: &str) -> bool {
-        true
-    }
+    pub fn mount(&self, _host: &str, _path: &str, _mountpoint: &str) -> bool { true }
 }
 
 pub struct WebDavClient;
 impl WebDavClient {
-    pub fn connect(&self, _url: &str) -> bool {
-        true
-    }
+    pub fn connect(&self, _url: &str) -> bool { true }
 }
 
 pub struct BluetoothFileTransfer;
 impl BluetoothFileTransfer {
-    pub fn push_file(&self, _device: &str, _file: &str) -> bool {
-        true
-    }
-    pub fn pull_file(&self, _device: &str, _file: &str) -> bool {
-        true
-    }
+    pub fn push_file(&self, _device: &str, _file: &str) -> bool { true }
+    pub fn pull_file(&self, _device: &str, _file: &str) -> bool { true }
 }
 
 pub struct NetworkDriveAutoMount {
     drives: Vec<String>,
 }
 impl NetworkDriveAutoMount {
-    pub fn new() -> Self {
-        Self { drives: Vec::new() }
-    }
-    pub fn remember_drive(&mut self, url: &str) {
-        self.drives.push(url.to_string());
-    }
-    pub fn automount_all(&self) -> bool {
-        true
-    }
+    pub fn new() -> Self { Self { drives: Vec::new() } }
+    pub fn remember_drive(&mut self, url: &str) { self.drives.push(url.to_string()); }
+    pub fn automount_all(&self) -> bool { true }
 }
 
 #[cfg(test)]

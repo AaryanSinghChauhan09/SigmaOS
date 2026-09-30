@@ -849,9 +849,6 @@ impl ShellJobControl {
     }
 
     pub fn list_jobs(&self) -> Vec<String> {
-        if self.jobs.is_empty() {
-            return vec![String::from("No active jobs")];
-        }
         let mut list = Vec::new();
         for job in &self.jobs {
             let state_str = match job.state {
@@ -859,13 +856,12 @@ impl ShellJobControl {
                 JobState::Stopped => "Stopped",
                 JobState::Terminated => "Terminated",
             };
-            list.push(format!(
-                "[{}] PID {}  {}  {}",
-                job.id, job.pid, state_str, job.command
-            ));
+            list.push(format!("[{}] PID {}  {}  {}", job.id, job.pid, state_str, job.command));
         }
         list
     }
+
+
 
     pub fn bring_to_foreground(&mut self, id: usize) -> Result<String, String> {
         if let Some(job) = self.jobs.iter_mut().find(|j| j.id == id) {
@@ -1408,11 +1404,9 @@ impl UniversalScriptTranspiler {
             let converted_line = match dialect {
                 ShellDialect::Fish => Self::transpile_fish_line(trimmed, &mut in_function),
                 ShellDialect::Tcsh => Self::transpile_tcsh_line(trimmed),
-                ShellDialect::Bash
-                | ShellDialect::Zsh
-                | ShellDialect::Ksh
-                | ShellDialect::Yash
-                | ShellDialect::Mksh => Self::transpile_bash_zsh_line(trimmed),
+                ShellDialect::Bash | ShellDialect::Zsh | ShellDialect::Ksh | ShellDialect::Yash | ShellDialect::Mksh => {
+                    Self::transpile_bash_zsh_line(trimmed)
+                }
                 ShellDialect::Nu => Self::transpile_nu_line(trimmed),
                 ShellDialect::Ion => Self::transpile_ion_line(trimmed),
                 ShellDialect::Rc => Self::transpile_rc_line(trimmed),
@@ -1467,11 +1461,7 @@ impl UniversalScriptTranspiler {
             return "fi".to_string();
         }
         if l.starts_with("fish_add_path ") {
-            let path = l
-                .trim_start_matches("fish_add_path ")
-                .trim()
-                .trim_matches('"')
-                .trim_matches('\'');
+            let path = l.trim_start_matches("fish_add_path ").trim().trim_matches('"').trim_matches('\'');
             return format!("export PATH=\"{}:$PATH\"", path);
         }
         if l.starts_with("while ") && !l.contains("; do") {
@@ -1579,10 +1569,7 @@ impl UniversalScriptTranspiler {
                 return format!("export {}={}", var, val);
             }
         } else if l.starts_with("set -e ") || l.starts_with("set -e") {
-            let var = l
-                .trim_start_matches("set -e ")
-                .trim_start_matches("set -e")
-                .trim();
+            let var = l.trim_start_matches("set -e ").trim_start_matches("set -e").trim();
             return format!("unset {}", var);
         } else if l.starts_with("set -l ") || l.starts_with("set -g ") || l.starts_with("set ") {
             let rest = l
@@ -1627,17 +1614,11 @@ impl UniversalScriptTranspiler {
 
         // 0. Tcsh switch/case/endsw block
         if l.starts_with("switch (") && l.ends_with(')') {
-            let var = l
-                .trim_start_matches("switch (")
-                .trim_end_matches(')')
-                .trim();
+            let var = l.trim_start_matches("switch (").trim_end_matches(')').trim();
             return format!("case {} in", var);
         }
         if l.starts_with("switch ( ") && l.ends_with(" )") {
-            let var = l
-                .trim_start_matches("switch (")
-                .trim_end_matches(')')
-                .trim();
+            let var = l.trim_start_matches("switch (").trim_end_matches(')').trim();
             return format!("case {} in", var);
         }
         if l.starts_with("case ") && l.ends_with(':') {
@@ -1761,9 +1742,7 @@ impl UniversalScriptTranspiler {
         if l.starts_with("let-env ") || l.starts_with("$env.") {
             if let Some(eq_idx) = l.find('=') {
                 let var_part = l[..eq_idx].trim();
-                let var_name = var_part
-                    .trim_start_matches("let-env ")
-                    .trim_start_matches("$env.");
+                let var_name = var_part.trim_start_matches("let-env ").trim_start_matches("$env.");
                 let val_part = l[eq_idx + 1..].trim();
                 return format!("export {}={}", var_name, val_part);
             }
@@ -1814,10 +1793,7 @@ impl UniversalScriptTranspiler {
     fn transpile_elvish_line(line: &str) -> String {
         let l = line.trim();
         if l.starts_with("var ") || l.starts_with("set ") {
-            let rest = l
-                .trim_start_matches("var ")
-                .trim_start_matches("set ")
-                .trim();
+            let rest = l.trim_start_matches("var ").trim_start_matches("set ").trim();
             if let Some(eq_idx) = rest.find('=') {
                 let var = rest[..eq_idx].trim();
                 let val = rest[eq_idx + 1..].trim();
@@ -1846,9 +1822,7 @@ impl UniversalScriptTranspiler {
         }
         if l.starts_with("for ") && l.contains(" in range(") && l.ends_with(':') {
             let rest = l.trim_start_matches("for ").trim_end_matches(':').trim();
-            if let (Some(var_end), Some(r_start), Some(r_end)) =
-                (rest.find(" in "), rest.find("range("), rest.rfind(')'))
-            {
+            if let (Some(var_end), Some(r_start), Some(r_end)) = (rest.find(" in "), rest.find("range("), rest.rfind(')')) {
                 let var = rest[..var_end].trim();
                 let num = rest[r_start + 6..r_end].trim();
                 return format!("for {} in $(seq 0 $(( {} - 1 ))); do", var, num);
@@ -1865,8 +1839,7 @@ impl UniversalScriptTranspiler {
     fn transpile_oil_line(line: &str) -> String {
         let l = line.trim();
         if l.starts_with("var ") || l.starts_with("const ") || l.starts_with("setvar ") {
-            let rest = l
-                .trim_start_matches("var ")
+            let rest = l.trim_start_matches("var ")
                 .trim_start_matches("const ")
                 .trim_start_matches("setvar ")
                 .trim();
@@ -1932,29 +1905,20 @@ impl UniversalScriptTranspiler {
             let rest = l.trim_start_matches("select ").trim();
             if let Some(in_idx) = rest.find(" in ") {
                 let var = rest[..in_idx].trim();
-                let list = rest[in_idx + 4..]
-                    .trim()
-                    .trim_end_matches("; do")
-                    .trim_end_matches(';')
-                    .trim();
+                let list = rest[in_idx + 4..].trim().trim_end_matches("; do").trim_end_matches(';').trim();
                 return format!("for {} in {}; do", var, list);
             }
         }
 
         // 0c. Bash declare -a / declare -A -> var=...
-        if l.starts_with("declare -a ") || l.starts_with("declare -A ") || l.starts_with("declare ")
-        {
-            let rest = l
-                .trim_start_matches("declare -a ")
+        if l.starts_with("declare -a ") || l.starts_with("declare -A ") || l.starts_with("declare ") {
+            let rest = l.trim_start_matches("declare -a ")
                 .trim_start_matches("declare -A ")
                 .trim_start_matches("declare ")
                 .trim();
             if let Some(eq_idx) = rest.find('=') {
                 let var = rest[..eq_idx].trim();
-                let val = rest[eq_idx + 1..]
-                    .trim()
-                    .trim_matches('(')
-                    .trim_matches(')');
+                let val = rest[eq_idx + 1..].trim().trim_matches('(').trim_matches(')');
                 return format!("{}=\"{}\"", var, val);
             }
         }
@@ -2089,11 +2053,7 @@ impl UniversalScriptTranspiler {
 
         // 5. Ksh 'let "expr"' -> 'expr'
         if l.starts_with("let ") {
-            let expr = l
-                .trim_start_matches("let ")
-                .trim()
-                .trim_matches('"')
-                .trim_matches('\'');
+            let expr = l.trim_start_matches("let ").trim().trim_matches('"').trim_matches('\'');
             l = format!(": $(( {} ))", expr);
         }
 
@@ -2210,18 +2170,10 @@ impl SovereignBackendShellEngine {
 
                         let cond_posix = if cond.contains('<') {
                             let cond_parts: Vec<&str> = cond.split('<').collect();
-                            format!(
-                                "[ \"${}\" -lt {} ]",
-                                cond_parts[0].trim(),
-                                cond_parts[1].trim()
-                            )
+                            format!("[ \"${}\" -lt {} ]", cond_parts[0].trim(), cond_parts[1].trim())
                         } else if cond.contains('>') {
                             let cond_parts: Vec<&str> = cond.split('>').collect();
-                            format!(
-                                "[ \"${}\" -gt {} ]",
-                                cond_parts[0].trim(),
-                                cond_parts[1].trim()
-                            )
+                            format!("[ \"${}\" -gt {} ]", cond_parts[0].trim(), cond_parts[1].trim())
                         } else {
                             format!("[ {} ]", cond)
                         };
@@ -2308,9 +2260,7 @@ pub struct ZshAutosuggestionsEngine {
 
 impl ZshAutosuggestionsEngine {
     pub fn new() -> Self {
-        Self {
-            history: Vec::new(),
-        }
+        Self { history: Vec::new() }
     }
 
     pub fn add_history(&mut self, command: &str) {
@@ -2369,9 +2319,7 @@ impl DirenvEnvironmentManager {
         let target_vars = self.loaded_envs.get(new_dir).cloned().unwrap_or_default();
 
         // Unload old keys not present in new dir
-        let keys_to_remove: Vec<String> = self
-            .current_env
-            .keys()
+        let keys_to_remove: Vec<String> = self.current_env.keys()
             .filter(|k| !target_vars.contains_key(*k))
             .cloned()
             .collect();
@@ -2527,43 +2475,31 @@ mod tests {
         assert_eq!(BashParameterExpansion::expand("${USER:0:5}", &env), "sover");
 
         // Uppercase / Lowercase conversion
-        assert_eq!(
-            BashParameterExpansion::expand("${USER^^}", &env),
-            "SOVEREIGN"
-        );
-        assert_eq!(
-            BashParameterExpansion::expand("${USER,,}", &env),
-            "sovereign"
-        );
+        assert_eq!(BashParameterExpansion::expand("${USER^^}", &env), "SOVEREIGN");
+        assert_eq!(BashParameterExpansion::expand("${USER,,}", &env), "sovereign");
 
         // Indirect variable expansion
         env.insert("PTR".to_string(), "USER".to_string());
         assert_eq!(BashParameterExpansion::expand("${!PTR}", &env), "sovereign");
 
         // Single pattern replacement
-        assert_eq!(
-            BashParameterExpansion::expand("${FILE/document/file}", &env),
-            "file.txt"
-        );
+        assert_eq!(BashParameterExpansion::expand("${FILE/document/file}", &env), "file.txt");
     }
 
     #[test]
     fn test_extended_shell_transpilation() {
         let fish_str = "string trim '  hello  '\nstring length hello\nstring repeat 3 x";
-        let posix_fish =
-            UniversalScriptTranspiler::transpile_to_posix_sh(fish_str, ShellDialect::Fish);
+        let posix_fish = UniversalScriptTranspiler::transpile_to_posix_sh(fish_str, ShellDialect::Fish);
         assert!(posix_fish.contains("echo '  hello  ' | xargs"));
         assert!(posix_fish.contains("echo -n hello | wc -m"));
         assert!(posix_fish.contains("seq -s '' 3 | sed 's/[0-9]/x/g'"));
 
         let tcsh_str = "if ( $?PATH ) then\n  echo path set\nendif";
-        let posix_tcsh =
-            UniversalScriptTranspiler::transpile_to_posix_sh(tcsh_str, ShellDialect::Tcsh);
+        let posix_tcsh = UniversalScriptTranspiler::transpile_to_posix_sh(tcsh_str, ShellDialect::Tcsh);
         assert!(posix_tcsh.contains("if [ -n \"${PATH}\" ]; then"));
 
         let ksh_str = "coproc my_daemon";
-        let posix_ksh =
-            UniversalScriptTranspiler::transpile_to_posix_sh(ksh_str, ShellDialect::Ksh);
+        let posix_ksh = UniversalScriptTranspiler::transpile_to_posix_sh(ksh_str, ShellDialect::Ksh);
         assert!(posix_ksh.contains("my_daemon &"));
     }
 
@@ -2812,14 +2748,8 @@ mod tests {
         suggest_engine.add_history("git commit -m 'feat'");
         suggest_engine.add_history("cargo test --lib");
 
-        assert_eq!(
-            suggest_engine.suggest("car"),
-            Some("go test --lib".to_string())
-        );
-        assert_eq!(
-            suggest_engine.suggest("git c"),
-            Some("ommit -m 'feat'".to_string())
-        );
+        assert_eq!(suggest_engine.suggest("car"), Some("go test --lib".to_string()));
+        assert_eq!(suggest_engine.suggest("git c"), Some("ommit -m 'feat'".to_string()));
         assert_eq!(suggest_engine.suggest("unknown"), None);
     }
 
@@ -2835,10 +2765,7 @@ mod tests {
 
         let _changes_b = direnv.on_directory_change("/proj/b");
         assert_eq!(direnv.current_env.get("PORT"), None);
-        assert_eq!(
-            direnv.current_env.get("NODE_ENV"),
-            Some(&"production".to_string())
-        );
+        assert_eq!(direnv.current_env.get("NODE_ENV"), Some(&"production".to_string()));
     }
 
     #[test]
@@ -2858,68 +2785,43 @@ mod tests {
     #[test]
     fn test_expanded_shell_dialect_transpilation() {
         let bash_array_script = "declare -a items=(alpha beta gamma)";
-        let posix_array =
-            UniversalScriptTranspiler::transpile_to_posix_sh(bash_array_script, ShellDialect::Bash);
+        let posix_array = UniversalScriptTranspiler::transpile_to_posix_sh(bash_array_script, ShellDialect::Bash);
         assert!(posix_array.contains("items=\"alpha beta gamma\""));
 
         let ksh_coproc_script = "coproc my_worker";
-        let posix_coproc =
-            UniversalScriptTranspiler::transpile_to_posix_sh(ksh_coproc_script, ShellDialect::Ksh);
+        let posix_coproc = UniversalScriptTranspiler::transpile_to_posix_sh(ksh_coproc_script, ShellDialect::Ksh);
         assert!(posix_coproc.contains("my_worker &"));
 
         let zsh_glob_script = "ls *(*.txt)";
-        let posix_glob =
-            UniversalScriptTranspiler::transpile_to_posix_sh(zsh_glob_script, ShellDialect::Zsh);
+        let posix_glob = UniversalScriptTranspiler::transpile_to_posix_sh(zsh_glob_script, ShellDialect::Zsh);
         assert!(posix_glob.contains("ls *"));
 
         let mut env = BTreeMap::new();
         env.insert("FILE".to_string(), "archive.tar.gz".to_string());
-        assert_eq!(
-            BashParameterExpansion::expand("${FILE#archive.}", &env),
-            "tar.gz"
-        );
-        assert_eq!(
-            BashParameterExpansion::expand("${FILE%.gz}", &env),
-            "archive.tar"
-        );
+        assert_eq!(BashParameterExpansion::expand("${FILE#archive.}", &env), "tar.gz");
+        assert_eq!(BashParameterExpansion::expand("${FILE%.gz}", &env), "archive.tar");
 
         let nu_script = "#!/usr/bin/env nu\nlet-env FOO = bar\ndef my_func [] {\n  echo hi\n}";
-        assert_eq!(
-            UniversalShellCompatibilityEngine::detect_shebang_dialect(nu_script),
-            ShellDialect::Nu
-        );
-        let posix_nu =
-            UniversalScriptTranspiler::transpile_to_posix_sh(nu_script, ShellDialect::Nu);
+        assert_eq!(UniversalShellCompatibilityEngine::detect_shebang_dialect(nu_script), ShellDialect::Nu);
+        let posix_nu = UniversalScriptTranspiler::transpile_to_posix_sh(nu_script, ShellDialect::Nu);
         assert!(posix_nu.contains("export FOO=bar"));
         assert!(posix_nu.contains("my_func() {"));
 
         let ion_script = "#!/usr/bin/ion\nfn build_pkg {\n  export PORT=8080\n}";
-        assert_eq!(
-            UniversalShellCompatibilityEngine::detect_shebang_dialect(ion_script),
-            ShellDialect::Ion
-        );
-        let posix_ion =
-            UniversalScriptTranspiler::transpile_to_posix_sh(ion_script, ShellDialect::Ion);
+        assert_eq!(UniversalShellCompatibilityEngine::detect_shebang_dialect(ion_script), ShellDialect::Ion);
+        let posix_ion = UniversalScriptTranspiler::transpile_to_posix_sh(ion_script, ShellDialect::Ion);
         assert!(posix_ion.contains("build_pkg() {"));
         assert!(posix_ion.contains("export PORT=8080"));
 
         let rc_script = "#!/bin/rc\nfn test_run {\n  for (i in 1 2 3)\n}";
-        assert_eq!(
-            UniversalShellCompatibilityEngine::detect_shebang_dialect(rc_script),
-            ShellDialect::Rc
-        );
-        let posix_rc =
-            UniversalScriptTranspiler::transpile_to_posix_sh(rc_script, ShellDialect::Rc);
+        assert_eq!(UniversalShellCompatibilityEngine::detect_shebang_dialect(rc_script), ShellDialect::Rc);
+        let posix_rc = UniversalScriptTranspiler::transpile_to_posix_sh(rc_script, ShellDialect::Rc);
         assert!(posix_rc.contains("test_run() {"));
         assert!(posix_rc.contains("for i in 1 2 3; do"));
 
         let elvish_script = "#!/usr/bin/elvish\nvar PATH = /bin\nfn setup {\n  echo ready\n}";
-        assert_eq!(
-            UniversalShellCompatibilityEngine::detect_shebang_dialect(elvish_script),
-            ShellDialect::Elvish
-        );
-        let posix_elvish =
-            UniversalScriptTranspiler::transpile_to_posix_sh(elvish_script, ShellDialect::Elvish);
+        assert_eq!(UniversalShellCompatibilityEngine::detect_shebang_dialect(elvish_script), ShellDialect::Elvish);
+        let posix_elvish = UniversalScriptTranspiler::transpile_to_posix_sh(elvish_script, ShellDialect::Elvish);
         assert!(posix_elvish.contains("export PATH=/bin"));
         assert!(posix_elvish.contains("setup() {"));
     }
@@ -2927,42 +2829,26 @@ mod tests {
     #[test]
     fn test_universal_sh_dialect_transpilation() {
         let xonsh_script = "#!/usr/bin/env xonsh\n$MODE = 'production'\ndef init():\n  echo start";
-        assert_eq!(
-            UniversalShellCompatibilityEngine::detect_shebang_dialect(xonsh_script),
-            ShellDialect::Xonsh
-        );
-        let posix_xonsh =
-            UniversalScriptTranspiler::transpile_to_posix_sh(xonsh_script, ShellDialect::Xonsh);
+        assert_eq!(UniversalShellCompatibilityEngine::detect_shebang_dialect(xonsh_script), ShellDialect::Xonsh);
+        let posix_xonsh = UniversalScriptTranspiler::transpile_to_posix_sh(xonsh_script, ShellDialect::Xonsh);
         assert!(posix_xonsh.contains("export MODE='production'"));
         assert!(posix_xonsh.contains("init() {"));
 
         let oil_script = "#!/usr/bin/env ysh\nvar PORT = 8080\nproc run {\n  echo running\n}";
-        assert_eq!(
-            UniversalShellCompatibilityEngine::detect_shebang_dialect(oil_script),
-            ShellDialect::Oil
-        );
-        let posix_oil =
-            UniversalScriptTranspiler::transpile_to_posix_sh(oil_script, ShellDialect::Oil);
+        assert_eq!(UniversalShellCompatibilityEngine::detect_shebang_dialect(oil_script), ShellDialect::Oil);
+        let posix_oil = UniversalScriptTranspiler::transpile_to_posix_sh(oil_script, ShellDialect::Oil);
         assert!(posix_oil.contains("PORT=8080"));
         assert!(posix_oil.contains("run() {"));
 
         let es_script = "#!/bin/es\nfn-deploy = {\n  echo deployed\n}\nports = ( 80 443 )";
-        assert_eq!(
-            UniversalShellCompatibilityEngine::detect_shebang_dialect(es_script),
-            ShellDialect::Es
-        );
-        let posix_es =
-            UniversalScriptTranspiler::transpile_to_posix_sh(es_script, ShellDialect::Es);
+        assert_eq!(UniversalShellCompatibilityEngine::detect_shebang_dialect(es_script), ShellDialect::Es);
+        let posix_es = UniversalScriptTranspiler::transpile_to_posix_sh(es_script, ShellDialect::Es);
         assert!(posix_es.contains("deploy() {"));
         assert!(posix_es.contains("ports=\"80 443\""));
 
         let bsh_script = "#!/bin/bsh\nexport BSH_ACTIVE=1";
-        assert_eq!(
-            UniversalShellCompatibilityEngine::detect_shebang_dialect(bsh_script),
-            ShellDialect::Bsh
-        );
-        let posix_bsh =
-            UniversalScriptTranspiler::transpile_to_posix_sh(bsh_script, ShellDialect::Bsh);
+        assert_eq!(UniversalShellCompatibilityEngine::detect_shebang_dialect(bsh_script), ShellDialect::Bsh);
+        let posix_bsh = UniversalScriptTranspiler::transpile_to_posix_sh(bsh_script, ShellDialect::Bsh);
         assert!(posix_bsh.contains("export BSH_ACTIVE=1"));
 
         let mut engine = UniversalShellCompatibilityEngine::new();
@@ -2971,8 +2857,7 @@ mod tests {
 
         let bridge = SovereignUniversalShellBridgeEngine::new();
         let fish_cond_script = "#!/usr/bin/env fish\nif test -d /tmp\n  echo dir_exists\nelse if test -f /tmp/foo\n  echo file_exists\nelse\n  echo none\nend";
-        let (dialect, transpiled, pipelines_bridge) =
-            bridge.execute_universal_script(fish_cond_script).unwrap();
+        let (dialect, transpiled, pipelines_bridge) = bridge.execute_universal_script(fish_cond_script).unwrap();
         assert_eq!(dialect, ShellDialect::Fish);
         assert!(transpiled.contains("if test -d /tmp; then"));
         assert!(transpiled.contains("elif test -f /tmp/foo; then"));
@@ -2982,18 +2867,9 @@ mod tests {
 
         let mut env_transforms = BTreeMap::new();
         env_transforms.insert("GREETING".to_string(), "hello world".to_string());
-        assert_eq!(
-            BashParameterExpansion::expand("${GREETING@U}", &env_transforms),
-            "HELLO WORLD"
-        );
-        assert_eq!(
-            BashParameterExpansion::expand("${GREETING@Q}", &env_transforms),
-            "'hello world'"
-        );
-        assert_eq!(
-            BashParameterExpansion::expand("${GREETING@A}", &env_transforms),
-            "GREETING='hello world'"
-        );
+        assert_eq!(BashParameterExpansion::expand("${GREETING@U}", &env_transforms), "HELLO WORLD");
+        assert_eq!(BashParameterExpansion::expand("${GREETING@Q}", &env_transforms), "'hello world'");
+        assert_eq!(BashParameterExpansion::expand("${GREETING@A}", &env_transforms), "GREETING='hello world'");
     }
 
     #[test]
@@ -3003,8 +2879,7 @@ mod tests {
         assert!(posix_for.contains("i=0; while [ \"$i\" -lt 10 ]; do i=$(( i + 1 ));"));
 
         let net_redir = "cat index.html > /dev/tcp/127.0.0.1/8080";
-        let posix_net =
-            SovereignBackendShellEngine::transpile_network_socket_redirection(net_redir);
+        let posix_net = SovereignBackendShellEngine::transpile_network_socket_redirection(net_redir);
         assert!(posix_net.contains("nc 127.0.0.1 8080"));
 
         let fd_close = "exec 3>&-";

@@ -1,13 +1,14 @@
 #[cfg(not(target_os = "none"))]
+
 use std::boxed::Box;
 
 use std::string::{String, ToString};
+use std::vec::Vec as StdVec;
+use std::vec::Vec;
 /// OOP-based Sigma Shell for SigmaOS
 /// Based on Ultimate Dominance Strategy: Stage 0 Milestone 0.1
 /// Implements interactive shell with command parsing, echo, environment variables, aliases, and basic utilities
 use std::sync::atomic::{AtomicUsize, Ordering};
-use std::vec::Vec as StdVec;
-use std::vec::Vec;
 
 pub type CommandID = usize;
 
@@ -232,11 +233,7 @@ impl ShellCommand for LsCommand {
         b"ls"
     }
     fn execute(&mut self, args: &[&[u8]]) -> Result<(), ShellError> {
-        let target_dir = if args.is_empty() {
-            b"." as &[u8]
-        } else {
-            args[0]
-        };
+        let target_dir = if args.is_empty() { b"." as &[u8] } else { args[0] };
         if target_dir.is_empty() {
             return Err(ShellError::InvalidArgument);
         }
@@ -517,14 +514,10 @@ impl SimpleShell {
         shell.env.set(b"HOSTNAME", b"sigmaos");
         shell.env.set(b"HOME", b"/userland/home/sovereign");
         shell.env.set(b"PWD", b"/userland/home/sovereign");
-        shell
-            .env
-            .set(b"PATH", b"/shards:/system:/userland:/bin:/usr/bin");
+        shell.env.set(b"PATH", b"/shards:/system:/userland:/bin:/usr/bin");
         shell.env.set(b"JAILED", b"0");
         shell.env.set(b"VNET_NAME", b"default");
-        shell
-            .env
-            .set(b"OPENBSD_PLEDGE", b"stdio rpath wpath cpath exec");
+        shell.env.set(b"OPENBSD_PLEDGE", b"stdio rpath wpath cpath exec");
 
         // Register built-in commands (echo, exit, help, clear, alias, unalias, export, unset, cd, pwd, ls, mkdir, rm, cat, kill, ps, jobs, fg, bg, type, which, trap, read)
         let _ = shell.register_command(Box::new(EchoCommand::new(0)));
@@ -1288,6 +1281,7 @@ mod repl_tests {
     }
 }
 
+
 // =========================================================================
 // ADVANCED ZSH, BASH, TCSH & KSH SHELL INNOVATIONS
 // =========================================================================
@@ -1978,9 +1972,7 @@ impl SovereignSigmaShRepl {
 
     pub fn suggest_completion(&self, input: &str) -> Option<String> {
         let completions = self.completer.complete(input);
-        completions
-            .first()
-            .map(|(sub, _): &(String, String)| sub.clone())
+        completions.first().map(|(sub, _): &(String, String)| sub.clone())
     }
 
     pub fn execute_repl_command(&mut self, cmd: &str) -> Result<(), String> {

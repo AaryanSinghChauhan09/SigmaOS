@@ -278,11 +278,7 @@ impl HidKeyboard {
     }
 
     /// Converts a USB HID scancode to ASCII character based on KeyboardLayout
-    pub fn scancode_to_ascii_layout(
-        scancode: u8,
-        shift: bool,
-        layout: KeyboardLayout,
-    ) -> Option<u8> {
+    pub fn scancode_to_ascii_layout(scancode: u8, shift: bool, layout: KeyboardLayout) -> Option<u8> {
         let ascii = Self::scancode_to_ascii(scancode, shift)?;
         match layout {
             KeyboardLayout::UsQwerty | KeyboardLayout::UkQwerty => Some(ascii),

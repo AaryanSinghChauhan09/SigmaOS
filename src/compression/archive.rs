@@ -1,7 +1,7 @@
-use std::format;
-use std::string::{String, ToString};
 use std::vec;
+use std::string::{String, ToString};
 use std::vec::Vec;
+use std::format;
 // Archive Subsystem for SigmaOS
 // Inspired by BSD libarchive, Linux GNU tar, zip/unzip, cpio, and ISO-9660 image tools.
 
@@ -116,12 +116,7 @@ impl ArchiveManager {
     }
 
     /// Create a new archive containing the provided entries
-    pub fn create_archive(
-        &mut self,
-        format: ArchiveFormat,
-        codec: CompressionCodec,
-        entries: Vec<ArchiveEntry>,
-    ) -> ArchiveImage {
+    pub fn create_archive(&mut self, format: ArchiveFormat, codec: CompressionCodec, entries: Vec<ArchiveEntry>) -> ArchiveImage {
         self.created_archives_count += 1;
         ArchiveImage {
             format,
@@ -132,11 +127,7 @@ impl ArchiveManager {
     }
 
     /// Extract matching entries from an archive image
-    pub fn extract_entry<'a>(
-        &self,
-        archive: &'a ArchiveImage,
-        path: &str,
-    ) -> Option<&'a ArchiveEntry> {
+    pub fn extract_entry<'a>(&self, archive: &'a ArchiveImage, path: &str) -> Option<&'a ArchiveEntry> {
         archive.entries.iter().find(|e| e.path == path)
     }
 
@@ -180,8 +171,7 @@ mod tests {
         let f2 = ArchiveEntry::new_file("etc/sigma.conf", b"key=value\n", 0o644);
         let d1 = ArchiveEntry::new_dir("usr/bin", 0o755);
 
-        let archive =
-            mgr.create_archive(ArchiveFormat::Tar, CompressionCodec::Gzip, vec![d1, f1, f2]);
+        let archive = mgr.create_archive(ArchiveFormat::Tar, CompressionCodec::Gzip, vec![d1, f1, f2]);
 
         assert_eq!(archive.format, ArchiveFormat::Tar);
         assert_eq!(archive.codec, CompressionCodec::Gzip);
@@ -195,9 +185,6 @@ mod tests {
         assert_eq!(extracted.payload, b"key=value\n");
 
         let files = mgr.list_files(&archive);
-        assert_eq!(
-            files,
-            vec!["usr/bin", "usr/bin/sigma-cli", "etc/sigma.conf"]
-        );
+        assert_eq!(files, vec!["usr/bin", "usr/bin/sigma-cli", "etc/sigma.conf"]);
     }
 }

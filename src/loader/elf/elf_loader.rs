@@ -1,10 +1,11 @@
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 /// Custom ELF Loader for SigmaOS
 /// Implements ELF binary loading without relying on ld.so
 /// Supports ELF32/ELF64 formats, glibc symbol resolution, and Auxiliary Vectors (auxv)
+
 use core::ptr;
-use std::format;
-use std::string::{String, ToString};
-use std::vec::Vec;
 
 /// ELF magic number
 const ELF_MAGIC: [u8; 4] = [0x7f, b'E', b'L', b'F'];
@@ -52,9 +53,7 @@ pub struct ElfAuxvBuilder {
 
 impl ElfAuxvBuilder {
     pub fn new() -> Self {
-        Self {
-            entries: Vec::new(),
-        }
+        Self { entries: Vec::new() }
     }
 
     pub fn add(&mut self, key: u64, val: u64) {
@@ -62,14 +61,7 @@ impl ElfAuxvBuilder {
     }
 
     /// Constructs standard auxiliary vector array for an ELF binary
-    pub fn build_standard_vector(
-        &mut self,
-        entry_point: u64,
-        phdr_addr: u64,
-        phnum: u64,
-        phentsize: u64,
-        base_addr: u64,
-    ) {
+    pub fn build_standard_vector(&mut self, entry_point: u64, phdr_addr: u64, phnum: u64, phentsize: u64, base_addr: u64) {
         self.add(auxv_types::AT_PAGESZ, 4096);
         self.add(auxv_types::AT_PHDR, phdr_addr);
         self.add(auxv_types::AT_PHENT, phentsize);
@@ -213,11 +205,7 @@ mod tests {
         assert_eq!(builder.entries[0].key, auxv_types::AT_PAGESZ);
         assert_eq!(builder.entries[0].val, 4096);
 
-        let entry_item = builder
-            .entries
-            .iter()
-            .find(|e| e.key == auxv_types::AT_ENTRY)
-            .unwrap();
+        let entry_item = builder.entries.iter().find(|e| e.key == auxv_types::AT_ENTRY).unwrap();
         assert_eq!(entry_item.val, 0x401000);
     }
 

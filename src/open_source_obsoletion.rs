@@ -10,6 +10,8 @@ use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
+
+
 #[cfg(not(feature = "standalone_test"))]
 #[path = "open_source_os_gap_closure.rs"]
 pub mod open_source_os_gap_closure;
@@ -288,16 +290,8 @@ impl SovereignFdiskDiskPartitioner {
         }
     }
 
-    pub fn add_partition(
-        &mut self,
-        sectors_count: u64,
-        type_guid: &str,
-    ) -> Result<usize, &'static str> {
-        let last_end = self
-            .partitions
-            .last()
-            .map(|p| p.end_sector + 1)
-            .unwrap_or(2048); // 1MB initial alignment
+    pub fn add_partition(&mut self, sectors_count: u64, type_guid: &str) -> Result<usize, &'static str> {
+        let last_end = self.partitions.last().map(|p| p.end_sector + 1).unwrap_or(2048); // 1MB initial alignment
         let end_sector = last_end + sectors_count - 1;
 
         if end_sector >= self.total_disk_sectors {
@@ -460,11 +454,7 @@ impl SovereignHtopProcessMonitorEngine {
 
     pub fn get_top_cpu_processes(&self, limit: usize) -> Vec<ProcessTaskSnapshot> {
         let mut sorted = self.process_snapshots.clone();
-        sorted.sort_by(|a, b| {
-            b.cpu_pct
-                .partial_cmp(&a.cpu_pct)
-                .unwrap_or(core::cmp::Ordering::Equal)
-        });
+        sorted.sort_by(|a, b| b.cpu_pct.partial_cmp(&a.cpu_pct).unwrap_or(core::cmp::Ordering::Equal));
         sorted.truncate(limit);
         sorted
     }
@@ -514,10 +504,7 @@ impl SovereignAnsibleAutomationEngine {
         self.playbooks.push(playbook);
     }
 
-    pub fn execute_playbook(
-        &mut self,
-        playbook_name: &str,
-    ) -> Result<(usize, usize), &'static str> {
+    pub fn execute_playbook(&mut self, playbook_name: &str) -> Result<(usize, usize), &'static str> {
         let playbook = self
             .playbooks
             .iter()
@@ -529,10 +516,7 @@ impl SovereignAnsibleAutomationEngine {
 
         for task in &playbook.tasks {
             task_count += 1;
-            if task.target_state == "present"
-                || task.target_state == "started"
-                || task.target_state == "absent"
-            {
+            if task.target_state == "present" || task.target_state == "started" || task.target_state == "absent" {
                 changed_count += 1;
             }
         }
@@ -1891,9 +1875,7 @@ pub struct SovereignApacheSparkDataEngine {
 
 impl SovereignApacheSparkDataEngine {
     pub fn new() -> Self {
-        Self {
-            dataset: Vec::new(),
-        }
+        Self { dataset: Vec::new() }
     }
 
     pub fn load_dataset(&mut self, records: Vec<SparkDataRecord>) {
@@ -1901,11 +1883,7 @@ impl SovereignApacheSparkDataEngine {
     }
 
     pub fn filter_by_min_value(&self, min_val: u64) -> Vec<SparkDataRecord> {
-        self.dataset
-            .iter()
-            .filter(|r| r.value >= min_val)
-            .cloned()
-            .collect()
+        self.dataset.iter().filter(|r| r.value >= min_val).cloned().collect()
     }
 
     pub fn map_transform<F>(&self, transform: F) -> Vec<SparkDataRecord>
@@ -2094,8 +2072,7 @@ impl SovereignMosquittoMqttBroker {
     }
 
     pub fn subscribe(&mut self, client_id: &str, topic_filter: &str, qos: MqttQos) {
-        self.subscriptions
-            .retain(|s| !(s.client_id == client_id && s.topic_filter == topic_filter));
+        self.subscriptions.retain(|s| !(s.client_id == client_id && s.topic_filter == topic_filter));
         self.subscriptions.push(MqttSubscription {
             client_id: client_id.to_string(),
             topic_filter: topic_filter.to_string(),
@@ -2137,8 +2114,7 @@ impl SovereignMosquittoMqttBroker {
             if payload.is_empty() {
                 self.retained_messages.remove(topic);
             } else {
-                self.retained_messages
-                    .insert(topic.to_string(), msg.clone());
+                self.retained_messages.insert(topic.to_string(), msg.clone());
             }
         }
 
@@ -2346,10 +2322,7 @@ impl SovereignHelixModalEditorEngine {
         let pos = self.selections.first().map(|s| s.head).unwrap_or(0);
         self.buffer.insert_str(pos, text);
         let new_pos = pos + text.len();
-        self.selections = vec![TextSelection {
-            anchor: new_pos,
-            head: new_pos,
-        }];
+        self.selections = vec![TextSelection { anchor: new_pos, head: new_pos }];
     }
 }
 
@@ -2714,10 +2687,7 @@ impl SovereignBatSyntaxHighlighterEngine {
 
     pub fn tokenize(&self, code: &str) -> Vec<SyntaxToken> {
         let mut tokens = Vec::new();
-        let keywords = [
-            "fn", "let", "mut", "pub", "struct", "enum", "impl", "use", "if", "else", "return",
-            "import", "def",
-        ];
+        let keywords = ["fn", "let", "mut", "pub", "struct", "enum", "impl", "use", "if", "else", "return", "import", "def"];
 
         for line in code.lines() {
             let trimmed = line.trim();
@@ -2756,30 +2726,17 @@ impl SovereignBatSyntaxHighlighterEngine {
         tokens
     }
 
-    pub fn render_file_view(
-        &self,
-        file_path: &str,
-        code: &str,
-        git_diff_additions: &[usize],
-    ) -> String {
+    pub fn render_file_view(&self, file_path: &str, code: &str, git_diff_additions: &[usize]) -> String {
         let mut out = String::new();
         if self.show_header_box {
-            out.push_str(&format!(
-                "┌────────────────────────────────────────────────────────┐\n"
-            ));
+            out.push_str(&format!("┌────────────────────────────────────────────────────────┐\n"));
             out.push_str(&format!("│ File: {:<49} │\n", file_path));
-            out.push_str(&format!(
-                "└────────────────────────────────────────────────────────┘\n"
-            ));
+            out.push_str(&format!("└────────────────────────────────────────────────────────┘\n"));
         }
 
         for (idx, line) in code.lines().enumerate() {
             let line_num = idx + 1;
-            let diff_symbol = if git_diff_additions.contains(&line_num) {
-                "+"
-            } else {
-                " "
-            };
+            let diff_symbol = if git_diff_additions.contains(&line_num) { "+" } else { " " };
 
             if self.show_line_numbers {
                 out.push_str(&format!("{:>4} {} │ {}\n", line_num, diff_symbol, line));
@@ -2850,11 +2807,7 @@ impl SovereignFzfFuzzyFinderEngine {
                     score += 20; // Prefix match bonus
                 }
 
-                if ci > 0
-                    && (candidate.as_bytes()[ci - 1] == b'/'
-                        || candidate.as_bytes()[ci - 1] == b'_'
-                        || candidate.as_bytes()[ci - 1] == b'-')
-                {
+                if ci > 0 && (candidate.as_bytes()[ci - 1] == b'/' || candidate.as_bytes()[ci - 1] == b'_' || candidate.as_bytes()[ci - 1] == b'-') {
                     score += 10; // Word boundary bonus
                 }
 
@@ -2903,9 +2856,7 @@ impl SovereignFzfFuzzyFinderEngine {
 
     pub fn selected_item(&self, query: &str) -> Option<String> {
         let results = self.search(query);
-        results
-            .get(self.selection_index)
-            .map(|r| r.candidate.clone())
+        results.get(self.selection_index).map(|r| r.candidate.clone())
     }
 }
 
@@ -2965,13 +2916,7 @@ impl SovereignNatsJetstreamEngine {
         pi == pat_parts.len() && si == sub_parts.len()
     }
 
-    pub fn publish(
-        &mut self,
-        subject: &str,
-        msg_id: &str,
-        payload: &[u8],
-        timestamp: u64,
-    ) -> Result<u64, &'static str> {
+    pub fn publish(&mut self, subject: &str, msg_id: &str, payload: &[u8], timestamp: u64) -> Result<u64, &'static str> {
         if self.deduplication_window.contains(&msg_id.to_string()) {
             return Err("JetStream: Duplicate message detected in deduplication window");
         }
@@ -3051,11 +2996,7 @@ impl SovereignYaziTerminalFileExplorerEngine {
         if self.entries.is_empty() {
             return;
         }
-        if let Some(pos) = self
-            .selected_indices
-            .iter()
-            .position(|&i| i == self.cursor_pos)
-        {
+        if let Some(pos) = self.selected_indices.iter().position(|&i| i == self.cursor_pos) {
             self.selected_indices.remove(pos);
         } else {
             self.selected_indices.push(self.cursor_pos);
@@ -3189,12 +3130,7 @@ impl SovereignOpenSourceObsoletionOrchestrator {
         ai_server.load_model("sovereign-ai-7b", 8192);
 
         let mut bcachefs = open_source_os_gap_closure::SovereignBcachefsTieredEngine::new();
-        bcachefs.register_device(
-            1,
-            "/dev/nvme0n1",
-            open_source_os_gap_closure::BcachefsTier::NvmeReadCache,
-            1_000_000_000_000,
-        );
+        bcachefs.register_device(1, "/dev/nvme0n1", open_source_os_gap_closure::BcachefsTier::NvmeReadCache, 1_000_000_000_000);
 
         Self {
             vcs: SovereignVcsEngine::new(),
@@ -3225,18 +3161,12 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             zellij_multiplexer: SovereignZellijMultiplexerEngine::new("default_session"),
             mosquitto_mqtt: SovereignMosquittoMqttBroker::new(),
             restic_backup: SovereignResticBorgBackupEngine::new([0x3C; 32]),
-            helix_editor: SovereignHelixModalEditorEngine::new(
-                "/etc/sigma.conf",
-                "sovereign_mode=enabled",
-            ),
+            helix_editor: SovereignHelixModalEditorEngine::new("/etc/sigma.conf", "sovereign_mode=enabled"),
             fastfetch_sysinfo: SovereignFastfetchSysInfoEngine::new(),
             fish_shell: SovereignFishSmartShellEngine::new(),
             polars_dataframe: SovereignPolarsDataframeEngine::new(),
             bat_highlighter: SovereignBatSyntaxHighlighterEngine::new(),
-            fzf_finder: SovereignFzfFuzzyFinderEngine::new(vec![
-                "/bin/bash".to_string(),
-                "/usr/bin/zsh".to_string(),
-            ]),
+            fzf_finder: SovereignFzfFuzzyFinderEngine::new(vec!["/bin/bash".to_string(), "/usr/bin/zsh".to_string()]),
             nats_jetstream: SovereignNatsJetstreamEngine::new("system_events"),
             yazi_explorer: SovereignYaziTerminalFileExplorerEngine::new("/home/sovereign"),
             ast_grep: SovereignAstGrepStructuralEngine::new(),
@@ -3270,15 +3200,9 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             btop_monitor: SovereignBtopResourceMonitorEngine::new(),
             bcachefs,
             bpf_lsm: open_source_os_gap_closure::SovereignLinuxBpfLsmEngine::new(),
-            ghostty_terminal: open_source_os_gap_closure::SovereignGhosttyTextGridEngine::new(
-                80, 24,
-            ),
-            valgrind_debugger:
-                open_source_os_gap_closure::SovereignValgrindMemoryDebuggerEngine::new(),
-            nebula_mesh: open_source_os_gap_closure::SovereignNebulaMeshVpnEngine::new(
-                "orchestrator_node",
-                "10.200.0.1",
-            ),
+            ghostty_terminal: open_source_os_gap_closure::SovereignGhosttyTextGridEngine::new(80, 24),
+            valgrind_debugger: open_source_os_gap_closure::SovereignValgrindMemoryDebuggerEngine::new(),
+            nebula_mesh: open_source_os_gap_closure::SovereignNebulaMeshVpnEngine::new("orchestrator_node", "10.200.0.1"),
             total_obsoleted_projects_count: 90,
         }
     }
@@ -3307,79 +3231,36 @@ impl SovereignOpenSourceObsoletionOrchestrator {
 
         // Bootstrap additional integrated sovereign sub-engines
         let _ = self.scheme_router.register_scheme("ipc");
-        let _ = self
-            .zircon_manager
-            .create_handle("channel", ZirconRights::Full, [0x01; 16]);
-        self.serenity_async
-            .enqueue_task(1, "BOOT_EVENT", b"init_ready");
-        self.solaris_zone
-            .register_probe("sovereign_kernel", "sys_boot");
-        let nix_hash = self
-            .nix_declarative
-            .build_derivation("sigmaos-core", &["gcc", "musl"]);
+        let _ = self.zircon_manager.create_handle("channel", ZirconRights::Full, [0x01; 16]);
+        self.serenity_async.enqueue_task(1, "BOOT_EVENT", b"init_ready");
+        self.solaris_zone.register_probe("sovereign_kernel", "sys_boot");
+        let nix_hash = self.nix_declarative.build_derivation("sigmaos-core", &["gcc", "musl"]);
         let _ = self.nix_declarative.switch_profile(&nix_hash);
-        self.qubes_isolation
-            .create_domain("vault-domain", "black", false);
+        self.qubes_isolation.create_domain("vault-domain", "black", false);
         self.linux_security_lsm.add_landlock_rule("/system", 0b111);
-        self.haiku_interface
-            .register_translator("ELF", "SOVEREIGN_BIN");
-        let _ = self
-            .firecracker_microvm
-            .launch_microvm("boot_microvm", 2, 512, "/boot/vmlinuz");
+        self.haiku_interface.register_translator("ELF", "SOVEREIGN_BIN");
+        let _ = self.firecracker_microvm.launch_microvm("boot_microvm", 2, 512, "/boot/vmlinuz");
         self.tpm_attestation.extend_pcr(0, b"boot_integrity_pcr");
-        self.sbom_generator
-            .record_package("sigmaos-kernel", "6.12.0", "MIT");
-        self.pipewire_audio
-            .register_node(100, "master_output", 48000);
+        self.sbom_generator.record_package("sigmaos-kernel", "6.12.0", "MIT");
+        self.pipewire_audio.register_node(100, "master_output", 48000);
         let ipfs_cid = self.web3fs_ipfs.store_block(b"sovereign_genesis_manifest");
         let _ = self.web3fs_ipfs.fetch_block(&ipfs_cid);
-        self.wasm_cranelift
-            .load_wasm_bytecode("sovereign_runtime", b"\x00asm\x01\x00\x00\x00");
-        self.reproducible_build_farm.trigger_reproducible_build(
-            "job_01",
-            "kernel",
-            "sha256_root_hash",
-        );
-        self.capsicum_sandbox.limit_fd_rights(
-            3,
-            CapsicumCapRights {
-                read: true,
-                write: true,
-                seek: true,
-                fstat: true,
-            },
-        );
-        self.wayland_compositor
-            .create_surface(1, "DesktopWorkspace", 1920, 1080);
-        self.flatpak_sandbox
-            .register_bundle("org.sigmaos.CoreDesktop", "1.0");
-        let snap_id = self
-            .btrfs_zfs_pool
-            .create_instant_snapshot("genesis_snapshot", 1700000000);
+        self.wasm_cranelift.load_wasm_bytecode("sovereign_runtime", b"\x00asm\x01\x00\x00\x00");
+        self.reproducible_build_farm.trigger_reproducible_build("job_01", "kernel", "sha256_root_hash");
+        self.capsicum_sandbox.limit_fd_rights(3, CapsicumCapRights { read: true, write: true, seek: true, fstat: true });
+        self.wayland_compositor.create_surface(1, "DesktopWorkspace", 1920, 1080);
+        self.flatpak_sandbox.register_bundle("org.sigmaos.CoreDesktop", "1.0");
+        let snap_id = self.btrfs_zfs_pool.create_instant_snapshot("genesis_snapshot", 1700000000);
         assert_eq!(snap_id, 1);
-        self.cockroach_store
-            .raft_put("cluster_state", b"initialized");
-        self.starship_prompt
-            .set_segment("kernel", "v6.12.0", "\x1b[36m");
-        self.chezmoi_dotfiles
-            .register_mapping(".zshrc", "/home/sovereign/.zshrc", false);
+        self.cockroach_store.raft_put("cluster_state", b"initialized");
+        self.starship_prompt.set_segment("kernel", "v6.12.0", "\x1b[36m");
+        self.chezmoi_dotfiles.register_mapping(".zshrc", "/home/sovereign/.zshrc", false);
         self.fd_walker.add_entry("/src/main.rs", false, false, 1024);
-        self.telescope_picker
-            .add_item(1, "open_sovereign_terminal", "action", Some("function"));
+        self.telescope_picker.add_item(1, "open_sovereign_terminal", "action", Some("function"));
         self.btop_monitor.record_core_telemetry(0, 15, 3600, 42);
-        let _ = self.bcachefs.allocate_extent(
-            1,
-            open_source_os_gap_closure::BcachefsTier::NvmeReadCache,
-            4096,
-            true,
-        );
-        self.bpf_lsm.attach_hook_rule(
-            open_source_os_gap_closure::BpfLsmHook::FileOpen,
-            "/etc/shadow",
-            false,
-        );
-        self.ghostty_terminal
-            .write_char(0, 0, 'S', (255, 255, 255), (0, 0, 0));
+        let _ = self.bcachefs.allocate_extent(1, open_source_os_gap_closure::BcachefsTier::NvmeReadCache, 4096, true);
+        self.bpf_lsm.attach_hook_rule(open_source_os_gap_closure::BpfLsmHook::FileOpen, "/etc/shadow", false);
+        self.ghostty_terminal.write_char(0, 0, 'S', (255, 255, 255), (0, 0, 0));
         self.valgrind_debugger.shadow_malloc(0x7fff0000, 1024);
         let _ = self.nebula_mesh.perform_noise_handshake("lighthouse_01");
 
@@ -5329,16 +5210,9 @@ impl SovereignStarshipPromptEngine {
                 out.push_str(&format!("{} {} \x1b[0m", seg.color_code, seg.content));
             }
         }
-        let status_color = if last_status == 0 {
-            "\x1b[32m"
-        } else {
-            "\x1b[31m"
-        };
+        let status_color = if last_status == 0 { "\x1b[32m" } else { "\x1b[31m" };
         if self.execution_duration_ms > 0 {
-            out.push_str(&format!(
-                "\x1b[33m[{}ms] \x1b[0m",
-                self.execution_duration_ms
-            ));
+            out.push_str(&format!("\x1b[33m[{}ms] \x1b[0m", self.execution_duration_ms));
         }
         out.push_str(&format!("{}{}\x1b[0m ", status_color, self.prompt_symbol));
         out
@@ -5522,11 +5396,7 @@ impl SovereignTelescopeFuzzyPickerEngine {
                     score: 100,
                 });
             } else if text_lower.contains(&query_lower) {
-                let score = if text_lower.starts_with(&query_lower) {
-                    200
-                } else {
-                    150
-                };
+                let score = if text_lower.starts_with(&query_lower) { 200 } else { 150 };
                 results.push(TelescopeSearchResult {
                     item: item.clone(),
                     score,
@@ -5589,12 +5459,7 @@ impl SovereignBtopResourceMonitorEngine {
     }
 
     pub fn record_core_telemetry(&mut self, core_id: u32, usage: u8, freq: u32, temp: u8) {
-        if let Some(core) = self
-            .active_snapshot
-            .cpu_cores
-            .iter_mut()
-            .find(|c| c.core_id == core_id)
-        {
+        if let Some(core) = self.active_snapshot.cpu_cores.iter_mut().find(|c| c.core_id == core_id) {
             core.usage_pct = usage;
             core.freq_mhz = freq;
             core.temp_celsius = temp;
@@ -5612,12 +5477,7 @@ impl SovereignBtopResourceMonitorEngine {
         if self.active_snapshot.cpu_cores.is_empty() {
             return 0;
         }
-        let total: u32 = self
-            .active_snapshot
-            .cpu_cores
-            .iter()
-            .map(|c| c.usage_pct as u32)
-            .sum();
+        let total: u32 = self.active_snapshot.cpu_cores.iter().map(|c| c.usage_pct as u32).sum();
         (total / self.active_snapshot.cpu_cores.len() as u32) as u8
     }
 }
@@ -5681,9 +5541,7 @@ impl SovereignAstGrepStructuralEngine {
                     bindings.insert("$VAR".to_string(), var_name);
                     matched = true;
                 }
-            } else if pat_clean.contains("$FUNC")
-                && (trimmed.contains("fn ") || trimmed.contains("def "))
-            {
+            } else if pat_clean.contains("$FUNC") && (trimmed.contains("fn ") || trimmed.contains("def ")) {
                 if let Some(fn_pos) = trimmed.find("fn ") {
                     let rest = &trimmed[fn_pos + 3..];
                     if let Some(paren_pos) = rest.find('(') {
@@ -5777,16 +5635,8 @@ impl SovereignDifftasticSyntaxDiffEngine {
             let l_line = left_lines.get(i).copied().unwrap_or("");
             let r_line = right_lines.get(i).copied().unwrap_or("");
 
-            let l_clean = if self.ignore_whitespace {
-                l_line.trim()
-            } else {
-                l_line
-            };
-            let r_clean = if self.ignore_whitespace {
-                r_line.trim()
-            } else {
-                r_line
-            };
+            let l_clean = if self.ignore_whitespace { l_line.trim() } else { l_line };
+            let r_clean = if self.ignore_whitespace { r_line.trim() } else { r_line };
 
             if l_clean == r_clean {
                 hunks.push(SyntaxDiffHunk {
@@ -6029,21 +5879,9 @@ mod tests {
     fn test_sovereign_apache_spark_data_engine() {
         let mut spark = SovereignApacheSparkDataEngine::new();
         let records = vec![
-            SparkDataRecord {
-                id: 1,
-                key: "CPU".to_string(),
-                value: 40,
-            },
-            SparkDataRecord {
-                id: 2,
-                key: "RAM".to_string(),
-                value: 80,
-            },
-            SparkDataRecord {
-                id: 3,
-                key: "CPU".to_string(),
-                value: 60,
-            },
+            SparkDataRecord { id: 1, key: "CPU".to_string(), value: 40 },
+            SparkDataRecord { id: 2, key: "RAM".to_string(), value: 80 },
+            SparkDataRecord { id: 3, key: "CPU".to_string(), value: 60 },
         ];
         spark.load_dataset(records);
 
@@ -6627,9 +6465,7 @@ mod tests {
     #[test]
     fn test_sovereign_fdisk_partitioner() {
         let mut fdisk = SovereignFdiskDiskPartitioner::new(PartitionTableType::Gpt, 100_000_000);
-        let p1 = fdisk
-            .add_partition(204800, "C12A7328-F81F-11D2-BA4B-00A0C93EC93B")
-            .unwrap();
+        let p1 = fdisk.add_partition(204800, "C12A7328-F81F-11D2-BA4B-00A0C93EC93B").unwrap();
         assert_eq!(p1, 1);
         assert!(fdisk.is_lba_aligned());
     }
@@ -6637,9 +6473,7 @@ mod tests {
     #[test]
     fn test_sovereign_curl_http_client() {
         let curl = SovereignCurlHttpClientEngine::new();
-        let resp = curl
-            .execute_http_get("https://api.sigmaos.org/v1/health")
-            .unwrap();
+        let resp = curl.execute_http_get("https://api.sigmaos.org/v1/health").unwrap();
         assert_eq!(resp.status_code, 200);
         assert!(resp.headers.contains_key("server"));
     }
@@ -6723,22 +6557,12 @@ mod tests {
         let mut mqtt = SovereignMosquittoMqttBroker::new();
         mqtt.subscribe("client-1", "sensors/+/temperature", MqttQos::AtLeastOnce);
 
-        let subs = mqtt.publish(
-            "sensors/room1/temperature",
-            b"22.5C",
-            MqttQos::AtLeastOnce,
-            true,
-        );
+        let subs = mqtt.publish("sensors/room1/temperature", b"22.5C", MqttQos::AtLeastOnce, true);
         assert_eq!(subs, 1);
         assert_eq!(mqtt.published_count, 1);
-        assert!(mqtt
-            .retained_messages
-            .contains_key("sensors/room1/temperature"));
+        assert!(mqtt.retained_messages.contains_key("sensors/room1/temperature"));
 
-        assert!(SovereignMosquittoMqttBroker::topic_matches(
-            "sensors/#",
-            "sensors/room1/humidity"
-        ));
+        assert!(SovereignMosquittoMqttBroker::topic_matches("sensors/#", "sensors/room1/humidity"));
     }
 
     #[test]
@@ -6757,8 +6581,7 @@ mod tests {
 
     #[test]
     fn test_sovereign_helix_modal_editor() {
-        let mut helix =
-            SovereignHelixModalEditorEngine::new("/tmp/test.txt", "fn main() { return; }");
+        let mut helix = SovereignHelixModalEditorEngine::new("/tmp/test.txt", "fn main() { return; }");
         helix.insert_text("// Sovereign Editor\n");
         assert!(helix.buffer.starts_with("// Sovereign Editor\n"));
 
@@ -6798,11 +6621,7 @@ mod tests {
         let mut df = SovereignPolarsDataframeEngine::new();
         let name_series = DataSeries {
             name: "package".to_string(),
-            data: SeriesData::Utf8(vec![
-                "gcc".to_string(),
-                "clang".to_string(),
-                "rustc".to_string(),
-            ]),
+            data: SeriesData::Utf8(vec!["gcc".to_string(), "clang".to_string(), "rustc".to_string()]),
         };
         let count_series = DataSeries {
             name: "downloads".to_string(),
@@ -6858,18 +6677,10 @@ mod tests {
     fn test_sovereign_nats_jetstream() {
         let mut js = SovereignNatsJetstreamEngine::new("system_events");
 
-        assert!(SovereignNatsJetstreamEngine::match_subject(
-            "orders.*",
-            "orders.created"
-        ));
-        assert!(SovereignNatsJetstreamEngine::match_subject(
-            "events.>",
-            "events.user.login"
-        ));
+        assert!(SovereignNatsJetstreamEngine::match_subject("orders.*", "orders.created"));
+        assert!(SovereignNatsJetstreamEngine::match_subject("events.>", "events.user.login"));
 
-        let seq1 = js
-            .publish("orders.created", "msg-101", b"payload1", 1700000000)
-            .unwrap();
+        let seq1 = js.publish("orders.created", "msg-101", b"payload1", 1700000000).unwrap();
         assert_eq!(seq1, 1);
 
         let dup = js.publish("orders.created", "msg-101", b"payload1", 1700000001);
@@ -6988,10 +6799,7 @@ mod tests {
         let code = "fn compute_hash() -> u64 {\n    let mut val = 42;\n    val\n}";
         let matches = ast_grep.search_pattern(code, "fn $FUNC");
         assert_eq!(matches.len(), 1);
-        assert_eq!(
-            matches[0].bindings.get("$FUNC"),
-            Some(&"compute_hash".to_string())
-        );
+        assert_eq!(matches[0].bindings.get("$FUNC"), Some(&"compute_hash".to_string()));
 
         let rewritten = ast_grep.rewrite_code(code, "export_fn");
         assert!(rewritten.contains("pub fn compute_hash"));

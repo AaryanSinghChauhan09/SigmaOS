@@ -99,16 +99,14 @@ impl SovereignMicrovmHermeticPackageSandboxEngine {
                 writable_bind_mounts: vec![format!("/var/cache/build/{}", package_name)],
                 network_access_allowed: false,
             },
-            SandboxIsolationLevel::FirecrackerMicroVm | SandboxIsolationLevel::QubesIsoDomain => {
-                MicrovmSandboxSpec {
-                    isolation_level: self.active_sandbox_level,
-                    allocated_ram_mb: 2048,
-                    cpu_cores: 4,
-                    read_only_bind_mounts: vec!["/sovereign/store".to_string()],
-                    writable_bind_mounts: vec![format!("/vm/workspace/{}", package_name)],
-                    network_access_allowed: false,
-                }
-            }
+            SandboxIsolationLevel::FirecrackerMicroVm | SandboxIsolationLevel::QubesIsoDomain => MicrovmSandboxSpec {
+                isolation_level: self.active_sandbox_level,
+                allocated_ram_mb: 2048,
+                cpu_cores: 4,
+                read_only_bind_mounts: vec!["/sovereign/store".to_string()],
+                writable_bind_mounts: vec![format!("/vm/workspace/{}", package_name)],
+                network_access_allowed: false,
+            },
         }
     }
 
@@ -218,10 +216,7 @@ impl SovereignPqcMultiKeyringPackageTrustGovernor {
             }
             Ok(true)
         } else {
-            Err(format!(
-                "Key ID '{}' not found in multi-distro keyring",
-                key_id
-            ))
+            Err(format!("Key ID '{}' not found in multi-distro keyring", key_id))
         }
     }
 }
@@ -281,11 +276,7 @@ impl SovereignAiOptimizedMirrorRankingGovernor {
 
     pub fn get_ranked_mirrors(&self) -> Vec<String> {
         let mut sorted = self.mirrors.clone();
-        sorted.sort_by(|a, b| {
-            b.calculated_score
-                .partial_cmp(&a.calculated_score)
-                .unwrap_or(core::cmp::Ordering::Equal)
-        });
+        sorted.sort_by(|a, b| b.calculated_score.partial_cmp(&a.calculated_score).unwrap_or(core::cmp::Ordering::Equal));
         sorted.into_iter().map(|m| m.mirror_url).collect()
     }
 }
@@ -445,15 +436,10 @@ impl SovereignDistroPackageAdvancementsSuiteV8 {
         }
     }
 
-    pub fn process_and_enrich_package_v8(
-        &mut self,
-        pkg: &mut UnifiedPackage,
-    ) -> Result<(), String> {
+    pub fn process_and_enrich_package_v8(&mut self, pkg: &mut UnifiedPackage) -> Result<(), String> {
         let spec = self.sandbox_engine.generate_sandbox_spec(&pkg.name);
-        pkg.properties.insert(
-            "v8_sandbox_ram_mb".to_string(),
-            spec.allocated_ram_mb.to_string(),
-        );
+        pkg.properties
+            .insert("v8_sandbox_ram_mb".to_string(), spec.allocated_ram_mb.to_string());
         pkg.properties
             .insert("v8_advancements_processed".to_string(), "true".to_string());
         Ok(())
@@ -529,7 +515,10 @@ mod tests {
 
         let verifier = SovereignCrossDistroSonameAbiVerifierEngine::new(available);
 
-        let report_ok = verifier.audit_package_abi_dependencies(&["libc.so.6".to_string()], &[]);
+        let report_ok = verifier.audit_package_abi_dependencies(
+            &["libc.so.6".to_string()],
+            &[],
+        );
         assert!(report_ok.is_abi_compatible);
 
         let report_err = verifier.audit_package_abi_dependencies(
@@ -547,9 +536,7 @@ mod tests {
 
         assert!(suite.process_and_enrich_package_v8(&mut pkg).is_ok());
         assert_eq!(
-            pkg.properties
-                .get("v8_advancements_processed")
-                .map(|s| s.as_str()),
+            pkg.properties.get("v8_advancements_processed").map(|s| s.as_str()),
             Some("true")
         );
         assert!(pkg.properties.contains_key("v8_sandbox_ram_mb"));

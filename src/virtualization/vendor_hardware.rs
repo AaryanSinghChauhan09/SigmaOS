@@ -12,9 +12,9 @@ use std::vec::Vec;
 /// Hardware Virtualization Vendor Category
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VirtualizationVendorType {
-    IntelVtxEpt,    // Intel VT-x with Extended Page Tables (EPT)
-    AmdSvmSevSnp,   // AMD-V SVM with Secure Encrypted Virtualization (SEV-SNP)
-    NvidiaVgpuGrid, // NVIDIA vGPU / VFIO Mediated Device (mdev)
+    IntelVtxEpt,     // Intel VT-x with Extended Page Tables (EPT)
+    AmdSvmSevSnp,    // AMD-V SVM with Secure Encrypted Virtualization (SEV-SNP)
+    NvidiaVgpuGrid,  // NVIDIA vGPU / VFIO Mediated Device (mdev)
 }
 
 /// Intel VT-x VMCS Execution State
@@ -35,8 +35,8 @@ pub struct AmdVmcbExecutionBlock {
     pub vmcb_phys_addr: u64,
     pub intercept_read_cr3: bool,
     pub intercept_write_cr3: bool,
-    pub npt_pointer: u64, // Nested Page Table (NPT) pointer
-    pub sev_asid: u32,    // SEV-SNP Address Space Identifier
+    pub npt_pointer: u64,             // Nested Page Table (NPT) pointer
+    pub sev_asid: u32,                // SEV-SNP Address Space Identifier
     pub is_sev_snp_encrypted: bool,
 }
 
@@ -44,7 +44,7 @@ pub struct AmdVmcbExecutionBlock {
 #[derive(Debug, Clone)]
 pub struct NvidiaVgpuMediatedInstance {
     pub mdev_uuid: String,
-    pub vgpu_type: String, // e.g. "grid_p100-2q" or "rtx6000-4q"
+    pub vgpu_type: String,            // e.g. "grid_p100-2q" or "rtx6000-4q"
     pub vram_allocated_mb: u64,
     pub max_display_heads: u32,
     pub is_vfio_bound: bool,
@@ -52,8 +52,8 @@ pub struct NvidiaVgpuMediatedInstance {
 
 /// Multi-Vendor Virtualization Engine
 pub struct MultiVendorVirtualizationEngine {
-    pub active_intel_vmcs: HashMap<u32, IntelVmcsExecutionState>, // VMID -> VMCS
-    pub active_amd_vmcb: HashMap<u32, AmdVmcbExecutionBlock>,     // VMID -> VMCB
+    pub active_intel_vmcs: HashMap<u32, IntelVmcsExecutionState>,  // VMID -> VMCS
+    pub active_amd_vmcb: HashMap<u32, AmdVmcbExecutionBlock>,       // VMID -> VMCB
     pub active_nvidia_vgpu: HashMap<String, NvidiaVgpuMediatedInstance>, // UUID -> vGPU
     pub is_hardware_supported: bool,
 }
@@ -69,18 +69,13 @@ impl MultiVendorVirtualizationEngine {
     }
 
     /// Provision Intel VT-x VMCS with EPT 2D Page Table Pointer
-    pub fn create_intel_vmcs(
-        &mut self,
-        vmid: u32,
-        vmcs_phys: u64,
-        ept_pml4_phys: u64,
-    ) -> IntelVmcsExecutionState {
+    pub fn create_intel_vmcs(&mut self, vmid: u32, vmcs_phys: u64, ept_pml4_phys: u64) -> IntelVmcsExecutionState {
         let vmcs = IntelVmcsExecutionState {
             vmcs_phys_addr: vmcs_phys,
             pin_based_controls: 0x0000001F,
             cpu_based_controls: 0x80000000, // Secondary controls enabled for EPT
             ept_pointer: ept_pml4_phys | 0x1E, // WB memory type, 4-level walk
-            guest_rip: 0xFFFE_0000,         // Reset vector
+            guest_rip: 0xFFFE_0000,            // Reset vector
             guest_rsp: 0x7FFF_0000,
             is_vmx_active: true,
         };
@@ -90,13 +85,7 @@ impl MultiVendorVirtualizationEngine {
     }
 
     /// Provision AMD-V SVM VMCB with SEV-SNP Memory Encryption
-    pub fn create_amd_vmcb(
-        &mut self,
-        vmid: u32,
-        vmcb_phys: u64,
-        npt_phys: u64,
-        sev_asid: u32,
-    ) -> AmdVmcbExecutionBlock {
+    pub fn create_amd_vmcb(&mut self, vmid: u32, vmcb_phys: u64, npt_phys: u64, sev_asid: u32) -> AmdVmcbExecutionBlock {
         let vmcb = AmdVmcbExecutionBlock {
             vmcb_phys_addr: vmcb_phys,
             intercept_read_cr3: false,
@@ -111,12 +100,7 @@ impl MultiVendorVirtualizationEngine {
     }
 
     /// Provision NVIDIA vGPU Mediated Device (VFIO-mdev GRID slicing)
-    pub fn create_nvidia_vgpu_instance(
-        &mut self,
-        uuid: &str,
-        vgpu_type: &str,
-        vram_mb: u64,
-    ) -> NvidiaVgpuMediatedInstance {
+    pub fn create_nvidia_vgpu_instance(&mut self, uuid: &str, vgpu_type: &str, vram_mb: u64) -> NvidiaVgpuMediatedInstance {
         let vgpu = NvidiaVgpuMediatedInstance {
             mdev_uuid: uuid.to_string(),
             vgpu_type: vgpu_type.to_string(),
@@ -125,8 +109,7 @@ impl MultiVendorVirtualizationEngine {
             is_vfio_bound: true,
         };
 
-        self.active_nvidia_vgpu
-            .insert(uuid.to_string(), vgpu.clone());
+        self.active_nvidia_vgpu.insert(uuid.to_string(), vgpu.clone());
         vgpu
     }
 }

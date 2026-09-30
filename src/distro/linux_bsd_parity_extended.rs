@@ -222,11 +222,7 @@ impl AlpineApkVolatileOverlayEngine {
         } else {
             self.lbu_commit()
         };
-        (
-            hash,
-            self.staged_packages.clone(),
-            self.volatile_tmpfs_bytes,
-        )
+        (hash, self.staged_packages.clone(), self.volatile_tmpfs_bytes)
     }
 
     pub fn rollback_tmpfs_snapshot(&mut self, snapshot: &(u64, Vec<String>, usize)) -> bool {

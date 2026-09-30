@@ -1,10 +1,10 @@
 // BPF Syscall Implementation
 // Phase 9.4 Part 2-3: sys_bpf() Syscall with Program Loading, Verification, and Execution
 
-use crate::kernel::ebpf_verification::{BpfProgramVerifier, VerificationReport};
-use crate::kernel::ebpf_vm::{BpfInstruction, BpfVm};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex, OnceLock};
+use crate::kernel::ebpf_vm::{BpfInstruction, BpfVm};
+use crate::kernel::ebpf_verification::{BpfProgramVerifier, VerificationReport};
 
 /// BPF syscall commands
 #[repr(u32)]
@@ -128,16 +128,15 @@ impl BpfProgramRegistry {
     ) -> Result<BpfProgFd, BpfError> {
         // Step 1: Verify program
         let mut verifier = BpfProgramVerifier::new(instructions.clone());
-        let _report = verifier
-            .verify()
-            .map_err(|e| BpfError::VerificationFailed(format!("Verification failed: {}", e)))?;
+        let _report = verifier.verify().map_err(|e| {
+            BpfError::VerificationFailed(format!("Verification failed: {}", e))
+        })?;
 
         // Check if verifier found errors
         if !verifier.report.is_valid {
-            return Err(BpfError::VerificationFailed(format!(
-                "Program verification failed with {} errors",
-                verifier.report.errors.len()
-            )));
+            return Err(BpfError::VerificationFailed(
+                format!("Program verification failed with {} errors", verifier.report.errors.len())
+            ));
         }
 
         // Step 2: Create program entry
@@ -176,7 +175,8 @@ impl BpfProgramRegistry {
             .map_err(|e| BpfError::ProgamExecutionFailed(e))?;
 
         // Execute program
-        vm.run().map_err(|e| BpfError::ProgamExecutionFailed(e))
+        vm.run()
+            .map_err(|e| BpfError::ProgamExecutionFailed(e))
     }
 
     /// Unload a program
@@ -206,13 +206,17 @@ impl Default for BpfProgramRegistry {
 static GLOBAL_BPF_REGISTRY: OnceLock<Arc<Mutex<BpfProgramRegistry>>> = OnceLock::new();
 
 fn get_global_bpf_registry() -> Arc<Mutex<BpfProgramRegistry>> {
-    GLOBAL_BPF_REGISTRY
-        .get_or_init(|| Arc::new(Mutex::new(BpfProgramRegistry::new())))
-        .clone()
+    GLOBAL_BPF_REGISTRY.get_or_init(|| {
+        Arc::new(Mutex::new(BpfProgramRegistry::new()))
+    }).clone()
 }
 
 /// sys_bpf syscall - main entry point for BPF operations
-pub fn sys_bpf(cmd: u32, attr: *const u8, attr_size: u32) -> Result<u32, BpfError> {
+pub fn sys_bpf(
+    cmd: u32,
+    attr: *const u8,
+    attr_size: u32,
+) -> Result<u32, BpfError> {
     let cmd = match cmd {
         0 => BpfCmd::BpfMapCreate,
         1 => BpfCmd::BpfMapLookupElem,
@@ -230,8 +234,12 @@ pub fn sys_bpf(cmd: u32, attr: *const u8, attr_size: u32) -> Result<u32, BpfErro
     };
 
     match cmd {
-        BpfCmd::BpfProgLoad => sys_bpf_prog_load(attr, attr_size),
-        BpfCmd::BpfProgTest => sys_bpf_prog_test(attr, attr_size),
+        BpfCmd::BpfProgLoad => {
+            sys_bpf_prog_load(attr, attr_size)
+        }
+        BpfCmd::BpfProgTest => {
+            sys_bpf_prog_test(attr, attr_size)
+        }
         BpfCmd::BpfMapCreate => {
             // Not fully implemented yet
             Ok(0)
@@ -276,28 +284,35 @@ pub fn sys_bpf(cmd: u32, attr: *const u8, attr_size: u32) -> Result<u32, BpfErro
 }
 
 /// BPF_PROG_LOAD syscall - load a new BPF program
-fn sys_bpf_prog_load(_attr: *const u8, _attr_size: u32) -> Result<u32, BpfError> {
+fn sys_bpf_prog_load(
+    _attr: *const u8,
+    _attr_size: u32,
+) -> Result<u32, BpfError> {
     // In a real implementation, would parse attr struct
     // For now, create a test program and load it
 
     let prog_type = BpfProgType::Tracing;
     let instructions = vec![
-        BpfInstruction::LoadImm64 {
-            dst_reg: 0,
-            imm64: 42,
-        },
+        BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 42 },
         BpfInstruction::Return,
     ];
 
     let bpf_registry = get_global_bpf_registry();
     let mut registry = bpf_registry.lock().unwrap();
-    let fd = registry.load_program(prog_type, instructions, "sys_bpf_test".to_string())?;
+    let fd = registry.load_program(
+        prog_type,
+        instructions,
+        "sys_bpf_test".to_string(),
+    )?;
 
     Ok(fd.0)
 }
 
 /// BPF_PROG_RUN syscall - execute a loaded BPF program
-fn sys_bpf_prog_test(_attr: *const u8, _attr_size: u32) -> Result<u32, BpfError> {
+fn sys_bpf_prog_test(
+    _attr: *const u8,
+    _attr_size: u32,
+) -> Result<u32, BpfError> {
     // In a real implementation, would parse attr struct to get program FD
     // For now, return 0
     Ok(0)
@@ -317,10 +332,7 @@ mod tests {
     fn test_load_valid_program() {
         let mut registry = BpfProgramRegistry::new();
         let instructions = vec![
-            BpfInstruction::LoadImm64 {
-                dst_reg: 0,
-                imm64: 42,
-            },
+            BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 42 },
             BpfInstruction::Return,
         ];
 
@@ -358,10 +370,7 @@ mod tests {
     fn test_execute_program() {
         let mut registry = BpfProgramRegistry::new();
         let instructions = vec![
-            BpfInstruction::LoadImm64 {
-                dst_reg: 0,
-                imm64: 42,
-            },
+            BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 42 },
             BpfInstruction::Return,
         ];
 
@@ -377,10 +386,7 @@ mod tests {
     fn test_unload_program() {
         let mut registry = BpfProgramRegistry::new();
         let instructions = vec![
-            BpfInstruction::LoadImm64 {
-                dst_reg: 0,
-                imm64: 42,
-            },
+            BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 42 },
             BpfInstruction::Return,
         ];
 
@@ -396,10 +402,7 @@ mod tests {
     fn test_list_programs() {
         let mut registry = BpfProgramRegistry::new();
         let instructions = vec![
-            BpfInstruction::LoadImm64 {
-                dst_reg: 0,
-                imm64: 42,
-            },
+            BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 42 },
             BpfInstruction::Return,
         ];
 
@@ -421,10 +424,7 @@ mod tests {
     fn test_program_info() {
         let mut registry = BpfProgramRegistry::new();
         let instructions = vec![
-            BpfInstruction::LoadImm64 {
-                dst_reg: 0,
-                imm64: 42,
-            },
+            BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 42 },
             BpfInstruction::Return,
         ];
 
@@ -446,10 +446,7 @@ mod tests {
     fn test_multiple_programs_different_fds() {
         let mut registry = BpfProgramRegistry::new();
         let instructions = vec![
-            BpfInstruction::LoadImm64 {
-                dst_reg: 0,
-                imm64: 42,
-            },
+            BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 42 },
             BpfInstruction::Return,
         ];
 
@@ -462,7 +459,11 @@ mod tests {
             .unwrap();
 
         let fd2 = registry
-            .load_program(BpfProgType::Xdp, instructions.clone(), "prog2".to_string())
+            .load_program(
+                BpfProgType::Xdp,
+                instructions.clone(),
+                "prog2".to_string(),
+            )
             .unwrap();
 
         assert_ne!(fd1, fd2);

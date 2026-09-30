@@ -5,6 +5,9 @@
  * health checking, and automatic restart policy governance.
  */
 
+
+
+
 use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
@@ -19,6 +22,7 @@ pub enum RunitStage {
 
 pub type ServiceState = RunitServiceStatus;
 
+
 /// Runit Service Status
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum RunitServiceStatus {
@@ -29,6 +33,7 @@ pub enum RunitServiceStatus {
     Stopping,
     Failed,
 }
+
 
 /// Runit Service Definition
 #[derive(Debug, Clone)]
@@ -58,17 +63,6 @@ impl RunitService {
     pub fn with_dependencies(mut self, deps: Vec<String>) -> Self {
         self.dependencies = deps;
         self
-    }
-
-    /// Adds a service dependency once, preserving insertion order.
-    pub fn add_dependency(&mut self, name: &str) {
-        if !self
-            .dependencies
-            .iter()
-            .any(|dependency| dependency == name)
-        {
-            self.dependencies.push(name.to_string());
-        }
     }
 
     pub fn start(&mut self) -> bool {

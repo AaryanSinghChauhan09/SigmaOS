@@ -54,13 +54,7 @@ impl OmarchyScratchpadManager {
         };
 
         // Standard Omarchy default scratchpads
-        mgr.register_scratchpad(
-            "terminal",
-            "ghostty --class=scratchpad-term",
-            "Super+Return",
-            80,
-            50,
-        );
+        mgr.register_scratchpad("terminal", "ghostty --class=scratchpad-term", "Super+Return", 80, 50);
         mgr.register_scratchpad("ai_assistant", "sigma-ai-hud", "Super+Space", 40, 70);
         mgr.register_scratchpad("monitor", "btop", "Super+M", 85, 60);
 
@@ -387,11 +381,8 @@ impl OmarchyTilingLayoutEngine {
         match self.algorithm {
             TilingAlgorithm::MasterStack => {
                 let mut geoms = Vec::with_capacity(window_count);
-                let master_w = ((usable_w as f32 * self.master_ratio) as u32)
-                    .saturating_sub(self.gap_inner / 2);
-                let stack_w = usable_w
-                    .saturating_sub(master_w)
-                    .saturating_sub(self.gap_inner);
+                let master_w = ((usable_w as f32 * self.master_ratio) as u32).saturating_sub(self.gap_inner / 2);
+                let stack_w = usable_w.saturating_sub(master_w).saturating_sub(self.gap_inner);
                 let stack_count = (window_count - 1) as u32;
 
                 // 1. Master Window

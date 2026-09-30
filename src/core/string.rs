@@ -15,9 +15,10 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use std::format;
+
 
 // (no_std only applicable at crate root - removed)
 
@@ -221,15 +222,11 @@ pub fn string_trim(s: &[u8]) -> &[u8] {
     let mut start = 0;
     let mut end = s.len();
 
-    while start < end
-        && (s[start] == b' ' || s[start] == b'\t' || s[start] == b'\n' || s[start] == b'\r')
-    {
+    while start < end && (s[start] == b' ' || s[start] == b'\t' || s[start] == b'\n' || s[start] == b'\r') {
         start += 1;
     }
 
-    while end > start
-        && (s[end - 1] == b' ' || s[end - 1] == b'\t' || s[end - 1] == b'\n' || s[end - 1] == b'\r')
-    {
+    while end > start && (s[end - 1] == b' ' || s[end - 1] == b'\t' || s[end - 1] == b'\n' || s[end - 1] == b'\r') {
         end -= 1;
     }
 

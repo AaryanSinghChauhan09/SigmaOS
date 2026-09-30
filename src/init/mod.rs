@@ -1,9 +1,9 @@
 pub mod init_abstraction;
 pub mod runit;
 pub mod s6;
-pub mod service_innovations_engine;
 pub mod sigma_init;
 pub mod sigmainit;
+pub mod service_innovations_engine;
 pub mod systemd_init;
 pub use service_innovations_engine::*;
 

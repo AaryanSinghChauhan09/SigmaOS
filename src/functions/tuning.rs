@@ -1,8 +1,10 @@
 //! Performance Tuning Functions (tuned Inspiration)
 //! Performance tuner, I/O tuner, and network tuner
 
-use std::string::{String, ToString};
+
+
 use std::vec::Vec;
+use std::string::{String, ToString};
 
 /// Tuning profile
 #[derive(Debug, Clone)]
@@ -146,11 +148,7 @@ impl IOTuner {
         self.io_classes.push(io_class);
     }
 
-    pub fn set_io_scheduler(
-        &mut self,
-        _device: &str,
-        _scheduler: IOScheduler,
-    ) -> Result<(), TuningError> {
+    pub fn set_io_scheduler(&mut self, _device: &str, _scheduler: IOScheduler) -> Result<(), TuningError> {
         // Set I/O scheduler for device
         Ok(())
     }

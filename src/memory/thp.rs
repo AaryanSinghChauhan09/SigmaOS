@@ -2,7 +2,7 @@
 // Inspired by Linux transparent huge pages for memory efficiency
 
 use std::collections::HashMap;
-use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
+use std::sync::atomic::{AtomicU64, AtomicU32, Ordering};
 
 /// Huge page size
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -137,9 +137,7 @@ impl ThpManager {
     /// Find allocation by address
     fn find_allocation_by_addr(&self, addr: u64) -> Result<u64, &'static str> {
         for (&id, allocation) in &self.allocations {
-            if addr >= allocation.start_addr
-                && addr < allocation.start_addr + allocation.size as u64
-            {
+            if addr >= allocation.start_addr && addr < allocation.start_addr + allocation.size as u64 {
                 return Ok(id);
             }
         }
@@ -178,8 +176,7 @@ impl ThpManager {
 
     /// Get total huge page memory
     pub fn total_huge_memory(&self) -> usize {
-        self.allocations
-            .values()
+        self.allocations.values()
             .filter(|a| a.allocated)
             .map(|a| a.size)
             .sum()
@@ -188,17 +185,15 @@ impl ThpManager {
     /// Get THP statistics
     pub fn get_stats(&self) -> ThpStats {
         let total_allocations = self.allocations.len();
-        let active_allocations = self.allocations.values().filter(|a| a.allocated).count();
+        let active_allocations = self.allocations.values()
+            .filter(|a| a.allocated)
+            .count();
 
-        let total_2mb = self
-            .allocations
-            .values()
+        let total_2mb = self.allocations.values()
             .filter(|a| a.allocated && a.page_size == HugePageSize::Size2MB)
             .count();
 
-        let total_1gb = self
-            .allocations
-            .values()
+        let total_1gb = self.allocations.values()
             .filter(|a| a.allocated && a.page_size == HugePageSize::Size1GB)
             .count();
 
@@ -234,9 +229,7 @@ mod tests {
     fn test_allocate_2mb() {
         let mut thp = ThpManager::new();
 
-        let addr = thp
-            .allocate(2 * 1024 * 1024, HugePageSize::Size2MB)
-            .unwrap();
+        let addr = thp.allocate(2 * 1024 * 1024, HugePageSize::Size2MB).unwrap();
         assert!(addr > 0);
         assert_eq!(thp.allocation_count(), 1);
     }
@@ -245,9 +238,7 @@ mod tests {
     fn test_free() {
         let mut thp = ThpManager::new();
 
-        let addr = thp
-            .allocate(2 * 1024 * 1024, HugePageSize::Size2MB)
-            .unwrap();
+        let addr = thp.allocate(2 * 1024 * 1024, HugePageSize::Size2MB).unwrap();
         assert!(thp.free(addr).is_ok());
     }
 
@@ -267,9 +258,7 @@ mod tests {
 
         thp.set_policy(ThpPolicy::Always);
 
-        let addr = thp
-            .allocate(2 * 1024 * 1024, HugePageSize::Size2MB)
-            .unwrap();
+        let addr = thp.allocate(2 * 1024 * 1024, HugePageSize::Size2MB).unwrap();
         assert!(addr > 0);
     }
 
@@ -305,10 +294,8 @@ mod tests {
     fn test_stats() {
         let mut thp = ThpManager::new();
 
-        thp.allocate(2 * 1024 * 1024, HugePageSize::Size2MB)
-            .unwrap();
-        thp.allocate(1024 * 1024 * 1024, HugePageSize::Size1GB)
-            .unwrap();
+        thp.allocate(2 * 1024 * 1024, HugePageSize::Size2MB).unwrap();
+        thp.allocate(1024 * 1024 * 1024, HugePageSize::Size1GB).unwrap();
 
         let stats = thp.get_stats();
         assert_eq!(stats.total_2mb, 1);
@@ -319,8 +306,7 @@ mod tests {
     fn test_total_huge_memory() {
         let mut thp = ThpManager::new();
 
-        thp.allocate(2 * 1024 * 1024, HugePageSize::Size2MB)
-            .unwrap();
+        thp.allocate(2 * 1024 * 1024, HugePageSize::Size2MB).unwrap();
 
         let total = thp.total_huge_memory();
         assert_eq!(total, 2 * 1024 * 1024);

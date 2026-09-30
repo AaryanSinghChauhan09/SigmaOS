@@ -12,8 +12,8 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::boxed::Box;
 use std::string::{String, ToString};
+use std::boxed::Box;
 // SigmaOS Network Protocol Layer
 
 // (no_std only applicable at crate root - removed)
@@ -434,14 +434,7 @@ impl ConnTrackTable {
         }
     }
 
-    pub fn lookup(
-        &self,
-        protocol: u8,
-        src_addr: u32,
-        src_port: u16,
-        dst_addr: u32,
-        dst_port: u16,
-    ) -> Option<usize> {
+    pub fn lookup(&self, protocol: u8, src_addr: u32, src_port: u16, dst_addr: u32, dst_port: u16) -> Option<usize> {
         self.entries.iter().position(|entry| {
             entry.protocol == protocol
                 && entry.src_addr == src_addr

@@ -3,10 +3,11 @@
 // Privacy protection subsystem
 // Zero-dependency implementation - no external libraries required
 
-use core::fmt;
-use std::boxed::Box;
-use std::string::{String, ToString};
+
 use std::vec::Vec;
+use std::string::{String, ToString};
+use std::boxed::Box;
+use core::fmt;
 
 /// Error type for the Privacy module
 #[derive(Debug, Clone, PartialEq, Eq)]

@@ -1,5 +1,6 @@
 // SigmaOS Drivers Module
-pub mod ata_bus_controller;
+pub mod serial;
+pub mod rtc;
 pub mod boot_init;
 pub mod dde;
 pub mod distro_device_expansion;
@@ -18,44 +19,37 @@ pub mod modern_usb_printer;
 pub mod modern_wifi;
 pub mod network;
 pub mod peripheral;
-pub mod printing;
-pub mod rtc;
-pub mod serial;
-pub mod sovereign_comprehensive_drivers;
-pub mod sovereign_driver_lifecycle;
-pub mod sovereign_hardware_expansion;
-pub mod sovereign_usb_xhci;
 pub mod storage;
 pub mod touch_jingos;
+pub mod printing;
 pub mod usb_hid;
+pub mod sovereign_driver_lifecycle;
 pub mod vesa;
+pub mod ata_bus_controller;
+pub mod sovereign_hardware_expansion;
+pub mod sovereign_usb_xhci;
+pub mod sovereign_comprehensive_drivers;
 
-pub use printing::{CupsIppPrintSpooler, LpdSpooler, PpdDriverMatcher, PrintJob, PrintJobState};
 pub use sovereign_comprehensive_drivers::*;
+pub use printing::{CupsIppPrintSpooler, LpdSpooler, PpdDriverMatcher, PrintJob, PrintJobState};
 
-pub use ata_bus_controller::{
-    AhciNcqSlot, AtaBusControllerEngine, AtaBusType, AtaCommand, AtaDeviceIdentity,
-    AtapiPacketCdb12, AtapiPacketDispatcher, IdeBusMasterDmaEngine, IdeChannel, IdeDriveSelect,
-    IdePioTransferEngine, IdePrdEntry, AHCI_MAX_NCQ_TAGS, ATA_SECTOR_SIZE_BYTES, ATA_STATUS_BSY,
-    ATA_STATUS_DF, ATA_STATUS_DRDY, ATA_STATUS_DRQ, ATA_STATUS_ERR,
-};
 pub use gpu::{GpuCommand, GpuDriver, GpuError};
 pub use input::{InputDriver, InputEvent, InputType};
 pub use legacy_audio_ac97::LegacyAudioAc97;
 pub use legacy_keyboard::LegacyKeyboard;
 pub use legacy_parallel_printer::LegacyParallelPrinter;
-pub use linux_bsd_drivers::*;
 pub use linux_bsd_drivers::{
     AmdgpuDrmDriver, AmdgpuIpBlockType, AppleSiliconDartIommu, BroadcomBcmWifiDriver,
     BsdWgNetgraphHardwareDriver, DriverCapability, DrmAtomicKmsState, DrmConnectorType,
     DrmDisplayMode, EvdevEvent, EvdevEventType, EvdevInputDevice, FreeBsdDrmConnector,
-    IntelIgcEthernetDriver, IntelXeDrmDriver, LinuxIioImuSensorDriver, LinuxUrb, LinuxUrbQueue,
-    LsiMegaRaidHbaDriver, MultiTouchSlot, NetBsdRumpDriverHost, NvidiaNouveauGpuDriver,
-    OpenBsdDriverPledge, QualcommAdrenoMaliGpuDriver, RaidLevel, RealtekR8169EthernetDriver,
-    RpiBcmSocDriver, SdhciEmmcStorageDriver, SensorReadings, SovereignDeviceManager,
-    SovereignWirelessCardDriver, ThunderboltSecurityLevel, ThunderboltUsb4Driver, Uac2AudioDriver,
-    UrbTransferType, UvcCameraDriver, VideoPixelFormat, VirtioGpu3dDriver, VirtioSoundDriver,
-    WacomPrecisionTouchpadDriver, WifiMode,
+    IntelIgcEthernetDriver, IntelXeDrmDriver, LinuxIioImuSensorDriver, LinuxUrb,
+    LinuxUrbQueue, LsiMegaRaidHbaDriver, MultiTouchSlot, NetBsdRumpDriverHost,
+    NvidiaNouveauGpuDriver, OpenBsdDriverPledge, QualcommAdrenoMaliGpuDriver, RaidLevel,
+    RealtekR8169EthernetDriver, RpiBcmSocDriver, SdhciEmmcStorageDriver, SensorReadings,
+    SovereignDeviceManager, SovereignWirelessCardDriver, ThunderboltSecurityLevel,
+    ThunderboltUsb4Driver, Uac2AudioDriver, UrbTransferType, UvcCameraDriver,
+    VideoPixelFormat, VirtioGpu3dDriver, VirtioSoundDriver, WacomPrecisionTouchpadDriver,
+    WifiMode,
 };
 pub use modern_audio_intel_hda::*;
 pub use modern_nvme::*;
@@ -64,23 +58,30 @@ pub use modern_usb_printer::ModernUsbPrinterDriver;
 pub use modern_wifi::*;
 pub use network::{NetworkCommand, NetworkDriver, NetworkError, NetworkType};
 pub use peripheral::{DeviceGeneration, PeripheralDevice, PeripheralManager, PowerState};
+pub use storage::{StorageCommand, StorageDriver, StorageError, StorageType};
+pub use linux_bsd_drivers::*;
 pub use sovereign_driver_lifecycle::{
     ClusterAwarePeripheralManager, CommunityDriverRegistry, CrossOsDriverShim,
     DeclarativeDriverProfile, DeclarativeHardwareResolver, DriverShard, DriverShardManager,
-    FirmwareType, IoBusType, ProgrammableIoStack, SandboxedHardwareModule, SignedDriverPackage,
-    SovereignDriverLifecycleState, SovereignDriverManager, SovereignModularDeviceSupportEngine,
-    TargetOsOrigin, UniversalFirmwareBridge,
+    FirmwareType, IoBusType, ProgrammableIoStack, SandboxedHardwareModule,
+    SignedDriverPackage, SovereignDriverLifecycleState, SovereignDriverManager,
+    SovereignModularDeviceSupportEngine, TargetOsOrigin, UniversalFirmwareBridge,
+};
+pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
+pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
+pub use ata_bus_controller::{
+    AhciNcqSlot, AtaBusControllerEngine, AtaBusType, AtaCommand, AtaDeviceIdentity, AtapiPacketCdb12,
+    AtapiPacketDispatcher, IdeBusMasterDmaEngine, IdeChannel, IdeDriveSelect, IdePioTransferEngine, IdePrdEntry,
+    AHCI_MAX_NCQ_TAGS, ATA_SECTOR_SIZE_BYTES, ATA_STATUS_BSY, ATA_STATUS_DF, ATA_STATUS_DRQ, ATA_STATUS_DRDY,
+    ATA_STATUS_ERR,
 };
 pub use sovereign_hardware_expansion::{
     ExpandedHardwareClass, HardwareDriverState, SovereignHardwareDriverExpansionEngine,
 };
 pub use sovereign_usb_xhci::{
-    SovereignXhciTrb, SovereignXhciTrbType, SovereignXhciUsb3Driver, UsbDeviceSlotContext,
-    UsbEndpointSpeed, XHCI_MAX_PORTS, XHCI_MAX_SLOTS, XHCI_TRB_RING_SIZE,
+    SovereignXhciTrb, SovereignXhciTrbType, SovereignXhciUsb3Driver, UsbDeviceSlotContext, UsbEndpointSpeed,
+    XHCI_MAX_PORTS, XHCI_MAX_SLOTS, XHCI_TRB_RING_SIZE,
 };
-pub use storage::{StorageCommand, StorageDriver, StorageError, StorageType};
-pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
-pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
 
 pub use distro_device_expansion::*;
 

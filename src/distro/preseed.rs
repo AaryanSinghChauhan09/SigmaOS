@@ -1,10 +1,10 @@
 // SigmaOS Debian-style Automated Preseed Installer Subsystem (S-Preseed)
 // Zero-dependency, #![no_std] compliant, parses and executes automated installs.
 
-use core::cell::RefCell;
 use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;
+use core::cell::RefCell;
 
 #[derive(Debug, Clone)]
 pub struct PreseedVariable {

@@ -132,8 +132,7 @@ impl FreeBsdGeomStorageStack {
         Self::default()
     }
     pub fn add_geom_provider(&mut self, name: &str, class_type: &str, capacity_bytes: u64) {
-        self.providers
-            .push((name.to_string(), class_type.to_string(), capacity_bytes));
+        self.providers.push((name.to_string(), class_type.to_string(), capacity_bytes));
     }
 }
 
@@ -1139,6 +1138,7 @@ impl Default for OpenSourceCompetitorOrchestrator {
         Self::new()
     }
 }
+
 
 #[cfg(test_disabled)]
 mod tests {

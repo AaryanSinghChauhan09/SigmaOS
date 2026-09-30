@@ -1,5 +1,6 @@
 /// SigmaOS ARP Implementation (Phase 2 Networking)
 /// Inspired by Linux's net/ipv4/arp.c
+
 use std::collections::HashMap;
 
 pub const ARP_REQUEST: u16 = 1;
@@ -18,9 +19,7 @@ pub struct ArpTable {
 
 impl ArpTable {
     pub fn new() -> Self {
-        Self {
-            entries: HashMap::new(),
-        }
+        Self { entries: HashMap::new() }
     }
 
     pub fn insert(&mut self, ip: [u8; 4], mac: [u8; 6], timestamp: u64) {
@@ -32,8 +31,7 @@ impl ArpTable {
     }
 
     pub fn remove_stale(&mut self, current_time: u64, max_age: u64) {
-        self.entries
-            .retain(|_, e| current_time - e.timestamp < max_age);
+        self.entries.retain(|_, e| current_time - e.timestamp < max_age);
     }
 }
 

@@ -77,11 +77,7 @@ impl AnonymousPackageRepoAccessGovernor {
         }
     }
 
-    pub fn validate_guest_access(
-        &self,
-        requested_path: &str,
-        requested_size_mb: u64,
-    ) -> Result<(), &'static str> {
+    pub fn validate_guest_access(&self, requested_path: &str, requested_size_mb: u64) -> Result<(), &'static str> {
         if !self.policy.allow_guest_download {
             return Err("Anonymous Access: Guest downloads disabled");
         }
@@ -129,12 +125,7 @@ impl ControllingTerminalPackageInstallerManager {
         }
     }
 
-    pub fn allocate_controlling_tty(
-        &mut self,
-        tty_id: u32,
-        pgid: u32,
-        installer: &str,
-    ) -> Result<(), &'static str> {
+    pub fn allocate_controlling_tty(&mut self, tty_id: u32, pgid: u32, installer: &str) -> Result<(), &'static str> {
         if self.active_terminals.contains_key(&tty_id) {
             return Err("TTY Manager: Terminal already allocated");
         }
@@ -253,11 +244,7 @@ impl LdapEnterprisePackageRepoAuth {
         }
     }
 
-    pub fn bind_authenticate(
-        &mut self,
-        uid: &str,
-        secret_token: &str,
-    ) -> Result<String, &'static str> {
+    pub fn bind_authenticate(&mut self, uid: &str, secret_token: &str) -> Result<String, &'static str> {
         if uid.is_empty() || secret_token.len() < 8 {
             return Err("LDAP Auth: Invalid credentials or short secret token");
         }
@@ -266,10 +253,7 @@ impl LdapEnterprisePackageRepoAuth {
         let identity = LdapUserIdentity {
             dn: user_dn.clone(),
             uid: uid.to_string(),
-            member_groups: vec![
-                "package_maintainers".to_string(),
-                "release_engineers".to_string(),
-            ],
+            member_groups: vec!["package_maintainers".to_string(), "release_engineers".to_string()],
         };
 
         self.authenticated_users.insert(uid.to_string(), identity);
@@ -278,8 +262,7 @@ impl LdapEnterprisePackageRepoAuth {
 
     pub fn is_authorized_maintainer(&self, uid: &str) -> bool {
         if let Some(user) = self.authenticated_users.get(uid) {
-            user.member_groups
-                .contains(&"package_maintainers".to_string())
+            user.member_groups.contains(&"package_maintainers".to_string())
         } else {
             false
         }
@@ -313,11 +296,7 @@ impl ProcessPackageInstallerMigrationGovernor {
         }
     }
 
-    pub fn migrate_process_to_node(
-        &self,
-        pid: u32,
-        target_node_id: u32,
-    ) -> Result<u32, &'static str> {
+    pub fn migrate_process_to_node(&self, pid: u32, target_node_id: u32) -> Result<u32, &'static str> {
         if self.allowed_migrating_pids.contains(&pid) {
             Ok(target_node_id)
         } else {
@@ -384,9 +363,7 @@ impl PackageSecurityAccessToken {
 pub struct SecurityTokenPackageAccessEnforcer;
 
 impl SecurityTokenPackageAccessEnforcer {
-    pub fn validate_package_installation_access(
-        token: &PackageSecurityAccessToken,
-    ) -> Result<(), &'static str> {
+    pub fn validate_package_installation_access(token: &PackageSecurityAccessToken) -> Result<(), &'static str> {
         if token.has_privilege("CAP_PACKAGE_ADMIN") || token.euid == 0 {
             Ok(())
         } else {
@@ -477,13 +454,7 @@ impl RemotePackageFileGateway {
         }
     }
 
-    pub fn mount_remote_package(
-        &mut self,
-        server: &str,
-        path: &str,
-        proto: RemoteFileAccessProtocol,
-        read_only: bool,
-    ) -> u64 {
+    pub fn mount_remote_package(&mut self, server: &str, path: &str, proto: RemoteFileAccessProtocol, read_only: bool) -> u64 {
         let id = self.next_id;
         self.next_id += 1;
 
@@ -529,11 +500,7 @@ impl WirelessAccessPointPackagePolicyEngine {
         }
     }
 
-    pub fn validate_wireless_download_policy(
-        &self,
-        client_mac: &str,
-        is_metered: bool,
-    ) -> Result<(), &'static str> {
+    pub fn validate_wireless_download_policy(&self, client_mac: &str, is_metered: bool) -> Result<(), &'static str> {
         if !self.authorized_macs.contains(&client_mac.to_string()) {
             return Err("Wireless Access: Client MAC address not authorized");
         }
@@ -573,32 +540,20 @@ impl SovereignPackageAccessMasterSuite {
             anonymous_governor: AnonymousPackageRepoAccessGovernor::new(),
             tty_manager: ControllingTerminalPackageInstallerManager::new(),
             time_calc: EffectivePackageAccessTimeCalculator::new(0.85, 10, 500_000),
-            ldap_auth: LdapEnterprisePackageRepoAuth::new(
-                "ldap://auth.sigmaos.org",
-                "dc=sigmaos,dc=org",
-            ),
+            ldap_auth: LdapEnterprisePackageRepoAuth::new("ldap://auth.sigmaos.org", "dc=sigmaos,dc=org"),
             migration_governor: ProcessPackageInstallerMigrationGovernor::new(),
-            device_tracker: RandomSequentialPackageDeviceTracker::new(
-                BlockDeviceAccessKind::RandomAccessDevice,
-                15,
-            ),
+            device_tracker: RandomSequentialPackageDeviceTracker::new(BlockDeviceAccessKind::RandomAccessDevice, 15),
             remote_gateway: RemotePackageFileGateway::new(),
             wireless_engine: WirelessAccessPointPackagePolicyEngine::new(),
         }
     }
 
-    pub fn audit_and_prepare_access(
-        &mut self,
-        pkg: &mut UnifiedPackage,
-        token: &PackageSecurityAccessToken,
-    ) -> Result<(), &'static str> {
+    pub fn audit_and_prepare_access(&mut self, pkg: &mut UnifiedPackage, token: &PackageSecurityAccessToken) -> Result<(), &'static str> {
         SecurityTokenPackageAccessEnforcer::validate_package_installation_access(token)?;
 
         pkg.properties.insert(
             "effective_access_time_ns".to_string(),
-            self.time_calc
-                .calculate_effective_access_time_ns()
-                .to_string(),
+            self.time_calc.calculate_effective_access_time_ns().to_string(),
         );
 
         Ok(())
@@ -618,9 +573,7 @@ mod tests {
     #[test]
     fn test_anonymous_access_governor() {
         let governor = AnonymousPackageRepoAccessGovernor::new();
-        assert!(governor
-            .validate_guest_access("/var/cache/sigma/pkg.tar.zst", 100)
-            .is_ok());
+        assert!(governor.validate_guest_access("/var/cache/sigma/pkg.tar.zst", 100).is_ok());
         assert!(governor.validate_guest_access("/etc/shadow", 10).is_err());
     }
 
@@ -633,8 +586,7 @@ mod tests {
 
     #[test]
     fn test_ldap_enterprise_auth() {
-        let mut ldap =
-            LdapEnterprisePackageRepoAuth::new("ldap://auth.sigmaos.org", "dc=sigmaos,dc=org");
+        let mut ldap = LdapEnterprisePackageRepoAuth::new("ldap://auth.sigmaos.org", "dc=sigmaos,dc=org");
         ldap.bind_authenticate("alice", "secure_token_123").unwrap();
         assert!(ldap.is_authorized_maintainer("alice"));
     }
@@ -644,13 +596,8 @@ mod tests {
         let root = PackageSecurityAccessToken::root(1);
         let user = PackageSecurityAccessToken::new(2, 1000, 1000);
 
-        assert!(
-            SecurityTokenPackageAccessEnforcer::validate_package_installation_access(&root).is_ok()
-        );
-        assert!(
-            SecurityTokenPackageAccessEnforcer::validate_package_installation_access(&user)
-                .is_err()
-        );
+        assert!(SecurityTokenPackageAccessEnforcer::validate_package_installation_access(&root).is_ok());
+        assert!(SecurityTokenPackageAccessEnforcer::validate_package_installation_access(&user).is_err());
     }
 
     #[test]
@@ -658,12 +605,8 @@ mod tests {
         let mut wap = WirelessAccessPointPackagePolicyEngine::new();
         wap.authorize_mac("AA:BB:CC:DD:EE:FF");
 
-        assert!(wap
-            .validate_wireless_download_policy("AA:BB:CC:DD:EE:FF", false)
-            .is_ok());
-        assert!(wap
-            .validate_wireless_download_policy("AA:BB:CC:DD:EE:FF", true)
-            .is_err());
+        assert!(wap.validate_wireless_download_policy("AA:BB:CC:DD:EE:FF", false).is_ok());
+        assert!(wap.validate_wireless_download_policy("AA:BB:CC:DD:EE:FF", true).is_err());
     }
 
     #[test]
@@ -672,9 +615,7 @@ mod tests {
         let mut pkg = UnifiedPackage::new("curl".to_string(), "8.5.0".to_string());
         let root_token = PackageSecurityAccessToken::root(100);
 
-        assert!(suite
-            .audit_and_prepare_access(&mut pkg, &root_token)
-            .is_ok());
+        assert!(suite.audit_and_prepare_access(&mut pkg, &root_token).is_ok());
         assert!(pkg.properties.contains_key("effective_access_time_ns"));
     }
 }

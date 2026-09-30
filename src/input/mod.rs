@@ -13,9 +13,7 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-pub mod gamepad;
 pub mod handler;
 pub mod keyboard;
-pub use gamepad::{
-    GamepadAxis, GamepadButton, GamepadDevice, GamepadEvent, GamepadEventType, GamepadManager,
-};
+pub mod gamepad;
+pub use gamepad::{GamepadManager, GamepadDevice, GamepadEvent, GamepadButton, GamepadAxis, GamepadEventType};

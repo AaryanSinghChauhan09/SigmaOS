@@ -25,7 +25,8 @@ impl DriverArchiveVault {
     }
 
     pub fn store_driver(&mut self, name: &str, raw_binary: &[u8]) {
-        let encrypted: Vec<u8> = raw_binary.iter().map(|b| b ^ self.secret_key).collect();
+        let encrypted: Vec<u8> =
+            raw_binary.iter().map(|b| b ^ self.secret_key).collect();
         let sig = String::from(format!("SIGMA_{}_OK", name));
 
         let entry = VaultEntry {
@@ -33,7 +34,8 @@ impl DriverArchiveVault {
             encrypted_payload: encrypted,
             hash_signature: sig,
         };
-        self.archive.insert(String::from(name), entry);
+        self.archive
+            .insert(String::from(name), entry);
     }
 
     pub fn retrieve_driver(&self, name: &str) -> Option<Vec<u8>> {
