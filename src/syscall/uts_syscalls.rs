@@ -51,6 +51,8 @@ pub unsafe fn sys_sethostname(namespace_id: u64, hostname_ptr: *const u8, len: u
     }
 
     // Convert bytes to String
+    // SAFETY: guaranteed by this function's contract; the length checks above
+    // also ensure `len` is nonzero and within the hostname limit.
     let hostname_bytes = unsafe { std::slice::from_raw_parts(hostname_ptr, len) };
 
     let hostname = match String::from_utf8(hostname_bytes.to_vec()) {
@@ -104,6 +106,8 @@ pub unsafe fn sys_gethostname(namespace_id: u64, hostname_ptr: *mut u8, len: usi
 
     // Copy hostname to buffer
     let copy_len = std::cmp::min(len - 1, hostname.len());
+    // SAFETY: guaranteed by this function's contract; `copy_len < len`, so
+    // the payload and trailing NUL fit in the caller-provided output buffer.
     unsafe {
         std::ptr::copy_nonoverlapping(hostname.as_ptr(), hostname_ptr, copy_len);
         // Null terminate
@@ -137,6 +141,8 @@ pub unsafe fn sys_setdomainname(namespace_id: u64, domainname_ptr: *const u8, le
         return -14; // EFAULT
     }
 
+    // SAFETY: guaranteed by this function's contract; the length checks above
+    // also ensure `len` is nonzero and within the domainname limit.
     let domainname_bytes = unsafe { std::slice::from_raw_parts(domainname_ptr, len) };
 
     let domainname = match String::from_utf8(domainname_bytes.to_vec()) {
@@ -177,6 +183,8 @@ pub unsafe fn sys_getdomainname(namespace_id: u64, domainname_ptr: *mut u8, len:
     };
 
     let copy_len = std::cmp::min(len - 1, domainname.len());
+    // SAFETY: guaranteed by this function's contract; `copy_len < len`, so
+    // the payload and trailing NUL fit in the caller-provided output buffer.
     unsafe {
         std::ptr::copy_nonoverlapping(domainname.as_ptr(), domainname_ptr, copy_len);
         *domainname_ptr.add(copy_len) = 0;
