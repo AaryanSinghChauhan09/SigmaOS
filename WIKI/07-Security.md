@@ -209,6 +209,10 @@ access fails closed.
 maintenance login likewise remains locked until a trusted password verifier
 exists. The stored byte arrays are compatibility placeholders, not hashes, and
 must not be used as credentials.
+AI agents maintaining these paths must preserve denial for all credentials and
+keep maintenance access locked until an audited password-hashing verifier and
+account-state backend are integrated. Update this guidance with any future
+provider change; never substitute direct byte or prefix comparisons.
 
 The Fedora Cockpit and FreeIPA compatibility models do not authenticate
 sessions or mint Kerberos tickets without trusted Cockpit/KDC integrations.
