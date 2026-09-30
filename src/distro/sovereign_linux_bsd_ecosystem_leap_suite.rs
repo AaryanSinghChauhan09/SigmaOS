@@ -1,10 +1,16 @@
+//! In-memory compatibility models for selected Linux and BSD ecosystem ideas.
+//!
+//! These APIs do not invoke host package managers, ZFS, runit, chroot, or boot
+//! tools. Filesystem rollback, package building, and cryptographic digest
+//! operations remain unavailable until real providers are integrated.
+
 // SigmaOS Sovereign Linux & BSD Ecosystem Leap Suite
 // Incorporates 6 iconic Linux & BSD distribution subsystems:
 // 1. Gentoo Portage World Set, Depclean Reverse Dependency Solver & Preserved-Libs Engine
 // 2. openSUSE Snapper Pre/Post Transaction Snapshot, Diff Rollback & AutoYaST XML Parser
 // 3. FreeBSD bectl ZFS Boot Environment (BE) Lifecycle & Boot Priority Governor
 // 4. Void Linux runit svlogd Log Supervisor & Kernel Core Dump Event Governor
-// 5. Alpine Linux abuild APKBUILD Chroot Sandbox & SHA-512 Checksum Pipeline
+// 5. Alpine APKBUILD metadata model; building and SHA-512 verification are unavailable
 // 6. Debian/Ubuntu debconf Priority Threshold Answer DB & dpkg-reconfigure Engine
 
 use std::collections::{BTreeMap, BTreeSet};
@@ -17,7 +23,7 @@ use std::vec::Vec;
 pub struct GentooPortageWorldDepcleanEngine {
     pub world_packages: BTreeSet<String>,
     pub installed_packages: BTreeMap<String, Vec<String>>, // pkg -> dependencies
-    pub preserved_libs: BTreeMap<String, String>,         // so_name -> provider_pkg
+    pub preserved_libs: BTreeMap<String, String>,          // so_name -> provider_pkg
 }
 
 impl GentooPortageWorldDepcleanEngine {
@@ -52,25 +58,14 @@ impl GentooPortageWorldDepcleanEngine {
     }
 
     pub fn run_depclean(&self) -> Vec<String> {
-        let mut needed = BTreeSet::new();
+        let mut needed = self.world_packages.clone();
+        let mut pending: Vec<String> = needed.iter().cloned().collect();
 
-        // 1. Include explicit @world packages
-        for pkg in &self.world_packages {
-            needed.insert(pkg.clone());
-        }
-
-        // 2. Traverse dependencies iteratively until fixed point
-        let mut added_new = true;
-        while added_new {
-            added_new = false;
-            let current_needed: Vec<String> = needed.iter().cloned().collect();
-            for pkg in current_needed {
-                if let Some(deps) = self.installed_packages.get(&pkg) {
-                    for dep in deps {
-                        if !needed.contains(dep) {
-                            needed.insert(dep.clone());
-                            added_new = true;
-                        }
+        while let Some(package) = pending.pop() {
+            if let Some(dependencies) = self.installed_packages.get(&package) {
+                for dependency in dependencies {
+                    if needed.insert(dependency.clone()) {
+                        pending.push(dependency.clone());
                     }
                 }
             }
@@ -211,7 +206,7 @@ impl OpenSuseSnapperAutoYastEngine {
         if self.snapshots.contains_key(&target_snapshot_id) {
             self.active_root_snapshot_id = target_snapshot_id;
             Ok(format!(
-                "Successfully rolled back active root subvolume to Snapper snapshot #{}",
+                "Model state only: selected Snapper snapshot #{}; host filesystem was not changed",
                 target_snapshot_id
             ))
         } else {
@@ -321,7 +316,12 @@ impl FreeBsdBectlZfsBootEnvEngine {
         Ok(format!("Created Boot Environment '{}'", be_name))
     }
 
-    pub fn clone_be(&mut self, source_be: &str, new_be_name: &str, timestamp: u64) -> Result<String, &'static str> {
+    pub fn clone_be(
+        &mut self,
+        source_be: &str,
+        new_be_name: &str,
+        timestamp: u64,
+    ) -> Result<String, &'static str> {
         if !self.boot_environments.contains_key(source_be) {
             return Err("bectl error: Source Boot environment not found");
         }
@@ -336,7 +336,10 @@ impl FreeBsdBectlZfsBootEnvEngine {
 
         be.is_mounted = true;
         be.mountpoint = Some(mountpoint.to_string());
-        Ok(format!("Mounted Boot Environment '{}' at '{}'", be_name, mountpoint))
+        Ok(format!(
+            "Mounted Boot Environment '{}' at '{}'",
+            be_name, mountpoint
+        ))
     }
 
     pub fn unmount_be(&mut self, be_name: &str) -> Result<String, &'static str> {
@@ -367,7 +370,10 @@ impl FreeBsdBectlZfsBootEnvEngine {
             target.active_on_boot = true;
         }
 
-        Ok(format!("Successfully activated Boot Environment '{}' for next boot", be_name))
+        Ok(format!(
+            "Successfully activated Boot Environment '{}' for next boot",
+            be_name
+        ))
     }
 
     pub fn destroy_be(&mut self, be_name: &str) -> Result<String, &'static str> {
@@ -445,7 +451,12 @@ impl VoidRunitSvlogdCoreDumpEngine {
         self.log_channels.insert(service_name.to_string(), channel);
     }
 
-    pub fn write_log_entry(&mut self, service_name: &str, message: &str, timestamp: u64) -> Result<(), &'static str> {
+    pub fn write_log_entry(
+        &mut self,
+        service_name: &str,
+        message: &str,
+        timestamp: u64,
+    ) -> Result<(), &'static str> {
         let channel = self
             .log_channels
             .get_mut(service_name)
@@ -481,7 +492,12 @@ impl VoidRunitSvlogdCoreDumpEngine {
         core_bytes: u64,
         timestamp: u64,
     ) -> String {
-        let dump_path = format!("/var/crash/core.{}.{}.{}", exe_path.replace('/', "_"), pid, timestamp);
+        let dump_path = format!(
+            "/var/crash/core.{}.{}.{}",
+            exe_path.replace('/', "_"),
+            pid,
+            timestamp
+        );
         let event = CoreDumpEvent {
             pid,
             executable_path: exe_path.to_string(),
@@ -505,7 +521,7 @@ impl Default for VoidRunitSvlogdCoreDumpEngine {
     }
 }
 
-/// 5. Alpine Linux abuild APKBUILD Chroot Sandbox & SHA-512 Pipeline
+/// 5. Alpine package build metadata model (no chroot or audited digest provider is integrated)
 #[derive(Debug, Clone)]
 pub struct ApkbuildSpec {
     pub pkgname: String,
@@ -540,38 +556,19 @@ impl AlpineAbuildChrootSandboxEngine {
         self.specs.insert(spec.pkgname.clone(), spec);
     }
 
-    pub fn calculate_sha512_checksum(&self, payload: &[u8]) -> String {
-        let mut hash: u64 = 0xcbf29ce484222325;
-        for &b in payload {
-            hash ^= u64::from(b);
-            hash = hash.wrapping_mul(0x100000001b3);
-        }
-        format!("{:016x}{:016x}", hash, hash.wrapping_add(101))
+    pub fn calculate_sha512_checksum(&self, payload: &[u8]) -> Result<String, &'static str> {
+        let _ = payload;
+        Err("SHA-512 provider unavailable; refusing to return a placeholder digest")
     }
 
-    pub fn run_abuild_package_build(&self, pkgname: &str) -> Result<AbuildBuildResult, &'static str> {
-        let spec = self
-            .specs
-            .get(pkgname)
-            .ok_or("abuild error: APKBUILD specification not found")?;
-
-        let full_version = format!("{}-r{}", spec.pkgver, spec.pkgrel);
-        let mut apk_files = Vec::new();
-
-        // Main package
-        apk_files.push(format!("{}-{}.apk", spec.pkgname, full_version));
-
-        // Subpackages (e.g. -dev, -doc)
-        for sub in &spec.subpackages {
-            apk_files.push(format!("{}-{}-{}.apk", spec.pkgname, sub, full_version));
+    pub fn run_abuild_package_build(
+        &self,
+        pkgname: &str,
+    ) -> Result<AbuildBuildResult, &'static str> {
+        if !self.specs.contains_key(pkgname) {
+            return Err("abuild error: APKBUILD specification not found");
         }
-
-        Ok(AbuildBuildResult {
-            pkgname: spec.pkgname.clone(),
-            full_version,
-            generated_apk_files: apk_files,
-            chroot_clean: true,
-        })
+        Err("abuild chroot provider unavailable; no package was built")
     }
 }
 
@@ -737,7 +734,10 @@ mod tests {
     fn test_gentoo_portage_depclean() {
         let mut portage = GentooPortageWorldDepcleanEngine::new();
         portage.add_to_world("app-editors/neovim");
-        portage.register_installed_package("app-editors/neovim", &["dev-libs/unibilium", "dev-lua/mpack"]);
+        portage.register_installed_package(
+            "app-editors/neovim",
+            &["dev-libs/unibilium", "dev-lua/mpack"],
+        );
         portage.register_installed_package("dev-libs/unibilium", &[]);
         portage.register_installed_package("dev-lua/mpack", &[]);
         portage.register_installed_package("net-misc/orphan-pkg", &[]);
@@ -755,13 +755,19 @@ mod tests {
     fn test_opensuse_snapper_autoyast() {
         let mut snapper = OpenSuseSnapperAutoYastEngine::new();
         let pre_id = snapper.create_pre_snapshot("Before Kernel Update", 1672531200);
-        let post_id = snapper.create_post_snapshot(pre_id, "After Kernel Update", 1672531300, &["/boot/vmlinuz", "/etc/os-release"]);
+        let post_id = snapper.create_post_snapshot(
+            pre_id,
+            "After Kernel Update",
+            1672531300,
+            &["/boot/vmlinuz", "/etc/os-release"],
+        );
 
         let diffs = snapper.compare_snapshots(pre_id, post_id);
         assert_eq!(diffs.len(), 2);
 
         let res = snapper.perform_rollback(pre_id);
         assert!(res.is_ok());
+        assert!(res.unwrap().contains("host filesystem was not changed"));
         assert_eq!(snapper.active_root_snapshot_id, pre_id);
 
         let xml = "<profile><host_name>sigma-box</host_name><package>zsh</package><partitioning>zfs</partitioning></profile>";
@@ -778,13 +784,33 @@ mod tests {
         assert_eq!(bectl.list_bes().len(), 2);
 
         bectl.mount_be("patch-1.0.1", "/mnt/patch").unwrap();
-        assert_eq!(bectl.boot_environments.get("patch-1.0.1").unwrap().mountpoint.as_deref(), Some("/mnt/patch"));
+        assert_eq!(
+            bectl
+                .boot_environments
+                .get("patch-1.0.1")
+                .unwrap()
+                .mountpoint
+                .as_deref(),
+            Some("/mnt/patch")
+        );
 
         bectl.unmount_be("patch-1.0.1").unwrap();
-        assert!(!bectl.boot_environments.get("patch-1.0.1").unwrap().is_mounted);
+        assert!(
+            !bectl
+                .boot_environments
+                .get("patch-1.0.1")
+                .unwrap()
+                .is_mounted
+        );
 
         bectl.activate_be("patch-1.0.1").unwrap();
-        assert!(bectl.boot_environments.get("patch-1.0.1").unwrap().active_on_boot);
+        assert!(
+            bectl
+                .boot_environments
+                .get("patch-1.0.1")
+                .unwrap()
+                .active_on_boot
+        );
 
         assert!(bectl.destroy_be("patch-1.0.1").is_err()); // active
         bectl.activate_be("default").unwrap();
@@ -795,9 +821,19 @@ mod tests {
     fn test_void_runit_svlogd_core_dump() {
         let mut void_engine = VoidRunitSvlogdCoreDumpEngine::new();
         void_engine.register_service_logger("nginx", 1024, 5);
-        void_engine.write_log_entry("nginx", "Worker process started", 1672531200).unwrap();
+        void_engine
+            .write_log_entry("nginx", "Worker process started", 1672531200)
+            .unwrap();
 
-        assert_eq!(void_engine.log_channels.get("nginx").unwrap().log_entries.len(), 1);
+        assert_eq!(
+            void_engine
+                .log_channels
+                .get("nginx")
+                .unwrap()
+                .log_entries
+                .len(),
+            1
+        );
 
         let path = void_engine.record_core_dump(1337, "/usr/bin/nginx", 11, 4096000, 1672531300);
         assert!(path.contains("1337"));
@@ -814,28 +850,41 @@ mod tests {
             pkgdesc: "Command line tool for transferring data with URLs".to_string(),
             url: "https://curl.se".to_string(),
             subpackages: vec!["dev".to_string(), "doc".to_string()],
-            checksum_sha512: "dummy".to_string(),
+            checksum_sha512: String::new(),
         };
 
         abuild.register_apkbuild(spec);
 
-        let res = abuild.run_abuild_package_build("curl").unwrap();
-        assert_eq!(res.full_version, "8.4.0-r1");
-        assert_eq!(res.generated_apk_files.len(), 3);
-        assert!(res.generated_apk_files[0].contains("curl-8.4.0-r1.apk"));
+        assert!(abuild.calculate_sha512_checksum(b"payload").is_err());
+        assert!(abuild.run_abuild_package_build("curl").is_err());
     }
 
     #[test]
     fn test_debian_debconf_answer_db() {
         let mut debconf = DebianDebconfAnswerDatabaseEngine::new();
-        debconf.register_question("tzdata/zones", "select", DebconfPriorityThreshold::Critical, "UTC");
-        debconf.register_question("tzdata/debug", "boolean", DebconfPriorityThreshold::Low, "false");
+        debconf.register_question(
+            "tzdata/zones",
+            "select",
+            DebconfPriorityThreshold::Critical,
+            "UTC",
+        );
+        debconf.register_question(
+            "tzdata/debug",
+            "boolean",
+            DebconfPriorityThreshold::Low,
+            "false",
+        );
 
         let to_prompt = debconf.filter_questions_to_prompt();
         assert_eq!(to_prompt.len(), 1);
 
-        debconf.set_answer("tzdata/zones", "America/New_York").unwrap();
-        assert_eq!(debconf.get_answer("tzdata/zones").unwrap(), "America/New_York");
+        debconf
+            .set_answer("tzdata/zones", "America/New_York")
+            .unwrap();
+        assert_eq!(
+            debconf.get_answer("tzdata/zones").unwrap(),
+            "America/New_York"
+        );
 
         let reconfigured = debconf.execute_dpkg_reconfigure("tzdata").unwrap();
         assert_eq!(reconfigured, 2);
