@@ -1,4 +1,3 @@
-#![allow(warnings, unused)]
 // Phase 8 End-to-End Integration Tests
 // Tests all 5 Tier 1 features working together
 
