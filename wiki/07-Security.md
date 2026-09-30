@@ -16,9 +16,13 @@ SigmaOS implements multiple layers of security:
 4. Filesystem encryption interfaces; audited providers are not integrated
 5. Network security models, which require runtime and protocol review
 
-`src/security/kali_stack.rs` contains in-process models, not host PAM, sudo, iptables, swap, or kernel dmesg enforcement. Its password-authentication provider is unavailable and sudo must deny elevation; its firewall model uses first-match, default-deny behavior but is not attached to a host packet path. Do not rely on these types as operating-system security controls.
+### System user credential storage
 
-AI agents maintaining this file must preserve fail-closed authentication, protocol length validation, first-match default-deny firewall behavior, synchronized log writes, and atomic swap-capacity accounting. Do not reintroduce credential comparisons as authentication without an audited provider.
+`system::UserManager` does not have a vetted password-hashing provider. Its
+`set_password` returns `UserError::CryptoUnavailable` without modifying user
+or shadow records, and `verify_password` always denies. Existing demonstration
+hashes are not accepted. AI agents must preserve this fail-closed behavior and
+reject or reset legacy weak hashes if a trusted provider is later integrated.
 
 ## Pledge/Unveil Sandbox
 
@@ -199,6 +203,59 @@ The emergency shell gate does not keep a plaintext password or accept a
 signature based on fixed magic bytes. Its password and signature checks remain
 unavailable until vetted verification providers are integrated, so shell
 access fails closed.
+
+`auth::SimpleUser` has no password verifier and always returns
+`AuthError::ProviderUnavailable` for non-locked accounts. The single-user
+maintenance login likewise remains locked until a trusted password verifier
+exists. The stored byte arrays are compatibility placeholders, not hashes, and
+must not be used as credentials.
+AI agents maintaining these paths must preserve denial for all credentials and
+keep maintenance access locked until an audited password-hashing verifier and
+account-state backend are integrated. Update this guidance with any future
+provider change; never substitute direct byte or prefix comparisons.
+
+`src/functions/user.rs` has no audited password-hashing provider or account
+state backend. Hashing, verification, password changes, and account lock or
+unlock requests return `UserError::ProviderUnavailable`; they neither claim
+success nor authenticate users. Password policy checks are not authentication.
+AI agents must preserve fail-closed errors until audited hash storage and real
+account-state enforcement are integrated and reviewed.
+
+`distro::InteractiveUserEnvironment` is exported, but it has no trusted
+credential verifier. `authenticate_and_login` returns the same unavailable
+error for every credential and does not create a session; the default root
+account has no placeholder password hash. AI agents must preserve this
+fail-closed behavior until a vetted verifier and account-state backend are
+integrated and reviewed.
+
+`src/security/password.rs` is an in-memory API model, not a usable vault. It
+does not persist `vault_path`; encryption, decryption, password generation,
+biometric checks, and direct unlock fail closed without audited providers.
+Construction discards the owned key buffer, and add/update clear owned
+plaintext buffers on both success and failure; caller-owned copies are not
+cleared. AI agents must preserve unavailable-provider errors and buffer
+clearing, and must not enable real storage or authentication without reviewed
+crypto, randomness, biometric, and persistence integrations.
+
+`src/security/kali_stack.rs` contains in-process models, not host PAM, sudo,
+iptables, swap, or kernel dmesg enforcement. Authentication denies access until
+a trusted verifier exists. Its firewall model uses ordered first-match rules
+and default-deny behavior, but is not attached to a host packet path. AI agents
+must preserve fail-closed authentication, protocol-length validation,
+first-match rules, synchronized log writes, and atomic bounded swap accounting.
+
+`src/security/cleaner.rs` provides bounded overwrites of caller memory and a
+policy check for exactly `127.0.0.1:<configured Tor port>`; neither guarantees
+erasure from storage or configures a host firewall. EXIF removal returns
+`MetadataScrubError::ParserUnavailable` without changing input until a
+format-aware parser is integrated. RAM overwrite rounds are bounded. AI agents
+must preserve these limits and fail-closed metadata behavior.
+
+`src/security/secrets.rs::SimpleSecret` clears its fixed buffer before
+replacement and uses volatile writes for its owned buffers on drop. This is
+best-effort clearing only; it cannot erase caller copies or guarantee system-
+wide zeroization, and the component is not secure storage. Preserve this scope
+and do not describe it as encrypted storage without an audited provider.
 
 The Fedora Cockpit and FreeIPA compatibility models do not authenticate
 sessions or mint Kerberos tickets without trusted Cockpit/KDC integrations.
