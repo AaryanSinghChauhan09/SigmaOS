@@ -11,7 +11,7 @@ use std::vec::Vec;
 /// Slackware SysV Runlevel
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SlackwareRunlevel {
-    SingleUser,   // rc.K / runlevel 1
+    SingleUser,    // rc.K / runlevel 1
     MultiUserText, // rc.M / runlevel 3
     MultiUserX11,  // rc.4 / runlevel 4
     Reboot,        // rc.6 / runlevel 6
@@ -47,7 +47,11 @@ impl SlackwarePkgtoolSysvEngine {
     }
 
     pub fn installpkg(&mut self, pkg: SlackwarePackageRecord) -> bool {
-        if self.installed_packages.iter().any(|p| p.package_name == pkg.package_name) {
+        if self
+            .installed_packages
+            .iter()
+            .any(|p| p.package_name == pkg.package_name)
+        {
             return false;
         }
         self.installed_packages.push(pkg);
@@ -56,7 +60,8 @@ impl SlackwarePkgtoolSysvEngine {
 
     pub fn removepkg(&mut self, pkg_name: &str) -> bool {
         let initial_len = self.installed_packages.len();
-        self.installed_packages.retain(|p| p.package_name != pkg_name);
+        self.installed_packages
+            .retain(|p| p.package_name != pkg_name);
         self.installed_packages.len() < initial_len
     }
 
@@ -69,8 +74,12 @@ impl SlackwarePkgtoolSysvEngine {
         self.current_runlevel = target;
         match target {
             SlackwareRunlevel::SingleUser => self.runlevel_scripts_executed.push("/etc/rc.d/rc.K"),
-            SlackwareRunlevel::MultiUserText => self.runlevel_scripts_executed.push("/etc/rc.d/rc.M"),
-            SlackwareRunlevel::MultiUserX11 => self.runlevel_scripts_executed.push("/etc/rc.d/rc.4"),
+            SlackwareRunlevel::MultiUserText => {
+                self.runlevel_scripts_executed.push("/etc/rc.d/rc.M")
+            }
+            SlackwareRunlevel::MultiUserX11 => {
+                self.runlevel_scripts_executed.push("/etc/rc.d/rc.4")
+            }
             SlackwareRunlevel::Reboot => self.runlevel_scripts_executed.push("/etc/rc.d/rc.6"),
         }
     }
@@ -165,17 +174,17 @@ impl Default for AlpineMuslApkV3TriggerEngine {
 /// Gentoo Keyword Mask Status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GentooKeywordStatus {
-    Stable,       // amd64
-    Testing,      // ~amd64
-    HardMasked,   // **
+    Stable,     // amd64
+    Testing,    // ~amd64
+    HardMasked, // **
 }
 
 /// Gentoo Portage Ebuild Spec
 #[derive(Debug, Clone)]
 pub struct PortageEbuildSpec {
     pub atom: &'static str,
-    pub slot: &'static str,        // e.g. "0/2.1"
-    pub subslot: &'static str,     // e.g. "2.1"
+    pub slot: &'static str,    // e.g. "0/2.1"
+    pub subslot: &'static str, // e.g. "2.1"
     pub keyword: GentooKeywordStatus,
     pub use_flags: Vec<(&'static str, bool)>, // (flag, enabled)
     pub conditional_deps: Vec<(&'static str, &'static str)>, // (required_flag, dep_atom)
@@ -502,7 +511,14 @@ impl SmartOsCrossbowZoneEngine {
         Self { zones: Vec::new() }
     }
 
-    pub fn create_zone(&mut self, id: u32, name: &'static str, brand: SmartOsZoneBrand, vnic_limit: u32, cpu_shares: u32) {
+    pub fn create_zone(
+        &mut self,
+        id: u32,
+        name: &'static str,
+        brand: SmartOsZoneBrand,
+        vnic_limit: u32,
+        cpu_shares: u32,
+    ) {
         if !self.zones.iter().any(|z| z.zone_id == id) {
             self.zones.push(SmartOsZone {
                 zone_id: id,
@@ -664,8 +680,12 @@ impl SovereignLinuxBsdUltimateSynthesisSuite {
         let slack_ok = self.slackware_engine.get_installed_count() == 1;
 
         // Alpine verification
-        self.alpine_engine.register_trigger("font-cache", "/usr/share/fonts");
-        let alpine_ok = self.alpine_engine.execute_triggers_for_path("/usr/share/fonts/TTF") == 1;
+        self.alpine_engine
+            .register_trigger("font-cache", "/usr/share/fonts");
+        let alpine_ok = self
+            .alpine_engine
+            .execute_triggers_for_path("/usr/share/fonts/TTF")
+            == 1;
 
         // Gentoo verification
         self.gentoo_engine.register_ebuild(PortageEbuildSpec {
@@ -679,18 +699,24 @@ impl SovereignLinuxBsdUltimateSynthesisSuite {
         let gentoo_ok = self.gentoo_engine.is_ebuild_accepted("sys-libs/zlib");
 
         // FreeBSD verification
-        let freebsd_ok = self.freebsd_engine.bectl_create("snap_backup", "zroot/ROOT/snap_backup");
+        let freebsd_ok = self
+            .freebsd_engine
+            .bectl_create("snap_backup", "zroot/ROOT/snap_backup");
 
         // OpenBSD verification
         self.openbsd_engine.unveil("/etc", &[UnveilPerm::Read]);
-        let openbsd_ok = self.openbsd_engine.check_unveil("/etc/resolv.conf", UnveilPerm::Read);
+        let openbsd_ok = self
+            .openbsd_engine
+            .check_unveil("/etc/resolv.conf", UnveilPerm::Read);
 
         // NixOS verification
-        self.nixos_engine.add_store_path("abc12345", "systemd", "255");
+        self.nixos_engine
+            .add_store_path("abc12345", "systemd", "255");
         let nix_ok = self.nixos_engine.pin_gc_root("abc12345");
 
         // SmartOS verification
-        self.smartos_engine.create_zone(100, "db_zone", SmartOsZoneBrand::Lx, 1000, 100);
+        self.smartos_engine
+            .create_zone(100, "db_zone", SmartOsZoneBrand::Lx, 1000, 100);
         let smartos_ok = self.smartos_engine.get_zone_count() == 1;
 
         // openSUSE verification
@@ -698,9 +724,19 @@ impl SovereignLinuxBsdUltimateSynthesisSuite {
         let suse_ok = self.suse_engine.commit_and_switch_snapshot(1);
 
         // HardenedBSD verification
-        let hardened_ok = !self.hardenedbsd_engine.intercept_control_flow_anomaly(0x100, 0x200);
+        let hardened_ok = !self
+            .hardenedbsd_engine
+            .intercept_control_flow_anomaly(0x100, 0x200);
 
-        slack_ok && alpine_ok && gentoo_ok && freebsd_ok && openbsd_ok && nix_ok && smartos_ok && suse_ok && hardened_ok
+        slack_ok
+            && alpine_ok
+            && gentoo_ok
+            && freebsd_ok
+            && openbsd_ok
+            && nix_ok
+            && smartos_ok
+            && suse_ok
+            && hardened_ok
     }
 }
 
@@ -741,7 +777,10 @@ mod tests {
         let mut alpine = AlpineMuslApkV3TriggerEngine::new();
         alpine.register_trigger("update-desktop-database", "/usr/share/applications");
 
-        assert_eq!(alpine.execute_triggers_for_path("/usr/share/applications/editor.desktop"), 1);
+        assert_eq!(
+            alpine.execute_triggers_for_path("/usr/share/applications/editor.desktop"),
+            1
+        );
         assert!(alpine.audit_musl_guard_pages(64));
     }
 
@@ -778,8 +817,12 @@ mod tests {
     #[test]
     fn test_openbsd_pledge_unveil_hardening_engine() {
         let mut openbsd = OpenBsdPledgeUnveilHardeningEngine::new();
-        assert!(openbsd.pledge(&[PledgePromise::Stdio, PledgePromise::Rpath]).is_ok());
-        assert!(openbsd.pledge(&[PledgePromise::Stdio, PledgePromise::Exec]).is_err());
+        assert!(openbsd
+            .pledge(&[PledgePromise::Stdio, PledgePromise::Rpath])
+            .is_ok());
+        assert!(openbsd
+            .pledge(&[PledgePromise::Stdio, PledgePromise::Exec])
+            .is_err());
 
         openbsd.unveil("/var/log", &[UnveilPerm::Read, UnveilPerm::Write]);
         assert!(openbsd.check_unveil("/var/log/syslog", UnveilPerm::Write));
