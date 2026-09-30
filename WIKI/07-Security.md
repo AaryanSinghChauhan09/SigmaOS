@@ -317,6 +317,10 @@ validate credentials or replace host LDAP/PAM services.
 
 ## Audit and Logging
 
+`src/security/audit.rs` provides an in-memory audit model, not a durable or tamper-resistant system audit service. Its event buffer is capped at 65,536 entries and returns `LogFull` when full; old entries can be removed explicitly. Do not use it as the sole record for security-critical events until persistence, integrity protection, access control, and crash-safe delivery are implemented.
+
+AI agents maintaining this module must keep unknown event discriminants in an explicit invalid state, preserve the event cap and `LogFull` behavior, and avoid unbounded or quadratic cleanup paths. Update this status when durable logging and its threat-model checks are implemented.
+
 ### System Audit
 
 View system audit logs:
