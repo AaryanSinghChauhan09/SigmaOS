@@ -165,7 +165,11 @@ impl SovereignStatelessPackageConfigGovernor {
         );
     }
 
-    pub fn set_user_override(&mut self, rel_path: &str, user_content: impl Into<String>) -> Result<(), String> {
+    pub fn set_user_override(
+        &mut self,
+        rel_path: &str,
+        user_content: impl Into<String>,
+    ) -> Result<(), String> {
         if let Some(entry) = self.configs.get_mut(rel_path) {
             entry.user_override_content = Some(user_content.into());
             Ok(())
@@ -415,7 +419,9 @@ pub struct SovereignDistroPackageAdvancementsSuiteV9 {
 impl SovereignDistroPackageAdvancementsSuiteV9 {
     pub fn new() -> Self {
         Self {
-            ccache_governor: SovereignDistributedCcacheCompilationGovernor::new(10 * 1024 * 1024 * 1024),
+            ccache_governor: SovereignDistributedCcacheCompilationGovernor::new(
+                10 * 1024 * 1024 * 1024,
+            ),
             stateless_governor: SovereignStatelessPackageConfigGovernor::new(),
             auto_repair_engine: SovereignPackageAutoRepairAndDeltaPatchOrchestrator::new(),
             slot_pruning_governor: SovereignMultiVersionSlotAndPfsPruningGovernor::new(),
@@ -423,11 +429,16 @@ impl SovereignDistroPackageAdvancementsSuiteV9 {
         }
     }
 
-    pub fn process_and_enrich_package_v9(&mut self, pkg: &mut UnifiedPackage) -> Result<(), String> {
+    pub fn process_and_enrich_package_v9(
+        &mut self,
+        pkg: &mut UnifiedPackage,
+    ) -> Result<(), String> {
         pkg.properties
             .insert("v9_advancements_processed".to_string(), "true".to_string());
-        pkg.properties
-            .insert("v9_stateless_architecture".to_string(), "enabled".to_string());
+        pkg.properties.insert(
+            "v9_stateless_architecture".to_string(),
+            "enabled".to_string(),
+        );
         Ok(())
     }
 }
@@ -451,7 +462,10 @@ mod tests {
         let mut governor = SovereignDistributedCcacheCompilationGovernor::new(1024 * 1024);
         governor.store_artifact("hash123", vec![0xDE, 0xAD, 0xBE, 0xEF]);
 
-        assert_eq!(governor.lookup_artifact("hash123"), Some(&vec![0xDE, 0xAD, 0xBE, 0xEF]));
+        assert_eq!(
+            governor.lookup_artifact("hash123"),
+            Some(&vec![0xDE, 0xAD, 0xBE, 0xEF])
+        );
         assert_eq!(governor.lookup_artifact("unknown_hash"), None);
 
         let metrics = governor.get_metrics();
@@ -479,7 +493,9 @@ mod tests {
             Some("user custom;")
         );
 
-        assert!(governor.reset_to_vendor_default("etc/nginx/nginx.conf").is_ok());
+        assert!(governor
+            .reset_to_vendor_default("etc/nginx/nginx.conf")
+            .is_ok());
         assert_eq!(
             governor.resolve_effective_config("etc/nginx/nginx.conf"),
             Some("user www-data;")
@@ -495,7 +511,10 @@ mod tests {
         actual.insert("/usr/bin/curl".to_string(), "sha_corrupted_456".to_string());
 
         let report = orchestrator.audit_and_repair_package("curl", &actual);
-        assert_eq!(report.corrupted_files_repaired, vec!["/usr/bin/curl".to_string()]);
+        assert_eq!(
+            report.corrupted_files_repaired,
+            vec!["/usr/bin/curl".to_string()]
+        );
         assert!(report.is_fully_repaired);
     }
 
@@ -541,11 +560,15 @@ mod tests {
 
         assert!(suite.process_and_enrich_package_v9(&mut pkg).is_ok());
         assert_eq!(
-            pkg.properties.get("v9_advancements_processed").map(|s| s.as_str()),
+            pkg.properties
+                .get("v9_advancements_processed")
+                .map(|s| s.as_str()),
             Some("true")
         );
         assert_eq!(
-            pkg.properties.get("v9_stateless_architecture").map(|s| s.as_str()),
+            pkg.properties
+                .get("v9_stateless_architecture")
+                .map(|s| s.as_str()),
             Some("enabled")
         );
     }
