@@ -23,7 +23,7 @@ impl CapabilityToken {
     }
 }
 
-use core::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::Mutex;
 
 pub type DomainID = usize;
 
@@ -574,62 +574,59 @@ impl QubesGuiBlitter {
     }
 }
 
-/// Bypasses virtual network cards (which cause bottlenecks in Qubes OS) to write directly into target buffer ranges.
+/// Bounded in-process model of a qrexec payload channel.
+/// This is not shared memory or an operating-system IPC transport.
 pub struct SQrexecChannel {
-    pub buffer: *mut u8,
-    pub size: usize,
-    pub write_cursor: AtomicUsize,
-    pub read_cursor: AtomicUsize,
+    state: Mutex<SQrexecChannelState>,
+    size: usize,
+}
+
+struct SQrexecChannelState {
+    pending: Vec<u8>,
+    destroyed: bool,
 }
 
 impl SQrexecChannel {
     pub fn new(size: usize) -> Self {
-        let layout = std::alloc::Layout::from_size_align(size.max(1), 8).unwrap();
-        let buffer = unsafe { std::alloc::alloc(layout) };
         Self {
-            buffer,
+            state: Mutex::new(SQrexecChannelState {
+                pending: Vec::new(),
+                destroyed: false,
+            }),
             size,
-            write_cursor: AtomicUsize::new(0),
-            read_cursor: AtomicUsize::new(0),
         }
     }
 
     pub fn write_payload(&self, data: &[u8]) -> Result<(), IsolationError> {
-        let w = self.write_cursor.load(Ordering::SeqCst);
-        let len = data.len();
-        if w + len > self.size {
+        let mut state = self
+            .state
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        if state.destroyed || data.len() > self.size.saturating_sub(state.pending.len()) {
             return Err(IsolationError::IpcRouteFailed);
         }
-
-        unsafe {
-            core::ptr::copy_nonoverlapping(data.as_ptr(), self.buffer.add(w), len);
-        }
-        self.write_cursor.store(w + len, Ordering::SeqCst);
+        state.pending.extend_from_slice(data);
         Ok(())
     }
 
     pub fn read_payload(&self) -> Vec<u8> {
-        let w = self.write_cursor.load(Ordering::SeqCst);
-        let r = self.read_cursor.load(Ordering::SeqCst);
-        let mut vec = Vec::new();
-
-        if w > r {
-            unsafe {
-                for i in r..w {
-                    vec.push(*self.buffer.add(i));
-                }
-            }
-            self.read_cursor.store(w, Ordering::SeqCst);
+        let mut state = self
+            .state
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        if state.destroyed {
+            return Vec::new();
         }
-        vec
+        core::mem::take(&mut state.pending)
     }
 
     pub fn destroy(&self) {
-        unsafe {
-            core::ptr::write_bytes(self.buffer, 0, self.size);
-            let layout = std::alloc::Layout::from_size_align(self.size.max(1), 8).unwrap();
-            std::alloc::dealloc(self.buffer, layout);
-        }
+        let mut state = self
+            .state
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        state.pending.clear();
+        state.destroyed = true;
     }
 }
 
