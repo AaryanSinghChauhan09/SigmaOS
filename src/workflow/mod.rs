@@ -4,11 +4,10 @@ use std::format;
 // Workflow automation engine
 // Zero-dependency implementation - no external libraries required
 
-
-use std::vec::Vec;
-use std::string::{String, ToString};
-use std::boxed::Box;
 use core::fmt;
+use std::boxed::Box;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Error type for the Workflow module
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -63,19 +62,19 @@ impl Workflow {
             enabled: false,
         }
     }
-    
+
     /// Enable this resource
     pub fn enable(&mut self) -> WorkflowResult<()> {
         self.enabled = true;
         Ok(())
     }
-    
+
     /// Disable this resource
     pub fn disable(&mut self) -> WorkflowResult<()> {
         self.enabled = false;
         Ok(())
     }
-    
+
     /// Check if enabled
     pub fn is_enabled(&self) -> bool {
         self.enabled
@@ -97,13 +96,13 @@ impl WorkflowStep {
             initialized: false,
         }
     }
-    
+
     /// Initialize the Workflow subsystem
     pub fn init(&mut self) -> WorkflowResult<()> {
         self.initialized = true;
         Ok(())
     }
-    
+
     /// Add a resource
     pub fn add(&mut self, resource: Workflow) -> WorkflowResult<u64> {
         if !self.initialized {
@@ -113,29 +112,29 @@ impl WorkflowStep {
         self.resources.push(resource);
         Ok(id)
     }
-    
+
     /// Get resource by ID
     pub fn get(&self, id: u64) -> Option<&Workflow> {
         let res: &[Workflow] = &self.resources;
         res.get(id as usize)
     }
-    
+
     /// Get mutable resource by ID
     pub fn get_mut(&mut self, id: u64) -> Option<&mut Workflow> {
         let res: &mut [Workflow] = &mut self.resources;
         res.get_mut(id as usize)
     }
-    
+
     /// List all resources
     pub fn list(&self) -> &[Workflow] {
         &self.resources
     }
-    
+
     /// Check if initialized
     pub fn is_initialized(&self) -> bool {
         self.initialized
     }
-    
+
     /// Shutdown the subsystem
     pub fn shutdown(&mut self) -> WorkflowResult<()> {
         self.initialized = false;
@@ -192,7 +191,8 @@ impl SystemWorkflow {
             WorkflowCategory::Automation => "Triggering scheduled background automation...",
             WorkflowCategory::Pages => "Publishing static documentation pages...",
             WorkflowCategory::General => "Executing general workflow task...",
-        }.into();
+        }
+        .into();
         Ok(&self.status)
     }
 
@@ -253,7 +253,7 @@ impl SystemWorkflowRegistry {
 #[cfg(test_disabled)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_workflow_manager_init() {
         let mut manager = WorkflowStep::new();
@@ -261,7 +261,7 @@ mod tests {
         assert!(manager.init().is_ok());
         assert!(manager.is_initialized());
     }
-    
+
     #[test]
     fn test_workflow_resource_add() {
         let mut manager = WorkflowStep::new();
@@ -285,10 +285,15 @@ mod tests {
         assert_eq!(w_len, 5);
 
         // Verify deployment trigger
-        let triggered = registry.trigger_all_by_category(WorkflowCategory::Deployment).unwrap();
+        let triggered = registry
+            .trigger_all_by_category(WorkflowCategory::Deployment)
+            .unwrap();
         assert_eq!(triggered, 1);
         assert!(registry.workflows[dep_id as usize].active);
-        assert_eq!(registry.workflows[dep_id as usize].status, "Deploying release artifacts...");
+        assert_eq!(
+            registry.workflows[dep_id as usize].status,
+            "Deploying release artifacts..."
+        );
 
         // Complete the deployment
         registry.workflows[dep_id as usize].complete().unwrap();
@@ -301,5 +306,3 @@ mod tests {
         assert_eq!(pages_workflows[0].name, "BuildDocs");
     }
 }
-
-

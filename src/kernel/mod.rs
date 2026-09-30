@@ -5,41 +5,41 @@ pub use panic_handler::*;
 
 pub mod sovereign_smp_xhci_apc_synthesis;
 pub use sovereign_smp_xhci_apc_synthesis::*;
-pub mod kprintf;
 pub mod architecture;
 pub mod atomic_extended;
-pub mod cgroup_v2;
-pub mod kqueue_event;
-pub mod cgroup_controllers;
 pub mod block_dev;
-pub mod process_monitor;
 pub mod bore;
 pub mod breakthrough;
 pub mod breakthroughs;
 pub mod breakthroughs_v2;
 pub mod bus;
+pub mod cgroup_controllers;
+pub mod cgroup_v2;
 pub mod classic_os;
 pub mod component;
 pub mod console;
-pub mod missing_linux_kernel_components;
 pub mod cpu_features;
 pub mod cpufreq;
 pub mod device;
 pub mod driver;
 pub mod dtrace_compat;
 pub mod ebpf;
-pub mod ebpf_vm;
 pub mod ebpf_verification;
+pub mod ebpf_vm;
 pub mod exports;
 pub mod gap_closing;
 pub mod gap_filling;
 pub mod generation_manager;
 pub mod io_uring;
 pub mod ipc;
+pub mod kprintf;
 pub mod kqueue;
+pub mod kqueue_event;
 pub mod linux_absorb;
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
+pub mod missing_linux_kernel_components;
+pub mod process_monitor;
 pub mod sysfs_manager;
 pub use linux_parity::{
     CmaRegion, KernelTimer, LinuxCmaAllocatorEngine, LinuxKernelTimerWheel,
@@ -51,7 +51,6 @@ pub mod module_loader;
 pub mod module_loading_control;
 pub mod module_tools;
 pub mod namespaces;
-pub mod uts_namespace;
 pub mod net;
 pub mod nextgen_breakthroughs;
 pub mod numa_allocator;
@@ -61,12 +60,13 @@ pub mod os_innovations;
 pub mod paging;
 pub mod performance;
 pub mod pipes;
-pub mod process;
 pub mod policy_mechanism;
+pub mod process;
 pub mod roundrobin;
 pub mod sched;
 pub mod scheduler;
 pub mod structures;
+pub mod uts_namespace;
 pub mod virtual_cpu;
 
 pub use missing_linux_kernel_components::{
@@ -79,25 +79,7 @@ pub use missing_linux_kernel_components::{
 pub mod traits;
 pub mod vmm_paging;
 
-#[allow(ambiguous_glob_reexports)]
-pub use architecture::*;
-pub use bus::*;
 pub use crate::kernel::linux_bsd_innovations::*;
-pub use pipes::*;
-pub use policy_mechanism::*;
-#[allow(ambiguous_glob_reexports)]
-pub use structures::*;
-pub use breakthroughs::{
-    AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
-    UniversalAbiTranslator, UserDefinedKernelFunctions,
-};
-pub use gap_closing::{
-    AcpiInterruptManager, GapError, IrqRoutingTable, JournalBlock, JournalState, MetadataJournal,
-    Pml4PageTableEntry, VirtualMemoryPagingManager,
-};
-pub use generation_manager::{Generation, GenerationManager};
-pub use io_uring::{CompletionQueueEntry, IoUringEngine, IoUringOpcode, SubmissionQueueEntry};
-pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use crate::kernel::linux_bsd_innovations::{
     AlpineHardenedEnv, AndroidBinderIpc, AndroidBroadcastReceiverRegistry, ArchUserRepoManager,
     BinderNode, BottomHalfKernelThread, BoundedBufferProducerConsumer, BroadcastReceiver,
@@ -124,6 +106,20 @@ pub use crate::kernel::linux_bsd_innovations::{
     CAP_WRITE_FLAG, PLEDGE_CPATH, PLEDGE_DPATH, PLEDGE_EXEC, PLEDGE_INET, PLEDGE_RPATH,
     PLEDGE_STDIO, PLEDGE_UNIX, PLEDGE_WPATH,
 };
+#[allow(ambiguous_glob_reexports)]
+pub use architecture::*;
+pub use breakthroughs::{
+    AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
+    UniversalAbiTranslator, UserDefinedKernelFunctions,
+};
+pub use bus::*;
+pub use gap_closing::{
+    AcpiInterruptManager, GapError, IrqRoutingTable, JournalBlock, JournalState, MetadataJournal,
+    Pml4PageTableEntry, VirtualMemoryPagingManager,
+};
+pub use generation_manager::{Generation, GenerationManager};
+pub use io_uring::{CompletionQueueEntry, IoUringEngine, IoUringOpcode, SubmissionQueueEntry};
+pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use linux_parity::*;
 pub use memory::{
     BuddyAllocator, ContainerResourceGovernor, DmaRingBufferAllocator, HardenedGuardPageAllocator,
@@ -136,23 +132,27 @@ pub use meta::{
 };
 pub use nextgen_breakthroughs::*;
 pub use paging::{PageTable, PageTableEntry, PageTableFlags, VirtualMemoryManagerV2};
+pub use pipes::*;
+pub use policy_mechanism::*;
 pub use roundrobin::{
     RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError,
 };
+#[allow(ambiguous_glob_reexports)]
+pub use structures::*;
+pub use uts_namespace::{NamespaceId, UtsNamespaceManager};
 pub use vmm_paging::{PageTableManager, VirtualMemoryManager};
-pub use uts_namespace::{UtsNamespaceManager, NamespaceId};
 // Note: linux_bsd_innovations types fully re-exported via `pub use crate::kernel::linux_bsd_innovations::*` above.
-pub use kqueue_event::{Kqueue, KqueueManager, Kevent, FilterType, FilterFlags, Interest};
+pub use kqueue_event::{FilterFlags, FilterType, Interest, Kevent, Kqueue, KqueueManager};
 pub use tss_ring3_user_mode::{
     IretqStackFrame, SovereignRing3UserModeEngine, SovereignTaskStateSegment64,
     UserModeProcessContext,
 };
 
 // ─── Phase 1: Safe-Rust Kernel Foundation — New Sovereign Modules ─────────────
-pub mod sigma_version;
-pub mod tss_ring3_user_mode;
 pub mod hardened_security_mitigations;
 pub mod sigma_kernel_autotuner_v2;
+pub mod sigma_version;
+pub mod tss_ring3_user_mode;
 pub mod xdp_engine_sovereign;
 
 pub use hardened_security_mitigations::{
@@ -170,31 +170,36 @@ pub use low_level_hardware::*;
 
 pub mod kptr_restrict;
 pub mod pidfd;
-pub use pidfd::{PidFd, PidFdCapabilities, ProcDesc, ProcDescCapabilities, SubreaperEntry, PidfdProcDescManager};
+pub use pidfd::{
+    PidFd, PidFdCapabilities, PidfdProcDescManager, ProcDesc, ProcDescCapabilities, SubreaperEntry,
+};
 pub mod cfi;
 pub mod interrupt;
-pub use interrupt::{InterruptController, InterruptVector, InterruptType, InterruptDescriptor, IrqLine, IrqTriggerType};
-pub use scheduler::{CfsScheduler, RtScheduler, ProcessTask, Priority, SchedulerPolicy, ProcessState, ThermalState};
 pub use cfi::{CfiEngine, CfiTarget, CfiViolation};
-pub use kptr_restrict::{
-    KptrRestrictLevel, DmesgRestrictLevel,
-    KptrRestrict, DmesgRestrict, KernelSecurityParams, SecurityLevel,
+pub use interrupt::{
+    InterruptController, InterruptDescriptor, InterruptType, InterruptVector, IrqLine,
+    IrqTriggerType,
 };
-pub use process_monitor::{
-    MonitoredProcessState, ProcessEntry, ProcessTreeNode, ProcessFilter, ProcessSortField,
-    ProcessMonitor,
+pub use kptr_restrict::{
+    DmesgRestrict, DmesgRestrictLevel, KernelSecurityParams, KptrRestrict, KptrRestrictLevel,
+    SecurityLevel,
 };
 pub use module_loading_control::{
-    ModuleLoadingState, ModuleLoadingPolicy, KernelModule as ModuleLoadingKernelModule, ModuleLoadingRule,
-    KernelModuleLoadingController,
+    KernelModule as ModuleLoadingKernelModule, KernelModuleLoadingController, ModuleLoadingPolicy,
+    ModuleLoadingRule, ModuleLoadingState,
+};
+pub use process_monitor::{
+    MonitoredProcessState, ProcessEntry, ProcessFilter, ProcessMonitor, ProcessSortField,
+    ProcessTreeNode,
+};
+pub use scheduler::{
+    CfsScheduler, Priority, ProcessState, ProcessTask, RtScheduler, SchedulerPolicy, ThermalState,
 };
 
 pub mod procfs_linux;
-pub use procfs_linux::{
-    ProcessInfo, ProcFs,
-};
-pub use sysfs_manager::{Sysfs, SysfsKobject, SysfsAttribute};
 pub use module_tools::{
-    KernelModuleMetadata, KernelModuleConfig, ModuleParameter, KernelModuleSkeleton,
-    KernelModuleBuilder, BuildType, OptimizationLevel, KernelModuleLoader, KernelModuleManager,
+    BuildType, KernelModuleBuilder, KernelModuleConfig, KernelModuleLoader, KernelModuleManager,
+    KernelModuleMetadata, KernelModuleSkeleton, ModuleParameter, OptimizationLevel,
 };
+pub use procfs_linux::{ProcFs, ProcessInfo};
+pub use sysfs_manager::{Sysfs, SysfsAttribute, SysfsKobject};

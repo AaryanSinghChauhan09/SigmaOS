@@ -11,4 +11,3 @@ pub use licensing::{
     ComplianceCert, ComponentLicense, LegalComplianceRegistry, LicenseType, PatentRecord,
 };
 // SigmaOS Legal & Compliance Module
-

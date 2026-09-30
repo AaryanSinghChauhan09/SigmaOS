@@ -1,24 +1,33 @@
 use std::boxed::Box;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
+use core::mem;
 /// OOP-based GPU Driver for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 71
 /// Implements GPU device management and rendering
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type GPUDeviceID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum GPUVendor { Intel = 0, AMD = 1, NVIDIA = 2, Other = 3 }
+pub enum GPUVendor {
+    Intel = 0,
+    AMD = 1,
+    NVIDIA = 2,
+    Other = 3,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum GPUError { Success = 0, NotFound = 1, InitFailed = 2, RenderFailed = 3 }
+pub enum GPUError {
+    Success = 0,
+    NotFound = 1,
+    InitFailed = 2,
+    RenderFailed = 3,
+}
 
 pub trait GPUDevice {
     fn id(&self) -> GPUDeviceID;
@@ -53,7 +62,9 @@ impl SimpleGPUDevice {
 }
 
 impl GPUDevice for SimpleGPUDevice {
-    fn id(&self) -> GPUDeviceID { self.id }
+    fn id(&self) -> GPUDeviceID {
+        self.id
+    }
     fn vendor(&self) -> GPUVendor {
         match self.vendor.load(Ordering::SeqCst) {
             0 => GPUVendor::Intel,
@@ -66,7 +77,9 @@ impl GPUDevice for SimpleGPUDevice {
         let len = self.model.iter().position(|&b| b == 0).unwrap_or(64);
         &self.model[..len]
     }
-    fn vram_size(&self) -> usize { self.vram_size.load(Ordering::SeqCst) }
+    fn vram_size(&self) -> usize {
+        self.vram_size.load(Ordering::SeqCst)
+    }
 
     fn initialize(&mut self) -> Result<(), GPUError> {
         Ok(())
@@ -122,7 +135,12 @@ impl GPUManager for SimpleGPUManager {
 }
 
 pub trait Framebuffer {
-    fn create_framebuffer(&mut self, width: usize, height: usize, format: u32) -> Result<usize, GPUError>;
+    fn create_framebuffer(
+        &mut self,
+        width: usize,
+        height: usize,
+        format: u32,
+    ) -> Result<usize, GPUError>;
     fn bind_framebuffer(&mut self, fb_id: usize) -> Result<(), GPUError>;
     fn clear(&mut self, color: u32) -> Result<(), GPUError>;
     fn swap_buffers(&mut self) -> Result<(), GPUError>;
@@ -146,7 +164,12 @@ impl SimpleFramebuffer {
 }
 
 impl Framebuffer for SimpleFramebuffer {
-    fn create_framebuffer(&mut self, width: usize, height: usize, format: u32) -> Result<usize, GPUError> {
+    fn create_framebuffer(
+        &mut self,
+        width: usize,
+        height: usize,
+        format: u32,
+    ) -> Result<usize, GPUError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         self.framebuffers.push((id, width, height, format));
         Ok(id)
@@ -173,7 +196,11 @@ impl Framebuffer for SimpleFramebuffer {
 }
 
 pub trait RenderPipeline {
-    fn create_pipeline(&mut self, vertex_shader: &[u8], fragment_shader: &[u8]) -> Result<usize, GPUError>;
+    fn create_pipeline(
+        &mut self,
+        vertex_shader: &[u8],
+        fragment_shader: &[u8],
+    ) -> Result<usize, GPUError>;
     fn bind_pipeline(&mut self, pipeline_id: usize) -> Result<(), GPUError>;
     fn draw(&mut self, vertex_count: usize) -> Result<(), GPUError>;
 }
@@ -196,14 +223,22 @@ impl SimpleRenderPipeline {
 }
 
 impl RenderPipeline for SimpleRenderPipeline {
-    fn create_pipeline(&mut self, vertex_shader: &[u8], fragment_shader: &[u8]) -> Result<usize, GPUError> {
+    fn create_pipeline(
+        &mut self,
+        vertex_shader: &[u8],
+        fragment_shader: &[u8],
+    ) -> Result<usize, GPUError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let mut vs_array = [0u8; 256];
         let mut fs_array = [0u8; 256];
         let vs_len = vertex_shader.len().min(255);
         let fs_len = fragment_shader.len().min(255);
-        for i in 0..vs_len { vs_array[i] = vertex_shader[i]; }
-        for i in 0..fs_len { fs_array[i] = fragment_shader[i]; }
+        for i in 0..vs_len {
+            vs_array[i] = vertex_shader[i];
+        }
+        for i in 0..fs_len {
+            fs_array[i] = fragment_shader[i];
+        }
         self.pipelines.push((id, vs_array, fs_array));
         Ok(id)
     }
@@ -223,4 +258,3 @@ impl RenderPipeline for SimpleRenderPipeline {
         Ok(())
     }
 }
-

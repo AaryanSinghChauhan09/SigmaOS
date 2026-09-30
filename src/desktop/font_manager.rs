@@ -187,7 +187,7 @@ mod tests {
         assert!(xml.contains("<bool>true</bool>"));
         assert!(xml.contains("<const>hintslight</const>"));
     }
-    
+
     #[test]
     fn test_emoji_support() {
         let conf = EmojiSupport::configure_priority();

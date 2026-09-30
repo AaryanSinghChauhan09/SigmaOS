@@ -49,41 +49,41 @@ pub struct Transaction {
 /// Supported Linux & BSD Universal Foreign Package Formats
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum UniversalPackageFormat {
-    DebianDeb,      // .deb (APT/dpkg)
-    ArchPacman,     // .pkg.tar.zst (pacman)
-    FedoraRpm,      // .rpm (dnf/rpm)
-    AlpineApk,      // .apk (apk)
-    GentooEbuild,   // .ebuild (portage)
-    VoidXbps,       // .xbps (xbps)
-    FreeBsdPkg,     // .txz / .pkg (pkg)
-    OpenBsdPkg,     // .tgz / .pkg (OpenBSD pkg_add)
-    NetBsdPkgsrc,   // .tgz / .tgz (NetBSD pkgsrc)
-    SlackwarePkg,   // .txz / .tgz (Slackware installpkg)
-    NixDerivation,  // .nix / .drv (NixOS store derivation)
-    GuixPackage,    // .scm (GNU Guix package scheme)
-    HaikuHpkg,      // .hpkg (Haiku package format)
-    SolusEopkg,     // .eopkg / .pisi (Solus eopkg)
-    OpenWrtIpk,     // .ipk / .opkg (OpenWrt opkg)
-    TinyCoreTcz,    // .tcz / .sfs (TinyCore Linux)
-    ChimeraCports,  // .cports (Chimera Linux)
-    MacOsBottle,    // .bottle (Homebrew macOS/Linux)
-    IosIpa,         // .ipa (iOS app bundle)
-    AndroidAab,     // .aab / .apk (Android App Bundle / APK)
-    HarmonyHap,     // .hap (OpenHarmony HAP package)
-    FlatpakBundle,  // .flatpak
-    SnapPackage,    // .snap
-    AppImageBinary, // .AppImage
-    SwupdClear,     // .swupd
-    StarlingFormat, // .starling
-    MageiaUrpmi,    // .urpmi (urpmi)
-    PardusPisi,     // .pisi (PiSi)
-    PuppyPet,       // .pet (Puppy Linux)
-    SlaxLzm,        // .lzm (Slax)
-    CruxPkg,        // .crux.tar.gz (CRUX pkgadd)
-    DragonFlyDports,// .dports (DragonFly BSD DPorts)
-    BedrockStratum, // .stratum (Bedrock Linux)
-    SpackHpc,       // .spack (Spack HPC)
-    ConanCpp,       // .conan (Conan C++)
+    DebianDeb,       // .deb (APT/dpkg)
+    ArchPacman,      // .pkg.tar.zst (pacman)
+    FedoraRpm,       // .rpm (dnf/rpm)
+    AlpineApk,       // .apk (apk)
+    GentooEbuild,    // .ebuild (portage)
+    VoidXbps,        // .xbps (xbps)
+    FreeBsdPkg,      // .txz / .pkg (pkg)
+    OpenBsdPkg,      // .tgz / .pkg (OpenBSD pkg_add)
+    NetBsdPkgsrc,    // .tgz / .tgz (NetBSD pkgsrc)
+    SlackwarePkg,    // .txz / .tgz (Slackware installpkg)
+    NixDerivation,   // .nix / .drv (NixOS store derivation)
+    GuixPackage,     // .scm (GNU Guix package scheme)
+    HaikuHpkg,       // .hpkg (Haiku package format)
+    SolusEopkg,      // .eopkg / .pisi (Solus eopkg)
+    OpenWrtIpk,      // .ipk / .opkg (OpenWrt opkg)
+    TinyCoreTcz,     // .tcz / .sfs (TinyCore Linux)
+    ChimeraCports,   // .cports (Chimera Linux)
+    MacOsBottle,     // .bottle (Homebrew macOS/Linux)
+    IosIpa,          // .ipa (iOS app bundle)
+    AndroidAab,      // .aab / .apk (Android App Bundle / APK)
+    HarmonyHap,      // .hap (OpenHarmony HAP package)
+    FlatpakBundle,   // .flatpak
+    SnapPackage,     // .snap
+    AppImageBinary,  // .AppImage
+    SwupdClear,      // .swupd
+    StarlingFormat,  // .starling
+    MageiaUrpmi,     // .urpmi (urpmi)
+    PardusPisi,      // .pisi (PiSi)
+    PuppyPet,        // .pet (Puppy Linux)
+    SlaxLzm,         // .lzm (Slax)
+    CruxPkg,         // .crux.tar.gz (CRUX pkgadd)
+    DragonFlyDports, // .dports (DragonFly BSD DPorts)
+    BedrockStratum,  // .stratum (Bedrock Linux)
+    SpackHpc,        // .spack (Spack HPC)
+    ConanCpp,        // .conan (Conan C++)
 }
 
 /// Importer/Converter engine mapping foreign Linux/BSD packages into SigmaPkg native representation
@@ -175,48 +175,116 @@ impl UniversalPackageImporter {
             .to_string();
 
         let (license, raw_deps) = match format {
-            UniversalPackageFormat::DebianDeb => ("GPL-3.0-or-later", vec!["libc6".to_string(), "libssl-dev".to_string()]),
-            UniversalPackageFormat::ArchPacman => ("MIT", vec!["glibc".to_string(), "openssl".to_string()]),
-            UniversalPackageFormat::FedoraRpm => {
-                ("GPLv2+", vec!["glibc".to_string(), "bash".to_string(), "openssl-devel".to_string()])
+            UniversalPackageFormat::DebianDeb => (
+                "GPL-3.0-or-later",
+                vec!["libc6".to_string(), "libssl-dev".to_string()],
+            ),
+            UniversalPackageFormat::ArchPacman => {
+                ("MIT", vec!["glibc".to_string(), "openssl".to_string()])
             }
-            UniversalPackageFormat::AlpineApk => ("MIT/GPL-2.0", vec!["musl".to_string(), "openssl-dev".to_string()]),
-            UniversalPackageFormat::GentooEbuild => ("GPL-2.0-or-later", vec!["sys-libs/glibc".to_string(), "dev-libs/openssl".to_string()]),
-            UniversalPackageFormat::VoidXbps => ("BSD-2-Clause", vec!["libc6".to_string(), "libssl-dev".to_string()]),
-            UniversalPackageFormat::FreeBsdPkg => {
-                ("BSD-2-Clause", vec!["freebsd-runtime".to_string(), "security/openssl".to_string()])
+            UniversalPackageFormat::FedoraRpm => (
+                "GPLv2+",
+                vec![
+                    "glibc".to_string(),
+                    "bash".to_string(),
+                    "openssl-devel".to_string(),
+                ],
+            ),
+            UniversalPackageFormat::AlpineApk => (
+                "MIT/GPL-2.0",
+                vec!["musl".to_string(), "openssl-dev".to_string()],
+            ),
+            UniversalPackageFormat::GentooEbuild => (
+                "GPL-2.0-or-later",
+                vec!["sys-libs/glibc".to_string(), "dev-libs/openssl".to_string()],
+            ),
+            UniversalPackageFormat::VoidXbps => (
+                "BSD-2-Clause",
+                vec!["libc6".to_string(), "libssl-dev".to_string()],
+            ),
+            UniversalPackageFormat::FreeBsdPkg => (
+                "BSD-2-Clause",
+                vec![
+                    "freebsd-runtime".to_string(),
+                    "security/openssl".to_string(),
+                ],
+            ),
+            UniversalPackageFormat::OpenBsdPkg => (
+                "ISC/BSD",
+                vec!["openbsd-sys".to_string(), "security/openssl".to_string()],
+            ),
+            UniversalPackageFormat::NetBsdPkgsrc => (
+                "BSD-3-Clause",
+                vec!["pkgsrc-core".to_string(), "security/openssl".to_string()],
+            ),
+            UniversalPackageFormat::SlackwarePkg => {
+                ("GPL", vec!["slack-base".to_string(), "openssl".to_string()])
             }
-            UniversalPackageFormat::OpenBsdPkg => ("ISC/BSD", vec!["openbsd-sys".to_string(), "security/openssl".to_string()]),
-            UniversalPackageFormat::NetBsdPkgsrc => {
-                ("BSD-3-Clause", vec!["pkgsrc-core".to_string(), "security/openssl".to_string()])
-            }
-            UniversalPackageFormat::SlackwarePkg => ("GPL", vec!["slack-base".to_string(), "openssl".to_string()]),
-            UniversalPackageFormat::NixDerivation => {
-                ("MIT/Apache-2.0", vec!["nix-store".to_string(), "openssl.dev".to_string()])
-            }
-            UniversalPackageFormat::GuixPackage => ("GPL-3.0+", vec!["guix-daemon".to_string(), "openssl".to_string()]),
-            UniversalPackageFormat::HaikuHpkg => ("MIT", vec!["haiku-libroot".to_string(), "openssl".to_string()]),
-            UniversalPackageFormat::FlatpakBundle => ("LGPL-2.1+", vec!["glibc".to_string(), "openssl".to_string()]),
-            UniversalPackageFormat::SnapPackage => ("GPL-3.0+", vec!["libc6".to_string(), "libssl-dev".to_string()]),
+            UniversalPackageFormat::NixDerivation => (
+                "MIT/Apache-2.0",
+                vec!["nix-store".to_string(), "openssl.dev".to_string()],
+            ),
+            UniversalPackageFormat::GuixPackage => (
+                "GPL-3.0+",
+                vec!["guix-daemon".to_string(), "openssl".to_string()],
+            ),
+            UniversalPackageFormat::HaikuHpkg => (
+                "MIT",
+                vec!["haiku-libroot".to_string(), "openssl".to_string()],
+            ),
+            UniversalPackageFormat::FlatpakBundle => (
+                "LGPL-2.1+",
+                vec!["glibc".to_string(), "openssl".to_string()],
+            ),
+            UniversalPackageFormat::SnapPackage => (
+                "GPL-3.0+",
+                vec!["libc6".to_string(), "libssl-dev".to_string()],
+            ),
             UniversalPackageFormat::AppImageBinary => ("MIT", vec!["glibc".to_string()]),
-            UniversalPackageFormat::SolusEopkg => ("GPL-2.0-only", vec!["glibc".to_string(), "openssl".to_string()]),
-            UniversalPackageFormat::OpenWrtIpk => ("GPL-2.0-only", vec!["musl".to_string(), "libustream-openssl".to_string()]),
-            UniversalPackageFormat::TinyCoreTcz => ("GPL-2.0-only", vec!["glibc".to_string(), "openssl".to_string()]),
-            UniversalPackageFormat::ChimeraCports => ("BSD-2-Clause", vec!["musl".to_string(), "openssl".to_string()]),
+            UniversalPackageFormat::SolusEopkg => (
+                "GPL-2.0-only",
+                vec!["glibc".to_string(), "openssl".to_string()],
+            ),
+            UniversalPackageFormat::OpenWrtIpk => (
+                "GPL-2.0-only",
+                vec!["musl".to_string(), "libustream-openssl".to_string()],
+            ),
+            UniversalPackageFormat::TinyCoreTcz => (
+                "GPL-2.0-only",
+                vec!["glibc".to_string(), "openssl".to_string()],
+            ),
+            UniversalPackageFormat::ChimeraCports => (
+                "BSD-2-Clause",
+                vec!["musl".to_string(), "openssl".to_string()],
+            ),
             UniversalPackageFormat::MacOsBottle => ("BSD-2-Clause", vec!["openssl".to_string()]),
             UniversalPackageFormat::IosIpa => ("Proprietary", vec![]),
             UniversalPackageFormat::AndroidAab => ("Apache-2.0", vec![]),
             UniversalPackageFormat::HarmonyHap => ("Apache-2.0", vec![]),
             UniversalPackageFormat::SwupdClear => ("Apache-2.0", vec!["glibc".to_string()]),
             UniversalPackageFormat::StarlingFormat => ("MIT", vec!["glibc".to_string()]),
-            UniversalPackageFormat::MageiaUrpmi => ("GPLv3+", vec!["glibc".to_string(), "libssl-devel".to_string()]),
-            UniversalPackageFormat::PardusPisi => ("GPLv2", vec!["glibc".to_string(), "openssl".to_string()]),
+            UniversalPackageFormat::MageiaUrpmi => (
+                "GPLv3+",
+                vec!["glibc".to_string(), "libssl-devel".to_string()],
+            ),
+            UniversalPackageFormat::PardusPisi => {
+                ("GPLv2", vec!["glibc".to_string(), "openssl".to_string()])
+            }
             UniversalPackageFormat::PuppyPet => ("GPL", vec!["glibc".to_string()]),
             UniversalPackageFormat::SlaxLzm => ("GPL", vec!["glibc".to_string()]),
             UniversalPackageFormat::CruxPkg => ("BSD-2-Clause", vec!["glibc".to_string()]),
-            UniversalPackageFormat::DragonFlyDports => ("BSD-2-Clause", vec!["dragonfly-runtime".to_string(), "security/openssl".to_string()]),
+            UniversalPackageFormat::DragonFlyDports => (
+                "BSD-2-Clause",
+                vec![
+                    "dragonfly-runtime".to_string(),
+                    "security/openssl".to_string(),
+                ],
+            ),
             UniversalPackageFormat::BedrockStratum => ("MIT", vec!["bedrock-core".to_string()]),
-            UniversalPackageFormat::SpackHpc => ("Apache-2.0", vec!["spack-runtime".to_string(), "openmpi".to_string()]),
+            UniversalPackageFormat::SpackHpc => (
+                "Apache-2.0",
+                vec!["spack-runtime".to_string(), "openmpi".to_string()],
+            ),
             UniversalPackageFormat::ConanCpp => ("MIT", vec!["conan-center".to_string()]),
         };
 
@@ -228,7 +296,10 @@ impl UniversalPackageImporter {
             description: format!("Imported {:?} package '{}'", format, pkg_name),
             dependencies: translated_deps,
             conflicts: vec![],
-            provides: vec![pkg_name.clone(), format!("foreign-compat-{:?}", format).to_lowercase()],
+            provides: vec![
+                pkg_name.clone(),
+                format!("foreign-compat-{:?}", format).to_lowercase(),
+            ],
             size: 10_000_000,
             installed_size: 25_000_000,
             url: Some(format!("file://{}", filename)),
@@ -258,7 +329,8 @@ impl UniversalPackageImporter {
                         "Description" => description = val.to_string(),
                         "Depends" => {
                             for dep in val.split(',') {
-                                let clean = dep.trim().split_whitespace().next().unwrap_or(dep.trim());
+                                let clean =
+                                    dep.trim().split_whitespace().next().unwrap_or(dep.trim());
                                 if !clean.is_empty() {
                                     raw_deps.push(clean.to_string());
                                 }
@@ -272,19 +344,45 @@ impl UniversalPackageImporter {
             for line in text.lines() {
                 let trimmed = line.trim();
                 if trimmed.starts_with("pkgname=") || trimmed.starts_with("pkgname ") {
-                    name = trimmed.split('=').last().unwrap_or(trimmed).trim_matches(|c| c == '\'' || c == '"' || c == ' ').to_string();
+                    name = trimmed
+                        .split('=')
+                        .last()
+                        .unwrap_or(trimmed)
+                        .trim_matches(|c| c == '\'' || c == '"' || c == ' ')
+                        .to_string();
                 } else if trimmed.starts_with("pkgver=") || trimmed.starts_with("pkgver ") {
-                    version = trimmed.split('=').last().unwrap_or(trimmed).trim_matches(|c| c == '\'' || c == '"' || c == ' ').to_string();
+                    version = trimmed
+                        .split('=')
+                        .last()
+                        .unwrap_or(trimmed)
+                        .trim_matches(|c| c == '\'' || c == '"' || c == ' ')
+                        .to_string();
                 } else if trimmed.starts_with("pkgdesc=") || trimmed.starts_with("pkgdesc ") {
-                    description = trimmed.split('=').last().unwrap_or(trimmed).trim_matches(|c| c == '\'' || c == '"' || c == ' ').to_string();
-                } else if trimmed.starts_with("depends=") || trimmed.starts_with("depend =") || trimmed.starts_with("depend=") {
-                    let val = trimmed.split('=').last().unwrap_or(trimmed).trim_matches(|c| c == '(' || c == ')' || c == '\'' || c == '"' || c == ' ');
+                    description = trimmed
+                        .split('=')
+                        .last()
+                        .unwrap_or(trimmed)
+                        .trim_matches(|c| c == '\'' || c == '"' || c == ' ')
+                        .to_string();
+                } else if trimmed.starts_with("depends=")
+                    || trimmed.starts_with("depend =")
+                    || trimmed.starts_with("depend=")
+                {
+                    let val = trimmed
+                        .split('=')
+                        .last()
+                        .unwrap_or(trimmed)
+                        .trim_matches(|c| {
+                            c == '(' || c == ')' || c == '\'' || c == '"' || c == ' '
+                        });
                     for dep in val.split_whitespace() {
                         raw_deps.push(dep.trim_matches(|c| c == '\'' || c == '"').to_string());
                     }
                 }
             }
-        } else if (text.contains("Name:") && text.contains("Version:")) || filename.ends_with(".spec") {
+        } else if (text.contains("Name:") && text.contains("Version:"))
+            || filename.ends_with(".spec")
+        {
             for line in text.lines() {
                 let trimmed = line.trim();
                 if let Some(pos) = trimmed.find(':') {
@@ -331,9 +429,15 @@ impl UniversalPackageImporter {
             for line in text.lines() {
                 let trimmed = line.trim();
                 if trimmed.starts_with("DESCRIPTION=") {
-                    description = trimmed["DESCRIPTION=".len()..].trim_matches(|c| c == '"' || c == '\'').to_string();
+                    description = trimmed["DESCRIPTION=".len()..]
+                        .trim_matches(|c| c == '"' || c == '\'')
+                        .to_string();
                 } else if trimmed.starts_with("RDEPEND=") || trimmed.starts_with("DEPEND=") {
-                    let val = trimmed.split('=').last().unwrap_or(trimmed).trim_matches(|c| c == '"' || c == '\'');
+                    let val = trimmed
+                        .split('=')
+                        .last()
+                        .unwrap_or(trimmed)
+                        .trim_matches(|c| c == '"' || c == '\'');
                     for dep in val.split_whitespace() {
                         let clean = dep.trim_matches(|c| c == '"' || c == '\'');
                         if !clean.is_empty() && !clean.starts_with('!') {
@@ -347,7 +451,9 @@ impl UniversalPackageImporter {
                 let trimmed = line.trim();
                 if let Some(pos) = trimmed.find('=') {
                     let key = trimmed[..pos].trim();
-                    let val = trimmed[pos + 1..].trim().trim_matches(|c| c == '"' || c == '\'');
+                    let val = trimmed[pos + 1..]
+                        .trim()
+                        .trim_matches(|c| c == '"' || c == '\'');
                     match key {
                         "pkgname" => name = val.to_string(),
                         "version" => version = val.to_string(),
@@ -366,7 +472,9 @@ impl UniversalPackageImporter {
                 let trimmed = line.trim();
                 if let Some(pos) = trimmed.find(':') {
                     let key = trimmed[..pos].trim();
-                    let val = trimmed[pos + 1..].trim().trim_matches(|c| c == '"' || c == '\'' || c == ',');
+                    let val = trimmed[pos + 1..]
+                        .trim()
+                        .trim_matches(|c| c == '"' || c == '\'' || c == ',');
                     match key {
                         "name" => name = val.to_string(),
                         "version" => version = val.to_string(),
@@ -436,21 +544,75 @@ impl UniversalPackageImporter {
             .iter()
             .map(|dep| {
                 let dep_lower = dep.to_lowercase();
-                if dep_lower.contains("ssl") || dep_lower.contains("crypto") || dep_lower.contains("gnutls") || dep_lower.contains("mbedtls") {
+                if dep_lower.contains("ssl")
+                    || dep_lower.contains("crypto")
+                    || dep_lower.contains("gnutls")
+                    || dep_lower.contains("mbedtls")
+                {
                     "sovereign-openssl".to_string()
-                } else if dep_lower.contains("libc") || dep_lower == "musl" || dep_lower.contains("glibc") || dep_lower.contains("freebsd-runtime") || dep_lower.contains("openbsd-sys") || dep_lower.contains("dragonfly-runtime") || dep_lower.contains("bedrock-core") || dep_lower.contains("haiku-libroot") || dep_lower.contains("pkgsrc-core") {
+                } else if dep_lower.contains("libc")
+                    || dep_lower == "musl"
+                    || dep_lower.contains("glibc")
+                    || dep_lower.contains("freebsd-runtime")
+                    || dep_lower.contains("openbsd-sys")
+                    || dep_lower.contains("dragonfly-runtime")
+                    || dep_lower.contains("bedrock-core")
+                    || dep_lower.contains("haiku-libroot")
+                    || dep_lower.contains("pkgsrc-core")
+                {
                     "sovereign-libc".to_string()
-                } else if dep_lower.contains("zlib") || dep_lower.contains("zstd") || dep_lower.contains("lz4") || dep_lower.contains("xz") || dep_lower.contains("bzip2") || dep_lower.contains("brotli") {
+                } else if dep_lower.contains("zlib")
+                    || dep_lower.contains("zstd")
+                    || dep_lower.contains("lz4")
+                    || dep_lower.contains("xz")
+                    || dep_lower.contains("bzip2")
+                    || dep_lower.contains("brotli")
+                {
                     "sovereign-compression".to_string()
-                } else if dep_lower.contains("python") || dep_lower.contains("perl") || dep_lower.contains("ruby") || dep_lower.contains("node") || dep_lower.contains("golang") || dep_lower.contains("rust") || dep_lower.contains("java") {
+                } else if dep_lower.contains("python")
+                    || dep_lower.contains("perl")
+                    || dep_lower.contains("ruby")
+                    || dep_lower.contains("node")
+                    || dep_lower.contains("golang")
+                    || dep_lower.contains("rust")
+                    || dep_lower.contains("java")
+                {
                     "sovereign-runtime".to_string()
-                } else if dep_lower == "bash" || dep_lower == "zsh" || dep_lower == "fish" || dep_lower == "sh" || dep_lower == "ksh" || dep_lower == "tcsh" {
+                } else if dep_lower == "bash"
+                    || dep_lower == "zsh"
+                    || dep_lower == "fish"
+                    || dep_lower == "sh"
+                    || dep_lower == "ksh"
+                    || dep_lower == "tcsh"
+                {
                     "sovereign-shell".to_string()
-                } else if dep_lower.contains("systemd") || dep_lower.contains("openrc") || dep_lower.contains("runit") || dep_lower.contains("sysvinit") || dep_lower.contains("s6") || dep_lower.contains("dinit") {
+                } else if dep_lower.contains("systemd")
+                    || dep_lower.contains("openrc")
+                    || dep_lower.contains("runit")
+                    || dep_lower.contains("sysvinit")
+                    || dep_lower.contains("s6")
+                    || dep_lower.contains("dinit")
+                {
                     "sovereign-init".to_string()
-                } else if dep_lower.contains("wayland") || dep_lower.contains("x11") || dep_lower.contains("mesa") || dep_lower.contains("vulkan") || dep_lower.contains("pipewire") || dep_lower.contains("pulseaudio") || dep_lower.contains("alsa") || dep_lower.contains("ffmpeg") {
+                } else if dep_lower.contains("wayland")
+                    || dep_lower.contains("x11")
+                    || dep_lower.contains("mesa")
+                    || dep_lower.contains("vulkan")
+                    || dep_lower.contains("pipewire")
+                    || dep_lower.contains("pulseaudio")
+                    || dep_lower.contains("alsa")
+                    || dep_lower.contains("ffmpeg")
+                {
                     "sovereign-media-graphics".to_string()
-                } else if dep_lower.contains("gcc") || dep_lower.contains("clang") || dep_lower.contains("llvm") || dep_lower.contains("binutils") || dep_lower.contains("make") || dep_lower.contains("cmake") || dep_lower.contains("ninja") || dep_lower.contains("meson") {
+                } else if dep_lower.contains("gcc")
+                    || dep_lower.contains("clang")
+                    || dep_lower.contains("llvm")
+                    || dep_lower.contains("binutils")
+                    || dep_lower.contains("make")
+                    || dep_lower.contains("cmake")
+                    || dep_lower.contains("ninja")
+                    || dep_lower.contains("meson")
+                {
                     "sovereign-toolchain".to_string()
                 } else {
                     dep.clone()
@@ -482,7 +644,10 @@ impl ForeignRepoIndexParser {
                                 name: current_name.clone(),
                                 version: current_ver.clone(),
                                 description: current_desc.clone(),
-                                dependencies: UniversalPackageImporter::translate_foreign_dependencies(&current_deps),
+                                dependencies:
+                                    UniversalPackageImporter::translate_foreign_dependencies(
+                                        &current_deps,
+                                    ),
                                 conflicts: vec![],
                                 provides: vec![current_name.clone()],
                                 size: 5_000_000,
@@ -510,7 +675,8 @@ impl ForeignRepoIndexParser {
                             "Description" => current_desc = val.to_string(),
                             "Depends" => {
                                 for dep in val.split(',') {
-                                    let clean_dep = dep.trim().split_whitespace().next().unwrap_or(dep.trim());
+                                    let clean_dep =
+                                        dep.trim().split_whitespace().next().unwrap_or(dep.trim());
                                     if !clean_dep.is_empty() {
                                         current_deps.push(clean_dep.to_string());
                                     }
@@ -535,7 +701,10 @@ impl ForeignRepoIndexParser {
                                 name: current_name.clone(),
                                 version: current_ver.clone(),
                                 description: current_desc.clone(),
-                                dependencies: UniversalPackageImporter::translate_foreign_dependencies(&current_deps),
+                                dependencies:
+                                    UniversalPackageImporter::translate_foreign_dependencies(
+                                        &current_deps,
+                                    ),
                                 conflicts: vec![],
                                 provides: vec![current_name.clone()],
                                 size: 2_000_000,
@@ -578,12 +747,22 @@ impl ForeignRepoIndexParser {
                     let trimmed = line.trim();
                     if trimmed.starts_with('%') && trimmed.ends_with('%') {
                         let new_sec = &trimmed[1..trimmed.len() - 1];
-                        if (new_sec == "FILENAME" || new_sec == "NAME") && !current_name.is_empty() && (!current_ver.is_empty() || !current_desc.is_empty()) {
+                        if (new_sec == "FILENAME" || new_sec == "NAME")
+                            && !current_name.is_empty()
+                            && (!current_ver.is_empty() || !current_desc.is_empty())
+                        {
                             packages.push(Package {
                                 name: current_name.clone(),
-                                version: if current_ver.is_empty() { "1.0.0".to_string() } else { current_ver.clone() },
+                                version: if current_ver.is_empty() {
+                                    "1.0.0".to_string()
+                                } else {
+                                    current_ver.clone()
+                                },
                                 description: current_desc.clone(),
-                                dependencies: UniversalPackageImporter::translate_foreign_dependencies(&current_deps),
+                                dependencies:
+                                    UniversalPackageImporter::translate_foreign_dependencies(
+                                        &current_deps,
+                                    ),
                                 conflicts: vec![],
                                 provides: vec![current_name.clone()],
                                 size: 4_000_000,
@@ -610,16 +789,32 @@ impl ForeignRepoIndexParser {
                         "NAME" => current_name = trimmed.to_string(),
                         "VERSION" => current_ver = trimmed.to_string(),
                         "DESC" => current_desc = trimmed.to_string(),
-                        "DEPENDS" => current_deps.push(trimmed.split('>').next().unwrap_or(trimmed).split('=').next().unwrap_or(trimmed).trim().to_string()),
+                        "DEPENDS" => current_deps.push(
+                            trimmed
+                                .split('>')
+                                .next()
+                                .unwrap_or(trimmed)
+                                .split('=')
+                                .next()
+                                .unwrap_or(trimmed)
+                                .trim()
+                                .to_string(),
+                        ),
                         _ => {}
                     }
                 }
                 if !current_name.is_empty() {
                     packages.push(Package {
                         name: current_name.clone(),
-                        version: if current_ver.is_empty() { "1.0.0".to_string() } else { current_ver },
+                        version: if current_ver.is_empty() {
+                            "1.0.0".to_string()
+                        } else {
+                            current_ver
+                        },
                         description: current_desc,
-                        dependencies: UniversalPackageImporter::translate_foreign_dependencies(&current_deps),
+                        dependencies: UniversalPackageImporter::translate_foreign_dependencies(
+                            &current_deps,
+                        ),
                         conflicts: vec![],
                         provides: vec![current_name.clone()],
                         size: 4_000_000,
@@ -641,7 +836,9 @@ impl ForeignRepoIndexParser {
                 for line in raw_index.lines() {
                     let trimmed = line.trim();
                     if trimmed.contains("<name>") && trimmed.contains("</name>") {
-                        if let (Some(s), Some(e)) = (trimmed.find("<name>"), trimmed.find("</name>")) {
+                        if let (Some(s), Some(e)) =
+                            (trimmed.find("<name>"), trimmed.find("</name>"))
+                        {
                             current_name = trimmed[s + 6..e].to_string();
                         }
                     } else if trimmed.contains("ver=\"") {
@@ -652,7 +849,9 @@ impl ForeignRepoIndexParser {
                             }
                         }
                     } else if trimmed.contains("<summary>") && trimmed.contains("</summary>") {
-                        if let (Some(s), Some(e)) = (trimmed.find("<summary>"), trimmed.find("</summary>")) {
+                        if let (Some(s), Some(e)) =
+                            (trimmed.find("<summary>"), trimmed.find("</summary>"))
+                        {
                             current_desc = trimmed[s + 9..e].to_string();
                         }
                     } else if trimmed.contains("<entry name=\"") {
@@ -666,9 +865,16 @@ impl ForeignRepoIndexParser {
                         if !current_name.is_empty() {
                             packages.push(Package {
                                 name: current_name.clone(),
-                                version: if current_ver.is_empty() { "1.0.0".to_string() } else { current_ver.clone() },
+                                version: if current_ver.is_empty() {
+                                    "1.0.0".to_string()
+                                } else {
+                                    current_ver.clone()
+                                },
                                 description: current_desc.clone(),
-                                dependencies: UniversalPackageImporter::translate_foreign_dependencies(&current_deps),
+                                dependencies:
+                                    UniversalPackageImporter::translate_foreign_dependencies(
+                                        &current_deps,
+                                    ),
                                 conflicts: vec![],
                                 provides: vec![current_name.clone()],
                                 size: 6_000_000,
@@ -701,7 +907,10 @@ impl ForeignRepoIndexParser {
                                 name: current_name.clone(),
                                 version: current_ver.clone(),
                                 description: current_desc.clone(),
-                                dependencies: UniversalPackageImporter::translate_foreign_dependencies(&current_deps),
+                                dependencies:
+                                    UniversalPackageImporter::translate_foreign_dependencies(
+                                        &current_deps,
+                                    ),
                                 conflicts: vec![],
                                 provides: vec![current_name.clone()],
                                 size: 3_000_000,
@@ -749,9 +958,16 @@ impl ForeignRepoIndexParser {
                         if !current_name.is_empty() {
                             packages.push(Package {
                                 name: current_name.clone(),
-                                version: if current_ver.is_empty() { "1.0.0".to_string() } else { current_ver.clone() },
+                                version: if current_ver.is_empty() {
+                                    "1.0.0".to_string()
+                                } else {
+                                    current_ver.clone()
+                                },
                                 description: current_desc.clone(),
-                                dependencies: UniversalPackageImporter::translate_foreign_dependencies(&current_deps),
+                                dependencies:
+                                    UniversalPackageImporter::translate_foreign_dependencies(
+                                        &current_deps,
+                                    ),
                                 conflicts: vec![],
                                 provides: vec![current_name.clone()],
                                 size: 5_000_000,
@@ -772,15 +988,26 @@ impl ForeignRepoIndexParser {
 
                     if trimmed.starts_with("name:") || trimmed.starts_with("\"name\":") {
                         if let Some(pos) = trimmed.find(':') {
-                            current_name = trimmed[pos + 1..].trim().trim_matches(&['"', ',', ' '][..]).to_string();
+                            current_name = trimmed[pos + 1..]
+                                .trim()
+                                .trim_matches(&['"', ',', ' '][..])
+                                .to_string();
                         }
-                    } else if trimmed.starts_with("version:") || trimmed.starts_with("\"version\":") {
+                    } else if trimmed.starts_with("version:") || trimmed.starts_with("\"version\":")
+                    {
                         if let Some(pos) = trimmed.find(':') {
-                            current_ver = trimmed[pos + 1..].trim().trim_matches(&['"', ',', ' '][..]).to_string();
+                            current_ver = trimmed[pos + 1..]
+                                .trim()
+                                .trim_matches(&['"', ',', ' '][..])
+                                .to_string();
                         }
-                    } else if trimmed.starts_with("comment:") || trimmed.starts_with("\"comment\":") {
+                    } else if trimmed.starts_with("comment:") || trimmed.starts_with("\"comment\":")
+                    {
                         if let Some(pos) = trimmed.find(':') {
-                            current_desc = trimmed[pos + 1..].trim().trim_matches(&['"', ',', ' '][..]).to_string();
+                            current_desc = trimmed[pos + 1..]
+                                .trim()
+                                .trim_matches(&['"', ',', ' '][..])
+                                .to_string();
                         }
                     } else if trimmed.contains("origin") {
                         if let Some(pos) = trimmed.find(':') {
@@ -794,9 +1021,15 @@ impl ForeignRepoIndexParser {
                 if !current_name.is_empty() {
                     packages.push(Package {
                         name: current_name.clone(),
-                        version: if current_ver.is_empty() { "1.0.0".to_string() } else { current_ver },
+                        version: if current_ver.is_empty() {
+                            "1.0.0".to_string()
+                        } else {
+                            current_ver
+                        },
                         description: current_desc,
-                        dependencies: UniversalPackageImporter::translate_foreign_dependencies(&current_deps),
+                        dependencies: UniversalPackageImporter::translate_foreign_dependencies(
+                            &current_deps,
+                        ),
                         conflicts: vec![],
                         provides: vec![current_name.clone()],
                         size: 5_000_000,
@@ -821,9 +1054,16 @@ impl ForeignRepoIndexParser {
                         if !current_name.is_empty() {
                             packages.push(Package {
                                 name: current_name.clone(),
-                                version: if current_ver.is_empty() { "1.0.0".to_string() } else { current_ver.clone() },
+                                version: if current_ver.is_empty() {
+                                    "1.0.0".to_string()
+                                } else {
+                                    current_ver.clone()
+                                },
                                 description: current_desc.clone(),
-                                dependencies: UniversalPackageImporter::translate_foreign_dependencies(&current_deps),
+                                dependencies:
+                                    UniversalPackageImporter::translate_foreign_dependencies(
+                                        &current_deps,
+                                    ),
                                 conflicts: vec![],
                                 provides: vec![current_name.clone()],
                                 size: 3_000_000,
@@ -843,16 +1083,40 @@ impl ForeignRepoIndexParser {
                     }
 
                     if trimmed.starts_with("P:") || trimmed.starts_with("NAME=") {
-                        let val = trimmed.split('=').last().unwrap_or(trimmed).split(':').last().unwrap_or(trimmed).trim();
+                        let val = trimmed
+                            .split('=')
+                            .last()
+                            .unwrap_or(trimmed)
+                            .split(':')
+                            .last()
+                            .unwrap_or(trimmed)
+                            .trim();
                         current_name = val.to_string();
                     } else if trimmed.starts_with("V:") || trimmed.starts_with("VER=") {
-                        let val = trimmed.split('=').last().unwrap_or(trimmed).split(':').last().unwrap_or(trimmed).trim();
+                        let val = trimmed
+                            .split('=')
+                            .last()
+                            .unwrap_or(trimmed)
+                            .split(':')
+                            .last()
+                            .unwrap_or(trimmed)
+                            .trim();
                         current_ver = val.to_string();
                     } else if trimmed.starts_with("DESC=") || trimmed.starts_with("DESCRIPTION=") {
-                        let val = trimmed.split('=').last().unwrap_or(trimmed).trim_matches('"').trim_matches('\'');
+                        let val = trimmed
+                            .split('=')
+                            .last()
+                            .unwrap_or(trimmed)
+                            .trim_matches('"')
+                            .trim_matches('\'');
                         current_desc = val.to_string();
                     } else if trimmed.starts_with("RDEPEND=") || trimmed.starts_with("DEPEND=") {
-                        let val = trimmed.split('=').last().unwrap_or(trimmed).trim_matches('"').trim_matches('\'');
+                        let val = trimmed
+                            .split('=')
+                            .last()
+                            .unwrap_or(trimmed)
+                            .trim_matches('"')
+                            .trim_matches('\'');
                         for dep in val.split_whitespace() {
                             current_deps.push(dep.to_string());
                         }
@@ -861,9 +1125,15 @@ impl ForeignRepoIndexParser {
                 if !current_name.is_empty() {
                     packages.push(Package {
                         name: current_name.clone(),
-                        version: if current_ver.is_empty() { "1.0.0".to_string() } else { current_ver },
+                        version: if current_ver.is_empty() {
+                            "1.0.0".to_string()
+                        } else {
+                            current_ver
+                        },
                         description: current_desc,
-                        dependencies: UniversalPackageImporter::translate_foreign_dependencies(&current_deps),
+                        dependencies: UniversalPackageImporter::translate_foreign_dependencies(
+                            &current_deps,
+                        ),
                         conflicts: vec![],
                         provides: vec![current_name.clone()],
                         size: 3_000_000,
@@ -920,24 +1190,38 @@ pub struct SandboxedScriptletResult {
 }
 
 impl UniversalScriptletSandbox {
-    pub fn transpile_and_sandbox(format: UniversalPackageFormat, script_name: &str, raw_script: &str) -> SandboxedScriptletResult {
+    pub fn transpile_and_sandbox(
+        format: UniversalPackageFormat,
+        script_name: &str,
+        raw_script: &str,
+    ) -> SandboxedScriptletResult {
         let mut actions = Vec::new();
         let mut safe = true;
 
         for line in raw_script.lines() {
             let trimmed = line.trim();
-            if trimmed.contains("rm -rf /") || trimmed.contains("mkfs") || trimmed.contains("dd if=") {
+            if trimmed.contains("rm -rf /")
+                || trimmed.contains("mkfs")
+                || trimmed.contains("dd if=")
+            {
                 actions.push(SandboxActionType::BlockedDangerousCommand);
                 safe = false;
-            } else if trimmed.contains("useradd") || trimmed.contains("groupadd") || trimmed.contains("pw useradd") {
+            } else if trimmed.contains("useradd")
+                || trimmed.contains("groupadd")
+                || trimmed.contains("pw useradd")
+            {
                 actions.push(SandboxActionType::AddUserGroup);
             } else if trimmed.contains("mkdir -p") || trimmed.contains("install -d") {
                 actions.push(SandboxActionType::CreateDirectory);
             } else if trimmed.contains("ln -s") || trimmed.contains("ln -sf") {
                 actions.push(SandboxActionType::SymlinkBinary);
-            } else if trimmed.contains("gtk-update-icon-cache") || trimmed.contains("update-desktop-database") {
+            } else if trimmed.contains("gtk-update-icon-cache")
+                || trimmed.contains("update-desktop-database")
+            {
                 actions.push(SandboxActionType::UpdateIconCache);
-            } else if trimmed.contains("systemctl enable") || trimmed.contains("systemctl daemon-reload") {
+            } else if trimmed.contains("systemctl enable")
+                || trimmed.contains("systemctl daemon-reload")
+            {
                 actions.push(SandboxActionType::RegisterSystemdUnit);
             }
         }
@@ -1151,7 +1435,10 @@ impl SigmaPkg {
 
             for (name, package) in &repo.packages {
                 if name.to_lowercase().contains(query_lower.as_str())
-                    || package.description.to_lowercase().contains(query_lower.as_str())
+                    || package
+                        .description
+                        .to_lowercase()
+                        .contains(query_lower.as_str())
                 {
                     results.push(package);
                 }
@@ -1496,8 +1783,7 @@ impl SigmaPkg {
             "Successfully imported foreign manifest text for '{}' into Sigma-pkg universal engine.",
             pkg.name
         );
-        self.local_packages
-            .insert(pkg.name.clone(), pkg.clone());
+        self.local_packages.insert(pkg.name.clone(), pkg.clone());
         self.run_hooks("post_install", &pkg)?;
         Ok(pkg)
     }
@@ -1513,7 +1799,10 @@ impl SigmaPkg {
     }
 
     /// Import and perform full transactional installation of foreign package format with dependency resolution
-    pub fn import_and_install_foreign_package(&mut self, file_path: &str) -> Result<Package, String> {
+    pub fn import_and_install_foreign_package(
+        &mut self,
+        file_path: &str,
+    ) -> Result<Package, String> {
         let pkg = self.import_foreign_package(file_path)?;
         let mut missing_deps = Vec::new();
         for dep in &pkg.dependencies {
@@ -1551,9 +1840,18 @@ impl SigmaPkg {
         let foreign_repos = [
             ("apt-debian-main", "https://deb.debian.org/debian"),
             ("pacman-arch-extra", "https://archlinux.org/packages"),
-            ("dnf-fedora-updates", "https://mirrors.fedoraproject.org/metalink?repo=updates-released"),
-            ("apk-alpine-main", "https://dl-cdn.alpinelinux.org/alpine/v3.19/main"),
-            ("pkg-freebsd-ports", "https://pkg.freebsd.org/FreeBSD:14:amd64/quarterly"),
+            (
+                "dnf-fedora-updates",
+                "https://mirrors.fedoraproject.org/metalink?repo=updates-released",
+            ),
+            (
+                "apk-alpine-main",
+                "https://dl-cdn.alpinelinux.org/alpine/v3.19/main",
+            ),
+            (
+                "pkg-freebsd-ports",
+                "https://pkg.freebsd.org/FreeBSD:14:amd64/quarterly",
+            ),
         ];
 
         let mut count = 0;
@@ -1645,27 +1943,84 @@ impl SigmaPkg {
 
         for arg in args {
             if !action_explicitly_set {
-                if *arg == "install" || *arg == "add" || *arg == "it" || *arg == "in" || *arg == "get" || *arg == "b" || *arg == "build" {
+                if *arg == "install"
+                    || *arg == "add"
+                    || *arg == "it"
+                    || *arg == "in"
+                    || *arg == "get"
+                    || *arg == "b"
+                    || *arg == "build"
+                {
                     action = "install";
                 } else if *arg == "-S" {
-                    if args.contains(&"-s") || args.contains(&"-ss") || args.contains(&"-Ss") || args.contains(&"-Si") {
+                    if args.contains(&"-s")
+                        || args.contains(&"-ss")
+                        || args.contains(&"-Ss")
+                        || args.contains(&"-Si")
+                    {
                         action = "search";
-                    } else if args.contains(&"-u") || args.contains(&"-yyu") || args.contains(&"-yu") {
+                    } else if args.contains(&"-u")
+                        || args.contains(&"-yyu")
+                        || args.contains(&"-yu")
+                    {
                         action = "upgrade";
                     } else {
                         action = "install";
                     }
-                } else if *arg == "-Qi" || *arg == "-Si" || *arg == "info" || *arg == "show" || *arg == "status" {
+                } else if *arg == "-Qi"
+                    || *arg == "-Si"
+                    || *arg == "info"
+                    || *arg == "show"
+                    || *arg == "status"
+                {
                     action = "query_info";
-                } else if *arg == "remove" || *arg == "purge" || *arg == "-R" || *arg == "del" || *arg == "delete" || *arg == "rm" || *arg == "-C" || *arg == "--unmerge" || *arg == "erase" || *arg == "uninstall" || *arg == "deselect" {
+                } else if *arg == "remove"
+                    || *arg == "purge"
+                    || *arg == "-R"
+                    || *arg == "del"
+                    || *arg == "delete"
+                    || *arg == "rm"
+                    || *arg == "-C"
+                    || *arg == "--unmerge"
+                    || *arg == "erase"
+                    || *arg == "uninstall"
+                    || *arg == "deselect"
+                {
                     action = "remove";
-                } else if *arg == "update" || *arg == "upgrade" || *arg == "-Syu" || *arg == "-Syyu" || *arg == "up" || *arg == "dup" || *arg == "sync" || *arg == "@world" {
+                } else if *arg == "update"
+                    || *arg == "upgrade"
+                    || *arg == "-Syu"
+                    || *arg == "-Syyu"
+                    || *arg == "up"
+                    || *arg == "dup"
+                    || *arg == "sync"
+                    || *arg == "@world"
+                {
                     action = "upgrade";
                 } else if *arg == "search" || *arg == "-Ss" || *arg == "se" || *arg == "find" {
                     action = "search";
                 }
             }
-            if !arg.starts_with('-') && *arg != "install" && *arg != "remove" && *arg != "add" && *arg != "del" && *arg != "delete" && *arg != "purge" && *arg != "update" && *arg != "upgrade" && *arg != "search" && *arg != "find" && *arg != "show" && *arg != "info" && *arg != "it" && *arg != "in" && *arg != "rm" && *arg != "up" && *arg != "se" && *arg != "sr" {
+            if !arg.starts_with('-')
+                && *arg != "install"
+                && *arg != "remove"
+                && *arg != "add"
+                && *arg != "del"
+                && *arg != "delete"
+                && *arg != "purge"
+                && *arg != "update"
+                && *arg != "upgrade"
+                && *arg != "search"
+                && *arg != "find"
+                && *arg != "show"
+                && *arg != "info"
+                && *arg != "it"
+                && *arg != "in"
+                && *arg != "rm"
+                && *arg != "up"
+                && *arg != "se"
+                && *arg != "sr"
+            {
                 target_packages.push(arg.to_string());
             }
         }
@@ -1673,7 +2028,10 @@ impl SigmaPkg {
         match action {
             "install" => {
                 if target_packages.is_empty() {
-                    return Ok(format!("Dispatched {:?} command: No target packages specified", pm));
+                    return Ok(format!(
+                        "Dispatched {:?} command: No target packages specified",
+                        pm
+                    ));
                 }
                 let simulated_deps = vec!["sovereign-libc".to_string()];
                 if is_dry_run {
@@ -1728,7 +2086,10 @@ impl SigmaPkg {
                     ));
                 }
                 self.upgrade_system()?;
-                Ok(format!("Universal PM (via {}): System upgrade completed", pm))
+                Ok(format!(
+                    "Universal PM (via {}): System upgrade completed",
+                    pm
+                ))
             }
             "search" => {
                 let term = target_packages.first().cloned().unwrap_or_default();
@@ -1748,10 +2109,16 @@ impl SigmaPkg {
                         pm, pkg.name, pkg.version, pkg.description, pkg.dependencies
                     ))
                 } else {
-                    Ok(format!("Universal PM (via {}): Package '{}' not found", pm, term))
+                    Ok(format!(
+                        "Universal PM (via {}): Package '{}' not found",
+                        pm, term
+                    ))
                 }
             }
-            _ => Ok(format!("Universal PM (via {}): Dispatched command '{}'", pm, full_cmd)),
+            _ => Ok(format!(
+                "Universal PM (via {}): Dispatched command '{}'",
+                pm, full_cmd
+            )),
         }
     }
 }
@@ -1864,21 +2231,26 @@ mod tests {
     #[test]
     fn test_foreign_repo_index_parser() {
         let apt_index = "Package: curl\nVersion: 8.2.1\nDescription: Command line tool\nDepends: libc6, libssl3\n\nPackage: wget\nVersion: 1.21.3\nDescription: Network retriever\nDepends: libc6\n\n";
-        let pkgs = ForeignRepoIndexParser::parse_index(UniversalPackageFormat::DebianDeb, apt_index);
+        let pkgs =
+            ForeignRepoIndexParser::parse_index(UniversalPackageFormat::DebianDeb, apt_index);
         assert_eq!(pkgs.len(), 2);
         assert_eq!(pkgs[0].name, "curl");
         assert_eq!(pkgs[0].version, "8.2.1");
         assert!(pkgs[0].dependencies.contains(&"sovereign-libc".to_string()));
-        assert!(pkgs[0].dependencies.contains(&"sovereign-openssl".to_string()));
+        assert!(pkgs[0]
+            .dependencies
+            .contains(&"sovereign-openssl".to_string()));
 
         let apk_index = "P:musl\nV:1.2.4\nT:musl c library\nD:so:libc.musl\n\nP:zstd\nV:1.5.5\nT:fast compression\nD:musl\n\n";
-        let apk_pkgs = ForeignRepoIndexParser::parse_index(UniversalPackageFormat::AlpineApk, apk_index);
+        let apk_pkgs =
+            ForeignRepoIndexParser::parse_index(UniversalPackageFormat::AlpineApk, apk_index);
         assert_eq!(apk_pkgs.len(), 2);
         assert_eq!(apk_pkgs[0].name, "musl");
         assert_eq!(apk_pkgs[1].name, "zstd");
 
         let arch_desc = "%FILENAME%\nripgrep-13.0.0-1-x86_64.pkg.tar.zst\n\n%NAME%\nripgrep\n\n%VERSION%\n13.0.0-1\n\n%DESC%\nFast search tool\n\n%DEPENDS%\npcre2\n\n%FILENAME%\nfd-8.7.0-1-x86_64.pkg.tar.zst\n\n%NAME%\nfd\n\n%VERSION%\n8.7.0-1\n\n%DESC%\nSimple fast find alternative\n\n";
-        let arch_pkgs = ForeignRepoIndexParser::parse_index(UniversalPackageFormat::ArchPacman, arch_desc);
+        let arch_pkgs =
+            ForeignRepoIndexParser::parse_index(UniversalPackageFormat::ArchPacman, arch_desc);
         assert_eq!(arch_pkgs.len(), 2);
         assert_eq!(arch_pkgs[0].name, "ripgrep");
         assert_eq!(arch_pkgs[0].version, "13.0.0-1");
@@ -1886,16 +2258,20 @@ mod tests {
         assert_eq!(arch_pkgs[1].version, "8.7.0-1");
 
         let freebsd_index = "name: redis\nversion: 7.2.3\ncomment: Persistent key-value database\n\nname: nginx\nversion: 1.24.0\ncomment: HTTP server\n\n";
-        let freebsd_pkgs = ForeignRepoIndexParser::parse_index(UniversalPackageFormat::FreeBsdPkg, freebsd_index);
+        let freebsd_pkgs =
+            ForeignRepoIndexParser::parse_index(UniversalPackageFormat::FreeBsdPkg, freebsd_index);
         assert_eq!(freebsd_pkgs.len(), 2);
         assert_eq!(freebsd_pkgs[0].name, "redis");
         assert_eq!(freebsd_pkgs[1].name, "nginx");
 
         let xbps_index = "pkgname=neovim\nversion=0.9.5_1\nshort_desc=Fork of Vim focused on extensibility\nrun_depends=\"glibc>=2.30 libunibilium>=2.0\"\n\n";
-        let xbps_pkgs = ForeignRepoIndexParser::parse_index(UniversalPackageFormat::VoidXbps, xbps_index);
+        let xbps_pkgs =
+            ForeignRepoIndexParser::parse_index(UniversalPackageFormat::VoidXbps, xbps_index);
         assert_eq!(xbps_pkgs.len(), 1);
         assert_eq!(xbps_pkgs[0].name, "neovim");
-        assert!(xbps_pkgs[0].dependencies.contains(&"sovereign-libc".to_string()));
+        assert!(xbps_pkgs[0]
+            .dependencies
+            .contains(&"sovereign-libc".to_string()));
     }
 
     #[test]
@@ -1907,8 +2283,12 @@ mod tests {
             safe_script,
         );
         assert!(result.safe_execution);
-        assert!(result.actions_permitted.contains(&SandboxActionType::CreateDirectory));
-        assert!(result.actions_permitted.contains(&SandboxActionType::SymlinkBinary));
+        assert!(result
+            .actions_permitted
+            .contains(&SandboxActionType::CreateDirectory));
+        assert!(result
+            .actions_permitted
+            .contains(&SandboxActionType::SymlinkBinary));
 
         let dangerous_script = "#!/bin/sh\nrm -rf /\n";
         let dangerous_result = UniversalScriptletSandbox::transpile_and_sandbox(
@@ -1917,7 +2297,9 @@ mod tests {
             dangerous_script,
         );
         assert!(!dangerous_result.safe_execution);
-        assert!(dangerous_result.actions_permitted.contains(&SandboxActionType::BlockedDangerousCommand));
+        assert!(dangerous_result
+            .actions_permitted
+            .contains(&SandboxActionType::BlockedDangerousCommand));
     }
 
     #[test]
@@ -1998,51 +2380,77 @@ mod tests {
             database_dir: PathBuf::from("/tmp/sigma_db_cli_test"),
         };
 
-        let apt_res = pkg_mgr.execute_universal_cli_command("apt install nginx curl").unwrap();
+        let apt_res = pkg_mgr
+            .execute_universal_cli_command("apt install nginx curl")
+            .unwrap();
         assert!(apt_res.contains("nginx"));
         assert!(pkg_mgr.local_packages.contains_key("nginx"));
         assert!(pkg_mgr.local_packages.contains_key("curl"));
 
-        let pac_res = pkg_mgr.execute_universal_cli_command("pacman -R nginx").unwrap();
+        let pac_res = pkg_mgr
+            .execute_universal_cli_command("pacman -R nginx")
+            .unwrap();
         assert!(pac_res.contains("removed"));
         assert!(!pkg_mgr.local_packages.contains_key("nginx"));
 
-        let apk_res = pkg_mgr.execute_universal_cli_command("apk add musl-dev").unwrap();
+        let apk_res = pkg_mgr
+            .execute_universal_cli_command("apk add musl-dev")
+            .unwrap();
         assert!(apk_res.contains("musl-dev"));
         assert!(pkg_mgr.local_packages.contains_key("musl-dev"));
 
-        let dnf_res = pkg_mgr.execute_universal_cli_command("dnf install htop").unwrap();
+        let dnf_res = pkg_mgr
+            .execute_universal_cli_command("dnf install htop")
+            .unwrap();
         assert!(dnf_res.contains("htop"));
         assert!(pkg_mgr.local_packages.contains_key("htop"));
 
-        let xbps_res = pkg_mgr.execute_universal_cli_command("xbps-install -S zstd").unwrap();
+        let xbps_res = pkg_mgr
+            .execute_universal_cli_command("xbps-install -S zstd")
+            .unwrap();
         assert!(xbps_res.contains("zstd"));
         assert!(pkg_mgr.local_packages.contains_key("zstd"));
 
-        let freebsd_res = pkg_mgr.execute_universal_cli_command("pkg install redis").unwrap();
+        let freebsd_res = pkg_mgr
+            .execute_universal_cli_command("pkg install redis")
+            .unwrap();
         assert!(freebsd_res.contains("redis"));
         assert!(pkg_mgr.local_packages.contains_key("redis"));
 
-        let nix_res = pkg_mgr.execute_universal_cli_command("nix-env -iA nixpkgs.git").unwrap();
+        let nix_res = pkg_mgr
+            .execute_universal_cli_command("nix-env -iA nixpkgs.git")
+            .unwrap();
         assert!(nix_res.contains("nixpkgs.git"));
 
-        let xbps_query_res = pkg_mgr.execute_universal_cli_command("xbps-query -S zstd").unwrap();
+        let xbps_query_res = pkg_mgr
+            .execute_universal_cli_command("xbps-query -S zstd")
+            .unwrap();
         assert!(xbps_query_res.contains("Found"));
 
-        let pacman_search_res = pkg_mgr.execute_universal_cli_command("pacman -Ss nginx").unwrap();
+        let pacman_search_res = pkg_mgr
+            .execute_universal_cli_command("pacman -Ss nginx")
+            .unwrap();
         assert!(pacman_search_res.contains("Found"));
 
-        let apt_dry = pkg_mgr.execute_universal_cli_command("apt install firefox --dry-run").unwrap();
+        let apt_dry = pkg_mgr
+            .execute_universal_cli_command("apt install firefox --dry-run")
+            .unwrap();
         assert!(apt_dry.contains("DRY-RUN"));
         assert!(apt_dry.contains("firefox"));
 
-        let pac_dry = pkg_mgr.execute_universal_cli_command("pacman -Syu --print").unwrap();
+        let pac_dry = pkg_mgr
+            .execute_universal_cli_command("pacman -Syu --print")
+            .unwrap();
         assert!(pac_dry.contains("DRY-RUN"));
 
-        let emerge_dry = pkg_mgr.execute_universal_cli_command("emerge -pv portage").unwrap();
+        let emerge_dry = pkg_mgr
+            .execute_universal_cli_command("emerge -pv portage")
+            .unwrap();
         assert!(emerge_dry.contains("DRY-RUN"));
 
-        let info_res = pkg_mgr.execute_universal_cli_command("apt show musl-dev").unwrap();
+        let info_res = pkg_mgr
+            .execute_universal_cli_command("apt show musl-dev")
+            .unwrap();
         assert!(info_res.contains("musl-dev"));
     }
 
@@ -2062,8 +2470,12 @@ mod tests {
             .unwrap();
         assert_eq!(imported.name, "ripgrep");
         assert_eq!(imported.version, "13.0.0");
-        assert!(imported.dependencies.contains(&"sovereign-libc".to_string()));
-        assert!(imported.dependencies.contains(&"sovereign-openssl".to_string()));
+        assert!(imported
+            .dependencies
+            .contains(&"sovereign-libc".to_string()));
+        assert!(imported
+            .dependencies
+            .contains(&"sovereign-openssl".to_string()));
         assert!(pkg_mgr.local_packages.contains_key("ripgrep"));
 
         let apk_bytes = b"P:zstd\nV:1.5.5\nT:fast compression\nD:musl\n";
@@ -2072,7 +2484,9 @@ mod tests {
             .unwrap();
         assert_eq!(imported_apk.name, "zstd");
         assert_eq!(imported_apk.version, "1.5.5");
-        assert!(imported_apk.dependencies.contains(&"sovereign-libc".to_string()));
+        assert!(imported_apk
+            .dependencies
+            .contains(&"sovereign-libc".to_string()));
         assert!(pkg_mgr.local_packages.contains_key("zstd"));
     }
 }
