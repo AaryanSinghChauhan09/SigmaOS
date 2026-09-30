@@ -10,3 +10,5 @@ This master document details:
 2. **500+ Open-Source Repositories Absorption Catalog:** Comprehensive mapping of kernel, distros, build systems, desktop shells, and utilities into SigmaOS Rust subsystems.
 
 For full specifications, consult `SIGMAOS_MASTER_PLAN_TRI_AGENT_500_REPOS_ABSORPTION.md` and `docs/SIGMAOS_500_REPOS_TRI_AGENT_ABSORPTION_MASTER_PLAN.md`.
+
+These documents describe proposed roadmap items and inspirations; they do not claim those systems or capabilities are implemented in SigmaOS. Verify each component and its security boundaries before documenting it as available.

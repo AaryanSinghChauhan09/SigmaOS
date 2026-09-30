@@ -10,6 +10,8 @@
 
 **SigmaOS** is a sovereign, high-performance, security-hardened, and universally compatible operating system written in Rust and modern zero-dependency systems programming paradigms.
 
+> **Status and accuracy:** This file is a proposal and research roadmap, not evidence that SigmaOS already implements the listed capabilities or has absorbed the listed repositories. Treat each capability as planned until its code path, threat model, licensing, and verification are reviewed. Prefer design inspiration over copying third-party code, and describe prototype models as prototypes.
+
 This Master Specification establishes a unified framework with two core components:
 1. **The Tri-Agent Governance Framework:** Defining operational boundaries, daily workflows, PR standards, and persistent journal learning mechanisms for three autonomous engineering agents:
    - **Bolt** ⚡ (Performance & Speed Specialist)
