@@ -1,3 +1,4 @@
+#![allow(warnings, unused)]
 // Integration tests for Mount namespace implementation
 
 #[cfg(test)]
