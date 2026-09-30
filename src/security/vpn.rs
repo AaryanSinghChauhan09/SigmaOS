@@ -135,23 +135,7 @@ impl WireGuardHandler {
 
 impl VpnProtocolHandler for WireGuardHandler {
     fn connect(&mut self, _config: &VpnConfig) -> Result<VpnConnectionResult, VpnError> {
-        if self.state == ConnectionState::Connected {
-            return Err(VpnError::AlreadyConnected);
-        }
-
-        self.state = ConnectionState::Connecting;
-
-        let assigned_ip = Some(Ipv4Addr_new(10, 0, 0, 2));
-
-        self.state = ConnectionState::Connected;
-        self.statistics.connection_duration_seconds = 0;
-
-        Ok(VpnConnectionResult {
-            success: true,
-            connection_id: format!("wg_{}", 1700000000u64),
-            assigned_ip,
-            message: "WireGuard connection established".to_string(),
-        })
+        Err(VpnError::ProtocolNotSupported)
     }
 
     fn disconnect(&mut self) -> Result<(), VpnError> {
@@ -232,22 +216,7 @@ impl OpenVpnHandler {
 
 impl VpnProtocolHandler for OpenVpnHandler {
     fn connect(&mut self, _config: &VpnConfig) -> Result<VpnConnectionResult, VpnError> {
-        if self.state == ConnectionState::Connected {
-            return Err(VpnError::AlreadyConnected);
-        }
-
-        self.state = ConnectionState::Connecting;
-        let assigned_ip = Some(Ipv4Addr_new(10, 1, 0, 2));
-
-        self.state = ConnectionState::Connected;
-        self.statistics.connection_duration_seconds = 0;
-
-        Ok(VpnConnectionResult {
-            success: true,
-            connection_id: format!("ovpn_{}", 1700000000u64),
-            assigned_ip,
-            message: "OpenVPN connection established".to_string(),
-        })
+        Err(VpnError::ProtocolNotSupported)
     }
 
     fn disconnect(&mut self) -> Result<(), VpnError> {
@@ -682,6 +651,25 @@ mod authentication_fail_closed_tests {
         assert!(manager.authenticate("test_token").is_err());
         assert!(manager.connect(0).is_err());
         assert_eq!(manager.state, ConnectionState::Disconnected);
+    }
+
+    #[test]
+    fn protocol_adapters_do_not_claim_tunnels_without_providers() {
+        let config = VpnConfig {
+            server_address: "vpn.invalid".to_string(),
+            port: 51820,
+            protocol: VpnProtocol::WireGuard,
+            local_ip: None,
+            dns_servers: Vec::new(),
+            mtu: 1420,
+            keepalive_interval: 25,
+        };
+        let mut wireguard = WireGuardHandler::new();
+        let mut openvpn = OpenVpnHandler::new();
+        assert!(wireguard.connect(&config).is_err());
+        assert!(openvpn.connect(&config).is_err());
+        assert_eq!(wireguard.state(), ConnectionState::Disconnected);
+        assert_eq!(openvpn.state(), ConnectionState::Disconnected);
     }
 }
 
