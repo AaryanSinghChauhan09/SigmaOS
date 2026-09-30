@@ -1,6 +1,8 @@
 # Security
 
-SigmaOS provides comprehensive security features including sandboxing, encryption, and access control.
+This page includes planned interfaces and compatibility models. It is not a claim
+of complete security or Linux/BSD parity. Check each component's implementation
+and runtime status before relying on it.
 
 ## Security Model
 
@@ -8,11 +10,11 @@ SigmaOS provides comprehensive security features including sandboxing, encryptio
 
 SigmaOS implements multiple layers of security:
 
-1. **Capability-based Security**: Fine-grained resource permissions
-2. **Sandboxing**: Pledge/unveil for process isolation
-3. **Kernel Hardening**: Kernel pointer restriction, stack protection
-4. **Filesystem Encryption**: Per-directory encryption with fscrypt
-5. **Network Security**: Firewall, VPN, secure protocols
+1. Capability APIs and policy models
+2. Pledge/unveil compatibility models
+3. Kernel hardening mechanisms, some not wired to runtime enforcement
+4. Filesystem encryption interfaces; audited providers are not integrated
+5. Network security models, which require runtime and protocol review
 
 ## Pledge/Unveil Sandbox
 
@@ -164,35 +166,21 @@ action = "allow"
 
 ## Post-Quantum Cryptography
 
-### Kyber-1024
+No audited ML-KEM or ML-DSA provider is integrated. The APIs in
+`src/crypto/post_quantum.rs` now fail closed rather than emit placeholder keys,
+signatures, ciphertexts, or shared secrets. Other PQC-named modules remain
+prototypes and must not be used for authentication, key exchange, package
+verification, or production encryption. Commands for key generation, signing,
+and encryption are not available until a reviewed provider and executable
+integration exist.
 
-Use post-quantum encryption:
+## Authentication and randomness
 
-```bash
-# Generate Kyber keypair
-sigpqc keygen kyber1024
-
-# Encrypt file
-sigpqc encrypt file.txt --algorithm kyber1024
-
-# Decrypt file
-sigpqc decrypt file.txt.enc --algorithm kyber1024
-```
-
-### Dilithium-5
-
-Use post-quantum signatures:
-
-```bash
-# Generate Dilithium keypair
-sigpqc keygen dilithium5
-
-# Sign file
-sigpqc sign file.txt --algorithm dilithium5
-
-# Verify signature
-sigpqc verify file.txt.sig --algorithm dilithium5
-```
+The exported PAM model currently fails closed: without a secure random source
+and an audited password hashing provider, it will not register users or
+authenticate credentials. `security::crypto_utils::SecureRandom` and its
+password-hash placeholder return errors. This module is not a replacement for
+the host operating system's PAM or account database.
 
 ## Audit and Logging
 
@@ -361,6 +349,8 @@ gatt disconnect 1
 SigmaPkg currently computes SHA-256 digests for content integrity, but its signature verifier and signing service have no vetted cryptographic provider. They return `CryptoUnavailable` or an empty signature and reject signed metadata; a trusted key name or matching checksum alone is not proof of authenticity. Do not use these APIs to approve packages or updates until real signature verification and end-to-end trust-chain checks are integrated.
 
 The API-shaped compatibility layer in `src/crypto/libsodium.rs`, `src/crypto/aes.rs`, `src/crypto/encryption.rs`, the vault adapters in `src/security/vault.rs`, the secret manager in `src/security/secrets.rs`, and the PQC routines in `src/crypto/pqc_dilithium.rs` are prototypes with simulated primitives, deterministic keys, or placeholder verification. They are not libsodium, AES, ChaCha20-Poly1305, or NIST-standard implementations and must not protect real data, credentials, updates, or network sessions. The AES-shaped, XOR-based, vault, and secret encryption APIs return `CryptoUnavailable` until audited providers are integrated. The secret manager can still hold in-memory plaintext and is not secure storage. The separate `src/crypto/advanced_encryption_standard.rs` file is not wired into the crypto module and also contains simulated transformations. `sodium_init` only provides thread-safe one-time state; it does not make any prototype primitive secure.
+
+The clipboard's XOR strategy also fails closed. The default clipboard mode is explicitly plaintext (`SecurityLevel::None`) and does not label copied text as encrypted. Selecting an encryption level without an audited provider returns an error.
 
 Cross-distro authentication dispatch also fails closed: `SovereignSystemdHomedAuthBridge` has no trusted credential backend and cannot authenticate users or mount home directories. Do not count it as an available authentication feature until a provider validates credentials and the mount path has end-to-end tests.
 

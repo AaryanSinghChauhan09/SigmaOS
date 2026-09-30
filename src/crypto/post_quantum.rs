@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
-// SigmaOS Post-Quantum Cryptography Module
-// Implements NIST PQC standards: Dilithium-5 (signing), Kyber-1024 (encryption)
+//! Post-quantum API shapes. No audited ML-DSA or ML-KEM provider is integrated,
+//! so all cryptographic operations fail closed instead of returning fake keys.
 
 use core::sync::atomic::{AtomicU32, Ordering};
 use std::vec::Vec;
@@ -248,54 +248,16 @@ impl PostQuantumCryptoManager {
 
     pub fn generate_dilithium_keypair(
         &mut self,
-        seed: &[u8; DILITHIUM_SEED_BYTES],
+        _seed: &[u8; DILITHIUM_SEED_BYTES],
     ) -> Result<(DilithiumPublicKey, DilithiumSecretKey), &'static str> {
-        // In real implementation:
-        // 1. Use seed to expand with SHAKE256
-        // 2. Generate matrix A and vectors s1, s2
-        // 3. Compute public key from secret key
-        // 4. Perform rejection sampling if needed
-
-        let secret_key = DilithiumSecretKey::new(seed);
-
-        // Generate public key from secret key
-        let mut pk_data = vec![0u8; DILITHIUM_PK_BYTES];
-        pk_data[0..DILITHIUM_SEED_BYTES].copy_from_slice(seed);
-
-        let public_key = DilithiumPublicKey::new(&pk_data)?;
-
-        self.dilithium_keys
-            .push((public_key.clone(), secret_key.clone()));
-        self.key_count.fetch_add(1, Ordering::SeqCst);
-
-        Ok((public_key, secret_key))
+        Err("ML-DSA provider unavailable; refusing to generate placeholder keys")
     }
 
     pub fn generate_kyber_keypair(
         &mut self,
-        seed: &[u8; KYBER_SEED_BYTES],
+        _seed: &[u8; KYBER_SEED_BYTES],
     ) -> Result<(KyberPublicKey, KyberSecretKey), &'static str> {
-        // In real implementation:
-        // 1. Use seed with SHAKE256
-        // 2. Generate polynomial ring elements
-        // 3. Compute public key (A*s + e) mod q
-        // 4. Store secret key
-
-        let mut sk_data = vec![0u8; KYBER_SK_BYTES];
-        sk_data[0..KYBER_SEED_BYTES].copy_from_slice(seed);
-
-        let secret_key = KyberSecretKey::new(&sk_data)?;
-
-        let mut pk_data = vec![0u8; KYBER_PK_BYTES];
-        pk_data[0..KYBER_SEED_BYTES].copy_from_slice(seed);
-
-        let public_key = KyberPublicKey::new(&pk_data)?;
-
-        self.kyber_keys
-            .push((public_key.clone(), secret_key.clone()));
-        self.key_count.fetch_add(1, Ordering::SeqCst);
-
-        Ok((public_key, secret_key))
+        Err("ML-KEM provider unavailable; refusing to generate placeholder keys")
     }
 
     pub fn sign_dilithium(
@@ -303,20 +265,8 @@ impl PostQuantumCryptoManager {
         secret_key: &DilithiumSecretKey,
         _message: &[u8],
     ) -> Result<DilithiumSignature, &'static str> {
-        if !secret_key.is_valid() {
-            return Err("Invalid secret key");
-        }
-
-        // In real implementation:
-        // 1. Hash message with SHAKE256
-        // 2. Perform rejection sampling
-        // 3. Compute signature polynomial
-        // 4. Encode signature
-
-        let sig_data = vec![0u8; DILITHIUM_SIG_BYTES];
-        self.operation_count.fetch_add(1, Ordering::SeqCst);
-
-        DilithiumSignature::new(&sig_data)
+        let _ = secret_key;
+        Err("ML-DSA provider unavailable; refusing to create placeholder signatures")
     }
 
     pub fn verify_dilithium(
@@ -325,47 +275,16 @@ impl PostQuantumCryptoManager {
         _message: &[u8],
         signature: &DilithiumSignature,
     ) -> Result<bool, &'static str> {
-        if !public_key.is_valid() {
-            return Err("Invalid public key");
-        }
-
-        if !signature.is_valid() {
-            return Err("Invalid signature");
-        }
-
-        // In real implementation:
-        // 1. Verify signature length
-        // 2. Decode public key and signature
-        // 3. Hash message
-        // 4. Verify using matrix vector product
-
-        self.operation_count.fetch_add(1, Ordering::SeqCst);
-        Ok(true)
+        let _ = (public_key, signature);
+        Err("ML-DSA provider unavailable; refusing to accept unverifiable signatures")
     }
 
     pub fn encapsulate_kyber(
         &self,
         public_key: &KyberPublicKey,
     ) -> Result<(KyberCiphertext, KyberSharedSecret), &'static str> {
-        if !public_key.is_valid() {
-            return Err("Invalid public key");
-        }
-
-        // In real implementation:
-        // 1. Generate random shared secret
-        // 2. Encode into polynomial
-        // 3. Compute ciphertext (b = A^T*u + e', v = B^T*u + e + m)
-        // 4. Apply XOF
-
-        let ct_data = vec![0u8; KYBER_CT_BYTES];
-        let ss_data = vec![0u8; KYBER_SS_BYTES];
-
-        self.operation_count.fetch_add(1, Ordering::SeqCst);
-
-        Ok((
-            KyberCiphertext::new(&ct_data)?,
-            KyberSharedSecret::new(&ss_data)?,
-        ))
+        let _ = public_key;
+        Err("ML-KEM provider unavailable; refusing to return a placeholder secret")
     }
 
     pub fn decapsulate_kyber(
@@ -373,25 +292,8 @@ impl PostQuantumCryptoManager {
         secret_key: &KyberSecretKey,
         ciphertext: &KyberCiphertext,
     ) -> Result<KyberSharedSecret, &'static str> {
-        if !secret_key.is_valid() {
-            return Err("Invalid secret key");
-        }
-
-        if !ciphertext.is_valid() {
-            return Err("Invalid ciphertext");
-        }
-
-        // In real implementation:
-        // 1. Decode ciphertext (b, v)
-        // 2. Compute u = A^-1 * b
-        // 3. Recover shared secret m = v - B^T*u
-        // 4. Apply XOF
-
-        let ss_data = vec![0u8; KYBER_SS_BYTES];
-
-        self.operation_count.fetch_add(1, Ordering::SeqCst);
-
-        KyberSharedSecret::new(&ss_data)
+        let _ = (secret_key, ciphertext);
+        Err("ML-KEM provider unavailable; refusing to return a placeholder secret")
     }
 
     pub fn get_key_count(&self) -> u32 {
@@ -461,6 +363,24 @@ impl Default for HybridCryptoMode {
     }
 }
 
+#[cfg(test)]
+mod provider_fail_closed_tests {
+    use super::{PostQuantumCryptoManager, DILITHIUM_SEED_BYTES, KYBER_SEED_BYTES};
+
+    #[test]
+    fn unavailable_pqc_provider_never_returns_placeholder_material() {
+        let mut manager = PostQuantumCryptoManager::new();
+        assert!(manager
+            .generate_dilithium_keypair(&[0; DILITHIUM_SEED_BYTES])
+            .is_err());
+        assert!(manager
+            .generate_kyber_keypair(&[0; KYBER_SEED_BYTES])
+            .is_err());
+        assert_eq!(manager.get_key_count(), 0);
+        assert_eq!(manager.get_operation_count(), 0);
+    }
+}
+
 // ============================================================================
 // Tests
 // ============================================================================
@@ -527,71 +447,16 @@ mod tests {
     }
 
     #[test]
-    fn test_generate_dilithium_keypair() {
+    fn test_pqc_operations_fail_closed_without_provider() {
         let mut manager = PostQuantumCryptoManager::new();
-        let seed = [0u8; DILITHIUM_SEED_BYTES];
-
-        let (pk, sk) = manager.generate_dilithium_keypair(&seed).unwrap();
-        assert!(pk.is_valid());
-        assert!(sk.is_valid());
-        assert_eq!(manager.get_key_count(), 1);
-    }
-
-    #[test]
-    fn test_generate_kyber_keypair() {
-        let mut manager = PostQuantumCryptoManager::new();
-        let seed = [0u8; KYBER_SEED_BYTES];
-
-        let (pk, sk) = manager.generate_kyber_keypair(&seed).unwrap();
-        assert!(pk.is_valid());
-        assert!(sk.is_valid());
-        assert_eq!(manager.get_key_count(), 2);
-    }
-
-    #[test]
-    fn test_sign_dilithium() {
-        let mut manager = PostQuantumCryptoManager::new();
-        let seed = [0u8; DILITHIUM_SEED_BYTES];
-        let (_, sk) = manager.generate_dilithium_keypair(&seed).unwrap();
-
-        let message = b"Hello, post-quantum world!";
-        let sig = manager.sign_dilithium(&sk, message).unwrap();
-        assert!(sig.is_valid());
-    }
-
-    #[test]
-    fn test_verify_dilithium() {
-        let mut manager = PostQuantumCryptoManager::new();
-        let seed = [0u8; DILITHIUM_SEED_BYTES];
-        let (pk, sk) = manager.generate_dilithium_keypair(&seed).unwrap();
-
-        let message = b"Hello, post-quantum world!";
-        let sig = manager.sign_dilithium(&sk, message).unwrap();
-
-        let valid = manager.verify_dilithium(&pk, message, &sig).unwrap();
-        assert!(valid);
-    }
-
-    #[test]
-    fn test_encapsulate_kyber() {
-        let mut manager = PostQuantumCryptoManager::new();
-        let seed = [0u8; KYBER_SEED_BYTES];
-        let (pk, _) = manager.generate_kyber_keypair(&seed).unwrap();
-
-        let (ct, ss) = manager.encapsulate_kyber(&pk).unwrap();
-        assert!(ct.is_valid());
-        assert!(ss.is_valid());
-    }
-
-    #[test]
-    fn test_decapsulate_kyber() {
-        let mut manager = PostQuantumCryptoManager::new();
-        let seed = [0u8; KYBER_SEED_BYTES];
-        let (pk, sk) = manager.generate_kyber_keypair(&seed).unwrap();
-
-        let (ct, _) = manager.encapsulate_kyber(&pk).unwrap();
-        let ss = manager.decapsulate_kyber(&sk, &ct).unwrap();
-        assert!(ss.is_valid());
+        assert!(manager
+            .generate_dilithium_keypair(&[0; DILITHIUM_SEED_BYTES])
+            .is_err());
+        assert!(manager
+            .generate_kyber_keypair(&[0; KYBER_SEED_BYTES])
+            .is_err());
+        assert_eq!(manager.get_key_count(), 0);
+        assert_eq!(manager.get_operation_count(), 0);
     }
 
     #[test]
