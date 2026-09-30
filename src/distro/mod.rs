@@ -106,6 +106,8 @@ pub use garuda_nomad_innovations::{
 pub mod linux_ideas;
 pub mod manjaro;
 pub mod missing_distro_innovations;
+pub mod missing_linux_bsd_components;
+pub use missing_linux_bsd_components::*;
 pub mod nextgen;
 pub mod nixos_inspirations;
 pub mod parity;
