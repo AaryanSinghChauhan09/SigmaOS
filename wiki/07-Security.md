@@ -193,6 +193,11 @@ signature based on fixed magic bytes. Its password and signature checks remain
 unavailable until vetted verification providers are integrated, so shell
 access fails closed.
 
+The Fedora Cockpit and FreeIPA compatibility models do not authenticate
+sessions or mint Kerberos tickets without trusted Cockpit/KDC integrations.
+They reject authentication and token verification rather than treating any
+nonempty token as proof of identity.
+
 The exported PAM model currently fails closed: without a secure random source
 and an audited password hashing provider, it will not register users or
 authenticate credentials. `security::crypto_utils::SecureRandom` and its

@@ -2,7 +2,7 @@
 
 **Snapshot date:** 2026-09-30
 **Remote:** `AaryanSinghChauhan09/SigmaOS`
-**Latest verified code snapshot:** `f38a4289ed`
+**Latest verified code snapshot:** `d6ecfb0008`
 
 This file records verified work and known limitations. It does not claim that SigmaOS matches Linux or BSD feature parity, is production-ready, or has completed every roadmap idea.
 
@@ -26,6 +26,7 @@ This file records verified work and known limitations. It does not claim that Si
 - Replaced an unnecessary raw pointer copy in `SimpleEncryptionKey::new` with a bounds-matched slice copy; the encryption service still fails closed without a provider.
 - Removed the installer's hard-coded pseudo-Argon2 hash. Dry-run account creation remains simulated; real account creation now fails closed until an audited password-hashing provider is integrated, and the supplied password is not retained.
 - Removed the emergency shell gate's stored plaintext password and magic-byte “PQC” signature check. Password and signature authentication now fail closed without vetted verification providers, and failure counts saturate instead of overflowing.
+- Disabled fake Fedora Cockpit session authentication and synthetic Kerberos ticket/GSSAPI acceptance; remote authentication now fails closed without a trusted Cockpit/KDC provider.
 - Disabled timestamp/hardware-mixed pseudo-random output, reported hardware entropy unavailable instead of fabricating values, and made the simulated crypto audit report no verified algorithms.
 - Removed the unsynchronized `static mut` RNG pool and fake ChaCha-like output from `klib::rand`; secure byte/range requests now return `EntropyUnavailable`. `klib::rng::OsRng` also fails closed, while `SigmaRng` is clearly a deterministic simulation generator and uses an atomic compare/exchange update.
 - Made cross-distro authentication fail closed because no trusted credential provider exists.
@@ -42,6 +43,7 @@ This file records verified work and known limitations. It does not claim that Si
 - The focused fail-closed encryption-service test passed after removing the unnecessary pointer copy.
 - All four `SafeInstaller` unit tests passed after removing the fake password hash.
 - The emergency-gate module is currently not linked into the crate; it was compiled directly with `rustc --test`, and its fail-closed test passed.
+- All three focused Fedora remote subsystem tests passed after disabling unauthenticated session/ticket creation and GSSAPI acceptance.
 - `cargo check --lib` passed earlier in this work; later code changes were compiled by the focused library test builds.
 - `./run_sigma_tests.sh` passed in an earlier verification run. Python `pytest` could not run because `pytest` is not installed in the environment.
 - GitHub Actions for the latest `main` commit were queued when this snapshot was written. Their results are not yet known; check the current run list before relying on CI status.
