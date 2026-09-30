@@ -91,4 +91,11 @@ pub use sigma_office::{
     TypographyRenderer, ValidationRuleType, VersionHistoryManager, VidScene, VivaCommunityPost,
     WebLayoutBlock, WhiteboardElement, WhiteboardElementType, WorkCenter, WorkflowAction,
     WorkflowRule, WorkflowTrigger, WorkgroupChannelMessage, WorkgroupTask,
+    BatchLotTraceRecord, BreakoutRoom, CandidateApplicant, CandidateStage, ChatSpaceMessage,
+    ConferenceChatMessage, ContractApprovalStatus, ContractDocument, EnterpriseChatSpace,
+    FieldServiceWorkOrder, MeetingParticipant, QualityControlStatus,
+    SovereignBatchSerialTraceabilityEngine, SovereignContractLifecycleManagementEngine,
+    SovereignEnterpriseChatSpaceEngine, SovereignFieldServiceDispatchEngine,
+    SovereignHratsoOnboardingEngine, SovereignWebConferencingEngine, TechnicianProfile,
+    UserPresenceStatus,
 };
