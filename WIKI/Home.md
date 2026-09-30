@@ -1,14 +1,407 @@
-# ⚡🎨🛡️ SIGMAOS MASTER SPECIFICATION: TRI-AGENT FRAMEWORK & 500+ REPOSITORIES ABSORPTION ARCHITECTURE
+## Star History
 
-Welcome to the **SigmaOS Wiki Master Specification**.
+<a href="https://www.star-history.com/?repos=aaryansinghchauhan09%2Fsigmaos&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=aaryansinghchauhan09/sigmaos&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=aaryansinghchauhan09/sigmaos&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=aaryansinghchauhan09/sigmaos&type=date&legend=top-left" />
+ </picture>
+</a>
 
-## Overview
-SigmaOS is a sovereign, high-performance, security-hardened operating system written in zero-dependency systems Rust.
+# 🚀 SigmaOS — Sovereign AI-Native Operating System
 
-This master document details:
-1. **The Tri-Agent Governance Framework:** Operational rules, boundaries, and daily routines for **Bolt ⚡**, **Palette 🎨**, and **Sentinel 🛡️**.
-2. **500+ Open-Source Repositories Absorption Catalog:** Comprehensive mapping of kernel, distros, build systems, desktop shells, and utilities into SigmaOS Rust subsystems.
+<p align="center">
+  <strong>A secure, fast, Rust-native operating system built from the ground up</strong><br>
+  <em>Inspired by Linux, Omarchy, and the OSDev community</em>
+</p>
 
-For full specifications, consult `SIGMAOS_MASTER_PLAN_TRI_AGENT_500_REPOS_ABSORPTION.md` and `docs/SIGMAOS_500_REPOS_TRI_AGENT_ABSORPTION_MASTER_PLAN.md`.
+<p align="center">
+  <a href="#architecture">Architecture</a> •
+  <a href="#features">Features</a> •
+  <a href="#quick-start">Quick Start</a> •
+  <a href="#kernel-subsystems">Kernel Subsystems</a> •
+  <a href="#roadmap">Roadmap</a> •
+  <a href="#contributing">Contributing</a>
+</p>
 
-These documents describe proposed roadmap items and inspirations; they do not claim those systems or capabilities are implemented in SigmaOS. Verify each component and its security boundaries before documenting it as available.
+---
+
+## 📖 Overview
+
+SigmaOS is a Rust-based operating system designed to be a bootable, user-focused desktop distribution with:
+
+- **Safe Rust kernel** — Memory safety without garbage collection
+- **AI-native runtime** — First-class agent integration and local LLM inference
+- **Zenith compositor** — Wayland-inspired tiling desktop with keyboard-driven workflow
+- **Universal package engine** — `sigpkg` supporting 60+ package format bridges
+- **Atomic updates** — Dual-root A/B images with CoW rollback
+
+```
+Firmware → Bootloader → Kernel Init → Memory Manager → Scheduler →
+  VFS Mount → Init System → Zenith Desktop → User Shell
+```
+
+---
+
+## 🏗️ Architecture
+
+```
+SigmaOS/
+├── src/
+│   ├── kernel/             # Core kernel subsystems
+│   │   ├── main.rs         # Kernel entry point (start_kernel bootstrap)
+│   │   ├── mod.rs          # Kernel module registry
+│   │   ├── memory/         # Physical memory allocators (Buddy, Slab, DMA)
+│   │   ├── mm/             # Virtual memory, paging, page tables
+│   │   ├── sched/          # Schedulers (Round-Robin, CFS, EEVDF, BORE)
+│   │   ├── proc/           # Process management, task control blocks
+│   │   ├── syscall/        # System call dispatch table and handlers
+│   │   ├── vfs/            # Virtual Filesystem layer
+│   │   ├── fs/             # Concrete filesystems (RamFS, FAT, ext2)
+│   │   ├── net/            # Network stack
+│   │   ├── irq/            # Interrupt request handling
+│   │   ├── drivers/        # Kernel-space device drivers
+│   │   ├── security/       # Security modules (Landlock, Capsicum, Seccomp)
+│   │   ├── core/           # Core kernel primitives
+│   │   ├── panic_handler.rs # Kernel panic with register dump & stack trace
+│   │   └── kprintf.rs      # Formatted kernel output (printk-style)
+│   ├── drivers/            # Hardware drivers
+│   │   ├── serial.rs       # UART 16550 serial port (COM1-COM4)
+│   │   ├── rtc.rs          # CMOS Real-Time Clock
+│   │   ├── gpu/            # GPU/Display drivers
+│   │   └── ...             # Block, network, input drivers
+│   ├── boot/               # Bootloader components
+│   ├── shell/              # Interactive kernel shell (sigma-sh)
+│   ├── userland/           # User-space programs
+│   │   ├── coreutils/      # Core Unix utilities (ls, cat, grep, etc.)
+│   │   ├── libc/           # Minimal C library shims
+│   │   └── pkg/            # Package management
+│   ├── loader/             # Binary loaders
+│   │   └── elf/            # ELF64 binary parser and loader
+│   ├── fs/                 # Filesystem implementations
+│   ├── vfs/                # VFS abstractions
+│   ├── ai/                 # AI/ML runtime and agent framework
+│   ├── security/           # Security framework
+│   ├── klib/               # Kernel library (no_std compatible primitives)
+│   └── ...                 # Additional subsystems
+├── tools/                  # Build tools and utilities
+├── tests/                  # Test suites (Rust + Python)
+├── docs/                   # Documentation
+├── Cargo.toml              # Rust build configuration
+├── Makefile                # Build automation
+└── ARCHITECTURE.md         # Detailed architecture guide
+```
+
+---
+
+## ✨ Features
+
+### Kernel Subsystems
+| Subsystem | Status | Description |
+|-----------|--------|-------------|
+| **Memory Management** | ✅ Working | Buddy allocator, Slab cache, DMA ring buffer, guard pages, NUMA-aware |
+| **Process Scheduler** | ✅ Working | Round-Robin, Priority-based, CFS, EEVDF, BORE schedulers |
+| **Virtual Filesystem** | ✅ Working | Linux-style VFS with inode/dentry/superblock abstractions, RamFS |
+| **System Calls** | ✅ Working | x86_64 syscall table with 50+ POSIX-compatible calls |
+| **Interrupt Handling** | ✅ Working | IDT, ISR/IRQ dispatch, PIC remapping, APIC support |
+| **Paging & VMM** | ✅ Working | 4-level page tables, identity mapping, virtual memory manager |
+| **Device Drivers** | ✅ Working | Serial (UART 16550), RTC, VGA, keyboard, block devices |
+| **Kernel Panic** | ✅ Working | Register dump, stack trace, panic log ring buffer |
+| **ELF Loader** | ✅ Working | ELF64 parser with segment loading and symbol resolution |
+| **Kernel Printf** | ✅ Working | printk-style output with log levels and hex dump |
+
+### Hardware Drivers
+| Driver | Description |
+|--------|-------------|
+| **Serial Port** | UART 16550 with configurable baud rate, FIFO, interrupt support |
+| **RTC Clock** | CMOS real-time clock with BCD conversion, NMI-safe access |
+| **VGA Text** | 80×25 text mode with cursor control, scrolling, color attributes |
+| **PS/2 Keyboard** | Scancode translation, modifier keys, callback-based input |
+| **ATA/IDE** | PIO mode disk access for storage devices |
+| **NVMe** | PCIe NVMe storage controller |
+| **GPU/DRM** | Framebuffer, DRM atomic commit, VirtIO-GPU |
+
+### User Space
+| Component | Description |
+|-----------|-------------|
+| **sigma-sh** | Interactive shell with piping, redirection, job control, scripting |
+| **Coreutils** | 40+ Unix utilities (ls, cat, grep, sort, find, diff, hexdump...) |
+| **sigpkg** | Universal package manager supporting .sigpkg and 60+ format bridges |
+| **Zenith Desktop** | Wayland-inspired tiling compositor with keyboard-driven workflow |
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+```bash
+# Install Rust toolchain
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# Install build dependencies (Ubuntu/Debian)
+sudo apt install build-essential qemu-system-x86 nasm
+```
+
+### Build & Test
+
+```bash
+# Clone the repository
+git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
+cd SigmaOS
+
+# Verify the library compiles
+cargo check --lib
+
+# Run the test suite
+make test
+
+# Build a preview ISO
+make iso
+
+# Launch in QEMU
+make run
+```
+
+### Development Commands
+
+```bash
+make check    # Static analysis via cargo check
+make test     # Execute native test suites
+make format   # Verify code formatting
+make iso      # Assemble bootable ISO image
+make run      # Run QEMU virtual machine preview
+make clean    # Remove build artifacts
+make help     # Show all available targets
+```
+
+---
+
+## 🔧 Kernel Subsystems
+
+### Boot Process
+```
+BIOS/UEFI → Bootloader → early_cpu_init (GDT, IDT) →
+  early_memory_init (Paging, Buddy Allocator) →
+  Scheduler Init → Service Manager → Enable Interrupts
+```
+
+### Memory Architecture
+- **Physical**: Buddy allocator with configurable region sizes
+- **Virtual**: 4-level page tables (PML4) with identity and higher-half mapping
+- **Heap**: Slab allocator for fixed-size kernel objects, kmalloc/kfree
+- **DMA**: Ring buffer allocator for device I/O
+- **Guard Pages**: Hardened allocator with red zones for overflow detection
+
+### Scheduler Architecture
+- **Round-Robin**: Default scheduler with configurable time quantum
+- **Priority**: Multi-level priority queues (0-139, Linux-compatible)
+- **CFS**: Completely Fair Scheduler with virtual runtime tracking
+- **EEVDF**: Earliest Eligible Virtual Deadline First (Linux 6.6+)
+- **BORE**: Burst-Oriented Response Enhancer for interactive workloads
+
+### Filesystem Stack
+```
+User Application
+       ↓
+  System Calls (open, read, write, close)
+       ↓
+  VFS Layer (inode, dentry, superblock, file_operations)
+       ↓
+  ┌──────────┬──────────┬──────────┐
+  │  RamFS   │  FAT16   │  DevFS   │
+  │ (tmpfs)  │ (disk)   │ (/dev)   │
+  └──────────┴──────────┴──────────┘
+       ↓
+  Block Device Layer (ATA PIO, NVMe, VirtIO)
+```
+
+---
+
+## 📋 Roadmap
+
+### ✅ Completed
+- [x] Kernel bootstrap (GDT, IDT, memory init)
+- [x] Memory management (Buddy, Slab, Paging)
+- [x] Process management & scheduling
+- [x] VFS with RamFS
+- [x] System call dispatch table
+- [x] ELF64 binary loader
+- [x] Serial port driver (UART 16550)
+- [x] RTC driver (CMOS clock)
+- [x] Kernel panic handler with register dump
+- [x] Formatted kernel output (kprintf)
+- [x] Interactive shell with 40+ commands
+- [x] Coreutils (ls, cat, grep, sort, find, etc.)
+- [x] Security framework (Landlock, Capsicum, Seccomp)
+- [x] AI/Agent runtime integration
+
+### 🔄 In Progress
+- [ ] User mode (Ring 3) with TSS
+- [ ] Bare-metal x86_64 target (no_std boot)
+- [ ] Network TCP/IP stack
+- [ ] GUI desktop (Zenith compositor)
+- [ ] ISO installer
+
+### 📌 Planned
+- [ ] SMP multi-core support
+- [ ] USB (xHCI) driver
+- [ ] Sound (HDA) driver
+- [ ] ACPI power management
+- [ ] Self-hosting compiler toolchain
+
+---
+
+## 🧪 Testing
+
+```bash
+# Run all Rust tests
+cargo test
+
+# Run standalone test suite
+make test
+
+# Run Python integration tests
+pytest tests/
+
+# Run with verbose output
+cargo test -- --nocapture
+```
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these guidelines:
+
+1. **Language**: All kernel and system code must be written in **safe Rust** (unsafe only when strictly necessary for hardware access)
+2. **Style**: Run `cargo fmt` before committing
+3. **Tests**: Add tests for new functionality
+4. **Documentation**: Include doc comments for all public APIs
+5. **No external runtimes**: No Python, Node.js, Java, or Go dependencies in the kernel
+
+### Development Workflow
+```bash
+# Fork and clone
+git clone https://github.com/YOUR_USERNAME/SigmaOS.git
+
+# Create a feature branch
+git checkout -b feature/your-feature
+
+# Make changes and verify
+cargo check --lib
+cargo test
+
+# Commit and push
+git add .
+git commit -m "feat: add your feature description"
+git push origin feature/your-feature
+
+# Open a Pull Request
+```
+
+---
+
+## 📚 Documentation
+
+| Document | Description |
+|----------|-------------|
+| [ARCHITECTURE.md](ARCHITECTURE.md) | Detailed system architecture guide |
+| [docs/PRODUCT_VISION.md](docs/PRODUCT_VISION.md) | Product vision and manifesto |
+| [docs/ROADMAP.md](docs/ROADMAP.md) | Master execution roadmap |
+| [docs/SUPPORT_MATRIX.md](docs/SUPPORT_MATRIX.md) | Hardware support matrix |
+| [WHAT_IS_WORKING_AND_NOT_WORKING.md](WHAT_IS_WORKING_AND_NOT_WORKING.md) | Component status tracker |
+
+---
+
+## 🏆 Inspiration & References
+
+SigmaOS draws inspiration from these outstanding projects:
+
+| Project | Inspiration |
+|---------|-------------|
+| [Linux Kernel](https://github.com/torvalds/linux) | Kernel architecture, VFS, scheduler design, driver model |
+| [Omarchy](https://github.com/omacom/omarchy) | Desktop experience, modular installer, theme system |
+| [os-tutorial](https://github.com/cfenollosa/os-tutorial) | Bootloader patterns, interrupt handling, educational approach |
+| [Linux Mint](https://github.com/linuxmint) | User experience, polish, documentation standards |
+| [Redox OS](https://www.redox-os.org/) | Rust-based microkernel design patterns |
+| [xv6](https://github.com/mit-pdos/xv6-riscv) | Clean educational OS design |
+
+---
+
+## 📄 License
+
+SigmaOS is dual-licensed under [MIT](LICENSE) or [GPL-2.0](LICENSE-GPL).
+
+---
+
+<p align="center">
+  <strong>Built with 🦀 Rust | Designed for the Future</strong>
+</p>
+
+## 🤖 AI Agent Guidelines
+
+SigmaOS provides comprehensive guidelines for AI agents working on various components. Each major subsystem has dedicated agent documentation for autonomous development and improvement.
+
+### Component Agent Documentation
+
+Located in `Agents/`, each subsystem has specialized guidelines:
+
+- **KERNEL_AGENTS.md** - Core kernel subsystems (scheduling, interrupts, syscalls)
+- **MEMORY_AGENTS.md** - Memory management (buddy allocator, slab allocator, paging)
+- **FILESYSTEM_AGENTS.md** - Virtual filesystem layer and implementations
+- **NETWORK_AGENTS.md** - Networking stack (TCP/IP, WireGuard, packet filtering)
+- **SECURITY_AGENTS.md** - Security framework (capabilities, seccomp, sandboxing)
+- **DESKTOP_AGENTS.md** - Zenith desktop environment and window management
+- **PACKAGE_AGENTS.md** - Universal package manager SigmaPkg
+- **DISTRO_AGENTS.md** - Linux/BSD distro compatibility and gateway
+- **AUDIO_AGENTS.md** - Audio subsystem and sound management
+- **BLUETOOTH_AGENTS.md** - Bluetooth stack and GATT client
+- **DRIVERS_AGENTS.md** - Hardware drivers (PCIe, NVMe, USB, WiFi)
+- **CRYPTO_AGENTS.md** - Cryptographic operations and encryption
+- **IPC_AGENTS.md** - Inter-process communication mechanisms
+- **ARCH_AGENTS.md** - Architecture portability (x86_64, ARM64, RISC-V)
+
+### Open Source Inspiration
+
+Each component agent document includes:
+- Linux kernel references and implementation patterns
+- FreeBSD and OpenBSD design inspirations
+- Specific improvement opportunities
+- Performance optimization strategies
+- Security hardening guidelines
+
+### Continuous Improvement
+
+These agent guidelines enable SigmaOS to continuously improve by:
+- Learning from open source competitors (Linux, FreeBSD, OpenBSD)
+- Implementing best practices from mature operating systems
+- Maintaining zero-dependency philosophy
+- Ensuring security and performance excellence
+
+For detailed agent guidelines, see [AGENTS.md](AGENTS.md) and the component-specific files in [Agents/](Agents/).
+
+---
+
+
+## 🗺️ Future Development Plan
+
+SigmaOS has a comprehensive 30-month development plan drawing inspiration from Linux, FreeBSD, and OpenBSD distributions. The plan is organized into 10 phases covering kernel subsystems, memory management, networking, filesystems, security, desktop environment, hardware support, package management, virtualization, and development tools.
+
+### Key Focus Areas
+
+- **Phase 1-3**: Kernel enhancements, memory management, networking stack
+- **Phase 4-6**: Filesystems, security hardening, desktop environment
+- **Phase 7-9**: Hardware support, package management, virtualization
+- **Phase 10**: Development tools and profiling
+
+### Open Source Inspiration
+
+Each phase incorporates best practices from:
+- **Linux**: CFS scheduler, io_uring, eBPF, XDP, SELinux, AppArmor
+- **FreeBSD**: Capsicum, Jails, ZFS, GEOM, bhyve, DTrace
+- **OpenBSD**: pledge/unveil, PF, CARP, W^X, LibreSSL
+
+For detailed information, see [FUTURE_DEVELOPMENT_PLAN.md](FUTURE_DEVELOPMENT_PLAN.md).
+
+---

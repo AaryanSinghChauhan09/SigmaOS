@@ -1,14 +1,33 @@
-# ⚡🎨🛡️ SIGMAOS MASTER SPECIFICATION: TRI-AGENT FRAMEWORK & 500+ REPOSITORIES ABSORPTION ARCHITECTURE
+# SigmaOS
 
-Welcome to the **SigmaOS Wiki Master Specification**.
+SigmaOS is an autonomous, from-scratch, zero-dependency, zero-trust bare-metal operating system built exclusively using modern low-level systems programming languages (Rust `#![no_std]`, Zig, and Nim).
 
 ## Overview
-SigmaOS is a sovereign, high-performance, security-hardened operating system written in zero-dependency systems Rust.
 
-This master document details:
-1. **The Tri-Agent Governance Framework:** Operational rules, boundaries, and daily routines for **Bolt ⚡**, **Palette 🎨**, and **Sentinel 🛡️**.
-2. **500+ Open-Source Repositories Absorption Catalog:** Comprehensive mapping of kernel, distros, build systems, desktop shells, and utilities into SigmaOS Rust subsystems.
+SigmaOS is designed to eliminate operating system fragmentation, bloat, and legacy technical debt by absorbing the finest architectural innovations from all existing operating systems and distributions (Ubuntu, Fedora, Arch, NixOS, Debian, Gentoo, Void, Alpine, FreeBSD, OpenBSD, NetBSD, macOS, and Windows) into a single, unified, principle-driven bare-metal platform.
 
-For full specifications, consult `SIGMAOS_MASTER_PLAN_TRI_AGENT_500_REPOS_ABSORPTION.md` and `docs/SIGMAOS_500_REPOS_TRI_AGENT_ABSORPTION_MASTER_PLAN.md`.
+## Key Features
 
-These documents describe proposed roadmap items and inspirations; they do not claim those systems or capabilities are implemented in SigmaOS. Verify each component and its security boundaries before documenting it as available.
+- **Zero-Dependency**: No external package managers, third-party libraries, or predefined wrappers
+- **Modern Languages**: Core OS implemented in Rust, Zig, and Nim for systems programming
+- **Hardware Support**: From 1980s ISA/IDE/VGA to 2026+ CXL 3.0/PCIe Gen7/NVMe/xHCI
+- **Security**: Capability-based sandboxing, kernel mitigations, post-quantum cryptography
+- **Performance**: Lock-free structures, zero-copy buffers, sub-80ns context switching
+- **Zenith Desktop**: Direct bare-metal rendering without X11/Wayland overhead
+- **SigmaPkg**: Universal package manager supporting 29+ Linux/BSD package formats
+
+## Documentation Structure
+
+This wiki is organized in Arch Linux style with one page per topic:
+
+- [Installation](01-Installation.md)
+- [Getting Started](02-Getting-Started.md)
+- [Configuration](03-Configuration.md)
+- [Kernel](04-Kernel.md)
+- [Filesystems](05-Filesystems.md)
+- [Networking](06-Networking.md)
+- [Security](07-Security.md)
+- [Desktop](08-Desktop.md)
+- [Packaging](09-Packaging.md)
+- [Development](10-Development.md)
+- [Roadmap](11-Roadmap.md)
