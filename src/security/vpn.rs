@@ -97,9 +97,6 @@ pub trait VpnProtocolHandler {
 pub struct WireGuardHandler {
     state: ConnectionState,
     statistics: VpnStatistics,
-    private_key: Option<String>,
-    public_key: Option<String>,
-    peer_public_key: Option<String>,
 }
 
 impl WireGuardHandler {
@@ -114,21 +111,16 @@ impl WireGuardHandler {
                 latency_ms: 0,
                 packet_loss_percent: 0.0,
             },
-            private_key: None,
-            public_key: None,
-            peer_public_key: None,
         }
     }
 
     pub fn with_keys(
-        mut self,
+        self,
         private_key: String,
         public_key: String,
         peer_public_key: String,
     ) -> Self {
-        self.private_key = Some(private_key);
-        self.public_key = Some(public_key);
-        self.peer_public_key = Some(peer_public_key);
+        let _ = (private_key, public_key, peer_public_key);
         self
     }
 }
