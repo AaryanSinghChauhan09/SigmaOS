@@ -59,7 +59,9 @@ impl DistroWatchRankTrackerEngine {
     }
 
     pub fn check_distro_update_alert(&self, distro: &str) -> bool {
-        self.tracked_distros.iter().any(|d| d.eq_ignore_ascii_case(distro))
+        self.tracked_distros
+            .iter()
+            .any(|d| d.eq_ignore_ascii_case(distro))
     }
 }
 
@@ -193,7 +195,11 @@ impl NineToFiveGoogleMacEcosystemEngine {
         String::from(palettes[color_index])
     }
 
-    pub fn extract_contrast_aware_material_you_palette(&self, wallpaper_hash: u64, dark_mode: bool) -> String {
+    pub fn extract_contrast_aware_material_you_palette(
+        &self,
+        wallpaper_hash: u64,
+        dark_mode: bool,
+    ) -> String {
         let color_index = (wallpaper_hash % 4) as usize;
         let light_palettes = ["#1967D2", "#137333", "#C5221F", "#3C4043"];
         let dark_palettes = ["#8AB4F8", "#C3ECD8", "#F6AEA9", "#E8EAED"];
@@ -479,7 +485,10 @@ impl SovereignTechMediaDistroInnovationsSuite {
             && self.sysadmin_automation.run_hardening_audit()
             && self.google_mac_ecosystem.is_ecosystem_healthy()
             && self.google_mac_ecosystem.verify_airplay_2_buffer_health()
-            && !self.google_mac_ecosystem.extract_contrast_aware_material_you_palette(10, true).is_empty()
+            && !self
+                .google_mac_ecosystem
+                .extract_contrast_aware_material_you_palette(10, true)
+                .is_empty()
             && self.frappe_framework.erpnext_workflow_active
             && self.itsfoss_tooling.verify_tooling()
             && self.geeky_gadgets.audit_sbc_support()
