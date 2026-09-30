@@ -2,7 +2,7 @@
 
 **Snapshot date:** 2026-09-30
 **Remote:** `AaryanSinghChauhan09/SigmaOS`
-**Latest verified code snapshot:** `1e714810b7`
+**Latest verified code snapshot:** `0a575ca58e` (PR #1751 review branch; not yet merged to `main`)
 
 This file records verified work and known limitations. It does not claim that SigmaOS matches Linux or BSD feature parity, is production-ready, or has completed every roadmap idea.
 
@@ -43,6 +43,7 @@ This file records verified work and known limitations. It does not claim that Si
 - The focused fail-closed encryption-service test passed after removing the unnecessary pointer copy.
 - All four `SafeInstaller` unit tests passed after removing the fake password hash.
 - The emergency-gate module is currently not linked into the crate; it was compiled directly with `rustc --test`, and its fail-closed test passed.
+- The newly exported missing-distro component module passed its focused tests (2) and the full library suite (3,181 passed, 0 failed) after merging current `main`; these components remain models rather than runtime distro integrations.
 - All three focused Fedora remote subsystem tests passed after disabling unauthenticated session/ticket creation and GSSAPI acceptance.
 - `cargo check --lib` passed earlier in this work; later code changes were compiled by the focused library test builds.
 - `./run_sigma_tests.sh` passed in an earlier verification run. Python `pytest` could not run because `pytest` is not installed in the environment.
