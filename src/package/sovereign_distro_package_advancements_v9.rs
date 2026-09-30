@@ -142,7 +142,7 @@ impl SovereignPackageAutoRepairAndDeltaPatchOrchestrator {
 
     pub fn verify_and_repair_package_integrity(
         &mut self,
-        pkg_name: &str,
+        _pkg_name: &str,
         missing_so: &[String],
     ) -> bool {
         if !missing_so.is_empty() {
@@ -218,7 +218,7 @@ impl SovereignPackageVulnerabilityAdvisoryAutoPatchEngine {
     pub fn audit_and_patch_vulnerabilities(
         &self,
         pkg_name: &str,
-        pkg_version: &str,
+        _pkg_version: &str,
     ) -> (bool, Option<String>) {
         for (cve, spec) in &self.known_cves {
             if spec.contains(pkg_name) {
