@@ -16,6 +16,14 @@ SigmaOS implements multiple layers of security:
 4. Filesystem encryption interfaces; audited providers are not integrated
 5. Network security models, which require runtime and protocol review
 
+### System user credential storage
+
+`system::UserManager` does not have a vetted password-hashing provider. Its
+`set_password` returns `UserError::CryptoUnavailable` without modifying user
+or shadow records, and `verify_password` always denies. Existing demonstration
+hashes are not accepted. AI agents must preserve this fail-closed behavior and
+reject or reset legacy weak hashes if a trusted provider is later integrated.
+
 ## Pledge/Unveil Sandbox
 
 ### Pledge
