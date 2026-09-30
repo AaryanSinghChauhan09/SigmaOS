@@ -2,11 +2,13 @@
 
 **Snapshot date:** 2026-09-30
 **Remote:** `AaryanSinghChauhan09/SigmaOS`
-**Latest verified code snapshot:** `1e714810b7`
+**Latest verified code snapshot:** `d5729a6ee1` (PR #1755 review branch; not yet merged to `main`)
 
 This file records verified work and known limitations. It does not claim that SigmaOS matches Linux or BSD feature parity, is production-ready, or has completed every roadmap idea.
 
 ## Verified changes in this work
+
+- Added distro-specific authentication mechanism metadata to the Linux/BSD interoperability model while keeping authentication and subsystem auditing unavailable without a trusted provider.
 
 - Optimized `tr` translation using an ASCII lookup table and a Unicode character map; duplicate-source and Unicode behavior are covered by focused tests.
 - Optimized package-name lookup by trimming NUL padding once and using checked slice boundaries.
@@ -40,6 +42,7 @@ This file records verified work and known limitations. It does not claim that Si
 - Focused fail-closed tests passed for the RNG and simulated audit; the combined security fail-closed filter passed 7 tests.
 - The complete library suite passed after the RNG, sodium, hash, KDF, PQC, and FDE changes: 3,177 passed, 0 failed.
 - The complete library suite passed with the primitive changes: 3,179 passed, 0 failed. `cargo fmt --check` and `git diff --check` also passed.
+- The repaired Linux/BSD auth-engine branch passed all 9 focused interoperability tests and the full library suite (3,181 passed, 0 failed) after integrating current `main`.
 - The focused fail-closed encryption-service test passed after removing the unnecessary pointer copy.
 - All four `SafeInstaller` unit tests passed after removing the fake password hash.
 - The emergency-gate module is currently not linked into the crate; it was compiled directly with `rustc --test`, and its fail-closed test passed.

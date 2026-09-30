@@ -383,6 +383,10 @@ The clipboard's XOR strategy also fails closed. The default clipboard mode is ex
 
 Cross-distro authentication dispatch also fails closed: `SovereignSystemdHomedAuthBridge` has no trusted credential backend and cannot authenticate users or mount home directories. Do not count it as an available authentication feature until a provider validates credentials and the mount path has end-to-end tests.
 
+The Linux/BSD PAM-auth compatibility model also returns an unavailable error
+and does not create trusted sessions without a real PAM, BSD-auth, or
+systemd-homed provider. Distro mode selection is not credential verification.
+
 Maintain this component by checking opcode encodings, forward jump targets, native-endian argument word offsets, 64-bit comparisons, and default-action behavior together. Run `cargo test --lib security::seccomp_filter::tests` and `cargo check --lib` after edits. Do not weaken the default action or claim runtime enforcement unless the kernel integration path and its end-to-end checks are present.
 
 ## Documentation status
