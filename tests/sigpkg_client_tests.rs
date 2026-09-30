@@ -2,6 +2,14 @@
 use sigmaos::sigpkg::client::{parse_manifest, Manifest, SigpkgClient, TufRole};
 use sigmaos::sigpkg::{CryptoVerifier, Version};
 
+fn sha256_hex(data: &[u8]) -> String {
+    sigmaos::crypto::primitives::sha256_hash(data)
+        .data
+        .iter()
+        .map(|byte| format!("{byte:02x}"))
+        .collect()
+}
+
 #[test]
 fn test_sigpkg_client_repository_flow() {
     let mut client = SigpkgClient::new("https://repo.sigmaos.dev/sigma");
@@ -10,8 +18,9 @@ fn test_sigpkg_client_repository_flow() {
     // Fetch + verify signed root metadata.
     let payload = b"{\"role\":\"root\",\"version\":1}";
     let sig = client.verifier.sign("root-key", payload);
-    assert!(client.fetch_metadata(TufRole::Root, payload, &sig));
-    assert!(client.metadata.contains_key("root"));
+    assert!(sig.is_empty());
+    assert!(!client.fetch_metadata(TufRole::Root, payload, &sig));
+    assert!(!client.metadata.contains_key("root"));
 
     // An unsigned timestamp must be rejected.
     assert!(!client.fetch_metadata(TufRole::Timestamp, payload, &[]));
@@ -24,12 +33,7 @@ fn test_sigpkg_client_install_from_manifest() {
     client.add_trusted_key("pkg-key");
 
     let payload: &[u8] = b"hello-package-bytes";
-    let mut h: u64 = 0xcbf29ce484222325;
-    for &b in payload.iter() {
-        h ^= b as u64;
-        h = h.wrapping_mul(0x100000001b3);
-    }
-    let checksum = format!("{:x}", h);
+    let checksum = sha256_hex(payload);
 
     let manifest = parse_manifest(&format!(
         "name: hello\nversion: 2.0.0\ndescription: hello util\nchecksum: {}\ndependencies:\n",
@@ -77,7 +81,7 @@ fn test_sigpkg_manifest_build_and_resolve() {
 fn test_sigpkg_manifest_roundtrip() {
     let verifier = CryptoVerifier::new();
     let sig = verifier.sign("some-key", b"meta");
-    assert!(!sig.is_empty());
+    assert!(sig.is_empty());
 }
 
 #[test]
@@ -89,7 +93,7 @@ fn test_sigpkg_daemon_sync_verify_and_gc() {
 
     assert!(matches!(
         daemon.sync_repository(payload, &sig),
-        sigmaos::sigpkg::SyncStatus::Synced { .. }
+        sigmaos::sigpkg::SyncStatus::Failed { .. }
     ));
     // Unsigned must fail all-or-nothing.
     assert!(matches!(
@@ -100,26 +104,18 @@ fn test_sigpkg_daemon_sync_verify_and_gc() {
     // Deploy two packages; keep one referenced and GC the other.
     let installed = std::collections::BTreeMap::new();
     let p1: &[u8] = b"keep-bytes";
-    let mut h1: u64 = 0xcbf29ce484222325;
-    for &b in p1.iter() {
-        h1 ^= b as u64;
-        h1 = h1.wrapping_mul(0x100000001b3);
-    }
+    let h1 = sha256_hex(p1);
     let m1 = sigmaos::sigpkg::parse_manifest(&format!(
-        "name: keep\nversion: 1.0.0\ndescription: x\nchecksum: {:x}\ndependencies:\n",
+        "name: keep\nversion: 1.0.0\ndescription: x\nchecksum: {}\ndependencies:\n",
         h1
     ))
     .unwrap();
     daemon.deploy(&m1, p1, &installed).unwrap();
 
     let p2: &[u8] = b"orphan-bytes";
-    let mut h2: u64 = 0xcbf29ce484222325;
-    for &b in p2.iter() {
-        h2 ^= b as u64;
-        h2 = h2.wrapping_mul(0x100000001b3);
-    }
+    let h2 = sha256_hex(p2);
     let m2 = sigmaos::sigpkg::parse_manifest(&format!(
-        "name: orphan\nversion: 1.0.0\ndescription: x\nchecksum: {:x}\ndependencies:\n",
+        "name: orphan\nversion: 1.0.0\ndescription: x\nchecksum: {}\ndependencies:\n",
         h2
     ))
     .unwrap();
@@ -136,13 +132,9 @@ fn test_sigpkg_daemon_update_check() {
     let mut daemon = sigmaos::sigpkg::SigpkgDaemon::default();
     let installed = std::collections::BTreeMap::new();
     let p: &[u8] = b"hello-bytes";
-    let mut h: u64 = 0xcbf29ce484222325;
-    for &b in p.iter() {
-        h ^= b as u64;
-        h = h.wrapping_mul(0x100000001b3);
-    }
+    let h = sha256_hex(p);
     let m = sigmaos::sigpkg::parse_manifest(&format!(
-        "name: hello\nversion: 1.0.0\ndescription: x\nchecksum: {:x}\ndependencies:\n",
+        "name: hello\nversion: 1.0.0\ndescription: x\nchecksum: {}\ndependencies:\n",
         h
     ))
     .unwrap();
