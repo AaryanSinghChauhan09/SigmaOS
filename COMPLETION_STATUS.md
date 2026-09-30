@@ -8,6 +8,8 @@ This file records verified work and known limitations. It does not claim that Si
 
 ## Verified changes in this work
 
+- The V9 package interoperability module recognizes several package filename extensions. Its unintegrated parsers, digest/signature verification, conversion, sandbox enforcement, and installation APIs now fail closed; policy descriptions are not runtime sandbox controls.
+
 - Optimized `tr` translation using an ASCII lookup table and a Unicode character map; duplicate-source and Unicode behavior are covered by focused tests.
 - Optimized package-name lookup by trimming NUL padding once and using checked slice boundaries.
 - Optimized launcher matching without allocations on ASCII search paths while preserving Unicode lowercase matching.
