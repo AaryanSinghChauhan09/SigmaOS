@@ -166,7 +166,7 @@ impl PasswordPolicy {
     }
 
     pub fn validate(&self, password: &str) -> Result<(), UserError> {
-        if password.len() < self.min_length as usize {
+        if password.chars().count() < self.min_length as usize {
             return Err(UserError::PasswordTooShort);
         }
         if self.require_uppercase && !password.chars().any(|c| c.is_uppercase()) {
@@ -175,8 +175,11 @@ impl PasswordPolicy {
         if self.require_lowercase && !password.chars().any(|c| c.is_lowercase()) {
             return Err(UserError::PasswordMissingLowercase);
         }
-        if self.require_numbers && !password.chars().any(|c| c.is_numeric()) {
+        if self.require_numbers && !password.chars().any(|c| c.is_ascii_digit()) {
             return Err(UserError::PasswordMissingNumbers);
+        }
+        if self.require_special && !password.chars().any(|c| c.is_ascii_punctuation()) {
+            return Err(UserError::PasswordMissingSpecial);
         }
         Ok(())
     }
@@ -208,14 +211,12 @@ impl PasswordHash {
         }
     }
 
-    pub fn hash_password(&mut self, password: &str) -> Result<(), UserError> {
-        // Hash password with salt
-        Ok(())
+    pub fn hash_password(&mut self, _password: &str) -> Result<(), UserError> {
+        Err(UserError::ProviderUnavailable)
     }
 
-    pub fn verify(&self, password: &str) -> Result<bool, UserError> {
-        // Verify password against hash
-        Ok(true)
+    pub fn verify(&self, _password: &str) -> Result<bool, UserError> {
+        Err(UserError::ProviderUnavailable)
     }
 }
 
@@ -245,21 +246,16 @@ impl PasswordManager {
     }
 
     pub fn verify_password(&self, username: &str, password: &str) -> Result<bool, UserError> {
-        if let Some(hash) = self.password_hashes.iter().find(|h| h.username == username) {
-            hash.verify(password)
-        } else {
-            Err(UserError::UserNotFound)
-        }
+        let _ = (username, password);
+        Err(UserError::ProviderUnavailable)
     }
 
-    pub fn lock_account(&mut self, username: &str) -> Result<(), UserError> {
-        // Lock user account
-        Ok(())
+    pub fn lock_account(&mut self, _username: &str) -> Result<(), UserError> {
+        Err(UserError::ProviderUnavailable)
     }
 
-    pub fn unlock_account(&mut self, username: &str) -> Result<(), UserError> {
-        // Unlock user account
-        Ok(())
+    pub fn unlock_account(&mut self, _username: &str) -> Result<(), UserError> {
+        Err(UserError::ProviderUnavailable)
     }
 }
 
@@ -347,6 +343,7 @@ pub enum UserError {
     PasswordMissingSpecial,
     ModuleNotFound,
     HashFailed,
+    ProviderUnavailable,
 }
 
 impl Default for UserManager {
@@ -396,11 +393,22 @@ mod tests {
     fn test_password_policy() {
         let policy = PasswordPolicy::new();
         assert!(policy.validate("Test123!").is_ok());
+        assert_eq!(
+            policy.validate("Test1234"),
+            Err(UserError::PasswordMissingSpecial)
+        );
     }
 
     #[test]
     fn test_password_manager() {
         let mut manager = PasswordManager::new();
-        assert!(manager.set_password("testuser", "Test123!").is_ok());
+        assert_eq!(
+            manager.set_password("testuser", "Test123!"),
+            Err(UserError::ProviderUnavailable)
+        );
+        assert_eq!(
+            manager.verify_password("testuser", "Test123!"),
+            Err(UserError::ProviderUnavailable)
+        );
     }
 }

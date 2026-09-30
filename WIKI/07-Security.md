@@ -214,6 +214,13 @@ keep maintenance access locked until an audited password-hashing verifier and
 account-state backend are integrated. Update this guidance with any future
 provider change; never substitute direct byte or prefix comparisons.
 
+`src/functions/user.rs` has no audited password-hashing provider or account
+state backend. Hashing, verification, password changes, and account lock or
+unlock requests return `UserError::ProviderUnavailable`; they neither claim
+success nor authenticate users. Password policy checks are not authentication.
+AI agents must preserve fail-closed errors until audited hash storage and real
+account-state enforcement are integrated and reviewed.
+
 `distro::InteractiveUserEnvironment` is exported, but it has no trusted
 credential verifier. `authenticate_and_login` returns the same unavailable
 error for every credential and does not create a session; the default root
