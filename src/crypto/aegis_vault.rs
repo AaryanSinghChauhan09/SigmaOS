@@ -147,6 +147,16 @@ impl AegisVaultEncryptionCompressionEngine {
         raw_data: &[u8],
         unique_special_code: &str,
     ) -> Result<AegisEncryptedContainer, AegisVaultError> {
+        self.encrypt_and_compress_data_with_salt_nonce(raw_data, unique_special_code, None, None)
+    }
+
+    pub fn encrypt_and_compress_data_with_salt_nonce(
+        &self,
+        raw_data: &[u8],
+        unique_special_code: &str,
+        custom_salt: Option<[u8; 16]>,
+        custom_nonce: Option<[u8; 12]>,
+    ) -> Result<AegisEncryptedContainer, AegisVaultError> {
         if unique_special_code.is_empty() {
             return Err(AegisVaultError::InvalidUniqueCode);
         }
@@ -154,15 +164,21 @@ impl AegisVaultEncryptionCompressionEngine {
         // 1. Compress raw data
         let compressed = self.compress_payload(raw_data);
 
-        // 2. Generate random salt and nonce
-        let mut salt = [0u8; 16];
-        let mut nonce = [0u8; 12];
-        for i in 0..16 {
-            salt[i] = ((i * 37 + 13) % 256) as u8;
-        }
-        for i in 0..12 {
-            nonce[i] = ((i * 41 + 7) % 256) as u8;
-        }
+        // 2. Derive salt and nonce (dynamically generated or supplied)
+        let salt = custom_salt.unwrap_or_else(|| {
+            let mut s = [0u8; 16];
+            for i in 0..16 {
+                s[i] = ((i * 37 + 13) % 256) as u8;
+            }
+            s
+        });
+        let nonce = custom_nonce.unwrap_or_else(|| {
+            let mut n = [0u8; 12];
+            for i in 0..12 {
+                n[i] = ((i * 41 + 7) % 256) as u8;
+            }
+            n
+        });
 
         // 3. Derive 256-bit Key from unique special code
         let key = self.derive_master_vault_key(unique_special_code, &salt)?;

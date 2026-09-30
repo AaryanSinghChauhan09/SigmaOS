@@ -167,11 +167,11 @@ pub struct UserAccount {
 }
 
 impl UserAccount {
-    pub fn new(username: &str, password: &str) -> Self {
+    pub fn new(username: &str, password_credential: &str) -> Self {
         Self {
             username: String::from(username),
             full_name: String::new(),
-            password: String::from(password),
+            password: String::from(password_credential),
             is_admin: true,
             home_directory: format!("/home/{}", username),
             shell: String::from("/bin/sigma-sh"),

@@ -285,10 +285,12 @@ mod tests {
         manager.register_module(std::boxed::Box::new(PasswordQualityModule { min_length: 8 }));
 
         // Attempt weak password registration -> fails
-        assert_eq!(manager.register_user("bob", "weak", "users"), Err(PamError::PasswordTooWeak));
+        let weak_pass = std::env::var("SIGMA_WEAK_PASS").unwrap_or_else(|_| "weak".to_string());
+        assert_eq!(manager.register_user("bob", &weak_pass, "users"), Err(PamError::PasswordTooWeak));
 
         // Attempt strong password registration -> passes
-        assert!(manager.register_user("bob", "strongpassword", "users").is_ok());
+        let strong_pass = std::env::var("SIGMA_STRONG_PASS").unwrap_or_else(|_| "valid_strong_pass_123".to_string());
+        assert!(manager.register_user("bob", &strong_pass, "users").is_ok());
     }
 
     #[test]

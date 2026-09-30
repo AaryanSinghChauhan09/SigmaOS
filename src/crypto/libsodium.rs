@@ -585,8 +585,10 @@ mod tests {
     }
 
     fn generate_random_nonce<const N: usize>() -> [u8; N] {
-        let mut n = core::array::from_fn(|i| (i as u8).wrapping_mul(17));
-        random_bytes(&mut n);
+        let mut n = [0u8; N];
+        for i in 0..N {
+            n[i] = ((i * 17 + 3) % 256) as u8;
+        }
         n
     }
 
