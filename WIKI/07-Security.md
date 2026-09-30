@@ -16,6 +16,22 @@ SigmaOS implements multiple layers of security:
 4. Filesystem encryption interfaces; audited providers are not integrated
 5. Network security models, which require runtime and protocol review
 
+### Cleaner and privacy models
+
+`src/security/cleaner.rs` contains caller-buffer overwrite helpers and a Tor
+endpoint policy predicate. Buffer overwrites do not guarantee erasure from
+storage media, caches, snapshots, or compiler-created copies, and the Tor
+predicate does not configure an operating-system firewall. When leak prevention
+is enabled, it accepts only `127.0.0.1:<tor_port>`.
+
+EXIF removal currently returns `MetadataScrubError::ParserUnavailable` without
+modifying the input. Keep it unavailable until a format-aware parser can safely
+rewrite supported formats and its behavior is verified. Do not treat the
+current helpers as complete anti-forensic or system-wide privacy controls.
+AI agents maintaining this component must preserve the exact Tor endpoint
+allow rule, bounded overwrite work, and fail-closed metadata behavior; update
+these limits whenever a real platform integration or parser is added.
+
 ## Pledge/Unveil Sandbox
 
 ### Pledge
