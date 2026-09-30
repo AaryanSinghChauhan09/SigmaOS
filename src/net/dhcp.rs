@@ -1,5 +1,6 @@
 /// SigmaOS DHCP Client (Phase 2 Networking)
 /// Inspired by Linux Mint's network-manager DHCP integration
+
 use std::vec::Vec;
 
 #[derive(Debug, PartialEq)]

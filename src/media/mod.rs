@@ -10,8 +10,8 @@ pub mod sovereign_video_editor;
 pub mod sovereign_video_player;
 
 pub use distro_media_engine::{
-    AudioSinkBackend, FfmpegHwEncoderBackend, FfmpegZeroCopyEncoder, GStreamerPulseAudioPipeline,
-    GstHardwareDecoder, LinuxBsdDistroMediaSuite, MpvAudioTrack, MpvFreeBsdSndioEngine,
+    AudioSinkBackend, FfmpegHwEncoderBackend, FfmpegZeroCopyEncoder, GstHardwareDecoder,
+    GStreamerPulseAudioPipeline, LinuxBsdDistroMediaSuite, MpvAudioTrack, MpvFreeBsdSndioEngine,
     SubtitleTrackEntry, VlcSubtitleManager,
 };
 
@@ -31,8 +31,7 @@ pub use browser::{
     SearchEngineType, SearchSwitcher, SecureStorageContainer, SigmaWebBrowser,
     SovereignBrowserEngine, TabMemoryOptimizer, TelemetryAndTrackerStripper, TorCircuitManager,
     TorOnionRoutingTunnelEngine, TorSecurityLevel, TrackerTrustGrade, UBlockOriginFilterEngine,
-    UngoogledChromiumPrivacyHardeningEngine, VivaldiSpatialNavigationEngine,
-    ZenWorkspaceTreeEngine,
+    UngoogledChromiumPrivacyHardeningEngine, VivaldiSpatialNavigationEngine, ZenWorkspaceTreeEngine,
 };
 
 pub use sovereign_video_player::{

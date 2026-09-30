@@ -24,9 +24,9 @@
 #![allow(dead_code)]
 
 use std::collections::BTreeMap;
-use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use std::format;
 
 // ─── Memory Region ────────────────────────────────────────────────────────────
 
@@ -80,25 +80,18 @@ impl MemoryRegion {
     pub fn is_dirty(&self, page_idx: usize) -> bool {
         let byte = page_idx / 8;
         let bit = page_idx % 8;
-        if byte >= self.dirty_bitmap.len() {
-            return false;
-        }
+        if byte >= self.dirty_bitmap.len() { return false; }
         (self.dirty_bitmap[byte] >> bit) & 1 != 0
     }
 
     /// Clear all dirty bits (after pages have been transferred)
     pub fn clear_dirty(&mut self) {
-        for b in &mut self.dirty_bitmap {
-            *b = 0;
-        }
+        for b in &mut self.dirty_bitmap { *b = 0; }
     }
 
     /// Count total dirty pages
     pub fn dirty_page_count(&self) -> usize {
-        self.dirty_bitmap
-            .iter()
-            .map(|b| b.count_ones() as usize)
-            .sum()
+        self.dirty_bitmap.iter().map(|b| b.count_ones() as usize).sum()
     }
 
     /// Count total pages in this region
@@ -109,9 +102,7 @@ impl MemoryRegion {
     /// Dirty rate: fraction of pages that are dirty [0.0, 1.0]
     pub fn dirty_rate(&self) -> f32 {
         let total = self.total_pages();
-        if total == 0 {
-            return 0.0;
-        }
+        if total == 0 { return 0.0; }
         self.dirty_page_count() as f32 / total as f32
     }
 }
@@ -121,30 +112,12 @@ impl MemoryRegion {
 /// Simulated CPU register file for x86_64
 #[derive(Debug, Clone, Default)]
 pub struct CpuRegisters {
-    pub rax: u64,
-    pub rbx: u64,
-    pub rcx: u64,
-    pub rdx: u64,
-    pub rsi: u64,
-    pub rdi: u64,
-    pub rsp: u64,
-    pub rbp: u64,
-    pub r8: u64,
-    pub r9: u64,
-    pub r10: u64,
-    pub r11: u64,
-    pub r12: u64,
-    pub r13: u64,
-    pub r14: u64,
-    pub r15: u64,
-    pub rip: u64,
-    pub rflags: u64,
-    pub cs: u16,
-    pub ss: u16,
-    pub ds: u16,
-    pub es: u16,
-    pub fs: u16,
-    pub gs: u16,
+    pub rax: u64, pub rbx: u64, pub rcx: u64, pub rdx: u64,
+    pub rsi: u64, pub rdi: u64, pub rsp: u64, pub rbp: u64,
+    pub r8: u64,  pub r9: u64,  pub r10: u64, pub r11: u64,
+    pub r12: u64, pub r13: u64, pub r14: u64, pub r15: u64,
+    pub rip: u64, pub rflags: u64,
+    pub cs: u16, pub ss: u16, pub ds: u16, pub es: u16, pub fs: u16, pub gs: u16,
 }
 
 // ─── File Descriptor State ────────────────────────────────────────────────────
@@ -160,21 +133,11 @@ pub struct FdState {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum FdType {
-    RegularFile {
-        path: String,
-    },
-    Pipe {
-        pipe_id: u32,
-    },
-    Socket {
-        domain: u32,
-        sock_type: u32,
-        peer_addr: String,
-    },
+    RegularFile { path: String },
+    Pipe { pipe_id: u32 },
+    Socket { domain: u32, sock_type: u32, peer_addr: String },
     Epoll,
-    EventFd {
-        count: u64,
-    },
+    EventFd { count: u64 },
 }
 
 // ─── Network Connection State ─────────────────────────────────────────────────
@@ -255,10 +218,7 @@ impl ProcessSnapshot {
 
     /// Total dirty pages across all regions
     pub fn total_dirty_pages(&self) -> usize {
-        self.memory_regions
-            .iter()
-            .map(|r| r.dirty_page_count())
-            .sum()
+        self.memory_regions.iter().map(|r| r.dirty_page_count()).sum()
     }
 }
 
@@ -343,8 +303,7 @@ impl LiveMigrationEngine {
     pub fn checkpoint(&mut self, snapshot: ProcessSnapshot) -> u32 {
         let pid = snapshot.pid;
         let stats = MigrationStats::default();
-        self.sessions
-            .insert(pid, (snapshot, MigrationPhase::Checkpointing, stats));
+        self.sessions.insert(pid, (snapshot, MigrationPhase::Checkpointing, stats));
         pid
     }
 
@@ -374,11 +333,8 @@ impl LiveMigrationEngine {
             region.clear_dirty();
         }
 
-        let dirty_rate = if total_pages == 0 {
-            0.0
-        } else {
-            total_dirty as f32 / total_pages as f32
-        };
+        let dirty_rate = if total_pages == 0 { 0.0 }
+            else { total_dirty as f32 / total_pages as f32 };
 
         Some((total_dirty, dirty_rate))
     }
@@ -406,9 +362,7 @@ impl LiveMigrationEngine {
     ///
     /// Returns Ok(new_pid) on success, or Err(reason) on failure.
     pub fn restore(&mut self, pid: u32) -> Result<u32, String> {
-        let session = self
-            .sessions
-            .get_mut(&pid)
+        let session = self.sessions.get_mut(&pid)
             .ok_or_else(|| format!("No migration session for pid={}", pid))?;
         let (snapshot, phase, stats) = session;
 
@@ -513,23 +467,13 @@ mod migration_tests {
         snap.registers.rip = 0x400000;
         snap.registers.rsp = 0x7FFF0000;
 
-        let mut region1 = MemoryRegion::new(
-            0x400000,
-            4 * 4096,
-            MemoryRegion::PROT_READ | MemoryRegion::PROT_EXEC,
-        );
+        let mut region1 = MemoryRegion::new(0x400000, 4 * 4096, MemoryRegion::PROT_READ | MemoryRegion::PROT_EXEC);
         region1.mark_dirty(0);
         region1.mark_dirty(1);
         snap.add_region(region1);
 
-        let mut region2 = MemoryRegion::new(
-            0x7FFF0000,
-            8 * 4096,
-            MemoryRegion::PROT_READ | MemoryRegion::PROT_WRITE,
-        );
-        for p in 0..4 {
-            region2.mark_dirty(p);
-        }
+        let mut region2 = MemoryRegion::new(0x7FFF0000, 8 * 4096, MemoryRegion::PROT_READ | MemoryRegion::PROT_WRITE);
+        for p in 0..4 { region2.mark_dirty(p); }
         snap.add_region(region2);
 
         snap
@@ -537,11 +481,7 @@ mod migration_tests {
 
     #[test]
     fn test_memory_region_dirty_tracking() {
-        let mut region = MemoryRegion::new(
-            0x1000,
-            8 * 4096,
-            MemoryRegion::PROT_READ | MemoryRegion::PROT_WRITE,
-        );
+        let mut region = MemoryRegion::new(0x1000, 8 * 4096, MemoryRegion::PROT_READ | MemoryRegion::PROT_WRITE);
         region.mark_dirty(0);
         region.mark_dirty(3);
         region.mark_dirty(7);
@@ -611,9 +551,7 @@ mod migration_tests {
     fn test_full_hybrid_migration() {
         let mut engine = LiveMigrationEngine::new();
         let snap = make_snapshot(5000);
-        let new_pid = engine
-            .migrate_hybrid(snap)
-            .expect("hybrid migration should succeed");
+        let new_pid = engine.migrate_hybrid(snap).expect("hybrid migration should succeed");
         assert!(new_pid > 5000);
         assert_eq!(engine.completed_migrations, 1);
         assert_eq!(engine.failed_migrations, 0);

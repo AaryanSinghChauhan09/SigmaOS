@@ -203,10 +203,7 @@ impl XfsFilesystem {
         }
 
         if strategy == AllocationStrategy::Realtime {
-            let rt = self
-                .realtime
-                .as_mut()
-                .ok_or("Realtime subsystem not enabled")?;
+            let rt = self.realtime.as_mut().ok_or("Realtime subsystem not enabled")?;
             let ext_idx = rt.allocate_extent()?;
             let start_block = ext_idx * rt.extent_size_blocks as u64;
             let extent = XfsExtent {
@@ -429,9 +426,7 @@ mod tests {
         fs.enable_realtime(64, 16);
 
         let id = fs.create_inode(262144, 0o644).unwrap();
-        let extents = fs
-            .allocate_blocks(id, 64, AllocationStrategy::Realtime)
-            .unwrap();
+        let extents = fs.allocate_blocks(id, 64, AllocationStrategy::Realtime).unwrap();
         assert_eq!(extents.len(), 1);
         assert_eq!(extents[0].block_count, 64);
         assert!(fs.get_inode(id).unwrap().is_realtime);

@@ -53,8 +53,8 @@ pub mod zero_dependency_elimination;
 
 pub use arc::Arc;
 pub use collections::BTreeMap;
+pub use ring_buffer::{RingBuffer, HeapRingBuffer};
 pub use linked_list::{LinkedList, SList};
-pub use ring_buffer::{HeapRingBuffer, RingBuffer};
 pub use slab::{SlabCache, TypedSlabCache};
 pub use uuid::Uuid;
 pub use zero_dependency_elimination::ZeroDependencyMasterHub;

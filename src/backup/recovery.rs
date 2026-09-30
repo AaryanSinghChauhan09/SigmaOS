@@ -2,6 +2,7 @@
 //! Incremental backups, deduplicated chunks, point-in-time recovery, and instant snapshot rollbacks.
 use std::vec;
 
+
 use std::string::{String, ToString};
 use std::vec::Vec;
 
@@ -42,11 +43,7 @@ impl RecoveryManager {
             hash[i % 32] ^= b.wrapping_add(i as u8);
         }
 
-        if let Some(existing) = self
-            .chunk_repository
-            .iter_mut()
-            .find(|c| c.chunk_hash == hash)
-        {
+        if let Some(existing) = self.chunk_repository.iter_mut().find(|c| c.chunk_hash == hash) {
             existing.is_deduplicated = true;
             self.total_saved_bytes_dedup += data.len();
             return hash;
@@ -73,10 +70,7 @@ impl RecoveryManager {
     }
 
     pub fn rollback_to_snapshot(&self, snapshot_id: u32) -> Result<usize, &'static str> {
-        let snap = self
-            .snapshots
-            .iter()
-            .find(|s| s.snapshot_id == snapshot_id)
+        let snap = self.snapshots.iter().find(|s| s.snapshot_id == snapshot_id)
             .ok_or("Snapshot ID not found in recovery manager")?;
         Ok(snap.chunk_hashes.len())
     }

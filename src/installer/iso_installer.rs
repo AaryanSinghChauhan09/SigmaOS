@@ -23,10 +23,10 @@ pub enum TargetFilesystemType {
 /// Installation Target Profile Descriptor (archinstall / Calamares configuration JSON schema)
 #[derive(Debug, Clone)]
 pub struct IsoInstallProfile {
-    pub target_disk: String,   // e.g. "/dev/nvme0n1" or "/dev/sda"
-    pub hostname: String,      // e.g. "sigmaos-workstation"
-    pub username: String,      // e.g. "sigma_user"
-    pub password_hash: String, // SHA-512 / Argon2 password hash
+    pub target_disk: String,           // e.g. "/dev/nvme0n1" or "/dev/sda"
+    pub hostname: String,              // e.g. "sigmaos-workstation"
+    pub username: String,              // e.g. "sigma_user"
+    pub password_hash: String,         // SHA-512 / Argon2 password hash
     pub filesystem: TargetFilesystemType,
     pub enable_swap_file: bool,
     pub swap_size_mb: u64,
@@ -57,10 +57,7 @@ impl MultiDistroIsoInstallerEngine {
     }
 
     /// Load non-interactive JSON configuration profile (archinstall / Calamares parity)
-    pub fn load_profile_from_json(
-        &mut self,
-        json_str: &str,
-    ) -> Result<IsoInstallProfile, &'static str> {
+    pub fn load_profile_from_json(&mut self, json_str: &str) -> Result<IsoInstallProfile, &'static str> {
         if json_str.is_empty() {
             return Err("Empty ISO install profile JSON");
         }
@@ -83,15 +80,11 @@ impl MultiDistroIsoInstallerEngine {
             let trimmed = line.trim();
             if trimmed.starts_with("\"hostname\"") {
                 if let Some(pos) = trimmed.find(':') {
-                    hostname = trimmed[pos + 1..]
-                        .trim_matches(|c| c == '"' || c == ',' || c == ' ')
-                        .to_string();
+                    hostname = trimmed[pos + 1..].trim_matches(|c| c == '"' || c == ',' || c == ' ').to_string();
                 }
             } else if trimmed.starts_with("\"username\"") {
                 if let Some(pos) = trimmed.find(':') {
-                    username = trimmed[pos + 1..]
-                        .trim_matches(|c| c == '"' || c == ',' || c == ' ')
-                        .to_string();
+                    username = trimmed[pos + 1..].trim_matches(|c| c == '"' || c == ',' || c == ' ').to_string();
                 }
             }
         }
@@ -114,19 +107,12 @@ impl MultiDistroIsoInstallerEngine {
 
     /// Execute automated live ISO installation pipeline
     pub fn execute_installation_pipeline(&mut self) -> Result<String, &'static str> {
-        let profile = self
-            .active_profile
-            .clone()
-            .ok_or("No active installation profile loaded")?;
+        let profile = self.active_profile.clone().ok_or("No active installation profile loaded")?;
 
         // Step 1: Disk Partitioning (ESP + Main)
         self.installation_progress_pct = 10;
-        self.current_step_description = format!(
-            "Partitioning {} (GPT/ESP 512MB + Root)",
-            profile.target_disk
-        );
-        self.execution_logs
-            .push(self.current_step_description.clone());
+        self.current_step_description = format!("Partitioning {} (GPT/ESP 512MB + Root)", profile.target_disk);
+        self.execution_logs.push(self.current_step_description.clone());
 
         // Step 2: Filesystem Creation & Subvolumes / ZFS Pools
         self.installation_progress_pct = 30;
@@ -138,44 +124,30 @@ impl MultiDistroIsoInstallerEngine {
                     "@snapshots".to_string(),
                     "@swap".to_string(),
                 ];
-                self.current_step_description =
-                    "Created Btrfs subvolume layout (@root, @home, @snapshots, @swap)".to_string();
+                self.current_step_description = "Created Btrfs subvolume layout (@root, @home, @snapshots, @swap)".to_string();
             }
             TargetFilesystemType::ZfsZrootPool => {
-                self.created_subvolumes =
-                    vec!["zroot/ROOT/default".to_string(), "zroot/home".to_string()];
+                self.created_subvolumes = vec!["zroot/ROOT/default".to_string(), "zroot/home".to_string()];
                 self.current_step_description = "Created ZFS zroot pool & datasets".to_string();
             }
             _ => {
                 self.current_step_description = "Formatted ext4/f2fs root partition".to_string();
             }
         }
-        self.execution_logs
-            .push(self.current_step_description.clone());
+        self.execution_logs.push(self.current_step_description.clone());
 
         // Step 3: Package Unpacking & System RSync / Target Setup
         self.installation_progress_pct = 70;
-        self.current_step_description = format!(
-            "Unpacking live ISO squashfs image onto {}",
-            profile.target_disk
-        );
-        self.execution_logs
-            .push(self.current_step_description.clone());
+        self.current_step_description = format!("Unpacking live ISO squashfs image onto {}", profile.target_disk);
+        self.execution_logs.push(self.current_step_description.clone());
 
         // Step 4: Bootloader (Limine / GRUB / EFISTUB) & Finalization
         self.installation_progress_pct = 100;
-        self.current_step_description = format!(
-            "Bootloader installed, hostname '{}', user '{}' configured.",
-            profile.hostname, profile.username
-        );
-        self.execution_logs
-            .push(self.current_step_description.clone());
+        self.current_step_description = format!("Bootloader installed, hostname '{}', user '{}' configured.", profile.hostname, profile.username);
+        self.execution_logs.push(self.current_step_description.clone());
         self.is_complete = true;
 
-        Ok(format!(
-            "ISO Installation to {} complete successfully.",
-            profile.target_disk
-        ))
+        Ok(format!("ISO Installation to {} complete successfully.", profile.target_disk))
     }
 }
 

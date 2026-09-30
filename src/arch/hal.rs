@@ -3,11 +3,13 @@
 //! Inspired by Linux (sysfs, eBPF/IRQ domains, device tree FDT, PCI ECAM, DMA pools)
 //! and BSD (FreeBSD newbus/bus_dma/nexus, OpenBSD pledge/unveil security, NetBSD rump hypercall driver model).
 
-use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
+
+
 use std::boxed::Box;
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 
 // ==============================================================================
 // 1. Core Drivers & Unified Driver Interfaces
@@ -68,11 +70,7 @@ pub trait ArchitectureHal: Send + Sync {
     unsafe fn invalidate_tlb_page(&self, vaddr: u64);
 
     /// Allocate zero-copy DMA memory buffer conforming to BSD bus_dma_tag constraints
-    fn allocate_dma_buffer(
-        &self,
-        size: usize,
-        alignment: usize,
-    ) -> Result<HalDmaBuffer, DriverError>;
+    fn allocate_dma_buffer(&self, size: usize, alignment: usize) -> Result<HalDmaBuffer, DriverError>;
 
     /// Bind a virtual interrupt vector to a hardware IRQ handler
     fn register_irq_handler(
@@ -154,13 +152,7 @@ pub struct HalDeviceDescriptor {
 }
 
 impl HalDeviceDescriptor {
-    pub fn new(
-        device_id: u32,
-        vendor_id: u16,
-        product_id: u16,
-        bus_type: HalBusType,
-        syspath: &str,
-    ) -> Self {
+    pub fn new(device_id: u32, vendor_id: u16, product_id: u16, bus_type: HalBusType, syspath: &str) -> Self {
         Self {
             device_id,
             vendor_id,
@@ -311,18 +303,13 @@ impl X86_64HAL {
     }
 
     /// PCI ECAM MMIO space scan for x86_64
-    pub fn enumerate_pci_ecam(
-        &self,
-        ecam_base: u64,
-    ) -> Result<Vec<HalDeviceDescriptor>, DriverError> {
+    pub fn enumerate_pci_ecam(&self, ecam_base: u64) -> Result<Vec<HalDeviceDescriptor>, DriverError> {
         let mut devices = Vec::new();
         // Scan ECAM 256 buses
         for bus in 0..=255u8 {
             for dev in 0..32u8 {
                 for func in 0..8u8 {
-                    let offset = (((bus as u64) << 20)
-                        | ((dev as u64) << 15)
-                        | ((func as u64) << 12)) as usize;
+                    let offset = (((bus as u64) << 20) | ((dev as u64) << 15) | ((func as u64) << 12)) as usize;
                     let _addr = ecam_base + offset as u64;
                     // Check vendor ID stub
                     if bus == 0 && dev == 0 && func == 0 {
@@ -423,11 +410,7 @@ impl ArchitectureHal for X86_64HAL {
         let _ = vaddr;
     }
 
-    fn allocate_dma_buffer(
-        &self,
-        size: usize,
-        alignment: usize,
-    ) -> Result<HalDmaBuffer, DriverError> {
+    fn allocate_dma_buffer(&self, size: usize, alignment: usize) -> Result<HalDmaBuffer, DriverError> {
         let tag = HalDmaTag::new(alignment, size);
         Ok(HalDmaBuffer {
             phys_addr: 0x200000,
@@ -595,11 +578,7 @@ impl ArchitectureHal for ARM64HAL {
         let _ = vaddr;
     }
 
-    fn allocate_dma_buffer(
-        &self,
-        size: usize,
-        alignment: usize,
-    ) -> Result<HalDmaBuffer, DriverError> {
+    fn allocate_dma_buffer(&self, size: usize, alignment: usize) -> Result<HalDmaBuffer, DriverError> {
         let tag = HalDmaTag::new(alignment, size);
         Ok(HalDmaBuffer {
             phys_addr: 0x80000000,
@@ -679,16 +658,11 @@ impl RISCV64HAL {
     }
 
     /// RISC-V SBI (Supervisor Binary Interface) ecall wrapper
-    pub fn sbi_ecall(
-        &self,
-        extension_id: usize,
-        _function_id: usize,
-        _arg0: u64,
-    ) -> Result<i64, DriverError> {
+    pub fn sbi_ecall(&self, extension_id: usize, _function_id: usize, _arg0: u64) -> Result<i64, DriverError> {
         // SBI extensions: Timer (0x00), IPI (0x01), RFENCE (0x02), HSM (0x48534D), SRST (0x53525354)
         match extension_id {
-            0x00 => Ok(0),       // sbi_set_timer
-            0x01 => Ok(0),       // sbi_send_ipi
+            0x00 => Ok(0), // sbi_set_timer
+            0x01 => Ok(0), // sbi_send_ipi
             0x53525354 => Ok(0), // sbi_system_reset
             _ => Ok(0),
         }
@@ -760,11 +734,7 @@ impl ArchitectureHal for RISCV64HAL {
         let _ = vaddr;
     }
 
-    fn allocate_dma_buffer(
-        &self,
-        size: usize,
-        alignment: usize,
-    ) -> Result<HalDmaBuffer, DriverError> {
+    fn allocate_dma_buffer(&self, size: usize, alignment: usize) -> Result<HalDmaBuffer, DriverError> {
         let tag = HalDmaTag::new(alignment, size);
         Ok(HalDmaBuffer {
             phys_addr: 0x80200000,
@@ -836,18 +806,10 @@ impl Default for X86HAL {
 }
 
 impl PlatformHAL for X86HAL {
-    fn init(&mut self) -> Result<(), DriverError> {
-        Ok(())
-    }
-    fn enumerate_pci(&self) -> Result<(), DriverError> {
-        Ok(())
-    }
-    fn parse_acpi(&self) -> Result<(), DriverError> {
-        Ok(())
-    }
-    fn configure_apic(&self) -> Result<(), DriverError> {
-        Ok(())
-    }
+    fn init(&mut self) -> Result<(), DriverError> { Ok(()) }
+    fn enumerate_pci(&self) -> Result<(), DriverError> { Ok(()) }
+    fn parse_acpi(&self) -> Result<(), DriverError> { Ok(()) }
+    fn configure_apic(&self) -> Result<(), DriverError> { Ok(()) }
 }
 
 impl ArchitectureHal for X86HAL {
@@ -868,11 +830,7 @@ impl ArchitectureHal for X86HAL {
         let _ = vaddr;
     }
 
-    fn allocate_dma_buffer(
-        &self,
-        size: usize,
-        alignment: usize,
-    ) -> Result<HalDmaBuffer, DriverError> {
+    fn allocate_dma_buffer(&self, size: usize, alignment: usize) -> Result<HalDmaBuffer, DriverError> {
         let tag = HalDmaTag::new(alignment, size);
         Ok(HalDmaBuffer {
             phys_addr: 0x100000,
@@ -932,18 +890,10 @@ impl Default for LoongArch64HAL {
 }
 
 impl PlatformHAL for LoongArch64HAL {
-    fn init(&mut self) -> Result<(), DriverError> {
-        Ok(())
-    }
-    fn enumerate_pci(&self) -> Result<(), DriverError> {
-        Ok(())
-    }
-    fn parse_acpi(&self) -> Result<(), DriverError> {
-        Ok(())
-    }
-    fn configure_apic(&self) -> Result<(), DriverError> {
-        Ok(())
-    }
+    fn init(&mut self) -> Result<(), DriverError> { Ok(()) }
+    fn enumerate_pci(&self) -> Result<(), DriverError> { Ok(()) }
+    fn parse_acpi(&self) -> Result<(), DriverError> { Ok(()) }
+    fn configure_apic(&self) -> Result<(), DriverError> { Ok(()) }
 }
 
 impl ArchitectureHal for LoongArch64HAL {
@@ -964,11 +914,7 @@ impl ArchitectureHal for LoongArch64HAL {
         let _ = vaddr;
     }
 
-    fn allocate_dma_buffer(
-        &self,
-        size: usize,
-        alignment: usize,
-    ) -> Result<HalDmaBuffer, DriverError> {
+    fn allocate_dma_buffer(&self, size: usize, alignment: usize) -> Result<HalDmaBuffer, DriverError> {
         let tag = HalDmaTag::new(alignment, size);
         Ok(HalDmaBuffer {
             phys_addr: 0x90000000,
@@ -1072,11 +1018,11 @@ impl Default for ExampleDriver {
 #[repr(u32)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum KeIrql {
-    PassiveLevel = 0,  // User mode and normal thread execution
-    ApcLevel = 1,      // Asynchronous Procedure Calls execution
-    DispatchLevel = 2, // Thread scheduler & deferred execution (DPCs)
-    Dirql = 3,         // Device Interrupt Request Level (hardware drivers)
-    HighLevel = 31,    // All interrupts masked/disabled (panic, IPIs)
+    PassiveLevel = 0,     // User mode and normal thread execution
+    ApcLevel = 1,         // Asynchronous Procedure Calls execution
+    DispatchLevel = 2,    // Thread scheduler & deferred execution (DPCs)
+    Dirql = 3,            // Device Interrupt Request Level (hardware drivers)
+    HighLevel = 31,       // All interrupts masked/disabled (panic, IPIs)
 }
 
 #[repr(C)]
@@ -1086,9 +1032,7 @@ pub struct KeIrqlManager {
 
 impl KeIrqlManager {
     pub const fn new() -> Self {
-        Self {
-            current_irql: AtomicUsize::new(KeIrql::PassiveLevel as usize),
-        }
+        Self { current_irql: AtomicUsize::new(KeIrql::PassiveLevel as usize) }
     }
 
     pub fn get_irql(&self) -> KeIrql {
@@ -1282,28 +1226,18 @@ mod tests {
     #[test]
     fn test_hal_factory_and_irq_domain() {
         let mut factory_x86_32 = HALFactory::create_arch_hal(Architecture::X86);
-        assert!(factory_x86_32
-            .register_irq_handler(32, Box::new(|| {}))
-            .is_ok());
+        assert!(factory_x86_32.register_irq_handler(32, Box::new(|| {})).is_ok());
 
         let mut factory_x86 = HALFactory::create_arch_hal(Architecture::X86_64);
-        assert!(factory_x86
-            .register_irq_handler(32, Box::new(|| {}))
-            .is_ok());
+        assert!(factory_x86.register_irq_handler(32, Box::new(|| {})).is_ok());
 
         let mut factory_arm = HALFactory::create_arch_hal(Architecture::ARM64);
-        assert!(factory_arm
-            .register_irq_handler(32, Box::new(|| {}))
-            .is_ok());
+        assert!(factory_arm.register_irq_handler(32, Box::new(|| {})).is_ok());
 
         let mut factory_riscv = HALFactory::create_arch_hal(Architecture::RISCV64);
-        assert!(factory_riscv
-            .register_irq_handler(10, Box::new(|| {}))
-            .is_ok());
+        assert!(factory_riscv.register_irq_handler(10, Box::new(|| {})).is_ok());
 
         let mut factory_loongarch = HALFactory::create_arch_hal(Architecture::LoongArch64);
-        assert!(factory_loongarch
-            .register_irq_handler(5, Box::new(|| {}))
-            .is_ok());
+        assert!(factory_loongarch.register_irq_handler(5, Box::new(|| {})).is_ok());
     }
 }

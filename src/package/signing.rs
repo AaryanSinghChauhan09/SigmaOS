@@ -1,10 +1,11 @@
+
+use std::boxed::Box;
+use std::string::String;
+use std::vec::Vec;
 /// OOP-based Package Signing & Attestation for SigmaOS
 /// Based on Ideas-999-Structured: Package, Build & Reproducibility Item 10
 /// Implements provenance metadata and supply-chain attestations
 use core::sync::atomic::{AtomicUsize, Ordering};
-use std::boxed::Box;
-use std::string::String;
-use std::vec::Vec;
 
 pub type KeyID = usize;
 

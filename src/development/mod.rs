@@ -4,5 +4,6 @@
 pub mod testing;
 
 pub use testing::{
-    DevelopmentTestingFramework, TestConfig, TestResult, TestStatus, TestSuite, TestType,
+    TestType, TestStatus, TestResult, TestSuite, TestConfig,
+    DevelopmentTestingFramework,
 };

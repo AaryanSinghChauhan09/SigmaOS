@@ -58,10 +58,7 @@ impl SigmaFsEngine {
         id
     }
 
-    pub fn sub_millisecond_rollback(
-        &mut self,
-        target_tx_id: u64,
-    ) -> Result<[u8; 32], &'static str> {
+    pub fn sub_millisecond_rollback(&mut self, target_tx_id: u64) -> Result<[u8; 32], &'static str> {
         for tx in self.journal_history.iter().rev() {
             if tx.transaction_id == target_tx_id {
                 self.merkl_root.hash = tx.root_hash;
@@ -147,11 +144,13 @@ impl SovereignSched {
     }
 
     pub fn select_next_task(&mut self) -> Option<&SovereignTask> {
-        self.tasks.iter().min_by_key(|t| match t.class {
-            SchedulerClass::HardRealTimeEdf => t.deadline_ns,
-            SchedulerClass::InteractiveCfs => t.vruntime_ns + 1_000_000,
-            SchedulerClass::BatchBackground => t.vruntime_ns + 10_000_000,
-        })
+        self.tasks
+            .iter()
+            .min_by_key(|t| match t.class {
+                SchedulerClass::HardRealTimeEdf => t.deadline_ns,
+                SchedulerClass::InteractiveCfs => t.vruntime_ns + 1_000_000,
+                SchedulerClass::BatchBackground => t.vruntime_ns + 10_000_000,
+            })
     }
 }
 
@@ -384,10 +383,7 @@ impl SovereignAiOrchestrator {
         let mut map = BTreeMap::new();
         map.insert(SovereignAiModelSize::Tiny1B, "DeepSeek-1.5B".to_string());
         map.insert(SovereignAiModelSize::Medium8B, "LLaMA-3-8B".to_string());
-        map.insert(
-            SovereignAiModelSize::Large70B,
-            "DeepSeek-V3-70B".to_string(),
-        );
+        map.insert(SovereignAiModelSize::Large70B, "DeepSeek-V3-70B".to_string());
         Self { active_models: map }
     }
 

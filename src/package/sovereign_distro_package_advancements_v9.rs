@@ -84,7 +84,8 @@ impl SovereignDistributedCcacheCompilationGovernor {
                 self.cached_entries.remove(&first_key);
             }
         }
-        self.cached_entries.insert(hash.to_string(), artifact_size_mb);
+        self.cached_entries
+            .insert(hash.to_string(), artifact_size_mb);
         true
     }
 }
@@ -107,7 +108,8 @@ impl SovereignStatelessPackageConfigGovernor {
     }
 
     pub fn register_package_default_config(&mut self, rel_path: &str, default_content: &str) {
-        self.tracked_configs.insert(rel_path.to_string(), default_content.to_string());
+        self.tracked_configs
+            .insert(rel_path.to_string(), default_content.to_string());
     }
 
     pub fn detect_configuration_drift(&self, rel_path: &str, current_content: &str) -> bool {
@@ -138,14 +140,22 @@ impl SovereignPackageAutoRepairAndDeltaPatchOrchestrator {
         }
     }
 
-    pub fn verify_and_repair_package_integrity(&mut self, pkg_name: &str, missing_so: &[String]) -> bool {
+    pub fn verify_and_repair_package_integrity(
+        &mut self,
+        pkg_name: &str,
+        missing_so: &[String],
+    ) -> bool {
         if !missing_so.is_empty() {
             self.corrupted_files_repaired += missing_so.len() as u64;
         }
         true
     }
 
-    pub fn apply_vcdiff_delta_patch(&mut self, base_pkg: &str, delta_blob_size: usize) -> Result<String, &'static str> {
+    pub fn apply_vcdiff_delta_patch(
+        &mut self,
+        base_pkg: &str,
+        delta_blob_size: usize,
+    ) -> Result<String, &'static str> {
         if delta_blob_size == 0 {
             return Err("Empty delta patch payload");
         }
@@ -170,7 +180,10 @@ impl SovereignMultiVersionSlotAndPfsPruningGovernor {
     }
 
     pub fn register_slotted_package(&mut self, slot_group: &str, version: &str) {
-        self.installed_slots.entry(slot_group.to_string()).or_default().push(version.to_string());
+        self.installed_slots
+            .entry(slot_group.to_string())
+            .or_default()
+            .push(version.to_string());
     }
 
     pub fn prune_old_pfs_snapshots(&mut self, keep_count: usize) -> usize {
@@ -198,13 +211,21 @@ impl SovereignPackageVulnerabilityAdvisoryAutoPatchEngine {
     }
 
     pub fn register_security_advisory(&mut self, cve_id: &str, affected_spec: &str) {
-        self.known_cves.insert(cve_id.to_string(), affected_spec.to_string());
+        self.known_cves
+            .insert(cve_id.to_string(), affected_spec.to_string());
     }
 
-    pub fn audit_and_patch_vulnerabilities(&self, pkg_name: &str, pkg_version: &str) -> (bool, Option<String>) {
+    pub fn audit_and_patch_vulnerabilities(
+        &self,
+        pkg_name: &str,
+        pkg_version: &str,
+    ) -> (bool, Option<String>) {
         for (cve, spec) in &self.known_cves {
             if spec.contains(pkg_name) {
-                return (true, Some(format!("Patch {} applied for {}", cve, pkg_name)));
+                return (
+                    true,
+                    Some(format!("Patch {} applied for {}", cve, pkg_name)),
+                );
             }
         }
         (false, None)
@@ -224,7 +245,10 @@ pub struct SovereignDistroPackageAdvancementsSuiteV9 {
 impl SovereignDistroPackageAdvancementsSuiteV9 {
     pub fn new() -> Self {
         Self {
-            ccache_governor: SovereignDistributedCcacheCompilationGovernor::new("/var/cache/sigma/ccache", 4096),
+            ccache_governor: SovereignDistributedCcacheCompilationGovernor::new(
+                "/var/cache/sigma/ccache",
+                4096,
+            ),
             stateless_governor: SovereignStatelessPackageConfigGovernor::new(),
             auto_repair_orchestrator: SovereignPackageAutoRepairAndDeltaPatchOrchestrator::new(),
             slot_pruning_governor: SovereignMultiVersionSlotAndPfsPruningGovernor::new(),
@@ -232,10 +256,18 @@ impl SovereignDistroPackageAdvancementsSuiteV9 {
         }
     }
 
-    pub fn process_and_enrich_package_v9(&mut self, pkg: &mut UnifiedPackage) -> Result<(), &'static str> {
-        pkg.properties.insert("v9_advancements_processed".to_string(), "true".to_string());
-        pkg.properties.insert("v9_stateless_overlay".to_string(), "/usr/share/defaults".to_string());
-        pkg.properties.insert("v9_ccache_enabled".to_string(), "true".to_string());
+    pub fn process_and_enrich_package_v9(
+        &mut self,
+        pkg: &mut UnifiedPackage,
+    ) -> Result<(), &'static str> {
+        pkg.properties
+            .insert("v9_advancements_processed".to_string(), "true".to_string());
+        pkg.properties.insert(
+            "v9_stateless_overlay".to_string(),
+            "/usr/share/defaults".to_string(),
+        );
+        pkg.properties
+            .insert("v9_ccache_enabled".to_string(), "true".to_string());
         Ok(())
     }
 }
@@ -262,7 +294,10 @@ mod tests {
         assert!(!gov.detect_configuration_drift("etc/nginx/nginx.conf", "worker_processes 1;"));
         assert!(gov.detect_configuration_drift("etc/nginx/nginx.conf", "worker_processes 4;"));
 
-        assert_eq!(gov.reset_to_stock_defaults("etc/nginx/nginx.conf"), Some("worker_processes 1;".to_string()));
+        assert_eq!(
+            gov.reset_to_stock_defaults("etc/nginx/nginx.conf"),
+            Some("worker_processes 1;".to_string())
+        );
     }
 
     #[test]
@@ -283,7 +318,11 @@ mod tests {
 
         assert_eq!(gov.installed_slots.get("python").unwrap().len(), 2);
 
-        gov.pfs_snapshots = vec!["snap1".to_string(), "snap2".to_string(), "snap3".to_string()];
+        gov.pfs_snapshots = vec![
+            "snap1".to_string(),
+            "snap2".to_string(),
+            "snap3".to_string(),
+        ];
         let pruned = gov.prune_old_pfs_snapshots(1);
         assert_eq!(pruned, 2);
         assert_eq!(gov.pfs_snapshots.len(), 1);
@@ -306,7 +345,9 @@ mod tests {
 
         assert!(suite.process_and_enrich_package_v9(&mut pkg).is_ok());
         assert_eq!(
-            pkg.properties.get("v9_advancements_processed").map(|s| s.as_str()),
+            pkg.properties
+                .get("v9_advancements_processed")
+                .map(|s| s.as_str()),
             Some("true")
         );
     }

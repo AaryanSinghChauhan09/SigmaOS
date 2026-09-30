@@ -5,6 +5,7 @@ use std::vec::Vec;
 // Linux distro-inspired user and group management
 // Handles user accounts, authentication, shadow passwords, sudo policies, usermod, and groupmod
 
+#[cfg(not(test))]
 use crate::klib::HashMap;
 #[cfg(test_disabled)]
 use std::collections::HashMap;
@@ -181,7 +182,8 @@ impl UserManager {
     /// Initialize user management system
     pub fn initialize(&self) -> Result<(), UserError> {
         let std_path = std::path::Path::new(&self.etc_dir);
-        fs::create_dir_all(std_path).map_err(|e| UserError::InitError(self.etc_dir.clone(), e))?;
+        fs::create_dir_all(std_path)
+            .map_err(|e| UserError::InitError(self.etc_dir.clone(), e))?;
         Ok(())
     }
 

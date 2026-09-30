@@ -95,12 +95,10 @@ impl MediaBitrateController {
     pub fn adjust_bitrate(&mut self, buffer_fullness: f32, cpu_usage: f32) -> u32 {
         if buffer_fullness > 0.85 || cpu_usage > 0.90 {
             // Buffer is full or CPU is throttling: scale down encoding bitrate to save memory/processing
-            self.current_bitrate_kbps =
-                (self.current_bitrate_kbps * 4 / 5).max(self.min_bitrate_kbps);
+            self.current_bitrate_kbps = (self.current_bitrate_kbps * 4 / 5).max(self.min_bitrate_kbps);
         } else if buffer_fullness < 0.40 && cpu_usage < 0.60 {
             // High resource capacity: boost bitrate to maximize audio fidelity
-            self.current_bitrate_kbps =
-                (self.current_bitrate_kbps * 5 / 4).min(self.max_bitrate_kbps);
+            self.current_bitrate_kbps = (self.current_bitrate_kbps * 5 / 4).min(self.max_bitrate_kbps);
         }
         self.current_bitrate_kbps
     }
@@ -152,9 +150,7 @@ pub struct AudioPacketLossConcealer {
 
 impl AudioPacketLossConcealer {
     pub fn new() -> Self {
-        Self {
-            last_samples: [0; 64],
-        }
+        Self { last_samples: [0; 64] }
     }
 
     pub fn record_good_frame(&mut self, samples: &[i16]) {
@@ -199,14 +195,10 @@ impl VorbisCommentParser {
         } else {
             for i in 0..key.len() {
                 let mut b1 = key[i];
-                if b1 >= b'a' && b1 <= b'z' {
-                    b1 -= 32;
-                } // convert to uppercase
+                if b1 >= b'a' && b1 <= b'z' { b1 -= 32; } // convert to uppercase
 
                 let mut b2 = target_key.as_bytes()[i];
-                if b2 >= b'a' && b2 <= b'z' {
-                    b2 -= 32;
-                }
+                if b2 >= b'a' && b2 <= b'z' { b2 -= 32; }
 
                 if b1 != b2 {
                     key_matches = false;
@@ -246,12 +238,7 @@ impl AudioCodec {
         }
 
         // FLAC signature: fLaC
-        if data.len() >= 4
-            && data[0] == 0x66
-            && data[1] == 0x4C
-            && data[2] == 0x61
-            && data[3] == 0x43
-        {
+        if data.len() >= 4 && data[0] == 0x66 && data[1] == 0x4C && data[2] == 0x61 && data[3] == 0x43 {
             return AudioFormat::Flac;
         }
 
@@ -526,14 +513,8 @@ mod tests {
         let title_tag = b"TITLE=Song Name";
         let artist_tag = b"ARTIST=Sovereign Musician";
 
-        assert_eq!(
-            VorbisCommentParser::parse_tag(title_tag, "TITLE").unwrap(),
-            "Song Name"
-        );
-        assert_eq!(
-            VorbisCommentParser::parse_tag(artist_tag, "artist").unwrap(),
-            "Sovereign Musician"
-        );
+        assert_eq!(VorbisCommentParser::parse_tag(title_tag, "TITLE").unwrap(), "Song Name");
+        assert_eq!(VorbisCommentParser::parse_tag(artist_tag, "artist").unwrap(), "Sovereign Musician");
         assert!(VorbisCommentParser::parse_tag(title_tag, "ALBUM").is_none());
     }
 }

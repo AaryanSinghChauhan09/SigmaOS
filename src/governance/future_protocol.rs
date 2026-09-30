@@ -104,7 +104,9 @@ pub struct RollingTwoYearRoadmap {
 
 impl RollingTwoYearRoadmap {
     pub fn new() -> Self {
-        Self { goals: Vec::new() }
+        Self {
+            goals: Vec::new(),
+        }
     }
 
     pub fn add_goal(&mut self, goal: RoadmapGoalItem) {
@@ -381,9 +383,7 @@ mod tests {
     #[test]
     fn test_protocol_master_engine() {
         let mut protocol = SigmaFutureDevelopmentProtocolEngine::new();
-        protocol
-            .community
-            .award_badge("alice_dev", "Kernel Veteran");
+        protocol.community.award_badge("alice_dev", "Kernel Veteran");
         assert_eq!(protocol.community.hall_of_fame.len(), 1);
         assert_eq!(protocol.security.bug_bounty_payouts_usd, 50_000);
     }

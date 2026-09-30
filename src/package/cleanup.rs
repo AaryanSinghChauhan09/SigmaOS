@@ -50,15 +50,9 @@ impl CleanupResult {
 
     pub fn get_summary(&self) -> String {
         let mut summary = format!("Cleanup operation: {}\n", self.operation.as_str());
-        summary.push_str(&format!(
-            "Packages removed: {}\n",
-            self.packages_removed.len()
-        ));
+        summary.push_str(&format!("Packages removed: {}\n", self.packages_removed.len()));
         summary.push_str(&format!("Space freed: {} bytes\n", self.space_freed));
-        summary.push_str(&format!(
-            "Config files removed: {}\n",
-            self.config_files_removed.len()
-        ));
+        summary.push_str(&format!("Config files removed: {}\n", self.config_files_removed.len()));
         summary.push_str(&format!("Errors: {}\n", self.errors.len()));
         summary
     }
@@ -201,9 +195,7 @@ impl PackageCleanupManager {
         let mut result = CleanupResult::new(CleanupOperation::CleanCache);
 
         for cached in &self.cached_packages {
-            result
-                .packages_removed
-                .push(format!("{}@{}", cached.name, cached.version));
+            result.packages_removed.push(format!("{}@{}", cached.name, cached.version));
             result.space_freed += cached.size;
         }
 
@@ -215,9 +207,7 @@ impl PackageCleanupManager {
         let mut result = CleanupResult::new(CleanupOperation::RemoveOldVersions);
 
         for old in &self.old_versions {
-            result
-                .packages_removed
-                .push(format!("{}@{}", old.name, old.old_version));
+            result.packages_removed.push(format!("{}@{}", old.name, old.old_version));
             result.space_freed += old.size;
         }
 
@@ -241,12 +231,8 @@ impl PackageCleanupManager {
         let mut result = CleanupResult::new(CleanupOperation::PurgeConfig);
 
         for name in &package_names {
-            result
-                .config_files_removed
-                .push(format!("/etc/{}.conf", name));
-            result
-                .config_files_removed
-                .push(format!("/var/lib/{}.db", name));
+            result.config_files_removed.push(format!("/etc/{}.conf", name));
+            result.config_files_removed.push(format!("/var/lib/{}.db", name));
         }
 
         result.packages_removed = package_names;
@@ -285,10 +271,7 @@ impl PackageCleanupManager {
     pub fn get_statistics(&self) -> String {
         let mut stats = String::from("Package Cleanup Statistics\n");
         stats.push_str(&format!("Orphan packages: {}\n", self.orphans.len()));
-        stats.push_str(&format!(
-            "Cached packages: {}\n",
-            self.cached_packages.len()
-        ));
+        stats.push_str(&format!("Cached packages: {}\n", self.cached_packages.len()));
         stats.push_str(&format!("Old versions: {}\n", self.old_versions.len()));
 
         let orphan_size: u64 = self.orphans.iter().map(|o| o.size).sum();
@@ -298,10 +281,7 @@ impl PackageCleanupManager {
         stats.push_str(&format!("Orphan size: {} bytes\n", orphan_size));
         stats.push_str(&format!("Cache size: {} bytes\n", cache_size));
         stats.push_str(&format!("Old versions size: {} bytes\n", old_size));
-        stats.push_str(&format!(
-            "Total cleanable: {} bytes\n",
-            orphan_size + cache_size + old_size
-        ));
+        stats.push_str(&format!("Total cleanable: {} bytes\n", orphan_size + cache_size + old_size));
         stats.push_str(&format!("Keep old versions: {}\n", self.keep_old_versions));
         stats.push_str(&format!("Auto cleanup: {}\n", self.auto_cleanup_enabled));
 
@@ -317,10 +297,7 @@ mod tests {
     fn test_cleanup_operation_as_str() {
         assert_eq!(CleanupOperation::Autoremove.as_str(), "autoremove");
         assert_eq!(CleanupOperation::CleanCache.as_str(), "clean");
-        assert_eq!(
-            CleanupOperation::RemoveOldVersions.as_str(),
-            "remove-old-versions"
-        );
+        assert_eq!(CleanupOperation::RemoveOldVersions.as_str(), "remove-old-versions");
     }
 
     #[test]
@@ -402,11 +379,7 @@ mod tests {
     #[test]
     fn test_package_cleanup_manager_add_orphan() {
         let mut manager = PackageCleanupManager::new();
-        manager.add_orphan(OrphanPackage::new(
-            String::from("test"),
-            String::from("1.0.0"),
-            1024,
-        ));
+        manager.add_orphan(OrphanPackage::new(String::from("test"), String::from("1.0.0"), 1024));
         assert_eq!(manager.orphans.len(), 1);
     }
 
@@ -437,16 +410,8 @@ mod tests {
     #[test]
     fn test_package_cleanup_manager_autoremove() {
         let mut manager = PackageCleanupManager::new();
-        manager.add_orphan(OrphanPackage::new(
-            String::from("test1"),
-            String::from("1.0.0"),
-            1024,
-        ));
-        manager.add_orphan(OrphanPackage::new(
-            String::from("test2"),
-            String::from("1.0.0"),
-            2048,
-        ));
+        manager.add_orphan(OrphanPackage::new(String::from("test1"), String::from("1.0.0"), 1024));
+        manager.add_orphan(OrphanPackage::new(String::from("test2"), String::from("1.0.0"), 2048));
 
         let result = manager.autoremove();
         assert_eq!(result.packages_removed.len(), 2);
@@ -501,11 +466,7 @@ mod tests {
     #[test]
     fn test_package_cleanup_manager_remove_orphans() {
         let mut manager = PackageCleanupManager::new();
-        manager.add_orphan(OrphanPackage::new(
-            String::from("test1"),
-            String::from("1.0.0"),
-            1024,
-        ));
+        manager.add_orphan(OrphanPackage::new(String::from("test1"), String::from("1.0.0"), 1024));
 
         let result = manager.remove_orphans();
         assert_eq!(result.packages_removed.len(), 1);
@@ -526,11 +487,7 @@ mod tests {
     #[test]
     fn test_package_cleanup_manager_cleanup_all() {
         let mut manager = PackageCleanupManager::new();
-        manager.add_orphan(OrphanPackage::new(
-            String::from("test1"),
-            String::from("1.0.0"),
-            1024,
-        ));
+        manager.add_orphan(OrphanPackage::new(String::from("test1"), String::from("1.0.0"), 1024));
         manager.add_cached_package(CachedPackage::new(
             String::from("test2"),
             String::from("1.0.0"),
@@ -555,11 +512,7 @@ mod tests {
     #[test]
     fn test_package_cleanup_manager_get_statistics() {
         let mut manager = PackageCleanupManager::new();
-        manager.add_orphan(OrphanPackage::new(
-            String::from("test1"),
-            String::from("1.0.0"),
-            1024,
-        ));
+        manager.add_orphan(OrphanPackage::new(String::from("test1"), String::from("1.0.0"), 1024));
         manager.add_cached_package(CachedPackage::new(
             String::from("test2"),
             String::from("1.0.0"),

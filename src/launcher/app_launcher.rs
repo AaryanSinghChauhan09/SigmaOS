@@ -13,10 +13,10 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::collections::BTreeMap;
+use alloc::format;
 use core::fmt;
 
 /// Application entry
@@ -90,22 +90,22 @@ impl AppEntry {
         let name = self.name.to_lowercase();
 
         if name == query {
-            return 1000; // Exact match
+            return 1000;  // Exact match
         }
 
         if name.starts_with(&query) {
-            return 900; // Prefix match
+            return 900;  // Prefix match
         }
 
         if name.contains(&query) {
-            return 800; // Substring match
+            return 800;  // Substring match
         }
 
         // Check word boundaries
         let words: Vec<&str> = name.split_whitespace().collect();
         for word in words {
             if word.starts_with(&query) {
-                return 700; // Word start match
+                return 700;  // Word start match
             }
         }
 
@@ -116,7 +116,7 @@ impl AppEntry {
             }
         }
 
-        0 // No match
+        0  // No match
     }
 }
 
@@ -310,9 +310,8 @@ impl AppLauncher {
         let mut results = Vec::new();
 
         for command in &self.commands {
-            if command.name.to_lowercase().contains(&query)
-                || command.description.to_lowercase().contains(&query)
-            {
+            if command.name.to_lowercase().contains(&query) ||
+               command.description.to_lowercase().contains(&query) {
                 results.push(command.clone());
             }
         }
@@ -434,9 +433,9 @@ mod tests {
     fn test_fuzzy_search() {
         let app = AppEntry::new("Firefox Browser", "/usr/bin/firefox");
 
-        assert_eq!(app.fuzzy_score("firefox browser"), 1000); // Exact
-        assert_eq!(app.fuzzy_score("firefox"), 900); // Prefix
-        assert!(app.fuzzy_score("fox") > 0); // Fuzzy
+        assert_eq!(app.fuzzy_score("firefox browser"), 1000);  // Exact
+        assert_eq!(app.fuzzy_score("firefox"), 900);  // Prefix
+        assert!(app.fuzzy_score("fox") > 0);  // Fuzzy
     }
 
     #[test]
@@ -466,7 +465,7 @@ mod tests {
 
         let recent = launcher.get_recent_apps();
         assert_eq!(recent.len(), 2);
-        assert_eq!(recent[0].name, "App 2"); // Most recent first
+        assert_eq!(recent[0].name, "App 2");  // Most recent first
     }
 
     #[test]

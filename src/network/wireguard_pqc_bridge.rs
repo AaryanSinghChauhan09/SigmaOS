@@ -18,9 +18,9 @@
 #![allow(dead_code)]
 
 use std::collections::BTreeMap;
-use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use std::format;
 
 // ─── PQC Key Types ────────────────────────────────────────────────────────────
 
@@ -218,14 +218,14 @@ impl KyberKem {
             shared_secret[i] = (h >> 16) as u8;
         }
 
-        KemEncapsulation {
-            ciphertext,
-            shared_secret,
-        }
+        KemEncapsulation { ciphertext, shared_secret }
     }
 
     /// Decapsulate: recovers the shared secret from ciphertext + secret key
-    pub fn decapsulate(secret: &KyberSecretKey, ciphertext: &[u8; 32]) -> [u8; 32] {
+    pub fn decapsulate(
+        secret: &KyberSecretKey,
+        ciphertext: &[u8; 32],
+    ) -> [u8; 32] {
         const FNV_PRIME: u64 = 0x00000100000001B3;
         let mut h: u64 = 0xcbf29ce484222325;
 
@@ -412,7 +412,11 @@ impl WgPqcTunnel {
     /// Encrypt a packet for a specific peer using the established session key.
     ///
     /// Packet format: [counter: 8 bytes LE][encrypted payload: N bytes]
-    pub fn encrypt_packet(&mut self, peer_id: u32, plaintext: &[u8]) -> Option<Vec<u8>> {
+    pub fn encrypt_packet(
+        &mut self,
+        peer_id: u32,
+        plaintext: &[u8],
+    ) -> Option<Vec<u8>> {
         let session = self.sessions.get_mut(&peer_id)?;
         if session.state != SessionState::Established {
             return None;
@@ -442,7 +446,11 @@ impl WgPqcTunnel {
     }
 
     /// Decrypt a packet from a specific peer.
-    pub fn decrypt_packet(&mut self, peer_id: u32, ciphertext: &[u8]) -> Option<Vec<u8>> {
+    pub fn decrypt_packet(
+        &mut self,
+        peer_id: u32,
+        ciphertext: &[u8],
+    ) -> Option<Vec<u8>> {
         if ciphertext.len() < 8 {
             return None;
         }
@@ -614,9 +622,7 @@ mod wireguard_pqc_tests {
         let ciphertext = tunnel.encrypt_packet(1, plaintext).expect("encrypt failed");
         assert_ne!(ciphertext[8..], plaintext[..]);
 
-        let decrypted = tunnel
-            .decrypt_packet(1, &ciphertext)
-            .expect("decrypt failed");
+        let decrypted = tunnel.decrypt_packet(1, &ciphertext).expect("decrypt failed");
         assert_eq!(decrypted, plaintext);
     }
 
@@ -635,7 +641,7 @@ mod wireguard_pqc_tests {
             peer_dilithium_public: peer_dilithium.public,
             session_key: [0x55; 32],
             send_counter: 0,
-            recv_counter: 10, // Already seen counter 10
+            recv_counter: 10,  // Already seen counter 10
             state: SessionState::Established,
             created_at_ns: 0,
             endpoint: String::from("10.0.0.3:51820"),

@@ -2,8 +2,10 @@
 //! Comprehensive testing framework for SigmaOS
 use std::vec;
 
-use std::string::{String, ToString};
+
+
 use std::vec::Vec;
+use std::string::{String, ToString};
 
 /// Test result
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -46,26 +48,10 @@ impl TestSuite {
         TestSummary {
             suite_name: self.name.clone(),
             total: self.tests.len(),
-            passed: self
-                .results
-                .iter()
-                .filter(|&&r| r == TestResult::Passed)
-                .count(),
-            failed: self
-                .results
-                .iter()
-                .filter(|&&r| r == TestResult::Failed)
-                .count(),
-            skipped: self
-                .results
-                .iter()
-                .filter(|&&r| r == TestResult::Skipped)
-                .count(),
-            errors: self
-                .results
-                .iter()
-                .filter(|&&r| r == TestResult::Error)
-                .count(),
+            passed: self.results.iter().filter(|&&r| r == TestResult::Passed).count(),
+            failed: self.results.iter().filter(|&&r| r == TestResult::Failed).count(),
+            skipped: self.results.iter().filter(|&&r| r == TestResult::Skipped).count(),
+            errors: self.results.iter().filter(|&&r| r == TestResult::Error).count(),
             results: self.results.clone(),
         }
     }
@@ -148,7 +134,9 @@ pub struct UnitTestFramework {
 
 impl UnitTestFramework {
     pub fn new() -> Self {
-        Self { suites: Vec::new() }
+        Self {
+            suites: Vec::new(),
+        }
     }
 
     pub fn add_suite(&mut self, suite: TestSuite) {
@@ -347,7 +335,9 @@ pub enum SecuritySeverity {
 
 impl SecurityTestFramework {
     pub fn new() -> Self {
-        Self { tests: Vec::new() }
+        Self {
+            tests: Vec::new(),
+        }
     }
 
     pub fn add_test(&mut self, test: SecurityTest) {
@@ -365,10 +355,7 @@ impl SecurityTestFramework {
             total_tests: self.tests.len(),
             passed: results.iter().filter(|r| r.passed).count(),
             failed: results.iter().filter(|r| !r.passed).count(),
-            critical_vulnerabilities: results
-                .iter()
-                .filter(|r| r.severity == SecuritySeverity::Critical)
-                .count(),
+            critical_vulnerabilities: results.iter().filter(|r| r.severity == SecuritySeverity::Critical).count(),
             results,
         }
     }

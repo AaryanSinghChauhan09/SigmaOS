@@ -1,8 +1,10 @@
 //! Real-Time Capabilities (PREEMPT_RT Inspiration)
 //! Real-time kernel, scheduling policies, and industrial support
 
-use std::string::{String, ToString};
+
+
 use std::vec::Vec;
+use std::string::{String, ToString};
 
 /// Scheduling policy
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -90,11 +92,7 @@ impl LatencyMonitor {
     }
 
     pub fn get_max_latency(&self) -> u64 {
-        self.measurements
-            .iter()
-            .map(|m| m.latency_ns)
-            .max()
-            .unwrap_or(0)
+        self.measurements.iter().map(|m| m.latency_ns).max().unwrap_or(0)
     }
 
     pub fn get_avg_latency(&self) -> u64 {
@@ -109,11 +107,7 @@ impl LatencyMonitor {
         if self.measurements.is_empty() {
             return 0.0;
         }
-        let missed = self
-            .measurements
-            .iter()
-            .filter(|m| m.deadline_missed)
-            .count();
+        let missed = self.measurements.iter().filter(|m| m.deadline_missed).count();
         (missed as f64 / self.measurements.len() as f64) * 100.0
     }
 }
@@ -132,8 +126,7 @@ impl TimingAnalyzer {
     }
 
     pub fn add_wcet(&mut self, task_name: &str, wcet: u64) {
-        self.worst_case_execution_times
-            .push((task_name.to_string(), wcet));
+        self.worst_case_execution_times.push((task_name.to_string(), wcet));
     }
 
     pub fn get_wcet(&self, task_name: &str) -> Option<u64> {
@@ -145,8 +138,7 @@ impl TimingAnalyzer {
 
     pub fn analyze_schedulability(&self, tasks: &[RealTimeTask]) -> bool {
         // Rate monotonic analysis
-        let total_utilization: f64 = tasks
-            .iter()
+        let total_utilization: f64 = tasks.iter()
             .map(|t| t.execution_time as f64 / t.period as f64)
             .sum();
 
@@ -262,26 +254,10 @@ impl SigmaRT {
     pub fn get_rt_stats(&self) -> RTStats {
         RTStats {
             total_tasks: self.tasks.len(),
-            ready_tasks: self
-                .tasks
-                .iter()
-                .filter(|t| t.state == TaskState::Ready)
-                .count(),
-            running_tasks: self
-                .tasks
-                .iter()
-                .filter(|t| t.state == TaskState::Running)
-                .count(),
-            completed_tasks: self
-                .tasks
-                .iter()
-                .filter(|t| t.state == TaskState::Completed)
-                .count(),
-            missed_deadlines: self
-                .tasks
-                .iter()
-                .filter(|t| t.state == TaskState::MissedDeadline)
-                .count(),
+            ready_tasks: self.tasks.iter().filter(|t| t.state == TaskState::Ready).count(),
+            running_tasks: self.tasks.iter().filter(|t| t.state == TaskState::Running).count(),
+            completed_tasks: self.tasks.iter().filter(|t| t.state == TaskState::Completed).count(),
+            missed_deadlines: self.tasks.iter().filter(|t| t.state == TaskState::MissedDeadline).count(),
             max_latency: self.latency_monitor.get_max_latency(),
             avg_latency: self.latency_monitor.get_avg_latency(),
             deadline_miss_rate: self.latency_monitor.get_deadline_miss_rate(),

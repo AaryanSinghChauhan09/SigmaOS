@@ -9,10 +9,10 @@
 //! - Fast Terminal & Development Environment Provisioner
 
 use std::collections::BTreeMap;
-use std::format;
 use std::string::{String, ToString};
-use std::vec;
 use std::vec::Vec;
+use std::format;
+use std::vec;
 
 /// Supported Omarchy Curated Themes
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -364,6 +364,7 @@ impl Default for OmarchyModernDesktopEngine {
     }
 }
 
+
 /// Sovereign Agent Definition (inspired by omacom/omarchy: ori-agent, hermes-agent, openclaw-agent, add-default-agent)
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SovereignAgentKind {
@@ -442,15 +443,9 @@ impl FactoryResetGuardian {
 
     pub fn plan_rollback_instructions(&self) -> Vec<String> {
         vec![
-            format!(
-                "btrfs subvolume snapshot -r {} {}",
-                self.btrfs_subvolume_root, "/@pre-reset-backup"
-            ),
+            format!("btrfs subvolume snapshot -r {} {}", self.btrfs_subvolume_root, "/@pre-reset-backup"),
             format!("btrfs subvolume delete {}", self.btrfs_subvolume_root),
-            format!(
-                "btrfs subvolume snapshot {} {}",
-                self.btrfs_subvolume_factory, self.btrfs_subvolume_root
-            ),
+            format!("btrfs subvolume snapshot {} {}", self.btrfs_subvolume_factory, self.btrfs_subvolume_root),
             "systemctl reboot".to_string(),
         ]
     }
@@ -482,9 +477,7 @@ impl HardwareQuirkAdapter {
 
     /// Framework 16 & ASUS ROG Keyboard RGB / Backlight Quirk
     pub fn probe_rgb_keyboard(device_name: &str) -> Option<Self> {
-        if device_name.to_lowercase().contains("framework16")
-            || device_name.to_lowercase().contains("asus-rog")
-        {
+        if device_name.to_lowercase().contains("framework16") || device_name.to_lowercase().contains("asus-rog") {
             Some(Self {
                 pci_id: "usb:input-rgb".to_string(),
                 device_name: device_name.to_string(),
@@ -737,11 +730,7 @@ mod tests {
     #[test]
     fn test_omarchy_web2app_registration() {
         let mut engine = OmarchyModernDesktopEngine::new();
-        engine.register_webapp(
-            "Slack",
-            "https://app.slack.com/",
-            "https://example.com/slack.png",
-        );
+        engine.register_webapp("Slack", "https://app.slack.com/", "https://example.com/slack.png");
         let desktop = engine.generate_desktop_entry("Slack").unwrap();
         assert!(desktop.contains("Name=Slack"));
         assert!(desktop.contains("--ozone-platform=wayland"));
@@ -800,6 +789,7 @@ mod tests {
 // =========================================================================
 // OMARCHY & OMAKUB MISSING ECOSYSTEM GAP CLOSURE ENGINES
 // =========================================================================
+
 
 /// Ghostty GPU-accelerated terminal configuration generator engine
 pub struct OmarchyGhosttyTerminalConfigEngine {
@@ -896,90 +886,7 @@ impl Default for OmarchyHyprlandDwindleTilingEngine {
     }
 }
 
-/// Generates a practical Hyprland configuration with Omarchy's common defaults.
-#[derive(Debug, Clone, Copy, Default)]
-pub struct OmarchyHyprlandCompositorConfigEngine;
-
-impl OmarchyHyprlandCompositorConfigEngine {
-    /// Creates the configuration generator.
-    pub fn new() -> Self {
-        Self
-    }
-
-    /// Returns a minimal config with sane borders and a floating audio mixer.
-    pub fn generate_hyprland_conf(&self) -> String {
-        "general {\n    border_size = 2\n}\nwindowrulev2 = float,class:^(pavucontrol)$\n"
-            .to_string()
-    }
-}
-
-/// Produces a mise configuration for common language toolchains.
-#[derive(Debug, Clone, Copy, Default)]
-pub struct OmarchyMiseVersionManagerEngine;
-
-impl OmarchyMiseVersionManagerEngine {
-    /// Creates the version configuration generator.
-    pub fn new() -> Self {
-        Self
-    }
-
-    /// Returns stable defaults for Node.js and Rust.
-    pub fn generate_config_toml(&self) -> String {
-        "[tools]\nnode = \"lts\"\nrust = \"stable\"\n".to_string()
-    }
-}
-
-/// Produces a readable Lazygit configuration.
-#[derive(Debug, Clone, Copy, Default)]
-pub struct OmarchyLazyGitConfigurationEngine;
-
-impl OmarchyLazyGitConfigurationEngine {
-    /// Creates the Lazygit configuration generator.
-    pub fn new() -> Self {
-        Self
-    }
-
-    /// Returns a Lazygit YAML configuration with icons and dark diffs enabled.
-    pub fn generate_config_yml(&self) -> String {
-        "gui:\n  showIcons: true\ngit:\n  paging:\n    colorArg: always\n    pager: delta --dark\n"
-            .to_string()
-    }
-}
-
-/// Generates GTK colors for the Ayu theme.
-#[derive(Debug, Clone, Copy)]
-pub struct OmarchyAyuThemeEngine {
-    dark: bool,
-}
-
-impl OmarchyAyuThemeEngine {
-    /// Creates an Ayu theme generator, selecting dark or light colors.
-    pub fn new(dark: bool) -> Self {
-        Self { dark }
-    }
-
-    /// Returns GTK CSS variables for the selected color variant.
-    pub fn generate_gtk_css(&self) -> String {
-        let (background, foreground) = if self.dark {
-            ("#0f1419", "#e6e1cf")
-        } else {
-            ("#f8f9fa", "#5c6773")
-        };
-        format!("@define-color bg_color {background};\n@define-color fg_color {foreground};\n")
-    }
-}
-
-/// Generates a Starship prompt configuration.
-#[derive(Debug, Clone, Copy, Default)]
-pub struct OmarchyStarshipPromptConfigEngine;
-
-impl OmarchyStarshipPromptConfigEngine {
-    /// Returns a compact prompt configuration with bounded path display.
-    pub fn generate_starship_toml() -> String {
-        "truncation_length = 3\nadd_newline = false\n".to_string()
-    }
-}
-
+#[cfg(test)]
 mod omarchy_gap_closure_tests {
     use super::*;
 

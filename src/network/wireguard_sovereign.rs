@@ -4,6 +4,8 @@
 #![allow(clippy::new_without_default)]
 
 #[cfg(not(any(feature = "standalone_test", test)))]
+
+
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
@@ -95,11 +97,7 @@ impl SovereignWireGuardTunnel {
     }
 
     /// Initiate Noise IK handshake with peer
-    pub fn initiate_handshake(
-        &mut self,
-        peer_key: &[u8; 32],
-        current_tick: u64,
-    ) -> Result<u32, &'static str> {
+    pub fn initiate_handshake(&mut self, peer_key: &[u8; 32], current_tick: u64) -> Result<u32, &'static str> {
         let sender_idx = self.next_index;
         self.next_index = self.next_index.saturating_add(1);
 
@@ -114,11 +112,7 @@ impl SovereignWireGuardTunnel {
     }
 
     /// Complete Noise IK handshake response
-    pub fn complete_handshake(
-        &mut self,
-        peer_key: &[u8; 32],
-        receiver_idx: u32,
-    ) -> Result<(), &'static str> {
+    pub fn complete_handshake(&mut self, peer_key: &[u8; 32], receiver_idx: u32) -> Result<(), &'static str> {
         if let Some(peer) = self.peers.iter_mut().find(|p| &p.public_key == peer_key) {
             peer.receiver_index = receiver_idx;
             peer.session_state = WgSessionState::Established;
@@ -129,16 +123,10 @@ impl SovereignWireGuardTunnel {
     }
 
     /// Encrypt and route outgoing packet via cryptokey routing
-    pub fn encapsulate_and_send(
-        &mut self,
-        dest_ip: &str,
-        payload: &[u8],
-    ) -> Result<Vec<u8>, &'static str> {
+    pub fn encapsulate_and_send(&mut self, dest_ip: &str, payload: &[u8]) -> Result<Vec<u8>, &'static str> {
         // Find matching peer by AllowedIPs
         let peer_opt = self.peers.iter_mut().find(|p| {
-            p.allowed_ips
-                .iter()
-                .any(|allowed| allowed.starts_with(dest_ip) || dest_ip.starts_with(allowed))
+            p.allowed_ips.iter().any(|allowed| allowed.starts_with(dest_ip) || dest_ip.starts_with(allowed))
         });
 
         if let Some(peer) = peer_opt {
@@ -196,10 +184,7 @@ mod tests {
         tunnel.add_peer(peer);
 
         let s_idx = tunnel.initiate_handshake(&peer_key, 1000).unwrap();
-        assert_eq!(
-            tunnel.peers[0].session_state,
-            WgSessionState::HandshakeInitiated
-        );
+        assert_eq!(tunnel.peers[0].session_state, WgSessionState::HandshakeInitiated);
 
         assert!(tunnel.complete_handshake(&peer_key, s_idx + 1).is_ok());
         assert_eq!(tunnel.peers[0].session_state, WgSessionState::Established);
@@ -227,9 +212,7 @@ mod tests {
         tunnel.initiate_handshake(&peer_key, 100).unwrap();
         tunnel.complete_handshake(&peer_key, 555).unwrap();
 
-        let res = tunnel
-            .encapsulate_and_send("10.0.0.4", b"hello wireguard")
-            .unwrap();
+        let res = tunnel.encapsulate_and_send("10.0.0.4", b"hello wireguard").unwrap();
         assert_eq!(res[0], 4); // Transport packet
         assert_eq!(tunnel.packets_tunneled, 1);
         assert_eq!(tunnel.peers[0].tx_bytes, 15);

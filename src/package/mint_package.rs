@@ -6,6 +6,8 @@
 
 #![allow(dead_code)]
 
+
+
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec;
@@ -38,10 +40,10 @@ impl MintUpdateLevel {
     /// Get color code for terminal display
     pub fn color_code(&self) -> &'static str {
         match self {
-            MintUpdateLevel::Security => "\x1b[31m",    // Red
+            MintUpdateLevel::Security => "\x1b[31m", // Red
             MintUpdateLevel::Recommended => "\x1b[33m", // Yellow
-            MintUpdateLevel::Optional => "\x1b[36m",    // Cyan
-            MintUpdateLevel::Unsafe => "\x1b[35m",      // Magenta
+            MintUpdateLevel::Optional => "\x1b[36m", // Cyan
+            MintUpdateLevel::Unsafe => "\x1b[35m", // Magenta
         }
     }
 }
@@ -195,7 +197,10 @@ impl MintUpdateManager {
 
     /// Get total size of all pending updates
     pub fn get_total_update_size(&self) -> u64 {
-        self.get_filtered_updates().iter().map(|pkg| pkg.size).sum()
+        self.get_filtered_updates()
+            .iter()
+            .map(|pkg| pkg.size)
+            .sum()
     }
 
     /// Set which update levels are enabled
