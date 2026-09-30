@@ -16,6 +16,10 @@ SigmaOS implements multiple layers of security:
 4. Filesystem encryption interfaces; audited providers are not integrated
 5. Network security models, which require runtime and protocol review
 
+`src/security/integrity.rs::SimpleFile` is a model without a file reader or trusted checksum verifier. Verification returns `VerificationUnavailable`, new files remain `Unverified`, and registration does not count files as valid. Do not rely on this API to detect tampering until verification reads the intended file and compares it using a defined, trusted digest path.
+
+AI agents maintaining this module must keep unverified state distinct from valid state, propagate verifier errors from `verify_all`, and preserve bounded path/checksum storage. Update this guidance only when end-to-end file verification is implemented and checked.
+
 ## Pledge/Unveil Sandbox
 
 ### Pledge
