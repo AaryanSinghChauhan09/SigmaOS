@@ -264,6 +264,13 @@ keep unverified state distinct from valid state, propagate verifier errors,
 and preserve bounded path/checksum storage. Do not present this model as
 tamper detection until end-to-end verification is implemented and reviewed.
 
+`src/security/qubes_isolation.rs::SQrexecChannel` is a bounded in-process byte
+queue, not shared memory, OS IPC, a hypervisor boundary, or Qubes-compatible VM
+isolation. Reads drain pending bytes; destruction discards queued data and
+rejects later writes, but does not guarantee memory zeroization. AI agents must
+preserve its size bound, synchronized access, and destroyed state, and must not
+reintroduce raw pointer allocation or claim VM isolation without a real backend.
+
 The Fedora Cockpit and FreeIPA compatibility models do not authenticate
 sessions or mint Kerberos tickets without trusted Cockpit/KDC integrations.
 They reject authentication and token verification rather than treating any
