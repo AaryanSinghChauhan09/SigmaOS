@@ -1,7 +1,6 @@
-
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::string::String;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 /// OOP-based Container Runtime for SigmaOS
 /// Implements container runtime using OOP principles with traits and structs
 /// No dependency on external container frameworks
@@ -820,7 +819,7 @@ pub mod oci {
     use crate::container::runtime::NamespaceConfig;
     use crate::container::ContainerError;
     use crate::container::ContainerState;
-    
+
     pub struct NamespaceSet {
         pub pidns: Option<usize>,
         pub mntns: Option<usize>,

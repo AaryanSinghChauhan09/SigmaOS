@@ -4,9 +4,9 @@
 
 use crate::compatibility::{KernelPersona, SyscallAbi};
 use crate::klib::HashMap;
-use std::string::{String, ToString};
 use core::cell::RefCell;
 use core::sync::atomic::{AtomicBool, Ordering};
+use std::string::{String, ToString};
 
 const MAX_SYMLINK_RECURSION: usize = 8;
 const MAX_FALLBACK_PATHS: usize = 4;

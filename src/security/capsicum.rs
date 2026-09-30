@@ -2,9 +2,9 @@
 //! Process capability constraints and sandboxing
 //! Inspired by FreeBSD Capsicum with Linux seccomp enhancements
 
-use std::vec::Vec;
-use std::string::String;
 use std::collections::HashSet;
+use std::string::String;
+use std::vec::Vec;
 
 /// Capability rights (inspired by FreeBSD capsicum rights)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -213,7 +213,7 @@ mod tests {
         sandbox.set_mode(CapMode::Restricted);
         let entry = CapEntry::new("/etc/passwd", &[CapRight::CapRead]);
         sandbox.add_entry(entry);
-        
+
         assert!(sandbox.check_access("/etc/passwd", CapRight::CapRead));
         assert!(!sandbox.check_access("/etc/passwd", CapRight::CapWrite));
         assert!(!sandbox.check_access("/etc/shadow", CapRight::CapRead));
@@ -224,7 +224,7 @@ mod tests {
         let mut sandbox = CapabilitySandbox::new();
         sandbox.set_mode(CapMode::Restricted);
         sandbox.grant_global_right(CapRight::CapSpawn);
-        
+
         assert!(sandbox.can_spawn());
         sandbox.revoke_global_right(CapRight::CapSpawn);
         assert!(!sandbox.can_spawn());
@@ -235,7 +235,7 @@ mod tests {
         let mut sandbox = CapabilitySandbox::new();
         sandbox.set_mode(CapMode::Restricted);
         sandbox.grant_global_right(CapRight::CapConnect);
-        
+
         assert!(sandbox.can_network());
     }
 
@@ -252,7 +252,7 @@ mod tests {
         sandbox.set_mode(CapMode::Restricted);
         let entry = CapEntry::new("/home/user", &[CapRight::CapRead, CapRight::CapWrite]);
         sandbox.add_entry(entry);
-        
+
         assert!(sandbox.check_access("/home/user/file.txt", CapRight::CapRead));
         assert!(sandbox.check_access("/home/user/subdir/doc.pdf", CapRight::CapWrite));
         assert!(!sandbox.check_access("/etc/passwd", CapRight::CapRead));

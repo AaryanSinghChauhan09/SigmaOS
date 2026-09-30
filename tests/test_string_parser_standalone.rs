@@ -35,7 +35,10 @@ fn test_split_and_trim_string() {
     assert_eq!(parts[1], "beta");
     assert_eq!(parts[2], "gamma");
 
-    assert_eq!(string_parser::trim_string("   sovereign_os   "), "sovereign_os");
+    assert_eq!(
+        string_parser::trim_string("   sovereign_os   "),
+        "sovereign_os"
+    );
     assert_eq!(string_parser::trim_string("  hello world  "), "hello world");
 }
 
@@ -83,7 +86,10 @@ targets = ["x86_64", "aarch64", "riscv64"]
     assert_eq!(doc.get_string("name"), Some("sigma-core"));
     assert_eq!(doc.get_int("version"), Some(2026));
     assert_eq!(doc.get_bool("settings.fast_path"), Some(true));
-    assert_eq!(doc.get_string("settings.escaped_path"), Some("C:\\SigmaOS\\boot"));
+    assert_eq!(
+        doc.get_string("settings.escaped_path"),
+        Some("C:\\SigmaOS\\boot")
+    );
 
     if let Some(toml_parser::TomlValue::Array(items)) = doc.get("settings.targets") {
         assert_eq!(items.len(), 3);

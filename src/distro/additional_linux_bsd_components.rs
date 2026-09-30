@@ -2,9 +2,9 @@
 // Zero-dependency Rust #![no_std] / std implementation of strategic distro abstractions:
 // Debian dpkg-divert, Arch pacdiff, Gentoo eclass/SLOT, FreeBSD pkg audit VuXML, OpenBSD signify, Void xbps journal.
 
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 /// Debian dpkg-divert File Diversion Engine
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -25,7 +25,12 @@ impl DebianDpkgDivertEngine {
         Self { rules: Vec::new() }
     }
 
-    pub fn add_diversion(&mut self, original: &str, diverted: &str, pkg: &str) -> Result<(), &'static str> {
+    pub fn add_diversion(
+        &mut self,
+        original: &str,
+        diverted: &str,
+        pkg: &str,
+    ) -> Result<(), &'static str> {
         if self.rules.iter().any(|r| r.original_file == original) {
             return Err("Diversion rule for file already exists");
         }
@@ -144,7 +149,9 @@ pub struct FreeBsdPkgAuditVuxmlEngine {
 
 impl FreeBsdPkgAuditVuxmlEngine {
     pub fn new() -> Self {
-        Self { advisories: Vec::new() }
+        Self {
+            advisories: Vec::new(),
+        }
     }
 
     pub fn register_advisory(&mut self, pkg_name: &str, range: &str, cve: &str) {
@@ -201,7 +208,9 @@ pub struct VoidXbpsTransactionJournalEngine {
 
 impl VoidXbpsTransactionJournalEngine {
     pub fn new() -> Self {
-        Self { history: Vec::new() }
+        Self {
+            history: Vec::new(),
+        }
     }
 
     pub fn log_transaction(&mut self, pkg_name: &str, action: &str, now: u64) {
@@ -241,10 +250,14 @@ impl ArchChrootContainerEngine {
     }
 
     pub fn prepare_virtual_mounts(&mut self) -> usize {
-        self.mounted_binds.push(format!("{}/proc", self.target_root_dir));
-        self.mounted_binds.push(format!("{}/sys", self.target_root_dir));
-        self.mounted_binds.push(format!("{}/dev", self.target_root_dir));
-        self.mounted_binds.push(format!("{}/run", self.target_root_dir));
+        self.mounted_binds
+            .push(format!("{}/proc", self.target_root_dir));
+        self.mounted_binds
+            .push(format!("{}/sys", self.target_root_dir));
+        self.mounted_binds
+            .push(format!("{}/dev", self.target_root_dir));
+        self.mounted_binds
+            .push(format!("{}/run", self.target_root_dir));
         self.chroot_active = true;
         self.mounted_binds.len()
     }
@@ -266,7 +279,8 @@ impl DebianDebconfPreseedEngine {
     }
 
     pub fn set_preseed_question(&mut self, question: &str, answer: &str) {
-        self.preseed_answers.insert(question.to_string(), answer.to_string());
+        self.preseed_answers
+            .insert(question.to_string(), answer.to_string());
     }
 
     pub fn query_answer(&self, question: &str) -> Option<&String> {
@@ -356,10 +370,18 @@ pub struct ArchAuditSecurityVulnerabilityEngine {
 
 impl ArchAuditSecurityVulnerabilityEngine {
     pub fn new() -> Self {
-        Self { vulnerabilities: Vec::new() }
+        Self {
+            vulnerabilities: Vec::new(),
+        }
     }
 
-    pub fn register_vulnerability(&mut self, pkg: &str, cve: &str, severity: &str, fixed_ver: Option<&str>) {
+    pub fn register_vulnerability(
+        &mut self,
+        pkg: &str,
+        cve: &str,
+        severity: &str,
+        fixed_ver: Option<&str>,
+    ) {
         self.vulnerabilities.push(ArchAuditVulnerabilityEntry {
             package_name: pkg.to_string(),
             cve_id: cve.to_string(),
@@ -369,7 +391,10 @@ impl ArchAuditSecurityVulnerabilityEngine {
     }
 
     pub fn audit_package(&self, pkg_name: &str) -> Vec<&ArchAuditVulnerabilityEntry> {
-        self.vulnerabilities.iter().filter(|v| v.package_name == pkg_name).collect()
+        self.vulnerabilities
+            .iter()
+            .filter(|v| v.package_name == pkg_name)
+            .collect()
     }
 }
 
@@ -634,7 +659,11 @@ impl AlpineMuslApkOverlayRecoveryEngine {
     }
 
     /// Verify `apk3` ed25519 signature manifest and checksum
-    pub fn verify_apk3_signature(&mut self, package_tarball: &str, signature_pubkey: &str) -> Result<bool, &'static str> {
+    pub fn verify_apk3_signature(
+        &mut self,
+        package_tarball: &str,
+        signature_pubkey: &str,
+    ) -> Result<bool, &'static str> {
         if package_tarball.is_empty() || signature_pubkey.is_empty() {
             return Err("Tarball path or signature key cannot be empty");
         }
@@ -674,7 +703,8 @@ impl SovereignCrossDistroCapabilityMatrixGateway {
     /// Query capability across Linux, BSD, and Illumos distro engines
     pub fn query_capability(&self, capability_key: &str) -> bool {
         match capability_key {
-            "dtrace" | "zfs_arc" | "apk3" | "diskless_overlay" | "pledge_unveil" | "capsicum" | "ebuild_slots" => true,
+            "dtrace" | "zfs_arc" | "apk3" | "diskless_overlay" | "pledge_unveil" | "capsicum"
+            | "ebuild_slots" => true,
             _ => false,
         }
     }
@@ -693,7 +723,9 @@ mod tests {
     #[test]
     fn test_dpkg_divert_engine() {
         let mut divert = DebianDpkgDivertEngine::new();
-        assert!(divert.add_diversion("/usr/bin/gcc", "/usr/bin/gcc.real", "gcc-multilib").is_ok());
+        assert!(divert
+            .add_diversion("/usr/bin/gcc", "/usr/bin/gcc.real", "gcc-multilib")
+            .is_ok());
         assert_eq!(divert.resolve_path("/usr/bin/gcc"), "/usr/bin/gcc.real");
         assert_eq!(divert.resolve_path("/usr/bin/clang"), "/usr/bin/clang");
     }
@@ -728,7 +760,10 @@ mod tests {
 
     #[test]
     fn test_openbsd_signify_engine() {
-        let signify = OpenBsdSignifyBaseEngine::new("untrusted comment: openbsd-76-base public key", [1u8; 32]);
+        let signify = OpenBsdSignifyBaseEngine::new(
+            "untrusted comment: openbsd-76-base public key",
+            [1u8; 32],
+        );
         let sig = [1u8; 64];
         assert!(signify.verify_signature(b"base.tgz", &sig));
     }
@@ -760,7 +795,8 @@ mod tests {
         assert_eq!(ebuild.executed_phases.len(), 2);
 
         // Test FreeBSD update binary patch
-        let mut fbsd_update = FreeBsdUpdateBinaryPatchEngine::new("14.1-RELEASE", "14.1-RELEASE-p1");
+        let mut fbsd_update =
+            FreeBsdUpdateBinaryPatchEngine::new("14.1-RELEASE", "14.1-RELEASE-p1");
         assert!(fbsd_update.apply_binary_patches(12));
         assert!(fbsd_update.rollback_available);
         assert!(fbsd_update.rollback_patches());
@@ -801,7 +837,8 @@ mod tests {
         assert_eq!(apkovl, "/media/sda1/sovereign-node.apkovl.tar.gz");
 
         // Test Nix Flake hermetic build engine
-        let mut flake = NixFlakeHermeticBuildEngine::new("github:nixos/nixpkgs", "a1b2c3d4e5f67890");
+        let mut flake =
+            NixFlakeHermeticBuildEngine::new("github:nixos/nixpkgs", "a1b2c3d4e5f67890");
         let store_p = flake.evaluate_flake_output("packages.x86_64-linux.neovim");
         assert!(store_p.contains("/nix/store/a1b2c3d4-packages.x86_64-linux.neovim-pure-closure"));
     }

@@ -45,7 +45,7 @@ impl CfiEngine {
     /// Register a valid CFI target
     pub fn register_target(&mut self, address: u64, function_name: String) -> u64 {
         let signature_hash = self.next_signature.fetch_add(1, Ordering::SeqCst);
-        
+
         let target = CfiTarget {
             address,
             signature_hash,
@@ -65,7 +65,11 @@ impl CfiEngine {
     }
 
     /// Validate an indirect call
-    pub fn validate_indirect_call(&mut self, from_address: u64, to_address: u64) -> Result<(), CfiViolation> {
+    pub fn validate_indirect_call(
+        &mut self,
+        from_address: u64,
+        to_address: u64,
+    ) -> Result<(), CfiViolation> {
         if let Some(target) = self.registered_targets.get(&to_address) {
             // In a real implementation, we would compute the actual signature
             // For simulation, we accept valid targets
@@ -91,11 +95,11 @@ impl CfiEngine {
     /// Record a CFI violation
     fn record_violation(&mut self, violation: CfiViolation) {
         self.violation_count.fetch_add(1, Ordering::SeqCst);
-        
+
         if self.violations.len() >= self.max_violations {
             self.violations.remove(0);
         }
-        
+
         self.violations.push(violation);
     }
 
@@ -148,7 +152,7 @@ mod tests {
     #[test]
     fn test_register_target() {
         let mut engine = CfiEngine::new(100);
-        
+
         let sig = engine.register_target(0x1000, "test_function".to_string());
         assert_eq!(sig, 1);
         assert_eq!(engine.target_count(), 1);
@@ -157,9 +161,9 @@ mod tests {
     #[test]
     fn test_validate_indirect_call() {
         let mut engine = CfiEngine::new(100);
-        
+
         engine.register_target(0x1000, "test_function".to_string());
-        
+
         assert!(engine.validate_indirect_call(0x2000, 0x1000).is_ok());
         assert!(engine.validate_indirect_call(0x2000, 0x3000).is_err());
     }
@@ -167,12 +171,12 @@ mod tests {
     #[test]
     fn test_violation_tracking() {
         let mut engine = CfiEngine::new(100);
-        
+
         engine.register_target(0x1000, "test_function".to_string());
-        
+
         engine.validate_indirect_call(0x2000, 0x3000).unwrap_err();
         assert_eq!(engine.violation_count(), 1);
-        
+
         let violations = engine.get_violations();
         assert_eq!(violations.len(), 1);
         assert_eq!(violations[0].to_address, 0x3000);
@@ -181,7 +185,7 @@ mod tests {
     #[test]
     fn test_unregister_target() {
         let mut engine = CfiEngine::new(100);
-        
+
         engine.register_target(0x1000, "test_function".to_string());
         assert!(engine.unregister_target(0x1000));
         assert_eq!(engine.target_count(), 0);
@@ -190,13 +194,13 @@ mod tests {
     #[test]
     fn test_register_batch() {
         let mut engine = CfiEngine::new(100);
-        
+
         let targets = vec![
             (0x1000, "func1".to_string()),
             (0x2000, "func2".to_string()),
             (0x3000, "func3".to_string()),
         ];
-        
+
         let sigs = engine.register_targets_batch(targets);
         assert_eq!(sigs.len(), 3);
         assert_eq!(engine.target_count(), 3);
@@ -205,10 +209,10 @@ mod tests {
     #[test]
     fn test_clear_violations() {
         let mut engine = CfiEngine::new(100);
-        
+
         engine.register_target(0x1000, "test_function".to_string());
         engine.validate_indirect_call(0x2000, 0x3000).unwrap_err();
-        
+
         engine.clear_violations();
         assert_eq!(engine.violation_count(), 0);
         assert_eq!(engine.get_violations().len(), 0);

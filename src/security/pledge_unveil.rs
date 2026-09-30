@@ -158,6 +158,7 @@ impl UnveilSandbox {
         if let Some(perm) = UnveilPermission::from_str(permissions) {
             self.paths.insert(String::from(path), perm);
             self.unveiled = true;
+            self.default_deny = true;
             true
         } else {
             false
@@ -180,23 +181,38 @@ impl UnveilSandbox {
         // Check exact path match
         if let Some(perm) = self.paths.get(path) {
             return match permission {
-                UnveilPermission::Read => *perm == UnveilPermission::Read || *perm == UnveilPermission::ReadWrite,
-                UnveilPermission::Write => *perm == UnveilPermission::Write || *perm == UnveilPermission::ReadWrite,
+                UnveilPermission::Read => {
+                    *perm == UnveilPermission::Read || *perm == UnveilPermission::ReadWrite
+                }
+                UnveilPermission::Write => {
+                    *perm == UnveilPermission::Write || *perm == UnveilPermission::ReadWrite
+                }
                 UnveilPermission::Execute => *perm == UnveilPermission::Execute,
                 UnveilPermission::ReadWrite => *perm == UnveilPermission::ReadWrite,
             };
         }
 
-        // Check parent path match
-        for (unveiled_path, perm) in &self.paths {
-            if path.starts_with(unveiled_path) {
-                return match permission {
-                    UnveilPermission::Read => *perm == UnveilPermission::Read || *perm == UnveilPermission::ReadWrite,
-                    UnveilPermission::Write => *perm == UnveilPermission::Write || *perm == UnveilPermission::ReadWrite,
-                    UnveilPermission::Execute => *perm == UnveilPermission::Execute,
-                    UnveilPermission::ReadWrite => *perm == UnveilPermission::ReadWrite,
-                };
-            }
+        // Use the most specific component boundary match; `/tmp-old` is not under `/tmp`.
+        if let Some((_, perm)) = self
+            .paths
+            .iter()
+            .filter(|(base, _)| {
+                path == base.as_str()
+                    || (path.starts_with(base.as_str())
+                        && (base.ends_with('/') || path.as_bytes().get(base.len()) == Some(&b'/')))
+            })
+            .max_by_key(|(base, _)| base.len())
+        {
+            return match permission {
+                UnveilPermission::Read => {
+                    *perm == UnveilPermission::Read || *perm == UnveilPermission::ReadWrite
+                }
+                UnveilPermission::Write => {
+                    *perm == UnveilPermission::Write || *perm == UnveilPermission::ReadWrite
+                }
+                UnveilPermission::Execute => *perm == UnveilPermission::Execute,
+                UnveilPermission::ReadWrite => *perm == UnveilPermission::ReadWrite,
+            };
         }
 
         // Default deny if unveiled and no match
@@ -233,7 +249,12 @@ impl Sandbox {
         self.unveil.unveil(path, permissions)
     }
 
-    pub fn check_operation(&self, promise: PledgePromise, path: Option<&str>, permission: Option<UnveilPermission>) -> bool {
+    pub fn check_operation(
+        &self,
+        promise: PledgePromise,
+        path: Option<&str>,
+        permission: Option<UnveilPermission>,
+    ) -> bool {
         // Check pledge promise
         if !self.pledge.check_promise(promise) {
             return false;
@@ -340,8 +361,16 @@ mod tests {
         sandbox.unveil("/tmp", "r");
 
         assert!(sandbox.check_operation(PledgePromise::Stdio, None, None));
-        assert!(sandbox.check_operation(PledgePromise::Rpath, Some("/tmp"), Some(UnveilPermission::Read)));
+        assert!(sandbox.check_operation(
+            PledgePromise::Rpath,
+            Some("/tmp"),
+            Some(UnveilPermission::Read)
+        ));
         assert!(!sandbox.check_operation(PledgePromise::Wpath, None, None));
-        assert!(!sandbox.check_operation(PledgePromise::Rpath, Some("/etc"), Some(UnveilPermission::Read)));
+        assert!(!sandbox.check_operation(
+            PledgePromise::Rpath,
+            Some("/etc"),
+            Some(UnveilPermission::Read)
+        ));
     }
 }
