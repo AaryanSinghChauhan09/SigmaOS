@@ -17,11 +17,10 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-
 // (no_std only applicable at crate root - removed)
 
-use core::sync::atomic::{AtomicUsize, AtomicPtr, Ordering};
 use core::ptr::null_mut;
+use core::sync::atomic::{AtomicPtr, AtomicUsize, Ordering};
 
 #[repr(C)]
 pub struct TaskControlBlock {
@@ -131,7 +130,11 @@ impl MLFQueue {
             let tail = self.tail.load(Ordering::Acquire);
             if tail.is_null() {
                 // Empty queue
-                if self.head.compare_exchange(null_mut(), task, Ordering::SeqCst, Ordering::SeqCst).is_ok() {
+                if self
+                    .head
+                    .compare_exchange(null_mut(), task, Ordering::SeqCst, Ordering::SeqCst)
+                    .is_ok()
+                {
                     self.tail.store(task, Ordering::Release);
                     (*task).next.store(null_mut(), Ordering::SeqCst);
                 }
@@ -152,7 +155,11 @@ impl MLFQueue {
             }
 
             let next = (*head).next.load(Ordering::Acquire);
-            if self.head.compare_exchange(head, next, Ordering::SeqCst, Ordering::SeqCst).is_ok() {
+            if self
+                .head
+                .compare_exchange(head, next, Ordering::SeqCst, Ordering::SeqCst)
+                .is_ok()
+            {
                 if next.is_null() {
                     self.tail.store(null_mut(), Ordering::Release);
                 }
@@ -180,7 +187,11 @@ impl RTQueue {
         unsafe {
             let tail = self.tail.load(Ordering::Acquire);
             if tail.is_null() {
-                if self.head.compare_exchange(null_mut(), task, Ordering::SeqCst, Ordering::SeqCst).is_ok() {
+                if self
+                    .head
+                    .compare_exchange(null_mut(), task, Ordering::SeqCst, Ordering::SeqCst)
+                    .is_ok()
+                {
                     self.tail.store(task, Ordering::Release);
                     (*task).next.store(null_mut(), Ordering::SeqCst);
                 }
@@ -200,7 +211,11 @@ impl RTQueue {
             }
 
             let next = (*head).next.load(Ordering::Acquire);
-            if self.head.compare_exchange(head, next, Ordering::SeqCst, Ordering::SeqCst).is_ok() {
+            if self
+                .head
+                .compare_exchange(head, next, Ordering::SeqCst, Ordering::SeqCst)
+                .is_ok()
+            {
                 if next.is_null() {
                     self.tail.store(null_mut(), Ordering::Release);
                 }
@@ -277,7 +292,11 @@ impl FineGrainedSpinlock {
     /// Acquires spinlock with fine-grained contention tracking
     pub fn lock(&self) {
         let mut spins = 0;
-        while self.locked.compare_exchange_weak(0, 1, Ordering::Acquire, Ordering::Relaxed).is_err() {
+        while self
+            .locked
+            .compare_exchange_weak(0, 1, Ordering::Acquire, Ordering::Relaxed)
+            .is_err()
+        {
             spins += 1;
             core::hint::spin_loop();
         }
@@ -338,10 +357,10 @@ impl SovereignScheduler {
     pub fn new(cpu_count: usize) -> Self {
         SovereignScheduler {
             mlfq: [
-                MLFQueue::new(4),   // Highest priority
+                MLFQueue::new(4), // Highest priority
                 MLFQueue::new(8),
                 MLFQueue::new(16),
-                MLFQueue::new(32),  // Lowest priority
+                MLFQueue::new(32), // Lowest priority
             ],
             rt_queue: RTQueue::new(),
             current_task: AtomicPtr::new(null_mut()),
@@ -381,14 +400,14 @@ impl SovereignScheduler {
     /// Context switch to next task
     pub fn context_switch(&self, next_task: *mut TaskControlBlock) {
         let prev_task = self.current_task.swap(next_task, Ordering::SeqCst);
-        
+
         unsafe {
             if !prev_task.is_null() {
                 (*prev_task).set_state(TaskState::Ready);
                 // Re-queue previous task
                 self.add_task(prev_task, false);
             }
-            
+
             if !next_task.is_null() {
                 (*next_task).set_state(TaskState::Running);
             }
@@ -398,22 +417,22 @@ impl SovereignScheduler {
     /// Handle timer tick
     pub fn handle_tick(&self) {
         self.tick_count.fetch_add(1, Ordering::SeqCst);
-        
+
         let current = self.current_task.load(Ordering::Acquire);
         if !current.is_null() {
             unsafe {
                 (*current).increment_runtime();
-                
+
                 // Check if time slice expired
                 let runtime = (*current).get_runtime();
                 let priority = (*current).get_priority();
                 let quantum = self.mlfq[priority.min(3)].get_quantum();
-                
+
                 if runtime >= quantum {
                     // Demote task to lower priority
                     let new_priority = (priority + 1).min(3);
                     (*current).set_priority(new_priority);
-                    
+
                     // Force reschedule
                     let next = self.schedule();
                     if !next.is_null() && next != current {

@@ -1,7 +1,7 @@
-use std::vec;
-use std::string::{String, ToString};
-use std::vec::Vec;
 use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 // SigmaOS Sovereign AI-Native Desktop Productivity & Utility Suite
 // Pure, zero-dependency, #![no_std] standard-conforming implementation absorbing features from:
 // IrfanView, PotPlayer, VLC, Flameshot, ShareX, OBS Studio, Everything, 7-Zip, OneCommander, Brave, Vivaldi, Firefox, EarTrumpet, Kdenlive, Shotcut, DaVinci Resolve, Notepad++, Audacity.
@@ -91,7 +91,8 @@ impl NotepadPlusPlusBuffer {
         tab.content = tab.content.replace(find, replace);
 
         if self.is_recording {
-            self.macro_record.push(format!("replace:{}:{}", find, replace));
+            self.macro_record
+                .push(format!("replace:{}:{}", find, replace));
         }
         occurrences
     }
@@ -157,7 +158,9 @@ impl SovereignBrowserEngine {
         };
         // Setup initial default tracking / telemetry adblock domains
         engine.adblock_filters.push("doubleclick.net".to_string());
-        engine.adblock_filters.push("telemetry.analytics.com".to_string());
+        engine
+            .adblock_filters
+            .push("telemetry.analytics.com".to_string());
         engine
     }
 
@@ -307,7 +310,15 @@ impl FlameshotAnnotator {
         }
     }
 
-    pub fn draw_annotation(&mut self, shape: AnnotationShape, x0: u32, y0: u32, x1: u32, y1: u32, color: ColorRgba) {
+    pub fn draw_annotation(
+        &mut self,
+        shape: AnnotationShape,
+        x0: u32,
+        y0: u32,
+        x1: u32,
+        y1: u32,
+        color: ColorRgba,
+    ) {
         self.annotations.push(ScreenshotAnnotation {
             shape,
             x0,
@@ -519,9 +530,9 @@ impl DaVinciTimeline {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ItemAgeColor {
-    HotNew,   // Added < 1 day
-    WarmMed,  // Added < 30 days
-    ColdOld,  // Added > 30 days
+    HotNew,  // Added < 1 day
+    WarmMed, // Added < 30 days
+    ColdOld, // Added > 30 days
 }
 
 pub struct OneCommanderFileGrid {
@@ -677,7 +688,11 @@ impl SovereignPresentationEngine {
         });
     }
 
-    pub fn trigger_component_hot_reload(&mut self, slide_idx: usize, updated_code: &str) -> Result<u32, &'static str> {
+    pub fn trigger_component_hot_reload(
+        &mut self,
+        slide_idx: usize,
+        updated_code: &str,
+    ) -> Result<u32, &'static str> {
         if slide_idx >= self.slides.len() {
             return Err("PresentationError: Target slide index out of range");
         }
@@ -718,9 +733,14 @@ mod tests {
         assert!(engine.advance_slide());
         assert_eq!(engine.current_slide_index, 1);
 
-        let new_ver = engine.trigger_component_hot_reload(1, "export default () => <div>Hot Reloaded!</div>").unwrap();
+        let new_ver = engine
+            .trigger_component_hot_reload(1, "export default () => <div>Hot Reloaded!</div>")
+            .unwrap();
         assert_eq!(new_ver, 2);
-        assert_eq!(engine.slides[1].interactive_component_code, "export default () => <div>Hot Reloaded!</div>");
+        assert_eq!(
+            engine.slides[1].interactive_component_code,
+            "export default () => <div>Hot Reloaded!</div>"
+        );
     }
 
     #[test]
@@ -745,19 +765,31 @@ mod tests {
         npp.find_and_replace("Task", "Todo Item");
         npp.stop_macro_recording();
 
-        assert_eq!(npp.tabs[0].content, "Todo Item 1: Bugzilla triage; Todo Item 2: Wiki audit;");
+        assert_eq!(
+            npp.tabs[0].content,
+            "Todo Item 1: Bugzilla triage; Todo Item 2: Wiki audit;"
+        );
         assert_eq!(npp.macro_record.len(), 1);
 
         // Run macro again on fresh file content
-        npp.open_file("another_todo.txt", "Task 10: Code review; Task 20: LTS tag;");
+        npp.open_file(
+            "another_todo.txt",
+            "Task 10: Code review; Task 20: LTS tag;",
+        );
         npp.play_macro();
-        assert_eq!(npp.tabs[1].content, "Todo Item 10: Code review; Todo Item 20: LTS tag;");
+        assert_eq!(
+            npp.tabs[1].content,
+            "Todo Item 10: Code review; Todo Item 20: LTS tag;"
+        );
     }
 
     #[test]
     fn test_sovereign_browser_shields() {
         let mut browser = SovereignBrowserEngine::new();
-        browser.open_tab("https://news.ycombinator.com", BrowserContainerType::Personal);
+        browser.open_tab(
+            "https://news.ycombinator.com",
+            BrowserContainerType::Personal,
+        );
 
         // Block advertisement request
         assert!(!browser.navigate_url("https://ads.doubleclick.net/tracker"));
@@ -788,13 +820,23 @@ mod tests {
     #[test]
     fn test_flameshot_screenshot_annotations() {
         let mut flameshot = FlameshotAnnotator::new(100, 100);
-        flameshot.draw_annotation(AnnotationShape::Rectangle, 10, 20, 30, 40, ColorRgba::new(255, 0, 0, 255));
+        flameshot.draw_annotation(
+            AnnotationShape::Rectangle,
+            10,
+            20,
+            30,
+            40,
+            ColorRgba::new(255, 0, 0, 255),
+        );
 
         let mut frame = vec![ColorRgba::new(0, 0, 0, 255); 10000];
         flameshot.apply_annotations_to_frame(&mut frame);
 
         // Pixels at bounds should have color
-        assert_eq!(frame[(20 * 100 + 10) as usize], ColorRgba::new(255, 0, 0, 255));
+        assert_eq!(
+            frame[(20 * 100 + 10) as usize],
+            ColorRgba::new(255, 0, 0, 255)
+        );
     }
 
     #[test]
@@ -802,7 +844,10 @@ mod tests {
         let mut obs = ObsStudioMixer::new("Stream Scene 1");
         obs.add_video_source("Webcam Overlay", 0.9, true);
 
-        let mut pixel_frame = vec![ColorRgba::new(20, 180, 20, 255), ColorRgba::new(255, 128, 0, 255)];
+        let mut pixel_frame = vec![
+            ColorRgba::new(20, 180, 20, 255),
+            ColorRgba::new(255, 128, 0, 255),
+        ];
         obs.apply_chroma_key_filter(&mut pixel_frame, ColorRgba::new(20, 180, 20, 255));
 
         assert_eq!(pixel_frame[0].a, 0); // chroma-keyed transparent
@@ -881,7 +926,9 @@ mod tests {
         assert_eq!(analyzer.scan_tree_size_mb(), 450);
 
         let mut archive = ArchiveCompressorUtility::new();
-        assert!(archive.create_archive(&["file1.txt", "file2.txt"], "output.7z", "7z").is_ok());
+        assert!(archive
+            .create_archive(&["file1.txt", "file2.txt"], "output.7z", "7z")
+            .is_ok());
 
         let mut monitor = ProcessResourceMonitorUtility::new();
         let top = monitor.get_top_processes_by_cpu(5);
@@ -913,23 +960,40 @@ impl DiskUsageAnalyzerUtility {
 pub struct ArchiveCompressorUtility;
 
 impl ArchiveCompressorUtility {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
 
-    pub fn create_archive(&mut self, files: &[&str], archive_name: &str, _format: &str) -> Result<String, &'static str> {
-        if files.is_empty() { return Err("No files specified"); }
-        Ok(format!("Created archive {} with {} files", archive_name, files.len()))
+    pub fn create_archive(
+        &mut self,
+        files: &[&str],
+        archive_name: &str,
+        _format: &str,
+    ) -> Result<String, &'static str> {
+        if files.is_empty() {
+            return Err("No files specified");
+        }
+        Ok(format!(
+            "Created archive {} with {} files",
+            archive_name,
+            files.len()
+        ))
     }
 }
 
 impl Default for ArchiveCompressorUtility {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 /// htop / BTOP inspired Process Resource Monitor Utility
 pub struct ProcessResourceMonitorUtility;
 
 impl ProcessResourceMonitorUtility {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
 
     pub fn get_top_processes_by_cpu(&mut self, limit: usize) -> Vec<(u32, String, f32)> {
         let mut list = Vec::new();
@@ -942,20 +1006,30 @@ impl ProcessResourceMonitorUtility {
 }
 
 impl Default for ProcessResourceMonitorUtility {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 /// GParted / Disk Utility inspired Partition Formatter
 pub struct SovereignDiskFormatter;
 
 impl SovereignDiskFormatter {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
 
-    pub fn format_partition(&mut self, partition: &str, filesystem: &str) -> Result<String, &'static str> {
+    pub fn format_partition(
+        &mut self,
+        partition: &str,
+        filesystem: &str,
+    ) -> Result<String, &'static str> {
         Ok(format!("Formatted {} with {}", partition, filesystem))
     }
 }
 
 impl Default for SovereignDiskFormatter {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }

@@ -141,7 +141,8 @@ impl SovereignUsbXhciDriver {
     }
 
     pub fn enable_slot(&mut self) -> Result<u8, &'static str> {
-        self.command_ring.push_trb(0, 0, XhciTrbType::EnableSlotCommand);
+        self.command_ring
+            .push_trb(0, 0, XhciTrbType::EnableSlotCommand);
         for i in 1..self.max_slots {
             if self.slots[i as usize].is_none() {
                 self.slots[i as usize] = Some(XhciDeviceSlot {
@@ -157,9 +158,17 @@ impl SovereignUsbXhciDriver {
         Err("No available xHCI device slots")
     }
 
-    pub fn send_hid_packet(&mut self, slot_id: u8, endpoint: u8, packet_buffer: u64, length: u32) -> Result<(), &'static str> {
+    pub fn send_hid_packet(
+        &mut self,
+        slot_id: u8,
+        endpoint: u8,
+        packet_buffer: u64,
+        length: u32,
+    ) -> Result<(), &'static str> {
         if let Some(slot) = &mut self.slots[slot_id as usize] {
-            let _idx = slot.transfer_ring.push_trb(packet_buffer, length, XhciTrbType::Normal);
+            let _idx = slot
+                .transfer_ring
+                .push_trb(packet_buffer, length, XhciTrbType::Normal);
             let _ep = endpoint;
             Ok(())
         } else {

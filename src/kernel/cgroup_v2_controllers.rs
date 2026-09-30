@@ -170,11 +170,19 @@ impl CgroupV2 {
         self.processes.len()
     }
 
-    pub fn get_controller_config(&self, controller: CgroupController) -> Option<&CgroupControllerConfig> {
+    pub fn get_controller_config(
+        &self,
+        controller: CgroupController,
+    ) -> Option<&CgroupControllerConfig> {
         self.controllers.get(&controller)
     }
 
-    pub fn set_controller_param(&mut self, controller: CgroupController, key: String, value: String) {
+    pub fn set_controller_param(
+        &mut self,
+        controller: CgroupController,
+        key: String,
+        value: String,
+    ) {
         if let Some(config) = self.controllers.get_mut(&controller) {
             config.set_param(key, value);
         }
@@ -198,7 +206,11 @@ impl CgroupV2Manager {
         manager
     }
 
-    pub fn create_cgroup(&mut self, name: String, parent: Option<Arc<Mutex<CgroupV2>>>) -> Result<Arc<Mutex<CgroupV2>>, String> {
+    pub fn create_cgroup(
+        &mut self,
+        name: String,
+        parent: Option<Arc<Mutex<CgroupV2>>>,
+    ) -> Result<Arc<Mutex<CgroupV2>>, String> {
         if self.cgroups.contains_key(&name) {
             return Err(format!("cgroup already exists: {}", name));
         }
@@ -218,12 +230,17 @@ impl CgroupV2Manager {
     }
 
     pub fn remove_cgroup(&mut self, name: &str) -> Result<(), String> {
-        let cg = self.cgroups.get(name)
+        let cg = self
+            .cgroups
+            .get(name)
             .ok_or_else(|| format!("cgroup not found: {}", name))?;
 
         let process_count = cg.lock().unwrap().process_count();
         if process_count > 0 {
-            return Err(format!("cgroup has {} processes, cannot remove", process_count));
+            return Err(format!(
+                "cgroup has {} processes, cannot remove",
+                process_count
+            ));
         }
 
         self.cgroups.remove(name);
@@ -294,10 +311,14 @@ mod tests {
         let mut cgroup = CgroupV2::new("/test".to_string());
 
         cgroup.add_controller(CgroupController::Cpu);
-        assert!(cgroup.get_controller_config(CgroupController::Cpu).is_some());
+        assert!(cgroup
+            .get_controller_config(CgroupController::Cpu)
+            .is_some());
 
         cgroup.remove_controller(CgroupController::Cpu);
-        assert!(cgroup.get_controller_config(CgroupController::Cpu).is_none());
+        assert!(cgroup
+            .get_controller_config(CgroupController::Cpu)
+            .is_none());
     }
 
     #[test]

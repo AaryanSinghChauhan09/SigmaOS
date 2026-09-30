@@ -134,9 +134,9 @@ impl Signal {
 /// Signal disposition (how to handle a signal)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SignalDisposition {
-    Default,  // Default handler
-    Ignore,   // Ignore signal
-    Catch,    // Catch with handler
+    Default, // Default handler
+    Ignore,  // Ignore signal
+    Catch,   // Catch with handler
 }
 
 /// Signal handler
@@ -316,7 +316,8 @@ impl SignalManager {
         let sig = info.signal;
 
         let signal_masks = self.signal_masks.lock().unwrap();
-        let blocked = signal_masks.get(&pid)
+        let blocked = signal_masks
+            .get(&pid)
             .map(|mask| mask.is_blocked(sig))
             .unwrap_or(false);
         drop(signal_masks);
@@ -373,7 +374,11 @@ impl SignalManager {
         let mut signal_masks = self.signal_masks.lock().unwrap();
         let mut pending = self.pending_signals.lock().unwrap();
 
-        match (handlers.remove(&pid), signal_masks.remove(&pid), pending.remove(&pid)) {
+        match (
+            handlers.remove(&pid),
+            signal_masks.remove(&pid),
+            pending.remove(&pid),
+        ) {
             (Some(_), Some(_), Some(_)) => Ok(()),
             _ => Err(format!("Process {} not found", pid)),
         }
@@ -421,8 +426,8 @@ mod tests {
 
     #[test]
     fn test_signal_handler() {
-        let handler = SignalHandler::new(Signal::SIGTERM, SignalDisposition::Catch)
-            .with_handler(0x12345678);
+        let handler =
+            SignalHandler::new(Signal::SIGTERM, SignalDisposition::Catch).with_handler(0x12345678);
 
         assert_eq!(handler.signal, Signal::SIGTERM);
         assert_eq!(handler.disposition, SignalDisposition::Catch);
@@ -527,6 +532,11 @@ mod tests {
         let pid = manager.create_process();
         manager.remove_process(pid).unwrap();
 
-        assert!(manager.set_handler(pid, SignalHandler::new(Signal::SIGTERM, SignalDisposition::Default)).is_err());
+        assert!(manager
+            .set_handler(
+                pid,
+                SignalHandler::new(Signal::SIGTERM, SignalDisposition::Default)
+            )
+            .is_err());
     }
 }

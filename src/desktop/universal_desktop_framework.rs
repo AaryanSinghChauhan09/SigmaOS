@@ -139,7 +139,10 @@ impl XdgSessionDesktopFileParser {
         }
 
         if entry.session_type.is_empty() {
-            if entry.exec.contains("wayland") || entry.exec.contains("hyprland") || entry.exec.contains("cosmic") {
+            if entry.exec.contains("wayland")
+                || entry.exec.contains("hyprland")
+                || entry.exec.contains("cosmic")
+            {
                 entry.session_type = String::from("wayland");
             } else {
                 entry.session_type = String::from("x11");
@@ -154,27 +157,54 @@ impl XdgSessionDesktopFileParser {
         let exec_lower = entry.exec.to_lowercase();
         let desktop_lower = entry.desktop_names.to_lowercase();
 
-        if name_lower.contains("plasma") || exec_lower.contains("startplasma") || desktop_lower.contains("kde") {
+        if name_lower.contains("plasma")
+            || exec_lower.contains("startplasma")
+            || desktop_lower.contains("kde")
+        {
             DesktopFormat::KdePlasma
-        } else if name_lower.contains("gnome") || exec_lower.contains("gnome-session") || desktop_lower.contains("gnome") {
+        } else if name_lower.contains("gnome")
+            || exec_lower.contains("gnome-session")
+            || desktop_lower.contains("gnome")
+        {
             DesktopFormat::GnomeShell
-        } else if name_lower.contains("xfce") || exec_lower.contains("startxfce") || desktop_lower.contains("xfce") {
+        } else if name_lower.contains("xfce")
+            || exec_lower.contains("startxfce")
+            || desktop_lower.contains("xfce")
+        {
             DesktopFormat::Xfce
-        } else if name_lower.contains("cinnamon") || exec_lower.contains("cinnamon-session") || desktop_lower.contains("cinnamon") {
+        } else if name_lower.contains("cinnamon")
+            || exec_lower.contains("cinnamon-session")
+            || desktop_lower.contains("cinnamon")
+        {
             DesktopFormat::Cinnamon
-        } else if name_lower.contains("lxqt") || exec_lower.contains("startlxqt") || desktop_lower.contains("lxqt") {
+        } else if name_lower.contains("lxqt")
+            || exec_lower.contains("startlxqt")
+            || desktop_lower.contains("lxqt")
+        {
             DesktopFormat::Lxqt
-        } else if name_lower.contains("cosmic") || exec_lower.contains("cosmic-session") || desktop_lower.contains("cosmic") {
+        } else if name_lower.contains("cosmic")
+            || exec_lower.contains("cosmic-session")
+            || desktop_lower.contains("cosmic")
+        {
             DesktopFormat::Cosmic
         } else if name_lower.contains("hyprland") || exec_lower.contains("hyprland") {
             DesktopFormat::Hyprland
         } else if name_lower.contains("wayfire") || exec_lower.contains("wayfire") {
             DesktopFormat::Wayfire
-        } else if name_lower.contains("mate") || exec_lower.contains("mate-session") || desktop_lower.contains("mate") {
+        } else if name_lower.contains("mate")
+            || exec_lower.contains("mate-session")
+            || desktop_lower.contains("mate")
+        {
             DesktopFormat::Mate
-        } else if name_lower.contains("pantheon") || exec_lower.contains("io.elementary.wingpanel") || desktop_lower.contains("pantheon") {
+        } else if name_lower.contains("pantheon")
+            || exec_lower.contains("io.elementary.wingpanel")
+            || desktop_lower.contains("pantheon")
+        {
             DesktopFormat::Pantheon
-        } else if name_lower.contains("lumina") || exec_lower.contains("start-lumina") || desktop_lower.contains("lumina") {
+        } else if name_lower.contains("lumina")
+            || exec_lower.contains("start-lumina")
+            || desktop_lower.contains("lumina")
+        {
             DesktopFormat::LuminaBsd
         } else {
             DesktopFormat::Custom(entry.name.clone())
@@ -207,33 +237,48 @@ impl UniversalDesktopSessionRuntime {
 
     pub fn configure_environment_variables(&mut self) {
         let desktop_name = self.active_format.desktop_names();
-        self.env_vars.insert(String::from("XDG_CURRENT_DESKTOP"), desktop_name.to_string());
-        self.env_vars.insert(String::from("XDG_SESSION_DESKTOP"), desktop_name.to_string());
+        self.env_vars.insert(
+            String::from("XDG_CURRENT_DESKTOP"),
+            desktop_name.to_string(),
+        );
+        self.env_vars.insert(
+            String::from("XDG_SESSION_DESKTOP"),
+            desktop_name.to_string(),
+        );
 
         match self.active_format {
             DesktopFormat::KdePlasma => {
-                self.env_vars.insert(String::from("QT_QPA_PLATFORM"), String::from("wayland;xcb"));
-                self.env_vars.insert(String::from("KDE_FULL_SESSION"), String::from("true"));
+                self.env_vars
+                    .insert(String::from("QT_QPA_PLATFORM"), String::from("wayland;xcb"));
+                self.env_vars
+                    .insert(String::from("KDE_FULL_SESSION"), String::from("true"));
                 self.portal_backends.push(String::from("kde"));
             }
             DesktopFormat::GnomeShell => {
-                self.env_vars.insert(String::from("GDK_BACKEND"), String::from("wayland,x11"));
-                self.env_vars.insert(String::from("QT_QPA_PLATFORM"), String::from("wayland"));
+                self.env_vars
+                    .insert(String::from("GDK_BACKEND"), String::from("wayland,x11"));
+                self.env_vars
+                    .insert(String::from("QT_QPA_PLATFORM"), String::from("wayland"));
                 self.portal_backends.push(String::from("gnome"));
             }
             DesktopFormat::Xfce | DesktopFormat::Mate | DesktopFormat::Cinnamon => {
-                self.env_vars.insert(String::from("GDK_BACKEND"), String::from("x11"));
-                self.env_vars.insert(String::from("QT_QPA_PLATFORM"), String::from("xcb"));
+                self.env_vars
+                    .insert(String::from("GDK_BACKEND"), String::from("x11"));
+                self.env_vars
+                    .insert(String::from("QT_QPA_PLATFORM"), String::from("xcb"));
                 self.portal_backends.push(String::from("gtk"));
             }
             DesktopFormat::Cosmic | DesktopFormat::Hyprland => {
-                self.env_vars.insert(String::from("XDG_SESSION_TYPE"), String::from("wayland"));
-                self.env_vars.insert(String::from("GBM_BACKEND"), String::from("nvidia-drm"));
+                self.env_vars
+                    .insert(String::from("XDG_SESSION_TYPE"), String::from("wayland"));
+                self.env_vars
+                    .insert(String::from("GBM_BACKEND"), String::from("nvidia-drm"));
                 self.portal_backends.push(String::from("hyprland"));
                 self.portal_backends.push(String::from("cosmic"));
             }
             DesktopFormat::LuminaBsd => {
-                self.env_vars.insert(String::from("LUMINA_OS"), String::from("FreeBSD"));
+                self.env_vars
+                    .insert(String::from("LUMINA_OS"), String::from("FreeBSD"));
                 self.portal_backends.push(String::from("lumina"));
             }
             _ => {
@@ -384,7 +429,11 @@ impl AppFrameworkBridgeEngine {
         Ok(())
     }
 
-    pub fn register_dbus_endpoint(&mut self, app_id: &str, dbus_service: &str) -> Result<(), &'static str> {
+    pub fn register_dbus_endpoint(
+        &mut self,
+        app_id: &str,
+        dbus_service: &str,
+    ) -> Result<(), &'static str> {
         let app = self
             .registered_apps
             .get_mut(app_id)
@@ -470,8 +519,14 @@ pub struct XfceFormatAdapter {
 impl XfceFormatAdapter {
     pub fn new() -> Self {
         let mut xfconf = BTreeMap::new();
-        xfconf.insert(String::from("xfwm4/general/theme"), String::from("Greybird"));
-        xfconf.insert(String::from("xfce4-desktop/backdrop/screen0/monitor0/workspace0/last-image"), String::from("/usr/share/backgrounds/xfce/xfce-blue.jpg"));
+        xfconf.insert(
+            String::from("xfwm4/general/theme"),
+            String::from("Greybird"),
+        );
+        xfconf.insert(
+            String::from("xfce4-desktop/backdrop/screen0/monitor0/workspace0/last-image"),
+            String::from("/usr/share/backgrounds/xfce/xfce-blue.jpg"),
+        );
 
         Self {
             xfconf_channels: xfconf,
@@ -492,7 +547,8 @@ impl XfceFormatAdapter {
     }
 
     pub fn set_xfconf_property(&mut self, key: &str, value: &str) {
-        self.xfconf_channels.insert(key.to_string(), value.to_string());
+        self.xfconf_channels
+            .insert(key.to_string(), value.to_string());
     }
 }
 
@@ -598,10 +654,17 @@ impl SovereignUniversalDesktopSuite {
         }
     }
 
-    pub fn initialize_desktop_session_from_content(&mut self, desktop_file_content: &str) -> Result<&UniversalDesktopSessionRuntime, &'static str> {
+    pub fn initialize_desktop_session_from_content(
+        &mut self,
+        desktop_file_content: &str,
+    ) -> Result<&UniversalDesktopSessionRuntime, &'static str> {
         let entry = XdgSessionDesktopFileParser::parse_desktop_entry(desktop_file_content)?;
         let format = XdgSessionDesktopFileParser::detect_format_from_entry(&entry);
-        let session_type = if entry.session_type.is_empty() { format.default_session_type() } else { entry.session_type.as_str() };
+        let session_type = if entry.session_type.is_empty() {
+            format.default_session_type()
+        } else {
+            entry.session_type.as_str()
+        };
 
         let mut runtime = UniversalDesktopSessionRuntime::new(format, session_type);
         runtime.start_session();
@@ -681,8 +744,14 @@ DesktopNames=GNOME
     #[test]
     fn test_universal_desktop_session_runtime() {
         let mut runtime = UniversalDesktopSessionRuntime::new(DesktopFormat::KdePlasma, "wayland");
-        assert_eq!(runtime.env_vars.get("XDG_CURRENT_DESKTOP"), Some(&String::from("KDE")));
-        assert_eq!(runtime.env_vars.get("QT_QPA_PLATFORM"), Some(&String::from("wayland;xcb")));
+        assert_eq!(
+            runtime.env_vars.get("XDG_CURRENT_DESKTOP"),
+            Some(&String::from("KDE"))
+        );
+        assert_eq!(
+            runtime.env_vars.get("QT_QPA_PLATFORM"),
+            Some(&String::from("wayland;xcb"))
+        );
 
         assert!(runtime.start_session());
         assert!(runtime.running);
@@ -712,9 +781,15 @@ DesktopNames=GNOME
     #[test]
     fn test_xfce_format_adapter() {
         let mut adapter = XfceFormatAdapter::new();
-        assert_eq!(adapter.get_xfconf_property("xfwm4/general/theme"), Some(&String::from("Greybird")));
+        assert_eq!(
+            adapter.get_xfconf_property("xfwm4/general/theme"),
+            Some(&String::from("Greybird"))
+        );
         adapter.set_xfconf_property("xfwm4/general/theme", "Adwaita-dark");
-        assert_eq!(adapter.get_xfconf_property("xfwm4/general/theme"), Some(&String::from("Adwaita-dark")));
+        assert_eq!(
+            adapter.get_xfconf_property("xfwm4/general/theme"),
+            Some(&String::from("Adwaita-dark"))
+        );
     }
 
     #[test]
@@ -733,7 +808,9 @@ DesktopNames=GNOME
 
         adapter.register_lumina_fm_action("lumina-file-zfs-mount");
         assert_eq!(adapter.lumina_fm_actions.len(), 3);
-        assert!(adapter.lumina_fm_actions.contains(&String::from("lumina-file-zfs-mount")));
+        assert!(adapter
+            .lumina_fm_actions
+            .contains(&String::from("lumina-file-zfs-mount")));
     }
 
     #[test]
@@ -746,7 +823,9 @@ Comment=An intelligent dynamic tiling Wayland compositor
 Exec=Hyprland
 Type=Application
 "#;
-        let runtime = suite.initialize_desktop_session_from_content(hyprland_desktop).unwrap();
+        let runtime = suite
+            .initialize_desktop_session_from_content(hyprland_desktop)
+            .unwrap();
         assert_eq!(runtime.active_format, DesktopFormat::Hyprland);
         assert_eq!(suite.get_active_format_name(), "Hyprland");
     }
@@ -754,17 +833,29 @@ Type=Application
     #[test]
     fn test_app_framework_bridge_engine() {
         let mut engine = AppFrameworkBridgeEngine::new();
-        engine.register_application("org.gnome.Gimp", "GIMP", "/usr/bin/gimp", DesktopFormat::GnomeShell);
+        engine.register_application(
+            "org.gnome.Gimp",
+            "GIMP",
+            "/usr/bin/gimp",
+            DesktopFormat::GnomeShell,
+        );
 
-        assert!(engine.register_dbus_endpoint("org.gnome.Gimp", "org.gnome.Gimp.Service").is_ok());
+        assert!(engine
+            .register_dbus_endpoint("org.gnome.Gimp", "org.gnome.Gimp.Service")
+            .is_ok());
 
         let surface_id = engine.launch_app("org.gnome.Gimp").unwrap();
         assert!(surface_id > 100);
-        assert_eq!(engine.active_foreground_app_id, Some("org.gnome.Gimp".to_string()));
+        assert_eq!(
+            engine.active_foreground_app_id,
+            Some("org.gnome.Gimp".to_string())
+        );
 
         let app_desc = engine.registered_apps.get("org.gnome.Gimp").unwrap();
         assert_eq!(app_desc.state, ApplicationLifecycleState::Foreground);
-        assert!(app_desc.dbus_services.contains(&"org.gnome.Gimp.Service".to_string()));
+        assert!(app_desc
+            .dbus_services
+            .contains(&"org.gnome.Gimp.Service".to_string()));
 
         assert!(engine.move_app_to_background("org.gnome.Gimp").is_ok());
         assert_eq!(engine.active_foreground_app_id, None);

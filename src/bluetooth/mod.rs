@@ -5,12 +5,12 @@
 
 pub mod adapter;
 
-use std::vec::Vec;
-use std::string::String;
 use core::fmt;
+use std::string::String;
+use std::vec::Vec;
 
 pub mod gatt;
-pub use gatt::{GattClient, GattDevice, GattService, GattCharacteristic};
+pub use gatt::{GattCharacteristic, GattClient, GattDevice, GattService};
 
 /// Error type for the Bluetooth module
 #[derive(Debug, Clone, PartialEq, Eq)]

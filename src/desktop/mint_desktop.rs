@@ -1,11 +1,9 @@
 //! Linux Mint Cinnamon-inspired Desktop Environment
-//! 
+//!
 //! This module implements desktop environment features inspired by Linux Mint's
 //! Cinnamon desktop, including panels, desklets, themes, extensions, and XApp integration.
 
 #![allow(dead_code)]
-
-
 
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
@@ -401,8 +399,9 @@ impl CinnamonDesktopManager {
     /// Initialize default desktop layout
     pub fn initialize_default_layout(&mut self) {
         // Create bottom panel with default applets
-        let mut bottom_panel = CinnamonPanel::new("panel-1".to_string(), CinnamonPanelPosition::Bottom);
-        
+        let mut bottom_panel =
+            CinnamonPanel::new("panel-1".to_string(), CinnamonPanelPosition::Bottom);
+
         bottom_panel.add_applet(PanelApplet {
             applet_type: PanelAppletType::Menu,
             id: "menu-applet".to_string(),
@@ -460,7 +459,7 @@ mod tests {
     #[test]
     fn test_panel_applet_management() {
         let mut panel = CinnamonPanel::new("test-panel".to_string(), CinnamonPanelPosition::Bottom);
-        
+
         let applet = PanelApplet {
             applet_type: PanelAppletType::Menu,
             id: "menu-applet".to_string(),
@@ -468,10 +467,10 @@ mod tests {
             position: 0,
             config: BTreeMap::new(),
         };
-        
+
         panel.add_applet(applet);
         assert_eq!(panel.applets.len(), 1);
-        
+
         panel.remove_applet("menu-applet");
         assert_eq!(panel.applets.len(), 0);
     }
@@ -480,7 +479,7 @@ mod tests {
     fn test_desktop_manager_default_layout() {
         let mut manager = CinnamonDesktopManager::new();
         manager.initialize_default_layout();
-        
+
         assert_eq!(manager.panels.len(), 1);
         assert_eq!(manager.panels[0].applets.len(), 4);
     }
@@ -489,7 +488,7 @@ mod tests {
     fn test_theme_dark_mode() {
         let mut theme = CinnamonTheme::new("test".to_string(), "test".to_string());
         assert!(!theme.dark_mode);
-        
+
         theme.set_dark_mode(true);
         assert!(theme.dark_mode);
         assert_eq!(theme.gtk_theme, "Adwaita-dark");
@@ -499,10 +498,10 @@ mod tests {
     fn test_xapp_preferences() {
         let mut prefs = XAppPreferences::new("test-app".to_string());
         assert!(!prefs.dark_mode);
-        
+
         prefs.set_dark_mode(true);
         assert!(prefs.dark_mode);
-        
+
         prefs.set_accent_color("#ff0000".to_string());
         assert_eq!(prefs.accent_color, "#ff0000");
     }

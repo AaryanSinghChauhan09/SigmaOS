@@ -75,7 +75,15 @@ pub struct Key {
 }
 
 impl Key {
-    pub fn new(id: u64, key_type: KeyType, description: String, payload: KeyPayload, permissions: KeyPermissions, uid: u32, gid: u32) -> Self {
+    pub fn new(
+        id: u64,
+        key_type: KeyType,
+        description: String,
+        payload: KeyPayload,
+        permissions: KeyPermissions,
+        uid: u32,
+        gid: u32,
+    ) -> Self {
         Key {
             id,
             key_type,
@@ -206,14 +214,33 @@ impl KeyManager {
     }
 
     /// Add key to keyring
-    pub fn add_key(&mut self, keyring_id: u64, key_type: KeyType, description: String, payload: KeyPayload, permissions: KeyPermissions, uid: u32, gid: u32) -> Result<u64, String> {
-        let keyring = self.keyrings.get(&keyring_id)
+    pub fn add_key(
+        &mut self,
+        keyring_id: u64,
+        key_type: KeyType,
+        description: String,
+        payload: KeyPayload,
+        permissions: KeyPermissions,
+        uid: u32,
+        gid: u32,
+    ) -> Result<u64, String> {
+        let keyring = self
+            .keyrings
+            .get(&keyring_id)
             .ok_or_else(|| format!("Keyring not found: {}", keyring_id))?;
 
         let key_id = self.next_key_id;
         self.next_key_id += 1;
 
-        let key = Arc::new(Key::new(key_id, key_type, description, payload, permissions, uid, gid));
+        let key = Arc::new(Key::new(
+            key_id,
+            key_type,
+            description,
+            payload,
+            permissions,
+            uid,
+            gid,
+        ));
 
         let mut keyring_guard = keyring.lock().unwrap();
         keyring_guard.add_key(key);
@@ -223,11 +250,14 @@ impl KeyManager {
 
     /// Remove key from keyring
     pub fn remove_key(&self, keyring_id: u64, key_id: u64) -> Result<(), String> {
-        let keyring = self.keyrings.get(&keyring_id)
+        let keyring = self
+            .keyrings
+            .get(&keyring_id)
             .ok_or_else(|| format!("Keyring not found: {}", keyring_id))?;
 
         let mut keyring_guard = keyring.lock().unwrap();
-        keyring_guard.remove_key(key_id)
+        keyring_guard
+            .remove_key(key_id)
             .ok_or_else(|| format!("Key not found: {}", key_id))?;
 
         Ok(())
@@ -235,27 +265,34 @@ impl KeyManager {
 
     /// Get key from keyring
     pub fn get_key(&self, keyring_id: u64, key_id: u64) -> Result<Arc<Key>, String> {
-        let keyring = self.keyrings.get(&keyring_id)
+        let keyring = self
+            .keyrings
+            .get(&keyring_id)
             .ok_or_else(|| format!("Keyring not found: {}", keyring_id))?;
 
         let keyring_guard = keyring.lock().unwrap();
-        keyring_guard.get_key(key_id)
+        keyring_guard
+            .get_key(key_id)
             .ok_or_else(|| format!("Key not found: {}", key_id))
     }
 
     /// Search key by description
     pub fn search_key(&self, keyring_id: u64, description: &str) -> Result<Arc<Key>, String> {
-        let keyring = self.keyrings.get(&keyring_id)
+        let keyring = self
+            .keyrings
+            .get(&keyring_id)
             .ok_or_else(|| format!("Keyring not found: {}", keyring_id))?;
 
         let keyring_guard = keyring.lock().unwrap();
-        keyring_guard.search_key(description)
+        keyring_guard
+            .search_key(description)
             .ok_or_else(|| format!("Key not found with description: {}", description))
     }
 
     /// Remove keyring
     pub fn remove_keyring(&mut self, keyring_id: u64) -> Result<(), String> {
-        self.keyrings.remove(&keyring_id)
+        self.keyrings
+            .remove(&keyring_id)
             .ok_or_else(|| format!("Keyring not found: {}", keyring_id))?;
         Ok(())
     }
@@ -300,7 +337,7 @@ mod tests {
             KeyPayload::String("value".to_string()),
             KeyPermissions::with_all(),
             0,
-            0
+            0,
         );
 
         assert_eq!(key.id(), 1);
@@ -325,7 +362,7 @@ mod tests {
             KeyPayload::String("value".to_string()),
             KeyPermissions::with_all(),
             0,
-            0
+            0,
         ));
 
         keyring.add_key(key);
@@ -342,7 +379,7 @@ mod tests {
             KeyPayload::String("value".to_string()),
             KeyPermissions::with_all(),
             0,
-            0
+            0,
         ));
 
         keyring.add_key(key.clone());
@@ -362,7 +399,7 @@ mod tests {
             KeyPayload::String("value".to_string()),
             KeyPermissions::with_all(),
             0,
-            0
+            0,
         ));
 
         keyring.add_key(key);
@@ -391,15 +428,17 @@ mod tests {
         let mut manager = KeyManager::new();
         let keyring_id = manager.create_keyring("test_ring".to_string(), None);
 
-        let key_id = manager.add_key(
-            keyring_id,
-            KeyType::User,
-            "test_key".to_string(),
-            KeyPayload::String("value".to_string()),
-            KeyPermissions::with_all(),
-            0,
-            0
-        ).unwrap();
+        let key_id = manager
+            .add_key(
+                keyring_id,
+                KeyType::User,
+                "test_key".to_string(),
+                KeyPayload::String("value".to_string()),
+                KeyPermissions::with_all(),
+                0,
+                0,
+            )
+            .unwrap();
 
         assert_eq!(key_id, 1);
     }
@@ -409,15 +448,17 @@ mod tests {
         let mut manager = KeyManager::new();
         let keyring_id = manager.create_keyring("test_ring".to_string(), None);
 
-        let key_id = manager.add_key(
-            keyring_id,
-            KeyType::User,
-            "test_key".to_string(),
-            KeyPayload::String("value".to_string()),
-            KeyPermissions::with_all(),
-            0,
-            0
-        ).unwrap();
+        let key_id = manager
+            .add_key(
+                keyring_id,
+                KeyType::User,
+                "test_key".to_string(),
+                KeyPayload::String("value".to_string()),
+                KeyPermissions::with_all(),
+                0,
+                0,
+            )
+            .unwrap();
 
         let key = manager.get_key(keyring_id, key_id).unwrap();
         assert_eq!(key.id(), key_id);
@@ -428,15 +469,17 @@ mod tests {
         let mut manager = KeyManager::new();
         let keyring_id = manager.create_keyring("test_ring".to_string(), None);
 
-        manager.add_key(
-            keyring_id,
-            KeyType::User,
-            "test_key".to_string(),
-            KeyPayload::String("value".to_string()),
-            KeyPermissions::with_all(),
-            0,
-            0
-        ).unwrap();
+        manager
+            .add_key(
+                keyring_id,
+                KeyType::User,
+                "test_key".to_string(),
+                KeyPayload::String("value".to_string()),
+                KeyPermissions::with_all(),
+                0,
+                0,
+            )
+            .unwrap();
 
         let key = manager.search_key(keyring_id, "test_key").unwrap();
         assert_eq!(key.description(), "test_key");
@@ -447,15 +490,17 @@ mod tests {
         let mut manager = KeyManager::new();
         let keyring_id = manager.create_keyring("test_ring".to_string(), None);
 
-        let key_id = manager.add_key(
-            keyring_id,
-            KeyType::User,
-            "test_key".to_string(),
-            KeyPayload::String("value".to_string()),
-            KeyPermissions::with_all(),
-            0,
-            0
-        ).unwrap();
+        let key_id = manager
+            .add_key(
+                keyring_id,
+                KeyType::User,
+                "test_key".to_string(),
+                KeyPayload::String("value".to_string()),
+                KeyPermissions::with_all(),
+                0,
+                0,
+            )
+            .unwrap();
 
         assert!(manager.remove_key(keyring_id, key_id).is_ok());
     }

@@ -79,7 +79,9 @@ impl Omarchy4DynamicHyprlandLayoutEngine {
     }
 
     pub fn query_rule_for_window(&self, class_name: &str) -> Option<&HyprlandWindowRule> {
-        self.window_rules.iter().find(|r| r.window_class == class_name)
+        self.window_rules
+            .iter()
+            .find(|r| r.window_class == class_name)
     }
 }
 
@@ -351,7 +353,9 @@ impl OmarchyWalkerFuzzyLauncherEngine {
             .app_index
             .iter()
             .filter(|app| {
-                app.display_name.to_lowercase().contains(&query.to_lowercase())
+                app.display_name
+                    .to_lowercase()
+                    .contains(&query.to_lowercase())
                     || app.exec_cmd.contains(query)
             })
             .collect();

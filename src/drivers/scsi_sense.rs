@@ -209,18 +209,9 @@ mod tests {
 
     #[test]
     fn test_scsi_sense_key_descriptions() {
-        assert_eq!(
-            ScsiSenseKey::from_u8(0x02).description(),
-            "NOT READY"
-        );
-        assert_eq!(
-            ScsiSenseKey::from_u8(0x05).description(),
-            "ILLEGAL REQUEST"
-        );
-        assert_eq!(
-            ScsiSenseKey::from_u8(0x06).description(),
-            "UNIT ATTENTION"
-        );
+        assert_eq!(ScsiSenseKey::from_u8(0x02).description(), "NOT READY");
+        assert_eq!(ScsiSenseKey::from_u8(0x05).description(), "ILLEGAL REQUEST");
+        assert_eq!(ScsiSenseKey::from_u8(0x06).description(), "UNIT ATTENTION");
     }
 
     #[test]

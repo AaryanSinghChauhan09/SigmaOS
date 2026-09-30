@@ -6,7 +6,6 @@
 use std::vec::Vec;
 
 #[cfg(target_os = "none")]
-
 #[cfg(target_os = "none")]
 use std::vec::Vec;
 
@@ -52,10 +51,16 @@ pub struct FileDialogPortal {
 
 impl FileDialogPortal {
     pub fn new() -> Self {
-        Self { requests_processed: 0 }
+        Self {
+            requests_processed: 0,
+        }
     }
 
-    pub fn show_dialog(&mut self, _request: FileDialogRequest, user_approved_paths: Vec<&'static str>) -> FileDialogResponse {
+    pub fn show_dialog(
+        &mut self,
+        _request: FileDialogRequest,
+        user_approved_paths: Vec<&'static str>,
+    ) -> FileDialogResponse {
         self.requests_processed += 1;
         if user_approved_paths.is_empty() {
             return FileDialogResponse {
@@ -144,7 +149,11 @@ impl ScreenCastScreenshotPortal {
     }
 
     pub fn stop_screencast_session(&mut self, session_id: u32) -> bool {
-        if let Some(pos) = self.active_sessions.iter().position(|s| s.session_id == session_id) {
+        if let Some(pos) = self
+            .active_sessions
+            .iter()
+            .position(|s| s.session_id == session_id)
+        {
             self.active_sessions.remove(pos);
             true
         } else {
@@ -152,7 +161,11 @@ impl ScreenCastScreenshotPortal {
         }
     }
 
-    pub fn take_screenshot(&mut self, app_id: &'static str, interactive: bool) -> Result<u32, &'static str> {
+    pub fn take_screenshot(
+        &mut self,
+        app_id: &'static str,
+        interactive: bool,
+    ) -> Result<u32, &'static str> {
         if app_id.is_empty() {
             return Err("Invalid App ID");
         }
@@ -188,11 +201,25 @@ pub struct OpenUriPortal {
 
 impl OpenUriPortal {
     pub fn new() -> Self {
-        let mut portal = Self { handlers: Vec::new() };
-        portal.register_handler(UriHandler { scheme: "http", default_app: "SigmaWeb" });
-        portal.register_handler(UriHandler { scheme: "https", default_app: "SigmaWeb" });
-        portal.register_handler(UriHandler { scheme: "mailto", default_app: "PantheonMail" });
-        portal.register_handler(UriHandler { scheme: "sigma", default_app: "SigmaControl" });
+        let mut portal = Self {
+            handlers: Vec::new(),
+        };
+        portal.register_handler(UriHandler {
+            scheme: "http",
+            default_app: "SigmaWeb",
+        });
+        portal.register_handler(UriHandler {
+            scheme: "https",
+            default_app: "SigmaWeb",
+        });
+        portal.register_handler(UriHandler {
+            scheme: "mailto",
+            default_app: "PantheonMail",
+        });
+        portal.register_handler(UriHandler {
+            scheme: "sigma",
+            default_app: "SigmaControl",
+        });
         portal
     }
 
@@ -253,12 +280,17 @@ impl SecretKeyringPortal {
         Self { vault: Vec::new() }
     }
 
-    pub fn store_secret(&mut self, app_id: &'static str, item: SecretItem) -> Result<(), &'static str> {
+    pub fn store_secret(
+        &mut self,
+        app_id: &'static str,
+        item: SecretItem,
+    ) -> Result<(), &'static str> {
         if app_id != item.app_owner {
             return Err("Security Violation: Cannot store secret for another application");
         }
         // Remove existing item with same key for this app
-        self.vault.retain(|i| !(i.app_owner == app_id && i.key == item.key));
+        self.vault
+            .retain(|i| !(i.app_owner == app_id && i.key == item.key));
         self.vault.push(item);
         Ok(())
     }
@@ -272,7 +304,8 @@ impl SecretKeyringPortal {
 
     pub fn delete_secret(&mut self, app_id: &str, key: &str) -> bool {
         let initial_len = self.vault.len();
-        self.vault.retain(|item| !(item.app_owner == app_id && item.key == key));
+        self.vault
+            .retain(|item| !(item.app_owner == app_id && item.key == key));
         self.vault.len() < initial_len
     }
 }
@@ -317,7 +350,12 @@ impl InhibitPortal {
         }
     }
 
-    pub fn inhibit(&mut self, app_id: &'static str, reason: &'static str, flags: u32) -> Result<u32, &'static str> {
+    pub fn inhibit(
+        &mut self,
+        app_id: &'static str,
+        reason: &'static str,
+        flags: u32,
+    ) -> Result<u32, &'static str> {
         if app_id.is_empty() || reason.is_empty() {
             return Err("Invalid Inhibitor parameters");
         }
@@ -393,13 +431,27 @@ impl PermissionStorePortal {
         Self { rules: Vec::new() }
     }
 
-    pub fn set_permission(&mut self, app_id: &'static str, category: PermissionCategory, state: PermissionState) {
-        self.rules.retain(|r| !(r.app_id == app_id && r.category == category));
-        self.rules.push(AppPermissionRule { app_id, category, state });
+    pub fn set_permission(
+        &mut self,
+        app_id: &'static str,
+        category: PermissionCategory,
+        state: PermissionState,
+    ) {
+        self.rules
+            .retain(|r| !(r.app_id == app_id && r.category == category));
+        self.rules.push(AppPermissionRule {
+            app_id,
+            category,
+            state,
+        });
     }
 
     pub fn check_permission(&self, app_id: &str, category: PermissionCategory) -> PermissionState {
-        if let Some(rule) = self.rules.iter().find(|r| r.app_id == app_id && r.category == category) {
+        if let Some(rule) = self
+            .rules
+            .iter()
+            .find(|r| r.app_id == app_id && r.category == category)
+        {
             rule.state
         } else {
             PermissionState::Prompt
@@ -431,7 +483,9 @@ pub struct ContractorAppChooserPortal {
 
 impl ContractorAppChooserPortal {
     pub fn new() -> Self {
-        let mut portal = Self { choices: Vec::new() };
+        let mut portal = Self {
+            choices: Vec::new(),
+        };
 
         portal.register_choice(AppChooserChoice {
             app_name: "SigmaText",
@@ -460,7 +514,11 @@ impl ContractorAppChooserPortal {
             .collect()
     }
 
-    pub fn launch_app_for_file(&self, app_name: &str, file_path: &str) -> Result<&'static str, &'static str> {
+    pub fn launch_app_for_file(
+        &self,
+        app_name: &str,
+        file_path: &str,
+    ) -> Result<&'static str, &'static str> {
         if file_path.is_empty() {
             return Err("Target file path is empty");
         }
@@ -557,13 +615,19 @@ mod tests {
     #[test]
     fn test_open_uri_portal() {
         let portal = OpenUriPortal::new();
-        let app = portal.open_uri("org.sigmaos.browser", "https://sigmaos.dev").unwrap();
+        let app = portal
+            .open_uri("org.sigmaos.browser", "https://sigmaos.dev")
+            .unwrap();
         assert_eq!(app, "SigmaWeb");
 
-        let mail_app = portal.open_uri("org.sigmaos.browser", "mailto:dev@sigmaos.dev").unwrap();
+        let mail_app = portal
+            .open_uri("org.sigmaos.browser", "mailto:dev@sigmaos.dev")
+            .unwrap();
         assert_eq!(mail_app, "PantheonMail");
 
-        assert!(portal.open_uri("org.sigmaos.browser", "ftp://invalid").is_err());
+        assert!(portal
+            .open_uri("org.sigmaos.browser", "ftp://invalid")
+            .is_err());
     }
 
     #[test]
@@ -577,12 +641,17 @@ mod tests {
         };
 
         // Fail when app_id doesn't match owner
-        assert!(portal.store_secret("org.sigmaos.hacker", item.clone()).is_err());
+        assert!(portal
+            .store_secret("org.sigmaos.hacker", item.clone())
+            .is_err());
 
         // Store successfully
         assert!(portal.store_secret("org.sigmaos.db", item).is_ok());
 
-        assert_eq!(portal.get_secret("org.sigmaos.db", "db_pass"), Some("SuperSecret123"));
+        assert_eq!(
+            portal.get_secret("org.sigmaos.db", "db_pass"),
+            Some("SuperSecret123")
+        );
         assert_eq!(portal.get_secret("org.sigmaos.other", "db_pass"), None);
 
         assert!(portal.delete_secret("org.sigmaos.db", "db_pass"));
@@ -593,7 +662,11 @@ mod tests {
     fn test_inhibit_portal() {
         let mut portal = InhibitPortal::new();
         let cookie = portal
-            .inhibit("org.sigmaos.media", "Playing Movie", InhibitFlag::Idle as u32 | InhibitFlag::Suspend as u32)
+            .inhibit(
+                "org.sigmaos.media",
+                "Playing Movie",
+                InhibitFlag::Idle as u32 | InhibitFlag::Suspend as u32,
+            )
             .unwrap();
 
         assert!(portal.is_flag_inhibited(InhibitFlag::Idle));
@@ -612,7 +685,11 @@ mod tests {
             PermissionState::Prompt
         );
 
-        portal.set_permission("org.sigmaos.camera", PermissionCategory::Camera, PermissionState::Granted);
+        portal.set_permission(
+            "org.sigmaos.camera",
+            PermissionCategory::Camera,
+            PermissionState::Granted,
+        );
         assert_eq!(
             portal.check_permission("org.sigmaos.camera", PermissionCategory::Camera),
             PermissionState::Granted
@@ -626,8 +703,12 @@ mod tests {
         assert_eq!(apps.len(), 1);
         assert_eq!(apps[0].app_name, "SigmaText");
 
-        assert!(portal.launch_app_for_file("SigmaText", "/tmp/notes.txt").is_ok());
-        assert!(portal.launch_app_for_file("UnknownApp", "/tmp/notes.txt").is_err());
+        assert!(portal
+            .launch_app_for_file("SigmaText", "/tmp/notes.txt")
+            .is_ok());
+        assert!(portal
+            .launch_app_for_file("UnknownApp", "/tmp/notes.txt")
+            .is_err());
     }
 
     #[test]

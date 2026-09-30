@@ -32,7 +32,8 @@ impl TailsAmnesicRamWipeGovernor {
     }
 
     pub fn allocate_sensitive_page(&mut self, page_size_bytes: usize) {
-        self.allocated_session_pages.push(vec![0xFFu8; page_size_bytes]);
+        self.allocated_session_pages
+            .push(vec![0xFFu8; page_size_bytes]);
     }
 
     pub fn emergency_wipe_all_ram(&mut self) -> usize {
@@ -254,39 +255,237 @@ impl SovereignMediaPortalIntelligenceEngine {
     pub fn new() -> Self {
         let mut portals = Vec::new();
         let list = [
-            ("9to5google", "9to5Google", "9to5google.com", "https://9to5google.com", "Mobile & Gadgets"),
-            ("9to5linux", "9to5Linux", "9to5linux.com", "https://9to5linux.com", "Linux & Open Source"),
-            ("9to5mac", "9to5Mac", "9to5mac.com", "https://9to5mac.com", "Mobile & Gadgets"),
-            ("androidauthority", "Android Authority", "androidauthority.com", "https://www.androidauthority.com", "Mobile Ecosystem"),
-            ("androidpolice", "Android Police", "androidpolice.com", "https://www.androidpolice.com", "Mobile Ecosystem"),
-            ("appuals", "Appuals", "appuals.com", "https://appuals.com", "Troubleshooting"),
-            ("distrowatch", "DistroWatch", "distrowatch.com", "https://distrowatch.com", "Linux & BSD Distros"),
-            ("frappe", "Frappe Framework", "frappe.io", "https://frappe.io", "Enterprise Low-Code"),
-            ("geekygadgets", "Geeky Gadgets", "geeky-gadgets.com", "https://www.geeky-gadgets.com", "Hardware & Peripherals"),
-            ("hwbusters", "HW Busters", "hwbusters.com", "https://hwbusters.com", "Hardware & PSU Telemetry"),
-            ("howtogeek", "How-To Geek", "howtogeek.com", "https://www.howtogeek.com", "OS Explainer Guides"),
-            ("infoworld", "InfoWorld", "infoworld.com", "https://www.infoworld.com", "Enterprise Architecture"),
-            ("itsfoss", "ItsFOSS", "itsfoss.com", "https://itsfoss.com", "Linux Tutorials"),
-            ("itdaily", "ITDaily", "itdaily.com", "https://www.itdaily.com", "Enterprise IT"),
-            ("kdnuggets", "KDnuggets", "kdnuggets.com", "https://www.kdnuggets.com", "AI & Data Science"),
-            ("linuxdotcom", "Linux.com", "linux.com", "https://www.linux.com", "Linux Community"),
-            ("linuxorg", "Linux.org", "linux.org", "https://www.linux.org", "Linux Forums"),
-            ("linuxfoundation", "Linux Foundation", "linuxfoundation.org", "https://www.linuxfoundation.org", "Open Source Governance"),
-            ("linuxteck", "LinuxTeck", "linuxteck.com", "https://www.linuxteck.com", "SysAdmin & DevOps"),
-            ("makeuseof", "MakeUseOf", "makeuseof.com", "https://www.makeuseof.com", "Consumer Tech & Linux"),
-            ("marktechpost", "MarkTechPost", "marktechpost.com", "https://www.marktechpost.com", "AI & LLM Research"),
-            ("opensourceforu", "Open Source For You", "opensourceforu.com", "https://www.opensourceforu.com", "Linux Kernel & FOSS"),
-            ("pcmag", "PCMag", "pcmag.com", "https://www.pcmag.com", "Hardware Reviews"),
-            ("pcworld", "PCWorld", "pcworld.com", "https://www.pcworld.com", "PC Benchmarks"),
-            ("phoronix", "Phoronix", "phoronix.com", "https://www.phoronix.com", "Linux Hardware Benchmarks"),
-            ("techcrunch", "TechCrunch", "techcrunch.com", "https://techcrunch.com", "Tech Startup Ecosystem"),
-            ("techpowerup", "TechPowerUp", "techpowerup.com", "https://www.techpowerup.com", "GPU & Hardware Databases"),
-            ("techspot", "TechSpot", "techspot.com", "https://www.techspot.com", "Gaming Benchmarks"),
-            ("thenewstack", "The New Stack", "thenewstack.io", "https://thenewstack.io", "Cloud Native & eBPF"),
-            ("windowscentral", "Windows Central", "windowscentral.com", "https://www.windowscentral.com", "Windows Ecosystem"),
-            ("windowslatest", "Windows Latest", "windowslatest.com", "https://www.windowslatest.com", "Windows Platform News"),
-            ("xdadevelopers", "XDA Developers", "xda-developers.com", "https://www.xda-developers.com", "Custom ROMs & Mobile Modding"),
-            ("zdnet", "ZDNET", "zdnet.com", "https://www.zdnet.com", "Enterprise Technology"),
+            (
+                "9to5google",
+                "9to5Google",
+                "9to5google.com",
+                "https://9to5google.com",
+                "Mobile & Gadgets",
+            ),
+            (
+                "9to5linux",
+                "9to5Linux",
+                "9to5linux.com",
+                "https://9to5linux.com",
+                "Linux & Open Source",
+            ),
+            (
+                "9to5mac",
+                "9to5Mac",
+                "9to5mac.com",
+                "https://9to5mac.com",
+                "Mobile & Gadgets",
+            ),
+            (
+                "androidauthority",
+                "Android Authority",
+                "androidauthority.com",
+                "https://www.androidauthority.com",
+                "Mobile Ecosystem",
+            ),
+            (
+                "androidpolice",
+                "Android Police",
+                "androidpolice.com",
+                "https://www.androidpolice.com",
+                "Mobile Ecosystem",
+            ),
+            (
+                "appuals",
+                "Appuals",
+                "appuals.com",
+                "https://appuals.com",
+                "Troubleshooting",
+            ),
+            (
+                "distrowatch",
+                "DistroWatch",
+                "distrowatch.com",
+                "https://distrowatch.com",
+                "Linux & BSD Distros",
+            ),
+            (
+                "frappe",
+                "Frappe Framework",
+                "frappe.io",
+                "https://frappe.io",
+                "Enterprise Low-Code",
+            ),
+            (
+                "geekygadgets",
+                "Geeky Gadgets",
+                "geeky-gadgets.com",
+                "https://www.geeky-gadgets.com",
+                "Hardware & Peripherals",
+            ),
+            (
+                "hwbusters",
+                "HW Busters",
+                "hwbusters.com",
+                "https://hwbusters.com",
+                "Hardware & PSU Telemetry",
+            ),
+            (
+                "howtogeek",
+                "How-To Geek",
+                "howtogeek.com",
+                "https://www.howtogeek.com",
+                "OS Explainer Guides",
+            ),
+            (
+                "infoworld",
+                "InfoWorld",
+                "infoworld.com",
+                "https://www.infoworld.com",
+                "Enterprise Architecture",
+            ),
+            (
+                "itsfoss",
+                "ItsFOSS",
+                "itsfoss.com",
+                "https://itsfoss.com",
+                "Linux Tutorials",
+            ),
+            (
+                "itdaily",
+                "ITDaily",
+                "itdaily.com",
+                "https://www.itdaily.com",
+                "Enterprise IT",
+            ),
+            (
+                "kdnuggets",
+                "KDnuggets",
+                "kdnuggets.com",
+                "https://www.kdnuggets.com",
+                "AI & Data Science",
+            ),
+            (
+                "linuxdotcom",
+                "Linux.com",
+                "linux.com",
+                "https://www.linux.com",
+                "Linux Community",
+            ),
+            (
+                "linuxorg",
+                "Linux.org",
+                "linux.org",
+                "https://www.linux.org",
+                "Linux Forums",
+            ),
+            (
+                "linuxfoundation",
+                "Linux Foundation",
+                "linuxfoundation.org",
+                "https://www.linuxfoundation.org",
+                "Open Source Governance",
+            ),
+            (
+                "linuxteck",
+                "LinuxTeck",
+                "linuxteck.com",
+                "https://www.linuxteck.com",
+                "SysAdmin & DevOps",
+            ),
+            (
+                "makeuseof",
+                "MakeUseOf",
+                "makeuseof.com",
+                "https://www.makeuseof.com",
+                "Consumer Tech & Linux",
+            ),
+            (
+                "marktechpost",
+                "MarkTechPost",
+                "marktechpost.com",
+                "https://www.marktechpost.com",
+                "AI & LLM Research",
+            ),
+            (
+                "opensourceforu",
+                "Open Source For You",
+                "opensourceforu.com",
+                "https://www.opensourceforu.com",
+                "Linux Kernel & FOSS",
+            ),
+            (
+                "pcmag",
+                "PCMag",
+                "pcmag.com",
+                "https://www.pcmag.com",
+                "Hardware Reviews",
+            ),
+            (
+                "pcworld",
+                "PCWorld",
+                "pcworld.com",
+                "https://www.pcworld.com",
+                "PC Benchmarks",
+            ),
+            (
+                "phoronix",
+                "Phoronix",
+                "phoronix.com",
+                "https://www.phoronix.com",
+                "Linux Hardware Benchmarks",
+            ),
+            (
+                "techcrunch",
+                "TechCrunch",
+                "techcrunch.com",
+                "https://techcrunch.com",
+                "Tech Startup Ecosystem",
+            ),
+            (
+                "techpowerup",
+                "TechPowerUp",
+                "techpowerup.com",
+                "https://www.techpowerup.com",
+                "GPU & Hardware Databases",
+            ),
+            (
+                "techspot",
+                "TechSpot",
+                "techspot.com",
+                "https://www.techspot.com",
+                "Gaming Benchmarks",
+            ),
+            (
+                "thenewstack",
+                "The New Stack",
+                "thenewstack.io",
+                "https://thenewstack.io",
+                "Cloud Native & eBPF",
+            ),
+            (
+                "windowscentral",
+                "Windows Central",
+                "windowscentral.com",
+                "https://www.windowscentral.com",
+                "Windows Ecosystem",
+            ),
+            (
+                "windowslatest",
+                "Windows Latest",
+                "windowslatest.com",
+                "https://www.windowslatest.com",
+                "Windows Platform News",
+            ),
+            (
+                "xdadevelopers",
+                "XDA Developers",
+                "xda-developers.com",
+                "https://www.xda-developers.com",
+                "Custom ROMs & Mobile Modding",
+            ),
+            (
+                "zdnet",
+                "ZDNET",
+                "zdnet.com",
+                "https://www.zdnet.com",
+                "Enterprise Technology",
+            ),
         ];
 
         for (key, name, domain, url, cat) in list {
@@ -440,7 +639,10 @@ impl SovereignOmniDistroMediaSynthesisSuite {
 
     pub fn verify_synthesis_suite(&self) -> bool {
         self.media_engine.total_portals_count() == 33
-            && self.media_engine.lookup_portal_canonical_url("phoronix").is_some()
+            && self
+                .media_engine
+                .lookup_portal_canonical_url("phoronix")
+                .is_some()
             && self.distro_engine.verify_all_distro_innovations()
             && self.absorption_engine.verify_absorption()
     }

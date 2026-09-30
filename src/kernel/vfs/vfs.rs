@@ -15,11 +15,11 @@
 
 // (no_std only applicable at crate root - removed)
 
-use std::string::{String, ToString};
-use std::vec::Vec;
+use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
 use std::collections::BTreeMap;
 use std::format;
-use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FileFlags {
@@ -382,25 +382,25 @@ impl FilesystemMetadata {
 // ==========================================
 
 /// Standard Linux & BSD-inspired mount flags
-pub const MS_RDONLY: u32 = 1;       // Mount read-only
-pub const MS_NOSUID: u32 = 2;       // Ignore suid and sgid bits
-pub const MS_NODEV: u32 = 4;        // Disallow access to device special files
-pub const MS_NOEXEC: u32 = 8;       // Disallow program execution
+pub const MS_RDONLY: u32 = 1; // Mount read-only
+pub const MS_NOSUID: u32 = 2; // Ignore suid and sgid bits
+pub const MS_NODEV: u32 = 4; // Disallow access to device special files
+pub const MS_NOEXEC: u32 = 8; // Disallow program execution
 pub const MS_SYNCHRONOUS: u32 = 16; // Writes are synced immediately
-pub const MS_REMOUNT: u32 = 32;     // Alter flags of a mounted FS
-pub const MS_NOATIME: u32 = 1024;   // Do not update access times
+pub const MS_REMOUNT: u32 = 32; // Alter flags of a mounted FS
+pub const MS_NOATIME: u32 = 1024; // Do not update access times
 pub const MS_NODIRATIME: u32 = 2048; // Do not update directory access times
-pub const MS_BIND: u32 = 4096;      // Create a bind mount
-pub const MS_MOVE: u32 = 8192;      // Move a subtree
-pub const MS_REC: u32 = 16384;      // Recursive mount
+pub const MS_BIND: u32 = 4096; // Create a bind mount
+pub const MS_MOVE: u32 = 8192; // Move a subtree
+pub const MS_REC: u32 = 16384; // Recursive mount
 pub const MS_LAZYATIME: u32 = 32768; // Lazy atime updates
 pub const MS_STRICTATIME: u32 = 16777216; // Always update atime
 
 /// Unmount flags (umount2 parity)
-pub const MNT_FORCE: u32 = 1;       // Force unmount
-pub const MNT_DETACH: u32 = 2;      // Lazy unmount (detach from hierarchy)
-pub const MNT_EXPIRE: u32 = 4;      // Mark for expiration
-pub const MNT_UNION: u32 = 8;       // BSD Union mount
+pub const MNT_FORCE: u32 = 1; // Force unmount
+pub const MNT_DETACH: u32 = 2; // Lazy unmount (detach from hierarchy)
+pub const MNT_EXPIRE: u32 = 4; // Mark for expiration
+pub const MNT_UNION: u32 = 8; // BSD Union mount
 
 /// Standard Linux-inspired mount propagation modes
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -424,9 +424,9 @@ pub struct ActiveMountEntry {
 /// Highly robust Linux-inspired Mount Manager
 pub struct SovereignMountManager {
     pub active_mount_table: BTreeMap<String, ActiveMountEntry>, // maps mount point to entry
-    pub fstab_config: BTreeMap<String, String>,                 // raw lines of /etc/fstab configuration
-    pub automount_triggers: BTreeMap<String, String>,           // maps device UUID to auto-mount target
-    pub securelevel: i32,                                       // OpenBSD securelevel (>=2 locks mount table modification)
+    pub fstab_config: BTreeMap<String, String>, // raw lines of /etc/fstab configuration
+    pub automount_triggers: BTreeMap<String, String>, // maps device UUID to auto-mount target
+    pub securelevel: i32, // OpenBSD securelevel (>=2 locks mount table modification)
 }
 
 impl SovereignMountManager {
@@ -484,7 +484,12 @@ impl SovereignMountManager {
     }
 
     /// Implements Bind Mount operations (MS_BIND) and Namespace Propagation settings
-    pub fn execute_bind_mount(&mut self, source_dir: &str, target_dir: &str, propagation: MountPropagation) -> Result<(), &'static str> {
+    pub fn execute_bind_mount(
+        &mut self,
+        source_dir: &str,
+        target_dir: &str,
+        propagation: MountPropagation,
+    ) -> Result<(), &'static str> {
         if self.securelevel >= 2 {
             return Err("OpenBSD Securelevel >= 2 prohibits modifying mount table");
         }
@@ -501,7 +506,8 @@ impl SovereignMountManager {
             pass_no: 0,
         };
 
-        self.active_mount_table.insert(target_dir.to_string(), entry);
+        self.active_mount_table
+            .insert(target_dir.to_string(), entry);
         Ok(())
     }
 
@@ -519,7 +525,11 @@ impl SovereignMountManager {
     }
 
     /// Advanced unmount with support for force (MNT_FORCE) and lazy detach (MNT_DETACH) (umount2 parity)
-    pub fn unmount_with_flags(&mut self, mount_point: &str, flags: u32) -> Result<(), &'static str> {
+    pub fn unmount_with_flags(
+        &mut self,
+        mount_point: &str,
+        flags: u32,
+    ) -> Result<(), &'static str> {
         if self.securelevel >= 2 {
             return Err("OpenBSD Securelevel >= 2 prohibits modifying mount table");
         }
@@ -545,16 +555,39 @@ impl SovereignMountManager {
         let mut result = String::new();
         for (mp, entry) in &self.active_mount_table {
             let mut opts = Vec::new();
-            if (entry.flags & MS_RDONLY) != 0 { opts.push("ro"); } else { opts.push("rw"); }
-            if (entry.flags & MS_NOSUID) != 0 { opts.push("nosuid"); }
-            if (entry.flags & MS_NODEV) != 0 { opts.push("nodev"); }
-            if (entry.flags & MS_NOEXEC) != 0 { opts.push("noexec"); }
-            if (entry.flags & MS_SYNCHRONOUS) != 0 { opts.push("sync"); }
-            if (entry.flags & MS_NOATIME) != 0 { opts.push("noatime"); }
-            if (entry.flags & MS_BIND) != 0 { opts.push("bind"); }
+            if (entry.flags & MS_RDONLY) != 0 {
+                opts.push("ro");
+            } else {
+                opts.push("rw");
+            }
+            if (entry.flags & MS_NOSUID) != 0 {
+                opts.push("nosuid");
+            }
+            if (entry.flags & MS_NODEV) != 0 {
+                opts.push("nodev");
+            }
+            if (entry.flags & MS_NOEXEC) != 0 {
+                opts.push("noexec");
+            }
+            if (entry.flags & MS_SYNCHRONOUS) != 0 {
+                opts.push("sync");
+            }
+            if (entry.flags & MS_NOATIME) != 0 {
+                opts.push("noatime");
+            }
+            if (entry.flags & MS_BIND) != 0 {
+                opts.push("bind");
+            }
 
-            let opts_str = if opts.is_empty() { "defaults".to_string() } else { opts.join(",") };
-            result.push_str(&format!("{} {} {} {} 0 {}\n", entry.spec_device_uuid, mp, entry.fstype, opts_str, entry.pass_no));
+            let opts_str = if opts.is_empty() {
+                "defaults".to_string()
+            } else {
+                opts.join(",")
+            };
+            result.push_str(&format!(
+                "{} {} {} {} 0 {}\n",
+                entry.spec_device_uuid, mp, entry.fstype, opts_str, entry.pass_no
+            ));
         }
         result
     }
@@ -573,7 +606,10 @@ impl SovereignMountManager {
                     pass_no: 0,
                 };
                 self.active_mount_table.insert(trigger_path.clone(), entry);
-                return Some(format!("Auto-mount triggered successfully for path '{}' mapping to UUID '{}'", accessed_path, dev_uuid));
+                return Some(format!(
+                    "Auto-mount triggered successfully for path '{}' mapping to UUID '{}'",
+                    accessed_path, dev_uuid
+                ));
             }
         }
         None
@@ -618,7 +654,9 @@ mod mount_tests {
     #[test]
     fn test_bind_mount() {
         let mut manager = SovereignMountManager::new();
-        assert!(manager.execute_bind_mount("/home/user", "/mnt/home", MountPropagation::Shared).is_ok());
+        assert!(manager
+            .execute_bind_mount("/home/user", "/mnt/home", MountPropagation::Shared)
+            .is_ok());
 
         let entry = manager.active_mount_table.get("/mnt/home").unwrap();
         assert_eq!(entry.spec_device_uuid, "BIND_SRC:/home/user");
@@ -630,7 +668,9 @@ mod mount_tests {
     #[test]
     fn test_automount() {
         let mut manager = SovereignMountManager::new();
-        manager.automount_triggers.insert("/media/usb".to_string(), "UUID=USB-9999".to_string());
+        manager
+            .automount_triggers
+            .insert("/media/usb".to_string(), "UUID=USB-9999".to_string());
 
         // Prior to lookup, no active mount entry exists
         assert!(!manager.active_mount_table.contains_key("/media/usb"));
@@ -647,7 +687,9 @@ mod mount_tests {
     #[test]
     fn test_remount_unmount_and_proc_mounts() {
         let mut manager = SovereignMountManager::new();
-        manager.parse_and_register_fstab_entry("UUID=1111-2222 /mnt/data ext4 ro,sync 0 1").unwrap();
+        manager
+            .parse_and_register_fstab_entry("UUID=1111-2222 /mnt/data ext4 ro,sync 0 1")
+            .unwrap();
 
         // Check proc mounts formatting
         let proc_mounts = manager.generate_proc_mounts();

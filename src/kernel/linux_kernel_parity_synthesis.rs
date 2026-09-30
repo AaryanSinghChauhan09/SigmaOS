@@ -39,7 +39,11 @@ impl LinuxKernelFutex2WaitvEngine {
         }
     }
 
-    pub fn futex_waitv(&mut self, waiters: &[FutexWaitvEntry], timeout_ns: Option<u64>) -> Result<usize, &'static str> {
+    pub fn futex_waitv(
+        &mut self,
+        waiters: &[FutexWaitvEntry],
+        timeout_ns: Option<u64>,
+    ) -> Result<usize, &'static str> {
         if waiters.is_empty() {
             return Err("FUTEX2_WAITV: Empty waiter array");
         }
@@ -54,7 +58,8 @@ impl LinuxKernelFutex2WaitvEngine {
             if entry.uaddr == 0 {
                 return Err("FUTEX2_WAITV: Invalid null futex address");
             }
-            if entry.val == 0x1234 { // Signaled matching value
+            if entry.val == 0x1234 {
+                // Signaled matching value
                 return Ok(idx);
             }
         }
@@ -108,14 +113,21 @@ impl LinuxDamonAccessMonitorEngine {
     }
 
     pub fn record_access_sample(&mut self, start_pfn: u64, hits: u32) {
-        if let Some(r) = self.regions.iter_mut().find(|reg| reg.start_pfn == start_pfn) {
+        if let Some(r) = self
+            .regions
+            .iter_mut()
+            .find(|reg| reg.start_pfn == start_pfn)
+        {
             r.nr_accesses += hits;
             r.age_cycles += 1;
         }
     }
 
     pub fn get_hot_regions_count(&self, threshold_hits: u32) -> usize {
-        self.regions.iter().filter(|r| r.nr_accesses >= threshold_hits).count()
+        self.regions
+            .iter()
+            .filter(|r| r.nr_accesses >= threshold_hits)
+            .count()
     }
 }
 
@@ -152,7 +164,13 @@ impl LinuxDeviceMapperEngine {
         }
     }
 
-    pub fn create_dm_target(&mut self, name: &str, target_type: DmTargetType, length: u64, dev: &str) {
+    pub fn create_dm_target(
+        &mut self,
+        name: &str,
+        target_type: DmTargetType,
+        length: u64,
+        dev: &str,
+    ) {
         self.targets.insert(
             name.to_string(),
             DmTargetDevice {
@@ -233,7 +251,12 @@ impl LinuxPressureStallInfoEngine {
         if let Some(m) = self.metrics.get(&resource) {
             format!(
                 "some avg10={:.2} avg60={:.2} total={}\nfull avg10={:.2} avg60={:.2} total={}\n",
-                m.some_avg10, m.some_avg60, m.total_stall_us, m.full_avg10, m.full_avg60, m.total_stall_us
+                m.some_avg10,
+                m.some_avg60,
+                m.total_stall_us,
+                m.full_avg10,
+                m.full_avg60,
+                m.total_stall_us
             )
         } else {
             String::new()
@@ -271,14 +294,12 @@ impl SovereignLinuxKernelParitySynthesisSuite {
 
     pub fn synthesize_and_verify_all(&mut self) -> bool {
         // Verify Futex2
-        let waiters = vec![
-            FutexWaitvEntry {
-                uaddr: 0x1000,
-                val: 0x1234,
-                flags: 0,
-                size: FutexSize::U32,
-            },
-        ];
+        let waiters = vec![FutexWaitvEntry {
+            uaddr: 0x1000,
+            val: 0x1234,
+            flags: 0,
+            size: FutexSize::U32,
+        }];
         let futex_res = self.futex2.futex_waitv(&waiters, None);
         let futex_ok = futex_res == Ok(0);
 
@@ -288,11 +309,17 @@ impl SovereignLinuxKernelParitySynthesisSuite {
         let damon_ok = self.damon.get_hot_regions_count(10) == 1;
 
         // Verify Device Mapper
-        self.device_mapper.create_dm_target("dm-root", DmTargetType::Crypt, 100000, "/dev/nvme0n1p2");
+        self.device_mapper.create_dm_target(
+            "dm-root",
+            DmTargetType::Crypt,
+            100000,
+            "/dev/nvme0n1p2",
+        );
         let dm_ok = self.device_mapper.get_target_count() == 1;
 
         // Verify PSI
-        self.psi.update_stall_pressure(PsiResourceKind::Memory, 2.5, 500);
+        self.psi
+            .update_stall_pressure(PsiResourceKind::Memory, 2.5, 500);
         let proc_out = self.psi.render_proc_pressure(PsiResourceKind::Memory);
         let psi_ok = proc_out.contains("some avg10=2.50");
 
@@ -307,14 +334,12 @@ mod tests {
     #[test]
     fn test_futex2_waitv_engine() {
         let mut engine = LinuxKernelFutex2WaitvEngine::new();
-        let waiters = vec![
-            FutexWaitvEntry {
-                uaddr: 0x2000,
-                val: 0x1234,
-                flags: 0,
-                size: FutexSize::U32,
-            },
-        ];
+        let waiters = vec![FutexWaitvEntry {
+            uaddr: 0x2000,
+            val: 0x1234,
+            flags: 0,
+            size: FutexSize::U32,
+        }];
         let match_idx = engine.futex_waitv(&waiters, Some(1000)).unwrap();
         assert_eq!(match_idx, 0);
     }

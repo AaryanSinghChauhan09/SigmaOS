@@ -1,10 +1,10 @@
-use std::string::{String, ToString};
-use std::vec::Vec;
-use std::format;
 /// WebAssembly (WASM) Sandbox and Secure Runtime Execution Engine
 /// Provides isolated module runtimes, memory sandboxing, and pledge security checks
 /// to achieve Wasmer/Wasmtime/wasm3 parity inside SigmaOS.
 use core::sync::atomic::{AtomicUsize, Ordering};
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WasmState {

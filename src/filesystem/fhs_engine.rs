@@ -2,11 +2,11 @@
 // Zero-dependency Rust #![no_std] / std implementation of Linux & BSD inspired FHS translation & mapping.
 
 #[cfg(not(test))]
+use alloc::format;
+#[cfg(not(test))]
 use alloc::string::{String, ToString};
 #[cfg(not(test))]
 use alloc::vec::Vec;
-#[cfg(not(test))]
-use alloc::format;
 
 #[cfg(test)]
 use std::string::String;
@@ -118,7 +118,11 @@ impl SovereignFhsHierarchyEngine {
 
     /// Identifies the directory classification of a given path
     pub fn classify_path(&self, path: &str) -> FhsDirectoryKind {
-        if path.starts_with("/bin/") || path.starts_with("/sbin/") || path.starts_with("/lib/") || path.starts_with("/lib64/") {
+        if path.starts_with("/bin/")
+            || path.starts_with("/sbin/")
+            || path.starts_with("/lib/")
+            || path.starts_with("/lib64/")
+        {
             FhsDirectoryKind::UsrMergeSymlink
         } else if path.starts_with("/usr/local/") {
             FhsDirectoryKind::ThirdPartyLocalBinary
@@ -128,7 +132,10 @@ impl SovereignFhsHierarchyEngine {
             FhsDirectoryKind::UserWorkspacePath
         } else if path.starts_with("/run/") || path.starts_with("/tmp/") {
             FhsDirectoryKind::VolatileRuntimePath
-        } else if path.starts_with("/proc/") || path.starts_with("/sys/") || path.starts_with("/dev/") {
+        } else if path.starts_with("/proc/")
+            || path.starts_with("/sys/")
+            || path.starts_with("/dev/")
+        {
             FhsDirectoryKind::KernelVirtualFsPath
         } else {
             FhsDirectoryKind::BaseSystemBinary
@@ -156,12 +163,27 @@ mod tests {
         assert_eq!(engine.resolve_path("/lib64/libc.so"), "/usr/lib/libc.so");
 
         // NixOS Store and Sovereign Namespace resolution
-        assert_eq!(engine.resolve_path("/sigma/store/hash-app/bin/app"), "@store/hash-app/bin/app");
-        assert_eq!(engine.resolve_path("/home/jules/file.txt"), "@user/jules/file.txt");
+        assert_eq!(
+            engine.resolve_path("/sigma/store/hash-app/bin/app"),
+            "@store/hash-app/bin/app"
+        );
+        assert_eq!(
+            engine.resolve_path("/home/jules/file.txt"),
+            "@user/jules/file.txt"
+        );
 
         // Classification
-        assert_eq!(engine.classify_path("/bin/bash"), FhsDirectoryKind::UsrMergeSymlink);
-        assert_eq!(engine.classify_path("/usr/local/bin/htop"), FhsDirectoryKind::ThirdPartyLocalBinary);
-        assert_eq!(engine.classify_path("/proc/1/status"), FhsDirectoryKind::KernelVirtualFsPath);
+        assert_eq!(
+            engine.classify_path("/bin/bash"),
+            FhsDirectoryKind::UsrMergeSymlink
+        );
+        assert_eq!(
+            engine.classify_path("/usr/local/bin/htop"),
+            FhsDirectoryKind::ThirdPartyLocalBinary
+        );
+        assert_eq!(
+            engine.classify_path("/proc/1/status"),
+            FhsDirectoryKind::KernelVirtualFsPath
+        );
     }
 }

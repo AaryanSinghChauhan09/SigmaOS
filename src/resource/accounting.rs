@@ -1,14 +1,12 @@
+#[cfg(all(not(feature = "standalone_test"), not(test)))]
+use crate::klib::HashMap;
+use std::string::String;
 /// Sovereign Process & System Accounting Subsystem (SigmaAccounting)
 /// Inspired by Linux Process Accounting (`acct_v3` / `/var/log/pacct`),
 /// BSD Resource Accounting (`getrusage` / `sa(8)` / `lastcomm`),
 /// BSD User Session Accounting (`utmp` / `wtmp` / `lastlog` / `btmp`),
 /// and Linux Netlink Taskstats & Delay Accounting.
-
-
 use std::vec::Vec;
-use std::string::String;
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
-use crate::klib::HashMap;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap as HashMap;
@@ -23,7 +21,7 @@ pub type GroupID = u32;
 
 pub mod acct_flags {
     pub const AFORK: u8 = 1 << 0; // Process was created by fork but not exec'd
-    pub const ASU: u8   = 1 << 1; // Process used superuser privileges
+    pub const ASU: u8 = 1 << 1; // Process used superuser privileges
     pub const ACORE: u8 = 1 << 2; // Process dumped core
     pub const AXSIG: u8 = 1 << 3; // Process was killed by a signal
 }
@@ -35,16 +33,16 @@ pub struct AcctV3Record {
     pub uid: UserID,
     pub gid: GroupID,
     pub command_name: String,
-    pub utime_ms: u64,       // User CPU time in milliseconds
-    pub stime_ms: u64,       // System CPU time in milliseconds
-    pub etime_ms: u64,       // Elapsed wall-clock time in milliseconds
-    pub start_time_sec: u64, // Process start time (POSIX epoch)
-    pub io_bytes_read: u64,  // Character I/O bytes read
+    pub utime_ms: u64,         // User CPU time in milliseconds
+    pub stime_ms: u64,         // System CPU time in milliseconds
+    pub etime_ms: u64,         // Elapsed wall-clock time in milliseconds
+    pub start_time_sec: u64,   // Process start time (POSIX epoch)
+    pub io_bytes_read: u64,    // Character I/O bytes read
     pub io_bytes_written: u64, // Character I/O bytes written
     pub page_faults_minor: u64,
     pub page_faults_major: u64,
     pub exit_code: u32,
-    pub flags: u8,            // AC_AFORK, AC_ASU, AC_ACORE, AC_AXSIG
+    pub flags: u8, // AC_AFORK, AC_ASU, AC_ACORE, AC_AXSIG
 }
 
 impl AcctV3Record {
@@ -75,16 +73,16 @@ impl AcctV3Record {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct RusageAccounting {
-    pub user_cpu_us: u64,          // ru_utime in microseconds
-    pub system_cpu_us: u64,        // ru_stime in microseconds
-    pub max_rss_bytes: u64,        // ru_maxrss peak resident set size
-    pub minor_page_faults: u64,    // ru_minflt page reclaims
-    pub major_page_faults: u64,    // ru_majflt page faults requiring I/O
-    pub block_input_ops: u64,      // ru_inblock filesystem reads
-    pub block_output_ops: u64,     // ru_oublock filesystem writes
-    pub vol_context_switches: u64,  // ru_nvcsw voluntary switches
-    pub invol_context_switches: u64,// ru_nivcsw involuntary switches
-    pub signals_delivered: u64,    // ru_nsignals signals received
+    pub user_cpu_us: u64,            // ru_utime in microseconds
+    pub system_cpu_us: u64,          // ru_stime in microseconds
+    pub max_rss_bytes: u64,          // ru_maxrss peak resident set size
+    pub minor_page_faults: u64,      // ru_minflt page reclaims
+    pub major_page_faults: u64,      // ru_majflt page faults requiring I/O
+    pub block_input_ops: u64,        // ru_inblock filesystem reads
+    pub block_output_ops: u64,       // ru_oublock filesystem writes
+    pub vol_context_switches: u64,   // ru_nvcsw voluntary switches
+    pub invol_context_switches: u64, // ru_nivcsw involuntary switches
+    pub signals_delivered: u64,      // ru_nsignals signals received
 }
 
 impl RusageAccounting {
@@ -123,7 +121,14 @@ pub struct UtmpSessionRecord {
 }
 
 impl UtmpSessionRecord {
-    pub fn new(session_type: SessionType, pid: Pid, tty: &str, user: &str, host: &str, timestamp: u64) -> Self {
+    pub fn new(
+        session_type: SessionType,
+        pid: Pid,
+        tty: &str,
+        user: &str,
+        host: &str,
+        timestamp: u64,
+    ) -> Self {
         Self {
             session_type,
             pid,
@@ -142,9 +147,9 @@ impl UtmpSessionRecord {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct TaskstatsAccount {
-    pub cpu_delay_ns: u64,       // Time waiting for CPU
-    pub block_io_delay_ns: u64,  // Time waiting for Block I/O completion
-    pub swap_in_delay_ns: u64,   // Time waiting for Swap-in page faults
+    pub cpu_delay_ns: u64,            // Time waiting for CPU
+    pub block_io_delay_ns: u64,       // Time waiting for Block I/O completion
+    pub swap_in_delay_ns: u64,        // Time waiting for Swap-in page faults
     pub memory_reclaim_delay_ns: u64, // Time waiting for memory page reclaim
 }
 
@@ -260,8 +265,22 @@ mod tests {
     fn test_session_accounting_wtmp_btmp() {
         let mut engine = SovereignAccountingEngine::new();
 
-        let login = UtmpSessionRecord::new(SessionType::UserProcess, 1001, "tty1", "aaryan", "local_console", 1700000000);
-        let failed = UtmpSessionRecord::new(SessionType::FailedLogin, 1002, "tty2", "attacker", "192.168.1.50", 1700000005);
+        let login = UtmpSessionRecord::new(
+            SessionType::UserProcess,
+            1001,
+            "tty1",
+            "aaryan",
+            "local_console",
+            1700000000,
+        );
+        let failed = UtmpSessionRecord::new(
+            SessionType::FailedLogin,
+            1002,
+            "tty2",
+            "attacker",
+            "192.168.1.50",
+            1700000005,
+        );
 
         engine.record_session_event(login);
         engine.record_session_event(failed);

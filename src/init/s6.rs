@@ -1,9 +1,9 @@
 // S6 Supervision Engine for SigmaOS
 // Location: src/init/s6.rs
 
-use std::string::String;
+use super::init_abstraction::{InitError, InitSystem, InitSystemType, ServiceStatus};
 use std::collections::BTreeMap;
-use super::init_abstraction::{InitSystem, InitSystemType, ServiceStatus, InitError};
+use std::string::String;
 
 pub struct S6Service {
     pub name: String,
@@ -78,7 +78,10 @@ impl InitSystem for S6Init {
     }
 
     fn service_status(&self, name: &str) -> ServiceStatus {
-        self.services.get(name).map(|s| s.status).unwrap_or(ServiceStatus::Unknown)
+        self.services
+            .get(name)
+            .map(|s| s.status)
+            .unwrap_or(ServiceStatus::Unknown)
     }
 
     fn enable_service(&mut self, name: &str) -> Result<(), InitError> {

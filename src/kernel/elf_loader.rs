@@ -11,18 +11,18 @@
 extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
+use alloc::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
+use std::collections::BTreeMap;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use std::collections::BTreeMap;
+use std::vec::Vec;
 
 /// ELF Relocation Types (x86_64)
 pub const R_X86_64_64: u32 = 1;
@@ -83,7 +83,12 @@ impl SovereignElfDynamicLoader {
     }
 
     /// Register a loaded shared library into the dynamic loader symbol registry
-    pub fn load_shared_library(&mut self, soname: &str, symbols: Vec<ElfSymbol>, relocs: Vec<ElfRelocation>) -> Result<u64, &'static str> {
+    pub fn load_shared_library(
+        &mut self,
+        soname: &str,
+        symbols: Vec<ElfSymbol>,
+        relocs: Vec<ElfRelocation>,
+    ) -> Result<u64, &'static str> {
         if self.loaded_objects.contains_key(soname) {
             return Err("ELF Loader: Shared object already loaded");
         }
@@ -112,7 +117,10 @@ impl SovereignElfDynamicLoader {
 
     /// Resolves GOT/PLT dynamic relocations across all loaded shared objects
     pub fn apply_dynamic_relocations(&self, soname: &str) -> Result<usize, &'static str> {
-        let obj = self.loaded_objects.get(soname).ok_or("ELF Loader: Target shared object not found")?;
+        let obj = self
+            .loaded_objects
+            .get(soname)
+            .ok_or("ELF Loader: Target shared object not found")?;
 
         let mut applied = 0;
         for reloc in &obj.relocations {
@@ -157,15 +165,30 @@ mod tests {
         let mut loader = SovereignElfDynamicLoader::new();
 
         let symbols = vec![
-            ElfSymbol { name: "libc_malloc".to_string(), address: 0x1000, size: 64, binding: SymbolBinding::Global },
-            ElfSymbol { name: "libc_free".to_string(), address: 0x1040, size: 64, binding: SymbolBinding::Global },
+            ElfSymbol {
+                name: "libc_malloc".to_string(),
+                address: 0x1000,
+                size: 64,
+                binding: SymbolBinding::Global,
+            },
+            ElfSymbol {
+                name: "libc_free".to_string(),
+                address: 0x1040,
+                size: 64,
+                binding: SymbolBinding::Global,
+            },
         ];
 
-        let relocs = vec![
-            ElfRelocation { offset: 0x2000, reloc_type: R_X86_64_GLOB_DAT, symbol_name: "libc_malloc".to_string(), addend: 0 },
-        ];
+        let relocs = vec![ElfRelocation {
+            offset: 0x2000,
+            reloc_type: R_X86_64_GLOB_DAT,
+            symbol_name: "libc_malloc".to_string(),
+            addend: 0,
+        }];
 
-        let base_addr = loader.load_shared_library("libc.so.6", symbols, relocs).unwrap();
+        let base_addr = loader
+            .load_shared_library("libc.so.6", symbols, relocs)
+            .unwrap();
         assert_eq!(base_addr, 0x7FFF_0000_0000);
 
         let applied = loader.apply_dynamic_relocations("libc.so.6").unwrap();

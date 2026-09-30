@@ -2,7 +2,6 @@
 //! KVM hardware acceleration, live VM migration, GPU passthrough,
 //! and Libvirt-compatible management APIs.
 
-
 use std::string::{String, ToString};
 use std::vec::Vec;
 
@@ -39,7 +38,13 @@ impl VirtualizationManager {
         }
     }
 
-    pub fn create_vm(&mut self, name: &str, vcpus: u32, ram_mb: u64, passthrough_gpu: Option<u16>) -> u32 {
+    pub fn create_vm(
+        &mut self,
+        name: &str,
+        vcpus: u32,
+        ram_mb: u64,
+        passthrough_gpu: Option<u16>,
+    ) -> u32 {
         let vm_id = self.vms.len() as u32 + 1;
         self.vms.push(VirtualMachine {
             vm_id,
@@ -54,14 +59,24 @@ impl VirtualizationManager {
     }
 
     pub fn start_vm(&mut self, vm_id: u32) -> Result<(), &'static str> {
-        let vm = self.vms.iter_mut().find(|v| v.vm_id == vm_id)
+        let vm = self
+            .vms
+            .iter_mut()
+            .find(|v| v.vm_id == vm_id)
             .ok_or("VM ID not found")?;
         vm.state = VmState::Running;
         Ok(())
     }
 
-    pub fn live_migrate_vm(&mut self, vm_id: u32, _target_host_ip: &str) -> Result<(), &'static str> {
-        let vm = self.vms.iter_mut().find(|v| v.vm_id == vm_id)
+    pub fn live_migrate_vm(
+        &mut self,
+        vm_id: u32,
+        _target_host_ip: &str,
+    ) -> Result<(), &'static str> {
+        let vm = self
+            .vms
+            .iter_mut()
+            .find(|v| v.vm_id == vm_id)
             .ok_or("VM ID not found")?;
         vm.state = VmState::Migrating;
         // Simulate dirty memory page migration

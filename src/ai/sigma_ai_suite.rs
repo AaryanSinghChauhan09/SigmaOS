@@ -3,7 +3,6 @@
 // Phases 1-5: Natural Language Translator, Workflow Automation, Adaptive CLI Suggestions,
 // Error Explanation Layer, and SigmaAI Assistant (Indic Languages & Voice Support).
 
-
 use std::format;
 use std::string::{String, ToString};
 use std::vec;
@@ -57,7 +56,8 @@ impl SigmaAiNaturalLanguageTranslator {
         let lower = input.to_lowercase();
         if lower.contains("karo") || lower.contains("dikhayein") || lower.contains("meri") {
             IndicLanguage::Hindi
-        } else if input.contains("நிறுவவும்") || input.contains("காண்பி") {
+        } else if input.contains("நிறுவவும்") || input.contains("காண்பி")
+        {
             IndicLanguage::Tamil
         } else if input.contains("করুন") || input.contains("ইনস্টল") {
             IndicLanguage::Bengali
@@ -73,26 +73,41 @@ impl SigmaAiNaturalLanguageTranslator {
         let lang = self.detect_language(input);
         let lower = input.to_lowercase();
 
-        let (command, safety, explanation) = if lower.contains("delete all") || lower.contains("rm -rf /") || lower.contains("saari files mitao") {
+        let (command, safety, explanation) = if lower.contains("delete all")
+            || lower.contains("rm -rf /")
+            || lower.contains("saari files mitao")
+        {
             (
                 "rm -rf / --no-preserve-root".to_string(),
                 SafetyLevel::Destructive,
                 "Recursively deletes all files and directories from the root directory without safeguard.".to_string(),
             )
-        } else if lower.contains("install libreoffice") || lower.contains("libreoffice install karo") || input.contains("லிப்ரேஆபிஸ் நிறுவவும்") {
+        } else if lower.contains("install libreoffice")
+            || lower.contains("libreoffice install karo")
+            || input.contains("லிப்ரேஆபிஸ் நிறுவவும்")
+        {
             (
                 "sigpkg install libreoffice".to_string(),
                 SafetyLevel::Safe,
-                "Downloads and installs the LibreOffice office productivity suite using sigpkg.".to_string(),
+                "Downloads and installs the LibreOffice office productivity suite using sigpkg."
+                    .to_string(),
             )
-        } else if lower.contains("disk usage") || lower.contains("disk dikhayein") || lower.contains("storage check") {
+        } else if lower.contains("disk usage")
+            || lower.contains("disk dikhayein")
+            || lower.contains("storage check")
+        {
             (
                 "df -h".to_string(),
                 SafetyLevel::Safe,
-                "Displays human-readable filesystem disk space usage for all mounted partitions.".to_string(),
+                "Displays human-readable filesystem disk space usage for all mounted partitions."
+                    .to_string(),
             )
         } else if lower.contains("connect to wifi") || lower.contains("wifi connect") {
-            let ssid = if lower.contains("home") { "Home" } else { "DefaultNet" };
+            let ssid = if lower.contains("home") {
+                "Home"
+            } else {
+                "DefaultNet"
+            };
             (
                 format!("sigma-wifi connect --ssid {}", ssid),
                 SafetyLevel::Safe,
@@ -106,7 +121,8 @@ impl SigmaAiNaturalLanguageTranslator {
             )
         };
 
-        let requires_confirmation = matches!(safety, SafetyLevel::Dangerous | SafetyLevel::Destructive);
+        let requires_confirmation =
+            matches!(safety, SafetyLevel::Dangerous | SafetyLevel::Destructive);
 
         CommandTranslation {
             natural_language_input: input.to_string(),
@@ -123,7 +139,8 @@ impl SigmaAiNaturalLanguageTranslator {
         if command.starts_with("tar -xvf") || command.starts_with("tar -xzvf") {
             "Extracts (-x) a tar archive (-f) verbosely (-v) with optional compression.".to_string()
         } else if command.starts_with("sigpkg install") {
-            "Invokes the native package manager to fetch and install specified software.".to_string()
+            "Invokes the native package manager to fetch and install specified software."
+                .to_string()
         } else if command.starts_with("df -h") {
             "Shows disk space statistics in human-readable megabytes and gigabytes.".to_string()
         } else {
@@ -179,13 +196,36 @@ impl SigmaAiWorkflowAutomation {
 
     /// Creates standard pre-built template workflows (e.g. Daily GST Filing).
     pub fn create_gst_filing_template() -> Self {
-        let mut wf = Self::new("Daily GST Filing", WorkflowTrigger::CronSchedule("daily 18:00".to_string()));
-        wf.add_step("Open Accounting Suite", "sigma-accounts", &["--mode", "gst"]);
-        wf.add_step("Generate Return", "sigma-accounts", &["--action", "generate-gstr3b"]);
+        let mut wf = Self::new(
+            "Daily GST Filing",
+            WorkflowTrigger::CronSchedule("daily 18:00".to_string()),
+        );
+        wf.add_step(
+            "Open Accounting Suite",
+            "sigma-accounts",
+            &["--mode", "gst"],
+        );
+        wf.add_step(
+            "Generate Return",
+            "sigma-accounts",
+            &["--action", "generate-gstr3b"],
+        );
         wf.add_step("Validate Data", "sigma-accounts", &["--action", "validate"]);
-        wf.add_step("Export PDF Report", "sigma-accounts", &["--action", "export-pdf"]);
-        wf.add_step("Email Filing", "sigma-mail", &["--to", "gst@gst.gov.in", "--attach", "gstr3b.pdf"]);
-        wf.add_step("Archive Record", "sigma-fs", &["--archive", "/home/ravi/sigma-archives/gst/"]);
+        wf.add_step(
+            "Export PDF Report",
+            "sigma-accounts",
+            &["--action", "export-pdf"],
+        );
+        wf.add_step(
+            "Email Filing",
+            "sigma-mail",
+            &["--to", "gst@gst.gov.in", "--attach", "gstr3b.pdf"],
+        );
+        wf.add_step(
+            "Archive Record",
+            "sigma-fs",
+            &["--archive", "/home/ravi/sigma-archives/gst/"],
+        );
         wf
     }
 
@@ -267,7 +307,8 @@ impl SigmaAiErrorExplanation {
         } else {
             ErrorExplanation {
                 raw_error: raw_error.to_string(),
-                plain_explanation: "The command encountered a general runtime error during execution.".to_string(),
+                plain_explanation:
+                    "The command encountered a general runtime error during execution.".to_string(),
                 suggested_fixes: vec!["Check system logs via journalctl -xe".to_string()],
                 related_doc_url: "https://docs.sigmaos.org/errors/general".to_string(),
             }
@@ -292,12 +333,17 @@ impl SigmaAiAssistant {
     /// Processes voice or text command in Indic language and returns assistant response.
     pub fn process_assistant_prompt(&self, prompt: &str) -> String {
         let lower = prompt.to_lowercase();
-        if lower.contains("gst return file karo") || prompt.contains("வரி தாக்கல் செய்") {
-            "Opening sigma-accounts, generating GSTR3B statement, and rendering PDF preview.".to_string()
+        if lower.contains("gst return file karo") || prompt.contains("வரி தாக்கல் செய்")
+        {
+            "Opening sigma-accounts, generating GSTR3B statement, and rendering PDF preview."
+                .to_string()
         } else if lower.contains("disk full") || lower.contains("storage low") {
             "Disk space is at 85% capacity. Would you like me to trigger an automated system cleanup workflow?".to_string()
         } else {
-            format!("SigmaAI Assistant ({:?}): Standard task registered.", self.active_language)
+            format!(
+                "SigmaAI Assistant ({:?}): Standard task registered.",
+                self.active_language
+            )
         }
     }
 }

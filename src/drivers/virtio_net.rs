@@ -1,9 +1,8 @@
+use crate::drivers::virtio_blk::{VirtioError, VirtioQueue};
 /// SigmaOS VirtIO Network Device Driver (Phase 2 Networking)
 /// Inspired by Linux virtio_net.c
 /// Implements RX/TX VirtQueues for network packet transmission.
-
 use std::vec::Vec;
-use crate::drivers::virtio_blk::{VirtioError, VirtioQueue};
 
 #[derive(Debug)]
 pub struct MacAddress(pub [u8; 6]);
@@ -39,7 +38,7 @@ impl VirtioNet {
         if self.tx_queue.num_free < 2 {
             return Err(VirtioError::QueueFull);
         }
-        
+
         self.tx_queue.num_free -= 2;
         // Mock hardware TX complete
         self.tx_queue.num_free += 2;

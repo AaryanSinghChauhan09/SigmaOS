@@ -133,7 +133,11 @@ impl EarlyLuksUnsealEngine {
         is_valid
     }
 
-    pub fn unseal_volume(&mut self, vol_uuid: &str, passphrase_or_key: &str) -> Result<String, &'static str> {
+    pub fn unseal_volume(
+        &mut self,
+        vol_uuid: &str,
+        passphrase_or_key: &str,
+    ) -> Result<String, &'static str> {
         if vol_uuid.is_empty() || passphrase_or_key.is_empty() {
             return Err("LUKS2 unseal: Invalid volume UUID or key");
         }
@@ -208,7 +212,10 @@ impl InitramfsPivotRootEngine {
             return Err("Switch-root: Sysroot not prepared");
         }
         self.switched_root = true;
-        Ok(format!("Successfully switched root to {}", self.target_sysroot))
+        Ok(format!(
+            "Successfully switched root to {}",
+            self.target_sysroot
+        ))
     }
 }
 
@@ -272,7 +279,11 @@ impl SovereignInitramfsEngine {
         }
     }
 
-    pub fn run_early_boot_sequence(&mut self, initrd_bytes: &[u8], cmdline: &str) -> Result<String, &'static str> {
+    pub fn run_early_boot_sequence(
+        &mut self,
+        initrd_bytes: &[u8],
+        cmdline: &str,
+    ) -> Result<String, &'static str> {
         self.cpio_unpacker.unpack_payload(initrd_bytes)?;
         self.cmdline_parser.parse_cmdline(cmdline);
 
@@ -288,7 +299,8 @@ impl SovereignInitramfsEngine {
             self.is_boot_completed = true;
             Ok(msg)
         } else {
-            self.emergency_gate.trigger_recovery("Missing root parameter in command line");
+            self.emergency_gate
+                .trigger_recovery("Missing root parameter in command line");
             Err("Initramfs: Boot failed, emergency recovery triggered")
         }
     }
@@ -335,7 +347,9 @@ mod tests {
         let count = scanner.scan_and_assemble_pools();
         assert_eq!(count, 2);
         assert!(scanner.ready_for_mount);
-        assert!(scanner.discovered_pools.contains(&"zpool-rpool".to_string()));
+        assert!(scanner
+            .discovered_pools
+            .contains(&"zpool-rpool".to_string()));
     }
 
     #[test]

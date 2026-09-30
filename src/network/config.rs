@@ -4,8 +4,6 @@ use std::vec;
 // Linux distro-inspired network configuration
 // Handles network interfaces, routing, DNS, and network settings
 
-
-
 use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
@@ -107,7 +105,13 @@ impl NetworkConfigManager {
     }
 
     /// Configure interface with static IP
-    pub fn configure_static_ip(&mut self, interface: &str, ip: &str, netmask: &str, gateway: &str) -> Result<(), NetworkError> {
+    pub fn configure_static_ip(
+        &mut self,
+        interface: &str,
+        ip: &str,
+        netmask: &str,
+        gateway: &str,
+    ) -> Result<(), NetworkError> {
         if let Some(iface) = self.interfaces.get_mut(interface) {
             iface.ip_address = Some(String::from(ip));
             iface.netmask = Some(String::from(netmask));
@@ -137,7 +141,12 @@ impl NetworkConfigManager {
     }
 
     /// Add route to routing table
-    pub fn add_route(&mut self, destination: &str, gateway: &str, interface: &str) -> Result<(), NetworkError> {
+    pub fn add_route(
+        &mut self,
+        destination: &str,
+        gateway: &str,
+        interface: &str,
+    ) -> Result<(), NetworkError> {
         let route = RouteEntry {
             destination: String::from(destination),
             gateway: String::from(gateway),
@@ -243,9 +252,11 @@ mod tests {
     fn test_static_ip_configuration() {
         let mut manager = NetworkConfigManager::new("/etc/network");
         manager.initialize().unwrap();
-        
-        assert!(manager.configure_static_ip("eth0", "192.168.1.100", "255.255.255.0", "192.168.1.1").is_ok());
-        
+
+        assert!(manager
+            .configure_static_ip("eth0", "192.168.1.100", "255.255.255.0", "192.168.1.1")
+            .is_ok());
+
         let iface = manager.get_interface("eth0").unwrap();
         assert_eq!(iface.ip_address, Some(String::from("192.168.1.100")));
     }
@@ -254,9 +265,9 @@ mod tests {
     fn test_dhcp_configuration() {
         let mut manager = NetworkConfigManager::new("/etc/network");
         manager.initialize().unwrap();
-        
+
         assert!(manager.enable_dhcp("eth0").is_ok());
-        
+
         let iface = manager.get_interface("eth0").unwrap();
         assert!(iface.dhcp_enabled);
     }
@@ -265,7 +276,7 @@ mod tests {
     fn test_interface_status() {
         let mut manager = NetworkConfigManager::new("/etc/network");
         manager.initialize().unwrap();
-        
+
         assert!(manager.bring_up("eth0").is_ok());
         assert!(manager.bring_down("eth0").is_ok());
     }
@@ -274,7 +285,7 @@ mod tests {
     fn test_dns_configuration() {
         let mut manager = NetworkConfigManager::new("/etc/network");
         manager.initialize().unwrap();
-        
+
         manager.set_dns_servers(vec![String::from("1.1.1.1"), String::from("1.0.0.1")]);
         assert_eq!(manager.dns_config.servers.len(), 2);
     }

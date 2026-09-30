@@ -4,8 +4,8 @@
 
 #![allow(dead_code)]
 
-use std::vec::Vec;
 use std::string::String;
+use std::vec::Vec;
 
 /// Persistent Panic Record
 #[derive(Debug, Clone)]

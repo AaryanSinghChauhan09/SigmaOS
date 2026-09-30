@@ -9,8 +9,8 @@ use crate::security::user_namespace::{
     CapabilitySet, SubgidEntry, SubuidEntry, UidGidMapping, UserContext, UserNamespace,
     UserNamespaceId, UserNamespaceManager,
 };
-use std::sync::{Arc, Mutex};
 use std::collections::HashMap;
+use std::sync::{Arc, Mutex};
 
 /// User namespace syscall error codes
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

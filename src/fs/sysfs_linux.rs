@@ -61,36 +61,101 @@ impl Sysfs {
 
     fn create_standard_structure(&mut self) {
         // /sys/devices
-        self.create_entry("/sys/devices".to_string(), SysfsEntryType::Directory, "".to_string());
+        self.create_entry(
+            "/sys/devices".to_string(),
+            SysfsEntryType::Directory,
+            "".to_string(),
+        );
 
         // /sys/kernel
-        self.create_entry("/sys/kernel".to_string(), SysfsEntryType::Directory, "".to_string());
-        self.create_entry("/sys/kernel/version".to_string(), SysfsEntryType::File, "SigmaOS 1.0.0".to_string());
-        self.create_entry("/sys/kernel/hostname".to_string(), SysfsEntryType::File, "sigmaos".to_string());
+        self.create_entry(
+            "/sys/kernel".to_string(),
+            SysfsEntryType::Directory,
+            "".to_string(),
+        );
+        self.create_entry(
+            "/sys/kernel/version".to_string(),
+            SysfsEntryType::File,
+            "SigmaOS 1.0.0".to_string(),
+        );
+        self.create_entry(
+            "/sys/kernel/hostname".to_string(),
+            SysfsEntryType::File,
+            "sigmaos".to_string(),
+        );
 
         // /sys/module
-        self.create_entry("/sys/module".to_string(), SysfsEntryType::Directory, "".to_string());
+        self.create_entry(
+            "/sys/module".to_string(),
+            SysfsEntryType::Directory,
+            "".to_string(),
+        );
 
         // /sys/fs
-        self.create_entry("/sys/fs".to_string(), SysfsEntryType::Directory, "".to_string());
-        self.create_entry("/sys/fs/cgroup".to_string(), SysfsEntryType::Directory, "".to_string());
-        self.create_entry("/sys/fs/proc".to_string(), SysfsEntryType::Directory, "".to_string());
+        self.create_entry(
+            "/sys/fs".to_string(),
+            SysfsEntryType::Directory,
+            "".to_string(),
+        );
+        self.create_entry(
+            "/sys/fs/cgroup".to_string(),
+            SysfsEntryType::Directory,
+            "".to_string(),
+        );
+        self.create_entry(
+            "/sys/fs/proc".to_string(),
+            SysfsEntryType::Directory,
+            "".to_string(),
+        );
 
         // /sys/class
-        self.create_entry("/sys/class".to_string(), SysfsEntryType::Directory, "".to_string());
-        self.create_entry("/sys/class/net".to_string(), SysfsEntryType::Directory, "".to_string());
-        self.create_entry("/sys/class/block".to_string(), SysfsEntryType::Directory, "".to_string());
+        self.create_entry(
+            "/sys/class".to_string(),
+            SysfsEntryType::Directory,
+            "".to_string(),
+        );
+        self.create_entry(
+            "/sys/class/net".to_string(),
+            SysfsEntryType::Directory,
+            "".to_string(),
+        );
+        self.create_entry(
+            "/sys/class/block".to_string(),
+            SysfsEntryType::Directory,
+            "".to_string(),
+        );
 
         // /sys/block
-        self.create_entry("/sys/block".to_string(), SysfsEntryType::Directory, "".to_string());
+        self.create_entry(
+            "/sys/block".to_string(),
+            SysfsEntryType::Directory,
+            "".to_string(),
+        );
 
         // /sys/bus
-        self.create_entry("/sys/bus".to_string(), SysfsEntryType::Directory, "".to_string());
-        self.create_entry("/sys/bus/pci".to_string(), SysfsEntryType::Directory, "".to_string());
-        self.create_entry("/sys/bus/usb".to_string(), SysfsEntryType::Directory, "".to_string());
+        self.create_entry(
+            "/sys/bus".to_string(),
+            SysfsEntryType::Directory,
+            "".to_string(),
+        );
+        self.create_entry(
+            "/sys/bus/pci".to_string(),
+            SysfsEntryType::Directory,
+            "".to_string(),
+        );
+        self.create_entry(
+            "/sys/bus/usb".to_string(),
+            SysfsEntryType::Directory,
+            "".to_string(),
+        );
     }
 
-    pub fn create_entry(&mut self, path: String, entry_type: SysfsEntryType, value: String) -> Arc<Mutex<SysfsEntry>> {
+    pub fn create_entry(
+        &mut self,
+        path: String,
+        entry_type: SysfsEntryType,
+        value: String,
+    ) -> Arc<Mutex<SysfsEntry>> {
         let entry = Arc::new(Mutex::new(SysfsEntry::new(
             path.split('/').last().unwrap_or(&path).to_string(),
             entry_type,
@@ -115,7 +180,9 @@ impl Sysfs {
     }
 
     pub fn read_entry(&self, path: &str) -> Result<String, String> {
-        let entry = self.entries.get(path)
+        let entry = self
+            .entries
+            .get(path)
             .ok_or_else(|| format!("Entry not found: {}", path))?;
 
         let entry_guard = entry.lock().unwrap();
@@ -127,7 +194,9 @@ impl Sysfs {
     }
 
     pub fn write_entry(&self, path: &str, value: String) -> Result<(), String> {
-        let entry = self.entries.get(path)
+        let entry = self
+            .entries
+            .get(path)
             .ok_or_else(|| format!("Entry not found: {}", path))?;
 
         let mut entry_guard = entry.lock().unwrap();
@@ -140,7 +209,9 @@ impl Sysfs {
     }
 
     pub fn list_directory(&self, path: &str) -> Result<Vec<String>, String> {
-        let entry = self.entries.get(path)
+        let entry = self
+            .entries
+            .get(path)
             .ok_or_else(|| format!("Entry not found: {}", path))?;
 
         let entry_guard = entry.lock().unwrap();
@@ -192,7 +263,11 @@ mod tests {
     #[test]
     fn test_sysfs_create_entry() {
         let mut sysfs = Sysfs::new();
-        let entry = sysfs.create_entry("/sys/test".to_string(), SysfsEntryType::File, "test_value".to_string());
+        let entry = sysfs.create_entry(
+            "/sys/test".to_string(),
+            SysfsEntryType::File,
+            "test_value".to_string(),
+        );
 
         let entry_guard = entry.lock().unwrap();
         assert_eq!(entry_guard.value, "test_value");
@@ -215,7 +290,9 @@ mod tests {
     #[test]
     fn test_sysfs_write_entry() {
         let sysfs = Sysfs::new();
-        sysfs.write_entry("/sys/kernel/hostname", "newhostname".to_string()).unwrap();
+        sysfs
+            .write_entry("/sys/kernel/hostname", "newhostname".to_string())
+            .unwrap();
 
         let value = sysfs.read_entry("/sys/kernel/hostname").unwrap();
         assert_eq!(value, "newhostname");
@@ -238,11 +315,14 @@ mod tests {
     #[test]
     fn test_sysfs_entry_permissions() {
         let mut sysfs = Sysfs::new();
-        let mut entry = SysfsEntry::new("test".to_string(), SysfsEntryType::File, "test".to_string());
+        let mut entry =
+            SysfsEntry::new("test".to_string(), SysfsEntryType::File, "test".to_string());
         entry.permissions = 0o755;
 
         let entry_arc = Arc::new(Mutex::new(entry));
-        sysfs.entries.insert("/sys/test".to_string(), entry_arc.clone());
+        sysfs
+            .entries
+            .insert("/sys/test".to_string(), entry_arc.clone());
 
         let entry_guard = entry_arc.lock().unwrap();
         assert_eq!(entry_guard.permissions, 0o755);

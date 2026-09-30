@@ -2,11 +2,11 @@
 // Zero-dependency Rust #![no_std] / std implementation of deduplicated, encrypted system & user backup archives.
 
 #[cfg(not(test))]
+use alloc::format;
+#[cfg(not(test))]
 use alloc::string::{String, ToString};
 #[cfg(not(test))]
 use alloc::vec::Vec;
-#[cfg(not(test))]
-use alloc::format;
 
 #[cfg(test)]
 use std::string::String;
@@ -52,7 +52,12 @@ impl SovereignBackupToolEngine {
     }
 
     /// Creates a new deduplicated, encrypted backup archive entry
-    pub fn create_backup_archive(&mut self, archive_id: &str, mode: BackupMode, original_bytes: u64) -> BackupArchiveRecord {
+    pub fn create_backup_archive(
+        &mut self,
+        archive_id: &str,
+        mode: BackupMode,
+        original_bytes: u64,
+    ) -> BackupArchiveRecord {
         // Simulate ~40% deduplication savings
         let deduplicated_bytes = (original_bytes as f64 * 0.6) as u64;
         let savings = original_bytes.saturating_sub(deduplicated_bytes);
@@ -79,7 +84,11 @@ impl SovereignBackupToolEngine {
 
     /// Deletes an archive record from the repository index
     pub fn delete_archive(&mut self, archive_id: &str) -> bool {
-        if let Some(pos) = self.archives.iter().position(|a| a.archive_id == archive_id) {
+        if let Some(pos) = self
+            .archives
+            .iter()
+            .position(|a| a.archive_id == archive_id)
+        {
             self.archives.remove(pos);
             true
         } else {
@@ -105,7 +114,8 @@ mod tests {
         assert_eq!(engine.archives.len(), 0);
 
         // Create personal data backup archive
-        let archive = engine.create_backup_archive("user-20260920", BackupMode::UserDataPersonal, 10_000_000);
+        let archive =
+            engine.create_backup_archive("user-20260920", BackupMode::UserDataPersonal, 10_000_000);
         assert_eq!(archive.archive_id, "user-20260920");
         assert!(archive.deduplicated_bytes < 10_000_000);
         assert!(archive.encrypted);

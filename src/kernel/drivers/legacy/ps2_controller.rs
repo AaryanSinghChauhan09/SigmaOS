@@ -25,15 +25,21 @@ use std::collections::VecDeque;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum InitOrder { CoreKernel }
+pub enum InitOrder {
+    CoreKernel,
+}
 
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SubsystemPriority { High }
+pub enum SubsystemPriority {
+    High,
+}
 
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone)]
-pub enum SubsystemError { InitializationFailed }
+pub enum SubsystemError {
+    InitializationFailed,
+}
 
 #[cfg(any(feature = "standalone_test", test))]
 pub trait KernelSubsystem {

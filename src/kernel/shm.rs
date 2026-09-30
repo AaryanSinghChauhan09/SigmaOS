@@ -38,9 +38,15 @@ impl ShmPerm {
 
     pub fn to_mode(&self) -> u32 {
         let mut mode = 0u32;
-        if self.read { mode |= 0o400; }
-        if self.write { mode |= 0o200; }
-        if self.execute { mode |= 0o100; }
+        if self.read {
+            mode |= 0o400;
+        }
+        if self.write {
+            mode |= 0o200;
+        }
+        if self.execute {
+            mode |= 0o100;
+        }
         mode
     }
 }

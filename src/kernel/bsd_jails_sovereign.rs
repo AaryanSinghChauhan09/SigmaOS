@@ -4,8 +4,6 @@
 #![allow(clippy::new_without_default)]
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-
-
 // SigmaOS Sovereign BSD Jails Process Isolation
 // Implements FreeBSD Jails-style lightweight OS virtualization in 100% safe Rust.
 //
@@ -14,14 +12,12 @@
 // and process namespace. This module implements the same concepts in pure Rust.
 //
 // Also incorporates OpenBSD securelevel, Linux network namespaces concept.
-
-
 #[cfg(any(feature = "standalone_test", test))]
+use std::string::{String, ToString};
+#[cfg(not(any(feature = "standalone_test", test)))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::vec::Vec;
 
@@ -79,7 +75,7 @@ pub struct JailPermissions {
     pub allow_raw_sockets: bool,
     pub allow_set_hostname: bool,
     pub enforce_statfs: u8, // 0=all, 1=jail root, 2=jail root only
-    pub securelevel: i8,    // OpenBSD securelevel: -1 disabled, 0 permissive, 1 immutable, 2 highly secure
+    pub securelevel: i8, // OpenBSD securelevel: -1 disabled, 0 permissive, 1 immutable, 2 highly secure
     pub devfs_ruleset: u32,
 }
 
@@ -166,13 +162,17 @@ impl SovereignJail {
     }
 
     pub fn start(&mut self) -> bool {
-        if self.state != JailState::Creating { return false; }
+        if self.state != JailState::Creating {
+            return false;
+        }
         self.state = JailState::Running;
         true
     }
 
     pub fn attach_process(&mut self, proc: JailProcess) -> bool {
-        if self.state != JailState::Running { return false; }
+        if self.state != JailState::Running {
+            return false;
+        }
         // Enforce securelevel: level >= 1 blocks root from reducing securelevel
         if proc.uid == 0 && self.permissions.securelevel >= 2 {
             // Highly secure: even root cannot load kernel modules etc.
@@ -186,10 +186,14 @@ impl SovereignJail {
         if let Some(idx) = self.processes.iter().position(|p| p.pid == pid) {
             self.processes.remove(idx);
             true
-        } else { false }
+        } else {
+            false
+        }
     }
 
-    pub fn process_count(&self) -> usize { self.processes.len() }
+    pub fn process_count(&self) -> usize {
+        self.processes.len()
+    }
 
     pub fn teardown(&mut self) {
         self.state = JailState::Dying;
@@ -201,12 +205,12 @@ impl SovereignJail {
     /// Mirrors jail's syscall interception in FreeBSD.
     pub fn check_syscall(&mut self, syscall: &str) -> bool {
         let allowed = match syscall {
-            "mount"        => self.permissions.allow_mount,
-            "sysvipc"      => self.permissions.allow_sysvipc,
-            "raw_socket"   => self.permissions.allow_raw_sockets,
+            "mount" => self.permissions.allow_mount,
+            "sysvipc" => self.permissions.allow_sysvipc,
+            "raw_socket" => self.permissions.allow_raw_sockets,
             "set_hostname" => self.permissions.allow_set_hostname,
-            "chflags"      => self.permissions.allow_chflags,
-            _              => true, // Default: allow unknown syscalls
+            "chflags" => self.permissions.allow_chflags,
+            _ => true, // Default: allow unknown syscalls
         };
         if !allowed {
             self.syscall_violation_count = self.syscall_violation_count.saturating_add(1);
@@ -228,9 +232,9 @@ impl SovereignJail {
         s.push_str(" state=");
         s.push_str(match self.state {
             JailState::Creating => "creating",
-            JailState::Running  => "running",
-            JailState::Dying    => "dying",
-            JailState::Dead     => "dead",
+            JailState::Running => "running",
+            JailState::Dying => "dying",
+            JailState::Dead => "dead",
         });
         s
     }
@@ -254,7 +258,9 @@ impl SovereignBsdJailManager {
     }
 
     pub fn create_jail(&mut self, name: &str, path: &str, hostname: &str) -> Option<u32> {
-        if self.jails.len() as u32 >= self.max_jails { return None; }
+        if self.jails.len() as u32 >= self.max_jails {
+            return None;
+        }
         let jid = self.next_jid;
         self.next_jid = self.next_jid.saturating_add(1);
         let jail = SovereignJail::new(jid, name, path, hostname);
@@ -270,7 +276,9 @@ impl SovereignBsdJailManager {
         if let Some(jail) = self.get_mut(jid) {
             jail.teardown();
             true
-        } else { false }
+        } else {
+            false
+        }
     }
 
     pub fn get_mut(&mut self, jid: u32) -> Option<&mut SovereignJail> {
@@ -282,7 +290,10 @@ impl SovereignBsdJailManager {
     }
 
     pub fn running_count(&self) -> usize {
-        self.jails.iter().filter(|j| j.state == JailState::Running).count()
+        self.jails
+            .iter()
+            .filter(|j| j.state == JailState::Running)
+            .count()
     }
 
     pub fn total_processes(&self) -> usize {
@@ -319,7 +330,13 @@ mod tests {
         let mut mgr = SovereignBsdJailManager::new(64);
         let jid = mgr.create_jail("db", "/jails/db", "db.sigma").unwrap();
         mgr.start_jail(jid);
-        let proc = JailProcess { pid: 100, ppid: 1, name: "postgres".to_string(), uid: 70, gid: 70 };
+        let proc = JailProcess {
+            pid: 100,
+            ppid: 1,
+            name: "postgres".to_string(),
+            uid: 70,
+            gid: 70,
+        };
         assert!(mgr.get_mut(jid).unwrap().attach_process(proc));
         assert_eq!(mgr.total_processes(), 1);
     }
@@ -327,7 +344,9 @@ mod tests {
     #[test]
     fn test_jail_syscall_enforcement() {
         let mut mgr = SovereignBsdJailManager::new(64);
-        let jid = mgr.create_jail("secure", "/jails/secure", "secure.sigma").unwrap();
+        let jid = mgr
+            .create_jail("secure", "/jails/secure", "secure.sigma")
+            .unwrap();
         mgr.start_jail(jid);
         let jail = mgr.get_mut(jid).unwrap();
         // Secure defaults deny mount, sysvipc
@@ -349,7 +368,13 @@ mod tests {
         let mut mgr = SovereignBsdJailManager::new(64);
         let jid = mgr.create_jail("tmp", "/jails/tmp", "tmp.sigma").unwrap();
         mgr.start_jail(jid);
-        let proc = JailProcess { pid: 200, ppid: 1, name: "sh".to_string(), uid: 0, gid: 0 };
+        let proc = JailProcess {
+            pid: 200,
+            ppid: 1,
+            name: "sh".to_string(),
+            uid: 0,
+            gid: 0,
+        };
         mgr.get_mut(jid).unwrap().attach_process(proc);
         mgr.teardown_jail(jid);
         assert_eq!(mgr.get(jid).unwrap().process_count(), 0);

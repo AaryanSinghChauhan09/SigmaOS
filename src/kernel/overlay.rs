@@ -7,9 +7,9 @@ use std::sync::{Arc, Mutex};
 /// Overlay layer type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OverlayLayerType {
-    Lower,  // Read-only base layer
-    Upper,  // Read-write layer for modifications
-    Work,   // Work directory for overlay operations
+    Lower, // Read-only base layer
+    Upper, // Read-write layer for modifications
+    Work,  // Work directory for overlay operations
 }
 
 /// Overlay layer
@@ -114,19 +114,31 @@ impl OverlayFilesystem {
 
         // Create layers from config
         for lower_path in &self.config.lower_dirs {
-            let layer = OverlayLayer::new(self.next_layer_id, OverlayLayerType::Lower, lower_path.clone());
+            let layer = OverlayLayer::new(
+                self.next_layer_id,
+                OverlayLayerType::Lower,
+                lower_path.clone(),
+            );
             self.layers.insert(self.next_layer_id, layer);
             self.next_layer_id += 1;
         }
 
         if let Some(ref upper_path) = self.config.upper_dir {
-            let layer = OverlayLayer::new(self.next_layer_id, OverlayLayerType::Upper, upper_path.clone());
+            let layer = OverlayLayer::new(
+                self.next_layer_id,
+                OverlayLayerType::Upper,
+                upper_path.clone(),
+            );
             self.layers.insert(self.next_layer_id, layer);
             self.next_layer_id += 1;
         }
 
         if let Some(ref work_path) = self.config.work_dir {
-            let layer = OverlayLayer::new(self.next_layer_id, OverlayLayerType::Work, work_path.clone());
+            let layer = OverlayLayer::new(
+                self.next_layer_id,
+                OverlayLayerType::Work,
+                work_path.clone(),
+            );
             self.layers.insert(self.next_layer_id, layer);
             self.next_layer_id += 1;
         }
@@ -318,8 +330,7 @@ mod tests {
 
     #[test]
     fn test_overlay_filesystem_unmount() {
-        let config = OverlayConfig::new("test".to_string())
-            .with_lower("/lower".to_string());
+        let config = OverlayConfig::new("test".to_string()).with_lower("/lower".to_string());
 
         let mut overlay = OverlayFilesystem::new(1, config);
         overlay.mount().unwrap();
@@ -354,10 +365,8 @@ mod tests {
     fn test_overlay_manager_multiple_overlays() {
         let manager = OverlayManager::new();
 
-        let config1 = OverlayConfig::new("overlay1".to_string())
-            .with_lower("/lower1".to_string());
-        let config2 = OverlayConfig::new("overlay2".to_string())
-            .with_lower("/lower2".to_string());
+        let config1 = OverlayConfig::new("overlay1".to_string()).with_lower("/lower1".to_string());
+        let config2 = OverlayConfig::new("overlay2".to_string()).with_lower("/lower2".to_string());
 
         let overlay_id1 = manager.create_overlay(config1);
         let overlay_id2 = manager.create_overlay(config2);
@@ -373,8 +382,7 @@ mod tests {
     fn test_overlay_remove_mounted() {
         let manager = OverlayManager::new();
 
-        let config = OverlayConfig::new("test".to_string())
-            .with_lower("/lower".to_string());
+        let config = OverlayConfig::new("test".to_string()).with_lower("/lower".to_string());
 
         let overlay_id = manager.create_overlay(config);
         manager.mount(overlay_id).unwrap();

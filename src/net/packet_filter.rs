@@ -70,7 +70,7 @@ impl PacketFilter {
         let id = self.next_rule_id.fetch_add(1, Ordering::SeqCst);
         let mut new_rule = rule;
         new_rule.id = id;
-        
+
         self.rules.push(new_rule);
         id
     }
@@ -98,12 +98,12 @@ impl PacketFilter {
     /// Filter a packet
     pub fn filter_packet(&mut self, packet: &Packet) -> PfAction {
         self.packet_count.fetch_add(1, Ordering::SeqCst);
-        
+
         for rule in &self.rules {
             if !rule.enabled {
                 continue;
             }
-            
+
             if self.rule_matches(rule, packet) {
                 let action = rule.action;
                 match action {
@@ -120,7 +120,7 @@ impl PacketFilter {
                 return action;
             }
         }
-        
+
         // Default action: pass
         self.pass_count.fetch_add(1, Ordering::SeqCst);
         PfAction::Pass
@@ -132,35 +132,35 @@ impl PacketFilter {
         if rule.protocol != PfProtocol::All && rule.protocol != packet.protocol {
             return false;
         }
-        
+
         // Check source address
         if let Some(addr) = rule.source_addr {
             if addr != packet.source_addr {
                 return false;
             }
         }
-        
+
         // Check source port
         if let Some(port) = rule.source_port {
             if port != packet.source_port {
                 return false;
             }
         }
-        
+
         // Check destination address
         if let Some(addr) = rule.dest_addr {
             if addr != packet.dest_addr {
                 return false;
             }
         }
-        
+
         // Check destination port
         if let Some(port) = rule.dest_port {
             if port != packet.dest_port {
                 return false;
             }
         }
-        
+
         true
     }
 
@@ -207,7 +207,7 @@ mod tests {
     #[test]
     fn test_add_rule() {
         let mut filter = PacketFilter::new();
-        
+
         let rule = PfRule {
             id: 0,
             action: PfAction::Block,
@@ -218,7 +218,7 @@ mod tests {
             dest_port: Some(22),
             enabled: true,
         };
-        
+
         let id = filter.add_rule(rule);
         assert_eq!(id, 1);
         assert_eq!(filter.rule_count(), 1);
@@ -227,7 +227,7 @@ mod tests {
     #[test]
     fn test_filter_packet() {
         let mut filter = PacketFilter::new();
-        
+
         let rule = PfRule {
             id: 0,
             action: PfAction::Block,
@@ -238,9 +238,9 @@ mod tests {
             dest_port: Some(22),
             enabled: true,
         };
-        
+
         filter.add_rule(rule);
-        
+
         let packet = Packet {
             source_addr: Ipv4Addr::new(192, 168, 1, 1),
             source_port: 50000,
@@ -248,7 +248,7 @@ mod tests {
             dest_port: 22,
             protocol: PfProtocol::Tcp,
         };
-        
+
         let action = filter.filter_packet(&packet);
         assert_eq!(action, PfAction::Block);
     }
@@ -256,7 +256,7 @@ mod tests {
     #[test]
     fn test_filter_pass() {
         let mut filter = PacketFilter::new();
-        
+
         let packet = Packet {
             source_addr: Ipv4Addr::new(192, 168, 1, 1),
             source_port: 50000,
@@ -264,7 +264,7 @@ mod tests {
             dest_port: 80,
             protocol: PfProtocol::Tcp,
         };
-        
+
         let action = filter.filter_packet(&packet);
         assert_eq!(action, PfAction::Pass);
     }
@@ -272,7 +272,7 @@ mod tests {
     #[test]
     fn test_remove_rule() {
         let mut filter = PacketFilter::new();
-        
+
         let rule = PfRule {
             id: 0,
             action: PfAction::Block,
@@ -283,7 +283,7 @@ mod tests {
             dest_port: Some(22),
             enabled: true,
         };
-        
+
         let id = filter.add_rule(rule);
         assert!(filter.remove_rule(id).is_ok());
         assert_eq!(filter.rule_count(), 0);
@@ -292,7 +292,7 @@ mod tests {
     #[test]
     fn test_rule_enabled() {
         let mut filter = PacketFilter::new();
-        
+
         let rule = PfRule {
             id: 0,
             action: PfAction::Block,
@@ -303,10 +303,10 @@ mod tests {
             dest_port: Some(22),
             enabled: true,
         };
-        
+
         let id = filter.add_rule(rule);
         assert!(filter.set_rule_enabled(id, false).is_ok());
-        
+
         let packet = Packet {
             source_addr: Ipv4Addr::new(192, 168, 1, 1),
             source_port: 50000,
@@ -314,7 +314,7 @@ mod tests {
             dest_port: 22,
             protocol: PfProtocol::Tcp,
         };
-        
+
         let action = filter.filter_packet(&packet);
         assert_eq!(action, PfAction::Pass); // Disabled rule
     }

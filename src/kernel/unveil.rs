@@ -75,10 +75,18 @@ impl UnveilPermissions {
 
     pub fn as_str(&self) -> String {
         let mut s = String::new();
-        if self.read { s.push('r'); }
-        if self.write { s.push('w'); }
-        if self.exec { s.push('x'); }
-        if self.create { s.push('c'); }
+        if self.read {
+            s.push('r');
+        }
+        if self.write {
+            s.push('w');
+        }
+        if self.exec {
+            s.push('x');
+        }
+        if self.create {
+            s.push('c');
+        }
         s
     }
 
@@ -240,7 +248,12 @@ impl UnveilManager {
     }
 
     /// Unveil for a context
-    pub fn unveil(&self, context_id: u64, path: String, permissions: UnveilPermissions) -> Result<(), String> {
+    pub fn unveil(
+        &self,
+        context_id: u64,
+        path: String,
+        permissions: UnveilPermissions,
+    ) -> Result<(), String> {
         let mut contexts = self.contexts.lock().unwrap();
         match contexts.get_mut(&context_id) {
             Some(context) => context.unveil(path, permissions),
@@ -352,7 +365,9 @@ mod tests {
     #[test]
     fn test_unveil_context_unveil() {
         let mut context = UnveilContext::new();
-        context.unveil("/home".to_string(), UnveilPermissions::rw()).unwrap();
+        context
+            .unveil("/home".to_string(), UnveilPermissions::rw())
+            .unwrap();
         context.lock();
 
         assert!(context.is_unveiled());
@@ -363,16 +378,24 @@ mod tests {
     #[test]
     fn test_unveil_context_double_unveil() {
         let mut context = UnveilContext::new();
-        context.unveil("/home".to_string(), UnveilPermissions::rw()).unwrap();
+        context
+            .unveil("/home".to_string(), UnveilPermissions::rw())
+            .unwrap();
         context.lock();
-        assert!(context.unveil("/tmp".to_string(), UnveilPermissions::rw()).is_err());
+        assert!(context
+            .unveil("/tmp".to_string(), UnveilPermissions::rw())
+            .is_err());
     }
 
     #[test]
     fn test_unveil_context_specificity() {
         let mut context = UnveilContext::new();
-        context.unveil("/".to_string(), UnveilPermissions::r()).unwrap();
-        context.unveil("/home".to_string(), UnveilPermissions::rw()).unwrap();
+        context
+            .unveil("/".to_string(), UnveilPermissions::r())
+            .unwrap();
+        context
+            .unveil("/home".to_string(), UnveilPermissions::rw())
+            .unwrap();
         context.lock();
 
         // More specific rule should take precedence
@@ -387,7 +410,9 @@ mod tests {
         let context_id = manager.create_context();
         assert_eq!(context_id, 1);
 
-        manager.unveil(context_id, "/home".to_string(), UnveilPermissions::rw()).unwrap();
+        manager
+            .unveil(context_id, "/home".to_string(), UnveilPermissions::rw())
+            .unwrap();
         manager.lock(context_id).unwrap();
 
         assert!(manager.allows(context_id, "/home/user", UnveilOperation::Read));
@@ -406,10 +431,14 @@ mod tests {
         let context_id1 = manager.create_context();
         let context_id2 = manager.create_context();
 
-        manager.unveil(context_id1, "/home".to_string(), UnveilPermissions::rw()).unwrap();
+        manager
+            .unveil(context_id1, "/home".to_string(), UnveilPermissions::rw())
+            .unwrap();
         manager.lock(context_id1).unwrap();
 
-        manager.unveil(context_id2, "/tmp".to_string(), UnveilPermissions::r()).unwrap();
+        manager
+            .unveil(context_id2, "/tmp".to_string(), UnveilPermissions::r())
+            .unwrap();
         manager.lock(context_id2).unwrap();
 
         assert!(manager.allows(context_id1, "/home/user", UnveilOperation::Write));

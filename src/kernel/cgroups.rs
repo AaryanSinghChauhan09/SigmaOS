@@ -5,7 +5,7 @@
 #![allow(dead_code)]
 
 use std::collections::BTreeMap;
-use std::sync::atomic::{AtomicU64, AtomicU32, AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, Ordering};
 
 /// Cgroup ID type
 pub type CgroupId = u64;
@@ -34,7 +34,7 @@ pub enum CgroupState {
 #[derive(Debug, Clone)]
 pub struct CgroupLimits {
     pub cpu_shares: u64,
-    pub cpu_quota_us: i64,  // -1 means unlimited
+    pub cpu_quota_us: i64, // -1 means unlimited
     pub cpu_period_us: u64,
     pub memory_limit_bytes: u64,
     pub memory_swap_limit_bytes: u64,
@@ -141,7 +141,9 @@ impl Cgroup {
     }
 
     pub fn update_cpu_usage(&self, delta_ns: u64) {
-        self.stats.cpu_usage_ns.fetch_add(delta_ns, Ordering::SeqCst);
+        self.stats
+            .cpu_usage_ns
+            .fetch_add(delta_ns, Ordering::SeqCst);
     }
 
     pub fn update_memory_usage(&self, delta_bytes: i64) {
@@ -163,7 +165,7 @@ impl CgroupSubsystem {
     pub fn new() -> Self {
         let root_id = 1;
         let mut cgroups = BTreeMap::new();
-        
+
         let root = Cgroup::new(root_id, "/".to_string(), None);
         cgroups.insert(root_id, root);
 
@@ -175,15 +177,22 @@ impl CgroupSubsystem {
     }
 
     /// Create a new cgroup
-    pub fn create_cgroup(&mut self, name: String, parent_id: Option<CgroupId>) -> Result<CgroupId, &'static str> {
+    pub fn create_cgroup(
+        &mut self,
+        name: String,
+        parent_id: Option<CgroupId>,
+    ) -> Result<CgroupId, &'static str> {
         let parent = match parent_id {
             Some(id) => self.cgroups.get(&id).ok_or("Parent cgroup not found")?,
-            None => self.cgroups.get(&self.root_cgroup_id).ok_or("Root cgroup not found")?,
+            None => self
+                .cgroups
+                .get(&self.root_cgroup_id)
+                .ok_or("Root cgroup not found")?,
         };
 
         let id = self.next_cgroup_id.fetch_add(1, Ordering::SeqCst);
         let cgroup = Cgroup::new(id, name, parent_id.or(Some(self.root_cgroup_id)));
-        
+
         if let Some(pid) = parent_id {
             if let Some(parent) = self.cgroups.get_mut(&pid) {
                 parent.children.push(id);
@@ -211,7 +220,7 @@ impl CgroupSubsystem {
         }
 
         let cgroup = self.cgroups.get(&id).ok_or("Cgroup not found")?;
-        
+
         if !cgroup.children.is_empty() {
             return Err("Cannot delete cgroup with children");
         }
@@ -231,14 +240,22 @@ impl CgroupSubsystem {
     }
 
     /// Add process to cgroup
-    pub fn add_process_to_cgroup(&mut self, cgroup_id: CgroupId, pid: u32) -> Result<(), &'static str> {
+    pub fn add_process_to_cgroup(
+        &mut self,
+        cgroup_id: CgroupId,
+        pid: u32,
+    ) -> Result<(), &'static str> {
         let cgroup = self.cgroups.get_mut(&cgroup_id).ok_or("Cgroup not found")?;
         cgroup.add_process(pid);
         Ok(())
     }
 
     /// Remove process from cgroup
-    pub fn remove_process_from_cgroup(&mut self, cgroup_id: CgroupId, pid: u32) -> Result<(), &'static str> {
+    pub fn remove_process_from_cgroup(
+        &mut self,
+        cgroup_id: CgroupId,
+        pid: u32,
+    ) -> Result<(), &'static str> {
         let cgroup = self.cgroups.get_mut(&cgroup_id).ok_or("Cgroup not found")?;
         cgroup.remove_process(pid);
         Ok(())
@@ -268,7 +285,7 @@ mod tests {
     #[test]
     fn test_cgroup_creation() {
         let mut subsystem = CgroupSubsystem::new();
-        
+
         let id = subsystem.create_cgroup("test".to_string(), None).unwrap();
         assert!(id > 1);
         assert_eq!(subsystem.cgroup_count(), 2);
@@ -277,10 +294,12 @@ mod tests {
     #[test]
     fn test_cgroup_hierarchy() {
         let mut subsystem = CgroupSubsystem::new();
-        
+
         let parent_id = subsystem.create_cgroup("parent".to_string(), None).unwrap();
-        let child_id = subsystem.create_cgroup("child".to_string(), Some(parent_id)).unwrap();
-        
+        let child_id = subsystem
+            .create_cgroup("child".to_string(), Some(parent_id))
+            .unwrap();
+
         let parent = subsystem.get_cgroup(parent_id).unwrap();
         assert!(parent.children.contains(&child_id));
     }
@@ -288,10 +307,10 @@ mod tests {
     #[test]
     fn test_cgroup_process_management() {
         let mut subsystem = CgroupSubsystem::new();
-        
+
         let id = subsystem.create_cgroup("test".to_string(), None).unwrap();
         subsystem.add_process_to_cgroup(id, 1234).unwrap();
-        
+
         let cgroup = subsystem.get_cgroup(id).unwrap();
         assert!(cgroup.processes.contains(&1234));
         assert_eq!(cgroup.stats.current_pids.load(Ordering::SeqCst), 1);
@@ -300,20 +319,20 @@ mod tests {
     #[test]
     fn test_cgroup_deletion() {
         let mut subsystem = CgroupSubsystem::new();
-        
+
         let id = subsystem.create_cgroup("test".to_string(), None).unwrap();
         subsystem.delete_cgroup(id).unwrap();
-        
+
         assert_eq!(subsystem.cgroup_count(), 1);
     }
 
     #[test]
     fn test_cgroup_controller_enablement() {
         let mut subsystem = CgroupSubsystem::new();
-        
+
         let id = subsystem.create_cgroup("test".to_string(), None).unwrap();
         let cgroup = subsystem.get_cgroup_mut(id).unwrap();
-        
+
         cgroup.enable_controller(CgroupController::Cpu);
         assert!(cgroup.is_controller_enabled(CgroupController::Cpu));
     }
@@ -321,10 +340,10 @@ mod tests {
     #[test]
     fn test_cgroup_freeze() {
         let mut subsystem = CgroupSubsystem::new();
-        
+
         let id = subsystem.create_cgroup("test".to_string(), None).unwrap();
         let cgroup = subsystem.get_cgroup(id).unwrap();
-        
+
         cgroup.set_state(CgroupState::Frozen);
         assert!(cgroup.is_frozen());
     }

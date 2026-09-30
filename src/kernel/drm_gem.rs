@@ -11,18 +11,18 @@
 extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
+use alloc::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
+use std::collections::BTreeMap;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use std::collections::BTreeMap;
+use std::vec::Vec;
 
 /// TTM Memory Placement Domains
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -106,14 +106,26 @@ impl SovereignDrmGemGpuManager {
     }
 
     /// Migrate GEM Buffer Object between TTM domains (e.g. SystemRam -> VRAM)
-    pub fn migrate_ttm_domain(&mut self, handle: u32, new_placement: TtmPlacementDomain) -> Result<(), &'static str> {
-        let bo = self.gem_buffers.get_mut(&handle).ok_or("DRM/GEM: Buffer object not found")?;
+    pub fn migrate_ttm_domain(
+        &mut self,
+        handle: u32,
+        new_placement: TtmPlacementDomain,
+    ) -> Result<(), &'static str> {
+        let bo = self
+            .gem_buffers
+            .get_mut(&handle)
+            .ok_or("DRM/GEM: Buffer object not found")?;
         bo.placement = new_placement;
         Ok(())
     }
 
     /// Submit a GPU command packet to the DRM command ring
-    pub fn submit_gpu_command(&mut self, cmd_id: u32, gem_handle: u32, payload_size: u32) -> Result<u64, &'static str> {
+    pub fn submit_gpu_command(
+        &mut self,
+        cmd_id: u32,
+        gem_handle: u32,
+        payload_size: u32,
+    ) -> Result<u64, &'static str> {
         if !self.gem_buffers.contains_key(&gem_handle) {
             return Err("DRM/GEM: Invalid GEM handle for GPU command");
         }
@@ -135,7 +147,8 @@ impl SovereignDrmGemGpuManager {
     /// Flush and execute GPU command ring up to a specific fence sequence
     pub fn flush_gpu_ring(&mut self, target_fence: u64) -> usize {
         let original_len = self.command_ring.len();
-        self.command_ring.retain(|pkt| pkt.fence_sequence > target_fence);
+        self.command_ring
+            .retain(|pkt| pkt.fence_sequence > target_fence);
         original_len - self.command_ring.len()
     }
 }
@@ -157,8 +170,13 @@ mod tests {
         let bo_handle = drm.allocate_gem_buffer(4096 * 1080, TtmPlacementDomain::Vram);
         assert_eq!(bo_handle, 1);
 
-        assert!(drm.migrate_ttm_domain(bo_handle, TtmPlacementDomain::Gtt).is_ok());
-        assert_eq!(drm.gem_buffers.get(&bo_handle).unwrap().placement, TtmPlacementDomain::Gtt);
+        assert!(drm
+            .migrate_ttm_domain(bo_handle, TtmPlacementDomain::Gtt)
+            .is_ok());
+        assert_eq!(
+            drm.gem_buffers.get(&bo_handle).unwrap().placement,
+            TtmPlacementDomain::Gtt
+        );
 
         let fence = drm.submit_gpu_command(0x10, bo_handle, 128).unwrap();
         assert_eq!(fence, 1);

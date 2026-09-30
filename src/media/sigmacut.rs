@@ -50,8 +50,18 @@ impl SigmaCutEditor {
         self.tracks.len() - 1
     }
 
-    pub fn insert_clip(&mut self, track_idx: usize, id: u32, title: &str, start: u64, duration: u64) -> Result<(), &'static str> {
-        let track = self.tracks.get_mut(track_idx).ok_or("Invalid track index")?;
+    pub fn insert_clip(
+        &mut self,
+        track_idx: usize,
+        id: u32,
+        title: &str,
+        start: u64,
+        duration: u64,
+    ) -> Result<(), &'static str> {
+        let track = self
+            .tracks
+            .get_mut(track_idx)
+            .ok_or("Invalid track index")?;
         track.1.push(MediaClip {
             id,
             title: title.to_string(),
@@ -76,7 +86,9 @@ impl SigmaCutEditor {
 
         for (_, clips) in &self.tracks {
             for clip in clips {
-                if frame_idx >= clip.start_frame && frame_idx < clip.start_frame + clip.duration_frames {
+                if frame_idx >= clip.start_frame
+                    && frame_idx < clip.start_frame + clip.duration_frames
+                {
                     active_clips_count += 1;
                 }
             }
@@ -105,7 +117,7 @@ mod tests {
         let a_track = editor.add_track(TrackType::Audio);
 
         assert!(editor.insert_clip(v_track, 1, "intro.mp4", 0, 120).is_ok()); // 2 seconds
-        assert!(editor.insert_clip(a_track, 2, "bgm.mp3", 0, 300).is_ok());   // 5 seconds
+        assert!(editor.insert_clip(a_track, 2, "bgm.mp3", 0, 300).is_ok()); // 5 seconds
 
         editor.add_subtitle_overlay(30, 90, "Welcome to SigmaOS");
 

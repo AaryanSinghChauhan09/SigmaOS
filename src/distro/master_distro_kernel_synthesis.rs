@@ -202,13 +202,13 @@ impl LinuxSyscallDispatcher {
     pub fn dispatch(&mut self, nr: u64, _arg1: u64, _arg2: u64, arg3: u64) -> i64 {
         self.calls_processed += 1;
         match nr {
-            0 => arg3 as i64,      // read: returns bytes read
-            1 => arg3 as i64,      // write: returns bytes written
-            3 => 0,                // close: success
-            39 => 1001,            // getpid: returns sovereign PID
-            60 => 0,               // exit: returns 0
-            425 => 10,             // io_uring_setup: returns ring fd
-            _ => 0,                // default success return
+            0 => arg3 as i64, // read: returns bytes read
+            1 => arg3 as i64, // write: returns bytes written
+            3 => 0,           // close: success
+            39 => 1001,       // getpid: returns sovereign PID
+            60 => 0,          // exit: returns 0
+            425 => 10,        // io_uring_setup: returns ring fd
+            _ => 0,           // default success return
         }
     }
 }

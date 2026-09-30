@@ -240,8 +240,14 @@ mod tests {
     #[test]
     fn test_landlock_ruleset_specificity() {
         let mut ruleset = LandlockRuleset::new();
-        ruleset.add_rule(LandlockRule::new("/".to_string(), LandlockAccess::READ_FILE));
-        ruleset.add_rule(LandlockRule::new("/home".to_string(), LandlockAccess::WRITE_FILE));
+        ruleset.add_rule(LandlockRule::new(
+            "/".to_string(),
+            LandlockAccess::READ_FILE,
+        ));
+        ruleset.add_rule(LandlockRule::new(
+            "/home".to_string(),
+            LandlockAccess::WRITE_FILE,
+        ));
 
         // More specific rule should take precedence
         assert!(ruleset.allows("/home/user", LandlockAccess::WRITE_FILE));
@@ -253,7 +259,10 @@ mod tests {
         let manager = LandlockManager::new();
 
         let mut ruleset = LandlockRuleset::new();
-        ruleset.add_rule(LandlockRule::new("/home".to_string(), LandlockAccess::READ_FILE));
+        ruleset.add_rule(LandlockRule::new(
+            "/home".to_string(),
+            LandlockAccess::READ_FILE,
+        ));
 
         let domain_id = manager.create_domain(ruleset.clone());
         assert_eq!(domain_id, 1);
@@ -272,10 +281,16 @@ mod tests {
         let manager = LandlockManager::new();
 
         let mut ruleset1 = LandlockRuleset::new();
-        ruleset1.add_rule(LandlockRule::new("/home".to_string(), LandlockAccess::READ_FILE));
+        ruleset1.add_rule(LandlockRule::new(
+            "/home".to_string(),
+            LandlockAccess::READ_FILE,
+        ));
 
         let mut ruleset2 = LandlockRuleset::new();
-        ruleset2.add_rule(LandlockRule::new("/tmp".to_string(), LandlockAccess::WRITE_FILE));
+        ruleset2.add_rule(LandlockRule::new(
+            "/tmp".to_string(),
+            LandlockAccess::WRITE_FILE,
+        ));
 
         let domain_id1 = manager.create_domain(ruleset1);
         let domain_id2 = manager.create_domain(ruleset2);

@@ -37,9 +37,9 @@ const MAX_FREE_LIST: usize = SLAB_PAGE_SIZE / 8;
 /// In a real implementation these would be embedded inside the free memory
 /// itself; here we keep an explicit array so the code stays safe-Rust.
 struct FreeList {
-    slots: [u32; MAX_FREE_LIST],  // offsets (in bytes) of free slots
-    head: usize,                  // index of first free slot
-    count: usize,                 // number of free slots
+    slots: [u32; MAX_FREE_LIST], // offsets (in bytes) of free slots
+    head: usize,                 // index of first free slot
+    count: usize,                // number of free slots
 }
 
 impl FreeList {
@@ -99,7 +99,11 @@ impl SlabCache {
     /// `static` initialisers (no heap allocation at runtime).
     pub const fn new(name: &'static str, object_size: usize) -> Self {
         // Compute how many objects fit in one 4 KiB page.
-        let total = if object_size == 0 { 1 } else { SLAB_PAGE_SIZE / object_size };
+        let total = if object_size == 0 {
+            1
+        } else {
+            SLAB_PAGE_SIZE / object_size
+        };
         Self {
             name,
             object_size,
@@ -152,17 +156,33 @@ impl SlabCache {
 
     // ── Query ─────────────────────────────────────────────────────────────────
 
-    pub fn name(&self) -> &'static str { self.name }
-    pub fn object_size(&self) -> usize { self.object_size }
-    pub fn total_slots(&self) -> usize { self.total }
-    pub fn free_slots(&self) -> usize { self.free.count }
-    pub fn used_slots(&self) -> usize { self.total.saturating_sub(self.free.count) }
-    pub fn alloc_count(&self) -> usize { self.alloc_count }
-    pub fn free_count(&self) -> usize { self.free_count_stat }
+    pub fn name(&self) -> &'static str {
+        self.name
+    }
+    pub fn object_size(&self) -> usize {
+        self.object_size
+    }
+    pub fn total_slots(&self) -> usize {
+        self.total
+    }
+    pub fn free_slots(&self) -> usize {
+        self.free.count
+    }
+    pub fn used_slots(&self) -> usize {
+        self.total.saturating_sub(self.free.count)
+    }
+    pub fn alloc_count(&self) -> usize {
+        self.alloc_count
+    }
+    pub fn free_count(&self) -> usize {
+        self.free_count_stat
+    }
 
     /// Utilisation as a percentage (0–100).
     pub fn utilisation_pct(&self) -> u32 {
-        if self.total == 0 { return 0; }
+        if self.total == 0 {
+            return 0;
+        }
         ((self.used_slots() * 100) / self.total) as u32
     }
 }
@@ -174,11 +194,11 @@ impl SlabCache {
 // SAFETY: These statics are only accessed from single-threaded kernel init
 //         and then protected by the kernel's big lock.  SigmaOS does not yet
 //         have multi-core SMP, so data races are impossible.
-pub static mut PROCESS_SLAB: SlabCache = SlabCache::new("sigma_process",  256);
-pub static mut SOCKET_SLAB:  SlabCache = SlabCache::new("sigma_socket",   128);
-pub static mut INODE_SLAB:   SlabCache = SlabCache::new("sigma_inode",    512);
-pub static mut PIPE_SLAB:    SlabCache = SlabCache::new("sigma_pipe",     64);
-pub static mut TIMER_SLAB:   SlabCache = SlabCache::new("sigma_timer",    32);
+pub static mut PROCESS_SLAB: SlabCache = SlabCache::new("sigma_process", 256);
+pub static mut SOCKET_SLAB: SlabCache = SlabCache::new("sigma_socket", 128);
+pub static mut INODE_SLAB: SlabCache = SlabCache::new("sigma_inode", 512);
+pub static mut PIPE_SLAB: SlabCache = SlabCache::new("sigma_pipe", 64);
+pub static mut TIMER_SLAB: SlabCache = SlabCache::new("sigma_timer", 32);
 
 /// Initialise all static kernel slab caches.  Call once during early boot.
 ///

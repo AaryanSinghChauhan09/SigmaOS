@@ -1,5 +1,5 @@
-use std::vec;
 use std::format;
+use std::vec;
 // SigmaOS Advanced Debugger Subsystem
 //
 // Models and implements advanced debugger user interfaces, mathematical and bitwise expression
@@ -7,12 +7,11 @@ use std::format;
 // Highly inspired by low-level hardware debugging interfaces (x86 DR0-DR7, ARM EL registers)
 // and production kernels (Linux ptrace, Windows Dbgsrv/WinDbg).
 
-
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
+use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::collections::BTreeMap;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[cfg(feature = "standalone_test")]
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -83,15 +82,50 @@ impl DebugWindowManager {
 
     fn initialize_default_layout(&mut self) {
         // Registers Window (Top Left)
-        self.windows.push(DebugWindow::new(DebugWindowType::Registers, String::from("Registers [CPU]"), 0, 0, 40, 15));
+        self.windows.push(DebugWindow::new(
+            DebugWindowType::Registers,
+            String::from("Registers [CPU]"),
+            0,
+            0,
+            40,
+            15,
+        ));
         // Disassembly Window (Top Right)
-        self.windows.push(DebugWindow::new(DebugWindowType::Disassembly, String::from("Disassembly [RIP]"), 40, 0, 80, 15));
+        self.windows.push(DebugWindow::new(
+            DebugWindowType::Disassembly,
+            String::from("Disassembly [RIP]"),
+            40,
+            0,
+            80,
+            15,
+        ));
         // Watch Window (Middle Left)
-        self.windows.push(DebugWindow::new(DebugWindowType::WatchExpressions, String::from("Watch Expressions"), 0, 15, 40, 15));
+        self.windows.push(DebugWindow::new(
+            DebugWindowType::WatchExpressions,
+            String::from("Watch Expressions"),
+            0,
+            15,
+            40,
+            15,
+        ));
         // CallStack Window (Middle Right)
-        self.windows.push(DebugWindow::new(DebugWindowType::CallStack, String::from("Call Stack"), 40, 15, 80, 15));
+        self.windows.push(DebugWindow::new(
+            DebugWindowType::CallStack,
+            String::from("Call Stack"),
+            40,
+            15,
+            80,
+            15,
+        ));
         // Console Window (Bottom Full)
-        self.windows.push(DebugWindow::new(DebugWindowType::Console, String::from("Debugger Command Console"), 0, 30, 120, 10));
+        self.windows.push(DebugWindow::new(
+            DebugWindowType::Console,
+            String::from("Debugger Command Console"),
+            0,
+            30,
+            120,
+            10,
+        ));
     }
 
     pub fn set_focus(&mut self, window_type: DebugWindowType) {
@@ -121,7 +155,11 @@ impl SosNarlyDebuggerExtension {
         }
     }
 
-    pub fn audit_module_security_mitigations(&self, module_name: &str, flags: MitigationFlags) -> bool {
+    pub fn audit_module_security_mitigations(
+        &self,
+        module_name: &str,
+        flags: MitigationFlags,
+    ) -> bool {
         let secure = flags.dep_nx_enabled && flags.aslr_enabled && flags.safe_seh_enabled;
         if !secure {
             println!(
@@ -161,38 +199,47 @@ impl CrashDiagnosticAnalyzer {
     }
 
     /// Evaluates crash event mimicking WinDbg '!analyze -v' and '!exploitable'
-    pub fn analyze_crash(&self, exception: TraceExceptionType, fault_address: u64) -> (String, ExploitabilityRisk) {
+    pub fn analyze_crash(
+        &self,
+        exception: TraceExceptionType,
+        fault_address: u64,
+    ) -> (String, ExploitabilityRisk) {
         match exception {
             TraceExceptionType::AccessViolation => {
                 if fault_address < 0x1000 {
                     (
-                        format!("!analyze: NULL Pointer Dereference at address {:#X}", fault_address),
+                        format!(
+                            "!analyze: NULL Pointer Dereference at address {:#X}",
+                            fault_address
+                        ),
                         ExploitabilityRisk::LowRisk,
                     )
                 } else if fault_address >= 0x7FFF0000_00000000 {
                     (
-                        format!("!analyze: Kernel Space Access Violation at address {:#X}", fault_address),
+                        format!(
+                            "!analyze: Kernel Space Access Violation at address {:#X}",
+                            fault_address
+                        ),
                         ExploitabilityRisk::Critical,
                     )
                 } else {
                     (
-                        format!("!analyze: User Space Memory Access Violation at address {:#X}", fault_address),
+                        format!(
+                            "!analyze: User Space Memory Access Violation at address {:#X}",
+                            fault_address
+                        ),
                         ExploitabilityRisk::Exploitable,
                     )
                 }
             }
-            TraceExceptionType::DivisionByZero => {
-                (
-                    String::from("!analyze: Integer Divide-by-Zero fault"),
-                    ExploitabilityRisk::LowRisk,
-                )
-            }
-            _ => {
-                (
-                    String::from("!analyze: Exception trap triggered"),
-                    ExploitabilityRisk::ProbablyExploitable,
-                )
-            }
+            TraceExceptionType::DivisionByZero => (
+                String::from("!analyze: Integer Divide-by-Zero fault"),
+                ExploitabilityRisk::LowRisk,
+            ),
+            _ => (
+                String::from("!analyze: Exception trap triggered"),
+                ExploitabilityRisk::ProbablyExploitable,
+            ),
         }
     }
 }
@@ -210,7 +257,9 @@ pub struct PyKdEngine {
 
 impl PyKdEngine {
     pub fn new() -> Self {
-        Self { scripts: Vec::new() }
+        Self {
+            scripts: Vec::new(),
+        }
     }
 
     pub fn register_pykd_script(&mut self, cmd: &str, payload: &str) {
@@ -221,14 +270,19 @@ impl PyKdEngine {
     }
 
     pub fn execute_pykd_script(&self, cmd: &str, current_rip: u64) -> Result<String, &'static str> {
-        let script = self.scripts.iter()
+        let script = self
+            .scripts
+            .iter()
             .find(|s| s.command_name == cmd)
             .ok_or("pykd: Target script command not registered")?;
 
         if script.script_payload.contains("get_rip") {
             Ok(format!("pykd output: RIP={:#X}", current_rip))
         } else {
-            Ok(format!("pykd output: Executed script '{}' successfully", cmd))
+            Ok(format!(
+                "pykd output: Executed script '{}' successfully",
+                cmd
+            ))
         }
     }
 }
@@ -251,7 +305,8 @@ impl VirtualKdSyncChannel {
     }
 
     pub fn establish_handshake(&mut self, magic_token: u32) -> Result<(), &'static str> {
-        if magic_token != 0x564b4453 { // "VKDS" (VirtualKD Sync) Magic
+        if magic_token != 0x564b4453 {
+            // "VKDS" (VirtualKD Sync) Magic
             return Err("VirtualKD: Invalid handshake token. Rejecting VM connection.");
         }
         self.host_connected = true;
@@ -312,7 +367,11 @@ impl DebugFloatRegister {
         let sign = (bits >> 63) == 1;
         let exponent = (((bits >> 52) & 0x7FF) as i16) - 1023;
         let fraction = bits & 0xFFFFFFFFFFFFF;
-        Self { sign, exponent, fraction }
+        Self {
+            sign,
+            exponent,
+            fraction,
+        }
     }
 }
 
@@ -337,10 +396,7 @@ impl EvaluationEngine {
                 (String::from("st0"), 3.1415926535),
                 (String::from("st1"), -0.5),
             ],
-            mock_memory: vec![
-                (0x000F0000, 0x00100500),
-                (0x00100500, 0x00000100),
-            ],
+            mock_memory: vec![(0x000F0000, 0x00100500), (0x00100500, 0x00000100)],
         }
     }
 
@@ -348,15 +404,16 @@ impl EvaluationEngine {
     pub fn evaluate(&self, node: &ExpressionNode) -> Result<u64, &'static str> {
         match node {
             ExpressionNode::Literal(val) => Ok(*val),
-            ExpressionNode::Register(reg) => {
-                self.mock_registers.iter()
-                    .find(|(r, _)| r == reg)
-                    .map(|(_, val)| *val)
-                    .ok_or("Register not found")
-            }
+            ExpressionNode::Register(reg) => self
+                .mock_registers
+                .iter()
+                .find(|(r, _)| r == reg)
+                .map(|(_, val)| *val)
+                .ok_or("Register not found"),
             ExpressionNode::Dereference(inner) => {
                 let address = self.evaluate(inner)?;
-                self.mock_memory.iter()
+                self.mock_memory
+                    .iter()
                     .find(|(addr, _)| *addr == address)
                     .map(|(_, val)| *val)
                     .ok_or("Memory segmentation fault or invalid read pointer")
@@ -379,7 +436,9 @@ impl EvaluationEngine {
             ExpressionNode::Divide(left, right) => {
                 let l = self.evaluate(left)?;
                 let r = self.evaluate(right)?;
-                if r == 0 { return Err("Division by zero exception"); }
+                if r == 0 {
+                    return Err("Division by zero exception");
+                }
                 Ok(l / r)
             }
             ExpressionNode::BitwiseAnd(left, right) => {
@@ -405,19 +464,30 @@ impl EvaluationEngine {
     }
 
     /// Formats a register output based on requested format rules
-    pub fn format_register_value(&self, reg: &str, format: RegisterDisplayFormat) -> Result<String, &'static str> {
+    pub fn format_register_value(
+        &self,
+        reg: &str,
+        format: RegisterDisplayFormat,
+    ) -> Result<String, &'static str> {
         if let Some((_, val)) = self.mock_registers.iter().find(|(r, _)| r == reg) {
             match format {
                 RegisterDisplayFormat::Hexadecimal => Ok(std::format!("0x{:X}", val)),
                 RegisterDisplayFormat::Decimal => Ok(std::format!("{}", val)),
                 RegisterDisplayFormat::Octal => Ok(std::format!("0o{:o}", val)),
                 RegisterDisplayFormat::Binary => Ok(std::format!("0b{:b}", val)),
-                RegisterDisplayFormat::FloatingPoint => Err("Integer register cannot be formatted as Float"),
+                RegisterDisplayFormat::FloatingPoint => {
+                    Err("Integer register cannot be formatted as Float")
+                }
             }
         } else if let Some((_, f_val)) = self.mock_float_registers.iter().find(|(r, _)| r == reg) {
             if format == RegisterDisplayFormat::FloatingPoint {
                 let float_reg = DebugFloatRegister::from_f64(*f_val);
-                Ok(std::format!("Sign: {}, Exp: {}, Frac: {:X}", float_reg.sign, float_reg.exponent, float_reg.fraction))
+                Ok(std::format!(
+                    "Sign: {}, Exp: {}, Frac: {:X}",
+                    float_reg.sign,
+                    float_reg.exponent,
+                    float_reg.fraction
+                ))
             } else {
                 Err("Float register must use FloatingPoint format")
             }
@@ -437,13 +507,17 @@ impl EvaluationEngine {
                     match next_c {
                         'd' => {
                             chars.next(); // consume
-                            if let Some((_, val)) = self.mock_registers.iter().find(|(r, _)| r == "rax") {
+                            if let Some((_, val)) =
+                                self.mock_registers.iter().find(|(r, _)| r == "rax")
+                            {
                                 result.push_str(&std::format!("{}", val));
                             }
                         }
                         'x' => {
                             chars.next(); // consume
-                            if let Some((_, val)) = self.mock_registers.iter().find(|(r, _)| r == "rip") {
+                            if let Some((_, val)) =
+                                self.mock_registers.iter().find(|(r, _)| r == "rip")
+                            {
                                 result.push_str(&std::format!("0x{:X}", val));
                             }
                         }
@@ -453,7 +527,9 @@ impl EvaluationEngine {
                         }
                         'f' => {
                             chars.next(); // consume
-                            if let Some((_, val)) = self.mock_float_registers.iter().find(|(r, _)| r == "st0") {
+                            if let Some((_, val)) =
+                                self.mock_float_registers.iter().find(|(r, _)| r == "st0")
+                            {
                                 result.push_str("3.141593");
                             }
                         }
@@ -492,7 +568,9 @@ pub struct MemoryDumpUtility {
 
 impl MemoryDumpUtility {
     pub fn new() -> Self {
-        let mut utility = Self { raw_ram: BTreeMap::new() };
+        let mut utility = Self {
+            raw_ram: BTreeMap::new(),
+        };
         // Populate standard virtual RAM offsets
         for i in 0..100 {
             utility.raw_ram.insert(0x1000 + i as u64, i as u8);
@@ -501,30 +579,46 @@ impl MemoryDumpUtility {
     }
 
     /// Read granularity sizes directly (bytes, word, dword, qword)
-    pub fn read_granularity(&self, start_address: u64, granularity: MemoryGranularity) -> Result<u64, &'static str> {
+    pub fn read_granularity(
+        &self,
+        start_address: u64,
+        granularity: MemoryGranularity,
+    ) -> Result<u64, &'static str> {
         match granularity {
             MemoryGranularity::Byte => {
-                let &val = self.raw_ram.get(&start_address).ok_or("Invalid memory address")?;
+                let &val = self
+                    .raw_ram
+                    .get(&start_address)
+                    .ok_or("Invalid memory address")?;
                 Ok(val as u64)
             }
             MemoryGranularity::Word => {
                 let mut b = [0u8; 2];
                 for i in 0..2 {
-                    b[i] = *self.raw_ram.get(&(start_address + i as u64)).ok_or("Invalid memory address")?;
+                    b[i] = *self
+                        .raw_ram
+                        .get(&(start_address + i as u64))
+                        .ok_or("Invalid memory address")?;
                 }
                 Ok(u16::from_le_bytes(b) as u64)
             }
             MemoryGranularity::Dword => {
                 let mut b = [0u8; 4];
                 for i in 0..4 {
-                    b[i] = *self.raw_ram.get(&(start_address + i as u64)).ok_or("Invalid memory address")?;
+                    b[i] = *self
+                        .raw_ram
+                        .get(&(start_address + i as u64))
+                        .ok_or("Invalid memory address")?;
                 }
                 Ok(u32::from_le_bytes(b) as u64)
             }
             MemoryGranularity::Qword => {
                 let mut b = [0u8; 8];
                 for i in 0..8 {
-                    b[i] = *self.raw_ram.get(&(start_address + i as u64)).ok_or("Invalid memory address")?;
+                    b[i] = *self
+                        .raw_ram
+                        .get(&(start_address + i as u64))
+                        .ok_or("Invalid memory address")?;
                 }
                 Ok(u64::from_le_bytes(b))
             }
@@ -532,7 +626,12 @@ impl MemoryDumpUtility {
     }
 
     /// Write granularity size back to address (editing memory contents)
-    pub fn write_granularity(&mut self, start_address: u64, granularity: MemoryGranularity, value: u64) -> Result<(), &'static str> {
+    pub fn write_granularity(
+        &mut self,
+        start_address: u64,
+        granularity: MemoryGranularity,
+        value: u64,
+    ) -> Result<(), &'static str> {
         match granularity {
             MemoryGranularity::Byte => {
                 self.raw_ram.insert(start_address, value as u8);
@@ -570,10 +669,16 @@ pub struct SymbolResolver {
 
 impl SymbolResolver {
     pub fn new() -> Self {
-        let mut resolver = Self { symbols: BTreeMap::new() };
+        let mut resolver = Self {
+            symbols: BTreeMap::new(),
+        };
         resolver.symbols.insert(0x00100400, String::from("kmain"));
-        resolver.symbols.insert(0x00100500, String::from("scheduler_tick"));
-        resolver.symbols.insert(0x00100600, String::from("vfs_read"));
+        resolver
+            .symbols
+            .insert(0x00100500, String::from("scheduler_tick"));
+        resolver
+            .symbols
+            .insert(0x00100600, String::from("vfs_read"));
         resolver
     }
 
@@ -582,7 +687,8 @@ impl SymbolResolver {
     }
 
     pub fn lookup_symbol(&self, name: &str) -> Option<u64> {
-        self.symbols.iter()
+        self.symbols
+            .iter()
             .find(|(_, sym_name)| sym_name.as_str() == name)
             .map(|(&addr, _)| addr)
     }
@@ -744,8 +850,8 @@ pub enum TraceExceptionType {
 /// WinDbg-style Exception Resolution levels
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ExceptionResolution {
-    Handled,     // Debugger repaired state; continue execution safely
-    NotHandled,  // Debugger bubbled up; triggers Kernel Panic or task termination
+    Handled,    // Debugger repaired state; continue execution safely
+    NotHandled, // Debugger bubbled up; triggers Kernel Panic or task termination
 }
 
 pub struct DebugEvent {
@@ -817,18 +923,26 @@ mod tests {
         let engine = EvaluationEngine::new();
 
         // Binary integer formats
-        let format_hex = engine.format_register_value("rax", RegisterDisplayFormat::Hexadecimal).unwrap();
+        let format_hex = engine
+            .format_register_value("rax", RegisterDisplayFormat::Hexadecimal)
+            .unwrap();
         assert_eq!(format_hex, "0x2A");
 
-        let format_dec = engine.format_register_value("rax", RegisterDisplayFormat::Decimal).unwrap();
+        let format_dec = engine
+            .format_register_value("rax", RegisterDisplayFormat::Decimal)
+            .unwrap();
         assert_eq!(format_dec, "42");
 
         // Selector segment formatting
-        let format_cs = engine.format_register_value("cs", RegisterDisplayFormat::Hexadecimal).unwrap();
+        let format_cs = engine
+            .format_register_value("cs", RegisterDisplayFormat::Hexadecimal)
+            .unwrap();
         assert_eq!(format_cs, "0x23");
 
         // FP float structure parsing
-        let format_fp = engine.format_register_value("st0", RegisterDisplayFormat::FloatingPoint).unwrap();
+        let format_fp = engine
+            .format_register_value("st0", RegisterDisplayFormat::FloatingPoint)
+            .unwrap();
         assert!(format_fp.contains("Sign: false"));
     }
 
@@ -845,14 +959,20 @@ mod tests {
         let mut utility = MemoryDumpUtility::new();
 
         // Verify initial byte read at 0x1000
-        let byte_val = utility.read_granularity(0x1000, MemoryGranularity::Byte).unwrap();
+        let byte_val = utility
+            .read_granularity(0x1000, MemoryGranularity::Byte)
+            .unwrap();
         assert_eq!(byte_val, 0);
 
         // Edit memory contents (write Qword)
-        assert!(utility.write_granularity(0x1005, MemoryGranularity::Qword, 0xAABBCCDD).is_ok());
+        assert!(utility
+            .write_granularity(0x1005, MemoryGranularity::Qword, 0xAABBCCDD)
+            .is_ok());
 
         // Verify read back using Word/Dword/Qword
-        let dword_val = utility.read_granularity(0x1005, MemoryGranularity::Dword).unwrap();
+        let dword_val = utility
+            .read_granularity(0x1005, MemoryGranularity::Dword)
+            .unwrap();
         assert_eq!(dword_val, 0xAABBCCDD);
     }
 
@@ -869,7 +989,8 @@ mod tests {
 
     #[test]
     fn test_extended_breakpoints() {
-        let bp_cond = SovereignBreakpoint::new_resolved(1, 0x100400, SovereignBreakpointType::Conditional);
+        let bp_cond =
+            SovereignBreakpoint::new_resolved(1, 0x100400, SovereignBreakpointType::Conditional);
         assert!(bp_cond.is_resolved);
 
         let bp_unresolved = SovereignBreakpoint::new_unresolved(2, "vfs_read");
@@ -934,7 +1055,8 @@ mod tests {
         let engine = EvaluationEngine::new();
 
         // *rsp -> *0x000F0000 -> 0x00100500
-        let node_deref = ExpressionNode::Dereference(Box::new(ExpressionNode::Register(String::from("rsp"))));
+        let node_deref =
+            ExpressionNode::Dereference(Box::new(ExpressionNode::Register(String::from("rsp"))));
         assert_eq!(engine.evaluate(&node_deref).unwrap(), 0x00100500);
 
         // **rsp -> 0x00000100
@@ -948,17 +1070,32 @@ mod tests {
         process.add_thread(1, 0x1000, 0xF000);
         process.add_thread(2, 0x1200, 0xE000);
 
-        assert_eq!(process.threads[0].execution_state, DebugExecutionState::Frozen);
+        assert_eq!(
+            process.threads[0].execution_state,
+            DebugExecutionState::Frozen
+        );
 
         // Resume all
         process.resume_all();
-        assert_eq!(process.threads[0].execution_state, DebugExecutionState::Running);
-        assert_eq!(process.threads[1].execution_state, DebugExecutionState::Running);
+        assert_eq!(
+            process.threads[0].execution_state,
+            DebugExecutionState::Running
+        );
+        assert_eq!(
+            process.threads[1].execution_state,
+            DebugExecutionState::Running
+        );
 
         // Single step thread 1
         assert!(process.single_step_thread(1).is_ok());
-        assert_eq!(process.threads[0].execution_state, DebugExecutionState::SingleStepping);
-        assert_eq!(process.threads[1].execution_state, DebugExecutionState::Frozen);
+        assert_eq!(
+            process.threads[0].execution_state,
+            DebugExecutionState::SingleStepping
+        );
+        assert_eq!(
+            process.threads[1].execution_state,
+            DebugExecutionState::Frozen
+        );
     }
 
     #[test]
@@ -1021,11 +1158,13 @@ mod tests {
         assert!(desc1.contains("NULL Pointer"));
 
         // User Space AV (Exploitable)
-        let (desc2, risk2) = analyzer.analyze_crash(TraceExceptionType::AccessViolation, 0x00401000);
+        let (desc2, risk2) =
+            analyzer.analyze_crash(TraceExceptionType::AccessViolation, 0x00401000);
         assert_eq!(risk2, ExploitabilityRisk::Exploitable);
 
         // Kernel Space AV (Critical)
-        let (desc3, risk3) = analyzer.analyze_crash(TraceExceptionType::AccessViolation, 0x8000000000000000);
+        let (desc3, risk3) =
+            analyzer.analyze_crash(TraceExceptionType::AccessViolation, 0x8000000000000000);
         assert_eq!(risk3, ExploitabilityRisk::Critical);
     }
 

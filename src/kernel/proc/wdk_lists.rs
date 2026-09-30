@@ -1,7 +1,6 @@
 // SigmaOS Windows WDK / Linux Kernel List & PCB Subsystem
 // Zero-dependency, #![no_std] compliant kernel structures.
 
-
 use std::string::String;
 use std::vec::Vec;
 
@@ -322,8 +321,14 @@ mod tests {
         let mut head = SingleListHead::new();
         assert!(head.is_empty());
 
-        let mut entry1 = SingleListEntry { next: None, data: 101 };
-        let mut entry2 = SingleListEntry { next: None, data: 202 };
+        let mut entry1 = SingleListEntry {
+            next: None,
+            data: 101,
+        };
+        let mut entry2 = SingleListEntry {
+            next: None,
+            data: 202,
+        };
 
         unsafe {
             head.push(&mut entry1 as *mut SingleListEntry);

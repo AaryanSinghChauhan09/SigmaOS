@@ -16,12 +16,12 @@
 use crate::kernel::subsystems::registry::{
     InitOrder, KernelSubsystem, SubsystemError, SubsystemPriority,
 };
+use crate::klib::VecDeque;
 /// SigmaOS Legacy Driver — NS8250/16550A UART Serial Port Driver
 /// Absorbs Linux serial.c (the most-ported driver in Linux history)
 /// Supports: 8250, 8250A, 16450, 16550, 16550A, 16750, 16950 UARTs
 /// COM1–COM4, baud rates 50–4,000,000, 5–8 data bits, 1–2 stop bits, parity
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::klib::VecDeque;
 
 /// Standard COM port I/O bases and IRQs
 pub const COM1_BASE: u16 = 0x3F8;

@@ -35,8 +35,6 @@
 
 #![allow(dead_code)]
 
-
-
 use std::string::{String, ToString};
 use std::vec::Vec;
 
@@ -62,11 +60,11 @@ pub enum MessageQueueError {
 impl core::fmt::Display for MessageQueueError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
-            MessageQueueError::QueueFull      => write!(f, "mq: queue full"),
-            MessageQueueError::QueueEmpty     => write!(f, "mq: queue empty"),
+            MessageQueueError::QueueFull => write!(f, "mq: queue full"),
+            MessageQueueError::QueueEmpty => write!(f, "mq: queue empty"),
             MessageQueueError::MessageTooLarge => write!(f, "mq: message too large"),
-            MessageQueueError::InvalidName(n)  => write!(f, "mq: invalid name '{}'", n),
-            MessageQueueError::Closed          => write!(f, "mq: queue closed"),
+            MessageQueueError::InvalidName(n) => write!(f, "mq: invalid name '{}'", n),
+            MessageQueueError::Closed => write!(f, "mq: queue closed"),
         }
     }
 }
@@ -91,7 +89,11 @@ pub struct SigmaMessage {
 impl SigmaMessage {
     /// Construct a new message.
     pub fn new(priority: u8, data: Vec<u8>, timestamp: u64) -> Self {
-        SigmaMessage { priority, data, timestamp }
+        SigmaMessage {
+            priority,
+            data,
+            timestamp,
+        }
     }
 
     /// Create a message with priority 0 (lowest).
@@ -282,19 +284,33 @@ mod tests {
 
     #[test]
     fn test_queue_full() {
-        let attrs = MessageQueueAttributes { max_msgs: 2, max_msg_size: 128, cur_msgs: 0 };
+        let attrs = MessageQueueAttributes {
+            max_msgs: 2,
+            max_msg_size: 128,
+            cur_msgs: 0,
+        };
         let mut mq = SigmaMessageQueue::open("test".to_string(), attrs).unwrap();
         mq.send(SigmaMessage::normal(vec![0], 0)).unwrap();
         mq.send(SigmaMessage::normal(vec![0], 1)).unwrap();
-        assert_eq!(mq.send(SigmaMessage::normal(vec![0], 2)), Err(MessageQueueError::QueueFull));
+        assert_eq!(
+            mq.send(SigmaMessage::normal(vec![0], 2)),
+            Err(MessageQueueError::QueueFull)
+        );
     }
 
     #[test]
     fn test_message_too_large() {
-        let attrs = MessageQueueAttributes { max_msgs: 10, max_msg_size: 4, cur_msgs: 0 };
+        let attrs = MessageQueueAttributes {
+            max_msgs: 10,
+            max_msg_size: 4,
+            cur_msgs: 0,
+        };
         let mut mq = SigmaMessageQueue::open("tiny".to_string(), attrs).unwrap();
         let big = vec![0u8; 5];
-        assert_eq!(mq.send(SigmaMessage::normal(big, 0)), Err(MessageQueueError::MessageTooLarge));
+        assert_eq!(
+            mq.send(SigmaMessage::normal(big, 0)),
+            Err(MessageQueueError::MessageTooLarge)
+        );
     }
 
     #[test]

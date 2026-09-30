@@ -3,11 +3,9 @@
 //! No dependency on external desktop frameworks
 //! Based on Roadmap Item 41: Zenith Desktop core
 
-
-
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Window ID
 pub type WindowID = usize;
@@ -256,7 +254,11 @@ impl Window for SimpleWindow {
 /// Desktop compositor trait (OOP interface)
 pub trait DesktopCompositor {
     /// Create window
-    fn create_window(&mut self, title: &[u8], capability: WindowCapability) -> Result<WindowID, DesktopError>;
+    fn create_window(
+        &mut self,
+        title: &[u8],
+        capability: WindowCapability,
+    ) -> Result<WindowID, DesktopError>;
     /// Destroy window
     fn destroy_window(&mut self, id: WindowID) -> Result<(), DesktopError>;
     /// Get window
@@ -351,7 +353,11 @@ impl SimpleDesktopCompositor {
 }
 
 impl DesktopCompositor for SimpleDesktopCompositor {
-    fn create_window(&mut self, title: &[u8], capability: WindowCapability) -> Result<WindowID, DesktopError> {
+    fn create_window(
+        &mut self,
+        title: &[u8],
+        capability: WindowCapability,
+    ) -> Result<WindowID, DesktopError> {
         if !self.capability.can_create {
             return Err(DesktopError::PermissionDenied);
         }
@@ -449,7 +455,9 @@ mod tests {
     #[test]
     fn test_simple_desktop_compositor_operations() {
         let mut compositor = SimpleDesktopCompositor::new(CompositorCapability::full());
-        let id = compositor.create_window(b"Browser", WindowCapability::full()).unwrap();
+        let id = compositor
+            .create_window(b"Browser", WindowCapability::full())
+            .unwrap();
         assert_eq!(id, 1);
 
         assert!(compositor.focus_window(id).is_ok());

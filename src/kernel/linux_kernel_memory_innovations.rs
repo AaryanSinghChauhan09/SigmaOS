@@ -210,18 +210,27 @@ impl SovereignKernelMemoryInnovationsSuite {
 
         // 1. memcg check
         let charge_ok = self.memcg.try_charge(100 * 1024 * 1024).is_ok();
-        results.insert("cgroups_v2_memcg".to_string(), charge_ok && !self.memcg.is_under_high_pressure());
+        results.insert(
+            "cgroups_v2_memcg".to_string(),
+            charge_ok && !self.memcg.is_under_high_pressure(),
+        );
 
         // 2. KSM check
         let dummy_page = [0xA5u8; 4096];
         self.ksm.scan_and_merge_page(0x1000_0000, &dummy_page);
         let shared_frame = self.ksm.scan_and_merge_page(0x2000_0000, &dummy_page);
-        results.insert("kernel_ksm_dedup".to_string(), shared_frame == Some(0x1000_0000));
+        results.insert(
+            "kernel_ksm_dedup".to_string(),
+            shared_frame == Some(0x1000_0000),
+        );
 
         // 3. OverlayFS check
         let upper_path = self.overlayfs.copy_up_on_write("etc/nginx.conf");
         let wh_path = self.overlayfs.create_whiteout_device("etc/old.conf");
-        results.insert("overlayfs_copy_up".to_string(), upper_path.contains("/upper/etc/nginx.conf") && wh_path.contains(".wh.etc/old.conf"));
+        results.insert(
+            "overlayfs_copy_up".to_string(),
+            upper_path.contains("/upper/etc/nginx.conf") && wh_path.contains(".wh.etc/old.conf"),
+        );
 
         results
     }

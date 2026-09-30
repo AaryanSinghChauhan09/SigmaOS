@@ -3,9 +3,9 @@
 //! hands-free automated installation into disposable dev environments and VM instances.
 
 use std::collections::BTreeMap;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 /// Cloud-init / cidata unattended configuration specs
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
@@ -49,7 +49,10 @@ impl CiDataUnattendedEngine {
         for label in drive_labels {
             if label.eq_ignore_ascii_case("cidata") || label.eq_ignore_ascii_case("nocloud") {
                 self.detected_drive_label = Some((*label).to_string());
-                self.status_logs.push(format!("Detected unattended cidata drive volume: {}", label));
+                self.status_logs.push(format!(
+                    "Detected unattended cidata drive volume: {}",
+                    label
+                ));
                 return true;
             }
         }
@@ -62,7 +65,10 @@ impl CiDataUnattendedEngine {
         files: &BTreeMap<String, String>,
     ) -> Result<CiDataUnattendedConfig, String> {
         let mut config = CiDataUnattendedConfig::default();
-        config.volume_label = self.detected_drive_label.clone().unwrap_or_else(|| "cidata".to_string());
+        config.volume_label = self
+            .detected_drive_label
+            .clone()
+            .unwrap_or_else(|| "cidata".to_string());
 
         // Check for defer-provisioning flag
         if files.contains_key("defer-provisioning") || files.contains_key("defer_provisioning") {
@@ -74,7 +80,9 @@ impl CiDataUnattendedEngine {
         if let Some(user_config) = files.get("user_configuration.json") {
             self.parse_json_user_config(user_config, &mut config)?;
         } else if !config.defer_provisioning {
-            return Err("Missing required file 'user_configuration.json' on cidata volume".to_string());
+            return Err(
+                "Missing required file 'user_configuration.json' on cidata volume".to_string(),
+            );
         }
 
         // Parse user_credentials.json if present
@@ -142,7 +150,10 @@ impl CiDataUnattendedEngine {
         if config.defer_provisioning {
             steps.push("Configuring system image in deferred provisioning mode (no user credentials stored).".to_string());
         } else if let Some(ref username) = config.username {
-            steps.push(format!("Provisioning user account '{}' with encrypted password hash.", username));
+            steps.push(format!(
+                "Provisioning user account '{}' with encrypted password hash.",
+                username
+            ));
         }
 
         if config.sshd_enabled {
@@ -157,7 +168,10 @@ impl CiDataUnattendedEngine {
         }
 
         if config.disk_encryption_requested {
-            steps.push("Enabling LUKS disk encryption (passphrase prompt required on initial reboot).".to_string());
+            steps.push(
+                "Enabling LUKS disk encryption (passphrase prompt required on initial reboot)."
+                    .to_string(),
+            );
         }
 
         let summary = format!(
@@ -254,16 +268,29 @@ mod tests {
         );
         files.insert(
             "user_credentials.json".to_string(),
-            r#"{"username": "admin", "password_hash": "$6$rounds=50000$saltsalt$hashhash"}"#.to_string(),
+            r#"{"username": "admin", "password_hash": "$6$rounds=50000$saltsalt$hashhash"}"#
+                .to_string(),
         );
-        files.insert("user_full_name.txt".to_string(), "Omarchy Admin\n".to_string());
-        files.insert("user_email_address.txt".to_string(), "admin@omarchy.org\n".to_string());
-        files.insert("user_encrypt_installation.txt".to_string(), "true\n".to_string());
+        files.insert(
+            "user_full_name.txt".to_string(),
+            "Omarchy Admin\n".to_string(),
+        );
+        files.insert(
+            "user_email_address.txt".to_string(),
+            "admin@omarchy.org\n".to_string(),
+        );
+        files.insert(
+            "user_encrypt_installation.txt".to_string(),
+            "true\n".to_string(),
+        );
         files.insert(
             "authorized_keys".to_string(),
             "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... admin@dev\n".to_string(),
         );
-        files.insert("tailscale_authkey".to_string(), "tskey-auth-k123456789\n".to_string());
+        files.insert(
+            "tailscale_authkey".to_string(),
+            "tskey-auth-k123456789\n".to_string(),
+        );
 
         let cfg = engine.parse_cidata_files(&files).unwrap();
         assert_eq!(cfg.hostname, "omarchy-vm");
@@ -275,7 +302,10 @@ mod tests {
         assert_eq!(cfg.ssh_authorized_keys.len(), 1);
         assert!(cfg.sshd_enabled);
         assert!(cfg.firewall_ssh_open);
-        assert_eq!(cfg.tailscale_authkey.as_deref(), Some("tskey-auth-k123456789"));
+        assert_eq!(
+            cfg.tailscale_authkey.as_deref(),
+            Some("tskey-auth-k123456789")
+        );
         assert!(cfg.tailscale_auto_join);
         assert!(!cfg.defer_provisioning);
 

@@ -168,7 +168,10 @@ impl SovereignUniversalPmPrBridgeEngine {
 
     /// Validates PR dependencies using SAT constraint checker and verifies PQC signature
     pub fn validate_sat_pr_dependencies(&mut self, pr_id: u64) -> Result<bool, &'static str> {
-        let tx = self.pr_transactions.get_mut(&pr_id).ok_or("PR ID not found")?;
+        let tx = self
+            .pr_transactions
+            .get_mut(&pr_id)
+            .ok_or("PR ID not found")?;
 
         if !tx.pqc_signature_verified {
             tx.status = UniversalPrStatus::Rejected;
@@ -189,7 +192,10 @@ impl SovereignUniversalPmPrBridgeEngine {
 
     /// Converts normalized foreign package manifest to canonical `sigma-pkg` object
     pub fn convert_to_canonical_sigpkg(&mut self, pr_id: u64) -> Result<String, &'static str> {
-        let tx = self.pr_transactions.get_mut(&pr_id).ok_or("PR ID not found")?;
+        let tx = self
+            .pr_transactions
+            .get_mut(&pr_id)
+            .ok_or("PR ID not found")?;
 
         if tx.status != UniversalPrStatus::SatValidated {
             return Err("PR must pass SAT validation before conversion");
@@ -200,15 +206,22 @@ impl SovereignUniversalPmPrBridgeEngine {
     }
 
     /// Merges approved PR transaction into active `sigma-pkg` system registry
-    pub fn merge_pr_to_sigma_pkg(&mut self, pr_id: u64) -> Result<UniversalDistroPackageManifest, &'static str> {
+    pub fn merge_pr_to_sigma_pkg(
+        &mut self,
+        pr_id: u64,
+    ) -> Result<UniversalDistroPackageManifest, &'static str> {
         let converted_name = self.convert_to_canonical_sigpkg(pr_id)?;
-        let tx = self.pr_transactions.get_mut(&pr_id).ok_or("PR ID not found")?;
+        let tx = self
+            .pr_transactions
+            .get_mut(&pr_id)
+            .ok_or("PR ID not found")?;
 
         tx.status = UniversalPrStatus::Merged;
         self.total_prs_merged += 1;
 
         let sigpkg_manifest = tx.manifest.clone();
-        self.active_sigpkg_registry.insert(converted_name, sigpkg_manifest.clone());
+        self.active_sigpkg_registry
+            .insert(converted_name, sigpkg_manifest.clone());
 
         Ok(sigpkg_manifest)
     }
@@ -243,7 +256,8 @@ mod tests {
             b"valid_pqc_sig",
         );
 
-        assert_eq!(pr1, 1);        assert!(bridge.validate_sat_pr_dependencies(pr1).unwrap());
+        assert_eq!(pr1, 1);
+        assert!(bridge.validate_sat_pr_dependencies(pr1).unwrap());
         let merged = bridge.merge_pr_to_sigma_pkg(pr1).unwrap();
         assert_eq!(merged.name, "nginx");
         assert_eq!(bridge.total_prs_merged, 1);
@@ -253,16 +267,56 @@ mod tests {
     #[test]
     fn test_multi_format_package_conversions() {
         let formats = [
-            (UniversalDistroPackageFormat::PacmanPkg, "arch-app", &["glibc"][..]),
-            (UniversalDistroPackageFormat::DnfRpm, "fedora-app", &["systemd"][..]),
-            (UniversalDistroPackageFormat::AlpineApk, "alpine-app", &["musl"][..]),
-            (UniversalDistroPackageFormat::VoidXbps, "void-app", &["xbps"][..]),
-            (UniversalDistroPackageFormat::GentooEbuild, "gentoo-app", &["portage"][..]),
-            (UniversalDistroPackageFormat::BsdPkg, "freebsd-app", &["libc"][..]),
-            (UniversalDistroPackageFormat::NixFlake, "nix-app", &["stdenv"][..]),
-            (UniversalDistroPackageFormat::FlatpakApp, "flatpak-app", &["org.freedesktop.Sdk"][..]),
-            (UniversalDistroPackageFormat::SnapApp, "snap-app", &["core22"][..]),
-            (UniversalDistroPackageFormat::AppImage, "appimage-app", &["fuse"][..]),
+            (
+                UniversalDistroPackageFormat::PacmanPkg,
+                "arch-app",
+                &["glibc"][..],
+            ),
+            (
+                UniversalDistroPackageFormat::DnfRpm,
+                "fedora-app",
+                &["systemd"][..],
+            ),
+            (
+                UniversalDistroPackageFormat::AlpineApk,
+                "alpine-app",
+                &["musl"][..],
+            ),
+            (
+                UniversalDistroPackageFormat::VoidXbps,
+                "void-app",
+                &["xbps"][..],
+            ),
+            (
+                UniversalDistroPackageFormat::GentooEbuild,
+                "gentoo-app",
+                &["portage"][..],
+            ),
+            (
+                UniversalDistroPackageFormat::BsdPkg,
+                "freebsd-app",
+                &["libc"][..],
+            ),
+            (
+                UniversalDistroPackageFormat::NixFlake,
+                "nix-app",
+                &["stdenv"][..],
+            ),
+            (
+                UniversalDistroPackageFormat::FlatpakApp,
+                "flatpak-app",
+                &["org.freedesktop.Sdk"][..],
+            ),
+            (
+                UniversalDistroPackageFormat::SnapApp,
+                "snap-app",
+                &["core22"][..],
+            ),
+            (
+                UniversalDistroPackageFormat::AppImage,
+                "appimage-app",
+                &["fuse"][..],
+            ),
         ];
 
         let mut bridge = SovereignUniversalPmPrBridgeEngine::new();
@@ -301,6 +355,9 @@ mod tests {
         );
 
         assert!(bridge.validate_sat_pr_dependencies(pr_conflict).is_err());
-        assert_eq!(bridge.pr_transactions[&pr_conflict].status, UniversalPrStatus::Rejected);
+        assert_eq!(
+            bridge.pr_transactions[&pr_conflict].status,
+            UniversalPrStatus::Rejected
+        );
     }
 }

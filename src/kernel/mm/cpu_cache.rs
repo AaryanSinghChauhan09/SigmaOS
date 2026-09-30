@@ -1,12 +1,11 @@
 // SigmaOS CPU Cache Subsystem Simulator
 // High-fidelity modeling of caches inspired by x86, x64, and ARM architectures
 
-
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MappingFunction {
@@ -66,11 +65,11 @@ pub struct CacheLine {
     pub valid: bool,
     pub dirty: bool,
     pub state: MesiState,
-    pub lru_counter: u64,   // system_time of last access
-    pub fifo_counter: u64,  // system_time of insertion
-    pub frequency: u64,     // LFU counter
-    pub mru_bit: bool,      // Pseudo-LRU MRU tracking bit
-    pub data: [u8; 64],     // 64-byte block size
+    pub lru_counter: u64,  // system_time of last access
+    pub fifo_counter: u64, // system_time of insertion
+    pub frequency: u64,    // LFU counter
+    pub mru_bit: bool,     // Pseudo-LRU MRU tracking bit
+    pub data: [u8; 64],    // 64-byte block size
 }
 
 impl CacheLine {
@@ -514,7 +513,10 @@ impl CpuCacheHierarchy {
         self.l2.access(addr, false, None, system_time);
         l1.access(addr, false, None, system_time);
 
-        (false, self.l1_latency + self.l2_latency + self.l3_latency + self.dram_latency)
+        (
+            false,
+            self.l1_latency + self.l2_latency + self.l3_latency + self.dram_latency,
+        )
     }
 
     /// Write data to cache hierarchy
@@ -537,7 +539,10 @@ impl CpuCacheHierarchy {
                 self.l2.access(addr, true, Some(data), system_time);
                 self.l3.access(addr, true, Some(data), system_time);
                 self.dram_traffic_bytes.fetch_add(64, Ordering::Relaxed);
-                return (true, self.l1_latency + self.l2_latency + self.l3_latency + self.dram_latency);
+                return (
+                    true,
+                    self.l1_latency + self.l2_latency + self.l3_latency + self.dram_latency,
+                );
             }
             return (true, self.l1_latency);
         }
@@ -548,7 +553,10 @@ impl CpuCacheHierarchy {
             self.l2.access(addr, true, Some(data), system_time);
             self.l3.access(addr, true, Some(data), system_time);
             self.dram_traffic_bytes.fetch_add(64, Ordering::Relaxed);
-            return (false, self.l1_latency + self.l2_latency + self.l3_latency + self.dram_latency);
+            return (
+                false,
+                self.l1_latency + self.l2_latency + self.l3_latency + self.dram_latency,
+            );
         }
 
         // WriteAllocate: fetch block to L1/L2/L3, then apply write
@@ -579,7 +587,10 @@ impl CpuCacheHierarchy {
         self.l2.access(addr, true, Some(data), system_time);
         l1.access(addr, true, Some(data), system_time);
 
-        (false, self.l1_latency + self.l2_latency + self.l3_latency + self.dram_latency)
+        (
+            false,
+            self.l1_latency + self.l2_latency + self.l3_latency + self.dram_latency,
+        )
     }
 
     /// Broadcast snoop to support MESI cache coherence protocol (e.g. multi-core invalidation)

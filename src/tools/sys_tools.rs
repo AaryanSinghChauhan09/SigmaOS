@@ -2,8 +2,8 @@
 //! Implements high-fidelity tcpdump, ncdu disk analysis, and kernel sysctl runtime tuners.
 use std::format;
 
+use crate::klib::{HashMap, Vec};
 use std::string::{String, ToString};
-use crate::klib::{Vec, HashMap};
 
 // ==========================================
 // 1. SovereignTcpDump Packet Sniffer Tool
@@ -136,10 +136,10 @@ impl SovereignNcdu {
         let n = consumers.len();
         for i in 0..n {
             for j in 0..n - 1 - i {
-                if consumers[j].1 < consumers[j+1].1 {
+                if consumers[j].1 < consumers[j + 1].1 {
                     let temp = consumers[j].clone();
-                    consumers[j] = consumers[j+1].clone();
-                    consumers[j+1] = temp;
+                    consumers[j] = consumers[j + 1].clone();
+                    consumers[j + 1] = temp;
                 }
             }
         }
@@ -159,7 +159,10 @@ impl SovereignSysctl {
     pub fn new() -> Self {
         let mut params = HashMap::new();
         params.insert("net.ipv4.ip_forward".to_string(), "0".to_string());
-        params.insert("kernel.sched_latency_ns".to_string(), "12000000".to_string());
+        params.insert(
+            "kernel.sched_latency_ns".to_string(),
+            "12000000".to_string(),
+        );
         params.insert("vm.swappiness".to_string(), "60".to_string());
         Self {
             kernel_parameters: params,
@@ -181,7 +184,8 @@ impl SovereignSysctl {
                 return Err("Swappiness cannot exceed 100");
             }
         }
-        self.kernel_parameters.insert(key.to_string(), value.to_string());
+        self.kernel_parameters
+            .insert(key.to_string(), value.to_string());
         Ok(())
     }
 }

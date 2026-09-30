@@ -190,23 +190,37 @@ impl KernelSecurity {
     }
 
     pub fn add_rule(&mut self, profile_name: &str, rule: SecurityRule) -> Result<(), String> {
-        let profile = self.profiles.get_mut(profile_name)
+        let profile = self
+            .profiles
+            .get_mut(profile_name)
             .ok_or_else(|| format!("Profile '{}' not found", profile_name))?;
 
         profile.rules.push(rule);
         Ok(())
     }
 
-    pub fn add_capability(&mut self, profile_name: &str, capability: Capability) -> Result<(), String> {
-        let profile = self.profiles.get_mut(profile_name)
+    pub fn add_capability(
+        &mut self,
+        profile_name: &str,
+        capability: Capability,
+    ) -> Result<(), String> {
+        let profile = self
+            .profiles
+            .get_mut(profile_name)
             .ok_or_else(|| format!("Profile '{}' not found", profile_name))?;
 
         profile.capabilities.push(capability);
         Ok(())
     }
 
-    pub fn set_sandbox_level(&mut self, profile_name: &str, level: SandboxLevel) -> Result<(), String> {
-        let profile = self.profiles.get_mut(profile_name)
+    pub fn set_sandbox_level(
+        &mut self,
+        profile_name: &str,
+        level: SandboxLevel,
+    ) -> Result<(), String> {
+        let profile = self
+            .profiles
+            .get_mut(profile_name)
             .ok_or_else(|| format!("Profile '{}' not found", profile_name))?;
 
         profile.sandbox_level = level;
@@ -223,7 +237,11 @@ impl KernelSecurity {
         Ok(())
     }
 
-    pub fn evaluate_action(&self, context: SecurityContext, action: SecurityAction) -> SecurityPolicy {
+    pub fn evaluate_action(
+        &self,
+        context: SecurityContext,
+        action: SecurityAction,
+    ) -> SecurityPolicy {
         if !self.enforcement_enabled {
             return SecurityPolicy::Allow;
         }
@@ -251,8 +269,10 @@ impl KernelSecurity {
 
     fn log_action(&self, context: SecurityContext, action: SecurityAction, policy: SecurityPolicy) {
         if self.audit_enabled {
-            println!("SECURITY: Context={:?}, Action={:?}, Policy={:?}", 
-                context, action, policy);
+            println!(
+                "SECURITY: Context={:?}, Action={:?}, Policy={:?}",
+                context, action, policy
+            );
         }
     }
 
@@ -284,14 +304,37 @@ impl KernelSecurity {
         let mut report = String::new();
         report.push_str("SigmaOS Security Report\n");
         report.push_str("======================\n\n");
-        
-        report.push_str(&format!("Enforcement: {}\n", if self.enforcement_enabled { "Enabled" } else { "Disabled" }));
-        report.push_str(&format!("Audit: {}\n", if self.audit_enabled { "Enabled" } else { "Disabled" }));
-        report.push_str(&format!("Learning Mode: {}\n", if self.learning_mode { "Enabled" } else { "Disabled" }));
-        report.push_str(&format!("Active Profile: {}\n", 
-            self.active_profile.as_deref().unwrap_or("None")));
+
+        report.push_str(&format!(
+            "Enforcement: {}\n",
+            if self.enforcement_enabled {
+                "Enabled"
+            } else {
+                "Disabled"
+            }
+        ));
+        report.push_str(&format!(
+            "Audit: {}\n",
+            if self.audit_enabled {
+                "Enabled"
+            } else {
+                "Disabled"
+            }
+        ));
+        report.push_str(&format!(
+            "Learning Mode: {}\n",
+            if self.learning_mode {
+                "Enabled"
+            } else {
+                "Disabled"
+            }
+        ));
+        report.push_str(&format!(
+            "Active Profile: {}\n",
+            self.active_profile.as_deref().unwrap_or("None")
+        ));
         report.push_str(&format!("Total Profiles: {}\n\n", self.profiles.len()));
-        
+
         if let Some(profile_name) = &self.active_profile {
             if let Some(profile) = self.profiles.get(profile_name) {
                 report.push_str(&format!("Profile: {}\n", profile.name));
@@ -300,7 +343,7 @@ impl KernelSecurity {
                 report.push_str(&format!("  Sandbox Level: {:?}\n", profile.sandbox_level));
             }
         }
-        
+
         report
     }
 }

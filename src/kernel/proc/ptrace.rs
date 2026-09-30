@@ -1,9 +1,9 @@
 //! Linux & BSD-inspired Debugger, Process, and Thread Control Engine (ptrace)
 //! Implements trace event queues, exception monitors, singlestep traps, and exception continue-state routing.
 
-use std::vec::Vec;
-use std::string::{String, ToString};
 use crate::klib::HashMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// ptrace system call requests
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -32,7 +32,7 @@ pub enum DbgEvent {
 pub struct ThreadDebugContext {
     pub thread_id: u64,
     pub is_traced: bool,
-    pub breakpoints: Vec<usize>,      // Virtual addresses of set breakpoints
+    pub breakpoints: Vec<usize>, // Virtual addresses of set breakpoints
     pub last_event: Option<DbgEvent>,
     pub single_step_active: bool,
 }
@@ -87,7 +87,10 @@ impl ExceptionMonitor {
 
     /// Triggers set/poke breakpoint at a memory location
     pub fn set_breakpoint(&mut self, thread_id: u64, address: usize) -> Result<(), &'static str> {
-        let ctx = self.debug_contexts.get_mut(&thread_id).ok_or("Thread not traced")?;
+        let ctx = self
+            .debug_contexts
+            .get_mut(&thread_id)
+            .ok_or("Thread not traced")?;
         if !ctx.breakpoints.contains(&address) {
             ctx.breakpoints.push(address);
         }
@@ -100,7 +103,10 @@ impl ExceptionMonitor {
         request: PtraceRequest,
         thread_id: u64,
     ) -> Result<Option<String>, &'static str> {
-        let ctx = self.debug_contexts.get_mut(&thread_id).ok_or("Thread not traced")?;
+        let ctx = self
+            .debug_contexts
+            .get_mut(&thread_id)
+            .ok_or("Thread not traced")?;
 
         match request {
             PtraceRequest::TraceMe => {
@@ -110,9 +116,7 @@ impl ExceptionMonitor {
             PtraceRequest::PeekText => {
                 Ok(Some("PEEKTEXT: [0x90909090]".to_string())) // mock nop code
             }
-            PtraceRequest::PokeText => {
-                Ok(Some("POKETEXT: Succeeded".to_string()))
-            }
+            PtraceRequest::PokeText => Ok(Some("POKETEXT: Succeeded".to_string())),
             PtraceRequest::Cont => {
                 ctx.single_step_active = false;
                 ctx.last_event = None;
@@ -121,7 +125,8 @@ impl ExceptionMonitor {
             PtraceRequest::SingleStep => {
                 ctx.single_step_active = true;
                 ctx.last_event = Some(DbgEvent::SingleStepTrap);
-                self.debug_event_queue.push((thread_id, DbgEvent::SingleStepTrap));
+                self.debug_event_queue
+                    .push((thread_id, DbgEvent::SingleStepTrap));
                 Ok(Some("SINGLESTEP: Stepped one instruction".to_string()))
             }
             PtraceRequest::Kill => {
@@ -144,7 +149,8 @@ impl ExceptionMonitor {
                     ExceptionType::Breakpoint => {
                         if ctx.breakpoints.contains(&instruction_pointer) {
                             ctx.last_event = Some(DbgEvent::Breakpoint);
-                            self.debug_event_queue.push((thread_id, DbgEvent::Breakpoint));
+                            self.debug_event_queue
+                                .push((thread_id, DbgEvent::Breakpoint));
                             return ExceptionStatus::Handled; // Caught and Handled by debugger
                         }
                     }
@@ -179,11 +185,15 @@ mod tests {
         monitor.attach_tracee(500);
 
         // Peek text check
-        let res = monitor.process_ptrace_request(PtraceRequest::PeekText, 500).unwrap();
+        let res = monitor
+            .process_ptrace_request(PtraceRequest::PeekText, 500)
+            .unwrap();
         assert!(res.unwrap().contains("PEEKTEXT"));
 
         // Single step check
-        let res = monitor.process_ptrace_request(PtraceRequest::SingleStep, 500).unwrap();
+        let res = monitor
+            .process_ptrace_request(PtraceRequest::SingleStep, 500)
+            .unwrap();
         assert!(res.unwrap().contains("SINGLESTEP"));
 
         let ctx = monitor.debug_contexts.get(&500).unwrap();

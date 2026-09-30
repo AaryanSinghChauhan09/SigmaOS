@@ -1,7 +1,6 @@
 /// SigmaOS VirtIO Block Device Driver (Phase 2 Storage)
 /// Inspired by Linux's virtio_blk.c and FreeBSD's virtio_blk.c.
 /// Implements VirtQueue semantics for asynchronous block I/O requests.
-
 use std::vec::Vec;
 
 #[derive(Debug)]
@@ -58,7 +57,7 @@ impl VirtioBlk {
             device_ready: false,
         }
     }
-    
+
     pub fn init(&mut self) -> Result<(), VirtioError> {
         // 1. Reset device
         // 2. Acknowledge device
@@ -69,7 +68,7 @@ impl VirtioBlk {
         self.capacity_sectors = 2048; // Simulated 1MB disk
         Ok(())
     }
-    
+
     pub fn read_block(&mut self, sector: u64, buffer: &mut [u8]) -> Result<(), VirtioError> {
         if !self.device_ready {
             return Err(VirtioError::DeviceNotReady);
@@ -77,23 +76,23 @@ impl VirtioBlk {
         if self.request_queue.num_free < 3 {
             return Err(VirtioError::QueueFull);
         }
-        
+
         let _header = VirtioBlkOuthdr {
             iotype: VirtioBlkType::In as u32,
             ioprio: 0,
             sector,
         };
-        
+
         // Simulating the VirtQueue push and kick
         self.request_queue.num_free -= 3; // header, buffer, status
-        
+
         // Mocking an immediate hardware response
         buffer.fill(0); // Return empty block
         self.request_queue.num_free += 3;
-        
+
         Ok(())
     }
-    
+
     pub fn write_block(&mut self, sector: u64, data: &[u8]) -> Result<(), VirtioError> {
         if !self.device_ready {
             return Err(VirtioError::DeviceNotReady);
@@ -101,21 +100,21 @@ impl VirtioBlk {
         if self.request_queue.num_free < 3 {
             return Err(VirtioError::QueueFull);
         }
-        
+
         let _header = VirtioBlkOuthdr {
             iotype: VirtioBlkType::Out as u32,
             ioprio: 0,
             sector,
         };
-        
+
         // Simulating VirtQueue processing
         self.request_queue.num_free -= 3;
         // Mock hardware completes write
         self.request_queue.num_free += 3;
-        
+
         Ok(())
     }
-    
+
     pub fn flush(&mut self) -> Result<(), VirtioError> {
         if !self.device_ready {
             return Err(VirtioError::DeviceNotReady);

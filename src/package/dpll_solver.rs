@@ -311,7 +311,7 @@ mod tests {
         assert!(result.is_some());
         let assignment = result.unwrap();
         assert!(!assignment[0]); // pkg_a = false
-        assert!(assignment[1]);  // pkg_b = true
+        assert!(assignment[1]); // pkg_b = true
     }
 
     #[test]
@@ -353,7 +353,7 @@ mod tests {
         assert!(result.is_some());
         let assignment = result.unwrap();
         assert!(assignment[0]); // pkg_a = true
-        // Exactly one of pkg_b or pkg_c is true
+                                // Exactly one of pkg_b or pkg_c is true
         assert!(assignment[1] ^ assignment[2]);
     }
 }

@@ -16,9 +16,9 @@
 #![allow(dead_code)]
 
 use std::collections::BTreeMap;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 // ─── Version Constraint ───────────────────────────────────────────────────────
 
@@ -158,16 +158,16 @@ pub struct PackageUniverse {
 impl PackageUniverse {
     /// Create an empty universe
     pub fn new() -> Self {
-        PackageUniverse { available: BTreeMap::new() }
+        PackageUniverse {
+            available: BTreeMap::new(),
+        }
     }
 
     /// Add package versions to the universe
     pub fn add_package(&mut self, name: &str, versions: Vec<&str>) {
         let mut vers: Vec<String> = versions.iter().map(|v| String::from(*v)).collect();
         // Sort descending (newest first) using version comparison
-        vers.sort_by(|a, b| {
-            VersionConstraint::version_cmp(b, a).cmp(&0)
-        });
+        vers.sort_by(|a, b| VersionConstraint::version_cmp(b, a).cmp(&0));
         self.available.insert(String::from(name), vers);
     }
 
@@ -231,17 +231,12 @@ impl BooleanDepSolver {
         match expr {
             DepExpr::Empty => true,
             DepExpr::Pkg(name) => installed.contains_key(name.as_str()),
-            DepExpr::Version(name, constraint) => {
-                installed.get(name.as_str())
-                    .map(|ver| constraint.satisfies(ver))
-                    .unwrap_or(false)
-            }
-            DepExpr::And(a, b) => {
-                self.evaluate(a, installed) && self.evaluate(b, installed)
-            }
-            DepExpr::Or(a, b) => {
-                self.evaluate(a, installed) || self.evaluate(b, installed)
-            }
+            DepExpr::Version(name, constraint) => installed
+                .get(name.as_str())
+                .map(|ver| constraint.satisfies(ver))
+                .unwrap_or(false),
+            DepExpr::And(a, b) => self.evaluate(a, installed) && self.evaluate(b, installed),
+            DepExpr::Or(a, b) => self.evaluate(a, installed) || self.evaluate(b, installed),
             DepExpr::Not(inner) => !self.evaluate(inner, installed),
             DepExpr::Conflict(name) => !installed.contains_key(name.as_str()),
         }
@@ -266,7 +261,10 @@ impl BooleanDepSolver {
         // Check conflicts
         for conflict in &conflicts {
             if required.contains_key(conflict) {
-                return Err(format!("Conflict: package '{}' is both required and conflicted", conflict));
+                return Err(format!(
+                    "Conflict: package '{}' is both required and conflicted",
+                    conflict
+                ));
             }
         }
 
@@ -300,7 +298,9 @@ impl BooleanDepSolver {
                 if !self.universe.has_package(name) {
                     return Err(format!("Package '{}' not found in universe", name));
                 }
-                required.entry(name.clone()).or_insert(VersionConstraint::Any);
+                required
+                    .entry(name.clone())
+                    .or_insert(VersionConstraint::Any);
             }
             DepExpr::Version(name, constraint) => {
                 if !self.universe.has_package(name) {
@@ -320,7 +320,10 @@ impl BooleanDepSolver {
                 // OR: try left first; if unavailable, try right
                 let mut left_req = required.clone();
                 let mut left_conf = conflicts.clone();
-                if self.collect_requirements(a, &mut left_req, &mut left_conf).is_ok() {
+                if self
+                    .collect_requirements(a, &mut left_req, &mut left_conf)
+                    .is_ok()
+                {
                     *required = left_req;
                     *conflicts = left_conf;
                 } else {
@@ -479,14 +482,20 @@ mod solver_tests {
         let solver = BooleanDepSolver::new(u);
         let exprs = vec![
             DepExpr::Pkg(String::from("bash")),
-            DepExpr::Version(String::from("glibc"), VersionConstraint::AtLeast(String::from("2.38"))),
+            DepExpr::Version(
+                String::from("glibc"),
+                VersionConstraint::AtLeast(String::from("2.38")),
+            ),
         ];
         let result = solver.resolve(&exprs).expect("should resolve");
         let names: Vec<&str> = result.iter().map(|(n, _)| n.as_str()).collect();
         assert!(names.contains(&"bash"));
         assert!(names.contains(&"glibc"));
         // glibc should be 2.39 (newest satisfying >= 2.38)
-        let glibc_ver = result.iter().find(|(n, _)| n == "glibc").map(|(_, v)| v.as_str());
+        let glibc_ver = result
+            .iter()
+            .find(|(n, _)| n == "glibc")
+            .map(|(_, v)| v.as_str());
         assert_eq!(glibc_ver, Some("2.39"));
     }
 
@@ -527,7 +536,9 @@ mod solver_tests {
             DepExpr::Pkg(String::from("bash")),
             DepExpr::Pkg(String::from("nonexistent-shell")),
         )];
-        let result = solver.resolve(&exprs).expect("bash OR fallback should work");
+        let result = solver
+            .resolve(&exprs)
+            .expect("bash OR fallback should work");
         let names: Vec<&str> = result.iter().map(|(n, _)| n.as_str()).collect();
         assert!(names.contains(&"bash"));
     }

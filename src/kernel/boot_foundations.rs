@@ -66,7 +66,9 @@ impl UefiBootProtocolManager {
             } else if arg.contains('=') {
                 let parts: Vec<&str> = arg.splitn(2, '=').collect();
                 if parts.len() == 2 {
-                    self.cmdline.custom_args.insert(parts[0].to_string(), parts[1].to_string());
+                    self.cmdline
+                        .custom_args
+                        .insert(parts[0].to_string(), parts[1].to_string());
                 }
             }
         }
@@ -132,7 +134,11 @@ impl SmpCpuTopologyManager {
                 core_id: (i / 2) as u32,
                 thread_id: (i % 2) as u32,
                 is_bsp: i == 0,
-                state: if i == 0 { CpuCoreState::Online } else { CpuCoreState::Offline },
+                state: if i == 0 {
+                    CpuCoreState::Online
+                } else {
+                    CpuCoreState::Offline
+                },
             });
         }
 
@@ -456,16 +462,25 @@ mod tests {
     #[test]
     fn test_posix_syscall_abi_and_panic() {
         let mut abi = PosixCoreSyscallAbiTable::new();
-        assert_eq!(abi.dispatch_syscall(SyscallNumber::SysRead as u64, &[0, 0x1000, 512]), Ok(0));
+        assert_eq!(
+            abi.dispatch_syscall(SyscallNumber::SysRead as u64, &[0, 0x1000, 512]),
+            Ok(0)
+        );
 
         abi.open_file_descriptor(3, "/var/log/syslog");
-        assert_eq!(abi.open_fds.get(&3).map(|s| s.as_str()), Some("/var/log/syslog"));
+        assert_eq!(
+            abi.open_fds.get(&3).map(|s| s.as_str()),
+            Some("/var/log/syslog")
+        );
 
         let mut panic_engine = KernelPanicCrashRecoveryEngine::new();
         panic_engine.log_serial("Kernel initializing vfs");
         panic_engine.trigger_kernel_panic("Page fault at 0x0", 0x0, [0; 16]);
 
         assert_eq!(panic_engine.panic_history.len(), 1);
-        assert_eq!(panic_engine.panic_history[0].panic_message, "Page fault at 0x0");
+        assert_eq!(
+            panic_engine.panic_history[0].panic_message,
+            "Page fault at 0x0"
+        );
     }
 }

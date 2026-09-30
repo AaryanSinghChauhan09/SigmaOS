@@ -105,10 +105,30 @@ impl PowerToysFancyZonesEngine {
             FancyZoneLayoutMode::Grid => {
                 let half_w = self.screen_width / 2;
                 let half_h = self.screen_height / 2;
-                self.zones.push(ZoneArea { x: 0, y: 0, width: half_w, height: half_h });
-                self.zones.push(ZoneArea { x: half_w, y: 0, width: half_w, height: half_h });
-                self.zones.push(ZoneArea { x: 0, y: half_h, width: half_w, height: half_h });
-                self.zones.push(ZoneArea { x: half_w, y: half_h, width: half_w, height: half_h });
+                self.zones.push(ZoneArea {
+                    x: 0,
+                    y: 0,
+                    width: half_w,
+                    height: half_h,
+                });
+                self.zones.push(ZoneArea {
+                    x: half_w,
+                    y: 0,
+                    width: half_w,
+                    height: half_h,
+                });
+                self.zones.push(ZoneArea {
+                    x: 0,
+                    y: half_h,
+                    width: half_w,
+                    height: half_h,
+                });
+                self.zones.push(ZoneArea {
+                    x: half_w,
+                    y: half_h,
+                    width: half_w,
+                    height: half_h,
+                });
             }
             _ => {
                 self.zones.push(ZoneArea {
@@ -131,7 +151,14 @@ impl PowerToysTextExtractorOcr {
         Self
     }
 
-    pub fn extract_text_from_region(&self, _x: u32, _y: u32, _w: u32, _h: u32, mock_image_data: &[u8]) -> String {
+    pub fn extract_text_from_region(
+        &self,
+        _x: u32,
+        _y: u32,
+        _w: u32,
+        _h: u32,
+        mock_image_data: &[u8],
+    ) -> String {
         if mock_image_data.starts_with(b"TEXT:") {
             String::from_utf8_lossy(&mock_image_data[5..]).to_string()
         } else {
@@ -155,7 +182,9 @@ pub struct PowerToysFileLocksmith {
 
 impl PowerToysFileLocksmith {
     pub fn new() -> Self {
-        Self { locked_handles: Vec::new() }
+        Self {
+            locked_handles: Vec::new(),
+        }
     }
 
     pub fn register_lock(&mut self, pid: u32, name: &str, path: &str) {
@@ -412,7 +441,9 @@ pub struct SovereignTerraformIacTool {
 
 impl SovereignTerraformIacTool {
     pub fn new() -> Self {
-        Self { state_resources: Vec::new() }
+        Self {
+            state_resources: Vec::new(),
+        }
     }
 
     pub fn declare_resource(&mut self, res_type: &str, name: &str) {

@@ -118,7 +118,11 @@ impl AlpcSecurityTokenVerifier {
     }
 
     /// Verifies if a security token is authorized to invoke procedures on a facility
-    pub fn verify_token_access(&self, token: &AlpcSecurityToken, facility: &str) -> Result<(), String> {
+    pub fn verify_token_access(
+        &self,
+        token: &AlpcSecurityToken,
+        facility: &str,
+    ) -> Result<(), String> {
         if !token.is_sandboxed {
             return Ok(()); // Privileged un-sandboxed caller
         }
@@ -232,7 +236,8 @@ impl LinuxBsdFastLpcBridgeEngine {
         let sec_id = self.next_section_id;
         self.next_section_id += 1;
 
-        let section = AlpcZeroCopySharedSection::new(sec_id, owner_token.pid, size, initial_payload);
+        let section =
+            AlpcZeroCopySharedSection::new(sec_id, owner_token.pid, size, initial_payload);
         self.sections.insert(sec_id, section);
         Ok(sec_id)
     }
@@ -290,10 +295,14 @@ mod tests {
         let verifier = AlpcSecurityTokenVerifier::new();
 
         let root_token = AlpcSecurityToken::new_root(1);
-        assert!(verifier.verify_token_access(&root_token, "FileSystemVfs").is_ok());
+        assert!(verifier
+            .verify_token_access(&root_token, "FileSystemVfs")
+            .is_ok());
 
         let user_token = AlpcSecurityToken::new_user(1001, 1000, 1000, &["rpath", "wpath"]);
-        assert!(verifier.verify_token_access(&user_token, "FileSystemVfs").is_ok());
+        assert!(verifier
+            .verify_token_access(&user_token, "FileSystemVfs")
+            .is_ok());
 
         let restricted_token = AlpcSecurityToken::new_user(1002, 1000, 1000, &["stdio"]);
         let res = verifier.verify_token_access(&restricted_token, "FileSystemVfs");

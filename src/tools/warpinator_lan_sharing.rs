@@ -109,7 +109,7 @@ impl WarpinatorLanSharing {
             is_online: true,
             last_seen: self.get_current_timestamp(),
         };
-        
+
         if !self.devices.iter().any(|d| d.device_id == device_id) {
             self.devices.push(device);
         }
@@ -137,9 +137,15 @@ impl WarpinatorLanSharing {
     }
 
     /// Start a file transfer
-    pub fn start_transfer(&mut self, from_device: &str, to_device: &str, file_path: &str, file_size: u64) -> TransferResult {
+    pub fn start_transfer(
+        &mut self,
+        from_device: &str,
+        to_device: &str,
+        file_path: &str,
+        file_size: u64,
+    ) -> TransferResult {
         let transfer_id = format!("transfer_{}", self.transfers.len());
-        
+
         let transfer = TransferItem {
             transfer_id: transfer_id.clone(),
             from_device: from_device.to_string(),
@@ -150,9 +156,9 @@ impl WarpinatorLanSharing {
             status: TransferStatus::Pending,
             timestamp: self.get_current_timestamp(),
         };
-        
+
         self.transfers.push(transfer);
-        
+
         TransferResult {
             success: true,
             transfer_id,
@@ -164,7 +170,11 @@ impl WarpinatorLanSharing {
 
     /// Update transfer progress
     pub fn update_transfer_progress(&mut self, transfer_id: &str, bytes_transferred: u64) {
-        if let Some(transfer) = self.transfers.iter_mut().find(|t| t.transfer_id == transfer_id) {
+        if let Some(transfer) = self
+            .transfers
+            .iter_mut()
+            .find(|t| t.transfer_id == transfer_id)
+        {
             transfer.bytes_transferred = bytes_transferred;
             if bytes_transferred >= transfer.file_size {
                 transfer.status = TransferStatus::Completed;
@@ -223,11 +233,23 @@ impl WarpinatorLanSharing {
     /// Get transfer statistics
     pub fn get_transfer_statistics(&self) -> TransferStatistics {
         let total_transfers = self.transfers.len();
-        let completed_transfers = self.transfers.iter().filter(|t| t.status == TransferStatus::Completed).count();
-        let in_progress_transfers = self.transfers.iter().filter(|t| t.status == TransferStatus::InProgress).count();
-        let failed_transfers = self.transfers.iter().filter(|t| t.status == TransferStatus::Failed).count();
+        let completed_transfers = self
+            .transfers
+            .iter()
+            .filter(|t| t.status == TransferStatus::Completed)
+            .count();
+        let in_progress_transfers = self
+            .transfers
+            .iter()
+            .filter(|t| t.status == TransferStatus::InProgress)
+            .count();
+        let failed_transfers = self
+            .transfers
+            .iter()
+            .filter(|t| t.status == TransferStatus::Failed)
+            .count();
         let total_bytes_transferred: u64 = self.transfers.iter().map(|t| t.bytes_transferred).sum();
-        
+
         TransferStatistics {
             total_transfers,
             completed_transfers,
@@ -240,21 +262,31 @@ impl WarpinatorLanSharing {
     /// Display device list in text-based GUI format
     pub fn display_device_list(&self) -> String {
         let mut output = String::from("=== Warpinator Devices ===\n\n");
-        
+
         if self.devices.is_empty() {
             output.push_str("No devices available.\n");
             return output;
         }
-        
+
         for (i, device) in self.devices.iter().enumerate() {
             output.push_str(&format!("{}. {}\n", i + 1, device.device_name));
             output.push_str(&format!("   ID: {}\n", device.device_id));
             output.push_str(&format!("   IP: {}\n", device.ip_address));
-            output.push_str(&format!("   Status: {}\n", if device.is_online { "Online" } else { "Offline" }));
-            output.push_str(&format!("   Last Seen: {}\n", self.format_timestamp(device.last_seen)));
+            output.push_str(&format!(
+                "   Status: {}\n",
+                if device.is_online {
+                    "Online"
+                } else {
+                    "Offline"
+                }
+            ));
+            output.push_str(&format!(
+                "   Last Seen: {}\n",
+                self.format_timestamp(device.last_seen)
+            ));
             output.push_str("\n");
         }
-        
+
         output.push_str(&format!("Total: {} devices\n", self.devices.len()));
         output
     }
@@ -262,24 +294,33 @@ impl WarpinatorLanSharing {
     /// Display transfer list in text-based GUI format
     pub fn display_transfer_list(&self) -> String {
         let mut output = String::from("=== Warpinator Transfers ===\n\n");
-        
+
         if self.transfers.is_empty() {
             output.push_str("No transfers available.\n");
             return output;
         }
-        
+
         for (i, transfer) in self.transfers.iter().enumerate() {
             output.push_str(&format!("{}. {}\n", i + 1, transfer.transfer_id));
             output.push_str(&format!("   From: {}\n", transfer.from_device));
             output.push_str(&format!("   To: {}\n", transfer.to_device));
             output.push_str(&format!("   File: {}\n", transfer.file_path));
             output.push_str(&format!("   Size: {} bytes\n", transfer.file_size));
-            output.push_str(&format!("   Transferred: {} bytes\n", transfer.bytes_transferred));
-            output.push_str(&format!("   Status: {}\n", self.status_to_string(&transfer.status)));
-            output.push_str(&format!("   Time: {}\n", self.format_timestamp(transfer.timestamp)));
+            output.push_str(&format!(
+                "   Transferred: {} bytes\n",
+                transfer.bytes_transferred
+            ));
+            output.push_str(&format!(
+                "   Status: {}\n",
+                self.status_to_string(&transfer.status)
+            ));
+            output.push_str(&format!(
+                "   Time: {}\n",
+                self.format_timestamp(transfer.timestamp)
+            ));
             output.push_str("\n");
         }
-        
+
         output.push_str(&format!("Total: {} transfers\n", self.transfers.len()));
         output
     }
@@ -288,9 +329,26 @@ impl WarpinatorLanSharing {
     pub fn display_config(&self) -> String {
         let mut output = String::from("=== Warpinator Configuration ===\n\n");
         output.push_str(&format!("Group Code: {}\n", self.group_code.code));
-        output.push_str(&format!("Incoming Directory: {}\n", self.incoming_directory));
-        output.push_str(&format!("Compression: {}\n", if self.compression_enabled { "Enabled" } else { "Disabled" }));
-        output.push_str(&format!("Encryption: {}\n", if self.encryption_enabled { "Enabled" } else { "Disabled" }));
+        output.push_str(&format!(
+            "Incoming Directory: {}\n",
+            self.incoming_directory
+        ));
+        output.push_str(&format!(
+            "Compression: {}\n",
+            if self.compression_enabled {
+                "Enabled"
+            } else {
+                "Disabled"
+            }
+        ));
+        output.push_str(&format!(
+            "Encryption: {}\n",
+            if self.encryption_enabled {
+                "Enabled"
+            } else {
+                "Disabled"
+            }
+        ));
         output
     }
 
@@ -302,7 +360,10 @@ impl WarpinatorLanSharing {
         output.push_str(&format!("Completed: {}\n", stats.completed_transfers));
         output.push_str(&format!("In Progress: {}\n", stats.in_progress_transfers));
         output.push_str(&format!("Failed: {}\n", stats.failed_transfers));
-        output.push_str(&format!("Total Bytes Transferred: {}\n", stats.total_bytes_transferred));
+        output.push_str(&format!(
+            "Total Bytes Transferred: {}\n",
+            stats.total_bytes_transferred
+        ));
         output
     }
 
@@ -320,7 +381,9 @@ impl WarpinatorLanSharing {
     }
 
     fn find_transfer_index(&self, transfer_id: &str) -> Option<usize> {
-        self.transfers.iter().position(|t| t.transfer_id == transfer_id)
+        self.transfers
+            .iter()
+            .position(|t| t.transfer_id == transfer_id)
     }
 
     fn get_current_timestamp(&self) -> u64 {
@@ -365,7 +428,7 @@ mod tests {
     fn test_group_code_generation() {
         let mut warpinator = WarpinatorLanSharing::new();
         let code = warpinator.generate_group_code();
-        
+
         assert!(!code.is_empty());
         assert_eq!(warpinator.group_code.code, code);
         assert!(warpinator.group_code.is_valid);
@@ -374,12 +437,12 @@ mod tests {
     #[test]
     fn test_device_management() {
         let mut warpinator = WarpinatorLanSharing::new();
-        
+
         warpinator.add_device("device1", "Laptop", "192.168.1.100");
         warpinator.add_device("device2", "Desktop", "192.168.1.101");
-        
+
         assert_eq!(warpinator.devices.len(), 2);
-        
+
         let result = warpinator.remove_device("device1");
         assert!(result.is_ok());
         assert_eq!(warpinator.devices.len(), 1);
@@ -388,9 +451,9 @@ mod tests {
     #[test]
     fn test_transfer_creation() {
         let mut warpinator = WarpinatorLanSharing::new();
-        
+
         let result = warpinator.start_transfer("device1", "device2", "/home/user/file.txt", 1024);
-        
+
         assert!(result.success);
         assert_eq!(warpinator.transfers.len(), 1);
         assert_eq!(warpinator.transfers[0].status, TransferStatus::Pending);
@@ -399,14 +462,14 @@ mod tests {
     #[test]
     fn test_transfer_progress() {
         let mut warpinator = WarpinatorLanSharing::new();
-        
+
         let result = warpinator.start_transfer("device1", "device2", "/home/user/file.txt", 1024);
         let transfer_id = result.transfer_id;
-        
+
         warpinator.update_transfer_progress(&transfer_id, 512);
         assert_eq!(warpinator.transfers[0].bytes_transferred, 512);
         assert_eq!(warpinator.transfers[0].status, TransferStatus::InProgress);
-        
+
         warpinator.update_transfer_progress(&transfer_id, 1024);
         assert_eq!(warpinator.transfers[0].status, TransferStatus::Completed);
     }
@@ -414,10 +477,10 @@ mod tests {
     #[test]
     fn test_transfer_cancellation() {
         let mut warpinator = WarpinatorLanSharing::new();
-        
+
         let result = warpinator.start_transfer("device1", "device2", "/home/user/file.txt", 1024);
         let transfer_id = result.transfer_id;
-        
+
         let cancel_result = warpinator.cancel_transfer(&transfer_id);
         assert!(cancel_result.is_ok());
         assert_eq!(warpinator.transfers[0].status, TransferStatus::Cancelled);
@@ -426,7 +489,7 @@ mod tests {
     #[test]
     fn test_compression_toggle() {
         let mut warpinator = WarpinatorLanSharing::new();
-        
+
         assert!(!warpinator.compression_enabled);
         warpinator.enable_compression();
         assert!(warpinator.compression_enabled);
@@ -437,7 +500,7 @@ mod tests {
     #[test]
     fn test_encryption_toggle() {
         let mut warpinator = WarpinatorLanSharing::new();
-        
+
         assert!(warpinator.encryption_enabled);
         warpinator.disable_encryption();
         assert!(!warpinator.encryption_enabled);
@@ -448,10 +511,10 @@ mod tests {
     #[test]
     fn test_statistics() {
         let mut warpinator = WarpinatorLanSharing::new();
-        
+
         warpinator.start_transfer("device1", "device2", "/home/user/file1.txt", 1024);
         warpinator.start_transfer("device1", "device2", "/home/user/file2.txt", 2048);
-        
+
         let stats = warpinator.get_transfer_statistics();
         assert_eq!(stats.total_transfers, 2);
         assert_eq!(stats.completed_transfers, 0);
@@ -461,21 +524,21 @@ mod tests {
     #[test]
     fn test_display_output() {
         let mut warpinator = WarpinatorLanSharing::new();
-        
+
         warpinator.add_device("device1", "Laptop", "192.168.1.100");
         warpinator.start_transfer("device1", "device2", "/home/user/file.txt", 1024);
-        
+
         let device_output = warpinator.display_device_list();
         assert!(device_output.contains("Laptop"));
         assert!(device_output.contains("192.168.1.100"));
-        
+
         let transfer_output = warpinator.display_transfer_list();
         assert!(transfer_output.contains("/home/user/file.txt"));
-        
+
         let config_output = warpinator.display_config();
         assert!(config_output.contains("Group Code"));
         assert!(config_output.contains("Encryption"));
-        
+
         let stats_output = warpinator.display_statistics();
         assert!(stats_output.contains("Total Transfers: 1"));
     }

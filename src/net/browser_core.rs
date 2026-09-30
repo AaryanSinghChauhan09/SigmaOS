@@ -12,8 +12,8 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::vec;
 use std::format;
+use std::vec;
 // SigmaOS Network Protocol Layer
 
 // Browser Core - High-performance, memory-safe browser implementation
@@ -112,7 +112,7 @@ impl BrowserCore {
     /// Create a new tab with specified capabilities
     pub fn create_tab(&mut self, url: String, capabilities: TabCapabilities) -> u32 {
         let tab_id = self.tabs.len() as u32 + 1;
-        
+
         let tab = BrowserTab {
             id: tab_id,
             url: url.clone(),
@@ -124,14 +124,14 @@ impl BrowserCore {
 
         self.tabs.push(tab);
         self.active_tab = Some(self.tabs.len() - 1);
-        
+
         tab_id
     }
 
     /// Navigate to a URL
     pub fn navigate(&mut self, tab_id: u32, url: String) -> Result<(), &'static str> {
         let tab = self.find_tab_mut(tab_id).ok_or("Tab not found")?;
-        
+
         tab.url = url.clone();
         tab.title = String::from("Loading...");
         tab.state = BrowserTabState::Loading;
@@ -146,12 +146,12 @@ impl BrowserCore {
     /// Close a tab
     pub fn close_tab(&mut self, tab_id: u32) -> Result<(), &'static str> {
         let idx = self.find_tab_index(tab_id).ok_or("Tab not found")?;
-        
+
         self.tabs[idx].state = BrowserTabState::Closed;
-        
+
         // Remove the tab
         self.tabs.remove(idx);
-        
+
         // Update active tab if needed
         if self.active_tab == Some(idx) {
             self.active_tab = if self.tabs.is_empty() {
@@ -236,7 +236,11 @@ impl BrowserCore {
     }
 
     /// Set tab security level
-    pub fn set_tab_security(&mut self, tab_id: u32, level: SecurityLevel) -> Result<(), &'static str> {
+    pub fn set_tab_security(
+        &mut self,
+        tab_id: u32,
+        level: SecurityLevel,
+    ) -> Result<(), &'static str> {
         let tab = self.find_tab_mut(tab_id).ok_or("Tab not found")?;
         tab.security_level = level;
         Ok(())
@@ -309,7 +313,9 @@ mod tests {
         };
 
         let tab_id = browser.create_tab("https://example.com".to_string(), capabilities);
-        browser.navigate(tab_id, "https://sigmaos.org".to_string()).unwrap();
+        browser
+            .navigate(tab_id, "https://sigmaos.org".to_string())
+            .unwrap();
 
         let tab = browser.get_active_tab().unwrap();
         assert_eq!(tab.url, "https://sigmaos.org");
@@ -336,7 +342,7 @@ mod tests {
     #[test]
     fn test_adblock() {
         let browser = BrowserCore::new();
-        
+
         assert!(browser.should_block_url("https://doubleclick.net/ad"));
         assert!(browser.should_block_url("https://google-analytics.com/track"));
         assert!(!browser.should_block_url("https://example.com"));
@@ -345,7 +351,7 @@ mod tests {
     #[test]
     fn test_tracker_detection() {
         let mut browser = BrowserCore::new();
-        
+
         assert!(browser.is_tracker("https://google-analytics.com/collect"));
         assert!(browser.is_tracker("https://doubleclick.net/ad"));
         assert!(!browser.is_tracker("https://example.com"));
@@ -354,10 +360,10 @@ mod tests {
     #[test]
     fn test_tracking_protection() {
         let mut browser = BrowserCore::new();
-        
+
         browser.block_tracker("google-analytics.com".to_string());
         assert_eq!(browser.blocked_trackers_count(), 1);
-        
+
         browser.set_tracking_protection(false);
         browser.block_tracker("doubleclick.net".to_string());
         assert_eq!(browser.blocked_trackers_count(), 1); // Should not block when disabled
@@ -366,7 +372,7 @@ mod tests {
     #[test]
     fn test_tab_isolation() {
         let mut browser = BrowserCore::new();
-        
+
         let caps1 = TabCapabilities {
             network_allowed: true,
             filesystem_read_allowed: true,

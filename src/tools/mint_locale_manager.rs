@@ -1,11 +1,9 @@
 //! Linux Mint mintlocale-inspired Locale Manager
-//! 
+//!
 //! This module implements a locale manager inspired by Linux Mint's mintlocale,
 //! which configures system locale settings and language packs.
 
 #![allow(dead_code)]
-
-
 
 use std::collections::BTreeMap;
 use std::format;
@@ -182,7 +180,11 @@ impl MintLocaleManager {
 
     /// Install a language pack
     pub fn install_language_pack(&mut self, language_code: &str) -> Result<(), String> {
-        if let Some(pack) = self.language_packs.iter_mut().find(|p| p.language_code == language_code) {
+        if let Some(pack) = self
+            .language_packs
+            .iter_mut()
+            .find(|p| p.language_code == language_code)
+        {
             pack.installed = true;
             Ok(())
         } else {
@@ -192,7 +194,11 @@ impl MintLocaleManager {
 
     /// Remove a language pack
     pub fn remove_language_pack(&mut self, language_code: &str) -> Result<(), String> {
-        if let Some(pack) = self.language_packs.iter_mut().find(|p| p.language_code == language_code) {
+        if let Some(pack) = self
+            .language_packs
+            .iter_mut()
+            .find(|p| p.language_code == language_code)
+        {
             pack.installed = false;
             Ok(())
         } else {
@@ -229,7 +235,7 @@ impl MintLocaleManager {
     /// Generate locale configuration (for /etc/default/locale)
     pub fn generate_locale_config(&self) -> Vec<String> {
         let mut config = Vec::new();
-        
+
         if let Some(default) = &self.default_locale {
             config.push(format!("LANG={}", default));
         }
@@ -250,7 +256,7 @@ impl MintLocaleManager {
         // 2. Update locale-gen
         // 3. Update system locale
         // 4. Restart affected services
-        
+
         Ok(())
     }
 
@@ -301,7 +307,7 @@ mod tests {
     #[test]
     fn test_add_locale() {
         let mut manager = MintLocaleManager::new();
-        
+
         let locale = LocaleInfo {
             code: "en_US.UTF-8".to_string(),
             language: "English".to_string(),
@@ -310,7 +316,7 @@ mod tests {
             installed: false,
             is_default: false,
         };
-        
+
         manager.add_locale(locale);
         assert_eq!(manager.locales.len(), 1);
     }
@@ -318,7 +324,7 @@ mod tests {
     #[test]
     fn test_install_locale() {
         let mut manager = MintLocaleManager::new();
-        
+
         let locale = LocaleInfo {
             code: "en_US.UTF-8".to_string(),
             language: "English".to_string(),
@@ -327,7 +333,7 @@ mod tests {
             installed: false,
             is_default: false,
         };
-        
+
         manager.add_locale(locale);
         let result = manager.install_locale("en_US.UTF-8");
         assert!(result.is_ok());
@@ -337,7 +343,7 @@ mod tests {
     #[test]
     fn test_set_default_locale() {
         let mut manager = MintLocaleManager::new();
-        
+
         manager.set_default_locale("en_US.UTF-8".to_string());
         assert_eq!(manager.default_locale, Some("en_US.UTF-8".to_string()));
         assert_eq!(
@@ -349,7 +355,7 @@ mod tests {
     #[test]
     fn test_search_locales() {
         let mut manager = MintLocaleManager::new();
-        
+
         let locale = LocaleInfo {
             code: "en_US.UTF-8".to_string(),
             language: "English".to_string(),
@@ -358,7 +364,7 @@ mod tests {
             installed: false,
             is_default: false,
         };
-        
+
         manager.add_locale(locale);
         let results = manager.search_locales("English");
         assert_eq!(results.len(), 1);
@@ -367,7 +373,7 @@ mod tests {
     #[test]
     fn test_locale_statistics() {
         let mut manager = MintLocaleManager::new();
-        
+
         let locale = LocaleInfo {
             code: "en_US.UTF-8".to_string(),
             language: "English".to_string(),
@@ -376,7 +382,7 @@ mod tests {
             installed: true,
             is_default: false,
         };
-        
+
         manager.add_locale(locale);
         let stats = manager.get_statistics();
         assert_eq!(stats.total_locales, 1);
@@ -386,7 +392,7 @@ mod tests {
     #[test]
     fn test_cannot_remove_default_locale() {
         let mut manager = MintLocaleManager::new();
-        
+
         let mut locale = LocaleInfo {
             code: "en_US.UTF-8".to_string(),
             language: "English".to_string(),
@@ -395,10 +401,10 @@ mod tests {
             installed: true,
             is_default: true,
         };
-        
+
         manager.add_locale(locale.clone());
         locale.is_default = true;
-        
+
         let result = manager.remove_locale("en_US.UTF-8");
         assert!(result.is_err());
     }

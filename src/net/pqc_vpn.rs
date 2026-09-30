@@ -1,10 +1,8 @@
+use core::sync::atomic::{AtomicBool, Ordering};
+use std::string::String;
 /// Post-Quantum Cryptography WireGuard VPN protocol and secure tunnel.
 /// Employs Kyber-1024 KEM and Dilithium-5 digital signatures for military-grade protection.
-
-
 use std::vec::Vec;
-use std::string::String;
-use core::sync::atomic::{AtomicBool, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TunnelState {
@@ -24,7 +22,7 @@ impl HybridX25519KyberKeyExchange {
     pub fn new() -> Self {
         let mut x25519_pubkey = [0u8; 32];
         let mut kyber_pubkey = [0u8; 1184];
-        
+
         // In production, use cryptographically secure random number generator
         // For now, use deterministic but non-constant derivation
         for i in 0..32 {
@@ -33,7 +31,7 @@ impl HybridX25519KyberKeyExchange {
         for i in 0..1184 {
             kyber_pubkey[i] = ((i * 13 + 59) % 256) as u8;
         }
-        
+
         Self {
             x25519_pubkey,
             kyber_pubkey,

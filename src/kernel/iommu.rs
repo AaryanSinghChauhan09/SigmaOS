@@ -5,7 +5,7 @@
 #![allow(dead_code)]
 
 use std::collections::BTreeMap;
-use std::sync::atomic::{AtomicU64, AtomicU32, Ordering};
+use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 
 /// IOMMU domain ID
 pub type IommuDomainId = u64;
@@ -41,9 +41,15 @@ impl IommuPageProtection {
 
     pub fn as_flags(&self) -> u32 {
         let mut flags = 0;
-        if self.read { flags |= 0x1; }
-        if self.write { flags |= 0x2; }
-        if self.execute { flags |= 0x4; }
+        if self.read {
+            flags |= 0x1;
+        }
+        if self.write {
+            flags |= 0x2;
+        }
+        if self.execute {
+            flags |= 0x4;
+        }
         flags
     }
 }
@@ -51,9 +57,9 @@ impl IommuPageProtection {
 /// IOMMU mapping
 #[derive(Debug, Clone)]
 pub struct IommuMapping {
-    pub iova: u64,         // IO virtual address
-    pub paddr: u64,        // Physical address
-    pub size: u64,         // Size in bytes
+    pub iova: u64,  // IO virtual address
+    pub paddr: u64, // Physical address
+    pub size: u64,  // Size in bytes
     pub protection: IommuPageProtection,
 }
 
@@ -170,7 +176,7 @@ impl IommuSubsystem {
     /// Delete a domain
     pub fn delete_domain(&mut self, id: IommuDomainId) -> Result<(), &'static str> {
         let domain = self.domains.remove(&id).ok_or("Domain not found")?;
-        
+
         if !domain.devices.is_empty() {
             return Err("Cannot delete domain with attached devices");
         }
@@ -183,10 +189,14 @@ impl IommuSubsystem {
     }
 
     /// Attach device to domain
-    pub fn attach_device(&mut self, device_id: DeviceId, domain_id: IommuDomainId) -> Result<(), &'static str> {
+    pub fn attach_device(
+        &mut self,
+        device_id: DeviceId,
+        domain_id: IommuDomainId,
+    ) -> Result<(), &'static str> {
         // Detach from previous domain if any
         let prev_domain_id = self.devices.get(&device_id).copied().flatten();
-        
+
         if let Some(prev_id) = prev_domain_id {
             if let Some(prev_domain) = self.domains.get_mut(&prev_id) {
                 prev_domain.remove_device(device_id);
@@ -201,8 +211,13 @@ impl IommuSubsystem {
 
     /// Detach device from domain
     pub fn detach_device(&mut self, device_id: DeviceId) -> Result<(), &'static str> {
-        let domain_id = self.devices.get(&device_id).copied().flatten().ok_or("Device not attached")?;
-        
+        let domain_id = self
+            .devices
+            .get(&device_id)
+            .copied()
+            .flatten()
+            .ok_or("Device not attached")?;
+
         if let Some(domain) = self.domains.get_mut(&domain_id) {
             domain.remove_device(device_id);
         }
@@ -240,7 +255,7 @@ mod tests {
     #[test]
     fn test_iommu_domain_creation() {
         let mut subsystem = IommuSubsystem::new();
-        
+
         let id = subsystem.create_domain(IommuDomainType::DMA, 4096);
         assert!(id > 0);
         assert_eq!(subsystem.domain_count(), 1);
@@ -249,17 +264,17 @@ mod tests {
     #[test]
     fn test_iommu_mapping() {
         let mut subsystem = IommuSubsystem::new();
-        
+
         let domain_id = subsystem.create_domain(IommuDomainType::DMA, 4096);
         let domain = subsystem.get_domain_mut(domain_id).unwrap();
-        
+
         let mapping = IommuMapping::new(
             0x1000,
             0x2000,
             4096,
             IommuPageProtection::new(true, false, false),
         );
-        
+
         domain.add_mapping(mapping).unwrap();
         assert_eq!(domain.mapping_count(), 1);
     }
@@ -267,21 +282,21 @@ mod tests {
     #[test]
     fn test_iommu_device_attach() {
         let mut subsystem = IommuSubsystem::new();
-        
+
         let domain_id = subsystem.create_domain(IommuDomainType::DMA, 4096);
         subsystem.attach_device(1234, domain_id).unwrap();
-        
+
         assert_eq!(subsystem.get_device_domain(1234), Some(domain_id));
     }
 
     #[test]
     fn test_iommu_device_detach() {
         let mut subsystem = IommuSubsystem::new();
-        
+
         let domain_id = subsystem.create_domain(IommuDomainType::DMA, 4096);
         subsystem.attach_device(1234, domain_id).unwrap();
         subsystem.detach_device(1234).unwrap();
-        
+
         assert_eq!(subsystem.get_device_domain(1234), None);
     }
 
@@ -289,7 +304,7 @@ mod tests {
     fn test_iommu_page_protection() {
         let prot = IommuPageProtection::new(true, true, false);
         let flags = prot.as_flags();
-        
+
         assert!(flags & 0x1 != 0); // read
         assert!(flags & 0x2 != 0); // write
         assert!(flags & 0x4 == 0); // execute
@@ -298,10 +313,10 @@ mod tests {
     #[test]
     fn test_iommu_domain_deletion() {
         let mut subsystem = IommuSubsystem::new();
-        
+
         let domain_id = subsystem.create_domain(IommuDomainType::DMA, 4096);
         subsystem.delete_domain(domain_id).unwrap();
-        
+
         assert_eq!(subsystem.domain_count(), 0);
     }
 }

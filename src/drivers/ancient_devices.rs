@@ -16,7 +16,6 @@
 // SigmaOS Ancient Device Drivers
 // Implements OOP-based lightweight legacy drivers executing sandboxed UDFs
 
-
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 use std::boxed::Box;
 use std::vec::Vec;

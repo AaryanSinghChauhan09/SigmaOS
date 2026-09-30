@@ -67,7 +67,11 @@ impl NobaraGamingProtonOptimizerEngine {
         spec
     }
 
-    pub fn set_gamemode_state(&mut self, pid: usize, state: GameModeState) -> Result<(), &'static str> {
+    pub fn set_gamemode_state(
+        &mut self,
+        pid: usize,
+        state: GameModeState,
+    ) -> Result<(), &'static str> {
         if let Some(game) = self.active_games.get_mut(&pid) {
             game.gamemode_state = state;
             Ok(())
@@ -77,7 +81,10 @@ impl NobaraGamingProtonOptimizerEngine {
     }
 
     pub fn active_proton_games_count(&self) -> usize {
-        self.active_games.values().filter(|g| g.is_proton_wine).count()
+        self.active_games
+            .values()
+            .filter(|g| g.is_proton_wine)
+            .count()
     }
 }
 
@@ -129,7 +136,13 @@ impl AsahiAppleSiliconPlatformEngine {
     }
 
     fn init_power_domains(&mut self) {
-        let domains = ["p_cores", "e_cores", "gpu_cluster", "npu_neural_engine", "dcp_display"];
+        let domains = [
+            "p_cores",
+            "e_cores",
+            "gpu_cluster",
+            "npu_neural_engine",
+            "dcp_display",
+        ];
         for d in domains {
             self.power_domains.insert(
                 d.to_string(),
@@ -153,7 +166,10 @@ impl AsahiAppleSiliconPlatformEngine {
     }
 
     pub fn active_domains_count(&self) -> usize {
-        self.power_domains.values().filter(|pd| pd.is_powered).count()
+        self.power_domains
+            .values()
+            .filter(|pd| pd.is_powered)
+            .count()
     }
 }
 
@@ -213,7 +229,10 @@ impl OracleUekKspliceLivepatchEngine {
             }
             patch.is_applied = true;
             self.total_livepatches_applied += 1;
-            Ok(format!("KSplice: Livepatch '{}' safely applied in-memory without reboot", patch_id))
+            Ok(format!(
+                "KSplice: Livepatch '{}' safely applied in-memory without reboot",
+                patch_id
+            ))
         } else {
             Err("KSplice: Patch record not found")
         }
@@ -301,7 +320,13 @@ impl PostmarketOsPmbootstrapMobileEngine {
 impl Default for PostmarketOsPmbootstrapMobileEngine {
     fn default() -> Self {
         let mut engine = Self::new();
-        engine.register_mobile_device("pine64-pinephone", "Pine64", "/boot/dtbs/sun50i-a64-pinephone.dtb", 295, 2.0);
+        engine.register_mobile_device(
+            "pine64-pinephone",
+            "Pine64",
+            "/boot/dtbs/sun50i-a64-pinephone.dtb",
+            295,
+            2.0,
+        );
         engine
     }
 }
@@ -470,7 +495,9 @@ mod tests {
         let mut nobara = NobaraGamingProtonOptimizerEngine::new();
         nobara.register_gaming_process(1234, "cyberpunk2077.exe", true, &[0, 1, 2, 3]);
         assert_eq!(nobara.active_proton_games_count(), 1);
-        assert!(nobara.set_gamemode_state(1234, GameModeState::UltraPerformance).is_ok());
+        assert!(nobara
+            .set_gamemode_state(1234, GameModeState::UltraPerformance)
+            .is_ok());
     }
 
     #[test]

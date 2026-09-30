@@ -1,9 +1,9 @@
 // POSIX Threads (pthreads) Compatibility Layer
 // Implements pthreads API for thread creation, synchronization, and management
 
-use std::sync::{Mutex, Condvar};
-use std::thread;
 use std::sync::atomic::{AtomicU32, Ordering};
+use std::sync::{Condvar, Mutex};
+use std::thread;
 
 /// pthread_t - thread identifier
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -61,7 +61,10 @@ impl PthreadMutex {
     }
 
     pub fn lock(&self) -> Result<(), String> {
-        let _guard = self.inner.lock().map_err(|e| format!("pthread_mutex_lock: {}", e))?;
+        let _guard = self
+            .inner
+            .lock()
+            .map_err(|e| format!("pthread_mutex_lock: {}", e))?;
         Ok(())
     }
 
@@ -99,8 +102,14 @@ impl PthreadCond {
     }
 
     pub fn wait(&self, mutex: &PthreadMutex) -> Result<(), String> {
-        let guard = mutex.inner.lock().map_err(|e| format!("pthread_cond_wait: {}", e))?;
-        let _guard = self.inner.wait(guard).map_err(|e| format!("pthread_cond_wait: {}", e))?;
+        let guard = mutex
+            .inner
+            .lock()
+            .map_err(|e| format!("pthread_cond_wait: {}", e))?;
+        let _guard = self
+            .inner
+            .wait(guard)
+            .map_err(|e| format!("pthread_cond_wait: {}", e))?;
         Ok(())
     }
 
@@ -136,7 +145,10 @@ impl PthreadRwlock {
 
     pub fn rdlock(&self) -> Result<(), String> {
         loop {
-            let writer = self.writer.lock().map_err(|e| format!("pthread_rwlock_rdlock: {}", e))?;
+            let writer = self
+                .writer
+                .lock()
+                .map_err(|e| format!("pthread_rwlock_rdlock: {}", e))?;
             if *writer {
                 continue;
             }
@@ -149,7 +161,10 @@ impl PthreadRwlock {
     pub fn wrlock(&self) -> Result<(), String> {
         // Simplified implementation - sets writer flag and waits for readers
         // In real implementation, would use proper synchronization
-        let _writer = self.writer.lock().map_err(|e| format!("pthread_rwlock_wrlock: {}", e))?;
+        let _writer = self
+            .writer
+            .lock()
+            .map_err(|e| format!("pthread_rwlock_wrlock: {}", e))?;
 
         // Wait for readers to finish
         while self.readers.load(Ordering::SeqCst) > 0 {
@@ -263,10 +278,7 @@ pub fn pthread_key_delete(_key: PthreadKey) -> Result<(), String> {
 }
 
 /// pthread_setspecific - set thread-specific data
-pub fn pthread_setspecific(
-    _key: PthreadKey,
-    _value: *mut (),
-) -> Result<(), String> {
+pub fn pthread_setspecific(_key: PthreadKey, _value: *mut ()) -> Result<(), String> {
     // Simplified implementation - would use thread-local storage
     Ok(())
 }
@@ -305,15 +317,22 @@ impl PthreadBarrier {
     }
 
     pub fn wait(&self) -> Result<(), String> {
-        let mut guard = self.mutex.lock().map_err(|e| format!("pthread_barrier_wait: {}", e))?;
+        let mut guard = self
+            .mutex
+            .lock()
+            .map_err(|e| format!("pthread_barrier_wait: {}", e))?;
 
         if self.count.fetch_sub(1, Ordering::SeqCst) == 1 {
             // Last thread to reach barrier
-            self.count.store(self.count.load(Ordering::SeqCst) + 1, Ordering::SeqCst);
+            self.count
+                .store(self.count.load(Ordering::SeqCst) + 1, Ordering::SeqCst);
             self.cond.notify_all();
         } else {
             while self.count.load(Ordering::SeqCst) > 0 {
-                guard = self.cond.wait(guard).map_err(|e| format!("pthread_barrier_wait: {}", e))?;
+                guard = self
+                    .cond
+                    .wait(guard)
+                    .map_err(|e| format!("pthread_barrier_wait: {}", e))?;
             }
         }
 

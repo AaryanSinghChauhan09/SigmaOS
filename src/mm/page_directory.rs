@@ -105,11 +105,17 @@ impl PagingController {
     }
 
     pub fn free_physical_frames(&self) -> usize {
-        self.physical_bitmap.iter().filter(|&&allocated| !allocated).count()
+        self.physical_bitmap
+            .iter()
+            .filter(|&&allocated| !allocated)
+            .count()
     }
 
     pub fn used_physical_frames(&self) -> usize {
-        self.physical_bitmap.iter().filter(|&&allocated| allocated).count()
+        self.physical_bitmap
+            .iter()
+            .filter(|&&allocated| allocated)
+            .count()
     }
 
     pub fn clear(&mut self) {
@@ -139,12 +145,12 @@ mod tests {
     #[test]
     fn test_map_page() {
         let mut controller = PagingController::new();
-        
+
         let frame_idx = controller.map_page(0, true).unwrap();
         assert_eq!(controller.mapped_page_count(), 1);
         assert_eq!(controller.used_physical_frames(), 1);
         assert!(controller.is_mapped(0));
-        
+
         let entry = controller.get_page_entry(0).unwrap();
         assert_eq!(entry.physical_frame_idx, frame_idx);
         assert!(entry.is_present);
@@ -154,10 +160,10 @@ mod tests {
     #[test]
     fn test_unmap_page() {
         let mut controller = PagingController::new();
-        
+
         controller.map_page(0, true).unwrap();
         assert!(controller.is_mapped(0));
-        
+
         controller.unmap_page(0).unwrap();
         assert!(!controller.is_mapped(0));
         assert_eq!(controller.mapped_page_count(), 0);
@@ -166,7 +172,7 @@ mod tests {
     #[test]
     fn test_virtual_address_out_of_bounds() {
         let mut controller = PagingController::new();
-        
+
         assert!(controller.map_page(256, true).is_err());
         assert!(controller.unmap_page(256).is_err());
     }
@@ -174,7 +180,7 @@ mod tests {
     #[test]
     fn test_double_map() {
         let mut controller = PagingController::new();
-        
+
         controller.map_page(0, true).unwrap();
         assert!(controller.map_page(0, true).is_err());
     }
@@ -182,17 +188,17 @@ mod tests {
     #[test]
     fn test_unmap_unmapped_page() {
         let mut controller = PagingController::new();
-        
+
         assert!(controller.unmap_page(0).is_err());
     }
 
     #[test]
     fn test_physical_frame_allocation() {
         let mut controller = PagingController::new();
-        
+
         let frame1 = controller.map_page(0, true).unwrap();
         let frame2 = controller.map_page(1, false).unwrap();
-        
+
         assert_ne!(frame1, frame2);
         assert_eq!(controller.used_physical_frames(), 2);
     }
@@ -200,12 +206,12 @@ mod tests {
     #[test]
     fn test_out_of_physical_memory() {
         let mut controller = PagingController::new();
-        
+
         // Allocate all physical frames
         for i in 0..MAX_PHYSICAL_FRAMES {
             assert!(controller.map_page(i, true).is_ok());
         }
-        
+
         // Should fail when out of physical memory
         assert!(controller.map_page(MAX_PHYSICAL_FRAMES, true).is_err());
     }
@@ -213,11 +219,11 @@ mod tests {
     #[test]
     fn test_writable_flag() {
         let mut controller = PagingController::new();
-        
+
         controller.map_page(0, true).unwrap();
         let entry = controller.get_page_entry(0).unwrap();
         assert!(entry.is_writable);
-        
+
         controller.unmap_page(0).unwrap();
         controller.map_page(0, false).unwrap();
         let entry = controller.get_page_entry(0).unwrap();
@@ -227,14 +233,14 @@ mod tests {
     #[test]
     fn test_clear_controller() {
         let mut controller = PagingController::new();
-        
+
         controller.map_page(0, true).unwrap();
         controller.map_page(1, false).unwrap();
-        
+
         assert_eq!(controller.mapped_page_count(), 2);
-        
+
         controller.clear();
-        
+
         assert_eq!(controller.mapped_page_count(), 0);
         assert_eq!(controller.used_physical_frames(), 0);
         assert_eq!(controller.free_physical_frames(), MAX_PHYSICAL_FRAMES);
@@ -243,12 +249,12 @@ mod tests {
     #[test]
     fn test_frame_reuse_after_unmap() {
         let mut controller = PagingController::new();
-        
+
         let frame1 = controller.map_page(0, true).unwrap();
         controller.unmap_page(0).unwrap();
-        
+
         let frame2 = controller.map_page(1, true).unwrap();
-        
+
         // Frame should be reused
         assert_eq!(frame1, frame2);
     }

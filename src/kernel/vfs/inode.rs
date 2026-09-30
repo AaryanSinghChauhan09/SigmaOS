@@ -15,9 +15,9 @@
 
 // (no_std only applicable at crate root - removed)
 
+use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
 use std::string::String;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InodeType {

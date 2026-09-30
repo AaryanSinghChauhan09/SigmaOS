@@ -146,9 +146,7 @@ impl CpuState {
     pub fn trigger_undefined_instruction_abort(&mut self) {
         self.arm_mode = ArmPrivilegeMode::Undefined;
         self.ring = CpuRing::Ring0;
-        println!(
-            "ARM: Undefined Instruction Abort vector triggered! Kernel entered panic state."
-        );
+        println!("ARM: Undefined Instruction Abort vector triggered! Kernel entered panic state.");
     }
 }
 

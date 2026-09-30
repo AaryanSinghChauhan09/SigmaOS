@@ -4,8 +4,6 @@
 #![allow(clippy::new_without_default)]
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-
-
 // SigmaOS Sovereign Traffic Control (tc) Qdiscs
 // Implements Linux Traffic Control queuing disciplines in 100% safe Rust.
 //
@@ -15,14 +13,12 @@
 //   - HFSC (Hierarchical Fair-Service Curve) — latency + bandwidth
 //   - TBF (Token Bucket Filter) — simple rate limiting
 //   - PRIO (Priority scheduler) — strict priority queues
-
-
 #[cfg(any(feature = "standalone_test", test))]
+use std::string::{String, ToString};
+#[cfg(not(any(feature = "standalone_test", test)))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::vec::Vec;
 
@@ -31,26 +27,32 @@ use std::vec::Vec;
 #[derive(Debug, Clone)]
 pub struct Packet {
     pub len: u32,
-    pub priority: u8,    // 0=highest
-    pub dscp: u8,        // Differentiated Services Code Point
+    pub priority: u8, // 0=highest
+    pub dscp: u8,     // Differentiated Services Code Point
     pub enqueue_tick: u64,
-    pub flow_id: u32,    // for per-flow fair queuing
+    pub flow_id: u32, // for per-flow fair queuing
 }
 
 impl Packet {
     pub fn new(len: u32, priority: u8, flow_id: u32, tick: u64) -> Self {
-        Packet { len, priority, dscp: priority << 2, enqueue_tick: tick, flow_id }
+        Packet {
+            len,
+            priority,
+            dscp: priority << 2,
+            enqueue_tick: tick,
+            flow_id,
+        }
     }
 }
 
 // ─── TBF — Token Bucket Filter ────────────────────────────────────────────────
 
 pub struct TbfQdisc {
-    pub rate_bps: u64,       // bytes per second
-    pub burst_bytes: u64,    // bucket capacity
-    pub tokens: u64,         // current token count (bytes)
+    pub rate_bps: u64,    // bytes per second
+    pub burst_bytes: u64, // bucket capacity
+    pub tokens: u64,      // current token count (bytes)
     pub last_refill_tick: u64,
-    pub ns_per_byte: u64,    // nanoseconds per byte at rate
+    pub ns_per_byte: u64, // nanoseconds per byte at rate
     pub enqueued: u64,
     pub dropped: u64,
     pub queue: Vec<Packet>,
@@ -59,7 +61,11 @@ pub struct TbfQdisc {
 
 impl TbfQdisc {
     pub fn new(rate_bps: u64, burst_bytes: u64, queue_limit: usize) -> Self {
-        let ns_per_byte = if rate_bps > 0 { 1_000_000_000 / rate_bps } else { 0 };
+        let ns_per_byte = if rate_bps > 0 {
+            1_000_000_000 / rate_bps
+        } else {
+            0
+        };
         TbfQdisc {
             rate_bps,
             burst_bytes,
@@ -75,9 +81,15 @@ impl TbfQdisc {
 
     /// Advance simulation clock by `ns` nanoseconds, refilling tokens.
     pub fn tick(&mut self, now_ns: u64) {
-        if now_ns <= self.last_refill_tick { return; }
+        if now_ns <= self.last_refill_tick {
+            return;
+        }
         let elapsed = now_ns - self.last_refill_tick;
-        let new_tokens = if self.ns_per_byte > 0 { elapsed / self.ns_per_byte } else { 0 };
+        let new_tokens = if self.ns_per_byte > 0 {
+            elapsed / self.ns_per_byte
+        } else {
+            0
+        };
         self.tokens = (self.tokens + new_tokens).min(self.burst_bytes);
         self.last_refill_tick = now_ns;
     }
@@ -95,7 +107,9 @@ impl TbfQdisc {
 
     /// Dequeue if tokens allow.
     pub fn dequeue(&mut self) -> Option<Packet> {
-        if self.queue.is_empty() { return None; }
+        if self.queue.is_empty() {
+            return None;
+        }
         let pkt_len = self.queue[0].len as u64;
         if self.tokens < pkt_len {
             return None; // Rate-limited — wait for tokens
@@ -105,7 +119,9 @@ impl TbfQdisc {
     }
 
     pub fn utilization_pct(&self) -> u32 {
-        if self.burst_bytes == 0 { return 0; }
+        if self.burst_bytes == 0 {
+            return 0;
+        }
         let used = self.burst_bytes - self.tokens;
         ((used * 100) / self.burst_bytes) as u32
     }
@@ -125,7 +141,13 @@ impl PrioQdisc {
     pub fn new(bands: u8) -> Self {
         let queues = (0..bands).map(|_| Vec::new()).collect();
         let per_band_count = vec![0u64; bands as usize];
-        PrioQdisc { bands, queues, enqueued: 0, dequeued: 0, per_band_count }
+        PrioQdisc {
+            bands,
+            queues,
+            enqueued: 0,
+            dequeued: 0,
+            per_band_count,
+        }
     }
 
     pub fn enqueue(&mut self, pkt: Packet) -> bool {
@@ -169,7 +191,7 @@ pub struct HtbClass {
     pub queue: Vec<Packet>,
     pub enqueued: u64,
     pub dequeued: u64,
-    pub lended: u64,   // bytes borrowed from parent
+    pub lended: u64, // bytes borrowed from parent
     pub dropped: u64,
 }
 
@@ -177,13 +199,19 @@ impl HtbClass {
     pub fn new(id: u32, parent_id: u32, rate_bps: u64, ceil_bps: u64, prio: u8) -> Self {
         let burst = rate_bps / 8; // 125ms burst
         HtbClass {
-            id, parent_id, rate_bps, ceil_bps,
+            id,
+            parent_id,
+            rate_bps,
+            ceil_bps,
             burst_bytes: burst,
             tokens: burst,
             ctokens: ceil_bps / 8,
             prio,
             queue: Vec::new(),
-            enqueued: 0, dequeued: 0, lended: 0, dropped: 0,
+            enqueued: 0,
+            dequeued: 0,
+            lended: 0,
+            dropped: 0,
         }
     }
 
@@ -206,7 +234,9 @@ impl HtbClass {
     }
 
     pub fn try_dequeue(&mut self) -> Option<Packet> {
-        if self.queue.is_empty() { return None; }
+        if self.queue.is_empty() {
+            return None;
+        }
         let len = self.queue[0].len as u64;
         if self.tokens >= len {
             // In-rate: use own tokens
@@ -234,7 +264,12 @@ pub struct HtbQdisc {
 
 impl HtbQdisc {
     pub fn new(default_class_id: u32) -> Self {
-        HtbQdisc { classes: Vec::new(), r2q: 10, default_class_id, last_tick_ns: 0 }
+        HtbQdisc {
+            classes: Vec::new(),
+            r2q: 10,
+            default_class_id,
+            last_tick_ns: 0,
+        }
     }
 
     pub fn add_class(&mut self, class: HtbClass) {
@@ -253,7 +288,9 @@ impl HtbQdisc {
         if let Some(cls) = self.classes.iter_mut().find(|c| c.id == class_id) {
             cls.enqueue_packet(pkt);
             true
-        } else { false }
+        } else {
+            false
+        }
     }
 
     /// Dequeue across all classes in priority order.
@@ -280,9 +317,9 @@ impl HtbQdisc {
 // ─── FQ-CoDel (Fair Queuing Controlled Delay) — simplified ───────────────────
 
 pub struct FqCodelQdisc {
-    pub target_delay_ns: u64,  // target queue latency (default 5ms)
-    pub interval_ns: u64,      // CoDel interval (default 100ms)
-    pub quantum: u32,          // FQ quantum in bytes
+    pub target_delay_ns: u64, // target queue latency (default 5ms)
+    pub interval_ns: u64,     // CoDel interval (default 100ms)
+    pub quantum: u32,         // FQ quantum in bytes
     pub flows: Vec<Vec<Packet>>,
     pub flow_count: usize,
     pub drop_count: u64,
@@ -294,8 +331,8 @@ impl FqCodelQdisc {
     pub fn new(flow_count: usize) -> Self {
         let flows = (0..flow_count).map(|_| Vec::new()).collect();
         FqCodelQdisc {
-            target_delay_ns: 5_000_000,    // 5ms
-            interval_ns: 100_000_000,       // 100ms
+            target_delay_ns: 5_000_000, // 5ms
+            interval_ns: 100_000_000,   // 100ms
             quantum: 1514,
             flows,
             flow_count,
@@ -306,7 +343,9 @@ impl FqCodelQdisc {
     }
 
     pub fn enqueue(&mut self, pkt: Packet) -> bool {
-        if self.flow_count == 0 { return false; }
+        if self.flow_count == 0 {
+            return false;
+        }
         let flow_idx = (pkt.flow_id as usize) % self.flow_count;
         // CoDel: if sojourn time > target, mark/drop
         // (simplified: if flow queue is deep, mark ECN)
@@ -323,7 +362,9 @@ impl FqCodelQdisc {
 
     /// Round-robin dequeue across non-empty flows.
     pub fn dequeue(&mut self) -> Option<Packet> {
-        if self.flow_count == 0 { return None; }
+        if self.flow_count == 0 {
+            return None;
+        }
         let start = self.round_robin_idx;
         for i in 0..self.flow_count {
             let idx = (start + i) % self.flow_count;
@@ -373,7 +414,7 @@ mod tests {
         prio.enqueue(Packet::new(100, 2, 1, 0)); // low priority
         prio.enqueue(Packet::new(100, 0, 2, 0)); // highest priority
         prio.enqueue(Packet::new(100, 1, 3, 0)); // medium
-        // Should dequeue highest priority first
+                                                 // Should dequeue highest priority first
         let d = prio.dequeue().unwrap();
         assert_eq!(d.priority, 0); // highest priority (band 0)
     }
@@ -394,7 +435,7 @@ mod tests {
     #[test]
     fn test_fq_codel_fair_queuing() {
         let mut fq = FqCodelQdisc::new(8); // 8 flows
-        // Send packets for two flows
+                                           // Send packets for two flows
         for i in 0..4 {
             fq.enqueue(Packet::new(100, 0, 1, i)); // flow 1
             fq.enqueue(Packet::new(100, 0, 2, i)); // flow 2

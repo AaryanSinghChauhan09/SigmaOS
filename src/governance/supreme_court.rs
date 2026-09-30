@@ -3,7 +3,6 @@
 // Implements Article I-V Judicial Chambers, Audit Inspection,
 // Rollback Safety Verification, Sandbox Policy Enforcement, and Remedy Dispatch.
 
-
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
@@ -87,7 +86,9 @@ impl SigmaSupremeCourtEngine {
         self.next_dispute_id += 1;
 
         let chamber = match category {
-            DisputeCategory::ComplianceViolation | DisputeCategory::SandboxBypass => SupremeCourtChamber::SecurityChamber,
+            DisputeCategory::ComplianceViolation | DisputeCategory::SandboxBypass => {
+                SupremeCourtChamber::SecurityChamber
+            }
             DisputeCategory::RollbackFailure => SupremeCourtChamber::FilesystemChamber,
             DisputeCategory::ModuleConflict => SupremeCourtChamber::CommunityChamber,
             DisputeCategory::UserRightsBypass => SupremeCourtChamber::KernelChamber,
@@ -111,10 +112,15 @@ impl SigmaSupremeCourtEngine {
 
     /// Article III & IV — Adjudicate dispute, run rollback/sandbox checks, and issue final binding remedy
     pub fn adjudicate_dispute(&mut self, dispute_id: u64) -> Result<JudicialRemedy, &'static str> {
-        let dispute = self.disputes.get_mut(&dispute_id).ok_or("Dispute ID not found")?;
+        let dispute = self
+            .disputes
+            .get_mut(&dispute_id)
+            .ok_or("Dispute ID not found")?;
 
         // Article III Procedural Check: Rollback Test (>= 99% success required)
-        if dispute.rollback_success_rate < 0.99 && dispute.category == DisputeCategory::RollbackFailure {
+        if dispute.rollback_success_rate < 0.99
+            && dispute.category == DisputeCategory::RollbackFailure
+        {
             let remedy = JudicialRemedy::EnforceRollback {
                 snapshot_id: format!("auto-recovery-snap-{}", dispute_id),
             };
@@ -129,21 +135,15 @@ impl SigmaSupremeCourtEngine {
                     module_name: dispute.target_module.clone(),
                 }
             }
-            DisputeCategory::UserRightsBypass => {
-                JudicialRemedy::GrantTransparencyReport {
-                    user_id: dispute.complainant.clone(),
-                }
-            }
-            DisputeCategory::ModuleConflict => {
-                JudicialRemedy::EnforceSandboxRule {
-                    rule_spec: format!("isolate_module({})", dispute.target_module),
-                }
-            }
-            DisputeCategory::RollbackFailure => {
-                JudicialRemedy::EnforceRollback {
-                    snapshot_id: "genesis-rollback-point".to_string(),
-                }
-            }
+            DisputeCategory::UserRightsBypass => JudicialRemedy::GrantTransparencyReport {
+                user_id: dispute.complainant.clone(),
+            },
+            DisputeCategory::ModuleConflict => JudicialRemedy::EnforceSandboxRule {
+                rule_spec: format!("isolate_module({})", dispute.target_module),
+            },
+            DisputeCategory::RollbackFailure => JudicialRemedy::EnforceRollback {
+                snapshot_id: "genesis-rollback-point".to_string(),
+            },
         };
 
         dispute.is_resolved = true;

@@ -13,32 +13,40 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
+use core::sync::atomic::{AtomicUsize, Ordering};
 /// OOP-based Window Manager for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 686
 /// Implements window creation, management, and composition
-
-
 use std::boxed::Box;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type WindowID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum WindowState { Normal = 0, Minimized = 1, Maximized = 2, Fullscreen = 3, Hidden = 4 }
+pub enum WindowState {
+    Normal = 0,
+    Minimized = 1,
+    Maximized = 2,
+    Fullscreen = 3,
+    Hidden = 4,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum WindowError { Success = 0, NotFound = 1, InvalidState = 2 }
+pub enum WindowError {
+    Success = 0,
+    NotFound = 1,
+    InvalidState = 2,
+}
 
 pub trait Window {
     fn id(&self) -> WindowID;
@@ -86,15 +94,25 @@ impl SimpleWindow {
 }
 
 impl Window for SimpleWindow {
-    fn id(&self) -> WindowID { self.id }
+    fn id(&self) -> WindowID {
+        self.id
+    }
     fn title(&self) -> &[u8] {
         // O(1) slice lookup using cached title_len, avoiding O(N) zero-byte linear scan (.position(|&b| b == 0))
         &self.title[..self.title_len as usize]
     }
-    fn x(&self) -> i32 { self.x.load(Ordering::SeqCst) as i32 }
-    fn y(&self) -> i32 { self.y.load(Ordering::SeqCst) as i32 }
-    fn width(&self) -> u32 { self.width.load(Ordering::SeqCst) as u32 }
-    fn height(&self) -> u32 { self.height.load(Ordering::SeqCst) as u32 }
+    fn x(&self) -> i32 {
+        self.x.load(Ordering::SeqCst) as i32
+    }
+    fn y(&self) -> i32 {
+        self.y.load(Ordering::SeqCst) as i32
+    }
+    fn width(&self) -> u32 {
+        self.width.load(Ordering::SeqCst) as u32
+    }
+    fn height(&self) -> u32 {
+        self.height.load(Ordering::SeqCst) as u32
+    }
     fn state(&self) -> WindowState {
         match self.state.load(Ordering::SeqCst) {
             0 => WindowState::Normal,
@@ -121,7 +139,14 @@ impl Window for SimpleWindow {
 }
 
 pub trait WindowManager {
-    fn create_window(&mut self, title: &[u8], x: i32, y: i32, width: u32, height: u32) -> Result<WindowID, WindowError>;
+    fn create_window(
+        &mut self,
+        title: &[u8],
+        x: i32,
+        y: i32,
+        width: u32,
+        height: u32,
+    ) -> Result<WindowID, WindowError>;
     fn destroy_window(&mut self, id: WindowID) -> Result<(), WindowError>;
     fn get_window(&self, id: WindowID) -> Option<&dyn Window>;
     fn focus_window(&mut self, id: WindowID) -> Result<(), WindowError>;
@@ -147,7 +172,14 @@ impl SimpleWindowManager {
 }
 
 impl WindowManager for SimpleWindowManager {
-    fn create_window(&mut self, title: &[u8], x: i32, y: i32, width: u32, height: u32) -> Result<WindowID, WindowError> {
+    fn create_window(
+        &mut self,
+        title: &[u8],
+        x: i32,
+        y: i32,
+        width: u32,
+        height: u32,
+    ) -> Result<WindowID, WindowError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let window = SimpleWindow::new(id, title, x, y, width, height);
         self.windows.push(Some(Box::new(window)));
@@ -168,7 +200,9 @@ impl WindowManager for SimpleWindowManager {
     fn get_window(&self, id: WindowID) -> Option<&dyn Window> {
         for window_option in &self.windows {
             if let Some(ref window) = *window_option {
-                if window.id() == id { return Some(window.as_ref()); }
+                if window.id() == id {
+                    return Some(window.as_ref());
+                }
             }
         }
         None
@@ -198,9 +232,24 @@ impl WindowManager for SimpleWindowManager {
 }
 
 pub trait WindowDecoration {
-    fn set_border(&mut self, window_id: WindowID, width: u32, color: u32) -> Result<(), WindowError>;
-    fn set_title_bar(&mut self, window_id: WindowID, height: u32, color: u32) -> Result<(), WindowError>;
-    fn set_shadow(&mut self, window_id: WindowID, enabled: bool, blur: u32) -> Result<(), WindowError>;
+    fn set_border(
+        &mut self,
+        window_id: WindowID,
+        width: u32,
+        color: u32,
+    ) -> Result<(), WindowError>;
+    fn set_title_bar(
+        &mut self,
+        window_id: WindowID,
+        height: u32,
+        color: u32,
+    ) -> Result<(), WindowError>;
+    fn set_shadow(
+        &mut self,
+        window_id: WindowID,
+        enabled: bool,
+        blur: u32,
+    ) -> Result<(), WindowError>;
 }
 
 #[repr(C)]
@@ -215,15 +264,30 @@ impl SimpleWindowDecoration {
 }
 
 impl WindowDecoration for SimpleWindowDecoration {
-    fn set_border(&mut self, _window_id: WindowID, _width: u32, _color: u32) -> Result<(), WindowError> {
+    fn set_border(
+        &mut self,
+        _window_id: WindowID,
+        _width: u32,
+        _color: u32,
+    ) -> Result<(), WindowError> {
         Ok(())
     }
 
-    fn set_title_bar(&mut self, _window_id: WindowID, _height: u32, _color: u32) -> Result<(), WindowError> {
+    fn set_title_bar(
+        &mut self,
+        _window_id: WindowID,
+        _height: u32,
+        _color: u32,
+    ) -> Result<(), WindowError> {
         Ok(())
     }
 
-    fn set_shadow(&mut self, _window_id: WindowID, _enabled: bool, _blur: u32) -> Result<(), WindowError> {
+    fn set_shadow(
+        &mut self,
+        _window_id: WindowID,
+        _enabled: bool,
+        _blur: u32,
+    ) -> Result<(), WindowError> {
         Ok(())
     }
 }
@@ -262,7 +326,9 @@ impl ZenithTilingLayout {
 
         match self.mode {
             TilingMode::HorizontalSplit => {
-                let avail_width = self.screen_width.saturating_sub(self.gap_px * (window_count as u32 + 1));
+                let avail_width = self
+                    .screen_width
+                    .saturating_sub(self.gap_px * (window_count as u32 + 1));
                 let win_width = avail_width / window_count as u32;
                 let x = self.gap_px + index as u32 * (win_width + self.gap_px);
                 let y = self.gap_px;
@@ -270,7 +336,9 @@ impl ZenithTilingLayout {
                 (x as i32, y as i32, win_width, h)
             }
             TilingMode::VerticalSplit => {
-                let avail_height = self.screen_height.saturating_sub(self.gap_px * (window_count as u32 + 1));
+                let avail_height = self
+                    .screen_height
+                    .saturating_sub(self.gap_px * (window_count as u32 + 1));
                 let win_height = avail_height / window_count as u32;
                 let y = self.gap_px + index as u32 * (win_height + self.gap_px);
                 let x = self.gap_px;
@@ -280,8 +348,16 @@ impl ZenithTilingLayout {
             TilingMode::BinarySpacePartition | TilingMode::FloatingSnap => {
                 let half_w = (self.screen_width / 2).saturating_sub(self.gap_px * 2);
                 let half_h = (self.screen_height / 2).saturating_sub(self.gap_px * 2);
-                let x = if index % 2 == 0 { self.gap_px as i32 } else { (self.screen_width / 2) as i32 + self.gap_px as i32 };
-                let y = if index < 2 { self.gap_px as i32 } else { (self.screen_height / 2) as i32 + self.gap_px as i32 };
+                let x = if index % 2 == 0 {
+                    self.gap_px as i32
+                } else {
+                    (self.screen_width / 2) as i32 + self.gap_px as i32
+                };
+                let y = if index < 2 {
+                    self.gap_px as i32
+                } else {
+                    (self.screen_height / 2) as i32 + self.gap_px as i32
+                };
                 (x, y, half_w, half_h)
             }
         }

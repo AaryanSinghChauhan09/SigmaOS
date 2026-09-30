@@ -9,7 +9,11 @@
 pub struct IndianGstCalculator;
 
 impl IndianGstCalculator {
-    pub fn calculate_gst(taxable_value_inr: f64, gst_rate_pct: f64, is_inter_state: bool) -> Result<(f64, f64, f64, f64), &'static str> {
+    pub fn calculate_gst(
+        taxable_value_inr: f64,
+        gst_rate_pct: f64,
+        is_inter_state: bool,
+    ) -> Result<(f64, f64, f64, f64), &'static str> {
         if taxable_value_inr < 0.0 || gst_rate_pct < 0.0 {
             return Err("Value and rate must be non-negative");
         }
@@ -76,12 +80,15 @@ impl IndianIncomeTaxRegimeCalculator {
 pub struct IndianTdsCalculator;
 
 impl IndianTdsCalculator {
-    pub fn calculate_tds(section_code: &str, payment_amount_inr: f64) -> Result<(f64, f64), &'static str> {
+    pub fn calculate_tds(
+        section_code: &str,
+        payment_amount_inr: f64,
+    ) -> Result<(f64, f64), &'static str> {
         let (rate_pct, threshold_inr) = match section_code {
-            "194C" => (1.0, 30_000.0),  // Contractor
-            "194J" => (10.0, 30_000.0), // Professional Fees
-            "194I" => (10.0, 240_000.0),// Rent
-            "194H" => (5.0, 15_000.0),  // Commission
+            "194C" => (1.0, 30_000.0),   // Contractor
+            "194J" => (10.0, 30_000.0),  // Professional Fees
+            "194I" => (10.0, 240_000.0), // Rent
+            "194H" => (5.0, 15_000.0),   // Commission
             _ => return Err("Unsupported TDS Section"),
         };
 
@@ -103,7 +110,10 @@ impl IndianTdsCalculator {
 pub struct IndianMspYieldCalculator;
 
 impl IndianMspYieldCalculator {
-    pub fn estimate_crop_msp_value(crop_name: &str, yield_quintals: f64) -> Result<f64, &'static str> {
+    pub fn estimate_crop_msp_value(
+        crop_name: &str,
+        yield_quintals: f64,
+    ) -> Result<f64, &'static str> {
         if yield_quintals < 0.0 {
             return Err("Yield quintals must be non-negative");
         }
@@ -126,7 +136,10 @@ impl IndianMspYieldCalculator {
 pub struct IndianMandiFeeCalculator;
 
 impl IndianMandiFeeCalculator {
-    pub fn calculate_mandi_net(sale_amount_inr: f64, state_mandi_tax_pct: f64) -> Result<(f64, f64), &'static str> {
+    pub fn calculate_mandi_net(
+        sale_amount_inr: f64,
+        state_mandi_tax_pct: f64,
+    ) -> Result<(f64, f64), &'static str> {
         if sale_amount_inr < 0.0 || state_mandi_tax_pct < 0.0 {
             return Err("Amount and tax rate must be non-negative");
         }
@@ -161,7 +174,10 @@ impl IndianConcreteGradeIs456 {
 pub struct IndianVaastuOrientationEvaluator;
 
 impl IndianVaastuOrientationEvaluator {
-    pub fn evaluate_room_vaastu(room_type: &str, facing_direction: &str) -> Result<(&'static str, &'static str), &'static str> {
+    pub fn evaluate_room_vaastu(
+        room_type: &str,
+        facing_direction: &str,
+    ) -> Result<(&'static str, &'static str), &'static str> {
         let dir = facing_direction.to_ascii_uppercase();
         match room_type.to_ascii_lowercase().as_str() {
             "kitchen" => {
@@ -170,7 +186,10 @@ impl IndianVaastuOrientationEvaluator {
                 } else if dir == "NORTHWEST" || dir == "NW" {
                     Ok(("Acceptable Secondary Choice", "good"))
                 } else {
-                    Ok(("Inauspicious: Avoid placing kitchen in North/Southwest", "avoid"))
+                    Ok((
+                        "Inauspicious: Avoid placing kitchen in North/Southwest",
+                        "avoid",
+                    ))
                 }
             }
             "master_bedroom" => {
@@ -222,13 +241,35 @@ impl IndianAyurvedaDoshaCalculator {
 pub struct IndianAyurvedicHerbalDravyaguna;
 
 impl IndianAyurvedicHerbalDravyaguna {
-    pub fn get_herb_properties(herb_name: &str) -> Result<(&'static str, &'static str, &'static str), &'static str> {
+    pub fn get_herb_properties(
+        herb_name: &str,
+    ) -> Result<(&'static str, &'static str, &'static str), &'static str> {
         match herb_name.to_ascii_lowercase().as_str() {
-            "ashwagandha" => Ok(("Tikta/Katu (Bitter/Pungent)", "Ushna (Heating)", "Vata-Kapha Hara")),
-            "tulsi" => Ok(("Katu/Tikta (Pungent/Bitter)", "Ushna (Heating)", "Kapha-Vata Hara")),
-            "triphala" | "amla" => Ok(("Kashaya/Madhura (Astringent/Sweet)", "Sheeta (Cooling)", "Tridosha Samana")),
-            "shatavari" => Ok(("Madhura/Tikta (Sweet/Bitter)", "Sheeta (Cooling)", "Pitta-Vata Hara")),
-            "turmeric" | "haldi" => Ok(("Tikta/Katu (Bitter/Pungent)", "Ushna (Heating)", "Tridoshakara")),
+            "ashwagandha" => Ok((
+                "Tikta/Katu (Bitter/Pungent)",
+                "Ushna (Heating)",
+                "Vata-Kapha Hara",
+            )),
+            "tulsi" => Ok((
+                "Katu/Tikta (Pungent/Bitter)",
+                "Ushna (Heating)",
+                "Kapha-Vata Hara",
+            )),
+            "triphala" | "amla" => Ok((
+                "Kashaya/Madhura (Astringent/Sweet)",
+                "Sheeta (Cooling)",
+                "Tridosha Samana",
+            )),
+            "shatavari" => Ok((
+                "Madhura/Tikta (Sweet/Bitter)",
+                "Sheeta (Cooling)",
+                "Pitta-Vata Hara",
+            )),
+            "turmeric" | "haldi" => Ok((
+                "Tikta/Katu (Bitter/Pungent)",
+                "Ushna (Heating)",
+                "Tridoshakara",
+            )),
             _ => Err("Herb profile not found in Dravyaguna database"),
         }
     }
@@ -248,7 +289,10 @@ impl IndianPenalCodeBnsMapper {
             304 => Ok((105, "Culpable Homicide Not Amounting to Murder")),
             420 => Ok((318, "Cheating & Dishonestly Inducing Delivery of Property")),
             376 => Ok((63, "Rape")),
-            124 => Ok((152, "Act Endangering Sovereignty, Unity and Integrity of India")),
+            124 => Ok((
+                152,
+                "Act Endangering Sovereignty, Unity and Integrity of India",
+            )),
             498 => Ok((85, "Cruelty by Husband or Relatives")),
             307 => Ok((109, "Attempt to Murder")),
             _ => Err("IPC Section mapping to BNS not found"),
@@ -260,8 +304,16 @@ impl IndianPenalCodeBnsMapper {
 pub struct IndianLegalCitationFormatter;
 
 impl IndianLegalCitationFormatter {
-    pub fn format_sc_citation(petitioner: &str, respondent: &str, air_year: u32, page: u32) -> String {
-        format!("{} v. {}, AIR {} SC {}", petitioner, respondent, air_year, page)
+    pub fn format_sc_citation(
+        petitioner: &str,
+        respondent: &str,
+        air_year: u32,
+        page: u32,
+    ) -> String {
+        format!(
+            "{} v. {}, AIR {} SC {}",
+            petitioner, respondent, air_year, page
+        )
     }
 }
 
@@ -278,14 +330,23 @@ impl IndianSchoolGradeConverter {
             return Err("Percentage must be between 0 and 100");
         }
         let cgpa = percentage / 9.5;
-        let grade = if percentage >= 91.0 { "A1" }
-        else if percentage >= 81.0 { "A2" }
-        else if percentage >= 71.0 { "B1" }
-        else if percentage >= 61.0 { "B2" }
-        else if percentage >= 51.0 { "C1" }
-        else if percentage >= 41.0 { "C2" }
-        else if percentage >= 33.0 { "D" }
-        else { "E (Needs Improvement)" };
+        let grade = if percentage >= 91.0 {
+            "A1"
+        } else if percentage >= 81.0 {
+            "A2"
+        } else if percentage >= 71.0 {
+            "B1"
+        } else if percentage >= 61.0 {
+            "B2"
+        } else if percentage >= 51.0 {
+            "C1"
+        } else if percentage >= 41.0 {
+            "C2"
+        } else if percentage >= 33.0 {
+            "D"
+        } else {
+            "E (Needs Improvement)"
+        };
 
         Ok((grade, cgpa))
     }
@@ -313,7 +374,10 @@ impl IndianHandloomKhadiCalculator {
 pub struct IndianEwayBillTollCalculator;
 
 impl IndianEwayBillTollCalculator {
-    pub fn calculate_eway_bill_validity_days(distance_km: f64, is_over_dimensional_cargo: bool) -> Result<u32, &'static str> {
+    pub fn calculate_eway_bill_validity_days(
+        distance_km: f64,
+        is_over_dimensional_cargo: bool,
+    ) -> Result<u32, &'static str> {
         if distance_km <= 0.0 {
             return Err("Distance must be strictly positive");
         }
@@ -342,7 +406,8 @@ mod tests {
 
     #[test]
     fn test_indian_gst_calculator() {
-        let (cgst, sgst, igst, total) = IndianGstCalculator::calculate_gst(1000.0, 18.0, false).unwrap();
+        let (cgst, sgst, igst, total) =
+            IndianGstCalculator::calculate_gst(1000.0, 18.0, false).unwrap();
         assert_eq!(cgst, 90.0);
         assert_eq!(sgst, 90.0);
         assert_eq!(igst, 0.0);
@@ -389,21 +454,27 @@ mod tests {
 
     #[test]
     fn test_vaastu_evaluator() {
-        let (eval, status) = IndianVaastuOrientationEvaluator::evaluate_room_vaastu("kitchen", "SE").unwrap();
+        let (eval, status) =
+            IndianVaastuOrientationEvaluator::evaluate_room_vaastu("kitchen", "SE").unwrap();
         assert_eq!(status, "ideal");
         assert!(eval.contains("Agneya"));
     }
 
     #[test]
     fn test_ayurveda_dosha() {
-        let score = DoshaScore { vata: 10, pitta: 5, kapha: 2 };
+        let score = DoshaScore {
+            vata: 10,
+            pitta: 5,
+            kapha: 2,
+        };
         let res = IndianAyurvedaDoshaCalculator::dominant_prakriti(score);
         assert!(res.contains("Vata Predominant"));
     }
 
     #[test]
     fn test_dravyaguna_herbs() {
-        let (rasa, virya, _) = IndianAyurvedicHerbalDravyaguna::get_herb_properties("ashwagandha").unwrap();
+        let (rasa, virya, _) =
+            IndianAyurvedicHerbalDravyaguna::get_herb_properties("ashwagandha").unwrap();
         assert!(rasa.contains("Bitter"));
         assert_eq!(virya, "Ushna (Heating)");
     }
@@ -417,7 +488,12 @@ mod tests {
 
     #[test]
     fn test_citation_formatter() {
-        let cit = IndianLegalCitationFormatter::format_sc_citation("Kesavananda Bharati", "State of Kerala", 1973, 1461);
+        let cit = IndianLegalCitationFormatter::format_sc_citation(
+            "Kesavananda Bharati",
+            "State of Kerala",
+            1973,
+            1461,
+        );
         assert!(cit.contains("AIR 1973 SC 1461"));
     }
 
@@ -436,7 +512,8 @@ mod tests {
 
     #[test]
     fn test_eway_bill_validity() {
-        let days = IndianEwayBillTollCalculator::calculate_eway_bill_validity_days(350.0, false).unwrap();
+        let days =
+            IndianEwayBillTollCalculator::calculate_eway_bill_validity_days(350.0, false).unwrap();
         assert_eq!(days, 2);
         assert_eq!(MasterIndianProfessionToolsSuite::total_tools_count(), 14);
     }

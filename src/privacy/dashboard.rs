@@ -1,12 +1,11 @@
 /// OOP-based Privacy Dashboard and Self-Healing system for SigmaOS
 /// Implements transparent privacy management, telemetry, and automated self-healing.
 /// Inspired by Windows PC Reset, iOS Privacy Prompts, and BSD minimalism.
-
 use std::boxed::Box;
 
+use core::mem;
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// Permission ID
 pub type PermissionID = usize;
@@ -110,7 +109,12 @@ pub struct SimplePermission {
 }
 
 impl SimplePermission {
-    pub fn new(id: PermissionID, name: &[u8], category: &[u8], capability: PermissionCapability) -> Self {
+    pub fn new(
+        id: PermissionID,
+        name: &[u8],
+        category: &[u8],
+        capability: PermissionCapability,
+    ) -> Self {
         let mut name_array = [0u8; 64];
         let mut category_array = [0u8; 64];
 
@@ -119,7 +123,11 @@ impl SimplePermission {
 
         unsafe {
             core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
-            core::ptr::copy_nonoverlapping(category.as_ptr(), category_array.as_mut_ptr(), category_len);
+            core::ptr::copy_nonoverlapping(
+                category.as_ptr(),
+                category_array.as_mut_ptr(),
+                category_len,
+            );
         }
 
         SimplePermission {
@@ -198,7 +206,10 @@ impl Permission for SimplePermission {
 /// Privacy dashboard trait (OOP interface)
 pub trait PrivacyDashboard {
     /// Register permission
-    fn register_permission(&mut self, permission: Box<dyn Permission>) -> Result<PermissionID, PrivacyError>;
+    fn register_permission(
+        &mut self,
+        permission: Box<dyn Permission>,
+    ) -> Result<PermissionID, PrivacyError>;
     /// Unregister permission
     fn unregister_permission(&mut self, id: PermissionID) -> Result<(), PrivacyError>;
     /// Grant permission
@@ -295,7 +306,10 @@ impl SimplePrivacyDashboard {
 }
 
 impl PrivacyDashboard for SimplePrivacyDashboard {
-    fn register_permission(&mut self, permission: Box<dyn Permission>) -> Result<PermissionID, PrivacyError> {
+    fn register_permission(
+        &mut self,
+        permission: Box<dyn Permission>,
+    ) -> Result<PermissionID, PrivacyError> {
         if !self.capability.can_register {
             return Err(PrivacyError::PermissionDenied);
         }
@@ -473,7 +487,11 @@ impl Default for TelemetryDashboard {
 // 2. Self-Healing Configuration & Rollback Manager (Windows PC Reset Parity)
 // ==============================================================================
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ConfigState { Valid, Corrupted, Repaired }
+pub enum ConfigState {
+    Valid,
+    Corrupted,
+    Repaired,
+}
 
 pub struct SelfHealingManager {
     pub config_status: ConfigState,
@@ -517,13 +535,25 @@ impl Default for SelfHealingManager {
 // ==============================================================================
 // Vec Implementation
 // ==============================================================================
-pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+pub struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    pub fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     pub fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -540,19 +570,31 @@ impl<T> Vec<T> {
             item
         }
     }
-    pub fn len(&self) -> usize { self.len }
-    pub fn is_empty(&self) -> bool { self.len == 0 }
+    pub fn len(&self) -> usize {
+        self.len
+    }
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
     pub fn clear(&mut self) {
         while self.len > 0 {
             self.remove(0);
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
@@ -564,7 +606,6 @@ extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
 }
-
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -596,7 +637,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;

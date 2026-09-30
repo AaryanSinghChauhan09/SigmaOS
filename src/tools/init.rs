@@ -1,9 +1,6 @@
 //! Init System (systemd/OpenRC Inspiration)
 //! Service management, target units, and dependency resolution
 
-
-
-
 /// Service state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ServiceState {
@@ -179,7 +176,7 @@ impl InitSystem {
         if self.services.iter().any(|s| s.name == name) {
             // Resolve dependencies
             self.resolve_dependencies(name)?;
-            
+
             // Start service
             if let Some(service) = self.get_service(name) {
                 service.state = ServiceState::Activating;
@@ -236,11 +233,17 @@ impl InitSystem {
     }
 
     pub fn get_running_services(&self) -> Vec<&ServiceUnit> {
-        self.services.iter().filter(|s| s.state == ServiceState::Active).collect()
+        self.services
+            .iter()
+            .filter(|s| s.state == ServiceState::Active)
+            .collect()
     }
 
     pub fn get_failed_services(&self) -> Vec<&ServiceUnit> {
-        self.services.iter().filter(|s| s.state == ServiceState::Failed).collect()
+        self.services
+            .iter()
+            .filter(|s| s.state == ServiceState::Failed)
+            .collect()
     }
 }
 

@@ -264,7 +264,9 @@ impl BoltAutonomousAgent {
         self.cycle_count += 1;
 
         // Step 1: Auto-tune power profile
-        let power_source = self.power_automation.auto_tune_profile(is_charging, battery_pct);
+        let power_source = self
+            .power_automation
+            .auto_tune_profile(is_charging, battery_pct);
 
         // Step 2: Evaluate thermal state
         let thermal_state = self.thermal_governor.evaluate_thermal_state(temp_celsius);
@@ -333,10 +335,16 @@ mod tests {
         assert_eq!(thermal.evaluate_thermal_state(45.0), ThermalState::Normal);
         assert_eq!(thermal.rapl_package_limit_watts, 45.0);
 
-        assert_eq!(thermal.evaluate_thermal_state(88.0), ThermalState::ActiveThrottling);
+        assert_eq!(
+            thermal.evaluate_thermal_state(88.0),
+            ThermalState::ActiveThrottling
+        );
         assert_eq!(thermal.rapl_package_limit_watts, 25.0);
 
-        assert_eq!(thermal.evaluate_thermal_state(95.0), ThermalState::HotThrottling);
+        assert_eq!(
+            thermal.evaluate_thermal_state(95.0),
+            ThermalState::HotThrottling
+        );
         assert_eq!(thermal.rapl_package_limit_watts, 15.0);
     }
 
@@ -350,7 +358,10 @@ mod tests {
         assert_eq!(power.display_refresh_hz, 90);
         assert!(power.pcie_aspm_l1_enabled);
 
-        assert_eq!(power.auto_tune_profile(false, 10), PowerSource::LowBatteryCrisis);
+        assert_eq!(
+            power.auto_tune_profile(false, 10),
+            PowerSource::LowBatteryCrisis
+        );
         assert_eq!(power.display_refresh_hz, 60);
         assert_eq!(power.dirty_writeback_secs, 30);
     }

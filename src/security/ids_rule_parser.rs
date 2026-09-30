@@ -3,11 +3,9 @@
 // Advanced rule-based intrusion detection system with Snort/Suricata-style syntax
 // Solves BUG-011: IDS Rule Parser not implemented
 
-
-
+use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::collections::BTreeMap;
 
 /// Rule action types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -34,7 +32,7 @@ pub enum RuleProtocol {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RuleDirection {
     SourceToDestination, // ->
-    Bidirectional,      // <>
+    Bidirectional,       // <>
     DestinationToSource, // <-
 }
 
@@ -91,18 +89,18 @@ impl IdsRuleParser {
     /// Parse a single IDS rule
     pub fn parse_rule(&self, rule_str: &str) -> Result<IdsRule, ParseError> {
         let parts: Vec<&str> = rule_str.split_whitespace().collect();
-        
+
         if parts.len() < 5 {
             return Err(ParseError::InvalidSyntax("Rule too short".to_string()));
         }
 
         let action = self.parse_action(parts[0])?;
         let protocol = self.parse_protocol(parts[1])?;
-        
+
         let (source_addr, source_port) = self.parse_address_port(parts[2])?;
         let direction = self.parse_direction(parts[3])?;
         let (dest_addr, dest_port) = self.parse_address_port(parts[4])?;
-        
+
         let options = if parts.len() > 5 {
             self.parse_options(&parts[5..])?
         } else {
@@ -156,7 +154,7 @@ impl IdsRuleParser {
 
     fn parse_address_port(&self, addr_port: &str) -> Result<(RuleAddress, RulePort), ParseError> {
         let parts: Vec<&str> = addr_port.rsplitn(2, ':').collect();
-        
+
         if parts.len() != 2 {
             return Err(ParseError::InvalidAddressPort(addr_port.to_string()));
         }
@@ -205,10 +203,9 @@ impl IdsRuleParser {
         if port_str.contains(':') {
             let range_parts: Vec<&str> = port_str.split(':').collect();
             if range_parts.len() == 2 {
-                if let (Ok(start), Ok(end)) = (
-                    range_parts[0].parse::<u16>(),
-                    range_parts[1].parse::<u16>()
-                ) {
+                if let (Ok(start), Ok(end)) =
+                    (range_parts[0].parse::<u16>(), range_parts[1].parse::<u16>())
+                {
                     return Ok(RulePort::Range(start, end));
                 }
             }
@@ -223,10 +220,10 @@ impl IdsRuleParser {
 
     fn parse_options(&self, option_strs: &[&str]) -> Result<Vec<RuleOption>, ParseError> {
         let mut options = Vec::new();
-        
+
         for opt_str in option_strs {
             let parts: Vec<&str> = opt_str.split(';').collect();
-            
+
             for part in parts {
                 let kv: Vec<&str> = part.splitn(2, ':').collect();
                 if kv.len() == 2 {
@@ -255,13 +252,13 @@ impl IdsRuleParser {
     /// Parse multiple rules from a string
     pub fn parse_rules(&self, rules_text: &str) -> Result<Vec<IdsRule>, ParseError> {
         let mut rules = Vec::new();
-        
+
         for line in rules_text.lines() {
             let line = line.trim();
             if line.is_empty() || line.starts_with('#') {
                 continue;
             }
-            
+
             match self.parse_rule(line) {
                 Ok(rule) => rules.push(rule),
                 Err(e) => return Err(e),
@@ -323,12 +320,14 @@ impl RuleMatcher {
     }
 
     /// Match a packet against loaded rules
-    pub fn match_packet(&self, 
-        src_ip: &str, 
-        src_port: u16, 
-        dst_ip: &str, 
-        dst_port: u16, 
-        protocol: RuleProtocol) -> Vec<&IdsRule> {
+    pub fn match_packet(
+        &self,
+        src_ip: &str,
+        src_port: u16,
+        dst_ip: &str,
+        dst_port: u16,
+        protocol: RuleProtocol,
+    ) -> Vec<&IdsRule> {
         let mut matched_rules = Vec::new();
 
         for rule in &self.rules {
@@ -340,7 +339,8 @@ impl RuleMatcher {
         matched_rules
     }
 
-    fn rule_matches(&self,
+    fn rule_matches(
+        &self,
         rule: &IdsRule,
         src_ip: &str,
         src_port: u16,
@@ -413,8 +413,10 @@ mod tests {
     #[test]
     fn test_parse_simple_rule() {
         let parser = IdsRuleParser::new();
-        let rule = parser.parse_rule("alert tcp any any -> 192.168.1.1 80").unwrap();
-        
+        let rule = parser
+            .parse_rule("alert tcp any any -> 192.168.1.1 80")
+            .unwrap();
+
         assert_eq!(rule.action, RuleAction::Alert);
         assert_eq!(rule.protocol, RuleProtocol::Tcp);
         assert_eq!(rule.direction, RuleDirection::SourceToDestination);
@@ -423,10 +425,12 @@ mod tests {
     #[test]
     fn test_parse_rule_with_options() {
         let parser = IdsRuleParser::new();
-        let rule = parser.parse_rule(
-            "alert tcp any any -> any 80 (msg:\"HTTP traffic detected\";sid:1000001;rev:1)"
-        ).unwrap();
-        
+        let rule = parser
+            .parse_rule(
+                "alert tcp any any -> any 80 (msg:\"HTTP traffic detected\";sid:1000001;rev:1)",
+            )
+            .unwrap();
+
         assert_eq!(rule.options.len(), 3);
         assert_eq!(rule.options[0].name, "msg");
         assert_eq!(rule.options[1].name, "sid");
@@ -436,8 +440,10 @@ mod tests {
     #[test]
     fn test_parse_cidr_address() {
         let parser = IdsRuleParser::new();
-        let rule = parser.parse_rule("alert tcp 192.168.0.0/24 any -> any any").unwrap();
-        
+        let rule = parser
+            .parse_rule("alert tcp 192.168.0.0/24 any -> any any")
+            .unwrap();
+
         match rule.source_address {
             RuleAddress::Network(addr, mask) => {
                 assert_eq!(addr, "192.168.0.0");
@@ -450,8 +456,10 @@ mod tests {
     #[test]
     fn test_parse_port_range() {
         let parser = IdsRuleParser::new();
-        let rule = parser.parse_rule("alert tcp any 1024:65535 -> any 80").unwrap();
-        
+        let rule = parser
+            .parse_rule("alert tcp any 1024:65535 -> any 80")
+            .unwrap();
+
         match rule.source_port {
             RulePort::Range(start, end) => {
                 assert_eq!(start, 1024);
@@ -464,15 +472,18 @@ mod tests {
     #[test]
     fn test_rule_matcher() {
         let parser = IdsRuleParser::new();
-        let rule = parser.parse_rule("alert tcp any any -> 192.168.1.1 80").unwrap();
-        
+        let rule = parser
+            .parse_rule("alert tcp any any -> 192.168.1.1 80")
+            .unwrap();
+
         let mut matcher = RuleMatcher::new();
         matcher.add_rule(rule);
-        
+
         let matched = matcher.match_packet("10.0.0.1", 12345, "192.168.1.1", 80, RuleProtocol::Tcp);
         assert_eq!(matched.len(), 1);
-        
-        let not_matched = matcher.match_packet("10.0.0.1", 12345, "192.168.1.1", 443, RuleProtocol::Tcp);
+
+        let not_matched =
+            matcher.match_packet("10.0.0.1", 12345, "192.168.1.1", 443, RuleProtocol::Tcp);
         assert_eq!(not_matched.len(), 0);
     }
 
@@ -486,7 +497,7 @@ mod tests {
             # This is a comment
             alert ip any any -> 10.0.0.0/8 any
         "#;
-        
+
         let rules = parser.parse_rules(rules_text).unwrap();
         assert_eq!(rules.len(), 4);
     }
@@ -494,8 +505,10 @@ mod tests {
     #[test]
     fn test_bidirectional_rule() {
         let parser = IdsRuleParser::new();
-        let rule = parser.parse_rule("alert tcp 192.168.1.1 80 <> 10.0.0.1 12345").unwrap();
-        
+        let rule = parser
+            .parse_rule("alert tcp 192.168.1.1 80 <> 10.0.0.1 12345")
+            .unwrap();
+
         assert_eq!(rule.direction, RuleDirection::Bidirectional);
     }
 

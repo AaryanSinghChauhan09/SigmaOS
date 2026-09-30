@@ -1,13 +1,12 @@
 /// Retro 15-pin Gameport and Analog Joystick Driver Subsystem for SigmaOS
 /// Re-implements high-fidelity analog coordinate and MIDI support dropped by modern competitors.
-
-use crate::drivers::peripheral::{PeripheralDevice, DeviceGeneration, PowerState};
+use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct RetroJoystickState {
-    pub x_axis: i8,       // -128 (left) to 127 (right)
-    pub y_axis: i8,       // -128 (up) to 127 (down)
-    pub buttons: u8,      // Bitmask for up to 4 analog buttons
+    pub x_axis: i8,  // -128 (left) to 127 (right)
+    pub y_axis: i8,  // -128 (up) to 127 (down)
+    pub buttons: u8, // Bitmask for up to 4 analog buttons
 }
 
 /// Simulates a legacy ISA 15-pin Gameport hardware interface (IBM PC standard)
@@ -28,7 +27,11 @@ impl RetroGameportDevice {
     pub fn new() -> Self {
         RetroGameportDevice {
             power_state: PowerState::On,
-            state: RetroJoystickState { x_axis: 0, y_axis: 0, buttons: 0 },
+            state: RetroJoystickState {
+                x_axis: 0,
+                y_axis: 0,
+                buttons: 0,
+            },
             calibration_offset: 0,
         }
     }
@@ -65,7 +68,11 @@ impl PeripheralDevice for RetroGameportDevice {
 
     fn initialize(&mut self) -> Result<(), &'static str> {
         self.power_state = PowerState::On;
-        self.state = RetroJoystickState { x_axis: 0, y_axis: 0, buttons: 0 };
+        self.state = RetroJoystickState {
+            x_axis: 0,
+            y_axis: 0,
+            buttons: 0,
+        };
         Ok(())
     }
 
@@ -75,8 +82,10 @@ impl PeripheralDevice for RetroGameportDevice {
         }
 
         // Apply calibration offset to absolute axis readings
-        let adjusted_x = (self.state.x_axis as i16 + self.calibration_offset).clamp(-128, 127) as i8;
-        let adjusted_y = (self.state.y_axis as i16 + self.calibration_offset).clamp(-128, 127) as i8;
+        let adjusted_x =
+            (self.state.x_axis as i16 + self.calibration_offset).clamp(-128, 127) as i8;
+        let adjusted_y =
+            (self.state.y_axis as i16 + self.calibration_offset).clamp(-128, 127) as i8;
 
         buffer[0] = adjusted_x as u8;
         buffer[1] = adjusted_y as u8;

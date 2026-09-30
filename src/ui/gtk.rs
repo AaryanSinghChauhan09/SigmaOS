@@ -11,7 +11,6 @@
 // - OpenBSD Pledge/Unveil & FreeBSD Jail GTK Sandbox Guard (BsdGtkSandboxGuard)
 // - Master Unified GTK Toolkit Engine (SovereignGtkToolkitEngine)
 
-
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
@@ -79,7 +78,10 @@ impl GtkCssProvider {
     fn load_default_rules(&mut self) {
         self.custom_css_rules.insert(
             ".suggested-action".to_string(),
-            format!("background-color: {}; color: #ffffff; border-radius: 8px;", self.accent_color.to_hex()),
+            format!(
+                "background-color: {}; color: #ffffff; border-radius: 8px;",
+                self.accent_color.to_hex()
+            ),
         );
         self.custom_css_rules.insert(
             ".destructive-action".to_string(),
@@ -95,7 +97,8 @@ impl GtkCssProvider {
         );
         self.custom_css_rules.insert(
             ".card".to_string(),
-            "background-color: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 12px;".to_string(),
+            "background-color: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 12px;"
+                .to_string(),
         );
     }
 
@@ -105,7 +108,8 @@ impl GtkCssProvider {
     }
 
     pub fn add_custom_rule(&mut self, selector: &str, css_declarations: &str) {
-        self.custom_css_rules.insert(selector.to_string(), css_declarations.to_string());
+        self.custom_css_rules
+            .insert(selector.to_string(), css_declarations.to_string());
     }
 
     pub fn get_style_for_selector(&self, selector: &str) -> Option<&String> {
@@ -158,7 +162,14 @@ impl GtkHeaderBar {
         self.subtitle = Some(subtitle.to_string());
     }
 
-    pub fn add_action(&mut self, id: &str, icon_name: &str, tooltip: &str, is_suggested: bool, pack_start: bool) {
+    pub fn add_action(
+        &mut self,
+        id: &str,
+        icon_name: &str,
+        tooltip: &str,
+        is_suggested: bool,
+        pack_start: bool,
+    ) {
         self.actions.push(HeaderBarAction {
             id: id.to_string(),
             icon_name: icon_name.to_string(),
@@ -175,7 +186,13 @@ impl GtkHeaderBar {
             WindowControlLayout::CloseOnly => "[ X ]",
         };
         let subtitle_str = self.subtitle.as_deref().unwrap_or("");
-        format!("HeaderBar: '{}' ({}) | Controls: {} | Actions: {}", self.title, subtitle_str, controls, self.actions.len())
+        format!(
+            "HeaderBar: '{}' ({}) | Controls: {} | Actions: {}",
+            self.title,
+            subtitle_str,
+            controls,
+            self.actions.len()
+        )
     }
 }
 
@@ -295,7 +312,11 @@ impl AdwPreferencesEngine {
     }
 
     pub fn total_settings_count(&self) -> usize {
-        self.pages.iter().flat_map(|p| p.groups.iter()).map(|g| g.rows.len()).sum()
+        self.pages
+            .iter()
+            .flat_map(|p| p.groups.iter())
+            .map(|g| g.rows.len())
+            .sum()
     }
 
     pub fn search_rows(&self, query: &str) -> Vec<&AdwPreferenceRow> {
@@ -626,12 +647,17 @@ impl BsdGtkSandboxGuard {
     }
 
     pub fn unveil_path(&mut self, path: &str, permissions: &str) {
-        self.unveiled_paths.push((path.to_string(), permissions.to_string()));
+        self.unveiled_paths
+            .push((path.to_string(), permissions.to_string()));
     }
 
     pub fn apply_pledge_sandbox(&mut self) -> Result<(), &'static str> {
         // Enforce standard GTK asset directory unveiled access
-        if !self.unveiled_paths.iter().any(|(p, _)| p == "/usr/share/themes") {
+        if !self
+            .unveiled_paths
+            .iter()
+            .any(|(p, _)| p == "/usr/share/themes")
+        {
             self.unveil_path("/usr/share/themes", "r");
             self.unveil_path("/usr/share/icons", "r");
             self.unveil_path("/usr/share/fonts", "r");
@@ -684,8 +710,16 @@ impl SovereignGtkToolkitEngine {
         };
 
         // Standard default GTK application setup
-        engine.header_bar.add_action("btn_search", "system-search-symbolic", "Search", false, false);
-        engine.header_bar.add_action("btn_menu", "open-menu-symbolic", "Main Menu", false, false);
+        engine.header_bar.add_action(
+            "btn_search",
+            "system-search-symbolic",
+            "Search",
+            false,
+            false,
+        );
+        engine
+            .header_bar
+            .add_action("btn_menu", "open-menu-symbolic", "Main Menu", false, false);
 
         engine.status_icon_manager.register_status_icon(
             "app_status_tray",
@@ -720,14 +754,22 @@ mod tests {
     fn test_gtk_css_provider() {
         let mut provider = GtkCssProvider::new("Yaru-Dark");
         assert_eq!(provider.active_theme, "Yaru-Dark");
-        assert!(provider.get_style_for_selector(".suggested-action").is_some());
+        assert!(provider
+            .get_style_for_selector(".suggested-action")
+            .is_some());
 
         provider.set_accent_color(GtkAccentColor::Orange);
         assert_eq!(provider.accent_color, GtkAccentColor::Orange);
-        assert!(provider.get_style_for_selector(".suggested-action").unwrap().contains("#e66100"));
+        assert!(provider
+            .get_style_for_selector(".suggested-action")
+            .unwrap()
+            .contains("#e66100"));
 
         provider.add_custom_rule(".my-button", "padding: 10px;");
-        assert_eq!(provider.get_style_for_selector(".my-button").unwrap(), "padding: 10px;");
+        assert_eq!(
+            provider.get_style_for_selector(".my-button").unwrap(),
+            "padding: 10px;"
+        );
     }
 
     #[test]
@@ -786,7 +828,12 @@ mod tests {
     #[test]
     fn test_xapp_status_icon_manager() {
         let mut manager = XAppStatusIconManager::new();
-        manager.register_status_icon("mail_app", "Email Client", "mail-unread-symbolic", "3 new emails");
+        manager.register_status_icon(
+            "mail_app",
+            "Email Client",
+            "mail-unread-symbolic",
+            "3 new emails",
+        );
 
         assert!(manager.update_badge("mail_app", 3));
         assert!(manager.add_menu_item("mail_app", "Check Mail"));
@@ -811,7 +858,8 @@ mod tests {
 
     #[test]
     fn test_adw_banner_and_view_switcher() {
-        let mut banner = AdwBanner::new("Updates available", AdwBannerSeverity::Info).with_button("Restart");
+        let mut banner =
+            AdwBanner::new("Updates available", AdwBannerSeverity::Info).with_button("Restart");
         assert!(banner.revealed);
         assert_eq!(banner.severity, AdwBannerSeverity::Info);
         banner.dismiss();

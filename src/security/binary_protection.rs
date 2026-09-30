@@ -1,11 +1,11 @@
 // SigmaOS Linux / ELF Binary Protection Parity Subsystem
 // Stack Canaries (SSP), ASLR, NX/DEP, Full/Partial RELRO, PIE, and CFI Validation
 
+use std::collections::BTreeMap;
+use std::format;
 use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;
-use std::format;
-use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RelroMode {
@@ -69,7 +69,10 @@ impl BinaryProtectionManager {
     }
 
     fn generate_random_64(&mut self) -> u64 {
-        self.next_entropy = self.next_entropy.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+        self.next_entropy = self
+            .next_entropy
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1442695040888963407);
         self.next_entropy
     }
 
@@ -170,7 +173,9 @@ mod tests {
         assert!(manager.verify_canary(thread_id, canary).is_ok());
 
         // Corrupted canary check
-        assert!(manager.verify_canary(thread_id, canary ^ 0xDEADBEEF).is_err());
+        assert!(manager
+            .verify_canary(thread_id, canary ^ 0xDEADBEEF)
+            .is_err());
 
         // 2. ASLR Offset Randomization
         let aslr1 = manager.generate_aslr_offsets(10);

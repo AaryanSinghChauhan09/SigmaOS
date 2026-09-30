@@ -61,7 +61,10 @@ impl ItsFossTimeshiftBackupEngine {
 
     pub fn rollback_to_snapshot(&self, id: u64) -> Result<String, &'static str> {
         if let Some(snap) = self.snapshots.iter().find(|s| s.id == id) {
-            Ok(format!("TIMESHIFT_ROLLBACK: Reverted system root to snapshot '{}' ({:?})", snap.name, snap.mode))
+            Ok(format!(
+                "TIMESHIFT_ROLLBACK: Reverted system root to snapshot '{}' ({:?})",
+                snap.name, snap.mode
+            ))
         } else {
             Err("TIMESHIFT_ROLLBACK: Snapshot ID not found")
         }
@@ -183,7 +186,10 @@ impl ItsFossZorinAppAppearanceEngine {
 
     pub fn switch_layout(&mut self, preset: DesktopLayoutPreset) -> String {
         self.current_preset = preset;
-        format!("ZORIN_APPEARANCE: Switched Zenith desktop layout to {:?}", preset)
+        format!(
+            "ZORIN_APPEARANCE: Switched Zenith desktop layout to {:?}",
+            preset
+        )
     }
 
     pub fn set_accent_color(&mut self, color_hex: &str) {
@@ -234,14 +240,19 @@ impl ItsFossPantheonAppCenterEngine {
             },
         ];
 
-        Self { curated_apps: sample_apps }
+        Self {
+            curated_apps: sample_apps,
+        }
     }
 
     pub fn search_apps(&self, query: &str) -> Vec<CuratedAppEntry> {
         let q_lower = query.to_lowercase();
         self.curated_apps
             .iter()
-            .filter(|app| app.name.to_lowercase().contains(&q_lower) || app.summary.to_lowercase().contains(&q_lower))
+            .filter(|app| {
+                app.name.to_lowercase().contains(&q_lower)
+                    || app.summary.to_lowercase().contains(&q_lower)
+            })
             .cloned()
             .collect()
     }
@@ -355,7 +366,9 @@ impl SovereignItsFossInnovationsSuite {
 
     pub fn synthesize_and_verify_all(&mut self) -> bool {
         // Verify Timeshift
-        let snap_id = self.timeshift.create_snapshot("pre-update", 1700000000, true);
+        let snap_id = self
+            .timeshift
+            .create_snapshot("pre-update", 1700000000, true);
         let timeshift_ok = self.timeshift.rollback_to_snapshot(snap_id).is_ok();
 
         // Verify Tiling WM
@@ -364,7 +377,9 @@ impl SovereignItsFossInnovationsSuite {
         let wm_ok = self.tiling_wm.get_window_count() == 2;
 
         // Verify Zorin Appearance
-        let layout_msg = self.zorin_appearance.switch_layout(DesktopLayoutPreset::MacOsDock);
+        let layout_msg = self
+            .zorin_appearance
+            .switch_layout(DesktopLayoutPreset::MacOsDock);
         let zorin_ok = layout_msg.contains("MacOsDock");
 
         // Verify AppCenter

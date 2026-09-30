@@ -4,8 +4,8 @@
 
 #![allow(dead_code)]
 
-use std::sync::atomic::{AtomicU64, AtomicU32, Ordering};
 use std::collections::VecDeque;
+use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 
 /// RCU epoch type
 pub type RcuEpoch = u64;
@@ -87,10 +87,10 @@ impl RcuSubsystem {
     pub fn register_callback(&mut self, callback: RcuCallback, user_data: u64) -> u64 {
         let id = self.next_callback_id.fetch_add(1, Ordering::SeqCst);
         let epoch = self.current_epoch.load(Ordering::SeqCst);
-        
+
         let desc = RcuCallbackDescriptor::new(id, callback, user_data, epoch);
         self.pending_callbacks.push_back(desc);
-        
+
         id
     }
 
@@ -98,10 +98,11 @@ impl RcuSubsystem {
     pub fn synchronize_rcu(&mut self) -> GracePeriodId {
         let gp_id = self.grace_period_id.fetch_add(1, Ordering::SeqCst);
         let epoch = self.current_epoch.load(Ordering::SeqCst);
-        
+
         self.grace_period_start.store(epoch, Ordering::SeqCst);
-        self.state.store(RcuState::InGracePeriod as u32, Ordering::SeqCst);
-        
+        self.state
+            .store(RcuState::InGracePeriod as u32, Ordering::SeqCst);
+
         gp_id
     }
 
@@ -110,7 +111,7 @@ impl RcuSubsystem {
         let readers = self.readers_count.load(Ordering::SeqCst);
         let gp_start = self.grace_period_start.load(Ordering::SeqCst);
         let current = self.current_epoch.load(Ordering::SeqCst);
-        
+
         readers == 0 && (current > gp_start)
     }
 
@@ -122,24 +123,25 @@ impl RcuSubsystem {
     /// Process pending callbacks after grace period
     pub fn process_callbacks(&mut self) -> Vec<u64> {
         let mut processed = Vec::new();
-        
+
         if self.grace_period_ended() {
-            self.state.store(RcuState::Processing as u32, Ordering::SeqCst);
-            
+            self.state
+                .store(RcuState::Processing as u32, Ordering::SeqCst);
+
             while let Some(callback) = self.pending_callbacks.pop_front() {
                 let id = callback.id;
                 let user_data = callback.user_data;
-                
+
                 if let Err(_) = (callback.callback)(user_data) {
                     // Callback failed, but continue processing
                 }
-                
+
                 processed.push(id);
             }
-            
+
             self.state.store(RcuState::Idle as u32, Ordering::SeqCst);
         }
-        
+
         processed
     }
 
@@ -182,10 +184,10 @@ mod tests {
     #[test]
     fn test_rcu_read_lock_unlock() {
         let rcu = RcuSubsystem::new();
-        
+
         let epoch = rcu.read_lock();
         assert_eq!(rcu.active_reader_count(), 1);
-        
+
         rcu.read_unlock(epoch);
         assert_eq!(rcu.active_reader_count(), 0);
     }
@@ -193,10 +195,10 @@ mod tests {
     #[test]
     fn test_rcu_callback_registration() {
         let mut rcu = RcuSubsystem::new();
-        
+
         let callback: RcuCallback = |_data| Ok(());
         let id = rcu.register_callback(callback, 42);
-        
+
         assert!(id > 0);
         assert_eq!(rcu.pending_callback_count(), 1);
     }
@@ -204,7 +206,7 @@ mod tests {
     #[test]
     fn test_rcu_synchronize() {
         let mut rcu = RcuSubsystem::new();
-        
+
         let gp_id = rcu.synchronize_rcu();
         assert!(gp_id > 0);
         assert_eq!(rcu.get_state(), RcuState::InGracePeriod);
@@ -213,7 +215,7 @@ mod tests {
     #[test]
     fn test_rcu_grace_period_end() {
         let mut rcu = RcuSubsystem::new();
-        
+
         rcu.synchronize_rcu();
         // No readers, so grace period should end immediately
         assert!(rcu.grace_period_ended());
@@ -222,13 +224,13 @@ mod tests {
     #[test]
     fn test_rcu_callback_processing() {
         let mut rcu = RcuSubsystem::new();
-        
+
         let callback: RcuCallback = |_data| Ok(());
         rcu.register_callback(callback, 42);
-        
+
         rcu.synchronize_rcu();
         let processed = rcu.process_callbacks();
-        
+
         assert_eq!(processed.len(), 1);
         assert_eq!(rcu.pending_callback_count(), 0);
     }
@@ -236,11 +238,11 @@ mod tests {
     #[test]
     fn test_rcu_epoch_advancement() {
         let rcu = RcuSubsystem::new();
-        
+
         let epoch1 = rcu.get_epoch();
         rcu.advance_epoch();
         let epoch2 = rcu.get_epoch();
-        
+
         assert!(epoch2 > epoch1);
     }
 }

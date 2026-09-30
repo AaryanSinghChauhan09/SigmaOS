@@ -4,8 +4,6 @@ use std::vec;
 // Linux distro-inspired boot process and system initialization
 // Handles boot sequence, service startup, and system readiness
 
-
-
 use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
@@ -61,72 +59,77 @@ impl SystemInit {
     /// Initialize boot sequence
     pub fn initialize_boot(&mut self) -> Result<(), InitError> {
         self.update_status(BootStage::EarlyBoot, 5, "Starting early boot sequence")?;
-        
+
         // Early boot initialization
         self.early_boot_init()?;
-        
+
         // Hardware initialization
         self.update_status(BootStage::HardwareInit, 15, "Initializing hardware")?;
         self.hardware_init()?;
-        
+
         // Kernel initialization
         self.update_status(BootStage::KernelInit, 30, "Initializing kernel subsystems")?;
         self.kernel_init()?;
-        
+
         // Filesystem mounting
         self.update_status(BootStage::FilesystemMount, 50, "Mounting filesystems")?;
         self.mount_filesystems()?;
-        
+
         // Service startup
         self.update_status(BootStage::ServiceStart, 70, "Starting system services")?;
         self.start_services()?;
-        
+
         // Network initialization
         self.update_status(BootStage::NetworkInit, 85, "Initializing network")?;
         self.init_network()?;
-        
+
         // User initialization
         self.update_status(BootStage::UserInit, 95, "Initializing user space")?;
         self.init_userspace()?;
-        
+
         // Complete boot
         self.update_status(BootStage::Complete, 100, "Boot complete")?;
-        
+
         Ok(())
     }
 
     /// Early boot initialization
     fn early_boot_init(&mut self) -> Result<(), InitError> {
         // Initialize essential boot components
-        self.system_state.insert(String::from("boot_mode"), String::from("normal"));
-        self.system_state.insert(String::from("boot_timestamp"), String::from("0"));
-        
+        self.system_state
+            .insert(String::from("boot_mode"), String::from("normal"));
+        self.system_state
+            .insert(String::from("boot_timestamp"), String::from("0"));
+
         // Load boot configuration
         self.load_boot_config()?;
-        
+
         Ok(())
     }
 
     /// Hardware initialization
     fn hardware_init(&mut self) -> Result<(), InitError> {
         // Initialize hardware components
-        self.system_state.insert(String::from("cpu_initialized"), String::from("true"));
-        self.system_state.insert(String::from("memory_initialized"), String::from("true"));
-        
+        self.system_state
+            .insert(String::from("cpu_initialized"), String::from("true"));
+        self.system_state
+            .insert(String::from("memory_initialized"), String::from("true"));
+
         // Detect and initialize hardware
         self.detect_hardware()?;
-        
+
         Ok(())
     }
 
     /// Kernel initialization
     fn kernel_init(&mut self) -> Result<(), InitError> {
         // Initialize kernel subsystems
-        self.system_state.insert(String::from("kernel_ready"), String::from("true"));
-        
+        self.system_state
+            .insert(String::from("kernel_ready"), String::from("true"));
+
         // Initialize kernel modules
         self.init_kernel_modules()?;
-        
+
         Ok(())
     }
 
@@ -138,12 +141,13 @@ impl SystemInit {
         self.mount_point("dev", "/dev")?;
         self.mount_point("devpts", "/dev/pts")?;
         self.mount_point("tmpfs", "/run")?;
-        
+
         // Mount root filesystem
         self.mount_point("root", "/")?;
-        
-        self.system_state.insert(String::from("filesystems_mounted"), String::from("true"));
-        
+
+        self.system_state
+            .insert(String::from("filesystems_mounted"), String::from("true"));
+
         Ok(())
     }
 
@@ -158,36 +162,39 @@ impl SystemInit {
             "ssh",
             "cron",
         ];
-        
+
         for service in essential_services {
             self.start_service(service)?;
             self.boot_services.push(String::from(service));
         }
-        
-        self.system_state.insert(String::from("services_started"), String::from("true"));
-        
+
+        self.system_state
+            .insert(String::from("services_started"), String::from("true"));
+
         Ok(())
     }
 
     /// Initialize network
     fn init_network(&mut self) -> Result<(), InitError> {
         // Initialize network interfaces
-        self.system_state.insert(String::from("network_initialized"), String::from("true"));
-        
+        self.system_state
+            .insert(String::from("network_initialized"), String::from("true"));
+
         // Start network services
         self.start_service("networking")?;
-        
+
         Ok(())
     }
 
     /// Initialize userspace
     fn init_userspace(&mut self) -> Result<(), InitError> {
         // Initialize user space components
-        self.system_state.insert(String::from("userspace_ready"), String::from("true"));
-        
+        self.system_state
+            .insert(String::from("userspace_ready"), String::from("true"));
+
         // Start login manager
         self.start_service("display-manager")?;
-        
+
         Ok(())
     }
 
@@ -195,45 +202,42 @@ impl SystemInit {
     fn load_boot_config(&mut self) -> Result<(), InitError> {
         // In real implementation, this would read from /etc/default/sigmaos
         // For now, use default configuration
-        self.system_state.insert(String::from("default_runlevel"), String::from("5"));
-        self.system_state.insert(String::from("root_device"), String::from("/dev/sda1"));
-        
+        self.system_state
+            .insert(String::from("default_runlevel"), String::from("5"));
+        self.system_state
+            .insert(String::from("root_device"), String::from("/dev/sda1"));
+
         Ok(())
     }
 
     /// Detect hardware
     fn detect_hardware(&mut self) -> Result<(), InitError> {
         // Simulate hardware detection
-        self.system_state.insert(String::from("cpu_count"), String::from("4"));
-        self.system_state.insert(String::from("memory_mb"), String::from("8192"));
-        
+        self.system_state
+            .insert(String::from("cpu_count"), String::from("4"));
+        self.system_state
+            .insert(String::from("memory_mb"), String::from("8192"));
+
         Ok(())
     }
 
     /// Initialize kernel modules
     fn init_kernel_modules(&mut self) -> Result<(), InitError> {
         // Define essential kernel modules
-        let essential_modules = vec![
-            "ext4",
-            "vfat",
-            "btrfs",
-            "xfs",
-            "tcp",
-            "udp",
-            "ipv6",
-        ];
-        
+        let essential_modules = vec!["ext4", "vfat", "btrfs", "xfs", "tcp", "udp", "ipv6"];
+
         for module in essential_modules {
             self.load_kernel_module(module)?;
         }
-        
+
         Ok(())
     }
 
     /// Mount a filesystem
     fn mount_point(&mut self, fs_type: &str, mount_point: &str) -> Result<(), InitError> {
-        self.mount_points.insert(String::from(mount_point), String::from(fs_type));
-        
+        self.mount_points
+            .insert(String::from(mount_point), String::from(fs_type));
+
         // In real implementation, this would call mount(2)
         Ok(())
     }
@@ -251,14 +255,19 @@ impl SystemInit {
     }
 
     /// Update boot status
-    fn update_status(&mut self, stage: BootStage, progress: u8, message: &str) -> Result<(), InitError> {
+    fn update_status(
+        &mut self,
+        stage: BootStage,
+        progress: u8,
+        message: &str,
+    ) -> Result<(), InitError> {
         self.boot_status = BootStatus {
             stage,
             progress,
             message: String::from(message),
             timestamp: 0, // In real implementation, use actual timestamp
         };
-        
+
         Ok(())
     }
 
@@ -335,15 +344,30 @@ pub struct RunlevelManager {
 impl RunlevelManager {
     pub fn new() -> Self {
         let mut scripts = BTreeMap::new();
-        
+
         // Define scripts for each runlevel
         scripts.insert(0, vec![String::from("halt")]);
         scripts.insert(1, vec![String::from("single")]);
         scripts.insert(2, vec![String::from("network"), String::from("local")]);
-        scripts.insert(3, vec![String::from("network"), String::from("local"), String::from("sshd")]);
-        scripts.insert(5, vec![String::from("network"), String::from("local"), String::from("sshd"), String::from("gdm")]);
+        scripts.insert(
+            3,
+            vec![
+                String::from("network"),
+                String::from("local"),
+                String::from("sshd"),
+            ],
+        );
+        scripts.insert(
+            5,
+            vec![
+                String::from("network"),
+                String::from("local"),
+                String::from("sshd"),
+                String::from("gdm"),
+            ],
+        );
         scripts.insert(6, vec![String::from("reboot")]);
-        
+
         Self {
             current_runlevel: Runlevel::MultiUserNetwork,
             default_runlevel: Runlevel::Graphical,
@@ -354,19 +378,22 @@ impl RunlevelManager {
     /// Switch to a different runlevel
     pub fn switch_runlevel(&mut self, new_runlevel: Runlevel) -> Result<(), InitError> {
         // Stop services from current runlevel
-        if let Some(scripts) = self.runlevel_scripts.get(&self.current_runlevel.to_number()) {
+        if let Some(scripts) = self
+            .runlevel_scripts
+            .get(&self.current_runlevel.to_number())
+        {
             for script in scripts {
                 self.stop_script(script)?;
             }
         }
-        
+
         // Start services for new runlevel
         if let Some(scripts) = self.runlevel_scripts.get(&new_runlevel.to_number()) {
             for script in scripts {
                 self.start_script(script)?;
             }
         }
-        
+
         self.current_runlevel = new_runlevel;
         Ok(())
     }
@@ -404,7 +431,7 @@ mod tests {
     fn test_runlevel_management() {
         let mut manager = RunlevelManager::new();
         assert_eq!(manager.get_current_runlevel(), Runlevel::MultiUserNetwork);
-        
+
         assert!(manager.switch_runlevel(Runlevel::Graphical).is_ok());
         assert_eq!(manager.get_current_runlevel(), Runlevel::Graphical);
     }

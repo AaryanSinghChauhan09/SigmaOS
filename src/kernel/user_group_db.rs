@@ -101,12 +101,17 @@ impl UserGroupDatabase {
 
     /// Get user by username
     pub fn get_user_by_username(&self, username: &str) -> Option<&User> {
-        self.username_to_uid.get(username).and_then(|uid| self.users.get(uid))
+        self.username_to_uid
+            .get(username)
+            .and_then(|uid| self.users.get(uid))
     }
 
     /// Remove user
     pub fn remove_user(&mut self, uid: u32) -> Result<(), String> {
-        let user = self.users.remove(&uid).ok_or_else(|| format!("User {} not found", uid))?;
+        let user = self
+            .users
+            .remove(&uid)
+            .ok_or_else(|| format!("User {} not found", uid))?;
         self.username_to_uid.remove(&user.username);
         Ok(())
     }
@@ -117,7 +122,8 @@ impl UserGroupDatabase {
             return Err(format!("Group {} already exists", group.groupname));
         }
 
-        self.groupname_to_gid.insert(group.groupname.clone(), group.gid);
+        self.groupname_to_gid
+            .insert(group.groupname.clone(), group.gid);
         self.groups.insert(group.gid, group);
 
         Ok(())
@@ -130,12 +136,17 @@ impl UserGroupDatabase {
 
     /// Get group by groupname
     pub fn get_group_by_groupname(&self, groupname: &str) -> Option<&Group> {
-        self.groupname_to_gid.get(groupname).and_then(|gid| self.groups.get(gid))
+        self.groupname_to_gid
+            .get(groupname)
+            .and_then(|gid| self.groups.get(gid))
     }
 
     /// Remove group
     pub fn remove_group(&mut self, gid: u32) -> Result<(), String> {
-        let group = self.groups.remove(&gid).ok_or_else(|| format!("Group {} not found", gid))?;
+        let group = self
+            .groups
+            .remove(&gid)
+            .ok_or_else(|| format!("Group {} not found", gid))?;
         self.groupname_to_gid.remove(&group.groupname);
         Ok(())
     }
@@ -266,14 +277,26 @@ mod tests {
 
     #[test]
     fn test_user() {
-        let user = User::new(1000, "testuser".to_string(), 1000, "/home/testuser".to_string(), "/bin/bash".to_string());
+        let user = User::new(
+            1000,
+            "testuser".to_string(),
+            1000,
+            "/home/testuser".to_string(),
+            "/bin/bash".to_string(),
+        );
         assert_eq!(user.uid, 1000);
         assert_eq!(user.username, "testuser");
     }
 
     #[test]
     fn test_user_set_gecos() {
-        let mut user = User::new(1000, "testuser".to_string(), 1000, "/home/testuser".to_string(), "/bin/bash".to_string());
+        let mut user = User::new(
+            1000,
+            "testuser".to_string(),
+            1000,
+            "/home/testuser".to_string(),
+            "/bin/bash".to_string(),
+        );
         user.set_gecos("Test User".to_string());
         assert_eq!(user.gecos, "Test User");
     }
@@ -325,7 +348,13 @@ mod tests {
     #[test]
     fn test_user_group_database_add_user() {
         let mut db = UserGroupDatabase::new();
-        let user = User::new(1000, "testuser".to_string(), 1000, "/home/testuser".to_string(), "/bin/bash".to_string());
+        let user = User::new(
+            1000,
+            "testuser".to_string(),
+            1000,
+            "/home/testuser".to_string(),
+            "/bin/bash".to_string(),
+        );
 
         db.add_user(user).unwrap();
         assert_eq!(db.user_count(), 1);
@@ -334,7 +363,13 @@ mod tests {
     #[test]
     fn test_user_group_database_add_duplicate_user() {
         let mut db = UserGroupDatabase::new();
-        let user = User::new(1000, "testuser".to_string(), 1000, "/home/testuser".to_string(), "/bin/bash".to_string());
+        let user = User::new(
+            1000,
+            "testuser".to_string(),
+            1000,
+            "/home/testuser".to_string(),
+            "/bin/bash".to_string(),
+        );
 
         db.add_user(user.clone()).unwrap();
         assert!(db.add_user(user).is_err());
@@ -343,7 +378,13 @@ mod tests {
     #[test]
     fn test_user_group_database_get_user_by_uid() {
         let mut db = UserGroupDatabase::new();
-        let user = User::new(1000, "testuser".to_string(), 1000, "/home/testuser".to_string(), "/bin/bash".to_string());
+        let user = User::new(
+            1000,
+            "testuser".to_string(),
+            1000,
+            "/home/testuser".to_string(),
+            "/bin/bash".to_string(),
+        );
 
         db.add_user(user).unwrap();
         let retrieved = db.get_user_by_uid(1000).unwrap();
@@ -354,7 +395,13 @@ mod tests {
     #[test]
     fn test_user_group_database_get_user_by_username() {
         let mut db = UserGroupDatabase::new();
-        let user = User::new(1000, "testuser".to_string(), 1000, "/home/testuser".to_string(), "/bin/bash".to_string());
+        let user = User::new(
+            1000,
+            "testuser".to_string(),
+            1000,
+            "/home/testuser".to_string(),
+            "/bin/bash".to_string(),
+        );
 
         db.add_user(user).unwrap();
         let retrieved = db.get_user_by_username("testuser").unwrap();
@@ -365,7 +412,13 @@ mod tests {
     #[test]
     fn test_user_group_database_remove_user() {
         let mut db = UserGroupDatabase::new();
-        let user = User::new(1000, "testuser".to_string(), 1000, "/home/testuser".to_string(), "/bin/bash".to_string());
+        let user = User::new(
+            1000,
+            "testuser".to_string(),
+            1000,
+            "/home/testuser".to_string(),
+            "/bin/bash".to_string(),
+        );
 
         db.add_user(user).unwrap();
         db.remove_user(1000).unwrap();
@@ -386,7 +439,13 @@ mod tests {
     fn test_user_group_manager() {
         let manager = UserGroupManager::new();
 
-        let user = User::new(1000, "testuser".to_string(), 1000, "/home/testuser".to_string(), "/bin/bash".to_string());
+        let user = User::new(
+            1000,
+            "testuser".to_string(),
+            1000,
+            "/home/testuser".to_string(),
+            "/bin/bash".to_string(),
+        );
         manager.add_user(user).unwrap();
 
         assert_eq!(manager.user_count(), 1);
@@ -396,13 +455,21 @@ mod tests {
     fn test_user_group_manager_add_user_to_group() {
         let manager = UserGroupManager::new();
 
-        let user = User::new(1000, "testuser".to_string(), 1000, "/home/testuser".to_string(), "/bin/bash".to_string());
+        let user = User::new(
+            1000,
+            "testuser".to_string(),
+            1000,
+            "/home/testuser".to_string(),
+            "/bin/bash".to_string(),
+        );
         manager.add_user(user).unwrap();
 
         let group = Group::new(1000, "testgroup".to_string());
         manager.add_group(group).unwrap();
 
-        manager.add_user_to_group("testuser".to_string(), 1000).unwrap();
+        manager
+            .add_user_to_group("testuser".to_string(), 1000)
+            .unwrap();
 
         let retrieved_group = manager.get_group_by_gid(1000).unwrap();
         assert_eq!(retrieved_group.members.len(), 1);
@@ -412,13 +479,21 @@ mod tests {
     fn test_user_group_manager_remove_user_from_group() {
         let manager = UserGroupManager::new();
 
-        let user = User::new(1000, "testuser".to_string(), 1000, "/home/testuser".to_string(), "/bin/bash".to_string());
+        let user = User::new(
+            1000,
+            "testuser".to_string(),
+            1000,
+            "/home/testuser".to_string(),
+            "/bin/bash".to_string(),
+        );
         manager.add_user(user).unwrap();
 
         let group = Group::new(1000, "testgroup".to_string());
         manager.add_group(group).unwrap();
 
-        manager.add_user_to_group("testuser".to_string(), 1000).unwrap();
+        manager
+            .add_user_to_group("testuser".to_string(), 1000)
+            .unwrap();
         manager.remove_user_from_group("testuser", 1000).unwrap();
 
         let retrieved_group = manager.get_group_by_gid(1000).unwrap();

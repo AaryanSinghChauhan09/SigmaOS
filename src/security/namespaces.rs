@@ -1,7 +1,6 @@
-
-use std::vec::Vec;
-use std::string::String;
 use std::collections::BTreeMap;
+use std::string::String;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NamespaceType {

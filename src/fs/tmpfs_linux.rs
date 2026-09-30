@@ -102,7 +102,9 @@ impl Tmpfs {
     }
 
     pub fn write_file(&mut self, path: &str, data: &[u8]) -> Result<(), String> {
-        let file = self.files.get(path)
+        let file = self
+            .files
+            .get(path)
             .ok_or_else(|| format!("File not found: {}", path))?;
 
         let old_size = {
@@ -125,7 +127,9 @@ impl Tmpfs {
     }
 
     pub fn read_file(&self, path: &str) -> Result<Vec<u8>, String> {
-        let file = self.files.get(path)
+        let file = self
+            .files
+            .get(path)
             .ok_or_else(|| format!("File not found: {}", path))?;
 
         let file_guard = file.lock().unwrap();
@@ -137,7 +141,9 @@ impl Tmpfs {
     }
 
     pub fn append_file(&mut self, path: &str, data: &[u8]) -> Result<(), String> {
-        let file = self.files.get(path)
+        let file = self
+            .files
+            .get(path)
             .ok_or_else(|| format!("File not found: {}", path))?;
 
         let new_size = data.len();
@@ -155,7 +161,9 @@ impl Tmpfs {
     }
 
     pub fn delete_file(&mut self, path: &str) -> Result<(), String> {
-        let file = self.files.remove(path)
+        let file = self
+            .files
+            .remove(path)
             .ok_or_else(|| format!("File not found: {}", path))?;
 
         let size = file.lock().unwrap().size;
@@ -173,7 +181,9 @@ impl Tmpfs {
     }
 
     pub fn list_directory(&self, path: &str) -> Result<Vec<String>, String> {
-        let file = self.files.get(path)
+        let file = self
+            .files
+            .get(path)
             .ok_or_else(|| format!("Directory not found: {}", path))?;
 
         let file_guard = file.lock().unwrap();
@@ -185,7 +195,9 @@ impl Tmpfs {
     }
 
     pub fn get_file_size(&self, path: &str) -> Result<usize, String> {
-        let file = self.files.get(path)
+        let file = self
+            .files
+            .get(path)
             .ok_or_else(|| format!("File not found: {}", path))?;
 
         let file_guard = file.lock().unwrap();

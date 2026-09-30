@@ -100,7 +100,11 @@ impl ItsFossFlatpakSnapLayer {
         app.is_running = true;
         Ok(format!(
             "Launched {:?} app '{}' under runtime branch '{}' (HomeDir: {}, Net: {})",
-            app.format, app.app_id, app.runtime_branch, app.permissions.allow_home_dir, app.permissions.allow_network
+            app.format,
+            app.app_id,
+            app.runtime_branch,
+            app.permissions.allow_home_dir,
+            app.permissions.allow_network
         ))
     }
 }
@@ -253,7 +257,9 @@ impl ItsFossGuiSoftwareCenterEngine {
         let q = query.to_lowercase();
         self.catalog
             .iter()
-            .filter(|e| e.name.to_lowercase().contains(&q) || e.description.to_lowercase().contains(&q))
+            .filter(|e| {
+                e.name.to_lowercase().contains(&q) || e.description.to_lowercase().contains(&q)
+            })
             .cloned()
             .collect()
     }
@@ -266,7 +272,10 @@ impl ItsFossGuiSoftwareCenterEngine {
             .ok_or("Application not found in software center catalog")?;
 
         entry.is_installed = true;
-        Ok(format!("Successfully installed '{}' ({}) via {:?}", entry.name, entry.app_id, entry.backend_format))
+        Ok(format!(
+            "Successfully installed '{}' ({}) via {:?}",
+            entry.name, entry.app_id, entry.backend_format
+        ))
     }
 }
 
@@ -511,7 +520,9 @@ mod tests {
         assert!(layer.set_override_permission("org.mozilla.firefox", true, "--filesystem=/home"));
         let launch_res = layer.launch_app_sandbox("org.mozilla.firefox");
         assert!(launch_res.is_ok());
-        assert!(launch_res.unwrap().contains("Launched Flatpak app 'org.mozilla.firefox'"));
+        assert!(launch_res
+            .unwrap()
+            .contains("Launched Flatpak app 'org.mozilla.firefox'"));
     }
 
     #[test]
@@ -566,7 +577,11 @@ mod tests {
         assert_eq!(bdu.nodes[0].path, "/usr/lib");
 
         let mut notes = NeowritableNotetakerEngine::new();
-        notes.create_note("Kernel Notes", &["kernel", "rust"], "no_std architecture details");
+        notes.create_note(
+            "Kernel Notes",
+            &["kernel", "rust"],
+            "no_std architecture details",
+        );
         let found = notes.find_notes_by_tag("kernel");
         assert_eq!(found.len(), 1);
         assert_eq!(found[0].title, "Kernel Notes");

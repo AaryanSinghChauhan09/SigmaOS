@@ -82,13 +82,20 @@ impl SovereignAsymmetricClusteringEngine {
             }
         }
 
-        let msg = format!("Node {} elected as Asymmetric Cluster Leader for term {}", candidate_id, self.current_term);
+        let msg = format!(
+            "Node {} elected as Asymmetric Cluster Leader for term {}",
+            candidate_id, self.current_term
+        );
         self.cluster_log.push(msg);
         true
     }
 
     /// Hybrid Asymmetric PQC Payload Encryption
-    pub fn encrypt_asymmetric_envelope(&self, recipient_node_id: u32, plaintext: &[u8]) -> Result<Vec<u8>, String> {
+    pub fn encrypt_asymmetric_envelope(
+        &self,
+        recipient_node_id: u32,
+        plaintext: &[u8],
+    ) -> Result<Vec<u8>, String> {
         if let Some(node) = self.cluster_nodes.get(&recipient_node_id) {
             let mut envelope = Vec::new();
             // Prefix ML-KEM-1024 header
@@ -102,7 +109,10 @@ impl SovereignAsymmetricClusteringEngine {
             }
             Ok(envelope)
         } else {
-            Err(format!("Recipient node {} not found in cluster", recipient_node_id))
+            Err(format!(
+                "Recipient node {} not found in cluster",
+                recipient_node_id
+            ))
         }
     }
 }

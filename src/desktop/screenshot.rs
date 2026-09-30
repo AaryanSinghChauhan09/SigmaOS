@@ -13,29 +13,35 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
 /// OOP-based Screenshot Tool for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 796
 /// Implements screenshot capture and annotation
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type ScreenshotID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum CaptureMode { Fullscreen = 0, Window = 1, Region = 2 }
+pub enum CaptureMode {
+    Fullscreen = 0,
+    Window = 1,
+    Region = 2,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum ScreenshotError { Success = 0, CaptureFailed = 1 }
+pub enum ScreenshotError {
+    Success = 0,
+    CaptureFailed = 1,
+}
 
 pub trait Screenshot {
     fn id(&self) -> ScreenshotID;
@@ -72,11 +78,21 @@ impl SimpleScreenshot {
 }
 
 impl Screenshot for SimpleScreenshot {
-    fn id(&self) -> ScreenshotID { self.id }
-    fn timestamp(&self) -> u64 { self.timestamp.load(Ordering::SeqCst) as u64 }
-    fn width(&self) -> u32 { self.width.load(Ordering::SeqCst) as u32 }
-    fn height(&self) -> u32 { self.height.load(Ordering::SeqCst) as u32 }
-    fn data(&self) -> &[u8] { &self.data }
+    fn id(&self) -> ScreenshotID {
+        self.id
+    }
+    fn timestamp(&self) -> u64 {
+        self.timestamp.load(Ordering::SeqCst) as u64
+    }
+    fn width(&self) -> u32 {
+        self.width.load(Ordering::SeqCst) as u32
+    }
+    fn height(&self) -> u32 {
+        self.height.load(Ordering::SeqCst) as u32
+    }
+    fn data(&self) -> &[u8] {
+        &self.data
+    }
 }
 
 pub trait ScreenshotTool {
@@ -113,7 +129,7 @@ impl ScreenshotTool for SimpleScreenshotTool {
         self.screenshots.push(Some(Box::new(screenshot)));
         Ok(id)
     }
-    
+
     fn save(&self, id: ScreenshotID, _path: &[u8]) -> Result<(), ScreenshotError> {
         if self.get_screenshot(id).is_some() {
             Ok(())
@@ -121,11 +137,13 @@ impl ScreenshotTool for SimpleScreenshotTool {
             Err(ScreenshotError::CaptureFailed)
         }
     }
-    
+
     fn get_screenshot(&self, id: ScreenshotID) -> Option<&dyn Screenshot> {
         for screenshot_option in &self.screenshots {
             if let Some(ref screenshot) = *screenshot_option {
-                if screenshot.id() == id { return Some(screenshot.as_ref()); }
+                if screenshot.id() == id {
+                    return Some(screenshot.as_ref());
+                }
             }
         }
         None
@@ -134,7 +152,14 @@ impl ScreenshotTool for SimpleScreenshotTool {
 
 pub trait Annotation {
     fn add_text(&mut self, screenshot_id: ScreenshotID, x: u32, y: u32, text: &[u8]);
-    fn add_rectangle(&mut self, screenshot_id: ScreenshotID, x: u32, y: u32, width: u32, height: u32);
+    fn add_rectangle(
+        &mut self,
+        screenshot_id: ScreenshotID,
+        x: u32,
+        y: u32,
+        width: u32,
+        height: u32,
+    );
     fn add_arrow(&mut self, screenshot_id: ScreenshotID, x1: u32, y1: u32, x2: u32, y2: u32);
 }
 
@@ -154,25 +179,65 @@ impl SimpleAnnotation {
 
 impl Annotation for SimpleAnnotation {
     fn add_text(&mut self, screenshot_id: ScreenshotID, x: u32, y: u32, _text: &[u8]) {
-        self.annotations.push((screenshot_id, [b't', b'e', b'x', b't', 0, 0, 0, 0], x, y, 0, 0));
+        self.annotations.push((
+            screenshot_id,
+            [b't', b'e', b'x', b't', 0, 0, 0, 0],
+            x,
+            y,
+            0,
+            0,
+        ));
     }
-    
-    fn add_rectangle(&mut self, screenshot_id: ScreenshotID, x: u32, y: u32, width: u32, height: u32) {
-        self.annotations.push((screenshot_id, [b'r', b'e', b'c', b't', 0, 0, 0, 0], x, y, width, height));
+
+    fn add_rectangle(
+        &mut self,
+        screenshot_id: ScreenshotID,
+        x: u32,
+        y: u32,
+        width: u32,
+        height: u32,
+    ) {
+        self.annotations.push((
+            screenshot_id,
+            [b'r', b'e', b'c', b't', 0, 0, 0, 0],
+            x,
+            y,
+            width,
+            height,
+        ));
     }
-    
+
     fn add_arrow(&mut self, screenshot_id: ScreenshotID, x1: u32, y1: u32, x2: u32, y2: u32) {
-        self.annotations.push((screenshot_id, [b'a', b'r', b'r', b'w', 0, 0, 0, 0], x1, y1, x2, y2));
+        self.annotations.push((
+            screenshot_id,
+            [b'a', b'r', b'r', b'w', 0, 0, 0, 0],
+            x1,
+            y1,
+            x2,
+            y2,
+        ));
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -180,19 +245,29 @@ impl<T> Vec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -224,7 +299,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;

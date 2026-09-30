@@ -1,8 +1,8 @@
 // Secure Boot Chain-of-Trust Verification Engine for SigmaOS
 // Location: src/boot/secure_boot.rs
 
-use std::vec::Vec;
 use std::string::String;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SecureBootState {
@@ -53,7 +53,12 @@ impl SecureBootVerifier {
         self.dbx.push(key_id);
     }
 
-    pub fn verify_kernel_signature(&self, key_id: u64, payload_hash: &[u8; 32], signature: &[u8; 64]) -> VerificationResult {
+    pub fn verify_kernel_signature(
+        &self,
+        key_id: u64,
+        payload_hash: &[u8; 32],
+        signature: &[u8; 64],
+    ) -> VerificationResult {
         if self.state == SecureBootState::Disabled {
             return VerificationResult::Verified;
         }

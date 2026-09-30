@@ -86,7 +86,8 @@ impl IllumosSmfDependencyEngine {
 
     pub fn register_service(&mut self, manifest: SmfServiceManifest) {
         let fmri = manifest.fmri.clone();
-        self.property_snapshots.insert(fmri.clone(), manifest.properties.clone());
+        self.property_snapshots
+            .insert(fmri.clone(), manifest.properties.clone());
         self.services.insert(fmri, manifest);
     }
 
@@ -128,12 +129,16 @@ impl IllumosSmfDependencyEngine {
 
             match dep.grouping {
                 SmfDependencyGrouping::RequireAll => {
-                    if target_svc.state != SmfServiceState::Online && target_svc.state != SmfServiceState::Degraded {
+                    if target_svc.state != SmfServiceState::Online
+                        && target_svc.state != SmfServiceState::Degraded
+                    {
                         return Ok(false);
                     }
                 }
                 SmfDependencyGrouping::RequireAny => {
-                    if target_svc.state == SmfServiceState::Online || target_svc.state == SmfServiceState::Degraded {
+                    if target_svc.state == SmfServiceState::Online
+                        || target_svc.state == SmfServiceState::Degraded
+                    {
                         return Ok(true);
                     }
                 }
@@ -152,7 +157,8 @@ impl IllumosSmfDependencyEngine {
             } else {
                 svc.state = SmfServiceState::Degraded;
             }
-            svc.properties.insert("last_fault".to_string(), fault_description.to_string());
+            svc.properties
+                .insert("last_fault".to_string(), fault_description.to_string());
             svc.state
         } else {
             SmfServiceState::Uninitialized
@@ -285,10 +291,15 @@ impl SovereignIllumosSmfSuite {
         }
 
         // Simulate multiple faults trigger maintenance mode
-        self.smf_engine.report_service_fault("svc:/network/http:default", "crash 1");
-        self.smf_engine.report_service_fault("svc:/network/http:default", "crash 2");
-        self.smf_engine.report_service_fault("svc:/network/http:default", "crash 3");
-        let fault_state = self.smf_engine.report_service_fault("svc:/network/http:default", "crash 4");
+        self.smf_engine
+            .report_service_fault("svc:/network/http:default", "crash 1");
+        self.smf_engine
+            .report_service_fault("svc:/network/http:default", "crash 2");
+        self.smf_engine
+            .report_service_fault("svc:/network/http:default", "crash 3");
+        let fault_state = self
+            .smf_engine
+            .report_service_fault("svc:/network/http:default", "crash 4");
 
         if fault_state != SmfServiceState::Maintenance {
             return false;

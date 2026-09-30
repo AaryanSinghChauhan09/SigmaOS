@@ -103,7 +103,11 @@ mod tests {
 
     #[test]
     fn test_echo_escape() {
-        let args = vec!["echo".to_string(), "-e".to_string(), "hello\\nworld".to_string()];
+        let args = vec![
+            "echo".to_string(),
+            "-e".to_string(),
+            "hello\\nworld".to_string(),
+        ];
         let result = run(&args);
         assert!(result.is_ok());
     }

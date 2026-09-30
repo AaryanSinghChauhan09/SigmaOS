@@ -1,9 +1,6 @@
 //! Shell/Command Interpreter (bash/zsh Inspiration)
 //! Advanced shell with history, completion, aliases, and job control
 
-
-
-
 /// Command
 #[derive(Debug, Clone)]
 pub struct Command {
@@ -108,7 +105,10 @@ impl Environment {
     }
 
     pub fn get_variable(&self, name: &str) -> Option<&String> {
-        self.variables.iter().find(|v| v.name == name).map(|v| &v.value)
+        self.variables
+            .iter()
+            .find(|v| v.name == name)
+            .map(|v| &v.value)
     }
 
     pub fn export_variable(&mut self, name: &str) {
@@ -197,10 +197,10 @@ impl SigmaShell {
 
     pub fn execute_command(&mut self, command: &str) -> Result<String, ShellError> {
         self.add_to_history(command);
-        
+
         // Parse command
         let parsed = self.parse_command(command)?;
-        
+
         // Check for aliases
         let default_cmd = String::new();
         let command_name = parsed.argv.first().unwrap_or(&default_cmd);
@@ -208,12 +208,12 @@ impl SigmaShell {
         if let Some(alias_value) = alias_val {
             return self.execute_command(&alias_value);
         }
-        
+
         // Execute built-in commands
         if let Some(result) = self.execute_builtin(&parsed) {
             return Ok(result);
         }
-        
+
         // Execute external command
         self.execute_external(&parsed)
     }
@@ -285,7 +285,10 @@ impl SigmaShell {
     fn builtin_jobs(&self) -> Option<String> {
         let mut output = String::new();
         for job in &self.jobs {
-            output.push_str(&format!("[{}] {} {}\n", job.id, job.state as u8, job.command));
+            output.push_str(&format!(
+                "[{}] {} {}\n",
+                job.id, job.state as u8, job.command
+            ));
         }
         Some(output)
     }

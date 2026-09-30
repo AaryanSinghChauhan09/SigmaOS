@@ -1,11 +1,9 @@
 //! Linux Mint mintnanny-inspired Domain Blocker
-//! 
+//!
 //! This module implements a domain blocker inspired by Linux Mint's mintnanny,
 //! which blocks outgoing traffic towards chosen domain names using /etc/hosts.
 
 #![allow(dead_code)]
-
-
 
 use std::collections::BTreeSet;
 use std::format;
@@ -80,7 +78,11 @@ impl MintDomainBlocker {
 
     /// Remove a domain from block list
     pub fn unblock_domain(&mut self, domain: &str) -> Result<(), String> {
-        let domain_to_remove = self.blocked_domains.iter().find(|d| d.domain == domain).cloned();
+        let domain_to_remove = self
+            .blocked_domains
+            .iter()
+            .find(|d| d.domain == domain)
+            .cloned();
         if let Some(blocked) = domain_to_remove {
             self.blocked_domains.remove(&blocked);
             Ok(())
@@ -92,7 +94,11 @@ impl MintDomainBlocker {
     /// Check if a domain is blocked
     pub fn is_domain_blocked(&self, domain: &str) -> bool {
         // Check exact match
-        if self.blocked_domains.iter().any(|d| d.domain == domain && d.active) {
+        if self
+            .blocked_domains
+            .iter()
+            .any(|d| d.domain == domain && d.active)
+        {
             return true;
         }
 
@@ -128,7 +134,8 @@ impl MintDomainBlocker {
 
     /// Remove a block rule
     pub fn remove_block_rule(&mut self, rule_type: BlockRuleType, pattern: &str) {
-        self.block_rules.retain(|(t, p)| *t != rule_type || p != pattern);
+        self.block_rules
+            .retain(|(t, p)| *t != rule_type || p != pattern);
     }
 
     /// Get all blocked domains
@@ -138,10 +145,7 @@ impl MintDomainBlocker {
 
     /// Get active blocked domains only
     pub fn get_active_blocked_domains(&self) -> Vec<&BlockedDomain> {
-        self.blocked_domains
-            .iter()
-            .filter(|d| d.active)
-            .collect()
+        self.blocked_domains.iter().filter(|d| d.active).collect()
     }
 
     /// Enable or disable blocking
@@ -238,7 +242,7 @@ mod tests {
     #[test]
     fn test_block_domain() {
         let mut blocker = MintDomainBlocker::new();
-        
+
         let result = blocker.block_domain("example.com".to_string(), "Test block".to_string());
         assert!(result.is_ok());
         assert_eq!(blocker.blocked_domains.len(), 1);
@@ -247,8 +251,10 @@ mod tests {
     #[test]
     fn test_unblock_domain() {
         let mut blocker = MintDomainBlocker::new();
-        
-        blocker.block_domain("example.com".to_string(), "Test block".to_string()).unwrap();
+
+        blocker
+            .block_domain("example.com".to_string(), "Test block".to_string())
+            .unwrap();
         let result = blocker.unblock_domain("example.com");
         assert!(result.is_ok());
         assert_eq!(blocker.blocked_domains.len(), 0);
@@ -257,8 +263,10 @@ mod tests {
     #[test]
     fn test_is_domain_blocked() {
         let mut blocker = MintDomainBlocker::new();
-        
-        blocker.block_domain("example.com".to_string(), "Test block".to_string()).unwrap();
+
+        blocker
+            .block_domain("example.com".to_string(), "Test block".to_string())
+            .unwrap();
         assert!(blocker.is_domain_blocked("example.com"));
         assert!(!blocker.is_domain_blocked("notblocked.com"));
     }
@@ -266,8 +274,10 @@ mod tests {
     #[test]
     fn test_generate_hosts_entries() {
         let mut blocker = MintDomainBlocker::new();
-        
-        blocker.block_domain("example.com".to_string(), "Test block".to_string()).unwrap();
+
+        blocker
+            .block_domain("example.com".to_string(), "Test block".to_string())
+            .unwrap();
         let entries = blocker.generate_hosts_entries();
         assert_eq!(entries.len(), 1);
         assert!(entries[0].contains("127.0.0.1"));
@@ -277,15 +287,15 @@ mod tests {
     #[test]
     fn test_import_export() {
         let mut blocker = MintDomainBlocker::new();
-        
+
         let domains = vec![
             ("example.com".to_string(), "Test 1".to_string()),
             ("test.com".to_string(), "Test 2".to_string()),
         ];
-        
+
         let count = blocker.import_domains(domains);
         assert_eq!(count, 2);
-        
+
         let exported = blocker.export_domains();
         assert_eq!(exported.len(), 2);
     }
@@ -293,10 +303,12 @@ mod tests {
     #[test]
     fn test_block_statistics() {
         let mut blocker = MintDomainBlocker::new();
-        
-        blocker.block_domain("example.com".to_string(), "Test block".to_string()).unwrap();
+
+        blocker
+            .block_domain("example.com".to_string(), "Test block".to_string())
+            .unwrap();
         blocker.add_block_rule(BlockRuleType::Wildcard, "*.ads.com".to_string());
-        
+
         let stats = blocker.get_statistics();
         assert_eq!(stats.total_blocked, 1);
         assert_eq!(stats.active_blocked, 1);
@@ -307,7 +319,7 @@ mod tests {
     #[test]
     fn test_wildcard_rule() {
         let mut blocker = MintDomainBlocker::new();
-        
+
         blocker.add_block_rule(BlockRuleType::Wildcard, "*.ads.com".to_string());
         assert!(blocker.is_domain_blocked("tracker.ads.com"));
         assert!(blocker.is_domain_blocked("analytics.ads.com"));

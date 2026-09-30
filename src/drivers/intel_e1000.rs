@@ -1,32 +1,32 @@
 // Intel e1000 Gigabit Network Interface Card Driver Blueprint
 // Conforms to Sovereign Driver Framework (SDF) and PeripheralDevice interface
 
-use core::ptr::{read_volatile, write_volatile};
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 use crate::security::CapabilityToken;
+use core::ptr::{read_volatile, write_volatile};
 
 // Register Offsets (MMIO)
-const REG_CTRL: u32     = 0x0000; // Device Control Register
-const REG_STATUS: u32   = 0x0008; // Device Status Register
-const REG_IMS: u32      = 0x00D0; // Interrupt Mask Set Register
-const REG_IMC: u32      = 0x00D8; // Interrupt Mask Clear Register
-const REG_RCTL: u32     = 0x0100; // Receive Control Register
-const REG_TCTL: u32     = 0x0400; // Transmit Control Register
-const REG_RDBAL: u32    = 0x2800; // Receive Descriptor Base Address Low
-const REG_RDBAH: u32    = 0x2804; // Receive Descriptor Base Address High
-const REG_RDLEN: u32    = 0x2808; // Receive Descriptor Length
-const REG_RDH: u32      = 0x2810; // Receive Descriptor Head
-const REG_RDT: u32      = 0x2818; // Receive Descriptor Tail
-const REG_TDBAL: u32    = 0x3800; // Transmit Descriptor Base Address Low
-const REG_TDBAH: u32    = 0x3804; // Transmit Descriptor Base Address High
-const REG_TDLEN: u32    = 0x3808; // Transmit Descriptor Length
-const REG_TDH: u32      = 0x3810; // Transmit Descriptor Head
-const REG_TDT: u32      = 0x3818; // Transmit Descriptor Tail
+const REG_CTRL: u32 = 0x0000; // Device Control Register
+const REG_STATUS: u32 = 0x0008; // Device Status Register
+const REG_IMS: u32 = 0x00D0; // Interrupt Mask Set Register
+const REG_IMC: u32 = 0x00D8; // Interrupt Mask Clear Register
+const REG_RCTL: u32 = 0x0100; // Receive Control Register
+const REG_TCTL: u32 = 0x0400; // Transmit Control Register
+const REG_RDBAL: u32 = 0x2800; // Receive Descriptor Base Address Low
+const REG_RDBAH: u32 = 0x2804; // Receive Descriptor Base Address High
+const REG_RDLEN: u32 = 0x2808; // Receive Descriptor Length
+const REG_RDH: u32 = 0x2810; // Receive Descriptor Head
+const REG_RDT: u32 = 0x2818; // Receive Descriptor Tail
+const REG_TDBAL: u32 = 0x3800; // Transmit Descriptor Base Address Low
+const REG_TDBAH: u32 = 0x3804; // Transmit Descriptor Base Address High
+const REG_TDLEN: u32 = 0x3808; // Transmit Descriptor Length
+const REG_TDH: u32 = 0x3810; // Transmit Descriptor Head
+const REG_TDT: u32 = 0x3818; // Transmit Descriptor Tail
 
 // Descriptor count
 pub const NUM_RX_DESCRIPTORS: usize = 128;
 pub const NUM_TX_DESCRIPTORS: usize = 128;
-pub const RX_BUFFER_SIZE: usize     = 2048;
+pub const RX_BUFFER_SIZE: usize = 2048;
 
 /// Receive Descriptor Layout
 #[repr(C, packed)]
@@ -149,7 +149,10 @@ impl PeripheralDevice for E1000Driver {
             let rx_ring_physical = self.rx_ring.as_ptr() as u64;
             self.write_reg(REG_RDBAL, (rx_ring_physical & 0xFFFFFFFF) as u32);
             self.write_reg(REG_RDBAH, (rx_ring_physical >> 32) as u32);
-            self.write_reg(REG_RDLEN, (NUM_RX_DESCRIPTORS * core::mem::size_of::<RxDescriptor>()) as u32);
+            self.write_reg(
+                REG_RDLEN,
+                (NUM_RX_DESCRIPTORS * core::mem::size_of::<RxDescriptor>()) as u32,
+            );
             self.write_reg(REG_RDH, 0);
             self.write_reg(REG_RDT, (NUM_RX_DESCRIPTORS - 1) as u32);
 
@@ -166,7 +169,10 @@ impl PeripheralDevice for E1000Driver {
             let tx_ring_physical = self.tx_ring.as_ptr() as u64;
             self.write_reg(REG_TDBAL, (tx_ring_physical & 0xFFFFFFFF) as u32);
             self.write_reg(REG_TDBAH, (tx_ring_physical >> 32) as u32);
-            self.write_reg(REG_TDLEN, (NUM_TX_DESCRIPTORS * core::mem::size_of::<TxDescriptor>()) as u32);
+            self.write_reg(
+                REG_TDLEN,
+                (NUM_TX_DESCRIPTORS * core::mem::size_of::<TxDescriptor>()) as u32,
+            );
             self.write_reg(REG_TDH, 0);
             self.write_reg(REG_TDT, 0);
 
@@ -253,10 +259,16 @@ mod tests {
 
     #[test]
     fn test_e1000_driver_probe_and_init() {
-        let dev_intel = DeviceId { vendor: 0x8086, device: 0x100E };
+        let dev_intel = DeviceId {
+            vendor: 0x8086,
+            device: 0x100E,
+        };
         assert!(E1000Driver::probe(&dev_intel));
 
-        let dev_other = DeviceId { vendor: 0x10EC, device: 0x8168 };
+        let dev_other = DeviceId {
+            vendor: 0x10EC,
+            device: 0x8168,
+        };
         assert!(!E1000Driver::probe(&dev_other));
 
         let caps = CapabilityToken::from_bits(0x02); // Network cap

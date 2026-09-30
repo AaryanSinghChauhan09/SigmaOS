@@ -1,22 +1,22 @@
-use std::vec;
-use std::string::{String, ToString};
-use std::vec::Vec;
 use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 // Sovereign Automated Fixer and Self-Healing Daemon
 // Inspired by Linux watchdogs, systemd service recovery, and Solaris Fault Management Architecture (FMA).
 
-use crate::resilience::self_healing::{SelfHealingModule, RecoveryEventType, RecoveryAction};
 use crate::klib::HashMap;
+use crate::resilience::self_healing::{RecoveryAction, RecoveryEventType, SelfHealingModule};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ProblemType {
-    NullPointerDeRef,   // Invalid address dereference
-    MemoryLeak,         // Growing heap consumption
-    ThreadDeadlock,     // Cyclic thread dependencies
-    SocketPortBlocked,  // TCP/UDP port collision
-    DatabaseCorruption, // Inconsistent system configuration files
+    NullPointerDeRef,     // Invalid address dereference
+    MemoryLeak,           // Growing heap consumption
+    ThreadDeadlock,       // Cyclic thread dependencies
+    SocketPortBlocked,    // TCP/UDP port collision
+    DatabaseCorruption,   // Inconsistent system configuration files
     ProcessZombification, // Dead process un-reaped by parent
-    InfiniteLoopDetect, // Monopolizing quantum thread execution
+    InfiniteLoopDetect,   // Monopolizing quantum thread execution
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -100,7 +100,9 @@ impl AutomatedFixerDaemon {
                 // Rollback to latest configuration checkpoint snapshot
                 if let Some(snap) = self_healing.snapshots.first() {
                     let id = snap.id.clone();
-                    self_healing.rollback_to_snapshot(&id).map_err(|_| "Rollback failed")?;
+                    self_healing
+                        .rollback_to_snapshot(&id)
+                        .map_err(|_| "Rollback failed")?;
                     RemediationAction::RollbackCheckpoint
                 } else {
                     return Err("Remediation aborted: No available system snapshot checkpoints");
@@ -148,7 +150,10 @@ mod tests {
         assert_eq!(res.unwrap(), RemediationAction::RemapPage);
         assert_eq!(daemon.stats.total_problems_detected, 1);
         assert_eq!(daemon.stats.successful_fixes, 1);
-        assert_eq!(daemon.stats.last_resolved, Some(ProblemType::NullPointerDeRef));
+        assert_eq!(
+            daemon.stats.last_resolved,
+            Some(ProblemType::NullPointerDeRef)
+        );
     }
 
     #[test]

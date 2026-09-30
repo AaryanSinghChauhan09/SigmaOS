@@ -5,15 +5,14 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(dead_code)]
 //! smoltcp Integration for SigmaOS
-//! 
+//!
 //! This module provides integration with smoltcp, a standalone, high-performance
 //! TCP/IP stack for embedded systems. It enables SigmaOS to leverage smoltcp's
 //! proven networking capabilities while maintaining custom extensions.
 
-
-use std::vec::Vec;
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// smoltcp interface identifier
 pub type InterfaceId = usize;
@@ -33,19 +32,19 @@ impl IpAddress {
     pub fn new_ipv4(a: u8, b: u8, c: u8, d: u8) -> Self {
         IpAddress::IPv4([a, b, c, d])
     }
-    
+
     pub fn new_ipv6(addr: [u8; 16]) -> Self {
         IpAddress::IPv6(addr)
     }
-    
+
     pub fn is_unspecified(&self) -> bool {
         matches!(self, IpAddress::Unspecified)
     }
-    
+
     pub fn is_ipv4(&self) -> bool {
         matches!(self, IpAddress::IPv4(_))
     }
-    
+
     pub fn is_ipv6(&self) -> bool {
         matches!(self, IpAddress::IPv6(_))
     }
@@ -84,12 +83,12 @@ impl InterfaceConfig {
             mtu: 1500,
         }
     }
-    
+
     pub fn with_ip(mut self, ip: IpAddress) -> Self {
         self.ip_address = ip;
         self
     }
-    
+
     pub fn with_gateway(mut self, gateway: IpAddress) -> Self {
         self.gateway = Some(gateway);
         self
@@ -115,22 +114,22 @@ impl SmoltcpInterface {
             enabled: false,
         }
     }
-    
+
     pub fn enable(&mut self) {
         self.enabled = true;
     }
-    
+
     pub fn disable(&mut self) {
         self.enabled = false;
     }
-    
+
     pub fn add_socket(&mut self, socket: SmoltcpSocket) -> SocketHandle {
         let handle = self.next_socket_handle;
         self.next_socket_handle += 1;
         self.sockets.push(socket);
         handle
     }
-    
+
     pub fn remove_socket(&mut self, handle: SocketHandle) -> Option<SmoltcpSocket> {
         if let Some(pos) = self.sockets.iter().position(|s| s.handle == handle) {
             Some(self.sockets.remove(pos))
@@ -138,25 +137,25 @@ impl SmoltcpInterface {
             None
         }
     }
-    
+
     pub fn get_socket(&self, handle: SocketHandle) -> Option<&SmoltcpSocket> {
         self.sockets.iter().find(|s| s.handle == handle)
     }
-    
+
     pub fn poll(&mut self, timestamp: u64) -> Vec<SmoltcpEvent> {
         let mut events = Vec::new();
-        
+
         if !self.enabled {
             return events;
         }
-        
+
         // Simulate polling sockets for events
         for socket in &mut self.sockets {
             if let Some(event) = socket.poll(timestamp) {
                 events.push(event);
             }
         }
-        
+
         events
     }
 }
@@ -213,45 +212,45 @@ impl SmoltcpSocket {
             tx_capacity: 65536,
         }
     }
-    
+
     pub fn bind(&mut self, endpoint: IpEndpoint) {
         self.local_endpoint = Some(endpoint);
     }
-    
+
     pub fn connect(&mut self, remote: IpEndpoint) {
         self.remote_endpoint = Some(remote);
         self.state = SmoltcpSocketState::SynSent;
     }
-    
+
     pub fn listen(&mut self) {
         self.state = SmoltcpSocketState::Listen;
     }
-    
+
     pub fn send(&mut self, data: &[u8]) -> Result<usize, SmoltcpError> {
         if self.tx_buffer.len() + data.len() > self.tx_capacity {
             return Err(SmoltcpError::BufferFull);
         }
-        
+
         self.tx_buffer.extend_from_slice(data);
         Ok(data.len())
     }
-    
+
     pub fn recv(&mut self, buffer: &mut [u8]) -> Result<usize, SmoltcpError> {
         if self.rx_buffer.is_empty() {
             return Err(SmoltcpError::Empty);
         }
-        
+
         let bytes_to_copy = buffer.len().min(self.rx_buffer.len());
         buffer[..bytes_to_copy].copy_from_slice(&self.rx_buffer[..bytes_to_copy]);
         self.rx_buffer.drain(..bytes_to_copy);
-        
+
         Ok(bytes_to_copy)
     }
-    
+
     pub fn close(&mut self) {
         self.state = SmoltcpSocketState::Closing;
     }
-    
+
     pub fn poll(&mut self, timestamp: u64) -> Option<SmoltcpEvent> {
         // Simulate socket state transitions and events
         match self.state {
@@ -304,17 +303,17 @@ impl SmoltcpStack {
             current_time: 0,
         }
     }
-    
+
     pub fn add_interface(&mut self, config: InterfaceConfig) -> InterfaceId {
         let id = self.next_interface_id;
         self.next_interface_id += 1;
-        
+
         let interface = SmoltcpInterface::new(id, config);
         self.interfaces.push(interface);
-        
+
         id
     }
-    
+
     pub fn remove_interface(&mut self, id: InterfaceId) -> Option<SmoltcpInterface> {
         if let Some(pos) = self.interfaces.iter().position(|i| i.id == id) {
             Some(self.interfaces.remove(pos))
@@ -322,42 +321,45 @@ impl SmoltcpStack {
             None
         }
     }
-    
+
     pub fn get_interface(&self, id: InterfaceId) -> Option<&SmoltcpInterface> {
         self.interfaces.iter().find(|i| i.id == id)
     }
-    
+
     pub fn get_interface_mut(&mut self, id: InterfaceId) -> Option<&mut SmoltcpInterface> {
         self.interfaces.iter_mut().find(|i| i.id == id)
     }
-    
-    pub fn create_socket(&mut self, interface_id: InterfaceId, 
-                        socket_type: SmoltcpSocketType) -> Result<SocketHandle, SmoltcpError> {
+
+    pub fn create_socket(
+        &mut self,
+        interface_id: InterfaceId,
+        socket_type: SmoltcpSocketType,
+    ) -> Result<SocketHandle, SmoltcpError> {
         if let Some(interface) = self.get_interface_mut(interface_id) {
             let handle = interface.next_socket_handle;
             interface.next_socket_handle += 1;
-            
+
             let socket = SmoltcpSocket::new(handle, socket_type);
             interface.add_socket(socket);
-            
+
             Ok(handle)
         } else {
             Err(SmoltcpError::Illegal)
         }
     }
-    
+
     pub fn tick(&mut self, duration_ms: u64) -> Vec<SmoltcpEvent> {
         self.current_time += duration_ms;
-        
+
         let mut all_events = Vec::new();
         for interface in &mut self.interfaces {
             let events = interface.poll(self.current_time);
             all_events.extend(events);
         }
-        
+
         all_events
     }
-    
+
     pub fn interface_sockets(&self, interface_id: InterfaceId) -> Vec<SocketHandle> {
         if let Some(interface) = self.get_interface(interface_id) {
             interface.sockets.iter().map(|s| s.handle).collect()
@@ -385,12 +387,12 @@ impl IcmpPacket {
             payload: Vec::new(),
         }
     }
-    
+
     pub fn with_payload(mut self, payload: &[u8]) -> Self {
         self.payload.extend_from_slice(payload);
         self
     }
-    
+
     pub fn compute_checksum(&mut self) {
         // Simplified checksum computation
         self.checksum = 0x1234; // Placeholder
@@ -426,16 +428,16 @@ impl DhcpClient {
             lease_duration: 0,
         }
     }
-    
+
     pub fn discover(&mut self) {
         self.state = DhcpState::Selecting;
     }
-    
+
     pub fn request(&mut self, server_ip: IpAddress) {
         self.server_ip = Some(server_ip);
         self.state = DhcpState::Requesting;
     }
-    
+
     pub fn bind(&mut self, client_ip: IpAddress, lease_duration: u32) {
         self.client_ip = Some(client_ip);
         self.lease_duration = lease_duration;
@@ -458,10 +460,10 @@ pub struct DnsQuery {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DnsQueryType {
-    A,     // IPv4 address
-    AAAA,  // IPv6 address
-    MX,    // Mail exchange
-    TXT,   // Text record
+    A,    // IPv4 address
+    AAAA, // IPv6 address
+    MX,   // Mail exchange
+    TXT,  // Text record
 }
 
 impl DnsClient {
@@ -471,16 +473,20 @@ impl DnsClient {
             queries: Vec::new(),
         }
     }
-    
-    pub fn query(&mut self, hostname: &str, query_type: DnsQueryType) -> Result<IpAddress, SmoltcpError> {
+
+    pub fn query(
+        &mut self,
+        hostname: &str,
+        query_type: DnsQueryType,
+    ) -> Result<IpAddress, SmoltcpError> {
         let query = DnsQuery {
             hostname: hostname.to_string(),
             query_type,
             result: None,
         };
-        
+
         self.queries.push(query);
-        
+
         // Simulate DNS resolution
         Ok(IpAddress::IPv4([8, 8, 8, 8])) // Placeholder
     }
@@ -489,72 +495,74 @@ impl DnsClient {
 #[cfg(test_disabled)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_smoltcp_interface() {
         let mac = [0x02, 0x00, 0x00, 0x00, 0x00, 0x01];
         let config = InterfaceConfig::new(mac)
             .with_ip(IpAddress::new_ipv4(192, 168, 1, 100))
             .with_gateway(IpAddress::new_ipv4(192, 168, 1, 1));
-        
+
         let mut interface = SmoltcpInterface::new(1, config);
         assert!(!interface.enabled);
-        
+
         interface.enable();
         assert!(interface.enabled);
     }
-    
+
     #[test]
     fn test_smoltcp_socket() {
         let mut socket = SmoltcpSocket::new(1, SmoltcpSocketType::Tcp);
         assert_eq!(socket.state, SmoltcpSocketState::Closed);
-        
+
         let endpoint = IpEndpoint::new(IpAddress::new_ipv4(0, 0, 0, 0), 8080);
         socket.bind(endpoint);
         assert!(socket.local_endpoint.is_some());
-        
+
         socket.listen();
         assert_eq!(socket.state, SmoltcpSocketState::Listen);
     }
-    
+
     #[test]
     fn test_smoltcp_stack() {
         let mut stack = SmoltcpStack::new();
-        
+
         let mac = [0x02, 0x00, 0x00, 0x00, 0x00, 0x01];
         let config = InterfaceConfig::new(mac);
         let interface_id = stack.add_interface(config);
-        
+
         assert!(stack.get_interface(interface_id).is_some());
-        
-        let socket_handle = stack.create_socket(interface_id, SmoltcpSocketType::Udp).unwrap();
+
+        let socket_handle = stack
+            .create_socket(interface_id, SmoltcpSocketType::Udp)
+            .unwrap();
         let sockets = stack.interface_sockets(interface_id);
         assert!(sockets.contains(&socket_handle));
     }
-    
+
     #[test]
     fn test_dhcp_client() {
         let mut client = DhcpClient::new(1);
         assert_eq!(client.state, DhcpState::Init);
-        
+
         client.discover();
         assert_eq!(client.state, DhcpState::Selecting);
-        
+
         let server_ip = IpAddress::new_ipv4(192, 168, 1, 1);
         client.request(server_ip);
         assert_eq!(client.state, DhcpState::Requesting);
-        
+
         let client_ip = IpAddress::new_ipv4(192, 168, 1, 100);
         client.bind(client_ip, 3600);
         assert_eq!(client.state, DhcpState::Bound);
         assert_eq!(client.client_ip, Some(client_ip));
     }
-    
+
     #[test]
     fn test_dns_client() {
         let server = IpAddress::new_ipv4(8, 8, 8, 8);
         let mut client = DnsClient::new(server);
-        
+
         let result = client.query("example.com", DnsQueryType::A);
         assert!(result.is_ok());
     }

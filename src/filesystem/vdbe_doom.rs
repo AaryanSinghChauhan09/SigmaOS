@@ -12,10 +12,10 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::vec;
-use std::string::{String, ToString};
-use std::vec::Vec;
 use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 // Turso Virtual Database Engine (VDBE) Doom Compiler & VM Integration Module
 //
@@ -24,13 +24,37 @@ use std::format;
 // 2. VdbeVirtualMachine (Virtual machine utilizing memory blob indexing, standard register structures, and step/present functions)
 
 pub enum VdbeOpcode {
-    BlobRead { reg_addr: usize, offset: usize, len: usize },
-    BlobWrite { reg_addr: usize, offset: usize, value: Vec<u8> },
-    GetByte { reg_dest: usize, reg_blob: usize, offset: usize },
-    SetByte { reg_blob: usize, offset: usize, reg_val: usize },
-    Gosub { label_addr: usize },
-    YieldFrame { reg_fb: usize },
-    Add { dest: usize, src1: usize, src2: usize },
+    BlobRead {
+        reg_addr: usize,
+        offset: usize,
+        len: usize,
+    },
+    BlobWrite {
+        reg_addr: usize,
+        offset: usize,
+        value: Vec<u8>,
+    },
+    GetByte {
+        reg_dest: usize,
+        reg_blob: usize,
+        offset: usize,
+    },
+    SetByte {
+        reg_blob: usize,
+        offset: usize,
+        reg_val: usize,
+    },
+    Gosub {
+        label_addr: usize,
+    },
+    YieldFrame {
+        reg_fb: usize,
+    },
+    Add {
+        dest: usize,
+        src1: usize,
+        src2: usize,
+    },
     Halt,
 }
 
@@ -69,7 +93,11 @@ impl VdbeVirtualMachine {
             self.pc += 1;
 
             match op {
-                VdbeOpcode::BlobRead { reg_addr, offset, len } => {
+                VdbeOpcode::BlobRead {
+                    reg_addr,
+                    offset,
+                    len,
+                } => {
                     let addr = self.registers[*reg_addr];
                     let end = (addr + len).min(self.ram_blob.len());
                     // Copy RAM chunk into registers or buffer
@@ -77,20 +105,32 @@ impl VdbeVirtualMachine {
                         self.registers[0] = self.ram_blob[addr..end].iter().sum::<u8>() as usize;
                     }
                 }
-                VdbeOpcode::BlobWrite { reg_addr, offset, value } => {
+                VdbeOpcode::BlobWrite {
+                    reg_addr,
+                    offset,
+                    value,
+                } => {
                     let addr = self.registers[*reg_addr] + offset;
                     let end = (addr + value.len()).min(self.ram_blob.len());
                     if addr < self.ram_blob.len() {
                         self.ram_blob[addr..end].copy_from_slice(&value[..(end - addr)]);
                     }
                 }
-                VdbeOpcode::GetByte { reg_dest, reg_blob, offset } => {
+                VdbeOpcode::GetByte {
+                    reg_dest,
+                    reg_blob,
+                    offset,
+                } => {
                     let blob_addr = self.registers[*reg_blob] + offset;
                     if blob_addr < self.ram_blob.len() {
                         self.registers[*reg_dest] = self.ram_blob[blob_addr] as usize;
                     }
                 }
-                VdbeOpcode::SetByte { reg_blob, offset, reg_val } => {
+                VdbeOpcode::SetByte {
+                    reg_blob,
+                    offset,
+                    reg_val,
+                } => {
                     let blob_addr = self.registers[*reg_blob] + offset;
                     if blob_addr < self.ram_blob.len() {
                         self.ram_blob[blob_addr] = self.registers[*reg_val] as u8;
@@ -132,15 +172,31 @@ impl VdbeCc {
     pub fn lower_llvm_ir_to_vdbe(ir_instructions: &[&str]) -> Vec<VdbeOpcode> {
         let mut ops = Vec::new();
         // Seed initial stack pointer and video memory address registers
-        ops.push(VdbeOpcode::BlobWrite { reg_addr: 0, offset: 0, value: vec![12u8; 16] });
+        ops.push(VdbeOpcode::BlobWrite {
+            reg_addr: 0,
+            offset: 0,
+            value: vec![12u8; 16],
+        });
 
         for ir in ir_instructions {
             if ir.contains("add") {
-                ops.push(VdbeOpcode::Add { dest: 1, src1: 2, src2: 3 });
+                ops.push(VdbeOpcode::Add {
+                    dest: 1,
+                    src1: 2,
+                    src2: 3,
+                });
             } else if ir.contains("store") {
-                ops.push(VdbeOpcode::SetByte { reg_blob: 0, offset: 0x1000, reg_val: 1 });
+                ops.push(VdbeOpcode::SetByte {
+                    reg_blob: 0,
+                    offset: 0x1000,
+                    reg_val: 1,
+                });
             } else if ir.contains("load") {
-                ops.push(VdbeOpcode::GetByte { reg_dest: 2, reg_blob: 0, offset: 0x1000 });
+                ops.push(VdbeOpcode::GetByte {
+                    reg_dest: 2,
+                    reg_blob: 0,
+                    offset: 0x1000,
+                });
             } else if ir.contains("vdbe_present") {
                 ops.push(VdbeOpcode::YieldFrame { reg_fb: 4 });
             }
@@ -157,7 +213,11 @@ mod tests {
 
     #[test]
     fn test_vdbe_cc_lowering() {
-        let ir = vec!["%1 = add i32 %2, %3", "store i8 %1, i8* %ptr", "call void @vdbe_present()"];
+        let ir = vec![
+            "%1 = add i32 %2, %3",
+            "store i8 %1, i8* %ptr",
+            "call void @vdbe_present()",
+        ];
         let opcodes = VdbeCc::lower_llvm_ir_to_vdbe(&ir);
 
         // Ensure proper bytecode generation, translation, and termination opcodes
@@ -179,10 +239,7 @@ mod tests {
         mock_frame[319 * 199] = 0xAA;
         vm.ram_blob[0x2000..0x2000 + 320 * 200].copy_from_slice(&mock_frame);
 
-        let program = vec![
-            VdbeOpcode::YieldFrame { reg_fb: 4 },
-            VdbeOpcode::Halt,
-        ];
+        let program = vec![VdbeOpcode::YieldFrame { reg_fb: 4 }, VdbeOpcode::Halt];
 
         let fb = vm.step(&program).unwrap();
         assert_eq!(fb[0], 0xFF);

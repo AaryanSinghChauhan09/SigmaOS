@@ -16,12 +16,12 @@
 use crate::kernel::subsystems::registry::{
     InitOrder, KernelSubsystem, SubsystemError, SubsystemPriority,
 };
+use crate::klib::VecDeque;
 /// SigmaOS Legacy Driver — NE1000/NE2000 ISA Network Interface Card
 /// The most-cloned NIC in history — absorbs Linux drivers/net/ne.c
 /// NS DP8390 chipset: 10BASE-2 (coax), 10BASE-T (twisted pair)
 /// Also covers RTL8139 PCI NIC and Intel e1000 Gigabit
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::klib::VecDeque;
 
 /// Ethernet frame constants
 pub const ETH_ALEN: usize = 6; // MAC address length

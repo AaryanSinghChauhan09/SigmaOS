@@ -1,10 +1,9 @@
 // SigmaOS Dial-up 56K Modem Driver (S-Modem)
 // Zero-dependency, #![no_std] compliant, emulating iconic telephone AT commands.
 
-
+use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 use std::string::String;
 use std::vec::Vec;
-use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 
 pub struct DialupModemDriver {
     pub current_power: PowerState,

@@ -11,18 +11,18 @@
 extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
+use alloc::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
+use std::collections::BTreeMap;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use std::collections::BTreeMap;
+use std::vec::Vec;
 
 /// CPU Hardware Virtualization Extensions
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -112,7 +112,10 @@ impl SovereignBareMetalHypervisor {
 
     /// Map Guest Physical Address (GPA) to Host Physical Address (HPA) via EPT
     pub fn map_guest_memory(&mut self, vmid: u32, gpa: u64, hpa: u64) -> Result<(), &'static str> {
-        let vm = self.active_vms.get_mut(&vmid).ok_or("Hypervisor: Guest VM not found")?;
+        let vm = self
+            .active_vms
+            .get_mut(&vmid)
+            .ok_or("Hypervisor: Guest VM not found")?;
 
         let entry = EptPageMapEntry {
             guest_phys_addr: gpa,
@@ -128,7 +131,10 @@ impl SovereignBareMetalHypervisor {
 
     /// Launch microVM guest execution (VMLAUNCH / VMRUN)
     pub fn launch_guest(&mut self, vmid: u32) -> Result<(), &'static str> {
-        let vm = self.active_vms.get_mut(&vmid).ok_or("Hypervisor: Guest VM not found")?;
+        let vm = self
+            .active_vms
+            .get_mut(&vmid)
+            .ok_or("Hypervisor: Guest VM not found")?;
         if vm.state == VmExecutionState::Running {
             return Err("Hypervisor: Guest VM already running");
         }
@@ -145,10 +151,12 @@ impl SovereignBareMetalHypervisor {
 
         self.total_exit_events += 1;
         match exit_reason {
-            0x30 => { // IO_INSTRUCTION exit
+            0x30 => {
+                // IO_INSTRUCTION exit
                 Ok(())
             }
-            0x300 => { // EPT_VIOLATION exit
+            0x300 => {
+                // EPT_VIOLATION exit
                 Ok(())
             }
             _ => Ok(()),

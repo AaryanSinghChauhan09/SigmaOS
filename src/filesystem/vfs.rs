@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
-use std::fmt;
+use crate::security::{CapabilityToken, Permission};
 use std::collections::HashMap;
+use std::fmt;
 use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;
-use crate::security::{CapabilityToken, Permission};
 
 pub const O_RDONLY: u32 = 0;
 pub const O_WRONLY: u32 = 1;
@@ -68,12 +68,12 @@ pub struct FileMode {
     pub other_write: bool,
     pub other_execute: bool,
     // BSD file flags (chflags)
-    pub nodump: bool,       // Do not dump (backup exclusion)
-    pub immutable: bool,    // File cannot be changed
-    pub append_only: bool,  // File can only be appended to
-    pub opaque: bool,       // Directory is opaque for union mounts
-    pub nounlink: bool,     // File cannot be renamed or deleted
-    pub archived: bool,     // File is archived
+    pub nodump: bool,      // Do not dump (backup exclusion)
+    pub immutable: bool,   // File cannot be changed
+    pub append_only: bool, // File can only be appended to
+    pub opaque: bool,      // Directory is opaque for union mounts
+    pub nounlink: bool,    // File cannot be renamed or deleted
+    pub archived: bool,    // File is archived
 }
 
 impl FileMode {
@@ -148,7 +148,7 @@ pub struct Inode {
     pub link_count: u32,
     pub symlink_target: Option<String>,
     pub xattrs: HashMap<String, Vec<u8>>,
-    pub data: Vec<u8>,                 // File storage data
+    pub data: Vec<u8>, // File storage data
     pub data_blocks: Vec<u64>,
     pub entries: HashMap<String, u64>, // Directory entries
 }
@@ -197,9 +197,15 @@ impl Inode {
 
         if is_owner {
             let mut owner_bits = 0u32;
-            if self.mode.owner_read { owner_bits |= 0o4; }
-            if self.mode.owner_write { owner_bits |= 0o2; }
-            if self.mode.owner_execute { owner_bits |= 0o1; }
+            if self.mode.owner_read {
+                owner_bits |= 0o4;
+            }
+            if self.mode.owner_write {
+                owner_bits |= 0o2;
+            }
+            if self.mode.owner_execute {
+                owner_bits |= 0o1;
+            }
 
             if (owner_bits & req_mask) == req_mask {
                 Ok(())
@@ -208,9 +214,15 @@ impl Inode {
             }
         } else if is_group {
             let mut group_bits = 0u32;
-            if self.mode.group_read { group_bits |= 0o4; }
-            if self.mode.group_write { group_bits |= 0o2; }
-            if self.mode.group_execute { group_bits |= 0o1; }
+            if self.mode.group_read {
+                group_bits |= 0o4;
+            }
+            if self.mode.group_write {
+                group_bits |= 0o2;
+            }
+            if self.mode.group_execute {
+                group_bits |= 0o1;
+            }
 
             if (group_bits & req_mask) == req_mask {
                 Ok(())
@@ -219,9 +231,15 @@ impl Inode {
             }
         } else {
             let mut other_bits = 0u32;
-            if self.mode.other_read { other_bits |= 0o4; }
-            if self.mode.other_write { other_bits |= 0o2; }
-            if self.mode.other_execute { other_bits |= 0o1; }
+            if self.mode.other_read {
+                other_bits |= 0o4;
+            }
+            if self.mode.other_write {
+                other_bits |= 0o2;
+            }
+            if self.mode.other_execute {
+                other_bits |= 0o1;
+            }
 
             if (other_bits & req_mask) == req_mask {
                 Ok(())
@@ -360,7 +378,6 @@ pub struct VirtualFileSystem {
     next_inode_id: u64,
 }
 
-
 impl VirtualFileSystem {
     pub fn new() -> Self {
         let mut vfs = Self {
@@ -461,7 +478,6 @@ impl VirtualFileSystem {
         Ok(fd)
     }
 
-
     /// Creates a hard link pointing directly to the same underlying file Inode
     pub fn create_hard_link(&mut self, inode_id: u64) -> Result<(), FsError> {
         let inode = self.inodes.get_mut(&inode_id).ok_or(FsError::NotFound)?;
@@ -469,7 +485,6 @@ impl VirtualFileSystem {
         inode.hard_links_count = inode.link_count;
         Ok(())
     }
-
 
     /// Mount filesystem at path
     pub fn mount(&mut self, path: String, fs_type: String) -> Result<(), VfsError> {
@@ -498,7 +513,7 @@ impl VirtualFileSystem {
     }
 
     /// Open file - returns file descriptor
-        pub fn open(&mut self, path: &str, flags: u32, mode: u32) -> Result<i32, VfsError> {
+    pub fn open(&mut self, path: &str, flags: u32, mode: u32) -> Result<i32, VfsError> {
         if path.len() > 4096 {
             return Err(VfsError::NameTooLong);
         }
@@ -539,10 +554,7 @@ impl VirtualFileSystem {
     }
 
     pub fn read_file(&mut self, fd: u64, buffer: &mut [u8]) -> Result<usize, FsError> {
-        let file_descriptor = self
-            .open_files
-            .get_mut(&fd)
-            .ok_or(FsError::InvalidFd)?;
+        let file_descriptor = self.open_files.get_mut(&fd).ok_or(FsError::InvalidFd)?;
 
         let inode = self
             .inodes
@@ -573,10 +585,7 @@ impl VirtualFileSystem {
     }
 
     pub fn write_file(&mut self, fd: u64, buffer: &[u8]) -> Result<usize, FsError> {
-        let file_descriptor = self
-            .open_files
-            .get_mut(&fd)
-            .ok_or(FsError::InvalidFd)?;
+        let file_descriptor = self.open_files.get_mut(&fd).ok_or(FsError::InvalidFd)?;
 
         let inode = self
             .inodes
@@ -622,24 +631,48 @@ impl VirtualFileSystem {
     }
 
     /// Validates file access permissions for specified process euid/egid
-    pub fn check_access(&self, path: &str, euid: u32, egid: u32, mode: AccessMode) -> Result<(), FsError> {
+    pub fn check_access(
+        &self,
+        path: &str,
+        euid: u32,
+        egid: u32,
+        mode: AccessMode,
+    ) -> Result<(), FsError> {
         let inode_num = self.resolve_path(path)?;
         let inode = self.inodes.get(&inode_num).ok_or(FsError::NotFound)?;
         inode.check_permission(euid, egid, mode)
     }
 
     /// Read file with explicit UID/GID DAC permission validation
-    pub fn read_file_as_user(&mut self, fd: u64, buffer: &mut [u8], euid: u32, egid: u32) -> Result<usize, FsError> {
+    pub fn read_file_as_user(
+        &mut self,
+        fd: u64,
+        buffer: &mut [u8],
+        euid: u32,
+        egid: u32,
+    ) -> Result<usize, FsError> {
         let file_descriptor = self.open_files.get_mut(&fd).ok_or(FsError::InvalidFd)?;
-        let inode = self.inodes.get(&file_descriptor.inode_number).ok_or(FsError::NotFound)?;
+        let inode = self
+            .inodes
+            .get(&file_descriptor.inode_number)
+            .ok_or(FsError::NotFound)?;
         inode.check_permission(euid, egid, AccessMode::Read)?;
         self.read_file(fd, buffer)
     }
 
     /// Write file with explicit UID/GID DAC permission validation
-    pub fn write_file_as_user(&mut self, fd: u64, buffer: &[u8], euid: u32, egid: u32) -> Result<usize, FsError> {
+    pub fn write_file_as_user(
+        &mut self,
+        fd: u64,
+        buffer: &[u8],
+        euid: u32,
+        egid: u32,
+    ) -> Result<usize, FsError> {
         let file_descriptor = self.open_files.get_mut(&fd).ok_or(FsError::InvalidFd)?;
-        let inode = self.inodes.get(&file_descriptor.inode_number).ok_or(FsError::NotFound)?;
+        let inode = self
+            .inodes
+            .get(&file_descriptor.inode_number)
+            .ok_or(FsError::NotFound)?;
         inode.check_permission(euid, egid, AccessMode::Write)?;
         self.write_file(fd, buffer)
     }
@@ -1083,11 +1116,20 @@ mod tests {
 
         // Group member (1001, 1000) read -> OK, write -> Denied
         assert!(vfs.read_file_as_user(fd, &mut buf, 1001, 1000).is_ok());
-        assert_eq!(vfs.write_file_as_user(fd, b"hack", 1001, 1000), Err(FsError::PermissionDenied));
+        assert_eq!(
+            vfs.write_file_as_user(fd, b"hack", 1001, 1000),
+            Err(FsError::PermissionDenied)
+        );
 
         // Other user (2000, 2000) read -> Denied, write -> Denied
-        assert_eq!(vfs.read_file_as_user(fd, &mut buf, 2000, 2000), Err(FsError::PermissionDenied));
-        assert_eq!(vfs.write_file_as_user(fd, b"hack", 2000, 2000), Err(FsError::PermissionDenied));
+        assert_eq!(
+            vfs.read_file_as_user(fd, &mut buf, 2000, 2000),
+            Err(FsError::PermissionDenied)
+        );
+        assert_eq!(
+            vfs.write_file_as_user(fd, b"hack", 2000, 2000),
+            Err(FsError::PermissionDenied)
+        );
 
         // Root superuser (0, 0) read & write -> OK
         assert!(vfs.read_file_as_user(fd, &mut buf, 0, 0).is_ok());

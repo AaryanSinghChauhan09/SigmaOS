@@ -7,10 +7,10 @@ use std::sync::{Arc, Mutex};
 /// Clock source type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ClockSource {
-    TSC,      // Time Stamp Counter
-    HPET,     // High Precision Event Timer
-    AcpiPm,   // ACPI Power Management Timer
-    RTC,      // Real Time Clock
+    TSC,    // Time Stamp Counter
+    HPET,   // High Precision Event Timer
+    AcpiPm, // ACPI Power Management Timer
+    RTC,    // Real Time Clock
 }
 
 /// Clock source statistics
@@ -115,11 +115,26 @@ impl TimeManager {
 
         // Common timezones
         timezones.insert("UTC".to_string(), Timezone::new("UTC".to_string(), 0));
-        timezones.insert("America/New_York".to_string(), Timezone::new("EST".to_string(), -300));
-        timezones.insert("America/Los_Angeles".to_string(), Timezone::new("PST".to_string(), -480));
-        timezones.insert("Europe/London".to_string(), Timezone::new("GMT".to_string(), 0));
-        timezones.insert("Europe/Paris".to_string(), Timezone::new("CET".to_string(), 60));
-        timezones.insert("Asia/Tokyo".to_string(), Timezone::new("JST".to_string(), 540));
+        timezones.insert(
+            "America/New_York".to_string(),
+            Timezone::new("EST".to_string(), -300),
+        );
+        timezones.insert(
+            "America/Los_Angeles".to_string(),
+            Timezone::new("PST".to_string(), -480),
+        );
+        timezones.insert(
+            "Europe/London".to_string(),
+            Timezone::new("GMT".to_string(), 0),
+        );
+        timezones.insert(
+            "Europe/Paris".to_string(),
+            Timezone::new("CET".to_string(), 60),
+        );
+        timezones.insert(
+            "Asia/Tokyo".to_string(),
+            Timezone::new("JST".to_string(), 540),
+        );
 
         Self {
             clock_sources: Arc::new(Mutex::new(HashMap::new())),
@@ -138,7 +153,8 @@ impl TimeManager {
         *next_id += 1;
         drop(next_id);
 
-        let stats = ClockSourceStats::new(clock_id, clock_source, resolution_ns).with_registered(true);
+        let stats =
+            ClockSourceStats::new(clock_id, clock_source, resolution_ns).with_registered(true);
         let mut clock_sources = self.clock_sources.lock().unwrap();
         clock_sources.insert(clock_id, stats);
 
@@ -312,7 +328,9 @@ mod tests {
     fn test_time_manager_timezone() {
         let manager = TimeManager::new();
 
-        manager.set_timezone("America/New_York".to_string()).unwrap();
+        manager
+            .set_timezone("America/New_York".to_string())
+            .unwrap();
         let tz = manager.get_timezone();
         assert_eq!(tz.name, "EST");
         assert_eq!(tz.offset_minutes, -300);
@@ -321,7 +339,9 @@ mod tests {
     #[test]
     fn test_time_manager_invalid_timezone() {
         let manager = TimeManager::new();
-        assert!(manager.set_timezone("Invalid/Timezone".to_string()).is_err());
+        assert!(manager
+            .set_timezone("Invalid/Timezone".to_string())
+            .is_err());
     }
 
     #[test]

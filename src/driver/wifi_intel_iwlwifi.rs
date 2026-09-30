@@ -2,9 +2,9 @@
 // SigmaOS Intel iwlwifi Wireless Driver
 // Inspired by Linux (drivers/net/wireless/intel/iwlwifi/) and FreeBSD (sys/dev/iwm/)
 
+use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 use std::boxed::Box;
 use std::string::String;
-use core::sync::atomic::{AtomicU32, AtomicBool, Ordering};
 
 #[cfg(not(feature = "standalone_test"))]
 use crate::driver::pci_enumeration::{PciDeviceInfo, PciDriver};
@@ -24,8 +24,8 @@ pub const INTEL_VENDOR_ID: u16 = 0x8086;
 // Intel Wireless Device IDs
 pub const IWL_AX200_DEVICE_ID: u16 = 0x2723; // Wi-Fi 6 AX200
 pub const IWL_AX210_DEVICE_ID: u16 = 0x2725; // Wi-Fi 6E AX210
-pub const IWL_7265_DEVICE_ID: u16 = 0x095A;  // Wireless-AC 7265
-pub const IWL_3165_DEVICE_ID: u16 = 0x095B;  // Wireless-AC 3165
+pub const IWL_7265_DEVICE_ID: u16 = 0x095A; // Wireless-AC 7265
+pub const IWL_3165_DEVICE_ID: u16 = 0x095B; // Wireless-AC 3165
 
 // Register Offsets
 pub const REG_CSR_HW_IF_CONFIG_REG: u32 = 0x000;
@@ -136,7 +136,9 @@ impl PciDriver for IntelIwlwifiPciDriver {
         }
 
         let supported = match device.device_id {
-            IWL_AX200_DEVICE_ID | IWL_AX210_DEVICE_ID | IWL_7265_DEVICE_ID | IWL_3165_DEVICE_ID => true,
+            IWL_AX200_DEVICE_ID | IWL_AX210_DEVICE_ID | IWL_7265_DEVICE_ID | IWL_3165_DEVICE_ID => {
+                true
+            }
             _ => false,
         };
 

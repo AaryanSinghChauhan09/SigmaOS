@@ -194,7 +194,12 @@ impl FreeBsdGeliIntegrityEngine {
     }
 
     /// Verify sector data against expected HMAC integrity tag
-    pub fn verify_sector_integrity(&self, sector_num: u64, payload: &[u8], expected_mac: &[u8]) -> bool {
+    pub fn verify_sector_integrity(
+        &self,
+        sector_num: u64,
+        payload: &[u8],
+        expected_mac: &[u8],
+    ) -> bool {
         let actual_mac = self.compute_sector_mac(sector_num, payload);
         if actual_mac.len() != expected_mac.len() {
             return false;
@@ -234,7 +239,12 @@ impl OpenBsdCryptodevFrameworkEngine {
     }
 
     /// `CIOCGSESSION`: Open a new cryptodev session
-    pub fn create_session(&mut self, cipher: AesCipherMode, key: &[u8], hardware_accel: bool) -> Result<u64, String> {
+    pub fn create_session(
+        &mut self,
+        cipher: AesCipherMode,
+        key: &[u8],
+        hardware_accel: bool,
+    ) -> Result<u64, String> {
         if key.is_empty() {
             return Err("EINVAL: Key cannot be empty for cryptodev session".to_string());
         }
@@ -372,10 +382,12 @@ impl LinuxCryptoTransformRegistry {
 
     /// `crypto_alloc_tfm`: Allocate a crypto transform handle
     pub fn alloc_tfm(&mut self, alg_name: &str) -> Result<u64, String> {
-        let spec = self
-            .transforms
-            .get(alg_name)
-            .ok_or_else(|| format!("ENOENT: Crypto algorithm transform '{}' not registered", alg_name))?;
+        let spec = self.transforms.get(alg_name).ok_or_else(|| {
+            format!(
+                "ENOENT: Crypto algorithm transform '{}' not registered",
+                alg_name
+            )
+        })?;
 
         let handle_id = self.next_handle_id;
         self.next_handle_id += 1;
@@ -389,7 +401,10 @@ impl LinuxCryptoTransformRegistry {
         if self.active_tfms.remove(&handle_id).is_some() {
             Ok(())
         } else {
-            Err(format!("EINVAL: Invalid crypto transform handle ID {}", handle_id))
+            Err(format!(
+                "EINVAL: Invalid crypto transform handle ID {}",
+                handle_id
+            ))
         }
     }
 
@@ -455,15 +470,21 @@ mod tests {
         let mut cryptodev = OpenBsdCryptodevFrameworkEngine::new();
 
         let key = b"0123456789abcdef0123456789abcdef"; // 32-byte key
-        let sess_id = cryptodev.create_session(AesCipherMode::Gcm, key, true).unwrap();
+        let sess_id = cryptodev
+            .create_session(AesCipherMode::Gcm, key, true)
+            .unwrap();
 
         let plaintext = b"Cryptodev openbsd session payload verification";
         let iv = b"123456789012";
 
-        let ciphertext = cryptodev.process_crypto_op(sess_id, plaintext, iv, true).unwrap();
+        let ciphertext = cryptodev
+            .process_crypto_op(sess_id, plaintext, iv, true)
+            .unwrap();
         assert_ne!(plaintext.to_vec(), ciphertext);
 
-        let decrypted = cryptodev.process_crypto_op(sess_id, &ciphertext, iv, false).unwrap();
+        let decrypted = cryptodev
+            .process_crypto_op(sess_id, &ciphertext, iv, false)
+            .unwrap();
         assert_eq!(plaintext.to_vec(), decrypted);
 
         cryptodev.close_session(sess_id).unwrap();

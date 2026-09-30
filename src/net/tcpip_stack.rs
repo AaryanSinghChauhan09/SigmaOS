@@ -1,11 +1,10 @@
 // SigmaOS Network Protocol Layer
+use core::ptr::{self, NonNull};
+use core::sync::atomic::{AtomicUsize, Ordering};
 /// Custom Production-Grade TCP/IP Stack for SigmaOS
 /// Implements full TCP/IP and UDP networking without relying on external stack
 /// Supports internet checksum computation, full TCP state machine, and UDP parsing
-
 use std::vec::Vec;
-use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Computes the standard internet checksum (one's complement sum of 16-bit words)
 pub fn calculate_internet_checksum(data: &[u8]) -> u16 {
@@ -52,10 +51,10 @@ impl IPAddress {
     }
 
     pub fn to_u32(&self) -> u32 {
-        ((self.bytes[0] as u32) << 24) |
-        ((self.bytes[1] as u32) << 16) |
-        ((self.bytes[2] as u32) << 8) |
-        (self.bytes[3] as u32)
+        ((self.bytes[0] as u32) << 24)
+            | ((self.bytes[1] as u32) << 16)
+            | ((self.bytes[2] as u32) << 8)
+            | (self.bytes[3] as u32)
     }
 }
 
@@ -222,7 +221,12 @@ impl TCPSegment {
         buf
     }
 
-    pub fn calculate_checksum(&mut self, src_ip: IPAddress, dest_ip: IPAddress, payload_len: usize) -> u16 {
+    pub fn calculate_checksum(
+        &mut self,
+        src_ip: IPAddress,
+        dest_ip: IPAddress,
+        payload_len: usize,
+    ) -> u16 {
         self.checksum = 0;
         let payload_len = payload_len.min(1460); // Safety: bounds-checked to prevent out-of-bounds slicing
 
@@ -278,7 +282,12 @@ impl UDPSegment {
         buf
     }
 
-    pub fn calculate_checksum(&mut self, src_ip: IPAddress, dest_ip: IPAddress, payload_len: usize) -> u16 {
+    pub fn calculate_checksum(
+        &mut self,
+        src_ip: IPAddress,
+        dest_ip: IPAddress,
+        payload_len: usize,
+    ) -> u16 {
         self.checksum = 0;
         let payload_len = payload_len.min(1472); // Safety: bounds-checked to prevent out-of-bounds slicing
 
@@ -308,8 +317,8 @@ impl UDPSegment {
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SocketType {
-    Stream = 1,    // TCP
-    Datagram = 2,  // UDP
+    Stream = 1,   // TCP
+    Datagram = 2, // UDP
     Raw = 3,
 }
 
@@ -401,7 +410,11 @@ impl TCPIPStack {
     }
 
     /// Create a socket
-    pub unsafe fn socket(&mut self, socket_type: SocketType, protocol: SocketProtocol) -> Option<usize> {
+    pub unsafe fn socket(
+        &mut self,
+        socket_type: SocketType,
+        protocol: SocketProtocol,
+    ) -> Option<usize> {
         let fd = self.next_fd.fetch_add(1, Ordering::SeqCst);
         if fd >= 1024 {
             return None;
@@ -476,7 +489,7 @@ impl TCPIPStack {
             (*socket.as_ptr()).remote_ip = ip;
             (*socket.as_ptr()).remote_port = port;
             (*socket.as_ptr()).state = TCPState::SynSent;
-            
+
             // In a simulated test or complete stack, we proceed directly to Established
             (*socket.as_ptr()).state = TCPState::Established;
             true
@@ -564,10 +577,30 @@ impl TCPIPStack {
         }
 
         let protocol = ip_payload[9];
-        let src_ip_bytes = [ip_payload[12], ip_payload[13], ip_payload[14], ip_payload[15]];
-        let dest_ip_bytes = [ip_payload[16], ip_payload[17], ip_payload[18], ip_payload[19]];
-        let src_ip = IPAddress::new(src_ip_bytes[0], src_ip_bytes[1], src_ip_bytes[2], src_ip_bytes[3]);
-        let dest_ip = IPAddress::new(dest_ip_bytes[0], dest_ip_bytes[1], dest_ip_bytes[2], dest_ip_bytes[3]);
+        let src_ip_bytes = [
+            ip_payload[12],
+            ip_payload[13],
+            ip_payload[14],
+            ip_payload[15],
+        ];
+        let dest_ip_bytes = [
+            ip_payload[16],
+            ip_payload[17],
+            ip_payload[18],
+            ip_payload[19],
+        ];
+        let src_ip = IPAddress::new(
+            src_ip_bytes[0],
+            src_ip_bytes[1],
+            src_ip_bytes[2],
+            src_ip_bytes[3],
+        );
+        let dest_ip = IPAddress::new(
+            dest_ip_bytes[0],
+            dest_ip_bytes[1],
+            dest_ip_bytes[2],
+            dest_ip_bytes[3],
+        );
 
         // Dynamically parse IHL (Internet Header Length) from first byte
         let ihl = (ip_payload[0] & 0x0F) as usize * 4;
@@ -576,7 +609,8 @@ impl TCPIPStack {
         }
         let proto_payload = &ip_payload[ihl..];
 
-        if protocol == 6 { // TCP Protocol
+        if protocol == 6 {
+            // TCP Protocol
             if proto_payload.len() < 20 {
                 return;
             }
@@ -591,10 +625,16 @@ impl TCPIPStack {
                     if (*s).protocol == SocketProtocol::TCP && (*s).local_port == dest_port {
                         // Perform State Machine Transitions
                         let current_state = (*s).state;
-                        let rx_seq = u32::from_be_bytes([proto_payload[4], proto_payload[5], proto_payload[6], proto_payload[7]]);
+                        let rx_seq = u32::from_be_bytes([
+                            proto_payload[4],
+                            proto_payload[5],
+                            proto_payload[6],
+                            proto_payload[7],
+                        ]);
                         match current_state {
                             TCPState::Listen => {
-                                if (flags & 0x02) != 0 { // SYN Received
+                                if (flags & 0x02) != 0 {
+                                    // SYN Received
                                     (*s).state = TCPState::SynReceived;
                                     (*s).remote_ip = src_ip;
                                     (*s).remote_port = src_port;
@@ -611,7 +651,8 @@ impl TCPIPStack {
                                 }
                             }
                             TCPState::SynSent => {
-                                if (flags & 0x02) != 0 && (flags & 0x10) != 0 { // SYN-ACK Received
+                                if (flags & 0x02) != 0 && (flags & 0x10) != 0 {
+                                    // SYN-ACK Received
                                     (*s).state = TCPState::Established;
                                     // Send ACK response packet
                                     self.ack_engine.build_ack_segment(
@@ -626,12 +667,14 @@ impl TCPIPStack {
                                 }
                             }
                             TCPState::SynReceived => {
-                                if (flags & 0x10) != 0 { // ACK Received
+                                if (flags & 0x10) != 0 {
+                                    // ACK Received
                                     (*s).state = TCPState::Established;
                                 }
                             }
                             TCPState::Established => {
-                                if (flags & 0x01) != 0 { // FIN Received
+                                if (flags & 0x01) != 0 {
+                                    // FIN Received
                                     (*s).state = TCPState::CloseWait;
                                     // Send ACK response for FIN
                                     self.ack_engine.build_ack_segment(
@@ -648,7 +691,8 @@ impl TCPIPStack {
                                     let tcp_payload = &proto_payload[20..];
                                     let copy_len = tcp_payload.len().min(1024);
                                     if copy_len > 0 {
-                                        (&mut (*s).rcv_buffer)[..copy_len].copy_from_slice(&tcp_payload[..copy_len]);
+                                        (&mut (*s).rcv_buffer)[..copy_len]
+                                            .copy_from_slice(&tcp_payload[..copy_len]);
                                         (*s).rcv_len = copy_len;
                                         // Send ACK for data received
                                         self.ack_engine.build_ack_segment(
@@ -668,7 +712,8 @@ impl TCPIPStack {
                     }
                 }
             }
-        } else if protocol == 17 { // UDP Protocol
+        } else if protocol == 17 {
+            // UDP Protocol
             if proto_payload.len() < 8 {
                 return;
             }
@@ -683,7 +728,8 @@ impl TCPIPStack {
                     if (*s).protocol == SocketProtocol::UDP && (*s).local_port == dest_port {
                         let copy_len = udp_payload.len().min(1024);
                         if copy_len > 0 {
-                            (&mut (*s).rcv_buffer)[..copy_len].copy_from_slice(&udp_payload[..copy_len]);
+                            (&mut (*s).rcv_buffer)[..copy_len]
+                                .copy_from_slice(&udp_payload[..copy_len]);
                             (*s).rcv_len = copy_len;
                             (*s).remote_ip = src_ip;
                             (*s).remote_port = src_port;
@@ -806,10 +852,10 @@ pub struct SackBlock {
 
 #[derive(Debug, Clone)]
 pub struct AcknowledgementPacketEngine {
-    pub quick_ack_mode: bool,           // TCP_QUICKACK mode (Linux default)
-    pub delayed_ack_pending: bool,      // TCP_DELACK pending flag (BSD / Linux 40ms timer)
-    pub pending_ack_seq: u32,           // Sequence number to acknowledge
-    pub sack_blocks: Vec<SackBlock>,    // SACK blocks for out-of-order data (RFC 2018)
+    pub quick_ack_mode: bool,        // TCP_QUICKACK mode (Linux default)
+    pub delayed_ack_pending: bool,   // TCP_DELACK pending flag (BSD / Linux 40ms timer)
+    pub pending_ack_seq: u32,        // Sequence number to acknowledge
+    pub sack_blocks: Vec<SackBlock>, // SACK blocks for out-of-order data (RFC 2018)
     pub tx_ack_count: usize,
 }
 
@@ -854,7 +900,8 @@ impl AcknowledgementPacketEngine {
 
             for block in &self.sack_blocks {
                 tcp.payload[opt_idx..opt_idx + 4].copy_from_slice(&block.left_edge.to_be_bytes());
-                tcp.payload[opt_idx + 4..opt_idx + 8].copy_from_slice(&block.right_edge.to_be_bytes());
+                tcp.payload[opt_idx + 4..opt_idx + 8]
+                    .copy_from_slice(&block.right_edge.to_be_bytes());
                 opt_idx += 8;
             }
         }
@@ -877,7 +924,10 @@ impl AcknowledgementPacketEngine {
     /// Add a SACK out-of-order block (RFC 2018)
     pub fn add_sack_block(&mut self, left: u32, right: u32) {
         if self.sack_blocks.len() < 4 {
-            self.sack_blocks.push(SackBlock { left_edge: left, right_edge: right });
+            self.sack_blocks.push(SackBlock {
+                left_edge: left,
+                right_edge: right,
+            });
         }
     }
 
@@ -905,10 +955,10 @@ pub struct SackBlock {
 
 #[derive(Debug, Clone)]
 pub struct AcknowledgementPacketEngine {
-    pub quick_ack_mode: bool,           // TCP_QUICKACK mode (Linux default)
-    pub delayed_ack_pending: bool,      // TCP_DELACK pending flag (BSD / Linux 40ms timer)
-    pub pending_ack_seq: u32,           // Sequence number to acknowledge
-    pub sack_blocks: Vec<SackBlock>,    // SACK blocks for out-of-order data (RFC 2018)
+    pub quick_ack_mode: bool,        // TCP_QUICKACK mode (Linux default)
+    pub delayed_ack_pending: bool,   // TCP_DELACK pending flag (BSD / Linux 40ms timer)
+    pub pending_ack_seq: u32,        // Sequence number to acknowledge
+    pub sack_blocks: Vec<SackBlock>, // SACK blocks for out-of-order data (RFC 2018)
     pub tx_ack_count: usize,
 }
 
@@ -953,7 +1003,8 @@ impl AcknowledgementPacketEngine {
 
             for block in &self.sack_blocks {
                 tcp.payload[opt_idx..opt_idx + 4].copy_from_slice(&block.left_edge.to_be_bytes());
-                tcp.payload[opt_idx + 4..opt_idx + 8].copy_from_slice(&block.right_edge.to_be_bytes());
+                tcp.payload[opt_idx + 4..opt_idx + 8]
+                    .copy_from_slice(&block.right_edge.to_be_bytes());
                 opt_idx += 8;
             }
         }
@@ -976,7 +1027,10 @@ impl AcknowledgementPacketEngine {
     /// Add a SACK out-of-order block (RFC 2018)
     pub fn add_sack_block(&mut self, left: u32, right: u32) {
         if self.sack_blocks.len() < 4 {
-            self.sack_blocks.push(SackBlock { left_edge: left, right_edge: right });
+            self.sack_blocks.push(SackBlock {
+                left_edge: left,
+                right_edge: right,
+            });
         }
     }
 
@@ -1095,7 +1149,9 @@ mod tests {
     fn test_tcp_state_machine_transitions() {
         unsafe {
             let mut stack = TCPIPStack::new();
-            let fd = stack.socket(SocketType::Stream, SocketProtocol::TCP).unwrap();
+            let fd = stack
+                .socket(SocketType::Stream, SocketProtocol::TCP)
+                .unwrap();
 
             // Listen state transition
             assert!(stack.bind(fd, IPAddress::new(192, 168, 1, 100), 80));
@@ -1112,7 +1168,10 @@ mod tests {
             // IP header: Protocol = 6, dest ip = 192.168.1.100, IHL = 5 (20 bytes)
             packet[14] = 0x45;
             packet[14 + 9] = 6;
-            packet[14 + 16] = 192; packet[14 + 17] = 168; packet[14 + 18] = 1; packet[14 + 19] = 100;
+            packet[14 + 16] = 192;
+            packet[14 + 17] = 168;
+            packet[14 + 18] = 1;
+            packet[14 + 19] = 100;
             // TCP header: dest port = 80, flags = 0x02 (SYN)
             let dest_port_bytes = 80u16.to_be_bytes();
             packet[14 + 20 + 2] = dest_port_bytes[0];
@@ -1140,7 +1199,9 @@ mod tests {
     fn test_udp_demultiplexing_and_extraction() {
         unsafe {
             let mut stack = TCPIPStack::new();
-            let fd = stack.socket(SocketType::Datagram, SocketProtocol::UDP).unwrap();
+            let fd = stack
+                .socket(SocketType::Datagram, SocketProtocol::UDP)
+                .unwrap();
             assert!(stack.bind(fd, IPAddress::new(192, 168, 1, 100), 53));
 
             let socket_ptr = stack.sockets[fd].unwrap().as_ptr();
@@ -1153,7 +1214,10 @@ mod tests {
             // IP
             packet[14] = 0x45; // IHL = 5
             packet[14 + 9] = 17; // UDP Protocol
-            packet[14 + 16] = 192; packet[14 + 17] = 168; packet[14 + 18] = 1; packet[14 + 19] = 100;
+            packet[14 + 16] = 192;
+            packet[14 + 17] = 168;
+            packet[14 + 18] = 1;
+            packet[14 + 19] = 100;
             // UDP Header
             let src_port_bytes = 1053u16.to_be_bytes();
             packet[14 + 20] = src_port_bytes[0];

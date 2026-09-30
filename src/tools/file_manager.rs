@@ -1,11 +1,9 @@
 //! File Manager (Nautilus/Thunar Inspiration)
 //! File navigation, operations, and file properties
 
-
-
 use std::string::{String, ToString};
-use std::vec::Vec;
 use std::vec;
+use std::vec::Vec;
 
 const MAX_CLIPBOARD_ITEMS: usize = 16;
 
@@ -359,7 +357,11 @@ mod tests {
             File::new("a.txt", "/a.txt", false),
         ];
 
-        DualPaneFileManager::sort_pane_files(&mut files, FileSortField::Name, FileSortOrder::Ascending);
+        DualPaneFileManager::sort_pane_files(
+            &mut files,
+            FileSortField::Name,
+            FileSortOrder::Ascending,
+        );
         assert_eq!(files[0].name, "a.txt");
     }
 }

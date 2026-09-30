@@ -291,7 +291,9 @@ mod tests {
     #[test]
     fn test_pledge_context_pledge() {
         let mut context = PledgeContext::new();
-        context.pledge(&[PledgePromise::Stdio, PledgePromise::Rpath]).unwrap();
+        context
+            .pledge(&[PledgePromise::Stdio, PledgePromise::Rpath])
+            .unwrap();
 
         assert!(context.is_pledged());
         assert!(context.has_promise(PledgePromise::Stdio));
@@ -349,8 +351,12 @@ mod tests {
         let context_id1 = manager.create_context();
         let context_id2 = manager.create_context();
 
-        manager.pledge(context_id1, &[PledgePromise::Stdio]).unwrap();
-        manager.pledge(context_id2, &[PledgePromise::Rpath]).unwrap();
+        manager
+            .pledge(context_id1, &[PledgePromise::Stdio])
+            .unwrap();
+        manager
+            .pledge(context_id2, &[PledgePromise::Rpath])
+            .unwrap();
 
         assert!(manager.has_promise(context_id1, PledgePromise::Stdio));
         assert!(!manager.has_promise(context_id2, PledgePromise::Stdio));

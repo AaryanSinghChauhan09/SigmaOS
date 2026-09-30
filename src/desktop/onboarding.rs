@@ -23,27 +23,51 @@ impl Language {
     }
 
     pub fn english() -> Self {
-        Language::new(String::from("en"), String::from("English"), String::from("English"))
+        Language::new(
+            String::from("en"),
+            String::from("English"),
+            String::from("English"),
+        )
     }
 
     pub fn spanish() -> Self {
-        Language::new(String::from("es"), String::from("Spanish"), String::from("Español"))
+        Language::new(
+            String::from("es"),
+            String::from("Spanish"),
+            String::from("Español"),
+        )
     }
 
     pub fn french() -> Self {
-        Language::new(String::from("fr"), String::from("French"), String::from("Français"))
+        Language::new(
+            String::from("fr"),
+            String::from("French"),
+            String::from("Français"),
+        )
     }
 
     pub fn german() -> Self {
-        Language::new(String::from("de"), String::from("German"), String::from("Deutsch"))
+        Language::new(
+            String::from("de"),
+            String::from("German"),
+            String::from("Deutsch"),
+        )
     }
 
     pub fn japanese() -> Self {
-        Language::new(String::from("ja"), String::from("Japanese"), String::from("日本語"))
+        Language::new(
+            String::from("ja"),
+            String::from("Japanese"),
+            String::from("日本語"),
+        )
     }
 
     pub fn chinese() -> Self {
-        Language::new(String::from("zh"), String::from("Chinese"), String::from("中文"))
+        Language::new(
+            String::from("zh"),
+            String::from("Chinese"),
+            String::from("中文"),
+        )
     }
 }
 
@@ -65,23 +89,43 @@ impl Region {
     }
 
     pub fn us() -> Self {
-        Region::new(String::from("US"), String::from("United States"), String::from("America/New_York"))
+        Region::new(
+            String::from("US"),
+            String::from("United States"),
+            String::from("America/New_York"),
+        )
     }
 
     pub fn eu() -> Self {
-        Region::new(String::from("EU"), String::from("Europe"), String::from("Europe/Brussels"))
+        Region::new(
+            String::from("EU"),
+            String::from("Europe"),
+            String::from("Europe/Brussels"),
+        )
     }
 
     pub fn uk() -> Self {
-        Region::new(String::from("UK"), String::from("United Kingdom"), String::from("Europe/London"))
+        Region::new(
+            String::from("UK"),
+            String::from("United Kingdom"),
+            String::from("Europe/London"),
+        )
     }
 
     pub fn jp() -> Self {
-        Region::new(String::from("JP"), String::from("Japan"), String::from("Asia/Tokyo"))
+        Region::new(
+            String::from("JP"),
+            String::from("Japan"),
+            String::from("Asia/Tokyo"),
+        )
     }
 
     pub fn cn() -> Self {
-        Region::new(String::from("CN"), String::from("China"), String::from("Asia/Shanghai"))
+        Region::new(
+            String::from("CN"),
+            String::from("China"),
+            String::from("Asia/Shanghai"),
+        )
     }
 }
 
@@ -471,7 +515,7 @@ mod tests {
         let settings = PrivacySettings::new()
             .with_usage_data(true)
             .with_crash_reports(false);
-        
+
         assert!(settings.send_anonymous_usage_data);
         assert!(!settings.send_crash_reports);
     }
@@ -489,7 +533,7 @@ mod tests {
         let config = OnboardingConfig::new()
             .with_username(String::from("testuser"))
             .with_hostname(String::from("testhost"));
-        
+
         assert_eq!(config.username, "testuser");
         assert_eq!(config.hostname, "testhost");
     }
@@ -498,9 +542,8 @@ mod tests {
     fn test_onboarding_config_validate() {
         let config = OnboardingConfig::default();
         assert!(config.validate().is_ok());
-        
-        let invalid_config = OnboardingConfig::new()
-            .with_username(String::from("ab"));
+
+        let invalid_config = OnboardingConfig::new().with_username(String::from("ab"));
         assert!(invalid_config.validate().is_err());
     }
 
@@ -516,7 +559,7 @@ mod tests {
         let mut wizard = OnboardingWizard::new();
         wizard.next_step();
         assert_eq!(wizard.current_step, OnboardingStep::NetworkConfiguration);
-        
+
         wizard.previous_step();
         assert_eq!(wizard.current_step, OnboardingStep::LanguageAndRegion);
     }
@@ -525,13 +568,13 @@ mod tests {
     fn test_onboarding_wizard_completion() {
         let mut wizard = OnboardingWizard::new();
         assert!(!wizard.is_complete());
-        
+
         wizard.next_step();
         wizard.next_step();
         wizard.next_step();
         wizard.next_step();
         wizard.next_step();
-        
+
         assert!(wizard.is_complete());
     }
 
@@ -539,10 +582,10 @@ mod tests {
     fn test_onboarding_wizard_can_proceed() {
         let mut wizard = OnboardingWizard::new();
         assert!(wizard.can_proceed());
-        
+
         wizard.current_step = OnboardingStep::UserAccountSetup;
         assert!(!wizard.can_proceed());
-        
+
         wizard.set_username(String::from("testuser"));
         assert!(wizard.can_proceed());
     }

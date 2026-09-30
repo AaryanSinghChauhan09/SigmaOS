@@ -12,9 +12,9 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 // Visa Vulnerability Agentic Harness (VVAH) Integration Module
 //
@@ -74,52 +74,75 @@ impl VisaVulnerabilityAgenticHarness {
     pub fn run_pipeline(&mut self) -> Result<&'static str, &'static str> {
         // --- PHASE 1: DISCOVERY & MODELING (S1-S3) ---
         self.current_stage = PipelineStage::S1Explore;
-        if self.should_stop() { return Ok("Stopped after S1Explore"); }
+        if self.should_stop() {
+            return Ok("Stopped after S1Explore");
+        }
 
         self.current_stage = PipelineStage::S2ThreatModel;
         // Inject mock STRIDE threat analysis finding
-        self.findings.insert("CVE-2026-0001".to_string(), VvahFinding {
-            cve_id: "CVE-2026-0001".to_string(),
-            title: "STRIDE: Authentication Bypass via Insecure Port".to_string(),
-            severity: "Critical".to_string(),
-            stage_discovered: PipelineStage::S2ThreatModel,
-            exploit_chain_validated: false,
-            candidate_fix: None,
-        });
-        if self.should_stop() { return Ok("Stopped after S2ThreatModel"); }
+        self.findings.insert(
+            "CVE-2026-0001".to_string(),
+            VvahFinding {
+                cve_id: "CVE-2026-0001".to_string(),
+                title: "STRIDE: Authentication Bypass via Insecure Port".to_string(),
+                severity: "Critical".to_string(),
+                stage_discovered: PipelineStage::S2ThreatModel,
+                exploit_chain_validated: false,
+                candidate_fix: None,
+            },
+        );
+        if self.should_stop() {
+            return Ok("Stopped after S2ThreatModel");
+        }
 
         self.current_stage = PipelineStage::S3Strategize;
-        if self.should_stop() { return Ok("Stopped after S3Strategize"); }
+        if self.should_stop() {
+            return Ok("Stopped after S3Strategize");
+        }
 
         // --- PHASE 2: DEEP DIVE & VERIFICATION (S4-S6) ---
         self.current_stage = PipelineStage::S4LensResearch;
-        if self.should_stop() { return Ok("Stopped after S4LensResearch"); }
+        if self.should_stop() {
+            return Ok("Stopped after S4LensResearch");
+        }
 
         self.current_stage = PipelineStage::S5PreFilter;
-        if self.should_stop() { return Ok("Stopped after S5PreFilter"); }
+        if self.should_stop() {
+            return Ok("Stopped after S5PreFilter");
+        }
 
         self.current_stage = PipelineStage::S6AdversarialVerify;
         if let Some(finding) = self.findings.get_mut("CVE-2026-0001") {
             finding.exploit_chain_validated = true;
         }
-        if self.should_stop() { return Ok("Stopped after S6AdversarialVerify"); }
+        if self.should_stop() {
+            return Ok("Stopped after S6AdversarialVerify");
+        }
 
         // --- PHASE 3: SYNTHESIS & REPORTING (S7-S9) ---
         self.current_stage = PipelineStage::S7Deduplicate;
-        if self.should_stop() { return Ok("Stopped after S7Deduplicate"); }
+        if self.should_stop() {
+            return Ok("Stopped after S7Deduplicate");
+        }
 
         self.current_stage = PipelineStage::S8ChainConstruct;
-        if self.should_stop() { return Ok("Stopped after S8ChainConstruct"); }
+        if self.should_stop() {
+            return Ok("Stopped after S8ChainConstruct");
+        }
 
         self.current_stage = PipelineStage::S9SarifEmission;
-        if self.should_stop() { return Ok("Stopped after S9SarifEmission"); }
+        if self.should_stop() {
+            return Ok("Stopped after S9SarifEmission");
+        }
 
         // --- PHASE 4: REMEDIATION & VALIDATION (S10-S11) ---
         self.current_stage = PipelineStage::S10RemediatePatch;
         if let Some(finding) = self.findings.get_mut("CVE-2026-0001") {
             finding.candidate_fix = Some("apply_port_security_patch();".to_string());
         }
-        if self.should_stop() { return Ok("Stopped after S10RemediatePatch"); }
+        if self.should_stop() {
+            return Ok("Stopped after S10RemediatePatch");
+        }
 
         self.current_stage = PipelineStage::S11ValidationPanel;
 
@@ -159,7 +182,10 @@ mod tests {
     fn test_vvah_pipeline_full() {
         let mut harness = VisaVulnerabilityAgenticHarness::new("/path/to/test_repo", None);
         let res = harness.run_pipeline().unwrap();
-        assert_eq!(res, "Pipeline complete: All 11 stages executed successfully");
+        assert_eq!(
+            res,
+            "Pipeline complete: All 11 stages executed successfully"
+        );
         assert_eq!(harness.current_stage, PipelineStage::S11ValidationPanel);
 
         let finding = harness.findings.get("CVE-2026-0001").unwrap();
@@ -175,7 +201,7 @@ mod tests {
     fn test_vvah_pipeline_stop_early() {
         let mut harness = VisaVulnerabilityAgenticHarness::new(
             "/path/to/test_repo",
-            Some(PipelineStage::S6AdversarialVerify)
+            Some(PipelineStage::S6AdversarialVerify),
         );
         let res = harness.run_pipeline().unwrap();
         assert_eq!(res, "Stopped after S6AdversarialVerify");

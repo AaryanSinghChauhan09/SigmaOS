@@ -84,7 +84,9 @@ impl UnifiedDmaBroker {
                     let end_byte = start_byte + (desc.length_pages * PAGE_SIZE_BYTES);
                     let mut ram = self.physical_ram.borrow_mut();
                     for byte in ram[start_byte..end_byte].iter_mut() {
-                        unsafe { core::ptr::write_volatile(byte, 0x00); }
+                        unsafe {
+                            core::ptr::write_volatile(byte, 0x00);
+                        }
                     }
 
                     *slot = None;
@@ -246,7 +248,12 @@ impl SelfHealingDriverManager {
     }
 
     /// Logs a pending high-importance device operation before sending it to hardware
-    pub fn begin_transaction(&self, device_id: u32, command_type: DeviceCommandType, sector_id: u64) -> Result<usize, &'static str> {
+    pub fn begin_transaction(
+        &self,
+        device_id: u32,
+        command_type: DeviceCommandType,
+        sector_id: u64,
+    ) -> Result<usize, &'static str> {
         let mut transactions = self.transactions.borrow_mut();
         for (i, slot) in transactions.iter_mut().enumerate() {
             if slot.is_none() {
@@ -277,7 +284,11 @@ impl SelfHealingDriverManager {
 
     /// Simulates automatic device healing. If a command times out (e.g. status status remains busy),
     /// the manager resets device registers, cycles power, flushes descriptor rings, and replays pending transactions.
-    pub fn handle_device_fault_and_replay(&self, device_id: u32, simulated_fault_occurred: bool) -> Result<u32, &'static str> {
+    pub fn handle_device_fault_and_replay(
+        &self,
+        device_id: u32,
+        simulated_fault_occurred: bool,
+    ) -> Result<u32, &'static str> {
         if simulated_fault_occurred {
             let count = self.simulated_hardware_error_count.get();
             self.simulated_hardware_error_count.set(count + 1);
@@ -392,7 +403,9 @@ mod tests {
         let manager = SelfHealingDriverManager::new();
 
         // Log write transaction on device 42
-        let tx_idx = manager.begin_transaction(42, DeviceCommandType::WriteBlock, 1024).unwrap();
+        let tx_idx = manager
+            .begin_transaction(42, DeviceCommandType::WriteBlock, 1024)
+            .unwrap();
 
         // Simulate a device fault occurrence
         let replay_count = manager.handle_device_fault_and_replay(42, true).unwrap();

@@ -71,7 +71,8 @@ impl Session {
             return Err(format!("Process group {} already exists", pgid));
         }
 
-        self.process_groups.insert(pgid, ProcessGroup::new(pgid, leader_pid));
+        self.process_groups
+            .insert(pgid, ProcessGroup::new(pgid, leader_pid));
         Ok(())
     }
 
@@ -149,7 +150,9 @@ impl ProcessGroupSessionManager {
     /// Get process group from session
     pub fn get_process_group(&self, sid: i32, pgid: i32) -> Option<ProcessGroup> {
         let sessions = self.sessions.lock().unwrap();
-        sessions.get(&sid).and_then(|s| s.get_process_group(pgid).cloned())
+        sessions
+            .get(&sid)
+            .and_then(|s| s.get_process_group(pgid).cloned())
     }
 
     /// Remove process group from session

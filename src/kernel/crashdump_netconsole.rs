@@ -4,9 +4,8 @@
 
 #![cfg_attr(not(test), no_std)]
 
-
-use std::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
+use std::vec::Vec;
 
 /// Magic marker for valid SigmaOS kdump headers
 pub const KDUMP_MAGIC: u64 = 0x5349474D41444D50; // "SIGMADMP"

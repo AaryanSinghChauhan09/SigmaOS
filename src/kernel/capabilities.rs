@@ -2,8 +2,8 @@
 // POSIX capabilities for SigmaOS
 
 use std::collections::BTreeMap;
-use std::sync::{Arc, Mutex};
 use std::sync::atomic::{AtomicU32, Ordering};
+use std::sync::{Arc, Mutex};
 
 /// POSIX capability identifiers (Linux capabilities.h)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -173,7 +173,9 @@ impl CapabilityManager {
 
     /// Grant capability to process
     pub fn grant(&self, pid: u32, cap: Capability) -> Result<(), String> {
-        let caps = self.process_capabilities.get(&pid)
+        let caps = self
+            .process_capabilities
+            .get(&pid)
             .ok_or_else(|| format!("Process not found: {}", pid))?;
 
         let mut caps_guard = caps.lock().unwrap();
@@ -184,7 +186,9 @@ impl CapabilityManager {
 
     /// Revoke capability from process
     pub fn revoke(&self, pid: u32, cap: Capability) -> Result<(), String> {
-        let caps = self.process_capabilities.get(&pid)
+        let caps = self
+            .process_capabilities
+            .get(&pid)
             .ok_or_else(|| format!("Process not found: {}", pid))?;
 
         let mut caps_guard = caps.lock().unwrap();
@@ -194,7 +198,8 @@ impl CapabilityManager {
 
     /// Remove process
     pub fn remove_process(&mut self, pid: u32) -> Result<(), String> {
-        self.process_capabilities.remove(&pid)
+        self.process_capabilities
+            .remove(&pid)
             .ok_or_else(|| format!("Process not found: {}", pid))?;
         Ok(())
     }

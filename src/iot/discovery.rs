@@ -13,29 +13,37 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
 /// OOP-based IoT Device Discovery for SigmaOS
 /// Based on Ideas-999-Structured: IoT & Smart Home Item 1006
 /// Implements device discovery and enumeration
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type DeviceID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum DiscoveryProtocol { mDNS = 0, UPnP = 1, SSDP = 2, BLE = 3 }
+pub enum DiscoveryProtocol {
+    mDNS = 0,
+    UPnP = 1,
+    SSDP = 2,
+    BLE = 3,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum DiscoveryError { Success = 0, NotFound = 1, ScanFailed = 2 }
+pub enum DiscoveryError {
+    Success = 0,
+    NotFound = 1,
+    ScanFailed = 2,
+}
 
 pub trait DiscoveredDevice {
     fn id(&self) -> DeviceID;
@@ -58,8 +66,12 @@ impl SimpleDiscoveredDevice {
         let mut addr_array = [0u8; 64];
         let name_len = name.len().min(63);
         let addr_len = address.len().min(63);
-        for i in 0..name_len { name_array[i] = name[i]; }
-        for i in 0..addr_len { addr_array[i] = address[i]; }
+        for i in 0..name_len {
+            name_array[i] = name[i];
+        }
+        for i in 0..addr_len {
+            addr_array[i] = address[i];
+        }
         SimpleDiscoveredDevice {
             id,
             name: name_array,
@@ -70,7 +82,9 @@ impl SimpleDiscoveredDevice {
 }
 
 impl DiscoveredDevice for SimpleDiscoveredDevice {
-    fn id(&self) -> DeviceID { self.id }
+    fn id(&self) -> DeviceID {
+        self.id
+    }
     fn name(&self) -> &[u8] {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
@@ -79,7 +93,9 @@ impl DiscoveredDevice for SimpleDiscoveredDevice {
         let len = self.address.iter().position(|&b| b == 0).unwrap_or(64);
         &self.address[..len]
     }
-    fn protocol(&self) -> DiscoveryProtocol { unsafe { core::mem::transmute(self.protocol.load(Ordering::SeqCst)) } }
+    fn protocol(&self) -> DiscoveryProtocol {
+        unsafe { core::mem::transmute(self.protocol.load(Ordering::SeqCst)) }
+    }
 }
 
 pub trait DeviceDiscovery {
@@ -111,11 +127,11 @@ impl DeviceDiscovery for SimpleDeviceDiscovery {
         self.scanning.store(1, Ordering::SeqCst);
         Ok(())
     }
-    
+
     fn stop_scan(&mut self) {
         self.scanning.store(0, Ordering::SeqCst);
     }
-    
+
     fn get_devices(&self) -> Vec<&dyn DiscoveredDevice> {
         let mut devices = Vec::new();
         for device_option in &self.devices {
@@ -140,9 +156,7 @@ pub struct SimpleDevicePairing {
 impl SimpleDevicePairing {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        SimpleDevicePairing {
-            paired: Vec::new(),
-        }
+        SimpleDevicePairing { paired: Vec::new() }
     }
 }
 
@@ -151,7 +165,7 @@ impl DevicePairing for SimpleDevicePairing {
         self.paired.push(device_id);
         Ok(())
     }
-    
+
     fn unpair_device(&mut self, device_id: DeviceID) -> Result<(), DiscoveryError> {
         for i in 0..self.paired.len() {
             if self.paired[i] == device_id {
@@ -163,13 +177,25 @@ impl DevicePairing for SimpleDevicePairing {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -187,19 +213,29 @@ impl<T> Vec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -231,7 +267,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;

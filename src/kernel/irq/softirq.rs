@@ -13,10 +13,10 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-use core::sync::atomic::{AtomicU32, Ordering};
 /// SigmaOS Softirq and tasklets deferred execution engine
 /// Handles lower-priority interrupt bottom-half processing
 use crate::klib::VecDeque;
+use core::sync::atomic::{AtomicU32, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SoftirqType {
@@ -97,8 +97,8 @@ impl Default for SoftirqEngine {
 mod tests {
     use super::*;
     use core::sync::atomic::{AtomicUsize, Ordering};
-    
-use std::sync::Arc;
+
+    use std::sync::Arc;
 
     static CALLED_COUNT: AtomicUsize = AtomicUsize::new(0);
 

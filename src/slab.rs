@@ -14,10 +14,9 @@
 //! - FreeBSD UMA: `sys/vm/uma_core.c`
 //! - NetBSD pool allocator: `sys/kern/subr_pool.c`
 
-
+use core::mem;
 use core::ptr::NonNull;
 use core::sync::atomic::{AtomicPtr, AtomicUsize, Ordering};
-use core::mem;
 
 /// Maximum object size handled by the slab allocator.
 /// Objects larger than this are delegated to the buddy allocator.
@@ -135,7 +134,11 @@ impl Slab {
         let addr = ptr as usize;
         let header_size = Self::aligned_size(mem::size_of::<Slab>(), mem::align_of::<usize>());
         let start = self.base.saturating_add(header_size);
-        let end = self.base.saturating_add(self.total_objects.saturating_mul(self.object_size).saturating_add(header_size));
+        let end = self.base.saturating_add(
+            self.total_objects
+                .saturating_mul(self.object_size)
+                .saturating_add(header_size),
+        );
         addr >= start && addr < end
     }
 
@@ -220,7 +223,10 @@ impl SlabCache {
         }
         // Should not reach here — mismatched deallocation
         #[cfg(debug_assertions)]
-        panic!("SlabCache::dealloc: ptr does not belong to any slab in cache '{}'", self.name);
+        panic!(
+            "SlabCache::dealloc: ptr does not belong to any slab in cache '{}'",
+            self.name
+        );
     }
 
     /// Add a pre-initialized slab to this cache's partial list.
@@ -248,13 +254,13 @@ unsafe impl Send for SlabCache {}
 
 /// Global slab caches for common kernel object sizes.
 /// Inspired by Linux's `kmalloc` size classes.
-pub static SLAB_8:    SlabCache = SlabCache::new("slab-8",    8);
-pub static SLAB_16:   SlabCache = SlabCache::new("slab-16",   16);
-pub static SLAB_32:   SlabCache = SlabCache::new("slab-32",   32);
-pub static SLAB_64:   SlabCache = SlabCache::new("slab-64",   64);
-pub static SLAB_128:  SlabCache = SlabCache::new("slab-128",  128);
-pub static SLAB_256:  SlabCache = SlabCache::new("slab-256",  256);
-pub static SLAB_512:  SlabCache = SlabCache::new("slab-512",  512);
+pub static SLAB_8: SlabCache = SlabCache::new("slab-8", 8);
+pub static SLAB_16: SlabCache = SlabCache::new("slab-16", 16);
+pub static SLAB_32: SlabCache = SlabCache::new("slab-32", 32);
+pub static SLAB_64: SlabCache = SlabCache::new("slab-64", 64);
+pub static SLAB_128: SlabCache = SlabCache::new("slab-128", 128);
+pub static SLAB_256: SlabCache = SlabCache::new("slab-256", 256);
+pub static SLAB_512: SlabCache = SlabCache::new("slab-512", 512);
 pub static SLAB_1024: SlabCache = SlabCache::new("slab-1024", 1024);
 pub static SLAB_2048: SlabCache = SlabCache::new("slab-2048", 2048);
 pub static SLAB_4096: SlabCache = SlabCache::new("slab-4096", 4096);
@@ -263,13 +269,13 @@ pub static SLAB_4096: SlabCache = SlabCache::new("slab-4096", 4096);
 /// Returns `None` if size exceeds `SLAB_MAX_OBJECT_SIZE`.
 pub fn cache_for_size(size: usize) -> Option<&'static SlabCache> {
     match size {
-        0..=8    => Some(&SLAB_8),
-        9..=16   => Some(&SLAB_16),
-        17..=32  => Some(&SLAB_32),
-        33..=64  => Some(&SLAB_64),
+        0..=8 => Some(&SLAB_8),
+        9..=16 => Some(&SLAB_16),
+        17..=32 => Some(&SLAB_32),
+        33..=64 => Some(&SLAB_64),
         65..=128 => Some(&SLAB_128),
-        129..=256  => Some(&SLAB_256),
-        257..=512  => Some(&SLAB_512),
+        129..=256 => Some(&SLAB_256),
+        257..=512 => Some(&SLAB_512),
         513..=1024 => Some(&SLAB_1024),
         1025..=2048 => Some(&SLAB_2048),
         2049..=4096 => Some(&SLAB_4096),

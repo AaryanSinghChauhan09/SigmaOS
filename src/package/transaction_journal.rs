@@ -5,28 +5,44 @@
 
 use std::collections::HashMap;
 use std::fs;
-use std::path::{Path, PathBuf};
 use std::io::{self, Write};
+use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 /// Transaction operation type
 #[derive(Debug, Clone, PartialEq)]
 pub enum TransactionOperation {
-    Install { package_name: String, version: String },
-    Remove { package_name: String },
-    Update { package_name: String, old_version: String, new_version: String },
+    Install {
+        package_name: String,
+        version: String,
+    },
+    Remove {
+        package_name: String,
+    },
+    Update {
+        package_name: String,
+        old_version: String,
+        new_version: String,
+    },
 }
 
 impl TransactionOperation {
     fn to_string(&self) -> String {
         match self {
-            TransactionOperation::Install { package_name, version } => {
+            TransactionOperation::Install {
+                package_name,
+                version,
+            } => {
                 format!("INSTALL {} {}", package_name, version)
             }
             TransactionOperation::Remove { package_name } => {
                 format!("REMOVE {}", package_name)
             }
-            TransactionOperation::Update { package_name, old_version, new_version } => {
+            TransactionOperation::Update {
+                package_name,
+                old_version,
+                new_version,
+            } => {
                 format!("UPDATE {} {} -> {}", package_name, old_version, new_version)
             }
         }
@@ -180,7 +196,9 @@ impl TransactionEntry {
             }
         }
 
-        if let (Some(id), Some(timestamp), Some(operation), Some(state)) = (id, timestamp, operation, state) {
+        if let (Some(id), Some(timestamp), Some(operation), Some(state)) =
+            (id, timestamp, operation, state)
+        {
             Some(TransactionEntry {
                 id,
                 timestamp,
@@ -241,7 +259,9 @@ impl TransactionJournal {
             if line.starts_with("id:") {
                 // New entry starts
                 if !current_entry_lines.is_empty() {
-                    if let Some(entry) = TransactionEntry::from_text(&current_entry_lines.join("\n")) {
+                    if let Some(entry) =
+                        TransactionEntry::from_text(&current_entry_lines.join("\n"))
+                    {
                         next_id = next_id.max(entry.id + 1);
                         entries.push(entry);
                     }
@@ -311,7 +331,10 @@ impl TransactionJournal {
             entry.state = state;
             self.save()
         } else {
-            Err(io::Error::new(io::ErrorKind::NotFound, "Transaction not found"))
+            Err(io::Error::new(
+                io::ErrorKind::NotFound,
+                "Transaction not found",
+            ))
         }
     }
 
@@ -321,7 +344,10 @@ impl TransactionJournal {
             entry.files_changed.push(path);
             self.save()
         } else {
-            Err(io::Error::new(io::ErrorKind::NotFound, "Transaction not found"))
+            Err(io::Error::new(
+                io::ErrorKind::NotFound,
+                "Transaction not found",
+            ))
         }
     }
 
@@ -331,7 +357,10 @@ impl TransactionJournal {
             entry.directories_created.push(path);
             self.save()
         } else {
-            Err(io::Error::new(io::ErrorKind::NotFound, "Transaction not found"))
+            Err(io::Error::new(
+                io::ErrorKind::NotFound,
+                "Transaction not found",
+            ))
         }
     }
 
@@ -341,7 +370,10 @@ impl TransactionJournal {
             entry.pre_snapshot = Some(snapshot_path);
             self.save()
         } else {
-            Err(io::Error::new(io::ErrorKind::NotFound, "Transaction not found"))
+            Err(io::Error::new(
+                io::ErrorKind::NotFound,
+                "Transaction not found",
+            ))
         }
     }
 
@@ -351,7 +383,10 @@ impl TransactionJournal {
             entry.post_snapshot = Some(snapshot_path);
             self.save()
         } else {
-            Err(io::Error::new(io::ErrorKind::NotFound, "Transaction not found"))
+            Err(io::Error::new(
+                io::ErrorKind::NotFound,
+                "Transaction not found",
+            ))
         }
     }
 
@@ -367,7 +402,9 @@ impl TransactionJournal {
 
     /// Rollback a transaction
     pub fn rollback(&mut self, id: u64) -> io::Result<()> {
-        let entry = self.entries.iter_mut()
+        let entry = self
+            .entries
+            .iter_mut()
             .find(|e| e.id == id)
             .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, "Transaction not found"))?;
 
@@ -378,7 +415,7 @@ impl TransactionJournal {
             } else {
                 return Err(io::Error::new(
                     io::ErrorKind::NotFound,
-                    "Pre-snapshot not found"
+                    "Pre-snapshot not found",
                 ));
             }
         }
@@ -469,11 +506,20 @@ impl TransactionJournal {
 
     /// Get transaction history for a package
     pub fn get_package_history(&self, package_name: &str) -> Vec<&TransactionEntry> {
-        self.entries.iter()
+        self.entries
+            .iter()
             .filter(|e| match &e.operation {
-                TransactionOperation::Install { package_name: ref name, .. } => name == package_name,
-                TransactionOperation::Remove { package_name: ref name } => name == package_name,
-                TransactionOperation::Update { package_name: ref name, .. } => name == package_name,
+                TransactionOperation::Install {
+                    package_name: ref name,
+                    ..
+                } => name == package_name,
+                TransactionOperation::Remove {
+                    package_name: ref name,
+                } => name == package_name,
+                TransactionOperation::Update {
+                    package_name: ref name,
+                    ..
+                } => name == package_name,
             })
             .collect()
     }
@@ -508,7 +554,9 @@ mod tests {
         journal.set_state(id, TransactionState::InProgress).unwrap();
 
         // Record file change
-        journal.record_file_change(id, PathBuf::from("/bin/test")).unwrap();
+        journal
+            .record_file_change(id, PathBuf::from("/bin/test"))
+            .unwrap();
 
         // Complete transaction
         journal.set_state(id, TransactionState::Completed).unwrap();

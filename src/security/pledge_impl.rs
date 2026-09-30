@@ -22,41 +22,41 @@ use crate::runtime::process::ProcessId;
 #[repr(u32)]
 pub enum PledgePromise {
     /// Basic I/O: read, write, fstat, close, …
-    Stdio   = 0,
+    Stdio = 0,
     /// Read-only filesystem access.
-    Rpath   = 1,
+    Rpath = 1,
     /// Write filesystem access (no create/delete).
-    Wpath   = 2,
+    Wpath = 2,
     /// Create and delete paths (implies Wpath).
-    Cpath   = 3,
+    Cpath = 3,
     /// Execute other programs via exec*.
-    Exec    = 4,
+    Exec = 4,
     /// DNS resolution via getaddrinfo / getnameinfo.
-    Dns     = 5,
+    Dns = 5,
     /// TCP/UDP connections via inet sockets.
-    Inet    = 6,
+    Inet = 6,
     /// Unix-domain socket access.
-    Unix    = 7,
+    Unix = 7,
     /// Fork, wait, getpid, kill (limited).
-    Proc    = 8,
+    Proc = 8,
     /// setuid, setgid, seteuid, setegid.
-    Id      = 9,
+    Id = 9,
     /// chdir, fchdir.
-    Chdir   = 10,
+    Chdir = 10,
     /// mmap, mprotect (anonymous mappings only).
-    Prot    = 11,
+    Prot = 11,
     /// tty-related ioctls.
-    Tty     = 12,
+    Tty = 12,
     /// Audio device access.
-    Audio   = 13,
+    Audio = 13,
     /// Video / camera device access.
-    Video   = 14,
+    Video = 14,
     /// Bluetooth device access.
-    Bpf     = 15,
+    Bpf = 15,
     /// Cryptographic hardware (TPM, HSM).
-    Crypto  = 16,
+    Crypto = 16,
     /// Virtual memory management.
-    Vminfo  = 17,
+    Vminfo = 17,
 }
 
 impl PledgePromise {
@@ -98,7 +98,11 @@ struct PledgeState {
 
 impl PledgeState {
     fn new(promises: u32, mode: ViolationMode) -> Self {
-        Self { allowed: promises, locked: true, mode }
+        Self {
+            allowed: promises,
+            locked: true,
+            mode,
+        }
     }
 
     fn check(&self, op: PledgePromise) -> bool {
@@ -147,7 +151,9 @@ pub struct PledgeEnforcer {
 impl PledgeEnforcer {
     /// Create a new, empty enforcer.
     pub fn new() -> Self {
-        Self { registry: SigmaBTreeMap::new() }
+        Self {
+            registry: SigmaBTreeMap::new(),
+        }
     }
 
     // ── pledge() ──────────────────────────────────────────────────────────────
@@ -180,13 +186,9 @@ impl PledgeEnforcer {
     /// - The operation is covered by its promise set.
     ///
     /// Returns `Err(PledgeError::Violation(_))` otherwise.
-    pub fn check(
-        &self,
-        pid: ProcessId,
-        op: PledgePromise,
-    ) -> Result<(), PledgeError> {
+    pub fn check(&self, pid: ProcessId, op: PledgePromise) -> Result<(), PledgeError> {
         match self.registry.get(&pid) {
-            None => Ok(()),  // unpledged: full access
+            None => Ok(()), // unpledged: full access
             Some(state) => {
                 if state.check(op) {
                     Ok(())
@@ -253,7 +255,9 @@ macro_rules! check_pledge {
 mod tests {
     use super::*;
 
-    fn pid(n: u64) -> ProcessId { ProcessId(n) }
+    fn pid(n: u64) -> ProcessId {
+        ProcessId(n)
+    }
 
     #[test]
     fn test_unpledged_process_allowed() {
@@ -264,7 +268,13 @@ mod tests {
     #[test]
     fn test_pledged_allowed_promise() {
         let mut enforcer = PledgeEnforcer::new();
-        enforcer.pledge(pid(2), &[PledgePromise::Stdio, PledgePromise::Rpath], ViolationMode::Kill).unwrap();
+        enforcer
+            .pledge(
+                pid(2),
+                &[PledgePromise::Stdio, PledgePromise::Rpath],
+                ViolationMode::Kill,
+            )
+            .unwrap();
         assert!(enforcer.check(pid(2), PledgePromise::Stdio).is_ok());
         assert!(enforcer.check(pid(2), PledgePromise::Rpath).is_ok());
     }
@@ -272,7 +282,9 @@ mod tests {
     #[test]
     fn test_pledged_forbidden_promise() {
         let mut enforcer = PledgeEnforcer::new();
-        enforcer.pledge(pid(3), &[PledgePromise::Stdio], ViolationMode::ReturnError).unwrap();
+        enforcer
+            .pledge(pid(3), &[PledgePromise::Stdio], ViolationMode::ReturnError)
+            .unwrap();
         assert_eq!(
             enforcer.check(pid(3), PledgePromise::Inet),
             Err(PledgeError::Violation(PledgePromise::Inet))
@@ -282,25 +294,41 @@ mod tests {
     #[test]
     fn test_narrowing_allowed() {
         let mut enforcer = PledgeEnforcer::new();
-        enforcer.pledge(pid(4), &[PledgePromise::Stdio, PledgePromise::Inet], ViolationMode::Kill).unwrap();
+        enforcer
+            .pledge(
+                pid(4),
+                &[PledgePromise::Stdio, PledgePromise::Inet],
+                ViolationMode::Kill,
+            )
+            .unwrap();
         // Narrow to Stdio only — should succeed
-        enforcer.pledge(pid(4), &[PledgePromise::Stdio], ViolationMode::Kill).unwrap();
+        enforcer
+            .pledge(pid(4), &[PledgePromise::Stdio], ViolationMode::Kill)
+            .unwrap();
         assert!(enforcer.check(pid(4), PledgePromise::Inet).is_err());
     }
 
     #[test]
     fn test_widening_forbidden() {
         let mut enforcer = PledgeEnforcer::new();
-        enforcer.pledge(pid(5), &[PledgePromise::Stdio], ViolationMode::Kill).unwrap();
+        enforcer
+            .pledge(pid(5), &[PledgePromise::Stdio], ViolationMode::Kill)
+            .unwrap();
         // Try to add Inet — should fail
-        let result = enforcer.pledge(pid(5), &[PledgePromise::Stdio, PledgePromise::Inet], ViolationMode::Kill);
+        let result = enforcer.pledge(
+            pid(5),
+            &[PledgePromise::Stdio, PledgePromise::Inet],
+            ViolationMode::Kill,
+        );
         assert_eq!(result, Err(PledgeError::WideningForbidden));
     }
 
     #[test]
     fn test_remove_clears_state() {
         let mut enforcer = PledgeEnforcer::new();
-        enforcer.pledge(pid(6), &[PledgePromise::Stdio], ViolationMode::Kill).unwrap();
+        enforcer
+            .pledge(pid(6), &[PledgePromise::Stdio], ViolationMode::Kill)
+            .unwrap();
         enforcer.remove(pid(6));
         // After removal, process is considered unpledged (full access)
         assert!(enforcer.check(pid(6), PledgePromise::Inet).is_ok());

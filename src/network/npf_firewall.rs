@@ -2,11 +2,11 @@ use std::vec;
 // SigmaOS NetBSD NPF & Linux Netfilter/PF Parity Subsystem - NPF Firewall Engine
 // Stateful Connection Tracking (Conntrack), NAPT/NAT64 Engine, BPF Rule Inspection, & IP Sets
 
+use std::collections::BTreeMap;
+use std::format;
 use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;
-use std::format;
-use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NpfDirection {
@@ -118,7 +118,14 @@ impl NpfFirewallEngine {
         }
     }
 
-    pub fn add_rule(&mut self, direction: NpfDirection, action: NpfAction, proto: Option<IpProtocol>, dst_port: Option<u16>, table_match: Option<&str>) -> usize {
+    pub fn add_rule(
+        &mut self,
+        direction: NpfDirection,
+        action: NpfAction,
+        proto: Option<IpProtocol>,
+        dst_port: Option<u16>,
+        table_match: Option<&str>,
+    ) -> usize {
         let id = self.next_id;
         self.next_id += 1;
 
@@ -145,7 +152,12 @@ impl NpfFirewallEngine {
         );
     }
 
-    pub fn add_nat_rule(&mut self, nat_type: NatType, match_proto: Option<IpProtocol>, match_port: Option<u16>) -> usize {
+    pub fn add_nat_rule(
+        &mut self,
+        nat_type: NatType,
+        match_proto: Option<IpProtocol>,
+        match_port: Option<u16>,
+    ) -> usize {
         let id = self.next_id;
         self.next_id += 1;
 
@@ -247,7 +259,11 @@ impl NpfFirewallEngine {
                 self.stats.passed_packets += 1;
 
                 if final_action == NpfAction::StatefulPass {
-                    let initial_state = if is_syn { TcpState::SynSent } else { TcpState::Established };
+                    let initial_state = if is_syn {
+                        TcpState::SynSent
+                    } else {
+                        TcpState::Established
+                    };
                     self.conntrack_table.insert(
                         tuple.clone(),
                         ConntrackEntry {
@@ -276,7 +292,11 @@ impl NpfFirewallEngine {
                         }
                     }
 
-                    if let NatType::DnatPortForward { target_ip, target_port } = nat.nat_type {
+                    if let NatType::DnatPortForward {
+                        target_ip,
+                        target_port,
+                    } = nat.nat_type
+                    {
                         let mut xlated = tuple.clone();
                         xlated.dst_ip = target_ip;
                         xlated.dst_port = target_port;
@@ -304,13 +324,32 @@ mod tests {
         npf.add_table("spammers", vec![0x0A000001]); // 10.0.0.1
 
         // Add rule: Block inbound from table "spammers"
-        npf.add_rule(NpfDirection::Inbound, NpfAction::Block, None, None, Some("spammers"));
+        npf.add_rule(
+            NpfDirection::Inbound,
+            NpfAction::Block,
+            None,
+            None,
+            Some("spammers"),
+        );
 
         // Add rule: Stateful pass outbound TCP port 80
-        npf.add_rule(NpfDirection::Outbound, NpfAction::StatefulPass, Some(IpProtocol::Tcp), Some(80), None);
+        npf.add_rule(
+            NpfDirection::Outbound,
+            NpfAction::StatefulPass,
+            Some(IpProtocol::Tcp),
+            Some(80),
+            None,
+        );
 
         // Add NAT rule: Port forward port 80 to internal web server 192.168.1.100:8080
-        npf.add_nat_rule(NatType::DnatPortForward { target_ip: 0xC0A80164, target_port: 8080 }, Some(IpProtocol::Tcp), Some(80));
+        npf.add_nat_rule(
+            NatType::DnatPortForward {
+                target_ip: 0xC0A80164,
+                target_port: 8080,
+            },
+            Some(IpProtocol::Tcp),
+            Some(80),
+        );
 
         let tuple_normal = FiveTuple {
             src_ip: 0xC0A80101, // 192.168.1.1
@@ -321,14 +360,26 @@ mod tests {
         };
 
         // Outbound packet should pass statefully and be transformed by DNAT
-        let (action, xlated) = npf.evaluate_packet(NpfDirection::Outbound, tuple_normal.clone(), 100, true, false);
+        let (action, xlated) = npf.evaluate_packet(
+            NpfDirection::Outbound,
+            tuple_normal.clone(),
+            100,
+            true,
+            false,
+        );
         assert_eq!(action, NpfAction::Pass);
         assert!(xlated.is_some());
         assert_eq!(xlated.unwrap().dst_port, 8080);
         assert_eq!(npf.stats.active_conntrack_entries, 1);
 
         // Subsequent packet in same connection hits stateful conntrack fast-path
-        let (action_fast, _) = npf.evaluate_packet(NpfDirection::Outbound, tuple_normal.clone(), 100, false, false);
+        let (action_fast, _) = npf.evaluate_packet(
+            NpfDirection::Outbound,
+            tuple_normal.clone(),
+            100,
+            false,
+            false,
+        );
         assert_eq!(action_fast, NpfAction::Pass);
         assert_eq!(npf.stats.stateful_matches, 1);
 
@@ -341,7 +392,8 @@ mod tests {
             proto: IpProtocol::Tcp,
         };
 
-        let (action_blocked, _) = npf.evaluate_packet(NpfDirection::Inbound, tuple_blocked, 100, true, false);
+        let (action_blocked, _) =
+            npf.evaluate_packet(NpfDirection::Inbound, tuple_blocked, 100, true, false);
         assert_eq!(action_blocked, NpfAction::Block);
         assert_eq!(npf.stats.blocked_packets, 1);
     }

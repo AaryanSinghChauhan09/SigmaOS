@@ -3,9 +3,9 @@
 
 extern crate alloc;
 
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 
 /// Terminal Output Color Mode
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -33,7 +33,9 @@ impl StdoutAnsiColorFormatter {
             return text.to_string();
         }
         match self.mode {
-            TerminalColorMode::TrueColorRgb => format!("\x1b[38;2;{};{};{}m{}\x1b[0m", r, g, b, text),
+            TerminalColorMode::TrueColorRgb => {
+                format!("\x1b[38;2;{};{};{}m{}\x1b[0m", r, g, b, text)
+            }
             TerminalColorMode::Palette256 => format!("\x1b[38;5;196m{}\x1b[0m", text),
             TerminalColorMode::Ansi16Color => format!("\x1b[31m{}\x1b[0m", text),
             TerminalColorMode::NoColor => text.to_string(),
@@ -54,7 +56,6 @@ impl Default for StdoutAnsiColorFormatter {
         Self::new(TerminalColorMode::TrueColorRgb, true)
     }
 }
-
 
 /// High-Performance eBPF Zero-Copy Page Splice Output Pipeline (`splice(2)` / `vmsplice(2)`)
 #[derive(Debug, Clone)]
@@ -86,7 +87,6 @@ impl Default for StdoutZeroCopySplicePipeline {
         Self::new(65536)
     }
 }
-
 
 /// Stream Buffering Mode Governor (`stdbuf` Parity)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -122,7 +122,7 @@ impl StdoutStreamBufferingGovernor {
                 } else {
                     Vec::new()
                 }
-            },
+            }
             StdoutBufferMode::BlockBuffered(size) => {
                 self.internal_buffer.extend_from_slice(data);
                 if self.internal_buffer.len() >= size {
@@ -132,7 +132,7 @@ impl StdoutStreamBufferingGovernor {
                 } else {
                     Vec::new()
                 }
-            },
+            }
         }
     }
 
@@ -148,7 +148,6 @@ impl Default for StdoutStreamBufferingGovernor {
         Self::new(StdoutBufferMode::LineBuffered)
     }
 }
-
 
 /// Output Format Mode for CLI Tooling & Observability
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -185,7 +184,6 @@ impl Default for StdoutStructuredLogFormatter {
     }
 }
 
-
 /// Sovereign Master Output Stream Engine
 #[derive(Debug, Clone)]
 pub struct SovereignStdoutMasterEngine {
@@ -207,10 +205,18 @@ impl SovereignStdoutMasterEngine {
 
     pub fn evaluate_stream_throughput_score(&self) -> u32 {
         let mut score = 0;
-        if self.ansi_formatter.is_tty { score += 25; }
-        if self.splice_pipeline.buffer_capacity >= 65536 { score += 25; }
-        if self.buffering_governor.mode == StdoutBufferMode::LineBuffered { score += 25; }
-        if self.structured_formatter.format == OutputFormat::Text { score += 25; }
+        if self.ansi_formatter.is_tty {
+            score += 25;
+        }
+        if self.splice_pipeline.buffer_capacity >= 65536 {
+            score += 25;
+        }
+        if self.buffering_governor.mode == StdoutBufferMode::LineBuffered {
+            score += 25;
+        }
+        if self.structured_formatter.format == OutputFormat::Text {
+            score += 25;
+        }
         score
     }
 }
@@ -220,7 +226,6 @@ impl Default for SovereignStdoutMasterEngine {
         Self::new()
     }
 }
-
 
 #[cfg(test)]
 mod tests {

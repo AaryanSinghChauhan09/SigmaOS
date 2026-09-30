@@ -1,12 +1,10 @@
 //! Linux Mint System Reporting Tool
-//! 
+//!
 //! This module implements a system reporting tool inspired by Linux Mint's
 //! system information reporting capabilities, which collects and displays
 //! detailed system information for troubleshooting and diagnostics.
 
 #![allow(dead_code)]
-
-
 
 use std::format;
 use std::string::{String, ToString};
@@ -94,12 +92,12 @@ impl MintSystemReport {
     /// Generate text report
     pub fn generate_text_report(&self) -> String {
         let mut report = String::new();
-        
+
         report.push_str(&self.title);
         report.push_str("\n");
         report.push_str(&"=".repeat(self.title.len()));
         report.push_str("\n\n");
-        
+
         // Group by category
         let mut categories = Vec::new();
         for item in &self.info_items {
@@ -107,31 +105,31 @@ impl MintSystemReport {
                 categories.push(item.category);
             }
         }
-        
+
         for category in categories {
             report.push_str(&format!("{:?}\n", category));
             report.push_str(&"-".repeat(20));
             report.push_str("\n");
-            
+
             for item in self.get_items_by_category(category) {
                 report.push_str(&format!("{}: {}\n", item.name, item.value));
             }
-            
+
             report.push_str("\n");
         }
-        
+
         report
     }
 
     /// Generate JSON report
     pub fn generate_json_report(&self) -> String {
         let mut json = String::new();
-        
+
         json.push_str("{\n");
         json.push_str(&format!("  \"title\": \"{}\",\n", self.title));
         json.push_str(&format!("  \"timestamp\": {},\n", self.timestamp));
         json.push_str("  \"items\": [\n");
-        
+
         for (i, item) in self.info_items.iter().enumerate() {
             if i > 0 {
                 json.push_str(",\n");
@@ -142,21 +140,21 @@ impl MintSystemReport {
             json.push_str(&format!("      \"category\": \"{:?}\"\n", item.category));
             json.push_str("    }");
         }
-        
+
         json.push_str("\n  ]\n");
         json.push_str("}\n");
-        
+
         json
     }
 
     /// Generate markdown report
     pub fn generate_markdown_report(&self) -> String {
         let mut md = String::new();
-        
+
         md.push_str("# ");
         md.push_str(&self.title);
         md.push_str("\n\n");
-        
+
         // Group by category
         let mut categories = Vec::new();
         for item in &self.info_items {
@@ -164,22 +162,22 @@ impl MintSystemReport {
                 categories.push(item.category);
             }
         }
-        
+
         for category in categories {
             md.push_str("## ");
             md.push_str(&format!("{:?}", category));
             md.push_str("\n\n");
-            
+
             md.push_str("| Name | Value |\n");
             md.push_str("|------|-------|\n");
-            
+
             for item in self.get_items_by_category(category) {
                 md.push_str(&format!("| {} | {} |\n", item.name, item.value));
             }
-            
+
             md.push_str("\n");
         }
-        
+
         md
     }
 
@@ -191,13 +189,13 @@ impl MintSystemReport {
             value: "SigmaOS".to_string(),
             category: SystemInfoCategory::General,
         });
-        
+
         self.add_info_item(SystemInfoItem {
             name: "OS Version".to_string(),
             value: "1.0.0".to_string(),
             category: SystemInfoCategory::General,
         });
-        
+
         self.add_info_item(SystemInfoItem {
             name: "Architecture".to_string(),
             value: "x86_64".to_string(),
@@ -212,7 +210,7 @@ impl MintSystemReport {
             value: "Unknown CPU".to_string(),
             category: SystemInfoCategory::Cpu,
         });
-        
+
         self.add_info_item(SystemInfoItem {
             name: "CPU Cores".to_string(),
             value: "4".to_string(),
@@ -227,7 +225,7 @@ impl MintSystemReport {
             value: "8 GB".to_string(),
             category: SystemInfoCategory::Memory,
         });
-        
+
         self.add_info_item(SystemInfoItem {
             name: "Available Memory".to_string(),
             value: "4 GB".to_string(),
@@ -275,13 +273,13 @@ mod tests {
     #[test]
     fn test_add_info_item() {
         let mut report = MintSystemReport::new();
-        
+
         let item = SystemInfoItem {
             name: "Test".to_string(),
             value: "Value".to_string(),
             category: SystemInfoCategory::General,
         };
-        
+
         report.add_info_item(item);
         assert_eq!(report.info_items.len(), 1);
     }
@@ -289,19 +287,19 @@ mod tests {
     #[test]
     fn test_get_items_by_category() {
         let mut report = MintSystemReport::new();
-        
+
         report.add_info_item(SystemInfoItem {
             name: "Test1".to_string(),
             value: "Value1".to_string(),
             category: SystemInfoCategory::General,
         });
-        
+
         report.add_info_item(SystemInfoItem {
             name: "Test2".to_string(),
             value: "Value2".to_string(),
             category: SystemInfoCategory::Cpu,
         });
-        
+
         let general_items = report.get_items_by_category(SystemInfoCategory::General);
         assert_eq!(general_items.len(), 1);
     }
@@ -309,13 +307,13 @@ mod tests {
     #[test]
     fn test_generate_text_report() {
         let mut report = MintSystemReport::new();
-        
+
         report.add_info_item(SystemInfoItem {
             name: "Test".to_string(),
             value: "Value".to_string(),
             category: SystemInfoCategory::General,
         });
-        
+
         let text = report.generate_text_report();
         assert!(text.contains("SigmaOS System Report"));
         assert!(text.contains("Test: Value"));
@@ -325,7 +323,7 @@ mod tests {
     fn test_collect_general_info() {
         let mut report = MintSystemReport::new();
         report.collect_general_info();
-        
+
         assert!(report.get_item_by_name("OS Name").is_some());
         assert!(report.get_item_by_name("OS Version").is_some());
     }
@@ -333,13 +331,13 @@ mod tests {
     #[test]
     fn test_search() {
         let mut report = MintSystemReport::new();
-        
+
         report.add_info_item(SystemInfoItem {
             name: "CPU Model".to_string(),
             value: "Intel i7".to_string(),
             category: SystemInfoCategory::Cpu,
         });
-        
+
         let results = report.search("intel");
         assert_eq!(results.len(), 1);
     }

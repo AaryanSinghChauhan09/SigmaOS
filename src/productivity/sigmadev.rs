@@ -66,8 +66,13 @@ impl SigmaDevIde {
         let active_file = &self.open_files[idx];
 
         match active_file.language {
-            SupportedLanguage::Rust => Ok("fn main() {\n    println!(\"Sovereign SigmaOS!\");\n}".to_string()),
-            SupportedLanguage::Zig => Ok("pub fn main() !void {\n    const stdout = std.io.getStdOut().writer();\n}".to_string()),
+            SupportedLanguage::Rust => {
+                Ok("fn main() {\n    println!(\"Sovereign SigmaOS!\");\n}".to_string())
+            }
+            SupportedLanguage::Zig => Ok(
+                "pub fn main() !void {\n    const stdout = std.io.getStdOut().writer();\n}"
+                    .to_string(),
+            ),
             SupportedLanguage::Nim => Ok("proc main() =\n  echo \"Sovereign Nim!\"".to_string()),
             SupportedLanguage::Unknown => Ok("// Sovereign code suggestion".to_string()),
         }

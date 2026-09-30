@@ -65,8 +65,15 @@ impl VoidRunitServiceTreeSupervisor {
         self.services.insert(name.to_string(), node);
     }
 
-    pub fn svctl_command(&mut self, name: &str, command: &str) -> Result<RunitServiceStatus, &'static str> {
-        let node = self.services.get_mut(name).ok_or("runit error: Service not found")?;
+    pub fn svctl_command(
+        &mut self,
+        name: &str,
+        command: &str,
+    ) -> Result<RunitServiceStatus, &'static str> {
+        let node = self
+            .services
+            .get_mut(name)
+            .ok_or("runit error: Service not found")?;
 
         match command {
             "up" | "start" => {
@@ -293,7 +300,9 @@ impl SovereignOpenSourceDistroSynthesisSuite {
             void_runit: VoidRunitServiceTreeSupervisor::new(),
             alpine_lbu: AlpineLbuRamBootCommitEngineFull::new("sigma-node"),
             qubes_dispvm: QubesDisposableVmAmnesicEngine::new(),
-            haiku_bserver: HaikuBServerWindowMessagingEngine::new("application/x-vnd.SigmaOS-Desktop"),
+            haiku_bserver: HaikuBServerWindowMessagingEngine::new(
+                "application/x-vnd.SigmaOS-Desktop",
+            ),
         }
     }
 
@@ -329,7 +338,11 @@ mod tests {
     #[test]
     fn test_void_runit_supervisor() {
         let mut runit = VoidRunitServiceTreeSupervisor::new();
-        runit.register_service("dhcpcd", "/etc/runit/runsvdir/dhcpcd/run", "/etc/runit/runsvdir/dhcpcd/finish");
+        runit.register_service(
+            "dhcpcd",
+            "/etc/runit/runsvdir/dhcpcd/run",
+            "/etc/runit/runsvdir/dhcpcd/finish",
+        );
 
         let status = runit.svctl_command("dhcpcd", "up").unwrap();
         assert_eq!(status, RunitServiceStatus::Run);
@@ -345,7 +358,9 @@ mod tests {
 
         let commit = lbu.lbu_commit();
         assert_eq!(commit.hostname, "alpine-box");
-        assert!(commit.tracked_etc_files.contains(&"/etc/conf.d/hostname".to_string()));
+        assert!(commit
+            .tracked_etc_files
+            .contains(&"/etc/conf.d/hostname".to_string()));
     }
 
     #[test]
@@ -372,6 +387,8 @@ mod tests {
     fn test_open_source_distro_suite() {
         let suite = SovereignOpenSourceDistroSynthesisSuite::new();
         assert!(suite.health_check());
-        assert!(suite.summary_report().contains("Sovereign Open-Source Distro"));
+        assert!(suite
+            .summary_report()
+            .contains("Sovereign Open-Source Distro"));
     }
 }

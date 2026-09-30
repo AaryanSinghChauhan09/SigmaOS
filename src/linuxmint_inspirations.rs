@@ -21,7 +21,6 @@
 //   - MintMenu            -> `MintMenuLayout`
 //   - Automate            -> `AutomateWorkflow`
 
-
 use std::format;
 use std::string::{String, ToString};
 use std::vec;
@@ -1269,7 +1268,10 @@ impl StickyNotesManager {
     }
 
     pub fn get_by_category(&self, category: &str) -> Vec<&StickyNote> {
-        self.notes.iter().filter(|n| n.category == category).collect()
+        self.notes
+            .iter()
+            .filter(|n| n.category == category)
+            .collect()
     }
 }
 
@@ -1498,7 +1500,10 @@ impl MintStickIsoVerifier {
     }
 
     pub fn format_partition_table(target_path: &str, scheme: PartitionScheme) -> String {
-        format!("Formatted {} with {:?} partition table", target_path, scheme)
+        format!(
+            "Formatted {} with {:?} partition table",
+            target_path, scheme
+        )
     }
 }
 
@@ -1663,7 +1668,10 @@ mod tests {
 
     #[test]
     fn test_mint_stick_verifier_and_xapps() {
-        assert!(MintStickIsoVerifier::verify_checksum("abc123hash", "ABC123HASH"));
+        assert!(MintStickIsoVerifier::verify_checksum(
+            "abc123hash",
+            "ABC123HASH"
+        ));
         let fmt = MintStickIsoVerifier::format_partition_table("/dev/sdb", PartitionScheme::Gpt);
         assert!(fmt.contains("Gpt"));
 

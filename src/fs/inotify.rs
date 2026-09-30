@@ -163,7 +163,8 @@ impl Inotify {
 
     /// Remove a watch
     pub fn remove_watch(&mut self, wd: i32) -> Result<(), String> {
-        self.watches.remove(&wd)
+        self.watches
+            .remove(&wd)
             .ok_or_else(|| format!("Watch descriptor not found: {}", wd))?;
         Ok(())
     }
@@ -228,7 +229,9 @@ mod tests {
     fn test_inotify_add_watch() {
         let mut inotify = Inotify::new();
 
-        let wd = inotify.add_watch(PathBuf::from("/tmp"), 0xffffffff).unwrap();
+        let wd = inotify
+            .add_watch(PathBuf::from("/tmp"), 0xffffffff)
+            .unwrap();
         assert_eq!(wd, 1);
         assert_eq!(inotify.watch_count(), 1);
     }
@@ -237,7 +240,9 @@ mod tests {
     fn test_inotify_remove_watch() {
         let mut inotify = Inotify::new();
 
-        let wd = inotify.add_watch(PathBuf::from("/tmp"), 0xffffffff).unwrap();
+        let wd = inotify
+            .add_watch(PathBuf::from("/tmp"), 0xffffffff)
+            .unwrap();
         inotify.remove_watch(wd).unwrap();
 
         assert_eq!(inotify.watch_count(), 0);

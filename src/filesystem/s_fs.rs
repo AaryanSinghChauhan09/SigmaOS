@@ -1,5 +1,5 @@
 //! S-FS: Content-Addressed Snapshot Manager (NixOS Absorption)
-//! 
+//!
 //! This module provides the core structures for SigmaOS's zero-copy,
 //! atomic rollback filesystem based on log-structured Merkle-Trees.
 #![allow(clippy::new_without_default)]
@@ -16,8 +16,6 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-
-
 
 use std::string::String;
 use std::vec::Vec;
@@ -53,7 +51,11 @@ impl SnapshotManager {
 
     /// Performs a sub-millisecond rollback to a previous generation.
     pub fn rollback(&mut self, target_generation: u64) -> Result<(), &'static str> {
-        if self.nodes.iter().any(|n| n.metadata.generation == target_generation) {
+        if self
+            .nodes
+            .iter()
+            .any(|n| n.metadata.generation == target_generation)
+        {
             self.active_generation = target_generation;
             Ok(())
         } else {

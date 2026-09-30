@@ -34,12 +34,29 @@ impl SovereignOmarchyCliRouterAndTmuxEngine {
             collision_log: Vec::new(),
         };
 
-        engine.group_descriptions.insert("theme".to_string(), "Desktop & Application Styling".to_string());
-        engine.group_descriptions.insert("network".to_string(), "Wi-Fi, DNS & Connectivity".to_string());
-        engine.group_descriptions.insert("tailscale".to_string(), "Mesh VPN & File Transfer".to_string());
-        engine.group_descriptions.insert("dns".to_string(), "DNS Provider Resolver".to_string());
-        engine.group_descriptions.insert("dev".to_string(), "Developer Tooling & Benchmarks".to_string());
-        engine.group_descriptions.insert("commands".to_string(), "Command Registry & Inspection".to_string());
+        engine.group_descriptions.insert(
+            "theme".to_string(),
+            "Desktop & Application Styling".to_string(),
+        );
+        engine.group_descriptions.insert(
+            "network".to_string(),
+            "Wi-Fi, DNS & Connectivity".to_string(),
+        );
+        engine.group_descriptions.insert(
+            "tailscale".to_string(),
+            "Mesh VPN & File Transfer".to_string(),
+        );
+        engine
+            .group_descriptions
+            .insert("dns".to_string(), "DNS Provider Resolver".to_string());
+        engine.group_descriptions.insert(
+            "dev".to_string(),
+            "Developer Tooling & Benchmarks".to_string(),
+        );
+        engine.group_descriptions.insert(
+            "commands".to_string(),
+            "Command Registry & Inspection".to_string(),
+        );
 
         engine.register_binary(
             "omarchy-theme-set",
@@ -123,7 +140,8 @@ impl SovereignOmarchyCliRouterAndTmuxEngine {
                 ));
             }
         } else {
-            self.route_table.insert(canonical_route.clone(), meta.clone());
+            self.route_table
+                .insert(canonical_route.clone(), meta.clone());
         }
 
         if filename_route != canonical_route && !self.route_table.contains_key(&filename_route) {
@@ -154,7 +172,10 @@ impl SovereignOmarchyCliRouterAndTmuxEngine {
 
         for (route, meta) in &self.route_table {
             if meta.summary.is_empty() {
-                errors.push(format!("Missing explicit summary for binary '{}' at route '{}'", meta.binary, route));
+                errors.push(format!(
+                    "Missing explicit summary for binary '{}' at route '{}'",
+                    meta.binary, route
+                ));
             }
         }
 
@@ -243,7 +264,10 @@ impl SovereignNetworkManagerMeshEngine {
                     "6" => "6ghz",
                     _ => "auto",
                 };
-                Ok(format!("nmcli connection modify '{}' 802-11-wireless.band {}", self.active_interface, nm_band))
+                Ok(format!(
+                    "nmcli connection modify '{}' 802-11-wireless.band {}",
+                    self.active_interface, nm_band
+                ))
             }
             _ => Err("Invalid band. Choose 2.4, 5, 6, or auto".to_string()),
         }
@@ -257,7 +281,10 @@ impl SovereignNetworkManagerMeshEngine {
             "Quad9" => "9.9.9.9 149.112.112.112",
             _ => "DHCP",
         };
-        format!("nmcli connection modify '{}' ipv4.dns '{}'", self.active_interface, servers)
+        format!(
+            "nmcli connection modify '{}' ipv4.dns '{}'",
+            self.active_interface, servers
+        )
     }
 
     pub fn toggle_sshd(&mut self, enable: bool) -> String {
@@ -305,13 +332,23 @@ impl SovereignAtomicMigrationsEngine {
         self.applied_markers.contains(&migration_name.to_string())
     }
 
-    pub fn apply_migration(&mut self, migration_name: &str, script_content: &str) -> Result<String, String> {
+    pub fn apply_migration(
+        &mut self,
+        migration_name: &str,
+        script_content: &str,
+    ) -> Result<String, String> {
         if self.is_applied(migration_name) {
-            return Ok(format!("Migration {} already applied (no-op)", migration_name));
+            return Ok(format!(
+                "Migration {} already applied (no-op)",
+                migration_name
+            ));
         }
 
         if script_content.contains("exit 1") || script_content.contains("error") {
-            return Err(format!("Migration {} failed execution - remaining pending", migration_name));
+            return Err(format!(
+                "Migration {} failed execution - remaining pending",
+                migration_name
+            ));
         }
 
         self.applied_markers.push(migration_name.to_string());
@@ -367,7 +404,9 @@ impl SovereignLinuxBsdMasterInnovationsSuite {
     pub fn run_master_distro_health_check(&mut self) -> Result<String, String> {
         let lint_count = self.cli_router.check_metadata().map_err(|e| e.join("; "))?;
         let nm_cmd = self.network_mesh.pin_wifi_band("5")?;
-        let mig_res = self.migrations_engine.apply_migration("1781158082.sh", "echo 'Relink theme'; exit 0")?;
+        let mig_res = self
+            .migrations_engine
+            .apply_migration("1781158082.sh", "echo 'Relink theme'; exit 0")?;
 
         Ok(format!(
             "Master Distro Health Check Passed: {} CLI routes verified, NM: '{}', {}",
@@ -419,11 +458,15 @@ mod tests {
         let mut mig = SovereignAtomicMigrationsEngine::new();
         assert!(!mig.is_applied("001_theme.sh"));
 
-        let res = mig.apply_migration("001_theme.sh", "echo 'Relink theme'").unwrap();
+        let res = mig
+            .apply_migration("001_theme.sh", "echo 'Relink theme'")
+            .unwrap();
         assert!(res.contains("successfully"));
         assert!(mig.is_applied("001_theme.sh"));
 
-        let res2 = mig.apply_migration("001_theme.sh", "echo 'Relink theme'").unwrap();
+        let res2 = mig
+            .apply_migration("001_theme.sh", "echo 'Relink theme'")
+            .unwrap();
         assert!(res2.contains("no-op"));
 
         let unit = mig.generate_notifier_service_unit();

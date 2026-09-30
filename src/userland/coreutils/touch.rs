@@ -15,7 +15,10 @@ pub fn run(path: &str, create: bool) -> Result<(), String> {
         // Create new file
         File::create(path_obj).map_err(|e| format!("touch: {}", e))?;
     } else {
-        return Err(format!("touch: cannot touch '{}': No such file or directory", path));
+        return Err(format!(
+            "touch: cannot touch '{}': No such file or directory",
+            path
+        ));
     }
 
     Ok(())
@@ -37,7 +40,10 @@ pub fn set_mtime(path: &str, _mtime: std::time::SystemTime) -> Result<(), String
     let path_obj = Path::new(path);
 
     if !path_obj.exists() {
-        return Err(format!("touch: cannot touch '{}': No such file or directory", path));
+        return Err(format!(
+            "touch: cannot touch '{}': No such file or directory",
+            path
+        ));
     }
 
     // Placeholder for real implementation

@@ -70,13 +70,15 @@ impl SovereignArchPacdiffMicroarchEngine {
     }
 
     pub fn register_pacnew(&mut self, path: &str, orig: &str, pacnew: &str) {
-        self.pending_pacdiffs.insert(
-            path.to_string(),
-            (orig.to_string(), pacnew.to_string()),
-        );
+        self.pending_pacdiffs
+            .insert(path.to_string(), (orig.to_string(), pacnew.to_string()));
     }
 
-    pub fn merge_config(&mut self, path: &str, action: PacdiffMergeActionV2) -> Result<String, &'static str> {
+    pub fn merge_config(
+        &mut self,
+        path: &str,
+        action: PacdiffMergeActionV2,
+    ) -> Result<String, &'static str> {
         let (orig, pacnew) = self
             .pending_pacdiffs
             .remove(path)
@@ -302,7 +304,10 @@ impl SovereignFreeBsdVuXmlPoudriereEngine {
 
     pub fn create_be_snapshot(&mut self, name: &str) -> String {
         self.active_boot_env = name.to_string();
-        format!("bectl create -e {} pre-update-{}", self.active_boot_env, name)
+        format!(
+            "bectl create -e {} pre-update-{}",
+            self.active_boot_env, name
+        )
     }
 }
 
@@ -341,7 +346,8 @@ impl SovereignNixGuixCasDeduplicatorEngine {
     }
 
     pub fn set_flake_lock(&mut self, flake_name: &str, lock_hash: &str) {
-        self.flake_lockfiles.insert(flake_name.to_string(), lock_hash.to_string());
+        self.flake_lockfiles
+            .insert(flake_name.to_string(), lock_hash.to_string());
     }
 
     pub fn verify_nar_integrity(&self, store_path: &str, expected_hash: &str) -> bool {
@@ -411,7 +417,10 @@ impl SovereignFedoraDnf5DeltaRpmEngine {
             .collect()
     }
 
-    pub fn reconstruct_deltarpm(old_rpm: &[u8], delta_patch: &[u8]) -> Result<Vec<u8>, &'static str> {
+    pub fn reconstruct_deltarpm(
+        old_rpm: &[u8],
+        delta_patch: &[u8],
+    ) -> Result<Vec<u8>, &'static str> {
         if delta_patch.is_empty() {
             return Ok(old_rpm.to_vec());
         }
@@ -457,7 +466,11 @@ impl SovereignFedoraDnf5DeltaRpmEngine {
                 }
                 0xFF => break,
                 _ => {
-                    let old_b = if out.len() < old_rpm.len() { old_rpm[out.len()] } else { 0 };
+                    let old_b = if out.len() < old_rpm.len() {
+                        old_rpm[out.len()]
+                    } else {
+                        0
+                    };
                     out.push(old_b ^ opcode);
                 }
             }
@@ -654,7 +667,10 @@ impl SovereignDistroPackageAdvancementsSuiteV2 {
         }
     }
 
-    pub fn audit_and_enrich_package(&mut self, pkg: &mut UnifiedPackage) -> Result<(), &'static str> {
+    pub fn audit_and_enrich_package(
+        &mut self,
+        pkg: &mut UnifiedPackage,
+    ) -> Result<(), &'static str> {
         // Gatekeeper check via FreeBSD VuXML CVE DB
         let (blocked, _reason) = self.freebsd.evaluate_security_gatekeeper(&pkg.name);
         if blocked {
@@ -693,11 +709,20 @@ mod tests {
     #[test]
     fn test_arch_pacdiff_microarch() {
         let mut arch = SovereignArchPacdiffMicroarchEngine::new(MicroarchLevelV2::V4);
-        arch.register_pacnew("/etc/pacman.conf", "HoldPkg = pacman", "HoldPkg = pacman glibc");
+        arch.register_pacnew(
+            "/etc/pacman.conf",
+            "HoldPkg = pacman",
+            "HoldPkg = pacman glibc",
+        );
 
-        let merged = arch.merge_config("/etc/pacman.conf", PacdiffMergeActionV2::ThreeWayMerge).unwrap();
+        let merged = arch
+            .merge_config("/etc/pacman.conf", PacdiffMergeActionV2::ThreeWayMerge)
+            .unwrap();
         assert!(merged.contains("Merged from .pacnew"));
-        assert_eq!(arch.resolve_optimal_repository(), "https://repo.cachyos.org/v4");
+        assert_eq!(
+            arch.resolve_optimal_repository(),
+            "https://repo.cachyos.org/v4"
+        );
     }
 
     #[test]
@@ -710,8 +735,14 @@ mod tests {
             command: "fc-cache -fv".to_string(),
         });
 
-        assert_eq!(apk.evaluate_changed_files(&["/usr/share/fonts/TTF/font.ttf"]), 1);
-        assert_eq!(apk.execute_pending_triggers(), vec!["fc-cache -fv".to_string()]);
+        assert_eq!(
+            apk.evaluate_changed_files(&["/usr/share/fonts/TTF/font.ttf"]),
+            1
+        );
+        assert_eq!(
+            apk.execute_pending_triggers(),
+            vec!["fc-cache -fv".to_string()]
+        );
     }
 
     #[test]
@@ -780,12 +811,12 @@ mod tests {
     fn test_fedora_dnf5_deltarpm() {
         let old_rpm = b"OLD_RPM_HEADER_BASE_SYSTEM_BYTES";
         let delta_patch = vec![
-            0x01, 0x00, 0x07, 0x00, 0x00, 0x00, 0x00,
-            0x02, 0x00, 0x06, b'_', b'P', b'A', b'T', b'C', b'H',
-            0xFF,
+            0x01, 0x00, 0x07, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x06, b'_', b'P', b'A', b'T',
+            b'C', b'H', 0xFF,
         ];
 
-        let reconstructed = SovereignFedoraDnf5DeltaRpmEngine::reconstruct_deltarpm(old_rpm, &delta_patch).unwrap();
+        let reconstructed =
+            SovereignFedoraDnf5DeltaRpmEngine::reconstruct_deltarpm(old_rpm, &delta_patch).unwrap();
         assert_eq!(String::from_utf8(reconstructed).unwrap(), "OLD_RPM_PATCH");
     }
 
@@ -805,14 +836,19 @@ mod tests {
         .unwrap();
 
         xbps.commit_tx(tx).unwrap();
-        assert_eq!(xbps.installed_sonames.get("libc.so.6"), Some(&"glibc".to_string()));
+        assert_eq!(
+            xbps.installed_sonames.get("libc.so.6"),
+            Some(&"glibc".to_string())
+        );
     }
 
     #[test]
     fn test_openbsd_signify() {
         let mut obsd = SovereignOpenBsdSignifyPledgeEngine::new();
         obsd.add_signify_key("key-1", "pubkey_data_123");
-        assert!(obsd.verify_signature_header("key-1", "untrusted comment: verify with pubkey_data_123"));
+        assert!(
+            obsd.verify_signature_header("key-1", "untrusted comment: verify with pubkey_data_123")
+        );
     }
 
     #[test]
@@ -820,6 +856,9 @@ mod tests {
         let mut suite = SovereignDistroPackageAdvancementsSuiteV2::new();
         let mut pkg = UnifiedPackage::new("curl".to_string(), "8.5.0".to_string());
         assert!(suite.audit_and_enrich_package(&mut pkg).is_ok());
-        assert_eq!(pkg.properties.get("microarch_repo").unwrap(), "https://repo.cachyos.org/v3");
+        assert_eq!(
+            pkg.properties.get("microarch_repo").unwrap(),
+            "https://repo.cachyos.org/v3"
+        );
     }
 }

@@ -13,29 +13,38 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
 /// OOP-based sigma-pkg Package Manager for SigmaOS
 /// Based on Ultimate Dominance Strategy: Stage 1 Phase 1A
 /// Implements sigpkg v1 format, local registry, package installation/removal
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type PackageID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum PackageError { Success = 0, PackageNotFound = 1, InstallFailed = 2, RemoveFailed = 3, InvalidSignature = 4 }
+pub enum PackageError {
+    Success = 0,
+    PackageNotFound = 1,
+    InstallFailed = 2,
+    RemoveFailed = 3,
+    InvalidSignature = 4,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum PackageState { NotInstalled = 0, Installed = 1, Broken = 2 }
+pub enum PackageState {
+    NotInstalled = 0,
+    Installed = 1,
+    Broken = 2,
+}
 
 pub trait Package {
     fn id(&self) -> PackageID;
@@ -64,7 +73,11 @@ impl SimplePackage {
         let version_len = version.len().min(31);
         unsafe {
             core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
-            core::ptr::copy_nonoverlapping(version.as_ptr(), version_array.as_mut_ptr(), version_len);
+            core::ptr::copy_nonoverlapping(
+                version.as_ptr(),
+                version_array.as_mut_ptr(),
+                version_len,
+            );
         }
         SimplePackage {
             id,
@@ -79,7 +92,9 @@ impl SimplePackage {
 }
 
 impl Package for SimplePackage {
-    fn id(&self) -> PackageID { self.id }
+    fn id(&self) -> PackageID {
+        self.id
+    }
     fn name(&self) -> &[u8] {
         // Bolt ⚡ performance optimization: O(1) direct slice indexing using cached name_len instead of O(N) zero-byte linear scan
         &self.name[..self.name_len as usize]
@@ -88,8 +103,12 @@ impl Package for SimplePackage {
         // Bolt ⚡ performance optimization: O(1) direct slice indexing using cached version_len instead of O(N) zero-byte linear scan
         &self.version[..self.version_len as usize]
     }
-    fn state(&self) -> PackageState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
-    fn dependencies(&self) -> Vec<PackageID> { self.deps.clone() }
+    fn state(&self) -> PackageState {
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+    }
+    fn dependencies(&self) -> Vec<PackageID> {
+        self.deps.clone()
+    }
 }
 
 pub trait PackageManager {
@@ -122,17 +141,19 @@ impl PackageManager for SigmaPackageManager {
     fn install(&mut self, pkg: Box<dyn Package>) -> Result<PackageID, PackageError> {
         let id = pkg.id();
         let mut pkg = pkg;
-        pkg.state.store(PackageState::Installed as usize, Ordering::SeqCst);
+        pkg.state
+            .store(PackageState::Installed as usize, Ordering::SeqCst);
         self.packages.push(Some(pkg));
         self.installed_count.fetch_add(1, Ordering::SeqCst);
         Ok(id)
     }
-    
+
     fn remove(&mut self, id: PackageID) -> Result<(), PackageError> {
         for pkg_option in &mut self.packages {
             if let Some(ref mut pkg) = *pkg_option {
                 if pkg.id() == id {
-                    pkg.state.store(PackageState::NotInstalled as usize, Ordering::SeqCst);
+                    pkg.state
+                        .store(PackageState::NotInstalled as usize, Ordering::SeqCst);
                     self.installed_count.fetch_sub(1, Ordering::SeqCst);
                     return Ok(());
                 }
@@ -140,7 +161,7 @@ impl PackageManager for SigmaPackageManager {
         }
         Err(PackageError::PackageNotFound)
     }
-    
+
     fn list(&self) -> Vec<PackageID> {
         let mut ids = Vec::new();
         for pkg_option in &self.packages {
@@ -152,7 +173,7 @@ impl PackageManager for SigmaPackageManager {
         }
         ids
     }
-    
+
     fn search(&self, query: &[u8]) -> Vec<PackageID> {
         let mut ids = Vec::new();
         for pkg_option in &self.packages {
@@ -174,11 +195,13 @@ impl PackageManager for SigmaPackageManager {
         }
         ids
     }
-    
+
     fn get_package(&self, id: PackageID) -> Option<&dyn Package> {
         for pkg_option in &self.packages {
             if let Some(ref pkg) = *pkg_option {
-                if pkg.id() == id { return Some(pkg.as_ref()); }
+                if pkg.id() == id {
+                    return Some(pkg.as_ref());
+                }
             }
         }
         None
@@ -197,44 +220,48 @@ pub struct Dilithium5Signature {
 
 impl Dilithium5Signature {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { Dilithium5Signature { key_id: AtomicUsize::new(0) } }
+    pub fn new() -> Self {
+        Dilithium5Signature {
+            key_id: AtomicUsize::new(0),
+        }
+    }
 }
 
 impl PackageSignature for Dilithium5Signature {
     fn verify(&self, pkg: &dyn Package, signature: &[u8]) -> Result<bool, PackageError> {
         let name = pkg.name();
         let version = pkg.version();
-        
+
         if signature.len() < name.len() + version.len() {
             return Ok(false);
         }
-        
+
         let mut valid = true;
         for (i, &n) in name.iter().enumerate() {
             if i < signature.len() && signature[i] != n.wrapping_add(13) {
                 valid = false;
             }
         }
-        
+
         Ok(valid)
     }
-    
+
     fn sign(&self, pkg: &dyn Package) -> Result<Vec<u8>, PackageError> {
         let name = pkg.name();
         let version = pkg.version();
         let mut signature = Vec::new();
-        
+
         for &n in name {
             signature.push(n.wrapping_add(13));
         }
         for &v in version {
             signature.push(v.wrapping_add(7));
         }
-        
+
         for i in 0..2560 {
             signature.push(((i * 17 + 31) % 256) as u8);
         }
-        
+
         Ok(signature)
     }
 }
@@ -259,7 +286,7 @@ impl LocalPackageRegistry {
             next_id: AtomicUsize::new(1),
         }
     }
-    
+
     pub fn seed_with_defaults(&mut self) {
         let default_packages = [
             (b"sigma-sh", b"1.0"),
@@ -269,7 +296,7 @@ impl LocalPackageRegistry {
             (b"sigma-git", b"2.40"),
             (b"sigma-python", b"3.11"),
         ];
-        
+
         for (name, version) in &default_packages {
             let id = self.next_id.fetch_add(1, Ordering::SeqCst);
             let pkg = SimplePackage::new(id, name, version);
@@ -284,7 +311,7 @@ impl PackageRegistry for LocalPackageRegistry {
         self.packages.push(Some(pkg));
         Ok(id)
     }
-    
+
     fn get_package(&self, name: &[u8]) -> Option<PackageID> {
         for pkg_option in &self.packages {
             if let Some(ref pkg) = *pkg_option {
@@ -295,7 +322,7 @@ impl PackageRegistry for LocalPackageRegistry {
         }
         None
     }
-    
+
     fn list_all(&self) -> Vec<PackageID> {
         let mut ids = Vec::new();
         for pkg_option in &self.packages {
@@ -343,11 +370,11 @@ impl ReproducibleBuild for ReproducibleBuildSystem {
         self.source_date_epoch.store(epoch, Ordering::SeqCst);
         self.compute_hash();
     }
-    
+
     fn get_build_hash(&self) -> [u8; 32] {
         self.build_hash
     }
-    
+
     fn verify_reproducibility(&self, expected_hash: [u8; 32]) -> bool {
         for i in 0..32 {
             if self.build_hash[i] != expected_hash[i] {
@@ -358,13 +385,25 @@ impl ReproducibleBuild for ReproducibleBuildSystem {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -382,19 +421,29 @@ impl<T> Vec<T> {
         new_vec
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -426,7 +475,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;

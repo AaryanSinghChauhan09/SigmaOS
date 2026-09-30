@@ -2,11 +2,11 @@
 // Zero-dependency Rust #![no_std] / std implementation of privilege delegation & authentication.
 
 #[cfg(not(test))]
+use alloc::format;
+#[cfg(not(test))]
 use alloc::string::{String, ToString};
 #[cfg(not(test))]
 use alloc::vec::Vec;
-#[cfg(not(test))]
-use alloc::format;
 
 #[cfg(test)]
 use std::string::String;
@@ -63,7 +63,13 @@ impl SovereignSudoEngine {
     }
 
     /// Evaluates if a user is authorized to run a command as a target user
-    pub fn authorize(&self, user: &str, groups: &[&str], target_user: &str, command: &str) -> SudoAuthResult {
+    pub fn authorize(
+        &self,
+        user: &str,
+        groups: &[&str],
+        target_user: &str,
+        command: &str,
+    ) -> SudoAuthResult {
         for rule in &self.rules {
             let entity_match = if rule.entity.starts_with('%') || rule.entity.starts_with(':') {
                 let group_name = &rule.entity[1..];

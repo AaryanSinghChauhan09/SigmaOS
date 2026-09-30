@@ -13,30 +13,40 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
 /// OOP-based Workflow Automation for SigmaOS
 /// Based on Ideas-999-Structured: AI & Automation Item 396
 /// Implements workflow engine with triggers and actions
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type WorkflowID = usize;
 pub type StepID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum WorkflowState { Draft = 0, Active = 1, Paused = 2, Completed = 3, Failed = 4 }
+pub enum WorkflowState {
+    Draft = 0,
+    Active = 1,
+    Paused = 2,
+    Completed = 3,
+    Failed = 4,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum WorkflowError { Success = 0, NotFound = 1, ExecutionFailed = 2, InvalidState = 3 }
+pub enum WorkflowError {
+    Success = 0,
+    NotFound = 1,
+    ExecutionFailed = 2,
+    InvalidState = 3,
+}
 
 pub trait WorkflowStep {
     fn id(&self) -> StepID;
@@ -68,7 +78,9 @@ impl SimpleWorkflowStep {
 }
 
 impl WorkflowStep for SimpleWorkflowStep {
-    fn id(&self) -> StepID { self.id }
+    fn id(&self) -> StepID {
+        self.id
+    }
     fn name(&self) -> &[u8] {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
@@ -78,7 +90,9 @@ impl WorkflowStep for SimpleWorkflowStep {
         self.completed.store(1, Ordering::SeqCst);
         let mut output = Vec::new();
         let name = self.name();
-        for &byte in name { output.push(byte); }
+        for &byte in name {
+            output.push(byte);
+        }
         output.push(b':');
         output.push(b' ');
         output.push(b'd');
@@ -88,7 +102,9 @@ impl WorkflowStep for SimpleWorkflowStep {
         Ok(output)
     }
 
-    fn is_complete(&self) -> bool { self.completed.load(Ordering::SeqCst) == 1 }
+    fn is_complete(&self) -> bool {
+        self.completed.load(Ordering::SeqCst) == 1
+    }
 }
 
 pub trait Workflow {
@@ -124,12 +140,16 @@ impl SimpleWorkflow {
 }
 
 impl Workflow for SimpleWorkflow {
-    fn id(&self) -> WorkflowID { self.id }
+    fn id(&self) -> WorkflowID {
+        self.id
+    }
     fn name(&self) -> &[u8] {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-    fn state(&self) -> WorkflowState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> WorkflowState {
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+    }
 
     fn add_step(&mut self, step: Box<dyn WorkflowStep>) -> Result<(), WorkflowError> {
         self.steps.push(Some(step));
@@ -137,25 +157,30 @@ impl Workflow for SimpleWorkflow {
     }
 
     fn execute(&mut self) -> Result<Vec<u8>, WorkflowError> {
-        self.state.store(WorkflowState::Active as usize, Ordering::SeqCst);
+        self.state
+            .store(WorkflowState::Active as usize, Ordering::SeqCst);
         let mut results = Vec::new();
 
         for step_option in &mut self.steps {
             if let Some(ref mut step) = *step_option {
                 match step.execute() {
                     Ok(output) => {
-                        for &byte in &output { results.push(byte); }
+                        for &byte in &output {
+                            results.push(byte);
+                        }
                         results.push(b'\n');
                     }
                     Err(e) => {
-                        self.state.store(WorkflowState::Failed as usize, Ordering::SeqCst);
+                        self.state
+                            .store(WorkflowState::Failed as usize, Ordering::SeqCst);
                         return Err(e);
                     }
                 }
             }
         }
 
-        self.state.store(WorkflowState::Completed as usize, Ordering::SeqCst);
+        self.state
+            .store(WorkflowState::Completed as usize, Ordering::SeqCst);
         Ok(results)
     }
 }
@@ -178,7 +203,11 @@ impl SimpleTrigger {
         let mut type_array = [0u8; 32];
         let type_len = trigger_type.len().min(31);
         unsafe {
-            core::ptr::copy_nonoverlapping(trigger_type.as_ptr(), type_array.as_mut_ptr(), type_len);
+            core::ptr::copy_nonoverlapping(
+                trigger_type.as_ptr(),
+                type_array.as_mut_ptr(),
+                type_len,
+            );
         }
         SimpleTrigger {
             id,
@@ -189,15 +218,21 @@ impl SimpleTrigger {
 }
 
 impl Trigger for SimpleTrigger {
-    fn id(&self) -> usize { self.id }
-    fn check(&self) -> bool { self.condition.load(Ordering::SeqCst) == 1 }
+    fn id(&self) -> usize {
+        self.id
+    }
+    fn check(&self) -> bool {
+        self.condition.load(Ordering::SeqCst) == 1
+    }
 
     fn fire(&mut self) -> Result<Vec<u8>, WorkflowError> {
         self.condition.store(0, Ordering::SeqCst);
         let mut output = Vec::new();
         let trigger_type = &self.trigger_type;
         let len = trigger_type.iter().position(|&b| b == 0).unwrap_or(32);
-        for &byte in &trigger_type[..len] { output.push(byte); }
+        for &byte in &trigger_type[..len] {
+            output.push(byte);
+        }
         output.push(b' ');
         output.push(b'f');
         output.push(b'i');
@@ -209,8 +244,15 @@ impl Trigger for SimpleTrigger {
 }
 
 pub trait WorkflowEngine {
-    fn register_workflow(&mut self, workflow: Box<dyn Workflow>) -> Result<WorkflowID, WorkflowError>;
-    fn add_trigger(&mut self, workflow_id: WorkflowID, trigger: Box<dyn Trigger>) -> Result<(), WorkflowError>;
+    fn register_workflow(
+        &mut self,
+        workflow: Box<dyn Workflow>,
+    ) -> Result<WorkflowID, WorkflowError>;
+    fn add_trigger(
+        &mut self,
+        workflow_id: WorkflowID,
+        trigger: Box<dyn Trigger>,
+    ) -> Result<(), WorkflowError>;
     fn process_triggers(&mut self) -> Vec<WorkflowID>;
     fn execute_workflow(&mut self, workflow_id: WorkflowID) -> Result<Vec<u8>, WorkflowError>;
 }
@@ -234,13 +276,20 @@ impl SimpleWorkflowEngine {
 }
 
 impl WorkflowEngine for SimpleWorkflowEngine {
-    fn register_workflow(&mut self, workflow: Box<dyn Workflow>) -> Result<WorkflowID, WorkflowError> {
+    fn register_workflow(
+        &mut self,
+        workflow: Box<dyn Workflow>,
+    ) -> Result<WorkflowID, WorkflowError> {
         let id = workflow.id();
         self.workflows.push(Some(workflow));
         Ok(id)
     }
 
-    fn add_trigger(&mut self, workflow_id: WorkflowID, trigger: Box<dyn Trigger>) -> Result<(), WorkflowError> {
+    fn add_trigger(
+        &mut self,
+        workflow_id: WorkflowID,
+        trigger: Box<dyn Trigger>,
+    ) -> Result<(), WorkflowError> {
         self.triggers.push((workflow_id, Some(trigger)));
         Ok(())
     }
@@ -272,7 +321,11 @@ impl WorkflowEngine for SimpleWorkflowEngine {
 }
 
 pub trait Scheduler {
-    fn schedule_workflow(&mut self, workflow_id: WorkflowID, delay_ms: u64) -> Result<(), WorkflowError>;
+    fn schedule_workflow(
+        &mut self,
+        workflow_id: WorkflowID,
+        delay_ms: u64,
+    ) -> Result<(), WorkflowError>;
     fn check_scheduled(&mut self) -> Vec<WorkflowID>;
     fn cancel_schedule(&mut self, workflow_id: WorkflowID) -> Result<(), WorkflowError>;
 }
@@ -292,10 +345,15 @@ impl SimpleScheduler {
 }
 
 impl Scheduler for SimpleScheduler {
-    fn schedule_workflow(&mut self, workflow_id: WorkflowID, delay_ms: u64) -> Result<(), WorkflowError> {
+    fn schedule_workflow(
+        &mut self,
+        workflow_id: WorkflowID,
+        delay_ms: u64,
+    ) -> Result<(), WorkflowError> {
         let current_time = 1000000u64;
         let execute_time = current_time + delay_ms;
-        self.scheduled.push((workflow_id, current_time, execute_time));
+        self.scheduled
+            .push((workflow_id, current_time, execute_time));
         Ok(())
     }
 
@@ -327,13 +385,25 @@ impl Scheduler for SimpleScheduler {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -351,19 +421,29 @@ impl<T> Vec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -395,7 +475,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;

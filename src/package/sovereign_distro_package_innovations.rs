@@ -70,7 +70,8 @@ impl SovereignOpenBsdSignifyPledgeEngine {
             if key.is_pqc_dilithium {
                 signature.starts_with("pqc-dilithium-v1:") && signature.contains(&key.pubkey)
             } else {
-                signature.starts_with("untrusted comment: verify with ") && signature.contains(&key.pubkey)
+                signature.starts_with("untrusted comment: verify with ")
+                    && signature.contains(&key.pubkey)
             }
         } else {
             false
@@ -198,7 +199,8 @@ impl SovereignGentooPortageEapi8Engine {
     }
 
     pub fn register_ebuild_slot(&mut self, metadata: EbuildSlotMetadata) {
-        self.registered_slots.insert(metadata.atom.clone(), metadata);
+        self.registered_slots
+            .insert(metadata.atom.clone(), metadata);
     }
 
     pub fn set_use_expand(&mut self, category: &str, flags: &[&str]) {
@@ -274,7 +276,10 @@ impl SovereignFreeBsdPoudriereVuxmlEngine {
     pub fn check_package_vulnerability(&self, pkg_name: &str) -> (bool, Option<VuXmlVulnRecord>) {
         for vuln in &self.vulnerabilities {
             if pkg_name.contains(&vuln.package_pattern) {
-                return (vuln.cvss_score_x10 >= self.cvss_critical_threshold_x10, Some(vuln.clone()));
+                return (
+                    vuln.cvss_score_x10 >= self.cvss_critical_threshold_x10,
+                    Some(vuln.clone()),
+                );
             }
         }
         (false, None)
@@ -401,7 +406,10 @@ impl SovereignFedoraDnf5RpmOstreeEngine {
     pub fn filter_critical_advisories(&self) -> Vec<Dnf5Advisory> {
         self.advisories
             .iter()
-            .filter(|a| a.severity == Dnf5AdvisorySeverity::Critical || a.severity == Dnf5AdvisorySeverity::Important)
+            .filter(|a| {
+                a.severity == Dnf5AdvisorySeverity::Critical
+                    || a.severity == Dnf5AdvisorySeverity::Important
+            })
             .cloned()
             .collect()
     }
@@ -486,7 +494,8 @@ impl SovereignArchCachyosMicroarchEngine {
     }
 
     pub fn register_pacdiff(&mut self, config: &str, pacnew: &str) {
-        self.pacdiff_conflicts.push((config.to_string(), pacnew.to_string()));
+        self.pacdiff_conflicts
+            .push((config.to_string(), pacnew.to_string()));
     }
 }
 
@@ -744,8 +753,14 @@ mod tests {
         engine.add_mirror("https://mirror1.com", 50);
         engine.add_mirror("https://mirror2.com", 20);
 
-        assert_eq!(engine.select_fastest_mirror(), Some("https://mirror2.com".to_string()));
-        assert_eq!(engine.resolve_cachyos_repo_url(), "https://repo.cachyos.org/v4");
+        assert_eq!(
+            engine.select_fastest_mirror(),
+            Some("https://mirror2.com".to_string())
+        );
+        assert_eq!(
+            engine.resolve_cachyos_repo_url(),
+            "https://repo.cachyos.org/v4"
+        );
     }
 
     #[test]
@@ -768,6 +783,9 @@ mod tests {
     #[test]
     fn test_distro_innovations_suite() {
         let suite = SovereignDistroPackageInnovationsSuite::new();
-        assert_eq!(suite.cachy_engine.resolve_cachyos_repo_url(), "https://repo.cachyos.org/v3");
+        assert_eq!(
+            suite.cachy_engine.resolve_cachyos_repo_url(),
+            "https://repo.cachyos.org/v3"
+        );
     }
 }

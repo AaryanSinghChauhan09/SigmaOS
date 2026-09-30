@@ -1,6 +1,6 @@
 use std::string::{String, ToString};
-use std::vec::Vec;
 use std::vec;
+use std::vec::Vec;
 // SigmaOS Processor Initialisation, Memory Layout, and Fast System Call Engine
 // Fully absorbs and implements design philosophies of Linux (SMEP/SMAP, LSTAR) and BSD distros (Guard pages, strict GDT/IDT):
 // x86-64 GDT segment structures, IDT gates, hardened CR0/CR4 control registers, virtual memory maps, and fast SYSCALL/SYSRET.
@@ -104,8 +104,8 @@ pub struct ProcessorInitSuite {
     pub idt: BTreeMap<u8, IdtGate>,
     pub memory_regions: Vec<VirtualMemoryRegion>,
     pub tss: TaskStateSegment64,
-    pub active_ring: u8, // 0 = Ring 0 (Kernel), 3 = Ring 3 (User)
-    pub cr0_wp_enabled: bool,  // Write Protect (prevents kernel writing to read-only pages)
+    pub active_ring: u8,             // 0 = Ring 0 (Kernel), 3 = Ring 3 (User)
+    pub cr0_wp_enabled: bool,        // Write Protect (prevents kernel writing to read-only pages)
     pub cr4_smep_enabled: bool, // Supervisor Mode Execution Prevention (prevents executing user code in ring 0)
     pub cr4_smap_enabled: bool, // Supervisor Mode Access Prevention (prevents accessing user data in ring 0)
     pub ia32_efer_nxe_enabled: bool, // No-Execute Enable (NX page validation)
@@ -207,7 +207,11 @@ impl ProcessorInitSuite {
     }
 
     /// Transition execution context to Ring 3 (User Mode)
-    pub fn enter_user_mode_ring3(&mut self, user_rsp: u64, kernel_rsp0: u64) -> Result<(), &'static str> {
+    pub fn enter_user_mode_ring3(
+        &mut self,
+        user_rsp: u64,
+        kernel_rsp0: u64,
+    ) -> Result<(), &'static str> {
         if user_rsp >= 0xFFFF_8000_0000_0000 {
             return Err("User mode RSP cannot reside in Ring 0 higher-half kernel memory");
         }
@@ -222,7 +226,13 @@ impl ProcessorInitSuite {
     }
 
     /// Configures the IDT with standard exception and hardware interrupt gates
-    pub fn register_idt_gate(&mut self, interrupt_num: u8, handler: usize, gate_type: u8, privilege: u8) {
+    pub fn register_idt_gate(
+        &mut self,
+        interrupt_num: u8,
+        handler: usize,
+        gate_type: u8,
+        privilege: u8,
+    ) {
         let gate = IdtGate {
             handler_address: handler,
             selector: 0x08, // Kernel code segment selector
@@ -265,7 +275,12 @@ impl FastSyscallDispatcher {
     }
 
     /// Handles fast system calls without the interrupt overhead of INT 0x80 (FreeBSD/Linux style)
-    pub fn dispatch_syscall(&mut self, rax_syscall_num: u64, rdi_arg1: u64, rsi_arg2: u64) -> Result<u64, &'static str> {
+    pub fn dispatch_syscall(
+        &mut self,
+        rax_syscall_num: u64,
+        rdi_arg1: u64,
+        rsi_arg2: u64,
+    ) -> Result<u64, &'static str> {
         self.call_count += 1;
         match rax_syscall_num {
             1 => {
@@ -376,7 +391,9 @@ mod tests {
 
         // Fail user mode entry if user RSP attempts to point to kernel address
         let invalid_user_rsp = 0xFFFF_8000_0000_1000;
-        assert!(suite.enter_user_mode_ring3(invalid_user_rsp, kernel_rsp0).is_err());
+        assert!(suite
+            .enter_user_mode_ring3(invalid_user_rsp, kernel_rsp0)
+            .is_err());
 
         // Exit Ring 3 back to Ring 0 Kernel Mode
         suite.exit_user_mode_ring0();

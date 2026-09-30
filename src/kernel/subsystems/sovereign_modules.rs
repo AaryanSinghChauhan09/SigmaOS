@@ -1,7 +1,7 @@
-use std::vec;
-use std::string::{String, ToString};
-use std::vec::Vec;
 use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 // SigmaOS Sovereign Core Modules & Subsystems
 // Implements missing enterprise, gaming, accessibility, mobile, localization,
 // and sovereign sector integrations (Healthcare, Education, Agriculture, Finance)
@@ -141,7 +141,10 @@ impl ProtonGameTranslator {
 
     pub fn load_pe_binary(&self, pe_name: &str) -> Result<String, &'static str> {
         if pe_name.ends_with(".exe") {
-            Ok(format!("Successfully initialized {} in sandboxed DX12->Vulkan pipeline", pe_name))
+            Ok(format!(
+                "Successfully initialized {} in sandboxed DX12->Vulkan pipeline",
+                pe_name
+            ))
         } else {
             Err("Invalid PE format")
         }
@@ -268,7 +271,12 @@ impl SovereignSectorServices {
     pub fn trace_execution_loop(&self, code_lines: &[&str]) -> Vec<String> {
         let mut trace = Vec::new();
         for (i, line) in code_lines.iter().enumerate() {
-            trace.push(format!("Step {}: Loaded '{}' into Virtual Register R{}", i, line, i % 8));
+            trace.push(format!(
+                "Step {}: Loaded '{}' into Virtual Register R{}",
+                i,
+                line,
+                i % 8
+            ));
         }
         trace
     }
@@ -329,7 +337,10 @@ impl SovereignDynamicKernelModuleManager {
         }
     }
 
-    pub fn insmod_kldload(&mut self, mut module: SovereignKernelModule) -> Result<(), &'static str> {
+    pub fn insmod_kldload(
+        &mut self,
+        mut module: SovereignKernelModule,
+    ) -> Result<(), &'static str> {
         if self.loaded_modules.contains_key(&module.name) {
             return Err("KernelModule: Module already loaded");
         }
@@ -351,7 +362,8 @@ impl SovereignDynamicKernelModuleManager {
 
         // Register exported symbols
         for sym in &module.exported_symbols {
-            self.global_symbol_table.insert(sym.clone(), module.name.clone());
+            self.global_symbol_table
+                .insert(sym.clone(), module.name.clone());
         }
 
         self.loaded_modules.insert(module.name.clone(), module);
@@ -499,7 +511,10 @@ mod tests {
 
         // 4. Agricultural irrigation
         let strategy = services.evaluate_soil_irrigation_strategy(15.0);
-        assert_eq!(strategy, "Action Required: Initiate localized water drip loop");
+        assert_eq!(
+            strategy,
+            "Action Required: Initiate localized water drip loop"
+        );
     }
 
     #[test]
@@ -532,7 +547,10 @@ mod tests {
 
         // Load base module
         assert!(kmod.insmod_kldload(base_module).is_ok());
-        assert_eq!(kmod.global_symbol_table.get("snd_pcm_write"), Some(&"snd_core".to_string()));
+        assert_eq!(
+            kmod.global_symbol_table.get("snd_pcm_write"),
+            Some(&"snd_core".to_string())
+        );
 
         // Load dependent driver module
         assert!(kmod.insmod_kldload(driver_module).is_ok());

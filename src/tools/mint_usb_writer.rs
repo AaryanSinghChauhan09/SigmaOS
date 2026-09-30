@@ -1,11 +1,9 @@
 //! Linux Mint mintstick-inspired USB Image Writer
-//! 
+//!
 //! This module implements a USB image writer inspired by Linux Mint's mintstick,
 //! which formats USB sticks and creates bootable USB sticks.
 
 #![allow(dead_code)]
-
-
 
 use std::string::{String, ToString};
 use std::vec::Vec;
@@ -187,7 +185,7 @@ impl MintUsbWriter {
         }
 
         self.operation_in_progress = true;
-        
+
         // Simulate formatting progress
         self.progress = Some(UsbOperationProgress {
             operation: "Formatting".to_string(),
@@ -234,7 +232,7 @@ impl MintUsbWriter {
         }
 
         self.operation_in_progress = true;
-        
+
         // Simulate writing progress
         self.progress = Some(UsbOperationProgress {
             operation: "Writing image".to_string(),
@@ -298,7 +296,11 @@ impl MintUsbWriter {
     }
 
     /// Check if device has enough space
-    pub fn check_device_space(&self, device_path: &str, required_size: u64) -> Result<bool, String> {
+    pub fn check_device_space(
+        &self,
+        device_path: &str,
+        required_size: u64,
+    ) -> Result<bool, String> {
         if let Some(device) = self.get_device(device_path) {
             Ok(device.size >= required_size)
         } else {
@@ -327,7 +329,7 @@ mod tests {
     #[test]
     fn test_add_device() {
         let mut writer = MintUsbWriter::new();
-        
+
         let device = UsbDevice {
             device_path: "/dev/sdb".to_string(),
             size: 16 * 1024 * 1024 * 1024, // 16GB
@@ -337,7 +339,7 @@ mod tests {
             mounted: false,
             mount_points: Vec::new(),
         };
-        
+
         writer.add_device(device);
         assert_eq!(writer.devices.len(), 1);
     }
@@ -345,7 +347,7 @@ mod tests {
     #[test]
     fn test_select_device() {
         let mut writer = MintUsbWriter::new();
-        
+
         let device = UsbDevice {
             device_path: "/dev/sdb".to_string(),
             size: 16 * 1024 * 1024 * 1024,
@@ -355,7 +357,7 @@ mod tests {
             mounted: false,
             mount_points: Vec::new(),
         };
-        
+
         writer.add_device(device);
         let result = writer.select_device("/dev/sdb".to_string());
         assert!(result.is_ok());
@@ -364,7 +366,10 @@ mod tests {
 
     #[test]
     fn test_filesystem_max_size() {
-        assert_eq!(FilesystemType::Fat32.max_file_size(), 4 * 1024 * 1024 * 1024);
+        assert_eq!(
+            FilesystemType::Fat32.max_file_size(),
+            4 * 1024 * 1024 * 1024
+        );
         assert!(FilesystemType::Ntfs.max_file_size() > FilesystemType::Fat32.max_file_size());
     }
 

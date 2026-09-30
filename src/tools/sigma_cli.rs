@@ -41,20 +41,27 @@ impl SigmaMasterCli {
         match cmd {
             SigmaCliCommand::Init => {
                 self.active_project = arg.to_string();
-                Ok(format!("Successfully initialized Sovereign project '{}' with WASM/no_std defaults.", arg))
+                Ok(format!(
+                    "Successfully initialized Sovereign project '{}' with WASM/no_std defaults.",
+                    arg
+                ))
             }
-            SigmaCliCommand::Build => {
-                Ok(format!("Compiled '{}' bit-for-bit reproducible WASM binary in 0.08s.", self.active_project))
-            }
-            SigmaCliCommand::Run => {
-                Ok(format!("Launched instant sandbox for '{}' in <1ms (WASM fast-path hostcalls active).", self.active_project))
-            }
-            SigmaCliCommand::Attest => {
-                Ok(format!("Hardware Attestation Validated: Dilithium-5 signature verified for '{}'.", self.active_project))
-            }
-            SigmaCliCommand::Publish => {
-                Ok(format!("Published signed package '{}:v1.0.0' to Sovereign Marketplace.", self.active_project))
-            }
+            SigmaCliCommand::Build => Ok(format!(
+                "Compiled '{}' bit-for-bit reproducible WASM binary in 0.08s.",
+                self.active_project
+            )),
+            SigmaCliCommand::Run => Ok(format!(
+                "Launched instant sandbox for '{}' in <1ms (WASM fast-path hostcalls active).",
+                self.active_project
+            )),
+            SigmaCliCommand::Attest => Ok(format!(
+                "Hardware Attestation Validated: Dilithium-5 signature verified for '{}'.",
+                self.active_project
+            )),
+            SigmaCliCommand::Publish => Ok(format!(
+                "Published signed package '{}:v1.0.0' to Sovereign Marketplace.",
+                self.active_project
+            )),
         }
     }
 }
@@ -72,10 +79,25 @@ mod tests {
     #[test]
     fn test_sigma_master_cli_flow() {
         let mut cli = SigmaMasterCli::new();
-        assert!(cli.execute(SigmaCliCommand::Init, "my_app").unwrap().contains("my_app"));
-        assert!(cli.execute(SigmaCliCommand::Build, "").unwrap().contains("reproducible"));
-        assert!(cli.execute(SigmaCliCommand::Run, "").unwrap().contains("<1ms"));
-        assert!(cli.execute(SigmaCliCommand::Attest, "").unwrap().contains("Dilithium-5"));
-        assert!(cli.execute(SigmaCliCommand::Publish, "").unwrap().contains("Published"));
+        assert!(cli
+            .execute(SigmaCliCommand::Init, "my_app")
+            .unwrap()
+            .contains("my_app"));
+        assert!(cli
+            .execute(SigmaCliCommand::Build, "")
+            .unwrap()
+            .contains("reproducible"));
+        assert!(cli
+            .execute(SigmaCliCommand::Run, "")
+            .unwrap()
+            .contains("<1ms"));
+        assert!(cli
+            .execute(SigmaCliCommand::Attest, "")
+            .unwrap()
+            .contains("Dilithium-5"));
+        assert!(cli
+            .execute(SigmaCliCommand::Publish, "")
+            .unwrap()
+            .contains("Published"));
     }
 }

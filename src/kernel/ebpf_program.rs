@@ -232,7 +232,9 @@ impl EbpfVerifier {
             }
             visited[state.pc] = true;
 
-            let insn = program.instructions.get(state.pc)
+            let insn = program
+                .instructions
+                .get(state.pc)
                 .ok_or_else(|| EbpfVerifyError::InvalidInstruction { pc: state.pc })?;
 
             // Verify register bounds
@@ -258,7 +260,11 @@ impl EbpfVerifier {
     }
 
     /// Execute a single instruction for verification
-    fn execute_insn(&self, state: &mut EbpfVerifierState, insn: &EbpfInsn) -> Result<(), EbpfVerifyError> {
+    fn execute_insn(
+        &self,
+        state: &mut EbpfVerifierState,
+        insn: &EbpfInsn,
+    ) -> Result<(), EbpfVerifyError> {
         match insn.class() {
             EbpfInsnClass::Alu | EbpfInsnClass::Alu64 => {
                 // ALU operations
@@ -327,7 +333,9 @@ impl EbpfVm {
         let mut pc = 0;
 
         while pc < program.insn_count() {
-            let insn = program.instructions.get(pc)
+            let insn = program
+                .instructions
+                .get(pc)
                 .ok_or_else(|| EbpfVerifyError::InvalidInstruction { pc })?;
 
             self.execute_insn(insn)?;

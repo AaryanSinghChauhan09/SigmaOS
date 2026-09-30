@@ -76,30 +76,49 @@ impl SovereignAlpineAbuildSecurityAuditor {
         }
     }
 
-    pub fn audit_binary_files(&self, pkg_name: &str, binaries: &[BinarySecurityProfile]) -> PackageSecurityAuditResult {
+    pub fn audit_binary_files(
+        &self,
+        pkg_name: &str,
+        binaries: &[BinarySecurityProfile],
+    ) -> PackageSecurityAuditResult {
         let mut warnings = Vec::new();
         let mut score = 100u32;
 
         for bin in binaries {
             if bin.is_setuid || bin.is_setgid {
                 score = score.saturating_sub(15);
-                warnings.push(format!("Binary '{}' has SUID/SGID elevation flags set", bin.filepath));
+                warnings.push(format!(
+                    "Binary '{}' has SUID/SGID elevation flags set",
+                    bin.filepath
+                ));
             }
             if bin.is_world_writable {
                 score = score.saturating_sub(25);
-                warnings.push(format!("File '{}' is world-writable (security risk)", bin.filepath));
+                warnings.push(format!(
+                    "File '{}' is world-writable (security risk)",
+                    bin.filepath
+                ));
             }
             if !bin.is_stripped {
                 score = score.saturating_sub(5);
-                warnings.push(format!("Binary '{}' contains unstripped debug symbols", bin.filepath));
+                warnings.push(format!(
+                    "Binary '{}' contains unstripped debug symbols",
+                    bin.filepath
+                ));
             }
             if !bin.has_stack_canary {
                 score = score.saturating_sub(15);
-                warnings.push(format!("Binary '{}' lacks stack canary protection", bin.filepath));
+                warnings.push(format!(
+                    "Binary '{}' lacks stack canary protection",
+                    bin.filepath
+                ));
             }
             if !bin.has_full_relro {
                 score = score.saturating_sub(10);
-                warnings.push(format!("Binary '{}' lacks full RELRO memory protection", bin.filepath));
+                warnings.push(format!(
+                    "Binary '{}' lacks full RELRO memory protection",
+                    bin.filepath
+                ));
             }
         }
 
@@ -314,7 +333,8 @@ impl SovereignDebianAptFileDebconfEngine {
 
     pub fn index_package_files(&mut self, pkg_name: &str, filepaths: &[&str]) {
         for path in filepaths {
-            self.file_to_package_index.insert(path.to_string(), pkg_name.to_string());
+            self.file_to_package_index
+                .insert(path.to_string(), pkg_name.to_string());
         }
     }
 
@@ -385,14 +405,19 @@ impl SovereignFreeBsdVuXmlCapsicumEngine {
             if adv.package_name == pkg_name && adv.cvss_score_x10 >= self.max_allowed_cvss_x10 {
                 return Err(format!(
                     "VuXML Gatekeeper Block: {} contains critical security flaw [{}] CVSS {}",
-                    pkg_name, adv.cve_id, adv.cvss_score_x10 as f32 / 10.0
+                    pkg_name,
+                    adv.cve_id,
+                    adv.cvss_score_x10 as f32 / 10.0
                 ));
             }
         }
         Ok(())
     }
 
-    pub fn execute_scriptlet_in_sandbox(&self, scriptlet_cmd: &str) -> Result<String, &'static str> {
+    pub fn execute_scriptlet_in_sandbox(
+        &self,
+        scriptlet_cmd: &str,
+    ) -> Result<String, &'static str> {
         if scriptlet_cmd.contains("rm -rf /") || scriptlet_cmd.contains("chmod 777 /") {
             return Err("Capsicum Sandbox: Restricted unsafe system call detected");
         }
@@ -441,10 +466,12 @@ impl SovereignNixGuixCasClosureEngine {
             if visited.contains(&path) {
                 continue;
             }
-            let obj = self
-                .store_objects
-                .get(&path)
-                .ok_or_else(|| format!("Broken closure reference: path '{}' missing in CAS store", path))?;
+            let obj = self.store_objects.get(&path).ok_or_else(|| {
+                format!(
+                    "Broken closure reference: path '{}' missing in CAS store",
+                    path
+                )
+            })?;
 
             visited.push(path.clone());
             for dep in &obj.direct_references {
@@ -510,12 +537,21 @@ impl SovereignFedoraDnf5OstreePatchEngine {
     }
 
     pub fn layer_package(&mut self, pkg_name: &str) {
-        if !self.active_deployment.layered_packages.contains(&pkg_name.to_string()) {
-            self.active_deployment.layered_packages.push(pkg_name.to_string());
+        if !self
+            .active_deployment
+            .layered_packages
+            .contains(&pkg_name.to_string())
+        {
+            self.active_deployment
+                .layered_packages
+                .push(pkg_name.to_string());
         }
     }
 
-    pub fn reconstruct_deltarpm(base_bytes: &[u8], patch_bytes: &[u8]) -> Result<Vec<u8>, &'static str> {
+    pub fn reconstruct_deltarpm(
+        base_bytes: &[u8],
+        patch_bytes: &[u8],
+    ) -> Result<Vec<u8>, &'static str> {
         if patch_bytes.is_empty() {
             return Ok(base_bytes.to_vec());
         }
@@ -681,17 +717,24 @@ impl SovereignDistroPackageMasterSuite {
         self.freebsd.audit_vulnerability_gatekeeper(&pkg.name)?;
 
         // 2. Arch Linux signature verification
-        let sig_valid = self.arch.verify_package_signature("sovereign-root", "dilithium-5-valid-sig");
+        let sig_valid = self
+            .arch
+            .verify_package_signature("sovereign-root", "dilithium-5-valid-sig");
         if sig_valid {
-            pkg.properties.insert("signature_status".to_string(), "Verified Dilithium-5".to_string());
+            pkg.properties.insert(
+                "signature_status".to_string(),
+                "Verified Dilithium-5".to_string(),
+            );
         }
 
         // 3. Debian path indexer registration
-        self.debian.index_package_files(&pkg.name, &[&format!("/usr/bin/{}", pkg.name)]);
+        self.debian
+            .index_package_files(&pkg.name, &[&format!("/usr/bin/{}", pkg.name)]);
 
         // 4. Gentoo USE flag tag
         if self.gentoo.is_use_enabled("hardened") {
-            pkg.properties.insert("security_profile".to_string(), "hardened".to_string());
+            pkg.properties
+                .insert("security_profile".to_string(), "hardened".to_string());
         }
 
         Ok(())
@@ -760,8 +803,17 @@ mod tests {
             is_revoked: false,
         });
 
-        assert_eq!(arch.evaluate_transaction_files(&["/usr/share/fonts/dejavu.ttf"], HookType::PostTransaction), 1);
-        assert_eq!(arch.execute_pending_hooks(), vec!["fc-cache -fv".to_string()]);
+        assert_eq!(
+            arch.evaluate_transaction_files(
+                &["/usr/share/fonts/dejavu.ttf"],
+                HookType::PostTransaction
+            ),
+            1
+        );
+        assert_eq!(
+            arch.execute_pending_hooks(),
+            vec!["fc-cache -fv".to_string()]
+        );
         assert!(arch.verify_package_signature("key-1", "abcd1234pubkey"));
     }
 
@@ -786,10 +838,16 @@ mod tests {
     fn test_debian_apt_file_debconf() {
         let mut debian = SovereignDebianAptFileDebconfEngine::new();
         debian.index_package_files("nginx", &["/usr/sbin/nginx", "/etc/nginx/nginx.conf"]);
-        assert_eq!(debian.search_file_owner("/usr/sbin/nginx"), Some(&"nginx".to_string()));
+        assert_eq!(
+            debian.search_file_owner("/usr/sbin/nginx"),
+            Some(&"nginx".to_string())
+        );
 
         debian.set_debconf_preseed("tzdata", "tzdata/areas", "UTC");
-        assert_eq!(debian.get_preseed_answer("tzdata", "tzdata/areas"), Some("UTC".to_string()));
+        assert_eq!(
+            debian.get_preseed_answer("tzdata", "tzdata/areas"),
+            Some("UTC".to_string())
+        );
     }
 
     #[test]
@@ -803,11 +861,15 @@ mod tests {
             resolution_summary: "Buffer overflow fix".to_string(),
         });
 
-        assert!(freebsd.audit_vulnerability_gatekeeper("vulnerable_app").is_err());
+        assert!(freebsd
+            .audit_vulnerability_gatekeeper("vulnerable_app")
+            .is_err());
         assert!(freebsd.audit_vulnerability_gatekeeper("safe_app").is_ok());
 
         assert!(freebsd.execute_scriptlet_in_sandbox("chmod 777 /").is_err());
-        assert!(freebsd.execute_scriptlet_in_sandbox("echo PostInstall").is_ok());
+        assert!(freebsd
+            .execute_scriptlet_in_sandbox("echo PostInstall")
+            .is_ok());
     }
 
     #[test]
@@ -835,13 +897,16 @@ mod tests {
     fn test_fedora_dnf5_deltarpm() {
         let base = b"FEDORA_BASE_SYSTEM_RPM";
         let patch = vec![
-            0x01, 0x00, 0x0B, 0x00, 0x00, 0x00, 0x00,
-            0x02, 0x00, 0x07, b'_', b'P', b'A', b'T', b'C', b'H', b'E',
-            0xFF,
+            0x01, 0x00, 0x0B, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x07, b'_', b'P', b'A', b'T',
+            b'C', b'H', b'E', 0xFF,
         ];
 
-        let reconstructed = SovereignFedoraDnf5OstreePatchEngine::reconstruct_deltarpm(base, &patch).unwrap();
-        assert_eq!(String::from_utf8(reconstructed).unwrap(), "FEDORA_BASE_PATCHE");
+        let reconstructed =
+            SovereignFedoraDnf5OstreePatchEngine::reconstruct_deltarpm(base, &patch).unwrap();
+        assert_eq!(
+            String::from_utf8(reconstructed).unwrap(),
+            "FEDORA_BASE_PATCHE"
+        );
     }
 
     #[test]

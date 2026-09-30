@@ -176,13 +176,21 @@ impl SwapManager {
     /// Get all active devices
     pub fn get_active_devices(&self) -> Vec<SwapDevice> {
         let devices = self.devices.lock().unwrap();
-        devices.values().filter(|d| d.is_active()).cloned().collect()
+        devices
+            .values()
+            .filter(|d| d.is_active())
+            .cloned()
+            .collect()
     }
 
     /// Get swap statistics
     pub fn get_stats(&self) -> SwapStats {
         let devices = self.devices.lock().unwrap();
-        let total: u64 = devices.values().filter(|d| d.is_active()).map(|d| d.size).sum();
+        let total: u64 = devices
+            .values()
+            .filter(|d| d.is_active())
+            .map(|d| d.size)
+            .sum();
         // In a real implementation, used would be tracked
         let used = total / 2; // Placeholder: 50% usage
         SwapStats::new(total, used)
@@ -225,7 +233,12 @@ mod tests {
 
     #[test]
     fn test_swap_device_creation() {
-        let device = SwapDevice::new(1, SwapDeviceType::Partition, "/dev/sda2".to_string(), 1024 * 1024 * 1024);
+        let device = SwapDevice::new(
+            1,
+            SwapDeviceType::Partition,
+            "/dev/sda2".to_string(),
+            1024 * 1024 * 1024,
+        );
         assert_eq!(device.id, 1);
         assert_eq!(device.path, "/dev/sda2");
         assert!(!device.is_active());
@@ -233,14 +246,24 @@ mod tests {
 
     #[test]
     fn test_swap_device_with_priority() {
-        let device = SwapDevice::new(1, SwapDeviceType::Partition, "/dev/sda2".to_string(), 1024 * 1024 * 1024)
-            .with_priority(10);
+        let device = SwapDevice::new(
+            1,
+            SwapDeviceType::Partition,
+            "/dev/sda2".to_string(),
+            1024 * 1024 * 1024,
+        )
+        .with_priority(10);
         assert_eq!(device.priority, 10);
     }
 
     #[test]
     fn test_swap_device_lifecycle() {
-        let mut device = SwapDevice::new(1, SwapDeviceType::Partition, "/dev/sda2".to_string(), 1024 * 1024 * 1024);
+        let mut device = SwapDevice::new(
+            1,
+            SwapDeviceType::Partition,
+            "/dev/sda2".to_string(),
+            1024 * 1024 * 1024,
+        );
 
         device.activate().unwrap();
         assert!(device.is_active());
@@ -251,7 +274,12 @@ mod tests {
 
     #[test]
     fn test_swap_device_double_activate() {
-        let mut device = SwapDevice::new(1, SwapDeviceType::Partition, "/dev/sda2".to_string(), 1024 * 1024 * 1024);
+        let mut device = SwapDevice::new(
+            1,
+            SwapDeviceType::Partition,
+            "/dev/sda2".to_string(),
+            1024 * 1024 * 1024,
+        );
         device.activate().unwrap();
         assert!(device.activate().is_err());
     }
@@ -269,7 +297,11 @@ mod tests {
     fn test_swap_manager() {
         let manager = SwapManager::new();
 
-        let device_id = manager.create_device(SwapDeviceType::Partition, "/dev/sda2".to_string(), 1024 * 1024 * 1024);
+        let device_id = manager.create_device(
+            SwapDeviceType::Partition,
+            "/dev/sda2".to_string(),
+            1024 * 1024 * 1024,
+        );
         assert_eq!(device_id, 1);
 
         manager.activate_device(device_id).unwrap();
@@ -288,8 +320,16 @@ mod tests {
     fn test_swap_manager_multiple_devices() {
         let manager = SwapManager::new();
 
-        let device_id1 = manager.create_device(SwapDeviceType::Partition, "/dev/sda2".to_string(), 1024 * 1024 * 1024);
-        let device_id2 = manager.create_device(SwapDeviceType::File, "/swapfile".to_string(), 512 * 1024 * 1024);
+        let device_id1 = manager.create_device(
+            SwapDeviceType::Partition,
+            "/dev/sda2".to_string(),
+            1024 * 1024 * 1024,
+        );
+        let device_id2 = manager.create_device(
+            SwapDeviceType::File,
+            "/swapfile".to_string(),
+            512 * 1024 * 1024,
+        );
 
         manager.activate_device(device_id1).unwrap();
         manager.activate_device(device_id2).unwrap();
@@ -304,7 +344,11 @@ mod tests {
     fn test_swap_manager_set_priority() {
         let manager = SwapManager::new();
 
-        let device_id = manager.create_device(SwapDeviceType::Partition, "/dev/sda2".to_string(), 1024 * 1024 * 1024);
+        let device_id = manager.create_device(
+            SwapDeviceType::Partition,
+            "/dev/sda2".to_string(),
+            1024 * 1024 * 1024,
+        );
         manager.set_priority(device_id, 10).unwrap();
 
         let device = manager.get_device(device_id).unwrap();
@@ -328,7 +372,11 @@ mod tests {
     fn test_swap_manager_remove_active() {
         let manager = SwapManager::new();
 
-        let device_id = manager.create_device(SwapDeviceType::Partition, "/dev/sda2".to_string(), 1024 * 1024 * 1024);
+        let device_id = manager.create_device(
+            SwapDeviceType::Partition,
+            "/dev/sda2".to_string(),
+            1024 * 1024 * 1024,
+        );
         manager.activate_device(device_id).unwrap();
 
         assert!(manager.remove_device(device_id).is_err());

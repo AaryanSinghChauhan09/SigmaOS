@@ -3,8 +3,8 @@
 // allocates BAR memory addresses, and configures MSI-X interrupts.
 // Enhanced with CXL 3.0 support and PCIe Gen7 capabilities
 
-use std::vec::Vec;
 use std::string::String;
+use std::vec::Vec;
 
 /// PCIe link generation
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -153,12 +153,12 @@ impl PcieBusDriver {
         if device_index >= self.enumerated_devices.len() {
             return Err("Invalid device index".to_string());
         }
-        
+
         let device = &self.enumerated_devices[device_index];
         if !device.capabilities.msi_x {
             return Err("Device does not support MSI-X".to_string());
         }
-        
+
         // Placeholder: Configure MSI-X interrupt vectors
         Ok(())
     }
@@ -166,10 +166,10 @@ impl PcieBusDriver {
     /// Perform CXL hot-plug enumeration
     pub fn cxl_hotplug_scan(&mut self) -> Vec<PcieDeviceInfo> {
         let mut new_devices = Vec::new();
-        
+
         // Placeholder: Scan for new CXL devices
         // In production, this would check the CXL fabric for newly added memory expanders
-        
+
         new_devices
     }
 }
@@ -193,7 +193,7 @@ mod tests {
         driver.init_cxl_memory_pool(0xFE200000);
         let count = driver.scan_pcie_bus();
         assert!(count >= 3);
-        
+
         let cxl_devices = driver.get_cxl_devices();
         assert!(!cxl_devices.is_empty());
     }
@@ -202,7 +202,7 @@ mod tests {
     fn test_gen7_devices() {
         let mut driver = PcieBusDriver::new(0xE0000000);
         driver.scan_pcie_bus();
-        
+
         let gen7_devices = driver.get_gen7_devices();
         assert!(!gen7_devices.is_empty());
     }
@@ -211,10 +211,10 @@ mod tests {
     fn test_msix_configuration() {
         let mut driver = PcieBusDriver::new(0xE0000000);
         driver.scan_pcie_bus();
-        
+
         // Test MSI-X configuration for device 0 (NVMe with MSI-X support)
         assert!(driver.configure_msix(0).is_ok());
-        
+
         // Test failure for device without MSI-X (if any)
         // This would require a device with msi_x: false
     }

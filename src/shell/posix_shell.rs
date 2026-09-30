@@ -149,14 +149,14 @@ pub struct PosixShell {
 /// Shell options (set -o)
 #[derive(Debug, Clone)]
 pub struct ShellOptions {
-    pub errexit: bool,          // set -e
-    pub nounset: bool,          // set -u
-    pub noglob: bool,           // set -f
-    pub noclobber: bool,        // set -C
-    pub pipefail: bool,         // set -o pipefail
-    pub interactive: bool,      // set -i
-    pub monitor: bool,          // set -m
-    pub notify: bool,           // set -b
+    pub errexit: bool,     // set -e
+    pub nounset: bool,     // set -u
+    pub noglob: bool,      // set -f
+    pub noclobber: bool,   // set -C
+    pub pipefail: bool,    // set -o pipefail
+    pub interactive: bool, // set -i
+    pub monitor: bool,     // set -m
+    pub notify: bool,      // set -b
 }
 
 impl Default for ShellOptions {
@@ -188,7 +188,11 @@ impl PosixShell {
         };
 
         // Initialize standard environment variables
-        shell.set_var("PATH".to_string(), "/bin:/usr/bin:/usr/local/bin".to_string(), true);
+        shell.set_var(
+            "PATH".to_string(),
+            "/bin:/usr/bin:/usr/local/bin".to_string(),
+            true,
+        );
         shell.set_var("HOME".to_string(), "/root".to_string(), true);
         shell.set_var("USER".to_string(), "root".to_string(), true);
         shell.set_var("SHELL".to_string(), "/bin/sh".to_string(), true);
@@ -200,7 +204,8 @@ impl PosixShell {
 
     /// Set environment variable
     pub fn set_var(&mut self, name: String, value: String, exported: bool) {
-        self.env_vars.insert(name.clone(), ShellVar::new(name, value, exported));
+        self.env_vars
+            .insert(name.clone(), ShellVar::new(name, value, exported));
     }
 
     /// Get environment variable
@@ -222,7 +227,8 @@ impl PosixShell {
 
     /// Set alias
     pub fn set_alias(&mut self, name: String, value: String) {
-        self.aliases.insert(name.clone(), ShellAlias::new(name, value));
+        self.aliases
+            .insert(name.clone(), ShellAlias::new(name, value));
     }
 
     /// Get alias
@@ -251,7 +257,11 @@ impl PosixShell {
             .map_err(|e| format!("cd: {}: {}", path, e))?;
 
         self.cwd = new_path.clone();
-        self.set_var("PWD".to_string(), new_path.to_str().unwrap().to_string(), true);
+        self.set_var(
+            "PWD".to_string(),
+            new_path.to_str().unwrap().to_string(),
+            true,
+        );
         Ok(())
     }
 
@@ -261,19 +271,20 @@ impl PosixShell {
     }
 
     /// Execute built-in command
-    pub fn execute_builtin(&mut self, builtin: ShellBuiltin, args: &[String]) -> Result<String, String> {
+    pub fn execute_builtin(
+        &mut self,
+        builtin: ShellBuiltin,
+        args: &[String],
+    ) -> Result<String, String> {
         match builtin {
-            ShellBuiltin::Cd => {
-                if args.is_empty() {
-                    self.cd("~")
-                } else {
-                    self.cd(&args[0])
-                }.map(|_| String::new())
+            ShellBuiltin::Cd => if args.is_empty() {
+                self.cd("~")
+            } else {
+                self.cd(&args[0])
             }
+            .map(|_| String::new()),
             ShellBuiltin::Pwd => Ok(self.pwd()),
-            ShellBuiltin::Echo => {
-                Ok(args.join(" "))
-            }
+            ShellBuiltin::Echo => Ok(args.join(" ")),
             ShellBuiltin::Export => {
                 if !args.is_empty() {
                     for arg in args {
@@ -439,7 +450,10 @@ mod tests {
         let mut shell = PosixShell::new();
 
         // Test echo
-        let result = shell.execute_builtin(ShellBuiltin::Echo, &["hello".to_string(), "world".to_string()]);
+        let result = shell.execute_builtin(
+            ShellBuiltin::Echo,
+            &["hello".to_string(), "world".to_string()],
+        );
         assert_eq!(result.unwrap(), "hello world");
 
         // Test true
@@ -455,7 +469,9 @@ mod tests {
     fn test_shell_export() {
         let mut shell = PosixShell::new();
 
-        shell.execute_builtin(ShellBuiltin::Export, &["TEST=value".to_string()]).unwrap();
+        shell
+            .execute_builtin(ShellBuiltin::Export, &["TEST=value".to_string()])
+            .unwrap();
         assert_eq!(shell.get_var("TEST"), Some("value".to_string()));
         assert!(shell.env_vars.get("TEST").unwrap().exported);
     }
@@ -467,7 +483,9 @@ mod tests {
         shell.set_var("TEST".to_string(), "value".to_string(), true);
         assert_eq!(shell.get_var("TEST"), Some("value".to_string()));
 
-        shell.execute_builtin(ShellBuiltin::Unset, &["TEST".to_string()]).unwrap();
+        shell
+            .execute_builtin(ShellBuiltin::Unset, &["TEST".to_string()])
+            .unwrap();
         assert_eq!(shell.get_var("TEST"), None);
     }
 

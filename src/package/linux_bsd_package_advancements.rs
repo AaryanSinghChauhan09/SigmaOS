@@ -61,7 +61,10 @@ impl AptListChangesChangelogAuditorEngine {
     }
 
     pub fn format_pre_upgrade_notice(&self, pkg_name: &str) -> Option<String> {
-        let entry = self.changelogs.iter().find(|c| c.package_name == pkg_name)?;
+        let entry = self
+            .changelogs
+            .iter()
+            .find(|c| c.package_name == pkg_name)?;
         let mut notice = format!(
             "=== Pre-upgrade Notice for {} ({}) ===\n{}",
             entry.package_name, entry.version, entry.changelog_text
@@ -281,7 +284,10 @@ impl FedoraDnf5AdvisorySecurityEngine {
 
     /// DeltaRPM patch reconstitution algorithm processing VCDIFF/XDELTA opcode byte streams.
     /// Operates on (0x01: COPY len src_off, 0x02: ADD len bytes...) instruction blocks.
-    pub fn reconstruct_deltarpm(old_rpm: &[u8], delta_patch: &[u8]) -> Result<Vec<u8>, &'static str> {
+    pub fn reconstruct_deltarpm(
+        old_rpm: &[u8],
+        delta_patch: &[u8],
+    ) -> Result<Vec<u8>, &'static str> {
         if delta_patch.is_empty() {
             return Ok(old_rpm.to_vec());
         }
@@ -331,7 +337,11 @@ impl FedoraDnf5AdvisorySecurityEngine {
                 0xFF => break,
                 // Direct literal diff XOR byte fallback
                 _ => {
-                    let old_b = if out.len() < old_rpm.len() { old_rpm[out.len()] } else { 0 };
+                    let old_b = if out.len() < old_rpm.len() {
+                        old_rpm[out.len()]
+                    } else {
+                        0
+                    };
                     out.push(old_b ^ opcode);
                 }
             }
@@ -631,7 +641,12 @@ impl OpenBsdSignifyPledgeUnveilSandboxEngine {
 
     /// Verifies OpenBSD Signify ed25519 / Dilithium-PQC signature headers over binary payload checksums.
     /// Format: `untrusted comment: verify with <key_id>.pub\n<signature_data>`
-    pub fn verify_signature(&self, key_id: &str, signature_header: &str, payload_bytes: &[u8]) -> bool {
+    pub fn verify_signature(
+        &self,
+        key_id: &str,
+        signature_header: &str,
+        payload_bytes: &[u8],
+    ) -> bool {
         if let Some(pubkey) = self.signify_keys.get(key_id) {
             // Check key reference match in untrusted comment header
             let header_valid = signature_header.contains("untrusted comment")
@@ -659,7 +674,11 @@ impl OpenBsdSignifyPledgeUnveilSandboxEngine {
         }
     }
 
-    pub fn generate_pledge_unveil_script(&self, pledges: &[&str], unveils: &[(&str, &str)]) -> String {
+    pub fn generate_pledge_unveil_script(
+        &self,
+        pledges: &[&str],
+        unveils: &[(&str, &str)],
+    ) -> String {
         let pledge_str = pledges.join(" ");
         let mut unveil_str = String::new();
         for &(p, perm) in unveils {
@@ -688,8 +707,7 @@ impl NetBsdPkgsrcOptionsFrameworkEngine {
     }
 
     pub fn set_option(&mut self, option: &str, enabled: bool) {
-        self.supported_options
-            .insert(option.to_string(), enabled);
+        self.supported_options.insert(option.to_string(), enabled);
     }
 
     pub fn is_option_enabled(&self, option: &str) -> bool {
@@ -742,7 +760,10 @@ impl SovereignLinuxBsdPackageAdvancementsSuite {
 
     /// Deep integration auditor enriching `UnifiedPackage` instances with cross-distro security,
     /// license compliance, sandbox rules, and microarch optimization routes.
-    pub fn audit_and_enrich_package(&mut self, pkg: &mut UnifiedPackage) -> Result<(), &'static str> {
+    pub fn audit_and_enrich_package(
+        &mut self,
+        pkg: &mut UnifiedPackage,
+    ) -> Result<(), &'static str> {
         // 1. License Compliance Audit via Portage EAPI License Governor
         if let Some(lic) = pkg.properties.get("license") {
             if !self.portage_slots.is_license_accepted(lic) {
@@ -761,7 +782,8 @@ impl SovereignLinuxBsdPackageAdvancementsSuite {
         let advisories = self.dnf5_advisories.check_pkg_advisory(&pkg.name);
         for adv in advisories {
             if adv.critical {
-                pkg.properties.insert("security_advisory".to_string(), adv.cve);
+                pkg.properties
+                    .insert("security_advisory".to_string(), adv.cve);
             }
         }
 
@@ -822,8 +844,7 @@ mod tests {
             .unwrap();
         assert!(merged.contains("Merged from .pacnew"));
 
-        let mut microarch =
-            ArchCachyosMicroarchParallelDownloadEngine::new(MicroarchVersion::V4);
+        let mut microarch = ArchCachyosMicroarchParallelDownloadEngine::new(MicroarchVersion::V4);
         microarch.add_mirror("https://fast.mirror", 10, 50000);
         microarch.add_mirror("https://slow.mirror", 100, 2000);
 
@@ -856,7 +877,8 @@ mod tests {
             0xFF, // End opcode
         ];
 
-        let reconstructed = FedoraDnf5AdvisorySecurityEngine::reconstruct_deltarpm(old_rpm, &delta_patch).unwrap();
+        let reconstructed =
+            FedoraDnf5AdvisorySecurityEngine::reconstruct_deltarpm(old_rpm, &delta_patch).unwrap();
         assert_eq!(String::from_utf8(reconstructed).unwrap(), "OLD_RPM_PATCH");
     }
 
@@ -918,15 +940,17 @@ mod tests {
         let mut openbsd = OpenBsdSignifyPledgeUnveilSandboxEngine::new();
         openbsd.add_key("key-1", "pubkey-abc");
         let payload = b"sovereign_binary_payload";
-        let payload_chk = payload.iter().fold(0u64, |acc, &b| acc.wrapping_add(b as u64));
-        let sig_header = format!("untrusted comment: verify with key-1.pub\nchk:{:x}", payload_chk);
+        let payload_chk = payload
+            .iter()
+            .fold(0u64, |acc, &b| acc.wrapping_add(b as u64));
+        let sig_header = format!(
+            "untrusted comment: verify with key-1.pub\nchk:{:x}",
+            payload_chk
+        );
 
         assert!(openbsd.verify_signature("key-1", &sig_header, payload));
 
-        let script = openbsd.generate_pledge_unveil_script(
-            &["stdio", "rpath"],
-            &[("/etc", "r")],
-        );
+        let script = openbsd.generate_pledge_unveil_script(&["stdio", "rpath"], &[("/etc", "r")]);
         assert!(script.contains("pledge(\"stdio rpath\", NULL);"));
 
         let mut netbsd = NetBsdPkgsrcOptionsFrameworkEngine::new();
@@ -938,7 +962,8 @@ mod tests {
     fn test_sovereign_suite_enrichment() {
         let mut suite = SovereignLinuxBsdPackageAdvancementsSuite::new();
         let mut pkg = UnifiedPackage::new("curl".to_string(), "8.5.0".to_string());
-        pkg.properties.insert("license".to_string(), "MIT".to_string());
+        pkg.properties
+            .insert("license".to_string(), "MIT".to_string());
 
         assert!(suite.audit_and_enrich_package(&mut pkg).is_ok());
         assert_eq!(

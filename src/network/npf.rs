@@ -2,7 +2,6 @@
 // Zero-dependency, safe, robust stateful packet filtering and NAT framework
 // Inspired by NetBSD's NPF (N-Packet Filter) architecture
 
-
 use std::collections::BTreeMap;
 use std::vec::Vec;
 
@@ -74,11 +73,18 @@ impl NpfFirewallEngine {
     fn serialize_state_key(packet: &NpfPacket) -> [u8; 18] {
         let mut key = [0u8; 18];
         // Normalize direction (canonical order) so both inbound and outbound packets produce the identical state key
-        let ((ip1, port1), (ip2, port2)) = if (packet.src_ip, packet.src_port) <= (packet.dst_ip, packet.dst_port) {
-            ((packet.src_ip, packet.src_port), (packet.dst_ip, packet.dst_port))
-        } else {
-            ((packet.dst_ip, packet.dst_port), (packet.src_ip, packet.src_port))
-        };
+        let ((ip1, port1), (ip2, port2)) =
+            if (packet.src_ip, packet.src_port) <= (packet.dst_ip, packet.dst_port) {
+                (
+                    (packet.src_ip, packet.src_port),
+                    (packet.dst_ip, packet.dst_port),
+                )
+            } else {
+                (
+                    (packet.dst_ip, packet.dst_port),
+                    (packet.src_ip, packet.src_port),
+                )
+            };
 
         key[0..4].copy_from_slice(&ip1);
         key[4..8].copy_from_slice(&ip2);
@@ -89,7 +95,11 @@ impl NpfFirewallEngine {
         key
     }
 
-    pub fn evaluate_packet(&mut self, packet: &NpfPacket, direction: NpfDirection) -> NpfFilterAction {
+    pub fn evaluate_packet(
+        &mut self,
+        packet: &NpfPacket,
+        direction: NpfDirection,
+    ) -> NpfFilterAction {
         let key = Self::serialize_state_key(packet);
 
         // Check stateful session table first
@@ -142,7 +152,8 @@ impl NpfFirewallEngine {
         nat_key[4..6].copy_from_slice(&packet.src_port.to_be_bytes());
 
         let public_port = packet.src_port.wrapping_add(10000);
-        self.nat_translations.insert(nat_key, (self.public_ip, public_port));
+        self.nat_translations
+            .insert(nat_key, (self.public_ip, public_port));
 
         packet.src_ip = self.public_ip;
         packet.src_port = public_port;

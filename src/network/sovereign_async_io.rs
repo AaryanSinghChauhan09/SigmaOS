@@ -27,22 +27,22 @@ use std::collections::{BTreeMap, HashMap, HashSet};
 /// Event Reactor Paradigm / Backend Engine Kind
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum AsyncIoBackendKind {
-    EpollReactor,   // Linux epoll_create1 / epoll_wait
-    KqueueReactor,  // FreeBSD/OpenBSD kqueue / kevent
-    IoUringEngine,  // Linux io_uring SQ / CQ ring buffers
-    PollMultiplexer,// POSIX poll / select fallback
+    EpollReactor,    // Linux epoll_create1 / epoll_wait
+    KqueueReactor,   // FreeBSD/OpenBSD kqueue / kevent
+    IoUringEngine,   // Linux io_uring SQ / CQ ring buffers
+    PollMultiplexer, // POSIX poll / select fallback
 }
 
 /// Filter / Event Types across epoll and kqueue
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum AsyncIoFilterKind {
-    Read,           // EPOLLIN / EVFILT_READ
-    Write,          // EPOLLOUT / EVFILT_WRITE
-    Except,         // EPOLLPRI / EVFILT_EXCEPT
-    Signal,         // EVFILT_SIGNAL
-    Proc,           // EVFILT_PROC (process state changes)
-    Timer,          // EVFILT_TIMER / timerfd
-    NetworkSocket,  // Socket I/O
+    Read,          // EPOLLIN / EVFILT_READ
+    Write,         // EPOLLOUT / EVFILT_WRITE
+    Except,        // EPOLLPRI / EVFILT_EXCEPT
+    Signal,        // EVFILT_SIGNAL
+    Proc,          // EVFILT_PROC (process state changes)
+    Timer,         // EVFILT_TIMER / timerfd
+    NetworkSocket, // Socket I/O
 }
 
 /// Notification Trigger Modes
@@ -179,7 +179,13 @@ impl SovereignAsyncIoEngine {
     }
 
     /// Submit `io_uring` SQE ring buffer entry
-    pub fn submit_io_uring_sqe(&mut self, opcode: IoUringOpcode, fd: i32, len: usize, user_data: u64) {
+    pub fn submit_io_uring_sqe(
+        &mut self,
+        opcode: IoUringOpcode,
+        fd: i32,
+        len: usize,
+        user_data: u64,
+    ) {
         let sqe = IoUringSqe {
             user_data,
             opcode,
@@ -241,7 +247,12 @@ mod async_io_tests {
         let mut engine = SovereignAsyncIoEngine::new(AsyncIoBackendKind::KqueueReactor);
 
         // Register socket descriptor 12 for READ in Edge-Triggered mode
-        engine.register_interest(12, AsyncIoFilterKind::Read, NotificationTriggerMode::EdgeTriggered, 0xA1);
+        engine.register_interest(
+            12,
+            AsyncIoFilterKind::Read,
+            NotificationTriggerMode::EdgeTriggered,
+            0xA1,
+        );
 
         // Initially no events ready
         assert_eq!(engine.poll_events(10).len(), 0);

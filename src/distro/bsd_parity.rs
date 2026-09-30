@@ -1,6 +1,6 @@
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 // SigmaOS BSD Parity Implementation
 // Implements OpenBSD/FreeBSD security features and system management
 
@@ -47,7 +47,7 @@ impl OpenBsdSecurity {
         if !self.sandbox_active.get() {
             return true;
         }
-        
+
         let op_str = String::from(operation);
         for pledge in &self.pledges {
             if pledge.contains(&op_str) {

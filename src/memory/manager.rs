@@ -13,21 +13,20 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
 /// OOP-based Memory Manager for SigmaOS
 /// Implements memory management using OOP principles with traits and structs
 /// No dependency on external memory management frameworks
 /// Based on Roadmap Item 4: Memory manager
-
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// Block ID
 pub type BlockID = usize;
@@ -126,9 +125,7 @@ impl SimpleMemoryBlock {
     }
 
     pub fn get_state(&self) -> BlockState {
-        unsafe {
-            core::mem::transmute(self.state.load(Ordering::SeqCst))
-        }
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
     }
 
     pub fn set_state_atomic(&self, state: BlockState) {
@@ -300,13 +297,13 @@ impl MemoryManager for SimpleMemoryManager {
         let address = self.heap_start + (self.stats.used_memory % self.heap_size);
         let block = SimpleMemoryBlock::new(id, size, address, BlockCapability::full());
         block.set_state_atomic(BlockState::Allocated);
-        
+
         self.blocks.push(Some(Box::new(block)));
         self.stats.total_blocks += 1;
         self.stats.allocated_blocks += 1;
         self.stats.total_memory += size;
         self.stats.used_memory += size;
-        
+
         Ok(id)
     }
 
@@ -398,7 +395,11 @@ impl<T> Vec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {
@@ -421,7 +422,6 @@ extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
 }
-
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -453,7 +453,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;

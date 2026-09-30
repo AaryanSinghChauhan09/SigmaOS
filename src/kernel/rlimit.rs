@@ -7,28 +7,28 @@ use std::sync::{Arc, Mutex};
 /// Resource types
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum RlimitResource {
-    Cpu = 0,           // CPU time in seconds
-    Fsize = 1,         // Maximum file size
-    Data = 2,          // Maximum data size
-    Stack = 3,         // Maximum stack size
-    Core = 4,          // Core file size
-    Nproc = 6,         // Number of processes
-    Nofile = 7,        // Number of open files
-    Memlock = 8,       // Locked memory size
-    As = 9,            // Address space limit
-    Locks = 10,        // Number of file locks
-    Sigpending = 11,   // Pending signals
-    Msgqueue = 12,     // Bytes in message queues
-    Nice = 13,         // Max nice priority
-    Rtprio = 14,       // Real-time priority
-    Rttime = 15,       // Real-time timeout
+    Cpu = 0,         // CPU time in seconds
+    Fsize = 1,       // Maximum file size
+    Data = 2,        // Maximum data size
+    Stack = 3,       // Maximum stack size
+    Core = 4,        // Core file size
+    Nproc = 6,       // Number of processes
+    Nofile = 7,      // Number of open files
+    Memlock = 8,     // Locked memory size
+    As = 9,          // Address space limit
+    Locks = 10,      // Number of file locks
+    Sigpending = 11, // Pending signals
+    Msgqueue = 12,   // Bytes in message queues
+    Nice = 13,       // Max nice priority
+    Rtprio = 14,     // Real-time priority
+    Rttime = 15,     // Real-time timeout
 }
 
 /// Resource limit value
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Rlimit {
-    pub cur: u64,  // Current limit
-    pub max: u64,  // Maximum limit (hard limit)
+    pub cur: u64, // Current limit
+    pub max: u64, // Maximum limit (hard limit)
 }
 
 impl Rlimit {
@@ -73,15 +73,24 @@ impl ResourceLimits {
         limits.insert(RlimitResource::Cpu, Rlimit::new(u64::MAX, u64::MAX));
         limits.insert(RlimitResource::Fsize, Rlimit::new(u64::MAX, u64::MAX));
         limits.insert(RlimitResource::Data, Rlimit::new(u64::MAX, u64::MAX));
-        limits.insert(RlimitResource::Stack, Rlimit::new(8 * 1024 * 1024, u64::MAX));
+        limits.insert(
+            RlimitResource::Stack,
+            Rlimit::new(8 * 1024 * 1024, u64::MAX),
+        );
         limits.insert(RlimitResource::Core, Rlimit::new(0, u64::MAX));
         limits.insert(RlimitResource::Nproc, Rlimit::new(u64::MAX, u64::MAX));
         limits.insert(RlimitResource::Nofile, Rlimit::new(1024, 4096));
-        limits.insert(RlimitResource::Memlock, Rlimit::new(64 * 1024 * 1024, 64 * 1024 * 1024));
+        limits.insert(
+            RlimitResource::Memlock,
+            Rlimit::new(64 * 1024 * 1024, 64 * 1024 * 1024),
+        );
         limits.insert(RlimitResource::As, Rlimit::new(u64::MAX, u64::MAX));
         limits.insert(RlimitResource::Locks, Rlimit::new(u64::MAX, u64::MAX));
         limits.insert(RlimitResource::Sigpending, Rlimit::new(u64::MAX, u64::MAX));
-        limits.insert(RlimitResource::Msgqueue, Rlimit::new(8 * 1024 * 1024, u64::MAX));
+        limits.insert(
+            RlimitResource::Msgqueue,
+            Rlimit::new(8 * 1024 * 1024, u64::MAX),
+        );
         limits.insert(RlimitResource::Nice, Rlimit::new(0, 0));
         limits.insert(RlimitResource::Rtprio, Rlimit::new(0, 0));
         limits.insert(RlimitResource::Rttime, Rlimit::new(u64::MAX, u64::MAX));
@@ -189,7 +198,9 @@ impl ResourceLimitsManager {
     /// Check resource usage
     pub fn check(&self, pid: u64, resource: RlimitResource, value: u64) -> bool {
         let limits_map = self.limits.lock().unwrap();
-        limits_map.get(&pid).map_or(true, |l| l.check(resource, value))
+        limits_map
+            .get(&pid)
+            .map_or(true, |l| l.check(resource, value))
     }
 
     /// Get limits count
@@ -344,6 +355,8 @@ mod tests {
     fn test_resource_limits_manager_invalid() {
         let manager = ResourceLimitsManager::new();
         assert!(manager.get(999, RlimitResource::Nofile).is_none());
-        assert!(manager.set(999, RlimitResource::Nofile, Rlimit::new(1024, 4096)).is_err());
+        assert!(manager
+            .set(999, RlimitResource::Nofile, Rlimit::new(1024, 4096))
+            .is_err());
     }
 }

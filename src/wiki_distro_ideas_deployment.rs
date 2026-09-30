@@ -83,7 +83,10 @@ impl SigmaOsImmutableContainerDeploymentEngine {
         if let Some((ver, dep)) = self.deployments.iter_mut().find(|(_, d)| !d.is_active) {
             dep.is_active = true;
             self.active_slot = dep.slot;
-            Ok(format!("DEPLOYMENT_ROLLBACK: Reverted active root slot to version {}", ver))
+            Ok(format!(
+                "DEPLOYMENT_ROLLBACK: Reverted active root slot to version {}",
+                ver
+            ))
         } else {
             Err("DEPLOYMENT_ROLLBACK: No inactive deployment snapshot available for rollback")
         }
@@ -196,7 +199,13 @@ impl SigmaOsEbpfLsmSecurityGovernor {
         }
     }
 
-    pub fn register_rule(&mut self, rule_id: u32, process_path: &str, syscall: &str, action: LsmPolicyAction) {
+    pub fn register_rule(
+        &mut self,
+        rule_id: u32,
+        process_path: &str,
+        syscall: &str,
+        action: LsmPolicyAction,
+    ) {
         self.rules.push(LsmPolicyRule {
             rule_id,
             process_path: process_path.to_string(),
@@ -205,8 +214,16 @@ impl SigmaOsEbpfLsmSecurityGovernor {
         });
     }
 
-    pub fn evaluate_syscall_access(&mut self, process_path: &str, syscall: &str) -> LsmPolicyAction {
-        if let Some(rule) = self.rules.iter().find(|r| r.process_path == process_path && r.syscall_name == syscall) {
+    pub fn evaluate_syscall_access(
+        &mut self,
+        process_path: &str,
+        syscall: &str,
+    ) -> LsmPolicyAction {
+        if let Some(rule) = self
+            .rules
+            .iter()
+            .find(|r| r.process_path == process_path && r.syscall_name == syscall)
+        {
             if rule.action == LsmPolicyAction::Deny {
                 self.violations_blocked += 1;
             }
@@ -265,7 +282,11 @@ impl SigmaOsZeroCopyPqcVpnEngine {
         });
     }
 
-    pub fn transmit_zero_copy_packet(&mut self, peer_id: u32, packet_size: usize) -> Result<u64, &'static str> {
+    pub fn transmit_zero_copy_packet(
+        &mut self,
+        peer_id: u32,
+        packet_size: usize,
+    ) -> Result<u64, &'static str> {
         if let Some(peer) = self.peers.iter_mut().find(|p| p.peer_id == peer_id) {
             peer.tx_bytes += packet_size as u64;
             Ok(peer.tx_bytes)
@@ -303,21 +324,35 @@ impl SovereignWikiDistroIdeasDeploymentSuite {
 
     pub fn synthesize_and_verify_all(&mut self) -> bool {
         // Verify Atomic Deployment
-        let new_slot = self.immutable_deployment.deploy_atomic_update("v1.1.0", 1700000100);
-        let dep_ok = new_slot == DeploymentSlot::SlotB && self.immutable_deployment.get_deployment_count() == 2;
+        let new_slot = self
+            .immutable_deployment
+            .deploy_atomic_update("v1.1.0", 1700000100);
+        let dep_ok = new_slot == DeploymentSlot::SlotB
+            && self.immutable_deployment.get_deployment_count() == 2;
 
         // Verify Hyprland Compositor
         self.hyprland_compositor.map_surface(1, "kitty", "Terminal");
         let comp_ok = self.hyprland_compositor.get_surface_count() == 1;
 
         // Verify eBPF LSM
-        self.ebpf_lsm_governor.register_rule(1, "/usr/bin/bad_app", "execve", LsmPolicyAction::Deny);
-        let action = self.ebpf_lsm_governor.evaluate_syscall_access("/usr/bin/bad_app", "execve");
-        let lsm_ok = action == LsmPolicyAction::Deny && self.ebpf_lsm_governor.get_blocked_violations_count() == 1;
+        self.ebpf_lsm_governor.register_rule(
+            1,
+            "/usr/bin/bad_app",
+            "execve",
+            LsmPolicyAction::Deny,
+        );
+        let action = self
+            .ebpf_lsm_governor
+            .evaluate_syscall_access("/usr/bin/bad_app", "execve");
+        let lsm_ok = action == LsmPolicyAction::Deny
+            && self.ebpf_lsm_governor.get_blocked_violations_count() == 1;
 
         // Verify PQC WireGuard VPN
         self.pqc_vpn_engine.add_pqc_peer(100, [10, 0, 0, 1]);
-        let tx_ok = self.pqc_vpn_engine.transmit_zero_copy_packet(100, 1400).is_ok();
+        let tx_ok = self
+            .pqc_vpn_engine
+            .transmit_zero_copy_packet(100, 1400)
+            .is_ok();
         let vpn_ok = tx_ok && self.pqc_vpn_engine.get_peer_count() == 1;
 
         dep_ok && comp_ok && lsm_ok && vpn_ok

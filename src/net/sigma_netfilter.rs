@@ -49,8 +49,8 @@
 
 use std::collections::HashMap;
 use std::net::Ipv4Addr;
-use std::vec::Vec;
 use std::string::String;
+use std::vec::Vec;
 
 // ── Packet representation ─────────────────────────────────────────────────────
 
@@ -177,8 +177,13 @@ pub enum PacketVerdict {
 impl PacketVerdict {
     /// Return `true` if this verdict terminates rule evaluation.
     pub fn is_terminal(&self) -> bool {
-        matches!(self, PacketVerdict::Accept | PacketVerdict::Drop
-                      | PacketVerdict::Queue(_) | PacketVerdict::Reject)
+        matches!(
+            self,
+            PacketVerdict::Accept
+                | PacketVerdict::Drop
+                | PacketVerdict::Queue(_)
+                | PacketVerdict::Reject
+        )
     }
 }
 
@@ -220,13 +225,9 @@ impl MatchCriteria {
     pub fn matches(&self, pkt: &Packet) -> bool {
         match self {
             MatchCriteria::SrcIp(ip) => pkt.src_ip == *ip,
-            MatchCriteria::SrcIpCidr { addr, prefix } => {
-                ip_in_cidr(pkt.src_ip, *addr, *prefix)
-            }
+            MatchCriteria::SrcIpCidr { addr, prefix } => ip_in_cidr(pkt.src_ip, *addr, *prefix),
             MatchCriteria::DstIp(ip) => pkt.dst_ip == *ip,
-            MatchCriteria::DstIpCidr { addr, prefix } => {
-                ip_in_cidr(pkt.dst_ip, *addr, *prefix)
-            }
+            MatchCriteria::DstIpCidr { addr, prefix } => ip_in_cidr(pkt.dst_ip, *addr, *prefix),
             MatchCriteria::SrcPort(p) => pkt.src_port == *p,
             MatchCriteria::DstPort(p) => pkt.dst_port == *p,
             MatchCriteria::DstPortRange(lo, hi) => pkt.dst_port >= *lo && pkt.dst_port <= *hi,
@@ -459,7 +460,10 @@ impl NetfilterTable {
     pub fn stats(&self) -> String {
         let mut out = format!("Table: {}\n", self.name);
         for (name, chain) in &self.chains {
-            out.push_str(&format!("  Chain {} (policy: {:?})\n", name, chain.default_policy));
+            out.push_str(&format!(
+                "  Chain {} (policy: {:?})\n",
+                name, chain.default_policy
+            ));
             for (i, rule) in chain.rules.iter().enumerate() {
                 out.push_str(&format!(
                     "    rule[{}]: {:?} hit_count={}\n",
@@ -548,13 +552,19 @@ mod tests {
         table.add_rule(
             ChainHook::Input,
             NetfilterRule::new(
-                vec![MatchCriteria::DstPort(22), MatchCriteria::Proto(IpProto::Tcp)],
+                vec![
+                    MatchCriteria::DstPort(22),
+                    MatchCriteria::Proto(IpProto::Tcp),
+                ],
                 PacketVerdict::Drop,
             ),
         );
 
         let pkt = make_pkt(22);
-        assert_eq!(table.evaluate_packet(ChainHook::Input, &pkt), PacketVerdict::Drop);
+        assert_eq!(
+            table.evaluate_packet(ChainHook::Input, &pkt),
+            PacketVerdict::Drop
+        );
     }
 
     #[test]
@@ -562,15 +572,15 @@ mod tests {
         let mut table = NetfilterTable::new_filter();
         table.add_rule(
             ChainHook::Input,
-            NetfilterRule::new(
-                vec![MatchCriteria::DstPort(22)],
-                PacketVerdict::Drop,
-            ),
+            NetfilterRule::new(vec![MatchCriteria::DstPort(22)], PacketVerdict::Drop),
         );
 
         // HTTP port 80 should use default policy (Accept).
         let pkt = make_pkt(80);
-        assert_eq!(table.evaluate_packet(ChainHook::Input, &pkt), PacketVerdict::Accept);
+        assert_eq!(
+            table.evaluate_packet(ChainHook::Input, &pkt),
+            PacketVerdict::Accept
+        );
     }
 
     #[test]
@@ -585,7 +595,8 @@ mod tests {
         let pkt2 = Packet::tcp(
             Ipv4Addr::new(172, 16, 0, 1),
             Ipv4Addr::new(192, 168, 1, 1),
-            1234, 80,
+            1234,
+            80,
         );
         assert!(!crit.matches(&pkt2)); // 172.16.0.1 not in 10.0.0.0/8
     }
@@ -618,7 +629,10 @@ mod tests {
         );
 
         let pkt = make_pkt(22);
-        assert_eq!(table.evaluate_packet(ChainHook::Input, &pkt), PacketVerdict::Drop);
+        assert_eq!(
+            table.evaluate_packet(ChainHook::Input, &pkt),
+            PacketVerdict::Drop
+        );
     }
 
     #[test]
@@ -629,7 +643,8 @@ mod tests {
         let mut pkt = Packet::tcp(
             Ipv4Addr::new(192, 168, 1, 100),
             Ipv4Addr::new(8, 8, 8, 8),
-            54321, 443,
+            54321,
+            443,
         );
         assert!(nat.apply_snat(&mut pkt));
         assert_eq!(pkt.src_ip, Ipv4Addr::new(203, 0, 113, 1));

@@ -16,25 +16,33 @@
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+pub use std::boxed::Box;
 /// OOP-based IoT Hub for SigmaOS
 /// Based on Ideas-999-Structured: IoT & Smart Home Item 976
 /// Implements IoT device management
-
 pub use std::string::String;
-pub use std::boxed::Box;
 
-use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type DeviceID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum DeviceType { Sensor = 0, Actuator = 1, Controller = 2, Gateway = 3 }
+pub enum DeviceType {
+    Sensor = 0,
+    Actuator = 1,
+    Controller = 2,
+    Gateway = 3,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum IoTError { Success = 0, NotFound = 1, ConnectionFailed = 2 }
+pub enum IoTError {
+    Success = 0,
+    NotFound = 1,
+    ConnectionFailed = 2,
+}
 
 pub trait IoTDevice {
     fn id(&self) -> DeviceID;
@@ -68,7 +76,9 @@ impl SimpleIoTDevice {
 }
 
 impl IoTDevice for SimpleIoTDevice {
-    fn id(&self) -> DeviceID { self.id }
+    fn id(&self) -> DeviceID {
+        self.id
+    }
     fn name(&self) -> &[u8] {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
@@ -81,7 +91,9 @@ impl IoTDevice for SimpleIoTDevice {
             _ => DeviceType::Gateway,
         }
     }
-    fn is_online(&self) -> bool { self.online.load(Ordering::SeqCst) == 1 }
+    fn is_online(&self) -> bool {
+        self.online.load(Ordering::SeqCst) == 1
+    }
 }
 
 pub trait IoTHub {
@@ -113,7 +125,7 @@ impl IoTHub for SimpleIoTHub {
         self.devices.push(Some(device));
         Ok(id)
     }
-    
+
     fn remove_device(&mut self, id: DeviceID) -> Result<(), IoTError> {
         for device_option in &mut self.devices {
             if let Some(ref device) = *device_option {
@@ -124,16 +136,18 @@ impl IoTHub for SimpleIoTHub {
         }
         Err(IoTError::NotFound)
     }
-    
+
     fn get_device(&self, id: DeviceID) -> Option<&dyn IoTDevice> {
         for device_option in &self.devices {
             if let Some(ref device) = *device_option {
-                if device.id() == id { return Some(device.as_ref()); }
+                if device.id() == id {
+                    return Some(device.as_ref());
+                }
             }
         }
         None
     }
-    
+
     fn send_command(&self, id: DeviceID, _command: &[u8]) -> Result<(), IoTError> {
         if self.get_device(id).is_some() {
             Ok(())
@@ -156,9 +170,7 @@ pub struct SimpleAutomationRule {
 impl SimpleAutomationRule {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        SimpleAutomationRule {
-            rules: Vec::new(),
-        }
+        SimpleAutomationRule { rules: Vec::new() }
     }
 }
 
@@ -168,11 +180,15 @@ impl AutomationRule for SimpleAutomationRule {
         let mut action_array = [0u8; 64];
         let trigger_len = trigger.len().min(63);
         let action_len = action.len().min(63);
-        for i in 0..trigger_len { trigger_array[i] = trigger[i]; }
-        for i in 0..action_len { action_array[i] = action[i]; }
+        for i in 0..trigger_len {
+            trigger_array[i] = trigger[i];
+        }
+        for i in 0..action_len {
+            action_array[i] = action[i];
+        }
         self.rules.push((trigger_array, action_array));
     }
-    
+
     fn execute_rules(&self, event: &[u8]) -> Vec<&[u8]> {
         let mut actions = Vec::new();
         for &(ref trigger, ref action) in &self.rules {
@@ -195,7 +211,9 @@ pub struct SmartScene {
 impl SmartScene {
     pub fn new(name: &str) -> Self {
         let mut s = String::new();
-        for &b in name.as_bytes() { s.push(b as char); }
+        for &b in name.as_bytes() {
+            s.push(b as char);
+        }
         Self {
             name: s,
             commands: Vec::new(),
@@ -205,7 +223,9 @@ impl SmartScene {
     pub fn add_command(&mut self, device_id: DeviceID, cmd: &[u8]) {
         let mut cmd_array = [0u8; 64];
         let cmd_len = cmd.len().min(63);
-        for i in 0..cmd_len { cmd_array[i] = cmd[i]; }
+        for i in 0..cmd_len {
+            cmd_array[i] = cmd[i];
+        }
         self.commands.push((device_id, cmd_array));
     }
 
@@ -234,9 +254,7 @@ pub struct DeviceStateStore {
 
 impl DeviceStateStore {
     pub fn new() -> Self {
-        Self {
-            states: Vec::new(),
-        }
+        Self { states: Vec::new() }
     }
 
     pub fn update_state(&mut self, state: DeviceState) {
@@ -266,14 +284,14 @@ pub struct VoiceAssistantMock {
 
 impl VoiceAssistantMock {
     pub fn new() -> Self {
-        Self {
-            scenes: Vec::new(),
-        }
+        Self { scenes: Vec::new() }
     }
 
     pub fn register_scene(&mut self, phrase: &str, scene: SmartScene) {
         let mut p = String::new();
-        for &b in phrase.as_bytes() { p.push(b as char); }
+        for &b in phrase.as_bytes() {
+            p.push(b as char);
+        }
         self.scenes.push((p, scene));
     }
 
@@ -314,7 +332,9 @@ impl VoiceAssistantMock {
                     if let Some(dev) = hub.get_device(device_id) {
                         let mut response = String::new();
                         response.push_str("device ");
-                        for &b in dev.name() { response.push(b as char); }
+                        for &b in dev.name() {
+                            response.push(b as char);
+                        }
                         response.push_str(" is ");
                         response.push_str(if dev.is_online() { "online" } else { "offline" });
                         return Ok(response);
@@ -329,13 +349,25 @@ impl VoiceAssistantMock {
     }
 }
 
-pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+pub struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -343,11 +375,19 @@ impl<T> Vec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
@@ -371,7 +411,6 @@ extern "C" {
 pub extern "C" fn alloc(size: usize) -> *mut u8 {
     unsafe { malloc(size) }
 }
-
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -403,7 +442,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;
@@ -497,15 +535,21 @@ mod tests {
         assert_eq!(res1, "triggered scene: Good Morning");
 
         // 2. Direct device command parsing "turn on device X"
-        let res2 = assistant.handle_voice_phrase("Alexa, turn on device 2", &hub).unwrap();
+        let res2 = assistant
+            .handle_voice_phrase("Alexa, turn on device 2", &hub)
+            .unwrap();
         assert_eq!(res2, "activated device ID 2");
 
         // 3. Direct device query status parsing "status of device X"
-        let res3 = assistant.handle_voice_phrase("Google, query status of device 2", &hub).unwrap();
+        let res3 = assistant
+            .handle_voice_phrase("Google, query status of device 2", &hub)
+            .unwrap();
         assert_eq!(res3, "device Thermostat is offline");
 
         // 4. Fallback message
-        let res4 = assistant.handle_voice_phrase("Open the pod bay doors", &hub).unwrap();
+        let res4 = assistant
+            .handle_voice_phrase("Open the pod bay doors", &hub)
+            .unwrap();
         assert_eq!(res4, "sorry, I didn't catch that command");
     }
 }

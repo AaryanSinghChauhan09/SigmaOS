@@ -9,7 +9,6 @@
 #![allow(dead_code)]
 #![allow(clippy::new_without_default)]
 
-
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
@@ -18,10 +17,10 @@ use std::vec::Vec;
 pub struct OFlags(pub u32);
 impl OFlags {
     pub const O_RDONLY: u32 = 0;
-    pub const O_RDWR:   u32 = 2;
-    pub const O_CREAT:  u32 = 64;
-    pub const O_EXCL:   u32 = 128;
-    pub const O_TRUNC:  u32 = 512;
+    pub const O_RDWR: u32 = 2;
+    pub const O_CREAT: u32 = 64;
+    pub const O_EXCL: u32 = 128;
+    pub const O_TRUNC: u32 = 512;
 }
 
 /// A shared memory object.
@@ -44,13 +43,20 @@ pub struct ShmObject {
 impl ShmObject {
     pub fn new(name: &str, size: usize, uid: u32, mode: u16, now_ns: u64) -> Self {
         Self {
-            name: name.into(), size, ref_count: 1, uid, mode,
-            data: vec![0u8; size], created_ns: now_ns,
+            name: name.into(),
+            size,
+            ref_count: 1,
+            uid,
+            mode,
+            data: vec![0u8; size],
+            created_ns: now_ns,
         }
     }
 
     pub fn read(&self, offset: usize, buf: &mut [u8]) -> Result<usize, &'static str> {
-        if offset >= self.size { return Ok(0); }
+        if offset >= self.size {
+            return Ok(0);
+        }
         let end = (offset + buf.len()).min(self.size);
         let n = end - offset;
         buf[..n].copy_from_slice(&self.data[offset..end]);
@@ -58,7 +64,9 @@ impl ShmObject {
     }
 
     pub fn write(&mut self, offset: usize, data: &[u8]) -> Result<usize, &'static str> {
-        if offset >= self.size { return Err("out of bounds"); }
+        if offset >= self.size {
+            return Err("out of bounds");
+        }
         let end = (offset + data.len()).min(self.size);
         let n = end - offset;
         self.data[offset..end].copy_from_slice(&data[..n]);
@@ -84,24 +92,40 @@ pub struct SigmaShmNamespace {
 
 impl SigmaShmNamespace {
     pub fn new() -> Self {
-        Self { objects: BTreeMap::new(), fds: BTreeMap::new(), next_fd: 1 }
+        Self {
+            objects: BTreeMap::new(),
+            fds: BTreeMap::new(),
+            next_fd: 1,
+        }
     }
 
     /// shm_open — create or open a shared memory object.
-    pub fn shm_open(&mut self, name: &str, flags: u32, mode: u16, uid: u32, now_ns: u64)
-        -> Result<ShmFd, &'static str>
-    {
+    pub fn shm_open(
+        &mut self,
+        name: &str,
+        flags: u32,
+        mode: u16,
+        uid: u32,
+        now_ns: u64,
+    ) -> Result<ShmFd, &'static str> {
         let create = (flags & OFlags::O_CREAT) != 0;
-        let excl   = (flags & OFlags::O_EXCL)  != 0;
+        let excl = (flags & OFlags::O_EXCL) != 0;
 
-        if !name.starts_with('/') { return Err("EINVAL: name must start with /"); }
+        if !name.starts_with('/') {
+            return Err("EINVAL: name must start with /");
+        }
 
         if self.objects.contains_key(name) {
-            if create && excl { return Err("EEXIST"); }
+            if create && excl {
+                return Err("EEXIST");
+            }
             self.objects.get_mut(name).unwrap().ref_count += 1;
         } else {
-            if !create { return Err("ENOENT"); }
-            self.objects.insert(name.into(), ShmObject::new(name, 0, uid, mode, now_ns));
+            if !create {
+                return Err("ENOENT");
+            }
+            self.objects
+                .insert(name.into(), ShmObject::new(name, 0, uid, mode, now_ns));
         }
 
         let fd = ShmFd(self.next_fd);
@@ -127,7 +151,10 @@ impl SigmaShmNamespace {
     /// mmap simulation — write to mapped region.
     pub fn write(&mut self, fd: ShmFd, offset: usize, data: &[u8]) -> Result<usize, &'static str> {
         let name = self.fds.get(&fd).ok_or("EBADF")?.clone();
-        self.objects.get_mut(&name).ok_or("ENOENT")?.write(offset, data)
+        self.objects
+            .get_mut(&name)
+            .ok_or("ENOENT")?
+            .write(offset, data)
     }
 
     /// close — decrement ref count.
@@ -149,8 +176,12 @@ impl SigmaShmNamespace {
         Ok(())
     }
 
-    pub fn object_count(&self) -> usize { self.objects.len() }
-    pub fn get_object(&self, name: &str) -> Option<&ShmObject> { self.objects.get(name) }
+    pub fn object_count(&self) -> usize {
+        self.objects.len()
+    }
+    pub fn get_object(&self, name: &str) -> Option<&ShmObject> {
+        self.objects.get(name)
+    }
 }
 
 #[cfg(test)]
@@ -160,7 +191,9 @@ mod tests {
     #[test]
     fn test_create_and_write() {
         let mut ns = SigmaShmNamespace::new();
-        let fd = ns.shm_open("/test", OFlags::O_CREAT | OFlags::O_RDWR, 0o600, 0, 0).unwrap();
+        let fd = ns
+            .shm_open("/test", OFlags::O_CREAT | OFlags::O_RDWR, 0o600, 0, 0)
+            .unwrap();
         ns.ftruncate(fd, 4096).unwrap();
         ns.write(fd, 0, b"SigmaOS SHM").unwrap();
         let mut buf = [0u8; 11];
@@ -171,7 +204,10 @@ mod tests {
     #[test]
     fn test_excl_create_fails() {
         let mut ns = SigmaShmNamespace::new();
-        ns.shm_open("/excl", OFlags::O_CREAT | OFlags::O_RDWR, 0o600, 0, 0).unwrap();
-        assert!(ns.shm_open("/excl", OFlags::O_CREAT | OFlags::O_EXCL, 0o600, 0, 0).is_err());
+        ns.shm_open("/excl", OFlags::O_CREAT | OFlags::O_RDWR, 0o600, 0, 0)
+            .unwrap();
+        assert!(ns
+            .shm_open("/excl", OFlags::O_CREAT | OFlags::O_EXCL, 0o600, 0, 0)
+            .is_err());
     }
 }

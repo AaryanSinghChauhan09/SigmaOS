@@ -624,9 +624,12 @@ impl BtopResourceMonitorEngine {
              │ MEM:    [{:<20}] {:.1}%                                  │\n\
              │ DISK:   [{:<20}] {:.1}%                                  │\n\
              └──────────────────────────────────────────────────────────────────┘",
-            "████████░░░░░░░░░░░░", self.cpu_usage_pct,
-            "████████████░░░░░░░░", self.memory_usage_pct,
-            "████░░░░░░░░░░░░░░░░", self.disk_usage_pct
+            "████████░░░░░░░░░░░░",
+            self.cpu_usage_pct,
+            "████████████░░░░░░░░",
+            self.memory_usage_pct,
+            "████░░░░░░░░░░░░░░░░",
+            self.disk_usage_pct
         )
     }
 }

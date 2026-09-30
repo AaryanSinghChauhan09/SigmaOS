@@ -2,7 +2,6 @@
 // SigmaOS Universal Hardware Compatibility, Footprint Optimization & Distro Parity Engine
 // Supports ancient (16-bit/32-bit ISA, IDE, AC97, CGA/VGA) and modern (PCIe 5.0, NVMe 2.0, USB4, Wi-Fi 7, CXL) devices.
 
-
 use std::format;
 use std::string::{String, ToString};
 use std::vec;
@@ -11,7 +10,7 @@ use std::vec::Vec;
 /// Device Generation Classification
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceGeneration {
-    AncientLegacy,  // 16-bit / 32-bit ISA, IDE/PATA, AC97, Floppy, Parallel LPT
+    AncientLegacy,     // 16-bit / 32-bit ISA, IDE/PATA, AC97, Floppy, Parallel LPT
     ModernCuttingEdge, // PCIe 5.0, NVMe 2.0, USB4, Wi-Fi 7 (802.11be), CXL, NPU
 }
 
@@ -166,10 +165,25 @@ impl KernelFootprintCompressor {
     }
 
     /// Optimizes kernel memory and executable size for low-RAM/ancient hardware.
-    pub fn optimize_footprint(&self, current_memory_used_bytes: usize) -> FootprintOptimizationReport {
-        let saved_dedup = if self.deduplication_enabled { current_memory_used_bytes / 5 } else { 0 };
-        let saved_drivers = if self.dynamic_driver_unloader { current_memory_used_bytes / 10 } else { 0 };
-        let saved_trim = if self.code_page_trimming { current_memory_used_bytes / 20 } else { 0 };
+    pub fn optimize_footprint(
+        &self,
+        current_memory_used_bytes: usize,
+    ) -> FootprintOptimizationReport {
+        let saved_dedup = if self.deduplication_enabled {
+            current_memory_used_bytes / 5
+        } else {
+            0
+        };
+        let saved_drivers = if self.dynamic_driver_unloader {
+            current_memory_used_bytes / 10
+        } else {
+            0
+        };
+        let saved_trim = if self.code_page_trimming {
+            current_memory_used_bytes / 20
+        } else {
+            0
+        };
 
         let total_saved = saved_dedup + saved_drivers + saved_trim;
         let final_size = current_memory_used_bytes.saturating_sub(total_saved);
@@ -247,7 +261,10 @@ mod tests {
         let modern = ModernHardwareAdapter::new();
         let modern_devs = modern.probe_modern_hardware();
         assert!(!modern_devs.is_empty());
-        assert_eq!(modern_devs[0].generation, DeviceGeneration::ModernCuttingEdge);
+        assert_eq!(
+            modern_devs[0].generation,
+            DeviceGeneration::ModernCuttingEdge
+        );
     }
 
     #[test]
@@ -263,7 +280,11 @@ mod tests {
         let gap_closure = DistroParityGapClosure::new();
         let summary = gap_closure.verify_distro_parity();
         assert_eq!(summary.posix_compliance_percentage, 100);
-        assert!(summary.package_managers_supported.contains(&"apt".to_string()));
-        assert!(summary.init_systems_compatible.contains(&"openrc".to_string()));
+        assert!(summary
+            .package_managers_supported
+            .contains(&"apt".to_string()));
+        assert!(summary
+            .init_systems_compatible
+            .contains(&"openrc".to_string()));
     }
 }

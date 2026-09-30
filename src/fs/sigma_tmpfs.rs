@@ -23,11 +23,10 @@
 
 #![allow(dead_code)]
 
-
+use std::boxed::Box;
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::boxed::Box;
 
 // ============================================================
 // Inode Types
@@ -60,12 +59,18 @@ pub struct UnixMode(pub u16);
 
 impl UnixMode {
     pub const FILE_DEFAULT: Self = Self(0o644);
-    pub const DIR_DEFAULT:  Self = Self(0o755);
-    pub const EXEC:         Self = Self(0o755);
+    pub const DIR_DEFAULT: Self = Self(0o755);
+    pub const EXEC: Self = Self(0o755);
 
-    pub fn readable(self) -> bool   { (self.0 & 0o444) != 0 }
-    pub fn writable(self) -> bool   { (self.0 & 0o222) != 0 }
-    pub fn executable(self) -> bool { (self.0 & 0o111) != 0 }
+    pub fn readable(self) -> bool {
+        (self.0 & 0o444) != 0
+    }
+    pub fn writable(self) -> bool {
+        (self.0 & 0o222) != 0
+    }
+    pub fn executable(self) -> bool {
+        (self.0 & 0o111) != 0
+    }
 }
 
 // ============================================================
@@ -110,9 +115,16 @@ enum TmpfsInodeContent {
 impl TmpfsInode {
     fn new_file(ino: u64, now_ns: u64) -> Self {
         Self {
-            ino, inode_type: TmpfsInodeType::File, mode: UnixMode::FILE_DEFAULT,
-            uid: 0, gid: 0, atime_ns: now_ns, mtime_ns: now_ns, ctime_ns: now_ns,
-            nlink: 1, content: TmpfsInodeContent::File(Vec::new()),
+            ino,
+            inode_type: TmpfsInodeType::File,
+            mode: UnixMode::FILE_DEFAULT,
+            uid: 0,
+            gid: 0,
+            atime_ns: now_ns,
+            mtime_ns: now_ns,
+            ctime_ns: now_ns,
+            nlink: 1,
+            content: TmpfsInodeContent::File(Vec::new()),
         }
     }
 
@@ -120,17 +132,31 @@ impl TmpfsInode {
         let mut entries = BTreeMap::new();
         entries.insert(".".to_string(), ino);
         Self {
-            ino, inode_type: TmpfsInodeType::Directory, mode: UnixMode::DIR_DEFAULT,
-            uid: 0, gid: 0, atime_ns: now_ns, mtime_ns: now_ns, ctime_ns: now_ns,
-            nlink: 2, content: TmpfsInodeContent::Directory(entries),
+            ino,
+            inode_type: TmpfsInodeType::Directory,
+            mode: UnixMode::DIR_DEFAULT,
+            uid: 0,
+            gid: 0,
+            atime_ns: now_ns,
+            mtime_ns: now_ns,
+            ctime_ns: now_ns,
+            nlink: 2,
+            content: TmpfsInodeContent::Directory(entries),
         }
     }
 
     fn new_symlink(ino: u64, target: &str, now_ns: u64) -> Self {
         Self {
-            ino, inode_type: TmpfsInodeType::Symlink, mode: UnixMode(0o777),
-            uid: 0, gid: 0, atime_ns: now_ns, mtime_ns: now_ns, ctime_ns: now_ns,
-            nlink: 1, content: TmpfsInodeContent::Symlink(target.into()),
+            ino,
+            inode_type: TmpfsInodeType::Symlink,
+            mode: UnixMode(0o777),
+            uid: 0,
+            gid: 0,
+            atime_ns: now_ns,
+            mtime_ns: now_ns,
+            ctime_ns: now_ns,
+            nlink: 1,
+            content: TmpfsInodeContent::Symlink(target.into()),
         }
     }
 
@@ -148,7 +174,9 @@ impl TmpfsInode {
         match &self.content {
             TmpfsInodeContent::File(data) => {
                 let start = offset as usize;
-                if start >= data.len() { return Ok(0); }
+                if start >= data.len() {
+                    return Ok(0);
+                }
                 let end = (start + buf.len()).min(data.len());
                 let n = end - start;
                 buf[..n].copy_from_slice(&data[start..end]);
@@ -164,7 +192,9 @@ impl TmpfsInode {
             TmpfsInodeContent::File(buf) => {
                 let start = offset as usize;
                 let end = start + data.len();
-                if end > buf.len() { buf.resize(end, 0); }
+                if end > buf.len() {
+                    buf.resize(end, 0);
+                }
                 buf[start..end].copy_from_slice(data);
                 self.mtime_ns = now_ns;
                 self.ctime_ns = now_ns;
@@ -209,7 +239,9 @@ impl TmpfsInode {
     fn dir_insert(&mut self, name: &str, ino: u64, now_ns: u64) -> Result<(), &'static str> {
         match &mut self.content {
             TmpfsInodeContent::Directory(entries) => {
-                if entries.contains_key(name) { return Err("entry exists"); }
+                if entries.contains_key(name) {
+                    return Err("entry exists");
+                }
                 entries.insert(name.into(), ino);
                 self.mtime_ns = now_ns;
                 self.ctime_ns = now_ns;
@@ -285,7 +317,9 @@ impl TmpfsMount {
     }
 
     /// Update the internal clock.
-    pub fn set_time(&mut self, now_ns: u64) { self.now_ns = now_ns; }
+    pub fn set_time(&mut self, now_ns: u64) {
+        self.now_ns = now_ns;
+    }
 
     /// Resolve an absolute path to an inode number.
     ///
@@ -295,12 +329,16 @@ impl TmpfsMount {
     }
 
     fn resolve_from(&self, start: u64, path: &str, depth: usize) -> Result<u64, &'static str> {
-        if depth > 8 { return Err("symlink loop"); }
+        if depth > 8 {
+            return Err("symlink loop");
+        }
         let path = path.trim_start_matches('/');
-        if path.is_empty() { return Ok(start); }
+        if path.is_empty() {
+            return Ok(start);
+        }
 
         let (component, rest) = match path.find('/') {
-            Some(i) => (&path[..i], &path[i+1..]),
+            Some(i) => (&path[..i], &path[i + 1..]),
             None => (path, ""),
         };
 
@@ -315,13 +353,17 @@ impl TmpfsMount {
             return self.resolve_from(resolved, rest, depth + 1);
         }
 
-        if rest.is_empty() { Ok(child_ino) } else { self.resolve_from(child_ino, rest, depth) }
+        if rest.is_empty() {
+            Ok(child_ino)
+        } else {
+            self.resolve_from(child_ino, rest, depth)
+        }
     }
 
     fn parent_and_name(path: &str) -> (&str, &str) {
         let path = path.trim_end_matches('/');
         match path.rfind('/') {
-            Some(i) if i > 0 => (&path[..i], &path[i+1..]),
+            Some(i) if i > 0 => (&path[..i], &path[i + 1..]),
             Some(_) => ("/", &path[1..]),
             None => (".", path),
         }
@@ -336,7 +378,10 @@ impl TmpfsMount {
         let file = TmpfsInode::new_file(ino, self.now_ns);
         self.inodes.insert(ino, file);
         let now = self.now_ns;
-        self.inodes.get_mut(&parent_ino).unwrap().dir_insert(name, ino, now)?;
+        self.inodes
+            .get_mut(&parent_ino)
+            .unwrap()
+            .dir_insert(name, ino, now)?;
         Ok(ino)
     }
 
@@ -353,7 +398,10 @@ impl TmpfsMount {
             entries.insert("..".into(), parent_ino);
         }
         self.inodes.insert(ino, dir);
-        self.inodes.get_mut(&parent_ino).unwrap().dir_insert(name, ino, now)?;
+        self.inodes
+            .get_mut(&parent_ino)
+            .unwrap()
+            .dir_insert(name, ino, now)?;
         Ok(ino)
     }
 
@@ -366,7 +414,10 @@ impl TmpfsMount {
         let now = self.now_ns;
         let link = TmpfsInode::new_symlink(ino, target, now);
         self.inodes.insert(ino, link);
-        self.inodes.get_mut(&parent_ino).unwrap().dir_insert(name, ino, now)?;
+        self.inodes
+            .get_mut(&parent_ino)
+            .unwrap()
+            .dir_insert(name, ino, now)?;
         Ok(ino)
     }
 
@@ -375,7 +426,11 @@ impl TmpfsMount {
         let (parent_path, name) = Self::parent_and_name(path);
         let parent_ino = self.resolve(parent_path)?;
         let now = self.now_ns;
-        let child_ino = self.inodes.get_mut(&parent_ino).unwrap().dir_remove(name, now)?;
+        let child_ino = self
+            .inodes
+            .get_mut(&parent_ino)
+            .unwrap()
+            .dir_remove(name, now)?;
         // Reduce nlink; remove inode if zero
         if let Some(inode) = self.inodes.get_mut(&child_ino) {
             inode.nlink = inode.nlink.saturating_sub(1);
@@ -406,7 +461,10 @@ impl TmpfsMount {
 
     /// Read data from a file by inode number.
     pub fn read_ino(&self, ino: u64, offset: u64, buf: &mut [u8]) -> Result<usize, &'static str> {
-        self.inodes.get(&ino).ok_or("inode not found")?.read(offset, buf)
+        self.inodes
+            .get(&ino)
+            .ok_or("inode not found")?
+            .read(offset, buf)
     }
 
     /// Write data to file at path.
@@ -435,14 +493,22 @@ impl TmpfsMount {
 
     /// Returns bytes used / bytes available.
     pub fn usage(&self) -> (u64, u64) {
-        let avail = if self.max_bytes == u64::MAX { u64::MAX } else { self.max_bytes - self.used_bytes };
+        let avail = if self.max_bytes == u64::MAX {
+            u64::MAX
+        } else {
+            self.max_bytes - self.used_bytes
+        };
         (self.used_bytes, avail)
     }
 
     /// Returns the root inode number.
-    pub fn root_ino(&self) -> u64 { self.root_ino }
+    pub fn root_ino(&self) -> u64 {
+        self.root_ino
+    }
     /// Returns total inode count.
-    pub fn inode_count(&self) -> usize { self.inodes.len() }
+    pub fn inode_count(&self) -> usize {
+        self.inodes.len()
+    }
 }
 
 // ============================================================

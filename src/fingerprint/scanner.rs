@@ -13,24 +13,28 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
-use std::string::{String, ToString};
 use std::format;
+use std::string::{String, ToString};
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
 /// OOP-based Fingerprint Scanner for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 562
 /// Implements fingerprint capture and authentication
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type FingerID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum ScanError { Success = 0, NotFound = 1, ScanFailed = 2, NoMatch = 3 }
+pub enum ScanError {
+    Success = 0,
+    NotFound = 1,
+    ScanFailed = 2,
+    NoMatch = 3,
+}
 
 pub trait FingerprintTemplate {
     fn id(&self) -> FingerID;
@@ -63,14 +67,18 @@ impl SimpleFingerprintTemplate {
 }
 
 impl FingerprintTemplate for SimpleFingerprintTemplate {
-    fn id(&self) -> FingerID { self.id }
+    fn id(&self) -> FingerID {
+        self.id
+    }
     fn data(&self) -> &[u8] {
         // Bolt ⚡ Optimization: Utilize precomputed data_len stored on instantiation
         // to eliminate O(N) zero-byte linear scanning (.position(|&b| b == 0)) on every
         // fingerprint template data access, reducing slice lookup to instantaneous O(1) constant time.
         &self.data[..self.data_len as usize]
     }
-    fn quality(&self) -> u32 { self.quality.load(Ordering::SeqCst) as u32 }
+    fn quality(&self) -> u32 {
+        self.quality.load(Ordering::SeqCst) as u32
+    }
 }
 
 pub trait FingerprintScanner {
@@ -123,7 +131,11 @@ impl FingerprintScanner for SimpleFingerprintScanner {
 
 pub trait BiometricAuth {
     fn authenticate(&mut self, _fingerprint: &dyn FingerprintTemplate) -> Result<usize, ScanError>;
-    fn register_user(&mut self, user_id: usize, template: Box<dyn FingerprintTemplate>) -> Result<(), ScanError>;
+    fn register_user(
+        &mut self,
+        user_id: usize,
+        template: Box<dyn FingerprintTemplate>,
+    ) -> Result<(), ScanError>;
 }
 
 #[repr(C)]
@@ -134,9 +146,7 @@ pub struct SimpleBiometricAuth {
 impl SimpleBiometricAuth {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        SimpleBiometricAuth {
-            users: Vec::new(),
-        }
+        SimpleBiometricAuth { users: Vec::new() }
     }
 }
 
@@ -150,19 +160,35 @@ impl BiometricAuth for SimpleBiometricAuth {
         Err(ScanError::NoMatch)
     }
 
-    fn register_user(&mut self, user_id: usize, template: Box<dyn FingerprintTemplate>) -> Result<(), ScanError> {
+    fn register_user(
+        &mut self,
+        user_id: usize,
+        template: Box<dyn FingerprintTemplate>,
+    ) -> Result<(), ScanError> {
         self.users.push((user_id, template));
         Ok(())
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -170,11 +196,17 @@ impl<T> Vec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_layout = core::alloc::Layout::array::<T>(new_capacity).unwrap();
         let new_data = std::alloc::alloc(new_layout) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
             if self.capacity > 0 {
                 let old_layout = core::alloc::Layout::array::<T>(self.capacity).unwrap();
                 std::alloc::dealloc(self.data as *mut u8, old_layout);
@@ -184,7 +216,6 @@ impl<T> Vec<T> {
         }
     }
 }
-
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -216,7 +247,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;

@@ -13,29 +13,41 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
 /// OOP-based MicroVM Sandbox Foundation for SigmaOS
 /// Based on Ideas-999-Structured: Core System Item 11
 /// Implements Firecracker-style lightweight VMM primitives, sandboxing, isolation
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type VMID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum VMState { Stopped = 0, Starting = 1, Running = 2, Paused = 3, Stopping = 4, Failed = 5 }
+pub enum VMState {
+    Stopped = 0,
+    Starting = 1,
+    Running = 2,
+    Paused = 3,
+    Stopping = 4,
+    Failed = 5,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum VMError { Success = 0, InvalidConfig = 1, StartFailed = 2, StopFailed = 3, ResourceLimit = 4 }
+pub enum VMError {
+    Success = 0,
+    InvalidConfig = 1,
+    StartFailed = 2,
+    StopFailed = 3,
+    ResourceLimit = 4,
+}
 
 pub trait MicroVM {
     fn id(&self) -> VMID;
@@ -74,18 +86,26 @@ impl SimpleMicroVM {
 }
 
 impl MicroVM for SimpleMicroVM {
-    fn id(&self) -> VMID { self.id }
-    fn state(&self) -> VMState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn id(&self) -> VMID {
+        self.id
+    }
+    fn state(&self) -> VMState {
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+    }
 
     fn start(&mut self) -> Result<(), VMError> {
-        self.state.store(VMState::Starting as usize, Ordering::SeqCst);
-        self.state.store(VMState::Running as usize, Ordering::SeqCst);
+        self.state
+            .store(VMState::Starting as usize, Ordering::SeqCst);
+        self.state
+            .store(VMState::Running as usize, Ordering::SeqCst);
         Ok(())
     }
 
     fn stop(&mut self) -> Result<(), VMError> {
-        self.state.store(VMState::Stopping as usize, Ordering::SeqCst);
-        self.state.store(VMState::Stopped as usize, Ordering::SeqCst);
+        self.state
+            .store(VMState::Stopping as usize, Ordering::SeqCst);
+        self.state
+            .store(VMState::Stopped as usize, Ordering::SeqCst);
         Ok(())
     }
 
@@ -101,12 +121,17 @@ impl MicroVM for SimpleMicroVM {
         if self.state.load(Ordering::SeqCst) != VMState::Paused as usize {
             return Err(VMError::StartFailed);
         }
-        self.state.store(VMState::Running as usize, Ordering::SeqCst);
+        self.state
+            .store(VMState::Running as usize, Ordering::SeqCst);
         Ok(())
     }
 
-    fn get_memory_limit(&self) -> usize { self.memory_limit.load(Ordering::SeqCst) }
-    fn get_cpu_count(&self) -> usize { self.cpu_count.load(Ordering::SeqCst) }
+    fn get_memory_limit(&self) -> usize {
+        self.memory_limit.load(Ordering::SeqCst)
+    }
+    fn get_cpu_count(&self) -> usize {
+        self.cpu_count.load(Ordering::SeqCst)
+    }
 }
 
 pub trait VMMManager {
@@ -140,7 +165,7 @@ impl VMMManager for SimpleVMMManager {
         }
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let vm = SimpleMicroVM::new(id, memory_mb, cpus);
-       self.vms.push(Some(Box::new(vm)));
+        self.vms.push(Some(Box::new(vm)));
         Ok(id)
     }
 
@@ -158,7 +183,9 @@ impl VMMManager for SimpleVMMManager {
     fn get_vm(&self, id: VMID) -> Option<&dyn MicroVM> {
         for vm_option in &self.vms {
             if let Some(ref vm) = *vm_option {
-                if vm.id() == id { return Some(vm.as_ref()); }
+                if vm.id() == id {
+                    return Some(vm.as_ref());
+                }
             }
         }
         None
@@ -247,7 +274,13 @@ pub trait CapabilityBasedSecurity {
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum Capability { Network = 0, Filesystem = 1, Process = 2, IPC = 3, Device = 4 }
+pub enum Capability {
+    Network = 0,
+    Filesystem = 1,
+    Process = 2,
+    IPC = 3,
+    Device = 4,
+}
 
 #[repr(C)]
 pub struct SimpleCapabilitySecurity {
@@ -298,7 +331,11 @@ impl CapabilityBasedSecurity for SimpleCapabilitySecurity {
 }
 
 pub trait FirecrackerIntegration {
-    fn create_firecracker_vm(&mut self, kernel_path: &[u8], rootfs_path: &[u8]) -> Result<VMID, VMError>;
+    fn create_firecracker_vm(
+        &mut self,
+        kernel_path: &[u8],
+        rootfs_path: &[u8],
+    ) -> Result<VMID, VMError>;
     fn configure_vsock(&mut self, vm_id: VMID, port: u16) -> Result<(), VMError>;
     fn attach_snapshot(&mut self, vm_id: VMID, snapshot_path: &[u8]) -> Result<(), VMError>;
 }
@@ -317,7 +354,11 @@ impl SimpleFirecrackerIntegration {
 }
 
 impl FirecrackerIntegration for SimpleFirecrackerIntegration {
-    fn create_firecracker_vm(&mut self, _kernel_path: &[u8], _rootfs_path: &[u8]) -> Result<VMID, VMError> {
+    fn create_firecracker_vm(
+        &mut self,
+        _kernel_path: &[u8],
+        _rootfs_path: &[u8],
+    ) -> Result<VMID, VMError> {
         self.vmm.create_vm(512, 2)
     }
 
@@ -336,35 +377,59 @@ impl FirecrackerIntegration for SimpleFirecrackerIntegration {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
         }
     }
-    fn contains(&self, item: &T) -> bool where T: PartialEq {
+    fn contains(&self, item: &T) -> bool
+    where
+        T: PartialEq,
+    {
         for i in 0..self.len {
             unsafe {
-                if &*self.data.add(i) == item { return true; }
+                if &*self.data.add(i) == item {
+                    return true;
+                }
             }
         }
         false
     }
-    fn retain<F>(&mut self, mut f: F) where F: FnMut(&T) -> bool {
+    fn retain<F>(&mut self, mut f: F)
+    where
+        F: FnMut(&T) -> bool,
+    {
         let mut write_idx = 0;
         for i in 0..self.len {
             unsafe {
                 let item = &*self.data.add(i);
                 if f(item) {
                     if write_idx != i {
-                        core::ptr::copy_nonoverlapping(self.data.add(i), self.data.add(write_idx), 1);
+                        core::ptr::copy_nonoverlapping(
+                            self.data.add(i),
+                            self.data.add(write_idx),
+                            1,
+                        );
                     }
                     write_idx += 1;
                 }
@@ -373,19 +438,29 @@ impl<T> Vec<T> {
         self.len = write_idx;
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -417,7 +492,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;

@@ -1,12 +1,9 @@
-use std::vec;
-use std::string::{String, ToString};
-use std::vec::Vec;
 use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 // System Installer (Ubiquity/Calamares Inspiration)
 // Graphical installer with partitioning and user setup
-
-
-
 
 /// Installer stage
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -193,7 +190,10 @@ impl WubiWindowsInstallerEngine {
             return Err(InstallerError::PartitioningFailed);
         }
         self.loopback_rootfs_created = true;
-        Ok(format!("{}\\\\disks\\\\root.disk", self.config.install_folder_path))
+        Ok(format!(
+            "{}\\\\disks\\\\root.disk",
+            self.config.install_folder_path
+        ))
     }
 
     /// Registers dual-boot entry in Windows Boot Configuration Data (BCD)
@@ -202,7 +202,10 @@ impl WubiWindowsInstallerEngine {
             return Err(InstallerError::InstallationFailed);
         }
         self.bcd_registered = true;
-        Ok(format!("BCD Entry Registered: {}", self.config.bcd_entry_label))
+        Ok(format!(
+            "BCD Entry Registered: {}",
+            self.config.bcd_entry_label
+        ))
     }
 
     /// Uninstalls Linux Mint Wubi virtual disk and cleans Windows BCD entries
