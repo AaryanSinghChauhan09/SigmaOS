@@ -169,7 +169,7 @@ jobs:
             qemu-utils ovmf
 
       - name: Download build artifact
-        uses: actions/download-artifact@cc3a921d7b1d989f81ebff39e1be2fdf0dbb60cc # v4.1.9
+        uses: actions/download-artifact@v4
         with:
           name: "kernel-${{ matrix.arch }}-release"
           path: boot-artifacts/
