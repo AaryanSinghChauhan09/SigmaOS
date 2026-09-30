@@ -111,4 +111,19 @@ assert.strictEqual(win1.classList.contains("active-focus"), false, "Expected win
 assert.strictEqual(Number(win2.style.zIndex) > z1, true, "Expected win2 zIndex to be elevated above win1 zIndex");
 console.log("✓ Window focus elevation and active-focus state verified successfully!");
 
+// Test 6: toggleHelp toggles modal dialog and ARIA states
+const helpOverlay = createMockElement("help-overlay");
+helpOverlay.classList.add("wizard-overlay--hidden");
+
+zenith.toggleHelp();
+assert.strictEqual(helpOverlay.classList.contains("wizard-overlay--hidden"), false, "Expected help-overlay to no longer be hidden after toggleHelp()");
+assert.strictEqual(helpOverlay.getAttribute("role"), "dialog", "Expected role='dialog' on help-overlay");
+assert.strictEqual(helpOverlay.getAttribute("aria-label"), "Sovereign Desktop Help Matrix", "Expected aria-label on help-overlay");
+assert.strictEqual(helpOverlay.getAttribute("aria-hidden"), "false", "Expected aria-hidden='false' when opened");
+
+zenith.toggleHelp();
+assert.strictEqual(helpOverlay.classList.contains("wizard-overlay--hidden"), true, "Expected help-overlay to be hidden on second toggleHelp()");
+assert.strictEqual(helpOverlay.getAttribute("aria-hidden"), "true", "Expected aria-hidden='true' when closed");
+console.log("✓ toggleHelp modal overlay and ARIA states verified successfully!");
+
 console.log("All Command Palette & Desktop UX tests passed successfully!");
