@@ -5,6 +5,9 @@
  * health checking, and automatic restart policy governance.
  */
 
+
+
+
 use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
@@ -19,6 +22,7 @@ pub enum RunitStage {
 
 pub type ServiceState = RunitServiceStatus;
 
+
 /// Runit Service Status
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum RunitServiceStatus {
@@ -29,6 +33,7 @@ pub enum RunitServiceStatus {
     Stopping,
     Failed,
 }
+
 
 /// Runit Service Definition
 #[derive(Debug, Clone)]

@@ -4,10 +4,11 @@ use std::format;
 // Workflow automation engine
 // Zero-dependency implementation - no external libraries required
 
-use core::fmt;
-use std::boxed::Box;
-use std::string::{String, ToString};
+
 use std::vec::Vec;
+use std::string::{String, ToString};
+use std::boxed::Box;
+use core::fmt;
 
 /// Error type for the Workflow module
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -191,8 +192,7 @@ impl SystemWorkflow {
             WorkflowCategory::Automation => "Triggering scheduled background automation...",
             WorkflowCategory::Pages => "Publishing static documentation pages...",
             WorkflowCategory::General => "Executing general workflow task...",
-        }
-        .into();
+        }.into();
         Ok(&self.status)
     }
 
@@ -285,15 +285,10 @@ mod tests {
         assert_eq!(w_len, 5);
 
         // Verify deployment trigger
-        let triggered = registry
-            .trigger_all_by_category(WorkflowCategory::Deployment)
-            .unwrap();
+        let triggered = registry.trigger_all_by_category(WorkflowCategory::Deployment).unwrap();
         assert_eq!(triggered, 1);
         assert!(registry.workflows[dep_id as usize].active);
-        assert_eq!(
-            registry.workflows[dep_id as usize].status,
-            "Deploying release artifacts..."
-        );
+        assert_eq!(registry.workflows[dep_id as usize].status, "Deploying release artifacts...");
 
         // Complete the deployment
         registry.workflows[dep_id as usize].complete().unwrap();

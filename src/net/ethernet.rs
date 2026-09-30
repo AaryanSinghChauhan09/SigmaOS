@@ -25,11 +25,7 @@ impl EthernetHeader {
         dest.copy_from_slice(&data[0..6]);
         source.copy_from_slice(&data[6..12]);
         let ethertype = ((data[12] as u16) << 8) | data[13] as u16;
-        Ok(Self {
-            dest,
-            source,
-            ethertype,
-        })
+        Ok(Self { dest, source, ethertype })
     }
 
     pub fn serialize(&self) -> [u8; ETH_HLEN] {

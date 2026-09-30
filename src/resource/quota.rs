@@ -13,36 +13,28 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
-use std::format;
 use std::string::{String, ToString};
+use std::format;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
-use core::mem;
 /// OOP-based Resource Quota for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 221
 /// Implements resource quota management and enforcement
+
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 pub type QuotaID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ResourceType {
-    CPU = 0,
-    Memory = 1,
-    Disk = 2,
-    Network = 3,
-}
+pub enum ResourceType { CPU = 0, Memory = 1, Disk = 2, Network = 3 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum QuotaError {
-    Success = 0,
-    Exceeded = 1,
-    NotFound = 2,
-}
+pub enum QuotaError { Success = 0, Exceeded = 1, NotFound = 2 }
 
 pub trait Quota {
     fn id(&self) -> QuotaID;
@@ -74,9 +66,7 @@ impl SimpleQuota {
 }
 
 impl Quota for SimpleQuota {
-    fn id(&self) -> QuotaID {
-        self.id
-    }
+    fn id(&self) -> QuotaID { self.id }
     fn resource_type(&self) -> ResourceType {
         match self.resource_type.load(Ordering::SeqCst) {
             0 => ResourceType::CPU,
@@ -86,12 +76,8 @@ impl Quota for SimpleQuota {
             _ => ResourceType::CPU,
         }
     }
-    fn limit(&self) -> u64 {
-        self.limit.load(Ordering::SeqCst) as u64
-    }
-    fn usage(&self) -> u64 {
-        self.usage.load(Ordering::SeqCst) as u64
-    }
+    fn limit(&self) -> u64 { self.limit.load(Ordering::SeqCst) as u64 }
+    fn usage(&self) -> u64 { self.usage.load(Ordering::SeqCst) as u64 }
 
     fn set_limit(&mut self, limit: u64) {
         self.limit.store(limit as usize, Ordering::SeqCst);
@@ -115,11 +101,7 @@ impl Quota for SimpleQuota {
 }
 
 pub trait QuotaManager {
-    fn create_quota(
-        &mut self,
-        resource_type: ResourceType,
-        limit: u64,
-    ) -> Result<QuotaID, QuotaError>;
+    fn create_quota(&mut self, resource_type: ResourceType, limit: u64) -> Result<QuotaID, QuotaError>;
     fn delete_quota(&mut self, id: QuotaID) -> Result<(), QuotaError>;
     fn get_quota(&self, id: QuotaID) -> Option<&dyn Quota>;
     fn check_quota(&self, id: QuotaID, amount: u64) -> Result<(), QuotaError>;
@@ -143,11 +125,7 @@ impl SimpleQuotaManager {
 }
 
 impl QuotaManager for SimpleQuotaManager {
-    fn create_quota(
-        &mut self,
-        resource_type: ResourceType,
-        limit: u64,
-    ) -> Result<QuotaID, QuotaError> {
+    fn create_quota(&mut self, resource_type: ResourceType, limit: u64) -> Result<QuotaID, QuotaError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let quota = SimpleQuota::new(id, resource_type, limit);
         self.quotas.push(Some(Box::new(quota)));
@@ -168,9 +146,7 @@ impl QuotaManager for SimpleQuotaManager {
     fn get_quota(&self, id: QuotaID) -> Option<&dyn Quota> {
         for quota_option in &self.quotas {
             if let Some(ref quota) = *quota_option {
-                if quota.id() == id {
-                    return Some(quota.as_ref());
-                }
+                if quota.id() == id { return Some(quota.as_ref()); }
             }
         }
         None
@@ -244,25 +220,13 @@ impl ResourceEnforcer for SimpleResourceEnforcer {
     }
 }
 
-struct CustomVec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
+struct CustomVec<T> { data: *mut T, len: usize, capacity: usize }
 
 impl<T> CustomVec<T> {
-    fn new() -> Self {
-        CustomVec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
+    fn new() -> Self { CustomVec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
+            if self.len >= self.capacity { self.grow(); }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -270,29 +234,19 @@ impl<T> CustomVec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
+            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
+            if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+
 
 impl<T> core::ops::Deref for CustomVec<T> {
     type Target = [T];
@@ -324,6 +278,7 @@ impl<'a, T> IntoIterator for &'a CustomVec<T> {
         self.deref().iter()
     }
 }
+
 
 impl<'a, T> IntoIterator for &'a mut CustomVec<T> {
     type Item = &'a mut T;

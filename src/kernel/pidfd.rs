@@ -149,22 +149,18 @@ impl PidfdProcDescManager {
     }
 
     /// Fork with procdesc (FreeBSD pdfork-inspired)
-    pub fn pdfork(
-        &mut self,
-        parent_pid: u64,
-        capabilities: ProcDescCapabilities,
-    ) -> Result<(u64, ProcDesc), &'static str> {
+    pub fn pdfork(&mut self, parent_pid: u64, capabilities: ProcDescCapabilities) -> Result<(u64, ProcDesc), &'static str> {
         let pid = self.next_pid.fetch_add(1, Ordering::SeqCst);
 
-        let procdesc = ProcDesc { pid, capabilities };
+        let procdesc = ProcDesc {
+            pid,
+            capabilities,
+        };
 
         self.procdescs.insert(pid, procdesc.clone());
 
         // Add to process tree
-        self.process_tree
-            .entry(parent_pid)
-            .or_insert_with(Vec::new)
-            .push(pid);
+        self.process_tree.entry(parent_pid).or_insert_with(Vec::new).push(pid);
 
         Ok((pid, procdesc))
     }
@@ -242,10 +238,7 @@ impl PidfdProcDescManager {
             children.retain(|p| *p != orphan_pid);
         }
 
-        self.process_tree
-            .entry(subreaper_pid)
-            .or_insert_with(Vec::new)
-            .push(orphan_pid);
+        self.process_tree.entry(subreaper_pid).or_insert_with(Vec::new).push(orphan_pid);
 
         Ok(subreaper_pid)
     }

@@ -13,39 +13,29 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
-use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use std::format;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
-use core::mem;
 /// OOP-based Atomic Updates & Rollback for SigmaOS
 /// Based on Ideas-999-Structured: Package, Build & Reproducibility Item 6
 /// Implements transactional upgrades with automatic rollback on failure
+
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 pub type TransactionID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TransactionState {
-    Pending = 0,
-    InProgress = 1,
-    Committed = 2,
-    RolledBack = 3,
-    Failed = 4,
-}
+pub enum TransactionState { Pending = 0, InProgress = 1, Committed = 2, RolledBack = 3, Failed = 4 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum UpdateError {
-    Success = 0,
-    TransactionFailed = 1,
-    RollbackFailed = 2,
-    InvalidState = 3,
-}
+pub enum UpdateError { Success = 0, TransactionFailed = 1, RollbackFailed = 2, InvalidState = 3 }
 
 pub trait Transaction {
     fn id(&self) -> TransactionID;
@@ -76,16 +66,11 @@ impl SimpleTransaction {
 }
 
 impl Transaction for SimpleTransaction {
-    fn id(&self) -> TransactionID {
-        self.id
-    }
-    fn state(&self) -> TransactionState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) }
-    }
+    fn id(&self) -> TransactionID { self.id }
+    fn state(&self) -> TransactionState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) } }
 
     fn begin(&mut self) -> Result<(), UpdateError> {
-        self.state
-            .store(TransactionState::InProgress as usize, Ordering::SeqCst);
+        self.state.store(TransactionState::InProgress as usize, Ordering::SeqCst);
         Ok(())
     }
 
@@ -93,20 +78,16 @@ impl Transaction for SimpleTransaction {
         if self.state.load(Ordering::SeqCst) != TransactionState::InProgress as usize {
             return Err(UpdateError::InvalidState);
         }
-        self.state
-            .store(TransactionState::Committed as usize, Ordering::SeqCst);
+        self.state.store(TransactionState::Committed as usize, Ordering::SeqCst);
         Ok(())
     }
 
     fn rollback(&mut self) -> Result<(), UpdateError> {
         let current_state = self.state.load(Ordering::SeqCst);
-        if current_state != TransactionState::InProgress as usize
-            && current_state != TransactionState::Failed as usize
-        {
+        if current_state != TransactionState::InProgress as usize && current_state != TransactionState::Failed as usize {
             return Err(UpdateError::InvalidState);
         }
-        self.state
-            .store(TransactionState::RolledBack as usize, Ordering::SeqCst);
+        self.state.store(TransactionState::RolledBack as usize, Ordering::SeqCst);
         Ok(())
     }
 }
@@ -181,9 +162,7 @@ impl AtomicUpdateManager for SimpleAtomicUpdateManager {
     fn get_transaction(&self, tx_id: TransactionID) -> Option<&dyn Transaction> {
         for tx_option in &self.transactions {
             if let Some(ref tx) = *tx_option {
-                if tx.id() == tx_id {
-                    return Some(tx.as_ref());
-                }
+                if tx.id() == tx_id { return Some(tx.as_ref()); }
             }
         }
         None

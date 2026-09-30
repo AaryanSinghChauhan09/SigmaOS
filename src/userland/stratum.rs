@@ -232,15 +232,8 @@ impl StratumManager {
     }
 
     /// Translates cross-stratum path execution context.
-    pub fn cross_stratum_exec(
-        &self,
-        command: &str,
-        target_stratum: StratumKind,
-    ) -> Result<String, &'static str> {
-        let stratum = self
-            .strata
-            .get(&target_stratum)
-            .ok_or("Target stratum not registered")?;
+    pub fn cross_stratum_exec(&self, command: &str, target_stratum: StratumKind) -> Result<String, &'static str> {
+        let stratum = self.strata.get(&target_stratum).ok_or("Target stratum not registered")?;
         if !stratum.active {
             return Err("Target stratum is disabled");
         }

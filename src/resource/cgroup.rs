@@ -1,9 +1,10 @@
 // Linux-style Control Groups (cgroups) for SigmaOS
 // Implements hierarchical grouping of processes and resource limitation, prioritization, accounting, and control.
 
-use crate::klib::btreemap::BTreeMap;
+
 use std::string::String;
 use std::vec::Vec;
+use crate::klib::btreemap::BTreeMap;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -83,9 +84,7 @@ impl CgroupManager {
             cgroups: BTreeMap::new(),
         };
         // Create root cgroup
-        manager
-            .cgroups
-            .insert(String::from("/"), Cgroup::new("/", None));
+        manager.cgroups.insert(String::from("/"), Cgroup::new("/", None));
         manager
     }
 
@@ -122,11 +121,7 @@ impl CgroupManager {
         };
 
         // Leverage string slices and borrow lifetimes to migrate PIDs to parent or root without dynamic heap allocations
-        let parent_str = target_group
-            .parent_name
-            .as_deref()
-            .unwrap_or("/")
-            .to_string();
+        let parent_str = target_group.parent_name.as_deref().unwrap_or("/").to_string();
         let pids_to_migrate = target_group.pids.clone();
 
         for pid in pids_to_migrate {
@@ -269,8 +264,7 @@ impl CgroupManager {
         let mut curr: Option<String> = Some(name.to_string());
         while let Some(cname) = curr {
             let parent_ptr = if let Some(group) = self.cgroups.get_mut_str(&cname) {
-                group.usage.memory_usage_bytes =
-                    group.usage.memory_usage_bytes.saturating_add(bytes);
+                group.usage.memory_usage_bytes = group.usage.memory_usage_bytes.saturating_add(bytes);
                 group.parent_name.clone()
             } else {
                 None
@@ -297,8 +291,7 @@ impl CgroupManager {
         let mut curr: Option<String> = Some(name);
         while let Some(cname) = curr {
             let parent_ptr = if let Some(group) = self.cgroups.get_mut_str(&cname) {
-                group.usage.memory_usage_bytes =
-                    group.usage.memory_usage_bytes.saturating_sub(bytes);
+                group.usage.memory_usage_bytes = group.usage.memory_usage_bytes.saturating_sub(bytes);
                 group.parent_name.clone()
             } else {
                 None
@@ -333,16 +326,10 @@ mod tests {
         assert_eq!(manager.create_cgroup("/sys/db", Some("/sys")), Ok(()));
 
         // Attempting to create duplicate group
-        assert_eq!(
-            manager.create_cgroup("/sys", Some("/")),
-            Err(CgroupError::AlreadyExists)
-        );
+        assert_eq!(manager.create_cgroup("/sys", Some("/")), Err(CgroupError::AlreadyExists));
 
         // Attempting to create under non-existent parent
-        assert_eq!(
-            manager.create_cgroup("/app/web", Some("/app")),
-            Err(CgroupError::ParentNotFound)
-        );
+        assert_eq!(manager.create_cgroup("/app/web", Some("/app")), Err(CgroupError::ParentNotFound));
 
         let db_group = manager.cgroups.get("/sys/db").unwrap();
         assert_eq!(db_group.parent_name.as_deref(), Some("/sys"));
@@ -382,54 +369,19 @@ mod tests {
 
         // First allocation fits
         assert_eq!(manager.track_memory_alloc(101, 600), Ok(()));
-        assert_eq!(
-            manager
-                .cgroups
-                .get("/app")
-                .unwrap()
-                .usage
-                .memory_usage_bytes,
-            600
-        );
+        assert_eq!(manager.cgroups.get("/app").unwrap().usage.memory_usage_bytes, 600);
 
         // Second allocation exceeds limit
-        assert_eq!(
-            manager.track_memory_alloc(101, 500),
-            Err(CgroupError::LimitExceeded)
-        );
-        assert_eq!(
-            manager
-                .cgroups
-                .get("/app")
-                .unwrap()
-                .usage
-                .memory_usage_bytes,
-            600
-        ); // usage unchanged
+        assert_eq!(manager.track_memory_alloc(101, 500), Err(CgroupError::LimitExceeded));
+        assert_eq!(manager.cgroups.get("/app").unwrap().usage.memory_usage_bytes, 600); // usage unchanged
 
         // Release some memory
         assert_eq!(manager.track_memory_free(101, 200), Ok(()));
-        assert_eq!(
-            manager
-                .cgroups
-                .get("/app")
-                .unwrap()
-                .usage
-                .memory_usage_bytes,
-            400
-        );
+        assert_eq!(manager.cgroups.get("/app").unwrap().usage.memory_usage_bytes, 400);
 
         // Now the second allocation fits
         assert_eq!(manager.track_memory_alloc(101, 500), Ok(()));
-        assert_eq!(
-            manager
-                .cgroups
-                .get("/app")
-                .unwrap()
-                .usage
-                .memory_usage_bytes,
-            900
-        );
+        assert_eq!(manager.cgroups.get("/app").unwrap().usage.memory_usage_bytes, 900);
     }
 
     #[test]
@@ -441,9 +393,6 @@ mod tests {
         assert_eq!(manager.attach_pid("/restricted", 201), Ok(()));
         assert_eq!(manager.attach_pid("/restricted", 202), Ok(()));
         // Third attach exceeds process limit
-        assert_eq!(
-            manager.attach_pid("/restricted", 203),
-            Err(CgroupError::LimitExceeded)
-        );
+        assert_eq!(manager.attach_pid("/restricted", 203), Err(CgroupError::LimitExceeded));
     }
 }

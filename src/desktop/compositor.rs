@@ -1,23 +1,18 @@
 /// SigmaOS Compositor (Phase 4 Desktop)
 /// Inspired by Omarchy's keyboard-first tiling and Mint Cinnamon's window management.
+
 use std::string::String;
 use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub enum CompositorBackend {
-    Framebuffer,
-    Software,
-    Wayland,
-}
+pub enum CompositorBackend { Framebuffer, Software, Wayland }
 
 #[derive(Debug, Clone)]
 pub struct Window {
     pub id: u32,
     pub title: String,
-    pub x: i32,
-    pub y: i32,
-    pub width: u32,
-    pub height: u32,
+    pub x: i32, pub y: i32,
+    pub width: u32, pub height: u32,
     pub z_order: u32,
     pub focused: bool,
     pub workspace: u32,
@@ -35,31 +30,12 @@ pub struct Compositor {
 
 impl Compositor {
     pub fn new(backend: CompositorBackend, w: u32, h: u32) -> Self {
-        Self {
-            backend,
-            windows: Vec::new(),
-            next_id: 1,
-            active_workspace: 0,
-            screen_width: w,
-            screen_height: h,
-        }
+        Self { backend, windows: Vec::new(), next_id: 1, active_workspace: 0, screen_width: w, screen_height: h }
     }
 
     pub fn create_window(&mut self, title: &str, x: i32, y: i32, w: u32, h: u32) -> u32 {
-        let id = self.next_id;
-        self.next_id += 1;
-        let win = Window {
-            id,
-            title: title.into(),
-            x,
-            y,
-            width: w,
-            height: h,
-            z_order: id,
-            focused: false,
-            workspace: self.active_workspace,
-            visible: true,
-        };
+        let id = self.next_id; self.next_id += 1;
+        let win = Window { id, title: title.into(), x, y, width: w, height: h, z_order: id, focused: false, workspace: self.active_workspace, visible: true };
         self.windows.push(win);
         self.focus_window(id);
         id
@@ -67,48 +43,23 @@ impl Compositor {
 
     pub fn focus_window(&mut self, id: u32) {
         let max_z = self.windows.iter().map(|w| w.z_order).max().unwrap_or(0);
-        for w in &mut self.windows {
-            w.focused = w.id == id;
-            if w.id == id {
-                w.z_order = max_z + 1;
-            }
-        }
+        for w in &mut self.windows { w.focused = w.id == id; if w.id == id { w.z_order = max_z + 1; } }
     }
 
-    pub fn close_window(&mut self, id: u32) {
-        self.windows.retain(|w| w.id != id);
-    }
+    pub fn close_window(&mut self, id: u32) { self.windows.retain(|w| w.id != id); }
 
     pub fn cycle_focus(&mut self) {
-        let visible: Vec<u32> = self
-            .windows
-            .iter()
-            .filter(|w| w.workspace == self.active_workspace && w.visible)
-            .map(|w| w.id)
-            .collect();
-        if visible.is_empty() {
-            return;
-        }
-        let cur = visible
-            .iter()
-            .position(|&id| self.windows.iter().any(|w| w.id == id && w.focused))
-            .unwrap_or(0);
+        let visible: Vec<u32> = self.windows.iter().filter(|w| w.workspace == self.active_workspace && w.visible).map(|w| w.id).collect();
+        if visible.is_empty() { return; }
+        let cur = visible.iter().position(|&id| self.windows.iter().any(|w| w.id == id && w.focused)).unwrap_or(0);
         let next = visible[(cur + 1) % visible.len()];
         self.focus_window(next);
     }
 
     pub fn tile_windows(&mut self) {
-        let ws_windows: Vec<usize> = self
-            .windows
-            .iter()
-            .enumerate()
-            .filter(|(_, w)| w.workspace == self.active_workspace && w.visible)
-            .map(|(i, _)| i)
-            .collect();
+        let ws_windows: Vec<usize> = self.windows.iter().enumerate().filter(|(_, w)| w.workspace == self.active_workspace && w.visible).map(|(i, _)| i).collect();
         let count = ws_windows.len();
-        if count == 0 {
-            return;
-        }
+        if count == 0 { return; }
         let cols = if count <= 2 { count as u32 } else { 2 };
         let rows = ((count as u32) + cols - 1) / cols;
         let tw = self.screen_width / cols;
@@ -123,24 +74,15 @@ impl Compositor {
         }
     }
 
-    pub fn switch_workspace(&mut self, ws: u32) {
-        self.active_workspace = ws;
-    }
+    pub fn switch_workspace(&mut self, ws: u32) { self.active_workspace = ws; }
 
     pub fn move_window_to_workspace(&mut self, window_id: u32, ws: u32) {
-        if let Some(w) = self.windows.iter_mut().find(|w| w.id == window_id) {
-            w.workspace = ws;
-            w.visible = ws == self.active_workspace;
-        }
+        if let Some(w) = self.windows.iter_mut().find(|w| w.id == window_id) { w.workspace = ws; w.visible = ws == self.active_workspace; }
     }
 
     pub fn render_frame(&self) -> Vec<u32> {
         // Returns visible window IDs in z-order for the active workspace
-        let mut visible: Vec<&Window> = self
-            .windows
-            .iter()
-            .filter(|w| w.workspace == self.active_workspace && w.visible)
-            .collect();
+        let mut visible: Vec<&Window> = self.windows.iter().filter(|w| w.workspace == self.active_workspace && w.visible).collect();
         visible.sort_by_key(|w| w.z_order);
         visible.iter().map(|w| w.id).collect()
     }

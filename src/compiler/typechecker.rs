@@ -17,18 +17,9 @@ use super::parser::{
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Type {
     // Primitives
-    I8,
-    I16,
-    I32,
-    I64,
-    I128,
-    U8,
-    U16,
-    U32,
-    U64,
-    U128,
-    F32,
-    F64,
+    I8, I16, I32, I64, I128,
+    U8, U16, U32, U64, U128,
+    F32, F64,
     Bool,
     Char,
     Str,
@@ -56,10 +47,9 @@ impl Type {
     pub fn from_type_expr(expr: &TypeExpr) -> Type {
         match expr {
             TypeExpr::Named(n) => Self::resolve_primitive(n),
-            TypeExpr::Generic(name, args) => Type::Generic(
-                name.clone(),
-                args.iter().map(Self::from_type_expr).collect(),
-            ),
+            TypeExpr::Generic(name, args) => {
+                Type::Generic(name.clone(), args.iter().map(Self::from_type_expr).collect())
+            }
             TypeExpr::Reference { mutable, inner } => Type::Reference {
                 mutable: *mutable,
                 inner: Box::new(Self::from_type_expr(inner)),
@@ -71,7 +61,9 @@ impl Type {
             TypeExpr::Array { element, size } => {
                 Type::Array(Box::new(Self::from_type_expr(element)), *size)
             }
-            TypeExpr::Tuple(types) => Type::Tuple(types.iter().map(Self::from_type_expr).collect()),
+            TypeExpr::Tuple(types) => {
+                Type::Tuple(types.iter().map(Self::from_type_expr).collect())
+            }
             TypeExpr::Function { params, ret } => Type::Function {
                 params: params.iter().map(Self::from_type_expr).collect(),
                 ret: Box::new(Self::from_type_expr(ret)),
@@ -126,16 +118,8 @@ impl Type {
     pub fn is_integer(&self) -> bool {
         matches!(
             self,
-            Type::I8
-                | Type::I16
-                | Type::I32
-                | Type::I64
-                | Type::I128
-                | Type::U8
-                | Type::U16
-                | Type::U32
-                | Type::U64
-                | Type::U128
+            Type::I8 | Type::I16 | Type::I32 | Type::I64 | Type::I128
+                | Type::U8 | Type::U16 | Type::U32 | Type::U64 | Type::U128
         )
     }
 
@@ -346,12 +330,10 @@ impl TypeChecker {
                         fields,
                     },
                 );
-                self.symbols
-                    .define(&s.name, Type::Named(s.name.clone()), false);
+                self.symbols.define(&s.name, Type::Named(s.name.clone()), false);
             }
             Item::EnumDef(e) => {
-                self.symbols
-                    .define(&e.name, Type::Named(e.name.clone()), false);
+                self.symbols.define(&e.name, Type::Named(e.name.clone()), false);
             }
             _ => {}
         }
@@ -412,8 +394,7 @@ impl TypeChecker {
                             self.errors.push(TypeError {
                                 message: alloc::format!(
                                     "type mismatch: cannot assign {:?} to {:?}",
-                                    v,
-                                    d
+                                    v, d
                                 ),
                                 file: span.file.clone(),
                                 line: span.line,
@@ -441,17 +422,13 @@ impl TypeChecker {
                 self.symbols.define(name, final_type, *mutable);
             }
             Stmt::Return(expr, span) => {
-                let ret_type = expr
-                    .as_ref()
-                    .map(|e| self.infer_expr(e))
-                    .unwrap_or(Type::Unit);
+                let ret_type = expr.as_ref().map(|e| self.infer_expr(e)).unwrap_or(Type::Unit);
                 if let Some(expected) = &self.current_return_type {
                     if !expected.is_assignable_from(&ret_type) {
                         self.errors.push(TypeError {
                             message: alloc::format!(
                                 "return type mismatch: expected {:?}, got {:?}",
-                                expected,
-                                ret_type
+                                expected, ret_type
                             ),
                             file: span.file.clone(),
                             line: span.line,
@@ -460,11 +437,7 @@ impl TypeChecker {
                     }
                 }
             }
-            Stmt::While {
-                condition,
-                body,
-                span,
-            } => {
+            Stmt::While { condition, body, span } => {
                 let cond_type = self.infer_expr(condition);
                 if cond_type != Type::Bool && cond_type != Type::Unknown {
                     self.errors.push(TypeError {
@@ -479,12 +452,7 @@ impl TypeChecker {
                 }
                 self.check_block(body);
             }
-            Stmt::For {
-                variable,
-                iterable: _,
-                body,
-                ..
-            } => {
+            Stmt::For { variable, iterable: _, body, .. } => {
                 self.symbols.push_scope();
                 self.symbols.define(variable, Type::Unknown, false);
                 self.check_block(body);
@@ -523,21 +491,12 @@ impl TypeChecker {
                 }
             }
 
-            Expr::Binary {
-                left,
-                op,
-                right,
-                span,
-            } => {
+            Expr::Binary { left, op, right, span } => {
                 let lt = self.infer_expr(left);
                 let rt = self.infer_expr(right);
 
                 match op {
-                    BinaryOp::Add
-                    | BinaryOp::Sub
-                    | BinaryOp::Mul
-                    | BinaryOp::Div
-                    | BinaryOp::Mod => {
+                    BinaryOp::Add | BinaryOp::Sub | BinaryOp::Mul | BinaryOp::Div | BinaryOp::Mod => {
                         if !lt.is_numeric() && lt != Type::Unknown {
                             self.errors.push(TypeError {
                                 message: alloc::format!(
@@ -556,18 +515,11 @@ impl TypeChecker {
                             lt
                         }
                     }
-                    BinaryOp::Eq
-                    | BinaryOp::NotEq
-                    | BinaryOp::Lt
-                    | BinaryOp::LtEq
-                    | BinaryOp::Gt
-                    | BinaryOp::GtEq => Type::Bool,
+                    BinaryOp::Eq | BinaryOp::NotEq | BinaryOp::Lt | BinaryOp::LtEq
+                    | BinaryOp::Gt | BinaryOp::GtEq => Type::Bool,
                     BinaryOp::And | BinaryOp::Or => Type::Bool,
-                    BinaryOp::BitAnd
-                    | BinaryOp::BitOr
-                    | BinaryOp::BitXor
-                    | BinaryOp::Shl
-                    | BinaryOp::Shr => lt,
+                    BinaryOp::BitAnd | BinaryOp::BitOr | BinaryOp::BitXor
+                    | BinaryOp::Shl | BinaryOp::Shr => lt,
                 }
             }
 
@@ -610,8 +562,7 @@ impl TypeChecker {
                                 self.errors.push(TypeError {
                                     message: alloc::format!(
                                         "argument type mismatch: expected {:?}, got {:?}",
-                                        param_ty,
-                                        arg_ty
+                                        param_ty, arg_ty
                                     ),
                                     file: span.file.clone(),
                                     line: span.line,
@@ -624,10 +575,7 @@ impl TypeChecker {
                     Type::Unknown => Type::Unknown,
                     _ => {
                         self.errors.push(TypeError {
-                            message: alloc::format!(
-                                "cannot call non-function type {:?}",
-                                callee_type
-                            ),
+                            message: alloc::format!("cannot call non-function type {:?}", callee_type),
                             file: span.file.clone(),
                             line: span.line,
                             column: span.column,
@@ -637,11 +585,7 @@ impl TypeChecker {
                 }
             }
 
-            Expr::FieldAccess {
-                object,
-                field,
-                span,
-            } => {
+            Expr::FieldAccess { object, field, span } => {
                 let obj_type = self.infer_expr(object);
                 if let Type::Named(name) = &obj_type {
                     if let Some(info) = self.structs.get(name) {
@@ -659,11 +603,7 @@ impl TypeChecker {
                 Type::Unknown
             }
 
-            Expr::Index {
-                object,
-                index,
-                span,
-            } => {
+            Expr::Index { object, index, span } => {
                 let obj_type = self.infer_expr(object);
                 let idx_type = self.infer_expr(index);
                 if !idx_type.is_integer() && idx_type != Type::Unknown {
@@ -680,12 +620,7 @@ impl TypeChecker {
                 }
             }
 
-            Expr::If {
-                condition,
-                then_block,
-                else_block,
-                span,
-            } => {
+            Expr::If { condition, then_block, else_block, span } => {
                 let cond_type = self.infer_expr(condition);
                 if cond_type != Type::Bool && cond_type != Type::Unknown {
                     self.errors.push(TypeError {
@@ -702,9 +637,7 @@ impl TypeChecker {
                 Type::Unit
             }
 
-            Expr::Match {
-                scrutinee, arms, ..
-            } => {
+            Expr::Match { scrutinee, arms, .. } => {
                 let _ = self.infer_expr(scrutinee);
                 for arm in arms {
                     let _ = self.infer_expr(&arm.body);
@@ -725,19 +658,14 @@ impl TypeChecker {
                 Type::Array(Box::new(first), Some(elems.len() as u64))
             }
 
-            Expr::Assign {
-                target,
-                value,
-                span,
-            } => {
+            Expr::Assign { target, value, span } => {
                 let target_type = self.infer_expr(target);
                 let value_type = self.infer_expr(value);
                 if !target_type.is_assignable_from(&value_type) {
                     self.errors.push(TypeError {
                         message: alloc::format!(
                             "cannot assign {:?} to {:?}",
-                            value_type,
-                            target_type
+                            value_type, target_type
                         ),
                         file: span.file.clone(),
                         line: span.line,
@@ -758,9 +686,7 @@ impl TypeChecker {
                                 self.errors.push(TypeError {
                                     message: alloc::format!(
                                         "field '{}' type mismatch: expected {:?}, got {:?}",
-                                        fname,
-                                        expected,
-                                        expr_type
+                                        fname, expected, expr_type
                                     ),
                                     file: span.file.clone(),
                                     line: span.line,
@@ -821,8 +747,9 @@ mod tests {
 
     #[test]
     fn test_struct_field_access() {
-        let result =
-            typecheck("struct Point { x: i32, y: i32 }\nfn test(p: Point) -> i32 { return p.x }");
+        let result = typecheck(
+            "struct Point { x: i32, y: i32 }\nfn test(p: Point) -> i32 { return p.x }",
+        );
         assert!(result.is_ok());
     }
 }

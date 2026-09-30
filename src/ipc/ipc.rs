@@ -17,15 +17,16 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+
 // (no_std only applicable at crate root - removed)
 
-use core::mem;
-use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+use std::vec::Vec;
+use std::vec;
 use std::string::String;
 use std::string::ToString;
-use std::vec;
-use std::vec::Vec;
+use core::ptr::{self, NonNull};
+use core::sync::atomic::{AtomicUsize, Ordering, AtomicBool};
+use core::mem;
 
 /// IPC endpoint trait (OOP interface)
 pub trait IPCEndpoint {
@@ -177,8 +178,7 @@ impl IPCEndpoint for Pipe {
         };
 
         unsafe {
-            let available_space = self.buffer_size
-                - (self.write_pos.load(Ordering::SeqCst) - self.read_pos.load(Ordering::SeqCst));
+            let available_space = self.buffer_size - (self.write_pos.load(Ordering::SeqCst) - self.read_pos.load(Ordering::SeqCst));
             if message.len() > available_space {
                 return Err(IPCError::BufferFull);
             }
@@ -208,8 +208,7 @@ impl IPCEndpoint for Pipe {
         };
 
         unsafe {
-            let available_data =
-                self.write_pos.load(Ordering::SeqCst) - self.read_pos.load(Ordering::SeqCst);
+            let available_data = self.write_pos.load(Ordering::SeqCst) - self.read_pos.load(Ordering::SeqCst);
             let read_count = buffer.len().min(available_data);
 
             for i in 0..read_count {
@@ -267,7 +266,10 @@ impl Message {
         for &byte in data {
             v.push(byte);
         }
-        Message { data: v, priority }
+        Message {
+            data: v,
+            priority,
+        }
     }
 }
 
@@ -410,7 +412,9 @@ impl IPCEndpoint for SharedMemory {
     }
 
     fn receive(&mut self, buffer: &mut [u8]) -> Result<usize, IPCError> {
-        unsafe { self.read(0, buffer) }
+        unsafe {
+            self.read(0, buffer)
+        }
     }
 
     fn info(&self) -> IPCInfo {
@@ -450,19 +454,9 @@ impl Drop for SharedMemory {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SerenityIpcMessage {
     /// WindowServer Backing Store mapping updates: (window_id, shm_id, width, height)
-    UpdateBackingStore {
-        window_id: usize,
-        shm_id: usize,
-        width: usize,
-        height: usize,
-    },
+    UpdateBackingStore { window_id: usize, shm_id: usize, width: usize, height: usize },
     /// Standard key/mouse input event message: (window_id, event_type, x, y)
-    InputEvent {
-        window_id: usize,
-        event_type: u32,
-        x: i32,
-        y: i32,
-    },
+    InputEvent { window_id: usize, event_type: u32, x: i32, y: i32 },
     /// General system call adaptation payload: (syscall_id, payload)
     SyscallShim { syscall_id: usize, payload: Vec<u8> },
 }
@@ -472,34 +466,21 @@ impl SerenityIpcMessage {
     pub fn serialize(&self) -> Vec<u8> {
         let mut out = Vec::new();
         match self {
-            Self::UpdateBackingStore {
-                window_id,
-                shm_id,
-                width,
-                height,
-            } => {
+            Self::UpdateBackingStore { window_id, shm_id, width, height } => {
                 out.push(1); // Msg Type ID
                 out.extend_from_slice(&window_id.to_le_bytes());
                 out.extend_from_slice(&shm_id.to_le_bytes());
                 out.extend_from_slice(&width.to_le_bytes());
                 out.extend_from_slice(&height.to_le_bytes());
             }
-            Self::InputEvent {
-                window_id,
-                event_type,
-                x,
-                y,
-            } => {
+            Self::InputEvent { window_id, event_type, x, y } => {
                 out.push(2); // Msg Type ID
                 out.extend_from_slice(&window_id.to_le_bytes());
                 out.extend_from_slice(&event_type.to_le_bytes());
                 out.extend_from_slice(&x.to_le_bytes());
                 out.extend_from_slice(&y.to_le_bytes());
             }
-            Self::SyscallShim {
-                syscall_id,
-                payload,
-            } => {
+            Self::SyscallShim { syscall_id, payload } => {
                 out.push(3); // Msg Type ID
                 out.extend_from_slice(&syscall_id.to_le_bytes());
                 out.extend_from_slice(&payload);
@@ -531,12 +512,7 @@ impl SerenityIpcMessage {
                 let shm_id = read_usize(1 + sz);
                 let width = read_usize(1 + 2 * sz);
                 let height = read_usize(1 + 3 * sz);
-                Some(Self::UpdateBackingStore {
-                    window_id,
-                    shm_id,
-                    width,
-                    height,
-                })
+                Some(Self::UpdateBackingStore { window_id, shm_id, width, height })
             }
             2 => {
                 let sz = mem::size_of::<usize>();
@@ -566,12 +542,7 @@ impl SerenityIpcMessage {
                 let event_type = read_u32(1 + sz);
                 let x = read_i32(1 + sz + 4);
                 let y = read_i32(1 + sz + 8);
-                Some(Self::InputEvent {
-                    window_id,
-                    event_type,
-                    x,
-                    y,
-                })
+                Some(Self::InputEvent { window_id, event_type, x, y })
             }
             3 => {
                 let sz = mem::size_of::<usize>();
@@ -582,10 +553,7 @@ impl SerenityIpcMessage {
                 b.copy_from_slice(&bytes[1..1 + sz]);
                 let syscall_id = usize::from_le_bytes(b);
                 let payload = bytes[1 + sz..].to_vec();
-                Some(Self::SyscallShim {
-                    syscall_id,
-                    payload,
-                })
+                Some(Self::SyscallShim { syscall_id, payload })
             }
             _ => None,
         }
@@ -634,11 +602,7 @@ impl SerenityIpcSandboxEnforcer {
     }
 
     /// Validate whether a message or dynamic transfer is allowed under the current sandbox parameters.
-    pub fn validate_ipc_transfer(
-        &self,
-        is_sending_fd: bool,
-        is_unix_connect: bool,
-    ) -> Result<(), IPCError> {
+    pub fn validate_ipc_transfer(&self, is_sending_fd: bool, is_unix_connect: bool) -> Result<(), IPCError> {
         if is_sending_fd && !self.has_send_fd_pledge {
             return Err(IPCError::PermissionDenied);
         }
@@ -674,11 +638,7 @@ impl IPCManager {
         }
     }
 
-    pub fn create_pipe(
-        &mut self,
-        buffer_size: usize,
-        capability: IPCCapability,
-    ) -> Result<usize, IPCError> {
+    pub fn create_pipe(&mut self, buffer_size: usize, capability: IPCCapability) -> Result<usize, IPCError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let pipe = Pipe::new(id, buffer_size, capability);
 
@@ -695,11 +655,7 @@ impl IPCManager {
         Ok(id)
     }
 
-    pub fn create_message_queue(
-        &mut self,
-        capacity: usize,
-        capability: IPCCapability,
-    ) -> Result<usize, IPCError> {
+    pub fn create_message_queue(&mut self, capacity: usize, capability: IPCCapability) -> Result<usize, IPCError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let mq = MessageQueue::new(id, capacity, capability);
 
@@ -716,11 +672,7 @@ impl IPCManager {
         Ok(id)
     }
 
-    pub fn create_shared_memory(
-        &mut self,
-        size: usize,
-        capability: IPCCapability,
-    ) -> Result<usize, IPCError> {
+    pub fn create_shared_memory(&mut self, size: usize, capability: IPCCapability) -> Result<usize, IPCError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let shm = SharedMemory::new(id, size, capability);
 
@@ -861,11 +813,7 @@ impl<T> CustomIpcVec<T> {
     pub fn remove(&mut self, index: usize) -> T {
         unsafe {
             let item = core::ptr::read(self.data.add(index));
-            core::ptr::copy(
-                self.data.add(index + 1),
-                self.data.add(index),
-                self.len - index - 1,
-            );
+            core::ptr::copy(self.data.add(index + 1), self.data.add(index), self.len - index - 1);
             self.len -= 1;
             item
         }
@@ -884,11 +832,7 @@ impl<T> CustomIpcVec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {

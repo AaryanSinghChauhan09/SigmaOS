@@ -54,17 +54,11 @@ impl ResourceDomainGroup {
         );
     }
 
-    pub fn request_allocation(
-        &mut self,
-        res_type: AllocatorResourceType,
-        amount: u64,
-    ) -> Result<u64, String> {
-        let limit = self.resource_limits.get_mut(&res_type).ok_or_else(|| {
-            format!(
-                "Resource type {:?} not configured for domain {}",
-                res_type, self.name
-            )
-        })?;
+    pub fn request_allocation(&mut self, res_type: AllocatorResourceType, amount: u64) -> Result<u64, String> {
+        let limit = self
+            .resource_limits
+            .get_mut(&res_type)
+            .ok_or_else(|| format!("Resource type {:?} not configured for domain {}", res_type, self.name))?;
 
         if limit.current_usage + amount > limit.hard_limit {
             return Err(format!(
@@ -77,17 +71,11 @@ impl ResourceDomainGroup {
         Ok(limit.current_usage)
     }
 
-    pub fn release_allocation(
-        &mut self,
-        res_type: AllocatorResourceType,
-        amount: u64,
-    ) -> Result<u64, String> {
-        let limit = self.resource_limits.get_mut(&res_type).ok_or_else(|| {
-            format!(
-                "Resource type {:?} not configured for domain {}",
-                res_type, self.name
-            )
-        })?;
+    pub fn release_allocation(&mut self, res_type: AllocatorResourceType, amount: u64) -> Result<u64, String> {
+        let limit = self
+            .resource_limits
+            .get_mut(&res_type)
+            .ok_or_else(|| format!("Resource type {:?} not configured for domain {}", res_type, self.name))?;
 
         if amount > limit.current_usage {
             limit.current_usage = 0;
@@ -121,12 +109,7 @@ impl SovereignMultiResourceAllocator {
         allocator
     }
 
-    pub fn create_domain_group(
-        &mut self,
-        name: &str,
-        cpu_weight: u32,
-        parent_id: Option<usize>,
-    ) -> usize {
+    pub fn create_domain_group(&mut self, name: &str, cpu_weight: u32, parent_id: Option<usize>) -> usize {
         let domain_id = self.next_domain_id;
         self.next_domain_id += 1;
 
@@ -137,12 +120,7 @@ impl SovereignMultiResourceAllocator {
         domain_id
     }
 
-    pub fn allocate_resource(
-        &mut self,
-        domain_id: usize,
-        res_type: AllocatorResourceType,
-        amount: u64,
-    ) -> Result<u64, String> {
+    pub fn allocate_resource(&mut self, domain_id: usize, res_type: AllocatorResourceType, amount: u64) -> Result<u64, String> {
         let domain = self
             .domain_groups
             .get_mut(&domain_id)
@@ -151,12 +129,7 @@ impl SovereignMultiResourceAllocator {
         domain.request_allocation(res_type, amount)
     }
 
-    pub fn free_resource(
-        &mut self,
-        domain_id: usize,
-        res_type: AllocatorResourceType,
-        amount: u64,
-    ) -> Result<u64, String> {
+    pub fn free_resource(&mut self, domain_id: usize, res_type: AllocatorResourceType, amount: u64) -> Result<u64, String> {
         let domain = self
             .domain_groups
             .get_mut(&domain_id)
@@ -184,27 +157,10 @@ mod tests {
         let domain = allocator.domain_groups.get_mut(&user_domain).unwrap();
         domain.set_limit(AllocatorResourceType::MemoryPages, 1000, 2000);
 
-        assert_eq!(
-            allocator
-                .allocate_resource(user_domain, AllocatorResourceType::MemoryPages, 500)
-                .unwrap(),
-            500
-        );
-        assert_eq!(
-            allocator
-                .allocate_resource(user_domain, AllocatorResourceType::MemoryPages, 1000)
-                .unwrap(),
-            1500
-        );
-        assert!(allocator
-            .allocate_resource(user_domain, AllocatorResourceType::MemoryPages, 1000)
-            .is_err());
+        assert_eq!(allocator.allocate_resource(user_domain, AllocatorResourceType::MemoryPages, 500).unwrap(), 500);
+        assert_eq!(allocator.allocate_resource(user_domain, AllocatorResourceType::MemoryPages, 1000).unwrap(), 1500);
+        assert!(allocator.allocate_resource(user_domain, AllocatorResourceType::MemoryPages, 1000).is_err());
 
-        assert_eq!(
-            allocator
-                .free_resource(user_domain, AllocatorResourceType::MemoryPages, 500)
-                .unwrap(),
-            1000
-        );
+        assert_eq!(allocator.free_resource(user_domain, AllocatorResourceType::MemoryPages, 500).unwrap(), 1000);
     }
 }

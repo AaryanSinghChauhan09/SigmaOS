@@ -155,11 +155,7 @@ impl FreeBsdGeliDiskEncryptionDriver {
         }
     }
 
-    pub fn decrypt_sector(
-        &self,
-        sector_id: u64,
-        encrypted_buf: &[u8],
-    ) -> Result<Vec<u8>, &'static str> {
+    pub fn decrypt_sector(&self, sector_id: u64, encrypted_buf: &[u8]) -> Result<Vec<u8>, &'static str> {
         if encrypted_buf.len() % self.sector_size as usize != 0 {
             return Err("Buffer size not aligned to sector size");
         }
@@ -182,11 +178,7 @@ pub struct OpenBsdDriverSandboxGuard {
 impl OpenBsdDriverSandboxGuard {
     pub fn new() -> Self {
         Self {
-            pledged_capabilities: alloc::vec![
-                "stdio".to_string(),
-                "iommufd".to_string(),
-                "dma".to_string()
-            ],
+            pledged_capabilities: alloc::vec!["stdio".to_string(), "iommufd".to_string(), "dma".to_string()],
             unveiled_paths: alloc::vec!["/dev/pci0".to_string(), "/dev/nvme0".to_string()],
             locked: false,
         }
@@ -198,8 +190,7 @@ impl OpenBsdDriverSandboxGuard {
     }
 
     pub fn validate_access(&self, path: &str, capability: &str) -> bool {
-        self.unveiled_paths.iter().any(|p| p == path)
-            && self.pledged_capabilities.iter().any(|c| c == capability)
+        self.unveiled_paths.iter().any(|p| p == path) && self.pledged_capabilities.iter().any(|c| c == capability)
     }
 }
 

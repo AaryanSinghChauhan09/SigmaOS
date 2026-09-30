@@ -665,8 +665,8 @@ mod tests {
 /// Memory allocation target pool governed by the 50% physical RAM ceiling rule
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum FiftyPercentRamTargetPool {
-    TmpfsSharedMemory,   // Linux /dev/shm & BSD tmpfs
-    ZramSwapCompressor,  // Linux zram compressed swap pool
+    TmpfsSharedMemory, // Linux /dev/shm & BSD tmpfs
+    ZramSwapCompressor, // Linux zram compressed swap pool
     CgroupMemoryCeiling, // cgroups v2 default process group memory ceiling
 }
 
@@ -710,9 +710,7 @@ impl SovereignFiftyPercentRamRuleEngine {
         let new_total = current.saturating_add(requested_bytes);
 
         if new_total > self.max_allowed_50_percent_limit {
-            return Err(
-                "50% System RAM limit rule violation: Allocation exceeds 50% physical RAM ceiling",
-            );
+            return Err("50% System RAM limit rule violation: Allocation exceeds 50% physical RAM ceiling");
         }
 
         self.active_allocations.insert(pool, new_total);
@@ -746,37 +744,25 @@ mod tests_50_percent_ram {
 
         // Allocate 4 GB in tmpfs pool - succeeds
         let alloc_4gb = engine
-            .allocate_in_pool(
-                FiftyPercentRamTargetPool::TmpfsSharedMemory,
-                4 * 1024 * 1024 * 1024,
-            )
+            .allocate_in_pool(FiftyPercentRamTargetPool::TmpfsSharedMemory, 4 * 1024 * 1024 * 1024)
             .unwrap();
         assert_eq!(alloc_4gb, 4 * 1024 * 1024 * 1024);
 
         // Allocate another 4 GB - succeeds (reaches exactly 8 GB)
         let alloc_8gb = engine
-            .allocate_in_pool(
-                FiftyPercentRamTargetPool::TmpfsSharedMemory,
-                4 * 1024 * 1024 * 1024,
-            )
+            .allocate_in_pool(FiftyPercentRamTargetPool::TmpfsSharedMemory, 4 * 1024 * 1024 * 1024)
             .unwrap();
         assert_eq!(alloc_8gb, 8 * 1024 * 1024 * 1024);
 
         // Trying to allocate 1 MB more fails 50% RAM rule
-        let overflow_alloc =
-            engine.allocate_in_pool(FiftyPercentRamTargetPool::TmpfsSharedMemory, 1024 * 1024);
+        let overflow_alloc = engine
+            .allocate_in_pool(FiftyPercentRamTargetPool::TmpfsSharedMemory, 1024 * 1024);
         assert!(overflow_alloc.is_err());
 
         // Release 2 GB
-        engine.release_in_pool(
-            FiftyPercentRamTargetPool::TmpfsSharedMemory,
-            2 * 1024 * 1024 * 1024,
-        );
+        engine.release_in_pool(FiftyPercentRamTargetPool::TmpfsSharedMemory, 2 * 1024 * 1024 * 1024);
         assert_eq!(
-            *engine
-                .active_allocations
-                .get(&FiftyPercentRamTargetPool::TmpfsSharedMemory)
-                .unwrap(),
+            *engine.active_allocations.get(&FiftyPercentRamTargetPool::TmpfsSharedMemory).unwrap(),
             6 * 1024 * 1024 * 1024
         );
     }

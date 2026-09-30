@@ -66,9 +66,7 @@ impl SovereignUniversalPackageOrchestratorEngine {
             .unwrap_or("sovereign-pkg");
 
         let signature_verified = match pqc_signature {
-            Some(sig) => {
-                sig.contains("dilithium") || sig.contains("ed25519") || sig.contains("gpg")
-            }
+            Some(sig) => sig.contains("dilithium") || sig.contains("ed25519") || sig.contains("gpg"),
             None => true, // default allowed for unsigned local dev builds
         };
 
@@ -105,8 +103,8 @@ impl SovereignUniversalPackageOrchestratorEngine {
             "ProcessExec".to_string(),
         ];
 
-        let mut pkg =
-            UnifiedPackage::new(clean_name.to_string(), "1.0.0".to_string()).with_format(fmt);
+        let mut pkg = UnifiedPackage::new(clean_name.to_string(), "1.0.0".to_string())
+            .with_format(fmt);
         pkg.installed = true;
         pkg.state = PackageState::Installed;
         for dep in &canonical_deps {
@@ -376,11 +374,7 @@ impl DebianAppStreamCatalogEngine {
     pub fn filter_by_category(&self, category: &str) -> Vec<AppStreamCatalogEntry> {
         self.app_catalog
             .values()
-            .filter(|app| {
-                app.categories
-                    .iter()
-                    .any(|c| c.eq_ignore_ascii_case(category))
-            })
+            .filter(|app| app.categories.iter().any(|c| c.eq_ignore_ascii_case(category)))
             .cloned()
             .collect()
     }
@@ -442,9 +436,7 @@ impl ArchPacstrapSeederEngine {
                 "pkgconf".to_string(),
             ],
         );
-        Self {
-            package_groups: groups,
-        }
+        Self { package_groups: groups }
     }
 
     pub fn expand_targets(&self, targets: &[&str]) -> Vec<String> {
@@ -465,11 +457,7 @@ impl ArchPacstrapSeederEngine {
         expanded
     }
 
-    pub fn seed_chroot_target(
-        &self,
-        target_dir: &str,
-        packages: &[&str],
-    ) -> Result<String, &'static str> {
+    pub fn seed_chroot_target(&self, target_dir: &str, packages: &[&str]) -> Result<String, &'static str> {
         let expanded = self.expand_targets(packages);
         if expanded.is_empty() {
             return Err("No packages specified for pacstrap seeding");
@@ -507,7 +495,7 @@ pub struct GentooEcleanRevdepRebuildEngine {
     pub distfiles_cache: Vec<StaleDistfileRecord>,
     pub installed_binaries: BTreeMap<String, Vec<String>>, // binary_path -> required_sonames
     pub available_sonames: Vec<String>,
-    pub soname_owner_map: BTreeMap<String, String>, // soname -> atom
+    pub soname_owner_map: BTreeMap<String, String>,        // soname -> atom
 }
 
 impl GentooEcleanRevdepRebuildEngine {
@@ -646,10 +634,7 @@ impl NixStorePathVerifyEngine {
         }
         record.actual_sha256 = record.expected_sha256.clone();
         record.is_corrupted = false;
-        Ok(format!(
-            "Repaired store path '{}' from CAS substitute",
-            store_path
-        ))
+        Ok(format!("Repaired store path '{}' from CAS substitute", store_path))
     }
 }
 
@@ -676,9 +661,7 @@ pub struct HardenedBsdBinaryMitigationAuditorEngine {
 
 impl HardenedBsdBinaryMitigationAuditorEngine {
     pub fn new() -> Self {
-        Self {
-            binaries: Vec::new(),
-        }
+        Self { binaries: Vec::new() }
     }
 
     pub fn register_binary(&mut self, profile: BinaryMitigationProfile) {
@@ -686,10 +669,7 @@ impl HardenedBsdBinaryMitigationAuditorEngine {
     }
 
     pub fn audit_hardening_score(&self, binary_name: &str) -> Option<u32> {
-        let b = self
-            .binaries
-            .iter()
-            .find(|p| p.binary_name == binary_name)?;
+        let b = self.binaries.iter().find(|p| p.binary_name == binary_name)?;
         let mut score = 0u32;
         if b.has_pie {
             score += 20;
@@ -772,13 +752,7 @@ impl OpenBsdPkgUpgradeRelinkerEngine {
                 self.pending_relinks.push(app_name.to_string());
                 return Err(format!(
                     "Application '{}' requires major lib upgrade {}.so.{}.{} -> {}.so.{}.{}",
-                    app_name,
-                    req_lib,
-                    installed.major,
-                    installed.minor,
-                    req_lib,
-                    req_major,
-                    req_minor
+                    app_name, req_lib, installed.major, installed.minor, req_lib, req_major, req_minor
                 ));
             }
             Ok(installed.minor >= req_minor)
@@ -832,10 +806,7 @@ impl AlpineLbuOverlayStateGovernor {
     pub fn generate_apkovl_manifest(&self) -> String {
         let mut manifest = format!("# Alpine LBU Overlay Archive: {}\n", self.apkovl_filename);
         for f in &self.tracked_files {
-            manifest.push_str(&format!(
-                "{} {} {}\n",
-                f.filepath, f.hash_sha256, f.size_bytes
-            ));
+            manifest.push_str(&format!("{} {} {}\n", f.filepath, f.hash_sha256, f.size_bytes));
         }
         manifest
     }
@@ -915,29 +886,21 @@ mod tests {
 
         let old_pkg = b"glibc-2.37-binary-data-stream";
         let new_pkg = b"glibc-2.38-binary-data-stream";
-        let patch = ArchPacmanDeltaSyncEngine::create_delta_patch(
-            "glibc", "2.37", "2.38", old_pkg, new_pkg,
-        );
+        let patch = ArchPacmanDeltaSyncEngine::create_delta_patch("glibc", "2.37", "2.38", old_pkg, new_pkg);
         let reconstructed = ArchPacmanDeltaSyncEngine::apply_delta_patch(old_pkg, &patch);
         assert_eq!(&reconstructed[..], new_pkg);
 
         let dnf_solver = FedoraDnfGroupInstallSolver::new();
-        let dev_pkgs = dnf_solver
-            .resolve_group_packages("development-tools", false)
-            .unwrap();
+        let dev_pkgs = dnf_solver.resolve_group_packages("development-tools", false).unwrap();
         assert!(dev_pkgs.contains(&"gcc".to_string()));
 
         let mut pkg_base = FreeBsdPkgBaseRootfsEngine::new("14.0-RELEASE");
-        let upgrade_msg = pkg_base
-            .upgrade_pkg_base_with_be("14.1-RELEASE", "be_14_1")
-            .unwrap();
+        let upgrade_msg = pkg_base.upgrade_pkg_base_with_be("14.1-RELEASE", "be_14_1").unwrap();
         assert!(upgrade_msg.contains("14.1-RELEASE"));
         assert_eq!(pkg_base.active_boot_env, "be_14_1");
 
         let mut orchestrator = SovereignUniversalPackageOrchestratorEngine::new();
-        let res = orchestrator
-            .orchestrate_and_install("nginx.deb", b"deb-data", Some("dilithium-5-valid"))
-            .unwrap();
+        let res = orchestrator.orchestrate_and_install("nginx.deb", b"deb-data", Some("dilithium-5-valid")).unwrap();
         assert_eq!(res.package_name, "nginx");
         assert_eq!(res.detected_format, PackageFormat::Deb);
         assert!(res.canonical_dependencies.contains(&"openssl".to_string()));
@@ -1006,9 +969,7 @@ mod tests {
         let corrupted = verifier.list_corrupted_paths();
         assert_eq!(corrupted, vec!["/nix/store/hash1-glibc".to_string()]);
 
-        let repair = verifier
-            .repair_corrupted_path("/nix/store/hash1-glibc")
-            .unwrap();
+        let repair = verifier.repair_corrupted_path("/nix/store/hash1-glibc").unwrap();
         assert!(repair.contains("Repaired store path"));
     }
 

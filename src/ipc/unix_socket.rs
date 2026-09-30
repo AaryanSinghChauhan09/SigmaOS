@@ -4,10 +4,12 @@
 //! Implements Stream and Datagram sockets, path-based binding, abstract namespaces,
 //! socketpair creation, and capability-scoped sandboxing constraints.
 
-use crate::ipc::ipc::{IPCCapability, IPCError};
-use std::collections::BTreeMap;
+
+
 use std::string::String;
 use std::vec::Vec;
+use std::collections::BTreeMap;
+use crate::ipc::ipc::{IPCError, IPCCapability};
 
 /// Sockets can be Stream (connection-oriented) or Datagram (connectionless)
 #[repr(C)]
@@ -115,11 +117,7 @@ impl UnixSocketManager {
     }
 
     /// Create a new socket
-    pub fn create_socket(
-        &mut self,
-        socket_type: UnixSocketType,
-        capability: IPCCapability,
-    ) -> usize {
+    pub fn create_socket(&mut self, socket_type: UnixSocketType, capability: IPCCapability) -> usize {
         let id = self.next_id;
         self.next_id += 1;
         let socket = UnixSocket::new(id, socket_type, capability);
@@ -150,21 +148,14 @@ impl UnixSocketManager {
     }
 
     /// Connect socket to bound address (Stream only)
-    pub fn connect(
-        &mut self,
-        client_id: usize,
-        address: UnixSocketAddress,
-    ) -> Result<(), IPCError> {
+    pub fn connect(&mut self, client_id: usize, address: UnixSocketAddress) -> Result<(), IPCError> {
         let address_str = match &address {
             UnixSocketAddress::Path(p) => p.clone(),
             UnixSocketAddress::Abstract(a) => a.clone(),
             UnixSocketAddress::Unbound => return Err(IPCError::InvalidSize),
         };
 
-        let server_id = *self
-            .bindings
-            .get(&address_str)
-            .ok_or(IPCError::NotConnected)?;
+        let server_id = *self.bindings.get(&address_str).ok_or(IPCError::NotConnected)?;
 
         let (client_capability, client_type) = {
             let client_socket = self.sockets.get(&client_id).ok_or(IPCError::NotConnected)?;
@@ -182,10 +173,7 @@ impl UnixSocketManager {
             return Err(IPCError::NotConnected);
         }
 
-        let server_socket = self
-            .sockets
-            .get_mut(&server_id)
-            .ok_or(IPCError::NotConnected)?;
+        let server_socket = self.sockets.get_mut(&server_id).ok_or(IPCError::NotConnected)?;
         if server_socket.state != UnixSocketState::Listening {
             return Err(IPCError::PermissionDenied);
         }
@@ -201,10 +189,7 @@ impl UnixSocketManager {
 
     /// Accept incoming connection on listening socket (Stream only)
     pub fn accept(&mut self, server_id: usize) -> Result<usize, IPCError> {
-        let server_socket = self
-            .sockets
-            .get_mut(&server_id)
-            .ok_or(IPCError::NotConnected)?;
+        let server_socket = self.sockets.get_mut(&server_id).ok_or(IPCError::NotConnected)?;
         if server_socket.state != UnixSocketState::Listening {
             return Err(IPCError::PermissionDenied);
         }
@@ -218,19 +203,12 @@ impl UnixSocketManager {
         let accepted_id = self.next_id;
         self.next_id += 1;
 
-        let mut accepted_socket = UnixSocket::new(
-            accepted_id,
-            UnixSocketType::Stream,
-            server_socket.capability,
-        );
+        let mut accepted_socket = UnixSocket::new(accepted_id, UnixSocketType::Stream, server_socket.capability);
         accepted_socket.state = UnixSocketState::Connected;
         accepted_socket.peer_id = Some(client_id);
         self.sockets.insert(accepted_id, accepted_socket);
 
-        let client_socket = self
-            .sockets
-            .get_mut(&client_id)
-            .ok_or(IPCError::NotConnected)?;
+        let client_socket = self.sockets.get_mut(&client_id).ok_or(IPCError::NotConnected)?;
         client_socket.state = UnixSocketState::Connected;
         client_socket.peer_id = Some(accepted_id);
 
@@ -250,10 +228,7 @@ impl UnixSocketManager {
                     return Err(IPCError::NotConnected);
                 }
                 let peer_id = sender_socket.peer_id.ok_or(IPCError::NotConnected)?;
-                let peer_socket = self
-                    .sockets
-                    .get_mut(&peer_id)
-                    .ok_or(IPCError::NotConnected)?;
+                let peer_socket = self.sockets.get_mut(&peer_id).ok_or(IPCError::NotConnected)?;
                 peer_socket.rx_buffer.extend_from_slice(data);
                 Ok(())
             }
@@ -262,10 +237,7 @@ impl UnixSocketManager {
                     return Err(IPCError::NotConnected);
                 }
                 let peer_id = sender_socket.peer_id.unwrap();
-                let peer_socket = self
-                    .sockets
-                    .get_mut(&peer_id)
-                    .ok_or(IPCError::NotConnected)?;
+                let peer_socket = self.sockets.get_mut(&peer_id).ok_or(IPCError::NotConnected)?;
 
                 let mut packet = data.len().to_le_bytes().to_vec();
                 packet.extend_from_slice(data);
@@ -276,12 +248,7 @@ impl UnixSocketManager {
     }
 
     /// Send datagram to target address (Datagram only, connectionless)
-    pub fn send_to(
-        &mut self,
-        sender_id: usize,
-        data: &[u8],
-        target: UnixSocketAddress,
-    ) -> Result<(), IPCError> {
+    pub fn send_to(&mut self, sender_id: usize, data: &[u8], target: UnixSocketAddress) -> Result<(), IPCError> {
         let sender_socket = self.sockets.get(&sender_id).ok_or(IPCError::NotConnected)?;
         if sender_socket.socket_type != UnixSocketType::Datagram {
             return Err(IPCError::NotConnected);
@@ -296,14 +263,8 @@ impl UnixSocketManager {
             UnixSocketAddress::Unbound => return Err(IPCError::InvalidSize),
         };
 
-        let target_id = *self
-            .bindings
-            .get(&target_str)
-            .ok_or(IPCError::NotConnected)?;
-        let target_socket = self
-            .sockets
-            .get_mut(&target_id)
-            .ok_or(IPCError::NotConnected)?;
+        let target_id = *self.bindings.get(&target_str).ok_or(IPCError::NotConnected)?;
+        let target_socket = self.sockets.get_mut(&target_id).ok_or(IPCError::NotConnected)?;
 
         let mut packet = sender_id.to_le_bytes().to_vec();
         packet.extend_from_slice(&data.len().to_le_bytes());
@@ -340,11 +301,7 @@ impl UnixSocketManager {
     }
 
     /// Receive datagram from socket (Datagram)
-    pub fn receive_from(
-        &mut self,
-        id: usize,
-        buffer: &mut [u8],
-    ) -> Result<(usize, Option<usize>), IPCError> {
+    pub fn receive_from(&mut self, id: usize, buffer: &mut [u8]) -> Result<(usize, Option<usize>), IPCError> {
         let socket = self.sockets.get_mut(&id).ok_or(IPCError::NotConnected)?;
         if !socket.capability.can_receive {
             return Err(IPCError::PermissionDenied);
@@ -402,11 +359,7 @@ impl UnixSocketManager {
     }
 
     /// Create a pre-connected socketpair (Stream or Datagram)
-    pub fn socketpair(
-        &mut self,
-        socket_type: UnixSocketType,
-        capability: IPCCapability,
-    ) -> Result<(usize, usize), IPCError> {
+    pub fn socketpair(&mut self, socket_type: UnixSocketType, capability: IPCCapability) -> Result<(usize, usize), IPCError> {
         let id1 = self.create_socket(socket_type, capability);
         let id2 = self.create_socket(socket_type, capability);
 

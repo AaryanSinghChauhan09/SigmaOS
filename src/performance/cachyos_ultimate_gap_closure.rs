@@ -198,17 +198,11 @@ impl SovereignCachyosUltimateGapClosureSuite {
     pub fn verify_suite(&mut self) -> bool {
         self.bore_sched.enqueue_task(1001, "cyberpunk2077", -10);
         let burst = self.bore_sched.calculate_burst_penalty(1001, 10_000_000);
-        let matched = self
-            .ananicy_autonicer
-            .match_and_apply_rule("hyprland")
-            .is_some();
+        let matched = self.ananicy_autonicer.match_and_apply_rule("hyprland").is_some();
         self.microarch_opt.set_microarch_level(MicroarchLevel::V4);
         self.kernel_tuner.enable_gamemode();
 
-        burst >= 0
-            && matched
-            && self.microarch_opt.current_level == MicroarchLevel::V4
-            && self.kernel_tuner.gamemode_profile_active
+        burst >= 0 && matched && self.microarch_opt.current_level == MicroarchLevel::V4 && self.kernel_tuner.gamemode_profile_active
     }
 }
 

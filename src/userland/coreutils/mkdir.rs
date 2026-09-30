@@ -2,8 +2,8 @@
 //! POSIX-compatible mkdir implementation
 
 use std::fs;
-use std::os::unix::fs::PermissionsExt;
 use std::path::Path;
+use std::os::unix::fs::PermissionsExt;
 
 /// Create directories
 pub fn run(path: &str, parents: bool, mode: Option<u32>) -> Result<(), String> {

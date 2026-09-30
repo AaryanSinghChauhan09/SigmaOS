@@ -1,6 +1,7 @@
-use core::sync::atomic::{AtomicU32, Ordering};
+
 use std::boxed::Box;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicU32, Ordering};
 
 use crate::filesystem::FsError;
 use crate::kernel::sched::task::{SchedPolicy, Task};

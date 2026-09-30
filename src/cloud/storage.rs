@@ -20,33 +20,29 @@ use std::format;
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
-#[cfg(not(target_os = "none"))]
-use core::mem;
-#[cfg(not(target_os = "none"))]
-use core::ops::{Deref, DerefMut};
 /// OOP-based Cloud Storage for SigmaOS
 /// Based on Ideas-999-Structured: Cloud & Remote Item 946
 /// Implements cloud storage integration
 
 #[cfg(not(target_os = "none"))]
 use core::sync::atomic::{AtomicUsize, Ordering};
+#[cfg(not(target_os = "none"))]
+use core::mem;
+#[cfg(not(target_os = "none"))]
+use core::ops::{Deref, DerefMut};
 
+#[cfg(target_os = "none")]
+use core::sync::atomic::{AtomicUsize, Ordering};
 #[cfg(target_os = "none")]
 use core::mem;
 #[cfg(target_os = "none")]
 use core::ops::{Deref, DerefMut};
-#[cfg(target_os = "none")]
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type FileID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum StorageError {
-    Success = 0,
-    NotFound = 1,
-    UploadFailed = 2,
-}
+pub enum StorageError { Success = 0, NotFound = 1, UploadFailed = 2 }
 
 pub trait CloudFile {
     fn id(&self) -> FileID;
@@ -80,19 +76,13 @@ impl SimpleCloudFile {
 }
 
 impl CloudFile for SimpleCloudFile {
-    fn id(&self) -> FileID {
-        self.id
-    }
+    fn id(&self) -> FileID { self.id }
     fn name(&self) -> &[u8] {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(256);
         &self.name[..len]
     }
-    fn size(&self) -> u64 {
-        self.size.load(Ordering::SeqCst) as u64
-    }
-    fn is_cached(&self) -> bool {
-        self.cached.load(Ordering::SeqCst) == 1
-    }
+    fn size(&self) -> u64 { self.size.load(Ordering::SeqCst) as u64 }
+    fn is_cached(&self) -> bool { self.cached.load(Ordering::SeqCst) == 1 }
 }
 
 pub trait CloudStorage {
@@ -209,9 +199,7 @@ impl SovereignS3Bucket {
     }
 
     pub fn upload_part(&mut self, upload_id: u32, part_num: usize) -> Result<(), &'static str> {
-        let session = self
-            .active_multipart_uploads
-            .iter_mut()
+        let session = self.active_multipart_uploads.iter_mut()
             .find(|u| u.upload_id == upload_id)
             .ok_or("S3 SDK: Multipart upload ID not active")?;
 
@@ -222,14 +210,8 @@ impl SovereignS3Bucket {
         Ok(())
     }
 
-    pub fn complete_multipart_upload(
-        &mut self,
-        upload_id: u32,
-        size: u64,
-    ) -> Result<(), &'static str> {
-        let pos = self
-            .active_multipart_uploads
-            .iter()
+    pub fn complete_multipart_upload(&mut self, upload_id: u32, size: u64) -> Result<(), &'static str> {
+        let pos = self.active_multipart_uploads.iter()
             .position(|u| u.upload_id == upload_id)
             .ok_or("S3 SDK: Multipart upload session not found")?;
 
@@ -252,17 +234,8 @@ impl SovereignS3Bucket {
         Ok(())
     }
 
-    pub fn generate_presigned_get_url(
-        &self,
-        key: &str,
-        duration_secs: u64,
-        current_time: u64,
-    ) -> Result<PresignedUrl, &'static str> {
-        let obj = self
-            .objects
-            .iter()
-            .find(|o| o.key == key)
-            .ok_or("S3 SDK: Object key not found")?;
+    pub fn generate_presigned_get_url(&self, key: &str, duration_secs: u64, current_time: u64) -> Result<PresignedUrl, &'static str> {
+        let obj = self.objects.iter().find(|o| o.key == key).ok_or("S3 SDK: Object key not found")?;
 
         let expiration = current_time + duration_secs;
         let mut signature: u32 = 5381;
@@ -272,12 +245,7 @@ impl SovereignS3Bucket {
         signature = signature.wrapping_mul(33).wrapping_add(expiration as u32);
 
         Ok(PresignedUrl {
-            url: std::format!(
-                "https://s3.sigma.os/{}/{}?signature={:x}",
-                self.bucket_name,
-                key,
-                signature
-            ),
+            url: std::format!("https://s3.sigma.os/{}/{}?signature={:x}", self.bucket_name, key, signature),
             expiration_timestamp: expiration,
             signature_token: signature,
         })
@@ -287,14 +255,10 @@ impl SovereignS3Bucket {
     pub fn process_lifecycle_policies(&mut self, current_age_days: u32) -> usize {
         let mut transitioned_count = 0;
         for obj in &mut self.objects {
-            if current_age_days >= self.lifecycle_transition_days_glacier
-                && obj.storage_class != StorageClass::Glacier
-            {
+            if current_age_days >= self.lifecycle_transition_days_glacier && obj.storage_class != StorageClass::Glacier {
                 obj.storage_class = StorageClass::Glacier;
                 transitioned_count += 1;
-            } else if current_age_days >= self.lifecycle_transition_days_ia
-                && obj.storage_class == StorageClass::Standard
-            {
+            } else if current_age_days >= self.lifecycle_transition_days_ia && obj.storage_class == StorageClass::Standard {
                 obj.storage_class = StorageClass::InfrequentAccess;
                 transitioned_count += 1;
             }
@@ -333,30 +297,16 @@ impl CloudProvider for SimpleCloudProvider {
         self.connected.store(0, Ordering::SeqCst);
     }
 
-    fn is_connected(&self) -> bool {
-        self.connected.load(Ordering::SeqCst) == 1
-    }
+    fn is_connected(&self) -> bool { self.connected.load(Ordering::SeqCst) == 1 }
 }
 
-struct CustomVec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
+struct CustomVec<T> { data: *mut T, len: usize, capacity: usize }
 
 impl<T> CustomVec<T> {
-    fn new() -> Self {
-        CustomVec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
+    fn new() -> Self { CustomVec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
+            if self.len >= self.capacity { self.grow(); }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -364,29 +314,19 @@ impl<T> CustomVec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
+            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
+            if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+
 
 impl<T> core::ops::Deref for CustomVec<T> {
     type Target = [T];
@@ -418,6 +358,7 @@ impl<'a, T> IntoIterator for &'a CustomVec<T> {
     }
 }
 
+
 impl<'a, T> IntoIterator for &'a mut CustomVec<T> {
     type Item = &'a mut T;
     type IntoIter = core::slice::IterMut<'a, T>;
@@ -441,17 +382,13 @@ mod tests {
         assert!(bucket.upload_part(101, 3).is_ok());
         assert!(bucket.upload_part(101, 4).is_err()); // Exceeds expected parts
 
-        assert!(bucket
-            .complete_multipart_upload(101, 1024 * 1024 * 15)
-            .is_ok());
+        assert!(bucket.complete_multipart_upload(101, 1024 * 1024 * 15).is_ok());
         assert_eq!(bucket.objects.len(), 1);
         assert_eq!(bucket.objects[0].key, "kernel-image.bin");
         assert_eq!(bucket.objects[0].storage_class, StorageClass::Standard);
 
         // Generate and verify presigned URL
-        let presigned = bucket
-            .generate_presigned_get_url("kernel-image.bin", 3600, 1000)
-            .unwrap();
+        let presigned = bucket.generate_presigned_get_url("kernel-image.bin", 3600, 1000).unwrap();
         assert!(presigned.url.contains("signature="));
         assert_eq!(presigned.expiration_timestamp, 4600);
     }
@@ -473,10 +410,7 @@ mod tests {
 
         // 45 days - transition to IA
         assert_eq!(bucket.process_lifecycle_policies(45), 1);
-        assert_eq!(
-            bucket.objects[0].storage_class,
-            StorageClass::InfrequentAccess
-        );
+        assert_eq!(bucket.objects[0].storage_class, StorageClass::InfrequentAccess);
 
         // 100 days - transition to Glacier
         assert_eq!(bucket.process_lifecycle_policies(100), 1);

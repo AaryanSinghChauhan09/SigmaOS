@@ -13,7 +13,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-pub mod aegis_vault;
 pub mod aes;
 pub mod encryption;
 pub mod hash;
@@ -27,11 +26,12 @@ pub mod primitives;
 pub mod random;
 pub mod rsa;
 pub mod vectorized_pqc;
+pub mod aegis_vault;
 
 pub use aegis_vault::{
     AegisEncryptedContainer, AegisVaultEncryptionCompressionEngine, AegisVaultError,
 };
 pub use post_quantum::{
-    DilithiumPublicKey, DilithiumSecretKey, DilithiumSignature, HybridCryptoMode, KyberCiphertext,
-    KyberPublicKey, KyberSecretKey, KyberSharedSecret, PostQuantumCryptoManager,
+    PostQuantumCryptoManager, DilithiumSecretKey, DilithiumPublicKey, DilithiumSignature,
+    KyberSecretKey, KyberPublicKey, KyberCiphertext, KyberSharedSecret, HybridCryptoMode,
 };

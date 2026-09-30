@@ -8,6 +8,8 @@ pub type CoprRepository = CoprProjectConfig;
 // 4. COPR Community Build Engine (Custom repository builds, chroot environment builds, RPM repo generation)
 // 5. Rootless OCI Container Engine (Podman / Buildah / Skopeo OCI container lifecycle and rootless user namespace isolation)
 
+
+
 #[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
 
@@ -116,11 +118,7 @@ impl FedoraKojiBuildSystemEngine {
         }
     }
 
-    pub fn complete_build_task(
-        &mut self,
-        task_id: usize,
-        success: bool,
-    ) -> Result<(), &'static str> {
+    pub fn complete_build_task(&mut self, task_id: usize, success: bool) -> Result<(), &'static str> {
         if let Some(task) = self.tasks.get_mut(&task_id) {
             if success {
                 task.state = KojiTaskState::Closed;
@@ -222,11 +220,7 @@ impl FedoraBodhiUpdateEngine {
         }
     }
 
-    pub fn cast_karma_vote(
-        &mut self,
-        update_id: &str,
-        is_positive: bool,
-    ) -> Result<i32, &'static str> {
+    pub fn cast_karma_vote(&mut self, update_id: &str, is_positive: bool) -> Result<i32, &'static str> {
         if let Some(record) = self.updates.get_mut(update_id) {
             if is_positive {
                 record.karma_score += 1;
@@ -356,10 +350,7 @@ impl FedoraCoprBuildGatewayEngine {
         let key = format!("{}/{}", owner, project);
         if let Some(config) = self.projects.get_mut(&key) {
             config.packages_built.push(package_srpm.to_string());
-            Ok(format!(
-                "https://copr.fedorainfracloud.org/coprs/{}/repo",
-                key
-            ))
+            Ok(format!("https://copr.fedorainfracloud.org/coprs/{}/repo", key))
         } else {
             Err("COPR: Project not found")
         }
@@ -469,6 +460,8 @@ impl FedoraGreenwaveDecisionEngine {
     }
 }
 
+
+
 // =========================================================================
 // 6. FEDORA MOCK CHROOT BUILD ENVIRONMENT ENGINE
 // =========================================================================
@@ -544,11 +537,7 @@ impl FedoraDnf5PackageEngine {
         let mut groups = BTreeMap::new();
         groups.insert(
             "development-tools".to_string(),
-            vec![
-                "gcc".to_string(),
-                "make".to_string(),
-                "autoconf".to_string(),
-            ],
+            vec!["gcc".to_string(), "make".to_string(), "autoconf".to_string()],
         );
 
         Self {
@@ -643,10 +632,7 @@ impl FedoraAnacondaKickstartEngine {
                     self.partitions.push(KickstartPartition {
                         mount_point: parts[1].to_string(),
                         fstype: parts[2].trim_start_matches("--fstype=").to_string(),
-                        size_mb: parts[3]
-                            .trim_start_matches("--size=")
-                            .parse()
-                            .unwrap_or(1024),
+                        size_mb: parts[3].trim_start_matches("--size=").parse().unwrap_or(1024),
                     });
                 }
             }
@@ -718,21 +704,11 @@ impl SovereignFedoraEcosystemSuite {
     }
 
     pub fn run_release_pipeline(&mut self, pkg: &str, ver: &str) -> Result<String, &'static str> {
-        let task_id =
-            self.koji
-                .submit_build_task(pkg, ver, "1", "f40-build", "sovereign-builder")?;
+        let task_id = self.koji.submit_build_task(pkg, ver, "1", "f40-build", "sovereign-builder")?;
         let rpm = self.koji.build_target(task_id)?;
-        self.bodhi.submit_update(
-            &format!("{}-update", pkg),
-            &format!("{}-{}", pkg, ver),
-            BodhiUpdateType::Enhancement,
-            &[],
-        );
+        self.bodhi.submit_update(&format!("{}-update", pkg), &format!("{}-{}", pkg, ver), BodhiUpdateType::Enhancement, &[]);
         self.bodhi.add_karma(&format!("{}-update", pkg), 3)?;
-        Ok(format!(
-            "Successfully released {} via Koji task #{}",
-            rpm, task_id
-        ))
+        Ok(format!("Successfully released {} via Koji task #{}", rpm, task_id))
     }
 }
 
@@ -778,8 +754,7 @@ mod tests {
 
     #[test]
     fn test_fedora_anaconda_kickstart_engine() {
-        let ks_content =
-            "timezone UTC\npart / --fstype=ext4 --size=20480\n%packages\n@core\nkernel\n%end";
+        let ks_content = "timezone UTC\npart / --fstype=ext4 --size=20480\n%packages\n@core\nkernel\n%end";
         let mut ks = FedoraAnacondaKickstartEngine::new();
         ks.parse_kickstart(ks_content);
 
@@ -819,31 +794,20 @@ impl FedoraWaiverDbEngine {
         }
     }
 
-    pub fn issue_waiver(
-        &mut self,
-        subject: &str,
-        test_type: &str,
-        waver: &str,
-        comment: &str,
-    ) -> usize {
+    pub fn issue_waiver(&mut self, subject: &str, test_type: &str, waver: &str, comment: &str) -> usize {
         let id = self.next_waiver_id;
         self.next_waiver_id += 1;
-        self.waivers.insert(
-            id,
-            WaiverRecord {
-                subject: subject.to_string(),
-                test_type: test_type.to_string(),
-                waver: waver.to_string(),
-                comment: comment.to_string(),
-            },
-        );
+        self.waivers.insert(id, WaiverRecord {
+            subject: subject.to_string(),
+            test_type: test_type.to_string(),
+            waver: waver.to_string(),
+            comment: comment.to_string(),
+        });
         id
     }
 
     pub fn is_waived(&self, subject: &str, test_type: &str) -> bool {
-        self.waivers
-            .values()
-            .any(|w| w.subject == subject && w.test_type == test_type)
+        self.waivers.values().any(|w| w.subject == subject && w.test_type == test_type)
     }
 }
 
@@ -874,9 +838,7 @@ impl FedoraCryptoPoliciesEngine {
 }
 
 impl Default for FedoraCryptoPoliciesEngine {
-    fn default() -> Self {
-        Self::new()
-    }
+    fn default() -> Self { Self::new() }
 }
 
 pub type FedoraMockChrootBuilderEngine = FedoraMockChrootBuilder;
@@ -908,9 +870,7 @@ impl FedoraOpenQaTestGatewayEngine {
 }
 
 impl Default for FedoraOpenQaTestGatewayEngine {
-    fn default() -> Self {
-        Self::new()
-    }
+    fn default() -> Self { Self::new() }
 }
 
 #[derive(Debug, Clone)]
@@ -927,16 +887,12 @@ pub struct FedoraRpmostreeAtomicEngine {
 
 impl FedoraRpmostreeAtomicEngine {
     pub fn new() -> Self {
-        Self {
-            deployments: Vec::new(),
-        }
+        Self { deployments: Vec::new() }
     }
 }
 
 impl Default for FedoraRpmostreeAtomicEngine {
-    fn default() -> Self {
-        Self::new()
-    }
+    fn default() -> Self { Self::new() }
 }
 
 #[derive(Debug, Clone)]

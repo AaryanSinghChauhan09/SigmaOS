@@ -1,8 +1,10 @@
 //! Bluetooth/Wireless Management (BlueZ/NetworkManager Inspiration)
 //! Bluetooth stack, WiFi management, and wireless profiles
 
-use std::string::{String, ToString};
+
+
 use std::vec::Vec;
+use std::string::{String, ToString};
 
 /// Bluetooth adapter state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -271,11 +273,7 @@ impl WirelessManager {
             total_bluetooth_adapters: self.bluetooth_adapters.len(),
             total_bluetooth_devices: self.bluetooth_devices.len(),
             paired_devices: self.bluetooth_devices.iter().filter(|d| d.paired).count(),
-            connected_devices: self
-                .bluetooth_devices
-                .iter()
-                .filter(|d| d.connected)
-                .count(),
+            connected_devices: self.bluetooth_devices.iter().filter(|d| d.connected).count(),
             wifi_state: self.wifi.state,
             wifi_networks: self.wifi.networks.len(),
         }

@@ -114,9 +114,7 @@ impl ZorinGridDesktopManager {
         match snap {
             ZorinSnapPosition::LeftHalf => (0, 0, screen_width / 2, screen_height),
             ZorinSnapPosition::RightHalf => (screen_width / 2, 0, screen_width / 2, screen_height),
-            ZorinSnapPosition::TopLeft | ZorinSnapPosition::TopLeftQuarter => {
-                (0, 0, screen_width / 2, screen_height / 2)
-            }
+            ZorinSnapPosition::TopLeft | ZorinSnapPosition::TopLeftQuarter => (0, 0, screen_width / 2, screen_height / 2),
             ZorinSnapPosition::TopRight | ZorinSnapPosition::TopRightQuarter => {
                 (screen_width / 2, 0, screen_width / 2, screen_height / 2)
             }
@@ -129,9 +127,7 @@ impl ZorinGridDesktopManager {
                 screen_width / 2,
                 screen_height / 2,
             ),
-            ZorinSnapPosition::Maximize | ZorinSnapPosition::Maximized => {
-                (0, 0, screen_width, screen_height)
-            }
+            ZorinSnapPosition::Maximize | ZorinSnapPosition::Maximized => (0, 0, screen_width, screen_height),
         }
     }
 }

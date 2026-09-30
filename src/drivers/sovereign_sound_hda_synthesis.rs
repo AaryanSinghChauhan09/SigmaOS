@@ -321,10 +321,7 @@ impl BsdHdaMixerJackDetectEngine {
                 if let Some(line_out) = self.jacks.get_mut(&0x14) {
                     line_out.is_muted = true;
                 }
-            } else if self.automute_headphones
-                && jack.jack_type == JackType::Headphone
-                && !connected
-            {
+            } else if self.automute_headphones && jack.jack_type == JackType::Headphone && !connected {
                 if let Some(line_out) = self.jacks.get_mut(&0x14) {
                     line_out.is_muted = false;
                 }

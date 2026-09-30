@@ -3,6 +3,7 @@
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, manages rolling release upgrades,
 // parses ALPM hooks, builds initramfs with mkinitcpio, packages with makepkg, and executes ALPM transactions.
 
+
 use std::format;
 use std::string::{String, ToString};
 
@@ -277,7 +278,9 @@ pub struct AlpmHookManager {
 
 impl AlpmHookManager {
     pub fn new() -> Self {
-        Self { hooks: Vec::new() }
+        Self {
+            hooks: Vec::new(),
+        }
     }
 
     pub fn add_hook(&mut self, hook: AlpmHook) {
@@ -316,7 +319,11 @@ impl AlpmHookManager {
         Ok(())
     }
 
-    pub fn trigger_hooks(&self, when: HookWhen, changed_file: &str) -> std::vec::Vec<SigmaString> {
+    pub fn trigger_hooks(
+        &self,
+        when: HookWhen,
+        changed_file: &str,
+    ) -> std::vec::Vec<SigmaString> {
         let mut triggered_cmds = std::vec::Vec::new();
         for hook in &self.hooks {
             if hook.when == when {
@@ -785,7 +792,10 @@ mod tests {
         let source_pkg = DebianSbuildPackage {
             name: SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: std::vec![SigmaString::from("gcc"), SigmaString::from("make")],
+            build_depends: std::vec![
+                SigmaString::from("gcc"),
+                SigmaString::from("make")
+            ],
         };
 
         assert!(sync.is_debian_sbuild_builddeps_satisfied(&source_pkg));
@@ -942,8 +952,7 @@ mod tests {
         let builder = MakepkgBuilder::new("ripgrep", "13.0.0", "x86_64", "SKIP");
         let source_bytes = b"cargo build --release";
 
-        let (pkg_file, pkg_data): (SigmaString, AllocVec<u8>) =
-            builder.build_package_archive(source_bytes).unwrap();
+        let (pkg_file, pkg_data): (SigmaString, AllocVec<u8>) = builder.build_package_archive(source_bytes).unwrap();
         assert_eq!(pkg_file.as_str(), "ripgrep-13.0.0-x86_64.pkg.tar.zst");
         assert!(pkg_data.len() > source_bytes.len());
     }

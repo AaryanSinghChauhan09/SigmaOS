@@ -17,4 +17,4 @@
 
 pub mod solver;
 
-pub use solver::{Matrix, MolecularDynamics, NumericIntegration};
+pub use solver::{Matrix, NumericIntegration, MolecularDynamics};

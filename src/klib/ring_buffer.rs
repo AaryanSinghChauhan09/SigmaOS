@@ -284,26 +284,14 @@ mod tests {
         let simulated_dbus_ns_per_op = 15000.0;
 
         // Verify RingBuffer sub-microsecond latency (< 100ns per push/pop cycle)
-        assert!(
-            ring_ns_per_op < 500.0,
-            "RingBuffer latency: {} ns/op",
-            ring_ns_per_op
-        );
+        assert!(ring_ns_per_op < 500.0, "RingBuffer latency: {} ns/op", ring_ns_per_op);
 
         // Verify >10x latency improvement over Linux D-Bus
         let speedup_vs_dbus = simulated_dbus_ns_per_op / ring_ns_per_op;
-        assert!(
-            speedup_vs_dbus > 10.0,
-            "Speedup vs D-Bus: {}x",
-            speedup_vs_dbus
-        );
+        assert!(speedup_vs_dbus > 10.0, "Speedup vs D-Bus: {}x", speedup_vs_dbus);
 
         // Verify >5x latency improvement over Linux pipes
         let speedup_vs_pipe = simulated_linux_pipe_ns_per_op / ring_ns_per_op;
-        assert!(
-            speedup_vs_pipe > 2.0,
-            "Speedup vs Linux Pipe: {}x",
-            speedup_vs_pipe
-        );
+        assert!(speedup_vs_pipe > 2.0, "Speedup vs Linux Pipe: {}x", speedup_vs_pipe);
     }
 }

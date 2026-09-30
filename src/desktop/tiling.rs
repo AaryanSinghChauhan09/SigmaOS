@@ -117,8 +117,7 @@ impl TilingWindowManager {
             return;
         };
 
-        let window_ids: Vec<u64> = self
-            .windows
+        let window_ids: Vec<u64> = self.windows
             .values()
             .filter(|w| w.workspace_id == workspace_id && !w.is_floating && !w.is_fullscreen)
             .map(|w| w.id)
@@ -372,11 +371,7 @@ impl TilingWindowManager {
     }
 
     /// Set workspace layout
-    pub fn set_layout(
-        &mut self,
-        workspace_id: u64,
-        layout: TilingLayout,
-    ) -> Result<(), &'static str> {
+    pub fn set_layout(&mut self, workspace_id: u64, layout: TilingLayout) -> Result<(), &'static str> {
         if let Some(workspace) = self.workspaces.get_mut(&workspace_id) {
             workspace.layout = layout;
             self.rearrange_workspace(workspace_id);
@@ -438,12 +433,7 @@ mod tests {
         let mut manager = TilingWindowManager::new();
 
         let workspace = manager.create_workspace("1".to_string(), TilingLayout::Spiral);
-        let area = WindowArea {
-            x: 0,
-            y: 0,
-            width: 800,
-            height: 600,
-        };
+        let area = WindowArea { x: 0, y: 0, width: 800, height: 600 };
 
         let window = manager.add_window(workspace.id, area);
         assert_eq!(window.id, 1);
@@ -455,12 +445,7 @@ mod tests {
         let mut manager = TilingWindowManager::new();
 
         let workspace = manager.create_workspace("1".to_string(), TilingLayout::Spiral);
-        let area = WindowArea {
-            x: 0,
-            y: 0,
-            width: 800,
-            height: 600,
-        };
+        let area = WindowArea { x: 0, y: 0, width: 800, height: 600 };
 
         let window = manager.add_window(workspace.id, area);
         assert!(manager.remove_window(window.id).is_ok());

@@ -18,10 +18,10 @@
 // Indirect Addressing (Mailboxes/Ports with 1-to-1, 1-to-N, N-to-N relationships),
 // Structured Message Headers with payload validation, sequence numbers, and delivery modes.
 
-use core::mem;
-use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 pub type ChannelID = usize;
 pub type Pid = u32;
@@ -450,10 +450,7 @@ mod tests {
 
         // Attempt from unauthorized sender 101 fails with RelationshipViolation
         let bad_header = MessageHeader::new(2, 101, 11, DeliveryMode::AsynchronousNonBlocking);
-        assert_eq!(
-            ch.send(bad_header, b"fail"),
-            Err(IPCError::RelationshipViolation)
-        );
+        assert_eq!(ch.send(bad_header, b"fail"), Err(IPCError::RelationshipViolation));
 
         let (recv_header, payload) = ch.receive().unwrap();
         assert_eq!(recv_header.recipient_pid, Some(200));
@@ -462,15 +459,11 @@ mod tests {
 
     #[test]
     fn test_indirect_addressing_one_to_many() {
-        let mut ch =
-            SimpleMessageChannel::new_indirect(2, 10, 5000, ProcessRelationship::OneToMany);
+        let mut ch = SimpleMessageChannel::new_indirect(2, 10, 5000, ProcessRelationship::OneToMany);
         ch.register_sender(100).unwrap();
 
         // Second sender registration fails due to 1-to-N constraint
-        assert_eq!(
-            ch.register_sender(101),
-            Err(IPCError::RelationshipViolation)
-        );
+        assert_eq!(ch.register_sender(101), Err(IPCError::RelationshipViolation));
 
         // Multiple receivers can register
         assert!(ch.register_receiver(201).is_ok());
@@ -491,9 +484,6 @@ mod tests {
         let oversized_payload = [0u8; 300];
 
         // Should return PayloadTooLarge error
-        assert_eq!(
-            ch.send(header, &oversized_payload),
-            Err(IPCError::PayloadTooLarge)
-        );
+        assert_eq!(ch.send(header, &oversized_payload), Err(IPCError::PayloadTooLarge));
     }
 }

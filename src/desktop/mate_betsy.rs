@@ -2,6 +2,7 @@
 //! Replicates MATE Desktop Environment components: Marco (WM), Caja (File Manager),
 //! Pluma (Text Editor), Atril (Document Viewer), and Eye of MATE (EOM Image Viewer).
 
+
 use std::format;
 use std::string::{String, ToString};
 use std::vec;

@@ -82,12 +82,7 @@ impl GamepadManager {
     }
 
     /// Register a gamepad device
-    pub fn register_device(
-        &mut self,
-        name: String,
-        vendor_id: u16,
-        product_id: u16,
-    ) -> GamepadDevice {
+    pub fn register_device(&mut self, name: String, vendor_id: u16, product_id: u16) -> GamepadDevice {
         let id = self.next_device_id.fetch_add(1, Ordering::SeqCst);
 
         let device = GamepadDevice {
@@ -114,11 +109,7 @@ impl GamepadManager {
     }
 
     /// Handle button press
-    pub fn handle_button_press(
-        &mut self,
-        device_id: u64,
-        button: GamepadButton,
-    ) -> Result<(), &'static str> {
+    pub fn handle_button_press(&mut self, device_id: u64, button: GamepadButton) -> Result<(), &'static str> {
         if let Some(device) = self.devices.get_mut(&device_id) {
             device.button_states.insert(button, true);
 
@@ -139,11 +130,7 @@ impl GamepadManager {
     }
 
     /// Handle button release
-    pub fn handle_button_release(
-        &mut self,
-        device_id: u64,
-        button: GamepadButton,
-    ) -> Result<(), &'static str> {
+    pub fn handle_button_release(&mut self, device_id: u64, button: GamepadButton) -> Result<(), &'static str> {
         if let Some(device) = self.devices.get_mut(&device_id) {
             device.button_states.insert(button, false);
 
@@ -164,12 +151,7 @@ impl GamepadManager {
     }
 
     /// Handle axis movement
-    pub fn handle_axis_move(
-        &mut self,
-        device_id: u64,
-        axis: GamepadAxis,
-        value: i16,
-    ) -> Result<(), &'static str> {
+    pub fn handle_axis_move(&mut self, device_id: u64, axis: GamepadAxis, value: i16) -> Result<(), &'static str> {
         if let Some(device) = self.devices.get_mut(&device_id) {
             device.axis_values.insert(axis, value);
 
@@ -205,16 +187,12 @@ impl GamepadManager {
 
     /// Get button state
     pub fn get_button_state(&self, device_id: u64, button: GamepadButton) -> Option<bool> {
-        self.devices
-            .get(&device_id)
-            .and_then(|d| d.button_states.get(&button).copied())
+        self.devices.get(&device_id).and_then(|d| d.button_states.get(&button).copied())
     }
 
     /// Get axis value
     pub fn get_axis_value(&self, device_id: u64, axis: GamepadAxis) -> Option<i16> {
-        self.devices
-            .get(&device_id)
-            .and_then(|d| d.axis_values.get(&axis).copied())
+        self.devices.get(&device_id).and_then(|d| d.axis_values.get(&axis).copied())
     }
 
     /// Get all devices
@@ -256,9 +234,7 @@ mod tests {
         let mut manager = GamepadManager::new();
 
         let device = manager.register_device("Xbox Controller".to_string(), 0x045e, 0x028e);
-        assert!(manager
-            .handle_button_press(device.id, GamepadButton::A)
-            .is_ok());
+        assert!(manager.handle_button_press(device.id, GamepadButton::A).is_ok());
 
         let state = manager.get_button_state(device.id, GamepadButton::A);
         assert_eq!(state, Some(true));
@@ -269,12 +245,8 @@ mod tests {
         let mut manager = GamepadManager::new();
 
         let device = manager.register_device("Xbox Controller".to_string(), 0x045e, 0x028e);
-        manager
-            .handle_button_press(device.id, GamepadButton::A)
-            .unwrap();
-        assert!(manager
-            .handle_button_release(device.id, GamepadButton::A)
-            .is_ok());
+        manager.handle_button_press(device.id, GamepadButton::A).unwrap();
+        assert!(manager.handle_button_release(device.id, GamepadButton::A).is_ok());
 
         let state = manager.get_button_state(device.id, GamepadButton::A);
         assert_eq!(state, Some(false));
@@ -285,9 +257,7 @@ mod tests {
         let mut manager = GamepadManager::new();
 
         let device = manager.register_device("Xbox Controller".to_string(), 0x045e, 0x028e);
-        assert!(manager
-            .handle_axis_move(device.id, GamepadAxis::LeftStickX, 100)
-            .is_ok());
+        assert!(manager.handle_axis_move(device.id, GamepadAxis::LeftStickX, 100).is_ok());
 
         let value = manager.get_axis_value(device.id, GamepadAxis::LeftStickX);
         assert_eq!(value, Some(100));
@@ -298,9 +268,7 @@ mod tests {
         let mut manager = GamepadManager::new();
 
         let device = manager.register_device("Xbox Controller".to_string(), 0x045e, 0x028e);
-        manager
-            .handle_button_press(device.id, GamepadButton::A)
-            .unwrap();
+        manager.handle_button_press(device.id, GamepadButton::A).unwrap();
 
         assert_eq!(manager.event_count(), 1);
 
