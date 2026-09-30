@@ -16,6 +16,17 @@ SigmaOS implements multiple layers of security:
 4. Filesystem encryption interfaces; audited providers are not integrated
 5. Network security models, which require runtime and protocol review
 
+### User account credential APIs
+
+`src/functions/user.rs` does not include an audited password-hashing provider or
+account-state backend. Hashing, verification, setting a password, and account
+lock/unlock requests return `UserError::ProviderUnavailable`; they do not claim
+success or authenticate users. `PasswordPolicy` checks character count, case,
+ASCII digits, and the configured special-character requirement, but policy
+validation alone is not authentication. AI agents maintaining this API must
+preserve unavailable-provider failures and uniform verification errors until
+audited hash storage and real account-state enforcement are integrated.
+
 ## Pledge/Unveil Sandbox
 
 ### Pledge
