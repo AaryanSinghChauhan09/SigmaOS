@@ -353,3 +353,18 @@ gatt disconnect 1
 - [Desktop](08-Desktop.md) - Desktop security settings
 - [Packaging](09-Packaging.md) - Package security and signing
 - [Kernel](04-Kernel.md) - Kernel security features
+
+## Seccomp-BPF filter compiler
+
+`src/security/seccomp_filter.rs` contains a classic BPF filter compiler for syscall numbers and up to six 64-bit arguments. Compilation returns an error for an invalid argument index or a program larger than the classic BPF instruction limit. The generated program must still be validated and installed by the platform's syscall boundary before it can enforce a policy; compiling a filter alone does not sandbox a running process.
+
+Maintain this component by checking opcode encodings, forward jump targets, native-endian argument word offsets, 64-bit comparisons, and default-action behavior together. Run `cargo test --lib security::seccomp_filter::tests` and `cargo check --lib` after edits. Do not weaken the default action or claim runtime enforcement unless the kernel integration path and its end-to-end checks are present.
+
+## Documentation status
+
+Commands shown on this page describe intended interfaces unless the corresponding executable or syscall integration exists in the current repository. Verify command names and runtime behavior before documenting them as available. Security claims must identify whether they are implemented, prototype-only, or planned. Never add real keys, passwords, salts, nonces, or other secret material to examples or source files.
+
+## See also
+
+- [AI Agent Guidelines](13-Agents.md) - Component ownership and maintenance workflow
+- [Kernel](04-Kernel.md) - Syscall integration points
