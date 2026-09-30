@@ -5,6 +5,8 @@
 
 use std::vec::Vec;
 
+const MAX_DECOMPRESSED_PAYLOAD_SIZE: usize = 64 * 1024 * 1024;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum AegisVaultError {
     /// No audited cryptographic provider is wired to this experimental format.
@@ -14,6 +16,7 @@ pub enum AegisVaultError {
     IntegrityCheckFailed,
     SignatureVerificationFailed,
     DecompressionError,
+    DecompressedPayloadTooLarge,
     CompressionError,
 }
 
@@ -97,16 +100,32 @@ impl AegisVaultEncryptionCompressionEngine {
         let mut i = 0;
         while i < compressed.len() {
             if compressed[i] == 0xFF {
-                if i + 2 >= compressed.len() {
+                if compressed.len() - i < 3 {
                     return Err(AegisVaultError::DecompressionError);
                 }
                 let count = compressed[i + 1] as usize;
                 let byte = compressed[i + 2];
+                let new_len = decompressed
+                    .len()
+                    .checked_add(count)
+                    .ok_or(AegisVaultError::DecompressedPayloadTooLarge)?;
+                if new_len > MAX_DECOMPRESSED_PAYLOAD_SIZE {
+                    return Err(AegisVaultError::DecompressedPayloadTooLarge);
+                }
+                decompressed
+                    .try_reserve(count)
+                    .map_err(|_| AegisVaultError::DecompressedPayloadTooLarge)?;
                 for _ in 0..count {
                     decompressed.push(byte);
                 }
                 i += 3;
             } else {
+                if decompressed.len() == MAX_DECOMPRESSED_PAYLOAD_SIZE {
+                    return Err(AegisVaultError::DecompressedPayloadTooLarge);
+                }
+                decompressed
+                    .try_reserve(1)
+                    .map_err(|_| AegisVaultError::DecompressedPayloadTooLarge)?;
                 decompressed.push(compressed[i]);
                 i += 1;
             }
@@ -176,6 +195,20 @@ mod tests {
         assert_eq!(
             engine.decrypt_and_decompress_data(&container, "test"),
             Err(AegisVaultError::CryptoProviderUnavailable)
+        );
+    }
+
+    #[test]
+    fn decompression_rejects_output_over_limit() {
+        let engine = AegisVaultEncryptionCompressionEngine::new();
+        let mut compressed = Vec::with_capacity((MAX_DECOMPRESSED_PAYLOAD_SIZE / 255 + 1) * 3);
+        while compressed.len() <= (MAX_DECOMPRESSED_PAYLOAD_SIZE / 255) * 3 {
+            compressed.extend_from_slice(&[0xFF, 255, b'x']);
+        }
+
+        assert_eq!(
+            engine.decompress_payload(&compressed),
+            Err(AegisVaultError::DecompressedPayloadTooLarge)
         );
     }
 }
