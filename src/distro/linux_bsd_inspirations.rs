@@ -3596,25 +3596,57 @@ mod cross_subsystem_tests {
             ServiceSupervisorType::OpenRC
         );
 
-        let ubuntu_srv_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxUbuntuServer);
-        assert_eq!(ubuntu_srv_bridge.translate_package_specifier("app"), "app.deb");
-        assert_eq!(ubuntu_srv_bridge.get_supervisor_type(), ServiceSupervisorType::Systemd);
+        let ubuntu_srv_bridge =
+            SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxUbuntuServer);
+        assert_eq!(
+            ubuntu_srv_bridge.translate_package_specifier("app"),
+            "app.deb"
+        );
+        assert_eq!(
+            ubuntu_srv_bridge.get_supervisor_type(),
+            ServiceSupervisorType::Systemd
+        );
 
-        let pop_cosmic_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxPopOsCosmic);
-        assert_eq!(pop_cosmic_bridge.translate_package_specifier("app"), "app.deb");
-        assert_eq!(pop_cosmic_bridge.get_supervisor_type(), ServiceSupervisorType::Systemd);
+        let pop_cosmic_bridge =
+            SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxPopOsCosmic);
+        assert_eq!(
+            pop_cosmic_bridge.translate_package_specifier("app"),
+            "app.deb"
+        );
+        assert_eq!(
+            pop_cosmic_bridge.get_supervisor_type(),
+            ServiceSupervisorType::Systemd
+        );
 
-        let fbsd_hardened_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::FreeBsdHardened);
-        assert_eq!(fbsd_hardened_bridge.translate_package_specifier("app"), "app.pkg");
-        assert_eq!(fbsd_hardened_bridge.get_supervisor_type(), ServiceSupervisorType::OpenRC);
+        let fbsd_hardened_bridge =
+            SovereignUniversalDistroBridge::new(DistroSubsystemMode::FreeBsdHardened);
+        assert_eq!(
+            fbsd_hardened_bridge.translate_package_specifier("app"),
+            "app.pkg"
+        );
+        assert_eq!(
+            fbsd_hardened_bridge.get_supervisor_type(),
+            ServiceSupervisorType::OpenRC
+        );
 
-        let hammer2_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::DragonFlyHammer2);
+        let hammer2_bridge =
+            SovereignUniversalDistroBridge::new(DistroSubsystemMode::DragonFlyHammer2);
         assert_eq!(hammer2_bridge.translate_package_specifier("app"), "app.pkg");
-        assert_eq!(hammer2_bridge.get_supervisor_type(), ServiceSupervisorType::OpenRC);
+        assert_eq!(
+            hammer2_bridge.get_supervisor_type(),
+            ServiceSupervisorType::OpenRC
+        );
 
-        let smartos_sol_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::SolarisSmartOS);
-        assert_eq!(smartos_sol_bridge.translate_package_specifier("app"), "app.p5p");
-        assert_eq!(smartos_sol_bridge.get_supervisor_type(), ServiceSupervisorType::Smf);
+        let smartos_sol_bridge =
+            SovereignUniversalDistroBridge::new(DistroSubsystemMode::SolarisSmartOS);
+        assert_eq!(
+            smartos_sol_bridge.translate_package_specifier("app"),
+            "app.p5p"
+        );
+        assert_eq!(
+            smartos_sol_bridge.get_supervisor_type(),
+            ServiceSupervisorType::Smf
+        );
     }
 
     #[test]
