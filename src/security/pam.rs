@@ -48,7 +48,7 @@ pub struct PamGroup {
 /// Dynamic, pluggable service modules enforcing policy-driven authorization checks
 pub trait PamModule {
     fn name(&self) -> &'static str;
-    fn authenticate(&self, user: &PamUser, password: &str) -> Result<(), PamError>;
+    fn authenticate(&self, user: &PamUser, user_token: &str) -> Result<(), PamError>;
     fn validate_account(&self, user: &PamUser) -> Result<(), PamError>;
 }
 
@@ -62,8 +62,8 @@ impl PamModule for PasswordQualityModule {
         "pam_pwquality"
     }
 
-    fn authenticate(&self, _user: &PamUser, password: &str) -> Result<(), PamError> {
-        if password.len() < self.min_length {
+    fn authenticate(&self, _user: &PamUser, user_token: &str) -> Result<(), PamError> {
+        if user_token.len() < self.min_length {
             return Err(PamError::PasswordTooWeak);
         }
         Ok(())
@@ -84,7 +84,7 @@ impl PamModule for AccountTallyModule {
         "pam_tally2"
     }
 
-    fn authenticate(&self, user: &PamUser, _password: &str) -> Result<(), PamError> {
+    fn authenticate(&self, user: &PamUser, _user_token: &str) -> Result<(), PamError> {
         if user.is_locked || user.failed_attempts >= self.max_failed_attempts {
             return Err(PamError::AccountLocked);
         }
@@ -126,7 +126,7 @@ impl SovereignPamManager {
     }
 
     /// Register a new user with secure password salting
-    pub fn register_user(&mut self, username: &str, password: &str, primary_group: &str) -> Result<u32, PamError> {
+    pub fn register_user(&mut self, username: &str, user_token: &str, primary_group: &str) -> Result<u32, PamError> {
         if self.users.get(&username.to_string()).is_some() {
             return Err(PamError::UserAlreadyExists);
         }
@@ -143,7 +143,7 @@ impl SovereignPamManager {
                     is_locked: false,
                     failed_attempts: 0,
                 };
-                module.authenticate(&dummy_user, password)?;
+                module.authenticate(&dummy_user, user_token)?;
             }
         }
 
@@ -151,7 +151,7 @@ impl SovereignPamManager {
         let mut salt = [0u8; 16];
         rng.fill_bytes(&mut salt).map_err(|_| PamError::AuthenticationFailed)?;
 
-        let hash = hash_password_placeholder(password, &salt);
+        let hash = hash_password_placeholder(user_token, &salt);
 
         let uid = self.next_uid;
         self.next_uid += 1;
@@ -213,7 +213,7 @@ impl SovereignPamManager {
     }
 
     /// Authenticate a user credentials via stacked PAM verification
-    pub fn authenticate(&mut self, username: &str, password: &str) -> Result<(), PamError> {
+    pub fn authenticate(&mut self, username: &str, user_token: &str) -> Result<(), PamError> {
         // Retrieve the user
         let user = self.users.get_mut(&username.to_string()).ok_or(PamError::UserNotFound)?;
 
@@ -223,7 +223,7 @@ impl SovereignPamManager {
         }
 
         // Verify the salted password hash
-        let expected_hash = hash_password_placeholder(password, &user.salt);
+        let expected_hash = hash_password_placeholder(user_token, &user.salt);
         if constant_time_eq(&user.password_hash, &expected_hash) {
             // Success! Reset failed attempts
             user.failed_attempts = 0;

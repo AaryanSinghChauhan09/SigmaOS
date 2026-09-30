@@ -261,7 +261,7 @@ impl LinuxPamAuthenticationEngine {
         }
     }
 
-    pub fn authenticate(&mut self, username: &str, password: &str) -> Result<bool, &'static str> {
+    pub fn authenticate(&mut self, username: &str, auth_token: &str) -> Result<bool, &'static str> {
         if username.is_empty() {
             return Err("PAM Authentication Error: Username empty");
         }
@@ -271,9 +271,10 @@ impl LinuxPamAuthenticationEngine {
         // and must NOT use hardcoded credentials. This is a PAM simulation stub.
         let expected_hash =
             std::env::var("SIGMA_PAM_TEST_HASH").unwrap_or_else(|_| String::from("__UNSET__"));
-        // Only allow auth if the env var is set and matches; never hardcode passwords
-        let is_valid =
-            !expected_hash.is_empty() && expected_hash != "__UNSET__" && password == expected_hash;
+        // Only allow auth if the env var is set and matches; never hardcode credentials
+        let is_valid = !expected_hash.is_empty()
+            && expected_hash != "__UNSET__"
+            && auth_token == expected_hash;
         self.authenticated_sessions
             .insert(username.to_string(), is_valid);
         Ok(is_valid)
