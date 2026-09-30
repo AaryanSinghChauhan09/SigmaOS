@@ -29,6 +29,7 @@ This file records verified work and known limitations. It does not claim that Si
 - `cargo fmt --check` passed after the latest local changes.
 - Focused library tests passed for `tr` (5), PQC empty-input handling (2), distro authentication (11), package lookup (3), launcher search (6), AES fail-closed behavior (2), XOR encryption (1), vault adapters (1), secret manager (3), unavailable PQC provider (1), secure randomness/password hashing failure (1), PAM registration fail-closed behavior (1), and clipboard plaintext labeling (1).
 - Focused fail-closed tests passed for the RNG and simulated audit; the combined security fail-closed filter passed 7 tests.
+- The complete library suite passed after the crypto changes: 3,167 passed, 0 failed. A subsequent focused ASLR invalid-configuration test also passed.
 - `cargo check --lib` passed earlier in this work; later code changes were compiled by the focused library test builds.
 - `./run_sigma_tests.sh` passed in an earlier verification run. Python `pytest` could not run because `pytest` is not installed in the environment.
 - GitHub Actions for the latest `main` commit were queued when this snapshot was written. Their results are not yet known; check the current run list before relying on CI status.
@@ -39,6 +40,7 @@ This file records verified work and known limitations. It does not claim that Si
 - GitHub code scanning still reports open findings. The returned alert instances pointed to an older analysis commit (`f586d5bb`), and a fresh CodeQL run for current `main` was queued. Recheck the findings after that run before treating stale locations as current.
 - `src/crypto/libsodium.rs`, `src/crypto/pqc_dilithium.rs`, other post-quantum modules, and `src/crypto/advanced_encryption_standard.rs` contain prototype or simulated algorithms. They are not safe substitutes for audited cryptographic implementations. Do not use them for real data, credentials, package authenticity, or network protection. `src/security/secrets.rs` still stores raw in-memory data and is not secure secret storage.
 - Many kernel, driver, distro, and desktop components remain models, placeholders, or incomplete integrations. Unit tests for a model do not prove hardware, kernel, or runtime behavior.
+- `src/security/memory_protection.rs` computes only a best-effort time-derived ASLR model; it is not a CSPRNG and does not provide production address-space randomization or kernel stack-canary integration.
 - No Markdown proposal has been confirmed fully implemented end to end in this pass, so none was transferred out of the repository or deleted.
 - Broad PR integration, stale security findings, runtime integration, performance benchmarking, complete branch reduction, and full Wiki parity remain unfinished.
 

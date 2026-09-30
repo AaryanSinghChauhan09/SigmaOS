@@ -292,20 +292,11 @@ mod tests {
         let mut manager = SovereignPamManager::new();
         manager.create_group("wheel").unwrap();
 
-        // Register user
-        let uid = manager
-            .register_user("aaryan", "super-secret-pass", "wheel")
-            .unwrap();
-        assert_eq!(uid, 1000);
-
-        // Authenticate user successfully
-        assert!(manager.authenticate("aaryan", "super-secret-pass").is_ok());
-
-        // Fail authentication with wrong password
         assert_eq!(
-            manager.authenticate("aaryan", "wrong-pass"),
+            manager.register_user("aaryan", "super-secret-pass", "wheel"),
             Err(PamError::AuthenticationFailed)
         );
+        assert!(manager.users.is_empty());
     }
 
     #[test]
@@ -321,10 +312,13 @@ mod tests {
             Err(PamError::PasswordTooWeak)
         );
 
-        // Attempt strong password registration -> passes
-        assert!(manager
-            .register_user("bob", "strongpassword", "users")
-            .is_ok());
+        // Password policy passes, but account creation fails closed without
+        // secure randomness and a vetted password-hashing provider.
+        assert_eq!(
+            manager.register_user("bob", "strongpassword", "users"),
+            Err(PamError::AuthenticationFailed)
+        );
+        assert!(manager.users.is_empty());
     }
 
     #[test]
@@ -334,19 +328,10 @@ mod tests {
             max_failed_attempts: 3,
         }));
 
-        manager
-            .register_user("alice", "validpass123", "users")
-            .unwrap();
-
-        // 3 consecutive failed attempts
-        assert!(manager.authenticate("alice", "bad").is_err());
-        assert!(manager.authenticate("alice", "bad").is_err());
-        assert!(manager.authenticate("alice", "bad").is_err());
-
-        // Account is locked! Even valid password fails now
         assert_eq!(
-            manager.authenticate("alice", "validpass123"),
-            Err(PamError::AccountLocked)
+            manager.register_user("alice", "validpass123", "users"),
+            Err(PamError::AuthenticationFailed)
         );
+        assert!(manager.users.is_empty());
     }
 }
