@@ -16,7 +16,6 @@
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
-use core::mem;
 /// Random-generator API placeholder. No audited CSPRNG provider is integrated,
 /// so this type must never emit key or nonce material.
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -216,65 +215,15 @@ impl ProductionCryptoEnclave {
     }
 
     /// Reports unavailable until audited crypto and signature checks are integrated.
-    pub fn perform_security_audit(&mut self, hrng: &HardwareRng) -> SecurityAuditReport {
+    pub fn perform_security_audit(&mut self, _hrng: &HardwareRng) -> SecurityAuditReport {
         self.audit_passed = false;
 
         SecurityAuditReport {
             verified_algorithms: std::vec::Vec::new(),
-            hardware_rng_active: hrng.total_harvested_bytes > 0,
+            hardware_rng_active: false,
             signatures_intact: false,
         }
     }
-}
-
-struct VecImpl<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-
-impl<T> VecImpl<T> {
-    fn new() -> Self {
-        VecImpl {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
 }
 
 #[cfg(test)]
@@ -302,9 +251,11 @@ mod fail_closed_tests {
     fn unavailable_hardware_rng_and_audit_do_not_claim_success() {
         let mut rng = HardwareRng::new();
         assert_eq!(rng.get_hardware_u64(), None);
+        rng.total_harvested_bytes = 8;
         let mut audit = ProductionCryptoEnclave::new(b"test-key");
         let report = audit.perform_security_audit(&rng);
         assert!(!audit.audit_passed);
+        assert!(!report.hardware_rng_active);
         assert!(!report.signatures_intact);
         assert!(report.verified_algorithms.is_empty());
     }
