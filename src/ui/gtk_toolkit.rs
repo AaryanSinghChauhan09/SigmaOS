@@ -1,8 +1,9 @@
-use core::sync::atomic::{AtomicUsize, Ordering};
+
 use std::boxed::Box;
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Widget ID counter
 static NEXT_GTK_WIDGET_ID: AtomicUsize = AtomicUsize::new(1000);
@@ -682,11 +683,7 @@ mod tests {
         assert!(panel.render_bar_summary().contains("Clock=10:45 AM"));
 
         let mut dock = SovereignDockBar::new();
-        dock.pin_app(
-            "org.sigmaos.calculator",
-            "Calculator",
-            "accessories-calculator-symbolic",
-        );
+        dock.pin_app("org.sigmaos.calculator", "Calculator", "accessories-calculator-symbolic");
         dock.set_hover_magnification("org.sigmaos.calculator", 140);
         assert_eq!(dock.items.len(), 4);
         assert_eq!(dock.items[3].magnification_factor, 140);

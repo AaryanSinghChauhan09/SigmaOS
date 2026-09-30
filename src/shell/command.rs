@@ -1,5 +1,5 @@
-use core::sync::atomic::{AtomicUsize, Ordering};
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type ShellVec<T> = std::vec::Vec<T>;
 pub type CommandID = usize;
@@ -411,8 +411,7 @@ impl DirectoryStack {
 }
 
 /// Global directory stack (thread-safe with OnceLock)
-static GLOBAL_DIR_STACK: std::sync::OnceLock<std::sync::Mutex<DirectoryStack>> =
-    std::sync::OnceLock::new();
+static GLOBAL_DIR_STACK: std::sync::OnceLock<std::sync::Mutex<DirectoryStack>> = std::sync::OnceLock::new();
 
 fn get_global_dir_stack() -> &'static std::sync::Mutex<DirectoryStack> {
     GLOBAL_DIR_STACK.get_or_init(|| std::sync::Mutex::new(DirectoryStack::new()))
@@ -432,7 +431,7 @@ impl ShellCommand for PushdCommand {
         if !args.is_empty() {
             let len = args[0].iter().position(|&b| b == 0).unwrap_or(64);
             if len > 0 {
-                if let Ok(stack_mutex) = get_global_dir_stack().lock() {
+                if let Ok(_stack_mutex) = get_global_dir_stack().lock() {
                     // Note: cannot push while holding Mutex in this simple example
                     // In production, use interior mutability or restructure
                 }
@@ -462,7 +461,7 @@ impl ShellCommand for PopdCommand {
         let mut output = ShellVec::new();
         if let Ok(stack_mutex) = get_global_dir_stack().lock() {
             if !stack_mutex.stack.is_empty() {
-                let last_idx = stack_mutex.stack.len() - 1;
+                let _last_idx = stack_mutex.stack.len() - 1;
                 // Note: cannot remove while holding Mutex in this simple example
                 // In production, use interior mutability or restructure
                 for &b in b"popd: popped directory\n" {

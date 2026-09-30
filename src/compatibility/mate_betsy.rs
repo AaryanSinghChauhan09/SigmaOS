@@ -45,11 +45,7 @@ impl MatePackagesBetsyEngine {
             name: "mate-desktop-environment".to_string(),
             version: "1.16.0".to_string(),
             category: MateBetsyCategory::MateDesktopEnv,
-            dependencies: vec![
-                "mate-panel".to_string(),
-                "caja".to_string(),
-                "marco".to_string(),
-            ],
+            dependencies: vec!["mate-panel".to_string(), "caja".to_string(), "marco".to_string()],
             installed: true,
             pin_priority: 700,
         });
@@ -111,11 +107,7 @@ impl MatePackagesBetsyEngine {
         }
     }
 
-    pub fn set_apt_pin_priority(
-        &mut self,
-        pkg_name: &str,
-        priority: i32,
-    ) -> Result<(), &'static str> {
+    pub fn set_apt_pin_priority(&mut self, pkg_name: &str, priority: i32) -> Result<(), &'static str> {
         if let Some(pkg) = self.packages.get_mut(pkg_name) {
             pkg.pin_priority = priority;
             Ok(())
@@ -124,10 +116,7 @@ impl MatePackagesBetsyEngine {
         }
     }
 
-    pub fn query_packages_by_category(
-        &self,
-        category: MateBetsyCategory,
-    ) -> Vec<&MateBetsyPackage> {
+    pub fn query_packages_by_category(&self, category: MateBetsyCategory) -> Vec<&MateBetsyPackage> {
         self.packages
             .values()
             .filter(|p| p.category == category)
@@ -148,10 +137,7 @@ mod tests {
     #[test]
     fn test_mate_packages_betsy_engine() {
         let mut engine = MatePackagesBetsyEngine::new();
-        assert_eq!(
-            engine.active_distribution,
-            "LMDE 2 Betsy (Debian Jessie Base)"
-        );
+        assert_eq!(engine.active_distribution, "LMDE 2 Betsy (Debian Jessie Base)");
 
         // Test Category Query
         let applets = engine.query_packages_by_category(MateBetsyCategory::MateApplets);
@@ -185,25 +171,14 @@ mod tests {
         let pluma_installed = engine.install_package("pluma").unwrap();
         assert_eq!(pluma_installed, 2);
         assert!(engine.packages.get("pluma").unwrap().installed);
-        assert!(
-            engine
-                .packages
-                .get("libgtksourceview-3.0")
-                .unwrap()
-                .installed
-        );
+        assert!(engine.packages.get("libgtksourceview-3.0").unwrap().installed);
 
         // Test Non-existent package error handling
         assert!(engine.install_package("non-existent-pkg").is_err());
-        assert!(engine
-            .set_apt_pin_priority("non-existent-pkg", 100)
-            .is_err());
+        assert!(engine.set_apt_pin_priority("non-existent-pkg", 100).is_err());
 
         // Test APT Pin Priority Setting
         assert!(engine.set_apt_pin_priority("mate-applets", 900).is_ok());
-        assert_eq!(
-            engine.packages.get("mate-applets").unwrap().pin_priority,
-            900
-        );
+        assert_eq!(engine.packages.get("mate-applets").unwrap().pin_priority, 900);
     }
 }

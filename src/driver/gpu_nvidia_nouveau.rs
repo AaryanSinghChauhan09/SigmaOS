@@ -2,9 +2,9 @@
 // SigmaOS NVIDIA Open-GPU / Nouveau / NVK GPU & DRM/KMS Driver
 // Supports NVIDIA Turing, Ampere, Ada Lovelace, and Blackwell GPUs with GSP firmware & NVK Vulkan compatibility
 
-use core::sync::atomic::{AtomicU64, Ordering};
-use std::sync::Arc;
 use std::vec::Vec;
+use std::sync::Arc;
+use core::sync::atomic::{AtomicU64, Ordering};
 
 #[cfg(not(test))]
 use crate::driver::pci_enumeration::{PciDeviceInfo, PciDriver};
@@ -50,12 +50,12 @@ pub const BLACKWELL_B200: u16 = 0x2900;
 
 // MMIO Register Offsets & Memory Layout
 pub const MMIO_VRAM_SIZE_DEFAULT: usize = 1024 * 1024 * 1024; // 1 GB minimum
-pub const NV_PMC_BOOT_0: u32 = 0x00000000; // Boot architecture ID
-pub const NV_PMC_INTR_0: u32 = 0x00000100; // Interrupt status
-pub const NV_PMC_INTR_EN_0: u32 = 0x00000140; // Interrupt enable
-pub const NV_FIFO_ENG_RUNLIST_BASE: u32 = 0x00002600; // FIFO Runlist Base
-pub const NV_DISP_HEAD_SET_CONTROL: u32 = 0x00610000; // Display head control
-pub const NV_GSP_FW_BOOT_CTRL: u32 = 0x00110000; // GSP firmware boot control
+pub const NV_PMC_BOOT_0: u32 = 0x00000000;                     // Boot architecture ID
+pub const NV_PMC_INTR_0: u32 = 0x00000100;                     // Interrupt status
+pub const NV_PMC_INTR_EN_0: u32 = 0x00000140;                  // Interrupt enable
+pub const NV_FIFO_ENG_RUNLIST_BASE: u32 = 0x00002600;          // FIFO Runlist Base
+pub const NV_DISP_HEAD_SET_CONTROL: u32 = 0x00610000;          // Display head control
+pub const NV_GSP_FW_BOOT_CTRL: u32 = 0x00110000;               // GSP firmware boot control
 
 /// NVIDIA GPU Architecture Family
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -120,12 +120,8 @@ pub struct NvidiaGpuDriver {
 impl NvidiaGpuDriver {
     pub fn new(device_id: u16) -> Self {
         let architecture = match device_id {
-            TURING_RTX_2080_TI | TURING_RTX_2080 | TURING_RTX_2070 | TURING_GTX_1660_TI => {
-                NvidiaArchitecture::Turing
-            }
-            AMPERE_RTX_3090 | AMPERE_RTX_3080 | AMPERE_RTX_3070 | AMPERE_RTX_3060_TI => {
-                NvidiaArchitecture::Ampere
-            }
+            TURING_RTX_2080_TI | TURING_RTX_2080 | TURING_RTX_2070 | TURING_GTX_1660_TI => NvidiaArchitecture::Turing,
+            AMPERE_RTX_3090 | AMPERE_RTX_3080 | AMPERE_RTX_3070 | AMPERE_RTX_3060_TI => NvidiaArchitecture::Ampere,
             ADA_RTX_4090 | ADA_RTX_4080 | ADA_RTX_4070_TI => NvidiaArchitecture::AdaLovelace,
             BLACKWELL_B200 => NvidiaArchitecture::Blackwell,
             other => NvidiaArchitecture::Unknown(other as u32),
@@ -159,11 +155,7 @@ impl NvidiaGpuDriver {
     }
 
     /// Allocate a FIFO channel for pushbuffer command execution
-    pub fn allocate_fifo_channel(
-        &mut self,
-        channel_id: u32,
-        pushbuffer_words: usize,
-    ) -> Result<u32, &'static str> {
+    pub fn allocate_fifo_channel(&mut self, channel_id: u32, pushbuffer_words: usize) -> Result<u32, &'static str> {
         if self.gsp_state != GspFirmwareState::Ready {
             return Err("GSP firmware must be initialized prior to FIFO allocation");
         }
@@ -180,11 +172,7 @@ impl NvidiaGpuDriver {
     }
 
     /// Allocate VRAM GEM buffer object
-    pub fn allocate_vram_buffer(
-        &mut self,
-        handle: u32,
-        size_bytes: usize,
-    ) -> Result<u64, &'static str> {
+    pub fn allocate_vram_buffer(&mut self, handle: u32, size_bytes: usize) -> Result<u64, &'static str> {
         if self.vram_allocated_bytes + size_bytes > self.vram_total_bytes {
             return Err("Out of VRAM memory");
         }
@@ -220,12 +208,7 @@ impl NvidiaGpuDriver {
     }
 
     /// Configure Atomic KMS display mode
-    pub fn set_display_mode(
-        &mut self,
-        width: u32,
-        height: u32,
-        refresh_rate_hz: u32,
-    ) -> Result<(), &'static str> {
+    pub fn set_display_mode(&mut self, width: u32, height: u32, refresh_rate_hz: u32) -> Result<(), &'static str> {
         self.display_mode = NvidiaDisplayMode {
             width,
             height,

@@ -38,33 +38,18 @@ impl SovereignCanonicalFhsResolver {
         map.insert("/opt".to_string(), "/state/opt".to_string());
 
         // FreeBSD / DragonFly / GhostBSD / NomadBSD
-        map.insert(
-            "/usr/local/bin".to_string(),
-            "/system/current/bin".to_string(),
-        );
-        map.insert(
-            "/usr/local/sbin".to_string(),
-            "/system/current/bin".to_string(),
-        );
+        map.insert("/usr/local/bin".to_string(), "/system/current/bin".to_string());
+        map.insert("/usr/local/sbin".to_string(), "/system/current/bin".to_string());
         map.insert("/usr/local/etc".to_string(), "/state/etc".to_string());
         map.insert("/usr/home".to_string(), "/home".to_string());
 
         // NetBSD pkgsrc
-        map.insert(
-            "/usr/pkg/bin".to_string(),
-            "/system/current/bin".to_string(),
-        );
-        map.insert(
-            "/usr/pkg/sbin".to_string(),
-            "/system/current/bin".to_string(),
-        );
+        map.insert("/usr/pkg/bin".to_string(), "/system/current/bin".to_string());
+        map.insert("/usr/pkg/sbin".to_string(), "/system/current/bin".to_string());
         map.insert("/usr/pkg/etc".to_string(), "/state/etc".to_string());
 
         // OpenBSD
-        map.insert(
-            "/usr/X11R6/bin".to_string(),
-            "/system/current/bin".to_string(),
-        );
+        map.insert("/usr/X11R6/bin".to_string(), "/system/current/bin".to_string());
 
         // NixOS & Guix
         map.insert("/nix/store".to_string(), "/system/store".to_string());
@@ -74,9 +59,7 @@ impl SovereignCanonicalFhsResolver {
         map.insert("/var/home".to_string(), "/home".to_string());
         map.insert("/ostree/deploy".to_string(), "/system/deploy".to_string());
 
-        Self {
-            legacy_mappings: map,
-        }
+        Self { legacy_mappings: map }
     }
 
     pub fn resolve_path(&self, requested_path: &str) -> String {
@@ -277,48 +260,21 @@ mod tests {
     #[test]
     fn test_canonical_fhs_resolver() {
         let resolver = SovereignCanonicalFhsResolver::new();
-        assert_eq!(
-            resolver.resolve_path("/usr/bin/bash"),
-            "/system/current/bin/bash"
-        );
-        assert_eq!(
-            resolver.resolve_path("/lib64/libc.so.6"),
-            "/system/current/lib/libc.so.6"
-        );
-        assert_eq!(
-            resolver.resolve_path("/etc/os-release"),
-            "/state/etc/os-release"
-        );
-        assert_eq!(
-            resolver.resolve_path("/usr/local/etc/nginx.conf"),
-            "/state/etc/nginx.conf"
-        );
-        assert_eq!(
-            resolver.resolve_path("/usr/pkg/bin/pkgin"),
-            "/system/current/bin/pkgin"
-        );
-        assert_eq!(
-            resolver.resolve_path("/nix/store/abc-pkg"),
-            "/system/store/abc-pkg"
-        );
+        assert_eq!(resolver.resolve_path("/usr/bin/bash"), "/system/current/bin/bash");
+        assert_eq!(resolver.resolve_path("/lib64/libc.so.6"), "/system/current/lib/libc.so.6");
+        assert_eq!(resolver.resolve_path("/etc/os-release"), "/state/etc/os-release");
+        assert_eq!(resolver.resolve_path("/usr/local/etc/nginx.conf"), "/state/etc/nginx.conf");
+        assert_eq!(resolver.resolve_path("/usr/pkg/bin/pkgin"), "/system/current/bin/pkgin");
+        assert_eq!(resolver.resolve_path("/nix/store/abc-pkg"), "/system/store/abc-pkg");
         assert_eq!(resolver.resolve_path("/var/home/jules"), "/home/jules");
     }
 
     #[test]
     fn test_multi_distro_fhs_hierarchy_engine() {
         let engine = SovereignMultiDistroFhsHierarchyEngine::new();
-        assert_eq!(
-            engine.resolve_distro_path("freebsd", "/usr/local/etc/rc.conf"),
-            "/state/etc/rc.conf"
-        );
-        assert_eq!(
-            engine.resolve_distro_path("freebsd", "/etc/rc.d/netif"),
-            "/state/etc/rc.d/netif"
-        );
-        assert_eq!(
-            engine.resolve_distro_path("nixos", "/etc/nixos"),
-            "/state/etc/nixos"
-        );
+        assert_eq!(engine.resolve_distro_path("freebsd", "/usr/local/etc/rc.conf"), "/state/etc/rc.conf");
+        assert_eq!(engine.resolve_distro_path("freebsd", "/etc/rc.d/netif"), "/state/etc/rc.d/netif");
+        assert_eq!(engine.resolve_distro_path("nixos", "/etc/nixos"), "/state/etc/nixos");
         assert!(engine.validate_fhs_compliance("/usr/bin/env"));
         assert!(!engine.validate_fhs_compliance("/usr//bin/env"));
     }
@@ -328,9 +284,7 @@ mod tests {
         let provider = SyntheticProcSysfsProvider::new();
         let mem = provider.read_synthetic_file("/proc/meminfo").unwrap();
         assert!(mem.contains("MemTotal:"));
-        let host = provider
-            .read_synthetic_file("/proc/sys/kernel/hostname")
-            .unwrap();
+        let host = provider.read_synthetic_file("/proc/sys/kernel/hostname").unwrap();
         assert_eq!(host.trim(), "sovereign-node");
     }
 

@@ -169,11 +169,7 @@ impl MintUpdateManager {
     pub fn get_eligible_updates(&self) -> Vec<&SystemUpdateItem> {
         self.available_updates
             .iter()
-            .filter(|u| {
-                u.is_selected
-                    && (u.tier <= self.max_allowed_tier
-                        || u.category == UpdateCategory::SecurityVulnerability)
-            })
+            .filter(|u| u.is_selected && (u.tier <= self.max_allowed_tier || u.category == UpdateCategory::SecurityVulnerability))
             .collect()
     }
 
@@ -230,9 +226,7 @@ mod tests {
         let eligible = mgr.get_eligible_updates();
         // Kernel is Tier 5, but openssl is Tier 1 (Security) and zenith is Tier 2
         assert!(eligible.iter().any(|u| u.package_name == "openssl-pqc"));
-        assert!(eligible
-            .iter()
-            .any(|u| u.package_name == "zenith_compositor"));
+        assert!(eligible.iter().any(|u| u.package_name == "zenith_compositor"));
     }
 
     #[test]

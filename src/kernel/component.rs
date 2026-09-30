@@ -18,10 +18,10 @@
 //! inspired by Genode OS framework. Provides hierarchical security isolation and
 //! fine-grained privilege scoping through capability-based security.
 
-use core::sync::atomic::{AtomicUsize, Ordering};
 use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Component identifier (Genode-style capability-based)
 pub type ComponentId = usize;
@@ -1160,8 +1160,7 @@ impl OpenBsdPledgeUnveilComponentSandboxEngine {
     }
 
     pub fn unveil(&mut self, path: &str, permissions: &str) {
-        self.unveiled_paths
-            .insert(path.to_string(), permissions.to_string());
+        self.unveiled_paths.insert(path.to_string(), permissions.to_string());
     }
 
     pub fn allows_path_access(&self, path: &str, req_perm: char) -> bool {
@@ -1400,8 +1399,7 @@ mod tests {
         assert!(openbsd.allows_path_access("/etc/sigmaos/config.toml", 'r'));
         assert!(!openbsd.allows_path_access("/etc/sigmaos/config.toml", 'w'));
 
-        let mut rump =
-            NetBsdRumpComponentDriverEngine::new("nvme_rump", RumpComponentType::StorageDriver);
+        let mut rump = NetBsdRumpComponentDriverEngine::new("nvme_rump", RumpComponentType::StorageDriver);
         rump.bind_hypercall_interface();
         assert!(rump.is_hypercall_bound);
         assert_eq!(rump.status, "Bound");

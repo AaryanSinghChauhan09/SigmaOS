@@ -47,27 +47,12 @@ impl FastfetchInfoEngine {
         let mut hud = String::from("   █████████   SigmaOS Sovereign Edition\n");
         hud.push_str("  ███     ███  -------------------------\n");
         hud.push_str(&format!("  ███          OS: {}\n", self.sys_info.os_name));
-        hud.push_str(&format!(
-            "  ███    ████  Kernel: {}\n",
-            self.sys_info.kernel_version
-        ));
-        hud.push_str(&format!(
-            "  ███     ███  Uptime: {}s\n",
-            self.sys_info.uptime_seconds
-        ));
+        hud.push_str(&format!("  ███    ████  Kernel: {}\n", self.sys_info.kernel_version));
+        hud.push_str(&format!("  ███     ███  Uptime: {}s\n", self.sys_info.uptime_seconds));
         hud.push_str(&format!("   █████████   Shell: {}\n", self.sys_info.shell));
-        hud.push_str(&format!(
-            "               Memory: {}MB / {}MB\n",
-            self.sys_info.memory_used_mb, self.sys_info.memory_total_mb
-        ));
-        hud.push_str(&format!(
-            "               CPU: {}\n",
-            self.sys_info.cpu_model
-        ));
-        hud.push_str(&format!(
-            "               Arch: {}\n",
-            self.sys_info.architecture
-        ));
+        hud.push_str(&format!("               Memory: {}MB / {}MB\n", self.sys_info.memory_used_mb, self.sys_info.memory_total_mb));
+        hud.push_str(&format!("               CPU: {}\n", self.sys_info.cpu_model));
+        hud.push_str(&format!("               Arch: {}\n", self.sys_info.architecture));
         hud
     }
 }
@@ -130,16 +115,11 @@ impl BtopSystemMonitorEngine {
     }
 
     pub fn sort_by_cpu(&mut self) {
-        self.processes.sort_by(|a, b| {
-            b.cpu_usage_percent
-                .partial_cmp(&a.cpu_usage_percent)
-                .unwrap_or(core::cmp::Ordering::Equal)
-        });
+        self.processes.sort_by(|a, b| b.cpu_usage_percent.partial_cmp(&a.cpu_usage_percent).unwrap_or(core::cmp::Ordering::Equal));
     }
 
     pub fn sort_by_memory(&mut self) {
-        self.processes
-            .sort_by(|a, b| b.memory_rss_kb.cmp(&a.memory_rss_kb));
+        self.processes.sort_by(|a, b| b.memory_rss_kb.cmp(&a.memory_rss_kb));
     }
 
     pub fn top_process_name(&self) -> Option<String> {
@@ -200,10 +180,7 @@ impl RofiCommandHudEngine {
         let query_lower = query.to_lowercase();
         self.apps
             .iter()
-            .filter(|app| {
-                app.name.to_lowercase().contains(&query_lower)
-                    || app.category.to_lowercase().contains(&query_lower)
-            })
+            .filter(|app| app.name.to_lowercase().contains(&query_lower) || app.category.to_lowercase().contains(&query_lower))
             .cloned()
             .collect()
     }
@@ -395,11 +372,7 @@ impl ZoxideFastCdEngine {
         self.db
             .iter()
             .filter(|e| e.path.to_lowercase().contains(&kw))
-            .max_by(|a, b| {
-                a.frecency_score
-                    .partial_cmp(&b.frecency_score)
-                    .unwrap_or(core::cmp::Ordering::Equal)
-            })
+            .max_by(|a, b| a.frecency_score.partial_cmp(&b.frecency_score).unwrap_or(core::cmp::Ordering::Equal))
             .map(|e| e.path.clone())
     }
 }
@@ -499,11 +472,7 @@ mod tests {
     #[test]
     fn test_fd_and_ripgrep_engines() {
         let fd = FdFastFindEngine::new("/src");
-        let nodes = vec![
-            "main.rs".to_string(),
-            "config.json".to_string(),
-            "lib.rs".to_string(),
-        ];
+        let nodes = vec!["main.rs".to_string(), "config.json".to_string(), "lib.rs".to_string()];
         let rs_files = fd.find_by_extension(&nodes, "rs");
         assert_eq!(rs_files.len(), 2);
 

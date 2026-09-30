@@ -1,8 +1,10 @@
 //! Logging Functions (rsyslog/journald Inspiration)
 //! Log manager, journal manager, and log analyzer
 
-use std::string::{String, ToString};
+
+
 use std::vec::Vec;
+use std::string::{String, ToString};
 
 /// Log file
 #[derive(Debug, Clone)]

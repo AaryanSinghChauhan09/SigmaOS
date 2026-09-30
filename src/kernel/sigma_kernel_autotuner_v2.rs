@@ -15,9 +15,9 @@
 #![allow(dead_code)]
 
 use std::collections::BTreeMap;
-use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use std::format;
 
 // ─── Workload Profile ─────────────────────────────────────────────────────────
 
@@ -197,9 +197,9 @@ impl SigmaKernelAutotuner {
             String::from("kernel.sched_min_granularity_ns"),
             KernelTunable::new(
                 "kernel.sched_min_granularity_ns",
-                2_000_000,  // 2ms default
-                100_000,    // 100µs min (gaming mode)
-                20_000_000, // 20ms max (batch mode)
+                2_000_000,        // 2ms default
+                100_000,          // 100µs min (gaming mode)
+                20_000_000,       // 20ms max (batch mode)
                 "Minimum scheduler preemption granularity (lower = more responsive)",
             ),
         );
@@ -229,7 +229,7 @@ impl SigmaKernelAutotuner {
             String::from("vm.swappiness"),
             KernelTunable::new(
                 "vm.swappiness",
-                10, // SigmaOS default: prefer RAM over swap
+                10,   // SigmaOS default: prefer RAM over swap
                 0,
                 200,
                 "Swappiness: 0=prefer RAM, 200=aggressive swap",
@@ -281,9 +281,9 @@ impl SigmaKernelAutotuner {
             String::from("net.ipv4.tcp_rmem_max"),
             KernelTunable::new(
                 "net.ipv4.tcp_rmem_max",
-                16_777_216, // 16 MB
+                16_777_216,   // 16 MB
                 4096,
-                134_217_728, // 128 MB
+                134_217_728,  // 128 MB
                 "Maximum TCP receive buffer size",
             ),
         );
@@ -301,7 +301,7 @@ impl SigmaKernelAutotuner {
         SigmaKernelAutotuner {
             tunables,
             metrics_history: Vec::new(),
-            history_capacity: 60, // 60 snapshots = 1 minute at 1s intervals
+            history_capacity: 60,  // 60 snapshots = 1 minute at 1s intervals
             current_profile: WorkloadProfile::Mixed,
             applied_recommendations: Vec::new(),
             tune_count: 0,
@@ -378,7 +378,7 @@ impl SigmaKernelAutotuner {
             WorkloadProfile::Gaming => {
                 recs.push(self.make_rec(
                     "kernel.sched_min_granularity_ns",
-                    500_000, // 0.5ms
+                    500_000,   // 0.5ms
                     0.95,
                     "Minimize scheduler granularity for sub-millisecond gaming latency",
                     "-75% scheduling jitter",
@@ -424,7 +424,7 @@ impl SigmaKernelAutotuner {
             WorkloadProfile::ServerBatch => {
                 recs.push(self.make_rec(
                     "kernel.sched_min_granularity_ns",
-                    8_000_000, // 8ms for batch
+                    8_000_000,  // 8ms for batch
                     0.85,
                     "Increase scheduler granularity for throughput-oriented batch jobs",
                     "+20% CPU throughput",
@@ -447,7 +447,7 @@ impl SigmaKernelAutotuner {
             WorkloadProfile::Compilation => {
                 recs.push(self.make_rec(
                     "kernel.sched_latency_ns",
-                    20_000_000, // 20ms period for build throughput
+                    20_000_000,  // 20ms period for build throughput
                     0.85,
                     "Maximize scheduler period for sustained compilation throughput",
                     "+15% compiler throughput",
@@ -463,7 +463,7 @@ impl SigmaKernelAutotuner {
             WorkloadProfile::PowerSave => {
                 recs.push(self.make_rec(
                     "kernel.sched_min_granularity_ns",
-                    10_000_000, // 10ms for power save
+                    10_000_000,  // 10ms for power save
                     0.90,
                     "Increase scheduler granularity to reduce CPU wake frequency",
                     "+30% battery life extension",
@@ -479,7 +479,7 @@ impl SigmaKernelAutotuner {
             WorkloadProfile::NetworkIntensive => {
                 recs.push(self.make_rec(
                     "net.ipv4.tcp_rmem_max",
-                    67_108_864, // 64 MB
+                    67_108_864,  // 64 MB
                     0.88,
                     "Maximize TCP receive buffer for high-throughput XDP networking",
                     "+40% network throughput",
@@ -651,13 +651,9 @@ mod autotuner_tests {
     fn test_apply_recommendations_changes_tunables() {
         let mut tuner = SigmaKernelAutotuner::new();
         tuner.ingest_metrics(gaming_metrics());
-        let old_val = tuner
-            .get_tunable("kernel.sched_min_granularity_ns")
-            .unwrap();
+        let old_val = tuner.get_tunable("kernel.sched_min_granularity_ns").unwrap();
         tuner.apply_recommendations();
-        let new_val = tuner
-            .get_tunable("kernel.sched_min_granularity_ns")
-            .unwrap();
+        let new_val = tuner.get_tunable("kernel.sched_min_granularity_ns").unwrap();
         // Gaming mode should reduce granularity
         assert!(new_val <= old_val);
         assert_eq!(tuner.tune_count, 1);

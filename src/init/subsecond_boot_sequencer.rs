@@ -19,9 +19,9 @@
 #![allow(dead_code)]
 
 use std::collections::BTreeMap;
-use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use std::format;
 
 // ─── Boot Stage ───────────────────────────────────────────────────────────────
 
@@ -92,7 +92,7 @@ pub struct SigmaService {
     /// Sandbox: pledge promise set (OpenBSD-inspired)
     pub pledge_promises: Vec<String>,
     /// Sandbox: unveil paths (OpenBSD-inspired)
-    pub unveil_paths: Vec<(String, String)>, // (path, permissions)
+    pub unveil_paths: Vec<(String, String)>,  // (path, permissions)
     /// Current state
     pub state: SvcState,
     /// Actual start time (simulated ms from boot epoch)
@@ -126,10 +126,7 @@ impl SigmaService {
 
     /// Add an OpenBSD-style unveil path
     pub fn with_unveil(mut self, paths: &[(&str, &str)]) -> Self {
-        self.unveil_paths = paths
-            .iter()
-            .map(|(p, m)| (String::from(*p), String::from(*m)))
-            .collect();
+        self.unveil_paths = paths.iter().map(|(p, m)| (String::from(*p), String::from(*m))).collect();
         self
     }
 }
@@ -182,204 +179,108 @@ impl SigmaBootSequencer {
     fn register_default_services(&mut self) {
         // ── Stage 1: Kernel Subsystems ──────────────────────────────────────
         self.add(
-            SigmaService::new(
-                "sigma-memory-init",
-                BootStage::KernelSubsystems,
-                vec![],
-                true,
-                2,
-            )
-            .with_pledge(&["stdio", "rpath"])
-            .with_unveil(&[("/sigma/store", "r")]),
+            SigmaService::new("sigma-memory-init", BootStage::KernelSubsystems, vec![], true, 2)
+                .with_pledge(&["stdio", "rpath"])
+                .with_unveil(&[("/sigma/store", "r")])
         );
         self.add(
-            SigmaService::new(
-                "sigma-cpu-topology",
-                BootStage::KernelSubsystems,
-                vec![],
-                true,
-                1,
-            )
-            .with_pledge(&["stdio"]),
+            SigmaService::new("sigma-cpu-topology", BootStage::KernelSubsystems, vec![], true, 1)
+                .with_pledge(&["stdio"])
         );
         self.add(
-            SigmaService::new(
-                "sigma-irq-controller",
-                BootStage::KernelSubsystems,
-                vec!["sigma-cpu-topology"],
-                true,
-                3,
-            )
-            .with_pledge(&["stdio", "unveil"]),
+            SigmaService::new("sigma-irq-controller", BootStage::KernelSubsystems,
+                vec!["sigma-cpu-topology"], true, 3)
+                .with_pledge(&["stdio", "unveil"])
         );
         self.add(
-            SigmaService::new(
-                "sigma-bore-eevdf-sched",
-                BootStage::KernelSubsystems,
-                vec!["sigma-cpu-topology"],
-                true,
-                2,
-            )
-            .with_pledge(&["stdio"]),
+            SigmaService::new("sigma-bore-eevdf-sched", BootStage::KernelSubsystems,
+                vec!["sigma-cpu-topology"], true, 2)
+                .with_pledge(&["stdio"])
         );
 
         // ── Stage 2: Essential Services ─────────────────────────────────────
         self.add(
-            SigmaService::new(
-                "sigma-entropy",
-                BootStage::EssentialServices,
-                vec!["sigma-memory-init"],
-                true,
-                5,
-            )
-            .with_pledge(&["stdio", "rpath"])
-            .with_unveil(&[("/dev/urandom", "r")]),
+            SigmaService::new("sigma-entropy", BootStage::EssentialServices,
+                vec!["sigma-memory-init"], true, 5)
+                .with_pledge(&["stdio", "rpath"])
+                .with_unveil(&[("/dev/urandom", "r")])
         );
         self.add(
-            SigmaService::new(
-                "sigma-clock",
-                BootStage::EssentialServices,
-                vec!["sigma-memory-init"],
-                true,
-                2,
-            )
-            .with_pledge(&["stdio", "settime"]),
+            SigmaService::new("sigma-clock", BootStage::EssentialServices,
+                vec!["sigma-memory-init"], true, 2)
+                .with_pledge(&["stdio", "settime"])
         );
         self.add(
-            SigmaService::new(
-                "sigma-pqc-keystore",
-                BootStage::EssentialServices,
-                vec!["sigma-entropy"],
-                true,
-                8,
-            )
-            .with_pledge(&["stdio", "rpath", "wpath", "cpath"])
-            .with_unveil(&[("/sigma/keys", "rwc")]),
+            SigmaService::new("sigma-pqc-keystore", BootStage::EssentialServices,
+                vec!["sigma-entropy"], true, 8)
+                .with_pledge(&["stdio", "rpath", "wpath", "cpath"])
+                .with_unveil(&[("/sigma/keys", "rwc")])
         );
         self.add(
-            SigmaService::new(
-                "sigma-netstack",
-                BootStage::EssentialServices,
-                vec!["sigma-entropy", "sigma-clock"],
-                true,
-                10,
-            )
-            .with_pledge(&["stdio", "inet", "rpath"]),
+            SigmaService::new("sigma-netstack", BootStage::EssentialServices,
+                vec!["sigma-entropy", "sigma-clock"], true, 10)
+                .with_pledge(&["stdio", "inet", "rpath"])
         );
         self.add(
-            SigmaService::new(
-                "sigma-landlock-lsm",
-                BootStage::EssentialServices,
-                vec!["sigma-memory-init"],
-                true,
-                3,
-            )
-            .with_pledge(&["stdio"]),
+            SigmaService::new("sigma-landlock-lsm", BootStage::EssentialServices,
+                vec!["sigma-memory-init"], true, 3)
+                .with_pledge(&["stdio"])
         );
 
         // ── Stage 3: System Services ─────────────────────────────────────────
         self.add(
-            SigmaService::new(
-                "sigma-vfs-mount",
-                BootStage::SystemServices,
-                vec!["sigma-memory-init"],
-                false,
-                15,
-            )
-            .with_pledge(&["stdio", "rpath", "wpath"])
-            .with_unveil(&[("/", "r"), ("/sigma/store", "r"), ("/var", "rwc")]),
+            SigmaService::new("sigma-vfs-mount", BootStage::SystemServices,
+                vec!["sigma-memory-init"], false, 15)
+                .with_pledge(&["stdio", "rpath", "wpath"])
+                .with_unveil(&[("/", "r"), ("/sigma/store", "r"), ("/var", "rwc")])
         );
         self.add(
-            SigmaService::new(
-                "sigma-sigpkg-daemon",
-                BootStage::SystemServices,
-                vec!["sigma-vfs-mount", "sigma-netstack"],
-                true,
-                12,
-            )
-            .with_pledge(&["stdio", "rpath", "wpath", "cpath", "inet", "exec"])
-            .with_unveil(&[("/sigma/store", "rwc"), ("/etc/sigpkg", "r")]),
+            SigmaService::new("sigma-sigpkg-daemon", BootStage::SystemServices,
+                vec!["sigma-vfs-mount", "sigma-netstack"], true, 12)
+                .with_pledge(&["stdio", "rpath", "wpath", "cpath", "inet", "exec"])
+                .with_unveil(&[("/sigma/store", "rwc"), ("/etc/sigpkg", "r")])
         );
         self.add(
-            SigmaService::new(
-                "sigma-logger",
-                BootStage::SystemServices,
-                vec!["sigma-vfs-mount"],
-                true,
-                5,
-            )
-            .with_pledge(&["stdio", "wpath", "cpath"])
-            .with_unveil(&[("/var/log/sigma", "wc")]),
+            SigmaService::new("sigma-logger", BootStage::SystemServices,
+                vec!["sigma-vfs-mount"], true, 5)
+                .with_pledge(&["stdio", "wpath", "cpath"])
+                .with_unveil(&[("/var/log/sigma", "wc")])
         );
         self.add(
-            SigmaService::new(
-                "sigma-udev",
-                BootStage::SystemServices,
-                vec!["sigma-vfs-mount", "sigma-irq-controller"],
-                true,
-                8,
-            )
-            .with_pledge(&["stdio", "rpath", "wpath"])
-            .with_unveil(&[("/dev", "rwc"), ("/sys", "r")]),
+            SigmaService::new("sigma-udev", BootStage::SystemServices,
+                vec!["sigma-vfs-mount", "sigma-irq-controller"], true, 8)
+                .with_pledge(&["stdio", "rpath", "wpath"])
+                .with_unveil(&[("/dev", "rwc"), ("/sys", "r")])
         );
         self.add(
-            SigmaService::new(
-                "sigma-dbus",
-                BootStage::SystemServices,
-                vec!["sigma-logger"],
-                true,
-                6,
-            )
-            .with_pledge(&["stdio", "rpath", "unix"])
-            .with_unveil(&[("/var/run/dbus", "rwc")]),
+            SigmaService::new("sigma-dbus", BootStage::SystemServices,
+                vec!["sigma-logger"], true, 6)
+                .with_pledge(&["stdio", "rpath", "unix"])
+                .with_unveil(&[("/var/run/dbus", "rwc")])
         );
         self.add(
-            SigmaService::new(
-                "sigma-wireguard-pqc",
-                BootStage::SystemServices,
-                vec!["sigma-netstack", "sigma-pqc-keystore"],
-                true,
-                15,
-            )
-            .with_pledge(&["stdio", "inet", "rpath"])
-            .with_unveil(&[("/sigma/keys", "r"), ("/etc/wg", "r")]),
+            SigmaService::new("sigma-wireguard-pqc", BootStage::SystemServices,
+                vec!["sigma-netstack", "sigma-pqc-keystore"], true, 15)
+                .with_pledge(&["stdio", "inet", "rpath"])
+                .with_unveil(&[("/sigma/keys", "r"), ("/etc/wg", "r")])
         );
 
         // ── Stage 4: Graphical Session ────────────────────────────────────────
         self.add(
-            SigmaService::new(
-                "zenith-wayland",
-                BootStage::GraphicalSession,
-                vec!["sigma-udev", "sigma-dbus"],
-                false,
-                40,
-            )
-            .with_pledge(&["stdio", "rpath", "wpath", "proc", "exec"])
-            .with_unveil(&[
-                ("/sigma/store", "r"),
-                ("/dev/dri", "rw"),
-                ("/dev/input", "r"),
-            ]),
+            SigmaService::new("zenith-wayland", BootStage::GraphicalSession,
+                vec!["sigma-udev", "sigma-dbus"], false, 40)
+                .with_pledge(&["stdio", "rpath", "wpath", "proc", "exec"])
+                .with_unveil(&[("/sigma/store", "r"), ("/dev/dri", "rw"), ("/dev/input", "r")])
         );
         self.add(
-            SigmaService::new(
-                "sigma-session-manager",
-                BootStage::GraphicalSession,
-                vec!["zenith-wayland"],
-                true,
-                20,
-            )
-            .with_pledge(&["stdio", "rpath", "wpath", "proc", "exec", "unix"]),
+            SigmaService::new("sigma-session-manager", BootStage::GraphicalSession,
+                vec!["zenith-wayland"], true, 20)
+                .with_pledge(&["stdio", "rpath", "wpath", "proc", "exec", "unix"])
         );
         self.add(
-            SigmaService::new(
-                "sigma-autotuner-governor",
-                BootStage::GraphicalSession,
-                vec!["sigma-bore-eevdf-sched", "sigma-session-manager"],
-                true,
-                5,
-            )
-            .with_pledge(&["stdio"]),
+            SigmaService::new("sigma-autotuner-governor", BootStage::GraphicalSession,
+                vec!["sigma-bore-eevdf-sched", "sigma-session-manager"], true, 5)
+                .with_pledge(&["stdio"])
         );
     }
 
@@ -467,14 +368,10 @@ impl SigmaBootSequencer {
         let mut iteration = 0u32;
         loop {
             iteration += 1;
-            if iteration > 100 {
-                break;
-            } // safety: max 100 iterations
+            if iteration > 100 { break; } // safety: max 100 iterations
 
             // Find all Pending services in this stage with satisfied deps
-            let ready: Vec<String> = self
-                .services
-                .iter()
+            let ready: Vec<String> = self.services.iter()
                 .filter(|(_, s)| s.stage == stage && s.state == SvcState::Pending)
                 .filter(|(name, _)| self.deps_satisfied(name))
                 .map(|(name, _)| name.clone())
@@ -482,17 +379,11 @@ impl SigmaBootSequencer {
 
             if ready.is_empty() {
                 // Check if any services in this stage are still not done
-                let pending = self
-                    .services
-                    .values()
+                let pending = self.services.values()
                     .any(|s| s.stage == stage && s.state == SvcState::Pending);
-                if !pending {
-                    break;
-                }
+                if !pending { break; }
                 // Some services have unsatisfied deps — mark them as skipped
-                let stuck: Vec<String> = self
-                    .services
-                    .iter()
+                let stuck: Vec<String> = self.services.iter()
                     .filter(|(_, s)| s.stage == stage && s.state == SvcState::Pending)
                     .map(|(n, _)| n.clone())
                     .collect();
@@ -505,8 +396,7 @@ impl SigmaBootSequencer {
             }
 
             // Start all ready services (parallel within stage)
-            let estimated_times: Vec<(String, u64)> = ready
-                .iter()
+            let estimated_times: Vec<(String, u64)> = ready.iter()
                 .map(|name| {
                     let est = self.services.get(name).map(|s| s.estimated_ms).unwrap_or(5);
                     (name.clone(), est)
@@ -551,9 +441,7 @@ impl SigmaBootSequencer {
         ];
 
         for stage in &stages {
-            let svcs: Vec<&SigmaService> = self
-                .services
-                .values()
+            let svcs: Vec<&SigmaService> = self.services.values()
                 .filter(|s| s.stage == *stage)
                 .collect();
             let done = svcs.iter().filter(|s| s.state == SvcState::Done).count();
@@ -561,16 +449,11 @@ impl SigmaBootSequencer {
             let max_t = svcs.iter().map(|s| s.finish_time_ms).max().unwrap_or(0);
             lines.push(format!(
                 "  {} | {}/{} done | finished at {}ms",
-                stage.label(),
-                done,
-                total,
-                max_t
+                stage.label(), done, total, max_t
             ));
         }
 
-        let failed: Vec<&str> = self
-            .services
-            .values()
+        let failed: Vec<&str> = self.services.values()
             .filter(|s| matches!(s.state, SvcState::Failed(_)))
             .map(|s| s.name.as_str())
             .collect();
@@ -697,9 +580,6 @@ mod boot_sequencer_tests {
         let seq = SigmaBootSequencer::new();
         let entropy = seq.services.get("sigma-entropy").unwrap();
         assert!(entropy.pledge_promises.contains(&String::from("rpath")));
-        assert!(entropy
-            .unveil_paths
-            .iter()
-            .any(|(p, _)| p.contains("urandom")));
+        assert!(entropy.unveil_paths.iter().any(|(p, _)| p.contains("urandom")));
     }
 }

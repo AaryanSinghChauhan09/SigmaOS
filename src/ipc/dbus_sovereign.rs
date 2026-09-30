@@ -4,18 +4,22 @@
 #![allow(clippy::new_without_default)]
 
 #[cfg(not(any(feature = "standalone_test", test)))]
+
+
 // SigmaOS Sovereign D-Bus IPC Protocol Implementation
 // Implements D-Bus message format and dispatch in 100% safe Rust.
 //
 // D-Bus is the standard IPC mechanism on Linux desktops (freedesktop.org).
 // Used by systemd, NetworkManager, BlueZ, PulseAudio, GNOME, KDE, etc.
 // This is a pure-Rust, zero-dependency implementation of the D-Bus wire protocol.
+
+
 #[cfg(any(feature = "standalone_test", test))]
-use std::string::{String, ToString};
-#[cfg(not(any(feature = "standalone_test", test)))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::vec::Vec;
 
@@ -31,7 +35,7 @@ pub enum DbusValue {
     Uint32(u32),
     Int64(i64),
     Uint64(u64),
-    Double(u32, u32), // (high, low) — avoid f64 for no_std compatibility
+    Double(u32, u32),   // (high, low) — avoid f64 for no_std compatibility
     Str(String),
     ObjectPath(String),
     Signature(String),
@@ -45,23 +49,23 @@ pub enum DbusValue {
 impl DbusValue {
     pub fn type_signature(&self) -> &'static str {
         match self {
-            DbusValue::Byte(_) => "y",
-            DbusValue::Bool(_) => "b",
-            DbusValue::Int16(_) => "n",
-            DbusValue::Uint16(_) => "q",
-            DbusValue::Int32(_) => "i",
-            DbusValue::Uint32(_) => "u",
-            DbusValue::Int64(_) => "x",
-            DbusValue::Uint64(_) => "t",
-            DbusValue::Double(_, _) => "d",
-            DbusValue::Str(_) => "s",
-            DbusValue::ObjectPath(_) => "o",
-            DbusValue::Signature(_) => "g",
-            DbusValue::Array(_) => "a",
-            DbusValue::Variant(_) => "v",
-            DbusValue::DictEntry(_, _) => "e",
-            DbusValue::Struct(_) => "r",
-            DbusValue::UnixFd(_) => "h",
+            DbusValue::Byte(_)        => "y",
+            DbusValue::Bool(_)        => "b",
+            DbusValue::Int16(_)       => "n",
+            DbusValue::Uint16(_)      => "q",
+            DbusValue::Int32(_)       => "i",
+            DbusValue::Uint32(_)      => "u",
+            DbusValue::Int64(_)       => "x",
+            DbusValue::Uint64(_)      => "t",
+            DbusValue::Double(_, _)   => "d",
+            DbusValue::Str(_)         => "s",
+            DbusValue::ObjectPath(_)  => "o",
+            DbusValue::Signature(_)   => "g",
+            DbusValue::Array(_)       => "a",
+            DbusValue::Variant(_)     => "v",
+            DbusValue::DictEntry(_,_) => "e",
+            DbusValue::Struct(_)      => "r",
+            DbusValue::UnixFd(_)      => "h",
         }
     }
 }
@@ -79,10 +83,10 @@ pub enum DbusMessageType {
 impl DbusMessageType {
     pub fn code(&self) -> u8 {
         match self {
-            DbusMessageType::MethodCall => 1,
+            DbusMessageType::MethodCall   => 1,
             DbusMessageType::MethodReturn => 2,
-            DbusMessageType::Error => 3,
-            DbusMessageType::Signal => 4,
+            DbusMessageType::Error        => 3,
+            DbusMessageType::Signal       => 4,
         }
     }
 }
@@ -92,16 +96,16 @@ impl DbusMessageType {
 #[derive(Debug, Clone)]
 pub struct DbusMessage {
     pub msg_type: DbusMessageType,
-    pub flags: u8, // NO_REPLY_EXPECTED=1, NO_AUTO_START=2, ALLOW_INTERACTIVE_AUTH=4
+    pub flags: u8,           // NO_REPLY_EXPECTED=1, NO_AUTO_START=2, ALLOW_INTERACTIVE_AUTH=4
     pub serial: u32,
-    pub path: Option<String>, // object path  e.g. /org/sigma/NetworkManager
-    pub interface: Option<String>, // e.g. org.sigma.NetworkManager
-    pub member: Option<String>, // method/signal name e.g. GetDevices
-    pub error_name: Option<String>, // for Error messages
-    pub reply_serial: Option<u32>, // for MethodReturn / Error
+    pub path: Option<String>,        // object path  e.g. /org/sigma/NetworkManager
+    pub interface: Option<String>,   // e.g. org.sigma.NetworkManager
+    pub member: Option<String>,      // method/signal name e.g. GetDevices
+    pub error_name: Option<String>,  // for Error messages
+    pub reply_serial: Option<u32>,   // for MethodReturn / Error
     pub destination: Option<String>, // e.g. org.sigma.NetworkManager
-    pub sender: Option<String>, // e.g. :1.42
-    pub signature: Option<String>, // body type signature
+    pub sender: Option<String>,      // e.g. :1.42
+    pub signature: Option<String>,   // body type signature
     pub body: Vec<DbusValue>,
 }
 
@@ -191,8 +195,8 @@ impl DbusMessage {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum DbusName {
-    WellKnown(String), // org.freedesktop.NetworkManager
-    Unique(String),    // :1.42
+    WellKnown(String),     // org.freedesktop.NetworkManager
+    Unique(String),        // :1.42
 }
 
 impl DbusName {
@@ -215,24 +219,16 @@ pub struct DbusMatchRule {
 impl DbusMatchRule {
     pub fn matches(&self, msg: &DbusMessage) -> bool {
         if let Some(ref t) = self.msg_type {
-            if &msg.msg_type != t {
-                return false;
-            }
+            if &msg.msg_type != t { return false; }
         }
         if let Some(ref iface) = self.interface {
-            if msg.interface.as_deref() != Some(iface.as_str()) {
-                return false;
-            }
+            if msg.interface.as_deref() != Some(iface.as_str()) { return false; }
         }
         if let Some(ref member) = self.member {
-            if msg.member.as_deref() != Some(member.as_str()) {
-                return false;
-            }
+            if msg.member.as_deref() != Some(member.as_str()) { return false; }
         }
         if let Some(ref path) = self.path {
-            if msg.path.as_deref() != Some(path.as_str()) {
-                return false;
-            }
+            if msg.path.as_deref() != Some(path.as_str()) { return false; }
         }
         true
     }
@@ -315,9 +311,7 @@ impl SovereignDbusBus {
         // Route to destination
         if let Some(ref dest) = msg.destination.clone() {
             let dest_str = dest.as_str();
-            if let Some(svc) = self
-                .services
-                .iter_mut()
+            if let Some(svc) = self.services.iter_mut()
                 .find(|s| s.name == dest_str || s.unique_name == dest_str)
             {
                 svc.deliver(msg);
@@ -345,14 +339,10 @@ impl SovereignDbusBus {
         false
     }
 
-    pub fn service_count(&self) -> usize {
-        self.services.len()
-    }
+    pub fn service_count(&self) -> usize { self.services.len() }
 
     pub fn get_service_mut(&mut self, name: &str) -> Option<&mut DbusService> {
-        self.services
-            .iter_mut()
-            .find(|s| s.name == name || s.unique_name == name)
+        self.services.iter_mut().find(|s| s.name == name || s.unique_name == name)
     }
 }
 
@@ -387,10 +377,7 @@ mod tests {
 
         let svc = bus.get_service_mut("org.sigma.NetworkManager").unwrap();
         assert_eq!(svc.received_messages.len(), 1);
-        assert_eq!(
-            svc.received_messages[0].member.as_deref(),
-            Some("GetDevices")
-        );
+        assert_eq!(svc.received_messages[0].member.as_deref(), Some("GetDevices"));
     }
 
     #[test]
@@ -408,29 +395,17 @@ mod tests {
             member: Some("StateChanged".to_string()),
             path: None,
         };
-        bus.get_service_mut("org.sigma.App1")
-            .unwrap()
-            .add_match(rule.clone());
-        bus.get_service_mut("org.sigma.App2")
-            .unwrap()
-            .add_match(rule);
+        bus.get_service_mut("org.sigma.App1").unwrap().add_match(rule.clone());
+        bus.get_service_mut("org.sigma.App2").unwrap().add_match(rule);
 
-        let sig = DbusMessage::signal("/org/sigma/NM", "org.sigma.NM", "StateChanged");
+        let sig = DbusMessage::signal(
+            "/org/sigma/NM",
+            "org.sigma.NM",
+            "StateChanged",
+        );
         assert!(bus.send(sig));
-        assert_eq!(
-            bus.get_service_mut("org.sigma.App1")
-                .unwrap()
-                .received_messages
-                .len(),
-            1
-        );
-        assert_eq!(
-            bus.get_service_mut("org.sigma.App2")
-                .unwrap()
-                .received_messages
-                .len(),
-            1
-        );
+        assert_eq!(bus.get_service_mut("org.sigma.App1").unwrap().received_messages.len(), 1);
+        assert_eq!(bus.get_service_mut("org.sigma.App2").unwrap().received_messages.len(), 1);
     }
 
     #[test]
@@ -446,10 +421,7 @@ mod tests {
         let err = DbusMessage::error(5, "org.freedesktop.DBus.Error.NoSuchMethod");
         assert_eq!(err.msg_type, DbusMessageType::Error);
         assert_eq!(err.reply_serial, Some(5));
-        assert_eq!(
-            err.error_name.as_deref(),
-            Some("org.freedesktop.DBus.Error.NoSuchMethod")
-        );
+        assert_eq!(err.error_name.as_deref(), Some("org.freedesktop.DBus.Error.NoSuchMethod"));
     }
 
     #[test]

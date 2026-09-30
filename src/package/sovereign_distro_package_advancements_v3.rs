@@ -145,20 +145,13 @@ impl SovereignDebianAptMultiarchFileEngine {
     pub fn new() -> Self {
         let mut file_index = BTreeMap::new();
         file_index.insert("/usr/bin/gcc".to_string(), "gcc".to_string());
-        file_index.insert(
-            "/lib/x86_64-linux-gnu/libc.so.6".to_string(),
-            "libc6".to_string(),
-        );
+        file_index.insert("/lib/x86_64-linux-gnu/libc.so.6".to_string(), "libc6".to_string());
 
         Self {
             pin_rules: Vec::new(),
             preseed_answers: BTreeMap::new(),
             file_index,
-            supported_architectures: vec![
-                "amd64".to_string(),
-                "i386".to_string(),
-                "arm64".to_string(),
-            ],
+            supported_architectures: vec!["amd64".to_string(), "i386".to_string(), "arm64".to_string()],
         }
     }
 
@@ -517,10 +510,7 @@ impl SovereignFedoraDnf5DeltaRpmEngineV3 {
             .collect()
     }
 
-    pub fn reconstruct_deltarpm(
-        base_rpm: &[u8],
-        delta_patch: &[u8],
-    ) -> Result<Vec<u8>, &'static str> {
+    pub fn reconstruct_deltarpm(base_rpm: &[u8], delta_patch: &[u8]) -> Result<Vec<u8>, &'static str> {
         if delta_patch.is_empty() {
             return Ok(base_rpm.to_vec());
         }
@@ -627,9 +617,7 @@ impl SovereignBsdVuXmlPledgeSandboxEngineV3 {
             if vuln.package_name == pkg_name && vuln.cvss_score_x10 >= self.max_permitted_cvss_x10 {
                 return Err(format!(
                     "FreeBSD VuXML Gatekeeper: {} blocked due to critical CVE {} (CVSS {})",
-                    pkg_name,
-                    vuln.cve,
-                    vuln.cvss_score_x10 as f32 / 10.0
+                    pkg_name, vuln.cve, vuln.cvss_score_x10 as f32 / 10.0
                 ));
             }
         }
@@ -644,11 +632,7 @@ impl SovereignBsdVuXmlPledgeSandboxEngineV3 {
         }
     }
 
-    pub fn build_scriptlet_sandbox_code(
-        &self,
-        pledges: &[&str],
-        unveils: &[(&str, &str)],
-    ) -> String {
+    pub fn build_scriptlet_sandbox_code(&self, pledges: &[&str], unveils: &[(&str, &str)]) -> String {
         let mut script = String::from("# OpenBSD Scriptlet Pledge/Unveil Sandbox V3\n");
         for &(path, perm) in unveils {
             script.push_str(&format!("unveil(\"{}\", \"{}\");\n", path, perm));
@@ -699,10 +683,7 @@ impl SovereignDistroPackageAdvancementsSuiteV3 {
 
         // 2. Check Debian APT Pinning block status
         if self.debian.is_package_blocked(&pkg.name) {
-            return Err(format!(
-                "Package '{}' is blocked by Debian APT pinning rule",
-                pkg.name
-            ));
+            return Err(format!("Package '{}' is blocked by Debian APT pinning rule", pkg.name));
         }
 
         // 3. Attach Arch / CachyOS microarch mirror route tag
@@ -714,8 +695,7 @@ impl SovereignDistroPackageAdvancementsSuiteV3 {
         // 4. Attach DNF5 advisory CVE tag if critical
         let criticals = self.dnf5.get_critical_advisories_for(&pkg.name);
         if let Some(c) = criticals.first() {
-            pkg.properties
-                .insert("critical_cve_advisory".to_string(), c.cve.clone());
+            pkg.properties.insert("critical_cve_advisory".to_string(), c.cve.clone());
         }
 
         Ok(())
@@ -737,10 +717,7 @@ mod tests {
         let arch = SovereignArchCachyosMakepkgOptimizationEngine::new(MicroarchTierV3::V4);
         let flags = arch.generate_compiler_flags();
         assert!(flags.cflags.contains("-march=x86-64-v4"));
-        assert_eq!(
-            arch.resolve_optimal_mirror_url(),
-            "https://repo.cachyos.org/repo/v4"
-        );
+        assert_eq!(arch.resolve_optimal_mirror_url(), "https://repo.cachyos.org/repo/v4");
     }
 
     #[test]
@@ -762,10 +739,7 @@ mod tests {
             answer: "UTC".to_string(),
         });
 
-        assert_eq!(
-            debian.lookup_apt_file("/usr/bin/gcc"),
-            Some(&"gcc".to_string())
-        );
+        assert_eq!(debian.lookup_apt_file("/usr/bin/gcc"), Some(&"gcc".to_string()));
     }
 
     #[test]
@@ -849,8 +823,9 @@ mod tests {
     fn test_fedora_dnf5_deltarpm() {
         let base = b"FEDORA_BASE_SYSTEM_DATA";
         let delta = vec![
-            0x01, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x05, b'_', b'D', b'N', b'F',
-            b'5', 0xFF,
+            0x01, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00,
+            0x02, 0x00, 0x05, b'_', b'D', b'N', b'F', b'5',
+            0xFF,
         ];
 
         let res = SovereignFedoraDnf5DeltaRpmEngineV3::reconstruct_deltarpm(base, &delta).unwrap();

@@ -65,11 +65,7 @@ impl DeviceDiscoverySyncEngine {
         protocol: DiscoveryProtocol,
         timestamp: u64,
     ) -> String {
-        let peer_id = format!(
-            "peer_{}_{}",
-            mac_address.replace(':', ""),
-            ip_address.replace('.', "_")
-        );
+        let peer_id = format!("peer_{}_{}", mac_address.replace(':', ""), ip_address.replace('.', "_"));
 
         if let Some(peer) = self.peers.iter_mut().find(|p| p.id == peer_id) {
             peer.last_seen_timestamp = timestamp;
@@ -131,9 +127,7 @@ impl DeviceDiscoverySyncEngine {
         // Active paired peers seen within the last 300 seconds
         self.peers
             .iter()
-            .filter(|p| {
-                p.is_paired && (current_timestamp.saturating_sub(p.last_seen_timestamp) <= 300)
-            })
+            .filter(|p| p.is_paired && (current_timestamp.saturating_sub(p.last_seen_timestamp) <= 300))
             .count()
     }
 }

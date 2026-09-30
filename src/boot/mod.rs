@@ -19,14 +19,11 @@ pub mod uefi;
 pub mod verified;
 
 pub use sigma_bootloader::{
-    BootArch, BootMemoryMap, BootPlatform, FramebufferInfo, KernelCmdline, LiveEnvironmentConfig,
-    MemoryRegion, MemoryType, SigmaBootInfo, SigmaBootManager, SigmaBootloaderEngine,
+    BootArch, BootMemoryMap, BootPlatform, FramebufferInfo, KernelCmdline, MemoryRegion,
+    MemoryType, SigmaBootInfo, SigmaBootManager, SigmaBootloaderEngine, LiveEnvironmentConfig,
     SIGMA_BOOT_MAGIC,
 };
 
-pub use boot_snapshot::{
-    BootSnapshotConfig, BootSnapshotEngine, BootSnapshotItem, BootSnapshotStatus,
-};
 pub use firmware::{
     efi_attr, CpuMicrocodePatchEngine, EfiVariable, EfiVariableStore, EsrtEntry, EsrtFirmwareType,
     FirmwareCapsuleUpdateManager, IommuArchitecture, IommuFirmwareEngine, MicrocodeHeader,
@@ -40,6 +37,9 @@ pub use post::{PostDiagnostics, PostStatus, PostTest, TestType};
 pub use sigma_boot::{
     BootEntry, BootManager, BootStageDescriptor, BootTheme, HandoffProtocol,
     SovereignDistroBootStageHandoff, SovereignFastBootServicePipeline,
+};
+pub use boot_snapshot::{
+    BootSnapshotConfig, BootSnapshotEngine, BootSnapshotItem, BootSnapshotStatus,
 };
 pub use uefi::{
     AcpiParser, BootError, GopFramebuffer, GopSplashCanvas, MicrokernelProfile,

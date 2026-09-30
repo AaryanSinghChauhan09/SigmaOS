@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
-use core::fmt;
 /// SigmaOS: ZenithNet - Bare-Metal Networking Stack
 /// Implements TCP/IP, UDP, ARP, ICMP with zero-copy packet handling
 /// Enhanced with Linux netfilter and BSD firewall integration
+
 use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
+use core::fmt;
 
 /// Packet types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -140,8 +141,16 @@ impl EthernetFrame {
             return None;
         }
 
-        let dst_mac = MacAddr([data[0], data[1], data[2], data[3], data[4], data[5]]);
-        let src_mac = MacAddr([data[6], data[7], data[8], data[9], data[10], data[11]]);
+        let dst_mac = MacAddr(
+            [
+                data[0], data[1], data[2], data[3], data[4], data[5],
+            ],
+        );
+        let src_mac = MacAddr(
+            [
+                data[6], data[7], data[8], data[9], data[10], data[11],
+            ],
+        );
         let ether_type = u16::from_be_bytes([data[12], data[13]]);
         let payload = data[14..].to_vec();
 
@@ -400,9 +409,9 @@ pub struct TcpConnection {
 #[derive(Debug, Clone)]
 pub struct NetworkSocket {
     pub socket_id: u32,
-    pub domain: u32,      // AF_INET, AF_INET6, etc.
+    pub domain: u32, // AF_INET, AF_INET6, etc.
     pub socket_type: u32, // SOCK_STREAM, SOCK_DGRAM, etc.
-    pub protocol: u32,    // IPPROTO_TCP, IPPROTO_UDP, etc.
+    pub protocol: u32, // IPPROTO_TCP, IPPROTO_UDP, etc.
     pub bound_addr: Option<Ipv4Addr>,
     pub bound_port: Option<u16>,
     pub connected_addr: Option<Ipv4Addr>,
@@ -410,7 +419,7 @@ pub struct NetworkSocket {
     pub tcp_connection: Option<TcpConnection>,
     pub non_blocking: bool,
     pub receive_timeout: Option<u64>, // milliseconds
-    pub send_timeout: Option<u64>,    // milliseconds
+    pub send_timeout: Option<u64>, // milliseconds
 }
 
 /// ZenithNet - Main Networking Stack
@@ -420,7 +429,7 @@ pub struct ZenithNet {
     arp_cache: BTreeMap<Ipv4Addr, MacAddr>,
     firewall_rules: Vec<FirewallRule>,
     tcp_connections: BTreeMap<u32, TcpConnection>, // connection_id -> connection
-    sockets: BTreeMap<u32, NetworkSocket>,         // socket_id -> socket
+    sockets: BTreeMap<u32, NetworkSocket>, // socket_id -> socket
     next_socket_id: u32,
     next_connection_id: u32,
 }
@@ -492,12 +501,7 @@ impl ZenithNet {
     /// Get interface statistics
     pub fn get_interface_stats(&self, name: &str) -> Result<(u64, u64, u64, u64), NetworkError> {
         if let Some(iface) = self.interfaces.get(name) {
-            Ok((
-                iface.rx_packets,
-                iface.tx_packets,
-                iface.rx_bytes,
-                iface.tx_bytes,
-            ))
+            Ok((iface.rx_packets, iface.tx_packets, iface.rx_bytes, iface.tx_bytes))
         } else {
             Err(NetworkError::InterfaceNotFound)
         }
@@ -527,14 +531,7 @@ impl ZenithNet {
     }
 
     /// Check if packet should be allowed by firewall
-    pub fn check_firewall(
-        &self,
-        src_addr: Ipv4Addr,
-        dst_addr: Ipv4Addr,
-        src_port: u16,
-        dst_port: u16,
-        protocol: IpProtocol,
-    ) -> Result<(), NetworkError> {
+    pub fn check_firewall(&self, src_addr: Ipv4Addr, dst_addr: Ipv4Addr, src_port: u16, dst_port: u16, protocol: IpProtocol) -> Result<(), NetworkError> {
         for rule in &self.firewall_rules {
             if !rule.enabled {
                 continue;
@@ -592,12 +589,7 @@ impl ZenithNet {
     // ========== Socket Management (Linux/BSD socket API) ==========
 
     /// Create a new socket
-    pub fn socket(
-        &mut self,
-        domain: u32,
-        socket_type: u32,
-        protocol: u32,
-    ) -> Result<u32, NetworkError> {
+    pub fn socket(&mut self, domain: u32, socket_type: u32, protocol: u32) -> Result<u32, NetworkError> {
         let socket_id = self.next_socket_id;
         self.next_socket_id += 1;
 
@@ -632,15 +624,9 @@ impl ZenithNet {
     }
 
     /// Connect socket to remote address
-    pub fn connect(
-        &mut self,
-        socket_id: u32,
-        remote_addr: Ipv4Addr,
-        remote_port: u16,
-    ) -> Result<(), NetworkError> {
+    pub fn connect(&mut self, socket_id: u32, remote_addr: Ipv4Addr, remote_port: u16) -> Result<(), NetworkError> {
         if let Some(socket) = self.sockets.get_mut(&socket_id) {
-            if socket.socket_type != 1 {
-                // SOCK_STREAM
+            if socket.socket_type != 1 { // SOCK_STREAM
                 return Err(NetworkError::SocketError);
             }
 
@@ -665,8 +651,7 @@ impl ZenithNet {
                 last_activity: 0,
             };
 
-            self.tcp_connections
-                .insert(connection_id, tcp_connection.clone());
+            self.tcp_connections.insert(connection_id, tcp_connection.clone());
             socket.connected_addr = Some(remote_addr);
             socket.connected_port = Some(remote_port);
             socket.tcp_connection = Some(tcp_connection);
@@ -680,8 +665,7 @@ impl ZenithNet {
     /// Listen on socket (TCP server)
     pub fn listen(&mut self, socket_id: u32, _backlog: u32) -> Result<(), NetworkError> {
         if let Some(socket) = self.sockets.get_mut(&socket_id) {
-            if socket.socket_type != 1 {
-                // SOCK_STREAM
+            if socket.socket_type != 1 { // SOCK_STREAM
                 return Err(NetworkError::SocketError);
             }
 
@@ -706,8 +690,7 @@ impl ZenithNet {
                     last_activity: 0,
                 };
 
-                self.tcp_connections
-                    .insert(connection_id, tcp_connection.clone());
+                self.tcp_connections.insert(connection_id, tcp_connection.clone());
                 socket.tcp_connection = Some(tcp_connection);
             }
 
@@ -718,11 +701,7 @@ impl ZenithNet {
     }
 
     /// Set socket to non-blocking mode
-    pub fn set_non_blocking(
-        &mut self,
-        socket_id: u32,
-        non_blocking: bool,
-    ) -> Result<(), NetworkError> {
+    pub fn set_non_blocking(&mut self, socket_id: u32, non_blocking: bool) -> Result<(), NetworkError> {
         if let Some(socket) = self.sockets.get_mut(&socket_id) {
             socket.non_blocking = non_blocking;
             Ok(())
@@ -732,11 +711,7 @@ impl ZenithNet {
     }
 
     /// Set socket receive timeout
-    pub fn set_receive_timeout(
-        &mut self,
-        socket_id: u32,
-        timeout_ms: u64,
-    ) -> Result<(), NetworkError> {
+    pub fn set_receive_timeout(&mut self, socket_id: u32, timeout_ms: u64) -> Result<(), NetworkError> {
         if let Some(socket) = self.sockets.get_mut(&socket_id) {
             socket.receive_timeout = Some(timeout_ms);
             Ok(())
@@ -762,17 +737,11 @@ impl ZenithNet {
 
     /// Get TCP connection state
     pub fn get_tcp_state(&self, connection_id: u32) -> Option<TcpState> {
-        self.tcp_connections
-            .get(&connection_id)
-            .map(|conn| conn.state)
+        self.tcp_connections.get(&connection_id).map(|conn| conn.state)
     }
 
     /// Update TCP connection state
-    pub fn set_tcp_state(
-        &mut self,
-        connection_id: u32,
-        state: TcpState,
-    ) -> Result<(), NetworkError> {
+    pub fn set_tcp_state(&mut self, connection_id: u32, state: TcpState) -> Result<(), NetworkError> {
         if let Some(conn) = self.tcp_connections.get_mut(&connection_id) {
             conn.state = state;
             Ok(())
@@ -941,8 +910,7 @@ mod tests {
 
         // Create and bind socket
         let socket_id = net.socket(2, 1, 6).unwrap();
-        net.bind(socket_id, Ipv4Addr::new(0, 0, 0, 0), 8080)
-            .unwrap();
+        net.bind(socket_id, Ipv4Addr::new(0, 0, 0, 0), 8080).unwrap();
 
         // Connect to remote address
         let result = net.connect(socket_id, Ipv4Addr::new(192, 168, 1, 100), 80);

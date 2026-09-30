@@ -5,6 +5,7 @@
 // - PipeWire Wayland Screen Sharing & Remote Desktop (`FedoraPipeWireRemoteDesktop`)
 // - FreeIPA Enterprise Realm & Kerberos GSSAPI Single Sign-On (`FedoraFreeIpaKerberosAuth`)
 
+
 use std::string::{String, ToString};
 use std::vec::Vec;
 
@@ -233,9 +234,7 @@ mod tests {
     #[test]
     fn test_freeipa_kerberos_auth() {
         let mut ipa = FedoraFreeIpaKerberosAuth::new("FEDORA.LOCAL");
-        let ticket = ipa
-            .kinit("admin@FEDORA.LOCAL", "<SIGMA_TEST_PASSWORD>")
-            .unwrap();
+        let ticket = ipa.kinit("admin@FEDORA.LOCAL", "<SIGMA_TEST_PASSWORD>").unwrap();
         assert_eq!(ticket.realm, "FEDORA.LOCAL");
         assert!(ipa.verify_gssapi_token(b"GSSAPI_TICKET_BLOB"));
     }

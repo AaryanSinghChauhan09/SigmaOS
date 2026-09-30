@@ -26,24 +26,14 @@ pub struct FilePermissions {
 
 impl FilePermissions {
     pub fn new(read: bool, write: bool, execute: bool) -> Self {
-        Self {
-            read,
-            write,
-            execute,
-        }
+        Self { read, write, execute }
     }
 
     pub fn as_mode(&self) -> u32 {
         let mut mode = 0u32;
-        if self.read {
-            mode |= 0o400;
-        }
-        if self.write {
-            mode |= 0o200;
-        }
-        if self.execute {
-            mode |= 0o100;
-        }
+        if self.read { mode |= 0o400; }
+        if self.write { mode |= 0o200; }
+        if self.execute { mode |= 0o100; }
         mode
     }
 }
@@ -198,11 +188,7 @@ impl Vfs {
     }
 
     /// Create a file
-    pub fn create(
-        &mut self,
-        path: &str,
-        permissions: FilePermissions,
-    ) -> Result<u64, &'static str> {
+    pub fn create(&mut self, path: &str, permissions: FilePermissions) -> Result<u64, &'static str> {
         let parent_path = self.get_parent_path(path)?;
         let parent_inode = self.lookup(&parent_path).ok_or("Parent not found")?;
 
@@ -279,12 +265,7 @@ impl Vfs {
     }
 
     /// Mount a filesystem
-    pub fn mount(
-        &mut self,
-        mount_point: String,
-        filesystem_type: String,
-        device: String,
-    ) -> Result<(), &'static str> {
+    pub fn mount(&mut self, mount_point: String, filesystem_type: String, device: String) -> Result<(), &'static str> {
         let parent_inode = self.lookup(&mount_point).ok_or("Mount point not found")?;
 
         let superblock = VfsSuperblock {
@@ -411,8 +392,7 @@ mod tests {
     fn test_mount() {
         let mut vfs = Vfs::new();
 
-        vfs.mount("/".to_string(), "ext4".to_string(), "/dev/sda1".to_string())
-            .unwrap();
+        vfs.mount("/".to_string(), "ext4".to_string(), "/dev/sda1".to_string()).unwrap();
         assert_eq!(vfs.mount_count(), 1);
     }
 }

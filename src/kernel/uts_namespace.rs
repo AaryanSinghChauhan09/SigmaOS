@@ -4,10 +4,7 @@
 //! Enables processes to have independent UTS (hostname) information.
 
 use std::collections::HashMap;
-use std::sync::{
-    atomic::{AtomicU64, Ordering},
-    Arc, Mutex,
-};
+use std::sync::{Arc, Mutex, atomic::{AtomicU64, Ordering}};
 
 /// Unique identifier for a UTS namespace
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -173,7 +170,10 @@ impl UtsNamespaceManager {
     }
 
     /// Create a new UTS namespace
-    pub fn create_namespace(&self, parent_id: Option<NamespaceId>) -> Result<NamespaceId, String> {
+    pub fn create_namespace(
+        &self,
+        parent_id: Option<NamespaceId>,
+    ) -> Result<NamespaceId, String> {
         // Generate new namespace ID
         let new_id = self.id_counter.fetch_add(1, Ordering::SeqCst);
         let ns_id = NamespaceId::new(new_id);
@@ -183,9 +183,9 @@ impl UtsNamespaceManager {
         let domainname = "localdomain".to_string();
 
         // Create the namespace
-        let namespace = Arc::new(Mutex::new(UtsNamespace::new(
-            ns_id, hostname, domainname, parent_id,
-        )));
+        let namespace = Arc::new(Mutex::new(
+            UtsNamespace::new(ns_id, hostname, domainname, parent_id)
+        ));
 
         // Register it
         let mut namespaces = self.namespaces.lock().map_err(|e| e.to_string())?;
@@ -197,14 +197,17 @@ impl UtsNamespaceManager {
     /// Get a namespace by ID
     pub fn get_namespace(&self, ns_id: NamespaceId) -> Result<Arc<Mutex<UtsNamespace>>, String> {
         let namespaces = self.namespaces.lock().map_err(|e| e.to_string())?;
-        namespaces
-            .get(&ns_id)
+        namespaces.get(&ns_id)
             .cloned()
             .ok_or_else(|| format!("Namespace {:?} not found", ns_id))
     }
 
     /// Set hostname for a namespace
-    pub fn set_hostname(&self, ns_id: NamespaceId, hostname: String) -> Result<(), String> {
+    pub fn set_hostname(
+        &self,
+        ns_id: NamespaceId,
+        hostname: String,
+    ) -> Result<(), String> {
         let ns_arc = self.get_namespace(ns_id)?;
         let mut ns = ns_arc.lock().map_err(|e| e.to_string())?;
         ns.set_hostname(hostname)
@@ -218,7 +221,11 @@ impl UtsNamespaceManager {
     }
 
     /// Set domainname for a namespace
-    pub fn set_domainname(&self, ns_id: NamespaceId, domainname: String) -> Result<(), String> {
+    pub fn set_domainname(
+        &self,
+        ns_id: NamespaceId,
+        domainname: String,
+    ) -> Result<(), String> {
         let ns_arc = self.get_namespace(ns_id)?;
         let mut ns = ns_arc.lock().map_err(|e| e.to_string())?;
         ns.set_domainname(domainname)
@@ -264,28 +271,18 @@ mod tests {
     #[test]
     fn test_namespace_creation() {
         let manager = UtsNamespaceManager::new();
-        let ns_id = manager
-            .create_namespace(None)
-            .expect("Failed to create namespace");
+        let ns_id = manager.create_namespace(None).expect("Failed to create namespace");
         assert_ne!(ns_id.raw(), 0);
     }
 
     #[test]
     fn test_namespace_hostname_isolation() {
         let manager = UtsNamespaceManager::new();
-        let ns1 = manager
-            .create_namespace(None)
-            .expect("Failed to create ns1");
-        let ns2 = manager
-            .create_namespace(None)
-            .expect("Failed to create ns2");
+        let ns1 = manager.create_namespace(None).expect("Failed to create ns1");
+        let ns2 = manager.create_namespace(None).expect("Failed to create ns2");
 
-        manager
-            .set_hostname(ns1, "host1".to_string())
-            .expect("Failed to set hostname");
-        manager
-            .set_hostname(ns2, "host2".to_string())
-            .expect("Failed to set hostname");
+        manager.set_hostname(ns1, "host1".to_string()).expect("Failed to set hostname");
+        manager.set_hostname(ns2, "host2".to_string()).expect("Failed to set hostname");
 
         let host1 = manager.get_hostname(ns1).expect("Failed to get hostname");
         let host2 = manager.get_hostname(ns2).expect("Failed to get hostname");
@@ -298,9 +295,7 @@ mod tests {
     #[test]
     fn test_hostname_max_length() {
         let manager = UtsNamespaceManager::new();
-        let ns = manager
-            .create_namespace(None)
-            .expect("Failed to create namespace");
+        let ns = manager.create_namespace(None).expect("Failed to create namespace");
 
         let long_hostname = "a".repeat(256);
         let result = manager.set_hostname(ns, long_hostname);
@@ -310,9 +305,7 @@ mod tests {
     #[test]
     fn test_empty_hostname() {
         let manager = UtsNamespaceManager::new();
-        let ns = manager
-            .create_namespace(None)
-            .expect("Failed to create namespace");
+        let ns = manager.create_namespace(None).expect("Failed to create namespace");
 
         let result = manager.set_hostname(ns, "".to_string());
         assert!(result.is_err());
@@ -321,19 +314,11 @@ mod tests {
     #[test]
     fn test_namespace_listing() {
         let manager = UtsNamespaceManager::new();
-        let ns1 = manager
-            .create_namespace(None)
-            .expect("Failed to create ns1");
-        let ns2 = manager
-            .create_namespace(None)
-            .expect("Failed to create ns2");
-        let ns3 = manager
-            .create_namespace(None)
-            .expect("Failed to create ns3");
+        let ns1 = manager.create_namespace(None).expect("Failed to create ns1");
+        let ns2 = manager.create_namespace(None).expect("Failed to create ns2");
+        let ns3 = manager.create_namespace(None).expect("Failed to create ns3");
 
-        let namespaces = manager
-            .list_namespaces()
-            .expect("Failed to list namespaces");
+        let namespaces = manager.list_namespaces().expect("Failed to list namespaces");
         assert_eq!(namespaces.len(), 3);
         assert!(namespaces.contains(&ns1));
         assert!(namespaces.contains(&ns2));
@@ -343,13 +328,9 @@ mod tests {
     #[test]
     fn test_namespace_deletion() {
         let manager = UtsNamespaceManager::new();
-        let ns = manager
-            .create_namespace(None)
-            .expect("Failed to create namespace");
+        let ns = manager.create_namespace(None).expect("Failed to create namespace");
 
-        manager
-            .delete_namespace(ns)
-            .expect("Failed to delete namespace");
+        manager.delete_namespace(ns).expect("Failed to delete namespace");
 
         let result = manager.get_namespace(ns);
         assert!(result.is_err());
@@ -358,26 +339,14 @@ mod tests {
     #[test]
     fn test_domainname_isolation() {
         let manager = UtsNamespaceManager::new();
-        let ns1 = manager
-            .create_namespace(None)
-            .expect("Failed to create ns1");
-        let ns2 = manager
-            .create_namespace(None)
-            .expect("Failed to create ns2");
+        let ns1 = manager.create_namespace(None).expect("Failed to create ns1");
+        let ns2 = manager.create_namespace(None).expect("Failed to create ns2");
 
-        manager
-            .set_domainname(ns1, "domain1.local".to_string())
-            .expect("Failed to set domainname");
-        manager
-            .set_domainname(ns2, "domain2.local".to_string())
-            .expect("Failed to set domainname");
+        manager.set_domainname(ns1, "domain1.local".to_string()).expect("Failed to set domainname");
+        manager.set_domainname(ns2, "domain2.local".to_string()).expect("Failed to set domainname");
 
-        let dom1 = manager
-            .get_domainname(ns1)
-            .expect("Failed to get domainname");
-        let dom2 = manager
-            .get_domainname(ns2)
-            .expect("Failed to get domainname");
+        let dom1 = manager.get_domainname(ns1).expect("Failed to get domainname");
+        let dom2 = manager.get_domainname(ns2).expect("Failed to get domainname");
 
         assert_eq!(dom1, "domain1.local");
         assert_eq!(dom2, "domain2.local");
@@ -386,16 +355,10 @@ mod tests {
     #[test]
     fn test_hierarchical_namespaces() {
         let manager = UtsNamespaceManager::new();
-        let parent = manager
-            .create_namespace(None)
-            .expect("Failed to create parent");
-        let child = manager
-            .create_namespace(Some(parent))
-            .expect("Failed to create child");
+        let parent = manager.create_namespace(None).expect("Failed to create parent");
+        let child = manager.create_namespace(Some(parent)).expect("Failed to create child");
 
-        let ns_arc = manager
-            .get_namespace(child)
-            .expect("Failed to get namespace");
+        let ns_arc = manager.get_namespace(child).expect("Failed to get namespace");
         let ns = ns_arc.lock().expect("Failed to lock namespace");
 
         assert_eq!(ns.parent_id(), Some(parent));
@@ -404,12 +367,8 @@ mod tests {
     #[test]
     fn test_namespace_count() {
         let manager = UtsNamespaceManager::new();
-        manager
-            .create_namespace(None)
-            .expect("Failed to create ns1");
-        manager
-            .create_namespace(None)
-            .expect("Failed to create ns2");
+        manager.create_namespace(None).expect("Failed to create ns1");
+        manager.create_namespace(None).expect("Failed to create ns2");
 
         let count = manager.count().expect("Failed to get count");
         assert_eq!(count, 2);

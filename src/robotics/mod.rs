@@ -19,5 +19,5 @@ use std::vec::Vec;
 pub mod ros_core;
 pub mod simulator;
 
-pub use ros_core::{RosMessage, RosMiddleware, Transform};
+pub use ros_core::{RosMiddleware, RosMessage, Transform};
 pub use simulator::{PhysicsWorld, RigidBody, Vector3};

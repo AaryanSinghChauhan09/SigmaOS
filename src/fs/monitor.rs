@@ -56,7 +56,12 @@ impl DiskUsage {
 
         format!(
             "{} {} {} {} {:.1}% {}",
-            self.device, total_mb, used_mb, avail_mb, self.usage_percent, self.mount_point
+            self.device,
+            total_mb,
+            used_mb,
+            avail_mb,
+            self.usage_percent,
+            self.mount_point
         )
     }
 }
@@ -82,10 +87,7 @@ impl DirectorySize {
 
     pub fn get_human_readable(&self) -> String {
         let mb = self.size / (1024 * 1024);
-        format!(
-            "{} {}M {} files {} dirs",
-            self.path, mb, self.file_count, self.dir_count
-        )
+        format!("{} {}M {} files {} dirs", self.path, mb, self.file_count, self.dir_count)
     }
 }
 
@@ -220,9 +222,7 @@ impl FilesystemMonitor {
     }
 
     pub fn get_disk_usage(&self, mount_point: &str) -> Option<&DiskUsage> {
-        self.disk_usage
-            .iter()
-            .find(|d| d.mount_point == mount_point)
+        self.disk_usage.iter().find(|d| d.mount_point == mount_point)
     }
 
     pub fn list_disk_usage(&self) -> Vec<DiskUsage> {
@@ -231,11 +231,7 @@ impl FilesystemMonitor {
 
     pub fn list_disk_usage_sorted(&self) -> Vec<DiskUsage> {
         let mut usage = self.disk_usage.clone();
-        usage.sort_by(|a, b| {
-            b.usage_percent
-                .partial_cmp(&a.usage_percent)
-                .unwrap_or(std::cmp::Ordering::Equal)
-        });
+        usage.sort_by(|a, b| b.usage_percent.partial_cmp(&a.usage_percent).unwrap_or(std::cmp::Ordering::Equal));
         usage
     }
 
@@ -255,11 +251,7 @@ impl FilesystemMonitor {
 
     pub fn list_inode_usage_sorted(&self) -> Vec<InodeUsage> {
         let mut usage = self.inode_usage.clone();
-        usage.sort_by(|a, b| {
-            b.usage_percent
-                .partial_cmp(&a.usage_percent)
-                .unwrap_or(std::cmp::Ordering::Equal)
-        });
+        usage.sort_by(|a, b| b.usage_percent.partial_cmp(&a.usage_percent).unwrap_or(std::cmp::Ordering::Equal));
         usage
     }
 
@@ -269,10 +261,7 @@ impl FilesystemMonitor {
         // Simulate filesystem check
         if force {
             result.status = FsCheckStatus::Clean;
-            result.output = format!(
-                "Forced check on {} ({}) completed successfully",
-                device, fs_type
-            );
+            result.output = format!("Forced check on {} ({}) completed successfully", device, fs_type);
         } else {
             result.status = FsCheckStatus::Clean;
             result.output = format!("Check on {} ({}) completed successfully", device, fs_type);
@@ -282,16 +271,14 @@ impl FilesystemMonitor {
     }
 
     pub fn get_high_usage_disks(&self, threshold: f32) -> Vec<DiskUsage> {
-        self.disk_usage
-            .iter()
+        self.disk_usage.iter()
             .filter(|d| d.usage_percent >= threshold)
             .cloned()
             .collect()
     }
 
     pub fn get_high_inode_usage(&self, threshold: f32) -> Vec<InodeUsage> {
-        self.inode_usage
-            .iter()
+        self.inode_usage.iter()
             .filter(|i| i.usage_percent >= threshold)
             .cloned()
             .collect()
@@ -316,18 +303,9 @@ impl FilesystemMonitor {
 
     pub fn get_statistics(&self) -> String {
         let mut stats = String::from("Filesystem Statistics:\n");
-        stats.push_str(&format!(
-            "Filesystems monitored: {}\n",
-            self.disk_usage.len()
-        ));
-        stats.push_str(&format!(
-            "Directories monitored: {}\n",
-            self.directory_sizes.len()
-        ));
-        stats.push_str(&format!(
-            "Inode tables monitored: {}\n",
-            self.inode_usage.len()
-        ));
+        stats.push_str(&format!("Filesystems monitored: {}\n", self.disk_usage.len()));
+        stats.push_str(&format!("Directories monitored: {}\n", self.directory_sizes.len()));
+        stats.push_str(&format!("Inode tables monitored: {}\n", self.inode_usage.len()));
 
         let total_usage = self.get_total_disk_usage();
         let total_capacity = self.get_total_disk_capacity();
@@ -338,10 +316,7 @@ impl FilesystemMonitor {
         stats.push_str(&format!("Overall usage: {:.1}%\n", overall_percent));
 
         let high_usage = self.get_high_usage_disks(90.0);
-        stats.push_str(&format!(
-            "High usage filesystems (>90%): {}\n",
-            high_usage.len()
-        ));
+        stats.push_str(&format!("High usage filesystems (>90%): {}\n", high_usage.len()));
 
         let high_inode = self.get_high_inode_usage(90.0);
         stats.push_str(&format!("High inode usage (>90%): {}\n", high_inode.len()));
@@ -363,8 +338,7 @@ impl FilesystemMonitor {
 
     pub fn count_files(&self, path: &str) -> u32 {
         // Simulate file count
-        self.directory_sizes
-            .iter()
+        self.directory_sizes.iter()
             .filter(|d| d.path.starts_with(path))
             .map(|d| d.file_count)
             .sum()
@@ -451,7 +425,10 @@ mod tests {
 
     #[test]
     fn test_fs_check_result_creation() {
-        let result = FsCheckResult::new(String::from("/dev/sda1"), String::from("ext4"));
+        let result = FsCheckResult::new(
+            String::from("/dev/sda1"),
+            String::from("ext4"),
+        );
         assert_eq!(result.device, "/dev/sda1");
         assert_eq!(result.fs_type, "ext4");
         assert_eq!(result.status, FsCheckStatus::Clean);
@@ -491,19 +468,11 @@ mod tests {
     #[test]
     fn test_filesystem_monitor_list_disk_usage_sorted() {
         let mut monitor = FilesystemMonitor::new();
-        let mut usage1 = DiskUsage::new(
-            String::from("/"),
-            String::from("/dev/sda1"),
-            String::from("ext4"),
-        );
+        let mut usage1 = DiskUsage::new(String::from("/"), String::from("/dev/sda1"), String::from("ext4"));
         usage1.usage_percent = 90.0;
         monitor.add_disk_usage(usage1);
 
-        let mut usage2 = DiskUsage::new(
-            String::from("/home"),
-            String::from("/dev/sda2"),
-            String::from("ext4"),
-        );
+        let mut usage2 = DiskUsage::new(String::from("/home"), String::from("/dev/sda2"), String::from("ext4"));
         usage2.usage_percent = 50.0;
         monitor.add_disk_usage(usage2);
 
@@ -521,19 +490,11 @@ mod tests {
     #[test]
     fn test_filesystem_monitor_get_high_usage_disks() {
         let mut monitor = FilesystemMonitor::new();
-        let mut usage1 = DiskUsage::new(
-            String::from("/"),
-            String::from("/dev/sda1"),
-            String::from("ext4"),
-        );
+        let mut usage1 = DiskUsage::new(String::from("/"), String::from("/dev/sda1"), String::from("ext4"));
         usage1.usage_percent = 95.0;
         monitor.add_disk_usage(usage1);
 
-        let mut usage2 = DiskUsage::new(
-            String::from("/home"),
-            String::from("/dev/sda2"),
-            String::from("ext4"),
-        );
+        let mut usage2 = DiskUsage::new(String::from("/home"), String::from("/dev/sda2"), String::from("ext4"));
         usage2.usage_percent = 50.0;
         monitor.add_disk_usage(usage2);
 
@@ -544,11 +505,7 @@ mod tests {
     #[test]
     fn test_filesystem_monitor_get_statistics() {
         let mut monitor = FilesystemMonitor::new();
-        let mut usage = DiskUsage::new(
-            String::from("/"),
-            String::from("/dev/sda1"),
-            String::from("ext4"),
-        );
+        let mut usage = DiskUsage::new(String::from("/"), String::from("/dev/sda1"), String::from("ext4"));
         usage.total_size = 1000;
         usage.used_size = 500;
         monitor.add_disk_usage(usage);

@@ -101,14 +101,7 @@ impl NetBsdNpfFirewallEngine {
         });
     }
 
-    pub fn add_nat_rule(
-        &mut self,
-        id: u32,
-        nat_type: NpfNatType,
-        orig_ip: &str,
-        trans_ip: &str,
-        port: u16,
-    ) {
+    pub fn add_nat_rule(&mut self, id: u32, nat_type: NpfNatType, orig_ip: &str, trans_ip: &str, port: u16) {
         self.nat_rules.push(NpfNatRule {
             id,
             nat_type,
@@ -174,12 +167,7 @@ impl OpenBsdPledgeUnveilEnforcer {
         Ok(())
     }
 
-    pub fn unveil(
-        &mut self,
-        pid: usize,
-        path: &str,
-        permissions: &str,
-    ) -> Result<(), &'static str> {
+    pub fn unveil(&mut self, pid: usize, path: &str, permissions: &str) -> Result<(), &'static str> {
         let process_paths = self.unveiled_paths.entry(pid).or_insert_with(BTreeMap::new);
         process_paths.insert(path.to_string(), permissions.to_string());
         Ok(())
@@ -252,13 +240,7 @@ impl AlpineOpenRcApkWorldEngine {
         }
     }
 
-    pub fn register_service(
-        &mut self,
-        name: &str,
-        cmd: &str,
-        runlevel: OpenRcRunlevel,
-        deps: &[&str],
-    ) {
+    pub fn register_service(&mut self, name: &str, cmd: &str, runlevel: OpenRcRunlevel, deps: &[&str]) {
         let svc = OpenRcService {
             name: name.to_string(),
             command: cmd.to_string(),
@@ -282,8 +264,7 @@ impl AlpineOpenRcApkWorldEngine {
         if !self.world_packages.contains(&pkg.to_string()) {
             self.world_packages.push(pkg.to_string());
         }
-        self.installed_packages
-            .insert(pkg.to_string(), version.to_string());
+        self.installed_packages.insert(pkg.to_string(), version.to_string());
     }
 
     pub fn reconcile_apk_world(&mut self) -> usize {
@@ -380,10 +361,7 @@ impl NixGuixCasStoreEngine {
         gen_id
     }
 
-    pub fn rollback_generation(
-        &mut self,
-        target_gen_id: u32,
-    ) -> Result<SystemGeneration, &'static str> {
+    pub fn rollback_generation(&mut self, target_gen_id: u32) -> Result<SystemGeneration, &'static str> {
         if let Some(gen) = self.generations.get(&target_gen_id).cloned() {
             self.current_generation_id = target_gen_id;
             Ok(gen)
@@ -509,13 +487,7 @@ impl FreeBsdGeomGateStorageEngine {
         }
     }
 
-    pub fn create_gate_device(
-        &mut self,
-        name: &str,
-        remote_ip: &str,
-        port: u16,
-        total_sectors: u64,
-    ) -> GeomGateDevice {
+    pub fn create_gate_device(&mut self, name: &str, remote_ip: &str, port: u16, total_sectors: u64) -> GeomGateDevice {
         let dev = GeomGateDevice {
             name: name.to_string(),
             remote_ip: remote_ip.to_string(),
@@ -640,18 +612,11 @@ mod tests {
     #[test]
     fn test_openrc_apk_engine() {
         let mut alpine = AlpineOpenRcApkWorldEngine::new();
-        alpine.register_service(
-            "sshd",
-            "/usr/sbin/sshd",
-            OpenRcRunlevel::DefaultRunlevel,
-            &["network"],
-        );
+        alpine.register_service("sshd", "/usr/sbin/sshd", OpenRcRunlevel::DefaultRunlevel, &["network"]);
         assert!(alpine.start_service("sshd").unwrap());
 
         alpine.add_to_world("neofetch", "7.1.0");
-        alpine
-            .installed_packages
-            .insert("orphaned-pkg".to_string(), "1.0.0".to_string());
+        alpine.installed_packages.insert("orphaned-pkg".to_string(), "1.0.0".to_string());
         assert_eq!(alpine.reconcile_apk_world(), 1);
         assert!(!alpine.installed_packages.contains_key("orphaned-pkg"));
     }
@@ -695,8 +660,6 @@ mod tests {
     fn test_master_synthesis_suite() {
         let suite = SovereignLinuxBsdMasterSynthesisSuite::new();
         assert!(suite.health_check());
-        assert!(suite
-            .summary_report()
-            .contains("Sovereign Linux & BSD Master Synthesis Suite Active"));
+        assert!(suite.summary_report().contains("Sovereign Linux & BSD Master Synthesis Suite Active"));
     }
 }

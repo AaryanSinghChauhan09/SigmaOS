@@ -55,10 +55,7 @@ impl SystemTray {
     }
 
     pub fn get_icons_by_category(&self, category: TrayCategory) -> Vec<&StatusIcon> {
-        self.icons
-            .values()
-            .filter(|i| i.category == category)
-            .collect()
+        self.icons.values().filter(|i| i.category == category).collect()
     }
 
     pub fn set_unread_count(&mut self, id: &str, count: u32) -> Result<(), String> {
@@ -90,13 +87,15 @@ mod tests {
             icon_name: "network-wireless".to_string(),
             tooltip: "Connected to WiFi".to_string(),
             unread_count: 0,
-            menu: vec![TrayMenuItem {
-                label: "Disconnect".to_string(),
-                icon: None,
-                shortcut: None,
-                is_separator: false,
-                submenu: None,
-            }],
+            menu: vec![
+                TrayMenuItem {
+                    label: "Disconnect".to_string(),
+                    icon: None,
+                    shortcut: None,
+                    is_separator: false,
+                    submenu: None,
+                }
+            ],
         }
     }
 

@@ -6,6 +6,7 @@
 pub mod kuroko_lang;
 
 pub use kuroko_lang::{
-    BuiltinFn, CodeObject, Instruction, KurokoCompiler, KurokoError, KurokoObject, KurokoREPL,
-    KurokoVM, KurokoValue, Opcode, Token, TokenType,
+    KurokoValue, KurokoObject, KurokoError, Opcode, Instruction, CodeObject,
+    KurokoCompiler, KurokoVM, KurokoREPL, BuiltinFn,
+    Token, TokenType,
 };

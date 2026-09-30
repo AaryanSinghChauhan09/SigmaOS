@@ -227,8 +227,7 @@ impl ZeroCopyRingBuffer {
         }
 
         self.packets[tail] = Some(packet);
-        self.tail
-            .store((tail + 1) % self.capacity, Ordering::SeqCst);
+        self.tail.store((tail + 1) % self.capacity, Ordering::SeqCst);
         Ok(())
     }
 
@@ -242,8 +241,7 @@ impl ZeroCopyRingBuffer {
         }
 
         let packet = self.packets[head].take();
-        self.head
-            .store((head + 1) % self.capacity, Ordering::SeqCst);
+        self.head.store((head + 1) % self.capacity, Ordering::SeqCst);
         packet
     }
 

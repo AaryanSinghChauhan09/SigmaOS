@@ -14,11 +14,11 @@ use std::vec::Vec;
 /// Driver Hardware Class Category
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ExpandedHardwareClass {
-    Wifi6e7Wireless,     // Intel AX210/AX211, Realtek RTL8852AE, Broadcom BCM4360
-    ModernAudioSof,      // Intel Sound Open Firmware / AMD ACP Audio
-    Usb32XhciController, // USB 3.2 Gen 2x2 20Gbps xHCI Host Controller
-    Usb4Thunderbolt4,    // USB4 40Gbps / Thunderbolt 4 Domain Router
-    AcpiThermalBattery,  // ACPI Thermal Zone, Fan Control & Smart Battery Telemetry
+    Wifi6e7Wireless,      // Intel AX210/AX211, Realtek RTL8852AE, Broadcom BCM4360
+    ModernAudioSof,       // Intel Sound Open Firmware / AMD ACP Audio
+    Usb32XhciController,  // USB 3.2 Gen 2x2 20Gbps xHCI Host Controller
+    Usb4Thunderbolt4,     // USB4 40Gbps / Thunderbolt 4 Domain Router
+    AcpiThermalBattery,   // ACPI Thermal Zone, Fan Control & Smart Battery Telemetry
 }
 
 /// Hardware Driver State Descriptor
@@ -29,7 +29,7 @@ pub struct HardwareDriverState {
     pub hardware_class: ExpandedHardwareClass,
     pub is_firmware_loaded: bool,
     pub link_speed_mbps: u32,
-    pub power_state_mwd: u8, // 0 = D0 (Full Power), 3 = D3hot
+    pub power_state_mwd: u8,   // 0 = D0 (Full Power), 3 = D3hot
 }
 
 /// Sovereign Hardware Driver Support Expansion Engine
@@ -51,61 +51,25 @@ impl SovereignHardwareDriverExpansionEngine {
     /// Register default Linux & BSD inspired expanded drivers
     pub fn initialize_default_expanded_drivers(&mut self) {
         // 1. Intel AX210 Wi-Fi 6E (iwlwifi / iwm)
-        self.register_driver(
-            "iwlwifi-ax210",
-            "8086:2725",
-            ExpandedHardwareClass::Wifi6e7Wireless,
-            2400,
-        );
+        self.register_driver("iwlwifi-ax210", "8086:2725", ExpandedHardwareClass::Wifi6e7Wireless, 2400);
 
         // 2. Realtek RTL8852AE Wi-Fi 6 (rtw89)
-        self.register_driver(
-            "rtw89-8852ae",
-            "10EC:8852",
-            ExpandedHardwareClass::Wifi6e7Wireless,
-            1200,
-        );
+        self.register_driver("rtw89-8852ae", "10EC:8852", ExpandedHardwareClass::Wifi6e7Wireless, 1200);
 
         // 3. Intel Sound Open Firmware (snd_sof_pci)
-        self.register_driver(
-            "snd-sof-pci-intel-tme",
-            "8086:51C8",
-            ExpandedHardwareClass::ModernAudioSof,
-            192,
-        );
+        self.register_driver("snd-sof-pci-intel-tme", "8086:51C8", ExpandedHardwareClass::ModernAudioSof, 192);
 
         // 4. USB 3.2 xHCI Host Controller (xhci_hcd)
-        self.register_driver(
-            "xhci-hcd-usb32",
-            "1022:149C",
-            ExpandedHardwareClass::Usb32XhciController,
-            20000,
-        );
+        self.register_driver("xhci-hcd-usb32", "1022:149C", ExpandedHardwareClass::Usb32XhciController, 20000);
 
         // 5. USB4 / Thunderbolt 4 Domain Router (thunderbolt)
-        self.register_driver(
-            "thunderbolt-tb4-router",
-            "8086:9A1B",
-            ExpandedHardwareClass::Usb4Thunderbolt4,
-            40000,
-        );
+        self.register_driver("thunderbolt-tb4-router", "8086:9A1B", ExpandedHardwareClass::Usb4Thunderbolt4, 40000);
 
         // 6. ACPI Thermal Zone & Battery Governor (acpi_thermal)
-        self.register_driver(
-            "acpi-thermal-battery-governor",
-            "PNP0C02",
-            ExpandedHardwareClass::AcpiThermalBattery,
-            0,
-        );
+        self.register_driver("acpi-thermal-battery-governor", "PNP0C02", ExpandedHardwareClass::AcpiThermalBattery, 0);
     }
 
-    pub fn register_driver(
-        &mut self,
-        name: &str,
-        device_id: &str,
-        class: ExpandedHardwareClass,
-        max_speed: u32,
-    ) {
+    pub fn register_driver(&mut self, name: &str, device_id: &str, class: ExpandedHardwareClass, max_speed: u32) {
         let state = HardwareDriverState {
             driver_name: name.to_string(),
             pci_or_usb_id: device_id.to_string(),
@@ -121,17 +85,11 @@ impl SovereignHardwareDriverExpansionEngine {
 
     /// Query active driver info by PCI / USB ID matcher
     pub fn probe_hardware_by_id(&self, device_id: &str) -> Option<&HardwareDriverState> {
-        self.active_drivers
-            .values()
-            .find(|d| d.pci_or_usb_id == device_id)
+        self.active_drivers.values().find(|d| d.pci_or_usb_id == device_id)
     }
 
     /// Set driver power management D-state (D0 = Active, D3 = Low Power Suspend)
-    pub fn set_driver_power_state(
-        &mut self,
-        driver_name: &str,
-        d_state: u8,
-    ) -> Result<(), &'static str> {
+    pub fn set_driver_power_state(&mut self, driver_name: &str, d_state: u8) -> Result<(), &'static str> {
         if let Some(driver) = self.active_drivers.get_mut(driver_name) {
             driver.power_state_mwd = d_state;
             Ok(())

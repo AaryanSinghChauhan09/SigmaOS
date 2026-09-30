@@ -25,9 +25,7 @@ pub struct BuddyAllocator {
 
 impl BuddyAllocator {
     pub fn new(total_memory: usize, min_block_size: usize) -> Self {
-        let max_order = (total_memory / min_block_size)
-            .next_power_of_two()
-            .trailing_zeros() as usize;
+        let max_order = (total_memory / min_block_size).next_power_of_two().trailing_zeros() as usize;
 
         let mut free_lists = vec![Vec::new(); max_order + 1];
 
@@ -73,8 +71,7 @@ impl BuddyAllocator {
     /// Free memory
     pub fn free(&mut self, address: u64) -> Result<(), &'static str> {
         // Find allocated block
-        let block_id = self
-            .allocated_blocks
+        let block_id = self.allocated_blocks
             .iter()
             .find(|(_, b)| b.start == address && b.allocated)
             .map(|(id, _)| *id)
@@ -106,14 +103,8 @@ impl BuddyAllocator {
     }
 
     /// Split block to required order
-    fn split_block(
-        &mut self,
-        current_order: usize,
-        required_order: usize,
-    ) -> Result<MemoryBlock, &'static str> {
-        let mut block = self.free_lists[current_order]
-            .pop()
-            .ok_or("Block not found")?;
+    fn split_block(&mut self, current_order: usize, required_order: usize) -> Result<MemoryBlock, &'static str> {
+        let mut block = self.free_lists[current_order].pop().ok_or("Block not found")?;
 
         while block.order > required_order {
             let new_order = block.order - 1;
@@ -147,10 +138,7 @@ impl BuddyAllocator {
 
         // Find buddy in free list
         for order in block.order..self.max_order {
-            if let Some(pos) = self.free_lists[order]
-                .iter()
-                .position(|b| b.start == buddy_address)
-            {
+            if let Some(pos) = self.free_lists[order].iter().position(|b| b.start == buddy_address) {
                 // Found buddy - merge
                 let buddy = self.free_lists[order].remove(pos);
 
@@ -178,8 +166,7 @@ impl BuddyAllocator {
 
     /// Get free memory
     pub fn free_memory(&self) -> usize {
-        self.free_lists
-            .iter()
+        self.free_lists.iter()
             .flatten()
             .filter(|b| !b.allocated)
             .map(|b| b.size)
@@ -188,8 +175,7 @@ impl BuddyAllocator {
 
     /// Get allocated memory
     pub fn allocated_memory(&self) -> usize {
-        self.allocated_blocks
-            .values()
+        self.allocated_blocks.values()
             .filter(|b| b.allocated)
             .map(|b| b.size)
             .sum()
@@ -259,8 +245,7 @@ impl SlabCache {
 
     /// Grow slab cache
     fn grow_slab(&mut self) {
-        let base_address =
-            self.slabs.len() as u64 * self.object_size as u64 * self.objects_per_slab as u64;
+        let base_address = self.slabs.len() as u64 * self.object_size as u64 * self.objects_per_slab as u64;
 
         let mut slab = Vec::new();
         for i in 0..self.objects_per_slab {
@@ -270,8 +255,7 @@ impl SlabCache {
             });
         }
 
-        self.free_objects
-            .fetch_add(self.objects_per_slab, Ordering::SeqCst);
+        self.free_objects.fetch_add(self.objects_per_slab, Ordering::SeqCst);
         self.slabs.push(slab);
     }
 
@@ -299,12 +283,7 @@ impl SlabAllocator {
     }
 
     /// Create a slab cache
-    pub fn create_cache(
-        &mut self,
-        name: String,
-        object_size: usize,
-        objects_per_slab: usize,
-    ) -> Result<(), &'static str> {
+    pub fn create_cache(&mut self, name: String, object_size: usize, objects_per_slab: usize) -> Result<(), &'static str> {
         if self.caches.contains_key(&name) {
             return Err("Cache already exists");
         }

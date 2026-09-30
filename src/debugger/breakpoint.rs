@@ -1,10 +1,12 @@
+
+
+use std::vec::Vec;
+use std::boxed::Box;
 use core::mem;
 /// OOP-based Debugger for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 171
 /// Implements breakpoints and debugging interface
 use core::sync::atomic::{AtomicUsize, Ordering};
-use std::boxed::Box;
-use std::vec::Vec;
 
 pub type BreakpointID = usize;
 

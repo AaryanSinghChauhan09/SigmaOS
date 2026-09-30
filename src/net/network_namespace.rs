@@ -5,15 +5,10 @@
 
 use std::collections::HashMap;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
-use std::sync::{
-    atomic::{AtomicU64, Ordering},
-    Arc, Mutex,
-};
+use std::sync::{Arc, Mutex, atomic::{AtomicU64, Ordering}};
 
 // Re-export socket types for convenience
-pub use crate::net::network_syscalls::{
-    NamespaceSocketTable, SocketFd, SocketMetadata, CLONE_NEWNET,
-};
+pub use crate::net::network_syscalls::{SocketFd, SocketMetadata, NamespaceSocketTable, CLONE_NEWNET};
 
 /// Unique identifier for a network namespace
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -165,7 +160,10 @@ pub struct NetworkNamespace {
 }
 
 impl NetworkNamespace {
-    pub fn new(id: NetworkNamespaceId, parent_id: Option<NetworkNamespaceId>) -> Self {
+    pub fn new(
+        id: NetworkNamespaceId,
+        parent_id: Option<NetworkNamespaceId>,
+    ) -> Self {
         NetworkNamespace {
             id,
             interfaces: Arc::new(Mutex::new(HashMap::new())),
@@ -197,8 +195,7 @@ impl NetworkNamespace {
 
     pub fn get_interface(&self, name: &str) -> Result<Arc<Mutex<NetworkInterface>>, String> {
         let interfaces = self.interfaces.lock().map_err(|e| e.to_string())?;
-        interfaces
-            .get(name)
+        interfaces.get(name)
             .cloned()
             .ok_or_else(|| format!("Interface {} not found", name))
     }
@@ -309,7 +306,9 @@ impl NetworkNamespaceManager {
         let new_id = self.id_counter.fetch_add(1, Ordering::SeqCst);
         let ns_id = NetworkNamespaceId::new(new_id);
 
-        let namespace = Arc::new(Mutex::new(NetworkNamespace::new(ns_id, parent_id)));
+        let namespace = Arc::new(Mutex::new(
+            NetworkNamespace::new(ns_id, parent_id)
+        ));
 
         let mut namespaces = self.namespaces.lock().map_err(|e| e.to_string())?;
         namespaces.insert(ns_id, namespace);
@@ -317,13 +316,9 @@ impl NetworkNamespaceManager {
         Ok(ns_id)
     }
 
-    pub fn get_namespace(
-        &self,
-        ns_id: NetworkNamespaceId,
-    ) -> Result<Arc<Mutex<NetworkNamespace>>, String> {
+    pub fn get_namespace(&self, ns_id: NetworkNamespaceId) -> Result<Arc<Mutex<NetworkNamespace>>, String> {
         let namespaces = self.namespaces.lock().map_err(|e| e.to_string())?;
-        namespaces
-            .get(&ns_id)
+        namespaces.get(&ns_id)
             .cloned()
             .ok_or_else(|| format!("Network namespace {:?} not found", ns_id))
     }
@@ -358,21 +353,15 @@ mod tests {
     #[test]
     fn test_network_namespace_creation() {
         let manager = NetworkNamespaceManager::new();
-        let ns_id = manager
-            .create_namespace(None)
-            .expect("Failed to create namespace");
+        let ns_id = manager.create_namespace(None).expect("Failed to create namespace");
         assert_ne!(ns_id.raw(), 0);
     }
 
     #[test]
     fn test_add_interface() {
         let manager = NetworkNamespaceManager::new();
-        let ns_id = manager
-            .create_namespace(None)
-            .expect("Failed to create namespace");
-        let ns_arc = manager
-            .get_namespace(ns_id)
-            .expect("Failed to get namespace");
+        let ns_id = manager.create_namespace(None).expect("Failed to create namespace");
+        let ns_arc = manager.get_namespace(ns_id).expect("Failed to get namespace");
         let ns = ns_arc.lock().expect("Failed to lock namespace");
 
         let iface = NetworkInterface::new("eth0".to_string());
@@ -382,12 +371,8 @@ mod tests {
     #[test]
     fn test_list_interfaces() {
         let manager = NetworkNamespaceManager::new();
-        let ns_id = manager
-            .create_namespace(None)
-            .expect("Failed to create namespace");
-        let ns_arc = manager
-            .get_namespace(ns_id)
-            .expect("Failed to get namespace");
+        let ns_id = manager.create_namespace(None).expect("Failed to create namespace");
+        let ns_arc = manager.get_namespace(ns_id).expect("Failed to get namespace");
         let ns = ns_arc.lock().expect("Failed to lock namespace");
 
         let iface1 = NetworkInterface::new("eth0".to_string());
@@ -404,12 +389,8 @@ mod tests {
     #[test]
     fn test_add_route() {
         let manager = NetworkNamespaceManager::new();
-        let ns_id = manager
-            .create_namespace(None)
-            .expect("Failed to create namespace");
-        let ns_arc = manager
-            .get_namespace(ns_id)
-            .expect("Failed to get namespace");
+        let ns_id = manager.create_namespace(None).expect("Failed to create namespace");
+        let ns_arc = manager.get_namespace(ns_id).expect("Failed to get namespace");
         let ns = ns_arc.lock().expect("Failed to lock namespace");
 
         let route = Route::new(
@@ -426,12 +407,8 @@ mod tests {
     #[test]
     fn test_network_isolation() {
         let manager = NetworkNamespaceManager::new();
-        let ns1 = manager
-            .create_namespace(None)
-            .expect("Failed to create ns1");
-        let ns2 = manager
-            .create_namespace(None)
-            .expect("Failed to create ns2");
+        let ns1 = manager.create_namespace(None).expect("Failed to create ns1");
+        let ns2 = manager.create_namespace(None).expect("Failed to create ns2");
 
         let ns1_arc = manager.get_namespace(ns1).expect("Failed to get ns1");
         let ns2_arc = manager.get_namespace(ns2).expect("Failed to get ns2");
@@ -442,12 +419,8 @@ mod tests {
         let iface1 = NetworkInterface::new("eth0".to_string());
         let iface2 = NetworkInterface::new("eth0".to_string());
 
-        ns1_lock
-            .add_interface(iface1)
-            .expect("Failed to add to ns1");
-        ns2_lock
-            .add_interface(iface2)
-            .expect("Failed to add to ns2");
+        ns1_lock.add_interface(iface1).expect("Failed to add to ns1");
+        ns2_lock.add_interface(iface2).expect("Failed to add to ns2");
 
         let ifaces1 = ns1_lock.list_interfaces().expect("Failed to list ns1");
         let ifaces2 = ns2_lock.list_interfaces().expect("Failed to list ns2");
@@ -459,12 +432,8 @@ mod tests {
     #[test]
     fn test_virtual_bridge_creation() {
         let manager = NetworkNamespaceManager::new();
-        let ns_id = manager
-            .create_namespace(None)
-            .expect("Failed to create namespace");
-        let ns_arc = manager
-            .get_namespace(ns_id)
-            .expect("Failed to get namespace");
+        let ns_id = manager.create_namespace(None).expect("Failed to create namespace");
+        let ns_arc = manager.get_namespace(ns_id).expect("Failed to get namespace");
         let ns = ns_arc.lock().expect("Failed to lock namespace");
 
         assert!(ns.create_virtual_bridge("br0".to_string()).is_ok());
@@ -473,12 +442,8 @@ mod tests {
     #[test]
     fn test_firewall_rules() {
         let manager = NetworkNamespaceManager::new();
-        let ns_id = manager
-            .create_namespace(None)
-            .expect("Failed to create namespace");
-        let ns_arc = manager
-            .get_namespace(ns_id)
-            .expect("Failed to get namespace");
+        let ns_id = manager.create_namespace(None).expect("Failed to create namespace");
+        let ns_arc = manager.get_namespace(ns_id).expect("Failed to get namespace");
         let ns = ns_arc.lock().expect("Failed to lock namespace");
 
         let rule = FirewallRule::new(FirewallAction::Allow);
@@ -491,12 +456,8 @@ mod tests {
     #[test]
     fn test_hierarchical_network_namespaces() {
         let manager = NetworkNamespaceManager::new();
-        let parent = manager
-            .create_namespace(None)
-            .expect("Failed to create parent");
-        let child = manager
-            .create_namespace(Some(parent))
-            .expect("Failed to create child");
+        let parent = manager.create_namespace(None).expect("Failed to create parent");
+        let child = manager.create_namespace(Some(parent)).expect("Failed to create child");
 
         let child_arc = manager.get_namespace(child).expect("Failed to get child");
         let child_ns = child_arc.lock().expect("Failed to lock child");
@@ -507,12 +468,8 @@ mod tests {
     #[test]
     fn test_get_interface() {
         let manager = NetworkNamespaceManager::new();
-        let ns_id = manager
-            .create_namespace(None)
-            .expect("Failed to create namespace");
-        let ns_arc = manager
-            .get_namespace(ns_id)
-            .expect("Failed to get namespace");
+        let ns_id = manager.create_namespace(None).expect("Failed to create namespace");
+        let ns_arc = manager.get_namespace(ns_id).expect("Failed to get namespace");
         let ns = ns_arc.lock().expect("Failed to lock namespace");
 
         let iface = NetworkInterface::new("eth0".to_string());
@@ -526,12 +483,8 @@ mod tests {
     #[test]
     fn test_namespace_count() {
         let manager = NetworkNamespaceManager::new();
-        manager
-            .create_namespace(None)
-            .expect("Failed to create ns1");
-        manager
-            .create_namespace(None)
-            .expect("Failed to create ns2");
+        manager.create_namespace(None).expect("Failed to create ns1");
+        manager.create_namespace(None).expect("Failed to create ns2");
 
         let count = manager.count().expect("Failed to get count");
         assert_eq!(count, 2);

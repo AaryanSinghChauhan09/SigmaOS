@@ -26,9 +26,9 @@
 #![allow(dead_code)]
 
 use std::collections::BTreeMap;
-use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use std::format;
 
 // ─── Wayland Object ID ─────────────────────────────────────────────────────────
 
@@ -41,9 +41,7 @@ pub struct WlIdAllocator {
 }
 
 impl WlIdAllocator {
-    pub fn new() -> Self {
-        WlIdAllocator { next: 1 }
-    }
+    pub fn new() -> Self { WlIdAllocator { next: 1 } }
     pub fn alloc(&mut self) -> WlObjectId {
         let id = self.next;
         self.next += 1;
@@ -88,34 +86,19 @@ impl WlShmFormat {
 
 /// Integer 2D point
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct WlPoint {
-    pub x: i32,
-    pub y: i32,
-}
+pub struct WlPoint { pub x: i32, pub y: i32 }
 
 /// Integer 2D size
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct WlSize {
-    pub width: u32,
-    pub height: u32,
-}
+pub struct WlSize { pub width: u32, pub height: u32 }
 
 /// Integer rectangle (position + size)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct WlRect {
-    pub pos: WlPoint,
-    pub size: WlSize,
-}
+pub struct WlRect { pub pos: WlPoint, pub size: WlSize }
 
 impl WlRect {
     pub fn new(x: i32, y: i32, w: u32, h: u32) -> Self {
-        WlRect {
-            pos: WlPoint { x, y },
-            size: WlSize {
-                width: w,
-                height: h,
-            },
-        }
+        WlRect { pos: WlPoint { x, y }, size: WlSize { width: w, height: h } }
     }
 
     /// Returns true if point is inside this rect
@@ -150,7 +133,7 @@ pub struct WlBuffer {
     pub data: Vec<u8>,
     pub width: u32,
     pub height: u32,
-    pub stride: u32, // bytes per row
+    pub stride: u32,  // bytes per row
     pub format: WlShmFormat,
     /// Number of times this buffer is currently referenced by a surface
     pub ref_count: u32,
@@ -177,39 +160,24 @@ impl WlBuffer {
 
     /// Read a pixel at (x, y) as RGBA bytes
     pub fn read_pixel(&self, x: u32, y: u32) -> Option<[u8; 4]> {
-        if x >= self.width || y >= self.height {
-            return None;
-        }
+        if x >= self.width || y >= self.height { return None; }
         let bpp = self.format.bytes_per_pixel() as usize;
         let off = (y as usize * self.stride as usize) + (x as usize * bpp);
-        if off + 4 > self.data.len() {
-            return None;
-        }
-        Some([
-            self.data[off],
-            self.data[off + 1],
-            self.data[off + 2],
-            self.data[off + 3],
-        ])
+        if off + 4 > self.data.len() { return None; }
+        Some([self.data[off], self.data[off+1], self.data[off+2], self.data[off+3]])
     }
 
     /// Write a pixel at (x, y) from ARGB bytes
     pub fn write_pixel(&mut self, x: u32, y: u32, argb: [u8; 4]) -> bool {
-        if x >= self.width || y >= self.height {
-            return false;
-        }
+        if x >= self.width || y >= self.height { return false; }
         let bpp = self.format.bytes_per_pixel() as usize;
         let off = (y as usize * self.stride as usize) + (x as usize * bpp);
-        if off + 4 > self.data.len() {
-            return false;
-        }
-        self.data[off..off + 4].copy_from_slice(&argb);
+        if off + 4 > self.data.len() { return false; }
+        self.data[off..off+4].copy_from_slice(&argb);
         true
     }
 
-    pub fn size_bytes(&self) -> usize {
-        self.data.len()
-    }
+    pub fn size_bytes(&self) -> usize { self.data.len() }
 }
 
 // ─── WlSurface ────────────────────────────────────────────────────────────────
@@ -232,21 +200,15 @@ pub struct WlDamageRegion {
 }
 
 impl WlDamageRegion {
-    pub fn new() -> Self {
-        WlDamageRegion { rects: Vec::new() }
-    }
+    pub fn new() -> Self { WlDamageRegion { rects: Vec::new() } }
 
     pub fn add_damage(&mut self, rect: WlRect) {
         self.rects.push(rect);
     }
 
-    pub fn clear(&mut self) {
-        self.rects.clear();
-    }
+    pub fn clear(&mut self) { self.rects.clear(); }
 
-    pub fn is_empty(&self) -> bool {
-        self.rects.is_empty()
-    }
+    pub fn is_empty(&self) -> bool { self.rects.is_empty() }
 
     /// Total damaged area (may overlap — not de-duplicated for performance)
     pub fn total_area(&self) -> u64 {
@@ -292,10 +254,7 @@ impl WlSurface {
             current_buffer: None,
             pending_buffer: None,
             position: WlPoint { x: 0, y: 0 },
-            size: WlSize {
-                width: 0,
-                height: 0,
-            },
+            size: WlSize { width: 0, height: 0 },
             damage: WlDamageRegion::new(),
             transform: WlTransform::Normal,
             scale: 1,
@@ -315,12 +274,7 @@ impl WlSurface {
 
     /// Returns the bounding rect of this surface in compositor space
     pub fn rect(&self) -> WlRect {
-        WlRect::new(
-            self.position.x,
-            self.position.y,
-            self.size.width,
-            self.size.height,
-        )
+        WlRect::new(self.position.x, self.position.y, self.size.width, self.size.height)
     }
 }
 
@@ -364,31 +318,11 @@ impl WlOutput {
             id,
             physical_width_mm: 344,
             physical_height_mm: 194,
-            current_mode: WlOutputMode {
-                width: 1920,
-                height: 1080,
-                refresh_mhz: 60000,
-                preferred: true,
-            },
+            current_mode: WlOutputMode { width: 1920, height: 1080, refresh_mhz: 60000, preferred: true },
             modes: vec![
-                WlOutputMode {
-                    width: 1920,
-                    height: 1080,
-                    refresh_mhz: 60000,
-                    preferred: true,
-                },
-                WlOutputMode {
-                    width: 1920,
-                    height: 1080,
-                    refresh_mhz: 144000,
-                    preferred: false,
-                },
-                WlOutputMode {
-                    width: 1280,
-                    height: 720,
-                    refresh_mhz: 60000,
-                    preferred: false,
-                },
+                WlOutputMode { width: 1920, height: 1080, refresh_mhz: 60000, preferred: true },
+                WlOutputMode { width: 1920, height: 1080, refresh_mhz: 144000, preferred: false },
+                WlOutputMode { width: 1280, height: 720, refresh_mhz: 60000, preferred: false },
             ],
             name: String::from(name),
             description: format!("{}: 1920x1080 @60Hz", name),
@@ -399,18 +333,16 @@ impl WlOutput {
 
     /// Returns display PPI (pixels per inch)
     pub fn ppi(&self) -> f32 {
-        let diag_px = ((self.current_mode.width as f32).powi(2)
-            + (self.current_mode.height as f32).powi(2))
-        .sqrt();
-        let diag_mm = ((self.physical_width_mm as f32).powi(2)
-            + (self.physical_height_mm as f32).powi(2))
-        .sqrt();
+        let diag_px = (
+            (self.current_mode.width as f32).powi(2) +
+            (self.current_mode.height as f32).powi(2)
+        ).sqrt();
+        let diag_mm = (
+            (self.physical_width_mm as f32).powi(2) +
+            (self.physical_height_mm as f32).powi(2)
+        ).sqrt();
         let diag_in = diag_mm / 25.4;
-        if diag_in > 0.0 {
-            diag_px / diag_in
-        } else {
-            0.0
-        }
+        if diag_in > 0.0 { diag_px / diag_in } else { 0.0 }
     }
 }
 
@@ -420,21 +352,13 @@ impl WlOutput {
 #[derive(Debug, Clone)]
 pub enum WlPointerEvent {
     /// Pointer entered a surface
-    Enter {
-        surface_id: WlObjectId,
-        sx: f64,
-        sy: f64,
-    },
+    Enter { surface_id: WlObjectId, sx: f64, sy: f64 },
     /// Pointer left a surface
     Leave { surface_id: WlObjectId },
     /// Pointer moved within a surface
     Motion { sx: f64, sy: f64, time_ms: u32 },
     /// Button pressed or released
-    Button {
-        button: u32,
-        pressed: bool,
-        time_ms: u32,
-    },
+    Button { button: u32, pressed: bool, time_ms: u32 },
     /// Scroll axis
     Axis { axis: u32, value: f64, time_ms: u32 },
 }
@@ -443,18 +367,9 @@ pub enum WlPointerEvent {
 #[derive(Debug, Clone)]
 pub enum WlKeyEvent {
     /// Key pressed or released
-    Key {
-        key: u32,
-        pressed: bool,
-        time_ms: u32,
-    },
+    Key { key: u32, pressed: bool, time_ms: u32 },
     /// Modifier state changed
-    Modifiers {
-        depressed: u32,
-        latched: u32,
-        locked: u32,
-        group: u32,
-    },
+    Modifiers { depressed: u32, latched: u32, locked: u32, group: u32 },
 }
 
 // ─── Zenith Compositor ────────────────────────────────────────────────────────
@@ -470,7 +385,7 @@ pub struct ZenithStats {
     pub pointer_events: u64,
     pub key_events: u64,
     pub accessibility_events: u64, // GNOME-inspired screen reader events
-    pub widget_events: u64,        // KDE-inspired widget interactions
+    pub widget_events: u64, // KDE-inspired widget interactions
 }
 
 /// Window tiling layout (COSMIC/i3-inspired)
@@ -582,12 +497,8 @@ impl ZenithCompositor {
     pub fn destroy_surface(&mut self, id: WlObjectId) -> bool {
         if self.surfaces.remove(&id).is_some() {
             self.stats.surfaces_destroyed += 1;
-            if self.keyboard_focus == Some(id) {
-                self.keyboard_focus = None;
-            }
-            if self.pointer_focus == Some(id) {
-                self.pointer_focus = None;
-            }
+            if self.keyboard_focus == Some(id) { self.keyboard_focus = None; }
+            if self.pointer_focus == Some(id) { self.pointer_focus = None; }
             true
         } else {
             false
@@ -610,10 +521,7 @@ impl ZenithCompositor {
             // Apply pending buffer size
             if let Some(buf_id) = surface.pending_buffer {
                 if let Some(buf) = self.buffers.get(&buf_id) {
-                    surface.size = WlSize {
-                        width: buf.width,
-                        height: buf.height,
-                    };
+                    surface.size = WlSize { width: buf.width, height: buf.height };
                 }
             }
             surface.commit();
@@ -638,7 +546,12 @@ impl ZenithCompositor {
     // ── Buffer Management ─────────────────────────────────────────────────────
 
     /// Allocate a new shared memory buffer
-    pub fn create_buffer(&mut self, width: u32, height: u32, format: WlShmFormat) -> WlObjectId {
+    pub fn create_buffer(
+        &mut self,
+        width: u32,
+        height: u32,
+        format: WlShmFormat,
+    ) -> WlObjectId {
         let id = self.id_alloc.alloc();
         let buf = WlBuffer::new(id, width, height, format);
         self.buffers.insert(id, buf);
@@ -668,9 +581,7 @@ impl ZenithCompositor {
         let mut dirty: Vec<(WlObjectId, WlDamageRegion)> = Vec::new();
 
         // Collect surfaces with damage, sorted by z_order
-        let mut to_repaint: Vec<WlObjectId> = self
-            .surfaces
-            .iter()
+        let mut to_repaint: Vec<WlObjectId> = self.surfaces.iter()
             .filter(|(_, s)| s.mapped && !s.damage.is_empty())
             .map(|(id, _)| *id)
             .collect();
@@ -701,13 +612,8 @@ impl ZenithCompositor {
             }
             WlPointerEvent::Motion { sx, sy, .. } => {
                 // Find which surface is under the cursor
-                let pos = WlPoint {
-                    x: *sx as i32,
-                    y: *sy as i32,
-                };
-                self.pointer_focus = self
-                    .surfaces
-                    .iter()
+                let pos = WlPoint { x: *sx as i32, y: *sy as i32 };
+                self.pointer_focus = self.surfaces.iter()
                     .filter(|(_, s)| s.mapped && s.rect().contains(pos))
                     .max_by_key(|(_, s)| s.z_order)
                     .map(|(id, _)| *id);
@@ -854,16 +760,13 @@ impl ZenithCompositor {
             return; // No auto-tiling in floating mode
         }
 
-        let mut mapped_surfaces: Vec<_> = self
-            .surfaces
+        let mut mapped_surfaces: Vec<_> = self.surfaces
             .iter()
             .filter(|(_, s)| s.mapped)
             .map(|(id, s)| (*id, s.size))
             .collect();
 
-        let output_size = self
-            .outputs
-            .values()
+        let output_size = self.outputs.values()
             .next()
             .map(|o| (o.current_mode.width, o.current_mode.height))
             .unwrap_or((1920, 1080));
@@ -1045,11 +948,7 @@ mod zenith_tests {
         comp.surface_attach_buffer(surf_id, buf_id);
         comp.surface_commit(surf_id);
 
-        comp.dispatch_pointer_event(WlPointerEvent::Motion {
-            sx: 400.0,
-            sy: 300.0,
-            time_ms: 100,
-        });
+        comp.dispatch_pointer_event(WlPointerEvent::Motion { sx: 400.0, sy: 300.0, time_ms: 100 });
         assert_eq!(comp.pointer_focus, Some(surf_id));
     }
 

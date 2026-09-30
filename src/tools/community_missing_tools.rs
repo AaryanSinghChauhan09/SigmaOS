@@ -14,8 +14,7 @@ impl UniversalHardwareDiagnostic {
 
     pub fn scan_hardware(&mut self) -> Result<(), &'static str> {
         // Simulating a deep hardware scan
-        self.reported_issues
-            .push("Thermal sensor missing on PCIE lane 4".to_string());
+        self.reported_issues.push("Thermal sensor missing on PCIE lane 4".to_string());
         Ok(())
     }
 
