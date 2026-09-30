@@ -228,6 +228,15 @@ account has no placeholder password hash. AI agents must preserve this
 fail-closed behavior until a vetted verifier and account-state backend are
 integrated and reviewed.
 
+`src/security/password.rs` is an in-memory API model, not a usable vault. It
+does not persist `vault_path`; encryption, decryption, password generation,
+biometric checks, and direct unlock fail closed without audited providers.
+Construction discards the owned key buffer, and add/update clear owned
+plaintext buffers on both success and failure; caller-owned copies are not
+cleared. AI agents must preserve unavailable-provider errors and buffer
+clearing, and must not enable real storage or authentication without reviewed
+crypto, randomness, biometric, and persistence integrations.
+
 The Fedora Cockpit and FreeIPA compatibility models do not authenticate
 sessions or mint Kerberos tickets without trusted Cockpit/KDC integrations.
 They reject authentication and token verification rather than treating any
