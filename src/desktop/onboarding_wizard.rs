@@ -26,7 +26,7 @@ impl CodecInstaller {
     pub fn is_installed() -> bool {
         false
     }
-    
+
     pub fn install_nonfree_codecs() -> Result<(), String> {
         Ok(())
     }
@@ -91,10 +91,22 @@ pub struct AppSuggestions;
 impl AppSuggestions {
     pub fn get_recommendations(role: UserRole) -> Vec<String> {
         match role {
-            UserRole::Developer => vec!["vscode".to_string(), "git".to_string(), "docker".to_string()],
-            UserRole::Creative => vec!["gimp".to_string(), "blender".to_string(), "kdenlive".to_string()],
+            UserRole::Developer => vec![
+                "vscode".to_string(),
+                "git".to_string(),
+                "docker".to_string(),
+            ],
+            UserRole::Creative => vec![
+                "gimp".to_string(),
+                "blender".to_string(),
+                "kdenlive".to_string(),
+            ],
             UserRole::Office => vec!["libreoffice".to_string(), "thunderbird".to_string()],
-            UserRole::Gaming => vec!["steam".to_string(), "lutris".to_string(), "mangohud".to_string()],
+            UserRole::Gaming => vec![
+                "steam".to_string(),
+                "lutris".to_string(),
+                "mangohud".to_string(),
+            ],
         }
     }
 }
@@ -170,7 +182,7 @@ impl OnboardingWizard {
             codecs_installed: self.codecs_requested,
         }
     }
-    
+
     pub fn get_current_step(&self) -> &WizardStep {
         &self.current_step
     }
@@ -199,7 +211,7 @@ mod tests {
         let mut wizard = OnboardingWizard::new();
         wizard.set_theme(ThemeVariant::Dark);
         wizard.set_layout(DesktopLayoutVariant::Tiling);
-        
+
         let summary = wizard.generate_summary();
         assert_eq!(summary.theme, ThemeVariant::Dark);
         assert_eq!(summary.layout, DesktopLayoutVariant::Tiling);

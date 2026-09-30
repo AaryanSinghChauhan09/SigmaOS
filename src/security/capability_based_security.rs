@@ -86,22 +86,25 @@ pub struct CapabilityManager {
 
 impl CapabilityManager {
     pub fn new() -> Self {
-        CapabilityManager {
-            grants: Vec::new(),
-        }
+        CapabilityManager { grants: Vec::new() }
     }
 
     pub fn grant(&mut self, process_name: String, capability: CapabilityType) -> bool {
         // Remove existing grant for same capability
-        self.grants.retain(|g| !(g.process_name == process_name && g.capability == capability));
-        
+        self.grants
+            .retain(|g| !(g.process_name == process_name && g.capability == capability));
+
         let grant = CapabilityGrant::new(process_name, capability);
         self.grants.push(grant);
         true
     }
 
     pub fn revoke(&mut self, process_name: String, capability: CapabilityType) -> bool {
-        if let Some(grant) = self.grants.iter_mut().find(|g| g.process_name == process_name && g.capability == capability) {
+        if let Some(grant) = self
+            .grants
+            .iter_mut()
+            .find(|g| g.process_name == process_name && g.capability == capability)
+        {
             grant.revoke();
             true
         } else {
@@ -116,19 +119,22 @@ impl CapabilityManager {
     }
 
     pub fn check(&self, process_name: &str, capability: &CapabilityType) -> bool {
-        self.grants.iter()
-            .any(|g| g.process_name == process_name && g.capability == *capability && g.is_granted())
+        self.grants.iter().any(|g| {
+            g.process_name == process_name && g.capability == *capability && g.is_granted()
+        })
     }
 
     pub fn list_capabilities(&self, process_name: &str) -> Vec<String> {
-        self.grants.iter()
+        self.grants
+            .iter()
             .filter(|g| g.process_name == process_name && g.is_granted())
             .map(|g| g.capability.as_str().to_string())
             .collect()
     }
 
     pub fn list_all(&self) -> Vec<String> {
-        self.grants.iter()
+        self.grants
+            .iter()
             .filter(|g| g.is_granted())
             .map(|g| format!("{}: {}", g.process_name, g.capability.as_str()))
             .collect()
@@ -156,25 +162,22 @@ mod tests {
     fn test_capability_type_from_str() {
         assert_eq!(CapabilityType::from_str("read"), CapabilityType::Read);
         assert_eq!(CapabilityType::from_str("write"), CapabilityType::Write);
-        assert_eq!(CapabilityType::from_str("network:connect"), CapabilityType::NetworkConnect);
+        assert_eq!(
+            CapabilityType::from_str("network:connect"),
+            CapabilityType::NetworkConnect
+        );
     }
 
     #[test]
     fn test_capability_grant_creation() {
-        let grant = CapabilityGrant::new(
-            String::from("test_process"),
-            CapabilityType::Read,
-        );
+        let grant = CapabilityGrant::new(String::from("test_process"), CapabilityType::Read);
         assert_eq!(grant.process_name, "test_process");
         assert!(grant.is_granted());
     }
 
     #[test]
     fn test_capability_grant_revoke() {
-        let mut grant = CapabilityGrant::new(
-            String::from("test_process"),
-            CapabilityType::Read,
-        );
+        let mut grant = CapabilityGrant::new(String::from("test_process"), CapabilityType::Read);
         grant.revoke();
         assert!(!grant.is_granted());
     }
@@ -188,10 +191,7 @@ mod tests {
     #[test]
     fn test_capability_manager_grant() {
         let mut manager = CapabilityManager::new();
-        assert!(manager.grant(
-            String::from("test_process"),
-            CapabilityType::Read,
-        ));
+        assert!(manager.grant(String::from("test_process"), CapabilityType::Read,));
         assert_eq!(manager.grants.len(), 1);
     }
 
@@ -199,11 +199,8 @@ mod tests {
     fn test_capability_manager_revoke() {
         let mut manager = CapabilityManager::new();
         manager.grant(String::from("test_process"), CapabilityType::Read);
-        assert!(manager.revoke(
-            String::from("test_process"),
-            CapabilityType::Read,
-        ));
-        
+        assert!(manager.revoke(String::from("test_process"), CapabilityType::Read,));
+
         let grant = manager.grants.first().unwrap();
         assert!(!grant.is_granted());
     }
@@ -213,7 +210,7 @@ mod tests {
         let mut manager = CapabilityManager::new();
         manager.grant(String::from("test_process"), CapabilityType::Read);
         manager.grant(String::from("test_process"), CapabilityType::Write);
-        
+
         let count = manager.revoke_all(String::from("test_process"));
         assert_eq!(count, 2);
         assert_eq!(manager.grants.len(), 0);
@@ -223,7 +220,7 @@ mod tests {
     fn test_capability_manager_check() {
         let mut manager = CapabilityManager::new();
         manager.grant(String::from("test_process"), CapabilityType::Read);
-        
+
         assert!(manager.check("test_process", &CapabilityType::Read));
         assert!(!manager.check("test_process", &CapabilityType::Write));
     }
@@ -233,7 +230,7 @@ mod tests {
         let mut manager = CapabilityManager::new();
         manager.grant(String::from("test_process"), CapabilityType::Read);
         manager.grant(String::from("test_process"), CapabilityType::Write);
-        
+
         let caps = manager.list_capabilities("test_process");
         assert_eq!(caps.len(), 2);
     }
@@ -242,7 +239,7 @@ mod tests {
     fn test_capability_manager_list_all() {
         let mut manager = CapabilityManager::new();
         manager.grant(String::from("test_process"), CapabilityType::Read);
-        
+
         let all = manager.list_all();
         assert!(!all.is_empty());
     }
@@ -251,7 +248,7 @@ mod tests {
     fn test_add_standard_capabilities() {
         let mut manager = CapabilityManager::new();
         manager.add_standard_capabilities(String::from("test_process"));
-        
+
         let caps = manager.list_capabilities("test_process");
         assert!(caps.contains(&String::from("read")));
         assert!(caps.contains(&String::from("network:connect")));
@@ -269,7 +266,7 @@ mod tests {
         let mut manager = CapabilityManager::new();
         manager.grant(String::from("test_process"), CapabilityType::Read);
         manager.grant(String::from("test_process"), CapabilityType::Read);
-        
+
         // Should only have one grant (duplicates removed)
         assert_eq!(manager.grants.len(), 1);
     }

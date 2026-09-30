@@ -51,4 +51,24 @@ These agent guidelines enable SigmaOS to continuously improve by:
 - Maintaining zero-dependency philosophy
 - Ensuring security and performance excellence
 
-For detailed agent guidelines, see the component-specific files in the [Agents/](Agents/) folder.
+For detailed agent guidelines, see the component-specific files in the [Agents directory](https://github.com/AaryanSinghChauhan09/SigmaOS/tree/main/Agents).
+
+## AI maintenance workflow
+
+Use the repository implementation and its current checks as the source of truth. Treat roadmap entries and feature names as plans until the code path is present, wired into the running system, and verified. Do not describe a model, stub, or standalone compiler as an operating-system feature that is enforced at runtime.
+
+| Topic | Canonical implementation | Maintainer guide |
+| --- | --- | --- |
+| Boot and installation | `src/boot/`, `src/installer/` | `Agents/ARCH_AGENTS.md` |
+| Kernel and system calls | `src/kernel/`, `src/syscall/` | `Agents/KERNEL_AGENTS.md` |
+| Memory | `src/memory/` | `Agents/MEMORY_AGENTS.md` |
+| Filesystems | `src/vfs/`, `src/filesystem/` | `Agents/FILESYSTEM_AGENTS.md` |
+| Networking | `src/net/`, `src/network/`, `src/networking/` | `Agents/NETWORK_AGENTS.md` |
+| Security and cryptography | `src/security/`, `src/auth/` | `Agents/SECURITY_AGENTS.md`, `Agents/CRYPTO_AGENTS.md` |
+| Desktop and accessibility | `src/desktop/`, `src/accessibility/` | `Agents/DESKTOP_AGENTS.md` |
+| Packages and distro compatibility | `src/sigpkg/`, `src/userland/pkg/`, `src/distro/`, `src/compatibility/` | `Agents/PACKAGE_AGENTS.md`, `Agents/DISTRO_AGENTS.md` |
+| Drivers, audio, Bluetooth, IPC | `src/drivers/`, `src/usb/`, `src/audio/`, `src/bluetooth/`, `src/ipc/` | Matching `Agents/*_AGENTS.md` files |
+
+For each change, read the matching component guide, trace the call path to its integration point, preserve safe Rust and secure defaults, and avoid new dependencies unless the repository owner has approved them. Update the single canonical topic page and its repository mirrors together. Keep titles and headings in sentence case, start sections at level 2, use concise factual prose, and put related links in a final “See also” section. Keep roadmap entries in historical oldest-first order; never delete a design note until the feature is verified and its content has been transferred to the canonical wiki topic.
+
+Before publishing, run `cargo fmt --check`, `cargo check --lib`, `cargo test --lib`, and `./run_sigma_tests.sh`. Run `pytest tests/` when pytest is available. Report unavailable checks and warnings; do not mark features complete solely because a test or name exists.

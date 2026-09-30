@@ -1,5 +1,5 @@
-use std::string::{String, ToString};
 use std::format;
+use std::string::{String, ToString};
 // Asynchronous I/O Ring Subsystem for SigmaOS
 // Inspired by Linux io_uring, Linux POSIX AIO, FreeBSD kqueue EVFILT_AIO, and Windows IOCP.
 
@@ -20,9 +20,9 @@ pub enum IoOpCode {
 /// Submission Queue Entry (SQE)
 #[derive(Debug, Clone)]
 pub struct SubmissionQueueEntry {
-    pub user_data: u64,     // Matching token returned in CompletionQueueEntry
+    pub user_data: u64, // Matching token returned in CompletionQueueEntry
     pub opcode: IoOpCode,
-    pub fd: i32,            // File or socket descriptor
+    pub fd: i32, // File or socket descriptor
     pub buffer_address: u64,
     pub buffer_length: usize,
     pub file_offset: u64,
@@ -133,12 +133,14 @@ impl AsyncIoRingEngine {
                         read_payload: Vec::new(),
                     }
                 }
-                IoOpCode::Splice | IoOpCode::Fsync | IoOpCode::Accept | IoOpCode::Connect => CompletionQueueEntry {
-                    user_data: sqe.user_data,
-                    result: 0,
-                    flags: 0,
-                    read_payload: Vec::new(),
-                },
+                IoOpCode::Splice | IoOpCode::Fsync | IoOpCode::Accept | IoOpCode::Connect => {
+                    CompletionQueueEntry {
+                        user_data: sqe.user_data,
+                        result: 0,
+                        flags: 0,
+                        read_payload: Vec::new(),
+                    }
+                }
             };
 
             self.cq_ring.push_back(cqe);
@@ -248,7 +250,9 @@ impl LinuxBsdUniversalIoSubsystemEngine {
     pub fn check_pledge_io_access(&self, opcode: IoOpCode) -> bool {
         match opcode {
             IoOpCode::Nop => true,
-            IoOpCode::Read | IoOpCode::Fsync => self.pledge_rights.stdio || self.pledge_rights.rpath,
+            IoOpCode::Read | IoOpCode::Fsync => {
+                self.pledge_rights.stdio || self.pledge_rights.rpath
+            }
             IoOpCode::Write => self.pledge_rights.stdio || self.pledge_rights.wpath,
             IoOpCode::Accept | IoOpCode::Connect | IoOpCode::Splice => self.pledge_rights.inet,
         }

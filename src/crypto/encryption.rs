@@ -4,14 +4,17 @@ use std::boxed::Box;
 
 /// OOP-based Encryption Service for SigmaOS
 /// Based on Roadmap Item 15: Encryption service
-
 use core::sync::atomic::AtomicUsize;
 
 pub type KeyID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum CipherType { AES = 0, ChaCha20 = 1, XOR = 2 }
+pub enum CipherType {
+    AES = 0,
+    ChaCha20 = 1,
+    XOR = 2,
+}
 
 pub trait EncryptionKey {
     fn id(&self) -> KeyID;
@@ -44,8 +47,12 @@ impl SimpleEncryptionKey {
 }
 
 impl EncryptionKey for SimpleEncryptionKey {
-    fn id(&self) -> KeyID { self.id }
-    fn cipher_type(&self) -> CipherType { self.cipher_type }
+    fn id(&self) -> KeyID {
+        self.id
+    }
+    fn cipher_type(&self) -> CipherType {
+        self.cipher_type
+    }
     fn key_data(&self) -> &[u8] {
         // Bolt ⚡ Optimization: Store explicit key length on instantiation to eliminate
         // O(N) zero-byte linear scanning (.position(|&b| b == 0)) on every key slice lookup,
@@ -67,7 +74,12 @@ pub trait EncryptionService {
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum CryptoError { Success = 0, KeyNotFound = 1, EncryptionFailed = 2, InvalidKey = 3 }
+pub enum CryptoError {
+    Success = 0,
+    KeyNotFound = 1,
+    EncryptionFailed = 2,
+    InvalidKey = 3,
+}
 
 pub struct SimpleEncryptionService {
     keys: Vec<Option<Box<dyn EncryptionKey>>>,
@@ -75,7 +87,12 @@ pub struct SimpleEncryptionService {
 }
 
 impl SimpleEncryptionService {
-    pub fn new() -> Self { SimpleEncryptionService { keys: Vec::new(), next_id: AtomicUsize::new(1) } }
+    pub fn new() -> Self {
+        SimpleEncryptionService {
+            keys: Vec::new(),
+            next_id: AtomicUsize::new(1),
+        }
+    }
 }
 
 impl EncryptionService for SimpleEncryptionService {

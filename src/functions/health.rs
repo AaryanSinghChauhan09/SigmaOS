@@ -1,12 +1,10 @@
 //! System Health Check Functions (systemd-analyze Inspiration)
 //! Health checker, diagnostics tool, and recovery tool
-use std::vec;
 use std::format;
+use std::vec;
 
-
-
-use std::vec::Vec;
 use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Health check
 #[derive(Debug, Clone)]
@@ -78,7 +76,7 @@ impl SystemHealthStatus {
             self.network_status,
             self.security_status,
         ];
-        
+
         if statuses.iter().any(|&s| s == HealthStatus::Critical) {
             self.overall_status = HealthStatus::Critical;
         } else if statuses.iter().any(|&s| s == HealthStatus::Warning) {
@@ -185,13 +183,13 @@ impl DiagnosticsTool {
     pub fn collect_diagnostics(&mut self) -> Result<String, HealthError> {
         let report_id = format!("report_{}", self.reports.len());
         let mut report = DiagnosticReport::new(&report_id);
-        
+
         for module in &self.diagnostic_modules {
             if module.enabled {
                 report.modules.push(module.name.clone());
             }
         }
-        
+
         report.data = "System diagnostic data".to_string();
         self.reports.push(report);
         Ok(report_id)

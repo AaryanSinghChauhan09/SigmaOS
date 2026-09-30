@@ -2,10 +2,8 @@
 //! System log viewer, system monitor, and system information tools
 use std::format;
 
-
-
-use std::vec::Vec;
 use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Log priority
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -119,11 +117,15 @@ impl JournalViewer {
 
     pub fn get_filtered_entries(&self) -> Vec<&JournalEntry> {
         let mut filtered = self.entries.iter().collect::<Vec<_>>();
-        
+
         for filter in &self.filters {
-            filtered = filtered.iter().filter(|e| filter.matches(e)).cloned().collect();
+            filtered = filtered
+                .iter()
+                .filter(|e| filter.matches(e))
+                .cloned()
+                .collect();
         }
-        
+
         filtered
     }
 
@@ -146,11 +148,9 @@ impl JournalViewer {
     fn export_text(&self) -> Result<String, JournalError> {
         let mut output = String::new();
         for entry in &self.entries {
-            output.push_str(&format!("{} {} {}: {}\n", 
-                entry.timestamp, 
-                entry.priority as u8,
-                entry.service,
-                entry.message
+            output.push_str(&format!(
+                "{} {} {}: {}\n",
+                entry.timestamp, entry.priority as u8, entry.service, entry.message
             ));
         }
         Ok(output)
@@ -164,11 +164,9 @@ impl JournalViewer {
         let mut output = String::new();
         output.push_str("timestamp,priority,service,message\n");
         for entry in &self.entries {
-            output.push_str(&format!("{},{},{},{}\n",
-                entry.timestamp,
-                entry.priority as u8,
-                entry.service,
-                entry.message
+            output.push_str(&format!(
+                "{},{},{},{}\n",
+                entry.timestamp, entry.priority as u8, entry.service, entry.message
             ));
         }
         Ok(output)
@@ -277,11 +275,13 @@ impl SystemMonitor {
     }
 
     pub fn sort_processes_by_cpu(&mut self) {
-        self.process_list.sort_by(|a, b| b.cpu_usage.partial_cmp(&a.cpu_usage).unwrap());
+        self.process_list
+            .sort_by(|a, b| b.cpu_usage.partial_cmp(&a.cpu_usage).unwrap());
     }
 
     pub fn sort_processes_by_memory(&mut self) {
-        self.process_list.sort_by(|a, b| b.memory_usage.cmp(&a.memory_usage));
+        self.process_list
+            .sort_by(|a, b| b.memory_usage.cmp(&a.memory_usage));
     }
 
     pub fn get_monitor_stats(&self) -> MonitorStats {

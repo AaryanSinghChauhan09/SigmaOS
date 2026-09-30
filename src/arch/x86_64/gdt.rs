@@ -146,17 +146,13 @@ impl GlobalDescriptorTableManager {
     }
 
     /// Builds the interrupt return frame (IRETQ) for Ring 3 transition
-    pub fn build_ring3_iret_frame(
-        user_rip: u64,
-        user_rsp: u64,
-        user_rflags: u64,
-    ) -> [u64; 5] {
+    pub fn build_ring3_iret_frame(user_rip: u64, user_rsp: u64, user_rflags: u64) -> [u64; 5] {
         [
-            user_rip,                     // RIP
-            USER_CS as u64,              // CS (User Code with RPL 3)
-            user_rflags | 0x200,         // RFLAGS (Ensure Interrupt Flag IF is enabled)
-            user_rsp,                    // RSP (User Mode Stack)
-            USER_DS as u64,              // SS (User Mode Data with RPL 3)
+            user_rip,            // RIP
+            USER_CS as u64,      // CS (User Code with RPL 3)
+            user_rflags | 0x200, // RFLAGS (Ensure Interrupt Flag IF is enabled)
+            user_rsp,            // RSP (User Mode Stack)
+            USER_DS as u64,      // SS (User Mode Data with RPL 3)
         ]
     }
 }
@@ -201,9 +197,9 @@ mod tests {
             0x0000_0000_0000_0002,
         );
         assert_eq!(frame[0], 0x0000_0000_0040_0000); // RIP
-        assert_eq!(frame[1], 0x23);                  // CS
-        assert_eq!(frame[2] & 0x200, 0x200);         // RFLAGS (IF enabled)
+        assert_eq!(frame[1], 0x23); // CS
+        assert_eq!(frame[2] & 0x200, 0x200); // RFLAGS (IF enabled)
         assert_eq!(frame[3], 0x0000_7FFF_FFFF_0000); // RSP
-        assert_eq!(frame[4], 0x1B);                  // SS
+        assert_eq!(frame[4], 0x1B); // SS
     }
 }
