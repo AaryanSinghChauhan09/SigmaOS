@@ -11,7 +11,7 @@ use std::string::String;
 pub struct AuthenticatedEmergencyTargetGate {
     pub emergency_password_hash: String,
     pub pqc_dilithium_pubkey: Vec<u8>,
-    pub authenticated: bool,
+    authenticated: bool,
     pub failed_attempts: u32,
 }
 
@@ -31,6 +31,10 @@ impl AuthenticatedEmergencyTargetGate {
         let _ = attempt;
         self.failed_attempts = self.failed_attempts.saturating_add(1);
         Err("Emergency Gate: Password verification provider unavailable")
+    }
+
+    pub fn is_authenticated(&self) -> bool {
+        self.authenticated
     }
 
     pub fn authenticate_pqc_signature(&mut self, signature: &[u8]) -> Result<(), &'static str> {
@@ -57,6 +61,7 @@ mod tests {
         let mut gate = AuthenticatedEmergencyTargetGate::new("root_secret");
         assert!(gate.emergency_password_hash.is_empty());
         assert!(gate.pqc_dilithium_pubkey.is_empty());
+        assert!(!gate.is_authenticated());
         assert!(gate.drop_to_emergency_shell().is_err());
 
         assert!(gate.authenticate_password("wrong_secret").is_err());
