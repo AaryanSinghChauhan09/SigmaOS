@@ -3,6 +3,7 @@
 #![allow(unexpected_cfgs)]
 #![allow(clippy::new_without_default)]
 
+use std::collections::VecDeque;
 #[cfg(not(any(feature = "standalone_test", test)))]
 // SigmaOS Sovereign Zero-Copy Networking
 // Implements Linux XDP (eXpress Data Path) + io_uring-style zero-copy networking
@@ -115,7 +116,7 @@ pub struct PacketRingDescriptor {
 }
 
 pub struct XdpRing {
-    pub entries: Vec<PacketRingDescriptor>,
+    pub entries: VecDeque<PacketRingDescriptor>,
     pub capacity: usize,
     pub producer: usize,
     pub consumer: usize,
@@ -126,7 +127,7 @@ pub struct XdpRing {
 impl XdpRing {
     pub fn new(capacity: usize) -> Self {
         XdpRing {
-            entries: Vec::new(),
+            entries: VecDeque::new(),
             capacity,
             producer: 0,
             consumer: 0,
@@ -141,7 +142,7 @@ impl XdpRing {
             self.drops = self.drops.saturating_add(1);
             return false;
         }
-        self.entries.push(desc);
+        self.entries.push_back(desc);
         self.producer = self.producer.wrapping_add(1);
         true
     }
@@ -150,17 +151,10 @@ impl XdpRing {
         if self.producer == self.consumer {
             return None;
         }
-        if self.entries.is_empty() {
-            return None;
-        }
+        let descriptor = self.entries.pop_front()?;
         self.consumer = self.consumer.wrapping_add(1);
         self.packets_processed = self.packets_processed.saturating_add(1);
-        // Drain from front (FIFO)
-        if !self.entries.is_empty() {
-            Some(self.entries.remove(0))
-        } else {
-            None
-        }
+        Some(descriptor)
     }
 
     pub fn available(&self) -> usize {
@@ -189,7 +183,7 @@ pub struct IoCompletionEntry {
 }
 
 pub struct IoCompletionQueue {
-    pub entries: Vec<IoCompletionEntry>,
+    pub entries: VecDeque<IoCompletionEntry>,
     pub capacity: usize,
     pub head: usize,
     pub tail: usize,
@@ -199,7 +193,7 @@ pub struct IoCompletionQueue {
 impl IoCompletionQueue {
     pub fn new(capacity: usize) -> Self {
         IoCompletionQueue {
-            entries: Vec::new(),
+            entries: VecDeque::new(),
             capacity,
             head: 0,
             tail: 0,
@@ -211,7 +205,7 @@ impl IoCompletionQueue {
         if self.entries.len() >= self.capacity {
             return false;
         }
-        self.entries.push(IoCompletionEntry {
+        self.entries.push_back(IoCompletionEntry {
             user_data,
             result,
             flags: 0,
@@ -222,11 +216,9 @@ impl IoCompletionQueue {
     }
 
     pub fn consume(&mut self) -> Option<IoCompletionEntry> {
-        if self.entries.is_empty() {
-            return None;
-        }
+        let entry = self.entries.pop_front()?;
         self.head = self.head.wrapping_add(1);
-        Some(self.entries.remove(0))
+        Some(entry)
     }
 
     pub fn pending_count(&self) -> usize {
