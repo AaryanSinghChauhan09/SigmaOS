@@ -155,13 +155,17 @@ impl AegisVaultEncryptionCompressionEngine {
         let compressed = self.compress_payload(raw_data);
 
         // 2. Generate random salt and nonce
+        let nanos = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_nanos())
+            .unwrap_or(0);
         let mut salt = [0u8; 16];
         let mut nonce = [0u8; 12];
         for i in 0..16 {
-            salt[i] = ((i * 37 + 13) % 256) as u8;
+            salt[i] = ((nanos.wrapping_add(i as u128 * 37 + 13)) % 256) as u8;
         }
         for i in 0..12 {
-            nonce[i] = ((i * 41 + 7) % 256) as u8;
+            nonce[i] = ((nanos.wrapping_add(i as u128 * 41 + 7)) % 256) as u8;
         }
 
         // 3. Derive 256-bit Key from unique special code

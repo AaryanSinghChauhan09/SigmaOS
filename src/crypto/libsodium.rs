@@ -585,7 +585,11 @@ mod tests {
     }
 
     fn generate_random_nonce<const N: usize>() -> [u8; N] {
-        let mut n = core::array::from_fn(|i| (i as u8).wrapping_mul(17));
+        let nanos = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_nanos())
+            .unwrap_or(0);
+        let mut n = core::array::from_fn(|i| ((nanos.wrapping_add(i as u128 * 17)) % 256) as u8);
         random_bytes(&mut n);
         n
     }

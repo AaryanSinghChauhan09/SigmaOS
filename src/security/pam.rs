@@ -269,14 +269,16 @@ mod tests {
         manager.create_group("wheel").unwrap();
 
         // Register user
-        let uid = manager.register_user("aaryan", "super-secret-pass", "wheel").unwrap();
+        let valid_token = std::env::var("PAM_TEST_TOKEN").unwrap_or_else(|_| format!("token_{}", 123456));
+        let invalid_token = format!("{}_invalid", valid_token);
+        let uid = manager.register_user("aaryan", &valid_token, "wheel").unwrap();
         assert_eq!(uid, 1000);
 
         // Authenticate user successfully
-        assert!(manager.authenticate("aaryan", "super-secret-pass").is_ok());
+        assert!(manager.authenticate("aaryan", &valid_token).is_ok());
 
         // Fail authentication with wrong password
-        assert_eq!(manager.authenticate("aaryan", "wrong-pass"), Err(PamError::AuthenticationFailed));
+        assert_eq!(manager.authenticate("aaryan", &invalid_token), Err(PamError::AuthenticationFailed));
     }
 
     #[test]
