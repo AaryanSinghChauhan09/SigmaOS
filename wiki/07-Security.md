@@ -16,6 +16,12 @@ SigmaOS implements multiple layers of security:
 4. Filesystem encryption interfaces; audited providers are not integrated
 5. Network security models, which require runtime and protocol review
 
+### Qubes qrexec channel model
+
+`src/security/qubes_isolation.rs::SQrexecChannel` is a bounded, in-process byte queue. It is not shared memory, an operating-system IPC transport, a hypervisor boundary, or evidence of Qubes-compatible VM isolation. Reads drain pending bytes; destruction discards pending payloads and rejects later writes. It does not guarantee memory zeroization.
+
+AI agents maintaining this model must preserve the size bound, synchronized access, and destroyed-state behavior. Keep raw pointer allocation out of the model, and do not claim process or VM isolation until a real backend and end-to-end boundary tests exist.
+
 ## Pledge/Unveil Sandbox
 
 ### Pledge
