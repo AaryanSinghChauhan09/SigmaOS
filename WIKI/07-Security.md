@@ -264,6 +264,13 @@ keep unverified state distinct from valid state, propagate verifier errors,
 and preserve bounded path/checksum storage. Do not present this model as
 tamper detection until end-to-end verification is implemented and reviewed.
 
+`src/security/qubes_isolation.rs::SQrexecChannel` is a bounded in-process byte
+queue, not shared memory, OS IPC, a hypervisor boundary, or Qubes-compatible VM
+isolation. Reads drain pending bytes; destruction discards queued data and
+rejects later writes, but does not guarantee memory zeroization. AI agents must
+preserve its size bound, synchronized access, and destroyed state, and must not
+reintroduce raw pointer allocation or claim VM isolation without a real backend.
+
 The Fedora Cockpit and FreeIPA compatibility models do not authenticate
 sessions or mint Kerberos tickets without trusted Cockpit/KDC integrations.
 They reject authentication and token verification rather than treating any
@@ -309,6 +316,10 @@ helper also deny access until trusted providers are integrated. They do not
 validate credentials or replace host LDAP/PAM services.
 
 ## Audit and Logging
+
+`src/security/audit.rs` provides an in-memory audit model, not a durable or tamper-resistant system audit service. Its event buffer is capped at 65,536 entries and returns `LogFull` when full; old entries can be removed explicitly. Do not use it as the sole record for security-critical events until persistence, integrity protection, access control, and crash-safe delivery are implemented.
+
+AI agents maintaining this module must keep unknown event discriminants in an explicit invalid state, preserve the event cap and `LogFull` behavior, and avoid unbounded or quadratic cleanup paths. Update this status when durable logging and its threat-model checks are implemented.
 
 ### System Audit
 
