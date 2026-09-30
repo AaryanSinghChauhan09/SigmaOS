@@ -50,7 +50,10 @@ pub use filesystem::{
     SovereignFscryptAutofsEngine, SovereignMultiDistroFhsHierarchyEngine,
     SyntheticProcSysfsProvider,
 };
-pub use package::{SovereignUniversalPackageFormatMasterEngine, UniversalPackageFormatKind};
+pub use package::{
+    SovereignDistroPackageAdvancementsSuiteV9, SovereignUniversalPackageFormatMasterEngine,
+    UniversalPackageFormatKind,
+};
 pub use sigpkg::{
     SovereignUniversalPackageManagerInteropEngine, SovereignUniversalPackageTranslationBridge,
 };
