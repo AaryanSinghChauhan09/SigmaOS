@@ -213,7 +213,10 @@ impl SlackwareBuildPackageEngine {
         _files: &[&str],
         _desc: &str,
     ) -> Result<String, &'static str> {
-        let script = self.scripts.get(pkg_name).ok_or("SlackBuild script not found")?;
+        let script = self
+            .scripts
+            .get(pkg_name)
+            .ok_or("SlackBuild script not found")?;
         let filename = format!(
             "{}-{}-{}-{}.txz",
             script.name, script.version, script.arch, script.build_number
@@ -222,7 +225,10 @@ impl SlackwareBuildPackageEngine {
     }
 
     pub fn explode_txz_archive(&self, txz_filename: &str) -> Result<Vec<String>, &'static str> {
-        let name = txz_filename.split('-').next().ok_or("Invalid txz package format")?;
+        let name = txz_filename
+            .split('-')
+            .next()
+            .ok_or("Invalid txz package format")?;
         if self.scripts.contains_key(name) {
             Ok(vec![
                 "/usr/bin/htop".to_string(),
@@ -289,7 +295,8 @@ impl ZypperSatDependencyResolver {
 
         if !self.vendor_change_allowed {
             if let Some(installed) = current_installed {
-                if let Some(same_vendor) = candidates.iter().find(|c| c.vendor == installed.vendor) {
+                if let Some(same_vendor) = candidates.iter().find(|c| c.vendor == installed.vendor)
+                {
                     return Ok((*same_vendor).clone());
                 }
             }
@@ -417,7 +424,10 @@ impl DebianAptPinningEngine {
         priority
     }
 
-    pub fn select_winning_candidate(&self, candidates: &[AptPackageCandidate]) -> Option<AptPackageCandidate> {
+    pub fn select_winning_candidate(
+        &self,
+        candidates: &[AptPackageCandidate],
+    ) -> Option<AptPackageCandidate> {
         let mut best: Option<(i32, AptPackageCandidate)> = None;
         for candidate in candidates {
             let prio = self.calculate_candidate_priority(candidate);
@@ -476,12 +486,15 @@ impl XbpsDebianAlternativesGovernorEngine {
         symlink_name: &str,
         provider: AlternativeProvider,
     ) {
-        let group = self.groups.entry(group_name.to_string()).or_insert_with(|| AlternativeGroup {
-            symlink_name: symlink_name.to_string(),
-            active_provider: None,
-            auto_mode: true,
-            providers: Vec::new(),
-        });
+        let group = self
+            .groups
+            .entry(group_name.to_string())
+            .or_insert_with(|| AlternativeGroup {
+                symlink_name: symlink_name.to_string(),
+                active_provider: None,
+                auto_mode: true,
+                providers: Vec::new(),
+            });
 
         if let Some(pos) = group.providers.iter().position(|p| p.name == provider.name) {
             group.providers[pos] = provider;
@@ -590,7 +603,8 @@ impl FreeBsdPkgMessageNotifierEngine {
         let mut actionable = Vec::new();
         for msg in &self.messages {
             if msg.package_name == pkg_name {
-                let trigger_matches = msg.trigger == PkgMessageTrigger::Always || &msg.trigger == action;
+                let trigger_matches =
+                    msg.trigger == PkgMessageTrigger::Always || &msg.trigger == action;
                 if trigger_matches {
                     if let Some(ref min_ver) = msg.minimum_version {
                         if installed_version < min_ver.as_str() {
@@ -669,7 +683,9 @@ impl OpenBsdPledgeUnveilSandboxScriptletEngine {
     pub fn execute_sandboxed_scriptlet(&self, scriptlet_body: &str) -> Result<String, String> {
         // Evaluate sandbox policy against scriptlet content
         if scriptlet_body.contains("rm -rf /") || scriptlet_body.contains("> /dev/sda") {
-            return Err("SANBOX_VIOLATION: Destructive command blocked by unveil/pledge policy".to_string());
+            return Err(
+                "SANBOX_VIOLATION: Destructive command blocked by unveil/pledge policy".to_string(),
+            );
         }
         Ok(format!("EXECUTED_SANDBOXED[{}]", scriptlet_body))
     }
@@ -715,10 +731,15 @@ impl AlpineApkCachePeerSyncEngine {
     }
 
     pub fn store_local_cache(&mut self, package_name: &str, data: &[u8]) {
-        self.local_cache.insert(package_name.to_string(), data.to_vec());
+        self.local_cache
+            .insert(package_name.to_string(), data.to_vec());
     }
 
-    pub fn discover_peer_with_package(&self, package_name: &str, expected_hash: &str) -> Option<CachePeerNode> {
+    pub fn discover_peer_with_package(
+        &self,
+        package_name: &str,
+        expected_hash: &str,
+    ) -> Option<CachePeerNode> {
         for peer in self.peers.values() {
             if let Some(hash) = peer.available_packages.get(package_name) {
                 if hash == expected_hash {
@@ -729,10 +750,16 @@ impl AlpineApkCachePeerSyncEngine {
         None
     }
 
-    pub fn sync_package_from_peer(&mut self, peer_id: &str, package_name: &str, package_bytes: &[u8]) -> bool {
+    pub fn sync_package_from_peer(
+        &mut self,
+        peer_id: &str,
+        package_name: &str,
+        package_bytes: &[u8],
+    ) -> bool {
         if let Some(peer) = self.peers.get(peer_id) {
             if peer.available_packages.contains_key(package_name) {
-                self.local_cache.insert(package_name.to_string(), package_bytes.to_vec());
+                self.local_cache
+                    .insert(package_name.to_string(), package_bytes.to_vec());
                 return true;
             }
         }
@@ -791,7 +818,12 @@ impl RpmOstreeLayeredImageGovernorEngine {
         }
     }
 
-    pub fn stage_overlay_layer(&mut self, layer_id: &str, packages: &[&str], commit_checksum: &str) {
+    pub fn stage_overlay_layer(
+        &mut self,
+        layer_id: &str,
+        packages: &[&str],
+        commit_checksum: &str,
+    ) {
         self.layers.push(OstreeLayer {
             layer_id: layer_id.to_string(),
             package_names: packages.iter().map(|s| s.to_string()).collect(),
@@ -908,7 +940,11 @@ mod tests {
         });
 
         let txz = engine
-            .compile_slackbuild("htop", &["/usr/bin/htop", "/usr/man/man1/htop.1"], "htop process viewer")
+            .compile_slackbuild(
+                "htop",
+                &["/usr/bin/htop", "/usr/man/man1/htop.1"],
+                "htop process viewer",
+            )
             .unwrap();
         assert_eq!(txz, "htop-3.2.1-x86_64-1.txz");
 
@@ -1007,7 +1043,11 @@ mod tests {
             default_priority: 1,
         };
 
-        let selected = engine.select_winning_candidate(&[cand_stable, cand_unstable.clone(), cand_experimental]);
+        let selected = engine.select_winning_candidate(&[
+            cand_stable,
+            cand_unstable.clone(),
+            cand_experimental,
+        ]);
         assert_eq!(selected.unwrap().version, "120.0");
     }
 
@@ -1033,15 +1073,24 @@ mod tests {
             },
         );
 
-        assert_eq!(governor.resolve_symlink_target("editor"), Some("/usr/bin/vim".to_string()));
+        assert_eq!(
+            governor.resolve_symlink_target("editor"),
+            Some("/usr/bin/vim".to_string())
+        );
 
         // Manual override
         governor.set_active_provider("editor", "nano");
-        assert_eq!(governor.resolve_symlink_target("editor"), Some("/usr/bin/nano".to_string()));
+        assert_eq!(
+            governor.resolve_symlink_target("editor"),
+            Some("/usr/bin/nano".to_string())
+        );
 
         // Back to auto mode
         governor.set_auto_mode("editor");
-        assert_eq!(governor.resolve_symlink_target("editor"), Some("/usr/bin/vim".to_string()));
+        assert_eq!(
+            governor.resolve_symlink_target("editor"),
+            Some("/usr/bin/vim".to_string())
+        );
     }
 
     #[test]
@@ -1054,11 +1103,19 @@ mod tests {
             minimum_version: None,
         });
 
-        let msgs = notifier.get_actionable_messages("postgresql15-server", &PkgMessageTrigger::Install, "15.3");
+        let msgs = notifier.get_actionable_messages(
+            "postgresql15-server",
+            &PkgMessageTrigger::Install,
+            "15.3",
+        );
         assert_eq!(msgs.len(), 1);
         assert!(msgs[0].contains("postgresql_enable=YES"));
 
-        let no_msgs = notifier.get_actionable_messages("postgresql15-server", &PkgMessageTrigger::Remove, "15.3");
+        let no_msgs = notifier.get_actionable_messages(
+            "postgresql15-server",
+            &PkgMessageTrigger::Remove,
+            "15.3",
+        );
         assert!(no_msgs.is_empty());
     }
 
@@ -1094,9 +1151,13 @@ mod tests {
         assert!(discovered.is_some());
         assert_eq!(discovered.unwrap().node_id, "peer_node_1");
 
-        let synced = peer_engine.sync_package_from_peer("peer_node_1", "curl", b"CURL_PACKAGE_BYTES");
+        let synced =
+            peer_engine.sync_package_from_peer("peer_node_1", "curl", b"CURL_PACKAGE_BYTES");
         assert!(synced);
-        assert_eq!(peer_engine.local_cache.get("curl").unwrap(), b"CURL_PACKAGE_BYTES");
+        assert_eq!(
+            peer_engine.local_cache.get("curl").unwrap(),
+            b"CURL_PACKAGE_BYTES"
+        );
     }
 
     #[test]

@@ -1,6 +1,5 @@
 /// Repository Management System (Debian APT + Arch Pacman Inspiration)
 /// Manages package repositories, mirrors, and metadata
-
 use crate::klib::btreemap::BTreeMap;
 
 // Zero-dependency architecture: Use alloc:: primitives for no_std compatibility
@@ -25,7 +24,6 @@ use std::vec::Vec;
 use core::default::Default;
 use core::option::Option::{self, None, Some};
 use core::result::Result::{self, Err, Ok};
-
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RepositoryGpgKey {
@@ -69,7 +67,10 @@ impl PpaRepository {
     }
 
     pub fn to_sources_list_entry(&self) -> String {
-        format!("deb https://ppa.launchpadcontent.net/{}/{}/ubuntu main", self.owner, self.ppa_name)
+        format!(
+            "deb https://ppa.launchpadcontent.net/{}/{}/ubuntu main",
+            self.owner, self.ppa_name
+        )
     }
 }
 

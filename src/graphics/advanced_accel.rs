@@ -1,7 +1,6 @@
 //! Graphics Acceleration Support inspired by Mesa, Vulkan, and DRI
 //! Vulkan 1.3 / OpenGL 4.6 APIs, PRIME GPU offloading, compute shaders, and ray tracing pipelines.
 
-
 use std::string::{String, ToString};
 use std::vec::Vec;
 
@@ -97,7 +96,13 @@ impl DmaBufSyncEngine {
         }
     }
 
-    pub fn export_dma_buf(&mut self, size: usize, stride: usize, width: u32, height: u32) -> DmaBufHandle {
+    pub fn export_dma_buf(
+        &mut self,
+        size: usize,
+        stride: usize,
+        width: u32,
+        height: u32,
+    ) -> DmaBufHandle {
         let fd = (self.exported_buffers.len() + 10) as i32;
         let handle = DmaBufHandle {
             fd,
@@ -174,7 +179,12 @@ impl NvidiaPrimeEngine {
         self.power_state = state;
     }
 
-    pub fn offload_render_buffer(&mut self, width: u32, height: u32, stride: usize) -> Result<DmaBufHandle, &'static str> {
+    pub fn offload_render_buffer(
+        &mut self,
+        width: u32,
+        height: u32,
+        stride: usize,
+    ) -> Result<DmaBufHandle, &'static str> {
         if self.power_state == DynamicPowerState::D3coldPowerOff {
             self.power_state = DynamicPowerState::D0Active;
         }
@@ -219,13 +229,19 @@ impl GraphicsManager {
         Ok(true)
     }
 
-    pub fn create_pipeline(&mut self, api: GraphicsBackendApi, force_discrete_offload: bool) -> Result<usize, &'static str> {
+    pub fn create_pipeline(
+        &mut self,
+        api: GraphicsBackendApi,
+        force_discrete_offload: bool,
+    ) -> Result<usize, &'static str> {
         let pipeline_id = self.active_pipelines.len() + 1;
         let has_dgpu = self.gpus.iter().any(|g| g.is_discrete);
         let profile_offload = match self.prime_engine.applet.active_profile {
             NvidiaPrimeProfile::NvidiaPerformance => true,
             NvidiaPrimeProfile::IntegratedIntelRadeon => false,
-            NvidiaPrimeProfile::NvidiaOnDemand | NvidiaPrimeProfile::OffloadCompute => force_discrete_offload,
+            NvidiaPrimeProfile::NvidiaOnDemand | NvidiaPrimeProfile::OffloadCompute => {
+                force_discrete_offload
+            }
         };
         let is_offloaded = (force_discrete_offload || profile_offload) && has_dgpu;
 
@@ -273,7 +289,9 @@ mod tests {
             supports_compute_shaders: true,
         });
 
-        let pipe_id = mgr.create_pipeline(GraphicsBackendApi::Vulkan, true).unwrap();
+        let pipe_id = mgr
+            .create_pipeline(GraphicsBackendApi::Vulkan, true)
+            .unwrap();
         assert_eq!(pipe_id, 1);
         assert!(mgr.active_pipelines[0].is_prime_offloaded);
     }
@@ -303,18 +321,25 @@ mod tests {
         });
 
         // 1. Default On-Demand mode: without force offload -> not offloaded
-        let pipe1 = mgr.create_pipeline(GraphicsBackendApi::ModernOpenGl, false).unwrap();
+        let pipe1 = mgr
+            .create_pipeline(GraphicsBackendApi::ModernOpenGl, false)
+            .unwrap();
         assert!(!mgr.active_pipelines[pipe1 - 1].is_prime_offloaded);
 
         // 2. Default On-Demand mode: with force offload -> offloaded
-        let pipe2 = mgr.create_pipeline(GraphicsBackendApi::Vulkan, true).unwrap();
+        let pipe2 = mgr
+            .create_pipeline(GraphicsBackendApi::Vulkan, true)
+            .unwrap();
         assert!(mgr.active_pipelines[pipe2 - 1].is_prime_offloaded);
 
         // 3. Switch profile to NvidiaPerformance (runtime pending relogin)
-        mgr.set_prime_profile(NvidiaPrimeProfile::NvidiaPerformance).unwrap();
+        mgr.set_prime_profile(NvidiaPrimeProfile::NvidiaPerformance)
+            .unwrap();
         let _ = mgr.prime_engine.apply_pending_profile().unwrap();
 
-        let pipe3 = mgr.create_pipeline(GraphicsBackendApi::DirectRenderingDri3, false).unwrap();
+        let pipe3 = mgr
+            .create_pipeline(GraphicsBackendApi::DirectRenderingDri3, false)
+            .unwrap();
         assert!(mgr.active_pipelines[pipe3 - 1].is_prime_offloaded);
     }
 }

@@ -1,4 +1,3 @@
-
 // Sovereign Core Apps Shard (SigmaOffice, SigmaTasks, SigmaVault, SigmaChat)
 // Zero-dependency, #![no_std] compliant
 

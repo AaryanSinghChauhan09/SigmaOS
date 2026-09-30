@@ -3,7 +3,6 @@
 // 30-year ancient-to-modern hardware bring-up tier (BIOS shims, ISA DMA, ATA/IDE, PCIe Gen5/CXL 3.0, NVMe 2.0),
 // and lockless SPSC DMA ring queues under #![no_std] constraints.
 
-
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 
@@ -22,7 +21,7 @@ pub type SovereignDriverLifecycleState = DriverLifecycleState;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum HardwareTier {
     Legacy30YearAncient, // BIOS Real-Mode, ISA DMA, 8259 PIC, ATA/IDE PIO
-    ModernBareMetal,      // UEFI 2.10, ACPI 6.5, PCIe Gen5/6, CXL 3.0, NVMe 2.0
+    ModernBareMetal,     // UEFI 2.10, ACPI 6.5, PCIe Gen5/6, CXL 3.0, NVMe 2.0
 }
 
 pub struct PciDeviceId {
@@ -103,7 +102,10 @@ impl SovereignDriverManager {
         let pci_id = match (vendor_id, device_id) {
             (Some(v), Some(d)) => {
                 self.pci_binding_table.insert((v, d), id);
-                Some(PciDeviceId { vendor_id: v, device_id: d })
+                Some(PciDeviceId {
+                    vendor_id: v,
+                    device_id: d,
+                })
             }
             _ => None,
         };
@@ -230,8 +232,15 @@ impl UniversalFirmwareBridge {
         self.registered_blobs.insert(name.to_string(), fw_type);
     }
 
-    pub fn translate_firmware_call(&self, blob_name: &str, method_offset: u32) -> Result<String, &'static str> {
-        let fw_type = self.registered_blobs.get(blob_name).ok_or("Firmware blob not registered")?;
+    pub fn translate_firmware_call(
+        &self,
+        blob_name: &str,
+        method_offset: u32,
+    ) -> Result<String, &'static str> {
+        let fw_type = self
+            .registered_blobs
+            .get(blob_name)
+            .ok_or("Firmware blob not registered")?;
         Ok(format!(
             "Translated {:?} Method Offset {:#X} in blob '{}' to SigmaOS Native HAL Call",
             fw_type, method_offset, blob_name
@@ -259,7 +268,9 @@ pub struct DeclarativeHardwareResolver {
 
 impl DeclarativeHardwareResolver {
     pub fn new() -> Self {
-        Self { profiles: Vec::new() }
+        Self {
+            profiles: Vec::new(),
+        }
     }
 
     pub fn add_profile(&mut self, profile: DeclarativeDriverProfile) {
@@ -410,15 +421,22 @@ pub struct ProgrammableIoStack {
 
 impl ProgrammableIoStack {
     pub fn new() -> Self {
-        Self { scripts: Vec::new() }
+        Self {
+            scripts: Vec::new(),
+        }
     }
 
     pub fn register_script(&mut self, name: &str, bus: IoBusType, bytecode: &[u8]) {
-        self.scripts.push((name.to_string(), bus, bytecode.to_vec()));
+        self.scripts
+            .push((name.to_string(), bus, bytecode.to_vec()));
     }
 
     pub fn execute_script(&self, name: &str) -> Result<usize, &'static str> {
-        let (_, _, bytecode) = self.scripts.iter().find(|(n, _, _)| n == name).ok_or("Script not found")?;
+        let (_, _, bytecode) = self
+            .scripts
+            .iter()
+            .find(|(n, _, _)| n == name)
+            .ok_or("Script not found")?;
         Ok(bytecode.len())
     }
 }
@@ -461,7 +479,10 @@ impl ClusterAwarePeripheralManager {
         );
     }
 
-    pub fn list_shared_peripherals_by_class(&self, dev_class: &str) -> Vec<ClusterPeripheralDevice> {
+    pub fn list_shared_peripherals_by_class(
+        &self,
+        dev_class: &str,
+    ) -> Vec<ClusterPeripheralDevice> {
         self.devices
             .values()
             .filter(|d| d.device_class == dev_class && d.is_shared)
@@ -576,23 +597,37 @@ mod tests {
         let mut engine = SovereignModularDeviceSupportEngine::new();
 
         // 1. Driver Shards
-        let shard_id = engine.shard_manager.register_shard("amdgpu-shard", "gpu", true);
+        let shard_id = engine
+            .shard_manager
+            .register_shard("amdgpu-shard", "gpu", true);
         assert!(engine.shard_manager.load_shard(shard_id).is_ok());
-        let new_rev = engine.shard_manager.hot_swap_shard(shard_id, "amdgpu-shard-v2").unwrap();
+        let new_rev = engine
+            .shard_manager
+            .hot_swap_shard(shard_id, "amdgpu-shard-v2")
+            .unwrap();
         assert_eq!(new_rev, 2);
 
         // 2. Universal Firmware Bridge
-        engine.firmware_bridge.register_firmware_blob("amdgpu_pci.bin", FirmwareType::ProprietaryGpuBlob);
-        let trans = engine.firmware_bridge.translate_firmware_call("amdgpu_pci.bin", 0x40).unwrap();
+        engine
+            .firmware_bridge
+            .register_firmware_blob("amdgpu_pci.bin", FirmwareType::ProprietaryGpuBlob);
+        let trans = engine
+            .firmware_bridge
+            .translate_firmware_call("amdgpu_pci.bin", 0x40)
+            .unwrap();
         assert!(trans.contains("Translated ProprietaryGpuBlob"));
 
         // 3. Declarative Driver Profiles
-        engine.hardware_resolver.add_profile(DeclarativeDriverProfile {
-            profile_name: "gaming-rig".to_string(),
-            pci_id_patterns: vec![(0x1002, 0x731f)],
-            required_shards: vec!["amdgpu-shard".to_string()],
-        });
-        let resolved = engine.hardware_resolver.auto_resolve_hardware(&[(0x1002, 0x731f)]);
+        engine
+            .hardware_resolver
+            .add_profile(DeclarativeDriverProfile {
+                profile_name: "gaming-rig".to_string(),
+                pci_id_patterns: vec![(0x1002, 0x731f)],
+                required_shards: vec!["amdgpu-shard".to_string()],
+            });
+        let resolved = engine
+            .hardware_resolver
+            .auto_resolve_hardware(&[(0x1002, 0x731f)]);
         assert_eq!(resolved, vec!["amdgpu-shard".to_string()]);
 
         // 4. Cross-OS Driver Compatibility Shims
@@ -613,16 +648,38 @@ mod tests {
             signature_dilithium5: vec![0xAB, 0xCD],
             author: "SigmaCommunity".to_string(),
         };
-        assert!(engine.community_registry.publish_driver_package(pkg).is_ok());
-        assert!(engine.community_registry.verify_and_fetch("community-realtek-audio").is_some());
+        assert!(engine
+            .community_registry
+            .publish_driver_package(pkg)
+            .is_ok());
+        assert!(engine
+            .community_registry
+            .verify_and_fetch("community-realtek-audio")
+            .is_some());
 
         // 7. Programmable I/O Stack
-        engine.programmable_io.register_script("reset_usb_bus", IoBusType::Usb, &[0x01, 0x02, 0x03]);
-        assert_eq!(engine.programmable_io.execute_script("reset_usb_bus").unwrap(), 3);
+        engine.programmable_io.register_script(
+            "reset_usb_bus",
+            IoBusType::Usb,
+            &[0x01, 0x02, 0x03],
+        );
+        assert_eq!(
+            engine
+                .programmable_io
+                .execute_script("reset_usb_bus")
+                .unwrap(),
+            3
+        );
 
         // 8. Cluster-Aware Peripherals
-        engine.cluster_peripherals.register_cluster_peripheral("remote-nvidia-h100", "node-02", "gpu");
-        let shared_gpus = engine.cluster_peripherals.list_shared_peripherals_by_class("gpu");
+        engine.cluster_peripherals.register_cluster_peripheral(
+            "remote-nvidia-h100",
+            "node-02",
+            "gpu",
+        );
+        let shared_gpus = engine
+            .cluster_peripherals
+            .list_shared_peripherals_by_class("gpu");
         assert_eq!(shared_gpus.len(), 1);
         assert_eq!(shared_gpus[0].node_id, "node-02");
     }

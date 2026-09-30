@@ -93,7 +93,11 @@ impl ProductionInstallerEngine {
     }
 
     /// Select installation target and generate standard x86_64 UEFI partition layout
-    pub fn select_disk_and_plan_partitions(&mut self, disk: DiscoveredBlockDevice, use_btrfs: bool) -> Result<(), &'static str> {
+    pub fn select_disk_and_plan_partitions(
+        &mut self,
+        disk: DiscoveredBlockDevice,
+        use_btrfs: bool,
+    ) -> Result<(), &'static str> {
         if disk.size_gb() < 16.0 {
             return Err("Target disk too small; minimum 16 GB required for SigmaOS installation");
         }
@@ -130,34 +134,48 @@ impl ProductionInstallerEngine {
             is_boot_efi: false,
         });
 
-        self.execution_log.push(format!("Partition plan generated for {:?}", self.target_disk.as_ref().unwrap().name));
+        self.execution_log.push(format!(
+            "Partition plan generated for {:?}",
+            self.target_disk.as_ref().unwrap().name
+        ));
         Ok(())
     }
 
     /// Execute or simulate partitioning, formatting, and base-system rsync
     pub fn execute_installation(&mut self) -> Result<bool, &'static str> {
         if self.target_disk.is_none() || self.partitions.is_empty() {
-            return Err("Cannot execute installation without a selected target and valid partition plan");
+            return Err(
+                "Cannot execute installation without a selected target and valid partition plan",
+            );
         }
 
         let disk_name = self.target_disk.as_ref().unwrap().name.clone();
 
         if self.dry_run {
-            self.execution_log.push(format!("[DRY-RUN] Writing GPT partition table to {}", disk_name));
+            self.execution_log.push(format!(
+                "[DRY-RUN] Writing GPT partition table to {}",
+                disk_name
+            ));
             for part in &self.partitions {
                 self.execution_log.push(format!(
                     "[DRY-RUN] Partition {}: {} MB ({:?}) -> {}",
                     part.number, part.size_mb, part.fs_type, part.mount_point
                 ));
             }
-            self.execution_log.push("[DRY-RUN] Unpacking SigmaOS Base System image into root...".into());
-            self.execution_log.push("[DRY-RUN] Installing GRUB/systemd-boot UEFI bootloader...".into());
-            self.execution_log.push("[DRY-RUN] Installation dry-run finished with complete success.".into());
+            self.execution_log
+                .push("[DRY-RUN] Unpacking SigmaOS Base System image into root...".into());
+            self.execution_log
+                .push("[DRY-RUN] Installing GRUB/systemd-boot UEFI bootloader...".into());
+            self.execution_log
+                .push("[DRY-RUN] Installation dry-run finished with complete success.".into());
             return Ok(true);
         }
 
         // Live execution path when not in dry-run mode
-        self.execution_log.push(format!("LIVE: Formatted {} and synchronized sovereign rootfs.", disk_name));
+        self.execution_log.push(format!(
+            "LIVE: Formatted {} and synchronized sovereign rootfs.",
+            disk_name
+        ));
         Ok(true)
     }
 }
@@ -173,10 +191,15 @@ mod tests {
         assert!(!disks.is_empty());
 
         let target = disks[0].clone();
-        assert!(installer.select_disk_and_plan_partitions(target, true).is_ok());
+        assert!(installer
+            .select_disk_and_plan_partitions(target, true)
+            .is_ok());
         assert_eq!(installer.partitions.len(), 2);
         assert!(installer.execute_installation().is_ok());
-        assert!(installer.execution_log.iter().any(|log| log.contains("DRY-RUN")));
+        assert!(installer
+            .execution_log
+            .iter()
+            .any(|log| log.contains("DRY-RUN")));
     }
 
     #[test]
@@ -190,6 +213,8 @@ mod tests {
             is_removable: true,
             is_rotational: false,
         };
-        assert!(installer.select_disk_and_plan_partitions(tiny_disk, false).is_err());
+        assert!(installer
+            .select_disk_and_plan_partitions(tiny_disk, false)
+            .is_err());
     }
 }

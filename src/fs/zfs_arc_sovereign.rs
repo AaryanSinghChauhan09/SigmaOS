@@ -4,8 +4,6 @@
 #![allow(clippy::new_without_default)]
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-
-
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
@@ -41,7 +39,7 @@ impl ArcBufferHeader {
 
 pub struct SovereignZfsArc {
     pub max_cache_blocks: usize,
-    pub p_target_mru: usize,     // Adaptive target size for T1 (MRU)
+    pub p_target_mru: usize,          // Adaptive target size for T1 (MRU)
     pub t1_mru: Vec<ArcBufferHeader>, // Most Recently Used cache
     pub t2_mfu: Vec<ArcBufferHeader>, // Most Frequently Used cache
     pub b1_ghost: Vec<u64>,           // Eviction ghost list for T1
@@ -118,7 +116,9 @@ impl SovereignZfsArc {
             return;
         }
 
-        if !self.t1_mru.is_empty() && (self.t1_mru.len() > self.p_target_mru || (self.t2_mfu.is_empty())) {
+        if !self.t1_mru.is_empty()
+            && (self.t1_mru.len() > self.p_target_mru || (self.t2_mfu.is_empty()))
+        {
             // Evict from T1 into B1
             if let Some(evicted) = self.t1_mru.pop() {
                 if self.b1_ghost.len() >= self.max_cache_blocks {

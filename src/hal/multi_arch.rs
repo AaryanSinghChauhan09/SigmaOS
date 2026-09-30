@@ -230,11 +230,16 @@ impl MultiArchHalManager {
         }
     }
 
-    pub fn register_irq_handler(&mut self, irq: u32, handler_name: &str) -> Result<(), &'static str> {
+    pub fn register_irq_handler(
+        &mut self,
+        irq: u32,
+        handler_name: &str,
+    ) -> Result<(), &'static str> {
         if self.registered_irq_handlers.iter().any(|(i, _)| *i == irq) {
             return Err("IRQ handler already registered");
         }
-        self.registered_irq_handlers.push((irq, handler_name.to_string()));
+        self.registered_irq_handlers
+            .push((irq, handler_name.to_string()));
         Ok(())
     }
 
@@ -361,7 +366,10 @@ mod tests {
     fn test_x86_32bit_hal_manager() {
         let hal_x86 = MultiArchHalManager::new(TargetArchitecture::X86);
         assert_eq!(hal_x86.irq_controller, InterruptControllerKind::X86PicApic);
-        if let CpuRegisterContext::X86 { esp, eip, eflags, .. } = hal_x86.create_default_context() {
+        if let CpuRegisterContext::X86 {
+            esp, eip, eflags, ..
+        } = hal_x86.create_default_context()
+        {
             assert_eq!(esp, 0xC0000000);
             assert_eq!(eip, 0x00100000);
             assert_eq!(eflags, 0x00000202);
@@ -373,9 +381,14 @@ mod tests {
     #[test]
     fn test_multi_arch_hal_manager() {
         let mut hal_x86 = MultiArchHalManager::new(TargetArchitecture::X86_64);
-        assert_eq!(hal_x86.irq_controller, InterruptControllerKind::X86ApicIoApic);
+        assert_eq!(
+            hal_x86.irq_controller,
+            InterruptControllerKind::X86ApicIoApic
+        );
         assert!(hal_x86.register_irq_handler(33, "keyboard_irq").is_ok());
-        assert!(hal_x86.register_irq_handler(33, "keyboard_irq_dup").is_err());
+        assert!(hal_x86
+            .register_irq_handler(33, "keyboard_irq_dup")
+            .is_err());
 
         let fault = MmioPageFault {
             faulting_address: 0xFED00000,
@@ -403,7 +416,10 @@ mod tests {
         }
 
         let hal_riscv = MultiArchHalManager::new(TargetArchitecture::Riscv64);
-        assert_eq!(hal_riscv.irq_controller, InterruptControllerKind::RiscvPlicClint);
+        assert_eq!(
+            hal_riscv.irq_controller,
+            InterruptControllerKind::RiscvPlicClint
+        );
         if let CpuRegisterContext::Riscv64 { pc, .. } = hal_riscv.create_default_context() {
             assert_eq!(pc, 0x80000000);
         } else {
@@ -411,8 +427,12 @@ mod tests {
         }
 
         let hal_loongarch = MultiArchHalManager::new(TargetArchitecture::LoongArch64);
-        assert_eq!(hal_loongarch.irq_controller, InterruptControllerKind::LoongArchExtIoi);
-        if let CpuRegisterContext::LoongArch64 { era, .. } = hal_loongarch.create_default_context() {
+        assert_eq!(
+            hal_loongarch.irq_controller,
+            InterruptControllerKind::LoongArchExtIoi
+        );
+        if let CpuRegisterContext::LoongArch64 { era, .. } = hal_loongarch.create_default_context()
+        {
             assert_eq!(era, 0x9000000000000000);
         } else {
             panic!("Expected LoongArch64 register context");
@@ -428,27 +448,42 @@ mod tests {
 
         let hal_armv7 = MultiArchHalManager::new(TargetArchitecture::Armv7);
         assert_eq!(hal_armv7.irq_controller, InterruptControllerKind::ArmGicV2);
-        assert_eq!(hal_armv7.current_arch.to_gnu_triplet(), "armv7-unknown-linux-gnueabihf");
+        assert_eq!(
+            hal_armv7.current_arch.to_gnu_triplet(),
+            "armv7-unknown-linux-gnueabihf"
+        );
 
         let hal_mips = MultiArchHalManager::new(TargetArchitecture::Mips64);
         assert_eq!(hal_mips.irq_controller, InterruptControllerKind::MipsGic);
-        assert_eq!(MultiArchElfHeader::detect_architecture(8), Some(TargetArchitecture::Mips64));
+        assert_eq!(
+            MultiArchElfHeader::detect_architecture(8),
+            Some(TargetArchitecture::Mips64)
+        );
 
         let hal_s390x = MultiArchHalManager::new(TargetArchitecture::S390x);
         assert_eq!(hal_s390x.irq_controller, InterruptControllerKind::S390xSclp);
 
         let hal_sparc = MultiArchHalManager::new(TargetArchitecture::Sparc64);
-        assert_eq!(hal_sparc.irq_controller, InterruptControllerKind::Sparc64Monddo);
+        assert_eq!(
+            hal_sparc.irq_controller,
+            InterruptControllerKind::Sparc64Monddo
+        );
 
         let hal_sh4 = MultiArchHalManager::new(TargetArchitecture::Sh4);
         assert_eq!(hal_sh4.irq_controller, InterruptControllerKind::SuperHIntc);
-        assert_eq!(hal_sh4.current_arch.to_gnu_triplet(), "sh4-unknown-linux-gnu");
+        assert_eq!(
+            hal_sh4.current_arch.to_gnu_triplet(),
+            "sh4-unknown-linux-gnu"
+        );
 
         let hal_alpha = MultiArchHalManager::new(TargetArchitecture::Alpha);
         assert_eq!(hal_alpha.irq_controller, InterruptControllerKind::AlphaSrm);
 
         let hal_m68k = MultiArchHalManager::new(TargetArchitecture::M68k);
         assert_eq!(hal_m68k.irq_controller, InterruptControllerKind::M68kPic);
-        assert_eq!(MultiArchElfHeader::detect_architecture(4), Some(TargetArchitecture::M68k));
+        assert_eq!(
+            MultiArchElfHeader::detect_architecture(4),
+            Some(TargetArchitecture::M68k)
+        );
     }
 }

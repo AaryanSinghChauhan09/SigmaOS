@@ -16,7 +16,12 @@ pub struct TilingWindowGeometry {
 
 impl TilingWindowGeometry {
     pub fn new(x: i32, y: i32, width: u32, height: u32) -> Self {
-        Self { x, y, width, height }
+        Self {
+            x,
+            y,
+            width,
+            height,
+        }
     }
 
     pub fn area(&self) -> u32 {
@@ -418,11 +423,10 @@ impl TilingWindowManager {
     /// Get statistics
     pub fn get_statistics(&self) -> TilingStatistics {
         let total_workspaces = self.workspaces.len();
-        let total_windows: usize = self.workspaces.values()
-            .map(|w| w.window_count())
-            .sum();
+        let total_windows: usize = self.workspaces.values().map(|w| w.window_count()).sum();
 
-        let active_window_count = self.get_active_workspace()
+        let active_window_count = self
+            .get_active_workspace()
             .map(|w| w.window_count())
             .unwrap_or(0);
 
@@ -478,8 +482,14 @@ mod tests {
     #[test]
     fn test_tiling_layout_from_str() {
         assert_eq!(TilingLayout::from_str("spiral"), Some(TilingLayout::Spiral));
-        assert_eq!(TilingLayout::from_str("monocle"), Some(TilingLayout::Monocle));
-        assert_eq!(TilingLayout::from_str("columns"), Some(TilingLayout::Columns));
+        assert_eq!(
+            TilingLayout::from_str("monocle"),
+            Some(TilingLayout::Monocle)
+        );
+        assert_eq!(
+            TilingLayout::from_str("columns"),
+            Some(TilingLayout::Columns)
+        );
         assert_eq!(TilingLayout::from_str("rows"), Some(TilingLayout::Rows));
         assert_eq!(TilingLayout::from_str("grid"), Some(TilingLayout::Grid));
         assert_eq!(TilingLayout::from_str("invalid"), None);
@@ -497,7 +507,11 @@ mod tests {
     #[test]
     fn test_workspace_add_window() {
         let mut workspace = Workspace::new(1, "1".to_string(), TilingLayout::Spiral);
-        let window = TiledWindow::new(1, "Test".to_string(), TilingWindowGeometry::new(0, 0, 800, 600));
+        let window = TiledWindow::new(
+            1,
+            "Test".to_string(),
+            TilingWindowGeometry::new(0, 0, 800, 600),
+        );
         workspace.add_window(window);
         assert_eq!(workspace.window_count(), 1);
     }
@@ -505,7 +519,11 @@ mod tests {
     #[test]
     fn test_workspace_remove_window() {
         let mut workspace = Workspace::new(1, "1".to_string(), TilingLayout::Spiral);
-        let window = TiledWindow::new(1, "Test".to_string(), TilingWindowGeometry::new(0, 0, 800, 600));
+        let window = TiledWindow::new(
+            1,
+            "Test".to_string(),
+            TilingWindowGeometry::new(0, 0, 800, 600),
+        );
         workspace.add_window(window);
         let removed = workspace.remove_window(1);
         assert!(removed.is_some());
@@ -515,8 +533,16 @@ mod tests {
     #[test]
     fn test_workspace_focus_window() {
         let mut workspace = Workspace::new(1, "1".to_string(), TilingLayout::Spiral);
-        let window1 = TiledWindow::new(1, "Test1".to_string(), TilingWindowGeometry::new(0, 0, 800, 600));
-        let window2 = TiledWindow::new(2, "Test2".to_string(), TilingWindowGeometry::new(0, 0, 800, 600));
+        let window1 = TiledWindow::new(
+            1,
+            "Test1".to_string(),
+            TilingWindowGeometry::new(0, 0, 800, 600),
+        );
+        let window2 = TiledWindow::new(
+            2,
+            "Test2".to_string(),
+            TilingWindowGeometry::new(0, 0, 800, 600),
+        );
         workspace.add_window(window1);
         workspace.add_window(window2);
         assert!(workspace.focus_window(2).is_ok());
@@ -556,7 +582,10 @@ mod tests {
     #[test]
     fn test_tiling_manager_add_window() {
         let mut manager = TilingWindowManager::new();
-        let id = manager.add_window("Test".to_string(), TilingWindowGeometry::new(0, 0, 800, 600));
+        let id = manager.add_window(
+            "Test".to_string(),
+            TilingWindowGeometry::new(0, 0, 800, 600),
+        );
         assert_eq!(id, 1);
         assert_eq!(manager.list_windows().len(), 1);
     }
@@ -564,7 +593,10 @@ mod tests {
     #[test]
     fn test_tiling_manager_remove_window() {
         let mut manager = TilingWindowManager::new();
-        let id = manager.add_window("Test".to_string(), TilingWindowGeometry::new(0, 0, 800, 600));
+        let id = manager.add_window(
+            "Test".to_string(),
+            TilingWindowGeometry::new(0, 0, 800, 600),
+        );
         assert!(manager.remove_window(id).is_ok());
         assert_eq!(manager.list_windows().len(), 0);
     }
@@ -579,8 +611,14 @@ mod tests {
     #[test]
     fn test_tiling_manager_statistics() {
         let mut manager = TilingWindowManager::new();
-        manager.add_window("Test1".to_string(), TilingWindowGeometry::new(0, 0, 800, 600));
-        manager.add_window("Test2".to_string(), TilingWindowGeometry::new(0, 0, 800, 600));
+        manager.add_window(
+            "Test1".to_string(),
+            TilingWindowGeometry::new(0, 0, 800, 600),
+        );
+        manager.add_window(
+            "Test2".to_string(),
+            TilingWindowGeometry::new(0, 0, 800, 600),
+        );
 
         let stats = manager.get_statistics();
         assert_eq!(stats.total_workspaces, 1);
@@ -591,8 +629,16 @@ mod tests {
     #[test]
     fn test_monocle_layout() {
         let mut workspace = Workspace::new(1, "1".to_string(), TilingLayout::Monocle);
-        let window1 = TiledWindow::new(1, "Test1".to_string(), TilingWindowGeometry::new(0, 0, 800, 600));
-        let window2 = TiledWindow::new(2, "Test2".to_string(), TilingWindowGeometry::new(0, 0, 800, 600));
+        let window1 = TiledWindow::new(
+            1,
+            "Test1".to_string(),
+            TilingWindowGeometry::new(0, 0, 800, 600),
+        );
+        let window2 = TiledWindow::new(
+            2,
+            "Test2".to_string(),
+            TilingWindowGeometry::new(0, 0, 800, 600),
+        );
         workspace.add_window(window1);
         workspace.add_window(window2);
 
@@ -606,8 +652,16 @@ mod tests {
     #[test]
     fn test_columns_layout() {
         let mut workspace = Workspace::new(1, "1".to_string(), TilingLayout::Columns);
-        let window1 = TiledWindow::new(1, "Test1".to_string(), TilingWindowGeometry::new(0, 0, 800, 600));
-        let window2 = TiledWindow::new(2, "Test2".to_string(), TilingWindowGeometry::new(0, 0, 800, 600));
+        let window1 = TiledWindow::new(
+            1,
+            "Test1".to_string(),
+            TilingWindowGeometry::new(0, 0, 800, 600),
+        );
+        let window2 = TiledWindow::new(
+            2,
+            "Test2".to_string(),
+            TilingWindowGeometry::new(0, 0, 800, 600),
+        );
         workspace.add_window(window1);
         workspace.add_window(window2);
 
@@ -619,8 +673,16 @@ mod tests {
     #[test]
     fn test_rows_layout() {
         let mut workspace = Workspace::new(1, "1".to_string(), TilingLayout::Rows);
-        let window1 = TiledWindow::new(1, "Test1".to_string(), TilingWindowGeometry::new(0, 0, 800, 600));
-        let window2 = TiledWindow::new(2, "Test2".to_string(), TilingWindowGeometry::new(0, 0, 800, 600));
+        let window1 = TiledWindow::new(
+            1,
+            "Test1".to_string(),
+            TilingWindowGeometry::new(0, 0, 800, 600),
+        );
+        let window2 = TiledWindow::new(
+            2,
+            "Test2".to_string(),
+            TilingWindowGeometry::new(0, 0, 800, 600),
+        );
         workspace.add_window(window1);
         workspace.add_window(window2);
 

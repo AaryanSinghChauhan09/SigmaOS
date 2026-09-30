@@ -36,9 +36,9 @@ pub enum SovereignXhciTrbType {
 #[repr(C, align(16))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SovereignXhciTrb {
-    pub parameter: u64,  // Data Buffer Pointer / Physical Addr
-    pub status: u32,     // Transfer Length / Completion Code
-    pub control: u32,    // TRB Type (bits 10..15), Cycle Bit (bit 0), IOC, ENT
+    pub parameter: u64, // Data Buffer Pointer / Physical Addr
+    pub status: u32,    // Transfer Length / Completion Code
+    pub control: u32,   // TRB Type (bits 10..15), Cycle Bit (bit 0), IOC, ENT
 }
 
 impl SovereignXhciTrb {
@@ -115,7 +115,10 @@ pub struct XhciEventRing {
 impl XhciEventRing {
     pub fn new(size: usize) -> Self {
         Self {
-            events: vec![SovereignXhciTrb::new(0, 0, SovereignXhciTrbType::TransferEvent, false); size],
+            events: vec![
+                SovereignXhciTrb::new(0, 0, SovereignXhciTrbType::TransferEvent, false);
+                size
+            ],
             dequeue_idx: 0,
             cycle_bit: true,
         }
@@ -190,8 +193,47 @@ impl SovereignXhciUsb3Driver {
         Ok(())
     }
 
+    /// Adds a bounded transfer ring and returns its stable index.
+    pub fn create_transfer_ring(&mut self, size: usize) -> Result<usize, &'static str> {
+        if !(2..=4096).contains(&size) {
+            return Err("Transfer ring size must be between 2 and 4096 TRBs");
+        }
+        let index = self.transfer_rings.len();
+        self.transfer_rings.push(XhciTransferRing::new(size));
+        Ok(index)
+    }
+
+    /// Submits a transfer to a previously created ring.
+    pub fn submit_transfer(
+        &mut self,
+        ring_index: usize,
+        trb: SovereignXhciTrb,
+    ) -> Result<usize, &'static str> {
+        self.transfer_rings
+            .get_mut(ring_index)
+            .ok_or("Unknown transfer ring")?
+            .enqueue(trb)
+    }
+
+    /// Returns the current enqueue and dequeue indices for a ring.
+    pub fn get_transfer_ring_status(
+        &self,
+        ring_index: usize,
+    ) -> Result<(usize, usize), &'static str> {
+        let ring = self
+            .transfer_rings
+            .get(ring_index)
+            .ok_or("Unknown transfer ring")?;
+        Ok((ring.enqueue_idx, ring.dequeue_idx))
+    }
+
     /// Enqueue a TRB onto the Command Ring
-    pub fn enqueue_command_trb(&mut self, param: u64, status: u32, trb_type: SovereignXhciTrbType) -> usize {
+    pub fn enqueue_command_trb(
+        &mut self,
+        param: u64,
+        status: u32,
+        trb_type: SovereignXhciTrbType,
+    ) -> usize {
         let idx = self.cmd_ring_enqueue_idx;
         let trb = SovereignXhciTrb::new(param, status, trb_type, self.cmd_ring_cycle_bit);
         self.command_ring[idx] = trb;
@@ -199,7 +241,12 @@ impl SovereignXhciUsb3Driver {
         self.cmd_ring_enqueue_idx += 1;
         if self.cmd_ring_enqueue_idx >= XHCI_TRB_RING_SIZE - 1 {
             // Place Link TRB at ring end to toggle cycle bit
-            let link_trb = SovereignXhciTrb::new(self.mmio_base + 0x1000, 0, SovereignXhciTrbType::Link, self.cmd_ring_cycle_bit);
+            let link_trb = SovereignXhciTrb::new(
+                self.mmio_base + 0x1000,
+                0,
+                SovereignXhciTrbType::Link,
+                self.cmd_ring_cycle_bit,
+            );
             self.command_ring[XHCI_TRB_RING_SIZE - 1] = link_trb;
             self.cmd_ring_enqueue_idx = 0;
             self.cmd_ring_cycle_bit = !self.cmd_ring_cycle_bit;
@@ -209,7 +256,11 @@ impl SovereignXhciUsb3Driver {
     }
 
     /// Enable Device Slot and assign context
-    pub fn enable_slot(&mut self, speed: UsbEndpointSpeed, class_code: u8) -> Result<u8, &'static str> {
+    pub fn enable_slot(
+        &mut self,
+        speed: UsbEndpointSpeed,
+        class_code: u8,
+    ) -> Result<u8, &'static str> {
         if !self.is_controller_running {
             return Err("xHCI Controller is not running");
         }
@@ -237,7 +288,11 @@ impl SovereignXhciUsb3Driver {
     }
 
     /// Ring Doorbell register for endpoint transfer execution
-    pub fn ring_doorbell(&mut self, slot_id: u8, target_endpoint_ctx: u8) -> Result<(), &'static str> {
+    pub fn ring_doorbell(
+        &mut self,
+        slot_id: u8,
+        target_endpoint_ctx: u8,
+    ) -> Result<(), &'static str> {
         if !self.active_slots.contains_key(&slot_id) {
             return Err("Invalid xHCI Slot ID");
         }
@@ -256,7 +311,6 @@ impl Default for SovereignXhciUsb3Driver {
 // UNIT TESTS
 // =========================================================================
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -266,7 +320,9 @@ mod tests {
         let mut xhci = SovereignXhciUsb3Driver::new(0xFEE00000);
         assert!(xhci.initialize().is_ok());
 
-        let slot_id = xhci.enable_slot(UsbEndpointSpeed::SuperSpeedPlus10Gbps, 0x08).unwrap();
+        let slot_id = xhci
+            .enable_slot(UsbEndpointSpeed::SuperSpeedPlus10Gbps, 0x08)
+            .unwrap();
         assert_eq!(slot_id, 1);
         assert_eq!(xhci.active_slots.len(), 1);
         assert_eq!(xhci.doorbells[1], 1);
@@ -286,7 +342,9 @@ mod tests {
     fn test_ring_doorbell() {
         let mut xhci = SovereignXhciUsb3Driver::new(0xFEE00000);
         xhci.initialize().unwrap();
-        let slot = xhci.enable_slot(UsbEndpointSpeed::SuperSpeed5Gbps, 0x03).unwrap();
+        let slot = xhci
+            .enable_slot(UsbEndpointSpeed::SuperSpeed5Gbps, 0x03)
+            .unwrap();
 
         assert!(xhci.ring_doorbell(slot, 2).is_ok());
         assert_eq!(xhci.doorbells[slot as usize], 2);
@@ -296,10 +354,10 @@ mod tests {
     fn test_transfer_ring_operations() {
         let mut ring = XhciTransferRing::new(64);
         let trb = SovereignXhciTrb::new(0x1000, 512, SovereignXhciTrbType::Normal, true);
-        
+
         assert!(ring.enqueue(trb).is_ok());
         assert_eq!(ring.enqueue_idx, 1);
-        
+
         let dequeued = ring.dequeue();
         assert!(dequeued.is_some());
         assert_eq!(ring.dequeue_idx, 1);
@@ -310,7 +368,7 @@ mod tests {
         let mut event_ring = XhciEventRing::new(256);
         let event = SovereignXhciTrb::new(0, 0, SovereignXhciTrbType::TransferEvent, true);
         event_ring.events[0] = event;
-        
+
         let dequeued = event_ring.dequeue();
         assert!(dequeued.is_some());
     }
@@ -319,13 +377,13 @@ mod tests {
     fn test_xhci_transfer_ring_management() {
         let mut xhci = SovereignXhciUsb3Driver::new(0xFEE00000);
         xhci.initialize().unwrap();
-        
+
         let ring_idx = xhci.create_transfer_ring(64).unwrap();
         assert_eq!(ring_idx, 0);
-        
+
         let trb = SovereignXhciTrb::new(0x2000, 1024, SovereignXhciTrbType::Normal, true);
         assert!(xhci.submit_transfer(ring_idx, trb).is_ok());
-        
+
         let status = xhci.get_transfer_ring_status(ring_idx);
         assert!(status.is_ok());
     }

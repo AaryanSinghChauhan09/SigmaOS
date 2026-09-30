@@ -521,9 +521,9 @@ impl OpenWrtUciSqmRouterEngine {
         if bw < 10000 {
             15 // 15ms target delay for low-bandwidth links
         } else if bw <= 100000 {
-            5  // 5ms standard CAKE target delay
+            5 // 5ms standard CAKE target delay
         } else {
-            2  // 2ms ultra-low latency target delay for gigabit
+            2 // 2ms ultra-low latency target delay for gigabit
         }
     }
 }
@@ -554,7 +554,10 @@ pub struct QubesHardenedBsdSecurityGuard {
 
 impl QubesHardenedBsdSecurityGuard {
     pub fn new(domain_type: QubeDomainType, pax_level: PaxSecurityLevel) -> Self {
-        let allow_net = matches!(domain_type, QubeDomainType::NetGateway | QubeDomainType::UntrustedWork);
+        let allow_net = matches!(
+            domain_type,
+            QubeDomainType::NetGateway | QubeDomainType::UntrustedWork
+        );
         Self {
             domain_type,
             pax_level,
@@ -567,7 +570,11 @@ impl QubesHardenedBsdSecurityGuard {
         self.allow_net_access && self.domain_type != QubeDomainType::AdminVault
     }
 
-    pub fn validate_memory_execution_permission(&self, is_writeable: bool, is_executable: bool) -> bool {
+    pub fn validate_memory_execution_permission(
+        &self,
+        is_writeable: bool,
+        is_executable: bool,
+    ) -> bool {
         match self.pax_level {
             PaxSecurityLevel::Disabled => true,
             PaxSecurityLevel::Standard | PaxSecurityLevel::StrictHardened => {
@@ -706,7 +713,12 @@ impl AlpineLbuApkOverlayEngine {
         false
     }
 
-    pub fn commit_lbu_overlay(&mut self, timestamp: u64, modified_count: usize, encrypt: bool) -> bool {
+    pub fn commit_lbu_overlay(
+        &mut self,
+        timestamp: u64,
+        modified_count: usize,
+        encrypt: bool,
+    ) -> bool {
         if self.commit_count < 8 {
             self.recent_commits[self.commit_count] = Some(ApkovlCommit {
                 commit_timestamp: timestamp,
