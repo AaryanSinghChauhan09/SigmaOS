@@ -16,6 +16,10 @@ SigmaOS is designed to eliminate operating system fragmentation, bloat, and lega
 - **Zenith Desktop**: Direct bare-metal rendering without X11/Wayland overhead
 - **SigmaPkg**: Universal package manager supporting 29+ Linux/BSD package formats
 
+## Master Specification Files
+
+- [Sovereign OS Absolute Omnipresent Self-Sufficiency Ultra Encyclopedia V40](15-Sovereign-OS-Self-Sufficiency-Encyclopedia-V40.md)
+
 ## Documentation Structure
 
 This wiki is organized in Arch Linux style with one page per topic:
