@@ -1369,27 +1369,14 @@ impl SovereignUniversalShellBridgeEngine {
 pub struct UniversalScriptTranspiler;
 
 impl UniversalScriptTranspiler {
-    /// Transpiles multi-dialect shell scripts (Fish, Tcsh, Bash, Zsh, Ksh, Yash, Mksh, Nu, Ion, Rc, Elvish, Xonsh, Oil, Es, Bsh, Dash, BsdSh) into POSIX /bin/sh compliant syntax
+    /// Transpiles multi-dialect shell scripts (Fish, Tcsh, Bash, Zsh, Ksh) into POSIX /bin/sh compliant syntax
     pub fn transpile_to_posix_sh(script: &str, dialect: ShellDialect) -> String {
         let mut transpiled = String::new();
         let mut in_function = false;
-        let mut in_heredoc = false;
-        let mut heredoc_delimiter = String::new();
         let mut indent_stack: Vec<usize> = Vec::new();
 
         for line in script.lines() {
             let trimmed = line.trim();
-
-            if in_heredoc {
-                if trimmed == heredoc_delimiter {
-                    in_heredoc = false;
-                    transpiled.push_str(&format!("EOF_HEREDOC_{}\n", heredoc_delimiter));
-                } else {
-                    transpiled.push_str(line);
-                    transpiled.push('\n');
-                }
-                continue;
-            }
 
             if trimmed.starts_with("#!") {
                 transpiled.push_str("#!/bin/sh\n");
@@ -1399,22 +1386,6 @@ impl UniversalScriptTranspiler {
             if trimmed.is_empty() {
                 transpiled.push('\n');
                 continue;
-            }
-
-            // Heredoc delimiter detection (e.g., cat << EOF or cmd << 'END')
-            if !trimmed.starts_with('#') && trimmed.contains("<<") && !trimmed.contains("<<<") {
-                if let Some(pos) = trimmed.find("<<") {
-                    let cmd_prefix = trimmed[..pos].trim();
-                    let rest = trimmed[pos + 2..].trim();
-                    let delim = rest.split_whitespace().next().unwrap_or("EOF").trim_matches('\'').trim_matches('"');
-                    if !delim.is_empty() {
-                        in_heredoc = true;
-                        heredoc_delimiter = delim.to_string();
-                        let cmd_str = if cmd_prefix.is_empty() { "cat" } else { cmd_prefix };
-                        transpiled.push_str(&format!("{} << EOF_HEREDOC_{}\n", cmd_str, delim));
-                        continue;
-                    }
-                }
             }
 
             // Indentation tracking for Pythonic / block-scoped dialects (e.g. Xonsh)
