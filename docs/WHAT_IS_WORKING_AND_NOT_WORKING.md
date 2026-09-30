@@ -52,7 +52,7 @@ The following legacy inventory identifies code paths and selected tests only. It
 ### B. Storage, Filesystems & Encryption (`src/filesystem/`, `src/crypto/`)
 - **Multi-Distro FHS Hierarchy Engine**: Path resolution for FreeBSD (`/usr/local/bin`), NetBSD (`/usr/pkg`), OpenBSD (`/usr/X11R6/bin`), NixOS/Guix (`/nix/store`), and Fedora Silverblue (`/var/home`, `/ostree/deploy`).
 - **POSIX VFS DAC Engine**: `Inode::check_permission` supporting UID 0 root bypass, owner/group/other permission bits, and user impersonation methods (`read_file_as_user`).
-- **Crypto prototypes**: `src/crypto/aes.rs` and `src/crypto/encryption.rs` now fail closed with `CryptoUnavailable`; `src/crypto/advanced_encryption_standard.rs` contains simulated transformations and is not connected to the crypto module. None of these provides production AES, GELI, or `/dev/crypto` support.
+- **Crypto prototypes**: `src/crypto/aes.rs` and `src/crypto/encryption.rs` now fail closed with `CryptoUnavailable`; `src/crypto/aegis_vault.rs` compression helpers are non-cryptographic, while key derivation, encryption, and decryption return `CryptoProviderUnavailable`; `src/crypto/advanced_encryption_standard.rs` contains simulated transformations and is not connected to the crypto module. None provides production AES, GELI, or `/dev/crypto` support.
 - **ATA Bus Controller**: PATA PIO transfer engine, ATAPI 12-byte SCSI packet command dispatcher, and Bus Master DMA controller with PRD table chain management.
 
 ### C. Universal Packaging & Distro Gateways (`src/package/`, `src/distro/`)
