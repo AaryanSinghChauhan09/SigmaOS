@@ -14,6 +14,8 @@ pub enum IntegrityStatus {
     Modified = 1,
     Corrupted = 2,
     Missing = 3,
+    Unverified = 4,
+    Invalid = usize::MAX,
 }
 
 /// File trait (OOP interface)
@@ -38,6 +40,7 @@ pub enum IntegrityError {
     FileNotFound = 1,
     ReadFailed = 2,
     PermissionDenied = 3,
+    VerificationUnavailable = 4,
 }
 
 /// File info
@@ -56,7 +59,7 @@ impl FileInfo {
             id,
             path: [0; 256],
             checksum: [0; 64],
-            status: IntegrityStatus::Valid,
+            status: IntegrityStatus::Unverified,
             capability: FileCapability::new(),
         }
     }
@@ -90,11 +93,11 @@ impl FileCapability {
 #[repr(C)]
 pub struct SimpleFile {
     pub id: FileID,
-    pub path: [u8; 256],
-    pub path_len: u16,
-    pub checksum: [u8; 64],
-    pub checksum_len: u8,
-    pub status: AtomicUsize, // IntegrityStatus as usize
+    path: [u8; 256],
+    path_len: u16,
+    checksum: [u8; 64],
+    checksum_len: u8,
+    status: IntegrityStatus,
     pub capability: FileCapability,
 }
 
@@ -106,14 +109,8 @@ impl SimpleFile {
         let path_len = path.len().min(255);
         let checksum_len = checksum.len().min(63);
 
-        unsafe {
-            core::ptr::copy_nonoverlapping(path.as_ptr(), path_array.as_mut_ptr(), path_len);
-            core::ptr::copy_nonoverlapping(
-                checksum.as_ptr(),
-                checksum_array.as_mut_ptr(),
-                checksum_len,
-            );
-        }
+        path_array[..path_len].copy_from_slice(&path[..path_len]);
+        checksum_array[..checksum_len].copy_from_slice(&checksum[..checksum_len]);
 
         SimpleFile {
             id,
@@ -121,17 +118,13 @@ impl SimpleFile {
             path_len: path_len as u16,
             checksum: checksum_array,
             checksum_len: checksum_len as u8,
-            status: AtomicUsize::new(IntegrityStatus::Valid as usize),
+            status: IntegrityStatus::Unverified,
             capability,
         }
     }
 
     pub fn get_status(&self) -> IntegrityStatus {
-        unsafe { core::mem::transmute(self.status.load(Ordering::SeqCst)) }
-    }
-
-    pub fn set_status(&self, status: IntegrityStatus) {
-        self.status.store(status as usize, Ordering::SeqCst);
+        self.status
     }
 }
 
@@ -155,10 +148,9 @@ impl File for SimpleFile {
             return Err(IntegrityError::PermissionDenied);
         }
 
-        // In a real implementation, this would compute and verify checksum
-        // For now, simulate verification
-        self.set_status(IntegrityStatus::Valid);
-        Ok(IntegrityStatus::Valid)
+        // This model has no file reader or trusted checksum implementation.
+        // Preserve the unverified state instead of reporting a false success.
+        Err(IntegrityError::VerificationUnavailable)
     }
 
     fn info(&self) -> FileInfo {
@@ -253,10 +245,16 @@ impl SimpleIntegrityMonitor {
 
     fn update_stats(&mut self, status: IntegrityStatus) {
         match status {
-            IntegrityStatus::Valid => self.stats.valid_files += 1,
-            IntegrityStatus::Modified => self.stats.modified_files += 1,
-            IntegrityStatus::Corrupted => self.stats.corrupted_files += 1,
-            IntegrityStatus::Missing => {}
+            IntegrityStatus::Valid => {
+                self.stats.valid_files = self.stats.valid_files.saturating_add(1)
+            }
+            IntegrityStatus::Modified => {
+                self.stats.modified_files = self.stats.modified_files.saturating_add(1)
+            }
+            IntegrityStatus::Corrupted => {
+                self.stats.corrupted_files = self.stats.corrupted_files.saturating_add(1)
+            }
+            IntegrityStatus::Missing | IntegrityStatus::Unverified | IntegrityStatus::Invalid => {}
         }
     }
 }
@@ -269,8 +267,7 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
 
         let id = file.id();
         self.files.push(Some(file));
-        self.stats.total_files += 1;
-        self.stats.valid_files += 1;
+        self.stats.total_files = self.stats.total_files.saturating_add(1);
         Ok(id)
     }
 
@@ -293,7 +290,7 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
             if let Some(slot) = self.files.get_mut(i) {
                 *slot = None;
             }
-            self.stats.total_files -= 1;
+            self.stats.total_files = self.stats.total_files.saturating_sub(1);
             Ok(())
         } else {
             Err(IntegrityError::FileNotFound)
@@ -311,6 +308,7 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
                     let result = file.verify();
                     if let Ok(status) = result {
                         self.update_stats(status);
+                        return Ok(status);
                     }
                     return result;
                 }
@@ -329,11 +327,14 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
         for i in 0..self.files.len() {
             if let Some(Some(ref mut file)) = self.files.get_mut(i) {
                 let result = file.verify();
-                if let Ok(status) = result {
-                    if status != IntegrityStatus::Valid {
-                        modified_files.push(file.id());
+                match result {
+                    Ok(status) => {
+                        if status != IntegrityStatus::Valid {
+                            modified_files.push(file.id());
+                        }
+                        self.update_stats(status);
                     }
-                    self.update_stats(status);
+                    Err(error) => return Err(error),
                 }
             }
         }
@@ -371,21 +372,30 @@ mod tests {
         assert_eq!(file.id(), 1);
         assert_eq!(file.path(), b"/var/www/index.html");
         assert_eq!(file.checksum(), b"checksum123");
-        assert!(matches!(file.verify(), Ok(IntegrityStatus::Valid)));
+        assert!(matches!(
+            file.verify(),
+            Err(IntegrityError::VerificationUnavailable)
+        ));
+        assert_eq!(file.get_status(), IntegrityStatus::Unverified);
 
         let monitor_cap = MonitorCapability::full();
         let mut monitor = SimpleIntegrityMonitor::new(monitor_cap);
         let id = monitor.register_file(Box::new(file)).unwrap();
         assert_eq!(id, 1);
 
-        assert!(matches!(monitor.verify_file(1), Ok(IntegrityStatus::Valid)));
+        assert!(matches!(
+            monitor.verify_file(1),
+            Err(IntegrityError::VerificationUnavailable)
+        ));
 
         let stats = monitor.stats();
         assert_eq!(stats.total_files, 1);
-        assert_eq!(stats.valid_files, 2); // 1 from register, 1 from verify_file
+        assert_eq!(stats.valid_files, 0);
 
-        let verify_all_results = monitor.verify_all().unwrap();
-        assert!(verify_all_results.is_empty());
+        assert!(matches!(
+            monitor.verify_all(),
+            Err(IntegrityError::VerificationUnavailable)
+        ));
 
         monitor.unregister_file(1).unwrap();
         assert_eq!(monitor.stats().total_files, 0);

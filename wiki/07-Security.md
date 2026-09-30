@@ -257,6 +257,13 @@ best-effort clearing only; it cannot erase caller copies or guarantee system-
 wide zeroization, and the component is not secure storage. Preserve this scope
 and do not describe it as encrypted storage without an audited provider.
 
+`src/security/integrity.rs::SimpleFile` has no file reader or trusted checksum
+verifier. Verification returns `VerificationUnavailable`, new files remain
+`Unverified`, and registration does not count them as valid. AI agents must
+keep unverified state distinct from valid state, propagate verifier errors,
+and preserve bounded path/checksum storage. Do not present this model as
+tamper detection until end-to-end verification is implemented and reviewed.
+
 The Fedora Cockpit and FreeIPA compatibility models do not authenticate
 sessions or mint Kerberos tickets without trusted Cockpit/KDC integrations.
 They reject authentication and token verification rather than treating any
