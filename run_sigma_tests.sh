@@ -452,4 +452,11 @@ if [ -f "src/distro/sovereign_linux_bsd_ecosystem_pinnacle_suite.rs" ]; then
     ./build/test_ecosystem_pinnacle
 fi
 
+if [ -f "src/distro/sovereign_linux_bsd_ecosystem_leap_suite.rs" ]; then
+    echo "Running Sovereign Linux & BSD Ecosystem Leap Suite test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_linux_bsd_ecosystem_leap_suite.rs --edition=2021 -o build/test_ecosystem_leap
+    ./build/test_ecosystem_leap
+fi
+
 echo "All SigmaOS test suites completed."
