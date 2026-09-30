@@ -801,14 +801,7 @@ impl SovereignUniversalDistroBridge {
                     }
                 }
             }
-            "auth" => {
-                let mut auth_bridge = SovereignSystemdHomedAuthBridge::new();
-                let _ = auth_bridge.authenticate_and_mount(action, "token_pass");
-                Ok(format!(
-                    "Dispatched systemd-homed PAM authentication for user '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
+            "auth" => Err("Authentication unavailable: no trusted credential provider configured"),
             "boot" => {
                 let mut boot_bridge = SovereignMultiArchBootChainBridge::new();
                 let _ = boot_bridge.configure_boot_entry(action, "quiet splash")?;
@@ -1337,6 +1330,15 @@ impl SovereignUniversalDistroBridge {
         ];
 
         for sub in subsystems {
+            if sub == "auth" {
+                if self
+                    .dispatch_cross_subsystem_operation(sub, "/tmp/test_action")
+                    .is_ok()
+                {
+                    return false;
+                }
+                continue;
+            }
             if let Err(e) = self.dispatch_cross_subsystem_operation(sub, "/tmp/test_action") {
                 println!(
                     "Subsystem '{}' failed under distro mode '{:?}': {}",
@@ -1764,7 +1766,10 @@ impl SovereignUniversalDistroBridge {
             "workflow",
             "zig",
         ];
-        subsystems.iter().map(|&s| (s, true, supervisor)).collect()
+        subsystems
+            .iter()
+            .map(|&s| (s, s != "auth", supervisor))
+            .collect()
     }
 
     pub fn cross_distro_subsystem_sync(
@@ -2985,7 +2990,7 @@ mod inspiration_leap_tests {
         assert_eq!(leap_engine.active_inspirations.len(), 13);
 
         let (count, valid) = leap_engine.audit_subsystem_readiness();
-        assert_eq!(count, 174);
+        assert_eq!(count, 173);
         assert!(valid);
 
         let res = leap_engine
@@ -3002,7 +3007,7 @@ mod inspiration_leap_tests {
         assert!(res_bsd.unwrap().contains("VNET network stack routing"));
 
         let (count_bsd, valid_bsd) = leap_engine.audit_subsystem_readiness();
-        assert_eq!(count_bsd, 174);
+        assert_eq!(count_bsd, 173);
         assert!(valid_bsd);
     }
 }
@@ -3036,7 +3041,7 @@ mod subsystem_interop_tests {
         assert!(caps.len() >= 140);
         for (sub, supported, supervisor) in caps {
             assert!(!sub.is_empty());
-            assert!(supported);
+            assert_eq!(supported, sub != "auth");
             assert_eq!(supervisor, ServiceSupervisorType::Systemd);
         }
     }
@@ -3321,6 +3326,15 @@ mod cross_subsystem_tests {
     use super::*;
 
     #[test]
+    fn auth_bridge_fails_closed_without_a_credential_provider() {
+        let mut auth = SovereignSystemdHomedAuthBridge::new();
+        assert!(auth
+            .authenticate_and_mount("alice", "some-password")
+            .is_err());
+        assert!(auth.authenticated_users.is_empty());
+    }
+
+    #[test]
     fn test_cross_subsystem_dispatch_actions() {
         let bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxArch);
         let res = bridge.dispatch_cross_subsystem_action("neofetch", DistroSubsystemMode::FreeBsd);
@@ -3569,8 +3583,7 @@ mod cross_subsystem_tests {
         assert!(orchestrator.verify_full_subsystem_matrix());
 
         let res_auth = orchestrator.orchestrate_subsystem("auth", "alice");
-        assert!(res_auth.is_ok());
-        assert!(res_auth.unwrap().contains("PAM authentication"));
+        assert!(res_auth.is_err());
 
         let res_boot = orchestrator.orchestrate_subsystem("boot", "sigma_kernel");
         assert!(res_boot.is_ok());
@@ -3587,14 +3600,14 @@ mod cross_subsystem_tests {
         let res_sys = orchestrator.orchestrate_subsystem("syscall", "sys_read");
         assert!(res_sys.is_ok());
 
-        assert!(orchestrator.active_subsystems.contains(&"auth".to_string()));
+        assert!(!orchestrator.active_subsystems.contains(&"auth".to_string()));
         assert!(orchestrator
             .active_subsystems
             .contains(&"network".to_string()));
 
         let sync_count = orchestrator.synchronize_subsystem_pipeline();
         assert!(sync_count.is_ok());
-        assert_eq!(sync_count.unwrap(), 174);
+        assert_eq!(sync_count.unwrap(), 173);
 
         let (supervisor, pkg_spec, vfs_etc, compatible) =
             orchestrator.query_subsystem_capabilities();
@@ -3794,7 +3807,14 @@ mod cross_subsystem_tests {
         let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxArch);
         for sub in all_174 {
             let res = bridge.dispatch_cross_subsystem_operation(sub, "test_action");
-            assert!(res.is_ok(), "Subsystem '{}' dispatch failed", sub);
+            if sub == "auth" {
+                assert!(
+                    res.is_err(),
+                    "auth must remain unavailable without a provider"
+                );
+            } else {
+                assert!(res.is_ok(), "Subsystem '{}' dispatch failed", sub);
+            }
         }
 
         assert!(bridge.verify_all_subsystems_compatibility_matrix());
@@ -3805,8 +3825,8 @@ mod cross_subsystem_tests {
         let mut gateway =
             LinuxBsdDistroSubsystemInteroperabilityGateway::new(DistroSubsystemMode::LinuxArch);
         let count = gateway.synchronize_and_audit_all_subsystems().unwrap();
-        assert_eq!(count, 174);
-        assert_eq!(gateway.audited_subsystems_count, 174);
+        assert_eq!(count, 173);
+        assert_eq!(gateway.audited_subsystems_count, 173);
 
         let res = gateway.orchestrate_subsystem("kernel", "sched_task");
         assert!(res.is_ok());
@@ -3814,7 +3834,7 @@ mod cross_subsystem_tests {
 
         gateway.set_distro_mode(DistroSubsystemMode::FreeBsd);
         let count_bsd = gateway.synchronize_and_audit_all_subsystems().unwrap();
-        assert_eq!(count_bsd, 174);
+        assert_eq!(count_bsd, 173);
 
         let (supervisor, pkg_spec, vfs_etc, compatible) = gateway.query_gateway_capability_matrix();
         assert_eq!(supervisor, ServiceSupervisorType::OpenRC);
@@ -8368,14 +8388,10 @@ impl SovereignSystemdHomedAuthBridge {
 
     pub fn authenticate_and_mount(
         &mut self,
-        username: &str,
-        password: &str,
+        _username: &str,
+        _password: &str,
     ) -> Result<&'static str, &'static str> {
-        if username.is_empty() || password.is_empty() {
-            return Err("Invalid credentials");
-        }
-        self.authenticated_users.push(username.to_string());
-        Ok("LUKS_HOME_MOUNTED")
+        Err("Authentication unavailable: no trusted credential provider configured")
     }
 }
 

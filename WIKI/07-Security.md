@@ -362,6 +362,8 @@ SigmaPkg currently computes SHA-256 digests for content integrity, but its signa
 
 The API-shaped compatibility layer in `src/crypto/libsodium.rs` and the PQC routines in `src/crypto/pqc_dilithium.rs` are prototypes with simulated primitives, deterministic keys, or placeholder verification. They are not libsodium or NIST-standard implementations and must not protect real data, credentials, updates, or network sessions. Keep production cryptographic operations disabled until an audited provider is integrated and its key lifecycle and protocol use are reviewed. `sodium_init` only provides thread-safe one-time state; it does not make the prototype primitives secure.
 
+Cross-distro authentication dispatch also fails closed: `SovereignSystemdHomedAuthBridge` has no trusted credential backend and cannot authenticate users or mount home directories. Do not count it as an available authentication feature until a provider validates credentials and the mount path has end-to-end tests.
+
 Maintain this component by checking opcode encodings, forward jump targets, native-endian argument word offsets, 64-bit comparisons, and default-action behavior together. Run `cargo test --lib security::seccomp_filter::tests` and `cargo check --lib` after edits. Do not weaken the default action or claim runtime enforcement unless the kernel integration path and its end-to-end checks are present.
 
 ## Documentation status
