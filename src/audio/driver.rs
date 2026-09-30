@@ -1,11 +1,11 @@
+use std::boxed::Box;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 /// OOP-based Audio Driver for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 71
 /// Implements audio device management and playback
 use core::sync::atomic::{AtomicUsize, Ordering};
-use std::boxed::Box;
-use std::format;
-use std::string::{String, ToString};
-use std::vec::Vec;
 
 pub type AudioDeviceID = usize;
 

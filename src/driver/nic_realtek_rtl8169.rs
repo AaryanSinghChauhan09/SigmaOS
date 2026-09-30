@@ -2,10 +2,10 @@
 // SigmaOS Realtek RTL8169/8111 Gigabit Ethernet Driver
 // Inspired by Linux (drivers/net/ethernet/realtek/8139cp.c) and FreeBSD (sys/dev/re/if_re.c)
 
-use core::sync::atomic::{AtomicU32, Ordering};
 use std::boxed::Box;
-use std::string::String;
 use std::vec::Vec;
+use std::string::String;
+use core::sync::atomic::{AtomicU32, Ordering};
 
 #[cfg(not(feature = "standalone_test"))]
 use crate::driver::pci_enumeration::{PciDeviceInfo, PciDriver};
@@ -27,14 +27,14 @@ pub const RTL8168_DEVICE_ID: u16 = 0x8168;
 pub const RTL8111_DEVICE_ID: u16 = 0x8111;
 
 // Register Offsets
-pub const REG_MAC0: u32 = 0x00; // MAC Address Byte 0
-pub const REG_COMMAND: u32 = 0x37; // Command Register
-pub const REG_IMR: u32 = 0x3C; // Interrupt Mask Register
-pub const REG_ISR: u32 = 0x3E; // Interrupt Status Register
-pub const REG_TX_CONFIG: u32 = 0x40; // Transmit Configuration
-pub const REG_RX_CONFIG: u32 = 0x44; // Receive Configuration
-pub const REG_TDSAR_LOW: u32 = 0x20; // Transmit Descriptor Start Address Low
-pub const REG_RDSAR_LOW: u32 = 0x28; // Receive Descriptor Start Address Low
+pub const REG_MAC0: u32 = 0x00;        // MAC Address Byte 0
+pub const REG_COMMAND: u32 = 0x37;     // Command Register
+pub const REG_IMR: u32 = 0x3C;         // Interrupt Mask Register
+pub const REG_ISR: u32 = 0x3E;         // Interrupt Status Register
+pub const REG_TX_CONFIG: u32 = 0x40;   // Transmit Configuration
+pub const REG_RX_CONFIG: u32 = 0x44;   // Receive Configuration
+pub const REG_TDSAR_LOW: u32 = 0x20;   // Transmit Descriptor Start Address Low
+pub const REG_RDSAR_LOW: u32 = 0x28;   // Receive Descriptor Start Address Low
 
 // Command Bits
 pub const CMD_RESET: u8 = 0x10;

@@ -1,5 +1,5 @@
-use core::sync::atomic::{AtomicUsize, Ordering};
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Chimera Linux dinit service management compatibility
 #[derive(Debug, Clone)]

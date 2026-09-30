@@ -19,8 +19,8 @@ mod atomic;
 use distro_update_parity::{
     ArchNewsAlertChecker, ArchRollingReleaseUpdater, DebianUnattendedUpgradesEngine,
     FreeBsdPatchEntry, FreeBsdUpdateEngine, FwupdCapsuleManager, OstreeAbPartitionUpdater,
-    PartitionSlot, PostQuantumSignedUpdateVerifier, PreUpdateSnapshotGuard, SystemDiagnosticReport,
-    TopgradeSystemUpdateOrchestrator, UnattendedUpgradeRule,
+    PartitionSlot, PostQuantumSignedUpdateVerifier, PreUpdateSnapshotGuard,
+    SystemDiagnosticReport, TopgradeSystemUpdateOrchestrator, UnattendedUpgradeRule,
 };
 
 #[cfg(feature = "standalone_test")]
@@ -32,8 +32,8 @@ use atomic::{
 use super::distro_update_parity::{
     ArchNewsAlertChecker, ArchRollingReleaseUpdater, DebianUnattendedUpgradesEngine,
     FreeBsdPatchEntry, FreeBsdUpdateEngine, FwupdCapsuleManager, OstreeAbPartitionUpdater,
-    PartitionSlot, PostQuantumSignedUpdateVerifier, PreUpdateSnapshotGuard, SystemDiagnosticReport,
-    TopgradeSystemUpdateOrchestrator, UnattendedUpgradeRule,
+    PartitionSlot, PostQuantumSignedUpdateVerifier, PreUpdateSnapshotGuard,
+    SystemDiagnosticReport, TopgradeSystemUpdateOrchestrator, UnattendedUpgradeRule,
 };
 
 #[cfg(not(feature = "standalone_test"))]
@@ -118,9 +118,7 @@ pub struct UpdateHealthVerifier {
 
 impl UpdateHealthVerifier {
     pub fn new(minimum_free_space_bytes: u64) -> Self {
-        Self {
-            minimum_free_space_bytes,
-        }
+        Self { minimum_free_space_bytes }
     }
 
     /// Evaluates pre-flight health diagnostics
@@ -131,10 +129,7 @@ impl UpdateHealthVerifier {
         battery_percent: u8,
         services_ok: bool,
     ) -> PreflightCheckResult {
-        let disk_ok = available_disk_bytes
-            >= payload
-                .required_disk_space_bytes
-                .max(self.minimum_free_space_bytes);
+        let disk_ok = available_disk_bytes >= payload.required_disk_space_bytes.max(self.minimum_free_space_bytes);
         let battery_ok = battery_percent >= 20;
         let network_ok = true;
         let overall = disk_ok && battery_ok && services_ok;
@@ -339,11 +334,7 @@ impl SovereignSystemUpdateManager {
         }
 
         // 2. Arch News Breaking Change Check
-        if self
-            .news_checker
-            .check_breaking_changes(&payload.target_version)
-            .is_err()
-        {
+        if self.news_checker.check_breaking_changes(&payload.target_version).is_err() {
             self.transaction_ledger.record_transaction(
                 &payload.update_id,
                 &self.current_version,
@@ -357,11 +348,7 @@ impl SovereignSystemUpdateManager {
         }
 
         // 3. Pre-update Restore Snapshot Creation
-        if self
-            .snapshot_guard
-            .create_preupdate_snapshot(&payload.target_version)
-            .is_err()
-        {
+        if self.snapshot_guard.create_preupdate_snapshot(&payload.target_version).is_err() {
             return Err("Failed to create pre-update restore snapshot");
         }
 
@@ -393,38 +380,29 @@ impl SovereignSystemUpdateManager {
                 Ok("Atomic slot swap update applied successfully".to_string())
             }
             SystemUpdateStrategy::DeltaBinaryPatch => {
-                self.freebsd_updater
-                    .fetch_binary_diffs(vec![FreeBsdPatchEntry {
-                        target_path: "/boot/kernel",
-                        original_sha256: "old_sha",
-                        patched_sha256: "new_sha",
-                        delta_bytes: payload.payload_bytes.clone(),
-                    }]);
+                self.freebsd_updater.fetch_binary_diffs(vec![FreeBsdPatchEntry {
+                    target_path: "/boot/kernel",
+                    original_sha256: "old_sha",
+                    patched_sha256: "new_sha",
+                    delta_bytes: payload.payload_bytes.clone(),
+                }]);
                 let _applied = self.freebsd_updater.apply_patch_and_verify()?;
                 self.current_version = target_version.clone();
                 Ok("Delta binary patch update applied successfully".to_string())
             }
             SystemUpdateStrategy::InPlaceTransaction => {
-                let tx_id = self
-                    .atomic_manager
-                    .create_transaction()
-                    .map_err(|_| "Failed to create atomic update tx")?;
-                self.atomic_manager
-                    .add_operation(tx_id, b"stage_inplace")
-                    .map_err(|_| "Failed to add operation")?;
-                self.atomic_manager
-                    .execute_transaction(tx_id)
-                    .map_err(|_| "Failed to commit atomic update tx")?;
+                let tx_id = self.atomic_manager.create_transaction().map_err(|_| "Failed to create atomic update tx")?;
+                self.atomic_manager.add_operation(tx_id, b"stage_inplace").map_err(|_| "Failed to add operation")?;
+                self.atomic_manager.execute_transaction(tx_id).map_err(|_| "Failed to commit atomic update tx")?;
                 self.current_version = target_version.clone();
                 Ok("In-place transactional update applied successfully".to_string())
             }
             SystemUpdateStrategy::UnattendedBackground => {
-                let mut debian_engine =
-                    DebianUnattendedUpgradesEngine::new(UnattendedUpgradeRule {
-                        origin_pattern: "SigmaOS:security",
-                        allow_security_updates_only: self.policy.security_updates_only,
-                        automatic_reboot_window: self.policy.maintenance_window_hours,
-                    });
+                let mut debian_engine = DebianUnattendedUpgradesEngine::new(UnattendedUpgradeRule {
+                    origin_pattern: "SigmaOS:security",
+                    allow_security_updates_only: self.policy.security_updates_only,
+                    automatic_reboot_window: self.policy.maintenance_window_hours,
+                });
                 debian_engine.register_pending_update("kernel-core", true);
                 let _count = debian_engine.process_unattended_updates();
                 self.current_version = target_version.clone();
@@ -436,8 +414,7 @@ impl SovereignSystemUpdateManager {
                 Ok("Topgrade-style unified multi-system update applied successfully".to_string())
             }
             SystemUpdateStrategy::FirmwareCapsule => {
-                let res =
-                    FwupdCapsuleManager::verify_and_apply_firmware_capsule(&payload.payload_bytes)?;
+                let res = FwupdCapsuleManager::verify_and_apply_firmware_capsule(&payload.payload_bytes)?;
                 self.current_version = target_version.clone();
                 Ok(res)
             }
@@ -494,10 +471,7 @@ impl SovereignSystemUpdateManager {
     pub fn rollback_last_update(&mut self) -> Result<String, &'static str> {
         let rolled_slot = self.ab_updater.trigger_fail_safe_rollback()?;
         self.active_slot = rolled_slot;
-        Ok(format!(
-            "System successfully rolled back to active slot {:?}",
-            rolled_slot
-        ))
+        Ok(format!("System successfully rolled back to active slot {:?}", rolled_slot))
     }
 }
 
@@ -511,9 +485,7 @@ mod tests {
 
     fn create_test_payload(strategy: SystemUpdateStrategy) -> SystemUpdatePayload {
         let payload_bytes = b"sovereign_update_v2.0_padded_bytes".to_vec();
-        let calc_checksum = payload_bytes
-            .iter()
-            .fold(0u8, |acc, &b| acc.wrapping_add(b));
+        let calc_checksum = payload_bytes.iter().fold(0u8, |acc, &b| acc.wrapping_add(b));
         let mut dilithium5_sig = vec![0u8; 32];
         dilithium5_sig[0] = calc_checksum;
 
@@ -533,10 +505,7 @@ mod tests {
     #[test]
     fn test_update_policy_default() {
         let policy = SystemUpdatePolicy::default();
-        assert_eq!(
-            policy.default_strategy,
-            SystemUpdateStrategy::AtomicSlotSwap
-        );
+        assert_eq!(policy.default_strategy, SystemUpdateStrategy::AtomicSlotSwap);
         assert!(policy.require_pqc_signature);
         assert_eq!(policy.min_battery_percent, 30);
     }
@@ -598,9 +567,7 @@ mod tests {
     fn test_apply_update_news_breaking_change_blocking() {
         let policy = SystemUpdatePolicy::default();
         let mut manager = SovereignSystemUpdateManager::new("1.0.0", policy);
-        manager
-            .news_checker
-            .add_advisory("Manual migration required for glibc", "2.0.0", true);
+        manager.news_checker.add_advisory("Manual migration required for glibc", "2.0.0", true);
 
         let payload = create_test_payload(SystemUpdateStrategy::AtomicSlotSwap);
         manager.register_update(payload);
@@ -641,24 +608,8 @@ mod tests {
     #[test]
     fn test_transaction_ledger_audit_history() {
         let mut ledger = UpdateTransactionLedger::new();
-        let tx1 = ledger.record_transaction(
-            "up1",
-            "1.0.0",
-            "1.1.0",
-            SystemUpdateStrategy::DeltaBinaryPatch,
-            true,
-            false,
-            "applied",
-        );
-        let tx2 = ledger.record_transaction(
-            "up2",
-            "1.1.0",
-            "2.0.0",
-            SystemUpdateStrategy::AtomicSlotSwap,
-            false,
-            true,
-            "rollback",
-        );
+        let tx1 = ledger.record_transaction("up1", "1.0.0", "1.1.0", SystemUpdateStrategy::DeltaBinaryPatch, true, false, "applied");
+        let tx2 = ledger.record_transaction("up2", "1.1.0", "2.0.0", SystemUpdateStrategy::AtomicSlotSwap, false, true, "rollback");
 
         assert_eq!(tx1, 1);
         assert_eq!(tx2, 2);
@@ -672,9 +623,7 @@ mod tests {
         let payload = create_test_payload(SystemUpdateStrategy::AtomicSlotSwap);
 
         manager.register_update(payload);
-        manager
-            .apply_update("update_200", 50_000_000, 80, true)
-            .unwrap();
+        manager.apply_update("update_200", 50_000_000, 80, true).unwrap();
         assert_eq!(manager.active_slot, PartitionSlot::SlotB);
 
         // Simulate boot failure requiring manual rollback

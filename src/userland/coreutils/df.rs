@@ -27,7 +27,7 @@ pub fn run(path: &str, _human_readable: bool) -> Result<Vec<FilesystemInfo>, Str
 
     // Placeholder: In real implementation, this would call statvfs syscall
     let total = 100_000_000_000u64; // 100GB placeholder
-    let used = 50_000_000_000u64; // 50GB placeholder
+    let used = 50_000_000_000u64;   // 50GB placeholder
     let available = total - used;
 
     Ok(vec![FilesystemInfo {

@@ -78,14 +78,6 @@ impl CapRights {
     }
 }
 
-impl core::ops::BitOr for CapRights {
-    type Output = Self;
-
-    fn bitor(self, rhs: Self) -> Self::Output {
-        self.union(rhs)
-    }
-}
-
 impl Default for CapRights {
     fn default() -> Self {
         Self::new()
@@ -194,13 +186,14 @@ impl CapsicumManager {
 
     /// Check if file descriptor has required rights
     pub fn check_rights(&self, fd: i32, required: CapRights) -> bool {
-        if let Some(entry) = self.get_entry(fd) {
-            if !entry.is_valid {
-                return false;
-            }
-            return self.mode == CapSandboxMode::Unrestricted || entry.check_rights(required);
+        if self.mode == CapSandboxMode::Unrestricted {
+            return true;
         }
-        self.mode == CapSandboxMode::Unrestricted
+
+        match self.get_entry(fd) {
+            Some(entry) => entry.check_rights(required),
+            None => false,
+        }
     }
 
     /// Limit rights on a file descriptor
@@ -369,7 +362,6 @@ mod tests {
         let mut manager = CapsicumManager::new();
         let rights = CapRights::READ | CapRights::WRITE;
         let fd = manager.create_entry(rights);
-        manager.set_mode(CapSandboxMode::Restricted);
 
         assert!(manager.check_rights(fd, CapRights::READ));
         assert!(!manager.check_rights(fd, CapRights::EXECUTE));

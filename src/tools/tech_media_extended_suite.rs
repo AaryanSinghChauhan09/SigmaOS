@@ -190,11 +190,7 @@ impl TheNewStackCloudNativeEngine {
         self.pods.insert(spec.pod_id.clone(), spec);
     }
 
-    pub fn rolling_update_pod(
-        &mut self,
-        pod_id: &str,
-        new_image: &str,
-    ) -> Result<(), &'static str> {
+    pub fn rolling_update_pod(&mut self, pod_id: &str, new_image: &str) -> Result<(), &'static str> {
         if let Some(pod) = self.pods.get_mut(pod_id) {
             pod.image_name = new_image.to_string();
             pod.is_running = true;
@@ -366,23 +362,18 @@ impl SovereignTechMediaExtendedMasterSuite {
     pub fn verify_entire_extended_suite(&mut self) -> bool {
         // 1. PC Health Verification
         let storage_report = self.pc_health.analyze_storage_cleanup();
-        let pc_health_ok =
-            storage_report.total_reclaimable_bytes > 0 && self.pc_health.audit_drivers();
+        let pc_health_ok = storage_report.total_reclaimable_bytes > 0 && self.pc_health.audit_drivers();
 
         // 2. GPU Accelerator Verification
         let pacing = self.gpu_accel.optimize_frame_pacing(165.0);
         let gpu_ok = pacing.current_fps == 165.0 && self.gpu_accel.verify_direct_storage();
 
         // 3. Cloud Native Verification
-        let update_res = self
-            .cloud_native
-            .rolling_update_pod("pod_gateway", "sigma/ingress_gw:v1.3");
+        let update_res = self.cloud_native.rolling_update_pod("pod_gateway", "sigma/ingress_gw:v1.3");
         let cloud_ok = update_res.is_ok() && self.cloud_native.is_network_observability_nominal();
 
         // 4. AI Quantizer Verification
-        let ai_ok = self
-            .ai_quantizer
-            .verify_quantization_profile("sigma_slm_3b")
+        let ai_ok = self.ai_quantizer.verify_quantization_profile("sigma_slm_3b")
             && self.ai_quantizer.evaluate_rag_vector_cache();
 
         // 5. Power Telemetry Verification
@@ -423,9 +414,7 @@ mod tests {
     fn test_the_new_stack_cloud_native_engine() {
         let mut engine = TheNewStackCloudNativeEngine::new();
         assert!(engine.is_network_observability_nominal());
-        assert!(engine
-            .rolling_update_pod("pod_gateway", "sigma/ingress_gw:v2.0")
-            .is_ok());
+        assert!(engine.rolling_update_pod("pod_gateway", "sigma/ingress_gw:v2.0").is_ok());
         assert!(engine.rolling_update_pod("invalid_pod", "v1.0").is_err());
     }
 

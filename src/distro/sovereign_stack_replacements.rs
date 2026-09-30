@@ -98,11 +98,7 @@ impl SovereignOnlyOfficeCollaboraEngine {
         format!(
             "Opened {} via {} Suite (Web-Native, Modular)",
             doc_name,
-            if self.is_collabora {
-                "Collabora Online"
-            } else {
-                "OnlyOffice"
-            }
+            if self.is_collabora { "Collabora Online" } else { "OnlyOffice" }
         )
     }
 }
@@ -123,10 +119,7 @@ impl SovereignMidoriEpiphanyBraveBrowser {
     }
 
     pub fn navigate(&self, url: &str) -> String {
-        format!(
-            "Navigating to {} via {} (Shields: {})",
-            url, self.browser_name, self.privacy_shield_active
-        )
+        format!("Navigating to {} via {} (Shields: {})", url, self.browser_name, self.privacy_shield_active)
     }
 }
 
@@ -192,9 +185,7 @@ impl SovereignDoasPrivilegeEngine {
     pub fn new() -> Self {
         let mut rules = Vec::new();
         rules.push("permit nopass sovereign as root".to_string());
-        Self {
-            permitted_rules: rules,
-        }
+        Self { permitted_rules: rules }
     }
 
     pub fn check_permission(&self, user: &str, target_cmd: &str) -> bool {
@@ -218,9 +209,7 @@ pub struct SovereignNfsCifsSharingEngine {
 
 impl SovereignNfsCifsSharingEngine {
     pub fn new() -> Self {
-        Self {
-            active_shares: Vec::new(),
-        }
+        Self { active_shares: Vec::new() }
     }
 
     pub fn add_share(&mut self, path: &str) {
@@ -265,9 +254,7 @@ impl SovereignMdevDeviceManager {
             "nvme[0-n]* 0:0 660".to_string(),
             "input/.* 0:0 660".to_string(),
         ];
-        Self {
-            device_rules: rules,
-        }
+        Self { device_rules: rules }
     }
 }
 
@@ -365,9 +352,9 @@ impl Default for SovereignOpenSourceVulkanDriverEngine {
 /// Milestone Phase Strategy
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GapRoadmapMilestone {
-    CoreCredibility6Months,  // v1.0
-    AdoptionLayer12Months,   // v1.2
-    Differentiation18Months, // v1.5
+    CoreCredibility6Months,   // v1.0
+    AdoptionLayer12Months,    // v1.2
+    Differentiation18Months,  // v1.5
 }
 
 /// Sovereign Gap-Filling Roadmap & Milestone Tracker Engine
@@ -397,24 +384,15 @@ impl SovereignGapFillingRoadmapEngine {
         map.insert("v1.5_lts_rolling_lifecycle".to_string(), true);
         map.insert("v1.5_community_marketplace".to_string(), true);
 
-        Self {
-            completed_milestones: map,
-        }
+        Self { completed_milestones: map }
     }
 
     pub fn completion_ratio_for(&self, prefix: &str) -> f32 {
-        let matching: Vec<_> = self
-            .completed_milestones
-            .keys()
-            .filter(|k| k.starts_with(prefix))
-            .collect();
+        let matching: Vec<_> = self.completed_milestones.keys().filter(|k| k.starts_with(prefix)).collect();
         if matching.is_empty() {
             0.0
         } else {
-            let done = matching
-                .iter()
-                .filter(|&&k| *self.completed_milestones.get(k).unwrap_or(&false))
-                .count();
+            let done = matching.iter().filter(|&&k| *self.completed_milestones.get(k).unwrap_or(&false)).count();
             (done as f32) / (matching.len() as f32)
         }
     }
@@ -441,13 +419,11 @@ mod tests {
 
     #[test]
     fn test_fish_nushell_shell_engine() {
-        let mut fish =
-            SovereignFishNushellShellEngine::new(ShellExecutionMode::FishInteractiveSuggestions);
+        let mut fish = SovereignFishNushellShellEngine::new(ShellExecutionMode::FishInteractiveSuggestions);
         let out = fish.execute_command("git status");
         assert!(out.contains("fish-suggestion"));
 
-        let mut nu =
-            SovereignFishNushellShellEngine::new(ShellExecutionMode::NushellStructuredPipeline);
+        let mut nu = SovereignFishNushellShellEngine::new(ShellExecutionMode::NushellStructuredPipeline);
         let out_nu = nu.execute_command("ls");
         assert!(out_nu.contains("| name | type | value |"));
     }

@@ -3,11 +3,11 @@
 // native development tooling, making the operating system fully self-hosting.
 
 use std::collections::BTreeMap;
-#[cfg(not(target_os = "none"))]
-use std::path::{Path, PathBuf};
 use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
+#[cfg(not(target_os = "none"))]
+use std::path::{Path, PathBuf};
 
 /// Error types thrown during compilation and toolchain initialization
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -54,31 +54,18 @@ impl SelfHostingManager {
 
     /// Bootstraps native GCC/rustc binary toolchain components inside system sysroot
     pub fn build_toolchain(&mut self) {
-        self.installed_tools
-            .insert("make".to_string(), "4.4.1".to_string());
-        self.installed_tools
-            .insert("git".to_string(), "2.45.0".to_string());
+        self.installed_tools.insert("make".to_string(), "4.4.1".to_string());
+        self.installed_tools.insert("git".to_string(), "2.45.0".to_string());
     }
 
     /// Compiles high-level source code (C/Rust) into optimized machine binaries
-    pub fn compile_source(
-        &self,
-        source_path: &Path,
-        output_binary: &Path,
-    ) -> Result<bool, ToolchainError> {
+    pub fn compile_source(&self, source_path: &Path, output_binary: &Path) -> Result<bool, ToolchainError> {
         if !self.installed_tools.contains_key("rustc") {
             return Err(ToolchainError::CompilerNotFound);
         }
 
-        if source_path
-            .extension()
-            .and_then(|s: &std::ffi::OsStr| s.to_str())
-            != Some("rs")
-            && source_path
-                .extension()
-                .and_then(|s: &std::ffi::OsStr| s.to_str())
-                != Some("c")
-        {
+        if source_path.extension().and_then(|s: &std::ffi::OsStr| s.to_str()) != Some("rs") &&
+           source_path.extension().and_then(|s: &std::ffi::OsStr| s.to_str()) != Some("c") {
             return Err(ToolchainError::InvalidOutput);
         }
 

@@ -1,32 +1,26 @@
 // SigmaOS Filesystem Module
 pub mod archive;
+pub mod file_monitor;
+pub mod watch;
 pub mod bsd_linux_innovations;
 pub mod cow_snapshot;
 pub mod defragmenter;
 pub mod disk_usage;
-pub mod ext4_mount;
 pub mod ext4_ntfs_security;
-pub mod file_monitor;
+pub mod ext4_mount;
 pub mod manager;
 pub mod mount_namespace;
-pub mod sigma_fs;
 pub mod smart_symlink;
 pub mod support;
 pub mod vfs;
-pub mod watch;
+pub mod sigma_fs;
 
-pub use crate::filesystem::vfs::{FileType, FsError, Inode, VfsError, VirtualFilesystem};
 pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
+pub use crate::filesystem::vfs::{FileType, FsError, Inode, VirtualFilesystem, VfsError};
 // Removed non-existent vfs exports: FileDescriptor, FilePermissions
 pub use crate::filesystem::sigma_fs::{
-    JournalState,
-    SigmaFS,
-    SigmaFhsAuditor,
-    SigmaFhsHook,
-    SigmaFhsNamespace,
-    SigmaFhsRouter,
-    SigmaFsCrypt,
-    SigmaFsVirtio,
+    SigmaFS, SigmaFhsRouter, SigmaFhsHook, SigmaFhsNamespace, SigmaFhsAuditor,
+    JournalState, SigmaFsCrypt, SigmaFsVirtio,
     // Removed potentially incomplete exports: RaidLevel, SigmaFsJournal, SigmaFsCow, SigmaFsVolume, SigmaFsRaid
 };
 
@@ -46,26 +40,23 @@ pub use manager::{
     SortOrder, SplitPaneView, StandardFileOperation, TabEntry, TabbedBrowsingManager, ViewMode,
     YaziSpatialPreviewEngine,
 };
-pub use mount_namespace::{
-    MountFlags, MountId, MountInfo, MountNamespace, MountNamespaceStats, MountSource,
-};
+pub use mount_namespace::{MountId, MountInfo, MountNamespace, MountNamespaceStats, MountSource, MountFlags};
 pub use support::{FilesystemError, FilesystemType, SimpleFilesystem, SimpleFilesystemManager};
 // Removed duplicate vfs imports - already imported above
 // pub use ext4::{Ext4FileSystem, Ext4Superblock as Ext4SB, BlockGroupDescriptor};
 pub use file_monitor::{
-    EventFilter, EventId, FileEvent, FileEventType, WatchConfig, WatchId, WatchManager,
+    EventFilter, FileEvent, FileEventType, WatchConfig, WatchId, WatchManager, EventId,
 };
-pub mod fscrypt_autofs;
 pub mod sovereign_filesystem_hierarchy;
+pub mod fscrypt_autofs;
+pub use sovereign_filesystem_hierarchy::{
+    EphemeralTmpfsMountGovernor, SovereignAtomicGenerationRootfsGuard, SovereignCanonicalFhsResolver,
+    SovereignMultiDistroFhsHierarchyEngine, SyntheticProcSysfsProvider,
+};
 pub use fscrypt_autofs::{
     AutofsMountTrigger, FscryptInodeRecord, FscryptPolicy, SovereignFscryptAutofsEngine,
 };
-pub use sovereign_filesystem_hierarchy::{
-    EphemeralTmpfsMountGovernor, SovereignAtomicGenerationRootfsGuard,
-    SovereignCanonicalFhsResolver, SovereignMultiDistroFhsHierarchyEngine,
-    SyntheticProcSysfsProvider,
-};
-pub use watch::{EventQueue, ThreadSafeEventQueue, COALESCE_WINDOW_MS, RING_BUFFER_SIZE};
+pub use watch::{EventQueue, ThreadSafeEventQueue, RING_BUFFER_SIZE, COALESCE_WINDOW_MS};
 
 pub type FileDescriptor = i32;
 pub type FilePermissions = u32;

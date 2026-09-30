@@ -1,14 +1,11 @@
 /// SigmaOS Notification Daemon (Phase 4)
 /// Inspired by Linux Mint's notification system.
+
 use std::string::String;
 use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub enum NotificationUrgency {
-    Low,
-    Normal,
-    Critical,
-}
+pub enum NotificationUrgency { Low, Normal, Critical }
 
 #[derive(Debug, Clone)]
 pub struct Notification {
@@ -28,49 +25,20 @@ pub struct NotificationDaemon {
 }
 
 impl NotificationDaemon {
-    pub fn new() -> Self {
-        Self {
-            queue: Vec::new(),
-            next_id: 1,
-            do_not_disturb: false,
-        }
-    }
+    pub fn new() -> Self { Self { queue: Vec::new(), next_id: 1, do_not_disturb: false } }
 
-    pub fn notify(
-        &mut self,
-        app: &str,
-        summary: &str,
-        body: &str,
-        urgency: NotificationUrgency,
-        ts: u64,
-    ) -> u32 {
-        let id = self.next_id;
-        self.next_id += 1;
-        self.queue.push(Notification {
-            id,
-            summary: summary.into(),
-            body: body.into(),
-            urgency,
-            app_name: app.into(),
-            timestamp: ts,
-            dismissed: false,
-        });
+    pub fn notify(&mut self, app: &str, summary: &str, body: &str, urgency: NotificationUrgency, ts: u64) -> u32 {
+        let id = self.next_id; self.next_id += 1;
+        self.queue.push(Notification { id, summary: summary.into(), body: body.into(), urgency, app_name: app.into(), timestamp: ts, dismissed: false });
         id
     }
 
     pub fn dismiss(&mut self, id: u32) {
-        if let Some(n) = self.queue.iter_mut().find(|n| n.id == id) {
-            n.dismissed = true;
-        }
+        if let Some(n) = self.queue.iter_mut().find(|n| n.id == id) { n.dismissed = true; }
     }
 
     pub fn pending(&self) -> Vec<&Notification> {
-        self.queue
-            .iter()
-            .filter(|n| {
-                !n.dismissed && (!self.do_not_disturb || n.urgency == NotificationUrgency::Critical)
-            })
-            .collect()
+        self.queue.iter().filter(|n| !n.dismissed && (!self.do_not_disturb || n.urgency == NotificationUrgency::Critical)).collect()
     }
 }
 
@@ -81,13 +49,7 @@ mod tests {
     #[test]
     fn test_notification_lifecycle() {
         let mut d = NotificationDaemon::new();
-        let id = d.notify(
-            "System",
-            "Update available",
-            "3 packages",
-            NotificationUrgency::Normal,
-            1000,
-        );
+        let id = d.notify("System", "Update available", "3 packages", NotificationUrgency::Normal, 1000);
         assert_eq!(d.pending().len(), 1);
         d.dismiss(id);
         assert_eq!(d.pending().len(), 0);

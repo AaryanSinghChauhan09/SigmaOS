@@ -59,20 +59,10 @@ impl PhoronixAutomatedPerformanceSuite {
             },
         );
 
-        Self {
-            benchmark_results: results,
-        }
+        Self { benchmark_results: results }
     }
 
-    pub fn record_metric(
-        &mut self,
-        id: &str,
-        name: &str,
-        cat: &str,
-        score: f64,
-        unit: &str,
-        higher_is_better: bool,
-    ) {
+    pub fn record_metric(&mut self, id: &str, name: &str, cat: &str, score: f64, unit: &str, higher_is_better: bool) {
         self.benchmark_results.insert(
             id.to_string(),
             BenchmarkMetric {
@@ -122,9 +112,7 @@ pub struct CodePurityEngine {
 
 impl CodePurityEngine {
     pub fn new() -> Self {
-        Self {
-            binaries: Vec::new(),
-        }
+        Self { binaries: Vec::new() }
     }
 
     pub fn register_binary(&mut self, name: &str, lang: SystemLanguage) {
@@ -214,8 +202,7 @@ impl DeclarativeSystemStateGraph {
     }
 
     pub fn set_property(&mut self, key: &str, value: &str) {
-        self.active_settings
-            .insert(key.to_string(), value.to_string());
+        self.active_settings.insert(key.to_string(), value.to_string());
     }
 
     pub fn serialize_to_json(&self) -> String {
@@ -381,11 +368,11 @@ impl LinuxDistroDefeaterEngine {
         ];
 
         Self {
-            sigma_boot_latency_ms: 1,      // 1ms ultra fast microkernel boot
-            linux_boot_latency_ms: 12500,  // ~12.5s baseline Linux boot
-            sigma_rss_memory_mb: 28,       // 28MB total system RSS
-            linux_rss_memory_mb: 1250,     // 1.25GB baseline Linux RSS
-            sigma_syscall_overhead_ns: 12, // 12ns fast direct register syscall
+            sigma_boot_latency_ms: 1,       // 1ms ultra fast microkernel boot
+            linux_boot_latency_ms: 12500,   // ~12.5s baseline Linux boot
+            sigma_rss_memory_mb: 28,        // 28MB total system RSS
+            linux_rss_memory_mb: 1250,      // 1.25GB baseline Linux RSS
+            sigma_syscall_overhead_ns: 12,  // 12ns fast direct register syscall
             zero_copy_ipc_msg_sec: 25_000_000,
             baselines,
         }
@@ -408,13 +395,11 @@ impl LinuxDistroDefeaterEngine {
             .map(|b| {
                 let boot_multiplier = b.boot_latency_ms / self.sigma_boot_latency_ms.max(1);
                 let ram_multiplier = b.rss_memory_mb / self.sigma_rss_memory_mb.max(1);
-                let syscall_multiplier =
-                    b.syscall_overhead_ns / self.sigma_syscall_overhead_ns.max(1);
+                let syscall_multiplier = b.syscall_overhead_ns / self.sigma_syscall_overhead_ns.max(1);
                 let ipc_multiplier = self.zero_copy_ipc_msg_sec / b.ipc_throughput_msg_sec.max(1);
                 (boot_multiplier + ram_multiplier + syscall_multiplier + ipc_multiplier) / 4
             })
-            .sum::<u64>()
-            / self.baselines.len().max(1) as u64
+            .sum::<u64>() / self.baselines.len().max(1) as u64
     }
 
     /// Calculates overall distro domination ratio vs average Linux & BSD baselines
@@ -438,9 +423,7 @@ impl LinuxDistroDefeaterEngine {
     }
 
     pub fn generate_distro_defeat_report(&self) -> String {
-        let mut report = String::from(
-            "# SigmaOS vs Linux & BSD Distros Parity & Supremacy Benchmark Report\n\n",
-        );
+        let mut report = String::from("# SigmaOS vs Linux & BSD Distros Parity & Supremacy Benchmark Report\n\n");
         report.push_str(&format!(
             "- **Boot Latency**: SigmaOS ({}ms) vs Linux Baseline ({}ms) -> {}x Faster\n",
             self.sigma_boot_latency_ms,
@@ -459,8 +442,7 @@ impl LinuxDistroDefeaterEngine {
         ));
 
         report.push_str("### Per-Distro Advantage Matrix:\n\n");
-        for (distro, boot_adv, ram_adv, syscall_adv, ipc_adv) in self.benchmark_comparison_matrix()
-        {
+        for (distro, boot_adv, ram_adv, syscall_adv, ipc_adv) in self.benchmark_comparison_matrix() {
             report.push_str(&format!(
                 "- **{}**: Boot {}x faster | RAM {}x smaller | Syscall {}x lower latency | IPC {}x higher throughput\n",
                 distro, boot_adv, ram_adv, syscall_adv, ipc_adv
@@ -532,14 +514,7 @@ mod tests {
     #[test]
     fn test_phoronix_performance_suite() {
         let mut phoronix = PhoronixAutomatedPerformanceSuite::new();
-        phoronix.record_metric(
-            "memtier-redis",
-            "Memtier Redis Ops",
-            "Database",
-            125000.0,
-            "ops/sec",
-            true,
-        );
+        phoronix.record_metric("memtier-redis", "Memtier Redis Ops", "Database", 125000.0, "ops/sec", true);
         let report = phoronix.generate_summary_report();
         assert!(report.contains("Phoronix Test Suite Automated Performance Report"));
         assert!(report.contains("Memtier Redis Ops"));
@@ -552,9 +527,7 @@ mod tests {
         assert!(defeater.sigma_rss_memory_mb < defeater.linux_rss_memory_mb);
 
         let report = defeater.generate_distro_defeat_report();
-        assert!(
-            report.contains("# SigmaOS vs Linux & BSD Distros Parity & Supremacy Benchmark Report")
-        );
+        assert!(report.contains("# SigmaOS vs Linux & BSD Distros Parity & Supremacy Benchmark Report"));
         assert!(report.contains("Boot Latency"));
     }
 

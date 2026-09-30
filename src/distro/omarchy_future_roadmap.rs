@@ -35,19 +35,13 @@ impl OmarchyRoadmapPhase {
             Self::Phase1ReproducibleBuildIso => "Phase 1 - Reproducible Build & ISO Pipeline",
             Self::Phase2QemuDesktopPreview => "Phase 2 - QEMU Desktop Preview",
             Self::Phase3ZenithShellIntegration => "Phase 3 - Zenith Shell & Desktop Integration",
-            Self::Phase4InstallerHardwareDetection => {
-                "Phase 4 - Installer, First Boot & Hardware Detection"
-            }
+            Self::Phase4InstallerHardwareDetection => "Phase 4 - Installer, First Boot & Hardware Detection",
             Self::Phase5NativeSigpkgMvp => "Phase 5 - Native sigpkg MVP",
             Self::Phase6AtomicUpdatesRecovery => "Phase 6 - Atomic Updates & Recovery",
-            Self::Phase7DeclarativeConfigTheme => {
-                "Phase 7 - Declarative Configuration & Theme System"
-            }
+            Self::Phase7DeclarativeConfigTheme => "Phase 7 - Declarative Configuration & Theme System",
             Self::Phase8AppExperienceWebApps => "Phase 8 - Application Experience & Web Apps",
             Self::Phase9SecurityUxPermissions => "Phase 9 - Security UX & Permission Management",
-            Self::Phase10HardwareQualificationRelease => {
-                "Phase 10 - Hardware Qualification & Release Engineering"
-            }
+            Self::Phase10HardwareQualificationRelease => "Phase 10 - Hardware Qualification & Release Engineering",
         }
     }
 
@@ -226,10 +220,7 @@ impl SovereignOmarchyFutureRoadmapEngine {
         phases.insert(OmarchyRoadmapPhase::Phase7DeclarativeConfigTheme, true);
         phases.insert(OmarchyRoadmapPhase::Phase8AppExperienceWebApps, true);
         phases.insert(OmarchyRoadmapPhase::Phase9SecurityUxPermissions, true);
-        phases.insert(
-            OmarchyRoadmapPhase::Phase10HardwareQualificationRelease,
-            true,
-        );
+        phases.insert(OmarchyRoadmapPhase::Phase10HardwareQualificationRelease, true);
 
         Self {
             phases,

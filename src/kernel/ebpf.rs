@@ -2,6 +2,7 @@
 // Features static bytecode validation (bounds, division-by-zero, stack alignment, backward jump loop-prevention)
 // and execution over standard in-kernel maps.
 
+
 #[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
 

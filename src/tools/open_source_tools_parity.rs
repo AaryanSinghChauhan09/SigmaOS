@@ -5,6 +5,7 @@
 #[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
 
+
 #[cfg(any(feature = "standalone_test", test))]
 use std::format;
 #[cfg(any(feature = "standalone_test", test))]
@@ -79,9 +80,7 @@ impl SimpleJqJsonQueryEngine {
                     return Some(rest[start..start + end].to_string());
                 }
             } else {
-                let end = rest
-                    .find(|c: char| c == ',' || c == '}' || c == ']')
-                    .unwrap_or(rest.len());
+                let end = rest.find(|c: char| c == ',' || c == '}' || c == ']').unwrap_or(rest.len());
                 return Some(rest[..end].trim().to_string());
             }
         }

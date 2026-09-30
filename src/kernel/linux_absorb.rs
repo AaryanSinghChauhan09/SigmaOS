@@ -2,9 +2,9 @@
 // Systematic absorption of Linux kernel drivers with OOP encapsulation and security hardening
 // This enables SigmaOS to absorb Linux subsystems while maintaining sovereign identity
 
-use std::any::Any;
 use std::string::String;
 use std::vec::Vec;
+use std::any::Any;
 
 pub mod subsystem {
     use super::*;

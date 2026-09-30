@@ -120,8 +120,7 @@ impl MintSoftwareStoreEngine {
                 app_id: "org.gimp.GIMP".into(),
                 name: "GIMP Image Editor".into(),
                 summary: "Create and edit professional graphics".into(),
-                description: "GNU Image Manipulation Program for photo retouching and authoring."
-                    .into(),
+                description: "GNU Image Manipulation Program for photo retouching and authoring.".into(),
                 category: "Graphics".into(),
                 version: "3.0.0-RC1".into(),
                 format: PackageFormat::FlatpakFlathub,
@@ -149,9 +148,7 @@ impl MintSoftwareStoreEngine {
                 app_id: "com.visualstudio.code".into(),
                 name: "Visual Studio Code".into(),
                 summary: "Extensible code editor and IDE".into(),
-                description:
-                    "Lightweight but powerful source code editor with built-in Git and debugging."
-                        .into(),
+                description: "Lightweight but powerful source code editor with built-in Git and debugging.".into(),
                 category: "Development".into(),
                 version: "1.93.0".into(),
                 format: PackageFormat::NativeSigpkg,
@@ -189,27 +186,18 @@ impl MintSoftwareStoreEngine {
 
     /// Install an application from the store
     pub fn install_app(&mut self, app_id: &str) -> Result<String, &'static str> {
-        let app = self
-            .catalog
-            .get_mut(app_id)
-            .ok_or("Application ID not found in store")?;
+        let app = self.catalog.get_mut(app_id).ok_or("Application ID not found in store")?;
         if app.is_installed {
             return Err("Application is already installed");
         }
         app.is_installed = true;
         self.installed_apps.push(app_id.to_string());
-        Ok(format!(
-            "Successfully installed '{}' via {:?}",
-            app.name, app.format
-        ))
+        Ok(format!("Successfully installed '{}' via {:?}", app.name, app.format))
     }
 
     /// Uninstall an application
     pub fn uninstall_app(&mut self, app_id: &str) -> Result<String, &'static str> {
-        let app = self
-            .catalog
-            .get_mut(app_id)
-            .ok_or("Application ID not found in store")?;
+        let app = self.catalog.get_mut(app_id).ok_or("Application ID not found in store")?;
         if !app.is_installed {
             return Err("Application is not installed");
         }

@@ -115,12 +115,7 @@ impl ZeroCopySpliceTeeStreamEngine {
         len
     }
 
-    pub fn tee_stream(
-        &mut self,
-        src_buf: &[u8],
-        target1: &mut Vec<u8>,
-        target2: &mut Vec<u8>,
-    ) -> usize {
+    pub fn tee_stream(&mut self, src_buf: &[u8], target1: &mut Vec<u8>, target2: &mut Vec<u8>) -> usize {
         let len = src_buf.len();
         target1.extend_from_slice(src_buf);
         target2.extend_from_slice(src_buf);
@@ -155,8 +150,7 @@ impl PqcEncryptedStreamMultiplexerEngine {
     }
 
     pub fn open_multiplexed_channel(&mut self, channel_id: u32, channel_label: &str) {
-        self.active_channels
-            .insert(channel_id, channel_label.to_string());
+        self.active_channels.insert(channel_id, channel_label.to_string());
     }
 
     pub fn encrypt_and_write_stream(&self, _channel_id: u32, payload: &[u8]) -> Vec<u8> {
@@ -214,18 +208,13 @@ impl SovereignTechMediaStdStreamsSuite {
         let color_ok = colored.contains("\x1b[38;2;0;255;128m");
 
         // Verify Json Logger
-        let json =
-            self.json_logger
-                .format_json_log(LogLevel::Info, "System boot complete", 1700000000);
-        let json_ok =
-            json.contains("\"service\":\"sigma-core\"") && json.contains("\"level\":\"INFO\"");
+        let json = self.json_logger.format_json_log(LogLevel::Info, "System boot complete", 1700000000);
+        let json_ok = json.contains("\"service\":\"sigma-core\"") && json.contains("\"level\":\"INFO\"");
 
         // Verify Splice/Tee
         let mut buf1 = Vec::new();
         let mut buf2 = Vec::new();
-        let teed = self
-            .splice_tee
-            .tee_stream(b"hello streams", &mut buf1, &mut buf2);
+        let teed = self.splice_tee.tee_stream(b"hello streams", &mut buf1, &mut buf2);
         let splice_ok = teed == 13 && buf1 == b"hello streams" && buf2 == b"hello streams";
 
         // Verify PQC Mux

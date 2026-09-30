@@ -11,16 +11,14 @@ mod wiki_unimplemented_ideas;
 mod wiki_ideas_implementation;
 
 use sovereign_wiki_master_engine::*;
-use wiki_ideas_implementation::*;
 use wiki_unimplemented_ideas::*;
+use wiki_ideas_implementation::*;
 
 #[test]
 fn test_sovereign_wiki_master_engine_full_parity() {
     let suite = MasterWikiAndRoadmapVerificationSuite::new();
     assert!(suite.health_check());
-    assert!(suite
-        .summary_report()
-        .contains("Parity Verification: 100.0%"));
+    assert!(suite.summary_report().contains("Parity Verification: 100.0%"));
 }
 
 #[test]
@@ -50,12 +48,7 @@ fn test_calendar_and_email_engines_wiki_parity() {
     assert_eq!(cal.tasks.len(), 1);
 
     let mut email = EmailClientEngine::new("user@sigmaos.org");
-    let msg_id = email.receive_email(
-        "sender@sigmaos.org",
-        "Release V1",
-        "SigmaOS is ready.",
-        true,
-    );
+    let msg_id = email.receive_email("sender@sigmaos.org", "Release V1", "SigmaOS is ready.", true);
     assert_eq!(msg_id, 1);
     assert_eq!(email.messages.len(), 1);
 }
@@ -63,12 +56,7 @@ fn test_calendar_and_email_engines_wiki_parity() {
 #[test]
 fn test_markdown_and_media_engines_wiki_parity() {
     let mut md = MarkdownNoteTakingEngine::new();
-    md.create_note(
-        "Default",
-        "Wiki Note",
-        "# Heading\nContent [[TargetNote]]",
-        &["wiki", "ideas"],
-    );
+    md.create_note("Default", "Wiki Note", "# Heading\nContent [[TargetNote]]", &["wiki", "ideas"]);
     assert_eq!(md.notebooks.len(), 1);
 
     let mut video = NativeVideoEditorEngine::new();
@@ -99,11 +87,7 @@ fn test_security_vault_and_systemd_parity() {
     assert!(pm.check_haveibeenpwned_breach("password123"));
 
     let mut systemd = SovereignSystemdParityEngine::new();
-    systemd.register_unit(
-        "sigma-init.service",
-        SystemdUnitType::Service,
-        &["network.target"],
-    );
+    systemd.register_unit("sigma-init.service", SystemdUnitType::Service, &["network.target"]);
     let state = systemd.start_unit("sigma-init.service").unwrap();
     assert_eq!(state, SystemdUnitActiveState::Active);
     assert_eq!(systemd.query_journal("sigma-init.service").len(), 1);
@@ -114,9 +98,7 @@ fn test_frappe_and_tech_media_engines_wiki_parity() {
     let mut nix_state = NixDeclarativeSystemState::new();
     assert_eq!(nix_state.active_generation_id, 1);
 
-    let recipe =
-        ArchRecipeSandboxCompiler::parse_recipe("pkgname=htop\npkgver=3.2.2\nbuild_cmd=make")
-            .unwrap();
+    let recipe = ArchRecipeSandboxCompiler::parse_recipe("pkgname=htop\npkgver=3.2.2\nbuild_cmd=make").unwrap();
     assert_eq!(recipe.pkgname, "htop");
 
     let mut snapper = SnapperTransactionGuard::new();

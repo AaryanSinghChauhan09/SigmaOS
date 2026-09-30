@@ -155,9 +155,7 @@ impl SovereignUniversalPrGatewayEngine {
                 PullRequestPackageFormat::AlpineApk => PackageFormat::Apk,
                 PullRequestPackageFormat::GentooEbuild => PackageFormat::Ebuild,
                 PullRequestPackageFormat::VoidXbps => PackageFormat::Xbps,
-                PullRequestPackageFormat::FreeBsdPorts
-                | PullRequestPackageFormat::NetBsdPkgsrc
-                | PullRequestPackageFormat::DportsPackage => PackageFormat::Ports,
+                PullRequestPackageFormat::FreeBsdPorts | PullRequestPackageFormat::NetBsdPkgsrc | PullRequestPackageFormat::DportsPackage => PackageFormat::Ports,
                 PullRequestPackageFormat::OpenBsdPorts => PackageFormat::OpenBsdPkg,
                 PullRequestPackageFormat::NixFlake => PackageFormat::Nixpkg,
                 PullRequestPackageFormat::GuixScheme => PackageFormat::GuixNar,
@@ -165,22 +163,15 @@ impl SovereignUniversalPrGatewayEngine {
                 PullRequestPackageFormat::SnapPackage => PackageFormat::Snap,
                 PullRequestPackageFormat::AppImage => PackageFormat::AppImage,
                 PullRequestPackageFormat::ZypperSpec => PackageFormat::Zypper,
-                PullRequestPackageFormat::EopkgSpec | PullRequestPackageFormat::SolusEopkg => {
-                    PackageFormat::Eopkg
-                }
-                PullRequestPackageFormat::OpenWrtIpk | PullRequestPackageFormat::IpkPackage => {
-                    PackageFormat::Ipk
-                }
+                PullRequestPackageFormat::EopkgSpec | PullRequestPackageFormat::SolusEopkg => PackageFormat::Eopkg,
+                PullRequestPackageFormat::OpenWrtIpk | PullRequestPackageFormat::IpkPackage => PackageFormat::Ipk,
                 PullRequestPackageFormat::OpkgPackage => PackageFormat::Opkg,
-                PullRequestPackageFormat::SolarisIpsPackage
-                | PullRequestPackageFormat::IllumosP5p => PackageFormat::SolarisIps,
+                PullRequestPackageFormat::SolarisIpsPackage | PullRequestPackageFormat::IllumosP5p => PackageFormat::SolarisIps,
                 PullRequestPackageFormat::PuppyPet => PackageFormat::Pet,
                 PullRequestPackageFormat::PuppyPup => PackageFormat::Pup,
                 PullRequestPackageFormat::SlaxLzm => PackageFormat::Lzm,
                 PullRequestPackageFormat::AdobeAir => PackageFormat::Air,
-                PullRequestPackageFormat::AppleIpa | PullRequestPackageFormat::IosIpaBundle => {
-                    PackageFormat::Ipa
-                }
+                PullRequestPackageFormat::AppleIpa | PullRequestPackageFormat::IosIpaBundle => PackageFormat::Ipa,
                 PullRequestPackageFormat::MacOsApp => PackageFormat::App,
                 PullRequestPackageFormat::AndroidAabPackage => PackageFormat::Aab,
                 PullRequestPackageFormat::HarmonyHapModule => PackageFormat::Hap,
@@ -189,8 +180,7 @@ impl SovereignUniversalPrGatewayEngine {
                 PullRequestPackageFormat::RubyGem => PackageFormat::Gem,
                 PullRequestPackageFormat::DotnetNuget => PackageFormat::Nupkg,
                 PullRequestPackageFormat::MacOsHomebrewBottle => PackageFormat::Bottle,
-                PullRequestPackageFormat::SlackwareSlackBuild
-                | PullRequestPackageFormat::SlackwareTxz => PackageFormat::TarGz,
+                PullRequestPackageFormat::SlackwareSlackBuild | PullRequestPackageFormat::SlackwareTxz => PackageFormat::TarGz,
                 PullRequestPackageFormat::HaikuHpkg => PackageFormat::Pkg,
                 PullRequestPackageFormat::NativeSigPkg => PackageFormat::SigmaPkg,
                 PullRequestPackageFormat::QemuQcow2VmImage
@@ -226,7 +216,10 @@ impl SovereignUniversalPrGatewayEngine {
     }
 
     /// Auto-merges an approved PR submission into the active SigmaPkg system registry
-    pub fn auto_merge_package_pr(&mut self, pr_id: u64) -> Result<UnifiedPackage, &'static str> {
+    pub fn auto_merge_package_pr(
+        &mut self,
+        pr_id: u64,
+    ) -> Result<UnifiedPackage, &'static str> {
         let consolidated = self.pr_engine.merge_pr(pr_id)?;
 
         if let Some(entry) = self.pr_gateway_registry.get_mut(&pr_id) {
@@ -311,102 +304,18 @@ mod tests {
         let mut gateway = SovereignUniversalPrGatewayEngine::new();
 
         let submissions = [
-            (
-                "bob",
-                "ripgrep",
-                "14.1.0",
-                PullRequestPackageFormat::ArchPkgbuild,
-                "pkgname=ripgrep",
-                &["pcre2"][..],
-            ),
-            (
-                "carol",
-                "htop",
-                "3.3.0",
-                PullRequestPackageFormat::FedoraRpm,
-                "Name: htop",
-                &["ncurses"][..],
-            ),
-            (
-                "dave",
-                "curl",
-                "8.5.0",
-                PullRequestPackageFormat::AlpineApk,
-                "P:curl",
-                &["sovereign-openssl"][..],
-            ),
-            (
-                "eve",
-                "vlc",
-                "3.0.20",
-                PullRequestPackageFormat::VoidXbps,
-                "pkgname=vlc",
-                &["ffmpeg"][..],
-            ),
-            (
-                "frank",
-                "ffmpeg",
-                "6.1.0",
-                PullRequestPackageFormat::FreeBsdPorts,
-                "PORTNAME=ffmpeg",
-                &["libx264"][..],
-            ),
-            (
-                "grace",
-                "git",
-                "2.43.0",
-                PullRequestPackageFormat::NixFlake,
-                "description = \"git\"",
-                &["zlib"][..],
-            ),
-            (
-                "heidi",
-                "gimp",
-                "2.10.36",
-                PullRequestPackageFormat::FlatpakApp,
-                "app-id: org.gimp.GIMP",
-                &["babl"][..],
-            ),
-            (
-                "ivan",
-                "blender",
-                "4.0.2",
-                PullRequestPackageFormat::AppImage,
-                "AppImage Blender",
-                &["glibc"][..],
-            ),
-            (
-                "judy",
-                "bash",
-                "5.2.21",
-                PullRequestPackageFormat::NetBsdPkgsrc,
-                "PKGNAME=bash",
-                &["ncurses"][..],
-            ),
-            (
-                "mallory",
-                "python",
-                "3.12.1",
-                PullRequestPackageFormat::ZypperSpec,
-                "Name: python3",
-                &["readline"][..],
-            ),
-            (
-                "oscar",
-                "zsh",
-                "5.9.0",
-                PullRequestPackageFormat::GuixScheme,
-                "define-public zsh",
-                &["ncurses"][..],
-            ),
-            (
-                "peggy",
-                "nano",
-                "7.2.0",
-                PullRequestPackageFormat::OpenWrtIpk,
-                "Package: nano",
-                &["libncurses"][..],
-            ),
+            ("bob", "ripgrep", "14.1.0", PullRequestPackageFormat::ArchPkgbuild, "pkgname=ripgrep", &["pcre2"][..]),
+            ("carol", "htop", "3.3.0", PullRequestPackageFormat::FedoraRpm, "Name: htop", &["ncurses"][..]),
+            ("dave", "curl", "8.5.0", PullRequestPackageFormat::AlpineApk, "P:curl", &["sovereign-openssl"][..]),
+            ("eve", "vlc", "3.0.20", PullRequestPackageFormat::VoidXbps, "pkgname=vlc", &["ffmpeg"][..]),
+            ("frank", "ffmpeg", "6.1.0", PullRequestPackageFormat::FreeBsdPorts, "PORTNAME=ffmpeg", &["libx264"][..]),
+            ("grace", "git", "2.43.0", PullRequestPackageFormat::NixFlake, "description = \"git\"", &["zlib"][..]),
+            ("heidi", "gimp", "2.10.36", PullRequestPackageFormat::FlatpakApp, "app-id: org.gimp.GIMP", &["babl"][..]),
+            ("ivan", "blender", "4.0.2", PullRequestPackageFormat::AppImage, "AppImage Blender", &["glibc"][..]),
+            ("judy", "bash", "5.2.21", PullRequestPackageFormat::NetBsdPkgsrc, "PKGNAME=bash", &["ncurses"][..]),
+            ("mallory", "python", "3.12.1", PullRequestPackageFormat::ZypperSpec, "Name: python3", &["readline"][..]),
+            ("oscar", "zsh", "5.9.0", PullRequestPackageFormat::GuixScheme, "define-public zsh", &["ncurses"][..]),
+            ("peggy", "nano", "7.2.0", PullRequestPackageFormat::OpenWrtIpk, "Package: nano", &["libncurses"][..]),
         ];
 
         for (author, name, ver, fmt, manifest, deps) in submissions {
@@ -435,30 +344,9 @@ mod tests {
         let mut gateway = SovereignUniversalPrGatewayEngine::new();
 
         let vm_submissions = [
-            (
-                "dev1",
-                "alpine-microvm",
-                "3.19.0",
-                PullRequestPackageFormat::QemuQcow2VmImage,
-                "qcow2_format=3\ndisk_size=20G",
-                &["qemu-kvm"][..],
-            ),
-            (
-                "dev2",
-                "ubuntu-cloud-init",
-                "24.04.0",
-                PullRequestPackageFormat::VagrantVmBox,
-                "vagrant_box=ubuntu/jammy64",
-                &["vagrant"][..],
-            ),
-            (
-                "dev3",
-                "freebsd-appliance",
-                "14.0.0",
-                PullRequestPackageFormat::OvaVirtualAppliance,
-                "ovf_version=2.0\nram=4096",
-                &["virtualbox"][..],
-            ),
+            ("dev1", "alpine-microvm", "3.19.0", PullRequestPackageFormat::QemuQcow2VmImage, "qcow2_format=3\ndisk_size=20G", &["qemu-kvm"][..]),
+            ("dev2", "ubuntu-cloud-init", "24.04.0", PullRequestPackageFormat::VagrantVmBox, "vagrant_box=ubuntu/jammy64", &["vagrant"][..]),
+            ("dev3", "freebsd-appliance", "14.0.0", PullRequestPackageFormat::OvaVirtualAppliance, "ovf_version=2.0\nram=4096", &["virtualbox"][..]),
         ];
 
         for (author, name, ver, fmt, manifest, deps) in vm_submissions {
@@ -472,14 +360,10 @@ mod tests {
                 b"pqc_vm_signature_dilithium5",
             );
 
-            let translated = gateway
-                .validate_and_translate_pr(pr)
-                .expect("VM PR translation failed");
+            let translated = gateway.validate_and_translate_pr(pr).expect("VM PR translation failed");
             assert_eq!(translated.name, name);
 
-            let merged = gateway
-                .auto_merge_package_pr(pr)
-                .expect("VM PR merge failed");
+            let merged = gateway.auto_merge_package_pr(pr).expect("VM PR merge failed");
             assert_eq!(merged.name, format!("sigpkg-{}", name));
         }
 
@@ -491,76 +375,16 @@ mod tests {
         let mut gateway = SovereignUniversalPrGatewayEngine::new();
 
         let arch_components = [
-            (
-                "archinstall-profile",
-                "1.0.0",
-                PullRequestPackageFormat::ArchInstallProfile,
-                "profile_type=minimal",
-                &["base"][..],
-            ),
-            (
-                "mkinitcpio-hook",
-                "1.0.0",
-                PullRequestPackageFormat::ArchMkinitcpioHook,
-                "HOOKS=(base udev autodetect modconf block filesystems fsck)",
-                &["mkinitcpio"][..],
-            ),
-            (
-                "pacman-conf-repo",
-                "6.1.0",
-                PullRequestPackageFormat::ArchPacmanConfRepo,
-                "[custom-repo]\nSigLevel = Required DatabaseOptional",
-                &["pacman"][..],
-            ),
-            (
-                "pacman-keyring",
-                "2026.01",
-                PullRequestPackageFormat::ArchPacmanKeyring,
-                "keyid=0xABCDEF",
-                &["archlinux-keyring"][..],
-            ),
-            (
-                "aur-rpc-pkg",
-                "5.0.0",
-                PullRequestPackageFormat::ArchAurRpcV5Package,
-                "Name=yay",
-                &["pacman"][..],
-            ),
-            (
-                "pacstrap-profile",
-                "1.0.0",
-                PullRequestPackageFormat::ArchPacstrapRecipe,
-                "PACSTRAP_PKGS=(base linux)",
-                &["arch-install-scripts"][..],
-            ),
-            (
-                "arch-chroot-spec",
-                "1.0.0",
-                PullRequestPackageFormat::ArchChrootSpec,
-                "CHROOT_PATH=/mnt",
-                &["arch-install-scripts"][..],
-            ),
-            (
-                "arch-audit-cve",
-                "1.0.0",
-                PullRequestPackageFormat::ArchAuditVulnerability,
-                "CVE-2026-9999",
-                &["arch-audit"][..],
-            ),
-            (
-                "namcap-linter",
-                "3.5.0",
-                PullRequestPackageFormat::ArchNamcapLinterReport,
-                "PKGBUILD_AUDIT=PASS",
-                &["namcap"][..],
-            ),
-            (
-                "makepkg-conf",
-                "6.1.0",
-                PullRequestPackageFormat::ArchMakepkgConfProfile,
-                "MAKEFLAGS=\"-j$(nproc)\"",
-                &["pacman"][..],
-            ),
+            ("archinstall-profile", "1.0.0", PullRequestPackageFormat::ArchInstallProfile, "profile_type=minimal", &["base"][..]),
+            ("mkinitcpio-hook", "1.0.0", PullRequestPackageFormat::ArchMkinitcpioHook, "HOOKS=(base udev autodetect modconf block filesystems fsck)", &["mkinitcpio"][..]),
+            ("pacman-conf-repo", "6.1.0", PullRequestPackageFormat::ArchPacmanConfRepo, "[custom-repo]\nSigLevel = Required DatabaseOptional", &["pacman"][..]),
+            ("pacman-keyring", "2026.01", PullRequestPackageFormat::ArchPacmanKeyring, "keyid=0xABCDEF", &["archlinux-keyring"][..]),
+            ("aur-rpc-pkg", "5.0.0", PullRequestPackageFormat::ArchAurRpcV5Package, "Name=yay", &["pacman"][..]),
+            ("pacstrap-profile", "1.0.0", PullRequestPackageFormat::ArchPacstrapRecipe, "PACSTRAP_PKGS=(base linux)", &["arch-install-scripts"][..]),
+            ("arch-chroot-spec", "1.0.0", PullRequestPackageFormat::ArchChrootSpec, "CHROOT_PATH=/mnt", &["arch-install-scripts"][..]),
+            ("arch-audit-cve", "1.0.0", PullRequestPackageFormat::ArchAuditVulnerability, "CVE-2026-9999", &["arch-audit"][..]),
+            ("namcap-linter", "3.5.0", PullRequestPackageFormat::ArchNamcapLinterReport, "PKGBUILD_AUDIT=PASS", &["namcap"][..]),
+            ("makepkg-conf", "6.1.0", PullRequestPackageFormat::ArchMakepkgConfProfile, "MAKEFLAGS=\"-j$(nproc)\"", &["pacman"][..]),
         ];
 
         for (name, ver, fmt, manifest, deps) in arch_components {
@@ -574,14 +398,10 @@ mod tests {
                 b"pqc_arch_comp_sig",
             );
 
-            let translated = gateway
-                .validate_and_translate_pr(pr)
-                .expect("Arch component PR translation failed");
+            let translated = gateway.validate_and_translate_pr(pr).expect("Arch component PR translation failed");
             assert_eq!(translated.name, name);
 
-            let merged = gateway
-                .auto_merge_package_pr(pr)
-                .expect("Arch component PR merge failed");
+            let merged = gateway.auto_merge_package_pr(pr).expect("Arch component PR merge failed");
             assert_eq!(merged.name, format!("sigpkg-{}", name));
         }
 

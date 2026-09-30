@@ -1,3 +1,4 @@
+
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
@@ -65,11 +66,7 @@ impl GStreamerPulseAudioPipeline {
         id
     }
 
-    pub fn set_audio_sink(
-        &mut self,
-        pipeline_id: u64,
-        sink: AudioSinkBackend,
-    ) -> Result<(), String> {
+    pub fn set_audio_sink(&mut self, pipeline_id: u64, sink: AudioSinkBackend) -> Result<(), String> {
         let pipe = self
             .active_pipelines
             .get_mut(&pipeline_id)
@@ -281,11 +278,7 @@ impl VlcSubtitleManager {
         id
     }
 
-    pub fn set_subtitle_sync_delay(
-        &mut self,
-        track_id: usize,
-        delay_ms: i32,
-    ) -> Result<(), String> {
+    pub fn set_subtitle_sync_delay(&mut self, track_id: usize, delay_ms: i32) -> Result<(), String> {
         let track = self
             .subtitle_tracks
             .iter_mut()
@@ -334,14 +327,9 @@ mod tests {
     #[test]
     fn test_gstreamer_pulseaudio_pipeline() {
         let mut gst = GStreamerPulseAudioPipeline::new(AudioSinkBackend::PipeWire);
-        let pipe_id = gst.play_uri(
-            "https://media.sigmaos.org/demo.mp4",
-            GstHardwareDecoder::Vaapi,
-        );
+        let pipe_id = gst.play_uri("https://media.sigmaos.org/demo.mp4", GstHardwareDecoder::Vaapi);
         assert_eq!(pipe_id, 1);
-        assert!(gst
-            .set_audio_sink(pipe_id, AudioSinkBackend::PulseAudio)
-            .is_ok());
+        assert!(gst.set_audio_sink(pipe_id, AudioSinkBackend::PulseAudio).is_ok());
         assert_eq!(
             gst.active_pipelines.get(&pipe_id).unwrap().sink_backend,
             AudioSinkBackend::PulseAudio

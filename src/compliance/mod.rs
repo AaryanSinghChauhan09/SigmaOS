@@ -4,7 +4,8 @@
 pub mod dashboard;
 
 pub use dashboard::{
-    AlertSeverity, BankingStatus, BoardMeetingModule, ComplianceAlert, ComplianceOverviewDashboard,
-    ComplianceReport, ComplianceStatus, Deadline, EPFContributionModule, EnvironmentalStatus,
-    GovernanceStatus, LabourStatus, RegulatoryComplianceError, TDSComplianceModule, TaxationStatus,
+    ComplianceAlert, ComplianceOverviewDashboard, ComplianceStatus, Deadline,
+    BoardMeetingModule, ComplianceReport, RegulatoryComplianceError, GovernanceStatus,
+    TaxationStatus, LabourStatus, EnvironmentalStatus, BankingStatus,
+    TDSComplianceModule, EPFContributionModule, AlertSeverity,
 };

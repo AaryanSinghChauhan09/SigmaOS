@@ -5,16 +5,16 @@
 
 pub mod tpm2_implementation;
 
-use core::fmt;
-use std::boxed::Box;
-use std::string::{String, ToString};
 use std::vec::Vec;
+use std::string::{String, ToString};
+use std::boxed::Box;
+use core::fmt;
 
 pub use tpm2_implementation::{
-    Pcr, PcrBank, Tpm2, TpmCommandHeader, TpmKey, TpmKeyStore, TpmResponseHeader, TpmStartupType,
-    SHA256_DIGEST_SIZE, TPM_ALG_RSA, TPM_ALG_SHA256, TPM_CC_CREATE_PRIMARY, TPM_CC_PCR_EXTEND,
-    TPM_CC_PCR_READ, TPM_CC_SHUTDOWN, TPM_CC_STARTUP, TPM_PCR_COUNT, TPM_RC_SUCCESS,
-    TPM_ST_NO_SESSIONS,
+    Tpm2, Pcr, PcrBank, TpmKey, TpmKeyStore, TpmCommandHeader, TpmResponseHeader,
+    TpmStartupType, TPM_PCR_COUNT, TPM_ALG_SHA256, TPM_ALG_RSA, SHA256_DIGEST_SIZE,
+    TPM_CC_STARTUP, TPM_CC_SHUTDOWN, TPM_CC_PCR_READ, TPM_CC_PCR_EXTEND,
+    TPM_CC_CREATE_PRIMARY, TPM_RC_SUCCESS, TPM_ST_NO_SESSIONS,
 };
 
 /// Error type for the Tpm module

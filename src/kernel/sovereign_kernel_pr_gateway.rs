@@ -12,7 +12,9 @@ use std::vec::Vec;
 #[path = "universal_kernel_format.rs"]
 pub mod universal_kernel_format;
 
-pub use universal_kernel_format::{KernelFormat, ParsedKernelImage, UniversalKernelFormatEngine};
+pub use universal_kernel_format::{
+    KernelFormat, ParsedKernelImage, UniversalKernelFormatEngine,
+};
 
 /// Target Kernel Subsystem for PR submission
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -172,10 +174,7 @@ impl SovereignKernelPrGatewayEngine {
 
     /// Validates PQC digital signature, verifies exported kernel symbol dependencies, and checks lockdep/preempt safety
     pub fn validate_kernel_pr(&mut self, pr_id: u64) -> Result<bool, &'static str> {
-        let submission = self
-            .pr_submissions
-            .get_mut(&pr_id)
-            .ok_or("Kernel PR ID not found")?;
+        let submission = self.pr_submissions.get_mut(&pr_id).ok_or("Kernel PR ID not found")?;
 
         if submission.pqc_signature.is_empty() {
             submission.status = KernelPrStatus::Rejected;
@@ -198,10 +197,7 @@ impl SovereignKernelPrGatewayEngine {
         submission.status = KernelPrStatus::SymbolCheckPassed;
 
         // Perform Lockdep & Preempt safety validation
-        if submission
-            .patch_or_manifest
-            .contains("spin_lock_irqsave_bug")
-        {
+        if submission.patch_or_manifest.contains("spin_lock_irqsave_bug") {
             submission.status = KernelPrStatus::Rejected;
             return Err("Kernel PR Rejected: Lockdep IRQ deadlocking risk detected");
         }
@@ -211,28 +207,13 @@ impl SovereignKernelPrGatewayEngine {
     }
 
     /// Generates Git-style patch diff comparing the PR patch against a base file
-    pub fn generate_kernel_pr_diff(
-        &self,
-        pr_id: u64,
-        base_content: &str,
-    ) -> Result<String, &'static str> {
-        let submission = self
-            .pr_submissions
-            .get(&pr_id)
-            .ok_or("Kernel PR ID not found")?;
+    pub fn generate_kernel_pr_diff(&self, pr_id: u64, base_content: &str) -> Result<String, &'static str> {
+        let submission = self.pr_submissions.get(&pr_id).ok_or("Kernel PR ID not found")?;
         let patch = &submission.patch_or_manifest;
 
         let mut diff = String::new();
-        diff.push_str(&format!(
-            "--- a/kernel/{:?}/{}\n",
-            submission.target_subsystem,
-            submission.title.replace(' ', "_")
-        ));
-        diff.push_str(&format!(
-            "+++ b/kernel/{:?}/{}\n",
-            submission.target_subsystem,
-            submission.title.replace(' ', "_")
-        ));
+        diff.push_str(&format!("--- a/kernel/{:?}/{}\n", submission.target_subsystem, submission.title.replace(' ', "_")));
+        diff.push_str(&format!("+++ b/kernel/{:?}/{}\n", submission.target_subsystem, submission.title.replace(' ', "_")));
 
         let base_lines: Vec<&str> = base_content.lines().collect();
         let patch_lines: Vec<&str> = patch.lines().collect();
@@ -254,24 +235,14 @@ impl SovereignKernelPrGatewayEngine {
     }
 
     /// Auto-merges an approved Kernel PR submission into the active Sovereign Kernel execution payload
-    pub fn auto_merge_kernel_pr(
-        &mut self,
-        pr_id: u64,
-    ) -> Result<ConsolidatedSovereignKernelPatch, &'static str> {
+    pub fn auto_merge_kernel_pr(&mut self, pr_id: u64) -> Result<ConsolidatedSovereignKernelPatch, &'static str> {
         if let Err(e) = self.validate_kernel_pr(pr_id) {
             return Err(e);
         }
 
-        let submission = self
-            .pr_submissions
-            .get_mut(&pr_id)
-            .ok_or("Kernel PR ID not found")?;
+        let submission = self.pr_submissions.get_mut(&pr_id).ok_or("Kernel PR ID not found")?;
 
-        let patch_id = format!(
-            "kernel-patch-pr{}-{}",
-            pr_id,
-            submission.title.replace(' ', "_")
-        );
+        let patch_id = format!("kernel-patch-pr{}-{}", pr_id, submission.title.replace(' ', "_"));
         let commit_hash = format!("sha256:kernel{:016x}", pr_id * 0xCAFEBABE);
 
         let consolidated = ConsolidatedSovereignKernelPatch {
@@ -291,8 +262,7 @@ impl SovereignKernelPrGatewayEngine {
         };
 
         submission.status = KernelPrStatus::Merged;
-        self.merged_kernel_patches
-            .insert(patch_id, consolidated.clone());
+        self.merged_kernel_patches.insert(patch_id, consolidated.clone());
 
         Ok(consolidated)
     }
