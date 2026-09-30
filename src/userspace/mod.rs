@@ -3,11 +3,10 @@
 // Userspace management
 // Zero-dependency implementation - no external libraries required
 
-
-use std::vec::Vec;
-use std::string::{String, ToString};
-use std::boxed::Box;
 use core::fmt;
+use std::boxed::Box;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Error type for the Userspace module
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -62,19 +61,19 @@ impl UserspaceManager {
             enabled: false,
         }
     }
-    
+
     /// Enable this resource
     pub fn enable(&mut self) -> UserspaceResult<()> {
         self.enabled = true;
         Ok(())
     }
-    
+
     /// Disable this resource
     pub fn disable(&mut self) -> UserspaceResult<()> {
         self.enabled = false;
         Ok(())
     }
-    
+
     /// Check if enabled
     pub fn is_enabled(&self) -> bool {
         self.enabled
@@ -96,13 +95,13 @@ impl UserProcess {
             initialized: false,
         }
     }
-    
+
     /// Initialize the Userspace subsystem
     pub fn init(&mut self) -> UserspaceResult<()> {
         self.initialized = true;
         Ok(())
     }
-    
+
     /// Add a resource
     pub fn add(&mut self, resource: UserspaceManager) -> UserspaceResult<u64> {
         if !self.initialized {
@@ -112,27 +111,27 @@ impl UserProcess {
         self.resources.push(resource);
         Ok(id)
     }
-    
+
     /// Get resource by ID
     pub fn get(&self, id: u64) -> Option<&UserspaceManager> {
         self.resources.get(id as usize)
     }
-    
+
     /// Get mutable resource by ID
     pub fn get_mut(&mut self, id: u64) -> Option<&mut UserspaceManager> {
         self.resources.get_mut(id as usize)
     }
-    
+
     /// List all resources
     pub fn list(&self) -> &[UserspaceManager] {
         &self.resources
     }
-    
+
     /// Check if initialized
     pub fn is_initialized(&self) -> bool {
         self.initialized
     }
-    
+
     /// Shutdown the subsystem
     pub fn shutdown(&mut self) -> UserspaceResult<()> {
         self.initialized = false;
@@ -150,7 +149,7 @@ impl Default for UserProcess {
 #[cfg(test_disabled)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_userspace_manager_init() {
         let mut manager = UserProcess::new();
@@ -158,7 +157,7 @@ mod tests {
         assert!(manager.init().is_ok());
         assert!(manager.is_initialized());
     }
-    
+
     #[test]
     fn test_userspace_resource_add() {
         let mut manager = UserProcess::new();

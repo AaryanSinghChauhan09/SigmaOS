@@ -3,7 +3,6 @@ use std::vec;
 // Sovereign Standard Streams Controller
 // Linux & BSD inspired standard input, output, and error stream management.
 
-
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
@@ -104,7 +103,12 @@ impl StreamTeeSpliceRouter {
     }
 
     /// Linux-style zero-copy splice between standard stream buffers
-    pub fn splice_streams(&self, src: &mut StandardStreamHandle, dest: &mut StandardStreamHandle, max_bytes: usize) -> usize {
+    pub fn splice_streams(
+        &self,
+        src: &mut StandardStreamHandle,
+        dest: &mut StandardStreamHandle,
+        max_bytes: usize,
+    ) -> usize {
         let available = src.internal_buffer.len().min(max_bytes);
         if available == 0 {
             return 0;
@@ -115,7 +119,12 @@ impl StreamTeeSpliceRouter {
     }
 
     /// Linux-style tee duplication from src stream to target stream without consuming src buffer
-    pub fn tee_stream(&self, src: &StandardStreamHandle, target: &mut StandardStreamHandle, max_bytes: usize) -> usize {
+    pub fn tee_stream(
+        &self,
+        src: &StandardStreamHandle,
+        target: &mut StandardStreamHandle,
+        max_bytes: usize,
+    ) -> usize {
         let available = src.internal_buffer.len().min(max_bytes);
         if available == 0 {
             return 0;
@@ -183,18 +192,28 @@ impl StandardStreamController {
     pub fn write_to_fd(&mut self, fd: i32, data: &[u8]) -> Result<Vec<u8>, &'static str> {
         self.validate_pledge_stdio()?;
 
-        let handle = self.handles.get_mut(&fd).ok_or("EBADF: Invalid file descriptor")?;
+        let handle = self
+            .handles
+            .get_mut(&fd)
+            .ok_or("EBADF: Invalid file descriptor")?;
         Ok(handle.write_bytes(data))
     }
 
     pub fn set_buffering(&mut self, fd: i32, mode: StreamBufferMode) -> Result<(), &'static str> {
-        let handle = self.handles.get_mut(&fd).ok_or("EBADF: Invalid file descriptor")?;
+        let handle = self
+            .handles
+            .get_mut(&fd)
+            .ok_or("EBADF: Invalid file descriptor")?;
         handle.buffer_mode = mode;
         Ok(())
     }
 
     /// Linux stdbuf / setvbuf override parity
-    pub fn apply_stdbuf_override(&mut self, stdout_mode: StreamBufferMode, stderr_mode: StreamBufferMode) {
+    pub fn apply_stdbuf_override(
+        &mut self,
+        stdout_mode: StreamBufferMode,
+        stderr_mode: StreamBufferMode,
+    ) {
         if let Some(stdout) = self.handles.get_mut(&STDOUT_FILENO) {
             stdout.buffer_mode = stdout_mode;
         }
@@ -217,7 +236,10 @@ impl StandardStreamController {
 
     /// Linux isatty(3) / BSD tty query
     pub fn isatty(&self, fd: i32) -> bool {
-        self.handles.get(&fd).map(|h| h.is_tty && !h.is_closed).unwrap_or(false)
+        self.handles
+            .get(&fd)
+            .map(|h| h.is_tty && !h.is_closed)
+            .unwrap_or(false)
     }
 }
 
@@ -236,7 +258,9 @@ mod tests {
         let mut controller = StandardStreamController::new();
 
         // Stderr is unbuffered
-        let stderr_out = controller.write_to_fd(STDERR_FILENO, b"error message\n").unwrap();
+        let stderr_out = controller
+            .write_to_fd(STDERR_FILENO, b"error message\n")
+            .unwrap();
         assert_eq!(stderr_out, b"error message\n");
 
         // Stdout is line buffered
@@ -271,7 +295,8 @@ mod tests {
 
     #[test]
     fn test_stream_splice_and_tee_routing() {
-        let mut src = StandardStreamHandle::new(3, "pipe_in", StreamBufferMode::BlockBuffered(1024));
+        let mut src =
+            StandardStreamHandle::new(3, "pipe_in", StreamBufferMode::BlockBuffered(1024));
         let mut dest = StandardStreamHandle::new(4, "pipe_out", StreamBufferMode::Unbuffered);
 
         src.write_bytes(b"spliced stream chunk");
@@ -293,14 +318,22 @@ mod tests {
         assert!(controller.isatty(STDERR_FILENO));
 
         // Auto-detect buffering
-        let mut pipe_handle = StandardStreamHandle::new(5, "pipe_out", StreamBufferMode::Unbuffered);
+        let mut pipe_handle =
+            StandardStreamHandle::new(5, "pipe_out", StreamBufferMode::Unbuffered);
         pipe_handle.is_tty = false;
         pipe_handle.auto_detect_buffering();
-        assert_eq!(pipe_handle.buffer_mode, StreamBufferMode::BlockBuffered(4096));
+        assert_eq!(
+            pipe_handle.buffer_mode,
+            StreamBufferMode::BlockBuffered(4096)
+        );
 
         // Linux stdbuf override
-        controller.apply_stdbuf_override(StreamBufferMode::Unbuffered, StreamBufferMode::LineBuffered);
-        assert_eq!(controller.handles.get(&STDOUT_FILENO).unwrap().buffer_mode, StreamBufferMode::Unbuffered);
+        controller
+            .apply_stdbuf_override(StreamBufferMode::Unbuffered, StreamBufferMode::LineBuffered);
+        assert_eq!(
+            controller.handles.get(&STDOUT_FILENO).unwrap().buffer_mode,
+            StreamBufferMode::Unbuffered
+        );
 
         // SIGPIPE signal trigger on closed stream write
         pipe_handle.is_closed = true;
@@ -309,8 +342,12 @@ mod tests {
 
         // Multi-stream flush_all
         let mut ctrl2 = StandardStreamController::new();
-        ctrl2.set_buffering(STDOUT_FILENO, StreamBufferMode::BlockBuffered(1024)).unwrap();
-        ctrl2.write_to_fd(STDOUT_FILENO, b"buffered_stdout").unwrap();
+        ctrl2
+            .set_buffering(STDOUT_FILENO, StreamBufferMode::BlockBuffered(1024))
+            .unwrap();
+        ctrl2
+            .write_to_fd(STDOUT_FILENO, b"buffered_stdout")
+            .unwrap();
         let flushed = ctrl2.flush_all();
         assert!(flushed.contains_key(&STDOUT_FILENO));
         assert_eq!(flushed.get(&STDOUT_FILENO).unwrap(), b"buffered_stdout");
@@ -364,7 +401,11 @@ impl SovereignStdinStreamEngine {
     }
 
     pub fn parse_and_consume_line(&mut self) -> Option<String> {
-        if let Some(pos) = self.ring_buffer.iter().position(|&b| b == b'\n' || b == b'\r') {
+        if let Some(pos) = self
+            .ring_buffer
+            .iter()
+            .position(|&b| b == b'\n' || b == b'\r')
+        {
             let line_bytes: Vec<u8> = self.ring_buffer.drain(..pos).collect();
             // Skip newline
             if !self.ring_buffer.is_empty() {

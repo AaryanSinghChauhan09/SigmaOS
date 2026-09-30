@@ -23,9 +23,9 @@
 #![allow(dead_code)]
 
 use std::collections::BTreeMap;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 // ─── Syscall Class (pledge promises) ─────────────────────────────────────────
 
@@ -118,17 +118,21 @@ impl SyscallClass {
 pub struct FsAccess(pub u32);
 
 impl FsAccess {
-    pub const READ_FILE: FsAccess   = FsAccess(1 << 0);
-    pub const WRITE_FILE: FsAccess  = FsAccess(1 << 1);
-    pub const EXECUTE: FsAccess     = FsAccess(1 << 2);
-    pub const READ_DIR: FsAccess    = FsAccess(1 << 3);
-    pub const ADD_FILE: FsAccess    = FsAccess(1 << 4);
-    pub const ADD_DIR: FsAccess     = FsAccess(1 << 5);
+    pub const READ_FILE: FsAccess = FsAccess(1 << 0);
+    pub const WRITE_FILE: FsAccess = FsAccess(1 << 1);
+    pub const EXECUTE: FsAccess = FsAccess(1 << 2);
+    pub const READ_DIR: FsAccess = FsAccess(1 << 3);
+    pub const ADD_FILE: FsAccess = FsAccess(1 << 4);
+    pub const ADD_DIR: FsAccess = FsAccess(1 << 5);
     pub const REMOVE_FILE: FsAccess = FsAccess(1 << 6);
-    pub const REMOVE_DIR: FsAccess  = FsAccess(1 << 7);
+    pub const REMOVE_DIR: FsAccess = FsAccess(1 << 7);
 
-    pub fn empty() -> Self { FsAccess(0) }
-    pub fn all() -> Self { FsAccess(0xFF) }
+    pub fn empty() -> Self {
+        FsAccess(0)
+    }
+    pub fn all() -> Self {
+        FsAccess(0xFF)
+    }
 
     pub fn contains(self, other: FsAccess) -> bool {
         (self.0 & other.0) == other.0
@@ -154,18 +158,30 @@ impl FsAccess {
             flags = flags.union(FsAccess::ADD_FILE).union(FsAccess::ADD_DIR);
         }
         if s.contains('d') {
-            flags = flags.union(FsAccess::REMOVE_FILE).union(FsAccess::REMOVE_DIR);
+            flags = flags
+                .union(FsAccess::REMOVE_FILE)
+                .union(FsAccess::REMOVE_DIR);
         }
         flags
     }
 
     pub fn to_string_repr(self) -> String {
         let mut s = String::new();
-        if self.contains(FsAccess::READ_FILE) { s.push('r'); }
-        if self.contains(FsAccess::WRITE_FILE) { s.push('w'); }
-        if self.contains(FsAccess::EXECUTE) { s.push('x'); }
-        if self.contains(FsAccess::ADD_FILE) { s.push('c'); }
-        if self.contains(FsAccess::REMOVE_FILE) { s.push('d'); }
+        if self.contains(FsAccess::READ_FILE) {
+            s.push('r');
+        }
+        if self.contains(FsAccess::WRITE_FILE) {
+            s.push('w');
+        }
+        if self.contains(FsAccess::EXECUTE) {
+            s.push('x');
+        }
+        if self.contains(FsAccess::ADD_FILE) {
+            s.push('c');
+        }
+        if self.contains(FsAccess::REMOVE_FILE) {
+            s.push('d');
+        }
         s
     }
 }
@@ -183,7 +199,10 @@ pub struct UnveilEntry {
 
 impl UnveilEntry {
     pub fn new(path: &str, access: &str) -> Self {
-        UnveilEntry { path: String::from(path), access: FsAccess::parse(access) }
+        UnveilEntry {
+            path: String::from(path),
+            access: FsAccess::parse(access),
+        }
     }
 
     /// Check if a given filesystem path is covered by this unveil entry
@@ -213,8 +232,12 @@ impl CapabilityRights {
     pub const RECV: CapabilityRights = CapabilityRights(1 << 11);
     pub const FSYNC: CapabilityRights = CapabilityRights(1 << 12);
 
-    pub fn none() -> Self { CapabilityRights(0) }
-    pub fn all() -> Self { CapabilityRights(!0) }
+    pub fn none() -> Self {
+        CapabilityRights(0)
+    }
+    pub fn all() -> Self {
+        CapabilityRights(!0)
+    }
 
     pub fn has(self, right: CapabilityRights) -> bool {
         (self.0 & right.0) == right.0
@@ -256,12 +279,18 @@ pub struct PledgeProfile {
 
 impl PledgeProfile {
     pub fn new() -> Self {
-        PledgeProfile { allowed: Vec::new(), sealed: false, violations: Vec::new() }
+        PledgeProfile {
+            allowed: Vec::new(),
+            sealed: false,
+            violations: Vec::new(),
+        }
     }
 
     /// Grant a syscall class (only allowed before sealing)
     pub fn grant(&mut self, class: SyscallClass) -> bool {
-        if self.sealed { return false; }
+        if self.sealed {
+            return false;
+        }
         if !self.allowed.contains(&class) {
             self.allowed.push(class);
         }
@@ -269,7 +298,9 @@ impl PledgeProfile {
     }
 
     /// Seal the profile — no more grants possible
-    pub fn seal(&mut self) { self.sealed = true; }
+    pub fn seal(&mut self) {
+        self.sealed = true;
+    }
 
     /// Restrict: remove a syscall class (allowed even after sealing)
     pub fn restrict(&mut self, class: SyscallClass) {
@@ -381,7 +412,8 @@ impl CapabilityMonitor {
 
     /// Grant a syscall class to a process (before sealing)
     pub fn pledge_grant(&mut self, pid: u32, class: SyscallClass) -> bool {
-        self.profiles.get_mut(&pid)
+        self.profiles
+            .get_mut(&pid)
             .map(|p| p.pledge.grant(class))
             .unwrap_or(false)
     }
@@ -391,7 +423,9 @@ impl CapabilityMonitor {
         if let Some(profile) = self.profiles.get_mut(&pid) {
             profile.pledge.seal();
             true
-        } else { false }
+        } else {
+            false
+        }
     }
 
     /// Check if a process's syscall class is allowed (pledge enforcement)
@@ -402,7 +436,9 @@ impl CapabilityMonitor {
             None => return true, // Unknown process — allow (should be registered)
             Some(p) => {
                 // If not sealed, all syscalls allowed
-                if !p.pledge.sealed { return true; }
+                if !p.pledge.sealed {
+                    return true;
+                }
                 (p.pledge.is_allowed(class), p.violation_action)
             }
         };
@@ -412,7 +448,8 @@ impl CapabilityMonitor {
                 profile.violations_count += 1;
                 profile.pledge.violations.push(format!(
                     "PLEDGE VIOLATION: pid={} denied syscall class '{}'",
-                    pid, class.label()
+                    pid,
+                    class.label()
                 ));
             }
             self.total_violations += 1;
@@ -451,9 +488,13 @@ impl CapabilityMonitor {
         let result = match self.profiles.get(&pid) {
             None => return true,
             Some(p) => {
-                if p.unveil.is_empty() { return true; }
+                if p.unveil.is_empty() {
+                    return true;
+                }
                 // Find the most specific (longest) matching unveil entry
-                let best = p.unveil.iter()
+                let best = p
+                    .unveil
+                    .iter()
                     .filter(|e| e.covers_path(path))
                     .max_by_key(|e| e.path.len());
                 match best {
@@ -484,24 +525,32 @@ impl CapabilityMonitor {
         if let Some(profile) = self.profiles.get_mut(&pid) {
             profile.in_capability_mode = true;
             true
-        } else { false }
+        } else {
+            false
+        }
     }
 
     /// Register a capability-restricted file descriptor for a process
     pub fn cap_new_fd(&mut self, pid: u32, fd: i32, rights: CapabilityRights, desc: &str) -> bool {
         if let Some(profile) = self.profiles.get_mut(&pid) {
-            profile.cap_fds.insert(fd, CapFd {
+            profile.cap_fds.insert(
                 fd,
-                rights,
-                description: String::from(desc),
-            });
+                CapFd {
+                    fd,
+                    rights,
+                    description: String::from(desc),
+                },
+            );
             true
-        } else { false }
+        } else {
+            false
+        }
     }
 
     /// Check if a process has a specific right on a file descriptor
     pub fn check_cap_right(&self, pid: u32, fd: i32, right: CapabilityRights) -> bool {
-        self.profiles.get(&pid)
+        self.profiles
+            .get(&pid)
             .and_then(|p| p.cap_fds.get(&fd))
             .map(|cap_fd| cap_fd.rights.has(right))
             .unwrap_or(false)
@@ -608,16 +657,26 @@ mod capability_tests {
     fn test_capsicum_mode_and_fd_rights() {
         let mut monitor = CapabilityMonitor::new();
         monitor.register_process(600);
-        monitor.cap_new_fd(600, 3, CapabilityRights::READ.union(CapabilityRights::SEEK), "input file");
-        monitor.cap_new_fd(600, 4, CapabilityRights::WRITE.union(CapabilityRights::FSYNC), "output file");
+        monitor.cap_new_fd(
+            600,
+            3,
+            CapabilityRights::READ.union(CapabilityRights::SEEK),
+            "input file",
+        );
+        monitor.cap_new_fd(
+            600,
+            4,
+            CapabilityRights::WRITE.union(CapabilityRights::FSYNC),
+            "output file",
+        );
         monitor.enter_capability_mode(600);
 
         assert!(monitor.check_cap_right(600, 3, CapabilityRights::READ));
         assert!(monitor.check_cap_right(600, 3, CapabilityRights::SEEK));
         assert!(!monitor.check_cap_right(600, 3, CapabilityRights::WRITE)); // fd 3 has no WRITE
         assert!(monitor.check_cap_right(600, 4, CapabilityRights::WRITE));
-        assert!(!monitor.check_cap_right(600, 4, CapabilityRights::READ));  // fd 4 has no READ
-        assert!(!monitor.check_cap_right(600, 5, CapabilityRights::READ));  // fd 5 not registered
+        assert!(!monitor.check_cap_right(600, 4, CapabilityRights::READ)); // fd 4 has no READ
+        assert!(!monitor.check_cap_right(600, 5, CapabilityRights::READ)); // fd 5 not registered
     }
 
     #[test]
@@ -664,7 +723,9 @@ mod capability_tests {
 
     #[test]
     fn test_capability_rights_restrict() {
-        let full = CapabilityRights::READ.union(CapabilityRights::WRITE).union(CapabilityRights::SEEK);
+        let full = CapabilityRights::READ
+            .union(CapabilityRights::WRITE)
+            .union(CapabilityRights::SEEK);
         let restricted = full.restrict(CapabilityRights::WRITE);
         assert!(restricted.has(CapabilityRights::READ));
         assert!(!restricted.has(CapabilityRights::WRITE));

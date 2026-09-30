@@ -1,9 +1,9 @@
 // OOP-based Process Spawning and POSIX Signals Framework for SigmaOS
 // Implements process lifecycles, fork, exec, and signals (SIGKILL, SIGTERM, SIGINT).
 
+use core::sync::atomic::{AtomicI32, AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicI32, AtomicUsize, Ordering};
 
 pub type ProcessID = usize;
 

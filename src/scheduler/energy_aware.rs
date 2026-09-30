@@ -7,11 +7,11 @@ use std::vec::Vec;
 /// CPU frequency states for energy management
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CpuFrequency {
-    Min = 800,       // 800 MHz - minimum power
-    Low = 1200,      // 1.2 GHz - power saving
-    Nominal = 2400,  // 2.4 GHz - balanced
-    Turbo = 3200,     // 3.2 GHz - performance
-    Max = 4800,      // 4.8 GHz - maximum performance
+    Min = 800,      // 800 MHz - minimum power
+    Low = 1200,     // 1.2 GHz - power saving
+    Nominal = 2400, // 2.4 GHz - balanced
+    Turbo = 3200,   // 3.2 GHz - performance
+    Max = 4800,     // 4.8 GHz - maximum performance
 }
 
 impl CpuFrequency {
@@ -147,7 +147,8 @@ impl EnergyAwareScheduler {
 
         for (i, task) in self.tasks_pool.iter().enumerate() {
             // Calculate score: priority - energy cost factor
-            let energy_cost = (task.expected_cpu_cycles as f32 / 1_000_000.0) * task.expected_temp_increase_celsius;
+            let energy_cost = (task.expected_cpu_cycles as f32 / 1_000_000.0)
+                * task.expected_temp_increase_celsius;
             let freq_factor = self.current_frequency.power_factor();
             let adjusted_cost = energy_cost * freq_factor;
             let score = (task.priority as f32) - (adjusted_cost / energy_budget);
@@ -189,12 +190,12 @@ mod tests {
     #[test]
     fn test_thermal_throttling() {
         let mut eas = EnergyAwareScheduler::new();
-        
+
         // Set critical temperature
         eas.set_temperature(90.0);
         assert_eq!(eas.thermal_state, ThermalState::Critical);
         assert_eq!(eas.current_frequency, CpuFrequency::Min);
-        
+
         // Return to normal
         eas.set_temperature(50.0);
         assert_eq!(eas.thermal_state, ThermalState::Normal);
@@ -203,12 +204,12 @@ mod tests {
     #[test]
     fn test_frequency_scaling() {
         let mut eas = EnergyAwareScheduler::new();
-        
+
         assert_eq!(eas.get_frequency(), CpuFrequency::Nominal);
-        
+
         eas.set_frequency(CpuFrequency::Turbo);
         assert_eq!(eas.get_frequency(), CpuFrequency::Turbo);
-        
+
         eas.set_frequency(CpuFrequency::Max);
         assert_eq!(eas.get_frequency(), CpuFrequency::Max);
     }
@@ -217,8 +218,8 @@ mod tests {
     fn test_priority_scheduling() {
         let mut eas = EnergyAwareScheduler::new();
         eas.queue_task_with_priority(1, 10000, 1.5, 255); // high priority
-        eas.queue_task_with_priority(2, 100, 0.1, 0);   // low priority
-        
+        eas.queue_task_with_priority(2, 100, 0.1, 0); // low priority
+
         let task = eas.schedule_next_task();
         assert!(task.is_some());
         assert_eq!(task.unwrap(), 1); // high priority should schedule first
@@ -227,11 +228,11 @@ mod tests {
     #[test]
     fn test_energy_budget() {
         let mut eas = EnergyAwareScheduler::new();
-        
+
         // Normal state
         let budget = eas.get_energy_budget();
         assert!(budget > 0.9);
-        
+
         // Low battery
         eas.battery_level_percentage = 10;
         let budget = eas.get_energy_budget();
@@ -240,9 +241,9 @@ mod tests {
 
     #[test]
     fn test_scheduler_stats() {
-        let eas = EnergyAwareScheduler::new();
+        let mut eas = EnergyAwareScheduler::new();
         eas.queue_task_prediction(1, 10000, 1.5);
-        
+
         let (pool_size, freq, thermal, temp) = eas.get_stats();
         assert_eq!(pool_size, 1);
         assert_eq!(freq, CpuFrequency::Nominal);

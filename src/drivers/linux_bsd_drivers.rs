@@ -4,7 +4,6 @@
 // UVC/UAC2 media drivers, LSI MegaRAID/SAS HBA storage, Wacom tablet & I2C precision touchpad,
 // Apple Silicon DART IOMMU, Raspberry Pi BCM2711/2712 SoC, and OpenBSD/NetBSD driver sandboxing.
 
-
 use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;
@@ -77,7 +76,14 @@ impl EvdevInputDevice {
         }
     }
 
-    pub fn update_touch_slot(&mut self, slot: usize, tracking_id: i32, x: i32, y: i32, pressure: u32) -> Result<(), &'static str> {
+    pub fn update_touch_slot(
+        &mut self,
+        slot: usize,
+        tracking_id: i32,
+        x: i32,
+        y: i32,
+        pressure: u32,
+    ) -> Result<(), &'static str> {
         if slot >= self.mt_slots.len() {
             return Err("Evdev: Multi-touch slot index out of bounds");
         }
@@ -165,7 +171,10 @@ impl FreeBsdDrmConnector {
         }
     }
 
-    pub fn commit_atomic_state(&mut self, new_state: DrmAtomicKmsState) -> Result<(), &'static str> {
+    pub fn commit_atomic_state(
+        &mut self,
+        new_state: DrmAtomicKmsState,
+    ) -> Result<(), &'static str> {
         if new_state.active_mode.h_display == 0 || new_state.active_mode.v_display == 0 {
             return Err("FreeBSD DRM: Invalid resolution mode requested");
         }
@@ -216,7 +225,11 @@ impl AmdgpuDrmDriver {
         Ok(())
     }
 
-    pub fn submit_command_ring(&mut self, block: AmdgpuIpBlockType, pm4_packets: &[u32]) -> Result<u64, &'static str> {
+    pub fn submit_command_ring(
+        &mut self,
+        block: AmdgpuIpBlockType,
+        pm4_packets: &[u32],
+    ) -> Result<u64, &'static str> {
         if !self.active_ip_blocks.contains(&block) {
             return Err("AMDGPU: IP block not initialized");
         }
@@ -257,7 +270,9 @@ impl IntelXeDrmDriver {
 
     pub fn map_ppgtt_page(&mut self, gpu_va: u64, phys_frame: u64) -> Result<(), &'static str> {
         if !self.guc_fw_loaded {
-            return Err("Intel Xe: GuC microcontroller firmware must be loaded before PPGTT mapping");
+            return Err(
+                "Intel Xe: GuC microcontroller firmware must be loaded before PPGTT mapping",
+            );
         }
         self.ppgtt_entries.push((gpu_va, phys_frame));
         Ok(())
@@ -885,7 +900,7 @@ impl NetBsdRumpKernelBridge {
 
 pub struct IntelWifi7Be200Driver {
     pub mac_addr: [u8; 6],
-    pub mlo_links_active: u8, // Aggregated 2.4GHz + 5GHz + 6GHz
+    pub mlo_links_active: u8,   // Aggregated 2.4GHz + 5GHz + 6GHz
     pub channel_width_mhz: u16, // 320 MHz channels
     pub max_phy_rate_gbps: f32, // Up to 5.8 Gbps
 }
@@ -938,7 +953,11 @@ impl SovereignWirelessCardDriver {
         }
     }
 
-    pub fn authenticate_wpa3_sae(&mut self, ssid: &str, passphrase: &str) -> Result<(), &'static str> {
+    pub fn authenticate_wpa3_sae(
+        &mut self,
+        ssid: &str,
+        passphrase: &str,
+    ) -> Result<(), &'static str> {
         if ssid.is_empty() || passphrase.len() < 8 {
             return Err("Wi-Fi: Invalid SSID or passphrase length");
         }
@@ -982,7 +1001,9 @@ impl ThunderboltUsb4Driver {
 
     pub fn authorize_device_tunnel(&mut self, is_dp: bool) -> Result<(), &'static str> {
         if self.security_level == ThunderboltSecurityLevel::DisplayPortOnly && !is_dp {
-            return Err("Thunderbolt: PCIe tunneling blocked under DisplayPort-only security policy");
+            return Err(
+                "Thunderbolt: PCIe tunneling blocked under DisplayPort-only security policy",
+            );
         }
         if is_dp {
             self.active_dp_tunnels += 1;
@@ -1095,7 +1116,11 @@ impl LsiMegaRaidHbaDriver {
         self.attached_sas_drives = drive_count;
     }
 
-    pub fn create_raid_volume(&mut self, level: RaidLevel, capacity_bytes: u64) -> Result<(), &'static str> {
+    pub fn create_raid_volume(
+        &mut self,
+        level: RaidLevel,
+        capacity_bytes: u64,
+    ) -> Result<(), &'static str> {
         if self.attached_sas_drives == 0 {
             return Err("LSI MegaRAID: No SAS drives discovered to configure volume");
         }
@@ -1229,7 +1254,10 @@ impl OpenBsdDriverPledge {
         if !self.is_pledged {
             return true;
         }
-        if !self.allowed_capabilities.contains(&DriverCapability::MmioAccess) {
+        if !self
+            .allowed_capabilities
+            .contains(&DriverCapability::MmioAccess)
+        {
             return false;
         }
         addr >= self.mmio_range_start && addr <= self.mmio_range_end
@@ -1329,7 +1357,11 @@ impl SovereignDeviceManager {
         }
     }
 
-    pub fn auto_probe_pci_device(&mut self, vendor_id: u16, device_id: u16) -> Result<String, &'static str> {
+    pub fn auto_probe_pci_device(
+        &mut self,
+        vendor_id: u16,
+        device_id: u16,
+    ) -> Result<String, &'static str> {
         let driver_name = match (vendor_id, device_id) {
             (0x1002, 0x731F) => "AMDGPU DRM/KMS Driver",
             (0x1002, 0x744C) => "AMD RDNA 3 DCN 3.2 Display Driver",
@@ -1343,18 +1375,24 @@ impl SovereignDeviceManager {
             (0x1217, 0x8520) => "SDHCI ADMA2 eMMC Storage Driver",
             _ => "Generic PCI Device Driver",
         };
-        self.bound_drivers.push((vendor_id, device_id, driver_name.to_string()));
+        self.bound_drivers
+            .push((vendor_id, device_id, driver_name.to_string()));
         Ok(driver_name.to_string())
     }
 
-    pub fn auto_probe_usb_device(&mut self, vendor_id: u16, product_id: u16) -> Result<String, &'static str> {
+    pub fn auto_probe_usb_device(
+        &mut self,
+        vendor_id: u16,
+        product_id: u16,
+    ) -> Result<String, &'static str> {
         let driver_name = match (vendor_id, product_id) {
             (0x056a, 0x037a) => "Wacom Precision Tablet Driver",
             (0x046d, 0x0825) => "OpenBSD uvideo UVC Camera Driver",
             (0x0a5c, 0x21e8) => "Broadcom BCM Bluetooth HCI Driver",
             _ => "Generic USB Device Driver",
         };
-        self.bound_drivers.push((vendor_id, product_id, driver_name.to_string()));
+        self.bound_drivers
+            .push((vendor_id, product_id, driver_name.to_string()));
         Ok(driver_name.to_string())
     }
 }
@@ -1502,7 +1540,12 @@ impl SdhciEmmcStorageDriver {
         }
     }
 
-    pub fn execute_adma2_transfer(&mut self, lba: u64, blocks: u32, buffer: &mut [u8]) -> Result<usize, &'static str> {
+    pub fn execute_adma2_transfer(
+        &mut self,
+        lba: u64,
+        blocks: u32,
+        buffer: &mut [u8],
+    ) -> Result<usize, &'static str> {
         let bytes_needed = (blocks as usize) * 512;
         if buffer.len() < bytes_needed {
             return Err("Buffer underflow for ADMA2 descriptor");
@@ -1523,7 +1566,11 @@ impl IntelIgcEthernetDriver {
         Self { mac_address: mac }
     }
 
-    pub fn transmit_queue(&mut self, _queue_id: usize, packet: &[u8]) -> Result<usize, &'static str> {
+    pub fn transmit_queue(
+        &mut self,
+        _queue_id: usize,
+        packet: &[u8],
+    ) -> Result<usize, &'static str> {
         Ok(packet.len())
     }
 }
@@ -1540,7 +1587,9 @@ pub struct LinuxIioImuSensorDriver {
 
 impl LinuxIioImuSensorDriver {
     pub fn new(name: &str) -> Self {
-        Self { name: name.to_string() }
+        Self {
+            name: name.to_string(),
+        }
     }
 
     pub fn read_sensor_data(&mut self, _x: i32, _y: i32, z: i32) -> ImuReadings {
@@ -1892,7 +1941,12 @@ mod tests_linux_bsd_drivers {
     fn test_nouveau_apple_ans2_adreno_usb_midi_geli_rump_be200_drivers() {
         let mut nouveau = NouveauGpuDrmDriver::new(0x2782, "NV170", 16384);
         assert!(nouveau.load_gsp_firmware().is_ok());
-        assert_eq!(nouveau.submit_pushbuf(0, &[0x00000001, 0x00000002]).unwrap(), 2);
+        assert_eq!(
+            nouveau
+                .submit_pushbuf(0, &[0x00000001, 0x00000002])
+                .unwrap(),
+            2
+        );
 
         let mut ans2 = AppleAns2NvmeDriver::new("M3");
         assert!(ans2.boot_rtkit_coprocessor().is_ok());
@@ -1959,7 +2013,9 @@ mod tests_linux_bsd_drivers {
     fn test_amdgpu_and_intel_xe_drivers() {
         let mut amdgpu = AmdgpuDrmDriver::new(0x731F, 16384);
         assert!(amdgpu.init_ip_blocks().is_ok());
-        let seq = amdgpu.submit_command_ring(AmdgpuIpBlockType::Gfx, &[0xC0001000, 0x00000001]).unwrap();
+        let seq = amdgpu
+            .submit_command_ring(AmdgpuIpBlockType::Gfx, &[0xC0001000, 0x00000001])
+            .unwrap();
         assert_eq!(seq, 1);
 
         let mut intel_xe = IntelXeDrmDriver::new(0x4680);
@@ -1969,8 +2025,11 @@ mod tests_linux_bsd_drivers {
 
     #[test]
     fn test_wireless_and_thunderbolt_drivers() {
-        let mut wifi = SovereignWirelessCardDriver::new("iwlwifi0", [0x00, 0x11, 0x22, 0x33, 0x44, 0x55]);
-        assert!(wifi.authenticate_wpa3_sae("SovereignNet", "SuperSecretPass").is_ok());
+        let mut wifi =
+            SovereignWirelessCardDriver::new("iwlwifi0", [0x00, 0x11, 0x22, 0x33, 0x44, 0x55]);
+        assert!(wifi
+            .authenticate_wpa3_sae("SovereignNet", "SuperSecretPass")
+            .is_ok());
         assert!(wifi.is_wpa3_sae_authenticated);
 
         let mut tb = ThunderboltUsb4Driver::new(0, ThunderboltSecurityLevel::SecureConnect);
@@ -1987,7 +2046,9 @@ mod tests_linux_bsd_drivers {
 
         let mut hba = LsiMegaRaidHbaDriver::new(0x005b);
         hba.discover_sas_topology(8);
-        assert!(hba.create_raid_volume(RaidLevel::Raid10, 8_000_000_000_000).is_ok());
+        assert!(hba
+            .create_raid_volume(RaidLevel::Raid10, 8_000_000_000_000)
+            .is_ok());
     }
 
     #[test]
@@ -2061,12 +2122,16 @@ mod tests_linux_bsd_drivers {
     #[test]
     fn test_openbsd_driver_pledge() {
         let mut pledge = OpenBsdDriverPledge::new("e1000_nic", 0xE000_0000, 0xE000_FFFF);
-        assert!(pledge.pledge_capabilities(&[DriverCapability::MmioAccess]).is_ok());
+        assert!(pledge
+            .pledge_capabilities(&[DriverCapability::MmioAccess])
+            .is_ok());
         assert!(pledge.validate_mmio_access(0xE000_1000));
         assert!(!pledge.validate_mmio_access(0xF000_0000));
 
         // Escalation fails
-        assert!(pledge.pledge_capabilities(&[DriverCapability::MmioAccess, DriverCapability::DmaBuffer]).is_err());
+        assert!(pledge
+            .pledge_capabilities(&[DriverCapability::MmioAccess, DriverCapability::DmaBuffer])
+            .is_err());
     }
 
     #[test]
@@ -2101,7 +2166,13 @@ mod tests_linux_bsd_drivers {
         let mut drm = DrmKmsDisplayDriver::new(0);
         let gem = drm.alloc_gem_buffer(8192);
         assert_eq!(gem, 2);
-        assert!(drm.set_mode(DrmDisplayMode { h_display: 1920, v_display: 1080, v_refresh: 60 }).is_ok());
+        assert!(drm
+            .set_mode(DrmDisplayMode {
+                h_display: 1920,
+                v_display: 1080,
+                v_refresh: 60
+            })
+            .is_ok());
         assert!(drm.primary_crtc_active);
 
         let mut dev_mgr = SovereignDeviceManager::new();
@@ -2148,10 +2219,25 @@ mod tests_linux_bsd_drivers {
 
         // 6. Device Manager Auto-Probing
         let mut dev_mgr = SovereignDeviceManager::new();
-        assert_eq!(dev_mgr.auto_probe_pci_device(0x10de, 0x2484).unwrap(), "NVIDIA Nouveau GSP DRM/KMS Driver");
-        assert_eq!(dev_mgr.auto_probe_pci_device(0x5143, 0x0001).unwrap(), "Qualcomm Adreno DRM GPU Driver");
-        assert_eq!(dev_mgr.auto_probe_pci_device(0x14e4, 0x43e5).unwrap(), "Broadcom BCM Wi-Fi 6E/7 Driver");
-        assert_eq!(dev_mgr.auto_probe_pci_device(0x1217, 0x8520).unwrap(), "SDHCI ADMA2 eMMC Storage Driver");
-        assert_eq!(dev_mgr.auto_probe_usb_device(0x0a5c, 0x21e8).unwrap(), "Broadcom BCM Bluetooth HCI Driver");
+        assert_eq!(
+            dev_mgr.auto_probe_pci_device(0x10de, 0x2484).unwrap(),
+            "NVIDIA Nouveau GSP DRM/KMS Driver"
+        );
+        assert_eq!(
+            dev_mgr.auto_probe_pci_device(0x5143, 0x0001).unwrap(),
+            "Qualcomm Adreno DRM GPU Driver"
+        );
+        assert_eq!(
+            dev_mgr.auto_probe_pci_device(0x14e4, 0x43e5).unwrap(),
+            "Broadcom BCM Wi-Fi 6E/7 Driver"
+        );
+        assert_eq!(
+            dev_mgr.auto_probe_pci_device(0x1217, 0x8520).unwrap(),
+            "SDHCI ADMA2 eMMC Storage Driver"
+        );
+        assert_eq!(
+            dev_mgr.auto_probe_usb_device(0x0a5c, 0x21e8).unwrap(),
+            "Broadcom BCM Bluetooth HCI Driver"
+        );
     }
 }

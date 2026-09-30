@@ -158,21 +158,21 @@ impl NetworkNamespaceManager {
             next_id: AtomicU64::new(2),
             initial_namespace: initial_id,
         };
-        
+
         // Create initial namespace
         let initial_ns = NetworkNamespace::new(initial_id);
         manager.namespaces.insert(initial_id, initial_ns);
-        
+
         manager
     }
 
     /// Create a new network namespace
     pub fn create_namespace(&mut self) -> NetworkNamespaceId {
         let id = NetworkNamespaceId(self.next_id.fetch_add(1, Ordering::SeqCst));
-        
+
         let namespace = NetworkNamespace::new(id);
         self.namespaces.insert(id, namespace);
-        
+
         id
     }
 
@@ -181,7 +181,7 @@ impl NetworkNamespaceManager {
         if id == self.initial_namespace {
             return Err("Cannot delete initial namespace");
         }
-        
+
         if self.namespaces.remove(&id).is_some() {
             Ok(())
         } else {
@@ -222,7 +222,7 @@ mod tests {
     #[test]
     fn test_create_namespace() {
         let mut manager = NetworkNamespaceManager::new();
-        
+
         let id = manager.create_namespace();
         assert_eq!(id.0, 2);
         assert_eq!(manager.namespace_count(), 2);
@@ -231,7 +231,7 @@ mod tests {
     #[test]
     fn test_delete_namespace() {
         let mut manager = NetworkNamespaceManager::new();
-        
+
         let id = manager.create_namespace();
         assert!(manager.delete_namespace(id).is_ok());
         assert_eq!(manager.namespace_count(), 1);
@@ -240,7 +240,7 @@ mod tests {
     #[test]
     fn test_delete_initial_namespace() {
         let mut manager = NetworkNamespaceManager::new();
-        
+
         let initial = manager.initial_namespace();
         assert!(manager.delete_namespace(initial).is_err());
     }
@@ -248,10 +248,10 @@ mod tests {
     #[test]
     fn test_add_interface() {
         let mut manager = NetworkNamespaceManager::new();
-        
+
         let id = manager.create_namespace();
         let namespace = manager.get_namespace_mut(id).unwrap();
-        
+
         let interface = NetworkInterface {
             name: "eth0".to_string(),
             index: 1,
@@ -259,7 +259,7 @@ mod tests {
             state: InterfaceState::Up,
             addresses: Vec::new(),
         };
-        
+
         namespace.add_interface(interface);
         assert_eq!(namespace.interface_count(), 1);
     }
@@ -267,17 +267,17 @@ mod tests {
     #[test]
     fn test_add_route() {
         let mut manager = NetworkNamespaceManager::new();
-        
+
         let id = manager.create_namespace();
         let namespace = manager.get_namespace_mut(id).unwrap();
-        
+
         let route = NetworkRoute {
             destination: "192.168.1.0/24".to_string(),
             gateway: "192.168.1.1".to_string(),
             metric: 100,
             interface: "eth0".to_string(),
         };
-        
+
         namespace.add_route(route);
         assert_eq!(namespace.route_count(), 1);
     }
@@ -285,16 +285,16 @@ mod tests {
     #[test]
     fn test_firewall_rule() {
         let mut manager = NetworkNamespaceManager::new();
-        
+
         let id = manager.create_namespace();
         let namespace = manager.get_namespace_mut(id).unwrap();
-        
+
         let rule = FirewallRule {
             source: "0.0.0.0/0".to_string(),
             destination: "192.168.1.0/24".to_string(),
             action: FirewallAction::Accept,
         };
-        
+
         namespace.add_firewall_rule(rule);
         assert_eq!(namespace.firewall_rule_count(), 1);
     }
@@ -302,17 +302,17 @@ mod tests {
     #[test]
     fn test_default_route() {
         let mut manager = NetworkNamespaceManager::new();
-        
+
         let id = manager.create_namespace();
         let namespace = manager.get_namespace_mut(id).unwrap();
-        
+
         let route = NetworkRoute {
             destination: "default".to_string(),
             gateway: "192.168.1.1".to_string(),
             metric: 100,
             interface: "eth0".to_string(),
         };
-        
+
         namespace.set_default_route(route);
         assert!(namespace.default_route.is_some());
     }
@@ -320,10 +320,10 @@ mod tests {
     #[test]
     fn test_list_namespaces() {
         let mut manager = NetworkNamespaceManager::new();
-        
+
         manager.create_namespace();
         manager.create_namespace();
-        
+
         let list = manager.list_namespaces();
         assert_eq!(list.len(), 3);
     }

@@ -4,6 +4,6 @@
 pub mod code_review;
 
 pub use code_review::{
-    ReviewStatus, ReviewComment, PullRequestReview, QualityGate, QualityGateResult,
-    PreCommitVerification, CodeReviewManager,
+    CodeReviewManager, PreCommitVerification, PullRequestReview, QualityGate, QualityGateResult,
+    ReviewComment, ReviewStatus,
 };

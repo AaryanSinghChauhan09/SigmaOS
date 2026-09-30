@@ -92,7 +92,7 @@ impl Default for AsanConfig {
     fn default() -> Self {
         Self {
             redzone_size: 16, // 16-byte redzones
-            shadow_scale: 3,   // 1:8 shadow mapping
+            shadow_scale: 3,  // 1:8 shadow mapping
             shadow_offset: 0,
             quarantine_size: 1024 * 1024, // 1MB quarantine
         }
@@ -132,18 +132,27 @@ impl AddressSanitizer {
 
     /// Allocate memory with redzone protection
     pub fn allocate(&mut self, size: usize) -> Result<u64, String> {
-        let base_address = self.next_address.fetch_add((size + self.config.redzone_size * 2) as u64, Ordering::SeqCst);
+        let base_address = self.next_address.fetch_add(
+            (size + self.config.redzone_size * 2) as u64,
+            Ordering::SeqCst,
+        );
         let redzone_size = self.config.redzone_size;
         let shadow_offset = self.config.shadow_offset + base_address;
 
         // Create region with redzones
         let total_size = size + redzone_size * 2;
-        let region = AsanRegion::new(base_address + redzone_size as u64, size, redzone_size, shadow_offset);
+        let region = AsanRegion::new(
+            base_address + redzone_size as u64,
+            size,
+            redzone_size,
+            shadow_offset,
+        );
 
         // Initialize shadow memory
         self.initialize_shadow_memory(base_address, total_size, &region);
 
-        self.regions.insert(base_address + redzone_size as u64, region);
+        self.regions
+            .insert(base_address + redzone_size as u64, region);
         self.allocation_count += 1;
 
         Ok(base_address + redzone_size as u64)
@@ -154,7 +163,9 @@ impl AddressSanitizer {
             let addr = base + i as u64;
             let offset = i as u64;
 
-            if offset < region.redzone_size() as u64 || offset >= (region.redzone_size() + region.size()) as u64 {
+            if offset < region.redzone_size() as u64
+                || offset >= (region.redzone_size() + region.size()) as u64
+            {
                 self.shadow_memory.insert(addr, ShadowState::Redzone);
             } else {
                 self.shadow_memory.insert(addr, ShadowState::Allocated);
@@ -165,12 +176,16 @@ impl AddressSanitizer {
     /// Check valid access
     pub fn check_access(&mut self, address: u64, size: usize) -> Result<(), String> {
         // Find region containing this address
-        let region = self.find_region(address)
+        let region = self
+            .find_region(address)
             .ok_or_else(|| format!("Address 0x{:x} not in any allocated region", address))?;
 
         if !region.is_valid_access(address, size) {
             self.error_count += 1;
-            return Err(format!("Invalid access to address 0x{:x} with size {}", address, size));
+            return Err(format!(
+                "Invalid access to address 0x{:x} with size {}",
+                address, size
+            ));
         }
 
         // Check shadow memory for corruption
@@ -187,7 +202,10 @@ impl AddressSanitizer {
                 }
                 if state == ShadowState::Corrupted {
                     self.error_count += 1;
-                    return Err(format!("Memory corruption detected at address 0x{:x}", addr));
+                    return Err(format!(
+                        "Memory corruption detected at address 0x{:x}",
+                        addr
+                    ));
                 }
             }
         }
@@ -205,7 +223,9 @@ impl AddressSanitizer {
 
     /// Free memory
     pub fn free(&mut self, address: u64) -> Result<(), String> {
-        let region = self.regions.get_mut(&address)
+        let region = self
+            .regions
+            .get_mut(&address)
             .ok_or_else(|| format!("Address 0x{:x} not allocated", address))?;
 
         if !region.is_allocated() {
@@ -245,7 +265,10 @@ impl AddressSanitizer {
     pub fn check_stack_canary(&mut self, canary: u64, expected: u64) -> Result<(), String> {
         if canary != expected {
             self.error_count += 1;
-            return Err(format!("Stack canary corruption detected: expected 0x{:x}, got 0x{:x}", expected, canary));
+            return Err(format!(
+                "Stack canary corruption detected: expected 0x{:x}, got 0x{:x}",
+                expected, canary
+            ));
         }
         Ok(())
     }

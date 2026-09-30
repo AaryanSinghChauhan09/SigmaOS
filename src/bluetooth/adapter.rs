@@ -99,7 +99,10 @@ impl BluetoothAdapter for SimpleBluetoothAdapter {
 }
 
 pub trait BluetoothManager {
-    fn add_adapter(&mut self, adapter: Box<dyn BluetoothAdapter>) -> Result<DeviceID, BluetoothError>;
+    fn add_adapter(
+        &mut self,
+        adapter: Box<dyn BluetoothAdapter>,
+    ) -> Result<DeviceID, BluetoothError>;
     fn remove_adapter(&mut self, id: DeviceID) -> Result<(), BluetoothError>;
     fn get_adapter(&self, id: DeviceID) -> Option<&dyn BluetoothAdapter>;
     fn start_scan(&mut self, id: DeviceID) -> Result<(), BluetoothError>;
@@ -123,7 +126,10 @@ impl SimpleBluetoothManager {
 }
 
 impl BluetoothManager for SimpleBluetoothManager {
-    fn add_adapter(&mut self, adapter: Box<dyn BluetoothAdapter>) -> Result<DeviceID, BluetoothError> {
+    fn add_adapter(
+        &mut self,
+        adapter: Box<dyn BluetoothAdapter>,
+    ) -> Result<DeviceID, BluetoothError> {
         let id = adapter.id();
         self.adapters.push(Some(adapter));
         Ok(id)
@@ -178,8 +184,16 @@ impl BluetoothManager for SimpleBluetoothManager {
 }
 
 pub trait DevicePairing {
-    fn pair_device(&mut self, adapter_id: DeviceID, device_address: &[u8]) -> Result<(), BluetoothError>;
-    fn unpair_device(&mut self, adapter_id: DeviceID, device_address: &[u8]) -> Result<(), BluetoothError>;
+    fn pair_device(
+        &mut self,
+        adapter_id: DeviceID,
+        device_address: &[u8],
+    ) -> Result<(), BluetoothError>;
+    fn unpair_device(
+        &mut self,
+        adapter_id: DeviceID,
+        device_address: &[u8],
+    ) -> Result<(), BluetoothError>;
     fn get_paired_devices(&self, adapter_id: DeviceID) -> Vec<&[u8]>;
 }
 
@@ -196,7 +210,11 @@ impl SimpleDevicePairing {
 }
 
 impl DevicePairing for SimpleDevicePairing {
-    fn pair_device(&mut self, adapter_id: DeviceID, device_address: &[u8]) -> Result<(), BluetoothError> {
+    fn pair_device(
+        &mut self,
+        adapter_id: DeviceID,
+        device_address: &[u8],
+    ) -> Result<(), BluetoothError> {
         let mut addr_array = [0u8; 6];
         let addr_len = device_address.len().min(6);
         for i in 0..addr_len {
@@ -206,9 +224,15 @@ impl DevicePairing for SimpleDevicePairing {
         Ok(())
     }
 
-    fn unpair_device(&mut self, adapter_id: DeviceID, device_address: &[u8]) -> Result<(), BluetoothError> {
+    fn unpair_device(
+        &mut self,
+        adapter_id: DeviceID,
+        device_address: &[u8],
+    ) -> Result<(), BluetoothError> {
         for i in 0..self.paired.len() {
-            if self.paired[i].0 == adapter_id && &self.paired[i].1[..device_address.len().min(6)] == device_address {
+            if self.paired[i].0 == adapter_id
+                && &self.paired[i].1[..device_address.len().min(6)] == device_address
+            {
                 self.paired.remove(i);
                 return Ok(());
             }
@@ -302,7 +326,13 @@ impl SovereignBluetoothProtocolStackEngine {
         packet
     }
 
-    pub fn register_gatt_attribute(&mut self, handle: u16, uuid: u16, initial_value: &[u8], is_notify: bool) {
+    pub fn register_gatt_attribute(
+        &mut self,
+        handle: u16,
+        uuid: u16,
+        initial_value: &[u8],
+        is_notify: bool,
+    ) {
         self.gatt_attributes.push(GattAttribute {
             handle,
             uuid,
@@ -333,7 +363,8 @@ mod tests {
 
     #[test]
     fn test_bluetooth_adapter_lifecycle() {
-        let mut adapter = SimpleBluetoothAdapter::new(1, b"Sigma_BT_Host", &[0x00, 0x11, 0x22, 0x33, 0x44, 0x55]);
+        let mut adapter =
+            SimpleBluetoothAdapter::new(1, b"Sigma_BT_Host", &[0x00, 0x11, 0x22, 0x33, 0x44, 0x55]);
         assert_eq!(adapter.id(), 1);
         assert_eq!(adapter.name(), b"Sigma_BT_Host");
         assert_eq!(adapter.address(), &[0x00, 0x11, 0x22, 0x33, 0x44, 0x55]);
@@ -346,15 +377,24 @@ mod tests {
     #[test]
     fn test_bluetooth_manager_and_pairing() {
         let mut manager = SimpleBluetoothManager::new();
-        let adapter = Box::new(SimpleBluetoothAdapter::new(10, b"Adapter_1", &[0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF]));
+        let adapter = Box::new(SimpleBluetoothAdapter::new(
+            10,
+            b"Adapter_1",
+            &[0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF],
+        ));
         let id = manager.add_adapter(adapter).unwrap();
         assert_eq!(id, 10);
 
         assert!(manager.start_scan(10).is_ok());
-        assert_eq!(manager.get_adapter(10).unwrap().state(), BluetoothState::Scanning);
+        assert_eq!(
+            manager.get_adapter(10).unwrap().state(),
+            BluetoothState::Scanning
+        );
 
         let mut pairing = SimpleDevicePairing::new();
-        pairing.pair_device(10, &[0x11, 0x22, 0x33, 0x44, 0x55, 0x66]).unwrap();
+        pairing
+            .pair_device(10, &[0x11, 0x22, 0x33, 0x44, 0x55, 0x66])
+            .unwrap();
         let paired = pairing.get_paired_devices(10);
         assert_eq!(paired.len(), 1);
         assert_eq!(paired[0], &[0x11, 0x22, 0x33, 0x44, 0x55, 0x66]);
@@ -362,7 +402,8 @@ mod tests {
 
     #[test]
     fn test_sovereign_bluetooth_protocol_stack() {
-        let mut stack = SovereignBluetoothProtocolStackEngine::new([0xDC, 0x00, 0x11, 0x22, 0x33, 0x44]);
+        let mut stack =
+            SovereignBluetoothProtocolStackEngine::new([0xDC, 0x00, 0x11, 0x22, 0x33, 0x44]);
         let hci_pkt = stack.frame_hci_command(0x03, 0x0003, &[]);
         assert_eq!(hci_pkt[0], HciPacketType::Command as u8);
         assert_eq!(hci_pkt[1], 0x03);

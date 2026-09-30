@@ -4,8 +4,6 @@
 #![allow(clippy::new_without_default)]
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-
-
 // SigmaOS Sovereign bcachefs Copy-on-Write Filesystem Layer
 // Implements bcachefs-inspired CoW filesystem concepts in 100% safe Rust.
 //
@@ -18,14 +16,12 @@
 // - Snapshots and subvolumes
 // - RAID (levels 0, 1, 10, 5, 6)
 // - Reflinks (like Btrfs/XFS)
-
-
 #[cfg(any(feature = "standalone_test", test))]
+use std::string::{String, ToString};
+#[cfg(not(any(feature = "standalone_test", test)))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::vec::Vec;
 
@@ -43,9 +39,9 @@ pub enum ChecksumAlgorithm {
 impl ChecksumAlgorithm {
     pub fn name(&self) -> &'static str {
         match self {
-            ChecksumAlgorithm::None   => "none",
+            ChecksumAlgorithm::None => "none",
             ChecksumAlgorithm::Crc32c => "crc32c",
-            ChecksumAlgorithm::Crc64  => "crc64",
+            ChecksumAlgorithm::Crc64 => "crc64",
             ChecksumAlgorithm::XxHash => "xxhash",
             ChecksumAlgorithm::Sha256 => "sha256",
         }
@@ -81,20 +77,20 @@ pub enum CompressionType {
 impl CompressionType {
     pub fn name(&self) -> &'static str {
         match self {
-            CompressionType::None  => "none",
-            CompressionType::Lz4   => "lz4",
-            CompressionType::Gzip  => "gzip",
-            CompressionType::Zstd  => "zstd",
+            CompressionType::None => "none",
+            CompressionType::Lz4 => "lz4",
+            CompressionType::Gzip => "gzip",
+            CompressionType::Zstd => "zstd",
         }
     }
 
     /// Simulated compression ratio for testing (not actual compression).
     pub fn simulated_ratio(&self) -> f64 {
         match self {
-            CompressionType::None  => 1.0,
-            CompressionType::Lz4   => 0.70,
-            CompressionType::Gzip  => 0.55,
-            CompressionType::Zstd  => 0.45,
+            CompressionType::None => 1.0,
+            CompressionType::Lz4 => 0.70,
+            CompressionType::Gzip => 0.55,
+            CompressionType::Zstd => 0.45,
         }
     }
 }
@@ -104,8 +100,8 @@ impl CompressionType {
 #[derive(Debug, Clone)]
 pub struct BcachefsExtent {
     pub inode: u64,
-    pub offset: u64,      // file offset in bytes
-    pub size: u32,        // size of extent in bytes
+    pub offset: u64, // file offset in bytes
+    pub size: u32,   // size of extent in bytes
     pub checksum: u32,
     pub checksum_algo: ChecksumAlgorithm,
     pub compression: CompressionType,
@@ -133,9 +129,9 @@ impl BcachefsExtent {
 
     pub fn verify(&self, data: &[u8]) -> bool {
         match self.checksum_algo {
-            ChecksumAlgorithm::None   => true,
+            ChecksumAlgorithm::None => true,
             ChecksumAlgorithm::Crc32c => sovereign_crc32c(data) == self.checksum,
-            _                          => true, // Other algos: pass-through in simulation
+            _ => true, // Other algos: pass-through in simulation
         }
     }
 
@@ -221,7 +217,9 @@ impl BcachefsInode {
         !self.inline_data.is_empty() && self.extents.is_empty()
     }
 
-    pub fn extent_count(&self) -> usize { self.extents.len() }
+    pub fn extent_count(&self) -> usize {
+        self.extents.len()
+    }
 }
 
 // ─── bcachefs Volume ──────────────────────────────────────────────────────────
@@ -247,8 +245,10 @@ impl SovereignBcachefsVolume {
     pub fn new(label: &str, total_gb: u64) -> Self {
         let total_sectors = total_gb * 1024 * 1024 * 1024 / 512;
         SovereignBcachefsVolume {
-            uuid: [0xBC, 0xAC, 0x4E, 0xF5, 0x00, 0x01, 0x02, 0x03,
-                   0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B],
+            uuid: [
+                0xBC, 0xAC, 0x4E, 0xF5, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
+                0x0A, 0x0B,
+            ],
             label: label.to_string(),
             block_size: 4096,
             total_sectors,
@@ -275,48 +275,68 @@ impl SovereignBcachefsVolume {
     pub fn write_inode(&mut self, ino: u64, offset: u64, data: &[u8]) -> bool {
         if let Some(inode) = self.inodes.iter_mut().find(|i| i.inode == ino) {
             let sectors_needed = (data.len() as u64).div_ceil(512);
-            if sectors_needed > self.free_sectors { return false; }
+            if sectors_needed > self.free_sectors {
+                return false;
+            }
             // CoW: if data being written to existing extent with reflinks
             let is_cow = inode.extents.iter().any(|e| e.is_cow_shared);
-            if is_cow { self.cow_writes = self.cow_writes.saturating_add(1); }
+            if is_cow {
+                self.cow_writes = self.cow_writes.saturating_add(1);
+            }
             inode.write_data(offset, data);
             self.free_sectors = self.free_sectors.saturating_sub(sectors_needed);
-            self.write_count  = self.write_count.saturating_add(1);
+            self.write_count = self.write_count.saturating_add(1);
             true
-        } else { false }
+        } else {
+            false
+        }
     }
 
     pub fn create_snapshot(&mut self, name: &str, writable: bool) -> u32 {
         let id = self.next_snapshot_id;
         self.next_snapshot_id = self.next_snapshot_id.saturating_add(1);
-        self.snapshots.push(BcachefsSnapshot::new(id, 0, name, writable));
+        self.snapshots
+            .push(BcachefsSnapshot::new(id, 0, name, writable));
         id
     }
 
     pub fn reflink(&mut self, src_ino: u64, dst_ino: u64) -> bool {
         // Find source extents
-        let src_extents: Vec<BcachefsExtent> = self.inodes
+        let src_extents: Vec<BcachefsExtent> = self
+            .inodes
             .iter()
             .find(|i| i.inode == src_ino)
             .map(|i| i.extents.iter().map(|e| e.make_reflink_copy()).collect())
             .unwrap_or_default();
 
-        if src_extents.is_empty() { return false; }
+        if src_extents.is_empty() {
+            return false;
+        }
 
         // Mark source extents as shared
         if let Some(src) = self.inodes.iter_mut().find(|i| i.inode == src_ino) {
-            for e in &mut src.extents { e.is_cow_shared = true; }
+            for e in &mut src.extents {
+                e.is_cow_shared = true;
+            }
         }
 
         // Attach shared extents to destination
         if let Some(dst) = self.inodes.iter_mut().find(|i| i.inode == dst_ino) {
-            for ext in src_extents { dst.extents.push(ext); }
+            for ext in src_extents {
+                dst.extents.push(ext);
+            }
             true
-        } else { false }
+        } else {
+            false
+        }
     }
 
-    pub fn inode_count(&self) -> usize { self.inodes.len() }
-    pub fn snapshot_count(&self) -> usize { self.snapshots.len() }
+    pub fn inode_count(&self) -> usize {
+        self.inodes.len()
+    }
+    pub fn snapshot_count(&self) -> usize {
+        self.snapshots.len()
+    }
 
     pub fn used_gb(&self) -> u64 {
         let used_sectors = self.total_sectors - self.free_sectors;

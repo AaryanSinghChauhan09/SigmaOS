@@ -1,7 +1,6 @@
 // India Stack - Professional Utility Engines for Indian Krishi, Vyapaar, and Kanoon
 // Core calculators for Indian farmers, CAs/retailers, medical practitioners, structural engineers, and legal advocates
 
-
 use std::string::String;
 use std::vec::Vec;
 
@@ -146,7 +145,12 @@ impl ChikitshakCalculator {
 
     /// Calculate Creatinine Clearance (CrCl) in mL/min using the Cockcroft-Gault formula
     /// formula: ((140 - age) * weight_kg) / (72 * serum_creatinine)
-    pub fn calculate_creatinine_clearance(age: u32, weight_kg: f64, serum_creatinine: f64, is_female: bool) -> f64 {
+    pub fn calculate_creatinine_clearance(
+        age: u32,
+        weight_kg: f64,
+        serum_creatinine: f64,
+        is_female: bool,
+    ) -> f64 {
         if serum_creatinine <= 0.0 {
             return 0.0;
         }
@@ -201,7 +205,12 @@ impl AbhiyantaCalculator {
 
     /// Calculate beam deflection at center for simply supported beam under single-point load
     /// formula: (Load * L^3) / (48 * E * I)
-    pub fn calculate_beam_deflection(load_newtons: f64, length_m: f64, elasticity_pa: f64, inertia_m4: f64) -> f64 {
+    pub fn calculate_beam_deflection(
+        load_newtons: f64,
+        length_m: f64,
+        elasticity_pa: f64,
+        inertia_m4: f64,
+    ) -> f64 {
         let l3 = length_m * length_m * length_m;
         let denominator = 48.0 * elasticity_pa * inertia_m4;
         if denominator == 0.0 {
@@ -333,14 +342,19 @@ mod tests {
     #[test]
     fn test_engineer_mix_design_and_beam_deflection() {
         // M20 Mix ratios for 5 cubic meters
-        let (cement, _sand, _agg) = AbhiyantaCalculator::get_concrete_mix_ratio(ConcreteGrade::M20, 5.0);
+        let (cement, _sand, _agg) =
+            AbhiyantaCalculator::get_concrete_mix_ratio(ConcreteGrade::M20, 5.0);
         // M20 parts: 1:1.5:3. total = 5.5. cement = 1/5.5, sand = 1.5/5.5, agg = 3/5.5.
         let expected_cement = (5.0 * 1.0) / 5.5 * 1440.0;
         assert_eq!(cement, expected_cement);
 
         // Deflection for load 5000N, length 4m, E = 200GPa, I = 0.0001 m4
-        let deflection = AbhiyantaCalculator::calculate_beam_deflection(5000.0, 4.0, 200_000_000_000.0, 0.0001);
-        assert_eq!(deflection, (5000.0 * 64.0) / (48.0 * 200_000_000_000.0 * 0.0001));
+        let deflection =
+            AbhiyantaCalculator::calculate_beam_deflection(5000.0, 4.0, 200_000_000_000.0, 0.0001);
+        assert_eq!(
+            deflection,
+            (5000.0 * 64.0) / (48.0 * 200_000_000_000.0 * 0.0001)
+        );
     }
 
     #[test]
