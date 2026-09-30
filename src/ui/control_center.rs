@@ -36,9 +36,15 @@ pub struct NetworkSettingsPlug {
 }
 
 impl SwitchboardPlug for NetworkSettingsPlug {
-    fn id(&self) -> &str { "network" }
-    fn title(&self) -> &str { "Network & Wi-Fi" }
-    fn category(&self) -> ControlCenterCategory { ControlCenterCategory::Network }
+    fn id(&self) -> &str {
+        "network"
+    }
+    fn title(&self) -> &str {
+        "Network & Wi-Fi"
+    }
+    fn category(&self) -> ControlCenterCategory {
+        ControlCenterCategory::Network
+    }
     fn get_setting(&self, key: &str) -> Option<String> {
         match key {
             "wifi_enabled" => Some(self.wifi_enabled.to_string()),
@@ -70,9 +76,15 @@ pub struct DisplaySettingsPlug {
 }
 
 impl SwitchboardPlug for DisplaySettingsPlug {
-    fn id(&self) -> &str { "display" }
-    fn title(&self) -> &str { "Display & Scaling" }
-    fn category(&self) -> ControlCenterCategory { ControlCenterCategory::Display }
+    fn id(&self) -> &str {
+        "display"
+    }
+    fn title(&self) -> &str {
+        "Display & Scaling"
+    }
+    fn category(&self) -> ControlCenterCategory {
+        ControlCenterCategory::Display
+    }
     fn get_setting(&self, key: &str) -> Option<String> {
         match key {
             "resolution" => Some(self.resolution.clone()),
@@ -113,12 +125,16 @@ pub struct BareGuard<'a, T>(&'a mut T);
 #[cfg(target_os = "none")]
 impl<'a, T> core::ops::Deref for BareGuard<'a, T> {
     type Target = T;
-    fn deref(&self) -> &Self::Target { self.0 }
+    fn deref(&self) -> &Self::Target {
+        self.0
+    }
 }
 
 #[cfg(target_os = "none")]
 impl<'a, T> core::ops::DerefMut for BareGuard<'a, T> {
-    fn deref_mut(&mut self) -> &mut Self::Target { self.0 }
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        self.0
+    }
 }
 
 #[cfg(target_os = "none")]
@@ -193,7 +209,12 @@ impl UnifiedControlCenter {
         }
     }
 
-    pub fn set_plug_setting(&mut self, plug_id: &str, key: &str, value: &str) -> Result<(), String> {
+    pub fn set_plug_setting(
+        &mut self,
+        plug_id: &str,
+        key: &str,
+        value: &str,
+    ) -> Result<(), String> {
         let plug = self.plugs.get(plug_id).ok_or("Plug not found")?;
         #[cfg(not(target_os = "none"))]
         {
@@ -201,7 +222,9 @@ impl UnifiedControlCenter {
         }
         #[cfg(target_os = "none")]
         {
-            plug.lock().map_err(|_| "Lock error")?.set_setting(key, value)
+            plug.lock()
+                .map_err(|_| "Lock error")?
+                .set_setting(key, value)
         }
     }
 }
@@ -219,13 +242,29 @@ mod tests {
     #[test]
     fn test_unified_control_center() {
         let mut center = UnifiedControlCenter::new();
-        assert_eq!(center.get_plug_setting("network", "hostname").unwrap(), "sigmaos-desktop");
+        assert_eq!(
+            center.get_plug_setting("network", "hostname").unwrap(),
+            "sigmaos-desktop"
+        );
 
-        assert!(center.set_plug_setting("network", "hostname", "sigmaos-workstation").is_ok());
-        assert_eq!(center.get_plug_setting("network", "hostname").unwrap(), "sigmaos-workstation");
+        assert!(center
+            .set_plug_setting("network", "hostname", "sigmaos-workstation")
+            .is_ok());
+        assert_eq!(
+            center.get_plug_setting("network", "hostname").unwrap(),
+            "sigmaos-workstation"
+        );
 
-        assert_eq!(center.get_plug_setting("display", "resolution").unwrap(), "1920x1080");
-        assert!(center.set_plug_setting("display", "scale_factor", "1.25").is_ok());
-        assert_eq!(center.get_plug_setting("display", "scale_factor").unwrap(), "1.25");
+        assert_eq!(
+            center.get_plug_setting("display", "resolution").unwrap(),
+            "1920x1080"
+        );
+        assert!(center
+            .set_plug_setting("display", "scale_factor", "1.25")
+            .is_ok());
+        assert_eq!(
+            center.get_plug_setting("display", "scale_factor").unwrap(),
+            "1.25"
+        );
     }
 }

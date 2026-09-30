@@ -2,28 +2,23 @@
 // Interactive shell with full desktop GUI-parity and defensive auditing commands
 
 use std::collections::{BTreeMap, HashMap, HashSet};
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
-use crate::accessibility::{
-    AccessibilityFeature, AccessibilityFramework,
-    AccessibilitySetting,
-};
-use crate::compatibility::{
-    ApplicationBinary, BinaryFormat, CompatibilityManager, TargetPlatform,
-};
+use crate::accessibility::{AccessibilityFeature, AccessibilityFramework, AccessibilitySetting};
+use crate::compatibility::{ApplicationBinary, BinaryFormat, CompatibilityManager, TargetPlatform};
 use crate::customization::CustomizationEngine;
 use crate::dashboard::SystemMonitor;
 use crate::package::{UnifiedPackage, UniversalPackageManager};
-use crate::virtualization::{VirtualizationOrchestrator, VirtualizationTech, VirtualMachine, Container};
 use crate::resilience::SelfHealingModule;
 use crate::shell::zsh_bash_parity::{
     BsdDirectoryStack, FuzzyCompletionEngine, PowerlinePromptBuilder, ShellJobControl,
     ZshSyntaxHighlighter,
 };
-use crate::shell::{
-    HistoryExpansionEngine, JobControlManager,
+use crate::shell::{HistoryExpansionEngine, JobControlManager};
+use crate::virtualization::{
+    Container, VirtualMachine, VirtualizationOrchestrator, VirtualizationTech,
 };
 
 /// Shell command type
@@ -361,8 +356,8 @@ impl ShellRepl {
         } else {
             let mut suggestions = Vec::new();
             let commands = [
-                "help", "ps", "ls", "pwd", "whoami", "uname", "clear",
-                "touch", "mkdir", "theme", "profile", "a11y", "set", "get", "alias"
+                "help", "ps", "ls", "pwd", "whoami", "uname", "clear", "touch", "mkdir", "theme",
+                "profile", "a11y", "set", "get", "alias",
             ];
             for cmd in &commands {
                 if cmd.starts_with(prefix) {
@@ -418,9 +413,14 @@ impl ShellRepl {
         env_map.insert("USER".to_string(), self.current_user.clone());
         env_map.insert("PWD".to_string(), self.current_dir.clone());
 
-        let mut fully_expanded = crate::shell::zsh_bash_parity::BashParameterExpansion::expand(&alias_expanded, &env_map);
+        let mut fully_expanded = crate::shell::zsh_bash_parity::BashParameterExpansion::expand(
+            &alias_expanded,
+            &env_map,
+        );
         if fully_expanded.contains("$(( ") || fully_expanded.contains("$(((") {
-            if let Ok(val) = crate::shell::zsh_bash_parity::ShellArithmeticEvaluator::evaluate(&fully_expanded) {
+            if let Ok(val) =
+                crate::shell::zsh_bash_parity::ShellArithmeticEvaluator::evaluate(&fully_expanded)
+            {
                 let val_i64: i64 = val;
                 fully_expanded = val_i64.to_string();
             }

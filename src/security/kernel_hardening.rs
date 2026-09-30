@@ -631,10 +631,10 @@ impl SovereignRing3UserModeTssEngine {
         Self {
             tss,
             current_ring: PrivilegeRing::Ring0Kernel,
-            kernel_cs: 0x08, // Ring 0 Kernel Code Selector (GDT Index 1, RPL 0)
-            kernel_ds: 0x10, // Ring 0 Kernel Data Selector (GDT Index 2, RPL 0)
-            user_cs: 0x23,   // Ring 3 User Code Selector (GDT Index 4, RPL 3 = 0x20 | 3)
-            user_ds: 0x2B,   // Ring 3 User Data Selector (GDT Index 5, RPL 3 = 0x28 | 3)
+            kernel_cs: 0x08,    // Ring 0 Kernel Code Selector (GDT Index 1, RPL 0)
+            kernel_ds: 0x10,    // Ring 0 Kernel Data Selector (GDT Index 2, RPL 0)
+            user_cs: 0x23,      // Ring 3 User Code Selector (GDT Index 4, RPL 3 = 0x20 | 3)
+            user_ds: 0x2B,      // Ring 3 User Data Selector (GDT Index 5, RPL 3 = 0x28 | 3)
             tss_selector: 0x30, // TSS Selector (GDT Index 6)
             active_user_entry: 0,
             active_user_rsp: 0,
@@ -710,7 +710,8 @@ mod tests_tss {
 
     #[test]
     fn test_sovereign_ring3_user_mode_tss_engine() {
-        let mut engine = SovereignRing3UserModeTssEngine::new(0xFFFF_8000_0010_0000, 0xFFFF_8000_0020_0000);
+        let mut engine =
+            SovereignRing3UserModeTssEngine::new(0xFFFF_8000_0010_0000, 0xFFFF_8000_0020_0000);
 
         let rsp0 = engine.tss.rsp0;
         let ist1 = engine.tss.ist1;
@@ -724,7 +725,9 @@ mod tests_tss {
         assert_eq!(rsp0, 0xFFFF_8000_0010_8000);
 
         // Test IST configuration
-        assert!(engine.set_interrupt_stack_table(2, 0xFFFF_8000_0030_0000).is_ok());
+        assert!(engine
+            .set_interrupt_stack_table(2, 0xFFFF_8000_0030_0000)
+            .is_ok());
         let ist2 = engine.tss.ist2;
         assert_eq!(ist2, 0xFFFF_8000_0030_0000);
 
@@ -760,10 +763,12 @@ mod tests_tss {
         let user_data = GdtSegmentDescriptor::new_data_segment(PrivilegeRing::Ring3Userland);
         assert_eq!(user_data.access_byte, 0xF2);
 
-        let user_cs_sel = SovereignRing3UserModeTssEngine::calculate_selector(4, PrivilegeRing::Ring3Userland);
+        let user_cs_sel =
+            SovereignRing3UserModeTssEngine::calculate_selector(4, PrivilegeRing::Ring3Userland);
         assert_eq!(user_cs_sel, 0x23);
 
-        let user_ds_sel = SovereignRing3UserModeTssEngine::calculate_selector(5, PrivilegeRing::Ring3Userland);
+        let user_ds_sel =
+            SovereignRing3UserModeTssEngine::calculate_selector(5, PrivilegeRing::Ring3Userland);
         assert_eq!(user_ds_sel, 0x2B);
     }
 }

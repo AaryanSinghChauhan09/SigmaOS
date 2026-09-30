@@ -187,10 +187,10 @@ impl CapabilityEnforcer {
     /// Create a new security context
     pub fn create_context(&mut self) -> SecurityContext {
         let id = self.next_context_id.fetch_add(1, Ordering::SeqCst);
-        
+
         let context = SecurityContext::new(id);
         self.contexts.insert(id, context.clone());
-        
+
         context
     }
 
@@ -205,36 +205,39 @@ impl CapabilityEnforcer {
     }
 
     /// Check resource access
-    pub fn check_access(&self, context_id: u64, resource: ResourceType, permission: ResourcePermission) -> bool {
+    pub fn check_access(
+        &self,
+        context_id: u64,
+        resource: ResourceType,
+        permission: ResourcePermission,
+    ) -> bool {
         let context = self.contexts.get(&context_id);
-        
+
         match context {
-            Some(ctx) => {
-                match (resource, permission) {
-                    (ResourceType::File, ResourcePermission::Read) => {
-                        ctx.check(LinuxCapability::DacReadSearch) || ctx.check(LinuxCapability::DacOverride)
-                    }
-                    (ResourceType::File, ResourcePermission::Write) => {
-                        ctx.check(LinuxCapability::DacOverride)
-                    }
-                    (ResourceType::File, ResourcePermission::Execute) => {
-                        ctx.check(LinuxCapability::DacOverride)
-                    }
-                    (ResourceType::Process, ResourcePermission::Delete) => {
-                        ctx.check(LinuxCapability::Kill)
-                    }
-                    (ResourceType::Network, ResourcePermission::Bind) => {
-                        ctx.check(LinuxCapability::NetBindService) || ctx.check(LinuxCapability::NetAdmin)
-                    }
-                    (ResourceType::Network, ResourcePermission::Connect) => {
-                        ctx.check(LinuxCapability::NetRaw) || ctx.check(LinuxCapability::NetAdmin)
-                    }
-                    (ResourceType::System, _) => {
-                        ctx.check(LinuxCapability::SysAdmin)
-                    }
-                    _ => false,
+            Some(ctx) => match (resource, permission) {
+                (ResourceType::File, ResourcePermission::Read) => {
+                    ctx.check(LinuxCapability::DacReadSearch)
+                        || ctx.check(LinuxCapability::DacOverride)
                 }
-            }
+                (ResourceType::File, ResourcePermission::Write) => {
+                    ctx.check(LinuxCapability::DacOverride)
+                }
+                (ResourceType::File, ResourcePermission::Execute) => {
+                    ctx.check(LinuxCapability::DacOverride)
+                }
+                (ResourceType::Process, ResourcePermission::Delete) => {
+                    ctx.check(LinuxCapability::Kill)
+                }
+                (ResourceType::Network, ResourcePermission::Bind) => {
+                    ctx.check(LinuxCapability::NetBindService)
+                        || ctx.check(LinuxCapability::NetAdmin)
+                }
+                (ResourceType::Network, ResourcePermission::Connect) => {
+                    ctx.check(LinuxCapability::NetRaw) || ctx.check(LinuxCapability::NetAdmin)
+                }
+                (ResourceType::System, _) => ctx.check(LinuxCapability::SysAdmin),
+                _ => false,
+            },
             None => false,
         }
     }
@@ -283,11 +286,11 @@ mod tests {
     #[test]
     fn test_capability_set() {
         let mut set = CapabilitySet::new();
-        
+
         set.add(LinuxCapability::Chown);
         assert!(set.has(LinuxCapability::Chown));
         assert_eq!(set.count(), 1);
-        
+
         set.remove(LinuxCapability::Chown);
         assert!(!set.has(LinuxCapability::Chown));
     }
@@ -295,7 +298,7 @@ mod tests {
     #[test]
     fn test_security_context() {
         let mut ctx = SecurityContext::new(1);
-        
+
         ctx.add_permitted(LinuxCapability::Chown);
         assert!(ctx.promote(LinuxCapability::Chown));
         assert!(ctx.check(LinuxCapability::Chown));
@@ -304,7 +307,7 @@ mod tests {
     #[test]
     fn test_create_context() {
         let mut enforcer = CapabilityEnforcer::new();
-        
+
         let ctx = enforcer.create_context();
         assert_eq!(ctx.id, 1);
         assert_eq!(enforcer.context_count(), 1);
@@ -313,9 +316,9 @@ mod tests {
     #[test]
     fn test_grant_revoke() {
         let mut enforcer = CapabilityEnforcer::new();
-        
+
         let ctx = enforcer.create_context();
-        
+
         assert!(enforcer.grant(ctx.id, LinuxCapability::Chown).is_ok());
         assert!(enforcer.revoke(ctx.id, LinuxCapability::Chown).is_ok());
     }
@@ -323,19 +326,21 @@ mod tests {
     #[test]
     fn test_check_access() {
         let mut enforcer = CapabilityEnforcer::new();
-        
+
         let ctx = enforcer.create_context();
-        enforcer.grant(ctx.id, LinuxCapability::DacOverride).unwrap();
-        
+        enforcer
+            .grant(ctx.id, LinuxCapability::DacOverride)
+            .unwrap();
+
         assert!(enforcer.check_access(ctx.id, ResourceType::File, ResourcePermission::Write));
     }
 
     #[test]
     fn test_check_access_denied() {
         let mut enforcer = CapabilityEnforcer::new();
-        
+
         let ctx = enforcer.create_context();
-        
+
         // No capabilities - should be denied
         assert!(!enforcer.check_access(ctx.id, ResourceType::File, ResourcePermission::Write));
     }
@@ -343,22 +348,24 @@ mod tests {
     #[test]
     fn test_network_access() {
         let mut enforcer = CapabilityEnforcer::new();
-        
+
         let ctx = enforcer.create_context();
-        enforcer.grant(ctx.id, LinuxCapability::NetBindService).unwrap();
-        
+        enforcer
+            .grant(ctx.id, LinuxCapability::NetBindService)
+            .unwrap();
+
         assert!(enforcer.check_access(ctx.id, ResourceType::Network, ResourcePermission::Bind));
     }
 
     #[test]
     fn test_drop_all() {
         let mut ctx = SecurityContext::new(1);
-        
+
         ctx.add_permitted(LinuxCapability::Chown);
         ctx.add_effective(LinuxCapability::Chown);
-        
+
         ctx.drop_all();
-        
+
         assert!(!ctx.check(LinuxCapability::Chown));
     }
 }

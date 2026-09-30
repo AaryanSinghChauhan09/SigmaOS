@@ -1,22 +1,30 @@
-use std::string::{String, ToString};
 use std::boxed::Box;
+use std::string::{String, ToString};
 
+use core::mem;
 /// OOP-based Configuration Loader for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 201
 /// Implements system configuration management
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type ConfigID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum ConfigType { String = 0, Integer = 1, Boolean = 2, Float = 3 }
+pub enum ConfigType {
+    String = 0,
+    Integer = 1,
+    Boolean = 2,
+    Float = 3,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum ConfigError { Success = 0, NotFound = 1, InvalidType = 2 }
+pub enum ConfigError {
+    Success = 0,
+    NotFound = 1,
+    InvalidType = 2,
+}
 
 pub trait ConfigValue {
     fn id(&self) -> ConfigID;
@@ -57,7 +65,9 @@ impl SimpleConfigValue {
 }
 
 impl ConfigValue for SimpleConfigValue {
-    fn id(&self) -> ConfigID { self.id }
+    fn id(&self) -> ConfigID {
+        self.id
+    }
     fn key(&self) -> &[u8] {
         let len = self.key.iter().position(|&b| b == 0).unwrap_or(128);
         &self.key[..len]
@@ -71,12 +81,22 @@ impl ConfigValue for SimpleConfigValue {
         }
     }
     fn as_string(&self) -> &[u8] {
-        let len = self.string_value.iter().position(|&b| b == 0).unwrap_or(256);
+        let len = self
+            .string_value
+            .iter()
+            .position(|&b| b == 0)
+            .unwrap_or(256);
         &self.string_value[..len]
     }
-    fn as_integer(&self) -> i64 { self.int_value.load(Ordering::SeqCst) as i64 }
-    fn as_boolean(&self) -> bool { self.bool_value.load(Ordering::SeqCst) == 1 }
-    fn as_float(&self) -> f64 { self.int_value.load(Ordering::SeqCst) as f64 / 1000.0 }
+    fn as_integer(&self) -> i64 {
+        self.int_value.load(Ordering::SeqCst) as i64
+    }
+    fn as_boolean(&self) -> bool {
+        self.bool_value.load(Ordering::SeqCst) == 1
+    }
+    fn as_float(&self) -> f64 {
+        self.int_value.load(Ordering::SeqCst) as f64 / 1000.0
+    }
 }
 
 pub trait ConfigLoader {
@@ -111,7 +131,9 @@ impl ConfigLoader for SimpleConfigLoader {
     fn get_config(&self, key: &[u8]) -> Option<&dyn ConfigValue> {
         for config_option in &self.configs {
             if let Some(ref config) = *config_option {
-                if config.key() == key { return Some(config.as_ref()); }
+                if config.key() == key {
+                    return Some(config.as_ref());
+                }
             }
         }
         None
@@ -164,7 +186,11 @@ impl ConfigWatcher for SimpleConfigWatcher {
 
     fn unwatch_key(&mut self, key: &[u8]) {
         for i in 0..self.watchers.len() {
-            let len = self.watchers[i].0.iter().position(|&b| b == 0).unwrap_or(128);
+            let len = self.watchers[i]
+                .0
+                .iter()
+                .position(|&b| b == 0)
+                .unwrap_or(128);
             if &self.watchers[i].0[..len] == key {
                 self.watchers.remove(i);
                 return;
@@ -182,13 +208,25 @@ impl ConfigWatcher for SimpleConfigWatcher {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -206,11 +244,19 @@ impl<T> Vec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
@@ -230,7 +276,10 @@ unsafe fn free(ptr: *mut u8) {
 }
 
 #[cfg(target_os = "none")]
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];

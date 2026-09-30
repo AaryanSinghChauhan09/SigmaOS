@@ -17,21 +17,29 @@ use std::boxed::Box;
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
 /// OOP-based Hardware Abstraction Layer for SigmaOS
 /// Based on Roadmap Item 2: Hardware abstraction layer
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type DeviceID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum DeviceType { CPU = 0, Memory = 1, Storage = 2, Network = 3 }
+pub enum DeviceType {
+    CPU = 0,
+    Memory = 1,
+    Storage = 2,
+    Network = 3,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DeviceState { Uninitialized = 0, Initialized = 1, Active = 2 }
+pub enum DeviceState {
+    Uninitialized = 0,
+    Initialized = 1,
+    Active = 2,
+}
 
 pub trait Device {
     fn id(&self) -> DeviceID;
@@ -42,7 +50,10 @@ pub trait Device {
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum HALError { Success = 0, InitFailed = 1 }
+pub enum HALError {
+    Success = 0,
+    InitFailed = 1,
+}
 
 #[repr(C)]
 pub struct SimpleDevice {
@@ -53,13 +64,21 @@ pub struct SimpleDevice {
 
 impl SimpleDevice {
     pub fn new(id: DeviceID, device_type: DeviceType) -> Self {
-        SimpleDevice { id, device_type, state: AtomicUsize::new(DeviceState::Uninitialized as usize) }
+        SimpleDevice {
+            id,
+            device_type,
+            state: AtomicUsize::new(DeviceState::Uninitialized as usize),
+        }
     }
 }
 
 impl Device for SimpleDevice {
-    fn id(&self) -> DeviceID { self.id }
-    fn device_type(&self) -> DeviceType { self.device_type }
+    fn id(&self) -> DeviceID {
+        self.id
+    }
+    fn device_type(&self) -> DeviceType {
+        self.device_type
+    }
     fn state(&self) -> DeviceState {
         match self.state.load(Ordering::SeqCst) {
             1 => DeviceState::Initialized,
@@ -68,7 +87,8 @@ impl Device for SimpleDevice {
         }
     }
     fn initialize(&mut self) -> Result<(), HALError> {
-        self.state.store(DeviceState::Initialized as usize, Ordering::SeqCst);
+        self.state
+            .store(DeviceState::Initialized as usize, Ordering::SeqCst);
         Ok(())
     }
 }
@@ -85,7 +105,12 @@ pub struct SimpleHAL {
 
 impl SimpleHAL {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { SimpleHAL { devices: Vec::new(), next_id: AtomicUsize::new(1) } }
+    pub fn new() -> Self {
+        SimpleHAL {
+            devices: Vec::new(),
+            next_id: AtomicUsize::new(1),
+        }
+    }
 }
 
 impl HAL for SimpleHAL {
@@ -97,20 +122,34 @@ impl HAL for SimpleHAL {
     fn get_device(&self, id: DeviceID) -> Option<&dyn Device> {
         for device_option in &self.devices {
             if let Some(ref device) = *device_option {
-                if device.id() == id { return Some(device.as_ref()); }
+                if device.id() == id {
+                    return Some(device.as_ref());
+                }
             }
         }
         None
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -118,11 +157,19 @@ impl<T> Vec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
@@ -142,7 +189,10 @@ unsafe fn free(ptr: *mut u8) {
 }
 
 #[cfg(target_os = "none")]
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];

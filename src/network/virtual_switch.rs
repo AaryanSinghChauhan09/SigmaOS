@@ -1,10 +1,10 @@
 // SigmaOS Linux Open vSwitch & BSD if_bridge Virtual Ethernet Switch Engine
 // MAC Forwarding Database (FDB), 802.1Q VLAN Tagging/Trunking, STP Spanning Tree, SPAN Mirroring, & LACP
 
+use std::collections::BTreeMap;
 use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;
-use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SwitchPortMode {
@@ -91,7 +91,12 @@ impl VirtualSwitchEngine {
     }
 
     /// Linux `ovs-vsctl add-port`: Attaches a port with 802.1Q VLAN configuration
-    pub fn add_port(&mut self, bridge_id: usize, name: &str, mode: SwitchPortMode) -> Result<usize, &'static str> {
+    pub fn add_port(
+        &mut self,
+        bridge_id: usize,
+        name: &str,
+        mode: SwitchPortMode,
+    ) -> Result<usize, &'static str> {
         let bridge = self.bridges.get_mut(&bridge_id).ok_or("Bridge not found")?;
         let port_id = self.next_port_id;
         self.next_port_id += 1;
@@ -109,7 +114,12 @@ impl VirtualSwitchEngine {
     }
 
     /// Update Spanning Tree Protocol (STP / RSTP) port state
-    pub fn set_stp_state(&mut self, bridge_id: usize, port_id: usize, stp_state: StpPortState) -> Result<(), &'static str> {
+    pub fn set_stp_state(
+        &mut self,
+        bridge_id: usize,
+        port_id: usize,
+        stp_state: StpPortState,
+    ) -> Result<(), &'static str> {
         let bridge = self.bridges.get_mut(&bridge_id).ok_or("Bridge not found")?;
         let port = bridge.ports.get_mut(&port_id).ok_or("Port not found")?;
         port.stp_state = stp_state;
@@ -126,20 +136,30 @@ impl VirtualSwitchEngine {
         vlan_id: Option<u16>,
     ) -> Result<(FlowAction, Vec<usize>), &'static str> {
         let bridge = self.bridges.get_mut(&bridge_id).ok_or("Bridge not found")?;
-        let in_port = bridge.ports.get(&in_port_id).ok_or("Input port not found")?;
+        let in_port = bridge
+            .ports
+            .get(&in_port_id)
+            .ok_or("Input port not found")?;
 
         // 1. Check STP Port State
-        if in_port.stp_state == StpPortState::Blocking || in_port.stp_state == StpPortState::Disabled {
+        if in_port.stp_state == StpPortState::Blocking
+            || in_port.stp_state == StpPortState::Disabled
+        {
             return Ok((FlowAction::Drop, Vec::new()));
         }
 
         // 2. FDB Learning (MAC Learning)
-        if in_port.stp_state == StpPortState::Learning || in_port.stp_state == StpPortState::Forwarding {
-            bridge.fdb.insert(src_mac, FdbEntry {
-                mac_address: src_mac,
-                port_id: in_port_id,
-                age_seconds: 0,
-            });
+        if in_port.stp_state == StpPortState::Learning
+            || in_port.stp_state == StpPortState::Forwarding
+        {
+            bridge.fdb.insert(
+                src_mac,
+                FdbEntry {
+                    mac_address: src_mac,
+                    port_id: in_port_id,
+                    age_seconds: 0,
+                },
+            );
         }
 
         if in_port.stp_state != StpPortState::Forwarding {
@@ -204,10 +224,16 @@ mod tests {
         let br_id = switch.create_bridge("br0");
 
         // Add 2 ports in Access VLAN 10
-        let p1 = switch.add_port(br_id, "eth0", SwitchPortMode::Access { vlan_id: 10 }).unwrap();
-        let p2 = switch.add_port(br_id, "eth1", SwitchPortMode::Access { vlan_id: 10 }).unwrap();
+        let p1 = switch
+            .add_port(br_id, "eth0", SwitchPortMode::Access { vlan_id: 10 })
+            .unwrap();
+        let p2 = switch
+            .add_port(br_id, "eth1", SwitchPortMode::Access { vlan_id: 10 })
+            .unwrap();
         // Add 1 port in Access VLAN 20
-        let _p3 = switch.add_port(br_id, "eth2", SwitchPortMode::Access { vlan_id: 20 }).unwrap();
+        let _p3 = switch
+            .add_port(br_id, "eth2", SwitchPortMode::Access { vlan_id: 20 })
+            .unwrap();
 
         let mac_a = [0x00, 0x11, 0x22, 0x33, 0x44, 0x55];
         let mac_b = [0x00, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE];
@@ -218,7 +244,8 @@ mod tests {
         assert_eq!(targets, vec![p2]);
 
         // 2. Send frame from MAC B on Port 2 -> FDB now knows MAC A is on Port 1!
-        let (action_unicast, targets_unicast) = switch.process_frame(br_id, p2, mac_b, mac_a, None).unwrap();
+        let (action_unicast, targets_unicast) =
+            switch.process_frame(br_id, p2, mac_b, mac_a, None).unwrap();
         assert_eq!(action_unicast, FlowAction::OutputPort(p1));
         assert_eq!(targets_unicast, vec![p1]);
     }

@@ -11,9 +11,9 @@
 #![no_std]
 
 extern crate alloc;
+use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
 use core::fmt;
 
 use crate::ai::agent_runtime::{AgentId, SovereignAgentRuntime};
@@ -31,11 +31,11 @@ impl Color {
     pub const fn rgb(r: u8, g: u8, b: u8) -> Self {
         Self { r, g, b, a: 255 }
     }
-    
+
     pub const fn rgba(r: u8, g: u8, b: u8, a: u8) -> Self {
         Self { r, g, b, a }
     }
-    
+
     pub fn to_hex(&self) -> String {
         if self.a == 255 {
             alloc::format!("#{:02x}{:02x}{:02x}", self.r, self.g, self.b)
@@ -43,10 +43,10 @@ impl Color {
             alloc::format!("#{:02x}{:02x}{:02x}{:02x}", self.r, self.g, self.b, self.a)
         }
     }
-    
+
     pub fn from_hex(hex: &str) -> Result<Self, ThemeError> {
         let hex = hex.trim_start_matches('#');
-        
+
         match hex.len() {
             6 => {
                 let r = u8::from_str_radix(&hex[0..2], 16).map_err(|_| ThemeError::InvalidColor)?;
@@ -64,12 +64,12 @@ impl Color {
             _ => Err(ThemeError::InvalidColor),
         }
     }
-    
+
     /// Blend two colors together
     pub fn blend(&self, other: &Color, ratio: f32) -> Self {
         let ratio = ratio.clamp(0.0, 1.0);
         let inv = 1.0 - ratio;
-        
+
         Self::rgba(
             ((self.r as f32 * inv) + (other.r as f32 * ratio)) as u8,
             ((self.g as f32 * inv) + (other.g as f32 * ratio)) as u8,
@@ -77,16 +77,16 @@ impl Color {
             ((self.a as f32 * inv) + (other.a as f32 * ratio)) as u8,
         )
     }
-    
+
     /// Calculate luminance (0.0 - 1.0)
     pub fn luminance(&self) -> f32 {
         let r = (self.r as f32 / 255.0).powf(2.2);
         let g = (self.g as f32 / 255.0).powf(2.2);
         let b = (self.b as f32 / 255.0).powf(2.2);
-        
+
         0.2126 * r + 0.7152 * g + 0.0722 * b
     }
-    
+
     /// Check if color is light or dark
     pub fn is_light(&self) -> bool {
         self.luminance() > 0.5
@@ -137,7 +137,7 @@ impl ColorScheme {
             border: Color::rgb(60, 60, 60),
         }
     }
-    
+
     pub fn light_default() -> Self {
         Self {
             background: Color::rgb(255, 255, 255),
@@ -304,76 +304,78 @@ impl ThemeEngine {
             shadows: Shadows::default(),
             animations: Animations::default(),
         };
-        
+
         let mut themes = BTreeMap::new();
         themes.insert("SigmaDefault".into(), default_theme.clone());
-        
+
         Self {
             active_theme: default_theme,
             themes,
             agent_runtime: None,
         }
     }
-    
+
     pub fn set_active_theme(&mut self, name: &str) -> Result<(), ThemeError> {
-        let theme = self.themes
+        let theme = self
+            .themes
             .get(name)
             .ok_or(ThemeError::ThemeNotFound)?
             .clone();
-        
+
         self.active_theme = theme;
         Ok(())
     }
-    
+
     pub fn get_active_theme(&self) -> &Theme {
         &self.active_theme
     }
-    
+
     pub fn add_theme(&mut self, theme: Theme) {
         self.themes.insert(theme.name.clone(), theme);
     }
-    
+
     pub fn remove_theme(&mut self, name: &str) -> Result<(), ThemeError> {
         if name == "SigmaDefault" {
             return Err(ThemeError::CannotRemoveDefault);
         }
-        
+
         self.themes.remove(name).ok_or(ThemeError::ThemeNotFound)?;
         Ok(())
     }
-    
+
     pub fn list_themes(&self) -> Vec<String> {
         self.themes.keys().cloned().collect()
     }
-    
+
     /// Extract colors from an image (wallpaper)
     pub fn extract_from_image(&self, image_data: &[u8]) -> Result<ColorScheme, ThemeError> {
         // Simple color extraction algorithm
         // In production, would use k-means clustering or similar
-        
+
         if image_data.len() < 12 {
             return Err(ThemeError::InvalidImage);
         }
-        
+
         // Sample dominant colors (simplified)
         let mut colors: Vec<Color> = Vec::new();
-        
+
         for chunk in image_data.chunks(4) {
             if chunk.len() >= 3 {
                 colors.push(Color::rgb(chunk[0], chunk[1], chunk[2]));
             }
         }
-        
+
         // Sort by luminance
-        colors.sort_by(|a, b| {
-            a.luminance().partial_cmp(&b.luminance()).unwrap()
-        });
-        
+        colors.sort_by(|a, b| a.luminance().partial_cmp(&b.luminance()).unwrap());
+
         // Pick dark/light and accent colors
         let background = colors.first().copied().unwrap_or(Color::rgb(30, 30, 30));
         let foreground = colors.last().copied().unwrap_or(Color::rgb(255, 255, 255));
-        let accent = colors.get(colors.len() / 2).copied().unwrap_or(Color::rgb(100, 149, 237));
-        
+        let accent = colors
+            .get(colors.len() / 2)
+            .copied()
+            .unwrap_or(Color::rgb(100, 149, 237));
+
         Ok(ColorScheme {
             background,
             foreground,
@@ -388,7 +390,7 @@ impl ThemeEngine {
             border: background.blend(&foreground, 0.1),
         })
     }
-    
+
     /// Generate theme from description using AI agent
     pub fn generate_from_description(
         &mut self,
@@ -398,7 +400,7 @@ impl ThemeEngine {
         // Generate a theme based on description keywords and agent integration
         let is_dark = description.to_lowercase().contains("dark");
         let is_light = description.to_lowercase().contains("light");
-        
+
         let colors = if is_dark {
             ColorScheme::dark_default()
         } else if is_light {
@@ -406,7 +408,7 @@ impl ThemeEngine {
         } else {
             ColorScheme::dark_default()
         };
-        
+
         Ok(Theme {
             name: "Generated".into(),
             colors,
@@ -444,43 +446,43 @@ impl fmt::Display for ThemeError {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_color_hex() {
         let color = Color::rgb(255, 128, 64);
         assert_eq!(color.to_hex(), "#ff8040");
-        
+
         let parsed = Color::from_hex("#ff8040").unwrap();
         assert_eq!(parsed, color);
     }
-    
+
     #[test]
     fn test_color_blend() {
         let black = Color::rgb(0, 0, 0);
         let white = Color::rgb(255, 255, 255);
         let gray = black.blend(&white, 0.5);
-        
+
         assert!(gray.r > 100 && gray.r < 155);
     }
-    
+
     #[test]
     fn test_color_luminance() {
         let black = Color::rgb(0, 0, 0);
         let white = Color::rgb(255, 255, 255);
-        
+
         assert!(black.luminance() < 0.1);
         assert!(white.luminance() > 0.9);
         assert!(!black.is_light());
         assert!(white.is_light());
     }
-    
+
     #[test]
     fn test_theme_engine() {
         let mut engine = ThemeEngine::new();
-        
+
         assert_eq!(engine.list_themes().len(), 1);
         assert!(engine.list_themes().contains(&"SigmaDefault".into()));
-        
+
         let theme = Theme {
             name: "CustomTheme".into(),
             colors: ColorScheme::light_default(),
@@ -490,10 +492,10 @@ mod tests {
             shadows: Shadows::default(),
             animations: Animations::default(),
         };
-        
+
         engine.add_theme(theme);
         assert_eq!(engine.list_themes().len(), 2);
-        
+
         engine.set_active_theme("CustomTheme").unwrap();
         assert_eq!(engine.get_active_theme().name, "CustomTheme");
     }

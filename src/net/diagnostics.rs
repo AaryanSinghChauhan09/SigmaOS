@@ -106,7 +106,11 @@ impl TraceRouteResult {
 
     pub fn get_summary(&self) -> String {
         if self.success {
-            let mut summary = format!("Trace route to {} ({} hops):\n", self.target, self.hops.len());
+            let mut summary = format!(
+                "Trace route to {} ({} hops):\n",
+                self.target,
+                self.hops.len()
+            );
             for hop in &self.hops {
                 summary.push_str(&format!(
                     "  {}: {} ({}) - {:.2} ms\n",
@@ -231,7 +235,12 @@ pub struct NetworkConnection {
 }
 
 impl NetworkConnection {
-    pub fn new(protocol: String, local_address: String, remote_address: String, state: String) -> Self {
+    pub fn new(
+        protocol: String,
+        local_address: String,
+        remote_address: String,
+        state: String,
+    ) -> Self {
         NetworkConnection {
             protocol,
             local_address,
@@ -282,9 +291,7 @@ pub struct NetworkDiagnostics {
 
 impl Default for NetworkDiagnostics {
     fn default() -> Self {
-        NetworkDiagnostics {
-            enabled: true,
-        }
+        NetworkDiagnostics { enabled: true }
     }
 }
 
@@ -312,7 +319,7 @@ impl NetworkDiagnostics {
 
         let mut result = PingResult::new(target.clone());
         result.packets_sent = count;
-        
+
         // Simulate ping result
         result.packets_received = count;
         result.packet_loss_percent = 0.0;
@@ -320,7 +327,7 @@ impl NetworkDiagnostics {
         result.max_rtt_ms = 20.0;
         result.avg_rtt_ms = 15.0;
         result.success = true;
-        
+
         result
     }
 
@@ -330,20 +337,17 @@ impl NetworkDiagnostics {
         }
 
         let mut result = TraceRouteResult::new(target.clone());
-        
+
         // Simulate trace route
         for i in 1..=max_hops.min(10) {
-            let mut hop = TraceRouteHop::new(
-                i,
-                format!("hop-{}", i),
-                format!("192.168.{}.{}", i, 1),
-            );
+            let mut hop =
+                TraceRouteHop::new(i, format!("hop-{}", i), format!("192.168.{}.{}", i, 1));
             hop.add_rtt(10.0 + i as f32);
             hop.add_rtt(12.0 + i as f32);
             hop.add_rtt(11.0 + i as f32);
             result.add_hop(hop);
         }
-        
+
         result.success = true;
         result
     }
@@ -354,13 +358,13 @@ impl NetworkDiagnostics {
         }
 
         let mut result = DnsLookupResult::new(hostname.clone());
-        
+
         // Simulate DNS lookup
         result.add_ip(String::from("192.168.1.1"));
         result.add_ip(String::from("192.168.1.2"));
         result.query_time_ms = 5.0;
         result.success = true;
-        
+
         result
     }
 
@@ -378,7 +382,7 @@ impl NetworkDiagnostics {
         stats.errors_receive = 1;
         stats.drops_send = 0;
         stats.drops_receive = 2;
-        
+
         stats
     }
 
@@ -393,13 +397,15 @@ impl NetworkDiagnostics {
                 String::from("192.168.1.100:50000"),
                 String::from("93.184.216.34:80"),
                 String::from("ESTABLISHED"),
-            ).with_pid(1234),
+            )
+            .with_pid(1234),
             NetworkConnection::new(
                 String::from("tcp"),
                 String::from("192.168.1.100:50001"),
                 String::from("8.8.8.8:53"),
                 String::from("ESTABLISHED"),
-            ).with_pid(5678),
+            )
+            .with_pid(5678),
             NetworkConnection::new(
                 String::from("udp"),
                 String::from("192.168.1.100:50002"),
@@ -418,27 +424,27 @@ impl NetworkDiagnostics {
         bandwidth.upload_mbps = 50.0;
         bandwidth.download_mbps = 100.0;
         bandwidth.total_mbps = 150.0;
-        
+
         bandwidth
     }
 
     pub fn diagnose_connectivity(&self, target: String) -> String {
         let mut diagnosis = String::new();
-        
+
         diagnosis.push_str(&format!("Diagnosing connectivity to {}\n", target));
-        
+
         // Ping test
         let ping_result = self.ping(target.clone(), 4);
         diagnosis.push_str(&format!("Ping: {}\n", ping_result.get_summary()));
-        
+
         // DNS lookup
         let dns_result = self.nslookup(target.clone());
         diagnosis.push_str(&format!("DNS: {}\n", dns_result.get_summary()));
-        
+
         // Trace route
         let trace_result = self.traceroute(target, 10);
         diagnosis.push_str(&format!("Trace route: {}\n", trace_result.get_summary()));
-        
+
         diagnosis
     }
 }
@@ -464,7 +470,7 @@ mod tests {
         result.max_rtt_ms = 20.0;
         result.avg_rtt_ms = 15.0;
         result.success = true;
-        
+
         let summary = result.get_summary();
         assert!(summary.contains("example.com"));
         assert!(summary.contains("4 packets"));
@@ -472,25 +478,17 @@ mod tests {
 
     #[test]
     fn test_trace_route_hop_creation() {
-        let hop = TraceRouteHop::new(
-            1,
-            String::from("hop-1"),
-            String::from("192.168.1.1"),
-        );
+        let hop = TraceRouteHop::new(1, String::from("hop-1"), String::from("192.168.1.1"));
         assert_eq!(hop.hop_number, 1);
         assert_eq!(hop.hostname, "hop-1");
     }
 
     #[test]
     fn test_trace_route_hop_add_rtt() {
-        let mut hop = TraceRouteHop::new(
-            1,
-            String::from("hop-1"),
-            String::from("192.168.1.1"),
-        );
+        let mut hop = TraceRouteHop::new(1, String::from("hop-1"), String::from("192.168.1.1"));
         hop.add_rtt(10.0);
         hop.add_rtt(20.0);
-        
+
         assert_eq!(hop.rtt_ms.len(), 2);
         assert_eq!(hop.get_avg_rtt(), 15.0);
     }
@@ -505,13 +503,9 @@ mod tests {
     #[test]
     fn test_trace_route_result_add_hop() {
         let mut result = TraceRouteResult::new(String::from("example.com"));
-        let hop = TraceRouteHop::new(
-            1,
-            String::from("hop-1"),
-            String::from("192.168.1.1"),
-        );
+        let hop = TraceRouteHop::new(1, String::from("hop-1"), String::from("192.168.1.1"));
         result.add_hop(hop);
-        
+
         assert_eq!(result.hops.len(), 1);
     }
 
@@ -527,7 +521,7 @@ mod tests {
         let mut result = DnsLookupResult::new(String::from("example.com"));
         result.add_ip(String::from("192.168.1.1"));
         result.add_ip(String::from("192.168.1.2"));
-        
+
         assert_eq!(result.ip_addresses.len(), 2);
     }
 
@@ -549,7 +543,7 @@ mod tests {
         stats.errors_receive = 2;
         stats.drops_send = 3;
         stats.drops_receive = 4;
-        
+
         assert_eq!(stats.get_total_bytes(), 3000);
         assert_eq!(stats.get_total_packets(), 30);
         assert_eq!(stats.get_total_errors(), 3);
@@ -575,8 +569,9 @@ mod tests {
             String::from("192.168.1.100:50000"),
             String::from("93.184.216.34:80"),
             String::from("ESTABLISHED"),
-        ).with_pid(1234);
-        
+        )
+        .with_pid(1234);
+
         assert_eq!(conn.pid, Some(1234));
     }
 
@@ -598,7 +593,7 @@ mod tests {
         let mut diag = NetworkDiagnostics::new();
         diag.disable();
         assert!(!diag.is_enabled());
-        
+
         diag.enable();
         assert!(diag.is_enabled());
     }
@@ -607,7 +602,7 @@ mod tests {
     fn test_network_diagnostics_ping() {
         let diag = NetworkDiagnostics::new();
         let result = diag.ping(String::from("example.com"), 4);
-        
+
         assert!(result.success);
         assert_eq!(result.packets_sent, 4);
     }
@@ -616,7 +611,7 @@ mod tests {
     fn test_network_diagnostics_traceroute() {
         let diag = NetworkDiagnostics::new();
         let result = diag.traceroute(String::from("example.com"), 5);
-        
+
         assert!(result.success);
         assert_eq!(result.hops.len(), 5);
     }
@@ -625,7 +620,7 @@ mod tests {
     fn test_network_diagnostics_nslookup() {
         let diag = NetworkDiagnostics::new();
         let result = diag.nslookup(String::from("example.com"));
-        
+
         assert!(result.success);
         assert_eq!(result.ip_addresses.len(), 2);
     }
@@ -634,7 +629,7 @@ mod tests {
     fn test_network_diagnostics_get_stats() {
         let diag = NetworkDiagnostics::new();
         let stats = diag.get_stats(String::from("eth0"));
-        
+
         assert_eq!(stats.interface, "eth0");
         assert!(stats.bytes_sent > 0);
     }
@@ -643,7 +638,7 @@ mod tests {
     fn test_network_diagnostics_get_connections() {
         let diag = NetworkDiagnostics::new();
         let connections = diag.get_connections();
-        
+
         assert!(!connections.is_empty());
         assert_eq!(connections.len(), 3);
     }
@@ -652,7 +647,7 @@ mod tests {
     fn test_network_diagnostics_get_bandwidth() {
         let diag = NetworkDiagnostics::new();
         let bandwidth = diag.get_bandwidth(String::from("eth0"));
-        
+
         assert_eq!(bandwidth.interface, "eth0");
         assert!(bandwidth.download_mbps > 0);
     }
@@ -661,7 +656,7 @@ mod tests {
     fn test_network_diagnostics_diagnose_connectivity() {
         let diag = NetworkDiagnostics::new();
         let diagnosis = diag.diagnose_connectivity(String::from("example.com"));
-        
+
         assert!(diagnosis.contains("Diagnosing connectivity"));
         assert!(diagnosis.contains("Ping"));
         assert!(diagnosis.contains("DNS"));
@@ -672,10 +667,10 @@ mod tests {
     fn test_network_diagnostics_disabled() {
         let mut diag = NetworkDiagnostics::new();
         diag.disable();
-        
+
         let result = diag.ping(String::from("example.com"), 4);
         assert!(!result.success);
-        
+
         let stats = diag.get_stats(String::from("eth0"));
         assert_eq!(stats.bytes_sent, 0);
     }

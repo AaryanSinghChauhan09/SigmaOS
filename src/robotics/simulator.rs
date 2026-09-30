@@ -22,7 +22,9 @@ use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Vector3 {
-    pub x: f64, pub y: f64, pub z: f64,
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
 }
 
 impl Vector3 {
@@ -68,12 +70,12 @@ impl PhysicsWorld {
             if body.mass > 0.0 {
                 // Apply gravity
                 body.velocity.y += self.gravity.y * dt;
-                
+
                 // Update position
                 body.position.x += body.velocity.x * dt;
                 body.position.y += body.velocity.y * dt;
                 body.position.z += body.velocity.z * dt;
-                
+
                 // Simple ground collision at y = 0
                 if body.position.y < 0.0 {
                     body.position.y = 0.0;
@@ -92,21 +94,21 @@ mod tests {
     fn test_physics_step() {
         let mut world = PhysicsWorld::new();
         let id = world.add_body(1.0, Vector3::new(0.0, 10.0, 0.0));
-        
+
         world.step(1.0); // 1 second step
-        
+
         let body = &world.bodies[id as usize];
         assert_eq!(body.velocity.y, -9.81);
         assert_eq!(body.position.y, 10.0 - 9.81);
     }
-    
+
     #[test]
     fn test_ground_collision() {
         let mut world = PhysicsWorld::new();
         let id = world.add_body(1.0, Vector3::new(0.0, 1.0, 0.0));
-        
+
         world.step(1.0); // Will fall past 0 and trigger collision
-        
+
         let body = &world.bodies[id as usize];
         assert_eq!(body.position.y, 0.0);
         assert_eq!(body.velocity.y, 0.0);

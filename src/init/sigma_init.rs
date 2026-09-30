@@ -1,22 +1,31 @@
-
 /// OOP-based Lightweight Init System for SigmaOS
 /// Based on Ideas-999-Structured: Core System Item 5
 /// Implements minimal init system with service management, dependency resolution, parallel startup
-
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use std::vec::Vec;
 use std::boxed::Box;
+use std::vec::Vec;
 
 pub type ServiceID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum ServiceState { Stopped = 0, Starting = 1, Running = 2, Stopping = 3, Failed = 4 }
+pub enum ServiceState {
+    Stopped = 0,
+    Starting = 1,
+    Running = 2,
+    Stopping = 3,
+    Failed = 4,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum InitError { Success = 0, ServiceNotFound = 1, DependencyFailed = 2, StartFailed = 3, StopFailed = 4 }
+pub enum InitError {
+    Success = 0,
+    ServiceNotFound = 1,
+    DependencyFailed = 2,
+    StartFailed = 3,
+    StopFailed = 4,
+}
 
 pub trait Service {
     fn id(&self) -> ServiceID;
@@ -55,12 +64,14 @@ impl SimpleService {
 }
 
 impl Service for SimpleService {
-    fn id(&self) -> ServiceID { self.id }
+    fn id(&self) -> ServiceID {
+        self.id
+    }
     fn name(&self) -> &[u8] {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-    fn state(&self) -> ServiceState { 
+    fn state(&self) -> ServiceState {
         match self.state.load(Ordering::SeqCst) {
             0 => ServiceState::Stopped,
             1 => ServiceState::Starting,
@@ -70,18 +81,24 @@ impl Service for SimpleService {
             _ => ServiceState::Stopped,
         }
     }
-    fn dependencies(&self) -> Vec<ServiceID> { self.deps.clone() }
+    fn dependencies(&self) -> Vec<ServiceID> {
+        self.deps.clone()
+    }
 
     fn start(&mut self) -> Result<(), InitError> {
-        self.state.store(ServiceState::Starting as usize, Ordering::SeqCst);
-        self.state.store(ServiceState::Running as usize, Ordering::SeqCst);
+        self.state
+            .store(ServiceState::Starting as usize, Ordering::SeqCst);
+        self.state
+            .store(ServiceState::Running as usize, Ordering::SeqCst);
         self.pid.store(self.id + 1000, Ordering::SeqCst);
         Ok(())
     }
 
     fn stop(&mut self) -> Result<(), InitError> {
-        self.state.store(ServiceState::Stopping as usize, Ordering::SeqCst);
-        self.state.store(ServiceState::Stopped as usize, Ordering::SeqCst);
+        self.state
+            .store(ServiceState::Stopping as usize, Ordering::SeqCst);
+        self.state
+            .store(ServiceState::Stopped as usize, Ordering::SeqCst);
         self.pid.store(0, Ordering::SeqCst);
         Ok(())
     }
@@ -151,12 +168,12 @@ impl InitSystem for SigmaInit {
             }
             deps_vec
         };
-        
+
         // Start dependencies first
         for dep_id in deps {
             self.start_service(dep_id)?;
         }
-        
+
         // Now start the service itself
         for svc_option in &mut self.services {
             if let Some(ref mut svc) = *svc_option {
@@ -182,7 +199,9 @@ impl InitSystem for SigmaInit {
     fn get_service(&self, id: ServiceID) -> Option<&dyn Service> {
         for svc_option in &self.services {
             if let Some(ref svc) = *svc_option {
-                if svc.id() == id { return Some(svc.as_ref()); }
+                if svc.id() == id {
+                    return Some(svc.as_ref());
+                }
             }
         }
         None
@@ -210,7 +229,9 @@ pub struct SimpleDependencyResolver {
 }
 
 impl SimpleDependencyResolver {
-    pub fn new(init: SigmaInit) -> Self { SimpleDependencyResolver { init } }
+    pub fn new(init: SigmaInit) -> Self {
+        SimpleDependencyResolver { init }
+    }
 }
 
 impl DependencyResolver for SimpleDependencyResolver {
@@ -242,7 +263,12 @@ impl DependencyResolver for SimpleDependencyResolver {
 }
 
 impl SimpleDependencyResolver {
-    fn visit(&self, id: ServiceID, order: &mut Vec<ServiceID>, visited: &mut Vec<ServiceID>) -> Result<(), InitError> {
+    fn visit(
+        &self,
+        id: ServiceID,
+        order: &mut Vec<ServiceID>,
+        visited: &mut Vec<ServiceID>,
+    ) -> Result<(), InitError> {
         if visited.contains(&id) {
             return Ok(());
         }
@@ -259,7 +285,12 @@ impl SimpleDependencyResolver {
         Ok(())
     }
 
-    fn has_cycle(&self, id: ServiceID, visited: &mut Vec<ServiceID>, rec_stack: &mut Vec<ServiceID>) -> bool {
+    fn has_cycle(
+        &self,
+        id: ServiceID,
+        visited: &mut Vec<ServiceID>,
+        rec_stack: &mut Vec<ServiceID>,
+    ) -> bool {
         visited.push(id);
         rec_stack.push(id);
 
@@ -343,7 +374,9 @@ pub struct SovereignJournalLogger {
 
 impl SovereignJournalLogger {
     pub fn new() -> Self {
-        Self { log_buffer: Vec::new() }
+        Self {
+            log_buffer: Vec::new(),
+        }
     }
 
     pub fn log_entry(&mut self, service_id: ServiceID, message: &str) {
@@ -559,7 +592,9 @@ mod tests {
         assert!(!r_init.user_daemon_active);
 
         // Try launching a container before starting System daemon -> should fail
-        assert!(r_init.launch_container("test", "img", ContainerDaemonType::SystemDaemon).is_err());
+        assert!(r_init
+            .launch_container("test", "img", ContainerDaemonType::SystemDaemon)
+            .is_err());
 
         // Start system daemon (PID 1)
         r_init.start_system_daemon();
@@ -567,7 +602,9 @@ mod tests {
         assert_eq!(r_init.system_containers.len(), 2); // syslog and udev seeded
 
         // Launch system-level container (e.g. ntp daemon)
-        let ntp_id = r_init.launch_container("ntpd", "system-ntpd", ContainerDaemonType::SystemDaemon).unwrap();
+        let ntp_id = r_init
+            .launch_container("ntpd", "system-ntpd", ContainerDaemonType::SystemDaemon)
+            .unwrap();
         assert_eq!(ntp_id, 3);
         assert_eq!(r_init.system_containers.len(), 3);
 
@@ -576,7 +613,9 @@ mod tests {
         assert!(r_init.user_daemon_active);
 
         // Launch user-level workload container
-        let web_id = r_init.launch_container("nginx", "user-nginx", ContainerDaemonType::UserDaemon).unwrap();
+        let web_id = r_init
+            .launch_container("nginx", "user-nginx", ContainerDaemonType::UserDaemon)
+            .unwrap();
         assert_eq!(web_id, 1);
         assert_eq!(r_init.user_containers.len(), 1);
     }
@@ -603,9 +642,18 @@ mod tests {
 
         // Start shell_svc (should cascade & start filesystem and networking)
         assert!(init.start_service(3).is_ok());
-        assert_eq!(init.get_service(1).unwrap().state() as usize, ServiceState::Running as usize);
-        assert_eq!(init.get_service(2).unwrap().state() as usize, ServiceState::Running as usize);
-        assert_eq!(init.get_service(3).unwrap().state() as usize, ServiceState::Running as usize);
+        assert_eq!(
+            init.get_service(1).unwrap().state() as usize,
+            ServiceState::Running as usize
+        );
+        assert_eq!(
+            init.get_service(2).unwrap().state() as usize,
+            ServiceState::Running as usize
+        );
+        assert_eq!(
+            init.get_service(3).unwrap().state() as usize,
+            ServiceState::Running as usize
+        );
 
         // Validate SovereignManifest & SovereignJournalLogger
         let fs_manifest = SovereignServiceManifest::new(1, "filesystem", "/usr/bin/fsd", &[]);
