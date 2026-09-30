@@ -23,6 +23,9 @@ distro is responsible for Linux/BSD distro compatibility and gateway.
 - Commit hardcoded secrets or keys
 - Introduce memory safety violations
 - Break compatibility without documentation
+- Treat package suffix recognition or a distro mode enum as full distro compatibility
+- Mark authentication successful without a trusted credential provider
+- Claim a model, status string, or test fixture performs real OS integration
 
 ## Open Source Inspiration
 
@@ -39,9 +42,10 @@ distro is responsible for Linux/BSD distro compatibility and gateway.
 ## Implementation Status
 
 ### Current State
-- **Implemented**: Core functionality is implemented
-- **In Progress**: Advanced features and optimizations
-- **Planned**: Additional distro compatibility layers
+- **Verified**: Report distro support only for call paths integrated with the target system and tested against its real interfaces.
+- **Models**: Distro mode maps and compatibility bridges describe policy or behavior; they are not host OS integrations by themselves.
+- **Unavailable**: Authentication and package operations must fail closed when trusted providers and runtime adapters are absent.
+- **Planned**: Track missing distro integrations and validation per subsystem rather than treating a mode selector as parity.
 
 ### Testing
 - **Unit Tests**: Implemented for core functions
@@ -77,6 +81,9 @@ cargo fmt
 - Use safe Rust patterns
 - Prefer alloc:: over std:: for kernel code
 - Implement comprehensive error handling
+- Keep authentication unsupported until credentials are checked by a trusted PAM/BSD-auth/systemd-homed provider.
+- Verify new distro-mode mappings with focused tests and preserve unavailable behavior for unintegrated security operations.
+- Update the canonical Wiki topic, repository mirrors, and `COMPLETION_STATUS.md`; label compatibility models separately from runtime integration.
 
 ## Known Issues
 
