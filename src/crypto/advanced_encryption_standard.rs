@@ -234,55 +234,24 @@ impl OpenBsdCryptodevFrameworkEngine {
     }
 
     /// `CIOCGSESSION`: Open a new cryptodev session
-    pub fn create_session(&mut self, cipher: AesCipherMode, key: &[u8], hardware_accel: bool) -> Result<u64, String> {
-        if key.is_empty() {
-            return Err("EINVAL: Key cannot be empty for cryptodev session".to_string());
-        }
-
-        let session_id = self.next_session_id;
-        self.next_session_id += 1;
-
-        let session = CryptodevSession {
-            session_id,
-            cipher,
-            key: key.to_vec(),
-            hardware_accelerated: hardware_accel,
-            created_at_sec: 1700000000,
-        };
-
-        self.sessions.insert(session_id, session);
-        Ok(session_id)
+    pub fn create_session(
+        &mut self,
+        _cipher: AesCipherMode,
+        _key: &[u8],
+        _hardware_accel: bool,
+    ) -> Result<u64, String> {
+        Err("ENOTSUP: audited cryptographic provider unavailable".to_string())
     }
 
     /// `CIOCCRYPT`: Execute symmetric crypto operation under session
     pub fn process_crypto_op(
         &self,
-        session_id: u64,
-        data: &[u8],
-        iv: &[u8],
-        encrypt: bool,
+        _session_id: u64,
+        _data: &[u8],
+        _iv: &[u8],
+        _encrypt: bool,
     ) -> Result<Vec<u8>, String> {
-        let session = self
-            .sessions
-            .get(&session_id)
-            .ok_or_else(|| format!("EINVAL: Cryptodev session ID {} not found", session_id))?;
-
-        let mut output = data.to_vec();
-
-        // Perform crypto transformation according to session cipher mode
-        for i in 0..output.len() {
-            let key_byte = session.key[i % session.key.len()];
-            let iv_byte = if !iv.is_empty() { iv[i % iv.len()] } else { 0 };
-
-            if encrypt {
-                output[i] = output[i].wrapping_add(key_byte ^ iv_byte).rotate_left(1);
-            } else {
-                let unrotated = output[i].rotate_right(1);
-                output[i] = unrotated.wrapping_sub(key_byte ^ iv_byte);
-            }
-        }
-
-        Ok(output)
+        Err("ENOTSUP: audited cryptographic provider unavailable".to_string())
     }
 
     /// `CIOCFSESSION`: Close and free cryptodev session
@@ -451,23 +420,18 @@ mod tests {
     }
 
     #[test]
-    fn test_openbsd_cryptodev_framework_session() {
+    fn cryptodev_fails_closed_without_audited_provider() {
         let mut cryptodev = OpenBsdCryptodevFrameworkEngine::new();
-
-        let key = b"0123456789abcdef0123456789abcdef"; // 32-byte key
-        let sess_id = cryptodev.create_session(AesCipherMode::Gcm, key, true).unwrap();
-
-        let plaintext = b"Cryptodev openbsd session payload verification";
-        let iv = b"123456789012";
-
-        let ciphertext = cryptodev.process_crypto_op(sess_id, plaintext, iv, true).unwrap();
-        assert_ne!(plaintext.to_vec(), ciphertext);
-
-        let decrypted = cryptodev.process_crypto_op(sess_id, &ciphertext, iv, false).unwrap();
-        assert_eq!(plaintext.to_vec(), decrypted);
-
-        cryptodev.close_session(sess_id).unwrap();
-        assert!(cryptodev.get_session(sess_id).is_none());
+        assert_eq!(
+            cryptodev.create_session(AesCipherMode::Gcm, &[], true),
+            Err("ENOTSUP: audited cryptographic provider unavailable".to_string())
+        );
+        assert!(cryptodev.get_session(1).is_none());
+        assert_eq!(
+            cryptodev.process_crypto_op(1, &[], &[], true),
+            Err("ENOTSUP: audited cryptographic provider unavailable".to_string())
+        );
+        assert!(cryptodev.close_session(1).is_err());
     }
 
     #[test]
