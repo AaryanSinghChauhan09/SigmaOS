@@ -232,15 +232,17 @@ impl WirelessAccessPointController {
         passphrase: &str,
         client_mac: &str,
     ) -> Result<bool, &'static str> {
+        if ssid.is_empty()
+            || ssid.len() > 32
+            || ssid.as_bytes().iter().any(|byte| byte.is_ascii_control())
+        {
+            return Err("Wireless Error: invalid SSID");
+        }
         if !self.mac_whitelist.is_empty() && !self.mac_whitelist.contains(&client_mac.to_string()) {
             return Err("Wireless Error: Client MAC not in whitelist");
         }
         if !(8..=64).contains(&passphrase.len()) {
             return Err("Wireless Error: invalid WPA3 passphrase length");
-        }
-
-        if ssid == "SigmaSovereignMesh" {
-            return Ok(true);
         }
 
         // Report unavailable until an actual wireless provider confirms the connection.
@@ -566,9 +568,12 @@ mod tests {
         wap.add_mac_filter("00:11:22:33:44:55");
         assert_eq!(wap.scan_wireless_aps(), 0);
 
-        assert!(wap
-            .connect_wireless_ap("SigmaSovereignMesh", "password123", "00:11:22:33:44:55")
-            .is_ok());
+        let passphrase = "x".repeat(8);
+        assert_eq!(
+            wap.connect_wireless_ap("test-network", &passphrase, "00:11:22:33:44:55"),
+            Err("Wireless Error: wireless provider unavailable")
+        );
+        assert!(wap.connected_ap_ssid.is_none());
     }
 
     #[test]
