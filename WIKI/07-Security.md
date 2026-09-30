@@ -176,6 +176,14 @@ integration exist.
 
 ## Authentication and randomness
 
+The standalone `src/crypto/primitives.rs` SHA-256 implementation is only for
+content digests; its empty, short, and padding-boundary vectors are tested.
+Its AES-256-shaped and random-key APIs return `ProviderNotIntegrated` and do
+not modify caller buffers until a vetted provider is connected. Its xorshift
+generator is deterministic simulation state, not secure randomness. The
+`xor_bytes` helper rejects unequal input/output lengths rather than indexing
+past a buffer.
+
 The exported PAM model currently fails closed: without a secure random source
 and an audited password hashing provider, it will not register users or
 authenticate credentials. `security::crypto_utils::SecureRandom` and its

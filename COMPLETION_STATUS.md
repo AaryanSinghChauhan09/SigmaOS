@@ -2,7 +2,7 @@
 
 **Snapshot date:** 2026-09-30
 **Remote:** `AaryanSinghChauhan09/SigmaOS`
-**Latest verified code snapshot:** `fe51380cb6`
+**Latest verified code snapshot:** `19c42da69f`
 
 This file records verified work and known limitations. It does not claim that SigmaOS matches Linux or BSD feature parity, is production-ready, or has completed every roadmap idea.
 
@@ -22,6 +22,7 @@ This file records verified work and known limitations. It does not claim that Si
 - Disabled the `libsodium`-shaped cryptographic primitives because no audited provider is integrated; initialization now reports unavailable and key generation, encryption, authentication, hashes, signatures, scalar multiplication, and random bytes all return provider errors without placeholder output.
 - Disabled fake hash/HMAC and key-derivation/password-hash output in `src/crypto/hash.rs` and `src/crypto/kdf.rs`; these APIs return provider-unavailable errors. Removed unused custom raw-pointer vectors and removed an unsafe enum transmute.
 - Disabled deterministic PQC key/signature/HKDF and XOR-like FDE operations in `src/crypto/postquantum.rs`; they now return `ProviderUnavailable`. Removed that module's unused custom raw-pointer vector implementation.
+- Repaired SHA-256 final-block padding and added standard vectors covering empty input and 56/64-byte boundaries; changed AES-shaped and random-key APIs to fail closed, and made `xor_bytes` reject mismatched buffers without indexing out of bounds.
 - Disabled timestamp/hardware-mixed pseudo-random output, reported hardware entropy unavailable instead of fabricating values, and made the simulated crypto audit report no verified algorithms.
 - Removed the unsynchronized `static mut` RNG pool and fake ChaCha-like output from `klib::rand`; secure byte/range requests now return `EntropyUnavailable`. `klib::rng::OsRng` also fails closed, while `SigmaRng` is clearly a deterministic simulation generator and uses an atomic compare/exchange update.
 - Made cross-distro authentication fail closed because no trusted credential provider exists.
@@ -34,6 +35,7 @@ This file records verified work and known limitations. It does not claim that Si
 - Focused library tests passed for `tr` (5), PQC empty-input handling (2), distro authentication (11), package lookup (3), launcher search (6), AES fail-closed behavior (2), XOR encryption (1), vault adapters (1), secret manager (3), unavailable PQC provider (1), secure randomness/password hashing failure (1), PAM registration fail-closed behavior (1), and clipboard plaintext labeling (1).
 - Focused fail-closed tests passed for the RNG and simulated audit; the combined security fail-closed filter passed 7 tests.
 - The complete library suite passed after the RNG, sodium, hash, KDF, PQC, and FDE changes: 3,177 passed, 0 failed.
+- The complete library suite passed with the primitive changes: 3,179 passed, 0 failed. `cargo fmt --check` and `git diff --check` also passed.
 - `cargo check --lib` passed earlier in this work; later code changes were compiled by the focused library test builds.
 - `./run_sigma_tests.sh` passed in an earlier verification run. Python `pytest` could not run because `pytest` is not installed in the environment.
 - GitHub Actions for the latest `main` commit were queued when this snapshot was written. Their results are not yet known; check the current run list before relying on CI status.
@@ -51,6 +53,7 @@ This file records verified work and known limitations. It does not claim that Si
 ## Maintenance rules
 
 - Keep `main` as the integration branch. Merge a pull request only after reviewing its complete diff, preserving pinned workflow actions, resolving conflicts, and checking its required CI and security results.
+- For every public security API, keep provider absence explicit and fail closed; retain known-answer tests for handwritten digest code and verify all buffer lengths before indexing.
 - Delete a remote branch only after confirming it is merged or its unique work has been incorporated or deliberately retired.
 - Update one canonical Wiki page per topic and keep repository mirrors synchronized. Move a Markdown proposal to the GitHub Wiki only after its implementation and runtime claims are verified; then remove the source file in the same reviewed change.
 - Label planned, simulated, prototype, and runtime-integrated behavior accurately. Never claim complete Linux/BSD parity without evidence.
