@@ -16,10 +16,8 @@
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
-use core::mem;
-/// OOP-based Cryptographic Random Number Generator for SigmaOS
-/// Based on Ideas-999-Structured: Security & Sovereignty Item 502
-/// Implements CSPRNG with entropy collection
+/// Random-generator API placeholder. No audited CSPRNG provider is integrated,
+/// so this type must never emit key or nonce material.
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type RNGID = usize;
@@ -49,51 +47,9 @@ pub struct SimpleRandomGenerator {
 
 impl SimpleRandomGenerator {
     pub fn new(id: RNGID) -> Self {
-        let mut initial_seed = 12345_usize;
-
-        // 1. Hardware RNG (RDRAND) if available on x86_64 / x86, falling back to RDTSC
-        let mut hw_entropy: usize = 0;
-        let mut hw_success = false;
-
-        #[cfg(target_arch = "x86_64")]
-        unsafe {
-            let mut val: u64 = 0;
-            if core::arch::x86_64::_rdrand64_step(&mut val) == 1 {
-                hw_entropy = val as usize;
-                hw_success = true;
-            }
-        }
-
-        #[cfg(target_arch = "x86")]
-        unsafe {
-            let mut val: u32 = 0;
-            if core::arch::x86::_rdrand32_step(&mut val) == 1 {
-                hw_entropy = val as usize;
-                hw_success = true;
-            }
-        }
-
-        if hw_success {
-            initial_seed = initial_seed ^ hw_entropy;
-        } else {
-            // Fallback to RDTSC Time Stamp Counter if hardware RNG is not present
-            #[cfg(target_arch = "x86_64")]
-            unsafe {
-                initial_seed = initial_seed ^ (core::arch::x86_64::_rdtsc() as usize);
-            }
-            #[cfg(target_arch = "x86")]
-            unsafe {
-                initial_seed = initial_seed ^ (core::arch::x86::_rdtsc() as usize);
-            }
-        }
-
-        // 2. Dynamic pointer-derived ASLR and unique ID context mixing
-        let aslr_offset = id ^ (id.wrapping_mul(31));
-        initial_seed = initial_seed ^ aslr_offset;
-
         SimpleRandomGenerator {
             id,
-            state: AtomicUsize::new(initial_seed),
+            state: AtomicUsize::new(0),
             counter: AtomicUsize::new(0),
         }
     }
@@ -105,57 +61,7 @@ impl RandomGenerator for SimpleRandomGenerator {
     }
 
     fn next_byte(&mut self) -> Result<u8, RNGError> {
-        let counter = self.counter.fetch_add(1, Ordering::SeqCst);
-        let mut state = self.state.load(Ordering::SeqCst);
-
-        // Mix in hardware RNG on every generation step if available
-        let mut hw_byte: u8 = 0;
-        let mut hw_success = false;
-
-        #[cfg(target_arch = "x86_64")]
-        unsafe {
-            let mut val: u64 = 0;
-            if core::arch::x86_64::_rdrand64_step(&mut val) == 1 {
-                hw_byte = (val & 0xFF) as u8;
-                hw_success = true;
-                state = state ^ (val as usize);
-            }
-        }
-
-        #[cfg(target_arch = "x86")]
-        unsafe {
-            let mut val: u32 = 0;
-            if core::arch::x86::_rdrand32_step(&mut val) == 1 {
-                hw_byte = (val & 0xFF) as u8;
-                hw_success = true;
-                state = state ^ (val as usize);
-            }
-        }
-
-        if !hw_success {
-            // Fallback RDTSC mixing
-            #[cfg(target_arch = "x86_64")]
-            unsafe {
-                let rdtsc_val = core::arch::x86_64::_rdtsc();
-                hw_byte = (rdtsc_val & 0xFF) as u8;
-                state = state ^ (rdtsc_val as usize);
-            }
-            #[cfg(target_arch = "x86")]
-            unsafe {
-                let rdtsc_val = core::arch::x86::_rdtsc();
-                hw_byte = (rdtsc_val & 0xFF) as u8;
-                state = state ^ (rdtsc_val as usize);
-            }
-        }
-
-        let result = ((state.wrapping_mul(1103515245).wrapping_add(12345) + counter) % 256) as u8;
-        let final_result = result ^ hw_byte;
-
-        self.state.store(
-            state.wrapping_mul(1103515245).wrapping_add(12345),
-            Ordering::SeqCst,
-        );
-        Ok(final_result)
+        Err(RNGError::InsufficientEntropy)
     }
 
     fn next_u32(&mut self) -> Result<u32, RNGError> {
@@ -244,14 +150,8 @@ impl SimpleCSPRNG {
 }
 
 impl CSPRNG for SimpleCSPRNG {
-    fn reseed(&mut self, seed: &[u8]) -> Result<(), RNGError> {
-        self.entropy.add_entropy(0, seed);
-        let mut seed_value: usize = 0;
-        for (i, &byte) in seed.iter().enumerate() {
-            seed_value |= (byte as usize) << (i % 8) * 8;
-        }
-        self.rng.state.store(seed_value, Ordering::SeqCst);
-        Ok(())
+    fn reseed(&mut self, _seed: &[u8]) -> Result<(), RNGError> {
+        Err(RNGError::InsufficientEntropy)
     }
 
     fn generate_secure(&mut self, length: usize) -> Result<Vec<u8>, RNGError> {
@@ -268,10 +168,10 @@ impl CSPRNG for SimpleCSPRNG {
 }
 
 // ============================================================================
-// HARDWARE RNG & PRODUCTION-GRADE CRYPTOGRAPHIC SECURITY AUDIT
+// Experimental hardware RNG and audit API shapes
 // ============================================================================
 
-/// HardwareRng - Intel RDRAND & RDSEED secure hardware random number generator
+/// Hardware entropy API placeholder. Raw instructions are not a CSPRNG provider.
 pub struct HardwareRng {
     pub total_harvested_bytes: u64,
 }
@@ -283,45 +183,13 @@ impl HardwareRng {
         }
     }
 
-    /// Tries to harvest secure entropy directly from the physical hardware RNG instruction (RDRAND)
+    /// No health-tested entropy provider is integrated; never report raw entropy.
     pub fn get_hardware_u64(&mut self) -> Option<u64> {
-        let mut value: u64 = 0;
-        let success: u8;
-
-        #[cfg(target_arch = "x86_64")]
-        unsafe {
-            // Execute physical instruction rdrand
-            core::arch::asm!(
-                "rdrand {0}",
-                "setc {1}",
-                out(reg) value,
-                out(reg_byte) success,
-            );
-        }
-
-        #[cfg(not(target_arch = "x86_64"))]
-        {
-            // Dynamic cycle-counter jitter entropy source on non-x86 architectures
-            let mut state: u64 = 0x517cc1b727220a95;
-            for i in 0..16 {
-                state = state
-                    .wrapping_mul(6364136223846793005)
-                    .wrapping_add(i as u64 + 1);
-            }
-            value = state;
-            success = 1;
-        }
-
-        if success == 1 {
-            self.total_harvested_bytes += 8;
-            Some(value)
-        } else {
-            None
-        }
+        None
     }
 }
 
-/// Simulated Production-Grade Cryptographic Enclave (wrapping RustCrypto & OpenSSL equivalent APIs)
+/// Simulated audit API shape. It cannot attest production crypto integration.
 pub struct ProductionCryptoEnclave {
     pub key_checksum: u64,
     pub audit_passed: bool,
@@ -346,71 +214,51 @@ impl ProductionCryptoEnclave {
         }
     }
 
-    /// Performs a pre-deployment security audit and validates cryptographic signatures
-    pub fn perform_security_audit(&mut self, hrng: &HardwareRng) -> SecurityAuditReport {
-        self.audit_passed = true;
-        let mut algs = std::vec::Vec::new();
-        algs.push(std::string::String::from("AES-256-GCM (RustCrypto)"));
-        algs.push(std::string::String::from("Dilithium-5 (Post-Quantum)"));
-        algs.push(std::string::String::from("Kyber-1024"));
+    /// Reports unavailable until audited crypto and signature checks are integrated.
+    pub fn perform_security_audit(&mut self, _hrng: &HardwareRng) -> SecurityAuditReport {
+        self.audit_passed = false;
 
         SecurityAuditReport {
-            verified_algorithms: algs,
-            hardware_rng_active: hrng.total_harvested_bytes > 0
-                || cfg!(not(target_arch = "x86_64")),
-            signatures_intact: true,
+            verified_algorithms: std::vec::Vec::new(),
+            hardware_rng_active: false,
+            signatures_intact: false,
         }
     }
 }
 
-struct VecImpl<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
+#[cfg(test)]
+mod fail_closed_tests {
+    use super::{
+        HardwareRng, ProductionCryptoEnclave, RNGError, RandomGenerator, SimpleRandomGenerator,
+    };
 
-impl<T> VecImpl<T> {
-    fn new() -> Self {
-        VecImpl {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
+    #[test]
+    fn generator_does_not_emit_pseudo_random_bytes() {
+        let mut rng = SimpleRandomGenerator::new(7);
+        assert!(matches!(
+            rng.next_byte(),
+            Err(RNGError::InsufficientEntropy)
+        ));
+        let mut bytes = [0x5A; 8];
+        assert!(matches!(
+            rng.fill_bytes(&mut bytes),
+            Err(RNGError::InsufficientEntropy)
+        ));
+        assert_eq!(bytes, [0x5A; 8]);
     }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
 
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
+    #[test]
+    fn unavailable_hardware_rng_and_audit_do_not_claim_success() {
+        let mut rng = HardwareRng::new();
+        assert_eq!(rng.get_hardware_u64(), None);
+        rng.total_harvested_bytes = 8;
+        let mut audit = ProductionCryptoEnclave::new(b"test-key");
+        let report = audit.perform_security_audit(&rng);
+        assert!(!audit.audit_passed);
+        assert!(!report.hardware_rng_active);
+        assert!(!report.signatures_intact);
+        assert!(report.verified_algorithms.is_empty());
+    }
 }
 
 #[cfg(test_disabled)]
@@ -452,9 +300,8 @@ mod tests {
         assert!(!enclave.audit_passed);
 
         let report = enclave.perform_security_audit(&hrng);
-        assert!(enclave.audit_passed);
-        assert!(report.signatures_intact);
-        assert_eq!(report.verified_algorithms.len(), 3);
-        assert!(report.verified_algorithms[0].contains("AES-256-GCM"));
+        assert!(!enclave.audit_passed);
+        assert!(!report.signatures_intact);
+        assert!(report.verified_algorithms.is_empty());
     }
 }
