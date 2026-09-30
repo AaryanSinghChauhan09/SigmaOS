@@ -1,12 +1,12 @@
 # MASTER AI AGENT ALGORITHM DIAGNOSTICS & FIX GUIDE: WHAT'S WORKING & WHAT'S NOT WORKING
 
-This master reference guide provides AI agents and human contributors with an exhaustive diagnostic breakdown of **SigmaOS**, specifying what is currently operational, what contains parity gaps or compilation issues, **WHY** those issues exist, and the exact step-by-step **ALGORITHMS & BLUEPRINTS** required to resolve them autonomously.
+This diagnostic guide lists code areas, known gaps, and algorithms for future work. Its feature inventory is historical and is not proof of production readiness, kernel integration, Linux/BSD parity, or exhaustive test coverage. Check the current implementation and the repository-root `COMPLETION_STATUS.md` before making claims about behavior.
 
 ---
 
 ## TABLE OF CONTENTS
 1. [EXECUTIVE SUMMARY & OPERATIONAL ARCHITECTURE](#1-executive-summary--operational-architecture)
-2. [WHAT IS WORKING (100% OPERATIONAL & TESTED)](#2-what-is-working-100-operational--tested)
+2. [Code Areas with Selected Tests](#2-code-areas-with-selected-tests)
 3. [WHAT IS NOT WORKING & PARITY GAPS](#3-what-is-not-working--parity-gaps)
 4. [ROOT CAUSES: WHY ERRORS AND GAPS EXIST](#4-root-causes-why-errors-and-gaps-exist)
 5. [EXACT FIX ALGORITHMS FOR AI AGENTS](#5-exact-fix-algorithms-for-ai-agents)
@@ -21,7 +21,7 @@ This master reference guide provides AI agents and human contributors with an ex
 
 ## 1. EXECUTIVE SUMMARY & OPERATIONAL ARCHITECTURE
 
-SigmaOS is designed as a sovereign, zero-dependency, ultra-resilient operating system written in Safe Rust. The system architecture spans **12 System Shards**:
+SigmaOS is a Rust-first operating system project containing kernel, userland, and experimental subsystem code. Many interfaces are models or prototypes and are not wired to runtime hardware or system calls. Its conceptual architecture is grouped into **12 System Shards**:
 
 ```
 +---------------------------------------------------------------------------------------+
@@ -33,15 +33,15 @@ SigmaOS is designed as a sovereign, zero-dependency, ultra-resilient operating s
 +-------------------+-------------------+--------------------+--------------------------+
 ```
 
-### Key Diagnostic Distinction: Standalone Unit Testing vs. Workspace Crate Build
-- **Standalone Unit Testing (`./run_sigma_tests.sh`)**: **100% PASSING**. Every individual module's unit tests run in isolation using standalone `rustc --test` invocations.
-- **Full Workspace Compilation (`cargo check` / `cargo build`)**: **FAILING**. When compiling the crate as a single unified `lib.rs`, macro expansion collisions, re-export naming conflicts, and trait collisions across multi-distro modules trigger Rust compiler errors.
+### Verification status
+
+The repository's test and build status changes over time. A successful focused test or standalone module test does not establish system-wide runtime behavior. A previous `./run_sigma_tests.sh` run returned success, but it covers selected standalone targets rather than every feature. `cargo check --lib` passed earlier in the 2026-09-30 hardening work; focused library test builds for recently changed modules also passed. Check current GitHub Actions before relying on those results.
 
 ---
 
-## 2. WHAT IS WORKING (100% OPERATIONAL & TESTED)
+## 2. Code Areas with Selected Tests
 
-The following components are fully implemented, verified via unit tests in `./run_sigma_tests.sh`, and exhibit zero runtime panic bugs:
+The following legacy inventory identifies code paths and selected tests only. It does not claim that these components are fully implemented, have zero runtime bugs, or match their named Linux/BSD implementations.
 
 ### A. Core Kernel & Scheduling (`src/kernel/`, `src/memory/`)
 - **Acyclic Directory Graph Engine**: Cycle detection (`is_ancestor`), parent-child directed edge management (`add_directory_edge`), firmlink integration, and depth tracking (`get_depth`).
@@ -52,13 +52,13 @@ The following components are fully implemented, verified via unit tests in `./ru
 ### B. Storage, Filesystems & Encryption (`src/filesystem/`, `src/crypto/`)
 - **Multi-Distro FHS Hierarchy Engine**: Path resolution for FreeBSD (`/usr/local/bin`), NetBSD (`/usr/pkg`), OpenBSD (`/usr/X11R6/bin`), NixOS/Guix (`/nix/store`), and Fedora Silverblue (`/var/home`, `/ostree/deploy`).
 - **POSIX VFS DAC Engine**: `Inode::check_permission` supporting UID 0 root bypass, owner/group/other permission bits, and user impersonation methods (`read_file_as_user`).
-- **AES & Disk Encryption Suite**: LUKS2 dm-crypt XTS-AES-256, FreeBSD GELI HMAC-SHA256 sector integrity, OpenBSD `/dev/crypto` session framework, and Linux Kernel Crypto API transform registry.
+- **Crypto prototypes**: `src/crypto/aes.rs` and `src/crypto/encryption.rs` now fail closed with `CryptoUnavailable`; `src/crypto/advanced_encryption_standard.rs` contains simulated transformations and is not connected to the crypto module. None of these provides production AES, GELI, or `/dev/crypto` support.
 - **ATA Bus Controller**: PATA PIO transfer engine, ATAPI 12-byte SCSI packet command dispatcher, and Bus Master DMA controller with PRD table chain management.
 
 ### C. Universal Packaging & Distro Gateways (`src/package/`, `src/distro/`)
 - **Universal Package Gateway**: Support for Zypper/YaST DeltaRPM, FreeBSD VuXML / Poudriere jail builders, Homebrew bottle converter, and MacPorts Portfile parser.
 - **Multi-Distro CLI Bridge**: Translation and dispatching for 12 CLI package formats (`apt`, `pacman`, `dnf`, `zypper`, `apk`, `emerge`, `pkg`, `xbps`, `brew`, `nix`).
-- **Cross-Distro Interoperability Gateway**: Synchronization and capability querying across all 169 subsystems and 53+ Linux/BSD distro modes.
+- **Cross-Distro Interoperability Gateway**: Contains dispatch and capability-query models for many distro modes. The mode and subsystem counts are unverified and do not imply working interoperability.
 - **Universal ABI Bridge**: FreeBSD Linuxulator / NetBSD `COMPAT_LINUX`, OpenBSD `pledge`/`unveil`, and FreeBSD Capsicum rights matrices.
 
 ### D. Desktop, Gaming & Environment (`src/desktop/`, `src/installer/`)
@@ -163,14 +163,14 @@ STEP 3: Ensure top of file includes `#![no_std]` and `extern crate alloc;`.
 
 ```
 INPUT: Subsystem feature request or missing syscall/API
-OUTPUT: Native Safe-Rust `klib` implementation with 100% test coverage
+OUTPUT: Safe-Rust implementation with tests covering its defined behavior and failure cases
 
 STEP 1: Identify target shard and module in `src/`.
 STEP 2: Implement state struct, configuration enum, and error handling enum using zero third-party dependencies.
 STEP 3: Implement main processing engine and public API gateway.
 STEP 4: Re-export engine in target module's `mod.rs` and `src/lib.rs`.
 STEP 5: Add comprehensive `#[cfg(test)]` unit test suite in target file.
-STEP 6: Verify with `./run_sigma_tests.sh`.
+STEP 6: Run the focused tests and applicable repository checks; report exactly which targets ran and their results. Test coverage is not proof of runtime integration or production readiness.
 ```
 
 ---
@@ -199,7 +199,7 @@ Before finalizing any changes or submitting pull requests, AI Agents **MUST** ex
    ```bash
    ./run_sigma_tests.sh
    ```
-   *Requirement: 100% test pass rate across all test binaries.*
+   *Requirement: all selected test binaries pass; record skipped or unavailable targets and do not generalize the result to untested components.*
 
 2. **Verify Module Re-exports**:
    Inspect `src/lib.rs` and parent `mod.rs` files to confirm newly created structs/traits are cleanly re-exported without collision.
