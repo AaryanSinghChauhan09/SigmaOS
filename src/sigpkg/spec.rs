@@ -380,11 +380,17 @@ impl SimplePackageManager {
     /// eliminating redundant loop boilerplate across package manager operations.
     #[inline]
     fn find_package_index(&self, name: &[u8]) -> Option<usize> {
+        let target_len = name
+            .iter()
+            .position(|&byte| byte == 0)
+            .unwrap_or(name.len());
+        let target_name = &name[..target_len];
+
         self.packages.iter().position(|package_option| {
             if let Some(ref package) = *package_option {
                 let pkg_name = package.as_ref().name();
-                pkg_name.starts_with(name)
-                    && (pkg_name.len() == name.len() || pkg_name[name.len()] == 0)
+                pkg_name.starts_with(target_name)
+                    && pkg_name.get(target_len).map_or(true, |&byte| byte == 0)
             } else {
                 false
             }
@@ -1012,5 +1018,20 @@ mod tests {
 
         let result = mgr.resolve_dependencies(&app_pkg);
         assert!(matches!(result, Err(PackageError::DependencyNotFound)));
+    }
+
+    #[test]
+    fn package_lookup_handles_null_padded_and_overlong_names() {
+        let mut mgr = SimplePackageManager::new(ManagerCapability::full());
+        mgr.add_package(Box::new(SimplePackage::new(
+            b"libssl",
+            PackageVersion::new(1, 1, 1),
+            PackageCapability::full(),
+        )))
+        .unwrap();
+
+        assert!(mgr.get_package(b"libssl\0padding").is_some());
+        assert!(mgr.get_package(b"libssl-extra").is_none());
+        assert!(mgr.get_package(&[b'x'; 256]).is_none());
     }
 }
