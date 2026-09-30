@@ -28,17 +28,18 @@ use std::vec::Vec;
 #[derive(Debug, Clone)]
 pub struct UmemChunk {
     pub addr: u64, // offset within UMEM region
-    pub len: u32,  // actual data length
+    pub len: u32,  // maximum payload length after headroom
     pub headroom: u16,
     pub in_use: bool,
 }
 
 impl UmemChunk {
     pub fn new(addr: u64, max_len: u32) -> Self {
+        let headroom = max_len.min(256) as u16;
         UmemChunk {
             addr,
-            len: max_len,
-            headroom: 256,
+            len: max_len.saturating_sub(headroom as u32),
+            headroom,
             in_use: false,
         }
     }
@@ -270,13 +271,18 @@ impl SovereignZeroCopySocket {
 
     /// Simulate receiving a packet zero-copy from NIC DMA region.
     pub fn rx_packet(&mut self, len: u32) -> Option<usize> {
-        let chunk_idx = self.umem.alloc_chunk()?;
-        if let Some(chunk) = self.umem.chunks.get_mut(chunk_idx) {
-            chunk.len = len;
+        // `data_offset` reserves the chunk's headroom, so reject descriptors
+        // whose payload would extend beyond the backing UMEM chunk.
+        let first_chunk = self.umem.chunks.first()?;
+        let usable_len = first_chunk.len;
+        let data_offset = first_chunk.headroom as u32;
+        if len > usable_len {
+            return None;
         }
+        let chunk_idx = self.umem.alloc_chunk()?;
         let desc = PacketRingDescriptor {
             chunk_idx,
-            data_offset: 256, // past headroom
+            data_offset,
             data_len: len,
             flags: 0,
         };
@@ -307,9 +313,22 @@ impl SovereignZeroCopySocket {
 
     /// Zero-copy transmit a chunk.
     pub fn tx_packet(&mut self, chunk_idx: usize, len: u32) -> bool {
+        let Some(chunk) = self.umem.chunks.get(chunk_idx) else {
+            return false;
+        };
+        let usable_len = chunk.len;
+        if !chunk.in_use
+            || len > usable_len
+            || i32::try_from(len).is_err()
+            || self.tx_ring.available() >= self.tx_ring.capacity
+            || self.cq.pending_count() >= self.cq.capacity
+        {
+            return false;
+        }
+
         let desc = PacketRingDescriptor {
             chunk_idx,
-            data_offset: 256,
+            data_offset: chunk.headroom as u32,
             data_len: len,
             flags: 0,
         };
@@ -317,8 +336,9 @@ impl SovereignZeroCopySocket {
             self.tx_packets = self.tx_packets.saturating_add(1);
             self.tx_bytes = self.tx_bytes.saturating_add(len as u64);
             // Post completion immediately (simulate NIC DMA done)
-            self.cq.post_completion(chunk_idx as u64, len as i32);
-            true
+            // Capacity was checked above; with exclusive `&mut self` access
+            // no producer can race this post.
+            self.cq.post_completion(chunk_idx as u64, len as i32)
         } else {
             false
         }
