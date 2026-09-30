@@ -16,9 +16,13 @@ SigmaOS implements multiple layers of security:
 4. Filesystem encryption interfaces; audited providers are not integrated
 5. Network security models, which require runtime and protocol review
 
-### Password-manager prototype
+### System user credential storage
 
-`src/security/password.rs` is an in-memory API model, not a usable password vault. It does not persist `vault_path`; encryption/decryption, generated passwords, built-in fingerprint/Face ID checks, and direct `unlock` fail closed because there is no audited crypto, CSPRNG, biometric, or authentication provider. The constructor clears and discards its supplied key, and add/update clear the owned plaintext input buffer on failure or after processing. Caller-owned copies are unaffected. A caller-supplied `BiometricAuth` implementation remains responsible for real authentication before it can unlock the in-memory model. Auto-lock uses elapsed monotonic time. Do not store real credentials with this component. AI agents maintaining it must keep unavailable providers fail-closed and preserve best-effort input clearing; do not enable storage or authentication until audited providers and persistence are integrated and verified.
+`system::UserManager` does not have a vetted password-hashing provider. Its
+`set_password` returns `UserError::CryptoUnavailable` without modifying user
+or shadow records, and `verify_password` always denies. Existing demonstration
+hashes are not accepted. AI agents must preserve this fail-closed behavior and
+reject or reset legacy weak hashes if a trusted provider is later integrated.
 
 ## Pledge/Unveil Sandbox
 
@@ -199,6 +203,39 @@ The emergency shell gate does not keep a plaintext password or accept a
 signature based on fixed magic bytes. Its password and signature checks remain
 unavailable until vetted verification providers are integrated, so shell
 access fails closed.
+
+`auth::SimpleUser` has no password verifier and always returns
+`AuthError::ProviderUnavailable` for non-locked accounts. The single-user
+maintenance login likewise remains locked until a trusted password verifier
+exists. The stored byte arrays are compatibility placeholders, not hashes, and
+must not be used as credentials.
+AI agents maintaining these paths must preserve denial for all credentials and
+keep maintenance access locked until an audited password-hashing verifier and
+account-state backend are integrated. Update this guidance with any future
+provider change; never substitute direct byte or prefix comparisons.
+
+`src/functions/user.rs` has no audited password-hashing provider or account
+state backend. Hashing, verification, password changes, and account lock or
+unlock requests return `UserError::ProviderUnavailable`; they neither claim
+success nor authenticate users. Password policy checks are not authentication.
+AI agents must preserve fail-closed errors until audited hash storage and real
+account-state enforcement are integrated and reviewed.
+
+`distro::InteractiveUserEnvironment` is exported, but it has no trusted
+credential verifier. `authenticate_and_login` returns the same unavailable
+error for every credential and does not create a session; the default root
+account has no placeholder password hash. AI agents must preserve this
+fail-closed behavior until a vetted verifier and account-state backend are
+integrated and reviewed.
+
+`src/security/password.rs` is an in-memory API model, not a usable vault. It
+does not persist `vault_path`; encryption, decryption, password generation,
+biometric checks, and direct unlock fail closed without audited providers.
+Construction discards the owned key buffer, and add/update clear owned
+plaintext buffers on both success and failure; caller-owned copies are not
+cleared. AI agents must preserve unavailable-provider errors and buffer
+clearing, and must not enable real storage or authentication without reviewed
+crypto, randomness, biometric, and persistence integrations.
 
 The Fedora Cockpit and FreeIPA compatibility models do not authenticate
 sessions or mint Kerberos tickets without trusted Cockpit/KDC integrations.
