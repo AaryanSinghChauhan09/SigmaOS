@@ -3,6 +3,7 @@
 #![allow(unexpected_cfgs)]
 #![allow(clippy::new_without_default)]
 
+use std::collections::VecDeque;
 #[cfg(not(any(feature = "standalone_test", test)))]
 // SigmaOS Sovereign Zero-Copy Networking
 // Implements Linux XDP (eXpress Data Path) + io_uring-style zero-copy networking
@@ -28,17 +29,18 @@ use std::vec::Vec;
 #[derive(Debug, Clone)]
 pub struct UmemChunk {
     pub addr: u64, // offset within UMEM region
-    pub len: u32,  // actual data length
+    pub len: u32,  // maximum payload length after headroom
     pub headroom: u16,
     pub in_use: bool,
 }
 
 impl UmemChunk {
     pub fn new(addr: u64, max_len: u32) -> Self {
+        let headroom = max_len.min(256) as u16;
         UmemChunk {
             addr,
-            len: max_len,
-            headroom: 256,
+            len: max_len.saturating_sub(headroom as u32),
+            headroom,
             in_use: false,
         }
     }
@@ -99,8 +101,8 @@ impl UmemPool {
         if self.total_chunks == 0 {
             return 0;
         }
-        let used = self.total_chunks - self.free_count;
-        (used * 100) / self.total_chunks
+        let used = self.total_chunks.saturating_sub(self.free_count) as u64;
+        ((used * 100) / self.total_chunks as u64) as u32
     }
 }
 
@@ -114,7 +116,7 @@ pub struct PacketRingDescriptor {
 }
 
 pub struct XdpRing {
-    pub entries: Vec<PacketRingDescriptor>,
+    pub entries: VecDeque<PacketRingDescriptor>,
     pub capacity: usize,
     pub producer: usize,
     pub consumer: usize,
@@ -125,7 +127,7 @@ pub struct XdpRing {
 impl XdpRing {
     pub fn new(capacity: usize) -> Self {
         XdpRing {
-            entries: Vec::new(),
+            entries: VecDeque::new(),
             capacity,
             producer: 0,
             consumer: 0,
@@ -140,7 +142,7 @@ impl XdpRing {
             self.drops = self.drops.saturating_add(1);
             return false;
         }
-        self.entries.push(desc);
+        self.entries.push_back(desc);
         self.producer = self.producer.wrapping_add(1);
         true
     }
@@ -149,17 +151,10 @@ impl XdpRing {
         if self.producer == self.consumer {
             return None;
         }
-        if self.entries.is_empty() {
-            return None;
-        }
+        let descriptor = self.entries.pop_front()?;
         self.consumer = self.consumer.wrapping_add(1);
         self.packets_processed = self.packets_processed.saturating_add(1);
-        // Drain from front (FIFO)
-        if !self.entries.is_empty() {
-            Some(self.entries.remove(0))
-        } else {
-            None
-        }
+        Some(descriptor)
     }
 
     pub fn available(&self) -> usize {
@@ -188,7 +183,7 @@ pub struct IoCompletionEntry {
 }
 
 pub struct IoCompletionQueue {
-    pub entries: Vec<IoCompletionEntry>,
+    pub entries: VecDeque<IoCompletionEntry>,
     pub capacity: usize,
     pub head: usize,
     pub tail: usize,
@@ -198,7 +193,7 @@ pub struct IoCompletionQueue {
 impl IoCompletionQueue {
     pub fn new(capacity: usize) -> Self {
         IoCompletionQueue {
-            entries: Vec::new(),
+            entries: VecDeque::new(),
             capacity,
             head: 0,
             tail: 0,
@@ -210,7 +205,7 @@ impl IoCompletionQueue {
         if self.entries.len() >= self.capacity {
             return false;
         }
-        self.entries.push(IoCompletionEntry {
+        self.entries.push_back(IoCompletionEntry {
             user_data,
             result,
             flags: 0,
@@ -221,11 +216,9 @@ impl IoCompletionQueue {
     }
 
     pub fn consume(&mut self) -> Option<IoCompletionEntry> {
-        if self.entries.is_empty() {
-            return None;
-        }
+        let entry = self.entries.pop_front()?;
         self.head = self.head.wrapping_add(1);
-        Some(self.entries.remove(0))
+        Some(entry)
     }
 
     pub fn pending_count(&self) -> usize {
@@ -270,13 +263,18 @@ impl SovereignZeroCopySocket {
 
     /// Simulate receiving a packet zero-copy from NIC DMA region.
     pub fn rx_packet(&mut self, len: u32) -> Option<usize> {
-        let chunk_idx = self.umem.alloc_chunk()?;
-        if let Some(chunk) = self.umem.chunks.get_mut(chunk_idx) {
-            chunk.len = len;
+        // `data_offset` reserves the chunk's headroom, so reject descriptors
+        // whose payload would extend beyond the backing UMEM chunk.
+        let first_chunk = self.umem.chunks.first()?;
+        let usable_len = first_chunk.len;
+        let data_offset = first_chunk.headroom as u32;
+        if len > usable_len {
+            return None;
         }
+        let chunk_idx = self.umem.alloc_chunk()?;
         let desc = PacketRingDescriptor {
             chunk_idx,
-            data_offset: 256, // past headroom
+            data_offset,
             data_len: len,
             flags: 0,
         };
@@ -307,9 +305,22 @@ impl SovereignZeroCopySocket {
 
     /// Zero-copy transmit a chunk.
     pub fn tx_packet(&mut self, chunk_idx: usize, len: u32) -> bool {
+        let Some(chunk) = self.umem.chunks.get(chunk_idx) else {
+            return false;
+        };
+        let usable_len = chunk.len;
+        if !chunk.in_use
+            || len > usable_len
+            || i32::try_from(len).is_err()
+            || self.tx_ring.available() >= self.tx_ring.capacity
+            || self.cq.pending_count() >= self.cq.capacity
+        {
+            return false;
+        }
+
         let desc = PacketRingDescriptor {
             chunk_idx,
-            data_offset: 256,
+            data_offset: chunk.headroom as u32,
             data_len: len,
             flags: 0,
         };
@@ -317,8 +328,9 @@ impl SovereignZeroCopySocket {
             self.tx_packets = self.tx_packets.saturating_add(1);
             self.tx_bytes = self.tx_bytes.saturating_add(len as u64);
             // Post completion immediately (simulate NIC DMA done)
-            self.cq.post_completion(chunk_idx as u64, len as i32);
-            true
+            // Capacity was checked above; with exclusive `&mut self` access
+            // no producer can race this post.
+            self.cq.post_completion(chunk_idx as u64, len as i32)
         } else {
             false
         }

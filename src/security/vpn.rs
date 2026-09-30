@@ -97,9 +97,6 @@ pub trait VpnProtocolHandler {
 pub struct WireGuardHandler {
     state: ConnectionState,
     statistics: VpnStatistics,
-    private_key: Option<String>,
-    public_key: Option<String>,
-    peer_public_key: Option<String>,
 }
 
 impl WireGuardHandler {
@@ -114,44 +111,23 @@ impl WireGuardHandler {
                 latency_ms: 0,
                 packet_loss_percent: 0.0,
             },
-            private_key: None,
-            public_key: None,
-            peer_public_key: None,
         }
     }
 
     pub fn with_keys(
-        mut self,
+        self,
         private_key: String,
         public_key: String,
         peer_public_key: String,
     ) -> Self {
-        self.private_key = Some(private_key);
-        self.public_key = Some(public_key);
-        self.peer_public_key = Some(peer_public_key);
+        let _ = (private_key, public_key, peer_public_key);
         self
     }
 }
 
 impl VpnProtocolHandler for WireGuardHandler {
     fn connect(&mut self, _config: &VpnConfig) -> Result<VpnConnectionResult, VpnError> {
-        if self.state == ConnectionState::Connected {
-            return Err(VpnError::AlreadyConnected);
-        }
-
-        self.state = ConnectionState::Connecting;
-
-        let assigned_ip = Some(Ipv4Addr_new(10, 0, 0, 2));
-
-        self.state = ConnectionState::Connected;
-        self.statistics.connection_duration_seconds = 0;
-
-        Ok(VpnConnectionResult {
-            success: true,
-            connection_id: format!("wg_{}", 1700000000u64),
-            assigned_ip,
-            message: "WireGuard connection established".to_string(),
-        })
+        Err(VpnError::ProtocolNotSupported)
     }
 
     fn disconnect(&mut self) -> Result<(), VpnError> {
@@ -232,22 +208,7 @@ impl OpenVpnHandler {
 
 impl VpnProtocolHandler for OpenVpnHandler {
     fn connect(&mut self, _config: &VpnConfig) -> Result<VpnConnectionResult, VpnError> {
-        if self.state == ConnectionState::Connected {
-            return Err(VpnError::AlreadyConnected);
-        }
-
-        self.state = ConnectionState::Connecting;
-        let assigned_ip = Some(Ipv4Addr_new(10, 1, 0, 2));
-
-        self.state = ConnectionState::Connected;
-        self.statistics.connection_duration_seconds = 0;
-
-        Ok(VpnConnectionResult {
-            success: true,
-            connection_id: format!("ovpn_{}", 1700000000u64),
-            assigned_ip,
-            message: "OpenVPN connection established".to_string(),
-        })
+        Err(VpnError::ProtocolNotSupported)
     }
 
     fn disconnect(&mut self) -> Result<(), VpnError> {
@@ -522,7 +483,7 @@ impl PiaStrictKillSwitch {
 /// Main Private Internet Access (PIA) Configuration and Management Engine
 pub struct PiaVpnManager {
     pub username: String,
-    pub auth_token: Option<String>,
+    auth_token: Option<String>,
     pub regions: Vec<PiaServerRegion>,
     pub active_region: Option<PiaServerRegion>,
     pub port_forwarding: PiaPortForwardingEngine,
@@ -615,13 +576,11 @@ impl PiaVpnManager {
 
     /// Authenticate via API token
     pub fn authenticate(&mut self, password_or_token: &str) -> Result<(), VpnError> {
-        if password_or_token.is_empty() {
-            return Err(VpnError::AuthenticationFailed(
-                "Empty PIA token".to_string(),
-            ));
-        }
-        self.auth_token = Some(format!("pia_tok_{}", password_or_token));
-        Ok(())
+        let _ = password_or_token;
+        self.auth_token = None;
+        Err(VpnError::AuthenticationFailed(
+            "PIA authentication provider unavailable".to_string(),
+        ))
     }
 
     /// Connect to active or optimal PIA region
@@ -670,6 +629,39 @@ impl PiaVpnManager {
         self.kill_switch.lift();
         self.state = ConnectionState::Disconnected;
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod authentication_fail_closed_tests {
+    use super::*;
+
+    #[test]
+    fn pia_authentication_and_connection_fail_closed_without_provider() {
+        let mut manager = PiaVpnManager::new("test_user");
+        manager.populate_default_regions();
+        assert!(manager.authenticate("test_token").is_err());
+        assert!(manager.connect(0).is_err());
+        assert_eq!(manager.state, ConnectionState::Disconnected);
+    }
+
+    #[test]
+    fn protocol_adapters_do_not_claim_tunnels_without_providers() {
+        let config = VpnConfig {
+            server_address: "vpn.invalid".to_string(),
+            port: 51820,
+            protocol: VpnProtocol::WireGuard,
+            local_ip: None,
+            dns_servers: Vec::new(),
+            mtu: 1420,
+            keepalive_interval: 25,
+        };
+        let mut wireguard = WireGuardHandler::new();
+        let mut openvpn = OpenVpnHandler::new();
+        assert!(wireguard.connect(&config).is_err());
+        assert!(openvpn.connect(&config).is_err());
+        assert_eq!(wireguard.state(), ConnectionState::Disconnected);
+        assert_eq!(openvpn.state(), ConnectionState::Disconnected);
     }
 }
 

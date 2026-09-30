@@ -32,6 +32,7 @@ pub enum AuthError {
     Success = 0,
     InvalidCredentials = 1,
     AccountLocked = 2,
+    ProviderUnavailable = 3,
 }
 
 #[repr(C)]
@@ -49,14 +50,8 @@ impl SimpleUser {
         let mut hash_array = [0u8; 64];
         let name_len = username.len().min(31);
         let hash_len = password_hash.len().min(63);
-        unsafe {
-            core::ptr::copy_nonoverlapping(username.as_ptr(), name_array.as_mut_ptr(), name_len);
-            core::ptr::copy_nonoverlapping(
-                password_hash.as_ptr(),
-                hash_array.as_mut_ptr(),
-                hash_len,
-            );
-        }
+        name_array[..name_len].copy_from_slice(&username[..name_len]);
+        hash_array[..hash_len].copy_from_slice(&password_hash[..hash_len]);
         SimpleUser {
             id,
             username: name_array,
@@ -87,7 +82,9 @@ impl User for SimpleUser {
         if self.state() == UserState::Locked {
             return Err(AuthError::AccountLocked);
         }
-        Ok(true)
+        // This type stores an opaque, truncated byte array and has no password
+        // hashing or verification provider. Never treat that as proof of identity.
+        Err(AuthError::ProviderUnavailable)
     }
 }
 
@@ -160,9 +157,7 @@ impl SovereignSingleUserEngine {
     pub fn new(root_hash: &[u8]) -> Self {
         let mut hash_arr = [0u8; 32];
         let hash_len = root_hash.len().min(32);
-        unsafe {
-            core::ptr::copy_nonoverlapping(root_hash.as_ptr(), hash_arr.as_mut_ptr(), hash_len);
-        }
+        hash_arr[..hash_len].copy_from_slice(&root_hash[..hash_len]);
 
         Self {
             maintenance_state: MaintenanceState::Locked,
@@ -182,24 +177,12 @@ impl SovereignSingleUserEngine {
     /// sulogin-style emergency maintenance login
     pub fn execute_emergency_login(
         &mut self,
-        password_input: &[u8],
+        _password_input: &[u8],
     ) -> Result<&'static str, &'static str> {
-        // Simple hash check
-        let mut matches = true;
-        for (i, &b) in password_input.iter().enumerate() {
-            if i < 32 && self.root_password_hash[i] != b {
-                matches = false;
-                break;
-            }
-        }
-
-        if matches {
-            self.maintenance_state = MaintenanceState::EmergencyShellActive;
-            Ok("sulogin: Emergency maintenance shell unlocked and spawned successfully.")
-        } else {
-            self.maintenance_state = MaintenanceState::Locked;
-            Err("sulogin: Authentication failure! Emergency maintenance login rejected.")
-        }
+        // The stored bytes are not a password verifier. Comparing input directly
+        // with them (or accepting a prefix) would permit trivial authentication.
+        self.maintenance_state = MaintenanceState::Locked;
+        Err("sulogin: Authentication unavailable; no trusted password verifier is configured.")
     }
 
     /// Remounts the root filesystem as read-write after successful validation (fsck)
