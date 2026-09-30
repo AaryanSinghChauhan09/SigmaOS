@@ -89,6 +89,7 @@ pub use distro::sovereign_2055_distro_supremacy_engine::*;
 pub use distro::sovereign_2060_distro_supremacy_engine::*;
 pub use distro::sovereign_linux_bsd_ecosystem_pinnacle_suite::*;
 pub use distro::sovereign_linux_bsd_master_synthesis::*;
+pub use distro::sovereign_linux_bsd_media_wiki_unimplemented_ideas_engine::*;
 pub use distro::sovereign_media_and_distro_unimplemented_innovations::*;
 pub use kernel::tss_ring3_user_mode::*;
 pub use open_source_obsoletion::open_source_os_gap_closure::*;
