@@ -6,9 +6,12 @@
 #![allow(dead_code)]
 //! libsodium Compatibility Layer for SigmaOS
 //!
-//! This module provides a compatibility layer for libsodium cryptographic primitives,
-//! enabling integration with existing libsodium-based applications and providing
-//! industry-standard cryptographic operations.
+//! This module is an API-shape prototype only. Its primitives are not
+//! cryptographically secure and must not be used for confidentiality,
+//! authentication, signatures, key generation, or random-number generation.
+//! Do not use this module in production. Production callers need a separately
+//! integrated, audited cryptographic provider.
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::vec;
 
 use std::vec::Vec;
@@ -16,21 +19,17 @@ use std::vec::Vec;
 pub type c_int = i32;
 
 /// Sodium initialization status
-static mut SODIUM_INITIALIZED: bool = false;
+static SODIUM_INITIALIZED: AtomicBool = AtomicBool::new(false);
 
 /// Initialize libsodium
 ///
 /// This function initializes the libsodium library and must be called
 /// before any other libsodium functions.
 pub fn sodium_init() -> c_int {
-    unsafe {
-        if SODIUM_INITIALIZED {
-            return 1; // Already initialized
-        }
-
-        // Initialize cryptographic primitives
-        SODIUM_INITIALIZED = true;
-        0 // Success
+    if SODIUM_INITIALIZED.swap(true, Ordering::AcqRel) {
+        1 // Already initialized
+    } else {
+        0 // Initialized
     }
 }
 
