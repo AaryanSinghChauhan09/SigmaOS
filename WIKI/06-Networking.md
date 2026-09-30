@@ -1,6 +1,12 @@
 # Networking
 
-SigmaOS provides a complete networking stack for connectivity and communication.
+SigmaOS contains networking models and prototype components. The commands and configuration examples below describe intended interfaces; use them only where the corresponding executable, service, or backend is implemented and enabled.
+
+## Implementation Status: Networking Models
+
+The `src/network/zero_copy_networking.rs` and `src/network/tc_qdisc_sovereign.rs` components are in-process models. UMEM chunks, packet/completion queues, and traffic-control queues are ordinary Rust data structures; they do not map NIC DMA memory, open AF_XDP sockets, call `io_uring`, attach qdiscs to a host interface, or transmit packets through an operating-system network backend. Do not treat them as production datapaths, lock-free queues, or security boundaries.
+
+Before describing these components as operational backends, implement and review the hardware/OS integration, explicit buffer ownership and completion lifecycle, queue synchronization, and resource limits. Keep their model status clear in code and docs until those pieces exist. AI agents maintaining them must preserve descriptor bounds, FIFO ordering, queue capacity invariants, token-refill precision, and overflow-safe accounting, and run the focused networking checks when changes are made.
 
 ## Network Configuration
 
