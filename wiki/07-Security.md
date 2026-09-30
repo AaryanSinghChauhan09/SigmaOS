@@ -16,21 +16,13 @@ SigmaOS implements multiple layers of security:
 4. Filesystem encryption interfaces; audited providers are not integrated
 5. Network security models, which require runtime and protocol review
 
-### Cleaner and privacy models
+### System user credential storage
 
-`src/security/cleaner.rs` contains caller-buffer overwrite helpers and a Tor
-endpoint policy predicate. Buffer overwrites do not guarantee erasure from
-storage media, caches, snapshots, or compiler-created copies, and the Tor
-predicate does not configure an operating-system firewall. When leak prevention
-is enabled, it accepts only `127.0.0.1:<tor_port>`.
-
-EXIF removal currently returns `MetadataScrubError::ParserUnavailable` without
-modifying the input. Keep it unavailable until a format-aware parser can safely
-rewrite supported formats and its behavior is verified. Do not treat the
-current helpers as complete anti-forensic or system-wide privacy controls.
-AI agents maintaining this component must preserve the exact Tor endpoint
-allow rule, bounded overwrite work, and fail-closed metadata behavior; update
-these limits whenever a real platform integration or parser is added.
+`system::UserManager` does not have a vetted password-hashing provider. Its
+`set_password` returns `UserError::CryptoUnavailable` without modifying user
+or shadow records, and `verify_password` always denies. Existing demonstration
+hashes are not accepted. AI agents must preserve this fail-closed behavior and
+reject or reset legacy weak hashes if a trusted provider is later integrated.
 
 ## Pledge/Unveil Sandbox
 
@@ -211,6 +203,52 @@ The emergency shell gate does not keep a plaintext password or accept a
 signature based on fixed magic bytes. Its password and signature checks remain
 unavailable until vetted verification providers are integrated, so shell
 access fails closed.
+
+`auth::SimpleUser` has no password verifier and always returns
+`AuthError::ProviderUnavailable` for non-locked accounts. The single-user
+maintenance login likewise remains locked until a trusted password verifier
+exists. The stored byte arrays are compatibility placeholders, not hashes, and
+must not be used as credentials.
+AI agents maintaining these paths must preserve denial for all credentials and
+keep maintenance access locked until an audited password-hashing verifier and
+account-state backend are integrated. Update this guidance with any future
+provider change; never substitute direct byte or prefix comparisons.
+
+`src/functions/user.rs` has no audited password-hashing provider or account
+state backend. Hashing, verification, password changes, and account lock or
+unlock requests return `UserError::ProviderUnavailable`; they neither claim
+success nor authenticate users. Password policy checks are not authentication.
+AI agents must preserve fail-closed errors until audited hash storage and real
+account-state enforcement are integrated and reviewed.
+
+`distro::InteractiveUserEnvironment` is exported, but it has no trusted
+credential verifier. `authenticate_and_login` returns the same unavailable
+error for every credential and does not create a session; the default root
+account has no placeholder password hash. AI agents must preserve this
+fail-closed behavior until a vetted verifier and account-state backend are
+integrated and reviewed.
+
+`src/security/password.rs` is an in-memory API model, not a usable vault. It
+does not persist `vault_path`; encryption, decryption, password generation,
+biometric checks, and direct unlock fail closed without audited providers.
+Construction discards the owned key buffer, and add/update clear owned
+plaintext buffers on both success and failure; caller-owned copies are not
+cleared. AI agents must preserve unavailable-provider errors and buffer
+clearing, and must not enable real storage or authentication without reviewed
+crypto, randomness, biometric, and persistence integrations.
+
+`src/security/cleaner.rs` provides bounded overwrites of caller memory and a
+policy check for exactly `127.0.0.1:<configured Tor port>`; neither guarantees
+erasure from storage or configures a host firewall. EXIF removal returns
+`MetadataScrubError::ParserUnavailable` without changing input until a
+format-aware parser is integrated. RAM overwrite rounds are bounded. AI agents
+must preserve these limits and fail-closed metadata behavior.
+
+`src/security/secrets.rs::SimpleSecret` clears its fixed buffer before
+replacement and uses volatile writes for its owned buffers on drop. This is
+best-effort clearing only; it cannot erase caller copies or guarantee system-
+wide zeroization, and the component is not secure storage. Preserve this scope
+and do not describe it as encrypted storage without an audited provider.
 
 The Fedora Cockpit and FreeIPA compatibility models do not authenticate
 sessions or mint Kerberos tickets without trusted Cockpit/KDC integrations.
@@ -422,7 +460,7 @@ gatt disconnect 1
 
 SigmaPkg currently computes SHA-256 digests for content integrity, but its signature verifier and signing service have no vetted cryptographic provider. They return `CryptoUnavailable` or an empty signature and reject signed metadata; a trusted key name or matching checksum alone is not proof of authenticity. Do not use these APIs to approve packages or updates until real signature verification and end-to-end trust-chain checks are integrated.
 
-The API-shaped compatibility layer in `src/crypto/libsodium.rs`, `src/crypto/aes.rs`, `src/crypto/encryption.rs`, `src/crypto/postquantum.rs`, the vault adapters in `src/security/vault.rs`, the secret manager in `src/security/secrets.rs`, and the PQC routines in `src/crypto/pqc_dilithium.rs` are not audited production implementations. They must not protect real data, credentials, updates, or network sessions. In `libsodium.rs`, `sodium_init` reports unavailable, and cryptographic operations return `ProviderNotIntegrated`; those APIs do not implement libsodium algorithms. The PQC/HKDF and FDE placeholders likewise return provider-unavailable errors. AES-shaped, XOR-based, vault, and secret encryption APIs also fail closed until audited providers are integrated. The `src/crypto/aegis_vault.rs` key derivation, encryption, and decryption entry points now return `CryptoProviderUnavailable`; its compression helpers are separate and are not cryptographic. Aegis decompression rejects output above 64 MiB. The secret manager can still hold in-memory plaintext and is not secure storage. `SimpleSecret::set_data` clears its fixed-size buffer before writing a replacement, preventing truncated old values from remaining in that buffer; dropping a `SimpleSecret` clears its name and payload arrays with volatile writes. These operations do not erase copies held elsewhere, guarantee whole-system zeroization, or make the manager secure storage. AI agents maintaining this behavior must preserve the replacement and drop clears, and must not claim encryption until an audited provider is integrated. The separate `src/crypto/advanced_encryption_standard.rs` file is not wired into the crypto module and contains simulated transformations.
+The API-shaped compatibility layer in `src/crypto/libsodium.rs`, `src/crypto/aes.rs`, `src/crypto/encryption.rs`, `src/crypto/postquantum.rs`, the vault adapters in `src/security/vault.rs`, the secret manager in `src/security/secrets.rs`, and the PQC routines in `src/crypto/pqc_dilithium.rs` are not audited production implementations. They must not protect real data, credentials, updates, or network sessions. In `libsodium.rs`, `sodium_init` reports unavailable, and cryptographic operations return `ProviderNotIntegrated`; those APIs do not implement libsodium algorithms. The PQC/HKDF and FDE placeholders likewise return provider-unavailable errors. AES-shaped, XOR-based, vault, and secret encryption APIs also fail closed until audited providers are integrated. The `src/crypto/aegis_vault.rs` key derivation, encryption, and decryption entry points now return `CryptoProviderUnavailable`; its compression helpers are separate and are not cryptographic. Aegis decompression rejects output above 64 MiB. The secret manager can still hold in-memory plaintext and is not secure storage. The separate `src/crypto/advanced_encryption_standard.rs` file is not wired into the crypto module and contains simulated transformations.
 
 The clipboard's XOR strategy also fails closed. The default clipboard mode is explicitly plaintext (`SecurityLevel::None`) and does not label copied text as encrypted. Selecting an encryption level without an audited provider returns an error.
 
