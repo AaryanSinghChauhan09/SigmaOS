@@ -16,6 +16,15 @@ SigmaOS implements multiple layers of security:
 4. Filesystem encryption interfaces; audited providers are not integrated
 5. Network security models, which require runtime and protocol review
 
+### Ready-to-use distro login model
+
+`distro::InteractiveUserEnvironment` is exported, but there is no trusted
+credential verifier integrated. `authenticate_and_login` therefore returns
+the same unavailable error for all credentials and does not create a session;
+the default root account has no placeholder password hash. AI agents must
+preserve this fail-closed behavior until a vetted verifier and account-state
+backend are integrated and reviewed.
+
 ## Pledge/Unveil Sandbox
 
 ### Pledge
