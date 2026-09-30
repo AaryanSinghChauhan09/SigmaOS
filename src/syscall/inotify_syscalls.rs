@@ -6,7 +6,7 @@
 // - read - Get events from inotify fd
 
 use crate::filesystem::file_monitor::{
-    EventFilter, EventId, FileEvent, FileEventType, WatchConfig, WatchId, WatchManager,
+    EventFilter, FileEvent, FileEventType, WatchConfig, WatchId, WatchManager, EventId,
 };
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -156,7 +156,11 @@ impl InotifyInstance {
     }
 
     /// Add watch
-    pub fn add_watch(&mut self, path: PathBuf, mask: u32) -> Result<WatchDescriptor, String> {
+    pub fn add_watch(
+        &mut self,
+        path: PathBuf,
+        mask: u32,
+    ) -> Result<WatchDescriptor, String> {
         // Convert mask to event types
         let inotify_mask = mask as u32;
         let event_types = InotifyMask::AllEvents.to_event_types();
@@ -536,8 +540,7 @@ mod tests {
     #[test]
     fn test_inotify_manager_add_watch_invalid_fd() {
         let manager = InotifyManager::new();
-        let result =
-            manager.inotify_add_watch(999, PathBuf::from("/test"), InotifyMask::Create as u32);
+        let result = manager.inotify_add_watch(999, PathBuf::from("/test"), InotifyMask::Create as u32);
         assert!(result.is_err());
     }
 

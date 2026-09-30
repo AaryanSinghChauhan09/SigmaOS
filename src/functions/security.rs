@@ -1,8 +1,10 @@
 //! Security Functions (firewalld/iptables Inspiration)
 //! Firewall management, SELinux management, and SSH key management
 
-use std::string::{String, ToString};
+
+
 use std::vec::Vec;
+use std::string::{String, ToString};
 
 use crate::security::RuleAction;
 
@@ -136,11 +138,7 @@ impl FirewallManager {
         self.zones.iter_mut().find(|z| z.name == name)
     }
 
-    pub fn enable_service(
-        &mut self,
-        zone_name: &str,
-        service_name: &str,
-    ) -> Result<(), SecurityError> {
+    pub fn enable_service(&mut self, zone_name: &str, service_name: &str) -> Result<(), SecurityError> {
         if let Some(zone) = self.get_zone(zone_name) {
             zone.add_service(service_name);
             Ok(())
@@ -149,12 +147,7 @@ impl FirewallManager {
         }
     }
 
-    pub fn open_port(
-        &mut self,
-        zone_name: &str,
-        port: u16,
-        protocol: &str,
-    ) -> Result<(), SecurityError> {
+    pub fn open_port(&mut self, zone_name: &str, port: u16, protocol: &str) -> Result<(), SecurityError> {
         if let Some(zone) = self.get_zone(zone_name) {
             zone.add_port(port, protocol);
             Ok(())
@@ -304,11 +297,7 @@ impl SSHKeyManager {
         self.keys.push(key);
     }
 
-    pub fn generate_key(
-        &mut self,
-        name: &str,
-        key_type: SSHKeyType,
-    ) -> Result<String, SecurityError> {
+    pub fn generate_key(&mut self, name: &str, key_type: SSHKeyType) -> Result<String, SecurityError> {
         let mut key = SSHKey::new(name, key_type);
         key.generate()?;
         let key_id = key.name.clone();
@@ -388,9 +377,7 @@ mod tests {
     #[test]
     fn test_ssh_key_manager() {
         let mut manager = SSHKeyManager::new();
-        let key_id = manager
-            .generate_key("test-key", SSHKeyType::ED25519)
-            .unwrap();
+        let key_id = manager.generate_key("test-key", SSHKeyType::ED25519).unwrap();
         assert_eq!(key_id, "test-key");
     }
 }

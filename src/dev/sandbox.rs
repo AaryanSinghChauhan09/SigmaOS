@@ -13,19 +13,20 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
-use std::format;
 use std::string::{String, ToString};
+use std::format;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
-use core::mem;
 /// OOP-based Dev Sandbox Manager for SigmaOS
 /// Implements sandbox management using OOP principles with traits and structs
 /// No dependency on external sandbox frameworks
 /// Based on Roadmap Item 88: Dev sandbox manager
+
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 /// Sandbox ID
 pub type SandboxID = usize;
@@ -262,11 +263,7 @@ impl Sandbox for SimpleSandbox {
 /// Sandbox manager trait (OOP interface)
 pub trait SandboxManager {
     /// Create sandbox
-    fn create_sandbox(
-        &mut self,
-        name: &[u8],
-        capability: SandboxCapability,
-    ) -> Result<SandboxID, SandboxError>;
+    fn create_sandbox(&mut self, name: &[u8], capability: SandboxCapability) -> Result<SandboxID, SandboxError>;
     /// Destroy sandbox
     fn destroy_sandbox(&mut self, id: SandboxID) -> Result<(), SandboxError>;
     /// Start sandbox
@@ -351,11 +348,7 @@ impl SimpleSandboxManager {
 }
 
 impl SandboxManager for SimpleSandboxManager {
-    fn create_sandbox(
-        &mut self,
-        name: &[u8],
-        capability: SandboxCapability,
-    ) -> Result<SandboxID, SandboxError> {
+    fn create_sandbox(&mut self, name: &[u8], capability: SandboxCapability) -> Result<SandboxID, SandboxError> {
         if !self.capability.can_create {
             return Err(SandboxError::PermissionDenied);
         }
@@ -505,11 +498,7 @@ impl<T> CustomVec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {
@@ -532,6 +521,7 @@ extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
 }
+
 
 impl<T> core::ops::Deref for CustomVec<T> {
     type Target = [T];
@@ -563,6 +553,7 @@ impl<'a, T> IntoIterator for &'a CustomVec<T> {
         self.deref().iter()
     }
 }
+
 
 impl<'a, T> IntoIterator for &'a mut CustomVec<T> {
     type Item = &'a mut T;

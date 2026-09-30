@@ -55,9 +55,7 @@ pub fn run(paths: &[String], opts: HeadOptions) -> Result<String, String> {
 fn process_reader<R: Read>(reader: &mut R, opts: HeadOptions) -> Result<String, String> {
     if let Some(num_bytes) = opts.bytes {
         let mut buffer = vec![0u8; num_bytes];
-        let bytes_read = reader
-            .read(&mut buffer)
-            .map_err(|e| format!("head: {}", e))?;
+        let bytes_read = reader.read(&mut buffer).map_err(|e| format!("head: {}", e))?;
         Ok(String::from_utf8_lossy(&buffer[..bytes_read]).to_string())
     } else {
         let buf_reader = BufReader::new(reader);

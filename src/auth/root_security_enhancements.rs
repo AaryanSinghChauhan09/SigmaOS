@@ -4,9 +4,9 @@
 
 extern crate alloc;
 
-use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::format;
 
 /// Linux & BSD Capability Rights Bitmask
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -69,6 +69,7 @@ impl Default for SovereignRootCapabilityGovernor {
     }
 }
 
+
 /// Immutable Root Filesystem System Integrity Protection (SIP & dm-verity)
 #[derive(Debug, Clone)]
 pub struct SovereignImmutableRootfsGuard {
@@ -86,18 +87,12 @@ impl SovereignImmutableRootfsGuard {
         }
     }
 
-    pub fn attempt_emergency_remount_rw(
-        &mut self,
-        provided_token: &[u8; 32],
-    ) -> Result<String, String> {
+    pub fn attempt_emergency_remount_rw(&mut self, provided_token: &[u8; 32]) -> Result<String, String> {
         if provided_token == &self.emergency_remount_token_hash {
             self.is_read_only = false;
             Ok("SIP Guard: Root filesystem remounted as READ-WRITE via valid emergency cryptographic token.".to_string())
         } else {
-            Err(
-                "SIP Guard Violation: Invalid emergency token! Remount RW request rejected."
-                    .to_string(),
-            )
+            Err("SIP Guard Violation: Invalid emergency token! Remount RW request rejected.".to_string())
         }
     }
 
@@ -106,6 +101,7 @@ impl SovereignImmutableRootfsGuard {
         "SIP Guard: Root filesystem locked in READ-ONLY mode.".to_string()
     }
 }
+
 
 /// Cryptographic Root Escalation Audit Event Logger
 #[derive(Debug, Clone)]
@@ -173,6 +169,7 @@ impl Default for SovereignRootAuditLogger {
     }
 }
 
+
 /// Modern `doas` / `sudo` Fine-Grained Policy Engine
 #[derive(Debug, Clone)]
 pub struct DoasRule {
@@ -214,46 +211,24 @@ impl SovereignSuDoasPolicyEngine {
         }
     }
 
-    pub fn authorize_execution(
-        &mut self,
-        user_uid: u32,
-        cmd_path: &str,
-        current_time: u64,
-    ) -> Result<String, String> {
-        let rule = self
-            .rules
-            .iter()
-            .find(|r| r.user_uid == user_uid && r.command_path == cmd_path);
+    pub fn authorize_execution(&mut self, user_uid: u32, cmd_path: &str, current_time: u64) -> Result<String, String> {
+        let rule = self.rules.iter().find(|r| r.user_uid == user_uid && r.command_path == cmd_path);
 
         match rule {
             Some(r) if r.permit => {
                 if r.require_password {
-                    if self.active_session_uid == Some(user_uid)
-                        && current_time < self.session_expiry_timestamp
-                    {
-                        Ok(format!(
-                            "doas: Execution of [{}] authorized via cached session.",
-                            cmd_path
-                        ))
+                    if self.active_session_uid == Some(user_uid) && current_time < self.session_expiry_timestamp {
+                        Ok(format!("doas: Execution of [{}] authorized via cached session.", cmd_path))
                     } else {
                         self.active_session_uid = Some(user_uid);
                         self.session_expiry_timestamp = current_time + 300; // 5 minute session
-                        Ok(format!(
-                            "doas: Execution of [{}] authorized via password authentication.",
-                            cmd_path
-                        ))
+                        Ok(format!("doas: Execution of [{}] authorized via password authentication.", cmd_path))
                     }
                 } else {
-                    Ok(format!(
-                        "doas: Execution of [{}] authorized (nopass).",
-                        cmd_path
-                    ))
+                    Ok(format!("doas: Execution of [{}] authorized (nopass).", cmd_path))
                 }
-            }
-            _ => Err(format!(
-                "doas: Access denied for UID {} executing [{}]",
-                user_uid, cmd_path
-            )),
+            },
+            _ => Err(format!("doas: Access denied for UID {} executing [{}]", user_uid, cmd_path)),
         }
     }
 }
@@ -263,6 +238,7 @@ impl Default for SovereignSuDoasPolicyEngine {
         Self::new()
     }
 }
+
 
 /// Sovereign Root Security Master Parity Suite
 #[derive(Debug, Clone)]
@@ -285,20 +261,10 @@ impl SovereignRootSecurityMasterSuite {
 
     pub fn calculate_root_security_score(&self) -> u32 {
         let mut score = 0;
-        if self.cap_governor.is_capability_bounded {
-            score += 25;
-        } else {
-            score += 10;
-        }
-        if self.rootfs_guard.is_read_only {
-            score += 25;
-        }
-        if self.audit_logger.verify_audit_chain_integrity() {
-            score += 25;
-        }
-        if !self.doas_policy.rules.is_empty() {
-            score += 25;
-        }
+        if self.cap_governor.is_capability_bounded { score += 25; } else { score += 10; }
+        if self.rootfs_guard.is_read_only { score += 25; }
+        if self.audit_logger.verify_audit_chain_integrity() { score += 25; }
+        if !self.doas_policy.rules.is_empty() { score += 25; }
         score
     }
 }
@@ -308,6 +274,7 @@ impl Default for SovereignRootSecurityMasterSuite {
         Self::new()
     }
 }
+
 
 #[cfg(test)]
 mod tests {

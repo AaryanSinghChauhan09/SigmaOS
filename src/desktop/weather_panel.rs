@@ -110,29 +110,17 @@ impl WeatherPanel {
         match &self.current_weather {
             Some(weather) => {
                 output.push_str(&format!("Location: {}\n", weather.location));
-                output.push_str(&format!(
-                    "Condition: {}\n",
-                    self.condition_to_string(&weather.condition)
-                ));
+                output.push_str(&format!("Condition: {}\n", self.condition_to_string(&weather.condition)));
 
                 if self.units_metric {
-                    output.push_str(&format!(
-                        "Temperature: {:.1}°C\n",
-                        weather.temperature_celsius
-                    ));
+                    output.push_str(&format!("Temperature: {:.1}°C\n", weather.temperature_celsius));
                 } else {
-                    output.push_str(&format!(
-                        "Temperature: {:.1}°F\n",
-                        weather.temperature_fahrenheit
-                    ));
+                    output.push_str(&format!("Temperature: {:.1}°F\n", weather.temperature_fahrenheit));
                 }
 
                 output.push_str(&format!("Humidity: {}%\n", weather.humidity_percent));
                 output.push_str(&format!("Wind Speed: {:.1} km/h\n", weather.wind_speed_kmh));
-                output.push_str(&format!(
-                    "Updated: {}\n",
-                    self.format_timestamp(weather.timestamp)
-                ));
+                output.push_str(&format!("Updated: {}\n", self.format_timestamp(weather.timestamp)));
             }
             None => {
                 output.push_str("No weather data available.\n");
@@ -158,20 +146,11 @@ impl WeatherPanel {
                 output.push_str(&format!("   High: {:.1}°C\n", forecast.high_temp_celsius));
                 output.push_str(&format!("   Low: {:.1}°C\n", forecast.low_temp_celsius));
             } else {
-                output.push_str(&format!(
-                    "   High: {:.1}°F\n",
-                    self.celsius_to_fahrenheit(forecast.high_temp_celsius)
-                ));
-                output.push_str(&format!(
-                    "   Low: {:.1}°F\n",
-                    self.celsius_to_fahrenheit(forecast.low_temp_celsius)
-                ));
+                output.push_str(&format!("   High: {:.1}°F\n", self.celsius_to_fahrenheit(forecast.high_temp_celsius)));
+                output.push_str(&format!("   Low: {:.1}°F\n", self.celsius_to_fahrenheit(forecast.low_temp_celsius)));
             }
 
-            output.push_str(&format!(
-                "   Condition: {}\n",
-                self.condition_to_string(&forecast.condition)
-            ));
+            output.push_str(&format!("   Condition: {}\n", self.condition_to_string(&forecast.condition)));
             output.push_str("\n");
         }
 

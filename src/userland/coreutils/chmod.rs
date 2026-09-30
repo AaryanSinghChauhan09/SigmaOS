@@ -2,18 +2,15 @@
 //! POSIX-compatible chmod implementation
 
 use std::fs;
-use std::os::unix::fs::PermissionsExt;
 use std::path::Path;
+use std::os::unix::fs::PermissionsExt;
 
 /// Change file permissions
 pub fn run(path: &str, mode: &str, recursive: bool) -> Result<(), String> {
     let path_obj = Path::new(path);
 
     if !path_obj.exists() {
-        return Err(format!(
-            "chmod: cannot access '{}': No such file or directory",
-            path
-        ));
+        return Err(format!("chmod: cannot access '{}': No such file or directory", path));
     }
 
     let permissions = parse_mode(mode)?;

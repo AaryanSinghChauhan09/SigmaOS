@@ -713,15 +713,9 @@ impl YaziSpatialPreviewEngine {
         if mime_type.starts_with("text/") || mime_type == "application/json" {
             format!("Text Preview [{}] ({} bytes): \n  1 | // Sample File Header\n  2 | fn main() {{ ... }}", path, size_bytes)
         } else if mime_type.starts_with("image/") {
-            format!(
-                "Image Preview [{}] ({} bytes): [1920x1080 RGBA PNG Canvas]",
-                path, size_bytes
-            )
+            format!("Image Preview [{}] ({} bytes): [1920x1080 RGBA PNG Canvas]", path, size_bytes)
         } else if mime_type == "application/zip" || mime_type == "application/x-tar" {
-            format!(
-                "Archive Preview [{}] ({} bytes): \n  - bin/\n  - docs/README.md\n  - lib.so",
-                path, size_bytes
-            )
+            format!("Archive Preview [{}] ({} bytes): \n  - bin/\n  - docs/README.md\n  - lib.so", path, size_bytes)
         } else {
             format!("Binary File [{}] ({} bytes)", path, size_bytes)
         }
@@ -830,8 +824,7 @@ mod open_source_file_manager_tests_2 {
         let preview = YaziSpatialPreviewEngine::generate_preview("code.rs", "text/plain", 512);
         assert!(preview.contains("Text Preview"));
 
-        let renamed =
-            BatchRegexRenamer::rename_batch(&["IMG_001.png", "IMG_002.png"], "IMG_", "VACATION_");
+        let renamed = BatchRegexRenamer::rename_batch(&["IMG_001.png", "IMG_002.png"], "IMG_", "VACATION_");
         assert_eq!(renamed[0].1, "VACATION_001.png");
         assert_eq!(renamed[1].1, "VACATION_002.png");
     }
@@ -940,12 +933,10 @@ mod tests {
 
         let mut tag_mgr = FileBookmarkTagManager::new();
         tag_mgr.add_tag_to_path("work", "/home/user/project");
-        assert_eq!(
-            tag_mgr.get_paths_for_tag("work"),
-            vec!["/home/user/project"]
-        );
+        assert_eq!(tag_mgr.get_paths_for_tag("work"), vec!["/home/user/project"]);
     }
 }
+
 
 #[cfg(test)]
 mod open_source_file_manager_tests {
@@ -1028,9 +1019,12 @@ mod open_source_file_manager_tests {
     }
 }
 
+
 // =========================================================================
 // Open-Source File Manager Enhancements (Dolphin, Yazi, Ranger, Nautilus, Thunar)
 // =========================================================================
+
+
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ViNavigationMode {
@@ -1126,12 +1120,7 @@ impl OpenSourceFileManagerEnhancementEngine {
         preview
     }
 
-    pub fn batch_rename_pattern(
-        &self,
-        files: &[&str],
-        pattern: &str,
-        replacement: &str,
-    ) -> Vec<(String, String)> {
+    pub fn batch_rename_pattern(&self, files: &[&str], pattern: &str, replacement: &str) -> Vec<(String, String)> {
         let mut renames = Vec::new();
         for file in files {
             if file.contains(pattern) {
@@ -1148,6 +1137,7 @@ impl Default for OpenSourceFileManagerEnhancementEngine {
         Self::new("/home/user")
     }
 }
+
 
 #[cfg(test)]
 mod tests {

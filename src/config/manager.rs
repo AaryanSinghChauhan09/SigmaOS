@@ -12,18 +12,19 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::format;
 use std::string::{String, ToString};
+use std::format;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
-use core::mem;
 /// OOP-based Configuration Manager for SigmaOS
 /// Implements configuration management using OOP principles with traits and structs
 /// No dependency on external configuration frameworks
+
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 /// Configuration value type
 #[repr(C)]
@@ -263,12 +264,7 @@ pub trait ConfigManager {
     /// Get value
     fn get_value(&self, section: &[u8], key: &[u8]) -> Option<ConfigValue>;
     /// Set value
-    fn set_value(
-        &mut self,
-        section: &[u8],
-        key: &[u8],
-        value: ConfigValue,
-    ) -> Result<(), ConfigError>;
+    fn set_value(&mut self, section: &[u8], key: &[u8], value: ConfigValue) -> Result<(), ConfigError>;
     /// Load configuration
     fn load(&mut self, _data: &[u8]) -> Result<(), ConfigError>;
     /// Save configuration
@@ -413,25 +409,24 @@ impl ConfigManager for SimpleConfigManager {
 
     fn get_value(&self, section: &[u8], key: &[u8]) -> Option<ConfigValue> {
         if let Some(config_section) = self.get_section(section) {
-            unsafe { config_section.get_entry(key).map(|entry| entry.value) }
+            unsafe {
+                config_section.get_entry(key).map(|entry| entry.value)
+            }
         } else {
             None
         }
     }
 
-    fn set_value(
-        &mut self,
-        section: &[u8],
-        key: &[u8],
-        value: ConfigValue,
-    ) -> Result<(), ConfigError> {
+    fn set_value(&mut self, section: &[u8], key: &[u8], value: ConfigValue) -> Result<(), ConfigError> {
         if !self.capability.can_modify {
             return Err(ConfigError::PermissionDenied);
         }
 
         if let Some(config_section) = self.get_section_mut(section) {
             let entry = ConfigEntry::new(key, value, EntryCapability::full());
-            unsafe { config_section.set_entry(entry) }
+            unsafe {
+                config_section.set_entry(entry)
+            }
         } else {
             Err(ConfigError::SectionNotFound)
         }
@@ -504,11 +499,7 @@ impl<T> CustomVec<T> {
     fn remove(&mut self, index: usize) -> T {
         unsafe {
             let item = core::ptr::read(self.data.add(index));
-            core::ptr::copy(
-                self.data.add(index + 1),
-                self.data.add(index),
-                self.len - index - 1,
-            );
+            core::ptr::copy(self.data.add(index + 1), self.data.add(index), self.len - index - 1);
             self.len -= 1;
             item
         }
@@ -519,11 +510,7 @@ impl<T> CustomVec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {
@@ -546,6 +533,7 @@ extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
 }
+
 
 impl<T> core::ops::Deref for CustomVec<T> {
     type Target = [T];
@@ -577,6 +565,7 @@ impl<'a, T> IntoIterator for &'a CustomVec<T> {
         self.deref().iter()
     }
 }
+
 
 impl<'a, T> IntoIterator for &'a mut CustomVec<T> {
     type Item = &'a mut T;

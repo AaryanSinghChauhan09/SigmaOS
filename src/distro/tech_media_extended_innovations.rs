@@ -177,15 +177,11 @@ impl LinuxFoundationSbomGovernanceEngine {
     }
 
     pub fn audit_sbom_compliance(&self) -> bool {
-        self.records.iter().all(|r| {
-            r.vulnerabilities_count == 0 && (r.spdx_id == "MIT" || r.spdx_id == "Apache-2.0")
-        })
+        self.records.iter().all(|r| r.vulnerabilities_count == 0 && (r.spdx_id == "MIT" || r.spdx_id == "Apache-2.0"))
     }
 
     pub fn audit_spdx_license_headers(&self) -> bool {
-        self.records
-            .iter()
-            .all(|r| !r.spdx_id.is_empty() && r.fips_compliant)
+        self.records.iter().all(|r| !r.spdx_id.is_empty() && r.fips_compliant)
     }
 }
 
@@ -256,16 +252,11 @@ pub struct HowToGeekExplainerEngine {
 
 impl HowToGeekExplainerEngine {
     pub fn new() -> Self {
-        Self {
-            known_guides_count: 42,
-        }
+        Self { known_guides_count: 42 }
     }
 
     pub fn translate_query(&self, topic: &str) -> String {
-        format!(
-            "HowToGeek Guide for {}: Recommended command execution verified",
-            topic
-        )
+        format!("HowToGeek Guide for {}: Recommended command execution verified", topic)
     }
 }
 
@@ -449,8 +440,7 @@ impl KdNuggetsAiDataEngineeringEngine {
         }
         let sum: f32 = data.iter().sum();
         let mean = sum / (data.len() as f32);
-        let variance: f32 =
-            data.iter().map(|&x| (x - mean) * (x - mean)).sum::<f32>() / (data.len() as f32);
+        let variance: f32 = data.iter().map(|&x| (x - mean) * (x - mean)).sum::<f32>() / (data.len() as f32);
         let std_dev = variance.sqrt().max(1e-6);
         data.iter().map(|&x| (x - mean) / std_dev).collect()
     }

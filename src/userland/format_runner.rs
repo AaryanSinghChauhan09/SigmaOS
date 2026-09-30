@@ -94,17 +94,10 @@ impl UserlandFormatRunner {
     }
 
     /// Auto-detects the userland executable format from magic header bytes, ELF EI_OSABI/notes, or shebang prefix.
-    pub fn detect_format(
-        raw_header: &[u8],
-        filename_hint: Option<&str>,
-    ) -> UserlandExecutableFormat {
+    pub fn detect_format(raw_header: &[u8], filename_hint: Option<&str>) -> UserlandExecutableFormat {
         if raw_header.len() >= 4 {
             // ELF binary detection: 0x7F 'E' 'L' 'F'
-            if raw_header[0] == 0x7F
-                && raw_header[1] == b'E'
-                && raw_header[2] == b'L'
-                && raw_header[3] == b'F'
-            {
+            if raw_header[0] == 0x7F && raw_header[1] == b'E' && raw_header[2] == b'L' && raw_header[3] == b'F' {
                 // Check ELF EI_OSABI byte (index 7 in e_ident)
                 if raw_header.len() > 7 {
                     match raw_header[7] {
@@ -132,23 +125,13 @@ impl UserlandFormatRunner {
             }
 
             // WebAssembly WASI: '\0' 'a' 's' 'm'
-            if raw_header[0] == 0x00
-                && raw_header[1] == b'a'
-                && raw_header[2] == b's'
-                && raw_header[3] == b'm'
-            {
+            if raw_header[0] == 0x00 && raw_header[1] == b'a' && raw_header[2] == b's' && raw_header[3] == b'm' {
                 return UserlandExecutableFormat::WasmWasi;
             }
 
             // macOS Mach-O Magic (MH_MAGIC_64 / MH_CIGAM_64 / FAT)
-            if (raw_header[0] == 0xCF
-                && raw_header[1] == 0xFA
-                && raw_header[2] == 0xED
-                && raw_header[3] == 0xFE)
-                || (raw_header[0] == 0xCA
-                    && raw_header[1] == 0xFE
-                    && raw_header[2] == 0xBA
-                    && raw_header[3] == 0xBE)
+            if (raw_header[0] == 0xCF && raw_header[1] == 0xFA && raw_header[2] == 0xED && raw_header[3] == 0xFE)
+                || (raw_header[0] == 0xCA && raw_header[1] == 0xFE && raw_header[2] == 0xBA && raw_header[3] == 0xBE)
             {
                 return UserlandExecutableFormat::MacOsMachO;
             }
@@ -159,11 +142,7 @@ impl UserlandFormatRunner {
             }
 
             // SquashFS AppImage / Snap Container header: 'h' 's' 'q' 's'
-            if raw_header[0] == b'h'
-                && raw_header[1] == b's'
-                && raw_header[2] == b'q'
-                && raw_header[3] == b's'
-            {
+            if raw_header[0] == b'h' && raw_header[1] == b's' && raw_header[2] == b'q' && raw_header[3] == b's' {
                 if let Some(hint) = filename_hint {
                     if hint.ends_with(".snap") {
                         return UserlandExecutableFormat::SnapSquashFs;
@@ -247,10 +226,7 @@ impl UserlandFormatRunner {
         }
 
         let mut environment_vars = BTreeMap::new();
-        environment_vars.insert(
-            "SIGMAOS_USERLAND_FORMAT".to_string(),
-            format.name().to_string(),
-        );
+        environment_vars.insert("SIGMAOS_USERLAND_FORMAT".to_string(), format.name().to_string());
         environment_vars.insert("LD_LIBRARY_PATH".to_string(), library_paths.join(":"));
 
         let mut exported_symbols = BTreeMap::new();
@@ -348,9 +324,7 @@ mod tests {
     fn test_prepare_execution_context() {
         let runner = UserlandFormatRunner::new();
         let elf_hdr = [0x7F, b'E', b'L', b'F', 0, 0, 0, 0];
-        let ctx = runner
-            .prepare_execution_context(&elf_hdr, "/usr/bin/nginx")
-            .unwrap();
+        let ctx = runner.prepare_execution_context(&elf_hdr, "/usr/bin/nginx").unwrap();
 
         assert_eq!(ctx.format, UserlandExecutableFormat::LinuxElf64Glibc);
         assert_eq!(ctx.interpreter, "/lib64/ld-linux-x86-64.so.2");

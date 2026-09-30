@@ -3,8 +3,8 @@
 // Inspired by Linux (arch/x86/kernel/process_64.c, entry_64.S) and FreeBSD (sys/amd64/amd64/machdep.c)
 // Enhanced with additional BSD security features and Linux scheduler integration
 
-use std::collections::BTreeMap;
 use std::vec::Vec;
+use std::collections::BTreeMap;
 
 // ============================================================================
 // 1. 64-bit Task State Segment (TSS) Hardware Layout
@@ -72,10 +72,10 @@ impl IretqStackFrame {
     pub fn new_user_mode(entry_point: u64, user_rsp: u64) -> Self {
         Self {
             rip: entry_point,
-            cs: 0x2B,      // Ring 3 Code Segment Selector (0x28 | 3)
+            cs: 0x2B,     // Ring 3 Code Segment Selector (0x28 | 3)
             rflags: 0x202, // Enable Interrupts (IF)
             rsp: user_rsp,
-            ss: 0x33, // Ring 3 Data Segment Selector (0x30 | 3)
+            ss: 0x33,     // Ring 3 Data Segment Selector (0x30 | 3)
         }
     }
 }
@@ -106,8 +106,8 @@ pub enum ProcessState {
 #[derive(Debug, Clone)]
 pub struct UserModeProcessContext {
     pub pid: u64,
-    pub ppid: u64,                  // Parent PID for process hierarchy
-    pub user_cr3_page_table: u64,   // KPTI Shadow Page Table for User Space
+    pub ppid: u64, // Parent PID for process hierarchy
+    pub user_cr3_page_table: u64, // KPTI Shadow Page Table for User Space
     pub kernel_cr3_page_table: u64, // Full Kernel Page Table
     pub kernel_stack_top: u64,
     pub user_stack_top: u64,
@@ -116,9 +116,9 @@ pub struct UserModeProcessContext {
     pub allowed_io_ports: Vec<u16>,
     pub security_level: SecuritySandboxLevel,
     pub process_state: ProcessState,
-    pub cgroup_id: Option<u64>,     // Linux CGroup integration
+    pub cgroup_id: Option<u64>, // Linux CGroup integration
     pub allowed_syscalls: Vec<u64>, // seccomp-style syscall filtering
-    pub signal_mask: u64,           // Signal mask inspired by Linux sigprocmask
+    pub signal_mask: u64, // Signal mask inspired by Linux sigprocmask
 }
 
 pub struct SovereignRing3UserModeEngine {
@@ -170,10 +170,7 @@ impl SovereignRing3UserModeEngine {
 
         // Update process hierarchy
         if ppid != 0 {
-            self.process_hierarchy
-                .entry(ppid)
-                .or_insert_with(Vec::new)
-                .push(pid);
+            self.process_hierarchy.entry(ppid).or_insert_with(Vec::new).push(pid);
         }
 
         // Set security context
@@ -247,10 +244,7 @@ impl SovereignRing3UserModeEngine {
         if let Some(process) = self.active_processes.iter().find(|p| p.pid == pid) {
             match process.security_level {
                 SecuritySandboxLevel::None => true,
-                SecuritySandboxLevel::Minimal => {
-                    process.allowed_syscalls.is_empty()
-                        || process.allowed_syscalls.contains(&syscall)
-                }
+                SecuritySandboxLevel::Minimal => process.allowed_syscalls.is_empty() || process.allowed_syscalls.contains(&syscall),
                 SecuritySandboxLevel::Restricted => process.allowed_syscalls.contains(&syscall),
                 SecuritySandboxLevel::Strict => process.allowed_syscalls.contains(&syscall),
             }
@@ -273,10 +267,7 @@ impl SovereignRing3UserModeEngine {
 
     /// Get child processes of a given PID (process tree traversal)
     pub fn get_child_processes(&self, ppid: u64) -> Vec<u64> {
-        self.process_hierarchy
-            .get(&ppid)
-            .cloned()
-            .unwrap_or_default()
+        self.process_hierarchy.get(&ppid).cloned().unwrap_or_default()
     }
 
     /// Change process state (inspired by Linux task state management)
@@ -292,11 +283,7 @@ impl SovereignRing3UserModeEngine {
     }
 
     /// BSD pledge-inspired security level escalation
-    pub fn set_security_level(
-        &mut self,
-        pid: u64,
-        level: SecuritySandboxLevel,
-    ) -> Result<(), &'static str> {
+    pub fn set_security_level(&mut self, pid: u64, level: SecuritySandboxLevel) -> Result<(), &'static str> {
         let process = self
             .active_processes
             .iter_mut()
@@ -384,17 +371,11 @@ mod tests {
         );
 
         // Should allow escalation to more restrictive levels
-        assert!(engine
-            .set_security_level(102, SecuritySandboxLevel::Minimal)
-            .is_ok());
-        assert!(engine
-            .set_security_level(102, SecuritySandboxLevel::Restricted)
-            .is_ok());
+        assert!(engine.set_security_level(102, SecuritySandboxLevel::Minimal).is_ok());
+        assert!(engine.set_security_level(102, SecuritySandboxLevel::Restricted).is_ok());
 
         // Should not allow downgrade
-        assert!(engine
-            .set_security_level(102, SecuritySandboxLevel::None)
-            .is_err());
+        assert!(engine.set_security_level(102, SecuritySandboxLevel::None).is_err());
     }
 
     #[test]
@@ -475,9 +456,7 @@ mod tests {
             SecuritySandboxLevel::None,
         );
 
-        assert!(engine
-            .set_process_state(104, ProcessState::Sleeping)
-            .is_ok());
+        assert!(engine.set_process_state(104, ProcessState::Sleeping).is_ok());
         assert!(engine.set_process_state(104, ProcessState::Stopped).is_ok());
         assert!(engine.set_process_state(104, ProcessState::Running).is_ok());
     }
@@ -497,11 +476,7 @@ mod tests {
         );
 
         assert!(engine.assign_cgroup(105, 42).is_ok());
-        let process = engine
-            .active_processes
-            .iter()
-            .find(|p| p.pid == 105)
-            .unwrap();
+        let process = engine.active_processes.iter().find(|p| p.pid == 105).unwrap();
         assert_eq!(process.cgroup_id, Some(42));
     }
 }

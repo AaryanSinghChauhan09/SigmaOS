@@ -29,10 +29,10 @@ pub mod universal_oop_system;
 
 pub mod sigpkg {
     pub use crate::security;
-    pub use crate::universal_adapter::*;
     pub use crate::universal_engine;
     pub use crate::universal_engine::PackageFormat;
     pub use crate::universal_oop_system;
+    pub use crate::universal_adapter::*;
 
     pub use crate::universal_oop_system::{Dependency, Package, Version, VersionConstraint};
 }
@@ -160,9 +160,7 @@ fn test_universal_pm_command_dispatcher_all_distros() {
     assert_eq!(alpine_act.source_pm, "alpine");
     assert_eq!(alpine_act.operation, UniversalPmOperation::Install);
 
-    let freebsd_act = dispatcher
-        .dispatch_command("freebsd install postgresql15")
-        .unwrap();
+    let freebsd_act = dispatcher.dispatch_command("freebsd install postgresql15").unwrap();
     assert_eq!(freebsd_act.source_pm, "freebsd");
     assert_eq!(freebsd_act.operation, UniversalPmOperation::Install);
 
@@ -170,9 +168,7 @@ fn test_universal_pm_command_dispatcher_all_distros() {
     assert_eq!(void_act.source_pm, "void");
     assert_eq!(void_act.operation, UniversalPmOperation::Install);
 
-    let gentoo_act = dispatcher
-        .dispatch_command("gentoo install portage")
-        .unwrap();
+    let gentoo_act = dispatcher.dispatch_command("gentoo install portage").unwrap();
     assert_eq!(gentoo_act.source_pm, "gentoo");
     assert_eq!(gentoo_act.operation, UniversalPmOperation::Install);
 
@@ -180,9 +176,7 @@ fn test_universal_pm_command_dispatcher_all_distros() {
     assert_eq!(opensuse_act.source_pm, "opensuse");
     assert_eq!(opensuse_act.operation, UniversalPmOperation::Install);
 
-    let nixos_act = dispatcher
-        .dispatch_command("nixos install firefox")
-        .unwrap();
+    let nixos_act = dispatcher.dispatch_command("nixos install firefox").unwrap();
     assert_eq!(nixos_act.source_pm, "nixos");
     assert_eq!(nixos_act.operation, UniversalPmOperation::Install);
 
@@ -195,9 +189,7 @@ fn test_universal_pm_command_dispatcher_all_distros() {
     assert_eq!(pisi_act.source_pm, "pisi");
     assert_eq!(pisi_act.operation, UniversalPmOperation::Install);
 
-    let spack_act = dispatcher
-        .dispatch_command("spack install openmpi")
-        .unwrap();
+    let spack_act = dispatcher.dispatch_command("spack install openmpi").unwrap();
     assert_eq!(spack_act.source_pm, "spack");
     assert_eq!(spack_act.operation, UniversalPmOperation::Install);
 
@@ -221,19 +213,12 @@ fn test_universal_scriptlet_and_dependency_mapper() {
     assert_eq!(dep_mapper.to_canonical_name("zlib1g-dev"), "zlib");
     assert_eq!(dep_mapper.to_canonical_name("sys-apps/systemd"), "systemd");
     assert_eq!(dep_mapper.to_canonical_name("sys-apps/openrc"), "openrc");
-    assert_eq!(
-        dep_mapper.to_canonical_name("media-video/pipewire"),
-        "pipewire"
-    );
+    assert_eq!(dep_mapper.to_canonical_name("media-video/pipewire"), "pipewire");
     assert_eq!(dep_mapper.to_canonical_name("dev-libs/wayland"), "wayland");
 
     let scriptlet_conv = UniversalScriptletConverter::new();
     let hook = scriptlet_conv
-        .convert_scriptlet(
-            universal_engine::PackageFormat::Apt,
-            "postinst",
-            "echo post",
-        )
+        .convert_scriptlet(universal_engine::PackageFormat::Apt, "postinst", "echo post")
         .unwrap();
     assert_eq!(hook.hook_type, SigmaPkgHookType::PostInstall);
 

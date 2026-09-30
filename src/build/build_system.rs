@@ -96,7 +96,9 @@ impl BuildSystemManager {
 
     pub fn build_rust(&self) -> Result<String, String> {
         let args = self.config.get_cargo_args();
-        let output = Command::new("cargo").args(&args).output();
+        let output = Command::new("cargo")
+            .args(&args)
+            .output();
 
         match output {
             Ok(result) => {
@@ -118,7 +120,9 @@ impl BuildSystemManager {
     }
 
     pub fn test_rust(&self) -> Result<String, String> {
-        let output = Command::new("cargo").args(&["test"]).output();
+        let output = Command::new("cargo")
+            .args(&["test"])
+            .output();
 
         match output {
             Ok(result) => {
@@ -133,7 +137,9 @@ impl BuildSystemManager {
     }
 
     pub fn format_rust(&self) -> Result<String, String> {
-        let output = Command::new("cargo").args(&["fmt"]).output();
+        let output = Command::new("cargo")
+            .args(&["fmt"])
+            .output();
 
         match output {
             Ok(result) => {
@@ -148,7 +154,9 @@ impl BuildSystemManager {
     }
 
     pub fn check_rust(&self) -> Result<String, String> {
-        let output = Command::new("cargo").args(&["check", "--lib"]).output();
+        let output = Command::new("cargo")
+            .args(&["check", "--lib"])
+            .output();
 
         match output {
             Ok(result) => {
@@ -163,7 +171,9 @@ impl BuildSystemManager {
     }
 
     pub fn doc_rust(&self) -> Result<String, String> {
-        let output = Command::new("cargo").args(&["doc", "--open"]).output();
+        let output = Command::new("cargo")
+            .args(&["doc", "--open"])
+            .output();
 
         match output {
             Ok(result) => {
@@ -179,14 +189,7 @@ impl BuildSystemManager {
 
     pub fn clippy_rust(&self) -> Result<String, String> {
         let output = Command::new("cargo")
-            .args(&[
-                "clippy",
-                "--all-targets",
-                "--all-features",
-                "--",
-                "-D",
-                "warnings",
-            ])
+            .args(&["clippy", "--all-targets", "--all-features", "--", "-D", "warnings"])
             .output();
 
         match output {
@@ -222,18 +225,9 @@ mod tests {
 
     #[test]
     fn test_build_target_to_rust_target() {
-        assert_eq!(
-            BuildTarget::X86_64.to_rust_target(),
-            "x86_64-unknown-linux-gnu"
-        );
-        assert_eq!(
-            BuildTarget::Aarch64.to_rust_target(),
-            "aarch64-unknown-linux-gnu"
-        );
-        assert_eq!(
-            BuildTarget::Riscv64.to_rust_target(),
-            "riscv64gc-unknown-linux-gnu"
-        );
+        assert_eq!(BuildTarget::X86_64.to_rust_target(), "x86_64-unknown-linux-gnu");
+        assert_eq!(BuildTarget::Aarch64.to_rust_target(), "aarch64-unknown-linux-gnu");
+        assert_eq!(BuildTarget::Riscv64.to_rust_target(), "riscv64gc-unknown-linux-gnu");
     }
 
     #[test]

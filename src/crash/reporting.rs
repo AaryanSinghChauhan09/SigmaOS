@@ -1,33 +1,25 @@
-use core::mem;
-use core::sync::atomic::{AtomicUsize, Ordering};
+
 /// OOP-based Crash Reporting Pipeline for SigmaOS
 /// Based on Ideas-999-Structured: Core System Item 14
 /// Implements automated coredump collection and anonymized bug reports
+
 use std::boxed::Box;
 use std::format;
 use std::string::String;
 use std::vec;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 pub type CrashReportID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum CrashType {
-    SegmentationFault = 0,
-    BusError = 1,
-    IllegalInstruction = 2,
-    Abort = 3,
-    Panic = 4,
-}
+pub enum CrashType { SegmentationFault = 0, BusError = 1, IllegalInstruction = 2, Abort = 3, Panic = 4 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum CrashError {
-    Success = 0,
-    CollectionFailed = 1,
-    UploadFailed = 2,
-}
+pub enum CrashError { Success = 0, CollectionFailed = 1, UploadFailed = 2 }
 
 pub trait CrashReport {
     fn id(&self) -> CrashReportID;
@@ -51,11 +43,7 @@ impl SimpleCrashReport {
         let mut name_array = [0u8; 64];
         let name_len = process_name.len().min(63);
         unsafe {
-            core::ptr::copy_nonoverlapping(
-                process_name.as_ptr(),
-                name_array.as_mut_ptr(),
-                name_len,
-            );
+            core::ptr::copy_nonoverlapping(process_name.as_ptr(), name_array.as_mut_ptr(), name_len);
         }
         SimpleCrashReport {
             id,
@@ -68,16 +56,12 @@ impl SimpleCrashReport {
 }
 
 impl CrashReport for SimpleCrashReport {
-    fn id(&self) -> CrashReportID {
-        self.id
-    }
+    fn id(&self) -> CrashReportID { self.id }
     fn crash_type(&self) -> CrashType {
         let val = self.crash_type.load(Ordering::SeqCst) as u32;
         unsafe { core::mem::transmute(val) }
     }
-    fn timestamp(&self) -> u64 {
-        self.timestamp.load(Ordering::SeqCst) as u64
-    }
+    fn timestamp(&self) -> u64 { self.timestamp.load(Ordering::SeqCst) as u64 }
     fn process_name(&self) -> &[u8] {
         let len = self.process_name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.process_name[..len]
@@ -239,10 +223,7 @@ impl SimpleCrashPipeline {
             collector,
             anonymizer,
             uploader,
-            statistics: CrashStatistics {
-                total_crashes: 0,
-                by_type: [0; 5],
-            },
+            statistics: CrashStatistics { total_crashes: 0, by_type: [0; 5] },
         }
     }
 }
@@ -261,21 +242,13 @@ impl CrashPipeline for SimpleCrashPipeline {
     fn generate_report(&self, report_id: CrashReportID) -> Vec<u8> {
         let mut report = Vec::new();
         let header = b"Crash Report #";
-        for &byte in header {
-            report.push(byte);
-        }
+        for &byte in header { report.push(byte); }
 
         let id_str = [b'0' + (report_id % 10) as u8];
         report.push(id_str[0]);
         report.push(b'\n');
 
-        if let Some(crash) = self
-            .collector
-            .reports
-            .iter()
-            .filter_map(|r| r.as_ref())
-            .find(|r| r.id() == report_id)
-        {
+        if let Some(crash) = self.collector.reports.iter().filter_map(|r| r.as_ref()).find(|r| r.id() == report_id) {
             let type_str: &[u8] = match crash.crash_type() {
                 CrashType::SegmentationFault => b"Segmentation Fault",
                 CrashType::BusError => b"Bus Error",
@@ -283,18 +256,12 @@ impl CrashPipeline for SimpleCrashPipeline {
                 CrashType::Abort => b"Abort",
                 CrashType::Panic => b"Panic",
             };
-            for &byte in type_str {
-                report.push(byte);
-            }
+            for &byte in type_str { report.push(byte); }
             report.push(b'\n');
 
             let proc = b"Process: ";
-            for &byte in proc {
-                report.push(byte);
-            }
-            for &byte in crash.process_name() {
-                report.push(byte);
-            }
+            for &byte in proc { report.push(byte); }
+            for &byte in crash.process_name() { report.push(byte); }
             report.push(b'\n');
         }
 
@@ -351,7 +318,7 @@ impl SovereignNetconsole {
 /// Reserved Kdump panic memory buffer header
 #[derive(Debug, Clone, Copy)]
 pub struct KdumpBufferHeader {
-    pub magic: u64, // 0x4B44554D50534947 ("KDUMPSIG")
+    pub magic: u64,           // 0x4B44554D50534947 ("KDUMPSIG")
     pub crash_type: CrashType,
     pub cpu_id: u32,
     pub memory_base_paddr: u64,
@@ -383,12 +350,7 @@ impl SovereignKdumpEngine {
     }
 
     /// Minimal zero-allocation panic path coredump writer
-    pub fn execute_panic_coredump(
-        &mut self,
-        crash_type: CrashType,
-        cpu_id: u32,
-        register_dump: &[u8],
-    ) -> Result<usize, CrashError> {
+    pub fn execute_panic_coredump(&mut self, crash_type: CrashType, cpu_id: u32, register_dump: &[u8]) -> Result<usize, CrashError> {
         self.panic_path_active = true;
         self.header.crash_type = crash_type;
         self.header.cpu_id = cpu_id;
@@ -426,9 +388,7 @@ mod tests {
         assert!(!kdump.panic_path_active);
 
         let reg_dump = b"RAX: 0x0000000000000000 RBX: 0x00007FFF00001000 RIP: 0xFFFFFFFF80100234";
-        let written = kdump
-            .execute_panic_coredump(CrashType::Panic, 0, reg_dump)
-            .unwrap();
+        let written = kdump.execute_panic_coredump(CrashType::Panic, 0, reg_dump).unwrap();
 
         assert_eq!(written, reg_dump.len());
         assert!(kdump.panic_path_active);

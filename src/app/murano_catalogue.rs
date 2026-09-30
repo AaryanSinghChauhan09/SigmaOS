@@ -3,6 +3,7 @@ use std::vec;
 use std::vec::Vec;
 // OpenStack Murano Inspired Application Catalogue for SigmaOS
 
+
 /// Application Topology / Environment Requirements
 #[derive(Debug, Clone)]
 pub struct AppTopology {

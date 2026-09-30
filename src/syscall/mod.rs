@@ -13,17 +13,17 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-pub mod bpf_syscalls;
 pub mod dispatch;
 pub mod dispatcher;
-pub mod inotify_syscalls;
 pub mod interface;
-pub mod kevent_syscalls;
-pub mod namespace_syscalls;
-pub mod posix_linux_bsd_api;
 pub mod table;
-pub mod user_syscalls;
+pub mod namespace_syscalls;
+pub mod inotify_syscalls;
+pub mod kevent_syscalls;
 pub mod uts_syscalls;
+pub mod user_syscalls;
+pub mod bpf_syscalls;
+pub mod posix_linux_bsd_api;
 
 pub use posix_linux_bsd_api::{
     posix_errno, syscall_abi_numbers, PidFdDescriptor, PosixLinuxBsdApiDispatcher,
@@ -31,7 +31,4 @@ pub use posix_linux_bsd_api::{
 pub mod abi;
 
 pub mod linux_compat;
-pub use linux_compat::{
-    LinuxFdEntry, LinuxFdTable, LinuxOpenFlags, LinuxProcess, LinuxProcessTable,
-    LinuxSyscallDispatcher, LinuxSyscallNumber, ProcessState,
-};
+pub use linux_compat::{LinuxSyscallDispatcher, LinuxSyscallNumber, LinuxOpenFlags, LinuxFdTable, LinuxProcessTable, LinuxFdEntry, LinuxProcess, ProcessState};

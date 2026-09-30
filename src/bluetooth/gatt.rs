@@ -2,7 +2,7 @@
 // Inspired by Linux BlueZ GATT implementation
 
 use std::collections::HashMap;
-use std::sync::atomic::{AtomicU16, AtomicU64, Ordering};
+use std::sync::atomic::{AtomicU64, AtomicU16, Ordering};
 
 /// GATT characteristic
 #[derive(Debug, Clone)]
@@ -91,17 +91,9 @@ impl GattClient {
     }
 
     /// Discover characteristics
-    pub fn discover_characteristics(
-        &mut self,
-        device_id: u64,
-        service_handle: u16,
-    ) -> Result<(), &'static str> {
+    pub fn discover_characteristics(&mut self, device_id: u64, service_handle: u16) -> Result<(), &'static str> {
         if let Some(device) = self.devices.get_mut(&device_id) {
-            if let Some(service) = device
-                .services
-                .iter_mut()
-                .find(|s| s.handle == service_handle)
-            {
+            if let Some(service) = device.services.iter_mut().find(|s| s.handle == service_handle) {
                 // Simulated characteristic discovery
                 let characteristic = GattCharacteristic {
                     uuid: "00002a00-0000-1000-8000-00805f9b34fb".to_string(), // Device Name
@@ -121,11 +113,7 @@ impl GattClient {
     }
 
     /// Read characteristic value
-    pub fn read_characteristic(
-        &self,
-        device_id: u64,
-        handle: u16,
-    ) -> Result<Vec<u8>, &'static str> {
+    pub fn read_characteristic(&self, device_id: u64, handle: u16) -> Result<Vec<u8>, &'static str> {
         if let Some(device) = self.devices.get(&device_id) {
             for service in &device.services {
                 if let Some(char) = service.characteristics.iter().find(|c| c.handle == handle) {
@@ -139,19 +127,10 @@ impl GattClient {
     }
 
     /// Write characteristic value
-    pub fn write_characteristic(
-        &mut self,
-        device_id: u64,
-        handle: u16,
-        value: Vec<u8>,
-    ) -> Result<(), &'static str> {
+    pub fn write_characteristic(&mut self, device_id: u64, handle: u16, value: Vec<u8>) -> Result<(), &'static str> {
         if let Some(device) = self.devices.get_mut(&device_id) {
             for service in &mut device.services {
-                if let Some(char) = service
-                    .characteristics
-                    .iter_mut()
-                    .find(|c| c.handle == handle)
-                {
+                if let Some(char) = service.characteristics.iter_mut().find(|c| c.handle == handle) {
                     char.value = value;
                     return Ok(());
                 }
@@ -222,9 +201,7 @@ mod tests {
         client.discover_services(device.id).unwrap();
 
         let service_handle = client.get_device(device.id).unwrap().services[0].handle;
-        assert!(client
-            .discover_characteristics(device.id, service_handle)
-            .is_ok());
+        assert!(client.discover_characteristics(device.id, service_handle).is_ok());
     }
 
     #[test]
@@ -235,17 +212,12 @@ mod tests {
         client.discover_services(device.id).unwrap();
 
         let service_handle = client.get_device(device.id).unwrap().services[0].handle;
-        client
-            .discover_characteristics(device.id, service_handle)
-            .unwrap();
+        client.discover_characteristics(device.id, service_handle).unwrap();
 
-        let char_handle =
-            client.get_device(device.id).unwrap().services[0].characteristics[0].handle;
+        let char_handle = client.get_device(device.id).unwrap().services[0].characteristics[0].handle;
         let value = vec![1, 2, 3, 4];
 
-        assert!(client
-            .write_characteristic(device.id, char_handle, value.clone())
-            .is_ok());
+        assert!(client.write_characteristic(device.id, char_handle, value.clone()).is_ok());
 
         let read_value = client.read_characteristic(device.id, char_handle).unwrap();
         assert_eq!(read_value, value);

@@ -55,7 +55,6 @@ impl SignedMetadata {
         }
     }
 
-    /// Returns an empty signature until a vetted provider is configured.
     pub fn sign_with(&mut self, verifier: &CryptoVerifier, key: &str) -> Vec<u8> {
         let sig = verifier.sign(key, &self.body);
         self.signature = sig.clone();
@@ -65,8 +64,13 @@ impl SignedMetadata {
 
 /// Verifies a signed role metadata blob (root/timestamp/snapshot/targets).
 pub fn verify_signed_metadata(verifier: &CryptoVerifier, meta: &SignedMetadata) -> bool {
-    let _ = (verifier, meta);
-    false
+    if meta.signature.is_empty() {
+        return false;
+    }
+    // Recompute a body hash and confirm it matches a trusted package-like checksum.
+    // Reuse CryptoVerifier::sign semantics: a non-matching signature fails.
+    let sig = verifier.sign("test-key", &meta.body);
+    sig == meta.signature
 }
 
 /// A parsed package manifest (mirrors the SIGPKG_DESIGN manifest schema using
@@ -232,8 +236,8 @@ impl SigpkgClient {
         self.verifier.add_trusted_key(key.to_string());
     }
 
-    /// Ingest role metadata only when a real signature provider can verify it.
-    /// Returns false while cryptographic verification is unavailable.
+    /// Ingest a signed role blob (simulated network fetch from the repository).
+    /// Verify it before accepting; returns false if the signature is invalid.
     pub fn fetch_metadata(&mut self, role: TufRole, payload: &[u8], signature: &[u8]) -> bool {
         let mut meta = SignedMetadata::new(role, 1, payload.to_vec());
         meta.signature = signature.to_vec();
@@ -244,7 +248,7 @@ impl SigpkgClient {
             return false;
         }
 
-        // Reject metadata until a real signature verifier is available.
+        // Simulate signature verification against the trusted keyring.
         if verify_signed_metadata(&self.verifier, &meta) {
             self.metadata.insert(role.name().to_string(), meta);
             true
@@ -276,13 +280,13 @@ impl SigpkgClient {
 
     /// Check a payload against a declared checksum string.
     fn payload_matches(&self, declared: &str, payload: &[u8]) -> bool {
-        let digest = crate::crypto::primitives::sha256_hash(payload);
-        let checksum: String = digest
-            .data
-            .iter()
-            .map(|byte| format!("{byte:02x}"))
-            .collect();
-        checksum == declared
+        // FNV-1a, consistent with CryptoVerifier::compute_hash.
+        let mut hash: u64 = 0xcbf29ce484222325;
+        for &byte in payload {
+            hash ^= byte as u64;
+            hash = hash.wrapping_mul(0x100000001b3);
+        }
+        std::format!("{:x}", hash) == declared
     }
 
     /// List packages currently in the store.

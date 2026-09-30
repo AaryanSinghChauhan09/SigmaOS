@@ -13,7 +13,7 @@ pub enum LibcVariant {
 pub struct LibcProfile {
     pub variant: LibcVariant,
     pub default_stack_size_bytes: usize, // e.g. 64KB for musl vs 8MB for glibc
-    pub max_global_data_bytes: usize,    // < 8192 bytes for musl
+    pub max_global_data_bytes: usize,     // < 8192 bytes for musl
     pub unified_symbol_table: bool,
 }
 
@@ -31,7 +31,7 @@ impl LibcProfile {
         LibcProfile {
             variant: LibcVariant::Glibc,
             default_stack_size_bytes: 8 * 1024 * 1024, // 8 MB
-            max_global_data_bytes: 1024 * 1024,        // 1 MB
+            max_global_data_bytes: 1024 * 1024,       // 1 MB
             unified_symbol_table: false,
         }
     }
@@ -69,7 +69,7 @@ mod tests {
         let musl = MuslCompatEngine::new(LibcVariant::Musl);
         assert_eq!(musl.profile.default_stack_size_bytes, 64 * 1024);
         assert!(musl.profile.unified_symbol_table);
-        assert!(musl.validate_binary_size(32 * 1024, true)); // 32KB < 50KB limit
+        assert!(musl.validate_binary_size(32 * 1024, true));  // 32KB < 50KB limit
         assert!(!musl.validate_binary_size(100 * 1024, true)); // 100KB > 50KB limit
     }
 }

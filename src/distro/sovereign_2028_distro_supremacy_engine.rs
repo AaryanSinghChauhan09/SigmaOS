@@ -99,7 +99,13 @@ impl SovereignSystemd258VmspawnEngine {
     }
 
     /// Spawn ephemeral micro-VM container with dynamically estimated kernel boot latency
-    pub fn spawn_micro_vm(&mut self, name: &str, image_path: &str, vcpus: u32, mem_mb: u32) -> u32 {
+    pub fn spawn_micro_vm(
+        &mut self,
+        name: &str,
+        image_path: &str,
+        vcpus: u32,
+        mem_mb: u32,
+    ) -> u32 {
         self.spawned_vm_counter += 1;
         let vm_id = self.spawned_vm_counter as u32;
 
@@ -140,11 +146,7 @@ impl SovereignSystemd258VmspawnEngine {
     }
 
     /// Unlock and mount PQC encrypted home directory with token hash validation
-    pub fn unlock_pqc_homed_user(
-        &mut self,
-        user: &str,
-        token_bytes: &[u8],
-    ) -> Result<bool, &'static str> {
+    pub fn unlock_pqc_homed_user(&mut self, user: &str, token_bytes: &[u8]) -> Result<bool, &'static str> {
         if token_bytes.is_empty() {
             return Err("Empty authorization token for PQC homed unlock");
         }
@@ -369,7 +371,13 @@ impl SovereignFreeBsd15VnetXdpEngine {
     }
 
     /// Configure FreeBSD 15.0 VNET dual-stack IPv4/IPv6 jail interface with eBPF-XDP
-    pub fn create_vnet_xdp_interface(&mut self, jid: u32, if_name: &str, ipv4: &str, ipv6: &str) {
+    pub fn create_vnet_xdp_interface(
+        &mut self,
+        jid: u32,
+        if_name: &str,
+        ipv4: &str,
+        ipv6: &str,
+    ) {
         let iface = VnetDualStackInterface {
             jail_id: jid,
             interface_name: if_name.to_string(),
@@ -394,10 +402,7 @@ impl SovereignFreeBsd15VnetXdpEngine {
     pub fn replicate_crdt_snapshot(&mut self, snapshot_label: &str) -> String {
         self.crdt_snapshot_replications += 1;
         let digest = fnv1a_64_digest(snapshot_label.as_bytes());
-        format!(
-            "crdt_replica://zroot/sigmaos_snapshot_{}_{:016X}",
-            snapshot_label, digest
-        )
+        format!("crdt_replica://zroot/sigmaos_snapshot_{}_{:016X}", snapshot_label, digest)
     }
 }
 
@@ -439,7 +444,12 @@ impl SovereignWayland125DirectScanoutEngine {
     }
 
     /// Submit visual frame targeting direct KMS scanout (bypassing compositor buffers)
-    pub fn submit_direct_scanout_frame(&mut self, surface_id: u32, drm_fb_id: u32, hz: u32) {
+    pub fn submit_direct_scanout_frame(
+        &mut self,
+        surface_id: u32,
+        drm_fb_id: u32,
+        hz: u32,
+    ) {
         let frame = DirectScanoutFrame {
             surface_id,
             drm_fb_id,
@@ -490,37 +500,31 @@ impl Sovereign2028DistroSupremacyMasterSuite {
         let mut score = 50u32; // Base baseline score
 
         // 1. Systemd 258 vmspawn micro-VM launcher (+10)
-        let vm_id =
-            self.vmspawn_engine
-                .spawn_micro_vm("ephemeral_box", "/images/minimal.raw", 2, 512);
+        let vm_id = self.vmspawn_engine.spawn_micro_vm("ephemeral_box", "/images/minimal.raw", 2, 512);
         if vm_id > 0 {
             score += 10;
         }
 
         // 2. Linux 6.14 eBPF sched_ext AI governor (+10)
-        self.sched_governor
-            .register_task(100, "interactive_shell", 0);
+        self.sched_governor.register_task(100, "interactive_shell", 0);
         if self.sched_governor.predict_and_optimize_task(100, 350) {
             score += 10;
         }
 
         // 3. OpenBSD 7.8 FineIBT CFI & W^X guard (+10)
-        self.fine_ibt_guard
-            .register_fine_ibt_target(0x4000, 0xABCDEF12);
+        self.fine_ibt_guard.register_fine_ibt_target(0x4000, 0xABCDEF12);
         if self.fine_ibt_guard.verify_indirect_call(0x4000, 0xABCDEF12) {
             score += 10;
         }
 
         // 4. FreeBSD 15.0 VNET eBPF-XDP Jail (+10)
-        self.vnet_xdp_engine
-            .create_vnet_xdp_interface(1, "vnet0", "192.168.1.10", "fe80::10");
+        self.vnet_xdp_engine.create_vnet_xdp_interface(1, "vnet0", "192.168.1.10", "fe80::10");
         if self.vnet_xdp_engine.redirect_packet_xdp(1, 1500) {
             score += 10;
         }
 
         // 5. Wayland 1.25 direct scanout pipeline (+10)
-        self.direct_scanout_engine
-            .submit_direct_scanout_frame(1, 42, 240);
+        self.direct_scanout_engine.submit_direct_scanout_frame(1, 42, 240);
         if self.direct_scanout_engine.direct_scanout_hits > 0 {
             score += 10;
         }
@@ -553,9 +557,7 @@ mod tests {
         assert!(spec.boot_latency_us > 0);
 
         engine.register_pqc_homed_user("alice", "/home/alice", b"RAW_MLKEM_KEY_BYTES_12345");
-        assert!(engine
-            .unlock_pqc_homed_user("alice", b"AUTH_TOKEN_PQC")
-            .unwrap());
+        assert!(engine.unlock_pqc_homed_user("alice", b"AUTH_TOKEN_PQC").unwrap());
         assert_eq!(engine.pqc_homed_unlocks, 1);
     }
 
@@ -568,10 +570,7 @@ mod tests {
 
         gov.switch_bpf_policy(BpfSchedExtPolicy::ScxBpfland);
         assert_eq!(gov.active_policy, BpfSchedExtPolicy::ScxBpfland);
-        assert_eq!(
-            gov.tasks.get(&42).unwrap().policy,
-            BpfSchedExtPolicy::ScxBpfland
-        );
+        assert_eq!(gov.tasks.get(&42).unwrap().policy, BpfSchedExtPolicy::ScxBpfland);
     }
 
     #[test]

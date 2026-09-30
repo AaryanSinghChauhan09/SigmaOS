@@ -511,20 +511,14 @@ impl Win32PeExecutableParser {
             return Err("PE: Invalid DOS header magic (MZ)");
         }
 
-        let e_lfanew =
-            u32::from_le_bytes([bytes[0x3C], bytes[0x3D], bytes[0x3E], bytes[0x3F]]) as usize;
+        let e_lfanew = u32::from_le_bytes([bytes[0x3C], bytes[0x3D], bytes[0x3E], bytes[0x3F]]) as usize;
         if bytes.len() < e_lfanew + 24 || &bytes[e_lfanew..e_lfanew + 4] != b"PE\0\0" {
             return Err("PE: Invalid NT signature (PE)");
         }
 
         let is_64bit = u16::from_le_bytes([bytes[e_lfanew + 24], bytes[e_lfanew + 25]]) == 0x020B;
         let num_sections = u16::from_le_bytes([bytes[e_lfanew + 6], bytes[e_lfanew + 7]]);
-        let entry_rva = u32::from_le_bytes([
-            bytes[e_lfanew + 40],
-            bytes[e_lfanew + 41],
-            bytes[e_lfanew + 42],
-            bytes[e_lfanew + 43],
-        ]);
+        let entry_rva = u32::from_le_bytes([bytes[e_lfanew + 40], bytes[e_lfanew + 41], bytes[e_lfanew + 42], bytes[e_lfanew + 43]]);
         let subsystem = u16::from_le_bytes([bytes[e_lfanew + 92], bytes[e_lfanew + 93]]);
 
         Ok(PeHeaderInfo {
@@ -552,10 +546,7 @@ impl NtNativeSyscallTranslator {
 
     pub fn translate_nt_create_file(path: &str) -> String {
         let posix_path = path.replace('\\', "/").replace("C:", "/mnt/c");
-        format!(
-            "openat(AT_FDCWD, \"{}\", O_CREAT | O_RDWR, 0644)",
-            posix_path
-        )
+        format!("openat(AT_FDCWD, \"{}\", O_CREAT | O_RDWR, 0644)", posix_path)
     }
 }
 
@@ -568,10 +559,7 @@ impl WindowsPowerShellShimEngine {
             "PID Name        CPU(s) Memory(MB)\n100 System           0        128\n400 Explorer         1        256\n".to_string()
         } else if trimmed.starts_with("Get-Service") {
             "Status   Name               DisplayName\nRunning  wuauserv           Windows Update\nRunning  Spooler            Print Spooler\n".to_string()
-        } else if trimmed.starts_with("Get-ChildItem")
-            || trimmed.starts_with("dir")
-            || trimmed.starts_with("ls")
-        {
+        } else if trimmed.starts_with("Get-ChildItem") || trimmed.starts_with("dir") || trimmed.starts_with("ls") {
             "Mode                 LastWriteTime         Length Name\n----                 -------------         ------ ----\nd-----         01/01/2026  12:00 PM                Program Files\n-a----         01/01/2026  12:00 PM           1024 boot.ini\n".to_string()
         } else {
             format!("PowerShell Output: Executed cmdlet '{}'", trimmed)
@@ -603,13 +591,8 @@ mod windows_extended_tests {
 
     #[test]
     fn test_nt_syscall_translator_and_powershell() {
-        assert_eq!(
-            NtNativeSyscallTranslator::translate_nt_status(0x00000000),
-            "STATUS_SUCCESS"
-        );
-        let open_call = NtNativeSyscallTranslator::translate_nt_create_file(
-            "C:\\Windows\\System32\\kernel32.dll",
-        );
+        assert_eq!(NtNativeSyscallTranslator::translate_nt_status(0x00000000), "STATUS_SUCCESS");
+        let open_call = NtNativeSyscallTranslator::translate_nt_create_file("C:\\Windows\\System32\\kernel32.dll");
         assert!(open_call.contains("/mnt/c/Windows/System32/kernel32.dll"));
 
         let proc_out = WindowsPowerShellShimEngine::execute_cmdlet_shim("Get-Process");

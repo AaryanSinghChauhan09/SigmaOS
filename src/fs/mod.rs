@@ -19,22 +19,19 @@
 pub mod btrfs;
 // pub mod filesystem;
 pub mod btrfs_send_receive;
-pub mod fstab;
 pub mod vfs;
+pub mod fstab;
+pub use btrfs_send_receive::{BtrfsSendOp, BtrfsSendCommand, BtrfsSendStream, BtrfsReceiveContext, BtrfsSubvolume, BtrfsSendReceiveManager};
 pub use btrfs::{BtrfsExtent, BtrfsFilesystem, BtrfsSnapshot, ChecksumType};
-pub use btrfs_send_receive::{
-    BtrfsReceiveContext, BtrfsSendCommand, BtrfsSendOp, BtrfsSendReceiveManager, BtrfsSendStream,
-    BtrfsSubvolume,
-};
 pub mod sigmacas;
 pub mod sigmafs;
 // pub mod support;
 // pub mod vfs;
+pub mod xfs;
+pub mod fscrypt;
 pub mod autofs;
 pub mod autofs_manager;
-pub mod fscrypt;
 pub mod monitor;
-pub mod xfs;
 pub use sigmacas::{CasBlock, SigmaFsCasEngine, DILITHIUM5_SIGNATURE_SIZE, SHA256_HASH_SIZE};
 pub use sigmafs::{
     AhciSataController, BlockStorageDevice, BlockStorageError, JournalBlock, JournalBlockType,
@@ -45,35 +42,36 @@ pub use xfs::{
     XfsState,
 };
 
-pub use fscrypt::{EncryptionContext, EncryptionPolicy, FscryptManager};
+pub use fscrypt::{
+    EncryptionPolicy, EncryptionContext, FscryptManager,
+};
 
-pub use autofs::{AutoFsManager, MountPoint, MountTriggerType};
+pub use autofs::{
+    MountTriggerType, MountPoint, AutoFsManager,
+};
 pub use monitor::{
-    DirectorySize, DiskUsage, FilesystemMonitor, FsCheckResult, FsCheckStatus, InodeUsage,
+    DiskUsage, DirectorySize, InodeUsage, FsCheckStatus, FsCheckResult,
+    FilesystemMonitor,
 };
 
 pub use autofs_manager::{
-    AutoFsEntry, AutoFsManager as AutoFsManagerNew, AutoFsState, AutoFsStats, AutoFsTrigger,
+    AutoFsTrigger, AutoFsState, AutoFsEntry, AutoFsManager as AutoFsManagerNew,
+    AutoFsStats,
 };
 
-pub use fstab::{FsType, FstabEntry, FstabManager, MountOption};
+pub use fstab::{
+    FsType, MountOption, FstabEntry, FstabManager,
+};
 
 pub mod bcachefs_sovereign;
-pub use bcachefs_sovereign::{
-    sovereign_crc32c, BcachefsExtent, BcachefsInode, BcachefsSnapshot, ChecksumAlgorithm,
-    SovereignBcachefsVolume,
-};
+pub use bcachefs_sovereign::{SovereignBcachefsVolume, BcachefsInode, BcachefsExtent, BcachefsSnapshot, ChecksumAlgorithm, sovereign_crc32c};
 
 pub mod overlayfs_sovereign;
-pub use overlayfs_sovereign::{OverlayEntry, OverlayEntryKind, OverlayLayer, SovereignOverlayFs};
+pub use overlayfs_sovereign::{SovereignOverlayFs, OverlayLayer, OverlayEntry, OverlayEntryKind};
 
 pub mod zfs_arc_sovereign;
-pub use zfs_arc_sovereign::{ArcBufferHeader, SovereignZfsArc};
+pub use zfs_arc_sovereign::{SovereignZfsArc, ArcBufferHeader};
 
 pub mod fanotify_sovereign;
-pub use fanotify_sovereign::{
-    FanotifyEvent, FanotifyEventKind, FanotifyMark, FanotifyResponse, SovereignFanotifyGroup,
-};
-pub use vfs::{
-    FilePermissions, FileType, Vfs, VfsDentry, VfsFile, VfsInode, VfsMount, VfsSuperblock,
-};
+pub use fanotify_sovereign::{SovereignFanotifyGroup, FanotifyEvent, FanotifyEventKind, FanotifyResponse, FanotifyMark};
+pub use vfs::{Vfs, VfsInode, VfsDentry, VfsSuperblock, VfsFile, VfsMount, FileType, FilePermissions};

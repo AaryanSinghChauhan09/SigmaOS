@@ -2,6 +2,7 @@
 //! Safe, zero-dependency `#![no_std]` audio graph, low-latency processing,
 //! spatial audio, and JACK client compatibility layer.
 
+
 use std::string::{String, ToString};
 use std::vec::Vec;
 
@@ -75,13 +76,7 @@ impl AudioGraph {
         id
     }
 
-    pub fn link_nodes(
-        &mut self,
-        src_id: usize,
-        src_port: usize,
-        dst_id: usize,
-        dst_port: usize,
-    ) -> bool {
+    pub fn link_nodes(&mut self, src_id: usize, src_port: usize, dst_id: usize, dst_port: usize) -> bool {
         if self.nodes.iter().any(|n| n.id == src_id) && self.nodes.iter().any(|n| n.id == dst_id) {
             self.links.push(AudioLink {
                 source_node_id: src_id,

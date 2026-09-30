@@ -1,6 +1,6 @@
-use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use std::format;
 // SigmaOS Legal & Licensing Framework
 // Clear licensing policies, patent/IP strategy, and compliance certification metrics
 

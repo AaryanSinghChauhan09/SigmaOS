@@ -53,27 +53,15 @@ impl FedoraMessageSchemaEngine {
     fn register_default_fedora_schemas(&mut self) {
         self.register_schema(
             "org.fedoraproject.prod.buildsys.task.state.change",
-            vec![
-                "task_id".to_string(),
-                "owner".to_string(),
-                "state".to_string(),
-            ],
+            vec!["task_id".to_string(), "owner".to_string(), "state".to_string()],
         );
         self.register_schema(
             "org.fedoraproject.prod.bodhi.update.comment",
-            vec![
-                "update_id".to_string(),
-                "author".to_string(),
-                "text".to_string(),
-            ],
+            vec!["update_id".to_string(), "author".to_string(), "text".to_string()],
         );
         self.register_schema(
             "org.fedoraproject.prod.git.receive",
-            vec![
-                "repo".to_string(),
-                "commit".to_string(),
-                "branch".to_string(),
-            ],
+            vec!["repo".to_string(), "commit".to_string(), "branch".to_string()],
         );
     }
 
@@ -159,7 +147,9 @@ impl FedoraAmqpBusAdapter {
     }
 
     pub fn consume_queue(&mut self, queue_name: &str) -> Vec<FedoraMessagePayload> {
-        self.queued_messages.remove(queue_name).unwrap_or_default()
+        self.queued_messages
+            .remove(queue_name)
+            .unwrap_or_default()
     }
 }
 
@@ -181,7 +171,10 @@ impl FedoraMessageSigner {
         )
     }
 
-    pub fn verify_signature(payload: &FedoraMessagePayload, signing_key: &[u8; 32]) -> bool {
+    pub fn verify_signature(
+        payload: &FedoraMessagePayload,
+        signing_key: &[u8; 32],
+    ) -> bool {
         if let Some(sig) = &payload.signature_header {
             let expected = Self::sign_message(&payload.msg_id, &payload.json_body, signing_key);
             sig == &expected
@@ -228,7 +221,13 @@ impl FedoraMessagingWebhookEngine {
         }
     }
 
-    pub fn register_endpoint(&mut self, id: &str, url: &str, pattern: &str, secret_key: &[u8]) {
+    pub fn register_endpoint(
+        &mut self,
+        id: &str,
+        url: &str,
+        pattern: &str,
+        secret_key: &[u8],
+    ) {
         self.endpoints.insert(
             id.to_string(),
             WebhookEndpoint {
@@ -334,27 +333,15 @@ impl Bugzilla2FedmsgBridgeEngine {
         let mut schema_engine = FedoraMessageSchemaEngine::new();
         schema_engine.register_schema(
             "org.fedoraproject.prod.bugzilla.bug.create",
-            vec![
-                "bug_id".to_string(),
-                "reporter".to_string(),
-                "component".to_string(),
-            ],
+            vec!["bug_id".to_string(), "reporter".to_string(), "component".to_string()],
         );
         schema_engine.register_schema(
             "org.fedoraproject.prod.bugzilla.bug.update",
-            vec![
-                "bug_id".to_string(),
-                "status".to_string(),
-                "assigned_to".to_string(),
-            ],
+            vec!["bug_id".to_string(), "status".to_string(), "assigned_to".to_string()],
         );
         schema_engine.register_schema(
             "org.fedoraproject.prod.bugzilla.comment.add",
-            vec![
-                "bug_id".to_string(),
-                "author".to_string(),
-                "comment".to_string(),
-            ],
+            vec!["bug_id".to_string(), "author".to_string(), "comment".to_string()],
         );
 
         let mut bus_adapter = FedoraAmqpBusAdapter::new(exchange_name);
@@ -444,8 +431,7 @@ mod tests {
             },
             msg_id: "msg_001".to_string(),
             timestamp: 1700000000,
-            json_body: "{\"task_id\": 1234, \"owner\": \"builder\", \"state\": \"CLOSED\"}"
-                .to_string(),
+            json_body: "{\"task_id\": 1234, \"owner\": \"builder\", \"state\": \"CLOSED\"}".to_string(),
             signature_header: None,
         };
 
@@ -539,10 +525,7 @@ mod tests {
         assert_eq!(processed, 1);
         assert_eq!(webhook.total_dispatched_count, 1);
 
-        assert_eq!(
-            FedoraMessagingWebhookEngine::compute_backoff_delay_secs(3),
-            8
-        );
+        assert_eq!(FedoraMessagingWebhookEngine::compute_backoff_delay_secs(3), 8);
     }
 
     #[test]

@@ -3,6 +3,8 @@ use std::format;
 // Kernel-level Illumos/Solaris DTrace D-Language bytecode interpreter and probe engine for SigmaOS
 // Enables dynamic tracing, DIF (DTrace Intermediate Format) execution, and aggregation buffers
 
+
+
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
@@ -27,13 +29,13 @@ pub struct DTraceProbe {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DifOpcode {
-    Ld,       // Load variable
-    SetX,     // Set constant
-    Add,      // Addition
-    Sub,      // Subtraction
-    Cmp,      // Compare
-    Be,       // Branch if equal
-    Ret,      // Return value
+    Ld,     // Load variable
+    SetX,   // Set constant
+    Add,    // Addition
+    Sub,    // Subtraction
+    Cmp,    // Compare
+    Be,     // Branch if equal
+    Ret,    // Return value
     AggCount, // Aggregation count
     AggSum,   // Aggregation sum
 }
@@ -64,14 +66,7 @@ impl DTraceEngine {
         }
     }
 
-    pub fn register_probe(
-        &mut self,
-        provider: &str,
-        module: &str,
-        function: &str,
-        name: &str,
-        kind: DTraceProbeKind,
-    ) -> usize {
+    pub fn register_probe(&mut self, provider: &str, module: &str, function: &str, name: &str, kind: DTraceProbeKind) -> usize {
         let probe = DTraceProbe {
             provider: provider.to_string(),
             module: module.to_string(),
@@ -85,44 +80,27 @@ impl DTraceEngine {
     }
 
     /// Executes DIF (DTrace Intermediate Format) bytecode program on probe hit
-    pub fn execute_dif_bytecode(
-        &mut self,
-        program: &[DifInstruction],
-        arg0: u64,
-    ) -> Result<u64, &'static str> {
+    pub fn execute_dif_bytecode(&mut self, program: &[DifInstruction], arg0: u64) -> Result<u64, &'static str> {
         self.registers = [0u64; 8];
         self.registers[0] = arg0;
 
         for instr in program {
             match instr.opcode {
                 DifOpcode::SetX => {
-                    if instr.reg_dest >= 8 {
-                        return Err("Invalid destination register");
-                    }
+                    if instr.reg_dest >= 8 { return Err("Invalid destination register"); }
                     self.registers[instr.reg_dest as usize] = instr.immediate;
                 }
                 DifOpcode::Ld => {
-                    if instr.reg_dest >= 8 || instr.reg_src1 >= 8 {
-                        return Err("Invalid register");
-                    }
-                    self.registers[instr.reg_dest as usize] =
-                        self.registers[instr.reg_src1 as usize];
+                    if instr.reg_dest >= 8 || instr.reg_src1 >= 8 { return Err("Invalid register"); }
+                    self.registers[instr.reg_dest as usize] = self.registers[instr.reg_src1 as usize];
                 }
                 DifOpcode::Add => {
-                    if instr.reg_dest >= 8 || instr.reg_src1 >= 8 || instr.reg_src2 >= 8 {
-                        return Err("Invalid register");
-                    }
-                    self.registers[instr.reg_dest as usize] = self.registers
-                        [instr.reg_src1 as usize]
-                        .wrapping_add(self.registers[instr.reg_src2 as usize]);
+                    if instr.reg_dest >= 8 || instr.reg_src1 >= 8 || instr.reg_src2 >= 8 { return Err("Invalid register"); }
+                    self.registers[instr.reg_dest as usize] = self.registers[instr.reg_src1 as usize].wrapping_add(self.registers[instr.reg_src2 as usize]);
                 }
                 DifOpcode::Sub => {
-                    if instr.reg_dest >= 8 || instr.reg_src1 >= 8 || instr.reg_src2 >= 8 {
-                        return Err("Invalid register");
-                    }
-                    self.registers[instr.reg_dest as usize] = self.registers
-                        [instr.reg_src1 as usize]
-                        .wrapping_sub(self.registers[instr.reg_src2 as usize]);
+                    if instr.reg_dest >= 8 || instr.reg_src1 >= 8 || instr.reg_src2 >= 8 { return Err("Invalid register"); }
+                    self.registers[instr.reg_dest as usize] = self.registers[instr.reg_src1 as usize].wrapping_sub(self.registers[instr.reg_src2 as usize]);
                 }
                 DifOpcode::AggCount => {
                     let key = std::format!("count@reg{}", instr.reg_src1);
@@ -137,8 +115,7 @@ impl DTraceEngine {
                 }
                 DifOpcode::Ret => {
                     let ret_val = self.registers[instr.reg_dest as usize];
-                    self.trace_log
-                        .push(std::format!("DTrace trace return: {}", ret_val));
+                    self.trace_log.push(std::format!("DTrace trace return: {}", ret_val));
                     return Ok(ret_val);
                 }
                 _ => {}
@@ -161,50 +138,14 @@ mod tests {
     #[test]
     fn test_dtrace_engine_execution() {
         let mut dtrace = DTraceEngine::new();
-        dtrace.register_probe(
-            "fbt",
-            "kernel",
-            "sys_read",
-            "entry",
-            DTraceProbeKind::FunctionBoundaryTracing,
-        );
+        dtrace.register_probe("fbt", "kernel", "sys_read", "entry", DTraceProbeKind::FunctionBoundaryTracing);
 
         let program = [
-            DifInstruction {
-                opcode: DifOpcode::SetX,
-                reg_dest: 1,
-                reg_src1: 0,
-                reg_src2: 0,
-                immediate: 100,
-            },
-            DifInstruction {
-                opcode: DifOpcode::Add,
-                reg_dest: 2,
-                reg_src1: 0,
-                reg_src2: 1,
-                immediate: 0,
-            },
-            DifInstruction {
-                opcode: DifOpcode::AggCount,
-                reg_dest: 0,
-                reg_src1: 0,
-                reg_src2: 0,
-                immediate: 0,
-            },
-            DifInstruction {
-                opcode: DifOpcode::AggSum,
-                reg_dest: 0,
-                reg_src1: 2,
-                reg_src2: 0,
-                immediate: 0,
-            },
-            DifInstruction {
-                opcode: DifOpcode::Ret,
-                reg_dest: 2,
-                reg_src1: 0,
-                reg_src2: 0,
-                immediate: 0,
-            },
+            DifInstruction { opcode: DifOpcode::SetX, reg_dest: 1, reg_src1: 0, reg_src2: 0, immediate: 100 },
+            DifInstruction { opcode: DifOpcode::Add, reg_dest: 2, reg_src1: 0, reg_src2: 1, immediate: 0 },
+            DifInstruction { opcode: DifOpcode::AggCount, reg_dest: 0, reg_src1: 0, reg_src2: 0, immediate: 0 },
+            DifInstruction { opcode: DifOpcode::AggSum, reg_dest: 0, reg_src1: 2, reg_src2: 0, immediate: 0 },
+            DifInstruction { opcode: DifOpcode::Ret, reg_dest: 2, reg_src1: 0, reg_src2: 0, immediate: 0 },
         ];
 
         let ret = dtrace.execute_dif_bytecode(&program, 50).unwrap();

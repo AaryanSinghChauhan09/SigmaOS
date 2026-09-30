@@ -1,4 +1,3 @@
-use core::sync::atomic::{AtomicUsize, Ordering};
 use std::format;
 /// Linux Mint (MintTools) Compatibility and UI Subsystem Layer for SigmaOS
 /// Replicates the signature user-friendly systems from Linux Mint:
@@ -6,6 +5,7 @@ use std::format;
 /// Cinnamon-like desktop theme manager, and MintDrivers manager.
 use std::string::{String, ToString};
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MintError {
@@ -354,16 +354,8 @@ impl CinnamonThemeEngine {
         let default_name = b"Mint-Y-Dark";
         let default_icons = b"Mint-Y";
         unsafe {
-            core::ptr::copy_nonoverlapping(
-                default_name.as_ptr(),
-                theme.as_mut_ptr(),
-                default_name.len(),
-            );
-            core::ptr::copy_nonoverlapping(
-                default_icons.as_ptr(),
-                icon_theme.as_mut_ptr(),
-                default_icons.len(),
-            );
+            core::ptr::copy_nonoverlapping(default_name.as_ptr(), theme.as_mut_ptr(), default_name.len());
+            core::ptr::copy_nonoverlapping(default_icons.as_ptr(), icon_theme.as_mut_ptr(), default_icons.len());
         }
         Self {
             active_gtk_theme: theme,
@@ -967,7 +959,14 @@ impl MintHypnotixIptvEngine {
         added
     }
 
-    pub fn add_channel(&mut self, name: &str, url: &str, country: &str, category: &str, hd: bool) {
+    pub fn add_channel(
+        &mut self,
+        name: &str,
+        url: &str,
+        country: &str,
+        category: &str,
+        hd: bool,
+    ) {
         self.channels.push(IptvChannel {
             name: name.to_string(),
             stream_url: url.to_string(),
@@ -978,12 +977,7 @@ impl MintHypnotixIptvEngine {
     }
 
     pub fn play_channel(&mut self, name: &str) -> Result<String, &'static str> {
-        if let Some((idx, ch)) = self
-            .channels
-            .iter()
-            .enumerate()
-            .find(|(_, c)| c.name == name)
-        {
+        if let Some((idx, ch)) = self.channels.iter().enumerate().find(|(_, c)| c.name == name) {
             self.active_channel_index = Some(idx);
             Ok(format!("Playing stream from {}", ch.stream_url))
         } else {
@@ -992,10 +986,7 @@ impl MintHypnotixIptvEngine {
     }
 
     pub fn filter_by_country(&self, country: &str) -> Vec<&IptvChannel> {
-        self.channels
-            .iter()
-            .filter(|c| c.country_code == country)
-            .collect()
+        self.channels.iter().filter(|c| c.country_code == country).collect()
     }
 }
 
@@ -1102,9 +1093,7 @@ impl MintNannyDomainFilter {
         }
         for rule in &self.blocked_rules {
             if domain.contains(&rule.domain) {
-                if current_hour >= rule.block_time_start_hour
-                    && current_hour < rule.block_time_end_hour
-                {
+                if current_hour >= rule.block_time_start_hour && current_hour < rule.block_time_end_hour {
                     return true;
                 }
             }
@@ -1153,11 +1142,7 @@ impl MintLocaleManager {
     }
 
     pub fn switch_active_locale(&mut self, locale_code: &str) -> Result<(), &'static str> {
-        if self
-            .installed_languages
-            .iter()
-            .any(|l| l.locale_code == locale_code)
-        {
+        if self.installed_languages.iter().any(|l| l.locale_code == locale_code) {
             self.active_locale = locale_code.to_string();
             Ok(())
         } else {
@@ -1197,10 +1182,7 @@ impl MintUsbFormatterTool {
     }
 
     pub fn select_device(&mut self, device_path: &str) -> Result<(), &'static str> {
-        if device_path.starts_with("/dev/sd")
-            || device_path.starts_with("/dev/nvme")
-            || device_path.starts_with("/dev/mmc")
-        {
+        if device_path.starts_with("/dev/sd") || device_path.starts_with("/dev/nvme") || device_path.starts_with("/dev/mmc") {
             self.target_device_path = device_path.to_string();
             Ok(())
         } else {
@@ -1208,11 +1190,7 @@ impl MintUsbFormatterTool {
         }
     }
 
-    pub fn format_filesystem(
-        &mut self,
-        format_type: UsbFileSystemFormat,
-        label: &str,
-    ) -> Result<String, &'static str> {
+    pub fn format_filesystem(&mut self, format_type: UsbFileSystemFormat, label: &str) -> Result<String, &'static str> {
         if self.target_device_path.is_empty() {
             return Err("No device selected");
         }
@@ -1401,17 +1379,8 @@ impl MintWarpinatorFileTransferEngine {
         }
     }
 
-    pub fn queue_file_transfer(
-        &mut self,
-        sender_uuid: &str,
-        file_name: &str,
-        size: u64,
-    ) -> Result<(), &'static str> {
-        if !self
-            .discovered_peers
-            .iter()
-            .any(|p| p.uuid == sender_uuid && p.trusted)
-        {
+    pub fn queue_file_transfer(&mut self, sender_uuid: &str, file_name: &str, size: u64) -> Result<(), &'static str> {
+        if !self.discovered_peers.iter().any(|p| p.uuid == sender_uuid && p.trusted) {
             return Err("Warpinator: Peer is not trusted or paired");
         }
         self.transfer_queue.push(WarpinatorTransferItem {
@@ -1567,15 +1536,7 @@ impl MintUploadManager {
         }
     }
 
-    pub fn add_profile(
-        &mut self,
-        name: &str,
-        host: &str,
-        port: u16,
-        protocol: UploadProtocol,
-        remote_path: &str,
-        url_base: &str,
-    ) {
+    pub fn add_profile(&mut self, name: &str, host: &str, port: u16, protocol: UploadProtocol, remote_path: &str, url_base: &str) {
         self.profiles.push(UploadProfile {
             name: name.to_string(),
             host: host.to_string(),
@@ -1586,21 +1547,9 @@ impl MintUploadManager {
         });
     }
 
-    pub fn generate_share_link(
-        &self,
-        profile_name: &str,
-        filename: &str,
-    ) -> Result<String, &'static str> {
-        let prof = self
-            .profiles
-            .iter()
-            .find(|p| p.name == profile_name)
-            .ok_or("Upload profile not found")?;
-        Ok(format!(
-            "{}/{}",
-            prof.public_url_base.trim_end_matches('/'),
-            filename
-        ))
+    pub fn generate_share_link(&self, profile_name: &str, filename: &str) -> Result<String, &'static str> {
+        let prof = self.profiles.iter().find(|p| p.name == profile_name).ok_or("Upload profile not found")?;
+        Ok(format!("{}/{}", prof.public_url_base.trim_end_matches('/'), filename))
     }
 }
 
@@ -1853,11 +1802,7 @@ impl MintUserAccountsManager {
     }
 
     pub fn set_autologin(&mut self, username: &str, enabled: bool) -> Result<(), &'static str> {
-        let user = self
-            .users
-            .iter_mut()
-            .find(|u| u.username == username)
-            .ok_or("User not found")?;
+        let user = self.users.iter_mut().find(|u| u.username == username).ok_or("User not found")?;
         user.autologin_enabled = enabled;
         Ok(())
     }
@@ -1933,9 +1878,7 @@ impl Default for MintCinnamonHotCornerEngine {
 
 impl MintCinnamonHotCornerEngine {
     pub fn new() -> Self {
-        let mut engine = Self {
-            corners: Vec::new(),
-        };
+        let mut engine = Self { corners: Vec::new() };
         engine.corners.push(HotCornerConfig {
             location: HotCornerLocation::TopLeft,
             action: HotCornerAction::ExpoWorkspaces,
@@ -1945,12 +1888,7 @@ impl MintCinnamonHotCornerEngine {
         engine
     }
 
-    pub fn set_corner_action(
-        &mut self,
-        location: HotCornerLocation,
-        action: HotCornerAction,
-        cmd: &str,
-    ) {
+    pub fn set_corner_action(&mut self, location: HotCornerLocation, action: HotCornerAction, cmd: &str) {
         if let Some(c) = self.corners.iter_mut().find(|c| c.location == location) {
             c.action = action;
             c.custom_cmd = cmd.to_string();
@@ -1965,10 +1903,7 @@ impl MintCinnamonHotCornerEngine {
     }
 
     pub fn trigger_corner(&self, location: HotCornerLocation) -> Option<HotCornerAction> {
-        self.corners
-            .iter()
-            .find(|c| c.location == location)
-            .map(|c| c.action)
+        self.corners.iter().find(|c| c.location == location).map(|c| c.action)
     }
 }
 
@@ -2030,13 +1965,7 @@ impl MintInstallFlatpakRefFetcher {
         Self { refs: Vec::new() }
     }
 
-    pub fn parse_flatpakref(
-        &mut self,
-        name: &str,
-        branch: &str,
-        title: &str,
-        url: &str,
-    ) -> Result<&FlatpakRefDescriptor, &'static str> {
+    pub fn parse_flatpakref(&mut self, name: &str, branch: &str, title: &str, url: &str) -> Result<&FlatpakRefDescriptor, &'static str> {
         if url.is_empty() {
             return Err("Invalid FlatpakRef URL");
         }
@@ -2252,10 +2181,7 @@ impl MintNemoExtensionManager {
     }
 
     pub fn get_menu_providers(&self) -> Vec<&NemoExtensionDescriptor> {
-        self.extensions
-            .iter()
-            .filter(|e| e.enabled && e.provides_menus)
-            .collect()
+        self.extensions.iter().filter(|e| e.enabled && e.provides_menus).collect()
     }
 }
 
@@ -2355,20 +2281,10 @@ mod tests {
     #[test]
     fn test_mint_cinnamon_hot_corner_engine() {
         let mut corners = MintCinnamonHotCornerEngine::new();
-        assert_eq!(
-            corners.trigger_corner(HotCornerLocation::TopLeft),
-            Some(HotCornerAction::ExpoWorkspaces)
-        );
+        assert_eq!(corners.trigger_corner(HotCornerLocation::TopLeft), Some(HotCornerAction::ExpoWorkspaces));
 
-        corners.set_corner_action(
-            HotCornerLocation::BottomRight,
-            HotCornerAction::ShowDesktop,
-            "",
-        );
-        assert_eq!(
-            corners.trigger_corner(HotCornerLocation::BottomRight),
-            Some(HotCornerAction::ShowDesktop)
-        );
+        corners.set_corner_action(HotCornerLocation::BottomRight, HotCornerAction::ShowDesktop, "");
+        assert_eq!(corners.trigger_corner(HotCornerLocation::BottomRight), Some(HotCornerAction::ShowDesktop));
     }
 
     #[test]
@@ -2384,14 +2300,7 @@ mod tests {
     #[test]
     fn test_mint_install_flatpak_ref_fetcher() {
         let mut flatpak_ref = MintInstallFlatpakRefFetcher::new();
-        let desc = flatpak_ref
-            .parse_flatpakref(
-                "vlc",
-                "stable",
-                "VLC Media Player",
-                "https://dl.flathub.org/repo/appstream/vlc.flatpakref",
-            )
-            .unwrap();
+        let desc = flatpak_ref.parse_flatpakref("vlc", "stable", "VLC Media Player", "https://dl.flathub.org/repo/appstream/vlc.flatpakref").unwrap();
         assert_eq!(desc.name, "vlc");
         assert!(desc.gpg_key_valid);
     }
@@ -2448,19 +2357,10 @@ mod tests {
     #[test]
     fn test_mint_upload_manager() {
         let mut upload = MintUploadManager::new();
-        upload.add_profile(
-            "Community FTP",
-            "ftp.example.com",
-            21,
-            UploadProtocol::Ftp,
-            "/uploads",
-            "https://example.com/files",
-        );
+        upload.add_profile("Community FTP", "ftp.example.com", 21, UploadProtocol::Ftp, "/uploads", "https://example.com/files");
         assert_eq!(upload.profiles.len(), 1);
 
-        let link = upload
-            .generate_share_link("Community FTP", "image.png")
-            .unwrap();
+        let link = upload.generate_share_link("Community FTP", "image.png").unwrap();
         assert_eq!(link, "https://example.com/files/image.png");
     }
 
@@ -2495,22 +2395,11 @@ mod tests {
     #[test]
     fn test_mint_webapp_manager() {
         let mut webapps = MintWebAppManager::new();
-        let id = webapps.register_webapp(
-            "GitHub",
-            "https://github.com",
-            "Development",
-            "github.png",
-            true,
-        );
+        let id = webapps.register_webapp("GitHub", "https://github.com", "Development", "github.png", true);
         assert_eq!(id, 1);
 
-        webapps
-            .set_custom_user_agent(id, "Mozilla/5.0 Custom")
-            .unwrap();
-        assert_eq!(
-            webapps.web_apps[0].custom_user_agent,
-            Some("Mozilla/5.0 Custom".to_string())
-        );
+        webapps.set_custom_user_agent(id, "Mozilla/5.0 Custom").unwrap();
+        assert_eq!(webapps.web_apps[0].custom_user_agent, Some("Mozilla/5.0 Custom".to_string()));
 
         let cmd = webapps.launch_webapp_command(id).unwrap();
         assert!(cmd.contains("zenith-browser --app=\"https://github.com\""));
@@ -2519,17 +2408,10 @@ mod tests {
     #[test]
     fn test_mint_hypnotix_iptv_engine() {
         let mut hypnotix = MintHypnotixIptvEngine::new();
-        hypnotix.add_channel(
-            "News 24",
-            "https://stream.news24.com/live.m3u8",
-            "US",
-            "News",
-            true,
-        );
+        hypnotix.add_channel("News 24", "https://stream.news24.com/live.m3u8", "US", "News", true);
         assert_eq!(hypnotix.channels.len(), 1);
 
-        let m3u_added =
-            hypnotix.import_m3u_playlist("#EXTM3U\nhttps://stream.sports.com/live.m3u8");
+        let m3u_added = hypnotix.import_m3u_playlist("#EXTM3U\nhttps://stream.sports.com/live.m3u8");
         assert_eq!(m3u_added, 1);
         assert_eq!(hypnotix.channels.len(), 2);
 
@@ -2588,9 +2470,7 @@ mod tests {
         let mut usb_tool = MintUsbFormatterTool::new();
         assert!(usb_tool.select_device("/dev/sdb").is_ok());
 
-        let fmt_result = usb_tool
-            .format_filesystem(UsbFileSystemFormat::Fat32, "MINT_USB")
-            .unwrap();
+        let fmt_result = usb_tool.format_filesystem(UsbFileSystemFormat::Fat32, "MINT_USB").unwrap();
         assert!(fmt_result.contains("Successfully formatted /dev/sdb"));
 
         let iso_result = usb_tool.write_iso_image("/home/user/sigmaos.iso").unwrap();
@@ -2613,9 +2493,7 @@ mod tests {
         applet_mgr.add_applet("workspace-switcher@cinnamon.org", "Workspace Switcher", 0);
         assert_eq!(applet_mgr.applets.len(), 1);
 
-        assert!(applet_mgr
-            .set_applet_state("workspace-switcher@cinnamon.org", false)
-            .is_ok());
+        assert!(applet_mgr.set_applet_state("workspace-switcher@cinnamon.org", false).is_ok());
         assert!(!applet_mgr.applets[0].enabled);
     }
 
@@ -2746,17 +2624,13 @@ mod tests {
         let peer_uuid = warpinator.discover_peer("mint-laptop", "192.168.1.100", 42000, "123456");
 
         // Unpaired queue attempt should fail
-        assert!(warpinator
-            .queue_file_transfer(&peer_uuid, "document.pdf", 1024)
-            .is_err());
+        assert!(warpinator.queue_file_transfer(&peer_uuid, "document.pdf", 1024).is_err());
 
         // Pair with matching PIN
         assert!(warpinator.pair_peer(&peer_uuid, "123456").is_ok());
 
         // Paired queue attempt should succeed
-        assert!(warpinator
-            .queue_file_transfer(&peer_uuid, "document.pdf", 1024)
-            .is_ok());
+        assert!(warpinator.queue_file_transfer(&peer_uuid, "document.pdf", 1024).is_ok());
         assert_eq!(warpinator.transfer_queue.len(), 1);
     }
 
@@ -2764,19 +2638,13 @@ mod tests {
     fn test_mint_bulky_batch_renamer() {
         let files = vec!["photo_1.png", "photo_2.png"];
 
-        let replaced =
-            MintBulkyBatchRenamerEngine::rename_find_replace(&files, "photo_", "vacation_");
+        let replaced = MintBulkyBatchRenamerEngine::rename_find_replace(&files, "photo_", "vacation_");
         assert_eq!(replaced, vec!["vacation_1.png", "vacation_2.png"]);
 
-        let prefixed =
-            MintBulkyBatchRenamerEngine::rename_add_prefix_suffix(&files, "2026_", "_backup");
-        assert_eq!(
-            prefixed,
-            vec!["2026_photo_1_backup.png", "2026_photo_2_backup.png"]
-        );
+        let prefixed = MintBulkyBatchRenamerEngine::rename_add_prefix_suffix(&files, "2026_", "_backup");
+        assert_eq!(prefixed, vec!["2026_photo_1_backup.png", "2026_photo_2_backup.png"]);
 
-        let cased =
-            MintBulkyBatchRenamerEngine::rename_change_case(&files, BulkyCaseMode::Uppercase);
+        let cased = MintBulkyBatchRenamerEngine::rename_change_case(&files, BulkyCaseMode::Uppercase);
         assert_eq!(cased, vec!["PHOTO_1.PNG", "PHOTO_2.PNG"]);
     }
 

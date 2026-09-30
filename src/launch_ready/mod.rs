@@ -12,18 +12,18 @@
 extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::format;
+use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use std::string::{String, ToString};
+use alloc::format;
 
-#[cfg(any(feature = "standalone_test", test))]
-use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::String;
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
+#[cfg(any(feature = "standalone_test", test))]
+use std::format;
 
 use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 
@@ -107,10 +107,10 @@ pub enum SovereignSyscallNumber {
     SysClose = 6,
     SysMmap = 9,
     SysIoctl = 16,
-    SysPledge = 100,      // OpenBSD security inspiration
-    SysUnveil = 101,      // OpenBSD filesystem sandboxing
-    SysKqueue = 102,      // FreeBSD high-performance event loop
-    SysKevent = 103,      // FreeBSD kevent multiplexing
+    SysPledge = 100, // OpenBSD security inspiration
+    SysUnveil = 101, // OpenBSD filesystem sandboxing
+    SysKqueue = 102, // FreeBSD high-performance event loop
+    SysKevent = 103, // FreeBSD kevent multiplexing
     SysZfsSnapshot = 104, // OpenZFS / Solaris snapshot primitive
     SysDtraceProbe = 105, // Illumos DTrace tracing probe
 }
@@ -126,12 +126,7 @@ impl SyscallDispatcher {
         }
     }
 
-    pub fn dispatch(
-        &self,
-        call: SovereignSyscallNumber,
-        arg1: u64,
-        arg2: u64,
-    ) -> Result<u64, &'static str> {
+    pub fn dispatch(&self, call: SovereignSyscallNumber, arg1: u64, arg2: u64) -> Result<u64, &'static str> {
         self.syscalls_handled.fetch_add(1, Ordering::Relaxed);
         match call {
             SovereignSyscallNumber::SysExit => Ok(0),
@@ -140,7 +135,7 @@ impl SyscallDispatcher {
             SovereignSyscallNumber::SysPledge => Ok(0), // Security isolation verified
             SovereignSyscallNumber::SysUnveil => Ok(0), // Path sandboxed verified
             SovereignSyscallNumber::SysKqueue => Ok(10), // Return new kqueue fd
-            SovereignSyscallNumber::SysKevent => Ok(1), // 1 event ready
+            SovereignSyscallNumber::SysKevent => Ok(1),  // 1 event ready
             _ => Ok(arg1),
         }
     }
@@ -187,16 +182,14 @@ impl SovereignPhysicalMemoryManager {
         if current + (PAGE_SIZE as u64) > self.total_memory_bytes {
             None
         } else {
-            self.used_memory_bytes
-                .fetch_add(PAGE_SIZE as u64, Ordering::SeqCst);
+            self.used_memory_bytes.fetch_add(PAGE_SIZE as u64, Ordering::SeqCst);
             Some(PhysicalFrame::from_addr(current))
         }
     }
 
     pub fn free_frame(&self, _frame: PhysicalFrame) {
         if self.used_memory_bytes.load(Ordering::Relaxed) >= (PAGE_SIZE as u64) {
-            self.used_memory_bytes
-                .fetch_sub(PAGE_SIZE as u64, Ordering::SeqCst);
+            self.used_memory_bytes.fetch_sub(PAGE_SIZE as u64, Ordering::SeqCst);
         }
     }
 }
@@ -298,10 +291,7 @@ impl SigmaOsLaunchReadinessSuite {
     pub fn verify_distro_superiority_matrix(&mut self) -> String {
         let next_task = self.scheduler.schedule_next();
         let frame = self.pmm.allocate_frame().map(|f| f.to_addr()).unwrap_or(0);
-        let syscall_res = self
-            .syscall_dispatcher
-            .dispatch(SovereignSyscallNumber::SysPledge, 0, 0)
-            .is_ok();
+        let syscall_res = self.syscall_dispatcher.dispatch(SovereignSyscallNumber::SysPledge, 0, 0).is_ok();
 
         format!(
             "SigmaOS Bare-Metal Launch Readiness Verified:\n\
@@ -331,24 +321,9 @@ mod tests {
     #[test]
     fn test_syscall_dispatch() {
         let dispatcher = SyscallDispatcher::new();
-        assert_eq!(
-            dispatcher
-                .dispatch(SovereignSyscallNumber::SysExit, 0, 0)
-                .unwrap(),
-            0
-        );
-        assert_eq!(
-            dispatcher
-                .dispatch(SovereignSyscallNumber::SysPledge, 0, 0)
-                .unwrap(),
-            0
-        );
-        assert_eq!(
-            dispatcher
-                .dispatch(SovereignSyscallNumber::SysKqueue, 0, 0)
-                .unwrap(),
-            10
-        );
+        assert_eq!(dispatcher.dispatch(SovereignSyscallNumber::SysExit, 0, 0).unwrap(), 0);
+        assert_eq!(dispatcher.dispatch(SovereignSyscallNumber::SysPledge, 0, 0).unwrap(), 0);
+        assert_eq!(dispatcher.dispatch(SovereignSyscallNumber::SysKqueue, 0, 0).unwrap(), 10);
     }
 
     #[test]

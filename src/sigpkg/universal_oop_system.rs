@@ -6015,13 +6015,19 @@ impl Default for OmarchyPackageBridgeAdapter {
 
 pub struct UrpmiRpmAdapter;
 impl UrpmiRpmAdapter {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
     pub fn parse_synthesis_hdr(&self, synthesis_line: &str) -> Option<(String, String, String)> {
         let parts: Vec<&str> = synthesis_line.split('@').collect();
         if parts.len() >= 2 {
             let name_ver = parts[1];
             let deps = if parts.len() >= 3 { parts[2] } else { "" };
-            Some((name_ver.to_string(), deps.to_string(), "rpm-synthesis".to_string()))
+            Some((
+                name_ver.to_string(),
+                deps.to_string(),
+                "rpm-synthesis".to_string(),
+            ))
         } else {
             None
         }
@@ -6029,12 +6035,16 @@ impl UrpmiRpmAdapter {
 }
 
 impl Default for UrpmiRpmAdapter {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 pub struct AptRpmAdapter;
 impl AptRpmAdapter {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
     pub fn translate_apt_rpm_release(&self, line: &str) -> Option<(String, String)> {
         if line.contains("Component:") {
             let comp = line.split("Component:").nth(1)?.split(',').next()?.trim();
@@ -6046,7 +6056,9 @@ impl AptRpmAdapter {
 }
 
 impl Default for AptRpmAdapter {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 pub struct ManjaroBranchSyncAdapter {
@@ -6055,7 +6067,9 @@ pub struct ManjaroBranchSyncAdapter {
 
 impl ManjaroBranchSyncAdapter {
     pub fn new() -> Self {
-        Self { current_branch: "stable".to_string() }
+        Self {
+            current_branch: "stable".to_string(),
+        }
     }
     pub fn switch_branch(&mut self, branch: &str) -> String {
         self.current_branch = branch.to_string();
@@ -6064,19 +6078,27 @@ impl ManjaroBranchSyncAdapter {
 }
 
 impl Default for ManjaroBranchSyncAdapter {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 pub struct PopOsSystem76Adapter;
 impl PopOsSystem76Adapter {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
     pub fn is_system76_hardware_driver(&self, pkg: &str) -> bool {
-        pkg.starts_with("system76-") || pkg.contains("pop-desktop") || pkg.contains("system76-driver")
+        pkg.starts_with("system76-")
+            || pkg.contains("pop-desktop")
+            || pkg.contains("system76-driver")
     }
 }
 
 impl Default for PopOsSystem76Adapter {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 pub struct NixFlakeProfileGcAdapter {
@@ -6085,7 +6107,9 @@ pub struct NixFlakeProfileGcAdapter {
 
 impl NixFlakeProfileGcAdapter {
     pub fn new() -> Self {
-        Self { profiles_cleaned: 0 }
+        Self {
+            profiles_cleaned: 0,
+        }
     }
     pub fn garbage_collect_generations(&mut self, keep_last: usize) -> usize {
         let freed = if keep_last < 5 { 5 - keep_last } else { 1 };
@@ -6095,7 +6119,9 @@ impl NixFlakeProfileGcAdapter {
 }
 
 impl Default for NixFlakeProfileGcAdapter {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // ============================================================================
@@ -6113,7 +6139,10 @@ pub struct EqualsExpr {
 
 impl EqualsExpr {
     pub fn new(key: impl Into<String>, value: impl Into<String>) -> Self {
-        Self { key: key.into(), value: value.into() }
+        Self {
+            key: key.into(),
+            value: value.into(),
+        }
     }
 }
 
@@ -6168,7 +6197,9 @@ pub struct PackageQueryInterpreter {
 
 impl PackageQueryInterpreter {
     pub fn new(expr: Box<dyn QueryExpr>) -> Self {
-        Self { root_expr: Some(expr) }
+        Self {
+            root_expr: Some(expr),
+        }
     }
 
     pub fn matches(&self, package: &dyn IPackage) -> bool {
@@ -6211,7 +6242,10 @@ pub struct PackageFilterIterator<'a> {
 }
 
 impl<'a> PackageFilterIterator<'a> {
-    pub fn new(inner: UniversalPackageIterator<'a>, interpreter: &'a PackageQueryInterpreter) -> Self {
+    pub fn new(
+        inner: UniversalPackageIterator<'a>,
+        interpreter: &'a PackageQueryInterpreter,
+    ) -> Self {
         Self { inner, interpreter }
     }
 }
@@ -6236,14 +6270,22 @@ pub trait SandboxBackend: Send + Sync {
 pub struct BubblewrapSandboxBackend;
 impl SandboxBackend for BubblewrapSandboxBackend {
     fn execute_in_sandbox(&self, command: &str, package: &dyn IPackage) -> Result<String, String> {
-        Ok(format!("bwrap --unshare-all --ro-bind / / {} (pkg: {})", command, package.name()))
+        Ok(format!(
+            "bwrap --unshare-all --ro-bind / / {} (pkg: {})",
+            command,
+            package.name()
+        ))
     }
 }
 
 pub struct ChrootSandboxBackend;
 impl SandboxBackend for ChrootSandboxBackend {
     fn execute_in_sandbox(&self, command: &str, package: &dyn IPackage) -> Result<String, String> {
-        Ok(format!("chroot /var/lib/sigma/jail {} (pkg: {})", command, package.name()))
+        Ok(format!(
+            "chroot /var/lib/sigma/jail {} (pkg: {})",
+            command,
+            package.name()
+        ))
     }
 }
 
@@ -6256,7 +6298,11 @@ impl PackageExecutionBridge {
         Self { sandbox }
     }
 
-    pub fn run_package_task(&self, command: &str, package: &dyn IPackage) -> Result<String, String> {
+    pub fn run_package_task(
+        &self,
+        command: &str,
+        package: &dyn IPackage,
+    ) -> Result<String, String> {
         self.sandbox.execute_in_sandbox(command, package)
     }
 }
@@ -6370,7 +6416,9 @@ pub struct UdfCustomConstraintSolverFilter {
 
 impl UdfCustomConstraintSolverFilter {
     pub fn new() -> Self {
-        Self { preference_filters: Vec::new() }
+        Self {
+            preference_filters: Vec::new(),
+        }
     }
 
     pub fn add_preference_filter<F>(&mut self, filter: F)
@@ -6390,7 +6438,9 @@ impl UdfCustomConstraintSolverFilter {
 }
 
 impl Default for UdfCustomConstraintSolverFilter {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 pub struct UdfEnvironmentSanitizerEngine {
@@ -6418,7 +6468,9 @@ impl UdfEnvironmentSanitizerEngine {
 }
 
 impl Default for UdfEnvironmentSanitizerEngine {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 pub struct UdfPackagePatchTransformerEngine {
@@ -6427,7 +6479,9 @@ pub struct UdfPackagePatchTransformerEngine {
 
 impl UdfPackagePatchTransformerEngine {
     pub fn new() -> Self {
-        Self { patch_hooks: Vec::new() }
+        Self {
+            patch_hooks: Vec::new(),
+        }
     }
 
     pub fn add_patch_hook<F>(&mut self, hook: F)
@@ -6447,7 +6501,9 @@ impl UdfPackagePatchTransformerEngine {
 }
 
 impl Default for UdfPackagePatchTransformerEngine {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // ============================================================================
@@ -8081,14 +8137,18 @@ Description: Hook test";
     fn test_new_distro_adapters_and_oop_patterns() {
         // 1. Urpmi RPM Adapter
         let urpmi = UrpmiRpmAdapter::new();
-        let (namever, deps, fmt) = urpmi.parse_synthesis_hdr("synthesis@htop-3.2.0-1.x86_64@libc.so.6@").unwrap();
+        let (namever, deps, fmt) = urpmi
+            .parse_synthesis_hdr("synthesis@htop-3.2.0-1.x86_64@libc.so.6@")
+            .unwrap();
         assert_eq!(namever, "htop-3.2.0-1.x86_64");
         assert_eq!(deps, "libc.so.6");
         assert_eq!(fmt, "rpm-synthesis");
 
         // 2. APT-RPM Adapter
         let apt_rpm = AptRpmAdapter::new();
-        let (k, v) = apt_rpm.translate_apt_rpm_release("Component: main, Architecture: x86_64").unwrap();
+        let (k, v) = apt_rpm
+            .translate_apt_rpm_release("Component: main, Architecture: x86_64")
+            .unwrap();
         assert_eq!(k, "component");
         assert_eq!(v, "main");
 
@@ -8130,7 +8190,9 @@ Description: Hook test";
         let bwrap = Box::new(BubblewrapSandboxBackend);
         let bridge = PackageExecutionBridge::new(bwrap);
         let sample_pkg = UniversalPackageBuilder::new("test").build().unwrap();
-        let res = bridge.run_package_task("ls -la", sample_pkg.as_ref()).unwrap();
+        let res = bridge
+            .run_package_task("ls -la", sample_pkg.as_ref())
+            .unwrap();
         assert!(res.contains("bwrap"));
 
         // 9. UDF Extensions (Constraint Solver Filter, Env Sanitizer, Patch Transformer)
@@ -8139,8 +8201,13 @@ Description: Hook test";
         assert_eq!(filter.score_package_candidate("sovereign-libc"), 100);
 
         let sanitizer = UdfEnvironmentSanitizerEngine::new();
-        assert!(sanitizer.sanitize_env_var("LD_PRELOAD", "/lib/malicious.so").is_none());
-        assert_eq!(sanitizer.sanitize_env_var("PATH", "/usr/bin").unwrap(), "/usr/bin");
+        assert!(sanitizer
+            .sanitize_env_var("LD_PRELOAD", "/lib/malicious.so")
+            .is_none());
+        assert_eq!(
+            sanitizer.sanitize_env_var("PATH", "/usr/bin").unwrap(),
+            "/usr/bin"
+        );
 
         let mut patcher = UdfPackagePatchTransformerEngine::new();
         patcher.add_patch_hook(|pkg, src| format!("// Patched for {}\n{}", pkg, src));
