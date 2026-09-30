@@ -252,7 +252,8 @@ impl SovereignDistroPackageAdvancementsSuiteV9 {
             stateless_governor: SovereignStatelessPackageConfigGovernor::new(),
             auto_repair_orchestrator: SovereignPackageAutoRepairAndDeltaPatchOrchestrator::new(),
             slot_pruning_governor: SovereignMultiVersionSlotAndPfsPruningGovernor::new(),
-            vulnerability_auto_patcher: SovereignPackageVulnerabilityAdvisoryAutoPatchEngine::new(),
+            vulnerability_auto_patcher:
+                SovereignPackageVulnerabilityAdvisoryAutoPatchEngine::new(),
         }
     }
 
@@ -303,7 +304,10 @@ mod tests {
     #[test]
     fn test_auto_repair_and_delta() {
         let mut orch = SovereignPackageAutoRepairAndDeltaPatchOrchestrator::new();
-        assert!(orch.verify_and_repair_package_integrity("bash", &["libreadline.so.8".to_string()]));
+        assert!(orch.verify_and_repair_package_integrity(
+            "bash",
+            &["libreadline.so.8".to_string()]
+        ));
         assert_eq!(orch.corrupted_files_repaired, 1);
 
         let res = orch.apply_vcdiff_delta_patch("bash-5.1", 1024);
