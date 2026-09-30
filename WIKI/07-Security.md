@@ -202,6 +202,12 @@ LDAP bind and package-repository LDAP/PAM compatibility methods also deny
 access until a trusted credential provider is integrated. These models must
 not be used as substitutes for host authentication services.
 
+Offline SSSD credential caching, FreeIPA identity authentication, Fedora SSSD
+ticket checks, Mint keyring prompts, and Warpinator peer authentication/file
+sharing are likewise unavailable without audited password hashing or trusted
+directory and authenticated transport providers. Policy checks and nonempty
+passwords, PINs, or ticket bytes do not authenticate an identity.
+
 The exported PAM model currently fails closed: without a secure random source
 and an audited password hashing provider, it will not register users or
 authenticate credentials. `security::crypto_utils::SecureRandom` and its
