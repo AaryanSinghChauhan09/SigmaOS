@@ -40,9 +40,15 @@ impl OmarchyHyprlandCompositorConfigEngine {
     /// Renders `hyprland.conf` configuration string
     pub fn render_hyprland_conf(&self) -> String {
         let mut conf = String::new();
-        conf.push_str(&format!("general {{\n    border_size = {}\n    gaps_in = {}\n    gaps_out = {}\n}}\n", self.border_size, self.gaps_in, self.gaps_out));
+        conf.push_str(&format!(
+            "general {{\n    border_size = {}\n    gaps_in = {}\n    gaps_out = {}\n}}\n",
+            self.border_size, self.gaps_in, self.gaps_out
+        ));
         for rule in &self.window_rules {
-            conf.push_str(&format!("windowrulev2 = {}, class:^{}$\n", rule.action, rule.match_class));
+            conf.push_str(&format!(
+                "windowrulev2 = {}, class:^{}$\n",
+                rule.action, rule.match_class
+            ));
         }
         conf
     }
@@ -61,7 +67,9 @@ impl OmarchyMiseVersionManagerEngine {
         versions.insert("python".to_string(), "3.12.1".to_string());
         versions.insert("rust".to_string(), "1.77.0".to_string());
 
-        Self { tool_versions: versions }
+        Self {
+            tool_versions: versions,
+        }
     }
 
     pub fn get_tool_version(&self, tool: &str) -> Option<String> {
@@ -143,7 +151,9 @@ mod tests {
         assert_eq!(mise.get_tool_version("rust").unwrap(), "1.77.0");
 
         let lazygit = OmarchyLazyGitConfigurationEngine::new();
-        assert!(lazygit.generate_config_yaml().contains("sideBySideDiff: true"));
+        assert!(lazygit
+            .generate_config_yaml()
+            .contains("sideBySideDiff: true"));
 
         let ayu = OmarchyAyuThemeEngine::ayu_dark();
         assert_eq!(ayu.bg_color, "#0f1419");

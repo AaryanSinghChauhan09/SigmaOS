@@ -448,21 +448,33 @@ impl Sovereign2055DistroSupremacyMasterSuite {
         let mut score = 50u32; // Base baseline score
 
         // 1. Systemd 320 SLH-DSA autonomous service engine (+10)
-        self.service_engine.register_autonomous_service("sigma-core-2055", "/usr/bin/sigma-core-2055", 0xFF);
-        if self.service_engine.activate_service("sigma-core-2055", b"sig_data_2055")
+        self.service_engine.register_autonomous_service(
+            "sigma-core-2055",
+            "/usr/bin/sigma-core-2055",
+            0xFF,
+        );
+        if self
+            .service_engine
+            .activate_service("sigma-core-2055", b"sig_data_2055")
             && self.service_engine.heal_service_failure("sigma-core-2055")
         {
             score += 10;
         }
 
         // 2. Linux 11.0 Bcachefs CXL 7.0 optical photonic mesh engine (+10)
-        self.bcachefs_mesh_engine.allocate_photonic_extent(1, "/var/db/mesh2055", StorageTier2055::OptaneNvmeGen10, 16 * 1024 * 1024);
+        self.bcachefs_mesh_engine.allocate_photonic_extent(
+            1,
+            "/var/db/mesh2055",
+            StorageTier2055::OptaneNvmeGen10,
+            16 * 1024 * 1024,
+        );
         if self.bcachefs_mesh_engine.promote_to_photonic_mesh(1) {
             score += 10;
         }
 
         // 3. OpenBSD 12.0 QuantumFineIBT CFI & unveil v18 guard (+10)
-        self.openbsd_guard.register_quantum_ibt_region("sys_kernel_hyper_2055", 0x5000, 0xF000);
+        self.openbsd_guard
+            .register_quantum_ibt_region("sys_kernel_hyper_2055", 0x5000, 0xF000);
         self.openbsd_guard.lock_unveil_v18_paths();
         if self.openbsd_guard.validate_instruction_pointer(0x6000) {
             score += 10;
@@ -481,7 +493,8 @@ impl Sovereign2055DistroSupremacyMasterSuite {
         }
 
         // 5. Wayland 2.20 zero-copy direct KMS display pipeline (+10)
-        self.wayland_display_engine.submit_zero_copy_frame(1, 104, 3000);
+        self.wayland_display_engine
+            .submit_zero_copy_frame(1, 104, 3000);
         if self.wayland_display_engine.direct_scanout_hits > 0 {
             score += 10;
         }
@@ -516,8 +529,14 @@ mod tests {
 
     #[test]
     fn test_bcachefs_photonic_mesh_engine() {
-        let mut engine = SovereignLinux110BcachefsQuantumPhotonicMeshEngine::new(512 * 1024 * 1024 * 1024);
-        engine.allocate_photonic_extent(100, "/data/mesh2055", StorageTier2055::UltraFastSsdCoW, 8192);
+        let mut engine =
+            SovereignLinux110BcachefsQuantumPhotonicMeshEngine::new(512 * 1024 * 1024 * 1024);
+        engine.allocate_photonic_extent(
+            100,
+            "/data/mesh2055",
+            StorageTier2055::UltraFastSsdCoW,
+            8192,
+        );
         assert!(engine.promote_to_photonic_mesh(100));
         assert_eq!(engine.zstd_compaction_events, 1);
         assert!(engine.deduplicated_bytes > 0);
@@ -537,13 +556,7 @@ mod tests {
     #[test]
     fn test_freebsd210_quantum_vnet_xdp_mesh_engine() {
         let mut engine = SovereignFreeBsd210QuantumVnetXdpMeshEngine::new();
-        engine.spawn_quantum_vnet_jail(
-            5,
-            "quantum_jail_2055",
-            [10, 10, 0, 1],
-            [0; 16],
-            0xFF,
-        );
+        engine.spawn_quantum_vnet_jail(5, "quantum_jail_2055", [10, 10, 0, 1], [0; 16], 0xFF);
         assert!(engine.process_xdp_quantum_packet(5, 2048));
         assert_eq!(engine.zero_copy_packets_processed, 1);
         assert_eq!(engine.pqc_mesh_tunnels_established, 1);
