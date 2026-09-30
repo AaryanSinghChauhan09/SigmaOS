@@ -62,6 +62,7 @@ pub mod paging;
 pub mod performance;
 pub mod pipes;
 pub mod process;
+pub use process::Process;
 pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod sched;

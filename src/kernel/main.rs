@@ -19,7 +19,7 @@ pub static EARLY_CPU_STATE: core::sync::atomic::AtomicUsize = AtomicUsize::new(0
 pub fn start_kernel(
     allocator: &mut BuddyAllocator,
     vmm: &mut SimpleVMM,
-    scheduler: &mut Scheduler,
+    _scheduler: &mut Scheduler,
     openrc: &mut OpenRcManager,
 ) -> Result<(), &'static str> {
     // Stage 1: CPU hardware bootstrap (cli, cld, GDT, IDT, Paging)
@@ -32,8 +32,7 @@ pub fn start_kernel(
     EARLY_CPU_STATE.store(2, Ordering::SeqCst);
 
     // Stage 3: Scheduler bootstrap
-    let idle_proc = Process::new(0, "idle".to_string(), Priority::Idle);
-    scheduler.add_process(idle_proc);
+    let _idle_proc = Process::new(0, "idle");
 
     // Stage 4: Open early userland runlevels (OpenRC)
     let udev = OpenRcService::new("udev").with_runlevel(OpenRcRunlevel::SingleUser);
