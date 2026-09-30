@@ -237,6 +237,13 @@ cleared. AI agents must preserve unavailable-provider errors and buffer
 clearing, and must not enable real storage or authentication without reviewed
 crypto, randomness, biometric, and persistence integrations.
 
+`src/security/kali_stack.rs` contains in-process models, not host PAM, sudo,
+iptables, swap, or kernel dmesg enforcement. Authentication denies access until
+a trusted verifier exists. Its firewall model uses ordered first-match rules
+and default-deny behavior, but is not attached to a host packet path. AI agents
+must preserve fail-closed authentication, protocol-length validation,
+first-match rules, synchronized log writes, and atomic bounded swap accounting.
+
 `src/security/cleaner.rs` provides bounded overwrites of caller memory and a
 policy check for exactly `127.0.0.1:<configured Tor port>`; neither guarantees
 erasure from storage or configures a host firewall. EXIF removal returns

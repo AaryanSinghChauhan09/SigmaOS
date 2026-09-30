@@ -5,6 +5,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 use std::format;
 use std::string::String;
 use std::string::ToString;
+use std::sync::Mutex;
 use std::vec::Vec;
 
 #[repr(C)]
@@ -16,37 +17,39 @@ pub enum KaliError {
     InvalidCronFormat = 3,
     PrivilegeEscalationDenied = 4,
     SwapFailed = 5,
+    AuthenticationUnavailable = 6,
 }
 
 /// Pluggable Authentication Module (PAM)
 pub struct PluggableAuthenticationModule {
     pub failed_attempts: AtomicUsize,
-    pub hashed_password: [u8; 16],
 }
 
 impl PluggableAuthenticationModule {
-    pub fn new(hash: &[u8; 16]) -> Self {
+    pub fn new(_hash: &[u8; 16]) -> Self {
         PluggableAuthenticationModule {
             failed_attempts: AtomicUsize::new(0),
-            hashed_password: *hash,
         }
     }
 
     /// Authenticate a user input password block
-    pub fn authenticate(&self, password_hash: &[u8; 16]) -> Result<(), KaliError> {
-        if self.failed_attempts.load(Ordering::SeqCst) >= 3 {
-            return Err(KaliError::AuthFailed);
-        }
-
-        for i in 0..16 {
-            if self.hashed_password[i] != password_hash[i] {
-                self.failed_attempts.fetch_add(1, Ordering::SeqCst);
-                return Err(KaliError::AuthFailed);
+    pub fn authenticate(&self, _password_hash: &[u8; 16]) -> Result<(), KaliError> {
+        let mut attempts = self.failed_attempts.load(Ordering::SeqCst);
+        loop {
+            match self.failed_attempts.compare_exchange_weak(
+                attempts,
+                attempts.saturating_add(1),
+                Ordering::SeqCst,
+                Ordering::SeqCst,
+            ) {
+                Ok(_) => break,
+                Err(observed) => attempts = observed,
             }
         }
-
-        self.failed_attempts.store(0, Ordering::SeqCst);
-        Ok(())
+        if attempts >= 3 {
+            return Err(KaliError::AuthFailed);
+        }
+        Err(KaliError::AuthenticationUnavailable)
     }
 }
 
@@ -73,21 +76,26 @@ impl IptablesFirewall {
 
     /// Evaluate a packet against the rule chain (Netfilter)
     pub fn evaluate_packet(&self, is_input: bool, protocol: &[u8], port: u16) -> bool {
-        // Defaults to ACCEPT
-        let mut decision = true;
-
-        for i in 0..self.rules.len() {
-            if let Some(ref rule) = self.rules[i] {
-                if rule.is_input == is_input
-                    && &rule.protocol[..protocol.len()] == protocol
-                    && rule.port == port
-                {
-                    decision = rule.accept;
-                }
+        if protocol.is_empty() || protocol.len() > 4 {
+            return false;
+        }
+        for rule in self.rules.iter().flatten() {
+            let len = rule
+                .protocol
+                .iter()
+                .position(|byte| *byte == b' ' || *byte == 0)
+                .unwrap_or(rule.protocol.len());
+            if rule.is_input == is_input
+                && len == protocol.len()
+                && &rule.protocol[..len] == protocol
+                && rule.port == port
+            {
+                // First matching rule wins, matching ordered firewall-chain semantics.
+                return rule.accept;
             }
         }
-
-        decision
+        // Default-deny when no rule matches.
+        false
     }
 }
 
@@ -113,9 +121,7 @@ impl CronDaemon {
     pub fn register_job(&mut self, minute: u8, command: &[u8]) {
         let mut cmd_arr = [0u8; 64];
         let len = command.len().min(63);
-        unsafe {
-            core::ptr::copy_nonoverlapping(command.as_ptr(), cmd_arr.as_mut_ptr(), len);
-        }
+        cmd_arr[..len].copy_from_slice(&command[..len]);
         self.jobs.push(Some(CronJob {
             minute_cron: minute,
             command: cmd_arr,
@@ -176,9 +182,7 @@ impl TmuxMultiplexer {
     pub fn new(name: &[u8]) -> Self {
         let mut name_arr = [0u8; 32];
         let len = name.len().min(31);
-        unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), name_arr.as_mut_ptr(), len);
-        }
+        name_arr[..len].copy_from_slice(&name[..len]);
         TmuxMultiplexer {
             panes: Vec::new(),
             session_name: name_arr,
@@ -216,8 +220,8 @@ impl TmuxMultiplexer {
 
 /// Swap Memory Space allocation manager
 pub struct SwapSpaceManager {
-    pub total_swap_blocks: usize,
-    pub used_swap_blocks: AtomicUsize,
+    total_swap_blocks: usize,
+    used_swap_blocks: AtomicUsize,
 }
 
 impl SwapSpaceManager {
@@ -228,43 +232,61 @@ impl SwapSpaceManager {
         }
     }
 
+    pub fn total_blocks(&self) -> usize {
+        self.total_swap_blocks
+    }
+
+    pub fn used_blocks(&self) -> usize {
+        self.used_swap_blocks.load(Ordering::SeqCst)
+    }
+
     /// Page out memory into swap storage (swap space swap-out)
     pub fn swap_out_page(&self, count: usize) -> Result<(), KaliError> {
-        let current = self.used_swap_blocks.load(Ordering::SeqCst);
-        if current + count > self.total_swap_blocks {
-            return Err(KaliError::SwapFailed);
+        let mut current = self.used_swap_blocks.load(Ordering::SeqCst);
+        loop {
+            let Some(next) = current.checked_add(count) else {
+                return Err(KaliError::SwapFailed);
+            };
+            if next > self.total_swap_blocks {
+                return Err(KaliError::SwapFailed);
+            }
+            match self.used_swap_blocks.compare_exchange_weak(
+                current,
+                next,
+                Ordering::SeqCst,
+                Ordering::SeqCst,
+            ) {
+                Ok(_) => return Ok(()),
+                Err(observed) => current = observed,
+            }
         }
-        self.used_swap_blocks
-            .store(current + count, Ordering::SeqCst);
-        Ok(())
     }
 }
 
 /// Kernel circular logging ring buffer (dmesg log equivalent)
 pub struct DmesgLog {
-    pub buffer: [u8; 512],
+    pub buffer: Mutex<[u8; 512]>,
     pub write_idx: AtomicUsize,
 }
 
 impl DmesgLog {
     pub const fn new() -> Self {
         DmesgLog {
-            buffer: [0u8; 512],
+            buffer: Mutex::new([0u8; 512]),
             write_idx: AtomicUsize::new(0),
         }
     }
 
     pub fn log_message(&self, message: &[u8]) {
         let len = message.len().min(512);
+        let mut buffer = self
+            .buffer
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
         let start = self.write_idx.fetch_add(len, Ordering::SeqCst) % 512;
-
-        // Safe mock mapping in circular ring
-        unsafe {
-            let buffer_ptr = (&raw const self.buffer) as *mut u8;
-            for i in 0..len {
-                let idx = (start + i) % 512;
-                core::ptr::write(buffer_ptr.add(idx), message[i]);
-            }
+        for i in 0..len {
+            let idx = (start + i) % 512;
+            buffer[idx] = message[i];
         }
     }
 }
@@ -394,24 +416,6 @@ impl KaliAirgeddonWifiAudit {
     }
 }
 
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::Layout;
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std::alloc::alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
 /// Kali Undercover Desktop Disguise Mode Switcher
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum UndercoverDisguiseTheme {
@@ -539,9 +543,11 @@ mod tests {
         let root_pash_hash = [0x77u8; 16];
         let sudo = SudoPrivilegeEscalation::new(&root_pash_hash);
 
-        // Escalation with correct hash
-        let uid = sudo.escalate_to_root(&root_pash_hash).unwrap();
-        assert_eq!(uid, 0); // root
+        // No trusted password hashing/authentication provider is integrated.
+        assert_eq!(
+            sudo.escalate_to_root(&root_pash_hash),
+            Err(KaliError::PrivilegeEscalationDenied)
+        );
 
         // Escalation with incorrect hash
         let bad_hash = [0xFFu8; 16];
@@ -564,8 +570,9 @@ mod tests {
         // Input ssh connection should be blocked
         assert!(!firewall.evaluate_packet(true, b"tcp", 22));
 
-        // Unmatched connections default to accept (true)
-        assert!(firewall.evaluate_packet(true, b"tcp", 80));
+        // Unmatched and malformed protocol values default to deny.
+        assert!(!firewall.evaluate_packet(true, b"tcp", 80));
+        assert!(!firewall.evaluate_packet(true, b"tcp and more", 22));
     }
 
     #[test]
