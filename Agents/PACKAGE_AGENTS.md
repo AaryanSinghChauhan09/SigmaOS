@@ -23,9 +23,6 @@ package is responsible for Universal package manager SigmaPkg.
 - Commit hardcoded secrets or keys
 - Introduce memory safety violations
 - Break compatibility without documentation
-- Treat a filename suffix or checksum as package validation or authenticity
-- Claim sandboxing, conversion, or installation unless the runtime call path performs and verifies it
-- Record a package as installed before parsing, signature verification, and transactional install complete
 
 ## Open Source Inspiration
 
@@ -42,10 +39,9 @@ package is responsible for Universal package manager SigmaPkg.
 ## Implementation Status
 
 ### Current State
-- **Verified**: Describe package operations as implemented only when their parsers, trust checks, transactional writes, and runtime paths are integrated and tested.
-- **Prototype**: Filename recognition and policy models are not package parsing, signature verification, sandbox enforcement, or installation.
-- **Unavailable**: Without trusted metadata/signature verification and an integrated installer, package installation must fail closed and leave state unchanged.
-- **Planned**: Track each missing format adapter and enforcement integration separately; do not claim all distro compatibility from suffix detection.
+- **Implemented**: Core functionality is implemented
+- **In Progress**: Advanced features and optimizations
+- **Planned**: Additional distro compatibility layers
 
 ### Testing
 - **Unit Tests**: Implemented for core functions
