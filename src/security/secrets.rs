@@ -121,9 +121,7 @@ impl SimpleSecret {
         let mut name_array = [0u8; 64];
         let name_len = name.len().min(63);
 
-        unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
-        }
+        name_array[..name_len].copy_from_slice(&name[..name_len]);
 
         SimpleSecret {
             id,
@@ -139,9 +137,8 @@ impl SimpleSecret {
 
     pub fn set_data(&mut self, data: &[u8]) {
         let len = data.len().min(511);
-        unsafe {
-            core::ptr::copy_nonoverlapping(data.as_ptr(), self.data.as_mut_ptr(), len);
-        }
+        self.data.fill(0);
+        self.data[..len].copy_from_slice(&data[..len]);
         self.data_len = len;
     }
 
