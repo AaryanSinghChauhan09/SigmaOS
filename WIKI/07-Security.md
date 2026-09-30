@@ -187,6 +187,9 @@ past a buffer.
 `SafeInstaller` does not store a simulated password hash. Account creation in
 dry-run mode is only a simulation; real account creation returns an error
 until an audited password-hashing provider is integrated.
+The GUI installer account request also discards its password argument and
+does not retain plaintext credentials; it cannot create a real account without
+the same trusted host provider.
 
 The emergency shell gate does not keep a plaintext password or accept a
 signature based on fixed magic bytes. Its password and signature checks remain
