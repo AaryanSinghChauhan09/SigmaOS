@@ -2,7 +2,7 @@
 
 **Snapshot date:** 2026-09-30
 **Remote:** `AaryanSinghChauhan09/SigmaOS`
-**Latest verified code snapshot:** `bbf88bff08`
+**Latest verified code snapshot:** `fe51380cb6`
 
 This file records verified work and known limitations. It does not claim that SigmaOS matches Linux or BSD feature parity, is production-ready, or has completed every roadmap idea.
 
@@ -21,6 +21,7 @@ This file records verified work and known limitations. It does not claim that Si
 - Made the clipboard default explicitly plaintext, prevented it from marking plaintext as encrypted, and disabled its XOR prototype.
 - Disabled the `libsodium`-shaped cryptographic primitives because no audited provider is integrated; initialization now reports unavailable and key generation, encryption, authentication, hashes, signatures, scalar multiplication, and random bytes all return provider errors without placeholder output.
 - Disabled fake hash/HMAC and key-derivation/password-hash output in `src/crypto/hash.rs` and `src/crypto/kdf.rs`; these APIs return provider-unavailable errors. Removed unused custom raw-pointer vectors and removed an unsafe enum transmute.
+- Disabled deterministic PQC key/signature/HKDF and XOR-like FDE operations in `src/crypto/postquantum.rs`; they now return `ProviderUnavailable`. Removed that module's unused custom raw-pointer vector implementation.
 - Disabled timestamp/hardware-mixed pseudo-random output, reported hardware entropy unavailable instead of fabricating values, and made the simulated crypto audit report no verified algorithms.
 - Removed the unsynchronized `static mut` RNG pool and fake ChaCha-like output from `klib::rand`; secure byte/range requests now return `EntropyUnavailable`. `klib::rng::OsRng` also fails closed, while `SigmaRng` is clearly a deterministic simulation generator and uses an atomic compare/exchange update.
 - Made cross-distro authentication fail closed because no trusted credential provider exists.
@@ -32,7 +33,7 @@ This file records verified work and known limitations. It does not claim that Si
 - `cargo fmt --check` passed after the latest local changes.
 - Focused library tests passed for `tr` (5), PQC empty-input handling (2), distro authentication (11), package lookup (3), launcher search (6), AES fail-closed behavior (2), XOR encryption (1), vault adapters (1), secret manager (3), unavailable PQC provider (1), secure randomness/password hashing failure (1), PAM registration fail-closed behavior (1), and clipboard plaintext labeling (1).
 - Focused fail-closed tests passed for the RNG and simulated audit; the combined security fail-closed filter passed 7 tests.
-- The complete library suite passed after the RNG, sodium, hash, and KDF changes: 3,176 passed, 0 failed.
+- The complete library suite passed after the RNG, sodium, hash, KDF, PQC, and FDE changes: 3,177 passed, 0 failed.
 - `cargo check --lib` passed earlier in this work; later code changes were compiled by the focused library test builds.
 - `./run_sigma_tests.sh` passed in an earlier verification run. Python `pytest` could not run because `pytest` is not installed in the environment.
 - GitHub Actions for the latest `main` commit were queued when this snapshot was written. Their results are not yet known; check the current run list before relying on CI status.
