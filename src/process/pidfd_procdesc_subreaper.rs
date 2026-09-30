@@ -97,7 +97,11 @@ impl SovereignPidfdProcdescEngine {
     }
 
     /// Linux `pidfd_open`: Open a file descriptor referring to a process by PID
-    pub fn pidfd_open(&mut self, pid: u32, flags: u32) -> Result<ProcessFileDescriptor, &'static str> {
+    pub fn pidfd_open(
+        &mut self,
+        pid: u32,
+        flags: u32,
+    ) -> Result<ProcessFileDescriptor, &'static str> {
         let _ = flags;
         if !self.process_tree.contains_key(&pid) {
             return Err("ESRCH: Process not found");
@@ -107,57 +111,108 @@ impl SovereignPidfdProcdescEngine {
         self.next_fd += 1;
 
         self.pidfd_map.insert(pfd, pid);
-        self.procdesc_rights.insert(pfd, ProcessDescriptorRights::default());
+        self.procdesc_rights
+            .insert(pfd, ProcessDescriptorRights::default());
 
         Ok(pfd)
     }
 
     /// FreeBSD Capsicum `pdfork`: Fork a process and obtain a process descriptor
-    pub fn pdfork(&mut self, parent_pid: u32, child_pid: u32, child_name: &str) -> Result<(ProcessFileDescriptor, u32), &'static str> {
+    pub fn pdfork(
+        &mut self,
+        parent_pid: u32,
+        child_pid: u32,
+        child_name: &str,
+    ) -> Result<(ProcessFileDescriptor, u32), &'static str> {
         self.register_process(child_pid, parent_pid, child_name);
         let pfd = self.pidfd_open(child_pid, 0)?;
         Ok((pfd, child_pid))
     }
 
     /// Send signal via process file descriptor (`pidfd_send_signal` / `pdkill`)
-    pub fn send_signal(&self, pfd: ProcessFileDescriptor, signal: i32) -> Result<String, &'static str> {
-        let pid = self.pidfd_map.get(&pfd).ok_or("EBADF: Invalid process descriptor")?;
-        let rights = self.procdesc_rights.get(&pfd).ok_or("EBADF: Rights not found")?;
+    pub fn send_signal(
+        &self,
+        pfd: ProcessFileDescriptor,
+        signal: i32,
+    ) -> Result<String, &'static str> {
+        let pid = self
+            .pidfd_map
+            .get(&pfd)
+            .ok_or("EBADF: Invalid process descriptor")?;
+        let rights = self
+            .procdesc_rights
+            .get(&pfd)
+            .ok_or("EBADF: Rights not found")?;
 
         if !rights.can_kill {
             return Err("EPERM: Process descriptor lacks can_kill capability");
         }
 
-        let entry = self.process_tree.get(pid).ok_or("ESRCH: Target process exited")?;
-        Ok(format!("Signalled process '{}' (PID {}) with signal {}", entry.name, pid, signal))
+        let entry = self
+            .process_tree
+            .get(pid)
+            .ok_or("ESRCH: Target process exited")?;
+        Ok(format!(
+            "Signalled process '{}' (PID {}) with signal {}",
+            entry.name, pid, signal
+        ))
     }
 
     /// Obtain duplicate file descriptor from target process (`pidfd_getfd`)
-    pub fn pidfd_getfd(&self, pfd: ProcessFileDescriptor, target_fd: i32) -> Result<String, &'static str> {
-        let pid = self.pidfd_map.get(&pfd).ok_or("EBADF: Invalid process descriptor")?;
-        let rights = self.procdesc_rights.get(&pfd).ok_or("EBADF: Rights not found")?;
+    pub fn pidfd_getfd(
+        &self,
+        pfd: ProcessFileDescriptor,
+        target_fd: i32,
+    ) -> Result<String, &'static str> {
+        let pid = self
+            .pidfd_map
+            .get(&pfd)
+            .ok_or("EBADF: Invalid process descriptor")?;
+        let rights = self
+            .procdesc_rights
+            .get(&pfd)
+            .ok_or("EBADF: Rights not found")?;
 
         if !rights.can_getfd {
             return Err("EPERM: Process descriptor lacks can_getfd capability");
         }
 
-        let entry = self.process_tree.get(pid).ok_or("ESRCH: Target process not found")?;
-        let fd_path = entry.open_fds.get(&target_fd).ok_or("EBADF: Target FD not open in process")?;
+        let entry = self
+            .process_tree
+            .get(pid)
+            .ok_or("ESRCH: Target process not found")?;
+        let fd_path = entry
+            .open_fds
+            .get(&target_fd)
+            .ok_or("EBADF: Target FD not open in process")?;
 
-        Ok(format!("Duplicated FD {} ({}) from PID {}", target_fd, fd_path, pid))
+        Ok(format!(
+            "Duplicated FD {} ({}) from PID {}",
+            target_fd, fd_path, pid
+        ))
     }
 
     /// Set process as a Child Subreaper (`PR_SET_CHILD_SUBREAPER` / `PROC_REAP_ACQUIRE`)
     pub fn set_subreaper(&mut self, pid: u32, enable: bool) -> Result<bool, &'static str> {
-        let entry = self.process_tree.get_mut(&pid).ok_or("ESRCH: Process not found")?;
+        let entry = self
+            .process_tree
+            .get_mut(&pid)
+            .ok_or("ESRCH: Process not found")?;
         entry.is_subreaper = enable;
         Ok(enable)
     }
 
     /// Re-parent orphan child processes to the nearest ancestor Subreaper
-    pub fn terminate_and_reparent_orphans(&mut self, pid: u32, exit_code: i32) -> Result<Vec<u32>, &'static str> {
+    pub fn terminate_and_reparent_orphans(
+        &mut self,
+        pid: u32,
+        exit_code: i32,
+    ) -> Result<Vec<u32>, &'static str> {
         let ppid = {
-            let entry = self.process_tree.get_mut(&pid).ok_or("ESRCH: Process not found")?;
+            let entry = self
+                .process_tree
+                .get_mut(&pid)
+                .ok_or("ESRCH: Process not found")?;
             entry.is_zombie = true;
             entry.exit_code = exit_code;
             entry.ppid

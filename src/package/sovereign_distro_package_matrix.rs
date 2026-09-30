@@ -119,7 +119,10 @@ impl SovereignXbpsTransactionJournalEngine {
         Ok(())
     }
 
-    pub fn rollback_transaction(&mut self, tx_id: u64) -> Result<Vec<XbpsTransactionOp>, &'static str> {
+    pub fn rollback_transaction(
+        &mut self,
+        tx_id: u64,
+    ) -> Result<Vec<XbpsTransactionOp>, &'static str> {
         let entry = self
             .journal
             .iter()
@@ -570,7 +573,8 @@ impl SovereignOpenBsdPledgeUnveilEngine {
     }
 
     pub fn register_signify_key(&mut self, key_id: &str, pubkey: &str) {
-        self.trusted_keys.insert(key_id.to_string(), pubkey.to_string());
+        self.trusted_keys
+            .insert(key_id.to_string(), pubkey.to_string());
     }
 
     pub fn add_unveil_path(&mut self, path: &str) {
@@ -651,7 +655,10 @@ mod tests {
         .unwrap();
 
         xbps.commit_transaction(tx).unwrap();
-        assert_eq!(xbps.installed_sonames.get("libssl.so.3"), Some(&"openssl".to_string()));
+        assert_eq!(
+            xbps.installed_sonames.get("libssl.so.3"),
+            Some(&"openssl".to_string())
+        );
 
         let orphans = xbps.sweep_orphaned_sonames(&["libcrypto.so.3"]);
         assert_eq!(orphans, vec!["openssl".to_string()]);
@@ -669,7 +676,10 @@ mod tests {
             command: "fc-cache -fv".to_string(),
         });
 
-        assert_eq!(apk.evaluate_file_changes(&["/usr/share/fonts/TTF/main.ttf"]), 1);
+        assert_eq!(
+            apk.evaluate_file_changes(&["/usr/share/fonts/TTF/main.ttf"]),
+            1
+        );
         let exec = apk.execute_pending_triggers();
         assert_eq!(exec, vec!["fc-cache -fv".to_string()]);
 
@@ -758,6 +768,9 @@ mod tests {
     #[test]
     fn test_suite_initialization() {
         let suite = SovereignDistroPackageMatrixSuite::new();
-        assert_eq!(suite.cachy.resolve_optimal_repo(), "https://repo.cachyos.org/v3");
+        assert_eq!(
+            suite.cachy.resolve_optimal_repo(),
+            "https://repo.cachyos.org/v3"
+        );
     }
 }

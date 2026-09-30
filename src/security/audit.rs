@@ -1,6 +1,6 @@
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 /// OOP-based Security Audit for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 542
 /// Implements security event logging and audit trails

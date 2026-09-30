@@ -3,9 +3,6 @@ use std::vec::Vec;
 // SigmaOS Strategic Vision Roadmap & OKR Engine
 // Pure Rust implementation of 3-Year Strategic Vision and Milestone Evaluators.
 
-
-
-
 /// Strategic evaluation error states
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OkrError {
@@ -220,7 +217,11 @@ impl StrategicDifferentiationEngine {
     }
 
     /// 1. Compliance-First Audit Verification
-    pub fn audit_compliance(&mut self, framework: RegulatedIndustryFramework, score: u8) -> ComplianceAuditVerdict {
+    pub fn audit_compliance(
+        &mut self,
+        framework: RegulatedIndustryFramework,
+        score: u8,
+    ) -> ComplianceAuditVerdict {
         let is_compliant = score >= 80;
         let violation_reason = if is_compliant {
             None
@@ -326,7 +327,10 @@ mod tests {
 
         // 4. Adaptive Workload Switch
         engine.adapt_workload_orchestration(AdaptiveWorkloadType::RegulatedCompliance);
-        assert_eq!(engine.current_workload, AdaptiveWorkloadType::RegulatedCompliance);
+        assert_eq!(
+            engine.current_workload,
+            AdaptiveWorkloadType::RegulatedCompliance
+        );
 
         // 5. Community Package Verification
         assert!(engine.verify_community_package("compliance-agent", "Community Lead"));

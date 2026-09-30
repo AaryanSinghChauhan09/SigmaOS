@@ -94,10 +94,7 @@ impl DeclarativeAdBlockRuleEngine {
                 "google-analytics.com".to_string(),
                 "facebook.com/tr/".to_string(),
             ],
-            blocked_path_keywords: vec![
-                "/ad/banner".to_string(),
-                "/telemetry/collect".to_string(),
-            ],
+            blocked_path_keywords: vec!["/ad/banner".to_string(), "/telemetry/collect".to_string()],
         }
     }
 

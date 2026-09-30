@@ -119,12 +119,18 @@ impl ProcessTreeNode {
     pub fn print_tree(&self, indent: usize) -> String {
         let mut output = String::new();
         let prefix = "  ".repeat(indent);
-        output.push_str(&format!("{}[{}] {} ({})\n", prefix, self.process.pid, self.process.name, self.process.state.as_str()));
-        
+        output.push_str(&format!(
+            "{}[{}] {} ({})\n",
+            prefix,
+            self.process.pid,
+            self.process.name,
+            self.process.state.as_str()
+        ));
+
         for child in &self.children {
             output.push_str(&child.print_tree(indent + 1));
         }
-        
+
         output
     }
 }
@@ -171,8 +177,16 @@ impl ProcessSortField {
         match self {
             ProcessSortField::Pid => a.pid.cmp(&b.pid),
             ProcessSortField::Name => a.name.cmp(&b.name),
-            ProcessSortField::Cpu => a.cpu_percent.partial_cmp(&b.cpu_percent).unwrap_or(std::cmp::Ordering::Equal).reverse(),
-            ProcessSortField::Memory => a.memory_percent.partial_cmp(&b.memory_percent).unwrap_or(std::cmp::Ordering::Equal).reverse(),
+            ProcessSortField::Cpu => a
+                .cpu_percent
+                .partial_cmp(&b.cpu_percent)
+                .unwrap_or(std::cmp::Ordering::Equal)
+                .reverse(),
+            ProcessSortField::Memory => a
+                .memory_percent
+                .partial_cmp(&b.memory_percent)
+                .unwrap_or(std::cmp::Ordering::Equal)
+                .reverse(),
             ProcessSortField::Runtime => a.runtime.cmp(&b.runtime).reverse(),
             ProcessSortField::Priority => a.priority.cmp(&b.priority).reverse(),
         }
@@ -215,7 +229,8 @@ impl ProcessMonitor {
     }
 
     pub fn list_filtered(&self, filter: ProcessFilter) -> Vec<ProcessEntry> {
-        self.processes.iter()
+        self.processes
+            .iter()
             .filter(|p| filter.matches(p))
             .cloned()
             .collect()
@@ -227,7 +242,11 @@ impl ProcessMonitor {
         processes
     }
 
-    pub fn list_filtered_sorted(&self, filter: ProcessFilter, sort_field: ProcessSortField) -> Vec<ProcessEntry> {
+    pub fn list_filtered_sorted(
+        &self,
+        filter: ProcessFilter,
+        sort_field: ProcessSortField,
+    ) -> Vec<ProcessEntry> {
         let mut processes = self.list_filtered(filter);
         processes.sort_by(|a, b| sort_field.compare(a, b));
         processes
@@ -235,14 +254,15 @@ impl ProcessMonitor {
 
     pub fn build_tree(&self) -> Vec<ProcessTreeNode> {
         let mut nodes: Vec<ProcessTreeNode> = Vec::new();
-        let mut by_pid: std::collections::HashMap<u32, ProcessTreeNode> = std::collections::HashMap::new();
-        
+        let mut by_pid: std::collections::HashMap<u32, ProcessTreeNode> =
+            std::collections::HashMap::new();
+
         for process in &self.processes {
             by_pid.insert(process.pid, ProcessTreeNode::new(process.clone()));
         }
-        
+
         let mut root_nodes: Vec<ProcessTreeNode> = Vec::new();
-        
+
         for process in &self.processes {
             if let Some(mut node) = by_pid.remove(&process.pid) {
                 if process.ppid == 0 || !by_pid.contains_key(&process.ppid) {
@@ -252,18 +272,18 @@ impl ProcessMonitor {
                 }
             }
         }
-        
+
         root_nodes
     }
 
     pub fn print_tree(&self) -> String {
         let tree = self.build_tree();
         let mut output = String::from("Process Tree:\n");
-        
+
         for node in &tree {
             output.push_str(&node.print_tree(0));
         }
-        
+
         output
     }
 
@@ -277,7 +297,10 @@ impl ProcessMonitor {
             details.push_str(&format!("  UID: {}\n", process.uid));
             details.push_str(&format!("  GID: {}\n", process.gid));
             details.push_str(&format!("  CPU: {:.1}%\n", process.cpu_percent));
-            details.push_str(&format!("  Memory: {:.1}% ({} KB)\n", process.memory_percent, process.memory_kb));
+            details.push_str(&format!(
+                "  Memory: {:.1}% ({} KB)\n",
+                process.memory_percent, process.memory_kb
+            ));
             details.push_str(&format!("  Runtime: {} seconds\n", process.runtime));
             details.push_str(&format!("  Priority: {}\n", process.priority));
             details.push_str(&format!("  Nice: {}\n", process.nice));
@@ -291,23 +314,39 @@ impl ProcessMonitor {
     pub fn get_statistics(&self) -> String {
         let mut stats = String::from("Process Statistics:\n");
         stats.push_str(&format!("Total processes: {}\n", self.processes.len()));
-        
-        let running = self.processes.iter().filter(|p| p.state == MonitoredProcessState::Running).count();
-        let sleeping = self.processes.iter().filter(|p| p.state == MonitoredProcessState::Sleeping).count();
-        let stopped = self.processes.iter().filter(|p| p.state == MonitoredProcessState::Stopped).count();
-        let zombie = self.processes.iter().filter(|p| p.state == MonitoredProcessState::Zombie).count();
-        
+
+        let running = self
+            .processes
+            .iter()
+            .filter(|p| p.state == MonitoredProcessState::Running)
+            .count();
+        let sleeping = self
+            .processes
+            .iter()
+            .filter(|p| p.state == MonitoredProcessState::Sleeping)
+            .count();
+        let stopped = self
+            .processes
+            .iter()
+            .filter(|p| p.state == MonitoredProcessState::Stopped)
+            .count();
+        let zombie = self
+            .processes
+            .iter()
+            .filter(|p| p.state == MonitoredProcessState::Zombie)
+            .count();
+
         stats.push_str(&format!("Running: {}\n", running));
         stats.push_str(&format!("Sleeping: {}\n", sleeping));
         stats.push_str(&format!("Stopped: {}\n", stopped));
         stats.push_str(&format!("Zombie: {}\n", zombie));
-        
+
         let total_cpu: f32 = self.processes.iter().map(|p| p.cpu_percent).sum();
         let total_memory: u64 = self.processes.iter().map(|p| p.memory_kb).sum();
-        
+
         stats.push_str(&format!("Total CPU usage: {:.1}%\n", total_cpu));
         stats.push_str(&format!("Total memory: {} KB\n", total_memory));
-        
+
         stats
     }
 
@@ -352,9 +391,18 @@ mod tests {
 
     #[test]
     fn test_process_state_from_str() {
-        assert_eq!(MonitoredProcessState::from_str("R"), MonitoredProcessState::Running);
-        assert_eq!(MonitoredProcessState::from_str("S"), MonitoredProcessState::Sleeping);
-        assert_eq!(MonitoredProcessState::from_str("Z"), MonitoredProcessState::Zombie);
+        assert_eq!(
+            MonitoredProcessState::from_str("R"),
+            MonitoredProcessState::Running
+        );
+        assert_eq!(
+            MonitoredProcessState::from_str("S"),
+            MonitoredProcessState::Sleeping
+        );
+        assert_eq!(
+            MonitoredProcessState::from_str("Z"),
+            MonitoredProcessState::Zombie
+        );
     }
 
     #[test]
@@ -372,7 +420,7 @@ mod tests {
         process.cpu_percent = 5.5;
         process.memory_percent = 2.3;
         process.memory_kb = 1024;
-        
+
         let summary = process.get_summary();
         assert!(summary.contains("123"));
         assert!(summary.contains("test"));
@@ -391,10 +439,10 @@ mod tests {
     fn test_process_tree_node_add_child() {
         let parent = ProcessEntry::new(1, String::from("parent"));
         let child = ProcessEntry::new(2, String::from("child"));
-        
+
         let mut node = ProcessTreeNode::new(parent);
         node.add_child(ProcessTreeNode::new(child));
-        
+
         assert_eq!(node.children.len(), 1);
     }
 
@@ -409,7 +457,7 @@ mod tests {
         let mut process = ProcessEntry::new(123, String::from("test"));
         process.state = MonitoredProcessState::Running;
         assert!(ProcessFilter::Running.matches(&process));
-        
+
         process.state = MonitoredProcessState::Sleeping;
         assert!(!ProcessFilter::Running.matches(&process));
     }
@@ -439,7 +487,7 @@ mod tests {
     fn test_process_monitor_get_process() {
         let mut monitor = ProcessMonitor::new();
         monitor.add_process(ProcessEntry::new(123, String::from("test")));
-        
+
         let process = monitor.get_process(123);
         assert!(process.is_some());
         assert_eq!(process.unwrap().pid, 123);
@@ -450,7 +498,7 @@ mod tests {
         let mut monitor = ProcessMonitor::new();
         monitor.add_process(ProcessEntry::new(123, String::from("test")));
         monitor.add_process(ProcessEntry::new(124, String::from("test2")));
-        
+
         let all = monitor.list_all();
         assert_eq!(all.len(), 2);
     }
@@ -461,11 +509,11 @@ mod tests {
         let mut process1 = ProcessEntry::new(123, String::from("test"));
         process1.state = MonitoredProcessState::Running;
         monitor.add_process(process1);
-        
+
         let mut process2 = ProcessEntry::new(124, String::from("test2"));
         process2.state = MonitoredProcessState::Sleeping;
         monitor.add_process(process2);
-        
+
         let running = monitor.list_filtered(ProcessFilter::Running);
         assert_eq!(running.len(), 1);
     }
@@ -476,11 +524,11 @@ mod tests {
         let mut process1 = ProcessEntry::new(123, String::from("test"));
         process1.cpu_percent = 10.0;
         monitor.add_process(process1);
-        
+
         let mut process2 = ProcessEntry::new(124, String::from("test2"));
         process2.cpu_percent = 5.0;
         monitor.add_process(process2);
-        
+
         let sorted = monitor.list_sorted(ProcessSortField::Cpu);
         assert_eq!(sorted[0].pid, 123); // Higher CPU first
     }
@@ -492,7 +540,7 @@ mod tests {
         process.cpu_percent = 5.5;
         process.memory_kb = 1024;
         monitor.add_process(process);
-        
+
         let details = monitor.show_process(123);
         assert!(details.is_some());
         assert!(details.unwrap().contains("123"));
@@ -505,12 +553,12 @@ mod tests {
         process1.state = MonitoredProcessState::Running;
         process1.cpu_percent = 5.0;
         monitor.add_process(process1);
-        
+
         let mut process2 = ProcessEntry::new(124, String::from("test2"));
         process2.state = MonitoredProcessState::Sleeping;
         process2.cpu_percent = 3.0;
         monitor.add_process(process2);
-        
+
         let stats = monitor.get_statistics();
         assert!(stats.contains("Total processes: 2"));
         assert!(stats.contains("Running: 1"));
@@ -521,7 +569,7 @@ mod tests {
     fn test_process_monitor_kill_process() {
         let mut monitor = ProcessMonitor::new();
         monitor.add_process(ProcessEntry::new(123, String::from("test")));
-        
+
         assert!(monitor.kill_process(123));
         assert_eq!(monitor.processes.len(), 0);
     }
@@ -530,7 +578,7 @@ mod tests {
     fn test_process_monitor_set_priority() {
         let mut monitor = ProcessMonitor::new();
         monitor.add_process(ProcessEntry::new(123, String::from("test")));
-        
+
         assert!(monitor.set_priority(123, 10));
         assert_eq!(monitor.get_process(123).unwrap().priority, 10);
     }
@@ -539,7 +587,7 @@ mod tests {
     fn test_process_monitor_set_nice() {
         let mut monitor = ProcessMonitor::new();
         monitor.add_process(ProcessEntry::new(123, String::from("test")));
-        
+
         assert!(monitor.set_nice(123, 5));
         assert_eq!(monitor.get_process(123).unwrap().nice, 5);
     }

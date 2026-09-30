@@ -230,10 +230,8 @@ impl PoudriereMultiJobQueue {
             if !slot.is_busy {
                 slot.is_busy = true;
                 slot.assigned_package = Some(pkg_name.to_string());
-                self.build_log_history.push(format!(
-                    "Dispatched {} to {}",
-                    pkg_name, slot.jail_name
-                ));
+                self.build_log_history
+                    .push(format!("Dispatched {} to {}", pkg_name, slot.jail_name));
                 return Some(slot.slot_id);
             }
         }
@@ -350,10 +348,8 @@ impl SovereignPackageSmpOrchestratorSuite {
     pub fn prepare_package_smp_build(&mut self, pkg: &mut UnifiedPackage) -> Result<(), String> {
         let cores = self.governor.allocate_affinity_group(&pkg.name);
         if let Some(c) = cores {
-            pkg.properties.insert(
-                "smp_assigned_cores".to_string(),
-                format!("{:?}", c),
-            );
+            pkg.properties
+                .insert("smp_assigned_cores".to_string(), format!("{:?}", c));
         }
 
         pkg.properties.insert(

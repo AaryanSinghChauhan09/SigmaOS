@@ -21,8 +21,8 @@ pub mod manager;
 pub use distro_update_parity::{
     ArchRollingReleaseUpdater, DebianUnattendedUpgradesEngine, FreeBsdPatchEntry,
     FreeBsdUpdateEngine, OstreeAbPartitionUpdater, OstreeDeploymentState, PacnewMergeConflict,
-    PartitionSlot, PostQuantumSignedUpdateVerifier, UnattendedUpgradeRule,
-    SovereignSystemUpdateAndTestingEngine, SystemDiagnosticReport,
+    PartitionSlot, PostQuantumSignedUpdateVerifier, SovereignSystemUpdateAndTestingEngine,
+    SystemDiagnosticReport, UnattendedUpgradeRule,
 };
 pub use manager::{
     PreflightCheckResult, SovereignSystemUpdateManager, SystemUpdatePayload, SystemUpdatePolicy,

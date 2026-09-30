@@ -214,14 +214,16 @@ mod tests {
 
         // 1. Linux sys_write(1, buf, 14)
         let regs_linux = SyscallRegisters64 {
-            rax: 1, // sys_write
-            rdi: 1, // stdout
+            rax: 1,                     // sys_write
+            rdi: 1,                     // stdout
             rsi: 0x0000_0000_0040_0000, // buf
-            rdx: 14, // count
+            rdx: 14,                    // count
             ..Default::default()
         };
 
-        let res_linux = engine.dispatch_syscall(AbiType::LinuxX86_64, &regs_linux).unwrap();
+        let res_linux = engine
+            .dispatch_syscall(AbiType::LinuxX86_64, &regs_linux)
+            .unwrap();
         assert!(res_linux.success);
         assert_eq!(res_linux.return_value, 14);
 
@@ -234,7 +236,9 @@ mod tests {
             ..Default::default()
         };
 
-        let res_bsd = engine.dispatch_syscall(AbiType::FreeBsdX86_64, &regs_bsd).unwrap();
+        let res_bsd = engine
+            .dispatch_syscall(AbiType::FreeBsdX86_64, &regs_bsd)
+            .unwrap();
         assert!(res_bsd.success);
         assert_eq!(res_bsd.return_value, 20);
 

@@ -3,8 +3,7 @@
 // Implements capability-gated logging, memory auditing, and PQC attestation
 // Enhanced with real enforcement capabilities for Linux/BSD parity
 
-
-use core::sync::atomic::{AtomicU32, AtomicU64, AtomicBool, AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, AtomicUsize, Ordering};
 
 /// Audit log entry types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -62,9 +61,10 @@ impl MemoryAuditShard {
 
         let current_time = self.get_current_time();
         let violations = self.walk_page_tables();
-        
+
         self.wwx_violations.store(violations, Ordering::SeqCst);
-        self.violations_detected.fetch_add(violations, Ordering::SeqCst);
+        self.violations_detected
+            .fetch_add(violations, Ordering::SeqCst);
         self.last_scan_time.store(current_time, Ordering::SeqCst);
 
         violations == 0
@@ -72,16 +72,16 @@ impl MemoryAuditShard {
 
     fn walk_page_tables(&self) -> u32 {
         let mut violations = 0;
-        
+
         for i in 0..1000 {
             let page_address = i * 4096;
             let permissions = self.simulate_page_permissions(page_address);
-            
+
             if permissions & 0b1010 == 0b1010 {
                 violations += 1;
             }
         }
-        
+
         violations
     }
 
@@ -94,7 +94,7 @@ impl MemoryAuditShard {
     }
 
     /// Get current timestamp using RDTSC
-    /// 
+    ///
     /// # Safety
     /// RDTSC is a CPU instruction that reads the time-stamp counter.
     /// This is safe to call in user-space but may have security implications
@@ -121,7 +121,10 @@ impl MemoryAuditShard {
     }
 
     pub fn get_violation_stats(&self) -> (u32, u32) {
-        (self.violations_detected.load(Ordering::SeqCst), self.wwx_violations.load(Ordering::SeqCst))
+        (
+            self.violations_detected.load(Ordering::SeqCst),
+            self.wwx_violations.load(Ordering::SeqCst),
+        )
     }
 }
 
@@ -145,7 +148,7 @@ impl SandboxAuditShard {
 
     pub fn log_blocked_syscall(&self, _syscall_number: usize, process_id: usize) {
         self.blocked_syscalls.fetch_add(1, Ordering::SeqCst);
-        
+
         let entry = AuditEntry {
             event_type: AuditEventType::SyscallBlocked,
             timestamp: self.get_current_time(),
@@ -153,7 +156,7 @@ impl SandboxAuditShard {
             details: "Syscall blocked by pledge policy",
             severity: AuditSeverity::Warning,
         };
-        
+
         self.write_audit_entry(entry);
     }
 
@@ -163,10 +166,10 @@ impl SandboxAuditShard {
         }
 
         let current_pledges = self.get_process_pledges(process_id);
-        
+
         if (requested_permissions & !current_pledges) != 0 {
             self.pledge_violations.fetch_add(1, Ordering::SeqCst);
-            
+
             let entry = AuditEntry {
                 event_type: AuditEventType::SandboxViolation,
                 timestamp: self.get_current_time(),
@@ -174,18 +177,19 @@ impl SandboxAuditShard {
                 details: "Pledge violation: requested permissions exceed pledged set",
                 severity: AuditSeverity::Error,
             };
-            
+
             self.write_audit_entry(entry);
             return false;
         }
-        
+
         true
     }
 
     pub fn set_process_pledges(&self, process_id: usize, _permissions: u64) {
         let bit = 1u64 << (process_id % 64);
         let current = self.process_pledge_table.load(Ordering::SeqCst);
-        self.process_pledge_table.store(current | bit, Ordering::SeqCst);
+        self.process_pledge_table
+            .store(current | bit, Ordering::SeqCst);
     }
 
     fn get_process_pledges(&self, process_id: usize) -> u64 {
@@ -194,7 +198,7 @@ impl SandboxAuditShard {
     }
 
     /// Get current timestamp using RDTSC
-    /// 
+    ///
     /// # Safety
     /// RDTSC is a CPU instruction that reads the time-stamp counter.
     /// This is safe to call in user-space but may have security implications
@@ -225,7 +229,10 @@ impl SandboxAuditShard {
     }
 
     pub fn get_stats(&self) -> (u32, u32) {
-        (self.blocked_syscalls.load(Ordering::SeqCst), self.pledge_violations.load(Ordering::SeqCst))
+        (
+            self.blocked_syscalls.load(Ordering::SeqCst),
+            self.pledge_violations.load(Ordering::SeqCst),
+        )
     }
 }
 
@@ -253,31 +260,31 @@ impl CryptoAuditShard {
         }
 
         let signature_success = self.generate_dilithium_signature(entry);
-        
+
         if signature_success {
             self.signed_entries.fetch_add(1, Ordering::SeqCst);
         } else {
             self.signature_failures.fetch_add(1, Ordering::SeqCst);
         }
-        
+
         signature_success
     }
 
     fn generate_dilithium_signature(&self, entry: &AuditEntry) -> bool {
         let entry_hash = self.compute_entry_hash(entry);
         let signature_valid = self.simulate_dilithium_sign(entry_hash);
-        
+
         signature_valid
     }
 
     fn compute_entry_hash(&self, entry: &AuditEntry) -> [u8; 32] {
         let mut hash = [0u8; 32];
         let combined = entry.timestamp as u64 ^ entry.source as u64;
-        
+
         for i in 0..32 {
             hash[i] = ((combined >> (i * 8)) & 0xFF) as u8;
         }
-        
+
         hash
     }
 
@@ -294,7 +301,10 @@ impl CryptoAuditShard {
     }
 
     pub fn get_stats(&self) -> (u32, u32) {
-        (self.signed_entries.load(Ordering::SeqCst), self.signature_failures.load(Ordering::SeqCst))
+        (
+            self.signed_entries.load(Ordering::SeqCst),
+            self.signature_failures.load(Ordering::SeqCst),
+        )
     }
 }
 
@@ -320,7 +330,7 @@ impl AuditCollectorBus {
 
     pub fn run_audit_cycle(&self) -> bool {
         let cycle_start = self.get_current_time();
-        
+
         if !self.memory_shard.scan_page_tables() {
             let entry = AuditEntry {
                 event_type: AuditEventType::MemoryViolation,
@@ -335,7 +345,10 @@ impl AuditCollectorBus {
 
         let test_process_id = 1;
         let test_permissions = 0x7;
-        if !self.sandbox_shard.check_pledge_compliance(test_process_id, test_permissions) {
+        if !self
+            .sandbox_shard
+            .check_pledge_compliance(test_process_id, test_permissions)
+        {
             return false;
         }
 
@@ -351,13 +364,14 @@ impl AuditCollectorBus {
         }
 
         self.audit_cycles_run.fetch_add(1, Ordering::SeqCst);
-        self.last_cycle_time.store(self.get_current_time(), Ordering::SeqCst);
+        self.last_cycle_time
+            .store(self.get_current_time(), Ordering::SeqCst);
 
         true
     }
 
     /// Get current timestamp using RDTSC
-    /// 
+    ///
     /// # Safety
     /// RDTSC is a CPU instruction that reads the time-stamp counter.
     /// This is safe to call in user-space but may have security implications
@@ -425,7 +439,7 @@ mod tests {
     fn test_sandbox_audit_shard() {
         let shard = SandboxAuditShard::new();
         shard.set_process_pledges(1, 0x7);
-        
+
         assert!(shard.check_pledge_compliance(1, 0x7));
         assert!(!shard.check_pledge_compliance(1, 0xF));
     }
@@ -440,7 +454,7 @@ mod tests {
             details: "Test entry",
             severity: AuditSeverity::Info,
         };
-        
+
         assert!(shard.sign_entry(&entry));
         assert_eq!(shard.get_stats().0, 1);
     }
@@ -449,7 +463,7 @@ mod tests {
     fn test_audit_collector_bus() {
         let bus = AuditCollectorBus::new();
         assert!(bus.run_audit_cycle());
-        
+
         let stats = bus.get_audit_stats();
         assert_eq!(stats.0, 1);
     }
@@ -458,7 +472,7 @@ mod tests {
     fn test_comprehensive_stats() {
         let bus = AuditCollectorBus::new();
         bus.run_audit_cycle();
-        
+
         let stats = bus.get_comprehensive_stats();
         assert_eq!(stats.cycles_run, 1);
         assert!(stats.last_cycle_time > 0);

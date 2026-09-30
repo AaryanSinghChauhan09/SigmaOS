@@ -14,16 +14,16 @@ use alloc::vec::Vec;
 /// Fine-grained Hardware Access Privilege Kinds inspired by Linux & BSD hardware capabilities
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum HardwarePrivilegeKind {
-    IoPortAccess,        // x86 inb/outb / Linux iopl(3) / ioperm
-    DirectDmaChannel,    // ISA/PCI DMA channel allocation & scatter-gather ring access
-    PcieBarMapping,      // Direct MMIO physical BAR memory mapping
-    MsrAccess,           // Model-Specific Registers (rdmsr/wrmsr)
-    AcpiDmiControl,      // ACPI power states & DMI system tables
-    GpuSubmissionQueue,  // Direct DRM/KMS Vulkan/Metal hardware command buffer submit
-    RawUsbTransfer,      // Direct USB xHCI URB submission & raw endpoint control
-    AudioDmaStream,      // Direct Intel HDA / PipeWire DMA ring buffer submission
-    NetworkRxTxRing,     // Direct eBPF/XDP zero-copy packet descriptor ring submission
-    StorageDirectCommand,// NVMe/SATA direct passthrough command submission
+    IoPortAccess,         // x86 inb/outb / Linux iopl(3) / ioperm
+    DirectDmaChannel,     // ISA/PCI DMA channel allocation & scatter-gather ring access
+    PcieBarMapping,       // Direct MMIO physical BAR memory mapping
+    MsrAccess,            // Model-Specific Registers (rdmsr/wrmsr)
+    AcpiDmiControl,       // ACPI power states & DMI system tables
+    GpuSubmissionQueue,   // Direct DRM/KMS Vulkan/Metal hardware command buffer submit
+    RawUsbTransfer,       // Direct USB xHCI URB submission & raw endpoint control
+    AudioDmaStream,       // Direct Intel HDA / PipeWire DMA ring buffer submission
+    NetworkRxTxRing,      // Direct eBPF/XDP zero-copy packet descriptor ring submission
+    StorageDirectCommand, // NVMe/SATA direct passthrough command submission
 }
 
 impl HardwarePrivilegeKind {
@@ -107,7 +107,11 @@ impl SovereignHardwarePrivilegeGovernor {
     }
 
     /// Revokes a hardware privilege from a process
-    pub fn revoke_hardware_privilege(&mut self, pid: u64, privilege: HardwarePrivilegeKind) -> bool {
+    pub fn revoke_hardware_privilege(
+        &mut self,
+        pid: u64,
+        privilege: HardwarePrivilegeKind,
+    ) -> bool {
         if let Some(mut grant) = self.active_grants.remove(&(pid, privilege)) {
             grant.is_active = false;
             self.audit_log.push(format!(
@@ -140,12 +144,14 @@ mod tests {
     fn test_hardware_privilege_governor() {
         let mut governor = SovereignHardwarePrivilegeGovernor::new();
 
-        let grant = governor.grant_hardware_privilege(
-            1001,
-            HardwarePrivilegeKind::PcieBarMapping,
-            "bar:0xFE000000-0xFE00FFFF",
-            100,
-        ).unwrap();
+        let grant = governor
+            .grant_hardware_privilege(
+                1001,
+                HardwarePrivilegeKind::PcieBarMapping,
+                "bar:0xFE000000-0xFE00FFFF",
+                100,
+            )
+            .unwrap();
 
         assert_eq!(grant.process_id, 1001);
         assert!(governor.check_hardware_privilege(1001, HardwarePrivilegeKind::PcieBarMapping));

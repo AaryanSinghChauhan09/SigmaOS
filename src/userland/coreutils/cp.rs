@@ -11,12 +11,18 @@ pub fn run(src: &str, dst: &str, recursive: bool, preserve: bool) -> Result<(), 
     let dst_path = Path::new(dst);
 
     if !src_path.exists() {
-        return Err(format!("cp: cannot stat '{}': No such file or directory", src));
+        return Err(format!(
+            "cp: cannot stat '{}': No such file or directory",
+            src
+        ));
     }
 
     if src_path.is_dir() {
         if !recursive {
-            return Err(format!("cp: -r not specified; omitting directory '{}'", src));
+            return Err(format!(
+                "cp: -r not specified; omitting directory '{}'",
+                src
+            ));
         }
         copy_directory(src_path, dst_path, preserve)
     } else {
@@ -33,11 +39,15 @@ fn copy_file(src: &Path, dst: &Path, preserve: bool) -> Result<(), String> {
 
     let mut buffer = [0u8; 8192];
     loop {
-        let n = src_file.read(&mut buffer).map_err(|e| format!("cp: {}", e))?;
+        let n = src_file
+            .read(&mut buffer)
+            .map_err(|e| format!("cp: {}", e))?;
         if n == 0 {
             break;
         }
-        dst_file.write_all(&buffer[..n]).map_err(|e| format!("cp: {}", e))?;
+        dst_file
+            .write_all(&buffer[..n])
+            .map_err(|e| format!("cp: {}", e))?;
     }
 
     if preserve {
