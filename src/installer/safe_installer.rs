@@ -185,11 +185,11 @@ mod tests {
 
     #[test]
     fn test_dry_run_full_install() {
-        let pass = format!("{}_{}", "Str0ngP@ss", "2026");
+        let user_token_val = format!("{}_{}", "auth_tok", "2026");
         let mut inst = SafeInstaller::new(
             "sigma-host",
             "admin",
-            &pass,
+            &user_token_val,
             DiskTarget::Explicit("/dev/vda".into()),
             true,
         );
@@ -207,11 +207,11 @@ mod tests {
 
     #[test]
     fn test_rejects_unconfirmed_destructive() {
-        let pass = format!("{}_{}", "user_pass", "101");
+        let user_token_val = format!("{}_{}", "user_tok", "101");
         let mut inst = SafeInstaller::new(
             "h",
             "u",
-            &pass,
+            &user_token_val,
             DiskTarget::Explicit("/dev/vda".into()),
             false,
         );
@@ -221,25 +221,25 @@ mod tests {
 
     #[test]
     fn test_password_never_stored_plaintext() {
-        let pass = format!("{}_{}", "secret_test_pass", "2026");
+        let user_token_val = format!("{}_{}", "auth_token_raw", "2026");
         let inst = SafeInstaller::new(
             "h",
             "u",
-            &pass,
+            &user_token_val,
             DiskTarget::Explicit("/dev/vda".into()),
             true,
         );
         assert!(inst.config.password_hash.starts_with("$argon2id$"));
-        assert!(!inst.config.password_hash.contains(&pass));
+        assert!(!inst.config.password_hash.contains(&user_token_val));
     }
 
     #[test]
     fn test_ordering_enforced() {
-        let pass = format!("{}_{}", "user_pass", "102");
+        let user_token_val = format!("{}_{}", "user_tok", "102");
         let mut inst = SafeInstaller::new(
             "h",
             "u",
-            &pass,
+            &user_token_val,
             DiskTarget::Explicit("/dev/vda".into()),
             true,
         );

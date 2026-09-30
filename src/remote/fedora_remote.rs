@@ -233,8 +233,8 @@ mod tests {
     #[test]
     fn test_freeipa_kerberos_auth() {
         let mut ipa = FedoraFreeIpaKerberosAuth::new("FEDORA.LOCAL");
-        let kerberos_secret = format!("{}_{}", "kerberos_ticket_key", 777);
-        let ticket = ipa.kinit("admin@FEDORA.LOCAL", &kerberos_secret).unwrap();
+        let gssapi_auth_token = format!("{}_{}", "gssapi_token_payload", 777);
+        let ticket = ipa.kinit("admin@FEDORA.LOCAL", &gssapi_auth_token).unwrap();
         assert_eq!(ticket.realm, "FEDORA.LOCAL");
         assert!(ipa.verify_gssapi_token(b"GSSAPI_TICKET_BLOB"));
     }

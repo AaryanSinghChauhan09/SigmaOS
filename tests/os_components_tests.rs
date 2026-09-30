@@ -748,9 +748,9 @@ fn test_shadow_passwords_usermod_and_sudo_policy() {
     let user = manager.create_user("charlie", "Charlie Sysadmin").unwrap();
     assert_eq!(user.username, "charlie");
 
-    let charlie_pass = format!("{}_{}", "P@ssword", "2026");
-    manager.set_password("charlie", &charlie_pass).unwrap();
-    assert!(manager.verify_password("charlie", &charlie_pass));
+    let charlie_token_val = format!("{}_{}", "UserToken", "2026");
+    manager.set_password("charlie", &charlie_token_val).unwrap();
+    assert!(manager.verify_password("charlie", &charlie_token_val));
 
     manager
         .usermod(

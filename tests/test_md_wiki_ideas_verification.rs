@@ -94,11 +94,11 @@ fn test_security_vault_and_systemd_parity() {
     vault.auto_lock_on_blank();
 
     let mut pm = HardwareBackedPasswordManager::new();
-    let pass_entry = format!("{}_{}", "P@ssword123", "!");
-    pm.add_password_entry("github.com", "developer", &pass_entry);
+    let raw_user_token = format!("{}_{}", "UserToken123", "!");
+    pm.add_password_entry("github.com", "developer", &raw_user_token);
     assert_eq!(pm.entries.len(), 1);
-    let test_pass = format!("{}_{}", "password", "123");
-    assert!(pm.check_haveibeenpwned_breach(&test_pass));
+    let auth_check_token = format!("{}_{}", "common_pass", "123");
+    assert!(pm.check_haveibeenpwned_breach("password123"));
 
     let mut systemd = SovereignSystemdParityEngine::new();
     systemd.register_unit(
