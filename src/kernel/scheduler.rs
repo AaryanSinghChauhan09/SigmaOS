@@ -96,6 +96,22 @@ pub struct ProcessTask {
     pub slice: u64,         // Time slice
 }
 
+impl ProcessTask {
+    pub fn new(pid: u64, priority: Priority) -> Self {
+        Self {
+            pid,
+            priority,
+            policy: SchedulerPolicy::Normal,
+            state: ProcessState::Runnable,
+            vruntime: 0,
+            exec_start: 0,
+            exec_duration: 0,
+            cpu_time: 0,
+            slice: 10,
+        }
+    }
+}
+
 impl Ord for ProcessTask {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         // Lower vruntime has higher priority
