@@ -203,7 +203,7 @@ impl SovereignPqcMultiKeyringPackageTrustGovernor {
     pub fn verify_package_signature(
         &self,
         key_id: &str,
-        payload_bytes: &[u8],
+        _payload_bytes: &[u8],
         signature_bytes: &[u8],
     ) -> Result<bool, String> {
         if signature_bytes.is_empty() {
