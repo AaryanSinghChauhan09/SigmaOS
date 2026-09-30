@@ -3118,10 +3118,6 @@ pub struct SovereignOpenSourceObsoletionOrchestrator {
     pub ghostty_terminal: open_source_os_gap_closure::SovereignGhosttyTextGridEngine,
     pub valgrind_debugger: open_source_os_gap_closure::SovereignValgrindMemoryDebuggerEngine,
     pub nebula_mesh: open_source_os_gap_closure::SovereignNebulaMeshVpnEngine,
-    pub ripgrep_search: SovereignRipgrepSearchEngine,
-    pub jq_processor: SovereignJqJsonProcessorEngine,
-    pub eza_directory: SovereignEzaFdDirectoryEngine,
-    pub zoxide_jump: SovereignZoxideDirectoryJumpEngine,
     pub total_obsoleted_projects_count: u32,
 }
 
@@ -3207,11 +3203,7 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             ghostty_terminal: open_source_os_gap_closure::SovereignGhosttyTextGridEngine::new(80, 24),
             valgrind_debugger: open_source_os_gap_closure::SovereignValgrindMemoryDebuggerEngine::new(),
             nebula_mesh: open_source_os_gap_closure::SovereignNebulaMeshVpnEngine::new("orchestrator_node", "10.200.0.1"),
-            ripgrep_search: SovereignRipgrepSearchEngine::new(),
-            jq_processor: SovereignJqJsonProcessorEngine::new(),
-            eza_directory: SovereignEzaFdDirectoryEngine::new(),
-            zoxide_jump: SovereignZoxideDirectoryJumpEngine::new(),
-            total_obsoleted_projects_count: 94,
+            total_obsoleted_projects_count: 90,
         }
     }
 
@@ -3271,16 +3263,6 @@ impl SovereignOpenSourceObsoletionOrchestrator {
         self.ghostty_terminal.write_char(0, 0, 'S', (255, 255, 255), (0, 0, 0));
         self.valgrind_debugger.shadow_malloc(0x7fff0000, 1024);
         let _ = self.nebula_mesh.perform_noise_handshake("lighthouse_01");
-        let _ = self.ripgrep_search.search_file("/src/main.rs", "fn main() {}", "main");
-        let _ = self.jq_processor.extract_key_value("{\"status\": \"ok\"}", "status");
-        let _ = self.eza_directory.format_entry(&EzaEntryMeta {
-            name: "main.rs".to_string(),
-            is_dir: false,
-            permissions_rwxrwxrwx: "rwxr-xr-x".to_string(),
-            owner: "root".to_string(),
-            size_bytes: 1024,
-        });
-        self.zoxide_jump.add_or_update_visit("/home/sovereign", 1700000000);
 
         Ok(format!(
             "Sovereign Stack Active: {} legacy open-source projects obsoleted",
@@ -5720,254 +5702,6 @@ impl Default for SovereignDifftasticSyntaxDiffEngine {
 }
 
 // =========================================================================
-// 63. SOVEREIGN RIPGREP SEARCH ENGINE (Superseding ripgrep, grep, ag, ack)
-// =========================================================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct RipgrepMatchLine {
-    pub line_number: usize,
-    pub line_content: String,
-    pub match_start: usize,
-    pub match_end: usize,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct RipgrepFileMatches {
-    pub file_path: String,
-    pub matches: Vec<RipgrepMatchLine>,
-}
-
-pub struct SovereignRipgrepSearchEngine {
-    pub case_sensitive: bool,
-    pub show_line_numbers: bool,
-}
-
-impl SovereignRipgrepSearchEngine {
-    pub fn new() -> Self {
-        Self {
-            case_sensitive: true,
-            show_line_numbers: true,
-        }
-    }
-
-    pub fn search_file(&self, file_path: &str, content: &str, query: &str) -> RipgrepFileMatches {
-        let mut matches = Vec::new();
-        if query.is_empty() {
-            return RipgrepFileMatches {
-                file_path: file_path.to_string(),
-                matches,
-            };
-        }
-
-        let query_cmp = if self.case_sensitive {
-            query.to_string()
-        } else {
-            query.to_lowercase()
-        };
-
-        for (idx, line) in content.lines().enumerate() {
-            let line_cmp = if self.case_sensitive {
-                line.to_string()
-            } else {
-                line.to_lowercase()
-            };
-
-            if let Some(start) = line_cmp.find(&query_cmp) {
-                matches.push(RipgrepMatchLine {
-                    line_number: idx + 1,
-                    line_content: line.to_string(),
-                    match_start: start,
-                    match_end: start + query.len(),
-                });
-            }
-        }
-
-        RipgrepFileMatches {
-            file_path: file_path.to_string(),
-            matches,
-        }
-    }
-}
-
-impl Default for SovereignRipgrepSearchEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// 64. SOVEREIGN JQ JSON PROCESSOR ENGINE (Superseding jq, yq, fx)
-// =========================================================================
-
-pub struct SovereignJqJsonProcessorEngine {
-    pub compact_output: bool,
-}
-
-impl SovereignJqJsonProcessorEngine {
-    pub fn new() -> Self {
-        Self {
-            compact_output: false,
-        }
-    }
-
-    pub fn extract_key_value(&self, json_str: &str, key: &str) -> Option<String> {
-        let key_pattern = format!("\"{}\":", key);
-        if let Some(pos) = json_str.find(&key_pattern) {
-            let rest = json_str[pos + key_pattern.len()..].trim();
-            if rest.starts_with('"') {
-                let end = rest[1..].find('"')?;
-                Some(rest[1..1 + end].to_string())
-            } else {
-                let end = rest.find(|c: char| c == ',' || c == '}' || c == ']').unwrap_or(rest.len());
-                Some(rest[..end].trim().to_string())
-            }
-        } else {
-            None
-        }
-    }
-
-    pub fn filter_json_array(&self, json_array_str: &str, filter_key: &str, filter_val: &str) -> Vec<String> {
-        let mut results = Vec::new();
-        let trimmed = json_array_str.trim().trim_start_matches('[').trim_end_matches(']');
-        for object_str in trimmed.split('}') {
-            let obj = object_str.trim();
-            if obj.is_empty() {
-                continue;
-            }
-            let full_obj = format!("{}}}", obj);
-            if let Some(val) = self.extract_key_value(&full_obj, filter_key) {
-                if val == filter_val {
-                    results.push(full_obj);
-                }
-            }
-        }
-        results
-    }
-}
-
-impl Default for SovereignJqJsonProcessorEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// 65. SOVEREIGN EZA FD DIRECTORY ENGINE (Superseding eza, exa, fd, ls)
-// =========================================================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct EzaEntryMeta {
-    pub name: String,
-    pub is_dir: bool,
-    pub permissions_rwxrwxrwx: String,
-    pub owner: String,
-    pub size_bytes: u64,
-}
-
-pub struct SovereignEzaFdDirectoryEngine {
-    pub show_icons: bool,
-    pub show_permissions: bool,
-}
-
-impl SovereignEzaFdDirectoryEngine {
-    pub fn new() -> Self {
-        Self {
-            show_icons: true,
-            show_permissions: true,
-        }
-    }
-
-    pub fn format_entry(&self, meta: &EzaEntryMeta) -> String {
-        let icon = if meta.is_dir { "📁" } else { "📄" };
-        let mut out = String::new();
-
-        if self.show_permissions {
-            out.push_str(&format!("{} ", meta.permissions_rwxrwxrwx));
-        }
-
-        out.push_str(&format!("{:<8} {:>10} ", meta.owner, meta.size_bytes));
-
-        if self.show_icons {
-            out.push_str(&format!("{} ", icon));
-        }
-
-        out.push_str(&meta.name);
-        out
-    }
-
-    pub fn render_tree_view(&self, dir_name: &str, children: &[EzaEntryMeta]) -> String {
-        let mut tree = format!("📁 {}\n", dir_name);
-        for (idx, child) in children.iter().enumerate() {
-            let branch = if idx == children.len() - 1 { "└── " } else { "├── " };
-            let icon = if child.is_dir { "📁" } else { "📄" };
-            tree.push_str(&format!("{}{}{} ({}) \n", branch, icon, child.name, child.size_bytes));
-        }
-        tree
-    }
-}
-
-impl Default for SovereignEzaFdDirectoryEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// 66. SOVEREIGN ZOXIDE DIRECTORY JUMP ENGINE (Superseding Zoxide, autojump, fasd)
-// =========================================================================
-
-#[derive(Debug, Clone, PartialEq)]
-pub struct ZoxideDirEntry {
-    pub path: String,
-    pub frecency_score: f64,
-    pub access_count: u32,
-    pub last_access_secs: u64,
-}
-
-pub struct SovereignZoxideDirectoryJumpEngine {
-    pub db: Vec<ZoxideDirEntry>,
-}
-
-impl SovereignZoxideDirectoryJumpEngine {
-    pub fn new() -> Self {
-        Self { db: Vec::new() }
-    }
-
-    pub fn add_or_update_visit(&mut self, path: &str, timestamp_secs: u64) {
-        if let Some(entry) = self.db.iter_mut().find(|e| e.path == path) {
-            entry.access_count += 1;
-            entry.last_access_secs = timestamp_secs;
-            entry.frecency_score += 10.0;
-        } else {
-            self.db.push(ZoxideDirEntry {
-                path: path.to_string(),
-                frecency_score: 10.0,
-                access_count: 1,
-                last_access_secs: timestamp_secs,
-            });
-        }
-    }
-
-    pub fn query_best_match(&self, query: &str) -> Option<String> {
-        let query_lower = query.to_lowercase();
-        let mut matches: Vec<&ZoxideDirEntry> = self
-            .db
-            .iter()
-            .filter(|e| e.path.to_lowercase().contains(&query_lower))
-            .collect();
-
-        matches.sort_by(|a, b| b.frecency_score.partial_cmp(&a.frecency_score).unwrap_or(core::cmp::Ordering::Equal));
-        matches.first().map(|e| e.path.clone())
-    }
-}
-
-impl Default for SovereignZoxideDirectoryJumpEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
 // UNIT TESTS
 // =========================================================================
 
@@ -6796,8 +6530,8 @@ mod tests {
     fn test_sovereign_orchestrator_bootstrap() {
         let mut orchestrator = SovereignOpenSourceObsoletionOrchestrator::new();
         let status = orchestrator.bootstrap_sovereign_stack().unwrap();
-        assert!(status.contains("94 legacy open-source projects obsoleted"));
-        assert_eq!(orchestrator.total_obsoleted_projects_count, 94);
+        assert!(status.contains("90 legacy open-source projects obsoleted"));
+        assert_eq!(orchestrator.total_obsoleted_projects_count, 90);
         assert_eq!(orchestrator.serenity_async.processed_count, 0);
         assert_eq!(orchestrator.serenity_async.task_queue.len(), 1);
         assert_eq!(orchestrator.qubes_isolation.domains.len(), 1);
@@ -7085,59 +6819,5 @@ mod tests {
         let summary = diff.render_diff_summary(&hunks);
         assert!(summary.contains("[- println!(\"Hello\"); -]"));
         assert!(summary.contains("[+ println!(\"Hello SigmaOS\"); +]"));
-    }
-
-    #[test]
-    fn test_sovereign_ripgrep_search_engine() {
-        let rg = SovereignRipgrepSearchEngine::new();
-        let code = "fn main() {\n    println!(\"Hello SigmaOS\");\n    // main function end\n}";
-        let res = rg.search_file("src/main.rs", code, "main");
-        assert_eq!(res.matches.len(), 2);
-        assert_eq!(res.matches[0].line_number, 1);
-        assert_eq!(res.matches[1].line_number, 3);
-    }
-
-    #[test]
-    fn test_sovereign_jq_json_processor_engine() {
-        let jq = SovereignJqJsonProcessorEngine::new();
-        let json_str = "{\"status\": \"active\", \"code\": 200}";
-        let val = jq.extract_key_value(json_str, "status").unwrap();
-        assert_eq!(val, "active");
-
-        let array_str = "[{\"name\": \"app1\", \"env\": \"prod\"}, {\"name\": \"app2\", \"env\": \"dev\"}]";
-        let filtered = jq.filter_json_array(array_str, "env", "prod");
-        assert_eq!(filtered.len(), 1);
-        assert!(filtered[0].contains("app1"));
-    }
-
-    #[test]
-    fn test_sovereign_eza_fd_directory_engine() {
-        let eza = SovereignEzaFdDirectoryEngine::new();
-        let meta = EzaEntryMeta {
-            name: "kernel.bin".to_string(),
-            is_dir: false,
-            permissions_rwxrwxrwx: "rwxr-xr-x".to_string(),
-            owner: "root".to_string(),
-            size_bytes: 4096,
-        };
-        let formatted = eza.format_entry(&meta);
-        assert!(formatted.contains("rwxr-xr-x"));
-        assert!(formatted.contains("kernel.bin"));
-        assert!(formatted.contains("📄"));
-
-        let tree = eza.render_tree_view("/boot", &[meta]);
-        assert!(tree.contains("📁 /boot"));
-        assert!(tree.contains("└── 📄kernel.bin (4096)"));
-    }
-
-    #[test]
-    fn test_sovereign_zoxide_directory_jump_engine() {
-        let mut zoxide = SovereignZoxideDirectoryJumpEngine::new();
-        zoxide.add_or_update_visit("/usr/src/sigmaos", 1700000000);
-        zoxide.add_or_update_visit("/usr/src/sigmaos", 1700000100);
-        zoxide.add_or_update_visit("/home/user/downloads", 1700000050);
-
-        let best = zoxide.query_best_match("sigma").unwrap();
-        assert_eq!(best, "/usr/src/sigmaos");
     }
 }
