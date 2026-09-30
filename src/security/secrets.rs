@@ -147,6 +147,21 @@ impl SimpleSecret {
     }
 }
 
+impl Drop for SimpleSecret {
+    fn drop(&mut self) {
+        for byte in self.data.iter_mut() {
+            // SAFETY: `byte` is a valid, uniquely borrowed element of this writable array.
+            unsafe { core::ptr::write_volatile(byte, 0) };
+        }
+        for byte in self.name.iter_mut() {
+            // SAFETY: `byte` is a valid, uniquely borrowed element of this writable array.
+            unsafe { core::ptr::write_volatile(byte, 0) };
+        }
+        self.data_len = 0;
+        self.name_len = 0;
+    }
+}
+
 impl Secret for SimpleSecret {
     fn id(&self) -> SecretID {
         self.id
