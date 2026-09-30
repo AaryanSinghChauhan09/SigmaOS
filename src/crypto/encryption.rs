@@ -35,7 +35,9 @@ impl SimpleEncryptionKey {
     pub fn new(id: KeyID, cipher_type: CipherType, key_data: &[u8]) -> Self {
         let mut key_array = [0u8; 32];
         let key_len = key_data.len().min(32);
-        key_array[..key_len].copy_from_slice(&key_data[..key_len]);
+        unsafe {
+            core::ptr::copy_nonoverlapping(key_data.as_ptr(), key_array.as_mut_ptr(), key_len);
+        }
         SimpleEncryptionKey {
             id,
             cipher_type,
