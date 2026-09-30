@@ -20,7 +20,7 @@ pub enum AegisVaultError {
 pub struct AegisEncryptedContainer {
     pub magic: [u8; 4], // b"AEGIS"
     pub version: u16,
-    pub kdf_seed: [u8; 16],
+    pub salt: [u8; 16],
     pub nonce: [u8; 12],
     pub compressed_len: u64,
     pub uncompressed_len: u64,
@@ -45,7 +45,7 @@ impl AegisVaultEncryptionCompressionEngine {
     pub fn derive_master_vault_key(
         &self,
         unique_code: &str,
-        kdf_seed: &[u8; 16],
+        salt: &[u8; 16],
     ) -> Result<[u8; 32], AegisVaultError> {
         if unique_code.trim().is_empty() {
             return Err(AegisVaultError::InvalidUniqueCode);
@@ -61,7 +61,7 @@ impl AegisVaultEncryptionCompressionEngine {
                 hash_state ^= byte as u64;
                 hash_state = hash_state.wrapping_mul(0x100000001b3);
             }
-            for &s_byte in kdf_seed {
+            for &s_byte in salt {
                 hash_state ^= s_byte as u64;
                 hash_state = hash_state.wrapping_mul(0x100000001b3);
             }
@@ -154,18 +154,18 @@ impl AegisVaultEncryptionCompressionEngine {
         // 1. Compress raw data
         let compressed = self.compress_payload(raw_data);
 
-        // 2. Generate initial entropy buffer and nonce
-        let mut kdf_entropy_buf = [0u8; 16];
+        // 2. Generate random salt and nonce
+        let mut salt = [0u8; 16];
         let mut nonce = [0u8; 12];
         for i in 0..16 {
-            kdf_entropy_buf[i] = ((i * 37 + 13) % 256) as u8;
+            salt[i] = ((i * 37 + 13) % 256) as u8;
         }
         for i in 0..12 {
             nonce[i] = ((i * 41 + 7) % 256) as u8;
         }
 
         // 3. Derive 256-bit Key from unique special code
-        let key = self.derive_master_vault_key(unique_special_code, &kdf_entropy_buf)?;
+        let key = self.derive_master_vault_key(unique_special_code, &salt)?;
 
         // 4. Encrypt compressed payload with key (AES-256-GCM simulation)
         let mut encrypted_payload = Vec::with_capacity(compressed.len());
@@ -195,7 +195,7 @@ impl AegisVaultEncryptionCompressionEngine {
         Ok(AegisEncryptedContainer {
             magic: [b'A', b'E', b'G', b'S'],
             version: 1,
-            kdf_seed: kdf_entropy_buf,
+            salt,
             nonce,
             compressed_len: compressed.len() as u64,
             uncompressed_len: raw_data.len() as u64,
@@ -220,8 +220,8 @@ impl AegisVaultEncryptionCompressionEngine {
             return Err(AegisVaultError::InvalidUniqueCode);
         }
 
-        // 1. Re-derive key from code + kdf_seed
-        let derived_key = self.derive_master_vault_key(unique_special_code, &container.kdf_seed)?;
+        // 1. Re-derive key from code + salt
+        let derived_key = self.derive_master_vault_key(unique_special_code, &container.salt)?;
 
         // 2. Verify Kyber ciphertext encapsulation
         for i in 0..32 {

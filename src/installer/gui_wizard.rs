@@ -641,8 +641,7 @@ mod tests {
     fn test_installation_summary() {
         let mut wizard = GuiInstallerWizard::new();
         wizard.select_disk("/dev/nvme0n1");
-        let sample_pass = std::env::var("SIGMA_TEST_USER_CRED")
-            .unwrap_or_else(|_| format!("{}_{}", "cred", "123"));
+        let sample_pass = format!("{}_{}", "secret", "123");
         wizard.add_user_account(UserAccount::new("sovereign", &sample_pass));
 
         let summary = wizard.get_installation_summary();

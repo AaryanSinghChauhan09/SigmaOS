@@ -554,8 +554,7 @@ mod tests {
     fn test_ldap_directory_engine() {
         let mut ldap =
             LdapLightweightDirectoryEngine::new("ldap://auth.sigmaos.org", "dc=sigmaos,dc=org");
-        let dynamic_token = format!("bind_auth_token_{}", 54321);
-        assert!(ldap.bind_credentials("admin_dn", &dynamic_token).is_ok());
+        assert!(ldap.bind_credentials("admin_dn", "secret_pass").is_ok());
 
         let alice = ldap.search_user_by_uid("alice").unwrap();
         assert_eq!(alice.uid, "alice");

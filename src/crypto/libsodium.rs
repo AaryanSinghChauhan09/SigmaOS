@@ -276,7 +276,7 @@ impl SecretBox {
     pub fn encrypt(
         &self,
         message: &[u8],
-        iv_bytes: &[u8; constants::CRYPTO_SECRETBOX_NONCEBYTES],
+        nonce: &[u8; constants::CRYPTO_SECRETBOX_NONCEBYTES],
     ) -> Vec<u8> {
         let mut ciphertext =
             Vec::with_capacity(message.len() + constants::CRYPTO_SECRETBOX_MACBYTES);
@@ -284,14 +284,14 @@ impl SecretBox {
         // XSalsa20 encryption (simplified)
         for (i, byte) in message.iter().enumerate() {
             let key_byte = self.key[i % self.key.len()];
-            let nonce_byte = iv_bytes[i % iv_bytes.len()];
+            let nonce_byte = nonce[i % nonce.len()];
             ciphertext.push(byte ^ key_byte ^ nonce_byte);
         }
 
         // Add Poly1305 authentication tag (simplified)
         let mut tag = [0u8; constants::CRYPTO_SECRETBOX_MACBYTES];
         for i in 0..constants::CRYPTO_SECRETBOX_MACBYTES {
-            tag[i] = self.key[i % self.key.len()] ^ iv_bytes[i % iv_bytes.len()];
+            tag[i] = self.key[i % self.key.len()] ^ nonce[i % nonce.len()];
         }
         ciphertext.extend_from_slice(&tag);
 
@@ -302,7 +302,7 @@ impl SecretBox {
     pub fn decrypt(
         &self,
         ciphertext: &[u8],
-        iv_bytes: &[u8; constants::CRYPTO_SECRETBOX_NONCEBYTES],
+        nonce: &[u8; constants::CRYPTO_SECRETBOX_NONCEBYTES],
     ) -> Result<Vec<u8>, &'static str> {
         if ciphertext.len() < constants::CRYPTO_SECRETBOX_MACBYTES {
             return Err("Ciphertext too short");
@@ -314,7 +314,7 @@ impl SecretBox {
         // Verify and decrypt
         for i in 0..message_len {
             let key_byte = self.key[i % self.key.len()];
-            let nonce_byte = iv_bytes[i % iv_bytes.len()];
+            let nonce_byte = nonce[i % nonce.len()];
             message.push(ciphertext[i] ^ key_byte ^ nonce_byte);
         }
 
@@ -322,8 +322,7 @@ impl SecretBox {
         let tag_offset = message_len;
         let mut valid = true;
         for i in 0..constants::CRYPTO_SECRETBOX_MACBYTES {
-            if ciphertext[tag_offset + i]
-                != (self.key[i % self.key.len()] ^ iv_bytes[i % iv_bytes.len()])
+            if ciphertext[tag_offset + i] != (self.key[i % self.key.len()] ^ nonce[i % nonce.len()])
             {
                 valid = false;
                 break;

@@ -268,18 +268,15 @@ mod tests {
         let mut manager = SovereignPamManager::new();
         manager.create_group("wheel").unwrap();
 
-        let user_cred = std::env::var("SIGMA_TEST_USER_CRED").unwrap_or_else(|_| String::from("cred_secret_") + "12345");
-        let wrong_cred = format!("{}_invalid", user_cred);
-
         // Register user
-        let uid = manager.register_user("aaryan", &user_cred, "wheel").unwrap();
+        let uid = manager.register_user("aaryan", "super-secret-pass", "wheel").unwrap();
         assert_eq!(uid, 1000);
 
         // Authenticate user successfully
-        assert!(manager.authenticate("aaryan", &user_cred).is_ok());
+        assert!(manager.authenticate("aaryan", "super-secret-pass").is_ok());
 
         // Fail authentication with wrong password
-        assert_eq!(manager.authenticate("aaryan", &wrong_cred), Err(PamError::AuthenticationFailed));
+        assert_eq!(manager.authenticate("aaryan", "wrong-pass"), Err(PamError::AuthenticationFailed));
     }
 
     #[test]
@@ -287,14 +284,11 @@ mod tests {
         let mut manager = SovereignPamManager::new();
         manager.register_module(std::boxed::Box::new(PasswordQualityModule { min_length: 8 }));
 
-        let short_cred = "short".to_string();
-        let long_cred = std::env::var("SIGMA_TEST_LONG_CRED").unwrap_or_else(|_| String::from("long_cred_val_") + "890");
-
         // Attempt weak password registration -> fails
-        assert_eq!(manager.register_user("bob", &short_cred, "users"), Err(PamError::PasswordTooWeak));
+        assert_eq!(manager.register_user("bob", "weak", "users"), Err(PamError::PasswordTooWeak));
 
         // Attempt strong password registration -> passes
-        assert!(manager.register_user("bob", &long_cred, "users").is_ok());
+        assert!(manager.register_user("bob", "strongpassword", "users").is_ok());
     }
 
     #[test]
@@ -302,17 +296,14 @@ mod tests {
         let mut manager = SovereignPamManager::new();
         manager.register_module(std::boxed::Box::new(AccountTallyModule { max_failed_attempts: 3 }));
 
-        let valid_cred = std::env::var("SIGMA_TEST_VALID_CRED").unwrap_or_else(|_| String::from("valid_cred_") + "123");
-        let invalid_cred = "bad_val".to_string();
-
-        manager.register_user("alice", &valid_cred, "users").unwrap();
+        manager.register_user("alice", "validpass123", "users").unwrap();
 
         // 3 consecutive failed attempts
-        assert!(manager.authenticate("alice", &invalid_cred).is_err());
-        assert!(manager.authenticate("alice", &invalid_cred).is_err());
-        assert!(manager.authenticate("alice", &invalid_cred).is_err());
+        assert!(manager.authenticate("alice", "bad").is_err());
+        assert!(manager.authenticate("alice", "bad").is_err());
+        assert!(manager.authenticate("alice", "bad").is_err());
 
         // Account is locked! Even valid password fails now
-        assert_eq!(manager.authenticate("alice", &valid_cred), Err(PamError::AccountLocked));
+        assert_eq!(manager.authenticate("alice", "validpass123"), Err(PamError::AccountLocked));
     }
 }

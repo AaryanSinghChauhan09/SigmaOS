@@ -815,9 +815,7 @@ mod tests {
         let eff_time = governor.calculate_effective_access_time_ms(0.8, 2.0, 50.0);
         assert_eq!(eff_time, 11.6); // 0.8 * 2.0 + 0.2 * 50.0 = 11.6
 
-        let ldap_cred =
-            std::env::var("SIGMA_TEST_LDAP_CRED").unwrap_or_else(|_| String::from("cred_") + "123");
-        assert!(governor.authenticate_ldap_repo_user("cn=admin,dc=sigma,dc=org", &ldap_cred));
+        assert!(governor.authenticate_ldap_repo_user("cn=admin,dc=sigma,dc=org", "pass123"));
 
         assert!(governor.evaluate_installer_process_migration(500, true));
 
