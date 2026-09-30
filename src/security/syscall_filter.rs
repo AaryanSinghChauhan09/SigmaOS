@@ -226,7 +226,10 @@ impl SyscallFilterManager {
             .filters
             .lock()
             .map_err(|_| "Failed to acquire filters lock".to_string())?;
-        filters.insert(process_id, ProcessSyscallFilter::new(process_id, filter_type));
+        filters.insert(
+            process_id,
+            ProcessSyscallFilter::new(process_id, filter_type),
+        );
         Ok(())
     }
 
@@ -439,14 +442,18 @@ mod tests {
     #[test]
     fn test_syscall_filter_manager_register() {
         let manager = SyscallFilterManager::new();
-        manager.register_process(100, FilterType::Whitelist).unwrap();
+        manager
+            .register_process(100, FilterType::Whitelist)
+            .unwrap();
         assert_eq!(manager.process_count().unwrap(), 1);
     }
 
     #[test]
     fn test_syscall_filter_manager_enable() {
         let manager = SyscallFilterManager::new();
-        manager.register_process(100, FilterType::Whitelist).unwrap();
+        manager
+            .register_process(100, FilterType::Whitelist)
+            .unwrap();
         manager.add_allowed_syscall(100, 1).unwrap();
         manager.enable_filter(100).unwrap();
 
@@ -457,7 +464,9 @@ mod tests {
     fn test_syscall_filter_inheritance() {
         let manager = SyscallFilterManager::new();
         manager.register_process(1, FilterType::Whitelist).unwrap();
-        manager.register_process(100, FilterType::Whitelist).unwrap();
+        manager
+            .register_process(100, FilterType::Whitelist)
+            .unwrap();
 
         manager.add_allowed_syscall(1, 1).unwrap();
         manager.set_parent_filter(100, 1).unwrap();
@@ -471,7 +480,9 @@ mod tests {
     #[test]
     fn test_whitelist_syscalls() {
         let manager = SyscallFilterManager::new();
-        manager.register_process(100, FilterType::Whitelist).unwrap();
+        manager
+            .register_process(100, FilterType::Whitelist)
+            .unwrap();
         manager.whitelist_syscalls(100, vec![1, 2, 3]).unwrap();
         manager.enable_filter(100).unwrap();
 
@@ -483,7 +494,9 @@ mod tests {
     #[test]
     fn test_blacklist_syscalls() {
         let manager = SyscallFilterManager::new();
-        manager.register_process(100, FilterType::Blacklist).unwrap();
+        manager
+            .register_process(100, FilterType::Blacklist)
+            .unwrap();
         manager.blacklist_syscalls(100, vec![56]).unwrap();
         manager.enable_filter(100).unwrap();
 

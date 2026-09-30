@@ -17,22 +17,30 @@ use std::boxed::Box;
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
 /// OOP-based Backup and Snapshot for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 161
 /// Implements system snapshots and backup management
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type SnapshotID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum SnapshotType { Full = 0, Incremental = 1, Differential = 2 }
+pub enum SnapshotType {
+    Full = 0,
+    Incremental = 1,
+    Differential = 2,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum BackupError { Success = 0, NotFound = 1, CreationFailed = 2, RestoreFailed = 3 }
+pub enum BackupError {
+    Success = 0,
+    NotFound = 1,
+    CreationFailed = 2,
+    RestoreFailed = 3,
+}
 
 pub trait Snapshot {
     fn id(&self) -> SnapshotID;
@@ -64,7 +72,9 @@ impl SimpleSnapshot {
 }
 
 impl Snapshot for SimpleSnapshot {
-    fn id(&self) -> SnapshotID { self.id }
+    fn id(&self) -> SnapshotID {
+        self.id
+    }
     fn snapshot_type(&self) -> SnapshotType {
         match self.snapshot_type.load(Ordering::SeqCst) {
             1 => SnapshotType::Incremental,
@@ -72,9 +82,15 @@ impl Snapshot for SimpleSnapshot {
             _ => SnapshotType::Full,
         }
     }
-    fn timestamp(&self) -> u64 { self.timestamp.load(Ordering::SeqCst) as u64 }
-    fn size(&self) -> usize { self.size.load(Ordering::SeqCst) }
-    fn is_valid(&self) -> bool { self.valid.load(Ordering::SeqCst) == 1 }
+    fn timestamp(&self) -> u64 {
+        self.timestamp.load(Ordering::SeqCst) as u64
+    }
+    fn size(&self) -> usize {
+        self.size.load(Ordering::SeqCst)
+    }
+    fn is_valid(&self) -> bool {
+        self.valid.load(Ordering::SeqCst) == 1
+    }
 }
 
 pub trait BackupManager {
@@ -123,7 +139,9 @@ impl BackupManager for SimpleBackupManager {
     fn get_snapshot(&self, id: SnapshotID) -> Option<&dyn Snapshot> {
         for snapshot_option in &self.snapshots {
             if let Some(ref snapshot) = *snapshot_option {
-                if snapshot.id() == id { return Some(snapshot.as_ref()); }
+                if snapshot.id() == id {
+                    return Some(snapshot.as_ref());
+                }
             }
         }
         None
@@ -173,7 +191,8 @@ impl SimpleBackupScheduler {
 impl BackupScheduler for SimpleBackupScheduler {
     fn schedule_backup(&mut self, interval_ms: u64) -> Result<usize, BackupError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
-        self.schedules.push((id, interval_ms, SnapshotType::Incremental));
+        self.schedules
+            .push((id, interval_ms, SnapshotType::Incremental));
         Ok(id)
     }
 
@@ -197,13 +216,25 @@ impl BackupScheduler for SimpleBackupScheduler {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -221,11 +252,19 @@ impl<T> Vec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
@@ -245,7 +284,10 @@ unsafe fn free(ptr: *mut u8) {
 }
 
 #[cfg(target_os = "none")]
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];

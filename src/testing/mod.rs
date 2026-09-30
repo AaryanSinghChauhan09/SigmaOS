@@ -2,10 +2,8 @@
 //! Comprehensive testing framework for SigmaOS
 use std::vec;
 
-
-
-use std::vec::Vec;
 use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Test result
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -39,19 +37,35 @@ impl TestSuite {
 
     pub fn run(&mut self) -> TestSummary {
         self.results.clear();
-        
+
         for test in &self.tests {
             let result = test.run();
             self.results.push(result);
         }
-        
+
         TestSummary {
             suite_name: self.name.clone(),
             total: self.tests.len(),
-            passed: self.results.iter().filter(|&&r| r == TestResult::Passed).count(),
-            failed: self.results.iter().filter(|&&r| r == TestResult::Failed).count(),
-            skipped: self.results.iter().filter(|&&r| r == TestResult::Skipped).count(),
-            errors: self.results.iter().filter(|&&r| r == TestResult::Error).count(),
+            passed: self
+                .results
+                .iter()
+                .filter(|&&r| r == TestResult::Passed)
+                .count(),
+            failed: self
+                .results
+                .iter()
+                .filter(|&&r| r == TestResult::Failed)
+                .count(),
+            skipped: self
+                .results
+                .iter()
+                .filter(|&&r| r == TestResult::Skipped)
+                .count(),
+            errors: self
+                .results
+                .iter()
+                .filter(|&&r| r == TestResult::Error)
+                .count(),
             results: self.results.clone(),
         }
     }
@@ -90,13 +104,13 @@ impl TestCase {
         if let Some(setup) = self.setup {
             setup();
         }
-        
+
         let result = (self.test_fn)();
-        
+
         if let Some(teardown) = self.teardown {
             teardown();
         }
-        
+
         result
     }
 }
@@ -134,9 +148,7 @@ pub struct UnitTestFramework {
 
 impl UnitTestFramework {
     pub fn new() -> Self {
-        Self {
-            suites: Vec::new(),
-        }
+        Self { suites: Vec::new() }
     }
 
     pub fn add_suite(&mut self, suite: TestSuite) {
@@ -145,11 +157,11 @@ impl UnitTestFramework {
 
     pub fn run_all(&mut self) -> OverallTestSummary {
         let mut summaries = Vec::new();
-        
+
         for suite in &mut self.suites {
             summaries.push(suite.run());
         }
-        
+
         OverallTestSummary {
             total_suites: self.suites.len(),
             total_tests: summaries.iter().map(|s| s.total).sum(),
@@ -228,18 +240,18 @@ impl IntegrationTestFramework {
         if let Some(setup) = self.setup {
             setup();
         }
-        
+
         let mut framework = UnitTestFramework::new();
         for suite in &self.suites {
             framework.add_suite(suite.clone());
         }
-        
+
         let summary = framework.run_all();
-        
+
         if let Some(teardown) = self.teardown {
             teardown();
         }
-        
+
         summary
     }
 }
@@ -282,11 +294,11 @@ impl PerformanceTestFramework {
 
     pub fn run_all(&self) -> PerformanceSummary {
         let mut results = Vec::new();
-        
+
         for benchmark in &self.benchmarks {
             results.push((benchmark.benchmark_fn)());
         }
-        
+
         PerformanceSummary {
             total_benchmarks: self.benchmarks.len(),
             results,
@@ -335,9 +347,7 @@ pub enum SecuritySeverity {
 
 impl SecurityTestFramework {
     pub fn new() -> Self {
-        Self {
-            tests: Vec::new(),
-        }
+        Self { tests: Vec::new() }
     }
 
     pub fn add_test(&mut self, test: SecurityTest) {
@@ -346,16 +356,19 @@ impl SecurityTestFramework {
 
     pub fn run_all(&self) -> SecuritySummary {
         let mut results = Vec::new();
-        
+
         for test in &self.tests {
             results.push((test.test_fn)());
         }
-        
+
         SecuritySummary {
             total_tests: self.tests.len(),
             passed: results.iter().filter(|r| r.passed).count(),
             failed: results.iter().filter(|r| !r.passed).count(),
-            critical_vulnerabilities: results.iter().filter(|r| r.severity == SecuritySeverity::Critical).count(),
+            critical_vulnerabilities: results
+                .iter()
+                .filter(|r| r.severity == SecuritySeverity::Critical)
+                .count(),
             results,
         }
     }
@@ -402,11 +415,11 @@ impl FuzzingTestFramework {
 
     pub fn run_all(&self) -> FuzzingSummary {
         let mut results = Vec::new();
-        
+
         for fuzzer in &self.fuzzers {
             let mut crashes = 0;
             let mut iterations = 0;
-            
+
             for _ in 0..fuzzer.max_iterations {
                 let input = (fuzzer.input_generator)();
                 if !(fuzzer.target)(&input) {
@@ -414,7 +427,7 @@ impl FuzzingTestFramework {
                 }
                 iterations += 1;
             }
-            
+
             results.push(FuzzerResult {
                 name: fuzzer.name.clone(),
                 iterations,
@@ -426,7 +439,7 @@ impl FuzzingTestFramework {
                 },
             });
         }
-        
+
         FuzzingSummary {
             total_fuzzers: self.fuzzers.len(),
             results,
@@ -461,10 +474,10 @@ mod tests {
     #[test]
     fn test_unit_test_framework() {
         let mut suite = TestSuite::new("test_suite");
-        
+
         let test_case = TestCase::new("test_example", || TestResult::Passed);
         suite.add_test(test_case);
-        
+
         let summary = suite.run();
         assert_eq!(summary.total, 1);
         assert_eq!(summary.passed, 1);
@@ -473,10 +486,10 @@ mod tests {
     #[test]
     fn test_integration_test_framework() {
         let mut framework = IntegrationTestFramework::new();
-        
+
         let suite = TestSuite::new("integration_suite");
         framework.add_suite(suite);
-        
+
         let summary = framework.run_all();
         assert_eq!(summary.total_suites, 1);
     }
@@ -484,7 +497,7 @@ mod tests {
     #[test]
     fn test_performance_framework() {
         let mut framework = PerformanceTestFramework::new();
-        
+
         let benchmark = Benchmark {
             name: "benchmark_example".to_string(),
             benchmark_fn: || BenchmarkResult {
@@ -495,7 +508,7 @@ mod tests {
             },
         };
         framework.add_benchmark(benchmark);
-        
+
         let summary = framework.run_all();
         assert_eq!(summary.total_benchmarks, 1);
     }
@@ -503,7 +516,7 @@ mod tests {
     #[test]
     fn test_security_framework() {
         let mut framework = SecurityTestFramework::new();
-        
+
         let test = SecurityTest {
             name: "security_test".to_string(),
             test_fn: || SecurityTestResult {
@@ -514,7 +527,7 @@ mod tests {
             },
         };
         framework.add_test(test);
-        
+
         let summary = framework.run_all();
         assert_eq!(summary.total_tests, 1);
         assert_eq!(summary.passed, 1);

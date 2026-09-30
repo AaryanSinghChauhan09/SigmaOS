@@ -81,7 +81,8 @@ impl EnhancedRemindersEngine {
     }
 
     pub fn mark_completed(&mut self, reminder_id: u64, current_timestamp: u64) -> bool {
-        let (recurrence, due_timestamp) = match self.reminders.iter().find(|r| r.id == reminder_id) {
+        let (recurrence, due_timestamp) = match self.reminders.iter().find(|r| r.id == reminder_id)
+        {
             Some(r) => (r.recurrence.clone(), r.due_timestamp),
             None => return false,
         };
@@ -109,7 +110,12 @@ impl EnhancedRemindersEngine {
         true
     }
 
-    pub fn snooze_reminder(&mut self, reminder_id: u64, snooze_duration_sec: u64, current_timestamp: u64) -> bool {
+    pub fn snooze_reminder(
+        &mut self,
+        reminder_id: u64,
+        snooze_duration_sec: u64,
+        current_timestamp: u64,
+    ) -> bool {
         if let Some(r) = self.reminders.iter_mut().find(|r| r.id == reminder_id) {
             r.snooze_until_timestamp = Some(current_timestamp + snooze_duration_sec);
             true

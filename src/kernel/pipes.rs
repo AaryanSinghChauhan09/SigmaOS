@@ -116,7 +116,8 @@ impl SovereignLinuxPipeEngine {
         let id = self.next_pipe_id;
         self.next_pipe_id += 1;
 
-        let mut pipe_buf = LinuxPipeBuffer::new(id, LinuxPipeKind::Anonymous, DEFAULT_PIPE_CAPACITY);
+        let mut pipe_buf =
+            LinuxPipeBuffer::new(id, LinuxPipeKind::Anonymous, DEFAULT_PIPE_CAPACITY);
         pipe_buf.non_blocking = non_blocking;
         self.pipes.push(pipe_buf);
 
@@ -129,7 +130,8 @@ impl SovereignLinuxPipeEngine {
         let id = self.next_pipe_id;
         self.next_pipe_id += 1;
 
-        let mut pipe_buf = LinuxPipeBuffer::new(id, LinuxPipeKind::NamedFifo, DEFAULT_PIPE_CAPACITY);
+        let mut pipe_buf =
+            LinuxPipeBuffer::new(id, LinuxPipeKind::NamedFifo, DEFAULT_PIPE_CAPACITY);
         pipe_buf.fifo_name = Some(fifo_name.to_string());
         self.pipes.push(pipe_buf);
         Ok(id)

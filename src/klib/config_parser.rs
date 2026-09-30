@@ -33,7 +33,8 @@ impl ConfigStore {
             if trimmed.starts_with('[') && trimmed.ends_with(']') {
                 current_section = trimmed[1..trimmed.len() - 1].to_string();
                 if !self.sections.contains_key(&current_section) {
-                    self.sections.insert(current_section.clone(), HashMap::new());
+                    self.sections
+                        .insert(current_section.clone(), HashMap::new());
                 }
                 continue;
             }

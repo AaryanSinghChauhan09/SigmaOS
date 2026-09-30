@@ -1,8 +1,5 @@
 // SPDX-License-Identifier: MIT
 /// Strategic OKR Engine & Milestone Evaluation Subsystem for SigmaOS
-
-
-
 use std::string::{String, ToString};
 use std::vec::Vec;
 
@@ -215,7 +212,11 @@ impl SigmaosMilestoneDependencyEngine {
             MilestoneDependencyNode {
                 milestone_name: "SigmaLink".to_string(),
                 core_dependencies: vec!["Networking stack baseline".to_string()],
-                dependent_modules: vec!["SigmaSecureNet".to_string(), "SigmaCollab".to_string(), "SigmaEdgeNet".to_string()],
+                dependent_modules: vec![
+                    "SigmaSecureNet".to_string(),
+                    "SigmaCollab".to_string(),
+                    "SigmaEdgeNet".to_string(),
+                ],
                 impact: "Unified connectivity".to_string(),
                 layer: RoadmapLayer::Expansion,
             },

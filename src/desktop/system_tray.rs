@@ -55,7 +55,10 @@ impl SystemTray {
     }
 
     pub fn get_icons_by_category(&self, category: TrayCategory) -> Vec<&StatusIcon> {
-        self.icons.values().filter(|i| i.category == category).collect()
+        self.icons
+            .values()
+            .filter(|i| i.category == category)
+            .collect()
     }
 
     pub fn set_unread_count(&mut self, id: &str, count: u32) -> Result<(), String> {
@@ -70,7 +73,7 @@ impl SystemTray {
     pub fn should_hide(&self) -> bool {
         self.auto_hide && !self.active && self.icons.values().all(|i| i.unread_count == 0)
     }
-    
+
     pub fn resolve_icon_theme(icon_name: &str) -> String {
         format!("/usr/share/icons/hicolor/scalable/apps/{}.svg", icon_name)
     }
@@ -87,15 +90,13 @@ mod tests {
             icon_name: "network-wireless".to_string(),
             tooltip: "Connected to WiFi".to_string(),
             unread_count: 0,
-            menu: vec![
-                TrayMenuItem {
-                    label: "Disconnect".to_string(),
-                    icon: None,
-                    shortcut: None,
-                    is_separator: false,
-                    submenu: None,
-                }
-            ],
+            menu: vec![TrayMenuItem {
+                label: "Disconnect".to_string(),
+                icon: None,
+                shortcut: None,
+                is_separator: false,
+                submenu: None,
+            }],
         }
     }
 
@@ -105,7 +106,7 @@ mod tests {
         let icon = create_test_icon();
         tray.add_icon(icon.clone());
         assert!(tray.get_icon("network").is_some());
-        
+
         tray.remove_icon("network");
         assert!(tray.get_icon("network").is_none());
     }
@@ -122,7 +123,7 @@ mod tests {
             unread_count: 0,
             menu: vec![],
         });
-        
+
         let sys_icons = tray.get_icons_by_category(TrayCategory::SystemServices);
         assert_eq!(sys_icons.len(), 1);
         assert_eq!(sys_icons[0].id, "network");
@@ -143,7 +144,7 @@ mod tests {
         tray.active = false;
         tray.add_icon(create_test_icon());
         assert!(tray.should_hide());
-        
+
         tray.set_unread_count("network", 1).unwrap();
         assert!(!tray.should_hide());
     }

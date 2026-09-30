@@ -1,10 +1,8 @@
 //! Network Diagnostic Functions (iproute2/ethtool Inspiration)
 //! Network configuration, diagnostics, and interface management
 
-
-
-use std::vec::Vec;
 use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Network interface state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

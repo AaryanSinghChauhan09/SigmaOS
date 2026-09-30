@@ -80,7 +80,9 @@ impl LandlockRuleset {
 
         // Check matching path beneath rules
         for rule in &self.path_beneath_rules {
-            if path == rule.parent_path || path.starts_with(&format!("{}/", rule.parent_path.trim_end_matches('/'))) {
+            if path == rule.parent_path
+                || path.starts_with(&format!("{}/", rule.parent_path.trim_end_matches('/')))
+            {
                 if (rule.allowed_access & access) == access {
                     return true;
                 }
@@ -166,28 +168,64 @@ mod tests {
     #[test]
     fn test_landlock_sandbox_enforcement() {
         let mut engine = LandlockEngine::new();
-        let handled = LANDLOCK_ACCESS_FS_READ_FILE | LANDLOCK_ACCESS_FS_WRITE_FILE | LANDLOCK_ACCESS_FS_EXECUTE;
+        let handled = LANDLOCK_ACCESS_FS_READ_FILE
+            | LANDLOCK_ACCESS_FS_WRITE_FILE
+            | LANDLOCK_ACCESS_FS_EXECUTE;
         let ruleset_id = engine.create_ruleset(handled);
 
         // Grant read + execute access under /usr and read + write under /tmp
-        assert!(engine.add_rule(ruleset_id, "/usr", LANDLOCK_ACCESS_FS_READ_FILE | LANDLOCK_ACCESS_FS_EXECUTE).is_ok());
-        assert!(engine.add_rule(ruleset_id, "/tmp", LANDLOCK_ACCESS_FS_READ_FILE | LANDLOCK_ACCESS_FS_WRITE_FILE).is_ok());
+        assert!(engine
+            .add_rule(
+                ruleset_id,
+                "/usr",
+                LANDLOCK_ACCESS_FS_READ_FILE | LANDLOCK_ACCESS_FS_EXECUTE
+            )
+            .is_ok());
+        assert!(engine
+            .add_rule(
+                ruleset_id,
+                "/tmp",
+                LANDLOCK_ACCESS_FS_READ_FILE | LANDLOCK_ACCESS_FS_WRITE_FILE
+            )
+            .is_ok());
 
         // Before restrict_self: access allowed everywhere
-        assert!(engine.validate_file_access(ruleset_id, "/etc/shadow", LANDLOCK_ACCESS_FS_READ_FILE));
+        assert!(engine.validate_file_access(
+            ruleset_id,
+            "/etc/shadow",
+            LANDLOCK_ACCESS_FS_READ_FILE
+        ));
 
         // Restrict process
         assert!(engine.restrict_self(ruleset_id).is_ok());
 
         // Cannot add rules after restriction
-        assert!(engine.add_rule(ruleset_id, "/home", LANDLOCK_ACCESS_FS_READ_FILE).is_err());
+        assert!(engine
+            .add_rule(ruleset_id, "/home", LANDLOCK_ACCESS_FS_READ_FILE)
+            .is_err());
 
         // Allowed accesses
-        assert!(engine.validate_file_access(ruleset_id, "/usr/bin/bash", LANDLOCK_ACCESS_FS_EXECUTE));
-        assert!(engine.validate_file_access(ruleset_id, "/tmp/log.txt", LANDLOCK_ACCESS_FS_WRITE_FILE));
+        assert!(engine.validate_file_access(
+            ruleset_id,
+            "/usr/bin/bash",
+            LANDLOCK_ACCESS_FS_EXECUTE
+        ));
+        assert!(engine.validate_file_access(
+            ruleset_id,
+            "/tmp/log.txt",
+            LANDLOCK_ACCESS_FS_WRITE_FILE
+        ));
 
         // Prohibited accesses
-        assert!(!engine.validate_file_access(ruleset_id, "/etc/shadow", LANDLOCK_ACCESS_FS_READ_FILE));
-        assert!(!engine.validate_file_access(ruleset_id, "/usr/bin/bash", LANDLOCK_ACCESS_FS_WRITE_FILE));
+        assert!(!engine.validate_file_access(
+            ruleset_id,
+            "/etc/shadow",
+            LANDLOCK_ACCESS_FS_READ_FILE
+        ));
+        assert!(!engine.validate_file_access(
+            ruleset_id,
+            "/usr/bin/bash",
+            LANDLOCK_ACCESS_FS_WRITE_FILE
+        ));
     }
 }

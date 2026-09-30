@@ -30,7 +30,7 @@ pub struct EntitlementCertificate {
 
 pub struct RhsmEntitlementEngine {
     pub certificates: BTreeMap<String, EntitlementCertificate>, // cert_id -> cert
-    pub active_key_mappings: BTreeMap<String, String>,            // activation_key -> cert_id
+    pub active_key_mappings: BTreeMap<String, String>,          // activation_key -> cert_id
 }
 
 impl RhsmEntitlementEngine {
@@ -130,7 +130,13 @@ impl FedoraDataMarketplaceEngine {
         }
     }
 
-    pub fn add_listing(&mut self, product_id: &str, title: &str, publisher: &str, pricing: CommercialPricingModel) {
+    pub fn add_listing(
+        &mut self,
+        product_id: &str,
+        title: &str,
+        publisher: &str,
+        pricing: CommercialPricingModel,
+    ) {
         self.listings.insert(
             product_id.to_string(),
             DataProductListing {
@@ -313,12 +319,16 @@ mod tests {
             1800000000,
         );
 
-        let cert = rhsm.attach_subscription_key("key_abc123", 1700000000).unwrap();
+        let cert = rhsm
+            .attach_subscription_key("key_abc123", 1700000000)
+            .unwrap();
         assert_eq!(cert.product_name, "SigmaOS Enterprise Server");
         assert_eq!(cert.sla, SlaLevel::Premium24x7);
 
         // Expiration check
-        assert!(rhsm.attach_subscription_key("key_abc123", 1900000000).is_err());
+        assert!(rhsm
+            .attach_subscription_key("key_abc123", 1900000000)
+            .is_err());
     }
 
     #[test]
@@ -334,7 +344,14 @@ mod tests {
         let (dev_payout, platform_fee) = marketplace.purchase_product("prod_analytics").unwrap();
         assert_eq!(dev_payout, 85);
         assert_eq!(platform_fee, 15);
-        assert_eq!(marketplace.listings.get("prod_analytics").unwrap().total_sales_count, 1);
+        assert_eq!(
+            marketplace
+                .listings
+                .get("prod_analytics")
+                .unwrap()
+                .total_sales_count,
+            1
+        );
     }
 
     #[test]
@@ -349,7 +366,10 @@ mod tests {
     #[test]
     fn test_data_commerce_dlp_engine() {
         let dlp = DataCommerceDlpEngine::new();
-        assert_eq!(dlp.classify_field("ssn"), DataClassificationTag::PiiSensitive);
+        assert_eq!(
+            dlp.classify_field("ssn"),
+            DataClassificationTag::PiiSensitive
+        );
 
         let masked = dlp.mask_sensitive_data("ssn", "123-45-6789");
         assert_eq!(masked, "****6789");

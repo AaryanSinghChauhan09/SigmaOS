@@ -17,18 +17,22 @@ use std::boxed::Box;
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
 /// OOP-based Full Syscall Dispatch for SigmaOS
 /// Based on Roadmap Item: Full Syscall Dispatch (30+ Essential Syscalls)
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type SyscallNumber = usize;
 pub type ProcessID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum SyscallError { Success = 0, InvalidSyscall = 1, InvalidArgument = 2, PermissionDenied = 3 }
+pub enum SyscallError {
+    Success = 0,
+    InvalidSyscall = 1,
+    InvalidArgument = 2,
+    PermissionDenied = 3,
+}
 
 pub trait SyscallHandler {
     fn handle(&mut self, num: SyscallNumber, args: &[usize]) -> Result<usize, SyscallError>;
@@ -102,11 +106,15 @@ impl SyscallHandler for SimpleSyscallDispatcher {
 pub struct ExitHandler;
 impl ExitHandler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { ExitHandler }
+    pub fn new() -> Self {
+        ExitHandler
+    }
 }
 impl SyscallHandler for ExitHandler {
     fn handle(&mut self, _num: SyscallNumber, args: &[usize]) -> Result<usize, SyscallError> {
-        if args.is_empty() { return Err(SyscallError::InvalidArgument); }
+        if args.is_empty() {
+            return Err(SyscallError::InvalidArgument);
+        }
         Ok(args[0])
     }
 }
@@ -114,11 +122,15 @@ impl SyscallHandler for ExitHandler {
 pub struct ReadHandler;
 impl ReadHandler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { ReadHandler }
+    pub fn new() -> Self {
+        ReadHandler
+    }
 }
 impl SyscallHandler for ReadHandler {
     fn handle(&mut self, _num: SyscallNumber, args: &[usize]) -> Result<usize, SyscallError> {
-        if args.len() < 3 { return Err(SyscallError::InvalidArgument); }
+        if args.len() < 3 {
+            return Err(SyscallError::InvalidArgument);
+        }
         Ok(args[2])
     }
 }
@@ -126,11 +138,15 @@ impl SyscallHandler for ReadHandler {
 pub struct WriteHandler;
 impl WriteHandler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { WriteHandler }
+    pub fn new() -> Self {
+        WriteHandler
+    }
 }
 impl SyscallHandler for WriteHandler {
     fn handle(&mut self, _num: SyscallNumber, args: &[usize]) -> Result<usize, SyscallError> {
-        if args.len() < 3 { return Err(SyscallError::InvalidArgument); }
+        if args.len() < 3 {
+            return Err(SyscallError::InvalidArgument);
+        }
         Ok(args[2])
     }
 }
@@ -138,11 +154,15 @@ impl SyscallHandler for WriteHandler {
 pub struct OpenHandler;
 impl OpenHandler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { OpenHandler }
+    pub fn new() -> Self {
+        OpenHandler
+    }
 }
 impl SyscallHandler for OpenHandler {
     fn handle(&mut self, _num: SyscallNumber, args: &[usize]) -> Result<usize, SyscallError> {
-        if args.is_empty() { return Err(SyscallError::InvalidArgument); }
+        if args.is_empty() {
+            return Err(SyscallError::InvalidArgument);
+        }
         Ok(3)
     }
 }
@@ -150,11 +170,15 @@ impl SyscallHandler for OpenHandler {
 pub struct CloseHandler;
 impl CloseHandler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { CloseHandler }
+    pub fn new() -> Self {
+        CloseHandler
+    }
 }
 impl SyscallHandler for CloseHandler {
     fn handle(&mut self, _num: SyscallNumber, args: &[usize]) -> Result<usize, SyscallError> {
-        if args.is_empty() { return Err(SyscallError::InvalidArgument); }
+        if args.is_empty() {
+            return Err(SyscallError::InvalidArgument);
+        }
         Ok(0)
     }
 }
@@ -162,7 +186,9 @@ impl SyscallHandler for CloseHandler {
 pub struct ForkHandler;
 impl ForkHandler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { ForkHandler }
+    pub fn new() -> Self {
+        ForkHandler
+    }
 }
 impl SyscallHandler for ForkHandler {
     fn handle(&mut self, _num: SyscallNumber, _args: &[usize]) -> Result<usize, SyscallError> {
@@ -173,11 +199,15 @@ impl SyscallHandler for ForkHandler {
 pub struct ExecHandler;
 impl ExecHandler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { ExecHandler }
+    pub fn new() -> Self {
+        ExecHandler
+    }
 }
 impl SyscallHandler for ExecHandler {
     fn handle(&mut self, _num: SyscallNumber, args: &[usize]) -> Result<usize, SyscallError> {
-        if args.is_empty() { return Err(SyscallError::InvalidArgument); }
+        if args.is_empty() {
+            return Err(SyscallError::InvalidArgument);
+        }
         Ok(0)
     }
 }
@@ -185,7 +215,9 @@ impl SyscallHandler for ExecHandler {
 pub struct WaitHandler;
 impl WaitHandler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { WaitHandler }
+    pub fn new() -> Self {
+        WaitHandler
+    }
 }
 impl SyscallHandler for WaitHandler {
     fn handle(&mut self, _num: SyscallNumber, _args: &[usize]) -> Result<usize, SyscallError> {
@@ -196,11 +228,15 @@ impl SyscallHandler for WaitHandler {
 pub struct StatHandler;
 impl StatHandler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { StatHandler }
+    pub fn new() -> Self {
+        StatHandler
+    }
 }
 impl SyscallHandler for StatHandler {
     fn handle(&mut self, _num: SyscallNumber, args: &[usize]) -> Result<usize, SyscallError> {
-        if args.len() < 2 { return Err(SyscallError::InvalidArgument); }
+        if args.len() < 2 {
+            return Err(SyscallError::InvalidArgument);
+        }
         Ok(0)
     }
 }
@@ -208,11 +244,15 @@ impl SyscallHandler for StatHandler {
 pub struct FstatHandler;
 impl FstatHandler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { FstatHandler }
+    pub fn new() -> Self {
+        FstatHandler
+    }
 }
 impl SyscallHandler for FstatHandler {
     fn handle(&mut self, _num: SyscallNumber, args: &[usize]) -> Result<usize, SyscallError> {
-        if args.len() < 2 { return Err(SyscallError::InvalidArgument); }
+        if args.len() < 2 {
+            return Err(SyscallError::InvalidArgument);
+        }
         Ok(0)
     }
 }
@@ -220,11 +260,15 @@ impl SyscallHandler for FstatHandler {
 pub struct LseekHandler;
 impl LseekHandler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { LseekHandler }
+    pub fn new() -> Self {
+        LseekHandler
+    }
 }
 impl SyscallHandler for LseekHandler {
     fn handle(&mut self, _num: SyscallNumber, args: &[usize]) -> Result<usize, SyscallError> {
-        if args.len() < 3 { return Err(SyscallError::InvalidArgument); }
+        if args.len() < 3 {
+            return Err(SyscallError::InvalidArgument);
+        }
         Ok(args[2])
     }
 }
@@ -232,11 +276,15 @@ impl SyscallHandler for LseekHandler {
 pub struct MmapHandler;
 impl MmapHandler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { MmapHandler }
+    pub fn new() -> Self {
+        MmapHandler
+    }
 }
 impl SyscallHandler for MmapHandler {
     fn handle(&mut self, _num: SyscallNumber, args: &[usize]) -> Result<usize, SyscallError> {
-        if args.len() < 6 { return Err(SyscallError::InvalidArgument); }
+        if args.len() < 6 {
+            return Err(SyscallError::InvalidArgument);
+        }
         Ok(0x1000000)
     }
 }
@@ -244,11 +292,15 @@ impl SyscallHandler for MmapHandler {
 pub struct MprotectHandler;
 impl MprotectHandler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { MprotectHandler }
+    pub fn new() -> Self {
+        MprotectHandler
+    }
 }
 impl SyscallHandler for MprotectHandler {
     fn handle(&mut self, _num: SyscallNumber, args: &[usize]) -> Result<usize, SyscallError> {
-        if args.len() < 3 { return Err(SyscallError::InvalidArgument); }
+        if args.len() < 3 {
+            return Err(SyscallError::InvalidArgument);
+        }
         Ok(0)
     }
 }
@@ -256,11 +308,15 @@ impl SyscallHandler for MprotectHandler {
 pub struct MunmapHandler;
 impl MunmapHandler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { MunmapHandler }
+    pub fn new() -> Self {
+        MunmapHandler
+    }
 }
 impl SyscallHandler for MunmapHandler {
     fn handle(&mut self, _num: SyscallNumber, args: &[usize]) -> Result<usize, SyscallError> {
-        if args.len() < 2 { return Err(SyscallError::InvalidArgument); }
+        if args.len() < 2 {
+            return Err(SyscallError::InvalidArgument);
+        }
         Ok(0)
     }
 }
@@ -268,11 +324,15 @@ impl SyscallHandler for MunmapHandler {
 pub struct BrkHandler;
 impl BrkHandler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { BrkHandler }
+    pub fn new() -> Self {
+        BrkHandler
+    }
 }
 impl SyscallHandler for BrkHandler {
     fn handle(&mut self, _num: SyscallNumber, args: &[usize]) -> Result<usize, SyscallError> {
-        if args.is_empty() { return Err(SyscallError::InvalidArgument); }
+        if args.is_empty() {
+            return Err(SyscallError::InvalidArgument);
+        }
         Ok(args[0])
     }
 }
@@ -280,7 +340,9 @@ impl SyscallHandler for BrkHandler {
 pub struct RtSigactionHandler;
 impl RtSigactionHandler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { RtSigactionHandler }
+    pub fn new() -> Self {
+        RtSigactionHandler
+    }
 }
 impl SyscallHandler for RtSigactionHandler {
     fn handle(&mut self, _num: SyscallNumber, _args: &[usize]) -> Result<usize, SyscallError> {
@@ -291,7 +353,9 @@ impl SyscallHandler for RtSigactionHandler {
 pub struct RtSigprocmaskHandler;
 impl RtSigprocmaskHandler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { RtSigprocmaskHandler }
+    pub fn new() -> Self {
+        RtSigprocmaskHandler
+    }
 }
 impl SyscallHandler for RtSigprocmaskHandler {
     fn handle(&mut self, _num: SyscallNumber, _args: &[usize]) -> Result<usize, SyscallError> {
@@ -302,11 +366,15 @@ impl SyscallHandler for RtSigprocmaskHandler {
 pub struct IoctlHandler;
 impl IoctlHandler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { IoctlHandler }
+    pub fn new() -> Self {
+        IoctlHandler
+    }
 }
 impl SyscallHandler for IoctlHandler {
     fn handle(&mut self, _num: SyscallNumber, args: &[usize]) -> Result<usize, SyscallError> {
-        if args.len() < 3 { return Err(SyscallError::InvalidArgument); }
+        if args.len() < 3 {
+            return Err(SyscallError::InvalidArgument);
+        }
         Ok(0)
     }
 }
@@ -314,11 +382,15 @@ impl SyscallHandler for IoctlHandler {
 pub struct Pread64Handler;
 impl Pread64Handler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { Pread64Handler }
+    pub fn new() -> Self {
+        Pread64Handler
+    }
 }
 impl SyscallHandler for Pread64Handler {
     fn handle(&mut self, _num: SyscallNumber, args: &[usize]) -> Result<usize, SyscallError> {
-        if args.len() < 4 { return Err(SyscallError::InvalidArgument); }
+        if args.len() < 4 {
+            return Err(SyscallError::InvalidArgument);
+        }
         Ok(args[3])
     }
 }
@@ -326,11 +398,15 @@ impl SyscallHandler for Pread64Handler {
 pub struct Pwrite64Handler;
 impl Pwrite64Handler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { Pwrite64Handler }
+    pub fn new() -> Self {
+        Pwrite64Handler
+    }
 }
 impl SyscallHandler for Pwrite64Handler {
     fn handle(&mut self, _num: SyscallNumber, args: &[usize]) -> Result<usize, SyscallError> {
-        if args.len() < 4 { return Err(SyscallError::InvalidArgument); }
+        if args.len() < 4 {
+            return Err(SyscallError::InvalidArgument);
+        }
         Ok(args[3])
     }
 }
@@ -338,11 +414,15 @@ impl SyscallHandler for Pwrite64Handler {
 pub struct ReadvHandler;
 impl ReadvHandler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { ReadvHandler }
+    pub fn new() -> Self {
+        ReadvHandler
+    }
 }
 impl SyscallHandler for ReadvHandler {
     fn handle(&mut self, _num: SyscallNumber, args: &[usize]) -> Result<usize, SyscallError> {
-        if args.len() < 3 { return Err(SyscallError::InvalidArgument); }
+        if args.len() < 3 {
+            return Err(SyscallError::InvalidArgument);
+        }
         Ok(args[2])
     }
 }
@@ -350,11 +430,15 @@ impl SyscallHandler for ReadvHandler {
 pub struct WritevHandler;
 impl WritevHandler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { WritevHandler }
+    pub fn new() -> Self {
+        WritevHandler
+    }
 }
 impl SyscallHandler for WritevHandler {
     fn handle(&mut self, _num: SyscallNumber, args: &[usize]) -> Result<usize, SyscallError> {
-        if args.len() < 3 { return Err(SyscallError::InvalidArgument); }
+        if args.len() < 3 {
+            return Err(SyscallError::InvalidArgument);
+        }
         Ok(args[2])
     }
 }
@@ -362,11 +446,15 @@ impl SyscallHandler for WritevHandler {
 pub struct AccessHandler;
 impl AccessHandler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { AccessHandler }
+    pub fn new() -> Self {
+        AccessHandler
+    }
 }
 impl SyscallHandler for AccessHandler {
     fn handle(&mut self, _num: SyscallNumber, args: &[usize]) -> Result<usize, SyscallError> {
-        if args.len() < 2 { return Err(SyscallError::InvalidArgument); }
+        if args.len() < 2 {
+            return Err(SyscallError::InvalidArgument);
+        }
         Ok(0)
     }
 }
@@ -374,11 +462,15 @@ impl SyscallHandler for AccessHandler {
 pub struct PipeHandler;
 impl PipeHandler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { PipeHandler }
+    pub fn new() -> Self {
+        PipeHandler
+    }
 }
 impl SyscallHandler for PipeHandler {
     fn handle(&mut self, _num: SyscallNumber, args: &[usize]) -> Result<usize, SyscallError> {
-        if args.is_empty() { return Err(SyscallError::InvalidArgument); }
+        if args.is_empty() {
+            return Err(SyscallError::InvalidArgument);
+        }
         Ok(0)
     }
 }
@@ -386,11 +478,15 @@ impl SyscallHandler for PipeHandler {
 pub struct SelectHandler;
 impl SelectHandler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { SelectHandler }
+    pub fn new() -> Self {
+        SelectHandler
+    }
 }
 impl SyscallHandler for SelectHandler {
     fn handle(&mut self, _num: SyscallNumber, args: &[usize]) -> Result<usize, SyscallError> {
-        if args.len() < 5 { return Err(SyscallError::InvalidArgument); }
+        if args.len() < 5 {
+            return Err(SyscallError::InvalidArgument);
+        }
         Ok(1)
     }
 }
@@ -398,7 +494,9 @@ impl SyscallHandler for SelectHandler {
 pub struct SchedYieldHandler;
 impl SchedYieldHandler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { SchedYieldHandler }
+    pub fn new() -> Self {
+        SchedYieldHandler
+    }
 }
 impl SyscallHandler for SchedYieldHandler {
     fn handle(&mut self, _num: SyscallNumber, _args: &[usize]) -> Result<usize, SyscallError> {
@@ -409,11 +507,15 @@ impl SyscallHandler for SchedYieldHandler {
 pub struct MremapHandler;
 impl MremapHandler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { MremapHandler }
+    pub fn new() -> Self {
+        MremapHandler
+    }
 }
 impl SyscallHandler for MremapHandler {
     fn handle(&mut self, _num: SyscallNumber, args: &[usize]) -> Result<usize, SyscallError> {
-        if args.len() < 4 { return Err(SyscallError::InvalidArgument); }
+        if args.len() < 4 {
+            return Err(SyscallError::InvalidArgument);
+        }
         Ok(args[3])
     }
 }
@@ -421,11 +523,15 @@ impl SyscallHandler for MremapHandler {
 pub struct MsyncHandler;
 impl MsyncHandler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { MsyncHandler }
+    pub fn new() -> Self {
+        MsyncHandler
+    }
 }
 impl SyscallHandler for MsyncHandler {
     fn handle(&mut self, _num: SyscallNumber, args: &[usize]) -> Result<usize, SyscallError> {
-        if args.len() < 3 { return Err(SyscallError::InvalidArgument); }
+        if args.len() < 3 {
+            return Err(SyscallError::InvalidArgument);
+        }
         Ok(0)
     }
 }
@@ -433,11 +539,15 @@ impl SyscallHandler for MsyncHandler {
 pub struct MinCoreHandler;
 impl MinCoreHandler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { MinCoreHandler }
+    pub fn new() -> Self {
+        MinCoreHandler
+    }
 }
 impl SyscallHandler for MinCoreHandler {
     fn handle(&mut self, _num: SyscallNumber, args: &[usize]) -> Result<usize, SyscallError> {
-        if args.len() < 3 { return Err(SyscallError::InvalidArgument); }
+        if args.len() < 3 {
+            return Err(SyscallError::InvalidArgument);
+        }
         Ok(0)
     }
 }
@@ -445,11 +555,15 @@ impl SyscallHandler for MinCoreHandler {
 pub struct MadviseHandler;
 impl MadviseHandler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { MadviseHandler }
+    pub fn new() -> Self {
+        MadviseHandler
+    }
 }
 impl SyscallHandler for MadviseHandler {
     fn handle(&mut self, _num: SyscallNumber, args: &[usize]) -> Result<usize, SyscallError> {
-        if args.len() < 3 { return Err(SyscallError::InvalidArgument); }
+        if args.len() < 3 {
+            return Err(SyscallError::InvalidArgument);
+        }
         Ok(0)
     }
 }
@@ -457,11 +571,15 @@ impl SyscallHandler for MadviseHandler {
 pub struct DupHandler;
 impl DupHandler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { DupHandler }
+    pub fn new() -> Self {
+        DupHandler
+    }
 }
 impl SyscallHandler for DupHandler {
     fn handle(&mut self, _num: SyscallNumber, args: &[usize]) -> Result<usize, SyscallError> {
-        if args.is_empty() { return Err(SyscallError::InvalidArgument); }
+        if args.is_empty() {
+            return Err(SyscallError::InvalidArgument);
+        }
         Ok(args[0] + 1)
     }
 }
@@ -469,11 +587,15 @@ impl SyscallHandler for DupHandler {
 pub struct Dup2Handler;
 impl Dup2Handler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { Dup2Handler }
+    pub fn new() -> Self {
+        Dup2Handler
+    }
 }
 impl SyscallHandler for Dup2Handler {
     fn handle(&mut self, _num: SyscallNumber, args: &[usize]) -> Result<usize, SyscallError> {
-        if args.len() < 2 { return Err(SyscallError::InvalidArgument); }
+        if args.len() < 2 {
+            return Err(SyscallError::InvalidArgument);
+        }
         Ok(args[1])
     }
 }
@@ -481,7 +603,9 @@ impl SyscallHandler for Dup2Handler {
 pub struct PauseHandler;
 impl PauseHandler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { PauseHandler }
+    pub fn new() -> Self {
+        PauseHandler
+    }
 }
 impl SyscallHandler for PauseHandler {
     fn handle(&mut self, _num: SyscallNumber, _args: &[usize]) -> Result<usize, SyscallError> {
@@ -492,11 +616,15 @@ impl SyscallHandler for PauseHandler {
 pub struct NanosleepHandler;
 impl NanosleepHandler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { NanosleepHandler }
+    pub fn new() -> Self {
+        NanosleepHandler
+    }
 }
 impl SyscallHandler for NanosleepHandler {
     fn handle(&mut self, _num: SyscallNumber, args: &[usize]) -> Result<usize, SyscallError> {
-        if args.len() < 2 { return Err(SyscallError::InvalidArgument); }
+        if args.len() < 2 {
+            return Err(SyscallError::InvalidArgument);
+        }
         Ok(0)
     }
 }
@@ -504,7 +632,9 @@ impl SyscallHandler for NanosleepHandler {
 pub struct GetPidHandler;
 impl GetPidHandler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { GetPidHandler }
+    pub fn new() -> Self {
+        GetPidHandler
+    }
 }
 impl SyscallHandler for GetPidHandler {
     fn handle(&mut self, _num: SyscallNumber, _args: &[usize]) -> Result<usize, SyscallError> {
@@ -515,7 +645,9 @@ impl SyscallHandler for GetPidHandler {
 pub struct GetPpidHandler;
 impl GetPpidHandler {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { GetPpidHandler }
+    pub fn new() -> Self {
+        GetPpidHandler
+    }
 }
 impl SyscallHandler for GetPpidHandler {
     fn handle(&mut self, _num: SyscallNumber, _args: &[usize]) -> Result<usize, SyscallError> {

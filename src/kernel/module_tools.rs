@@ -59,7 +59,12 @@ pub struct ModuleParameter {
 }
 
 impl ModuleParameter {
-    pub fn new(name: String, param_type: String, description: String, default_value: String) -> Self {
+    pub fn new(
+        name: String,
+        param_type: String,
+        description: String,
+        default_value: String,
+    ) -> Self {
         ModuleParameter {
             name,
             param_type,
@@ -80,7 +85,7 @@ impl KernelModuleSkeleton {
     pub fn new(name: String) -> Self {
         let mut metadata = KernelModuleMetadata::default();
         metadata.name = name.clone();
-        
+
         let config = KernelModuleConfig {
             metadata,
             ..Default::default()
@@ -94,13 +99,13 @@ impl KernelModuleSkeleton {
 
     pub fn generate_skeleton_code(&self) -> String {
         let mut code = String::new();
-        
+
         code.push_str("// SigmaOS Kernel Module: ");
         code.push_str(&self.config.metadata.name);
         code.push_str("\n\n");
-        
+
         code.push_str("use sigmaos::kernel::*;\n\n");
-        
+
         code.push_str("/// Module initialization function\n");
         code.push_str("#[no_mangle]\n");
         code.push_str("pub extern \"C\" fn ");
@@ -112,7 +117,7 @@ impl KernelModuleSkeleton {
         code.push_str(" loaded\");\n");
         code.push_str("    0\n");
         code.push_str("}\n\n");
-        
+
         code.push_str("/// Module cleanup function\n");
         code.push_str("#[no_mangle]\n");
         code.push_str("pub extern \"C\" fn ");
@@ -123,7 +128,7 @@ impl KernelModuleSkeleton {
         code.push_str(&self.config.metadata.name);
         code.push_str(" unloaded\");\n");
         code.push_str("}\n");
-        
+
         code
     }
 
@@ -185,7 +190,7 @@ impl KernelModuleBuilder {
 
     pub fn build_command(&self) -> String {
         let mut cmd = String::from("cargo build");
-        
+
         match self.build_type {
             BuildType::Release => cmd.push_str(" --release"),
             BuildType::Debug => {}
@@ -229,7 +234,7 @@ impl KernelModuleLoader {
             .next()
             .unwrap_or(&module_path)
             .replace(".ko", "");
-        
+
         self.loaded_modules.push(module_name.clone());
         Ok(format!("Loaded module: {}", module_name))
     }
@@ -314,7 +319,7 @@ mod tests {
     fn test_generate_skeleton_code() {
         let skeleton = KernelModuleSkeleton::new(String::from("test_module"));
         let code = skeleton.generate_skeleton_code();
-        
+
         assert!(code.contains("test_module"));
         assert!(code.contains("init_module"));
         assert!(code.contains("exit_module"));
@@ -352,7 +357,7 @@ mod tests {
         let builder = KernelModuleBuilder::new(String::from("test_module"))
             .with_build_type(BuildType::Release)
             .with_optimization(OptimizationLevel::O2);
-        
+
         let cmd = builder.build_command();
         assert!(cmd.contains("cargo build"));
         assert!(cmd.contains("--release"));
@@ -379,7 +384,7 @@ mod tests {
         let mut loader = KernelModuleLoader::new();
         loader.load(String::from("/path/to/module1.ko")).unwrap();
         loader.load(String::from("/path/to/module2.ko")).unwrap();
-        
+
         let loaded = loader.list_loaded();
         assert_eq!(loaded.len(), 2);
     }
@@ -394,7 +399,7 @@ mod tests {
 
     #[test]
     fn test_kernel_module_manager() {
-        let manager = KernelModuleManager::new(String::from("test_module"));
+        let mut manager = KernelModuleManager::new(String::from("test_module"));
         let code = manager.create_module();
         assert!(code.contains("test_module"));
     }
@@ -421,19 +426,19 @@ mod tests {
 
     #[test]
     fn test_build_types() {
-        let builder_debug = KernelModuleBuilder::new(String::from("test"))
-            .with_build_type(BuildType::Debug);
+        let builder_debug =
+            KernelModuleBuilder::new(String::from("test")).with_build_type(BuildType::Debug);
         assert_eq!(builder_debug.build_type, BuildType::Debug);
-        
-        let builder_release = KernelModuleBuilder::new(String::from("test"))
-            .with_build_type(BuildType::Release);
+
+        let builder_release =
+            KernelModuleBuilder::new(String::from("test")).with_build_type(BuildType::Release);
         assert_eq!(builder_release.build_type, BuildType::Release);
     }
 
     #[test]
     fn test_optimization_levels() {
-        let builder = KernelModuleBuilder::new(String::from("test"))
-            .with_optimization(OptimizationLevel::O3);
+        let builder =
+            KernelModuleBuilder::new(String::from("test")).with_optimization(OptimizationLevel::O3);
         assert_eq!(builder.optimization_level, OptimizationLevel::O3);
     }
 }

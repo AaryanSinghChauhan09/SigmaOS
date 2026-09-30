@@ -1,16 +1,17 @@
 // SigmaOS Native UI and Mathematical Visualisation Subsystem Mod
 
 pub mod control_center;
+pub mod folder_color;
 pub mod gtk_toolkit;
 pub mod math_plotter;
 pub mod toolkit;
-pub mod folder_color;
 pub mod widget_api;
 
 pub use control_center::{
     ControlCenterCategory, DisplaySettingsPlug, NetworkSettingsPlug, SwitchboardPlug,
     UnifiedControlCenter,
 };
+pub use folder_color::{FolderColor, FolderColorSwitcherEngine, FolderCustomization, FolderEmblem};
 pub use math_plotter::{PlotFunction, SovereignMathPlotter};
 pub use toolkit::{
     GtkAccessibilityRole, GtkBox, GtkDisplayMetrics, GtkHeaderBar, GtkOrientation,
@@ -18,12 +19,8 @@ pub use toolkit::{
     SimpleUILayout, SimpleWidget, UIError, UILayout, Widget, WidgetCapability, WidgetID,
     WidgetInfo, WidgetType,
 };
-pub use folder_color::{
-    FolderColor, FolderColorSwitcherEngine, FolderCustomization, FolderEmblem,
-};
 pub use widget_api::{
-    Widget as NativeWidget, WidgetApi, WidgetBuilder, WidgetKind, WidgetId,
-    Layout, Dimension, Spacing, FlexDirection, Justify, Align,
-    Style, Event, EventType, EventHandler, Modifiers,
-    widgets,
+    widgets, Align, Dimension, Event, EventHandler, EventType, FlexDirection, Justify, Layout,
+    Modifiers, Spacing, Style, Widget as NativeWidget, WidgetApi, WidgetBuilder, WidgetId,
+    WidgetKind,
 };

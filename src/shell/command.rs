@@ -1,5 +1,5 @@
-use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
+use std::vec::Vec;
 
 pub type ShellVec<T> = std::vec::Vec<T>;
 pub type CommandID = usize;
@@ -411,7 +411,8 @@ impl DirectoryStack {
 }
 
 /// Global directory stack (thread-safe with OnceLock)
-static GLOBAL_DIR_STACK: std::sync::OnceLock<std::sync::Mutex<DirectoryStack>> = std::sync::OnceLock::new();
+static GLOBAL_DIR_STACK: std::sync::OnceLock<std::sync::Mutex<DirectoryStack>> =
+    std::sync::OnceLock::new();
 
 fn get_global_dir_stack() -> &'static std::sync::Mutex<DirectoryStack> {
     GLOBAL_DIR_STACK.get_or_init(|| std::sync::Mutex::new(DirectoryStack::new()))

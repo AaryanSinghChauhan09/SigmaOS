@@ -56,7 +56,10 @@ impl KernelFormat {
     /// Infer kernel format from file name suffix or path
     pub fn from_filename(filename: &str) -> Option<Self> {
         let name = filename.to_lowercase();
-        if name.ends_with(".uki") || name.ends_with(".uki.efi") || (name.contains("vmlinuz") && name.ends_with(".efi")) {
+        if name.ends_with(".uki")
+            || name.ends_with(".uki.efi")
+            || (name.contains("vmlinuz") && name.ends_with(".efi"))
+        {
             Some(Self::UnifiedKernelImage)
         } else if name.contains(".zst") || name.contains(".zstd") {
             Some(Self::LinuxVmlinuzZstd)
@@ -245,7 +248,11 @@ impl UniversalKernelFormatEngine {
     }
 
     /// Auto-detect kernel image format inspecting magic bytes and headers with filename fallback
-    pub fn detect_format(&self, payload: &[u8], filename_hint: Option<&str>) -> Option<KernelFormat> {
+    pub fn detect_format(
+        &self,
+        payload: &[u8],
+        filename_hint: Option<&str>,
+    ) -> Option<KernelFormat> {
         if payload.len() >= 4 {
             // Check Android boot.img magic "ANDROID!"
             if payload.len() >= 8 && &payload[0..8] == b"ANDROID!" {
@@ -254,7 +261,8 @@ impl UniversalKernelFormatEngine {
 
             // Check U-Boot uImage magic 0x27051956 (Big-Endian or Little-Endian)
             if payload.len() >= 64 {
-                let uimage_magic = u32::from_be_bytes([payload[0], payload[1], payload[2], payload[3]]);
+                let uimage_magic =
+                    u32::from_be_bytes([payload[0], payload[1], payload[2], payload[3]]);
                 if uimage_magic == 0x27051956 {
                     return Some(KernelFormat::LinuxUImage);
                 }
@@ -262,7 +270,8 @@ impl UniversalKernelFormatEngine {
 
             // Check FIT Image / Flattened Device Tree magic 0xD00DFEED
             if payload.len() >= 8 {
-                let fit_magic = u32::from_be_bytes([payload[0], payload[1], payload[2], payload[3]]);
+                let fit_magic =
+                    u32::from_be_bytes([payload[0], payload[1], payload[2], payload[3]]);
                 if fit_magic == 0xD00DFEED {
                     return Some(KernelFormat::LinuxFitImage);
                 }
@@ -288,19 +297,27 @@ impl UniversalKernelFormatEngine {
 
             // Check Apple Mach-O 64-bit magic 0xFEEDFACF or Fat binary 0xCAFEBABE
             if payload.len() >= 4 {
-                let mach_magic = u32::from_be_bytes([payload[0], payload[1], payload[2], payload[3]]);
-                if mach_magic == 0xFEEDFACF || mach_magic == 0xCFFAEDFE || mach_magic == 0xCAFEBABE {
+                let mach_magic =
+                    u32::from_be_bytes([payload[0], payload[1], payload[2], payload[3]]);
+                if mach_magic == 0xFEEDFACF || mach_magic == 0xCFFAEDFE || mach_magic == 0xCAFEBABE
+                {
                     return Some(KernelFormat::AppleMachOKernel);
                 }
             }
 
             // Check ELF magic \x7fELF
-            if payload[0] == 0x7F && payload[1] == b'E' && payload[2] == b'L' && payload[3] == b'F' {
+            if payload[0] == 0x7F && payload[1] == b'E' && payload[2] == b'L' && payload[3] == b'F'
+            {
                 // Check Multiboot header magic (0x1BADB002 or 0x2BADB002) within first 8KB
                 let mut is_multiboot = false;
                 let scan_limit = payload.len().min(8192);
                 for i in 0..scan_limit.saturating_sub(4) {
-                    let magic = u32::from_le_bytes([payload[i], payload[i + 1], payload[i + 2], payload[i + 3]]);
+                    let magic = u32::from_le_bytes([
+                        payload[i],
+                        payload[i + 1],
+                        payload[i + 2],
+                        payload[i + 3],
+                    ]);
                     if magic == 0x1BADB002 || magic == 0x2BADB002 {
                         is_multiboot = true;
                         break;
@@ -409,8 +426,11 @@ impl UniversalKernelFormatEngine {
                     file_offset: 0x4000,
                 });
             }
-            KernelFormat::LinuxVmlinuzGzip | KernelFormat::LinuxVmlinuzZstd | KernelFormat::LinuxVmlinuzXz
-            | KernelFormat::LinuxVmlinuzLz4 | KernelFormat::LinuxVmlinuzLzo => {
+            KernelFormat::LinuxVmlinuzGzip
+            | KernelFormat::LinuxVmlinuzZstd
+            | KernelFormat::LinuxVmlinuzXz
+            | KernelFormat::LinuxVmlinuzLz4
+            | KernelFormat::LinuxVmlinuzLzo => {
                 compression = match format {
                     KernelFormat::LinuxVmlinuzGzip => KernelCompression::Gzip,
                     KernelFormat::LinuxVmlinuzZstd => KernelCompression::Zstd,
@@ -431,8 +451,12 @@ impl UniversalKernelFormatEngine {
             KernelFormat::LinuxUImage => {
                 arch = KernelArch::ARM64;
                 if payload.len() >= 64 {
-                    load_address = u32::from_be_bytes([payload[16], payload[17], payload[18], payload[19]]) as u64;
-                    entry_point = u32::from_be_bytes([payload[20], payload[21], payload[22], payload[23]]) as u64;
+                    load_address =
+                        u32::from_be_bytes([payload[16], payload[17], payload[18], payload[19]])
+                            as u64;
+                    entry_point =
+                        u32::from_be_bytes([payload[20], payload[21], payload[22], payload[23]])
+                            as u64;
                 }
             }
             KernelFormat::LinuxFitImage => {
@@ -441,7 +465,9 @@ impl UniversalKernelFormatEngine {
                 dtb_payload = Some(vec![0xD0, 0x0D, 0xFE, 0xED, 0x00, 0x00, 0x01, 0x00]);
             }
             KernelFormat::UnifiedKernelImage => {
-                cmdline = Some(String::from("root=LABEL=SIGMA_ROOT quiet splash systemd.unified_cgroup_hierarchy=1"));
+                cmdline = Some(String::from(
+                    "root=LABEL=SIGMA_ROOT quiet splash systemd.unified_cgroup_hierarchy=1",
+                ));
                 initramfs_payload = Some(vec![0x30, 0x30, 0x30, 0x30]); // Simulated initrd CPIO
                 sections.push(KernelSection {
                     name: String::from(".linux"),
@@ -463,7 +489,9 @@ impl UniversalKernelFormatEngine {
             KernelFormat::AndroidBootImg => {
                 arch = KernelArch::ARM64;
                 entry_point = 0x80008000;
-                cmdline = Some(String::from("console=ttyMSM0 androidboot.hardware=qcom bootgroup=0"));
+                cmdline = Some(String::from(
+                    "console=ttyMSM0 androidboot.hardware=qcom bootgroup=0",
+                ));
                 initramfs_payload = Some(vec![0x1F, 0x8B, 0x08, 0x00]);
             }
             KernelFormat::FreeBsdElfKernel => {
@@ -640,7 +668,9 @@ impl UniversalKernelFormatEngine {
         }
 
         match format {
-            KernelFormat::LinuxBzImage => payload.len() >= 0x206 && &payload[0x202..0x206] == b"HdrS",
+            KernelFormat::LinuxBzImage => {
+                payload.len() >= 0x206 && &payload[0x202..0x206] == b"HdrS"
+            }
             KernelFormat::AndroidBootImg => payload.len() >= 8 && &payload[0..8] == b"ANDROID!",
             KernelFormat::LinuxUImage => {
                 if payload.len() < 64 {
@@ -677,22 +707,70 @@ mod tests {
 
     #[test]
     fn test_filename_format_inference() {
-        assert_eq!(KernelFormat::from_filename("vmlinuz-6.8.0"), Some(KernelFormat::LinuxVmlinuzGzip));
-        assert_eq!(KernelFormat::from_filename("vmlinuz-sigma.zst"), Some(KernelFormat::LinuxVmlinuzZstd));
-        assert_eq!(KernelFormat::from_filename("uImage-arm64"), Some(KernelFormat::LinuxUImage));
-        assert_eq!(KernelFormat::from_filename("kernel.fit"), Some(KernelFormat::LinuxFitImage));
-        assert_eq!(KernelFormat::from_filename("sigma.uki.efi"), Some(KernelFormat::UnifiedKernelImage));
-        assert_eq!(KernelFormat::from_filename("boot.img"), Some(KernelFormat::AndroidBootImg));
-        assert_eq!(KernelFormat::from_filename("/boot/kernel/kernel"), Some(KernelFormat::FreeBsdElfKernel));
-        assert_eq!(KernelFormat::from_filename("netbsd.gz"), Some(KernelFormat::NetBsdMultibootElf));
-        assert_eq!(KernelFormat::from_filename("bsd.rd"), Some(KernelFormat::OpenBsdBsdKernel));
-        assert_eq!(KernelFormat::from_filename("vkernel"), Some(KernelFormat::DragonFlyVKernel));
-        assert_eq!(KernelFormat::from_filename("xen-kernel.xen"), Some(KernelFormat::XenPvKernel));
-        assert_eq!(KernelFormat::from_filename("kernelcache"), Some(KernelFormat::AppleMachOKernel));
-        assert_eq!(KernelFormat::from_filename("ntoskrnl.exe"), Some(KernelFormat::WindowsNtKernel));
-        assert_eq!(KernelFormat::from_filename("haiku_loader"), Some(KernelFormat::HaikuElfKernel));
-        assert_eq!(KernelFormat::from_filename("redox_kernel"), Some(KernelFormat::RedoxMicrokernel));
-        assert_eq!(KernelFormat::from_filename("illumos_unix"), Some(KernelFormat::IllumosSolarisKernel));
+        assert_eq!(
+            KernelFormat::from_filename("vmlinuz-6.8.0"),
+            Some(KernelFormat::LinuxVmlinuzGzip)
+        );
+        assert_eq!(
+            KernelFormat::from_filename("vmlinuz-sigma.zst"),
+            Some(KernelFormat::LinuxVmlinuzZstd)
+        );
+        assert_eq!(
+            KernelFormat::from_filename("uImage-arm64"),
+            Some(KernelFormat::LinuxUImage)
+        );
+        assert_eq!(
+            KernelFormat::from_filename("kernel.fit"),
+            Some(KernelFormat::LinuxFitImage)
+        );
+        assert_eq!(
+            KernelFormat::from_filename("sigma.uki.efi"),
+            Some(KernelFormat::UnifiedKernelImage)
+        );
+        assert_eq!(
+            KernelFormat::from_filename("boot.img"),
+            Some(KernelFormat::AndroidBootImg)
+        );
+        assert_eq!(
+            KernelFormat::from_filename("/boot/kernel/kernel"),
+            Some(KernelFormat::FreeBsdElfKernel)
+        );
+        assert_eq!(
+            KernelFormat::from_filename("netbsd.gz"),
+            Some(KernelFormat::NetBsdMultibootElf)
+        );
+        assert_eq!(
+            KernelFormat::from_filename("bsd.rd"),
+            Some(KernelFormat::OpenBsdBsdKernel)
+        );
+        assert_eq!(
+            KernelFormat::from_filename("vkernel"),
+            Some(KernelFormat::DragonFlyVKernel)
+        );
+        assert_eq!(
+            KernelFormat::from_filename("xen-kernel.xen"),
+            Some(KernelFormat::XenPvKernel)
+        );
+        assert_eq!(
+            KernelFormat::from_filename("kernelcache"),
+            Some(KernelFormat::AppleMachOKernel)
+        );
+        assert_eq!(
+            KernelFormat::from_filename("ntoskrnl.exe"),
+            Some(KernelFormat::WindowsNtKernel)
+        );
+        assert_eq!(
+            KernelFormat::from_filename("haiku_loader"),
+            Some(KernelFormat::HaikuElfKernel)
+        );
+        assert_eq!(
+            KernelFormat::from_filename("redox_kernel"),
+            Some(KernelFormat::RedoxMicrokernel)
+        );
+        assert_eq!(
+            KernelFormat::from_filename("illumos_unix"),
+            Some(KernelFormat::IllumosSolarisKernel)
+        );
     }
 
     #[test]
@@ -709,10 +787,16 @@ mod tests {
         let format = engine.detect_format(&mock_bzimage, None);
         assert_eq!(format, Some(KernelFormat::LinuxBzImage));
 
-        let parsed = engine.parse_kernel_image(&mock_bzimage, Some("bzImage")).unwrap();
+        let parsed = engine
+            .parse_kernel_image(&mock_bzimage, Some("bzImage"))
+            .unwrap();
         assert_eq!(parsed.format, KernelFormat::LinuxBzImage);
         assert_eq!(parsed.compression, KernelCompression::Gzip);
-        assert!(parsed.cmdline.as_ref().unwrap().contains("root=/dev/sigma0"));
+        assert!(parsed
+            .cmdline
+            .as_ref()
+            .unwrap()
+            .contains("root=/dev/sigma0"));
 
         let transpiled = engine.transpile_to_sigma_boot_payload(&parsed).unwrap();
         assert_eq!(transpiled.format_origin, KernelFormat::LinuxBzImage);
@@ -728,11 +812,15 @@ mod tests {
         let format = engine.detect_format(&mock_android, None);
         assert_eq!(format, Some(KernelFormat::AndroidBootImg));
 
-        let parsed = engine.parse_kernel_image(&mock_android, Some("boot.img")).unwrap();
+        let parsed = engine
+            .parse_kernel_image(&mock_android, Some("boot.img"))
+            .unwrap();
         assert_eq!(parsed.arch, KernelArch::ARM64);
         assert!(parsed.cmdline.unwrap().contains("androidboot.hardware"));
 
-        let initrd = engine.extract_initramfs(&mock_android, Some("boot.img")).unwrap();
+        let initrd = engine
+            .extract_initramfs(&mock_android, Some("boot.img"))
+            .unwrap();
         assert_eq!(initrd, vec![0x1F, 0x8B, 0x08, 0x00]);
 
         // UKI test
@@ -740,9 +828,14 @@ mod tests {
         mock_uki[0] = b'M';
         mock_uki[1] = b'Z';
 
-        let parsed_uki = engine.parse_kernel_image(&mock_uki, Some("sigma.uki.efi")).unwrap();
+        let parsed_uki = engine
+            .parse_kernel_image(&mock_uki, Some("sigma.uki.efi"))
+            .unwrap();
         assert_eq!(parsed_uki.format, KernelFormat::UnifiedKernelImage);
-        assert!(parsed_uki.cmdline.unwrap().contains("unified_cgroup_hierarchy"));
+        assert!(parsed_uki
+            .cmdline
+            .unwrap()
+            .contains("unified_cgroup_hierarchy"));
     }
 
     #[test]
@@ -751,18 +844,26 @@ mod tests {
         let mut mock_elf = vec![0x7F, b'E', b'L', b'F', 0x02, 0x01, 0x01, 0x00];
         mock_elf.extend_from_slice(&[0u8; 256]);
 
-        let freebsd_parsed = engine.parse_kernel_image(&mock_elf, Some("/boot/kernel/kernel")).unwrap();
+        let freebsd_parsed = engine
+            .parse_kernel_image(&mock_elf, Some("/boot/kernel/kernel"))
+            .unwrap();
         assert_eq!(freebsd_parsed.format, KernelFormat::FreeBsdElfKernel);
         assert!(freebsd_parsed.version_string.unwrap().contains("FreeBSD"));
 
-        let openbsd_parsed = engine.parse_kernel_image(&mock_elf, Some("bsd.rd")).unwrap();
+        let openbsd_parsed = engine
+            .parse_kernel_image(&mock_elf, Some("bsd.rd"))
+            .unwrap();
         assert_eq!(openbsd_parsed.format, KernelFormat::OpenBsdBsdKernel);
 
-        let win_parsed = engine.parse_kernel_image(&[b'M', b'Z', 0, 0], Some("ntoskrnl.exe")).unwrap();
+        let win_parsed = engine
+            .parse_kernel_image(&[b'M', b'Z', 0, 0], Some("ntoskrnl.exe"))
+            .unwrap();
         assert_eq!(win_parsed.format, KernelFormat::WindowsNtKernel);
         assert_eq!(win_parsed.entry_point, 0x140001000);
 
-        let apple_parsed = engine.parse_kernel_image(&[0xFE, 0xED, 0xFA, 0xCF], Some("kernelcache")).unwrap();
+        let apple_parsed = engine
+            .parse_kernel_image(&[0xFE, 0xED, 0xFA, 0xCF], Some("kernelcache"))
+            .unwrap();
         assert_eq!(apple_parsed.format, KernelFormat::AppleMachOKernel);
 
         assert!(engine.verify_kernel_integrity(&[b'M', b'Z'], KernelFormat::WindowsNtKernel));
@@ -775,9 +876,13 @@ mod tests {
         let checksum = engine.calculate_image_checksum(&payload);
         assert_ne!(checksum, 0);
 
-        let verified_format = engine.verify_checksum_and_format(&payload, checksum, Some("freebsd_kernel")).unwrap();
+        let verified_format = engine
+            .verify_checksum_and_format(&payload, checksum, Some("freebsd_kernel"))
+            .unwrap();
         assert_eq!(verified_format, KernelFormat::FreeBsdElfKernel);
 
-        assert!(engine.verify_checksum_and_format(&payload, checksum + 1, Some("freebsd_kernel")).is_err());
+        assert!(engine
+            .verify_checksum_and_format(&payload, checksum + 1, Some("freebsd_kernel"))
+            .is_err());
     }
 }

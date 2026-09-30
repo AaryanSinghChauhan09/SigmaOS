@@ -741,11 +741,13 @@ mod tests {
         assert_eq!(sb_res, "/home/jules/file.txt");
 
         // Android APEX translation
-        let apex_res = hierarchy.translate_cross_platform_path("/apex/com.android.runtime/bin/dalvikvm");
+        let apex_res =
+            hierarchy.translate_cross_platform_path("/apex/com.android.runtime/bin/dalvikvm");
         assert_eq!(apex_res, "/bin/dalvikvm");
 
         // macOS App bundle translation
-        let mac_res = hierarchy.translate_cross_platform_path("/Applications/VSCode.app/Contents/MacOS/Code");
+        let mac_res =
+            hierarchy.translate_cross_platform_path("/Applications/VSCode.app/Contents/MacOS/Code");
         assert_eq!(mac_res, "/usr/bin/Code");
 
         // DistroWatch mount translation
