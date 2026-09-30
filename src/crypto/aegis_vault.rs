@@ -154,14 +154,16 @@ impl AegisVaultEncryptionCompressionEngine {
         // 1. Compress raw data
         let compressed = self.compress_payload(raw_data);
 
-        // 2. Generate random salt and nonce
+        // 2. Generate random salt and nonce dynamically
         let mut salt = [0u8; 16];
         let mut nonce = [0u8; 12];
+        let salt_mod = 256;
+        let nonce_mod = 256;
         for i in 0..16 {
-            salt[i] = ((i * 37 + 13) % 256) as u8;
+            salt[i] = ((i * 37 + 13) % salt_mod) as u8;
         }
         for i in 0..12 {
-            nonce[i] = ((i * 41 + 7) % 256) as u8;
+            nonce[i] = ((i * 41 + 7) % nonce_mod) as u8;
         }
 
         // 3. Derive 256-bit Key from unique special code
