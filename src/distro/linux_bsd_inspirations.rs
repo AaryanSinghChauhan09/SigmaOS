@@ -147,7 +147,7 @@ pub struct AuthCredentialContext {
 
 pub struct LinuxBsdPamAuthEngine {
     pub default_mechanism: AuthMechanism,
-    pub trusted_sessions: Vec<AuthCredentialContext>,
+    trusted_sessions: Vec<AuthCredentialContext>,
 }
 
 impl LinuxBsdPamAuthEngine {
@@ -179,21 +179,12 @@ impl LinuxBsdPamAuthEngine {
     }
 
     pub fn authenticate(&mut self, username: &str, action: &str) -> Result<String, &'static str> {
-        let ctx = AuthCredentialContext {
-            username: username.to_string(),
-            service_name: action.to_string(),
-            mechanism: self.default_mechanism.clone(),
-            authenticated: true,
-        };
-        let msg = format!(
-            "Authenticated user '{}' for service/action '{}' via mechanism '{:?}'",
-            username, action, self.default_mechanism
-        );
-        self.trusted_sessions.push(ctx);
-        Ok(msg)
+        let _ = (username, action);
+        Err("Authentication provider unavailable")
     }
 
     pub fn is_authenticated(&self, username: &str) -> bool {
+        let _ = username;
         self.trusted_sessions
             .iter()
             .any(|s| s.username == username && s.authenticated)
@@ -1454,6 +1445,15 @@ impl SovereignUniversalDistroBridge {
         ];
 
         for sub in subsystems {
+            if sub == "auth" {
+                if self
+                    .dispatch_cross_subsystem_operation(sub, "/tmp/test_action")
+                    .is_ok()
+                {
+                    return false;
+                }
+                continue;
+            }
             if let Err(e) = self.dispatch_cross_subsystem_operation(sub, "/tmp/test_action") {
                 println!(
                     "Subsystem '{}' failed under distro mode '{:?}': {}",
@@ -1883,7 +1883,7 @@ impl SovereignUniversalDistroBridge {
         ];
         subsystems
             .iter()
-            .map(|&s| (s, true, supervisor))
+            .map(|&s| (s, s != "auth", supervisor))
             .collect()
     }
 
@@ -3105,7 +3105,7 @@ mod inspiration_leap_tests {
         assert_eq!(leap_engine.active_inspirations.len(), 13);
 
         let (count, valid) = leap_engine.audit_subsystem_readiness();
-        assert_eq!(count, 174);
+        assert_eq!(count, 173);
         assert!(valid);
 
         let res = leap_engine
@@ -3122,7 +3122,7 @@ mod inspiration_leap_tests {
         assert!(res_bsd.unwrap().contains("VNET network stack routing"));
 
         let (count_bsd, valid_bsd) = leap_engine.audit_subsystem_readiness();
-        assert_eq!(count_bsd, 174);
+        assert_eq!(count_bsd, 173);
         assert!(valid_bsd);
     }
 }
@@ -3156,7 +3156,7 @@ mod subsystem_interop_tests {
         assert!(caps.len() >= 140);
         for (sub, supported, supervisor) in caps {
             assert!(!sub.is_empty());
-            assert!(supported);
+            assert_eq!(supported, sub != "auth");
             assert_eq!(supervisor, ServiceSupervisorType::Systemd);
         }
     }
@@ -3698,7 +3698,7 @@ mod cross_subsystem_tests {
         assert!(orchestrator.verify_full_subsystem_matrix());
 
         let res_auth = orchestrator.orchestrate_subsystem("auth", "alice");
-        assert!(res_auth.is_ok());
+        assert!(res_auth.is_err());
 
         let res_boot = orchestrator.orchestrate_subsystem("boot", "sigma_kernel");
         assert!(res_boot.is_ok());
@@ -3715,14 +3715,14 @@ mod cross_subsystem_tests {
         let res_sys = orchestrator.orchestrate_subsystem("syscall", "sys_read");
         assert!(res_sys.is_ok());
 
-        assert!(orchestrator.active_subsystems.contains(&"auth".to_string()));
+        assert!(!orchestrator.active_subsystems.contains(&"auth".to_string()));
         assert!(orchestrator
             .active_subsystems
             .contains(&"network".to_string()));
 
         let sync_count = orchestrator.synchronize_subsystem_pipeline();
         assert!(sync_count.is_ok());
-        assert_eq!(sync_count.unwrap(), 174);
+        assert_eq!(sync_count.unwrap(), 173);
 
         let (supervisor, pkg_spec, vfs_etc, compatible) =
             orchestrator.query_subsystem_capabilities();
@@ -3922,7 +3922,11 @@ mod cross_subsystem_tests {
         let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxArch);
         for sub in all_174 {
             let res = bridge.dispatch_cross_subsystem_operation(sub, "test_action");
-            assert!(res.is_ok(), "Subsystem '{}' dispatch failed", sub);
+            if sub == "auth" {
+                assert!(res.is_err(), "Auth must fail closed without a provider");
+            } else {
+                assert!(res.is_ok(), "Subsystem '{}' dispatch failed", sub);
+            }
         }
 
         assert!(bridge.verify_all_subsystems_compatibility_matrix());
@@ -3933,8 +3937,8 @@ mod cross_subsystem_tests {
         let mut gateway =
             LinuxBsdDistroSubsystemInteroperabilityGateway::new(DistroSubsystemMode::LinuxArch);
         let count = gateway.synchronize_and_audit_all_subsystems().unwrap();
-        assert_eq!(count, 174);
-        assert_eq!(gateway.audited_subsystems_count, 174);
+        assert_eq!(count, 173);
+        assert_eq!(gateway.audited_subsystems_count, 173);
 
         let res = gateway.orchestrate_subsystem("kernel", "sched_task");
         assert!(res.is_ok());
@@ -3942,7 +3946,7 @@ mod cross_subsystem_tests {
 
         gateway.set_distro_mode(DistroSubsystemMode::FreeBsd);
         let count_bsd = gateway.synchronize_and_audit_all_subsystems().unwrap();
-        assert_eq!(count_bsd, 174);
+        assert_eq!(count_bsd, 173);
 
         let (supervisor, pkg_spec, vfs_etc, compatible) = gateway.query_gateway_capability_matrix();
         assert_eq!(supervisor, ServiceSupervisorType::OpenRC);
@@ -3956,20 +3960,20 @@ mod cross_subsystem_tests {
         let mut auth_linux = LinuxBsdPamAuthEngine::new(DistroSubsystemMode::LinuxDebian);
         assert_eq!(auth_linux.default_mechanism, AuthMechanism::LinuxPam);
         let res = auth_linux.authenticate("root", "pam_auth");
-        assert!(res.is_ok());
-        assert!(auth_linux.is_authenticated("root"));
+        assert!(res.is_err());
+        assert!(!auth_linux.is_authenticated("root"));
 
         let mut auth_bsd = LinuxBsdPamAuthEngine::new(DistroSubsystemMode::FreeBsd);
         assert_eq!(auth_bsd.default_mechanism, AuthMechanism::BsdAuth);
         let res_bsd = auth_bsd.authenticate("daemon", "login.conf");
-        assert!(res_bsd.is_ok());
-        assert!(auth_bsd.is_authenticated("daemon"));
+        assert!(res_bsd.is_err());
+        assert!(!auth_bsd.is_authenticated("daemon"));
 
         let mut auth_systemd = LinuxBsdPamAuthEngine::new(DistroSubsystemMode::LinuxArch);
         assert_eq!(auth_systemd.default_mechanism, AuthMechanism::SystemdHomed);
         let res_sysd = auth_systemd.authenticate("alice", "homed");
-        assert!(res_sysd.is_ok());
-        assert!(auth_systemd.is_authenticated("alice"));
+        assert!(res_sysd.is_err());
+        assert!(!auth_systemd.is_authenticated("alice"));
     }
 
     #[test]
@@ -3977,16 +3981,17 @@ mod cross_subsystem_tests {
         let mut harmonizer =
             LinuxBsdSubsystemInspirationHarmonizer::new(DistroSubsystemMode::LinuxUbuntu);
         let auth_res = harmonizer.process_subsystem_action("auth", "pam_authenticate");
-        assert!(auth_res.is_ok());
-        assert!(auth_res.unwrap().contains("Authenticated user"));
+        assert!(auth_res.is_err());
 
         harmonizer.set_mode(DistroSubsystemMode::OpenBsd);
         let bsd_auth_res = harmonizer.process_subsystem_action("auth", "bsd_auth_check");
-        assert!(bsd_auth_res.is_ok());
+        assert!(bsd_auth_res.is_err());
 
         let generic_res = harmonizer.process_subsystem_action("network", "vnet_routing");
         assert!(generic_res.is_ok());
-        assert!(generic_res.unwrap().contains("Harmonized subsystem 'network'"));
+        assert!(generic_res
+            .unwrap()
+            .contains("Harmonized subsystem 'network'"));
     }
 }
 
