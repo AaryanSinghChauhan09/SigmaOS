@@ -560,7 +560,9 @@ impl SovereignMultiDomainPackageAccessGovernor {
 
     /// Authenticates enterprise package repository user via LDAP & PAM
     pub fn authenticate_ldap_repo_user(&self, bind_dn: &str, password: &str) -> bool {
-        !bind_dn.is_empty() && !password.is_empty() && bind_dn.contains("cn=")
+        let _ = (bind_dn, password);
+        // Do not infer identity from input shape; a trusted LDAP/PAM provider is not integrated.
+        false
     }
 
     /// Evaluates live process migration readiness for package installer tasks (CRIU)
@@ -815,7 +817,7 @@ mod tests {
         let eff_time = governor.calculate_effective_access_time_ms(0.8, 2.0, 50.0);
         assert_eq!(eff_time, 11.6); // 0.8 * 2.0 + 0.2 * 50.0 = 11.6
 
-        assert!(governor.authenticate_ldap_repo_user("cn=admin,dc=sigma,dc=org", "pass123"));
+        assert!(!governor.authenticate_ldap_repo_user("test_dn", "test_password"));
 
         assert!(governor.evaluate_installer_process_migration(500, true));
 

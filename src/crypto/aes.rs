@@ -19,9 +19,9 @@ use std::vec::Vec;
 // #![no_main]  // crate-root only
 
 use core::mem;
-/// OOP-based AES Encryption for SigmaOS
+/// Prototype API shape for a future audited AES provider.
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 502
-/// Implements AES-256 encryption and decryption
+/// This module does not implement AES and must not be used to protect data.
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type CipherID = usize;
@@ -42,6 +42,7 @@ pub enum CipherError {
     InvalidKey = 1,
     InvalidIV = 2,
     EncryptionFailed = 3,
+    CryptoUnavailable = 4,
 }
 
 pub trait BlockCipher {
@@ -97,26 +98,8 @@ impl BlockCipher for SimpleAES {
         if key.len() != 32 {
             return Err(CipherError::InvalidKey);
         }
-
-        let mut ciphertext = Vec::new();
-        let mut key_hash: usize = 0;
-
-        for &byte in key {
-            key_hash = key_hash.wrapping_add(byte as usize);
-        }
-
-        if let Some(iv_data) = iv {
-            for &byte in iv_data {
-                key_hash = key_hash.wrapping_add(byte as usize);
-            }
-        }
-
-        for &byte in plaintext {
-            ciphertext.push(byte.wrapping_add((key_hash % 256) as u8));
-            key_hash = key_hash.wrapping_mul(17);
-        }
-
-        Ok(ciphertext)
+        let _ = (plaintext, iv);
+        Err(CipherError::CryptoUnavailable)
     }
 
     fn decrypt(
@@ -128,26 +111,8 @@ impl BlockCipher for SimpleAES {
         if key.len() != 32 {
             return Err(CipherError::InvalidKey);
         }
-
-        let mut plaintext = Vec::new();
-        let mut key_hash: usize = 0;
-
-        for &byte in key {
-            key_hash = key_hash.wrapping_add(byte as usize);
-        }
-
-        if let Some(iv_data) = iv {
-            for &byte in iv_data {
-                key_hash = key_hash.wrapping_add(byte as usize);
-            }
-        }
-
-        for &byte in ciphertext {
-            plaintext.push(byte.wrapping_sub((key_hash % 256) as u8));
-            key_hash = key_hash.wrapping_mul(17);
-        }
-
-        Ok(plaintext)
+        let _ = (ciphertext, iv);
+        Err(CipherError::CryptoUnavailable)
     }
 }
 
@@ -406,5 +371,38 @@ impl<'a, T> IntoIterator for &'a VecImpl<T> {
         } else {
             unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{
+        AuthenticatedEncryption, BlockCipher, CipherError, CipherManager, CipherMode, SimpleAES,
+        SimpleAuthenticatedEncryption, SimpleCipherManager,
+    };
+
+    #[test]
+    fn aes_compatibility_api_fails_closed_without_a_provider() {
+        let cipher = SimpleAES::new(1, CipherMode::GCM);
+        assert!(matches!(
+            cipher.encrypt(b"secret", &[7; 32], Some(&[9; 12])),
+            Err(CipherError::CryptoUnavailable)
+        ));
+        assert!(matches!(
+            cipher.decrypt(b"ciphertext", &[7; 32], Some(&[9; 12])),
+            Err(CipherError::CryptoUnavailable)
+        ));
+    }
+
+    #[test]
+    fn authenticated_encryption_fails_closed_without_a_provider() {
+        let mut manager = SimpleCipherManager::new();
+        manager.seed_with_defaults();
+        let aead = SimpleAuthenticatedEncryption::new(manager);
+
+        assert!(matches!(
+            aead.encrypt_auth(b"secret", &[7; 32], &[9; 12], b"context"),
+            Err(CipherError::CryptoUnavailable)
+        ));
     }
 }

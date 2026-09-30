@@ -175,9 +175,6 @@ SigmaOS development and maintenance are executed by 18 composite AI specialist a
 
 ---
 
-## SECTION 9: ENGINEERING REPORT & COMPLIANCE VERIFICATION
+## SECTION 9: ENGINEERING STATUS
 
-- **Compiler Errors / Warnings**: 0
-- **Failing Tests**: 0
-- **Test Pass Rate**: 100% (Verified via `./run_sigma_tests.sh`)
-- **Wiki Synchronization**: Synchronized across `WIKI/`, `wiki/`, and `wiki_repo/` targets via `./scripts/sync_wiki.sh`.
+The following are verification requirements, not current completion claims. Check the latest CI runs and `COMPLETION_STATUS.md` before reporting repository health. Focused or standalone tests cover only their selected targets and do not prove complete OS functionality or a global 100% pass rate. Compiler warnings and prototype-only components remain; record actual findings rather than reporting zero by default. Keep `wiki/`, `WIKI/`, and the GitHub Wiki aligned, and verify the sync result after edits.

@@ -80,20 +80,26 @@ impl MemoryProtectionManager {
         }
     }
 
-    /// Generate a random offset for ASLR
+    /// Generate a best-effort offset for this model. This is not a CSPRNG and
+    /// must not be treated as production ASLR entropy.
     fn generate_random_offset(config: &AslrConfig) -> u64 {
-        // In production, use a cryptographically secure RNG
-        // For now, use a simple hash-based approach
         let timestamp = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap_or_default()
             .as_nanos();
 
-        let mask = (1u64 << config.randomization_bits) - 1;
-        let random = (timestamp as u64) & mask;
+        let bits = config.randomization_bits.clamp(1, 63);
+        let mask = (1u64 << bits) - 1;
+        let alignment = config
+            .page_alignment
+            .max(1)
+            .checked_next_power_of_two()
+            .unwrap_or(1u64 << 63);
+        let random = ((timestamp as u64) & mask).wrapping_add(alignment);
 
-        // Align to page boundary
-        (random + config.page_alignment) & !(config.page_alignment - 1)
+        // Align to a power-of-two boundary; saturating the configurable input
+        // above avoids zero-alignment underflow and invalid shifts.
+        random & !(alignment - 1)
     }
 
     /// Apply ASLR to an address
@@ -140,7 +146,17 @@ impl MemoryProtectionManager {
     /// Update ASLR offset (for dynamic re-randomization)
     pub fn re_randomize_aslr(&mut self) {
         if self.mode == MemoryProtectionMode::ASLR || self.mode == MemoryProtectionMode::Full {
-            let new_offset = Self::generate_random_offset(&self.aslr_config);
+            let previous = self.aslr_offset.load(Ordering::SeqCst);
+            let mut new_offset = Self::generate_random_offset(&self.aslr_config);
+            if new_offset == previous {
+                let alignment = self
+                    .aslr_config
+                    .page_alignment
+                    .max(1)
+                    .checked_next_power_of_two()
+                    .unwrap_or(1u64 << 63);
+                new_offset = new_offset.wrapping_add(alignment);
+            }
             self.aslr_offset.store(new_offset, Ordering::SeqCst);
         }
     }
@@ -226,5 +242,14 @@ mod tests {
         manager.re_randomize_aslr();
         let new_offset = manager.get_aslr_offset();
         assert_ne!(initial_offset, new_offset);
+    }
+
+    #[test]
+    fn test_aslr_configuration_bounds_do_not_panic() {
+        let mut manager = MemoryProtectionManager::new(MemoryProtectionMode::ASLR);
+        manager.aslr_config.randomization_bits = u8::MAX;
+        manager.aslr_config.page_alignment = 0;
+        manager.re_randomize_aslr();
+        assert!(manager.get_aslr_offset() > 0);
     }
 }

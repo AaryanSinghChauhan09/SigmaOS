@@ -18,27 +18,11 @@ use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
 
-// SigmaOS Encrypted File Vault
-// OOP-based encrypted file storage with post-quantum cryptography
+// SigmaOS Encrypted File Vault API prototype.
+// Cipher adapters fail closed until an audited provider is integrated.
 
 use crate::klib::HashMap;
 // SystemTime not in no_std; using u64 timestamps
-
-/// Helper function to generate random bytes
-fn generate_random_bytes(len: usize) -> Vec<u8> {
-    let mut bytes = vec![0u8; len];
-    let seed: u64 = 1700000000u64;
-
-    // Simple XOR-based PRNG for demonstration
-    // In production, use cryptographically secure RNG
-    let mut state = seed;
-    for byte in bytes.iter_mut() {
-        state = state.wrapping_mul(1103515245).wrapping_add(12345);
-        *byte = (state >> 32) as u8;
-    }
-
-    bytes
-}
 
 /// Encryption algorithm
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -99,33 +83,22 @@ pub trait VaultEncryption {
     fn name(&self) -> &str;
 }
 
-/// AES-256-GCM encryption
+/// AES-256-GCM API marker; no provider is currently integrated.
 pub struct Aes256GcmEncryption;
 
 impl VaultEncryption for Aes256GcmEncryption {
-    fn encrypt(&self, data: &[u8], key: &[u8]) -> Result<(Vec<u8>, Vec<u8>, Vec<u8>), VaultError> {
+    fn encrypt(&self, _data: &[u8], key: &[u8]) -> Result<(Vec<u8>, Vec<u8>, Vec<u8>), VaultError> {
         if key.is_empty() {
             return Err(VaultError::EncryptionError(
                 "Encryption key cannot be empty".to_string(),
             ));
         }
-        // Simulated AES-256-GCM encryption
-        // In real implementation, use actual AES-256-GCM
-        let iv = generate_random_bytes(12); // 96-bit IV
-        let tag = generate_random_bytes(16); // 128-bit tag
-        let mut encrypted = data.to_vec();
-
-        // Simple XOR for simulation (replace with actual AES in production)
-        for (i, byte) in encrypted.iter_mut().enumerate() {
-            *byte ^= key[i % key.len()];
-        }
-
-        Ok((encrypted, iv, tag))
+        Err(VaultError::CryptoUnavailable)
     }
 
     fn decrypt(
         &self,
-        encrypted_data: &[u8],
+        _encrypted_data: &[u8],
         key: &[u8],
         _iv: &[u8],
         _tag: &[u8],
@@ -135,14 +108,7 @@ impl VaultEncryption for Aes256GcmEncryption {
                 "Decryption key cannot be empty".to_string(),
             ));
         }
-        // Simulated decryption
-        let mut decrypted = encrypted_data.to_vec();
-
-        for (i, byte) in decrypted.iter_mut().enumerate() {
-            *byte ^= key[i % key.len()];
-        }
-
-        Ok(decrypted)
+        Err(VaultError::CryptoUnavailable)
     }
 
     fn name(&self) -> &str {
@@ -150,32 +116,22 @@ impl VaultEncryption for Aes256GcmEncryption {
     }
 }
 
-/// ChaCha20-Poly1305 encryption
+/// ChaCha20-Poly1305 API marker; no provider is currently integrated.
 pub struct ChaCha20Poly1305Encryption;
 
 impl VaultEncryption for ChaCha20Poly1305Encryption {
-    fn encrypt(&self, data: &[u8], key: &[u8]) -> Result<(Vec<u8>, Vec<u8>, Vec<u8>), VaultError> {
+    fn encrypt(&self, _data: &[u8], key: &[u8]) -> Result<(Vec<u8>, Vec<u8>, Vec<u8>), VaultError> {
         if key.is_empty() {
             return Err(VaultError::EncryptionError(
                 "Encryption key cannot be empty".to_string(),
             ));
         }
-        // Simulated ChaCha20-Poly1305 encryption
-        let iv = vec![0u8; 12];
-        let tag = vec![0u8; 16];
-        let mut encrypted = data.to_vec();
-
-        // Simple XOR for simulation
-        for (i, byte) in encrypted.iter_mut().enumerate() {
-            *byte ^= key[(i + 1) % key.len()];
-        }
-
-        Ok((encrypted, iv, tag))
+        Err(VaultError::CryptoUnavailable)
     }
 
     fn decrypt(
         &self,
-        encrypted_data: &[u8],
+        _encrypted_data: &[u8],
         key: &[u8],
         _iv: &[u8],
         _tag: &[u8],
@@ -185,13 +141,7 @@ impl VaultEncryption for ChaCha20Poly1305Encryption {
                 "Decryption key cannot be empty".to_string(),
             ));
         }
-        let mut decrypted = encrypted_data.to_vec();
-
-        for (i, byte) in decrypted.iter_mut().enumerate() {
-            *byte ^= key[(i + 1) % key.len()];
-        }
-
-        Ok(decrypted)
+        Err(VaultError::CryptoUnavailable)
     }
 
     fn name(&self) -> &str {
@@ -199,32 +149,22 @@ impl VaultEncryption for ChaCha20Poly1305Encryption {
     }
 }
 
-/// Kyber-1024 KEM (Post-Quantum)
+/// Kyber-1024 API marker; no KEM provider is currently integrated.
 pub struct Kyber1024Encryption;
 
 impl VaultEncryption for Kyber1024Encryption {
-    fn encrypt(&self, data: &[u8], key: &[u8]) -> Result<(Vec<u8>, Vec<u8>, Vec<u8>), VaultError> {
+    fn encrypt(&self, _data: &[u8], key: &[u8]) -> Result<(Vec<u8>, Vec<u8>, Vec<u8>), VaultError> {
         if key.is_empty() {
             return Err(VaultError::EncryptionError(
                 "Encryption key cannot be empty".to_string(),
             ));
         }
-        // Simulated Kyber-1024 encryption
-        let iv = vec![0u8; 32]; // Larger IV for post-quantum
-        let tag = vec![0u8; 32]; // Larger tag for post-quantum
-        let mut encrypted = data.to_vec();
-
-        // Simulated lattice-based encryption
-        for (i, byte) in encrypted.iter_mut().enumerate() {
-            *byte ^= key[(i * 2) % key.len()];
-        }
-
-        Ok((encrypted, iv, tag))
+        Err(VaultError::CryptoUnavailable)
     }
 
     fn decrypt(
         &self,
-        encrypted_data: &[u8],
+        _encrypted_data: &[u8],
         key: &[u8],
         _iv: &[u8],
         _tag: &[u8],
@@ -234,13 +174,7 @@ impl VaultEncryption for Kyber1024Encryption {
                 "Decryption key cannot be empty".to_string(),
             ));
         }
-        let mut decrypted = encrypted_data.to_vec();
-
-        for (i, byte) in decrypted.iter_mut().enumerate() {
-            *byte ^= key[(i * 2) % key.len()];
-        }
-
-        Ok(decrypted)
+        Err(VaultError::CryptoUnavailable)
     }
 
     fn name(&self) -> &str {
@@ -423,8 +357,40 @@ pub enum VaultError {
     EncryptionError(String),
     DecryptionError(String),
     InvalidKey,
+    CryptoUnavailable,
     VaultLocked,
     PermissionDenied(String),
+}
+
+#[cfg(test)]
+mod fail_closed_tests {
+    use super::{
+        Aes256GcmEncryption, ChaCha20Poly1305Encryption, Kyber1024Encryption, VaultEncryption,
+        VaultError,
+    };
+
+    #[test]
+    fn named_vault_algorithms_fail_closed_without_providers() {
+        let key = [1u8; 32];
+        let aes = Aes256GcmEncryption;
+        let chacha = ChaCha20Poly1305Encryption;
+        let kyber = Kyber1024Encryption;
+
+        for adapter in [
+            &aes as &dyn VaultEncryption,
+            &chacha as &dyn VaultEncryption,
+            &kyber as &dyn VaultEncryption,
+        ] {
+            assert!(matches!(
+                adapter.encrypt(b"secret", &key),
+                Err(VaultError::CryptoUnavailable)
+            ));
+            assert!(matches!(
+                adapter.decrypt(b"ciphertext", &key, b"nonce", b"tag"),
+                Err(VaultError::CryptoUnavailable)
+            ));
+        }
+    }
 }
 
 #[cfg(test_disabled)]

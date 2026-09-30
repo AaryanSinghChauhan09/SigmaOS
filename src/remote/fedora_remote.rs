@@ -59,13 +59,8 @@ impl FedoraCockpitRemoteBridge {
         user: &str,
         auth_token: &str,
     ) -> Result<u64, &'static str> {
-        if user.is_empty() || auth_token.is_empty() {
-            return Err("Cockpit: Invalid credentials");
-        }
-        self.state = CockpitSessionState::Active;
-        let sid = self.session_id;
-        self.session_id += 1;
-        Ok(sid)
+        let _ = (user, auth_token);
+        Err("Cockpit: Trusted authentication provider unavailable")
     }
 
     pub fn query_unit_status(&self, unit_name: &str) -> CockpitSystemdStatus {
@@ -180,21 +175,13 @@ impl FedoraFreeIpaKerberosAuth {
         principal: &str,
         password: &str,
     ) -> Result<KerberosTicket, &'static str> {
-        if password.is_empty() {
-            return Err("Kerberos: Password cannot be empty");
-        }
-
-        let ticket = KerberosTicket {
-            principal: principal.to_string(),
-            realm: self.realm_name.clone(),
-            valid_until_ts: 1700000000 + 86400,
-        };
-        self.active_ticket = Some(ticket.clone());
-        Ok(ticket)
+        let _ = (principal, password);
+        Err("Kerberos: Trusted KDC provider unavailable")
     }
 
     pub fn verify_gssapi_token(&self, token_bytes: &[u8]) -> bool {
-        self.active_ticket.is_some() && !token_bytes.is_empty()
+        let _ = token_bytes;
+        false
     }
 }
 
@@ -207,13 +194,12 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_cockpit_remote_bridge() {
+    fn test_cockpit_remote_bridge_fails_closed_without_auth_provider() {
         let mut cockpit = FedoraCockpitRemoteBridge::new(9090);
-        let sid = cockpit
+        assert!(cockpit
             .authenticate_session("admin", "<SIGMA_SESSION_TOKEN>")
-            .unwrap();
-        assert_eq!(sid, 1);
-        assert_eq!(cockpit.state, CockpitSessionState::Active);
+            .is_err());
+        assert_eq!(cockpit.state, CockpitSessionState::Disconnected);
 
         let status = cockpit.query_unit_status("sshd.service");
         assert_eq!(status.active_state, "active");
@@ -231,12 +217,12 @@ mod tests {
     }
 
     #[test]
-    fn test_freeipa_kerberos_auth() {
+    fn test_freeipa_kerberos_auth_fails_closed_without_kdc() {
         let mut ipa = FedoraFreeIpaKerberosAuth::new("FEDORA.LOCAL");
-        let ticket = ipa
+        assert!(ipa
             .kinit("admin@FEDORA.LOCAL", "<SIGMA_TEST_PASSWORD>")
-            .unwrap();
-        assert_eq!(ticket.realm, "FEDORA.LOCAL");
-        assert!(ipa.verify_gssapi_token(b"GSSAPI_TICKET_BLOB"));
+            .is_err());
+        assert!(ipa.active_ticket.is_none());
+        assert!(!ipa.verify_gssapi_token(b"GSSAPI_TICKET_BLOB"));
     }
 }

@@ -65,11 +65,21 @@ pub trait ClipboardSecurity {
 pub struct NoEncryption;
 
 impl ClipboardSecurity for NoEncryption {
-    fn secure(&self, content: &str, _level: SecurityLevel) -> Result<String, ClipboardError> {
+    fn secure(&self, content: &str, level: SecurityLevel) -> Result<String, ClipboardError> {
+        if level != SecurityLevel::None {
+            return Err(ClipboardError::EncryptionError(
+                "No audited clipboard encryption provider is available".to_string(),
+            ));
+        }
         Ok(content.to_string())
     }
 
-    fn unsecure(&self, content: &str, _level: SecurityLevel) -> Result<String, ClipboardError> {
+    fn unsecure(&self, content: &str, level: SecurityLevel) -> Result<String, ClipboardError> {
+        if level != SecurityLevel::None {
+            return Err(ClipboardError::DecryptionError(
+                "No audited clipboard encryption provider is available".to_string(),
+            ));
+        }
         Ok(content.to_string())
     }
 
@@ -78,48 +88,30 @@ impl ClipboardSecurity for NoEncryption {
     }
 }
 
-/// XOR encryption strategy
+/// Retained API marker for an insecure XOR prototype. It never encrypts.
 pub struct XorEncryption {
-    key: Vec<u8>,
+    _key: Vec<u8>,
 }
 
 impl XorEncryption {
     pub fn new(key: Vec<u8>) -> Self {
-        Self { key }
+        Self { _key: key }
     }
 }
 
 impl ClipboardSecurity for XorEncryption {
     fn secure(&self, content: &str, _level: SecurityLevel) -> Result<String, ClipboardError> {
-        if self.key.is_empty() {
-            return Err(ClipboardError::EncryptionError(
-                "Encryption key cannot be empty".to_string(),
-            ));
-        }
-        // Optimize: Use single-pass cycle + zip iterator chain to eliminate repeated modulo index divisions
-        let encrypted: Vec<u8> = content
-            .bytes()
-            .zip(self.key.iter().cycle())
-            .map(|(b, &k)| b ^ k)
-            .collect();
-        Ok(String::from_utf8(encrypted)
-            .map_err(|e| ClipboardError::EncodingError(e.to_string()))?)
+        let _ = content;
+        Err(ClipboardError::EncryptionError(
+            "XOR is not encryption; no audited clipboard provider is available".to_string(),
+        ))
     }
 
     fn unsecure(&self, content: &str, _level: SecurityLevel) -> Result<String, ClipboardError> {
-        if self.key.is_empty() {
-            return Err(ClipboardError::DecryptionError(
-                "Decryption key cannot be empty".to_string(),
-            ));
-        }
-        // Optimize: Use single-pass cycle + zip iterator chain to eliminate repeated modulo index divisions
-        let decrypted: Vec<u8> = content
-            .bytes()
-            .zip(self.key.iter().cycle())
-            .map(|(b, &k)| b ^ k)
-            .collect();
-        Ok(String::from_utf8(decrypted)
-            .map_err(|e| ClipboardError::EncodingError(e.to_string()))?)
+        let _ = content;
+        Err(ClipboardError::DecryptionError(
+            "XOR is not encryption; no audited clipboard provider is available".to_string(),
+        ))
     }
 
     fn name(&self) -> &str {
@@ -145,7 +137,7 @@ impl SecureClipboardManager {
             history: Vec::new(),
             max_history_size: 50,
             security,
-            default_security_level: SecurityLevel::Medium,
+            default_security_level: SecurityLevel::None,
             auto_clear_enabled: true,
             auto_clear_duration: Duration::from_secs(60), // 1 minute
         }
@@ -324,9 +316,8 @@ mod tests {
     #[test]
     fn test_xor_encryption() {
         let security = XorEncryption::new(vec![1, 2, 3]);
-        let secured = security.secure("test", SecurityLevel::Low).unwrap();
-        let unsecured = security.unsecure(&secured, SecurityLevel::Low).unwrap();
-        assert_eq!(unsecured, "test");
+        assert!(security.secure("test", SecurityLevel::Low).is_err());
+        assert!(security.unsecure("test", SecurityLevel::Low).is_err());
     }
 
     #[test]
@@ -347,5 +338,25 @@ mod tests {
             .unwrap();
         manager.clear();
         assert!(manager.paste().is_err());
+    }
+}
+
+#[cfg(test)]
+mod fail_closed_tests {
+    use super::{
+        ClipboardSecurity, NoEncryption, SecureClipboardManager, SecurityLevel, XorEncryption,
+    };
+    use std::string::ToString;
+
+    #[test]
+    fn plaintext_is_never_marked_as_encrypted() {
+        let mut manager = SecureClipboardManager::default();
+        manager
+            .copy("text".to_string(), super::ClipboardType::Text)
+            .unwrap();
+        assert!(!manager.is_encrypted());
+        assert!(NoEncryption.secure("text", SecurityLevel::High).is_err());
+        let xor = XorEncryption::new(vec![1, 2, 3]);
+        assert!(xor.secure("text", SecurityLevel::Low).is_err());
     }
 }

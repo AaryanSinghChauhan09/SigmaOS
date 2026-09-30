@@ -65,6 +65,9 @@ impl PQCContext {
         if self.key_pair.is_none() {
             return Err(PQCError::NoKeyPair);
         }
+        if message.is_empty() {
+            return Err(PQCError::InvalidSignature);
+        }
 
         let mut signature = Dilithium5Signature { data: [0u8; 2592] };
 
@@ -105,22 +108,18 @@ impl PQCContext {
         info: &[u8],
         okm: &mut [u8],
     ) -> Result<(), PQCError> {
-        if okm.is_empty() {
+        if okm.is_empty() || ikm.is_empty() {
             return Err(PQCError::InvalidOutputLength);
         }
 
         // In real implementation, would use SHA3-256 based HKDF
         // This is a stub that generates deterministic keys
-        let salt_bytes = if let Some(s) = salt {
-            s
-        } else {
-            &self.hkdf.salt
-        };
+        let salt_bytes = salt.filter(|s| !s.is_empty()).unwrap_or(&self.hkdf.salt);
 
         for i in 0..okm.len() {
             okm[i] = ikm[i % ikm.len()]
                 .wrapping_add(salt_bytes[i % salt_bytes.len()])
-                .wrapping_add(info[i % info.len()]);
+                .wrapping_add(info.get(i % info.len().max(1)).copied().unwrap_or(0));
         }
 
         self.operation_count.fetch_add(1, Ordering::SeqCst);
@@ -136,6 +135,33 @@ impl PQCContext {
     /// Get public key
     pub fn public_key(&self) -> Option<&[u8]> {
         self.key_pair.as_ref().map(|kp| &kp.public_key[..])
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{PQCContext, PQCError};
+
+    #[test]
+    fn signing_empty_message_returns_error_instead_of_panicking() {
+        let mut context = PQCContext::new();
+        context.generate_keypair().unwrap();
+
+        assert!(matches!(context.sign(&[]), Err(PQCError::InvalidSignature)));
+    }
+
+    #[test]
+    fn key_derivation_rejects_empty_inputs() {
+        let context = PQCContext::new();
+        let mut output = [0u8; 32];
+
+        assert!(matches!(
+            context.derive_key(b"", None, b"info", &mut output),
+            Err(PQCError::InvalidOutputLength)
+        ));
+        context
+            .derive_key(b"input", Some(b""), b"", &mut output)
+            .unwrap();
     }
 }
 

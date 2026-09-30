@@ -23,6 +23,9 @@ crypto is responsible for Cryptographic operations and encryption.
 - Commit hardcoded secrets or keys
 - Introduce memory safety violations
 - Break compatibility without documentation
+- Implement replacement ciphers, signatures, hashes, KDFs, password hashes, or CSPRNGs for production use
+- Return fabricated keys, signatures, ciphertext, authentication success, or cryptographic audit results
+- Treat a checksum, nonempty token, fixed byte prefix, timestamp, or hardware counter as authentication or secure entropy
 
 ## Open Source Inspiration
 
@@ -39,9 +42,10 @@ crypto is responsible for Cryptographic operations and encryption.
 ## Implementation Status
 
 ### Current State
-- **Implemented**: Core functionality is implemented
-- **In Progress**: Advanced features and optimizations
-- **Planned**: Additional distro compatibility layers
+- **Provider boundary**: Several crypto-shaped APIs are compatibility prototypes and return provider-unavailable errors. Their names do not establish cryptographic behavior.
+- **Implemented**: Only claim an algorithm after known-answer tests, provider review, correct key lifecycle, and call-path integration are verified.
+- **Unavailable**: Production-grade password hashing, signatures, key exchange, authenticated encryption, and CSPRNG integration remain unavailable unless a vetted provider is wired in and verified.
+- **Planned**: Provider integration, key management, and end-to-end runtime checks must be tracked as plans until complete.
 
 ### Testing
 - **Unit Tests**: Implemented for core functions
@@ -77,11 +81,15 @@ cargo fmt
 - Use safe Rust patterns
 - Prefer alloc:: over std:: for kernel code
 - Implement comprehensive error handling
+- Propagate provider-unavailable errors; never downgrade to plaintext or a deterministic fallback and never mark output encrypted or authenticated.
+- Check algorithm behavior with independent known-answer vectors, boundary lengths, malformed input, and tamper cases. Keep secret material out of logs and tests.
+- Update `wiki/07-Security.md`, `WIKI/07-Security.md`, and `COMPLETION_STATUS.md` with verified behavior and limitations.
 
 ## Known Issues
 
+- Vetted cryptographic providers and end-to-end key management are not integrated for multiple exposed APIs.
+- Many crypto-named modules are models or prototypes; do not present them as runtime security controls.
 - Integration with multi-distro compatibility layers
-- Performance optimization opportunities
 
 ## Future Roadmap
 

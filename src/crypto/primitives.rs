@@ -75,35 +75,25 @@ impl SHA256 {
                 offset += remaining;
             }
         }
-        self.total_len += data.len() as u64;
+        self.total_len = self.total_len.wrapping_add(data.len() as u64);
     }
 
     pub fn finalize(mut self) -> SHA256Hash {
         // Append padding
-        let bit_len = self.total_len * 8;
-        let padding = [
-            0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0,
-        ];
+        let bit_len = self.total_len.wrapping_mul(8);
 
-        let mut offset = 0;
-        while offset < padding.len() && self.buffer_len < 64 {
-            self.buffer[self.buffer_len] = padding[offset];
-            self.buffer_len += 1;
-            offset += 1;
-        }
+        self.buffer[self.buffer_len] = 0x80;
+        self.buffer_len += 1;
 
         if self.buffer_len > 56 {
+            self.buffer[self.buffer_len..].fill(0);
             self.process_block();
             self.buffer_len = 0;
         }
 
-        // Append length
+        self.buffer[self.buffer_len..56].fill(0);
         let len_bytes = bit_len.to_be_bytes();
-        for i in 0..8 {
-            self.buffer[56 + i] = len_bytes[i];
-        }
+        self.buffer[56..64].copy_from_slice(&len_bytes);
 
         self.process_block();
 
@@ -252,54 +242,30 @@ impl AES256Block {
 }
 
 /// AES-256 encryption
-pub struct AES256 {
-    round_keys: [u32; 60],
+pub struct AES256 {}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PrimitiveError {
+    ProviderNotIntegrated,
+    BufferLengthMismatch,
 }
 
 impl AES256 {
-    pub fn new(key: &AES256Key) -> Self {
-        let mut aes = AES256 {
-            round_keys: [0; 60],
-        };
-        aes.key_expansion(key);
-        aes
+    pub fn new(_key: &AES256Key) -> Self {
+        AES256 {}
     }
 
-    fn key_expansion(&mut self, key: &AES256Key) {
-        // Convert key to words
-        let mut key_words = [0u32; 8];
-        for i in 0..8 {
-            key_words[i] = u32::from_be_bytes([
-                key.data[i * 4],
-                key.data[i * 4 + 1],
-                key.data[i * 4 + 2],
-                key.data[i * 4 + 3],
-            ]);
-        }
-
-        // Key expansion (simplified)
-        for i in 0..8 {
-            self.round_keys[i] = key_words[i];
-        }
-
-        // In a real implementation, this would perform full AES key expansion
-        // For now, this is a placeholder
+    pub fn encrypt_block(&self, _block: &mut AES256Block) -> Result<(), PrimitiveError> {
+        Err(PrimitiveError::ProviderNotIntegrated)
     }
 
-    pub fn encrypt_block(&self, block: &mut AES256Block) {
-        // In a real implementation, this would perform AES encryption
-        // For now, this is a placeholder
-        let _ = block;
-    }
-
-    pub fn decrypt_block(&self, block: &mut AES256Block) {
-        // In a real implementation, this would perform AES decryption
-        // For now, this is a placeholder
-        let _ = block;
+    pub fn decrypt_block(&self, _block: &mut AES256Block) -> Result<(), PrimitiveError> {
+        Err(PrimitiveError::ProviderNotIntegrated)
     }
 }
 
-/// Random number generator (Xorshift)
+/// Deterministic xorshift generator for simulation only. Never use it for keys,
+/// nonces, authentication tokens, or other secrets.
 pub struct XorshiftRNG {
     state: [u64; 4],
 }
@@ -359,82 +325,93 @@ pub fn sha256_hash(data: &[u8]) -> SHA256Hash {
     hasher.finalize()
 }
 
-/// Generate random bytes with enhanced entropy collection
-pub fn random_bytes(buf: &mut [u8]) {
-    static mut RNG: Option<XorshiftRNG> = None;
-
-    unsafe {
-        if (*&raw mut RNG).is_none() {
-            // Enhanced entropy collection with multiple sources
-            let mut seed = 0u64;
-
-            // 1. Hardware entropy mixing via RDTSC Time Stamp Counter if on x86_64
-            #[cfg(target_arch = "x86_64")]
-            {
-                seed ^= core::arch::x86_64::_rdtsc() as u64;
-            }
-
-            // 2. Dynamic pointer-derived ASLR context mixing
-            let aslr_ptr = &raw const RNG as usize as u64;
-            seed ^= aslr_ptr;
-
-            // 3. Stack address entropy
-            let stack_var = 0u64;
-            let stack_ptr = &stack_var as *const _ as usize as u64;
-            seed ^= stack_ptr;
-
-            // 4. Additional chaotic mixing with prime constants
-            seed = seed
-                .wrapping_mul(0x5851f42d4c957f2d)
-                .wrapping_add(0xbf58476d1ce4e5b9)
-                .rotate_left(13);
-
-            // 5. Final mixing
-            seed = seed.wrapping_mul(0x94d049bb133111eb);
-
-            RNG = Some(XorshiftRNG::new(seed));
-        }
-
-        if let Some(ref mut rng) = RNG {
-            rng.fill_random(buf);
-        }
-    }
+/// Secure randomness is unavailable until a real entropy provider is wired in.
+pub fn random_bytes(_buf: &mut [u8]) -> Result<(), PrimitiveError> {
+    Err(PrimitiveError::ProviderNotIntegrated)
 }
 
 /// Generate random 256-bit key
-pub fn random_key() -> AES256Key {
-    let mut key = AES256Key::new();
-    random_bytes(&mut key.data);
-    key
+pub fn random_key() -> Result<AES256Key, PrimitiveError> {
+    Err(PrimitiveError::ProviderNotIntegrated)
 }
 
 /// XOR two byte arrays
-pub fn xor_bytes(a: &[u8], b: &[u8], out: &mut [u8]) {
-    for i in 0..out.len() {
-        out[i] = a[i] ^ b[i];
+pub fn xor_bytes(a: &[u8], b: &[u8], out: &mut [u8]) -> Result<(), PrimitiveError> {
+    if a.len() != b.len() || a.len() != out.len() {
+        return Err(PrimitiveError::BufferLengthMismatch);
     }
+    for ((out_byte, a_byte), b_byte) in out.iter_mut().zip(a).zip(b) {
+        *out_byte = *a_byte ^ *b_byte;
+    }
+    Ok(())
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
-    use super::*;
+    use super::{
+        random_bytes, random_key, sha256_hash, AES256Block, AES256Key, PrimitiveError, AES256,
+    };
 
     #[test]
-    fn test_primitives_dynamic_entropy() {
-        let key1 = random_key();
-        let mut key2 = AES256Key::new();
-        // Since random_bytes initializes RNG as a static mut thread-unsafe Option,
-        // let's confirm the bytes produced are initialized and filled.
-        random_bytes(&mut key2.data);
+    fn sha256_matches_standard_vectors_and_padding_boundaries() {
+        assert_eq!(
+            sha256_hash(b"").data,
+            [
+                0xe3, 0xb0, 0xc4, 0x42, 0x98, 0xfc, 0x1c, 0x14, 0x9a, 0xfb, 0xf4, 0xc8, 0x99, 0x6f,
+                0xb9, 0x24, 0x27, 0xae, 0x41, 0xe4, 0x64, 0x9b, 0x93, 0x4c, 0xa4, 0x95, 0x99, 0x1b,
+                0x78, 0x52, 0xb8, 0x55,
+            ]
+        );
+        assert_eq!(
+            sha256_hash(b"abc").data,
+            [
+                0xba, 0x78, 0x16, 0xbf, 0x8f, 0x01, 0xcf, 0xea, 0x41, 0x41, 0x40, 0xde, 0x5d, 0xae,
+                0x22, 0x23, 0xb0, 0x03, 0x61, 0xa3, 0x96, 0x17, 0x7a, 0x9c, 0xb4, 0x10, 0xff, 0x61,
+                0xf2, 0x00, 0x15, 0xad,
+            ]
+        );
+        assert_eq!(
+            sha256_hash(&[b'a'; 56]).data,
+            [
+                0xb3, 0x54, 0x39, 0xa4, 0xac, 0x6f, 0x09, 0x48, 0xb6, 0xd6, 0xf9, 0xe3, 0xc6, 0xaf,
+                0x0f, 0x5f, 0x59, 0x0c, 0xe2, 0x0f, 0x1b, 0xde, 0x70, 0x90, 0xef, 0x79, 0x70, 0x68,
+                0x6e, 0xc6, 0x73, 0x8a,
+            ]
+        );
+        assert_eq!(
+            sha256_hash(&[b'a'; 64]).data,
+            [
+                0xff, 0xe0, 0x54, 0xfe, 0x7a, 0xe0, 0xcb, 0x6d, 0xc6, 0x5c, 0x3a, 0xf9, 0xb6, 0x1d,
+                0x52, 0x09, 0xf4, 0x39, 0x85, 0x1d, 0xb4, 0x3d, 0x0b, 0xa5, 0x99, 0x73, 0x37, 0xdf,
+                0x15, 0x46, 0x68, 0xeb,
+            ]
+        );
+    }
 
-        // Verify key length is 32 bytes (256-bit)
-        assert_eq!(key1.data.len(), 32);
-        assert_eq!(key2.data.len(), 32);
+    #[test]
+    fn aes_and_random_key_apis_fail_without_provider() {
+        let cipher = AES256::new(&AES256Key::new());
+        let mut block = AES256Block::new();
+        let before = block.data;
+        assert_eq!(
+            cipher.encrypt_block(&mut block),
+            Err(PrimitiveError::ProviderNotIntegrated)
+        );
+        assert_eq!(
+            cipher.decrypt_block(&mut block),
+            Err(PrimitiveError::ProviderNotIntegrated)
+        );
+        assert_eq!(block.data, before);
 
-        // Verify the key data has been modified from default zero state
-        let all_zeros_1 = key1.data.iter().all(|&b| b == 0);
-        let all_zeros_2 = key2.data.iter().all(|&b| b == 0);
-        assert!(!all_zeros_1);
-        assert!(!all_zeros_2);
+        let mut bytes = [0xA5; 32];
+        assert_eq!(
+            random_bytes(&mut bytes),
+            Err(PrimitiveError::ProviderNotIntegrated)
+        );
+        assert_eq!(bytes, [0xA5; 32]);
+        assert!(matches!(
+            random_key(),
+            Err(PrimitiveError::ProviderNotIntegrated)
+        ));
     }
 }

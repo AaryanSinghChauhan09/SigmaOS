@@ -14,10 +14,47 @@
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
+use alloc::string::String;
+use alloc::vec;
 use alloc::vec::Vec;
 use core::fmt;
+
+/// Case-insensitive equality without allocation for ASCII text.
+#[inline]
+fn eq_ignore_case(haystack: &str, needle: &str) -> bool {
+    if haystack.is_ascii() && needle.is_ascii() {
+        haystack.eq_ignore_ascii_case(needle)
+    } else {
+        haystack.to_lowercase() == needle.to_lowercase()
+    }
+}
+
+/// Case-insensitive prefix check without allocation for ASCII text.
+#[inline]
+fn starts_with_ignore_case(haystack: &str, needle: &str) -> bool {
+    if haystack.is_ascii() && needle.is_ascii() {
+        haystack
+            .get(..needle.len())
+            .map_or(false, |prefix| prefix.eq_ignore_ascii_case(needle))
+    } else {
+        haystack.to_lowercase().starts_with(&needle.to_lowercase())
+    }
+}
+
+/// Case-insensitive substring search without allocation for ASCII text.
+#[inline]
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if haystack.is_ascii() && needle.is_ascii() {
+        needle.is_empty()
+            || (needle.len() <= haystack.len()
+                && haystack
+                    .as_bytes()
+                    .windows(needle.len())
+                    .any(|window| window.eq_ignore_ascii_case(needle.as_bytes())))
+    } else {
+        haystack.to_lowercase().contains(&needle.to_lowercase())
+    }
+}
 
 /// Application entry
 #[derive(Debug, Clone)]
@@ -56,28 +93,26 @@ impl AppEntry {
     }
 
     pub fn matches_query(&self, query: &str) -> bool {
-        let query = query.to_lowercase();
-
         // Check name
-        if self.name.to_lowercase().contains(&query) {
+        if contains_ignore_case(&self.name, query) {
             return true;
         }
 
         // Check description
-        if self.description.to_lowercase().contains(&query) {
+        if contains_ignore_case(&self.description, query) {
             return true;
         }
 
         // Check keywords
         for keyword in &self.keywords {
-            if keyword.to_lowercase().contains(&query) {
+            if contains_ignore_case(keyword, query) {
                 return true;
             }
         }
 
         // Check categories
         for category in &self.categories {
-            if category.to_lowercase().contains(&query) {
+            if contains_ignore_case(category, query) {
                 return true;
             }
         }
@@ -86,32 +121,28 @@ impl AppEntry {
     }
 
     pub fn fuzzy_score(&self, query: &str) -> i32 {
-        let query = query.to_lowercase();
-        let name = self.name.to_lowercase();
-
-        if name == query {
+        if eq_ignore_case(&self.name, query) {
             return 1000; // Exact match
         }
 
-        if name.starts_with(&query) {
+        if starts_with_ignore_case(&self.name, query) {
             return 900; // Prefix match
         }
 
-        if name.contains(&query) {
+        if contains_ignore_case(&self.name, query) {
             return 800; // Substring match
         }
 
         // Check word boundaries
-        let words: Vec<&str> = name.split_whitespace().collect();
-        for word in words {
-            if word.starts_with(&query) {
+        for word in self.name.split_whitespace() {
+            if starts_with_ignore_case(word, query) {
                 return 700; // Word start match
             }
         }
 
         // Keyword match
         for keyword in &self.keywords {
-            if keyword.to_lowercase().contains(&query) {
+            if contains_ignore_case(keyword, query) {
                 return 600;
             }
         }
@@ -306,12 +337,11 @@ impl AppLauncher {
     }
 
     pub fn search_commands(&self, query: &str) -> Vec<Command> {
-        let query = query.to_lowercase();
         let mut results = Vec::new();
 
         for command in &self.commands {
-            if command.name.to_lowercase().contains(&query)
-                || command.description.to_lowercase().contains(&query)
+            if contains_ignore_case(&command.name, query)
+                || contains_ignore_case(&command.description, query)
             {
                 results.push(command.clone());
             }
@@ -437,6 +467,14 @@ mod tests {
         assert_eq!(app.fuzzy_score("firefox browser"), 1000); // Exact
         assert_eq!(app.fuzzy_score("firefox"), 900); // Prefix
         assert!(app.fuzzy_score("fox") > 0); // Fuzzy
+    }
+
+    #[test]
+    fn search_preserves_unicode_case_insensitive_behavior() {
+        let app = AppEntry::new("Über Terminal", "/usr/bin/terminal");
+
+        assert!(app.matches_query("ÜB"));
+        assert_eq!(app.fuzzy_score("ÜBER TERMINAL"), 1000);
     }
 
     #[test]
