@@ -74,35 +74,13 @@ impl HashFunction for SimpleHashFunction {
     fn id(&self) -> HashID {
         self.id
     }
+
     fn algorithm(&self) -> HashAlgorithm {
-        self.algorithm
-        unsafe {
-            core::mem::transmute::<usize, HashAlgorithm>(self.algorithm.load(Ordering::SeqCst))
         unsafe {
             core::mem::transmute::<usize, HashAlgorithm>(self.algorithm.load(Ordering::SeqCst))
         }
     }
-    fn hash_size(&self) -> usize {
-        32
-    }
-    fn id(&self) -> HashID { self.id }
-    fn algorithm(&self) -> HashAlgorithm { unsafe { core::mem::transmute::<usize, HashAlgorithm>(self.algorithm.load(Ordering::SeqCst)) } }
-    fn hash_size(&self) -> usize { 32 }
 
-    fn compute(&self, data: &[u8]) -> Result<Vec<u8>, HashError> {
-        let mut hash = Vec::new();
-        let mut digest: usize = 0;
-        let mult = self.multiplier.load(Ordering::SeqCst);
-        let offset = self.offset_factor.load(Ordering::SeqCst);
-
-        for &byte in data {
-            digest = digest.wrapping_add(byte as usize);
-            digest = digest.wrapping_mul(mult);
-        }
-        unsafe {
-            core::mem::transmute::<usize, HashAlgorithm>(self.algorithm.load(Ordering::SeqCst))
-        }
-    }
     fn hash_size(&self) -> usize {
         32
     }
@@ -213,21 +191,7 @@ impl SimpleHMAC {
 }
 
 impl HMAC for SimpleHMAC {
-    fn compute_hmac(
-        &self,
-        key: &[u8],
-        data: &[u8],
-        algorithm: HashAlgorithm,
-    ) -> Result<Vec<u8>, HashError> {
-        Err(HashError::ProviderUnavailable)
-        key: &[u8],
-        data: &[u8],
-        algorithm: HashAlgorithm,
-    ) -> Result<Vec<u8>, HashError> {
     fn compute_hmac(&self, key: &[u8], data: &[u8], algorithm: HashAlgorithm) -> Result<Vec<u8>, HashError> {
-        let mut combined = Vec::new();
-        for &byte in key { combined.push(byte); }
-        for &byte in data { combined.push(byte); }
         let mut combined = Vec::new();
         for &byte in key {
             combined.push(byte);
@@ -278,13 +242,6 @@ impl HashVerification for SimpleHashVerification {
     }
 }
 
-struct VecImpl<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> VecImpl<T> {
-    fn new() -> Self { VecImpl { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
 struct VecImpl<T> {
     data: *mut T,
     len: usize,
@@ -311,11 +268,6 @@ impl<T> VecImpl<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
         let new_capacity = if self.capacity == 0 {
             4
         } else {
@@ -334,10 +286,6 @@ impl<T> VecImpl<T> {
         }
     }
 }
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
-
 
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
