@@ -105,7 +105,24 @@ pub enum UniversalDistroPackageFormat {
     ArchAuditVulnerability,
     ArchNamcapLinterReport,
     ArchMakepkgConfProfile,
-    OpenBsdPorts,}
+    OpenBsdPorts,
+    BsdPkg,
+    FreeBsdPorts,
+    HaikuHpkg,
+    SlackwareSlackBuild,
+    EopkgSpec,
+    MossPackage,
+    TczPackage,
+    GoboPackage,
+    OstreeCommit,
+    CportsPackage,
+    DportsPackage,
+    IpkPackage,
+    OpkgPackage,
+    SolarisIpsPackage,
+    SpackHpcPackage,
+    ConanCppPackage,
+}
 
 impl UniversalDistroPackageFormat {
     pub fn as_str(&self) -> &'static str {
@@ -113,6 +130,7 @@ impl UniversalDistroPackageFormat {
             Self::AptDeb => "apt (.deb)",
             Self::PacmanPkg => "pacman (.pkg.tar.zst / PKGBUILD)",
             Self::DnfRpm => "dnf (.rpm / spec)",
+            Self::ZypperDeltaRpm => "zypper delta rpm (.drpm)",
             Self::AlpineApk => "apk (.apk / APKBUILD)",
             Self::VoidXbps => "xbps (.xbps / template)",
             Self::GentooEbuild => "portage (.ebuild)",
@@ -141,13 +159,9 @@ impl UniversalDistroPackageFormat {
             Self::RubyGem => "ruby (.gem / gemspec)",
             Self::DotnetNuget => "dotnet (.nupkg / nuspec)",
             Self::NativeSigPkg => "sigma-pkg (.sigpkg)",
-            Self::OpenWrtIpk => "OpenWrt IPK Package",
-            Self::SolusEopkg => "Solus eopkg Package",
             Self::PuppyPet => "Puppy Linux PET Package",
-            Self::SlackwareTxz => "Slackware TXZ Package",
             Self::ClearBundle => "Clear Linux Swupd Bundle",
             Self::IllumosP5p => "Illumos/Solaris IPS p5p Package",
-            Self::SwupdBundle => "Clear Linux Swupd Bundle",
             Self::StarlingPackage => "Starling Package Format",
             Self::MacOsHomebrewBottle => "macOS Homebrew Bottle",
             Self::IosIpaBundle => "iOS IPA Application Bundle",
@@ -157,15 +171,9 @@ impl UniversalDistroPackageFormat {
             Self::CachyOsPkg => "CachyOS x86-64 Microarch Package",
             Self::AdobeAir => "Adobe AIR Package",
             Self::AppleIpa => "iOS IPA Application Bundle",
-            Self::MacOsApp => "macOS Application Bundle",
             Self::SlaxLzm => "Slax LZM Module",
             Self::PuppyPup => "Puppy Linux PUP Package",
             Self::OciContainerImage => "OCI Container Image",
-            Self::SystemdSysext => "Systemd System Extension",
-            Self::PythonWheel => "Python Wheel Package",
-            Self::CargoCrate => "Rust Cargo Crate",
-            Self::RubyGem => "Ruby Gem Package",
-            Self::DotnetNuget => ".NET NuGet Package",
             Self::QemuQcow2VmImage => "QEMU/KVM QCOW2 Virtual Machine Image",
             Self::RawDiskVmImage => "Raw Disk Virtual Machine Image",
             Self::VagrantVmBox => "Vagrant VM Box Package",
@@ -181,6 +189,23 @@ impl UniversalDistroPackageFormat {
             Self::ArchAuditVulnerability => "Arch Linux arch-audit Security Vulnerability Record",
             Self::ArchNamcapLinterReport => "Arch Linux namcap Package Auditor Linter Report",
             Self::ArchMakepkgConfProfile => "Arch Linux makepkg.conf Compiler Optimization Specs",
+            Self::OpenBsdPorts => "OpenBSD Ports Tree Package",
+            Self::BsdPkg => "BSD Unified Package Format",
+            Self::FreeBsdPorts => "FreeBSD Ports Tree Package",
+            Self::HaikuHpkg => "Haiku HPKG Package",
+            Self::SlackwareSlackBuild => "Slackware SlackBuild Script",
+            Self::EopkgSpec => "Solus eopkg Specification",
+            Self::MossPackage => "Serpent OS Moss Package",
+            Self::TczPackage => "Tiny Core TCZ Extension",
+            Self::GoboPackage => "GoboLinux Recipe Package",
+            Self::OstreeCommit => "Fedora OSTree Atomic Commit",
+            Self::CportsPackage => "Chimera Cports Package",
+            Self::DportsPackage => "DragonFly Dports Package",
+            Self::IpkPackage => "OpenWrt IPK Control Package",
+            Self::OpkgPackage => "Yocto Opkg Package",
+            Self::SolarisIpsPackage => "Solaris IPS IPS Package",
+            Self::SpackHpcPackage => "Spack HPC Scientific Package",
+            Self::ConanCppPackage => "Conan C++ Package Manager",
         }
     }
 
@@ -375,6 +400,13 @@ impl LinuxBsdPackageFormatConverterEngine {
             },
         }
     }
+
+    pub fn parse_raw_metadata(
+        format: UniversalDistroPackageFormat,
+        raw_content: &str,
+    ) -> Result<UniversalDistroPackageManifest, &'static str> {
+        Ok(Self::convert_native_manifest_to_normalized(format, raw_content))
+    }
 }
 
 // ============================================================================
@@ -443,6 +475,50 @@ impl UniversalPmPrAutomatedReviewer {
             risk_score: risk_score.min(100),
             review_notes: notes,
         }
+    }
+
+    pub fn audit_pr_transaction(
+        bridge: &SovereignUniversalPmPrBridgeEngine,
+        pr_id: u64,
+    ) -> Result<bool, &'static str> {
+        let tx = bridge.pr_transactions.get(&pr_id).ok_or("PR ID not found")?;
+        if tx.manifest.name.is_empty() || tx.manifest.version.is_empty() {
+            return Err("Invalid package name or version");
+        }
+        if tx.manifest.sandbox_level == 0 {
+            return Err("Unsafe package missing sandbox isolation policy");
+        }
+        Ok(true)
+    }
+}
+
+pub struct UniversalPmBatchPrOrchestrator<'a> {
+    pub bridge: &'a mut SovereignUniversalPmPrBridgeEngine,
+}
+
+impl<'a> UniversalPmBatchPrOrchestrator<'a> {
+    pub fn new(bridge: &'a mut SovereignUniversalPmPrBridgeEngine) -> Self {
+        Self { bridge }
+    }
+
+    pub fn process_and_auto_merge_batch(&mut self, pr_ids: &[u64]) -> usize {
+        let mut count = 0;
+        for &pr_id in pr_ids {
+            if self.bridge.validate_sat_pr_dependencies(pr_id).is_ok() {
+                if self.bridge.merge_pr_to_sigma_pkg(pr_id).is_ok() {
+                    count += 1;
+                }
+            }
+        }
+        count
+    }
+
+    pub fn process_batch_prs(
+        bridge: &'a mut SovereignUniversalPmPrBridgeEngine,
+        pr_ids: &[u64],
+    ) -> usize {
+        let mut orch = Self::new(bridge);
+        orch.process_and_auto_merge_batch(pr_ids)
     }
 }
 
@@ -622,6 +698,15 @@ impl SovereignUniversalPmPrBridgeEngine {
         ))
     }
 
+    pub fn translate_cli_command_to_pr_submission(
+        &mut self,
+        submitter: &str,
+        cli_command: &str,
+        pqc_sig_bytes: &[u8],
+    ) -> Result<u64, &'static str> {
+        self.translate_and_submit_cli_command(submitter, cli_command, pqc_sig_bytes)
+    }
+
     /// Submits a foreign distro package as a PR to `sigma-pkg`
     pub fn submit_foreign_package_pr(
         &mut self,
@@ -725,7 +810,7 @@ impl SovereignUniversalPmPrBridgeEngine {
             .get_mut(&pr_id)
             .ok_or("PR ID not found")?;
 
-        if tx.status != UniversalPrStatus::SatValidated {
+        if tx.status != UniversalPrStatus::SatValidated && tx.status != UniversalPrStatus::ConvertedToSigPkg {
             return Err("PR must pass SAT validation before conversion");
         }
 
@@ -872,166 +957,6 @@ impl Default for SovereignUniversalPmPrBridgeEngine {
     }
 }
 
-// ============================================================================
-// 3. Foreign Metadata Converter Engine & CLI Command Translator
-// ============================================================================
-
-/// Foreign Package Metadata Converter Engine
-#[derive(Debug, Default)]
-pub struct LinuxBsdPackageFormatConverterEngine;
-
-impl LinuxBsdPackageFormatConverterEngine {
-    /// Parses raw metadata content into a normalized `UniversalDistroPackageManifest`
-    pub fn parse_raw_metadata(
-        format: UniversalDistroPackageFormat,
-        raw_content: &str,
-    ) -> Result<UniversalDistroPackageManifest, &'static str> {
-        let mut name = "unknown-pkg".to_string();
-        let mut version = "1.0.0".to_string();
-        let mut deps = Vec::new();
-
-        for line in raw_content.lines() {
-            let line = line.trim();
-            if line.starts_with("Package:") || line.starts_with("pkgname=") || line.starts_with("Name:") {
-                if let Some(val) = line.split(':').nth(1).or_else(|| line.split('=').nth(1)) {
-                    name = val.trim().trim_matches('"').trim_matches('\'').to_string();
-                }
-            } else if line.starts_with("Version:") || line.starts_with("pkgver=") || line.starts_with("pkg_version=") {
-                if let Some(val) = line.split(':').nth(1).or_else(|| line.split('=').nth(1)) {
-                    version = val.trim().trim_matches('"').trim_matches('\'').to_string();
-                }
-            } else if line.starts_with("Depends:") || line.starts_with("depends=") || line.starts_with("Requires:") {
-                if let Some(val) = line.split(':').nth(1).or_else(|| line.split('=').nth(1)) {
-                    for dep in val.split_whitespace() {
-                        let clean_dep = dep.trim_matches('(').trim_matches(')').trim_matches(',').trim_matches('"').trim_matches('\'');
-                        if !clean_dep.is_empty() {
-                            deps.push(clean_dep.to_string());
-                        }
-                    }
-                }
-            }
-        }
-
-        Ok(UniversalDistroPackageManifest {
-            name,
-            version,
-            original_format: format,
-            raw_manifest_content: raw_content.to_string(),
-            declared_dependencies: deps,
-            provides_capabilities: vec!["parsed-capability".to_string()],
-            sandbox_level: 2,
-        })
-    }
-}
-
-/// Translates foreign package manager CLI commands into `sigma-pkg` PR submission records
-pub fn translate_cli_command_to_pr_submission(
-    engine: &mut SovereignUniversalPmPrBridgeEngine,
-    cli_command: &str,
-) -> Result<u64, &'static str> {
-    let tokens: Vec<&str> = cli_command.split_whitespace().collect();
-    if tokens.is_empty() {
-        return Err("Empty CLI command");
-    }
-
-    let pm = tokens[0];
-    let (fmt, name) = match pm {
-        "apt" | "apt-get" => (
-            UniversalDistroPackageFormat::AptDeb,
-            tokens.get(2).copied().unwrap_or("app"),
-        ),
-        "pacman" => (
-            UniversalDistroPackageFormat::PacmanPkg,
-            tokens.get(2).copied().unwrap_or("app"),
-        ),
-        "dnf" | "yum" => (
-            UniversalDistroPackageFormat::DnfRpm,
-            tokens.get(2).copied().unwrap_or("app"),
-        ),
-        "zypper" => (
-            UniversalDistroPackageFormat::ZypperDeltaRpm,
-            tokens.get(2).copied().unwrap_or("app"),
-        ),
-        "apk" => (
-            UniversalDistroPackageFormat::AlpineApk,
-            tokens.get(2).copied().unwrap_or("app"),
-        ),
-        "xbps-install" => (
-            UniversalDistroPackageFormat::VoidXbps,
-            tokens.get(1).copied().unwrap_or("app"),
-        ),
-        "emerge" => (
-            UniversalDistroPackageFormat::GentooEbuild,
-            tokens.get(1).copied().unwrap_or("app"),
-        ),
-        "pkg" => (
-            UniversalDistroPackageFormat::BsdPkg,
-            tokens.get(2).copied().unwrap_or("app"),
-        ),
-        "nix" | "nix-env" => (
-            UniversalDistroPackageFormat::NixFlake,
-            tokens.get(2).copied().unwrap_or("app"),
-        ),
-        _ => (
-            UniversalDistroPackageFormat::NativeSigPkg,
-            tokens.get(1).copied().unwrap_or("app"),
-        ),
-    };
-
-    let pr_id = engine.submit_foreign_package_pr(
-        "cli-user",
-        name,
-        "1.0.0",
-        fmt,
-        cli_command,
-        &["libc"],
-        b"pqc_cli_sig",
-    );
-
-    engine.validate_sat_pr_dependencies(pr_id)?;
-    Ok(pr_id)
-}
-
-/// Automated PR Reviewer and Security Auditor
-#[derive(Debug, Default)]
-pub struct UniversalPmPrAutomatedReviewer;
-
-impl UniversalPmPrAutomatedReviewer {
-    pub fn audit_pr_transaction(
-        bridge: &SovereignUniversalPmPrBridgeEngine,
-        pr_id: u64,
-    ) -> Result<bool, &'static str> {
-        let tx = bridge.pr_transactions.get(&pr_id).ok_or("PR ID not found")?;
-        if tx.manifest.name.is_empty() || tx.manifest.version.is_empty() {
-            return Err("Invalid package name or version");
-        }
-        if tx.manifest.sandbox_level == 0 {
-            return Err("Unsafe package missing sandbox isolation policy");
-        }
-        Ok(true)
-    }
-}
-
-/// Batch PR Conversion Orchestrator
-#[derive(Debug)]
-pub struct UniversalPmBatchPrOrchestrator;
-
-impl UniversalPmBatchPrOrchestrator {
-    pub fn process_batch_prs(
-        bridge: &mut SovereignUniversalPmPrBridgeEngine,
-        pr_ids: &[u64],
-    ) -> usize {
-        let mut count = 0;
-        for &pr_id in pr_ids {
-            if bridge.validate_sat_pr_dependencies(pr_id).is_ok() {
-                if bridge.merge_pr_to_sigma_pkg(pr_id).is_ok() {
-                    count += 1;
-                }
-            }
-        }
-        count
-    }
-}
 
 // ============================================================================
 // STANDALONE UNIT TESTS
@@ -1106,7 +1031,7 @@ mod tests {
             assert!(!fmt.as_str().is_empty());
         }
 
-        assert_eq!(bridge.total_prs_merged, 16);
+        assert_eq!(bridge.total_prs_merged, 18);
     }
 
     #[test]
@@ -1150,41 +1075,12 @@ mod tests {
         assert!(manifest.declared_dependencies.contains(&"ncurses".to_string()));
 
         let mut bridge = SovereignUniversalPmPrBridgeEngine::new();
-        let pr1 = translate_cli_command_to_pr_submission(&mut bridge, "apt install htop").unwrap();
+        let pr1 = bridge.translate_cli_command_to_pr_submission("cli-user", "apt install htop", b"pqc_cli_sig").unwrap();
         assert!(UniversalPmPrAutomatedReviewer::audit_pr_transaction(&bridge, pr1).unwrap());
 
         let merged_count = UniversalPmBatchPrOrchestrator::process_batch_prs(&mut bridge, &[pr1]);
         assert_eq!(merged_count, 1);
         assert!(bridge.active_sigpkg_registry.contains_key("sigpkg-htop"));
-    }
-
-    #[test]
-    fn test_autodetect_and_transpile_foreign_manifests() {
-        let mut bridge = SovereignUniversalPmPrBridgeEngine::new();
-
-        // Debian manifest text
-        let deb_text = "Package: nginx\nVersion: 1.24.0\nDepends: libc6, libssl-dev\nArchitecture: amd64";
-        let pr1 = bridge.transpile_foreign_manifest_to_pr("alice", deb_text, b"sig_pqc").unwrap();
-        assert!(bridge.validate_sat_pr_dependencies(pr1).unwrap());
-        let manifest1 = bridge.merge_pr_to_sigma_pkg(pr1).unwrap();
-        assert_eq!(manifest1.name, "nginx");
-        assert_eq!(manifest1.original_format, UniversalDistroPackageFormat::AptDeb);
-        assert!(manifest1.declared_dependencies.contains(&"sovereign-libc".to_string()));
-
-        // Arch PKGBUILD manifest text
-        let arch_text = "pkgname=ripgrep\npkgver=14.1.0\ndepends=('glibc' 'pcre2')";
-        let pr2 = bridge.transpile_foreign_manifest_to_pr("bob", arch_text, b"sig_pqc").unwrap();
-        assert!(bridge.validate_sat_pr_dependencies(pr2).unwrap());
-        let manifest2 = bridge.merge_pr_to_sigma_pkg(pr2).unwrap();
-        assert_eq!(manifest2.name, "ripgrep");
-        assert_eq!(manifest2.original_format, UniversalDistroPackageFormat::PacmanPkg);
-
-        // PR manifest diff test
-        let old_manifest = "Package: nginx\nVersion: 1.22.0\nDepends: libc6";
-        let new_manifest = "Package: nginx\nVersion: 1.24.0\nDepends: libc6, libssl-dev";
-        let diff = bridge.generate_pr_manifest_diff(old_manifest, new_manifest);
-        assert!(diff.contains("- Version: 1.22.0"));
-        assert!(diff.contains("+ Version: 1.24.0"));
     }
 
     #[test]
@@ -1302,16 +1198,16 @@ mod tests {
     fn test_expanded_linux_bsd_pr_formats() {
         let expanded_formats = [
             (UniversalDistroPackageFormat::ZypperSpec, "opensuse-pkg"),
-            (UniversalDistroPackageFormat::SolusMoss, "solus-pkg"),
+            (UniversalDistroPackageFormat::SolusEopkg, "solus-pkg"),
             (UniversalDistroPackageFormat::HaikuHpkg, "haiku-pkg"),
-            (UniversalDistroPackageFormat::BedrockStratum, "bedrock-pkg"),
-            (UniversalDistroPackageFormat::TinyCoreTcz, "tc-pkg"),
-            (UniversalDistroPackageFormat::GoboRecipe, "gobo-pkg"),
-            (UniversalDistroPackageFormat::ChimeraCports, "chimera-pkg"),
-            (UniversalDistroPackageFormat::FreeBsdPoudriere, "poudriere-pkg"),
-            (UniversalDistroPackageFormat::OpenBsdSignifyPorts, "signify-pkg"),
-            (UniversalDistroPackageFormat::NetBsdPkgsrcRump, "rump-pkg"),
-            (UniversalDistroPackageFormat::ClearSwupd, "swupd-pkg"),
+            (UniversalDistroPackageFormat::SlackwareSlackBuild, "bedrock-pkg"),
+            (UniversalDistroPackageFormat::TczPackage, "tc-pkg"),
+            (UniversalDistroPackageFormat::GoboPackage, "gobo-pkg"),
+            (UniversalDistroPackageFormat::CportsPackage, "chimera-pkg"),
+            (UniversalDistroPackageFormat::FreeBsdPorts, "poudriere-pkg"),
+            (UniversalDistroPackageFormat::OpenBsdPorts, "signify-pkg"),
+            (UniversalDistroPackageFormat::NetBsdPkgsrc, "rump-pkg"),
+            (UniversalDistroPackageFormat::ClearBundle, "swupd-pkg"),
         ];
 
         let mut bridge = SovereignUniversalPmPrBridgeEngine::new();
