@@ -191,6 +191,16 @@ pub use process_monitor::{
 pub use module_loading_control::{
     ModuleLoadingState, ModuleLoadingPolicy, KernelModule as ModuleLoadingKernelModule, ModuleLoadingRule,
     KernelModuleLoadingController,
+    KernelModule as ModuleLoadingKernelModule, KernelModuleLoadingController, ModuleLoadingPolicy,
+    ModuleLoadingRule, ModuleLoadingState,
+};
+pub use process::{Process, ProcessState as KernelProcessState};
+pub use process_monitor::{
+    MonitoredProcessState, ProcessEntry, ProcessFilter, ProcessMonitor, ProcessSortField,
+    ProcessTreeNode,
+};
+pub use scheduler::{
+    CfsScheduler, Priority, ProcessState, ProcessTask, RtScheduler, SchedulerPolicy, ThermalState,
 };
 
 pub mod procfs_linux;

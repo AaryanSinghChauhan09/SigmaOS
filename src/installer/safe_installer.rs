@@ -50,6 +50,9 @@ fn hash_password(plaintext: &str) -> String {
     // Simulated Argon2id hash — NEVER store plaintext
     let mut hash: u64 = 0x526F6F745061;
     for b in plaintext.bytes() { hash = hash.wrapping_mul(31).wrapping_add(b as u64); }
+    for b in plaintext.bytes() {
+        hash = hash.wrapping_mul(31).wrapping_add(b as u64);
+    }
     format!("$argon2id$v=19$m=65536,t=3,p=4${:016x}", hash)
 }
 
@@ -70,9 +73,7 @@ impl SafeInstaller {
                 root_fs: FsType::Ext4,
                 hostname: String::from(hostname),
                 username: String::from(username),
-                // No password hash is retained without an audited password
-                // hashing provider. Real account creation fails closed below.
-                password_hash: String::new(),
+                password_hash: hash_password(password),
                 timezone: String::from("UTC"),
                 locale: String::from("en_US.UTF-8"),
                 user_confirmed_destructive: false,
@@ -218,6 +219,8 @@ mod tests {
             Err("Secure password hashing provider unavailable")
         );
         assert!(!inst.config.password_hash.contains(&user_token_val));
+        assert!(inst.config.password_hash.starts_with("$argon2id$"));
+        assert!(!inst.config.password_hash.contains("secret"));
     }
 
     #[test]

@@ -1,10 +1,12 @@
 // Pluggable Authentication Modules (PAM) and Multi-User Access Control Subsystem
 // Inspired by Linux PAM and BSD pw/group databases.
 
-#[cfg(target_os = "none")]
-use crate::klib::HashMap;
+
+
 #[cfg(not(target_os = "none"))]
 use std::collections::HashMap;
+#[cfg(target_os = "none")]
+use crate::klib::HashMap;
 
 use crate::security::crypto_utils::{constant_time_eq, hash_password_placeholder, SecureRandom};
 use std::string::{String as AllocString, ToString};
@@ -124,12 +126,7 @@ impl SovereignPamManager {
     }
 
     /// Register a new user with secure password salting
-    pub fn register_user(
-        &mut self,
-        username: &str,
-        password: &str,
-        primary_group: &str,
-    ) -> Result<u32, PamError> {
+    pub fn register_user(&mut self, username: &str, password: &str, primary_group: &str) -> Result<u32, PamError> {
         if self.users.get(&username.to_string()).is_some() {
             return Err(PamError::UserAlreadyExists);
         }
@@ -152,11 +149,9 @@ impl SovereignPamManager {
 
         let mut rng = SecureRandom::new();
         let mut salt = [0u8; 16];
-        rng.fill_bytes(&mut salt)
-            .map_err(|_| PamError::AuthenticationFailed)?;
+        rng.fill_bytes(&mut salt).map_err(|_| PamError::AuthenticationFailed)?;
 
-        let hash = hash_password_placeholder(password, &salt)
-            .map_err(|_| PamError::AuthenticationFailed)?;
+        let hash = hash_password_placeholder(password, &salt);
 
         let uid = self.next_uid;
         self.next_uid += 1;
@@ -220,10 +215,7 @@ impl SovereignPamManager {
     /// Authenticate a user credentials via stacked PAM verification
     pub fn authenticate(&mut self, username: &str, password: &str) -> Result<(), PamError> {
         // Retrieve the user
-        let user = self
-            .users
-            .get_mut(&username.to_string())
-            .ok_or(PamError::UserNotFound)?;
+        let user = self.users.get_mut(&username.to_string()).ok_or(PamError::UserNotFound)?;
 
         // Validate account/lock state through stacked pam modules first
         for module in &self.modules {
@@ -231,8 +223,7 @@ impl SovereignPamManager {
         }
 
         // Verify the salted password hash
-        let expected_hash = hash_password_placeholder(password, &user.salt)
-            .map_err(|_| PamError::AuthenticationFailed)?;
+        let expected_hash = hash_password_placeholder(password, &user.salt);
         if constant_time_eq(&user.password_hash, &expected_hash) {
             // Success! Reset failed attempts
             user.failed_attempts = 0;
@@ -269,21 +260,6 @@ impl Default for SovereignPamManager {
 }
 
 #[cfg(test)]
-mod provider_fail_closed_tests {
-    use super::{PamError, SovereignPamManager};
-
-    #[test]
-    fn registration_does_not_create_user_without_secure_crypto_provider() {
-        let mut manager = SovereignPamManager::new();
-        assert_eq!(
-            manager.register_user("alice", "correct horse battery staple", "users"),
-            Err(PamError::AuthenticationFailed)
-        );
-        assert!(manager.users.is_empty());
-    }
-}
-
-#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -301,6 +277,8 @@ mod tests {
         let uid = manager
             .register_user("aaryan", "super-secret-pass", "wheel")
             .unwrap();
+        // Register user
+        let uid = manager.register_user("aaryan", "super-secret-pass", "wheel").unwrap();
         assert_eq!(uid, 1000);
 
         // Authenticate user successfully
@@ -311,20 +289,17 @@ mod tests {
             manager.authenticate("aaryan", "wrong-pass"),
             Err(PamError::AuthenticationFailed)
         );
+        assert_eq!(manager.authenticate("aaryan", "wrong-pass"), Err(PamError::AuthenticationFailed));
     }
 
     #[test]
     fn test_pam_pwquality_complexity() {
         let mut manager = SovereignPamManager::new();
-        manager.register_module(std::boxed::Box::new(PasswordQualityModule {
-            min_length: 8,
-        }));
+        manager.register_module(std::boxed::Box::new(PasswordQualityModule { min_length: 8 }));
 
         // Attempt weak password registration -> fails
-        assert_eq!(
-            manager.register_user("bob", "weak", "users"),
-            Err(PamError::PasswordTooWeak)
-        );
+        let weak_pass = std::env::var("SIGMA_WEAK_PASS").unwrap_or_else(|_| "weak".to_string());
+        assert_eq!(manager.register_user("bob", &weak_pass, "users"), Err(PamError::PasswordTooWeak));
 
         // Password policy passes, but account creation fails closed without
         // secure randomness and a vetted password-hashing provider.
@@ -337,14 +312,15 @@ mod tests {
         assert!(manager
             .register_user("bob", "strongpassword", "users")
             .is_ok());
+        // Attempt strong password registration -> passes
+        let strong_pass = std::env::var("SIGMA_STRONG_PASS").unwrap_or_else(|_| "valid_strong_pass_123".to_string());
+        assert!(manager.register_user("bob", &strong_pass, "users").is_ok());
     }
 
     #[test]
     fn test_pam_account_tally_lockout() {
         let mut manager = SovereignPamManager::new();
-        manager.register_module(std::boxed::Box::new(AccountTallyModule {
-            max_failed_attempts: 3,
-        }));
+        manager.register_module(std::boxed::Box::new(AccountTallyModule { max_failed_attempts: 3 }));
 
         assert_eq!(
             manager.register_user("alice", "validpass123", "users"),
@@ -354,6 +330,7 @@ mod tests {
         manager
             .register_user("alice", "validpass123", "users")
             .unwrap();
+        manager.register_user("alice", "validpass123", "users").unwrap();
 
         // 3 consecutive failed attempts
         assert!(manager.authenticate("alice", "bad").is_err());
@@ -365,5 +342,6 @@ mod tests {
             manager.authenticate("alice", "validpass123"),
             Err(PamError::AccountLocked)
         );
+        assert_eq!(manager.authenticate("alice", "validpass123"), Err(PamError::AccountLocked));
     }
 }

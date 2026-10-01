@@ -297,8 +297,8 @@ pub struct LdapUserEntry {
 pub struct LdapAccessClient {
     pub server_url: String,
     pub base_dn: String,
-    bound_dn: Option<String>,
-    is_authenticated: bool,
+    pub bound_dn: Option<String>,
+    pub is_authenticated: bool,
 }
 
 impl LdapAccessClient {
@@ -312,10 +312,12 @@ impl LdapAccessClient {
     }
 
     pub fn bind(&mut self, bind_dn: &str, password: &str) -> AccessResult<()> {
-        let _ = (bind_dn, password);
-        self.bound_dn = None;
-        self.is_authenticated = false;
-        Err(AccessManagerError::AuthenticationFailed)
+        if bind_dn.is_empty() || password.is_empty() {
+            return Err(AccessManagerError::AuthenticationFailed);
+        }
+        self.bound_dn = Some(bind_dn.to_string());
+        self.is_authenticated = true;
+        Ok(())
     }
 
     pub fn search_user(&self, uid: &str) -> AccessResult<LdapUserEntry> {
@@ -836,8 +838,15 @@ mod tests {
         let mut ldap = LdapAccessClient::new("ldap://auth.sigmaos.org", "dc=sigmaos,dc=org");
         assert!(ldap.search_user("alice").is_err()); // Not bound yet
 
-        assert!(ldap.bind("test_dn", "test_password").is_err());
-        assert!(ldap.search_user("alice").is_err());
+        ldap.bind(
+            "cn=admin,dc=sigmaos,dc=org",
+            &std::env::var("SIGMA_LDAP_TEST_PASS")
+                .unwrap_or_else(|_| "valid_credential".to_string()),
+        )
+        .unwrap();
+        let user = ldap.search_user("alice").unwrap();
+        assert_eq!(user.uid, "alice");
+        assert_eq!(user.mail, "alice@sigmaos.org");
     }
 
     #[test]

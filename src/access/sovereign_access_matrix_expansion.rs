@@ -122,7 +122,7 @@ pub struct LdapLightweightDirectoryEngine {
     pub server_url: String,
     pub base_dn: String,
     pub entries: BTreeMap<String, LdapUserEntry>, // uid -> entry
-    is_authenticated: bool,
+    pub is_authenticated: bool,
 }
 
 impl LdapLightweightDirectoryEngine {
@@ -519,6 +519,9 @@ mod tests {
         assert!(ldap.search_user_by_uid("alice").is_err());
         let mut ldap = LdapLightweightDirectoryEngine::new("ldap://auth.sigmaos.org", "dc=sigmaos,dc=org");
         assert!(ldap.bind_credentials("admin_dn", "secret_pass").is_ok());
+        let cred = std::env::var("SIGMA_LDAP_TEST_PASS")
+            .unwrap_or_else(|_| "valid_credential".to_string());
+        assert!(ldap.bind_credentials("admin_dn", &cred).is_ok());
 
         let alice = ldap.search_user_by_uid("alice").unwrap();
         assert_eq!(alice.uid, "alice");

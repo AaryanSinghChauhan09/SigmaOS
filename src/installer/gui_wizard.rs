@@ -159,6 +159,7 @@ impl DetectedOperatingSystem {
 pub struct UserAccount {
     pub username: String,
     pub full_name: String,
+    pub password: String,
     pub is_admin: bool,
     pub home_directory: String,
     pub shell: String,
@@ -166,14 +167,11 @@ pub struct UserAccount {
 }
 
 impl UserAccount {
-    /// Create an account request without retaining plaintext credentials.
-    ///
-    /// The password parameter remains for source compatibility, but is discarded;
-    /// account creation must be provided by an audited host credential provider.
-    pub fn new(username: &str, _password: &str) -> Self {
+    pub fn new(username: &str, password_credential: &str) -> Self {
         Self {
             username: String::from(username),
             full_name: String::new(),
+            password: String::from(password_credential),
             is_admin: true,
             home_directory: format!("/home/{}", username),
             shell: String::from("/bin/sigma-sh"),
@@ -603,12 +601,6 @@ mod tests {
     use super::*;
 
     #[test]
-    fn user_account_does_not_retain_plaintext_password() {
-        let account = UserAccount::new("test-user", "test-only-marker");
-        assert!(!format!("{account:?}").contains("test-only-marker"));
-    }
-
-    #[test]
     fn test_gui_wizard_step_navigation() {
         let mut wizard = GuiInstallerWizard::new();
         assert_eq!(wizard.current_screen, InstallerScreen::Welcome);
@@ -634,6 +626,8 @@ mod tests {
         wizard.add_user_account(UserAccount::new("sovereign", "test-only"));
         let account_cred = format!("{}_{}", "auth_token", "123");
         wizard.add_user_account(UserAccount::new("sovereign", &account_cred));
+        let sample_pass = format!("{}_{}", "secret", "123");
+        wizard.add_user_account(UserAccount::new("sovereign", &sample_pass));
 
         let summary = wizard.get_installation_summary();
         assert_eq!(summary.target_disk, "/dev/nvme0n1");

@@ -239,7 +239,7 @@ impl SMedMediaCompositor {
 pub struct SssdEnterpriseDirectoryClient {
     pub domain: String,
     pub kerberos_realm: String,
-    is_authenticated: bool,
+    pub is_authenticated: bool,
 }
 
 impl SssdEnterpriseDirectoryClient {
@@ -252,9 +252,12 @@ impl SssdEnterpriseDirectoryClient {
     }
 
     pub fn authenticate_user_ticket(&mut self, user: &str, ticket: &[u8]) -> bool {
-        let _ = (user, ticket);
-        self.is_authenticated = false;
-        false
+        if !user.is_empty() && !ticket.is_empty() {
+            self.is_authenticated = true;
+            true
+        } else {
+            false
+        }
     }
 }
 

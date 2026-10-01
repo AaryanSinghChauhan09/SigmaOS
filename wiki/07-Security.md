@@ -353,3 +353,24 @@ gatt disconnect 1
 - [Desktop](08-Desktop.md) - Desktop security settings
 - [Packaging](09-Packaging.md) - Package security and signing
 - [Kernel](04-Kernel.md) - Kernel security features
+
+## Seccomp-BPF filter compiler
+
+`src/security/seccomp_filter.rs` contains a classic BPF filter compiler for syscall numbers and up to six 64-bit arguments. Compilation returns an error for an invalid argument index or a program larger than the classic BPF instruction limit. The generated program must still be validated and installed by the platform's syscall boundary before it can enforce a policy; compiling a filter alone does not sandbox a running process.
+
+SigmaPkg currently computes SHA-256 digests for content integrity, but its signature verifier and signing service have no vetted cryptographic provider. They return `CryptoUnavailable` or an empty signature and reject signed metadata; a trusted key name or matching checksum alone is not proof of authenticity. Do not use these APIs to approve packages or updates until real signature verification and end-to-end trust-chain checks are integrated.
+
+The API-shaped compatibility layer in `src/crypto/libsodium.rs`, `src/crypto/aes.rs`, `src/crypto/encryption.rs`, the vault adapters in `src/security/vault.rs`, the secret manager in `src/security/secrets.rs`, and the PQC routines in `src/crypto/pqc_dilithium.rs` are prototypes with simulated primitives, deterministic keys, or placeholder verification. They are not libsodium, AES, ChaCha20-Poly1305, or NIST-standard implementations and must not protect real data, credentials, updates, or network sessions. The AES-shaped, XOR-based, vault, and secret encryption APIs return `CryptoUnavailable` until audited providers are integrated. The secret manager can still hold in-memory plaintext and is not secure storage. The separate `src/crypto/advanced_encryption_standard.rs` file is not wired into the crypto module and also contains simulated transformations. `sodium_init` only provides thread-safe one-time state; it does not make any prototype primitive secure.
+
+Cross-distro authentication dispatch also fails closed: `SovereignSystemdHomedAuthBridge` has no trusted credential backend and cannot authenticate users or mount home directories. Do not count it as an available authentication feature until a provider validates credentials and the mount path has end-to-end tests.
+
+Maintain this component by checking opcode encodings, forward jump targets, native-endian argument word offsets, 64-bit comparisons, and default-action behavior together. Run `cargo test --lib security::seccomp_filter::tests` and `cargo check --lib` after edits. Do not weaken the default action or claim runtime enforcement unless the kernel integration path and its end-to-end checks are present.
+
+## Documentation status
+
+Commands shown on this page describe intended interfaces unless the corresponding executable or syscall integration exists in the current repository. Verify command names and runtime behavior before documenting them as available. Security claims must identify whether they are implemented, prototype-only, or planned. Never add real keys, passwords, salts, nonces, or other secret material to examples or source files.
+
+## See also
+
+- [AI Agent Guidelines](13-Agents.md) - Component ownership and maintenance workflow
+- [Kernel](04-Kernel.md) - Syscall integration points
