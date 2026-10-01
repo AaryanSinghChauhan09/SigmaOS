@@ -54,3 +54,4 @@ This wiki is organized in Arch Linux style with one page per topic:
 - [Packaging](09-Packaging.md)
 - [Development](10-Development.md)
 - [Roadmap](11-Roadmap.md)
+- [Sovereign OS Self-Sufficiency Encyclopedia V38](15-Sovereign-OS-Self-Sufficiency-Encyclopedia-V38.md)

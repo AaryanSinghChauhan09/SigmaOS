@@ -1,9 +1,7 @@
-# SigmaOS Documentation Source Policy
+# DOCUMENTATION SOURCE POLICY
 
-## Single Source of Truth Directive
-All canonical documentation for SigmaOS resides within the `/docs` directory in the primary repository.
+All primary documentation for SigmaOS resides in the `docs/` directory.
 
-### Rules
-1. **Primary Location**: Direct edits must be submitted to markdown files under `docs/`.
-2. **Auto-generated Mirrors**: Directories such as `wiki/` and `wiki_content/` are auto-generated publishing targets. Do not edit them directly.
-3. **Link Integrity**: All internal Markdown links must point to valid path targets under `docs/`.
+- **Single Source of Truth**: Edit markdown documentation directly within `docs/`.
+- **Auto-Generated Mirrors**: Any external wiki mirrors or exported static sites are auto-generated from `docs/`.
+- **No Direct Edits**: Do not make manual edits directly to legacy or generated directories (`wiki/`, `wiki_content/`, `WIKI/`, `wiki_repo/`).

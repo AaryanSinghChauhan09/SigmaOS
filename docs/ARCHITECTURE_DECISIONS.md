@@ -1,14 +1,7 @@
-# SigmaOS Architecture Decisions Record (ADR)
+# ARCHITECTURE DECISIONS (ADR)
 
-## Overview
-This document records key architectural decisions for the SigmaOS operating system.
-
-## ADR 001: Pure Rust Memory Safety Userland & Kernel
+## ADR-0001: Zero-External-Download Safe-Rust Self-Sufficiency Architecture
 - **Status**: Accepted
-- **Context**: Operational stability and self-sufficiency requirement.
-- **Decision**: All core userland utilities, desktop environments, and kernel components are developed in safe memory-managed Rust.
-
-## ADR 002: Universal Subsystem Absorption
-- **Status**: Accepted
-- **Context**: Interoperability across Linux, BSD, and Windows workflows.
-- **Decision**: Native adapters and universal package bridge engines support multi-distro package formats and POSIX/BSD CLI dialects.
+- **Context**: Operating systems traditionally require users to download third-party software packages (e.g. VLC, LibreOffice, GIMP, PyTorch, Ollama, MySQL).
+- **Decision**: Embed zero-dependency Safe-Rust (`klib`) native engines directly into the 12 Core System Shards of SigmaOS to satisfy all media, office, AI/LLM, ML, DB, security, scientific, and robotics requirements without external application downloads.
+- **Consequences**: Memory safety, reduced supply-chain attack surface, instant startup performance, and complete OS sovereignty.
