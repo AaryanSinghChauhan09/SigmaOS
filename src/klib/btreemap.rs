@@ -40,28 +40,35 @@ pub struct OccupiedEntry<'a, K: 'a + PartialEq + Clone + Ord, V: 'a + Clone> {
 pub struct VacantEntry<'a, K: 'a + PartialEq + Clone + Ord, V: 'a + Clone> {
     map: &'a mut BTreeMap<K, V>,
     key: K,
+    index: usize,
 }
 
 impl<'a, K: PartialEq + Clone + Ord, V: Clone> Entry<'a, K, V> {
+    /// Optimized by Bolt ⚡: inserts `(entry.key, default)` directly into `entry.map.entries`
+    /// at the precomputed binary search insertion index `entry.index`. Eliminates key cloning,
+    /// duplicate binary search lookups, and `.unwrap()` calls.
     pub fn or_insert(self, default: V) -> &'a mut V {
         match self {
             Entry::Occupied(entry) => &mut entry.map.entries[entry.index].1,
             Entry::Vacant(entry) => {
-                let key = entry.key.clone();
-                entry.map.insert(key.clone(), default);
-                entry.map.get_mut(&key).unwrap()
+                let idx = entry.index;
+                entry.map.entries.insert(idx, (entry.key, default));
+                &mut entry.map.entries[idx].1
             }
         }
     }
 
+    /// Optimized by Bolt ⚡: inserts `(entry.key, val)` directly into `entry.map.entries`
+    /// at the precomputed binary search insertion index `entry.index`. Eliminates key cloning,
+    /// duplicate binary search lookups, and `.unwrap()` calls.
     pub fn or_insert_with<F: FnOnce() -> V>(self, default: F) -> &'a mut V {
         match self {
             Entry::Occupied(entry) => &mut entry.map.entries[entry.index].1,
             Entry::Vacant(entry) => {
-                let key = entry.key.clone();
                 let val = default();
-                entry.map.insert(key.clone(), val);
-                entry.map.get_mut(&key).unwrap()
+                let idx = entry.index;
+                entry.map.entries.insert(idx, (entry.key, val));
+                &mut entry.map.entries[idx].1
             }
         }
     }
@@ -106,7 +113,11 @@ where
                 map: self,
                 index: idx,
             }),
-            Err(_) => Entry::Vacant(VacantEntry { map: self, key }),
+            Err(idx) => Entry::Vacant(VacantEntry {
+                map: self,
+                key,
+                index: idx,
+            }),
         }
     }
 

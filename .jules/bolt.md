@@ -15,3 +15,7 @@
 ## 2026-03-31 - HashMap entry vs get_mut in INI parsing
 **Learning:** In custom HashMap implementations or tight loops, using `get_mut` after checking/inserting section keys avoids re-allocating new String keys on every key-value line pair.
 **Action:** Always check if a section map reference can be borrowed mutably via `get_mut` before falling back to `insert` with cloned section keys.
+
+## 2026-10-01 - Single-Pass Entry Insertion via Precomputed Search Indices
+**Learning:** In custom BTreeMap or sorted vector entry abstractions, `Entry::vacant` insertions can re-trigger extra $O(\log N)$ binary searches (`insert` + `get_mut`) and clone keys unnecessarily. Storing the binary search insertion index (`Err(idx)`) directly inside `VacantEntry` allows `or_insert` / `or_insert_with` to perform a single-pass direct vector insert without key clones or duplicate lookups.
+**Action:** Always capture precomputed binary search insertion indices inside vacant entry types to enable zero-lookup single-pass insertions.
