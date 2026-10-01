@@ -186,7 +186,7 @@ impl TlsEngine {
 
         let session_idx = self.create_session(config);
         // SAFETY: session_idx was returned by create_session() which just inserted it; index is always valid.
-        let session = self.sessions.get_mut(session_idx).unwrap();
+        let session = self.sessions.get_mut(session_idx).ok_or("Failed to retrieve created TLS session")?;
 
         session.psk_identity = Some(ticket.to_vec());
         if session.config.enable_0rtt {

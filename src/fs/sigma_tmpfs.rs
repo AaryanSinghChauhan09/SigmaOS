@@ -380,7 +380,7 @@ impl TmpfsMount {
         let now = self.now_ns;
         self.inodes
             .get_mut(&parent_ino)
-            .unwrap()
+            .ok_or("Parent inode not found")?
             .dir_insert(name, ino, now)?;
         Ok(ino)
     }
@@ -400,7 +400,7 @@ impl TmpfsMount {
         self.inodes.insert(ino, dir);
         self.inodes
             .get_mut(&parent_ino)
-            .unwrap()
+            .ok_or("Parent inode not found")?
             .dir_insert(name, ino, now)?;
         Ok(ino)
     }
@@ -416,7 +416,7 @@ impl TmpfsMount {
         self.inodes.insert(ino, link);
         self.inodes
             .get_mut(&parent_ino)
-            .unwrap()
+            .ok_or("Parent inode not found")?
             .dir_insert(name, ino, now)?;
         Ok(ino)
     }
@@ -429,7 +429,7 @@ impl TmpfsMount {
         let child_ino = self
             .inodes
             .get_mut(&parent_ino)
-            .unwrap()
+            .ok_or("Parent inode not found")?
             .dir_remove(name, now)?;
         // Reduce nlink; remove inode if zero
         if let Some(inode) = self.inodes.get_mut(&child_ino) {

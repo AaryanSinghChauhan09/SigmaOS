@@ -337,19 +337,10 @@ fn emit_arg_comparison(
 
     /// Create a strict filter (deny all except allowed)
     pub fn create_strict_filter(
-        &mut self,
-        name: String,
-        allowed_syscalls: Vec<u64>,
-    ) -> Result<(), &'static str> {
-        self.create_filter(
-            name.clone(),
-            SeccompAction::KillProcess,
-            "x86_64".to_string(),
-        )?;
     pub fn create_strict_filter(&mut self, name: String, allowed_syscalls: Vec<u64>) -> Result<(), &'static str> {
         self.create_filter(name.clone(), SeccompAction::KillProcess, "x86_64".to_string())?;
 
-        let filter = self.get_filter_mut(&name).unwrap();
+        let filter = self.get_filter_mut(&name).ok_or("Filter not found")?;
 
         // Add allow rules for allowed syscalls
         for syscall_num in allowed_syscalls {

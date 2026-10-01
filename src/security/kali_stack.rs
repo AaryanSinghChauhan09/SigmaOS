@@ -405,8 +405,11 @@ impl KaliAirgeddonWifiAudit {
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
     use std::alloc::Layout;
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std::alloc::alloc(layout)
+    if let Ok(layout) = Layout::from_size_align(size, 8) {
+        std::alloc::alloc(layout)
+    } else {
+        core::ptr::null_mut()
+    }
 }
 
 #[cfg(not(target_os = "none"))]
