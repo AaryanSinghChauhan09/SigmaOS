@@ -1305,6 +1305,21 @@ pub struct MintMenuItem {
     pub is_favorite: bool,
 }
 
+/// Case-insensitive substring search without heap allocation for ASCII text.
+#[inline]
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if haystack.is_ascii() && needle.is_ascii() {
+        needle.is_empty()
+            || (needle.len() <= haystack.len()
+                && haystack
+                    .as_bytes()
+                    .windows(needle.len())
+                    .any(|window| window.eq_ignore_ascii_case(needle.as_bytes())))
+    } else {
+        haystack.to_lowercase().contains(&needle.to_lowercase())
+    }
+}
+
 pub struct MintMenuEngine {
     pub items: Vec<MintMenuItem>,
     pub active_category: String,
@@ -1331,14 +1346,13 @@ impl MintMenuEngine {
     }
 
     pub fn search(&self, query: &str) -> Vec<&MintMenuItem> {
-        let q = query.to_lowercase();
         self.items
             .iter()
             .filter(|item| {
-                item.name.to_lowercase().contains(&q)
-                    || item.generic_name.to_lowercase().contains(&q)
-                    || item.app_id.to_lowercase().contains(&q)
-                    || item.category.to_lowercase().contains(&q)
+                contains_ignore_case(&item.name, query)
+                    || contains_ignore_case(&item.generic_name, query)
+                    || contains_ignore_case(&item.app_id, query)
+                    || contains_ignore_case(&item.category, query)
             })
             .collect()
     }
