@@ -46,6 +46,7 @@ pub use zenithnet::{
     PacketType, TcpHeader, TcpState as ZenithTcpState, UdpHeader, ZenithNet,
 };
 
+#[path = "sovereign_async_io.rs"]
 pub mod zero_copy_networking;
 pub use zero_copy_networking::{
     IoCompletionEntry, IoCompletionQueue, SovereignZeroCopySocket, UmemPool, XdpAction, XdpRing,
