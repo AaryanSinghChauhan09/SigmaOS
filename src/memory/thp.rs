@@ -208,6 +208,12 @@ impl ThpManager {
             .count();
 
         let total_1gb = self.allocations.values()
+            .filter(|a| a.allocated && a.page_size == HugePageSize::Size2MB)
+            .count();
+
+        let total_1gb = self
+            .allocations
+            .values()
             .filter(|a| a.allocated && a.page_size == HugePageSize::Size1GB)
             .count();
 

@@ -273,6 +273,7 @@ impl SlabCache {
                 + self.object_size as u64;
             self.slabs.len() as u64 * self.object_size as u64 * self.objects_per_slab as u64;
         let base_address = self.slabs.len() as u64 * self.object_size as u64 * self.objects_per_slab as u64;
+            self.slabs.len() as u64 * self.object_size as u64 * self.objects_per_slab as u64;
 
         let mut slab = Vec::new();
         for i in 0..self.objects_per_slab {

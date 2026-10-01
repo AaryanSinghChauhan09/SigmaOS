@@ -252,6 +252,11 @@ mod tests {
         let value = vec![1, 2, 3, 4];
 
         assert!(client.write_characteristic(device.id, char_handle, value.clone()).is_ok());
+        let value = vec![1, 2, 3, 4];
+
+        assert!(client
+            .write_characteristic(device.id, char_handle, value.clone())
+            .is_ok());
 
         let read_value = client.read_characteristic(device.id, char_handle).unwrap();
         assert_eq!(read_value, value);

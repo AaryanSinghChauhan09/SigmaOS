@@ -66,6 +66,23 @@ impl HashFunction for SimpleHashFunction {
         self.algorithm
         unsafe {
             core::mem::transmute::<usize, HashAlgorithm>(self.algorithm.load(Ordering::SeqCst))
+        unsafe {
+            core::mem::transmute::<usize, HashAlgorithm>(self.algorithm.load(Ordering::SeqCst))
+        }
+    }
+    fn hash_size(&self) -> usize {
+        32
+    }
+
+    fn compute(&self, data: &[u8]) -> Result<Vec<u8>, HashError> {
+        let mut hash = Vec::new();
+        let mut digest: usize = 0;
+        let mult = self.multiplier.load(Ordering::SeqCst);
+        let offset = self.offset_factor.load(Ordering::SeqCst);
+
+        for &byte in data {
+            digest = digest.wrapping_add(byte as usize);
+            digest = digest.wrapping_mul(mult);
         }
     }
     fn hash_size(&self) -> usize {
