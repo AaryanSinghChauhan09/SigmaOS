@@ -190,6 +190,7 @@ pub use module_loading_control::{
     KernelModule as ModuleLoadingKernelModule, KernelModuleLoadingController, ModuleLoadingPolicy,
     ModuleLoadingRule, ModuleLoadingState,
 };
+pub use process::{Process, ProcessId, ProcessManager};
 pub use process_monitor::{
     MonitoredProcessState, ProcessEntry, ProcessFilter, ProcessMonitor, ProcessSortField,
     ProcessTreeNode,

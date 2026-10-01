@@ -32,8 +32,19 @@ pub fn start_kernel(
     EARLY_CPU_STATE.store(2, Ordering::SeqCst);
 
     // Stage 3: Scheduler bootstrap
-    let idle_proc = Process::new(0, "idle".to_string(), Priority::Idle);
-    scheduler.add_process(idle_proc);
+    let idle_proc = Process::new(0, "idle");
+    let idle_task = sigmaos::kernel::ProcessTask {
+        pid: idle_proc.pid.0,
+        priority: Priority::Idle,
+        policy: sigmaos::kernel::SchedulerPolicy::Batch,
+        state: sigmaos::kernel::ProcessState::Runnable,
+        vruntime: 0,
+        exec_start: 0,
+        exec_duration: 0,
+        cpu_time: 0,
+        slice: 10,
+    };
+    scheduler.add_process(idle_task);
 
     // Stage 4: Open early userland runlevels (OpenRC)
     let udev = OpenRcService::new("udev").with_runlevel(OpenRcRunlevel::SingleUser);
