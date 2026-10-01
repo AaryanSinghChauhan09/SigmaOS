@@ -700,11 +700,6 @@ UUID=AAAA-BBBB           /boot/efi       vfat    umask=0077        0       2
         let test_hash = std::env::var("SIGMA_PAM_TEST_HASH").unwrap_or_default();
         let ok = if test_hash.is_empty() {
             // Without env var, authentication correctly fails
-            let result = pam.authenticate("sovereign_user", "any_value").unwrap();
-            let unauth_val = format!("{}_{}", "any", "value");
-            let result = pam.authenticate("sovereign_user", &unauth_val).unwrap();
-            let dummy_token = format!("token_{}", 12345);
-            let result = pam.authenticate("sovereign_user", &dummy_token).unwrap();
             let test_input = format!("check_{}", 123);
             let result = pam.authenticate("sovereign_user", &test_input).unwrap();
             assert!(!result, "PAM should deny without env var set");

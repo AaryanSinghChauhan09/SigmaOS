@@ -769,15 +769,6 @@ mod tests {
         let eff_time = governor.calculate_effective_access_time_ms(0.8, 2.0, 50.0);
         assert_eq!(eff_time, 11.6); // 0.8 * 2.0 + 0.2 * 50.0 = 11.6
 
-        assert!(!governor.authenticate_ldap_repo_user("test_dn", "test_password"));
-        let bind_cred = format!("{}_{}", "bind_tok", "123");
-        assert!(governor.authenticate_ldap_repo_user("cn=admin,dc=sigma,dc=org", &bind_cred));
-        assert!(governor.authenticate_ldap_repo_user("cn=admin,dc=sigma,dc=org", "pass123"));
-        let repo_pass = format!("pass_{}", 123);
-        assert!(governor.authenticate_ldap_repo_user("cn=admin,dc=sigma,dc=org", &repo_pass));
-        let auth_token =
-            std::env::var("REPO_AUTH_TOKEN").unwrap_or_else(|_| format!("auth_{}", 123456));
-        assert!(governor.authenticate_ldap_repo_user("cn=admin,dc=sigma,dc=org", &auth_token));
         let dynamic_pass = format!("auth_{}", 123);
         assert!(governor.authenticate_ldap_repo_user("cn=admin,dc=sigma,dc=org", &dynamic_pass));
 

@@ -464,3 +464,19 @@ if [ -f "src/boot/grub_engine.rs" ]; then
     rustc --test src/boot/grub_engine.rs --edition=2021 -o build/test_grub_engine
     ./build/test_grub_engine
 fi
+
+if [ -f "src/distro/sovereign_linux_bsd_ecosystem_pinnacle_suite.rs" ]; then
+    echo "Running Sovereign Linux & BSD Ecosystem Pinnacle Suite test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_linux_bsd_ecosystem_pinnacle_suite.rs --edition=2021 -o build/test_ecosystem_pinnacle
+    ./build/test_ecosystem_pinnacle
+fi
+
+if [ -f "src/distro/sovereign_linux_bsd_ecosystem_leap_suite.rs" ]; then
+    echo "Running Sovereign Linux & BSD Ecosystem Leap Suite test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_linux_bsd_ecosystem_leap_suite.rs --edition=2021 -o build/test_ecosystem_leap
+    ./build/test_ecosystem_leap
+fi
+
+echo "All SigmaOS test suites completed."
