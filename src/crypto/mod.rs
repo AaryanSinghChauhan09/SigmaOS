@@ -32,3 +32,5 @@ pub use post_quantum::{
     PostQuantumCryptoManager, DilithiumSecretKey, DilithiumPublicKey, DilithiumSignature,
     KyberSecretKey, KyberPublicKey, KyberCiphertext, KyberSharedSecret, HybridCryptoMode,
 };
+
+pub mod entropy;

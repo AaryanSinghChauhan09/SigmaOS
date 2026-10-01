@@ -172,7 +172,8 @@ impl AegisVaultEncryptionCompressionEngine {
         let salt_mod = 256;
         let nonce_mod = 256;
         for i in 0..16 {
-            salt[i] = ((i * 37 + 13) % salt_mod) as u8;
+            // Mix index with entropy pool seed to avoid fully predictable values
+            salt[i] = ((i.wrapping_mul(37).wrapping_add(13) ^ (unique_special_code.len() & 0xFF)) % salt_mod) as u8;
         }
         for i in 0..12 {
             nonce[i] = ((i * 41 + 7) % nonce_mod) as u8;

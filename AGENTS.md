@@ -372,3 +372,64 @@ pub fn process_data(data: &[u8]) -> Result<&[u8], Error> {
 ---
 
 *End of Agent Guidelines*
+
+---
+
+## Linux & BSD Distro Inspiration Guidelines
+
+When implementing new components, AI agents MUST draw inspiration from these proven systems:
+
+### Kernel Subsystems
+- **Scheduler**: Implement EEVDF (Linux 6.6+) or CFS with W^X memory hardening (OpenBSD KARL)
+- **Memory**: Buddy allocator + slab allocator patterns (Linux mm/), ASLR (PaX/grsecurity)
+- **IPC**: HelenOS async IPC, Mach IPC ports, FreeBSD Capsicum capabilities
+- **Networking**: Linux netfilter/nftables, FreeBSD VIMAGE network stacks, Netmap zero-copy
+
+### Security Hardening (mandatory for all new code)
+- **Pledge/Unveil**: OpenBSD-style syscall restriction (`src/security/pledge_unveil.rs`)
+- **Seccomp-BPF**: Linux seccomp filters (`src/security/seccomp_filter.rs`)
+- **W^X Enforcement**: No page simultaneously writable and executable (`src/kernel/wx_pte_hardening.rs`)
+- **CFI**: Control Flow Integrity (`src/kernel/cfi.rs`)
+- **kptr_restrict**: Prevent kernel pointer leaks (`src/kernel/kptr_restrict.rs`)
+- **No hardcoded crypto**: Always use `src/crypto/entropy.rs` for random values
+
+### Package Management
+- Support all 33+ package formats via `SovereignUniversalPackageFormatMasterEngine`
+- Always add BsdPkg, FreeBsdPkg, OpenBsdPkg variants when adding package format enums
+- Use `sigpkg` as the unified CLI for all package operations
+
+### Build Rules (non-negotiable)
+- Run `cargo check 2>&1 | grep '^error' | wc -l` → must be **0** before every commit
+- Zero errors required before pushing to main
+- Use `#[allow(dead_code)]` only with a justification comment
+- No `std::` imports in `no_std` modules — use `alloc::` instead
+- No external crate dependencies — implement everything from scratch
+
+### Branch Policy
+- Only ONE branch: **main**. All work goes directly to main via commits.
+- Delete feature branches immediately after merging.
+- PRs are auto-merged if build passes and no conflicts.
+
+### Architecture Targets (all must compile)
+- x86_64 bare-metal (primary)
+- AArch64 / ARM (secondary)
+- RISC-V 64-bit (tertiary)
+- Must support both CISC (x86) and RISC (ARM, RISC-V) instruction set philosophies
+
+---
+## Linux/BSD Architecture Inspiration Guidelines (Oct 2026)
+
+### Build Rules (non-negotiable)
+- `cargo check 2>&1 | grep '^error' | wc -l` → must be **0** before every commit
+- No `std::` in no_std modules — use `alloc::`
+- No external crate deps — implement from scratch
+
+### Branch Policy
+- Only **main** branch. Delete feature branches immediately after merging.
+
+### New Modules Added
+- `src/crypto/entropy.rs` — XorShift64 PRNG entropy pool (RDRAND-ready)
+- `src/syscall/posix_compat.rs` — POSIX compat stubs (prctl, madvise, pread64, sigaction)
+
+### Architecture Targets
+- x86_64 bare-metal (primary), AArch64/ARM (secondary), RISC-V 64 (tertiary)

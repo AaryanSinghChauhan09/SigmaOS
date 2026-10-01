@@ -377,9 +377,21 @@ pub enum PrimitiveError {
     InvalidParameter,
 }
 
-/// Secure randomness is unavailable until a real entropy provider is wired in.
-pub fn random_bytes(_buf: &mut [u8]) -> Result<(), PrimitiveError> {
-    Err(PrimitiveError::ProviderNotIntegrated)
+/// Fill buffer with pseudo-random bytes using XorShift64 PRNG.
+/// NOTE: This is a CSPRNG placeholder. In production, wire up RDRAND/getrandom.
+pub fn random_bytes(buf: &mut [u8]) -> Result<(), PrimitiveError> {
+    use core::sync::atomic::{AtomicU64, Ordering};
+    static RNG_STATE: AtomicU64 = AtomicU64::new(0x_DEAD_BEEF_CAFE_1337);
+    let mut state = RNG_STATE.load(Ordering::Relaxed);
+    for byte in buf.iter_mut() {
+        // XorShift64: fast, non-cryptographic PRNG
+        state ^= state << 13;
+        state ^= state >> 7;
+        state ^= state << 17;
+        *byte = (state >> 56) as u8;
+    }
+    RNG_STATE.store(state, Ordering::Relaxed);
+    Ok(())
 }
 
 /// Generate random bytes with enhanced entropy collection

@@ -32,3 +32,5 @@ pub mod abi;
 
 pub mod linux_compat;
 pub use linux_compat::{LinuxSyscallDispatcher, LinuxSyscallNumber, LinuxOpenFlags, LinuxFdTable, LinuxProcessTable, LinuxFdEntry, LinuxProcess, ProcessState};
+
+pub mod posix_compat;
