@@ -118,6 +118,7 @@ impl CronDaemon {
     pub fn register_job(&mut self, minute: u8, command: &[u8]) {
         let mut cmd_arr = [0u8; 64];
         let len = command.len().min(63);
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         unsafe {
             core::ptr::copy_nonoverlapping(command.as_ptr(), cmd_arr.as_mut_ptr(), len);
         }
@@ -181,6 +182,7 @@ impl TmuxMultiplexer {
     pub fn new(name: &[u8]) -> Self {
         let mut name_arr = [0u8; 32];
         let len = name.len().min(31);
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         unsafe {
             core::ptr::copy_nonoverlapping(name.as_ptr(), name_arr.as_mut_ptr(), len);
         }
@@ -264,6 +266,7 @@ impl DmesgLog {
         let start = self.write_idx.fetch_add(len, Ordering::SeqCst) % 512;
 
         // Safe mock mapping in circular ring
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         unsafe {
             let buffer_ptr = (&raw const self.buffer) as *mut u8;
             for i in 0..len {

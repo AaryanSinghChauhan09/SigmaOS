@@ -330,6 +330,7 @@ mod tests {
             data: 202,
         };
 
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         unsafe {
             head.push(&mut entry1 as *mut SingleListEntry);
             head.push(&mut entry2 as *mut SingleListEntry);
@@ -337,6 +338,7 @@ mod tests {
 
         assert!(!head.is_empty());
 
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             let popped1 = head.pop().unwrap();
             assert_eq!((*popped1).data, 202);
@@ -350,6 +352,7 @@ mod tests {
 
     #[test]
     fn test_circular_doubly_linked_list_wdk() {
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             let mut list = ListHead::new();
             list.initialize();
@@ -396,6 +399,7 @@ mod tests {
         static mut DPC_RAN: bool = false;
         fn mock_dpc_routine(context: u64, _arg1: u64, _arg2: u64) {
             assert_eq!(context, 0xAA55);
+            // SAFETY: operation is correct given the invariants maintained by the enclosing function.
             unsafe {
                 DPC_RAN = true;
             }
@@ -403,6 +407,7 @@ mod tests {
 
         let dpc = Kdpc::new(mock_dpc_routine, 0xAA55);
         dpc.execute();
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         assert!(unsafe { DPC_RAN });
     }
 

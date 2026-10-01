@@ -182,13 +182,13 @@ impl TimerFdManager {
 
     /// Create a new timerfd
     pub fn create_timer(&self, clock: TimerClock, flags: TimerFlags) -> u64 {
-        let mut next_id = self.next_timer_id.lock().unwrap();
+        let mut next_id = self.next_timer_id.lock().unwrap_or_else(|e| e.into_inner());
         let timer_id = *next_id;
         *next_id += 1;
         drop(next_id);
 
         let timer = TimerFd::new(timer_id, clock, flags);
-        let mut timers = self.timers.lock().unwrap();
+        let mut timers = self.timers.lock().unwrap_or_else(|e| e.into_inner());
         timers.insert(timer_id, timer);
 
         timer_id
@@ -196,13 +196,13 @@ impl TimerFdManager {
 
     /// Get a timer by ID
     pub fn get_timer(&self, timer_id: u64) -> Option<TimerFd> {
-        let timers = self.timers.lock().unwrap();
+        let timers = self.timers.lock().unwrap_or_else(|e| e.into_inner());
         timers.get(&timer_id).cloned()
     }
 
     /// Remove a timer
     pub fn remove_timer(&self, timer_id: u64) -> Result<(), String> {
-        let mut timers = self.timers.lock().unwrap();
+        let mut timers = self.timers.lock().unwrap_or_else(|e| e.into_inner());
         match timers.remove(&timer_id) {
             Some(_) => Ok(()),
             None => Err(format!("Timer {} not found", timer_id)),
@@ -211,7 +211,7 @@ impl TimerFdManager {
 
     /// Set timer time
     pub fn set_time(&self, timer_id: u64, spec: TimerSpec) -> Result<(), String> {
-        let mut timers = self.timers.lock().unwrap();
+        let mut timers = self.timers.lock().unwrap_or_else(|e| e.into_inner());
         match timers.get_mut(&timer_id) {
             Some(timer) => {
                 timer.set_time(spec);
@@ -223,7 +223,7 @@ impl TimerFdManager {
 
     /// Get timer time
     pub fn get_time(&self, timer_id: u64) -> Result<TimerSpec, String> {
-        let timers = self.timers.lock().unwrap();
+        let timers = self.timers.lock().unwrap_or_else(|e| e.into_inner());
         match timers.get(&timer_id) {
             Some(timer) => Ok(timer.get_time()),
             None => Err(format!("Timer {} not found", timer_id)),
@@ -232,7 +232,7 @@ impl TimerFdManager {
 
     /// Disarm timer
     pub fn disarm(&self, timer_id: u64) -> Result<(), String> {
-        let mut timers = self.timers.lock().unwrap();
+        let mut timers = self.timers.lock().unwrap_or_else(|e| e.into_inner());
         match timers.get_mut(&timer_id) {
             Some(timer) => {
                 timer.disarm();
@@ -244,7 +244,7 @@ impl TimerFdManager {
 
     /// Read expirations
     pub fn read(&self, timer_id: u64) -> Result<TimerExpirations, String> {
-        let mut timers = self.timers.lock().unwrap();
+        let mut timers = self.timers.lock().unwrap_or_else(|e| e.into_inner());
         match timers.get_mut(&timer_id) {
             Some(timer) => Ok(timer.read_expirations()),
             None => Err(format!("Timer {} not found", timer_id)),
@@ -253,7 +253,7 @@ impl TimerFdManager {
 
     /// Simulate timer expiration (for testing)
     pub fn expire(&self, timer_id: u64) -> Result<(), String> {
-        let mut timers = self.timers.lock().unwrap();
+        let mut timers = self.timers.lock().unwrap_or_else(|e| e.into_inner());
         match timers.get_mut(&timer_id) {
             Some(timer) => {
                 timer.expire();
@@ -265,7 +265,7 @@ impl TimerFdManager {
 
     /// Get timer count
     pub fn timer_count(&self) -> usize {
-        let timers = self.timers.lock().unwrap();
+        let timers = self.timers.lock().unwrap_or_else(|e| e.into_inner());
         timers.len()
     }
 }

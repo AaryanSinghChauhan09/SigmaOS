@@ -163,7 +163,7 @@ impl FanotifyManager {
             .get(&watch_id)
             .ok_or_else(|| format!("Watch not found: {}", watch_id))?;
 
-        let mut watch_guard = watch.lock().unwrap();
+        let mut watch_guard = watch.lock().unwrap_or_else(|e| e.into_inner());
         watch_guard.add_event(event);
 
         Ok(())
@@ -176,7 +176,7 @@ impl FanotifyManager {
             .get(&watch_id)
             .ok_or_else(|| format!("Watch not found: {}", watch_id))?;
 
-        let watch_guard = watch.lock().unwrap();
+        let watch_guard = watch.lock().unwrap_or_else(|e| e.into_inner());
         Ok(watch_guard.get_events().to_vec())
     }
 
@@ -187,7 +187,7 @@ impl FanotifyManager {
             .get(&watch_id)
             .ok_or_else(|| format!("Watch not found: {}", watch_id))?;
 
-        let mut watch_guard = watch.lock().unwrap();
+        let mut watch_guard = watch.lock().unwrap_or_else(|e| e.into_inner());
         watch_guard.clear_events();
 
         Ok(())

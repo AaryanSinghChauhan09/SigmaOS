@@ -89,7 +89,7 @@ impl Tmpfs {
         // Add to parent directory
         if let Some(parent_path) = Self::parent_path(&path) {
             if let Some(parent) = self.files.get_mut(&parent_path) {
-                let mut parent_guard = parent.lock().unwrap();
+                let mut parent_guard = parent.lock().unwrap_or_else(|e| e.into_inner());
                 parent_guard.add_child(path.clone());
             }
         }
@@ -108,7 +108,7 @@ impl Tmpfs {
             .ok_or_else(|| format!("File not found: {}", path))?;
 
         let old_size = {
-            let file_guard = file.lock().unwrap();
+            let file_guard = file.lock().unwrap_or_else(|e| e.into_inner());
             file_guard.size
         };
 
@@ -119,7 +119,7 @@ impl Tmpfs {
             return Err("Not enough space".to_string());
         }
 
-        let mut file_guard = file.lock().unwrap();
+        let mut file_guard = file.lock().unwrap_or_else(|e| e.into_inner());
         file_guard.write(data);
 
         self.total_size = self.total_size - old_size + new_size;
@@ -132,7 +132,7 @@ impl Tmpfs {
             .get(path)
             .ok_or_else(|| format!("File not found: {}", path))?;
 
-        let file_guard = file.lock().unwrap();
+        let file_guard = file.lock().unwrap_or_else(|e| e.into_inner());
         if file_guard.file_type != TmpFileType::File {
             return Err("Not a file".to_string());
         }
@@ -153,7 +153,7 @@ impl Tmpfs {
             return Err("Not enough space".to_string());
         }
 
-        let mut file_guard = file.lock().unwrap();
+        let mut file_guard = file.lock().unwrap_or_else(|e| e.into_inner());
         file_guard.append(data);
 
         self.total_size += new_size;
@@ -166,13 +166,13 @@ impl Tmpfs {
             .remove(path)
             .ok_or_else(|| format!("File not found: {}", path))?;
 
-        let size = file.lock().unwrap().size;
+        let size = file.lock().unwrap_or_else(|e| e.into_inner()).size;
         self.total_size -= size;
 
         // Remove from parent directory
         if let Some(parent_path) = Self::parent_path(path) {
             if let Some(parent) = self.files.get_mut(&parent_path) {
-                let mut parent_guard = parent.lock().unwrap();
+                let mut parent_guard = parent.lock().unwrap_or_else(|e| e.into_inner());
                 parent_guard.children.retain(|c| c != path);
             }
         }
@@ -186,7 +186,7 @@ impl Tmpfs {
             .get(path)
             .ok_or_else(|| format!("Directory not found: {}", path))?;
 
-        let file_guard = file.lock().unwrap();
+        let file_guard = file.lock().unwrap_or_else(|e| e.into_inner());
         if file_guard.file_type != TmpFileType::Directory {
             return Err("Not a directory".to_string());
         }
@@ -200,7 +200,7 @@ impl Tmpfs {
             .get(path)
             .ok_or_else(|| format!("File not found: {}", path))?;
 
-        let file_guard = file.lock().unwrap();
+        let file_guard = file.lock().unwrap_or_else(|e| e.into_inner());
         Ok(file_guard.size)
     }
 

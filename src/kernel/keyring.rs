@@ -242,7 +242,7 @@ impl KeyManager {
             gid,
         ));
 
-        let mut keyring_guard = keyring.lock().unwrap();
+        let mut keyring_guard = keyring.lock().unwrap_or_else(|e| e.into_inner());
         keyring_guard.add_key(key);
 
         Ok(key_id)
@@ -255,7 +255,7 @@ impl KeyManager {
             .get(&keyring_id)
             .ok_or_else(|| format!("Keyring not found: {}", keyring_id))?;
 
-        let mut keyring_guard = keyring.lock().unwrap();
+        let mut keyring_guard = keyring.lock().unwrap_or_else(|e| e.into_inner());
         keyring_guard
             .remove_key(key_id)
             .ok_or_else(|| format!("Key not found: {}", key_id))?;
@@ -270,7 +270,7 @@ impl KeyManager {
             .get(&keyring_id)
             .ok_or_else(|| format!("Keyring not found: {}", keyring_id))?;
 
-        let keyring_guard = keyring.lock().unwrap();
+        let keyring_guard = keyring.lock().unwrap_or_else(|e| e.into_inner());
         keyring_guard
             .get_key(key_id)
             .ok_or_else(|| format!("Key not found: {}", key_id))
@@ -283,7 +283,7 @@ impl KeyManager {
             .get(&keyring_id)
             .ok_or_else(|| format!("Keyring not found: {}", keyring_id))?;
 
-        let keyring_guard = keyring.lock().unwrap();
+        let keyring_guard = keyring.lock().unwrap_or_else(|e| e.into_inner());
         keyring_guard
             .search_key(description)
             .ok_or_else(|| format!("Key not found with description: {}", description))

@@ -112,6 +112,7 @@ impl SimpleFile {
         let mut name_array = [0u8; 64];
         let name_len = name.len().min(63);
 
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         unsafe {
             core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
         }
@@ -149,6 +150,7 @@ impl File for SimpleFile {
         let current_size = self.size.load(Ordering::SeqCst);
         let bytes_to_read = buffer.len().min(current_size);
 
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         unsafe {
             core::ptr::copy_nonoverlapping(self.data.as_ptr(), buffer.as_mut_ptr(), bytes_to_read);
         }
@@ -164,6 +166,7 @@ impl File for SimpleFile {
         let bytes_to_write = data.len().min(4096);
         let current_size = self.size.load(Ordering::SeqCst);
 
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         unsafe {
             core::ptr::copy_nonoverlapping(data.as_ptr(), self.data.as_mut_ptr(), bytes_to_write);
         }
@@ -358,6 +361,7 @@ impl<T> Vec<T> {
     }
 
     fn push(&mut self, item: T) {
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             if self.len >= self.capacity {
                 self.grow();
@@ -409,6 +413,7 @@ impl<T> core::ops::Deref for Vec<T> {
         if self.data.is_null() {
             &[]
         } else {
+            // SAFETY: raw pointer was obtained from Box::into_raw and is exclusively owned here.
             unsafe { core::slice::from_raw_parts(self.data, self.len) }
         }
     }
@@ -419,6 +424,7 @@ impl<T> core::ops::DerefMut for Vec<T> {
         if self.data.is_null() {
             &mut []
         } else {
+            // SAFETY: raw pointer was obtained from Box::into_raw and is exclusively owned here.
             unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
         }
     }

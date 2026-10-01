@@ -59,6 +59,7 @@ impl SimpleCertificate {
         let mut issuer_array = [0u8; 256];
         let subject_len = subject.len().min(255);
         let issuer_len = issuer.len().min(255);
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         unsafe {
             core::ptr::copy_nonoverlapping(
                 subject.as_ptr(),

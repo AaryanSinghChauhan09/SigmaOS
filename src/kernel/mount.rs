@@ -101,7 +101,7 @@ impl MountNamespace {
             MountFlags::new(),
             "".to_string(),
         )));
-        root_mount.lock().unwrap().mount();
+        root_mount.lock().unwrap_or_else(|e| e.into_inner()).mount();
         namespace.root = Some(root_mount.clone());
         namespace.mounts.insert("/".to_string(), root_mount);
 
@@ -128,7 +128,7 @@ impl MountNamespace {
             flags,
             options,
         )));
-        mount_point.lock().unwrap().mount();
+        mount_point.lock().unwrap_or_else(|e| e.into_inner()).mount();
 
         self.mounts.insert(target, mount_point);
         Ok(())
@@ -141,7 +141,7 @@ impl MountNamespace {
             .remove(target)
             .ok_or_else(|| format!("Mount point not found: {}", target))?;
 
-        let mut mount_guard = mount_point.lock().unwrap();
+        let mut mount_guard = mount_point.lock().unwrap_or_else(|e| e.into_inner());
         mount_guard.unmount();
 
         Ok(())

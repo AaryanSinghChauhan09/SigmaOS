@@ -95,7 +95,7 @@ impl NetworkNamespaceManager {
 
     /// Create a new network namespace
     pub fn create_namespace(&self, parent_id: Option<u64>) -> u64 {
-        let mut next_id = self.next_namespace_id.lock().unwrap();
+        let mut next_id = self.next_namespace_id.lock().unwrap_or_else(|e| e.into_inner());
         let namespace_id = *next_id;
         *next_id += 1;
         drop(next_id);
@@ -105,7 +105,7 @@ impl NetworkNamespaceManager {
             None => NetworkNamespace::new(namespace_id),
         };
 
-        let mut namespaces = self.namespaces.lock().unwrap();
+        let mut namespaces = self.namespaces.lock().unwrap_or_else(|e| e.into_inner());
         namespaces.insert(namespace_id, namespace);
 
         namespace_id
@@ -113,13 +113,13 @@ impl NetworkNamespaceManager {
 
     /// Get a namespace by ID
     pub fn get_namespace(&self, namespace_id: u64) -> Option<NetworkNamespace> {
-        let namespaces = self.namespaces.lock().unwrap();
+        let namespaces = self.namespaces.lock().unwrap_or_else(|e| e.into_inner());
         namespaces.get(&namespace_id).cloned()
     }
 
     /// Remove a namespace
     pub fn remove_namespace(&self, namespace_id: u64) -> Result<(), String> {
-        let mut namespaces = self.namespaces.lock().unwrap();
+        let mut namespaces = self.namespaces.lock().unwrap_or_else(|e| e.into_inner());
         match namespaces.remove(&namespace_id) {
             Some(_) => Ok(()),
             None => Err(format!("Namespace {} not found", namespace_id)),
@@ -128,7 +128,7 @@ impl NetworkNamespaceManager {
 
     /// Add device to a namespace
     pub fn add_device(&self, namespace_id: u64, device: NetworkDevice) -> Result<(), String> {
-        let mut namespaces = self.namespaces.lock().unwrap();
+        let mut namespaces = self.namespaces.lock().unwrap_or_else(|e| e.into_inner());
         match namespaces.get_mut(&namespace_id) {
             Some(namespace) => namespace.add_device(device),
             None => Err(format!("Namespace {} not found", namespace_id)),
@@ -137,7 +137,7 @@ impl NetworkNamespaceManager {
 
     /// Remove device from a namespace
     pub fn remove_device(&self, namespace_id: u64, name: &str) -> Result<(), String> {
-        let mut namespaces = self.namespaces.lock().unwrap();
+        let mut namespaces = self.namespaces.lock().unwrap_or_else(|e| e.into_inner());
         match namespaces.get_mut(&namespace_id) {
             Some(namespace) => namespace.remove_device(name),
             None => Err(format!("Namespace {} not found", namespace_id)),
@@ -146,7 +146,7 @@ impl NetworkNamespaceManager {
 
     /// Get namespace count
     pub fn namespace_count(&self) -> usize {
-        let namespaces = self.namespaces.lock().unwrap();
+        let namespaces = self.namespaces.lock().unwrap_or_else(|e| e.into_inner());
         namespaces.len()
     }
 }

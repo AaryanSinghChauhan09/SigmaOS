@@ -145,13 +145,13 @@ impl LandlockManager {
 
     /// Create a new Landlock domain with a ruleset
     pub fn create_domain(&self, ruleset: LandlockRuleset) -> u64 {
-        let mut next_id = self.next_domain_id.lock().unwrap();
+        let mut next_id = self.next_domain_id.lock().unwrap_or_else(|e| e.into_inner());
         let domain_id = *next_id;
         *next_id += 1;
         drop(next_id);
 
         let domain = LandlockDomain::new(domain_id, ruleset);
-        let mut domains = self.domains.lock().unwrap();
+        let mut domains = self.domains.lock().unwrap_or_else(|e| e.into_inner());
         domains.insert(domain_id, domain);
 
         domain_id
@@ -159,13 +159,13 @@ impl LandlockManager {
 
     /// Get a domain by ID
     pub fn get_domain(&self, domain_id: u64) -> Option<LandlockDomain> {
-        let domains = self.domains.lock().unwrap();
+        let domains = self.domains.lock().unwrap_or_else(|e| e.into_inner());
         domains.get(&domain_id).cloned()
     }
 
     /// Remove a domain
     pub fn remove_domain(&self, domain_id: u64) -> Result<(), String> {
-        let mut domains = self.domains.lock().unwrap();
+        let mut domains = self.domains.lock().unwrap_or_else(|e| e.into_inner());
         match domains.remove(&domain_id) {
             Some(_) => Ok(()),
             None => Err(format!("Domain {} not found", domain_id)),
@@ -182,7 +182,7 @@ impl LandlockManager {
 
     /// Get number of active domains
     pub fn domain_count(&self) -> usize {
-        let domains = self.domains.lock().unwrap();
+        let domains = self.domains.lock().unwrap_or_else(|e| e.into_inner());
         domains.len()
     }
 }

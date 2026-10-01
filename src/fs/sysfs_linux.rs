@@ -167,7 +167,7 @@ impl Sysfs {
         // Add to parent directory
         if let Some(parent_path) = Self::parent_path(&path) {
             if let Some(parent) = self.entries.get_mut(&parent_path) {
-                let mut parent_guard = parent.lock().unwrap();
+                let mut parent_guard = parent.lock().unwrap_or_else(|e| e.into_inner());
                 parent_guard.add_child(path.clone());
             }
         }
@@ -185,7 +185,7 @@ impl Sysfs {
             .get(path)
             .ok_or_else(|| format!("Entry not found: {}", path))?;
 
-        let entry_guard = entry.lock().unwrap();
+        let entry_guard = entry.lock().unwrap_or_else(|e| e.into_inner());
         if entry_guard.entry_type != SysfsEntryType::File {
             return Err("Not a file".to_string());
         }
@@ -199,7 +199,7 @@ impl Sysfs {
             .get(path)
             .ok_or_else(|| format!("Entry not found: {}", path))?;
 
-        let mut entry_guard = entry.lock().unwrap();
+        let mut entry_guard = entry.lock().unwrap_or_else(|e| e.into_inner());
         if entry_guard.entry_type != SysfsEntryType::File {
             return Err("Not a file".to_string());
         }
@@ -214,7 +214,7 @@ impl Sysfs {
             .get(path)
             .ok_or_else(|| format!("Entry not found: {}", path))?;
 
-        let entry_guard = entry.lock().unwrap();
+        let entry_guard = entry.lock().unwrap_or_else(|e| e.into_inner());
         if entry_guard.entry_type != SysfsEntryType::Directory {
             return Err("Not a directory".to_string());
         }

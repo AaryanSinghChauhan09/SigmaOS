@@ -333,13 +333,13 @@ impl TmpfsManager {
 
     /// Create tmpfs instance
     pub fn create_instance(&self, max_size: usize) -> u64 {
-        let mut next_id = self.next_instance_id.lock().unwrap();
+        let mut next_id = self.next_instance_id.lock().unwrap_or_else(|e| e.into_inner());
         let instance_id = *next_id;
         *next_id += 1;
         drop(next_id);
 
         let tmpfs = Tmpfs::new(max_size);
-        let mut instances = self.instances.lock().unwrap();
+        let mut instances = self.instances.lock().unwrap_or_else(|e| e.into_inner());
         instances.insert(instance_id, tmpfs);
 
         instance_id
@@ -347,13 +347,13 @@ impl TmpfsManager {
 
     /// Get instance
     pub fn get_instance(&self, instance_id: u64) -> Option<Tmpfs> {
-        let instances = self.instances.lock().unwrap();
+        let instances = self.instances.lock().unwrap_or_else(|e| e.into_inner());
         instances.get(&instance_id).cloned()
     }
 
     /// Remove instance
     pub fn remove_instance(&self, instance_id: u64) -> Result<(), String> {
-        let mut instances = self.instances.lock().unwrap();
+        let mut instances = self.instances.lock().unwrap_or_else(|e| e.into_inner());
         match instances.remove(&instance_id) {
             Some(_) => Ok(()),
             None => Err(format!("Tmpfs instance {} not found", instance_id)),
@@ -362,7 +362,7 @@ impl TmpfsManager {
 
     /// Get instance count
     pub fn instance_count(&self) -> usize {
-        let instances = self.instances.lock().unwrap();
+        let instances = self.instances.lock().unwrap_or_else(|e| e.into_inner());
         instances.len()
     }
 }

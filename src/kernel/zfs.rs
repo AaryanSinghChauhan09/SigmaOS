@@ -250,13 +250,13 @@ impl ZfsManager {
 
     /// Create a new pool
     pub fn create_pool(&self, config: ZfsPoolConfig) -> u64 {
-        let mut next_id = self.next_pool_id.lock().unwrap();
+        let mut next_id = self.next_pool_id.lock().unwrap_or_else(|e| e.into_inner());
         let pool_id = *next_id;
         *next_id += 1;
         drop(next_id);
 
         let pool = ZfsPool::new(pool_id, config);
-        let mut pools = self.pools.lock().unwrap();
+        let mut pools = self.pools.lock().unwrap_or_else(|e| e.into_inner());
         pools.insert(pool_id, pool);
 
         pool_id
@@ -264,13 +264,13 @@ impl ZfsManager {
 
     /// Get a pool by ID
     pub fn get_pool(&self, pool_id: u64) -> Option<ZfsPool> {
-        let pools = self.pools.lock().unwrap();
+        let pools = self.pools.lock().unwrap_or_else(|e| e.into_inner());
         pools.get(&pool_id).cloned()
     }
 
     /// Remove a pool
     pub fn remove_pool(&self, pool_id: u64) -> Result<(), String> {
-        let mut pools = self.pools.lock().unwrap();
+        let mut pools = self.pools.lock().unwrap_or_else(|e| e.into_inner());
         match pools.remove(&pool_id) {
             Some(pool) => {
                 if pool.active {
@@ -284,7 +284,7 @@ impl ZfsManager {
 
     /// Activate a pool
     pub fn activate_pool(&self, pool_id: u64) -> Result<(), String> {
-        let mut pools = self.pools.lock().unwrap();
+        let mut pools = self.pools.lock().unwrap_or_else(|e| e.into_inner());
         match pools.get_mut(&pool_id) {
             Some(pool) => pool.activate(),
             None => Err(format!("Pool {} not found", pool_id)),
@@ -293,7 +293,7 @@ impl ZfsManager {
 
     /// Deactivate a pool
     pub fn deactivate_pool(&self, pool_id: u64) -> Result<(), String> {
-        let mut pools = self.pools.lock().unwrap();
+        let mut pools = self.pools.lock().unwrap_or_else(|e| e.into_inner());
         match pools.get_mut(&pool_id) {
             Some(pool) => pool.deactivate(),
             None => Err(format!("Pool {} not found", pool_id)),
@@ -302,7 +302,7 @@ impl ZfsManager {
 
     /// Create dataset in a pool
     pub fn create_dataset(&self, pool_id: u64, dataset: ZfsDataset) -> Result<(), String> {
-        let mut pools = self.pools.lock().unwrap();
+        let mut pools = self.pools.lock().unwrap_or_else(|e| e.into_inner());
         match pools.get_mut(&pool_id) {
             Some(pool) => pool.create_dataset(dataset),
             None => Err(format!("Pool {} not found", pool_id)),
@@ -316,7 +316,7 @@ impl ZfsManager {
         dataset_name: &str,
         snapshot_name: &str,
     ) -> Result<(), String> {
-        let mut pools = self.pools.lock().unwrap();
+        let mut pools = self.pools.lock().unwrap_or_else(|e| e.into_inner());
         match pools.get_mut(&pool_id) {
             Some(pool) => pool.create_snapshot(dataset_name, snapshot_name),
             None => Err(format!("Pool {} not found", pool_id)),
@@ -325,13 +325,13 @@ impl ZfsManager {
 
     /// Get number of active pools
     pub fn active_pool_count(&self) -> usize {
-        let pools = self.pools.lock().unwrap();
+        let pools = self.pools.lock().unwrap_or_else(|e| e.into_inner());
         pools.values().filter(|p| p.is_active()).count()
     }
 
     /// Get total pool count
     pub fn pool_count(&self) -> usize {
-        let pools = self.pools.lock().unwrap();
+        let pools = self.pools.lock().unwrap_or_else(|e| e.into_inner());
         pools.len()
     }
 }

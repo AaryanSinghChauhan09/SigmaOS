@@ -191,13 +191,13 @@ impl CapsicumManager {
 
     /// Create a new sandbox
     pub fn create_sandbox(&self) -> u64 {
-        let mut next_id = self.next_sandbox_id.lock().unwrap();
+        let mut next_id = self.next_sandbox_id.lock().unwrap_or_else(|e| e.into_inner());
         let sandbox_id = *next_id;
         *next_id += 1;
         drop(next_id);
 
         let sandbox = CapsicumSandbox::new();
-        let mut sandboxes = self.sandboxes.lock().unwrap();
+        let mut sandboxes = self.sandboxes.lock().unwrap_or_else(|e| e.into_inner());
         sandboxes.insert(sandbox_id, sandbox);
 
         sandbox_id
@@ -205,13 +205,13 @@ impl CapsicumManager {
 
     /// Get a sandbox by ID
     pub fn get_sandbox(&self, sandbox_id: u64) -> Option<CapsicumSandbox> {
-        let sandboxes = self.sandboxes.lock().unwrap();
+        let sandboxes = self.sandboxes.lock().unwrap_or_else(|e| e.into_inner());
         sandboxes.get(&sandbox_id).cloned()
     }
 
     /// Remove a sandbox
     pub fn remove_sandbox(&self, sandbox_id: u64) -> Result<(), String> {
-        let mut sandboxes = self.sandboxes.lock().unwrap();
+        let mut sandboxes = self.sandboxes.lock().unwrap_or_else(|e| e.into_inner());
         match sandboxes.remove(&sandbox_id) {
             Some(_) => Ok(()),
             None => Err(format!("Sandbox {} not found", sandbox_id)),
@@ -220,7 +220,7 @@ impl CapsicumManager {
 
     /// Enter capability mode for a sandbox
     pub fn enter_capability_mode(&self, sandbox_id: u64) -> Result<(), String> {
-        let mut sandboxes = self.sandboxes.lock().unwrap();
+        let mut sandboxes = self.sandboxes.lock().unwrap_or_else(|e| e.into_inner());
         match sandboxes.get_mut(&sandbox_id) {
             Some(sandbox) => {
                 sandbox.enter_capability_mode();
@@ -232,7 +232,7 @@ impl CapsicumManager {
 
     /// Add capability to a sandbox
     pub fn add_capability(&self, sandbox_id: u64, cap: CapsicumCapability) -> Result<(), String> {
-        let mut sandboxes = self.sandboxes.lock().unwrap();
+        let mut sandboxes = self.sandboxes.lock().unwrap_or_else(|e| e.into_inner());
         match sandboxes.get_mut(&sandbox_id) {
             Some(sandbox) => {
                 sandbox.add_capability(cap);
@@ -252,7 +252,7 @@ impl CapsicumManager {
 
     /// Get number of active sandboxes
     pub fn sandbox_count(&self) -> usize {
-        let sandboxes = self.sandboxes.lock().unwrap();
+        let sandboxes = self.sandboxes.lock().unwrap_or_else(|e| e.into_inner());
         sandboxes.len()
     }
 }

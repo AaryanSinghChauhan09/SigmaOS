@@ -33,14 +33,14 @@ impl HostnameManager {
             }
         }
 
-        let mut hn = self.hostname.lock().unwrap();
+        let mut hn = self.hostname.lock().unwrap_or_else(|e| e.into_inner());
         *hn = hostname;
         Ok(())
     }
 
     /// Get the hostname
     pub fn get_hostname(&self) -> String {
-        let hn = self.hostname.lock().unwrap();
+        let hn = self.hostname.lock().unwrap_or_else(|e| e.into_inner());
         hn.clone()
     }
 
@@ -57,14 +57,14 @@ impl HostnameManager {
             }
         }
 
-        let mut dn = self.domainname.lock().unwrap();
+        let mut dn = self.domainname.lock().unwrap_or_else(|e| e.into_inner());
         *dn = domainname;
         Ok(())
     }
 
     /// Get the domain name
     pub fn get_domainname(&self) -> String {
-        let dn = self.domainname.lock().unwrap();
+        let dn = self.domainname.lock().unwrap_or_else(|e| e.into_inner());
         dn.clone()
     }
 

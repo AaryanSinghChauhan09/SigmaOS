@@ -108,13 +108,13 @@ impl SemaphoreSet {
 
     /// Get a semaphore by ID
     pub fn get_semaphore(&self, sem_id: u64) -> Option<Semaphore> {
-        let semaphores = self.semaphores.lock().unwrap();
+        let semaphores = self.semaphores.lock().unwrap_or_else(|e| e.into_inner());
         semaphores.get(&sem_id).cloned()
     }
 
     /// Remove a semaphore
     pub fn remove_semaphore(&self, sem_id: u64) -> Result<(), String> {
-        let mut semaphores = self.semaphores.lock().unwrap();
+        let mut semaphores = self.semaphores.lock().unwrap_or_else(|e| e.into_inner());
         match semaphores.remove(&sem_id) {
             Some(_) => Ok(()),
             None => Err(format!("Semaphore {} not found", sem_id)),
@@ -123,7 +123,7 @@ impl SemaphoreSet {
 
     /// Get semaphore count
     pub fn semaphore_count(&self) -> usize {
-        let semaphores = self.semaphores.lock().unwrap();
+        let semaphores = self.semaphores.lock().unwrap_or_else(|e| e.into_inner());
         semaphores.len()
     }
 }
@@ -144,13 +144,13 @@ impl SemaphoreManager {
 
     /// Create a semaphore set
     pub fn create_semaphore_set(&self, key: i32) -> u64 {
-        let mut next_id = self.next_set_id.lock().unwrap();
+        let mut next_id = self.next_set_id.lock().unwrap_or_else(|e| e.into_inner());
         let set_id = *next_id;
         *next_id += 1;
         drop(next_id);
 
         let set = SemaphoreSet::new(set_id, key);
-        let mut sets = self.semaphore_sets.lock().unwrap();
+        let mut sets = self.semaphore_sets.lock().unwrap_or_else(|e| e.into_inner());
         sets.insert(set_id, set);
 
         set_id
@@ -158,13 +158,13 @@ impl SemaphoreManager {
 
     /// Get a semaphore set by ID
     pub fn get_semaphore_set(&self, set_id: u64) -> Option<SemaphoreSet> {
-        let sets = self.semaphore_sets.lock().unwrap();
+        let sets = self.semaphore_sets.lock().unwrap_or_else(|e| e.into_inner());
         sets.get(&set_id).cloned()
     }
 
     /// Remove a semaphore set
     pub fn remove_semaphore_set(&self, set_id: u64) -> Result<(), String> {
-        let mut sets = self.semaphore_sets.lock().unwrap();
+        let mut sets = self.semaphore_sets.lock().unwrap_or_else(|e| e.into_inner());
         match sets.remove(&set_id) {
             Some(_) => Ok(()),
             None => Err(format!("Semaphore set {} not found", set_id)),
@@ -178,7 +178,7 @@ impl SemaphoreManager {
         initial_value: i32,
         max_value: i32,
     ) -> Result<u64, String> {
-        let sets = self.semaphore_sets.lock().unwrap();
+        let sets = self.semaphore_sets.lock().unwrap_or_else(|e| e.into_inner());
         match sets.get(&set_id) {
             Some(set) => Ok(set.create_semaphore(initial_value, max_value)),
             None => Err(format!("Semaphore set {} not found", set_id)),
@@ -187,10 +187,10 @@ impl SemaphoreManager {
 
     /// Wait on a semaphore
     pub fn wait(&self, set_id: u64, sem_id: u64) -> Result<SemaphoreResult, String> {
-        let sets = self.semaphore_sets.lock().unwrap();
+        let sets = self.semaphore_sets.lock().unwrap_or_else(|e| e.into_inner());
         match sets.get(&set_id) {
             Some(set) => {
-                let mut semaphores = set.semaphores.lock().unwrap();
+                let mut semaphores = set.semaphores.lock().unwrap_or_else(|e| e.into_inner());
                 match semaphores.get_mut(&sem_id) {
                     Some(sem) => Ok(sem.wait()),
                     None => Err(format!("Semaphore {} not found", sem_id)),
@@ -202,10 +202,10 @@ impl SemaphoreManager {
 
     /// Try wait on a semaphore
     pub fn try_wait(&self, set_id: u64, sem_id: u64) -> Result<SemaphoreResult, String> {
-        let sets = self.semaphore_sets.lock().unwrap();
+        let sets = self.semaphore_sets.lock().unwrap_or_else(|e| e.into_inner());
         match sets.get(&set_id) {
             Some(set) => {
-                let mut semaphores = set.semaphores.lock().unwrap();
+                let mut semaphores = set.semaphores.lock().unwrap_or_else(|e| e.into_inner());
                 match semaphores.get_mut(&sem_id) {
                     Some(sem) => Ok(sem.try_wait()),
                     None => Err(format!("Semaphore {} not found", sem_id)),
@@ -217,10 +217,10 @@ impl SemaphoreManager {
 
     /// Post to a semaphore
     pub fn post(&self, set_id: u64, sem_id: u64) -> Result<SemaphoreResult, String> {
-        let sets = self.semaphore_sets.lock().unwrap();
+        let sets = self.semaphore_sets.lock().unwrap_or_else(|e| e.into_inner());
         match sets.get(&set_id) {
             Some(set) => {
-                let mut semaphores = set.semaphores.lock().unwrap();
+                let mut semaphores = set.semaphores.lock().unwrap_or_else(|e| e.into_inner());
                 match semaphores.get_mut(&sem_id) {
                     Some(sem) => Ok(sem.post()),
                     None => Err(format!("Semaphore {} not found", sem_id)),
@@ -232,10 +232,10 @@ impl SemaphoreManager {
 
     /// Get semaphore value
     pub fn get_value(&self, set_id: u64, sem_id: u64) -> Result<i32, String> {
-        let sets = self.semaphore_sets.lock().unwrap();
+        let sets = self.semaphore_sets.lock().unwrap_or_else(|e| e.into_inner());
         match sets.get(&set_id) {
             Some(set) => {
-                let semaphores = set.semaphores.lock().unwrap();
+                let semaphores = set.semaphores.lock().unwrap_or_else(|e| e.into_inner());
                 match semaphores.get(&sem_id) {
                     Some(sem) => Ok(sem.get_value()),
                     None => Err(format!("Semaphore {} not found", sem_id)),
@@ -247,7 +247,7 @@ impl SemaphoreManager {
 
     /// Get semaphore set count
     pub fn set_count(&self) -> usize {
-        let sets = self.semaphore_sets.lock().unwrap();
+        let sets = self.semaphore_sets.lock().unwrap_or_else(|e| e.into_inner());
         sets.len()
     }
 }

@@ -774,7 +774,7 @@ mod tests {
         let manager = UserNamespaceManager::new();
         let ns_id = manager.create_namespace(1000, None).unwrap();
         let ns = manager.get_namespace(ns_id).unwrap();
-        let locked = ns.lock().unwrap();
+        let locked = ns.lock().unwrap_or_else(|e| e.into_inner());
         assert_eq!(locked.owner_uid, 1000);
         assert_eq!(locked.id, ns_id);
     }
@@ -808,7 +808,7 @@ mod tests {
         let ns = manager.get_namespace(ns_id).unwrap();
 
         {
-            let mut locked = ns.lock().unwrap();
+            let mut locked = ns.lock().unwrap_or_else(|e| e.into_inner());
             assert!(!locked.has_capability(CapabilitySet::CapChown));
 
             let result = locked.grant_capability(CapabilitySet::CapChown);
@@ -857,7 +857,7 @@ mod tests {
 
         let mapping = UidGidMapping::new(0, 100000, 65536);
         {
-            let mut locked = ns.lock().unwrap();
+            let mut locked = ns.lock().unwrap_or_else(|e| e.into_inner());
             let result = locked.set_uid_map(vec![mapping]);
             assert!(result.is_ok());
             assert_eq!(locked.uid_map.len(), 1);
@@ -872,7 +872,7 @@ mod tests {
 
         let mapping = UidGidMapping::new(0, 100000, 65536);
         {
-            let mut locked = ns.lock().unwrap();
+            let mut locked = ns.lock().unwrap_or_else(|e| e.into_inner());
             let result = locked.set_gid_map(vec![mapping]);
             assert!(result.is_ok());
             assert_eq!(locked.gid_map.len(), 1);
@@ -887,7 +887,7 @@ mod tests {
 
         let mapping = UidGidMapping::new(0, 100000, 65536);
         {
-            let mut locked = ns.lock().unwrap();
+            let mut locked = ns.lock().unwrap_or_else(|e| e.into_inner());
             locked.set_uid_map(vec![mapping]).unwrap();
 
             // Test mapping: host UID 100000 -> NS UID 0
@@ -910,7 +910,7 @@ mod tests {
 
         let mapping = UidGidMapping::new(0, 100000, 65536);
         {
-            let mut locked = ns.lock().unwrap();
+            let mut locked = ns.lock().unwrap_or_else(|e| e.into_inner());
             locked.set_uid_map(vec![mapping]).unwrap();
 
             // Test mapping: NS UID 0 -> host UID 100000
@@ -933,7 +933,7 @@ mod tests {
 
         let mapping = UidGidMapping::new(0, 100000, 65536);
         {
-            let mut locked = ns.lock().unwrap();
+            let mut locked = ns.lock().unwrap_or_else(|e| e.into_inner());
             locked.set_gid_map(vec![mapping]).unwrap();
 
             // Test mapping: host GID 100000 -> NS GID 0
@@ -956,7 +956,7 @@ mod tests {
 
         let mapping = UidGidMapping::new(0, 100000, 65536);
         {
-            let mut locked = ns.lock().unwrap();
+            let mut locked = ns.lock().unwrap_or_else(|e| e.into_inner());
             locked.set_gid_map(vec![mapping]).unwrap();
 
             // Test mapping: NS GID 0 -> host GID 100000
@@ -1000,7 +1000,7 @@ mod tests {
         let mapping2 = UidGidMapping::new(50, 100050, 100); // Overlaps with mapping1
 
         {
-            let mut locked = ns.lock().unwrap();
+            let mut locked = ns.lock().unwrap_or_else(|e| e.into_inner());
             let result = locked.set_uid_map(vec![mapping1, mapping2]);
             assert!(result.is_err());
             assert!(result.unwrap_err().contains("Overlapping"));
@@ -1016,7 +1016,7 @@ mod tests {
         let invalid_mapping = UidGidMapping::new(0, 100000, 0); // count = 0
 
         {
-            let mut locked = ns.lock().unwrap();
+            let mut locked = ns.lock().unwrap_or_else(|e| e.into_inner());
             let result = locked.set_uid_map(vec![invalid_mapping]);
             assert!(result.is_err());
         }
@@ -1033,7 +1033,7 @@ mod tests {
         let mapping3 = UidGidMapping::new(200, 300000, 100);
 
         {
-            let mut locked = ns.lock().unwrap();
+            let mut locked = ns.lock().unwrap_or_else(|e| e.into_inner());
             let result = locked.set_uid_map(vec![mapping1, mapping2, mapping3]);
             assert!(result.is_ok());
             assert_eq!(locked.uid_map.len(), 3);

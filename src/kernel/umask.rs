@@ -18,13 +18,13 @@ impl UmaskManager {
 
     /// Get umask
     pub fn get(&self) -> u32 {
-        let umask = self.umask.lock().unwrap();
+        let umask = self.umask.lock().unwrap_or_else(|e| e.into_inner());
         *umask
     }
 
     /// Set umask
     pub fn set(&self, mask: u32) -> u32 {
-        let mut umask = self.umask.lock().unwrap();
+        let mut umask = self.umask.lock().unwrap_or_else(|e| e.into_inner());
         let old = *umask;
         *umask = mask & 0o777; // Only keep permission bits
         old
@@ -32,13 +32,13 @@ impl UmaskManager {
 
     /// Apply umask to mode
     pub fn apply(&self, mode: u32) -> u32 {
-        let umask = self.umask.lock().unwrap();
+        let umask = self.umask.lock().unwrap_or_else(|e| e.into_inner());
         mode & !(*umask)
     }
 
     /// Apply umask to file mode (files cannot be executable by default)
     pub fn apply_file_mode(&self, mode: u32) -> u32 {
-        let umask = self.umask.lock().unwrap();
+        let umask = self.umask.lock().unwrap_or_else(|e| e.into_inner());
         // For files, remove execute bits from the mode before applying umask
         let file_mode = mode & 0o666;
         file_mode & !(*umask)
@@ -46,7 +46,7 @@ impl UmaskManager {
 
     /// Apply umask to directory mode
     pub fn apply_directory_mode(&self, mode: u32) -> u32 {
-        let umask = self.umask.lock().unwrap();
+        let umask = self.umask.lock().unwrap_or_else(|e| e.into_inner());
         // For directories, keep execute bits
         mode & !(*umask)
     }

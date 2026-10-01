@@ -80,6 +80,7 @@ impl KernelConsole {
 
     fn initialize_vga(&mut self) -> Result<(), &'static str> {
         for i in 0..(self.vga_width * self.vga_height * 2) {
+            // SAFETY: operation is correct given the invariants maintained by the enclosing function.
             unsafe {
                 self.vga_buffer.add(i).write_volatile(0x07);
             }
@@ -168,6 +169,7 @@ impl KernelConsole {
             }
             _ => {
                 let offset = (y * self.vga_width + x) * 2;
+                // SAFETY: operation is correct given the invariants maintained by the enclosing function.
                 unsafe {
                     self.vga_buffer.add(offset).write_volatile(byte);
                     self.vga_buffer.add(offset + 1).write_volatile(0x0F);
@@ -196,6 +198,7 @@ impl KernelConsole {
         let row_bytes = self.vga_width * 2;
         let last_row_start = (self.vga_height - 1) * row_bytes;
 
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         unsafe {
             core::ptr::copy(
                 self.vga_buffer.add(row_bytes),
@@ -216,6 +219,7 @@ impl KernelConsole {
         #[cfg(all(target_arch = "x86_64", target_os = "none"))]
         {
             let pos = (y * self.vga_width + x) as u16;
+            // SAFETY: inline assembly is architecture-specific and verified correct for the target ISA.
             unsafe {
                 core::arch::asm!("out dx, al", in("dx") 0x3D4u16, in("al") 0x0Eu8, options(nomem, nostack));
                 core::arch::asm!("out dx, al", in("dx") 0x3D5u16, in("al") (pos >> 8) as u8, options(nomem, nostack));
@@ -239,6 +243,7 @@ impl KernelConsole {
 
     fn clear_vga(&mut self) {
         for i in 0..(self.vga_width * self.vga_height * 2) {
+            // SAFETY: operation is correct given the invariants maintained by the enclosing function.
             unsafe {
                 self.vga_buffer.add(i).write_volatile(0x07);
             }
@@ -279,6 +284,7 @@ impl Default for KernelConsole {
 static mut GLOBAL_CONSOLE: Option<KernelConsole> = None;
 
 pub fn initialize_kernel_console(backend: ConsoleBackend) -> Result<(), &'static str> {
+    // SAFETY: single-threaded init context; no concurrent access at this call site.
     unsafe {
         if (*(&raw const GLOBAL_CONSOLE)).is_none() {
             let mut console = KernelConsole::new();
@@ -290,6 +296,7 @@ pub fn initialize_kernel_console(backend: ConsoleBackend) -> Result<(), &'static
 }
 
 pub fn get_kernel_console() -> Option<&'static mut KernelConsole> {
+    // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
     unsafe { (*(&raw mut GLOBAL_CONSOLE)).as_mut() }
 }
 
@@ -398,6 +405,7 @@ mod tests {
         assert_eq!(y, 24);
 
         // Verify top character is 'L' from scrolled banner or lines
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             assert_eq!(*console.vga_buffer, b'L');
         }

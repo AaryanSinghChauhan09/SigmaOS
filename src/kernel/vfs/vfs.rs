@@ -341,6 +341,7 @@ impl Dentry {
         let mut current = self;
         while let Some(parent_ptr) = current.d_parent {
             parts.push(current.d_name.clone());
+            // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
             let parent_ref = unsafe { &*(parent_ptr as *const Dentry) };
             current = parent_ref;
         }

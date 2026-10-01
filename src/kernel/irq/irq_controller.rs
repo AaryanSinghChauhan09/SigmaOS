@@ -143,6 +143,7 @@ impl IRQController {
         if irq < 256 {
             let handler = self.handlers[irq].load(Ordering::Acquire);
             if !handler.is_null() {
+                // SAFETY: operation is correct given the invariants maintained by the enclosing function.
                 unsafe {
                     (*handler).enabled.store(1, Ordering::SeqCst);
                 }
@@ -155,6 +156,7 @@ impl IRQController {
         if irq < 256 {
             let handler = self.handlers[irq].load(Ordering::Acquire);
             if !handler.is_null() {
+                // SAFETY: operation is correct given the invariants maintained by the enclosing function.
                 unsafe {
                     (*handler).enabled.store(0, Ordering::SeqCst);
                 }
@@ -171,6 +173,7 @@ impl IRQController {
 
         let handler = self.handlers[irq].load(Ordering::Acquire);
         if !handler.is_null() {
+            // SAFETY: operation is correct given the invariants maintained by the enclosing function.
             unsafe {
                 if (*handler).enabled.load(Ordering::Acquire) == 1 {
                     // Call handler function

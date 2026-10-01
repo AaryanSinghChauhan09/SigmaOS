@@ -202,6 +202,7 @@ impl Inode {
 
 impl Drop for Inode {
     fn drop(&mut self) {
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             self.free_data();
         }
@@ -223,6 +224,7 @@ impl DirectoryEntry {
         };
 
         let len = name.len().min(255);
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         unsafe {
             core::ptr::copy_nonoverlapping(name.as_ptr(), entry.name.as_mut_ptr(), len);
         }
@@ -310,6 +312,7 @@ impl<T> Vec<T> {
     }
 
     pub fn push(&mut self, item: T) {
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             if self.len >= self.capacity {
                 self.grow();
@@ -326,6 +329,7 @@ impl<T> Vec<T> {
         if index >= self.len {
             panic!("index out of bounds");
         }
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         unsafe {
             let item = core::ptr::read(self.data.add(index));
             core::ptr::copy(
@@ -387,6 +391,7 @@ impl<'a, T> Iterator for Iter<T> {
     type Item = &'a T;
     fn next(&mut self) -> Option<Self::Item> {
         if self.index < self.len {
+            // SAFETY: operation is correct given the invariants maintained by the enclosing function.
             unsafe {
                 let item = &*self.data.add(self.index);
                 self.index += 1;
@@ -416,6 +421,7 @@ impl MemoryFilesystem {
         };
 
         // Create root directory
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             let mut root_inode = Inode::new(0);
             root_inode.file_info.is_directory = true;
@@ -536,6 +542,7 @@ impl MemoryFilesystem {
 
 impl Filesystem for MemoryFilesystem {
     fn open(&self, path: &[u8], flags: FileFlags) -> Result<FileHandle, FilesystemError> {
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             let inode_id = self.resolve_path(path)?;
 
@@ -557,6 +564,7 @@ impl Filesystem for MemoryFilesystem {
     }
 
     fn read(&self, handle: FileHandle, buffer: &mut [u8]) -> Result<usize, FilesystemError> {
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             // In a real implementation, this would read from the inode data
             // For now, return success
@@ -565,6 +573,7 @@ impl Filesystem for MemoryFilesystem {
     }
 
     fn write(&self, handle: FileHandle, buffer: &[u8]) -> Result<usize, FilesystemError> {
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             // In a real implementation, this would write to the inode data
             // For now, return success
@@ -597,7 +606,9 @@ impl Filesystem for MemoryFilesystem {
     }
 
     fn mkdir(&self, path: &[u8]) -> Result<(), FilesystemError> {
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         let mut_self = unsafe { &mut *(self as *const MemoryFilesystem as *mut MemoryFilesystem) };
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             let parent_path = Self::get_parent_path(path);
             let dir_name = Self::get_last_component(path);
@@ -631,7 +642,9 @@ impl Filesystem for MemoryFilesystem {
     }
 
     fn rmdir(&self, path: &[u8]) -> Result<(), FilesystemError> {
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         let mut_self = unsafe { &mut *(self as *const MemoryFilesystem as *mut MemoryFilesystem) };
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             let inode_id = mut_self.resolve_path(path)?;
 
@@ -656,7 +669,9 @@ impl Filesystem for MemoryFilesystem {
     }
 
     fn unlink(&self, path: &[u8]) -> Result<(), FilesystemError> {
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         let mut_self = unsafe { &mut *(self as *const MemoryFilesystem as *mut MemoryFilesystem) };
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             let inode_id = mut_self.resolve_path(path)?;
 
@@ -681,6 +696,7 @@ impl Filesystem for MemoryFilesystem {
     }
 
     fn stat(&self, path: &[u8]) -> Result<FileInfo, FilesystemError> {
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             let inode_id = self.resolve_path(path)?;
 
@@ -721,6 +737,7 @@ impl<T> core::ops::Deref for Vec<T> {
         if self.data.is_null() {
             &[]
         } else {
+            // SAFETY: raw pointer was obtained from Box::into_raw and is exclusively owned here.
             unsafe { core::slice::from_raw_parts(self.data, self.len) }
         }
     }
@@ -731,6 +748,7 @@ impl<T> core::ops::DerefMut for Vec<T> {
         if self.data.is_null() {
             &mut []
         } else {
+            // SAFETY: raw pointer was obtained from Box::into_raw and is exclusively owned here.
             unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
         }
     }

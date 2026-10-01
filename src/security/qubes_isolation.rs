@@ -586,6 +586,7 @@ pub struct SQrexecChannel {
 impl SQrexecChannel {
     pub fn new(size: usize) -> Self {
         let layout = std::alloc::Layout::from_size_align(size.max(1), 8).unwrap();
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         let buffer = unsafe { std::alloc::alloc(layout) };
         Self {
             buffer,
@@ -602,6 +603,7 @@ impl SQrexecChannel {
             return Err(IsolationError::IpcRouteFailed);
         }
 
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         unsafe {
             core::ptr::copy_nonoverlapping(data.as_ptr(), self.buffer.add(w), len);
         }
@@ -615,6 +617,7 @@ impl SQrexecChannel {
         let mut vec = Vec::new();
 
         if w > r {
+            // SAFETY: operation is correct given the invariants maintained by the enclosing function.
             unsafe {
                 for i in r..w {
                     vec.push(*self.buffer.add(i));
@@ -626,6 +629,7 @@ impl SQrexecChannel {
     }
 
     pub fn destroy(&self) {
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         unsafe {
             core::ptr::write_bytes(self.buffer, 0, self.size);
             let layout = std::alloc::Layout::from_size_align(self.size.max(1), 8).unwrap();

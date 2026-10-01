@@ -186,13 +186,13 @@ impl CronManager {
 
     /// Create a new cron job
     pub fn create_job(&self, schedule: CronSchedule, command: String) -> u64 {
-        let mut next_id = self.next_job_id.lock().unwrap();
+        let mut next_id = self.next_job_id.lock().unwrap_or_else(|e| e.into_inner());
         let job_id = *next_id;
         *next_id += 1;
         drop(next_id);
 
         let job = CronJob::new(job_id, schedule, command);
-        let mut jobs = self.jobs.lock().unwrap();
+        let mut jobs = self.jobs.lock().unwrap_or_else(|e| e.into_inner());
         jobs.insert(job_id, job);
 
         job_id
@@ -200,13 +200,13 @@ impl CronManager {
 
     /// Get a job by ID
     pub fn get_job(&self, job_id: u64) -> Option<CronJob> {
-        let jobs = self.jobs.lock().unwrap();
+        let jobs = self.jobs.lock().unwrap_or_else(|e| e.into_inner());
         jobs.get(&job_id).cloned()
     }
 
     /// Remove a job
     pub fn remove_job(&self, job_id: u64) -> Result<(), String> {
-        let mut jobs = self.jobs.lock().unwrap();
+        let mut jobs = self.jobs.lock().unwrap_or_else(|e| e.into_inner());
         match jobs.remove(&job_id) {
             Some(_) => Ok(()),
             None => Err(format!("Job {} not found", job_id)),
@@ -215,7 +215,7 @@ impl CronManager {
 
     /// Enable a job
     pub fn enable_job(&self, job_id: u64) -> Result<(), String> {
-        let mut jobs = self.jobs.lock().unwrap();
+        let mut jobs = self.jobs.lock().unwrap_or_else(|e| e.into_inner());
         match jobs.get_mut(&job_id) {
             Some(job) => {
                 job.enabled = true;
@@ -227,7 +227,7 @@ impl CronManager {
 
     /// Disable a job
     pub fn disable_job(&self, job_id: u64) -> Result<(), String> {
-        let mut jobs = self.jobs.lock().unwrap();
+        let mut jobs = self.jobs.lock().unwrap_or_else(|e| e.into_inner());
         match jobs.get_mut(&job_id) {
             Some(job) => {
                 job.enabled = false;
@@ -246,7 +246,7 @@ impl CronManager {
         month: u32,
         day_of_week: u32,
     ) -> Vec<CronJob> {
-        let jobs = self.jobs.lock().unwrap();
+        let jobs = self.jobs.lock().unwrap_or_else(|e| e.into_inner());
         jobs.values()
             .filter(|job| job.should_run(minute, hour, day_of_month, month, day_of_week))
             .cloned()
@@ -255,13 +255,13 @@ impl CronManager {
 
     /// Get all jobs
     pub fn get_all_jobs(&self) -> Vec<CronJob> {
-        let jobs = self.jobs.lock().unwrap();
+        let jobs = self.jobs.lock().unwrap_or_else(|e| e.into_inner());
         jobs.values().cloned().collect()
     }
 
     /// Get job count
     pub fn job_count(&self) -> usize {
-        let jobs = self.jobs.lock().unwrap();
+        let jobs = self.jobs.lock().unwrap_or_else(|e| e.into_inner());
         jobs.len()
     }
 }

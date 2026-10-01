@@ -427,6 +427,7 @@ impl WgDevice {
             return Err("no active session — handshake needed");
         }
 
+        // SAFETY: peer.session.is_none() guard above ensures this is always Some here.
         let session = peer.session.as_mut().unwrap();
         let nonce = session.next_send_nonce();
 
@@ -494,6 +495,7 @@ impl WgDevice {
         let eph = PrivateKey([0x42u8; 32]); // In production: random ephemeral key
         let sender_index = (now_ns & 0xFFFF_FFFF) as u32;
         peer.handshake = Some(WgHandshake::new_initiator(eph, sender_index, now_ns));
+        // SAFETY: peer.handshake was set to Some(WgHandshake::new_initiator(...)) on the line above.
         peer.handshake.as_mut().unwrap().state = HandshakeState::InitSent;
         Ok(())
     }

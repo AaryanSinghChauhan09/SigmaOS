@@ -257,7 +257,7 @@ impl Procfs {
         // Add to parent directory
         if let Some(parent_path) = Self::parent_path(&path) {
             if let Some(parent) = self.entries.get_mut(&parent_path) {
-                let mut parent_guard = parent.lock().unwrap();
+                let mut parent_guard = parent.lock().unwrap_or_else(|e| e.into_inner());
                 parent_guard.add_child(path.clone());
             }
         }
@@ -320,7 +320,7 @@ impl Procfs {
             .get(path)
             .ok_or_else(|| format!("Entry not found: {}", path))?;
 
-        let entry_guard = entry.lock().unwrap();
+        let entry_guard = entry.lock().unwrap_or_else(|e| e.into_inner());
         if entry_guard.entry_type != ProcEntryType::File {
             return Err("Not a file".to_string());
         }
@@ -334,7 +334,7 @@ impl Procfs {
             .get(path)
             .ok_or_else(|| format!("Entry not found: {}", path))?;
 
-        let entry_guard = entry.lock().unwrap();
+        let entry_guard = entry.lock().unwrap_or_else(|e| e.into_inner());
         if entry_guard.entry_type != ProcEntryType::Directory {
             return Err("Not a directory".to_string());
         }
@@ -375,7 +375,7 @@ impl Procfs {
     fn update_meminfo_entry(&mut self) {
         let new_value = self.generate_meminfo();
         if let Some(entry) = self.entries.get_mut("/proc/meminfo") {
-            let mut entry_guard = entry.lock().unwrap();
+            let mut entry_guard = entry.lock().unwrap_or_else(|e| e.into_inner());
             entry_guard.value = new_value;
         }
     }
@@ -388,7 +388,7 @@ impl Procfs {
     fn update_stat_entry(&mut self) {
         let new_value = self.generate_stat();
         if let Some(entry) = self.entries.get_mut("/proc/stat") {
-            let mut entry_guard = entry.lock().unwrap();
+            let mut entry_guard = entry.lock().unwrap_or_else(|e| e.into_inner());
             entry_guard.value = new_value;
         }
     }

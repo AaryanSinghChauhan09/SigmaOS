@@ -79,13 +79,13 @@ impl IoctlManager {
 
     /// Open device
     pub fn open_device(&self, device_type: String) -> i32 {
-        let mut next_fd = self.next_fd.lock().unwrap();
+        let mut next_fd = self.next_fd.lock().unwrap_or_else(|e| e.into_inner());
         let fd = *next_fd;
         *next_fd += 1;
         drop(next_fd);
 
         let device = IoctlDevice::new(fd, device_type);
-        let mut devices = self.devices.lock().unwrap();
+        let mut devices = self.devices.lock().unwrap_or_else(|e| e.into_inner());
         devices.insert(fd, device);
 
         fd
@@ -93,7 +93,7 @@ impl IoctlManager {
 
     /// Close device
     pub fn close_device(&self, fd: i32) -> Result<(), String> {
-        let mut devices = self.devices.lock().unwrap();
+        let mut devices = self.devices.lock().unwrap_or_else(|e| e.into_inner());
         match devices.remove(&fd) {
             Some(_) => Ok(()),
             None => Err(format!("Device fd {} not found", fd)),
@@ -102,7 +102,7 @@ impl IoctlManager {
 
     /// Perform ioctl
     pub fn ioctl(&self, fd: i32, request: IoctlRequest) -> Result<IoctlResponse, String> {
-        let devices = self.devices.lock().unwrap();
+        let devices = self.devices.lock().unwrap_or_else(|e| e.into_inner());
         match devices.get(&fd) {
             Some(device) => Ok(device.ioctl(request)),
             None => Err(format!("Device fd {} not found", fd)),
@@ -111,13 +111,13 @@ impl IoctlManager {
 
     /// Get device
     pub fn get_device(&self, fd: i32) -> Option<IoctlDevice> {
-        let devices = self.devices.lock().unwrap();
+        let devices = self.devices.lock().unwrap_or_else(|e| e.into_inner());
         devices.get(&fd).cloned()
     }
 
     /// Get device count
     pub fn device_count(&self) -> usize {
-        let devices = self.devices.lock().unwrap();
+        let devices = self.devices.lock().unwrap_or_else(|e| e.into_inner());
         devices.len()
     }
 }

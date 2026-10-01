@@ -207,13 +207,13 @@ impl PledgeManager {
 
     /// Create a new pledge context
     pub fn create_context(&self) -> u64 {
-        let mut next_id = self.next_context_id.lock().unwrap();
+        let mut next_id = self.next_context_id.lock().unwrap_or_else(|e| e.into_inner());
         let context_id = *next_id;
         *next_id += 1;
         drop(next_id);
 
         let context = PledgeContext::new();
-        let mut contexts = self.contexts.lock().unwrap();
+        let mut contexts = self.contexts.lock().unwrap_or_else(|e| e.into_inner());
         contexts.insert(context_id, context);
 
         context_id
@@ -221,13 +221,13 @@ impl PledgeManager {
 
     /// Get a context by ID
     pub fn get_context(&self, context_id: u64) -> Option<PledgeContext> {
-        let contexts = self.contexts.lock().unwrap();
+        let contexts = self.contexts.lock().unwrap_or_else(|e| e.into_inner());
         contexts.get(&context_id).cloned()
     }
 
     /// Remove a context
     pub fn remove_context(&self, context_id: u64) -> Result<(), String> {
-        let mut contexts = self.contexts.lock().unwrap();
+        let mut contexts = self.contexts.lock().unwrap_or_else(|e| e.into_inner());
         match contexts.remove(&context_id) {
             Some(_) => Ok(()),
             None => Err(format!("Context {} not found", context_id)),
@@ -236,7 +236,7 @@ impl PledgeManager {
 
     /// Pledge for a context
     pub fn pledge(&self, context_id: u64, promises: &[PledgePromise]) -> Result<(), String> {
-        let mut contexts = self.contexts.lock().unwrap();
+        let mut contexts = self.contexts.lock().unwrap_or_else(|e| e.into_inner());
         match contexts.get_mut(&context_id) {
             Some(context) => context.pledge(promises),
             None => Err(format!("Context {} not found", context_id)),
@@ -253,7 +253,7 @@ impl PledgeManager {
 
     /// Get number of active contexts
     pub fn context_count(&self) -> usize {
-        let contexts = self.contexts.lock().unwrap();
+        let contexts = self.contexts.lock().unwrap_or_else(|e| e.into_inner());
         contexts.len()
     }
 }

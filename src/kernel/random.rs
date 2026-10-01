@@ -121,7 +121,7 @@ impl RandomManager {
         len: usize,
         _flags: RandomFlags,
     ) -> Result<RandomBytes, String> {
-        let mut state = self.urandom_state.lock().unwrap();
+        let mut state = self.urandom_state.lock().unwrap_or_else(|e| e.into_inner());
         let data = state.random_bytes(len);
 
         Ok(RandomBytes::new(data, RandomSource::Urandom))
@@ -129,7 +129,7 @@ impl RandomManager {
 
     /// Get random bytes from random (blocking for entropy)
     pub fn getrandom_random(&self, len: usize, _flags: RandomFlags) -> Result<RandomBytes, String> {
-        let mut state = self.random_state.lock().unwrap();
+        let mut state = self.random_state.lock().unwrap_or_else(|e| e.into_inner());
         let data = state.random_bytes(len);
 
         Ok(RandomBytes::new(data, RandomSource::Random))
@@ -150,10 +150,10 @@ impl RandomManager {
 
     /// Reseed the random generators
     pub fn reseed(&self, urandom_seed: u64, random_seed: u64) {
-        let mut urandom_state = self.urandom_state.lock().unwrap();
+        let mut urandom_state = self.urandom_state.lock().unwrap_or_else(|e| e.into_inner());
         *urandom_state = RandomState::new(urandom_seed);
 
-        let mut random_state = self.random_state.lock().unwrap();
+        let mut random_state = self.random_state.lock().unwrap_or_else(|e| e.into_inner());
         *random_state = RandomState::new(random_seed);
     }
 }

@@ -178,7 +178,7 @@ impl CapabilityManager {
             .get(&pid)
             .ok_or_else(|| format!("Process not found: {}", pid))?;
 
-        let mut caps_guard = caps.lock().unwrap();
+        let mut caps_guard = caps.lock().unwrap_or_else(|e| e.into_inner());
         caps_guard.add_permitted(cap);
         caps_guard.add_effective(cap);
         Ok(())
@@ -191,7 +191,7 @@ impl CapabilityManager {
             .get(&pid)
             .ok_or_else(|| format!("Process not found: {}", pid))?;
 
-        let mut caps_guard = caps.lock().unwrap();
+        let mut caps_guard = caps.lock().unwrap_or_else(|e| e.into_inner());
         caps_guard.remove_effective(cap);
         Ok(())
     }

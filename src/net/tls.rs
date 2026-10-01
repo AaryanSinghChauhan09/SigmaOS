@@ -185,6 +185,7 @@ impl TlsEngine {
         }
 
         let session_idx = self.create_session(config);
+        // SAFETY: session_idx was returned by create_session() which just inserted it; index is always valid.
         let session = self.sessions.get_mut(session_idx).unwrap();
 
         session.psk_identity = Some(ticket.to_vec());

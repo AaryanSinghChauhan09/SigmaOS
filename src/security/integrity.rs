@@ -107,6 +107,7 @@ impl SimpleFile {
         let path_len = path.len().min(255);
         let checksum_len = checksum.len().min(63);
 
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         unsafe {
             core::ptr::copy_nonoverlapping(path.as_ptr(), path_array.as_mut_ptr(), path_len);
             core::ptr::copy_nonoverlapping(
@@ -128,6 +129,7 @@ impl SimpleFile {
     }
 
     pub fn get_status(&self) -> IntegrityStatus {
+        // SAFETY: transmute is valid because source and destination types have identical size and alignment.
         unsafe { core::mem::transmute(self.status.load(Ordering::SeqCst)) }
     }
 

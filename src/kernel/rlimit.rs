@@ -153,13 +153,13 @@ impl ResourceLimitsManager {
 
     /// Create resource limits for a process
     pub fn create_limits(&self) -> u64 {
-        let mut next_pid = self.next_pid.lock().unwrap();
+        let mut next_pid = self.next_pid.lock().unwrap_or_else(|e| e.into_inner());
         let pid = *next_pid;
         *next_pid += 1;
         drop(next_pid);
 
         let limits = ResourceLimits::new();
-        let mut limits_map = self.limits.lock().unwrap();
+        let mut limits_map = self.limits.lock().unwrap_or_else(|e| e.into_inner());
         limits_map.insert(pid, limits);
 
         pid
@@ -167,13 +167,13 @@ impl ResourceLimitsManager {
 
     /// Get resource limits for a process
     pub fn get_limits(&self, pid: u64) -> Option<ResourceLimits> {
-        let limits_map = self.limits.lock().unwrap();
+        let limits_map = self.limits.lock().unwrap_or_else(|e| e.into_inner());
         limits_map.get(&pid).cloned()
     }
 
     /// Remove resource limits
     pub fn remove_limits(&self, pid: u64) -> Result<(), String> {
-        let mut limits_map = self.limits.lock().unwrap();
+        let mut limits_map = self.limits.lock().unwrap_or_else(|e| e.into_inner());
         match limits_map.remove(&pid) {
             Some(_) => Ok(()),
             None => Err(format!("Resource limits for pid {} not found", pid)),
@@ -182,13 +182,13 @@ impl ResourceLimitsManager {
 
     /// Get resource limit
     pub fn get(&self, pid: u64, resource: RlimitResource) -> Option<Rlimit> {
-        let limits_map = self.limits.lock().unwrap();
+        let limits_map = self.limits.lock().unwrap_or_else(|e| e.into_inner());
         limits_map.get(&pid).and_then(|l| l.get(resource))
     }
 
     /// Set resource limit
     pub fn set(&self, pid: u64, resource: RlimitResource, rlimit: Rlimit) -> Result<(), String> {
-        let mut limits_map = self.limits.lock().unwrap();
+        let mut limits_map = self.limits.lock().unwrap_or_else(|e| e.into_inner());
         match limits_map.get_mut(&pid) {
             Some(limits) => limits.set(resource, rlimit),
             None => Err(format!("Resource limits for pid {} not found", pid)),
@@ -197,7 +197,7 @@ impl ResourceLimitsManager {
 
     /// Check resource usage
     pub fn check(&self, pid: u64, resource: RlimitResource, value: u64) -> bool {
-        let limits_map = self.limits.lock().unwrap();
+        let limits_map = self.limits.lock().unwrap_or_else(|e| e.into_inner());
         limits_map
             .get(&pid)
             .map_or(true, |l| l.check(resource, value))
@@ -205,7 +205,7 @@ impl ResourceLimitsManager {
 
     /// Get limits count
     pub fn limits_count(&self) -> usize {
-        let limits_map = self.limits.lock().unwrap();
+        let limits_map = self.limits.lock().unwrap_or_else(|e| e.into_inner());
         limits_map.len()
     }
 }

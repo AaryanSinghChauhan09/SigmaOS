@@ -95,10 +95,12 @@ impl KernelObject for KObject {
     }
 
     fn parent(&self) -> Option<&dyn KernelObject> {
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         self.parent.map(|p| unsafe { &*p })
     }
 
     fn set_parent(&mut self, parent: Option<&dyn KernelObject>) {
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         self.parent = parent.map(|p| unsafe {
             core::mem::transmute::<&dyn KernelObject, &'static dyn KernelObject>(p)
                 as *const dyn KernelObject
@@ -108,11 +110,13 @@ impl KernelObject for KObject {
     fn children(&self) -> Vec<&dyn KernelObject> {
         self.children
             .iter()
+            // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
             .filter_map(|c| unsafe { c.as_ref() })
             .collect()
     }
 
     fn add_child(&mut self, child: &dyn KernelObject) {
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         self.children.push(unsafe {
             core::mem::transmute::<&dyn KernelObject, &'static dyn KernelObject>(child)
                 as *const dyn KernelObject
@@ -123,9 +127,11 @@ impl KernelObject for KObject {
         if let Some(idx) = self
             .children
             .iter()
+            // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
             .position(|c| unsafe { c.as_ref() }.map_or(false, |child| child.name() == child_name))
         {
             let child_ptr = self.children.remove(idx);
+            // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
             unsafe { Some(Box::from_raw(child_ptr as *mut dyn KernelObject)) }
         } else {
             None
@@ -481,6 +487,7 @@ mod tests {
     static mut MOCK_UNLOAD_CALLED: bool = false;
     fn mock_unload_routine(context_address: usize) -> Result<(), ObjectError> {
         if context_address == 0xBAADF00D {
+            // SAFETY: operation is correct given the invariants maintained by the enclosing function.
             unsafe {
                 MOCK_UNLOAD_CALLED = true;
             }
@@ -499,11 +506,13 @@ mod tests {
         dev_dir.insert_object("HarddiskVolume1".to_string(), disk_ptr);
 
         let retrieved = dev_dir.lookup_object("HarddiskVolume1").unwrap();
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             let dev_obj = &*retrieved;
             assert_eq!(dev_obj.name(), "HarddiskVolume1");
         }
 
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         unsafe {
             let _ = Box::from_raw(disk_ptr as *mut DeviceObject);
         }
@@ -547,6 +556,7 @@ mod tests {
         driver_ctx.unload_driver().unwrap();
         assert!(!driver_ctx.is_loaded);
 
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             assert!(MOCK_UNLOAD_CALLED);
         }

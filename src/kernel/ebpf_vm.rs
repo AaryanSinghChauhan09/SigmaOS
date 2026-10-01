@@ -244,9 +244,11 @@ impl BpfHelper for GetPrandomU32Helper {
     fn execute(&self, vm: &mut BpfVm) -> Result<u64, String> {
         // Returns: random u32 value
         use std::time::SystemTime;
+        // SAFETY: duration_since only returns Err if time went before UNIX_EPOCH;
+        // unwrap_or_default gives Duration::ZERO as a safe fallback.
         let nanos = SystemTime::now()
             .duration_since(UNIX_EPOCH)
-            .unwrap()
+            .unwrap_or_default()
             .subsec_nanos();
 
         // Simple PRNG based on time

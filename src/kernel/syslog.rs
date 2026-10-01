@@ -265,37 +265,37 @@ impl SyslogManager {
         message: String,
     ) {
         let entry = SyslogEntry::new(facility, severity, process, pid, message);
-        let mut buffer = self.buffer.lock().unwrap();
+        let mut buffer = self.buffer.lock().unwrap_or_else(|e| e.into_inner());
         buffer.add(entry);
     }
 
     /// Get all entries
     pub fn get_all(&self) -> Vec<SyslogEntry> {
-        let buffer = self.buffer.lock().unwrap();
+        let buffer = self.buffer.lock().unwrap_or_else(|e| e.into_inner());
         buffer.get_all()
     }
 
     /// Get entries by severity
     pub fn get_by_severity(&self, severity: SyslogSeverity) -> Vec<SyslogEntry> {
-        let buffer = self.buffer.lock().unwrap();
+        let buffer = self.buffer.lock().unwrap_or_else(|e| e.into_inner());
         buffer.get_by_severity(severity)
     }
 
     /// Get entries by facility
     pub fn get_by_facility(&self, facility: SyslogFacility) -> Vec<SyslogEntry> {
-        let buffer = self.buffer.lock().unwrap();
+        let buffer = self.buffer.lock().unwrap_or_else(|e| e.into_inner());
         buffer.get_by_facility(facility)
     }
 
     /// Clear all entries
     pub fn clear(&self) {
-        let mut buffer = self.buffer.lock().unwrap();
+        let mut buffer = self.buffer.lock().unwrap_or_else(|e| e.into_inner());
         buffer.clear();
     }
 
     /// Get entry count
     pub fn len(&self) -> usize {
-        let buffer = self.buffer.lock().unwrap();
+        let buffer = self.buffer.lock().unwrap_or_else(|e| e.into_inner());
         buffer.len()
     }
 }

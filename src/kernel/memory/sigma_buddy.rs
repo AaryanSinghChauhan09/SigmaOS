@@ -458,6 +458,7 @@ impl SigmaBuddyAllocator {
 
         // Scrub and poison memory on free if poison_on_free is enabled
         if self.poison_on_free && block.size > 0 {
+            // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
             unsafe {
                 core::ptr::write_bytes(block.addr.as_ptr(), 0xDE, block.size);
             }

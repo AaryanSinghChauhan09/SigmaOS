@@ -121,6 +121,7 @@ impl SimpleSecret {
         let mut name_array = [0u8; 64];
         let name_len = name.len().min(63);
 
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         unsafe {
             core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
         }
@@ -139,6 +140,7 @@ impl SimpleSecret {
 
     pub fn set_data(&mut self, data: &[u8]) {
         let len = data.len().min(511);
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         unsafe {
             core::ptr::copy_nonoverlapping(data.as_ptr(), self.data.as_mut_ptr(), len);
         }

@@ -539,6 +539,7 @@ impl ForensicStorageFilter {
 
     pub fn secure_memory_wipe(&self, target_buffer: &mut [u8]) {
         for byte in target_buffer.iter_mut() {
+            // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
             unsafe {
                 core::ptr::write_volatile(byte, 0x00);
             }

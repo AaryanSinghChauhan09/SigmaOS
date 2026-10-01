@@ -341,26 +341,32 @@ impl Tty {
     pub fn ioctl(&mut self, request: usize, arg: usize) -> Result<usize, &'static str> {
         match request {
             TIOCGWINSZ => {
+                // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
                 unsafe { *(arg as *mut Winsize) = self.winsize };
                 Ok(0)
             }
             TIOCSWINSZ => {
+                // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
                 unsafe { self.winsize = *(arg as *const Winsize) };
                 Ok(0)
             }
             TCGETS => {
+                // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
                 unsafe { *(arg as *mut Termios) = self.termios };
                 Ok(0)
             }
             TCSETS => {
+                // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
                 unsafe { self.termios = *(arg as *const Termios) };
                 Ok(0)
             }
             TIOCGPGRP => {
+                // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
                 unsafe { *(arg as *mut u64) = self.foreground_pgid };
                 Ok(0)
             }
             TIOCSPGRP => {
+                // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
                 unsafe { self.foreground_pgid = *(arg as *const u64) };
                 Ok(0)
             }

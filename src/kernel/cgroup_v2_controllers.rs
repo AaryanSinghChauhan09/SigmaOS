@@ -235,7 +235,7 @@ impl CgroupV2Manager {
             .get(name)
             .ok_or_else(|| format!("cgroup not found: {}", name))?;
 
-        let process_count = cg.lock().unwrap().process_count();
+        let process_count = cg.lock().unwrap_or_else(|e| e.into_inner()).process_count();
         if process_count > 0 {
             return Err(format!(
                 "cgroup has {} processes, cannot remove",

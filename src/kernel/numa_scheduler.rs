@@ -65,11 +65,13 @@ impl LockFreeTaskQueue {
 
         loop {
             let tail_ptr = self.tail.load(Ordering::Acquire);
+            // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
             let next_ptr = unsafe { (*tail_ptr).next.load(Ordering::Acquire) };
 
             if tail_ptr == self.tail.load(Ordering::Acquire) {
                 if next_ptr.is_null() {
                     // Try to link the new node to the end of the list
+                    // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
                     if unsafe {
                         (*tail_ptr)
                             .next
@@ -108,6 +110,7 @@ impl LockFreeTaskQueue {
         loop {
             let head_ptr = self.head.load(Ordering::Acquire);
             let tail_ptr = self.tail.load(Ordering::Acquire);
+            // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
             let next_ptr = unsafe { (*head_ptr).next.load(Ordering::Acquire) };
 
             if head_ptr == self.head.load(Ordering::Acquire) {
@@ -124,6 +127,7 @@ impl LockFreeTaskQueue {
                     );
                 } else {
                     // Read the task from the first non-dummy node
+                    // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
                     let task = unsafe { (*next_ptr).task.clone() };
                     // Attempt to shift head to next node
                     if self
@@ -132,6 +136,7 @@ impl LockFreeTaskQueue {
                         .is_ok()
                     {
                         // Deallocate the old dummy head node safely
+                        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
                         unsafe {
                             let _ = Box::from_raw(head_ptr);
                         }
@@ -149,6 +154,7 @@ impl Drop for LockFreeTaskQueue {
         while self.dequeue().is_some() {}
         let head_ptr = self.head.load(Ordering::Acquire);
         if !head_ptr.is_null() {
+            // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
             unsafe {
                 let _ = Box::from_raw(head_ptr);
             }

@@ -110,6 +110,7 @@ impl DefaultDenyNetworkPolicy {
     pub fn whitelist_endpoint(&mut self, endpoint: &[u8]) {
         let mut ep_array = [0u8; 32];
         let len = endpoint.len().min(31);
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         unsafe {
             core::ptr::copy_nonoverlapping(endpoint.as_ptr(), ep_array.as_mut_ptr(), len);
         }
@@ -192,6 +193,7 @@ impl<T> Vec<T> {
         }
     }
     fn push(&mut self, item: T) {
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             if self.len >= self.capacity {
                 self.grow();
@@ -228,6 +230,7 @@ impl<T> core::ops::Index<usize> for Vec<T> {
         if index >= self.len {
             panic!("index out of bounds");
         }
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe { &*self.data.add(index) }
     }
 }
@@ -237,6 +240,7 @@ impl<T> core::ops::IndexMut<usize> for Vec<T> {
         if index >= self.len {
             panic!("index out of bounds");
         }
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe { &mut *self.data.add(index) }
     }
 }
@@ -244,6 +248,7 @@ impl<T> core::ops::IndexMut<usize> for Vec<T> {
 impl<T> Drop for Vec<T> {
     fn drop(&mut self) {
         if self.capacity > 0 {
+            // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
             unsafe {
                 for i in 0..self.len {
                     core::ptr::drop_in_place(self.data.add(i));

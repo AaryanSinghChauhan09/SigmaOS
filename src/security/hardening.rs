@@ -22,6 +22,7 @@ pub enum IntrusionSeverity {
 /// Uses volatile writes to guarantee that the compiler does not optimize away the memory wipe (preventing CVE leaks)
 pub fn secure_zeroize<T: Copy + Default>(slice: &mut [T]) {
     for item in slice.iter_mut() {
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         unsafe {
             core::ptr::write_volatile(item as *mut T, T::default());
         }

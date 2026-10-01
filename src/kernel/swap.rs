@@ -111,13 +111,13 @@ impl SwapManager {
 
     /// Create a new swap device
     pub fn create_device(&self, device_type: SwapDeviceType, path: String, size: u64) -> u64 {
-        let mut next_id = self.next_device_id.lock().unwrap();
+        let mut next_id = self.next_device_id.lock().unwrap_or_else(|e| e.into_inner());
         let device_id = *next_id;
         *next_id += 1;
         drop(next_id);
 
         let device = SwapDevice::new(device_id, device_type, path, size);
-        let mut devices = self.devices.lock().unwrap();
+        let mut devices = self.devices.lock().unwrap_or_else(|e| e.into_inner());
         devices.insert(device_id, device);
 
         device_id
@@ -125,13 +125,13 @@ impl SwapManager {
 
     /// Get a device by ID
     pub fn get_device(&self, device_id: u64) -> Option<SwapDevice> {
-        let devices = self.devices.lock().unwrap();
+        let devices = self.devices.lock().unwrap_or_else(|e| e.into_inner());
         devices.get(&device_id).cloned()
     }
 
     /// Remove a device
     pub fn remove_device(&self, device_id: u64) -> Result<(), String> {
-        let mut devices = self.devices.lock().unwrap();
+        let mut devices = self.devices.lock().unwrap_or_else(|e| e.into_inner());
         match devices.remove(&device_id) {
             Some(device) => {
                 if device.active {
@@ -145,7 +145,7 @@ impl SwapManager {
 
     /// Activate a swap device
     pub fn activate_device(&self, device_id: u64) -> Result<(), String> {
-        let mut devices = self.devices.lock().unwrap();
+        let mut devices = self.devices.lock().unwrap_or_else(|e| e.into_inner());
         match devices.get_mut(&device_id) {
             Some(device) => device.activate(),
             None => Err(format!("Swap device {} not found", device_id)),
@@ -154,7 +154,7 @@ impl SwapManager {
 
     /// Deactivate a swap device
     pub fn deactivate_device(&self, device_id: u64) -> Result<(), String> {
-        let mut devices = self.devices.lock().unwrap();
+        let mut devices = self.devices.lock().unwrap_or_else(|e| e.into_inner());
         match devices.get_mut(&device_id) {
             Some(device) => device.deactivate(),
             None => Err(format!("Swap device {} not found", device_id)),
@@ -163,7 +163,7 @@ impl SwapManager {
 
     /// Set swap device priority
     pub fn set_priority(&self, device_id: u64, priority: SwapPriority) -> Result<(), String> {
-        let mut devices = self.devices.lock().unwrap();
+        let mut devices = self.devices.lock().unwrap_or_else(|e| e.into_inner());
         match devices.get_mut(&device_id) {
             Some(device) => {
                 device.priority = priority;
@@ -175,7 +175,7 @@ impl SwapManager {
 
     /// Get all active devices
     pub fn get_active_devices(&self) -> Vec<SwapDevice> {
-        let devices = self.devices.lock().unwrap();
+        let devices = self.devices.lock().unwrap_or_else(|e| e.into_inner());
         devices
             .values()
             .filter(|d| d.is_active())
@@ -185,7 +185,7 @@ impl SwapManager {
 
     /// Get swap statistics
     pub fn get_stats(&self) -> SwapStats {
-        let devices = self.devices.lock().unwrap();
+        let devices = self.devices.lock().unwrap_or_else(|e| e.into_inner());
         let total: u64 = devices
             .values()
             .filter(|d| d.is_active())
@@ -198,25 +198,25 @@ impl SwapManager {
 
     /// Enable/disable swap globally
     pub fn set_swap_enabled(&self, enabled: bool) {
-        let mut swap_enabled = self.swap_enabled.lock().unwrap();
+        let mut swap_enabled = self.swap_enabled.lock().unwrap_or_else(|e| e.into_inner());
         *swap_enabled = enabled;
     }
 
     /// Check if swap is enabled
     pub fn is_swap_enabled(&self) -> bool {
-        let swap_enabled = self.swap_enabled.lock().unwrap();
+        let swap_enabled = self.swap_enabled.lock().unwrap_or_else(|e| e.into_inner());
         *swap_enabled
     }
 
     /// Get device count
     pub fn device_count(&self) -> usize {
-        let devices = self.devices.lock().unwrap();
+        let devices = self.devices.lock().unwrap_or_else(|e| e.into_inner());
         devices.len()
     }
 
     /// Get active device count
     pub fn active_device_count(&self) -> usize {
-        let devices = self.devices.lock().unwrap();
+        let devices = self.devices.lock().unwrap_or_else(|e| e.into_inner());
         devices.values().filter(|d| d.is_active()).count()
     }
 }

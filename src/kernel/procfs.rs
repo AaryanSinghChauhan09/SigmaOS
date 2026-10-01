@@ -83,13 +83,13 @@ impl ProcfsManager {
 
     /// Create process
     pub fn create_process(&self, ppid: u32, comm: String) -> u32 {
-        let mut next_pid = self.next_pid.lock().unwrap();
+        let mut next_pid = self.next_pid.lock().unwrap_or_else(|e| e.into_inner());
         let pid = *next_pid;
         *next_pid += 1;
         drop(next_pid);
 
         let process = ProcessInfo::new(pid, ppid, comm);
-        let mut processes = self.processes.lock().unwrap();
+        let mut processes = self.processes.lock().unwrap_or_else(|e| e.into_inner());
         processes.insert(pid, process);
 
         pid
@@ -97,13 +97,13 @@ impl ProcfsManager {
 
     /// Get process
     pub fn get_process(&self, pid: u32) -> Option<ProcessInfo> {
-        let processes = self.processes.lock().unwrap();
+        let processes = self.processes.lock().unwrap_or_else(|e| e.into_inner());
         processes.get(&pid).cloned()
     }
 
     /// Remove process
     pub fn remove_process(&self, pid: u32) -> Result<(), String> {
-        let mut processes = self.processes.lock().unwrap();
+        let mut processes = self.processes.lock().unwrap_or_else(|e| e.into_inner());
         match processes.remove(&pid) {
             Some(_) => Ok(()),
             None => Err(format!("Process {} not found", pid)),
@@ -112,7 +112,7 @@ impl ProcfsManager {
 
     /// Set process state
     pub fn set_state(&self, pid: u32, state: String) -> Result<(), String> {
-        let mut processes = self.processes.lock().unwrap();
+        let mut processes = self.processes.lock().unwrap_or_else(|e| e.into_inner());
         match processes.get_mut(&pid) {
             Some(process) => {
                 process.set_state(state);
@@ -124,7 +124,7 @@ impl ProcfsManager {
 
     /// Update CPU time
     pub fn update_cpu_time(&self, pid: u32, utime: u64, stime: u64) -> Result<(), String> {
-        let mut processes = self.processes.lock().unwrap();
+        let mut processes = self.processes.lock().unwrap_or_else(|e| e.into_inner());
         match processes.get_mut(&pid) {
             Some(process) => {
                 process.update_cpu_time(utime, stime);
@@ -136,7 +136,7 @@ impl ProcfsManager {
 
     /// Read /proc/[pid]/stat
     pub fn read_stat(&self, pid: u32) -> Result<String, String> {
-        let processes = self.processes.lock().unwrap();
+        let processes = self.processes.lock().unwrap_or_else(|e| e.into_inner());
         match processes.get(&pid) {
             Some(process) => Ok(process.format_stat()),
             None => Err(format!("Process {} not found", pid)),
@@ -145,7 +145,7 @@ impl ProcfsManager {
 
     /// Read /proc/[pid]/status
     pub fn read_status(&self, pid: u32) -> Result<String, String> {
-        let processes = self.processes.lock().unwrap();
+        let processes = self.processes.lock().unwrap_or_else(|e| e.into_inner());
         match processes.get(&pid) {
             Some(process) => Ok(process.format_status()),
             None => Err(format!("Process {} not found", pid)),
@@ -154,13 +154,13 @@ impl ProcfsManager {
 
     /// List processes
     pub fn list_processes(&self) -> Vec<u32> {
-        let processes = self.processes.lock().unwrap();
+        let processes = self.processes.lock().unwrap_or_else(|e| e.into_inner());
         processes.keys().cloned().collect()
     }
 
     /// Get process count
     pub fn process_count(&self) -> usize {
-        let processes = self.processes.lock().unwrap();
+        let processes = self.processes.lock().unwrap_or_else(|e| e.into_inner());
         processes.len()
     }
 }

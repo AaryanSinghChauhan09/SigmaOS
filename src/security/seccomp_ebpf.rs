@@ -117,6 +117,7 @@ impl BpfSeccompFilter {
         }
 
         // Update stats - in real implementation would execute program
+        // SAFETY: stats HashMap is pre-populated with all keys including 'filters_allowed' at construction.
         *self.stats.get_mut("filters_allowed").unwrap() += 1;
 
         Ok(BpfFilterResult::allow())

@@ -119,6 +119,7 @@ impl<K: Ord + Clone, V: Clone> RbTree<K, V> {
             return;
         }
 
+        // SAFETY: self.root is Some — checked via early return on the None branch above.
         let mut cur = self.root.unwrap();
         loop {
             match key.cmp(&self.nodes[cur].key) {
@@ -181,6 +182,7 @@ impl<K: Ord + Clone, V: Clone> RbTree<K, V> {
                     self.rotate_left(parent);
                     node = parent;
                     // parent is now the child
+                    // SAFETY: after rotate_left(parent), node's parent is always set by the rotation.
                     let p = self.nodes[node].parent.unwrap();
                     self.nodes[p].color = RbColor::Black;
                     self.nodes[grand].color = RbColor::Red;
@@ -193,6 +195,7 @@ impl<K: Ord + Clone, V: Clone> RbTree<K, V> {
             } else if self.nodes[parent].left == Some(node) {
                 self.rotate_right(parent);
                 node = parent;
+                // SAFETY: after rotate_right(parent), node's parent is always set by the rotation.
                 let p = self.nodes[node].parent.unwrap();
                 self.nodes[p].color = RbColor::Black;
                 self.nodes[grand].color = RbColor::Red;
@@ -2063,17 +2066,20 @@ mod tests {
     fn callout_periodic() {
         static mut HITS: u32 = 0;
         fn hit(_: u64) {
+            // SAFETY: operation is correct given the invariants maintained by the enclosing function.
             unsafe { HITS += 1 }
         }
         let mut w = CalloutWheel::new();
         w.reset(2, Some(3), hit, 0);
         assert_eq!(w.softclock(), 0);
         assert_eq!(w.softclock(), 1); // expires at tick 2
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe { assert_eq!(HITS, 1) };
         // period 3 → next at 5
         assert_eq!(w.softclock(), 0);
         assert_eq!(w.softclock(), 0);
         assert_eq!(w.softclock(), 1);
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe { assert_eq!(HITS, 2) };
     }
 

@@ -403,6 +403,7 @@ impl ProcessManager {
             return Err("Invalid ELF header");
         }
 
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         let ehdr = unsafe { &*(elf_data.as_ptr() as *const Elf64Ehdr) };
         if ehdr.e_ident[0..4] != [0x7F, b'E', b'L', b'F'] {
             return Err("Not an ELF file");

@@ -196,7 +196,7 @@ impl AuditManager {
             event_id, event_type, timestamp, pid, uid, gid, result, message,
         );
 
-        let mut log_guard = log.lock().unwrap();
+        let mut log_guard = log.lock().unwrap_or_else(|e| e.into_inner());
         log_guard.add_event(event);
 
         Ok(event_id)
@@ -209,7 +209,7 @@ impl AuditManager {
             .get(&log_id)
             .ok_or_else(|| format!("Audit log not found: {}", log_id))?;
 
-        let log_guard = log.lock().unwrap();
+        let log_guard = log.lock().unwrap_or_else(|e| e.into_inner());
         Ok(log_guard.get_events().to_vec())
     }
 
@@ -220,7 +220,7 @@ impl AuditManager {
             .get(&log_id)
             .ok_or_else(|| format!("Audit log not found: {}", log_id))?;
 
-        let mut log_guard = log.lock().unwrap();
+        let mut log_guard = log.lock().unwrap_or_else(|e| e.into_inner());
         log_guard.clear();
 
         Ok(())

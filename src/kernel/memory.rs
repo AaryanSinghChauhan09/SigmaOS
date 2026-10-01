@@ -450,6 +450,7 @@ impl VirtualMemoryManager {
         // Mock translation logic for SigmaOS OOP structure
         // In a real x86_64 system, we would walk PML4 -> PDPT -> PD -> PT
         let pt_index = (virtual_addr >> 12) & 0x1FF;
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         let root = unsafe { self.root_directory.as_ref() };
 
         let entry = &root.entries[pt_index as usize];
@@ -468,6 +469,7 @@ impl VirtualMemoryManager {
         flags: PageFlags,
     ) -> Result<(), &'static str> {
         let pt_index = (virtual_addr >> 12) & 0x1FF;
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         let root = unsafe { self.root_directory.as_mut() };
 
         let entry = &mut root.entries[pt_index as usize];
@@ -482,6 +484,7 @@ impl VirtualMemoryManager {
     /// Unmaps a virtual page
     pub fn unmap_page(&mut self, virtual_addr: u64) -> Result<(), &'static str> {
         let pt_index = (virtual_addr >> 12) & 0x1FF;
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         let root = unsafe { self.root_directory.as_mut() };
 
         let entry = &mut root.entries[pt_index as usize];

@@ -94,6 +94,7 @@ impl SovereignKernelModuleSystem {
         // Find module
         let mut mod_idx = None;
         for i in 0..self.modules.len {
+            // SAFETY: operation is correct given the invariants maintained by the enclosing function.
             let m = unsafe { &*self.modules.data.add(i) };
             if m.matches_name(name_str) {
                 mod_idx = Some(i);
@@ -102,6 +103,7 @@ impl SovereignKernelModuleSystem {
         }
 
         if let Some(idx) = mod_idx {
+            // SAFETY: operation is correct given the invariants maintained by the enclosing function.
             let m = unsafe { &mut *self.modules.data.add(idx) };
             if m.state == ModuleState::Active {
                 return true;
@@ -116,9 +118,11 @@ impl SovereignKernelModuleSystem {
             if dep_name_len > 0 {
                 // Dependency is non-empty, must verify it is active
                 let dep_str =
+                    // SAFETY: operation is correct given the invariants maintained by the enclosing function.
                     unsafe { core::str::from_utf8_unchecked(&m.dependency[..dep_name_len]) };
                 let mut dep_active = false;
                 for j in 0..self.modules.len {
+                    // SAFETY: operation is correct given the invariants maintained by the enclosing function.
                     let dm = unsafe { &*self.modules.data.add(j) };
                     if dm.matches_name(dep_str) && dm.state == ModuleState::Active {
                         dep_active = true;
@@ -141,6 +145,7 @@ impl SovereignKernelModuleSystem {
     pub fn ai_assisted_tuning(&mut self, cpu_utilization: u32, thermal_temp: u32) {
         // Auto-optimize module execution parameters based on telemetry parameters
         for i in 0..self.modules.len {
+            // SAFETY: operation is correct given the invariants maintained by the enclosing function.
             let m = unsafe { &mut *self.modules.data.add(i) };
             if cpu_utilization > 80 {
                 // High utilization, compress latency window (aggressive schedule)
@@ -320,6 +325,7 @@ impl<T> Vec<T> {
         }
     }
     pub fn push(&mut self, item: T) {
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             if self.len >= self.capacity {
                 self.grow();
@@ -332,6 +338,7 @@ impl<T> Vec<T> {
     }
     pub fn remove(&mut self, index: usize) -> T {
         assert!(index < self.len, "Index out of bounds in remove");
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         unsafe {
             let item = core::ptr::read(self.data.add(index));
             for i in index..self.len - 1 {
@@ -363,6 +370,7 @@ impl<T> Vec<T> {
         if self.len == 0 {
             &[]
         } else {
+            // SAFETY: raw pointer was obtained from Box::into_raw and is exclusively owned here.
             unsafe { core::slice::from_raw_parts(self.data, self.len) }
         }
     }

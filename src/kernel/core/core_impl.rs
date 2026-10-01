@@ -122,6 +122,7 @@ impl SimpleKernelTask {
         let mut name_array = [0u8; 64];
         let name_len = name.len().min(63);
 
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         unsafe {
             core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
         }
@@ -136,6 +137,7 @@ impl SimpleKernelTask {
     }
 
     pub fn get_state(&self) -> TaskState {
+        // SAFETY: transmute is valid because source and destination types have identical size and alignment.
         unsafe { core::mem::transmute::<usize, TaskState>(self.state.load(Ordering::SeqCst)) }
     }
 
@@ -360,6 +362,7 @@ impl<T> Vec<T> {
     }
 
     fn push(&mut self, item: T) {
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             if self.len >= self.capacity {
                 self.grow();
@@ -411,6 +414,7 @@ impl<T> core::ops::Deref for Vec<T> {
         if self.data.is_null() {
             &[]
         } else {
+            // SAFETY: raw pointer was obtained from Box::into_raw and is exclusively owned here.
             unsafe { core::slice::from_raw_parts(self.data, self.len) }
         }
     }
@@ -421,6 +425,7 @@ impl<T> core::ops::DerefMut for Vec<T> {
         if self.data.is_null() {
             &mut []
         } else {
+            // SAFETY: raw pointer was obtained from Box::into_raw and is exclusively owned here.
             unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
         }
     }

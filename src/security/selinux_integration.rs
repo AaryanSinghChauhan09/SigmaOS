@@ -260,6 +260,7 @@ pub struct SelinuxStats {
 static mut GLOBAL_SELINUX_INTEGRATION: Option<SelinuxSyscallIntegration> = None;
 
 pub fn initialize_selinux_integration() -> Result<(), SelinuxError> {
+    // SAFETY: single-threaded init context; no concurrent access at this call site.
     unsafe {
         if GLOBAL_SELINUX_INTEGRATION.is_none() {
             let mut integration = SelinuxSyscallIntegration::new();
@@ -271,6 +272,7 @@ pub fn initialize_selinux_integration() -> Result<(), SelinuxError> {
 }
 
 pub fn get_selinux_integration() -> Option<&'static mut SelinuxSyscallIntegration> {
+    // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
     unsafe { GLOBAL_SELINUX_INTEGRATION.as_mut() }
 }
 

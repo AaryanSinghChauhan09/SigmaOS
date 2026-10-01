@@ -161,6 +161,7 @@ impl<T> Drop for SpinlockGuard<'_, T> {
 impl<T: core::fmt::Debug> core::fmt::Debug for SpinlockGuard<'_, T> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("SpinlockGuard")
+            // SAFETY: operation is correct given the invariants maintained by the enclosing function.
             .field("data", unsafe { &*self.lock.data.get() })
             .finish()
     }
@@ -295,6 +296,7 @@ impl<T> Deref for RwWriteGuard<'_, T> {
 
 impl<T> DerefMut for RwWriteGuard<'_, T> {
     fn deref_mut(&mut self) -> &mut T {
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe { &mut *self.lock.data.get() }
     }
 }

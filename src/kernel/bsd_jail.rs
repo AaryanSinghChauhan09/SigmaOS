@@ -140,13 +140,13 @@ impl BsdJailManager {
 
     /// Create a new jail
     pub fn create_jail(&self, config: BsdJailConfig) -> u64 {
-        let mut next_id = self.next_jail_id.lock().unwrap();
+        let mut next_id = self.next_jail_id.lock().unwrap_or_else(|e| e.into_inner());
         let jail_id = *next_id;
         *next_id += 1;
         drop(next_id);
 
         let jail = BsdJail::new(jail_id, config);
-        let mut jails = self.jails.lock().unwrap();
+        let mut jails = self.jails.lock().unwrap_or_else(|e| e.into_inner());
         jails.insert(jail_id, jail);
 
         jail_id
@@ -154,13 +154,13 @@ impl BsdJailManager {
 
     /// Get a jail by ID
     pub fn get_jail(&self, jail_id: u64) -> Option<BsdJail> {
-        let jails = self.jails.lock().unwrap();
+        let jails = self.jails.lock().unwrap_or_else(|e| e.into_inner());
         jails.get(&jail_id).cloned()
     }
 
     /// Remove a jail
     pub fn remove_jail(&self, jail_id: u64) -> Result<(), String> {
-        let mut jails = self.jails.lock().unwrap();
+        let mut jails = self.jails.lock().unwrap_or_else(|e| e.into_inner());
         match jails.remove(&jail_id) {
             Some(jail) => {
                 if jail.active {
@@ -174,7 +174,7 @@ impl BsdJailManager {
 
     /// Start a jail
     pub fn start_jail(&self, jail_id: u64) -> Result<(), String> {
-        let mut jails = self.jails.lock().unwrap();
+        let mut jails = self.jails.lock().unwrap_or_else(|e| e.into_inner());
         match jails.get_mut(&jail_id) {
             Some(jail) => jail.start(),
             None => Err(format!("Jail {} not found", jail_id)),
@@ -183,7 +183,7 @@ impl BsdJailManager {
 
     /// Stop a jail
     pub fn stop_jail(&self, jail_id: u64) -> Result<(), String> {
-        let mut jails = self.jails.lock().unwrap();
+        let mut jails = self.jails.lock().unwrap_or_else(|e| e.into_inner());
         match jails.get_mut(&jail_id) {
             Some(jail) => jail.stop(),
             None => Err(format!("Jail {} not found", jail_id)),
@@ -192,7 +192,7 @@ impl BsdJailManager {
 
     /// Add process to a jail
     pub fn add_process(&self, jail_id: u64, pid: u64) -> Result<(), String> {
-        let mut jails = self.jails.lock().unwrap();
+        let mut jails = self.jails.lock().unwrap_or_else(|e| e.into_inner());
         match jails.get_mut(&jail_id) {
             Some(jail) => jail.add_process(pid),
             None => Err(format!("Jail {} not found", jail_id)),
@@ -201,7 +201,7 @@ impl BsdJailManager {
 
     /// Remove process from a jail
     pub fn remove_process(&self, jail_id: u64, pid: u64) -> Result<(), String> {
-        let mut jails = self.jails.lock().unwrap();
+        let mut jails = self.jails.lock().unwrap_or_else(|e| e.into_inner());
         match jails.get_mut(&jail_id) {
             Some(jail) => jail.remove_process(pid),
             None => Err(format!("Jail {} not found", jail_id)),
@@ -210,7 +210,7 @@ impl BsdJailManager {
 
     /// Find which jail a process belongs to
     pub fn find_jail_for_process(&self, pid: u64) -> Option<u64> {
-        let jails = self.jails.lock().unwrap();
+        let jails = self.jails.lock().unwrap_or_else(|e| e.into_inner());
         for (jail_id, jail) in jails.iter() {
             if jail.contains_process(pid) {
                 return Some(*jail_id);
@@ -221,13 +221,13 @@ impl BsdJailManager {
 
     /// Get number of active jails
     pub fn active_jail_count(&self) -> usize {
-        let jails = self.jails.lock().unwrap();
+        let jails = self.jails.lock().unwrap_or_else(|e| e.into_inner());
         jails.values().filter(|j| j.is_active()).count()
     }
 
     /// Get total jail count
     pub fn jail_count(&self) -> usize {
-        let jails = self.jails.lock().unwrap();
+        let jails = self.jails.lock().unwrap_or_else(|e| e.into_inner());
         jails.len()
     }
 }

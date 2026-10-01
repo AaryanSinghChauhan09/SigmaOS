@@ -194,6 +194,7 @@ mod tests {
     fn test_set_and_get() {
         let cache = TaskNameCache::new();
         let name = b"sigma_init\0\0\0\0\0\0";
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             assert!(cache.set(1, b"sigma_init"));
         }
@@ -205,6 +206,7 @@ mod tests {
     #[test]
     fn test_update() {
         let cache = TaskNameCache::new();
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             cache.set(42, b"worker");
             cache.set(42, b"worker_renamed");
@@ -216,6 +218,7 @@ mod tests {
     #[test]
     fn test_remove() {
         let cache = TaskNameCache::new();
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             cache.set(99, b"temp_task");
             cache.remove(99);

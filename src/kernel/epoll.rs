@@ -208,13 +208,13 @@ impl EpollManager {
 
     /// Create a new epoll instance
     pub fn create_instance(&self) -> u64 {
-        let mut next_id = self.next_instance_id.lock().unwrap();
+        let mut next_id = self.next_instance_id.lock().unwrap_or_else(|e| e.into_inner());
         let instance_id = *next_id;
         *next_id += 1;
         drop(next_id);
 
         let instance = EpollInstance::new(instance_id);
-        let mut instances = self.instances.lock().unwrap();
+        let mut instances = self.instances.lock().unwrap_or_else(|e| e.into_inner());
         instances.insert(instance_id, instance);
 
         instance_id
@@ -222,13 +222,13 @@ impl EpollManager {
 
     /// Get an instance by ID
     pub fn get_instance(&self, instance_id: u64) -> Option<EpollInstance> {
-        let instances = self.instances.lock().unwrap();
+        let instances = self.instances.lock().unwrap_or_else(|e| e.into_inner());
         instances.get(&instance_id).cloned()
     }
 
     /// Remove an instance
     pub fn remove_instance(&self, instance_id: u64) -> Result<(), String> {
-        let mut instances = self.instances.lock().unwrap();
+        let mut instances = self.instances.lock().unwrap_or_else(|e| e.into_inner());
         match instances.remove(&instance_id) {
             Some(_) => Ok(()),
             None => Err(format!("Instance {} not found", instance_id)),
@@ -243,7 +243,7 @@ impl EpollManager {
         fd: i32,
         event: EpollEvent,
     ) -> Result<(), String> {
-        let mut instances = self.instances.lock().unwrap();
+        let mut instances = self.instances.lock().unwrap_or_else(|e| e.into_inner());
         match instances.get_mut(&instance_id) {
             Some(inst) => inst.ctl(op, fd, event),
             None => Err(format!("Instance {} not found", instance_id)),
@@ -252,7 +252,7 @@ impl EpollManager {
 
     /// Wait for events
     pub fn wait(&self, instance_id: u64, max_events: usize) -> Result<Vec<EpollEvent>, String> {
-        let mut instances = self.instances.lock().unwrap();
+        let mut instances = self.instances.lock().unwrap_or_else(|e| e.into_inner());
         match instances.get_mut(&instance_id) {
             Some(inst) => Ok(inst.wait(max_events)),
             None => Err(format!("Instance {} not found", instance_id)),
@@ -261,7 +261,7 @@ impl EpollManager {
 
     /// Add a ready event (simulates I/O readiness)
     pub fn add_ready_event(&self, instance_id: u64, event: EpollEvent) -> Result<(), String> {
-        let mut instances = self.instances.lock().unwrap();
+        let mut instances = self.instances.lock().unwrap_or_else(|e| e.into_inner());
         match instances.get_mut(&instance_id) {
             Some(inst) => {
                 inst.add_ready_event(event);
@@ -273,7 +273,7 @@ impl EpollManager {
 
     /// Get instance count
     pub fn instance_count(&self) -> usize {
-        let instances = self.instances.lock().unwrap();
+        let instances = self.instances.lock().unwrap_or_else(|e| e.into_inner());
         instances.len()
     }
 }

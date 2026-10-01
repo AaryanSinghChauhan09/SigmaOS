@@ -257,18 +257,18 @@ impl SignalManager {
 
     /// Create a new process (returns PID)
     pub fn create_process(&self) -> u32 {
-        let mut next_pid = self.next_pid.lock().unwrap();
+        let mut next_pid = self.next_pid.lock().unwrap_or_else(|e| e.into_inner());
         let pid = *next_pid;
         *next_pid += 1;
         drop(next_pid);
 
-        let mut handlers = self.handlers.lock().unwrap();
+        let mut handlers = self.handlers.lock().unwrap_or_else(|e| e.into_inner());
         handlers.insert(pid, HashMap::new());
 
-        let mut signal_masks = self.signal_masks.lock().unwrap();
+        let mut signal_masks = self.signal_masks.lock().unwrap_or_else(|e| e.into_inner());
         signal_masks.insert(pid, SignalMask::new());
 
-        let mut pending = self.pending_signals.lock().unwrap();
+        let mut pending = self.pending_signals.lock().unwrap_or_else(|e| e.into_inner());
         pending.insert(pid, Vec::new());
 
         pid
@@ -276,7 +276,7 @@ impl SignalManager {
 
     /// Set signal handler for a process
     pub fn set_handler(&self, pid: u32, handler: SignalHandler) -> Result<(), String> {
-        let mut handlers = self.handlers.lock().unwrap();
+        let mut handlers = self.handlers.lock().unwrap_or_else(|e| e.into_inner());
         match handlers.get_mut(&pid) {
             Some(process_handlers) => {
                 process_handlers.insert(handler.signal, handler);
@@ -288,13 +288,13 @@ impl SignalManager {
 
     /// Get signal handler for a process
     pub fn get_handler(&self, pid: u32, signal: Signal) -> Option<SignalHandler> {
-        let handlers = self.handlers.lock().unwrap();
+        let handlers = self.handlers.lock().unwrap_or_else(|e| e.into_inner());
         handlers.get(&pid).and_then(|h| h.get(&signal).cloned())
     }
 
     /// Set signal mask for a process
     pub fn set_signal_mask(&self, pid: u32, mask: SignalMask) -> Result<(), String> {
-        let mut signal_masks = self.signal_masks.lock().unwrap();
+        let mut signal_masks = self.signal_masks.lock().unwrap_or_else(|e| e.into_inner());
         match signal_masks.get_mut(&pid) {
             Some(process_mask) => {
                 *process_mask = mask;
@@ -306,7 +306,7 @@ impl SignalManager {
 
     /// Get signal mask for a process
     pub fn get_signal_mask(&self, pid: u32) -> Option<SignalMask> {
-        let signal_masks = self.signal_masks.lock().unwrap();
+        let signal_masks = self.signal_masks.lock().unwrap_or_else(|e| e.into_inner());
         signal_masks.get(&pid).cloned()
     }
 
@@ -315,7 +315,7 @@ impl SignalManager {
         let pid = info.sender_pid;
         let sig = info.signal;
 
-        let signal_masks = self.signal_masks.lock().unwrap();
+        let signal_masks = self.signal_masks.lock().unwrap_or_else(|e| e.into_inner());
         let blocked = signal_masks
             .get(&pid)
             .map(|mask| mask.is_blocked(sig))
@@ -324,7 +324,7 @@ impl SignalManager {
 
         if blocked {
             // Add to pending signals
-            let mut pending = self.pending_signals.lock().unwrap();
+            let mut pending = self.pending_signals.lock().unwrap_or_else(|e| e.into_inner());
             match pending.get_mut(&pid) {
                 Some(signals) => {
                     signals.push(info);
@@ -333,7 +333,7 @@ impl SignalManager {
             }
         } else {
             // Deliver immediately (simplified)
-            let handlers = self.handlers.lock().unwrap();
+            let handlers = self.handlers.lock().unwrap_or_else(|e| e.into_inner());
             if let Some(process_handlers) = handlers.get(&pid) {
                 if let Some(handler) = process_handlers.get(&sig) {
                     match handler.disposition {
@@ -356,13 +356,13 @@ impl SignalManager {
 
     /// Get pending signals for a process
     pub fn get_pending_signals(&self, pid: u32) -> Vec<SignalInfo> {
-        let pending = self.pending_signals.lock().unwrap();
+        let pending = self.pending_signals.lock().unwrap_or_else(|e| e.into_inner());
         pending.get(&pid).cloned().unwrap_or_default()
     }
 
     /// Clear pending signals for a process
     pub fn clear_pending_signals(&self, pid: u32) {
-        let mut pending = self.pending_signals.lock().unwrap();
+        let mut pending = self.pending_signals.lock().unwrap_or_else(|e| e.into_inner());
         if let Some(signals) = pending.get_mut(&pid) {
             signals.clear();
         }
@@ -370,9 +370,9 @@ impl SignalManager {
 
     /// Remove a process
     pub fn remove_process(&self, pid: u32) -> Result<(), String> {
-        let mut handlers = self.handlers.lock().unwrap();
-        let mut signal_masks = self.signal_masks.lock().unwrap();
-        let mut pending = self.pending_signals.lock().unwrap();
+        let mut handlers = self.handlers.lock().unwrap_or_else(|e| e.into_inner());
+        let mut signal_masks = self.signal_masks.lock().unwrap_or_else(|e| e.into_inner());
+        let mut pending = self.pending_signals.lock().unwrap_or_else(|e| e.into_inner());
 
         match (
             handlers.remove(&pid),

@@ -106,6 +106,7 @@ impl SecureFreeDetector {
 
     /// Sanitize memory by zeroing
     fn sanitize_memory(&self, ptr: *mut u8, size: usize, value: u8) {
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         unsafe {
             for i in 0..size {
                 *ptr.add(i) = value;
@@ -115,6 +116,7 @@ impl SecureFreeDetector {
 
     /// Fill memory with detectable pattern
     fn fill_pattern(&self, ptr: *mut u8, size: usize) {
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         unsafe {
             for i in 0..size {
                 *ptr.add(i) = self.pattern;

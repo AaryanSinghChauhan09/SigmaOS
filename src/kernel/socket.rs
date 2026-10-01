@@ -204,13 +204,13 @@ impl SocketManager {
         socket_type: SocketType,
         protocol: SocketProtocol,
     ) -> u64 {
-        let mut next_id = self.next_socket_id.lock().unwrap();
+        let mut next_id = self.next_socket_id.lock().unwrap_or_else(|e| e.into_inner());
         let socket_id = *next_id;
         *next_id += 1;
         drop(next_id);
 
         let socket = Socket::new(socket_id, domain, socket_type, protocol);
-        let mut sockets = self.sockets.lock().unwrap();
+        let mut sockets = self.sockets.lock().unwrap_or_else(|e| e.into_inner());
         sockets.insert(socket_id, socket);
 
         socket_id
@@ -218,13 +218,13 @@ impl SocketManager {
 
     /// Get a socket by ID
     pub fn get_socket(&self, socket_id: u64) -> Option<Socket> {
-        let sockets = self.sockets.lock().unwrap();
+        let sockets = self.sockets.lock().unwrap_or_else(|e| e.into_inner());
         sockets.get(&socket_id).cloned()
     }
 
     /// Remove a socket
     pub fn remove_socket(&self, socket_id: u64) -> Result<(), String> {
-        let mut sockets = self.sockets.lock().unwrap();
+        let mut sockets = self.sockets.lock().unwrap_or_else(|e| e.into_inner());
         match sockets.remove(&socket_id) {
             Some(_) => Ok(()),
             None => Err(format!("Socket {} not found", socket_id)),
@@ -233,7 +233,7 @@ impl SocketManager {
 
     /// Bind socket
     pub fn bind(&self, socket_id: u64, address: String, port: u16) -> Result<(), String> {
-        let mut sockets = self.sockets.lock().unwrap();
+        let mut sockets = self.sockets.lock().unwrap_or_else(|e| e.into_inner());
         match sockets.get_mut(&socket_id) {
             Some(socket) => socket.bind(address, port),
             None => Err(format!("Socket {} not found", socket_id)),
@@ -242,7 +242,7 @@ impl SocketManager {
 
     /// Listen on socket
     pub fn listen(&self, socket_id: u64, backlog: u32) -> Result<(), String> {
-        let mut sockets = self.sockets.lock().unwrap();
+        let mut sockets = self.sockets.lock().unwrap_or_else(|e| e.into_inner());
         match sockets.get_mut(&socket_id) {
             Some(socket) => socket.listen(backlog),
             None => Err(format!("Socket {} not found", socket_id)),
@@ -251,7 +251,7 @@ impl SocketManager {
 
     /// Accept connection
     pub fn accept(&self, socket_id: u64) -> Result<Socket, String> {
-        let mut sockets = self.sockets.lock().unwrap();
+        let mut sockets = self.sockets.lock().unwrap_or_else(|e| e.into_inner());
         match sockets.get_mut(&socket_id) {
             Some(socket) => {
                 let new_socket = socket.accept()?;
@@ -265,7 +265,7 @@ impl SocketManager {
 
     /// Connect socket
     pub fn connect(&self, socket_id: u64, address: String, port: u16) -> Result<(), String> {
-        let mut sockets = self.sockets.lock().unwrap();
+        let mut sockets = self.sockets.lock().unwrap_or_else(|e| e.into_inner());
         match sockets.get_mut(&socket_id) {
             Some(socket) => socket.connect(address, port),
             None => Err(format!("Socket {} not found", socket_id)),
@@ -274,7 +274,7 @@ impl SocketManager {
 
     /// Send data
     pub fn send(&self, socket_id: u64, data: &[u8]) -> Result<usize, String> {
-        let sockets = self.sockets.lock().unwrap();
+        let sockets = self.sockets.lock().unwrap_or_else(|e| e.into_inner());
         match sockets.get(&socket_id) {
             Some(socket) => socket.send(data),
             None => Err(format!("Socket {} not found", socket_id)),
@@ -283,7 +283,7 @@ impl SocketManager {
 
     /// Receive data
     pub fn recv(&self, socket_id: u64, count: usize) -> Result<Vec<u8>, String> {
-        let sockets = self.sockets.lock().unwrap();
+        let sockets = self.sockets.lock().unwrap_or_else(|e| e.into_inner());
         match sockets.get(&socket_id) {
             Some(socket) => socket.recv(count),
             None => Err(format!("Socket {} not found", socket_id)),
@@ -292,7 +292,7 @@ impl SocketManager {
 
     /// Close socket
     pub fn close(&self, socket_id: u64) -> Result<(), String> {
-        let mut sockets = self.sockets.lock().unwrap();
+        let mut sockets = self.sockets.lock().unwrap_or_else(|e| e.into_inner());
         match sockets.get_mut(&socket_id) {
             Some(socket) => {
                 socket.close();
@@ -304,7 +304,7 @@ impl SocketManager {
 
     /// Get socket count
     pub fn socket_count(&self) -> usize {
-        let sockets = self.sockets.lock().unwrap();
+        let sockets = self.sockets.lock().unwrap_or_else(|e| e.into_inner());
         sockets.len()
     }
 }

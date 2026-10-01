@@ -111,13 +111,13 @@ impl ProcessGroupSessionManager {
 
     /// Create session
     pub fn create_session(&self, leader_pid: i32) -> i32 {
-        let mut next_sid = self.next_sid.lock().unwrap();
+        let mut next_sid = self.next_sid.lock().unwrap_or_else(|e| e.into_inner());
         let sid = *next_sid;
         *next_sid += 1;
         drop(next_sid);
 
         let session = Session::new(sid, leader_pid);
-        let mut sessions = self.sessions.lock().unwrap();
+        let mut sessions = self.sessions.lock().unwrap_or_else(|e| e.into_inner());
         sessions.insert(sid, session);
 
         sid
@@ -125,13 +125,13 @@ impl ProcessGroupSessionManager {
 
     /// Get session
     pub fn get_session(&self, sid: i32) -> Option<Session> {
-        let sessions = self.sessions.lock().unwrap();
+        let sessions = self.sessions.lock().unwrap_or_else(|e| e.into_inner());
         sessions.get(&sid).cloned()
     }
 
     /// Remove session
     pub fn remove_session(&self, sid: i32) -> Result<(), String> {
-        let mut sessions = self.sessions.lock().unwrap();
+        let mut sessions = self.sessions.lock().unwrap_or_else(|e| e.into_inner());
         match sessions.remove(&sid) {
             Some(_) => Ok(()),
             None => Err(format!("Session {} not found", sid)),
@@ -140,7 +140,7 @@ impl ProcessGroupSessionManager {
 
     /// Create process group in session
     pub fn create_process_group(&self, sid: i32, pgid: i32, leader_pid: i32) -> Result<(), String> {
-        let mut sessions = self.sessions.lock().unwrap();
+        let mut sessions = self.sessions.lock().unwrap_or_else(|e| e.into_inner());
         match sessions.get_mut(&sid) {
             Some(session) => session.create_process_group(pgid, leader_pid),
             None => Err(format!("Session {} not found", sid)),
@@ -149,7 +149,7 @@ impl ProcessGroupSessionManager {
 
     /// Get process group from session
     pub fn get_process_group(&self, sid: i32, pgid: i32) -> Option<ProcessGroup> {
-        let sessions = self.sessions.lock().unwrap();
+        let sessions = self.sessions.lock().unwrap_or_else(|e| e.into_inner());
         sessions
             .get(&sid)
             .and_then(|s| s.get_process_group(pgid).cloned())
@@ -157,7 +157,7 @@ impl ProcessGroupSessionManager {
 
     /// Remove process group from session
     pub fn remove_process_group(&self, sid: i32, pgid: i32) -> Result<(), String> {
-        let mut sessions = self.sessions.lock().unwrap();
+        let mut sessions = self.sessions.lock().unwrap_or_else(|e| e.into_inner());
         match sessions.get_mut(&sid) {
             Some(session) => session.remove_process_group(pgid),
             None => Err(format!("Session {} not found", sid)),
@@ -166,7 +166,7 @@ impl ProcessGroupSessionManager {
 
     /// Get session count
     pub fn session_count(&self) -> usize {
-        let sessions = self.sessions.lock().unwrap();
+        let sessions = self.sessions.lock().unwrap_or_else(|e| e.into_inner());
         sessions.len()
     }
 }

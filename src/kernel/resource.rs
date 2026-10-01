@@ -247,61 +247,61 @@ impl ResourceMonitor {
 
     /// Get CPU statistics
     pub fn get_cpu_stats(&self) -> CpuStats {
-        let stats = self.cpu_stats.lock().unwrap();
+        let stats = self.cpu_stats.lock().unwrap_or_else(|e| e.into_inner());
         *stats
     }
 
     /// Update CPU statistics
     pub fn update_cpu_stats(&self, stats: CpuStats) {
-        let mut cpu_stats = self.cpu_stats.lock().unwrap();
+        let mut cpu_stats = self.cpu_stats.lock().unwrap_or_else(|e| e.into_inner());
         *cpu_stats = stats;
     }
 
     /// Get memory statistics
     pub fn get_memory_stats(&self) -> MemoryStats {
-        let stats = self.memory_stats.lock().unwrap();
+        let stats = self.memory_stats.lock().unwrap_or_else(|e| e.into_inner());
         *stats
     }
 
     /// Update memory statistics
     pub fn update_memory_stats(&self, stats: MemoryStats) {
-        let mut memory_stats = self.memory_stats.lock().unwrap();
+        let mut memory_stats = self.memory_stats.lock().unwrap_or_else(|e| e.into_inner());
         *memory_stats = stats;
     }
 
     /// Get disk statistics for a device
     pub fn get_disk_stats(&self, device: &str) -> Option<DiskStats> {
-        let stats = self.disk_stats.lock().unwrap();
+        let stats = self.disk_stats.lock().unwrap_or_else(|e| e.into_inner());
         stats.get(device).copied()
     }
 
     /// Update disk statistics for a device
     pub fn update_disk_stats(&self, device: String, stats: DiskStats) {
-        let mut disk_stats = self.disk_stats.lock().unwrap();
+        let mut disk_stats = self.disk_stats.lock().unwrap_or_else(|e| e.into_inner());
         disk_stats.insert(device, stats);
     }
 
     /// Get all disk statistics
     pub fn get_all_disk_stats(&self) -> HashMap<String, DiskStats> {
-        let stats = self.disk_stats.lock().unwrap();
+        let stats = self.disk_stats.lock().unwrap_or_else(|e| e.into_inner());
         stats.clone()
     }
 
     /// Get network statistics for an interface
     pub fn get_network_stats(&self, interface: &str) -> Option<NetworkStats> {
-        let stats = self.network_stats.lock().unwrap();
+        let stats = self.network_stats.lock().unwrap_or_else(|e| e.into_inner());
         stats.get(interface).copied()
     }
 
     /// Update network statistics for an interface
     pub fn update_network_stats(&self, interface: String, stats: NetworkStats) {
-        let mut network_stats = self.network_stats.lock().unwrap();
+        let mut network_stats = self.network_stats.lock().unwrap_or_else(|e| e.into_inner());
         network_stats.insert(interface, stats);
     }
 
     /// Get all network statistics
     pub fn get_all_network_stats(&self) -> HashMap<String, NetworkStats> {
-        let stats = self.network_stats.lock().unwrap();
+        let stats = self.network_stats.lock().unwrap_or_else(|e| e.into_inner());
         stats.clone()
     }
 }

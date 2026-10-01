@@ -74,13 +74,13 @@ impl FileLockManager {
 
     /// Create lock
     pub fn create_lock(&self, fd: i32, lock_type: LockType) -> u32 {
-        let mut next_owner = self.next_owner.lock().unwrap();
+        let mut next_owner = self.next_owner.lock().unwrap_or_else(|e| e.into_inner());
         let owner = *next_owner;
         *next_owner += 1;
         drop(next_owner);
 
         let lock = FileLock::new(fd, lock_type, owner);
-        let mut locks = self.locks.lock().unwrap();
+        let mut locks = self.locks.lock().unwrap_or_else(|e| e.into_inner());
         locks.insert(fd, lock);
 
         owner
@@ -88,13 +88,13 @@ impl FileLockManager {
 
     /// Get lock
     pub fn get_lock(&self, fd: i32) -> Option<FileLock> {
-        let locks = self.locks.lock().unwrap();
+        let locks = self.locks.lock().unwrap_or_else(|e| e.into_inner());
         locks.get(&fd).cloned()
     }
 
     /// Remove lock
     pub fn remove_lock(&self, fd: i32) -> Result<(), String> {
-        let mut locks = self.locks.lock().unwrap();
+        let mut locks = self.locks.lock().unwrap_or_else(|e| e.into_inner());
         match locks.remove(&fd) {
             Some(_) => Ok(()),
             None => Err(format!("Lock for fd {} not found", fd)),
@@ -103,7 +103,7 @@ impl FileLockManager {
 
     /// Acquire lock
     pub fn acquire(&self, fd: i32) -> Result<(), String> {
-        let mut locks = self.locks.lock().unwrap();
+        let mut locks = self.locks.lock().unwrap_or_else(|e| e.into_inner());
         match locks.get_mut(&fd) {
             Some(lock) => lock.acquire(),
             None => Err(format!("Lock for fd {} not found", fd)),
@@ -112,7 +112,7 @@ impl FileLockManager {
 
     /// Release lock
     pub fn release(&self, fd: i32) -> Result<(), String> {
-        let mut locks = self.locks.lock().unwrap();
+        let mut locks = self.locks.lock().unwrap_or_else(|e| e.into_inner());
         match locks.get_mut(&fd) {
             Some(lock) => {
                 lock.release();
@@ -126,7 +126,7 @@ impl FileLockManager {
     pub fn flock(&self, fd: i32, op: LockOp) -> Result<(), String> {
         match op {
             LockOp::LockShared => {
-                let mut locks = self.locks.lock().unwrap();
+                let mut locks = self.locks.lock().unwrap_or_else(|e| e.into_inner());
                 match locks.get_mut(&fd) {
                     Some(lock) => {
                         lock.lock_type = LockType::Shared;
@@ -136,7 +136,7 @@ impl FileLockManager {
                 }
             }
             LockOp::LockExclusive => {
-                let mut locks = self.locks.lock().unwrap();
+                let mut locks = self.locks.lock().unwrap_or_else(|e| e.into_inner());
                 match locks.get_mut(&fd) {
                     Some(lock) => {
                         lock.lock_type = LockType::Exclusive;
@@ -151,7 +151,7 @@ impl FileLockManager {
 
     /// Get lock count
     pub fn lock_count(&self) -> usize {
-        let locks = self.locks.lock().unwrap();
+        let locks = self.locks.lock().unwrap_or_else(|e| e.into_inner());
         locks.len()
     }
 }

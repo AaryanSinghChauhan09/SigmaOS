@@ -701,18 +701,21 @@ mod tests {
     static mut WORK_TRIGGERED: usize = 0;
 
     fn test_apc_routine(context: usize) {
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             APC_TRIGGERED += context;
         }
     }
 
     fn test_dpc_routine(context: usize, arg1: usize, arg2: usize) {
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             DPC_TRIGGERED += context + arg1 + arg2;
         }
     }
 
     fn test_work_routine(parameter: usize) {
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             WORK_TRIGGERED += parameter;
         }
@@ -727,6 +730,7 @@ mod tests {
 
     #[test]
     fn test_wdk_threads_and_apcs() {
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             APC_TRIGGERED = 0;
         }
@@ -753,6 +757,7 @@ mod tests {
         let delivered = thread.deliver_apcs();
         assert_eq!(delivered, 2);
         assert_eq!(thread.apc_queue.len(), 0);
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             assert_eq!(APC_TRIGGERED, 30);
         }
@@ -760,6 +765,7 @@ mod tests {
 
     #[test]
     fn test_prcb_and_dpcs() {
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             DPC_TRIGGERED = 0;
         }
@@ -778,6 +784,7 @@ mod tests {
 
         let executed = prcb.execute_dpc_queue();
         assert_eq!(executed, 1);
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             assert_eq!(DPC_TRIGGERED, 45); // 5 + 15 + 25 = 45
         }
@@ -938,6 +945,7 @@ mod tests {
 
     #[test]
     fn test_work_items() {
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             WORK_TRIGGERED = 0;
         }
@@ -946,6 +954,7 @@ mod tests {
             parameter: 42,
         };
         (work.routine)(work.parameter);
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             assert_eq!(WORK_TRIGGERED, 42);
         }

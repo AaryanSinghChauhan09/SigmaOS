@@ -153,7 +153,7 @@ impl PipeManager {
 
     /// Create a new pipe
     pub fn create_pipe(&self, capacity: usize) -> Result<(u64, u64), String> {
-        let mut next_id = self.next_pipe_id.lock().unwrap();
+        let mut next_id = self.next_pipe_id.lock().unwrap_or_else(|e| e.into_inner());
         let pipe_id = *next_id;
         *next_id += 1;
         drop(next_id);
@@ -162,7 +162,7 @@ impl PipeManager {
         let read_end = pipe.read_end;
         let write_end = pipe.write_end;
 
-        let mut pipes = self.pipes.lock().unwrap();
+        let mut pipes = self.pipes.lock().unwrap_or_else(|e| e.into_inner());
         pipes.insert(pipe_id, pipe);
 
         Ok((read_end, write_end))
@@ -170,13 +170,13 @@ impl PipeManager {
 
     /// Get a pipe by ID
     pub fn get_pipe(&self, pipe_id: u64) -> Option<Pipe> {
-        let pipes = self.pipes.lock().unwrap();
+        let pipes = self.pipes.lock().unwrap_or_else(|e| e.into_inner());
         pipes.get(&pipe_id).cloned()
     }
 
     /// Remove a pipe
     pub fn remove_pipe(&self, pipe_id: u64) -> Result<(), String> {
-        let mut pipes = self.pipes.lock().unwrap();
+        let mut pipes = self.pipes.lock().unwrap_or_else(|e| e.into_inner());
         match pipes.remove(&pipe_id) {
             Some(_) => Ok(()),
             None => Err(format!("Pipe {} not found", pipe_id)),
@@ -185,7 +185,7 @@ impl PipeManager {
 
     /// Read from pipe
     pub fn read(&self, pipe_id: u64, count: usize) -> Result<Vec<u8>, String> {
-        let mut pipes = self.pipes.lock().unwrap();
+        let mut pipes = self.pipes.lock().unwrap_or_else(|e| e.into_inner());
         match pipes.get_mut(&pipe_id) {
             Some(pipe) => pipe.read(count),
             None => Err(format!("Pipe {} not found", pipe_id)),
@@ -194,7 +194,7 @@ impl PipeManager {
 
     /// Write to pipe
     pub fn write(&self, pipe_id: u64, data: &[u8]) -> Result<usize, String> {
-        let mut pipes = self.pipes.lock().unwrap();
+        let mut pipes = self.pipes.lock().unwrap_or_else(|e| e.into_inner());
         match pipes.get_mut(&pipe_id) {
             Some(pipe) => pipe.write(data),
             None => Err(format!("Pipe {} not found", pipe_id)),
@@ -203,7 +203,7 @@ impl PipeManager {
 
     /// Close read end
     pub fn close_read(&self, pipe_id: u64) -> Result<(), String> {
-        let mut pipes = self.pipes.lock().unwrap();
+        let mut pipes = self.pipes.lock().unwrap_or_else(|e| e.into_inner());
         match pipes.get_mut(&pipe_id) {
             Some(pipe) => {
                 pipe.close_read();
@@ -215,7 +215,7 @@ impl PipeManager {
 
     /// Close write end
     pub fn close_write(&self, pipe_id: u64) -> Result<(), String> {
-        let mut pipes = self.pipes.lock().unwrap();
+        let mut pipes = self.pipes.lock().unwrap_or_else(|e| e.into_inner());
         match pipes.get_mut(&pipe_id) {
             Some(pipe) => {
                 pipe.close_write();
@@ -227,7 +227,7 @@ impl PipeManager {
 
     /// Get pipe count
     pub fn pipe_count(&self) -> usize {
-        let pipes = self.pipes.lock().unwrap();
+        let pipes = self.pipes.lock().unwrap_or_else(|e| e.into_inner());
         pipes.len()
     }
 }

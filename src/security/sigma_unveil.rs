@@ -304,7 +304,7 @@ mod tests {
             .unwrap();
 
         assert!(!state.is_locked());
-        state.lock().unwrap();
+        state.lock().unwrap_or_else(|e| e.into_inner());
         assert!(state.is_locked());
 
         // Second lock should fail

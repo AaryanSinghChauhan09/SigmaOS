@@ -112,13 +112,13 @@ impl EventFdManager {
 
     /// Create a new eventfd
     pub fn create_event_fd(&self, flags: EventFdFlags, initval: u64) -> u64 {
-        let mut next_id = self.next_fd_id.lock().unwrap();
+        let mut next_id = self.next_fd_id.lock().unwrap_or_else(|e| e.into_inner());
         let fd_id = *next_id;
         *next_id += 1;
         drop(next_id);
 
         let event_fd = EventFd::new(fd_id, flags, initval);
-        let mut event_fds = self.event_fds.lock().unwrap();
+        let mut event_fds = self.event_fds.lock().unwrap_or_else(|e| e.into_inner());
         event_fds.insert(fd_id, event_fd);
 
         fd_id
@@ -126,13 +126,13 @@ impl EventFdManager {
 
     /// Get an eventfd by ID
     pub fn get_event_fd(&self, fd_id: u64) -> Option<EventFd> {
-        let event_fds = self.event_fds.lock().unwrap();
+        let event_fds = self.event_fds.lock().unwrap_or_else(|e| e.into_inner());
         event_fds.get(&fd_id).cloned()
     }
 
     /// Remove an eventfd
     pub fn remove_event_fd(&self, fd_id: u64) -> Result<(), String> {
-        let mut event_fds = self.event_fds.lock().unwrap();
+        let mut event_fds = self.event_fds.lock().unwrap_or_else(|e| e.into_inner());
         match event_fds.remove(&fd_id) {
             Some(_) => Ok(()),
             None => Err(format!("Event fd {} not found", fd_id)),
@@ -141,7 +141,7 @@ impl EventFdManager {
 
     /// Read from eventfd
     pub fn read(&self, fd_id: u64) -> Result<u64, String> {
-        let mut event_fds = self.event_fds.lock().unwrap();
+        let mut event_fds = self.event_fds.lock().unwrap_or_else(|e| e.into_inner());
         match event_fds.get_mut(&fd_id) {
             Some(event_fd) => event_fd.read(),
             None => Err(format!("Event fd {} not found", fd_id)),
@@ -150,7 +150,7 @@ impl EventFdManager {
 
     /// Write to eventfd
     pub fn write(&self, fd_id: u64, value: u64) -> Result<(), String> {
-        let mut event_fds = self.event_fds.lock().unwrap();
+        let mut event_fds = self.event_fds.lock().unwrap_or_else(|e| e.into_inner());
         match event_fds.get_mut(&fd_id) {
             Some(event_fd) => event_fd.write(value),
             None => Err(format!("Event fd {} not found", fd_id)),
@@ -159,7 +159,7 @@ impl EventFdManager {
 
     /// Get counter value
     pub fn get_counter(&self, fd_id: u64) -> Result<u64, String> {
-        let event_fds = self.event_fds.lock().unwrap();
+        let event_fds = self.event_fds.lock().unwrap_or_else(|e| e.into_inner());
         match event_fds.get(&fd_id) {
             Some(event_fd) => Ok(event_fd.get_counter()),
             None => Err(format!("Event fd {} not found", fd_id)),
@@ -168,7 +168,7 @@ impl EventFdManager {
 
     /// Check if readable
     pub fn is_readable(&self, fd_id: u64) -> Result<bool, String> {
-        let event_fds = self.event_fds.lock().unwrap();
+        let event_fds = self.event_fds.lock().unwrap_or_else(|e| e.into_inner());
         match event_fds.get(&fd_id) {
             Some(event_fd) => Ok(event_fd.is_readable()),
             None => Err(format!("Event fd {} not found", fd_id)),
@@ -177,7 +177,7 @@ impl EventFdManager {
 
     /// Get fd count
     pub fn fd_count(&self) -> usize {
-        let event_fds = self.event_fds.lock().unwrap();
+        let event_fds = self.event_fds.lock().unwrap_or_else(|e| e.into_inner());
         event_fds.len()
     }
 }

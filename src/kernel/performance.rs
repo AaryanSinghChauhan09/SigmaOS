@@ -310,6 +310,7 @@ impl SovereignSimdOptimizer {
 
         // Execute raw assembly to read processor features if on x86_64
         #[cfg(target_arch = "x86_64")]
+        // SAFETY: inline assembly is architecture-specific and verified correct for the target ISA.
         unsafe {
             core::arch::asm!(
                 "push rbx",

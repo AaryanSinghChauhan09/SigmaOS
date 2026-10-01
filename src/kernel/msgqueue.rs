@@ -145,13 +145,13 @@ impl MessageQueueManager {
 
     /// Create a new message queue
     pub fn create_queue(&self, key: i32, perm: MsgQPerm, max_size: usize) -> u64 {
-        let mut next_id = self.next_queue_id.lock().unwrap();
+        let mut next_id = self.next_queue_id.lock().unwrap_or_else(|e| e.into_inner());
         let queue_id = *next_id;
         *next_id += 1;
         drop(next_id);
 
         let queue = MessageQueue::new(queue_id, key, perm, max_size);
-        let mut queues = self.queues.lock().unwrap();
+        let mut queues = self.queues.lock().unwrap_or_else(|e| e.into_inner());
         queues.insert(queue_id, queue);
 
         queue_id
@@ -159,19 +159,19 @@ impl MessageQueueManager {
 
     /// Get a queue by ID
     pub fn get_queue(&self, queue_id: u64) -> Option<MessageQueue> {
-        let queues = self.queues.lock().unwrap();
+        let queues = self.queues.lock().unwrap_or_else(|e| e.into_inner());
         queues.get(&queue_id).cloned()
     }
 
     /// Get a queue by key
     pub fn get_queue_by_key(&self, key: i32) -> Option<MessageQueue> {
-        let queues = self.queues.lock().unwrap();
+        let queues = self.queues.lock().unwrap_or_else(|e| e.into_inner());
         queues.values().find(|q| q.key == key).cloned()
     }
 
     /// Remove a queue
     pub fn remove_queue(&self, queue_id: u64) -> Result<(), String> {
-        let mut queues = self.queues.lock().unwrap();
+        let mut queues = self.queues.lock().unwrap_or_else(|e| e.into_inner());
         match queues.remove(&queue_id) {
             Some(_) => Ok(()),
             None => Err(format!("Queue {} not found", queue_id)),
@@ -180,7 +180,7 @@ impl MessageQueueManager {
 
     /// Send a message
     pub fn send(&self, queue_id: u64, message: Message) -> Result<(), String> {
-        let mut queues = self.queues.lock().unwrap();
+        let mut queues = self.queues.lock().unwrap_or_else(|e| e.into_inner());
         match queues.get_mut(&queue_id) {
             Some(queue) => queue.send(message),
             None => Err(format!("Queue {} not found", queue_id)),
@@ -189,7 +189,7 @@ impl MessageQueueManager {
 
     /// Receive a message
     pub fn receive(&self, queue_id: u64, mtype: i64) -> Result<Message, String> {
-        let mut queues = self.queues.lock().unwrap();
+        let mut queues = self.queues.lock().unwrap_or_else(|e| e.into_inner());
         match queues.get_mut(&queue_id) {
             Some(queue) => queue.receive(mtype),
             None => Err(format!("Queue {} not found", queue_id)),
@@ -198,7 +198,7 @@ impl MessageQueueManager {
 
     /// Get queue count
     pub fn queue_count(&self) -> usize {
-        let queues = self.queues.lock().unwrap();
+        let queues = self.queues.lock().unwrap_or_else(|e| e.into_inner());
         queues.len()
     }
 }

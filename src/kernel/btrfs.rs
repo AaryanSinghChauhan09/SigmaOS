@@ -195,13 +195,13 @@ impl BtrfsManager {
 
     /// Create a new filesystem
     pub fn create_filesystem(&self, label: String, size: u64) -> u64 {
-        let mut next_id = self.next_fs_id.lock().unwrap();
+        let mut next_id = self.next_fs_id.lock().unwrap_or_else(|e| e.into_inner());
         let fs_id = *next_id;
         *next_id += 1;
         drop(next_id);
 
         let fs = BtrfsFilesystem::new(fs_id, label, size);
-        let mut filesystems = self.filesystems.lock().unwrap();
+        let mut filesystems = self.filesystems.lock().unwrap_or_else(|e| e.into_inner());
         filesystems.insert(fs_id, fs);
 
         fs_id
@@ -209,13 +209,13 @@ impl BtrfsManager {
 
     /// Get a filesystem by ID
     pub fn get_filesystem(&self, fs_id: u64) -> Option<BtrfsFilesystem> {
-        let filesystems = self.filesystems.lock().unwrap();
+        let filesystems = self.filesystems.lock().unwrap_or_else(|e| e.into_inner());
         filesystems.get(&fs_id).cloned()
     }
 
     /// Remove a filesystem
     pub fn remove_filesystem(&self, fs_id: u64) -> Result<(), String> {
-        let mut filesystems = self.filesystems.lock().unwrap();
+        let mut filesystems = self.filesystems.lock().unwrap_or_else(|e| e.into_inner());
         match filesystems.remove(&fs_id) {
             Some(fs) => {
                 if fs.mounted {
@@ -229,7 +229,7 @@ impl BtrfsManager {
 
     /// Mount a filesystem
     pub fn mount(&self, fs_id: u64) -> Result<(), String> {
-        let mut filesystems = self.filesystems.lock().unwrap();
+        let mut filesystems = self.filesystems.lock().unwrap_or_else(|e| e.into_inner());
         match filesystems.get_mut(&fs_id) {
             Some(fs) => fs.mount(),
             None => Err(format!("Filesystem {} not found", fs_id)),
@@ -238,7 +238,7 @@ impl BtrfsManager {
 
     /// Unmount a filesystem
     pub fn unmount(&self, fs_id: u64) -> Result<(), String> {
-        let mut filesystems = self.filesystems.lock().unwrap();
+        let mut filesystems = self.filesystems.lock().unwrap_or_else(|e| e.into_inner());
         match filesystems.get_mut(&fs_id) {
             Some(fs) => fs.unmount(),
             None => Err(format!("Filesystem {} not found", fs_id)),
@@ -247,7 +247,7 @@ impl BtrfsManager {
 
     /// Create subvolume in a filesystem
     pub fn create_subvolume(&self, fs_id: u64, name: String) -> Result<u64, String> {
-        let mut filesystems = self.filesystems.lock().unwrap();
+        let mut filesystems = self.filesystems.lock().unwrap_or_else(|e| e.into_inner());
         match filesystems.get_mut(&fs_id) {
             Some(fs) => fs.create_subvolume(name),
             None => Err(format!("Filesystem {} not found", fs_id)),
@@ -256,7 +256,7 @@ impl BtrfsManager {
 
     /// Create snapshot in a filesystem
     pub fn create_snapshot(&self, fs_id: u64, source_id: u64, name: String) -> Result<u64, String> {
-        let mut filesystems = self.filesystems.lock().unwrap();
+        let mut filesystems = self.filesystems.lock().unwrap_or_else(|e| e.into_inner());
         match filesystems.get_mut(&fs_id) {
             Some(fs) => fs.create_snapshot(source_id, name),
             None => Err(format!("Filesystem {} not found", fs_id)),
@@ -265,13 +265,13 @@ impl BtrfsManager {
 
     /// Get number of mounted filesystems
     pub fn mounted_count(&self) -> usize {
-        let filesystems = self.filesystems.lock().unwrap();
+        let filesystems = self.filesystems.lock().unwrap_or_else(|e| e.into_inner());
         filesystems.values().filter(|fs| fs.is_mounted()).count()
     }
 
     /// Get total filesystem count
     pub fn filesystem_count(&self) -> usize {
-        let filesystems = self.filesystems.lock().unwrap();
+        let filesystems = self.filesystems.lock().unwrap_or_else(|e| e.into_inner());
         filesystems.len()
     }
 }

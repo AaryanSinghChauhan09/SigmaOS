@@ -160,7 +160,7 @@ impl MountNamespaceManager {
 
     /// Create a new mount namespace
     pub fn create_namespace(&self, parent_id: Option<u64>) -> u64 {
-        let mut next_id = self.next_namespace_id.lock().unwrap();
+        let mut next_id = self.next_namespace_id.lock().unwrap_or_else(|e| e.into_inner());
         let namespace_id = *next_id;
         *next_id += 1;
         drop(next_id);
@@ -170,7 +170,7 @@ impl MountNamespaceManager {
             None => MountNamespace::new(namespace_id),
         };
 
-        let mut namespaces = self.namespaces.lock().unwrap();
+        let mut namespaces = self.namespaces.lock().unwrap_or_else(|e| e.into_inner());
         namespaces.insert(namespace_id, namespace);
 
         namespace_id
@@ -178,13 +178,13 @@ impl MountNamespaceManager {
 
     /// Get a namespace by ID
     pub fn get_namespace(&self, namespace_id: u64) -> Option<MountNamespace> {
-        let namespaces = self.namespaces.lock().unwrap();
+        let namespaces = self.namespaces.lock().unwrap_or_else(|e| e.into_inner());
         namespaces.get(&namespace_id).cloned()
     }
 
     /// Remove a namespace
     pub fn remove_namespace(&self, namespace_id: u64) -> Result<(), String> {
-        let mut namespaces = self.namespaces.lock().unwrap();
+        let mut namespaces = self.namespaces.lock().unwrap_or_else(|e| e.into_inner());
         match namespaces.remove(&namespace_id) {
             Some(_) => Ok(()),
             None => Err(format!("Namespace {} not found", namespace_id)),
@@ -193,7 +193,7 @@ impl MountNamespaceManager {
 
     /// Add mount to a namespace
     pub fn add_mount(&self, namespace_id: u64, mount: MountPoint) -> Result<(), String> {
-        let mut namespaces = self.namespaces.lock().unwrap();
+        let mut namespaces = self.namespaces.lock().unwrap_or_else(|e| e.into_inner());
         match namespaces.get_mut(&namespace_id) {
             Some(namespace) => namespace.add_mount(mount),
             None => Err(format!("Namespace {} not found", namespace_id)),
@@ -202,7 +202,7 @@ impl MountNamespaceManager {
 
     /// Remove mount from a namespace
     pub fn remove_mount(&self, namespace_id: u64, target: &str) -> Result<(), String> {
-        let mut namespaces = self.namespaces.lock().unwrap();
+        let mut namespaces = self.namespaces.lock().unwrap_or_else(|e| e.into_inner());
         match namespaces.get_mut(&namespace_id) {
             Some(namespace) => namespace.remove_mount(target),
             None => Err(format!("Namespace {} not found", namespace_id)),
@@ -211,7 +211,7 @@ impl MountNamespaceManager {
 
     /// Get namespace count
     pub fn namespace_count(&self) -> usize {
-        let namespaces = self.namespaces.lock().unwrap();
+        let namespaces = self.namespaces.lock().unwrap_or_else(|e| e.into_inner());
         namespaces.len()
     }
 }

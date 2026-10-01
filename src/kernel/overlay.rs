@@ -209,13 +209,13 @@ impl OverlayManager {
 
     /// Create a new overlay filesystem
     pub fn create_overlay(&self, config: OverlayConfig) -> u64 {
-        let mut next_id = self.next_overlay_id.lock().unwrap();
+        let mut next_id = self.next_overlay_id.lock().unwrap_or_else(|e| e.into_inner());
         let overlay_id = *next_id;
         *next_id += 1;
         drop(next_id);
 
         let overlay = OverlayFilesystem::new(overlay_id, config);
-        let mut overlays = self.overlays.lock().unwrap();
+        let mut overlays = self.overlays.lock().unwrap_or_else(|e| e.into_inner());
         overlays.insert(overlay_id, overlay);
 
         overlay_id
@@ -223,13 +223,13 @@ impl OverlayManager {
 
     /// Get an overlay by ID
     pub fn get_overlay(&self, overlay_id: u64) -> Option<OverlayFilesystem> {
-        let overlays = self.overlays.lock().unwrap();
+        let overlays = self.overlays.lock().unwrap_or_else(|e| e.into_inner());
         overlays.get(&overlay_id).cloned()
     }
 
     /// Remove an overlay
     pub fn remove_overlay(&self, overlay_id: u64) -> Result<(), String> {
-        let mut overlays = self.overlays.lock().unwrap();
+        let mut overlays = self.overlays.lock().unwrap_or_else(|e| e.into_inner());
         match overlays.remove(&overlay_id) {
             Some(overlay) => {
                 if overlay.mounted {
@@ -243,7 +243,7 @@ impl OverlayManager {
 
     /// Mount an overlay
     pub fn mount(&self, overlay_id: u64) -> Result<(), String> {
-        let mut overlays = self.overlays.lock().unwrap();
+        let mut overlays = self.overlays.lock().unwrap_or_else(|e| e.into_inner());
         match overlays.get_mut(&overlay_id) {
             Some(overlay) => overlay.mount(),
             None => Err(format!("Overlay {} not found", overlay_id)),
@@ -252,7 +252,7 @@ impl OverlayManager {
 
     /// Unmount an overlay
     pub fn unmount(&self, overlay_id: u64) -> Result<(), String> {
-        let mut overlays = self.overlays.lock().unwrap();
+        let mut overlays = self.overlays.lock().unwrap_or_else(|e| e.into_inner());
         match overlays.get_mut(&overlay_id) {
             Some(overlay) => overlay.unmount(),
             None => Err(format!("Overlay {} not found", overlay_id)),
@@ -261,13 +261,13 @@ impl OverlayManager {
 
     /// Get number of mounted overlays
     pub fn mounted_count(&self) -> usize {
-        let overlays = self.overlays.lock().unwrap();
+        let overlays = self.overlays.lock().unwrap_or_else(|e| e.into_inner());
         overlays.values().filter(|o| o.is_mounted()).count()
     }
 
     /// Get total overlay count
     pub fn overlay_count(&self) -> usize {
-        let overlays = self.overlays.lock().unwrap();
+        let overlays = self.overlays.lock().unwrap_or_else(|e| e.into_inner());
         overlays.len()
     }
 }

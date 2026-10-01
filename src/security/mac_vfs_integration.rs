@@ -248,6 +248,7 @@ static mut GLOBAL_MAC_VFS: Option<MacVfsIntegration> = None;
 
 /// Initialize global MAC-VFS integration
 pub fn initialize_mac_vfs() {
+    // SAFETY: single-threaded init context; no concurrent access at this call site.
     unsafe {
         if GLOBAL_MAC_VFS.is_none() {
             let mut integration = MacVfsIntegration::new();
@@ -259,11 +260,13 @@ pub fn initialize_mac_vfs() {
 
 /// Get global MAC-VFS integration instance
 pub fn get_mac_vfs() -> Option<&'static MacVfsIntegration> {
+    // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
     unsafe { GLOBAL_MAC_VFS.as_ref() }
 }
 
 /// Get mutable global MAC-VFS integration instance
 pub fn get_mac_vfs_mut() -> Option<&'static mut MacVfsIntegration> {
+    // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
     unsafe { GLOBAL_MAC_VFS.as_mut() }
 }
 

@@ -52,6 +52,7 @@ impl SimpleAuditEvent {
     pub fn new(id: EventID, event_type: EventType, user_id: usize, description: &[u8]) -> Self {
         let mut desc_array = [0u8; 256];
         let desc_len = description.len().min(255);
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         unsafe {
             core::ptr::copy_nonoverlapping(description.as_ptr(), desc_array.as_mut_ptr(), desc_len);
         }
@@ -72,6 +73,7 @@ impl AuditEvent for SimpleAuditEvent {
     }
 
     fn event_type(&self) -> EventType {
+        // SAFETY: transmute is valid because source and destination types have identical size and alignment.
         unsafe { core::mem::transmute(self.event_type.load(Ordering::SeqCst)) }
     }
 

@@ -256,13 +256,13 @@ impl UserGroupManager {
 
     /// Create a new user
     pub fn create_user(&self, username: String, gid: u32) -> Result<u32, String> {
-        let mut next_uid = self.next_uid.lock().unwrap();
+        let mut next_uid = self.next_uid.lock().unwrap_or_else(|e| e.into_inner());
         let uid = *next_uid;
         *next_uid += 1;
         drop(next_uid);
 
         let user = User::new(uid, username.clone(), gid);
-        let mut users = self.users.lock().unwrap();
+        let mut users = self.users.lock().unwrap_or_else(|e| e.into_inner());
 
         // Check for duplicate username
         for existing_user in users.values() {
@@ -277,13 +277,13 @@ impl UserGroupManager {
 
     /// Get a user by UID
     pub fn get_user(&self, uid: u32) -> Option<User> {
-        let users = self.users.lock().unwrap();
+        let users = self.users.lock().unwrap_or_else(|e| e.into_inner());
         users.get(&uid).cloned()
     }
 
     /// Get a user by username
     pub fn get_user_by_name(&self, username: &str) -> Option<User> {
-        let users = self.users.lock().unwrap();
+        let users = self.users.lock().unwrap_or_else(|e| e.into_inner());
         users.values().find(|u| u.username == username).cloned()
     }
 
@@ -292,7 +292,7 @@ impl UserGroupManager {
         if uid == 0 {
             return Err("Cannot remove root user".to_string());
         }
-        let mut users = self.users.lock().unwrap();
+        let mut users = self.users.lock().unwrap_or_else(|e| e.into_inner());
         match users.remove(&uid) {
             Some(_) => Ok(()),
             None => Err(format!("User {} not found", uid)),
@@ -301,13 +301,13 @@ impl UserGroupManager {
 
     /// Create a new group
     pub fn create_group(&self, groupname: String) -> Result<u32, String> {
-        let mut next_gid = self.next_gid.lock().unwrap();
+        let mut next_gid = self.next_gid.lock().unwrap_or_else(|e| e.into_inner());
         let gid = *next_gid;
         *next_gid += 1;
         drop(next_gid);
 
         let group = Group::new(gid, groupname.clone());
-        let mut groups = self.groups.lock().unwrap();
+        let mut groups = self.groups.lock().unwrap_or_else(|e| e.into_inner());
 
         // Check for duplicate groupname
         for existing_group in groups.values() {
@@ -322,13 +322,13 @@ impl UserGroupManager {
 
     /// Get a group by GID
     pub fn get_group(&self, gid: u32) -> Option<Group> {
-        let groups = self.groups.lock().unwrap();
+        let groups = self.groups.lock().unwrap_or_else(|e| e.into_inner());
         groups.get(&gid).cloned()
     }
 
     /// Get a group by name
     pub fn get_group_by_name(&self, groupname: &str) -> Option<Group> {
-        let groups = self.groups.lock().unwrap();
+        let groups = self.groups.lock().unwrap_or_else(|e| e.into_inner());
         groups.values().find(|g| g.groupname == groupname).cloned()
     }
 
@@ -337,7 +337,7 @@ impl UserGroupManager {
         if gid == 0 {
             return Err("Cannot remove root group".to_string());
         }
-        let mut groups = self.groups.lock().unwrap();
+        let mut groups = self.groups.lock().unwrap_or_else(|e| e.into_inner());
         match groups.remove(&gid) {
             Some(_) => Ok(()),
             None => Err(format!("Group {} not found", gid)),
@@ -346,7 +346,7 @@ impl UserGroupManager {
 
     /// Add user to group
     pub fn add_user_to_group(&self, uid: u32, gid: u32) -> Result<(), String> {
-        let mut groups = self.groups.lock().unwrap();
+        let mut groups = self.groups.lock().unwrap_or_else(|e| e.into_inner());
         match groups.get_mut(&gid) {
             Some(group) => {
                 group.add_member(uid);
@@ -358,7 +358,7 @@ impl UserGroupManager {
 
     /// Remove user from group
     pub fn remove_user_from_group(&self, uid: u32, gid: u32) -> Result<(), String> {
-        let mut groups = self.groups.lock().unwrap();
+        let mut groups = self.groups.lock().unwrap_or_else(|e| e.into_inner());
         match groups.get_mut(&gid) {
             Some(group) => {
                 if group.remove_member(uid as u64) {
@@ -381,13 +381,13 @@ impl UserGroupManager {
 
     /// Get user count
     pub fn user_count(&self) -> usize {
-        let users = self.users.lock().unwrap();
+        let users = self.users.lock().unwrap_or_else(|e| e.into_inner());
         users.len()
     }
 
     /// Get group count
     pub fn group_count(&self) -> usize {
-        let groups = self.groups.lock().unwrap();
+        let groups = self.groups.lock().unwrap_or_else(|e| e.into_inner());
         groups.len()
     }
 }

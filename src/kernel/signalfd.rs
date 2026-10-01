@@ -193,13 +193,13 @@ impl SignalFdManager {
 
     /// Create a new signalfd
     pub fn create_signal_fd(&self, flags: SignalFdFlags, mask: SignalMask) -> u64 {
-        let mut next_id = self.next_fd_id.lock().unwrap();
+        let mut next_id = self.next_fd_id.lock().unwrap_or_else(|e| e.into_inner());
         let fd_id = *next_id;
         *next_id += 1;
         drop(next_id);
 
         let signal_fd = SignalFd::new(fd_id, flags, mask);
-        let mut signal_fds = self.signal_fds.lock().unwrap();
+        let mut signal_fds = self.signal_fds.lock().unwrap_or_else(|e| e.into_inner());
         signal_fds.insert(fd_id, signal_fd);
 
         fd_id
@@ -207,13 +207,13 @@ impl SignalFdManager {
 
     /// Get a signalfd by ID
     pub fn get_signal_fd(&self, fd_id: u64) -> Option<SignalFd> {
-        let signal_fds = self.signal_fds.lock().unwrap();
+        let signal_fds = self.signal_fds.lock().unwrap_or_else(|e| e.into_inner());
         signal_fds.get(&fd_id).cloned()
     }
 
     /// Remove a signalfd
     pub fn remove_signal_fd(&self, fd_id: u64) -> Result<(), String> {
-        let mut signal_fds = self.signal_fds.lock().unwrap();
+        let mut signal_fds = self.signal_fds.lock().unwrap_or_else(|e| e.into_inner());
         match signal_fds.remove(&fd_id) {
             Some(_) => Ok(()),
             None => Err(format!("Signal fd {} not found", fd_id)),
@@ -222,7 +222,7 @@ impl SignalFdManager {
 
     /// Set signal mask
     pub fn set_mask(&self, fd_id: u64, mask: SignalMask) -> Result<(), String> {
-        let mut signal_fds = self.signal_fds.lock().unwrap();
+        let mut signal_fds = self.signal_fds.lock().unwrap_or_else(|e| e.into_inner());
         match signal_fds.get_mut(&fd_id) {
             Some(signal_fd) => {
                 signal_fd.set_mask(mask);
@@ -234,7 +234,7 @@ impl SignalFdManager {
 
     /// Get signal mask
     pub fn get_mask(&self, fd_id: u64) -> Result<SignalMask, String> {
-        let signal_fds = self.signal_fds.lock().unwrap();
+        let signal_fds = self.signal_fds.lock().unwrap_or_else(|e| e.into_inner());
         match signal_fds.get(&fd_id) {
             Some(signal_fd) => Ok(signal_fd.get_mask()),
             None => Err(format!("Signal fd {} not found", fd_id)),
@@ -243,7 +243,7 @@ impl SignalFdManager {
 
     /// Read signals
     pub fn read(&self, fd_id: u64) -> Result<Vec<SignalInfo>, String> {
-        let mut signal_fds = self.signal_fds.lock().unwrap();
+        let mut signal_fds = self.signal_fds.lock().unwrap_or_else(|e| e.into_inner());
         match signal_fds.get_mut(&fd_id) {
             Some(signal_fd) => Ok(signal_fd.read()),
             None => Err(format!("Signal fd {} not found", fd_id)),
@@ -252,7 +252,7 @@ impl SignalFdManager {
 
     /// Add a signal (simulates signal delivery)
     pub fn add_signal(&self, fd_id: u64, info: SignalInfo) -> Result<(), String> {
-        let mut signal_fds = self.signal_fds.lock().unwrap();
+        let mut signal_fds = self.signal_fds.lock().unwrap_or_else(|e| e.into_inner());
         match signal_fds.get_mut(&fd_id) {
             Some(signal_fd) => {
                 signal_fd.add_signal(info);
@@ -264,7 +264,7 @@ impl SignalFdManager {
 
     /// Get signal count
     pub fn signal_count(&self, fd_id: u64) -> Result<usize, String> {
-        let signal_fds = self.signal_fds.lock().unwrap();
+        let signal_fds = self.signal_fds.lock().unwrap_or_else(|e| e.into_inner());
         match signal_fds.get(&fd_id) {
             Some(signal_fd) => Ok(signal_fd.signal_count()),
             None => Err(format!("Signal fd {} not found", fd_id)),
@@ -273,7 +273,7 @@ impl SignalFdManager {
 
     /// Get fd count
     pub fn fd_count(&self) -> usize {
-        let signal_fds = self.signal_fds.lock().unwrap();
+        let signal_fds = self.signal_fds.lock().unwrap_or_else(|e| e.into_inner());
         signal_fds.len()
     }
 }

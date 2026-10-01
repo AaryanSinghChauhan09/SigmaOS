@@ -44,6 +44,7 @@ impl SecureCleaner {
             *b = 0xAA;
         }
 
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         unsafe {
             let ptr = block.as_mut_ptr();
             for i in 0..block.len() {
@@ -148,6 +149,7 @@ impl AmnesiaManager {
 
     pub fn shred_ram_segment(&self, ram_page: &mut [u8]) {
         for _ in 0..self.rounds {
+            // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
             unsafe {
                 let ptr = ram_page.as_mut_ptr();
                 for i in 0..ram_page.len() {

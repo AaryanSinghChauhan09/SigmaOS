@@ -397,6 +397,7 @@ impl MACEngine for SimpleMACEngine {
             return true;
         }
 
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             if let Some(context) = self.get_context(context_id) {
                 for i in 0..self.policies.len() {

@@ -206,7 +206,7 @@ impl SeccompManager {
             .get(&pid)
             .ok_or_else(|| format!("Process not found: {}", pid))?;
 
-        let filter_guard = filter.lock().unwrap();
+        let filter_guard = filter.lock().unwrap_or_else(|e| e.into_inner());
         Ok(filter_guard.check_syscall(syscall, args))
     }
 

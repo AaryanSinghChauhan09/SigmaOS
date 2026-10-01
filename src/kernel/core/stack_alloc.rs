@@ -40,6 +40,7 @@ impl<T: Copy, const N: usize> StackBuffer<T, N> {
 
     pub fn get(&self, index: usize) -> Option<T> {
         if index < self.len {
+            // SAFETY: operation is correct given the invariants maintained by the enclosing function.
             unsafe { Some(self.data[index].assume_init()) }
         } else {
             None

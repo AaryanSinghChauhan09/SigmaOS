@@ -148,14 +148,14 @@ impl TimeManager {
 
     /// Register a clock source
     pub fn register_clock_source(&self, clock_source: ClockSource, resolution_ns: u64) -> u32 {
-        let mut next_id = self.next_clock_id.lock().unwrap();
+        let mut next_id = self.next_clock_id.lock().unwrap_or_else(|e| e.into_inner());
         let clock_id = *next_id;
         *next_id += 1;
         drop(next_id);
 
         let stats =
             ClockSourceStats::new(clock_id, clock_source, resolution_ns).with_registered(true);
-        let mut clock_sources = self.clock_sources.lock().unwrap();
+        let mut clock_sources = self.clock_sources.lock().unwrap_or_else(|e| e.into_inner());
         clock_sources.insert(clock_id, stats);
 
         clock_id
@@ -163,29 +163,29 @@ impl TimeManager {
 
     /// Get a clock source by ID
     pub fn get_clock_source(&self, clock_id: u32) -> Option<ClockSourceStats> {
-        let clock_sources = self.clock_sources.lock().unwrap();
+        let clock_sources = self.clock_sources.lock().unwrap_or_else(|e| e.into_inner());
         clock_sources.get(&clock_id).cloned()
     }
 
     /// Select a clock source
     pub fn select_clock_source(&self, clock_id: u32) -> Result<(), String> {
-        let clock_sources = self.clock_sources.lock().unwrap();
+        let clock_sources = self.clock_sources.lock().unwrap_or_else(|e| e.into_inner());
         if !clock_sources.contains_key(&clock_id) {
             return Err(format!("Clock source {} not found", clock_id));
         }
         drop(clock_sources);
 
-        let mut current_clock_id = self.current_clock_id.lock().unwrap();
+        let mut current_clock_id = self.current_clock_id.lock().unwrap_or_else(|e| e.into_inner());
         *current_clock_id = Some(clock_id);
         Ok(())
     }
 
     /// Get current clock source
     pub fn get_current_clock_source(&self) -> Option<ClockSourceStats> {
-        let current_clock_id = self.current_clock_id.lock().unwrap();
+        let current_clock_id = self.current_clock_id.lock().unwrap_or_else(|e| e.into_inner());
         match *current_clock_id {
             Some(id) => {
-                let clock_sources = self.clock_sources.lock().unwrap();
+                let clock_sources = self.clock_sources.lock().unwrap_or_else(|e| e.into_inner());
                 clock_sources.get(&id).cloned()
             }
             None => None,
@@ -194,23 +194,23 @@ impl TimeManager {
 
     /// Set system time
     pub fn set_system_time(&self, time: SystemTime) {
-        let mut system_time = self.system_time.lock().unwrap();
+        let mut system_time = self.system_time.lock().unwrap_or_else(|e| e.into_inner());
         *system_time = time;
     }
 
     /// Get system time
     pub fn get_system_time(&self) -> SystemTime {
-        let system_time = self.system_time.lock().unwrap();
+        let system_time = self.system_time.lock().unwrap_or_else(|e| e.into_inner());
         *system_time
     }
 
     /// Set timezone
     pub fn set_timezone(&self, name: String) -> Result<(), String> {
-        let timezones = self.timezones.lock().unwrap();
+        let timezones = self.timezones.lock().unwrap_or_else(|e| e.into_inner());
         match timezones.get(&name).cloned() {
             Some(tz) => {
                 drop(timezones);
-                let mut timezone = self.timezone.lock().unwrap();
+                let mut timezone = self.timezone.lock().unwrap_or_else(|e| e.into_inner());
                 *timezone = tz;
                 Ok(())
             }
@@ -220,25 +220,25 @@ impl TimeManager {
 
     /// Get current timezone
     pub fn get_timezone(&self) -> Timezone {
-        let timezone = self.timezone.lock().unwrap();
+        let timezone = self.timezone.lock().unwrap_or_else(|e| e.into_inner());
         timezone.clone()
     }
 
     /// Add a timezone
     pub fn add_timezone(&self, timezone: Timezone) {
-        let mut timezones = self.timezones.lock().unwrap();
+        let mut timezones = self.timezones.lock().unwrap_or_else(|e| e.into_inner());
         timezones.insert(timezone.name.clone(), timezone);
     }
 
     /// Get all timezones
     pub fn get_all_timezones(&self) -> HashMap<String, Timezone> {
-        let timezones = self.timezones.lock().unwrap();
+        let timezones = self.timezones.lock().unwrap_or_else(|e| e.into_inner());
         timezones.clone()
     }
 
     /// Get clock source count
     pub fn clock_source_count(&self) -> usize {
-        let clock_sources = self.clock_sources.lock().unwrap();
+        let clock_sources = self.clock_sources.lock().unwrap_or_else(|e| e.into_inner());
         clock_sources.len()
     }
 }

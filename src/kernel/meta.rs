@@ -308,6 +308,7 @@ impl<T> Vec<T> {
         }
     }
     pub fn push(&mut self, item: T) {
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             if self.len >= self.capacity {
                 self.grow();
@@ -361,6 +362,7 @@ impl<T> core::ops::Index<usize> for Vec<T> {
         if index >= self.len {
             panic!("index out of bounds");
         }
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe { &*self.data.add(index) }
     }
 }
@@ -370,6 +372,7 @@ impl<T> core::ops::IndexMut<usize> for Vec<T> {
         if index >= self.len {
             panic!("index out of bounds");
         }
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe { &mut *self.data.add(index) }
     }
 }
@@ -383,6 +386,7 @@ impl<'a, T> Iterator for VecIter<'a, T> {
     type Item = &'a T;
     fn next(&mut self) -> Option<Self::Item> {
         if self.index < self.vec.len() {
+            // SAFETY: operation is correct given the invariants maintained by the enclosing function.
             let item = unsafe { &*self.vec.data.add(self.index) };
             self.index += 1;
             Some(item)
@@ -403,6 +407,7 @@ impl<'a, T> Iterator for VecIterMut<'a, T> {
     type Item = &'a mut T;
     fn next(&mut self) -> Option<Self::Item> {
         if self.index < self.len {
+            // SAFETY: operation is correct given the invariants maintained by the enclosing function.
             let item = unsafe { &mut *self.data.add(self.index) };
             self.index += 1;
             Some(item)

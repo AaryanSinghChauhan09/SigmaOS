@@ -187,13 +187,13 @@ impl FdTableManager {
 
     /// Create a new fd table
     pub fn create_table(&self) -> u64 {
-        let mut next_id = self.next_table_id.lock().unwrap();
+        let mut next_id = self.next_table_id.lock().unwrap_or_else(|e| e.into_inner());
         let table_id = *next_id;
         *next_id += 1;
         drop(next_id);
 
         let table = FdTable::new();
-        let mut tables = self.tables.lock().unwrap();
+        let mut tables = self.tables.lock().unwrap_or_else(|e| e.into_inner());
         tables.insert(table_id, table);
 
         table_id
@@ -201,13 +201,13 @@ impl FdTableManager {
 
     /// Get a fd table by ID
     pub fn get_table(&self, table_id: u64) -> Option<FdTable> {
-        let tables = self.tables.lock().unwrap();
+        let tables = self.tables.lock().unwrap_or_else(|e| e.into_inner());
         tables.get(&table_id).cloned()
     }
 
     /// Remove a fd table
     pub fn remove_table(&self, table_id: u64) -> Result<(), String> {
-        let mut tables = self.tables.lock().unwrap();
+        let mut tables = self.tables.lock().unwrap_or_else(|e| e.into_inner());
         match tables.remove(&table_id) {
             Some(_) => Ok(()),
             None => Err(format!("Fd table {} not found", table_id)),
@@ -221,7 +221,7 @@ impl FdTableManager {
         file_type: String,
         flags: FdFlags,
     ) -> Result<i32, String> {
-        let mut tables = self.tables.lock().unwrap();
+        let mut tables = self.tables.lock().unwrap_or_else(|e| e.into_inner());
         match tables.get_mut(&table_id) {
             Some(table) => Ok(table.allocate(file_type, flags)),
             None => Err(format!("Fd table {} not found", table_id)),
@@ -230,7 +230,7 @@ impl FdTableManager {
 
     /// Close a file descriptor
     pub fn close(&self, table_id: u64, fd: i32) -> Result<(), String> {
-        let mut tables = self.tables.lock().unwrap();
+        let mut tables = self.tables.lock().unwrap_or_else(|e| e.into_inner());
         match tables.get_mut(&table_id) {
             Some(table) => table.close(fd),
             None => Err(format!("Fd table {} not found", table_id)),
@@ -239,7 +239,7 @@ impl FdTableManager {
 
     /// Duplicate a file descriptor
     pub fn dup(&self, table_id: u64, old_fd: i32) -> Result<i32, String> {
-        let mut tables = self.tables.lock().unwrap();
+        let mut tables = self.tables.lock().unwrap_or_else(|e| e.into_inner());
         match tables.get_mut(&table_id) {
             Some(table) => table.dup(old_fd),
             None => Err(format!("Fd table {} not found", table_id)),
@@ -248,7 +248,7 @@ impl FdTableManager {
 
     /// Duplicate a file descriptor to a specific fd
     pub fn dup2(&self, table_id: u64, old_fd: i32, new_fd: i32) -> Result<i32, String> {
-        let mut tables = self.tables.lock().unwrap();
+        let mut tables = self.tables.lock().unwrap_or_else(|e| e.into_inner());
         match tables.get_mut(&table_id) {
             Some(table) => table.dup2(old_fd, new_fd),
             None => Err(format!("Fd table {} not found", table_id)),
@@ -257,7 +257,7 @@ impl FdTableManager {
 
     /// Get table count
     pub fn table_count(&self) -> usize {
-        let tables = self.tables.lock().unwrap();
+        let tables = self.tables.lock().unwrap_or_else(|e| e.into_inner());
         tables.len()
     }
 }

@@ -283,6 +283,7 @@ impl MemoryDescriptorList {
         for i in 0..self.physical_pages.len() {
             let virt = start_page + (i * 4096) as u64;
             let phys =
+                // SAFETY: operation is correct given the invariants maintained by the enclosing function.
                 unsafe { vmm.translate(virt) }.ok_or("Virtual address page fault during probe")?;
             self.physical_pages[i] = phys & !0xFFF;
         }
@@ -359,16 +360,19 @@ mod tests {
             }
         };
 
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         let mut vmm = unsafe { VirtualMemoryManagerV2::new(pml4_ptr as u64) };
         let virt = 0x0000_7FFF_FFFF_F000;
         let phys = 0x0000_0000_1000_0000;
         let flags = PageTableFlags(PageTableFlags::WRITABLE | PageTableFlags::USER_ACCESSIBLE);
 
         // Map the page
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         assert!(unsafe { vmm.map_page(virt, phys, flags, &mut allocator).is_ok() });
         assert_eq!(allocator_calls, 3);
 
         // Translate the page
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         let translated = unsafe { vmm.translate(virt).unwrap() };
         assert_eq!(translated, phys);
     }
@@ -418,6 +422,7 @@ mod tests {
             }
         };
 
+        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         let mut vmm = unsafe { VirtualMemoryManagerV2::new(pml4_ptr as u64) };
 
         // Pre-map user virtual address range sharing the exact same PML4/PDPT/PD index space
@@ -426,10 +431,12 @@ mod tests {
         let phys_frame2 = 0x1000_1000;
         let flags = PageTableFlags(PageTableFlags::WRITABLE | PageTableFlags::USER_ACCESSIBLE);
 
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         assert!(unsafe {
             vmm.map_page(virt_user_addr, phys_frame1, flags, &mut user_allocator)
                 .is_ok()
         });
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         assert!(unsafe {
             vmm.map_page(
                 virt_user_addr + 4096,
@@ -456,6 +463,7 @@ mod tests {
 
         // Map locked MDL to a contiguous kernel virtual address range (requires allocation of kernel mapping space page directories)
         let kernel_start_virt = 0x0000_2000_0000_0000;
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         let mapped_address = unsafe {
             mdl.map_to_kernel_space(kernel_start_virt, &mut vmm, &mut kern_allocator)
                 .unwrap()

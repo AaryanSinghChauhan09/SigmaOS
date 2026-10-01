@@ -126,6 +126,7 @@ impl MLFQueue {
     }
 
     pub fn enqueue(&self, task: *mut TaskControlBlock) {
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             let tail = self.tail.load(Ordering::Acquire);
             if tail.is_null() {
@@ -148,6 +149,7 @@ impl MLFQueue {
     }
 
     pub fn dequeue(&self) -> Option<*mut TaskControlBlock> {
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             let head = self.head.load(Ordering::Acquire);
             if head.is_null() {
@@ -184,6 +186,7 @@ impl RTQueue {
     }
 
     pub fn enqueue(&self, task: *mut TaskControlBlock) {
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             let tail = self.tail.load(Ordering::Acquire);
             if tail.is_null() {
@@ -204,6 +207,7 @@ impl RTQueue {
     }
 
     pub fn dequeue(&self) -> Option<*mut TaskControlBlock> {
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             let head = self.head.load(Ordering::Acquire);
             if head.is_null() {
@@ -374,6 +378,7 @@ impl SovereignScheduler {
         if is_realtime {
             self.rt_queue.enqueue(task);
         } else {
+            // SAFETY: operation is correct given the invariants maintained by the enclosing function.
             let priority = unsafe { (*task).get_priority() };
             let queue_idx = priority.min(3);
             self.mlfq[queue_idx].enqueue(task);
@@ -401,6 +406,7 @@ impl SovereignScheduler {
     pub fn context_switch(&self, next_task: *mut TaskControlBlock) {
         let prev_task = self.current_task.swap(next_task, Ordering::SeqCst);
 
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             if !prev_task.is_null() {
                 (*prev_task).set_state(TaskState::Ready);
@@ -420,6 +426,7 @@ impl SovereignScheduler {
 
         let current = self.current_task.load(Ordering::Acquire);
         if !current.is_null() {
+            // SAFETY: pointer and length are derived from a valid allocation; lifetime is sound.
             unsafe {
                 (*current).increment_runtime();
 
@@ -455,6 +462,7 @@ impl SovereignScheduler {
 
     /// MCS (Machine-to-Core Scheduling) - NUMA-aware task placement
     pub fn mcs_schedule(&self, task: *mut TaskControlBlock, cpu_id: usize) {
+        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe {
             (*task).cpu_affinity.store(cpu_id, Ordering::SeqCst);
         }
