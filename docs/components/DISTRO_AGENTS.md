@@ -92,6 +92,7 @@ cargo fmt
 ### Long Term
 - Enhanced security features
 - Improved compatibility layers
+- Missing Linux & BSD Components Roadmap: see `docs/roadmap/FUTURE_LINUX_BSD_MISSING_COMPONENTS_AGENTS.md` and `Agents/FUTURE_LINUX_BSD_MISSING_COMPONENTS_AGENTS.md`
 
 ## References
 
