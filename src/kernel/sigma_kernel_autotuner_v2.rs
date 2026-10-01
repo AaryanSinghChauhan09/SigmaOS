@@ -338,6 +338,11 @@ impl SigmaKernelAutotuner {
             return WorkloadProfile::Gaming;
         }
 
+        // Compilation: sustained CPU saturation
+        if m.cpu_utilization_pct > 85.0 && m.io_wait_pct < 10.0 {
+            return WorkloadProfile::Compilation;
+        }
+
         // Network intensive: high throughput, moderate CPU
         if m.network_throughput_mbps > 500.0 && m.cpu_utilization_pct < 60.0 {
             return WorkloadProfile::NetworkIntensive;
@@ -346,11 +351,6 @@ impl SigmaKernelAutotuner {
         // Server batch: high utilization, many tasks queued
         if m.cpu_utilization_pct > 70.0 && m.runqueue_depth > 8 {
             return WorkloadProfile::ServerBatch;
-        }
-
-        // Compilation: sustained CPU saturation without a server-sized queue.
-        if m.cpu_utilization_pct > 85.0 && m.io_wait_pct < 10.0 {
-            return WorkloadProfile::Compilation;
         }
 
         // Memory pressure: mostly memory-bound

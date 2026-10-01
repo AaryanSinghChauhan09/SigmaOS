@@ -308,12 +308,6 @@ impl LinuxProcessTable {
         }
     }
 
-    fn with_init_process() -> Self {
-        let mut table = Self::new();
-        table.create(0, "init".to_string());
-        table
-    }
-
     /// Create a new process
     pub fn create(&mut self, ppid: u64, name: String) -> u64 {
         let pid = self.next_pid.fetch_add(1, Ordering::SeqCst);
@@ -372,7 +366,7 @@ impl LinuxSyscallDispatcher {
     pub fn new() -> Self {
         Self {
             fd_table: LinuxFdTable::new(),
-            process_table: LinuxProcessTable::with_init_process(),
+            process_table: LinuxProcessTable::new(),
             syscall_count: AtomicU64::new(0),
         }
     }
@@ -542,7 +536,7 @@ mod tests {
 
     #[test]
     fn test_fd_table() {
-        let mut table = LinuxFdTable::new();
+        let table = LinuxFdTable::new();
         let path = "/tmp/test".to_string();
         let flags = LinuxOpenFlags::from_u32(0x02);
 
@@ -556,7 +550,7 @@ mod tests {
 
     #[test]
     fn test_process_table() {
-        let mut table = LinuxProcessTable::new();
+        let table = LinuxProcessTable::new();
         let pid = table.create(0, "test".to_string());
 
         assert_eq!(pid, 1);

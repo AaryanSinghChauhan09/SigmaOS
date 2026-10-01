@@ -650,7 +650,7 @@ mod tests {
         let bandwidth = diag.get_bandwidth(String::from("eth0"));
 
         assert_eq!(bandwidth.interface, "eth0");
-        assert!(bandwidth.download_mbps > 0.0);
+        assert!(bandwidth.download_mbps > 0);
     }
 
     #[test]

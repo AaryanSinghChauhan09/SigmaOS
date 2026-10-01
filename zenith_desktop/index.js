@@ -308,6 +308,47 @@ export function renderCommandResults(query = "") {
   return filtered;
 }
 
+/**
+ * Toggles the accessible Sovereign Help Matrix modal overlay (#help-overlay),
+ * populates system keyboard shortcuts guidance, and manages dialog focus.
+ */
+export function toggleHelp() {
+  if (typeof document === "undefined") return;
+  const overlay = document.getElementById("help-overlay");
+  if (!overlay) return;
+
+  const isHidden = overlay.classList.contains("wizard-overlay--hidden");
+  if (isHidden) {
+    if (!overlay.firstElementChild) {
+      overlay.setAttribute("role", "dialog");
+      overlay.setAttribute("aria-label", "Sovereign Desktop Help Matrix");
+      overlay.setAttribute("aria-modal", "true");
+      overlay.innerHTML = `
+        <div class="wizard-card" role="document">
+          <h2>❓ Help Matrix</h2>
+          <p style="color: var(--text-muted); margin-bottom: 15px; font-size: 0.9rem;">Essential Sovereign Desktop Keyboard Shortcuts</p>
+          <div class="wizard-steps" style="text-align: left; font-size: 0.85rem; gap: 8px;">
+            <div><kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">Alt + Space</kbd> Toggle Command Palette</div>
+            <div><kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">Alt + F / T / O / S / M / D</kbd> Launch Apps</div>
+            <div><kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">F1 / ?</kbd> Toggle Help Matrix</div>
+            <div><kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">Escape</kbd> Dismiss active dialogs & menus</div>
+          </div>
+          <button type="button" class="wizard-btn" style="margin-top: 20px;" onclick="toggleHelp()" aria-label="Close Help Matrix">Close</button>
+        </div>
+      `;
+    }
+    overlay.classList.remove("wizard-overlay--hidden");
+    overlay.setAttribute("aria-hidden", "false");
+    const closeBtn = overlay.querySelector("button");
+    if (closeBtn && typeof closeBtn.focus === "function") {
+      closeBtn.focus();
+    }
+  } else {
+    overlay.classList.add("wizard-overlay--hidden");
+    overlay.setAttribute("aria-hidden", "true");
+  }
+}
+
 export function closeCommandPalette() {
   if (typeof document === "undefined") return;
   const cmdPalette = document.getElementById("cmd-palette");
@@ -755,6 +796,7 @@ if (typeof window !== "undefined") {
   window.closeWindow = closeWindow;
   window.maximizeWindow = maximizeWindow;
   window.launchApp = launchApp;
+  window.toggleHelp = toggleHelp;
   window.renderCommandResults = renderCommandResults;
   window.initCommandPalette = initCommandPalette;
   window.initWindowFocus = initWindowFocus;

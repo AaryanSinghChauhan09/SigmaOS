@@ -7,6 +7,7 @@ use std::vec;
 
 use core::cell::RefCell;
 
+#[cfg(not(test))]
 use crate::security::CapabilityToken;
 
 #[cfg(test_disabled)]

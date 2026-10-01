@@ -173,7 +173,7 @@ impl NamespaceManager {
     pub fn new() -> Self {
         let mut manager = Self {
             namespaces: HashMap::new(),
-            next_id: AtomicU64::new(4),
+            next_id: AtomicU64::new(1),
             initial_namespaces: HashMap::new(),
         };
 

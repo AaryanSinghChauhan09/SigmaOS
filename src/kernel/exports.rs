@@ -10,6 +10,7 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
+#[cfg(not(test))]
 use crate::klib::HashMap;
 
 // =========================================================================

@@ -12,8 +12,6 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use core::ptr;
-use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::vec::Vec;
 

@@ -282,14 +282,7 @@ impl DebianMultiarchAptEngine {
     /// Calculates candidate package version based on APT pinning priority rules
     pub fn resolve_pin_priority(&self, package_name: &str, default_priority: i32) -> i32 {
         for rule in &self.pin_rules {
-            let matches = if let Some((prefix, suffix)) = rule.package_pattern.split_once('*') {
-                package_name.starts_with(prefix)
-                    && package_name.ends_with(suffix)
-                    && package_name.len() >= prefix.len() + suffix.len()
-            } else {
-                rule.package_pattern == package_name
-            };
-            if matches {
+            if rule.package_pattern == "*" || rule.package_pattern == package_name {
                 return rule.pin_priority;
             }
         }

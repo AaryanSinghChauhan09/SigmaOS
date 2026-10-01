@@ -39,7 +39,7 @@ impl DiskUsage {
 
     pub fn get_summary(&self) -> String {
         format!(
-            "{} {} {} {} {:.1}% {}",
+            "{} {} {} {} {} {:.1}%",
             self.device,
             self.total_size,
             self.used_size,

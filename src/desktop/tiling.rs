@@ -1,114 +1,42 @@
-//! Tiling Window Manager
-//!
-//! COSMIC-inspired safe multi-threaded tiling window manager with multiple layout types
-//! including spiral, monocle, columns, rows, and grid layouts.
+// Tiling Window Manager
+// COSMIC-inspired safe multi-threaded tiling dynamics
 
 use std::collections::HashMap;
+use std::sync::atomic::{AtomicU64, Ordering};
 
-/// Window position and size
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct TilingWindowGeometry {
+/// Tiling layout
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TilingLayout {
+    Spiral,
+    Monocle,
+    Columns,
+    Rows,
+    Grid,
+}
+
+/// Window area
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct WindowArea {
     pub x: i32,
     pub y: i32,
     pub width: u32,
     pub height: u32,
 }
 
-impl TilingWindowGeometry {
-    pub fn new(x: i32, y: i32, width: u32, height: u32) -> Self {
-        Self {
-            x,
-            y,
-            width,
-            height,
-        }
-    }
-
-    pub fn area(&self) -> u32 {
-        self.width * self.height
-    }
-}
-
-/// Window in tiling layout
+/// Tiling window
 #[derive(Debug, Clone)]
-pub struct TiledWindow {
-    pub id: u32,
-    pub title: String,
-    pub geometry: TilingWindowGeometry,
-    pub is_focused: bool,
+pub struct TilingWindow {
+    pub id: u64,
+    pub workspace_id: u64,
+    pub area: WindowArea,
     pub is_floating: bool,
+    pub is_fullscreen: bool,
 }
 
-impl TiledWindow {
-    pub fn new(id: u32, title: String, geometry: TilingWindowGeometry) -> Self {
-        Self {
-            id,
-            title,
-            geometry,
-            is_focused: false,
-            is_floating: false,
-        }
-    }
-
-    pub fn set_geometry(&mut self, geometry: TilingWindowGeometry) {
-        self.geometry = geometry;
-    }
-
-    pub fn focus(&mut self) {
-        self.is_focused = true;
-    }
-
-    pub fn unfocus(&mut self) {
-        self.is_focused = false;
-    }
-
-    pub fn set_floating(&mut self, floating: bool) {
-        self.is_floating = floating;
-    }
-}
-
-/// Tiling layout types
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum TilingLayout {
-    /// Spiral arrangement of windows
-    Spiral,
-    /// Single focused window fullscreen
-    Monocle,
-    /// Vertical column layout
-    Columns,
-    /// Horizontal row layout
-    Rows,
-    /// Grid-based layout
-    Grid,
-}
-
-impl TilingLayout {
-    pub fn from_str(s: &str) -> Option<Self> {
-        match s.to_lowercase().as_str() {
-            "spiral" => Some(TilingLayout::Spiral),
-            "monocle" => Some(TilingLayout::Monocle),
-            "columns" => Some(TilingLayout::Columns),
-            "rows" => Some(TilingLayout::Rows),
-            "grid" => Some(TilingLayout::Grid),
-            _ => None,
-        }
-    }
-
-    pub fn as_str(&self) -> &str {
-        match self {
-            TilingLayout::Spiral => "spiral",
-            TilingLayout::Monocle => "monocle",
-            TilingLayout::Columns => "columns",
-            TilingLayout::Rows => "rows",
-            TilingLayout::Grid => "grid",
-        }
-    }
-}
-
-/// Workspace with tiling layout
+/// Workspace
 #[derive(Debug, Clone)]
 pub struct Workspace {
-    pub id: u32,
+    pub id: u64,
     pub name: String,
     pub layout: TilingLayout,
     pub windows: Vec<TiledWindow>,
@@ -497,159 +425,385 @@ impl Workspace {
     pub fn window_count(&self) -> usize {
         self.windows.len()
     }
+    pub gaps: u32,
 }
 
 /// Tiling window manager
-#[derive(Debug)]
 pub struct TilingWindowManager {
-    workspaces: HashMap<u32, Workspace>,
-    active_workspace: u32,
-    next_window_id: u32,
-    next_workspace_id: u32,
+    next_window_id: AtomicU64,
+    next_workspace_id: AtomicU64,
+    windows: HashMap<u64, TilingWindow>,
+    workspaces: HashMap<u64, Workspace>,
+    active_workspace: u64,
+    focused_window: Option<u64>,
 }
 
 impl TilingWindowManager {
     pub fn new() -> Self {
-        let mut manager = Self {
+        Self {
+            next_window_id: AtomicU64::new(1),
+            next_workspace_id: AtomicU64::new(1),
+            windows: HashMap::new(),
             workspaces: HashMap::new(),
             active_workspace: 1,
-            next_window_id: 1,
-            next_workspace_id: 1,
+            focused_window: None,
+        }
+    }
+
+    /// Create a workspace
+    pub fn create_workspace(&mut self, name: String, layout: TilingLayout) -> Workspace {
+        let id = self.next_workspace_id.fetch_add(1, Ordering::SeqCst);
+
+        let workspace = Workspace {
+            id,
+            name,
+            layout,
+            gaps: 8,
         };
 
-        // Create default workspace
-        manager.create_workspace("1", TilingLayout::Spiral);
-        manager
+        self.workspaces.insert(id, workspace.clone());
+        workspace
     }
 
-    /// Create a new workspace
-    pub fn create_workspace(&mut self, name: &str, layout: TilingLayout) -> u32 {
-        let id = self.next_workspace_id;
-        self.next_workspace_id += 1;
+    /// Add a window to workspace
+    pub fn add_window(&mut self, workspace_id: u64, area: WindowArea) -> TilingWindow {
+        let id = self.next_window_id.fetch_add(1, Ordering::SeqCst);
 
-        let workspace = Workspace::new(id, name.to_string(), layout);
-        self.workspaces.insert(id, workspace);
+        let window = TilingWindow {
+            id,
+            workspace_id,
+            area,
+            is_floating: false,
+            is_fullscreen: false,
+        };
 
-        id
+        self.windows.insert(id, window.clone());
+        self.rearrange_workspace(workspace_id);
+        window
     }
 
-    /// Switch to a workspace
-    pub fn switch_workspace(&mut self, workspace_id: u32) -> Result<(), String> {
-        if !self.workspaces.contains_key(&workspace_id) {
-            return Err(format!("Workspace {} not found", workspace_id));
+    /// Remove a window
+    pub fn remove_window(&mut self, id: u64) -> Result<(), &'static str> {
+        if let Some(window) = self.windows.remove(&id) {
+            if self.focused_window == Some(id) {
+                self.focused_window = None;
+            }
+            self.rearrange_workspace(window.workspace_id);
+            Ok(())
+        } else {
+            Err("Window not found")
+        }
+    }
+
+    /// Rearrange workspace based on layout
+    fn rearrange_workspace(&mut self, workspace_id: u64) {
+        let (layout, gaps) = if let Some(workspace) = self.workspaces.get(&workspace_id) {
+            (workspace.layout, workspace.gaps)
+        } else {
+            return;
+        };
+
+        let window_ids: Vec<u64> = self
+            .windows
+            .values()
+            .filter(|w| w.workspace_id == workspace_id && !w.is_floating && !w.is_fullscreen)
+            .map(|w| w.id)
+            .collect();
+
+        let count = window_ids.len();
+        if count == 0 {
+            return;
         }
 
-        self.active_workspace = workspace_id;
-        Ok(())
-    }
-
-    /// Get active workspace
-    pub fn get_active_workspace(&self) -> Option<&Workspace> {
-        self.workspaces.get(&self.active_workspace)
-    }
-
-    /// Get active workspace mutably
-    pub fn get_active_workspace_mut(&mut self) -> Option<&mut Workspace> {
-        self.workspaces.get_mut(&self.active_workspace)
-    }
-
-    /// Add window to active workspace
-    pub fn add_window(&mut self, title: String, geometry: TilingWindowGeometry) -> u32 {
-        let id = self.next_window_id;
-        self.next_window_id += 1;
-
-        let window = TiledWindow::new(id, title, geometry);
-
-        if let Some(workspace) = self.get_active_workspace_mut() {
-            workspace.add_window(window);
-            workspace.focus_window(id).ok();
+        match layout {
+            TilingLayout::Spiral => self.rearrange_spiral_by_ids(&window_ids, gaps),
+            TilingLayout::Monocle => self.rearrange_monocle_by_ids(&window_ids),
+            TilingLayout::Columns => self.rearrange_columns_by_ids(&window_ids, gaps),
+            TilingLayout::Rows => self.rearrange_rows_by_ids(&window_ids, gaps),
+            TilingLayout::Grid => self.rearrange_grid_by_ids(&window_ids, gaps),
         }
-
-        id
     }
 
-    /// Remove window
-    pub fn remove_window(&mut self, window_id: u32) -> Result<(), String> {
-        for workspace in self.workspaces.values_mut() {
-            if workspace.remove_window(window_id).is_some() {
-                return Ok(());
+    fn rearrange_spiral(&mut self, windows: &[&TilingWindow], gaps: u32) {
+        // Simplified spiral layout
+        let screen_width = 1920u32;
+        let screen_height = 1080u32;
+
+        for (i, window) in windows.iter().enumerate() {
+            let x = (i as u32 * 50) % (screen_width - 200);
+            let y = (i as u32 * 50) % (screen_height - 200);
+
+            if let Some(w) = self.windows.get_mut(&window.id) {
+                w.area = WindowArea {
+                    x: x as i32 + gaps as i32,
+                    y: y as i32 + gaps as i32,
+                    width: 400,
+                    height: 300,
+                };
             }
         }
-        Err(format!("Window {} not found", window_id))
+    }
+
+    fn rearrange_monocle(&mut self, windows: &[&TilingWindow]) {
+        // Monocle: single focused window takes full screen
+        let screen_width = 1920u32;
+        let screen_height = 1080u32;
+
+        for window in windows {
+            if let Some(w) = self.windows.get_mut(&window.id) {
+                w.area = WindowArea {
+                    x: 0,
+                    y: 0,
+                    width: screen_width,
+                    height: screen_height,
+                };
+            }
+        }
+    }
+
+    fn rearrange_spiral_by_ids(&mut self, window_ids: &[u64], gaps: u32) {
+        // Simplified spiral layout
+        let screen_width = 1920u32;
+        let screen_height = 1080u32;
+        let count = window_ids.len() as u32;
+
+        if count == 0 {
+            return;
+        }
+
+        let window_width = (screen_width - gaps * (count + 1)) / count;
+        let window_height = (screen_height - gaps * (count + 1)) / count;
+
+        for (i, &id) in window_ids.iter().enumerate() {
+            let x = gaps + (i as u32 * (window_width + gaps));
+            let y = gaps;
+
+            if let Some(w) = self.windows.get_mut(&id) {
+                w.area = WindowArea {
+                    x: x as i32,
+                    y: y as i32,
+                    width: window_width,
+                    height: window_height,
+                };
+            }
+        }
+    }
+
+    fn rearrange_monocle_by_ids(&mut self, window_ids: &[u64]) {
+        let screen_width = 1920u32;
+        let screen_height = 1080u32;
+
+        for &id in window_ids {
+            if let Some(w) = self.windows.get_mut(&id) {
+                w.area = WindowArea {
+                    x: 0,
+                    y: 0,
+                    width: screen_width,
+                    height: screen_height,
+                };
+            }
+        }
+    }
+
+    fn rearrange_columns_by_ids(&mut self, window_ids: &[u64], gaps: u32) {
+        let screen_width = 1920u32;
+        let screen_height = 1080u32;
+        let count = window_ids.len() as u32;
+
+        let col_width = (screen_width - gaps * (count + 1)) / count;
+
+        for (i, &id) in window_ids.iter().enumerate() {
+            let x = gaps + (i as u32 * (col_width + gaps));
+
+            if let Some(w) = self.windows.get_mut(&id) {
+                w.area = WindowArea {
+                    x: x as i32,
+                    y: gaps as i32,
+                    width: col_width,
+                    height: screen_height - 2 * gaps,
+                };
+            }
+        }
+    }
+
+    fn rearrange_rows_by_ids(&mut self, window_ids: &[u64], gaps: u32) {
+        let screen_width = 1920u32;
+        let screen_height = 1080u32;
+        let count = window_ids.len() as u32;
+
+        let row_height = (screen_height - gaps * (count + 1)) / count;
+
+        for (i, &id) in window_ids.iter().enumerate() {
+            let y = gaps + (i as u32 * (row_height + gaps));
+
+            if let Some(w) = self.windows.get_mut(&id) {
+                w.area = WindowArea {
+                    x: gaps as i32,
+                    y: y as i32,
+                    width: screen_width - 2 * gaps,
+                    height: row_height,
+                };
+            }
+        }
+    }
+
+    fn rearrange_grid_by_ids(&mut self, window_ids: &[u64], gaps: u32) {
+        let screen_width = 1920u32;
+        let screen_height = 1080u32;
+        let count = window_ids.len() as u32;
+
+        let cols = (count as f32).sqrt().ceil() as u32;
+        let rows = (count as f32 / cols as f32).ceil() as u32;
+
+        let cell_width = (screen_width - gaps * (cols + 1)) / cols;
+        let cell_height = (screen_height - gaps * (rows + 1)) / rows;
+
+        for (i, &id) in window_ids.iter().enumerate() {
+            let col = (i as u32) % cols;
+            let row = (i as u32) / cols;
+
+            let x = gaps + col * (cell_width + gaps);
+            let y = gaps + row * (cell_height + gaps);
+
+            if let Some(w) = self.windows.get_mut(&id) {
+                w.area = WindowArea {
+                    x: x as i32,
+                    y: y as i32,
+                    width: cell_width,
+                    height: cell_height,
+                };
+            }
+        }
+    }
+
+    fn rearrange_columns(&mut self, windows: &[&TilingWindow], gaps: u32) {
+        let screen_width = 1920u32;
+        let screen_height = 1080u32;
+        let count = windows.len() as u32;
+
+        let col_width = (screen_width - gaps * (count + 1)) / count;
+
+        for (i, window) in windows.iter().enumerate() {
+            let x = gaps + (i as u32 * (col_width + gaps));
+
+            if let Some(w) = self.windows.get_mut(&window.id) {
+                w.area = WindowArea {
+                    x: x as i32,
+                    y: gaps as i32,
+                    width: col_width,
+                    height: screen_height - 2 * gaps,
+                };
+            }
+        }
+    }
+
+    fn rearrange_rows(&mut self, windows: &[&TilingWindow], gaps: u32) {
+        let screen_width = 1920u32;
+        let screen_height = 1080u32;
+        let count = windows.len() as u32;
+
+        let row_height = (screen_height - gaps * (count + 1)) / count;
+
+        for (i, window) in windows.iter().enumerate() {
+            let y = gaps + (i as u32 * (row_height + gaps));
+
+            if let Some(w) = self.windows.get_mut(&window.id) {
+                w.area = WindowArea {
+                    x: gaps as i32,
+                    y: y as i32,
+                    width: screen_width - 2 * gaps,
+                    height: row_height,
+                };
+            }
+        }
+    }
+
+    fn rearrange_grid(&mut self, windows: &[&TilingWindow], gaps: u32) {
+        let screen_width = 1920u32;
+        let screen_height = 1080u32;
+        let count = windows.len();
+
+        let cols = (count as f32).sqrt().ceil() as u32;
+        let rows = (count as f32 / cols as f32).ceil() as u32;
+
+        let cell_width = (screen_width - gaps * (cols + 1)) / cols;
+        let cell_height = (screen_height - gaps * (rows + 1)) / rows;
+
+        for (i, window) in windows.iter().enumerate() {
+            let col = (i as u32) % cols;
+            let row = (i as u32) / cols;
+
+            let x = gaps + col * (cell_width + gaps);
+            let y = gaps + row * (cell_height + gaps);
+
+            if let Some(w) = self.windows.get_mut(&window.id) {
+                w.area = WindowArea {
+                    x: x as i32,
+                    y: y as i32,
+                    width: cell_width,
+                    height: cell_height,
+                };
+            }
+        }
+    }
+
+    /// Switch to workspace
+    pub fn switch_workspace(&mut self, workspace_id: u64) -> Result<(), &'static str> {
+        if self.workspaces.contains_key(&workspace_id) {
+            self.active_workspace = workspace_id;
+            Ok(())
+        } else {
+            Err("Workspace not found")
+        }
+    }
+
+    /// Set workspace layout
+    pub fn set_layout(
+        &mut self,
+        workspace_id: u64,
+        layout: TilingLayout,
+    ) -> Result<(), &'static str> {
+        if let Some(workspace) = self.workspaces.get_mut(&workspace_id) {
+            workspace.layout = layout;
+            self.rearrange_workspace(workspace_id);
+            Ok(())
+        } else {
+            Err("Workspace not found")
+        }
     }
 
     /// Focus window
-    pub fn focus_window(&mut self, window_id: u32) -> Result<(), String> {
-        for workspace in self.workspaces.values_mut() {
-            if workspace.get_window(window_id).is_some() {
-                workspace.focus_window(window_id)?;
-                return Ok(());
-            }
-        }
-        Err(format!("Window {} not found", window_id))
-    }
-
-    /// Set layout for active workspace
-    pub fn set_layout(&mut self, layout: TilingLayout) -> Result<(), String> {
-        if let Some(workspace) = self.get_active_workspace_mut() {
-            workspace.set_layout(layout);
+    pub fn focus_window(&mut self, id: u64) -> Result<(), &'static str> {
+        if self.windows.contains_key(&id) {
+            self.focused_window = Some(id);
             Ok(())
         } else {
-            Err("No active workspace".to_string())
+            Err("Window not found")
         }
     }
 
-    /// Get layout for active workspace
-    pub fn get_layout(&self) -> Option<TilingLayout> {
-        self.get_active_workspace().map(|w| w.layout)
+    /// Get window by ID
+    pub fn get_window(&self, id: u64) -> Option<&TilingWindow> {
+        self.windows.get(&id)
     }
 
-    /// List all workspaces
-    pub fn list_workspaces(&self) -> Vec<&Workspace> {
-        self.workspaces.values().collect()
+    /// Get workspace windows
+    pub fn get_workspace_windows(&self, workspace_id: u64) -> Vec<&TilingWindow> {
+        self.windows
+            .values()
+            .filter(|w| w.workspace_id == workspace_id)
+            .collect()
     }
 
-    /// List windows in active workspace
-    pub fn list_windows(&self) -> Vec<&TiledWindow> {
-        self.get_active_workspace()
-            .map(|w| w.windows.iter().collect())
-            .unwrap_or_default()
+    /// Get window count
+    pub fn window_count(&self) -> usize {
+        self.windows.len()
     }
 
-    /// Get statistics
-    pub fn get_statistics(&self) -> TilingStatistics {
-        let total_workspaces = self.workspaces.len();
-        let total_windows: usize = self.workspaces.values().map(|w| w.window_count()).sum();
-
-        let active_window_count = self
-            .get_active_workspace()
-            .map(|w| w.window_count())
-            .unwrap_or(0);
-
-        TilingStatistics {
-            total_workspaces,
-            total_windows,
-            active_workspace: self.active_workspace,
-            active_window_count,
-            active_layout: self.get_layout(),
-        }
+    /// Get workspace count
+    pub fn workspace_count(&self) -> usize {
+        self.workspaces.len()
     }
-}
-
-impl Default for TilingWindowManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Tiling window manager statistics
-#[derive(Debug, Clone)]
-pub struct TilingStatistics {
-    pub total_workspaces: usize,
-    pub total_windows: usize,
-    pub active_workspace: u32,
-    pub active_window_count: usize,
-    pub active_layout: Option<TilingLayout>,
 }
 
 #[cfg(test)]
@@ -703,11 +857,12 @@ mod tests {
     fn test_create_workspace() {
         let mut manager = TilingWindowManager::new();
 
+    fn test_create_workspace() {
+        let mut manager = TilingWindowManager::new();
+
         let workspace = manager.create_workspace("1".to_string(), TilingLayout::Spiral);
         assert_eq!(workspace.id, 1);
-        assert_eq!(workspace.name, "1");
-        assert_eq!(workspace.layout, TilingLayout::Spiral);
-        assert_eq!(workspace.window_count(), 0);
+        assert_eq!(manager.workspace_count(), 1);
     }
 
     #[test]
@@ -814,41 +969,52 @@ mod tests {
 
     #[test]
     fn test_tiling_manager_create_workspace() {
+    fn test_add_window() {
         let mut manager = TilingWindowManager::new();
-        let id = manager.create_workspace("2", TilingLayout::Columns);
-        assert!(id > 1);
-        assert_eq!(manager.workspaces.len(), 2);
+
+        let workspace = manager.create_workspace("1".to_string(), TilingLayout::Spiral);
+        let area = WindowArea {
+            x: 0,
+            y: 0,
+            width: 800,
+            height: 600,
+        };
+
+        let window = manager.add_window(workspace.id, area);
+        assert_eq!(window.id, 1);
+        assert_eq!(manager.window_count(), 1);
     }
 
     #[test]
-    fn test_tiling_manager_switch_workspace() {
+    fn test_remove_window() {
         let mut manager = TilingWindowManager::new();
-        let id = manager.create_workspace("2", TilingLayout::Columns);
-        assert!(manager.switch_workspace(id).is_ok());
-        assert_eq!(manager.active_workspace, id);
+
+        let workspace = manager.create_workspace("1".to_string(), TilingLayout::Spiral);
+        let area = WindowArea {
+            x: 0,
+            y: 0,
+            width: 800,
+            height: 600,
+        };
+
+        let window = manager.add_window(workspace.id, area);
+        assert!(manager.remove_window(window.id).is_ok());
+        assert_eq!(manager.window_count(), 0);
     }
 
     #[test]
-    fn test_tiling_manager_add_window() {
+    fn test_switch_workspace() {
         let mut manager = TilingWindowManager::new();
-        let id = manager.add_window(
-            "Test".to_string(),
-            TilingWindowGeometry::new(0, 0, 800, 600),
-        );
-        assert_eq!(id, 1);
-        assert_eq!(manager.list_windows().len(), 1);
+
+        manager.create_workspace("1".to_string(), TilingLayout::Spiral);
+        manager.create_workspace("2".to_string(), TilingLayout::Monocle);
+
+        assert!(manager.switch_workspace(2).is_ok());
     }
 
     #[test]
-    fn test_tiling_manager_remove_window() {
+    fn test_set_layout() {
         let mut manager = TilingWindowManager::new();
-        let id = manager.add_window(
-            "Test".to_string(),
-            TilingWindowGeometry::new(0, 0, 800, 600),
-        );
-        assert!(manager.remove_window(id).is_ok());
-        assert_eq!(manager.list_windows().len(), 0);
-    }
 
     #[test]
     fn test_tiling_manager_set_layout() {

@@ -338,8 +338,8 @@ mod tests {
         assert_eq!(Architecture::from_str("x86_64"), Architecture::X86_64);
         assert_eq!(Architecture::from_str("arm64"), Architecture::ARM64);
         assert_eq!(Architecture::from_str("x86"), Architecture::X86);
-        assert!(Architecture::X86_64.is_64bit());
-        assert!(!Architecture::X86.is_64bit());
+        assert_eq!(Architecture::is_64bit(Architecture::X86_64), true);
+        assert_eq!(Architecture::is_64bit(Architecture::X86), false);
     }
 
     #[test]

@@ -156,10 +156,8 @@ impl CfsScheduler {
     fn calculate_slice(&self, priority: Priority) -> u64 {
         // Higher priority (lower value) gets larger slice
         let base_slice = self.latency / 10;
-        let factor = (19 - priority.value).clamp(0, 39) as u64;
-        base_slice
-            .saturating_mul(factor + 1)
-            .max(self.min_granularity)
+        let factor = (19 - (priority.value + 20)) as u64;
+        base_slice * (factor + 1)
     }
 
     /// Pick next task to run
@@ -332,11 +330,6 @@ impl EnergyAwareScheduler {
             ThermalState::Throttling
         } else {
             ThermalState::Normal
-        };
-        self.cpu_frequency = match self.thermal_state {
-            ThermalState::Normal => 2400,
-            ThermalState::Throttling => 1200,
-            ThermalState::Critical => 800,
         };
     }
 

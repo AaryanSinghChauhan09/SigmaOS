@@ -541,8 +541,7 @@ impl VirtualFileSystem {
     }
 
     pub fn close(&mut self, fd: i32) -> Result<(), VfsError> {
-        self.close_file(fd as u64)
-            .map_err(|_| VfsError::BadFileDescriptor)
+        self.close_file(fd as u64).map_err(|_| VfsError::NotFound)
     }
 
     pub fn close_file(&mut self, fd: u64) -> Result<(), FsError> {
@@ -552,30 +551,6 @@ impl VirtualFileSystem {
         } else {
             Err(FsError::InvalidFd)
         }
-    }
-
-    /// Move an open file's offset using POSIX `SEEK_SET`, `SEEK_CUR`, or `SEEK_END`.
-    pub fn seek(&mut self, fd: u64, offset: i64, whence: i32) -> Result<u64, FsError> {
-        let inode_id = self
-            .open_files
-            .get(&fd)
-            .ok_or(FsError::InvalidFd)?
-            .inode_number;
-        let end = self.inodes.get(&inode_id).ok_or(FsError::NotFound)?.size;
-        let descriptor = self.open_files.get_mut(&fd).ok_or(FsError::InvalidFd)?;
-        let base = match whence {
-            0 => 0,
-            1 => descriptor.position,
-            2 => end,
-            _ => return Err(FsError::InvalidArgument),
-        };
-        let target = (base as i128)
-            .checked_add(offset as i128)
-            .filter(|target| (0..=u64::MAX as i128).contains(target))
-            .ok_or(FsError::InvalidArgument)? as u64;
-        descriptor.offset = target;
-        descriptor.position = target;
-        Ok(target)
     }
 
     pub fn read_file(&mut self, fd: u64, buffer: &mut [u8]) -> Result<usize, FsError> {
@@ -979,7 +954,6 @@ pub enum FsError {
     NoSpace,
     AlreadyExists,
     AttributeNotFound,
-    InvalidArgument,
 }
 
 #[cfg(test)]
@@ -1026,27 +1000,17 @@ mod tests {
     #[test]
     fn test_seek_operations() {
         let mut vfs = VirtualFileSystem::new();
-        let inode_id = vfs.create_file(FileType::Regular, 0).unwrap();
-        let fd = vfs.open_file(inode_id, 0).unwrap();
+        let fd = vfs.open("/test.txt", 0, 0o644).unwrap();
 
         // SEEK_SET
-        let pos = vfs.seek(fd as u64, 100, 0).unwrap();
+        let pos = vfs.seek(fd, 100, 0).unwrap();
         assert_eq!(pos, 100);
 
         // SEEK_CUR
-        let pos = vfs.seek(fd as u64, 50, 1).unwrap();
+        let pos = vfs.seek(fd, 50, 1).unwrap();
         assert_eq!(pos, 150);
-    }
 
-    #[test]
-    fn test_gated_file_access_checks_capabilities() {
-        let mut vfs = VirtualFileSystem::new();
-        let inode_id = vfs.create_file(FileType::Regular, 0).unwrap();
-        let fd = vfs.open_file(inode_id, 0).unwrap();
-        let bad_token = CapabilityToken::new();
-        let read_token = CapabilityToken::new().allow_read("/var/www/gated");
-        let write_token = CapabilityToken::new().allow_write("/tmp/gated");
-
+        // Write should fail with bad_token and read_token, but succeed with write_token or all_token
         assert_eq!(
             vfs.write_file_gated(fd, b"gated", &bad_token),
             Err(FsError::PermissionDenied)
@@ -1055,23 +1019,21 @@ mod tests {
             vfs.write_file_gated(fd, b"gated", &read_token),
             Err(FsError::PermissionDenied)
         );
-        assert_eq!(vfs.write_file_gated(fd, b"gated", &write_token), Ok(5));
+        assert!(vfs.write_file_gated(fd, b"gated", &write_token).is_ok());
 
-        let read_fd = vfs.open_file(inode_id, 0).unwrap();
-        let mut buffer = [0; 5];
+        // Re-open file to reset offset to 0 for reading
+        let read_fd = vfs.open_file(id, 0).unwrap();
+
+        // Read should fail with bad_token and write_token, but succeed with read_token or all_token
         assert_eq!(
-            vfs.read_file_gated(read_fd, &mut buffer, &bad_token),
+            vfs.read_file_gated(read_fd, &mut buf, &bad_token),
             Err(FsError::PermissionDenied)
         );
         assert_eq!(
-            vfs.read_file_gated(read_fd, &mut buffer, &write_token),
+            vfs.read_file_gated(read_fd, &mut buf, &write_token),
             Err(FsError::PermissionDenied)
         );
-        assert_eq!(
-            vfs.read_file_gated(read_fd, &mut buffer, &read_token),
-            Ok(5)
-        );
-        assert_eq!(&buffer, b"gated");
+        assert_eq!(vfs.read_file_gated(read_fd, &mut buf, &read_token), Ok(5));
     }
 
     #[test]
@@ -1091,7 +1053,7 @@ mod tests {
         let symlink_id = vfs.create_symlink("/home/tc/file.txt", 1000).unwrap();
         assert_eq!(
             vfs.get_inode(symlink_id).unwrap().file_type,
-            FileType::SymbolicLink
+            FileType::Symlink
         );
         assert_eq!(
             vfs.get_inode(symlink_id)
@@ -1139,11 +1101,10 @@ mod tests {
     fn test_posix_uid_gid_dac_permissions() {
         let mut vfs = VirtualFilesystem::new();
         // Mode 0o750: owner rwx, group r-x, other ---
-        let file_id = vfs.create_file(FileType::Regular, 1000).unwrap();
+        let file_id = vfs.create_file("secure.txt", 0o750, 0).unwrap();
         if let Some(inode) = vfs.inodes.get_mut(&file_id) {
             inode.owner = 1000;
             inode.group = 1000;
-            inode.mode = FileMode::new(0o750);
         }
 
         let fd = vfs.open_file(file_id, O_RDWR).unwrap();

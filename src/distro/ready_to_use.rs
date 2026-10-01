@@ -415,7 +415,6 @@ impl Default for PlugAndPlayHardwareManager {
 }
 
 mod tests {
-    use super::*;
 
 
     #[test]

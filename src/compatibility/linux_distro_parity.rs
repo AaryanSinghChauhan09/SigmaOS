@@ -631,7 +631,6 @@ impl Default for LinuxCoreDumpFilterEngine {
 // ==========================================
 
 mod tests {
-    use super::*;
 
 
     #[test]

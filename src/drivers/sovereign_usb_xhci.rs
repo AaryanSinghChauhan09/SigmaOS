@@ -193,40 +193,6 @@ impl SovereignXhciUsb3Driver {
         Ok(())
     }
 
-    /// Adds a bounded transfer ring and returns its stable index.
-    pub fn create_transfer_ring(&mut self, size: usize) -> Result<usize, &'static str> {
-        if !(2..=4096).contains(&size) {
-            return Err("Transfer ring size must be between 2 and 4096 TRBs");
-        }
-        let index = self.transfer_rings.len();
-        self.transfer_rings.push(XhciTransferRing::new(size));
-        Ok(index)
-    }
-
-    /// Submits a transfer to a previously created ring.
-    pub fn submit_transfer(
-        &mut self,
-        ring_index: usize,
-        trb: SovereignXhciTrb,
-    ) -> Result<usize, &'static str> {
-        self.transfer_rings
-            .get_mut(ring_index)
-            .ok_or("Unknown transfer ring")?
-            .enqueue(trb)
-    }
-
-    /// Returns the current enqueue and dequeue indices for a ring.
-    pub fn get_transfer_ring_status(
-        &self,
-        ring_index: usize,
-    ) -> Result<(usize, usize), &'static str> {
-        let ring = self
-            .transfer_rings
-            .get(ring_index)
-            .ok_or("Unknown transfer ring")?;
-        Ok((ring.enqueue_idx, ring.dequeue_idx))
-    }
-
     /// Enqueue a TRB onto the Command Ring
     pub fn enqueue_command_trb(
         &mut self,

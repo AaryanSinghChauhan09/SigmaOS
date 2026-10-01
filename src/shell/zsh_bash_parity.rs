@@ -849,9 +849,6 @@ impl ShellJobControl {
     }
 
     pub fn list_jobs(&self) -> Vec<String> {
-        if self.jobs.is_empty() {
-            return vec![String::from("No active jobs")];
-        }
         let mut list = Vec::new();
         for job in &self.jobs {
             let state_str = match job.state {

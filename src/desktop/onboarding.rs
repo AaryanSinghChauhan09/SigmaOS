@@ -347,7 +347,6 @@ pub struct OnboardingWizard {
     pub config: OnboardingConfig,
     pub current_step: OnboardingStep,
     pub steps_completed: Vec<OnboardingStep>,
-    username_confirmed: bool,
 }
 
 impl Default for OnboardingWizard {
@@ -356,7 +355,6 @@ impl Default for OnboardingWizard {
             config: OnboardingConfig::default(),
             current_step: OnboardingStep::LanguageAndRegion,
             steps_completed: Vec::new(),
-            username_confirmed: false,
         }
     }
 }
@@ -367,7 +365,6 @@ impl OnboardingWizard {
     }
 
     pub fn with_config(mut self, config: OnboardingConfig) -> Self {
-        self.username_confirmed = !config.username.is_empty();
         self.config = config;
         self
     }
@@ -382,7 +379,6 @@ impl OnboardingWizard {
 
     pub fn set_username(&mut self, username: String) {
         self.config.username = username;
-        self.username_confirmed = true;
     }
 
     pub fn set_display_name(&mut self, display_name: String) {
@@ -420,9 +416,7 @@ impl OnboardingWizard {
         match self.current_step {
             OnboardingStep::LanguageAndRegion => true,
             OnboardingStep::NetworkConfiguration => true,
-            OnboardingStep::UserAccountSetup => {
-                self.username_confirmed && !self.config.username.is_empty()
-            }
+            OnboardingStep::UserAccountSetup => !self.config.username.is_empty(),
             OnboardingStep::DesktopThemeSelection => true,
             OnboardingStep::PrivacySettings => true,
             OnboardingStep::Complete => true,

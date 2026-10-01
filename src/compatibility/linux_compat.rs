@@ -799,8 +799,6 @@ impl LinuxZramSwapEngine {
 }
 
 mod tests {
-    use super::*;
-
     #[test]
     fn test_linux_pidfd_engine() {
         let mut pidfd = LinuxPidfdEngine::new();

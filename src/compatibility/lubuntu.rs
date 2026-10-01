@@ -923,7 +923,6 @@ impl Default for LubuntuLxqtAppearanceEngine {
 }
 
 mod tests {
-    use super::*;
 
     #[test]
     fn test_lubuntu_lxqt_appearance_engine() {

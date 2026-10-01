@@ -4570,7 +4570,6 @@ impl OpenSuseSnapperEngine {
 }
 
 mod linux_bsd_extra_tests {
-    use super::*;
 
 
     #[test]

@@ -399,7 +399,7 @@ mod tests {
 
     #[test]
     fn test_kernel_module_manager() {
-        let mut manager = KernelModuleManager::new(String::from("test_module"));
+        let manager = KernelModuleManager::new(String::from("test_module"));
         let code = manager.create_module();
         assert!(code.contains("test_module"));
     }

@@ -158,7 +158,6 @@ impl UnveilSandbox {
         if let Some(perm) = UnveilPermission::from_str(permissions) {
             self.paths.insert(String::from(path), perm);
             self.unveiled = true;
-            self.default_deny = true;
             true
         } else {
             false

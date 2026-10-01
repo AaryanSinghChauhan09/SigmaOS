@@ -680,13 +680,9 @@ impl HelenIpcManager {
         }
 
         // Answer all unanswered messages with error
-        let messages_to_answer: Vec<_> = {
-            self.answerboxes
-                .values_mut()
-                .find(|a| a.task_id == task_id)
-                .map(|answerbox| answerbox.dispatched_queue.drain(..).collect())
-                .unwrap_or_default()
-        };
+        if let Some(answerbox) = self.answerboxes.values_mut().find(|a| a.task_id == task_id) {
+            let messages_to_answer: Vec<_> = answerbox.dispatched_queue.drain(..).collect();
+            drop(answerbox);
 
         for mut msg in messages_to_answer {
             msg.method = 0xFFFFFFFFFFFFFFFE; // Error code
@@ -706,10 +702,10 @@ impl HelenIpcManager {
                     }
                 }
             }
-        }
 
-        if let Some(answerbox) = self.answerboxes.values_mut().find(|a| a.task_id == task_id) {
-            answerbox.dispatched_queue.clear();
+            if let Some(answerbox) = self.answerboxes.values_mut().find(|a| a.task_id == task_id) {
+                answerbox.dispatched_queue.clear();
+            }
         }
     }
 }

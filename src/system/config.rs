@@ -9,6 +9,7 @@ use std::vec::Vec;
 use crate::klib::path::PathBuf;
 use crate::klib::HashMap;
 
+#[cfg(not(test))]
 mod fs {
     use super::*;
     pub fn read_to_string<P: AsRef<str>>(_path: P) -> Result<String, std::io::Error> {

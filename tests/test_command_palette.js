@@ -28,6 +28,12 @@ function createMockElement(id, tag = "div") {
     value: "",
     innerHTML: "",
     listeners: {},
+    get firstElementChild() {
+      return el.children[0] || (el.innerHTML.length > 0 ? { tag: "div" } : null);
+    },
+    querySelector() {
+      return createMockElement(`btn_${Math.random()}`, "button");
+    },
     focus() { activeElement = el; },
     blur() { if (activeElement === el) activeElement = null; },
     setAttribute(k, v) { this.attributes[k] = v; },
@@ -110,5 +116,21 @@ assert.strictEqual(win2.classList.contains("active-focus"), true, "Expected win2
 assert.strictEqual(win1.classList.contains("active-focus"), false, "Expected win1 active-focus to be removed when win2 is focused");
 assert.strictEqual(Number(win2.style.zIndex) > z1, true, "Expected win2 zIndex to be elevated above win1 zIndex");
 console.log("✓ Window focus elevation and active-focus state verified successfully!");
+
+// Test 6: toggleHelp populates Help Matrix dialog and toggles ARIA accessibility attributes
+const helpOverlayEl = createMockElement("help-overlay");
+helpOverlayEl.classList.add("wizard-overlay--hidden");
+
+zenith.toggleHelp();
+assert.strictEqual(helpOverlayEl.classList.contains("wizard-overlay--hidden"), false, "Expected wizard-overlay--hidden to be removed when opened");
+assert.strictEqual(helpOverlayEl.getAttribute("aria-hidden"), "false", "Expected aria-hidden to be 'false' when opened");
+assert.strictEqual(helpOverlayEl.getAttribute("role"), "dialog", "Expected role='dialog' on help overlay");
+assert.strictEqual(helpOverlayEl.getAttribute("aria-modal"), "true", "Expected aria-modal='true' on help overlay");
+assert.strictEqual(helpOverlayEl.innerHTML.includes("Help Matrix"), true, "Expected innerHTML to contain Help Matrix content");
+
+zenith.toggleHelp();
+assert.strictEqual(helpOverlayEl.classList.contains("wizard-overlay--hidden"), true, "Expected wizard-overlay--hidden to be added when closed");
+assert.strictEqual(helpOverlayEl.getAttribute("aria-hidden"), "true", "Expected aria-hidden to be 'true' when closed");
+console.log("✓ Help Matrix overlay toggle & ARIA dialog attributes verified successfully!");
 
 console.log("All Command Palette & Desktop UX tests passed successfully!");
