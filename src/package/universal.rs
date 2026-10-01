@@ -85,9 +85,38 @@ pub struct ForeignDistroManifest {
 pub struct UniversalPackageTranslator;
 
 impl UniversalPackageTranslator {
-    pub fn translate_to_sigma_pkg(manifest: &ForeignDistroManifest) -> UnifiedPackage {
+    pub fn translate_apt_deb(manifest: &ForeignDistroManifest) -> UnifiedPackage {
+        Self::translate_base_manifest(manifest, "apt-deb")
+    }
+
+    pub fn translate_pacman_pkg(manifest: &ForeignDistroManifest) -> UnifiedPackage {
+        Self::translate_base_manifest(manifest, "pacman")
+    }
+
+    pub fn translate_dnf_rpm(manifest: &ForeignDistroManifest) -> UnifiedPackage {
+        Self::translate_base_manifest(manifest, "dnf-rpm")
+    }
+
+    pub fn translate_alpine_apk(manifest: &ForeignDistroManifest) -> UnifiedPackage {
+        Self::translate_base_manifest(manifest, "alpine-apk")
+    }
+
+    pub fn translate_void_xbps(manifest: &ForeignDistroManifest) -> UnifiedPackage {
+        Self::translate_base_manifest(manifest, "void-xbps")
+    }
+
+    pub fn translate_freebsd_pkg(manifest: &ForeignDistroManifest) -> UnifiedPackage {
+        Self::translate_base_manifest(manifest, "freebsd-pkg")
+    }
+
+    fn translate_base_manifest(manifest: &ForeignDistroManifest, prefix: &str) -> UnifiedPackage {
+        let pkg_name = if prefix.is_empty() {
+            format!("sigpkg-{}", manifest.original_name)
+        } else {
+            format!("sigpkg-{}-{}", prefix, manifest.original_name)
+        };
         let mut pkg = UnifiedPackage::new(
-            format!("sigpkg-{}", manifest.original_name),
+            pkg_name,
             manifest.version.clone(),
         )
         .with_format(PackageFormat::SigmaPkg)
@@ -97,23 +126,25 @@ impl UniversalPackageTranslator {
             let dep_str: &str = dep.as_str();
             let translated_dep: &str = match dep_str {
                 "libssl-dev" | "openssl-devel" | "openssl" => "sovereign-openssl",
-                "libc6" => "sovereign-libc",
+                "libc6" | "glibc" | "musl" => "sovereign-libc",
                 other => debtor_to_sovereign_name(other),
             };
             pkg = pkg.with_dependency(translated_dep.to_string());
         }
 
         for prov in manifest.raw_provides.iter() {
-            let prov_str: String = prov.clone();
-            pkg = pkg.with_provides(prov_str);
+            pkg = pkg.with_provides(prov.clone());
         }
 
         for conf in manifest.raw_conflicts.iter() {
-            let conf_str: String = conf.clone();
-            pkg = pkg.with_conflict(conf_str);
+            pkg = pkg.with_conflict(conf.clone());
         }
 
         pkg
+    }
+
+    pub fn translate_to_sigma_pkg(manifest: &ForeignDistroManifest) -> UnifiedPackage {
+        Self::translate_base_manifest(manifest, "")
     }
 }
 
@@ -3263,6 +3294,22 @@ mod tests {
         assert_eq!(sigpkg.version, "0.9.5");
         assert_eq!(sigpkg.formats[0], PackageFormat::SigmaPkg);
         assert!(manager.get_package("sigpkg-neovim").is_some());
+
+        let deb_manifest = ForeignDistroManifest {
+            raw_format: PackageFormat::Deb,
+            original_name: "curl".to_string(),
+            version: "7.88.1".to_string(),
+            architecture: "amd64".to_string(),
+            raw_dependencies: vec!["libssl-dev".to_string(), "libc6".to_string()],
+            raw_provides: vec!["http-client".to_string()],
+            raw_conflicts: vec![],
+            maintainer: "Debian".to_string(),
+        };
+
+        let deb_sigpkg = UniversalPackageTranslator::translate_apt_deb(&deb_manifest);
+        assert_eq!(deb_sigpkg.name, "sigpkg-apt-deb-curl");
+        assert!(deb_sigpkg.dependencies.contains(&"sovereign-openssl".to_string()));
+        assert!(deb_sigpkg.dependencies.contains(&"sovereign-libc".to_string()));
     }
 
     #[test]

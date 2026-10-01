@@ -1066,6 +1066,7 @@ pub struct LinuxOrgKernelTuningEngine {
     pub dirty_background_ratio: u8,
     pub preempt_mode: String,
     pub scheduler_latency_ms: u32,
+    pub tcp_congestion_control: String,
 }
 
 impl LinuxOrgKernelTuningEngine {
@@ -1076,12 +1077,21 @@ impl LinuxOrgKernelTuningEngine {
             dirty_background_ratio: 5,
             preempt_mode: "PREEMPT_RT".to_string(),
             scheduler_latency_ms: 2,
+            tcp_congestion_control: "bbr".to_string(),
         }
     }
 
     pub fn tune_sysctl_parameters(&mut self, swappiness: u8, dirty: u8) {
         self.swappiness = swappiness;
         self.dirty_ratio = dirty;
+    }
+
+    pub fn tune_tcp_congestion(&mut self, cc_algo: &str) {
+        self.tcp_congestion_control = cc_algo.to_string();
+    }
+
+    pub fn is_tcp_bbr_enabled(&self) -> bool {
+        self.tcp_congestion_control == "bbr" || self.tcp_congestion_control == "bbr2" || self.tcp_congestion_control == "bbr3"
     }
 
     pub fn is_realtime_optimized(&self) -> bool {
@@ -1224,6 +1234,30 @@ impl TechPowerUpGpuTelemetryEngine {
 
     pub fn is_thermal_safe(&self) -> bool {
         self.vram_temp_c < 95.0 && self.vrm_temp_c < 105.0
+    }
+
+    pub fn vram_thermal_headroom(&self) -> f32 {
+        if self.vram_temp_c >= 95.0 {
+            0.0
+        } else {
+            95.0 - self.vram_temp_c
+        }
+    }
+
+    pub fn calculate_target_fan_speed_pct(&self) -> u8 {
+        let max_temp = if self.vram_temp_c > self.vrm_temp_c {
+            self.vram_temp_c
+        } else {
+            self.vrm_temp_c
+        };
+        if max_temp <= 45.0 {
+            0
+        } else if max_temp >= 95.0 {
+            100
+        } else {
+            let pct = ((max_temp - 45.0) / (95.0 - 45.0) * 100.0) as u8;
+            if pct > 100 { 100 } else { pct }
+        }
     }
 
     pub fn enforce_vrm_thermal_guard(&mut self) -> u32 {
@@ -1554,6 +1588,9 @@ mod tests {
         assert!(linux_org.is_realtime_optimized());
         linux_org.tune_sysctl_parameters(5, 15);
         assert_eq!(linux_org.swappiness, 5);
+        assert!(linux_org.is_tcp_bbr_enabled());
+        linux_org.tune_tcp_congestion("cubic");
+        assert!(!linux_org.is_tcp_bbr_enabled());
 
         let makeuseof = MakeUseOfDesktopOptimizationEngine::new();
         assert!(makeuseof.is_low_resource_profile());
@@ -1569,6 +1606,8 @@ mod tests {
 
         let mut gpu = TechPowerUpGpuTelemetryEngine::new();
         assert!(gpu.is_thermal_safe());
+        assert_eq!(gpu.vram_thermal_headroom(), 27.0);
+        assert!(gpu.calculate_target_fan_speed_pct() > 50);
         gpu.vrm_temp_c = 105.0;
         let throttled_clock = gpu.enforce_vrm_thermal_guard();
         assert_eq!(throttled_clock, 1960);
