@@ -222,25 +222,32 @@ impl WirelessAccessPointController {
 
     pub fn scan_wireless_aps(&mut self) -> usize {
         self.scanned_aps.clear();
-        self.scanned_aps.push(ScannedAccessPoint {
-            ssid: "SigmaSovereignMesh".to_string(),
-            bssid: "00:11:22:33:44:55".to_string(),
-            channel: 36,
-            signal_dbm: -42,
-            is_wpa3: true,
-        });
-        self.scanned_aps.len()
+        // No wireless provider is connected yet, so do not fabricate scan results.
+        0
     }
 
     pub fn connect_wireless_ap(&mut self, ssid: &str, passphrase: &str, client_mac: &str) -> Result<bool, &'static str> {
+    pub fn connect_wireless_ap(
+        &mut self,
+        ssid: &str,
+        passphrase: &str,
+        client_mac: &str,
+    ) -> Result<bool, &'static str> {
+        if ssid.is_empty()
+            || ssid.len() > 32
+            || ssid.as_bytes().iter().any(|byte| byte.is_ascii_control())
+        {
+            return Err("Wireless Error: invalid SSID");
+        }
         if !self.mac_whitelist.is_empty() && !self.mac_whitelist.contains(&client_mac.to_string()) {
             return Err("Wireless Error: Client MAC not in whitelist");
         }
-        if passphrase.len() < 8 {
-            return Err("Wireless Error: WPA3 passphrase too short");
+        if !(8..=64).contains(&passphrase.len()) {
+            return Err("Wireless Error: invalid WPA3 passphrase length");
         }
-        self.connected_ap_ssid = Some(ssid.to_string());
-        Ok(true)
+
+        // Report unavailable until an actual wireless provider confirms the connection.
+        Err("Wireless Error: wireless provider unavailable")
     }
 }
 
@@ -542,9 +549,15 @@ mod tests {
     fn test_wireless_access_point_controller() {
         let mut wap = WirelessAccessPointController::new("wlan0");
         wap.add_mac_filter("00:11:22:33:44:55");
-        assert_eq!(wap.scan_wireless_aps(), 1);
+        assert_eq!(wap.scan_wireless_aps(), 0);
 
         assert!(wap.connect_wireless_ap("SigmaSovereignMesh", "password123", "00:11:22:33:44:55").is_ok());
+        let passphrase = "x".repeat(8);
+        assert_eq!(
+            wap.connect_wireless_ap("test-network", &passphrase, "00:11:22:33:44:55"),
+            Err("Wireless Error: wireless provider unavailable")
+        );
+        assert!(wap.connected_ap_ssid.is_none());
     }
 
     #[test]
