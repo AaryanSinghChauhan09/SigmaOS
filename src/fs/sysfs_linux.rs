@@ -269,7 +269,7 @@ mod tests {
             "test_value".to_string(),
         );
 
-        let entry_guard = entry.lock().unwrap();
+        let entry_guard = entry.lock().unwrap_or_else(|e| e.into_inner());
         assert_eq!(entry_guard.value, "test_value");
     }
 
@@ -324,7 +324,7 @@ mod tests {
             .entries
             .insert("/sys/test".to_string(), entry_arc.clone());
 
-        let entry_guard = entry_arc.lock().unwrap();
+        let entry_guard = entry_arc.lock().unwrap_or_else(|e| e.into_inner());
         assert_eq!(entry_guard.permissions, 0o755);
     }
 }

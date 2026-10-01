@@ -401,25 +401,25 @@ impl IpcNamespace {
         capacity: usize,
         creator_pid: u32,
     ) -> Result<MessageQueueId, NamespaceError> {
-        let mut registry = self.registry.lock().unwrap();
+        let mut registry = self.registry.lock().unwrap_or_else(|e| e.into_inner());
         registry.create_message_queue(name, capacity, creator_pid)
     }
 
     /// Get a message queue from this namespace by ID
     pub fn get_message_queue(&self, id: MessageQueueId) -> Option<MessageQueueObject> {
-        let registry = self.registry.lock().unwrap();
+        let registry = self.registry.lock().unwrap_or_else(|e| e.into_inner());
         registry.get_message_queue(id).cloned()
     }
 
     /// Get a message queue from this namespace by name
     pub fn get_message_queue_by_name(&self, name: &str) -> Option<MessageQueueObject> {
-        let registry = self.registry.lock().unwrap();
+        let registry = self.registry.lock().unwrap_or_else(|e| e.into_inner());
         registry.get_message_queue_by_name(name).cloned()
     }
 
     /// Delete a message queue from this namespace
     pub fn delete_message_queue(&self, id: MessageQueueId) -> Result<(), NamespaceError> {
-        let mut registry = self.registry.lock().unwrap();
+        let mut registry = self.registry.lock().unwrap_or_else(|e| e.into_inner());
         registry.delete_message_queue(id)
     }
 
@@ -431,25 +431,25 @@ impl IpcNamespace {
         max_value: u32,
         creator_pid: u32,
     ) -> Result<SemaphoreId, NamespaceError> {
-        let mut registry = self.registry.lock().unwrap();
+        let mut registry = self.registry.lock().unwrap_or_else(|e| e.into_inner());
         registry.create_semaphore(name, initial_value, max_value, creator_pid)
     }
 
     /// Get a semaphore from this namespace by ID
     pub fn get_semaphore(&self, id: SemaphoreId) -> Option<SemaphoreObject> {
-        let registry = self.registry.lock().unwrap();
+        let registry = self.registry.lock().unwrap_or_else(|e| e.into_inner());
         registry.get_semaphore(id).cloned()
     }
 
     /// Get a semaphore from this namespace by name
     pub fn get_semaphore_by_name(&self, name: &str) -> Option<SemaphoreObject> {
-        let registry = self.registry.lock().unwrap();
+        let registry = self.registry.lock().unwrap_or_else(|e| e.into_inner());
         registry.get_semaphore_by_name(name).cloned()
     }
 
     /// Delete a semaphore from this namespace
     pub fn delete_semaphore(&self, id: SemaphoreId) -> Result<(), NamespaceError> {
-        let mut registry = self.registry.lock().unwrap();
+        let mut registry = self.registry.lock().unwrap_or_else(|e| e.into_inner());
         registry.delete_semaphore(id)
     }
 
@@ -460,25 +460,25 @@ impl IpcNamespace {
         size: usize,
         creator_pid: u32,
     ) -> Result<SharedMemoryId, NamespaceError> {
-        let mut registry = self.registry.lock().unwrap();
+        let mut registry = self.registry.lock().unwrap_or_else(|e| e.into_inner());
         registry.create_shared_memory(name, size, creator_pid)
     }
 
     /// Get a shared memory object from this namespace by ID
     pub fn get_shared_memory(&self, id: SharedMemoryId) -> Option<SharedMemoryObject> {
-        let registry = self.registry.lock().unwrap();
+        let registry = self.registry.lock().unwrap_or_else(|e| e.into_inner());
         registry.get_shared_memory(id).cloned()
     }
 
     /// Get a shared memory object from this namespace by name
     pub fn get_shared_memory_by_name(&self, name: &str) -> Option<SharedMemoryObject> {
-        let registry = self.registry.lock().unwrap();
+        let registry = self.registry.lock().unwrap_or_else(|e| e.into_inner());
         registry.get_shared_memory_by_name(name).cloned()
     }
 
     /// Delete a shared memory object from this namespace
     pub fn delete_shared_memory(&self, id: SharedMemoryId) -> Result<(), NamespaceError> {
-        let mut registry = self.registry.lock().unwrap();
+        let mut registry = self.registry.lock().unwrap_or_else(|e| e.into_inner());
         registry.delete_shared_memory(id)
     }
 
@@ -490,7 +490,7 @@ impl IpcNamespace {
 
     /// Get statistics about this namespace
     pub fn get_stats(&self) -> IpcNamespaceStats {
-        let registry = self.registry.lock().unwrap();
+        let registry = self.registry.lock().unwrap_or_else(|e| e.into_inner());
         IpcNamespaceStats {
             namespace_id: self.namespace_id.raw(),
             ref_count: self.ref_count.load(Ordering::SeqCst),

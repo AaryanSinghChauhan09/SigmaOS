@@ -283,7 +283,7 @@ impl MountNamespace {
                 0,
             );
 
-            let mut table = namespace.mount_table.lock().unwrap();
+            let mut table = namespace.mount_table.lock().unwrap_or_else(|e| e.into_inner());
             table.add_mount(root_mount);
         }
 
@@ -301,9 +301,9 @@ impl MountNamespace {
 
         // Inherit root mount from parent
         {
-            let parent_table = self.mount_table.lock().unwrap();
+            let parent_table = self.mount_table.lock().unwrap_or_else(|e| e.into_inner());
             if let Some(root_mount) = parent_table.get_mount(MountId::new(0)) {
-                let mut child_table = child.mount_table.lock().unwrap();
+                let mut child_table = child.mount_table.lock().unwrap_or_else(|e| e.into_inner());
                 let inherited_root = MountInfo::new(
                     MountId::new(0),
                     None,
@@ -332,7 +332,7 @@ impl MountNamespace {
         options: String,
         creator_pid: u32,
     ) -> Result<MountId, NamespaceError> {
-        let mut table = self.mount_table.lock().unwrap();
+        let mut table = self.mount_table.lock().unwrap_or_else(|e| e.into_inner());
 
         // Check if path already mounted
         if table.get_mount_by_path(&path).is_some() {
@@ -360,7 +360,7 @@ impl MountNamespace {
 
     /// Get mount information by ID
     pub fn get_mount(&self, mount_id: MountId) -> Result<MountInfo, NamespaceError> {
-        let table = self.mount_table.lock().unwrap();
+        let table = self.mount_table.lock().unwrap_or_else(|e| e.into_inner());
         table
             .get_mount(mount_id)
             .cloned()
@@ -369,7 +369,7 @@ impl MountNamespace {
 
     /// Get mount information by path
     pub fn get_mount_by_path(&self, path: &str) -> Result<MountInfo, NamespaceError> {
-        let table = self.mount_table.lock().unwrap();
+        let table = self.mount_table.lock().unwrap_or_else(|e| e.into_inner());
         table
             .get_mount_by_path(path)
             .cloned()
@@ -383,7 +383,7 @@ impl MountNamespace {
             return Err(NamespaceError::InvalidNamespaceId);
         }
 
-        let mut table = self.mount_table.lock().unwrap();
+        let mut table = self.mount_table.lock().unwrap_or_else(|e| e.into_inner());
         table
             .remove_mount(mount_id)
             .ok_or(NamespaceError::InvalidNamespaceId)?;
@@ -392,13 +392,13 @@ impl MountNamespace {
 
     /// List all mounts in this namespace
     pub fn list_mounts(&self) -> Vec<MountInfo> {
-        let table = self.mount_table.lock().unwrap();
+        let table = self.mount_table.lock().unwrap_or_else(|e| e.into_inner());
         table.list_mounts()
     }
 
     /// Check if a mount exists in this namespace
     pub fn mount_exists(&self, mount_id: MountId) -> bool {
-        let table = self.mount_table.lock().unwrap();
+        let table = self.mount_table.lock().unwrap_or_else(|e| e.into_inner());
         table.get_mount(mount_id).is_some()
     }
 
@@ -414,7 +414,7 @@ impl MountNamespace {
 
     /// Get mount namespace statistics
     pub fn get_stats(&self) -> MountNamespaceStats {
-        let table = self.mount_table.lock().unwrap();
+        let table = self.mount_table.lock().unwrap_or_else(|e| e.into_inner());
         let total_refs: u64 = table
             .mounts
             .values()

@@ -278,7 +278,7 @@ mod tests {
         manager.grant(pid, Capability::Chown).unwrap();
 
         let caps = manager.get_capabilities(pid).unwrap();
-        let caps_guard = caps.lock().unwrap();
+        let caps_guard = caps.lock().unwrap_or_else(|e| e.into_inner());
         assert!(caps_guard.has_effective(Capability::Chown));
     }
 
@@ -291,7 +291,7 @@ mod tests {
         manager.revoke(pid, Capability::Chown).unwrap();
 
         let caps = manager.get_capabilities(pid).unwrap();
-        let caps_guard = caps.lock().unwrap();
+        let caps_guard = caps.lock().unwrap_or_else(|e| e.into_inner());
         assert!(!caps_guard.has_effective(Capability::Chown));
     }
 

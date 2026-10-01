@@ -607,7 +607,7 @@ mod tests {
             .unwrap();
 
         // Initially no events
-        let mut instances = manager.instances.lock().unwrap();
+        let mut instances = manager.instances.lock().unwrap_or_else(|e| e.into_inner());
         let instance = instances.get_mut(&fd).unwrap();
         assert_eq!(instance.pending_events_count().unwrap(), 0);
     }

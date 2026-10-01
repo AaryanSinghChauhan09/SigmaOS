@@ -102,7 +102,7 @@ impl PidNamespace {
         while attempts < max_attempts {
             if !self.is_pid_used(current) {
                 // Mark PID as used
-                let mut pids = self.used_pids.lock().unwrap();
+                let mut pids = self.used_pids.lock().unwrap_or_else(|e| e.into_inner());
                 pids.insert(current, true);
 
                 // Update next_pid for next allocation
@@ -133,7 +133,7 @@ impl PidNamespace {
             return Err(NamespaceError::InvalidNamespaceId);
         }
 
-        let mut pids = self.used_pids.lock().unwrap();
+        let mut pids = self.used_pids.lock().unwrap_or_else(|e| e.into_inner());
         if pids.get(&pid) == Some(&false) {
             return Err(NamespaceError::ProcessNotInNamespace);
         }
@@ -144,13 +144,13 @@ impl PidNamespace {
 
     /// Check if a PID is currently in use
     pub fn is_pid_used(&self, pid: ProcessId) -> bool {
-        let pids = self.used_pids.lock().unwrap();
+        let pids = self.used_pids.lock().unwrap_or_else(|e| e.into_inner());
         pids.get(&pid).copied().unwrap_or(false)
     }
 
     /// Get all used PIDs in this namespace
     pub fn get_used_pids(&self) -> Vec<ProcessId> {
-        let pids = self.used_pids.lock().unwrap();
+        let pids = self.used_pids.lock().unwrap_or_else(|e| e.into_inner());
         pids.iter()
             .filter_map(|(&pid, &used)| if used { Some(pid) } else { None })
             .collect()
@@ -165,7 +165,7 @@ impl PidNamespace {
 
     /// Get the number of used PIDs in this namespace
     pub fn used_pid_count(&self) -> u32 {
-        let pids = self.used_pids.lock().unwrap();
+        let pids = self.used_pids.lock().unwrap_or_else(|e| e.into_inner());
         pids.values()
             .filter(|&&used| used)
             .count() as u32

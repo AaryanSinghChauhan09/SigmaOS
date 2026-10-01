@@ -304,7 +304,7 @@ mod tests {
         let set = SemaphoreSet::new(1, 12345);
         let sem_id = set.create_semaphore(5, 10);
 
-        let mut semaphores = set.semaphores.lock().unwrap();
+        let mut semaphores = set.semaphores.lock().unwrap_or_else(|e| e.into_inner());
         let sem = semaphores.get_mut(&sem_id).unwrap();
         sem.wait();
         assert_eq!(sem.get_value(), 4);

@@ -356,7 +356,7 @@ mod tests {
 
         let cg = manager.create_cgroup("/test".to_string(), None).unwrap();
         {
-            let mut cg_guard = cg.lock().unwrap();
+            let mut cg_guard = cg.lock().unwrap_or_else(|e| e.into_inner());
             cg_guard.add_process(100);
         }
 

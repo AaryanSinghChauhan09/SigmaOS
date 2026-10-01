@@ -261,7 +261,7 @@ struct BrkHandler {
 }
 impl SyscallHandler for BrkHandler {
     fn handle(&self, args: &SyscallArgs) -> SyscallResult {
-        let mut end = self.heap_end.lock().unwrap();
+        let mut end = self.heap_end.lock().unwrap_or_else(|e| e.into_inner());
         if args.a0 == 0 {
             return SyscallResult::Ok(*end);
         }

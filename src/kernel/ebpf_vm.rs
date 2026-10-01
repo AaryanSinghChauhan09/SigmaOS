@@ -1691,7 +1691,7 @@ mod tests {
         let vm = BpfVm::new();
         let registry = vm.get_helper_registry();
 
-        let locked = registry.lock().unwrap();
+        let locked = registry.lock().unwrap_or_else(|e| e.into_inner());
         assert!(locked.get_helper(helper_ids::BPF_KTIME_GET_NS).is_some());
     }
 
@@ -1943,7 +1943,7 @@ mod tests {
     fn test_all_standard_helpers_exist() {
         let vm = BpfVm::new();
         let registry = vm.get_helper_registry();
-        let locked = registry.lock().unwrap();
+        let locked = registry.lock().unwrap_or_else(|e| e.into_inner());
 
         // Verify all 10 standard helpers exist and have correct IDs
         let helpers_to_check = vec![
