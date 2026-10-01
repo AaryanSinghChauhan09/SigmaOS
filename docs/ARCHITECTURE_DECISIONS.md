@@ -1,22 +1,16 @@
-# SigmaOS Architecture Decisions Record (ADR)
+# Architecture Decision Records (ADRs)
 
-## Overview
-This document records key architectural decisions, principles, and trade-offs for the SigmaOS operating system.
+## ADR-001: Sovereign Zero-Dependency Philosophy
+- **Status:** Accepted
+- **Context:** SigmaOS aims to be a self-sufficient, high-performance operating system surpassing legacy open-source projects.
+- **Decision:** Implement all core operating system capabilities natively in Rust under `#![no_std]` without external third-party crate dependencies.
 
-## Key Architecture Decisions
+## ADR-002: Universal Package Manager Interop
+- **Status:** Accepted
+- **Context:** Applications across various Linux distributions and BSD variants use diverse package formats (.deb, .rpm, .apk, pkg, etc.).
+- **Decision:** Provide native parsing, DPLL SAT dependency resolution, scriptlet sandboxing, and format translation for 30+ package formats into canonical `SigmaPkg`.
 
-### 1. Sovereign Zero-External-Dependency Core Architecture
-- **Decision**: Core system components, kernel modules, driver interfaces, and IPC mechanisms must be written in Rust `#![no_std]` or zero-external-dependency safe Rust primitives.
-- **Rationale**: Ensures complete self-sufficiency, security auditing capabilities, and independence from external third-party crate vulnerabilities.
-
-### 2. Tri-Agent Autonomous Development Framework
-- **Decision**: Employ three specialized AI agents (`Bolt`: Performance, `Palette`: UX/Accessibility, `Sentinel`: Security) for autonomous continuous improvement.
-- **Rationale**: Clear separation of operational concerns accelerates subsystem parity while enforcing strict security and performance boundaries.
-
-### 3. Universal Multi-Distro Package Interoperability Gateway
-- **Decision**: Implement universal package manager adapters supporting 110+ package formats (`.deb`, `.rpm`, `.pkg.tar.zst`, `.apk`, `.xbps`, `.nix`, `.ebuild`, etc.) backed by DPLL SAT dependency solving, OpenBSD pledge/unveil sandboxing, and atomic snapshot rollback.
-- **Rationale**: Enables seamless cross-distro package execution and migration without fragmenting user ecosystems.
-
-### 4. POSIX, Linux, and BSD Kernel Syscall Interoperability
-- **Decision**: Provide multi-ABI dispatcher supporting Linux, FreeBSD, and OpenBSD system calls alongside native sovereign IPC interfaces.
-- **Rationale**: Maximizes software compatibility across POSIX, Linux binaries, and BSD applications on SigmaOS.
+## ADR-003: Multi-Core SMP and Modern Kernel Subsystems
+- **Status:** Accepted
+- **Context:** Modern hardware requires efficient multi-core processing, async I/O, and low-latency IPC.
+- **Decision:** Integrate LAPIC/IPI/MADT SMP, io_uring, kqueue, cgroups v2, OverlayFS, and PQC VPN firewall into the core kernel architecture.

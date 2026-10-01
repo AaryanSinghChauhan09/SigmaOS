@@ -1,14 +1,9 @@
-# SigmaOS Documentation Source Policy
+# Documentation Source Policy
 
-## Overview
-This document defines the single-source-of-truth policy and governance rules for documentation within the SigmaOS repository.
+## Source of Truth
+The primary source of truth for all SigmaOS documentation is the `docs/` directory.
 
-## Canonical Source of Documentation
-1. **Primary Documentation (`docs/`)**: All architecture specifications, operational guides, subsystem technical designs, and master roadmaps reside in the `docs/` directory.
-2. **GitHub Wiki (`wiki/` and `wiki_repo/`)**: The `wiki/` directory contains topic-focused documentation formatted for GitHub Wiki deployment (Arch Linux-style topic organization).
-3. **Synchronization**: Changes to core documentation must be mirrored or synchronized across `docs/`, `wiki/`, and `wiki_repo/` using `scripts/sync_wiki.sh` to maintain consistency.
-
-## Rules for AI Agents and Contributors
-- Do not make untracked manual edits in generated wiki output locations without updating the corresponding source documentation in `docs/` or `wiki/`.
-- Maintain single-branch (`main`) cleanliness and clean git tree state before submitting PRs.
-- All documentation files must be formatted in Markdown (`.md`) and pass `markdown-link-check` and internal structure validation checks.
+## Policy Rules
+1. All architectural decisions, design specifications, and operations guides must be written and maintained in `docs/`.
+2. Do not manually edit auto-generated mirrors (`wiki/` and `wiki_content/`).
+3. Agent-specific guidelines for major subsystems are stored in the root `Agents/` directory.
