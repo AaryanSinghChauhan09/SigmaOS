@@ -6179,36 +6179,21 @@ impl OpenSourceProjectSupremacySuite {
 
     /// Starship Prompt Quick Helper
     pub fn render_starship_prompt(&self, cwd: &str, last_status: i32) -> String {
-        #[cfg(not(test))]
-        use crate::open_source_obsoletion::SovereignStarshipPromptEngine;
-        #[cfg(test)]
-        use self::open_source_obsoletion::SovereignStarshipPromptEngine;
-
-        let mut prompt = SovereignStarshipPromptEngine::new();
+        let mut prompt = open_source_obsoletion::SovereignStarshipPromptEngine::new();
         prompt.set_segment("directory", cwd, "\x1b[34m");
         prompt.render_prompt(last_status)
     }
 
     /// Chezmoi Dotfiles Quick Helper
     pub fn sync_chezmoi_dotfiles(&self, source_template: &str, target_path: &str) -> bool {
-        #[cfg(not(test))]
-        use crate::open_source_obsoletion::SovereignChezmoiDotfilesEngine;
-        #[cfg(test)]
-        use self::open_source_obsoletion::SovereignChezmoiDotfilesEngine;
-
-        let mut chezmoi = SovereignChezmoiDotfilesEngine::new();
+        let mut chezmoi = open_source_obsoletion::SovereignChezmoiDotfilesEngine::new();
         chezmoi.register_mapping(source_template, target_path, false);
         chezmoi.apply_dotfiles(1700000000) > 0
     }
 
     /// Fd Directory Search Quick Helper
     pub fn search_fd_files(&self, pattern: &str, ext: Option<&str>) -> Vec<String> {
-        #[cfg(not(test))]
-        use crate::open_source_obsoletion::SovereignFdDirectoryWalkerEngine;
-        #[cfg(test)]
-        use self::open_source_obsoletion::SovereignFdDirectoryWalkerEngine;
-
-        let mut walker = SovereignFdDirectoryWalkerEngine::new();
+        let mut walker = open_source_obsoletion::SovereignFdDirectoryWalkerEngine::new();
         walker.add_entry("/etc/sigma.conf", false, false, 512);
         walker.add_entry("/usr/bin/sigma-sh", false, false, 2048);
         walker.search_by_pattern(pattern, ext)
@@ -6216,12 +6201,7 @@ impl OpenSourceProjectSupremacySuite {
 
     /// Telescope Fuzzy Find Quick Helper
     pub fn telescope_fuzzy_search(&self, query: &str) -> Vec<String> {
-        #[cfg(not(test))]
-        use crate::open_source_obsoletion::SovereignTelescopeFuzzyPickerEngine;
-        #[cfg(test)]
-        use self::open_source_obsoletion::SovereignTelescopeFuzzyPickerEngine;
-
-        let mut picker = SovereignTelescopeFuzzyPickerEngine::new();
+        let mut picker = open_source_obsoletion::SovereignTelescopeFuzzyPickerEngine::new();
         picker.add_item(1, "Open Terminal", "action", Some("command"));
         picker.add_item(2, "Open Settings", "action", Some("command"));
         picker
@@ -6233,12 +6213,7 @@ impl OpenSourceProjectSupremacySuite {
 
     /// Btop System Telemetry Quick Helper
     pub fn snapshot_btop_telemetry(&self) -> (u8, u64) {
-        #[cfg(not(test))]
-        use crate::open_source_obsoletion::SovereignBtopResourceMonitorEngine;
-        #[cfg(test)]
-        use self::open_source_obsoletion::SovereignBtopResourceMonitorEngine;
-
-        let mut btop = SovereignBtopResourceMonitorEngine::new();
+        let mut btop = open_source_obsoletion::SovereignBtopResourceMonitorEngine::new();
         btop.record_core_telemetry(0, 20, 3200, 45);
         (
             btop.average_cpu_usage(),
