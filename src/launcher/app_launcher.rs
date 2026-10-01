@@ -14,9 +14,9 @@
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
+use alloc::string::String;
 use alloc::vec::Vec;
+use alloc::vec;
 use core::fmt;
 
 /// Case-insensitive equality without allocation for ASCII text.
@@ -92,29 +92,29 @@ impl AppEntry {
         name.to_lowercase().replace(" ", "-")
     }
 
+    /// Matches query against application name, description, keywords, and categories.
+    /// Uses zero-allocation case-insensitive matching over search fields.
     pub fn matches_query(&self, query: &str) -> bool {
-        let query = query.to_lowercase();
-
         // Check name
-        if contains_ignore_case(&self.name, &query) {
+        if contains_ignore_case(&self.name, query) {
             return true;
         }
 
         // Check description
-        if contains_ignore_case(&self.description, &query) {
+        if contains_ignore_case(&self.description, query) {
             return true;
         }
 
         // Check keywords
         for keyword in &self.keywords {
-            if contains_ignore_case(keyword, &query) {
+            if contains_ignore_case(keyword, query) {
                 return true;
             }
         }
 
         // Check categories
         for category in &self.categories {
-            if contains_ignore_case(category, &query) {
+            if contains_ignore_case(category, query) {
                 return true;
             }
         }
@@ -122,33 +122,32 @@ impl AppEntry {
         false
     }
 
+    /// Evaluates match score for ranking search results.
+    /// Eliminates heap allocations during search operations by using zero-allocation
+    /// case-insensitive equality, prefix, substring, and word-boundary iterators.
     pub fn fuzzy_score(&self, query: &str) -> i32 {
-        let query = query.to_lowercase();
-        let name = self.name.to_lowercase();
-
-        if name == query {
+        if eq_ignore_case(&self.name, query) {
             return 1000; // Exact match
         }
 
-        if name.starts_with(&query) {
+        if starts_with_ignore_case(&self.name, query) {
             return 900; // Prefix match
         }
 
-        if name.contains(&query) {
+        if contains_ignore_case(&self.name, query) {
             return 800; // Substring match
         }
 
-        // Check word boundaries
-        let words: Vec<&str> = name.split_whitespace().collect();
-        for word in words {
-            if word.starts_with(&query) {
+        // Check word boundaries without allocating a vector
+        for word in self.name.split_whitespace() {
+            if starts_with_ignore_case(word, query) {
                 return 700; // Word start match
             }
         }
 
         // Keyword match
         for keyword in &self.keywords {
-            if contains_ignore_case(keyword, &query) {
+            if contains_ignore_case(keyword, query) {
                 return 600;
             }
         }
@@ -346,8 +345,8 @@ impl AppLauncher {
         let mut results = Vec::new();
 
         for command in &self.commands {
-            if command.name.to_lowercase().contains(&query)
-                || command.description.to_lowercase().contains(&query)
+            if contains_ignore_case(&command.name, query)
+                || contains_ignore_case(&command.description, query)
             {
                 results.push(command.clone());
             }
