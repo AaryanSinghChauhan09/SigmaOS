@@ -4445,6 +4445,589 @@ impl Default for SovereignAutomatedCrmBotEngine {
     }
 }
 
+// ==========================================================
+// 41. Google Meet / MS Teams Web Conferencing Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct MeetingParticipant {
+    pub user_email: String,
+    pub display_name: String,
+    pub audio_muted: bool,
+    pub video_muted: bool,
+    pub hand_raised: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct BreakoutRoom {
+    pub room_id: u32,
+    pub room_name: String,
+    pub assigned_participants: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct ConferenceChatMessage {
+    pub sender_email: String,
+    pub message: String,
+    pub timestamp: u64,
+}
+
+/// Google Meet / MS Teams Video Conferencing Engine
+pub struct SovereignWebConferencingEngine {
+    pub meeting_id: String,
+    pub meeting_title: String,
+    pub participants: HashMap<String, MeetingParticipant>, // email -> participant
+    pub breakout_rooms: Vec<BreakoutRoom>,
+    pub chat_messages: Vec<ConferenceChatMessage>,
+    pub raised_hands_queue: Vec<String>, // list of emails in raise-hand order
+    pub next_room_id: u32,
+}
+
+impl SovereignWebConferencingEngine {
+    pub fn new(meeting_id: &str, title: &str) -> Self {
+        Self {
+            meeting_id: meeting_id.to_string(),
+            meeting_title: title.to_string(),
+            participants: HashMap::new(),
+            breakout_rooms: Vec::new(),
+            chat_messages: Vec::new(),
+            raised_hands_queue: Vec::new(),
+            next_room_id: 1,
+        }
+    }
+
+    pub fn join_meeting(&mut self, email: &str, name: &str) {
+        self.participants.insert(
+            email.to_string(),
+            MeetingParticipant {
+                user_email: email.to_string(),
+                display_name: name.to_string(),
+                audio_muted: true,
+                video_muted: false,
+                hand_raised: false,
+            },
+        );
+    }
+
+    pub fn toggle_audio(&mut self, email: &str) -> Option<bool> {
+        if let Some(p) = self.participants.get_mut(email) {
+            p.audio_muted = !p.audio_muted;
+            Some(p.audio_muted)
+        } else {
+            None
+        }
+    }
+
+    pub fn toggle_raise_hand(&mut self, email: &str) -> bool {
+        if let Some(p) = self.participants.get_mut(email) {
+            p.hand_raised = !p.hand_raised;
+            if p.hand_raised {
+                if !self.raised_hands_queue.contains(&email.to_string()) {
+                    self.raised_hands_queue.push(email.to_string());
+                }
+            } else {
+                self.raised_hands_queue.retain(|e| e != email);
+            }
+            p.hand_raised
+        } else {
+            false
+        }
+    }
+
+    pub fn create_breakout_room(&mut self, name: &str, participants: Vec<String>) -> u32 {
+        let id = self.next_room_id;
+        self.next_room_id += 1;
+        self.breakout_rooms.push(BreakoutRoom {
+            room_id: id,
+            room_name: name.to_string(),
+            assigned_participants: participants,
+        });
+        id
+    }
+
+    pub fn send_in_meeting_chat(&mut self, sender: &str, message: &str) -> bool {
+        if self.participants.contains_key(sender) {
+            self.chat_messages.push(ConferenceChatMessage {
+                sender_email: sender.to_string(),
+                message: message.to_string(),
+                timestamp: 1000 + self.chat_messages.len() as u64,
+            });
+            true
+        } else {
+            false
+        }
+    }
+}
+
+// ==========================================================
+// 42. Google Chat / Slack Enterprise Chat Spaces Engine
+// ==========================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum UserPresenceStatus {
+    Online,
+    Away,
+    DoNotDisturb,
+    InMeeting,
+    Offline,
+}
+
+#[derive(Debug, Clone)]
+pub struct ChatSpaceMessage {
+    pub message_id: u32,
+    pub author_email: String,
+    pub text_content: String,
+    pub thread_parent_id: Option<u32>,
+    pub reactions: HashMap<String, u32>,
+}
+
+#[derive(Debug, Clone)]
+pub struct EnterpriseChatSpace {
+    pub space_id: String,
+    pub space_name: String,
+    pub is_direct_message: bool,
+    pub members: Vec<String>,
+    pub messages: Vec<ChatSpaceMessage>,
+}
+
+/// Google Chat / Slack Enterprise Chat Space Engine
+pub struct SovereignEnterpriseChatSpaceEngine {
+    pub spaces: HashMap<String, EnterpriseChatSpace>,
+    pub user_presences: HashMap<String, UserPresenceStatus>,
+    pub next_msg_id: u32,
+}
+
+impl SovereignEnterpriseChatSpaceEngine {
+    pub fn new() -> Self {
+        Self {
+            spaces: HashMap::new(),
+            user_presences: HashMap::new(),
+            next_msg_id: 1,
+        }
+    }
+
+    pub fn set_user_presence(&mut self, email: &str, status: UserPresenceStatus) {
+        self.user_presences.insert(email.to_string(), status);
+    }
+
+    pub fn create_space(&mut self, space_id: &str, space_name: &str, members: Vec<String>, is_dm: bool) {
+        self.spaces.insert(
+            space_id.to_string(),
+            EnterpriseChatSpace {
+                space_id: space_id.to_string(),
+                space_name: space_name.to_string(),
+                is_direct_message: is_dm,
+                members,
+                messages: Vec::new(),
+            },
+        );
+    }
+
+    pub fn post_space_message(
+        &mut self,
+        space_id: &str,
+        author: &str,
+        text: &str,
+        parent_thread_id: Option<u32>,
+    ) -> Option<u32> {
+        let space = self.spaces.get_mut(space_id)?;
+        if !space.members.contains(&author.to_string()) {
+            return None;
+        }
+        let msg_id = self.next_msg_id;
+        self.next_msg_id += 1;
+        space.messages.push(ChatSpaceMessage {
+            message_id: msg_id,
+            author_email: author.to_string(),
+            text_content: text.to_string(),
+            thread_parent_id: parent_thread_id,
+            reactions: HashMap::new(),
+        });
+        Some(msg_id)
+    }
+}
+
+impl Default for SovereignEnterpriseChatSpaceEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 43. Zoho Recruit / Odoo HR ATS & Onboarding Engine
+// ==========================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum CandidateStage {
+    Applied,
+    Screening,
+    Interviewing,
+    OfferExtended,
+    Hired,
+    Rejected,
+}
+
+#[derive(Debug, Clone)]
+pub struct CandidateApplicant {
+    pub candidate_id: u32,
+    pub full_name: String,
+    pub email: String,
+    pub position_applied: String,
+    pub stage: CandidateStage,
+    pub scorecard_rating: u32, // 1 to 5
+    pub onboarding_checklist: Vec<(String, bool)>, // (task_name, completed)
+}
+
+/// Zoho Recruit / Odoo HR Applicant Tracking & Onboarding Engine
+pub struct SovereignHratsoOnboardingEngine {
+    pub candidates: Vec<CandidateApplicant>,
+    pub next_id: u32,
+}
+
+impl SovereignHratsoOnboardingEngine {
+    pub fn new() -> Self {
+        Self {
+            candidates: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn apply_candidate(&mut self, name: &str, email: &str, position: &str) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.candidates.push(CandidateApplicant {
+            candidate_id: id,
+            full_name: name.to_string(),
+            email: email.to_string(),
+            position_applied: position.to_string(),
+            stage: CandidateStage::Applied,
+            scorecard_rating: 0,
+            onboarding_checklist: vec![
+                ("Submit ID & Tax Forms".to_string(), false),
+                ("Provision Workstation & Email".to_string(), false),
+                ("Complete Security Training".to_string(), false),
+            ],
+        });
+        id
+    }
+
+    pub fn advance_candidate_stage(&mut self, candidate_id: u32, new_stage: CandidateStage) -> bool {
+        if let Some(c) = self.candidates.iter_mut().find(|c| c.candidate_id == candidate_id) {
+            c.stage = new_stage;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn rate_candidate(&mut self, candidate_id: u32, rating: u32) -> bool {
+        if let Some(c) = self.candidates.iter_mut().find(|c| c.candidate_id == candidate_id) {
+            c.scorecard_rating = rating.min(5);
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn complete_onboarding_task(&mut self, candidate_id: u32, task_index: usize) -> bool {
+        if let Some(c) = self.candidates.iter_mut().find(|c| c.candidate_id == candidate_id) {
+            if let Some(item) = c.onboarding_checklist.get_mut(task_index) {
+                item.1 = true;
+                return true;
+            }
+        }
+        false
+    }
+}
+
+impl Default for SovereignHratsoOnboardingEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 44. Salesforce Field Service Dispatch Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct FieldServiceWorkOrder {
+    pub work_order_id: u32,
+    pub customer_name: String,
+    pub required_skill: String,
+    pub priority_level: u32,
+    pub estimated_hours: f64,
+    pub assigned_technician: Option<String>,
+    pub is_completed: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct TechnicianProfile {
+    pub tech_id: String,
+    pub name: String,
+    pub skills: Vec<String>,
+    pub max_daily_hours: f64,
+    pub assigned_hours: f64,
+}
+
+/// Salesforce Field Service Intelligent Dispatch Engine
+pub struct SovereignFieldServiceDispatchEngine {
+    pub work_orders: Vec<FieldServiceWorkOrder>,
+    pub technicians: HashMap<String, TechnicianProfile>,
+    pub next_wo_id: u32,
+}
+
+impl SovereignFieldServiceDispatchEngine {
+    pub fn new() -> Self {
+        Self {
+            work_orders: Vec::new(),
+            technicians: HashMap::new(),
+            next_wo_id: 1,
+        }
+    }
+
+    pub fn register_technician(&mut self, tech_id: &str, name: &str, skills: Vec<String>, max_hours: f64) {
+        self.technicians.insert(
+            tech_id.to_string(),
+            TechnicianProfile {
+                tech_id: tech_id.to_string(),
+                name: name.to_string(),
+                skills,
+                max_daily_hours: max_hours,
+                assigned_hours: 0.0,
+            },
+        );
+    }
+
+    pub fn create_work_order(&mut self, customer: &str, skill: &str, priority: u32, est_hours: f64) -> u32 {
+        let id = self.next_wo_id;
+        self.next_wo_id += 1;
+        self.work_orders.push(FieldServiceWorkOrder {
+            work_order_id: id,
+            customer_name: customer.to_string(),
+            required_skill: skill.to_string(),
+            priority_level: priority,
+            estimated_hours: est_hours,
+            assigned_technician: None,
+            is_completed: false,
+        });
+        id
+    }
+
+    pub fn auto_dispatch_work_order(&mut self, wo_id: u32) -> Option<String> {
+        let wo = self.work_orders.iter().find(|w| w.work_order_id == wo_id)?.clone();
+
+        let mut best_tech_id: Option<String> = None;
+        for tech in self.technicians.values() {
+            if tech.skills.contains(&wo.required_skill)
+                && (tech.assigned_hours + wo.estimated_hours <= tech.max_daily_hours)
+            {
+                best_tech_id = Some(tech.tech_id.clone());
+                break;
+            }
+        }
+
+        if let Some(t_id) = best_tech_id {
+            if let Some(tech) = self.technicians.get_mut(&t_id) {
+                tech.assigned_hours += wo.estimated_hours;
+            }
+            if let Some(w) = self.work_orders.iter_mut().find(|w| w.work_order_id == wo_id) {
+                w.assigned_technician = Some(t_id.clone());
+            }
+            Some(t_id)
+        } else {
+            None
+        }
+    }
+}
+
+impl Default for SovereignFieldServiceDispatchEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 45. Odoo / Zoho Inventory Batch & Serial Traceability Engine
+// ==========================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum QualityControlStatus {
+    PendingInspection,
+    PassedQuality,
+    QuarantinedFailed,
+}
+
+#[derive(Debug, Clone)]
+pub struct BatchLotTraceRecord {
+    pub lot_number: String,
+    pub sku: String,
+    pub manufactured_timestamp: u64,
+    pub expiration_timestamp: u64,
+    pub initial_quantity: u32,
+    pub current_quantity: u32,
+    pub quality_status: QualityControlStatus,
+    pub serial_numbers: Vec<String>,
+}
+
+/// Odoo / Zoho Inventory Lot/Batch & Serial Number Traceability Engine
+pub struct SovereignBatchSerialTraceabilityEngine {
+    pub lot_records: HashMap<String, BatchLotTraceRecord>, // lot_number -> record
+}
+
+impl SovereignBatchSerialTraceabilityEngine {
+    pub fn new() -> Self {
+        Self {
+            lot_records: HashMap::new(),
+        }
+    }
+
+    pub fn register_lot(
+        &mut self,
+        lot_number: &str,
+        sku: &str,
+        mfg_time: u64,
+        exp_time: u64,
+        qty: u32,
+        serials: Vec<String>,
+    ) {
+        self.lot_records.insert(
+            lot_number.to_string(),
+            BatchLotTraceRecord {
+                lot_number: lot_number.to_string(),
+                sku: sku.to_string(),
+                manufactured_timestamp: mfg_time,
+                expiration_timestamp: exp_time,
+                initial_quantity: qty,
+                current_quantity: qty,
+                quality_status: QualityControlStatus::PendingInspection,
+                serial_numbers: serials,
+            },
+        );
+    }
+
+    pub fn update_quality_status(&mut self, lot_number: &str, status: QualityControlStatus) -> bool {
+        if let Some(lot) = self.lot_records.get_mut(lot_number) {
+            lot.quality_status = status;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn trace_serial_number(&self, serial: &str) -> Option<&BatchLotTraceRecord> {
+        self.lot_records.values().find(|lot| lot.serial_numbers.contains(&serial.to_string()))
+    }
+}
+
+impl Default for SovereignBatchSerialTraceabilityEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 46. Bitrix24 / Salesforce Contract Lifecycle Management (CLM) Engine
+// ==========================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ContractApprovalStatus {
+    Draft,
+    UnderLegalReview,
+    Approved,
+    SignedAndActive,
+    Expired,
+    Terminated,
+}
+
+#[derive(Debug, Clone)]
+pub struct ContractDocument {
+    pub contract_id: u32,
+    pub title: String,
+    pub counterparty_name: String,
+    pub total_contract_value: f64,
+    pub effective_date_timestamp: u64,
+    pub expiration_date_timestamp: u64,
+    pub clauses: Vec<String>,
+    pub status: ContractApprovalStatus,
+}
+
+/// Bitrix24 / Salesforce Contract Lifecycle Management (CLM) Engine
+pub struct SovereignContractLifecycleManagementEngine {
+    pub contracts: Vec<ContractDocument>,
+    pub clause_library: HashMap<String, String>, // clause_key -> clause_text
+    pub next_id: u32,
+}
+
+impl SovereignContractLifecycleManagementEngine {
+    pub fn new() -> Self {
+        Self {
+            contracts: Vec::new(),
+            clause_library: HashMap::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn register_standard_clause(&mut self, key: &str, text: &str) {
+        self.clause_library.insert(key.to_string(), text.to_string());
+    }
+
+    pub fn draft_contract(
+        &mut self,
+        title: &str,
+        counterparty: &str,
+        value: f64,
+        effective_ts: u64,
+        expiration_ts: u64,
+        clause_keys: Vec<String>,
+    ) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        let mut clauses = Vec::new();
+        for key in clause_keys {
+            if let Some(text) = self.clause_library.get(&key) {
+                clauses.push(text.clone());
+            } else {
+                clauses.push(format!("[Custom Clause: {}]", key));
+            }
+        }
+
+        self.contracts.push(ContractDocument {
+            contract_id: id,
+            title: title.to_string(),
+            counterparty_name: counterparty.to_string(),
+            total_contract_value: value,
+            effective_date_timestamp: effective_ts,
+            expiration_date_timestamp: expiration_ts,
+            clauses,
+            status: ContractApprovalStatus::Draft,
+        });
+        id
+    }
+
+    pub fn advance_contract_status(&mut self, contract_id: u32, status: ContractApprovalStatus) -> bool {
+        if let Some(c) = self.contracts.iter_mut().find(|c| c.contract_id == contract_id) {
+            c.status = status;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn find_expiring_contracts(&self, threshold_ts: u64) -> Vec<&ContractDocument> {
+        self.contracts
+            .iter()
+            .filter(|c| c.expiration_date_timestamp <= threshold_ts && c.status == ContractApprovalStatus::SignedAndActive)
+            .collect()
+    }
+}
+
+impl Default for SovereignContractLifecycleManagementEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // Placeholder types for compilation
 mod sigma_types {
     pub type Result<T> = core::result::Result<T, &'static str>;
@@ -5105,5 +5688,57 @@ mod tests {
         bot_engine.add_intent("pricing", "Our plans start at $10/mo.");
         let reply = bot_engine.process_message("What is your pricing model?");
         assert_eq!(reply, "Our plans start at $10/mo.");
+    }
+
+    #[test]
+    fn test_new_enterprise_suite_enhancements() {
+        // 1. Google Meet / MS Teams Web Conferencing Engine
+        let mut meet = SovereignWebConferencingEngine::new("meet-101", "Executive Sync");
+        meet.join_meeting("alice@sigmaos.org", "Alice Lead");
+        assert_eq!(meet.toggle_audio("alice@sigmaos.org"), Some(false)); // unmuted
+        assert!(meet.toggle_raise_hand("alice@sigmaos.org"));
+        assert_eq!(meet.raised_hands_queue, vec!["alice@sigmaos.org".to_string()]);
+        let room_id = meet.create_breakout_room("Breakout 1", vec!["alice@sigmaos.org".to_string()]);
+        assert_eq!(room_id, 1);
+        assert!(meet.send_in_meeting_chat("alice@sigmaos.org", "Hello everyone"));
+
+        // 2. Google Chat / Slack Enterprise Chat Spaces Engine
+        let mut chat_spaces = SovereignEnterpriseChatSpaceEngine::new();
+        chat_spaces.set_user_presence("bob@sigmaos.org", UserPresenceStatus::Online);
+        chat_spaces.create_space("space-dev", "Engineering", vec!["bob@sigmaos.org".to_string()], false);
+        let msg_id = chat_spaces.post_space_message("space-dev", "bob@sigmaos.org", "Build passing", None);
+        assert_eq!(msg_id, Some(1));
+
+        // 3. Zoho Recruit / Odoo HR ATS & Onboarding Engine
+        let mut hr_ats = SovereignHratsoOnboardingEngine::new();
+        let cand_id = hr_ats.apply_candidate("Charlie Dev", "charlie@dev.com", "Rust Kernel Engineer");
+        assert!(hr_ats.advance_candidate_stage(cand_id, CandidateStage::Interviewing));
+        assert!(hr_ats.rate_candidate(cand_id, 5));
+        assert!(hr_ats.complete_onboarding_task(cand_id, 0));
+        assert!(hr_ats.candidates[0].onboarding_checklist[0].1);
+
+        // 4. Salesforce Field Service Dispatch Engine
+        let mut field_dispatch = SovereignFieldServiceDispatchEngine::new();
+        field_dispatch.register_technician("tech-1", "Dave Tech", vec!["Fiber Repair".to_string()], 8.0);
+        let wo_id = field_dispatch.create_work_order("Acme Telecom", "Fiber Repair", 1, 4.0);
+        let assigned = field_dispatch.auto_dispatch_work_order(wo_id);
+        assert_eq!(assigned, Some("tech-1".to_string()));
+
+        // 5. Odoo / Zoho Inventory Batch & Serial Traceability Engine
+        let mut batch_trace = SovereignBatchSerialTraceabilityEngine::new();
+        batch_trace.register_lot("LOT-2026-A", "RAM-32GB", 1000, 5000, 100, vec!["SN-001".to_string(), "SN-002".to_string()]);
+        assert!(batch_trace.update_quality_status("LOT-2026-A", QualityControlStatus::PassedQuality));
+        let traced = batch_trace.trace_serial_number("SN-002");
+        assert!(traced.is_some());
+        assert_eq!(traced.unwrap().sku, "RAM-32GB");
+
+        // 6. Bitrix24 / Salesforce Contract Lifecycle Management (CLM) Engine
+        let mut clm = SovereignContractLifecycleManagementEngine::new();
+        clm.register_standard_clause("IP_OWNERSHIP", "All IP belongs to Sovereign OS.");
+        let contract_id = clm.draft_contract("Enterprise Support", "GlobalCorp", 250000.0, 1000, 2000, vec!["IP_OWNERSHIP".to_string()]);
+        assert!(clm.advance_contract_status(contract_id, ContractApprovalStatus::SignedAndActive));
+        let expiring = clm.find_expiring_contracts(2500);
+        assert_eq!(expiring.len(), 1);
+        assert_eq!(expiring[0].contract_id, contract_id);
     }
 }
