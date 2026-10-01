@@ -13,25 +13,29 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
-use std::string::{String, ToString};
 use std::format;
+use std::string::{String, ToString};
 use std::vec::Vec;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
 /// OOP-based Delta Updates for SigmaOS
 /// Based on Ideas-999-Structured: Package, Build & Reproducibility Item 7
 /// Implements binary diffs to minimize bandwidth for updates
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type PatchID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum DeltaError { Success = 0, InvalidPatch = 1, ApplyFailed = 2, GenerateFailed = 3 }
+pub enum DeltaError {
+    Success = 0,
+    InvalidPatch = 1,
+    ApplyFailed = 2,
+    GenerateFailed = 3,
+}
 
 pub trait DeltaPatch {
     fn id(&self) -> PatchID;
@@ -71,16 +75,28 @@ impl SimpleDeltaPatch {
 }
 
 impl DeltaPatch for SimpleDeltaPatch {
-    fn id(&self) -> PatchID { self.id }
+    fn id(&self) -> PatchID {
+        self.id
+    }
     fn source_version(&self) -> &[u8] {
-        let len = self.source_version.iter().position(|&b| b == 0).unwrap_or(32);
+        let len = self
+            .source_version
+            .iter()
+            .position(|&b| b == 0)
+            .unwrap_or(32);
         &self.source_version[..len]
     }
     fn target_version(&self) -> &[u8] {
-        let len = self.target_version.iter().position(|&b| b == 0).unwrap_or(32);
+        let len = self
+            .target_version
+            .iter()
+            .position(|&b| b == 0)
+            .unwrap_or(32);
         &self.target_version[..len]
     }
-    fn size(&self) -> usize { self.size.load(Ordering::SeqCst) }
+    fn size(&self) -> usize {
+        self.size.load(Ordering::SeqCst)
+    }
     fn operations(&self) -> &[[u8; 256]] {
         &self.operations
     }
@@ -176,22 +192,22 @@ impl DeltaApplier for SimpleDeltaApplier {
             if let Some(ref patch) = *patch_option {
                 if patch.id() == patch_id {
                     for op in patch.operations() {
-                            match op[0] {
-                                b'C' => {
-                                    let offset = op[1] as usize;
-                                    if offset < data.len() {
-                                        data[offset] = op[2];
-                                    }
+                        match op[0] {
+                            b'C' => {
+                                let offset = op[1] as usize;
+                                if offset < data.len() {
+                                    data[offset] = op[2];
                                 }
-                                b'A' => {
-                                    let offset = op[1] as usize;
-                                    if offset < data.len() {
-                                        data[offset] = op[2];
-                                    }
-                                }
-                                _ => {}
                             }
+                            b'A' => {
+                                let offset = op[1] as usize;
+                                if offset < data.len() {
+                                    data[offset] = op[2];
+                                }
+                            }
+                            _ => {}
                         }
+                    }
                     return Ok(());
                 }
             }

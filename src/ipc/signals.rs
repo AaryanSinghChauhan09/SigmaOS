@@ -4,11 +4,9 @@
 //! Implements standard signals, custom signal actions, signal masking,
 //! real-time queueable signals with custom payloads, and capability-gated signal delivery.
 
-
-
-use std::vec::Vec;
+use crate::ipc::ipc::{IPCCapability, IPCError};
 use std::collections::BTreeMap;
-use crate::ipc::ipc::{IPCError, IPCCapability};
+use std::vec::Vec;
 
 /// Unix/BSD standard and custom signal numbers
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -64,7 +62,11 @@ impl ProcessSignalState {
     }
 
     /// Set signal action (sigaction)
-    pub fn set_action(&mut self, signal: SignalType, disposition: SignalDisposition) -> Result<(), IPCError> {
+    pub fn set_action(
+        &mut self,
+        signal: SignalType,
+        disposition: SignalDisposition,
+    ) -> Result<(), IPCError> {
         // Cannot ignore SIGKILL (standard Unix/BSD rule)
         if signal == SignalType::SigKill && disposition == SignalDisposition::Ignore {
             return Err(IPCError::PermissionDenied);
@@ -99,7 +101,11 @@ impl ProcessSignalState {
 
         if let Some(i) = index {
             let pending = self.pending_signals.remove(i);
-            let disp = self.dispositions.get(&pending.signal_type).copied().unwrap_or(SignalDisposition::Default);
+            let disp = self
+                .dispositions
+                .get(&pending.signal_type)
+                .copied()
+                .unwrap_or(SignalDisposition::Default);
             Some((pending, disp))
         } else {
             None
@@ -135,13 +141,19 @@ impl SignalDeliverySystem {
     ) -> Result<(), IPCError> {
         // Capability-gated check
         {
-            let sender = self.processes.get(&sender_pid).ok_or(IPCError::NotConnected)?;
+            let sender = self
+                .processes
+                .get(&sender_pid)
+                .ok_or(IPCError::NotConnected)?;
             if !sender.capability.can_send {
                 return Err(IPCError::PermissionDenied);
             }
         }
 
-        let receiver = self.processes.get_mut(&receiver_pid).ok_or(IPCError::NotConnected)?;
+        let receiver = self
+            .processes
+            .get_mut(&receiver_pid)
+            .ok_or(IPCError::NotConnected)?;
         if !receiver.capability.can_receive {
             return Err(IPCError::PermissionDenied);
         }
@@ -172,7 +184,12 @@ mod tests {
         // Register custom handler on receiver
         {
             let p101 = sds.processes.get_mut(&101).unwrap();
-            assert!(p101.set_action(SignalType::SigUsr1, SignalDisposition::CustomHandler(0x1234)).is_ok());
+            assert!(p101
+                .set_action(
+                    SignalType::SigUsr1,
+                    SignalDisposition::CustomHandler(0x1234)
+                )
+                .is_ok());
         }
 
         // Send Usr1 signal from PID 100 to PID 101
@@ -233,7 +250,9 @@ mod tests {
         sds.register_process(301, cap);
 
         let payload_data = Vec::from(b"Realtime Payload");
-        assert!(sds.send_signal(300, 301, SignalType::SigUsr2, Some(payload_data.clone())).is_ok());
+        assert!(sds
+            .send_signal(300, 301, SignalType::SigUsr2, Some(payload_data.clone()))
+            .is_ok());
 
         let p301 = sds.processes.get_mut(&301).unwrap();
         let (pending, _) = p301.dispatch_next_signal().unwrap();

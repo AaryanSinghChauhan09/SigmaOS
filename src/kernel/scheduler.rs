@@ -2,7 +2,7 @@
 // Inspired by Linux CFS, RT scheduler, and energy-aware scheduling
 
 use std::collections::BinaryHeap;
-use std::sync::atomic::{AtomicU64, AtomicU32, Ordering};
+use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 
 /// Process priority
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -18,7 +18,9 @@ impl Priority {
     pub const Idle: Self = Self { value: 19 };
 
     pub fn new(value: i32) -> Self {
-        Self { value: value.max(-20).min(19) }
+        Self {
+            value: value.max(-20).min(19),
+        }
     }
 
     pub fn highest() -> Self {
@@ -54,7 +56,7 @@ impl Priority {
 /// Scheduler policy
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SchedulerPolicy {
-    Normal,  // CFS
+    Normal, // CFS
     Realtime,
     Idle,
     Batch,
@@ -87,11 +89,11 @@ pub struct ProcessTask {
     pub priority: Priority,
     pub policy: SchedulerPolicy,
     pub state: ProcessState,
-    pub vruntime: u64,     // Virtual runtime for CFS
-    pub exec_start: u64,   // Execution start time
+    pub vruntime: u64,      // Virtual runtime for CFS
+    pub exec_start: u64,    // Execution start time
     pub exec_duration: u64, // Total execution duration
-    pub cpu_time: u64,     // CPU time used
-    pub slice: u64,        // Time slice
+    pub cpu_time: u64,      // CPU time used
+    pub slice: u64,         // Time slice
 }
 
 impl ProcessTask {
@@ -270,7 +272,6 @@ impl RtScheduler {
         // Sort by priority (lower value = higher priority)
         self.runnable_tasks
             .sort_by(|a, b| a.priority.cmp(&b.priority));
-        self.runnable_tasks.sort_by(|a, b| a.priority.cmp(&b.priority));
 
         if let Some(current) = self.current_task.take() {
             if current.state == ProcessState::Running {
@@ -308,7 +309,7 @@ impl EnergyAwareScheduler {
     pub fn new() -> Self {
         Self {
             cfs: CfsScheduler::new(1000000, 20000000), // 1ms min granularity, 20ms latency
-            cpu_frequency: 2400, // 2.4 GHz default
+            cpu_frequency: 2400,                       // 2.4 GHz default
             thermal_state: ThermalState::Normal,
             energy_budget: 10000, // 10 J default
         }
@@ -322,9 +323,7 @@ impl EnergyAwareScheduler {
     /// Pick next task with energy awareness
     pub fn pick_next_task(&mut self) -> Option<ProcessTask> {
         match self.thermal_state {
-            ThermalState::Normal => {
-                self.cfs.pick_next_task()
-            }
+            ThermalState::Normal => self.cfs.pick_next_task(),
             ThermalState::Throttling => {
                 // Reduce frequency and pick lower priority tasks
                 self.cpu_frequency = 1200;

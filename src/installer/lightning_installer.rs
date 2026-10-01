@@ -12,9 +12,9 @@
 #![no_std]
 
 extern crate alloc;
+use alloc::format;
 use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::format;
 use core::fmt;
 
 /// Installation configuration
@@ -110,9 +110,9 @@ impl fmt::Display for BootloaderType {
 /// Desktop environments
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum DesktopEnvironment {
-    Sigma,      // Custom SigmaOS DE
-    Minimal,    // Window manager only
-    Server,     // No GUI
+    Sigma,   // Custom SigmaOS DE
+    Minimal, // Window manager only
+    Server,  // No GUI
 }
 
 impl fmt::Display for DesktopEnvironment {

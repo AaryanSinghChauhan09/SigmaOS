@@ -16,37 +16,60 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-
 // (no_std only applicable at crate root - removed)
 
 /// Custom absolute value for integers
 pub fn abs_i32(x: i32) -> i32 {
-    if x < 0 { -x } else { x }
+    if x < 0 {
+        -x
+    } else {
+        x
+    }
 }
 
 /// Custom absolute value for i64
 pub fn abs_i64(x: i64) -> i64 {
-    if x < 0 { -x } else { x }
+    if x < 0 {
+        -x
+    } else {
+        x
+    }
 }
 
 /// Custom minimum function
 pub fn min_i32(a: i32, b: i32) -> i32 {
-    if a < b { a } else { b }
+    if a < b {
+        a
+    } else {
+        b
+    }
 }
 
 /// Custom maximum function
 pub fn max_i32(a: i32, b: i32) -> i32 {
-    if a > b { a } else { b }
+    if a > b {
+        a
+    } else {
+        b
+    }
 }
 
 /// Custom minimum function for usize
 pub fn min_usize(a: usize, b: usize) -> usize {
-    if a < b { a } else { b }
+    if a < b {
+        a
+    } else {
+        b
+    }
 }
 
 /// Custom maximum function for usize
 pub fn max_usize(a: usize, b: usize) -> usize {
-    if a > b { a } else { b }
+    if a > b {
+        a
+    } else {
+        b
+    }
 }
 
 /// Custom power function for integers
@@ -89,7 +112,11 @@ pub fn sqrt_f64(x: f64) -> f64 {
 
 /// Custom absolute value for f64
 pub fn abs_f64(x: f64) -> f64 {
-    if x < 0.0 { -x } else { x }
+    if x < 0.0 {
+        -x
+    } else {
+        x
+    }
 }
 
 /// Custom floor function
@@ -294,7 +321,12 @@ pub struct InvocationFrame {
 
 impl InvocationFrame {
     pub fn new(rip: u64, rsp: u64, rbp: u64, params: [u64; 4]) -> Self {
-        Self { rip, rsp, rbp, parameters: params }
+        Self {
+            rip,
+            rsp,
+            rbp,
+            parameters: params,
+        }
     }
 
     /// Verifies the stack frame alignment and boundary sanity (BSD-inspired security rule)
@@ -307,7 +339,9 @@ impl InvocationFrame {
 /// Prevents unsafe stack-smashing via boundary sanity assertions (OpenBSD style).
 pub fn secure_invoke_sim(frame: &InvocationFrame, entry_point: u64) -> Result<u64, &'static str> {
     if !frame.verify_alignment() {
-        return Err("Stack alignment violation: Potential buffer override detected (SIGSEGV Parity)");
+        return Err(
+            "Stack alignment violation: Potential buffer override detected (SIGSEGV Parity)",
+        );
     }
     if frame.rip != entry_point {
         return Err("Function invocation hijack attempt blocked (Control Flow Guard Parity)");

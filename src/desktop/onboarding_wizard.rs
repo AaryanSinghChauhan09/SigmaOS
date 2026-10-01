@@ -91,10 +91,22 @@ pub struct AppSuggestions;
 impl AppSuggestions {
     pub fn get_recommendations(role: UserRole) -> Vec<String> {
         match role {
-            UserRole::Developer => vec!["vscode".to_string(), "git".to_string(), "docker".to_string()],
-            UserRole::Creative => vec!["gimp".to_string(), "blender".to_string(), "kdenlive".to_string()],
+            UserRole::Developer => vec![
+                "vscode".to_string(),
+                "git".to_string(),
+                "docker".to_string(),
+            ],
+            UserRole::Creative => vec![
+                "gimp".to_string(),
+                "blender".to_string(),
+                "kdenlive".to_string(),
+            ],
             UserRole::Office => vec!["libreoffice".to_string(), "thunderbird".to_string()],
-            UserRole::Gaming => vec!["steam".to_string(), "lutris".to_string(), "mangohud".to_string()],
+            UserRole::Gaming => vec![
+                "steam".to_string(),
+                "lutris".to_string(),
+                "mangohud".to_string(),
+            ],
         }
     }
 }

@@ -3,7 +3,6 @@
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, manages rolling release upgrades,
 // parses ALPM hooks, builds initramfs with mkinitcpio, packages with makepkg, and executes ALPM transactions.
 
-
 use std::format;
 use std::string::{String, ToString};
 
@@ -278,9 +277,7 @@ pub struct AlpmHookManager {
 
 impl AlpmHookManager {
     pub fn new() -> Self {
-        Self {
-            hooks: Vec::new(),
-        }
+        Self { hooks: Vec::new() }
     }
 
     pub fn add_hook(&mut self, hook: AlpmHook) {
@@ -319,11 +316,7 @@ impl AlpmHookManager {
         Ok(())
     }
 
-    pub fn trigger_hooks(
-        &self,
-        when: HookWhen,
-        changed_file: &str,
-    ) -> std::vec::Vec<SigmaString> {
+    pub fn trigger_hooks(&self, when: HookWhen, changed_file: &str) -> std::vec::Vec<SigmaString> {
         let mut triggered_cmds = std::vec::Vec::new();
         for hook in &self.hooks {
             if hook.when == when {
@@ -792,10 +785,7 @@ mod tests {
         let source_pkg = DebianSbuildPackage {
             name: SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: std::vec![
-                SigmaString::from("gcc"),
-                SigmaString::from("make")
-            ],
+            build_depends: std::vec![SigmaString::from("gcc"), SigmaString::from("make")],
         };
 
         assert!(sync.is_debian_sbuild_builddeps_satisfied(&source_pkg));

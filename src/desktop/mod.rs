@@ -1,22 +1,7 @@
 pub mod mobile_variant;
 pub use mobile_variant::*;
 pub mod tiling;
-pub use tiling::{
-    TilingWindowManager, TiledWindow, Workspace as TilingWorkspace, TilingLayout,
-    TilingStatistics,
-    TilingWindowGeometry,
-};
-pub mod onboarding;
-pub mod shortcuts;
-
-pub use onboarding::{
-    Language, Region, OnboardingStep, DesktopTheme, PrivacySettings,
-    OnboardingConfig, OnboardingWizard,
-};
-pub use shortcuts::{
-    KeyModifier, KeyAction, KeyboardShortcut, ShortcutCategory, ShortcutConfig,
-    KeyboardShortcutsManager,
-};
+pub use tiling::{TilingLayout, TilingWindow, TilingWindowManager, WindowArea, Workspace};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
@@ -26,20 +11,17 @@ pub mod omarchy_omakase;
 pub mod pantheon;
 pub mod screensaver;
 pub mod sovereign_navigation_engine;
-pub mod web_wasm_bridge;
-pub mod zenith_compositor;
-pub mod zenith_config;
+pub mod sovereign_ux_innovation_hub;
 pub mod ultimate_distro_desktop;
 pub mod wayland_protocol;
-pub mod sovereign_ux_innovation_hub;
 pub mod weather_panel;
+pub mod web_wasm_bridge;
+pub mod zenith_compositor;
 
-pub use wayland_protocol::*;
 pub use sovereign_ux_innovation_hub::*;
+pub use wayland_protocol::*;
 
 pub use crate::desktop::sovereign_navigation_engine::*;
-
-
 
 pub use sovereign_navigation_engine::*;
 
@@ -95,27 +77,25 @@ pub use crate::desktop::sovereign_navigation_engine::{
     SystemControlNode, TilingWindowManagerNav, WindowNode, YastBsdConfigControlTreeNav,
 };
 
-pub use weather_panel::{
-    WeatherCondition, WeatherData, WeatherForecast, WeatherPanel,
-};
-pub mod mint_update_manager;
-pub mod mint_software_store;
-pub mod mint_backup_tool;
+pub use weather_panel::{WeatherCondition, WeatherData, WeatherForecast, WeatherPanel};
 pub mod compositor;
 pub mod launcher;
+pub mod mint_backup_tool;
+pub mod mint_software_store;
+pub mod mint_update_manager;
 pub mod notification;
 pub mod omarchy_dynamic_workspace_suite;
 pub use omarchy_dynamic_workspace_suite::*;
 pub mod dev_workspace;
+pub mod font_manager;
 pub mod localization;
 pub mod network_sharing;
-pub mod permission_portal;
-pub mod font_manager;
 pub mod onboarding_wizard;
+pub mod permission_portal;
 
-pub use permission_portal::*;
 pub use font_manager::*;
 pub use onboarding_wizard::*;
+pub use permission_portal::*;
 pub mod display_manager;
 pub mod file_manager_extensions;
 pub mod system_tray;

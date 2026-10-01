@@ -2,10 +2,8 @@
 //! User manager, password manager, and authentication manager
 use std::format;
 
-
-
-use std::vec::Vec;
 use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// User
 #[derive(Debug, Clone)]
@@ -130,7 +128,9 @@ impl UserManager {
     }
 
     pub fn get_user_groups(&self, username: &str) -> Vec<&Group> {
-        let group_names: Vec<&String> = self.user_groups.iter()
+        let group_names: Vec<&String> = self
+            .user_groups
+            .iter()
             .filter(|ug| ug.username == username)
             .map(|ug| &ug.groupname)
             .collect();

@@ -16,9 +16,9 @@ use std::format;
 
 // (no_std only applicable at crate root - removed)
 
+use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
-use std::collections::BTreeMap;
 
 /// Robot Operating System (ROS) Parity Middleware
 /// Zero-latency, capability-based pub/sub message-passing.
@@ -42,8 +42,13 @@ pub struct RosMiddleware {
 
 #[derive(Debug, Clone, Copy)]
 pub struct Transform {
-    pub tx: f64, pub ty: f64, pub tz: f64,
-    pub qx: f64, pub qy: f64, pub qz: f64, pub qw: f64,
+    pub tx: f64,
+    pub ty: f64,
+    pub tz: f64,
+    pub qx: f64,
+    pub qy: f64,
+    pub qz: f64,
+    pub qw: f64,
 }
 
 impl RosMiddleware {
@@ -121,7 +126,19 @@ mod tests {
     #[test]
     fn test_tf_tree() {
         let mut ros = RosMiddleware::new();
-        ros.update_transform("world", "robot", Transform { tx: 1.0, ty: 2.0, tz: 0.0, qx: 0.0, qy: 0.0, qz: 0.0, qw: 1.0 });
+        ros.update_transform(
+            "world",
+            "robot",
+            Transform {
+                tx: 1.0,
+                ty: 2.0,
+                tz: 0.0,
+                qx: 0.0,
+                qy: 0.0,
+                qz: 0.0,
+                qw: 1.0,
+            },
+        );
         assert!(ros.tf_tree.contains_key("world->robot"));
     }
 }

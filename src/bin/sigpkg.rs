@@ -74,12 +74,9 @@ fn main() {
         | "trizen" | "aura" | "microdnf" | "rpm" | "apk" | "pkg" | "pkg_add" | "pkg_delete"
         | "pkg_info" | "pkgin" | "zypper" | "xbps" | "xbps-install" | "xbps-remove"
         | "xbps-query" | "emerge" | "ebuild" | "eopkg" | "moss" | "nix" | "nix-env" | "guix"
-        | "slackpkg" | "installpkg" | "removepkg" | "kiss" | "cpt" | "spack" | "conan"
-        | "pip" | "cargo" | "gem" | "nuget" | "vcpkg" | "brew" | "flatpak" | "snap"
-        | "opkg" | "ipkg" | "pkgman" | "swupd" | "slapt-get" | "urpmi" | "pisi" | "debian"
-        | "ubuntu" | "fedora" | "rhel" | "centos" | "arch" | "manjaro" | "cachy" | "cachyos"
-        | "alpine" | "freebsd" | "openbsd" | "netbsd" | "bsd" | "void" | "gentoo" | "portage"
-        | "opensuse" | "suse" | "slackware" | "solus" | "nixos" | "guixsd" => {
+        | "slackpkg" | "installpkg" | "removepkg" | "kiss" | "cpt" | "spack" | "conan" | "pip"
+        | "cargo" | "gem" | "nuget" | "vcpkg" | "brew" | "flatpak" | "snap" | "opkg" | "ipkg"
+        | "pkgman" | "swupd" | "slapt-get" | "urpmi" | "pisi" => {
             cmd_foreign_pm(&args[0], &args[1..])
         }
         "remove" => cmd_remove(&args[1..]),
@@ -227,7 +224,9 @@ mod tests {
     fn test_universal_pm_dispatcher_integration() {
         let dispatcher = UniversalPmCommandDispatcher::new();
 
-        let apt = dispatcher.dispatch_command("apt install nginx curl -y").unwrap();
+        let apt = dispatcher
+            .dispatch_command("apt install nginx curl -y")
+            .unwrap();
         assert_eq!(apt.source_pm, "apt");
         assert_eq!(apt.operation, UniversalPmOperation::Install);
         assert_eq!(apt.target_packages, vec!["nginx", "curl"]);
@@ -247,7 +246,9 @@ mod tests {
         assert_eq!(apk.operation, UniversalPmOperation::Install);
         assert_eq!(apk.target_packages, vec!["musl"]);
 
-        let bsd_pkg = dispatcher.dispatch_command("pkg install -n postgresql15-server").unwrap();
+        let bsd_pkg = dispatcher
+            .dispatch_command("pkg install -n postgresql15-server")
+            .unwrap();
         assert_eq!(bsd_pkg.source_pm, "pkg");
         assert_eq!(bsd_pkg.operation, UniversalPmOperation::Install);
         assert!(bsd_pkg.dry_run);
@@ -266,7 +267,9 @@ mod tests {
         assert_eq!(arch.source_pm, "arch");
         assert_eq!(arch.operation, UniversalPmOperation::Install);
 
-        let freebsd = dispatcher.dispatch_command("freebsd install postgresql").unwrap();
+        let freebsd = dispatcher
+            .dispatch_command("freebsd install postgresql")
+            .unwrap();
         assert_eq!(freebsd.source_pm, "freebsd");
         assert_eq!(freebsd.operation, UniversalPmOperation::Install);
 
@@ -283,7 +286,9 @@ mod tests {
         assert_eq!(emerge.operation, UniversalPmOperation::Install);
         assert!(emerge.dry_run);
 
-        let flatpak = dispatcher.dispatch_command("flatpak install org.gimp.GIMP").unwrap();
+        let flatpak = dispatcher
+            .dispatch_command("flatpak install org.gimp.GIMP")
+            .unwrap();
         assert_eq!(flatpak.source_pm, "flatpak");
         assert_eq!(flatpak.operation, UniversalPmOperation::Install);
 
@@ -529,9 +534,7 @@ fn cmd_install(args: &[String]) {
             "--eopkg" | "--pisi" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Pisi)
             }
-            "--nix" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Nix)
-            }
+            "--nix" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Nix),
             "--guix" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Guix)
             }
@@ -547,48 +550,30 @@ fn cmd_install(args: &[String]) {
             "--moss" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Moss)
             }
-            "--tcz" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Tcz)
-            }
+            "--tcz" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Tcz),
             "--gobo" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Gobo)
             }
             "--ostree" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Ostree)
             }
-            "--air" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Air)
-            }
+            "--air" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Air),
             "--bottle" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Bottle)
             }
-            "--ipa" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Ipa)
-            }
+            "--ipa" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Ipa),
             "--ports" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Ports)
             }
-            "--aab" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Aab)
-            }
-            "--hap" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Hap)
-            }
+            "--aab" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Aab),
+            "--hap" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Hap),
             "--superdeb" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Superdeb)
             }
-            "--lzm" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Lzm)
-            }
-            "--pup" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Pup)
-            }
-            "--pet" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Pet)
-            }
-            "--tar" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Tar)
-            }
+            "--lzm" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Lzm),
+            "--pup" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Pup),
+            "--pet" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Pet),
+            "--tar" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Tar),
             "--tgz" | "--targz" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::TarGz)
             }
@@ -598,21 +583,15 @@ fn cmd_install(args: &[String]) {
             "--app" | "--appbundle" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::AppBundle)
             }
-            "--puk" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Puk)
-            }
-            "--dmg" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Dmg)
-            }
+            "--puk" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Puk),
+            "--dmg" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Dmg),
             "--cports" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Cports)
             }
             "--dports" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Dports)
             }
-            "--ipk" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Ipk)
-            }
+            "--ipk" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Ipk),
             "--opkg" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Opkg)
             }
@@ -643,18 +622,14 @@ fn cmd_install(args: &[String]) {
             "--drpm" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Drpm)
             }
-            "--sfs" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Sfs)
-            }
+            "--sfs" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Sfs),
             "--wheel" | "--whl" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Wheel)
             }
             "--crate" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Crate)
             }
-            "--gem" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Gem)
-            }
+            "--gem" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Gem),
             "--nupkg" | "--nuget" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Nupkg)
             }
@@ -734,7 +709,11 @@ fn cmd_install(args: &[String]) {
             let canonical_name = dep_mapper.to_canonical_name(clean_name);
             let fmt_desc = forced_format
                 .map(|f| format!("{:?}", f))
-                .or_else(|| adapter.detect_format_by_extension(target).map(|f| format!("{:?}", f)))
+                .or_else(|| {
+                    adapter
+                        .detect_format_by_extension(target)
+                        .map(|f| format!("{:?}", f))
+                })
                 .unwrap_or_else(|| "Sovereign".to_string());
             let pkg = Package::new(
                 canonical_name.clone(),

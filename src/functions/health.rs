@@ -1,12 +1,10 @@
 //! System Health Check Functions (systemd-analyze Inspiration)
 //! Health checker, diagnostics tool, and recovery tool
-use std::vec;
 use std::format;
+use std::vec;
 
-
-
-use std::vec::Vec;
 use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Health check
 #[derive(Debug, Clone)]

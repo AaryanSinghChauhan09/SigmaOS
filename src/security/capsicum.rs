@@ -2,9 +2,9 @@
 //! Process capability constraints and sandboxing
 //! Inspired by FreeBSD Capsicum with Linux seccomp enhancements
 
-use std::vec::Vec;
-use std::string::String;
 use std::collections::HashSet;
+use std::string::String;
+use std::vec::Vec;
 
 /// Capability rights (inspired by FreeBSD capsicum rights)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

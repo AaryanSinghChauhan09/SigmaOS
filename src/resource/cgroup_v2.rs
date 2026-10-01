@@ -2,7 +2,7 @@
 // Inspired by Linux cgroup v2 for unified resource management
 
 use std::collections::HashMap;
-use std::sync::atomic::{AtomicU64, AtomicU32, Ordering};
+use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 
 /// Cgroup controller type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -34,25 +34,25 @@ pub struct MemoryController {
 /// CPU controller settings
 #[derive(Debug)]
 pub struct CpuController {
-    pub shares: u64,        // CPU shares (weight)
-    pub max: Option<u64>,   // Maximum CPU time (quota)
-    pub period: u64,        // Period in microseconds
-    pub rt_runtime: u64,   // Realtime runtime
+    pub shares: u64,      // CPU shares (weight)
+    pub max: Option<u64>, // Maximum CPU time (quota)
+    pub period: u64,      // Period in microseconds
+    pub rt_runtime: u64,  // Realtime runtime
 }
 
 /// IO controller settings
 #[derive(Debug, Clone)]
 pub struct IoController {
-    pub weight: u16,       // IO weight
-    pub max: Option<u64>,   // Maximum IO rate
-    pub read_bps: u64,     // Read bytes per second
-    pub write_bps: u64,    // Write bytes per second
+    pub weight: u16,      // IO weight
+    pub max: Option<u64>, // Maximum IO rate
+    pub read_bps: u64,    // Read bytes per second
+    pub write_bps: u64,   // Write bytes per second
 }
 
 /// PIDs controller settings
 #[derive(Debug)]
 pub struct PidsController {
-    pub max: u64,          // Maximum number of PIDs
+    pub max: u64,           // Maximum number of PIDs
     pub current: AtomicU64, // Current number of PIDs
 }
 
@@ -140,7 +140,11 @@ impl CgroupV2 {
     }
 
     /// Add a controller
-    pub fn add_controller(&mut self, controller: CgroupController, trait_obj: Box<dyn CgroupControllerTrait>) {
+    pub fn add_controller(
+        &mut self,
+        controller: CgroupController,
+        trait_obj: Box<dyn CgroupControllerTrait>,
+    ) {
         self.controllers.insert(controller, trait_obj);
     }
 
@@ -165,7 +169,10 @@ impl CgroupV2 {
     }
 
     /// Get controller by type
-    pub fn get_controller(&self, controller: CgroupController) -> Option<&dyn CgroupControllerTrait> {
+    pub fn get_controller(
+        &self,
+        controller: CgroupController,
+    ) -> Option<&dyn CgroupControllerTrait> {
         self.controllers.get(&controller).map(|c| c.as_ref())
     }
 
@@ -211,7 +218,11 @@ impl CgroupV2Manager {
     }
 
     /// Create a cgroup
-    pub fn create_cgroup(&mut self, name: String, parent: Option<String>) -> Result<(), &'static str> {
+    pub fn create_cgroup(
+        &mut self,
+        name: String,
+        parent: Option<String>,
+    ) -> Result<(), &'static str> {
         if self.cgroups.contains_key(&name) {
             return Err("Cgroup already exists");
         }
@@ -354,7 +365,6 @@ mod tests {
         assert!(manager
             .create_cgroup("/test".to_string(), Some("/".to_string()))
             .is_ok());
-        assert!(manager.create_cgroup("/test".to_string(), Some("/".to_string())).is_ok());
         assert_eq!(manager.cgroup_count(), 2);
     }
 
@@ -365,7 +375,6 @@ mod tests {
         manager
             .create_cgroup("/test".to_string(), Some("/".to_string()))
             .unwrap();
-        manager.create_cgroup("/test".to_string(), Some("/".to_string())).unwrap();
         assert!(manager.delete_cgroup("/test").is_ok());
         assert_eq!(manager.cgroup_count(), 1);
     }
@@ -387,8 +396,6 @@ mod tests {
         assert!(manager
             .add_memory_controller("/test", 1024 * 1024 * 1024, 512 * 1024 * 1024)
             .is_ok());
-        manager.create_cgroup("/test".to_string(), Some("/".to_string())).unwrap();
-        assert!(manager.add_memory_controller("/test", 1024 * 1024 * 1024, 512 * 1024 * 1024).is_ok());
     }
 
     #[test]
@@ -401,8 +408,6 @@ mod tests {
         assert!(manager
             .add_cpu_controller("/test", 1024, Some(500000))
             .is_ok());
-        manager.create_cgroup("/test".to_string(), Some("/".to_string())).unwrap();
-        assert!(manager.add_cpu_controller("/test", 1024, Some(500000)).is_ok());
     }
 
     #[test]
@@ -412,7 +417,6 @@ mod tests {
         manager
             .create_cgroup("/test".to_string(), Some("/".to_string()))
             .unwrap();
-        manager.create_cgroup("/test".to_string(), Some("/".to_string())).unwrap();
         assert!(manager.add_pids_controller("/test", 100).is_ok());
     }
 
@@ -423,7 +427,6 @@ mod tests {
         manager
             .create_cgroup("/test".to_string(), Some("/".to_string()))
             .unwrap();
-        manager.create_cgroup("/test".to_string(), Some("/".to_string())).unwrap();
         assert!(manager.move_process("/test", 1234).is_ok());
 
         let cgroup = manager.get_cgroup("/test").unwrap();
@@ -437,7 +440,6 @@ mod tests {
         manager
             .create_cgroup("/test".to_string(), Some("/".to_string()))
             .unwrap();
-        manager.create_cgroup("/test".to_string(), Some("/".to_string())).unwrap();
 
         let cgroup = manager.get_cgroup_mut("/test").unwrap();
         cgroup.disable();

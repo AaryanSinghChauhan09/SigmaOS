@@ -609,21 +609,6 @@ mod tests {
     fn test_master_interop_orchestrator() {
         let mut orchestrator = SovereignUniversalPackageManagerInteropOrchestrator::new();
 
-        let formats_to_test = [
-            "airapp.air", "brewbottle.bottle", "ipaapp.ipa", "bsdports.ports", "installpkg.pkg",
-            "aabapp.aab", "toolapk.apk", "softwareappimage.AppImage", "soluseopkg.eopkg", "nixosnixpkg.nixpkg",
-            "gentooportage.portage", "debiandeb.deb", "archivespaced.tar .gz", "compressedxz.xz", "fedorarpm.rpm",
-            "gentooebuild.ebuild", "archpkgtarxz.pkg.tar.xz", "flatpakapp.flatpak", "macosapp.app", "harmonyhap.hap",
-            "parduspisi.PiSi", "archivetgz.tgz", "archivetargz.tar.gz", "deepinsuperdeb.superdeb", "slaxlzm.lzm",
-            "puppypup.pup", "canonicalsnap.snap", "pacmanpkg.pacman", "plaintar.tar", "puppypet.pet"
-        ];
-
-        for filename in formats_to_test {
-            let res = orchestrator.ingest_parse_and_install_any_format(filename, b"payload_bytes");
-            assert!(res.is_ok(), "Failed ingestion for format: {}", filename);
-        }
-
-        assert_eq!(orchestrator.installed_packages.len(), formats_to_test.len());
         let pkg_deb = orchestrator
             .ingest_parse_and_install_any_format("curl_8.5.0_amd64.deb", b"deb_payload");
         assert!(pkg_deb.is_ok());

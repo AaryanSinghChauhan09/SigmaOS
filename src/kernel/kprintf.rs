@@ -389,11 +389,7 @@ mod tests {
     fn test_log_buffer_overflow() {
         let mut log = KernelLogBuffer::new(4);
         for i in 0..8 {
-            log.push(
-                KernelLogLevel::Info,
-                None,
-                format!("message {}", i),
-            );
+            log.push(KernelLogLevel::Info, None, format!("message {}", i));
         }
         assert_eq!(log.total_messages(), 8);
         assert_eq!(log.entries().len(), 4);
@@ -439,7 +435,11 @@ mod tests {
     #[test]
     fn test_dmesg_format() {
         let mut log = KernelLogBuffer::new(16);
-        log.push(KernelLogLevel::Info, Some("kernel"), "Boot complete".to_string());
+        log.push(
+            KernelLogLevel::Info,
+            Some("kernel"),
+            "Boot complete".to_string(),
+        );
         let dmesg = log.format_dmesg();
         assert!(dmesg.contains("INFO"));
         assert!(dmesg.contains("kernel"));

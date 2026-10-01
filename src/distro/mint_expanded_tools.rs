@@ -125,7 +125,10 @@ impl WarpinatorLanTransferEngine {
         peer_uuid: &str,
         files: Vec<(&str, u64, &str)>,
     ) -> Result<u64, &'static str> {
-        let peer = self.known_peers.get(peer_uuid).ok_or("Peer not found on LAN")?;
+        let peer = self
+            .known_peers
+            .get(peer_uuid)
+            .ok_or("Peer not found on LAN")?;
         if !peer.is_paired {
             return Err("Cannot transfer to unpaired peer: group code mismatch");
         }
@@ -210,7 +213,8 @@ impl WarpinatorLanTransferEngine {
     pub fn pump_transfer(&mut self, session_id: u64, chunk_bytes: u64) -> bool {
         if let Some(session) = self.active_transfers.get_mut(&session_id) {
             if session.status == TransferStatus::Transferring {
-                session.transferred_bytes = (session.transferred_bytes + chunk_bytes).min(session.total_bytes);
+                session.transferred_bytes =
+                    (session.transferred_bytes + chunk_bytes).min(session.total_bytes);
                 if session.transferred_bytes >= session.total_bytes {
                     session.status = TransferStatus::Completed;
                     return true;
@@ -331,7 +335,9 @@ impl MintstickUsbMediaWriterEngine {
             .ok_or("Target device not found")?;
 
         if dev.is_system_root {
-            return Err("FATAL: Target drive is the host root filesystem! Refusing to destroy host OS");
+            return Err(
+                "FATAL: Target drive is the host root filesystem! Refusing to destroy host OS",
+            );
         }
 
         if !dev.is_removable {
@@ -485,7 +491,10 @@ impl BulkyBatchRenamerEngine {
             };
 
             // 4. Prefix and suffix
-            let new_name = format!("{}{}{}{}{}", prefix, transformed_base, suffix, number_str, ext);
+            let new_name = format!(
+                "{}{}{}{}{}",
+                prefix, transformed_base, suffix, number_str, ext
+            );
 
             let has_collision = seen_new_names.contains_key(&new_name);
             seen_new_names.insert(new_name.clone(), true);
@@ -565,7 +574,11 @@ impl HypnotixStreamEngine {
                 let id = format!("chan_{}", self.channels.len() + 1);
                 self.channels.push(IptvChannel {
                     id,
-                    name: if cur_name.is_empty() { String::from("Live Stream") } else { cur_name.clone() },
+                    name: if cur_name.is_empty() {
+                        String::from("Live Stream")
+                    } else {
+                        cur_name.clone()
+                    },
                     group_title: cur_group.clone(),
                     stream_url: String::from(trimmed),
                     logo_url: cur_logo.clone(),
@@ -641,7 +654,13 @@ impl StickyNotesDesktopManager {
     }
 
     /// Create a new sticky note pinned to workspace
-    pub fn create_note(&mut self, title: &str, body: &str, color: NoteColor, workspace: u32) -> u64 {
+    pub fn create_note(
+        &mut self,
+        title: &str,
+        body: &str,
+        color: NoteColor,
+        workspace: u32,
+    ) -> u64 {
         let id = self.next_id;
         self.next_id += 1;
 
@@ -666,7 +685,9 @@ impl StickyNotesDesktopManager {
         let q = query.to_lowercase();
         self.notes
             .iter()
-            .filter(|n| n.title.to_lowercase().contains(&q) || n.markdown_body.to_lowercase().contains(&q))
+            .filter(|n| {
+                n.title.to_lowercase().contains(&q) || n.markdown_body.to_lowercase().contains(&q)
+            })
             .collect()
     }
 }
@@ -773,7 +794,12 @@ mod tests {
     #[test]
     fn test_sticky_notes() {
         let mut notes = StickyNotesDesktopManager::new();
-        let id = notes.create_note("Kernel Plan", "Finish Ring 3 user mode", NoteColor::MintGreen, 1);
+        let id = notes.create_note(
+            "Kernel Plan",
+            "Finish Ring 3 user mode",
+            NoteColor::MintGreen,
+            1,
+        );
 
         assert_eq!(id, 1);
         let results = notes.search_notes("ring 3");

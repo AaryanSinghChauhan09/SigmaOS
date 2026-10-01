@@ -2,8 +2,8 @@
 //! Kernel-level on-demand mount point triggers with idle timeout unmounting
 //! Inspired by Linux autofs with BSD automation improvements
 
-use std::vec::Vec;
 use std::string::String;
+use std::vec::Vec;
 
 /// Mount trigger type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

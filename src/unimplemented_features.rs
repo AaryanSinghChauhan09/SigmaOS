@@ -7,7 +7,11 @@
 #![allow(unexpected_cfgs)]
 extern crate alloc;
 
+use alloc::boxed::Box;
 use std::collections::BTreeMap;
+#[cfg(test)]
+use std::collections::HashMap;
+#[cfg(all(not(feature = "standalone_test"), not(test)))]
 use std::collections::HashMap;
 
 // ==================================================================// 6.1 POLYMORPHIC UNIVERSAL PERIPHERAL BLUEPRINT (OOP PARADIGM)
@@ -1708,7 +1712,6 @@ impl Default for GestureVoiceControlEngine {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1740,17 +1743,42 @@ mod tests {
         let mut vm = UdfVm::new(0, 16);
 
         let program = [
-            UdfInstruction { opcode: OP_WRITE, reg_dest: 0, reg_src: 0, address_or_imm: 4 }, // write R0 (0) to addr 4
-            UdfInstruction { opcode: OP_READ, reg_dest: 1, reg_src: 0, address_or_imm: 4 },  // read addr 4 to R1
-            UdfInstruction { opcode: OP_ADD, reg_dest: 1, reg_src: 1, address_or_imm: 0 },   // R1 = R1 + R1
-            UdfInstruction { opcode: OP_HALT, reg_dest: 1, reg_src: 0, address_or_imm: 0 },
+            UdfInstruction {
+                opcode: OP_WRITE,
+                reg_dest: 0,
+                reg_src: 0,
+                address_or_imm: 4,
+            }, // write R0 (0) to addr 4
+            UdfInstruction {
+                opcode: OP_READ,
+                reg_dest: 1,
+                reg_src: 0,
+                address_or_imm: 4,
+            }, // read addr 4 to R1
+            UdfInstruction {
+                opcode: OP_ADD,
+                reg_dest: 1,
+                reg_src: 1,
+                address_or_imm: 0,
+            }, // R1 = R1 + R1
+            UdfInstruction {
+                opcode: OP_HALT,
+                reg_dest: 1,
+                reg_src: 0,
+                address_or_imm: 0,
+            },
         ];
 
         let res = vm.execute_program(&program, &mut dev).unwrap();
         assert_eq!(res, 0);
 
         let invalid_program = [
-            UdfInstruction { opcode: OP_READ, reg_dest: 0, reg_src: 0, address_or_imm: 100 }, // out of bounds
+            UdfInstruction {
+                opcode: OP_READ,
+                reg_dest: 0,
+                reg_src: 0,
+                address_or_imm: 100,
+            }, // out of bounds
         ];
         assert!(vm.execute_program(&invalid_program, &mut dev).is_err());
     }
@@ -1768,7 +1796,9 @@ mod tests {
                     min_version: PkgVersion { major: 2, minor: 0 },
                     max_version: PkgVersion { major: 2, minor: 5 },
                 }),
-                None, None, None,
+                None,
+                None,
+                None,
             ],
         };
 
@@ -1806,9 +1836,24 @@ mod tests {
         dev.initialize().unwrap();
         let mut vm = UdfVm::new(0, 1024);
         let code = [
-            UdfInstruction { opcode: OP_READ, reg_dest: 0, reg_src: 0, address_or_imm: 0x3F8 },
-            UdfInstruction { opcode: OP_ADD, reg_dest: 0, reg_src: 0, address_or_imm: 10 },
-            UdfInstruction { opcode: OP_HALT, reg_dest: 0, reg_src: 0, address_or_imm: 0 },
+            UdfInstruction {
+                opcode: OP_READ,
+                reg_dest: 0,
+                reg_src: 0,
+                address_or_imm: 0x3F8,
+            },
+            UdfInstruction {
+                opcode: OP_ADD,
+                reg_dest: 0,
+                reg_src: 0,
+                address_or_imm: 10,
+            },
+            UdfInstruction {
+                opcode: OP_HALT,
+                reg_dest: 0,
+                reg_src: 0,
+                address_or_imm: 0,
+            },
         ];
         let res = vm.execute_program(&code, &mut dev).unwrap();
         assert_eq!(res, 0);
@@ -1818,8 +1863,18 @@ mod tests {
     fn test_constraint_sat_solver() {
         let solver = SpecConstraintSatSolver::new();
         let nodes = [
-            SpecPackageNode { id: 1, version: 10, req_min: 1, req_max: 20 },
-            SpecPackageNode { id: 2, version: 5, req_min: 1, req_max: 10 },
+            SpecPackageNode {
+                id: 1,
+                version: 10,
+                req_min: 1,
+                req_max: 20,
+            },
+            SpecPackageNode {
+                id: 2,
+                version: 5,
+                req_min: 1,
+                req_max: 10,
+            },
         ];
         assert!(solver.resolve_satisfiability(&nodes).is_ok());
     }
@@ -1842,9 +1897,24 @@ mod tests {
         dev.initialize().unwrap();
         let mut vm = UdfVm::new(0, 1024);
         let code = [
-            UdfInstruction { opcode: OP_READ, reg_dest: 0, reg_src: 0, address_or_imm: 100 },
-            UdfInstruction { opcode: OP_ADD, reg_dest: 0, reg_src: 0, address_or_imm: 50 },
-            UdfInstruction { opcode: OP_HALT, reg_dest: 0, reg_src: 0, address_or_imm: 0 },
+            UdfInstruction {
+                opcode: OP_READ,
+                reg_dest: 0,
+                reg_src: 0,
+                address_or_imm: 100,
+            },
+            UdfInstruction {
+                opcode: OP_ADD,
+                reg_dest: 0,
+                reg_src: 0,
+                address_or_imm: 50,
+            },
+            UdfInstruction {
+                opcode: OP_HALT,
+                reg_dest: 0,
+                reg_src: 0,
+                address_or_imm: 0,
+            },
         ];
         assert_eq!(vm.execute_program(&code, &mut dev).unwrap(), 0);
 
@@ -1855,7 +1925,12 @@ mod tests {
 
         // Inspect & verify SAT Solver
         let solver = SpecConstraintSatSolver::new();
-        let nodes = [SpecPackageNode { id: 1, version: 1, req_min: 1, req_max: 5 }];
+        let nodes = [SpecPackageNode {
+            id: 1,
+            version: 1,
+            req_min: 1,
+            req_max: 5,
+        }];
         assert!(solver.resolve_satisfiability(&nodes).is_ok());
     }
 }
@@ -1878,10 +1953,18 @@ pub struct LegacyPioController {
 }
 
 impl SpecBareMetalUnifiedPeripheral for LegacyPioController {
-    fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
-    fn read_register(&self, offset: u32) -> u64 { self.port_base as u64 + offset as u64 }
-    fn write_register(&mut self, _offset: u32, _value: u64) -> Result<(), &'static str> { Ok(()) }
-    fn handle_irq(&mut self) -> u32 { 1 }
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        Ok(())
+    }
+    fn read_register(&self, offset: u32) -> u64 {
+        self.port_base as u64 + offset as u64
+    }
+    fn write_register(&mut self, _offset: u32, _value: u64) -> Result<(), &'static str> {
+        Ok(())
+    }
+    fn handle_irq(&mut self) -> u32 {
+        1
+    }
 }
 
 pub struct ModernMmioSpecController {
@@ -1890,10 +1973,18 @@ pub struct ModernMmioSpecController {
 }
 
 impl SpecBareMetalUnifiedPeripheral for ModernMmioSpecController {
-    fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
-    fn read_register(&self, offset: u32) -> u64 { self.mmio_base + offset as u64 }
-    fn write_register(&mut self, _offset: u32, _value: u64) -> Result<(), &'static str> { Ok(()) }
-    fn handle_irq(&mut self) -> u32 { 1 }
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        Ok(())
+    }
+    fn read_register(&self, offset: u32) -> u64 {
+        self.mmio_base + offset as u64
+    }
+    fn write_register(&mut self, _offset: u32, _value: u64) -> Result<(), &'static str> {
+        Ok(())
+    }
+    fn handle_irq(&mut self) -> u32 {
+        1
+    }
 }
 
 pub struct BareMetalSpecPeripheralManager {
@@ -1909,8 +2000,15 @@ impl BareMetalSpecPeripheralManager {
         }
     }
 
-    pub fn register_device(&mut self, vendor_id: u16, base_addr: u64, is_mmio: bool) -> Result<(), &'static str> {
-        if self.device_count >= 16 { return Err("Registry full"); }
+    pub fn register_device(
+        &mut self,
+        vendor_id: u16,
+        base_addr: u64,
+        is_mmio: bool,
+    ) -> Result<(), &'static str> {
+        if self.device_count >= 16 {
+            return Err("Registry full");
+        }
         self.registered_devices[self.device_count] = (vendor_id, base_addr, is_mmio);
         self.device_count += 1;
         Ok(())
@@ -1918,14 +2016,16 @@ impl BareMetalSpecPeripheralManager {
 }
 
 impl Default for BareMetalSpecPeripheralManager {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // 6.2 Zero-Allocation UDF Bytecode Interpreter Specification
 #[derive(Debug, Clone, Copy)]
 pub struct SpecUdfInstruction {
-    pub op: u8,   // 0x10: READ, 0x20: WRITE, 0x30: ADD, 0xF0: HALT
-    pub reg: u8,  // R0 - R7
+    pub op: u8,  // 0x10: READ, 0x20: WRITE, 0x30: ADD, 0xF0: HALT
+    pub reg: u8, // R0 - R7
     pub addr: u64,
 }
 
@@ -1946,11 +2046,16 @@ impl SpecUdfVm {
         self.pc = 0;
         while self.pc < bytecode.len() {
             let inst = bytecode[self.pc];
-            if inst.reg >= 8 { return Err("Register out of bounds"); }
+            if inst.reg >= 8 {
+                return Err("Register out of bounds");
+            }
             match inst.op {
                 0x10 => self.registers[inst.reg as usize] = inst.addr, // OP_READ
                 0x20 => { /* OP_WRITE */ }
-                0x30 => self.registers[inst.reg as usize] = self.registers[inst.reg as usize].wrapping_add(inst.addr), // OP_ADD
+                0x30 => {
+                    self.registers[inst.reg as usize] =
+                        self.registers[inst.reg as usize].wrapping_add(inst.addr)
+                } // OP_ADD
                 0xF0 => return Ok(self.registers[inst.reg as usize]), // OP_HALT
                 _ => return Err("Invalid ISA opcode"),
             }
@@ -1961,7 +2066,9 @@ impl SpecUdfVm {
 }
 
 impl Default for SpecUdfVm {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // 6.3 Declarative Package Resolution SAT Solver
@@ -1976,9 +2083,14 @@ pub struct SpecPackageNode {
 pub struct SpecConstraintSatSolver;
 
 impl SpecConstraintSatSolver {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
 
-    pub fn resolve_satisfiability(&self, packages: &[SpecPackageNode]) -> Result<bool, &'static str> {
+    pub fn resolve_satisfiability(
+        &self,
+        packages: &[SpecPackageNode],
+    ) -> Result<bool, &'static str> {
         for pkg in packages {
             if pkg.version < pkg.req_min || pkg.version > pkg.req_max {
                 return Err("Constraint conflict detected");
@@ -1989,7 +2101,9 @@ impl SpecConstraintSatSolver {
 }
 
 impl Default for SpecConstraintSatSolver {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // 6.4 JBD2-Style Crash-Resilient Transactional Ledger
@@ -2019,11 +2133,19 @@ impl SpecJbd2TransactionLedger {
         }
     }
 
-    pub fn write_transaction(&mut self, target_addr: u64, data: &[u8]) -> Result<u64, &'static str> {
-        if self.head >= 16 { return Err("Ledger ring full"); }
+    pub fn write_transaction(
+        &mut self,
+        target_addr: u64,
+        data: &[u8],
+    ) -> Result<u64, &'static str> {
+        if self.head >= 16 {
+            return Err("Ledger ring full");
+        }
         let tx_id = self.head as u64 + 1;
         let mut crc = 0u32;
-        for &b in data { crc = crc.wrapping_add(b as u32); }
+        for &b in data {
+            crc = crc.wrapping_add(b as u32);
+        }
 
         self.ring_blocks[self.head] = SpecTransactionBlock {
             tx_id,
@@ -2049,7 +2171,9 @@ impl SpecJbd2TransactionLedger {
 }
 
 impl Default for SpecJbd2TransactionLedger {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 pub struct Android15PrivateSpaceGovernor;
@@ -2272,7 +2396,6 @@ impl GentooUseFlagEngine {
 pub const CAP_READ: u64 = 1 << 0;
 pub const CAP_WRITE: u64 = 1 << 1;
 pub const CAP_SEEK: u64 = 1 << 2;
-
 
 pub struct FreeBsdCapsicumEngine {
     pub is_capability_mode: bool,
@@ -4023,16 +4146,73 @@ impl TechMediaIntelligenceAggregatorEngine {
     }
 
     pub fn seed_curated_media_feeds(&mut self) {
-        self.ingest_portal_item(TechMediaPortal::ItsFoss, "It's FOSS", "Top 10 Essential Linux Desktop Applications", "Apps", 2, "GIMP/Kdenlive/Obsidian");
-        self.ingest_portal_item(TechMediaPortal::NineToFiveLinux, "9to5Linux", "Linux Kernel 6.12+ Sched_Ext Improvements", "Kernel", 3, "ScxBpflandScheduler");
-        self.ingest_portal_item(TechMediaPortal::Phoronix, "Phoronix", "AMD RDNA3 & NVIDIA OpenGSP Graphics Benchmarks", "Hardware", 1, "MesaVulkanStudio");
-        self.ingest_portal_item(TechMediaPortal::DistroWatch, "DistroWatch", "Linux & BSD Distribution Popularity Trends", "Distro", 2, "UniversalPackageManager");
-        self.ingest_portal_item(TechMediaPortal::XdaDevelopers, "XDA Developers", "Best Modern Terminal Emulators for Developers", "Tools", 2, "GhosttyTerminal");
-        self.ingest_portal_item(TechMediaPortal::TheNewStack, "The New Stack", "eBPF & WebAssembly in Cloud Native Systems", "Cloud", 3, "SigmaEbpfRuntime");
-        self.ingest_portal_item(TechMediaPortal::Marktechpost, "Marktechpost", "State of the Art Local LLMs & Coding Agents", "AI", 4, "OmarchyHerdrAiAgent");
+        self.ingest_portal_item(
+            TechMediaPortal::ItsFoss,
+            "It's FOSS",
+            "Top 10 Essential Linux Desktop Applications",
+            "Apps",
+            2,
+            "GIMP/Kdenlive/Obsidian",
+        );
+        self.ingest_portal_item(
+            TechMediaPortal::NineToFiveLinux,
+            "9to5Linux",
+            "Linux Kernel 6.12+ Sched_Ext Improvements",
+            "Kernel",
+            3,
+            "ScxBpflandScheduler",
+        );
+        self.ingest_portal_item(
+            TechMediaPortal::Phoronix,
+            "Phoronix",
+            "AMD RDNA3 & NVIDIA OpenGSP Graphics Benchmarks",
+            "Hardware",
+            1,
+            "MesaVulkanStudio",
+        );
+        self.ingest_portal_item(
+            TechMediaPortal::DistroWatch,
+            "DistroWatch",
+            "Linux & BSD Distribution Popularity Trends",
+            "Distro",
+            2,
+            "UniversalPackageManager",
+        );
+        self.ingest_portal_item(
+            TechMediaPortal::XdaDevelopers,
+            "XDA Developers",
+            "Best Modern Terminal Emulators for Developers",
+            "Tools",
+            2,
+            "GhosttyTerminal",
+        );
+        self.ingest_portal_item(
+            TechMediaPortal::TheNewStack,
+            "The New Stack",
+            "eBPF & WebAssembly in Cloud Native Systems",
+            "Cloud",
+            3,
+            "SigmaEbpfRuntime",
+        );
+        self.ingest_portal_item(
+            TechMediaPortal::Marktechpost,
+            "Marktechpost",
+            "State of the Art Local LLMs & Coding Agents",
+            "AI",
+            4,
+            "OmarchyHerdrAiAgent",
+        );
     }
 
-    pub fn ingest_portal_item(&mut self, portal: TechMediaPortal, source: &str, title: &str, category: &str, severity: u8, app: &str) {
+    pub fn ingest_portal_item(
+        &mut self,
+        portal: TechMediaPortal,
+        source: &str,
+        title: &str,
+        category: &str,
+        severity: u8,
+        app: &str,
+    ) {
         self.feed_items.push(TechMediaFeedItem {
             source_portal: portal,
             source_name: source.to_string(),
@@ -4044,7 +4224,14 @@ impl TechMediaIntelligenceAggregatorEngine {
     }
 
     pub fn ingest_feed_item(&mut self, source: &str, title: &str, category: &str, severity: u8) {
-        self.ingest_portal_item(TechMediaPortal::LinuxCom, source, title, category, severity, "SigmaPkg");
+        self.ingest_portal_item(
+            TechMediaPortal::LinuxCom,
+            source,
+            title,
+            category,
+            severity,
+            "SigmaPkg",
+        );
     }
 
     pub fn filter_by_source(&self, source: &str) -> Vec<TechMediaFeedItem> {
@@ -4116,7 +4303,13 @@ impl FrappeLowCodeEcosystemEngine {
         }
     }
 
-    pub fn define_doctype(&mut self, name: &str, module: &str, is_submittable: bool, fields: &[(&str, &str)]) {
+    pub fn define_doctype(
+        &mut self,
+        name: &str,
+        module: &str,
+        is_submittable: bool,
+        fields: &[(&str, &str)],
+    ) {
         let doc_fields = fields
             .iter()
             .map(|(fn_name, ft_type)| FrappeDocTypeField {
@@ -4137,7 +4330,8 @@ impl FrappeLowCodeEcosystemEngine {
     }
 
     pub fn register_doc_hook(&mut self, doctype: &str, event: &str, handler: &str) {
-        self.hooks_registered.push(format!("{}:{}:{}", doctype, event, handler));
+        self.hooks_registered
+            .push(format!("{}:{}:{}", doctype, event, handler));
     }
 
     pub fn validate_workflow_transition(&self, current_state: &str, target_state: &str) -> bool {
@@ -4239,9 +4433,30 @@ mod new_unimplemented_tests {
     #[test]
     fn test_tech_media_intelligence_aggregator_engine() {
         let mut aggregator = TechMediaIntelligenceAggregatorEngine::new();
-        aggregator.ingest_portal_item(TechMediaPortal::ItsFoss, "It's FOSS", "Linux Kernel 6.11 Released", "Kernel", 3, "KernelTool");
-        aggregator.ingest_portal_item(TechMediaPortal::Phoronix, "Phoronix", "AMD EPYC Zen 5 Benchmarks", "Hardware", 2, "BenchTool");
-        aggregator.ingest_portal_item(TechMediaPortal::XdaDevelopers, "XDA", "Critical Zero-Day Vulnerability Discovered", "Security", 9, "SecTool");
+        aggregator.ingest_portal_item(
+            TechMediaPortal::ItsFoss,
+            "It's FOSS",
+            "Linux Kernel 6.11 Released",
+            "Kernel",
+            3,
+            "KernelTool",
+        );
+        aggregator.ingest_portal_item(
+            TechMediaPortal::Phoronix,
+            "Phoronix",
+            "AMD EPYC Zen 5 Benchmarks",
+            "Hardware",
+            2,
+            "BenchTool",
+        );
+        aggregator.ingest_portal_item(
+            TechMediaPortal::XdaDevelopers,
+            "XDA",
+            "Critical Zero-Day Vulnerability Discovered",
+            "Security",
+            9,
+            "SecTool",
+        );
 
         let p_feeds = aggregator.filter_by_source("Phoronix");
         assert!(!p_feeds.is_empty());

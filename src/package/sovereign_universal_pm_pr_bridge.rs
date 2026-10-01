@@ -57,22 +57,17 @@ pub enum UniversalDistroPackageFormat {
     FlatpakApp,
     SnapApp,
     AppImage,
-    SlackwareTxz,
     ZypperSpec,
-    SolusEopkg,
-    OpenWrtIpk,
-    YoctoOpkg,
-    SolarisIps,
-    SwupdBundle,
-    HomebrewBottle,
-    AndroidAab,
-    MacOsApp,
-    OciContainer,
-    SystemdSysext,
-    PythonWheel,
-    CargoCrate,
-    RubyGem,
-    DotnetNuget,
+    SolusMoss,
+    HaikuHpkg,
+    BedrockStratum,
+    TinyCoreTcz,
+    GoboRecipe,
+    ChimeraCports,
+    FreeBsdPoudriere,
+    OpenBsdSignifyPorts,
+    NetBsdPkgsrcRump,
+    ClearSwupd,
     NativeSigPkg,
     BsdPkg,
     OpenBsdPorts,
@@ -96,22 +91,17 @@ impl UniversalDistroPackageFormat {
             Self::FlatpakApp => "flatpak (.flatpakref / .flatpak)",
             Self::SnapApp => "snap (snap.yaml / .snap)",
             Self::AppImage => "appimage (.AppImage)",
-            Self::SlackwareTxz => "slackware (.txz / SlackBuild)",
-            Self::ZypperSpec => "zypper (.rpm / .spec)",
-            Self::SolusEopkg => "eopkg (pspec.xml / .eopkg)",
-            Self::OpenWrtIpk => "opkg / ipk (control / .ipk)",
-            Self::YoctoOpkg => "yocto (.opkg)",
-            Self::SolarisIps => "solaris ips (.p5p / manifest)",
-            Self::SwupdBundle => "swupd (bundle / manifest)",
-            Self::HomebrewBottle => "homebrew (.bottle.tar.gz / Formula)",
-            Self::AndroidAab => "android (.aab / .apk)",
-            Self::MacOsApp => "macos (.app / .dmg)",
-            Self::OciContainer => "oci (container image tarball)",
-            Self::SystemdSysext => "systemd-sysext (.raw / .raw.xz)",
-            Self::PythonWheel => "python (.whl / setup.py)",
-            Self::CargoCrate => "cargo (.crate / Cargo.toml)",
-            Self::RubyGem => "ruby (.gem / gemspec)",
-            Self::DotnetNuget => "dotnet (.nupkg / nuspec)",
+            Self::ZypperSpec => "zypper (openSUSE RPM spec)",
+            Self::SolusMoss => "moss (Serpent OS / Solus recipe)",
+            Self::HaikuHpkg => "packagefs (Haiku .hpkg recipe)",
+            Self::BedrockStratum => "stratum (Bedrock Linux spec)",
+            Self::TinyCoreTcz => "tcz (TinyCore extension)",
+            Self::GoboRecipe => "gobo (/Programs recipe)",
+            Self::ChimeraCports => "cports (Chimera Linux recipe)",
+            Self::FreeBsdPoudriere => "poudriere (FreeBSD Poudriere port)",
+            Self::OpenBsdSignifyPorts => "signify-ports (OpenBSD ports recipe)",
+            Self::NetBsdPkgsrcRump => "pkgsrc-rump (NetBSD pkgsrc rump recipe)",
+            Self::ClearSwupd => "swupd (Clear Linux bundle)",
             Self::NativeSigPkg => "sigma-pkg (.sigpkg)",
             Self::BsdPkg => "bsd-pkg (+MANIFEST / pkg-plist)",
             Self::OpenBsdPorts => "openbsd-ports (Makefile / ports tree)",
@@ -1050,5 +1040,43 @@ mod tests {
         let merged_manifest = bridge.merge_pr_to_sigma_pkg(pr_id).unwrap();
         assert_eq!(merged_manifest.name, "ripgrep");
         assert_eq!(bridge.active_sigpkg_registry.len(), 1);
+    }
+
+    #[test]
+    fn test_expanded_linux_bsd_pr_formats() {
+        let expanded_formats = [
+            (UniversalDistroPackageFormat::ZypperSpec, "opensuse-pkg"),
+            (UniversalDistroPackageFormat::SolusMoss, "solus-pkg"),
+            (UniversalDistroPackageFormat::HaikuHpkg, "haiku-pkg"),
+            (UniversalDistroPackageFormat::BedrockStratum, "bedrock-pkg"),
+            (UniversalDistroPackageFormat::TinyCoreTcz, "tc-pkg"),
+            (UniversalDistroPackageFormat::GoboRecipe, "gobo-pkg"),
+            (UniversalDistroPackageFormat::ChimeraCports, "chimera-pkg"),
+            (UniversalDistroPackageFormat::FreeBsdPoudriere, "poudriere-pkg"),
+            (UniversalDistroPackageFormat::OpenBsdSignifyPorts, "signify-pkg"),
+            (UniversalDistroPackageFormat::NetBsdPkgsrcRump, "rump-pkg"),
+            (UniversalDistroPackageFormat::ClearSwupd, "swupd-pkg"),
+        ];
+
+        let mut bridge = SovereignUniversalPmPrBridgeEngine::new();
+
+        for (fmt, name) in expanded_formats {
+            assert!(!fmt.as_str().is_empty());
+            let pr = bridge.submit_foreign_package_pr(
+                "distro_maintainer",
+                name,
+                "1.0.0",
+                fmt,
+                "raw_manifest_data",
+                &["sovereign-libc"],
+                b"pqc_dilithium5_sig",
+            );
+
+            assert!(bridge.validate_sat_pr_dependencies(pr).unwrap());
+            let manifest = bridge.merge_pr_to_sigma_pkg(pr).unwrap();
+            assert_eq!(manifest.original_format, fmt);
+        }
+
+        assert_eq!(bridge.total_prs_merged, 11);
     }
 }

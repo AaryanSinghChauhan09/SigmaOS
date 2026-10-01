@@ -1,9 +1,9 @@
-use std::vec::Vec;
-use std::collections::{BTreeMap, VecDeque};
-use std::string::String;
-use std::rc::Rc;
 use core::cell::RefCell;
 use core::cmp;
+use std::collections::{BTreeMap, VecDeque};
+use std::rc::Rc;
+use std::string::String;
+use std::vec::Vec;
 
 // -----------------------------------------------------------------------------
 // TCP State Machine and Control Block
@@ -21,13 +21,13 @@ pub enum TcpState {
     CloseWait,
     Closing,
     LastAck,
-    TimeWait
+    TimeWait,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CongestionControlAlgo {
     Reno,
-    Cubic
+    Cubic,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -108,7 +108,14 @@ impl TcpControlBlock {
             rttvar: 0,
             tx_buffer: VecDeque::new(),
             rx_buffer: VecDeque::new(),
-            options: TcpOptions { mss: 1460, window_scaling: 7, timestamps: true, sack: true, ts_val: 0, ts_ecr: 0 },
+            options: TcpOptions {
+                mss: 1460,
+                window_scaling: 7,
+                timestamps: true,
+                sack: true,
+                ts_val: 0,
+                ts_ecr: 0,
+            },
         }
     }
 
@@ -128,14 +135,14 @@ impl TcpControlBlock {
                     self.irs = seq;
                     // Send SYN-ACK
                 }
-            },
+            }
             TcpState::Listen => {
                 if syn {
                     self.state = TcpState::SynReceived;
                     self.rcv_nxt = seq + 1;
                     self.irs = seq;
                 }
-            },
+            }
             TcpState::SynSent => {
                 if syn && ack_flag {
                     self.state = TcpState::Established;
@@ -147,12 +154,12 @@ impl TcpControlBlock {
                     self.rcv_nxt = seq + 1;
                     // Send SYN-ACK
                 }
-            },
+            }
             TcpState::SynReceived => {
                 if ack_flag && ack == self.snd_nxt {
                     self.state = TcpState::Established;
                 }
-            },
+            }
             TcpState::Established => {
                 if ack_flag {
                     if ack > self.snd_una && ack <= self.snd_nxt {
@@ -162,13 +169,16 @@ impl TcpControlBlock {
                         if self.cwnd < self.ssthresh {
                             self.cwnd += self.options.mss as u32; // Slow start
                         } else {
-                            self.cwnd += (self.options.mss as u32 * self.options.mss as u32) / self.cwnd; // Congestion avoidance
+                            self.cwnd +=
+                                (self.options.mss as u32 * self.options.mss as u32) / self.cwnd;
+                            // Congestion avoidance
                         }
                     } else if ack == self.snd_una {
                         self.dup_acks += 1;
                         if self.dup_acks == 3 {
                             // Fast retransmit
-                            self.ssthresh = core::cmp::max(self.cwnd / 2, 2 * self.options.mss as u32);
+                            self.ssthresh =
+                                core::cmp::max(self.cwnd / 2, 2 * self.options.mss as u32);
                             self.cwnd = self.ssthresh + 3 * self.options.mss as u32;
                         }
                     }
@@ -189,9 +199,11 @@ impl TcpControlBlock {
                     self.rcv_nxt += 1;
                     // Send ACK
                 }
-            },
+            }
             TcpState::FinWait1 => {
-                if ack_flag { self.state = TcpState::FinWait2; }
+                if ack_flag {
+                    self.state = TcpState::FinWait2;
+                }
                 if fin {
                     if self.state == TcpState::FinWait2 {
                         self.state = TcpState::TimeWait;
@@ -199,26 +211,26 @@ impl TcpControlBlock {
                         self.state = TcpState::Closing;
                     }
                 }
-            },
+            }
             TcpState::FinWait2 => {
                 if fin {
                     self.state = TcpState::TimeWait;
                     // Start TimeWait timer
                 }
-            },
+            }
             TcpState::CloseWait => {
                 // Application should call close()
-            },
+            }
             TcpState::Closing => {
                 if ack_flag {
                     self.state = TcpState::TimeWait;
                 }
-            },
+            }
             TcpState::LastAck => {
                 if ack_flag {
                     self.state = TcpState::Closed;
                 }
-            },
+            }
             TcpState::TimeWait => {
                 // Wait for 2*MSL then transition to Closed
             }
@@ -251,7 +263,9 @@ pub struct IpLayer {
 
 impl IpLayer {
     pub fn new() -> Self {
-        Self { reassembly_buffers: Vec::new() }
+        Self {
+            reassembly_buffers: Vec::new(),
+        }
     }
 
     pub fn handle_fragment(
@@ -272,7 +286,9 @@ impl IpLayer {
             Some(b) => b,
             None => {
                 self.reassembly_buffers.push(IpReassemblyBuffer {
-                    src_ip: src, dst_ip: dst, identification: id,
+                    src_ip: src,
+                    dst_ip: dst,
+                    identification: id,
                     fragments: BTreeMap::new(),
                     total_length: None,
                     timer: 60,
@@ -299,7 +315,9 @@ impl IpLayer {
         let mut fully_reassembled = false;
 
         for (off, frag) in &buffer.fragments {
-            if *off != current_offset { break; }
+            if *off != current_offset {
+                break;
+            }
             current_offset += frag.payload.len() as u16;
             if !frag.more_fragments {
                 fully_reassembled = true;
@@ -312,7 +330,8 @@ impl IpLayer {
                 complete_payload.extend(&frag.payload);
             }
             // Remove buffer
-            self.reassembly_buffers.retain(|b| !(b.src_ip == src && b.dst_ip == dst && b.identification == id));
+            self.reassembly_buffers
+                .retain(|b| !(b.src_ip == src && b.dst_ip == dst && b.identification == id));
             return Some(complete_payload);
         }
 
@@ -380,6 +399,13 @@ impl NetworkStack {
     }
 
     pub fn update_arp(&mut self, ip: u32, mac: [u8; 6]) {
-        self.arp_cache.insert(ip, ArpEntry { ip, mac, expiry: 0xFFFFFFFF });
+        self.arp_cache.insert(
+            ip,
+            ArpEntry {
+                ip,
+                mac,
+                expiry: 0xFFFFFFFF,
+            },
+        );
     }
 }

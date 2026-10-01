@@ -531,23 +531,9 @@ pub enum PackageFormat {
     Cabal,       // Haskell Cabal package (.cabal)
     JuliaPkg,    // Julia package (.jl)
     CRan,        // R CRAN package (.rpkg)
-    Brew,           // Homebrew formula (.brew)
-    Wasm,           // WebAssembly component (.wasm)
-    Oci,            // OCI container image (.oci)
-    Tazpkg,         // SliTaz Linux package (.tazpkg)
-    SingularitySif, // Singularity/Apptainer SIF container (.sif)
-    StampedeSlp,    // Stampede Linux package (.slp)
-    Winget,         // Windows Package Manager manifest (.winget)
-    Scoop,          // Windows Scoop manifest (.scoop)
-    Choco,          // Windows Chocolatey package (.choco)
-    Pixi,           // Conda/Pixi environment package (.pixi)
-    Nimble,         // Nim package manager spec (.nimble)
-    ZigPkg,         // Zig build package (.zig)
-    SwiftPkg,       // Swift Package Manager manifest (.swift)
-    DubPkg,         // D language Dub package (.dub)
-    Opam,           // OCaml OPAM package (.opam)
-    Shard,          // Crystal Shard package (.shard)
-    PltPkg,         // Racket PLT package (.plt)
+    Brew,        // Homebrew formula (.brew)
+    Wasm,        // WebAssembly component (.wasm)
+    Oci,         // OCI container image (.oci)
 }
 
 impl PackageFormat {
@@ -602,7 +588,10 @@ impl PackageFormat {
             Some(PackageFormat::OpenBsdPkg)
         } else if normalized == "tgz" || normalized == "tar.gz" || normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
             Some(PackageFormat::TarGz)
-        } else if normalized == "xz" || normalized == "tar.xz" || normalized.ends_with(".txz") || normalized.ends_with(".tar.xz") || normalized.ends_with(".xz") {
+        } else if normalized.ends_with(".txz")
+            || normalized.ends_with(".tar.xz")
+            || normalized.ends_with(".xz")
+        {
             Some(PackageFormat::Xz)
         } else if normalized.ends_with(".xbps") {
             Some(PackageFormat::Xbps)

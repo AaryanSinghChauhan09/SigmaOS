@@ -22,7 +22,7 @@ pub const DRM_IOCTL_GEM_CLOSE: u32 = 0x40086409;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DrmNodeType {
     PrimaryCard, // `/dev/dri/card0` - Modesetting + Display Output
-    RenderNode,  // `/dev/dri/renderD128` - Unprivileged Headless Compute / GPGPU / Vulkan / Offscreen
+    RenderNode, // `/dev/dri/renderD128` - Unprivileged Headless Compute / GPGPU / Vulkan / Offscreen
 }
 
 /// GEM (Graphics Execution Manager) Buffer Object
@@ -176,7 +176,10 @@ impl DrmKmsSubsystemEngine {
     }
 
     /// Submit Atomic KMS Commit State across all display CRTC pipelines
-    pub fn commit_atomic_kms_state(&mut self, commit: AtomicKmsCommitState) -> Result<(), &'static str> {
+    pub fn commit_atomic_kms_state(
+        &mut self,
+        commit: AtomicKmsCommitState,
+    ) -> Result<(), &'static str> {
         self.active_commit = Some(commit);
         Ok(())
     }
@@ -191,7 +194,13 @@ mod tests {
         let mut drm = DrmKmsSubsystemEngine::new();
 
         let handle = drm
-            .handle_drm_ioctl(DrmNodeType::PrimaryCard, DRM_IOCTL_MODE_CREATE_DUMB, 1920, 1080, 32)
+            .handle_drm_ioctl(
+                DrmNodeType::PrimaryCard,
+                DRM_IOCTL_MODE_CREATE_DUMB,
+                1920,
+                1080,
+                32,
+            )
             .unwrap();
         assert_eq!(handle, 1);
 
@@ -201,7 +210,13 @@ mod tests {
         assert_eq!(buf.pitch, 1920 * 4);
 
         let offset = drm
-            .handle_drm_ioctl(DrmNodeType::PrimaryCard, DRM_IOCTL_MODE_MAP_DUMB, handle, 0, 0)
+            .handle_drm_ioctl(
+                DrmNodeType::PrimaryCard,
+                DRM_IOCTL_MODE_MAP_DUMB,
+                handle,
+                0,
+                0,
+            )
             .unwrap();
         assert_eq!(offset, 0x0010_0000);
     }
@@ -220,7 +235,13 @@ mod tests {
         assert!(res.is_err());
 
         let handle = drm
-            .handle_drm_ioctl(DrmNodeType::RenderNode, DRM_IOCTL_MODE_CREATE_DUMB, 512, 512, 32)
+            .handle_drm_ioctl(
+                DrmNodeType::RenderNode,
+                DRM_IOCTL_MODE_CREATE_DUMB,
+                512,
+                512,
+                32,
+            )
             .unwrap();
         assert_eq!(handle, 1);
     }

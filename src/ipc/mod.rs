@@ -13,31 +13,30 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+pub mod async_io;
+pub mod bus;
+pub mod helenos_async;
 pub mod ipc;
+pub mod ipc_namespace;
 pub mod mechanism;
 pub mod message;
-pub mod unix_socket;
 pub mod signals;
-pub mod async_io;
-pub mod std_streams;
-pub mod ipc_namespace;
 pub mod sovereign_async_procedure_call;
-pub mod helenos_async;
-pub mod bus;
-pub use bus::{IpcBus, IpcMessage, BusName, BusEndpoint, MessageType};
+pub mod std_streams;
+pub mod unix_socket;
+pub use bus::{BusEndpoint, BusName, IpcBus, IpcMessage, MessageType};
 
 pub use ipc::{
-    IPCEndpoint, IPCError, IPCType, IPCInfo, IPCCapability,
-    Pipe, MessageQueue, SharedMemory, IPCManager,
-    SerenityIpcMessage, SerenitySharedBackingStore, SerenityIpcSandboxEnforcer,
+    IPCCapability, IPCEndpoint, IPCError, IPCInfo, IPCManager, IPCType, MessageQueue, Pipe,
+    SerenityIpcMessage, SerenityIpcSandboxEnforcer, SerenitySharedBackingStore, SharedMemory,
 };
 
 pub use unix_socket::{
-    UnixSocketType, UnixSocketAddress, UnixSocketState, UnixSocket, UnixSocketManager,
+    UnixSocket, UnixSocketAddress, UnixSocketManager, UnixSocketState, UnixSocketType,
 };
 
 pub use signals::{
-    SignalType, SignalDisposition, PendingSignal, ProcessSignalState, SignalDeliverySystem,
+    PendingSignal, ProcessSignalState, SignalDeliverySystem, SignalDisposition, SignalType,
 };
 
 pub use async_io::{
@@ -53,19 +52,18 @@ pub use std_streams::{
 };
 
 pub use ipc_namespace::{
-    IpcNamespace, IpcObjectRegistry, IpcObjectType, MessageQueueObject, SemaphoreObject,
-    SharedMemoryObject, IpcNamespaceStats, MessageQueueId, SemaphoreId, SharedMemoryId,
-    IpcObjectId,
+    IpcNamespace, IpcNamespaceStats, IpcObjectId, IpcObjectRegistry, IpcObjectType, MessageQueueId,
+    MessageQueueObject, SemaphoreId, SemaphoreObject, SharedMemoryId, SharedMemoryObject,
 };
 
-pub use sovereign_async_procedure_call::{
-    SovereignAsyncProcedureCallEngine,
-};
+pub use sovereign_async_procedure_call::SovereignAsyncProcedureCallEngine;
 
-pub use helenos_async::{HelenAsyncSystem, HelenMessage, HelenIpcError};
+pub use helenos_async::{HelenAsyncSystem, HelenIpcError, HelenMessage};
 
 pub mod dbus_sovereign;
-pub use dbus_sovereign::{SovereignDbusBus, DbusMessage, DbusMessageType, DbusValue, DbusMatchRule, DbusService, DbusName};
+pub use dbus_sovereign::{
+    DbusMatchRule, DbusMessage, DbusMessageType, DbusName, DbusService, DbusValue, SovereignDbusBus,
+};
 
 pub mod tech_media_std_streams_synthesis;
 pub use tech_media_std_streams_synthesis::{

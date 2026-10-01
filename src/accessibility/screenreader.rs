@@ -1,9 +1,9 @@
-use std::boxed::Box;
-use std::vec::Vec;
 /// OOP-based Screen Reader for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 816
 /// Implements text-to-speech and accessibility
 use core::sync::atomic::{AtomicUsize, Ordering};
+use std::boxed::Box;
+use std::vec::Vec;
 
 pub type VoiceID = usize;
 

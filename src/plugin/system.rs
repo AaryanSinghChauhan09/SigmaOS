@@ -1,11 +1,10 @@
 // OOP-based Plugin System for SigmaOS
 // Implements plugin management using OOP principles with traits and structs.
 
-
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::string::String;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Plugin ID
 pub type PluginID = usize;
@@ -466,7 +465,9 @@ pub struct PluginMarketplace {
 
 impl PluginMarketplace {
     pub fn new() -> Self {
-        Self { catalog: Vec::new() }
+        Self {
+            catalog: Vec::new(),
+        }
     }
 
     pub fn register_item(&mut self, item: MarketplaceItem) {
@@ -476,7 +477,10 @@ impl PluginMarketplace {
     pub fn search(&self, query: &str) -> Vec<MarketplaceItem> {
         let mut results = Vec::new();
         for item in &self.catalog {
-            if item.name.contains(query) || item.publisher.contains(query) || item.category.contains(query) {
+            if item.name.contains(query)
+                || item.publisher.contains(query)
+                || item.category.contains(query)
+            {
                 results.push(item.clone());
             }
         }
@@ -501,12 +505,8 @@ impl PluginMarketplace {
         for item in &self.catalog {
             if item.id == item_id {
                 let name_bytes = item.name.as_bytes();
-                let plugin = SimplePlugin::new(
-                    item.id,
-                    name_bytes,
-                    (1, 0, 0),
-                    PluginCapability::full(),
-                );
+                let plugin =
+                    SimplePlugin::new(item.id, name_bytes, (1, 0, 0), PluginCapability::full());
                 return manager.load_plugin(Box::new(plugin));
             }
         }
@@ -561,7 +561,9 @@ mod marketplace_tests {
 
         // Installation test into SimplePluginManager
         let mut manager = SimplePluginManager::new(ManagerCapability::full());
-        let installed_id = marketplace.install_plugin_to_manager(101, &mut manager).unwrap();
+        let installed_id = marketplace
+            .install_plugin_to_manager(101, &mut manager)
+            .unwrap();
         assert_eq!(installed_id, 101);
 
         let stats = manager.stats();

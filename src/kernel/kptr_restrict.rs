@@ -165,15 +165,40 @@ impl DmesgRestrictLevel {
         *self as u32
     }
 
-    pub fn as_str(&self) -> &str {
-        match self {
-            DmesgRestrictLevel::None => "none",
-            DmesgRestrictLevel::Restricted => "restricted",
+    /// Enable kernel module loading
+    pub fn enable_modules(&self) {
+        self.modules_disabled.store(0, Ordering::SeqCst);
+    }
+
+    /// Check if modules are disabled
+    pub fn are_modules_disabled(&self) -> bool {
+        self.modules_disabled.load(Ordering::SeqCst) == 1
+    }
+
+    /// Check if kernel pointer should be sanitized
+    pub fn should_sanitize_pointer(&self) -> bool {
+        matches!(
+            self.get_kptr_restrict(),
+            KptrRestrictLevel::Restricted | KptrRestrictLevel::Strict
+        )
+    }
+
+    /// Sanitize kernel pointer for display
+    pub fn sanitize_pointer(&self, ptr: usize) -> usize {
+        if self.should_sanitize_pointer() {
+            0 // Return null pointer
+        } else {
+            ptr
         }
     }
 
-    pub fn is_restricted(&self) -> bool {
-        matches!(self, DmesgRestrictLevel::Restricted)
+    /// Check if dmesg message should be displayed
+    pub fn should_show_dmesg(&self, level: u32) -> bool {
+        match self.get_dmesg_restrict() {
+            DmesgRestrictLevel::None => true,
+            DmesgRestrictLevel::Restricted => level >= 6, // Only show critical messages
+            DmesgRestrictLevel::Strict => level >= 7,     // Only show emergency messages
+        }
     }
 }
 
@@ -371,38 +396,61 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_kptr_restrict_level_from_u32() {
-        assert_eq!(KptrRestrictLevel::from_u32(0), KptrRestrictLevel::None);
-        assert_eq!(KptrRestrictLevel::from_u32(1), KptrRestrictLevel::Restricted);
-        assert_eq!(KptrRestrictLevel::from_u32(2), KptrRestrictLevel::Hidden);
+    fn test_kptr_restrict_levels() {
+        let mitigations = KernelSecurityMitigations::new();
+        assert_eq!(mitigations.get_kptr_restrict(), KptrRestrictLevel::None);
+
+        mitigations.set_kptr_restrict(KptrRestrictLevel::Strict);
+        assert_eq!(mitigations.get_kptr_restrict(), KptrRestrictLevel::Strict);
     }
 
     #[test]
-    fn test_kptr_restrict_level_properties() {
-        assert!(!KptrRestrictLevel::None.is_restricted());
-        assert!(KptrRestrictLevel::Restricted.is_restricted());
-        assert!(KptrRestrictLevel::Hidden.is_restricted());
-        assert!(KptrRestrictLevel::Hidden.is_hidden());
+    fn test_dmesg_restrict_levels() {
+        let mitigations = KernelSecurityMitigations::new();
+        assert_eq!(mitigations.get_dmesg_restrict(), DmesgRestrictLevel::None);
+
+        mitigations.set_dmesg_restrict(DmesgRestrictLevel::Restricted);
+        assert_eq!(
+            mitigations.get_dmesg_restrict(),
+            DmesgRestrictLevel::Restricted
+        );
     }
 
     #[test]
-    fn test_kptr_restrict_creation() {
-        let kptr = KptrRestrict::new();
-        assert_eq!(kptr.level, KptrRestrictLevel::Restricted);
+    fn test_pointer_sanitization() {
+        let mitigations = KernelSecurityMitigations::new();
+        let ptr = 0xdeadbeefusize;
+
+        // No restriction - pointer should not be sanitized
+        assert_eq!(mitigations.sanitize_pointer(ptr), ptr);
+
+        mitigations.set_kptr_restrict(KptrRestrictLevel::Strict);
+        assert_eq!(mitigations.sanitize_pointer(ptr), 0);
     }
 
     #[test]
-    fn test_kptr_restrict_set_level() {
-        let mut kptr = KptrRestrict::new();
-        kptr.set_level(KptrRestrictLevel::Hidden);
-        assert_eq!(kptr.level, KptrRestrictLevel::Hidden);
+    fn test_module_loading_control() {
+        let mitigations = KernelSecurityMitigations::new();
+        assert!(!mitigations.are_modules_disabled());
+
+        mitigations.disable_modules();
+        assert!(mitigations.are_modules_disabled());
+
+        mitigations.enable_modules();
+        assert!(!mitigations.are_modules_disabled());
     }
 
     #[test]
-    fn test_kptr_restrict_restrict_all() {
-        let mut kptr = KptrRestrict::new();
-        kptr.restrict_all();
-        assert_eq!(kptr.level, KptrRestrictLevel::Hidden);
+    fn test_dmesg_filtering() {
+        let mitigations = KernelSecurityMitigations::new();
+
+        // No restriction - all messages shown
+        assert!(mitigations.should_show_dmesg(1));
+        assert!(mitigations.should_show_dmesg(7));
+
+        mitigations.set_dmesg_restrict(DmesgRestrictLevel::Restricted);
+        assert!(!mitigations.should_show_dmesg(1)); // Info level filtered
+        assert!(mitigations.should_show_dmesg(6)); // Critical level shown
     }
 
     #[test]

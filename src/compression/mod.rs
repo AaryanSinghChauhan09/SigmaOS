@@ -3,17 +3,16 @@
 // Data compression algorithms & archive management
 // Zero-dependency implementation - no external libraries required
 
-
 pub mod archive;
 
 pub use archive::{
     ArchiveEntry, ArchiveFormat, ArchiveImage, ArchiveManager, CompressionCodec, EntryType,
 };
 
-use std::vec::Vec;
-use std::string::{String, ToString};
-use std::boxed::Box;
 use core::fmt;
+use std::boxed::Box;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Error type for the Compression module
 #[derive(Debug, Clone, PartialEq, Eq)]

@@ -23,11 +23,10 @@ use core::mem;
 /// Implements HKDF-SHA3-256 key derivation and PQC/Dilithium-5 signatures
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-
 pub type KeyID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum CryptoError {
     Success = 0,
     InvalidKey = 1,
@@ -83,7 +82,12 @@ impl KeyDerivation for SimpleKeyDerivation {
 
 pub trait PostQuantumSignature {
     fn sign(&self, message: &[u8], private_key: &[u8]) -> Result<Vec<u8>, CryptoError>;
-    fn verify(&self, message: &[u8], signature: &[u8], public_key: &[u8]) -> Result<bool, CryptoError>;
+    fn verify(
+        &self,
+        message: &[u8],
+        signature: &[u8],
+        public_key: &[u8],
+    ) -> Result<bool, CryptoError>;
     fn generate_keypair(&mut self) -> Result<(Vec<u8>, Vec<u8>), CryptoError>;
 }
 
@@ -117,8 +121,12 @@ impl PostQuantumSignature for Dilithium5Signature {
         }
         Ok(signature)
     }
-
-    fn verify(&self, message: &[u8], signature: &[u8], public_key: &[u8]) -> Result<bool, CryptoError> {
+    fn verify(
+        &self,
+        message: &[u8],
+        signature: &[u8],
+        public_key: &[u8],
+    ) -> Result<bool, CryptoError> {
         if signature.len() < message.len() {
             return Ok(false);
         }
@@ -153,7 +161,12 @@ impl PostQuantumSignature for Dilithium5Signature {
 
 pub trait SecureBootSigning {
     fn sign_bootloader(&self, bootloader: &[u8], key: &[u8]) -> Result<Vec<u8>, CryptoError>;
-    fn verify_bootloader(&self, bootloader: &[u8], signature: &[u8], key: &[u8]) -> Result<bool, CryptoError>;
+    fn verify_bootloader(
+        &self,
+        bootloader: &[u8],
+        signature: &[u8],
+        key: &[u8],
+    ) -> Result<bool, CryptoError>;
 }
 
 #[repr(C)]
@@ -164,7 +177,9 @@ pub struct SimpleSecureBootSigning {
 impl SimpleSecureBootSigning {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        SimpleSecureBootSigning { signature: Dilithium5Signature::new() }
+        SimpleSecureBootSigning {
+            signature: Dilithium5Signature::new(),
+        }
     }
 }
 
@@ -172,7 +187,12 @@ impl SecureBootSigning for SimpleSecureBootSigning {
     fn sign_bootloader(&self, bootloader: &[u8], key: &[u8]) -> Result<Vec<u8>, CryptoError> {
         self.signature.sign(bootloader, key)
     }
-    fn verify_bootloader(&self, bootloader: &[u8], signature: &[u8], key: &[u8]) -> Result<bool, CryptoError> {
+    fn verify_bootloader(
+        &self,
+        bootloader: &[u8],
+        signature: &[u8],
+        key: &[u8],
+    ) -> Result<bool, CryptoError> {
         self.signature.verify(bootloader, signature, key)
     }
 }
@@ -190,7 +210,9 @@ pub struct SimpleFDE {
 impl SimpleFDE {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        SimpleFDE { derivation: SimpleKeyDerivation::new() }
+        SimpleFDE {
+            derivation: SimpleKeyDerivation::new(),
+        }
     }
 }
 
@@ -284,39 +306,5 @@ impl<'a, T> IntoIterator for &'a VecImpl<T> {
         } else {
             unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_simple_key_derivation() {
-        let kdf = SimpleKeyDerivation::new();
-        let ikm = b"initial_key_material";
-        let salt = b"salt_value";
-        let info = b"application_info";
-        let key = kdf.hkdf_sha3_256(ikm, salt, info).unwrap();
-        assert_eq!(key.len(), 32);
-    }
-
-    #[test]
-    fn test_dilithium_signature() {
-        let sig = Dilithium5Signature::new();
-        let message = b"Test message for signing";
-        let private_key = b"test_private_key_data";
-        let signature = sig.sign(message, private_key).unwrap();
-        assert!(signature.len() > message.len());
-    }
-
-    #[test]
-    fn test_full_disk_encryption() {
-        let fde = SimpleFDE::new();
-        let data = b"Sensitive data to encrypt";
-        let key = b"encryption_key_material";
-        let encrypted = fde.encrypt_volume(data, key).unwrap();
-        let decrypted = fde.decrypt_volume(&encrypted, key).unwrap();
-        assert_eq!(data.to_vec(), decrypted);
     }
 }

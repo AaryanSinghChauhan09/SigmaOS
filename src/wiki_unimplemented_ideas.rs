@@ -69,8 +69,12 @@ impl SigmaOfficeSuiteEngine {
     }
 
     pub fn connect_collaborative_peer(&mut self, peer_id: &str) {
-        if !self.collaborative_peers_connected.contains(&String::from(peer_id)) {
-            self.collaborative_peers_connected.push(String::from(peer_id));
+        if !self
+            .collaborative_peers_connected
+            .contains(&String::from(peer_id))
+        {
+            self.collaborative_peers_connected
+                .push(String::from(peer_id));
         }
     }
 }
@@ -337,7 +341,8 @@ impl CalendarTaskManagerEngine {
     }
 
     pub fn export_icalendar_ics(&self) -> String {
-        let mut ics = String::from("BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//SigmaOS//NONSGML Calendar//EN\n");
+        let mut ics =
+            String::from("BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//SigmaOS//NONSGML Calendar//EN\n");
         for event in &self.events {
             ics.push_str(&format!(
                 "BEGIN:VEVENT\nSUMMARY:{}\nDTSTART:{}\nEND:VEVENT\n",
@@ -386,7 +391,13 @@ impl EmailClientEngine {
         }
     }
 
-    pub fn receive_email(&mut self, sender: &str, subject: &str, body: &str, encrypted: bool) -> u32 {
+    pub fn receive_email(
+        &mut self,
+        sender: &str,
+        subject: &str,
+        body: &str,
+        encrypted: bool,
+    ) -> u32 {
         let id = self.next_msg_id;
         self.next_msg_id += 1;
 
@@ -446,7 +457,13 @@ impl NativeVideoEditorEngine {
         self.video_tracks.len() - 1
     }
 
-    pub fn insert_clip(&mut self, track_idx: usize, clip_name: &str, start_ms: u64, duration_ms: u64) -> bool {
+    pub fn insert_clip(
+        &mut self,
+        track_idx: usize,
+        clip_name: &str,
+        start_ms: u64,
+        duration_ms: u64,
+    ) -> bool {
         if track_idx < self.video_tracks.len() {
             self.video_tracks[track_idx].push(VideoTrackClip {
                 clip_name: String::from(clip_name),
@@ -581,7 +598,8 @@ impl EnhancedCapabilitySystem {
             promise_name: String::from(promise),
             is_cheri_hardware_gated: cheri_gated,
         });
-        self.capability_audit_log.push(format!("GRANT: {} (CHERI={})", promise, cheri_gated));
+        self.capability_audit_log
+            .push(format!("GRANT: {} (CHERI={})", promise, cheri_gated));
     }
 
     pub fn check_capability(&self, promise: &str) -> bool {
@@ -617,7 +635,10 @@ impl AdvancedSandboxingEngine {
     }
 
     pub fn validate_process_sandbox_security(&self) -> bool {
-        self.network_ns_isolated && self.mount_ns_isolated && self.smep_active && self.cfi_integrity_active
+        self.network_ns_isolated
+            && self.mount_ns_isolated
+            && self.smep_active
+            && self.cfi_integrity_active
     }
 }
 
@@ -679,7 +700,9 @@ pub struct HardwareBackedPasswordManager {
 
 impl HardwareBackedPasswordManager {
     pub fn new() -> Self {
-        Self { entries: Vec::new() }
+        Self {
+            entries: Vec::new(),
+        }
     }
 
     /// Returns the number of entries stored by this manager.
@@ -746,7 +769,11 @@ impl SystemMonitorDashboardEngine {
         if self.historical_snapshots.is_empty() {
             return 0.0;
         }
-        let sum: f32 = self.historical_snapshots.iter().map(|s| s.cpu_percent).sum();
+        let sum: f32 = self
+            .historical_snapshots
+            .iter()
+            .map(|s| s.cpu_percent)
+            .sum();
         sum / self.historical_snapshots.len() as f32
     }
 }
@@ -1086,7 +1113,9 @@ impl SovereignFscryptAutofsStorageEngine {
     pub fn expire_idle_mounts(&mut self, current_time: u64, timeout_sec: u64) -> usize {
         let mut expired = 0;
         for trigger in self.autofs_triggers.values_mut() {
-            if trigger.is_mounted && current_time.saturating_sub(trigger.last_access_timestamp) >= timeout_sec {
+            if trigger.is_mounted
+                && current_time.saturating_sub(trigger.last_access_timestamp) >= timeout_sec
+            {
                 trigger.is_mounted = false;
                 expired += 1;
             }
@@ -1192,7 +1221,12 @@ mod tests {
     #[test]
     fn test_markdown_note_taking_engine() {
         let mut notes = MarkdownNoteTakingEngine::new();
-        notes.create_note("Work", "Architecture", "See [[SigmaFS_Design]] for details", &["rust", "os"]);
+        notes.create_note(
+            "Work",
+            "Architecture",
+            "See [[SigmaFS_Design]] for details",
+            &["rust", "os"],
+        );
         let found = notes.search_notes("Architecture");
         assert_eq!(found.len(), 1);
         assert_eq!(found[0].wikilinks, vec!["SigmaFS_Design"]);
@@ -1214,7 +1248,12 @@ mod tests {
     #[test]
     fn test_email_client_engine() {
         let mut email = EmailClientEngine::new("jules@sigma.os");
-        let _msg1 = email.receive_email("spammer@bot.com", "You WON!", "WINNER_LOTTERY click here", false);
+        let _msg1 = email.receive_email(
+            "spammer@bot.com",
+            "You WON!",
+            "WINNER_LOTTERY click here",
+            false,
+        );
         let _msg2 = email.receive_email("alice@sigma.os", "Release", "Build is ready", true);
 
         assert_eq!(email.messages[0].folder, "Spam");
@@ -1292,7 +1331,13 @@ mod tests {
         let pidfd = proc_eng.pidfd_open(1234);
         assert!(proc_eng.pidfd_send_signal(pidfd, 9));
         let procdesc = proc_eng.pdfork(1235, 0x07);
-        assert!(proc_eng.process_descriptors.get(&procdesc).unwrap().is_procdesc);
+        assert!(
+            proc_eng
+                .process_descriptors
+                .get(&procdesc)
+                .unwrap()
+                .is_procdesc
+        );
 
         proc_eng.set_subreaper(100, true);
         assert_eq!(proc_eng.reparent_orphan(2000), 100);
@@ -1312,7 +1357,10 @@ mod tests {
         let mut cfi_eng = SovereignKernelHardeningCfiEngine::new();
         cfi_eng.set_kptr_restrict(KptrRestrictLevel::ZeroNonRoot);
         assert_eq!(cfi_eng.sanitize_pointer(0xFFFFFFFF81000000, false), 0);
-        assert_eq!(cfi_eng.sanitize_pointer(0xFFFFFFFF81000000, true), 0xFFFFFFFF81000000);
+        assert_eq!(
+            cfi_eng.sanitize_pointer(0xFFFFFFFF81000000, true),
+            0xFFFFFFFF81000000
+        );
 
         cfi_eng.register_cfi_target(0xFFFFFFFF81200000, 0x1122334455667788);
         assert!(cfi_eng.validate_indirect_call(0xFFFFFFFF81200000, 0x1122334455667788));

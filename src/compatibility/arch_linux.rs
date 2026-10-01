@@ -1270,7 +1270,13 @@ impl SovereignMakepkgConfEngine {
             cxxflags: "-march=x86-64-v3 -O2 -pipe -fno-plt -fexceptions".to_string(),
             makeflags: "-j16".to_string(),
             pkgext: ".pkg.tar.zst".to_string(),
-            buildenv: vec!["!distcc".to_string(), "color".to_string(), "!ccache".to_string(), "check".to_string(), "sign".to_string()],
+            buildenv: vec![
+                "!distcc".to_string(),
+                "color".to_string(),
+                "!ccache".to_string(),
+                "check".to_string(),
+                "sign".to_string(),
+            ],
             integrity_checks: vec!["sha256".to_string()],
         }
     }
@@ -1293,7 +1299,9 @@ impl SovereignMakepkgConfEngine {
     }
 
     pub fn validate_optimization(&self) -> bool {
-        self.cflags.contains("-O2") || self.cflags.contains("-O3") || self.cflags.contains("-march=")
+        self.cflags.contains("-O2")
+            || self.cflags.contains("-O3")
+            || self.cflags.contains("-march=")
     }
 }
 
@@ -1317,7 +1325,11 @@ impl SovereignPacmanConfEngine {
             sig_level: "Required DatabaseOptional".to_string(),
             local_file_sig_level: "Optional".to_string(),
             hold_pkg: vec!["pacman".to_string(), "glibc".to_string()],
-            repositories: vec!["core".to_string(), "extra".to_string(), "multilib".to_string()],
+            repositories: vec![
+                "core".to_string(),
+                "extra".to_string(),
+                "multilib".to_string(),
+            ],
             parallel_downloads: 5,
         }
     }
@@ -1414,7 +1426,9 @@ mod tests {
 
     #[test]
     fn test_sovereign_makepkg_conf_engine() {
-        let conf = SovereignMakepkgConfEngine::parse_conf("CFLAGS=\"-march=x86-64-v3 -O3 -pipe\"\nMAKEFLAGS=\"-j8\"\nPKGEXT=\".pkg.tar.zst\"");
+        let conf = SovereignMakepkgConfEngine::parse_conf(
+            "CFLAGS=\"-march=x86-64-v3 -O3 -pipe\"\nMAKEFLAGS=\"-j8\"\nPKGEXT=\".pkg.tar.zst\"",
+        );
         assert!(conf.validate_optimization());
         assert_eq!(conf.makeflags, "-j8");
         assert_eq!(conf.pkgext, ".pkg.tar.zst");
@@ -1432,7 +1446,10 @@ mod tests {
         let mut chroot = SovereignArchChrootVfsEngine::new("/mnt/target");
         let mounts = chroot.prepare_system_vfs();
         assert_eq!(mounts.len(), 4);
-        assert_eq!(chroot.generate_chroot_command("pacman -Syu"), "arch-chroot /mnt/target pacman -Syu");
+        assert_eq!(
+            chroot.generate_chroot_command("pacman -Syu"),
+            "arch-chroot /mnt/target pacman -Syu"
+        );
     }
 
     #[test]
@@ -1754,7 +1771,11 @@ mod tests {
         keyring.init_keyring();
         assert!(keyring.is_initialized);
 
-        keyring.import_pgp_key("0x1234567890ABCDEF", "Arch Linux Master Key", PgpTrustLevel::Ultimate);
+        keyring.import_pgp_key(
+            "0x1234567890ABCDEF",
+            "Arch Linux Master Key",
+            PgpTrustLevel::Ultimate,
+        );
         assert!(keyring.verify_key_trust("0x1234567890ABCDEF"));
 
         keyring.revoke_pgp_key("0x1234567890ABCDEF");
@@ -1787,7 +1808,12 @@ mod tests {
     #[test]
     fn test_aur_rpc_client() {
         let mut aur = ArchUserRepositoryRpcClientEngine::new();
-        aur.register_mock_aur_package("yay", "12.3.0", "Yet another Yogurt - AUR Helper", vec!["go", "git"]);
+        aur.register_mock_aur_package(
+            "yay",
+            "12.3.0",
+            "Yet another Yogurt - AUR Helper",
+            vec!["go", "git"],
+        );
 
         let pkg = aur.search_aur_package("yay").unwrap();
         assert_eq!(pkg.version, "12.3.0");
@@ -1906,7 +1932,11 @@ impl ArchReflectorMirrorlistEngine {
         });
     }
 
-    pub fn rank_mirrors(&self, target_country: &str, min_speed_mbps: f32) -> Vec<ReflectorMirrorRecord> {
+    pub fn rank_mirrors(
+        &self,
+        target_country: &str,
+        min_speed_mbps: f32,
+    ) -> Vec<ReflectorMirrorRecord> {
         let mut candidates: Vec<ReflectorMirrorRecord> = self
             .mirrors
             .iter()
@@ -1985,7 +2015,13 @@ impl ArchUserRepositoryRpcClientEngine {
         }
     }
 
-    pub fn register_mock_aur_package(&mut self, name: &str, ver: &str, desc: &str, deps: Vec<&str>) {
+    pub fn register_mock_aur_package(
+        &mut self,
+        name: &str,
+        ver: &str,
+        desc: &str,
+        deps: Vec<&str>,
+    ) {
         self.mock_aur_database.insert(
             name.to_string(),
             AurRpcPackageRecord {

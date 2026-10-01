@@ -4,12 +4,11 @@
 //! including breakpoints, watchpoints, stack tracing, and memory inspection.
 //! Replicates Debian-style debug symbols packages (.dbgsym) and Build ID lookup systems.
 
-
+use std::format;
 use std::string::String;
 use std::string::ToString;
-use std::vec::Vec;
 use std::vec;
-use std::format;
+use std::vec::Vec;
 
 pub mod breakpoint;
 
@@ -18,8 +17,8 @@ pub use breakpoint::{Breakpoint, BreakpointID, BreakpointType, DebuggerError, Si
 /// Represents a Debian-style debug symbol package containing Build ID mappings
 #[derive(Debug, Clone)]
 pub struct DebianDbgsymPackage {
-    pub build_id: String,           // Unique ELF .note.gnu.build-id hash
-    pub package_name: String,       // Target binary name, e.g. "nano"
+    pub build_id: String,     // Unique ELF .note.gnu.build-id hash
+    pub package_name: String, // Target binary name, e.g. "nano"
     pub symbols_map: Vec<(u64, String, String, u32)>, // Address -> (Function, File, Line)
 }
 
@@ -33,7 +32,8 @@ impl DebianDbgsymPackage {
     }
 
     pub fn register_symbol(&mut self, addr: u64, func: &str, file: &str, line: u32) {
-        self.symbols_map.push((addr, func.to_string(), file.to_string(), line));
+        self.symbols_map
+            .push((addr, func.to_string(), file.to_string(), line));
     }
 }
 
@@ -160,11 +160,19 @@ impl Debugger {
         breakpoint_type: BreakpointType,
     ) -> Result<(), &'static str> {
         // Check if breakpoint already exists
-        if self.breakpoints.iter().any(|bp| bp.address() == address as usize) {
+        if self
+            .breakpoints
+            .iter()
+            .any(|bp| bp.address() == address as usize)
+        {
             return Err("Breakpoint already exists at this address");
         }
 
-        let breakpoint = SimpleBreakpoint::new(self.breakpoints.len() + 1, address as usize, breakpoint_type);
+        let breakpoint = SimpleBreakpoint::new(
+            self.breakpoints.len() + 1,
+            address as usize,
+            breakpoint_type,
+        );
         self.breakpoints.push(breakpoint);
         Ok(())
     }
@@ -172,7 +180,8 @@ impl Debugger {
     /// Remove a breakpoint
     pub fn remove_breakpoint(&mut self, address: u64) -> Result<(), &'static str> {
         let original_len = self.breakpoints.len();
-        self.breakpoints.retain(|bp| bp.address() != address as usize);
+        self.breakpoints
+            .retain(|bp| bp.address() != address as usize);
 
         if self.breakpoints.len() == original_len {
             return Err("Breakpoint not found at this address");
@@ -464,13 +473,19 @@ mod tests {
         assert!(!debugger.is_debian_dbgsym_compliant(&invalid_dbgsym));
 
         // Resolve instruction address to debug symbol StackFrame
-        let frame = debugger.resolve_address_to_symbol(&build_id, 0x1040).unwrap();
+        let frame = debugger
+            .resolve_address_to_symbol(&build_id, 0x1040)
+            .unwrap();
         assert_eq!(frame.function_name.unwrap(), "main");
         assert_eq!(frame.file_name.unwrap(), "nano.c");
         assert_eq!(frame.line_number.unwrap(), 42);
 
         // Fail to resolve address with invalid build id or wrong address
-        assert!(debugger.resolve_address_to_symbol("wrong_id", 0x1040).is_none());
-        assert!(debugger.resolve_address_to_symbol(&build_id, 0x9999).is_none());
+        assert!(debugger
+            .resolve_address_to_symbol("wrong_id", 0x1040)
+            .is_none());
+        assert!(debugger
+            .resolve_address_to_symbol(&build_id, 0x9999)
+            .is_none());
     }
 }

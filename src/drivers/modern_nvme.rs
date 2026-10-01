@@ -53,14 +53,17 @@ impl NvmeSubmissionQueue {
             head: 0,
             tail: 0,
             phase: true,
-            commands: vec![NvmeCmd {
-                opcode: 0,
-                nsid: 0,
-                prp1: 0,
-                prp2: 0,
-                cdw10: 0,
-                cdw11: 0,
-            }; size],
+            commands: vec![
+                NvmeCmd {
+                    opcode: 0,
+                    nsid: 0,
+                    prp1: 0,
+                    prp2: 0,
+                    cdw10: 0,
+                    cdw11: 0,
+                };
+                size
+            ],
         }
     }
 
@@ -169,8 +172,6 @@ pub struct AhciCommandHeader {
 }
 
 pub type AhciCommandHeaderV3 = AhciCommandHeader;
-
-
 
 /// Simulated AHCI Port MMIO Register Map
 pub struct AhciPort {
@@ -383,11 +384,21 @@ impl ModernNvmeDriver {
     }
 
     /// Create I/O queue pair
-    pub fn create_io_queue(&mut self, sq_id: u16, cq_id: u16, interrupt_vector: u16) -> Result<(), &'static str> {
+    pub fn create_io_queue(
+        &mut self,
+        sq_id: u16,
+        cq_id: u16,
+        interrupt_vector: u16,
+    ) -> Result<(), &'static str> {
         if self.queue_pairs.len() >= 65535 {
             return Err("Maximum number of queues reached");
         }
-        let qp = NvmeQueuePair::new(sq_id, cq_id, self.max_queue_depth as usize, interrupt_vector);
+        let qp = NvmeQueuePair::new(
+            sq_id,
+            cq_id,
+            self.max_queue_depth as usize,
+            interrupt_vector,
+        );
         self.queue_pairs.push(qp);
         Ok(())
     }

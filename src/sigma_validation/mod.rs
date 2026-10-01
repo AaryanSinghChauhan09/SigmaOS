@@ -3,11 +3,10 @@
 // System validation and verification
 // Zero-dependency implementation - no external libraries required
 
-
-use std::vec::Vec;
-use std::string::{String, ToString};
-use std::boxed::Box;
 use core::fmt;
+use std::boxed::Box;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Error type for the SigmaValidation module
 #[derive(Debug, Clone, PartialEq, Eq)]

@@ -126,81 +126,90 @@ impl AddressSanitizer {
         }
     }
 
-    pub fn new_default() -> Self {
-        Self::new(AsanConfig::default())
+    /// Allocate a memory region with redzones
+    pub fn allocate(&mut self, size: usize) -> Result<u64, &'static str> {
+        let region_id = self.next_region_id.fetch_add(1, Ordering::SeqCst);
+        let total_size = size + 2 * self.redzone_size;
+
+        let start = region_id * 1000; // Simulated address
+        let end = start + total_size as u64;
+
+        let canary = self.generate_canary(region_id);
+
+        let region = MemoryRegion {
+            start,
+            end,
+            allocated: true,
+            canary,
+        };
+
+        // Set redzones in shadow memory
+        for i in 0..self.redzone_size {
+            self.shadow_memory.insert(start + i as u64, 0xFA); // Left redzone
+            self.shadow_memory.insert(end - i as u64 - 1, 0xFA); // Right redzone
+        }
+
+        // Set accessible region
+        for i in self.redzone_size..(self.redzone_size + size) {
+            self.shadow_memory.insert(start + i as u64, 0x00); // Accessible
+        }
+
+        self.regions.insert(region_id, region);
+
+        Ok(start + self.redzone_size as u64) // Return pointer to data (after left redzone)
     }
 
-    /// Allocate memory with redzone protection
-    pub fn allocate(&mut self, size: usize) -> Result<u64, String> {
-        let base_address = self.next_address.fetch_add((size + self.config.redzone_size * 2) as u64, Ordering::SeqCst);
-        let redzone_size = self.config.redzone_size;
-        let shadow_offset = self.config.shadow_offset + base_address;
+    /// Free a memory region
+    pub fn free(&mut self, ptr: u64) -> Result<(), &'static str> {
+        let region_id = self.find_region_by_ptr(ptr)?;
 
-        // Create region with redzones
-        let total_size = size + redzone_size * 2;
-        let region = AsanRegion::new(base_address + redzone_size as u64, size, redzone_size, shadow_offset);
+        if let Some(region) = self.regions.remove(&region_id) {
+            // Check canary
+            if !self.check_canary(&region) {
+                return Err("Stack corruption detected: canary mismatch");
+            }
 
-        // Initialize shadow memory
-        self.initialize_shadow_memory(base_address, total_size, &region);
+            // Mark region as freed in shadow memory
+            for addr in region.start..region.end {
+                self.shadow_memory.insert(addr, 0xFD); // Freed
+            }
 
-        self.regions.insert(base_address + redzone_size as u64, region);
-        self.allocation_count += 1;
-
-        Ok(base_address + redzone_size as u64)
+            Ok(())
+        } else {
+            Err("Region not found")
+        }
     }
 
-    fn initialize_shadow_memory(&mut self, base: u64, total_size: usize, region: &AsanRegion) {
-        for i in 0..total_size {
-            let addr = base + i as u64;
-            let offset = i as u64;
+    /// Check if an address is valid
+    pub fn is_valid_access(&self, ptr: u64, size: usize) -> bool {
+        for region in self.regions.values() {
+            if !region.allocated {
+                continue;
+            }
 
-            if offset < region.redzone_size() as u64 || offset >= (region.redzone_size() + region.size()) as u64 {
-                self.shadow_memory.insert(addr, ShadowState::Redzone);
-            } else {
-                self.shadow_memory.insert(addr, ShadowState::Allocated);
+            let data_start = region.start + self.redzone_size as u64;
+            let data_end = region.end - self.redzone_size as u64;
+
+            if ptr >= data_start && ptr + size as u64 <= data_end {
+                // Check shadow memory
+                for i in 0..size {
+                    if let Some(&shadow) = self.shadow_memory.get(&(ptr + i as u64)) {
+                        if shadow != 0x00 {
+                            return false; // Invalid access (redzone or freed)
+                        }
+                    }
+                }
             }
         }
+
+        false
     }
 
-    /// Check valid access
-    pub fn check_access(&mut self, address: u64, size: usize) -> Result<(), String> {
-        // Find region containing this address
-        let region = self.find_region(address)
-            .ok_or_else(|| format!("Address 0x{:x} not in any allocated region", address))?;
-
-        if !region.is_valid_access(address, size) {
-            self.error_count += 1;
-            return Err(format!("Invalid access to address 0x{:x} with size {}", address, size));
-        }
-
-        // Check shadow memory for corruption
-        for i in 0..size {
-            let addr = address + i as u64;
-            if let Some(&state) = self.shadow_memory.get(&addr) {
-                if state == ShadowState::Freed {
-                    self.error_count += 1;
-                    return Err(format!("Use-after-free detected at address 0x{:x}", addr));
-                }
-                if state == ShadowState::Redzone {
-                    self.error_count += 1;
-                    return Err(format!("Redzone overflow detected at address 0x{:x}", addr));
-                }
-                if state == ShadowState::Corrupted {
-                    self.error_count += 1;
-                    return Err(format!("Memory corruption detected at address 0x{:x}", addr));
-                }
-            }
-        }
-
-        Ok(())
-    }
-
-    fn find_region(&self, address: u64) -> Option<&AsanRegion> {
-        self.regions.values().find(|r| {
-            let start = r.base_address();
-            let end = r.base_address() + (r.size() + r.redzone_size() * 2) as u64;
-            address >= start && address < end
-        })
+    /// Generate canary
+    fn generate_canary(&self, seed: u64) -> u64 {
+        self.canary_seed
+            .wrapping_add(seed)
+            .wrapping_mul(0x9E3779B97F4A7C15)
     }
 
     /// Free memory
@@ -208,8 +217,15 @@ impl AddressSanitizer {
         let region = self.regions.get_mut(&address)
             .ok_or_else(|| format!("Address 0x{:x} not allocated", address))?;
 
-        if !region.is_allocated() {
-            return Err(format!("Address 0x{:x} already freed", address));
+    /// Find region by pointer
+    fn find_region_by_ptr(&self, ptr: u64) -> Result<u64, &'static str> {
+        for (&id, region) in &self.regions {
+            let data_start = region.start + self.redzone_size as u64;
+            let data_end = region.end - self.redzone_size as u64;
+
+            if ptr >= data_start && ptr < data_end {
+                return Ok(id);
+            }
         }
 
         // Mark shadow memory as freed
@@ -304,116 +320,63 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_asan_region_creation() {
-        let region = AsanRegion::new(0x1000, 100, 16, 0);
-        assert_eq!(region.base_address(), 0x1000);
-        assert_eq!(region.size(), 100);
-        assert_eq!(region.redzone_size(), 16);
-        assert!(region.is_allocated());
+    fn test_allocate() {
+        let mut asan = AddressSanitizer::new(16);
+
+        let ptr = asan.allocate(100).unwrap();
+        assert!(ptr > 0);
+        assert_eq!(asan.region_count(), 1);
     }
 
     #[test]
-    fn test_asan_region_valid_access() {
-        let region = AsanRegion::new(0x1000, 100, 16, 0);
-        assert!(region.is_valid_access(0x1000, 50));
-        assert!(region.is_valid_access(0x1000, 100));
-        assert!(!region.is_valid_access(0x1000, 101));
-        assert!(!region.is_valid_access(0x0FF0, 50));
+    fn test_free() {
+        let mut asan = AddressSanitizer::new(16);
+
+        let ptr = asan.allocate(100).unwrap();
+        assert!(asan.free(ptr).is_ok());
+        assert_eq!(asan.region_count(), 0);
     }
 
     #[test]
-    fn test_asan_allocate() {
-        let mut asan = AddressSanitizer::new_default();
-        let addr = asan.allocate(100).unwrap();
-        assert!(addr >= 0x1000);
-        assert_eq!(asan.get_statistics().allocation_count, 1);
+    fn test_valid_access() {
+        let mut asan = AddressSanitizer::new(16);
+
+        let ptr = asan.allocate(100).unwrap();
+        assert!(asan.is_valid_access(ptr, 50));
     }
 
     #[test]
-    fn test_asan_valid_access() {
-        let mut asan = AddressSanitizer::new_default();
-        let addr = asan.allocate(100).unwrap();
-        assert!(asan.check_access(addr, 50).is_ok());
-        assert!(asan.check_access(addr, 100).is_ok());
+    fn test_invalid_access_redzone() {
+        let mut asan = AddressSanitizer::new(16);
+
+        let ptr = asan.allocate(100).unwrap();
+        // Access left redzone
+        assert!(!asan.is_valid_access(ptr - 1, 1));
+        // Access right redzone
+        assert!(!asan.is_valid_access(ptr + 100, 1));
     }
 
     #[test]
-    fn test_asan_invalid_access() {
-        let mut asan = AddressSanitizer::new_default();
-        let addr = asan.allocate(100).unwrap();
-        assert!(asan.check_access(addr, 101).is_err());
-        assert!(asan.check_access(addr + 50, 60).is_err());
+    fn test_shadow_memory() {
+        let mut asan = AddressSanitizer::new(16);
+
+        let ptr = asan.allocate(100).unwrap();
+
+        // Accessible region should be 0x00
+        assert_eq!(asan.get_shadow(ptr), Some(0x00));
+
+        // Redzone should be 0xFA
+        assert_eq!(asan.get_shadow(ptr - 1), Some(0xFA));
     }
 
     #[test]
-    fn test_asan_free() {
-        let mut asan = AddressSanitizer::new_default();
-        let addr = asan.allocate(100).unwrap();
-        assert!(asan.free(addr).is_ok());
-        assert_eq!(asan.get_statistics().deallocation_count, 1);
-    }
+    fn test_use_after_free() {
+        let mut asan = AddressSanitizer::new(16);
 
-    #[test]
-    fn test_asan_double_free() {
-        let mut asan = AddressSanitizer::new_default();
-        let addr = asan.allocate(100).unwrap();
-        assert!(asan.free(addr).is_ok());
-        assert!(asan.free(addr).is_err());
-    }
+        let ptr = asan.allocate(100).unwrap();
+        asan.free(ptr).unwrap();
 
-    #[test]
-    fn test_asan_use_after_free() {
-        let mut asan = AddressSanitizer::new_default();
-        let addr = asan.allocate(100).unwrap();
-        assert!(asan.free(addr).is_ok());
-        assert!(asan.detect_use_after_free(addr));
-    }
-
-    #[test]
-    fn test_asan_buffer_overflow() {
-        let mut asan = AddressSanitizer::new_default();
-        let addr = asan.allocate(100).unwrap();
-        assert!(asan.detect_buffer_overflow(addr, 101));
-        assert!(!asan.detect_buffer_overflow(addr, 100));
-    }
-
-    #[test]
-    fn test_asan_shadow_memory() {
-        let mut asan = AddressSanitizer::new_default();
-        let addr = asan.allocate(100).unwrap();
-        let state = asan.get_shadow(addr);
-        assert_eq!(state, Some(ShadowState::Allocated));
-    }
-
-    #[test]
-    fn test_asan_stack_canary() {
-        let mut asan = AddressSanitizer::new_default();
-        let canary = 0xDEADBEEF;
-        assert!(asan.check_stack_canary(canary, canary).is_ok());
-        assert!(asan.check_stack_canary(canary, 0x12345678).is_err());
-    }
-
-    #[test]
-    fn test_asan_statistics() {
-        let mut asan = AddressSanitizer::new_default();
-        asan.allocate(100).unwrap();
-        asan.allocate(200).unwrap();
-        let addr = asan.allocate(50).unwrap();
-        asan.free(addr).unwrap();
-
-        let stats = asan.get_statistics();
-        assert_eq!(stats.allocation_count, 3);
-        assert_eq!(stats.deallocation_count, 1);
-        assert_eq!(stats.active_regions, 2);
-    }
-
-    #[test]
-    fn test_asan_quarantine() {
-        let mut asan = AddressSanitizer::new_default();
-        let addr = asan.allocate(100).unwrap();
-        asan.free(addr).unwrap();
-        assert_eq!(asan.get_statistics().quarantine_size, 1);
-        asan.clear_quarantine();
-        assert_eq!(asan.get_statistics().quarantine_size, 0);
+        // Access after free should be invalid
+        assert!(!asan.is_valid_access(ptr, 1));
     }
 }

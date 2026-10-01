@@ -4,10 +4,9 @@
 use core::cell::{Cell, RefCell};
 use core::sync::atomic::AtomicBool;
 
-
+use crate::kernel::architecture::CpuArchitectureClass;
 use std::boxed::Box;
 use std::vec::Vec;
-use crate::kernel::architecture::CpuArchitectureClass;
 
 // 1. Singly, Sequenced, and Circular Doubly Linked Lists
 
@@ -64,7 +63,6 @@ impl<T> CircularDoublyLinkedList<T> {
 }
 
 // 2. Scheduler SystemThread, WorkItems, APCs
-
 
 pub struct SystemThread {
     pub thread_id: usize,

@@ -258,7 +258,10 @@ impl KernelAslrEntropyEngine {
     }
 
     fn next_prng(&mut self) -> u64 {
-        self.seed = self.seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+        self.seed = self
+            .seed
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1442695040888963407);
         self.seed
     }
 
