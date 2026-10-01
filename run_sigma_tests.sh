@@ -339,6 +339,13 @@ if [ -f "src/package/sovereign_distro_package_advancements_v9.rs" ]; then
     ./build/sovereign_advancements_v9_test
 fi
 
+if [ -f "src/package/sovereign_distro_package_advancements_v10.rs" ]; then
+    echo "Running Sovereign Distro Package Advancements Suite V10 test suite..."
+    mkdir -p build
+    rustc --test src/package/sovereign_distro_package_advancements_v10.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v10_test
+    ./build/sovereign_advancements_v10_test
+fi
+
 if [ -f "src/package/sovereign_distro_package_master_suite.rs" ]; then
     echo "Running Sovereign Distro Package Master Suite test suite..."
     mkdir -p build

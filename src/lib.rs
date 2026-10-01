@@ -63,8 +63,8 @@ pub mod storage;
 pub mod thread;
 pub mod system;
 pub use package::{
-    SovereignDistroPackageAdvancementsSuiteV9, SovereignUniversalPackageFormatMasterEngine,
-    UniversalPackageFormatKind,
+    SovereignDistroPackageAdvancementsSuiteV10, SovereignDistroPackageAdvancementsSuiteV9,
+    SovereignUniversalPackageFormatMasterEngine, UniversalPackageFormatKind,
 };
 pub use sigpkg::{
     SovereignUniversalPackageManagerInteropEngine, SovereignUniversalPackageTranslationBridge,
