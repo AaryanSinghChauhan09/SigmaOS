@@ -530,7 +530,32 @@ pub enum PackageFormat {
     Crux,       // CRUX Linux (.crux / .pkgfile)
     Drpm,       // Delta RPM (.drpm)
     Stratum,    // Bedrock Linux Stratum (.stratum)
-}
+    OpenBsdPkg,
+    FreeBsdPkg,
+    NetBsdPkgsrc,
+    MacOsApp,
+    WindowsMsi,
+    AndroidApk,
+    IosIpa,
+    Wheel,
+    SolarisIps,
+    Opkg,
+    Nupkg,
+    Gem,
+    Crate,
+    Vcpkg,
+    Conan,
+    Spack,
+    ZypperSpec,
+    Portage,
+    DnfRpm,
+    PacmanPkg,
+    AptDeb,
+    AlpineApk,
+    VoidXbps,
+    NativeSignedPkg,
+    OciContainer,
+    SystemdSysext,}
 
 impl PackageFormat {
     pub fn from_filename(filename: &str) -> Option<Self> {

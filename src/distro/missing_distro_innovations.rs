@@ -1342,7 +1342,6 @@ impl Default for NetBsdPkgsrcEngine {
         self.active_slot = fallback_slot;
         fallback_slot
     }
-}
 
 impl Default for SteamOsAtomicAbImageUpdateEngine {
     fn default() -> Self {

@@ -21,7 +21,9 @@ mod peripheral_fallback {
         Off,
         LowPower,
         FullOn,
-    }
+    Standby,
+    Sleep,
+    Unknown,}
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum DeviceGeneration {

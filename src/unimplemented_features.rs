@@ -22,7 +22,10 @@ pub enum PowerState {
     D1LowPower,
     D2LowPower,
     D3Off,
-}
+    FullOn,
+    Standby,
+    Sleep,
+    Unknown,}
 
 pub trait BareMetalUnifiedPeripheral {
     fn initialize(&mut self) -> Result<(), &'static str>;

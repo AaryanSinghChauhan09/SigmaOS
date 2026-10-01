@@ -670,11 +670,6 @@ impl TilingWindowManager {
         }
     }
 
-    /// Rearrange workspace based on layout
-
-
-
-
 
 
 
