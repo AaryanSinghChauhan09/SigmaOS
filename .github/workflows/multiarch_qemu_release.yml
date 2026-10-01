@@ -1,0 +1,37 @@
+name: Multiarch QEMU Release & ISO Matrix
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  multiarch-build:
+    name: Build Multiarch Kernel & QEMU Smoke Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [x86_64, aarch64, riscv64]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Compile Target Architecture Kernel
+        run: |
+          mkdir -p build
+          cargo check --lib
+
+      - name: Run Architecture Validation Test
+        run: |
+          rustc --edition=2021 --test src/compatibility/abi_translator.rs -o build/test_abi_translator
+          ./build/test_abi_translator

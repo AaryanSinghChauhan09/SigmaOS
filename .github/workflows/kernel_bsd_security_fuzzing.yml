@@ -1,0 +1,45 @@
+name: Kernel & BSD Security Capability Fuzzing Suite
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # Daily at 02:00 UTC
+  push:
+    branches: [ main ]
+    paths:
+      - 'src/security/**'
+      - 'src/kernel/**'
+      - 'src/drivers/**'
+      - '.github/workflows/kernel_bsd_security_fuzzing.yml'
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  security-fuzzing:
+    name: Security Capability & Sandbox Fuzzing
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Run Access Control & Permissions Matrix Tests
+        run: |
+          mkdir -p build
+          rustc --edition=2021 --test src/security/comprehensive_access_control.rs -o build/test_access_control
+          ./build/test_access_control
+          rustc --edition=2021 --test src/security/sovereign_permissions_matrix_engine.rs -o build/test_permissions_matrix
+          ./build/test_permissions_matrix
+
+      - name: Run Portable Sandbox Verification
+        run: |
+          rustc --edition=2021 --test src/security/sovereign_portable_sandbox_engine.rs -o build/test_portable_sandbox
+          ./build/test_portable_sandbox

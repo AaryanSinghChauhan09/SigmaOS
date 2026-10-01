@@ -46,7 +46,8 @@ pub mod security;
 pub mod shell;
 pub mod sigpkg;
 pub use package::{
-    SovereignUniversalPackageFormatMasterEngine, UniversalPackageFormatKind,
+    SovereignUniversalMultiDistroPmGatewayMasterSuite, SovereignUniversalPackageFormatMasterEngine,
+    UniversalMultiDistroFormat, UniversalPackageFormatKind,
 };
 pub use sigpkg::{
     SovereignUniversalPackageManagerInteropEngine, SovereignUniversalPackageTranslationBridge,
@@ -94,6 +95,7 @@ pub use distro::sovereign_media_and_distro_unimplemented_innovations::*;
 pub use distro::sovereign_2050_distro_supremacy_engine::*;
 pub use distro::sovereign_2055_distro_supremacy_engine::*;
 pub use distro::sovereign_2060_distro_supremacy_engine::*;
+pub use distro::sovereign_2065_distro_supremacy_engine::*;
 pub use distro::sovereign_linux_bsd_ecosystem_pinnacle_suite::*;
 pub mod sovereign_wiki_master_engine;
 pub use sovereign_wiki_master_engine::*;
