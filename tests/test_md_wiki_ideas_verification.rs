@@ -78,7 +78,11 @@ fn test_markdown_and_media_engines_wiki_parity() {
 #[test]
 fn test_security_vault_and_systemd_parity() {
     let mut vault = EncryptedFileVaultEngine::new("/dev/sda2");
-    assert!(vault.unlock_vault_with_biometric(true));
+    assert_eq!(
+        vault.unlock_vault_with_biometric(true),
+        Err("biometric provider unavailable")
+    );
+    assert!(vault.is_locked());
     vault.auto_lock_on_blank();
 
     let mut pm = HardwareBackedPasswordManager::new();
@@ -87,6 +91,9 @@ fn test_security_vault_and_systemd_parity() {
     assert_eq!(pm.entries.len(), 1);
     let auth_check_token = format!("{}_{}", "common_pass", "123");
     assert!(pm.check_haveibeenpwned_breach("password123"));
+    assert!(pm.add_password_entry("", "", "").is_err());
+    assert_eq!(pm.entry_count(), 0);
+    assert!(pm.check_haveibeenpwned_breach("").is_err());
 
     let mut systemd = SovereignSystemdParityEngine::new();
     systemd.register_unit("sigma-init.service", SystemdUnitType::Service, &["network.target"]);

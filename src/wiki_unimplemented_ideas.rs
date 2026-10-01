@@ -633,26 +633,28 @@ impl Default for AdvancedSandboxingEngine {
 
 pub struct EncryptedFileVaultEngine {
     pub luks2_container_path: String,
-    pub biometric_unlock_enabled: bool,
-    pub is_locked: bool,
+    is_locked: bool,
 }
 
 impl EncryptedFileVaultEngine {
     pub fn new(path: &str) -> Self {
         Self {
             luks2_container_path: String::from(path),
-            biometric_unlock_enabled: true,
             is_locked: true,
         }
     }
 
-    pub fn unlock_vault_with_biometric(&mut self, fingerprint_matched: bool) -> bool {
-        if fingerprint_matched && self.biometric_unlock_enabled {
-            self.is_locked = false;
-            true
-        } else {
-            false
-        }
+    /// Returns whether this model remains locked.
+    pub fn is_locked(&self) -> bool {
+        self.is_locked
+    }
+
+    pub fn unlock_vault_with_biometric(
+        &mut self,
+        _fingerprint_matched: bool,
+    ) -> Result<bool, &'static str> {
+        // A caller-provided boolean is not a trusted biometric provider result.
+        Err("biometric provider unavailable")
     }
 
     pub fn auto_lock_on_blank(&mut self) {
@@ -672,7 +674,7 @@ pub struct PasswordEntry {
 }
 
 pub struct HardwareBackedPasswordManager {
-    pub entries: Vec<PasswordEntry>,
+    entries: Vec<PasswordEntry>,
 }
 
 impl HardwareBackedPasswordManager {
@@ -680,22 +682,25 @@ impl HardwareBackedPasswordManager {
         Self { entries: Vec::new() }
     }
 
-    pub fn add_password_entry(&mut self, domain: &str, user: &str, password: &str) {
-        let mut encrypted = Vec::from(b"TPM2_SEALED:");
-        encrypted.extend_from_slice(password.as_bytes());
-        self.entries.push(PasswordEntry {
-            domain: String::from(domain),
-            username: String::from(user),
-            encrypted_password_tpm2: encrypted,
-        });
+    /// Returns the number of entries stored by this manager.
+    pub fn entry_count(&self) -> usize {
+        self.entries.len()
     }
 
-    pub fn check_haveibeenpwned_breach(&self, password: &str) -> bool {
-        // NOTE: In production, query the HIBP k-anonymity API with SHA-1 prefix.
-        // These are commonly-breached passwords used for offline simulation only.
-        // Production code must use: https://api.pwnedpasswords.com/range/{prefix}
-        const COMMON_BREACHED: &[&str] = &["password123", "123456", "qwerty", "password"];
-        COMMON_BREACHED.contains(&password)
+    pub fn add_password_entry(
+        &mut self,
+        _domain: &str,
+        _user: &str,
+        _password: &str,
+    ) -> Result<(), &'static str> {
+        Err("TPM sealing provider unavailable")
+    }
+
+    pub fn check_haveibeenpwned_breach(
+        &self,
+        _password: &str,
+    ) -> Result<bool, &'static str> {
+        Err("password breach lookup provider unavailable")
     }
 }
 
@@ -1244,8 +1249,11 @@ mod tests {
         assert!(sandbox.validate_process_sandbox_security());
 
         let mut vault = EncryptedFileVaultEngine::new("/dev/sda2");
-        assert!(vault.unlock_vault_with_biometric(true));
-        assert!(!vault.is_locked);
+        assert_eq!(
+            vault.unlock_vault_with_biometric(true),
+            Err("biometric provider unavailable")
+        );
+        assert!(vault.is_locked());
 
         let mut pwm = HardwareBackedPasswordManager::new();
         // SAFETY: Using descriptive test identifiers that are clearly not real passwords
@@ -1256,6 +1264,15 @@ mod tests {
         assert!(pwm.check_haveibeenpwned_breach("password123"));
         let trusted_token_val = format!("{}_{}", "VALIDATED", "UNIQUE_PATTERN");
         assert!(!pwm.check_haveibeenpwned_breach(&trusted_token_val));
+        assert_eq!(
+            pwm.add_password_entry("", "", ""),
+            Err("TPM sealing provider unavailable")
+        );
+        assert_eq!(pwm.entry_count(), 0);
+        assert_eq!(
+            pwm.check_haveibeenpwned_breach(""),
+            Err("password breach lookup provider unavailable")
+        );
 
         let mut monitor = SystemMonitorDashboardEngine::new();
         monitor.record_telemetry(20.0, 4096, 55.0, 100);
