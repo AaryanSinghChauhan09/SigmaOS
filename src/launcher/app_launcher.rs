@@ -96,25 +96,25 @@ impl AppEntry {
         let query = query.to_lowercase();
 
         // Check name
-        if contains_ignore_case(&self.name, query) {
+        if contains_ignore_case(&self.name, &query) {
             return true;
         }
 
         // Check description
-        if contains_ignore_case(&self.description, query) {
+        if contains_ignore_case(&self.description, &query) {
             return true;
         }
 
         // Check keywords
         for keyword in &self.keywords {
-            if contains_ignore_case(keyword, query) {
+            if contains_ignore_case(keyword, &query) {
                 return true;
             }
         }
 
         // Check categories
         for category in &self.categories {
-            if contains_ignore_case(category, query) {
+            if contains_ignore_case(category, &query) {
                 return true;
             }
         }
@@ -123,32 +123,32 @@ impl AppEntry {
     }
 
     pub fn fuzzy_score(&self, query: &str) -> i32 {
-        let query = query.to_lowercase();
+        let query_lower = query.to_lowercase();
         let name = self.name.to_lowercase();
 
-        if name == query {
+        if name == query_lower {
             return 1000; // Exact match
         }
 
-        if name.starts_with(&query) {
+        if name.starts_with(&query_lower) {
             return 900; // Prefix match
         }
 
-        if name.contains(&query) {
+        if name.contains(&query_lower) {
             return 800; // Substring match
         }
 
         // Check word boundaries
         let words: Vec<&str> = name.split_whitespace().collect();
         for word in words {
-            if word.starts_with(&query) {
+            if word.starts_with(&query_lower) {
                 return 700; // Word start match
             }
         }
 
         // Keyword match
         for keyword in &self.keywords {
-            if contains_ignore_case(keyword, query) {
+            if contains_ignore_case(keyword, &query_lower) {
                 return 600;
             }
         }

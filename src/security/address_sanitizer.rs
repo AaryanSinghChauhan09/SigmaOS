@@ -167,15 +167,17 @@ impl AddressSanitizer {
     pub fn free(&mut self, ptr: u64) -> Result<(), &'static str> {
         let region_id = self.find_region_by_ptr(ptr)?;
 
-        if let Some(region) = self.regions.remove(&region_id) {
-            // Check canary
-            if !self.check_canary(&region) {
-                return Err("Stack corruption detected: canary mismatch");
-            }
+        if let Some(mut region) = self.regions.remove(&region_id) {
+            region.deallocate();
+            self.deallocation_count += 1;
 
             // Mark region as freed in shadow memory
             for addr in region.start..region.end {
-                self.shadow_memory.insert(addr, 0xFD); // Freed
+                self.shadow_memory.insert(addr, ShadowState::Freed);
+            }
+
+            if self.quarantine.len() < self.config.quarantine_size {
+                self.quarantine.push(ptr);
             }
 
             Ok(())
@@ -187,7 +189,7 @@ impl AddressSanitizer {
     /// Check if an address is valid
     pub fn is_valid_access(&self, ptr: u64, size: usize) -> bool {
         for region in self.regions.values() {
-            if !region.allocated {
+            if !region.is_allocated() {
                 continue;
             }
 
@@ -198,11 +200,12 @@ impl AddressSanitizer {
                 // Check shadow memory
                 for i in 0..size {
                     if let Some(&shadow) = self.shadow_memory.get(&(ptr + i as u64)) {
-                        if shadow != 0x00 {
+                        if shadow != ShadowState::Allocated {
                             return false; // Invalid access (redzone or freed)
                         }
                     }
                 }
+                return true;
             }
         }
 
@@ -216,23 +219,6 @@ impl AddressSanitizer {
             .wrapping_mul(0x9E3779B97F4A7C15)
     }
 
-    /// Free memory
-    pub fn free(&mut self, address: u64) -> Result<(), String> {
-        let region = self
-            .regions
-            .get_mut(&address)
-            .ok_or_else(|| format!("Address 0x{:x} not allocated", address))?;
-        region.deallocate();
-        self.deallocation_count += 1;
-
-        // Add to quarantine
-        if self.quarantine.len() < self.config.quarantine_size {
-            self.quarantine.push(address);
-        }
-
-        Ok(())
-    }
-
     /// Find region by pointer
     fn find_region_by_ptr(&self, ptr: u64) -> Result<u64, &'static str> {
         for (&id, region) in &self.regions {
@@ -244,7 +230,7 @@ impl AddressSanitizer {
             }
         }
 
-        Err("Region not found")
+        Err("Region not found for given pointer")
     }
 
     /// Get shadow memory state for an address

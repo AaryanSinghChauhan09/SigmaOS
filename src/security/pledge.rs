@@ -1,10 +1,9 @@
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
-
 #[cfg(feature = "standalone_test")]
 #[path = "capability.rs"]
-pub mod capability;
+mod capability;
 
 #[cfg(feature = "standalone_test")]
 use capability::{CapabilityGate, CapabilityToken, Permission};

@@ -158,10 +158,6 @@ impl WikiDataTransferEngine {
         engine
     }
 
-    pub fn total_synced_specs(&self) -> u32 {
-        self.total_synced_to_wiki
-    }
-
     fn seed_known_feature_md_files(&mut self) {
         self.feature_specs.insert(
             "UniversalPackageSystem".to_string(),
@@ -196,6 +192,10 @@ impl WikiDataTransferEngine {
             synced_to_wiki_repo: false,
         };
         self.specifications.insert(filename.to_string(), spec);
+    }
+
+    pub fn total_synced_specs(&self) -> u32 {
+        self.total_synced_to_wiki
     }
 
     pub fn transfer_implemented_data_to_wiki(

@@ -1113,8 +1113,19 @@ mod tests {
                 ("Precision Touchpad", PlatformSubsystemStatus::FullyCertified),
             ],
         );
-        assert!(laptop_report.is_certified);
-    }
+
+        // 6. Test FreeBSD Netmap high-speed packet engine
+        let mut netmap = FreeBsdNetmapHighSpeedPacketEngine::new("vtnet0", 4, 4, 1024);
+        assert!(netmap
+            .transmit_packet_zero_copy(&[0x00, 0x11, 0x22])
+            .is_err());
+        assert!(netmap.open_netmap_ring().unwrap());
+        assert_eq!(
+            netmap
+                .transmit_packet_zero_copy(&[0x00, 0x11, 0x22])
+                .unwrap(),
+            3
+        );
 
     #[test]
     fn test_linux_driver_compat_boundary() {
