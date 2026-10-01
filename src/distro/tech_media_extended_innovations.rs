@@ -240,8 +240,16 @@ impl HWBustersPsuRailTelemetryEngine {
         }
     }
 
-    pub fn verify_12v_2x6_pin_thermal_safety(&self) -> bool {
-        self.sensing_12v_2x6_pin_temp_c < 85.0 && self.transient_recovery_us <= 50
+    pub fn evaluate_transient_spike_severity(&mut self, spike_voltage: f32) -> &'static str {
+        if spike_voltage > 13.5 {
+            self.transient_spike_detected = true;
+            "Critical"
+        } else if spike_voltage > 12.6 {
+            self.transient_spike_detected = true;
+            "Warning"
+        } else {
+            "Nominal"
+        }
     }
 
     pub fn is_psu_telemetry_nominal(&self) -> bool {
@@ -355,6 +363,14 @@ impl MarkTechPostLlmVectorEngine {
         input
             .iter()
             .map(|&val| ((val.clamp(-1.0, 1.0) + 1.0) * 127.5) as u8)
+            .collect()
+    }
+
+    pub fn filter_high_similarity_tokens(&self, similarities: &[f32], threshold: f32) -> Vec<usize> {
+        similarities
+            .iter()
+            .enumerate()
+            .filter_map(|(i, &score)| if score >= threshold { Some(i) } else { None })
             .collect()
     }
 }
@@ -791,9 +807,12 @@ mod tests {
 
     #[test]
     fn test_hwbusters_rail_transients_and_efficiency() {
-        let hw = HWBustersPsuRailTelemetryEngine::new();
+        let mut hw = HWBustersPsuRailTelemetryEngine::new();
         assert!(hw.verify_psu_rail_transients());
         assert!(hw.calculate_rail_efficiency(500.0) > 90.0);
+        let sev = hw.evaluate_transient_spike_severity(13.8);
+        assert_eq!(sev, "Critical");
+        assert!(hw.transient_spike_detected);
     }
 
     #[test]
@@ -805,5 +824,8 @@ mod tests {
         assert_eq!(quantized[0], 0);
         assert_eq!(quantized[2], 255);
         assert!(mt.evaluate_rag_memory_bandwidth() > 50.0);
+
+        let filtered = mt.filter_high_similarity_tokens(&[0.2, 0.85, 0.9], 0.8);
+        assert_eq!(filtered, vec![1, 2]);
     }
 }
