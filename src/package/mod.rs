@@ -75,8 +75,12 @@ pub mod sovereign_universal_package_format_master;
 pub use sovereign_universal_package_format_master::*;
 pub mod sovereign_distro_package_advancements_v7;
 pub use sovereign_distro_package_advancements_v7::*;
-pub mod sovereign_universal_pm_pr_bridge;
-pub use sovereign_universal_pm_pr_bridge::*;
+pub mod sovereign_distro_package_advancements_v8;
+pub use sovereign_distro_package_advancements_v8::*;
+pub mod sovereign_distro_package_advancements_v9;
+pub use sovereign_distro_package_advancements_v9::*;
+pub mod sovereign_distro_package_advancements_v10;
+pub use sovereign_distro_package_advancements_v10::*;
 
 pub use crate::sigpkg::{
     SovereignUniversalPackageManagerInteropEngine, SovereignUniversalPackageTranslationBridge,

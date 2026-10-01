@@ -1,6 +1,25 @@
 # SigmaOS AI Agent Guidelines & Tri-Agent Framework
 
-This document provides comprehensive guidelines for AI agents working on SigmaOS, defining the Tri-Agent Framework and operational boundaries for autonomous development.
+This document provides comprehensive guidelines for AI agents working on SigmaOS, defining the Tri-Agent Framework, operational boundaries, Linux & BSD inspired task guidelines, multi-distro PR package standards, and verification rules for autonomous development.
+
+## Linux & BSD Inspired Task Guidelines & Operating Rules
+
+All AI agents working on SigmaOS must obey these primary task guidelines derived from mature Linux and BSD distribution standards:
+
+1. **Universal Package Manager PR Integration Rule**:
+   - Every foreign package format (.deb, .pkg.tar.zst, .rpm, .apk, .ebuild, .xbps, .pkg, .nix, .flatpak, .snap, .appimage, etc.) MUST be transpiled and handled natively by `sigma-pkg` in Pull Request (PR) format.
+   - Dependencies MUST be mapped to canonical `sovereign-*` system package names (e.g., `glibc`/`musl`/`libc6` -> `sovereign-libc`, `libssl-dev`/`openssl-devel` -> `sovereign-openssl`).
+   - PR package submissions MUST generate SLSA Provenance v1.0 attestations, CycloneDX/SPDX SBOM metadata, and unified diff manifest summaries.
+
+2. **Zero-Dependency Bare-Metal Architecture**:
+   - System and kernel code MUST be written in `#![no_std]` safe Rust with zero external third-party library dependencies.
+   - All data structures and system abstractions must rely on custom `klib` primitives or `alloc::` primitives.
+
+3. **Multi-Distro System Parity Guarantee**:
+   - SigmaOS absorbs innovations from Linux (CFS/EEVDF scheduler, io_uring, eBPF, cgroups v2, OverlayFS, PipeFS, Landlock) and BSD (FreeBSD Capsicum, Jails, GEOM, RCTL, OpenBSD pledge, unveil, PF, CARP, NetBSD Rump).
+   - Component improvements MUST maintain 100% test passing status across all standalone tests (`./run_sigma_tests.sh`).
+
+---
 
 ## Tri-Agent Framework
 
@@ -12,7 +31,7 @@ SigmaOS employs a three-agent autonomous continuous development framework where 
 
 **Operational Boundaries**:
 - **Always Do**:
-  - Run test suite (`cargo check --lib`, `run_sigma_tests.sh`, `pytest tests/`) before submitting PRs
+  - Run test suite (`cargo check --lib`, `./run_sigma_tests.sh`, `pytest tests/`) before submitting PRs
   - Add concise comments explaining performance optimizations
   - Measure and document expected performance impact (latency reduction, memory saving, cycle efficiency)
 - **Ask First**:
@@ -101,6 +120,7 @@ git checkout -b feature/your-feature
 # Make changes and verify
 cargo check --lib
 cargo test
+./run_sigma_tests.sh
 
 # Commit and push
 git add .
@@ -116,8 +136,8 @@ Before submitting any code or documentation changes, all agents must complete th
 
 1. **Static Analysis & Compilation**: Execute `cargo check --lib` to ensure zero compilation warnings or errors
 2. **Unit Test Verification**: Run target module unit tests using `rustc --test` or `cargo test`
-3. **Integration Test Suite**: Run `./run_sigma_tests.sh` and `pytest tests/` to confirm 100% test pass rate
-4. **Mirror Parity Check**: Confirm that all modified documentation is reflected across `docs/`, `wiki/`, `WIKI/`, and `wiki_repo/`
+3. **Integration Test Suite**: Run `./run_sigma_tests.sh` to confirm 100% test pass rate across all system shards
+4. **Mirror Parity Check**: Confirm that all modified documentation is reflected across `docs/` and `wiki/`
 
 ### Error Resolution Algorithms
 
@@ -159,13 +179,13 @@ STEP 6: Verify with `./run_sigma_tests.sh`.
 1. **No Hardcoded Cryptographic Values**: Never use hardcoded keys, passwords, salts, or initialization vectors. Use randomly generated key material.
 2. **Memory Safety**: Ensure all memory operations are bounds-checked and use safe Rust patterns.
 3. **Input Validation**: Validate all user inputs at system call boundaries.
-4. **Least Privilege**: Implement capability-based security models using pledge/unveil where appropriate.
+4. **Least Privilege**: Implement capability-based security models using pledge/unveil and Landlock where appropriate.
 5. **Secure Defaults**: Default to secure configurations rather than convenient ones.
 
 ### Zero-Dependency Philosophy
 
 SigmaOS is designed to eliminate dependencies on:
-- External package managers (pacman, apt, rpm, etc. - these are handled by SigmaPkg)
+- External package managers (pacman, apt, rpm, etc. - these are handled natively by SigmaPkg in PR format)
 - Third-party libraries in kernel space
 - External runtimes (Python, Node.js, Java, Go)
 - Predefined wrappers and abstractions
@@ -174,199 +194,6 @@ All data structures and algorithms should be implemented directly using:
 - Raw hardware pointers and bare-metal memory pages (kernel space)
 - Safe Rust standard library (user space when std is available)
 - Custom `klib` primitives for no_std compatibility
-
-### Documentation Standards
-
-1. **Public APIs**: Every public function, struct, and enum must have doc comments
-2. **Examples**: Include usage examples in doc comments
-3. **Safety**: Document unsafe blocks with safety invariants
-4. **Panics**: Document conditions that cause panics
-5. **Error Handling**: Document all possible error conditions
-
-## Repository Organization
-
-### Key Directories
-
-- `src/kernel/` - Core kernel subsystems
-- `src/memory/` - Memory management (Buddy, Slab, Paging)
-- `src/vfs/` - Virtual Filesystem layer
-- `src/sigpkg/` - Universal package manager
-- `src/desktop/` - Zenith desktop environment
-- `src/security/` - Security framework
-- `src/klib/` - Kernel library (no_std compatible primitives)
-- `tests/` - Test suites
-- `docs/` - Documentation
-- `.github/workflows/` - CI/CD workflows
-
-### Documentation Files
-
-- `README.md` - Project overview and quick start
-- `AGENTS.md` - This file (agent guidelines)
-- `WHAT_IS_WORKING_AND_NOT_WORKING.md` - Component status tracker
-- `FUTURE-DEVELOPMENT-ROADMAP.md` - Roadmap and specifications
-- `FUTURE_LINUX_BSD_MISSING_COMPONENTS_AGENTS.md` - Agent guidelines for closing Linux & BSD distro component feature gaps
-- `SIGMAOS_MASTER_PLAN_TRI_AGENT_500_REPOS_ABSORPTION.md` - Tri-agent framework details
-- `CAPABILITY_MATRIX.toml` - Machine-readable capability matrix
-- `FEATURE_STATUS.toml` - Feature implementation status
-
-## Continuous Integration
-
-SigmaOS uses GitHub Actions for CI/CD:
-- `pr_fast_checks.yml` - Fast PR validation (format, clippy, basic tests)
-- `security.yml` - Security scanning and dependency checks
-- `qemu-boot-smoke-test.yml` - QEMU boot smoke tests
-- `documentation-checks.yml` - Documentation validation
-
-## Performance Benchmarks
-
-When making performance changes, always:
-1. Establish baseline measurements
-2. Run controlled benchmarks
-3. Document the improvement
-4. Ensure no regression in other areas
-
-## Testing Requirements
-
-1. **Unit Tests**: Every module must have unit tests
-2. **Integration Tests**: Cross-module functionality tests
-3. **Regression Tests**: Tests for previously fixed bugs
-4. **Coverage**: Aim for high test coverage on critical paths
-
-## Collaboration Guidelines
-
-1. **Respect Boundaries**: Each agent should respect the domain of other agents
-2. **Communication**: Use clear commit messages and PR descriptions
-3. **Review**: Participate in code reviews constructively
-4. **Documentation**: Update documentation when changing behavior
-5. **Stability**: Prioritize stability over speed of development
-
-## Emergency Procedures
-
-In case of critical issues:
-1. **Security Vulnerabilities**: Immediately escalate, do not attempt fixes without authorization
-2. **Data Loss**: Stop all operations, investigate root cause
-3. **Build Failures**: Rollback to last known good state
-4. **Performance Regression**: Revert if unexplained, investigate before reapplying
-
-## Version Control Policy
-
-1. **Branch Naming**: Use descriptive branch names (e.g., `feature/bolt-memory-optimization`)
-2. **Commit Messages**: Follow conventional commits format
-3. **PR Titles**: Clear, descriptive, and scoped
-4. **Merge Strategy**: Use squash merges for clean history
-5. **Release Tags**: Follow semantic versioning
-
-## AI Agent Specific Instructions
-
-### When to Ask for Help
-
-- If unsure about architectural implications
-- If a change might affect multiple subsystems
-- If security implications are unclear
-- If performance impact is uncertain
-- If documentation is missing or unclear
-
-### When to Proceed Independently
-
-- Clear bug fixes with known solutions
-- Performance optimizations with measurable impact
-- Documentation improvements
-- Test additions
-- Code style fixes
-
-### Quality Gates
-
-Before considering a task complete:
-1. All tests pass
-2. Code compiles without warnings
-3. Documentation is updated
-4. Performance is measured (if applicable)
-5. Security review is passed (if applicable)
-
-## Future Development Roadmap: Linux & BSD Missing Component Gap Closure
-
-This section defines the strategic future development roadmap for autonomous AI agents working on closing missing component gaps in SigmaOS relative to mainstream Linux distributions (Arch, Debian, Fedora, Alpine, NixOS, Gentoo, Void, CachyOS, Omarchy) and BSD operating systems (FreeBSD, OpenBSD, NetBSD, DragonFly BSD, Illumos/Solaris).
-
-### 🚀 Milestone 1: Kernel & System Architecture Gaps
-- **Linux eBPF / XDP Subsystem Enhancement**:
-  - Full x86_64 JIT compiler (`compile_x86_64_jit`) for eBPF bytecodes.
-  - Zero-copy AF_XDP socket maps (`XSK`) and BPF_MAP_TYPE_RINGBUF event passing.
-- **BSD Memory & Kernel Architecture**:
-  - OpenBSD KARL (Kernel Address Randomized Link) and W^X memory page protection allocator.
-  - NetBSD Rump Kernel userland driver host bridge for isolated device driver execution.
-  - DragonFly BSD Lockless Per-CPU Netpoll Ring & Variant Symlinks (`varsyms`) resolution.
-
-### 🛡️ Milestone 2: Security & Sandboxing Gaps
-- **Landlock v5 Network Guard & OpenBSD Pledge/Unveil**:
-  - Full path-based unveil restriction locking and socket port binding/connect controls.
-  - FreeBSD Capsicum descriptor capability rights and IOMMU DMA fault containment.
-- **Post-Quantum Cryptography & Isolation**:
-  - Dilithium / Falcon / ML-KEM PQC signature verification in package manager transactions (`sigma-pkg`).
-  - Firejail / Bubblewrap container sandboxing profiles for developer environments.
-
-### 💾 Milestone 3: Storage & Filesystem Gaps
-- **Self-Healing Copy-On-Write Storage**:
-  - Bcachefs multi-tier storage engine with automatic SSD promotion and cold HDD demotion.
-  - FreeBSD OpenZFS pool integration with Fletcher-4 checksum verification and zero-copy dataset clones.
-  - DragonFly HAMMER2 MVCC B-Tree snapshotting and cluster quorum consensus.
-
-### 📦 Milestone 4: Package Management & Build Infrastructure
-- **Universal Package Parity**:
-  - Transpilation gateway for `.deb`, `.rpm`, `PKGBUILD`, `.ebuild`, `APKBUILD`, `.xbps`, and `.nix` Flakes into native `.sigpkg`.
-  - Content-Addressed Storage (CAS) with reachability mark-and-sweep garbage collection.
-  - SAT dependency solver using Davis-Putnam-Logemann-Loveland (DPLL) with cycle detection.
-
-### 🎨 Milestone 5: Desktop & Developer Tools Gaps
-- **Wayland Direct KMS Scanout & Zenith Desktop**:
-  - Holographic 3D LUT HDR color transformations and sub-millisecond Wayland window scanout.
-  - Cinnamon/XApp desktop integration (Desklets, Warpinator LAN transfer, Timeshift snapshots, Hypnotix IPTV).
-  - Omarchy Developer Tools Suite (Theme Switcher, Stow Dotfiles Manager, Hyprland Binds, Fastfetch, Herdr AI Orchestrator).
-
----
-
-## Appendix: Quick Reference
-
-### Common Commands
-
-```bash
-# Build check
-cargo check --lib
-
-# Run tests
-cargo test
-./run_sigma_tests.sh
-
-# Format code
-cargo fmt
-
-# Lint
-cargo clippy --all-targets --all-features -- -D warnings
-
-# Clean build
-make clean
-```
-
-### Useful Patterns
-
-```rust
-// Safe Rust with error handling
-pub fn safe_function(input: &str) -> Result<Output, Error> {
-    // Implementation
-}
-
-// Custom error type
-#[derive(Debug)]
-pub enum Error {
-    InvalidInput(String),
-    NotFound,
-    PermissionDenied,
-}
-
-// Zero-copy patterns
-pub fn process_data(data: &[u8]) -> Result<&[u8], Error> {
-    // Process without allocation
-}
-```
 
 ---
 

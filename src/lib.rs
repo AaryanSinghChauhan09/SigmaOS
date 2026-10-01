@@ -21,6 +21,7 @@ pub mod desktop;
 pub mod development;
 pub mod device;
 pub mod distro;
+pub use distro::sovereign_linux_bsd_wiki_master_engine::*;
 pub mod driver;
 pub mod drivers;
 pub use drivers::sovereign_comprehensive_drivers::*;
