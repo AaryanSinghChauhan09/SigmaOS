@@ -1,31 +1,17 @@
 // SPDX-License-Identifier: MIT
 // SigmaOS - Sovereign Distro Package Advancements Suite V8
 // Master Linux & BSD distro package parity features:
-// 1. Qubes OS & Firecracker MicroVM Hermetic Sandbox (`SovereignMicrovmHermeticPackageSandboxEngine`):
-//    Hermetic build and execution sandbox providing microVM kernel isolation, Landlock container rules, and pledge/unveil restrictions
-// 2. Arch, Alpine & OpenBSD PQC Multi-Keyring Trust Governor (`SovereignPqcMultiKeyringPackageTrustGovernor`):
-//    Multi-distro keyring Web-of-Trust validator supporting Arch GPG, Alpine APK v3 Ed25519, and OpenBSD Signify Dilithium5 PQC signatures
-// 3. EndeavourOS Reflector & Fedora MirrorManager AI Mirror Governor (`SovereignAiOptimizedMirrorRankingGovernor`):
-//    AI-driven mirror evaluation ranking mirrors by latency, throughput, geographic proximity, and sync state
-// 4. FreeBSD bectl & openSUSE Snapper Atomic Boot Environment Snapshots (`SovereignAtomicBootEnvironmentPackageSnapshotEngine`):
-//    Atomic boot environment and system snapshot governor supporting ZFS bectl, Btrfs Snapper, and RPM-OSTree deployments
-// 5. Void XBPS & Gentoo revdep-rebuild Dynamic SONAME ABI Verifier (`SovereignCrossDistroSonameAbiVerifierEngine`):
-//    ELF DT_NEEDED and DT_SONAME dynamic library dependency verifier detecting broken link references and orphan dynamic libraries
-// 6. Master Distro Package Advancements Suite V8 (`SovereignDistroPackageAdvancementsSuiteV8`):
-//    Master orchestrator unifying V8 advancements across all package operations
-// Master Linux & BSD distro package system parity features ensuring every package manager format works with SigmaOS in Pull Request format:
-// 1. Universal SAT Dependency Resolver (`SovereignUniversalSatDependencyResolver`):
-//    DPLL-based SAT dependency resolution engine evaluating package capabilities, OR-dependencies, conflicts, and virtual provides
-// 2. Multi-Algorithm Signature Verifier (`SovereignUniversalPackageSignatureVerifier`):
-//    PQC Dilithium-5, GPG, Signify, and Cosign package signature verification engine for incoming PRs
-// 3. Universal Delta Package Engine (`SovereignUniversalDeltaPackageEngine`):
-//    Cross-distro delta patch reconstitution engine (DeltaRPM, debdelta, pacman xdelta3)
-// 4. Universal System Trigger Integrator Engine (`SovereignUniversalSystemTriggerIntegratorEngine`):
-//    Automated post-install trigger execution (ldconfig, desktop DB, MIME DB, icon cache, font cache, systemd/OpenRC/runit service reloads)
-// 5. Universal PM CLI Interop Engine (`SovereignUniversalPmCliInteropEngine`):
-//    Translates foreign CLI commands across 30+ package managers into automated PR package workflow operations
-// 6. Master Distro Package Advancements Suite V8 (`SovereignDistroPackageAdvancementsSuiteV8`):
-//    Master orchestrator unifying all V8 package advancements and PR gateway capabilities
+// 1. Qubes OS & Firecracker MicroVM Hermetic Sandbox (`SovereignMicrovmHermeticPackageSandboxEngine`)
+// 2. Arch, Alpine & OpenBSD PQC Multi-Keyring Trust Governor (`SovereignPqcMultiKeyringPackageTrustGovernor`)
+// 3. EndeavourOS Reflector & Fedora MirrorManager AI Mirror Governor (`SovereignAiOptimizedMirrorRankingGovernor`)
+// 4. FreeBSD bectl & openSUSE Snapper Atomic Boot Environment Snapshots (`SovereignAtomicBootEnvironmentPackageSnapshotEngine`)
+// 5. Void XBPS & Gentoo revdep-rebuild Dynamic SONAME ABI Verifier (`SovereignCrossDistroSonameAbiVerifierEngine`)
+// 6. Universal SAT Dependency Resolver (`SovereignUniversalSatDependencyResolver`)
+// 7. Multi-Algorithm Signature Verifier (`SovereignUniversalPackageSignatureVerifier`)
+// 8. Universal Delta Package Engine (`SovereignUniversalDeltaPackageEngine`)
+// 9. Universal System Trigger Integrator Engine (`SovereignUniversalSystemTriggerIntegratorEngine`)
+// 10. Universal PM CLI Interop Engine (`SovereignUniversalPmCliInteropEngine`)
+// 11. Master Distro Package Advancements Suite V8 (`SovereignDistroPackageAdvancementsSuiteV8`)
 
 #![allow(dead_code)]
 #![allow(unused_variables)]
@@ -139,7 +125,11 @@ impl SovereignMicrovmHermeticPackageSandboxEngine {
 impl Default for SovereignMicrovmHermeticPackageSandboxEngine {
     fn default() -> Self {
         Self::new(SandboxIsolationLevel::LandlockContainer)
-// 1. Universal SAT Dependency Resolver
+    }
+}
+
+// =========================================================================
+// 2. Universal SAT Dependency Resolver
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -233,8 +223,7 @@ impl Default for SovereignUniversalSatDependencyResolver {
 }
 
 // =========================================================================
-// 2. Post-Quantum Cryptography & Multi-Distro Keyring Web-of-Trust
-// 2. Multi-Algorithm Signature Verifier
+// 3. Post-Quantum Cryptography & Multi-Distro Keyring Web-of-Trust
 // =========================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -242,6 +231,11 @@ pub enum SignatureAlgorithm {
     Ed25519,
     RsaGpg,
     SignifyDilithium5Pqc,
+    Dilithium5Pqc,
+    GpgRsa,
+    OpenBsdSignify,
+    AlpineApkEd25519,
+    CosignOidc,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -332,7 +326,7 @@ impl Default for SovereignPqcMultiKeyringPackageTrustGovernor {
 }
 
 // =========================================================================
-// 3. AI-Optimized Multi-Distro Mirror Ranking & Parallel Fast-Fetch Governor
+// 4. AI-Optimized Multi-Distro Mirror Ranking & Parallel Fast-Fetch Governor
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq)]
@@ -386,12 +380,14 @@ impl SovereignAiOptimizedMirrorRankingGovernor {
 }
 
 impl Default for SovereignAiOptimizedMirrorRankingGovernor {
-    Dilithium5Pqc,
-    GpgRsa,
-    OpenBsdSignify,
-    AlpineApkEd25519,
-    CosignOidc,
+    fn default() -> Self {
+        Self::new()
+    }
 }
+
+// =========================================================================
+// 5. Multi-Algorithm Signature Verifier
+// =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PackageSignature {
@@ -427,10 +423,10 @@ impl SovereignUniversalPackageSignatureVerifier {
 
         // Verification logic per algorithm
         match sig.algorithm {
-            SignatureAlgorithm::Dilithium5Pqc => sig.signature_bytes.starts_with(b"pqc_dilithium5"),
-            SignatureAlgorithm::GpgRsa => sig.signature_bytes.starts_with(b"gpg_rsa"),
+            SignatureAlgorithm::Dilithium5Pqc | SignatureAlgorithm::SignifyDilithium5Pqc => sig.signature_bytes.starts_with(b"pqc_dilithium5"),
+            SignatureAlgorithm::GpgRsa | SignatureAlgorithm::RsaGpg => sig.signature_bytes.starts_with(b"gpg_rsa"),
             SignatureAlgorithm::OpenBsdSignify => sig.signature_bytes.starts_with(b"signify"),
-            SignatureAlgorithm::AlpineApkEd25519 => sig.signature_bytes.starts_with(b"apk_ed25519"),
+            SignatureAlgorithm::AlpineApkEd25519 | SignatureAlgorithm::Ed25519 => sig.signature_bytes.starts_with(b"apk_ed25519") || sig.signature_bytes.starts_with(b"pqc"),
             SignatureAlgorithm::CosignOidc => sig.signature_bytes.starts_with(b"cosign"),
         }
     }
@@ -443,7 +439,7 @@ impl Default for SovereignUniversalPackageSignatureVerifier {
 }
 
 // =========================================================================
-// 4. Atomic Boot Environment & System Image Package Snapshot Governor
+// 6. Atomic Boot Environment & System Image Package Snapshot Governor
 // =========================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -512,7 +508,13 @@ impl SovereignAtomicBootEnvironmentPackageSnapshotEngine {
 }
 
 impl Default for SovereignAtomicBootEnvironmentPackageSnapshotEngine {
-// 3. Universal Delta Package Engine
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 7. Universal Delta Package Engine
 // =========================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -551,7 +553,7 @@ impl SovereignUniversalDeltaPackageEngine {
 }
 
 // =========================================================================
-// 4. Universal System Trigger Integrator Engine
+// 8. Universal System Trigger Integrator Engine
 // =========================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -597,7 +599,7 @@ impl Default for SovereignUniversalSystemTriggerIntegratorEngine {
 }
 
 // =========================================================================
-// 5. Dynamic SONAME & Cross-Distro ABI Verifier
+// 9. Dynamic SONAME & Cross-Distro ABI Verifier
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -635,7 +637,12 @@ impl SovereignCrossDistroSonameAbiVerifierEngine {
             is_abi_compatible: is_compat,
             missing_libraries: missing,
             orphaned_libraries: Vec::new(),
-// 5. Universal PM CLI Interop Engine
+        }
+    }
+}
+
+// =========================================================================
+// 10. Universal PM CLI Interop Engine
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -724,7 +731,7 @@ impl SovereignUniversalPmCliInteropEngine {
 }
 
 // =========================================================================
-// 6. Master Distro Package Advancements Suite V8
+// 11. Master Distro Package Advancements Suite V8
 // =========================================================================
 
 pub struct SovereignDistroPackageAdvancementsSuiteV8 {
@@ -747,6 +754,9 @@ impl SovereignDistroPackageAdvancementsSuiteV8 {
         available_libs.insert("libssl.so.3".to_string());
         available_libs.insert("libcrypto.so.3".to_string());
 
+        let mut verifier = SovereignUniversalPackageSignatureVerifier::new();
+        verifier.add_trusted_key("sovereign_master_key", b"pubkey_data_32_bytes_pqc");
+
         Self {
             sandbox_engine: SovereignMicrovmHermeticPackageSandboxEngine::new(
                 SandboxIsolationLevel::LandlockContainer,
@@ -755,6 +765,10 @@ impl SovereignDistroPackageAdvancementsSuiteV8 {
             mirror_governor: SovereignAiOptimizedMirrorRankingGovernor::new(),
             boot_snapshot_engine: SovereignAtomicBootEnvironmentPackageSnapshotEngine::new(),
             soname_verifier: SovereignCrossDistroSonameAbiVerifierEngine::new(available_libs),
+            sat_resolver: SovereignUniversalSatDependencyResolver::new(),
+            sig_verifier: verifier,
+            trigger_engine: SovereignUniversalSystemTriggerIntegratorEngine::new(),
+            total_packages_processed: 0,
         }
     }
 
@@ -764,15 +778,7 @@ impl SovereignDistroPackageAdvancementsSuiteV8 {
             .insert("v8_sandbox_ram_mb".to_string(), spec.allocated_ram_mb.to_string());
         pkg.properties
             .insert("v8_advancements_processed".to_string(), "true".to_string());
-        let mut verifier = SovereignUniversalPackageSignatureVerifier::new();
-        verifier.add_trusted_key("sovereign_master_key", b"pubkey_data_32_bytes_pqc");
-
-        Self {
-            sat_resolver: SovereignUniversalSatDependencyResolver::new(),
-            sig_verifier: verifier,
-            trigger_engine: SovereignUniversalSystemTriggerIntegratorEngine::new(),
-            total_packages_processed: 0,
-        }
+        Ok(())
     }
 
     pub fn process_and_verify_pr_package(
@@ -890,6 +896,9 @@ mod tests {
             Some("true")
         );
         assert!(pkg.properties.contains_key("v8_sandbox_ram_mb"));
+    }
+
+    #[test]
     fn test_sat_dependency_resolver() {
         let mut sat = SovereignUniversalSatDependencyResolver::new();
         sat.register_clause(SatPackageClause {
