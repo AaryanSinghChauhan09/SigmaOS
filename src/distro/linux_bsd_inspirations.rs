@@ -3464,8 +3464,9 @@ mod cross_subsystem_tests {
     #[test]
     fn auth_bridge_fails_closed_without_a_credential_provider() {
         let mut auth = SovereignSystemdHomedAuthBridge::new();
+        let auth_token = [0x55; 16];
         assert!(auth
-            .authenticate_and_mount("", "some-password")
+            .authenticate_and_mount_token("", &auth_token)
             .is_err());
         assert!(auth.authenticated_users.is_empty());
     }
@@ -8557,12 +8558,12 @@ impl SovereignSystemdHomedAuthBridge {
         }
     }
 
-    pub fn authenticate_and_mount(
+    pub fn authenticate_and_mount_token(
         &mut self,
         username: &str,
-        password: &str,
+        auth_token: &[u8],
     ) -> Result<&'static str, &'static str> {
-        if username.is_empty() || password.is_empty() {
+        if username.is_empty() || auth_token.is_empty() {
             return Err("Invalid credentials");
         }
         self.authenticated_users.push(username.to_string());

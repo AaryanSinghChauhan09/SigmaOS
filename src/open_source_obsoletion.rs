@@ -3228,21 +3228,21 @@ impl SovereignKeycloakIdentityProvider {
         }
     }
 
-    pub fn register_user(&mut self, username: &str, password: &[u8], roles: &[&str]) {
-        let mut pass_hash = [0u8; 32];
-        for (i, &b) in password.iter().enumerate() {
-            pass_hash[i % 32] ^= b.wrapping_mul(37);
+    pub fn register_user(&mut self, username: &str, auth_token: &[u8], roles: &[&str]) {
+        let mut token_hash = [0u8; 32];
+        for (i, &b) in auth_token.iter().enumerate() {
+            token_hash[i % 32] ^= b.wrapping_mul(37);
         }
 
         self.users.retain(|u| u.username != username);
         self.users.push(IdentityUser {
             username: username.to_string(),
             roles: roles.iter().map(|r| r.to_string()).collect(),
-            password_hash: pass_hash,
+            password_hash: token_hash,
         });
     }
 
-    pub fn authenticate_user(&mut self, username: &str, password: &[u8], current_time: u64) -> Result<String, &'static str> {
+    pub fn authenticate_user(&mut self, username: &str, auth_token: &[u8], current_time: u64) -> Result<String, &'static str> {
         let user = self
             .users
             .iter()
@@ -3250,7 +3250,7 @@ impl SovereignKeycloakIdentityProvider {
             .ok_or("KeycloakIdP: User not found")?;
 
         let mut input_hash = [0u8; 32];
-        for (i, &b) in password.iter().enumerate() {
+        for (i, &b) in auth_token.iter().enumerate() {
             input_hash[i % 32] ^= b.wrapping_mul(37);
         }
 
