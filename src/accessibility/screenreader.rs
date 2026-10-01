@@ -171,7 +171,7 @@ impl BrailleDisplay for SimpleBrailleDisplay {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
