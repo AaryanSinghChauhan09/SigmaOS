@@ -71,6 +71,9 @@ pub use distro_device_expansion::{
     ThreeCom3c59xEthernetDriver, VirtioScsiControllerDriver, WacomGraphicsTabletDriver,
 };
 
+pub mod universal_device_matrix;
+pub use universal_device_matrix::*;
+
 pub mod sovereign_hardware_roadmap;
 pub use sovereign_hardware_roadmap::{
     SigmaDriverShard, ForeignDriverOrigin, CrossOsDriverAdapter, DeclarativeDriverProfileConfig,

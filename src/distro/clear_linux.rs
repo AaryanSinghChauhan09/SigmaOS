@@ -11,6 +11,8 @@
 // Implements Intel Clear Linux's stateless configuration and immutable root layers
 // Inspired by Clear Linux's performance-optimized architecture
 
+extern crate alloc;
+
 use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;

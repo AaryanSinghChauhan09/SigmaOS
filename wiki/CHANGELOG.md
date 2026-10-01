@@ -6,6 +6,8 @@ All notable changes to the SigmaOS sovereign operating system and system service
 
 ## [1.1.0] - 2026-08-02
 ### Added
+- **SigmaOS Product Vision Document (`PRODUCT_VISION.md`)**: Created root-level `PRODUCT_VISION.md` articulating SigmaOS's product philosophy, synthesizing Omarchy's opinionated defaults with Linux Mint's stability and 6-year LTS guarantees across a 5-phase strategic roadmap.
+- **Omarchy & Linux Mint Strategic Hybrid Roadmap (Section 91)**: Added Section 91 to `FUTURE-DEVELOPMENT-ROADMAP.md` specifying a 5-phase development roadmap combining Omarchy's developer-first opinionated defaults and instant toggles with Linux Mint's stability, 6-year LTS release cycles, and CoW/A-B rollback recovery.
 - **SteamOS-inspired GPU Driver Recovery & Reset** (`drivers/graphics/sigma_kms.cpp`):
   - Implements a self-healing GPU hang detection state machine (`sigma_kms_recover_gpu`) that safely clears frame buffer caches and resets display contexts, completely eliminating standard ring-buffer freezes.
 - **Clear Linux-inspired Graphics Performance Profiles** (`drivers/graphics/sigma_kms.cpp`):

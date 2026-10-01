@@ -15,6 +15,7 @@
 extern crate alloc;
 use crate::klib::collections::HashMap;
 use crate::klib;
+use crate::klib::SigmaString;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Version {
@@ -279,13 +280,13 @@ pub struct AlpmHook {
 
 #[derive(Debug, Clone)]
 pub struct AlpmHookManager {
-    pub hooks: AllocVec<AlpmHook>,
+    pub hooks: Vec<AlpmHook>,
 }
 
 impl AlpmHookManager {
     pub fn new() -> Self {
         Self {
-            hooks: AllocVec::new(),
+            hooks: Vec::new(),
         }
     }
 
@@ -362,7 +363,7 @@ pub enum AlpmTransactionState {
 #[derive(Debug, Clone)]
 pub struct AlpmTransactionEngine {
     pub state: AlpmTransactionState,
-    pub targets: AllocVec<SigmaString>,
+    pub targets: Vec<SigmaString>,
     pub installed: HashMap<SigmaString, Version>,
     pub hook_manager: AlpmHookManager,
 }
@@ -371,7 +372,7 @@ impl AlpmTransactionEngine {
     pub fn new() -> Self {
         Self {
             state: AlpmTransactionState::Init,
-            targets: AllocVec::new(),
+            targets: Vec::new(),
             installed: HashMap::new(),
             hook_manager: AlpmHookManager::new(),
         }
@@ -386,12 +387,12 @@ impl AlpmTransactionEngine {
     }
 
     /// Prepares transaction by checking dependencies, conflicts, and pre-transaction hooks
-    pub fn prepare(&mut self) -> Result<AllocVec<SigmaString>, &'static str> {
+    pub fn prepare(&mut self) -> Result<Vec<SigmaString>, &'static str> {
         if self.state != AlpmTransactionState::Init {
             return Err("ALPM: Transaction already prepared");
         }
 
-        let mut pre_cmds = AllocVec::new();
+        let mut pre_cmds = Vec::new();
         for target in &self.targets {
             let cmds = self
                 .hook_manager
@@ -404,12 +405,12 @@ impl AlpmTransactionEngine {
     }
 
     /// Commits transaction by updating installed package DB and triggering post-transaction hooks
-    pub fn commit(&mut self) -> Result<AllocVec<SigmaString>, &'static str> {
+    pub fn commit(&mut self) -> Result<Vec<SigmaString>, &'static str> {
         if self.state != AlpmTransactionState::Prepared {
             return Err("ALPM: Transaction must be prepared before committing");
         }
 
-        let mut post_cmds = AllocVec::new();
+        let mut post_cmds = Vec::new();
         for target in &self.targets {
             self.installed.insert(target.clone(), Version::new(1, 0, 0));
             let cmds = self
@@ -580,7 +581,7 @@ impl MkinitcpioBuilder {
         .into_bytes();
 
         image_header.extend_from_slice(b"\x1F\x8B\x08\x00_MOCK_INITRAMFS_PAYLOAD_BYTES");
-        image_header
+        image_header.to_vec()
     }
 }
 
@@ -671,7 +672,7 @@ impl SAbsSimdCompiler {
         }
     }
 
-    pub fn compile_vectorized_binary(&self, source_code: &str) -> AllocVec<u8> {
+    pub fn compile_vectorized_binary(&self, source_code: &str) -> Vec<u8> {
         let flags = self.generate_compiler_flags();
         let mut binary_header = format!(
             "S-ABS_SIMD_BINARY | ISA: {:?} | Flags: {} | SourceLength: {}\n",
@@ -781,157 +782,13 @@ impl MakepkgBuilder {
         .into_bytes();
 
         archive_content.extend_from_slice(source_data);
-        Ok((archive_name, archive_content))
+        Ok((archive_name, archive_content.to_vec()))
     }
 }
 // --- Arch Linux svntogit Repository Migration Engine ---
 #[derive(Debug, Clone)]
 pub struct SvntoGitEngine {
     pub migrated_packages: std::collections::HashMap<String, SvnPackageMetadata>,
-}
-
-// --- Arch Linux svntogit Repository Migration Engine ---
-
-#[derive(Debug, Clone)]
-pub struct SvnPackageMetadata {
-    pub pkgname: String,
-    pub repo: String, // e.g. "core", "extra", "community"
-    pub svn_revision: u64,
-    pub has_pkgbuild: bool,
-}
-
-#[derive(Debug, Default)]
-pub struct SvntogitMigrationEngine {
-    pub migrated_packages: alloc::collections::BTreeMap<String, SvnPackageMetadata>,
-}
-
-impl SvntogitMigrationEngine {
-    pub fn new() -> Self {
-        Self {
-            migrated_packages: alloc::collections::BTreeMap::new(),
-        }
-    }
-
-    pub fn migrate_svn_repo_layout(
-        &mut self,
-        pkgname: &str,
-        repo: &str,
-        svn_revision: u64,
-        pkgbuild_content: &str,
-    ) -> Result<String, &'static str> {
-        if pkgbuild_content.is_empty() {
-            return Err("svntogit: Cannot migrate empty PKGBUILD");
-        }
-
-        let metadata = SvnPackageMetadata {
-            pkgname: pkgname.to_string(),
-            repo: repo.to_string(),
-            svn_revision,
-            has_pkgbuild: true,
-        };
-
-        self.migrated_packages.insert(pkgname.to_string(), metadata);
-        Ok(format!(
-            "Migrated Arch SVN pkg '{}' (r{}) into Git branch 'packages/{}'",
-            pkgname, svn_revision, pkgname
-        ))
-    }
-}
-
-// --- Arch Linux svntogit Repository Migration Engine ---
-
-#[derive(Debug, Clone)]
-pub struct SvnPackageMetadata {
-    pub pkgname: String,
-    pub repo: String, // e.g. "core", "extra", "community"
-    pub svn_revision: u64,
-    pub has_pkgbuild: bool,
-}
-
-#[derive(Debug, Default)]
-pub struct SvntogitMigrationEngine {
-    pub migrated_packages: alloc::collections::BTreeMap<String, SvnPackageMetadata>,
-}
-
-impl SvntogitMigrationEngine {
-    pub fn new() -> Self {
-        Self {
-            migrated_packages: alloc::collections::BTreeMap::new(),
-        }
-    }
-
-    pub fn migrate_svn_repo_layout(
-        &mut self,
-        pkgname: &str,
-        repo: &str,
-        svn_revision: u64,
-        pkgbuild_content: &str,
-    ) -> Result<String, &'static str> {
-        if pkgbuild_content.is_empty() {
-            return Err("svntogit: Cannot migrate empty PKGBUILD");
-        }
-
-        let metadata = SvnPackageMetadata {
-            pkgname: pkgname.to_string(),
-            repo: repo.to_string(),
-            svn_revision,
-            has_pkgbuild: true,
-        };
-
-        self.migrated_packages.insert(pkgname.to_string(), metadata);
-        Ok(format!(
-            "Migrated Arch SVN pkg '{}' (r{}) into Git branch 'packages/{}'",
-            pkgname, svn_revision, pkgname
-        ))
-    }
-}
-
-// --- Arch Linux svntogit Repository Migration Engine ---
-
-#[derive(Debug, Clone)]
-pub struct SvnPackageMetadata {
-    pub pkgname: String,
-    pub repo: String, // e.g. "core", "extra", "community"
-    pub svn_revision: u64,
-    pub has_pkgbuild: bool,
-}
-
-#[derive(Debug, Default)]
-pub struct SvntogitMigrationEngine {
-    pub migrated_packages: alloc::collections::BTreeMap<String, SvnPackageMetadata>,
-}
-
-impl SvntogitMigrationEngine {
-    pub fn new() -> Self {
-        Self {
-            migrated_packages: alloc::collections::BTreeMap::new(),
-        }
-    }
-
-    pub fn migrate_svn_repo_layout(
-        &mut self,
-        pkgname: &str,
-        repo: &str,
-        svn_revision: u64,
-        pkgbuild_content: &str,
-    ) -> Result<String, &'static str> {
-        if pkgbuild_content.is_empty() {
-            return Err("svntogit: Cannot migrate empty PKGBUILD");
-        }
-
-        let metadata = SvnPackageMetadata {
-            pkgname: pkgname.to_string(),
-            repo: repo.to_string(),
-            svn_revision,
-            has_pkgbuild: true,
-        };
-
-        self.migrated_packages.insert(pkgname.to_string(), metadata);
-        Ok(format!(
-            "Migrated Arch SVN pkg '{}' (r{}) into Git branch 'packages/{}'",
-            pkgname, svn_revision, pkgname
-        ))
-    }
 }
 
 #[cfg(test)]

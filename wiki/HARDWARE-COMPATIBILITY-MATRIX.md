@@ -100,3 +100,17 @@ sigma-hardware-diag --summary
 # Validate secure boot and PQC Dilithium-5 certificates
 sigma-boot-check --verify
 ```
+
+---
+
+## 9. VALIDATION & TESTING STRATEGY: HARDWARE COMPATIBILITY MATRIX
+
+| Driver | Vendor | Device | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `intel-i915` | Intel | UHD 630 | ✅ Working | Integrated GPU support |
+| `intel-xe` | Intel | Alchemist | 🔄 Testing | Discrete GPU (new) |
+| `amdgpu` | AMD | RX 5700 | ✅ Working | RDNA support |
+| `nvidia-nouveau` | NVIDIA | RTX 3070 | ⚠️ Fallback VGA | (binary blob strategy) |
+| `iwlwifi` | Intel | AX210 | 🔄 Testing | WiFi 6E module |
+| `rtw89` | Realtek | RTL8852AE | 🔄 Testing | WiFi 6 alternative |
+| `xhci` | Various | USB 3.0+ | 🔄 Testing | Universal USB host |

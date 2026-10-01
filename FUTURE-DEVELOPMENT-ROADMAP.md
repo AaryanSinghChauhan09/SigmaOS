@@ -4278,3 +4278,79 @@ To outmatch the hardware support breadth and flexibility of Linux, Windows, and 
 
 3. **Priority Inheritance Protocol (PIP) for Blocking Mutexes**:
    - Mutex primitives used in real-time `BORE` or `EEVDF` scheduler task contexts must enforce Priority Inheritance Protocol (PIP) to prevent priority inversion deadlocks.
+
+---
+
+## 91. OMARCHY & LINUX MINT INSPIRED DEVELOPMENT ROADMAP SPECIFICATION
+
+### 91.1 Overview and Strategic Philosophy
+
+SigmaOS merges the developer-first, opinionated, keyboard-driven principles of Omarchy Linux with the stability, usability, and long-term support (LTS) policies of Linux Mint.
+
+```
+                  +-------------------------------------------------------+
+                  |               SIGMAOS STRATEGIC HYBRID                |
+                  +-------------------------------------------------------+
+                  |                                                       |
+        +-------------------------+                     +-------------------------+
+        |  OMARCHY LINUX DNA      |                     |    LINUX MINT DNA       |
+        |  - Opinionated Defaults |                     |  - High UX Polish       |
+        |  - Zenith Compositor    |                     |  - 5-6 Year LTS Support |
+        |  - Instant Toggles      |                     |  - A/B Rollback & CoW   |
+        |  - Unified Shell Config |                     |  - Graphical Installer  |
+        +-------------------------+                     +-------------------------+
+```
+
+### 91.2 Development Phases
+
+#### Phase 1: Foundation & Polish (Months 1-12)
+1. **Opinionated Defaults & Zero-Bloat Philosophy**:
+   - Single preferred desktop environment (Zenith Wayland-inspired Compositor).
+   - Curated developer toolchain (Alacritty/Kitty, Neovim presets, GGML/Ollama AI runtime).
+   - Unified configuration via `~/.config/omarchy/shell.json` and TOML manifests.
+2. **Core Microkernel Hardening**:
+   - Ring 3 task isolation and capability-gated syscall enforcement.
+   - Bare-metal x86_64 boot stabilization.
+   - Panic recovery with automated diagnostic log collection.
+3. **Zenith Compositor UX**:
+   - Keyboard-driven Dwindle tiling management (`Super + Space`, `Super + L`, `Super + Ctrl + O`).
+   - Native notification daemon with Do-Not-Disturb silencing.
+   - Hyprsunset night light controller (4000K warm / 6500K default).
+
+#### Phase 2: Ecosystem & Usability (Months 12-18)
+1. **sigpkg Package Management Maturity**:
+   - Native `.sigpkg` binary packages with cryptographic trust verification.
+   - Universal translation bridges for 60+ package formats (.deb, PKGBUILD, Snap, Flatpak).
+   - Fast content-addressed storage (CAS) binary cache.
+2. **Graphical Installer & System Setup**:
+   - Modern graphical installer wizard (`web_ui/index.html` & `GuiInstallerWizard`).
+   - LUKS/LVM disk encryption and UEFI/SecureBoot chainloader setup.
+   - Post-install setup wizard for localization, keyboard, and user accounts.
+3. **Snapshot & Rollback System**:
+   - Btrfs/ZFS Copy-on-Write (CoW) automatic snapshots before updates.
+   - One-click sub-second rollback to previous Merkle ledger state.
+
+#### Phase 3: Developer & AI Features (Months 18-24)
+1. **AI-Native Runtime Integration**:
+   - Local LLM inference engine with PQC provenance verification.
+   - Autonomous coding agent framework with natural language shell execution.
+   - Automated system diagnostics and self-healing agent.
+2. **Developer Tooling & Self-Hosting**:
+   - Integrated build system and flamegraph profiling tools.
+   - Self-compiling Rust toolchain targeting $O(1)$ zero-dependency self-hosting.
+
+#### Phase 4: Multi-Core & Hardware Support (Months 24+)
+1. **SMP Load Balancing & NUMA Awareness**:
+   - EEVDF + BORE scheduler SMP load balancing across multi-core CPUs.
+2. **Hardware Driver Expansion**:
+   - Universal device matrix support for ISA, PCI, AGP, USB4, NVMe Gen5, Wi-Fi 7, and RISC-V/ARM/QPU architectures.
+3. **Network Stack Hardening**:
+   - Dual-stack IPv4/IPv6, TLS 1.3, mDNS, and eBPF/XDP stateful firewalling.
+
+#### Phase 5: Long-Term Stability & Polish (Ongoing)
+1. **Mint-Style LTS Release Cycle**:
+   - 2-year major release cycles with 5-6 year Long-Term Support (LTS).
+   - Point releases every 6 months for security and bug-fix updates.
+2. **Community Governance**:
+   - Establishment of the SigmaOS Foundation.
+   - Monthly state-of-the-system developer blog posts and public issue tracking.

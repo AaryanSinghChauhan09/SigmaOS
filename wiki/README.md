@@ -227,6 +227,8 @@ Detailed conceptual documentation is managed exclusively in the GitHub Wiki:
 - **Kernel Performance**: [Kernel Performance Optimization Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/KERNEL_PERFORMANCE_PLAN)
 - **Zig Driver Integration**: [Zig Language Driver Integration Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/ZIG_INTEGRATION_PLAN)
 - **Nim Driver Integration**: [Nim Language Driver Integration Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/NIM_INTEGRATION_PLAN)
+- **Omarchy & Linux Mint Hybrid**: [Omarchy & Linux Mint Development Strategy](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/OMARCHY_LINUX_MINT_ROADMAP)
+- **Product Vision & Philosophy**: [SigmaOS Product Vision Document](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/PRODUCT_VISION.md)
 
 
 ---

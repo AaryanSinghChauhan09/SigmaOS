@@ -12,6 +12,8 @@
 // Native Rust implementation of Arch Linux svntogit and Reproducible Builds parity
 
 
+extern crate alloc;
+
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec;

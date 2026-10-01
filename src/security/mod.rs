@@ -5,6 +5,9 @@
 #![allow(clippy::empty_line_after_doc_comments)]
 #![allow(clippy::new_without_default)]
 #![allow(ambiguous_glob_reexports)]
+pub mod safe_absorption_protocol;
+pub use safe_absorption_protocol::*;
+
 pub mod system_policy_rules;
 pub use system_policy_rules::*;
 

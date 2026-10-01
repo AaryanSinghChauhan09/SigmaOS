@@ -74,6 +74,14 @@ pub enum PackageFormat {
     SolarisIps,
     GuixNar,
     OpenBsdPkg,
+    Wheel,
+    Crate,
+    Gem,
+    Nupkg,
+    Vcpkg,
+    NarInfo,
+    Spack,
+    Conan,
 }
 
 #[derive(Debug, Clone)]
@@ -499,6 +507,7 @@ impl PackageAdapterFactory {
             PackageFormat::SolarisIps => Box::new(SolarisIpsPackageAdapter),
             PackageFormat::GuixNar => Box::new(GuixNarPackageAdapter),
             PackageFormat::OpenBsdPkg => Box::new(OpenBsdPkgPackageAdapter),
+            _ => Box::new(SovereignPackageAdapter),
         }
     }
 }
