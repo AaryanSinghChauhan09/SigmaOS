@@ -9,9 +9,6 @@ extern crate alloc;
 
 use alloc::boxed::Box;
 use std::collections::BTreeMap;
-#[cfg(test)]
-use std::collections::HashMap;
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
 use std::collections::HashMap;
 
 // ==================================================================// 6.1 POLYMORPHIC UNIVERSAL PERIPHERAL BLUEPRINT (OOP PARADIGM)

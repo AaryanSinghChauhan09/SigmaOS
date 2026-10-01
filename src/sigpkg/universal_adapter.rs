@@ -15,7 +15,7 @@ pub use crate::sigpkg::Version;
 use crate::sigpkg::{Dependency, Package, VersionConstraint};
 
 #[cfg(feature = "standalone_test")]
-pub use crate::universal_oop_system;
+pub use crate::sigpkg::universal_oop_system;
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -1713,7 +1713,11 @@ impl SigPkgUniversalBridgeEngine {
         let standard_pkg = crate::sigpkg::universal_oop_system::StandardPackage {
             metadata: crate::sigpkg::universal_oop_system::PackageMetadata {
                 name: native_pkg.name.clone(),
-                version: native_pkg.version.clone(),
+                version: crate::sigpkg::universal_oop_system::Version::new(
+                    native_pkg.version.major,
+                    native_pkg.version.minor,
+                    native_pkg.version.patch,
+                ),
                 description: native_pkg.description.clone(),
                 license: String::new(),
                 maintainer: String::new(),
