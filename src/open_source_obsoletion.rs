@@ -3261,6 +3261,8 @@ impl SovereignK9sClusterManagerEngine {
 impl Default for SovereignK9sClusterManagerEngine {
     fn default() -> Self {
         Self::new()
+    }
+}
 // 61. SOVEREIGN SYNCTHING PEER SYNC ENGINE (Superseding Syncthing & Resilio Sync)
 // =========================================================================
 
@@ -3819,17 +3821,6 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             ghostty_terminal: open_source_os_gap_closure::SovereignGhosttyTextGridEngine::new(80, 24),
             valgrind_debugger: open_source_os_gap_closure::SovereignValgrindMemoryDebuggerEngine::new(),
             nebula_mesh: open_source_os_gap_closure::SovereignNebulaMeshVpnEngine::new("orchestrator_node", "10.200.0.1"),
-            total_obsoleted_projects_count: 90,
-            ghostty_terminal: open_source_os_gap_closure::SovereignGhosttyTextGridEngine::new(
-                80, 24,
-            ),
-            valgrind_debugger:
-                open_source_os_gap_closure::SovereignValgrindMemoryDebuggerEngine::new(),
-            nebula_mesh: open_source_os_gap_closure::SovereignNebulaMeshVpnEngine::new(
-                "orchestrator_node",
-                "10.200.0.1",
-            ),
-            total_obsoleted_projects_count: 92,
             syncthing_sync: SovereignSyncthingPeerSyncEngine::new("orchestrator_folder"),
             keycloak_idp: SovereignKeycloakIdentityProvider::new("sovereign_realm"),
             strace_tracer: SovereignStraceSyscallTracerEngine::new(),
@@ -7178,8 +7169,6 @@ mod tests {
     fn test_sovereign_orchestrator_bootstrap() {
         let mut orchestrator = SovereignOpenSourceObsoletionOrchestrator::new();
         let status = orchestrator.bootstrap_sovereign_stack().unwrap();
-        assert!(status.contains("92 legacy open-source projects obsoleted"));
-        assert_eq!(orchestrator.total_obsoleted_projects_count, 92);
         assert!(status.contains("94 legacy open-source projects obsoleted"));
         assert_eq!(orchestrator.total_obsoleted_projects_count, 94);
         assert_eq!(orchestrator.serenity_async.processed_count, 0);
@@ -7503,6 +7492,9 @@ mod tests {
         assert!(k9s.append_log("prod", "db-cluster-0", "Database connected"));
         assert!(k9s.restart_pod("prod", "db-cluster-0"));
         assert_eq!(k9s.pods[1].restart_count, 1);
+    }
+
+    #[test]
     fn test_sovereign_syncthing_peer_sync() {
         let mut sync = SovereignSyncthingPeerSyncEngine::new("folder_alpha");
         sync.connect_device("device_node_1");

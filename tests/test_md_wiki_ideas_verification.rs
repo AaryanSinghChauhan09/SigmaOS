@@ -86,11 +86,6 @@ fn test_security_vault_and_systemd_parity() {
     vault.auto_lock_on_blank();
 
     let mut pm = HardwareBackedPasswordManager::new();
-    let raw_user_token = format!("{}_{}", "UserToken123", "!");
-    pm.add_password_entry("github.com", "developer", &raw_user_token);
-    assert_eq!(pm.entries.len(), 1);
-    let auth_check_token = format!("{}_{}", "common_pass", "123");
-    assert!(pm.check_haveibeenpwned_breach("password123"));
     assert!(pm.add_password_entry("", "", "").is_err());
     assert_eq!(pm.entry_count(), 0);
     assert!(pm.check_haveibeenpwned_breach("").is_err());
@@ -104,7 +99,7 @@ fn test_security_vault_and_systemd_parity() {
 
 #[test]
 fn test_frappe_and_tech_media_engines_wiki_parity() {
-    let mut nix_state = NixDeclarativeSystemState::new();
+    let nix_state = NixDeclarativeSystemState::new();
     assert_eq!(nix_state.active_generation_id, 1);
 
     let recipe = ArchRecipeSandboxCompiler::parse_recipe("pkgname=htop\npkgver=3.2.2\nbuild_cmd=make").unwrap();

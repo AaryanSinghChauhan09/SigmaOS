@@ -351,8 +351,6 @@ impl SovereignUniversalDistroBridge {
 
             DistroSubsystemMode::LinuxSolus
             | DistroSubsystemMode::LinuxChimera
-            | DistroSubsystemMode::LinuxSerpentOS => {
-                ServiceSupervisorType::Dinit
             | DistroSubsystemMode::LinuxSerpentOS => ServiceSupervisorType::Dinit,
             DistroSubsystemMode::LinuxSlackware | DistroSubsystemMode::LinuxTinyCore => {
                 ServiceSupervisorType::Sysvinit
@@ -363,10 +361,6 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::SmartOs | DistroSubsystemMode::NetBsdRump => {
                 ServiceSupervisorType::Rcd
             }
-            DistroSubsystemMode::LinuxSlackware
-            | DistroSubsystemMode::LinuxTinyCore => ServiceSupervisorType::Sysvinit,
-            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => ServiceSupervisorType::Smf,
-            DistroSubsystemMode::SmartOs | DistroSubsystemMode::NetBsdRump => ServiceSupervisorType::Rcd,
         }
     }
 
@@ -573,8 +567,6 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxSlackware
             | DistroSubsystemMode::LinuxTinyCore
             | DistroSubsystemMode::LinuxSlax
-            | DistroSubsystemMode::LinuxPuppy => {
-                supervisor == ServiceSupervisorType::Sysvinit
             | DistroSubsystemMode::LinuxPuppy => supervisor == ServiceSupervisorType::Sysvinit,
             DistroSubsystemMode::SolarisIllumos
             | DistroSubsystemMode::SolarisOmniOS
@@ -582,8 +574,6 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::SmartOs | DistroSubsystemMode::NetBsdRump => {
                 supervisor == ServiceSupervisorType::Rcd
             }
-            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => supervisor == ServiceSupervisorType::Smf,
-            DistroSubsystemMode::SmartOs | DistroSubsystemMode::NetBsdRump => supervisor == ServiceSupervisorType::Rcd,
         };
         supervisor_valid && !pkg_spec.is_empty() && !vfs_etc.is_empty()
     }
@@ -3213,9 +3203,6 @@ mod cross_subsystem_tests {
         let res_sys = orchestrator.orchestrate_subsystem("syscall", "sys_read");
         assert!(res_sys.is_ok());
 
-        assert!(!orchestrator.active_subsystems.contains(&"auth".to_string()));
-        assert!(orchestrator.active_subsystems.contains(&"auth".to_string()));
-        assert!(orchestrator.active_subsystems.contains(&"network".to_string()));
         assert!(orchestrator.active_subsystems.contains(&"auth".to_string()));
         assert!(orchestrator
             .active_subsystems
@@ -7830,15 +7817,6 @@ impl SovereignSystemdHomedAuthBridge {
         _password: &str,
     ) -> Result<&'static str, &'static str> {
         Err("Authentication unavailable: no trusted credential provider configured")
-        username: &str,
-        password: &str,
-    ) -> Result<&'static str, &'static str> {
-    pub fn authenticate_and_mount(&mut self, username: &str, password: &str) -> Result<&'static str, &'static str> {
-        if username.is_empty() || password.is_empty() {
-            return Err("Invalid credentials");
-        }
-        self.authenticated_users.push(username.to_string());
-        Ok("LUKS_HOME_MOUNTED")
     }
 }
 
@@ -7862,8 +7840,6 @@ impl SovereignMultiArchSyscallTranslator {
             return Err("Syscall name cannot be empty");
         }
         match self.mode {
-            DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::DragonFlyBsd => Ok(1001),
-            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SmartOs => Ok(2002),
             DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::FreeBsdHardened
             | DistroSubsystemMode::OpenBsd

@@ -1411,8 +1411,6 @@ impl SovereignTechMediaMasterSuite {
         self.tensor_pipeline.load_column("current_loss", &[0.52, 0.41, 0.31, 0.21, 0.11]);
         let mean = self.tensor_pipeline.calculate_mean("baseline_loss");
         let drift = self.tensor_pipeline.calculate_drift_ratio("baseline_loss", "current_loss");
-        let ai_ok = mean == Some(0.3)
-            && drift.is_some()
         let norm = self
             .tensor_pipeline
             .normalize_vector_zero_copy(&[1.0, 2.0, 3.0]);
@@ -1428,8 +1426,6 @@ impl SovereignTechMediaMasterSuite {
                 .estimate_context_window_vram("Sigma-SLM-3B", 8192)
                 .unwrap_or(0)
                 > 2048;
-            && self.model_bench.evaluate_llm_performance("Sigma-SLM-3B").is_some()
-            && self.model_bench.estimate_context_window_vram("Sigma-SLM-3B", 8192).unwrap_or(0) > 2048;
 
         // Verify Security & Governance
         let sec_ok = self.zero_trust.verify_sandbox_policy("network_subsystem")
@@ -1444,7 +1440,6 @@ impl SovereignTechMediaMasterSuite {
         // Verify Device Bridge
         self.device_bridge.sync_clipboard("https://sigmaos.org");
         self.device_bridge.mirror_notification("Incoming Call from Pixel 8 Pro");
-        let bridge_ok = self.device_bridge.verify_bridge_status()
         self.device_bridge
             .send_drag_and_drop_stream(b"file_stream_chunk");
         let bridge_ok = self.device_bridge.verify_bridge_status()
@@ -1453,7 +1448,6 @@ impl SovereignTechMediaMasterSuite {
                 .device_bridge
                 .sideload_app("dev_android_1", "org.sigma.pqc_vpn")
                 .is_ok()
-            && self.device_bridge.sideload_app("dev_android_1", "org.sigma.pqc_vpn").is_ok()
             && !self.device_bridge.shared_clipboard_text.is_empty()
             && !self.device_bridge.synced_notifications.is_empty()
             && !self.device_bridge.drag_and_drop_buffer.is_empty();

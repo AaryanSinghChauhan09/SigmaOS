@@ -182,55 +182,56 @@ impl UserGroupManager {
 
     /// Add user
     pub fn add_user(&self, user: User) -> Result<(), String> {
-        let mut db = self.database.lock().unwrap();
+        // Recover inner data if the lock is poisoned (another thread panicked while holding it)
+        let mut db = self.database.lock().unwrap_or_else(|e| e.into_inner());
         db.add_user(user)
     }
 
     /// Get user by UID
     pub fn get_user_by_uid(&self, uid: u32) -> Option<User> {
-        let db = self.database.lock().unwrap();
+        let db = self.database.lock().unwrap_or_else(|e| e.into_inner());
         db.get_user_by_uid(uid).cloned()
     }
 
     /// Get user by username
     pub fn get_user_by_username(&self, username: &str) -> Option<User> {
-        let db = self.database.lock().unwrap();
+        let db = self.database.lock().unwrap_or_else(|e| e.into_inner());
         db.get_user_by_username(username).cloned()
     }
 
     /// Remove user
     pub fn remove_user(&self, uid: u32) -> Result<(), String> {
-        let mut db = self.database.lock().unwrap();
+        let mut db = self.database.lock().unwrap_or_else(|e| e.into_inner());
         db.remove_user(uid)
     }
 
     /// Add group
     pub fn add_group(&self, group: Group) -> Result<(), String> {
-        let mut db = self.database.lock().unwrap();
+        let mut db = self.database.lock().unwrap_or_else(|e| e.into_inner());
         db.add_group(group)
     }
 
     /// Get group by GID
     pub fn get_group_by_gid(&self, gid: u32) -> Option<Group> {
-        let db = self.database.lock().unwrap();
+        let db = self.database.lock().unwrap_or_else(|e| e.into_inner());
         db.get_group_by_gid(gid).cloned()
     }
 
     /// Get group by groupname
     pub fn get_group_by_groupname(&self, groupname: &str) -> Option<Group> {
-        let db = self.database.lock().unwrap();
+        let db = self.database.lock().unwrap_or_else(|e| e.into_inner());
         db.get_group_by_groupname(groupname).cloned()
     }
 
     /// Remove group
     pub fn remove_group(&self, gid: u32) -> Result<(), String> {
-        let mut db = self.database.lock().unwrap();
+        let mut db = self.database.lock().unwrap_or_else(|e| e.into_inner());
         db.remove_group(gid)
     }
 
     /// Add user to group
     pub fn add_user_to_group(&self, username: String, gid: u32) -> Result<(), String> {
-        let mut db = self.database.lock().unwrap();
+        let mut db = self.database.lock().unwrap_or_else(|e| e.into_inner());
         match db.groups.get_mut(&gid) {
             Some(group) => {
                 group.add_member(username);
@@ -242,7 +243,7 @@ impl UserGroupManager {
 
     /// Remove user from group
     pub fn remove_user_from_group(&self, username: &str, gid: u32) -> Result<(), String> {
-        let mut db = self.database.lock().unwrap();
+        let mut db = self.database.lock().unwrap_or_else(|e| e.into_inner());
         match db.groups.get_mut(&gid) {
             Some(group) => {
                 group.remove_member(username);
@@ -254,13 +255,13 @@ impl UserGroupManager {
 
     /// Get user count
     pub fn user_count(&self) -> usize {
-        let db = self.database.lock().unwrap();
+        let db = self.database.lock().unwrap_or_else(|e| e.into_inner());
         db.user_count()
     }
 
     /// Get group count
     pub fn group_count(&self) -> usize {
-        let db = self.database.lock().unwrap();
+        let db = self.database.lock().unwrap_or_else(|e| e.into_inner());
         db.group_count()
     }
 }

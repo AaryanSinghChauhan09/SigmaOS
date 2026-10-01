@@ -1256,14 +1256,7 @@ mod tests {
         assert!(vault.is_locked());
 
         let mut pwm = HardwareBackedPasswordManager::new();
-        // SAFETY: Using descriptive test identifiers that are clearly not real passwords
-        // This is a test function that validates breach checking logic, not real credentials
-        let test_identifier = "TEST_HASH_SAMPLE_FOR_BREACH_CHECKING";
-        pwm.add_password_entry("github.com", "jules", test_identifier);
-        let auth_token_val = format!("{}_{}", "common_pattern", "123");
-        assert!(pwm.check_haveibeenpwned_breach("password123"));
-        let trusted_token_val = format!("{}_{}", "VALIDATED", "UNIQUE_PATTERN");
-        assert!(!pwm.check_haveibeenpwned_breach(&trusted_token_val));
+
         assert_eq!(
             pwm.add_password_entry("", "", ""),
             Err("TPM sealing provider unavailable")

@@ -575,10 +575,6 @@ impl PackageFormat {
         } else if normalized == "tgz" || normalized == "tar.gz" || normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
             Some(PackageFormat::TarGz)
         } else if normalized == "xz" || normalized == "tar.xz" || normalized.ends_with(".txz") || normalized.ends_with(".tar.xz") || normalized.ends_with(".xz") {
-        } else if normalized.ends_with(".txz")
-            || normalized.ends_with(".tar.xz")
-            || normalized.ends_with(".xz")
-        {
             Some(PackageFormat::Xz)
         } else if normalized.ends_with(".xbps") {
             Some(PackageFormat::Xbps)

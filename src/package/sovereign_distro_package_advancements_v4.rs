@@ -534,12 +534,8 @@ impl SovereignMultiDomainPackageAccessGovernor {
     }
 
     /// Authenticates enterprise package repository user via LDAP & PAM
-    pub fn authenticate_ldap_repo_user(&self, bind_dn: &str, user_secret: &str) -> bool {
-        !bind_dn.is_empty() && !user_secret.is_empty() && bind_dn.contains("cn=")
     pub fn authenticate_ldap_repo_user(&self, bind_dn: &str, password: &str) -> bool {
         !bind_dn.is_empty() && !password.is_empty() && bind_dn.contains("cn=")
-    pub fn authenticate_ldap_repo_user(&self, bind_dn: &str, token: &str) -> bool {
-        !bind_dn.is_empty() && !token.is_empty()
     }
 
     /// Evaluates live process migration readiness for package installer tasks (CRIU)

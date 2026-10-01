@@ -92,13 +92,15 @@ impl SemaphoreSet {
 
     /// Create a semaphore in the set
     pub fn create_semaphore(&self, initial_value: i32, max_value: i32) -> u64 {
-        let mut next_id = self.next_sem_id.lock().unwrap();
+        // Safety: recover from poisoned mutex to avoid cascading panics in kernel code
+        let mut next_id = self.next_sem_id.lock().unwrap_or_else(|e| e.into_inner());
         let sem_id = *next_id;
         *next_id += 1;
         drop(next_id);
 
         let semaphore = Semaphore::new(sem_id, initial_value, max_value);
-        let mut semaphores = self.semaphores.lock().unwrap();
+        // Safety: recover from poisoned mutex to avoid cascading panics in kernel code
+        let mut semaphores = self.semaphores.lock().unwrap_or_else(|e| e.into_inner());
         semaphores.insert(sem_id, semaphore);
 
         sem_id
