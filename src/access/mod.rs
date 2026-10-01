@@ -844,6 +844,8 @@ mod tests {
                 .unwrap_or_else(|_| "valid_credential".to_string()),
         )
         .unwrap();
+        ldap.bind("cn=admin,dc=sigmaos,dc=org", "secret_pass")
+            .unwrap();
         let user = ldap.search_user("alice").unwrap();
         assert_eq!(user.uid, "alice");
         assert_eq!(user.mail, "alice@sigmaos.org");

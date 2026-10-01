@@ -315,6 +315,10 @@ mod tests {
         // Attempt strong password registration -> passes
         let strong_pass = std::env::var("SIGMA_STRONG_PASS").unwrap_or_else(|_| "valid_strong_pass_123".to_string());
         assert!(manager.register_user("bob", &strong_pass, "users").is_ok());
+        assert_eq!(manager.register_user("bob", "weak", "users"), Err(PamError::PasswordTooWeak));
+
+        // Attempt strong password registration -> passes
+        assert!(manager.register_user("bob", "strongpassword", "users").is_ok());
     }
 
     #[test]

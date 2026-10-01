@@ -172,6 +172,11 @@ impl UserAccount {
             username: String::from(username),
             full_name: String::new(),
             password: String::from(password_credential),
+    pub fn new(username: &str, password: &str) -> Self {
+        Self {
+            username: String::from(username),
+            full_name: String::new(),
+            password: String::from(password),
             is_admin: true,
             home_directory: format!("/home/{}", username),
             shell: String::from("/bin/sigma-sh"),
