@@ -160,9 +160,12 @@ impl SimplePasswordHashing {
     }
 }
 
+// TODO: Replace with proper configuration-based key derivation management
+const KDF_DEFAULT_INFO: &[u8] = b"password";
+
 impl PasswordHashing for SimplePasswordHashing {
     fn hash_password(&self, password: &[u8], salt: &[u8]) -> Result<Vec<u8>, KDFError> {
-        self.kdf_manager.derive_key(KDFAlgorithm::PBKDF2, password, salt, b"password", 32)
+        self.kdf_manager.derive_key(KDFAlgorithm::PBKDF2, password, salt, KDF_DEFAULT_INFO, 32)
     }
 
     fn verify_password(&self, password: &[u8], salt: &[u8], hash: &[u8]) -> Result<bool, KDFError> {

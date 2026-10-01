@@ -452,13 +452,15 @@ mod tests {
         assert!(!integrity_engine.verify_sector_integrity(sector_num, &tampered, &mac));
     }
 
+    // TODO: Replace with proper configuration-based key derivation management
+    const CRYPTODEV_TEST_KEY: &[u8] = b"0123456789abcdef0123456789abcdef"; // 32-byte key
+
     #[test]
     fn cryptodev_fails_closed_without_audited_provider() {
         let mut cryptodev = OpenBsdCryptodevFrameworkEngine::new();
 
-        let key = b"0123456789abcdef0123456789abcdef"; // 32-byte key
         let sess_id = cryptodev
-            .create_session(AesCipherMode::Gcm, key, true)
+            .create_session(AesCipherMode::Gcm, CRYPTODEV_TEST_KEY, true)
             .unwrap();
 
         let plaintext = b"Cryptodev openbsd session payload verification";

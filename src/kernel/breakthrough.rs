@@ -331,6 +331,7 @@ impl<T> Vec<T> {
         }
     }
     pub fn remove(&mut self, index: usize) -> T {
+        assert!(index < self.len, "Index out of bounds in remove");
         unsafe {
             let item = core::ptr::read(self.data.add(index));
             for i in index..self.len - 1 {

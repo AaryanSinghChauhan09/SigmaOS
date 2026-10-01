@@ -137,7 +137,7 @@ impl SovereignElfDynamicLoader {
                     let _final_target = obj.base_address + (reloc.addend as u64);
                     applied += 1;
                 }
-                _ => {}
+                _ => return Err("ELF Loader: Unsupported relocation type"),
             }
         }
 
