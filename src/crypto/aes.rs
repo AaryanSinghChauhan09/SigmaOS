@@ -78,22 +78,11 @@ impl SimpleAES {
 }
 
 impl BlockCipher for SimpleAES {
-    fn id(&self) -> CipherID {
-        self.id
-    }
-    fn block_size(&self) -> usize {
-        16
-    }
-    fn key_size(&self) -> usize {
-        32
-    }
+    fn id(&self) -> CipherID { self.id }
+    fn block_size(&self) -> usize { 16 }
+    fn key_size(&self) -> usize { 32 }
 
-    fn encrypt(
-        &self,
-        plaintext: &[u8],
-        key: &[u8],
-        iv: Option<&[u8]>,
-    ) -> Result<Vec<u8>, CipherError> {
+    fn encrypt(&self, plaintext: &[u8], key: &[u8], iv: Option<&[u8]>) -> Result<Vec<u8>, CipherError> {
         if key.len() != 32 {
             return Err(CipherError::InvalidKey);
         }

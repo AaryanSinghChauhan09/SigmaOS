@@ -266,56 +266,35 @@ impl KeyboardShortcutsManager {
 
     pub fn get_shortcuts_by_category(&self, category: ShortcutCategory) -> Vec<KeyboardShortcut> {
         match category {
-            ShortcutCategory::Global => self
-                .shortcuts
-                .iter()
-                .filter(|s| matches!(
-                    s.action,
-                    KeyAction::OpenLauncher
-                        | KeyAction::OpenTerminal
-                        | KeyAction::OpenFileManager
-                        | KeyAction::OpenWebBrowser
-                        | KeyAction::ShowDesktop
-                        | KeyAction::LockScreen
-                        | KeyAction::Screenshot
-                        | KeyAction::ScreenRecording
-                        | KeyAction::ToggleTheme
-                ))
-                .cloned()
-                .collect(),
-            ShortcutCategory::WindowManagement => self
-                .shortcuts
-                .iter()
-                .filter(|s| {
-                    matches!(
-                        s.action,
+            ShortcutCategory::Global => {
+                self.shortcuts.iter()
+                    .filter(|s| matches!(s.action,
+                        KeyAction::OpenLauncher | KeyAction::OpenTerminal | KeyAction::OpenFileManager |
+                        KeyAction::OpenWebBrowser | KeyAction::ShowDesktop | KeyAction::LockScreen |
+                        KeyAction::Screenshot | KeyAction::ScreenRecording | KeyAction::ToggleTheme
+                    ))
+                    .cloned()
+                    .collect()
+            }
+            ShortcutCategory::WindowManagement => {
+                self.shortcuts.iter()
+                    .filter(|s| matches!(s.action,
                         KeyAction::MaximizeWindow | KeyAction::TileWindow | KeyAction::CloseWindow
-                    )
-                })
-                .cloned()
-                .collect(),
-            ShortcutCategory::Application => self
-                .shortcuts
-                .iter()
-                .filter(|s| {
-                    !matches!(
-                        s.action,
-                        KeyAction::OpenLauncher
-                            | KeyAction::OpenTerminal
-                            | KeyAction::OpenFileManager
-                            | KeyAction::OpenWebBrowser
-                            | KeyAction::ShowDesktop
-                            | KeyAction::LockScreen
-                            | KeyAction::Screenshot
-                            | KeyAction::ScreenRecording
-                            | KeyAction::ToggleTheme
-                            | KeyAction::MaximizeWindow
-                            | KeyAction::TileWindow
-                            | KeyAction::CloseWindow
-                    )
-                })
-                .cloned()
-                .collect(),
+                    ))
+                    .cloned()
+                    .collect()
+            }
+            ShortcutCategory::Application => {
+                self.shortcuts.iter()
+                    .filter(|s| !matches!(s.action,
+                        KeyAction::OpenLauncher | KeyAction::OpenTerminal | KeyAction::OpenFileManager |
+                        KeyAction::OpenWebBrowser | KeyAction::ShowDesktop | KeyAction::LockScreen |
+                        KeyAction::Screenshot | KeyAction::ScreenRecording | KeyAction::ToggleTheme |
+                        KeyAction::MaximizeWindow | KeyAction::TileWindow | KeyAction::CloseWindow
+                    ))
+                    .cloned()
+                    .collect()
+            }
         }
     }
 
