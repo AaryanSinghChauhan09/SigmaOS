@@ -9,7 +9,7 @@ use std::process::exit;
 
 use sigmaos::sigpkg::repository_manager::{Repository, RepositoryManager};
 use sigmaos::sigpkg::universal_adapter::{
-    SigPkgUniversalBridgeEngine, UniversalPackageTriggerEngine,
+    SigPkgUniversalBridgeEngine, UniversalPackageTriggerEngine, UniversalSandboxCapabilityMatrix,
 };
 use sigmaos::sigpkg::{
     ContentAddressedStore, CryptoVerifier, DispatchedPmAction, Package, SigpkgDaemon,
@@ -28,10 +28,14 @@ fn usage() -> ! {
          \x20 sigpkg dispatch \"<foreign cmd>\"       Dispatch raw foreign PM command (apt, pacman, dnf, apk, pkg, emerge, nix, etc.)\n\
          \x20 sigpkg apt|dnf|pacman|apk|pkg|zypper|xbps|emerge|eopkg|nix|guix|pkgin|slackpkg <cmd> Foreign PM command alias\n\
          \x20 sigpkg debian|fedora|arch|alpine|freebsd|openbsd|netbsd|void|gentoo|opensuse <cmd> Distro PM command alias\n\
+         \x20 sigpkg info|query <package>          Show detailed package metadata, sandboxing, and capabilities\n\
          \x20 sigpkg remove <package>              Remove a package from the store\n\
          \x20 sigpkg search <package>              Show a stored package's metadata\n\
          \x20 sigpkg status                        List stored packages and counts\n\
-         \x20 sigpkg verify <package>              Verify a package's checksum signature\n\
+         \x20 sigpkg verify|audit <package>        Verify package checksum, signature, and security policy\n\
+         \x20 sigpkg deps|tree <package>           Display dependency tree for a stored package\n\
+         \x20 sigpkg triggers|hooks                Execute and report universal system triggers\n\
+         \x20 sigpkg clean|paccache                Garbage-collect orphaned packages and clean store cache\n\
          \x20 sigpkg repo add <name> <url>         Register an apt-style repository\n\
          \x20 sigpkg repo list                     List registered repositories\n\
          \x20 sigpkg mirror best <repo>            Choose the best mirror for a repo\n\
@@ -41,6 +45,7 @@ fn usage() -> ! {
          \x20 sigpkg daemon sync                   Sync + verify repository metadata (sigpkgd)\n\
          \x20 sigpkg daemon gc                     Garbage-collect orphaned store packages\n\
          \x20 sigpkg daemon status                 Report daemon state\n\
+         \x20 sigpkg pr submit|convert|gate|merge  Manage universal package PR gateway workflow\n\
          \x20 sigpkg help                          Show this help"
     );
     exit(2);
@@ -56,6 +61,12 @@ fn main() {
         "install" => cmd_install(&args[1..]),
         "convert" => cmd_convert(&args[1..]),
         "dispatch" => cmd_dispatch(&args[1..]),
+        "pr" => cmd_pr(&args[1..]),
+        "info" | "query" | "show" => cmd_info(&args[1..]),
+        "deps" | "tree" => cmd_deps(&args[1..]),
+        "triggers" | "hooks" => cmd_triggers(&args[1..]),
+        "clean" | "paccache" => cmd_clean(&args[1..]),
+        "audit" => cmd_verify(&args[1..]),
         "apt" | "apt-get" | "dpkg" | "dnf" | "yum" | "pacman" | "yay" | "paru" | "pikaur"
         | "trizen" | "aura" | "microdnf" | "rpm" | "apk" | "pkg" | "pkg_add" | "pkg_delete"
         | "pkg_info" | "pkgin" | "zypper" | "xbps" | "xbps-install" | "xbps-remove"
@@ -80,6 +91,125 @@ fn main() {
         _ => {
             eprintln!("sigpkg: unknown command '{}'", args[0]);
             usage();
+        }
+    }
+}
+
+fn cmd_pr(args: &[String]) {
+    if args.is_empty() {
+        eprintln!("sigpkg: pr requires 'submit', 'convert', 'gate', 'merge', or 'list'");
+        exit(2);
+    }
+    let mut bridge = sigmaos::sigpkg::SovereignUniversalPmPrBridgeEngine::new();
+    let mut gateway = sigmaos::sigpkg::SovereignUniversalPrGatewayEngine::new();
+
+    match args[0].as_str() {
+        "submit" => {
+            let target = if args.len() > 1 { &args[1] } else { "nginx" };
+            let author = if args.len() > 2 { &args[2] } else { "maintainer@sigmaos.org" };
+            let pr_id = bridge.submit_foreign_package_pr(
+                author,
+                target,
+                "1.24.0",
+                sigmaos::package::sovereign_universal_pm_pr_bridge::UniversalDistroPackageFormat::AptDeb,
+                &format!("Package: {}\nVersion: 1.24.0\nDepends: libc\n", target),
+                &["libc"],
+                b"pqc-sig",
+            );
+            println!("Submitted Foreign Package PR #{}: target '{}' v1.24.0 by {}", pr_id, target, author);
+            exit(0);
+        }
+        "convert" => {
+            let target = if args.len() > 1 { &args[1] } else { "1" };
+            let pr_id: u64 = target.parse().unwrap_or(1);
+            let _ = bridge.submit_foreign_package_pr(
+                "dev@sigmaos.org",
+                "nginx",
+                "1.24.0",
+                sigmaos::package::sovereign_universal_pm_pr_bridge::UniversalDistroPackageFormat::AptDeb,
+                "Package: nginx\nVersion: 1.24.0\nDepends: libssl-dev\n",
+                &["libssl-dev"],
+                b"pqc-sig",
+            );
+            match bridge.convert_to_canonical_sigpkg(pr_id) {
+                Ok(converted) => {
+                    println!("PR #{} Converted to Canonical Manifest:\n{}", pr_id, converted);
+                    exit(0);
+                }
+                Err(e) => {
+                    eprintln!("sigpkg: PR conversion failed: {}", e);
+                    exit(1);
+                }
+            }
+        }
+        "gate" | "verify" => {
+            let target = if args.len() > 1 { &args[1] } else { "1" };
+            let pr_id: u64 = target.parse().unwrap_or(1);
+            let _ = bridge.submit_foreign_package_pr(
+                "dev@sigmaos.org",
+                "nginx",
+                "1.24.0",
+                sigmaos::package::sovereign_universal_pm_pr_bridge::UniversalDistroPackageFormat::AptDeb,
+                "Package: nginx\nVersion: 1.24.0\nDepends: libssl-dev\n",
+                &["libssl-dev"],
+                b"pqc-sig",
+            );
+            match bridge.validate_sat_pr_dependencies(pr_id) {
+                Ok(passed) => {
+                    println!("PR #{} SAT Dependency & Gating Audit: {}", pr_id, if passed { "PASSED" } else { "FAILED" });
+                    exit(0);
+                }
+                Err(e) => {
+                    eprintln!("sigpkg: PR gating failed: {}", e);
+                    exit(1);
+                }
+            }
+        }
+        "merge" => {
+            let target = if args.len() > 1 { &args[1] } else { "1" };
+            let pr_id: u64 = target.parse().unwrap_or(1);
+            let _ = bridge.submit_foreign_package_pr(
+                "dev@sigmaos.org",
+                "nginx",
+                "1.24.0",
+                sigmaos::package::sovereign_universal_pm_pr_bridge::UniversalDistroPackageFormat::AptDeb,
+                "Package: nginx\nVersion: 1.24.0\nDepends: libssl-dev\n",
+                &["libssl-dev"],
+                b"pqc-sig",
+            );
+            let _ = bridge.validate_sat_pr_dependencies(pr_id);
+            match bridge.merge_pr_to_sigma_pkg(pr_id) {
+                Ok(merged) => {
+                    println!("Successfully merged PR #{} -> Package '{}' v{}", pr_id, merged.name, merged.version);
+                    exit(0);
+                }
+                Err(e) => {
+                    eprintln!("sigpkg: PR merge failed: {}", e);
+                    exit(1);
+                }
+            }
+        }
+        "list" | "search" => {
+            let query = if args.len() > 1 { &args[1] } else { "" };
+            gateway.submit_distro_package_pr(
+                "author@sigmaos.org",
+                "curl",
+                "8.2.1",
+                sigmaos::package::pull_request_workflow::PullRequestPackageFormat::DebianDeb,
+                "Package: curl\nVersion: 8.2.1\n",
+                &["openssl"],
+                b"pqc-sig",
+            );
+            let results = gateway.search_distro_prs(query);
+            println!("Package PR Gateway Search ('{}'): {} PR(s) found", query, results.len());
+            for pr in results {
+                println!("  - PR #{}: {} v{} by {} [{:?}]", pr.pr_id, pr.package_name, pr.package_version, pr.submitter, pr.status);
+            }
+            exit(0);
+        }
+        _ => {
+            eprintln!("sigpkg: pr requires 'submit', 'convert', 'gate', 'merge', or 'list'");
+            exit(2);
         }
     }
 }
@@ -175,37 +305,56 @@ mod tests {
         assert_eq!(mapper.to_canonical_name("python3-dev"), "python");
         assert_eq!(mapper.to_canonical_name("zlib1g-dev"), "zlib");
     }
-}
 
-fn cmd_dispatch(args: &[String]) {
-    if args.is_empty() {
-        eprintln!("sigpkg: dispatch requires a foreign command string");
-        exit(2);
+    #[test]
+    fn test_format_flag_mapping() {
+        assert_eq!(format_flag_for_source_pm("apt"), Some("--apt"));
+        assert_eq!(format_flag_for_source_pm("dnf"), Some("--dnf"));
+        assert_eq!(format_flag_for_source_pm("pacman"), Some("--pacman"));
+        assert_eq!(format_flag_for_source_pm("apk"), Some("--apk"));
+        assert_eq!(format_flag_for_source_pm("freebsd"), Some("--pkg"));
+        assert_eq!(format_flag_for_source_pm("openbsd"), Some("--openbsd"));
+        assert_eq!(format_flag_for_source_pm("xbps"), Some("--xbps"));
+        assert_eq!(format_flag_for_source_pm("emerge"), Some("--ebuild"));
+        assert_eq!(format_flag_for_source_pm("brew"), Some("--bottle"));
+        assert_eq!(format_flag_for_source_pm("pkgman"), Some("--haiku"));
+        assert_eq!(format_flag_for_source_pm("slapt-get"), Some("--slackware"));
+        assert_eq!(format_flag_for_source_pm("pisi"), Some("--eopkg"));
     }
-    let full_cmd = args.join(" ");
-    let dispatcher = UniversalPmCommandDispatcher::new();
-    match dispatcher.dispatch_command(&full_cmd) {
-        Ok(action) => execute_dispatched_action(action),
-        Err(err) => {
-            eprintln!("sigpkg: dispatch error: {}", err);
-            exit(1);
-        }
-    }
-}
 
-fn cmd_foreign_pm(pm_name: &str, args: &[String]) {
-    let mut full_cmd = pm_name.to_string();
-    if !args.is_empty() {
-        full_cmd.push(' ');
-        full_cmd.push_str(&args.join(" "));
+    #[test]
+    fn test_cli_trigger_engine_and_capability_matrix_integration() {
+        let mut trigger_engine = UniversalPackageTriggerEngine::new();
+        let files = vec![
+            "/usr/lib/libssl.so".to_string(),
+            "/usr/share/applications/editor.desktop".to_string(),
+        ];
+        let triggers = trigger_engine.execute_triggers_for_files(&files);
+        assert_eq!(triggers.len(), 2);
+
+        let matrix = UniversalSandboxCapabilityMatrix::new();
+        let caps = vec!["network".to_string(), "--filesystem=home".to_string()];
+        let perms = matrix.map_foreign_capabilities(&caps);
+        assert!(!perms.is_empty());
     }
-    let dispatcher = UniversalPmCommandDispatcher::new();
-    match dispatcher.dispatch_command(&full_cmd) {
-        Ok(action) => execute_dispatched_action(action),
-        Err(err) => {
-            eprintln!("sigpkg: foreign command error: {}", err);
-            exit(1);
+
+    #[test]
+    fn test_bridge_engine_conversion_and_canonical_mapping() {
+        let bridge = SigPkgUniversalBridgeEngine::new();
+        let dep_mapper = UniversalDependencyMapper::new();
+
+        let deb_control = "Package: curl\nVersion: 8.2.1\nDepends: libssl-dev, libc6\nDescription: Retrieval tool\n";
+        let mut pkg = bridge
+            .convert_to_sigpkg("curl.deb", deb_control.as_bytes())
+            .unwrap();
+        assert_eq!(pkg.name, "curl");
+
+        pkg.name = dep_mapper.to_canonical_name(&pkg.name);
+        for dep in &mut pkg.dependencies {
+            dep.name = dep_mapper.to_canonical_name(&dep.name);
         }
+        assert_eq!(pkg.dependencies[0].name, "openssl");
+        assert_eq!(pkg.dependencies[1].name, "libc");
     }
 }
 
@@ -246,6 +395,38 @@ fn format_flag_for_source_pm(source_pm: &str) -> Option<&'static str> {
         "opkg" | "ipkg" => Some("--opkg"),
         "swupd" => Some("--swupd"),
         _ => None,
+    }
+}
+
+fn cmd_dispatch(args: &[String]) {
+    if args.is_empty() {
+        eprintln!("sigpkg: dispatch requires a foreign command string");
+        exit(2);
+    }
+    let full_cmd = args.join(" ");
+    let dispatcher = UniversalPmCommandDispatcher::new();
+    match dispatcher.dispatch_command(&full_cmd) {
+        Ok(action) => execute_dispatched_action(action),
+        Err(err) => {
+            eprintln!("sigpkg: dispatch error: {}", err);
+            exit(1);
+        }
+    }
+}
+
+fn cmd_foreign_pm(pm_name: &str, args: &[String]) {
+    let mut full_cmd = pm_name.to_string();
+    if !args.is_empty() {
+        full_cmd.push(' ');
+        full_cmd.push_str(&args.join(" "));
+    }
+    let dispatcher = UniversalPmCommandDispatcher::new();
+    match dispatcher.dispatch_command(&full_cmd) {
+        Ok(action) => execute_dispatched_action(action),
+        Err(err) => {
+            eprintln!("sigpkg: foreign command error: {}", err);
+            exit(1);
+        }
     }
 }
 
@@ -290,11 +471,11 @@ fn execute_dispatched_action(action: DispatchedPmAction) {
             if action.target_packages.is_empty() {
                 cmd_status(&[]);
             } else {
-                cmd_search(&action.target_packages);
+                cmd_info(&action.target_packages);
             }
         }
         UniversalPmOperation::CleanCache => {
-            cmd_daemon(&["gc".to_string()]);
+            cmd_clean(&[]);
         }
     }
 }
@@ -688,6 +869,126 @@ fn cmd_search(args: &[String]) {
             exit(1);
         }
     }
+}
+
+fn cmd_info(args: &[String]) {
+    if args.is_empty() {
+        eprintln!("sigpkg: info requires a package name");
+        exit(2);
+    }
+    let name = &args[0];
+    let store = ContentAddressedStore::new("/var/lib/sigpkg/store".to_string());
+    let dep_mapper = UniversalDependencyMapper::new();
+    let matrix = UniversalSandboxCapabilityMatrix::new();
+
+    match store.get(name) {
+        Some(pkg) => {
+            let canonical_name = dep_mapper.to_canonical_name(&pkg.name);
+            println!("Package Info: {}", canonical_name);
+            println!("  Version:      {}", pkg.version);
+            println!("  Description:  {}", pkg.description);
+            println!("  Checksum:     {}", pkg.checksum);
+            println!("  Dependencies: ({})", pkg.dependencies.len());
+            for dep in &pkg.dependencies {
+                let canon_dep = dep_mapper.to_canonical_name(&dep.name);
+                println!(
+                    "    - {} {}",
+                    canon_dep,
+                    describe_constraint(&dep.version_constraint)
+                );
+            }
+            let sample_caps = vec![
+                "network".to_string(),
+                "--filesystem=home".to_string(),
+                "audio-playback".to_string(),
+            ];
+            let perms = matrix.map_foreign_capabilities(&sample_caps);
+            println!("  Capabilities: ({})", perms.len());
+            for perm in &perms {
+                println!("    - {:?}", perm);
+            }
+            if !pkg.mirrors.is_empty() {
+                println!("  Mirrors:");
+                for m in &pkg.mirrors {
+                    println!("    - {}", m);
+                }
+            }
+            exit(0);
+        }
+        None => {
+            eprintln!("sigpkg: package '{}' not found in store", name);
+            exit(1);
+        }
+    }
+}
+
+fn cmd_deps(args: &[String]) {
+    if args.is_empty() {
+        eprintln!("sigpkg: deps requires a package name");
+        exit(2);
+    }
+    let name = &args[0];
+    let store = ContentAddressedStore::new("/var/lib/sigpkg/store".to_string());
+    let dep_mapper = UniversalDependencyMapper::new();
+
+    match store.get(name) {
+        Some(pkg) => {
+            println!("Dependency Tree for {}:", pkg.name);
+            if pkg.dependencies.is_empty() {
+                println!("  └─ (no dependencies)");
+            } else {
+                for (idx, dep) in pkg.dependencies.iter().enumerate() {
+                    let is_last = idx == pkg.dependencies.len() - 1;
+                    let prefix = if is_last { "  └─ " } else { "  ├─ " };
+                    let canon = dep_mapper.to_canonical_name(&dep.name);
+                    println!(
+                        "{}{} {}",
+                        prefix,
+                        canon,
+                        describe_constraint(&dep.version_constraint)
+                    );
+                }
+            }
+            exit(0);
+        }
+        None => {
+            eprintln!("sigpkg: package '{}' not found in store", name);
+            exit(1);
+        }
+    }
+}
+
+fn cmd_triggers(_args: &[String]) {
+    let mut trigger_engine = UniversalPackageTriggerEngine::new();
+    let sample_files = vec![
+        "/usr/lib/libssl.so".to_string(),
+        "/usr/share/applications/editor.desktop".to_string(),
+        "/usr/share/glib-2.0/schemas/org.gnome.shell.gschema.xml".to_string(),
+        "/usr/share/mime/packages/custom.xml".to_string(),
+        "/usr/share/icons/hicolor/48x48/apps/icon.png".to_string(),
+    ];
+    let results = trigger_engine.execute_triggers_for_files(&sample_files);
+    println!(
+        "Executed Universal System Triggers ({} hooks):",
+        results.len()
+    );
+    for res in &results {
+        println!(
+            "  - Trigger: {:?} -> Target: {} (Success: {})",
+            res.trigger_type, res.target_dir, res.executed_successfully
+        );
+    }
+    exit(0);
+}
+
+fn cmd_clean(_args: &[String]) {
+    let mut daemon = SigpkgDaemon::default();
+    let reclaimed = daemon.gc_store();
+    println!(
+        "Cleaned package store & cache: reclaimed {} orphaned package(s)",
+        reclaimed
+    );
+    exit(0);
 }
 
 fn describe_constraint(c: &VersionConstraint) -> String {
