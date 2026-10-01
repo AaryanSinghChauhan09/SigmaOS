@@ -161,6 +161,9 @@ pub use universal::{
     SovereignUniversalDistroPackageMasterGateway, UnifiedPackage, UniversalPackageManager,
     ZypperYastRpmDeltaPackageAdapter,
 };
+pub mod sovereign_universal_multi_distro_pm_gateway;
+pub use sovereign_universal_multi_distro_pm_gateway::*;
+
 pub use crate::sigpkg::{
     SovereignUniversalPackageManagerInteropEngine, SovereignUniversalPackageTranslationBridge,
 };

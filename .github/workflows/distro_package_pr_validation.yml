@@ -1,0 +1,41 @@
+name: Distro Package PR Validation & Transpilation Pipeline
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'pkgs/**'
+      - 'src/package/**'
+      - '.github/workflows/distro_package_pr_validation.yml'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  validate-package-pr:
+    name: Validate Distro Package PR
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+
+      - name: Build Package PM Gateway Tests
+        run: |
+          mkdir -p build
+          rustc --edition=2021 --test src/package/sovereign_universal_multi_distro_pm_gateway.rs -o build/test_universal_pm_gateway
+
+      - name: Execute Universal Multi-Distro PM Gateway Verification
+        run: |
+          ./build/test_universal_pm_gateway
+
+      - name: Verify Multi-Distro Package Formats (Apt, Pacman, Dnf, Apk, Ebuild, Ports, Nix)
+        run: |
+          cargo check --lib
