@@ -286,30 +286,34 @@ impl KeyboardShortcutsManager {
             ShortcutCategory::WindowManagement => self
                 .shortcuts
                 .iter()
-                .filter(|s| matches!(
-                    s.action,
-                    KeyAction::MaximizeWindow | KeyAction::TileWindow | KeyAction::CloseWindow
-                ))
+                .filter(|s| {
+                    matches!(
+                        s.action,
+                        KeyAction::MaximizeWindow | KeyAction::TileWindow | KeyAction::CloseWindow
+                    )
+                })
                 .cloned()
                 .collect(),
             ShortcutCategory::Application => self
                 .shortcuts
                 .iter()
-                .filter(|s| !matches!(
-                    s.action,
-                    KeyAction::OpenLauncher
-                        | KeyAction::OpenTerminal
-                        | KeyAction::OpenFileManager
-                        | KeyAction::OpenWebBrowser
-                        | KeyAction::ShowDesktop
-                        | KeyAction::LockScreen
-                        | KeyAction::Screenshot
-                        | KeyAction::ScreenRecording
-                        | KeyAction::ToggleTheme
-                        | KeyAction::MaximizeWindow
-                        | KeyAction::TileWindow
-                        | KeyAction::CloseWindow
-                ))
+                .filter(|s| {
+                    !matches!(
+                        s.action,
+                        KeyAction::OpenLauncher
+                            | KeyAction::OpenTerminal
+                            | KeyAction::OpenFileManager
+                            | KeyAction::OpenWebBrowser
+                            | KeyAction::ShowDesktop
+                            | KeyAction::LockScreen
+                            | KeyAction::Screenshot
+                            | KeyAction::ScreenRecording
+                            | KeyAction::ToggleTheme
+                            | KeyAction::MaximizeWindow
+                            | KeyAction::TileWindow
+                            | KeyAction::CloseWindow
+                    )
+                })
                 .cloned()
                 .collect(),
         }
@@ -364,9 +368,6 @@ impl KeyboardShortcutsManager {
         let app_count = self
             .get_shortcuts_by_category(ShortcutCategory::Application)
             .len();
-        let global_count = self.get_shortcuts_by_category(ShortcutCategory::Global).len();
-        let window_count = self.get_shortcuts_by_category(ShortcutCategory::WindowManagement).len();
-        let app_count = self.get_shortcuts_by_category(ShortcutCategory::Application).len();
 
         stats.push_str(&format!("Global shortcuts: {}\n", global_count));
         stats.push_str(&format!("Window shortcuts: {}\n", window_count));
