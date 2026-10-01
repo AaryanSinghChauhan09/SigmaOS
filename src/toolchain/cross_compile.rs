@@ -1,4 +1,8 @@
 
+use core::sync::atomic::{AtomicUsize, Ordering};
+use std::boxed::Box;
+use std::format;
+use std::string::String;
 /// OOP-based Cross-compile Toolchain for SigmaOS
 /// Based on Ideas-999-Structured: Package, Build & Reproducibility Item 9
 /// Implements reproducible cross builds for multiple architectures
@@ -137,6 +141,9 @@ pub struct SimpleToolchain {
     pub target_arch: AtomicUsize,
     pub name: [u8; 64],
     pub version: [u8; 32],
+    // O(1) length cache: stores exact slice byte lengths to avoid O(N) zero-byte linear scans (.position(|&b| b == 0))
+    pub name_len: u8,
+    pub version_len: u8,
 }
 
 impl SimpleToolchain {
@@ -154,6 +161,8 @@ impl SimpleToolchain {
             target_arch: AtomicUsize::new(target_arch as usize),
             name: name_array,
             version: version_array,
+            name_len: name_len as u8,
+            version_len: version_len as u8,
         }
     }
 }
@@ -170,12 +179,12 @@ impl Toolchain for SimpleToolchain {
         }
     } }
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
+        // O(1) constant-time slice lookup using cached name_len
+        &self.name[..self.name_len as usize]
     }
     fn version(&self) -> &[u8] {
-        let len = self.version.iter().position(|&b| b == 0).unwrap_or(32);
-        &self.version[..len]
+        // O(1) constant-time slice lookup using cached version_len
+        &self.version[..self.version_len as usize]
     }
 
     fn compile(&mut self, source: &[u8]) -> Result<Vec<u8>, ToolchainError> {
@@ -696,8 +705,23 @@ impl ReproducibleBuild for SimpleReproducibleBuild {
 
 
 #[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_simple_toolchain_cached_len() {
+        let tc = SimpleToolchain::new(
+            1,
+            Architecture::X86_64,
+            b"x86_64-linux-gnu-gcc",
+            b"13.2.0",
+        );
+        assert_eq!(tc.name(), b"x86_64-linux-gnu-gcc");
+        assert_eq!(tc.version(), b"13.2.0");
+        assert_eq!(tc.name_len, 20);
+        assert_eq!(tc.version_len, 6);
+    }
 
     #[test]
     fn test_scrub_environment() {
