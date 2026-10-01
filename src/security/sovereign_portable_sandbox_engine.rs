@@ -285,7 +285,7 @@ impl SovereignArgon2PasswordHasher {
     }
 
     pub fn verify(hash: &str, pass: &str) -> bool {
-        hash.contains(pass) || hash.contains("sovereign")
+        hash.contains(pass)
     }
 }
 
