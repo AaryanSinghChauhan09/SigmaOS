@@ -1064,6 +1064,10 @@ pub enum ShellDialect {
     Oil,
     Es,
     Bsh,
+    Ash,
+    Csh,
+    MinixSh,
+    Psh,
 }
 
 pub struct FishAbbreviationEngine {
@@ -1279,8 +1283,10 @@ impl UniversalShellCompatibilityEngine {
                     return ShellDialect::Zsh;
                 } else if trimmed.contains("fish") {
                     return ShellDialect::Fish;
-                } else if trimmed.contains("tcsh") || trimmed.contains("csh") {
+                } else if trimmed.contains("tcsh") {
                     return ShellDialect::Tcsh;
+                } else if trimmed.contains("csh") {
+                    return ShellDialect::Csh;
                 } else if trimmed.contains("mksh") {
                     return ShellDialect::Mksh;
                 } else if trimmed.contains("ksh") {
@@ -1305,6 +1311,12 @@ impl UniversalShellCompatibilityEngine {
                     return ShellDialect::Bsh;
                 } else if trimmed.contains("dash") {
                     return ShellDialect::Dash;
+                } else if trimmed.contains("ash") {
+                    return ShellDialect::Ash;
+                } else if trimmed.contains("minix") {
+                    return ShellDialect::MinixSh;
+                } else if trimmed.contains("psh") {
+                    return ShellDialect::Psh;
                 } else if trimmed.contains("sh") {
                     return ShellDialect::BsdSh;
                 }
@@ -1366,6 +1378,45 @@ impl SovereignUniversalShellBridgeEngine {
     }
 }
 
+pub struct SovereignUniversalBsdLinuxShellEngine {
+    pub compat_engine: UniversalShellCompatibilityEngine,
+}
+
+impl SovereignUniversalBsdLinuxShellEngine {
+    pub fn new() -> Self {
+        Self {
+            compat_engine: UniversalShellCompatibilityEngine::new(),
+        }
+    }
+
+    /// Transpiles and executes any Linux or BSD distro shell script as standard POSIX /bin/sh
+    pub fn execute_bsd_linux_script(
+        &mut self,
+        script: &str,
+    ) -> Result<
+        (
+            ShellDialect,
+            String,
+            Vec<ShellPipeline>,
+            Vec<(u32, &'static str)>,
+        ),
+        &'static str,
+    > {
+        let dialect = UniversalShellCompatibilityEngine::detect_shebang_dialect(script);
+        let posix_sh = UniversalScriptTranspiler::transpile_to_posix_sh(script, dialect);
+        let warnings = DashPosixShValidator::validate_posix_compliance(&posix_sh);
+        let pipelines = self.compat_engine.execute_script_as_sh(&posix_sh)?;
+        Ok((dialect, posix_sh, pipelines, warnings))
+    }
+
+    /// Executes a single interactive shell input line with multi-dialect support
+    pub fn execute_command_line(&mut self, line: &str) -> Result<ShellPipeline, &'static str> {
+        let dialect = UniversalShellCompatibilityEngine::detect_shebang_dialect(line);
+        let posix_line = UniversalScriptTranspiler::transpile_to_posix_sh(line, dialect);
+        self.compat_engine.process_input_line(&posix_line)
+    }
+}
+
 pub struct UniversalScriptTranspiler;
 
 impl UniversalScriptTranspiler {
@@ -1407,6 +1458,12 @@ impl UniversalScriptTranspiler {
                 ShellDialect::Bash | ShellDialect::Zsh | ShellDialect::Ksh | ShellDialect::Yash | ShellDialect::Mksh => {
                     Self::transpile_bash_zsh_line(trimmed)
                 }
+                ShellDialect::Tcsh | ShellDialect::Csh => Self::transpile_tcsh_line(trimmed),
+                ShellDialect::Bash
+                | ShellDialect::Zsh
+                | ShellDialect::Ksh
+                | ShellDialect::Yash
+                | ShellDialect::Mksh => Self::transpile_bash_zsh_line(trimmed),
                 ShellDialect::Nu => Self::transpile_nu_line(trimmed),
                 ShellDialect::Ion => Self::transpile_ion_line(trimmed),
                 ShellDialect::Rc => Self::transpile_rc_line(trimmed),
@@ -1420,7 +1477,12 @@ impl UniversalScriptTranspiler {
                 }
                 ShellDialect::Oil => Self::transpile_oil_line(trimmed),
                 ShellDialect::Es => Self::transpile_es_line(trimmed),
-                ShellDialect::Dash | ShellDialect::BsdSh | ShellDialect::Bsh => trimmed.to_string(),
+                ShellDialect::Dash
+                | ShellDialect::BsdSh
+                | ShellDialect::Bsh
+                | ShellDialect::Ash
+                | ShellDialect::MinixSh
+                | ShellDialect::Psh => trimmed.to_string(),
             };
 
             transpiled.push_str(&converted_line);
@@ -2885,5 +2947,31 @@ mod tests {
         let fd_close = "exec 3>&-";
         let posix_fd = SovereignBackendShellEngine::transpile_fd_redirection(fd_close);
         assert!(posix_fd.contains("# closed fd"));
+    }
+
+    #[test]
+    fn test_bsd_linux_universal_shell_engine() {
+        let ash_script = "#!/bin/ash\necho \"Running under NetBSD/Debian ash\"\nexport ASH_VAR=1";
+        assert_eq!(
+            UniversalShellCompatibilityEngine::detect_shebang_dialect(ash_script),
+            ShellDialect::Ash
+        );
+
+        let csh_script = "#!/bin/csh\nsetenv CSH_ENV production\nswitch ($CSH_ENV)\ncase production:\necho prod\nbreaksw\nendsw";
+        assert_eq!(
+            UniversalShellCompatibilityEngine::detect_shebang_dialect(csh_script),
+            ShellDialect::Csh
+        );
+
+        let mut engine = SovereignUniversalBsdLinuxShellEngine::new();
+        let (dialect, posix_sh, pipelines, _warnings) =
+            engine.execute_bsd_linux_script(csh_script).unwrap();
+        assert_eq!(dialect, ShellDialect::Csh);
+        assert!(posix_sh.contains("export CSH_ENV=production"));
+        assert!(posix_sh.contains("case $CSH_ENV in"));
+        assert!(!pipelines.is_empty());
+
+        let cmd_line_result = engine.execute_command_line("echo hello world").unwrap();
+        assert_eq!(cmd_line_result.stages.len(), 1);
     }
 }

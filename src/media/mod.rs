@@ -20,8 +20,9 @@ pub use sovereign_screen_recorder::{
 };
 
 pub use browser::{
-    ArcBoostScript, ArcBrowserBoostEngine, BraveAdblockEngine, BraveShieldsEngine,
-    BrowserContainerType, BrowserProcess, BrowserProcessType, BrowserTabInstance,
+    ArcBoostDomainStylingEngine, ArcBoostScript, ArcBrowserBoostEngine, BraveAdblockEngine,
+    BraveScriptletInjectionEngine, BraveShieldsEngine, BrowserContainerType, BrowserProcess,
+    BrowserProcessType, BrowserTabInstance, ChromiumBlinkCssFlexLayoutEngine,
     ChromiumBlinkLayoutEngine, ChromiumIpcChannelEngine, ChromiumIpcMessage,
     DeclarativeNetRequestEngine, DnrActionType, DohEchEncryptionEngine, DuckAssistPrivacyEngine,
     FirefoxContainerJarManager, FirefoxGeckoViewLayoutEngine, FloorpWorkspacesSplitViewEngine,
@@ -32,6 +33,20 @@ pub use browser::{
     SovereignBrowserEngine, TabMemoryOptimizer, TelemetryAndTrackerStripper, TorCircuitManager,
     TorOnionRoutingTunnelEngine, TorSecurityLevel, TrackerTrustGrade, UBlockOriginFilterEngine,
     UngoogledChromiumPrivacyHardeningEngine, VivaldiSpatialNavigationEngine, ZenWorkspaceTreeEngine,
+    ChromiumPartitionAllocSlotGuardEngine, DeclarativeNetRequestEngine, DnrActionType,
+    DohEchEncryptionEngine, DuckAssistPrivacyEngine, DuckDuckGoAiAssistSummarizerEngine,
+    FirefoxContainerJarManager, FirefoxContentSecurityPolicyEngine, FirefoxGeckoFlexboxLayoutEngine,
+    FirefoxGeckoViewLayoutEngine, FirefoxTotalCookieProtectionEngine, FloorpSplitViewManagerEngine,
+    FloorpWorkspacesSplitViewEngine, GlobalPrivacyControl, LadybirdLibWebCss3ParserEngine,
+    LadybirdLibWebCssParserEngine, LibreWolfStrictFingerprintingProtectionEngine,
+    LibreWolfWebRtcProtectionEngine, MullvadODohRelayEngine, MullvadPrivacyIsolationEngine,
+    OnionCircuitNode, OrionWebExtensionCompatibilityEngine, QuantumWebRenderEngine,
+    ResistFingerprintingEngine, SearchEngineType, SearchSwitcher, SecureStorageContainer,
+    SigmaWebBrowser, SovereignBrowserEngine, TabMemoryOptimizer, TelemetryAndTrackerStripper,
+    TorCircuitManager, TorObfs4PacketFramingEngine, TorOnionRoutingTunnelEngine, TorSecurityLevel,
+    TrackerTrustGrade, UBlockOriginFilterEngine, UngoogledChromiumHostIpProtectionEngine,
+    UngoogledChromiumPrivacyHardeningEngine, VivaldiSpatialNavigationEngine,
+    VivaldiSpatialVectorNavEngine, ZenWorkspaceTreeEngine,
 };
 
 pub use sovereign_video_player::{
