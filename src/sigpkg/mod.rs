@@ -94,6 +94,9 @@ pub use universal_adapter::{
     UniversalDependencyMapper, UniversalDryRunResult, UniversalDryRunSimulator,
     UniversalFormatConverter, UniversalPackageAdapter, UniversalScriptletConverter,
 };
+
+pub use crate::package::sovereign_pr_package_gateway::SovereignUniversalPrGatewayEngine;
+pub use crate::package::sovereign_universal_pm_pr_bridge::SovereignUniversalPmPrBridgeEngine;
 pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
 
 pub use alpine_apk_engine::{AlpineCommunityRepo, ApkIndexParser, ApkPackage};
