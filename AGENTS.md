@@ -205,7 +205,7 @@ All data structures and algorithms should be implemented directly using:
 - `docs/MISSING_DISTRO_COMPONENTS_ROADMAP_AGENT.md` - Guidelines and roadmap for missing Linux & BSD components gap closure
 - `WHAT_IS_WORKING_AND_NOT_WORKING.md` - Component status tracker
 - `FUTURE-DEVELOPMENT-ROADMAP.md` - Roadmap and specifications
-- `docs/MISSING_DISTRO_COMPONENTS_ROADMAP_AGENT.md` - Missing Linux & BSD components development roadmap
+- `FUTURE_LINUX_BSD_MISSING_COMPONENTS_AGENTS.md` - Agent guidelines for closing Linux & BSD distro component feature gaps
 - `SIGMAOS_MASTER_PLAN_TRI_AGENT_500_REPOS_ABSORPTION.md` - Tri-agent framework details
 - `CAPABILITY_MATRIX.toml` - Machine-readable capability matrix
 - `FEATURE_STATUS.toml` - Feature implementation status

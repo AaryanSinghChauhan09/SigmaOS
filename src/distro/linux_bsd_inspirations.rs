@@ -1397,10 +1397,10 @@ impl SovereignUniversalDistroBridge {
             "open_source_obsoletion", "open_source_os_gap_closure", "orchestration", "package", "performance", "phase_l_plans", "pillars", "pledge", "plugin", "power", "print", "printing", "privacy",
             "process", "productivity", "provisioning", "recovery", "release", "remote", "resilience", "resource",
             "robotics", "rt", "runtime", "saver", "scheduler", "scientific", "secure", "security", "sensor",
-            "shell", "sigma-boot", "sigma_sandbox", "sigma_validation", "signal", "sigpkg", "slab", "smartcard", "storage",
-            "support", "syscall", "system", "tech_media_reexports", "telemetry", "testing", "theming", "thermal", "thread", "time",
-            "timeline_innovations", "timer", "toolchain", "tools", "touchscreen", "tpm", "tracing", "ui", "update",
-            "usb", "userland", "userspace", "vfs", "virt", "virtualization", "vm", "wiki", "wiki_distro_ideas_deployment", "wireless", "workflow",
+            "shell", "sigma-boot", "sigma_sandbox", "sigma_validation", "signal", "sigpkg", "slab", "smartcard", "sovereign_wiki_master_engine", "storage",
+            "subsystem_sync", "super_matrix", "support", "syscall", "system", "tech_media_reexports", "telemetry", "testing", "theming", "thermal", "thread", "time",
+            "timeline_innovations", "timer", "toolchain", "tools", "touchscreen", "tpm", "tracing", "ui", "unimplemented_features", "unimplemented_tools", "universal_distro_super_matrix", "update",
+            "usb", "userland", "userspace", "vfs", "virt", "virtualization", "vm", "wiki", "wiki_distro_ideas_deployment", "wiki_ideas", "wiki_unimplemented_ideas", "wireless", "workflow",
             "zig",
         ];
 
@@ -3208,7 +3208,7 @@ mod cross_subsystem_tests {
 
         let sync_count = orchestrator.synchronize_subsystem_pipeline();
         assert!(sync_count.is_ok());
-        assert_eq!(sync_count.unwrap(), 174);
+        assert_eq!(sync_count.unwrap(), 182);
 
         let (supervisor, pkg_spec, vfs_etc, compatible) = orchestrator.query_subsystem_capabilities();
         assert_eq!(supervisor, ServiceSupervisorType::Smf);
@@ -3254,8 +3254,8 @@ mod cross_subsystem_tests {
     fn test_linux_bsd_interoperability_gateway_matrix_and_sync() {
         let mut gateway = LinuxBsdDistroSubsystemInteroperabilityGateway::new(DistroSubsystemMode::LinuxArch);
         let count = gateway.synchronize_and_audit_all_subsystems().unwrap();
-        assert_eq!(count, 174);
-        assert_eq!(gateway.audited_subsystems_count, 174);
+        assert_eq!(count, 182);
+        assert_eq!(gateway.audited_subsystems_count, 182);
 
         let res = gateway.orchestrate_subsystem("kernel", "sched_task");
         assert!(res.is_ok());
@@ -3263,7 +3263,7 @@ mod cross_subsystem_tests {
 
         gateway.set_distro_mode(DistroSubsystemMode::FreeBsd);
         let count_bsd = gateway.synchronize_and_audit_all_subsystems().unwrap();
-        assert_eq!(count_bsd, 174);
+        assert_eq!(count_bsd, 182);
 
         let (supervisor, pkg_spec, vfs_etc, compatible) = gateway.query_gateway_capability_matrix();
         assert_eq!(supervisor, ServiceSupervisorType::OpenRC);
