@@ -350,37 +350,8 @@ pub use linux_bsd_distro_strategic_innovations::{
     ZorinExecGuardSubsystem,
 };
 
-pub mod master_distro_kernel_synthesis;
-pub use master_distro_kernel_synthesis::*;
+pub mod linux_bsd_distro_breakthroughs;
+pub use linux_bsd_distro_breakthroughs::*;
 
-pub mod tech_media_distro_innovations;
-pub use tech_media_distro_innovations::*;
-pub mod tech_media_extended_innovations;
-pub use tech_media_extended_innovations::*;
-
-pub mod sovereign_linux_bsd_master_synthesis;
-pub use sovereign_linux_bsd_master_synthesis::*;
-
-pub mod additional_linux_bsd_components;
-pub use additional_linux_bsd_components::*;
-
-pub mod sovereign_media_and_distro_unimplemented_innovations;
-pub use sovereign_media_and_distro_unimplemented_innovations::*;
-
-pub mod sovereign_2050_distro_supremacy_engine;
-pub use sovereign_2050_distro_supremacy_engine::*;
-
-pub mod sovereign_2055_distro_supremacy_engine;
-pub use sovereign_2055_distro_supremacy_engine::*;
-
-pub mod sovereign_2060_distro_supremacy_engine;
-pub use sovereign_2060_distro_supremacy_engine::*;
-
-pub mod sovereign_2065_distro_supremacy_engine;
-pub use sovereign_2065_distro_supremacy_engine::*;
-
-pub mod sovereign_github_wiki_complete_deployment;
-pub use sovereign_github_wiki_complete_deployment::*;
-
-pub mod sovereign_linux_bsd_ecosystem_pinnacle_suite;
-pub use sovereign_linux_bsd_ecosystem_pinnacle_suite::*;
+pub mod community_ecosystem;
+pub use community_ecosystem::*;
