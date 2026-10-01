@@ -303,11 +303,26 @@ if [ -f "src/package/sovereign_distro_package_advancements_v6.rs" ]; then
     mkdir -p build
     rustc --test src/package/sovereign_distro_package_advancements_v6.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v6_test
     ./build/sovereign_advancements_v6_test
+fi
 if [ -f "src/package/sovereign_distro_package_advancements_v7.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V7 test suite..."
     mkdir -p build
     rustc --test src/package/sovereign_distro_package_advancements_v7.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v7_test
     ./build/sovereign_advancements_v7_test
+fi
+
+if [ -f "src/package/sovereign_universal_pm_pr_bridge.rs" ]; then
+    echo "Running Sovereign Universal PM PR Bridge Engine test suite..."
+    mkdir -p build
+    rustc --test src/package/sovereign_universal_pm_pr_bridge.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_universal_pm_pr_bridge_test
+    ./build/sovereign_universal_pm_pr_bridge_test
+fi
+
+if [ -f "src/package/sovereign_pr_package_gateway.rs" ]; then
+    echo "Running Sovereign PR Package Gateway Engine test suite..."
+    mkdir -p build
+    rustc --test src/package/sovereign_pr_package_gateway.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_pr_package_gateway_test
+    ./build/sovereign_pr_package_gateway_test
 fi
 
 if [ -f "src/package/sovereign_distro_package_master_suite.rs" ]; then
