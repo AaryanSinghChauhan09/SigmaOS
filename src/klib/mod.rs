@@ -1,7 +1,4 @@
-// SigmaOS Kernel Library
-
-// Core Library Collection Modules for SigmaOS
-// Sovereign implementations - no external crate dependencies
+pub mod adt;
 pub mod arc;
 pub mod async_runtime;
 pub mod base64;
@@ -41,6 +38,7 @@ pub mod sigmalib;
 pub mod slab;
 pub mod static_hashmap;
 pub mod store;
+pub mod string;
 pub mod string_ops;
 pub mod string_parser;
 pub mod time;
@@ -49,6 +47,7 @@ pub mod toml;
 pub mod utf8_utils;
 pub mod uuid;
 pub mod uvm;
+pub mod vecdeque;
 pub mod zero_dependency_elimination;
 
 pub use arc::Arc;
@@ -115,4 +114,27 @@ pub use custom_string::SigmaString;
 
 pub mod vec {
     pub use super::Vec;
+}
+
+/// SigmaOS kernel library prelude.
+///
+/// Kernel modules can use `use crate::klib::prelude::*;` to get
+/// sovereign implementations of common types without stdlib imports.
+pub mod prelude {
+    // Collections
+    pub use super::BTreeMap;
+    pub use super::Vec;
+    pub use super::HashMap;
+    pub use super::HashSet;
+    // Linked structures
+    pub use super::LinkedList;
+    pub use super::RingBuffer;
+    pub use super::HeapRingBuffer;
+    // Utilities
+    pub use super::Arc;
+    pub use super::Uuid;
+    pub use super::SigmaString;
+    pub use super::SlabCache;
+    pub use super::ZeroDependencyMasterHub;
+    pub use super::ZeroDependencyPrimitiveHub;
 }
