@@ -4,8 +4,9 @@
 //
 // Zero-dependency, `#![no_std]` compliant Rust engine bridging multi-distro Linux & BSD
 // package formats (Apt .deb, Pacman .pkg.tar.zst / PKGBUILD, Dnf .rpm, Alpine .apk, Void .xbps,
-// Gentoo .ebuild, FreeBSD/OpenBSD .pkg, Nix Flakes, Flatpak, Snap, AppImage) into `sigma-pkg`
-// through automated Pull Request submission workflows, SAT dependency resolution, and PQC verification.
+// Gentoo .ebuild, FreeBSD .pkg, OpenBSD pkg, NetBSD pkgsrc, Nix Flakes, Guix Scheme, Zypper .rpm,
+// Slackware .txz, Haiku .hpkg, Opkg, Flatpak, Snap, AppImage) into `sigma-pkg` through automated
+// Pull Request submission workflows, SAT dependency resolution, and PQC verification.
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
@@ -41,8 +42,16 @@ pub enum UniversalDistroPackageFormat {
     AlpineApk,
     VoidXbps,
     GentooEbuild,
-    BsdPkg,
+    FreeBsdPkg,
+    OpenBsdPkg,
+    NetBsdPkgsrc,
     NixFlake,
+    GuixScheme,
+    ZypperSpec,
+    SlackwareTxz,
+    HaikuHpkg,
+    OpkgPackage,
+    SolusEopkg,
     FlatpakApp,
     SnapApp,
     AppImage,
@@ -58,8 +67,16 @@ impl UniversalDistroPackageFormat {
             Self::AlpineApk => "apk (.apk / APKBUILD)",
             Self::VoidXbps => "xbps (.xbps)",
             Self::GentooEbuild => "portage (.ebuild)",
-            Self::BsdPkg => "bsd-pkg (.pkg / ports)",
+            Self::FreeBsdPkg => "freebsd-pkg (.pkg / ports)",
+            Self::OpenBsdPkg => "openbsd-pkg (.pkg / ports)",
+            Self::NetBsdPkgsrc => "netbsd-pkgsrc (pkgsrc)",
             Self::NixFlake => "nix (flake / derivation)",
+            Self::GuixScheme => "guix (scheme / nar)",
+            Self::ZypperSpec => "zypper (.rpm / spec)",
+            Self::SlackwareTxz => "slackware (.txz / SlackBuild)",
+            Self::HaikuHpkg => "haiku (.hpkg)",
+            Self::OpkgPackage => "opkg (.ipk / .opkg)",
+            Self::SolusEopkg => "solus (.eopkg / yml)",
             Self::FlatpakApp => "flatpak (.flatpakref)",
             Self::SnapApp => "snap (.snap)",
             Self::AppImage => "appimage (.AppImage)",
@@ -147,7 +164,14 @@ impl SovereignUniversalPmPrBridgeEngine {
             raw_manifest_content: manifest_data.to_string(),
             declared_dependencies: dependencies.iter().map(|s| s.to_string()).collect(),
             provides_capabilities: vec![name.to_string()],
-            sandbox_level: 2,
+            sandbox_level: match format {
+                UniversalDistroPackageFormat::FreeBsdPkg
+                | UniversalDistroPackageFormat::OpenBsdPkg => 3,
+                UniversalDistroPackageFormat::FlatpakApp
+                | UniversalDistroPackageFormat::SnapApp
+                | UniversalDistroPackageFormat::AppImage => 2,
+                _ => 1,
+            },
         };
 
         let pqc_valid = !pqc_sig_bytes.is_empty();
@@ -243,7 +267,8 @@ mod tests {
             b"valid_pqc_sig",
         );
 
-        assert_eq!(pr1, 1);        assert!(bridge.validate_sat_pr_dependencies(pr1).unwrap());
+        assert_eq!(pr1, 1);
+        assert!(bridge.validate_sat_pr_dependencies(pr1).unwrap());
         let merged = bridge.merge_pr_to_sigma_pkg(pr1).unwrap();
         assert_eq!(merged.name, "nginx");
         assert_eq!(bridge.total_prs_merged, 1);
@@ -251,15 +276,24 @@ mod tests {
     }
 
     #[test]
-    fn test_multi_format_package_conversions() {
+    fn test_all_linux_bsd_distro_pr_package_formats() {
         let formats = [
+            (UniversalDistroPackageFormat::AptDeb, "debian-pkg", &["libc6"][..]),
             (UniversalDistroPackageFormat::PacmanPkg, "arch-app", &["glibc"][..]),
             (UniversalDistroPackageFormat::DnfRpm, "fedora-app", &["systemd"][..]),
             (UniversalDistroPackageFormat::AlpineApk, "alpine-app", &["musl"][..]),
             (UniversalDistroPackageFormat::VoidXbps, "void-app", &["xbps"][..]),
             (UniversalDistroPackageFormat::GentooEbuild, "gentoo-app", &["portage"][..]),
-            (UniversalDistroPackageFormat::BsdPkg, "freebsd-app", &["libc"][..]),
+            (UniversalDistroPackageFormat::FreeBsdPkg, "freebsd-app", &["libc"][..]),
+            (UniversalDistroPackageFormat::OpenBsdPkg, "openbsd-app", &["libc"][..]),
+            (UniversalDistroPackageFormat::NetBsdPkgsrc, "netbsd-app", &["pkgsrc"][..]),
             (UniversalDistroPackageFormat::NixFlake, "nix-app", &["stdenv"][..]),
+            (UniversalDistroPackageFormat::GuixScheme, "guix-app", &["guix"][..]),
+            (UniversalDistroPackageFormat::ZypperSpec, "zypper-app", &["zypper"][..]),
+            (UniversalDistroPackageFormat::SlackwareTxz, "slackware-app", &["tar"][..]),
+            (UniversalDistroPackageFormat::HaikuHpkg, "haiku-app", &["haiku"][..]),
+            (UniversalDistroPackageFormat::OpkgPackage, "opkg-app", &["opkg"][..]),
+            (UniversalDistroPackageFormat::SolusEopkg, "solus-app", &["eopkg"][..]),
             (UniversalDistroPackageFormat::FlatpakApp, "flatpak-app", &["org.freedesktop.Sdk"][..]),
             (UniversalDistroPackageFormat::SnapApp, "snap-app", &["core22"][..]),
             (UniversalDistroPackageFormat::AppImage, "appimage-app", &["fuse"][..]),
@@ -283,11 +317,11 @@ mod tests {
             assert_eq!(manifest.original_format, fmt);
         }
 
-        assert_eq!(bridge.total_prs_merged, 10);
+        assert_eq!(bridge.total_prs_merged, 19);
     }
 
     #[test]
-    fn test_sat_conflict_rejection() {
+    fn test_pr_gateway_sat_solver_validation() {
         let mut bridge = SovereignUniversalPmPrBridgeEngine::new();
 
         let pr_conflict = bridge.submit_foreign_package_pr(
