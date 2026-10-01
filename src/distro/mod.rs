@@ -375,5 +375,8 @@ pub use sovereign_2060_distro_supremacy_engine::*;
 pub mod sovereign_2065_distro_supremacy_engine;
 pub use sovereign_2065_distro_supremacy_engine::*;
 
+pub mod sovereign_github_wiki_complete_deployment;
+pub use sovereign_github_wiki_complete_deployment::*;
+
 pub mod sovereign_linux_bsd_ecosystem_pinnacle_suite;
 pub use sovereign_linux_bsd_ecosystem_pinnacle_suite::*;
