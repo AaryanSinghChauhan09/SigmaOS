@@ -110,6 +110,7 @@ pub use distro::sovereign_media_and_distro_unimplemented_innovations::*;
 pub use kernel::tss_ring3_user_mode::*;
 pub use open_source_obsoletion::open_source_os_gap_closure::*;
 pub use tools::tech_media_extended_suite::*;
+pub use distro::sovereign_github_wiki_complete_deployment::*;
 pub mod sovereign_wiki_master_engine;
 pub use sovereign_wiki_master_engine::*;
 pub mod unimplemented_features;
