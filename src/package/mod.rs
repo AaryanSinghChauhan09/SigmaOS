@@ -77,6 +77,8 @@ pub mod sovereign_distro_package_advancements_v8;
 pub use sovereign_distro_package_advancements_v8::*;
 pub mod sovereign_distro_package_advancements_v9;
 pub use sovereign_distro_package_advancements_v9::*;
+pub mod universal_pr_execution_engine;
+pub use universal_pr_execution_engine::*;
 
 pub use alpine_apk::{ApkPackage, ApkPackageManager, ApkRepository, ApkWorld};
 pub use arch_aur::{AURPackage, BuildError, SigmaAUR, PKGBUILD};

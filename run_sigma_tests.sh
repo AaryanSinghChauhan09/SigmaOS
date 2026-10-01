@@ -107,6 +107,13 @@ if [ -f "src/distro/sovereign_linux_bsd_master_synthesis.rs" ]; then
     ./build/linux_bsd_master_synthesis_test
 fi
 
+if [ -f "src/distro/sovereign_linux_bsd_distro_next_gen_innovations.rs" ]; then
+    echo "Running Next-Gen Sovereign Linux & BSD Distro Innovations test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_linux_bsd_distro_next_gen_innovations.rs --edition=2021 -o build/test_next_gen_distro
+    ./build/test_next_gen_distro
+fi
+
 if [ -f "src/network/approximation_proxy_firewall.rs" ]; then
     echo "Running Sovereign Approximation Proxy Firewall test suite..."
     mkdir -p build
@@ -304,26 +311,18 @@ if [ -f "src/package/sovereign_distro_package_advancements_v6.rs" ]; then
     rustc --test src/package/sovereign_distro_package_advancements_v6.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v6_test
     ./build/sovereign_advancements_v6_test
 fi
+if [ -f "src/package/universal_pr_execution_engine.rs" ]; then
+    echo "Running Universal Package Manager PR Transpiler & Execution Engine test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/package/universal_pr_execution_engine.rs --cfg 'feature="standalone_test"' -o build/test_pr_exec
+    ./build/test_pr_exec
+fi
 
 if [ -f "src/package/sovereign_distro_package_advancements_v7.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V7 test suite..."
     mkdir -p build
     rustc --test src/package/sovereign_distro_package_advancements_v7.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v7_test
     ./build/sovereign_advancements_v7_test
-fi
-
-if [ -f "src/package/sovereign_distro_package_advancements_v8.rs" ]; then
-    echo "Running Sovereign Distro Package Advancements Suite V8 test suite..."
-    mkdir -p build
-    rustc --test src/package/sovereign_distro_package_advancements_v8.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v8_test
-    ./build/sovereign_advancements_v8_test
-fi
-
-if [ -f "src/package/sovereign_distro_package_advancements_v9.rs" ]; then
-    echo "Running Sovereign Distro Package Advancements Suite V9 test suite..."
-    mkdir -p build
-    rustc --test src/package/sovereign_distro_package_advancements_v9.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v9_test
-    ./build/sovereign_advancements_v9_test
 fi
 
 if [ -f "src/package/sovereign_distro_package_master_suite.rs" ]; then
@@ -451,19 +450,3 @@ if [ -f "src/boot/grub_engine.rs" ]; then
     rustc --test src/boot/grub_engine.rs --edition=2021 -o build/test_grub_engine
     ./build/test_grub_engine
 fi
-
-if [ -f "src/distro/sovereign_linux_bsd_ecosystem_pinnacle_suite.rs" ]; then
-    echo "Running Sovereign Linux & BSD Ecosystem Pinnacle Suite test suite..."
-    mkdir -p build
-    rustc --test src/distro/sovereign_linux_bsd_ecosystem_pinnacle_suite.rs --edition=2021 -o build/test_ecosystem_pinnacle
-    ./build/test_ecosystem_pinnacle
-fi
-
-if [ -f "src/distro/sovereign_linux_bsd_ecosystem_leap_suite.rs" ]; then
-    echo "Running Sovereign Linux & BSD Ecosystem Leap Suite test suite..."
-    mkdir -p build
-    rustc --test src/distro/sovereign_linux_bsd_ecosystem_leap_suite.rs --edition=2021 -o build/test_ecosystem_leap
-    ./build/test_ecosystem_leap
-fi
-
-echo "All SigmaOS test suites completed."

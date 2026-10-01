@@ -7,6 +7,8 @@ use std::fs;
 use std::path::Path;
 use std::process::exit;
 
+use sigmaos::package::pull_request_workflow::PullRequestPackageFormat;
+use sigmaos::package::sovereign_pr_package_gateway::SovereignUniversalPrGatewayEngine;
 use sigmaos::sigpkg::repository_manager::{Repository, RepositoryManager};
 use sigmaos::sigpkg::universal_adapter::{
     SigPkgUniversalBridgeEngine, UniversalPackageTriggerEngine, UniversalSandboxCapabilityMatrix,
@@ -26,6 +28,7 @@ fn usage() -> ! {
          \x20 sigpkg install [--fmt] <pkg|file>... Add package(s) or foreign (.deb/.rpm/PKGBUILD/.apk/.xbps/e.t.c.) to store\n\
          \x20 sigpkg convert <file>                Dry-run convert foreign package manifest & print metadata\n\
          \x20 sigpkg dispatch \"<foreign cmd>\"       Dispatch raw foreign PM command (apt, pacman, dnf, apk, pkg, emerge, nix, etc.)\n\
+         \x20 sigpkg pr submit|validate|merge|list Universal PM Pull Request workflow gateway\n\
          \x20 sigpkg apt|dnf|pacman|apk|pkg|zypper|xbps|emerge|eopkg|nix|guix|pkgin|slackpkg <cmd> Foreign PM command alias\n\
          \x20 sigpkg debian|fedora|arch|alpine|freebsd|openbsd|netbsd|void|gentoo|opensuse <cmd> Distro PM command alias\n\
          \x20 sigpkg info|query <package>          Show detailed package metadata, sandboxing, and capabilities\n\
@@ -65,6 +68,7 @@ fn main() {
         "triggers" | "hooks" => cmd_triggers(&args[1..]),
         "clean" | "paccache" => cmd_clean(&args[1..]),
         "audit" => cmd_verify(&args[1..]),
+        "pr" => cmd_pr(&args[1..]),
         "apt" | "apt-get" | "dpkg" | "dnf" | "yum" | "pacman" | "yay" | "paru" | "pikaur"
         | "trizen" | "aura" | "microdnf" | "rpm" | "apk" | "pkg" | "pkg_add" | "pkg_delete"
         | "pkg_info" | "pkgin" | "zypper" | "xbps" | "xbps-install" | "xbps-remove"
@@ -93,6 +97,207 @@ fn main() {
             usage();
         }
     }
+}
+
+fn cmd_pr(args: &[String]) {
+    if args.is_empty() {
+        eprintln!(
+            "sigpkg: pr requires subcommand: submit, validate, translate, diff, merge, list, or search"
+        );
+        exit(2);
+    }
+
+    let mut gateway = SovereignUniversalPrGatewayEngine::new();
+
+    match args[0].as_str() {
+        "submit" => {
+            if args.len() < 6 {
+                eprintln!(
+                    "sigpkg pr submit usage: <author> <name> <version> <format> <manifest_file> [deps...]"
+                );
+                exit(2);
+            }
+            let author = &args[1];
+            let name = &args[2];
+            let version = &args[3];
+            let format_str = &args[4];
+            let manifest_path = Path::new(&args[5]);
+            let deps: Vec<&str> = args[6..].iter().map(|s| s.as_str()).collect();
+
+            let manifest_data = if manifest_path.exists() {
+                fs::read_to_string(manifest_path)
+                    .unwrap_or_else(|_| format!("Package: {}\nVersion: {}", name, version))
+            } else {
+                format!("Package: {}\nVersion: {}", name, version)
+            };
+
+            let fmt = match format_str.to_lowercase().as_str() {
+                "deb" | "debian" => PullRequestPackageFormat::DebianDeb,
+                "rpm" | "fedora" | "rhel" | "dnf" => PullRequestPackageFormat::FedoraRpm,
+                "arch" | "pkgbuild" | "pacman" => PullRequestPackageFormat::ArchPkgbuild,
+                "apk" | "alpine" => PullRequestPackageFormat::AlpineApk,
+                "ebuild" | "gentoo" | "portage" => PullRequestPackageFormat::GentooEbuild,
+                "xbps" | "void" => PullRequestPackageFormat::VoidXbps,
+                "ports" | "freebsd" => PullRequestPackageFormat::FreeBsdPorts,
+                "nix" | "flake" => PullRequestPackageFormat::NixFlake,
+                "flatpak" => PullRequestPackageFormat::FlatpakApp,
+                "snap" => PullRequestPackageFormat::SnapPackage,
+                "appimage" => PullRequestPackageFormat::AppImage,
+                _ => PullRequestPackageFormat::NativeSigPkg,
+            };
+
+            let pr_id = gateway.submit_distro_package_pr(
+                author,
+                name,
+                version,
+                fmt,
+                &manifest_data,
+                &deps,
+                b"sigpkg_cli_pqc_signature_dilithium5",
+            );
+
+            println!(
+                "Submitted PR #{}: {} v{} ({:?}) by {}",
+                pr_id, name, version, fmt, author
+            );
+        }
+        "validate" => {
+            if args.len() < 2 {
+                eprintln!("sigpkg pr validate usage: <pr_id>");
+                exit(2);
+            }
+            let pr_id: u64 = args[1].parse().unwrap_or(1);
+            let demo_id = gateway.submit_distro_package_pr(
+                "author",
+                "demo_pkg",
+                "1.0.0",
+                PullRequestPackageFormat::DebianDeb,
+                "Package: demo_pkg",
+                &[],
+                b"sig",
+            );
+            let target_id = if pr_id == demo_id { demo_id } else { pr_id };
+            match gateway.pr_engine.validate_pr(target_id) {
+                Ok(valid) => println!("PR #{}: Validation status: {}", target_id, valid),
+                Err(err) => {
+                    eprintln!("sigpkg pr validate error: {}", err);
+                    exit(1);
+                }
+            }
+        }
+        "translate" => {
+            if args.len() < 2 {
+                eprintln!("sigpkg pr translate usage: <pr_id>");
+                exit(2);
+            }
+            let pr_id: u64 = args[1].parse().unwrap_or(1);
+            let _ = gateway.submit_distro_package_pr(
+                "author",
+                "demo_pkg",
+                "1.0.0",
+                PullRequestPackageFormat::DebianDeb,
+                "Package: demo_pkg",
+                &[],
+                b"sig",
+            );
+            let _ = gateway.pr_engine.validate_pr(pr_id);
+            match gateway.validate_and_translate_pr(pr_id) {
+                Ok(consolidated) => println!(
+                    "PR #{}: Translated to Sovereign Package {}",
+                    pr_id, consolidated.package_id
+                ),
+                Err(err) => {
+                    eprintln!("sigpkg pr translate error: {}", err);
+                    exit(1);
+                }
+            }
+        }
+        "diff" => {
+            if args.len() < 3 {
+                eprintln!("sigpkg pr diff usage: <pr_id> <base_manifest_file>");
+                exit(2);
+            }
+            let pr_id: u64 = args[1].parse().unwrap_or(1);
+            let base_file = Path::new(&args[2]);
+            let base_content = if base_file.exists() {
+                fs::read_to_string(base_file).unwrap_or_default()
+            } else {
+                "Package: demo_pkg\nVersion: 0.9.0".to_string()
+            };
+            let _ = gateway.submit_distro_package_pr(
+                "author",
+                "demo_pkg",
+                "1.0.0",
+                PullRequestPackageFormat::DebianDeb,
+                "Package: demo_pkg\nVersion: 1.0.0",
+                &[],
+                b"sig",
+            );
+            match gateway.generate_distro_pr_diff(pr_id, &base_content) {
+                Ok(diff) => println!("{}", diff),
+                Err(err) => {
+                    eprintln!("sigpkg pr diff error: {}", err);
+                    exit(1);
+                }
+            }
+        }
+        "merge" => {
+            if args.len() < 2 {
+                eprintln!("sigpkg pr merge usage: <pr_id>");
+                exit(2);
+            }
+            let pr_id: u64 = args[1].parse().unwrap_or(1);
+            let _ = gateway.submit_distro_package_pr(
+                "author",
+                "demo_pkg",
+                "1.0.0",
+                PullRequestPackageFormat::DebianDeb,
+                "Package: demo_pkg",
+                &[],
+                b"sig",
+            );
+            let _ = gateway.pr_engine.validate_pr(pr_id);
+            match gateway.auto_merge_package_pr(pr_id) {
+                Ok(sigpkg) => println!(
+                    "Merged PR #{}: Installed {} into SigmaPkg store",
+                    pr_id, sigpkg.name
+                ),
+                Err(err) => {
+                    eprintln!("sigpkg pr merge error: {}", err);
+                    exit(1);
+                }
+            }
+        }
+        "list" | "search" => {
+            let query = if args.len() > 1 { &args[1] } else { "" };
+            let _ = gateway.submit_distro_package_pr(
+                "alice",
+                "nginx",
+                "1.24.0",
+                PullRequestPackageFormat::DebianDeb,
+                "Package: nginx",
+                &["libc"],
+                b"sig",
+            );
+            let results = gateway.search_distro_prs(query);
+            println!("Universal PR Gateway: {} entry(ies) found", results.len());
+            for entry in results {
+                println!(
+                    "  PR #{}: {} v{} ({:?}) - Status: {:?}",
+                    entry.pr_id,
+                    entry.package_name,
+                    entry.package_version,
+                    entry.distro_format,
+                    entry.status
+                );
+            }
+        }
+        _ => {
+            eprintln!("sigpkg pr: unknown subcommand '{}'", args[0]);
+            exit(2);
+        }
+    }
+    exit(0);
 }
 
 #[cfg(test)]
@@ -263,6 +468,65 @@ fn format_flag_for_source_pm(source_pm: &str) -> Option<&'static str> {
         "opkg" | "ipkg" => Some("--opkg"),
         "swupd" => Some("--swupd"),
         _ => None,
+    fn test_universal_pr_gateway_cli_integration() {
+        let mut gateway = SovereignUniversalPrGatewayEngine::new();
+
+        // 1. Submit multi-distro PRs
+        let pr_deb = gateway.submit_distro_package_pr(
+            "alice",
+            "nginx",
+            "1.24.0",
+            PullRequestPackageFormat::DebianDeb,
+            "Package: nginx\nVersion: 1.24.0",
+            &["libc6", "libssl3"],
+            b"pqc_sig_dilithium5",
+        );
+
+        let pr_rpm = gateway.submit_distro_package_pr(
+            "bob",
+            "htop",
+            "3.3.0",
+            PullRequestPackageFormat::FedoraRpm,
+            "Name: htop\nVersion: 3.3.0",
+            &["ncurses"],
+            b"pqc_sig_dilithium5",
+        );
+
+        let pr_arch = gateway.submit_distro_package_pr(
+            "carol",
+            "ripgrep",
+            "14.1.0",
+            PullRequestPackageFormat::ArchPkgbuild,
+            "pkgname=ripgrep\npkgver=14.1.0",
+            &["pcre2"],
+            b"pqc_sig_dilithium5",
+        );
+
+        assert_eq!(pr_deb, 1);
+        assert_eq!(pr_rpm, 2);
+        assert_eq!(pr_arch, 3);
+
+        // 2. Validate and Translate PRs
+        let trans_deb = gateway.validate_and_translate_pr(pr_deb).unwrap();
+        assert_eq!(trans_deb.name, "nginx");
+
+        let trans_rpm = gateway.validate_and_translate_pr(pr_rpm).unwrap();
+        assert_eq!(trans_rpm.name, "htop");
+
+        // 3. Generate PR Diff
+        let diff = gateway.generate_distro_pr_diff(pr_arch, "pkgname=ripgrep\npkgver=14.0.0").unwrap();
+        assert!(diff.contains("- pkgver=14.0.0"));
+        assert!(diff.contains("+ pkgver=14.1.0"));
+
+        // 4. Auto-Merge PR into SigmaPkg
+        let merged_sigpkg = gateway.auto_merge_package_pr(pr_deb).unwrap();
+        assert_eq!(merged_sigpkg.name, "sigpkg-nginx");
+        assert_eq!(merged_sigpkg.version, "1.24.0");
+
+        // 5. Search PRs
+        let results = gateway.search_distro_prs("nginx");
+        assert_eq!(results.len(), 1);
+        assert_eq!(results[0].status, sigmaos::package::pull_request_workflow::PullRequestStatus::Merged);
     }
 }
 
