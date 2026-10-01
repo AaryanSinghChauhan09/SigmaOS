@@ -202,9 +202,9 @@ All data structures and algorithms should be implemented directly using:
 
 - `README.md` - Project overview and quick start
 - `AGENTS.md` - This file (agent guidelines)
-- `WHAT_IS_WORKING_AND_NOT_WORKING.md` - Component status tracker (100% features deployed & verified)
-- `FUTURE-DEVELOPMENT-ROADMAP.md` - Roadmap and specifications (Includes 2065 Distro Supremacy & Universal Multi-Distro PM Gateway)
-- `docs/MISSING_DISTRO_COMPONENTS_ROADMAP_AGENT.md` - Task guidelines for multi-distro Linux/BSD package PR gateway & GitHub Wiki deployment
+- `WHAT_IS_WORKING_AND_NOT_WORKING.md` - Component status tracker
+- `FUTURE-DEVELOPMENT-ROADMAP.md` - Roadmap and specifications
+- `FUTURE_LINUX_BSD_MISSING_COMPONENTS_AGENTS.md` - Agent guidelines for closing Linux & BSD distro component feature gaps
 - `SIGMAOS_MASTER_PLAN_TRI_AGENT_500_REPOS_ABSORPTION.md` - Tri-agent framework details
 - `CAPABILITY_MATRIX.toml` - Machine-readable capability matrix
 - `FEATURE_STATUS.toml` - Feature implementation status
