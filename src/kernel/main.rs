@@ -14,6 +14,9 @@ use sigmaos::kernel::process::Process;
 use sigmaos::kernel::scheduler::ProcessTask;
 use sigmaos::kernel::{BuddyAllocator, Priority, RoundRobinScheduler as Scheduler};
 use sigmaos::kernel::{BuddyAllocator, Priority, ProcessTask, RoundRobinScheduler as Scheduler};
+use sigmaos::kernel::{
+    BuddyAllocator, Priority, ProcessTask, RoundRobinScheduler as Scheduler, SchedulerPolicy,
+};
 use sigmaos::memory::paging::SimpleVMM;
 
 pub static EARLY_CPU_STATE: core::sync::atomic::AtomicUsize = AtomicUsize::new(0);
@@ -41,6 +44,11 @@ pub fn start_kernel(
         priority: Priority::Idle,
         policy: sigmaos::kernel::SchedulerPolicy::Batch,
         state: sigmaos::kernel::ProcessState::Runnable,
+    let idle_proc = ProcessTask {
+        pid: 0,
+        priority: Priority::Idle,
+        policy: SchedulerPolicy::Idle,
+        state: sigmaos::kernel::ProcessState::Ready,
         vruntime: 0,
         exec_start: 0,
         exec_duration: 0,
@@ -51,6 +59,7 @@ pub fn start_kernel(
     scheduler.add_process(idle_task);
     let idle_proc = ProcessTask::new(0, Priority::Idle);
     scheduler.add_process(idle_proc);
+    let _ = scheduler.add_process(idle_proc);
 
     // Stage 4: Open early userland runlevels (OpenRC)
     let udev = OpenRcService::new("udev").with_runlevel(OpenRcRunlevel::SingleUser);

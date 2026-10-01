@@ -16,11 +16,7 @@ use std::vec::Vec;
 #[path = "open_source_os_gap_closure.rs"]
 pub mod open_source_os_gap_closure;
 
-#[cfg(not(feature = "standalone_test"))]
 use open_source_os_gap_closure::OpenSourceProjectSupremacySuite;
-
-#[cfg(feature = "standalone_test")]
-use crate::OpenSourceProjectSupremacySuite;
 
 // =========================================================================
 // 1. SOVEREIGN VCS ENGINE (Superseding Git, GitHub CLI, Mercurial)

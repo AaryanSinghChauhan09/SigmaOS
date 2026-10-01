@@ -11,7 +11,7 @@ mod open_source_obsoletion;
 #[path = "../src/ml/sovereign_data_workspace.rs"]
 mod sovereign_data_workspace;
 
-#[path = "../src/security/capability_enforcer.rs"]
+#[path = "../src/security/capability_token.rs"]
 mod capability_enforcer;
 
 use capability_enforcer::*;

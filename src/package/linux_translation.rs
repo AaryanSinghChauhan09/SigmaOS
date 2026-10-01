@@ -7,6 +7,7 @@ use crate::driver::framework::{
     DriverType, SimpleDriver,
 };
 #[cfg(not(feature = "standalone_test"))]
+use crate::driver::framework::{DriverType, SimpleDriver};
 use crate::package::PackageFormat;
 #[cfg(not(feature = "standalone_test"))]
 use std::sync::atomic::{AtomicBool, Ordering};
