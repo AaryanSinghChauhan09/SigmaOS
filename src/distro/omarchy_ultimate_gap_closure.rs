@@ -222,12 +222,8 @@ impl SovereignOmarchyUltimateGapClosureSuite {
     }
 
     pub fn verify_suite(&mut self) -> bool {
-        self.herdr_ai
-            .dispatch_coding_agent_task("ori-agent", "Optimize kernel scheduler");
-        !self
-            .quickshell_bar
-            .render_quickshell_config_json()
-            .is_empty()
+        self.herdr_ai.dispatch_coding_agent_task("ori-agent", "Optimize kernel scheduler");
+        !self.quickshell_bar.render_quickshell_config_json().is_empty()
             && self.herdr_ai.get_completed_tasks_count() > 0
             && self.factory_reset_guardian.perform_safe_factory_reset()
             && self.hardware_adapter.verify_quattro_hardware_adapters()

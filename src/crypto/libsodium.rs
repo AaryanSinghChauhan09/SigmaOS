@@ -199,6 +199,12 @@ impl BoxCipher {
     }
 
     /// Encrypt a message
+    pub fn new(public_key: [u8; constants::CRYPTO_BOX_PUBLICKEYBYTES],
+               secret_key: [u8; constants::CRYPTO_BOX_SECRETKEYBYTES]) -> Self {
+        BoxCipher { public_key, secret_key }
+    }
+
+    /// Encrypt a message
     pub fn encrypt(&self, message: &[u8], nonce: &[u8; constants::CRYPTO_BOX_NONCEBYTES],
                    recipient_public_key: &[u8; constants::CRYPTO_BOX_PUBLICKEYBYTES])
                    -> Vec<u8> {

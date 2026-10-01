@@ -1,7 +1,7 @@
 // SigmaOS Custom Time Implementation
 // Reduces dependency on std::time by providing custom implementations
 
-use core::sync::atomic::{AtomicU32, AtomicU64, Ordering};
+use core::sync::atomic::{AtomicU64, AtomicU32, Ordering};
 
 /// Custom timestamp for OS timekeeping
 #[derive(Debug, Clone, Copy)]
@@ -153,10 +153,8 @@ impl SigmaTimer {
             nanoseconds: elapsed_nanos as u32,
         };
 
-        self.elapsed_seconds
-            .store(elapsed_seconds, Ordering::SeqCst);
-        self.elapsed_nanos
-            .store(elapsed_nanos as u32, Ordering::SeqCst);
+        self.elapsed_seconds.store(elapsed_seconds, Ordering::SeqCst);
+        self.elapsed_nanos.store(elapsed_nanos as u32, Ordering::SeqCst);
         elapsed
     }
 

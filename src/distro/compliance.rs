@@ -2,10 +2,12 @@
 // Implements regulatory compliance frameworks (HIPAA, SOC2, ISO 27001, PCI-DSS)
 // Inspired by enterprise Linux distributions and security-focused BSD systems
 
-use std::format;
+
+
 use std::string::String;
-use std::vec;
 use std::vec::Vec;
+use std::vec;
+use std::format;
 
 /// Compliance framework types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -186,15 +188,16 @@ impl LinuxBsdDistroGuidelineRules {
             DistroGuidelineStandard::ArchSimplicityPurity => self.zero_dependency_purity,
             DistroGuidelineStandard::FreeBsdCapsicumJails
             | DistroGuidelineStandard::OpenBsdPledgeUnveil => self.capability_sandboxing_enabled,
+            DistroGuidelineStandard::FreeBsdCapsicumJails | DistroGuidelineStandard::OpenBsdPledgeUnveil => {
+                self.capability_sandboxing_enabled
+            }
             DistroGuidelineStandard::FedoraSelinuxPresets => self.cross_subsystem_event_routing,
             _ => true,
         }
     }
 
     pub fn verify_all_standards(&self) -> bool {
-        self.standards
-            .iter()
-            .all(|&std| self.verify_guideline_compliance(std))
+        self.standards.iter().all(|&std| self.verify_guideline_compliance(std))
     }
 }
 

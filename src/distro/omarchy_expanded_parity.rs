@@ -33,9 +33,7 @@ impl OmarchyOmakubBootstrapEngine {
     }
 
     pub fn is_app_installed(&self, app_name: &str) -> bool {
-        self.installed_apps
-            .iter()
-            .any(|a| a.eq_ignore_ascii_case(app_name))
+        self.installed_apps.iter().any(|a| a.eq_ignore_ascii_case(app_name))
     }
 }
 
@@ -147,9 +145,7 @@ pub struct OmarchyThunarFileActions {
 
 impl OmarchyThunarFileActions {
     pub fn new() -> Self {
-        Self {
-            custom_actions_count: 5,
-        }
+        Self { custom_actions_count: 5 }
     }
 
     pub fn generate_uca_xml(&self) -> String {
@@ -187,14 +183,8 @@ impl SovereignOmarchyExpandedParitySuite {
     pub fn verify_suite(&self) -> bool {
         self.omakub.is_app_installed("Ghostty")
             && self.zellij.generate_kdl_layout().contains("compact")
-            && self
-                .hyprlock
-                .generate_hyprlock_conf()
-                .contains("blur_passes = 3")
-            && self
-                .rofi
-                .generate_rofi_rasi_theme()
-                .contains("JetBrainsMono Nerd Font")
+            && self.hyprlock.generate_hyprlock_conf().contains("blur_passes = 3")
+            && self.rofi.generate_rofi_rasi_theme().contains("JetBrainsMono Nerd Font")
             && self.thunar.generate_uca_xml().contains("Open in Ghostty")
     }
 }

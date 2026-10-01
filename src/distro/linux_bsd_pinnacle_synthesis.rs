@@ -62,12 +62,7 @@ impl ChimeraDinitCportsEngine {
         }
     }
 
-    pub fn register_service(
-        &mut self,
-        name: &str,
-        dependencies: Vec<String>,
-        service_type: &str,
-    ) -> bool {
+    pub fn register_service(&mut self, name: &str, dependencies: Vec<String>, service_type: &str) -> bool {
         let spec = DinitServiceSpec {
             name: name.to_string(),
             dependencies,
@@ -88,17 +83,11 @@ impl ChimeraDinitCportsEngine {
             match self.services.get(dep) {
                 Some(dep_svc) => {
                     if dep_svc.state != DinitServiceState::Started {
-                        return Err(format!(
-                            "Dependency '{}' for service '{}' is not started",
-                            dep, name
-                        ));
+                        return Err(format!("Dependency '{}' for service '{}' is not started", dep, name));
                     }
                 }
                 None => {
-                    return Err(format!(
-                        "Unsatisfied dependency '{}' for service '{}'",
-                        dep, name
-                    ));
+                    return Err(format!("Unsatisfied dependency '{}' for service '{}'", dep, name));
                 }
             }
         }
@@ -184,13 +173,7 @@ impl OpenBsdKarlPinSyscallEngine {
         image
     }
 
-    pub fn register_pinned_syscall(
-        &mut self,
-        sys_num: u32,
-        func_symbol: &str,
-        start_addr: u64,
-        length: u64,
-    ) {
+    pub fn register_pinned_syscall(&mut self, sys_num: u32, func_symbol: &str, start_addr: u64, length: u64) {
         let region = PinnedSyscallRegion {
             sys_num,
             func_symbol: func_symbol.to_string(),
@@ -376,15 +359,10 @@ impl SolusRavenEopkgEngine {
     }
 
     pub fn register_delta_package(&mut self, delta: EopkgDeltaPackage) {
-        self.delta_packages
-            .insert(delta.package_name.clone(), delta);
+        self.delta_packages.insert(delta.package_name.clone(), delta);
     }
 
-    pub fn apply_eopkg_delta(
-        &self,
-        package_name: &str,
-        current_ver: &str,
-    ) -> Result<String, String> {
+    pub fn apply_eopkg_delta(&self, package_name: &str, current_ver: &str) -> Result<String, String> {
         let delta = self
             .delta_packages
             .get(package_name)
@@ -463,12 +441,10 @@ impl MageiaUrpmiMediaEngine {
     }
 
     pub fn resolve_and_install(&self, package_name: &str) -> Result<Vec<String>, String> {
-        let pkg = self.packages.get(package_name).ok_or_else(|| {
-            format!(
-                "Package '{}' not found in urpmi media database",
-                package_name
-            )
-        })?;
+        let pkg = self
+            .packages
+            .get(package_name)
+            .ok_or_else(|| format!("Package '{}' not found in urpmi media database", package_name))?;
 
         let media = self
             .media_sources
@@ -484,10 +460,7 @@ impl MageiaUrpmiMediaEngine {
             if self.packages.contains_key(dep) {
                 install_order.push(dep.clone());
             } else {
-                return Err(format!(
-                    "Unresolved urpmi dependency '{}' for '{}'",
-                    dep, package_name
-                ));
+                return Err(format!("Unresolved urpmi dependency '{}' for '{}'", dep, package_name));
             }
         }
         install_order.push(pkg.name.clone());
@@ -534,48 +507,29 @@ impl SovereignLinuxBsdPinnacleSynthesisSuite {
         self.chimera.start_service("dbus").ok();
         results.insert(
             "chimera_dinit".to_string(),
-            self.chimera
-                .services
-                .get("dbus")
-                .map(|s| s.state == DinitServiceState::Started)
-                .unwrap_or(false),
+            self.chimera.services.get("dbus").map(|s| s.state == DinitServiceState::Started).unwrap_or(false),
         );
 
         // 2. OpenBSD KARL check
         let kernel = self.openbsd_karl.generate_karl_kernel(0x12345678, 100);
-        results.insert(
-            "openbsd_karl".to_string(),
-            kernel.total_functions_reordered == 100,
-        );
+        results.insert("openbsd_karl".to_string(), kernel.total_functions_reordered == 100);
 
         // 3. FreeBSD MAC check
         let req = MacAccessRequest {
-            subject_label: MacLabel {
-                classification_level: 1,
-                integrity_level: 2,
-            },
-            object_label: MacLabel {
-                classification_level: 1,
-                integrity_level: 1,
-            },
+            subject_label: MacLabel { classification_level: 1, integrity_level: 2 },
+            object_label: MacLabel { classification_level: 1, integrity_level: 1 },
             access_type: "write".to_string(),
         };
         let mac_ok = self.freebsd_mac.evaluate_access(req);
         results.insert("freebsd_mac".to_string(), mac_ok);
 
         // 4. Solus Raven check
-        let notif_id =
-            self.solus_raven
-                .post_notification("Raven", "System Ready", "All systems nominal", 1);
+        let notif_id = self.solus_raven.post_notification("Raven", "System Ready", "All systems nominal", 1);
         results.insert("solus_raven".to_string(), notif_id == 1);
 
         // 5. Mageia Urpmi check
-        self.mageia_urpmi
-            .add_media_source("core", "Core Release", "http://mageia.org/core", false);
-        results.insert(
-            "mageia_urpmi".to_string(),
-            self.mageia_urpmi.media_sources.contains_key("core"),
-        );
+        self.mageia_urpmi.add_media_source("core", "Core Release", "http://mageia.org/core", false);
+        results.insert("mageia_urpmi".to_string(), self.mageia_urpmi.media_sources.contains_key("core"));
 
         results
     }
@@ -633,28 +587,16 @@ mod tests {
     fn test_freebsd_mac_framework() {
         let mut engine = FreeBsdMacFrameworkEngine::new(MacPolicyModel::BibaIntegrity);
         let req = MacAccessRequest {
-            subject_label: MacLabel {
-                classification_level: 1,
-                integrity_level: 5,
-            },
-            object_label: MacLabel {
-                classification_level: 1,
-                integrity_level: 2,
-            },
+            subject_label: MacLabel { classification_level: 1, integrity_level: 5 },
+            object_label: MacLabel { classification_level: 1, integrity_level: 2 },
             access_type: "write".to_string(),
         };
         assert!(engine.evaluate_access(req));
 
         engine.set_policy(MacPolicyModel::MlsConfidentiality);
         let mls_req = MacAccessRequest {
-            subject_label: MacLabel {
-                classification_level: 2,
-                integrity_level: 1,
-            },
-            object_label: MacLabel {
-                classification_level: 5,
-                integrity_level: 1,
-            },
+            subject_label: MacLabel { classification_level: 2, integrity_level: 1 },
+            object_label: MacLabel { classification_level: 5, integrity_level: 1 },
             access_type: "read".to_string(),
         };
         assert!(!engine.evaluate_access(mls_req));
