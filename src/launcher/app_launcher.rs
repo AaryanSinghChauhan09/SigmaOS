@@ -14,8 +14,8 @@
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
+use alloc::string::String;
+use alloc::vec;
 use alloc::vec::Vec;
 use core::fmt;
 
@@ -93,7 +93,9 @@ impl AppEntry {
     }
 
     pub fn matches_query(&self, query: &str) -> bool {
-        let query = query.to_lowercase();
+        // Bolt ⚡ Optimization: Utilize zero-allocation ASCII case-insensitive search
+        // helpers (`contains_ignore_case`) instead of calling `.to_lowercase()`
+        // which allocates temporary heap Strings on every application entry query check.
 
         // Check name
         if contains_ignore_case(&self.name, query) {
@@ -123,25 +125,25 @@ impl AppEntry {
     }
 
     pub fn fuzzy_score(&self, query: &str) -> i32 {
-        let query = query.to_lowercase();
-        let name = self.name.to_lowercase();
+        // Bolt ⚡ Optimization: Zero-allocation ASCII comparison on hot path.
+        // Avoid calling `.to_lowercase()` on `self.name` and `query` repeatedly.
 
-        if name == query {
+        if eq_ignore_case(&self.name, query) {
             return 1000; // Exact match
         }
 
-        if name.starts_with(&query) {
+        if starts_with_ignore_case(&self.name, query) {
             return 900; // Prefix match
         }
 
-        if name.contains(&query) {
+        if contains_ignore_case(&self.name, query) {
             return 800; // Substring match
         }
 
         // Check word boundaries
-        let words: Vec<&str> = name.split_whitespace().collect();
+        let words = self.name.split_whitespace();
         for word in words {
-            if word.starts_with(&query) {
+            if starts_with_ignore_case(word, query) {
                 return 700; // Word start match
             }
         }
@@ -345,9 +347,10 @@ impl AppLauncher {
     pub fn search_commands(&self, query: &str) -> Vec<Command> {
         let mut results = Vec::new();
 
+        // Bolt ⚡ Optimization: Zero-allocation ASCII substring matching for command palette searches.
         for command in &self.commands {
-            if command.name.to_lowercase().contains(&query)
-                || command.description.to_lowercase().contains(&query)
+            if contains_ignore_case(&command.name, query)
+                || contains_ignore_case(&command.description, query)
             {
                 results.push(command.clone());
             }
