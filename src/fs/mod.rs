@@ -75,3 +75,5 @@ pub use zfs_arc_sovereign::{SovereignZfsArc, ArcBufferHeader};
 pub mod fanotify_sovereign;
 pub use fanotify_sovereign::{SovereignFanotifyGroup, FanotifyEvent, FanotifyEventKind, FanotifyResponse, FanotifyMark};
 pub use vfs::{Vfs, VfsInode, VfsDentry, VfsSuperblock, VfsFile, VfsMount, FileType, FilePermissions};
+pub mod zfs_spa_zil_l2arc;
+pub mod hammer2_mvcc;

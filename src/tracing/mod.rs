@@ -21,3 +21,4 @@ pub mod sigma_trace;
 
 pub use dtrace::{DTraceEngine, DTraceProbe, DTraceProbeKind, DifInstruction, DifOpcode};
 pub use sigma_trace::{SigmaTrace, TraceEvent, TraceSpan};
+pub mod dtrace_usdt;

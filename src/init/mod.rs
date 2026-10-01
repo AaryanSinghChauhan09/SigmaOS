@@ -26,3 +26,4 @@ pub use systemd_init::{
 
 // ─── Sub-Second Boot Sequencer ────────────────────────────────────────────────
 pub mod subsecond_boot_sequencer;
+pub mod reincarnation_server;

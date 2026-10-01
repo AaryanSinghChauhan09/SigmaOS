@@ -120,3 +120,4 @@ pub use onboarding_wizard::*;
 pub mod display_manager;
 pub mod file_manager_extensions;
 pub mod system_tray;
+pub mod cinnamon_xapp_libgui;

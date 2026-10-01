@@ -216,3 +216,5 @@ pub use module_tools::{
     KernelModuleMetadata, KernelModuleConfig, ModuleParameter, KernelModuleSkeleton,
     KernelModuleBuilder, BuildType, OptimizationLevel, KernelModuleLoader, KernelModuleManager,
 };
+pub mod smp_load_balancer;
+pub mod wx_pte_hardening;
