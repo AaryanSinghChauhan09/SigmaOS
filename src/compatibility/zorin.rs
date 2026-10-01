@@ -542,10 +542,322 @@ mod tests {
         let res_none = ZorinWindowsAppSupport::inspect_package_format("native_pkg.sigpkg");
         assert!(res_none.is_none());
     }
+}
+
+/// Zorin OS Grid Desktop Window Tiling Engine (Pop Shell / Zorin Auto-Tile inspired)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TiledWindow {
+    pub window_id: u32,
+    pub title: String,
+    pub x: u32,
+    pub y: u32,
+    pub width: u32,
+    pub height: u32,
+}
+
+pub struct ZorinGridWindowTilingEngine {
+    gap_size: u32,
+    windows: Vec<TiledWindow>,
+}
+
+const MAX_TILED_WINDOWS: usize = 256;
+
+impl ZorinGridWindowTilingEngine {
+    pub fn new(gap_size: u32) -> Self {
+        Self {
+            gap_size,
+            windows: Vec::new(),
+        }
+    }
+
+    pub fn add_window(&mut self, window_id: u32, title: &str) -> bool {
+        if self.windows.len() >= MAX_TILED_WINDOWS
+            || title.len() > 256
+            || title.as_bytes().iter().any(|byte| byte.is_ascii_control())
+            || self
+                .windows
+                .iter()
+                .any(|window| window.window_id == window_id)
+        {
+            return false;
+        }
+        self.windows.push(TiledWindow {
+            window_id,
+            title: title.to_string(),
+            x: 0,
+            y: 0,
+            width: 0,
+            height: 0,
+        });
+        true
+    }
+
+    pub fn remove_window(&mut self, window_id: u32) -> bool {
+        if let Some(pos) = self.windows.iter().position(|w| w.window_id == window_id) {
+            self.windows.remove(pos);
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn windows(&self) -> &[TiledWindow] {
+        &self.windows
+    }
+
+    pub fn arrange_grid(
+        &mut self,
+        screen_width: u32,
+        screen_height: u32,
+    ) -> Result<(), &'static str> {
+        let count = self.windows.len();
+        if count == 0 {
+            return Ok(());
+        }
+        if screen_width == 0 || screen_height == 0 {
+            return Err("Grid layout requires non-zero screen dimensions");
+        }
+
+        let mut cols = 1u32;
+        while (cols as usize) * (cols as usize) < count {
+            cols += 1;
+        }
+        let rows = (count as u32 + cols - 1) / cols;
+        let horizontal_gaps = self
+            .gap_size
+            .checked_mul(cols + 1)
+            .ok_or("Grid layout gap overflow")?;
+        let vertical_gaps = self
+            .gap_size
+            .checked_mul(rows + 1)
+            .ok_or("Grid layout gap overflow")?;
+        let cell_width = screen_width
+            .checked_sub(horizontal_gaps)
+            .ok_or("Grid layout does not fit screen width")?
+            / cols;
+        let cell_height = screen_height
+            .checked_sub(vertical_gaps)
+            .ok_or("Grid layout does not fit screen height")?
+            / rows;
+        if cell_width == 0 || cell_height == 0 {
+            return Err("Grid layout leaves no space for tiled windows");
+        }
+
+        for (idx, win) in self.windows.iter_mut().enumerate() {
+            let col = (idx as u32) % cols;
+            let row = (idx as u32) / cols;
+
+            win.x = self.gap_size + col * (cell_width + self.gap_size);
+            win.y = self.gap_size + row * (cell_height + self.gap_size);
+            win.width = cell_width;
+            win.height = cell_height;
+        }
+        Ok(())
+    }
+
+    pub fn swap_windows(&mut self, id_a: u32, id_b: u32) -> bool {
+        let pos_a = self.windows.iter().position(|w| w.window_id == id_a);
+        let pos_b = self.windows.iter().position(|w| w.window_id == id_b);
+
+        if let (Some(a), Some(b)) = (pos_a, pos_b) {
+            self.windows.swap(a, b);
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for ZorinGridWindowTilingEngine {
+    fn default() -> Self {
+        Self::new(8)
+    }
+}
+
+/// Zorin OS Sound Event Dispatcher & Sound Theme Manager
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ZorinSoundEvent {
+    SystemStartup,
+    SystemShutdown,
+    Notification,
+    DeviceConnected,
+    DeviceDisconnected,
+    ErrorAlert,
+}
+
+pub struct ZorinSoundManager {
+    pub sound_theme: String,
+    pub is_muted: bool,
+    pub last_played_event: Option<ZorinSoundEvent>,
+    pub event_log_count: usize,
+}
+
+impl ZorinSoundManager {
+    pub fn new(theme: &str) -> Self {
+        Self {
+            sound_theme: if theme.len() <= 128
+                && !theme.as_bytes().iter().any(|byte| byte.is_ascii_control())
+            {
+                theme.to_string()
+            } else {
+                "zorin-default".to_string()
+            },
+            is_muted: false,
+            last_played_event: None,
+            event_log_count: 0,
+        }
+    }
+
+    pub fn play_event(&mut self, event: ZorinSoundEvent) -> bool {
+        if self.is_muted {
+            return false;
+        }
+        self.last_played_event = Some(event);
+        self.event_log_count = self.event_log_count.saturating_add(1);
+        true
+    }
+
+    pub fn toggle_mute(&mut self) -> bool {
+        self.is_muted = !self.is_muted;
+        self.is_muted
+    }
+
+    pub fn set_sound_theme(&mut self, theme: &str) {
+        if theme.len() <= 128 && !theme.as_bytes().iter().any(|byte| byte.is_ascii_control()) {
+            self.sound_theme = theme.to_string();
+        }
+    }
+}
+
+impl Default for ZorinSoundManager {
+    fn default() -> Self {
+        Self::new("zorin-default")
+    }
+}
+
+/// Zorin OS Taskbar Styling & Launcher Pin Customizer
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TaskbarPosition {
+    Top,
+    Bottom,
+    Left,
+    Right,
+}
+
+pub struct ZorinTaskbarCustomizer {
+    pub position: TaskbarPosition,
+    pub opacity_percent: u8,
+    pinned_app_ids: Vec<String>,
+    pub is_auto_hide_enabled: bool,
+}
+
+impl ZorinTaskbarCustomizer {
+    pub fn new() -> Self {
+        Self {
+            position: TaskbarPosition::Bottom,
+            opacity_percent: 100,
+            pinned_app_ids: Vec::new(),
+            is_auto_hide_enabled: false,
+        }
+    }
+
+    pub fn set_position(&mut self, pos: TaskbarPosition) {
+        self.position = pos;
+    }
+
+    pub fn set_opacity(&mut self, opacity: u8) {
+        self.opacity_percent = opacity.min(100);
+    }
+
+    pub fn pin_app(&mut self, app_id: &str) -> bool {
+        if app_id.is_empty()
+            || app_id.len() > 256
+            || app_id.as_bytes().iter().any(|byte| byte.is_ascii_control())
+            || self.pinned_app_ids.len() >= 256
+        {
+            return false;
+        }
+        if !self.pinned_app_ids.iter().any(|id| id == app_id) {
+            self.pinned_app_ids.push(app_id.to_string());
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn unpin_app(&mut self, app_id: &str) -> bool {
+        if let Some(pos) = self.pinned_app_ids.iter().position(|id| id == app_id) {
+            self.pinned_app_ids.remove(pos);
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn pinned_app_ids(&self) -> &[String] {
+        &self.pinned_app_ids
+    }
+}
+
+impl Default for ZorinTaskbarCustomizer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
+mod zorin_feature_tests {
+    use super::*;
 
     #[test]
     fn test_zorin_grid_tiling_sound_and_taskbar() {
-        // Stub test - these components are not yet implemented
-        // TODO: Implement ZorinGridWindowTilingEngine, ZorinSoundManager, ZorinTaskbarCustomizer
+        // Test ZorinGridWindowTilingEngine
+        let mut tiling = ZorinGridWindowTilingEngine::new(10);
+        assert!(tiling.add_window(1, "Terminal"));
+        assert!(tiling.add_window(2, "Browser"));
+        assert!(!tiling.add_window(2, "Duplicate"));
+        assert!(!tiling.add_window(3, &"x".repeat(257)));
+        tiling.arrange_grid(1920, 1080).unwrap();
+
+        assert_eq!(tiling.windows().len(), 2);
+        assert!(tiling.windows()[0].width > 0 && tiling.windows()[0].height > 0);
+        assert!(tiling
+            .windows()
+            .iter()
+            .all(|window| { window.x + window.width <= 1920 && window.y + window.height <= 1080 }));
+        assert!(tiling.swap_windows(1, 2));
+        assert_eq!(tiling.windows()[0].window_id, 2);
+        assert!(tiling.remove_window(1));
+        assert_eq!(tiling.windows().len(), 1);
+        assert!(!tiling.add_window(2, "Browser"));
+        assert!(tiling.arrange_grid(1, 1).is_err());
+
+        // Test ZorinSoundManager
+        let mut sound_mgr = ZorinSoundManager::new("zorin-glass");
+        assert_eq!(sound_mgr.sound_theme, "zorin-glass");
+        assert!(sound_mgr.play_event(ZorinSoundEvent::SystemStartup));
+        assert_eq!(
+            sound_mgr.last_played_event,
+            Some(ZorinSoundEvent::SystemStartup)
+        );
+        assert_eq!(sound_mgr.event_log_count, 1);
+        assert!(sound_mgr.toggle_mute()); // is_muted = true
+        assert!(!sound_mgr.play_event(ZorinSoundEvent::Notification)); // Muted!
+        sound_mgr.set_sound_theme(&"x".repeat(129));
+        assert_eq!(sound_mgr.sound_theme, "zorin-glass");
+
+        // Test ZorinTaskbarCustomizer
+        let mut customizer = ZorinTaskbarCustomizer::new();
+        assert_eq!(customizer.position, TaskbarPosition::Bottom);
+        customizer.set_position(TaskbarPosition::Left);
+        assert_eq!(customizer.position, TaskbarPosition::Left);
+        customizer.set_opacity(85);
+        assert_eq!(customizer.opacity_percent, 85);
+        assert!(customizer.pin_app("org.gnome.Nautilus"));
+        assert!(!customizer.pin_app("org.gnome.Nautilus")); // Already pinned
+        assert!(!customizer.pin_app("bad\napp"));
+        assert_eq!(customizer.pinned_app_ids().len(), 1);
+        assert!(customizer.unpin_app("org.gnome.Nautilus"));
+        assert_eq!(customizer.pinned_app_ids().len(), 0);
     }
 }
