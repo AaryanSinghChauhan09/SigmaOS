@@ -16,22 +16,19 @@
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
-use core::mem;
 /// OOP-based Syscall Table for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 111
 /// Implements syscall registration and dispatch table
+
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 pub type SyscallNumber = u64;
 pub type SyscallHandler = fn(u64, u64, u64, u64, u64, u64) -> i64;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum SyscallError {
-    Success = 0,
-    NotRegistered = 1,
-    InvalidArgs = 2,
-}
+pub enum SyscallError { Success = 0, NotRegistered = 1, InvalidArgs = 2 }
 
 pub trait SyscallEntry {
     fn number(&self) -> SyscallNumber;
@@ -52,11 +49,7 @@ impl SimpleSyscallEntry {
         let mut name_array = [0u8; 64];
         let name_len = name.len().min(63) as u8;
         unsafe {
-            core::ptr::copy_nonoverlapping(
-                name.as_ptr(),
-                name_array.as_mut_ptr(),
-                name_len as usize,
-            );
+            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len as usize);
         }
         SimpleSyscallEntry {
             number,
@@ -68,15 +61,11 @@ impl SimpleSyscallEntry {
 }
 
 impl SyscallEntry for SimpleSyscallEntry {
-    fn number(&self) -> SyscallNumber {
-        self.number
-    }
+    fn number(&self) -> SyscallNumber { self.number }
     fn name(&self) -> &[u8] {
         &self.name[..self.name_len as usize]
     }
-    fn handler(&self) -> SyscallHandler {
-        self.handler
-    }
+    fn handler(&self) -> SyscallHandler { self.handler }
 }
 
 pub trait SyscallTable {
@@ -100,23 +89,33 @@ impl SimpleSyscallTable {
     }
 
     pub fn register_common(&mut self) {
-        let read_handler: SyscallHandler = |a, b, c, d, e, f| (a + b + c + d + e + f) as i64;
+        let read_handler: SyscallHandler = |a, b, c, d, e, f| {
+            (a + b + c + d + e + f) as i64
+        };
         let read_entry = SimpleSyscallEntry::new(0, b"read", read_handler);
         self.entries.push(Some(Box::new(read_entry)));
 
-        let write_handler: SyscallHandler = |a, b, c, d, e, f| (a + b + c + d + e + f) as i64;
+        let write_handler: SyscallHandler = |a, b, c, d, e, f| {
+            (a + b + c + d + e + f) as i64
+        };
         let write_entry = SimpleSyscallEntry::new(1, b"write", write_handler);
         self.entries.push(Some(Box::new(write_entry)));
 
-        let open_handler: SyscallHandler = |a, b, c, d, e, f| (a + b + c + d + e + f) as i64;
+        let open_handler: SyscallHandler = |a, b, c, d, e, f| {
+            (a + b + c + d + e + f) as i64
+        };
         let open_entry = SimpleSyscallEntry::new(2, b"open", open_handler);
         self.entries.push(Some(Box::new(open_entry)));
 
-        let close_handler: SyscallHandler = |a, b, c, d, e, f| (a + b + c + d + e + f) as i64;
+        let close_handler: SyscallHandler = |a, b, c, d, e, f| {
+            (a + b + c + d + e + f) as i64
+        };
         let close_entry = SimpleSyscallEntry::new(3, b"close", close_handler);
         self.entries.push(Some(Box::new(close_entry)));
 
-        let exit_handler: SyscallHandler = |a, b, c, d, e, f| (a + b + c + d + e + f) as i64;
+        let exit_handler: SyscallHandler = |a, b, c, d, e, f| {
+            (a + b + c + d + e + f) as i64
+        };
         let exit_entry = SimpleSyscallEntry::new(60, b"exit", exit_handler);
         self.entries.push(Some(Box::new(exit_entry)));
     }
@@ -215,7 +214,9 @@ pub struct SimpleSyscallAuditor {
 impl SimpleSyscallAuditor {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        SimpleSyscallAuditor { log: Vec::new() }
+        SimpleSyscallAuditor {
+            log: Vec::new(),
+        }
     }
 }
 
@@ -229,8 +230,8 @@ impl SyscallAuditor for SimpleSyscallAuditor {
     }
 }
 
-use std::boxed::Box;
 use std::vec::Vec;
+use std::boxed::Box;
 
 #[cfg(test_disabled)]
 mod tests {

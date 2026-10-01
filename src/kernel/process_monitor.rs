@@ -178,16 +178,8 @@ impl ProcessSortField {
         match self {
             ProcessSortField::Pid => a.pid.cmp(&b.pid),
             ProcessSortField::Name => a.name.cmp(&b.name),
-            ProcessSortField::Cpu => a
-                .cpu_percent
-                .partial_cmp(&b.cpu_percent)
-                .unwrap_or(std::cmp::Ordering::Equal)
-                .reverse(),
-            ProcessSortField::Memory => a
-                .memory_percent
-                .partial_cmp(&b.memory_percent)
-                .unwrap_or(std::cmp::Ordering::Equal)
-                .reverse(),
+            ProcessSortField::Cpu => a.cpu_percent.partial_cmp(&b.cpu_percent).unwrap_or(std::cmp::Ordering::Equal).reverse(),
+            ProcessSortField::Memory => a.memory_percent.partial_cmp(&b.memory_percent).unwrap_or(std::cmp::Ordering::Equal).reverse(),
             ProcessSortField::Runtime => a.runtime.cmp(&b.runtime).reverse(),
             ProcessSortField::Priority => a.priority.cmp(&b.priority).reverse(),
         }
@@ -230,8 +222,7 @@ impl ProcessMonitor {
     }
 
     pub fn list_filtered(&self, filter: ProcessFilter) -> Vec<ProcessEntry> {
-        self.processes
-            .iter()
+        self.processes.iter()
             .filter(|p| filter.matches(p))
             .cloned()
             .collect()
@@ -243,11 +234,7 @@ impl ProcessMonitor {
         processes
     }
 
-    pub fn list_filtered_sorted(
-        &self,
-        filter: ProcessFilter,
-        sort_field: ProcessSortField,
-    ) -> Vec<ProcessEntry> {
+    pub fn list_filtered_sorted(&self, filter: ProcessFilter, sort_field: ProcessSortField) -> Vec<ProcessEntry> {
         let mut processes = self.list_filtered(filter);
         processes.sort_by(|a, b| sort_field.compare(a, b));
         processes
@@ -299,10 +286,7 @@ impl ProcessMonitor {
             details.push_str(&format!("  UID: {}\n", process.uid));
             details.push_str(&format!("  GID: {}\n", process.gid));
             details.push_str(&format!("  CPU: {:.1}%\n", process.cpu_percent));
-            details.push_str(&format!(
-                "  Memory: {:.1}% ({} KB)\n",
-                process.memory_percent, process.memory_kb
-            ));
+            details.push_str(&format!("  Memory: {:.1}% ({} KB)\n", process.memory_percent, process.memory_kb));
             details.push_str(&format!("  Runtime: {} seconds\n", process.runtime));
             details.push_str(&format!("  Priority: {}\n", process.priority));
             details.push_str(&format!("  Nice: {}\n", process.nice));
@@ -397,18 +381,9 @@ mod tests {
 
     #[test]
     fn test_process_state_from_str() {
-        assert_eq!(
-            MonitoredProcessState::from_str("R"),
-            MonitoredProcessState::Running
-        );
-        assert_eq!(
-            MonitoredProcessState::from_str("S"),
-            MonitoredProcessState::Sleeping
-        );
-        assert_eq!(
-            MonitoredProcessState::from_str("Z"),
-            MonitoredProcessState::Zombie
-        );
+        assert_eq!(MonitoredProcessState::from_str("R"), MonitoredProcessState::Running);
+        assert_eq!(MonitoredProcessState::from_str("S"), MonitoredProcessState::Sleeping);
+        assert_eq!(MonitoredProcessState::from_str("Z"), MonitoredProcessState::Zombie);
     }
 
     #[test]

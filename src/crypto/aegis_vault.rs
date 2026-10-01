@@ -3,6 +3,7 @@
 // Cryptographic operations remain unavailable until audited providers are wired in.
 // Inspired by OpenBSD signify, Android File-Based Encryption (FBE), and Apple FileVault.
 
+
 use std::vec::Vec;
 
 const MAX_DECOMPRESSED_PAYLOAD_SIZE: usize = 64 * 1024 * 1024;

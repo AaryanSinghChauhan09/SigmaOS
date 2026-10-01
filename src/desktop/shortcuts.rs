@@ -71,12 +71,7 @@ pub struct KeyboardShortcut {
 }
 
 impl KeyboardShortcut {
-    pub fn new(
-        modifiers: Vec<KeyModifier>,
-        key: String,
-        action: KeyAction,
-        description: String,
-    ) -> Self {
+    pub fn new(modifiers: Vec<KeyModifier>, key: String, action: KeyAction, description: String) -> Self {
         KeyboardShortcut {
             modifiers,
             key,
@@ -310,32 +305,21 @@ impl KeyboardShortcutsManager {
                 self.shortcuts.iter()
                     .filter(|s| matches!(s.action,
                         KeyAction::MaximizeWindow | KeyAction::TileWindow | KeyAction::CloseWindow
-                    )
-                })
-                .cloned()
-                .collect(),
-            ShortcutCategory::Application => self
-                .shortcuts
-                .iter()
-                .filter(|s| {
-                    !matches!(
-                        s.action,
-                        KeyAction::OpenLauncher
-                            | KeyAction::OpenTerminal
-                            | KeyAction::OpenFileManager
-                            | KeyAction::OpenWebBrowser
-                            | KeyAction::ShowDesktop
-                            | KeyAction::LockScreen
-                            | KeyAction::Screenshot
-                            | KeyAction::ScreenRecording
-                            | KeyAction::ToggleTheme
-                            | KeyAction::MaximizeWindow
-                            | KeyAction::TileWindow
-                            | KeyAction::CloseWindow
-                    )
-                })
-                .cloned()
-                .collect(),
+                    ))
+                    .cloned()
+                    .collect()
+            }
+            ShortcutCategory::Application => {
+                self.shortcuts.iter()
+                    .filter(|s| !matches!(s.action,
+                        KeyAction::OpenLauncher | KeyAction::OpenTerminal | KeyAction::OpenFileManager |
+                        KeyAction::OpenWebBrowser | KeyAction::ShowDesktop | KeyAction::LockScreen |
+                        KeyAction::Screenshot | KeyAction::ScreenRecording | KeyAction::ToggleTheme |
+                        KeyAction::MaximizeWindow | KeyAction::TileWindow | KeyAction::CloseWindow
+                    ))
+                    .cloned()
+                    .collect()
+            }
         }
     }
 
@@ -354,44 +338,22 @@ impl KeyboardShortcutsManager {
     }
 
     pub fn list_all_shortcuts(&self) -> Vec<String> {
-        self.shortcuts
-            .iter()
-            .map(|s| {
-                format!(
-                    "{} - {} ({})",
-                    s.get_key_combination(),
-                    s.action.as_str(),
-                    s.description
-                )
-            })
+        self.shortcuts.iter()
+            .map(|s| format!("{} - {} ({})", s.get_key_combination(), s.action.as_str(), s.description))
             .collect()
     }
 
     pub fn list_global_shortcuts(&self) -> Vec<String> {
         self.get_shortcuts_by_category(ShortcutCategory::Global)
             .iter()
-            .map(|s| {
-                format!(
-                    "{} - {} ({})",
-                    s.get_key_combination(),
-                    s.action.as_str(),
-                    s.description
-                )
-            })
+            .map(|s| format!("{} - {} ({})", s.get_key_combination(), s.action.as_str(), s.description))
             .collect()
     }
 
     pub fn list_window_shortcuts(&self) -> Vec<String> {
         self.get_shortcuts_by_category(ShortcutCategory::WindowManagement)
             .iter()
-            .map(|s| {
-                format!(
-                    "{} - {} ({})",
-                    s.get_key_combination(),
-                    s.action.as_str(),
-                    s.description
-                )
-            })
+            .map(|s| format!("{} - {} ({})", s.get_key_combination(), s.action.as_str(), s.description))
             .collect()
     }
 

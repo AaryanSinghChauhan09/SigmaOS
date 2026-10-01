@@ -28,6 +28,8 @@
 // All code is // #![no_std]  // crate-root only-compatible and zero-allocation hot-path capable.
 // ============================================================================
 
+
+
 use std::string::String;
 use std::vec::Vec;
 
@@ -477,79 +479,27 @@ pub struct SovereignPhasedRolloutGovernor {
 
 impl SovereignPhasedRolloutGovernor {
     pub fn new() -> Self {
-        let mut gov = Self {
-            components: Vec::new(),
-        };
+        let mut gov = Self { components: Vec::new() };
         gov.seed_rollout_roadmap();
         gov
     }
 
     fn seed_rollout_roadmap(&mut self) {
         // Critical Tier (Year 1-2)
-        self.components.push(RolloutComponent {
-            name: "Installer Framework",
-            tier: PriorityTier::CriticalImmediateYear1To2,
-            reference_source: "Ubuntu / Mint / Calamares",
-            is_deployed: true,
-        });
-        self.components.push(RolloutComponent {
-            name: "Hardware Enablement Stack",
-            tier: PriorityTier::CriticalImmediateYear1To2,
-            reference_source: "Fedora / FreeBSD GEOM / Linux DRM",
-            is_deployed: true,
-        });
-        self.components.push(RolloutComponent {
-            name: "Multimedia Codecs",
-            tier: PriorityTier::CriticalImmediateYear1To2,
-            reference_source: "Linux Mint / FFmpeg",
-            is_deployed: true,
-        });
-        self.components.push(RolloutComponent {
-            name: "Update & Snapshot Manager",
-            tier: PriorityTier::CriticalImmediateYear1To2,
-            reference_source: "openSUSE Snapper / Timeshift",
-            is_deployed: true,
-        });
+        self.components.push(RolloutComponent { name: "Installer Framework", tier: PriorityTier::CriticalImmediateYear1To2, reference_source: "Ubuntu / Mint / Calamares", is_deployed: true });
+        self.components.push(RolloutComponent { name: "Hardware Enablement Stack", tier: PriorityTier::CriticalImmediateYear1To2, reference_source: "Fedora / FreeBSD GEOM / Linux DRM", is_deployed: true });
+        self.components.push(RolloutComponent { name: "Multimedia Codecs", tier: PriorityTier::CriticalImmediateYear1To2, reference_source: "Linux Mint / FFmpeg", is_deployed: true });
+        self.components.push(RolloutComponent { name: "Update & Snapshot Manager", tier: PriorityTier::CriticalImmediateYear1To2, reference_source: "openSUSE Snapper / Timeshift", is_deployed: true });
 
         // Important Tier (Year 3-4)
-        self.components.push(RolloutComponent {
-            name: "System Configuration Tools",
-            tier: PriorityTier::ImportantMidTermYear3To4,
-            reference_source: "Mint / BSD rc.conf / YaST",
-            is_deployed: true,
-        });
-        self.components.push(RolloutComponent {
-            name: "Networking & Remote Access",
-            tier: PriorityTier::ImportantMidTermYear3To4,
-            reference_source: "OpenBSD pf / WireGuard / xRDP",
-            is_deployed: true,
-        });
-        self.components.push(RolloutComponent {
-            name: "Accessibility Features",
-            tier: PriorityTier::ImportantMidTermYear3To4,
-            reference_source: "WCAG 2.1 / GNOME Orca",
-            is_deployed: true,
-        });
+        self.components.push(RolloutComponent { name: "System Configuration Tools", tier: PriorityTier::ImportantMidTermYear3To4, reference_source: "Mint / BSD rc.conf / YaST", is_deployed: true });
+        self.components.push(RolloutComponent { name: "Networking & Remote Access", tier: PriorityTier::ImportantMidTermYear3To4, reference_source: "OpenBSD pf / WireGuard / xRDP", is_deployed: true });
+        self.components.push(RolloutComponent { name: "Accessibility Features", tier: PriorityTier::ImportantMidTermYear3To4, reference_source: "WCAG 2.1 / GNOME Orca", is_deployed: true });
 
         // Optional Tier (Year 5+)
-        self.components.push(RolloutComponent {
-            name: "Documentation & Community",
-            tier: PriorityTier::OptionalLongTermYear5Plus,
-            reference_source: "FreeBSD Handbook / RFC Governance",
-            is_deployed: true,
-        });
-        self.components.push(RolloutComponent {
-            name: "Plugin & Extension Ecosystem",
-            tier: PriorityTier::OptionalLongTermYear5Plus,
-            reference_source: "GNOME Shell / KDE Plasma Extensions",
-            is_deployed: true,
-        });
-        self.components.push(RolloutComponent {
-            name: "Multimedia Enhancements",
-            tier: PriorityTier::OptionalLongTermYear5Plus,
-            reference_source: "NVENC / AV1 Hardware Offload",
-            is_deployed: true,
-        });
+        self.components.push(RolloutComponent { name: "Documentation & Community", tier: PriorityTier::OptionalLongTermYear5Plus, reference_source: "FreeBSD Handbook / RFC Governance", is_deployed: true });
+        self.components.push(RolloutComponent { name: "Plugin & Extension Ecosystem", tier: PriorityTier::OptionalLongTermYear5Plus, reference_source: "GNOME Shell / KDE Plasma Extensions", is_deployed: true });
+        self.components.push(RolloutComponent { name: "Multimedia Enhancements", tier: PriorityTier::OptionalLongTermYear5Plus, reference_source: "NVENC / AV1 Hardware Offload", is_deployed: true });
     }
 
     pub fn filter_by_tier(&self, tier: PriorityTier) -> Vec<&RolloutComponent> {
@@ -557,9 +507,7 @@ impl SovereignPhasedRolloutGovernor {
     }
 
     pub fn deployment_readiness_pct(&self) -> f32 {
-        if self.components.is_empty() {
-            return 100.0;
-        }
+        if self.components.is_empty() { return 100.0; }
         let deployed = self.components.iter().filter(|c| c.is_deployed).count();
         (deployed as f32 / self.components.len() as f32) * 100.0
     }

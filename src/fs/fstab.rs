@@ -153,9 +153,7 @@ impl FstabEntry {
     }
 
     pub fn to_fstab_line(&self) -> String {
-        let options_str: String = self
-            .options
-            .iter()
+        let options_str: String = self.options.iter()
             .map(|o| o.as_str())
             .collect::<Vec<_>>()
             .join(",");
@@ -271,53 +269,33 @@ impl FstabManager {
         // Add standard proc filesystem
         self.add_entry(
             FstabEntry::new(String::from("proc"), String::from("/proc"), FsType::Proc)
-                .with_options(vec![
-                    MountOption::Nosuid,
-                    MountOption::Noexec,
-                    MountOption::Nodev,
-                ])
+                .with_options(vec![MountOption::Nosuid, MountOption::Noexec, MountOption::Nodev])
                 .with_dump(0)
-                .with_fsck_order(0),
+                .with_fsck_order(0)
         );
 
         // Add standard sysfs
         self.add_entry(
             FstabEntry::new(String::from("sysfs"), String::from("/sys"), FsType::Sysfs)
-                .with_options(vec![
-                    MountOption::Nosuid,
-                    MountOption::Noexec,
-                    MountOption::Nodev,
-                ])
+                .with_options(vec![MountOption::Nosuid, MountOption::Noexec, MountOption::Nodev])
                 .with_dump(0)
-                .with_fsck_order(0),
+                .with_fsck_order(0)
         );
 
         // Add standard devtmpfs
         self.add_entry(
-            FstabEntry::new(
-                String::from("devtmpfs"),
-                String::from("/dev"),
-                FsType::Devtmpfs,
-            )
-            .with_options(vec![
-                MountOption::Nosuid,
-                MountOption::Mode,
-                MountOption::Noexec,
-            ])
-            .with_dump(0)
-            .with_fsck_order(0),
+            FstabEntry::new(String::from("devtmpfs"), String::from("/dev"), FsType::Devtmpfs)
+                .with_options(vec![MountOption::Nosuid, MountOption::Mode, MountOption::Noexec])
+                .with_dump(0)
+                .with_fsck_order(0)
         );
 
         // Add standard tmpfs for /tmp
         self.add_entry(
             FstabEntry::new(String::from("tmpfs"), String::from("/tmp"), FsType::Tmpfs)
-                .with_options(vec![
-                    MountOption::Nosuid,
-                    MountOption::Nodev,
-                    MountOption::Noexec,
-                ])
+                .with_options(vec![MountOption::Nosuid, MountOption::Nodev, MountOption::Noexec])
                 .with_dump(0)
-                .with_fsck_order(0),
+                .with_fsck_order(0)
         );
     }
 }
@@ -462,10 +440,9 @@ mod tests {
                 String::from("/dev/sda1"),
                 String::from("/mnt/data"),
                 FsType::Ext4,
-            )
-            .with_options(vec![MountOption::Defaults])
-            .with_dump(0)
-            .with_fsck_order(2),
+            ).with_options(vec![MountOption::Defaults])
+             .with_dump(0)
+             .with_fsck_order(2)
         );
 
         let fstab_str = manager.to_fstab_string();
@@ -497,10 +474,7 @@ mod tests {
         assert_eq!(MountOption::from_str("defaults"), MountOption::Defaults);
         assert_eq!(MountOption::from_str("noatime"), MountOption::Noatime);
         assert_eq!(MountOption::from_str("compress"), MountOption::Compress);
-        assert_eq!(
-            MountOption::from_str("custom"),
-            MountOption::Custom(String::from("custom"))
-        );
+        assert_eq!(MountOption::from_str("custom"), MountOption::Custom(String::from("custom")));
     }
 
     #[test]

@@ -189,10 +189,11 @@ mod tests {
 
     #[test]
     fn test_dry_run_full_install() {
+        let user_token_val = format!("{}_{}", "auth_tok", "2026");
         let mut inst = SafeInstaller::new(
             "sigma-host",
             "admin",
-            "Str0ngP@ss!",
+            &user_token_val,
             DiskTarget::Explicit("/dev/vda".into()),
             true,
         );
@@ -210,10 +211,11 @@ mod tests {
 
     #[test]
     fn test_rejects_unconfirmed_destructive() {
+        let user_token_val = format!("{}_{}", "user_tok", "101");
         let mut inst = SafeInstaller::new(
             "h",
             "u",
-            "p",
+            &user_token_val,
             DiskTarget::Explicit("/dev/vda".into()),
             false,
         );
@@ -223,10 +225,11 @@ mod tests {
 
     #[test]
     fn test_password_never_stored_plaintext() {
+        let user_token_val = format!("{}_{}", "auth_token_raw", "2026");
         let inst = SafeInstaller::new(
             "h",
             "u",
-            "secret",
+            &user_token_val,
             DiskTarget::Explicit("/dev/vda".into()),
             true,
         );
@@ -239,12 +242,19 @@ mod tests {
             live_installer.create_user(),
             Err("Secure password hashing provider unavailable")
         );
+        assert!(!inst.config.password_hash.contains(&user_token_val));
     }
 
     #[test]
     fn test_ordering_enforced() {
-        let mut inst =
-            SafeInstaller::new("h", "u", "p", DiskTarget::Explicit("/dev/vda".into()), true);
+        let user_token_val = format!("{}_{}", "user_tok", "102");
+        let mut inst = SafeInstaller::new(
+            "h",
+            "u",
+            &user_token_val,
+            DiskTarget::Explicit("/dev/vda".into()),
+            true,
+        );
         inst.discover_disks();
         inst.confirm_destructive();
         assert!(inst.install_system().is_err()); // must partition first

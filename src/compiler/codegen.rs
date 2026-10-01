@@ -211,9 +211,7 @@ impl CodeGenerator {
             Stmt::Expr(expr) => {
                 self.gen_expr(expr, frame);
             }
-            Stmt::While {
-                condition, body, ..
-            } => {
+            Stmt::While { condition, body, .. } => {
                 let loop_label = frame.next_label("while");
                 let end_label = frame.next_label("while_end");
                 self.emit_text(&format!("{}:", loop_label));
@@ -224,12 +222,7 @@ impl CodeGenerator {
                 self.emit_text(&format!("    jmp {}", loop_label));
                 self.emit_text(&format!("{}:", end_label));
             }
-            Stmt::For {
-                variable,
-                iterable,
-                body,
-                ..
-            } => {
+            Stmt::For { variable, iterable, body, .. } => {
                 // Simple range-like for: treat iterable result as count
                 let offset = frame.alloc_local(variable);
                 self.emit_text(&format!("    movq $0, {}(%rbp)", offset));
@@ -293,9 +286,7 @@ impl CodeGenerator {
                     self.emit_text(&format!("    leaq {}(%rip), %rax", name));
                 }
             }
-            Expr::Binary {
-                left, op, right, ..
-            } => {
+            Expr::Binary { left, op, right, .. } => {
                 // Evaluate right first, push, then evaluate left
                 self.gen_expr(right, frame);
                 self.emit_text("    pushq %rax");
@@ -458,12 +449,7 @@ impl CodeGenerator {
                 self.emit_text("    popq %rcx");
                 self.emit_text("    movq (%rax,%rcx,8), %rax");
             }
-            Expr::If {
-                condition,
-                then_block,
-                else_block,
-                ..
-            } => {
+            Expr::If { condition, then_block, else_block, .. } => {
                 let else_label = frame.next_label("if_else");
                 let end_label = frame.next_label("if_end");
 
@@ -522,9 +508,7 @@ impl CodeGenerator {
                 // Most casts are no-ops at the assembly level for same-size types
                 self.gen_expr(expr, frame);
             }
-            Expr::Match {
-                scrutinee, arms, ..
-            } => {
+            Expr::Match { scrutinee, arms, .. } => {
                 self.gen_expr(scrutinee, frame);
                 let end_label = frame.next_label("match_end");
                 for arm in arms {
@@ -536,7 +520,10 @@ impl CodeGenerator {
                             self.emit_text(&format!("    jne {}", next_label));
                         }
                         super::parser::Pattern::BoolLiteral(b) => {
-                            self.emit_text(&format!("    cmpq ${}, %rax", if *b { 1 } else { 0 }));
+                            self.emit_text(&format!(
+                                "    cmpq ${}, %rax",
+                                if *b { 1 } else { 0 }
+                            ));
                             self.emit_text(&format!("    jne {}", next_label));
                         }
                         super::parser::Pattern::Wildcard | super::parser::Pattern::Ident(_) => {
@@ -572,11 +559,9 @@ impl CodeGenerator {
     fn alloc_string(&mut self, s: &str) -> String {
         let label = format!(".Lstr_{}", self.string_counter);
         self.string_counter += 1;
-        self.output.data_section.push_str(&format!(
-            "{}:\n    .asciz \"{}\"\n",
-            label,
-            Self::escape_asm(s)
-        ));
+        self.output
+            .data_section
+            .push_str(&format!("{}:\n    .asciz \"{}\"\n", label, Self::escape_asm(s)));
         label
     }
 

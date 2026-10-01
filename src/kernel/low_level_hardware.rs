@@ -350,13 +350,7 @@ pub struct PcieBarMmioRegion {
 }
 
 impl PcieBarMmioRegion {
-    pub fn new(
-        bar_index: u8,
-        base_address: u64,
-        size_bytes: u64,
-        bar_type: PcieBarType,
-        is_prefetchable: bool,
-    ) -> Self {
+    pub fn new(bar_index: u8, base_address: u64, size_bytes: u64, bar_type: PcieBarType, is_prefetchable: bool) -> Self {
         Self {
             bar_index,
             base_address,
@@ -448,14 +442,7 @@ impl NvmeQueuePairEngine {
         }
     }
 
-    pub fn submit_command(
-        &mut self,
-        opcode: u8,
-        nsid: u32,
-        prp1: u64,
-        prp2: u64,
-        cdw10: u32,
-    ) -> u16 {
+    pub fn submit_command(&mut self, opcode: u8, nsid: u32, prp1: u64, prp2: u64, cdw10: u32) -> u16 {
         let cmd_id = self.sq_tail as u16;
         let entry = NvmeSubmissionQueueEntry {
             opcode,
@@ -544,11 +531,7 @@ impl XhciRingEngine {
         let cycle_bit = if self.cycle_state { 1 } else { 0 };
         let control = (trb_type_val << 10) | cycle_bit;
 
-        let trb = XhciTrb {
-            parameter,
-            status,
-            control,
-        };
+        let trb = XhciTrb { parameter, status, control };
         let idx = self.enqueue_index;
         self.trbs.push(trb);
 

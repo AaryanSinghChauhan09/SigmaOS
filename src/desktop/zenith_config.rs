@@ -207,9 +207,7 @@ impl ZenithConfig {
                 "output_scale" => config.compositor.output_scale = OutputScale::from_str(value),
                 "vsync" => config.compositor.vsync = value == "true",
                 "keyboard_layout" => config.input.keyboard_layout = String::from(value),
-                "mouse_acceleration" => {
-                    config.input.mouse_acceleration = MouseAcceleration::from_str(value)
-                }
+                "mouse_acceleration" => config.input.mouse_acceleration = MouseAcceleration::from_str(value),
                 "theme" => config.appearance.theme = Theme::from_str(value),
                 "font" => config.appearance.font = String::from(value),
                 "icon_theme" => config.appearance.icon_theme = String::from(value),
@@ -224,33 +222,18 @@ impl ZenithConfig {
         let mut result = String::new();
 
         result.push_str("[compositor]\n");
-        result.push_str(&format!(
-            "backend = \"{}\"\n",
-            self.compositor.backend.as_str()
-        ));
-        result.push_str(&format!(
-            "output_scale = \"{}\"\n",
-            self.compositor.output_scale.as_str()
-        ));
+        result.push_str(&format!("backend = \"{}\"\n", self.compositor.backend.as_str()));
+        result.push_str(&format!("output_scale = \"{}\"\n", self.compositor.output_scale.as_str()));
         result.push_str(&format!("vsync = {}\n\n", self.compositor.vsync));
 
         result.push_str("[input]\n");
-        result.push_str(&format!(
-            "keyboard_layout = \"{}\"\n",
-            self.input.keyboard_layout
-        ));
-        result.push_str(&format!(
-            "mouse_acceleration = \"{}\"\n\n",
-            self.input.mouse_acceleration.as_str()
-        ));
+        result.push_str(&format!("keyboard_layout = \"{}\"\n", self.input.keyboard_layout));
+        result.push_str(&format!("mouse_acceleration = \"{}\"\n\n", self.input.mouse_acceleration.as_str()));
 
         result.push_str("[appearance]\n");
         result.push_str(&format!("theme = \"{}\"\n", self.appearance.theme.as_str()));
         result.push_str(&format!("font = \"{}\"\n", self.appearance.font));
-        result.push_str(&format!(
-            "icon_theme = \"{}\"\n",
-            self.appearance.icon_theme
-        ));
+        result.push_str(&format!("icon_theme = \"{}\"\n", self.appearance.icon_theme));
 
         result
     }
@@ -354,15 +337,9 @@ icon_theme = "sigma-icons"
     #[test]
     fn test_compositor_backend_from_str() {
         assert_eq!(CompositorBackend::from_str("drm"), CompositorBackend::Drm);
-        assert_eq!(
-            CompositorBackend::from_str("wayland"),
-            CompositorBackend::Wayland
-        );
+        assert_eq!(CompositorBackend::from_str("wayland"), CompositorBackend::Wayland);
         assert_eq!(CompositorBackend::from_str("x11"), CompositorBackend::X11);
-        assert_eq!(
-            CompositorBackend::from_str("unknown"),
-            CompositorBackend::Drm
-        );
+        assert_eq!(CompositorBackend::from_str("unknown"), CompositorBackend::Drm);
     }
 
     #[test]
@@ -383,10 +360,7 @@ icon_theme = "sigma-icons"
     #[test]
     fn test_mouse_acceleration_from_str() {
         assert_eq!(MouseAcceleration::from_str("none"), MouseAcceleration::None);
-        assert_eq!(
-            MouseAcceleration::from_str("adaptive"),
-            MouseAcceleration::Adaptive
-        );
+        assert_eq!(MouseAcceleration::from_str("adaptive"), MouseAcceleration::Adaptive);
         assert_eq!(MouseAcceleration::from_str("flat"), MouseAcceleration::Flat);
     }
 

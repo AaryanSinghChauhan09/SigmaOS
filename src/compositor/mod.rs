@@ -7,8 +7,14 @@
 pub mod sigma_compositor;
 
 pub use sigma_compositor::{
-    CompositorError, Geometry, LayoutType, SigmaCompositor, Window, WindowId, WindowState,
+    SigmaCompositor,
+    WindowId,
+    Window,
     Workspace,
+    Geometry,
+    LayoutType,
+    WindowState,
+    CompositorError,
 };
 
 // ─── Zenith Wayland Compositor Core ──────────────────────────────────────────

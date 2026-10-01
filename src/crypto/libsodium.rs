@@ -144,6 +144,8 @@ impl BoxCipher {
         [u8; constants::CRYPTO_BOX_PUBLICKEYBYTES],
         [u8; constants::CRYPTO_BOX_SECRETKEYBYTES],
     ) {
+    pub fn keypair() -> ([u8; constants::CRYPTO_BOX_PUBLICKEYBYTES],
+                         [u8; constants::CRYPTO_BOX_SECRETKEYBYTES]) {
         // Simplified key generation
         let mut public_key = [0u8; constants::CRYPTO_BOX_PUBLICKEYBYTES];
         let secret_key = [0u8; constants::CRYPTO_BOX_SECRETKEYBYTES];
@@ -160,8 +162,7 @@ impl BoxCipher {
             fold_state ^= secret_key[i] as u64;
             fold_state = fold_state.wrapping_mul(0x100000001b3);
             let derived_byte = (fold_state ^ (fold_state >> 32)) as u8;
-            public_key[i % constants::CRYPTO_BOX_PUBLICKEYBYTES] =
-                secret_key[i].wrapping_add(derived_byte);
+            public_key[i % constants::CRYPTO_BOX_PUBLICKEYBYTES] = secret_key[i].wrapping_add(derived_byte);
         }
 
         (public_key, secret_key)
@@ -192,6 +193,15 @@ impl BoxCipher {
         let _ = (message, nonce, recipient_public_key);
         Err(CryptoUnavailable::ProviderNotIntegrated)
     ) -> Vec<u8> {
+    pub fn new(public_key: [u8; constants::CRYPTO_BOX_PUBLICKEYBYTES],
+               secret_key: [u8; constants::CRYPTO_BOX_SECRETKEYBYTES]) -> Self {
+        BoxCipher { public_key, secret_key }
+    }
+
+    /// Encrypt a message
+    pub fn encrypt(&self, message: &[u8], nonce: &[u8; constants::CRYPTO_BOX_NONCEBYTES],
+                   recipient_public_key: &[u8; constants::CRYPTO_BOX_PUBLICKEYBYTES])
+                   -> Vec<u8> {
         // Simplified encryption (X25519+XSalsa20+Poly1305)
         let mut ciphertext = Vec::with_capacity(message.len() + constants::CRYPTO_BOX_MACBYTES);
 
@@ -225,6 +235,9 @@ impl BoxCipher {
         let _ = (ciphertext, nonce, sender_public_key);
         Err(CryptoUnavailable::ProviderNotIntegrated)
     ) -> Result<Vec<u8>, &'static str> {
+    pub fn decrypt(&self, ciphertext: &[u8], nonce: &[u8; constants::CRYPTO_BOX_NONCEBYTES],
+                   sender_public_key: &[u8; constants::CRYPTO_BOX_PUBLICKEYBYTES])
+                   -> Result<Vec<u8>, &'static str> {
         if ciphertext.len() < constants::CRYPTO_BOX_MACBYTES {
             return Err("Ciphertext too short");
         }
@@ -260,7 +273,8 @@ impl BoxCipher {
     }
 
     /// Simplified Diffie-Hellman key exchange
-    fn diffie_hellman(&self, public_key: &[u8; constants::CRYPTO_BOX_PUBLICKEYBYTES]) -> Vec<u8> {
+    fn diffie_hellman(&self, public_key: &[u8; constants::CRYPTO_BOX_PUBLICKEYBYTES])
+                      -> Vec<u8> {
         let mut shared = vec![0u8; 32];
         for i in 0..32 {
             shared[i] = self.secret_key[i] ^ public_key[i];
@@ -289,6 +303,9 @@ impl SecretBox {
     ) -> Vec<u8> {
         let mut ciphertext =
             Vec::with_capacity(message.len() + constants::CRYPTO_SECRETBOX_MACBYTES);
+    pub fn encrypt(&self, message: &[u8], nonce: &[u8; constants::CRYPTO_SECRETBOX_NONCEBYTES])
+                   -> Vec<u8> {
+        let mut ciphertext = Vec::with_capacity(message.len() + constants::CRYPTO_SECRETBOX_MACBYTES);
 
         // XSalsa20 encryption (simplified)
         for (i, byte) in message.iter().enumerate() {
@@ -316,6 +333,8 @@ impl SecretBox {
         let _ = (ciphertext, nonce);
         Err(CryptoUnavailable::ProviderNotIntegrated)
     ) -> Result<Vec<u8>, &'static str> {
+    pub fn decrypt(&self, ciphertext: &[u8], nonce: &[u8; constants::CRYPTO_SECRETBOX_NONCEBYTES])
+                   -> Result<Vec<u8>, &'static str> {
         if ciphertext.len() < constants::CRYPTO_SECRETBOX_MACBYTES {
             return Err("Ciphertext too short");
         }
@@ -334,8 +353,7 @@ impl SecretBox {
         let tag_offset = message_len;
         let mut valid = true;
         for i in 0..constants::CRYPTO_SECRETBOX_MACBYTES {
-            if ciphertext[tag_offset + i] != (self.key[i % self.key.len()] ^ nonce[i % nonce.len()])
-            {
+            if ciphertext[tag_offset + i] != (self.key[i % self.key.len()] ^ nonce[i % nonce.len()]) {
                 valid = false;
                 break;
             }
@@ -366,6 +384,8 @@ impl Sign {
         [u8; constants::CRYPTO_SIGN_PUBLICKEYBYTES],
         [u8; constants::CRYPTO_SIGN_SECRETKEYBYTES],
     ) {
+    pub fn keypair() -> ([u8; constants::CRYPTO_SIGN_PUBLICKEYBYTES],
+                        [u8; constants::CRYPTO_SIGN_SECRETKEYBYTES]) {
         let mut public_key = [0u8; constants::CRYPTO_SIGN_PUBLICKEYBYTES];
         let secret_key = [0u8; constants::CRYPTO_SIGN_SECRETKEYBYTES];
 
@@ -395,6 +415,9 @@ impl Sign {
             public_key,
             secret_key,
         }
+    pub fn new(public_key: [u8; constants::CRYPTO_SIGN_PUBLICKEYBYTES],
+               secret_key: [u8; constants::CRYPTO_SIGN_SECRETKEYBYTES]) -> Self {
+        Sign { public_key, secret_key }
     }
 
     /// Sign a message
@@ -413,6 +436,8 @@ impl Sign {
     ) -> Result<bool, CryptoUnavailable> {
         Err(CryptoUnavailable::ProviderNotIntegrated)
     pub fn verify(&self, signature: &[u8; constants::CRYPTO_SIGN_BYTES], message: &[u8]) -> bool {
+    pub fn verify(&self, signature: &[u8; constants::CRYPTO_SIGN_BYTES],
+                  message: &[u8]) -> bool {
         let computed = self.sign(message);
 
         // Constant-time comparison
@@ -457,6 +482,9 @@ impl ScalarMult {
         scalar: &[u8; constants::CRYPTO_SCALARMULT_SCALARBYTES],
         point: &[u8; constants::CRYPTO_SCALARMULT_BYTES],
     ) -> [u8; constants::CRYPTO_SCALARMULT_BYTES] {
+    pub fn scalar_mult(scalar: &[u8; constants::CRYPTO_SCALARMULT_SCALARBYTES],
+                       point: &[u8; constants::CRYPTO_SCALARMULT_BYTES])
+                       -> [u8; constants::CRYPTO_SCALARMULT_BYTES] {
         let mut result = [0u8; constants::CRYPTO_SCALARMULT_BYTES];
 
         // Simplified Curve25519 scalar multiplication
@@ -474,6 +502,8 @@ impl ScalarMult {
         Err(CryptoUnavailable::ProviderNotIntegrated)
         scalar: &[u8; constants::CRYPTO_SCALARMULT_SCALARBYTES],
     ) -> [u8; constants::CRYPTO_SCALARMULT_BYTES] {
+    pub fn scalar_mult_base(scalar: &[u8; constants::CRYPTO_SCALARMULT_SCALARBYTES])
+                            -> [u8; constants::CRYPTO_SCALARMULT_BYTES] {
         let mut result = [0u8; constants::CRYPTO_SCALARMULT_BYTES];
 
         // Simplified base point multiplication
@@ -502,6 +532,9 @@ impl Stream {
         nonce: &[u8; constants::CRYPTO_STREAM_NONCEBYTES],
         key: &[u8; constants::CRYPTO_STREAM_KEYBYTES],
     ) {
+    pub fn stream_xor(output: &mut [u8], input: &[u8],
+                      nonce: &[u8; constants::CRYPTO_STREAM_NONCEBYTES],
+                      key: &[u8; constants::CRYPTO_STREAM_KEYBYTES]) {
         let len = output.len().min(input.len());
 
         for i in 0..len {
@@ -522,6 +555,9 @@ impl Stream {
         nonce: &[u8; constants::CRYPTO_STREAM_NONCEBYTES],
         key: &[u8; constants::CRYPTO_STREAM_KEYBYTES],
     ) {
+    pub fn stream_xor_inplace(data: &mut [u8],
+                              nonce: &[u8; constants::CRYPTO_STREAM_NONCEBYTES],
+                              key: &[u8; constants::CRYPTO_STREAM_KEYBYTES]) {
         for i in 0..data.len() {
             let key_byte = key[i % key.len()];
             let nonce_byte = nonce[i % nonce.len()];
@@ -557,6 +593,7 @@ pub mod utils {
     pub fn randombytes(_buf: &mut [u8]) -> Result<(), super::CryptoUnavailable> {
         Err(super::CryptoUnavailable::ProviderNotIntegrated)
     pub fn randombytes(buf: &mut [u8]) {
+
         for _byte in buf.iter_mut() {
             // *byte = random::random_byte(); // not available
         }

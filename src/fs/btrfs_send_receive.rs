@@ -236,9 +236,7 @@ impl BtrfsSendReceiveManager {
 
     /// Generate send stream for subvolume
     pub fn generate_send_stream(&self, subvol_id: u64) -> Result<BtrfsSendStream, String> {
-        let subvol = self
-            .subvolumes
-            .get(&subvol_id)
+        let subvol = self.subvolumes.get(&subvol_id)
             .ok_or("Subvolume not found")?;
 
         let mut stream = BtrfsSendStream::new();
@@ -260,14 +258,8 @@ impl BtrfsSendReceiveManager {
     }
 
     /// Receive send stream into subvolume
-    pub fn receive_stream(
-        &mut self,
-        subvol_id: u64,
-        stream: &mut BtrfsSendStream,
-    ) -> Result<u64, String> {
-        let subvol = self
-            .subvolumes
-            .get(&subvol_id)
+    pub fn receive_stream(&mut self, subvol_id: u64, stream: &mut BtrfsSendStream) -> Result<u64, String> {
+        let subvol = self.subvolumes.get(&subvol_id)
             .ok_or("Subvolume not found")?;
 
         let mut context = BtrfsReceiveContext::new(subvol.name.clone());

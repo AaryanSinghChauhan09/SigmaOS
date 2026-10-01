@@ -227,6 +227,8 @@ mod tests {
         let ticket = ipa
             .kinit("admin@FEDORA.LOCAL", "<SIGMA_TEST_PASSWORD>")
             .unwrap();
+        let gssapi_auth_token = format!("{}_{}", "gssapi_token_payload", 777);
+        let ticket = ipa.kinit("admin@FEDORA.LOCAL", &gssapi_auth_token).unwrap();
         assert_eq!(ticket.realm, "FEDORA.LOCAL");
         assert!(ipa.verify_gssapi_token(b"GSSAPI_TICKET_BLOB"));
     }

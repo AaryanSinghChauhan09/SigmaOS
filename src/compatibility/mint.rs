@@ -72,15 +72,13 @@ impl MintUpdateManager {
     }
 
     pub fn get_security_updates(&self) -> Vec<&UpdatePackage> {
-        self.available_updates
-            .iter()
+        self.available_updates.iter()
             .filter(|u| u.level == UpdateLevel::Security)
             .collect()
     }
 
     pub fn get_recommended_updates(&self) -> Vec<&UpdatePackage> {
-        self.available_updates
-            .iter()
+        self.available_updates.iter()
             .filter(|u| u.level == UpdateLevel::Recommended)
             .collect()
     }
@@ -112,11 +110,7 @@ impl MintUpdateManager {
             recommended_count,
             self.flatpak_updates.len(),
             total_size / (1024 * 1024),
-            if self.auto_update_enabled {
-                "Enabled"
-            } else {
-                "Disabled"
-            }
+            if self.auto_update_enabled { "Enabled" } else { "Disabled" }
         )
     }
 }
@@ -201,15 +195,13 @@ impl MintInstallManager {
     }
 
     pub fn get_category_packages(&self, category: &str) -> Vec<&SoftwarePackage> {
-        self.packages
-            .iter()
+        self.packages.iter()
             .filter(|p| p.category == category)
             .collect()
     }
 
     pub fn get_flatpak_match(&self, apt_package: &str) -> Option<&SoftwarePackage> {
-        self.packages
-            .iter()
+        self.packages.iter()
             .find(|p| p.source == PackageSource::Flatpak && p.name == apt_package)
     }
 }
@@ -420,16 +412,13 @@ impl LinuxMintIntegrationEngine {
     }
 
     pub fn configure_desktop(&mut self) {
-        self.desktop_manager
-            .add_panel(CinnamonPanelPosition::Bottom, 48);
-        self.desktop_manager
-            .add_panel(CinnamonPanelPosition::Top, 32);
+        self.desktop_manager.add_panel(CinnamonPanelPosition::Bottom, 48);
+        self.desktop_manager.add_panel(CinnamonPanelPosition::Top, 32);
     }
 
     pub fn apply_mint_defaults(&mut self) {
         self.xapp_preferences.set_dark_mode(false);
-        self.system_config
-            .set_update_level(UpdateLevel::Recommended);
+        self.system_config.set_update_level(UpdateLevel::Recommended);
     }
 
     pub fn generate_integration_report(&self) -> String {
@@ -506,9 +495,7 @@ mod tests {
         desktop.add_applet_to_panel(0, "menu@cinnamon");
 
         assert_eq!(desktop.get_panel_count(), 1);
-        assert!(desktop.panels[0]
-            .applets
-            .contains(&"menu@cinnamon".to_string()));
+        assert!(desktop.panels[0].applets.contains(&"menu@cinnamon".to_string()));
     }
 
     #[test]

@@ -106,11 +106,7 @@ impl TraceRouteResult {
 
     pub fn get_summary(&self) -> String {
         if self.success {
-            let mut summary = format!(
-                "Trace route to {} ({} hops):\n",
-                self.target,
-                self.hops.len()
-            );
+            let mut summary = format!("Trace route to {} ({} hops):\n", self.target, self.hops.len());
             for hop in &self.hops {
                 summary.push_str(&format!(
                     "  {}: {} ({}) - {:.2} ms\n",
@@ -235,12 +231,7 @@ pub struct NetworkConnection {
 }
 
 impl NetworkConnection {
-    pub fn new(
-        protocol: String,
-        local_address: String,
-        remote_address: String,
-        state: String,
-    ) -> Self {
+    pub fn new(protocol: String, local_address: String, remote_address: String, state: String) -> Self {
         NetworkConnection {
             protocol,
             local_address,
@@ -291,7 +282,9 @@ pub struct NetworkDiagnostics {
 
 impl Default for NetworkDiagnostics {
     fn default() -> Self {
-        NetworkDiagnostics { enabled: true }
+        NetworkDiagnostics {
+            enabled: true,
+        }
     }
 }
 
@@ -340,8 +333,11 @@ impl NetworkDiagnostics {
 
         // Simulate trace route
         for i in 1..=max_hops.min(10) {
-            let mut hop =
-                TraceRouteHop::new(i, format!("hop-{}", i), format!("192.168.{}.{}", i, 1));
+            let mut hop = TraceRouteHop::new(
+                i,
+                format!("hop-{}", i),
+                format!("192.168.{}.{}", i, 1),
+            );
             hop.add_rtt(10.0 + i as f32);
             hop.add_rtt(12.0 + i as f32);
             hop.add_rtt(11.0 + i as f32);
@@ -397,15 +393,13 @@ impl NetworkDiagnostics {
                 String::from("192.168.1.100:50000"),
                 String::from("93.184.216.34:80"),
                 String::from("ESTABLISHED"),
-            )
-            .with_pid(1234),
+            ).with_pid(1234),
             NetworkConnection::new(
                 String::from("tcp"),
                 String::from("192.168.1.100:50001"),
                 String::from("8.8.8.8:53"),
                 String::from("ESTABLISHED"),
-            )
-            .with_pid(5678),
+            ).with_pid(5678),
             NetworkConnection::new(
                 String::from("udp"),
                 String::from("192.168.1.100:50002"),
@@ -478,14 +472,22 @@ mod tests {
 
     #[test]
     fn test_trace_route_hop_creation() {
-        let hop = TraceRouteHop::new(1, String::from("hop-1"), String::from("192.168.1.1"));
+        let hop = TraceRouteHop::new(
+            1,
+            String::from("hop-1"),
+            String::from("192.168.1.1"),
+        );
         assert_eq!(hop.hop_number, 1);
         assert_eq!(hop.hostname, "hop-1");
     }
 
     #[test]
     fn test_trace_route_hop_add_rtt() {
-        let mut hop = TraceRouteHop::new(1, String::from("hop-1"), String::from("192.168.1.1"));
+        let mut hop = TraceRouteHop::new(
+            1,
+            String::from("hop-1"),
+            String::from("192.168.1.1"),
+        );
         hop.add_rtt(10.0);
         hop.add_rtt(20.0);
 
@@ -503,7 +505,11 @@ mod tests {
     #[test]
     fn test_trace_route_result_add_hop() {
         let mut result = TraceRouteResult::new(String::from("example.com"));
-        let hop = TraceRouteHop::new(1, String::from("hop-1"), String::from("192.168.1.1"));
+        let hop = TraceRouteHop::new(
+            1,
+            String::from("hop-1"),
+            String::from("192.168.1.1"),
+        );
         result.add_hop(hop);
 
         assert_eq!(result.hops.len(), 1);

@@ -188,27 +188,13 @@ impl LinuxOpenFlags {
 
     pub fn as_u32(&self) -> u32 {
         let mut flags = 0u32;
-        if self.read_only {
-            flags |= 0x01;
-        }
-        if self.write_only {
-            flags |= 0x02;
-        }
-        if self.read_write {
-            flags |= 0x02;
-        }
-        if self.create {
-            flags |= 0x40;
-        }
-        if self.truncate {
-            flags |= 0x200;
-        }
-        if self.append {
-            flags |= 0x400;
-        }
-        if self.nonblock {
-            flags |= 0x800;
-        }
+        if self.read_only { flags |= 0x01; }
+        if self.write_only { flags |= 0x02; }
+        if self.read_write { flags |= 0x02; }
+        if self.create { flags |= 0x40; }
+        if self.truncate { flags |= 0x200; }
+        if self.append { flags |= 0x400; }
+        if self.nonblock { flags |= 0x800; }
         flags
     }
 }
@@ -253,10 +239,7 @@ impl LinuxFdTable {
         if fd < 3 {
             return Err("Cannot close standard file descriptor");
         }
-        self.entries
-            .remove(&fd)
-            .map(|_| ())
-            .ok_or("File descriptor not found")
+        self.entries.remove(&fd).map(|_| ()).ok_or("File descriptor not found")
     }
 
     /// Get file descriptor entry
@@ -565,21 +548,15 @@ mod tests {
         let dispatcher = LinuxSyscallDispatcher::new();
 
         // Test getpid
-        let pid = dispatcher
-            .dispatch(LinuxSyscallNumber::Getpid as u64, &[])
-            .unwrap();
+        let pid = dispatcher.dispatch(LinuxSyscallNumber::Getpid as u64, &[]).unwrap();
         assert_eq!(pid, 1);
 
         // Test getppid
-        let ppid = dispatcher
-            .dispatch(LinuxSyscallNumber::Getppid as u64, &[])
-            .unwrap();
+        let ppid = dispatcher.dispatch(LinuxSyscallNumber::Getppid as u64, &[]).unwrap();
         assert_eq!(ppid, 0);
 
         // Test fork
-        let child_pid = dispatcher
-            .dispatch(LinuxSyscallNumber::Fork as u64, &[])
-            .unwrap();
+        let child_pid = dispatcher.dispatch(LinuxSyscallNumber::Fork as u64, &[]).unwrap();
         assert_eq!(child_pid, 2);
 
         assert_eq!(dispatcher.process_count(), 2);
@@ -596,6 +573,8 @@ mod tests {
         dispatcher
             .dispatch(LinuxSyscallNumber::Getppid as u64, &[])
             .unwrap();
+        let dispatcher = LinuxSyscallDispatcher::new();
+
         dispatcher.dispatch(LinuxSyscallNumber::Getpid as u64, &[]).unwrap();
         dispatcher.dispatch(LinuxSyscallNumber::Getppid as u64, &[]).unwrap();
 

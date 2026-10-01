@@ -172,60 +172,34 @@ pub struct SovereignMultiDistroScriptletSecurityGovernor;
 
 impl SovereignMultiDistroScriptletSecurityGovernor {
     /// Generates strict OpenBSD pledge/unveil, FreeBSD Capsicum, and Linux Landlock sandbox policy for scriptlets
-    pub fn generate_sandbox_policy(
-        format: PackageFormat,
-        phase: ScriptletHookPhase,
-    ) -> SandboxSecurityPolicy {
+    pub fn generate_sandbox_policy(format: PackageFormat, phase: ScriptletHookPhase) -> SandboxSecurityPolicy {
         let mut policy = SandboxSecurityPolicy {
-            pledge_promises: vec![
-                "stdio".to_string(),
-                "rpath".to_string(),
-                "wpath".to_string(),
-                "cpath".to_string(),
-            ],
+            pledge_promises: vec!["stdio".to_string(), "rpath".to_string(), "wpath".to_string(), "cpath".to_string()],
             unveiled_paths: Vec::new(),
-            capsicum_rights: vec![
-                "CAP_READ".to_string(),
-                "CAP_WRITE".to_string(),
-                "CAP_FSTAT".to_string(),
-            ],
+            capsicum_rights: vec!["CAP_READ".to_string(), "CAP_WRITE".to_string(), "CAP_FSTAT".to_string()],
             landlock_read_only_paths: vec!["/usr/share".to_string(), "/etc".to_string()],
         };
 
         match format {
             PackageFormat::Deb | PackageFormat::Apt => {
-                policy
-                    .unveiled_paths
-                    .push(("/var/lib/dpkg".to_string(), "rwc".to_string()));
-                policy
-                    .unveiled_paths
-                    .push(("/tmp".to_string(), "rwc".to_string()));
+                policy.unveiled_paths.push(("/var/lib/dpkg".to_string(), "rwc".to_string()));
+                policy.unveiled_paths.push(("/tmp".to_string(), "rwc".to_string()));
             }
             PackageFormat::Rpm | PackageFormat::Zypper => {
-                policy
-                    .unveiled_paths
-                    .push(("/var/lib/rpm".to_string(), "rwc".to_string()));
+                policy.unveiled_paths.push(("/var/lib/rpm".to_string(), "rwc".to_string()));
             }
             PackageFormat::Pacman => {
-                policy
-                    .unveiled_paths
-                    .push(("/var/lib/pacman".to_string(), "rwc".to_string()));
+                policy.unveiled_paths.push(("/var/lib/pacman".to_string(), "rwc".to_string()));
             }
             PackageFormat::Apk => {
-                policy
-                    .unveiled_paths
-                    .push(("/lib/apk/db".to_string(), "rwc".to_string()));
+                policy.unveiled_paths.push(("/lib/apk/db".to_string(), "rwc".to_string()));
             }
             PackageFormat::Pkg | PackageFormat::OpenBsdPkg => {
-                policy
-                    .unveiled_paths
-                    .push(("/var/db/pkg".to_string(), "rwc".to_string()));
+                policy.unveiled_paths.push(("/var/db/pkg".to_string(), "rwc".to_string()));
                 policy.capsicum_rights.push("CAP_EVENT".to_string());
             }
             _ => {
-                policy
-                    .unveiled_paths
-                    .push(("/sovereign/store".to_string(), "rwc".to_string()));
+                policy.unveiled_paths.push(("/sovereign/store".to_string(), "rwc".to_string()));
             }
         }
 
@@ -237,9 +211,7 @@ impl SovereignMultiDistroScriptletSecurityGovernor {
         policy: &SandboxSecurityPolicy,
     ) -> Result<String, String> {
         if scriptlet_body.contains("rm -rf /") || scriptlet_body.contains("dd if=/dev/zero") {
-            return Err(
-                "ScriptletGovernor: Malicious payload blocked by sandbox governor".to_string(),
-            );
+            return Err("ScriptletGovernor: Malicious payload blocked by sandbox governor".to_string());
         }
 
         Ok(format!(
@@ -258,7 +230,10 @@ pub struct SovereignCrossPlatformDeltaPackageReconstitutionEngine;
 
 impl SovereignCrossPlatformDeltaPackageReconstitutionEngine {
     /// Reconstructs full binary package payload from base payload and patch stream
-    pub fn reconstitute_delta(base_payload: &[u8], delta_stream: &[u8]) -> Result<Vec<u8>, String> {
+    pub fn reconstitute_delta(
+        base_payload: &[u8],
+        delta_stream: &[u8],
+    ) -> Result<Vec<u8>, String> {
         if delta_stream.is_empty() {
             return Ok(base_payload.to_vec());
         }
@@ -426,93 +401,18 @@ impl SovereignUniversalPackageManagerInteropOrchestrator {
     pub fn strip_package_extension(filename: &str) -> &str {
         let name = filename.trim();
         let suffixes = [
-            ".pkg.tar.zst",
-            ".pkg.tar.xz",
-            ".pkg.tar.gz",
-            ".openbsd.tgz",
-            ".flatpakref",
-            ".flatpakrepo",
-            ".tar.gz",
-            ".tar .gz",
-            ".tar.xz",
-            ".tar.bz2",
-            ".superdeb",
-            ".appimage",
-            ".slackbuild",
-            ".flatpak",
-            ".nixpkg",
-            ".portage",
-            ".ebuild",
-            ".bottle",
-            ".eopkg",
-            ".ports",
-            ".pisi",
-            ".snap",
-            ".lzm",
-            ".pup",
-            ".pet",
-            ".aab",
-            ".apk",
-            ".air",
-            ".ipa",
-            ".hap",
-            ".app",
-            ".deb",
-            ".udeb",
-            ".rpm",
-            ".drpm",
-            ".tgz",
-            ".txz",
-            ".xbps",
-            ".pkg",
-            ".tar",
-            ".xz",
-            ".puk",
-            ".sfs",
-            ".hpkg",
-            ".tcz",
-            ".gobo",
-            ".moss",
-            ".guix",
-            ".scm",
-            ".cachy",
-            ".cachyos",
-            ".crux",
-            ".p5p",
-            ".ips",
-            ".nar",
-            ".spack",
-            ".conan",
-            ".whl",
-            ".crate",
-            ".gem",
-            ".nupkg",
-            ".vcpkg",
-            ".msi",
-            ".msix",
-            ".appx",
-            ".apex",
-            ".conda",
-            ".helm",
-            ".sysext",
-            ".run",
-            ".zpk",
-            ".kmp",
-            ".kmod",
-            ".jar",
-            ".npm",
-            ".phar",
-            ".cpan",
-            ".rock",
-            ".hex",
-            ".cabal",
-            ".jl",
-            ".rpkg",
-            ".brew",
-            ".wasm",
-            ".oci",
-            ".sigpkg",
-            ".sigma",
+            ".pkg.tar.zst", ".pkg.tar.xz", ".pkg.tar.gz", ".openbsd.tgz", ".flatpakref",
+            ".flatpakrepo", ".tar.gz", ".tar .gz", ".tar.xz", ".tar.bz2", ".superdeb",
+            ".appimage", ".slackbuild", ".flatpak", ".nixpkg", ".portage", ".ebuild",
+            ".bottle", ".eopkg", ".ports", ".pisi", ".snap", ".lzm",
+            ".pup", ".pet", ".aab", ".apk", ".air", ".ipa", ".hap", ".app", ".deb",
+            ".udeb", ".rpm", ".drpm", ".tgz", ".txz", ".xbps", ".pkg", ".tar", ".xz",
+            ".puk", ".sfs", ".hpkg", ".tcz", ".gobo", ".moss", ".guix", ".scm",
+            ".cachy", ".cachyos", ".crux", ".p5p", ".ips", ".nar", ".spack", ".conan",
+            ".whl", ".crate", ".gem", ".nupkg", ".vcpkg", ".msi", ".msix", ".appx",
+            ".apex", ".conda", ".helm", ".sysext", ".run", ".zpk", ".kmp", ".kmod",
+            ".jar", ".npm", ".phar", ".cpan", ".rock", ".hex", ".cabal", ".jl", ".rpkg",
+            ".brew", ".wasm", ".oci", ".sigpkg", ".sigma"
         ];
 
         let lower = name.to_lowercase();
@@ -530,23 +430,20 @@ impl SovereignUniversalPackageManagerInteropOrchestrator {
         filename: &str,
         raw_payload: &[u8],
     ) -> Result<UnifiedPackage, String> {
-        let fmt = PackageFormat::from_filename(filename).unwrap_or(PackageFormat::SigmaPkg);
+        let fmt = PackageFormat::from_filename(filename)
+            .unwrap_or(PackageFormat::SigmaPkg);
 
         // Strip known package extensions cleanly
         let raw_base = Self::strip_package_extension(filename);
 
-        let clean_name = raw_base
-            .split(|c| c == '_' || c == '-')
-            .next()
-            .unwrap_or(raw_base);
+        let clean_name = raw_base.split(|c| c == '_' || c == '-').next().unwrap_or(raw_base);
 
         let mut pkg = UnifiedPackage::new(format!("sigpkg-{}", clean_name), "1.0.0".to_string())
             .with_format(PackageFormat::SigmaPkg)
             .with_provides(clean_name.to_string());
 
         // Run SAT normalization
-        self.sat_normalizer
-            .register_package(&pkg.name, &["libc", "openssl"], &[clean_name]);
+        self.sat_normalizer.register_package(&pkg.name, &["libc", "openssl"], &[clean_name]);
         let resolved = self.sat_normalizer.solve_dependencies(&pkg.name)?;
         for dep in resolved {
             if dep != pkg.name {
@@ -559,23 +456,18 @@ impl SovereignUniversalPackageManagerInteropOrchestrator {
             fmt,
             ScriptletHookPhase::PostInstall,
         );
-        let scriptlet_res =
-            SovereignMultiDistroScriptletSecurityGovernor::execute_sandboxed_scriptlet(
-                "echo Installing package",
-                &policy,
-            )?;
-        pkg.properties
-            .insert("scriptlet_sandbox".to_string(), scriptlet_res);
+        let scriptlet_res = SovereignMultiDistroScriptletSecurityGovernor::execute_sandboxed_scriptlet(
+            "echo Installing package",
+            &policy,
+        )?;
+        pkg.properties.insert("scriptlet_sandbox".to_string(), scriptlet_res);
 
         // Run post-install system triggers
-        self.trigger_integrator
-            .dispatch_trigger(TriggerKind::Ldconfig);
-        self.trigger_integrator
-            .dispatch_trigger(TriggerKind::DesktopDatabase);
+        self.trigger_integrator.dispatch_trigger(TriggerKind::Ldconfig);
+        self.trigger_integrator.dispatch_trigger(TriggerKind::DesktopDatabase);
 
         pkg.installed = true;
-        self.installed_packages
-            .insert(pkg.name.clone(), pkg.clone());
+        self.installed_packages.insert(pkg.name.clone(), pkg.clone());
 
         Ok(pkg)
     }
@@ -642,7 +534,8 @@ mod tests {
         assert!(exec_ok.is_ok());
 
         let exec_err = SovereignMultiDistroScriptletSecurityGovernor::execute_sandboxed_scriptlet(
-            "rm -rf /", &policy,
+            "rm -rf /",
+            &policy,
         );
         assert!(exec_err.is_err());
     }
@@ -652,9 +545,7 @@ mod tests {
         let base = b"hello_world_base";
         let delta = b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
 
-        let reconstructed =
-            SovereignCrossPlatformDeltaPackageReconstitutionEngine::reconstitute_delta(base, delta)
-                .unwrap();
+        let reconstructed = SovereignCrossPlatformDeltaPackageReconstitutionEngine::reconstitute_delta(base, delta).unwrap();
         assert_eq!(reconstructed.len(), base.len());
     }
 
@@ -685,36 +576,12 @@ mod tests {
         let mut orchestrator = SovereignUniversalPackageManagerInteropOrchestrator::new();
 
         let formats_to_test = [
-            "airapp.air",
-            "brewbottle.bottle",
-            "ipaapp.ipa",
-            "bsdports.ports",
-            "installpkg.pkg",
-            "aabapp.aab",
-            "toolapk.apk",
-            "softwareappimage.AppImage",
-            "soluseopkg.eopkg",
-            "nixosnixpkg.nixpkg",
-            "gentooportage.portage",
-            "debiandeb.deb",
-            "archivespaced.tar .gz",
-            "compressedxz.xz",
-            "fedorarpm.rpm",
-            "gentooebuild.ebuild",
-            "archpkgtarxz.pkg.tar.xz",
-            "flatpakapp.flatpak",
-            "macosapp.app",
-            "harmonyhap.hap",
-            "parduspisi.PiSi",
-            "archivetgz.tgz",
-            "archivetargz.tar.gz",
-            "deepinsuperdeb.superdeb",
-            "slaxlzm.lzm",
-            "puppypup.pup",
-            "canonicalsnap.snap",
-            "pacmanpkg.pacman",
-            "plaintar.tar",
-            "puppypet.pet",
+            "airapp.air", "brewbottle.bottle", "ipaapp.ipa", "bsdports.ports", "installpkg.pkg",
+            "aabapp.aab", "toolapk.apk", "softwareappimage.AppImage", "soluseopkg.eopkg", "nixosnixpkg.nixpkg",
+            "gentooportage.portage", "debiandeb.deb", "archivespaced.tar .gz", "compressedxz.xz", "fedorarpm.rpm",
+            "gentooebuild.ebuild", "archpkgtarxz.pkg.tar.xz", "flatpakapp.flatpak", "macosapp.app", "harmonyhap.hap",
+            "parduspisi.PiSi", "archivetgz.tgz", "archivetargz.tar.gz", "deepinsuperdeb.superdeb", "slaxlzm.lzm",
+            "puppypup.pup", "canonicalsnap.snap", "pacmanpkg.pacman", "plaintar.tar", "puppypet.pet"
         ];
 
         for filename in formats_to_test {

@@ -2,11 +2,14 @@
 // Professional support tiers, LTS maintenance guarantees, Expanded Security Maintenance (ESM),
 // FIPS/CIS Compliance Scanners, Automated Remediation Playbooks, and System Drift Detectors.
 
-use core::sync::atomic::{AtomicBool, Ordering};
+
 #[cfg(test_disabled)]
+
+
 use std::string::String;
-use std::string::ToString;
 use std::vec::Vec;
+use std::string::ToString;
+use core::sync::atomic::{AtomicBool, Ordering};
 
 use crate::klib::HashMap;
 
@@ -85,9 +88,7 @@ impl ComplianceScanner {
         if self.enforce_fips_cryptography && !active_pledges.contains(&"fips-crypto".to_string()) {
             score -= 40; // Cryptographic module non-compliance penalty
         }
-        if self.standard == ComplianceStandard::CisBenchmark
-            && active_pledges.contains(&"unveiled-root".to_string())
-        {
+        if self.standard == ComplianceStandard::CisBenchmark && active_pledges.contains(&"unveiled-root".to_string()) {
             score -= 30; // Unrestricted filesystem unveil violation
         }
         (score >= 80, score)
@@ -116,8 +117,7 @@ impl DriftDetector {
     }
 
     pub fn register_baseline(&mut self, filepath: &str, hash: &str) {
-        self.baseline_hashes
-            .insert(filepath.to_string(), hash.to_string());
+        self.baseline_hashes.insert(filepath.to_string(), hash.to_string());
     }
 
     /// Scans modified files, returning list of paths that drifted from configurations
@@ -207,9 +207,9 @@ impl SupportServicesManager {
 
     /// Retrieve Vivid LTS release manifest metadata
     pub fn vivid_lts_manifest(&self) -> Option<&LtsRelease> {
-        self.lts_releases.values().find(|r| {
-            r.release_codename.eq_ignore_ascii_case("vivid") || r.version.contains("Vivid")
-        })
+        self.lts_releases
+            .values()
+            .find(|r| r.release_codename.eq_ignore_ascii_case("vivid") || r.version.contains("Vivid"))
     }
 
     pub fn add_recovery_tool(&mut self, config: RecoveryConfig) {
@@ -349,21 +349,15 @@ mod tests {
             remediation_steps: play_steps,
         };
         manager.register_remediation_playbook(playbook);
-        assert!(manager
-            .registered_playbooks
-            .contains_key("insights-play-01"));
+        assert!(manager.registered_playbooks.contains_key("insights-play-01"));
 
         // 4. Configuration Drift Detection
         let mut live_hashes = HashMap::new();
         live_hashes.insert("/etc/sysctl.conf".to_string(), "hash-001".to_string());
         live_hashes.insert("/etc/hosts".to_string(), "hash-002".to_string());
 
-        manager
-            .drift_detector
-            .register_baseline("/etc/sysctl.conf", "hash-001");
-        manager
-            .drift_detector
-            .register_baseline("/etc/hosts", "hash-002");
+        manager.drift_detector.register_baseline("/etc/sysctl.conf", "hash-001");
+        manager.drift_detector.register_baseline("/etc/hosts", "hash-002");
 
         // No drift detected under matching baseline hashes
         let drifted_files = manager.drift_detector.detect_drift(&live_hashes);

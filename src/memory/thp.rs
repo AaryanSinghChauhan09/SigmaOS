@@ -2,7 +2,7 @@
 // Inspired by Linux transparent huge pages for memory efficiency
 
 use std::collections::HashMap;
-use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
+use std::sync::atomic::{AtomicU64, AtomicU32, Ordering};
 
 /// Huge page size
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -137,9 +137,7 @@ impl ThpManager {
     /// Find allocation by address
     fn find_allocation_by_addr(&self, addr: u64) -> Result<u64, &'static str> {
         for (&id, allocation) in &self.allocations {
-            if addr >= allocation.start_addr
-                && addr < allocation.start_addr + allocation.size as u64
-            {
+            if addr >= allocation.start_addr && addr < allocation.start_addr + allocation.size as u64 {
                 return Ok(id);
             }
         }
@@ -178,8 +176,7 @@ impl ThpManager {
 
     /// Get total huge page memory
     pub fn total_huge_memory(&self) -> usize {
-        self.allocations
-            .values()
+        self.allocations.values()
             .filter(|a| a.allocated)
             .map(|a| a.size)
             .sum()
@@ -188,11 +185,11 @@ impl ThpManager {
     /// Get THP statistics
     pub fn get_stats(&self) -> ThpStats {
         let total_allocations = self.allocations.len();
-        let active_allocations = self.allocations.values().filter(|a| a.allocated).count();
+        let active_allocations = self.allocations.values()
+            .filter(|a| a.allocated)
+            .count();
 
-        let total_2mb = self
-            .allocations
-            .values()
+        let total_2mb = self.allocations.values()
             .filter(|a| a.allocated && a.page_size == HugePageSize::Size2MB)
             .count();
 
@@ -217,6 +214,7 @@ impl ThpManager {
         let total_1gb = self
             .allocations
             .values()
+        let total_1gb = self.allocations.values()
             .filter(|a| a.allocated && a.page_size == HugePageSize::Size1GB)
             .count();
 

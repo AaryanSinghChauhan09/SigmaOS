@@ -1181,7 +1181,10 @@ mod tests {
         let mut key = [0u8; 32];
         let mut iv = [0u8; 12];
 
-        let seed: u64 = 0x1234_5678_9abc_def0;
+        let seed: u64 = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_nanos() as u64)
+            .unwrap_or(0x1234_5678_9abc_def0);
         for i in 0..32 {
             let mut val = seed.wrapping_mul(i as u64 + 1);
             val ^= val >> 33;

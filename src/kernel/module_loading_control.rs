@@ -96,12 +96,7 @@ pub struct ModuleLoadingRule {
 }
 
 impl ModuleLoadingRule {
-    pub fn new(
-        module_name: String,
-        allowed: bool,
-        requires_signature: bool,
-        description: String,
-    ) -> Self {
+    pub fn new(module_name: String, allowed: bool, requires_signature: bool, description: String) -> Self {
         ModuleLoadingRule {
             module_name,
             allowed,
@@ -184,11 +179,7 @@ impl KernelModuleLoadingController {
     }
 
     /// Check if module can be loaded
-    pub fn can_load_module(
-        &self,
-        module_name: &str,
-        signature_verified: bool,
-    ) -> Result<bool, String> {
+    pub fn can_load_module(&self, module_name: &str, signature_verified: bool) -> Result<bool, String> {
         if self.loading_state == ModuleLoadingState::Disabled {
             return Err(String::from("Module loading is disabled"));
         }
@@ -208,10 +199,7 @@ impl KernelModuleLoadingController {
                         return Err(format!("Module {} is not whitelisted", module_name));
                     }
                     if rule.requires_signature && !signature_verified {
-                        return Err(format!(
-                            "Module {} requires signature verification",
-                            module_name
-                        ));
+                        return Err(format!("Module {} requires signature verification", module_name));
                     }
                 } else {
                     return Err(format!("Module {} is not in whitelist", module_name));
@@ -231,11 +219,7 @@ impl KernelModuleLoadingController {
     }
 
     /// Load module
-    pub fn load_module(
-        &mut self,
-        module_name: &str,
-        signature_verified: bool,
-    ) -> Result<(), String> {
+    pub fn load_module(&mut self, module_name: &str, signature_verified: bool) -> Result<(), String> {
         self.can_load_module(module_name, signature_verified)?;
 
         if let Some(module) = self.modules.iter_mut().find(|m| m.name == module_name) {
@@ -269,21 +253,9 @@ impl KernelModuleLoadingController {
 
     /// List loaded modules
     pub fn list_loaded_modules(&self) -> Vec<String> {
-        self.modules
-            .iter()
+        self.modules.iter()
             .filter(|m| m.loaded)
-            .map(|m| {
-                format!(
-                    "{} {} ({})",
-                    m.name,
-                    m.version,
-                    if m.signature_verified {
-                        "signed"
-                    } else {
-                        "unsigned"
-                    }
-                )
-            })
+            .map(|m| format!("{} {} ({})", m.name, m.version, if m.signature_verified { "signed" } else { "unsigned" }))
             .collect()
     }
 
@@ -389,10 +361,7 @@ mod tests {
 
     #[test]
     fn test_module_loading_state_from_str() {
-        assert_eq!(
-            ModuleLoadingState::from_str("enabled"),
-            Some(ModuleLoadingState::Enabled)
-        );
+        assert_eq!(ModuleLoadingState::from_str("enabled"), Some(ModuleLoadingState::Enabled));
         assert_eq!(ModuleLoadingState::from_str("invalid"), None);
     }
 
@@ -422,7 +391,7 @@ mod tests {
             String::from("test_module"),
             true,
             false,
-            String::from("Test module rule"),
+            String::from("Test module rule")
         );
         assert_eq!(rule.module_name, "test_module");
         assert!(rule.allowed);

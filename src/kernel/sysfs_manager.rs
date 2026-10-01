@@ -211,8 +211,7 @@ impl Sysfs {
     }
 
     pub fn get_hostname(&self) -> String {
-        self.read("/sys/kernel/hostname")
-            .unwrap_or_else(|| String::from("sigmaos"))
+        self.read("/sys/kernel/hostname").unwrap_or_else(|| String::from("sigmaos"))
     }
 
     pub fn set_hostname(&mut self, hostname: &str) -> bool {
@@ -220,13 +219,11 @@ impl Sysfs {
     }
 
     pub fn get_osrelease(&self) -> String {
-        self.read("/sys/kernel/osrelease")
-            .unwrap_or_else(|| String::from("1.0.0"))
+        self.read("/sys/kernel/osrelease").unwrap_or_else(|| String::from("1.0.0"))
     }
 
     pub fn get_version(&self) -> String {
-        self.read("/sys/kernel/version")
-            .unwrap_or_else(|| String::from("0.1.0"))
+        self.read("/sys/kernel/version").unwrap_or_else(|| String::from("0.1.0"))
     }
 }
 
@@ -251,24 +248,15 @@ mod tests {
     #[test]
     fn test_sysfs_read() {
         let sysfs = Sysfs::new();
-        assert_eq!(
-            sysfs.read("/sys/kernel/hostname"),
-            Some(String::from("sigmaos"))
-        );
-        assert_eq!(
-            sysfs.read("/sys/kernel/osrelease"),
-            Some(String::from("1.0.0"))
-        );
+        assert_eq!(sysfs.read("/sys/kernel/hostname"), Some(String::from("sigmaos")));
+        assert_eq!(sysfs.read("/sys/kernel/osrelease"), Some(String::from("1.0.0")));
     }
 
     #[test]
     fn test_sysfs_write() {
         let mut sysfs = Sysfs::new();
         assert!(sysfs.write("/sys/kernel/hostname", "newhost"));
-        assert_eq!(
-            sysfs.read("/sys/kernel/hostname"),
-            Some(String::from("newhost"))
-        );
+        assert_eq!(sysfs.read("/sys/kernel/hostname"), Some(String::from("newhost")));
     }
 
     #[test]
@@ -282,10 +270,7 @@ mod tests {
     fn test_sysfs_add_attr() {
         let mut sysfs = Sysfs::new();
         assert!(sysfs.add_attr("/sys/kernel", "custom_attr", "custom_value"));
-        assert_eq!(
-            sysfs.read("/sys/kernel/custom_attr"),
-            Some(String::from("custom_value"))
-        );
+        assert_eq!(sysfs.read("/sys/kernel/custom_attr"), Some(String::from("custom_value")));
     }
 
     #[test]

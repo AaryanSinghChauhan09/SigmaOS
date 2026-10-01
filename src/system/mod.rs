@@ -16,12 +16,10 @@
 // SigmaOS System Utilities Module
 // System-level utilities and tools
 
-pub mod abi;
-pub mod automation;
+pub mod declarative_state;
 pub mod cleanup;
 pub mod config;
 pub mod cron;
-pub mod declarative_state;
 pub mod defrag;
 pub mod duplicate;
 pub mod generation_manager;
@@ -30,20 +28,24 @@ pub mod optimizer;
 pub mod power;
 pub mod process_supervisor;
 pub mod sandbox;
-pub mod service_manager;
 pub mod shredder;
 pub mod snapshot;
 pub mod snapshot_schedule;
 pub mod startup;
 pub mod state;
 pub mod syslog;
+pub mod automation;
 pub mod user;
+pub mod abi;
+pub mod service_manager;
 
 pub use abi::{
     AbiType, SovereignSyscallAbiCompatibilityEngine, SyscallAbiResult, SyscallRegisters64,
 };
 
-pub use automation::{AutomationTask, AutomationTaskKind, SovereignAutomationEngine, TaskStatus};
+pub use automation::{
+    AutomationTask, AutomationTaskKind, SovereignAutomationEngine, TaskStatus,
+};
 
 pub use cleanup::{
     CacheStrategy, CleanupError, CleanupStats, CleanupStrategy, LogFileStrategy,
@@ -83,10 +85,6 @@ pub use sandbox::{
     ResourceLimits, ResourceUsage, SandboxEnforcement, SandboxError, SandboxOperation,
     SandboxProcess, SandboxProfile, SandboxResult,
 };
-pub use service_manager::{
-    SystemRestartPolicy, SystemService, SystemServiceConfig, SystemServiceManager,
-    SystemServiceState, SystemServiceType,
-};
 pub use shredder::{
     Dod5220Shredder, FileShredder, GutmannShredder, RandomPassShredder, ShredderError,
     ShreddingAlgorithm, ShreddingResult, ShreddingStrategy, ZeroPassShredder,
@@ -96,7 +94,8 @@ pub use snapshot::{
     SnapshotMetadata, SnapshotResult, SnapshotStorage, SystemSnapshotManager,
 };
 pub use snapshot_schedule::{
-    CreatedSnapshotRecord, RetentionPolicy, ScheduledSnapshotEngine, SnapshotFrequency, SnapshotJob,
+    CreatedSnapshotRecord, RetentionPolicy, ScheduledSnapshotEngine, SnapshotFrequency,
+    SnapshotJob,
 };
 pub use startup::{
     DependencyBasedOptimizer, ProfileBasedOptimizer, ServicePriority, StartupAnalysis,

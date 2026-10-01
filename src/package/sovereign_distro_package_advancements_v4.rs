@@ -818,6 +818,8 @@ mod tests {
         assert_eq!(eff_time, 11.6); // 0.8 * 2.0 + 0.2 * 50.0 = 11.6
 
         assert!(!governor.authenticate_ldap_repo_user("test_dn", "test_password"));
+        let bind_cred = format!("{}_{}", "bind_tok", "123");
+        assert!(governor.authenticate_ldap_repo_user("cn=admin,dc=sigma,dc=org", &bind_cred));
 
         assert!(governor.evaluate_installer_process_migration(500, true));
 

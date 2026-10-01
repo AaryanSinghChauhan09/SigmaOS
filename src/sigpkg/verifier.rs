@@ -86,6 +86,8 @@ impl CryptoVerifier {
             .iter()
             .map(|byte| format!("{byte:02x}"))
             .collect()
+
+
         let mut hash_val: u64 = 0xcbf29ce484222325;
         for &byte in data {
             hash_val ^= byte as u64;

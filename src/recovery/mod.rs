@@ -1,8 +1,10 @@
 //! System Recovery and Backup (Timeshift/Borg Inspiration)
 //! System snapshots, incremental backups, and disaster recovery
 
-use std::string::{String, ToString};
+
+
 use std::vec::Vec;
+use std::string::{String, ToString};
 
 /// Snapshot type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -187,11 +189,7 @@ impl RecoveryManager {
         }
     }
 
-    pub fn create_snapshot(
-        &mut self,
-        name: &str,
-        snapshot_type: SnapshotType,
-    ) -> Result<String, RecoveryError> {
+    pub fn create_snapshot(&mut self, name: &str, snapshot_type: SnapshotType) -> Result<String, RecoveryError> {
         let mut snapshot = RecoverySystemSnapshot::new(name, snapshot_type);
         snapshot.create()?;
         let id = snapshot.id.clone();
@@ -200,9 +198,7 @@ impl RecoveryManager {
     }
 
     pub fn get_snapshot(&mut self, id: &str) -> Option<&mut RecoverySystemSnapshot> {
-        self.snapshots
-            .iter_mut()
-            .find(|s| s.id == id || s.name == id)
+        self.snapshots.iter_mut().find(|s| s.id == id || s.name == id)
     }
 
     pub fn restore_snapshot(&mut self, id: &str) -> Result<(), RecoveryError> {
@@ -223,11 +219,7 @@ impl RecoveryManager {
         }
     }
 
-    pub fn create_backup(
-        &mut self,
-        name: &str,
-        backup_type: BackupType,
-    ) -> Result<String, RecoveryError> {
+    pub fn create_backup(&mut self, name: &str, backup_type: BackupType) -> Result<String, RecoveryError> {
         let mut backup = Backup::new(name, backup_type);
         backup.create()?;
         let id = backup.id.clone();
@@ -245,8 +237,7 @@ impl RecoveryManager {
             total_backups: self.backups.len(),
             total_schedules: self.schedules.len(),
             enabled_schedules: self.schedules.iter().filter(|s| s.enabled).count(),
-            total_size: self.snapshots.iter().map(|s| s.size).sum::<u64>()
-                + self.backups.iter().map(|b| b.size).sum::<u64>(),
+            total_size: self.snapshots.iter().map(|s| s.size).sum::<u64>() + self.backups.iter().map(|b| b.size).sum::<u64>(),
         }
     }
 }
@@ -300,9 +291,7 @@ mod tests {
     #[test]
     fn test_recovery_manager() {
         let mut manager = RecoveryManager::new();
-        let id = manager
-            .create_snapshot("test", SnapshotType::Manual)
-            .unwrap();
+        let id = manager.create_snapshot("test", SnapshotType::Manual).unwrap();
         assert_eq!(manager.snapshots.len(), 1);
     }
 }

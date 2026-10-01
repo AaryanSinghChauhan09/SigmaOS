@@ -20,9 +20,9 @@
 #![allow(dead_code)]
 
 use std::collections::BTreeMap;
-use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use std::format;
 
 // ─── XDP Action ───────────────────────────────────────────────────────────────
 
@@ -69,7 +69,7 @@ pub struct EthernetHeader {
 /// EtherType constants
 pub const ETHERTYPE_IPV4: u16 = 0x0800;
 pub const ETHERTYPE_IPV6: u16 = 0x86DD;
-pub const ETHERTYPE_ARP: u16 = 0x0806;
+pub const ETHERTYPE_ARP:  u16 = 0x0806;
 pub const ETHERTYPE_VLAN: u16 = 0x8100;
 
 impl EthernetHeader {
@@ -83,29 +83,17 @@ impl EthernetHeader {
         dst_mac.copy_from_slice(&data[0..6]);
         src_mac.copy_from_slice(&data[6..12]);
         let ethertype = ((data[12] as u16) << 8) | (data[13] as u16);
-        Some(EthernetHeader {
-            dst_mac,
-            src_mac,
-            ethertype,
-        })
+        Some(EthernetHeader { dst_mac, src_mac, ethertype })
     }
 
     /// Returns true if this is an IPv4 packet
-    pub fn is_ipv4(&self) -> bool {
-        self.ethertype == ETHERTYPE_IPV4
-    }
+    pub fn is_ipv4(&self) -> bool { self.ethertype == ETHERTYPE_IPV4 }
     /// Returns true if this is an IPv6 packet
-    pub fn is_ipv6(&self) -> bool {
-        self.ethertype == ETHERTYPE_IPV6
-    }
+    pub fn is_ipv6(&self) -> bool { self.ethertype == ETHERTYPE_IPV6 }
     /// Returns true if dst MAC is the broadcast address
-    pub fn is_broadcast(&self) -> bool {
-        self.dst_mac == [0xFF; 6]
-    }
+    pub fn is_broadcast(&self) -> bool { self.dst_mac == [0xFF; 6] }
     /// Returns true if dst MAC is multicast
-    pub fn is_multicast(&self) -> bool {
-        self.dst_mac[0] & 0x01 != 0
-    }
+    pub fn is_multicast(&self) -> bool { self.dst_mac[0] & 0x01 != 0 }
 }
 
 /// Minimal IPv4 header fields needed for XDP decisions
@@ -113,20 +101,16 @@ impl EthernetHeader {
 pub struct Ipv4Header {
     pub src_addr: [u8; 4],
     pub dst_addr: [u8; 4],
-    pub protocol: u8, // 6=TCP, 17=UDP, 1=ICMP
+    pub protocol: u8,  // 6=TCP, 17=UDP, 1=ICMP
     pub ttl: u8,
     pub total_len: u16,
 }
 
 impl Ipv4Header {
     pub fn parse(data: &[u8]) -> Option<Self> {
-        if data.len() < 20 {
-            return None;
-        }
+        if data.len() < 20 { return None; }
         let ihl = (data[0] & 0x0F) as usize * 4;
-        if data.len() < ihl {
-            return None;
-        }
+        if data.len() < ihl { return None; }
         let total_len = ((data[2] as u16) << 8) | (data[3] as u16);
         let ttl = data[8];
         let protocol = data[9];
@@ -134,20 +118,11 @@ impl Ipv4Header {
         let mut dst_addr = [0u8; 4];
         src_addr.copy_from_slice(&data[12..16]);
         dst_addr.copy_from_slice(&data[16..20]);
-        Some(Ipv4Header {
-            src_addr,
-            dst_addr,
-            protocol,
-            ttl,
-            total_len,
-        })
+        Some(Ipv4Header { src_addr, dst_addr, protocol, ttl, total_len })
     }
 
     pub fn src_str(&self) -> String {
-        format!(
-            "{}.{}.{}.{}",
-            self.src_addr[0], self.src_addr[1], self.src_addr[2], self.src_addr[3]
-        )
+        format!("{}.{}.{}.{}", self.src_addr[0], self.src_addr[1], self.src_addr[2], self.src_addr[3])
     }
 }
 
@@ -168,12 +143,7 @@ pub struct XdpPacket {
 
 impl XdpPacket {
     pub fn new(data: Vec<u8>, ingress_ifindex: u32) -> Self {
-        XdpPacket {
-            data,
-            rx_queue: 0,
-            ingress_ifindex,
-            timestamp_ns: 0,
-        }
+        XdpPacket { data, rx_queue: 0, ingress_ifindex, timestamp_ns: 0 }
     }
 
     /// Parse Ethernet header from packet data
@@ -183,43 +153,29 @@ impl XdpPacket {
 
     /// Parse IPv4 header (assumes Ethernet II frame)
     pub fn ipv4_header(&self) -> Option<Ipv4Header> {
-        if self.data.len() < 34 {
-            return None;
-        }
+        if self.data.len() < 34 { return None; }
         Ipv4Header::parse(&self.data[14..])
     }
 
     /// Returns TCP/UDP source port (bytes 34-35 of Ethernet+IPv4+TCP/UDP frame)
     pub fn src_port(&self) -> Option<u16> {
-        if self.data.len() < 36 {
-            return None;
-        }
+        if self.data.len() < 36 { return None; }
         let ip = self.ipv4_header()?;
-        if ip.protocol != 6 && ip.protocol != 17 {
-            return None;
-        }
+        if ip.protocol != 6 && ip.protocol != 17 { return None; }
         let ihl = ((self.data[14] & 0x0F) as usize) * 4;
         let port_off = 14 + ihl;
-        if self.data.len() < port_off + 2 {
-            return None;
-        }
+        if self.data.len() < port_off + 2 { return None; }
         Some(((self.data[port_off] as u16) << 8) | (self.data[port_off + 1] as u16))
     }
 
     /// Returns TCP/UDP destination port
     pub fn dst_port(&self) -> Option<u16> {
-        if self.data.len() < 38 {
-            return None;
-        }
+        if self.data.len() < 38 { return None; }
         let ip = self.ipv4_header()?;
-        if ip.protocol != 6 && ip.protocol != 17 {
-            return None;
-        }
+        if ip.protocol != 6 && ip.protocol != 17 { return None; }
         let ihl = ((self.data[14] & 0x0F) as usize) * 4;
         let port_off = 14 + ihl + 2;
-        if self.data.len() < port_off + 2 {
-            return None;
-        }
+        if self.data.len() < port_off + 2 { return None; }
         Some(((self.data[port_off] as u16) << 8) | (self.data[port_off + 1] as u16))
     }
 }
@@ -245,11 +201,7 @@ impl XdpIfaceStats {
 
     pub fn drop_rate(&self) -> f64 {
         let total = self.total_packets();
-        if total == 0 {
-            0.0
-        } else {
-            self.dropped as f64 / total as f64
-        }
+        if total == 0 { 0.0 } else { self.dropped as f64 / total as f64 }
     }
 }
 
@@ -395,10 +347,7 @@ impl XdpEngine {
 
     /// Record an action in per-interface statistics
     fn record_action(&mut self, iface: u32, action: XdpAction, pkt_len: u64) {
-        let stats = self
-            .iface_stats
-            .entry(iface)
-            .or_insert_with(XdpIfaceStats::default);
+        let stats = self.iface_stats.entry(iface).or_insert_with(XdpIfaceStats::default);
         match action {
             XdpAction::Pass => {
                 stats.passed += 1;
@@ -450,10 +399,7 @@ impl XdpFilterRule {
             dst_port: None,
             ethertype: None,
             action: XdpAction::Drop,
-            label: format!(
-                "block-{}.{}.{}.{}",
-                src_ip[0], src_ip[1], src_ip[2], src_ip[3]
-            ),
+            label: format!("block-{}.{}.{}.{}", src_ip[0], src_ip[1], src_ip[2], src_ip[3]),
         }
     }
 
@@ -495,23 +441,23 @@ pub fn build_test_packet(
     // Ethernet header (14 bytes)
     data.extend_from_slice(&[0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]); // dst MAC broadcast
     data.extend_from_slice(&[0x00, 0x11, 0x22, 0x33, 0x44, 0x55]); // src MAC
-    data.extend_from_slice(&[0x08, 0x00]); // EtherType = IPv4
-                                           // IPv4 header (20 bytes)
-    data.push(0x45); // version=4, IHL=5
-    data.push(0x00); // DSCP
-    data.extend_from_slice(&[0x00, 0x1C]); // total length = 28
-    data.extend_from_slice(&[0x00, 0x01]); // identification
-    data.extend_from_slice(&[0x00, 0x00]); // flags + fragment offset
-    data.push(64); // TTL
-    data.push(17); // protocol = UDP
-    data.extend_from_slice(&[0x00, 0x00]); // checksum (0 for test)
+    data.extend_from_slice(&[0x08, 0x00]);                          // EtherType = IPv4
+    // IPv4 header (20 bytes)
+    data.push(0x45);                                                 // version=4, IHL=5
+    data.push(0x00);                                                 // DSCP
+    data.extend_from_slice(&[0x00, 0x1C]);                          // total length = 28
+    data.extend_from_slice(&[0x00, 0x01]);                          // identification
+    data.extend_from_slice(&[0x00, 0x00]);                          // flags + fragment offset
+    data.push(64);                                                   // TTL
+    data.push(17);                                                   // protocol = UDP
+    data.extend_from_slice(&[0x00, 0x00]);                          // checksum (0 for test)
     data.extend_from_slice(&src_ip);
     data.extend_from_slice(&dst_ip);
     // UDP header (8 bytes)
     data.extend_from_slice(&[(src_port >> 8) as u8, src_port as u8]);
     data.extend_from_slice(&[(dst_port >> 8) as u8, dst_port as u8]);
-    data.extend_from_slice(&[0x00, 0x08]); // UDP length
-    data.extend_from_slice(&[0x00, 0x00]); // UDP checksum
+    data.extend_from_slice(&[0x00, 0x08]);                          // UDP length
+    data.extend_from_slice(&[0x00, 0x00]);                          // UDP checksum
     XdpPacket::new(data, 1)
 }
 

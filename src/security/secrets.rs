@@ -194,6 +194,7 @@ impl Secret for SimpleSecret {
             .iter_mut()
             .zip(key.iter().cycle())
         {
+        for (b, &k) in self.data[..self.data_len].iter_mut().zip(key.iter().cycle()) {
             *b ^= k;
         }
 
@@ -219,6 +220,7 @@ impl Secret for SimpleSecret {
             .iter_mut()
             .zip(key.iter().cycle())
         {
+        for (b, &k) in self.data[..self.data_len].iter_mut().zip(key.iter().cycle()) {
             *b ^= k;
         }
 

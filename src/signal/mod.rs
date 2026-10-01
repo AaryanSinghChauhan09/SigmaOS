@@ -141,9 +141,7 @@ mod tests {
         assert!(dispatcher.raise_signal(1, SovereignSignal::Terminate, false).is_err());
 
         // Should succeed with capability
-        assert!(dispatcher
-            .raise_signal(1, SovereignSignal::Terminate, true)
-            .is_ok());
+        assert!(dispatcher.raise_signal(1, SovereignSignal::Terminate, true).is_ok());
     }
 
     #[test]
@@ -152,17 +150,13 @@ mod tests {
 
         // Fill the queue
         for i in 0..16 {
-            assert!(dispatcher
-                .raise_signal(i, SovereignSignal::Interrupt, true)
-                .is_ok());
+            assert!(dispatcher.raise_signal(i, SovereignSignal::Interrupt, true).is_ok());
         }
 
         assert!(dispatcher.is_full());
 
         // Should fail when queue is full
-        assert!(dispatcher
-            .raise_signal(100, SovereignSignal::Terminate, true)
-            .is_err());
+        assert!(dispatcher.raise_signal(100, SovereignSignal::Terminate, true).is_err());
     }
 
     #[test]

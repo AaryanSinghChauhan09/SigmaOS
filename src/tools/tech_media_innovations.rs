@@ -33,8 +33,7 @@ impl LinuxPressFeedEngine {
     pub fn new() -> Self {
         let sample_articles = vec![
             TechMediaArticleFeed {
-                title: "Linux Kernel 6.12 LTS Released with Real-time PREEMPT_RT Support"
-                    .to_string(),
+                title: "Linux Kernel 6.12 LTS Released with Real-time PREEMPT_RT Support".to_string(),
                 portal: "9to5Linux".to_string(),
                 url: "https://9to5linux.com/linux-kernel-6-12-lts-released".to_string(),
                 category: "Kernel".to_string(),
@@ -50,8 +49,7 @@ impl LinuxPressFeedEngine {
                 tags: vec!["rust".to_string(), "tools".to_string()],
             },
             TechMediaArticleFeed {
-                title: "SigmaOS Architecture Analysis: Surpassing Legacy Monolithic Kernels"
-                    .to_string(),
+                title: "SigmaOS Architecture Analysis: Surpassing Legacy Monolithic Kernels".to_string(),
                 portal: "TechCrunch".to_string(),
                 url: "https://techcrunch.com/sigmaos-sovereign-kernel".to_string(),
                 category: "Enterprise".to_string(),
@@ -59,8 +57,7 @@ impl LinuxPressFeedEngine {
                 tags: vec!["architecture".to_string(), "sigmaos".to_string()],
             },
             TechMediaArticleFeed {
-                title: "DistroWatch Review: Sovereign Operating System Performance Benchmarks"
-                    .to_string(),
+                title: "DistroWatch Review: Sovereign Operating System Performance Benchmarks".to_string(),
                 portal: "DistroWatch".to_string(),
                 url: "https://distrowatch.com/sigmaos-review".to_string(),
                 category: "DistroReview".to_string(),
@@ -124,8 +121,7 @@ impl LinuxPressFeedEngine {
                 tags: vec!["scheduler".to_string(), "kernel".to_string()],
             },
             TechMediaArticleFeed {
-                title: "InfoWorld Enterprise Software Architecture & Cloud-Native Security"
-                    .to_string(),
+                title: "InfoWorld Enterprise Software Architecture & Cloud-Native Security".to_string(),
                 portal: "InfoWorld".to_string(),
                 url: "https://infoworld.com/cloud-native-security".to_string(),
                 category: "Security".to_string(),
@@ -133,8 +129,7 @@ impl LinuxPressFeedEngine {
                 tags: vec!["security".to_string(), "cloud".to_string()],
             },
             TechMediaArticleFeed {
-                title: "LinuxFoundation Open Source SBOM & License Compliance Standards"
-                    .to_string(),
+                title: "LinuxFoundation Open Source SBOM & License Compliance Standards".to_string(),
                 portal: "LinuxFoundation".to_string(),
                 url: "https://linuxfoundation.org/sbom-standards".to_string(),
                 category: "Governance".to_string(),
@@ -142,8 +137,7 @@ impl LinuxPressFeedEngine {
                 tags: vec!["sbom".to_string(), "compliance".to_string()],
             },
             TechMediaArticleFeed {
-                title: "MakeUseOf Lightweight Desktop Environment Comparisons for Low-RAM Systems"
-                    .to_string(),
+                title: "MakeUseOf Lightweight Desktop Environment Comparisons for Low-RAM Systems".to_string(),
                 portal: "MakeUseOf".to_string(),
                 url: "https://makeuseof.com/lightweight-desktop-guide".to_string(),
                 category: "Desktop".to_string(),
@@ -159,8 +153,7 @@ impl LinuxPressFeedEngine {
                 tags: vec!["battery".to_string(), "hardware".to_string()],
             },
             TechMediaArticleFeed {
-                title: "MarkTechPost SOTA Local RAG Vector Embeddings Context Benchmark"
-                    .to_string(),
+                title: "MarkTechPost SOTA Local RAG Vector Embeddings Context Benchmark".to_string(),
                 portal: "MarkTechPost".to_string(),
                 url: "https://marktechpost.com/local-rag-vector-benchmark".to_string(),
                 category: "AI".to_string(),
@@ -168,8 +161,7 @@ impl LinuxPressFeedEngine {
                 tags: vec!["rag".to_string(), "embeddings".to_string()],
             },
             TechMediaArticleFeed {
-                title: "WindowsLatest WSL Cross-Platform Kernel Interoperability Advances"
-                    .to_string(),
+                title: "WindowsLatest WSL Cross-Platform Kernel Interoperability Advances".to_string(),
                 portal: "WindowsLatest".to_string(),
                 url: "https://windowslatest.com/wsl-kernel-advances".to_string(),
                 category: "Interoperability".to_string(),
@@ -201,8 +193,7 @@ impl LinuxPressFeedEngine {
                 tags: vec!["gpu".to_string(), "vrm".to_string()],
             },
             TechMediaArticleFeed {
-                title: "WindowsCentral Phone Link & Unified Cross-Device Clipboard Integration"
-                    .to_string(),
+                title: "WindowsCentral Phone Link & Unified Cross-Device Clipboard Integration".to_string(),
                 portal: "WindowsCentral".to_string(),
                 url: "https://windowscentral.com/phone-link-clipboard".to_string(),
                 category: "Interoperability".to_string(),
@@ -210,8 +201,7 @@ impl LinuxPressFeedEngine {
                 tags: vec!["phone-link".to_string(), "clipboard".to_string()],
             },
             TechMediaArticleFeed {
-                title: "Phoronix Test Suite Automated Performance Benchmark Matrix Update"
-                    .to_string(),
+                title: "Phoronix Test Suite Automated Performance Benchmark Matrix Update".to_string(),
                 portal: "Phoronix".to_string(),
                 url: "https://phoronix.com/phoronix-test-suite-update".to_string(),
                 category: "Benchmarks".to_string(),
@@ -227,8 +217,7 @@ impl LinuxPressFeedEngine {
                 tags: vec!["android".to_string(), "apk".to_string()],
             },
             TechMediaArticleFeed {
-                title: "ZDNet Enterprise Security Deployment & Linux Server Hardening Audits"
-                    .to_string(),
+                title: "ZDNet Enterprise Security Deployment & Linux Server Hardening Audits".to_string(),
                 portal: "ZDNet".to_string(),
                 url: "https://zdnet.com/enterprise-linux-hardening".to_string(),
                 category: "Security".to_string(),
@@ -236,8 +225,7 @@ impl LinuxPressFeedEngine {
                 tags: vec!["hardening".to_string(), "security".to_string()],
             },
             TechMediaArticleFeed {
-                title: "OpenSourceForU SELinux Mandatory Access Control Policy Tutorial"
-                    .to_string(),
+                title: "OpenSourceForU SELinux Mandatory Access Control Policy Tutorial".to_string(),
                 portal: "OpenSourceForU".to_string(),
                 url: "https://opensourceforu.com/selinux-mac-tutorial".to_string(),
                 category: "Security".to_string(),
@@ -245,8 +233,7 @@ impl LinuxPressFeedEngine {
                 tags: vec!["selinux".to_string(), "mac".to_string()],
             },
             TechMediaArticleFeed {
-                title: "PCMag Comprehensive Linux Endpoint Security & Anti-Malware Review"
-                    .to_string(),
+                title: "PCMag Comprehensive Linux Endpoint Security & Anti-Malware Review".to_string(),
                 portal: "PCMag".to_string(),
                 url: "https://pcmag.com/linux-security-review".to_string(),
                 category: "Security".to_string(),
@@ -262,8 +249,7 @@ impl LinuxPressFeedEngine {
                 tags: vec!["firewall".to_string(), "ufw".to_string()],
             },
             TechMediaArticleFeed {
-                title: "Appuals Automated System Repair & Dependency Troubleshooting Guide"
-                    .to_string(),
+                title: "Appuals Automated System Repair & Dependency Troubleshooting Guide".to_string(),
                 portal: "Appuals".to_string(),
                 url: "https://appuals.com/linux-system-repair-guide".to_string(),
                 category: "Troubleshooting".to_string(),
@@ -468,11 +454,7 @@ impl HardwareTelemetryMonitor {
         self.current_telemetry.frame_pacing_latency_ms <= 8.33 // Smooth 120 FPS frame pacing
     }
 
-    pub fn enforce_pcworld_battery_charging_threshold(
-        &self,
-        current_charge_pct: u8,
-        threshold_pct: u8,
-    ) -> bool {
+    pub fn enforce_pcworld_battery_charging_threshold(&self, current_charge_pct: u8, threshold_pct: u8) -> bool {
         if current_charge_pct >= threshold_pct {
             // Stop charging at specified threshold (e.g., 80%) to preserve lithium battery lifespan
             false
@@ -481,10 +463,7 @@ impl HardwareTelemetryMonitor {
         }
     }
 
-    pub fn apply_makeuseof_lightweight_de_memory_governor(
-        &self,
-        free_ram_mb: usize,
-    ) -> &'static str {
+    pub fn apply_makeuseof_lightweight_de_memory_governor(&self, free_ram_mb: usize) -> &'static str {
         if free_ram_mb < 512 {
             "Zenith-Minimal-Tiling"
         } else if free_ram_mb < 2048 {
@@ -548,11 +527,7 @@ impl PhoronixBenchEngine {
 
     pub fn rank_system_benchmarks(&self) -> Vec<PhoronixBenchmarkSuiteNode> {
         let mut list: Vec<_> = self.benchmarks.values().cloned().collect();
-        list.sort_by(|a, b| {
-            b.score_ops_per_sec
-                .partial_cmp(&a.score_ops_per_sec)
-                .unwrap()
-        });
+        list.sort_by(|a, b| b.score_ops_per_sec.partial_cmp(&a.score_ops_per_sec).unwrap());
         list
     }
 }
@@ -599,14 +574,10 @@ impl AiMlTensorDatasetPipeline {
     pub fn calculate_std_dev(&self, column_name: &str) -> Option<f64> {
         let mean = self.calculate_mean(column_name)?;
         let col = self.dataset_columns.get(column_name)?;
-        let variance = col
-            .iter()
-            .map(|value| {
-                let diff = mean - (*value);
-                diff * diff
-            })
-            .sum::<f64>()
-            / col.len() as f64;
+        let variance = col.iter().map(|value| {
+            let diff = mean - (*value);
+            diff * diff
+        }).sum::<f64>() / col.len() as f64;
         Some(variance.sqrt())
     }
 
@@ -675,17 +646,10 @@ impl ModelPerformanceBenchmark {
     }
 
     pub fn evaluate_llm_performance(&self, model_name: &str) -> Option<LlmInferenceMetrics> {
-        self.models
-            .iter()
-            .find(|m| m.model_name == model_name)
-            .cloned()
+        self.models.iter().find(|m| m.model_name == model_name).cloned()
     }
 
-    pub fn estimate_context_window_vram(
-        &self,
-        model_name: &str,
-        context_tokens: u32,
-    ) -> Option<u32> {
+    pub fn estimate_context_window_vram(&self, model_name: &str, context_tokens: u32) -> Option<u32> {
         let model = self.evaluate_llm_performance(model_name)?;
         let base_vram = model.memory_vram_mb as u32;
         let token_cost_mb = (context_tokens as f64 * 0.125) as u32;
@@ -776,12 +740,7 @@ impl ZeroTrustSecuritySandbox {
         self.firewall_rules_active >= 10
     }
 
-    pub fn enforce_strict_pledge_unveil(
-        &mut self,
-        service_name: &str,
-        promise: &str,
-        path: &str,
-    ) -> bool {
+    pub fn enforce_strict_pledge_unveil(&mut self, service_name: &str, promise: &str, path: &str) -> bool {
         if let Some(p) = self.policies.get_mut(service_name) {
             if !p.pledge_promises.contains(&promise.to_string()) {
                 p.pledge_promises.push(promise.to_string());
@@ -821,10 +780,9 @@ impl OpenSourceGovernanceEngine {
     }
 
     pub fn audit_license_compliance(&self) -> bool {
-        self.records.iter().all(|r| {
-            r.vulnerability_count == 0
-                && (r.license_spdx == "MIT" || r.license_spdx == "Apache-2.0")
-        })
+        self.records
+            .iter()
+            .all(|r| r.vulnerability_count == 0 && (r.license_spdx == "MIT" || r.license_spdx == "Apache-2.0"))
     }
 
     pub fn scan_sbom_vulnerabilities(&self) -> u32 {
@@ -886,10 +844,7 @@ impl CrossPlatformDeviceBridge {
     pub fn sideload_app(&mut self, device_id: &str, app_id: &str) -> Result<String, &'static str> {
         if let Some(dev) = self.devices.iter_mut().find(|d| d.device_id == device_id) {
             dev.side_loaded_apps.push(app_id.to_string());
-            Ok(format!(
-                "Sideloaded app '{}' onto device '{}'",
-                app_id, device_id
-            ))
+            Ok(format!("Sideloaded app '{}' onto device '{}'", app_id, device_id))
         } else {
             Err("Device not found")
         }
@@ -946,9 +901,7 @@ impl GeekyGadgetsTechReviewEngine {
     }
 
     pub fn verify_sbc_support(&self, board_name: &str) -> bool {
-        self.sbc_configs
-            .iter()
-            .any(|b| b.board_name.contains(board_name))
+        self.sbc_configs.iter().any(|b| b.board_name.contains(board_name))
     }
 
     pub fn evaluate_hardware_viability(&self) -> bool {
@@ -1009,13 +962,8 @@ impl HowToGeekGuideSystemEngine {
         mappings.insert("show IP address".to_string(), "ip a".to_string());
         mappings.insert("list running processes".to_string(), "htop".to_string());
         mappings.insert("check disk space".to_string(), "duf".to_string());
-        mappings.insert(
-            "search text in files".to_string(),
-            "rg 'pattern'".to_string(),
-        );
-        Self {
-            command_mappings: mappings,
-        }
+        mappings.insert("search text in files".to_string(), "rg 'pattern'".to_string());
+        Self { command_mappings: mappings }
     }
 
     pub fn translate_user_query(&self, query: &str) -> Option<String> {
@@ -1446,6 +1394,7 @@ impl SovereignTechMediaMasterSuite {
             && self.press_feeds.get_portal_coverage_count() >= 25
             && !self.press_feeds.search_articles("kernel").is_empty()
             && !self.press_feeds.filter_by_tag("rust").is_empty();
+        let feeds_ok = !latest_news.is_empty() && self.press_feeds.get_portal_coverage_count() >= 25;
 
         // Verify Hardware Telemetry & Bench
         let telemetry_ok = self.telemetry.is_power_and_thermal_nominal()
@@ -1458,14 +1407,10 @@ impl SovereignTechMediaMasterSuite {
         let bench_ok = bench_res.score_ops_per_sec > 0.0;
 
         // Verify AI / ML Tensor Pipeline & Models
-        self.tensor_pipeline
-            .load_column("baseline_loss", &[0.5, 0.4, 0.3, 0.2, 0.1]);
-        self.tensor_pipeline
-            .load_column("current_loss", &[0.52, 0.41, 0.31, 0.21, 0.11]);
+        self.tensor_pipeline.load_column("baseline_loss", &[0.5, 0.4, 0.3, 0.2, 0.1]);
+        self.tensor_pipeline.load_column("current_loss", &[0.52, 0.41, 0.31, 0.21, 0.11]);
         let mean = self.tensor_pipeline.calculate_mean("baseline_loss");
-        let drift = self
-            .tensor_pipeline
-            .calculate_drift_ratio("baseline_loss", "current_loss");
+        let drift = self.tensor_pipeline.calculate_drift_ratio("baseline_loss", "current_loss");
         let ai_ok = mean == Some(0.3)
             && drift.is_some()
         let norm = self
@@ -1483,6 +1428,8 @@ impl SovereignTechMediaMasterSuite {
                 .estimate_context_window_vram("Sigma-SLM-3B", 8192)
                 .unwrap_or(0)
                 > 2048;
+            && self.model_bench.evaluate_llm_performance("Sigma-SLM-3B").is_some()
+            && self.model_bench.estimate_context_window_vram("Sigma-SLM-3B", 8192).unwrap_or(0) > 2048;
 
         // Verify Security & Governance
         let sec_ok = self.zero_trust.verify_sandbox_policy("network_subsystem")
@@ -1496,8 +1443,7 @@ impl SovereignTechMediaMasterSuite {
 
         // Verify Device Bridge
         self.device_bridge.sync_clipboard("https://sigmaos.org");
-        self.device_bridge
-            .mirror_notification("Incoming Call from Pixel 8 Pro");
+        self.device_bridge.mirror_notification("Incoming Call from Pixel 8 Pro");
         let bridge_ok = self.device_bridge.verify_bridge_status()
         self.device_bridge
             .send_drag_and_drop_stream(b"file_stream_chunk");
@@ -1507,6 +1453,7 @@ impl SovereignTechMediaMasterSuite {
                 .device_bridge
                 .sideload_app("dev_android_1", "org.sigma.pqc_vpn")
                 .is_ok()
+            && self.device_bridge.sideload_app("dev_android_1", "org.sigma.pqc_vpn").is_ok()
             && !self.device_bridge.shared_clipboard_text.is_empty()
             && !self.device_bridge.synced_notifications.is_empty()
             && !self.device_bridge.drag_and_drop_buffer.is_empty();
@@ -1514,8 +1461,7 @@ impl SovereignTechMediaMasterSuite {
         // Verify Expanded Tech Media Portals
         let sbc_ok = self.geeky_gadgets.verify_sbc_support("Raspberry Pi 5");
         let it_ok = self.it_daily.is_governance_compliant();
-        let htg_ok =
-            self.how_to_geek.translate_user_query("show IP address") == Some("ip a".to_string());
+        let htg_ok = self.how_to_geek.translate_user_query("show IP address") == Some("ip a".to_string());
         let tns_ok = self.thenewstack.verify_cloud_native_stack();
         let lcom_ok = self.linux_com.verify_standards();
         let pcmag_ok = self.pcmag.verify_pcmag_rating();
@@ -1665,9 +1611,7 @@ mod tests {
     fn test_cross_platform_device_bridge() {
         let mut bridge = CrossPlatformDeviceBridge::new();
         assert!(bridge.verify_bridge_status());
-        assert!(bridge
-            .sideload_app("dev_android_1", "com.sigma.app")
-            .is_ok());
+        assert!(bridge.sideload_app("dev_android_1", "com.sigma.app").is_ok());
         assert!(bridge.sideload_app("invalid_dev", "com.sigma.app").is_err());
     }
 

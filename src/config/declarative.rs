@@ -140,7 +140,7 @@ impl SigmaOsConfig {
 
             // Handle section headers
             if line.starts_with('[') && line.ends_with(']') {
-                current_section = line[1..line.len() - 1].to_string();
+                current_section = line[1..line.len()-1].to_string();
                 continue;
             }
 
@@ -150,44 +150,52 @@ impl SigmaOsConfig {
                 let value = value.trim().trim_matches('"');
 
                 match current_section.as_str() {
-                    "system" => match key {
-                        "hostname" => config.system.hostname = String::from(value),
-                        "timezone" => config.system.timezone = String::from(value),
-                        "locale" => config.system.locale = String::from(value),
-                        _ => {}
-                    },
-                    "network" => match key {
-                        "hostname" => config.network.hostname = String::from(value),
-                        "dhcp" => config.network.dhcp = value == "true",
-                        _ => {}
-                    },
-                    "desktop" => match key {
-                        "compositor" => config.desktop.compositor = String::from(value),
-                        "theme" => config.desktop.theme = String::from(value),
-                        "animations" => config.desktop.animations = value == "true",
-                        _ => {}
-                    },
-                    "security" => match key {
-                        "sandboxing" => config.security.sandboxing = value == "true",
-                        "firewall" => config.security.firewall = value == "true",
-                        "encryption" => config.security.encryption = value == "true",
-                        _ => {}
-                    },
-                    "kernel" => match key {
-                        "log_level" => config.kernel.log_level = String::from(value),
-                        "security_mitigations" => {
-                            config.kernel.security_mitigations = value == "true"
+                    "system" => {
+                        match key {
+                            "hostname" => config.system.hostname = String::from(value),
+                            "timezone" => config.system.timezone = String::from(value),
+                            "locale" => config.system.locale = String::from(value),
+                            _ => {}
                         }
-                        "memory_management" => {
-                            config.kernel.memory_management = String::from(value)
+                    }
+                    "network" => {
+                        match key {
+                            "hostname" => config.network.hostname = String::from(value),
+                            "dhcp" => config.network.dhcp = value == "true",
+                            _ => {}
                         }
-                        _ => {}
-                    },
-                    "performance" => match key {
-                        "cpu_governor" => config.performance.cpu_governor = String::from(value),
-                        "iopriority" => config.performance.iopriority = String::from(value),
-                        _ => {}
-                    },
+                    }
+                    "desktop" => {
+                        match key {
+                            "compositor" => config.desktop.compositor = String::from(value),
+                            "theme" => config.desktop.theme = String::from(value),
+                            "animations" => config.desktop.animations = value == "true",
+                            _ => {}
+                        }
+                    }
+                    "security" => {
+                        match key {
+                            "sandboxing" => config.security.sandboxing = value == "true",
+                            "firewall" => config.security.firewall = value == "true",
+                            "encryption" => config.security.encryption = value == "true",
+                            _ => {}
+                        }
+                    }
+                    "kernel" => {
+                        match key {
+                            "log_level" => config.kernel.log_level = String::from(value),
+                            "security_mitigations" => config.kernel.security_mitigations = value == "true",
+                            "memory_management" => config.kernel.memory_management = String::from(value),
+                            _ => {}
+                        }
+                    }
+                    "performance" => {
+                        match key {
+                            "cpu_governor" => config.performance.cpu_governor = String::from(value),
+                            "iopriority" => config.performance.iopriority = String::from(value),
+                            _ => {}
+                        }
+                    }
                     _ => {}
                 }
             }
@@ -220,24 +228,12 @@ impl SigmaOsConfig {
 
         result.push_str("[kernel]\n");
         result.push_str(&format!("log_level = \"{}\"\n", self.kernel.log_level));
-        result.push_str(&format!(
-            "security_mitigations = {}\n",
-            self.kernel.security_mitigations
-        ));
-        result.push_str(&format!(
-            "memory_management = \"{}\"\n\n",
-            self.kernel.memory_management
-        ));
+        result.push_str(&format!("security_mitigations = {}\n", self.kernel.security_mitigations));
+        result.push_str(&format!("memory_management = \"{}\"\n\n", self.kernel.memory_management));
 
         result.push_str("[performance]\n");
-        result.push_str(&format!(
-            "cpu_governor = \"{}\"\n",
-            self.performance.cpu_governor
-        ));
-        result.push_str(&format!(
-            "iopriority = \"{}\"\n",
-            self.performance.iopriority
-        ));
+        result.push_str(&format!("cpu_governor = \"{}\"\n", self.performance.cpu_governor));
+        result.push_str(&format!("iopriority = \"{}\"\n", self.performance.iopriority));
 
         result
     }

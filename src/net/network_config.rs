@@ -136,13 +136,7 @@ impl NetworkConfigManager {
         }
     }
 
-    pub fn configure_static(
-        &mut self,
-        name: &str,
-        address: Ipv4Addr,
-        netmask: Ipv4Addr,
-        gateway: Ipv4Addr,
-    ) -> bool {
+    pub fn configure_static(&mut self, name: &str, address: Ipv4Addr, netmask: Ipv4Addr, gateway: Ipv4Addr) -> bool {
         if let Some(iface) = self.interfaces.get_mut(name) {
             iface.set_static_ip(address, netmask, gateway);
             true

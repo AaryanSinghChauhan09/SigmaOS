@@ -1,21 +1,18 @@
 use std::boxed::Box;
 use std::vec::Vec;
 
-use core::mem;
 /// OOP-based Key Derivation Function for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 502
 /// Implements HKDF and PBKDF2 key derivation
+
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 pub type KDFID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum KDFAlgorithm {
-    HKDF_SHA256 = 0,
-    HKDF_SHA512 = 1,
-    PBKDF2 = 2,
-}
+pub enum KDFAlgorithm { HKDF_SHA256 = 0, HKDF_SHA512 = 1, PBKDF2 = 2 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -25,17 +22,12 @@ pub enum KDFError {
     InvalidLength = 2,
     ProviderUnavailable = 3,
 }
+pub enum KDFError { Success = 0, InvalidKey = 1, InvalidLength = 2 }
 
 pub trait KeyDerivation {
     fn id(&self) -> KDFID;
     fn algorithm(&self) -> KDFAlgorithm;
-    fn derive(
-        &self,
-        key: &[u8],
-        salt: &[u8],
-        info: &[u8],
-        length: usize,
-    ) -> Result<Vec<u8>, KDFError>;
+    fn derive(&self, key: &[u8], salt: &[u8], info: &[u8], length: usize) -> Result<Vec<u8>, KDFError>;
 }
 
 #[repr(C)]
@@ -51,9 +43,7 @@ impl SimpleKeyDerivation {
 }
 
 impl KeyDerivation for SimpleKeyDerivation {
-    fn id(&self) -> KDFID {
-        self.id
-    }
+    fn id(&self) -> KDFID { self.id }
     fn algorithm(&self) -> KDFAlgorithm {
         self.algorithm
     }
@@ -71,18 +61,13 @@ impl KeyDerivation for SimpleKeyDerivation {
         info: &[u8],
         length: usize,
     ) -> Result<Vec<u8>, KDFError> {
+    fn derive(&self, key: &[u8], salt: &[u8], info: &[u8], length: usize) -> Result<Vec<u8>, KDFError> {
         let mut derived = Vec::new();
         let mut hash: usize = 0;
 
-        for &byte in key {
-            hash = hash.wrapping_add(byte as usize);
-        }
-        for &byte in salt {
-            hash = hash.wrapping_add(byte as usize);
-        }
-        for &byte in info {
-            hash = hash.wrapping_add(byte as usize);
-        }
+        for &byte in key { hash = hash.wrapping_add(byte as usize); }
+        for &byte in salt { hash = hash.wrapping_add(byte as usize); }
+        for &byte in info { hash = hash.wrapping_add(byte as usize); }
 
         for i in 0..length {
             derived.push(((hash + i * 31) % 256) as u8);
@@ -94,14 +79,7 @@ impl KeyDerivation for SimpleKeyDerivation {
 
 pub trait KDFManager {
     fn register_kdf(&mut self, kdf: Box<dyn KeyDerivation>) -> Result<KDFID, KDFError>;
-    fn derive_key(
-        &self,
-        algorithm: KDFAlgorithm,
-        key: &[u8],
-        salt: &[u8],
-        info: &[u8],
-        length: usize,
-    ) -> Result<Vec<u8>, KDFError>;
+    fn derive_key(&self, algorithm: KDFAlgorithm, key: &[u8], salt: &[u8], info: &[u8], length: usize) -> Result<Vec<u8>, KDFError>;
 }
 
 #[repr(C)]
@@ -119,16 +97,10 @@ impl SimpleKDFManager {
     }
 
     pub fn seed_with_defaults(&mut self) {
-        let hkdf = SimpleKeyDerivation::new(
-            self.next_id.fetch_add(1, Ordering::SeqCst),
-            KDFAlgorithm::HKDF_SHA256,
-        );
+        let hkdf = SimpleKeyDerivation::new(self.next_id.fetch_add(1, Ordering::SeqCst), KDFAlgorithm::HKDF_SHA256);
         self.kdfs.push(Some(Box::new(hkdf)));
 
-        let pbkdf2 = SimpleKeyDerivation::new(
-            self.next_id.fetch_add(1, Ordering::SeqCst),
-            KDFAlgorithm::PBKDF2,
-        );
+        let pbkdf2 = SimpleKeyDerivation::new(self.next_id.fetch_add(1, Ordering::SeqCst), KDFAlgorithm::PBKDF2);
         self.kdfs.push(Some(Box::new(pbkdf2)));
     }
 }
@@ -140,14 +112,7 @@ impl KDFManager for SimpleKDFManager {
         Ok(id)
     }
 
-    fn derive_key(
-        &self,
-        algorithm: KDFAlgorithm,
-        key: &[u8],
-        salt: &[u8],
-        info: &[u8],
-        length: usize,
-    ) -> Result<Vec<u8>, KDFError> {
+    fn derive_key(&self, algorithm: KDFAlgorithm, key: &[u8], salt: &[u8], info: &[u8], length: usize) -> Result<Vec<u8>, KDFError> {
         for kdf_option in &self.kdfs {
             if let Some(ref kdf) = *kdf_option {
                 if kdf.algorithm() == algorithm {
@@ -202,8 +167,7 @@ impl SimplePasswordHashing {
 
 impl PasswordHashing for SimplePasswordHashing {
     fn hash_password(&self, password: &[u8], salt: &[u8]) -> Result<Vec<u8>, KDFError> {
-        self.kdf_manager
-            .derive_key(KDFAlgorithm::PBKDF2, password, salt, b"password", 32)
+        self.kdf_manager.derive_key(KDFAlgorithm::PBKDF2, password, salt, b"password", 32)
     }
 
     fn verify_password(&self, password: &[u8], salt: &[u8], hash: &[u8]) -> Result<bool, KDFError> {
@@ -223,25 +187,13 @@ impl PasswordHashing for SimplePasswordHashing {
     }
 }
 
-struct VecImpl<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
+struct VecImpl<T> { data: *mut T, len: usize, capacity: usize }
 
 impl<T> VecImpl<T> {
-    fn new() -> Self {
-        VecImpl {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
+    fn new() -> Self { VecImpl { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
+            if self.len >= self.capacity { self.grow(); }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -249,26 +201,15 @@ impl<T> VecImpl<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
+            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
+            if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }

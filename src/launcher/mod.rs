@@ -6,6 +6,12 @@
 pub mod app_launcher;
 
 pub use app_launcher::{
-    init_default_apps, AppEntry, AppLauncher, Command, CommandAction, LauncherError, MatchType,
+    AppLauncher,
+    AppEntry,
     SearchResult,
+    MatchType,
+    Command,
+    CommandAction,
+    LauncherError,
+    init_default_apps,
 };

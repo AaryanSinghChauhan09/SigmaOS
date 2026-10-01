@@ -163,14 +163,7 @@ impl SystemAuditManager {
         self.rules.push(rule);
     }
 
-    pub fn log_event(
-        &mut self,
-        event_type: AuditEventType,
-        user_id: u32,
-        resource: String,
-        action: String,
-        result: String,
-    ) -> u64 {
+    pub fn log_event(&mut self, event_type: AuditEventType, user_id: u32, resource: String, action: String, result: String) -> u64 {
         let mut event = AuditEvent::new(self.next_event_id, event_type, user_id);
         event.resource = resource;
         event.action = action;
@@ -193,12 +186,7 @@ impl SystemAuditManager {
         )
     }
 
-    pub fn log_security_event(
-        &mut self,
-        event_type: AuditEventType,
-        user_id: u32,
-        details: String,
-    ) -> u64 {
+    pub fn log_security_event(&mut self, event_type: AuditEventType, user_id: u32, details: String) -> u64 {
         let mut event = AuditEvent::new(self.next_event_id, event_type, user_id);
         event.details = details;
 
@@ -214,24 +202,21 @@ impl SystemAuditManager {
     }
 
     pub fn query_events(&self, event_type: AuditEventType) -> Vec<AuditEvent> {
-        self.events
-            .iter()
+        self.events.iter()
             .filter(|e| e.event_type == event_type)
             .cloned()
             .collect()
     }
 
     pub fn query_user_events(&self, user_id: u32) -> Vec<AuditEvent> {
-        self.events
-            .iter()
+        self.events.iter()
             .filter(|e| e.user_id == user_id)
             .cloned()
             .collect()
     }
 
     pub fn query_file_access(&self, path: &str) -> Vec<AuditEvent> {
-        self.events
-            .iter()
+        self.events.iter()
             .filter(|e| e.event_type == AuditEventType::FileAccess && e.resource.contains(path))
             .cloned()
             .collect()
@@ -243,8 +228,7 @@ impl SystemAuditManager {
     }
 
     pub fn list_security_events(&self) -> Vec<AuditEvent> {
-        self.events
-            .iter()
+        self.events.iter()
             .filter(|e| e.event_type == AuditEventType::SecurityViolation)
             .cloned()
             .collect()

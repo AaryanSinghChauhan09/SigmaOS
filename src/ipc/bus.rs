@@ -134,7 +134,9 @@ impl IpcBus {
     pub fn get_messages(&self, endpoint_id: u64) -> Vec<&IpcMessage> {
         self.messages
             .iter()
-            .filter(|m| m.destination == Some(endpoint_id) || m.destination.is_none())
+            .filter(|m| {
+                m.destination == Some(endpoint_id) || m.destination.is_none()
+            })
             .collect()
     }
 

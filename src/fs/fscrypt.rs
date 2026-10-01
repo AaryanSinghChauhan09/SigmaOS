@@ -2,8 +2,8 @@
 //! Per-directory transparent encryption with PQC support
 //! Inspired by Linux fscrypt with Kyber-1024 post-quantum cryptography
 
-use std::string::String;
 use std::vec::Vec;
+use std::string::String;
 
 /// Encryption policy type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -76,8 +76,7 @@ impl FscryptManager {
     /// Create encryption context for a directory
     pub fn create_context(&mut self, policy: EncryptionPolicy) -> Result<u64, String> {
         let mut context = EncryptionContext::new(policy);
-        context
-            .generate_master_key()
+        context.generate_master_key()
             .map_err(|e| format!("Failed to generate master key: {}", e))?;
 
         let id = self.contexts.len() as u64;
@@ -91,11 +90,7 @@ impl FscryptManager {
     }
 
     /// Set encryption policy for directory
-    pub fn set_directory_policy(
-        &mut self,
-        id: u64,
-        policy: EncryptionPolicy,
-    ) -> Result<(), String> {
+    pub fn set_directory_policy(&mut self, id: u64, policy: EncryptionPolicy) -> Result<(), String> {
         if let Some(context) = self.contexts.get_mut(id as usize) {
             context.set_policy(policy);
             Ok(())
@@ -139,8 +134,6 @@ mod tests {
     fn test_policy_change() {
         let mut manager = FscryptManager::new();
         let id = manager.create_context(EncryptionPolicy::Aes256Xts).unwrap();
-        assert!(manager
-            .set_directory_policy(id, EncryptionPolicy::Kyber1024)
-            .is_ok());
+        assert!(manager.set_directory_policy(id, EncryptionPolicy::Kyber1024).is_ok());
     }
 }

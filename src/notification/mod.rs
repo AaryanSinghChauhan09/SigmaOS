@@ -6,5 +6,12 @@
 pub mod notification_system;
 
 pub use notification_system::{
-    presets, Action, ActionType, DndConfig, Notification, NotificationSystem, Priority, Urgency,
+    NotificationSystem,
+    Notification,
+    Priority,
+    Urgency,
+    Action,
+    ActionType,
+    DndConfig,
+    presets,
 };

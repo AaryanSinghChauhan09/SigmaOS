@@ -1,6 +1,6 @@
-use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use std::format;
 // SigmaOS Ecosystem Integration Framework
 // Mobile/embedded presence matrices, enterprise partnerships, hardware/software certification pipelines,
 // zero-setup dev environments, IDE debugger support, Docker compatibility layers, and Kubernetes bootstrap configurations.
@@ -177,9 +177,7 @@ impl EcosystemManager {
 
     /// Docker Registry Authentication
     pub fn authenticate_registry(&mut self, registry_url: &str, token: &str) {
-        self.cloud_tools
-            .registry_credentials
-            .insert(String::from(registry_url), String::from(token));
+        self.cloud_tools.registry_credentials.insert(String::from(registry_url), String::from(token));
     }
 
     /// Bootstrap Kubernetes cluster using kubeadm with CNI configuration
@@ -303,11 +301,7 @@ mod tests {
         // Registry authentication
         manager.authenticate_registry("https://index.docker.io/v1/", "Bearer-secret-token");
         assert_eq!(
-            manager
-                .cloud_tools
-                .registry_credentials
-                .get("https://index.docker.io/v1/")
-                .unwrap(),
+            manager.cloud_tools.registry_credentials.get("https://index.docker.io/v1/").unwrap(),
             "Bearer-secret-token"
         );
 

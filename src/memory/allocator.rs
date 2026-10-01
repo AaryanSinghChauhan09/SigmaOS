@@ -74,8 +74,7 @@ impl BuddyAllocator {
     /// Free memory
     pub fn free(&mut self, address: u64) -> Result<(), &'static str> {
         // Find allocated block
-        let block_id = self
-            .allocated_blocks
+        let block_id = self.allocated_blocks
             .iter()
             .find(|(_, b)| b.start == address && b.allocated)
             .map(|(id, _)| *id)
@@ -153,10 +152,7 @@ impl BuddyAllocator {
 
         // Find buddy in free list
         for order in block.order..self.max_order {
-            if let Some(pos) = self.free_lists[order]
-                .iter()
-                .position(|b| b.start == buddy_address)
-            {
+            if let Some(pos) = self.free_lists[order].iter().position(|b| b.start == buddy_address) {
                 // Found buddy - merge
                 let buddy = self.free_lists[order].remove(pos);
 
@@ -184,8 +180,7 @@ impl BuddyAllocator {
 
     /// Get free memory
     pub fn free_memory(&self) -> usize {
-        self.free_lists
-            .iter()
+        self.free_lists.iter()
             .flatten()
             .filter(|b| !b.allocated)
             .map(|b| b.size)
@@ -194,8 +189,7 @@ impl BuddyAllocator {
 
     /// Get allocated memory
     pub fn allocated_memory(&self) -> usize {
-        self.allocated_blocks
-            .values()
+        self.allocated_blocks.values()
             .filter(|b| b.allocated)
             .map(|b| b.size)
             .sum()
@@ -271,6 +265,7 @@ impl SlabCache {
             self.slabs.len() as u64 * self.object_size as u64 * self.objects_per_slab as u64;
         let base_address = self.slabs.len() as u64 * self.object_size as u64 * self.objects_per_slab as u64;
             self.slabs.len() as u64 * self.object_size as u64 * self.objects_per_slab as u64;
+        let base_address = self.slabs.len() as u64 * self.object_size as u64 * self.objects_per_slab as u64;
 
         let mut slab = Vec::new();
         for i in 0..self.objects_per_slab {
@@ -310,12 +305,7 @@ impl SlabAllocator {
     }
 
     /// Create a slab cache
-    pub fn create_cache(
-        &mut self,
-        name: String,
-        object_size: usize,
-        objects_per_slab: usize,
-    ) -> Result<(), &'static str> {
+    pub fn create_cache(&mut self, name: String, object_size: usize, objects_per_slab: usize) -> Result<(), &'static str> {
         if self.caches.contains_key(&name) {
             return Err("Cache already exists");
         }

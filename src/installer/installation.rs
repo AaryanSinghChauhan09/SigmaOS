@@ -295,14 +295,12 @@ impl InstallationManager {
                         VmType::VMware => Ok(String::from("Create VM and mount ISO")),
                     }
                 } else {
-                    Err(String::from(
-                        "VM type not specified for virtual machine installation",
-                    ))
+                    Err(String::from("VM type not specified for virtual machine installation"))
                 }
             }
-            InstallationMethod::DualBoot => Ok(String::from(
-                "Run installer and use automatic partition detection",
-            )),
+            InstallationMethod::DualBoot => {
+                Ok(String::from("Run installer and use automatic partition detection"))
+            }
         }
     }
 
@@ -361,18 +359,9 @@ mod tests {
 
     #[test]
     fn test_installation_method_from_str() {
-        assert_eq!(
-            InstallationMethod::from_str("bare metal"),
-            InstallationMethod::BareMetal
-        );
-        assert_eq!(
-            InstallationMethod::from_str("virtual machine"),
-            InstallationMethod::VirtualMachine
-        );
-        assert_eq!(
-            InstallationMethod::from_str("dual boot"),
-            InstallationMethod::DualBoot
-        );
+        assert_eq!(InstallationMethod::from_str("bare metal"), InstallationMethod::BareMetal);
+        assert_eq!(InstallationMethod::from_str("virtual machine"), InstallationMethod::VirtualMachine);
+        assert_eq!(InstallationMethod::from_str("dual boot"), InstallationMethod::DualBoot);
     }
 
     #[test]
@@ -390,8 +379,10 @@ mod tests {
 
     #[test]
     fn test_installation_config_creation() {
-        let config =
-            InstallationConfig::new(InstallationMethod::VirtualMachine, Architecture::X86_64);
+        let config = InstallationConfig::new(
+            InstallationMethod::VirtualMachine,
+            Architecture::X86_64,
+        );
         assert_eq!(config.method, InstallationMethod::VirtualMachine);
         assert_eq!(config.architecture, Architecture::X86_64);
     }
@@ -480,9 +471,10 @@ mod tests {
 
     #[test]
     fn test_installation_manager_get_command() {
-        let config =
-            InstallationConfig::new(InstallationMethod::VirtualMachine, Architecture::X86_64)
-                .with_vm_type(VmType::QEMU);
+        let config = InstallationConfig::new(
+            InstallationMethod::VirtualMachine,
+            Architecture::X86_64,
+        ).with_vm_type(VmType::QEMU);
         let manager = InstallationManager::new(config);
 
         let cmd = manager.get_installation_command().unwrap();

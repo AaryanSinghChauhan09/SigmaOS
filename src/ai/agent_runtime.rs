@@ -8,12 +8,13 @@
 // - Memory-safe (Rust vs Python/JS)
 // - Microkernel isolation
 
+
 extern crate alloc;
 use alloc::collections::BTreeMap;
-use alloc::format;
+use alloc::vec::Vec;
 use alloc::string::String;
 use alloc::vec;
-use alloc::vec::Vec;
+use alloc::format;
 use core::sync::atomic::{AtomicU64, Ordering};
 
 use crate::kernel::process::ProcessId;
@@ -21,17 +22,13 @@ use crate::kernel::process::ProcessId;
 #[derive(Debug, Clone)]
 pub struct LandlockV5Guard;
 impl LandlockV5Guard {
-    pub fn new() -> Self {
-        Self
-    }
+    pub fn new() -> Self { Self }
 }
 
 #[derive(Debug, Clone)]
 pub struct CapsicumRights;
 impl CapsicumRights {
-    pub fn empty() -> Self {
-        Self
-    }
+    pub fn empty() -> Self { Self }
 }
 
 /// Unique identifier for AI agents in the kernel
@@ -76,22 +73,22 @@ pub enum AgentCapability {
 /// Agent execution priority (for BORE/EEVDF scheduler)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum AgentPriority {
-    Critical = 0, // Crash analysis, security incidents
-    High = 1,     // User-facing tasks, code generation
-    Normal = 2,   // Background optimization
-    Low = 3,      // Idle-time tasks
+    Critical = 0,   // Crash analysis, security incidents
+    High = 1,       // User-facing tasks, code generation
+    Normal = 2,     // Background optimization
+    Low = 3,        // Idle-time tasks
 }
 
 /// Agent state machine
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AgentState {
-    Created,      // Allocated but not started
-    Initializing, // Loading model/context
-    Ready,        // Waiting for tasks
-    Running,      // Executing task
-    Suspended,    // Paused (low memory/power)
-    Terminated,   // Clean shutdown
-    Crashed,      // Fault (isolated)
+    Created,        // Allocated but not started
+    Initializing,   // Loading model/context
+    Ready,          // Waiting for tasks
+    Running,        // Executing task
+    Suspended,      // Paused (low memory/power)
+    Terminated,     // Clean shutdown
+    Crashed,        // Fault (isolated)
 }
 
 /// Agent process descriptor (kernel-level)
@@ -167,9 +164,9 @@ impl AgentKernelBridge {
 
     pub fn code_generator() -> Self {
         Self {
-            can_spawn_process: true, // rustc, zig, nim
+            can_spawn_process: true,  // rustc, zig, nim
             can_read_memory: false,
-            can_modify_files: true, // Generate code files
+            can_modify_files: true,   // Generate code files
             can_network_access: false,
             can_gpu_access: false,
         }
@@ -178,7 +175,7 @@ impl AgentKernelBridge {
     pub fn system_analyzer() -> Self {
         Self {
             can_spawn_process: false,
-            can_read_memory: true, // Read crash dumps
+            can_read_memory: true,    // Read crash dumps
             can_modify_files: false,
             can_network_access: false,
             can_gpu_access: false,
@@ -340,7 +337,7 @@ impl SovereignAgentRuntime {
             kernel_bridge,
             process_id: None,
             memory_quota: 512 * 1024 * 1024, // 512 MB
-            cpu_quota: 1_000_000_000,        // 1 second per second
+            cpu_quota: 1_000_000_000, // 1 second per second
         };
 
         self.agents.insert(agent_id, agent);
@@ -384,7 +381,7 @@ impl SovereignAgentRuntime {
 
         // Validate language constraint (Rust/Zig/Nim only)
         match spec.language {
-            PluginLanguage::Rust | PluginLanguage::Zig | PluginLanguage::Nim => {}
+            PluginLanguage::Rust | PluginLanguage::Zig | PluginLanguage::Nim => {},
         }
 
         // Generate code via agent code generator
@@ -460,7 +457,8 @@ impl SovereignAgentRuntime {
             task_type: "crash_analysis".into(),
             analysis: format!(
                 "Process {} crashed with signal {}. Backtrace analysis in progress.",
-                crash_dump.process_id.0, crash_dump.signal
+                crash_dump.process_id.0,
+                crash_dump.signal
             ),
             recommendations: vec![
                 "Check for null pointer dereference".into(),
@@ -505,7 +503,10 @@ impl {} {{
     }}
 }}
 "#,
-            spec.name, spec.description, spec.name, spec.name
+            spec.name,
+            spec.description,
+            spec.name,
+            spec.name
         )
     }
 
@@ -571,6 +572,7 @@ pub enum AgentError {
     CodeGenerationFailed,
     AnalysisFailed,
 }
+
 
 #[cfg(test)]
 mod tests {

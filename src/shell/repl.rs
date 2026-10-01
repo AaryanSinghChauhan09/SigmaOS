@@ -953,7 +953,7 @@ impl ShellRepl {
                     self.current_user = username.clone();
                     self.current_dir = format!("/home/{}", username);
                     self.prompt = format!("{}@sigmaos:~$ ", username);
-                    Ok(format!("Logged in as {}.", username))
+                    Ok(format!("Successfully switched user account to target: {}.", username.trim()))
                 }
             }
             ShellCommand::Cat { filename } => {

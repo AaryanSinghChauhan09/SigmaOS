@@ -11,9 +11,9 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
+use alloc::collections::BTreeMap;
 use core::fmt;
 
 use crate::ai::agent_runtime::{AgentId, SovereignAgentRuntime};
@@ -316,8 +316,7 @@ impl ThemeEngine {
     }
 
     pub fn set_active_theme(&mut self, name: &str) -> Result<(), ThemeError> {
-        let theme = self
-            .themes
+        let theme = self.themes
             .get(name)
             .ok_or(ThemeError::ThemeNotFound)?
             .clone();

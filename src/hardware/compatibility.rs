@@ -1,11 +1,12 @@
 //! OOP-based Hardware Compatibility Matrix for SigmaOS
 //! Implements supported legacy, ancient (1980s/1990s), and modern hardware devices compatibility matrix.
 
-use core::sync::atomic::{AtomicUsize, Ordering};
-use std::boxed::Box;
+
 use std::collections::BTreeMap;
+use std::boxed::Box;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type DeviceID = usize;
 
@@ -58,11 +59,7 @@ impl Default for SimpleAcpiManager {
 
 /// ACPI power and interrupt load balancing strategy (inspired by Linux and BSD)
 pub trait AcpiLoadBalancer {
-    fn balance_irq_routing(
-        &mut self,
-        interrupt_line: u8,
-        cpu_id: usize,
-    ) -> Result<(), &'static str>;
+    fn balance_irq_routing(&mut self, interrupt_line: u8, cpu_id: usize) -> Result<(), &'static str>;
     fn set_device_power_state(
         &mut self,
         device_id: DeviceID,
@@ -72,14 +69,9 @@ pub trait AcpiLoadBalancer {
 }
 
 impl AcpiLoadBalancer for SimpleAcpiManager {
-    fn balance_irq_routing(
-        &mut self,
-        interrupt_line: u8,
-        cpu_id: usize,
-    ) -> Result<(), &'static str> {
+    fn balance_irq_routing(&mut self, interrupt_line: u8, cpu_id: usize) -> Result<(), &'static str> {
         // Map u32 irq to u8 interrupt_line by modulo
-        self.irq_routing
-            .insert(interrupt_line as u32, cpu_id as u32);
+        self.irq_routing.insert(interrupt_line as u32, cpu_id as u32);
         Ok(())
     }
 
@@ -550,9 +542,7 @@ impl HardwareCompatibilityManager for SimpleCompatibilityMatrix {
         self.devices.iter().find_map(|d| {
             let vendor = d.vendor_id();
             let dev = d.device_id();
-            if alias_query.contains(&format!("{:04x}", vendor))
-                && alias_query.contains(&format!("{:04x}", dev))
-            {
+            if alias_query.contains(&format!("{:04x}", vendor)) && alias_query.contains(&format!("{:04x}", dev)) {
                 Some(d.id())
             } else {
                 None
@@ -751,13 +741,7 @@ impl LinuxVirtioGpu3dVirglEngine {
         }
     }
 
-    pub fn create_3d_resource_3d(
-        &mut self,
-        target: u32,
-        format: u32,
-        width: u32,
-        height: u32,
-    ) -> Result<u32, &'static str> {
+    pub fn create_3d_resource_3d(&mut self, target: u32, format: u32, width: u32, height: u32) -> Result<u32, &'static str> {
         if !self.virgl_renderer_active {
             return Err("VirGL 3D renderer inactive");
         }
@@ -836,12 +820,7 @@ impl OpenBsdAmdGpuKmsEngine {
         }
     }
 
-    pub fn set_display_mode(
-        &mut self,
-        crtc: u32,
-        width: u32,
-        height: u32,
-    ) -> Result<bool, &'static str> {
+    pub fn set_display_mode(&mut self, crtc: u32, width: u32, height: u32) -> Result<bool, &'static str> {
         self.active_crtc = crtc;
         self.current_mode_width = width;
         self.current_mode_height = height;
@@ -974,21 +953,14 @@ mod tests {
     #[test]
     fn test_linux_and_bsd_advanced_drivers() {
         // 1. Test Linux NVMe-oF driver
-        let mut nvme_of = LinuxNvmeOverFabricsEngine::new(
-            "nqn.2026-09.org.sigma:storage",
-            "tcp",
-            "192.168.1.100",
-            4420,
-        );
+        let mut nvme_of = LinuxNvmeOverFabricsEngine::new("nqn.2026-09.org.sigma:storage", "tcp", "192.168.1.100", 4420);
         assert!(nvme_of.submit_nvme_cmd(0x02).is_err());
         assert!(nvme_of.connect_fabric().unwrap());
         assert_eq!(nvme_of.submit_nvme_cmd(0x02).unwrap(), 0);
 
         // 2. Test FreeBSD CAM storage engine
         let mut cam = FreeBsdCamStorageEngine::new(0, 0, 0, "da0");
-        let res = cam
-            .execute_scsi_cdb(&[0x12, 0x00, 0x00, 0x00, 0x24, 0x00])
-            .unwrap();
+        let res = cam.execute_scsi_cdb(&[0x12, 0x00, 0x00, 0x00, 0x24, 0x00]).unwrap();
         assert_eq!(res.len(), 4);
         cam.freeze_queue();
         assert!(cam.execute_scsi_cdb(&[0x12]).is_err());
@@ -1016,16 +988,9 @@ mod tests {
 
         // 6. Test FreeBSD Netmap high-speed packet engine
         let mut netmap = FreeBsdNetmapHighSpeedPacketEngine::new("vtnet0", 4, 4, 1024);
-        assert!(netmap
-            .transmit_packet_zero_copy(&[0x00, 0x11, 0x22])
-            .is_err());
+        assert!(netmap.transmit_packet_zero_copy(&[0x00, 0x11, 0x22]).is_err());
         assert!(netmap.open_netmap_ring().unwrap());
-        assert_eq!(
-            netmap
-                .transmit_packet_zero_copy(&[0x00, 0x11, 0x22])
-                .unwrap(),
-            3
-        );
+        assert_eq!(netmap.transmit_packet_zero_copy(&[0x00, 0x11, 0x22]).unwrap(), 3);
 
         // 7. Test OpenBSD AMDGPU DRM/KMS engine
         let mut amdgpu = OpenBsdAmdGpuKmsEngine::new("0000:03:00.0");

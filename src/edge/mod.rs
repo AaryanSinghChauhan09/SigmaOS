@@ -1,8 +1,10 @@
 //! Edge Computing Platform (Edge Computing Inspiration)
 //! Lightweight edge runtime, distributed computing, and offline support
 
-use std::string::{String, ToString};
+
+
 use std::vec::Vec;
+use std::string::{String, ToString};
 
 /// Edge node state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -268,9 +270,7 @@ impl SigmaEdge {
     }
 
     pub fn get_gateway(&mut self, id: &str) -> Option<&mut EdgeGateway> {
-        self.gateways
-            .iter_mut()
-            .find(|g| g.id == id || g.name == id)
+        self.gateways.iter_mut().find(|g| g.id == id || g.name == id)
     }
 
     pub fn add_data_pipeline(&mut self, pipeline: DataPipeline) {
@@ -281,11 +281,7 @@ impl SigmaEdge {
         self.sync_policies.push(policy);
     }
 
-    pub fn deploy_application(
-        &mut self,
-        node_id: &str,
-        app: EdgeApplication,
-    ) -> Result<(), EdgeError> {
+    pub fn deploy_application(&mut self, node_id: &str, app: EdgeApplication) -> Result<(), EdgeError> {
         if let Some(node) = self.get_node(node_id) {
             node.add_application(app);
             Ok(())
@@ -294,11 +290,7 @@ impl SigmaEdge {
         }
     }
 
-    pub fn scale_application(
-        &mut self,
-        app_name: &str,
-        target_nodes: u32,
-    ) -> Result<(), EdgeError> {
+    pub fn scale_application(&mut self, app_name: &str, target_nodes: u32) -> Result<(), EdgeError> {
         // Scale application across multiple edge nodes
         Ok(())
     }
@@ -306,16 +298,10 @@ impl SigmaEdge {
     pub fn get_edge_stats(&self) -> EdgeStats {
         EdgeStats {
             total_nodes: self.nodes.len(),
-            online_nodes: self
-                .nodes
-                .iter()
-                .filter(|n| n.state == EdgeNodeState::Online)
-                .count(),
+            online_nodes: self.nodes.iter().filter(|n| n.state == EdgeNodeState::Online).count(),
             total_gateways: self.gateways.len(),
             total_applications: self.nodes.iter().map(|n| n.applications.len()).sum(),
-            running_applications: self
-                .nodes
-                .iter()
+            running_applications: self.nodes.iter()
                 .flat_map(|n| n.applications.iter())
                 .filter(|a| a.state == EdgeAppState::Running)
                 .count(),
