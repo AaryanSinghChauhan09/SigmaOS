@@ -17,7 +17,7 @@ pub mod paging;
 pub mod quota;
 pub mod segmentation_paging;
 pub mod sovereign_address_translation;
-pub mod thp;
+pub mod huge_pages;
 pub mod tlb_associative;
 pub mod zone;
 pub use sovereign_address_translation::*;
@@ -39,6 +39,6 @@ pub use segmentation_paging::{
     RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, SegmentationPagingEngine,
     SpaceProtectionFlags, SystemControlRegisters,
 };
-pub use thp::{HugePageAllocation, HugePageSize, ThpManager, ThpPolicy, ThpStats};
+pub use huge_pages::{HugePageAllocation, HugePageSize, ThpManager, ThpPolicy, ThpStats};
 pub use tlb_associative::{AssociativeTlbCache, TlbAssociativityMode, TlbEntry, TlbPageFlags};
 pub use zone::{BsdZoneAllocator, Slab, Zone, ZoneStats};

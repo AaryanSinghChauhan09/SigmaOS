@@ -221,6 +221,17 @@ impl AddressSanitizer {
         let region = self.regions.get_mut(&address)
             .ok_or_else(|| format!("Address 0x{:x} not allocated", address))?;
 
+        region.deallocate();
+        self.deallocation_count += 1;
+
+        // Add to quarantine
+        if self.quarantine.len() < self.config.quarantine_size {
+            self.quarantine.push(address);
+        }
+
+        Ok(())
+    }
+
     /// Find region by pointer
     fn find_region_by_ptr(&self, ptr: u64) -> Result<u64, &'static str> {
         for (&id, region) in &self.regions {
@@ -232,15 +243,7 @@ impl AddressSanitizer {
             }
         }
 
-        region.deallocate();
-        self.deallocation_count += 1;
-
-        // Add to quarantine
-        if self.quarantine.len() < self.config.quarantine_size {
-            self.quarantine.push(address);
-        }
-
-        Ok(())
+        Err("Pointer not in any region")
     }
 
     /// Get shadow memory state for an address

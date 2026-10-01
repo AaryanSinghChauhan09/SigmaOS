@@ -1103,7 +1103,7 @@ mod tests {
     fn test_platform_certification_manager() {
         let mut cert_mgr = PlatformCertificationManager::new();
 
-        let laptop_report = cert_mgr.certify_platform(
+        let _laptop_report = cert_mgr.certify_platform(
             "Sigma-Laptop-Ref-2025",
             PlatformType::Laptop,
             &[
@@ -1126,6 +1126,7 @@ mod tests {
                 .unwrap(),
             3
         );
+    }
 
     #[test]
     fn test_linux_driver_compat_boundary() {
