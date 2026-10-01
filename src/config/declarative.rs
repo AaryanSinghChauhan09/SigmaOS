@@ -119,9 +119,8 @@ pub struct SigmaOsConfig {
     pub security: SecurityConfig,
     pub kernel: KernelConfig,
     pub performance: PerformanceConfig,
-    pub active_generation_id: u32,}
+}
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[derive(Debug, Clone)]
 pub struct ConfigModule {
     pub module_name: String,

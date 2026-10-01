@@ -50,6 +50,7 @@ pub enum UniversalDistroPackageFormat {
     AlpineApk,
     VoidXbps,
     GentooEbuild,
+    BsdPkg,
     FreeBsdPkg,
     OpenBsdPkg,
     NetBsdPkgsrc,
@@ -116,8 +117,10 @@ impl UniversalDistroPackageFormat {
             Self::AlpineApk => "apk (.apk / APKBUILD)",
             Self::VoidXbps => "xbps (.xbps / template)",
             Self::GentooEbuild => "portage (.ebuild)",
+            Self::BsdPkg => "bsd-pkg (generic BSD package)",
             Self::FreeBsdPkg => "freebsd-pkg (+MANIFEST / ports)",
             Self::OpenBsdPkg => "openbsd-pkg (+CONTENTS)",
+            Self::OpenBsdPorts => "openbsd-ports (port tree)",
             Self::NetBsdPkgsrc => "netbsd-pkgsrc (Makefile)",
             Self::NixFlake => "nix (flake / derivation)",
             Self::GuixScheme => "guix (scheme / nar)",
@@ -878,6 +881,7 @@ impl Default for SovereignUniversalPmPrBridgeEngine {
 
 /// Foreign Package Metadata Converter Engine
 #[derive(Debug, Default)]
+pub struct LinuxBsdPackageFormatConverterEngine;
 
 impl LinuxBsdPackageFormatConverterEngine {
     /// Parses raw metadata content into a normalized `UniversalDistroPackageManifest`
@@ -993,6 +997,7 @@ pub fn translate_cli_command_to_pr_submission(
 
 /// Automated PR Reviewer and Security Auditor
 #[derive(Debug, Default)]
+pub struct UniversalPmPrAutomatedReviewer;
 
 impl UniversalPmPrAutomatedReviewer {
     pub fn audit_pr_transaction(

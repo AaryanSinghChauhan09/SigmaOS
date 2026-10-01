@@ -1,3 +1,4 @@
+pub mod filesystem_encryption;
 // SigmaOS Security Subsystem
 pub mod address_sanitizer;
 pub mod capability_enforcer;

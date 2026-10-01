@@ -671,125 +671,17 @@ impl TilingWindowManager {
     }
 
     /// Rearrange workspace based on layout
-    fn rearrange_workspace(&mut self, workspace_id: u64) {
-        let (layout, gaps) = if let Some(workspace) = self.workspaces.get(&workspace_id) {
-            (workspace.layout, workspace.gaps)
-        } else {
-            return;
-        };
 
-        let window_ids: Vec<u64> = self
-            .windows
-            .values()
-            .filter(|w| w.workspace_id == workspace_id && !w.is_floating && !w.is_fullscreen)
-            .map(|w| w.id)
-            .collect();
 
-        if window_ids.is_empty() {
-            return;
-        }
 
-        match layout {
-            TilingLayout::Spiral  => self.rearrange_spiral_by_ids(&window_ids, gaps),
-            TilingLayout::Monocle => self.rearrange_monocle_by_ids(&window_ids),
-            TilingLayout::Columns => self.rearrange_columns_by_ids(&window_ids, gaps),
-            TilingLayout::Rows    => self.rearrange_rows_by_ids(&window_ids, gaps),
-            TilingLayout::Grid    => self.rearrange_grid_by_ids(&window_ids, gaps),
-        }
-    }
 
-    fn rearrange_spiral_by_ids(&mut self, window_ids: &[u64], gaps: u32) {
-        let screen_width = 1920u32;
-        let screen_height = 1080u32;
-        let count = window_ids.len() as u32;
-        if count == 0 {
-            return;
-        }
-        let window_width = (screen_width.saturating_sub(gaps * (count + 1))) / count.max(1);
-        let window_height = (screen_height.saturating_sub(gaps * (count + 1))) / count.max(1);
-        for (i, &id) in window_ids.iter().enumerate() {
-            let x = gaps + (i as u32 * (window_width + gaps));
-            let y = gaps;
-            if let Some(w) = self.windows.get_mut(&id) {
-                w.area = WindowArea {
-                    x: x as i32,
-                    y: y as i32,
-                    width: window_width,
-                    height: window_height,
-                };
-            }
-        }
-    }
 
-    fn rearrange_monocle_by_ids(&mut self, window_ids: &[u64]) {
-        let screen_width = 1920u32;
-        let screen_height = 1080u32;
-        for &id in window_ids {
-            if let Some(w) = self.windows.get_mut(&id) {
-                w.area = WindowArea { x: 0, y: 0, width: screen_width, height: screen_height };
-            }
-        }
-    }
 
-    fn rearrange_columns_by_ids(&mut self, window_ids: &[u64], gaps: u32) {
-        let screen_width = 1920u32;
-        let screen_height = 1080u32;
-        let count = window_ids.len() as u32;
-        let col_width = (screen_width.saturating_sub(gaps * (count + 1))) / count.max(1);
-        for (i, &id) in window_ids.iter().enumerate() {
-            let x = gaps + (i as u32 * (col_width + gaps));
-            if let Some(w) = self.windows.get_mut(&id) {
-                w.area = WindowArea {
-                    x: x as i32,
-                    y: gaps as i32,
-                    width: col_width,
-                    height: screen_height.saturating_sub(2 * gaps),
-                };
-            }
-        }
-    }
 
-    fn rearrange_rows_by_ids(&mut self, window_ids: &[u64], gaps: u32) {
-        let screen_width = 1920u32;
-        let screen_height = 1080u32;
-        let count = window_ids.len() as u32;
-        let row_height = (screen_height.saturating_sub(gaps * (count + 1))) / count.max(1);
-        for (i, &id) in window_ids.iter().enumerate() {
-            let y = gaps + (i as u32 * (row_height + gaps));
-            if let Some(w) = self.windows.get_mut(&id) {
-                w.area = WindowArea {
-                    x: gaps as i32,
-                    y: y as i32,
-                    width: screen_width.saturating_sub(2 * gaps),
-                    height: row_height,
-                };
-            }
-        }
-    }
 
-    fn rearrange_grid_by_ids(&mut self, window_ids: &[u64], gaps: u32) {
-        let screen_width = 1920u32;
-        let screen_height = 1080u32;
-        let count = window_ids.len() as u32;
-        let cols = (count as f32).sqrt().ceil() as u32;
-        let rows = (count as f32 / cols as f32).ceil() as u32;
-        let cell_width = (screen_width.saturating_sub(gaps * (cols + 1))) / cols.max(1);
-        let cell_height = (screen_height.saturating_sub(gaps * (rows + 1))) / rows.max(1);
-        for (i, &id) in window_ids.iter().enumerate() {
-            let col = (i as u32) % cols;
-            let row = (i as u32) / cols;
-            let x = gaps + col * (cell_width + gaps);
-            let y = gaps + row * (cell_height + gaps);
-            if let Some(w) = self.windows.get_mut(&id) {
-                w.area = WindowArea {
-                    x: x as i32,
-                    y: y as i32,
-                    width: cell_width,
-                    height: cell_height,
-                };
-            }
-        }
-    }
+
+
+
 }
 
 impl Default for TilingWindowManager {

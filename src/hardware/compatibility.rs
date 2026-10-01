@@ -6,7 +6,6 @@ use std::boxed::Box;
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::sync::atomic::{AtomicUsize, Ordering};
 
 pub type DeviceID = usize;
 

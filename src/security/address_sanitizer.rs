@@ -373,3 +373,6 @@ mod tests {
         assert!(!asan.is_valid_access(ptr, 1));
     }
 }
+
+/// Alias for backward compatibility
+pub type MemoryRegion = AsanRegion;
