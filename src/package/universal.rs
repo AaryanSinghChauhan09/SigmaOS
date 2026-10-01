@@ -517,9 +517,23 @@ pub enum PackageFormat {
     Cabal,       // Haskell Cabal package (.cabal)
     JuliaPkg,    // Julia package (.jl)
     CRan,        // R CRAN package (.rpkg)
-    Brew,        // Homebrew formula (.brew)
-    Wasm,        // WebAssembly component (.wasm)
-    Oci,         // OCI container image (.oci)
+    Brew,           // Homebrew formula (.brew)
+    Wasm,           // WebAssembly component (.wasm)
+    Oci,            // OCI container image (.oci)
+    Tazpkg,         // SliTaz Linux package (.tazpkg)
+    SingularitySif, // Singularity/Apptainer SIF container (.sif)
+    StampedeSlp,    // Stampede Linux package (.slp)
+    Winget,         // Windows Package Manager manifest (.winget)
+    Scoop,          // Windows Scoop manifest (.scoop)
+    Choco,          // Windows Chocolatey package (.choco)
+    Pixi,           // Conda/Pixi environment package (.pixi)
+    Nimble,         // Nim package manager spec (.nimble)
+    ZigPkg,         // Zig build package (.zig)
+    SwiftPkg,       // Swift Package Manager manifest (.swift)
+    DubPkg,         // D language Dub package (.dub)
+    Opam,           // OCaml OPAM package (.opam)
+    Shard,          // Crystal Shard package (.shard)
+    PltPkg,         // Racket PLT package (.plt)
 }
 
 impl PackageFormat {
@@ -698,6 +712,34 @@ impl PackageFormat {
             Some(PackageFormat::Wasm)
         } else if normalized.ends_with(".oci") {
             Some(PackageFormat::Oci)
+        } else if normalized.ends_with(".tazpkg") {
+            Some(PackageFormat::Tazpkg)
+        } else if normalized.ends_with(".sif") {
+            Some(PackageFormat::SingularitySif)
+        } else if normalized.ends_with(".slp") {
+            Some(PackageFormat::StampedeSlp)
+        } else if normalized.ends_with(".winget") {
+            Some(PackageFormat::Winget)
+        } else if normalized.ends_with(".scoop") {
+            Some(PackageFormat::Scoop)
+        } else if normalized.ends_with(".choco") {
+            Some(PackageFormat::Choco)
+        } else if normalized.ends_with(".pixi") {
+            Some(PackageFormat::Pixi)
+        } else if normalized.ends_with(".nimble") {
+            Some(PackageFormat::Nimble)
+        } else if normalized.ends_with(".zig") {
+            Some(PackageFormat::ZigPkg)
+        } else if normalized.ends_with(".swift") {
+            Some(PackageFormat::SwiftPkg)
+        } else if normalized.ends_with(".dub") {
+            Some(PackageFormat::DubPkg)
+        } else if normalized.ends_with(".opam") {
+            Some(PackageFormat::Opam)
+        } else if normalized.ends_with(".shard") {
+            Some(PackageFormat::Shard)
+        } else if normalized.ends_with(".plt") {
+            Some(PackageFormat::PltPkg)
         } else {
             None
         }
@@ -1724,6 +1766,20 @@ impl PackageFactory {
             PackageFormat::Brew => Box::new(BrewInstallStrategy),
             PackageFormat::Wasm => Box::new(WasmInstallStrategy),
             PackageFormat::Oci => Box::new(OciInstallStrategy),
+            PackageFormat::Tazpkg
+            | PackageFormat::SingularitySif
+            | PackageFormat::StampedeSlp
+            | PackageFormat::Winget
+            | PackageFormat::Scoop
+            | PackageFormat::Choco
+            | PackageFormat::Pixi
+            | PackageFormat::Nimble
+            | PackageFormat::ZigPkg
+            | PackageFormat::SwiftPkg
+            | PackageFormat::DubPkg
+            | PackageFormat::Opam
+            | PackageFormat::Shard
+            | PackageFormat::PltPkg => Box::new(TarGzInstallStrategy),
         }
     }
 
@@ -1818,6 +1874,20 @@ impl PackageFactory {
             PackageFormat::Brew => Box::new(BrewMetadataAdapter),
             PackageFormat::Wasm => Box::new(WasmMetadataAdapter),
             PackageFormat::Oci => Box::new(OciMetadataAdapter),
+            PackageFormat::Tazpkg
+            | PackageFormat::SingularitySif
+            | PackageFormat::StampedeSlp
+            | PackageFormat::Winget
+            | PackageFormat::Scoop
+            | PackageFormat::Choco
+            | PackageFormat::Pixi
+            | PackageFormat::Nimble
+            | PackageFormat::ZigPkg
+            | PackageFormat::SwiftPkg
+            | PackageFormat::DubPkg
+            | PackageFormat::Opam
+            | PackageFormat::Shard
+            | PackageFormat::PltPkg => Box::new(TarGzMetadataAdapter),
         }
     }
 }
