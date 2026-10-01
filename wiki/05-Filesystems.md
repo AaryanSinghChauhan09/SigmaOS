@@ -299,3 +299,10 @@ btree count
 - [Networking](06-Networking.md) - Network configuration
 - [Security](07-Security.md) - Security and encryption
 - [Kernel](04-Kernel.md) - Kernel configuration
+
+## AI Agent Maintenance Instructions
+
+- **Bolt ⚡**: Ensure documentation of any new zero-allocation optimizations or performance improvements are added concisely without marketing fluff.
+- **Palette 🎨**: Maintain Arch Linux wiki style: clear, factual, one page per topic, using appropriate markdown formatting and tables where necessary.
+- **Sentinel 🛡️**: Verify that no hardcoded credentials or unvetted cryptographic algorithms are documented as production-ready. Ensure security limitations are accurately stated.
+- **General**: Keep pages up-to-date with current repository capabilities. Remove redundant files when consolidating information.

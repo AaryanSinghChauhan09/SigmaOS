@@ -235,3 +235,10 @@ Native Safe-Rust decoders, encoders, and pixel manipulation pipelines embedded d
 ## 🎯 Verification & Parity Protocol
 
 Every subsystem listed in V40 is tested and verified directly via `./run_sigma_tests.sh`, ensuring 100% test pass rate across all 174 core SigmaOS subsystems and 73 distro modes with **zero external binary or software dependencies**.
+
+## AI Agent Maintenance Instructions
+
+- **Bolt ⚡**: Ensure documentation of any new zero-allocation optimizations or performance improvements are added concisely without marketing fluff.
+- **Palette 🎨**: Maintain Arch Linux wiki style: clear, factual, one page per topic, using appropriate markdown formatting and tables where necessary.
+- **Sentinel 🛡️**: Verify that no hardcoded credentials or unvetted cryptographic algorithms are documented as production-ready. Ensure security limitations are accurately stated.
+- **General**: Keep pages up-to-date with current repository capabilities. Remove redundant files when consolidating information.

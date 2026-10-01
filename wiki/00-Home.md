@@ -35,7 +35,6 @@ SigmaOS systematically extracts functions, features, architectural models, desig
 
 ## Master Specification Files
 
-- [Sovereign OS Absolute Omnipresent Self-Sufficiency Ultra Encyclopedia V40](15-Sovereign-OS-Self-Sufficiency-Encyclopedia-V40.md)
 - [Tri-Agent & 500 Repos Master Plan](../docs/SIGMAOS_500_REPOS_TRI_AGENT_ABSORPTION_MASTER_PLAN.md)
 - [Improvement Plan & Technical Audit](../ImprovementPlan.md)
 
@@ -54,4 +53,12 @@ This wiki is organized in Arch Linux style with one page per topic:
 - [Packaging](09-Packaging.md)
 - [Development](10-Development.md)
 - [Roadmap](11-Roadmap.md)
-- [Sovereign OS Self-Sufficiency Encyclopedia V38](15-Sovereign-OS-Self-Sufficiency-Encyclopedia-V38.md)
+- [Architecture Decisions](15-Architecture-Decisions.md)
+- [Self-Sufficiency Encyclopedia](16-Self-Sufficiency-Encyclopedia.md)
+
+## AI Agent Maintenance Instructions
+
+- **Bolt ⚡**: Ensure documentation of any new zero-allocation optimizations or performance improvements are added concisely without marketing fluff.
+- **Palette 🎨**: Maintain Arch Linux wiki style: clear, factual, one page per topic, using appropriate markdown formatting and tables where necessary.
+- **Sentinel 🛡️**: Verify that no hardcoded credentials or unvetted cryptographic algorithms are documented as production-ready. Ensure security limitations are accurately stated.
+- **General**: Keep pages up-to-date with current repository capabilities. Remove redundant files when consolidating information.

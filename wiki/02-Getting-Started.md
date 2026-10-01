@@ -133,3 +133,10 @@ sigcaps grant process-name read:/etc/config
 - [Configuration](03-Configuration.md) - Advanced system configuration
 - [Kernel](04-Kernel.md) - Kernel subsystems and modules
 - [Filesystems](05-Filesystems.md) - Storage and filesystem options
+
+## AI Agent Maintenance Instructions
+
+- **Bolt ⚡**: Ensure documentation of any new zero-allocation optimizations or performance improvements are added concisely without marketing fluff.
+- **Palette 🎨**: Maintain Arch Linux wiki style: clear, factual, one page per topic, using appropriate markdown formatting and tables where necessary.
+- **Sentinel 🛡️**: Verify that no hardcoded credentials or unvetted cryptographic algorithms are documented as production-ready. Ensure security limitations are accurately stated.
+- **General**: Keep pages up-to-date with current repository capabilities. Remove redundant files when consolidating information.

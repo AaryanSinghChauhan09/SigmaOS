@@ -431,10 +431,12 @@ mod tests {
         assert_eq!(plaintext, decrypted);
     }
 
+    // TODO: Replace with proper configuration-based key derivation management
+    const HMAC_KEY: &[u8] = b"super_secret_geli_hmac_key_256bit!";
+
     #[test]
     fn test_freebsd_geli_integrity_engine() {
-        let hmac_key = b"super_secret_geli_hmac_key_256bit!";
-        let integrity_engine = FreeBsdGeliIntegrityEngine::new(hmac_key, 32).unwrap();
+        let integrity_engine = FreeBsdGeliIntegrityEngine::new(HMAC_KEY, 32).unwrap();
 
         let sector_data = b"Sector payload data content needing integrity protection";
         let sector_num = 42;

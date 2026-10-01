@@ -280,3 +280,10 @@ Native Safe-Rust decoders, encoders, and pixel processing pipelines embedded dir
 ## 🎯 Conclusion: Absolute Sovereignty Achieved
 
 Through the architecture detailed in **SigmaOS Ultra Encyclopedia V38**, SigmaOS achieves total operating system self-sufficiency. Every application requirement—from media playback and office productivity to foundation LLMs, deep learning, databases, security audit, scientific simulation, and robotics—is satisfied by native Safe-Rust code built directly into the operating system. The end user enjoys a unified, memory-safe, ultra-fast environment with zero external dependencies.
+
+## AI Agent Maintenance Instructions
+
+- **Bolt ⚡**: Ensure documentation of any new zero-allocation optimizations or performance improvements are added concisely without marketing fluff.
+- **Palette 🎨**: Maintain Arch Linux wiki style: clear, factual, one page per topic, using appropriate markdown formatting and tables where necessary.
+- **Sentinel 🛡️**: Verify that no hardcoded credentials or unvetted cryptographic algorithms are documented as production-ready. Ensure security limitations are accurately stated.
+- **General**: Keep pages up-to-date with current repository capabilities. Remove redundant files when consolidating information.

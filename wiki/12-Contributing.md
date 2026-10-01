@@ -40,3 +40,10 @@ Thank you for contributing to **SigmaOS**! This document provides development gu
 ### 5. **Code Review & Quality Assurance**
 - Every pull request requires double maintainer review.
 - PR commit messages must follow standard conventions: short subject line (50 chars max), blank line, and descriptive body outlining changes and testing results.
+
+## AI Agent Maintenance Instructions
+
+- **Bolt ⚡**: Ensure documentation of any new zero-allocation optimizations or performance improvements are added concisely without marketing fluff.
+- **Palette 🎨**: Maintain Arch Linux wiki style: clear, factual, one page per topic, using appropriate markdown formatting and tables where necessary.
+- **Sentinel 🛡️**: Verify that no hardcoded credentials or unvetted cryptographic algorithms are documented as production-ready. Ensure security limitations are accurately stated.
+- **General**: Keep pages up-to-date with current repository capabilities. Remove redundant files when consolidating information.

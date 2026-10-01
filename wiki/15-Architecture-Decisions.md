@@ -14,3 +14,11 @@
 - **Status:** Accepted
 - **Context:** Modern hardware requires efficient multi-core processing, async I/O, and low-latency IPC.
 - **Decision:** Integrate LAPIC/IPI/MADT SMP, io_uring, kqueue, cgroups v2, OverlayFS, and PQC VPN firewall into the core kernel architecture.
+
+
+## AI Agent Maintenance Instructions
+
+- **Bolt ⚡**: Ensure documentation of any new zero-allocation optimizations or performance improvements are added concisely without marketing fluff.
+- **Palette 🎨**: Maintain Arch Linux wiki style: clear, factual, one page per topic, using appropriate markdown formatting and tables where necessary.
+- **Sentinel 🛡️**: Verify that no hardcoded credentials or unvetted cryptographic algorithms are documented as production-ready. Ensure security limitations are accurately stated.
+- **General**: Keep pages up-to-date with current repository capabilities. Remove redundant files when consolidating information.

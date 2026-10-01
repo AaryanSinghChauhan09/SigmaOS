@@ -182,3 +182,10 @@ SigmaOS development and maintenance are executed by 18 composite AI specialist a
 - **Test Pass Rate**: 100% (Verified via `./run_sigma_tests.sh`)
 - **Comparative Gap Analysis**: Documented in [`docs/OPEN_SOURCE_OS_COMPARATIVE_GAP_ANALYSIS.md`](../docs/OPEN_SOURCE_OS_COMPARATIVE_GAP_ANALYSIS.md).
 - **Wiki Synchronization**: Synchronized across `WIKI/`, `wiki/`, and `wiki_repo/` targets via `./scripts/sync_wiki.sh`.
+
+## AI Agent Maintenance Instructions
+
+- **Bolt ⚡**: Ensure documentation of any new zero-allocation optimizations or performance improvements are added concisely without marketing fluff.
+- **Palette 🎨**: Maintain Arch Linux wiki style: clear, factual, one page per topic, using appropriate markdown formatting and tables where necessary.
+- **Sentinel 🛡️**: Verify that no hardcoded credentials or unvetted cryptographic algorithms are documented as production-ready. Ensure security limitations are accurately stated.
+- **General**: Keep pages up-to-date with current repository capabilities. Remove redundant files when consolidating information.
