@@ -851,6 +851,9 @@ mod tests {
 
     // Mock WDM major function handlers
     fn mock_irp_read(device: &mut DEVICE_OBJECT, irp: &mut IRP) -> NTSTATUS {
+        if irp.user_buffer.is_null() {
+            return STATUS_UNSUCCESSFUL;
+        }
         irp.information = 8;
         unsafe {
             let buffer = core::slice::from_raw_parts_mut(irp.user_buffer as *mut u8, 8);
@@ -899,6 +902,9 @@ mod tests {
             _port: NDIS_PORT_NUMBER,
             _flags: ULONG,
         ) {
+            if nbl.is_null() {
+                return;
+            }
             unsafe {
                 let list = &*nbl;
                 assert_eq!(list.payload, b"NDIS_PACKET");
@@ -934,10 +940,16 @@ mod tests {
     fn test_storport_start_io() {
         static mut IO_DONE: bool = false;
         fn mock_start_io(_context: PVOID, srb: *mut SCSI_REQUEST_BLOCK) -> bool {
+            if srb.is_null() {
+                return false;
+            }
             unsafe {
                 let req = &*srb;
                 assert_eq!(req.function, 0x01); // Read
                 assert_eq!(req.cdb[5], 42); // Sector 42
+                if req.data_buffer.is_null() || req.data_transfer_length == 0 {
+                    return false;
+                }
                 let buffer = core::slice::from_raw_parts_mut(
                     req.data_buffer as *mut u8,
                     req.data_transfer_length as usize,

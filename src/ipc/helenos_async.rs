@@ -616,13 +616,9 @@ impl HelenIpcManager {
         }
 
         // Answer all unanswered messages with error
-        let messages_to_answer: Vec<_> = {
-            if let Some(answerbox) = self.answerboxes.values_mut().find(|a| a.task_id == task_id) {
-                answerbox.dispatched_queue.drain(..).collect()
-            } else {
-                Vec::new()
-            }
-        };
+        if let Some(answerbox) = self.answerboxes.values_mut().find(|a| a.task_id == task_id) {
+            let messages_to_answer: Vec<_> = answerbox.dispatched_queue.drain(..).collect();
+            let _ = answerbox;
 
         for mut msg in messages_to_answer {
             msg.method = 0xFFFFFFFFFFFFFFFE; // Error code
