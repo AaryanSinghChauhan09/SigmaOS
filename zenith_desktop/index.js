@@ -808,6 +808,47 @@ export function launchApp(appName) {
   }
 }
 
+let helpLastFocusedElement = null;
+
+export function toggleHelp() {
+  if (typeof document === "undefined") return;
+  const overlay = document.getElementById("help-overlay");
+  if (!overlay) return;
+
+  const isHidden = overlay.classList.contains("wizard-overlay--hidden");
+  if (isHidden) {
+    helpLastFocusedElement = document.activeElement;
+    overlay.setAttribute("role", "dialog");
+    overlay.setAttribute("aria-label", "Sovereign Desktop Help Matrix");
+    overlay.setAttribute("aria-modal", "true");
+    overlay.innerHTML = `
+      <div class="wizard-card">
+        <h2>⌨️ Zenith Shortcut Matrix</h2>
+        <p style="margin-bottom: 20px; color: var(--text-muted); font-size: 0.9rem;">Essential sovereign desktop keyboard shortcuts</p>
+        <div style="text-align: left; margin-bottom: 24px; display: grid; gap: 8px; font-size: 0.85rem;">
+          <div><strong>Alt + Space:</strong> Command Center</div>
+          <div><strong>Alt + F:</strong> Sovereign VFS Browser</div>
+          <div><strong>Alt + T:</strong> OmniShell Terminal</div>
+          <div><strong>Alt + S:</strong> Lattice System Settings</div>
+          <div><strong>F1 / ?:</strong> Help Matrix Dialog</div>
+          <div><strong>Escape:</strong> Dismiss Overlay / Palette</div>
+        </div>
+        <button type="button" class="wizard-btn" id="help-close-btn" onclick="toggleHelp()" aria-label="Close Help Matrix">Close</button>
+      </div>`;
+    overlay.classList.remove("wizard-overlay--hidden");
+    overlay.setAttribute("aria-hidden", "false");
+    const closeBtn = document.getElementById("help-close-btn");
+    if (closeBtn && typeof closeBtn.focus === "function") closeBtn.focus();
+  } else {
+    overlay.classList.add("wizard-overlay--hidden");
+    overlay.setAttribute("aria-hidden", "true");
+    if (helpLastFocusedElement && typeof helpLastFocusedElement.focus === "function") {
+      helpLastFocusedElement.focus();
+      helpLastFocusedElement = null;
+    }
+  }
+}
+
 if (typeof window !== "undefined") {
   window.closeWindow = closeWindow;
   window.maximizeWindow = maximizeWindow;
@@ -816,6 +857,7 @@ if (typeof window !== "undefined") {
   window.renderCommandResults = renderCommandResults;
   window.initCommandPalette = initCommandPalette;
   window.initWindowFocus = initWindowFocus;
+  window.toggleHelp = toggleHelp;
 }
 
 // Minimal dummy index file to export initialization and basic attributes
