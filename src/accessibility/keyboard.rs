@@ -191,7 +191,7 @@ impl StickyKeys for SimpleStickyKeys {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

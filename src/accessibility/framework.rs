@@ -352,7 +352,7 @@ impl Default for AccessibilityTestingHarness {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

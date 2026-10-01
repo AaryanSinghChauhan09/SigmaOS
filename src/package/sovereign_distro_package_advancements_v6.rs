@@ -46,7 +46,7 @@ use crate::package::universal::{PackageFormat, UnifiedPackage};
 pub mod universal;
 
 #[cfg(feature = "standalone_test")]
-pub use universal::{PackageError, UnifiedPackage};
+pub use universal::{PackageError, PackageFormat, UnifiedPackage};
 
 // =========================================================================
 // 1. Profile-Guided & Feedback-Driven Optimization Governor
