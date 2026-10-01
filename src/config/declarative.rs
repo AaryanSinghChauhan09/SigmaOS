@@ -152,20 +152,30 @@ impl SigmaOsConfig {
         }
     }
 
-    /// Parse config from a key=value format string
-    pub fn parse_config(config_str: &str) -> Self {
-        let mut cfg = Self::new();
-        for line in config_str.lines() {
-            let line = line.trim();
-            if let Some((key, value)) = line.split_once('=') {
-                let key = key.trim();
-                let value = value.trim().trim_matches('"');
-                match key {
-                    "hostname" => cfg.system.hostname = value.to_string(),
-                    "timezone" => cfg.system.timezone = value.to_string(),
-                    "compositor" => cfg.desktop.compositor = value.to_string(),
-                    _ => {} // Ignore unknown keys
-                }
+    pub fn add_module_to_active(&mut self, module: ConfigModule) {
+        if let Some(gen) = self
+            .generations
+            .iter_mut()
+            .find(|g| g.generation_id == self.active_generation_id)
+        {
+            gen.modules.push(module);
+        }
+    }
+
+    pub fn commit_atomic_generation(&mut self, timestamp: u64) -> u32 {
+        let new_id = self.generations.len() as u32 + 1;
+
+        let current_modules = self
+            .generations
+            .iter()
+            .find(|g| g.generation_id == self.active_generation_id)
+            .map(|g| g.modules.clone())
+            .unwrap_or_default();
+
+        let mut hash = [0u8; 32];
+        for (i, m) in current_modules.iter().enumerate() {
+            for &b in m.module_name.as_bytes() {
+                hash[i % 32] ^= b;
             }
         }
         cfg

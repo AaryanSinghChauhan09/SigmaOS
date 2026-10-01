@@ -2106,7 +2106,7 @@ impl SovereignWebPublisherEngine {
                 WebLayoutBlock::Header { title, subtitle } => {
                     html.push_str(&format!(
                         "<header><h1>{}</h1><p>{}</p></header>",
-                        escape_html(title), escape_html(subtitle)
+                        title, subtitle
                     ));
                 }
                 WebLayoutBlock::Paragraph { content } => {
@@ -2118,7 +2118,7 @@ impl SovereignWebPublisherEngine {
                 } => {
                     html.push_str(&format!(
                         "<div class=\"embed\"><h3>{}</h3><iframe src=\"{}\"></iframe></div>",
-                        escape_html(doc_title), escape_html(embed_url)
+                        doc_title, embed_url
                     ));
                 }
                 WebLayoutBlock::Image { src_url, alt_text } => {

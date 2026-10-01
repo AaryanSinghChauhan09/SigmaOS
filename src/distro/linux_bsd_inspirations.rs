@@ -360,7 +360,7 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => {
                 ServiceSupervisorType::Smf
             }
-            DistroSubsystemMode::SmartOs | DistroSubsystemMode::NetBsdRump | DistroSubsystemMode::SolarisSmartOS => {
+            DistroSubsystemMode::SmartOs | DistroSubsystemMode::NetBsdRump => {
                 ServiceSupervisorType::Rcd
             }
         }
@@ -562,12 +562,20 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxGuix
             | DistroSubsystemMode::LinuxTalos => supervisor == ServiceSupervisorType::Shepherd,
 
-                DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
-                DistroSubsystemMode::LinuxSlackware => {
-                    supervisor == ServiceSupervisorType::Sysvinit
-                }
-                DistroSubsystemMode::SmartOs | DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Rcd,
-            };
+            DistroSubsystemMode::LinuxSolus
+            | DistroSubsystemMode::LinuxChimera
+            | DistroSubsystemMode::LinuxSerpentOS => supervisor == ServiceSupervisorType::Dinit,
+            DistroSubsystemMode::LinuxSlackware
+            | DistroSubsystemMode::LinuxTinyCore
+            | DistroSubsystemMode::LinuxSlax
+            | DistroSubsystemMode::LinuxPuppy => supervisor == ServiceSupervisorType::Sysvinit,
+            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => {
+                supervisor == ServiceSupervisorType::Smf
+            }
+            DistroSubsystemMode::SmartOs | DistroSubsystemMode::NetBsdRump => {
+                supervisor == ServiceSupervisorType::Rcd
+            }
+        };
         supervisor_valid && !pkg_spec.is_empty() && !vfs_etc.is_empty()
     }
 
@@ -1551,24 +1559,179 @@ impl SovereignUniversalDistroBridge {
 
     pub fn synchronize_all_distro_subsystems(&mut self) -> Result<usize, &'static str> {
         let subsystems = [
-            "access", "accessibility", "ai", "app", "arch", "arch_kernel", "audio", "audit", "auth",
-            "automation", "backup", "bin", "bluetooth", "boot", "buddy", "buildfarm", "camera", "cloud",
-            "cluster", "community", "compatibility", "compiler", "compliance", "compositor", "compression", "config", "container",
-            "containers", "core", "crash", "crypto", "customization", "dashboard", "debugger", "desktop",
-            "dev", "device", "diagnostics", "display", "distro", "distro_innovations", "distro_inspirations", "docs", "driver", "drivers", "ecosystem",
-            "edge", "education", "embedded", "event", "expanded_wiki_innovations", "extended_distro_matrix", "filesystem", "finance", "fingerprint", "firewall", "fs",
-            "functions", "futuristic", "futuristic_modules", "gamepad", "gap_closure", "governance", "gpu", "graphics", "hal", "hardware", "i18n", "init",
-            "innovation", "input", "installer", "integration", "interop_gateway", "interrupt", "iot", "ipc", "iso",
-            "kernel", "klib", "lang", "launch_ready", "launcher", "legal", "linuxmint_inspirations", "loader", "location",
-            "logging", "media", "memory", "microphone", "ml", "mm", "monitor", "monitoring",
-            "net", "network", "networking", "nim", "nlp", "notification", "observability", "obsoletion", "onboarding",
-            "open_source_obsoletion", "open_source_os_gap_closure", "orchestration", "package", "performance", "phase_l_plans", "pillars", "pledge", "plugin", "power", "print", "printing", "privacy",
-            "process", "productivity", "provisioning", "recovery", "release", "remote", "resilience", "resource",
-            "robotics", "rt", "runtime", "saver", "scheduler", "scientific", "secure", "security", "sensor",
-            "shell", "sigma-boot", "sigma_sandbox", "sigma_validation", "signal", "sigpkg", "slab", "smartcard", "sovereign_wiki_master_engine", "storage",
-            "subsystem_sync", "super_matrix", "support", "syscall", "system", "tech_media_reexports", "telemetry", "testing", "theming", "thermal", "thread", "time",
-            "timeline_innovations", "timer", "toolchain", "tools", "touchscreen", "tpm", "tracing", "ui", "unimplemented_features", "unimplemented_tools", "universal_distro_super_matrix", "update",
-            "usb", "userland", "userspace", "vfs", "virt", "virtualization", "vm", "wiki", "wiki_distro_ideas_deployment", "wiki_ideas", "wiki_unimplemented_ideas", "wireless", "workflow",
+            "access",
+            "accessibility",
+            "ai",
+            "app",
+            "arch",
+            "arch_kernel",
+            "audio",
+            "audit",
+            "auth",
+            "automation",
+            "backup",
+            "bin",
+            "bluetooth",
+            "boot",
+            "buddy",
+            "buildfarm",
+            "camera",
+            "cloud",
+            "cluster",
+            "community",
+            "compatibility",
+            "compiler",
+            "compliance",
+            "compositor",
+            "compression",
+            "config",
+            "container",
+            "containers",
+            "core",
+            "crash",
+            "crypto",
+            "customization",
+            "dashboard",
+            "debugger",
+            "desktop",
+            "dev",
+            "device",
+            "diagnostics",
+            "display",
+            "distro",
+            "distro_innovations",
+            "distro_inspirations",
+            "docs",
+            "driver",
+            "drivers",
+            "ecosystem",
+            "edge",
+            "education",
+            "embedded",
+            "event",
+            "expanded_wiki_innovations",
+            "extended_distro_matrix",
+            "filesystem",
+            "finance",
+            "fingerprint",
+            "firewall",
+            "fs",
+            "functions",
+            "futuristic",
+            "futuristic_modules",
+            "gamepad",
+            "gap_closure",
+            "governance",
+            "gpu",
+            "graphics",
+            "hal",
+            "hardware",
+            "i18n",
+            "init",
+            "innovation",
+            "input",
+            "installer",
+            "integration",
+            "interop_gateway",
+            "interrupt",
+            "iot",
+            "ipc",
+            "iso",
+            "kernel",
+            "klib",
+            "lang",
+            "launch_ready",
+            "launcher",
+            "legal",
+            "linuxmint_inspirations",
+            "loader",
+            "location",
+            "logging",
+            "media",
+            "memory",
+            "microphone",
+            "ml",
+            "mm",
+            "monitor",
+            "monitoring",
+            "net",
+            "network",
+            "networking",
+            "nim",
+            "nlp",
+            "notification",
+            "observability",
+            "obsoletion",
+            "onboarding",
+            "open_source_obsoletion",
+            "open_source_os_gap_closure",
+            "orchestration",
+            "package",
+            "performance",
+            "phase_l_plans",
+            "pillars",
+            "pledge",
+            "plugin",
+            "power",
+            "print",
+            "printing",
+            "privacy",
+            "process",
+            "productivity",
+            "provisioning",
+            "recovery",
+            "release",
+            "remote",
+            "resilience",
+            "resource",
+            "robotics",
+            "rt",
+            "runtime",
+            "saver",
+            "scheduler",
+            "scientific",
+            "secure",
+            "security",
+            "sensor",
+            "shell",
+            "sigma-boot",
+            "sigma_sandbox",
+            "sigma_validation",
+            "signal",
+            "sigpkg",
+            "slab",
+            "smartcard",
+            "storage",
+            "support",
+            "syscall",
+            "system",
+            "tech_media_reexports",
+            "telemetry",
+            "testing",
+            "theming",
+            "thermal",
+            "thread",
+            "time",
+            "timeline_innovations",
+            "timer",
+            "toolchain",
+            "tools",
+            "touchscreen",
+            "tpm",
+            "tracing",
+            "ui",
+            "update",
+            "usb",
+            "userland",
+            "userspace",
+            "vfs",
+            "virt",
+            "virtualization",
+            "vm",
+            "wiki",
+            "wiki_distro_ideas_deployment",
+            "wireless",
+            "workflow",
             "zig",
         ];
 
@@ -8394,18 +8557,11 @@ impl SovereignSystemdHomedAuthBridge {
         }
     }
 
-    pub fn set_credential_provider(&mut self, provider: &str) {
-        self.credential_provider = Some(provider.to_string());
-    }
-
     pub fn authenticate_and_mount(
         &mut self,
         username: &str,
         password: &str,
     ) -> Result<&'static str, &'static str> {
-        if self.credential_provider.is_none() {
-            return Err("No credential provider registered");
-        }
         if username.is_empty() || password.is_empty() {
             return Err("Invalid credentials");
         }

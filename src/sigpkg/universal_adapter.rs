@@ -114,16 +114,6 @@ pub enum AdapterError {
 use crate::sigpkg::universal_oop_system::UniversalPackageManager;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-/// Debian-style package priority levels (DFSG and APT standard)
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum PackagePriority {
-    Optional = 0,
-    Standard = 1,
-    Important = 2,
-    Required = 3,
-    Essential = 4, // Systems block removing these (e.g. init, libc, kernel)
-}
-
 pub trait PackageFormatAdapter {
     fn format_name(&self) -> &str;
     fn parse_manifest(&self, raw: &[u8]) -> Result<Package, String>;
@@ -2408,15 +2398,15 @@ impl UniversalPmCommandDispatcher {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
-                        "-S" | "-Sy" | "install" | "-Sw" => operation = UniversalPmOperation::Install,
+                        "-S" | "-Sy" | "install" => operation = UniversalPmOperation::Install,
                         "-R" | "-Rns" | "-Rs" | "remove" => {
                             operation = UniversalPmOperation::Remove
                         }
                         "-Syu" | "-Syyu" | "update" | "upgrade" => {
                             operation = UniversalPmOperation::Upgrade
                         }
-                        "-Ss" | "-Qs" | "-F" | "search" => operation = UniversalPmOperation::Search,
-                        "-Si" | "-Qi" | "-Q" | "-Qe" | "-Ql" | "-Qo" | "-Fl" | "-Fy" | "info" | "show" => {
+                        "-Ss" | "-Qs" | "search" => operation = UniversalPmOperation::Search,
+                        "-Si" | "-Qi" | "info" | "show" => {
                             operation = UniversalPmOperation::QueryInfo
                         }
                         "-Sc" | "-Scc" | "clean" => operation = UniversalPmOperation::CleanCache,

@@ -2,7 +2,8 @@ use core::sync::atomic::{AtomicU32, Ordering};
 use std::vec::Vec;
 
 use crate::filesystem::FsError;
-use super::{RunQueue, Task, SchedClass};
+use crate::kernel::sched::scheduler::{RunQueue, SchedClass};
+use crate::kernel::sched::Task;
 
 /// Multi-Level Feedback Queue (MLFQ) Scheduler
 ///

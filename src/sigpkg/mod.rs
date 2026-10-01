@@ -78,25 +78,62 @@ pub use universal_oop_system::*;
 pub mod verifier;
 pub mod zero_alloc_resolver;
 
-pub use zero_alloc_resolver::{
-    PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES,
-};
-pub use universal_adapter::{
-    PackageFormatAdapter, AdapterError,
-};
-pub use universal_oop_system::{
-    DebAdapter, RpmAdapter, PacmanAdapter, ApkAdapter, NixAdapter, EbuildAdapter, UniversalPackageManager,
+pub use crate::package::sovereign_distro_package_matrix::*;
+
+#[path = "../package/sovereign_distro_package_advancements_v3.rs"]
+pub mod sovereign_distro_package_advancements_v3;
+pub use sovereign_distro_package_advancements_v3::*;
+
+#[path = "../package/sovereign_package_smp_engine.rs"]
+pub mod sovereign_package_smp_engine;
+pub use sovereign_package_smp_engine::*;
+
+#[path = "../package/sovereign_distro_package_advancements_v4.rs"]
+pub mod sovereign_distro_package_advancements_v4;
+pub use sovereign_distro_package_advancements_v4::*;
+
+#[path = "../package/sovereign_distro_package_advancements_v5.rs"]
+pub mod sovereign_distro_package_advancements_v5;
+pub use sovereign_distro_package_advancements_v5::*;
+
+#[path = "../package/sovereign_distro_package_advancements_v6.rs"]
+pub mod sovereign_distro_package_advancements_v6;
+pub use sovereign_distro_package_advancements_v6::*;
+#[path = "../package/sovereign_distro_package_advancements_v7.rs"]
+pub mod sovereign_distro_package_advancements_v7;
+pub use sovereign_distro_package_advancements_v7::*;
+
+#[path = "../package/bsd_linux_package_innovations.rs"]
+pub mod bsd_linux_package_innovations;
+pub use bsd_linux_package_innovations::{
+    AlpineApkWorldAndVirtualPkgEngine, AptBugReport, AptMarkRecord, AptMarkState,
+    ArchCachyosMicroarchOptimizationEngine, ArchSplitPackageHookRunnerEngine, CachedPackageFile,
+    CommunityPackageBuildSource, CommunityRepoBackend, CoprAurBuildRepositoryGatewayEngine,
+    DebconfPreseedEntry, DebconfQuestionType, DebianAptMarkPackageStateGovernor,
+    DebianDebconfStatoverrideEngine, DebianDpkgTriggersAptListbugsGuardEngine, DnfActionKind,
+    DnfActionRecord, DnfTransactionItem, DpkgStatoverrideRule, DpkgTrigger, DpkgTriggerKind,
+    DragonFlyDportsHammer2SnapshotEngine, EbuildSlotRecord, FedoraDnf5AdvisoryAndDeltaRpmEngine,
+    FedoraDnfHistoryRollbackJournalEngine, FlakeInputLock, FreeBsdPortsFlavoursAndVuxmlEngine,
+    GentooPortageEapiSlotOperatorEngine, GentooPortageSubslotAndUseExpandEngine,
+    HaikuHpkgPackageFsEngine, Hammer2PfsSnapshot, MicroarchRepoRoute, MicroarchitectureLevel,
+    NetBsdPkginBinaryDatabaseEngine, NetBsdPkgsrcOptionsFrameworkEngine,
+    NixFlakesDevshellResolverEngine, NixGuixCasGcProfileEngine, OpenBsdPkgAddSignifyEngine,
+    OpenSuseZypperVendorStickinessEngine, PkgSummaryRecord, PkgsrcOptionSpec, PortageEapiLevel,
+    PpaRepository, RestrictedPackageSpec, SlackBuildInfo, SlackPackageRecord,
+    SlackwarePkgtoolSlackBuildEngine, SlotOperator, UbuntuPpaAptPinningEngine,
+    XbpsRestrictedNonFreeLicenseEngine, XbpsSonameAndOrphanEngine, ZypperPackageOffer,
+    ZypperRepository,
 };
 pub use sovereign_sigpkg::*;
 pub use universal_adapter::{
-    AppImageContainer, FlatpakManifest, MappedScriptletHook, PackageFormatAdapter,
-    PackagePriority, PacmanPkgbuild, RpmSpecManifest, SigmaPkgHookType, SnapcraftManifest,
-    UniversalDependencyMapper, UniversalDryRunResult, UniversalDryRunSimulator,
-    UniversalFormatConverter, UniversalPackageAdapter, UniversalScriptletConverter,
+    AppImageContainer, AptDebManifest, DispatchedPmAction, FlatpakManifest, FreeBsdUclManifest,
+    MappedScriptletHook, NetBsdPkgsrcManifest, OpenBsdContentsManifest, PackageFormatAdapter,
+    PackagePriority, PacmanPkgbuild, RpmSpecManifest, SigPkgUniversalBridgeEngine,
+    SigmaPkgHookType, SlackwarePkgManifest, SnapcraftManifest, UniversalDependencyMapper,
+    UniversalDryRunResult, UniversalDryRunSimulator, UniversalFormatConverter,
+    UniversalPackageAdapter, UniversalPmCommandDispatcher, UniversalPmOperation,
+    UniversalScriptletConverter, ZypperSpecManifest,
 };
-
-pub use crate::package::sovereign_pr_package_gateway::SovereignUniversalPrGatewayEngine;
-pub use crate::package::sovereign_universal_pm_pr_bridge::SovereignUniversalPmPrBridgeEngine;
 pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
 
 pub use alpine_apk_engine::{AlpineCommunityRepo, ApkIndexParser, ApkPackage};

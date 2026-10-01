@@ -2,7 +2,6 @@
 // SigmaOS SVN-to-Git Migration & Reproducible Package Builder Subsystem
 // Native Rust implementation of Arch Linux svntogit and Reproducible Builds parity
 
-
 extern crate alloc;
 
 use alloc::format;

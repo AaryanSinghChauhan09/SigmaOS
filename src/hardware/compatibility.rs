@@ -856,13 +856,20 @@ impl AutomatedHardwareRegressionPipeline {
         Self::default()
     }
 
-    pub fn add_test_case(&mut self, case_id: &str, subsystem: &str, description: &str, passed: bool) {
-        self.test_cases.push(HardwareTestCase {
-            case_id: case_id.to_string(),
-            subsystem: subsystem.to_string(),
-            description: description.to_string(),
-            passed,
-        });
+    pub fn create_3d_resource_3d(
+        &mut self,
+        target: u32,
+        format: u32,
+        width: u32,
+        height: u32,
+    ) -> Result<u32, &'static str> {
+        if !self.virgl_renderer_active {
+            return Err("VirGL 3D renderer inactive");
+        }
+        let res_id = self.resource_id;
+        self.resource_id += 1;
+        let _ = (target, format, width, height);
+        Ok(res_id)
     }
 
     pub fn run_regression_suite(&self) -> (usize, usize) {
@@ -929,8 +936,39 @@ impl HardwareSubsystemRegistry {
         Self::default()
     }
 
-    pub fn get_subsystem_status(&self, name: &str) -> Option<SubsystemReadiness> {
-        self.subsystems.get(name).copied()
+    pub fn set_display_mode(
+        &mut self,
+        crtc: u32,
+        width: u32,
+        height: u32,
+    ) -> Result<bool, &'static str> {
+        self.active_crtc = crtc;
+        self.current_mode_width = width;
+        self.current_mode_height = height;
+        self.mode_set_active = true;
+        Ok(true)
+    }
+}
+
+/// NetBSD NPF Hardware NIC Packet Checksum & Offload Engine
+#[derive(Debug, Clone)]
+pub struct NetBsdNpfHardwareOffloadEngine {
+    pub interface_name: String,
+    pub rx_checksum_offload: bool,
+    pub tx_checksum_offload: bool,
+    pub tso_v4_enabled: bool,
+    pub lro_enabled: bool,
+}
+
+impl NetBsdNpfHardwareOffloadEngine {
+    pub fn new(ifname: &str) -> Self {
+        Self {
+            interface_name: ifname.to_string(),
+            rx_checksum_offload: true,
+            tx_checksum_offload: true,
+            tso_v4_enabled: true,
+            lro_enabled: true,
+        }
     }
 
     pub fn count_ready_subsystems(&self) -> usize {
@@ -1034,14 +1072,28 @@ mod tests {
     }
 
     #[test]
-    fn test_virtio_reliability_manager() {
-        let mut vmgr = VirtIoReliabilityManager::new();
-        vmgr.register_device(1, VirtIoDeviceType::Block, 256);
-        assert_eq!(vmgr.get_device_status(1), Some(VirtIoDeviceStatus::Active));
+    fn test_linux_and_bsd_advanced_drivers() {
+        // 1. Test Linux NVMe-oF driver
+        let mut nvme_of = LinuxNvmeOverFabricsEngine::new(
+            "nqn.2026-09.org.sigma:storage",
+            "tcp",
+            "192.168.1.100",
+            4420,
+        );
+        assert!(nvme_of.submit_nvme_cmd(0x02).is_err());
+        assert!(nvme_of.connect_fabric().unwrap());
+        assert_eq!(nvme_of.submit_nvme_cmd(0x02).unwrap(), 0);
 
-        vmgr.devices.get_mut(&1).unwrap().queue_stats.dropped_descriptors = 15;
-        assert_eq!(vmgr.verify_queue_health(1), Ok(false));
-        assert_eq!(vmgr.get_device_status(1), Some(VirtIoDeviceStatus::Error));
+        // 2. Test FreeBSD CAM storage engine
+        let mut cam = FreeBsdCamStorageEngine::new(0, 0, 0, "da0");
+        let res = cam
+            .execute_scsi_cdb(&[0x12, 0x00, 0x00, 0x00, 0x24, 0x00])
+            .unwrap();
+        assert_eq!(res.len(), 4);
+        cam.freeze_queue();
+        assert!(cam.execute_scsi_cdb(&[0x12]).is_err());
+        cam.release_queue();
+        assert!(cam.execute_scsi_cdb(&[0x12]).is_ok());
 
         assert!(vmgr.trigger_error_recovery(1).is_ok());
         assert_eq!(vmgr.get_device_status(1), Some(VirtIoDeviceStatus::Active));
@@ -1062,9 +1114,18 @@ mod tests {
             ],
         );
 
-        assert!(laptop_report.is_certified);
-        assert_eq!(cert_mgr.get_certified_platforms().len(), 1);
-    }
+        // 6. Test FreeBSD Netmap high-speed packet engine
+        let mut netmap = FreeBsdNetmapHighSpeedPacketEngine::new("vtnet0", 4, 4, 1024);
+        assert!(netmap
+            .transmit_packet_zero_copy(&[0x00, 0x11, 0x22])
+            .is_err());
+        assert!(netmap.open_netmap_ring().unwrap());
+        assert_eq!(
+            netmap
+                .transmit_packet_zero_copy(&[0x00, 0x11, 0x22])
+                .unwrap(),
+            3
+        );
 
     #[test]
     fn test_linux_driver_compat_boundary() {

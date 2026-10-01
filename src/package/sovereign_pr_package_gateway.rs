@@ -164,29 +164,10 @@ impl SovereignUniversalPrGatewayEngine {
                 PullRequestPackageFormat::FlatpakApp => PackageFormat::Flatpak,
                 PullRequestPackageFormat::SnapPackage => PackageFormat::Snap,
                 PullRequestPackageFormat::AppImage => PackageFormat::AppImage,
-                PullRequestPackageFormat::ZypperSpec
-                | PullRequestPackageFormat::OpenSuseZypperSpec => PackageFormat::Zypper,
+                PullRequestPackageFormat::ZypperSpec => PackageFormat::Zypper,
                 PullRequestPackageFormat::EopkgSpec | PullRequestPackageFormat::SolusEopkg => {
                     PackageFormat::Eopkg
                 }
-                PullRequestPackageFormat::MossPackage | PullRequestPackageFormat::SolusMossSpec => {
-                    PackageFormat::Moss
-                }
-                PullRequestPackageFormat::HaikuHpkg
-                | PullRequestPackageFormat::HaikuPackagefsSpec => PackageFormat::Hpkg,
-                PullRequestPackageFormat::BedrockLinuxStratumSpec => PackageFormat::Stratum,
-                PullRequestPackageFormat::TczPackage
-                | PullRequestPackageFormat::TinyCoreTczExtension => PackageFormat::Tcz,
-                PullRequestPackageFormat::GoboPackage
-                | PullRequestPackageFormat::GoboLinuxRecipeSpec => PackageFormat::Gobo,
-                PullRequestPackageFormat::CportsPackage
-                | PullRequestPackageFormat::ChimeraLinuxCportsSpec => PackageFormat::Cports,
-                PullRequestPackageFormat::FreeBsdPoudriereSpec => PackageFormat::Ports,
-                PullRequestPackageFormat::OpenBsdSignifyPortsSpec => PackageFormat::OpenBsdPkg,
-                PullRequestPackageFormat::NetBsdPkgsrcRumpSpec => PackageFormat::Pkgsrc,
-                PullRequestPackageFormat::ClearBundle
-                | PullRequestPackageFormat::SwupdBundle
-                | PullRequestPackageFormat::ClearLinuxSwupdSpec => PackageFormat::Swupd,
                 PullRequestPackageFormat::OpenWrtIpk | PullRequestPackageFormat::IpkPackage => {
                     PackageFormat::Ipk
                 }
@@ -210,6 +191,7 @@ impl SovereignUniversalPrGatewayEngine {
                 PullRequestPackageFormat::MacOsHomebrewBottle => PackageFormat::Bottle,
                 PullRequestPackageFormat::SlackwareSlackBuild
                 | PullRequestPackageFormat::SlackwareTxz => PackageFormat::TarGz,
+                PullRequestPackageFormat::HaikuHpkg => PackageFormat::Pkg,
                 PullRequestPackageFormat::NativeSigPkg => PackageFormat::SigmaPkg,
                 PullRequestPackageFormat::QemuQcow2VmImage
                 | PullRequestPackageFormat::RawDiskVmImage

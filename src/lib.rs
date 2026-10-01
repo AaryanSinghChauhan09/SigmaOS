@@ -25,6 +25,7 @@ pub mod distro;
 pub use distro::sovereign_linux_bsd_wiki_master_engine::*;
 pub mod driver;
 pub mod drivers;
+pub use drivers::sovereign_comprehensive_drivers::*;
 pub mod crypto;
 pub mod filesystem;
 pub mod futuristic_modules;
@@ -55,7 +56,10 @@ pub use filesystem::{
     SovereignFscryptAutofsEngine, SovereignMultiDistroFhsHierarchyEngine,
     SyntheticProcSysfsProvider,
 };
-pub use package::{SovereignUniversalPackageFormatMasterEngine, UniversalPackageFormatKind};
+pub use package::{
+    SovereignDistroPackageAdvancementsSuiteV8, SovereignUniversalPackageFormatMasterEngine,
+    UniversalPackageFormatKind,
+};
 pub use sigpkg::{
     SovereignUniversalPackageManagerInteropEngine, SovereignUniversalPackageTranslationBridge,
 };
@@ -85,19 +89,8 @@ pub use process::{
     SovereignProcess, SovereignProcessManager, SovereignProcessState, SubreaperProcessEntry,
     WaitStatus, ZeroCopyIpcChannel, WCONTINUED, WNOHANG, WUNTRACED,
 };
-pub mod linuxmint_inspirations;
-pub use linuxmint_inspirations::{
-    AppTheme, BulkyRenamer, CaptainInstaller, CaptainSource, ConfigBackend, DebPackage,
-    DesktopIconFlags, DiagnosticField, FsFormat, HypnotixIptvPlayer, IsolationMode, IptvProvider,
-    LanPeer, LanWarpEngine, MintConfigHub, MintDesktopEngine, MintLocaleEngine, MintMenuEngine,
-    MintMenuItem, MintNannyFilter, MintReportDiagnostics, MintStickFormatter, MintStickIsoVerifier,
-    MintUpgradeEngine, MintUpgradePhase, MintWelcomeFlow, NannyDecision, PartitionScheme,
-    ProviderType, RenameConflict, RenameRule, RenamedFile, RequestIncoming, SessionControlAction,
-    StickyNote, StickyNotesManager, ThingyEntry, ThingyKind, ThingyRecentDocs, TransferOutcome,
-    TransferRequest, TvChannel, UsbDevice, WARP_AUTH_PORT, WARP_MDNS_UDP_PORT, WARP_TRANSFER_PORT,
-    WebEngineKind, Webapp, WebappManager, WelcomeStep, XAppImageViewer, XAppStatusIconBadgeManager,
-    XAppTextEditor, XAppThemeEngine, XAppTrayBadge,
-};
+pub mod access;
+pub mod open_source_obsoletion;
 pub mod tools;
 pub use distro::additional_linux_bsd_components::*;
 pub use distro::sovereign_2050_distro_supremacy_engine::*;

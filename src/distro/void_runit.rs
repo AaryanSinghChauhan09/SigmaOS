@@ -5,11 +5,9 @@
  * health checking, and automatic restart policy governance.
  */
 
-extern crate alloc;
-
-use alloc::collections::BTreeMap;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::String;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum RunitStage {

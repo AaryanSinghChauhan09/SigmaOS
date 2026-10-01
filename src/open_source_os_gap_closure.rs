@@ -6011,14 +6011,6 @@ impl OpenSourceProjectSupremacySuite {
             1_000_000_000_000,
         );
 
-        let mut katran_engine = SovereignKatranL4LoadBalancerEngine::new("10.0.0.100", 80, 101);
-        katran_engine.register_backend(101, "192.168.1.10", 8080, 10);
-        katran_engine.register_backend(102, "192.168.1.11", 8080, 10);
-
-        let mut cilium_guard = SovereignCiliumEbpfEncryptionGuard::new(CiliumEncryptionMode::WireGuard);
-        cilium_guard.register_security_identity(1001, &["app=web", "env=prod"]);
-        cilium_guard.register_security_identity(2002, &["app=db", "env=prod"]);
-
         Self {
             amnesic_active: true,
             stateless_factory_path: String::from("/usr/share/factory/etc"),

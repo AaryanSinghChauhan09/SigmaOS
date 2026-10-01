@@ -78,7 +78,7 @@ pub enum CryptoError {
     KeyNotFound = 1,
     EncryptionFailed = 2,
     InvalidKey = 3,
-    CryptoUnavailable = 99,}
+}
 
 pub struct SimpleEncryptionService {
     keys: Vec<Option<Box<dyn EncryptionKey>>>,

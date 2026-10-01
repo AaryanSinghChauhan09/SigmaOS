@@ -479,83 +479,99 @@ pub enum PackagePriority {
 /// Supported package formats across Linux and BSD ecosystems
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum PackageFormat {
-    Deb,        // apt/dpkg
-    Rpm,        // yum/dnf/zypper
-    Pacman,     // pacman/pkgbuild
-    Snap,       // snap/squashfs
-    Flatpak,    // flatpak sandbox
-    AppImage,   // AppImage single-file container
-    SigmaPkg,   // native SigmaOS format
-    Air,        // Adobe AIR (.air)
-    Bottle,     // Homebrew Bottle (.bottle)
-    Ipa,        // iOS App (.ipa)
-    Ports,      // BSD Ports (.ports)
-    Pkg,        // macOS / BSD / Solaris PKG (.pkg)
-    Aab,        // Android App Bundle (.aab)
-    Apk,        // Android Package / Alpine Package (.apk)
-    Eopkg,      // Solus eopkg (.eopkg)
-    Nixpkg,     // Nix store package (.nixpkg)
-    Ebuild,     // Gentoo ebuild (.ebuild / .portage)
-    TarGz,      // Compressed Tar (.tar.gz, .tgz)
-    Xz,         // Compressed XZ archive (.xz, .tar.xz)
-    App,        // macOS App bundle (.app)
-    Hap,        // HarmonyOS Ability Package (.hap)
-    Pisi,       // Pardus / Solus PiSi (.PiSi)
-    Superdeb,   // Deepin Superdeb (.superdeb)
-    Lzm,        // Slax Linux Module (.lzm)
-    Pup,        // Puppy Linux Package (.pup)
-    Pet,        // Puppy Extra Tarball (.pet)
-    Tar,        // Plain tarball (.tar)
-    Xbps,       // Void Linux (.xbps)
-    Zypper,     // OpenSUSE Zypper (.zypper)
-    Guix,       // GNU Guix (.guix / .scm)
-    Moss,       // Solus Moss (.moss)
-    Hpkg,       // Haiku Package (.hpkg)
-    Tcz,        // Tiny Core Linux (.tcz)
-    Gobo,       // GoboLinux (.gobo)
-    Ostree,     // OSTree commit (.commit)
-    Pkgsrc,     // NetBSD pkgsrc (.pkgsrc)
-    Sfs,        // SquashFS (.sfs)
-    Puk,        // Portable Package (.puk)
-    Dmg,        // macOS Disk Image (.dmg)
-    Cports,     // Chimera Linux (.cports)
-    Cachy,      // CachyOS Package (.cachy)
-    Nix,        // Nix expression / package (.nix)
-    Txz,        // Slackware/FreeBSD txz package (.txz)
-    CachyOS,    // CachyOS (.cachyos)
-    Swupd,      // Clear Linux swupd (.swupd)
-    Starling,   // Starling format (.starling)
-    Dports,     // DragonFly BSD DPorts (.dports)
-    SlackBuild, // Slackware SlackBuild (.slackbuild / .tlz / .tbz)
-    Crux,       // CRUX Linux (.crux / .pkgfile)
-    Drpm,       // Delta RPM (.drpm)
-    Stratum,    // Bedrock Linux Stratum (.stratum)
-    OpenBsdPkg,
-    FreeBsdPkg,
-    NetBsdPkgsrc,
-    MacOsApp,
-    WindowsMsi,
-    AndroidApk,
-    IosIpa,
-    Wheel,
-    SolarisIps,
-    Opkg,
-    Nupkg,
-    Gem,
-    Crate,
-    Vcpkg,
-    Conan,
-    Spack,
-    ZypperSpec,
-    Portage,
-    DnfRpm,
-    PacmanPkg,
-    AptDeb,
-    AlpineApk,
-    VoidXbps,
-    NativeSignedPkg,
-    OciContainer,
-    SystemdSysext,}
+    #[default]
+    Deb, // apt/dpkg
+    GuixNar,     // GNU Guix NAR archive (.nar)
+    OpenBsdPkg,  // OpenBSD pkg_add (.tgz / .pkg)
+    Ipk,         // Opkg / OpenWrt (.ipk)
+    Opkg,        // Opkg package manager (.opkg / .ipk)
+    SolarisIps,  // Solaris IPS package (.p5p / .pkg)
+    Rpm,         // yum/dnf/zypper
+    Pacman,      // pacman/pkgbuild
+    Snap,        // snap/squashfs
+    Flatpak,     // flatpak sandbox
+    AppImage,    // AppImage single-file container
+    SigmaPkg,    // native SigmaOS format
+    Air,         // Adobe AIR (.air)
+    Bottle,      // Homebrew Bottle (.bottle)
+    Ipa,         // iOS App (.ipa)
+    Ports,       // BSD Ports (.ports)
+    Pkg,         // macOS / BSD / Solaris PKG (.pkg)
+    Aab,         // Android App Bundle (.aab)
+    Apk,         // Android Package / Alpine Package (.apk)
+    Eopkg,       // Solus eopkg (.eopkg)
+    Nixpkg,      // Nix store package (.nixpkg)
+    Ebuild,      // Gentoo ebuild (.ebuild / .portage)
+    TarGz,       // Compressed Tar (.tar.gz, .tgz)
+    Xz,          // Compressed XZ archive (.xz, .tar.xz)
+    App,         // macOS App bundle (.app)
+    Hap,         // HarmonyOS Ability Package (.hap)
+    Pisi,        // Pardus / Solus PiSi (.PiSi)
+    Superdeb,    // Deepin Superdeb (.superdeb)
+    Lzm,         // Slax Linux Module (.lzm)
+    Pup,         // Puppy Linux Package (.pup)
+    Pet,         // Puppy Extra Tarball (.pet)
+    Tar,         // Plain tarball (.tar)
+    Xbps,        // Void Linux (.xbps)
+    Zypper,      // OpenSUSE Zypper (.zypper)
+    Guix,        // GNU Guix (.guix / .scm)
+    Moss,        // Solus Moss (.moss)
+    Hpkg,        // Haiku Package (.hpkg)
+    Tcz,         // Tiny Core Linux (.tcz)
+    Gobo,        // GoboLinux (.gobo)
+    Ostree,      // OSTree commit (.commit)
+    Pkgsrc,      // NetBSD pkgsrc (.pkgsrc)
+    Sfs,         // SquashFS (.sfs)
+    Puk,         // Portable Package (.puk)
+    Dmg,         // macOS Disk Image (.dmg)
+    Cports,      // Chimera Linux (.cports)
+    Cachy,       // CachyOS Package (.cachy)
+    Nix,         // Nix expression / package (.nix)
+    Txz,         // Slackware/FreeBSD txz package (.txz)
+    CachyOS,     // CachyOS (.cachyos)
+    Swupd,       // Clear Linux swupd (.swupd)
+    Starling,    // Starling format (.starling)
+    Dports,      // DragonFly BSD DPorts (.dports)
+    SlackBuild,  // Slackware SlackBuild (.slackbuild / .tlz / .tbz)
+    Crux,        // CRUX Linux (.crux / .pkgfile)
+    Drpm,        // Delta RPM (.drpm)
+    Stratum,     // Bedrock Linux Stratum (.stratum)
+    Apt,         // Debian APT (.deb)
+    Yum,         // RedHat YUM/RPM (.rpm)
+    Portage,     // Gentoo Portage (.ebuild)
+    TarXz,       // Compressed Tar.XZ archive (.tar.xz)
+    Sovereign,   // Sovereign package format (.sigpkg)
+    Spack,       // HPC Spack package (.spack)
+    Conan,       // C/C++ Conan package (.conan)
+    Wheel,       // Python Wheel package (.whl)
+    Crate,       // Rust Cargo Crate (.crate)
+    Gem,         // Ruby Gem package (.gem)
+    Nupkg,       // .NET NuGet package (.nupkg)
+    Vcpkg,       // C++ Vcpkg package (.vcpkg)
+    NarInfo,     // Nix NAR Info (.narinfo)
+    Sysupdate,   // systemd-sysupdate format (.sysupdate)
+    Msi,         // Windows MSI/MSIX/AppX (.msi, .msix, .appx)
+    Apex,        // Android APEX Module (.apex)
+    Conda,       // Conda Package (.conda, .tar.bz2)
+    Helm,        // Kubernetes Helm Chart (.helm)
+    Sysext,      // systemd-sysext System Extension (.sysext)
+    FlatpakRef,  // Flatpak ref bundle (.flatpakref)
+    Makeself,    // Makeself runnable installer (.run)
+    ZeroInstall, // ZeroInstall package (.zpk)
+    Kmod,        // Kernel Module package (.kmp, .kmod)
+    Jar,         // Java JAR package (.jar)
+    Npm,         // Node.js NPM package (.npm)
+    Phar,        // PHP Phar archive (.phar)
+    Cpan,        // Perl CPAN package (.cpan)
+    LuaRock,     // LuaRock package (.rock)
+    Hex,         // Elixir Hex package (.hex)
+    Cabal,       // Haskell Cabal package (.cabal)
+    JuliaPkg,    // Julia package (.jl)
+    CRan,        // R CRAN package (.rpkg)
+    Brew,        // Homebrew formula (.brew)
+    Wasm,        // WebAssembly component (.wasm)
+    Oci,         // OCI container image (.oci)
+}
 
 impl PackageFormat {
     pub fn from_filename(filename: &str) -> Option<Self> {
@@ -1975,14 +1991,6 @@ impl Default for PackageTriggerRegistry {
         Self::new()
     }
 }
-
-
-#[derive(Debug, Clone)]
-pub struct DistroRepoRecord {
-    pub distro_name: String,
-    pub url: String,
-}
-
 
 // =========================================================================
 // Multi-Distro Package Adapter Execution Pipeline

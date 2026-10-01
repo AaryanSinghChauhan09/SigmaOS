@@ -221,12 +221,15 @@ impl AddressSanitizer {
         let region = self.regions.get_mut(&address)
             .ok_or_else(|| format!("Address 0x{:x} not allocated", address))?;
 
-        // Mark shadow memory as freed
-        let start = region.base_address();
-        let total_size = region.size() + region.redzone_size() * 2;
-        for i in 0..total_size {
-            let addr = start + i as u64;
-            self.shadow_memory.insert(addr, ShadowState::Freed);
+    /// Find region by pointer
+    fn find_region_by_ptr(&self, ptr: u64) -> Result<u64, &'static str> {
+        for (&id, region) in &self.regions {
+            let data_start = region.start + self.redzone_size as u64;
+            let data_end = region.end - self.redzone_size as u64;
+
+            if ptr >= data_start && ptr < data_end {
+                return Ok(id);
+            }
         }
 
         region.deallocate();

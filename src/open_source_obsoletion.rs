@@ -3669,14 +3669,16 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             btop_monitor: SovereignBtopResourceMonitorEngine::new(),
             bcachefs,
             bpf_lsm: open_source_os_gap_closure::SovereignLinuxBpfLsmEngine::new(),
-            ghostty_terminal: open_source_os_gap_closure::SovereignGhosttyTextGridEngine::new(80, 24),
-            valgrind_debugger: open_source_os_gap_closure::SovereignValgrindMemoryDebuggerEngine::new(),
-            nebula_mesh: open_source_os_gap_closure::SovereignNebulaMeshVpnEngine::new("orchestrator_node", "10.200.0.1"),
-            syncthing_sync: SovereignSyncthingPeerSyncEngine::new("orchestrator_folder"),
-            keycloak_idp: SovereignKeycloakIdentityProvider::new("sovereign_realm"),
-            strace_tracer: SovereignStraceSyscallTracerEngine::new(),
-            glusterfs_store: SovereignGlusterFsDistributedEngine::new("vol_sovereign_sys", 2),
-            total_obsoleted_projects_count: 94,
+            ghostty_terminal: open_source_os_gap_closure::SovereignGhosttyTextGridEngine::new(
+                80, 24,
+            ),
+            valgrind_debugger:
+                open_source_os_gap_closure::SovereignValgrindMemoryDebuggerEngine::new(),
+            nebula_mesh: open_source_os_gap_closure::SovereignNebulaMeshVpnEngine::new(
+                "orchestrator_node",
+                "10.200.0.1",
+            ),
+            total_obsoleted_projects_count: 90,
         }
     }
 

@@ -3,10 +3,11 @@
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, manages rolling release upgrades,
 // parses ALPM hooks, builds initramfs with mkinitcpio, packages with makepkg, and executes ALPM transactions.
 
-extern crate alloc;
-use crate::klib::collections::HashMap;
-use crate::klib;
-use crate::klib::SigmaString;
+use std::format;
+use std::string::{String, ToString};
+
+use std::collections::HashMap;
+pub type SigmaString = String;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Version {
@@ -276,9 +277,7 @@ pub struct AlpmHookManager {
 
 impl AlpmHookManager {
     pub fn new() -> Self {
-        Self {
-            hooks: Vec::new(),
-        }
+        Self { hooks: Vec::new() }
     }
 
     pub fn add_hook(&mut self, hook: AlpmHook) {

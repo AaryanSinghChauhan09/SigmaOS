@@ -208,16 +208,6 @@ pub use historic_linux::{
     VintagePackageConverter, VintageVirtualizationSandbox,
 };
 
-pub use mate_betsy::{
-    MateBetsyCategory, MateBetsyPackage, MatePackagesBetsyEngine,
-};
-pub use mint_linux::{
-    CinnamonPreset, CinnamonThemeEngine, Mint4WinInstallationConfig, Mint4WinInstallerEngine,
-    MintAppMetadata, MintBackupTool, MintCinnamonStyling, MintDriverInfo, MintDriverManager,
-    MintReportAlert, MintReportAlertSeverity, MintReportSystem, MintSoftwareManager,
-    MintTimeshiftEngine, MintUpdateLevel, MintUpdateManager, MintUpdatePackage,
-    TimeshiftSystemRestorer,
-};
 pub use legacy_adapters::{
     BinaryCompatMatrix, KernelPersona, KernelPersonaVM, LegacyDriverAdapter, LegacyFSAdapter,
     LegacyProtocolAdapter, LibcVersion, SyscallAbi,

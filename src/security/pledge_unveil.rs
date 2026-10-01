@@ -191,29 +191,6 @@ impl UnveilSandbox {
             };
         }
 
-        // Use the most specific component boundary match; `/tmp-old` is not under `/tmp`.
-        if let Some((_, perm)) = self
-            .paths
-            .iter()
-            .filter(|(base, _)| {
-                path == base.as_str()
-                    || (path.starts_with(base.as_str())
-                        && (base.ends_with('/') || path.as_bytes().get(base.len()) == Some(&b'/')))
-            })
-            .max_by_key(|(base, _)| base.len())
-        {
-            return match permission {
-                UnveilPermission::Read => {
-                    *perm == UnveilPermission::Read || *perm == UnveilPermission::ReadWrite
-                }
-                UnveilPermission::Write => {
-                    *perm == UnveilPermission::Write || *perm == UnveilPermission::ReadWrite
-                }
-                UnveilPermission::Execute => *perm == UnveilPermission::Execute,
-                UnveilPermission::ReadWrite => *perm == UnveilPermission::ReadWrite,
-            };
-        }
-
         // Check parent path match
         for (unveiled_path, perm) in &self.paths {
             if path.starts_with(unveiled_path) {

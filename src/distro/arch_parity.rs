@@ -735,25 +735,10 @@ impl Default for ReflectorMirrorRanker {
     }
 }
 
-// =========================================================================
-// ARCH LINUX PARITY MATRIX SUBSYSTEM (PACMAN, SAT SOLVER, AUR, COREUTILS)
-// =========================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum VersionOp {
-    Eq,
-    Gt,
-    Lt,
-    Gte,
-    Lte,
-    Any,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Constraint {
-    pub package_name: String,
-    pub operator: VersionOp,
-    pub version: Option<String>,
+#[derive(Debug, Clone)]
+pub struct ArchChrootProfile {
+    pub target: String,
+    pub chroot_dir: String,
 }
 
 #[derive(Debug, Clone)]
@@ -770,6 +755,41 @@ pub struct DependencyResolverEngine {
 
 impl DependencyResolverEngine {
     pub fn new() -> Self {
+        let mut engine = Self {
+            profiles: Vec::new(),
+            is_cleanroom_active: true,
+        };
+        engine.profiles.push(ArchChrootProfile {
+            target: "extra-x86_64-build".to_string(),
+            chroot_dir: "/var/lib/archbuild/extra-x86_64".to_string(),
+        });
+        engine.profiles.push(ArchChrootProfile {
+            target: "multilib-build".to_string(),
+            chroot_dir: "/var/lib/archbuild/multilib".to_string(),
+        });
+        engine
+    }
+
+    pub fn build_in_chroot(&self, target: &str, pkg_name: &str) -> Result<String, &'static str> {
+        if let Some(prof) = self.profiles.iter().find(|p| p.target == target) {
+            Ok(format!(
+                "arch-nspawn {}/root pacman -Syu && build {}",
+                prof.chroot_dir, pkg_name
+            ))
+        } else {
+            Err("ArchCdevtoolsEngine: Unknown build target profile")
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ArchPkgctlEngine {
+    pub active_repos: Vec<String>,
+    pub repo_name: String,
+}
+
+impl ArchPkgctlEngine {
+    pub fn new(repo_name: &str) -> Self {
         Self {
             registered_packages: BTreeMap::new(),
             constraints: Vec::new(),
@@ -780,8 +800,11 @@ impl DependencyResolverEngine {
         self.registered_packages.insert(pkg.pkgname.clone(), pkg);
     }
 
-    pub fn add_constraint(&mut self, constraint: Constraint) {
-        self.constraints.push(constraint);
+    pub fn split_package_repo(&self, pkg_name: &str) -> String {
+        format!(
+            "https://gitlab.archlinux.org/archlinux/packaging/packages/{}.git",
+            pkg_name
+        )
     }
 
     pub fn resolve(&self, target_pkg: &str) -> Result<ResolutionPlan, &'static str> {
@@ -838,10 +861,13 @@ impl PacmanDatabaseEngine {
         }
     }
 
-    pub fn search(&self, query: &str) -> Vec<&PkgBuild> {
-        self.installed_packages
-            .values()
-            .filter(|p| p.pkgname.contains(query) || p.pkgdesc.contains(query))
+    pub fn search(&self, query: &str) -> Vec<&WikiArticle> {
+        let q = query.to_lowercase();
+        self.articles
+            .iter()
+            .filter(|a| {
+                a.title.to_lowercase().contains(&q) || a.content.to_lowercase().contains(&q)
+            })
             .collect()
     }
 

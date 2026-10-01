@@ -194,23 +194,10 @@ impl WikiDataTransferEngine {
         self.specifications.insert(filename.to_string(), spec);
     }
 
-    pub fn total_synced_specs(&self) -> u32 {
-        self.total_synced_to_wiki
-    }
-
     pub fn transfer_implemented_data_to_wiki(
         &mut self,
         filename: &str,
     ) -> Result<String, &'static str> {
-        if let Some(spec) = self.feature_specs.get_mut(filename) {
-            if !spec.is_fully_implemented {
-                return Err("WikiSync Error: Specification is not fully implemented yet");
-            }
-            spec.wiki_mirrored = true;
-            self.total_synced_to_wiki += 1;
-            return Ok(format!("wiki_repo/{}", spec.spec_name));
-        }
-
         if let Some(spec) = self.specifications.get_mut(filename) {
             if !spec.is_fully_implemented {
                 return Err("WikiSync Error: Specification is not fully implemented yet");
