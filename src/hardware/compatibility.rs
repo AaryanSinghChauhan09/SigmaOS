@@ -1109,3 +1109,21 @@ mod tests {
         assert!(registry.count_ready_subsystems() >= 20);
     }
 }
+
+// Stubs for hardware compatibility engines
+#[derive(Debug, Default)]
+pub struct FreeBsdCamStorageEngine;
+#[derive(Debug, Default)]
+pub struct FreeBsdNetmapHighSpeedPacketEngine;
+#[derive(Debug, Default)]
+pub struct LinuxNvmeOverFabricsEngine;
+#[derive(Debug, Default)]
+pub struct LinuxThunderboltDisplayPortTunnelEngine;
+#[derive(Debug, Default)]
+pub struct LinuxVirtioGpu3dVirglEngine;
+#[derive(Debug, Default)]
+pub struct NetBsdNpfHardwareOffloadEngine;
+#[derive(Debug, Default)]
+pub struct OpenBsdAmdGpuKmsEngine;
+#[derive(Debug, Default)]
+pub struct OpenBsdUvideoWebcamEngine;

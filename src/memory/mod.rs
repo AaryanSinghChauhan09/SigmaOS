@@ -38,6 +38,5 @@ pub use segmentation_paging::{
     RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, SegmentationPagingEngine,
     SpaceProtectionFlags, SystemControlRegisters,
 };
-pub use thp::{HugePageAllocation, HugePageSize, ThpManager, ThpPolicy, ThpStats};
 pub use tlb_associative::{AssociativeTlbCache, TlbAssociativityMode, TlbEntry, TlbPageFlags};
 pub use zone::{BsdZoneAllocator, Slab, Zone, ZoneStats};

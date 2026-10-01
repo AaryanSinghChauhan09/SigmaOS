@@ -180,8 +180,7 @@ pub use interrupt::{
     InterruptController, InterruptDescriptor, InterruptType, InterruptVector, IrqLine,
     IrqTriggerType,
 };
-pub use kptr_restrict::{
-    get_security_mitigations, DmesgRestrictLevel, KernelSecurityMitigations, KptrRestrictLevel,
+pub use kptr_restrict::{DmesgRestrictLevel,KptrRestrictLevel,
 };
 pub use scheduler::{
     CfsScheduler, Priority, ProcessState, ProcessTask, RtScheduler, SchedulerPolicy, ThermalState,

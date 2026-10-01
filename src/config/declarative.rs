@@ -119,7 +119,6 @@ pub struct SigmaOsConfig {
     pub security: SecurityConfig,
     pub kernel: KernelConfig,
     pub performance: PerformanceConfig,
-    pub generations: Vec<SystemGeneration>,
     pub active_generation_id: u32,}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
