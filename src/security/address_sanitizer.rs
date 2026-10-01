@@ -14,7 +14,8 @@ pub struct AsanRegion {
     redzone_size: usize,
     shadow_offset: u64,
     is_allocated: bool,
-}
+    pub start: u64,
+    pub end: u64,}
 
 impl AsanRegion {
     pub fn new(base_address: u64, size: usize, redzone_size: usize, shadow_offset: u64) -> Self {
@@ -110,7 +111,10 @@ pub struct AddressSanitizer {
     allocation_count: u64,
     deallocation_count: u64,
     error_count: u64,
-}
+    pub redzone_size: usize,
+    pub canary_seed: u64,
+    pub next_region_id: u64,
+    pub allocated: usize,}
 
 impl AddressSanitizer {
     pub fn new(config: AsanConfig) -> Self {

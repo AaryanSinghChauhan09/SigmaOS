@@ -105,7 +105,7 @@ pub enum UniversalDistroPackageFormat {
     ArchAuditVulnerability,
     ArchNamcapLinterReport,
     ArchMakepkgConfProfile,
-}
+    OpenBsdPorts,}
 
 impl UniversalDistroPackageFormat {
     pub fn as_str(&self) -> &'static str {
@@ -877,7 +877,8 @@ impl Default for SovereignUniversalPmPrBridgeEngine {
 // ============================================================================
 
 /// Foreign Package Metadata Converter Engine
-#[derive(Debug)]
+#[derive(Debug, Default)]
+pub struct LinuxBsdPackageFormatConverterEngine;
 
 impl LinuxBsdPackageFormatConverterEngine {
     /// Parses raw metadata content into a normalized `UniversalDistroPackageManifest`
@@ -992,7 +993,8 @@ pub fn translate_cli_command_to_pr_submission(
 }
 
 /// Automated PR Reviewer and Security Auditor
-#[derive(Debug)]
+#[derive(Debug, Default)]
+pub struct UniversalPmPrAutomatedReviewer;
 
 impl UniversalPmPrAutomatedReviewer {
     pub fn audit_pr_transaction(

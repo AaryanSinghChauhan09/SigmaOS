@@ -13,7 +13,7 @@ pub enum KptrRestrictLevel {
     Restricted = 1,
     /// Completely hide kernel pointers
     Hidden = 2,
-}
+    Strict,}
 
 impl KptrRestrictLevel {
     pub fn from_u32(value: u32) -> Self {
@@ -150,7 +150,7 @@ pub enum DmesgRestrictLevel {
     None = 0,
     /// Restrict to processes with CAP_SYSLOG
     Restricted = 1,
-}
+    Strict,}
 
 impl DmesgRestrictLevel {
     pub fn from_u32(value: u32) -> Self {
@@ -163,16 +163,6 @@ impl DmesgRestrictLevel {
 
     pub fn as_u32(&self) -> u32 {
         *self as u32
-    }
-
-    /// Enable kernel module loading
-    pub fn enable_modules(&self) {
-        self.modules_disabled.store(0, Ordering::SeqCst);
-    }
-
-    /// Check if modules are disabled
-    pub fn are_modules_disabled(&self) -> bool {
-        self.modules_disabled.load(Ordering::SeqCst) == 1
     }
 
     /// Check if kernel pointer should be sanitized

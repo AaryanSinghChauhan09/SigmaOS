@@ -114,9 +114,30 @@ pub struct SigmaOsConfig {
     pub system: SystemConfig,
     pub network: NetworkConfig,
     pub desktop: DesktopConfig,
+    pub generations: Vec<SystemGeneration>,
+    pub active_generation_id: u32,
     pub security: SecurityConfig,
     pub kernel: KernelConfig,
     pub performance: PerformanceConfig,
+    pub generations: Vec<SystemGeneration>,
+    pub active_generation_id: u32,}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone)]
+pub struct ConfigModule {
+    pub module_name: String,
+    pub enabled: bool,
+}
+
+pub enum ConfigState { Active, Inactive, Pending }
+
+#[derive(Debug, Clone)]
+pub struct SystemGeneration {
+    pub generation_id: u32,
+    pub created_at_timestamp: u64,
+    pub config_hash: [u8; 32],
+    pub modules: Vec<ConfigModule>,
+    pub state: ConfigState,
 }
 
 impl SigmaOsConfig {
@@ -128,6 +149,8 @@ impl SigmaOsConfig {
             security: SecurityConfig::default(),
             kernel: KernelConfig::default(),
             performance: PerformanceConfig::default(),
+            generations: Vec::new(),
+            active_generation_id: 0,
         }
     }
 

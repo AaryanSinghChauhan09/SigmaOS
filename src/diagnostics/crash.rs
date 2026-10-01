@@ -32,13 +32,9 @@ use core::ptr::{self, NonNull};
 #[cfg(not(test))]
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-#[cfg(test_disabled)]
-#[cfg(test_disabled)]
-#[cfg(test_disabled)]
-#[cfg(test_disabled)]
-
 /// Report ID
 pub type ReportID = usize;
+
 
 
 /// Crash severity

@@ -136,7 +136,7 @@ pub struct FeatureMdStatus {
 pub struct WikiDataTransferEngine {
     pub feature_specs: BTreeMap<String, FeatureMdStatus>,
     pub total_synced_to_wiki: u32,
-}
+    pub specifications: Vec<String>,}
 
 impl WikiDataTransferEngine {
     pub fn new() -> Self {

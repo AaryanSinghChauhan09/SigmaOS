@@ -565,7 +565,20 @@ pub enum PackageFormat {
     Brew,        // Homebrew formula (.brew)
     Wasm,        // WebAssembly component (.wasm)
     Oci,         // OCI container image (.oci)
-}
+    Choco,
+    DubPkg,
+    Nimble,
+    Opam,
+    Pixi,
+    PltPkg,
+    Scoop,
+    Shard,
+    SingularitySif,
+    StampedeSlp,
+    SwiftPkg,
+    Tazpkg,
+    Winget,
+    ZigPkg,}
 
 impl PackageFormat {
     pub fn from_filename(filename: &str) -> Option<Self> {
