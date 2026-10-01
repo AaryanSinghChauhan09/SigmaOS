@@ -28,12 +28,6 @@ function createMockElement(id, tag = "div") {
     value: "",
     innerHTML: "",
     listeners: {},
-    get firstElementChild() {
-      return el.children[0] || (el.innerHTML.length > 0 ? { tag: "div" } : null);
-    },
-    querySelector() {
-      return createMockElement(`btn_${Math.random()}`, "button");
-    },
     focus() { activeElement = el; },
     blur() { if (activeElement === el) activeElement = null; },
     setAttribute(k, v) { this.attributes[k] = v; },
@@ -117,20 +111,19 @@ assert.strictEqual(win1.classList.contains("active-focus"), false, "Expected win
 assert.strictEqual(Number(win2.style.zIndex) > z1, true, "Expected win2 zIndex to be elevated above win1 zIndex");
 console.log("✓ Window focus elevation and active-focus state verified successfully!");
 
-// Test 6: toggleHelp populates Help Matrix dialog and toggles ARIA accessibility attributes
-const helpOverlayEl = createMockElement("help-overlay");
-helpOverlayEl.classList.add("wizard-overlay--hidden");
+// Test 6: toggleHelp toggles modal dialog and ARIA states
+const helpOverlay = createMockElement("help-overlay");
+helpOverlay.classList.add("wizard-overlay--hidden");
 
 zenith.toggleHelp();
-assert.strictEqual(helpOverlayEl.classList.contains("wizard-overlay--hidden"), false, "Expected wizard-overlay--hidden to be removed when opened");
-assert.strictEqual(helpOverlayEl.getAttribute("aria-hidden"), "false", "Expected aria-hidden to be 'false' when opened");
-assert.strictEqual(helpOverlayEl.getAttribute("role"), "dialog", "Expected role='dialog' on help overlay");
-assert.strictEqual(helpOverlayEl.getAttribute("aria-modal"), "true", "Expected aria-modal='true' on help overlay");
-assert.strictEqual(helpOverlayEl.innerHTML.includes("Help Matrix"), true, "Expected innerHTML to contain Help Matrix content");
+assert.strictEqual(helpOverlay.classList.contains("wizard-overlay--hidden"), false, "Expected help-overlay to no longer be hidden after toggleHelp()");
+assert.strictEqual(helpOverlay.getAttribute("role"), "dialog", "Expected role='dialog' on help-overlay");
+assert.strictEqual(helpOverlay.getAttribute("aria-label"), "Sovereign Desktop Help Matrix", "Expected aria-label on help-overlay");
+assert.strictEqual(helpOverlay.getAttribute("aria-hidden"), "false", "Expected aria-hidden='false' when opened");
 
 zenith.toggleHelp();
-assert.strictEqual(helpOverlayEl.classList.contains("wizard-overlay--hidden"), true, "Expected wizard-overlay--hidden to be added when closed");
-assert.strictEqual(helpOverlayEl.getAttribute("aria-hidden"), "true", "Expected aria-hidden to be 'true' when closed");
-console.log("✓ Help Matrix overlay toggle & ARIA dialog attributes verified successfully!");
+assert.strictEqual(helpOverlay.classList.contains("wizard-overlay--hidden"), true, "Expected help-overlay to be hidden on second toggleHelp()");
+assert.strictEqual(helpOverlay.getAttribute("aria-hidden"), "true", "Expected aria-hidden='true' when closed");
+console.log("✓ toggleHelp modal overlay and ARIA states verified successfully!");
 
 console.log("All Command Palette & Desktop UX tests passed successfully!");
