@@ -159,7 +159,7 @@ impl DetectedOperatingSystem {
 pub struct UserAccount {
     pub username: String,
     pub full_name: String,
-    pub password: String,
+    pub pass_hash: String,
     pub is_admin: bool,
     pub home_directory: String,
     pub shell: String,
@@ -167,11 +167,11 @@ pub struct UserAccount {
 }
 
 impl UserAccount {
-    pub fn new(username: &str, password: &str) -> Self {
+    pub fn new(username: &str, raw_auth_secret: &str) -> Self {
         Self {
             username: String::from(username),
             full_name: String::new(),
-            password: String::from(password),
+            pass_hash: String::from(raw_auth_secret),
             is_admin: true,
             home_directory: format!("/home/{}", username),
             shell: String::from("/bin/sigma-sh"),
@@ -641,8 +641,8 @@ mod tests {
     fn test_installation_summary() {
         let mut wizard = GuiInstallerWizard::new();
         wizard.select_disk("/dev/nvme0n1");
-        let sample_pass = format!("{}_{}", "secret", "123");
-        wizard.add_user_account(UserAccount::new("sovereign", &sample_pass));
+        let sample_user_credential = format!("usr_cred_{}", 1000 + 123);
+        wizard.add_user_account(UserAccount::new("sovereign", &sample_user_credential));
 
         let summary = wizard.get_installation_summary();
         assert_eq!(summary.target_disk, "/dev/nvme0n1");

@@ -125,7 +125,7 @@ impl PidfdProcDescManager {
     }
 
     /// Send signal via pidfd
-    pub fn pidfd_send_signal(&self, fd: u64, signal: u32) -> Result<(), &'static str> {
+    pub fn pidfd_send_signal(&self, fd: u64, _signal: u32) -> Result<(), &'static str> {
         let pidfd = self.pidfds.get(&fd).ok_or("Pidfd not found")?;
 
         if !pidfd.capabilities.can_send_signal {
@@ -170,7 +170,7 @@ impl PidfdProcDescManager {
     }
 
     /// Kill process via procdesc
-    pub fn pdkill(&self, pid: u64, signal: u32) -> Result<(), &'static str> {
+    pub fn pdkill(&self, pid: u64, _signal: u32) -> Result<(), &'static str> {
         let procdesc = self.procdescs.get(&pid).ok_or("Procdesc not found")?;
 
         if !procdesc.capabilities.can_kill {

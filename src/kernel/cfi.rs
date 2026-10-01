@@ -70,7 +70,7 @@ impl CfiEngine {
         from_address: u64,
         to_address: u64,
     ) -> Result<(), CfiViolation> {
-        if let Some(target) = self.registered_targets.get(&to_address) {
+        if let Some(_target) = self.registered_targets.get(&to_address) {
             // In a real implementation, we would compute the actual signature
             // For simulation, we accept valid targets
             Ok(())
