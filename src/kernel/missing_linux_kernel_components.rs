@@ -781,5 +781,22 @@ mod extended_kernel_tests {
         // Stub test - these components are not yet implemented
         // TODO: Implement LinuxLandlockV5AccessEngine, LinuxBinderIpcEngine,
         // LinuxZswapCompressedStorageEngine, LinuxOverlayfsMountEngine, LinuxMemfdSecretEngine
+    fn test_seccomp_epoll_ksm_fanotify_engines() {
+        let mut seccomp = LinuxSeccompBpfSyscallFilterEngine::new(SeccompAction::KillProcess);
+        seccomp.allow_syscall(1);
+        assert_eq!(seccomp.evaluate_syscall(1), SeccompAction::Allow);
+
+        let mut epoll = LinuxEpollEventPollEngine::new();
+        let ev = EpollEvent { fd: 3, events: 1 };
+        epoll.epoll_ctl(EpollCtlOp::Add, ev).unwrap();
+        assert_eq!(epoll.epoll_wait(3).len(), 1);
+
+        let mut ksm = LinuxKernelSamepageMergingEngine::new();
+        let shared = ksm.scan_and_merge();
+        assert_eq!(shared, 10);
+
+        let mut fanotify = LinuxFanotifyEngine::new();
+        fanotify.add_mark("/tmp").unwrap();
+        assert_eq!(fanotify.watches.len(), 1);
     }
 }

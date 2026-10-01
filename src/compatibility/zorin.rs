@@ -859,5 +859,20 @@ mod zorin_feature_tests {
         assert_eq!(customizer.pinned_app_ids().len(), 1);
         assert!(customizer.unpin_app("org.gnome.Nautilus"));
         assert_eq!(customizer.pinned_app_ids().len(), 0);
+        let grid = ZorinGridDesktopManager::new(2);
+        let left_rect = grid.calculate_window_bounds(ZorinSnapPosition::LeftHalf, 1920, 1080);
+        assert_eq!(left_rect, (0, 0, 960, 1080));
+
+        let top_right_rect = grid.calculate_window_bounds(ZorinSnapPosition::TopRight, 1920, 1080);
+        assert_eq!(top_right_rect, (960, 0, 960, 540));
+
+        let mut sound = ZorinSoundThemeManager::new();
+        sound.enable_amplification_boost(true);
+        sound.set_volume(120);
+        assert_eq!(sound.master_volume_percent.load(core::sync::atomic::Ordering::SeqCst), 120);
+
+        let mut bar = ZorinIntellihideTaskbar::new();
+        bar.update_window_overlap(true);
+        assert!(bar.is_hidden);
     }
 }
