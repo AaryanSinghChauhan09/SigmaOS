@@ -301,10 +301,9 @@ impl Controller for HugetlbController {
                 _ => return Err(format!("Unknown hugepage size: {}", size_str)),
             };
 
-            let limit: u64 = value
-                .parse()
+            let limit: u64 = value.parse()
                 .map_err(|_| format!("Invalid limit value: {}", value))?;
-
+            
             self.set_limit(size, limit);
             Ok(())
         } else {

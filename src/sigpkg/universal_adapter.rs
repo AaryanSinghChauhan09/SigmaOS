@@ -93,6 +93,36 @@ pub struct PacmanPkgbuild {
     pub makedepends: Vec<String>,
     pub source_urls: Vec<String>,
 }
+/// Description of Snapcraft Manifest (snap parity)
+pub struct SnapcraftManifest {
+    pub name: String,
+    pub version: String,
+    pub summary: String,
+    pub description: String,
+    pub confinement: String,
+    pub grade: String,
+    pub apps: Vec<String>,
+    pub plugs: Vec<String>,
+}
+#[derive(Debug, Clone)]
+pub enum AdapterError {
+    ParseError(String),
+    ValidationError(String),
+    UnsupportedFormat(String),
+}
+/// Use universal_oop_system::UniversalPackageManager instead
+use crate::sigpkg::universal_oop_system::UniversalPackageManager;
+use core::sync::atomic::{AtomicUsize, Ordering};
+
+/// Debian-style package priority levels (DFSG and APT standard)
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum PackagePriority {
+    Optional = 0,
+    Standard = 1,
+    Important = 2,
+    Required = 3,
+    Essential = 4, // Systems block removing these (e.g. init, libc, kernel)
+}
 
 pub trait PackageFormatAdapter {
     fn format_name(&self) -> &str;
@@ -116,8 +146,11 @@ pub trait PackageFormatAdapter {
 pub struct FlatpakManifest {
     pub id: String,
     pub app_id: String,
+    pub runtime: String,
+    pub runtime_version: String,
+    pub sdk: String,
     pub command: String,
-    pub finish_args: Vec<String>, // Sandboxed permissions like "--share=network", "--share=ipc"
+    pub finish_args: Vec<String>,
 }
 
 /// Description of FreeBSD UCL (+MANIFEST) pkg manifest
@@ -155,6 +188,7 @@ pub struct ZypperSpecManifest {
     pub name: String,
     pub version: String,
     pub summary: String,
+    pub architecture: String,
     pub requires: Vec<String>,
 }
 
@@ -167,23 +201,52 @@ pub struct SlackwarePkgManifest {
     pub slack_required: Vec<String>,
 }
 
-/// Description of DNF/Yum Primary Repomd XML manifest entry
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct DnfPrimaryXmlManifest {
+#[derive(Debug, Clone)]
+pub struct GentooEbuildMetadata {
+    pub category: String,
+    pub package_name: String,
+    pub version: String,
+    pub rdepend: Vec<String>,
+    pub depend: Vec<String>,
+    pub description: String,
+    pub use_flags: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct ApkIndexManifest {
+    pub pkgname: String,
+    pub pkgver: String,
+    pub pkgdesc: String,
+    pub depends: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct XbpsManifest {
+    pub pkgname: String,
+    pub version: String,
+    pub short_desc: String,
+    pub run_depends: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct HaikuHpkgManifest {
     pub name: String,
     pub version: String,
-    pub arch: String,
     pub summary: String,
+    pub architecture: String,
     pub requires: Vec<String>,
 }
 
-/// Description of Nix expression manifest
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct NixExpressionManifest {
-    pub pname: String,
-    pub version: String,
-    pub description: String,
-    pub build_inputs: Vec<String>,
+#[derive(Debug, Clone)]
+pub struct ArchPkgInfoManifest {
+    pub pkgname: String,
+    pub pkgver: String,
+    pub pkgdesc: String,
+    pub arch: String,
+    pub architecture: String,
+    pub depends: Vec<String>,
+    pub depend: Vec<String>,
+    pub makedepend: Vec<String>,
 }
 
 pub struct UniversalPackageAdapter;
@@ -241,11 +304,11 @@ impl UniversalPackageAdapter {
         Ok(AptDebManifest {
             package,
             version,
-            architecture,
-            maintainer,
+            architecture: "amd64".to_string(),
+            maintainer: "SigmaOS".to_string(),
             depends,
             description,
-            priority,
+            priority: format!("{:?}", priority),
         })
     }
 
@@ -328,8 +391,11 @@ impl UniversalPackageAdapter {
             pkgname,
             pkgver,
             pkgdesc,
-            depends,
+            arch: architecture.clone(),
             architecture,
+            depends: depends.clone(),
+            depend: depends,
+            makedepend: Vec::new(),
         })
     }
 
@@ -553,12 +619,14 @@ impl UniversalPackageAdapter {
             name,
             version,
             summary: summary.clone(),
-            description: summary,
             confinement,
             grade: String::from("stable"),
             base: String::from("core22"),
             apps: Vec::new(),
             plugs,
+            apps: Vec::new(),
+            description: summary,
+            grade: "stable".to_string(),
         })
     }
 
@@ -679,6 +747,9 @@ impl UniversalPackageAdapter {
         Ok(FlatpakManifest {
             id: app_id.clone(),
             app_id,
+            runtime: String::new(),
+            runtime_version: String::new(),
+            sdk: String::new(),
             command,
             finish_args,
         })
@@ -886,6 +957,7 @@ impl UniversalPackageAdapter {
             version,
             summary,
             requires,
+            architecture: "x86_64".to_string(),
         })
     }
 

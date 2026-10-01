@@ -562,20 +562,12 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxGuix
             | DistroSubsystemMode::LinuxTalos => supervisor == ServiceSupervisorType::Shepherd,
 
-            DistroSubsystemMode::LinuxSolus
-            | DistroSubsystemMode::LinuxChimera
-            | DistroSubsystemMode::LinuxSerpentOS => supervisor == ServiceSupervisorType::Dinit,
-            DistroSubsystemMode::LinuxSlackware
-            | DistroSubsystemMode::LinuxTinyCore
-            | DistroSubsystemMode::LinuxSlax
-            | DistroSubsystemMode::LinuxPuppy => supervisor == ServiceSupervisorType::Sysvinit,
-            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => {
-                supervisor == ServiceSupervisorType::Smf
-            }
-            DistroSubsystemMode::SmartOs | DistroSubsystemMode::NetBsdRump | DistroSubsystemMode::SolarisSmartOS => {
-                supervisor == ServiceSupervisorType::Rcd
-            }
-        };
+                DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
+                DistroSubsystemMode::LinuxSlackware => {
+                    supervisor == ServiceSupervisorType::Sysvinit
+                }
+                DistroSubsystemMode::SmartOs | DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Rcd,
+            };
         supervisor_valid && !pkg_spec.is_empty() && !vfs_etc.is_empty()
     }
 

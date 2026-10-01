@@ -1,22 +1,15 @@
-pub mod filesystem_encryption;
-// SigmaOS Security Subsystem
-pub mod address_sanitizer;
-pub mod capability_enforcer;
-pub mod memory_protection;
-pub use address_sanitizer::{AddressSanitizer, MemoryRegion};
-pub mod audit;
-pub mod system_audit;
-pub mod bsd_hardening;
-pub mod capability;
-pub mod capsicum;
-pub mod governance;
-pub mod hardware_privilege;
-pub mod pledge_unveil;
-pub mod pqc_enclave;
-pub mod sigma_pledge;
-pub mod sigma_unveil;
-pub mod vault;
-pub mod vpn;
+#![allow(unused_variables)]
+#![allow(unused_imports)]
+#![allow(dead_code)]
+#![allow(unexpected_cfgs)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::new_without_default)]
+#![allow(ambiguous_glob_reexports)]
+pub mod safe_absorption_protocol;
+pub use safe_absorption_protocol::*;
+
+pub mod system_policy_rules;
+pub use system_policy_rules::*;
 
 // SigmaOS Security Subsystem
 pub mod defensive_audit;

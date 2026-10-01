@@ -84,9 +84,16 @@ pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
 
 pub use distro_device_expansion::*;
 
-pub mod sovereign_sound_hda_synthesis;
-pub use sovereign_sound_hda_synthesis::*;
+pub mod universal_device_matrix;
+pub use universal_device_matrix::*;
 
-pub mod sovereign_distro_driver_suite;
-pub use sovereign_distro_driver_suite::*;
-pub mod rump_kernel;
+pub mod sovereign_hardware_roadmap;
+pub use sovereign_hardware_roadmap::{
+    SigmaDriverShard, ForeignDriverOrigin, CrossOsDriverAdapter, DeclarativeDriverProfileConfig,
+    SigmaHotplugOrchestrator, DriverSandboxDomain, SigmaSandboxedHardwareModule,
+    SigmaFirmwareBridge, SigmaFirmwareFreeDriver, SecurePeripheralIsolationGuard,
+    SigmaDriverLayeringSystem, ClusterDeviceResource, SigmaDeviceClusterPool,
+    SigmaProgrammableIoStack, TargetCpuArch, CrossArchDriverPortability,
+    DriverSovereigntyPolicy, SigmaHardwarePolicyEngine, SigmaCryptographicBootChain,
+    SigmaHardwareSovereigntyRoadmapEngine,
+};

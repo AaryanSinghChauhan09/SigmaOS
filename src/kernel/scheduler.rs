@@ -119,13 +119,7 @@ impl Ord for ProcessTask {
     }
 }
 
-impl PartialOrd for ProcessTask {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-/// CFS scheduler
+/// CFS Scheduler implementation
 pub struct CfsScheduler {
     runnable_tasks: BinaryHeap<ProcessTask>,
     current_task: Option<ProcessTask>,
@@ -168,22 +162,39 @@ impl CfsScheduler {
         task
     }
 
-    /// Calculate time slice based on priority
-    fn calculate_slice(&self, priority: Priority) -> u64 {
-        // Higher priority (lower value) gets larger slice
-        let base_slice = self.latency / 10;
-        let factor = (19 - (priority.value + 20)) as u64;
-        base_slice * (factor + 1)
+    pub fn pick_next_task(&mut self) -> Option<Task> {
+        if self.task_count > 0 {
+            let task = self.tasks[0].take();
+            self.tasks[0] = self.tasks[self.task_count - 1];
+            self.tasks[self.task_count - 1] = None;
+            self.task_count -= 1;
+            self.sort_tasks();
+            task
+        } else {
+            None
+        }
     }
 
-    /// Pick next task to run
-    pub fn pick_next_task(&mut self) -> Option<ProcessTask> {
-        if let Some(current) = self.current_task.take() {
-            // Put current task back if still runnable
-            if current.state == ProcessState::Running {
-                let mut updated = current;
-                updated.state = ProcessState::Runnable;
-                self.runnable_tasks.push(updated);
+    pub fn tick(&mut self) {
+        self.current_time += 1;
+        if self.task_count > 0 {
+            if let Some(ref mut task) = self.tasks[0] {
+                task.vruntime += 1;
+            }
+            self.sort_tasks();
+        }
+    }
+
+    pub fn schedule(&mut self) -> Option<Task> {
+        self.pick_next_task()
+    }
+
+    fn sort_tasks(&mut self) {
+        for i in 1..self.task_count {
+            let mut j = i;
+            while j > 0 && self.tasks[j - 1].unwrap().vruntime > self.tasks[j].unwrap().vruntime {
+                self.tasks.swap(j - 1, j);
+                j -= 1;
             }
         }
 

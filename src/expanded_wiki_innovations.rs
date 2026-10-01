@@ -21,12 +21,13 @@
 /// - Ubuntu Pro Livepatch kernel hot-patching engine
 /// - Flatpak SDK container builder
 /// - Clear Linux Stateless /usr Configuration Overlay Engine
-use std::format;
-use std::string::{String, ToString};
-use std::vec;
-use std::vec::Vec;
-#[cfg(any(feature = "standalone_test", test))]
 extern crate alloc;
+
+use alloc::format;
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::vec;
+use alloc::vec::Vec;
 
 /// Arch Linux pacman-contrib Utilities Engine
 pub struct ArchPacmanContribEngine {

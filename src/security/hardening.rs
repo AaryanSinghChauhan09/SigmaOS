@@ -6,16 +6,21 @@
 use core::sync::atomic::AtomicU64;
 use core::sync::atomic::Ordering;
 #[cfg(feature = "standalone_test")]
-use std::vec::Vec;
+use alloc::vec::Vec;
+use core::sync::atomic::AtomicU64;
 
-/// Severity level for intrusion/audit events
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum IntrusionSeverity {
-    Low,
-    Medium,
-    High,
-    Critical,
+pub enum MemoryPermission {
+    None,
+    Read,
+    Write,
+    Execute,
+    ReadWrite,
+    ReadExecute,
+    ReadWriteExecute,
 }
+use crate::security::Permission;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Secure Memory Zeroization utility
 /// Overwrites memory containing sensitive keys, credentials, or capability data
@@ -227,6 +232,12 @@ impl SecurityHardeningConfig {
 impl Default for SecurityHardeningConfig {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+pub fn secure_zeroize(buffer: &mut [u8]) {
+    for byte in buffer.iter_mut() {
+        unsafe { core::ptr::write_volatile(byte, 0) };
     }
 }
 

@@ -713,6 +713,251 @@ impl Default for OmarchyAppLauncherEngine {
     }
 }
 
+// =========================================================================
+// OMARCHY TOGGLES, IDLE, NIGHT LIGHT, AND SCREENSAVER SUBSYSTEM
+// =========================================================================
+
+/// Supported Omarchy Toggle Items
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum OmarchyToggleState {
+    Nightlight,
+    NotificationSilencing,
+    Idle,
+    CrashCapture,
+    Screensaver,
+    Bar,
+    Touchpad,
+    Touchscreen,
+    Suspend,
+    HybridGpu,
+}
+
+impl OmarchyToggleState {
+    pub fn name(&self) -> &'static str {
+        match self {
+            Self::Nightlight => "nightlight",
+            Self::NotificationSilencing => "notification silencing",
+            Self::Idle => "idle",
+            Self::CrashCapture => "crash-capture",
+            Self::Screensaver => "screensaver",
+            Self::Bar => "bar",
+            Self::Touchpad => "touchpad",
+            Self::Touchscreen => "touchscreen",
+            Self::Suspend => "suspend",
+            Self::HybridGpu => "hybrid gpu",
+        }
+    }
+
+    pub fn flag_filename(&self) -> &'static str {
+        match self {
+            Self::Nightlight => "nightlight-off",
+            Self::NotificationSilencing => "dnd-off",
+            Self::Idle => "idle-off",
+            Self::CrashCapture => "crash-capture-off",
+            Self::Screensaver => "screensaver-off",
+            Self::Bar => "bar-off",
+            Self::Touchpad => "touchpad-off",
+            Self::Touchscreen => "touchscreen-off",
+            Self::Suspend => "suspend-off",
+            Self::HybridGpu => "hybrid-gpu-off",
+        }
+    }
+
+    pub fn hotkey(&self) -> Option<&'static str> {
+        match self {
+            Self::Nightlight => Some("Super + Ctrl + N"),
+            Self::NotificationSilencing => Some("Super + Ctrl + ,"),
+            Self::Idle => Some("Super + Ctrl + I"),
+            Self::Bar => Some("Super + Shift + Space"),
+            Self::Touchpad => Some("XF86TouchpadToggle"),
+            _ => None,
+        }
+    }
+}
+
+/// Omarchy Toggle Manager controlling state flags under `~/.local/state/omarchy/toggles/`
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OmarchyToggleManager {
+    pub disabled_flags: Vec<String>,
+}
+
+impl OmarchyToggleManager {
+    pub fn new() -> Self {
+        Self {
+            disabled_flags: Vec::new(),
+        }
+    }
+
+    pub fn is_toggle_disabled(&self, toggle: OmarchyToggleState) -> bool {
+        self.disabled_flags.contains(&toggle.flag_filename().to_string())
+    }
+
+    pub fn is_toggle_enabled(&self, toggle: OmarchyToggleState) -> bool {
+        !self.is_toggle_disabled(toggle)
+    }
+
+    pub fn toggle(&mut self, toggle: OmarchyToggleState) -> bool {
+        let flag = toggle.flag_filename().to_string();
+        if self.disabled_flags.contains(&flag) {
+            self.disabled_flags.retain(|f| f != &flag);
+            true // Enabled
+        } else {
+            self.disabled_flags.push(flag);
+            false // Disabled
+        }
+    }
+
+    pub fn omarchy_toggle_enabled_cmd(&self, flag_name: &str) -> bool {
+        self.disabled_flags.iter().any(|f| f == flag_name)
+    }
+
+    pub fn generate_status_json(&self) -> String {
+        format!(
+            "{{\"idle_disabled\": {}, \"screensaver_disabled\": {}, \"nightlight_disabled\": {}, \"dnd_active\": {}}}",
+            self.is_toggle_disabled(OmarchyToggleState::Idle),
+            self.is_toggle_disabled(OmarchyToggleState::Screensaver),
+            self.is_toggle_disabled(OmarchyToggleState::Nightlight),
+            self.is_toggle_disabled(OmarchyToggleState::NotificationSilencing),
+        )
+    }
+}
+
+impl Default for OmarchyToggleManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Omarchy Shell Idle & Lock Configuration (`~/.config/omarchy/shell.json`)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OmarchyIdleLockManager {
+    pub screensaver_delay_secs: u32,
+    pub lock_delay_secs: u32,
+    pub stay_awake: bool,
+    pub active_terminal_emulator: String,
+}
+
+impl OmarchyIdleLockManager {
+    pub fn new() -> Self {
+        Self {
+            screensaver_delay_secs: 150,
+            lock_delay_secs: 300,
+            stay_awake: false,
+            active_terminal_emulator: "Kitty".to_string(),
+        }
+    }
+
+    pub fn set_stay_awake(&mut self, stay_awake: bool) {
+        self.stay_awake = stay_awake;
+    }
+
+    pub fn should_trigger_screensaver(&self, idle_time_secs: u32) -> bool {
+        !self.stay_awake && idle_time_secs >= self.screensaver_delay_secs && idle_time_secs < self.lock_delay_secs
+    }
+
+    pub fn should_trigger_lock(&self, idle_time_secs: u32) -> bool {
+        !self.stay_awake && idle_time_secs >= self.lock_delay_secs
+    }
+
+    pub fn generate_shell_json(&self) -> String {
+        format!(
+            "{{\n  \"version\": 1,\n  \"idle\": {{\n    \"screensaver\": {},\n    \"lock\": {}\n  }}\n}}",
+            self.screensaver_delay_secs, self.lock_delay_secs
+        )
+    }
+
+    pub fn execute_lock_screen(&self) -> String {
+        "omarchy-lockscreen --blank --reset-layout --lock-1password".to_string()
+    }
+}
+
+impl Default for OmarchyIdleLockManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Omarchy Night Light Controller (hyprsunset integration)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OmarchyNightLightConfig {
+    pub active_temperature_k: u32,
+    pub profile_schedule_time: Option<String>,
+}
+
+impl OmarchyNightLightConfig {
+    pub fn new() -> Self {
+        Self {
+            active_temperature_k: 6500,
+            profile_schedule_time: None,
+        }
+    }
+
+    pub fn toggle_night_light(&mut self) -> u32 {
+        if self.active_temperature_k == 6500 {
+            self.active_temperature_k = 4000;
+        } else {
+            self.active_temperature_k = 6500;
+        }
+        self.active_temperature_k
+    }
+
+    pub fn generate_hyprsunset_conf(&self) -> String {
+        if let Some(ref time) = self.profile_schedule_time {
+            format!(
+                "profile {{\n    time = {}\n    temperature = {}\n}}",
+                time, self.active_temperature_k
+            )
+        } else {
+            format!(
+                "profile {{\n    temperature = {}\n}}",
+                self.active_temperature_k
+            )
+        }
+    }
+}
+
+impl Default for OmarchyNightLightConfig {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Omarchy Bar Indicators Widget (`omarchy.indicators`)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OmarchyBarIndicatorsConfig {
+    pub always_show: bool,
+    pub active_indicators: Vec<String>,
+}
+
+impl OmarchyBarIndicatorsConfig {
+    pub fn new() -> Self {
+        Self {
+            always_show: false,
+            active_indicators: Vec::new(),
+        }
+    }
+
+    pub fn update_indicator(&mut self, name: &str, active: bool) {
+        if active {
+            if !self.active_indicators.contains(&name.to_string()) {
+                self.active_indicators.push(name.to_string());
+            }
+        } else {
+            self.active_indicators.retain(|i| i != name);
+        }
+    }
+
+    pub fn is_visible(&self, name: &str) -> bool {
+        self.always_show || self.active_indicators.contains(&name.to_string())
+    }
+}
+
+impl Default for OmarchyBarIndicatorsConfig {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -947,5 +1192,55 @@ mod omarchy_gap_closure_tests {
         let dwindle_conf = dwindle.generate_dwindle_conf();
         assert!(dwindle_conf.contains("preserve_split = true"));
         assert!(dwindle_conf.contains("force_split = 2"));
+    }
+
+    #[test]
+    fn test_omarchy_toggles_and_idle() {
+        let mut toggle_mgr = OmarchyToggleManager::new();
+        assert!(toggle_mgr.is_toggle_enabled(OmarchyToggleState::Nightlight));
+
+        // Toggle nightlight off
+        assert!(!toggle_mgr.toggle(OmarchyToggleState::Nightlight)); // returns false when disabled
+        assert!(toggle_mgr.is_toggle_disabled(OmarchyToggleState::Nightlight));
+        assert!(toggle_mgr.omarchy_toggle_enabled_cmd("nightlight-off"));
+
+        // Status JSON check
+        let json = toggle_mgr.generate_status_json();
+        assert!(json.contains("\"nightlight_disabled\": true"));
+
+        // Toggle back on
+        assert!(toggle_mgr.toggle(OmarchyToggleState::Nightlight));
+        assert!(toggle_mgr.is_toggle_enabled(OmarchyToggleState::Nightlight));
+
+        // Idle & Lock
+        let mut idle = OmarchyIdleLockManager::new();
+        assert!(!idle.should_trigger_screensaver(100));
+        assert!(idle.should_trigger_screensaver(180));
+        assert!(idle.should_trigger_lock(300));
+
+        idle.set_stay_awake(true);
+        assert!(!idle.should_trigger_screensaver(180));
+        assert!(!idle.should_trigger_lock(300));
+
+        let lock_cmd = idle.execute_lock_screen();
+        assert!(lock_cmd.contains("omarchy-lockscreen"));
+    }
+
+    #[test]
+    fn test_omarchy_nightlight_and_indicators() {
+        let mut nl = OmarchyNightLightConfig::new();
+        assert_eq!(nl.active_temperature_k, 6500);
+        let warm = nl.toggle_night_light();
+        assert_eq!(warm, 4000);
+        let conf = nl.generate_hyprsunset_conf();
+        assert!(conf.contains("temperature = 4000"));
+
+        let mut bar = OmarchyBarIndicatorsConfig::new();
+        assert!(!bar.is_visible("stay_awake"));
+        bar.update_indicator("stay_awake", true);
+        assert!(bar.is_visible("stay_awake"));
+
+        bar.always_show = true;
+        assert!(bar.is_visible("dnd"));
     }
 }

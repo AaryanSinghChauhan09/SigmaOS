@@ -3,11 +3,10 @@
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, manages rolling release upgrades,
 // parses ALPM hooks, builds initramfs with mkinitcpio, packages with makepkg, and executes ALPM transactions.
 
-use std::format;
-use std::string::{String, ToString};
-
-use std::collections::HashMap;
-pub type SigmaString = String;
+extern crate alloc;
+use crate::klib::collections::HashMap;
+use crate::klib;
+use crate::klib::SigmaString;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Version {
@@ -277,7 +276,9 @@ pub struct AlpmHookManager {
 
 impl AlpmHookManager {
     pub fn new() -> Self {
-        Self { hooks: Vec::new() }
+        Self {
+            hooks: Vec::new(),
+        }
     }
 
     pub fn add_hook(&mut self, hook: AlpmHook) {
@@ -723,53 +724,10 @@ impl MakepkgBuilder {
         Ok((archive_name, archive_content.to_vec()))
     }
 }
-
 // --- Arch Linux svntogit Repository Migration Engine ---
-
 #[derive(Debug, Clone)]
-pub struct SvnPackageMetadata {
-    pub pkgname: String,
-    pub repo: String, // e.g. "core", "extra", "community"
-    pub svn_revision: u64,
-    pub has_pkgbuild: bool,
-}
-
-#[derive(Debug, Default)]
-pub struct SvntogitMigrationEngine {
-    pub migrated_packages: std::collections::BTreeMap<String, SvnPackageMetadata>,
-}
-
-impl SvntogitMigrationEngine {
-    pub fn new() -> Self {
-        Self {
-            migrated_packages: std::collections::BTreeMap::new(),
-        }
-    }
-
-    pub fn migrate_svn_repo_layout(
-        &mut self,
-        pkgname: &str,
-        repo: &str,
-        svn_revision: u64,
-        pkgbuild_content: &str,
-    ) -> Result<String, &'static str> {
-        if pkgbuild_content.is_empty() {
-            return Err("svntogit: Cannot migrate empty PKGBUILD");
-        }
-
-        let metadata = SvnPackageMetadata {
-            pkgname: pkgname.to_string(),
-            repo: repo.to_string(),
-            svn_revision,
-            has_pkgbuild: true,
-        };
-
-        self.migrated_packages.insert(pkgname.to_string(), metadata);
-        Ok(format!(
-            "Migrated Arch SVN pkg '{}' (r{}) into Git branch 'packages/{}'",
-            pkgname, svn_revision, pkgname
-        ))
-    }
+pub struct SvntoGitEngine {
+    pub migrated_packages: std::collections::HashMap<String, SvnPackageMetadata>,
 }
 
 #[cfg(test)]

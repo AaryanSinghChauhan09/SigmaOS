@@ -6,9 +6,13 @@
 // 2. WikiSpecificationDataSyncer: Transpiles and syncs fully verified `.md` specifications directly to `wiki_repo/` and `wiki/` documentation pages.
 // 3. MasterWikiAndRoadmapVerificationSuite: Master coordinator unifying roadmap parity checks and wiki data syncing.
 
-use std::collections::BTreeMap;
-use std::string::{String, ToString};
-use std::vec::Vec;
+extern crate alloc;
+
+use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 // =========================================================================
 // 1. SOVEREIGN LINUX & BSD WIKI ROADMAP PARITY ENGINE

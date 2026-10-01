@@ -1268,10 +1268,7 @@ impl StickyNotesManager {
     }
 
     pub fn get_by_category(&self, category: &str) -> Vec<&StickyNote> {
-        self.notes
-            .iter()
-            .filter(|n| n.category == category)
-            .collect()
+        self.notes.iter().filter(|n| n.category == category).collect()
     }
 }
 
@@ -1307,21 +1304,6 @@ pub struct MintMenuItem {
     pub is_favorite: bool,
 }
 
-/// Case-insensitive substring search without heap allocation for ASCII text.
-#[inline]
-fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
-    if haystack.is_ascii() && needle.is_ascii() {
-        needle.is_empty()
-            || (needle.len() <= haystack.len()
-                && haystack
-                    .as_bytes()
-                    .windows(needle.len())
-                    .any(|window| window.eq_ignore_ascii_case(needle.as_bytes())))
-    } else {
-        haystack.to_lowercase().contains(&needle.to_lowercase())
-    }
-}
-
 pub struct MintMenuEngine {
     pub items: Vec<MintMenuItem>,
     pub active_category: String,
@@ -1348,13 +1330,14 @@ impl MintMenuEngine {
     }
 
     pub fn search(&self, query: &str) -> Vec<&MintMenuItem> {
+        let q = query.to_lowercase();
         self.items
             .iter()
             .filter(|item| {
-                contains_ignore_case(&item.name, query)
-                    || contains_ignore_case(&item.generic_name, query)
-                    || contains_ignore_case(&item.app_id, query)
-                    || contains_ignore_case(&item.category, query)
+                item.name.to_lowercase().contains(&q)
+                    || item.generic_name.to_lowercase().contains(&q)
+                    || item.app_id.to_lowercase().contains(&q)
+                    || item.category.to_lowercase().contains(&q)
             })
             .collect()
     }
@@ -1514,10 +1497,7 @@ impl MintStickIsoVerifier {
     }
 
     pub fn format_partition_table(target_path: &str, scheme: PartitionScheme) -> String {
-        format!(
-            "Formatted {} with {:?} partition table",
-            target_path, scheme
-        )
+        format!("Formatted {} with {:?} partition table", target_path, scheme)
     }
 }
 
@@ -1682,10 +1662,7 @@ mod tests {
 
     #[test]
     fn test_mint_stick_verifier_and_xapps() {
-        assert!(MintStickIsoVerifier::verify_checksum(
-            "abc123hash",
-            "ABC123HASH"
-        ));
+        assert!(MintStickIsoVerifier::verify_checksum("abc123hash", "ABC123HASH"));
         let fmt = MintStickIsoVerifier::format_partition_table("/dev/sdb", PartitionScheme::Gpt);
         assert!(fmt.contains("Gpt"));
 
