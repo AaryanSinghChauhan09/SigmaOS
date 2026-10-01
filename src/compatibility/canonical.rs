@@ -915,7 +915,7 @@ impl SigmaLiveRemasterBuilder {
 }
 
 // =========================================================================
-// 5. ZorinAppearanceSwitcher (Ecosystem Integration - Zorin Appearance Parity)
+// 5. ZorinLayoutPreset & ZorinAppearanceSwitcher Extension
 // =========================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -923,46 +923,6 @@ pub enum ZorinLayoutPreset {
     WindowsClassic,
     MacOsLike,
     GnomeDefault,
-}
-
-pub struct ZorinAppearanceSwitcher {
-    pub active_layout: ZorinLayoutPreset,
-    pub panel_height_pixels: u32,
-    pub app_launcher_columns: u32,
-    pub taskbar_docked: bool,
-}
-
-impl ZorinAppearanceSwitcher {
-    pub fn new() -> Self {
-        ZorinAppearanceSwitcher {
-            active_layout: ZorinLayoutPreset::WindowsClassic,
-            panel_height_pixels: 40,
-            app_launcher_columns: 2,
-            taskbar_docked: true,
-        }
-    }
-
-    /// CCleaner & BleachBit parity: scans and purges bloated/temporary file caches
-    pub fn switch_layout_preset(&mut self, preset: ZorinLayoutPreset) {
-        self.active_layout = preset;
-        match preset {
-            ZorinLayoutPreset::WindowsClassic => {
-                self.panel_height_pixels = 40;
-                self.app_launcher_columns = 2;
-                self.taskbar_docked = true;
-            }
-            ZorinLayoutPreset::MacOsLike => {
-                self.panel_height_pixels = 64;
-                self.app_launcher_columns = 1; // single linear app dock
-                self.taskbar_docked = false;
-            }
-            ZorinLayoutPreset::GnomeDefault => {
-                self.panel_height_pixels = 32;
-                self.app_launcher_columns = 4;
-                self.taskbar_docked = true;
-            }
-        }
-    }
 }
 
 // =========================================================================

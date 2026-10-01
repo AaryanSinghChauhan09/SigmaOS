@@ -40,6 +40,7 @@ pub trait Container {
 pub struct SimpleContainer {
     pub id: ContainerID,
     pub name: [u8; 64],
+    pub name_len: u8,
     pub state: AtomicUsize,
     pub pid: AtomicUsize,
 }
@@ -53,6 +54,7 @@ impl SimpleContainer {
         SimpleContainer {
             id,
             name: name_array,
+            name_len: name_len as u8,
             state: AtomicUsize::new(ContainerState::Created as usize),
             pid: AtomicUsize::new(0),
         }
@@ -64,8 +66,8 @@ impl Container for SimpleContainer {
         self.id
     }
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
+        // Performance optimization: explicit name_len field enables O(1) direct slice access, eliminating O(N) null-byte linear scans.
+        &self.name[..self.name_len as usize]
     }
     fn state(&self) -> ContainerState {
         match self.state.load(Ordering::SeqCst) {
@@ -305,7 +307,7 @@ pub trait ImageManager {
 }
 
 pub struct SimpleImageManager {
-    pub images: Vec<([u8; 128], [u8; 32])>,
+    pub images: Vec<([u8; 128], u8, [u8; 32])>,
 }
 
 impl Default for SimpleImageManager {
@@ -329,18 +331,18 @@ impl ImageManager for SimpleImageManager {
         for (i, item) in digest_array.iter_mut().enumerate() {
             *item = ((i * 17 + 31) % 256) as u8;
         }
-        self.images.push((name_array, digest_array));
+        self.images.push((name_array, name_len as u8, digest_array));
         Ok(())
     }
 
     fn list_images(&self) -> Vec<([u8; 128], [u8; 32])> {
-        self.images.clone()
+        self.images.iter().map(|img| (img.0, img.2)).collect()
     }
 
     fn remove_image(&mut self, name: &[u8], _tag: &[u8]) -> Result<(), ContainerError> {
+        // Performance optimization: explicit stored name_len enables direct O(1) slice lookup, eliminating O(N) null-byte scans.
         if let Some(pos) = self.images.iter().position(|img| {
-            let len = img.0.iter().position(|&b| b == 0).unwrap_or(128);
-            &img.0[..len] == name
+            &img.0[..img.1 as usize] == name
         }) {
             self.images.remove(pos);
             Ok(())

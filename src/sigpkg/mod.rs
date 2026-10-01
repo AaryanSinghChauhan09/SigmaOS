@@ -14,6 +14,8 @@ pub mod spec;
 pub mod store;
 pub mod transaction;
 pub mod verifier;
+pub mod universal_adapter;
+pub mod zero_alloc_resolver;
 
 pub use arch_compat::{AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder, PacmanDbAdapter, RollingSyncManager};
 pub use importer::{PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter};
@@ -29,6 +31,8 @@ pub use spec::{
     CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel,
     UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
 };
+pub use universal_adapter::{AdapterError, DebAdapter, RpmAdapter, PacmanAdapter};
+pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
 pub use store::ContentAddressedStore;

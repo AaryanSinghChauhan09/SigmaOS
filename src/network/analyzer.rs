@@ -19,9 +19,9 @@
 // SigmaOS Network Traffic Analyzer
 // OOP-based network traffic monitoring and analysis
 
-use klib::collections::HashMap;
-use klib::net::{IpAddr, Ipv4Addr, Ipv6Addr};
-use klib::time::{Duration, Instant};
+use crate::klib::collections::HashMap;
+use crate::klib::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+use crate::klib::time::{Duration, Instant};
 
 /// Network security alert classification
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

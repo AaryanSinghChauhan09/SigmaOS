@@ -2,7 +2,10 @@
 // Independent, zero-dependency implementations of Void Linux core tooling
 // Implements xbps package manager, runit init system, and musl-based toolchain
 
-use crate::klib::{BTreeMap, Vec, String, ToString};
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
+use alloc::string::{String, ToString};
 
 // =========================================================================
 // 1. XBPS PACKAGE MANAGER (X Binary Package System)

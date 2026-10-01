@@ -72,6 +72,7 @@ pub trait RemoteDesktop {
     fn disconnect(&mut self, id: SessionID) -> Result<(), RemoteError>;
     fn send_input(&self, id: SessionID, input: &[u8]) -> Result<(), RemoteError>;
     fn receive_screen(&self, id: SessionID) -> Result<Vec<u8>, RemoteError>;
+    fn get_session(&self, id: SessionID) -> Option<&dyn RemoteSession>;
 }
 
 #[repr(C)]

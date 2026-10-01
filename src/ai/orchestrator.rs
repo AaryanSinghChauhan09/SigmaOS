@@ -2,9 +2,12 @@
 // Dynamically schedules models, checks device bounds, and prunes context windows.
 
 extern crate alloc;
+use alloc::boxed::Box;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
+
+pub type AgentID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -15,10 +18,22 @@ pub enum DeviceTarget {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AgentState { Idle = 0, Active = 1, Busy = 2, Error = 3, Learning = 4 }
+pub enum AgentState {
+    Idle = 0,
+    Active = 1,
+    Busy = 2,
+    Error = 3,
+    Learning = 4,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AgentError { Success = 0, NotFound = 1, ExecutionFailed = 2, Timeout = 3, InvalidInput = 4 }
+pub enum AgentError {
+    Success = 0,
+    NotFound = 1,
+    ExecutionFailed = 2,
+    Timeout = 3,
+    InvalidInput = 4,
+}
 
 pub trait AIAgent {
     fn id(&self) -> AgentID;
@@ -37,6 +52,7 @@ pub enum OrchestratorError {
 
 pub struct ModelResource {
     pub name: [u8; 32],
+    pub name_len: u8,
     pub memory_required_mb: usize,
     pub target: DeviceTarget,
 }
@@ -48,6 +64,7 @@ impl ModelResource {
         name_array[..len].copy_from_slice(&name[..len]);
         ModelResource {
             name: name_array,
+            name_len: len as u8,
             memory_required_mb,
             target,
         }
@@ -66,42 +83,32 @@ impl SimpleAIAgent {
             id,
             name: name.to_string(),
             state: AgentState::Idle,
->>>>>>> origin/feat/activity-manager-paging-segmentation-613287197188639572
         }
     }
 }
 
-<<<<<<< HEAD
-/// Local LLM and deep learning model resource orchestrator
-pub struct LocalLlmOrchestrator {
-    pub active_models: Vec<Option<ModelResource>>,
-    pub total_gpu_memory_mb: usize,
-    pub total_tpu_memory_mb: usize,
-    pub allocated_gpu_memory_mb: AtomicUsize,
-    pub allocated_tpu_memory_mb: AtomicUsize,
-}
-
-impl LocalLlmOrchestrator {
-    pub fn new(gpu_mem: usize, tpu_mem: usize) -> Self {
-        LocalLlmOrchestrator {
-            active_models: Vec::new(),
-            total_gpu_memory_mb: gpu_mem,
-            total_tpu_memory_mb: tpu_mem,
-            allocated_gpu_memory_mb: AtomicUsize::new(0),
-            allocated_tpu_memory_mb: AtomicUsize::new(0),
-=======
 impl AIAgent for SimpleAIAgent {
-    fn id(&self) -> AgentID { self.id }
-    fn name(&self) -> &str { &self.name }
-    fn state(&self) -> AgentState { self.state }
+    fn id(&self) -> AgentID {
+        self.id
+    }
+    fn name(&self) -> &str {
+        &self.name
+    }
+    fn state(&self) -> AgentState {
+        self.state
+    }
 
     fn execute(&mut self, task: &[u8]) -> Result<Vec<u8>, AgentError> {
         self.state = AgentState::Busy;
         let mut result = Vec::new();
-        for &byte in self.name.as_bytes() { result.push(byte); }
+        for &byte in self.name.as_bytes() {
+            result.push(byte);
+        }
         result.push(b':');
         result.push(b' ');
-        for &byte in task { result.push(byte); }
+        for &byte in task {
+            result.push(byte);
+        }
         self.state = AgentState::Idle;
         Ok(result)
     }
@@ -124,12 +131,66 @@ impl SimpleAgentOrchestrator {
         SimpleAgentOrchestrator {
             agents: Vec::new(),
             next_id: AtomicUsize::new(1),
->>>>>>> origin/feat/activity-manager-paging-segmentation-613287197188639572
         }
     }
 }
 
-<<<<<<< HEAD
+impl Default for SimpleAgentOrchestrator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl AgentOrchestrator for SimpleAgentOrchestrator {
+    fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<AgentID, AgentError> {
+        let id = agent.id();
+        self.agents.push(agent);
+        Ok(id)
+    }
+
+    fn dispatch_task(&mut self, task: &[u8], agent_id: Option<AgentID>) -> Result<Vec<u8>, AgentError> {
+        if let Some(target_id) = agent_id {
+            if let Some(agent) = self.agents.iter_mut().find(|a| a.id() == target_id) {
+                agent.execute(task)
+            } else {
+                Err(AgentError::NotFound)
+            }
+        } else if let Some(agent) = self.agents.iter_mut().find(|a| a.state() == AgentState::Idle) {
+            agent.execute(task)
+        } else {
+            Err(AgentError::NotFound)
+        }
+    }
+
+    fn get_agent(&self, id: AgentID) -> Option<&dyn AIAgent> {
+        self.agents.iter().find(|a| a.id() == id).map(|a| a.as_ref())
+    }
+
+    fn list_agents(&self) -> Vec<AgentID> {
+        self.agents.iter().map(|a| a.id()).collect()
+    }
+}
+
+/// Local LLM and deep learning model resource orchestrator
+pub struct LocalLlmOrchestrator {
+    pub active_models: Vec<Option<ModelResource>>,
+    pub total_gpu_memory_mb: usize,
+    pub total_tpu_memory_mb: usize,
+    pub allocated_gpu_memory_mb: AtomicUsize,
+    pub allocated_tpu_memory_mb: AtomicUsize,
+}
+
+impl LocalLlmOrchestrator {
+    pub fn new(gpu_mem: usize, tpu_mem: usize) -> Self {
+        LocalLlmOrchestrator {
+            active_models: Vec::new(),
+            total_gpu_memory_mb: gpu_mem,
+            total_tpu_memory_mb: tpu_mem,
+            allocated_gpu_memory_mb: AtomicUsize::new(0),
+            allocated_tpu_memory_mb: AtomicUsize::new(0),
+        }
+    }
+
     /// Schedule and allocate resources for a local LLM model
     pub fn schedule_model(
         &mut self,
@@ -178,8 +239,8 @@ impl SimpleAgentOrchestrator {
     pub fn evict_model(&mut self, name: &[u8]) -> Result<(), OrchestratorError> {
         for i in 0..self.active_models.len() {
             if let Some(ref res) = self.active_models[i] {
-                let len = res.name.iter().position(|&b| b == 0).unwrap_or(32);
-                if &res.name[..len] == name {
+                // Performance optimization: explicit stored name_len enables direct O(1) slice comparison, eliminating O(N) null-byte linear scans.
+                if &res.name[..res.name_len as usize] == name {
                     match res.target {
                         DeviceTarget::Gpu => {
                             self.allocated_gpu_memory_mb
@@ -197,37 +258,6 @@ impl SimpleAgentOrchestrator {
             }
         }
         Err(OrchestratorError::ModelNotFound)
-=======
-impl AgentOrchestrator for SimpleAgentOrchestrator {
-    fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<AgentID, AgentError> {
-        let id = agent.id();
-        self.agents.push(agent);
-        Ok(id)
-    }
-
-    fn dispatch_task(&mut self, task: &[u8], agent_id: Option<AgentID>) -> Result<Vec<u8>, AgentError> {
-        if let Some(target_id) = agent_id {
-            if let Some(agent) = self.agents.iter_mut().find(|a| a.id() == target_id) {
-                agent.execute(task)
-            } else {
-                Err(AgentError::NotFound)
-            }
-        } else {
-            if let Some(agent) = self.agents.iter_mut().find(|a| a.state() == AgentState::Idle) {
-                agent.execute(task)
-            } else {
-                Err(AgentError::NotFound)
-            }
-        }
-    }
-
-    fn get_agent(&self, id: AgentID) -> Option<&dyn AIAgent> {
-        self.agents.iter().find(|a| a.id() == id).map(|a| a.as_ref())
-    }
-
-    fn list_agents(&self) -> Vec<AgentID> {
-        self.agents.iter().map(|a| a.id()).collect()
->>>>>>> origin/feat/activity-manager-paging-segmentation-613287197188639572
     }
 }
 
@@ -237,30 +267,6 @@ pub trait TaskQueue {
     fn size(&self) -> usize;
 }
 
-<<<<<<< HEAD
-impl ContextWindowPruner {
-    pub fn new(max_lines: usize) -> Self {
-        ContextWindowPruner {
-            history: Vec::new(),
-            max_lines,
-        }
-    }
-
-    /// Add a dialogue turn context string and prune old turns once exceeding limit (FIFO)
-    pub fn append_context(&mut self, text: &[u8]) {
-        let mut entry = [0u8; 128];
-        let len = text.len().min(127);
-        entry[..len].copy_from_slice(&text[..len]);
-
-        self.history.push(entry);
-
-        while self.history.len() > self.max_lines {
-            self.history.remove(0);
-        }
-    }
-}
-
-=======
 pub struct SimpleTaskQueue {
     pub tasks: Vec<([u8; 256], u8)>,
 }
@@ -268,6 +274,12 @@ pub struct SimpleTaskQueue {
 impl SimpleTaskQueue {
     pub fn new() -> Self {
         SimpleTaskQueue { tasks: Vec::new() }
+    }
+}
+
+impl Default for SimpleTaskQueue {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -301,13 +313,38 @@ impl TaskQueue for SimpleTaskQueue {
     }
 }
 
->>>>>>> origin/feat/activity-manager-paging-segmentation-613287197188639572
+pub struct ContextWindowPruner {
+    pub history: Vec<[u8; 128]>,
+    pub max_lines: usize,
+}
+
+impl ContextWindowPruner {
+    pub fn new(max_lines: usize) -> Self {
+        ContextWindowPruner {
+            history: Vec::new(),
+            max_lines,
+        }
+    }
+
+    /// Add a dialogue turn context string and prune old turns once exceeding limit (FIFO)
+    pub fn append_context(&mut self, text: &[u8]) {
+        let mut entry = [0u8; 128];
+        let len = text.len().min(127);
+        entry[..len].copy_from_slice(&text[..len]);
+
+        self.history.push(entry);
+
+        while self.history.len() > self.max_lines {
+            self.history.remove(0);
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-<<<<<<< HEAD
     fn test_model_scheduling() {
         let mut orchestrator = LocalLlmOrchestrator::new(4096, 8192);
 
@@ -340,7 +377,9 @@ mod tests {
         let mut turn_first = [0u8; 14];
         turn_first.copy_from_slice(&pruner.history[0][..14]);
         assert_eq!(&turn_first, b"Context turn 2");
-=======
+    }
+
+    #[test]
     fn test_orchestrator_and_queue() {
         let mut orchestrator = SimpleAgentOrchestrator::new();
         let agent = SimpleAIAgent::new(1, "TaskAgent");
@@ -356,6 +395,5 @@ mod tests {
 
         let task = queue.dequeue().unwrap();
         assert_eq!(std::str::from_utf8(&task[..14]).unwrap(), "TASK_PRIO_HIGH");
->>>>>>> origin/feat/activity-manager-paging-segmentation-613287197188639572
     }
 }

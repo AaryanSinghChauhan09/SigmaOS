@@ -22,6 +22,7 @@
 use std::fs::{self, File, OpenOptions};
 use std::io::{self, Seek, SeekFrom, Write};
 use std::path::Path;
+use crate::klib::rng::SigmaRng;
 
 /// Shredding algorithm
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

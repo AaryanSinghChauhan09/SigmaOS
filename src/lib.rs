@@ -1,7 +1,12 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
+pub mod access;
 pub mod accessibility;
+pub mod audio;
+pub mod ipc;
+pub mod storage;
+pub mod system;
 pub mod automation;
 pub mod compatibility;
 pub mod container;
@@ -106,7 +111,7 @@ pub use filesystem::{
 pub use kernel::{
     AiNativeRuntime, BuddyAllocator, Channel, EnergyAwareScheduler, FastPathIpc,
     InterruptMechanism, IpcError, IpcManager,
-    MemoryBlock, Message, PAGE_SIZE, PolicyError, PolicyManager, PrivacyFirstSandbox, Priority, Process, ProcessState,
+    MemoryBlock, Message, PAGE_SIZE, PolicyError, PolicyManager, PrivacyFirstSandbox, Priority, ProcessState,
     ProtectionDomain, PrivilegeLevel, ResourceBroker, RoundRobinConfig, RoundRobinScheduler,
     Scheduler, SchedulerError, SelfHealingKernel, SigmaFsPlusPlus, UniversalAbiTranslator,
     UserDefinedKernelFunctions,
@@ -170,7 +175,7 @@ pub use shell::{
     CommandError as ShellCommandError, ShellCommand, ShellRepl, ShellSession, SimpleShellSession,
 };
 pub use sigpkg::{
-    BuildSystem, ContentAddressedStore, CryptoVerifier, PackageDependencyResolver, PackageRecipe, RecipeError, RecipeManager,
+    BuildSystem, ContentAddressedStore, CryptoVerifier, PackageDependencyResolver, RecipeError, RecipeManager,
     SatSolver, Transaction, Version, MAX_RECIPE_DEPENDENCIES, AdapterError,
     DebAdapter, RpmAdapter, PacmanAdapter,
 };
@@ -179,9 +184,7 @@ pub use virtualization::{
     VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
 
-pub use thread::management::{
-    ThreadID, ThreadState as LibThreadState, ThreadAlertableState, Thread, ThreadError, SimpleThread, ThreadManager, SimpleThreadManager,
-};
+pub use thread::{Thread, ThreadError, Mutex as ThreadMutex};
 
 pub use process::spawn::{
     ProcessID, ProcessState as LibProcessState, ProcessError, Process, SimpleProcess, ProcessSpawner, SimpleProcessSpawner, ProcessWaiter, SimpleProcessWaiter, ProcessGroup, SimpleProcessGroup,

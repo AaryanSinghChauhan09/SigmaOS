@@ -14,6 +14,7 @@ pub mod custom_string;
 pub mod io;
 pub mod time;
 pub mod net;
+pub mod rng;
 
 pub use vec::Vec;
 pub use hashmap::{HashMap, Entry};
