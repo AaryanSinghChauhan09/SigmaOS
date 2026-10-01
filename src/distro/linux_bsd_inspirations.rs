@@ -360,9 +360,9 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => {
                 ServiceSupervisorType::Smf
             }
-            DistroSubsystemMode::SmartOs | DistroSubsystemMode::NetBsdRump => {
-                ServiceSupervisorType::Rcd
-            }
+            DistroSubsystemMode::SmartOs
+            | DistroSubsystemMode::SolarisSmartOS
+            | DistroSubsystemMode::NetBsdRump => ServiceSupervisorType::Rcd,
         }
     }
 
@@ -572,9 +572,9 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => {
                 supervisor == ServiceSupervisorType::Smf
             }
-            DistroSubsystemMode::SmartOs | DistroSubsystemMode::NetBsdRump => {
-                supervisor == ServiceSupervisorType::Rcd
-            }
+            DistroSubsystemMode::SmartOs
+            | DistroSubsystemMode::SolarisSmartOS
+            | DistroSubsystemMode::NetBsdRump => supervisor == ServiceSupervisorType::Rcd,
         };
         supervisor_valid && !pkg_spec.is_empty() && !vfs_etc.is_empty()
     }
