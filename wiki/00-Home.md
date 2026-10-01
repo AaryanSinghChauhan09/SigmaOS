@@ -35,6 +35,7 @@ SigmaOS systematically extracts functions, features, architectural models, desig
 
 ## Master Specification Files
 
+- [Sovereign OS Absolute Omnipresent Self-Sufficiency Ultra Encyclopedia V40](15-Sovereign-OS-Self-Sufficiency-Encyclopedia-V40.md)
 - [Tri-Agent & 500 Repos Master Plan](../docs/SIGMAOS_500_REPOS_TRI_AGENT_ABSORPTION_MASTER_PLAN.md)
 - [Improvement Plan & Technical Audit](../ImprovementPlan.md)
 
