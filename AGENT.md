@@ -1,66 +1,78 @@
-# SigmaOS AI Agent Roadmap: Missing Linux & BSD Subsystems (`AGENT.md`)
+# AGENT.md - SigmaOS Future Development Roadmap for Missing Linux & BSD Components
 
-This document provides autonomous AI agents working on SigmaOS with a comprehensive architectural guide and future development roadmap to close all remaining feature, protocol, and driver gaps between SigmaOS and major Linux & BSD distributions (Arch Linux, Debian, Fedora, FreeBSD, OpenBSD, NetBSD, DragonFly BSD, Alpine, NixOS, openSUSE, Gentoo, Ubuntu, Illumos/Solaris).
-
----
-
-## 1. Subsystem Parity Goals & Guidelines
-
-SigmaOS aims for 100% architectural and operational parity with open-source OS ecosystems while adhering to strict sovereign design principles:
-- **Language & Safety**: 100% Safe Rust in kernel and system space (unsafe permitted only for bare-metal hardware MMIO/register access).
-- **Zero Third-Party Dependencies**: No external C/C++ libraries or non-Rust runtimes. All drivers, protocols, and parsers are implemented natively.
-- **Tri-Agent Framework**:
-  - ⚡ **Bolt**: Latency reduction, zero-copy memory buffers, and lock-free SPSC primitives.
-  - 🎨 **Palette**: Zenith Desktop, Wayland protocols, accessibility, and Omarchy theme synchronization.
-  - 🛡️ **Sentinel**: Security hardening, Landlock v5, OpenBSD pledge/unveil, and PQC cryptographic verification.
+This document serves as the operational guide and technical specification for AI engineering agents working on closing all remaining component and subsystem gaps between **SigmaOS** and upstream **Linux** and **BSD** operating system distributions.
 
 ---
 
-## 2. Missing Components & Development Roadmap
+## 🎯 Master Objective
 
-### Tier 1: Linux Kernel & Distro Innovations
-
-| Component / Subsystem | Inspired By | Target Modules | Implementation Status & Goals |
-| :--- | :--- | :--- | :--- |
-| **Systemd 256/258 Parity** | Fedora / RHEL / Arch | `src/init/`, `src/distro/` | Complete userland integration for `systemd-homed` LUKS home directories, `systemd-vmspawn` microVM instantiation, and Varlink IPC protocol handlers. |
-| **sched_ext BORE v2 Scheduler** | CachyOS / Linux 6.12 | `src/kernel/`, `src/distro/` | eBPF sched_ext CPU scheduler policy governor with dynamic burst-aware timeslices and P-Core/E-Core microarchitecture topology auto-pinning. |
-| **ABRoot & APX Containers** | Vanilla OS | `src/distro/` | Immutable atomic A/B rootfs image transaction engine, cryptographic payload checksum verifier, and unprivileged APX subsystem container execution. |
-| **Hermetic CAS Store & Flakes** | NixOS / GNU Guix | `src/sigpkg/`, `src/distro/` | Content-Addressable Store (CAS) closure validator, NAR archive integrity verifier, generation history management, and zero-copy hardlink deduplication. |
-| **Stateless Config Architecture** | Clear Linux / NixOS | `src/system/`, `src/distro/` | Isolation of vendor defaults in `/usr/share/defaults` and dynamic user override resolution in `/etc` for instant factory resets. |
-| **EAPI 8 Portage & USE Flags** | Gentoo | `src/distro/`, `src/package/` | Subslot rebuild trigger tracking, conditional dependency expression solver, and package-level vs. global USE flag resolution. |
-| **Bcachefs Multi-Tiered Storage** | Linux Kernel 6.7+ | `src/storage/`, `src/distro/` | Automatic promotion/demotion tiering between Fast SSDs and Slow HDDs based on access frequency, with background scrub and self-healing. |
+Achieve 100% feature, ABI, and operational parity with modern Linux (6.12+ LTS) and BSD (FreeBSD 14.1, OpenBSD 7.6, NetBSD 10.0, DragonFly BSD 6.4) ecosystems in **zero-dependency, safe Rust**.
 
 ---
 
-### Tier 2: BSD Subsystems & Security Innovations
+## 🚀 Priority Roadmap for Missing Components
 
-| Component / Subsystem | Inspired By | Target Modules | Implementation Status & Goals |
-| :--- | :--- | :--- | :--- |
-| **FreeBSD 14/15 VNET & bhyve** | FreeBSD | `src/network/`, `src/virt/` | Per-jail independent network stack routing tables, epair virtual interfaces, and bhyve PCIe hardware passthrough with VirtIO device emulation. |
-| **Pinned Syscalls & Fine IBT** | OpenBSD 7.6 / 7.8 | `src/security/`, `src/kernel/` | Enforcing registered executable code region boundaries for syscall execution (`pinsyscall`), Fine-Grained Indirect Branch Tracking (IBT), and capability locking. |
-| **HAMMER2 Multi-Master PFS Sync** | DragonFly BSD | `src/distro/`, `src/storage/` | Clustering quorum consensus across HAMMER2 Pseudo Filesystems (PFS), automatic read-only failover upon network partition, and Emergency CoW deduplication. |
-| **Rump Kernel & Veriexec** | NetBSD 10 | `src/distro/`, `src/security/` | Executing kernel drivers in userland sandboxes via rump hypercalls, in-kernel SHA-256/SHA-512 executable fingerprint auditing, and Veriexec enforcement. |
-| **DTrace & Crossbow VNICs** | Illumos / Solaris | `src/observability/`, `src/net/` | Dynamic kernel/userland probe providers (FBT, SDT, Profile), aggregation metrics (Count, Sum, Avg), and virtual network interface (VNIC) etherstub routing. |
-| **Softraid AES-XTS & bioctl** | OpenBSD / NetBSD | `src/crypto/`, `src/storage/` | Softraid full-disk AES-XTS / ChaCha20-Poly1305 encrypted RAID volume management and bioctl hardware/software storage controller management. |
+### Phase 1: Linux Kernel Subsystems & Hardening
 
----
+1. **`sched_ext` (eBPF Extensible Scheduler)**
+   - *Target*: Parity with Linux 6.12+ `scx` scheduler frameworks (`scx_bpfland`, `scx_rusty`, `scx_lavd`).
+   - *Requirement*: Dynamic userland/eBPF CPU task scheduling policies for real-time and gaming workloads.
 
-## 3. Verification & CI Workflow Guidelines
+2. **Landlock LSM v5 & BPF LSM**
+   - *Target*: Linux unprivileged filesystem sandboxing & eBPF LSM hook gates.
+   - *Requirement*: Path-based read/write/exec restriction rules enforced per thread.
 
-Before submitting PRs, AI agents must execute:
-```bash
-# 1. Verify compilation and lib correctness
-cargo check --lib
+3. **Bcachefs Advanced Tiered CoW Storage**
+   - *Target*: Parity with Bcachefs multode tiering, encryption, and inline compression.
+   - *Requirement*: Extent-based copy-on-write allocation with automatic SSD/NVMe caching tiers.
 
-# 2. Run standalone test for distro next-gen innovations
-mkdir -p build
-rustc --test src/distro/sovereign_linux_bsd_distro_next_gen_innovations.rs --edition=2021 -o build/test_next_gen_distro
-./build/test_next_gen_distro
+4. **io_uring Asynchronous Ring Buffer Engine**
+   - *Target*: High-throughput zero-copy asynchronous I/O completion queues.
+   - *Requirement*: Fast submission (`SQ`) and completion (`CQ`) ring buffers for network and storage syscalls.
 
-# 3. Execute the full SigmaOS test suite runner
-./run_sigma_tests.sh
-```
+5. **systemd 256+ Parity & Varlink IPC**
+   - *Target*: Modern `systemd-sysext`, `systemd-confext`, `homed`, and Varlink binary IPC transport.
+   - *Requirement*: Immutable system extension overlay mounts and PQC encrypted home directories.
 
 ---
 
-*SigmaOS AI Agent Directive — Maintain 100% Test Pass Rates & Zero Compilation Warnings.*
+### Phase 2: BSD Subsystem Innovations
+
+1. **FreeBSD 14.1 VNET, Jails, Capsicum & GEOM**
+   - *Target*: Complete VNET virtual network stack per jail and Capsicum capability mode sandboxing.
+   - *Requirement*: Fine-grained file descriptor rights enforcement (`CAP_READ`, `CAP_WRITE`, `CAP_SEEK`).
+
+2. **OpenBSD 7.6+ Pledge, Unveil, KARL & pf**
+   - *Target*: Process call promise restrictions (`pledge`), path visibility locks (`unveil`), Kernel Address Randomized Link (`KARL`), and stateful Packet Filter (`pf`).
+   - *Requirement*: Mandatory pledge/unveil sandboxing for all userland scriptlets and processes.
+
+3. **NetBSD Rump Kernels & Anyware Drivers**
+   - *Target*: Modular hypercall-based userland kernel drivers for VFS, TCP/IP, and USB.
+   - *Requirement*: Microkernel-style isolated driver execution without host kernel panics.
+
+4. **DragonFly BSD HAMMER2 Multi-PFS & Block Deduplication**
+   - *Target*: Pseudo Filesystems (PFS), cluster replication, and Merkle tree block deduplication.
+   - *Requirement*: Zero-overhead snapshotting and multi-node cluster state synchronization.
+
+---
+
+### Phase 3: Universal Package Management & Distro Absorption
+
+1. **SigmaPkg Universal Ingestion Engine (`src/package/`)**
+   - *Target*: Absorption of 29+ foreign package formats into native `SigmaPkg`.
+   - *Formats*: `.pkg.tar.zst` (Arch), `.deb` (Debian/Ubuntu), `.rpm` (Fedora/RHEL), `.apk` (Alpine), `.xbps` (Void), `.ebuild` (Gentoo), `.nix` (NixOS), `.pkg` (FreeBSD), `.flatpak`, `.snap`, `.appimage`, `.ipk` (OpenWrt), `.eopkg` (Solus), `.pet`/`.pup` (Puppy), `.txz` (Slackware), `.p5p` (Illumos).
+
+2. **DPLL SAT Dependency Resolver & Mirror Manager**
+   - *Target*: Exact multi-distro dependency graph resolution and `/etc/pacman.d/mirrorlist` speed benchmarking.
+   - *Requirement*: Direct translation of foreign package capability dependencies into canonical SigmaOS capabilities (`sovereign-libc`, `sovereign-openssl`, `sovereign-graphics`).
+
+---
+
+## 🛠️ Verification & Testing Mandate
+
+Agents working on these components must ensure:
+1. All changes compile cleanly under `cargo check --lib`.
+2. Unit tests covering new data structures and methods are placed in the respective file under `#[cfg(test)]`.
+3. The master test suite `./run_sigma_tests.sh` executes with a **100% pass rate**.
+
+---
