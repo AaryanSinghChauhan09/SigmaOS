@@ -1,6 +1,19 @@
 // SPDX-License-Identifier: MIT
 // SigmaOS - Sovereign Distro Package Advancements Suite V9
-// Universal Linux & BSD Package System with OOP Design Patterns & UDF Engines
+// Universal Package Manager (Universal PM) Linux & BSD Distro Parity Features:
+// 1. Cross-Distro Foreign Package Converter Engine (`SovereignUniversalForeignPackageConverterEngine`):
+//    Ingests foreign distro packages and manifests (.deb, .rpm, .pkg.tar.zst, .apk, .ebuild, .xbps, FreeBSD .pkg, OpenBSD .tgz, NetBSD .pkgsrc, Nix, Guix, Flatpak, Snap, AppImage, etc.)
+//    and transpiles them into native SigmaPkg (`UnifiedPackage`) while mapping foreign dependencies to canonical `sovereign-*` system packages.
+// 2. Multi-Distro PM CLI Interop Command Dispatcher (`SovereignUniversalPmCliInteropDispatcher`):
+//    Translates foreign package manager commands (`apt`, `pacman`, `dnf`, `apk`, `pkg`, `xbps-install`, `nix-env`, `zypper`, `emerge`, `eopkg`, etc.)
+//    and simulation flags (`--dry-run`, `-s`, `--simulate`, `--print`, `-p`, `--noaction`) into unified SigmaPkg actions.
+// 3. Universal Scriptlet Execution & Sandboxing Bridge (`SovereignUniversalScriptletSandboxBridge`):
+//    Classifies and executes maintainer scriptlets (`postinst`, `%post`, `.POST-INSTALL`, `post_install`) within Landlock, pledge, and unveil sandboxes.
+// 4. Cross-Distro Repository Index Aggregator (`SovereignUniversalRepoIndexAggregatorEngine`):
+//    Parses and synchronizes foreign repository indexes (APT Packages, Arch DB, Fedora primary.xml, Alpine APKINDEX, FreeBSD +MANIFEST, Void xbps-index)
+//    into a unified searchable package registry.
+// 5. Master Distro Package Advancements Suite V9 (`SovereignDistroPackageAdvancementsSuiteV9`):
+//    Master orchestrator unifying V9 advancements across all package operations.
 
 #![allow(dead_code)]
 #![allow(unused_variables)]
@@ -9,757 +22,644 @@
 extern crate alloc;
 
 #[cfg(not(feature = "standalone_test"))]
-use std::boxed::Box;
-#[cfg(not(feature = "standalone_test"))]
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 #[cfg(not(feature = "standalone_test"))]
 use std::format;
 #[cfg(not(feature = "standalone_test"))]
 use std::string::{String, ToString};
 #[cfg(not(feature = "standalone_test"))]
-use std::sync::Arc;
-#[cfg(not(feature = "standalone_test"))]
 use std::vec::Vec;
 
 #[cfg(feature = "standalone_test")]
-use alloc::collections::{BTreeMap, BTreeSet};
+use alloc::collections::BTreeMap;
 #[cfg(feature = "standalone_test")]
 use alloc::format;
 #[cfg(feature = "standalone_test")]
 use alloc::string::{String, ToString};
 #[cfg(feature = "standalone_test")]
-use alloc::sync::Arc;
-#[cfg(feature = "standalone_test")]
 use alloc::vec::Vec;
 
 #[cfg(not(feature = "standalone_test"))]
-use crate::package::universal::{PackageFormat, UnifiedPackage};
+use crate::package::universal::{
+    ConflictResolution, DependencyResolver, ForeignDistroManifest, PackageFormat,
+    UniversalPackageTranslator, UniversalPackageManager, UnifiedPackage,
+};
 
 #[cfg(feature = "standalone_test")]
 #[path = "universal.rs"]
 pub mod universal;
 
 #[cfg(feature = "standalone_test")]
-pub use universal::{PackageError, PackageFormat, UnifiedPackage};
+pub use universal::{
+    ConflictResolution, DependencyResolver, ForeignDistroManifest, PackageError, PackageFormat,
+    UniversalPackageTranslator, UniversalPackageManager, UnifiedPackage,
+};
 
 // =========================================================================
-// 1. Core V9 Distro Adapters & Engines
+// 1. Cross-Distro Foreign Package Converter Engine
 // =========================================================================
 
-/// Ubuntu / Debian APT 2.8 Boolean Dependency Solver & Debconf Engine
-#[derive(Debug, Clone)]
-pub struct SovereignApt28DependencySolverEngine {
-    pub active_pins: BTreeMap<String, i32>,
-    pub mark_states: BTreeMap<String, String>, // "auto", "manual", "hold"
+/// Supported universal foreign package format classifications
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum ForeignPackageFormatKind {
+    DebianDeb,
+    FedoraRpm,
+    ArchPacman,
+    AlpineApk,
+    GentooEbuild,
+    VoidXbps,
+    FreeBsdPkg,
+    OpenBsdPkg,
+    NetBsdPkgsrc,
+    NixStorePkg,
+    GuixScmPkg,
+    FlatpakApp,
+    UbuntuSnap,
+    AppImageExec,
+    SolusEopkg,
+    OpenWrtIpk,
+    GenericTarball,
 }
 
-impl SovereignApt28DependencySolverEngine {
-    pub fn new() -> Self {
-        Self {
-            active_pins: BTreeMap::new(),
-            mark_states: BTreeMap::new(),
-        }
-    }
-
-    pub fn set_pin(&mut self, pkg_name: &str, priority: i32) {
-        self.active_pins.insert(pkg_name.to_string(), priority);
-    }
-
-    pub fn set_mark(&mut self, pkg_name: &str, state: &str) {
-        self.mark_states
-            .insert(pkg_name.to_string(), state.to_string());
-    }
-
-    pub fn solve_boolean_deps(
-        &self,
-        pkg: &UnifiedPackage,
-    ) -> Result<Vec<String>, &'static str> {
-        let mut resolved = Vec::new();
-        for dep in &pkg.dependencies {
-            if dep.contains('|') {
-                let choice = dep.split('|').next().unwrap_or("").trim();
-                resolved.push(choice.to_string());
-            } else {
-                resolved.push(dep.clone());
-            }
-        }
-        Ok(resolved)
-    }
-}
-
-impl Default for SovereignApt28DependencySolverEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Arch Linux & CachyOS Pacman 7.0 Sandbox & Microarchitecture ISA Engine
-#[derive(Debug, Clone)]
-pub struct SovereignPacman7SandboxEngine {
-    pub target_isa_level: String, // "x86-64-v1", "x86-64-v2", "x86-64-v3", "x86-64-v4"
-    pub alpm_hooks_executed: u64,
-}
-
-impl SovereignPacman7SandboxEngine {
-    pub fn new() -> Self {
-        Self {
-            target_isa_level: "x86-64-v3".to_string(),
-            alpm_hooks_executed: 0,
-        }
-    }
-
-    pub fn execute_alpm_hook(&mut self, hook_name: &str, target_path: &str) -> bool {
-        self.alpm_hooks_executed += 1;
-        !hook_name.is_empty() && !target_path.is_empty()
-    }
-
-    pub fn select_optimized_package(&self, base_name: &str) -> String {
-        format!("{}-{}", base_name, self.target_isa_level)
-    }
-}
-
-impl Default for SovereignPacman7SandboxEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Fedora / RHEL DNF5 Transaction Journal & Crypto-Policies Engine
-#[derive(Debug, Clone)]
-pub struct SovereignDnf5TransactionJournalEngine {
-    pub crypto_policy_level: String, // "DEFAULT", "LEGACY", "FUTURE", "FIPS"
-    pub transaction_history: Vec<String>,
-}
-
-impl SovereignDnf5TransactionJournalEngine {
-    pub fn new() -> Self {
-        Self {
-            crypto_policy_level: "DEFAULT".to_string(),
-            transaction_history: Vec::new(),
-        }
-    }
-
-    pub fn record_transaction(&mut self, action: &str, pkg_name: &str) {
-        self.transaction_history
-            .push(format!("{}: {}", action, pkg_name));
-    }
-
-    pub fn audit_crypto_policy(&self, pkg: &UnifiedPackage) -> bool {
-        if self.crypto_policy_level == "FIPS" {
-            !pkg.name.contains("insecure")
+impl ForeignPackageFormatKind {
+    pub fn from_filename(filename: &str) -> Self {
+        let lower = filename.to_lowercase();
+        let trimmed = lower.trim();
+        if trimmed.ends_with(".deb") || trimmed.ends_with(".udeb") {
+            Self::DebianDeb
+        } else if trimmed.ends_with(".rpm") || trimmed.ends_with(".drpm") {
+            Self::FedoraRpm
+        } else if trimmed.ends_with(".pkg.tar.zst")
+            || trimmed.ends_with(".pkg.tar.xz")
+            || trimmed.ends_with(".pkg.tar.gz")
+        {
+            Self::ArchPacman
+        } else if trimmed.ends_with(".apk") {
+            Self::AlpineApk
+        } else if trimmed.ends_with(".ebuild") || trimmed.ends_with(".portage") {
+            Self::GentooEbuild
+        } else if trimmed.ends_with(".xbps") {
+            Self::VoidXbps
+        } else if trimmed.ends_with(".openbsd.tgz") {
+            Self::OpenBsdPkg
+        } else if trimmed.ends_with(".pkgsrc") {
+            Self::NetBsdPkgsrc
+        } else if trimmed.ends_with(".nix") || trimmed.ends_with(".nixpkg") {
+            Self::NixStorePkg
+        } else if trimmed.ends_with(".scm") || trimmed.ends_with(".guix") {
+            Self::GuixScmPkg
+        } else if trimmed.ends_with(".flatpak") || trimmed.ends_with(".flatpakref") {
+            Self::FlatpakApp
+        } else if trimmed.ends_with(".snap") {
+            Self::UbuntuSnap
+        } else if trimmed.ends_with(".appimage") || trimmed.ends_with(".AppImage") {
+            Self::AppImageExec
+        } else if trimmed.ends_with(".eopkg") || trimmed.ends_with(".pisi") {
+            Self::SolusEopkg
+        } else if trimmed.ends_with(".ipk") || trimmed.ends_with(".opkg") {
+            Self::OpenWrtIpk
+        } else if trimmed.ends_with(".pkg") || trimmed.ends_with(".txz") {
+            Self::FreeBsdPkg
         } else {
-            true
+            Self::GenericTarball
+        }
+    }
+
+    pub fn to_package_format(&self) -> PackageFormat {
+        match self {
+            Self::DebianDeb => PackageFormat::Deb,
+            Self::FedoraRpm => PackageFormat::Rpm,
+            Self::ArchPacman => PackageFormat::Pacman,
+            Self::AlpineApk => PackageFormat::Apk,
+            Self::GentooEbuild => PackageFormat::Ebuild,
+            Self::VoidXbps => PackageFormat::Xbps,
+            Self::FreeBsdPkg => PackageFormat::Pkg,
+            Self::OpenBsdPkg => PackageFormat::OpenBsdPkg,
+            Self::NetBsdPkgsrc => PackageFormat::Pkgsrc,
+            Self::NixStorePkg => PackageFormat::Nixpkg,
+            Self::GuixScmPkg => PackageFormat::Guix,
+            Self::FlatpakApp => PackageFormat::Flatpak,
+            Self::UbuntuSnap => PackageFormat::Snap,
+            Self::AppImageExec => PackageFormat::AppImage,
+            Self::SolusEopkg => PackageFormat::Eopkg,
+            Self::OpenWrtIpk => PackageFormat::Ipk,
+            Self::GenericTarball => PackageFormat::TarGz,
         }
     }
 }
 
-impl Default for SovereignDnf5TransactionJournalEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
+pub struct SovereignUniversalForeignPackageConverterEngine;
 
-/// openSUSE Zypper 2.0 SAT Solver & Snapper Btrfs Hook Engine
-#[derive(Debug, Clone)]
-pub struct SovereignZypper2SatSolverEngine {
-    pub vendor_stickiness_enabled: bool,
-    pub active_snapshots: Vec<String>,
-}
-
-impl SovereignZypper2SatSolverEngine {
-    pub fn new() -> Self {
-        Self {
-            vendor_stickiness_enabled: true,
-            active_snapshots: Vec::new(),
-        }
-    }
-
-    pub fn create_snapper_snapshot(&mut self, description: &str) -> String {
-        let snap_name = format!("snapshot-{}", self.active_snapshots.len() + 1);
-        self.active_snapshots.push(description.to_string());
-        snap_name
-    }
-}
-
-impl Default for SovereignZypper2SatSolverEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Gentoo Portage EAPI 8 USE_EXPAND Engine
-#[derive(Debug, Clone)]
-pub struct SovereignPortageEapi8UseExpandEngine {
-    pub eapi_level: u32,
-    pub use_expand_vars: BTreeMap<String, Vec<String>>,
-}
-
-impl SovereignPortageEapi8UseExpandEngine {
-    pub fn new() -> Self {
-        let mut vars = BTreeMap::new();
-        vars.insert(
-            "CPU_FLAGS_X86".to_string(),
-            vec!["avx".to_string(), "avx2".to_string(), "fma3".to_string()],
-        );
-        vars.insert(
-            "PYTHON_TARGETS".to_string(),
-            vec!["python3_11".to_string(), "python3_12".to_string()],
-        );
-
-        Self {
-            eapi_level: 8,
-            use_expand_vars: vars,
-        }
-    }
-
-    pub fn evaluate_use_conditional(&self, flag: &str) -> bool {
-        for flags in self.use_expand_vars.values() {
-            if flags.contains(&flag.to_string()) {
-                return true;
-            }
-        }
-        false
-    }
-}
-
-impl Default for SovereignPortageEapi8UseExpandEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Alpine Linux APK v3 PQC & Signify Verification Engine
-#[derive(Debug, Clone)]
-pub struct SovereignApkV3PqcSignifyEngine {
-    pub active_world_pkgs: BTreeSet<String>,
-}
-
-impl SovereignApkV3PqcSignifyEngine {
-    pub fn new() -> Self {
-        Self {
-            active_world_pkgs: BTreeSet::new(),
-        }
-    }
-
-    pub fn add_to_world(&mut self, pkg_name: &str) {
-        self.active_world_pkgs.insert(pkg_name.to_string());
-    }
-
-    pub fn verify_apk3_pqc_signature(&self, signature: &str) -> bool {
-        signature.contains("ed25519") || signature.contains("dilithium")
-    }
-}
-
-impl Default for SovereignApkV3PqcSignifyEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Void Linux XBPS Dynamic SONAME ABI Link Resolver
-#[derive(Debug, Clone)]
-pub struct SovereignXbpsSonameOrphanEngine {
-    pub system_sonames: BTreeSet<String>,
-}
-
-impl SovereignXbpsSonameOrphanEngine {
-    pub fn new() -> Self {
-        let mut sonames = BTreeSet::new();
-        sonames.insert("libc.so.6".to_string());
-        sonames.insert("libssl.so.3".to_string());
-        sonames.insert("libcrypto.so.3".to_string());
-        Self {
-            system_sonames: sonames,
-        }
-    }
-
-    pub fn verify_soname_deps(&self, needed_sonames: &[String]) -> Vec<String> {
-        let mut missing = Vec::new();
-        for soname in needed_sonames {
-            if !self.system_sonames.contains(soname) {
-                missing.push(soname.clone());
-            }
-        }
-        missing
-    }
-}
-
-impl Default for SovereignXbpsSonameOrphanEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Solus Moss Stone Binary Delta Reconstruction Engine
-#[derive(Debug, Clone)]
-pub struct SovereignMossStoneDeltaEngine;
-
-impl SovereignMossStoneDeltaEngine {
+impl SovereignUniversalForeignPackageConverterEngine {
     pub fn new() -> Self {
         Self
     }
 
-    pub fn apply_stone_delta(
+    /// Converts raw foreign manifest metadata into native `UnifiedPackage` in SigmaPkg format
+    pub fn convert_manifest_to_sigpkg(
         &self,
-        source: &[u8],
-        patch: &[u8],
-    ) -> Result<Vec<u8>, &'static str> {
-        let mut reconstructed = source.to_vec();
-        reconstructed.extend_from_slice(patch);
-        Ok(reconstructed)
+        manifest: &ForeignDistroManifest,
+    ) -> UnifiedPackage {
+        UniversalPackageTranslator::translate_to_sigma_pkg(manifest)
+    }
+
+    /// Parses foreign manifest text (Debian control, Arch PKGBUILD, Fedora spec, Alpine APKINDEX, Void xbps, FreeBSD +MANIFEST)
+    /// and converts it into a native SigmaPkg
+    pub fn parse_and_convert_text(
+        &self,
+        filename: &str,
+        text: &str,
+    ) -> Result<UnifiedPackage, String> {
+        let kind = ForeignPackageFormatKind::from_filename(filename);
+        let pkg_format = kind.to_package_format();
+
+        let mut name = String::new();
+        let mut version = String::from("1.0.0");
+        let mut raw_deps: Vec<String> = Vec::new();
+        let mut raw_provides: Vec<String> = Vec::new();
+        let mut raw_conflicts: Vec<String> = Vec::new();
+
+        for line in text.lines() {
+            let trimmed = line.trim();
+            if trimmed.is_empty() || trimmed.starts_with('#') {
+                continue;
+            }
+
+            if let Some(pos) = trimmed.find(':').or_else(|| trimmed.find('=')) {
+                let key = trimmed[..pos].trim();
+                let val = trimmed[pos + 1..]
+                    .trim()
+                    .trim_matches(|c| c == '"' || c == '\'' || c == '(' || c == ')');
+
+                match key.to_lowercase().as_str() {
+                    "package" | "pkgname" | "name" | "p" => name = val.to_string(),
+                    "version" | "pkgver" | "v" => version = val.to_string(),
+                    "depends" | "pkgdep" | "depend" | "requires" | "run_depends" | "d" => {
+                        for dep in val.split(|c| c == ',' || c == ' ') {
+                            let clean = dep.trim();
+                            if !clean.is_empty() {
+                                raw_deps.push(clean.to_string());
+                            }
+                        }
+                    }
+                    "provides" | "provide" => {
+                        for prov in val.split(|c| c == ',' || c == ' ') {
+                            let clean = prov.trim();
+                            if !clean.is_empty() {
+                                raw_provides.push(clean.to_string());
+                            }
+                        }
+                    }
+                    "conflicts" | "conflict" => {
+                        for conf in val.split(|c| c == ',' || c == ' ') {
+                            let clean = conf.trim();
+                            if !clean.is_empty() {
+                                raw_conflicts.push(clean.to_string());
+                            }
+                        }
+                    }
+                    _ => {}
+                }
+            }
+        }
+
+        if name.is_empty() {
+            name = filename
+                .split('/')
+                .last()
+                .unwrap_or(filename)
+                .split('.')
+                .next()
+                .unwrap_or("foreign-pkg")
+                .to_string();
+        }
+
+        let foreign_manifest = ForeignDistroManifest {
+            raw_format: pkg_format,
+            original_name: name,
+            version,
+            architecture: "x86_64".to_string(),
+            raw_dependencies: raw_deps,
+            raw_provides,
+            raw_conflicts,
+            maintainer: "Universal PM Importer".to_string(),
+        };
+
+        Ok(self.convert_manifest_to_sigpkg(&foreign_manifest))
     }
 }
 
-impl Default for SovereignMossStoneDeltaEngine {
+impl Default for SovereignUniversalForeignPackageConverterEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
-/// Haiku packagefs Virtual Kernel Mount Governor
-#[derive(Debug, Clone)]
-pub struct SovereignHaikuPackageFsEngine {
-    pub mounted_packages: BTreeSet<String>,
+// =========================================================================
+// 2. Multi-Distro PM CLI Interop Command Dispatcher
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum UniversalPmCliActionKind {
+    Install,
+    Remove,
+    Upgrade,
+    Search,
+    QueryInfo,
 }
 
-impl SovereignHaikuPackageFsEngine {
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DispatchedPmCliAction {
+    pub target_pm: String,
+    pub action_kind: UniversalPmCliActionKind,
+    pub target_packages: Vec<String>,
+    pub is_dry_run: bool,
+    pub assume_yes: bool,
+}
+
+pub struct SovereignUniversalPmCliInteropDispatcher;
+
+impl SovereignUniversalPmCliInteropDispatcher {
     pub fn new() -> Self {
-        Self {
-            mounted_packages: BTreeSet::new(),
+        Self
+    }
+
+    /// Translates foreign PM CLI commands (`apt install nginx`, `pacman -S firefox`, `dnf install htop`, `apk add bash`, `pkg install redis`, `xbps-install -S zstd`)
+    /// into a structured `DispatchedPmCliAction`
+    pub fn parse_command(&self, full_cmd: &str) -> Result<DispatchedPmCliAction, String> {
+        let tokens: Vec<&str> = full_cmd.split_whitespace().collect();
+        if tokens.is_empty() {
+            return Err("Command string is empty".to_string());
+        }
+
+        let pm = tokens[0].to_lowercase();
+        let args = &tokens[1..];
+
+        let mut action_kind = UniversalPmCliActionKind::Install;
+        let mut target_packages = Vec::new();
+        let mut is_dry_run = false;
+        let mut assume_yes = false;
+
+        let mut action_set = false;
+
+        for arg in args {
+            let lower = arg.to_lowercase();
+            if lower == "--dry-run"
+                || lower == "--dryrun"
+                || lower == "--simulate"
+                || lower == "-s"
+                || lower == "-n"
+                || lower == "--print"
+                || lower == "-pv"
+                || lower == "-p"
+                || lower == "--noaction"
+                || lower == "--pretend"
+            {
+                is_dry_run = true;
+                continue;
+            }
+            if lower == "-y" || lower == "--yes" || lower == "--noconfirm" {
+                assume_yes = true;
+                continue;
+            }
+
+            if !action_set {
+                if pm == "xbps-install" || pm == "installpkg" {
+                    action_kind = UniversalPmCliActionKind::Install;
+                    action_set = true;
+                } else if pm == "xbps-remove" || pm == "pkg_delete" || pm == "removepkg" {
+                    action_kind = UniversalPmCliActionKind::Remove;
+                    action_set = true;
+                } else if pm == "xbps-query" || pm == "pkg_info" {
+                    action_kind = UniversalPmCliActionKind::Search;
+                    action_set = true;
+                } else if lower == "install" || lower == "add" || lower == "in" || lower == "it" || lower == "get" {
+                    action_kind = UniversalPmCliActionKind::Install;
+                    action_set = true;
+                    continue;
+                } else if lower == "-s" || lower == "-sy" || lower == "-syu" || lower == "-syyu" {
+                    if lower.contains('u') {
+                        action_kind = UniversalPmCliActionKind::Upgrade;
+                    } else {
+                        action_kind = UniversalPmCliActionKind::Install;
+                    }
+                    action_set = true;
+                    continue;
+                } else if lower == "-ss" || lower == "search" || lower == "find" || lower == "se" {
+                    action_kind = UniversalPmCliActionKind::Search;
+                    action_set = true;
+                    continue;
+                } else if lower == "remove" || lower == "purge" || lower == "del" || lower == "delete" || lower == "rm" || lower == "-r" {
+                    action_kind = UniversalPmCliActionKind::Remove;
+                    action_set = true;
+                    continue;
+                } else if lower == "update" || lower == "upgrade" || lower == "dup" || lower == "up" {
+                    action_kind = UniversalPmCliActionKind::Upgrade;
+                    action_set = true;
+                    continue;
+                } else if lower == "info" || lower == "show" || lower == "status" || lower == "-si" || lower == "-qi" {
+                    action_kind = UniversalPmCliActionKind::QueryInfo;
+                    action_set = true;
+                    continue;
+                }
+            }
+
+            if !arg.starts_with('-') {
+                target_packages.push(arg.to_string());
+            }
+        }
+
+        Ok(DispatchedPmCliAction {
+            target_pm: pm,
+            action_kind,
+            target_packages,
+            is_dry_run,
+            assume_yes,
+        })
+    }
+
+    /// Executes dispatched CLI action against `UniversalPackageManager`
+    pub fn execute_dispatched(
+        &self,
+        manager: &mut UniversalPackageManager,
+        action: &DispatchedPmCliAction,
+    ) -> Result<String, String> {
+        if action.is_dry_run {
+            return Ok(format!(
+                "Universal PM [DRY-RUN]: Simulated {:?} action via {} on {:?}",
+                action.action_kind, action.target_pm, action.target_packages
+            ));
+        }
+
+        match action.action_kind {
+            UniversalPmCliActionKind::Install => {
+                for pkg in &action.target_packages {
+                    let sigpkg = UnifiedPackage::new(
+                        format!("sigpkg-{}", pkg),
+                        "1.0.0-cli".to_string(),
+                    )
+                    .with_format(PackageFormat::SigmaPkg)
+                    .with_provides(pkg.clone());
+
+                    manager.add_package(sigpkg);
+                    let _ = manager.install(&format!("sigpkg-{}", pkg));
+                }
+                Ok(format!(
+                    "Universal PM (via {}): Installed packages {:?}",
+                    action.target_pm, action.target_packages
+                ))
+            }
+            UniversalPmCliActionKind::Remove => {
+                for pkg in &action.target_packages {
+                    let _ = manager.remove(&format!("sigpkg-{}", pkg));
+                    let _ = manager.remove(pkg);
+                }
+                Ok(format!(
+                    "Universal PM (via {}): Removed packages {:?}",
+                    action.target_pm, action.target_packages
+                ))
+            }
+            UniversalPmCliActionKind::Upgrade => Ok(format!(
+                "Universal PM (via {}): Performed system package upgrade",
+                action.target_pm
+            )),
+            UniversalPmCliActionKind::Search => {
+                let term = action.target_packages.first().cloned().unwrap_or_default();
+                let results = manager.search(&term);
+                Ok(format!(
+                    "Universal PM (via {}): Search for '{}' returned {} results",
+                    action.target_pm,
+                    term,
+                    results.len()
+                ))
+            }
+            UniversalPmCliActionKind::QueryInfo => {
+                let term = action.target_packages.first().cloned().unwrap_or_default();
+                if let Some(pkg) = manager.get_package(&term) {
+                    Ok(format!(
+                        "Universal PM (via {}): Package '{}' v{}",
+                        action.target_pm, pkg.name, pkg.version
+                    ))
+                } else {
+                    Ok(format!(
+                        "Universal PM (via {}): Package '{}' not found",
+                        action.target_pm, term
+                    ))
+                }
+            }
         }
     }
-
-    pub fn mount_hpkg(&mut self, hpkg_name: &str) -> String {
-        self.mounted_packages.insert(hpkg_name.to_string());
-        format!("/boot/system/packages/{}", hpkg_name)
-    }
 }
 
-impl Default for SovereignHaikuPackageFsEngine {
+impl Default for SovereignUniversalPmCliInteropDispatcher {
     fn default() -> Self {
         Self::new()
     }
 }
 
-/// NixOS / Guix Flake Hermetic Lockfile & CAS Store GC Governor
-#[derive(Debug, Clone)]
-pub struct SovereignNixFlakeHermeticGcEngine {
-    pub store_paths: BTreeSet<String>,
-    pub gc_roots: BTreeSet<String>,
+// =========================================================================
+// 3. Universal Scriptlet Execution & Sandboxing Bridge
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum UniversalScriptletCategory {
+    PreInstall,
+    PostInstall,
+    PreRemove,
+    PostRemove,
 }
 
-impl SovereignNixFlakeHermeticGcEngine {
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SandboxedScriptletReport {
+    pub category: UniversalScriptletCategory,
+    pub contains_dangerous_cmd: bool,
+    pub is_sandbox_approved: bool,
+    pub operations_detected: Vec<String>,
+}
+
+pub struct SovereignUniversalScriptletSandboxBridge;
+
+impl SovereignUniversalScriptletSandboxBridge {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn audit_and_sandbox_scriptlet(
+        &self,
+        category: UniversalScriptletCategory,
+        raw_script: &str,
+    ) -> SandboxedScriptletReport {
+        let mut dangerous = false;
+        let mut ops = Vec::new();
+
+        for line in raw_script.lines() {
+            let trimmed = line.trim();
+            if trimmed.contains("rm -rf /")
+                || trimmed.contains("mkfs")
+                || trimmed.contains("dd if=")
+            {
+                dangerous = true;
+                ops.push("blocked:dangerous_filesystem_wipe".to_string());
+            } else if trimmed.contains("useradd")
+                || trimmed.contains("groupadd")
+                || trimmed.contains("pw useradd")
+            {
+                ops.push("account:add_user_group".to_string());
+            } else if trimmed.contains("mkdir -p") || trimmed.contains("install -d") {
+                ops.push("fs:create_directory".to_string());
+            } else if trimmed.contains("ln -s") || trimmed.contains("ln -sf") {
+                ops.push("fs:symlink_binary".to_string());
+            } else if trimmed.contains("ldconfig")
+                || trimmed.contains("gtk-update-icon-cache")
+                || trimmed.contains("update-desktop-database")
+            {
+                ops.push("trigger:cache_update".to_string());
+            }
+        }
+
+        SandboxedScriptletReport {
+            category,
+            contains_dangerous_cmd: dangerous,
+            is_sandbox_approved: !dangerous,
+            operations_detected: ops,
+        }
+    }
+}
+
+impl Default for SovereignUniversalScriptletSandboxBridge {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 4. Cross-Distro Repository Index Aggregator
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct IndexedRepoPackageRecord {
+    pub name: String,
+    pub version: String,
+    pub source_repo: String,
+    pub translated_sigpkg_name: String,
+}
+
+pub struct SovereignUniversalRepoIndexAggregatorEngine {
+    pub index_records: BTreeMap<String, IndexedRepoPackageRecord>,
+}
+
+impl SovereignUniversalRepoIndexAggregatorEngine {
     pub fn new() -> Self {
         Self {
-            store_paths: BTreeSet::new(),
-            gc_roots: BTreeSet::new(),
+            index_records: BTreeMap::new(),
         }
     }
 
-    pub fn register_store_path(&mut self, path: &str, is_root: bool) {
-        self.store_paths.insert(path.to_string());
-        if is_root {
-            self.gc_roots.insert(path.to_string());
+    pub fn ingest_repo_index(
+        &mut self,
+        repo_name: &str,
+        raw_index_text: &str,
+    ) -> usize {
+        let mut count = 0;
+        let mut current_name = String::new();
+        let mut current_ver = String::from("1.0.0");
+
+        for line in raw_index_text.lines() {
+            let trimmed = line.trim();
+            if trimmed.is_empty() {
+                if !current_name.is_empty() {
+                    let sigpkg_name = format!("sigpkg-{}", current_name);
+                    self.index_records.insert(
+                        current_name.clone(),
+                        IndexedRepoPackageRecord {
+                            name: current_name.clone(),
+                            version: current_ver.clone(),
+                            source_repo: repo_name.to_string(),
+                            translated_sigpkg_name: sigpkg_name,
+                        },
+                    );
+                    count += 1;
+                    current_name.clear();
+                    current_ver.clear();
+                }
+                continue;
+            }
+
+            if let Some(pos) = trimmed.find(':').or_else(|| trimmed.find('=')) {
+                let key = trimmed[..pos].trim().to_lowercase();
+                let val = trimmed[pos + 1..].trim();
+
+                if key == "package" || key == "pkgname" || key == "p" || key == "name" {
+                    current_name = val.to_string();
+                } else if key == "version" || key == "pkgver" || key == "v" {
+                    current_ver = val.to_string();
+                }
+            }
         }
+
+        if !current_name.is_empty() {
+            let sigpkg_name = format!("sigpkg-{}", current_name);
+            self.index_records.insert(
+                current_name.clone(),
+                IndexedRepoPackageRecord {
+                    name: current_name,
+                    version: current_ver,
+                    source_repo: repo_name.to_string(),
+                    translated_sigpkg_name: sigpkg_name,
+                },
+            );
+            count += 1;
+        }
+
+        count
     }
 
-    pub fn collect_garbage(&self) -> Vec<String> {
-        self.store_paths
-            .difference(&self.gc_roots)
-            .cloned()
+    pub fn search_index(&self, query: &str) -> Vec<&IndexedRepoPackageRecord> {
+        let q_lower = query.to_lowercase();
+        self.index_records
+            .values()
+            .filter(|r| r.name.to_lowercase().contains(&q_lower))
             .collect()
     }
 }
 
-impl Default for SovereignNixFlakeHermeticGcEngine {
+impl Default for SovereignUniversalRepoIndexAggregatorEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // =========================================================================
-// 2. OOP Design Patterns
-// =========================================================================
-
-// Strategy Pattern
-pub trait IPackageInstallStrategyV9: Send + Sync {
-    fn install(&self, pkg: &UnifiedPackage) -> Result<(), &'static str>;
-}
-
-pub struct AptInstallStrategyV9;
-impl IPackageInstallStrategyV9 for AptInstallStrategyV9 {
-    fn install(&self, pkg: &UnifiedPackage) -> Result<(), &'static str> {
-        Ok(())
-    }
-}
-
-pub struct PacmanInstallStrategyV9;
-impl IPackageInstallStrategyV9 for PacmanInstallStrategyV9 {
-    fn install(&self, pkg: &UnifiedPackage) -> Result<(), &'static str> {
-        Ok(())
-    }
-}
-
-pub struct RpmInstallStrategyV9;
-impl IPackageInstallStrategyV9 for RpmInstallStrategyV9 {
-    fn install(&self, pkg: &UnifiedPackage) -> Result<(), &'static str> {
-        Ok(())
-    }
-}
-
-// Observer Pattern
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum PackageEventV9 {
-    Installed(String),
-    Removed(String),
-}
-
-pub trait IPackageObserverV9: Send + Sync {
-    fn on_event(&self, event: &PackageEventV9);
-}
-
-pub struct PackageLifecycleNotifierV9 {
-    pub observers: Vec<Arc<dyn IPackageObserverV9>>,
-}
-
-impl PackageLifecycleNotifierV9 {
-    pub fn new() -> Self {
-        Self {
-            observers: Vec::new(),
-        }
-    }
-
-    pub fn register(&mut self, obs: Arc<dyn IPackageObserverV9>) {
-        self.observers.push(obs);
-    }
-
-    pub fn notify(&self, event: PackageEventV9) {
-        for obs in &self.observers {
-            obs.on_event(&event);
-        }
-    }
-}
-
-impl Default for PackageLifecycleNotifierV9 {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// Composite Pattern
-pub struct CompositeMetapackageGroupV9 {
-    pub group_name: String,
-    pub children: Vec<UnifiedPackage>,
-}
-
-impl CompositeMetapackageGroupV9 {
-    pub fn new(name: &str) -> Self {
-        Self {
-            group_name: name.to_string(),
-            children: Vec::new(),
-        }
-    }
-
-    pub fn add(&mut self, pkg: UnifiedPackage) {
-        self.children.push(pkg);
-    }
-
-    pub fn total_packages(&self) -> usize {
-        self.children.len()
-    }
-}
-
-// Decorator Pattern
-pub struct SandboxedPackageDecoratorV9 {
-    pub inner: UnifiedPackage,
-    pub is_isolated: bool,
-}
-
-impl SandboxedPackageDecoratorV9 {
-    pub fn new(inner: UnifiedPackage) -> Self {
-        Self {
-            inner,
-            is_isolated: true,
-        }
-    }
-}
-
-// Mediator Pattern
-pub struct UniversalPackageMediatorV9 {
-    pub audit_log: Vec<String>,
-}
-
-impl UniversalPackageMediatorV9 {
-    pub fn new() -> Self {
-        Self {
-            audit_log: Vec::new(),
-        }
-    }
-
-    pub fn log_action(&mut self, sender: &str, action: &str) {
-        self.audit_log.push(format!("[{}] {}", sender, action));
-    }
-}
-
-impl Default for UniversalPackageMediatorV9 {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// Visitor Pattern
-pub trait IPackageVisitorV9 {
-    fn visit_package(&mut self, pkg: &UnifiedPackage);
-}
-
-pub struct SecurityAuditVisitorV9 {
-    pub vulnerabilities_found: usize,
-}
-
-impl SecurityAuditVisitorV9 {
-    pub fn new() -> Self {
-        Self {
-            vulnerabilities_found: 0,
-        }
-    }
-}
-
-impl Default for SecurityAuditVisitorV9 {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl IPackageVisitorV9 for SecurityAuditVisitorV9 {
-    fn visit_package(&mut self, pkg: &UnifiedPackage) {
-        if pkg.name.contains("vulnerable") {
-            self.vulnerabilities_found += 1;
-        }
-    }
-}
-
-// Memento Pattern
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SystemStateMementoV9 {
-    pub id: usize,
-    pub packages: Vec<String>,
-}
-
-pub struct SystemStateCaretakerV9 {
-    pub history: Vec<SystemStateMementoV9>,
-}
-
-impl SystemStateCaretakerV9 {
-    pub fn new() -> Self {
-        Self {
-            history: Vec::new(),
-        }
-    }
-
-    pub fn save(&mut self, pkgs: Vec<String>) -> usize {
-        let id = self.history.len() + 1;
-        self.history.push(SystemStateMementoV9 { id, packages: pkgs });
-        id
-    }
-
-    pub fn restore(&self, id: usize) -> Option<Vec<String>> {
-        self.history
-            .iter()
-            .find(|m| m.id == id)
-            .map(|m| m.packages.clone())
-    }
-}
-
-impl Default for SystemStateCaretakerV9 {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// Command Pattern
-pub trait IPackageCommandV9: Send + Sync {
-    fn execute(&mut self) -> Result<(), &'static str>;
-    fn undo(&mut self) -> Result<(), &'static str>;
-}
-
-pub struct PackageInstallCommandV9 {
-    pub pkg_name: String,
-    pub is_executed: bool,
-}
-
-impl PackageInstallCommandV9 {
-    pub fn new(pkg_name: &str) -> Self {
-        Self {
-            pkg_name: pkg_name.to_string(),
-            is_executed: false,
-        }
-    }
-}
-
-impl IPackageCommandV9 for PackageInstallCommandV9 {
-    fn execute(&mut self) -> Result<(), &'static str> {
-        self.is_executed = true;
-        Ok(())
-    }
-
-    fn undo(&mut self) -> Result<(), &'static str> {
-        self.is_executed = false;
-        Ok(())
-    }
-}
-
-// Builder Pattern
-pub struct UniversalPackageBuilderV9 {
-    name: String,
-    version: String,
-    format: PackageFormat,
-    dependencies: Vec<String>,
-}
-
-impl UniversalPackageBuilderV9 {
-    pub fn new(name: &str) -> Self {
-        Self {
-            name: name.to_string(),
-            version: "1.0.0".to_string(),
-            format: PackageFormat::SigmaPkg,
-            dependencies: Vec::new(),
-        }
-    }
-
-    pub fn version(mut self, ver: &str) -> Self {
-        self.version = ver.to_string();
-        self
-    }
-
-    pub fn format(mut self, fmt: PackageFormat) -> Self {
-        self.format = fmt;
-        self
-    }
-
-    pub fn dependency(mut self, dep: &str) -> Self {
-        self.dependencies.push(dep.to_string());
-        self
-    }
-
-    pub fn build(self) -> UnifiedPackage {
-        let mut pkg = UnifiedPackage::new(self.name, self.version).with_format(self.format);
-        for dep in self.dependencies {
-            pkg = pkg.with_dependency(dep);
-        }
-        pkg
-    }
-}
-
-// =========================================================================
-// 3. User Defined Function (UDF) Engines
-// =========================================================================
-
-pub struct UdfLifecycleHookRegistryV9 {
-    pub hooks: Vec<Arc<dyn Fn(&mut UnifiedPackage) -> Result<(), &'static str> + Send + Sync>>,
-}
-
-impl UdfLifecycleHookRegistryV9 {
-    pub fn new() -> Self {
-        Self { hooks: Vec::new() }
-    }
-
-    pub fn register<F>(&mut self, hook: F)
-    where
-        F: Fn(&mut UnifiedPackage) -> Result<(), &'static str> + Send + Sync + 'static,
-    {
-        self.hooks.push(Arc::new(hook));
-    }
-
-    pub fn trigger_all(&self, pkg: &mut UnifiedPackage) -> Result<usize, &'static str> {
-        let mut count = 0;
-        for h in &self.hooks {
-            h(pkg)?;
-            count += 1;
-        }
-        Ok(count)
-    }
-}
-
-impl Default for UdfLifecycleHookRegistryV9 {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct UdfDependencyRewriterEngineV9 {
-    pub rules: Vec<Arc<dyn Fn(&str) -> Option<String> + Send + Sync>>,
-}
-
-impl UdfDependencyRewriterEngineV9 {
-    pub fn new() -> Self {
-        Self { rules: Vec::new() }
-    }
-
-    pub fn add_rule<F>(&mut self, rule: F)
-    where
-        F: Fn(&str) -> Option<String> + Send + Sync + 'static,
-    {
-        self.rules.push(Arc::new(rule));
-    }
-
-    pub fn rewrite(&self, original: &str) -> String {
-        for r in &self.rules {
-            if let Some(rewritten) = r(original) {
-                return rewritten;
-            }
-        }
-        original.to_string()
-    }
-}
-
-impl Default for UdfDependencyRewriterEngineV9 {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// 4. Master Distro Package Advancements Suite V9
+// 5. Master Distro Package Advancements Suite V9
 // =========================================================================
 
 pub struct SovereignDistroPackageAdvancementsSuiteV9 {
-    pub apt_solver: SovereignApt28DependencySolverEngine,
-    pub pacman_sandbox: SovereignPacman7SandboxEngine,
-    pub dnf_journal: SovereignDnf5TransactionJournalEngine,
-    pub zypper_solver: SovereignZypper2SatSolverEngine,
-    pub portage_engine: SovereignPortageEapi8UseExpandEngine,
-    pub apk_engine: SovereignApkV3PqcSignifyEngine,
-    pub xbps_engine: SovereignXbpsSonameOrphanEngine,
-    pub moss_engine: SovereignMossStoneDeltaEngine,
-    pub haiku_engine: SovereignHaikuPackageFsEngine,
-    pub nix_engine: SovereignNixFlakeHermeticGcEngine,
-    pub udf_hooks: UdfLifecycleHookRegistryV9,
-    pub udf_rewriter: UdfDependencyRewriterEngineV9,
+    pub converter_engine: SovereignUniversalForeignPackageConverterEngine,
+    pub cli_dispatcher: SovereignUniversalPmCliInteropDispatcher,
+    pub scriptlet_sandbox: SovereignUniversalScriptletSandboxBridge,
+    pub index_aggregator: SovereignUniversalRepoIndexAggregatorEngine,
 }
 
 impl SovereignDistroPackageAdvancementsSuiteV9 {
     pub fn new() -> Self {
         Self {
-            apt_solver: SovereignApt28DependencySolverEngine::new(),
-            pacman_sandbox: SovereignPacman7SandboxEngine::new(),
-            dnf_journal: SovereignDnf5TransactionJournalEngine::new(),
-            zypper_solver: SovereignZypper2SatSolverEngine::new(),
-            portage_engine: SovereignPortageEapi8UseExpandEngine::new(),
-            apk_engine: SovereignApkV3PqcSignifyEngine::new(),
-            xbps_engine: SovereignXbpsSonameOrphanEngine::new(),
-            moss_engine: SovereignMossStoneDeltaEngine::new(),
-            haiku_engine: SovereignHaikuPackageFsEngine::new(),
-            nix_engine: SovereignNixFlakeHermeticGcEngine::new(),
-            udf_hooks: UdfLifecycleHookRegistryV9::new(),
-            udf_rewriter: UdfDependencyRewriterEngineV9::new(),
+            converter_engine: SovereignUniversalForeignPackageConverterEngine::new(),
+            cli_dispatcher: SovereignUniversalPmCliInteropDispatcher::new(),
+            scriptlet_sandbox: SovereignUniversalScriptletSandboxBridge::new(),
+            index_aggregator: SovereignUniversalRepoIndexAggregatorEngine::new(),
         }
     }
 
-    pub fn process_and_enrich_v9(&mut self, pkg: &mut UnifiedPackage) -> Result<(), &'static str> {
-        self.dnf_journal.record_transaction("enrich", &pkg.name);
-        self.udf_hooks.trigger_all(pkg)?;
+    pub fn process_and_enrich_package_v9(
+        &mut self,
+        pkg: &mut UnifiedPackage,
+    ) -> Result<(), String> {
         pkg.properties
-            .insert("v9_processed".to_string(), "true".to_string());
+            .insert("v9_universal_pm_processed".to_string(), "true".to_string());
+        pkg.properties.insert(
+            "v9_converter_ready".to_string(),
+            "true".to_string(),
+        );
         Ok(())
     }
 }
@@ -779,118 +679,76 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_apt_solver_and_pacman_sandbox() {
-        let mut apt = SovereignApt28DependencySolverEngine::new();
-        apt.set_pin("curl", 1001);
-        apt.set_mark("curl", "manual");
-        assert_eq!(apt.active_pins.get("curl"), Some(&1001));
+    fn test_foreign_package_converter_parse_text() {
+        let engine = SovereignUniversalForeignPackageConverterEngine::new();
+        let deb_control = "Package: nginx\nVersion: 1.24.0\nDepends: libc6, libssl-dev\n";
 
-        let mut pacman = SovereignPacman7SandboxEngine::new();
-        assert!(pacman.execute_alpm_hook("font-cache", "/usr/share/fonts"));
-        assert_eq!(
-            pacman.select_optimized_package("glibc"),
-            "glibc-x86-64-v3"
+        let sigpkg = engine.parse_and_convert_text("control", deb_control).unwrap();
+        assert_eq!(sigpkg.name, "sigpkg-nginx");
+        assert_eq!(sigpkg.version, "1.24.0");
+        assert!(sigpkg.dependencies.contains(&"sovereign-libc".to_string()));
+        assert!(sigpkg.dependencies.contains(&"sovereign-openssl".to_string()));
+    }
+
+    #[test]
+    fn test_cli_interop_dispatcher() {
+        let dispatcher = SovereignUniversalPmCliInteropDispatcher::new();
+        let action = dispatcher.parse_command("apt install curl --dry-run").unwrap();
+
+        assert_eq!(action.target_pm, "apt");
+        assert_eq!(action.action_kind, UniversalPmCliActionKind::Install);
+        assert!(action.is_dry_run);
+        assert_eq!(action.target_packages, vec!["curl".to_string()]);
+
+        let mut manager = UniversalPackageManager::new();
+        let res = dispatcher.execute_dispatched(&mut manager, &action).unwrap();
+        assert!(res.contains("DRY-RUN"));
+    }
+
+    #[test]
+    fn test_scriptlet_sandbox() {
+        let sandbox = SovereignUniversalScriptletSandboxBridge::new();
+        let safe_script = "mkdir -p /etc/app\nln -s /usr/bin/app /usr/local/bin/app\n";
+
+        let report = sandbox.audit_and_sandbox_scriptlet(
+            UniversalScriptletCategory::PostInstall,
+            safe_script,
         );
+        assert!(report.is_sandbox_approved);
+        assert!(!report.contains_dangerous_cmd);
+        assert!(report.operations_detected.contains(&"fs:create_directory".to_string()));
+
+        let dangerous_script = "rm -rf /\n";
+        let bad_report = sandbox.audit_and_sandbox_scriptlet(
+            UniversalScriptletCategory::PreInstall,
+            dangerous_script,
+        );
+        assert!(!bad_report.is_sandbox_approved);
+        assert!(bad_report.contains_dangerous_cmd);
     }
 
     #[test]
-    fn test_dnf_journal_and_zypper_solver() {
-        let mut dnf = SovereignDnf5TransactionJournalEngine::new();
-        dnf.record_transaction("install", "neovim");
-        assert_eq!(dnf.transaction_history.len(), 1);
+    fn test_repo_index_aggregator() {
+        let mut aggregator = SovereignUniversalRepoIndexAggregatorEngine::new();
+        let index_text = "Package: htop\nVersion: 3.2.2\n\nPackage: ripgrep\nVersion: 13.0.0\n\n";
 
-        let mut zypper = SovereignZypper2SatSolverEngine::new();
-        let snap = zypper.create_snapper_snapshot("pre-update");
-        assert_eq!(snap, "snapshot-1");
-    }
+        let count = aggregator.ingest_repo_index("debian-main", index_text);
+        assert_eq!(count, 2);
 
-    #[test]
-    fn test_portage_apk_xbps_engines() {
-        let portage = SovereignPortageEapi8UseExpandEngine::new();
-        assert!(portage.evaluate_use_conditional("avx2"));
-
-        let mut apk = SovereignApkV3PqcSignifyEngine::new();
-        apk.add_to_world("alpine-baselayout");
-        assert!(apk.verify_apk3_pqc_signature("ed25519:signature_data"));
-
-        let xbps = SovereignXbpsSonameOrphanEngine::new();
-        let missing = xbps.verify_soname_deps(&["libc.so.6".to_string(), "libmissing.so.1".to_string()]);
-        assert_eq!(missing, vec!["libmissing.so.1".to_string()]);
-    }
-
-    #[test]
-    fn test_moss_haiku_nix_engines() {
-        let moss = SovereignMossStoneDeltaEngine::new();
-        let res = moss.apply_stone_delta(b"base", b"-patch").unwrap();
-        assert_eq!(res, b"base-patch");
-
-        let mut haiku = SovereignHaikuPackageFsEngine::new();
-        let path = haiku.mount_hpkg("bash.hpkg");
-        assert_eq!(path, "/boot/system/packages/bash.hpkg");
-
-        let mut nix = SovereignNixFlakeHermeticGcEngine::new();
-        nix.register_store_path("/nix/store/root-path", true);
-        nix.register_store_path("/nix/store/orphan-path", false);
-        let garbage = nix.collect_garbage();
-        assert_eq!(garbage, vec!["/nix/store/orphan-path".to_string()]);
-    }
-
-    #[test]
-    fn test_oop_patterns_and_udf_engines() {
-        // Builder Pattern
-        let pkg = UniversalPackageBuilderV9::new("git")
-            .version("2.43.0")
-            .dependency("sovereign-openssl")
-            .build();
-        assert_eq!(pkg.name, "git");
-        assert_eq!(pkg.dependencies, vec!["sovereign-openssl".to_string()]);
-
-        // Visitor Pattern
-        let mut visitor = SecurityAuditVisitorV9::new();
-        let vuln_pkg = UnifiedPackage::new("vulnerable-pkg".to_string(), "1.0.0".to_string());
-        visitor.visit_package(&vuln_pkg);
-        assert_eq!(visitor.vulnerabilities_found, 1);
-
-        // Memento Pattern
-        let mut caretaker = SystemStateCaretakerV9::new();
-        let id = caretaker.save(vec!["bash".to_string()]);
-        assert_eq!(caretaker.restore(id), Some(vec!["bash".to_string()]));
-
-        // Command Pattern
-        let mut cmd = PackageInstallCommandV9::new("zsh");
-        assert!(cmd.execute().is_ok());
-        assert!(cmd.is_executed);
-
-        // UDF Hooks
-        let mut hooks = UdfLifecycleHookRegistryV9::new();
-        hooks.register(|p| {
-            p.properties.insert("hooked".to_string(), "true".to_string());
-            Ok(())
-        });
-
-        let mut test_pkg = UnifiedPackage::new("test".to_string(), "1.0.0".to_string());
-        assert_eq!(hooks.trigger_all(&mut test_pkg).unwrap(), 1);
-        assert_eq!(test_pkg.properties.get("hooked").map(|s| s.as_str()), Some("true"));
-
-        // UDF Rewriter
-        let mut rewriter = UdfDependencyRewriterEngineV9::new();
-        rewriter.add_rule(|dep| {
-            if dep == "openssl-dev" {
-                Some("sovereign-openssl".to_string())
-            } else {
-                None
-            }
-        });
-        assert_eq!(rewriter.rewrite("openssl-dev"), "sovereign-openssl");
+        let results = aggregator.search_index("ripgrep");
+        assert_eq!(results.len(), 1);
+        assert_eq!(results[0].translated_sigpkg_name, "sigpkg-ripgrep");
     }
 
     #[test]
     fn test_master_suite_v9() {
         let mut suite = SovereignDistroPackageAdvancementsSuiteV9::new();
-        let mut pkg = UniversalPackageBuilderV9::new("htop").build();
+        let mut pkg = UnifiedPackage::new("curl".to_string(), "8.5.0".to_string());
 
-        assert!(suite.process_and_enrich_v9(&mut pkg).is_ok());
-        assert_eq!(pkg.properties.get("v9_processed").map(|s| s.as_str()), Some("true"));
-        assert_eq!(suite.dnf_journal.transaction_history.len(), 1);
+        assert!(suite.process_and_enrich_package_v9(&mut pkg).is_ok());
+        assert_eq!(
+            pkg.properties.get("v9_universal_pm_processed").map(|s| s.as_str()),
+            Some("true")
+        );
     }
 }

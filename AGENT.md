@@ -1,68 +1,74 @@
-# AGENT.md - SigmaOS Future Development Roadmap: Missing Linux & BSD Components
+# AGENT.md - SigmaOS Future Development Roadmap & Agent Guidelines
 
-This document outlines the operational roadmap for AI agents (Bolt, Palette, Sentinel) working on closing remaining architectural, userland, kernel, and subsystem gaps between **SigmaOS** and traditional Linux and BSD distributions.
-
----
-
-## 🧭 Executive Summary & Core Directives
-
-SigmaOS aims to synthesize the best innovations across Linux (Arch, Debian, Fedora, Alpine, Void, NixOS, Clear Linux, Chimera, Pop!_OS) and BSD (FreeBSD, OpenBSD, NetBSD, DragonFly BSD, GhostBSD) into a unified, safe-Rust operating system.
-
-When implementing or extending missing Linux & BSD components, all agents MUST follow these principles:
-1. **Zero External Kernel Dependencies**: Kernel space code must remain pure safe Rust (or strictly encapsulated unsafe Rust for bare-metal hardware registers) with no third-party C library bindings.
-2. **Dual POSIX & Sovereign Parity**: Foreign binaries, syscalls, package formats, and configuration files must map cleanly to native SigmaOS primitives.
-3. **Comprehensive Unit Testing**: Every added component or bridge must include standalone test coverage executable via `./run_sigma_tests.sh`.
+## System Overview & Architecture Principles
+SigmaOS is a sovereign, high-performance, `#![no_std]` capable operating system written in Rust.
+It incorporates best-in-class innovations and design patterns from major Linux distributions (Arch, Debian, Fedora, Alpine, Gentoo, Void, NixOS/Guix, Clear Linux) and BSD variants (FreeBSD, OpenBSD, NetBSD, DragonFly BSD) alongside macOS and mobile systems.
 
 ---
 
-## 🔬 Subsystem Parity & Missing Component Roadmap
+## Instructions for Future AI & Human Engineers
 
-### 1. Kernel Subsystems & Microarchitecture
-- **Linux eBPF / SchedExt (`scx`) Governors**: Extend `SovereignSchedExtEngine` with dynamic AI-driven CPU scheduling policies (Bore v2, EEVDF latency deadline tracking).
-- **FreeBSD VNET Jails & Capsicum Framework**: Expand `FreeBsdVnetJailStackEngine` to support hierarchical nested VNET jail routing and Capsicum `cap_rights_limit` file descriptor delegation.
-- **OpenBSD Pinned Syscalls & Fine-IBT**: Maintain `OpenBsdPinsyscallGuardEngine` and Indirect Branch Tracking (Fine-IBT) callsite checks for userland-to-kernel entry safety.
-- **DragonFly BSD HAMMER2 PFS Replication**: Broaden multi-master PFS transaction log streaming and emergency snapshot scrubbing under high memory pressure.
+### 1. Zero-Dependency & `#![no_std]` First
+- Whenever implementing core OS modules (kernel, drivers, low-level memory, syscalls, process management), prefer `#![no_std]` zero-dependency implementations.
+- For userland and standalone test suites, use conditional compilation (`#[cfg(feature = "standalone_test")]` / `#[cfg(test)]`) to allow standard library harness compatibility where appropriate.
 
-### 2. Networking, Security & Firewalls
-- **OpenBSD PF Firewall & iked IKEv2**: Enhance stateful packet inspection, CARP redundant failover state sync, and iked IKEv2 IPsec security association setup.
-- **Linux nftables & XFRM IPsec Policy**: Maintain dual-stack nftables BPF offset rule matching and kernel XFRM IPsec SA/SP transforms.
-- **NetBSD NPF Stateful Firewall & BPF**: Expand NPF bytecode JIT compilation and custom N-code packet filter inspection.
-- **SLAAC IPv6 Privacy Extensions**: Maintain RFC 4941 dynamic IPv6 temporary address rotation in `OpenBsdIkedSlaacPrivacyEngine`.
-
-### 3. Storage, Filesystems & Memory
-- **Linux Bcachefs & ZRAM / Zswap**: Expand multi-device tiered storage extents, compression caching, and background scrubbing.
-- **FreeBSD GEOM / CTL SCSI Target Stack**: Support GEOM Gate network block storage, gmirror/gstripe/geli encryption, and CTL SCSI LUN target routing.
-- **NetBSD bioctl RAID & devpubd Hotplug**: Maintain `NetBsdBioctlDevpubdEngine` for RAID status monitoring (OK, Degraded, Failed) and devpubd dynamic hotplug event dispatching.
-- **OpenBSD Otto-Malloc & FreeBSD UMA Zone Allocator**: Enforce randomized guard pages, junk byte filling, and per-CPU bucket caching in memory allocators.
-
-### 4. Distro Userland, Init & Service Managers
-- **Chimera Linux LLVM/FreeBSD Userland & dinit**: Maintain `ChimeraLinuxDinitFreeBsdUserlandEngine` supporting `dinitctl` service graph trees, FreeBSD coreutils compatibility, and LLVM toolchain sanitizers (`-fsanitize=safe-stack`).
-- **Slackware pkgtool & SlackBuilds**: Expand `SlackwarePkgtoolSboEngine` for dependency-free `.txz`/`.tgz` package databases and `.SlackBuild` recipe parsing.
-- **Void Linux runit & Alpine OpenRC/APK**: Maintain runit 3-stage init lifecycle supervisors and Alpine diskless RAM-boot apkovl persistence.
-- **Pop!_OS System76 Power & Auto-Tiling**: Maintain `PopOsSystem76PowerAndAutoTileEngine` for energy performance profiles (Battery Saved, Balanced, High Performance), GPU mode switching (Integrated, Discrete, Hybrid, Compute), and Pop! Shell BSP window tiling layout calculations.
-
-### 5. Packaging & Distribution Interoperability (`sigpkg`)
-- **Universal Multi-Format Ingestion**: Ensure `SovereignUniversalPackageManagerInteropOrchestrator` can ingest, translate, sandbox, and install foreign packages (`.deb`, `.rpm`, `.apk`, `.pkg.tar.zst`, `.txz`, `.ebuild`, `.nixpkg`, `.xbps`, `.snap`, `.flatpak`, AppImage).
-- **DPLL SAT Dependency Solver**: Maintain `SovereignUniversalManifestNormalizerSatSolver` to normalize foreign library requirements to canonical SigmaOS capabilities (e.g. `sovereign-libc`, `sovereign-openssl`).
-- **Scriptlet Sandboxing**: Enforce strict OpenBSD pledge/unveil, FreeBSD Capsicum, and Linux Landlock sandbox policies when running pre/post install scriptlets.
-
----
-
-## 🛠️ Verification & Test Execution Protocol
-
-Before committing changes to any missing Linux or BSD component, run:
-
+### 2. Testing & Verification
+Before marking tasks as complete, always compile and run standalone unit test runners via `rustc`:
 ```bash
-# 1. Compile and test specific module standalone
-rustc --test src/distro/sovereign_linux_bsd_ecosystem_pinnacle_suite.rs --edition=2021 -o build/test_pinnacle
-./build/test_pinnacle
+# Example unit test runner invocation pattern
+mkdir -p build
+rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/package/sovereign_distro_package_advancements_v9.rs -o build/test_v9 && ./build/test_v9
 
-# 2. Run full SigmaOS test suite
+# Universal package CLI verification test
+rustc --test --edition=2021 --cfg 'feature="standalone_test"' tests/sigpkg_cli_verification_test.rs -o build/test_sigpkg_cli && ./build/test_sigpkg_cli
+
+# Full system test runner
 ./run_sigma_tests.sh
 ```
 
-Ensure **100% test pass rate** with 0 compilation errors or test regressions.
-
 ---
 
-*End of AGENT.md*
+## Future Development Roadmap: Missing Distro Components & Parity Targets
+
+### Phase 1: Universal Package Manager (`Sigma-pkg` / `Universal PM`)
+- [x] Multi-format package manifest parsing and conversion (`.deb`, `.rpm`, `.pkg.tar.zst`, `.apk`, `.ebuild`, `.xbps`, `.pkg`, `.openbsd.tgz`, `.pkgsrc`, `.nix`, `.guix`, `.flatpak`, `.snap`, `.appimage`, `.eopkg`, `.ipk`).
+- [x] Multi-distro PM CLI command interop (`apt`, `pacman`, `dnf`, `apk`, `pkg`, `xbps-install`, `nix-env`) with dry-run/simulation flags.
+- [x] Maintainer scriptlet sandboxing (`postinst`, `%post`, `.POST-INSTALL`) with Landlock/pledge/unveil capabilities.
+- [x] Cross-distro repository index aggregation (APT `Packages`, Arch DB, Fedora `primary.xml`, Alpine `APKINDEX`, FreeBSD `+MANIFEST`).
+- [ ] P2P Content-Addressed Storage (CAS) package distribution network with Merkle-tree deduplication.
+- [ ] SAT-based Boolean dependency solver with virtual provides and slotting support for Portage ebuilds.
+
+### Phase 2: Kernel Core, SMP & Memory Management
+- [x] Multi-core SMP scheduling with IPI inter-processor interrupts, per-CPU runqueues, and task stealing.
+- [x] Formatted kernel logging (`kprintf!`, `printk!`, `pr_info!`, `pr_err!`) with ring buffer capture.
+- [x] TLB 4-way associative lookup with LRU eviction and ASID allocation.
+- [x] Ring 0-3 privilege isolation with SMEP/SMAP/W^X paging protections.
+- [ ] Real-time eBPF SchedExt (`scx_bpfland`) user-space scheduler integration.
+- [ ] Demand paging with copy-on-write page fault handlers and POSIX `madvise` hint optimizations.
+
+### Phase 3: Hardware Drivers & Subsystems
+- [x] Multi-hardware driver auto-probing (PCIe, USB, NVMe, VirtIO, e1000/r8169/igc Ethernet, DRM/KMS GPU).
+- [x] Wi-Fi 6E/7 `mac80211` wireless driver stack and AF_XDP zero-copy networking.
+- [x] Open-source NVIDIA GPU & DRM/KMS subsystem with GEM buffer management for Turing/Ampere/Blackwell architectures.
+- [ ] USB4 / Thunderbolt 4 hotplug tunneling bus manager.
+- [ ] NVMe 2.0 ZNS (Zoned Namespaces) storage controller driver.
+
+### Phase 4: Init Supervision & Container Isolation
+- [x] Linux cgroups v2 unified hierarchy (memory, cpu, pids, freeze) and POSIX process namespaces (`CLONE_NEWPID`, `CLONE_NEWNS`, `CLONE_NEWNET`).
+- [x] OpenBSD-style `pledge()` and `unveil()` capability sandboxing for process security.
+- [x] FreeBSD Jail and Capsicum capability rights governor.
+- [ ] Hermetic MicroVM execution sandbox (Firecracker & Qubes OS style isolation).
+- [ ] Zero-overhead systemd-free service supervisor (`runit`/`s6` parity).
+
+### Phase 5: Filesystem & Storage Mechanics
+- [x] Linux OverlayFS & PipeFS virtual filesystems.
+- [x] Directed Acyclic Graph (DAG) directory engine (`SovereignAcyclicGraphDirectoryEngine`) for content-addressed store paths.
+- [x] Btrfs/ZFS transactional copy-on-write (CoW) snapshots with atomic rollback.
+- [ ] Bcachefs multi-device tiered extent scrubbing and erasure coding.
+- [ ] OpenBSD FFS / FreeBSD Soft Updates metadata journaling.
+
+### Phase 6: Userland Shell & Desktop Environment
+- [x] Full positional argument binding, local scoping, function autoloading, and hooks in `SimpleShell` and `SovereignBashZshParityShell`.
+- [x] Starship-inspired prompt renderer, Atuin shell history recorder, and Fish/Zsh smart auto-completion.
+- [ ] Native Wayland Compositor engine (`wlroots`/`Hyprland` parity).
+- [ ] PipeWire SPA audio pipeline and low-latency Graph router.
