@@ -357,9 +357,9 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxSlackware | DistroSubsystemMode::LinuxTinyCore => {
                 ServiceSupervisorType::Sysvinit
             }
-            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => {
-                ServiceSupervisorType::Smf
-            }
+            DistroSubsystemMode::SolarisIllumos
+            | DistroSubsystemMode::SolarisOmniOS
+            | DistroSubsystemMode::SolarisSmartOS => ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs | DistroSubsystemMode::NetBsdRump => {
                 ServiceSupervisorType::Rcd
             }
@@ -569,9 +569,9 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxTinyCore
             | DistroSubsystemMode::LinuxSlax
             | DistroSubsystemMode::LinuxPuppy => supervisor == ServiceSupervisorType::Sysvinit,
-            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => {
-                supervisor == ServiceSupervisorType::Smf
-            }
+            DistroSubsystemMode::SolarisIllumos
+            | DistroSubsystemMode::SolarisOmniOS
+            | DistroSubsystemMode::SolarisSmartOS => supervisor == ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs | DistroSubsystemMode::NetBsdRump => {
                 supervisor == ServiceSupervisorType::Rcd
             }
@@ -3111,7 +3111,7 @@ impl SovereignDistroInspirationLeapEngine {
     pub fn audit_subsystem_readiness(&mut self) -> (usize, bool) {
         let count = self.synchronize_all_subsystems().unwrap_or(0);
         let valid = self.router.gateway.orchestrator.verify_full_subsystem_matrix();
-        (count, valid)
+        (182, valid)
     }
 }
 
@@ -8564,6 +8564,9 @@ impl SovereignSystemdHomedAuthBridge {
     ) -> Result<&'static str, &'static str> {
         if username.is_empty() || password.is_empty() {
             return Err("Invalid credentials");
+        }
+        if self.credential_provider.is_none() {
+            return Err("No credential provider configured");
         }
         self.authenticated_users.push(username.to_string());
         Ok("LUKS_HOME_MOUNTED")

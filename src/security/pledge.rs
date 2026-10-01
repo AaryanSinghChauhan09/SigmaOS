@@ -1,14 +1,11 @@
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use crate::security::capability::Permission;
-use crate::security::capability::{CapabilityGate, CapabilityToken};
 
-#[cfg(feature = "standalone_test")]
+#[path = "capability.rs"]
+mod capability;
+
 use capability::{CapabilityGate, CapabilityToken, Permission};
-
-#[cfg(not(feature = "standalone_test"))]
-use crate::security::capability::{CapabilityGate, CapabilityToken, Permission};
 
 use core::sync::atomic::{AtomicBool, Ordering};
 
@@ -293,12 +290,7 @@ impl Default for PledgeManager {
 
 /// Common pledge promises
 pub mod promises {
-    #[cfg(feature = "standalone_test")]
     use super::capability::Permission;
-
-    #[cfg(not(feature = "standalone_test"))]
-    use crate::security::capability::Permission;
-
     use super::PledgePromise;
 
     /// Stdio promise - basic I/O only
