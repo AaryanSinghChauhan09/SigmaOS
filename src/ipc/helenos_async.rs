@@ -669,6 +669,15 @@ impl HelenIpcManager {
                 if let Some(origin_answerbox_id) = phone.connected_answerbox {
                     if let Some(origin_answerbox) = self.answerboxes.get_mut(&origin_answerbox_id) {
                         origin_answerbox.answer_queue.push(msg);
+            for mut msg in messages_to_answer {
+                msg.method = 0xFFFFFFFFFFFFFFFE; // Error code
+                if let Some(phone) = self.phones.get(&msg.phone_id) {
+                    if let Some(origin_answerbox_id) = phone.connected_answerbox {
+                        if let Some(origin_answerbox) =
+                            self.answerboxes.get_mut(&origin_answerbox_id)
+                        {
+                            origin_answerbox.answer_queue.push(msg);
+                        }
                     }
                 }
             }

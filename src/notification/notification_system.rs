@@ -225,6 +225,13 @@ impl NotificationSystem {
         self.queue.push(id);
         self.sort_queue();
 
+        // Add to queue based on priority
+        self.queue.push(id);
+        self.sort_queue();
+
+        // Store notification
+        self.notifications.insert(id, notification);
+
         // Trim history if needed
         if self.history.len() >= self.max_history {
             self.history.truncate(self.max_history);

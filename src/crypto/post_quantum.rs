@@ -251,6 +251,25 @@ impl PostQuantumCryptoManager {
         _seed: &[u8; DILITHIUM_SEED_BYTES],
     ) -> Result<(DilithiumPublicKey, DilithiumSecretKey), &'static str> {
         Err("ML-DSA provider unavailable; refusing to generate placeholder keys")
+        // In real implementation:
+        // 1. Use seed to expand with SHAKE256
+        // 2. Generate matrix A and vectors s1, s2
+        // 3. Compute public key from secret key
+        // 4. Perform rejection sampling if needed
+
+        let secret_key = DilithiumSecretKey::new(seed);
+
+        // Generate public key from secret key
+        let mut pk_data = vec![0u8; DILITHIUM_PK_BYTES];
+        pk_data[0..DILITHIUM_SEED_BYTES].copy_from_slice(seed);
+
+        let public_key = DilithiumPublicKey::new(&pk_data)?;
+
+        self.dilithium_keys
+            .push((public_key.clone(), secret_key.clone()));
+        self.key_count.fetch_add(1, Ordering::SeqCst);
+
+        Ok((public_key, secret_key))
     }
 
     pub fn generate_kyber_keypair(
@@ -258,6 +277,27 @@ impl PostQuantumCryptoManager {
         _seed: &[u8; KYBER_SEED_BYTES],
     ) -> Result<(KyberPublicKey, KyberSecretKey), &'static str> {
         Err("ML-KEM provider unavailable; refusing to generate placeholder keys")
+        // In real implementation:
+        // 1. Use seed with SHAKE256
+        // 2. Generate polynomial ring elements
+        // 3. Compute public key (A*s + e) mod q
+        // 4. Store secret key
+
+        let mut sk_data = vec![0u8; KYBER_SK_BYTES];
+        sk_data[0..KYBER_SEED_BYTES].copy_from_slice(seed);
+
+        let secret_key = KyberSecretKey::new(&sk_data)?;
+
+        let mut pk_data = vec![0u8; KYBER_PK_BYTES];
+        pk_data[0..KYBER_SEED_BYTES].copy_from_slice(seed);
+
+        let public_key = KyberPublicKey::new(&pk_data)?;
+
+        self.kyber_keys
+            .push((public_key.clone(), secret_key.clone()));
+        self.key_count.fetch_add(1, Ordering::SeqCst);
+
+        Ok((public_key, secret_key))
     }
 
     pub fn sign_dilithium(

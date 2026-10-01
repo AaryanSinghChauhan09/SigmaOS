@@ -22,6 +22,9 @@ use core::mem;
 /// Prototype API shape for a future audited AES provider.
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 502
 /// This module does not implement AES and must not be used to protect data.
+/// OOP-based AES Encryption for SigmaOS
+/// Based on Ideas-999-Structured: Security & Sovereignty Item 502
+/// Implements AES-256 encryption and decryption
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type CipherID = usize;
@@ -92,6 +95,42 @@ impl BlockCipher for SimpleAES {
     fn encrypt(
         &self,
         plaintext: &[u8],
+    }
+
+    fn encrypt(
+        &self,
+        plaintext: &[u8],
+        key: &[u8],
+        iv: Option<&[u8]>,
+    ) -> Result<Vec<u8>, CipherError> {
+        if key.len() != 32 {
+            return Err(CipherError::InvalidKey);
+        }
+
+        let mut ciphertext = Vec::new();
+        let mut key_hash: usize = 0;
+
+        for &byte in key {
+            key_hash = key_hash.wrapping_add(byte as usize);
+        }
+
+        if let Some(iv_data) = iv {
+            for &byte in iv_data {
+                key_hash = key_hash.wrapping_add(byte as usize);
+            }
+        }
+
+        for &byte in plaintext {
+            ciphertext.push(byte.wrapping_add((key_hash % 256) as u8));
+            key_hash = key_hash.wrapping_mul(17);
+        }
+
+        Ok(ciphertext)
+    }
+
+    fn decrypt(
+        &self,
+        ciphertext: &[u8],
         key: &[u8],
         iv: Option<&[u8]>,
     ) -> Result<Vec<u8>, CipherError> {

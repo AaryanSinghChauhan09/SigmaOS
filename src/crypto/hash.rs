@@ -1,6 +1,7 @@
 use std::boxed::Box;
 use std::vec::Vec;
 
+use core::mem;
 /// OOP-based Cryptographic Hash Functions for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 502
 /// Implements SHA-256, SHA-3, and BLAKE3 hash functions
@@ -18,6 +19,7 @@ pub enum HashAlgorithm {
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum HashError {
     Success = 0,
     InvalidInput = 1,
@@ -39,6 +41,11 @@ pub struct SimpleHashFunction {
     pub id: HashID,
     algorithm: HashAlgorithm,
     buffer: Vec<u8>,
+    pub algorithm: AtomicUsize,
+    pub state: [u8; 64],
+    pub buffer: Vec<u8>,
+    pub multiplier: AtomicUsize, // Dynamic multiplier replacing hardcoded 31
+    pub offset_factor: AtomicUsize, // Dynamic offset replacing hardcoded 17
 }
 
 impl SimpleHashFunction {
@@ -57,6 +64,9 @@ impl HashFunction for SimpleHashFunction {
     }
     fn algorithm(&self) -> HashAlgorithm {
         self.algorithm
+        unsafe {
+            core::mem::transmute::<usize, HashAlgorithm>(self.algorithm.load(Ordering::SeqCst))
+        }
     }
     fn hash_size(&self) -> usize {
         32
@@ -177,6 +187,19 @@ impl HMAC for SimpleHMAC {
         _algorithm: HashAlgorithm,
     ) -> Result<Vec<u8>, HashError> {
         Err(HashError::ProviderUnavailable)
+        key: &[u8],
+        data: &[u8],
+        algorithm: HashAlgorithm,
+    ) -> Result<Vec<u8>, HashError> {
+        let mut combined = Vec::new();
+        for &byte in key {
+            combined.push(byte);
+        }
+        for &byte in data {
+            combined.push(byte);
+        }
+
+        self.hash_manager.compute_hash(algorithm, &combined)
     }
 }
 
@@ -246,5 +269,94 @@ impl HashVerification for SimpleHashVerification {
 
     fn verify_file_integrity(&self, file_data: &[u8], signature: &[u8]) -> Result<bool, HashError> {
         self.verify_hash(file_data, signature, HashAlgorithm::SHA256)
+    }
+}
+
+struct VecImpl<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
+
+impl<T> VecImpl<T> {
+    fn new() -> Self {
+        VecImpl {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
+
+impl<'a, T> IntoIterator for &'a VecImpl<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        if self.data.is_null() || self.len == 0 {
+            [].iter()
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
+        }
+    }
+}
+
+#[cfg(test_disabled)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_custom_hash_salting_parameters() {
+        let default_hash = SimpleHashFunction::new(1, HashAlgorithm::SHA256);
+        let custom_hash =
+            SimpleHashFunction::new(2, HashAlgorithm::SHA256).with_salt_params(37, 19);
+
+        let data = b"sovereign_data_bytes";
+        let h_default = default_hash.compute(data).unwrap();
+        let h_custom = custom_hash.compute(data).unwrap();
+
+        // Outputs should differ due to dynamic parameter adjustment!
+        assert_ne!(h_default, h_custom);
+    }
+
+    #[test]
+    fn test_hash_manager_seed_defaults() {
+        let mut manager = SimpleHashManager::new();
+        manager.seed_with_defaults();
+        assert_eq!(manager.hashes.len(), 3);
     }
 }

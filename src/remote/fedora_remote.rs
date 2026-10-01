@@ -224,5 +224,10 @@ mod tests {
             .is_err());
         assert!(ipa.active_ticket.is_none());
         assert!(!ipa.verify_gssapi_token(b"GSSAPI_TICKET_BLOB"));
+        let ticket = ipa
+            .kinit("admin@FEDORA.LOCAL", "<SIGMA_TEST_PASSWORD>")
+            .unwrap();
+        assert_eq!(ticket.realm, "FEDORA.LOCAL");
+        assert!(ipa.verify_gssapi_token(b"GSSAPI_TICKET_BLOB"));
     }
 }

@@ -191,6 +191,9 @@ impl LinuxBsdDistroGuidelineRules {
             DistroGuidelineStandard::FreeBsdCapsicumJails
             | DistroGuidelineStandard::OpenBsdPledgeUnveil
             | DistroGuidelineStandard::OpenBsdPledge => self.capability_sandboxing_enabled,
+            DistroGuidelineStandard::ArchSimplicityPurity => self.zero_dependency_purity,
+            DistroGuidelineStandard::FreeBsdCapsicumJails
+            | DistroGuidelineStandard::OpenBsdPledgeUnveil => self.capability_sandboxing_enabled,
             DistroGuidelineStandard::FedoraSelinuxPresets => self.cross_subsystem_event_routing,
             DistroGuidelineStandard::DragonFlyHammer2 => self.cross_subsystem_event_routing,
             _ => true,

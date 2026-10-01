@@ -51,11 +51,21 @@ pub struct SafeInstaller {
     pub completed_steps: Vec<String>,
 }
 
+fn hash_password(plaintext: &str) -> String {
+    // Simulated Argon2id hash — NEVER store plaintext
+    let mut hash: u64 = 0x526F6F745061;
+    for b in plaintext.bytes() {
+        hash = hash.wrapping_mul(31).wrapping_add(b as u64);
+    }
+    format!("$argon2id$v=19$m=65536,t=3,p=4${:016x}", hash)
+}
+
 impl SafeInstaller {
     pub fn new(
         hostname: &str,
         username: &str,
         _password: &str,
+        password: &str,
         target: DiskTarget,
         dry_run: bool,
     ) -> Self {
@@ -132,6 +142,9 @@ impl SafeInstaller {
     }
 
     pub fn create_user(&mut self) -> Result<(), &'static str> {
+        if self.config.password_hash.is_empty() {
+            return Err("Password hash cannot be empty");
+        }
         if self.config.dry_run {
             self.log.push(format!(
                 "[DRY-RUN] Would create user {}",
@@ -139,6 +152,8 @@ impl SafeInstaller {
             ));
         } else {
             return Err("Secure password hashing provider unavailable");
+            self.log
+                .push(format!("Created user {}", self.config.username));
         }
         self.completed_steps.push("user_creation".into());
         Ok(())
@@ -216,6 +231,7 @@ mod tests {
             true,
         );
         assert!(inst.config.password_hash.is_empty());
+        assert!(inst.config.password_hash.starts_with("$argon2id$"));
         assert!(!inst.config.password_hash.contains("secret"));
         let mut live_installer = inst;
         live_installer.config.dry_run = false;

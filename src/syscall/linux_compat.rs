@@ -568,6 +568,7 @@ mod tests {
     #[test]
     fn test_syscall_dispatcher() {
         let mut dispatcher = LinuxSyscallDispatcher::new();
+        let dispatcher = LinuxSyscallDispatcher::new();
 
         // Test getpid
         let pid = dispatcher
@@ -593,6 +594,7 @@ mod tests {
     #[test]
     fn test_syscall_count() {
         let mut dispatcher = LinuxSyscallDispatcher::new();
+        let dispatcher = LinuxSyscallDispatcher::new();
 
         dispatcher
             .dispatch(LinuxSyscallNumber::Getpid as u64, &[])

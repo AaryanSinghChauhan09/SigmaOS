@@ -190,6 +190,15 @@ impl Secret for SimpleSecret {
         }
 
         Err(SecretError::CryptoUnavailable)
+        for (b, &k) in self.data[..self.data_len]
+            .iter_mut()
+            .zip(key.iter().cycle())
+        {
+            *b ^= k;
+        }
+
+        self.is_encrypted.store(true, Ordering::SeqCst);
+        Ok(())
     }
 
     fn decrypt(&mut self, key: &[u8]) -> Result<(), SecretError> {
@@ -206,6 +215,15 @@ impl Secret for SimpleSecret {
         }
 
         Err(SecretError::CryptoUnavailable)
+        for (b, &k) in self.data[..self.data_len]
+            .iter_mut()
+            .zip(key.iter().cycle())
+        {
+            *b ^= k;
+        }
+
+        self.is_encrypted.store(false, Ordering::SeqCst);
+        Ok(())
     }
 
     fn info(&self) -> SecretInfo {

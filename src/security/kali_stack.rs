@@ -416,6 +416,24 @@ impl KaliAirgeddonWifiAudit {
     }
 }
 
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::Layout;
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std::alloc::alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
+
 /// Kali Undercover Desktop Disguise Mode Switcher
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum UndercoverDisguiseTheme {

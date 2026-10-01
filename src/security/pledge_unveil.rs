@@ -213,6 +213,20 @@ impl UnveilSandbox {
                 UnveilPermission::Execute => *perm == UnveilPermission::Execute,
                 UnveilPermission::ReadWrite => *perm == UnveilPermission::ReadWrite,
             };
+        // Check parent path match
+        for (unveiled_path, perm) in &self.paths {
+            if path.starts_with(unveiled_path) {
+                return match permission {
+                    UnveilPermission::Read => {
+                        *perm == UnveilPermission::Read || *perm == UnveilPermission::ReadWrite
+                    }
+                    UnveilPermission::Write => {
+                        *perm == UnveilPermission::Write || *perm == UnveilPermission::ReadWrite
+                    }
+                    UnveilPermission::Execute => *perm == UnveilPermission::Execute,
+                    UnveilPermission::ReadWrite => *perm == UnveilPermission::ReadWrite,
+                };
+            }
         }
 
         // Default deny if unveiled and no match

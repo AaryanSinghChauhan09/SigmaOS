@@ -3601,6 +3601,7 @@ mod cross_subsystem_tests {
         assert!(res_sys.is_ok());
 
         assert!(!orchestrator.active_subsystems.contains(&"auth".to_string()));
+        assert!(orchestrator.active_subsystems.contains(&"auth".to_string()));
         assert!(orchestrator
             .active_subsystems
             .contains(&"network".to_string()));
@@ -8392,6 +8393,14 @@ impl SovereignSystemdHomedAuthBridge {
         _password: &str,
     ) -> Result<&'static str, &'static str> {
         Err("Authentication unavailable: no trusted credential provider configured")
+        username: &str,
+        password: &str,
+    ) -> Result<&'static str, &'static str> {
+        if username.is_empty() || password.is_empty() {
+            return Err("Invalid credentials");
+        }
+        self.authenticated_users.push(username.to_string());
+        Ok("LUKS_HOME_MOUNTED")
     }
 }
 

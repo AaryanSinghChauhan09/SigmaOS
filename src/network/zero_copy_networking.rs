@@ -30,6 +30,7 @@ use std::vec::Vec;
 pub struct UmemChunk {
     pub addr: u64, // offset within UMEM region
     pub len: u32,  // maximum payload length after headroom
+    pub len: u32,  // actual data length
     pub headroom: u16,
     pub in_use: bool,
 }
@@ -41,6 +42,10 @@ impl UmemChunk {
             addr,
             len: max_len.saturating_sub(headroom as u32),
             headroom,
+        UmemChunk {
+            addr,
+            len: max_len,
+            headroom: 256,
             in_use: false,
         }
     }
@@ -103,6 +108,8 @@ impl UmemPool {
         }
         let used = self.total_chunks.saturating_sub(self.free_count) as u64;
         ((used * 100) / self.total_chunks as u64) as u32
+        let used = self.total_chunks - self.free_count;
+        (used * 100) / self.total_chunks
     }
 }
 
@@ -155,6 +162,17 @@ impl XdpRing {
         self.consumer = self.consumer.wrapping_add(1);
         self.packets_processed = self.packets_processed.saturating_add(1);
         Some(descriptor)
+        if self.entries.is_empty() {
+            return None;
+        }
+        self.consumer = self.consumer.wrapping_add(1);
+        self.packets_processed = self.packets_processed.saturating_add(1);
+        // Drain from front (FIFO)
+        if !self.entries.is_empty() {
+            Some(self.entries.remove(0))
+        } else {
+            None
+        }
     }
 
     pub fn available(&self) -> usize {
@@ -206,6 +224,7 @@ impl IoCompletionQueue {
             return false;
         }
         self.entries.push_back(IoCompletionEntry {
+        self.entries.push(IoCompletionEntry {
             user_data,
             result,
             flags: 0,
@@ -217,6 +236,9 @@ impl IoCompletionQueue {
 
     pub fn consume(&mut self) -> Option<IoCompletionEntry> {
         let entry = self.entries.pop_front()?;
+        if self.entries.is_empty() {
+            return None;
+        }
         self.head = self.head.wrapping_add(1);
         Some(entry)
     }
@@ -321,6 +343,9 @@ impl SovereignZeroCopySocket {
         let desc = PacketRingDescriptor {
             chunk_idx,
             data_offset: chunk.headroom as u32,
+        let desc = PacketRingDescriptor {
+            chunk_idx,
+            data_offset: 256,
             data_len: len,
             flags: 0,
         };
@@ -331,6 +356,8 @@ impl SovereignZeroCopySocket {
             // Capacity was checked above; with exclusive `&mut self` access
             // no producer can race this post.
             self.cq.post_completion(chunk_idx as u64, len as i32)
+            self.cq.post_completion(chunk_idx as u64, len as i32);
+            true
         } else {
             false
         }
