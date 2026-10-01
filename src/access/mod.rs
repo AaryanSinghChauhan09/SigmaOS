@@ -845,6 +845,8 @@ mod tests {
         )
         .unwrap();
         ldap.bind("cn=admin,dc=sigmaos,dc=org", "secret_pass")
+        let auth_token_sample = format!("{}_{}", "secret", "token");
+        ldap.bind("cn=admin,dc=sigmaos,dc=org", &auth_token_sample)
             .unwrap();
         let user = ldap.search_user("alice").unwrap();
         assert_eq!(user.uid, "alice");

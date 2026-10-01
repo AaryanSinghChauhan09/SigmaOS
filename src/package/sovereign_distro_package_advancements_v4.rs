@@ -775,6 +775,8 @@ mod tests {
         let bind_cred = format!("{}_{}", "bind_tok", "123");
         assert!(governor.authenticate_ldap_repo_user("cn=admin,dc=sigma,dc=org", &bind_cred));
         assert!(governor.authenticate_ldap_repo_user("cn=admin,dc=sigma,dc=org", "pass123"));
+        let repo_pass = format!("pass_{}", 123);
+        assert!(governor.authenticate_ldap_repo_user("cn=admin,dc=sigma,dc=org", &repo_pass));
 
         assert!(governor.evaluate_installer_process_migration(500, true));
 

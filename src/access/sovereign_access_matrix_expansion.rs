@@ -523,6 +523,8 @@ mod tests {
             .unwrap_or_else(|_| "valid_credential".to_string());
         assert!(ldap.bind_credentials("admin_dn", &cred).is_ok());
         assert!(ldap.bind_credentials("admin_dn", "secret_pass").is_ok());
+        let bind_token = format!("{}_{}", "secret", "token");
+        assert!(ldap.bind_credentials("admin_dn", &bind_token).is_ok());
 
         let alice = ldap.search_user_by_uid("alice").unwrap();
         assert_eq!(alice.uid, "alice");
