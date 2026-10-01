@@ -36,6 +36,13 @@ pub fn sys_sethostname(
     hostname_ptr: *const u8,
     len: usize,
 ) -> i32 {
+/// - -EFAULT on a null pointer (non-null pointer validity is the caller's safety obligation)
+///
+/// # Safety
+/// `hostname_ptr` must be readable for `len` bytes for the duration of this call.
+/// A syscall entry point must validate/copy user memory before calling this helper;
+/// checking for null does not validate an arbitrary user pointer.
+pub unsafe fn sys_sethostname(namespace_id: u64, hostname_ptr: *const u8, len: usize) -> i32 {
     // Validate hostname length (max 255 bytes)
     if len > 255 {
         return -22; // EINVAL
@@ -54,6 +61,9 @@ pub fn sys_sethostname(
     let hostname_bytes = unsafe {
         std::slice::from_raw_parts(hostname_ptr, len)
     };
+    // SAFETY: guaranteed by this function's contract; the length checks above
+    // also ensure `len` is nonzero and within the hostname limit.
+    let hostname_bytes = unsafe { std::slice::from_raw_parts(hostname_ptr, len) };
 
     let hostname = match String::from_utf8(hostname_bytes.to_vec()) {
         Ok(h) => h,
@@ -86,6 +96,13 @@ pub fn sys_gethostname(
     hostname_ptr: *mut u8,
     len: usize,
 ) -> i32 {
+/// - -EFAULT on a null pointer (non-null pointer validity is the caller's safety obligation)
+///
+/// # Safety
+/// `hostname_ptr` must be writable for `len` bytes for the duration of this call.
+/// A syscall entry point must validate/copy user memory before calling this helper;
+/// checking for null does not validate an arbitrary user pointer.
+pub unsafe fn sys_gethostname(namespace_id: u64, hostname_ptr: *mut u8, len: usize) -> i32 {
     if len == 0 {
         return -22; // EINVAL
     }
@@ -105,6 +122,8 @@ pub fn sys_gethostname(
 
     // Copy hostname to buffer
     let copy_len = std::cmp::min(len - 1, hostname.len());
+    // SAFETY: guaranteed by this function's contract; `copy_len < len`, so
+    // the payload and trailing NUL fit in the caller-provided output buffer.
     unsafe {
         std::ptr::copy_nonoverlapping(
             hostname.as_ptr(),
@@ -129,6 +148,12 @@ pub fn sys_setdomainname(
     domainname_ptr: *const u8,
     len: usize,
 ) -> i32 {
+///
+/// # Safety
+/// `domainname_ptr` must be readable for `len` bytes for the duration of this call.
+/// A syscall entry point must validate/copy user memory before calling this helper;
+/// checking for null does not validate an arbitrary user pointer.
+pub unsafe fn sys_setdomainname(namespace_id: u64, domainname_ptr: *const u8, len: usize) -> i32 {
     if len > 255 {
         return -22; // EINVAL
     }
@@ -144,6 +169,9 @@ pub fn sys_setdomainname(
     let domainname_bytes = unsafe {
         std::slice::from_raw_parts(domainname_ptr, len)
     };
+    // SAFETY: guaranteed by this function's contract; the length checks above
+    // also ensure `len` is nonzero and within the domainname limit.
+    let domainname_bytes = unsafe { std::slice::from_raw_parts(domainname_ptr, len) };
 
     let domainname = match String::from_utf8(domainname_bytes.to_vec()) {
         Ok(d) => d,
@@ -165,6 +193,12 @@ pub fn sys_getdomainname(
     domainname_ptr: *mut u8,
     len: usize,
 ) -> i32 {
+///
+/// # Safety
+/// `domainname_ptr` must be writable for `len` bytes for the duration of this call.
+/// A syscall entry point must validate/copy user memory before calling this helper;
+/// checking for null does not validate an arbitrary user pointer.
+pub unsafe fn sys_getdomainname(namespace_id: u64, domainname_ptr: *mut u8, len: usize) -> i32 {
     if len == 0 {
         return -22; // EINVAL
     }
@@ -182,6 +216,8 @@ pub fn sys_getdomainname(
     };
 
     let copy_len = std::cmp::min(len - 1, domainname.len());
+    // SAFETY: guaranteed by this function's contract; `copy_len < len`, so
+    // the payload and trailing NUL fit in the caller-provided output buffer.
     unsafe {
         std::ptr::copy_nonoverlapping(
             domainname.as_ptr(),
@@ -204,7 +240,8 @@ mod tests {
         let ns = manager.create_namespace(None).expect("Failed to create namespace");
 
         let hostname = b"test-host".to_vec();
-        let result = sys_sethostname(ns.raw(), hostname.as_ptr(), hostname.len());
+        // SAFETY: the pointer references the live hostname vector for its full length.
+        let result = unsafe { sys_sethostname(ns.raw(), hostname.as_ptr(), hostname.len()) };
         assert_eq!(result, 0);
     }
 
@@ -214,7 +251,8 @@ mod tests {
         let ns = manager.create_namespace(None).expect("Failed to create namespace");
 
         let hostname = "a".repeat(256).into_bytes();
-        let result = sys_sethostname(ns.raw(), hostname.as_ptr(), hostname.len());
+        // SAFETY: the pointer references the live hostname vector for its full length.
+        let result = unsafe { sys_sethostname(ns.raw(), hostname.as_ptr(), hostname.len()) };
         assert_eq!(result, -22); // EINVAL
     }
 
@@ -223,7 +261,8 @@ mod tests {
         let manager = get_uts_manager();
         let ns = manager.create_namespace(None).expect("Failed to create namespace");
 
-        let result = sys_sethostname(ns.raw(), std::ptr::null(), 0);
+        // SAFETY: length zero is rejected before the pointer is dereferenced.
+        let result = unsafe { sys_sethostname(ns.raw(), std::ptr::null(), 0) };
         assert_eq!(result, -22); // EINVAL
     }
 
@@ -233,10 +272,12 @@ mod tests {
         let ns = manager.create_namespace(None).expect("Failed to create namespace");
 
         let hostname = b"test-host".to_vec();
-        sys_sethostname(ns.raw(), hostname.as_ptr(), hostname.len());
+        // SAFETY: the pointer references the live hostname vector for its full length.
+        unsafe { sys_sethostname(ns.raw(), hostname.as_ptr(), hostname.len()) };
 
         let mut buffer = vec![0u8; 256];
-        let result = sys_gethostname(ns.raw(), buffer.as_mut_ptr(), 256);
+        // SAFETY: the output vector has at least 256 writable bytes.
+        let result = unsafe { sys_gethostname(ns.raw(), buffer.as_mut_ptr(), 256) };
         assert_eq!(result, 0);
 
         let retrieved = String::from_utf8(buffer.iter().copied().take_while(|&b| b != 0).collect()).unwrap();
@@ -252,14 +293,20 @@ mod tests {
         let host1 = b"host1".to_vec();
         let host2 = b"host2".to_vec();
 
-        sys_sethostname(ns1.raw(), host1.as_ptr(), host1.len());
-        sys_sethostname(ns2.raw(), host2.as_ptr(), host2.len());
+        // SAFETY: both pointers reference live vectors for their respective lengths.
+        unsafe {
+            sys_sethostname(ns1.raw(), host1.as_ptr(), host1.len());
+            sys_sethostname(ns2.raw(), host2.as_ptr(), host2.len());
+        }
 
         let mut buf1 = vec![0u8; 256];
         let mut buf2 = vec![0u8; 256];
 
-        sys_gethostname(ns1.raw(), buf1.as_mut_ptr(), 256);
-        sys_gethostname(ns2.raw(), buf2.as_mut_ptr(), 256);
+        // SAFETY: both output vectors have at least 256 writable bytes.
+        unsafe {
+            sys_gethostname(ns1.raw(), buf1.as_mut_ptr(), 256);
+            sys_gethostname(ns2.raw(), buf2.as_mut_ptr(), 256);
+        }
 
         let h1 = String::from_utf8(buf1.iter().copied().take_while(|&b| b != 0).collect()).unwrap();
         let h2 = String::from_utf8(buf2.iter().copied().take_while(|&b| b != 0).collect()).unwrap();
