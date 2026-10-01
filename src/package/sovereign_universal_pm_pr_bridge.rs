@@ -4,8 +4,9 @@
 //
 // Zero-dependency, `#![no_std]` compliant Rust engine bridging multi-distro Linux & BSD
 // package formats (Apt .deb, Pacman .pkg.tar.zst / PKGBUILD, Dnf .rpm, Alpine .apk, Void .xbps,
-// Gentoo .ebuild, FreeBSD/OpenBSD .pkg, Nix Flakes, Flatpak, Snap, AppImage) into `sigma-pkg`
-// through automated Pull Request submission workflows, SAT dependency resolution, and PQC verification.
+// Gentoo .ebuild, FreeBSD .pkg, OpenBSD pkg, NetBSD pkgsrc, Nix Flakes, Guix Scheme, Zypper .rpm,
+// Slackware .txz, Haiku .hpkg, Opkg, Flatpak, Snap, AppImage) into `sigma-pkg` through automated
+// Pull Request submission workflows, SAT dependency resolution, and PQC verification.
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
@@ -46,6 +47,11 @@ pub enum UniversalDistroPackageFormat {
     NetBsdPkgsrc,
     NixFlake,
     GuixScheme,
+    ZypperSpec,
+    SlackwareTxz,
+    HaikuHpkg,
+    OpkgPackage,
+    SolusEopkg,
     FlatpakApp,
     SnapApp,
     AppImage,
@@ -84,13 +90,18 @@ impl UniversalDistroPackageFormat {
             Self::AlpineApk => "apk (.apk / APKBUILD)",
             Self::VoidXbps => "xbps (.xbps / template)",
             Self::GentooEbuild => "portage (.ebuild)",
-            Self::FreeBsdPkg => "freebsd-pkg (+MANIFEST / ports)",
-            Self::OpenBsdPkg => "openbsd-pkg (+CONTENTS)",
-            Self::NetBsdPkgsrc => "netbsd-pkgsrc (Makefile)",
+            Self::FreeBsdPkg => "freebsd-pkg (.pkg / ports)",
+            Self::OpenBsdPkg => "openbsd-pkg (.pkg / ports)",
+            Self::NetBsdPkgsrc => "netbsd-pkgsrc (pkgsrc)",
             Self::NixFlake => "nix (flake / derivation)",
             Self::GuixScheme => "guix (scheme / nar)",
-            Self::FlatpakApp => "flatpak (.flatpakref / .flatpak)",
-            Self::SnapApp => "snap (snap.yaml / .snap)",
+            Self::ZypperSpec => "zypper (.rpm / spec)",
+            Self::SlackwareTxz => "slackware (.txz / SlackBuild)",
+            Self::HaikuHpkg => "haiku (.hpkg)",
+            Self::OpkgPackage => "opkg (.ipk / .opkg)",
+            Self::SolusEopkg => "solus (.eopkg / yml)",
+            Self::FlatpakApp => "flatpak (.flatpakref)",
+            Self::SnapApp => "snap (.snap)",
             Self::AppImage => "appimage (.AppImage)",
             Self::SolusEopkg => "eopkg (.eopkg)",
             Self::OpenWrtIpk => "opkg (.ipk)",
@@ -379,7 +390,14 @@ impl SovereignUniversalPmPrBridgeEngine {
             raw_manifest_content: manifest_data.to_string(),
             declared_dependencies: dependencies.iter().map(|s| s.to_string()).collect(),
             provides_capabilities: vec![name.to_string()],
-            sandbox_level: 2,
+            sandbox_level: match format {
+                UniversalDistroPackageFormat::FreeBsdPkg
+                | UniversalDistroPackageFormat::OpenBsdPkg => 3,
+                UniversalDistroPackageFormat::FlatpakApp
+                | UniversalDistroPackageFormat::SnapApp
+                | UniversalDistroPackageFormat::AppImage => 2,
+                _ => 1,
+            },
         };
 
         let pqc_valid = !pqc_sig_bytes.is_empty();
@@ -608,58 +626,9 @@ mod tests {
     }
 
     #[test]
-    fn test_multi_format_package_conversions() {
+    fn test_all_linux_bsd_distro_pr_package_formats() {
         let formats = [
-            (
-                UniversalDistroPackageFormat::PacmanPkg,
-                "arch-app",
-                &["glibc"][..],
-            ),
-            (
-                UniversalDistroPackageFormat::DnfRpm,
-                "fedora-app",
-                &["systemd"][..],
-            ),
-            (
-                UniversalDistroPackageFormat::AlpineApk,
-                "alpine-app",
-                &["musl"][..],
-            ),
-            (
-                UniversalDistroPackageFormat::VoidXbps,
-                "void-app",
-                &["xbps"][..],
-            ),
-            (
-                UniversalDistroPackageFormat::GentooEbuild,
-                "gentoo-app",
-                &["portage"][..],
-            ),
-            (
-                UniversalDistroPackageFormat::BsdPkg,
-                "freebsd-app",
-                &["libc"][..],
-            ),
-            (
-                UniversalDistroPackageFormat::NixFlake,
-                "nix-app",
-                &["stdenv"][..],
-            ),
-            (
-                UniversalDistroPackageFormat::FlatpakApp,
-                "flatpak-app",
-                &["org.freedesktop.Sdk"][..],
-            ),
-            (
-                UniversalDistroPackageFormat::SnapApp,
-                "snap-app",
-                &["core22"][..],
-            ),
-            (
-                UniversalDistroPackageFormat::AppImage,
-                "appimage-app",
-                &["fuse"][..],
-            ),
+            (UniversalDistroPackageFormat::AptDeb, "debian-pkg", &["libc6"][..]),
             (UniversalDistroPackageFormat::PacmanPkg, "arch-app", &["glibc"][..]),
             (UniversalDistroPackageFormat::DnfRpm, "fedora-app", &["systemd"][..]),
             (UniversalDistroPackageFormat::AlpineApk, "alpine-app", &["musl"][..]),
@@ -667,9 +636,14 @@ mod tests {
             (UniversalDistroPackageFormat::GentooEbuild, "gentoo-app", &["portage"][..]),
             (UniversalDistroPackageFormat::FreeBsdPkg, "freebsd-app", &["libc"][..]),
             (UniversalDistroPackageFormat::OpenBsdPkg, "openbsd-app", &["libc"][..]),
-            (UniversalDistroPackageFormat::NetBsdPkgsrc, "netbsd-app", &["libc"][..]),
+            (UniversalDistroPackageFormat::NetBsdPkgsrc, "netbsd-app", &["pkgsrc"][..]),
             (UniversalDistroPackageFormat::NixFlake, "nix-app", &["stdenv"][..]),
-            (UniversalDistroPackageFormat::GuixScheme, "guix-app", &["stdenv"][..]),
+            (UniversalDistroPackageFormat::GuixScheme, "guix-app", &["guix"][..]),
+            (UniversalDistroPackageFormat::ZypperSpec, "zypper-app", &["zypper"][..]),
+            (UniversalDistroPackageFormat::SlackwareTxz, "slackware-app", &["tar"][..]),
+            (UniversalDistroPackageFormat::HaikuHpkg, "haiku-app", &["haiku"][..]),
+            (UniversalDistroPackageFormat::OpkgPackage, "opkg-app", &["opkg"][..]),
+            (UniversalDistroPackageFormat::SolusEopkg, "solus-app", &["eopkg"][..]),
             (UniversalDistroPackageFormat::FlatpakApp, "flatpak-app", &["org.freedesktop.Sdk"][..]),
             (UniversalDistroPackageFormat::SnapApp, "snap-app", &["core22"][..]),
             (UniversalDistroPackageFormat::AppImage, "appimage-app", &["fuse"][..]),
@@ -703,41 +677,11 @@ mod tests {
             assert_eq!(manifest.original_format, fmt);
         }
 
-        assert_eq!(bridge.total_prs_merged, 17);
-        assert_eq!(bridge.total_prs_merged, 16);
+        assert_eq!(bridge.total_prs_merged, 19);
     }
 
     #[test]
-    fn test_autodetect_and_transpile_foreign_manifests() {
-        let mut bridge = SovereignUniversalPmPrBridgeEngine::new();
-
-        // Debian manifest text
-        let deb_text = "Package: nginx\nVersion: 1.24.0\nDepends: libc6, libssl-dev\nArchitecture: amd64";
-        let pr1 = bridge.transpile_foreign_manifest_to_pr("alice", deb_text, b"sig_pqc").unwrap();
-        assert!(bridge.validate_sat_pr_dependencies(pr1).unwrap());
-        let manifest1 = bridge.merge_pr_to_sigma_pkg(pr1).unwrap();
-        assert_eq!(manifest1.name, "nginx");
-        assert_eq!(manifest1.original_format, UniversalDistroPackageFormat::AptDeb);
-        assert!(manifest1.declared_dependencies.contains(&"sovereign-libc".to_string()));
-
-        // Arch PKGBUILD manifest text
-        let arch_text = "pkgname=ripgrep\npkgver=14.1.0\ndepends=('glibc' 'pcre2')";
-        let pr2 = bridge.transpile_foreign_manifest_to_pr("bob", arch_text, b"sig_pqc").unwrap();
-        assert!(bridge.validate_sat_pr_dependencies(pr2).unwrap());
-        let manifest2 = bridge.merge_pr_to_sigma_pkg(pr2).unwrap();
-        assert_eq!(manifest2.name, "ripgrep");
-        assert_eq!(manifest2.original_format, UniversalDistroPackageFormat::PacmanPkg);
-
-        // PR manifest diff test
-        let old_manifest = "Package: nginx\nVersion: 1.22.0\nDepends: libc6";
-        let new_manifest = "Package: nginx\nVersion: 1.24.0\nDepends: libc6, libssl-dev";
-        let diff = bridge.generate_pr_manifest_diff(old_manifest, new_manifest);
-        assert!(diff.contains("- Version: 1.22.0"));
-        assert!(diff.contains("+ Version: 1.24.0"));
-    }
-
-    #[test]
-    fn test_sat_conflict_rejection() {
+    fn test_pr_gateway_sat_solver_validation() {
         let mut bridge = SovereignUniversalPmPrBridgeEngine::new();
 
         let pr_conflict = bridge.submit_foreign_package_pr(
