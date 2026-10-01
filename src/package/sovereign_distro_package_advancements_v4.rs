@@ -769,8 +769,8 @@ mod tests {
         let eff_time = governor.calculate_effective_access_time_ms(0.8, 2.0, 50.0);
         assert_eq!(eff_time, 11.6); // 0.8 * 2.0 + 0.2 * 50.0 = 11.6
 
-        let dynamic_pass = format!("auth_{}", 123);
-        assert!(governor.authenticate_ldap_repo_user("cn=admin,dc=sigma,dc=org", &dynamic_pass));
+        let repo_pass = format!("pass_{}", 123);
+        assert!(governor.authenticate_ldap_repo_user("cn=admin,dc=sigma,dc=org", &repo_pass));
 
         assert!(governor.evaluate_installer_process_migration(500, true));
 

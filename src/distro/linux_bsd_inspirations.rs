@@ -661,7 +661,6 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::SmartOs => {
                 format!("{}.tgz", input_pkg)
             }
-            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => format!("{}.p5p", input_pkg),
             DistroSubsystemMode::SolarisIllumos
             | DistroSubsystemMode::SolarisOmniOS
             | DistroSubsystemMode::SolarisSmartOS => format!("{}.p5p", input_pkg),
@@ -756,7 +755,6 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::SmartOs => format!("{}.tgz", action),
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", action),
             DistroSubsystemMode::LinuxTinyCore => format!("{}.tcz", action),
-            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => format!("{}.p5p", action),
             DistroSubsystemMode::SolarisIllumos
             | DistroSubsystemMode::SolarisOmniOS
             | DistroSubsystemMode::SolarisSmartOS => format!("{}.p5p", action),

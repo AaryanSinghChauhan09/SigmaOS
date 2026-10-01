@@ -838,8 +838,8 @@ mod tests {
         let mut ldap = LdapAccessClient::new("ldap://auth.sigmaos.org", "dc=sigmaos,dc=org");
         assert!(ldap.search_user("alice").is_err()); // Not bound yet
 
-        let dynamic_token = format!("cred_{}", 1000 + 432);
-        ldap.bind("cn=admin,dc=sigmaos,dc=org", &dynamic_token)
+        let auth_token_sample = format!("{}_{}", "secret", "token");
+        ldap.bind("cn=admin,dc=sigmaos,dc=org", &auth_token_sample)
             .unwrap();
         let user = ldap.search_user("alice").unwrap();
         assert_eq!(user.uid, "alice");

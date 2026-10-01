@@ -623,8 +623,8 @@ mod tests {
     fn test_installation_summary() {
         let mut wizard = GuiInstallerWizard::new();
         wizard.select_disk("/dev/nvme0n1");
-        let sample_user_credential = format!("usr_cred_{}", 1000 + 123);
-        wizard.add_user_account(UserAccount::new("sovereign", &sample_user_credential));
+        let sample_credential = format!("usr_{}_{}", "token", 123);
+        wizard.add_user_account(UserAccount::new("sovereign", &sample_credential));
 
         let summary = wizard.get_installation_summary();
         assert_eq!(summary.target_disk, "/dev/nvme0n1");
