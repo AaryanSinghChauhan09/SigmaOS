@@ -34,6 +34,9 @@ pub mod network;
 pub mod observability;
 pub mod orchestration;
 pub mod package;
+pub use package::{
+    SovereignDistroPackageAdvancementsSuiteV10, UniversalForeignPackageFormat,
+};
 pub mod process;
 pub mod productivity;
 pub use productivity::*;
