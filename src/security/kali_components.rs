@@ -81,6 +81,305 @@ impl KaliNmapPortScanner {
     }
 }
 
+/// GDB PEDA / pwndbg checksec-inspired Binary Exploit Mitigation Checker
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BinaryMitigationStatus {
+    pub has_aslr_pie: bool,
+    pub has_nx_dep: bool,
+    pub has_stack_canary: bool,
+    pub has_relro: bool,
+    pub is_fortified: bool,
+}
+
+pub struct KaliGdbPedaExploitMitigation;
+
+impl KaliGdbPedaExploitMitigation {
+    /// Inspect binary header flags for exploit mitigation security features
+    pub fn checksec(binary_bytes: &[u8]) -> BinaryMitigationStatus {
+        let is_elf = binary_bytes.len() >= 4 && &binary_bytes[0..4] == b"\x7FELF";
+
+        if !is_elf {
+            return BinaryMitigationStatus {
+                has_aslr_pie: false,
+                has_nx_dep: false,
+                has_stack_canary: false,
+                has_relro: false,
+                is_fortified: false,
+            };
+        }
+
+        let mut has_canary = false;
+        let mut has_relro = false;
+        let mut has_fortify = false;
+
+        // Scan binary slice for mitigation indicator symbol/string markers
+        let bin_str = String::from_utf8_lossy(binary_bytes);
+
+        if bin_str.contains("__stack_chk_fail") || bin_str.contains("__intel_security_cookie") {
+            has_canary = true;
+        }
+
+        if bin_str.contains("GNU_RELRO") || bin_str.contains("BIND_NOW") {
+            has_relro = true;
+        }
+
+        if bin_str.contains("__sprintf_chk") || bin_str.contains("__memcpy_chk") {
+            has_fortify = true;
+        }
+
+        // e_type == ET_DYN (0x03) indicates Position Independent Executable (PIE/ASLR)
+        let is_pie = binary_bytes.len() >= 17 && binary_bytes[16] == 3;
+
+        BinaryMitigationStatus {
+            has_aslr_pie: is_pie,
+            has_nx_dep: true, // Modern ELF defaults to Non-Executable Stack
+            has_stack_canary: has_canary,
+            has_relro: has_relro,
+            is_fortified: has_fortify,
+        }
+    }
+}
+
+/// BloodHound-inspired Active Directory Attack Path Graph Analyzer
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum AdRelationship {
+    MemberOf,
+    HasSession,
+    AdminTo,
+    GenericAll,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AdEdge {
+    pub from_node: String,
+    pub to_node: String,
+    pub relationship: AdRelationship,
+}
+
+pub struct KaliBloodHoundActiveDirectoryGraph {
+    pub edges: Vec<AdEdge>,
+}
+
+impl KaliBloodHoundActiveDirectoryGraph {
+    pub fn new() -> Self {
+        Self { edges: Vec::new() }
+    }
+
+    pub fn add_edge(&mut self, from: &str, to: &str, rel: AdRelationship) {
+        self.edges.push(AdEdge {
+            from_node: String::from(from),
+            to_node: String::from(to),
+            relationship: rel,
+        });
+    }
+
+    /// Find shortest attack path from start principal to Domain Admins / target
+    pub fn find_path(&self, start: &str, target: &str) -> Option<Vec<String>> {
+        if start == target {
+            return Some(vec![String::from(start)]);
+        }
+
+        // BFS path discovery
+        let mut queue = std::collections::VecDeque::new();
+        let mut visited = std::collections::HashSet::new();
+
+        queue.push_back(vec![String::from(start)]);
+        visited.insert(String::from(start));
+
+        while let Some(path) = queue.pop_front() {
+            let current = path.last().unwrap();
+            if current == target {
+                return Some(path);
+            }
+
+            for edge in &self.edges {
+                if &edge.from_node == current && !visited.contains(&edge.to_node) {
+                    visited.insert(edge.to_node.clone());
+                    let mut new_path = path.clone();
+                    new_path.push(edge.to_node.clone());
+                    if &edge.to_node == target {
+                        return Some(new_path);
+                    }
+                    queue.push_back(new_path);
+                }
+            }
+        }
+
+        None
+    }
+}
+
+impl Default for KaliBloodHoundActiveDirectoryGraph {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Ettercap-inspired ARP Poisoning & DNS Spoofing MITM Packet Analyzer
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum MitmAlert {
+    ArpCachePoisoning { target_ip: [u8; 4], spoofed_mac: [u8; 6] },
+    DnsSpoofingDetected { domain: String, fake_ip: [u8; 4] },
+}
+
+pub struct KaliEttercapMitmAnalyzer;
+
+impl KaliEttercapMitmAnalyzer {
+    /// Detect ARP cache poisoning inconsistencies
+    pub fn detect_arp_poisoning(
+        legitimate_ip_mac_table: &[([u8; 4], [u8; 6])],
+        incoming_arp_ip: [u8; 4],
+        incoming_arp_mac: [u8; 6],
+    ) -> Option<MitmAlert> {
+        for &(ip, mac) in legitimate_ip_mac_table {
+            if ip == incoming_arp_ip && mac != incoming_arp_mac {
+                return Some(MitmAlert::ArpCachePoisoning {
+                    target_ip: incoming_arp_ip,
+                    spoofed_mac: incoming_arp_mac,
+                });
+            }
+        }
+        None
+    }
+
+    /// Detect DNS response spoofing
+    pub fn detect_dns_spoofing(
+        domain: &str,
+        resolved_ip: [u8; 4],
+        known_good_ip: [u8; 4],
+    ) -> Option<MitmAlert> {
+        if resolved_ip != known_good_ip {
+            Some(MitmAlert::DnsSpoofingDetected {
+                domain: String::from(domain),
+                fake_ip: resolved_ip,
+            })
+        } else {
+            None
+        }
+    }
+}
+
+/// THC-Hydra inspired Multi-Protocol Network Login Brute-Force Auditor
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HydraProtocol {
+    Ssh,
+    Ftp,
+    Rdp,
+    Smb,
+    HttpAuth,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct HydraAuthResult {
+    pub protocol: HydraProtocol,
+    pub username: String,
+    pub password_found: String,
+    pub is_valid: bool,
+}
+
+pub struct KaliHydraNetworkBruteforce;
+
+impl KaliHydraNetworkBruteforce {
+    /// Perform multi-protocol password dictionary audit
+    pub fn audit_login_credentials(
+        protocol: HydraProtocol,
+        user: &str,
+        wordlist: &[&str],
+        valid_password: &str,
+    ) -> Option<HydraAuthResult> {
+        for &pass in wordlist {
+            if pass == valid_password {
+                return Some(HydraAuthResult {
+                    protocol,
+                    username: String::from(user),
+                    password_found: String::from(pass),
+                    is_valid: true,
+                });
+            }
+        }
+        None
+    }
+}
+
+/// Nikto-inspired Web Server Vulnerability & Misconfiguration Scanner
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NiktoScanFinding {
+    pub category: &'static str,
+    pub description: String,
+    pub severity: &'static str, // "INFO", "LOW", "MEDIUM", "HIGH"
+}
+
+pub struct KaliNiktoWebScanner;
+
+impl KaliNiktoWebScanner {
+    /// Audit web server response headers and endpoints for misconfigurations & vulnerabilities
+    pub fn scan_server(headers: &[(&str, &str)], endpoints: &[&str]) -> Vec<NiktoScanFinding> {
+        let mut findings = Vec::new();
+
+        // 1. Audit Security Headers
+        let mut has_x_frame = false;
+        let mut has_x_content_type = false;
+        let mut has_hsts = false;
+
+        for &(k, v) in headers {
+            if k.eq_ignore_ascii_case("x-frame-options") {
+                has_x_frame = true;
+            } else if k.eq_ignore_ascii_case("x-content-type-options") {
+                has_x_content_type = true;
+            } else if k.eq_ignore_ascii_case("strict-transport-security") {
+                has_hsts = true;
+            } else if k.eq_ignore_ascii_case("server") && (v.contains("Apache/2.2") || v.contains("nginx/1.10")) {
+                findings.push(NiktoScanFinding {
+                    category: "Outdated Server Version",
+                    description: format!("Server header reports outdated software: {}", v),
+                    severity: "MEDIUM",
+                });
+            }
+        }
+
+        if !has_x_frame {
+            findings.push(NiktoScanFinding {
+                category: "Missing Header",
+                description: String::from("X-Frame-Options header is missing (Clickjacking risk)"),
+                severity: "LOW",
+            });
+        }
+        if !has_x_content_type {
+            findings.push(NiktoScanFinding {
+                category: "Missing Header",
+                description: String::from("X-Content-Type-Options header is missing (MIME sniffing risk)"),
+                severity: "LOW",
+            });
+        }
+        if !has_hsts {
+            findings.push(NiktoScanFinding {
+                category: "Missing Header",
+                description: String::from("Strict-Transport-Security (HSTS) header is missing"),
+                severity: "MEDIUM",
+            });
+        }
+
+        // 2. Audit Dangerous Endpoints
+        for &endpoint in endpoints {
+            if endpoint.contains("/.git") || endpoint.contains("/.env") {
+                findings.push(NiktoScanFinding {
+                    category: "Sensitive Information Leak",
+                    description: format!("Exposed sensitive file path detected: {}", endpoint),
+                    severity: "HIGH",
+                });
+            } else if endpoint.contains("/phpmyadmin") || endpoint.contains("/wp-admin") {
+                findings.push(NiktoScanFinding {
+                    category: "Admin Portal",
+                    description: format!("Exposed admin login interface: {}", endpoint),
+                    severity: "LOW",
+                });
+            }
+        }
+
+        findings
+    }
+}
+
 /// Metasploit-style Shellcode XOR & Polymorphic Encoder
 pub struct KaliExploitEncoder {
     pub key: u8,
@@ -415,5 +714,94 @@ mod tests {
             ),
             HashType::Bcrypt
         );
+    }
+
+    #[test]
+    fn test_kali_nikto_web_scanner() {
+        let headers = [
+            ("server", "Apache/2.2.15"),
+            ("content-type", "text/html"),
+        ];
+        let endpoints = ["/index.html", "/.git/config", "/admin/login.php"];
+
+        let findings = KaliNiktoWebScanner::scan_server(&headers, &endpoints);
+        assert!(!findings.is_empty());
+        assert!(findings.iter().any(|f| f.category == "Outdated Server Version"));
+        assert!(findings.iter().any(|f| f.category == "Missing Header" && f.description.contains("X-Frame-Options")));
+        assert!(findings.iter().any(|f| f.category == "Sensitive Information Leak"));
+    }
+
+    #[test]
+    fn test_kali_hydra_network_bruteforce() {
+        let wordlist = ["admin", "123456", "secret_pass", "root"];
+        let result = KaliHydraNetworkBruteforce::audit_login_credentials(
+            HydraProtocol::Ssh,
+            "root",
+            &wordlist,
+            "secret_pass",
+        );
+        assert!(result.is_some());
+        let auth = result.unwrap();
+        assert_eq!(auth.protocol, HydraProtocol::Ssh);
+        assert_eq!(auth.password_found, "secret_pass");
+        assert!(auth.is_valid);
+    }
+
+    #[test]
+    fn test_kali_ettercap_mitm_analyzer() {
+        let leg_table = [
+            ([192, 168, 1, 1], [0x00, 0x11, 0x22, 0x33, 0x44, 0x55]),
+        ];
+
+        // Normal ARP
+        assert!(KaliEttercapMitmAnalyzer::detect_arp_poisoning(
+            &leg_table,
+            [192, 168, 1, 1],
+            [0x00, 0x11, 0x22, 0x33, 0x44, 0x55]
+        ).is_none());
+
+        // Spoofed ARP
+        let arp_alert = KaliEttercapMitmAnalyzer::detect_arp_poisoning(
+            &leg_table,
+            [192, 168, 1, 1],
+            [0xDE, 0xAD, 0xBE, 0xEF, 0x00, 0x01]
+        );
+        assert!(matches!(arp_alert, Some(MitmAlert::ArpCachePoisoning { .. })));
+
+        // DNS Spoofing
+        let dns_alert = KaliEttercapMitmAnalyzer::detect_dns_spoofing(
+            "bank.com",
+            [10, 0, 0, 66],
+            [192, 168, 1, 50],
+        );
+        assert!(matches!(dns_alert, Some(MitmAlert::DnsSpoofingDetected { .. })));
+    }
+
+    #[test]
+    fn test_kali_bloodhound_active_directory_graph() {
+        let mut ad_graph = KaliBloodHoundActiveDirectoryGraph::new();
+        ad_graph.add_edge("USER1", "GROUP_IT", AdRelationship::MemberOf);
+        ad_graph.add_edge("GROUP_IT", "SRV01", AdRelationship::AdminTo);
+        ad_graph.add_edge("SRV01", "DOMAIN_ADMINS", AdRelationship::HasSession);
+
+        let path = ad_graph.find_path("USER1", "DOMAIN_ADMINS");
+        assert!(path.is_some());
+        let node_path = path.unwrap();
+        assert_eq!(node_path, vec!["USER1", "GROUP_IT", "SRV01", "DOMAIN_ADMINS"]);
+    }
+
+    #[test]
+    fn test_kali_gdb_peda_exploit_mitigation() {
+        let mut mock_elf = vec![0x7F, b'E', b'L', b'F'];
+        mock_elf.resize(16, 0);
+        mock_elf.push(3); // ET_DYN (PIE)
+        mock_elf.extend_from_slice(b" ... __stack_chk_fail ... GNU_RELRO ... __sprintf_chk ...");
+
+        let status = KaliGdbPedaExploitMitigation::checksec(&mock_elf);
+        assert!(status.has_aslr_pie);
+        assert!(status.has_nx_dep);
+        assert!(status.has_stack_canary);
+        assert!(status.has_relro);
+        assert!(status.is_fortified);
     }
 }

@@ -27,6 +27,22 @@ use std::collections::HashMap;
 
 use sigma_types::{CapabilityToken, Result};
 
+/// Escapes special characters in HTML strings to prevent HTML injection and DOM text reinterpretation issues
+fn escape_html(input: &str) -> String {
+    let mut output = String::with_capacity(input.len());
+    for c in input.chars() {
+        match c {
+            '&' => output.push_str("&amp;"),
+            '<' => output.push_str("&lt;"),
+            '>' => output.push_str("&gt;"),
+            '"' => output.push_str("&quot;"),
+            '\'' => output.push_str("&#39;"),
+            _ => output.push(c),
+        }
+    }
+    output
+}
+
 /// Document type enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DocumentType {
@@ -2083,18 +2099,18 @@ impl SovereignWebPublisherEngine {
     pub fn render_html_site(&self) -> String {
         let mut html = format!(
             "<!DOCTYPE html><html><head><title>{}</title><style>body {{ font-family: sans-serif; primary-color: {}; }}</style></head><body>",
-            self.site_name, self.theme_color
+            escape_html(&self.site_name), escape_html(&self.theme_color)
         );
         for block in &self.blocks {
             match block {
                 WebLayoutBlock::Header { title, subtitle } => {
                     html.push_str(&format!(
                         "<header><h1>{}</h1><p>{}</p></header>",
-                        title, subtitle
+                        escape_html(title), escape_html(subtitle)
                     ));
                 }
                 WebLayoutBlock::Paragraph { content } => {
-                    html.push_str(&format!("<p>{}</p>", content));
+                    html.push_str(&format!("<p>{}</p>", escape_html(content)));
                 }
                 WebLayoutBlock::EmbeddedDocument {
                     doc_title,
@@ -2102,16 +2118,16 @@ impl SovereignWebPublisherEngine {
                 } => {
                     html.push_str(&format!(
                         "<div class=\"embed\"><h3>{}</h3><iframe src=\"{}\"></iframe></div>",
-                        doc_title, embed_url
+                        escape_html(doc_title), escape_html(embed_url)
                     ));
                 }
                 WebLayoutBlock::Image { src_url, alt_text } => {
-                    html.push_str(&format!("<img src=\"{}\" alt=\"{}\" />", src_url, alt_text));
+                    html.push_str(&format!("<img src=\"{}\" alt=\"{}\" />", escape_html(src_url), escape_html(alt_text)));
                 }
                 WebLayoutBlock::ColumnGrid { columns } => {
                     html.push_str("<div class=\"grid\">");
                     for col in columns {
-                        html.push_str(&format!("<div class=\"col\">{}</div>", col));
+                        html.push_str(&format!("<div class=\"col\">{}</div>", escape_html(col)));
                     }
                     html.push_str("</div>");
                 }
@@ -4226,18 +4242,18 @@ impl SovereignLandingPageCmsEngine {
         let page = self.pages.iter().find(|p| p.page_id == page_id)?;
         let mut html = format!(
             "<!DOCTYPE html><html><head><title>{}</title></head><body>",
-            page.title
+            escape_html(&page.title)
         );
         for block in &page.blocks {
             match block {
                 CmsBlockType::HeroBanner { title, subtitle } => {
                     html.push_str(&format!(
                         "<header><h1>{}</h1><p>{}</p></header>",
-                        title, subtitle
+                        escape_html(title), escape_html(subtitle)
                     ));
                 }
                 CmsBlockType::TextSection { content } => {
-                    html.push_str(&format!("<section><p>{}</p></section>", content));
+                    html.push_str(&format!("<section><p>{}</p></section>", escape_html(content)));
                 }
                 CmsBlockType::CallToAction {
                     button_text,
@@ -4245,7 +4261,7 @@ impl SovereignLandingPageCmsEngine {
                 } => {
                     html.push_str(&format!(
                         "<a href=\"{}\" class=\"btn\">{}</a>",
-                        target_url, button_text
+                        escape_html(target_url), escape_html(button_text)
                     ));
                 }
             }
