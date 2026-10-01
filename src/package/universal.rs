@@ -68,6 +68,21 @@ pub mod node_distribution_dummy {
 #[cfg(any(feature = "standalone_test", test))]
 pub use node_distribution_dummy::*;
 
+/// Case-insensitive substring search without heap allocation for ASCII text.
+#[inline]
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if haystack.is_ascii() && needle.is_ascii() {
+        needle.is_empty()
+            || (needle.len() <= haystack.len()
+                && haystack
+                    .as_bytes()
+                    .windows(needle.len())
+                    .any(|window| window.eq_ignore_ascii_case(needle.as_bytes())))
+    } else {
+        haystack.to_lowercase().contains(&needle.to_lowercase())
+    }
+}
+
 /// Foreign distro manifest
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ForeignDistroManifest {
@@ -390,10 +405,9 @@ impl DistroRepoSyncEngine {
     }
 
     pub fn search_indexed_manifests(&self, query: &str) -> Vec<UnifiedPackage> {
-        let query_lower = query.to_lowercase();
         self.indexed_manifests
             .values()
-            .filter(|m| m.original_name.to_lowercase().contains(&query_lower))
+            .filter(|m| contains_ignore_case(&m.original_name, query))
             .map(UniversalPackageTranslator::translate_to_sigma_pkg)
             .collect()
     }
