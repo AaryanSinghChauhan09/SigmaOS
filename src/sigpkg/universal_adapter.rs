@@ -2292,14 +2292,18 @@ impl UniversalPmCommandDispatcher {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
-                        "install" | "-i" => operation = UniversalPmOperation::Install,
+                        "install" | "-i" | "download" => operation = UniversalPmOperation::Install,
                         "remove" | "purge" | "-r" => operation = UniversalPmOperation::Remove,
-                        "update" | "upgrade" | "dist-upgrade" => {
+                        "autoremove" | "auto-remove" | "clean" | "autoclean" => {
+                            operation = UniversalPmOperation::CleanCache
+                        }
+                        "update" | "upgrade" | "dist-upgrade" | "full-upgrade" => {
                             operation = UniversalPmOperation::Upgrade
                         }
                         "search" => operation = UniversalPmOperation::Search,
-                        "show" | "status" => operation = UniversalPmOperation::QueryInfo,
-                        "clean" | "autoclean" => operation = UniversalPmOperation::CleanCache,
+                        "show" | "status" | "policy" | "depends" | "rdepends" | "list" | "check" => {
+                            operation = UniversalPmOperation::QueryInfo
+                        }
                         "-s" | "--dry-run" | "--simulate" => dry_run = true,
                         arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
                         _ => {}
@@ -2332,8 +2336,19 @@ impl UniversalPmCommandDispatcher {
                         "-Syu" | "-Syyu" | "update" | "upgrade" => operation = UniversalPmOperation::Upgrade,
                         "-Ss" | "-Qs" | "search" => operation = UniversalPmOperation::Search,
                         "-Si" | "-Qi" | "info" | "show" => operation = UniversalPmOperation::QueryInfo,
+                        "-S" | "-Sy" | "install" | "-Sw" => operation = UniversalPmOperation::Install,
+                        "-R" | "-Rns" | "-Rs" | "remove" => {
+                            operation = UniversalPmOperation::Remove
+                        }
+                        "-Syu" | "-Syyu" | "update" | "upgrade" => {
+                            operation = UniversalPmOperation::Upgrade
+                        }
+                        "-Ss" | "-Qs" | "-F" | "search" => operation = UniversalPmOperation::Search,
+                        "-Si" | "-Qi" | "-Q" | "-Qe" | "-Ql" | "-Qo" | "-Fl" | "-Fy" | "info" | "show" => {
+                            operation = UniversalPmOperation::QueryInfo
+                        }
                         "-Sc" | "-Scc" | "clean" => operation = UniversalPmOperation::CleanCache,
-                        "--print" | "--dryrun" | "--dry-run" => dry_run = true,
+                        "--print" | "--dryrun" | "--dry-run" | "-Sp" => dry_run = true,
                         arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
                         _ => {}
                     }
@@ -2344,12 +2359,12 @@ impl UniversalPmCommandDispatcher {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
-                        "install" | "in" => operation = UniversalPmOperation::Install,
+                        "install" | "in" | "download" => operation = UniversalPmOperation::Install,
                         "remove" | "erase" | "rm" => operation = UniversalPmOperation::Remove,
-                        "update" | "upgrade" | "up" => operation = UniversalPmOperation::Upgrade,
+                        "autoremove" | "clean" => operation = UniversalPmOperation::CleanCache,
+                        "update" | "upgrade" | "up" | "check-update" => operation = UniversalPmOperation::Upgrade,
                         "search" | "se" => operation = UniversalPmOperation::Search,
-                        "info" => operation = UniversalPmOperation::QueryInfo,
-                        "clean" => operation = UniversalPmOperation::CleanCache,
+                        "info" | "repoquery" | "list" => operation = UniversalPmOperation::QueryInfo,
                         "--dry-run" => dry_run = true,
                         arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
                         _ => {}
@@ -2361,11 +2376,11 @@ impl UniversalPmCommandDispatcher {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
-                        "add" => operation = UniversalPmOperation::Install,
+                        "add" | "fetch" => operation = UniversalPmOperation::Install,
                         "del" => operation = UniversalPmOperation::Remove,
                         "upgrade" => operation = UniversalPmOperation::Upgrade,
                         "search" => operation = UniversalPmOperation::Search,
-                        "info" => operation = UniversalPmOperation::QueryInfo,
+                        "info" | "audit" | "manifest" | "dot" => operation = UniversalPmOperation::QueryInfo,
                         "-s" | "--simulate" => dry_run = true,
                         arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
                         _ => {}
@@ -2393,11 +2408,14 @@ impl UniversalPmCommandDispatcher {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
-                        "install" | "add" => operation = UniversalPmOperation::Install,
+                        "install" | "add" | "fetch" => operation = UniversalPmOperation::Install,
                         "delete" | "remove" => operation = UniversalPmOperation::Remove,
+                        "autoremove" | "clean" => operation = UniversalPmOperation::CleanCache,
                         "upgrade" => operation = UniversalPmOperation::Upgrade,
                         "search" => operation = UniversalPmOperation::Search,
-                        "info" => operation = UniversalPmOperation::QueryInfo,
+                        "info" | "audit" | "check" | "query" | "which" => {
+                            operation = UniversalPmOperation::QueryInfo
+                        }
                         "-n" => dry_run = true,
                         arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
                         _ => {}
