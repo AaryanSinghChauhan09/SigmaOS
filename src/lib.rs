@@ -39,7 +39,8 @@ pub mod observability;
 pub mod orchestration;
 pub mod package;
 pub use package::{
-    SovereignDistroPackageAdvancementsSuiteV10, UniversalForeignPackageFormat,
+    SovereignDistroPackageAdvancementsSuiteV10, SovereignDistroPackageAdvancementsSuiteV11,
+    UniversalForeignPackageFormat, UniversalForeignPackageFormatConverter,
 };
 pub mod process;
 pub mod productivity;
