@@ -4,8 +4,6 @@
 #![allow(clippy::new_without_default)]
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-
-
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
@@ -29,15 +27,20 @@ pub enum PsiResource {
 
 #[derive(Debug, Clone)]
 pub struct PsiMetric {
-    pub avg10: f64,      // 10-second moving average percentage (0.0 - 100.0)
-    pub avg60: f64,      // 60-second moving average percentage
-    pub avg300: f64,     // 300-second moving average percentage
-    pub total_us: u64,   // Total accumulated stall time in microseconds
+    pub avg10: f64,    // 10-second moving average percentage (0.0 - 100.0)
+    pub avg60: f64,    // 60-second moving average percentage
+    pub avg300: f64,   // 300-second moving average percentage
+    pub total_us: u64, // Total accumulated stall time in microseconds
 }
 
 impl PsiMetric {
     pub fn new() -> Self {
-        PsiMetric { avg10: 0.0, avg60: 0.0, avg300: 0.0, total_us: 0 }
+        PsiMetric {
+            avg10: 0.0,
+            avg60: 0.0,
+            avg300: 0.0,
+            total_us: 0,
+        }
     }
 
     pub fn update(&mut self, stall_time_us: u64, elapsed_window_us: u64) {
@@ -119,7 +122,13 @@ impl SovereignPsiManager {
     }
 
     /// Record resource stall interval
-    pub fn record_stall(&mut self, resource: PsiResource, some_stalls_us: u64, full_stalls_us: u64, window_us: u64) {
+    pub fn record_stall(
+        &mut self,
+        resource: PsiResource,
+        some_stalls_us: u64,
+        full_stalls_us: u64,
+        window_us: u64,
+    ) {
         self.total_samples = self.total_samples.saturating_add(1);
         let record = match resource {
             PsiResource::Cpu => &mut self.cpu,
@@ -140,10 +149,16 @@ impl SovereignPsiManager {
     }
 
     /// Register threshold trigger
-    pub fn register_trigger(&mut self, resource: PsiResource, threshold_pct: f64, window_us: u64) -> u32 {
+    pub fn register_trigger(
+        &mut self,
+        resource: PsiResource,
+        threshold_pct: f64,
+        window_us: u64,
+    ) -> u32 {
         let id = self.next_trigger_id;
         self.next_trigger_id = self.next_trigger_id.saturating_add(1);
-        self.triggers.push(PsiTrigger::new(id, resource, threshold_pct, window_us));
+        self.triggers
+            .push(PsiTrigger::new(id, resource, threshold_pct, window_us));
         id
     }
 

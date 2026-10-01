@@ -3,11 +3,11 @@ use std::format;
 // Implements comprehensive compliance dashboard as described in COMPLIANCE_DASHBOARD_MAPPING.md
 // Maps technical features to Indian legal compliance requirements
 
-use core::fmt;
 use std::boxed::Box;
 use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;
+use core::fmt;
 
 /// Compliance status enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -151,6 +151,8 @@ impl ComplianceOverviewDashboard {
             + environmental_score
             + banking_score)
             / 5.0;
+        self.overall_compliance_score = (governance_score + taxation_score + labour_score
+            + environmental_score + banking_score) / 5.0;
     }
 
     pub fn add_alert(&mut self, severity: AlertSeverity, message: String, deadline: String) {
@@ -254,23 +256,14 @@ impl BoardMeetingModule {
         }
     }
 
-    pub fn schedule_meeting(
-        &mut self,
-        meeting: BoardMeeting,
-    ) -> Result<(), RegulatoryComplianceError> {
+    pub fn schedule_meeting(&mut self, meeting: BoardMeeting) -> Result<(), RegulatoryComplianceError> {
         // Validate notice period
-        if !self
-            .compliance_validator
-            .validate_notice_period(meeting.notice_period_days)
-        {
+        if !self.compliance_validator.validate_notice_period(meeting.notice_period_days) {
             return Err(RegulatoryComplianceError::InsufficientNoticePeriod);
         }
 
         // Check quorum
-        if !self
-            .quorum_tracker
-            .validate_quorum(meeting.directors_attending)
-        {
+        if !self.quorum_tracker.validate_quorum(meeting.directors_attending) {
             return Err(RegulatoryComplianceError::InsufficientQuorum);
         }
 
@@ -280,12 +273,8 @@ impl BoardMeetingModule {
 
     pub fn validate_meeting_compliance(&self, meeting: &BoardMeeting) -> ComplianceReport {
         ComplianceReport {
-            quorum_met: self
-                .quorum_tracker
-                .validate_quorum(meeting.directors_attending),
-            notice_period_compliant: self
-                .compliance_validator
-                .validate_notice_period(meeting.notice_period_days),
+            quorum_met: self.quorum_tracker.validate_quorum(meeting.directors_attending),
+            notice_period_compliant: self.compliance_validator.validate_notice_period(meeting.notice_period_days),
             agenda_complete: meeting.agenda_complete,
             minutes_filed: meeting.minutes_filed,
             statutory_registers_updated: true, // Assume true for now
@@ -297,18 +286,12 @@ impl BoardMeetingModule {
         let mut score = 0.0;
         let mut total = 0.0;
 
-        if self
-            .quorum_tracker
-            .validate_quorum(meeting.directors_attending)
-        {
+        if self.quorum_tracker.validate_quorum(meeting.directors_attending) {
             score += 20.0;
         }
         total += 20.0;
 
-        if self
-            .compliance_validator
-            .validate_notice_period(meeting.notice_period_days)
-        {
+        if self.compliance_validator.validate_notice_period(meeting.notice_period_days) {
             score += 20.0;
         }
         total += 20.0;
@@ -323,8 +306,7 @@ impl BoardMeetingModule {
         }
         total += 20.0;
 
-        if true {
-            // statutory_registers_updated
+        if true { // statutory_registers_updated
             score += 20.0;
         }
         total += 20.0;
@@ -354,9 +336,7 @@ pub enum RegulatoryComplianceError {
 impl fmt::Display for RegulatoryComplianceError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            RegulatoryComplianceError::InsufficientNoticePeriod => {
-                write!(f, "Insufficient notice period")
-            }
+            RegulatoryComplianceError::InsufficientNoticePeriod => write!(f, "Insufficient notice period"),
             RegulatoryComplianceError::InsufficientQuorum => write!(f, "Insufficient quorum"),
             RegulatoryComplianceError::InvalidAgenda => write!(f, "Invalid agenda"),
             RegulatoryComplianceError::FilingError => write!(f, "Filing error"),
@@ -522,10 +502,7 @@ mod tests {
         };
 
         let result = module.schedule_meeting(meeting);
-        assert_eq!(
-            result,
-            Err(RegulatoryComplianceError::InsufficientNoticePeriod)
-        );
+        assert_eq!(result, Err(RegulatoryComplianceError::InsufficientNoticePeriod));
     }
 
     #[test]
@@ -611,10 +588,7 @@ mod tests {
         );
 
         assert_eq!(dashboard.critical_alerts.len(), 1);
-        assert_eq!(
-            dashboard.critical_alerts[0].severity,
-            AlertSeverity::Critical
-        );
+        assert_eq!(dashboard.critical_alerts[0].severity, AlertSeverity::Critical);
     }
 
     #[test]
@@ -622,6 +596,11 @@ mod tests {
         let mut dashboard = ComplianceOverviewDashboard::new();
 
         dashboard.add_deadline("GSTR-3B Filing".to_string(), "2026-08-20".to_string(), 14);
+        dashboard.add_deadline(
+            "GSTR-3B Filing".to_string(),
+            "2026-08-20".to_string(),
+            14,
+        );
 
         assert_eq!(dashboard.upcoming_deadlines.len(), 1);
         assert_eq!(dashboard.upcoming_deadlines[0].days_remaining, 14);

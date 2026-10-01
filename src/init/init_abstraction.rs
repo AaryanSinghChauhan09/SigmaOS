@@ -188,15 +188,9 @@ mod tests {
         let sequence = controller.calculate_boot_sequence();
         assert_eq!(sequence, vec!["network.service", "webserver.service"]);
 
-        assert_eq!(
-            controller.service_status("webserver.service"),
-            ServiceStatus::Stopped
-        );
+        assert_eq!(controller.service_status("webserver.service"), ServiceStatus::Stopped);
         assert!(controller.start_service("webserver.service").is_ok());
-        assert_eq!(
-            controller.service_status("webserver.service"),
-            ServiceStatus::Running
-        );
+        assert_eq!(controller.service_status("webserver.service"), ServiceStatus::Running);
     }
 
     #[test]

@@ -2,11 +2,11 @@
 // Zero-dependency Rust #![no_std] / std implementation of xfwm4, xfce4-panel, xfconf & Thunar integrations.
 
 #[cfg(not(test))]
+use alloc::format;
+#[cfg(not(test))]
 use alloc::string::{String, ToString};
 #[cfg(not(test))]
 use alloc::vec::Vec;
-#[cfg(not(test))]
-use alloc::format;
 
 #[cfg(test)]
 use std::string::String;
@@ -24,7 +24,7 @@ pub enum XfconfValue {
 /// Xfconf Channel Entry
 #[derive(Debug, Clone)]
 pub struct XfconfProperty {
-    pub channel: String, // "xsettings", "xfwm4", "xfce4-panel", "displays"
+    pub channel: String,       // "xsettings", "xfwm4", "xfce4-panel", "displays"
     pub property_path: String, // "/Net/ThemeName", "/general/theme"
     pub value: XfconfValue,
 }
@@ -73,7 +73,11 @@ impl SovereignXfceDesktopEngine {
 
     /// Sets or updates an xfconf channel property
     pub fn set_xfconf_property(&mut self, channel: &str, property_path: &str, value: XfconfValue) {
-        if let Some(prop) = self.xfconf_properties.iter_mut().find(|p| p.channel == channel && p.property_path == property_path) {
+        if let Some(prop) = self
+            .xfconf_properties
+            .iter_mut()
+            .find(|p| p.channel == channel && p.property_path == property_path)
+        {
             prop.value = value;
         } else {
             self.xfconf_properties.push(XfconfProperty {
@@ -116,15 +120,27 @@ mod tests {
 
         // Check default xfconf settings
         let theme = engine.get_xfconf_property("xsettings", "/Net/ThemeName");
-        assert_eq!(theme, Some(&XfconfValue::StringVal(String::from("Sigma-Dark"))));
+        assert_eq!(
+            theme,
+            Some(&XfconfValue::StringVal(String::from("Sigma-Dark")))
+        );
 
         // Update setting
-        engine.set_xfconf_property("xsettings", "/Net/ThemeName", XfconfValue::StringVal(String::from("Adwaita-Dark")));
+        engine.set_xfconf_property(
+            "xsettings",
+            "/Net/ThemeName",
+            XfconfValue::StringVal(String::from("Adwaita-Dark")),
+        );
         let updated_theme = engine.get_xfconf_property("xsettings", "/Net/ThemeName");
-        assert_eq!(updated_theme, Some(&XfconfValue::StringVal(String::from("Adwaita-Dark"))));
+        assert_eq!(
+            updated_theme,
+            Some(&XfconfValue::StringVal(String::from("Adwaita-Dark")))
+        );
 
         // Add panel applet
         engine.add_panel_applet("cpugraph");
-        assert!(engine.active_panel_applets.contains(&String::from("cpugraph")));
+        assert!(engine
+            .active_panel_applets
+            .contains(&String::from("cpugraph")));
     }
 }

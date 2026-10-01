@@ -12,10 +12,7 @@ pub fn run(path: &str, recursive: bool, force: bool) -> Result<(), String> {
         if force {
             return Ok(());
         }
-        return Err(format!(
-            "rm: cannot remove '{}': No such file or directory",
-            path
-        ));
+        return Err(format!("rm: cannot remove '{}': No such file or directory", path));
     }
 
     if path_obj.is_dir() {

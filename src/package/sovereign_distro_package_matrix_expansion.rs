@@ -535,7 +535,10 @@ impl SovereignFedoraDnf5DeltaRpmEngine {
     /// Opcode 0x01: COPY <len: u16_be> <src_off: u32_be>
     /// Opcode 0x02: ADD <len: u16_be> <bytes...>
     /// Opcode 0xFF: End of stream
-    pub fn reconstruct_deltarpm(base_rpm: &[u8], delta_patch: &[u8]) -> Result<Vec<u8>, &'static str> {
+    pub fn reconstruct_deltarpm(
+        base_rpm: &[u8],
+        delta_patch: &[u8],
+    ) -> Result<Vec<u8>, &'static str> {
         if delta_patch.is_empty() {
             return Ok(base_rpm.to_vec());
         }
@@ -642,7 +645,9 @@ impl SovereignBsdVuXmlPledgeSandboxEngine {
             if vuln.package_name == pkg_name && vuln.cvss_score_x10 >= self.max_permitted_cvss_x10 {
                 return Err(format!(
                     "FreeBSD VuXML Gatekeeper Block: {} contains critical CVE {} (CVSS {})",
-                    pkg_name, vuln.cve, vuln.cvss_score_x10 as f32 / 10.0
+                    pkg_name,
+                    vuln.cve,
+                    vuln.cvss_score_x10 as f32 / 10.0
                 ));
             }
         }
@@ -659,7 +664,11 @@ impl SovereignBsdVuXmlPledgeSandboxEngine {
         }
     }
 
-    pub fn generate_scriptlet_pledge_unveil(&self, pledges: &[&str], unveils: &[(&str, &str)]) -> String {
+    pub fn generate_scriptlet_pledge_unveil(
+        &self,
+        pledges: &[&str],
+        unveils: &[(&str, &str)],
+    ) -> String {
         let mut script = String::from("# OpenBSD Scriptlet Pledge/Unveil Sandbox\n");
         for &(path, perm) in unveils {
             script.push_str(&format!("unveil(\"{}\", \"{}\");\n", path, perm));
@@ -710,7 +719,10 @@ impl SovereignDistroPackageMatrixExpansionSuite {
 
         // 2. Check Debian APT Pinning block status
         if self.apt_governor.is_blocked(&pkg.name) {
-            return Err(format!("Package '{}' is blocked by Debian APT Pinning rules", pkg.name));
+            return Err(format!(
+                "Package '{}' is blocked by Debian APT Pinning rules",
+                pkg.name
+            ));
         }
 
         // 3. Attach microarch optimization route tag
@@ -777,8 +789,14 @@ mod tests {
         );
 
         let cmds = arch.drain_pending_hooks();
-        assert_eq!(cmds, vec!["glib-compile-schemas /usr/share/glib-2.0/schemas".to_string()]);
-        assert_eq!(arch.resolve_optimal_repo_mirror(), "https://repo.cachyos.org/v4");
+        assert_eq!(
+            cmds,
+            vec!["glib-compile-schemas /usr/share/glib-2.0/schemas".to_string()]
+        );
+        assert_eq!(
+            arch.resolve_optimal_repo_mirror(),
+            "https://repo.cachyos.org/v4"
+        );
     }
 
     #[test]
@@ -867,7 +885,8 @@ mod tests {
             0xFF,
         ];
 
-        let reconstructed = SovereignFedoraDnf5DeltaRpmEngine::reconstruct_deltarpm(base, &delta).unwrap();
+        let reconstructed =
+            SovereignFedoraDnf5DeltaRpmEngine::reconstruct_deltarpm(base, &delta).unwrap();
         assert_eq!(String::from_utf8(reconstructed).unwrap(), "FEDORA_PATC");
     }
 

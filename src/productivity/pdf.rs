@@ -17,13 +17,12 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::vec;
 use std::format;
+use std::vec;
 
-
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::string::String;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PdfError {

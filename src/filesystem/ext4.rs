@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 /// SigmaOS: EXT4 Filesystem Implementation
 /// Provides native ext4 filesystem support with journal recovery
-
 use super::vfs::{DirEntry, FileSystem, FileType, Inode, VfsError};
 use std::vec::Vec;
 
@@ -178,7 +177,11 @@ impl FileSystem for Ext4FileSystem {
     }
 
     fn write_inode(&mut self, inode: &Inode) -> Result<(), VfsError> {
-        if let Some(cached) = self.inode_cache.iter_mut().find(|i| i.inode_number == inode.inode_number) {
+        if let Some(cached) = self
+            .inode_cache
+            .iter_mut()
+            .find(|i| i.inode_number == inode.inode_number)
+        {
             *cached = inode.clone();
             // Mark as dirty for eventual writeback
             Ok(())
@@ -188,7 +191,12 @@ impl FileSystem for Ext4FileSystem {
         }
     }
 
-    fn read_data(&self, inode_number: u64, offset: u64, buffer: &mut [u8]) -> Result<usize, VfsError> {
+    fn read_data(
+        &self,
+        inode_number: u64,
+        offset: u64,
+        buffer: &mut [u8],
+    ) -> Result<usize, VfsError> {
         let inode = self.read_inode(inode_number)?;
 
         if offset >= inode.size {
@@ -200,7 +208,12 @@ impl FileSystem for Ext4FileSystem {
         Ok(readable)
     }
 
-    fn write_data(&mut self, inode_number: u64, offset: u64, data: &[u8]) -> Result<usize, VfsError> {
+    fn write_data(
+        &mut self,
+        inode_number: u64,
+        offset: u64,
+        data: &[u8],
+    ) -> Result<usize, VfsError> {
         let mut inode = self.read_inode(inode_number)?;
 
         let written = data.len();

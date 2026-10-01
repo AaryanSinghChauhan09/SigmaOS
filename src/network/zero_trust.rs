@@ -130,13 +130,18 @@ impl ZeroTrustRouter {
         }
 
         if packet.signature_key_id != self.trust_authority_key_id {
-            self.log_threat("ZenithNet: Rejected - Invalid Post-Quantum signature key", packet.source_ip);
+            self.log_threat(
+                "ZenithNet: Rejected - Invalid Post-Quantum signature key",
+                packet.source_ip,
+            );
             return FirewallAction::Reject;
         }
 
         let mut allowed = false;
         for subnet in &self.allowed_subnets {
-            if subnet == &[0, 0, 0, 0] { continue; }
+            if subnet == &[0, 0, 0, 0] {
+                continue;
+            }
             if packet.source_ip[0] == subnet[0] && packet.source_ip[1] == subnet[1] {
                 allowed = true;
                 break;
@@ -144,12 +149,18 @@ impl ZeroTrustRouter {
         }
 
         if !allowed {
-            self.log_threat("ZenithNet: Dropped - Unauthorized subnet source", packet.source_ip);
+            self.log_threat(
+                "ZenithNet: Dropped - Unauthorized subnet source",
+                packet.source_ip,
+            );
             return FirewallAction::Drop;
         }
 
         if packet.payload_hash == 0 {
-            self.log_threat("ZenithNet: Rejected - Missing session verification payload hash", packet.source_ip);
+            self.log_threat(
+                "ZenithNet: Rejected - Missing session verification payload hash",
+                packet.source_ip,
+            );
             return FirewallAction::Reject;
         }
 
@@ -597,22 +608,34 @@ mod tests {
         };
 
         // 1. Valid packet should be accepted
-        assert_eq!(router.process_packet(&valid_packet, 100), FirewallAction::Accept);
+        assert_eq!(
+            router.process_packet(&valid_packet, 100),
+            FirewallAction::Accept
+        );
 
         // 2. Mismatched signature key should be rejected
         let mut bad_key_packet = valid_packet;
         bad_key_packet.signature_key_id = 0x9999;
-        assert_eq!(router.process_packet(&bad_key_packet, 110), FirewallAction::Reject);
+        assert_eq!(
+            router.process_packet(&bad_key_packet, 110),
+            FirewallAction::Reject
+        );
 
         // 3. Unauthorized subnet source should be dropped
         let mut bad_subnet_packet = valid_packet;
         bad_subnet_packet.source_ip = [172, 16, 0, 1];
-        assert_eq!(router.process_packet(&bad_subnet_packet, 120), FirewallAction::Drop);
+        assert_eq!(
+            router.process_packet(&bad_subnet_packet, 120),
+            FirewallAction::Drop
+        );
 
         // 4. Missing payload hash should be rejected
         let mut zero_hash_packet = valid_packet;
         zero_hash_packet.payload_hash = 0;
-        assert_eq!(router.process_packet(&zero_hash_packet, 130), FirewallAction::Reject);
+        assert_eq!(
+            router.process_packet(&zero_hash_packet, 130),
+            FirewallAction::Reject
+        );
 
         // Verify threat logs recorded bad packet attempts
         let audit = router.audit_log.borrow();

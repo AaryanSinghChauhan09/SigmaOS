@@ -9,9 +9,9 @@
 #![allow(dead_code)]
 
 use std::collections::BTreeMap;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BootKernelType {
@@ -63,7 +63,8 @@ impl ZfsBtrfsBootSnapshotSelector {
     }
 
     pub fn register_snapshot(&mut self, snap_name: &str, creation_sec: u64) {
-        self.available_snapshots.push((snap_name.to_string(), creation_sec));
+        self.available_snapshots
+            .push((snap_name.to_string(), creation_sec));
     }
 
     pub fn select_snapshot(&mut self, snap_name: &str) -> Result<(), &'static str> {
@@ -142,7 +143,8 @@ impl SovereignGrubConfigEngine {
     }
 
     pub fn set_variable(&mut self, key: &str, val: &str) {
-        self.custom_variables.insert(key.to_string(), val.to_string());
+        self.custom_variables
+            .insert(key.to_string(), val.to_string());
     }
 
     pub fn generate_grub_cfg(&self) -> String {
@@ -155,11 +157,16 @@ impl SovereignGrubConfigEngine {
             cfg.push_str(&format!("set {}=\"{}\"\n", k, v));
         }
 
-        cfg.push_str("\ninsmod part_gpt\ninsmod part_msdos\ninsmod btrfs\ninsmod zfs\ninsmod ext2\n\n");
+        cfg.push_str(
+            "\ninsmod part_gpt\ninsmod part_msdos\ninsmod btrfs\ninsmod zfs\ninsmod ext2\n\n",
+        );
 
         for entry in &self.entries {
             cfg.push_str(&format!("menuentry '{}' {{\n", entry.name));
-            cfg.push_str(&format!("    search --no-floppy --fs-uuid --set=root {}\n", entry.kernel_spec.root_device_uuid));
+            cfg.push_str(&format!(
+                "    search --no-floppy --fs-uuid --set=root {}\n",
+                entry.kernel_spec.root_device_uuid
+            ));
 
             match entry.kernel_spec.kernel_type {
                 BootKernelType::SigmaOS | BootKernelType::Linux => {
@@ -167,7 +174,10 @@ impl SovereignGrubConfigEngine {
                     if let Some(ref subvol) = entry.kernel_spec.snapshot_subvol {
                         cmdline.push_str(&format!(" {}", subvol));
                     }
-                    cfg.push_str(&format!("    linux {} {}\n", entry.kernel_spec.kernel_path, cmdline));
+                    cfg.push_str(&format!(
+                        "    linux {} {}\n",
+                        entry.kernel_spec.kernel_path, cmdline
+                    ));
                     if let Some(ref initrd) = entry.kernel_spec.initrd_path {
                         cfg.push_str(&format!("    initrd {}\n", initrd));
                     }
@@ -177,16 +187,25 @@ impl SovereignGrubConfigEngine {
                     cfg.push_str(&format!("    kfreebsd_loadenv /boot/device.hints\n"));
                 }
                 BootKernelType::Multiboot2 => {
-                    cfg.push_str(&format!("    multiboot2 {} {}\n", entry.kernel_spec.kernel_path, entry.kernel_spec.cmdline_params));
+                    cfg.push_str(&format!(
+                        "    multiboot2 {} {}\n",
+                        entry.kernel_spec.kernel_path, entry.kernel_spec.cmdline_params
+                    ));
                     if let Some(ref module) = entry.kernel_spec.initrd_path {
                         cfg.push_str(&format!("    module2 {}\n", module));
                     }
                 }
                 BootKernelType::ChainloadEFI | BootKernelType::ChainloadMBR => {
-                    cfg.push_str(&format!("    chainloader {}\n", entry.kernel_spec.kernel_path));
+                    cfg.push_str(&format!(
+                        "    chainloader {}\n",
+                        entry.kernel_spec.kernel_path
+                    ));
                 }
                 _ => {
-                    cfg.push_str(&format!("    linux {} {}\n", entry.kernel_spec.kernel_path, entry.kernel_spec.cmdline_params));
+                    cfg.push_str(&format!(
+                        "    linux {} {}\n",
+                        entry.kernel_spec.kernel_path, entry.kernel_spec.cmdline_params
+                    ));
                 }
             }
             cfg.push_str("}\n\n");
@@ -332,7 +351,10 @@ menuentry 'SigmaOS Secondary' {
         assert_eq!(engine.entries.len(), 2);
         assert_eq!(engine.entries[0].name, "Arch Linux");
         assert_eq!(engine.entries[0].kernel_spec.root_device_uuid, "1234-ABCD");
-        assert_eq!(engine.entries[0].kernel_spec.initrd_path, Some("/boot/initramfs-linux.img".to_string()));
+        assert_eq!(
+            engine.entries[0].kernel_spec.initrd_path,
+            Some("/boot/initramfs-linux.img".to_string())
+        );
     }
 
     #[test]
@@ -348,6 +370,9 @@ menuentry 'SigmaOS Secondary' {
         let mut zfs_selector = ZfsBtrfsBootSnapshotSelector::new("zfs", "rpool/ROOT");
         zfs_selector.register_snapshot("be-14.1", 1700000000);
         assert!(zfs_selector.select_snapshot("be-14.1").is_ok());
-        assert_eq!(zfs_selector.get_active_subvol_param().unwrap(), "zfs=rpool/ROOT/be-14.1");
+        assert_eq!(
+            zfs_selector.get_active_subvol_param().unwrap(),
+            "zfs=rpool/ROOT/be-14.1"
+        );
     }
 }

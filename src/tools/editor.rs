@@ -1,9 +1,9 @@
 // Text Editor (gedit/nano Inspiration)
 // Document management, syntax highlighting, and editor features
 
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 fn escape_html(input: &str) -> String {
     let mut escaped = String::with_capacity(input.len());
@@ -195,7 +195,8 @@ impl OnlineWebFileEditorEngine {
     pub fn save_version(&mut self, id: &str, version_label: &str) -> Result<usize, EditorError> {
         if let Some(doc) = self.active_tabs.iter_mut().find(|d| d.id == id) {
             doc.save()?;
-            self.version_history.push((version_label.to_string(), doc.content.clone()));
+            self.version_history
+                .push((version_label.to_string(), doc.content.clone()));
             Ok(self.version_history.len())
         } else {
             Err(EditorError::DocumentNotFound)
@@ -204,7 +205,10 @@ impl OnlineWebFileEditorEngine {
 
     pub fn render_live_html_preview(&self, id: &str) -> String {
         if let Some(doc) = self.active_tabs.iter().find(|d| d.id == id) {
-            format!("<div class=\"sigma-web-editor-preview\">{}</div>", escape_html(&doc.content))
+            format!(
+                "<div class=\"sigma-web-editor-preview\">{}</div>",
+                escape_html(&doc.content)
+            )
         } else {
             String::from("<div class=\"error\">No Document</div>")
         }

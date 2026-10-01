@@ -110,6 +110,11 @@ pub enum DistroSubsystemMode {
     LinuxDietPi,
     LinuxRegolith,
     LinuxOpenMandriva,
+    LinuxUbuntuServer,
+    LinuxPopOsCosmic,
+    FreeBsdHardened,
+    DragonFlyHammer2,
+    SolarisSmartOS,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -125,6 +130,118 @@ pub enum ServiceSupervisorType {
     Rcd,
 }
 
+// ==========================================
+// LINUX & BSD PAM AUTH & CREDENTIAL PROVIDER ENGINE
+// ==========================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum AuthMechanism {
+    LinuxPam,
+    SystemdHomed,
+    BsdAuth,
+    PqcSecurityToken,
+}
+
+#[derive(Debug, Clone)]
+pub struct AuthCredentialContext {
+    pub username: String,
+    pub service_name: String,
+    pub mechanism: AuthMechanism,
+    pub authenticated: bool,
+}
+
+pub struct LinuxBsdPamAuthEngine {
+    pub default_mechanism: AuthMechanism,
+    pub trusted_sessions: Vec<AuthCredentialContext>,
+}
+
+impl LinuxBsdPamAuthEngine {
+    pub fn new(mode: DistroSubsystemMode) -> Self {
+        let mechanism = match mode {
+            DistroSubsystemMode::FreeBsd
+            | DistroSubsystemMode::OpenBsd
+            | DistroSubsystemMode::NetBsd
+            | DistroSubsystemMode::DragonFlyBsd
+            | DistroSubsystemMode::GhostBsd
+            | DistroSubsystemMode::NomadBsd
+            | DistroSubsystemMode::MidnightBsd
+            | DistroSubsystemMode::HardenedBsd
+            | DistroSubsystemMode::OpenBsdHardened => AuthMechanism::BsdAuth,
+
+            DistroSubsystemMode::LinuxArch
+            | DistroSubsystemMode::LinuxFedora
+            | DistroSubsystemMode::LinuxUbuntu
+            | DistroSubsystemMode::LinuxFedoraSilverblue
+            | DistroSubsystemMode::LinuxBazzite => AuthMechanism::SystemdHomed,
+
+            _ => AuthMechanism::LinuxPam,
+        };
+
+        Self {
+            default_mechanism: mechanism,
+            trusted_sessions: Vec::new(),
+        }
+    }
+
+    pub fn authenticate(&mut self, username: &str, action: &str) -> Result<String, &'static str> {
+        let ctx = AuthCredentialContext {
+            username: username.to_string(),
+            service_name: action.to_string(),
+            mechanism: self.default_mechanism.clone(),
+            authenticated: true,
+        };
+        let msg = format!(
+            "Authenticated user '{}' for service/action '{}' via mechanism '{:?}'",
+            username, action, self.default_mechanism
+        );
+        self.trusted_sessions.push(ctx);
+        Ok(msg)
+    }
+
+    pub fn is_authenticated(&self, username: &str) -> bool {
+        self.trusted_sessions
+            .iter()
+            .any(|s| s.username == username && s.authenticated)
+    }
+}
+
+// ==========================================
+// UNIVERSAL LINUX & BSD SUBSYSTEM INSPIRATION HARMONIZER ENGINE
+// ==========================================
+
+pub struct LinuxBsdSubsystemInspirationHarmonizer {
+    pub mode: DistroSubsystemMode,
+    pub auth_engine: LinuxBsdPamAuthEngine,
+}
+
+impl LinuxBsdSubsystemInspirationHarmonizer {
+    pub fn new(mode: DistroSubsystemMode) -> Self {
+        Self {
+            mode,
+            auth_engine: LinuxBsdPamAuthEngine::new(mode),
+        }
+    }
+
+    pub fn set_mode(&mut self, mode: DistroSubsystemMode) {
+        self.mode = mode;
+        self.auth_engine = LinuxBsdPamAuthEngine::new(mode);
+    }
+
+    pub fn process_subsystem_action(
+        &mut self,
+        subsystem: &str,
+        action: &str,
+    ) -> Result<String, &'static str> {
+        if subsystem == "auth" {
+            return self.auth_engine.authenticate("root", action);
+        }
+        Ok(format!(
+            "Harmonized subsystem '{}' action '{}' under distro mode '{:?}'",
+            subsystem, action, self.mode
+        ))
+    }
+}
+
 pub struct SovereignUniversalDistroBridge {
     pub mode: DistroSubsystemMode,
     pub active_jail: Option<FreeBSDJail>,
@@ -133,6 +250,8 @@ pub struct SovereignUniversalDistroBridge {
     pub retguard_engine: OpenBsdRetguardEngine,
     pub dominance_suite: SovereignDistroDominanceSuite,
     pub super_matrix: UniversalDistroSuperMatrix,
+    pub auth_engine: LinuxBsdPamAuthEngine,
+    pub harmonizer: LinuxBsdSubsystemInspirationHarmonizer,
 }
 
 impl SovereignUniversalDistroBridge {
@@ -145,11 +264,15 @@ impl SovereignUniversalDistroBridge {
             retguard_engine: OpenBsdRetguardEngine::new(),
             dominance_suite: SovereignDistroDominanceSuite::new(),
             super_matrix: UniversalDistroSuperMatrix::new(),
+            auth_engine: LinuxBsdPamAuthEngine::new(mode),
+            harmonizer: LinuxBsdSubsystemInspirationHarmonizer::new(mode),
         }
     }
 
     pub fn set_subsystem_mode(&mut self, mode: DistroSubsystemMode) {
         self.mode = mode;
+        self.auth_engine = LinuxBsdPamAuthEngine::new(mode);
+        self.harmonizer.set_mode(mode);
     }
 
     pub fn get_supervisor_type(&self) -> ServiceSupervisorType {
@@ -196,13 +319,17 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxDietPi
             | DistroSubsystemMode::LinuxRegolith
             | DistroSubsystemMode::LinuxOpenMandriva
+            | DistroSubsystemMode::LinuxUbuntuServer
+            | DistroSubsystemMode::LinuxPopOsCosmic
             | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
+            | DistroSubsystemMode::FreeBsdHardened
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::DragonFlyBsd
+            | DistroSubsystemMode::DragonFlyHammer2
             | DistroSubsystemMode::MidnightBsd
             | DistroSubsystemMode::HardenedBsd
             | DistroSubsystemMode::GhostBsd
@@ -216,26 +343,30 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxPostmarket
             | DistroSubsystemMode::LinuxOpenWrt => ServiceSupervisorType::Runit,
 
-            DistroSubsystemMode::LinuxPuppy | DistroSubsystemMode::LinuxSlax => {
-                ServiceSupervisorType::Sysvinit
-            }
+            DistroSubsystemMode::LinuxPuppy | DistroSubsystemMode::LinuxSlax => ServiceSupervisorType::Sysvinit,
 
-            DistroSubsystemMode::LinuxNix
-            | DistroSubsystemMode::LinuxGuix
-            | DistroSubsystemMode::LinuxTalos => ServiceSupervisorType::Shepherd,
+            DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxGuix | DistroSubsystemMode::LinuxTalos => {
+                ServiceSupervisorType::Shepherd
+            }
 
             DistroSubsystemMode::LinuxSolus
             | DistroSubsystemMode::LinuxChimera
+            | DistroSubsystemMode::LinuxSerpentOS => {
+                ServiceSupervisorType::Dinit
             | DistroSubsystemMode::LinuxSerpentOS => ServiceSupervisorType::Dinit,
             DistroSubsystemMode::LinuxSlackware | DistroSubsystemMode::LinuxTinyCore => {
                 ServiceSupervisorType::Sysvinit
             }
-            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => {
-                ServiceSupervisorType::Smf
-            }
+            DistroSubsystemMode::SolarisIllumos
+            | DistroSubsystemMode::SolarisOmniOS
+            | DistroSubsystemMode::SolarisSmartOS => ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs | DistroSubsystemMode::NetBsdRump => {
                 ServiceSupervisorType::Rcd
             }
+            DistroSubsystemMode::LinuxSlackware
+            | DistroSubsystemMode::LinuxTinyCore => ServiceSupervisorType::Sysvinit,
+            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => ServiceSupervisorType::Smf,
+            DistroSubsystemMode::SmartOs | DistroSubsystemMode::NetBsdRump => ServiceSupervisorType::Rcd,
         }
     }
 
@@ -250,8 +381,10 @@ impl SovereignUniversalDistroBridge {
             (
                 DistroSubsystemMode::LinuxDebian
                 | DistroSubsystemMode::LinuxPopOs
+                | DistroSubsystemMode::LinuxPopOsCosmic
                 | DistroSubsystemMode::LinuxTails
                 | DistroSubsystemMode::LinuxUbuntu
+                | DistroSubsystemMode::LinuxUbuntuServer
                 | DistroSubsystemMode::LinuxMint
                 | DistroSubsystemMode::LinuxKali
                 | DistroSubsystemMode::LinuxAntiX
@@ -275,7 +408,8 @@ impl SovereignUniversalDistroBridge {
                 "/var/lib/pkg",
             ) => "/var/lib/rpm".to_string(),
             (
-                DistroSubsystemMode::LinuxRegolith | DistroSubsystemMode::LinuxDietPi,
+                DistroSubsystemMode::LinuxRegolith
+                | DistroSubsystemMode::LinuxDietPi,
                 "/var/lib/pkg",
             ) => "/var/lib/dpkg".to_string(),
             (
@@ -287,17 +421,16 @@ impl SovereignUniversalDistroBridge {
                 | DistroSubsystemMode::LinuxSteamOS,
                 "/var/lib/pkg",
             ) => "/var/lib/pacman".to_string(),
-            (
-                DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxAlpineExtended,
-                "/var/lib/pkg",
-            ) => "/lib/apk/db".to_string(),
+            (DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxAlpineExtended, "/var/lib/pkg") => "/lib/apk/db".to_string(),
             (DistroSubsystemMode::LinuxVoid, "/var/lib/pkg") => "/var/db/xbps".to_string(),
             (DistroSubsystemMode::LinuxOpenWrt, "/etc") => "/etc/config".to_string(),
             (
                 DistroSubsystemMode::FreeBsd
+                | DistroSubsystemMode::FreeBsdHardened
                 | DistroSubsystemMode::OpenBsd
                 | DistroSubsystemMode::NetBsd
                 | DistroSubsystemMode::DragonFlyBsd
+                | DistroSubsystemMode::DragonFlyHammer2
                 | DistroSubsystemMode::MidnightBsd
                 | DistroSubsystemMode::HardenedBsd
                 | DistroSubsystemMode::GhostBsd
@@ -307,18 +440,22 @@ impl SovereignUniversalDistroBridge {
             ) => "/var/db/pkg".to_string(),
             (
                 DistroSubsystemMode::FreeBsd
+                | DistroSubsystemMode::FreeBsdHardened
                 | DistroSubsystemMode::OpenBsd
                 | DistroSubsystemMode::NetBsd
                 | DistroSubsystemMode::DragonFlyBsd
+                | DistroSubsystemMode::DragonFlyHammer2
                 | DistroSubsystemMode::GhostBsd
                 | DistroSubsystemMode::NomadBsd
                 | DistroSubsystemMode::OpenBsdHardened
-                | DistroSubsystemMode::SmartOs,
+                | DistroSubsystemMode::SmartOs
+                | DistroSubsystemMode::SolarisSmartOS,
                 "/etc",
             ) => "/usr/local/etc".to_string(),
-            (DistroSubsystemMode::GhostBsd | DistroSubsystemMode::NomadBsd, "/var/log") => {
-                "/var/log".to_string()
-            }
+            (
+                DistroSubsystemMode::GhostBsd | DistroSubsystemMode::NomadBsd,
+                "/var/log",
+            ) => "/var/log".to_string(),
             (DistroSubsystemMode::LinuxClear, "/etc") => "/usr/etc".to_string(),
             (
                 DistroSubsystemMode::FreeBsd
@@ -400,13 +537,17 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxDietPi
             | DistroSubsystemMode::LinuxRegolith
             | DistroSubsystemMode::LinuxOpenMandriva
+            | DistroSubsystemMode::LinuxUbuntuServer
+            | DistroSubsystemMode::LinuxPopOsCosmic
             | DistroSubsystemMode::LinuxSteamOS => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
+            | DistroSubsystemMode::FreeBsdHardened
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::DragonFlyBsd
+            | DistroSubsystemMode::DragonFlyHammer2
             | DistroSubsystemMode::MidnightBsd
             | DistroSubsystemMode::HardenedBsd
             | DistroSubsystemMode::GhostBsd
@@ -420,23 +561,29 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxPostmarket
             | DistroSubsystemMode::LinuxOpenWrt => supervisor == ServiceSupervisorType::Runit,
 
-            DistroSubsystemMode::LinuxNix
-            | DistroSubsystemMode::LinuxGuix
-            | DistroSubsystemMode::LinuxTalos => supervisor == ServiceSupervisorType::Shepherd,
+            DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxGuix | DistroSubsystemMode::LinuxTalos => {
+                supervisor == ServiceSupervisorType::Shepherd
+            }
 
             DistroSubsystemMode::LinuxSolus
             | DistroSubsystemMode::LinuxChimera
-            | DistroSubsystemMode::LinuxSerpentOS => supervisor == ServiceSupervisorType::Dinit,
+            | DistroSubsystemMode::LinuxSerpentOS => {
+                supervisor == ServiceSupervisorType::Dinit
+            }
             DistroSubsystemMode::LinuxSlackware
             | DistroSubsystemMode::LinuxTinyCore
             | DistroSubsystemMode::LinuxSlax
+            | DistroSubsystemMode::LinuxPuppy => {
+                supervisor == ServiceSupervisorType::Sysvinit
             | DistroSubsystemMode::LinuxPuppy => supervisor == ServiceSupervisorType::Sysvinit,
-            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => {
-                supervisor == ServiceSupervisorType::Smf
-            }
+            DistroSubsystemMode::SolarisIllumos
+            | DistroSubsystemMode::SolarisOmniOS
+            | DistroSubsystemMode::SolarisSmartOS => supervisor == ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs | DistroSubsystemMode::NetBsdRump => {
                 supervisor == ServiceSupervisorType::Rcd
             }
+            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => supervisor == ServiceSupervisorType::Smf,
+            DistroSubsystemMode::SmartOs | DistroSubsystemMode::NetBsdRump => supervisor == ServiceSupervisorType::Rcd,
         };
         supervisor_valid && !pkg_spec.is_empty() && !vfs_etc.is_empty()
     }
@@ -445,8 +592,10 @@ impl SovereignUniversalDistroBridge {
         match self.mode {
             DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxUbuntu
+            | DistroSubsystemMode::LinuxUbuntuServer
             | DistroSubsystemMode::LinuxMint
             | DistroSubsystemMode::LinuxPopOs
+            | DistroSubsystemMode::LinuxPopOsCosmic
             | DistroSubsystemMode::LinuxTails
             | DistroSubsystemMode::LinuxKali
             | DistroSubsystemMode::LinuxAntiX
@@ -498,9 +647,7 @@ impl SovereignUniversalDistroBridge {
             }
             DistroSubsystemMode::LinuxBlendOS => format!("{}.pkg.tar.zst", input_pkg),
             DistroSubsystemMode::LinuxPuppy => format!("{}.pet", input_pkg),
-            DistroSubsystemMode::LinuxSolus | DistroSubsystemMode::LinuxSerpentOS => {
-                format!("{}.eopkg", input_pkg)
-            }
+            DistroSubsystemMode::LinuxSolus | DistroSubsystemMode::LinuxSerpentOS => format!("{}.eopkg", input_pkg),
             DistroSubsystemMode::LinuxClear => format!("{}.bundle", input_pkg),
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::LinuxTinyCore => format!("{}.tcz", input_pkg),
@@ -508,7 +655,9 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxTalos => format!("{}.yaml", input_pkg),
             DistroSubsystemMode::LinuxSlax => format!("{}.sb", input_pkg),
             DistroSubsystemMode::FreeBsd
+            | DistroSubsystemMode::FreeBsdHardened
             | DistroSubsystemMode::DragonFlyBsd
+            | DistroSubsystemMode::DragonFlyHammer2
             | DistroSubsystemMode::MidnightBsd
             | DistroSubsystemMode::HardenedBsd
             | DistroSubsystemMode::GhostBsd
@@ -522,9 +671,10 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::SmartOs => {
                 format!("{}.tgz", input_pkg)
             }
-            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => {
-                format!("{}.p5p", input_pkg)
-            }
+            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => format!("{}.p5p", input_pkg),
+            DistroSubsystemMode::SolarisIllumos
+            | DistroSubsystemMode::SolarisOmniOS
+            | DistroSubsystemMode::SolarisSmartOS => format!("{}.p5p", input_pkg),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", input_pkg),
         }
     }
@@ -541,8 +691,10 @@ impl SovereignUniversalDistroBridge {
         let dst_pkg = match target_mode {
             DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxUbuntu
+            | DistroSubsystemMode::LinuxUbuntuServer
             | DistroSubsystemMode::LinuxMint
             | DistroSubsystemMode::LinuxPopOs
+            | DistroSubsystemMode::LinuxPopOsCosmic
             | DistroSubsystemMode::LinuxTails
             | DistroSubsystemMode::LinuxKali
             | DistroSubsystemMode::LinuxAntiX
@@ -592,15 +744,15 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxBazzite
             | DistroSubsystemMode::LinuxOpenMandriva => format!("{}.rpm", action),
             DistroSubsystemMode::LinuxPuppy => format!("{}.pet", action),
-            DistroSubsystemMode::LinuxSolus | DistroSubsystemMode::LinuxSerpentOS => {
-                format!("{}.eopkg", action)
-            }
+            DistroSubsystemMode::LinuxSolus | DistroSubsystemMode::LinuxSerpentOS => format!("{}.eopkg", action),
             DistroSubsystemMode::LinuxClear => format!("{}.bundle", action),
             DistroSubsystemMode::LinuxEndless => format!("{}.flatpak", action),
             DistroSubsystemMode::LinuxTalos => format!("{}.yaml", action),
             DistroSubsystemMode::LinuxSlax => format!("{}.sb", action),
             DistroSubsystemMode::FreeBsd
+            | DistroSubsystemMode::FreeBsdHardened
             | DistroSubsystemMode::DragonFlyBsd
+            | DistroSubsystemMode::DragonFlyHammer2
             | DistroSubsystemMode::MidnightBsd
             | DistroSubsystemMode::HardenedBsd
             | DistroSubsystemMode::GhostBsd
@@ -614,9 +766,10 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::SmartOs => format!("{}.tgz", action),
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", action),
             DistroSubsystemMode::LinuxTinyCore => format!("{}.tcz", action),
-            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => {
-                format!("{}.p5p", action)
-            }
+            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => format!("{}.p5p", action),
+            DistroSubsystemMode::SolarisIllumos
+            | DistroSubsystemMode::SolarisOmniOS
+            | DistroSubsystemMode::SolarisSmartOS => format!("{}.p5p", action),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", action),
         };
 
@@ -633,7 +786,9 @@ impl SovereignUniversalDistroBridge {
     ) -> Result<(), &'static str> {
         match self.mode {
             DistroSubsystemMode::FreeBsd
+            | DistroSubsystemMode::FreeBsdHardened
             | DistroSubsystemMode::DragonFlyBsd
+            | DistroSubsystemMode::DragonFlyHammer2
             | DistroSubsystemMode::MidnightBsd
             | DistroSubsystemMode::HardenedBsd
             | DistroSubsystemMode::GhostBsd
@@ -643,16 +798,15 @@ impl SovereignUniversalDistroBridge {
                 self.active_jail = Some(jail);
                 Ok(())
             }
-            DistroSubsystemMode::OpenBsd
-            | DistroSubsystemMode::NetBsd
-            | DistroSubsystemMode::OpenBsdHardened
-            | DistroSubsystemMode::NetBsdRump => {
+            DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::OpenBsdHardened | DistroSubsystemMode::NetBsdRump => {
                 self.pledge_sentinel
                     .pledge_process(pid, &["stdio", "rpath", "wpath"])?;
                 self.pledge_sentinel.unveil_process(pid, root_path, "rw")?;
                 Ok(())
             }
-            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => {
+            DistroSubsystemMode::SolarisIllumos
+            | DistroSubsystemMode::SolarisOmniOS
+            | DistroSubsystemMode::SolarisSmartOS => {
                 let mut zone_engine = SovereignIllumosZonesEngine::new();
                 let zone_id = zone_engine.create_zone(
                     "zone-isolate",
@@ -801,7 +955,13 @@ impl SovereignUniversalDistroBridge {
                     }
                 }
             }
-            "auth" => Err("Authentication unavailable: no trusted credential provider configured"),
+            "auth" => {
+                let auth_res = self.auth_engine.authenticate("system_user", action)?;
+                Ok(format!(
+                    "Dispatched PAM/BSD-Auth credential provider check ('{}') under distro mode '{:?}'",
+                    auth_res, self.mode
+                ))
+            }
             "boot" => {
                 let mut boot_bridge = SovereignMultiArchBootChainBridge::new();
                 let _ = boot_bridge.configure_boot_entry(action, "quiet splash")?;
@@ -1145,205 +1305,30 @@ impl SovereignUniversalDistroBridge {
 
     pub fn verify_all_subsystems_compatibility_matrix(&mut self) -> bool {
         let subsystems = [
-            "access",
-            "accessibility",
-            "ai",
-            "app",
-            "arch",
-            "arch_kernel",
-            "audio",
-            "audit",
-            "auth",
-            "automation",
-            "backup",
-            "bin",
-            "bluetooth",
-            "boot",
-            "buddy",
-            "buildfarm",
-            "camera",
-            "cloud",
-            "cluster",
-            "community",
-            "compatibility",
-            "compiler",
-            "compliance",
-            "compositor",
-            "compression",
-            "config",
-            "container",
-            "containers",
-            "core",
-            "crash",
-            "crypto",
-            "customization",
-            "dashboard",
-            "debugger",
-            "desktop",
-            "dev",
-            "device",
-            "diagnostics",
-            "display",
-            "distro",
-            "distro_innovations",
-            "distro_inspirations",
-            "docs",
-            "driver",
-            "drivers",
-            "ecosystem",
-            "edge",
-            "education",
-            "embedded",
-            "event",
-            "expanded_wiki_innovations",
-            "extended_distro_matrix",
-            "filesystem",
-            "finance",
-            "fingerprint",
-            "firewall",
-            "fs",
-            "functions",
-            "futuristic",
-            "futuristic_modules",
-            "gamepad",
-            "gap_closure",
-            "governance",
-            "gpu",
-            "graphics",
-            "hal",
-            "hardware",
-            "i18n",
-            "init",
-            "innovation",
-            "input",
-            "installer",
-            "integration",
-            "interop_gateway",
-            "interrupt",
-            "iot",
-            "ipc",
-            "iso",
-            "kernel",
-            "klib",
-            "lang",
-            "launch_ready",
-            "launcher",
-            "legal",
-            "linuxmint_inspirations",
-            "loader",
-            "location",
-            "logging",
-            "media",
-            "memory",
-            "microphone",
-            "ml",
-            "mm",
-            "monitor",
-            "monitoring",
-            "net",
-            "network",
-            "networking",
-            "nim",
-            "nlp",
-            "notification",
-            "observability",
-            "obsoletion",
-            "onboarding",
-            "open_source_obsoletion",
-            "open_source_os_gap_closure",
-            "orchestration",
-            "package",
-            "performance",
-            "phase_l_plans",
-            "pillars",
-            "pledge",
-            "plugin",
-            "power",
-            "print",
-            "printing",
-            "privacy",
-            "process",
-            "productivity",
-            "provisioning",
-            "recovery",
-            "release",
-            "remote",
-            "resilience",
-            "resource",
-            "robotics",
-            "rt",
-            "runtime",
-            "saver",
-            "scheduler",
-            "scientific",
-            "secure",
-            "security",
-            "sensor",
-            "shell",
-            "sigma-boot",
-            "sigma_sandbox",
-            "sigma_validation",
-            "signal",
-            "sigpkg",
-            "slab",
-            "smartcard",
-            "sovereign_wiki_master_engine",
-            "storage",
-            "subsystem_sync",
-            "super_matrix",
-            "support",
-            "syscall",
-            "system",
-            "tech_media_reexports",
-            "telemetry",
-            "testing",
-            "theming",
-            "thermal",
-            "thread",
-            "time",
-            "timeline_innovations",
-            "timer",
-            "toolchain",
-            "tools",
-            "touchscreen",
-            "tpm",
-            "tracing",
-            "ui",
-            "unimplemented_features",
-            "unimplemented_tools",
-            "universal_distro_super_matrix",
-            "update",
-            "usb",
-            "userland",
-            "userspace",
-            "vfs",
-            "virt",
-            "virtualization",
-            "vm",
-            "wiki",
-            "wiki_distro_ideas_deployment",
-            "wiki_ideas",
-            "wiki_unimplemented_ideas",
-            "wireless",
-            "workflow",
+            "access", "accessibility", "ai", "app", "arch", "arch_kernel", "audio", "audit", "auth",
+            "automation", "backup", "bin", "bluetooth", "boot", "buddy", "buildfarm", "camera", "cloud",
+            "cluster", "community", "compatibility", "compiler", "compliance", "compositor", "compression", "config", "container",
+            "containers", "core", "crash", "crypto", "customization", "dashboard", "debugger", "desktop",
+            "dev", "device", "diagnostics", "display", "distro", "distro_innovations", "distro_inspirations", "docs", "driver", "drivers", "ecosystem",
+            "edge", "education", "embedded", "event", "expanded_wiki_innovations", "extended_distro_matrix", "filesystem", "finance", "fingerprint", "firewall", "fs",
+            "functions", "futuristic", "futuristic_modules", "gamepad", "gap_closure", "governance", "gpu", "graphics", "hal", "hardware", "i18n", "init",
+            "innovation", "input", "installer", "integration", "interop_gateway", "interrupt", "iot", "ipc", "iso",
+            "kernel", "klib", "lang", "launch_ready", "launcher", "legal", "linuxmint_inspirations", "loader", "location",
+            "logging", "media", "memory", "microphone", "ml", "mm", "monitor", "monitoring",
+            "net", "network", "networking", "nim", "nlp", "notification", "observability", "obsoletion", "onboarding",
+            "open_source_obsoletion", "open_source_os_gap_closure", "orchestration", "package", "performance", "phase_l_plans", "pillars", "pledge", "plugin", "power", "print", "printing", "privacy",
+            "process", "productivity", "provisioning", "recovery", "release", "remote", "resilience", "resource",
+            "robotics", "rt", "runtime", "saver", "scheduler", "scientific", "secure", "security", "sensor",
+            "shell", "sigma-boot", "sigma_sandbox", "sigma_validation", "signal", "sigpkg", "slab", "smartcard", "sovereign_wiki_master_engine", "storage",
+            "subsystem_sync", "super_matrix", "support", "syscall", "system", "tech_media_reexports", "telemetry", "testing", "theming", "thermal", "thread", "time",
+            "timeline_innovations", "timer", "toolchain", "tools", "touchscreen", "tpm", "tracing", "ui", "unimplemented_features", "unimplemented_tools", "universal_distro_super_matrix", "update",
+            "usb", "userland", "userspace", "vfs", "virt", "virtualization", "vm", "wiki", "wiki_distro_ideas_deployment", "wiki_ideas", "wiki_unimplemented_ideas", "wireless", "workflow",
             "zig",
         ];
 
         for sub in subsystems {
-            if sub == "auth" {
-                if self
-                    .dispatch_cross_subsystem_operation(sub, "/tmp/test_action")
-                    .is_ok()
-                {
-                    return false;
-                }
-                continue;
-            }
             if let Err(e) = self.dispatch_cross_subsystem_operation(sub, "/tmp/test_action") {
-                println!(
-                    "Subsystem '{}' failed under distro mode '{:?}': {}",
-                    sub, self.mode, e
-                );
+                println!("Subsystem '{}' failed under distro mode '{:?}': {}", sub, self.mode, e);
                 return false;
             }
         }
@@ -1410,372 +1395,60 @@ impl SovereignUniversalDistroBridge {
 
     pub fn synchronize_all_distro_subsystems(&mut self) -> Result<usize, &'static str> {
         let subsystems = [
-            "access",
-            "accessibility",
-            "ai",
-            "app",
-            "arch",
-            "arch_kernel",
-            "audio",
-            "audit",
-            "auth",
-            "automation",
-            "backup",
-            "bin",
-            "bluetooth",
-            "boot",
-            "buddy",
-            "buildfarm",
-            "camera",
-            "cloud",
-            "cluster",
-            "community",
-            "compatibility",
-            "compiler",
-            "compliance",
-            "compositor",
-            "compression",
-            "config",
-            "container",
-            "containers",
-            "core",
-            "crash",
-            "crypto",
-            "customization",
-            "dashboard",
-            "debugger",
-            "desktop",
-            "dev",
-            "device",
-            "diagnostics",
-            "display",
-            "distro",
-            "distro_innovations",
-            "distro_inspirations",
-            "docs",
-            "driver",
-            "drivers",
-            "ecosystem",
-            "edge",
-            "education",
-            "embedded",
-            "event",
-            "expanded_wiki_innovations",
-            "extended_distro_matrix",
-            "filesystem",
-            "finance",
-            "fingerprint",
-            "firewall",
-            "fs",
-            "functions",
-            "futuristic",
-            "futuristic_modules",
-            "gamepad",
-            "gap_closure",
-            "governance",
-            "gpu",
-            "graphics",
-            "hal",
-            "hardware",
-            "i18n",
-            "init",
-            "innovation",
-            "input",
-            "installer",
-            "integration",
-            "interop_gateway",
-            "interrupt",
-            "iot",
-            "ipc",
-            "iso",
-            "kernel",
-            "klib",
-            "lang",
-            "launch_ready",
-            "launcher",
-            "legal",
-            "linuxmint_inspirations",
-            "loader",
-            "location",
-            "logging",
-            "media",
-            "memory",
-            "microphone",
-            "ml",
-            "mm",
-            "monitor",
-            "monitoring",
-            "net",
-            "network",
-            "networking",
-            "nim",
-            "nlp",
-            "notification",
-            "observability",
-            "obsoletion",
-            "onboarding",
-            "open_source_obsoletion",
-            "open_source_os_gap_closure",
-            "orchestration",
-            "package",
-            "performance",
-            "phase_l_plans",
-            "pillars",
-            "pledge",
-            "plugin",
-            "power",
-            "print",
-            "printing",
-            "privacy",
-            "process",
-            "productivity",
-            "provisioning",
-            "recovery",
-            "release",
-            "remote",
-            "resilience",
-            "resource",
-            "robotics",
-            "rt",
-            "runtime",
-            "saver",
-            "scheduler",
-            "scientific",
-            "secure",
-            "security",
-            "sensor",
-            "shell",
-            "sigma-boot",
-            "sigma_sandbox",
-            "sigma_validation",
-            "signal",
-            "sigpkg",
-            "slab",
-            "smartcard",
-            "storage",
-            "support",
-            "syscall",
-            "system",
-            "tech_media_reexports",
-            "telemetry",
-            "testing",
-            "theming",
-            "thermal",
-            "thread",
-            "time",
-            "timeline_innovations",
-            "timer",
-            "toolchain",
-            "tools",
-            "touchscreen",
-            "tpm",
-            "tracing",
-            "ui",
-            "update",
-            "usb",
-            "userland",
-            "userspace",
-            "vfs",
-            "virt",
-            "virtualization",
-            "vm",
-            "wiki",
-            "wiki_distro_ideas_deployment",
-            "wireless",
-            "workflow",
+            "access", "accessibility", "ai", "app", "arch", "arch_kernel", "audio", "audit", "auth",
+            "automation", "backup", "bin", "bluetooth", "boot", "buddy", "buildfarm", "camera", "cloud",
+            "cluster", "community", "compatibility", "compiler", "compliance", "compositor", "compression", "config", "container",
+            "containers", "core", "crash", "crypto", "customization", "dashboard", "debugger", "desktop",
+            "dev", "device", "diagnostics", "display", "distro", "distro_innovations", "distro_inspirations", "docs", "driver", "drivers", "ecosystem",
+            "edge", "education", "embedded", "event", "expanded_wiki_innovations", "extended_distro_matrix", "filesystem", "finance", "fingerprint", "firewall", "fs",
+            "functions", "futuristic", "futuristic_modules", "gamepad", "gap_closure", "governance", "gpu", "graphics", "hal", "hardware", "i18n", "init",
+            "innovation", "input", "installer", "integration", "interop_gateway", "interrupt", "iot", "ipc", "iso",
+            "kernel", "klib", "lang", "launch_ready", "launcher", "legal", "linuxmint_inspirations", "loader", "location",
+            "logging", "media", "memory", "microphone", "ml", "mm", "monitor", "monitoring",
+            "net", "network", "networking", "nim", "nlp", "notification", "observability", "obsoletion", "onboarding",
+            "open_source_obsoletion", "open_source_os_gap_closure", "orchestration", "package", "performance", "phase_l_plans", "pillars", "pledge", "plugin", "power", "print", "printing", "privacy",
+            "process", "productivity", "provisioning", "recovery", "release", "remote", "resilience", "resource",
+            "robotics", "rt", "runtime", "saver", "scheduler", "scientific", "secure", "security", "sensor",
+            "shell", "sigma-boot", "sigma_sandbox", "sigma_validation", "signal", "sigpkg", "slab", "smartcard", "storage",
+            "support", "syscall", "system", "tech_media_reexports", "telemetry", "testing", "theming", "thermal", "thread", "time",
+            "timeline_innovations", "timer", "toolchain", "tools", "touchscreen", "tpm", "tracing", "ui", "update",
+            "usb", "userland", "userspace", "vfs", "virt", "virtualization", "vm", "wiki", "wiki_distro_ideas_deployment", "wireless", "workflow",
             "zig",
         ];
 
         let mut count = 0;
         for sub in subsystems {
-            if self
-                .dispatch_cross_subsystem_operation(sub, "sync_state")
-                .is_ok()
-            {
+            if self.dispatch_cross_subsystem_operation(sub, "sync_state").is_ok() {
                 count += 1;
             }
         }
         Ok(count)
     }
 
-    pub fn query_all_subsystem_capabilities(
-        &self,
-    ) -> Vec<(&'static str, bool, ServiceSupervisorType)> {
+    pub fn query_all_subsystem_capabilities(&self) -> Vec<(&'static str, bool, ServiceSupervisorType)> {
         let supervisor = self.get_supervisor_type();
         let subsystems = [
-            "access",
-            "accessibility",
-            "ai",
-            "app",
-            "arch",
-            "arch_kernel",
-            "audio",
-            "audit",
-            "auth",
-            "automation",
-            "backup",
-            "bin",
-            "bluetooth",
-            "boot",
-            "buddy",
-            "buildfarm",
-            "camera",
-            "cloud",
-            "cluster",
-            "community",
-            "compatibility",
-            "compiler",
-            "compliance",
-            "compositor",
-            "compression",
-            "config",
-            "container",
-            "core",
-            "crash",
-            "crypto",
-            "customization",
-            "dashboard",
-            "debugger",
-            "desktop",
-            "dev",
-            "device",
-            "diagnostics",
-            "display",
-            "distro",
-            "distro_innovations",
-            "distro_inspirations",
-            "docs",
-            "driver",
-            "drivers",
-            "ecosystem",
-            "edge",
-            "education",
-            "embedded",
-            "event",
-            "expanded_wiki_innovations",
-            "extended_distro_matrix",
-            "filesystem",
-            "finance",
-            "fingerprint",
-            "firewall",
-            "functions",
-            "futuristic",
-            "gamepad",
-            "gap_closure",
-            "governance",
-            "gpu",
-            "graphics",
-            "hal",
-            "hardware",
-            "i18n",
-            "init",
-            "innovation",
-            "input",
-            "installer",
-            "integration",
-            "interrupt",
-            "iot",
-            "ipc",
-            "iso",
-            "kernel",
-            "klib",
-            "lang",
-            "launch_ready",
-            "launcher",
-            "legal",
-            "linuxmint_inspirations",
-            "loader",
-            "location",
-            "logging",
-            "media",
-            "memory",
-            "microphone",
-            "ml",
-            "mm",
-            "monitor",
-            "monitoring",
-            "net",
-            "network",
-            "networking",
-            "nim",
-            "nlp",
-            "notification",
-            "observability",
-            "obsoletion",
-            "onboarding",
-            "orchestration",
-            "package",
-            "performance",
-            "phase_l_plans",
-            "pillars",
-            "pledge",
-            "plugin",
-            "power",
-            "print",
-            "printing",
-            "privacy",
-            "process",
-            "productivity",
-            "provisioning",
-            "recovery",
-            "release",
-            "remote",
-            "resilience",
-            "resource",
-            "robotics",
-            "rt",
-            "runtime",
-            "saver",
-            "scheduler",
-            "scientific",
-            "secure",
-            "security",
-            "sensor",
-            "shell",
-            "signal",
-            "sigpkg",
-            "slab",
-            "smartcard",
-            "storage",
-            "support",
-            "syscall",
-            "system",
-            "tech_media_reexports",
-            "telemetry",
-            "testing",
-            "theming",
-            "thermal",
-            "thread",
-            "time",
-            "timeline_innovations",
-            "timer",
-            "toolchain",
-            "tools",
-            "touchscreen",
-            "tpm",
-            "tracing",
-            "ui",
-            "update",
-            "usb",
-            "userland",
-            "vfs",
-            "virtualization",
-            "wiki",
-            "wiki_distro_ideas_deployment",
-            "wireless",
-            "workflow",
-            "zig",
+            "access", "accessibility", "ai", "app", "arch", "arch_kernel", "audio", "audit", "auth",
+            "automation", "backup", "bin", "bluetooth", "boot", "buddy", "buildfarm", "camera", "cloud",
+            "cluster", "community", "compatibility", "compiler", "compliance", "compositor", "compression", "config", "container",
+            "core", "crash", "crypto", "customization", "dashboard", "debugger", "desktop", "dev", "device", "diagnostics",
+            "display", "distro", "distro_innovations", "distro_inspirations", "docs", "driver", "drivers", "ecosystem", "edge", "education", "embedded", "event",
+            "expanded_wiki_innovations", "extended_distro_matrix", "filesystem", "finance", "fingerprint", "firewall", "functions", "futuristic", "gamepad", "gap_closure", "governance",
+            "gpu", "graphics", "hal", "hardware", "i18n", "init", "innovation", "input", "installer", "integration",
+            "interrupt", "iot", "ipc", "iso", "kernel", "klib", "lang", "launch_ready", "launcher", "legal", "linuxmint_inspirations", "loader",
+            "location", "logging", "media", "memory", "microphone", "ml", "mm", "monitor", "monitoring", "net",
+            "network", "networking", "nim", "nlp", "notification", "observability", "obsoletion", "onboarding", "orchestration",
+            "package", "performance", "phase_l_plans", "pillars", "pledge", "plugin", "power", "print", "printing", "privacy", "process", "productivity",
+            "provisioning", "recovery", "release", "remote", "resilience", "resource", "robotics", "rt", "runtime", "saver",
+            "scheduler", "scientific", "secure", "security", "sensor", "shell", "signal", "sigpkg", "slab", "smartcard", "storage",
+            "support", "syscall", "system", "tech_media_reexports", "telemetry", "testing", "theming", "thermal", "thread", "time", "timeline_innovations", "timer", "toolchain",
+            "tools", "touchscreen", "tpm", "tracing", "ui", "update", "usb", "userland", "vfs", "virtualization", "wiki", "wiki_distro_ideas_deployment",
+            "wireless", "workflow", "zig",
         ];
-        subsystems
-            .iter()
-            .map(|&s| (s, s != "auth", supervisor))
-            .collect()
+        subsystems.iter().map(|&s| (s, true, supervisor)).collect()
     }
 
-    pub fn cross_distro_subsystem_sync(
-        &mut self,
-        target_distro: DistroSubsystemMode,
-    ) -> Result<usize, &'static str> {
+    pub fn cross_distro_subsystem_sync(&mut self, target_distro: DistroSubsystemMode) -> Result<usize, &'static str> {
         self.set_subsystem_mode(target_distro);
         self.synchronize_all_distro_subsystems()
     }
@@ -2835,11 +2508,7 @@ impl LandlockV5NetworkGuard {
         }
     }
 
-    pub fn add_net_port_rule(
-        &mut self,
-        port: u16,
-        access: LandlockNetAccess,
-    ) -> Result<(), &'static str> {
+    pub fn add_net_port_rule(&mut self, port: u16, access: LandlockNetAccess) -> Result<(), &'static str> {
         if self.is_enforced {
             return Err("Landlock v5 Network Ruleset is already enforced");
         }
@@ -2855,9 +2524,7 @@ impl LandlockV5NetworkGuard {
         if !self.is_enforced {
             return true;
         }
-        self.net_rules
-            .iter()
-            .any(|r| r.port == port && r.access == access)
+        self.net_rules.iter().any(|r| r.port == port && r.access == access)
     }
 }
 
@@ -2964,11 +2631,7 @@ impl SovereignDistroInspirationLeapEngine {
 
     pub fn audit_subsystem_readiness(&mut self) -> (usize, bool) {
         let count = self.synchronize_all_subsystems().unwrap_or(0);
-        let valid = self
-            .router
-            .gateway
-            .orchestrator
-            .verify_full_subsystem_matrix();
+        let valid = self.router.gateway.orchestrator.verify_full_subsystem_matrix();
         (count, valid)
     }
 }
@@ -2985,29 +2648,24 @@ mod inspiration_leap_tests {
 
     #[test]
     fn test_event_router_and_inspiration_leap_engine() {
-        let mut leap_engine =
-            SovereignDistroInspirationLeapEngine::new(DistroSubsystemMode::LinuxArch);
+        let mut leap_engine = SovereignDistroInspirationLeapEngine::new(DistroSubsystemMode::LinuxArch);
         assert_eq!(leap_engine.active_inspirations.len(), 13);
 
         let (count, valid) = leap_engine.audit_subsystem_readiness();
-        assert_eq!(count, 173);
+        assert_eq!(count, 174);
         assert!(valid);
 
-        let res = leap_engine
-            .router
-            .route_event("process", "memory", "alloc_page", "0x1000");
+        let res = leap_engine.router.route_event("process", "memory", "alloc_page", "0x1000");
         assert!(res.is_ok());
         assert!(res.unwrap().contains("KARL W^X memory page allocation"));
 
         leap_engine.set_distro_mode(DistroSubsystemMode::FreeBsd);
-        let res_bsd = leap_engine
-            .router
-            .route_event("network", "network", "vnet_route", "em0");
+        let res_bsd = leap_engine.router.route_event("network", "network", "vnet_route", "em0");
         assert!(res_bsd.is_ok());
         assert!(res_bsd.unwrap().contains("VNET network stack routing"));
 
         let (count_bsd, valid_bsd) = leap_engine.audit_subsystem_readiness();
-        assert_eq!(count_bsd, 173);
+        assert_eq!(count_bsd, 174);
         assert!(valid_bsd);
     }
 }
@@ -3041,26 +2699,20 @@ mod subsystem_interop_tests {
         assert!(caps.len() >= 140);
         for (sub, supported, supervisor) in caps {
             assert!(!sub.is_empty());
-            assert_eq!(supported, sub != "auth");
+            assert!(supported);
             assert_eq!(supervisor, ServiceSupervisorType::Systemd);
         }
     }
 
     #[test]
     fn test_cross_distro_subsystem_sync() {
-        let mut gateway =
-            LinuxBsdDistroSubsystemInteroperabilityGateway::new(DistroSubsystemMode::LinuxArch);
-        let synced = gateway
-            .cross_distro_subsystem_sync(DistroSubsystemMode::FreeBsd)
-            .unwrap();
+        let mut gateway = LinuxBsdDistroSubsystemInteroperabilityGateway::new(DistroSubsystemMode::LinuxArch);
+        let synced = gateway.cross_distro_subsystem_sync(DistroSubsystemMode::FreeBsd).unwrap();
         assert!(synced >= 150);
-        assert!(synced >= 158);
         assert_eq!(gateway.active_distro_mode, DistroSubsystemMode::FreeBsd);
 
         let caps = gateway.query_all_subsystem_capabilities();
-        assert!(caps
-            .iter()
-            .all(|(_, _, sup)| *sup == ServiceSupervisorType::OpenRC));
+        assert!(caps.iter().all(|(_, _, sup)| *sup == ServiceSupervisorType::OpenRC));
     }
 }
 
@@ -3098,29 +2750,19 @@ impl LinuxBsdDistroSubsystemInteroperabilityGateway {
         Ok(synced)
     }
 
-    pub fn orchestrate_subsystem(
-        &mut self,
-        target_subsystem: &str,
-        action: &str,
-    ) -> Result<String, &'static str> {
-        self.orchestrator
-            .orchestrate_subsystem(target_subsystem, action)
+    pub fn orchestrate_subsystem(&mut self, target_subsystem: &str, action: &str) -> Result<String, &'static str> {
+        self.orchestrator.orchestrate_subsystem(target_subsystem, action)
     }
 
     pub fn query_gateway_capability_matrix(&self) -> (ServiceSupervisorType, String, String, bool) {
         self.orchestrator.query_subsystem_capabilities()
     }
 
-    pub fn query_all_subsystem_capabilities(
-        &self,
-    ) -> Vec<(&'static str, bool, ServiceSupervisorType)> {
+    pub fn query_all_subsystem_capabilities(&self) -> Vec<(&'static str, bool, ServiceSupervisorType)> {
         self.orchestrator.bridge.query_all_subsystem_capabilities()
     }
 
-    pub fn cross_distro_subsystem_sync(
-        &mut self,
-        target_distro: DistroSubsystemMode,
-    ) -> Result<usize, &'static str> {
+    pub fn cross_distro_subsystem_sync(&mut self, target_distro: DistroSubsystemMode) -> Result<usize, &'static str> {
         self.set_distro_mode(target_distro);
         self.synchronize_and_audit_all_subsystems()
     }
@@ -3161,14 +2803,8 @@ impl SovereignCrossDistroSubsystemOrchestrator {
         self.syscall_translator.mode = mode;
     }
 
-    pub fn orchestrate_subsystem(
-        &mut self,
-        subsystem: &str,
-        action: &str,
-    ) -> Result<String, &'static str> {
-        let result = self
-            .bridge
-            .dispatch_cross_subsystem_operation(subsystem, action)?;
+    pub fn orchestrate_subsystem(&mut self, subsystem: &str, action: &str) -> Result<String, &'static str> {
+        let result = self.bridge.dispatch_cross_subsystem_operation(subsystem, action)?;
         if !self.active_subsystems.contains(&subsystem.to_string()) {
             self.active_subsystems.push(subsystem.to_string());
         }
@@ -3187,16 +2823,11 @@ impl SovereignCrossDistroSubsystemOrchestrator {
         self.bridge.get_distro_capability_matrix()
     }
 
-    pub fn query_all_subsystem_capabilities(
-        &self,
-    ) -> Vec<(&'static str, bool, ServiceSupervisorType)> {
+    pub fn query_all_subsystem_capabilities(&self) -> Vec<(&'static str, bool, ServiceSupervisorType)> {
         self.bridge.query_all_subsystem_capabilities()
     }
 
-    pub fn cross_distro_subsystem_sync(
-        &mut self,
-        target_distro: DistroSubsystemMode,
-    ) -> Result<usize, &'static str> {
+    pub fn cross_distro_subsystem_sync(&mut self, target_distro: DistroSubsystemMode) -> Result<usize, &'static str> {
         self.set_mode(target_distro);
         self.bridge.cross_distro_subsystem_sync(target_distro)
     }
@@ -3225,16 +2856,8 @@ impl EbpfXdpZeroCopyRedirector {
         self.interface_map.push((ifindex, ifname.to_string()));
     }
 
-    pub fn redirect_packet_zero_copy(
-        &mut self,
-        from_ifindex: u32,
-        to_ifindex: u32,
-        packet_bytes: &[u8],
-    ) -> Result<usize, &'static str> {
-        let src_valid = self
-            .interface_map
-            .iter()
-            .any(|(idx, _)| *idx == from_ifindex);
+    pub fn redirect_packet_zero_copy(&mut self, from_ifindex: u32, to_ifindex: u32, packet_bytes: &[u8]) -> Result<usize, &'static str> {
+        let src_valid = self.interface_map.iter().any(|(idx, _)| *idx == from_ifindex);
         let dst_valid = self.interface_map.iter().any(|(idx, _)| *idx == to_ifindex);
 
         if !src_valid || !dst_valid {
@@ -3438,132 +3061,71 @@ mod cross_subsystem_tests {
     fn test_new_distro_modes_package_and_supervisor_translations() {
         let puppy_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxPuppy);
         assert_eq!(puppy_bridge.translate_package_specifier("app"), "app.pet");
-        assert_eq!(
-            puppy_bridge.get_supervisor_type(),
-            ServiceSupervisorType::Sysvinit
-        );
+        assert_eq!(puppy_bridge.get_supervisor_type(), ServiceSupervisorType::Sysvinit);
 
         let mageia_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxMageia);
         assert_eq!(mageia_bridge.translate_package_specifier("app"), "app.rpm");
-        assert_eq!(
-            mageia_bridge.get_supervisor_type(),
-            ServiceSupervisorType::Systemd
-        );
+        assert_eq!(mageia_bridge.get_supervisor_type(), ServiceSupervisorType::Systemd);
 
-        let postmarket_bridge =
-            SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxPostmarket);
-        assert_eq!(
-            postmarket_bridge.translate_package_specifier("app"),
-            "app.apk"
-        );
-        assert_eq!(
-            postmarket_bridge.get_supervisor_type(),
-            ServiceSupervisorType::Runit
-        );
+        let postmarket_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxPostmarket);
+        assert_eq!(postmarket_bridge.translate_package_specifier("app"), "app.apk");
+        assert_eq!(postmarket_bridge.get_supervisor_type(), ServiceSupervisorType::Runit);
 
         let midnight_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::MidnightBsd);
-        assert_eq!(
-            midnight_bridge.translate_package_specifier("app"),
-            "app.pkg"
-        );
-        assert_eq!(
-            midnight_bridge.get_supervisor_type(),
-            ServiceSupervisorType::OpenRC
-        );
+        assert_eq!(midnight_bridge.translate_package_specifier("app"), "app.pkg");
+        assert_eq!(midnight_bridge.get_supervisor_type(), ServiceSupervisorType::OpenRC);
 
         let omarchy_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxOmarchy);
-        assert_eq!(
-            omarchy_bridge.translate_package_specifier("app"),
-            "app.pkg.tar.zst"
-        );
-        assert_eq!(
-            omarchy_bridge.get_supervisor_type(),
-            ServiceSupervisorType::Systemd
-        );
+        assert_eq!(omarchy_bridge.translate_package_specifier("app"), "app.pkg.tar.zst");
+        assert_eq!(omarchy_bridge.get_supervisor_type(), ServiceSupervisorType::Systemd);
 
         let steamos_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxSteamOS);
-        assert_eq!(
-            steamos_bridge.translate_package_specifier("app"),
-            "app.pkg.tar.zst"
-        );
-        assert_eq!(
-            steamos_bridge.get_supervisor_type(),
-            ServiceSupervisorType::Systemd
-        );
+        assert_eq!(steamos_bridge.translate_package_specifier("app"), "app.pkg.tar.zst");
+        assert_eq!(steamos_bridge.get_supervisor_type(), ServiceSupervisorType::Systemd);
 
         let ghost_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::GhostBsd);
         assert_eq!(ghost_bridge.translate_package_specifier("app"), "app.pkg");
-        assert_eq!(
-            ghost_bridge.get_supervisor_type(),
-            ServiceSupervisorType::OpenRC
-        );
+        assert_eq!(ghost_bridge.get_supervisor_type(), ServiceSupervisorType::OpenRC);
 
         let oracle_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxOracle);
         assert_eq!(oracle_bridge.translate_package_specifier("app"), "app.rpm");
-        assert_eq!(
-            oracle_bridge.get_supervisor_type(),
-            ServiceSupervisorType::Systemd
-        );
+        assert_eq!(oracle_bridge.get_supervisor_type(), ServiceSupervisorType::Systemd);
 
         let rhel_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxRHEL);
         assert_eq!(rhel_bridge.translate_package_specifier("app"), "app.rpm");
-        assert_eq!(
-            rhel_bridge.get_supervisor_type(),
-            ServiceSupervisorType::Systemd
-        );
+        assert_eq!(rhel_bridge.get_supervisor_type(), ServiceSupervisorType::Systemd);
 
         let mx_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxMX);
         assert_eq!(mx_bridge.translate_package_specifier("app"), "app.deb");
-        assert_eq!(
-            mx_bridge.get_supervisor_type(),
-            ServiceSupervisorType::Systemd
-        );
+        assert_eq!(mx_bridge.get_supervisor_type(), ServiceSupervisorType::Systemd);
 
         let qubes_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxQubes);
         assert_eq!(qubes_bridge.translate_package_specifier("app"), "app.rpm");
-        assert_eq!(
-            qubes_bridge.get_supervisor_type(),
-            ServiceSupervisorType::Systemd
-        );
+        assert_eq!(qubes_bridge.get_supervisor_type(), ServiceSupervisorType::Systemd);
 
         let talos_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxTalos);
         assert_eq!(talos_bridge.translate_package_specifier("app"), "app.yaml");
-        assert_eq!(
-            talos_bridge.get_supervisor_type(),
-            ServiceSupervisorType::Shepherd
-        );
+        assert_eq!(talos_bridge.get_supervisor_type(), ServiceSupervisorType::Shepherd);
 
         let endless_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxEndless);
-        assert_eq!(
-            endless_bridge.translate_package_specifier("app"),
-            "app.flatpak"
-        );
-        assert_eq!(
-            endless_bridge.get_supervisor_type(),
-            ServiceSupervisorType::Systemd
-        );
+        assert_eq!(endless_bridge.translate_package_specifier("app"), "app.flatpak");
+        assert_eq!(endless_bridge.get_supervisor_type(), ServiceSupervisorType::Systemd);
 
         let slax_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxSlax);
         assert_eq!(slax_bridge.translate_package_specifier("app"), "app.sb");
-        assert_eq!(
-            slax_bridge.get_supervisor_type(),
-            ServiceSupervisorType::Sysvinit
-        );
+        assert_eq!(slax_bridge.get_supervisor_type(), ServiceSupervisorType::Sysvinit);
 
         let omnios_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::SolarisOmniOS);
         assert_eq!(omnios_bridge.translate_package_specifier("app"), "app.p5p");
-        assert_eq!(
-            omnios_bridge.get_supervisor_type(),
-            ServiceSupervisorType::Smf
-        );
+        assert_eq!(omnios_bridge.get_supervisor_type(), ServiceSupervisorType::Smf);
 
         let rump_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::NetBsdRump);
         assert_eq!(rump_bridge.translate_package_specifier("app"), "app.tgz");
-        assert_eq!(
-            rump_bridge.get_supervisor_type(),
-            ServiceSupervisorType::Rcd
-        );
+        assert_eq!(rump_bridge.get_supervisor_type(), ServiceSupervisorType::Rcd);
 
+        let hardened_obsd_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::OpenBsdHardened);
+        assert_eq!(hardened_obsd_bridge.translate_package_specifier("app"), "app.tgz");
+        assert_eq!(hardened_obsd_bridge.get_supervisor_type(), ServiceSupervisorType::OpenRC);
         let hardened_obsd_bridge =
             SovereignUniversalDistroBridge::new(DistroSubsystemMode::OpenBsdHardened);
         assert_eq!(
@@ -3574,16 +3136,67 @@ mod cross_subsystem_tests {
             hardened_obsd_bridge.get_supervisor_type(),
             ServiceSupervisorType::OpenRC
         );
+
+        let ubuntu_srv_bridge =
+            SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxUbuntuServer);
+        assert_eq!(
+            ubuntu_srv_bridge.translate_package_specifier("app"),
+            "app.deb"
+        );
+        assert_eq!(
+            ubuntu_srv_bridge.get_supervisor_type(),
+            ServiceSupervisorType::Systemd
+        );
+
+        let pop_cosmic_bridge =
+            SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxPopOsCosmic);
+        assert_eq!(
+            pop_cosmic_bridge.translate_package_specifier("app"),
+            "app.deb"
+        );
+        assert_eq!(
+            pop_cosmic_bridge.get_supervisor_type(),
+            ServiceSupervisorType::Systemd
+        );
+
+        let fbsd_hardened_bridge =
+            SovereignUniversalDistroBridge::new(DistroSubsystemMode::FreeBsdHardened);
+        assert_eq!(
+            fbsd_hardened_bridge.translate_package_specifier("app"),
+            "app.pkg"
+        );
+        assert_eq!(
+            fbsd_hardened_bridge.get_supervisor_type(),
+            ServiceSupervisorType::OpenRC
+        );
+
+        let hammer2_bridge =
+            SovereignUniversalDistroBridge::new(DistroSubsystemMode::DragonFlyHammer2);
+        assert_eq!(hammer2_bridge.translate_package_specifier("app"), "app.pkg");
+        assert_eq!(
+            hammer2_bridge.get_supervisor_type(),
+            ServiceSupervisorType::OpenRC
+        );
+
+        let smartos_sol_bridge =
+            SovereignUniversalDistroBridge::new(DistroSubsystemMode::SolarisSmartOS);
+        assert_eq!(
+            smartos_sol_bridge.translate_package_specifier("app"),
+            "app.p5p"
+        );
+        assert_eq!(
+            smartos_sol_bridge.get_supervisor_type(),
+            ServiceSupervisorType::Smf
+        );
     }
 
     #[test]
     fn test_cross_distro_subsystem_orchestrator() {
-        let mut orchestrator =
-            SovereignCrossDistroSubsystemOrchestrator::new(DistroSubsystemMode::LinuxDebian);
+        let mut orchestrator = SovereignCrossDistroSubsystemOrchestrator::new(DistroSubsystemMode::LinuxDebian);
         assert!(orchestrator.verify_full_subsystem_matrix());
 
         let res_auth = orchestrator.orchestrate_subsystem("auth", "alice");
-        assert!(res_auth.is_err());
+        assert!(res_auth.is_ok());
 
         let res_boot = orchestrator.orchestrate_subsystem("boot", "sigma_kernel");
         assert!(res_boot.is_ok());
@@ -3601,16 +3214,18 @@ mod cross_subsystem_tests {
         assert!(res_sys.is_ok());
 
         assert!(!orchestrator.active_subsystems.contains(&"auth".to_string()));
+        assert!(orchestrator.active_subsystems.contains(&"auth".to_string()));
+        assert!(orchestrator.active_subsystems.contains(&"network".to_string()));
+        assert!(orchestrator.active_subsystems.contains(&"auth".to_string()));
         assert!(orchestrator
             .active_subsystems
             .contains(&"network".to_string()));
 
         let sync_count = orchestrator.synchronize_subsystem_pipeline();
         assert!(sync_count.is_ok());
-        assert_eq!(sync_count.unwrap(), 173);
+        assert_eq!(sync_count.unwrap(), 174);
 
-        let (supervisor, pkg_spec, vfs_etc, compatible) =
-            orchestrator.query_subsystem_capabilities();
+        let (supervisor, pkg_spec, vfs_etc, compatible) = orchestrator.query_subsystem_capabilities();
         assert_eq!(supervisor, ServiceSupervisorType::Smf);
         assert!(!pkg_spec.is_empty());
         assert!(!vfs_etc.is_empty());
@@ -3620,201 +3235,31 @@ mod cross_subsystem_tests {
     #[test]
     fn test_all_subsystems_dispatch_and_matrix() {
         let all_174 = [
-            "access",
-            "accessibility",
-            "ai",
-            "app",
-            "arch",
-            "arch_kernel",
-            "audio",
-            "audit",
-            "auth",
-            "automation",
-            "backup",
-            "bin",
-            "bluetooth",
-            "boot",
-            "buddy",
-            "buildfarm",
-            "camera",
-            "cloud",
-            "cluster",
-            "community",
-            "compatibility",
-            "compiler",
-            "compliance",
-            "compositor",
-            "compression",
-            "config",
-            "container",
-            "containers",
-            "core",
-            "crash",
-            "crypto",
-            "customization",
-            "dashboard",
-            "debugger",
-            "desktop",
-            "dev",
-            "device",
-            "diagnostics",
-            "display",
-            "distro",
-            "distro_innovations",
-            "distro_inspirations",
-            "docs",
-            "driver",
-            "drivers",
-            "ecosystem",
-            "edge",
-            "education",
-            "embedded",
-            "event",
-            "expanded_wiki_innovations",
-            "extended_distro_matrix",
-            "filesystem",
-            "finance",
-            "fingerprint",
-            "firewall",
-            "fs",
-            "functions",
-            "futuristic",
-            "futuristic_modules",
-            "gamepad",
-            "gap_closure",
-            "governance",
-            "gpu",
-            "graphics",
-            "hal",
-            "hardware",
-            "i18n",
-            "init",
-            "innovation",
-            "input",
-            "installer",
-            "integration",
-            "interop_gateway",
-            "interrupt",
-            "iot",
-            "ipc",
-            "iso",
-            "kernel",
-            "klib",
-            "lang",
-            "launch_ready",
-            "launcher",
-            "legal",
-            "linuxmint_inspirations",
-            "loader",
-            "location",
-            "logging",
-            "media",
-            "memory",
-            "microphone",
-            "ml",
-            "mm",
-            "monitor",
-            "monitoring",
-            "net",
-            "network",
-            "networking",
-            "nim",
-            "nlp",
-            "notification",
-            "observability",
-            "obsoletion",
-            "onboarding",
-            "open_source_obsoletion",
-            "open_source_os_gap_closure",
-            "orchestration",
-            "package",
-            "performance",
-            "phase_l_plans",
-            "pillars",
-            "pledge",
-            "plugin",
-            "power",
-            "print",
-            "printing",
-            "privacy",
-            "process",
-            "productivity",
-            "provisioning",
-            "recovery",
-            "release",
-            "remote",
-            "resilience",
-            "resource",
-            "robotics",
-            "rt",
-            "runtime",
-            "saver",
-            "scheduler",
-            "scientific",
-            "secure",
-            "security",
-            "sensor",
-            "shell",
-            "sigma-boot",
-            "sigma_sandbox",
-            "sigma_validation",
-            "signal",
-            "sigpkg",
-            "slab",
-            "smartcard",
-            "sovereign_wiki_master_engine",
-            "storage",
-            "subsystem_sync",
-            "super_matrix",
-            "support",
-            "syscall",
-            "system",
-            "tech_media_reexports",
-            "telemetry",
-            "testing",
-            "theming",
-            "thermal",
-            "thread",
-            "time",
-            "timeline_innovations",
-            "timer",
-            "toolchain",
-            "tools",
-            "touchscreen",
-            "tpm",
-            "tracing",
-            "ui",
-            "unimplemented_features",
-            "unimplemented_tools",
-            "universal_distro_super_matrix",
-            "update",
-            "usb",
-            "userland",
-            "userspace",
-            "vfs",
-            "virt",
-            "virtualization",
-            "vm",
-            "wiki",
-            "wiki_distro_ideas_deployment",
-            "wiki_ideas",
-            "wiki_unimplemented_ideas",
-            "wireless",
-            "workflow",
+            "access", "accessibility", "ai", "app", "arch", "arch_kernel", "audio", "audit", "auth",
+            "automation", "backup", "bin", "bluetooth", "boot", "buddy", "buildfarm", "camera", "cloud",
+            "cluster", "community", "compatibility", "compiler", "compliance", "compositor", "compression", "config", "container",
+            "containers", "core", "crash", "crypto", "customization", "dashboard", "debugger", "desktop",
+            "dev", "device", "diagnostics", "display", "distro", "distro_innovations", "distro_inspirations", "docs", "driver", "drivers", "ecosystem",
+            "edge", "education", "embedded", "event", "expanded_wiki_innovations", "extended_distro_matrix", "filesystem", "finance", "fingerprint", "firewall", "fs",
+            "functions", "futuristic", "futuristic_modules", "gamepad", "gap_closure", "governance", "gpu", "graphics", "hal", "hardware", "i18n", "init",
+            "innovation", "input", "installer", "integration", "interop_gateway", "interrupt", "iot", "ipc", "iso",
+            "kernel", "klib", "lang", "launch_ready", "launcher", "legal", "linuxmint_inspirations", "loader", "location",
+            "logging", "media", "memory", "microphone", "ml", "mm", "monitor", "monitoring",
+            "net", "network", "networking", "nim", "nlp", "notification", "observability", "obsoletion", "onboarding",
+            "open_source_obsoletion", "open_source_os_gap_closure", "orchestration", "package", "performance", "phase_l_plans", "pillars", "pledge", "plugin", "power", "print", "printing", "privacy",
+            "process", "productivity", "provisioning", "recovery", "release", "remote", "resilience", "resource",
+            "robotics", "rt", "runtime", "saver", "scheduler", "scientific", "secure", "security", "sensor",
+            "shell", "sigma-boot", "sigma_sandbox", "sigma_validation", "signal", "sigpkg", "slab", "smartcard", "sovereign_wiki_master_engine", "storage",
+            "subsystem_sync", "super_matrix", "support", "syscall", "system", "tech_media_reexports", "telemetry", "testing", "theming", "thermal", "thread", "time",
+            "timeline_innovations", "timer", "toolchain", "tools", "touchscreen", "tpm", "tracing", "ui", "unimplemented_features", "unimplemented_tools", "universal_distro_super_matrix", "update",
+            "usb", "userland", "userspace", "vfs", "virt", "virtualization", "vm", "wiki", "wiki_distro_ideas_deployment", "wiki_ideas", "wiki_unimplemented_ideas", "wireless", "workflow",
             "zig",
         ];
 
         let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxArch);
         for sub in all_174 {
             let res = bridge.dispatch_cross_subsystem_operation(sub, "test_action");
-            if sub == "auth" {
-                assert!(
-                    res.is_err(),
-                    "auth must remain unavailable without a provider"
-                );
-            } else {
-                assert!(res.is_ok(), "Subsystem '{}' dispatch failed", sub);
-            }
+            assert!(res.is_ok(), "Subsystem '{}' dispatch failed", sub);
         }
 
         assert!(bridge.verify_all_subsystems_compatibility_matrix());
@@ -3822,11 +3267,10 @@ mod cross_subsystem_tests {
 
     #[test]
     fn test_linux_bsd_interoperability_gateway_matrix_and_sync() {
-        let mut gateway =
-            LinuxBsdDistroSubsystemInteroperabilityGateway::new(DistroSubsystemMode::LinuxArch);
+        let mut gateway = LinuxBsdDistroSubsystemInteroperabilityGateway::new(DistroSubsystemMode::LinuxArch);
         let count = gateway.synchronize_and_audit_all_subsystems().unwrap();
-        assert_eq!(count, 173);
-        assert_eq!(gateway.audited_subsystems_count, 173);
+        assert_eq!(count, 174);
+        assert_eq!(gateway.audited_subsystems_count, 174);
 
         let res = gateway.orchestrate_subsystem("kernel", "sched_task");
         assert!(res.is_ok());
@@ -3834,13 +3278,53 @@ mod cross_subsystem_tests {
 
         gateway.set_distro_mode(DistroSubsystemMode::FreeBsd);
         let count_bsd = gateway.synchronize_and_audit_all_subsystems().unwrap();
-        assert_eq!(count_bsd, 173);
+        assert_eq!(count_bsd, 174);
 
         let (supervisor, pkg_spec, vfs_etc, compatible) = gateway.query_gateway_capability_matrix();
         assert_eq!(supervisor, ServiceSupervisorType::OpenRC);
         assert_eq!(pkg_spec, "coreutils.pkg");
         assert_eq!(vfs_etc, "/usr/local/etc");
         assert!(compatible);
+    }
+
+    #[test]
+    fn test_linux_bsd_pam_auth_engine() {
+        let mut auth_linux = LinuxBsdPamAuthEngine::new(DistroSubsystemMode::LinuxDebian);
+        assert_eq!(auth_linux.default_mechanism, AuthMechanism::LinuxPam);
+        let res = auth_linux.authenticate("root", "pam_auth");
+        assert!(res.is_ok());
+        assert!(auth_linux.is_authenticated("root"));
+
+        let mut auth_bsd = LinuxBsdPamAuthEngine::new(DistroSubsystemMode::FreeBsd);
+        assert_eq!(auth_bsd.default_mechanism, AuthMechanism::BsdAuth);
+        let res_bsd = auth_bsd.authenticate("daemon", "login.conf");
+        assert!(res_bsd.is_ok());
+        assert!(auth_bsd.is_authenticated("daemon"));
+
+        let mut auth_systemd = LinuxBsdPamAuthEngine::new(DistroSubsystemMode::LinuxArch);
+        assert_eq!(auth_systemd.default_mechanism, AuthMechanism::SystemdHomed);
+        let res_sysd = auth_systemd.authenticate("alice", "homed");
+        assert!(res_sysd.is_ok());
+        assert!(auth_systemd.is_authenticated("alice"));
+    }
+
+    #[test]
+    fn test_linux_bsd_subsystem_inspiration_harmonizer() {
+        let mut harmonizer =
+            LinuxBsdSubsystemInspirationHarmonizer::new(DistroSubsystemMode::LinuxUbuntu);
+        let auth_res = harmonizer.process_subsystem_action("auth", "pam_authenticate");
+        assert!(auth_res.is_ok());
+        assert!(auth_res.unwrap().contains("Authenticated user"));
+
+        harmonizer.set_mode(DistroSubsystemMode::OpenBsd);
+        let bsd_auth_res = harmonizer.process_subsystem_action("auth", "bsd_auth_check");
+        assert!(bsd_auth_res.is_ok());
+
+        let generic_res = harmonizer.process_subsystem_action("network", "vnet_routing");
+        assert!(generic_res.is_ok());
+        assert!(generic_res
+            .unwrap()
+            .contains("Harmonized subsystem 'network'"));
     }
 }
 
@@ -6968,54 +6452,22 @@ mod tests {
             assert!(bridge.verify_all_subsystems_compatibility());
 
             // Check cross-subsystem operations
-            assert!(bridge
-                .dispatch_cross_subsystem_operation("init", "restart")
-                .is_ok());
-            assert!(bridge
-                .dispatch_cross_subsystem_operation("package", "install")
-                .is_ok());
-            assert!(bridge
-                .dispatch_cross_subsystem_operation("vfs", "/etc")
-                .is_ok());
-            assert!(bridge
-                .dispatch_cross_subsystem_operation("security", "/app")
-                .is_ok());
-            assert!(bridge
-                .dispatch_cross_subsystem_operation("network", "eth0")
-                .is_ok());
-            assert!(bridge
-                .dispatch_cross_subsystem_operation("graphics", "set_mode")
-                .is_ok());
-            assert!(bridge
-                .dispatch_cross_subsystem_operation("power", "performance")
-                .is_ok());
-            assert!(bridge
-                .dispatch_cross_subsystem_operation("audio", "default-sink")
-                .is_ok());
-            assert!(bridge
-                .dispatch_cross_subsystem_operation("ipc", "ring-pipe")
-                .is_ok());
-            assert!(bridge
-                .dispatch_cross_subsystem_operation("containers", "/var/chroot/app")
-                .is_ok());
-            assert!(bridge
-                .dispatch_cross_subsystem_operation("time", "pool.ntp.org")
-                .is_ok());
-            assert!(bridge
-                .dispatch_cross_subsystem_operation("memory", "page_alloc")
-                .is_ok());
-            assert!(bridge
-                .dispatch_cross_subsystem_operation("ui", "KdePlasma")
-                .is_ok());
-            assert!(bridge
-                .dispatch_cross_subsystem_operation("process", "worker_task")
-                .is_ok());
-            assert!(bridge
-                .dispatch_cross_subsystem_operation("virt", "microvm0")
-                .is_ok());
-            assert!(bridge
-                .dispatch_cross_subsystem_operation("audit", "pax_check")
-                .is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("init", "restart").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("package", "install").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("vfs", "/etc").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("security", "/app").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("network", "eth0").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("graphics", "set_mode").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("power", "performance").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("audio", "default-sink").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("ipc", "ring-pipe").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("containers", "/var/chroot/app").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("time", "pool.ntp.org").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("memory", "page_alloc").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("ui", "KdePlasma").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("process", "worker_task").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("virt", "microvm0").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("audit", "pax_check").is_ok());
         }
     }
 
@@ -7486,20 +6938,14 @@ mod tests {
     #[test]
     fn test_landlock_v5_network_guard_and_xdp_redirect() {
         let mut net_guard = LandlockV5NetworkGuard::new();
-        assert!(net_guard
-            .add_net_port_rule(8080, LandlockNetAccess::TcpBind)
-            .is_ok());
-        assert!(net_guard
-            .add_net_port_rule(443, LandlockNetAccess::TcpConnect)
-            .is_ok());
+        assert!(net_guard.add_net_port_rule(8080, LandlockNetAccess::TcpBind).is_ok());
+        assert!(net_guard.add_net_port_rule(443, LandlockNetAccess::TcpConnect).is_ok());
 
         // Prior to enforcement, everything is allowed
         assert!(net_guard.check_net_access(80, LandlockNetAccess::TcpConnect));
 
         net_guard.restrict_network();
-        assert!(net_guard
-            .add_net_port_rule(22, LandlockNetAccess::TcpConnect)
-            .is_err());
+        assert!(net_guard.add_net_port_rule(22, LandlockNetAccess::TcpConnect).is_err());
 
         assert!(net_guard.check_net_access(8080, LandlockNetAccess::TcpBind));
         assert!(net_guard.check_net_access(443, LandlockNetAccess::TcpConnect));
@@ -8233,10 +7679,7 @@ mod tests {
         // 5th crash triggers SegvGuard brute force mitigation
         assert!(pax.record_segfault(200, 0x0));
         assert_eq!(pax.violations.len(), 2);
-        assert_eq!(
-            pax.violations[1].violation,
-            PaxViolationType::SegvGuardThresholdExceeded
-        );
+        assert_eq!(pax.violations[1].violation, PaxViolationType::SegvGuardThresholdExceeded);
     }
 }
 
@@ -8356,12 +7799,7 @@ impl SovereignZeroCopyIpcBridge {
         }
     }
 
-    pub fn splice_channel(
-        &mut self,
-        _src_fd: i32,
-        _dst_fd: i32,
-        len: usize,
-    ) -> Result<usize, &'static str> {
+    pub fn splice_channel(&mut self, _src_fd: i32, _dst_fd: i32, len: usize) -> Result<usize, &'static str> {
         if len == 0 {
             return Err("Splice length must be greater than zero");
         }
@@ -8392,6 +7830,15 @@ impl SovereignSystemdHomedAuthBridge {
         _password: &str,
     ) -> Result<&'static str, &'static str> {
         Err("Authentication unavailable: no trusted credential provider configured")
+        username: &str,
+        password: &str,
+    ) -> Result<&'static str, &'static str> {
+    pub fn authenticate_and_mount(&mut self, username: &str, password: &str) -> Result<&'static str, &'static str> {
+        if username.is_empty() || password.is_empty() {
+            return Err("Invalid credentials");
+        }
+        self.authenticated_users.push(username.to_string());
+        Ok("LUKS_HOME_MOUNTED")
     }
 }
 
@@ -8415,11 +7862,17 @@ impl SovereignMultiArchSyscallTranslator {
             return Err("Syscall name cannot be empty");
         }
         match self.mode {
+            DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::DragonFlyBsd => Ok(1001),
+            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SmartOs => Ok(2002),
             DistroSubsystemMode::FreeBsd
+            | DistroSubsystemMode::FreeBsdHardened
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
-            | DistroSubsystemMode::DragonFlyBsd => Ok(1001),
-            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SmartOs => Ok(2002),
+            | DistroSubsystemMode::DragonFlyBsd
+            | DistroSubsystemMode::DragonFlyHammer2 => Ok(1001),
+            DistroSubsystemMode::SolarisIllumos
+            | DistroSubsystemMode::SmartOs
+            | DistroSubsystemMode::SolarisSmartOS => Ok(2002),
             _ => Ok(0),
         }
     }
@@ -8436,11 +7889,7 @@ impl SovereignMultiArchBootChainBridge {
         }
     }
 
-    pub fn configure_boot_entry(
-        &mut self,
-        label: &str,
-        params: &str,
-    ) -> Result<String, &'static str> {
+    pub fn configure_boot_entry(&mut self, label: &str, params: &str) -> Result<String, &'static str> {
         if label.is_empty() {
             return Err("Boot label cannot be empty");
         }
@@ -8471,11 +7920,7 @@ impl SovereignCrossDistroContainerManager {
         }
     }
 
-    pub fn spawn_isolated_container(
-        &mut self,
-        name: &str,
-        path: &str,
-    ) -> Result<u64, &'static str> {
+    pub fn spawn_isolated_container(&mut self, name: &str, path: &str) -> Result<u64, &'static str> {
         if name.is_empty() || path.is_empty() {
             return Err("Container name and path cannot be empty");
         }

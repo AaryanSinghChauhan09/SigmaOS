@@ -25,7 +25,11 @@ impl<T: Default, const N: usize> FixedObjectPool<T, N> {
     pub fn acquire(&self) -> Option<(usize, &T)> {
         for (idx, entry) in self.entries.iter().enumerate() {
             if !entry.active.load(Ordering::SeqCst) {
-                if entry.active.compare_exchange(false, true, Ordering::SeqCst, Ordering::SeqCst).is_ok() {
+                if entry
+                    .active
+                    .compare_exchange(false, true, Ordering::SeqCst, Ordering::SeqCst)
+                    .is_ok()
+                {
                     return Some((idx, &entry.object));
                 }
             }
@@ -43,7 +47,10 @@ impl<T: Default, const N: usize> FixedObjectPool<T, N> {
     }
 
     pub fn active_count(&self) -> usize {
-        self.entries.iter().filter(|e| e.active.load(Ordering::SeqCst)).count()
+        self.entries
+            .iter()
+            .filter(|e| e.active.load(Ordering::SeqCst))
+            .count()
     }
 }
 

@@ -4,8 +4,6 @@
 #![allow(clippy::new_without_default)]
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-
-
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
@@ -32,11 +30,11 @@ pub enum TaskState {
 pub struct EevdfSchedEntity {
     pub pid: u32,
     pub name: String,
-    pub weight: u32,            // task weight (1-10000, default 1024 like NICE 0)
-    pub slice_ns: u64,          // requested slice (e.g. 5ms for latency, 20ms for batch)
-    pub vruntime: u64,          // virtual runtime in ns
-    pub deadline: u64,          // virtual deadline = vruntime + slice / weight
-    pub exec_time_ns: u64,      // actual physical runtime accumulated
+    pub weight: u32,       // task weight (1-10000, default 1024 like NICE 0)
+    pub slice_ns: u64,     // requested slice (e.g. 5ms for latency, 20ms for batch)
+    pub vruntime: u64,     // virtual runtime in ns
+    pub deadline: u64,     // virtual deadline = vruntime + slice / weight
+    pub exec_time_ns: u64, // actual physical runtime accumulated
     pub state: TaskState,
 }
 
@@ -69,7 +67,7 @@ impl EevdfSchedEntity {
 pub struct SovereignEevdfScheduler {
     pub entities: Vec<EevdfSchedEntity>,
     pub current_running: Option<usize>,
-    pub avg_vruntime: u64,      // V: average virtual runtime (system virtual time)
+    pub avg_vruntime: u64, // V: average virtual runtime (system virtual time)
     pub total_weight: u64,
     pub total_switches: u64,
 }
@@ -92,11 +90,17 @@ impl SovereignEevdfScheduler {
     }
 
     pub fn recompute_avg_vruntime(&mut self) {
-        let runnable_count = self.entities.iter().filter(|e| e.state == TaskState::Runnable || e.state == TaskState::Running).count();
+        let runnable_count = self
+            .entities
+            .iter()
+            .filter(|e| e.state == TaskState::Runnable || e.state == TaskState::Running)
+            .count();
         if runnable_count == 0 {
             return;
         }
-        let sum_vruntime: u64 = self.entities.iter()
+        let sum_vruntime: u64 = self
+            .entities
+            .iter()
             .filter(|e| e.state == TaskState::Runnable || e.state == TaskState::Running)
             .map(|e| e.vruntime)
             .sum();
@@ -139,7 +143,9 @@ impl SovereignEevdfScheduler {
         if let Some(idx) = best_idx {
             // Context switch
             if let Some(curr_idx) = self.current_running {
-                if curr_idx < self.entities.len() && self.entities[curr_idx].state == TaskState::Running {
+                if curr_idx < self.entities.len()
+                    && self.entities[curr_idx].state == TaskState::Running
+                {
                     self.entities[curr_idx].state = TaskState::Runnable;
                 }
             }
@@ -175,7 +181,7 @@ mod tests {
 
     #[test]
     fn test_eevdf_deadline_calculation() {
-        let e1 = EevdfSchedEntity::new(1, "latency_task", 1024, 2_000_000);  // 2ms slice
+        let e1 = EevdfSchedEntity::new(1, "latency_task", 1024, 2_000_000); // 2ms slice
         let e2 = EevdfSchedEntity::new(2, "throughput_task", 1024, 20_000_000); // 20ms slice
         assert!(e1.deadline < e2.deadline); // Short slice gets earlier initial deadline
     }

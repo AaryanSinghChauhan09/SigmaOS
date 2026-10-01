@@ -64,7 +64,9 @@ pub struct LinuxLandlockSeccompBackend {
 impl SandboxBackend for LinuxLandlockSeccompBackend {
     fn restrict_filesystem(&self, policy: &FilesystemPolicy) -> Result<(), SandboxError> {
         if !self.landlock_v5_available {
-            return Err(SandboxError::BackendNotSupported("Linux Landlock v5 unavailable"));
+            return Err(SandboxError::BackendNotSupported(
+                "Linux Landlock v5 unavailable",
+            ));
         }
         if policy.allowed_read_paths.is_empty() && policy.allowed_write_paths.is_empty() {
             return Err(SandboxError::InvalidPolicy("Empty path list".to_string()));
@@ -74,10 +76,14 @@ impl SandboxBackend for LinuxLandlockSeccompBackend {
 
     fn restrict_syscalls(&self, policy: &SyscallPolicy) -> Result<(), SandboxError> {
         if !self.seccomp_bpf_available {
-            return Err(SandboxError::BackendNotSupported("Linux Seccomp BPF unavailable"));
+            return Err(SandboxError::BackendNotSupported(
+                "Linux Seccomp BPF unavailable",
+            ));
         }
         if policy.allowed_syscall_names.is_empty() {
-            return Err(SandboxError::InvalidPolicy("No allowed syscalls specified".to_string()));
+            return Err(SandboxError::InvalidPolicy(
+                "No allowed syscalls specified".to_string(),
+            ));
         }
         Ok(())
     }
@@ -96,7 +102,9 @@ pub struct OpenBsdPledgeUnveilBackend {
 impl SandboxBackend for OpenBsdPledgeUnveilBackend {
     fn restrict_filesystem(&self, policy: &FilesystemPolicy) -> Result<(), SandboxError> {
         if !self.unveil_available {
-            return Err(SandboxError::BackendNotSupported("OpenBSD Unveil unavailable"));
+            return Err(SandboxError::BackendNotSupported(
+                "OpenBSD Unveil unavailable",
+            ));
         }
         if policy.read_only_rootfs {
             // Unveil rootfs as read-only
@@ -106,14 +114,18 @@ impl SandboxBackend for OpenBsdPledgeUnveilBackend {
 
     fn restrict_syscalls(&self, _policy: &SyscallPolicy) -> Result<(), SandboxError> {
         if !self.pledge_available {
-            return Err(SandboxError::BackendNotSupported("OpenBSD Pledge unavailable"));
+            return Err(SandboxError::BackendNotSupported(
+                "OpenBSD Pledge unavailable",
+            ));
         }
         Ok(())
     }
 
     fn restrict_network(&self, policy: &NetworkPolicy) -> Result<(), SandboxError> {
         if policy.allow_raw_sockets {
-            return Err(SandboxError::PermissionDenied("OpenBSD pledge forbids raw sockets".to_string()));
+            return Err(SandboxError::PermissionDenied(
+                "OpenBSD pledge forbids raw sockets".to_string(),
+            ));
         }
         Ok(())
     }
@@ -128,7 +140,9 @@ pub struct FreeBsdCapsicumJailBackend {
 impl SandboxBackend for FreeBsdCapsicumJailBackend {
     fn restrict_filesystem(&self, _policy: &FilesystemPolicy) -> Result<(), SandboxError> {
         if !self.capsicum_available {
-            return Err(SandboxError::BackendNotSupported("FreeBSD Capsicum rights unavailable"));
+            return Err(SandboxError::BackendNotSupported(
+                "FreeBSD Capsicum rights unavailable",
+            ));
         }
         Ok(())
     }
@@ -139,7 +153,9 @@ impl SandboxBackend for FreeBsdCapsicumJailBackend {
 
     fn restrict_network(&self, _policy: &NetworkPolicy) -> Result<(), SandboxError> {
         if !self.jail_vnet_available {
-            return Err(SandboxError::BackendNotSupported("FreeBSD VNET Jails unavailable"));
+            return Err(SandboxError::BackendNotSupported(
+                "FreeBSD VNET Jails unavailable",
+            ));
         }
         Ok(())
     }
@@ -157,14 +173,18 @@ impl SandboxBackend for SigmaOsNativeCapabilityBackend {
 
     fn restrict_syscalls(&self, policy: &SyscallPolicy) -> Result<(), SandboxError> {
         if policy.block_execve && (self.capability_bounding_set & 0x01) != 0 {
-            return Err(SandboxError::PermissionDenied("Native cap_execve blocked".to_string()));
+            return Err(SandboxError::PermissionDenied(
+                "Native cap_execve blocked".to_string(),
+            ));
         }
         Ok(())
     }
 
     fn restrict_network(&self, policy: &NetworkPolicy) -> Result<(), SandboxError> {
         if policy.allow_raw_sockets && (self.capability_bounding_set & 0x02) == 0 {
-            return Err(SandboxError::PermissionDenied("Native CAP_NET_RAW missing".to_string()));
+            return Err(SandboxError::PermissionDenied(
+                "Native CAP_NET_RAW missing".to_string(),
+            ));
         }
         Ok(())
     }
@@ -219,7 +239,8 @@ impl SovereignUserGroupDatabase {
                 uid: 0,
                 gid: 0,
                 username: "root".to_string(),
-                password_hash_argon2id: "$argon2id$v=19$m=65536,t=3,p=4$sovereign_root_hash".to_string(),
+                password_hash_argon2id: "$argon2id$v=19$m=65536,t=3,p=4$sovereign_root_hash"
+                    .to_string(),
                 home_dir: "/root".to_string(),
                 shell: "/system/current/bin/sigma-sh".to_string(),
             },
@@ -230,7 +251,8 @@ impl SovereignUserGroupDatabase {
                 uid: 1000,
                 gid: 1000,
                 username: "sovereign".to_string(),
-                password_hash_argon2id: "$argon2id$v=19$m=65536,t=3,p=4$sovereign_user_hash".to_string(),
+                password_hash_argon2id: "$argon2id$v=19$m=65536,t=3,p=4$sovereign_user_hash"
+                    .to_string(),
                 home_dir: "/user/home/sovereign".to_string(),
                 shell: "/system/current/bin/sigma-sh".to_string(),
             },
@@ -307,7 +329,13 @@ impl Default for SovereignPamAuthPolicyEngine {
 pub struct SovereignAclPermissionEnforcer;
 
 impl SovereignAclPermissionEnforcer {
-    pub fn check_access(mode: u32, uid: u32, owner_uid: u32, requested_read: bool, requested_write: bool) -> bool {
+    pub fn check_access(
+        mode: u32,
+        uid: u32,
+        owner_uid: u32,
+        requested_read: bool,
+        requested_write: bool,
+    ) -> bool {
         if uid == 0 {
             return true;
         }
@@ -427,7 +455,9 @@ impl SovereignKernelModuleSigningVerifier {
     }
 
     pub fn verify_module_signature(&self, key_fingerprint: &str) -> bool {
-        self.allowed_signing_keys.iter().any(|k| k == key_fingerprint)
+        self.allowed_signing_keys
+            .iter()
+            .any(|k| k == key_fingerprint)
     }
 }
 
@@ -522,7 +552,10 @@ impl SovereignCveSecurityUpdateManager {
 
     pub fn apply_security_livepatch(&mut self, cve_id: &str) -> String {
         self.live_patches_applied += 1;
-        format!("Applied livepatch for {} (Total livepatches: {})", cve_id, self.live_patches_applied)
+        format!(
+            "Applied livepatch for {} (Total livepatches: {})",
+            cve_id, self.live_patches_applied
+        )
     }
 }
 
@@ -540,7 +573,9 @@ pub struct SovereignFuzzingBoundaryVerifier {
 
 impl SovereignFuzzingBoundaryVerifier {
     pub fn new() -> Self {
-        Self { fuzzed_inputs_evaluated: 100_000 }
+        Self {
+            fuzzed_inputs_evaluated: 100_000,
+        }
     }
 
     pub fn verify_parser_robustness(&self, raw_input: &[u8]) -> bool {
@@ -568,7 +603,9 @@ impl SovereignFormalThreatModelEvaluator {
             "Unsigned kernel module loading".to_string(),
             "Syscall boundary parameter injection".to_string(),
         ];
-        Self { threats_mitigated: threats }
+        Self {
+            threats_mitigated: threats,
+        }
     }
 
     pub fn threat_model_score(&self) -> f32 {

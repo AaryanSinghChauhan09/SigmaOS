@@ -239,7 +239,9 @@ impl RecoveryShell {
             }
             RecoveryCommand::Free => {
                 println!("              total        used        free      shared  buff/cache   available");
-                println!("Mem:           7.8G        2.1G        5.7G        0M        1.2G        5.3G");
+                println!(
+                    "Mem:           7.8G        2.1G        5.7G        0M        1.2G        5.3G"
+                );
                 println!("Swap:          2.0G          0B        2.0G");
                 // Placeholder: Show memory usage
             }

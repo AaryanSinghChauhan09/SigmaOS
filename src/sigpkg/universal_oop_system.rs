@@ -25,7 +25,7 @@ use std::vec::Vec;
 // Implements Strategy Pattern, Adapter Pattern, and Factory Pattern
 
 #[cfg(not(feature = "standalone_test"))]
-pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
 use std::sync::Arc;
 
@@ -5495,26 +5495,15 @@ pub struct UniversalDistroPackageMediator {
 
 impl UniversalDistroPackageMediator {
     pub fn new() -> Self {
-        Self {
-            history: Vec::new(),
-        }
+        Self { history: Vec::new() }
     }
 
     pub fn notify(&mut self, sender: &str, event: MediatorEvent) -> Result<String, &'static str> {
         let log = match &event {
-            MediatorEvent::PackageParsed(name) => {
-                format!("[Mediator] Sender '{}': Parsed package {}", sender, name)
-            }
-            MediatorEvent::PackageValidated(name) => {
-                format!("[Mediator] Sender '{}': Validated package {}", sender, name)
-            }
-            MediatorEvent::PackageInstalled(name) => {
-                format!("[Mediator] Sender '{}': Installed package {}", sender, name)
-            }
-            MediatorEvent::PackageRolledBack(name) => format!(
-                "[Mediator] Sender '{}': Rolled back package {}",
-                sender, name
-            ),
+            MediatorEvent::PackageParsed(name) => format!("[Mediator] Sender '{}': Parsed package {}", sender, name),
+            MediatorEvent::PackageValidated(name) => format!("[Mediator] Sender '{}': Validated package {}", sender, name),
+            MediatorEvent::PackageInstalled(name) => format!("[Mediator] Sender '{}': Installed package {}", sender, name),
+            MediatorEvent::PackageRolledBack(name) => format!("[Mediator] Sender '{}': Rolled back package {}", sender, name),
         };
         self.history.push(event);
         Ok(log)
@@ -5541,10 +5530,7 @@ pub struct SecurityAuditVisitor {
 
 impl SecurityAuditVisitor {
     pub fn new() -> Self {
-        Self {
-            audited_count: 0,
-            vulnerabilities_found: 0,
-        }
+        Self { audited_count: 0, vulnerabilities_found: 0 }
     }
 }
 
@@ -5582,10 +5568,7 @@ pub struct LicenseScannerVisitor {
 
 impl LicenseScannerVisitor {
     pub fn new() -> Self {
-        Self {
-            copyleft_count: 0,
-            permissive_count: 0,
-        }
+        Self { copyleft_count: 0, permissive_count: 0 }
     }
 }
 
@@ -5622,10 +5605,7 @@ pub struct FootprintMetricsVisitor {
 
 impl FootprintMetricsVisitor {
     pub fn new() -> Self {
-        Self {
-            total_installed_bytes: 0,
-            total_file_count: 0,
-        }
+        Self { total_installed_bytes: 0, total_file_count: 0 }
     }
 }
 
@@ -5718,32 +5698,18 @@ pub struct PackageMetadataFlyweightFactory {
 
 impl PackageMetadataFlyweightFactory {
     pub fn new() -> Self {
-        Self {
-            pool: HashMap::new(),
-        }
+        Self { pool: HashMap::new() }
     }
 
-    pub fn get_flyweight(
-        &mut self,
-        license: &str,
-        maintainer: &str,
-        architecture: &str,
-    ) -> Arc<PackageMetadataFlyweight> {
-        let key = (
-            license.to_string(),
-            maintainer.to_string(),
-            architecture.to_string(),
-        );
-        self.pool
-            .entry(key.clone())
-            .or_insert_with(|| {
-                Arc::new(PackageMetadataFlyweight {
-                    license: key.0,
-                    maintainer: key.1,
-                    architecture: key.2,
-                })
+    pub fn get_flyweight(&mut self, license: &str, maintainer: &str, architecture: &str) -> Arc<PackageMetadataFlyweight> {
+        let key = (license.to_string(), maintainer.to_string(), architecture.to_string());
+        self.pool.entry(key.clone()).or_insert_with(|| {
+            Arc::new(PackageMetadataFlyweight {
+                license: key.0,
+                maintainer: key.1,
+                architecture: key.2,
             })
-            .clone()
+        }).clone()
     }
 
     pub fn pool_size(&self) -> usize {
@@ -5775,19 +5741,13 @@ pub struct PackageStateMachine {
 
 impl PackageStateMachine {
     pub fn new() -> Self {
-        Self {
-            current_state: PackageLifecycleState::Uninstalled,
-        }
+        Self { current_state: PackageLifecycleState::Uninstalled }
     }
 
     pub fn transition_to(&mut self, new_state: PackageLifecycleState) -> Result<(), &'static str> {
         let valid = match (self.current_state, new_state) {
-            (PackageLifecycleState::Uninstalled, PackageLifecycleState::ResolvingDependencies) => {
-                true
-            }
-            (PackageLifecycleState::ResolvingDependencies, PackageLifecycleState::Downloading) => {
-                true
-            }
+            (PackageLifecycleState::Uninstalled, PackageLifecycleState::ResolvingDependencies) => true,
+            (PackageLifecycleState::ResolvingDependencies, PackageLifecycleState::Downloading) => true,
             (PackageLifecycleState::Downloading, PackageLifecycleState::Validating) => true,
             (PackageLifecycleState::Validating, PackageLifecycleState::Installing) => true,
             (PackageLifecycleState::Installing, PackageLifecycleState::Installed) => true,
@@ -5834,8 +5794,7 @@ impl LazyPackageLoadProxy {
 
     pub fn load_if_needed(&mut self, factory: &PackageParserFactory) -> Result<(), ParseError> {
         if self.inner_package.is_none() {
-            let parser = factory
-                .get_parser(self.format)
+            let parser = factory.get_parser(self.format)
                 .ok_or_else(|| ParseError::UnsupportedFormat(self.format))?;
             let pkg = parser.parse(&self.raw_data)?;
             self.inner_package = Some(pkg);
@@ -5930,18 +5889,14 @@ impl UniversalPackageBuilder {
 
 pub struct BedrockStratumAdapter;
 impl BedrockStratumAdapter {
-    pub fn new() -> Self {
-        Self
-    }
+    pub fn new() -> Self { Self }
     pub fn resolve_stratum_path(&self, stratum: &str, relative_path: &str) -> String {
         format!("/bedrock/strata/{}{}", stratum, relative_path)
     }
 }
 
 impl Default for BedrockStratumAdapter {
-    fn default() -> Self {
-        Self::new()
-    }
+    fn default() -> Self { Self::new() }
 }
 
 pub struct DistroboxOciAdapter {
@@ -5950,9 +5905,7 @@ pub struct DistroboxOciAdapter {
 
 impl DistroboxOciAdapter {
     pub fn new() -> Self {
-        Self {
-            exported_binaries: Vec::new(),
-        }
+        Self { exported_binaries: Vec::new() }
     }
 
     pub fn export_binary_shim(&mut self, container_name: &str, binary: &str) -> String {
@@ -5963,9 +5916,7 @@ impl DistroboxOciAdapter {
 }
 
 impl Default for DistroboxOciAdapter {
-    fn default() -> Self {
-        Self::new()
-    }
+    fn default() -> Self { Self::new() }
 }
 
 pub struct SystemdSysextAdapter {
@@ -5974,9 +5925,7 @@ pub struct SystemdSysextAdapter {
 
 impl SystemdSysextAdapter {
     pub fn new() -> Self {
-        Self {
-            extensions: Vec::new(),
-        }
+        Self { extensions: Vec::new() }
     }
 
     pub fn mount_extension(&mut self, extension_name: &str) -> Result<String, &'static str> {
@@ -5987,16 +5936,12 @@ impl SystemdSysextAdapter {
 }
 
 impl Default for SystemdSysextAdapter {
-    fn default() -> Self {
-        Self::new()
-    }
+    fn default() -> Self { Self::new() }
 }
 
 pub struct OmarchyPackageBridgeAdapter;
 impl OmarchyPackageBridgeAdapter {
-    pub fn new() -> Self {
-        Self
-    }
+    pub fn new() -> Self { Self }
     pub fn bridge_package(&self, package_name: &str) -> String {
         match package_name {
             "hyprland" | "sway" | "wayfire" => "sovereign-desktop-shell".to_string(),
@@ -6008,8 +5953,300 @@ impl OmarchyPackageBridgeAdapter {
 }
 
 impl Default for OmarchyPackageBridgeAdapter {
+    fn default() -> Self { Self::new() }
+}
+
+pub struct UrpmiRpmAdapter;
+impl UrpmiRpmAdapter {
+    pub fn new() -> Self {
+        Self
+    }
+    pub fn parse_synthesis_hdr(&self, synthesis_line: &str) -> Option<(String, String, String)> {
+        let parts: Vec<&str> = synthesis_line.split('@').collect();
+        if parts.len() >= 2 {
+            let name_ver = parts[1];
+            let deps = if parts.len() >= 3 { parts[2] } else { "" };
+            Some((
+                name_ver.to_string(),
+                deps.to_string(),
+                "rpm-synthesis".to_string(),
+            ))
+        } else {
+            None
+        }
+    }
+}
+
+impl Default for UrpmiRpmAdapter {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+pub struct AptRpmAdapter;
+impl AptRpmAdapter {
+    pub fn new() -> Self {
+        Self
+    }
+    pub fn translate_apt_rpm_release(&self, line: &str) -> Option<(String, String)> {
+        if line.contains("Component:") {
+            let comp = line.split("Component:").nth(1)?.split(',').next()?.trim();
+            Some(("component".to_string(), comp.to_string()))
+        } else {
+            None
+        }
+    }
+}
+
+impl Default for AptRpmAdapter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct ManjaroBranchSyncAdapter {
+    pub current_branch: String,
+}
+
+impl ManjaroBranchSyncAdapter {
+    pub fn new() -> Self {
+        Self {
+            current_branch: "stable".to_string(),
+        }
+    }
+    pub fn switch_branch(&mut self, branch: &str) -> String {
+        self.current_branch = branch.to_string();
+        format!("https://repo.manjaro.org/repo/{}/", branch)
+    }
+}
+
+impl Default for ManjaroBranchSyncAdapter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct PopOsSystem76Adapter;
+impl PopOsSystem76Adapter {
+    pub fn new() -> Self {
+        Self
+    }
+    pub fn is_system76_hardware_driver(&self, pkg: &str) -> bool {
+        pkg.starts_with("system76-")
+            || pkg.contains("pop-desktop")
+            || pkg.contains("system76-driver")
+    }
+}
+
+impl Default for PopOsSystem76Adapter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct NixFlakeProfileGcAdapter {
+    pub profiles_cleaned: usize,
+}
+
+impl NixFlakeProfileGcAdapter {
+    pub fn new() -> Self {
+        Self {
+            profiles_cleaned: 0,
+        }
+    }
+    pub fn garbage_collect_generations(&mut self, keep_last: usize) -> usize {
+        let freed = if keep_last < 5 { 5 - keep_last } else { 1 };
+        self.profiles_cleaned += freed;
+        freed
+    }
+}
+
+impl Default for NixFlakeProfileGcAdapter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// Behavioral & Structural OOP Design Patterns (Interpreter, Iterator, Bridge)
+// ============================================================================
+
+pub trait QueryExpr: Send + Sync {
+    fn interpret(&self, package: &dyn IPackage) -> bool;
+}
+
+pub struct EqualsExpr {
+    pub key: String,
+    pub value: String,
+}
+
+impl EqualsExpr {
+    pub fn new(key: impl Into<String>, value: impl Into<String>) -> Self {
+        Self {
+            key: key.into(),
+            value: value.into(),
+        }
+    }
+}
+
+impl QueryExpr for EqualsExpr {
+    fn interpret(&self, package: &dyn IPackage) -> bool {
+        match self.key.as_str() {
+            "name" => package.name() == self.value,
+            "license" => package.metadata().license == self.value,
+            "maintainer" => package.metadata().maintainer == self.value,
+            _ => false,
+        }
+    }
+}
+
+pub struct AndExpr {
+    pub left: Box<dyn QueryExpr>,
+    pub right: Box<dyn QueryExpr>,
+}
+
+impl AndExpr {
+    pub fn new(left: Box<dyn QueryExpr>, right: Box<dyn QueryExpr>) -> Self {
+        Self { left, right }
+    }
+}
+
+impl QueryExpr for AndExpr {
+    fn interpret(&self, package: &dyn IPackage) -> bool {
+        self.left.interpret(package) && self.right.interpret(package)
+    }
+}
+
+pub struct OrExpr {
+    pub left: Box<dyn QueryExpr>,
+    pub right: Box<dyn QueryExpr>,
+}
+
+impl OrExpr {
+    pub fn new(left: Box<dyn QueryExpr>, right: Box<dyn QueryExpr>) -> Self {
+        Self { left, right }
+    }
+}
+
+impl QueryExpr for OrExpr {
+    fn interpret(&self, package: &dyn IPackage) -> bool {
+        self.left.interpret(package) || self.right.interpret(package)
+    }
+}
+
+pub struct PackageQueryInterpreter {
+    pub root_expr: Option<Box<dyn QueryExpr>>,
+}
+
+impl PackageQueryInterpreter {
+    pub fn new(expr: Box<dyn QueryExpr>) -> Self {
+        Self {
+            root_expr: Some(expr),
+        }
+    }
+
+    pub fn matches(&self, package: &dyn IPackage) -> bool {
+        if let Some(ref expr) = self.root_expr {
+            expr.interpret(package)
+        } else {
+            true
+        }
+    }
+}
+
+pub struct UniversalPackageIterator<'a> {
+    pub packages: &'a [Box<dyn IPackage>],
+    pub index: usize,
+}
+
+impl<'a> UniversalPackageIterator<'a> {
+    pub fn new(packages: &'a [Box<dyn IPackage>]) -> Self {
+        Self { packages, index: 0 }
+    }
+}
+
+impl<'a> Iterator for UniversalPackageIterator<'a> {
+    type Item = &'a dyn IPackage;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.packages.len() {
+            let pkg = self.packages[self.index].as_ref();
+            self.index += 1;
+            Some(pkg)
+        } else {
+            None
+        }
+    }
+}
+
+pub struct PackageFilterIterator<'a> {
+    pub inner: UniversalPackageIterator<'a>,
+    pub interpreter: &'a PackageQueryInterpreter,
+}
+
+impl<'a> PackageFilterIterator<'a> {
+    pub fn new(
+        inner: UniversalPackageIterator<'a>,
+        interpreter: &'a PackageQueryInterpreter,
+    ) -> Self {
+        Self { inner, interpreter }
+    }
+}
+
+impl<'a> Iterator for PackageFilterIterator<'a> {
+    type Item = &'a dyn IPackage;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        while let Some(pkg) = self.inner.next() {
+            if self.interpreter.matches(pkg) {
+                return Some(pkg);
+            }
+        }
+        None
+    }
+}
+
+pub trait SandboxBackend: Send + Sync {
+    fn execute_in_sandbox(&self, command: &str, package: &dyn IPackage) -> Result<String, String>;
+}
+
+pub struct BubblewrapSandboxBackend;
+impl SandboxBackend for BubblewrapSandboxBackend {
+    fn execute_in_sandbox(&self, command: &str, package: &dyn IPackage) -> Result<String, String> {
+        Ok(format!(
+            "bwrap --unshare-all --ro-bind / / {} (pkg: {})",
+            command,
+            package.name()
+        ))
+    }
+}
+
+pub struct ChrootSandboxBackend;
+impl SandboxBackend for ChrootSandboxBackend {
+    fn execute_in_sandbox(&self, command: &str, package: &dyn IPackage) -> Result<String, String> {
+        Ok(format!(
+            "chroot /var/lib/sigma/jail {} (pkg: {})",
+            command,
+            package.name()
+        ))
+    }
+}
+
+pub struct PackageExecutionBridge {
+    pub sandbox: Box<dyn SandboxBackend>,
+}
+
+impl PackageExecutionBridge {
+    pub fn new(sandbox: Box<dyn SandboxBackend>) -> Self {
+        Self { sandbox }
+    }
+
+    pub fn run_package_task(
+        &self,
+        command: &str,
+        package: &dyn IPackage,
+    ) -> Result<String, String> {
+        self.sandbox.execute_in_sandbox(command, package)
     }
 }
 
@@ -6044,9 +6281,7 @@ impl UdfCustomScriptletEngine {
 }
 
 impl Default for UdfCustomScriptletEngine {
-    fn default() -> Self {
-        Self::new()
-    }
+    fn default() -> Self { Self::new() }
 }
 
 pub struct UdfPackageConflictResolverEngine {
@@ -6055,9 +6290,7 @@ pub struct UdfPackageConflictResolverEngine {
 
 impl UdfPackageConflictResolverEngine {
     pub fn new() -> Self {
-        Self {
-            conflict_rules: Vec::new(),
-        }
+        Self { conflict_rules: Vec::new() }
     }
 
     pub fn add_conflict_rule<F>(&mut self, rule: F)
@@ -6078,9 +6311,7 @@ impl UdfPackageConflictResolverEngine {
 }
 
 impl Default for UdfPackageConflictResolverEngine {
-    fn default() -> Self {
-        Self::new()
-    }
+    fn default() -> Self { Self::new() }
 }
 
 pub struct UdfPackageArchiveTransformerEngine {
@@ -6089,9 +6320,7 @@ pub struct UdfPackageArchiveTransformerEngine {
 
 impl UdfPackageArchiveTransformerEngine {
     pub fn new() -> Self {
-        Self {
-            transformers: Vec::new(),
-        }
+        Self { transformers: Vec::new() }
     }
 
     pub fn add_transformer<F>(&mut self, transformer: F)
@@ -6111,6 +6340,100 @@ impl UdfPackageArchiveTransformerEngine {
 }
 
 impl Default for UdfPackageArchiveTransformerEngine {
+    fn default() -> Self { Self::new() }
+}
+
+pub struct UdfCustomConstraintSolverFilter {
+    pub preference_filters: Vec<Arc<dyn Fn(&str) -> i32 + Send + Sync>>,
+}
+
+impl UdfCustomConstraintSolverFilter {
+    pub fn new() -> Self {
+        Self {
+            preference_filters: Vec::new(),
+        }
+    }
+
+    pub fn add_preference_filter<F>(&mut self, filter: F)
+    where
+        F: Fn(&str) -> i32 + Send + Sync + 'static,
+    {
+        self.preference_filters.push(Arc::new(filter));
+    }
+
+    pub fn score_package_candidate(&self, pkg_name: &str) -> i32 {
+        let mut score = 0;
+        for filter in &self.preference_filters {
+            score += filter(pkg_name);
+        }
+        score
+    }
+}
+
+impl Default for UdfCustomConstraintSolverFilter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct UdfEnvironmentSanitizerEngine {
+    pub denied_env_vars: Vec<String>,
+}
+
+impl UdfEnvironmentSanitizerEngine {
+    pub fn new() -> Self {
+        Self {
+            denied_env_vars: vec![
+                "LD_PRELOAD".to_string(),
+                "LD_LIBRARY_PATH".to_string(),
+                "DYLD_INSERT_LIBRARIES".to_string(),
+            ],
+        }
+    }
+
+    pub fn sanitize_env_var(&self, var_name: &str, value: &str) -> Option<String> {
+        if self.denied_env_vars.iter().any(|denied| denied == var_name) {
+            None
+        } else {
+            Some(value.to_string())
+        }
+    }
+}
+
+impl Default for UdfEnvironmentSanitizerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct UdfPackagePatchTransformerEngine {
+    pub patch_hooks: Vec<Arc<dyn Fn(&str, &str) -> String + Send + Sync>>,
+}
+
+impl UdfPackagePatchTransformerEngine {
+    pub fn new() -> Self {
+        Self {
+            patch_hooks: Vec::new(),
+        }
+    }
+
+    pub fn add_patch_hook<F>(&mut self, hook: F)
+    where
+        F: Fn(&str, &str) -> String + Send + Sync + 'static,
+    {
+        self.patch_hooks.push(Arc::new(hook));
+    }
+
+    pub fn apply_patches(&self, pkg_name: &str, source_code: &str) -> String {
+        let mut current = source_code.to_string();
+        for hook in &self.patch_hooks {
+            current = hook(pkg_name, &current);
+        }
+        current
+    }
+}
+
+impl Default for UdfPackagePatchTransformerEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -7566,12 +7889,7 @@ Description: Hook test";
     fn test_comprehensive_oop_mediator_visitor_memento_flyweight_state_proxy_builder() {
         // 1. Mediator Pattern
         let mut mediator = UniversalDistroPackageMediator::new();
-        let msg = mediator
-            .notify(
-                "TestRunner",
-                MediatorEvent::PackageParsed("htop".to_string()),
-            )
-            .unwrap();
+        let msg = mediator.notify("TestRunner", MediatorEvent::PackageParsed("htop".to_string())).unwrap();
         assert!(msg.contains("Parsed package htop"));
 
         // 2. Visitor Pattern
@@ -7602,11 +7920,7 @@ Description: Hook test";
 
         // 3. Memento Pattern & SystemStateCaretaker
         let mut caretaker = SystemStateCaretaker::new();
-        caretaker.save_state(
-            1,
-            vec!["bash".to_string(), "coreutils".to_string()],
-            1700000000,
-        );
+        caretaker.save_state(1, vec!["bash".to_string(), "coreutils".to_string()], 1700000000);
         assert_eq!(caretaker.mementos.len(), 1);
 
         let undone = caretaker.undo().unwrap();
@@ -7626,35 +7940,17 @@ Description: Hook test";
 
         // 5. State Pattern & StateMachine
         let mut state_machine = PackageStateMachine::new();
-        assert_eq!(
-            state_machine.current_state,
-            PackageLifecycleState::Uninstalled
-        );
+        assert_eq!(state_machine.current_state, PackageLifecycleState::Uninstalled);
 
-        assert!(state_machine
-            .transition_to(PackageLifecycleState::ResolvingDependencies)
-            .is_ok());
-        assert!(state_machine
-            .transition_to(PackageLifecycleState::Downloading)
-            .is_ok());
-        assert!(state_machine
-            .transition_to(PackageLifecycleState::Validating)
-            .is_ok());
-        assert!(state_machine
-            .transition_to(PackageLifecycleState::Installing)
-            .is_ok());
-        assert!(state_machine
-            .transition_to(PackageLifecycleState::Installed)
-            .is_ok());
-        assert_eq!(
-            state_machine.current_state,
-            PackageLifecycleState::Installed
-        );
+        assert!(state_machine.transition_to(PackageLifecycleState::ResolvingDependencies).is_ok());
+        assert!(state_machine.transition_to(PackageLifecycleState::Downloading).is_ok());
+        assert!(state_machine.transition_to(PackageLifecycleState::Validating).is_ok());
+        assert!(state_machine.transition_to(PackageLifecycleState::Installing).is_ok());
+        assert!(state_machine.transition_to(PackageLifecycleState::Installed).is_ok());
+        assert_eq!(state_machine.current_state, PackageLifecycleState::Installed);
 
         // Invalid transition test
-        assert!(state_machine
-            .transition_to(PackageLifecycleState::Downloading)
-            .is_err());
+        assert!(state_machine.transition_to(PackageLifecycleState::Downloading).is_err());
 
         // 6. Proxy Pattern (Lazy Package Load Proxy)
         let factory = PackageParserFactory::new();
@@ -7702,10 +7998,7 @@ Description: Hook test";
 
         // 4. Omarchy Package Bridge
         let omarchy = OmarchyPackageBridgeAdapter::new();
-        assert_eq!(
-            omarchy.bridge_package("hyprland"),
-            "sovereign-desktop-shell"
-        );
+        assert_eq!(omarchy.bridge_package("hyprland"), "sovereign-desktop-shell");
         assert_eq!(omarchy.bridge_package("custom-tool"), "custom-tool");
     }
 
@@ -7726,10 +8019,7 @@ Description: Hook test";
                 None
             }
         });
-        assert_eq!(
-            conflict_resolver.resolve_conflict("legacy-libc", "sovereign-libc"),
-            "sovereign-libc"
-        );
+        assert_eq!(conflict_resolver.resolve_conflict("legacy-libc", "sovereign-libc"), "sovereign-libc");
 
         // 3. UDF Package Archive Transformer Engine
         let mut archive_transformer = UdfPackageArchiveTransformerEngine::new();
@@ -7741,5 +8031,87 @@ Description: Hook test";
         let raw = b"payload";
         let out = archive_transformer.transform(raw);
         assert_eq!(&out[..4], b"SPKG");
+    }
+
+    #[test]
+    fn test_new_distro_adapters_and_oop_patterns() {
+        // 1. Urpmi RPM Adapter
+        let urpmi = UrpmiRpmAdapter::new();
+        let (namever, deps, fmt) = urpmi
+            .parse_synthesis_hdr("synthesis@htop-3.2.0-1.x86_64@libc.so.6@")
+            .unwrap();
+        assert_eq!(namever, "htop-3.2.0-1.x86_64");
+        assert_eq!(deps, "libc.so.6");
+        assert_eq!(fmt, "rpm-synthesis");
+
+        // 2. APT-RPM Adapter
+        let apt_rpm = AptRpmAdapter::new();
+        let (k, v) = apt_rpm
+            .translate_apt_rpm_release("Component: main, Architecture: x86_64")
+            .unwrap();
+        assert_eq!(k, "component");
+        assert_eq!(v, "main");
+
+        // 3. Manjaro Branch Sync Adapter
+        let mut manjaro = ManjaroBranchSyncAdapter::new();
+        let repo_url = manjaro.switch_branch("testing");
+        assert_eq!(repo_url, "https://repo.manjaro.org/repo/testing/");
+
+        // 4. Pop!_OS System76 Driver Adapter
+        let pop = PopOsSystem76Adapter::new();
+        assert!(pop.is_system76_hardware_driver("system76-driver-nvidia"));
+        assert!(!pop.is_system76_hardware_driver("gnome-calculator"));
+
+        // 5. Nix Flake Profile GC Adapter
+        let mut nix_gc = NixFlakeProfileGcAdapter::new();
+        let freed = nix_gc.garbage_collect_generations(2);
+        assert_eq!(freed, 3);
+
+        // 6. Interpreter Pattern
+        let pkg = UniversalPackageBuilder::new("curl")
+            .version(8, 5, 0)
+            .license("MIT")
+            .build()
+            .unwrap();
+
+        let name_eq = Box::new(EqualsExpr::new("name", "curl"));
+        let lic_eq = Box::new(EqualsExpr::new("license", "MIT"));
+        let and_expr = Box::new(AndExpr::new(name_eq, lic_eq));
+        let interpreter = PackageQueryInterpreter::new(and_expr);
+        assert!(interpreter.matches(pkg.as_ref()));
+
+        // 7. Iterator Pattern
+        let pkgs: Vec<Box<dyn IPackage>> = vec![pkg];
+        let iter = UniversalPackageIterator::new(&pkgs);
+        let mut filter_iter = PackageFilterIterator::new(iter, &interpreter);
+        assert!(filter_iter.next().is_some());
+
+        // 8. Bridge Pattern (Sandbox Execution Bridge)
+        let bwrap = Box::new(BubblewrapSandboxBackend);
+        let bridge = PackageExecutionBridge::new(bwrap);
+        let sample_pkg = UniversalPackageBuilder::new("test").build().unwrap();
+        let res = bridge
+            .run_package_task("ls -la", sample_pkg.as_ref())
+            .unwrap();
+        assert!(res.contains("bwrap"));
+
+        // 9. UDF Extensions (Constraint Solver Filter, Env Sanitizer, Patch Transformer)
+        let mut filter = UdfCustomConstraintSolverFilter::new();
+        filter.add_preference_filter(|p| if p.starts_with("sovereign-") { 100 } else { 0 });
+        assert_eq!(filter.score_package_candidate("sovereign-libc"), 100);
+
+        let sanitizer = UdfEnvironmentSanitizerEngine::new();
+        assert!(sanitizer
+            .sanitize_env_var("LD_PRELOAD", "/lib/malicious.so")
+            .is_none());
+        assert_eq!(
+            sanitizer.sanitize_env_var("PATH", "/usr/bin").unwrap(),
+            "/usr/bin"
+        );
+
+        let mut patcher = UdfPackagePatchTransformerEngine::new();
+        patcher.add_patch_hook(|pkg, src| format!("// Patched for {}\n{}", pkg, src));
+        let patched = patcher.apply_patches("zlib", "int main() {}");
+        assert!(patched.contains("Patched for zlib"));
     }
 }

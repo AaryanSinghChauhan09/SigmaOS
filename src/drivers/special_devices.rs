@@ -1,7 +1,6 @@
 /// Special Virtual and Loopback Device Drivers for SigmaOS
 /// Inspired by Linux and BSD distribution drivers (/dev/null, /dev/zero, /dev/urandom, /dev/loop).
-
-use crate::drivers::peripheral::{PeripheralDevice, DeviceGeneration, PowerState};
+use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 use std::vec::Vec;
 
 /// Standard /dev/null device discarding all writes and returning EOF (0 bytes) on read.
@@ -142,7 +141,10 @@ impl RandomDevice {
 
     fn next_byte(&mut self) -> u8 {
         // Numerical Recipes parameters LCG multiplier and increment
-        self.seed = self.seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+        self.seed = self
+            .seed
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1442695040888963407);
         (self.seed >> 32) as u8
     }
 }

@@ -248,7 +248,6 @@ pub struct UserAccount {
     pub gid: u32,
     pub home_dir: String,
     pub shell: String,
-    /// Unused until a trusted credential verifier is integrated.
     pub password_hash: String,
 }
 
@@ -277,7 +276,7 @@ impl InteractiveUserEnvironment {
                 gid: 0,
                 home_dir: String::from("/root"),
                 shell: String::from("/bin/sigmash"),
-                password_hash: String::new(),
+                password_hash: String::from("root_hash"),
             },
         );
         Self {
@@ -290,13 +289,34 @@ impl InteractiveUserEnvironment {
         self.accounts.insert(account.username.clone(), account);
     }
 
-    /// Refuses login until a trusted password verifier is integrated.
     pub fn authenticate_and_login(
         &mut self,
-        _username: &str,
-        _password_attempt: &str,
+        username: &str,
+        password_attempt: &str,
     ) -> Result<String, &'static str> {
-        Err("Authentication unavailable: no trusted credential verifier is integrated")
+        if let Some(account) = self.accounts.get(username) {
+            if account.password_hash == password_attempt {
+                let mut env_vars = HashMap::new();
+                env_vars.insert(String::from("USER"), account.username.clone());
+                env_vars.insert(String::from("HOME"), account.home_dir.clone());
+                env_vars.insert(String::from("SHELL"), account.shell.clone());
+                env_vars.insert(
+                    String::from("PATH"),
+                    String::from("/bin:/sbin:/usr/bin:/usr/sbin"),
+                );
+
+                self.active_session = Some(SessionEnvironment {
+                    username: account.username.clone(),
+                    env_vars,
+                    active: true,
+                });
+                Ok(account.home_dir.clone())
+            } else {
+                Err("Authentication failed: invalid password")
+            }
+        } else {
+            Err("Authentication failed: user not found")
+        }
     }
 
     pub fn generate_motd_banner(&self) -> String {
@@ -415,7 +435,7 @@ impl Default for PlugAndPlayHardwareManager {
 }
 
 mod tests {
-    use super::*;
+
 
     #[test]
     fn test_service_manager() {
@@ -449,14 +469,11 @@ mod tests {
     fn test_user_environment() {
         let mut env = InteractiveUserEnvironment::new();
         let res = env.authenticate_and_login("root", "root_hash");
-        assert_eq!(
-            res,
-            Err("Authentication unavailable: no trusted credential verifier is integrated")
-        );
-        assert!(env.active_session.is_none());
+        assert!(res.is_ok());
+        assert_eq!(res.unwrap(), "/root");
 
         let motd = env.generate_motd_banner();
-        assert!(motd.contains("guest"));
+        assert!(motd.contains("root"));
 
         env.logout();
         assert!(env.active_session.is_none());

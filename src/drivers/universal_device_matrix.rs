@@ -73,8 +73,12 @@ impl PeripheralDevice for IsaSoundBlasterProDriver {
         }
     }
 
-    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
-    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> { Ok(0) }
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> {
+        Ok(0)
+    }
+    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> {
+        Ok(0)
+    }
 
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
         self.power_state = state;
@@ -131,8 +135,12 @@ impl PeripheralDevice for VgaIsaVideoDriver {
         Ok(())
     }
 
-    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
-    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> { Ok(0) }
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> {
+        Ok(0)
+    }
+    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> {
+        Ok(0)
+    }
 
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
         self.power_state = state;
@@ -182,7 +190,9 @@ impl PeripheralDevice for Serial16550UartDriver {
         Ok(())
     }
 
-    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> {
+        Ok(0)
+    }
     fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
         for &byte in data {
             self.transmit_byte(byte);
@@ -241,7 +251,9 @@ impl PeripheralDevice for Ne2000IsaEthernetDriver {
         Ok(())
     }
 
-    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> {
+        Ok(0)
+    }
     fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
         self.send_packet(data)
     }
@@ -294,8 +306,12 @@ impl PeripheralDevice for PciSoundBlasterLiveDriver {
         Ok(())
     }
 
-    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
-    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> { Ok(0) }
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> {
+        Ok(0)
+    }
+    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> {
+        Ok(0)
+    }
 
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
         self.power_state = state;
@@ -339,8 +355,12 @@ impl PeripheralDevice for AgpNvidiaRiva128Driver {
         Ok(())
     }
 
-    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
-    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> { Ok(0) }
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> {
+        Ok(0)
+    }
+    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> {
+        Ok(0)
+    }
 
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
         self.power_state = state;
@@ -384,8 +404,12 @@ impl PeripheralDevice for FirewireIEEE1394Driver {
         Ok(())
     }
 
-    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
-    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> { Ok(0) }
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> {
+        Ok(0)
+    }
+    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> {
+        Ok(0)
+    }
 
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
         self.power_state = state;
@@ -446,8 +470,12 @@ impl PeripheralDevice for IntelWiWifi7Driver {
         Ok(())
     }
 
-    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
-    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> { Ok(0) }
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> {
+        Ok(0)
+    }
+    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> {
+        Ok(0)
+    }
 
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
         self.power_state = state;
@@ -493,8 +521,12 @@ impl PeripheralDevice for NvidiaAdaLovelaceGpuDriver {
         Ok(())
     }
 
-    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
-    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> { Ok(0) }
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> {
+        Ok(0)
+    }
+    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> {
+        Ok(0)
+    }
 
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
         self.power_state = state;
@@ -538,8 +570,12 @@ impl PeripheralDevice for AmdRdna3GpuDriver {
         Ok(())
     }
 
-    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
-    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> { Ok(0) }
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> {
+        Ok(0)
+    }
+    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> {
+        Ok(0)
+    }
 
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
         self.power_state = state;
@@ -581,8 +617,12 @@ impl PeripheralDevice for Usb4Thunderbolt4ControllerDriver {
         Ok(())
     }
 
-    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
-    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> { Ok(0) }
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> {
+        Ok(0)
+    }
+    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> {
+        Ok(0)
+    }
 
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
         self.power_state = state;
@@ -624,8 +664,12 @@ impl PeripheralDevice for NvmeGen5SSDControllerDriver {
         Ok(())
     }
 
-    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
-    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> { Ok(0) }
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> {
+        Ok(0)
+    }
+    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> {
+        Ok(0)
+    }
 
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
         self.power_state = state;
@@ -671,8 +715,12 @@ impl PeripheralDevice for RiscVSpikeUartDriver {
         Ok(())
     }
 
-    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
-    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> { Ok(0) }
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> {
+        Ok(0)
+    }
+    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> {
+        Ok(0)
+    }
 
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
         self.power_state = state;
@@ -716,8 +764,12 @@ impl PeripheralDevice for ArmGenericGicV3Driver {
         Ok(())
     }
 
-    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
-    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> { Ok(0) }
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> {
+        Ok(0)
+    }
+    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> {
+        Ok(0)
+    }
 
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
         self.power_state = state;
@@ -761,8 +813,12 @@ impl PeripheralDevice for QuantumQpuInterfaceDriver {
         Ok(())
     }
 
-    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
-    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> { Ok(0) }
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> {
+        Ok(0)
+    }
+    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> {
+        Ok(0)
+    }
 
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
         self.power_state = state;
@@ -806,8 +862,12 @@ impl PeripheralDevice for NeuroProstheticBciDriver {
         Ok(())
     }
 
-    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
-    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> { Ok(0) }
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> {
+        Ok(0)
+    }
+    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> {
+        Ok(0)
+    }
 
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
         self.power_state = state;

@@ -170,7 +170,12 @@ impl SemaphoreManager {
     }
 
     /// Create semaphore in a set
-    pub fn create_semaphore(&self, set_id: u64, initial_value: i32, max_value: i32) -> Result<u64, String> {
+    pub fn create_semaphore(
+        &self,
+        set_id: u64,
+        initial_value: i32,
+        max_value: i32,
+    ) -> Result<u64, String> {
         let sets = self.semaphore_sets.lock().unwrap();
         match sets.get(&set_id) {
             Some(set) => Ok(set.create_semaphore(initial_value, max_value)),
@@ -317,10 +322,16 @@ mod tests {
         let sem_id = manager.create_semaphore(set_id, 5, 10).unwrap();
         assert_eq!(sem_id, 1);
 
-        assert_eq!(manager.wait(set_id, sem_id).unwrap(), SemaphoreResult::Success);
+        assert_eq!(
+            manager.wait(set_id, sem_id).unwrap(),
+            SemaphoreResult::Success
+        );
         assert_eq!(manager.get_value(set_id, sem_id).unwrap(), 4);
 
-        assert_eq!(manager.post(set_id, sem_id).unwrap(), SemaphoreResult::Success);
+        assert_eq!(
+            manager.post(set_id, sem_id).unwrap(),
+            SemaphoreResult::Success
+        );
         assert_eq!(manager.get_value(set_id, sem_id).unwrap(), 5);
     }
 

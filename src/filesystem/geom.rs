@@ -2,7 +2,6 @@
 // Modular storage class, provider, consumer, and volume transformation topology
 // Inspired by FreeBSD's GEOM storage architecture (sys/geom)
 
-
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
@@ -61,8 +60,15 @@ impl GeomClass {
         self.providers.insert(provider.name.clone(), provider);
     }
 
-    pub fn attach_consumer(&mut self, provider_name: &str, rights: GeomAccessRights) -> Result<(), &'static str> {
-        let provider = self.providers.get_mut(provider_name).ok_or("Provider not found")?;
+    pub fn attach_consumer(
+        &mut self,
+        provider_name: &str,
+        rights: GeomAccessRights,
+    ) -> Result<(), &'static str> {
+        let provider = self
+            .providers
+            .get_mut(provider_name)
+            .ok_or("Provider not found")?;
         provider.consumers_count += 1;
         self.consumers.push(GeomConsumer {
             provider_name: provider_name.to_string(),
@@ -72,9 +78,20 @@ impl GeomClass {
     }
 
     /// Transforms a base provider into striped (RAID0) or mirror (RAID1) providers (GEOM_STRIPE/GEOM_MIRROR parity)
-    pub fn create_transformed_stripe(&mut self, new_provider_name: &str, provider1: &str, provider2: &str) -> Result<GeomProvider, &'static str> {
-        let p1 = self.providers.get(provider1).ok_or("Source provider 1 not found")?;
-        let p2 = self.providers.get(provider2).ok_or("Source provider 2 not found")?;
+    pub fn create_transformed_stripe(
+        &mut self,
+        new_provider_name: &str,
+        provider1: &str,
+        provider2: &str,
+    ) -> Result<GeomProvider, &'static str> {
+        let p1 = self
+            .providers
+            .get(provider1)
+            .ok_or("Source provider 1 not found")?;
+        let p2 = self
+            .providers
+            .get(provider2)
+            .ok_or("Source provider 2 not found")?;
 
         let min_sectors = p1.total_sectors.min(p2.total_sectors);
         let stripe_provider = GeomProvider::new(new_provider_name, p1.sector_size, min_sectors * 2);
@@ -108,6 +125,13 @@ mod tests {
         assert_eq!(stripe.name, "stripe/stripe0");
         assert_eq!(stripe.total_sectors, 2000000);
         assert_eq!(stripe.total_capacity_bytes(), 1024000000);
-        assert_eq!(geom_stripe_class.providers.get("ada0").unwrap().consumers_count, 1);
+        assert_eq!(
+            geom_stripe_class
+                .providers
+                .get("ada0")
+                .unwrap()
+                .consumers_count,
+            1
+        );
     }
 }

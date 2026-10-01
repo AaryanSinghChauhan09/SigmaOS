@@ -183,8 +183,8 @@ mod tests {
     #[test]
     fn test_hardenedbsd_wx_memory_enforcement() {
         let sandbox = UserlandSecuritySandbox::new(103);
-        assert!(sandbox.check_memory_protection(true, false)); // Writable only
-        assert!(sandbox.check_memory_protection(false, true)); // Executable only
-        assert!(!sandbox.check_memory_protection(true, true)); // W^X violation!
+        assert!(sandbox.check_memory_protection(true, false));  // Writable only
+        assert!(sandbox.check_memory_protection(false, true));  // Executable only
+        assert!(!sandbox.check_memory_protection(true, true));  // W^X violation!
     }
 }

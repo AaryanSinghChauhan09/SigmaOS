@@ -1,6 +1,7 @@
 //! Security, Privacy & Governance Framework (Items 61-80)
 //! Comprehensive Security, Privacy, and Open-Source Governance Suite for SigmaOS
 
+
 // ============================================================================
 // 61. Default Secure Posture
 // ============================================================================
@@ -182,8 +183,8 @@ pub struct PrivacyDashboardControls {
 impl PrivacyDashboardControls {
     pub fn new() -> Self {
         Self {
-            telemetry_opt_in: false,     // Opt-out by default
-            data_sharing_enabled: false, // No data sharing by default
+            telemetry_opt_in: false,       // Opt-out by default
+            data_sharing_enabled: false,   // No data sharing by default
             location_services_allowed: false,
         }
     }

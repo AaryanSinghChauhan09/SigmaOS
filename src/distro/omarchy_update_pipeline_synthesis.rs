@@ -40,8 +40,15 @@ impl fmt::Display for UpdateError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::LockAcquisitionFailed(msg) => write!(f, "Update lock error: {}", msg),
-            Self::InsufficientDiskSpace { required_gb, available_gb } => {
-                write!(f, "Insufficient free space on /: required {} GiB, found {} GiB", required_gb, available_gb)
+            Self::InsufficientDiskSpace {
+                required_gb,
+                available_gb,
+            } => {
+                write!(
+                    f,
+                    "Insufficient free space on /: required {} GiB, found {} GiB",
+                    required_gb, available_gb
+                )
             }
             Self::PacmanGuardAborted(msg) => write!(f, "Pacman guard aborted: {}", msg),
             Self::MigrationFailed(msg) => write!(f, "Migration error: {}", msg),
@@ -71,7 +78,9 @@ impl OmarchyUpdateLockManager {
 
     pub fn acquire_lock(&mut self) -> UpdateResult<()> {
         if self.is_locked {
-            return Err(UpdateError::LockAcquisitionFailed("Lock already held by current process".to_string()));
+            return Err(UpdateError::LockAcquisitionFailed(
+                "Lock already held by current process".to_string(),
+            ));
         }
         self.is_locked = true;
         Ok(())
@@ -104,13 +113,21 @@ impl OmarchyPacmanGuardHook {
     }
 
     /// Evaluates if a pacman transaction is authorized by Omarchy or explicit user bypass
-    pub fn evaluate_pacman_invocation(&self, is_sysupgrade: bool, env_omarchy_update_pacman: bool, env_allow_direct_pacman: bool) -> UpdateResult<String> {
+    pub fn evaluate_pacman_invocation(
+        &self,
+        is_sysupgrade: bool,
+        env_omarchy_update_pacman: bool,
+        env_allow_direct_pacman: bool,
+    ) -> UpdateResult<String> {
         if !is_sysupgrade {
             return Ok("Allowed: non-sysupgrade pacman transaction".to_string());
         }
 
         if env_omarchy_update_pacman {
-            return Ok("Allowed: transaction launched by Omarchy upgrader (OMARCHY_UPDATE_PACMAN=1)".to_string());
+            return Ok(
+                "Allowed: transaction launched by Omarchy upgrader (OMARCHY_UPDATE_PACMAN=1)"
+                    .to_string(),
+            );
         }
 
         if env_allow_direct_pacman {
@@ -161,7 +178,10 @@ impl OmarchyMigrationRunner {
         Ok(count)
     }
 
-    pub fn evaluate_migration_notification(&self, lock_manager: &OmarchyUpdateLockManager) -> Option<String> {
+    pub fn evaluate_migration_notification(
+        &self,
+        lock_manager: &OmarchyUpdateLockManager,
+    ) -> Option<String> {
         if lock_manager.is_locked {
             // Suppress notification if an update is actively holding the lock
             return None;
@@ -207,7 +227,11 @@ impl OmarchyUpdateOrchestrator {
         }
     }
 
-    pub fn execute_update_pipeline(&mut self, available_space_gb: u64, is_dev_linked: bool) -> UpdateResult<String> {
+    pub fn execute_update_pipeline(
+        &mut self,
+        available_space_gb: u64,
+        is_dev_linked: bool,
+    ) -> UpdateResult<String> {
         // 1. Acquire Lock
         self.lock_manager.acquire_lock()?;
 
@@ -223,7 +247,9 @@ impl OmarchyUpdateOrchestrator {
         // 3. Fast-forward dev checkout if dev-linked
         let mut steps = Vec::new();
         if is_dev_linked {
-            steps.push("Fast-forwarded active git checkout from remote tracking upstream".to_string());
+            steps.push(
+                "Fast-forwarded active git checkout from remote tracking upstream".to_string(),
+            );
         }
 
         // 4. Prune package cache (paccache -rk2)
@@ -237,7 +263,9 @@ impl OmarchyUpdateOrchestrator {
         steps.push("Started omarchy-update-stay-awake sleep inhibitor".to_string());
 
         // 7. System package upgrade with systemd-run --scope
-        let guard_res = self.pacman_guard.evaluate_pacman_invocation(true, true, false)?;
+        let guard_res = self
+            .pacman_guard
+            .evaluate_pacman_invocation(true, true, false)?;
         steps.push(format!("Executed pacman transaction: {}", guard_res));
 
         // 8. Run per-user migrations
@@ -253,9 +281,14 @@ impl OmarchyUpdateOrchestrator {
 
         // 11. Check restart triggers
         self.reboot_required = true;
-        steps.push("Triggered omarchy-update-restart check (reboot & shell restart required)".to_string());
+        steps.push(
+            "Triggered omarchy-update-restart check (reboot & shell restart required)".to_string(),
+        );
 
-        Ok(format!("Omarchy Update completed successfully:\n- {}", steps.join("\n- ")))
+        Ok(format!(
+            "Omarchy Update completed successfully:\n- {}",
+            steps.join("\n- ")
+        ))
     }
 }
 
@@ -280,7 +313,10 @@ mod tests {
     #[test]
     fn test_lock_manager() {
         let mut lock_mgr = OmarchyUpdateLockManager::new(Some("/run/user/1000"));
-        assert_eq!(lock_mgr.lock_file_path, "/run/user/1000/omarchy-update.lock");
+        assert_eq!(
+            lock_mgr.lock_file_path,
+            "/run/user/1000/omarchy-update.lock"
+        );
         assert!(lock_mgr.acquire_lock().is_ok());
         assert!(lock_mgr.acquire_lock().is_err());
         lock_mgr.release_lock();
@@ -322,7 +358,9 @@ mod tests {
     #[test]
     fn test_update_orchestrator_pipeline() {
         let mut orchestrator = OmarchyUpdateOrchestrator::new("/home/user", Some("/run/user/1000"));
-        orchestrator.migration_runner.register_migration("100_clean_cache.sh", false);
+        orchestrator
+            .migration_runner
+            .register_migration("100_clean_cache.sh", false);
 
         let res = orchestrator.execute_update_pipeline(15, false);
         assert!(res.is_ok());

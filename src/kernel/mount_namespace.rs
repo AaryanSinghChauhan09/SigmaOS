@@ -228,9 +228,7 @@ mod tests {
 
     #[test]
     fn test_mount_flags() {
-        let flags = MountFlags::new()
-            .with_read_only(true)
-            .with_noexec(true);
+        let flags = MountFlags::new().with_read_only(true).with_noexec(true);
 
         assert!(flags.read_only);
         assert!(flags.noexec);
@@ -239,7 +237,11 @@ mod tests {
 
     #[test]
     fn test_mount_point() {
-        let mount = MountPoint::new("/dev/sda1".to_string(), "/mnt/data".to_string(), "ext4".to_string());
+        let mount = MountPoint::new(
+            "/dev/sda1".to_string(),
+            "/mnt/data".to_string(),
+            "ext4".to_string(),
+        );
         assert_eq!(mount.source, "/dev/sda1");
         assert_eq!(mount.target, "/mnt/data");
         assert_eq!(mount.filesystem_type, "ext4");
@@ -248,8 +250,12 @@ mod tests {
     #[test]
     fn test_mount_point_with_flags() {
         let flags = MountFlags::new().with_read_only(true);
-        let mount = MountPoint::new("/dev/sda1".to_string(), "/mnt/data".to_string(), "ext4".to_string())
-            .with_flags(flags);
+        let mount = MountPoint::new(
+            "/dev/sda1".to_string(),
+            "/mnt/data".to_string(),
+            "ext4".to_string(),
+        )
+        .with_flags(flags);
 
         assert!(mount.flags.read_only);
     }
@@ -271,7 +277,11 @@ mod tests {
     fn test_mount_namespace_add_mount() {
         let mut namespace = MountNamespace::new(1);
 
-        let mount = MountPoint::new("/dev/sda1".to_string(), "/mnt/data".to_string(), "ext4".to_string());
+        let mount = MountPoint::new(
+            "/dev/sda1".to_string(),
+            "/mnt/data".to_string(),
+            "ext4".to_string(),
+        );
         namespace.add_mount(mount).unwrap();
 
         assert_eq!(namespace.mount_count(), 1);
@@ -281,7 +291,11 @@ mod tests {
     fn test_mount_namespace_duplicate_mount() {
         let mut namespace = MountNamespace::new(1);
 
-        let mount = MountPoint::new("/dev/sda1".to_string(), "/mnt/data".to_string(), "ext4".to_string());
+        let mount = MountPoint::new(
+            "/dev/sda1".to_string(),
+            "/mnt/data".to_string(),
+            "ext4".to_string(),
+        );
         namespace.add_mount(mount.clone()).unwrap();
         assert!(namespace.add_mount(mount).is_err());
     }
@@ -290,7 +304,11 @@ mod tests {
     fn test_mount_namespace_remove_mount() {
         let mut namespace = MountNamespace::new(1);
 
-        let mount = MountPoint::new("/dev/sda1".to_string(), "/mnt/data".to_string(), "ext4".to_string());
+        let mount = MountPoint::new(
+            "/dev/sda1".to_string(),
+            "/mnt/data".to_string(),
+            "ext4".to_string(),
+        );
         namespace.add_mount(mount).unwrap();
 
         namespace.remove_mount("/mnt/data").unwrap();
@@ -304,7 +322,11 @@ mod tests {
         let namespace_id = manager.create_namespace(None);
         assert_eq!(namespace_id, 1);
 
-        let mount = MountPoint::new("/dev/sda1".to_string(), "/mnt/data".to_string(), "ext4".to_string());
+        let mount = MountPoint::new(
+            "/dev/sda1".to_string(),
+            "/mnt/data".to_string(),
+            "ext4".to_string(),
+        );
         manager.add_mount(namespace_id, mount).unwrap();
 
         assert_eq!(manager.namespace_count(), 1);

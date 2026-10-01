@@ -10,7 +10,6 @@
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
 
-
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// CPU instruction extensions supported by SigmaOS
@@ -180,7 +179,11 @@ impl SovereignCompilerOptimizer {
 
             // CLFLUSH line size in bits 15-8 of EBX (in 8-byte quantities)
             let clflush_size = ((ebx >> 8) & 0xFF) as usize * 8;
-            if clflush_size > 0 { clflush_size } else { 64 }
+            if clflush_size > 0 {
+                clflush_size
+            } else {
+                64
+            }
         }
 
         #[cfg(not(target_arch = "x86_64"))]
@@ -229,7 +232,9 @@ pub fn init_cpu_optimizer() {
 /// Get global CPU optimizer reference
 pub fn get_cpu_optimizer() -> &'static SovereignCompilerOptimizer {
     unsafe {
-        GLOBAL_CPU_OPTIMIZER.as_ref().expect("CPU optimizer not initialized")
+        GLOBAL_CPU_OPTIMIZER
+            .as_ref()
+            .expect("CPU optimizer not initialized")
     }
 }
 
@@ -277,14 +282,32 @@ pub struct SovereignRegisterSet {
 impl SovereignRegisterSet {
     pub const fn new() -> Self {
         SovereignRegisterSet {
-            rax: 0, rbx: 0, rcx: 0, rdx: 0,
-            rsi: 0, rdi: 0, rbp: 0, rsp: 0,
-            r8: 0, r9: 0, r10: 0, r11: 0,
-            r12: 0, r13: 0, r14: 0, r15: 0,
-            rip: 0, rflags: 0,
-            cs: 0, ss: 0, ds: 0, es: 0,
-            fs: 0, gs: 0,
-            fs_base: 0, gs_base: 0,
+            rax: 0,
+            rbx: 0,
+            rcx: 0,
+            rdx: 0,
+            rsi: 0,
+            rdi: 0,
+            rbp: 0,
+            rsp: 0,
+            r8: 0,
+            r9: 0,
+            r10: 0,
+            r11: 0,
+            r12: 0,
+            r13: 0,
+            r14: 0,
+            r15: 0,
+            rip: 0,
+            rflags: 0,
+            cs: 0,
+            ss: 0,
+            ds: 0,
+            es: 0,
+            fs: 0,
+            gs: 0,
+            fs_base: 0,
+            gs_base: 0,
         }
     }
 
@@ -568,10 +591,18 @@ impl SovereignCpuRegisters {
     #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
     pub fn wrmsr(&self, msr: u32, val: u64) {
         match msr {
-            0x0000001B => self.emulated_msr_apic_base.store(val as usize, Ordering::SeqCst),
-            0xC0000100 => self.emulated_msr_fs_base.store(val as usize, Ordering::SeqCst),
-            0xC0000101 => self.emulated_msr_gs_base.store(val as usize, Ordering::SeqCst),
-            0xC0000102 => self.emulated_msr_kernel_gs_base.store(val as usize, Ordering::SeqCst),
+            0x0000001B => self
+                .emulated_msr_apic_base
+                .store(val as usize, Ordering::SeqCst),
+            0xC0000100 => self
+                .emulated_msr_fs_base
+                .store(val as usize, Ordering::SeqCst),
+            0xC0000101 => self
+                .emulated_msr_gs_base
+                .store(val as usize, Ordering::SeqCst),
+            0xC0000102 => self
+                .emulated_msr_kernel_gs_base
+                .store(val as usize, Ordering::SeqCst),
             _ => {}
         }
     }
@@ -724,13 +755,16 @@ impl Default for SovereignXcr0State {
 #[cfg(test_disabled)]
 mod tests {
     use super::*;
-    
+
     use std::vec;
 
     #[test]
     fn test_cpu_optimizer_creation() {
         let optimizer = SovereignCompilerOptimizer::new();
-        assert_eq!(optimizer.active_extension(), CpuInstructionExtension::Default);
+        assert_eq!(
+            optimizer.active_extension(),
+            CpuInstructionExtension::Default
+        );
     }
 
     #[test]
@@ -818,4 +852,3 @@ mod tests {
         assert!(xcr0.sse_enabled);
     }
 }
-

@@ -17,9 +17,9 @@
 #![allow(dead_code)]
 
 use std::collections::BTreeMap;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 // ─── Merkle Hash ──────────────────────────────────────────────────────────────
 
@@ -266,8 +266,7 @@ impl SovereignMerkleStore {
         for hash in all_hashes {
             if !reachable.contains_key(&hash) {
                 if let Some(entry) = self.entries.remove(&hash) {
-                    self.total_size_bytes =
-                        self.total_size_bytes.saturating_sub(entry.data_size);
+                    self.total_size_bytes = self.total_size_bytes.saturating_sub(entry.data_size);
                     removed.push(hash);
                 }
             }
@@ -318,7 +317,10 @@ impl SovereignMerkleStore {
     ///
     /// Inspired by NixOS's `nix-env --set-flag keep true` and profile generations.
     pub fn pin_generation(&mut self, gen_id: u32, hash: MerkleHash) {
-        self.pinned.entry(gen_id).or_insert_with(Vec::new).push(hash);
+        self.pinned
+            .entry(gen_id)
+            .or_insert_with(Vec::new)
+            .push(hash);
         if gen_id > self.current_generation {
             self.current_generation = gen_id;
         }
@@ -408,7 +410,12 @@ mod merkle_tests {
         let mut store = SovereignMerkleStore::new();
         let glibc = store.register_package("glibc", "2.38", vec![], 10_000);
         let libgcc = store.register_package("libgcc", "13.2", vec![glibc.clone()], 5_000);
-        let bash = store.register_package("bash", "5.2.1", vec![glibc.clone(), libgcc.clone()], 900_000);
+        let bash = store.register_package(
+            "bash",
+            "5.2.1",
+            vec![glibc.clone(), libgcc.clone()],
+            900_000,
+        );
 
         let closure = store.resolve_closure(&bash);
         assert!(closure.contains(&glibc));

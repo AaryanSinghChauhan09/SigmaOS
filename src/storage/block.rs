@@ -1,11 +1,14 @@
-use core::sync::atomic::{AtomicUsize, Ordering};
-use std::boxed::Box;
 /// OOP-based Block Storage for SigmaOS
 /// Based on 100-Improvement-Ideas.md storage management concepts
 /// Implements comprehensive block device abstraction, partition management,
 /// and caching for high-performance storage operations
+
+
+
 use std::collections::BTreeMap;
 use std::vec::Vec;
+use std::boxed::Box;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type BlockDeviceID = usize;
 pub type BlockNumber = u64;
@@ -639,8 +642,7 @@ mod tests {
         let sense = ScsiSenseData::new(
             ScsiSenseKey::IllegalRequest,
             ScsiAscQualifier::LbaOutOfRange,
-        )
-        .with_info(0x00018000);
+        ).with_info(0x00018000);
 
         assert_eq!(sense.sense_key, ScsiSenseKey::IllegalRequest);
         assert_eq!(sense.asc, 0x21);

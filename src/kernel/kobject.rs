@@ -5,7 +5,7 @@
 #![allow(dead_code)]
 
 use std::collections::BTreeMap;
-use std::sync::atomic::{AtomicU64, AtomicU32, Ordering};
+use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 
 /// Kobject type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -38,11 +38,7 @@ pub struct KObjectAttribute {
 
 impl KObjectAttribute {
     pub fn new(name: String, value: String, mode: u32) -> Self {
-        KObjectAttribute {
-            name,
-            value,
-            mode,
-        }
+        KObjectAttribute { name, value, mode }
     }
 }
 
@@ -60,7 +56,12 @@ pub struct KObject {
 }
 
 impl KObject {
-    pub fn new(id: KObjectId, name: String, obj_type: KObjectType, parent_id: Option<KObjectId>) -> Self {
+    pub fn new(
+        id: KObjectId,
+        name: String,
+        obj_type: KObjectType,
+        parent_id: Option<KObjectId>,
+    ) -> Self {
         KObject {
             id,
             name,
@@ -132,7 +133,7 @@ impl KObjectSubsystem {
     pub fn new() -> Self {
         let root_id = 1;
         let mut kobjects = BTreeMap::new();
-        
+
         let root = KObject::new(root_id, "/".to_string(), KObjectType::Directory, None);
         root.set_state(KObjectState::Added);
         kobjects.insert(root_id, root);
@@ -145,15 +146,23 @@ impl KObjectSubsystem {
     }
 
     /// Create a new kobject
-    pub fn create_kobject(&mut self, name: String, obj_type: KObjectType, parent_id: Option<KObjectId>) -> Result<KObjectId, &'static str> {
+    pub fn create_kobject(
+        &mut self,
+        name: String,
+        obj_type: KObjectType,
+        parent_id: Option<KObjectId>,
+    ) -> Result<KObjectId, &'static str> {
         let parent = match parent_id {
             Some(id) => self.kobjects.get(&id).ok_or("Parent kobject not found")?,
-            None => self.kobjects.get(&self.root_kobject_id).ok_or("Root kobject not found")?,
+            None => self
+                .kobjects
+                .get(&self.root_kobject_id)
+                .ok_or("Root kobject not found")?,
         };
 
         let id = self.next_kobject_id.fetch_add(1, Ordering::SeqCst);
         let kobject = KObject::new(id, name, obj_type, parent_id.or(Some(self.root_kobject_id)));
-        
+
         if let Some(pid) = parent_id {
             if let Some(parent) = self.kobjects.get_mut(&pid) {
                 parent.add_child(id);
@@ -188,7 +197,7 @@ impl KObjectSubsystem {
         }
 
         let kobject = self.kobjects.get(&id).ok_or("Kobject not found")?;
-        
+
         if !kobject.children.is_empty() {
             return Err("Cannot remove kobject with children");
         }
@@ -223,7 +232,7 @@ impl KObjectSubsystem {
         for part in parts {
             let current = self.kobjects.get(&current_id)?;
             let mut found = None;
-            
+
             for &child_id in &current.children {
                 if let Some(child) = self.kobjects.get(&child_id) {
                     if child.name == part {
@@ -232,7 +241,7 @@ impl KObjectSubsystem {
                     }
                 }
             }
-            
+
             current_id = found?;
         }
 
@@ -263,8 +272,10 @@ mod tests {
     #[test]
     fn test_kobject_creation() {
         let mut subsystem = KObjectSubsystem::new();
-        
-        let id = subsystem.create_kobject("test".to_string(), KObjectType::Directory, None).unwrap();
+
+        let id = subsystem
+            .create_kobject("test".to_string(), KObjectType::Directory, None)
+            .unwrap();
         assert!(id > 1);
         assert_eq!(subsystem.kobject_count(), 2);
     }
@@ -272,10 +283,14 @@ mod tests {
     #[test]
     fn test_kobject_hierarchy() {
         let mut subsystem = KObjectSubsystem::new();
-        
-        let parent_id = subsystem.create_kobject("parent".to_string(), KObjectType::Directory, None).unwrap();
-        let child_id = subsystem.create_kobject("child".to_string(), KObjectType::File, Some(parent_id)).unwrap();
-        
+
+        let parent_id = subsystem
+            .create_kobject("parent".to_string(), KObjectType::Directory, None)
+            .unwrap();
+        let child_id = subsystem
+            .create_kobject("child".to_string(), KObjectType::File, Some(parent_id))
+            .unwrap();
+
         let parent = subsystem.get_kobject(parent_id).unwrap();
         assert!(parent.children.contains(&child_id));
     }
@@ -283,21 +298,29 @@ mod tests {
     #[test]
     fn test_kobject_attributes() {
         let mut subsystem = KObjectSubsystem::new();
-        
-        let id = subsystem.create_kobject("test".to_string(), KObjectType::File, None).unwrap();
+
+        let id = subsystem
+            .create_kobject("test".to_string(), KObjectType::File, None)
+            .unwrap();
         let kobject = subsystem.get_kobject_mut(id).unwrap();
-        
-        kobject.add_attribute(KObjectAttribute::new("attr1".to_string(), "value1".to_string(), 0o644));
+
+        kobject.add_attribute(KObjectAttribute::new(
+            "attr1".to_string(),
+            "value1".to_string(),
+            0o644,
+        ));
         assert!(kobject.get_attribute("attr1").is_some());
     }
 
     #[test]
     fn test_kobject_refcount() {
         let mut subsystem = KObjectSubsystem::new();
-        
-        let id = subsystem.create_kobject("test".to_string(), KObjectType::File, None).unwrap();
+
+        let id = subsystem
+            .create_kobject("test".to_string(), KObjectType::File, None)
+            .unwrap();
         let kobject = subsystem.get_kobject(id).unwrap();
-        
+
         assert_eq!(kobject.get_refcount(), 1);
         kobject.increment_refcount();
         assert_eq!(kobject.get_refcount(), 2);
@@ -306,12 +329,16 @@ mod tests {
     #[test]
     fn test_kobject_path_lookup() {
         let mut subsystem = KObjectSubsystem::new();
-        
-        let parent_id = subsystem.create_kobject("parent".to_string(), KObjectType::Directory, None).unwrap();
+
+        let parent_id = subsystem
+            .create_kobject("parent".to_string(), KObjectType::Directory, None)
+            .unwrap();
         subsystem.add_kobject(parent_id).unwrap();
-        let child_id = subsystem.create_kobject("child".to_string(), KObjectType::File, Some(parent_id)).unwrap();
+        let child_id = subsystem
+            .create_kobject("child".to_string(), KObjectType::File, Some(parent_id))
+            .unwrap();
         subsystem.add_kobject(child_id).unwrap();
-        
+
         let found_id = subsystem.find_by_path("/parent/child");
         assert_eq!(found_id, Some(child_id));
     }
@@ -319,10 +346,12 @@ mod tests {
     #[test]
     fn test_kobject_removal() {
         let mut subsystem = KObjectSubsystem::new();
-        
-        let id = subsystem.create_kobject("test".to_string(), KObjectType::File, None).unwrap();
+
+        let id = subsystem
+            .create_kobject("test".to_string(), KObjectType::File, None)
+            .unwrap();
         subsystem.remove_kobject(id).unwrap();
-        
+
         assert_eq!(subsystem.kobject_count(), 1);
     }
 }

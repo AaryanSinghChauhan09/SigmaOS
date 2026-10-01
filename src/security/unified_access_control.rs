@@ -18,12 +18,12 @@ pub const DAC_EXECUTE: u32 = 0x1;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PosixAclTag {
-    UserObj,   // Owner permission
-    User,      // Named user
-    GroupObj,  // Primary group
-    Group,     // Named group
-    Mask,      // ACL mask limit
-    Other,     // World permission
+    UserObj,  // Owner permission
+    User,     // Named user
+    GroupObj, // Primary group
+    Group,    // Named group
+    Mask,     // ACL mask limit
+    Other,    // World permission
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -181,8 +181,11 @@ impl AccessVectorCache {
     ) -> String {
         format!(
             "{}:{}:{:?}->{}:{}:{:?}",
-            subject.domain_type, subject.sensitivity as u32, op,
-            object.domain_type, object.sensitivity as u32
+            subject.domain_type,
+            subject.sensitivity as u32,
+            op,
+            object.domain_type,
+            object.sensitivity as u32
         )
     }
 

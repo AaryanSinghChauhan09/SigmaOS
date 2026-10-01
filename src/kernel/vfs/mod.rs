@@ -16,5 +16,5 @@
 pub mod inode;
 pub mod vfs;
 
-pub use inode::*;
 pub use crate::filesystem::vfs::*;
+pub use inode::*;

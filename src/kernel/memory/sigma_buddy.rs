@@ -22,14 +22,14 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec;
 
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec;
-#[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec;
 
 use super::{MemoryBlock, PAGE_SIZE};
 use crate::klib::buddy_allocator::{BuddyAllocator, SimpleBuddyAllocator};
@@ -133,10 +133,10 @@ pub enum VmZone {
 /// Migration policies for physical memory zones (DMA32, Normal, HighMem)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ZoneFallbackPolicy {
-    StrictNoFallback,  // Fail allocation if requested zone is exhausted
-    FallbackToNormal,  // Fallback HighMem -> Normal
-    FallbackToDma32,   // Fallback Normal -> DMA32 (emergency only)
-    CascadingFallback, // Cascading HighMem -> Normal -> DMA32
+    StrictNoFallback,       // Fail allocation if requested zone is exhausted
+    FallbackToNormal,       // Fallback HighMem -> Normal
+    FallbackToDma32,        // Fallback Normal -> DMA32 (emergency only)
+    CascadingFallback,      // Cascading HighMem -> Normal -> DMA32
 }
 
 /// Zone Compaction and Reclaim Migration Policy
@@ -192,9 +192,7 @@ impl ZoneMigrationPolicyEngine {
             VmZone::Dma32 => {
                 if is_zone_available(dma32_zone) {
                     Ok(VmZone::Dma32)
-                } else if self.policy.fallback_policy != ZoneFallbackPolicy::StrictNoFallback
-                    && is_zone_available(normal_zone)
-                {
+                } else if self.policy.fallback_policy != ZoneFallbackPolicy::StrictNoFallback && is_zone_available(normal_zone) {
                     Ok(VmZone::Normal)
                 } else {
                     Err("Out of memory in DMA32 zone and fallback exhausted")
@@ -203,9 +201,7 @@ impl ZoneMigrationPolicyEngine {
             VmZone::Normal => {
                 if is_zone_available(normal_zone) {
                     Ok(VmZone::Normal)
-                } else if self.policy.fallback_policy == ZoneFallbackPolicy::CascadingFallback
-                    || self.policy.fallback_policy == ZoneFallbackPolicy::FallbackToDma32
-                {
+                } else if self.policy.fallback_policy == ZoneFallbackPolicy::CascadingFallback || self.policy.fallback_policy == ZoneFallbackPolicy::FallbackToDma32 {
                     if is_zone_available(dma32_zone) {
                         Ok(VmZone::Dma32)
                     } else {
@@ -221,9 +217,7 @@ impl ZoneMigrationPolicyEngine {
                 } else if self.policy.fallback_policy != ZoneFallbackPolicy::StrictNoFallback {
                     if is_zone_available(normal_zone) {
                         Ok(VmZone::Normal)
-                    } else if self.policy.fallback_policy == ZoneFallbackPolicy::CascadingFallback
-                        && is_zone_available(dma32_zone)
-                    {
+                    } else if self.policy.fallback_policy == ZoneFallbackPolicy::CascadingFallback && is_zone_available(dma32_zone) {
                         Ok(VmZone::Dma32)
                     } else {
                         Err("Out of memory in HighMem zone and all fallbacks exhausted")
@@ -250,18 +244,10 @@ impl ZoneMigrationPolicyEngine {
         if migrate_count == 0 {
             return Err("No inactive pages available for zone migration");
         }
-        from_zone
-            .inactive_pages
-            .fetch_sub(migrate_count, Ordering::SeqCst);
-        from_zone
-            .free_pages
-            .fetch_add(migrate_count, Ordering::SeqCst);
-        to_zone
-            .free_pages
-            .fetch_sub(migrate_count, Ordering::SeqCst);
-        to_zone
-            .active_pages
-            .fetch_add(migrate_count, Ordering::SeqCst);
+        from_zone.inactive_pages.fetch_sub(migrate_count, Ordering::SeqCst);
+        from_zone.free_pages.fetch_add(migrate_count, Ordering::SeqCst);
+        to_zone.free_pages.fetch_sub(migrate_count, Ordering::SeqCst);
+        to_zone.active_pages.fetch_add(migrate_count, Ordering::SeqCst);
         Ok(migrate_count)
     }
 }
@@ -650,9 +636,7 @@ mod tests {
         let normal = BsdVmZoneAllocator::new(VmZone::Normal, 100);
         let highmem = BsdVmZoneAllocator::new(VmZone::HighMem, 0);
 
-        let selected = engine
-            .select_allocation_zone(VmZone::HighMem, &dma32, &normal, &highmem)
-            .unwrap();
+        let selected = engine.select_allocation_zone(VmZone::HighMem, &dma32, &normal, &highmem).unwrap();
         assert_eq!(selected, VmZone::Normal);
 
         normal.inactive_pages.store(50, Ordering::SeqCst);

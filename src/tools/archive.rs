@@ -2,13 +2,9 @@
 //! Archive Tools (tar/zip Inspiration)
 //! Archive manager, compression tools, and archive operations
 
-
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-
-
-
 
 /// Compression type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -72,7 +68,11 @@ impl ArchiveManager {
         }
     }
 
-    pub fn create_archive(&mut self, name: &str, compression: CompressionType) -> Result<String, ArchiveError> {
+    pub fn create_archive(
+        &mut self,
+        name: &str,
+        compression: CompressionType,
+    ) -> Result<String, ArchiveError> {
         let archive = Archive::new(name, compression);
         let id = archive.name.clone();
         self.archives.push(archive);
@@ -88,7 +88,11 @@ impl ArchiveManager {
         }
     }
 
-    pub fn add_to_archive(&mut self, archive_name: &str, file_path: &str) -> Result<(), ArchiveError> {
+    pub fn add_to_archive(
+        &mut self,
+        archive_name: &str,
+        file_path: &str,
+    ) -> Result<(), ArchiveError> {
         if let Some(archive) = self.archives.iter_mut().find(|a| a.name == archive_name) {
             archive.add_file(ArchiveFile {
                 path: file_path.to_string(),
@@ -268,7 +272,11 @@ impl PaxTarHeader {
         let len = path_record.len() + 3;
         pax_body.push_str(&format!("{}{}", len, path_record));
 
-        let mtime_record = format!(" mtime={}.{:09}\n", self.mtime_nanos / 1_000_000_000, self.mtime_nanos % 1_000_000_000);
+        let mtime_record = format!(
+            " mtime={}.{:09}\n",
+            self.mtime_nanos / 1_000_000_000,
+            self.mtime_nanos % 1_000_000_000
+        );
         let mlen = mtime_record.len() + 3;
         pax_body.push_str(&format!("{}{}", mlen, mtime_record));
 
@@ -298,7 +306,9 @@ pub struct SovereignCpioEngine {
 
 impl SovereignCpioEngine {
     pub fn new() -> Self {
-        Self { entries: Vec::new() }
+        Self {
+            entries: Vec::new(),
+        }
     }
 
     pub fn add_entry(&mut self, name: &str, data: &[u8], is_dir: bool) {
@@ -380,7 +390,11 @@ impl MultiThreadedParallelCompressor {
         }
     }
 
-    pub fn compress_parallel_chunks(&self, input: &[u8], comp_type: CompressionType) -> Result<Vec<u8>, ArchiveError> {
+    pub fn compress_parallel_chunks(
+        &self,
+        input: &[u8],
+        comp_type: CompressionType,
+    ) -> Result<Vec<u8>, ArchiveError> {
         let mut compressed_output = Vec::new();
         let chunks: Vec<&[u8]> = input.chunks(self.chunk_size_bytes).collect();
 
@@ -516,7 +530,9 @@ mod tests {
     #[test]
     fn test_archive_manager() {
         let mut manager = ArchiveManager::new();
-        let id = manager.create_archive("test.tar", CompressionType::Gzip).unwrap();
+        let id = manager
+            .create_archive("test.tar", CompressionType::Gzip)
+            .unwrap();
         assert_eq!(id, "test.tar");
     }
 
@@ -578,7 +594,9 @@ mod tests {
     fn test_parallel_stream_compressor() {
         let parallel = MultiThreadedParallelCompressor::new(4);
         let data = b"Parallel Chunk Stream Data Payload for Pigz and Zstd -T0 Parity";
-        let compressed = parallel.compress_parallel_chunks(data, CompressionType::Zstd).unwrap();
+        let compressed = parallel
+            .compress_parallel_chunks(data, CompressionType::Zstd)
+            .unwrap();
 
         assert!(compressed.len() > 4);
     }

@@ -53,9 +53,17 @@ impl Keyring {
     }
 
     /// Add a key to the keyring
-    pub fn add_key(&mut self, key_type: KeyType, uid: u32, gid: u32, permissions: u32, description: KeyDescription, expiry: Option<u64>) -> u64 {
+    pub fn add_key(
+        &mut self,
+        key_type: KeyType,
+        uid: u32,
+        gid: u32,
+        permissions: u32,
+        description: KeyDescription,
+        expiry: Option<u64>,
+    ) -> u64 {
         let serial = self.next_serial.fetch_add(1, Ordering::SeqCst);
-        
+
         let key = Key {
             serial,
             key_type,
@@ -65,7 +73,7 @@ impl Keyring {
             description,
             expiry,
         };
-        
+
         self.keys.insert(serial, key);
         serial
     }
@@ -87,7 +95,10 @@ impl Keyring {
 
     /// Search keys by type
     pub fn search_by_type(&self, key_type: KeyType) -> Vec<&Key> {
-        self.keys.values().filter(|k| k.key_type == key_type).collect()
+        self.keys
+            .values()
+            .filter(|k| k.key_type == key_type)
+            .collect()
     }
 
     /// Search keys by UID
@@ -135,21 +146,21 @@ impl KeyManager {
             next_keyring_id: AtomicU64::new(1),
             root_keyring: 1,
         };
-        
+
         // Create root keyring
         let root = Keyring::new("root".to_string(), None);
         manager.keyrings.insert(1, root);
-        
+
         manager
     }
 
     /// Create a keyring
     pub fn create_keyring(&mut self, name: String, parent_id: Option<u64>) -> u64 {
         let id = self.next_keyring_id.fetch_add(1, Ordering::SeqCst);
-        
+
         let keyring = Keyring::new(name, parent_id);
         self.keyrings.insert(id, keyring);
-        
+
         id
     }
 
@@ -158,7 +169,7 @@ impl KeyManager {
         if id == self.root_keyring {
             return Err("Cannot delete root keyring");
         }
-        
+
         if self.keyrings.remove(&id).is_some() {
             Ok(())
         } else {
@@ -177,17 +188,32 @@ impl KeyManager {
     }
 
     /// Add a key to a keyring
-    pub fn add_key(&mut self, keyring_id: u64, key_type: KeyType, uid: u32, gid: u32, permissions: u32, description: KeyDescription, expiry: Option<u64>) -> Result<u64, &'static str> {
-        let keyring = self.keyrings.get_mut(&keyring_id).ok_or("Keyring not found")?;
-        
+    pub fn add_key(
+        &mut self,
+        keyring_id: u64,
+        key_type: KeyType,
+        uid: u32,
+        gid: u32,
+        permissions: u32,
+        description: KeyDescription,
+        expiry: Option<u64>,
+    ) -> Result<u64, &'static str> {
+        let keyring = self
+            .keyrings
+            .get_mut(&keyring_id)
+            .ok_or("Keyring not found")?;
+
         let serial = keyring.add_key(key_type, uid, gid, permissions, description, expiry);
         Ok(serial)
     }
 
     /// Remove a key from a keyring
     pub fn remove_key(&mut self, keyring_id: u64, serial: u64) -> Result<(), &'static str> {
-        let keyring = self.keyrings.get_mut(&keyring_id).ok_or("Keyring not found")?;
-        
+        let keyring = self
+            .keyrings
+            .get_mut(&keyring_id)
+            .ok_or("Keyring not found")?;
+
         if keyring.remove_key(serial).is_some() {
             Ok(())
         } else {
@@ -223,26 +249,28 @@ impl KeyManager {
     }
 
     /// Add a trusted key (e.g., for encryption)
-    pub fn add_trusted_key(&mut self, keyring_id: u64, key_id: &str, key_data: Vec<u8>) -> Result<u64, &'static str> {
+    pub fn add_trusted_key(
+        &mut self,
+        keyring_id: u64,
+        key_id: &str,
+        key_data: Vec<u8>,
+    ) -> Result<u64, &'static str> {
         let description = KeyDescription {
             type_id: "trusted".to_string(),
             description: format!("Trusted key: {}", key_id),
             payload: key_data,
         };
 
-        self.add_key(
-            keyring_id,
-            KeyType::User,
-            0,
-            0,
-            0o600,
-            description,
-            None,
-        )
+        self.add_key(keyring_id, KeyType::User, 0, 0, 0o600, description, None)
     }
 
     /// Add a session key
-    pub fn add_session_key(&mut self, keyring_id: u64, key_data: Vec<u8>, expiry: u64) -> Result<u64, &'static str> {
+    pub fn add_session_key(
+        &mut self,
+        keyring_id: u64,
+        key_data: Vec<u8>,
+        expiry: u64,
+    ) -> Result<u64, &'static str> {
         let description = KeyDescription {
             type_id: "session".to_string(),
             description: "Session key".to_string(),
@@ -300,7 +328,9 @@ mod tests {
             payload: vec![1, 2, 3, 4],
         };
 
-        let serial = manager.add_key(1, KeyType::User, 0, 0, 0o600, description, None).unwrap();
+        let serial = manager
+            .add_key(1, KeyType::User, 0, 0, 0o600, description, None)
+            .unwrap();
         assert_eq!(serial, 1);
     }
 
@@ -314,7 +344,9 @@ mod tests {
             payload: vec![1, 2, 3, 4],
         };
 
-        let serial = manager.add_key(1, KeyType::User, 0, 0, 0o600, description, None).unwrap();
+        let serial = manager
+            .add_key(1, KeyType::User, 0, 0, 0o600, description, None)
+            .unwrap();
         assert!(manager.remove_key(1, serial).is_ok());
     }
 
@@ -328,10 +360,17 @@ mod tests {
             payload: vec![1, 2, 3, 4],
         };
 
-        manager.add_key(1, KeyType::User, 0, 0, 0o600, description, None).unwrap();
-        manager.add_key(1, KeyType::Session, 0, 0, 0o600, description.clone(), None).unwrap();
+        manager
+            .add_key(1, KeyType::User, 0, 0, 0o600, description, None)
+            .unwrap();
+        manager
+            .add_key(1, KeyType::Session, 0, 0, 0o600, description.clone(), None)
+            .unwrap();
 
-        let user_keys = manager.get_keyring(1).unwrap().search_by_type(KeyType::User);
+        let user_keys = manager
+            .get_keyring(1)
+            .unwrap()
+            .search_by_type(KeyType::User);
         assert_eq!(user_keys.len(), 1);
     }
 
@@ -345,8 +384,10 @@ mod tests {
             payload: vec![1, 2, 3, 4],
         };
 
-        let serial = manager.add_key(1, KeyType::Session, 0, 0, 0o600, description, Some(100)).unwrap();
-        
+        let serial = manager
+            .add_key(1, KeyType::Session, 0, 0, 0o600, description, Some(100))
+            .unwrap();
+
         // Key should be expired (timestamp > 100)
         assert!(!manager.get_keyring(1).unwrap().check_expiry(serial));
     }

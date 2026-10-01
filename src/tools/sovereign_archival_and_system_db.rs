@@ -189,7 +189,8 @@ impl SigmaOsEtcDatabaseParser {
             shell_path: parts[6].to_string(),
         };
 
-        self.passwd_records.insert(rec.username.clone(), rec.clone());
+        self.passwd_records
+            .insert(rec.username.clone(), rec.clone());
         Some(rec)
     }
 
@@ -241,15 +242,24 @@ impl SovereignArchivalAndDbSuite {
         let mut results = BTreeMap::new();
 
         // 1. Tar packer check
-        self.tar_packer.add_file("etc/hostname", 0o644, b"sigmaos-host\n");
+        self.tar_packer
+            .add_file("etc/hostname", 0o644, b"sigmaos-host\n");
         let tar_bytes = self.tar_packer.pack_ustar_archive();
         let zstd_bytes = self.tar_packer.compress_zstd_stream(&tar_bytes);
-        results.insert("tar_zstd_archival_packer".to_string(), tar_bytes.len() >= 1536 && zstd_bytes.starts_with(&[0x28, 0xB5, 0x2F, 0xFD]));
+        results.insert(
+            "tar_zstd_archival_packer".to_string(),
+            tar_bytes.len() >= 1536 && zstd_bytes.starts_with(&[0x28, 0xB5, 0x2F, 0xFD]),
+        );
 
         // 2. etc parser check
         let root_user = self.etc_parser.passwd_records.get("root");
-        let root_ok = root_user.map(|u| u.uid == 0 && u.home_dir == "/root").unwrap_or(false);
-        results.insert("posix_etc_database_parser".to_string(), root_ok && !self.etc_parser.fstab_entries.is_empty());
+        let root_ok = root_user
+            .map(|u| u.uid == 0 && u.home_dir == "/root")
+            .unwrap_or(false);
+        results.insert(
+            "posix_etc_database_parser".to_string(),
+            root_ok && !self.etc_parser.fstab_entries.is_empty(),
+        );
 
         results
     }
@@ -288,7 +298,9 @@ mod tests {
         assert_eq!(root.uid, 0);
         assert_eq!(root.shell_path, "/bin/bash");
 
-        let custom_user = parser.parse_passwd_line("testuser:x:1001:1001:Test User:/home/testuser:/bin/sh").unwrap();
+        let custom_user = parser
+            .parse_passwd_line("testuser:x:1001:1001:Test User:/home/testuser:/bin/sh")
+            .unwrap();
         assert_eq!(custom_user.username, "testuser");
         assert_eq!(custom_user.uid, 1001);
 

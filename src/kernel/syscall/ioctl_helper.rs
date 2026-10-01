@@ -1,11 +1,10 @@
 // Unix/BSD-grade ioctl (Input/Output Control) syscall helper and decoder
 // Decodes direction, size, group-type, and sequence parameters for hardware control calls.
 
-
 /// Direction bitmasks for standard UNIX/BSD ioctl commands
-pub const IOC_VOID: u32  = 0x20000000; // No parameters, purely action command
-pub const IOC_OUT: u32   = 0x40000000; // Copy out parameters to userspace
-pub const IOC_IN: u32    = 0x80000000; // Copy in parameters from userspace
+pub const IOC_VOID: u32 = 0x20000000; // No parameters, purely action command
+pub const IOC_OUT: u32 = 0x40000000; // Copy out parameters to userspace
+pub const IOC_IN: u32 = 0x80000000; // Copy in parameters from userspace
 pub const IOC_INOUT: u32 = 0xC0000000; // Bidirectional data transfer
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -61,14 +60,20 @@ impl IoctlDecoder {
     }
 
     /// Enforces memory boundaries: verifies the user-supplied pointer matches decoded size constraints.
-    pub fn validate_parameter_bounds(cmd: u32, arg_ptr: usize, memory_limit: usize) -> Result<(), &'static str> {
+    pub fn validate_parameter_bounds(
+        cmd: u32,
+        arg_ptr: usize,
+        memory_limit: usize,
+    ) -> Result<(), &'static str> {
         let decoded = Self::decode_command(cmd);
         if decoded.parameter_size > 0 {
             if arg_ptr == 0 {
                 return Err("SYS_IOCTL_FAULT: Null parameter pointer passed");
             }
             // Simple overflow verification
-            let end_addr = arg_ptr.checked_add(decoded.parameter_size).ok_or("SYS_IOCTL_FAULT: Pointer bounds overflow")?;
+            let end_addr = arg_ptr
+                .checked_add(decoded.parameter_size)
+                .ok_or("SYS_IOCTL_FAULT: Pointer bounds overflow")?;
             if end_addr > memory_limit {
                 return Err("SYS_IOCTL_FAULT: Parameter exceeds safe memory space limits");
             }

@@ -5,17 +5,14 @@ use std::boxed::Box;
 /// Prototype encryption service API for SigmaOS.
 /// Based on Roadmap Item 15: Encryption service
 /// The former XOR-based transform was not encryption; operations now fail closed.
+
 use core::sync::atomic::AtomicUsize;
 
 pub type KeyID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum CipherType {
-    AES = 0,
-    ChaCha20 = 1,
-    XOR = 2,
-}
+pub enum CipherType { AES = 0, ChaCha20 = 1, XOR = 2 }
 
 pub trait EncryptionKey {
     fn id(&self) -> KeyID;
@@ -35,7 +32,9 @@ impl SimpleEncryptionKey {
     pub fn new(id: KeyID, cipher_type: CipherType, key_data: &[u8]) -> Self {
         let mut key_array = [0u8; 32];
         let key_len = key_data.len().min(32);
-        key_array[..key_len].copy_from_slice(&key_data[..key_len]);
+        unsafe {
+            core::ptr::copy_nonoverlapping(key_data.as_ptr(), key_array.as_mut_ptr(), key_len);
+        }
         SimpleEncryptionKey {
             id,
             cipher_type,
@@ -46,12 +45,8 @@ impl SimpleEncryptionKey {
 }
 
 impl EncryptionKey for SimpleEncryptionKey {
-    fn id(&self) -> KeyID {
-        self.id
-    }
-    fn cipher_type(&self) -> CipherType {
-        self.cipher_type
-    }
+    fn id(&self) -> KeyID { self.id }
+    fn cipher_type(&self) -> CipherType { self.cipher_type }
     fn key_data(&self) -> &[u8] {
         // Bolt ⚡ Optimization: Store explicit key length on instantiation to eliminate
         // O(N) zero-byte linear scanning (.position(|&b| b == 0)) on every key slice lookup,
@@ -80,6 +75,7 @@ pub enum CryptoError {
     InvalidKey = 3,
     CryptoUnavailable = 4,
 }
+pub enum CryptoError { Success = 0, KeyNotFound = 1, EncryptionFailed = 2, InvalidKey = 3 }
 
 pub struct SimpleEncryptionService {
     keys: Vec<Option<Box<dyn EncryptionKey>>>,
@@ -87,12 +83,7 @@ pub struct SimpleEncryptionService {
 }
 
 impl SimpleEncryptionService {
-    pub fn new() -> Self {
-        SimpleEncryptionService {
-            keys: Vec::new(),
-            next_id: AtomicUsize::new(1),
-        }
-    }
+    pub fn new() -> Self { SimpleEncryptionService { keys: Vec::new(), next_id: AtomicUsize::new(1) } }
 }
 
 impl EncryptionService for SimpleEncryptionService {

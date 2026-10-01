@@ -44,7 +44,8 @@ impl DoubleRatchetState {
         let mut msg_key = self.send_chain_key;
         let mut ciphertext = Vec::with_capacity(plaintext.len());
         for (i, &byte) in plaintext.iter().enumerate() {
-            let key_byte = msg_key[i % msg_key.len()] ^ ((self.message_number as u8).wrapping_mul(31));
+            let key_byte =
+                msg_key[i % msg_key.len()] ^ ((self.message_number as u8).wrapping_mul(31));
             ciphertext.push(byte ^ key_byte);
         }
         ciphertext
@@ -55,7 +56,8 @@ impl DoubleRatchetState {
         let mut msg_key = self.receive_chain_key;
         let mut plaintext = Vec::with_capacity(ciphertext.len());
         for (i, &byte) in ciphertext.iter().enumerate() {
-            let key_byte = msg_key[i % msg_key.len()] ^ ((self.message_number as u8).wrapping_mul(31));
+            let key_byte =
+                msg_key[i % msg_key.len()] ^ ((self.message_number as u8).wrapping_mul(31));
             plaintext.push(byte ^ key_byte);
         }
         plaintext
@@ -70,10 +72,10 @@ mod tests {
     fn test_double_ratchet_encryption() {
         let mut state = DoubleRatchetState::new([1; 32]);
         let plaintext = b"Hello Signal";
-        
+
         let ciphertext = state.ratchet_encrypt(plaintext);
         assert_ne!(ciphertext, plaintext);
-        
+
         let decrypted = state.ratchet_decrypt(&ciphertext);
         assert_eq!(decrypted, plaintext);
         assert_eq!(state.message_number, 1);

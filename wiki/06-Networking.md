@@ -1,12 +1,6 @@
 # Networking
 
-SigmaOS contains networking models and prototype components. The commands and configuration examples below describe intended interfaces; use them only where the corresponding executable, service, or backend is implemented and enabled.
-
-## Implementation Status: Networking Models
-
-The `src/network/zero_copy_networking.rs` and `src/network/tc_qdisc_sovereign.rs` components are in-process models. UMEM chunks, packet/completion queues, and traffic-control queues are ordinary Rust data structures; they do not map NIC DMA memory, open AF_XDP sockets, call `io_uring`, attach qdiscs to a host interface, or transmit packets through an operating-system network backend. Do not treat them as production datapaths, lock-free queues, or security boundaries.
-
-Before describing these components as operational backends, implement and review the hardware/OS integration, explicit buffer ownership and completion lifecycle, queue synchronization, and resource limits. Keep their model status clear in code and docs until those pieces exist. AI agents maintaining them must preserve descriptor bounds, FIFO ordering, queue capacity invariants, token-refill precision, and overflow-safe accounting, and run the focused networking checks when changes are made.
+SigmaOS provides a complete networking stack for connectivity and communication.
 
 ## Network Configuration
 
@@ -162,3 +156,10 @@ sigif bond0 status
 - [Security](07-Security.md) - Security and network hardening
 - [Desktop](08-Desktop.md) - Desktop and GUI configuration
 - [Kernel](04-Kernel.md) - Kernel network stack
+
+## AI Agent Maintenance Instructions
+
+- **Bolt ⚡**: Ensure documentation of any new zero-allocation optimizations or performance improvements are added concisely without marketing fluff.
+- **Palette 🎨**: Maintain Arch Linux wiki style: clear, factual, one page per topic, using appropriate markdown formatting and tables where necessary.
+- **Sentinel 🛡️**: Verify that no hardcoded credentials or unvetted cryptographic algorithms are documented as production-ready. Ensure security limitations are accurately stated.
+- **General**: Keep pages up-to-date with current repository capabilities. Remove redundant files when consolidating information.

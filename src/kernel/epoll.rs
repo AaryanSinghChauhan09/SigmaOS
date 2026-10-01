@@ -59,12 +59,24 @@ impl EpollEvents {
 
     pub fn to_u32(&self) -> u32 {
         let mut bits = 0u32;
-        if self.in_events { bits |= 0x001; }
-        if self.out_events { bits |= 0x004; }
-        if self.rdhup { bits |= 0x2000; }
-        if self.pri { bits |= 0x002; }
-        if self.err { bits |= 0x008; }
-        if self.hup { bits |= 0x010; }
+        if self.in_events {
+            bits |= 0x001;
+        }
+        if self.out_events {
+            bits |= 0x004;
+        }
+        if self.rdhup {
+            bits |= 0x2000;
+        }
+        if self.pri {
+            bits |= 0x002;
+        }
+        if self.err {
+            bits |= 0x008;
+        }
+        if self.hup {
+            bits |= 0x010;
+        }
         bits
     }
 }
@@ -92,10 +104,7 @@ pub struct EpollEvent {
 
 impl EpollEvent {
     pub fn new(events: EpollEvents, data: u64) -> Self {
-        Self {
-            events,
-            data,
-        }
+        Self { events, data }
     }
 
     /// Check if event is ready for read
@@ -146,21 +155,17 @@ impl EpollInstance {
                 self.interests.insert(fd, event);
                 Ok(())
             }
-            EpollOp::Del => {
-                match self.interests.remove(&fd) {
-                    Some(_) => Ok(()),
-                    None => Err(format!("File descriptor {} not found", fd)),
+            EpollOp::Del => match self.interests.remove(&fd) {
+                Some(_) => Ok(()),
+                None => Err(format!("File descriptor {} not found", fd)),
+            },
+            EpollOp::Mod => match self.interests.get_mut(&fd) {
+                Some(e) => {
+                    *e = event;
+                    Ok(())
                 }
-            }
-            EpollOp::Mod => {
-                match self.interests.get_mut(&fd) {
-                    Some(e) => {
-                        *e = event;
-                        Ok(())
-                    }
-                    None => Err(format!("File descriptor {} not found", fd)),
-                }
-            }
+                None => Err(format!("File descriptor {} not found", fd)),
+            },
         }
     }
 
@@ -231,7 +236,13 @@ impl EpollManager {
     }
 
     /// Add/modify/delete a file descriptor
-    pub fn ctl(&self, instance_id: u64, op: EpollOp, fd: i32, event: EpollEvent) -> Result<(), String> {
+    pub fn ctl(
+        &self,
+        instance_id: u64,
+        op: EpollOp,
+        fd: i32,
+        event: EpollEvent,
+    ) -> Result<(), String> {
         let mut instances = self.instances.lock().unwrap();
         match instances.get_mut(&instance_id) {
             Some(inst) => inst.ctl(op, fd, event),

@@ -152,7 +152,9 @@ impl MatePkgPpaRepositoryManager {
 
     pub fn add_ppa(&mut self, ppa_uri: &str, codename: &str) -> Result<String, &'static str> {
         // e.g. "ppa:ubuntu-mate-dev/ppa"
-        let stripped = ppa_uri.strip_prefix("ppa:").ok_or("Invalid PPA URI format")?;
+        let stripped = ppa_uri
+            .strip_prefix("ppa:")
+            .ok_or("Invalid PPA URI format")?;
         let mut parts = stripped.split('/');
         let owner = parts.next().ok_or("Missing PPA owner")?.to_string();
         let name = parts.next().unwrap_or("ppa").to_string();
@@ -356,7 +358,8 @@ mod tests {
 
     #[test]
     fn test_apt_url_protocol_handler() {
-        let (pkg, ver) = MateAptUrlProtocolHandler::parse_apt_url("apt:caja?version=1.26.0").unwrap();
+        let (pkg, ver) =
+            MateAptUrlProtocolHandler::parse_apt_url("apt:caja?version=1.26.0").unwrap();
         assert_eq!(pkg, "caja");
         assert_eq!(ver, Some("1.26.0".to_string()));
 
@@ -369,7 +372,9 @@ mod tests {
     fn test_ppa_repository_manager() {
         let mut ppa_mgr = MatePkgPpaRepositoryManager::new();
         let list_content = ppa_mgr.add_ppa("ppa:ubuntu-mate-dev/ppa", "betsy").unwrap();
-        assert!(list_content.contains("http://ppa.launchpad.net/ubuntu-mate-dev/ppa/ubuntu betsy main"));
+        assert!(
+            list_content.contains("http://ppa.launchpad.net/ubuntu-mate-dev/ppa/ubuntu betsy main")
+        );
         assert_eq!(ppa_mgr.repositories.len(), 1);
     }
 

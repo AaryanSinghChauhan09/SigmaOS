@@ -28,7 +28,7 @@ pub struct OsiProtocolDataUnit {
     pub dst_port: u16,
     pub transport_protocol: String, // "TCP", "UDP", "QUIC", "SCTP"
     pub session_id: String,
-    pub content_mime_type: String,  // e.g. "application/json", "application/cbor"
+    pub content_mime_type: String, // e.g. "application/json", "application/cbor"
     pub payload: Vec<u8>,
 }
 
@@ -81,15 +81,22 @@ impl SovereignOsiLayerEngine {
     }
 
     /// Process a packet upwards through all 7 OSI Layers (Encapsulation / Decapsulation)
-    pub fn process_upward_osi_stack(&mut self, mut pdu: OsiProtocolDataUnit) -> Result<OsiProtocolDataUnit, String> {
+    pub fn process_upward_osi_stack(
+        &mut self,
+        mut pdu: OsiProtocolDataUnit,
+    ) -> Result<OsiProtocolDataUnit, String> {
         // Layer 1: Physical Link Check
         pdu.current_layer = OsiLayerLevel::Layer1Physical;
-        self.layer_pipeline_log.push("L1 Physical: Bit-rate 10Gbps full-duplex link UP".to_string());
+        self.layer_pipeline_log
+            .push("L1 Physical: Bit-rate 10Gbps full-duplex link UP".to_string());
 
         // Layer 2: Data Link MAC & VLAN Filtering
         pdu.current_layer = OsiLayerLevel::Layer2DataLink;
         if let Some(vlan) = pdu.vlan_id {
-            self.layer_pipeline_log.push(format!("L2 Data Link: Decapsulated VLAN 802.1Q ID {}", vlan));
+            self.layer_pipeline_log.push(format!(
+                "L2 Data Link: Decapsulated VLAN 802.1Q ID {}",
+                vlan
+            ));
         }
 
         // Layer 3: Network IPv4/IPv6 Routing
@@ -97,29 +104,43 @@ impl SovereignOsiLayerEngine {
         if pdu.dst_ip.is_empty() {
             return Err("L3 Network Error: Missing destination IP address".to_string());
         }
-        self.layer_pipeline_log.push(format!("L3 Network: Route lookup {} -> {}", pdu.src_ip, pdu.dst_ip));
+        self.layer_pipeline_log.push(format!(
+            "L3 Network: Route lookup {} -> {}",
+            pdu.src_ip, pdu.dst_ip
+        ));
 
         // Layer 4: Transport TCP/UDP/QUIC Flow Control
         pdu.current_layer = OsiLayerLevel::Layer4Transport;
-        self.layer_pipeline_log.push(format!("L4 Transport: Flow {} :{} -> :{}", pdu.transport_protocol, pdu.src_port, pdu.dst_port));
+        self.layer_pipeline_log.push(format!(
+            "L4 Transport: Flow {} :{} -> :{}",
+            pdu.transport_protocol, pdu.src_port, pdu.dst_port
+        ));
 
         // Layer 5: Session ML-KEM Post-Quantum TLS / SOCKS5 Session
         pdu.current_layer = OsiLayerLevel::Layer5Session;
         if pdu.session_id.is_empty() {
             pdu.session_id = format!("SESS_PQC_{}", self.processed_packets_count + 1);
         }
-        self.layer_pipeline_log.push(format!("L5 Session: Validated session ID {}", pdu.session_id));
+        self.layer_pipeline_log.push(format!(
+            "L5 Session: Validated session ID {}",
+            pdu.session_id
+        ));
 
         // Layer 6: Presentation Serialization & Decryption
         pdu.current_layer = OsiLayerLevel::Layer6Presentation;
-        self.layer_pipeline_log.push(format!("L6 Presentation: Transcoded MIME {}", pdu.content_mime_type));
+        self.layer_pipeline_log.push(format!(
+            "L6 Presentation: Transcoded MIME {}",
+            pdu.content_mime_type
+        ));
 
         // Layer 7: Application Dispatch (HTTP/3, SSH, LocalSend, Taildrop)
         pdu.current_layer = OsiLayerLevel::Layer7Application;
-        self.layer_pipeline_log.push("L7 Application: Dispatched payload to application endpoint".to_string());
+        self.layer_pipeline_log
+            .push("L7 Application: Dispatched payload to application endpoint".to_string());
 
         self.processed_packets_count += 1;
-        self.active_sessions.insert(pdu.session_id.clone(), pdu.clone());
+        self.active_sessions
+            .insert(pdu.session_id.clone(), pdu.clone());
 
         Ok(pdu)
     }
@@ -146,7 +167,13 @@ mod tests {
         assert_eq!(processed.current_layer, OsiLayerLevel::Layer7Application);
         assert!(!processed.session_id.is_empty());
         assert_eq!(engine.processed_packets_count, 1);
-        assert!(engine.layer_pipeline_log.iter().any(|l| l.contains("L1 Physical")));
-        assert!(engine.layer_pipeline_log.iter().any(|l| l.contains("L7 Application")));
+        assert!(engine
+            .layer_pipeline_log
+            .iter()
+            .any(|l| l.contains("L1 Physical")));
+        assert!(engine
+            .layer_pipeline_log
+            .iter()
+            .any(|l| l.contains("L7 Application")));
     }
 }

@@ -4,8 +4,6 @@
 #![allow(clippy::new_without_default)]
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-
-
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
@@ -197,7 +195,13 @@ mod tests {
     #[test]
     fn test_sqpoll_ring_capacity_limit() {
         let mut ring = SovereignIoUringSqpoll::new(2, 5);
-        let sqe = SovereignSqe { opcode: IoUringOp::Nop, fd: 0, addr: 0, len: 0, user_data: 1 };
+        let sqe = SovereignSqe {
+            opcode: IoUringOp::Nop,
+            fd: 0,
+            addr: 0,
+            len: 0,
+            user_data: 1,
+        };
         assert!(ring.submit_sqe(sqe.clone()));
         assert!(ring.submit_sqe(sqe.clone()));
         assert!(!ring.submit_sqe(sqe)); // Exceeds ring capacity
@@ -229,7 +233,13 @@ mod tests {
     #[test]
     fn test_sqpoll_nop_operation() {
         let mut ring = SovereignIoUringSqpoll::new(8, 5);
-        ring.submit_sqe(SovereignSqe { opcode: IoUringOp::Nop, fd: 0, addr: 0, len: 0, user_data: 42 });
+        ring.submit_sqe(SovereignSqe {
+            opcode: IoUringOp::Nop,
+            fd: 0,
+            addr: 0,
+            len: 0,
+            user_data: 42,
+        });
         ring.poll_cycle();
         let cqe = ring.reap_cqe().unwrap();
         assert_eq!(cqe.user_data, 42);

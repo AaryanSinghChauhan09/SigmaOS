@@ -21,6 +21,7 @@ pub struct TechMediaArticleFeed {
     pub url: String,
     pub category: String,
     pub timestamp_epoch: u64,
+    pub tags: Vec<String>,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -32,12 +33,12 @@ impl LinuxPressFeedEngine {
     pub fn new() -> Self {
         let sample_articles = vec![
             TechMediaArticleFeed {
-                title: "Linux Kernel 6.12 LTS Released with Real-time PREEMPT_RT Support"
-                    .to_string(),
+                title: "Linux Kernel 6.12 LTS Released with Real-time PREEMPT_RT Support".to_string(),
                 portal: "9to5Linux".to_string(),
                 url: "https://9to5linux.com/linux-kernel-6-12-lts-released".to_string(),
                 category: "Kernel".to_string(),
                 timestamp_epoch: 1730000000,
+                tags: vec!["kernel".to_string(), "rt".to_string()],
             },
             TechMediaArticleFeed {
                 title: "Top 10 Zero-Dependency Rust Tools for Systems Software".to_string(),
@@ -45,22 +46,23 @@ impl LinuxPressFeedEngine {
                 url: "https://itsfoss.com/zero-dependency-rust-tools".to_string(),
                 category: "OpenSource".to_string(),
                 timestamp_epoch: 1730000100,
+                tags: vec!["rust".to_string(), "tools".to_string()],
             },
             TechMediaArticleFeed {
-                title: "SigmaOS Architecture Analysis: Surpassing Legacy Monolithic Kernels"
-                    .to_string(),
+                title: "SigmaOS Architecture Analysis: Surpassing Legacy Monolithic Kernels".to_string(),
                 portal: "TechCrunch".to_string(),
                 url: "https://techcrunch.com/sigmaos-sovereign-kernel".to_string(),
                 category: "Enterprise".to_string(),
                 timestamp_epoch: 1730000200,
+                tags: vec!["architecture".to_string(), "sigmaos".to_string()],
             },
             TechMediaArticleFeed {
-                title: "DistroWatch Review: Sovereign Operating System Performance Benchmarks"
-                    .to_string(),
+                title: "DistroWatch Review: Sovereign Operating System Performance Benchmarks".to_string(),
                 portal: "DistroWatch".to_string(),
                 url: "https://distrowatch.com/sigmaos-review".to_string(),
                 category: "DistroReview".to_string(),
                 timestamp_epoch: 1730000300,
+                tags: vec!["distro".to_string(), "benchmarks".to_string()],
             },
             TechMediaArticleFeed {
                 title: "DIY Linux Handhelds & RISC-V Single Board Computer Hacks".to_string(),
@@ -68,6 +70,7 @@ impl LinuxPressFeedEngine {
                 url: "https://geeky-gadgets.com/diy-riscv-handheld".to_string(),
                 category: "Hardware".to_string(),
                 timestamp_epoch: 1730000400,
+                tags: vec!["riscv".to_string(), "sbc".to_string()],
             },
             TechMediaArticleFeed {
                 title: "Enterprise Linux Administration & Zero-Trust Infrastructure".to_string(),
@@ -75,6 +78,7 @@ impl LinuxPressFeedEngine {
                 url: "https://linux.com/enterprise-zero-trust".to_string(),
                 category: "Sysadmin".to_string(),
                 timestamp_epoch: 1730000500,
+                tags: vec!["zero-trust".to_string(), "sysadmin".to_string()],
             },
             TechMediaArticleFeed {
                 title: "KDnuggets Guide to Optimizing LLM Memory Pipelines in Rust".to_string(),
@@ -82,6 +86,7 @@ impl LinuxPressFeedEngine {
                 url: "https://kdnuggets.com/rust-llm-memory-optimization".to_string(),
                 category: "DataScience".to_string(),
                 timestamp_epoch: 1730000600,
+                tags: vec!["ai".to_string(), "llm".to_string()],
             },
             TechMediaArticleFeed {
                 title: "HWBusters PSU Rail Voltage Ripple & Transient Spike Analysis".to_string(),
@@ -89,6 +94,7 @@ impl LinuxPressFeedEngine {
                 url: "https://hwbusters.com/psu-ripple-analysis".to_string(),
                 category: "Hardware".to_string(),
                 timestamp_epoch: 1730000700,
+                tags: vec!["psu".to_string(), "telemetry".to_string()],
             },
             TechMediaArticleFeed {
                 title: "ITDaily Enterprise IT Cloud Hybrid Governance Framework".to_string(),
@@ -96,6 +102,7 @@ impl LinuxPressFeedEngine {
                 url: "https://itdaily.com/enterprise-cloud-governance".to_string(),
                 category: "Enterprise".to_string(),
                 timestamp_epoch: 1730000800,
+                tags: vec!["cloud".to_string(), "governance".to_string()],
             },
             TechMediaArticleFeed {
                 title: "How-To Geek Terminal Guide to High-Performance Disk Tuning".to_string(),
@@ -103,6 +110,7 @@ impl LinuxPressFeedEngine {
                 url: "https://howtogeek.com/terminal-disk-tuning".to_string(),
                 category: "Desktop".to_string(),
                 timestamp_epoch: 1730000900,
+                tags: vec!["terminal".to_string(), "tuning".to_string()],
             },
             TechMediaArticleFeed {
                 title: "Linux.org Kernel Optimization & Preemptive Scheduler Tweaks".to_string(),
@@ -110,30 +118,31 @@ impl LinuxPressFeedEngine {
                 url: "https://linux.org/kernel-scheduler-tweaks".to_string(),
                 category: "Kernel".to_string(),
                 timestamp_epoch: 1730001000,
+                tags: vec!["scheduler".to_string(), "kernel".to_string()],
             },
             TechMediaArticleFeed {
-                title: "InfoWorld Enterprise Software Architecture & Cloud-Native Security"
-                    .to_string(),
+                title: "InfoWorld Enterprise Software Architecture & Cloud-Native Security".to_string(),
                 portal: "InfoWorld".to_string(),
                 url: "https://infoworld.com/cloud-native-security".to_string(),
                 category: "Security".to_string(),
                 timestamp_epoch: 1730001100,
+                tags: vec!["security".to_string(), "cloud".to_string()],
             },
             TechMediaArticleFeed {
-                title: "LinuxFoundation Open Source SBOM & License Compliance Standards"
-                    .to_string(),
+                title: "LinuxFoundation Open Source SBOM & License Compliance Standards".to_string(),
                 portal: "LinuxFoundation".to_string(),
                 url: "https://linuxfoundation.org/sbom-standards".to_string(),
                 category: "Governance".to_string(),
                 timestamp_epoch: 1730001200,
+                tags: vec!["sbom".to_string(), "compliance".to_string()],
             },
             TechMediaArticleFeed {
-                title: "MakeUseOf Lightweight Desktop Environment Comparisons for Low-RAM Systems"
-                    .to_string(),
+                title: "MakeUseOf Lightweight Desktop Environment Comparisons for Low-RAM Systems".to_string(),
                 portal: "MakeUseOf".to_string(),
                 url: "https://makeuseof.com/lightweight-desktop-guide".to_string(),
                 category: "Desktop".to_string(),
                 timestamp_epoch: 1730001300,
+                tags: vec!["desktop".to_string(), "ram".to_string()],
             },
             TechMediaArticleFeed {
                 title: "PCWorld Laptop Battery Health Threshold Charging Benchmarks".to_string(),
@@ -141,22 +150,23 @@ impl LinuxPressFeedEngine {
                 url: "https://pcworld.com/battery-health-benchmarks".to_string(),
                 category: "Hardware".to_string(),
                 timestamp_epoch: 1730001400,
+                tags: vec!["battery".to_string(), "hardware".to_string()],
             },
             TechMediaArticleFeed {
-                title: "MarkTechPost SOTA Local RAG Vector Embeddings Context Benchmark"
-                    .to_string(),
+                title: "MarkTechPost SOTA Local RAG Vector Embeddings Context Benchmark".to_string(),
                 portal: "MarkTechPost".to_string(),
                 url: "https://marktechpost.com/local-rag-vector-benchmark".to_string(),
                 category: "AI".to_string(),
                 timestamp_epoch: 1730001500,
+                tags: vec!["rag".to_string(), "embeddings".to_string()],
             },
             TechMediaArticleFeed {
-                title: "WindowsLatest WSL Cross-Platform Kernel Interoperability Advances"
-                    .to_string(),
+                title: "WindowsLatest WSL Cross-Platform Kernel Interoperability Advances".to_string(),
                 portal: "WindowsLatest".to_string(),
                 url: "https://windowslatest.com/wsl-kernel-advances".to_string(),
                 category: "Interoperability".to_string(),
                 timestamp_epoch: 1730001600,
+                tags: vec!["wsl".to_string(), "kernel".to_string()],
             },
             TechMediaArticleFeed {
                 title: "TechSpot Gaming Driver Performance & Frame Pacing Comparison".to_string(),
@@ -164,6 +174,7 @@ impl LinuxPressFeedEngine {
                 url: "https://techspot.com/driver-frame-pacing".to_string(),
                 category: "Gaming".to_string(),
                 timestamp_epoch: 1730001700,
+                tags: vec!["gaming".to_string(), "fps".to_string()],
             },
             TechMediaArticleFeed {
                 title: "TheNewStack eBPF-Powered Kubernetes Service Mesh Observability".to_string(),
@@ -171,6 +182,7 @@ impl LinuxPressFeedEngine {
                 url: "https://thenewstack.io/ebpf-service-mesh".to_string(),
                 category: "CloudNative".to_string(),
                 timestamp_epoch: 1730001800,
+                tags: vec!["ebpf".to_string(), "k8s".to_string()],
             },
             TechMediaArticleFeed {
                 title: "TechPowerUp GPU-Z VRM Thermal & Power Curve Telemetry Analysis".to_string(),
@@ -178,22 +190,23 @@ impl LinuxPressFeedEngine {
                 url: "https://techpowerup.com/gpu-vrm-telemetry".to_string(),
                 category: "Hardware".to_string(),
                 timestamp_epoch: 1730001900,
+                tags: vec!["gpu".to_string(), "vrm".to_string()],
             },
             TechMediaArticleFeed {
-                title: "WindowsCentral Phone Link & Unified Cross-Device Clipboard Integration"
-                    .to_string(),
+                title: "WindowsCentral Phone Link & Unified Cross-Device Clipboard Integration".to_string(),
                 portal: "WindowsCentral".to_string(),
                 url: "https://windowscentral.com/phone-link-clipboard".to_string(),
                 category: "Interoperability".to_string(),
                 timestamp_epoch: 1730002000,
+                tags: vec!["phone-link".to_string(), "clipboard".to_string()],
             },
             TechMediaArticleFeed {
-                title: "Phoronix Test Suite Automated Performance Benchmark Matrix Update"
-                    .to_string(),
+                title: "Phoronix Test Suite Automated Performance Benchmark Matrix Update".to_string(),
                 portal: "Phoronix".to_string(),
                 url: "https://phoronix.com/phoronix-test-suite-update".to_string(),
                 category: "Benchmarks".to_string(),
                 timestamp_epoch: 1730002100,
+                tags: vec!["benchmarks".to_string(), "testing".to_string()],
             },
             TechMediaArticleFeed {
                 title: "XDA-Developers Android APK Sideloading & Custom Kernel Tweaks".to_string(),
@@ -201,30 +214,31 @@ impl LinuxPressFeedEngine {
                 url: "https://xda-developers.com/android-kernel-tweaks".to_string(),
                 category: "Mobile".to_string(),
                 timestamp_epoch: 1730002200,
+                tags: vec!["android".to_string(), "apk".to_string()],
             },
             TechMediaArticleFeed {
-                title: "ZDNet Enterprise Security Deployment & Linux Server Hardening Audits"
-                    .to_string(),
+                title: "ZDNet Enterprise Security Deployment & Linux Server Hardening Audits".to_string(),
                 portal: "ZDNet".to_string(),
                 url: "https://zdnet.com/enterprise-linux-hardening".to_string(),
                 category: "Security".to_string(),
                 timestamp_epoch: 1730002300,
+                tags: vec!["hardening".to_string(), "security".to_string()],
             },
             TechMediaArticleFeed {
-                title: "OpenSourceForU SELinux Mandatory Access Control Policy Tutorial"
-                    .to_string(),
+                title: "OpenSourceForU SELinux Mandatory Access Control Policy Tutorial".to_string(),
                 portal: "OpenSourceForU".to_string(),
                 url: "https://opensourceforu.com/selinux-mac-tutorial".to_string(),
                 category: "Security".to_string(),
                 timestamp_epoch: 1730002400,
+                tags: vec!["selinux".to_string(), "mac".to_string()],
             },
             TechMediaArticleFeed {
-                title: "PCMag Comprehensive Linux Endpoint Security & Anti-Malware Review"
-                    .to_string(),
+                title: "PCMag Comprehensive Linux Endpoint Security & Anti-Malware Review".to_string(),
                 portal: "PCMag".to_string(),
                 url: "https://pcmag.com/linux-security-review".to_string(),
                 category: "Security".to_string(),
                 timestamp_epoch: 1730002500,
+                tags: vec!["anti-malware".to_string(), "endpoint".to_string()],
             },
             TechMediaArticleFeed {
                 title: "LinuxTeck Automated iptables & UFW Security Hardening Guide".to_string(),
@@ -232,14 +246,15 @@ impl LinuxPressFeedEngine {
                 url: "https://linuxteck.com/ufw-iptables-hardening".to_string(),
                 category: "Security".to_string(),
                 timestamp_epoch: 1730002600,
+                tags: vec!["firewall".to_string(), "ufw".to_string()],
             },
             TechMediaArticleFeed {
-                title: "Appuals Automated System Repair & Dependency Troubleshooting Guide"
-                    .to_string(),
+                title: "Appuals Automated System Repair & Dependency Troubleshooting Guide".to_string(),
                 portal: "Appuals".to_string(),
                 url: "https://appuals.com/linux-system-repair-guide".to_string(),
                 category: "Troubleshooting".to_string(),
                 timestamp_epoch: 1730002700,
+                tags: vec!["repair".to_string(), "troubleshooting".to_string()],
             },
         ];
         Self {
@@ -302,6 +317,33 @@ impl LinuxPressFeedEngine {
             .find(|a| a.portal.eq_ignore_ascii_case("DistroWatch") && a.title.contains(distro))
             .cloned()
     }
+
+    pub fn search_articles(&self, query: &str) -> Vec<TechMediaArticleFeed> {
+        let q_lower = query.to_lowercase();
+        self.articles
+            .iter()
+            .filter(|a| {
+                a.title.to_lowercase().contains(&q_lower)
+                    || a.category.to_lowercase().contains(&q_lower)
+            })
+            .cloned()
+            .collect()
+    }
+
+    pub fn filter_by_tag(&self, tag: &str) -> Vec<TechMediaArticleFeed> {
+        let tag_lower = tag.to_lowercase();
+        self.articles
+            .iter()
+            .filter(|a| a.tags.iter().any(|t| t.to_lowercase() == tag_lower))
+            .cloned()
+            .collect()
+    }
+
+    pub fn rank_recommended_articles(&self) -> Vec<TechMediaArticleFeed> {
+        let mut sorted = self.articles.clone();
+        sorted.sort_by(|a, b| b.timestamp_epoch.cmp(&a.timestamp_epoch));
+        sorted
+    }
 }
 
 // ============================================================================
@@ -314,6 +356,7 @@ pub struct PowerThermalTelemetryNode {
     pub cpu_temp_c: f32,
     pub gpu_temp_c: f32,
     pub gpu_vrm_temp_c: f32,
+    pub gpu_memory_junction_temp_c: f32,
     pub rail_12v_v: f32,
     pub rail_5v_v: f32,
     pub rail_3v3_v: f32,
@@ -322,6 +365,8 @@ pub struct PowerThermalTelemetryNode {
     pub fan_rpm: u32,
     pub transient_spike_detected: bool,
     pub frame_pacing_latency_ms: f32,
+    pub atx31_12v_2x6_cable_balanced: bool,
+    pub atx31_current_load_amps: f32,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -345,6 +390,7 @@ impl HardwareTelemetryMonitor {
                 cpu_temp_c: 42.0,
                 gpu_temp_c: 39.5,
                 gpu_vrm_temp_c: 45.2,
+                gpu_memory_junction_temp_c: 68.0,
                 rail_12v_v: 12.04,
                 rail_5v_v: 5.02,
                 rail_3v3_v: 3.31,
@@ -353,8 +399,35 @@ impl HardwareTelemetryMonitor {
                 fan_rpm: 1200,
                 transient_spike_detected: false,
                 frame_pacing_latency_ms: 1.2,
+                atx31_12v_2x6_cable_balanced: true,
+                atx31_current_load_amps: 28.5,
             },
         }
+    }
+
+    pub fn verify_atx31_cable_safety(&self) -> bool {
+        self.current_telemetry.atx31_12v_2x6_cable_balanced
+            && self.current_telemetry.atx31_current_load_amps <= 55.0
+    }
+
+    pub fn calculate_acoustic_fan_curve(&self) -> u32 {
+        let max_temp = self
+            .current_telemetry
+            .cpu_temp_c
+            .max(self.current_telemetry.gpu_temp_c);
+        if max_temp < 45.0 {
+            800
+        } else if max_temp < 65.0 {
+            1400
+        } else if max_temp < 80.0 {
+            2200
+        } else {
+            3200
+        }
+    }
+
+    pub fn check_gpu_junction_thermal_safety(&self) -> bool {
+        self.current_telemetry.gpu_memory_junction_temp_c < 105.0
     }
 
     pub fn is_power_and_thermal_nominal(&self) -> bool {
@@ -381,11 +454,7 @@ impl HardwareTelemetryMonitor {
         self.current_telemetry.frame_pacing_latency_ms <= 8.33 // Smooth 120 FPS frame pacing
     }
 
-    pub fn enforce_pcworld_battery_charging_threshold(
-        &self,
-        current_charge_pct: u8,
-        threshold_pct: u8,
-    ) -> bool {
+    pub fn enforce_pcworld_battery_charging_threshold(&self, current_charge_pct: u8, threshold_pct: u8) -> bool {
         if current_charge_pct >= threshold_pct {
             // Stop charging at specified threshold (e.g., 80%) to preserve lithium battery lifespan
             false
@@ -394,10 +463,7 @@ impl HardwareTelemetryMonitor {
         }
     }
 
-    pub fn apply_makeuseof_lightweight_de_memory_governor(
-        &self,
-        free_ram_mb: usize,
-    ) -> &'static str {
+    pub fn apply_makeuseof_lightweight_de_memory_governor(&self, free_ram_mb: usize) -> &'static str {
         if free_ram_mb < 512 {
             "Zenith-Minimal-Tiling"
         } else if free_ram_mb < 2048 {
@@ -461,11 +527,7 @@ impl PhoronixBenchEngine {
 
     pub fn rank_system_benchmarks(&self) -> Vec<PhoronixBenchmarkSuiteNode> {
         let mut list: Vec<_> = self.benchmarks.values().cloned().collect();
-        list.sort_by(|a, b| {
-            b.score_ops_per_sec
-                .partial_cmp(&a.score_ops_per_sec)
-                .unwrap()
-        });
+        list.sort_by(|a, b| b.score_ops_per_sec.partial_cmp(&a.score_ops_per_sec).unwrap());
         list
     }
 }
@@ -512,14 +574,10 @@ impl AiMlTensorDatasetPipeline {
     pub fn calculate_std_dev(&self, column_name: &str) -> Option<f64> {
         let mean = self.calculate_mean(column_name)?;
         let col = self.dataset_columns.get(column_name)?;
-        let variance = col
-            .iter()
-            .map(|value| {
-                let diff = mean - (*value);
-                diff * diff
-            })
-            .sum::<f64>()
-            / col.len() as f64;
+        let variance = col.iter().map(|value| {
+            let diff = mean - (*value);
+            diff * diff
+        }).sum::<f64>() / col.len() as f64;
         Some(variance.sqrt())
     }
 
@@ -531,6 +589,33 @@ impl AiMlTensorDatasetPipeline {
         } else {
             Some(((mean_curr - mean_base) / mean_base).abs())
         }
+    }
+
+    pub fn normalize_vector_zero_copy(&self, data: &[f64]) -> Vec<f64> {
+        if data.is_empty() {
+            return Vec::new();
+        }
+        let sum: f64 = data.iter().sum();
+        let mean = sum / data.len() as f64;
+        let variance: f64 =
+            data.iter().map(|&x| (x - mean) * (x - mean)).sum::<f64>() / data.len() as f64;
+        let std_dev = variance.sqrt().max(1e-9);
+        data.iter().map(|&x| (x - mean) / std_dev).collect()
+    }
+
+    pub fn compute_covariance_matrix(&self, col_a: &str, col_b: &str) -> Option<f64> {
+        let data_a = self.dataset_columns.get(col_a)?;
+        let data_b = self.dataset_columns.get(col_b)?;
+        if data_a.is_empty() || data_a.len() != data_b.len() {
+            return None;
+        }
+        let mean_a = self.calculate_mean(col_a)?;
+        let mean_b = self.calculate_mean(col_b)?;
+        let mut cov = 0.0f64;
+        for i in 0..data_a.len() {
+            cov += (data_a[i] - mean_a) * (data_b[i] - mean_b);
+        }
+        Some(cov / data_a.len() as f64)
     }
 }
 
@@ -561,17 +646,10 @@ impl ModelPerformanceBenchmark {
     }
 
     pub fn evaluate_llm_performance(&self, model_name: &str) -> Option<LlmInferenceMetrics> {
-        self.models
-            .iter()
-            .find(|m| m.model_name == model_name)
-            .cloned()
+        self.models.iter().find(|m| m.model_name == model_name).cloned()
     }
 
-    pub fn estimate_context_window_vram(
-        &self,
-        model_name: &str,
-        context_tokens: u32,
-    ) -> Option<u32> {
+    pub fn estimate_context_window_vram(&self, model_name: &str, context_tokens: u32) -> Option<u32> {
         let model = self.evaluate_llm_performance(model_name)?;
         let base_vram = model.memory_vram_mb as u32;
         let token_cost_mb = (context_tokens as f64 * 0.125) as u32;
@@ -613,6 +691,7 @@ pub struct SbomLicenseComplianceRecord {
 pub struct ZeroTrustSecuritySandbox {
     pub policies: BTreeMap<String, ZeroTrustSandboxPolicy>,
     pub firewall_rules_active: usize,
+    pub fips_140_3_mode_active: bool,
 }
 
 impl ZeroTrustSecuritySandbox {
@@ -630,6 +709,22 @@ impl ZeroTrustSecuritySandbox {
         Self {
             policies,
             firewall_rules_active: 24,
+            fips_140_3_mode_active: true,
+        }
+    }
+
+    pub fn verify_fips_compliance(&self) -> bool {
+        self.fips_140_3_mode_active
+    }
+
+    pub fn landlock_unveil_path(&mut self, service_name: &str, path: &str) -> bool {
+        if let Some(policy) = self.policies.get_mut(service_name) {
+            if !policy.unveil_paths.contains(&path.to_string()) {
+                policy.unveil_paths.push(path.to_string());
+            }
+            true
+        } else {
+            false
         }
     }
 
@@ -645,12 +740,7 @@ impl ZeroTrustSecuritySandbox {
         self.firewall_rules_active >= 10
     }
 
-    pub fn enforce_strict_pledge_unveil(
-        &mut self,
-        service_name: &str,
-        promise: &str,
-        path: &str,
-    ) -> bool {
+    pub fn enforce_strict_pledge_unveil(&mut self, service_name: &str, promise: &str, path: &str) -> bool {
         if let Some(p) = self.policies.get_mut(service_name) {
             if !p.pledge_promises.contains(&promise.to_string()) {
                 p.pledge_promises.push(promise.to_string());
@@ -690,10 +780,9 @@ impl OpenSourceGovernanceEngine {
     }
 
     pub fn audit_license_compliance(&self) -> bool {
-        self.records.iter().all(|r| {
-            r.vulnerability_count == 0
-                && (r.license_spdx == "MIT" || r.license_spdx == "Apache-2.0")
-        })
+        self.records
+            .iter()
+            .all(|r| r.vulnerability_count == 0 && (r.license_spdx == "MIT" || r.license_spdx == "Apache-2.0"))
     }
 
     pub fn scan_sbom_vulnerabilities(&self) -> u32 {
@@ -719,6 +808,8 @@ pub struct CrossPlatformDeviceBridge {
     pub devices: Vec<CrossPlatformDeviceSpec>,
     pub shared_clipboard_text: String,
     pub synced_notifications: Vec<String>,
+    pub adb_wireless_paired: bool,
+    pub drag_and_drop_buffer: Vec<u8>,
 }
 
 impl CrossPlatformDeviceBridge {
@@ -733,7 +824,17 @@ impl CrossPlatformDeviceBridge {
             devices,
             shared_clipboard_text: String::new(),
             synced_notifications: Vec::new(),
+            adb_wireless_paired: true,
+            drag_and_drop_buffer: Vec::new(),
         }
+    }
+
+    pub fn verify_adb_wireless_pairing(&self) -> bool {
+        self.adb_wireless_paired && !self.devices.is_empty()
+    }
+
+    pub fn send_drag_and_drop_stream(&mut self, data: &[u8]) {
+        self.drag_and_drop_buffer = data.to_vec();
     }
 
     pub fn register_device(&mut self, device: CrossPlatformDeviceSpec) {
@@ -743,10 +844,7 @@ impl CrossPlatformDeviceBridge {
     pub fn sideload_app(&mut self, device_id: &str, app_id: &str) -> Result<String, &'static str> {
         if let Some(dev) = self.devices.iter_mut().find(|d| d.device_id == device_id) {
             dev.side_loaded_apps.push(app_id.to_string());
-            Ok(format!(
-                "Sideloaded app '{}' onto device '{}'",
-                app_id, device_id
-            ))
+            Ok(format!("Sideloaded app '{}' onto device '{}'", app_id, device_id))
         } else {
             Err("Device not found")
         }
@@ -803,9 +901,7 @@ impl GeekyGadgetsTechReviewEngine {
     }
 
     pub fn verify_sbc_support(&self, board_name: &str) -> bool {
-        self.sbc_configs
-            .iter()
-            .any(|b| b.board_name.contains(board_name))
+        self.sbc_configs.iter().any(|b| b.board_name.contains(board_name))
     }
 
     pub fn evaluate_hardware_viability(&self) -> bool {
@@ -866,13 +962,8 @@ impl HowToGeekGuideSystemEngine {
         mappings.insert("show IP address".to_string(), "ip a".to_string());
         mappings.insert("list running processes".to_string(), "htop".to_string());
         mappings.insert("check disk space".to_string(), "duf".to_string());
-        mappings.insert(
-            "search text in files".to_string(),
-            "rg 'pattern'".to_string(),
-        );
-        Self {
-            command_mappings: mappings,
-        }
+        mappings.insert("search text in files".to_string(), "rg 'pattern'".to_string());
+        Self { command_mappings: mappings }
     }
 
     pub fn translate_user_query(&self, query: &str) -> Option<String> {
@@ -1299,25 +1390,35 @@ impl SovereignTechMediaMasterSuite {
         let latest_news = self.press_feeds.get_latest_news();
         let feeds_ok =
             !latest_news.is_empty() && self.press_feeds.get_portal_coverage_count() >= 25;
+        let feeds_ok = !latest_news.is_empty()
+            && self.press_feeds.get_portal_coverage_count() >= 25
+            && !self.press_feeds.search_articles("kernel").is_empty()
+            && !self.press_feeds.filter_by_tag("rust").is_empty();
+        let feeds_ok = !latest_news.is_empty() && self.press_feeds.get_portal_coverage_count() >= 25;
 
         // Verify Hardware Telemetry & Bench
         let telemetry_ok = self.telemetry.is_power_and_thermal_nominal()
             && self.telemetry.verify_vrm_and_psu_ripple()
-            && self.telemetry.validate_frame_pacing();
+            && self.telemetry.validate_frame_pacing()
+            && self.telemetry.verify_atx31_cable_safety()
+            && self.telemetry.check_gpu_junction_thermal_safety()
+            && self.telemetry.calculate_acoustic_fan_curve() > 0;
         let bench_res = self.phoronix_bench.run_automated_benchmark("synthetic_mem");
         let bench_ok = bench_res.score_ops_per_sec > 0.0;
 
         // Verify AI / ML Tensor Pipeline & Models
-        self.tensor_pipeline
-            .load_column("baseline_loss", &[0.5, 0.4, 0.3, 0.2, 0.1]);
-        self.tensor_pipeline
-            .load_column("current_loss", &[0.52, 0.41, 0.31, 0.21, 0.11]);
+        self.tensor_pipeline.load_column("baseline_loss", &[0.5, 0.4, 0.3, 0.2, 0.1]);
+        self.tensor_pipeline.load_column("current_loss", &[0.52, 0.41, 0.31, 0.21, 0.11]);
         let mean = self.tensor_pipeline.calculate_mean("baseline_loss");
-        let drift = self
-            .tensor_pipeline
-            .calculate_drift_ratio("baseline_loss", "current_loss");
+        let drift = self.tensor_pipeline.calculate_drift_ratio("baseline_loss", "current_loss");
         let ai_ok = mean == Some(0.3)
             && drift.is_some()
+        let norm = self
+            .tensor_pipeline
+            .normalize_vector_zero_copy(&[1.0, 2.0, 3.0]);
+        let ai_ok = mean == Some(0.3)
+            && drift.is_some()
+            && norm.len() == 3
             && self
                 .model_bench
                 .evaluate_llm_performance("Sigma-SLM-3B")
@@ -1327,30 +1428,40 @@ impl SovereignTechMediaMasterSuite {
                 .estimate_context_window_vram("Sigma-SLM-3B", 8192)
                 .unwrap_or(0)
                 > 2048;
+            && self.model_bench.evaluate_llm_performance("Sigma-SLM-3B").is_some()
+            && self.model_bench.estimate_context_window_vram("Sigma-SLM-3B", 8192).unwrap_or(0) > 2048;
 
         // Verify Security & Governance
         let sec_ok = self.zero_trust.verify_sandbox_policy("network_subsystem")
             && self.zero_trust.audit_firewall_rules()
+            && self.zero_trust.verify_fips_compliance()
+            && self
+                .zero_trust
+                .landlock_unveil_path("network_subsystem", "/tmp")
             && self.governance.audit_license_compliance()
             && self.governance.scan_sbom_vulnerabilities() == 0;
 
         // Verify Device Bridge
         self.device_bridge.sync_clipboard("https://sigmaos.org");
-        self.device_bridge
-            .mirror_notification("Incoming Call from Pixel 8 Pro");
+        self.device_bridge.mirror_notification("Incoming Call from Pixel 8 Pro");
         let bridge_ok = self.device_bridge.verify_bridge_status()
+        self.device_bridge
+            .send_drag_and_drop_stream(b"file_stream_chunk");
+        let bridge_ok = self.device_bridge.verify_bridge_status()
+            && self.device_bridge.verify_adb_wireless_pairing()
             && self
                 .device_bridge
                 .sideload_app("dev_android_1", "org.sigma.pqc_vpn")
                 .is_ok()
+            && self.device_bridge.sideload_app("dev_android_1", "org.sigma.pqc_vpn").is_ok()
             && !self.device_bridge.shared_clipboard_text.is_empty()
-            && !self.device_bridge.synced_notifications.is_empty();
+            && !self.device_bridge.synced_notifications.is_empty()
+            && !self.device_bridge.drag_and_drop_buffer.is_empty();
 
         // Verify Expanded Tech Media Portals
         let sbc_ok = self.geeky_gadgets.verify_sbc_support("Raspberry Pi 5");
         let it_ok = self.it_daily.is_governance_compliant();
-        let htg_ok =
-            self.how_to_geek.translate_user_query("show IP address") == Some("ip a".to_string());
+        let htg_ok = self.how_to_geek.translate_user_query("show IP address") == Some("ip a".to_string());
         let tns_ok = self.thenewstack.verify_cloud_native_stack();
         let lcom_ok = self.linux_com.verify_standards();
         let pcmag_ok = self.pcmag.verify_pcmag_rating();
@@ -1405,6 +1516,7 @@ mod tests {
             url: "https://phoronix.com/news".to_string(),
             category: "Hardware".to_string(),
             timestamp_epoch: 1730000400,
+            tags: vec!["hardware".to_string(), "benchmarks".to_string()],
         });
 
         let news = engine.get_latest_news();
@@ -1499,9 +1611,7 @@ mod tests {
     fn test_cross_platform_device_bridge() {
         let mut bridge = CrossPlatformDeviceBridge::new();
         assert!(bridge.verify_bridge_status());
-        assert!(bridge
-            .sideload_app("dev_android_1", "com.sigma.app")
-            .is_ok());
+        assert!(bridge.sideload_app("dev_android_1", "com.sigma.app").is_ok());
         assert!(bridge.sideload_app("invalid_dev", "com.sigma.app").is_err());
     }
 

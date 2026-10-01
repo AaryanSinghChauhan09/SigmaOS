@@ -400,9 +400,7 @@ impl BraveShieldsEngine {
     }
 
     pub fn should_hide_cosmetic_element(&self, selector: &str) -> bool {
-        self.cosmetic_filters
-            .iter()
-            .any(|f| f == selector || f.ends_with(selector))
+        self.cosmetic_filters.iter().any(|f| f == selector || f.ends_with(selector))
     }
 
     /// Generates CSS element hiding rules for cosmetic adblocking
@@ -811,16 +809,7 @@ impl QuantumWebRenderEngine {
         }
     }
 
-    pub fn build_display_item(
-        &mut self,
-        id: u32,
-        x: f32,
-        y: f32,
-        w: f32,
-        h: f32,
-        color: &str,
-        z: i32,
-    ) {
+    pub fn build_display_item(&mut self, id: u32, x: f32, y: f32, w: f32, h: f32, color: &str, z: i32) {
         self.display_items.push(WebRenderDisplayItem {
             item_id: id,
             rect_x: x,
@@ -832,12 +821,7 @@ impl QuantumWebRenderEngine {
         });
     }
 
-    pub fn calculate_gecko_grid_layout(
-        &mut self,
-        columns: u32,
-        container_w: f32,
-        container_h: f32,
-    ) {
+    pub fn calculate_gecko_grid_layout(&mut self, columns: u32, container_w: f32, container_h: f32) {
         self.css_grid_tracks.clear();
         if columns > 0 {
             let col_w = container_w / columns as f32;
@@ -851,11 +835,7 @@ impl QuantumWebRenderEngine {
         self.display_items.sort_by_key(|item| item.z_index);
     }
 
-    pub fn matches_gecko_css_selector(
-        element_tag: &str,
-        element_class: &str,
-        selector: &str,
-    ) -> bool {
+    pub fn matches_gecko_css_selector(element_tag: &str, element_class: &str, selector: &str) -> bool {
         let clean = selector.trim();
         if clean.starts_with('.') {
             element_class.contains(&clean[1..])
@@ -881,18 +861,10 @@ impl UBlockOriginFilterEngine {
             cosmetic_selectors: Vec::new(),
             injected_scriptlets: Vec::new(),
         };
-        engine
-            .cosmetic_selectors
-            .push(String::from(".ad-banner:has(a)"));
-        engine
-            .cosmetic_selectors
-            .push(String::from("##.sponsored-post"));
-        engine
-            .injected_scriptlets
-            .push(String::from("+js(set-cookie, telemetry_optout, 1)"));
-        engine
-            .injected_scriptlets
-            .push(String::from("+js(nowebrtc)"));
+        engine.cosmetic_selectors.push(String::from(".ad-banner:has(a)"));
+        engine.cosmetic_selectors.push(String::from("##.sponsored-post"));
+        engine.injected_scriptlets.push(String::from("+js(set-cookie, telemetry_optout, 1)"));
+        engine.injected_scriptlets.push(String::from("+js(nowebrtc)"));
         engine
     }
 
@@ -975,18 +947,10 @@ impl DuckAssistPrivacyEngine {
         let mut engine = Self {
             tracker_radar_database: BTreeMap::new(),
         };
-        engine
-            .tracker_radar_database
-            .insert(String::from("duckduckgo.com"), TrackerTrustGrade::GradeA);
-        engine
-            .tracker_radar_database
-            .insert(String::from("wikipedia.org"), TrackerTrustGrade::GradeA);
-        engine
-            .tracker_radar_database
-            .insert(String::from("github.com"), TrackerTrustGrade::GradeB);
-        engine
-            .tracker_radar_database
-            .insert(String::from("doubleclick.net"), TrackerTrustGrade::GradeF);
+        engine.tracker_radar_database.insert(String::from("duckduckgo.com"), TrackerTrustGrade::GradeA);
+        engine.tracker_radar_database.insert(String::from("wikipedia.org"), TrackerTrustGrade::GradeA);
+        engine.tracker_radar_database.insert(String::from("github.com"), TrackerTrustGrade::GradeB);
+        engine.tracker_radar_database.insert(String::from("doubleclick.net"), TrackerTrustGrade::GradeF);
         engine
     }
 
@@ -1037,15 +1001,9 @@ impl ChromiumIpcChannelEngine {
             partition_alloc_enabled: true,
             allocated_partitions: BTreeMap::new(),
         };
-        engine
-            .active_channels
-            .insert(1001, String::from("mojo:content.mojom.FrameHost"));
-        engine
-            .active_channels
-            .insert(1002, String::from("mojo:network.mojom.URLLoaderFactory"));
-        engine
-            .extension_service_workers
-            .insert(String::from("sigma_ublock_v3"), true);
+        engine.active_channels.insert(1001, String::from("mojo:content.mojom.FrameHost"));
+        engine.active_channels.insert(1002, String::from("mojo:network.mojom.URLLoaderFactory"));
+        engine.extension_service_workers.insert(String::from("sigma_ublock_v3"), true);
         engine
     }
 
@@ -1059,13 +1017,7 @@ impl ChromiumIpcChannelEngine {
         self.allocated_partitions.remove(&partition_id);
     }
 
-    pub fn dispatch_mojo_message(
-        &mut self,
-        channel_id: u32,
-        interface_name: &str,
-        method: &str,
-        payload: &[u8],
-    ) -> bool {
+    pub fn dispatch_mojo_message(&mut self, channel_id: u32, interface_name: &str, method: &str, payload: &[u8]) -> bool {
         if self.active_channels.contains_key(&channel_id) {
             self.dispatched_messages.push(ChromiumIpcMessage {
                 channel_id,
@@ -1079,20 +1031,13 @@ impl ChromiumIpcChannelEngine {
         }
     }
 
-    pub fn trigger_manifest_v3_background_event(
-        &self,
-        extension_id: &str,
-        event_type: &str,
-    ) -> String {
+    pub fn trigger_manifest_v3_background_event(&self, extension_id: &str, event_type: &str) -> String {
         if let Some(&active) = self.extension_service_workers.get(extension_id) {
             if active {
                 return format!("[MV3 ServiceWorker Dispatch]: Extension '{}' processed event '{}' in isolated background worker.", extension_id, event_type);
             }
         }
-        format!(
-            "[MV3 ServiceWorker Error]: Extension worker '{}' inactive.",
-            extension_id
-        )
+        format!("[MV3 ServiceWorker Error]: Extension worker '{}' inactive.", extension_id)
     }
 }
 
@@ -1164,8 +1109,7 @@ impl MullvadPrivacyIsolationEngine {
     }
 
     pub fn bind_tab_to_ephemeral_socks5(&mut self, tab_id: u64, proxy_addr: &str) {
-        self.socks5_proxies_per_tab
-            .insert(tab_id, proxy_addr.to_string());
+        self.socks5_proxies_per_tab.insert(tab_id, proxy_addr.to_string());
     }
 
     pub fn store_ephemeral_item(&mut self, tab_id: u64, key: &str, val: &str) {
@@ -1189,9 +1133,7 @@ impl MullvadPrivacyIsolationEngine {
     }
 
     pub fn sanitize_referrer_header(&self, origin: &str, target: &str) -> Option<String> {
-        if self.referrer_policy == "strict-origin-when-cross-origin"
-            || self.referrer_policy == "no-referrer"
-        {
+        if self.referrer_policy == "strict-origin-when-cross-origin" || self.referrer_policy == "no-referrer" {
             if origin != target {
                 return None; // Strip cross-origin referrer completely
             }
@@ -1207,10 +1149,7 @@ impl MullvadPrivacyIsolationEngine {
     }
 
     pub fn wrap_odoh_query(&self, domain: &str) -> String {
-        format!(
-            "odoh_relay://{}?target_dns=cloudflare-dns.com&q={}",
-            self.odoh_relay_endpoint, domain
-        )
+        format!("odoh_relay://{}?target_dns=cloudflare-dns.com&q={}", self.odoh_relay_endpoint, domain)
     }
 }
 
@@ -1236,27 +1175,19 @@ impl ArcBrowserBoostEngine {
     pub fn new() -> Self {
         let mut engine = Self {
             active_space: String::from("Personal"),
-            spaces: vec![
-                String::from("Personal"),
-                String::from("Work"),
-                String::from("Development"),
-            ],
+            spaces: vec![String::from("Personal"), String::from("Work"), String::from("Development")],
             domain_boosts: Vec::new(),
         };
         engine.domain_boosts.push(ArcBoostScript {
             domain_pattern: String::from("github.com"),
-            custom_css: String::from(
-                "body { font-family: 'JetBrains Mono', monospace !important; }",
-            ),
+            custom_css: String::from("body { font-family: 'JetBrains Mono', monospace !important; }"),
             custom_js: String::from("console.log('Arc Boost active on GitHub');"),
         });
         engine
     }
 
     pub fn get_boost_for_domain(&self, domain: &str) -> Option<&ArcBoostScript> {
-        self.domain_boosts
-            .iter()
-            .find(|b| domain.contains(&b.domain_pattern))
+        self.domain_boosts.iter().find(|b| domain.contains(&b.domain_pattern))
     }
 
     pub fn switch_space(&mut self, space_name: &str) -> bool {
@@ -1335,15 +1266,7 @@ impl LadybirdLibWebEngine {
         }
     }
 
-    pub fn push_layout_box(
-        &mut self,
-        id: u32,
-        tag: &str,
-        is_flex: bool,
-        grow: f32,
-        w: f32,
-        h: f32,
-    ) {
+    pub fn push_layout_box(&mut self, id: u32, tag: &str, is_flex: bool, grow: f32, w: f32, h: f32) {
         self.layout_tree.push(LadybirdLayoutBox {
             node_id: id,
             tag_name: tag.to_string(),
@@ -1355,12 +1278,7 @@ impl LadybirdLibWebEngine {
     }
 
     pub fn compute_flex_layout(&mut self, container_width: f32) {
-        let total_grow: f32 = self
-            .layout_tree
-            .iter()
-            .filter(|b| b.is_flex_child)
-            .map(|b| b.flex_grow)
-            .sum();
+        let total_grow: f32 = self.layout_tree.iter().filter(|b| b.is_flex_child).map(|b| b.flex_grow).sum();
         if total_grow > 0.0 {
             let available = container_width - (self.layout_tree.len() as f32 * self.flexbox_gap_px);
             for box_node in self.layout_tree.iter_mut() {
@@ -1564,14 +1482,8 @@ impl FirefoxCookieBannerRejectEngine {
     }
 
     pub fn sanitize_cookie_consent_dialog(&self, html: &str) -> String {
-        html.replace(
-            "id=\"cookie-banner\"",
-            "id=\"cookie-banner\" style=\"display:none !important;\"",
-        )
-        .replace(
-            "class=\"cmp-dialog\"",
-            "class=\"cmp-dialog\" style=\"display:none !important;\"",
-        )
+        html.replace("id=\"cookie-banner\"", "id=\"cookie-banner\" style=\"display:none !important;\"")
+            .replace("class=\"cmp-dialog\"", "class=\"cmp-dialog\" style=\"display:none !important;\"")
     }
 }
 
@@ -1628,6 +1540,280 @@ impl MullvadLFPFingerprintEngine {
     }
 }
 
+pub struct FirefoxGeckoFlexboxLayoutEngine;
+
+impl FirefoxGeckoFlexboxLayoutEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn compute_flex_item_grow(&self, base_width: f32, flex_grow: f32, container_width: f32) -> f32 {
+        if flex_grow > 0.0 && container_width > base_width {
+            base_width + (container_width - base_width) * (flex_grow / (flex_grow + 1.0))
+        } else {
+            base_width
+        }
+    }
+}
+
+pub struct LibreWolfWebRtcProtectionEngine {
+    pub strict_media_device_masking: bool,
+    pub block_public_ip_candidates: bool,
+}
+
+impl LibreWolfWebRtcProtectionEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            strict_media_device_masking: true,
+            block_public_ip_candidates: true,
+        }
+    }
+
+    pub fn sanitize_sdp_candidate(&self, candidate: &str) -> String {
+        if self.block_public_ip_candidates && candidate.contains("typ host") {
+            "candidate:0 1 UDP 2122260223 127.0.0.1 9 typ host".to_string()
+        } else {
+            candidate.to_string()
+        }
+    }
+}
+
+pub struct FirefoxTotalCookieProtectionEngine {
+    pub isolated_cookie_jars: BTreeMap<String, String>,
+}
+
+impl FirefoxTotalCookieProtectionEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            isolated_cookie_jars: BTreeMap::new(),
+        }
+    }
+
+    pub fn get_partition_key(&self, top_level_domain: &str) -> String {
+        format!("dFPI_jar_{}", top_level_domain)
+    }
+
+    pub fn store_partitioned_cookie(&mut self, top_level_domain: &str, cookie_val: &str) {
+        let key = self.get_partition_key(top_level_domain);
+        self.isolated_cookie_jars.insert(key, cookie_val.to_string());
+    }
+}
+
+pub struct FirefoxContentSecurityPolicyEngine {
+    pub enforced_directives: Vec<String>,
+}
+
+impl FirefoxContentSecurityPolicyEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            enforced_directives: vec![
+                "default-src 'self'".to_string(),
+                "script-src 'self'".to_string(),
+                "object-src 'none'".to_string(),
+            ],
+        }
+    }
+
+    pub fn is_script_allowed(&self, script_origin: &str) -> bool {
+        script_origin == "'self'" || script_origin.starts_with("https://")
+    }
+}
+
+pub struct ChromiumBlinkCssFlexLayoutEngine;
+
+impl ChromiumBlinkCssFlexLayoutEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn calculate_line_wrap_count(&self, total_items_width: f32, line_max_width: f32) -> usize {
+        if line_max_width <= 0.0 {
+            return 1;
+        }
+        ((total_items_width / line_max_width).ceil() as usize).max(1)
+    }
+}
+
+pub struct UngoogledChromiumHostIpProtectionEngine {
+    pub enforce_loopback_binding: bool,
+}
+
+impl UngoogledChromiumHostIpProtectionEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            enforce_loopback_binding: true,
+        }
+    }
+
+    pub fn sanitize_host_address(&self, address: &str) -> String {
+        if self.enforce_loopback_binding && !address.starts_with("127.") && address != "localhost" {
+            "127.0.0.1".to_string()
+        } else {
+            address.to_string()
+        }
+    }
+}
+
+pub struct BraveScriptletInjectionEngine {
+    pub active_scriptlets: Vec<String>,
+}
+
+impl BraveScriptletInjectionEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            active_scriptlets: vec![
+                "set-local-storage-item".to_string(),
+                "prevent-addEventListener".to_string(),
+            ],
+        }
+    }
+
+    pub fn generate_injection_code(&self, scriptlet_type: &str) -> String {
+        format!("/* Brave Shields Scriptlet Injection: {} */ (function() {{ window.__brave_scriptlet_defuse = true; }})();", scriptlet_type)
+    }
+}
+
+pub struct ChromiumPartitionAllocSlotGuardEngine {
+    pub verified_allocations: usize,
+}
+
+impl ChromiumPartitionAllocSlotGuardEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            verified_allocations: 1024,
+        }
+    }
+
+    pub fn verify_pointer_tag(&self, ptr: u64) -> bool {
+        ptr != 0 && (ptr & 0x0000_FFFF_FFFF_FFFF) != 0
+    }
+}
+
+pub struct TorObfs4PacketFramingEngine;
+
+impl TorObfs4PacketFramingEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn obfuscate_packet_payload(&self, raw_bytes: &[u8]) -> Vec<u8> {
+        let mut framed = vec![0x0B, 0x0F, 0x54];
+        framed.extend_from_slice(raw_bytes);
+        framed
+    }
+}
+
+pub struct MullvadODohRelayEngine {
+    pub target_resolver: String,
+    pub proxy_relay: String,
+}
+
+impl MullvadODohRelayEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            target_resolver: "https://doh.mullvad.net/dns-query".to_string(),
+            proxy_relay: "https://odoh-proxy.mullvad.net".to_string(),
+        }
+    }
+
+    pub fn build_odoh_query_url(&self, domain: &str) -> String {
+        format!("{}/relay?target={}&q={}", self.proxy_relay, self.target_resolver, domain)
+    }
+}
+
+pub struct DuckDuckGoAiAssistSummarizerEngine {
+    pub zero_logging_proxy: bool,
+}
+
+impl DuckDuckGoAiAssistSummarizerEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            zero_logging_proxy: true,
+        }
+    }
+
+    pub fn summarize_query(&self, query: &str) -> String {
+        format!("DuckAssist Privacy Summary for '{}': Key verified facts extracted without tracking.", query)
+    }
+}
+
+pub struct LadybirdLibWebCss3ParserEngine;
+
+impl LadybirdLibWebCss3ParserEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn parse_selector_specificity(&self, selector: &str) -> (u32, u32, u32) {
+        let ids = selector.matches('#').count() as u32;
+        let classes = selector.matches('.').count() as u32 + selector.matches(':').count() as u32;
+        let elements = if selector.contains("div") || selector.contains("span") || selector.contains("p") { 1 } else { 0 };
+        (ids, classes, elements)
+    }
+}
+
+pub struct FloorpSplitViewManagerEngine {
+    pub dual_pane_active: bool,
+    pub active_pane_index: usize,
+}
+
+impl FloorpSplitViewManagerEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            dual_pane_active: true,
+            active_pane_index: 0,
+        }
+    }
+
+    pub fn switch_active_pane(&mut self) -> usize {
+        self.active_pane_index = (self.active_pane_index + 1) % 2;
+        self.active_pane_index
+    }
+}
+
+pub struct VivaldiSpatialVectorNavEngine;
+
+impl VivaldiSpatialVectorNavEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn calculate_2d_distance(&self, x1: f32, y1: f32, x2: f32, y2: f32) -> f32 {
+        ((x2 - x1).powi(2) + (y2 - y1).powi(2)).sqrt()
+    }
+}
+
+pub struct ArcBoostDomainStylingEngine {
+    pub active_boosts: BTreeMap<String, String>,
+}
+
+impl ArcBoostDomainStylingEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            active_boosts: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_domain_css_boost(&mut self, domain: &str, css_rules: &str) {
+        self.active_boosts.insert(domain.to_string(), css_rules.to_string());
+    }
+}
+
 // =========================================================================
 // 22. UNIFIED SIGMAWEB BROWSER SUITE
 // =========================================================================
@@ -1673,6 +1859,21 @@ pub struct SigmaWebBrowser {
     pub floorp_split_view: FloorpWorkspacesSplitViewEngine,
     pub ladybird_css_parser: LadybirdLibWebCssParserEngine,
     pub orion_ext_compat: OrionWebExtensionCompatibilityEngine,
+    pub gecko_flexbox: FirefoxGeckoFlexboxLayoutEngine,
+    pub librewolf_webrtc: LibreWolfWebRtcProtectionEngine,
+    pub firefox_tcp: FirefoxTotalCookieProtectionEngine,
+    pub firefox_csp: FirefoxContentSecurityPolicyEngine,
+    pub blink_flexbox: ChromiumBlinkCssFlexLayoutEngine,
+    pub ungoogled_host_ip: UngoogledChromiumHostIpProtectionEngine,
+    pub brave_scriptlets: BraveScriptletInjectionEngine,
+    pub partition_alloc_guard: ChromiumPartitionAllocSlotGuardEngine,
+    pub tor_obfs4: TorObfs4PacketFramingEngine,
+    pub mullvad_odoh: MullvadODohRelayEngine,
+    pub duckassist_summary: DuckDuckGoAiAssistSummarizerEngine,
+    pub ladybird_css3: LadybirdLibWebCss3ParserEngine,
+    pub floorp_split_mgr: FloorpSplitViewManagerEngine,
+    pub vivaldi_spatial_vec: VivaldiSpatialVectorNavEngine,
+    pub arc_boost_styling: ArcBoostDomainStylingEngine,
 }
 
 impl SigmaWebBrowser {
@@ -1719,6 +1920,21 @@ impl SigmaWebBrowser {
             floorp_split_view: FloorpWorkspacesSplitViewEngine::new(),
             ladybird_css_parser: LadybirdLibWebCssParserEngine::new(),
             orion_ext_compat: OrionWebExtensionCompatibilityEngine::new(),
+            gecko_flexbox: FirefoxGeckoFlexboxLayoutEngine::new(),
+            librewolf_webrtc: LibreWolfWebRtcProtectionEngine::new(),
+            firefox_tcp: FirefoxTotalCookieProtectionEngine::new(),
+            firefox_csp: FirefoxContentSecurityPolicyEngine::new(),
+            blink_flexbox: ChromiumBlinkCssFlexLayoutEngine::new(),
+            ungoogled_host_ip: UngoogledChromiumHostIpProtectionEngine::new(),
+            brave_scriptlets: BraveScriptletInjectionEngine::new(),
+            partition_alloc_guard: ChromiumPartitionAllocSlotGuardEngine::new(),
+            tor_obfs4: TorObfs4PacketFramingEngine::new(),
+            mullvad_odoh: MullvadODohRelayEngine::new(),
+            duckassist_summary: DuckDuckGoAiAssistSummarizerEngine::new(),
+            ladybird_css3: LadybirdLibWebCss3ParserEngine::new(),
+            floorp_split_mgr: FloorpSplitViewManagerEngine::new(),
+            vivaldi_spatial_vec: VivaldiSpatialVectorNavEngine::new(),
+            arc_boost_styling: ArcBoostDomainStylingEngine::new(),
         }
     }
 
@@ -1752,8 +1968,7 @@ impl SigmaWebBrowser {
 
         // If domain is .onion, auto-route through Tor Circuit Manager
         if domain.ends_with(".onion") {
-            self.tor_manager
-                .build_circuit_for_domain(domain.to_string());
+            self.tor_manager.build_circuit_for_domain(domain.to_string());
         }
 
         let uncloaked = self.brave_shields.resolve_cname_uncloak(domain);
@@ -1826,11 +2041,7 @@ impl LibreWolfStrictFingerprintingProtectionEngine {
 
     pub fn mask_font_enumeration(&self, fonts: &[&str]) -> Vec<String> {
         if self.font_enumeration_blocked {
-            vec![
-                "sans-serif".to_string(),
-                "serif".to_string(),
-                "monospace".to_string(),
-            ]
+            vec!["sans-serif".to_string(), "serif".to_string(), "monospace".to_string()]
         } else {
             fonts.iter().map(|s| s.to_string()).collect()
         }
@@ -1838,8 +2049,7 @@ impl LibreWolfStrictFingerprintingProtectionEngine {
 
     pub fn inject_audio_noise(&mut self, samples: &mut [f32]) {
         for (i, sample) in samples.iter_mut().enumerate() {
-            let noise =
-                (((i as u64 ^ self.audio_context_noise_seed) % 100) as f32 - 50.0) / 10000.0;
+            let noise = (((i as u64 ^ self.audio_context_noise_seed) % 100) as f32 - 50.0) / 10000.0;
             *sample += noise;
         }
     }
@@ -1865,12 +2075,7 @@ impl ChromiumBlinkLayoutEngine {
         self.dom_reflow_count
     }
 
-    pub fn validate_turbofan_sandbox_boundary(
-        &self,
-        ptr_address: u64,
-        sandbox_base: u64,
-        sandbox_size: u64,
-    ) -> bool {
+    pub fn validate_turbofan_sandbox_boundary(&self, ptr_address: u64, sandbox_base: u64, sandbox_size: u64) -> bool {
         ptr_address >= sandbox_base && ptr_address < (sandbox_base + sandbox_size)
     }
 }
@@ -1978,21 +2183,14 @@ impl TorOnionRoutingTunnelEngine {
 
     pub fn wrap_onion_layers(&self, payload: &[u8]) -> Vec<u8> {
         let exit_encrypted: Vec<u8> = payload.iter().map(|b| b ^ self.exit_key).collect();
-        let middle_encrypted: Vec<u8> =
-            exit_encrypted.iter().map(|b| b ^ self.middle_key).collect();
-        let guard_encrypted: Vec<u8> = middle_encrypted
-            .iter()
-            .map(|b| b ^ self.guard_key)
-            .collect();
+        let middle_encrypted: Vec<u8> = exit_encrypted.iter().map(|b| b ^ self.middle_key).collect();
+        let guard_encrypted: Vec<u8> = middle_encrypted.iter().map(|b| b ^ self.guard_key).collect();
         guard_encrypted
     }
 
     pub fn unwrap_onion_layers(&self, wrapped_payload: &[u8]) -> Vec<u8> {
         let guard_decrypted: Vec<u8> = wrapped_payload.iter().map(|b| b ^ self.guard_key).collect();
-        let middle_decrypted: Vec<u8> = guard_decrypted
-            .iter()
-            .map(|b| b ^ self.middle_key)
-            .collect();
+        let middle_decrypted: Vec<u8> = guard_decrypted.iter().map(|b| b ^ self.middle_key).collect();
         let exit_decrypted: Vec<u8> = middle_decrypted.iter().map(|b| b ^ self.exit_key).collect();
         exit_decrypted
     }
@@ -2088,9 +2286,7 @@ impl FloorpWorkspacesSplitViewEngine {
     }
 
     pub fn create_workspace(&mut self, name: &str) {
-        self.workspaces
-            .entry(name.to_string())
-            .or_insert_with(Vec::new);
+        self.workspaces.entry(name.to_string()).or_insert_with(Vec::new);
     }
 
     pub fn switch_workspace(&mut self, name: &str) -> bool {
@@ -2156,12 +2352,7 @@ impl LadybirdLibWebCssParserEngine {
 
     pub fn match_selector(&self, selector: &str, tag_name: &str) -> bool {
         let parts: Vec<&str> = selector.split_whitespace().collect();
-        parts.iter().any(|&p| {
-            p == tag_name
-                || p == "*"
-                || p.starts_with(&format!(".{}", tag_name))
-                || p.starts_with(&format!("#{}", tag_name))
-        })
+        parts.iter().any(|&p| p == tag_name || p == "*" || p.starts_with(&format!(".{}", tag_name)) || p.starts_with(&format!("#{}", tag_name)))
     }
 }
 
@@ -2195,8 +2386,7 @@ mod tests {
     fn test_chromium_ipc_and_mullvad_arc_engines() {
         let mut ipc = ChromiumIpcChannelEngine::new();
         assert!(ipc.dispatch_mojo_message(1001, "FrameHost", "Navigate", b"payload"));
-        let mv3_out =
-            ipc.trigger_manifest_v3_background_event("sigma_ublock_v3", "onBeforeRequest");
+        let mv3_out = ipc.trigger_manifest_v3_background_event("sigma_ublock_v3", "onBeforeRequest");
         assert!(mv3_out.contains("isolated background worker"));
 
         ipc.allocate_partition(42, 1024);
@@ -2207,30 +2397,17 @@ mod tests {
         let mut mullvad = MullvadPrivacyIsolationEngine::new();
         mullvad.bind_tab_to_ephemeral_socks5(1, "socks5://127.0.0.1:9050");
         assert_eq!(mullvad.get_tab_proxy(1), "socks5://127.0.0.1:9050");
-        assert!(mullvad
-            .wrap_odoh_query("example.com")
-            .contains("odoh_relay"));
+        assert!(mullvad.wrap_odoh_query("example.com").contains("odoh_relay"));
         assert!(mullvad.suppress_webrtc_ip_leak(true));
 
         mullvad.store_ephemeral_item(1, "token", "abc");
-        assert_eq!(
-            mullvad
-                .session_isolated_storage
-                .get(&1)
-                .unwrap()
-                .get("token")
-                .unwrap(),
-            "abc"
-        );
+        assert_eq!(mullvad.session_isolated_storage.get(&1).unwrap().get("token").unwrap(), "abc");
         mullvad.purge_tab_ephemeral_storage(1);
         assert!(mullvad.session_isolated_storage.get(&1).is_none());
 
         let mut lw = LibreWolfHardeningEngine::new();
         lw.set_partitioned_cookie("example.com", "sess", "123");
-        assert_eq!(
-            lw.get_partitioned_cookie("example.com", "sess").unwrap(),
-            "123"
-        );
+        assert_eq!(lw.get_partitioned_cookie("example.com", "sess").unwrap(), "123");
 
         let mut arc = ArcBrowserBoostEngine::new();
         assert!(arc.switch_space("Work"));
@@ -2254,10 +2431,7 @@ mod tests {
 
         let mut tor_trans = TorPluggableTransportEngine::new();
         tor_trans.set_transport(TorTransportType::Snowflake);
-        assert_eq!(
-            tor_trans.active_transport,
-            Some(TorTransportType::Snowflake)
-        );
+        assert_eq!(tor_trans.active_transport, Some(TorTransportType::Snowflake));
         let obfuscated = tor_trans.obfuscate_packet_handshake(b"hello");
         assert_eq!(obfuscated[0], 0xE3);
     }
@@ -2420,8 +2594,7 @@ mod tests {
         assert_ne!(encrypted_sni, "example.com".as_bytes());
 
         let mut jars = FirefoxContainerJarManager::new();
-        let jar =
-            jars.get_or_create_container_jar(BrowserContainerType::Banking, "bank.com".to_string());
+        let jar = jars.get_or_create_container_jar(BrowserContainerType::Banking, "bank.com".to_string());
         jar.store_cookie("auth".to_string(), "pass123".to_string());
         assert_eq!(jar.read_cookie("auth").unwrap(), "pass123");
     }
@@ -2439,14 +2612,9 @@ mod tests {
         );
 
         // Test .onion circuit trigger
-        let onion_nav = sigma_web.navigate_protected(
-            "http://duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion/",
-        );
+        let onion_nav = sigma_web.navigate_protected("http://duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion/");
         assert!(onion_nav.is_ok());
-        assert!(sigma_web
-            .tor_manager
-            .circuits
-            .contains_key("duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion"));
+        assert!(sigma_web.tor_manager.circuits.contains_key("duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion"));
 
         // Test CNAME uncloaked ad target detection and block
         let blocked_nav =
@@ -2474,14 +2642,8 @@ mod tests {
         render.build_display_item(2, 0.0, 0.0, 100.0, 50.0, "#000", 1);
         render.sort_display_list();
         assert_eq!(render.display_items[0].item_id, 2);
-        assert!(QuantumWebRenderEngine::matches_gecko_css_selector(
-            "div",
-            "btn-active",
-            ".btn-active"
-        ));
-        assert!(QuantumWebRenderEngine::matches_gecko_css_selector(
-            "h1", "", "h1"
-        ));
+        assert!(QuantumWebRenderEngine::matches_gecko_css_selector("div", "btn-active", ".btn-active"));
+        assert!(QuantumWebRenderEngine::matches_gecko_css_selector("h1", "", "h1"));
 
         render.calculate_gecko_grid_layout(2, 1000.0, 600.0);
         assert_eq!(render.css_grid_tracks.len(), 2);
@@ -2500,14 +2662,8 @@ mod tests {
         assert!(zen.tree_nodes[0].is_pinned);
 
         let duck = DuckAssistPrivacyEngine::new();
-        assert_eq!(
-            duck.evaluate_domain_grade("duckduckgo.com"),
-            TrackerTrustGrade::GradeA
-        );
-        assert_eq!(
-            duck.evaluate_domain_grade("doubleclick.net"),
-            TrackerTrustGrade::GradeF
-        );
+        assert_eq!(duck.evaluate_domain_grade("duckduckgo.com"), TrackerTrustGrade::GradeA);
+        assert_eq!(duck.evaluate_domain_grade("doubleclick.net"), TrackerTrustGrade::GradeF);
         let summary = duck.summarize_web_page_ai("SigmaOS is an AI-Native operating system.");
         assert!(summary.contains("DuckAssist AI Privacy Summary"));
     }
@@ -2520,16 +2676,9 @@ mod tests {
         assert_eq!(pixels[0], 101);
 
         let mut brave = BraveShieldsEngine::new();
-        brave
-            .cname_aliases
-            .insert("tracker.a.com".to_string(), "tracker.b.com".to_string());
-        brave
-            .cname_aliases
-            .insert("tracker.b.com".to_string(), "ad-server.net".to_string());
-        assert_eq!(
-            brave.resolve_cname_uncloak("tracker.a.com"),
-            "ad-server.net"
-        );
+        brave.cname_aliases.insert("tracker.a.com".to_string(), "tracker.b.com".to_string());
+        brave.cname_aliases.insert("tracker.b.com".to_string(), "ad-server.net".to_string());
+        assert_eq!(brave.resolve_cname_uncloak("tracker.a.com"), "ad-server.net");
         assert!(brave.should_hide_cosmetic_element("##.ad-banner"));
     }
 
@@ -2557,21 +2706,14 @@ mod tests {
         assert!(goanna.supports_xul_extension("theme.xul"));
 
         let cookie_reject = FirefoxCookieBannerRejectEngine::new();
-        let cleaned_html =
-            cookie_reject.sanitize_cookie_consent_dialog("<div id=\"cookie-banner\"></div>");
+        let cleaned_html = cookie_reject.sanitize_cookie_consent_dialog("<div id=\"cookie-banner\"></div>");
         assert!(cleaned_html.contains("display:none !important;"));
 
         let deamp = BraveDeAmpReaderEngine::new();
-        assert_eq!(
-            deamp.unwrap_amp_url("https://example.com/amp/article"),
-            "https://example.com/article"
-        );
+        assert_eq!(deamp.unwrap_amp_url("https://example.com/amp/article"), "https://example.com/article");
 
         let ddg_pro = DuckDuckGoPrivacyProEngine::new();
-        assert_eq!(
-            ddg_pro.route_duck_player_stream("https://youtube.com/watch?v=123"),
-            "https://duckduckgo.com/duckplayer?v=123"
-        );
+        assert_eq!(ddg_pro.route_duck_player_stream("https://youtube.com/watch?v=123"), "https://duckduckgo.com/duckplayer?v=123");
 
         let mullvad_lfp = MullvadLFPFingerprintEngine::new();
         assert_eq!(mullvad_lfp.get_spoofed_language_header(), "en-US,en;q=0.5");
@@ -2598,23 +2740,16 @@ mod tests {
         assert!(blink.validate_turbofan_sandbox_boundary(0x1005, 0x1000, 0x1000));
 
         let ungoogled = UngoogledChromiumPrivacyHardeningEngine::new();
-        assert!(ungoogled
-            .sanitize_webrtc_stun_candidates("candidate 1 typ host 192.168.1.1")
-            .is_none());
+        assert!(ungoogled.sanitize_webrtc_stun_candidates("candidate 1 typ host 192.168.1.1").is_none());
         assert!(ungoogled.intercept_google_account_sync("https://accounts.google.com/signin"));
 
         let brave_ad = BraveAdblockEngine::new();
         assert!(brave_ad.should_block_request("https://doubleclick.net/ad.js"));
-        assert!(brave_ad
-            .build_cosmetic_css()
-            .contains("display: none !important"));
+        assert!(brave_ad.build_cosmetic_css().contains("display: none !important"));
 
         let mut tor_tun = TorOnionRoutingTunnelEngine::new();
         assert!(tor_tun.build_3hop_circuit());
-        assert!(tor_tun
-            .perform_v3_onion_rendezvous("duckduckgogg42.onion")
-            .unwrap()
-            .contains("duckduckgogg42.onion"));
+        assert!(tor_tun.perform_v3_onion_rendezvous("duckduckgogg42.onion").unwrap().contains("duckduckgogg42.onion"));
 
         let mut vivaldi = VivaldiSpatialNavigationEngine::new();
         vivaldi.add_focusable_node("btn1", 10.0, 10.0);
@@ -2628,16 +2763,11 @@ mod tests {
         assert!(floorp_split.toggle_dual_pane_split());
 
         let mut ladybird_css = LadybirdLibWebCssParserEngine::new();
-        assert_eq!(
-            ladybird_css.parse_css_stylesheet("body { color: red; } div { margin: 0; }"),
-            2
-        );
+        assert_eq!(ladybird_css.parse_css_stylesheet("body { color: red; } div { margin: 0; }"), 2);
         assert!(ladybird_css.match_selector(".container div", "div"));
 
         let orion = OrionWebExtensionCompatibilityEngine::new();
-        assert!(orion
-            .polyfill_browser_action("action")
-            .contains("window.chrome.action"));
+        assert!(orion.polyfill_browser_action("action").contains("window.chrome.action"));
     }
 
     #[test]
@@ -2651,34 +2781,13 @@ mod tests {
         assert_eq!(reflow_count, 1);
 
         let audit = suite.run_comprehensive_browser_suite_audit("https://example.com/index.html");
-        assert_eq!(
-            audit.get("network_request_safety"),
-            Some(&"true".to_string())
-        );
-        assert_eq!(
-            audit.get("firefox_gecko_subgrid_tracks"),
-            Some(&"3".to_string())
-        );
-        assert_eq!(
-            audit.get("chromium_blink_dom_reflow"),
-            Some(&"2".to_string())
-        );
-        assert_eq!(
-            audit.get("brave_cname_uncloaked"),
-            Some(&"tracking.doubleclick.net".to_string())
-        );
-        assert_eq!(
-            audit.get("librewolf_canvas_noise_enabled"),
-            Some(&"true".to_string())
-        );
-        assert_eq!(
-            audit.get("tor_javascript_allowed"),
-            Some(&"true".to_string())
-        );
-        assert_eq!(
-            audit.get("mullvad_tab_proxy"),
-            Some(&"direct://".to_string())
-        );
+        assert_eq!(audit.get("network_request_safety"), Some(&"true".to_string()));
+        assert_eq!(audit.get("firefox_gecko_subgrid_tracks"), Some(&"3".to_string()));
+        assert_eq!(audit.get("chromium_blink_dom_reflow"), Some(&"2".to_string()));
+        assert_eq!(audit.get("brave_cname_uncloaked"), Some(&"tracking.doubleclick.net".to_string()));
+        assert_eq!(audit.get("librewolf_canvas_noise_enabled"), Some(&"true".to_string()));
+        assert_eq!(audit.get("tor_javascript_allowed"), Some(&"true".to_string()));
+        assert_eq!(audit.get("mullvad_tab_proxy"), Some(&"direct://".to_string()));
     }
 }
 
@@ -2712,54 +2821,47 @@ impl SovereignOpenSourceBrowserSuiteEngine {
     }
 
     /// Performs comprehensive open-source web browser privacy, security, and layout audit
-    pub fn run_comprehensive_browser_suite_audit(
-        &mut self,
-        target_url: &str,
-    ) -> BTreeMap<String, String> {
+    pub fn run_comprehensive_browser_suite_audit(&mut self, target_url: &str) -> BTreeMap<String, String> {
         let mut results = BTreeMap::new();
 
         let safe = self.evaluate_network_request_safety(target_url);
         results.insert("network_request_safety".to_string(), safe.to_string());
 
-        let gecko_tracks = self
-            .browser
-            .geckoview_layout
-            .compute_subgrid_tracks(1024.0)
-            .len();
-        results.insert(
-            "firefox_gecko_subgrid_tracks".to_string(),
-            gecko_tracks.to_string(),
-        );
+        let gecko_tracks = self.browser.geckoview_layout.compute_subgrid_tracks(1024.0).len();
+        results.insert("firefox_gecko_subgrid_tracks".to_string(), gecko_tracks.to_string());
 
         let blink_reflow = self.browser.blink_layout.trigger_dom_reflow();
-        results.insert(
-            "chromium_blink_dom_reflow".to_string(),
-            blink_reflow.to_string(),
-        );
+        results.insert("chromium_blink_dom_reflow".to_string(), blink_reflow.to_string());
 
-        let uncloaked = self
-            .browser
-            .brave_shields
-            .resolve_cname_uncloak("metrics.example.com");
+        let uncloaked = self.browser.brave_shields.resolve_cname_uncloak("metrics.example.com");
         results.insert("brave_cname_uncloaked".to_string(), uncloaked);
 
-        let librewolf_canvas_noise = self
-            .browser
-            .librewolf_hardening
-            .canvas_fingerprint_noise_enabled;
-        results.insert(
-            "librewolf_canvas_noise_enabled".to_string(),
-            librewolf_canvas_noise.to_string(),
-        );
+        let librewolf_canvas_noise = self.browser.librewolf_hardening.canvas_fingerprint_noise_enabled;
+        results.insert("librewolf_canvas_noise_enabled".to_string(), librewolf_canvas_noise.to_string());
 
         let tor_js_allowed = self.browser.tor_manager.is_javascript_allowed(true);
-        results.insert(
-            "tor_javascript_allowed".to_string(),
-            tor_js_allowed.to_string(),
-        );
+        results.insert("tor_javascript_allowed".to_string(), tor_js_allowed.to_string());
 
         let mullvad_proxy = self.browser.mullvad_isolation.get_tab_proxy(1);
         results.insert("mullvad_tab_proxy".to_string(), mullvad_proxy);
+
+        let gecko_flex = self.browser.gecko_flexbox.compute_flex_item_grow(100.0, 1.0, 200.0);
+        results.insert("firefox_gecko_flex_width".to_string(), gecko_flex.to_string());
+
+        let sanitized_sdp = self.browser.librewolf_webrtc.sanitize_sdp_candidate("candidate:0 1 UDP 2122260223 192.168.1.10 9 typ host");
+        results.insert("librewolf_webrtc_sdp_sanitized".to_string(), sanitized_sdp);
+
+        let partitioned_key = self.browser.firefox_tcp.get_partition_key("example.com");
+        results.insert("firefox_tcp_partition_key".to_string(), partitioned_key);
+
+        let csp_script_ok = self.browser.firefox_csp.is_script_allowed("https://cdn.example.com");
+        results.insert("firefox_csp_script_allowed".to_string(), csp_script_ok.to_string());
+
+        let odoh_url = self.browser.mullvad_odoh.build_odoh_query_url("example.com");
+        results.insert("mullvad_odoh_query_url".to_string(), odoh_url);
+
+        let duck_summary = self.browser.duckassist_summary.summarize_query("SigmaOS Web");
+        results.insert("duckassist_summary_generated".to_string(), (!duck_summary.is_empty()).to_string());
 
         results
     }

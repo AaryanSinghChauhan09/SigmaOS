@@ -46,11 +46,36 @@ pub struct DeviceNodeInfo {
 
 pub fn get_standard_device_node(path: &str) -> Option<DeviceNodeInfo> {
     match path {
-        "/dev/input/keyboard" => Some(DeviceNodeInfo { path: "/dev/input/keyboard", major_number: 13, minor_number: 0, major_device_class: "input" }),
-        "/dev/input/mouse" => Some(DeviceNodeInfo { path: "/dev/input/mouse", major_number: 13, minor_number: 32, major_device_class: "input" }),
-        "/dev/sound/mic" => Some(DeviceNodeInfo { path: "/dev/sound/mic", major_number: 14, minor_number: 4, major_device_class: "sound" }),
-        "/dev/sound/speaker" => Some(DeviceNodeInfo { path: "/dev/sound/speaker", major_number: 14, minor_number: 3, major_device_class: "sound" }),
-        "/dev/printer" => Some(DeviceNodeInfo { path: "/dev/printer", major_number: 6, minor_number: 0, major_device_class: "printer" }),
+        "/dev/input/keyboard" => Some(DeviceNodeInfo {
+            path: "/dev/input/keyboard",
+            major_number: 13,
+            minor_number: 0,
+            major_device_class: "input",
+        }),
+        "/dev/input/mouse" => Some(DeviceNodeInfo {
+            path: "/dev/input/mouse",
+            major_number: 13,
+            minor_number: 32,
+            major_device_class: "input",
+        }),
+        "/dev/sound/mic" => Some(DeviceNodeInfo {
+            path: "/dev/sound/mic",
+            major_number: 14,
+            minor_number: 4,
+            major_device_class: "sound",
+        }),
+        "/dev/sound/speaker" => Some(DeviceNodeInfo {
+            path: "/dev/sound/speaker",
+            major_number: 14,
+            minor_number: 3,
+            major_device_class: "sound",
+        }),
+        "/dev/printer" => Some(DeviceNodeInfo {
+            path: "/dev/printer",
+            major_number: 6,
+            minor_number: 0,
+            major_device_class: "printer",
+        }),
         _ => None,
     }
 }

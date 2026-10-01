@@ -8,13 +8,13 @@ use std::vec::Vec;
 /// Bonding mode
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BondingMode {
-    BalanceRR, // Round-robin
+    BalanceRR,      // Round-robin
     ActiveBackup,
     BalanceXOR,
     Broadcast,
-    Ieee8023ad, // IEEE 802.3ad LACP
-    BalanceTLB, // Adaptive transmit load balancing
-    BalanceALB, // Adaptive load balancing
+    Ieee8023ad,     // IEEE 802.3ad LACP
+    BalanceTLB,     // Adaptive transmit load balancing
+    BalanceALB,     // Adaptive load balancing
 }
 
 impl BondingMode {
@@ -160,18 +160,14 @@ impl BondInterface {
     }
 
     pub fn get_total_bandwidth(&self) -> u32 {
-        self.slaves
-            .iter()
+        self.slaves.iter()
             .filter(|s| s.status == BondStatus::Active)
             .map(|s| s.link_speed_mbps)
             .sum()
     }
 
     pub fn get_active_slave_count(&self) -> usize {
-        self.slaves
-            .iter()
-            .filter(|s| s.status == BondStatus::Active)
-            .count()
+        self.slaves.iter().filter(|s| s.status == BondStatus::Active).count()
     }
 }
 
@@ -183,7 +179,9 @@ pub struct NetworkBondingManager {
 
 impl Default for NetworkBondingManager {
     fn default() -> Self {
-        NetworkBondingManager { bonds: Vec::new() }
+        NetworkBondingManager {
+            bonds: Vec::new(),
+        }
     }
 }
 
@@ -220,15 +218,11 @@ impl NetworkBondingManager {
     }
 
     pub fn add_slave_to_bond(&mut self, bond_name: &str, slave_name: String) -> Result<(), String> {
-        let bond = self
-            .get_bond_mut(bond_name)
+        let bond = self.get_bond_mut(bond_name)
             .ok_or_else(|| format!("Bond {} not found", bond_name))?;
 
         if bond.slaves.iter().any(|s| s.name == slave_name) {
-            return Err(format!(
-                "Slave {} already in bond {}",
-                slave_name, bond_name
-            ));
+            return Err(format!("Slave {} already in bond {}", slave_name, bond_name));
         }
 
         let slave = SlaveInterface::new(slave_name);
@@ -236,28 +230,19 @@ impl NetworkBondingManager {
         Ok(())
     }
 
-    pub fn remove_slave_from_bond(
-        &mut self,
-        bond_name: &str,
-        slave_name: &str,
-    ) -> Result<(), String> {
-        let bond = self
-            .get_bond_mut(bond_name)
+    pub fn remove_slave_from_bond(&mut self, bond_name: &str, slave_name: &str) -> Result<(), String> {
+        let bond = self.get_bond_mut(bond_name)
             .ok_or_else(|| format!("Bond {} not found", bond_name))?;
 
         if bond.remove_slave(slave_name) {
             Ok(())
         } else {
-            Err(format!(
-                "Slave {} not found in bond {}",
-                slave_name, bond_name
-            ))
+            Err(format!("Slave {} not found in bond {}", slave_name, bond_name))
         }
     }
 
     pub fn set_bond_mode(&mut self, bond_name: &str, mode: BondingMode) -> Result<(), String> {
-        let bond = self
-            .get_bond_mut(bond_name)
+        let bond = self.get_bond_mut(bond_name)
             .ok_or_else(|| format!("Bond {} not found", bond_name))?;
 
         bond.mode = mode;
@@ -265,8 +250,7 @@ impl NetworkBondingManager {
     }
 
     pub fn set_bond_mtu(&mut self, bond_name: &str, mtu: u32) -> Result<(), String> {
-        let bond = self
-            .get_bond_mut(bond_name)
+        let bond = self.get_bond_mut(bond_name)
             .ok_or_else(|| format!("Bond {} not found", bond_name))?;
 
         bond.set_mtu(mtu);
@@ -274,8 +258,7 @@ impl NetworkBondingManager {
     }
 
     pub fn activate_bond(&mut self, bond_name: &str) -> Result<(), String> {
-        let bond = self
-            .get_bond_mut(bond_name)
+        let bond = self.get_bond_mut(bond_name)
             .ok_or_else(|| format!("Bond {} not found", bond_name))?;
 
         if bond.slaves.is_empty() {
@@ -295,8 +278,7 @@ impl NetworkBondingManager {
     }
 
     pub fn deactivate_bond(&mut self, bond_name: &str) -> Result<(), String> {
-        let bond = self
-            .get_bond_mut(bond_name)
+        let bond = self.get_bond_mut(bond_name)
             .ok_or_else(|| format!("Bond {} not found", bond_name))?;
 
         bond.set_status(BondStatus::Inactive);
@@ -305,32 +287,22 @@ impl NetworkBondingManager {
     }
 
     pub fn get_bond_status(&self, bond_name: &str) -> Result<String, String> {
-        let bond = self
-            .get_bond(bond_name)
+        let bond = self.get_bond(bond_name)
             .ok_or_else(|| format!("Bond {} not found", bond_name))?;
 
         let mut status = format!("Bond: {}\n", bond.name);
         status.push_str(&format!("Mode: {}\n", bond.mode.as_str()));
         status.push_str(&format!("Status: {}\n", bond.status.as_str()));
         status.push_str(&format!("MTU: {}\n", bond.mtu));
-        status.push_str(&format!(
-            "Active Slave: {}\n",
-            bond.active_slave.as_ref().unwrap_or(&String::from("None"))
-        ));
-        status.push_str(&format!(
-            "Total Bandwidth: {} Mbps\n",
-            bond.get_total_bandwidth()
-        ));
-        status.push_str(&format!(
-            "Active Slaves: {}/{}\n",
-            bond.get_active_slave_count(),
-            bond.slaves.len()
-        ));
+        status.push_str(&format!("Active Slave: {}\n", bond.active_slave.as_ref().unwrap_or(&String::from("None"))));
+        status.push_str(&format!("Total Bandwidth: {} Mbps\n", bond.get_total_bandwidth()));
+        status.push_str(&format!("Active Slaves: {}/{}\n", bond.get_active_slave_count(), bond.slaves.len()));
         status.push_str("\nSlaves:\n");
 
         for slave in &bond.slaves {
             status.push_str(&format!(
                 "  - {}: {} ({} Mbps){}\n",
+            status.push_str(&format!("  - {}: {} ({} Mbps){}\n",
                 slave.name,
                 slave.status.as_str(),
                 slave.link_speed_mbps,
@@ -342,8 +314,7 @@ impl NetworkBondingManager {
     }
 
     pub fn list_bonds(&self) -> Vec<String> {
-        self.bonds
-            .iter()
+        self.bonds.iter()
             .map(|b| format!("{} ({}, {})", b.name, b.mode.as_str(), b.status.as_str()))
             .collect()
     }
@@ -365,6 +336,7 @@ impl NetworkBondingManager {
             .iter()
             .filter(|b| b.status == BondStatus::Active)
             .count();
+        let active_bonds = self.bonds.iter().filter(|b| b.status == BondStatus::Active).count();
         stats.push_str(&format!("Active bonds: {}\n", active_bonds));
 
         stats
@@ -383,10 +355,7 @@ mod tests {
 
     #[test]
     fn test_bonding_mode_from_str() {
-        assert_eq!(
-            BondingMode::from_str("balance-rr"),
-            Some(BondingMode::BalanceRR)
-        );
+        assert_eq!(BondingMode::from_str("balance-rr"), Some(BondingMode::BalanceRR));
         assert_eq!(BondingMode::from_str("invalid"), None);
     }
 
@@ -449,64 +418,44 @@ mod tests {
     #[test]
     fn test_network_bonding_manager_create_bond() {
         let mut manager = NetworkBondingManager::new();
-        assert!(manager
-            .create_bond(String::from("bond0"), BondingMode::BalanceRR)
-            .is_ok());
+        assert!(manager.create_bond(String::from("bond0"), BondingMode::BalanceRR).is_ok());
         assert_eq!(manager.bonds.len(), 1);
     }
 
     #[test]
     fn test_network_bonding_manager_create_duplicate_bond() {
         let mut manager = NetworkBondingManager::new();
-        manager
-            .create_bond(String::from("bond0"), BondingMode::BalanceRR)
-            .unwrap();
-        assert!(manager
-            .create_bond(String::from("bond0"), BondingMode::BalanceRR)
-            .is_err());
+        manager.create_bond(String::from("bond0"), BondingMode::BalanceRR).unwrap();
+        assert!(manager.create_bond(String::from("bond0"), BondingMode::BalanceRR).is_err());
     }
 
     #[test]
     fn test_network_bonding_manager_add_slave_to_bond() {
         let mut manager = NetworkBondingManager::new();
-        manager
-            .create_bond(String::from("bond0"), BondingMode::BalanceRR)
-            .unwrap();
-        assert!(manager
-            .add_slave_to_bond("bond0", String::from("eth0"))
-            .is_ok());
+        manager.create_bond(String::from("bond0"), BondingMode::BalanceRR).unwrap();
+        assert!(manager.add_slave_to_bond("bond0", String::from("eth0")).is_ok());
     }
 
     #[test]
     fn test_network_bonding_manager_activate_bond() {
         let mut manager = NetworkBondingManager::new();
-        manager
-            .create_bond(String::from("bond0"), BondingMode::BalanceRR)
-            .unwrap();
-        manager
-            .add_slave_to_bond("bond0", String::from("eth0"))
-            .unwrap();
+        manager.create_bond(String::from("bond0"), BondingMode::BalanceRR).unwrap();
+        manager.add_slave_to_bond("bond0", String::from("eth0")).unwrap();
         assert!(manager.activate_bond("bond0").is_ok());
     }
 
     #[test]
     fn test_network_bonding_manager_activate_bond_no_slaves() {
         let mut manager = NetworkBondingManager::new();
-        manager
-            .create_bond(String::from("bond0"), BondingMode::BalanceRR)
-            .unwrap();
+        manager.create_bond(String::from("bond0"), BondingMode::BalanceRR).unwrap();
         assert!(manager.activate_bond("bond0").is_err());
     }
 
     #[test]
     fn test_network_bonding_manager_get_bond_status() {
         let mut manager = NetworkBondingManager::new();
-        manager
-            .create_bond(String::from("bond0"), BondingMode::BalanceRR)
-            .unwrap();
-        manager
-            .add_slave_to_bond("bond0", String::from("eth0"))
-            .unwrap();
+        manager.create_bond(String::from("bond0"), BondingMode::BalanceRR).unwrap();
+        manager.add_slave_to_bond("bond0", String::from("eth0")).unwrap();
         let status = manager.get_bond_status("bond0");
         assert!(status.is_ok());
         assert!(status.unwrap().contains("bond0"));
@@ -515,9 +464,7 @@ mod tests {
     #[test]
     fn test_network_bonding_manager_list_bonds() {
         let mut manager = NetworkBondingManager::new();
-        manager
-            .create_bond(String::from("bond0"), BondingMode::BalanceRR)
-            .unwrap();
+        manager.create_bond(String::from("bond0"), BondingMode::BalanceRR).unwrap();
         let bonds = manager.list_bonds();
         assert_eq!(bonds.len(), 1);
     }
@@ -525,9 +472,7 @@ mod tests {
     #[test]
     fn test_network_bonding_manager_get_statistics() {
         let mut manager = NetworkBondingManager::new();
-        manager
-            .create_bond(String::from("bond0"), BondingMode::BalanceRR)
-            .unwrap();
+        manager.create_bond(String::from("bond0"), BondingMode::BalanceRR).unwrap();
         let stats = manager.get_statistics();
         assert!(stats.contains("Total bonds: 1"));
     }

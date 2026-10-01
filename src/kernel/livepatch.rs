@@ -29,7 +29,12 @@ impl SovereignLivePatchEngine {
         }
     }
 
-    pub fn apply_patch(&mut self, patch_id: &'static str, orig_addr: u64, new_addr: u64) -> Result<(), &'static str> {
+    pub fn apply_patch(
+        &mut self,
+        patch_id: &'static str,
+        orig_addr: u64,
+        new_addr: u64,
+    ) -> Result<(), &'static str> {
         if self.active_patches.contains_key(patch_id) {
             return Err("Patch ID already active");
         }

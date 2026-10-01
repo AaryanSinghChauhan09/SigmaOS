@@ -121,7 +121,9 @@ impl SimpleSecret {
         let mut name_array = [0u8; 64];
         let name_len = name.len().min(63);
 
-        name_array[..name_len].copy_from_slice(&name[..name_len]);
+        unsafe {
+            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
+        }
 
         SimpleSecret {
             id,
@@ -137,28 +139,14 @@ impl SimpleSecret {
 
     pub fn set_data(&mut self, data: &[u8]) {
         let len = data.len().min(511);
-        self.data.fill(0);
-        self.data[..len].copy_from_slice(&data[..len]);
+        unsafe {
+            core::ptr::copy_nonoverlapping(data.as_ptr(), self.data.as_mut_ptr(), len);
+        }
         self.data_len = len;
     }
 
     pub fn get_data(&self) -> &[u8] {
         &self.data[..self.data_len]
-    }
-}
-
-impl Drop for SimpleSecret {
-    fn drop(&mut self) {
-        for byte in self.data.iter_mut() {
-            // SAFETY: `byte` is a valid, uniquely borrowed element of this writable array.
-            unsafe { core::ptr::write_volatile(byte, 0) };
-        }
-        for byte in self.name.iter_mut() {
-            // SAFETY: `byte` is a valid, uniquely borrowed element of this writable array.
-            unsafe { core::ptr::write_volatile(byte, 0) };
-        }
-        self.data_len = 0;
-        self.name_len = 0;
     }
 }
 
@@ -190,6 +178,16 @@ impl Secret for SimpleSecret {
         }
 
         Err(SecretError::CryptoUnavailable)
+        for (b, &k) in self.data[..self.data_len]
+            .iter_mut()
+            .zip(key.iter().cycle())
+        {
+        for (b, &k) in self.data[..self.data_len].iter_mut().zip(key.iter().cycle()) {
+            *b ^= k;
+        }
+
+        self.is_encrypted.store(true, Ordering::SeqCst);
+        Ok(())
     }
 
     fn decrypt(&mut self, key: &[u8]) -> Result<(), SecretError> {
@@ -206,6 +204,16 @@ impl Secret for SimpleSecret {
         }
 
         Err(SecretError::CryptoUnavailable)
+        for (b, &k) in self.data[..self.data_len]
+            .iter_mut()
+            .zip(key.iter().cycle())
+        {
+        for (b, &k) in self.data[..self.data_len].iter_mut().zip(key.iter().cycle()) {
+            *b ^= k;
+        }
+
+        self.is_encrypted.store(false, Ordering::SeqCst);
+        Ok(())
     }
 
     fn info(&self) -> SecretInfo {

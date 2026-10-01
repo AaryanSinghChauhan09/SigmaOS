@@ -1,5 +1,7 @@
 use std::format;
 
+
+
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec;
@@ -1126,6 +1128,7 @@ impl TerminalSession {
         }
     }
 
+
     pub fn register_alias(&mut self, name: &str, value: &str) {
         self.aliases.insert(name.to_string(), value.to_string());
     }
@@ -1289,8 +1292,7 @@ impl TerminalSession {
     }
 
     pub fn register_trigger_rule(&mut self, pattern: &str, action: &str) {
-        self.trigger_rules
-            .push(TriggerRule::new(pattern, AnsiColor::Default, Some(action)));
+        self.trigger_rules.push(TriggerRule::new(pattern, AnsiColor::Default, Some(action)));
     }
 
     /// Parses basic ANSI Escape Sequences (CSIs)
@@ -1318,32 +1320,24 @@ impl TerminalSession {
             self.background = AnsiColor::Default;
             self.bold = false;
         } else if seq.starts_with("\x1B[38;5;") {
-            if let Ok(val) = seq
-                .trim_start_matches("\x1B[38;5;")
-                .trim_end_matches('m')
-                .parse::<u8>()
-            {
+            if let Ok(val) = seq.trim_start_matches("\x1B[38;5;").trim_end_matches('m').parse::<u8>() {
                 self.foreground = AnsiColor::Xterm256(val);
             }
         } else if seq.starts_with("\x1B[48;5;") {
-            if let Ok(val) = seq
-                .trim_start_matches("\x1B[48;5;")
-                .trim_end_matches('m')
-                .parse::<u8>()
-            {
+            if let Ok(val) = seq.trim_start_matches("\x1B[48;5;").trim_end_matches('m').parse::<u8>() {
                 self.background = AnsiColor::Xterm256(val);
             }
         } else if seq.starts_with("\x1B[") && seq.ends_with('A') {
-            let num = seq[2..seq.len() - 1].parse::<usize>().unwrap_or(1);
+            let num = seq[2..seq.len()-1].parse::<usize>().unwrap_or(1);
             self.cursor_y = self.cursor_y.saturating_sub(num);
         } else if seq.starts_with("\x1B[") && seq.ends_with('B') {
-            let num = seq[2..seq.len() - 1].parse::<usize>().unwrap_or(1);
+            let num = seq[2..seq.len()-1].parse::<usize>().unwrap_or(1);
             self.cursor_y = (self.cursor_y + num).min(self.height - 1);
         } else if seq.starts_with("\x1B[") && seq.ends_with('C') {
-            let num = seq[2..seq.len() - 1].parse::<usize>().unwrap_or(1);
+            let num = seq[2..seq.len()-1].parse::<usize>().unwrap_or(1);
             self.cursor_x = (self.cursor_x + num).min(self.width - 1);
         } else if seq.starts_with("\x1B[") && seq.ends_with('D') {
-            let num = seq[2..seq.len() - 1].parse::<usize>().unwrap_or(1);
+            let num = seq[2..seq.len()-1].parse::<usize>().unwrap_or(1);
             self.cursor_x = self.cursor_x.saturating_sub(num);
         }
     }

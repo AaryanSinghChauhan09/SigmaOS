@@ -55,9 +55,7 @@ pub fn run(paths: &[String], opts: TailOptions) -> Result<String, String> {
 fn process_reader<R: Read>(reader: &mut R, opts: TailOptions) -> Result<String, String> {
     if let Some(num_bytes) = opts.bytes {
         let mut buffer = Vec::new();
-        reader
-            .read_to_end(&mut buffer)
-            .map_err(|e| format!("tail: {}", e))?;
+        reader.read_to_end(&mut buffer).map_err(|e| format!("tail: {}", e))?;
         let start = if buffer.len() > num_bytes {
             buffer.len() - num_bytes
         } else {

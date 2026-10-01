@@ -138,10 +138,10 @@ mod tests {
     fn test_send_receive_message() {
         let mut bus = SovereignIpcBus::new();
         let data = b"Hello, World!";
-        
+
         assert!(bus.send_message(1, 2, data, true).is_ok());
         assert_eq!(bus.message_count(), 1);
-        
+
         let received = bus.receive_message(2);
         assert!(received.is_some());
         let msg = received.unwrap();
@@ -154,10 +154,10 @@ mod tests {
     fn test_ipc_capability_check() {
         let mut bus = SovereignIpcBus::new();
         let data = b"Test message";
-        
+
         // Should fail without capability
         assert!(bus.send_message(1, 2, data, false).is_err());
-        
+
         // Should succeed with capability
         assert!(bus.send_message(1, 2, data, true).is_ok());
     }
@@ -166,7 +166,7 @@ mod tests {
     fn test_message_size_limit() {
         let mut bus = SovereignIpcBus::new();
         let large_data = [0u8; 100]; // Exceeds MAX_IPC_MESSAGE_SIZE
-        
+
         assert!(bus.send_message(1, 2, &large_data, true).is_err());
     }
 
@@ -174,14 +174,14 @@ mod tests {
     fn test_queue_full() {
         let mut bus = SovereignIpcBus::new();
         let data = b"Test";
-        
+
         // Fill the queue
         for i in 0..IPC_QUEUE_CAPACITY {
             assert!(bus.send_message(1, (i + 1) as u32, data, true).is_ok());
         }
-        
+
         assert!(bus.is_full());
-        
+
         // Should fail when queue is full
         assert!(bus.send_message(1, 100, data, true).is_err());
     }
@@ -190,10 +190,10 @@ mod tests {
     fn test_clear_bus() {
         let mut bus = SovereignIpcBus::new();
         let data = b"Test";
-        
+
         bus.send_message(1, 2, data, true).unwrap();
         assert_eq!(bus.message_count(), 1);
-        
+
         bus.clear();
         assert!(bus.is_empty());
         assert_eq!(bus.message_count(), 0);
@@ -203,12 +203,12 @@ mod tests {
     fn test_receive_wrong_pid() {
         let mut bus = SovereignIpcBus::new();
         let data = b"Test";
-        
+
         bus.send_message(1, 2, data, true).unwrap();
-        
+
         // Process 3 should not receive message meant for process 2
         assert!(bus.receive_message(3).is_none());
-        
+
         // Process 2 should receive the message
         assert!(bus.receive_message(2).is_some());
     }

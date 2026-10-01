@@ -9,12 +9,12 @@ use std::vec::Vec;
 
 /// Standard POSIX System Call Error Codes
 pub mod posix_errno {
-    pub const EPERM: i64 = -1; // Operation not permitted
-    pub const ENOENT: i64 = -2; // No such file or directory
-    pub const ESRCH: i64 = -3; // No such process
-    pub const EINTR: i64 = -4; // Interrupted system call
-    pub const EIO: i64 = -5; // I/O error
-    pub const EBADF: i64 = -9; // Bad file descriptor
+    pub const EPERM: i64 = -1;   // Operation not permitted
+    pub const ENOENT: i64 = -2;  // No such file or directory
+    pub const ESRCH: i64 = -3;   // No such process
+    pub const EINTR: i64 = -4;   // Interrupted system call
+    pub const EIO: i64 = -5;     // I/O error
+    pub const EBADF: i64 = -9;   // Bad file descriptor
     pub const EAGAIN: i64 = -11; // Try again / Resource temporarily unavailable
     pub const ENOMEM: i64 = -12; // Out of memory
     pub const EACCES: i64 = -13; // Permission denied
@@ -53,7 +53,7 @@ pub struct PidFdDescriptor {
 pub struct PosixLinuxBsdApiDispatcher {
     pub active_pidfds: HashMap<i32, PidFdDescriptor>,
     pub next_pidfd: i32,
-    pub active_pledges: HashMap<u32, String>, // PID -> Promises
+    pub active_pledges: HashMap<u32, String>,      // PID -> Promises
     pub active_unveils: HashMap<u32, Vec<String>>, // PID -> Unveiled paths
 }
 
@@ -149,21 +149,13 @@ impl PosixLinuxBsdApiDispatcher {
     /// Unified Syscall Dispatcher Entry Point
     pub fn dispatch_syscall(&mut self, sys_nr: u64, calling_pid: u32, arg1: u64, arg2: u64) -> i64 {
         match sys_nr {
-            syscall_abi_numbers::LINUX_SYS_PIDFD_OPEN => {
-                self.sys_pidfd_open(arg1 as u32, arg2 as u32)
-            }
+            syscall_abi_numbers::LINUX_SYS_PIDFD_OPEN => self.sys_pidfd_open(arg1 as u32, arg2 as u32),
             syscall_abi_numbers::LINUX_SYS_MEMFD_SECRET => self.sys_memfd_secret(arg1 as u32),
-            syscall_abi_numbers::LINUX_SYS_IO_URING_SETUP => {
-                self.sys_io_uring_setup(arg1 as u32, arg2 as u32)
-            }
+            syscall_abi_numbers::LINUX_SYS_IO_URING_SETUP => self.sys_io_uring_setup(arg1 as u32, arg2 as u32),
             syscall_abi_numbers::LINUX_SYS_MSEAL => self.sys_mseal(arg1, arg2, 0),
             syscall_abi_numbers::FREEBSD_SYS_PDFORK => self.sys_pdfork(calling_pid, arg1 as u32),
-            syscall_abi_numbers::OPENBSD_SYS_PLEDGE => {
-                self.sys_pledge(calling_pid, "stdio rpath wpath cpath")
-            }
-            syscall_abi_numbers::OPENBSD_SYS_UNVEIL => {
-                self.sys_unveil(calling_pid, "/usr/bin", "rx")
-            }
+            syscall_abi_numbers::OPENBSD_SYS_PLEDGE => self.sys_pledge(calling_pid, "stdio rpath wpath cpath"),
+            syscall_abi_numbers::OPENBSD_SYS_UNVEIL => self.sys_unveil(calling_pid, "/usr/bin", "rx"),
             _ => posix_errno::ENOSYS,
         }
     }
@@ -189,10 +181,7 @@ mod tests {
         let pfd = api.sys_pidfd_open(501, 0);
 
         assert!(pfd >= 100);
-        assert_eq!(
-            api.active_pidfds.get(&(pfd as i32)).unwrap().target_pid,
-            501
-        );
+        assert_eq!(api.active_pidfds.get(&(pfd as i32)).unwrap().target_pid, 501);
 
         let child_pid = api.sys_pdfork(10, 0);
         assert!(child_pid > 1000);
@@ -215,12 +204,10 @@ mod tests {
         let res = api.dispatch_syscall(syscall_abi_numbers::LINUX_SYS_MEMFD_SECRET, 100, 0, 0);
         assert!(res >= 100);
 
-        let ring_res =
-            api.dispatch_syscall(syscall_abi_numbers::LINUX_SYS_IO_URING_SETUP, 100, 256, 0);
+        let ring_res = api.dispatch_syscall(syscall_abi_numbers::LINUX_SYS_IO_URING_SETUP, 100, 256, 0);
         assert!(ring_res >= 100);
 
-        let mseal_res =
-            api.dispatch_syscall(syscall_abi_numbers::LINUX_SYS_MSEAL, 100, 0x7fff0000, 4096);
+        let mseal_res = api.dispatch_syscall(syscall_abi_numbers::LINUX_SYS_MSEAL, 100, 0x7fff0000, 4096);
         assert_eq!(mseal_res, 0);
 
         let invalid_res = api.dispatch_syscall(9999, 100, 0, 0);

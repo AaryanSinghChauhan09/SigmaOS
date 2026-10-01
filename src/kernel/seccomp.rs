@@ -195,8 +195,15 @@ impl SeccompManager {
     }
 
     /// Check syscall for process
-    pub fn check_syscall(&self, pid: u32, syscall: i32, args: &[u64]) -> Result<SeccompOperation, String> {
-        let filter = self.process_filters.get(&pid)
+    pub fn check_syscall(
+        &self,
+        pid: u32,
+        syscall: i32,
+        args: &[u64],
+    ) -> Result<SeccompOperation, String> {
+        let filter = self
+            .process_filters
+            .get(&pid)
             .ok_or_else(|| format!("Process not found: {}", pid))?;
 
         let filter_guard = filter.lock().unwrap();
@@ -205,7 +212,8 @@ impl SeccompManager {
 
     /// Remove process
     pub fn remove_process(&mut self, pid: u32) -> Result<(), String> {
-        self.process_filters.remove(&pid)
+        self.process_filters
+            .remove(&pid)
             .ok_or_else(|| format!("Process not found: {}", pid))?;
         Ok(())
     }

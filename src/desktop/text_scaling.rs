@@ -8,11 +8,11 @@ use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ScalingProfile {
-    Standard,              // 1.0x (96 DPI)
-    HighDpi2K,             // 1.25x (120 DPI)
-    UltraDpi4K,            // 2.0x (192 DPI)
-    AccessibilityEnlarged, // 1.5x (144 DPI)
-    Compact,               // 0.85x (81 DPI)
+    Standard,             // 1.0x (96 DPI)
+    HighDpi2K,            // 1.25x (120 DPI)
+    UltraDpi4K,           // 2.0x (192 DPI)
+    AccessibilityEnlarged,// 1.5x (144 DPI)
+    Compact,              // 0.85x (81 DPI)
 }
 
 impl ScalingProfile {

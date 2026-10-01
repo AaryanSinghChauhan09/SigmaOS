@@ -1,11 +1,10 @@
-use std::vec;
+use crate::klib::btreemap::BTreeMap;
 use core::sync::atomic::{AtomicUsize, Ordering};
 /// SigmaFS: Content-Addressed, Post-Quantum Cryptography (PQC) Encrypted Filesystem
 /// Implements a full Merkle-tree DAG structure for content addressing.
-
 use std::string::{String, ToString};
+use std::vec;
 use std::vec::Vec;
-use crate::klib::btreemap::BTreeMap;
 
 use crate::security::vault::EncryptionAlgorithm;
 
@@ -56,7 +55,9 @@ impl SigmaFS {
         let mut key_state: u64 = 0x517cc1b727220a95;
         let mut encrypted = Vec::with_capacity(data.len());
         for (i, &b) in data.iter().enumerate() {
-            key_state = key_state.wrapping_mul(6364136223846793005).wrapping_add((i as u64) + 1);
+            key_state = key_state
+                .wrapping_mul(6364136223846793005)
+                .wrapping_add((i as u64) + 1);
             let mask = ((key_state >> 33) ^ (key_state >> 11)) as u8;
             encrypted.push(b ^ mask);
         }

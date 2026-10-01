@@ -16,10 +16,9 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-
 // (no_std only applicable at crate root - removed)
 
-use core::sync::atomic::{AtomicUsize, AtomicPtr, Ordering};
+use core::sync::atomic::{AtomicPtr, AtomicUsize, Ordering};
 
 #[repr(C)]
 pub struct IRQController {
@@ -31,10 +30,10 @@ pub struct IRQController {
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum ControllerType {
-    APIC,    // x86 Advanced Programmable Interrupt Controller
-    GIC,     // ARM Generic Interrupt Controller
-    PLIC,    // RISC-V Platform-Level Interrupt Controller
-    PIC,     // Legacy 8259 PIC
+    APIC, // x86 Advanced Programmable Interrupt Controller
+    GIC,  // ARM Generic Interrupt Controller
+    PLIC, // RISC-V Platform-Level Interrupt Controller
+    PIC,  // Legacy 8259 PIC
 }
 
 #[repr(C)]
@@ -127,7 +126,7 @@ impl IRQController {
 
         self.handlers[irq].store(handler, Ordering::SeqCst);
         self.enable_irq(irq);
-        
+
         Ok(())
     }
 
@@ -177,7 +176,7 @@ impl IRQController {
                     // Call handler function
                     let func = (*handler).handler.load(Ordering::Acquire);
                     let ctx = (*handler).context.load(Ordering::Acquire);
-                    
+
                     // In real implementation, would call the function pointer
                     // let handler_fn: fn(*mut u8) = core::mem::transmute(func);
                     // handler_fn(ctx);

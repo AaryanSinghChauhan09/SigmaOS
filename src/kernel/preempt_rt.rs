@@ -11,14 +11,14 @@
 extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::collections::BTreeMap;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
-#[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
 /// Task Real-Time Scheduling Class
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -91,9 +91,16 @@ impl SovereignPreemptRtScheduler {
 
     /// Lock RT-mutex with Priority Inheritance Protocol (PIP)
     pub fn lock_rt_mutex(&mut self, mutex_id: u32, calling_pid: u64) -> Result<bool, &'static str> {
-        let task_prio = self.tasks.get(&calling_pid).ok_or("PREEMPT_RT: Task not found")?.priority;
+        let task_prio = self
+            .tasks
+            .get(&calling_pid)
+            .ok_or("PREEMPT_RT: Task not found")?
+            .priority;
 
-        let mutex = self.rt_mutexes.get_mut(&mutex_id).ok_or("PREEMPT_RT: Mutex not found")?;
+        let mutex = self
+            .rt_mutexes
+            .get_mut(&mutex_id)
+            .ok_or("PREEMPT_RT: Mutex not found")?;
 
         if let Some(owner_pid) = mutex.owner_pid {
             if owner_pid == calling_pid {
@@ -101,7 +108,11 @@ impl SovereignPreemptRtScheduler {
             }
 
             // Priority Inheritance: Boost owner priority if calling task has higher priority
-            let owner_prio = self.tasks.get(&owner_pid).map(|t| t.effective_priority).unwrap_or(1);
+            let owner_prio = self
+                .tasks
+                .get(&owner_pid)
+                .map(|t| t.effective_priority)
+                .unwrap_or(1);
             if task_prio > owner_prio {
                 if let Some(owner_task) = self.tasks.get_mut(&owner_pid) {
                     owner_task.effective_priority = task_prio;
@@ -121,8 +132,15 @@ impl SovereignPreemptRtScheduler {
     }
 
     /// Unlock RT-mutex and restore owner original priority
-    pub fn unlock_rt_mutex(&mut self, mutex_id: u32, calling_pid: u64) -> Result<Option<u64>, &'static str> {
-        let mutex = self.rt_mutexes.get_mut(&mutex_id).ok_or("PREEMPT_RT: Mutex not found")?;
+    pub fn unlock_rt_mutex(
+        &mut self,
+        mutex_id: u32,
+        calling_pid: u64,
+    ) -> Result<Option<u64>, &'static str> {
+        let mutex = self
+            .rt_mutexes
+            .get_mut(&mutex_id)
+            .ok_or("PREEMPT_RT: Mutex not found")?;
 
         if mutex.owner_pid != Some(calling_pid) {
             return Err("PREEMPT_RT: Mutex not held by calling task");

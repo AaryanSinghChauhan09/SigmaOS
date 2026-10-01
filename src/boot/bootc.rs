@@ -1,13 +1,12 @@
-use std::vec;
 use std::format;
+use std::vec;
 // SigmaBootC - Bootable Container System
 // Inspired by RHEL Image Mode (bootc) and Fedora Atomic Desktops
 // OCI-compliant container images for OS deployment with atomic updates
 
-
-use std::vec::Vec;
-use std::string::{String, ToString};
 use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Container image descriptor for SigmaOS bootable containers
 #[derive(Debug, Clone)]
@@ -104,7 +103,7 @@ impl BootableContainer {
         // Validate OCI image format
         if !oci_image.ends_with(".oci") && !oci_image.ends_with(".tar") {
             return Err(BootCError::InvalidImage(
-                "Invalid OCI image format".to_string()
+                "Invalid OCI image format".to_string(),
             ));
         }
 
@@ -213,7 +212,10 @@ impl BootCManager {
     /// Set active container
     pub fn set_active(&mut self, name: &str) -> Result<(), BootCError> {
         if !self.containers.contains_key(name) {
-            return Err(BootCError::InvalidConfig(format!("Container {} not found", name)));
+            return Err(BootCError::InvalidConfig(format!(
+                "Container {} not found",
+                name
+            )));
         }
         self.active_container = Some(name.to_string());
         Ok(())
@@ -222,7 +224,10 @@ impl BootCManager {
     /// Set default container
     pub fn set_default(&mut self, name: &str) -> Result<(), BootCError> {
         if !self.containers.contains_key(name) {
-            return Err(BootCError::InvalidConfig(format!("Container {} not found", name)));
+            return Err(BootCError::InvalidConfig(format!(
+                "Container {} not found",
+                name
+            )));
         }
         self.default_container = Some(name.to_string());
         Ok(())
@@ -230,7 +235,9 @@ impl BootCManager {
 
     /// Get active container
     pub fn get_active(&self) -> Option<&BootableContainer> {
-        self.active_container.as_ref().and_then(|name| self.containers.get(name))
+        self.active_container
+            .as_ref()
+            .and_then(|name| self.containers.get(name))
     }
 
     /// List all registered containers

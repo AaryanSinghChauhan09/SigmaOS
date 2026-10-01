@@ -1,7 +1,9 @@
 // Legacy Serial Port (UART 16550A) Driver
 // Implements unified OOP peripheral interface for ancient communication terminals.
 
-use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice as PeripheralDeviceTrait, PowerState};
+use crate::drivers::peripheral::{
+    DeviceGeneration, PeripheralDevice as PeripheralDeviceTrait, PowerState,
+};
 
 /// Represents an ancient 16550 UART Serial Port (e.g., COM1 at 0x3F8, COM2 at 0x2F8)
 #[allow(dead_code)]

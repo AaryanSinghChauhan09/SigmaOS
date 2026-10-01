@@ -148,10 +148,12 @@ fn init_memory_manager(memory_map: &[MemoryRegion]) {
     println!("Usable memory regions: {}", usable_regions.len());
 
     for region in &usable_regions {
-        println!("  0x{:x} - 0x{:x} ({} MB)",
-                 region.start,
-                 region.end,
-                 (region.end - region.start) / (1024 * 1024));
+        println!(
+            "  0x{:x} - 0x{:x} ({} MB)",
+            region.start,
+            region.end,
+            (region.end - region.start) / (1024 * 1024)
+        );
     }
 }
 
@@ -207,13 +209,11 @@ mod tests {
     #[test]
     fn test_boot_info_creation() {
         let boot_info = BootInfo {
-            memory_map: vec![
-                MemoryRegion {
-                    start: 0x1000,
-                    end: 0x100000,
-                    mem_type: MemoryType::Usable,
-                },
-            ],
+            memory_map: vec![MemoryRegion {
+                start: 0x1000,
+                end: 0x100000,
+                mem_type: MemoryType::Usable,
+            }],
             cmdline: String::from("sigmaos quiet"),
             framebuffer: None,
             rsdp_address: Some(0xf0000),

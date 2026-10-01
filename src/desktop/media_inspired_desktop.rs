@@ -104,7 +104,11 @@ impl HyprlandAestheticEngine {
             "window {{ border-radius: {}px; border-color: {}; box-shadow: {}; }}",
             self.config.rounded_corners_radius_px,
             self.config.active_border_color_hex,
-            if self.config.drop_shadow_enabled { "0 4px 12px rgba(0,0,0,0.5)" } else { "none" }
+            if self.config.drop_shadow_enabled {
+                "0 4px 12px rgba(0,0,0,0.5)"
+            } else {
+                "none"
+            }
         )
     }
 }
@@ -118,10 +122,10 @@ impl Default for HyprlandAestheticEngine {
 /// 3. HowToGeek & PCWorld Inspired Windows 11 Snap Layouts & macOS Stage Manager Grid
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SnapLayoutType {
-    HalfSplit,      // 50 / 50
-    ThreeColumns,   // 25 / 50 / 25
-    FourGrid,       // 2x2
-    StageManager,   // 1 Large Center + Stacked Thumbnails
+    HalfSplit,    // 50 / 50
+    ThreeColumns, // 25 / 50 / 25
+    FourGrid,     // 2x2
+    StageManager, // 1 Large Center + Stacked Thumbnails
 }
 
 #[derive(Debug, Clone)]
@@ -156,16 +160,52 @@ impl SnapLayoutsEngine {
         match layout {
             SnapLayoutType::HalfSplit => {
                 let half_w = self.screen_width / 2;
-                self.snap_zones.push(WindowSnapZone { window_id: 1, x: 0, y: 0, width: half_w, height: self.screen_height });
-                self.snap_zones.push(WindowSnapZone { window_id: 2, x: half_w, y: 0, width: half_w, height: self.screen_height });
+                self.snap_zones.push(WindowSnapZone {
+                    window_id: 1,
+                    x: 0,
+                    y: 0,
+                    width: half_w,
+                    height: self.screen_height,
+                });
+                self.snap_zones.push(WindowSnapZone {
+                    window_id: 2,
+                    x: half_w,
+                    y: 0,
+                    width: half_w,
+                    height: self.screen_height,
+                });
             }
             SnapLayoutType::FourGrid => {
                 let half_w = self.screen_width / 2;
                 let half_h = self.screen_height / 2;
-                self.snap_zones.push(WindowSnapZone { window_id: 1, x: 0, y: 0, width: half_w, height: half_h });
-                self.snap_zones.push(WindowSnapZone { window_id: 2, x: half_w, y: 0, width: half_w, height: half_h });
-                self.snap_zones.push(WindowSnapZone { window_id: 3, x: 0, y: half_h, width: half_w, height: half_h });
-                self.snap_zones.push(WindowSnapZone { window_id: 4, x: half_w, y: half_h, width: half_w, height: half_h });
+                self.snap_zones.push(WindowSnapZone {
+                    window_id: 1,
+                    x: 0,
+                    y: 0,
+                    width: half_w,
+                    height: half_h,
+                });
+                self.snap_zones.push(WindowSnapZone {
+                    window_id: 2,
+                    x: half_w,
+                    y: 0,
+                    width: half_w,
+                    height: half_h,
+                });
+                self.snap_zones.push(WindowSnapZone {
+                    window_id: 3,
+                    x: 0,
+                    y: half_h,
+                    width: half_w,
+                    height: half_h,
+                });
+                self.snap_zones.push(WindowSnapZone {
+                    window_id: 4,
+                    x: half_w,
+                    y: half_h,
+                    width: half_w,
+                    height: half_h,
+                });
             }
             _ => {}
         }

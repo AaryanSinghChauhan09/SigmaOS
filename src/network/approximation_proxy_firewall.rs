@@ -338,13 +338,19 @@ impl OpenBsdPfSynProxyShield {
             cookie_seq: cookie,
             state: SynProxyState::SynReceived,
         };
-        self.syn_table.insert((client_ip.to_string(), client_port), conn);
+        self.syn_table
+            .insert((client_ip.to_string(), client_port), conn);
         cookie
     }
 
     pub fn handle_ack(&mut self, client_ip: &str, client_port: u16, ack_seq: u32) -> bool {
-        let expected_cookie = self.generate_syncookie(client_ip, client_port).wrapping_add(1);
-        if let Some(conn) = self.syn_table.get_mut(&(client_ip.to_string(), client_port)) {
+        let expected_cookie = self
+            .generate_syncookie(client_ip, client_port)
+            .wrapping_add(1);
+        if let Some(conn) = self
+            .syn_table
+            .get_mut(&(client_ip.to_string(), client_port))
+        {
             if ack_seq == expected_cookie {
                 conn.state = SynProxyState::EstablishedAndHandedOff;
                 return true;
@@ -459,7 +465,9 @@ impl SovereignApproximationProxyFirewallSuite {
         self.cardinality.add_ip(src_ip);
 
         if self.heavy_hitters.is_heavy_hitter(src_ip, 100) {
-            return Err("Firewall DENY: Source IP identified as DDOS Heavy Hitter via Count-Min Sketch");
+            return Err(
+                "Firewall DENY: Source IP identified as DDOS Heavy Hitter via Count-Min Sketch",
+            );
         }
 
         if !self.rate_limiter.observe_event(src_ip, time_ms) {
@@ -567,7 +575,9 @@ mod tests {
         let mut suite = SovereignApproximationProxyFirewallSuite::new();
         let pkt = b"POST /login HTTP/1.1";
 
-        let res = suite.process_incoming_packet("10.0.0.1", 12345, 80, pkt, 1000).unwrap();
+        let res = suite
+            .process_incoming_packet("10.0.0.1", 12345, 80, pkt, 1000)
+            .unwrap();
         assert!(res.contains("Firewall PASS"));
     }
 }

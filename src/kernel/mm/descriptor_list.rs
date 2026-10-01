@@ -1,13 +1,12 @@
+use std::boxed::Box;
+use std::string::String;
 /// Memory Descriptor Lists (MDL), physical-to-virtual memory descriptor tracking,
 /// locked-in-memory states, and ancient/historical hardware driver DMA buffer compatibility.
 ///
 /// Replicates historical concepts from early Linux kernels (0.01-1.0 series)
 /// where direct I/O address space, direct-memory access (DMA), page protection, and
 /// ISA 16MB memory boundaries required precise, contiguous/non-contiguous mapping trackers.
-
 use std::vec::Vec;
-use std::boxed::Box;
-use std::string::String;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MemoryProtection {
@@ -20,8 +19,8 @@ pub enum MemoryProtection {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct MdlEntry {
     pub physical_page_frame: usize, // Physical page number (PPN)
-    pub length: usize,               // Length of the segment in bytes
-    pub offset: usize,               // Offset within the page
+    pub length: usize,              // Length of the segment in bytes
+    pub offset: usize,              // Offset within the page
 }
 
 impl MdlEntry {
@@ -99,7 +98,11 @@ impl MemoryDescriptorList {
                 core::cmp::min(byte_count, page_size - byte_offset)
             } else if i == total_pages - 1 {
                 let rem = (byte_count + byte_offset) % page_size;
-                if rem == 0 { page_size } else { rem }
+                if rem == 0 {
+                    page_size
+                } else {
+                    rem
+                }
             } else {
                 page_size
             };
@@ -125,7 +128,9 @@ impl MemoryDescriptorList {
         }
         let page_size = 4096;
         for i in 0..self.entries.len() - 1 {
-            if self.entries[i].physical_page_frame + page_size != self.entries[i + 1].physical_page_frame {
+            if self.entries[i].physical_page_frame + page_size
+                != self.entries[i + 1].physical_page_frame
+            {
                 return false;
             }
         }
@@ -182,9 +187,9 @@ impl MemoryDescriptorList {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AncientDeviceType {
-    FloppyController,   // Floppy Drive (ISA 8237 DMA, strictly 16MB memory bounds, 64KB buffer limit)
-    SoundBlaster16,     // Sound Blaster 16 (Dual 8-bit/16-bit DMA ping-pong buffers)
-    Ne2000Ethernet,     // NE2000 shared memory rings (ISA standard ethernet buffers)
+    FloppyController, // Floppy Drive (ISA 8237 DMA, strictly 16MB memory bounds, 64KB buffer limit)
+    SoundBlaster16,   // Sound Blaster 16 (Dual 8-bit/16-bit DMA ping-pong buffers)
+    Ne2000Ethernet,   // NE2000 shared memory rings (ISA standard ethernet buffers)
 }
 
 /// Model of an ancient device driver DMA memory buffer bound to historical computer architectures.
@@ -197,10 +202,16 @@ pub struct AncientDeviceDmaBuffer {
 
 impl AncientDeviceDmaBuffer {
     /// Constructs a standard ISA DMA buffer limited to the first 16 Megabytes of physical memory.
-    pub fn new_isa_dma(device_type: AncientDeviceType, name: &str, size: usize) -> Result<Self, &'static str> {
+    pub fn new_isa_dma(
+        device_type: AncientDeviceType,
+        name: &str,
+        size: usize,
+    ) -> Result<Self, &'static str> {
         // Enforce traditional ISA 8237 DMA limits (max 64KB single transfer for Floppy, 16MB physical limits)
         if device_type == AncientDeviceType::FloppyController && size > 65536 {
-            return Err("Floppy controller ISA DMA transfer buffer exceeds traditional 64KB threshold");
+            return Err(
+                "Floppy controller ISA DMA transfer buffer exceeds traditional 64KB threshold",
+            );
         }
 
         // Allocate a simulated ISA-bound contiguous buffer (virtually and physically below 16MB limit)
@@ -219,8 +230,8 @@ impl AncientDeviceDmaBuffer {
 
         let isa_channel = match device_type {
             AncientDeviceType::FloppyController => Some(2), // Channel 2 typically reserved for Floppy
-            AncientDeviceType::SoundBlaster16 => Some(5),   // Channel 5 typically reserved for 16-bit Sound Blaster
-            AncientDeviceType::Ne2000Ethernet => None,      // NE2000 uses direct Shared-RAM ring
+            AncientDeviceType::SoundBlaster16 => Some(5), // Channel 5 typically reserved for 16-bit Sound Blaster
+            AncientDeviceType::Ne2000Ethernet => None,    // NE2000 uses direct Shared-RAM ring
         };
 
         Ok(Self {
@@ -310,7 +321,8 @@ mod tests {
 
     #[test]
     fn test_mdl_entry_linking() {
-        let mut main_mdl = MemoryDescriptorList::new(0x1000_0000, 4096, MemoryProtection::ReadWrite);
+        let mut main_mdl =
+            MemoryDescriptorList::new(0x1000_0000, 4096, MemoryProtection::ReadWrite);
         let link_mdl = MemoryDescriptorList::new(0x2000_0000, 4096, MemoryProtection::ReadWrite);
         main_mdl.link_mdl(link_mdl);
         assert!(main_mdl.next.is_some());
@@ -319,7 +331,11 @@ mod tests {
     #[test]
     fn test_floppy_isa_dma_limits() {
         // Safe floppy buffer creation
-        let floppy_buf = AncientDeviceDmaBuffer::new_isa_dma(AncientDeviceType::FloppyController, "FLOPPY_A", 32768);
+        let floppy_buf = AncientDeviceDmaBuffer::new_isa_dma(
+            AncientDeviceType::FloppyController,
+            "FLOPPY_A",
+            32768,
+        );
         assert!(floppy_buf.is_ok());
         let buf = floppy_buf.unwrap();
         assert_eq!(buf.isa_dma_channel, Some(2));
@@ -328,13 +344,22 @@ mod tests {
         assert!(buf.mdl.entries[0].physical_page_frame < 0x0100_0000);
 
         // Exceeding 64KB limit for Floppy
-        let bad_floppy = AncientDeviceDmaBuffer::new_isa_dma(AncientDeviceType::FloppyController, "FLOPPY_A", 100_000);
+        let bad_floppy = AncientDeviceDmaBuffer::new_isa_dma(
+            AncientDeviceType::FloppyController,
+            "FLOPPY_A",
+            100_000,
+        );
         assert!(bad_floppy.is_err());
     }
 
     #[test]
     fn test_sound_blaster_ping_pong() {
-        let mut sb = AncientDeviceDmaBuffer::new_isa_dma(AncientDeviceType::SoundBlaster16, "SB16_PLAYBACK", 4096).unwrap();
+        let mut sb = AncientDeviceDmaBuffer::new_isa_dma(
+            AncientDeviceType::SoundBlaster16,
+            "SB16_PLAYBACK",
+            4096,
+        )
+        .unwrap();
         assert_eq!(sb.isa_dma_channel, Some(5));
         let trigger_msg = sb.trigger_ping_pong_interrupt().unwrap();
         assert!(trigger_msg.contains("Flopped active playback"));
@@ -342,7 +367,12 @@ mod tests {
 
     #[test]
     fn test_ne2000_shared_ring() {
-        let mut eth = AncientDeviceDmaBuffer::new_isa_dma(AncientDeviceType::Ne2000Ethernet, "NE2000_RING", 16384).unwrap();
+        let mut eth = AncientDeviceDmaBuffer::new_isa_dma(
+            AncientDeviceType::Ne2000Ethernet,
+            "NE2000_RING",
+            16384,
+        )
+        .unwrap();
         assert_eq!(eth.isa_dma_channel, None);
         let bytes = [0x55; 128];
         assert!(eth.write_ne2000_ring(0, &bytes).is_ok());

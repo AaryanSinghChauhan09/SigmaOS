@@ -1,11 +1,10 @@
 // ZFS-Inspired Advanced Filesystem Features
 // Combines ZFS innovations: snapshots, compression, deduplication, data integrity
 
-
+use core::time::Duration;
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::time::Duration;
 
 /// ZFS-inspired compression algorithms
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -97,7 +96,7 @@ impl DeduplicationTable {
 
     pub fn lookup_or_insert(&mut self, checksum: [u8; 32], block_addr: u64) -> Option<u64> {
         self.blocks_processed += 1;
-        
+
         if let Some(&existing_addr) = self.table.get(&checksum) {
             self.blocks_deduped += 1;
             self.update_dedup_ratio();
@@ -184,7 +183,12 @@ impl SnapshotManager {
         Ok(())
     }
 
-    pub fn create_incremental_snapshot(&mut self, name: String, parent: String, timestamp: u64) -> Result<(), &'static str> {
+    pub fn create_incremental_snapshot(
+        &mut self,
+        name: String,
+        parent: String,
+        timestamp: u64,
+    ) -> Result<(), &'static str> {
         if !self.snapshots.contains_key(&parent) {
             return Err("Parent snapshot does not exist");
         }
@@ -304,7 +308,11 @@ impl DatasetManager {
         }
     }
 
-    pub fn create_dataset(&mut self, name: String, config: DatasetConfig) -> Result<(), &'static str> {
+    pub fn create_dataset(
+        &mut self,
+        name: String,
+        config: DatasetConfig,
+    ) -> Result<(), &'static str> {
         if self.datasets.contains_key(&name) {
             return Err("Dataset already exists");
         }
@@ -316,7 +324,11 @@ impl DatasetManager {
         self.datasets.get(name)
     }
 
-    pub fn update_dataset_config(&mut self, name: &str, config: DatasetConfig) -> Result<(), &'static str> {
+    pub fn update_dataset_config(
+        &mut self,
+        name: &str,
+        config: DatasetConfig,
+    ) -> Result<(), &'static str> {
         if !self.datasets.contains_key(name) {
             return Err("Dataset does not exist");
         }
@@ -324,7 +336,11 @@ impl DatasetManager {
         Ok(())
     }
 
-    pub fn set_compression(&mut self, name: &str, algorithm: CompressionAlgorithm) -> Result<(), &'static str> {
+    pub fn set_compression(
+        &mut self,
+        name: &str,
+        algorithm: CompressionAlgorithm,
+    ) -> Result<(), &'static str> {
         if let Some(config) = self.datasets.get_mut(name) {
             config.compression = algorithm;
             Ok(())
@@ -486,7 +502,12 @@ impl ZpoolManager {
         }
     }
 
-    pub fn create_pool(&mut self, name: String, size: u64, raid_level: RaidLevel) -> Result<(), &'static str> {
+    pub fn create_pool(
+        &mut self,
+        name: String,
+        size: u64,
+        raid_level: RaidLevel,
+    ) -> Result<(), &'static str> {
         if self.pools.contains_key(&name) {
             return Err("Pool already exists");
         }
@@ -559,7 +580,8 @@ impl ZfsInspiredFilesystem {
         dataset_name: String,
         config: DatasetConfig,
     ) -> Result<(), &'static str> {
-        self.pool_manager.create_pool(pool_name.clone(), pool_size, raid_level)?;
+        self.pool_manager
+            .create_pool(pool_name.clone(), pool_size, raid_level)?;
         self.dataset_manager.create_dataset(dataset_name, config)?;
         Ok(())
     }
@@ -606,7 +628,7 @@ mod tests {
     fn test_deduplication_table() {
         let mut table = DeduplicationTable::new();
         let checksum = [0u8; 32];
-        
+
         assert_eq!(table.lookup_or_insert(checksum, 100), None);
         assert_eq!(table.lookup_or_insert(checksum, 200), Some(100));
         assert!(table.dedup_ratio() > 0.0);

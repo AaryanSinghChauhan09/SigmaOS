@@ -1,7 +1,6 @@
 // Btrfs-Inspired Advanced Filesystem Features
 // Combines Btrfs innovations: subvolumes, copy-on-write, RAID levels, compression
 
-
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
@@ -108,7 +107,7 @@ impl SubvolumeManager {
     pub fn new() -> Self {
         let mut manager = Self {
             subvolumes: BTreeMap::new(),
-            next_id: 256, // Btrfs starts subvolume IDs at 256
+            next_id: 256,         // Btrfs starts subvolume IDs at 256
             root_subvolume_id: 5, // Btrfs root subvolume is ID 5
         };
 
@@ -118,7 +117,11 @@ impl SubvolumeManager {
         manager
     }
 
-    pub fn create_subvolume(&mut self, name: String, parent_id: Option<u64>) -> Result<u64, &'static str> {
+    pub fn create_subvolume(
+        &mut self,
+        name: String,
+        parent_id: Option<u64>,
+    ) -> Result<u64, &'static str> {
         let id = self.next_id;
         self.next_id += 1;
 
@@ -141,7 +144,11 @@ impl SubvolumeManager {
         self.next_id += 1;
 
         let source = self.subvolumes.get(&source_id).unwrap();
-        let mut snapshot = Subvolume::new(snapshot_id, name, Some(source.parent_id.unwrap_or(self.root_subvolume_id)));
+        let mut snapshot = Subvolume::new(
+            snapshot_id,
+            name,
+            Some(source.parent_id.unwrap_or(self.root_subvolume_id)),
+        );
         snapshot.used_space = source.used_space; // Copy-on-write semantics
         snapshot.compression = source.compression;
 
@@ -323,7 +330,11 @@ impl BtrfsManager {
         self.devices.values().collect()
     }
 
-    pub fn allocate_chunk(&mut self, size: u64, raid_profile: Option<BtrfsRaidProfile>) -> Result<u64, &'static str> {
+    pub fn allocate_chunk(
+        &mut self,
+        size: u64,
+        raid_profile: Option<BtrfsRaidProfile>,
+    ) -> Result<u64, &'static str> {
         let profile = raid_profile.unwrap_or(self.default_raid_profile);
         let min_devices = profile.min_devices();
 
@@ -332,7 +343,8 @@ impl BtrfsManager {
         }
 
         // Find devices with enough space
-        let available_devices: Vec<u64> = self.devices
+        let available_devices: Vec<u64> = self
+            .devices
             .values()
             .filter(|d| d.free_space() >= size)
             .map(|d| d.id)
@@ -436,12 +448,14 @@ pub struct SendReceiveManager {
 
 impl SendReceiveManager {
     pub fn new(subvolume_manager: SubvolumeManager) -> Self {
-        Self {
-            subvolume_manager,
-        }
+        Self { subvolume_manager }
     }
 
-    pub fn send_subvolume(&self, subvolume_id: u64, parent_id: Option<u64>) -> Result<Vec<u8>, &'static str> {
+    pub fn send_subvolume(
+        &self,
+        subvolume_id: u64,
+        parent_id: Option<u64>,
+    ) -> Result<Vec<u8>, &'static str> {
         if !self.subvolume_manager.get_subvolume(subvolume_id).is_some() {
             return Err("Subvolume does not exist");
         }
@@ -562,7 +576,9 @@ mod tests {
     #[test]
     fn test_btrfs_manager() {
         let mut manager = BtrfsManager::new();
-        let device_id = manager.add_device("/dev/sda1".to_string(), 1024 * 1024 * 1024).unwrap();
+        let device_id = manager
+            .add_device("/dev/sda1".to_string(), 1024 * 1024 * 1024)
+            .unwrap();
         assert!(manager.get_device(device_id).is_some());
         assert_eq!(manager.list_devices().len(), 1);
     }

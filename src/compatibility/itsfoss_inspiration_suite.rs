@@ -118,17 +118,11 @@ impl ItsFossLocalSendTransferEngine {
     }
 
     pub fn register_peer(&mut self, peer: LocalSendPeer) {
-        self.discovered_peers
-            .retain(|p| p.ip_address != peer.ip_address);
+        self.discovered_peers.retain(|p| p.ip_address != peer.ip_address);
         self.discovered_peers.push(peer);
     }
 
-    pub fn send_file_to_peer(
-        &mut self,
-        ip: &str,
-        filename: &str,
-        file_bytes: &[u8],
-    ) -> Result<String, &'static str> {
+    pub fn send_file_to_peer(&mut self, ip: &str, filename: &str, file_bytes: &[u8]) -> Result<String, &'static str> {
         let peer = self
             .discovered_peers
             .iter()
@@ -197,11 +191,7 @@ impl ItsFossStacerOptimizerEngine {
     }
 
     pub fn toggle_startup_service(&mut self, service_name: &str, enable: bool) -> bool {
-        if let Some(s) = self
-            .startup_services
-            .iter_mut()
-            .find(|(name, _)| name == service_name)
-        {
+        if let Some(s) = self.startup_services.iter_mut().find(|(name, _)| name == service_name) {
             s.1 = enable;
             true
         } else {
@@ -250,12 +240,7 @@ impl ItsFossVentoyMultiBootUsbEngine {
         Ok(())
     }
 
-    pub fn add_iso_image(
-        &mut self,
-        filename: &str,
-        size_mb: u64,
-        os_name: &str,
-    ) -> Result<(), &'static str> {
+    pub fn add_iso_image(&mut self, filename: &str, size_mb: u64, os_name: &str) -> Result<(), &'static str> {
         if !self.partition_table_created {
             return Err("Ventoy: Prepare Ventoy partition layout before copying ISO images");
         }
@@ -315,9 +300,7 @@ mod tests {
             device_type: "mobile".to_string(),
         });
 
-        let res = localsend
-            .send_file_to_peer("192.168.1.105", "document.pdf", b"PDF_DATA")
-            .unwrap();
+        let res = localsend.send_file_to_peer("192.168.1.105", "document.pdf", b"PDF_DATA").unwrap();
         assert!(res.contains("Android Phone"));
         assert!(res.contains("document.pdf"));
     }
@@ -335,17 +318,11 @@ mod tests {
     #[test]
     fn test_itsfoss_ventoy_multiboot_usb() {
         let mut ventoy = ItsFossVentoyMultiBootUsbEngine::new("/dev/sdc");
-        assert!(ventoy
-            .add_iso_image("ubuntu-24.04.iso", 4096, "Ubuntu 24.04 LTS")
-            .is_err()); // Not prepared yet
+        assert!(ventoy.add_iso_image("ubuntu-24.04.iso", 4096, "Ubuntu 24.04 LTS").is_err()); // Not prepared yet
 
         assert!(ventoy.prepare_ventoy_partition_layout().is_ok());
-        assert!(ventoy
-            .add_iso_image("ubuntu-24.04.iso", 4096, "Ubuntu 24.04 LTS")
-            .is_ok());
-        assert!(ventoy
-            .add_iso_image("archlinux.iso", 1024, "Arch Linux")
-            .is_ok());
+        assert!(ventoy.add_iso_image("ubuntu-24.04.iso", 4096, "Ubuntu 24.04 LTS").is_ok());
+        assert!(ventoy.add_iso_image("archlinux.iso", 1024, "Arch Linux").is_ok());
 
         let grub_cfg = ventoy.generate_grub_boot_menu();
         assert!(grub_cfg.contains("Ubuntu 24.04 LTS"));

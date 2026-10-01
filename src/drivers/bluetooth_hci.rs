@@ -6,11 +6,17 @@ use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState}
 
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DeviceGeneration { Legacy, Modern }
+pub enum DeviceGeneration {
+    Legacy,
+    Modern,
+}
 
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PowerState { Off, On }
+pub enum PowerState {
+    Off,
+    On,
+}
 
 #[cfg(feature = "standalone_test")]
 pub trait PeripheralDevice {
@@ -172,7 +178,10 @@ mod tests {
     fn test_bluetooth_hci_driver() {
         let mut driver = BluetoothHciDriver::new();
         driver.initialize().unwrap();
-        assert_eq!(driver.name(), "Bluetooth 5.3 Host Controller Interface Driver (HCI)");
+        assert_eq!(
+            driver.name(),
+            "Bluetooth 5.3 Host Controller Interface Driver (HCI)"
+        );
 
         let devices = driver.start_inquiry_scan().unwrap();
         assert_eq!(devices.len(), 2);

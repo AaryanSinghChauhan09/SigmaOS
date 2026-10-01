@@ -74,7 +74,7 @@ impl BareMetalTargetBootEngine {
         // Standard x86_64 Long Mode GDT Layout:
         // Index 0: Null, Index 1: Kernel Code 64-bit, Index 2: Kernel Data, Index 3: User Code, Index 4: User Data
         let gdt = [
-            BareMetalGdtEntry::new(0, 0, 0, 0),                           // Null
+            BareMetalGdtEntry::new(0, 0, 0, 0),             // Null
             BareMetalGdtEntry::new(0, 0xFFFFF, 0x9A, 0xA0), // Kernel Code 64-bit (0x9A = Present|Ring0|Code, 0xA0 = LongMode|PageGranularity)
             BareMetalGdtEntry::new(0, 0xFFFFF, 0x92, 0xC0), // Kernel Data (0x92 = Present|Ring0|Data, 0xC0 = 32bit|PageGranularity)
             BareMetalGdtEntry::new(0, 0xFFFFF, 0xFA, 0xA0), // User Code 64-bit (0xFA = Present|Ring3|Code)

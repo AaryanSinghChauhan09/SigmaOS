@@ -10,18 +10,18 @@
 extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
+use alloc::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
+use std::collections::BTreeMap;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use std::collections::BTreeMap;
+use std::vec::Vec;
 
 /// Target CPU architecture for JIT compilation
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -78,7 +78,10 @@ impl SovereignEbpfJitEngine {
     }
 
     /// Verifies eBPF instruction stream safety before compilation
-    pub fn verify_ebpf_bytecode(&self, instructions: &[EbpfInstruction]) -> Result<(), &'static str> {
+    pub fn verify_ebpf_bytecode(
+        &self,
+        instructions: &[EbpfInstruction],
+    ) -> Result<(), &'static str> {
         if instructions.is_empty() {
             return Err("eBPF Verifier: Empty instruction stream");
         }
@@ -91,7 +94,8 @@ impl SovereignEbpfJitEngine {
             if insn.dst_reg > 10 || insn.src_reg > 10 {
                 return Err("eBPF Verifier: Invalid register index (max R10)");
             }
-            if insn.opcode == 0x95 { // EXIT opcode
+            if insn.opcode == 0x95 {
+                // EXIT opcode
                 has_exit = true;
             }
         }
@@ -104,7 +108,10 @@ impl SovereignEbpfJitEngine {
     }
 
     /// Compiles eBPF instructions to native machine code
-    pub fn compile_ebpf_program(&mut self, instructions: &[EbpfInstruction]) -> Result<u64, &'static str> {
+    pub fn compile_ebpf_program(
+        &mut self,
+        instructions: &[EbpfInstruction],
+    ) -> Result<u64, &'static str> {
         self.verify_ebpf_bytecode(instructions)?;
 
         let mut code_bytes = Vec::new();
@@ -119,7 +126,11 @@ impl SovereignEbpfJitEngine {
                         // ALU ADD (REG)
                         0x0F => {
                             // add dst, src -> REX.W 01 /r
-                            code_bytes.extend_from_slice(&[0x48, 0x01, 0xC0 | (insn.src_reg << 3) | insn.dst_reg]);
+                            code_bytes.extend_from_slice(&[
+                                0x48,
+                                0x01,
+                                0xC0 | (insn.src_reg << 3) | insn.dst_reg,
+                            ]);
                         }
                         // ALU ADD (IMM)
                         0x07 => {
@@ -205,8 +216,20 @@ mod tests {
     fn test_ebpf_jit_compiler_x86_64() {
         let mut jit = SovereignEbpfJitEngine::new(JitTargetArch::X86_64);
         let program = vec![
-            EbpfInstruction { opcode: 0x07, dst_reg: 0, src_reg: 0, offset: 0, imm: 42 },
-            EbpfInstruction { opcode: 0x95, dst_reg: 0, src_reg: 0, offset: 0, imm: 0 },
+            EbpfInstruction {
+                opcode: 0x07,
+                dst_reg: 0,
+                src_reg: 0,
+                offset: 0,
+                imm: 42,
+            },
+            EbpfInstruction {
+                opcode: 0x95,
+                dst_reg: 0,
+                src_reg: 0,
+                offset: 0,
+                imm: 0,
+            },
         ];
 
         let page_id = jit.compile_ebpf_program(&program).unwrap();
@@ -220,9 +243,13 @@ mod tests {
     #[test]
     fn test_ebpf_verifier_invalid_program() {
         let jit = SovereignEbpfJitEngine::default();
-        let invalid_prog = vec![
-            EbpfInstruction { opcode: 0x07, dst_reg: 15, src_reg: 0, offset: 0, imm: 10 },
-        ];
+        let invalid_prog = vec![EbpfInstruction {
+            opcode: 0x07,
+            dst_reg: 15,
+            src_reg: 0,
+            offset: 0,
+            imm: 10,
+        }];
         assert!(jit.verify_ebpf_bytecode(&invalid_prog).is_err());
     }
 }

@@ -1,12 +1,9 @@
+use core::sync::atomic::{AtomicUsize, Ordering};
 /// OOP-based Device Provisioning Service for SigmaOS
 /// Implements zero-touch enrollment and automated device lifecycle management
 /// inspired by Linux Preseed/Kickstart and BSD Auto-Install configurations.
-
-
-
 use std::boxed::Box;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Device ID
 pub type DeviceID = usize;
@@ -231,7 +228,10 @@ pub trait ProvisioningService {
     fn register_device(&mut self, device: Box<dyn Device>) -> Result<DeviceID, ProvisioningError>;
     fn unregister_device(&mut self, id: DeviceID) -> Result<(), ProvisioningError>;
     fn provision_device(&mut self, id: DeviceID) -> Result<(), ProvisioningError>;
-    fn zero_touch_enroll(&mut self, manifest: ZeroTouchManifest) -> Result<DeviceID, ProvisioningError>;
+    fn zero_touch_enroll(
+        &mut self,
+        manifest: ZeroTouchManifest,
+    ) -> Result<DeviceID, ProvisioningError>;
     fn deactivate_device(&mut self, id: DeviceID) -> Result<(), ProvisioningError>;
     fn get_device(&self, id: DeviceID) -> Option<&dyn Device>;
     fn list_devices(&self, state: DeviceState) -> Vec<DeviceID>;
@@ -366,13 +366,20 @@ impl ProvisioningService for SimpleProvisioningService {
     }
 
     /// Hands-free zero-touch device enrollment pipeline (TPM attestation + automated config)
-    fn zero_touch_enroll(&mut self, manifest: ZeroTouchManifest) -> Result<DeviceID, ProvisioningError> {
+    fn zero_touch_enroll(
+        &mut self,
+        manifest: ZeroTouchManifest,
+    ) -> Result<DeviceID, ProvisioningError> {
         if !self.capability.can_register || !self.capability.can_provision {
             return Err(ProvisioningError::PermissionDenied);
         }
 
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
-        let serial_len = manifest.serial_number.iter().position(|&b| b == 0).unwrap_or(64);
+        let serial_len = manifest
+            .serial_number
+            .iter()
+            .position(|&b| b == 0)
+            .unwrap_or(64);
         let serial_bytes = &manifest.serial_number[..serial_len];
 
         let mut device = SimpleDevice::new(
@@ -478,7 +485,11 @@ impl<T> Vec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * core::mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {

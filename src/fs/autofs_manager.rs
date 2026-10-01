@@ -159,13 +159,7 @@ impl AutoFsManager {
         true
     }
 
-    pub fn register_with_timeout(
-        &mut self,
-        mount_point: String,
-        device: String,
-        fs_type: String,
-        timeout: u32,
-    ) -> bool {
+    pub fn register_with_timeout(&mut self, mount_point: String, device: String, fs_type: String, timeout: u32) -> bool {
         let trigger = AutoFsTrigger::new(mount_point, device, fs_type);
         let entry = AutoFsEntry::new(trigger, timeout);
         self.entries.push(entry);
@@ -173,11 +167,7 @@ impl AutoFsManager {
     }
 
     pub fn trigger(&mut self, mount_point: &str) -> Result<String, String> {
-        if let Some(entry) = self
-            .entries
-            .iter_mut()
-            .find(|e| e.trigger.mount_point == mount_point)
-        {
+        if let Some(entry) = self.entries.iter_mut().find(|e| e.trigger.mount_point == mount_point) {
             entry.trigger();
             Ok(String::from("Triggered successfully"))
         } else {
@@ -186,43 +176,25 @@ impl AutoFsManager {
     }
 
     pub fn mount(&mut self, mount_point: &str) -> Result<String, String> {
-        if let Some(entry) = self
-            .entries
-            .iter_mut()
-            .find(|e| e.trigger.mount_point == mount_point)
-        {
+        if let Some(entry) = self.entries.iter_mut().find(|e| e.trigger.mount_point == mount_point) {
             entry.mount();
-            Ok(format!(
-                "Mounted: {}",
-                entry.trigger.generate_mount_command()
-            ))
+            Ok(format!("Mounted: {}", entry.trigger.generate_mount_command()))
         } else {
             Err(String::from("Mount point not found"))
         }
     }
 
     pub fn unmount(&mut self, mount_point: &str) -> Result<String, String> {
-        if let Some(entry) = self
-            .entries
-            .iter_mut()
-            .find(|e| e.trigger.mount_point == mount_point)
-        {
+        if let Some(entry) = self.entries.iter_mut().find(|e| e.trigger.mount_point == mount_point) {
             entry.unmount();
-            Ok(format!(
-                "Unmounted: {}",
-                entry.trigger.generate_umount_command()
-            ))
+            Ok(format!("Unmounted: {}", entry.trigger.generate_umount_command()))
         } else {
             Err(String::from("Mount point not found"))
         }
     }
 
     pub fn set_timeout(&mut self, mount_point: &str, timeout: u32) -> Result<String, String> {
-        if let Some(entry) = self
-            .entries
-            .iter_mut()
-            .find(|e| e.trigger.mount_point == mount_point)
-        {
+        if let Some(entry) = self.entries.iter_mut().find(|e| e.trigger.mount_point == mount_point) {
             entry.idle_timeout_seconds = timeout;
             Ok(String::from("Timeout updated"))
         } else {
@@ -232,48 +204,33 @@ impl AutoFsManager {
 
     pub fn unregister(&mut self, mount_point: &str) -> bool {
         let original_len = self.entries.len();
-        self.entries
-            .retain(|e| e.trigger.mount_point != mount_point);
+        self.entries.retain(|e| e.trigger.mount_point != mount_point);
         original_len > self.entries.len()
     }
 
     pub fn get_entry(&self, mount_point: &str) -> Option<&AutoFsEntry> {
-        self.entries
-            .iter()
-            .find(|e| e.trigger.mount_point == mount_point)
+        self.entries.iter().find(|e| e.trigger.mount_point == mount_point)
     }
 
     pub fn get_entry_mut(&mut self, mount_point: &str) -> Option<&mut AutoFsEntry> {
-        self.entries
-            .iter_mut()
-            .find(|e| e.trigger.mount_point == mount_point)
+        self.entries.iter_mut().find(|e| e.trigger.mount_point == mount_point)
     }
 
     pub fn list_entries(&self) -> Vec<String> {
-        self.entries
-            .iter()
-            .map(|e| {
-                format!(
-                    "{} - {} ({})",
-                    e.trigger.mount_point,
-                    e.trigger.device,
-                    e.state.as_str()
-                )
-            })
+        self.entries.iter()
+            .map(|e| format!("{} - {} ({})", e.trigger.mount_point, e.trigger.device, e.state.as_str()))
             .collect()
     }
 
     pub fn list_mounted(&self) -> Vec<String> {
-        self.entries
-            .iter()
+        self.entries.iter()
             .filter(|e| e.state == AutoFsState::Mounted)
             .map(|e| e.trigger.mount_point.clone())
             .collect()
     }
 
     pub fn list_idle(&self, current_timestamp: u64) -> Vec<String> {
-        self.entries
-            .iter()
+        self.entries.iter()
             .filter(|e| e.should_unmount(current_timestamp))
             .map(|e| e.trigger.mount_point.clone())
             .collect()
@@ -325,6 +282,10 @@ impl AutoFsManager {
             .iter()
             .filter(|e| e.state == AutoFsState::Failed)
             .count();
+        let mounted = self.entries.iter().filter(|e| e.state == AutoFsState::Mounted).count();
+        let idle = self.entries.iter().filter(|e| e.state == AutoFsState::Idle).count();
+        let triggered = self.entries.iter().filter(|e| e.state == AutoFsState::Triggered).count();
+        let failed = self.entries.iter().filter(|e| e.state == AutoFsState::Failed).count();
 
         AutoFsStats {
             total_entries: self.entries.len(),
@@ -382,6 +343,7 @@ mod tests {
             String::from("ext4"),
         )
         .with_option(String::from("noatime"));
+        ).with_option(String::from("noatime"));
 
         assert!(trigger.options.contains(&String::from("noatime")));
     }
@@ -529,10 +491,7 @@ mod tests {
         );
 
         assert!(manager.trigger("/mnt/data").is_ok());
-        assert_eq!(
-            manager.entries.first().unwrap().state,
-            AutoFsState::Triggered
-        );
+        assert_eq!(manager.entries.first().unwrap().state, AutoFsState::Triggered);
     }
 
     #[test]

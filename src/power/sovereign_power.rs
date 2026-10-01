@@ -2,8 +2,6 @@
 // ACPI S0-S5, C0-C6, P-States, TLP/powerd frequency governors, Intel RAPL energy capping,
 // thermal throttling curves, and NVMe APST / PCIe ASPM link power management
 
-
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AcpiSystemPowerState {
     S0Working,
@@ -62,7 +60,10 @@ impl SovereignPowerThermalGovernance {
         }
     }
 
-    pub fn set_system_power_state(&mut self, state: AcpiSystemPowerState) -> Result<(), &'static str> {
+    pub fn set_system_power_state(
+        &mut self,
+        state: AcpiSystemPowerState,
+    ) -> Result<(), &'static str> {
         self.current_system_state = state;
         match state {
             AcpiSystemPowerState::S3SuspendToRam => {
@@ -95,12 +96,17 @@ impl SovereignPowerThermalGovernance {
         self.active_governor
     }
 
-    pub fn compute_target_frequency_mhz(&self, current_load_percent: f32, max_freq_mhz: u32) -> u32 {
+    pub fn compute_target_frequency_mhz(
+        &self,
+        current_load_percent: f32,
+        max_freq_mhz: u32,
+    ) -> u32 {
         match self.active_governor {
             SovereignCpuGovernor::Performance => max_freq_mhz,
             SovereignCpuGovernor::Powersave => (max_freq_mhz as f32 * 0.4) as u32,
             SovereignCpuGovernor::SchedutilAdaptive => {
-                let scaled = (max_freq_mhz as f32 * (current_load_percent / 100.0).clamp(0.2, 1.0)) as u32;
+                let scaled =
+                    (max_freq_mhz as f32 * (current_load_percent / 100.0).clamp(0.2, 1.0)) as u32;
                 scaled.max(800)
             }
         }

@@ -1,0 +1,36 @@
+name: "14: Stale Issue Triage & Karma Release Automation"
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Daily at midnight
+  pull_request_target:
+    types: [ opened, synchronize, reopened, labeled ]
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  pull-requests: write
+  contents: read
+
+jobs:
+  stale-triage-and-karma-gating:
+    name: Fedora Bodhi Karma Gating & Stale Triage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Verify Package Pull Request Gateway
+        run: |
+          mkdir -p build
+          rustc --test --edition=2021 src/package/sovereign_pr_package_gateway.rs --cfg 'feature="standalone_test"' -o build/test_pr_gateway
+          ./build/test_pr_gateway
+
+      - name: Stale Issue & PR Triage
+        uses: actions/stale@v9
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          stale-issue-message: 'This issue has been automatically marked as stale because it has not had recent activity in 60 days.'
+          stale-pr-message: 'This pull request has been automatically marked as stale because it has not had recent activity in 30 days.'
+          days-before-stale: 60
+          days-before-close: 14

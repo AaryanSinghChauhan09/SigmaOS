@@ -1,11 +1,9 @@
 //! Linux Mint mintdrivers-inspired Driver Manager
-//! 
+//!
 //! This module implements a driver manager inspired by Linux Mint's mintdrivers,
 //! which handles installation and management of proprietary and open-source drivers.
 
 #![allow(dead_code)]
-
-
 
 use std::collections::BTreeMap;
 use std::format;
@@ -166,9 +164,9 @@ impl MintDriverManager {
         self.drivers
             .iter()
             .filter(|d| {
-                self.devices
-                    .iter()
-                    .any(|dev| dev.device_class == device_class && d.supported_devices.contains(&dev.device_id))
+                self.devices.iter().any(|dev| {
+                    dev.device_class == device_class && d.supported_devices.contains(&dev.device_id)
+                })
             })
             .collect()
     }
@@ -203,10 +201,15 @@ impl MintDriverManager {
         }
 
         // Map device to driver
-        self.device_driver_map.insert(device_id.to_string(), package_name.to_string());
-        
+        self.device_driver_map
+            .insert(device_id.to_string(), package_name.to_string());
+
         // Update driver status
-        if let Some(driver) = self.drivers.iter_mut().find(|d| d.package_name == package_name) {
+        if let Some(driver) = self
+            .drivers
+            .iter_mut()
+            .find(|d| d.package_name == package_name)
+        {
             driver.status = DriverStatus::Installed;
         }
 
@@ -217,7 +220,11 @@ impl MintDriverManager {
     pub fn remove_driver(&mut self, device_id: &str) -> Result<(), String> {
         if let Some(package_name) = self.device_driver_map.remove(device_id) {
             // Update driver status
-            if let Some(driver) = self.drivers.iter_mut().find(|d| d.package_name == package_name) {
+            if let Some(driver) = self
+                .drivers
+                .iter_mut()
+                .find(|d| d.package_name == package_name)
+            {
                 driver.status = DriverStatus::NotInstalled;
             }
             Ok(())
@@ -228,7 +235,11 @@ impl MintDriverManager {
 
     /// Activate a driver
     pub fn activate_driver(&mut self, package_name: &str) -> Result<(), String> {
-        if let Some(driver) = self.drivers.iter_mut().find(|d| d.package_name == package_name) {
+        if let Some(driver) = self
+            .drivers
+            .iter_mut()
+            .find(|d| d.package_name == package_name)
+        {
             driver.status = DriverStatus::Active;
             Ok(())
         } else {
@@ -249,13 +260,17 @@ impl MintDriverManager {
     /// Auto-install recommended drivers for all devices
     pub fn auto_install_recommended_drivers(&mut self) -> Vec<String> {
         let mut installed = Vec::new();
-        
+
         if !self.auto_install_recommended {
             return installed;
         }
 
         // Collect device IDs and names first to avoid borrow conflicts
-        let device_list: Vec<(String, String)> = self.devices.iter().map(|d| (d.device_id.clone(), d.name.clone())).collect();
+        let device_list: Vec<(String, String)> = self
+            .devices
+            .iter()
+            .map(|d| (d.device_id.clone(), d.name.clone()))
+            .collect();
 
         for (device_id, device_name) in device_list {
             if let Some(driver) = self.get_recommended_driver(&device_id) {
@@ -274,7 +289,7 @@ impl MintDriverManager {
     /// Get driver recommendations for all devices
     pub fn get_driver_recommendations(&self) -> Vec<(String, String)> {
         let mut recommendations = Vec::new();
-        
+
         for device in &self.devices {
             if let Some(driver) = self.get_recommended_driver(&device.device_id) {
                 recommendations.push((device.device_id.clone(), driver.package_name.clone()));
@@ -305,7 +320,7 @@ mod tests {
     #[test]
     fn test_add_driver() {
         let mut manager = MintDriverManager::new();
-        
+
         let driver = DriverPackage {
             package_name: "nvidia-driver".to_string(),
             driver_name: "NVIDIA Driver".to_string(),
@@ -318,7 +333,7 @@ mod tests {
             proprietary: true,
             description: "NVIDIA proprietary driver".to_string(),
         };
-        
+
         manager.add_driver(driver);
         assert_eq!(manager.drivers.len(), 1);
     }
@@ -326,7 +341,7 @@ mod tests {
     #[test]
     fn test_install_driver() {
         let mut manager = MintDriverManager::new();
-        
+
         let device = HardwareDevice {
             device_id: "gpu-001".to_string(),
             name: "NVIDIA GPU".to_string(),
@@ -335,7 +350,7 @@ mod tests {
             pci_id: Some("10de:1234".to_string()),
             usb_id: None,
         };
-        
+
         let driver = DriverPackage {
             package_name: "nvidia-driver".to_string(),
             driver_name: "NVIDIA Driver".to_string(),
@@ -348,20 +363,23 @@ mod tests {
             proprietary: true,
             description: "NVIDIA proprietary driver".to_string(),
         };
-        
+
         manager.add_device(device);
         manager.add_driver(driver);
-        
+
         let result = manager.install_driver("gpu-001", "nvidia-driver");
         assert!(result.is_ok());
-        assert_eq!(manager.device_driver_map.get("gpu-001"), Some(&"nvidia-driver".to_string()));
+        assert_eq!(
+            manager.device_driver_map.get("gpu-001"),
+            Some(&"nvidia-driver".to_string())
+        );
     }
 
     #[test]
     fn test_proprietary_restriction() {
         let mut manager = MintDriverManager::new();
         manager.set_allow_proprietary(false);
-        
+
         let device = HardwareDevice {
             device_id: "gpu-001".to_string(),
             name: "NVIDIA GPU".to_string(),
@@ -370,7 +388,7 @@ mod tests {
             pci_id: Some("10de:1234".to_string()),
             usb_id: None,
         };
-        
+
         let driver = DriverPackage {
             package_name: "nvidia-driver".to_string(),
             driver_name: "NVIDIA Driver".to_string(),
@@ -383,10 +401,10 @@ mod tests {
             proprietary: true,
             description: "NVIDIA proprietary driver".to_string(),
         };
-        
+
         manager.add_device(device);
         manager.add_driver(driver);
-        
+
         let result = manager.install_driver("gpu-001", "nvidia-driver");
         assert!(result.is_err());
     }
@@ -394,7 +412,7 @@ mod tests {
     #[test]
     fn test_get_recommended_driver() {
         let mut manager = MintDriverManager::new();
-        
+
         let driver = DriverPackage {
             package_name: "amdgpu-driver".to_string(),
             driver_name: "AMDGPU Driver".to_string(),
@@ -407,9 +425,9 @@ mod tests {
             proprietary: false,
             description: "AMD open-source driver".to_string(),
         };
-        
+
         manager.add_driver(driver);
-        
+
         let recommended = manager.get_recommended_driver("gpu-002");
         assert!(recommended.is_some());
         assert_eq!(recommended.unwrap().package_name, "amdgpu-driver");

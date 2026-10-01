@@ -4,7 +4,7 @@
 //! enabling inter-namespace communication.
 
 use crate::net::network_namespace::{
-    NetworkNamespaceId, NetworkNamespace, NetworkInterface, NetworkNamespaceManager,
+    NetworkInterface, NetworkNamespace, NetworkNamespaceId, NetworkNamespaceManager,
 };
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
@@ -22,10 +22,7 @@ pub struct VethPair {
 }
 
 impl VethPair {
-    pub fn new(
-        left_ns: NetworkNamespaceId,
-        right_ns: NetworkNamespaceId,
-    ) -> Self {
+    pub fn new(left_ns: NetworkNamespaceId, right_ns: NetworkNamespaceId) -> Self {
         // Generate unique interface names
         let left_name = format!("veth-{}-l", left_ns.raw());
         let right_name = format!("veth-{}-r", right_ns.raw());
@@ -282,11 +279,25 @@ mod tests {
         let ns1 = NetworkNamespaceId::new(1);
         let ns2 = NetworkNamespaceId::new(2);
 
-        bridge.enable_forwarding(ns1, ns2).expect("Failed to enable");
-        assert!(bridge.is_forwarding_enabled(ns1, ns2).expect("Failed to check") == true);
+        bridge
+            .enable_forwarding(ns1, ns2)
+            .expect("Failed to enable");
+        assert!(
+            bridge
+                .is_forwarding_enabled(ns1, ns2)
+                .expect("Failed to check")
+                == true
+        );
 
-        bridge.disable_forwarding(ns1, ns2).expect("Failed to disable");
-        assert!(bridge.is_forwarding_enabled(ns1, ns2).expect("Failed to check") == false);
+        bridge
+            .disable_forwarding(ns1, ns2)
+            .expect("Failed to disable");
+        assert!(
+            bridge
+                .is_forwarding_enabled(ns1, ns2)
+                .expect("Failed to check")
+                == false
+        );
     }
 
     #[test]
@@ -307,12 +318,22 @@ mod tests {
         let bridge = VirtualBridgeDevice::new("br0".to_string());
         let manager = NetworkNamespaceManager::new();
 
-        let ns1 = manager.create_namespace(None).expect("Failed to create ns1");
-        let ns2 = manager.create_namespace(None).expect("Failed to create ns2");
-        let ns3 = manager.create_namespace(None).expect("Failed to create ns3");
+        let ns1 = manager
+            .create_namespace(None)
+            .expect("Failed to create ns1");
+        let ns2 = manager
+            .create_namespace(None)
+            .expect("Failed to create ns2");
+        let ns3 = manager
+            .create_namespace(None)
+            .expect("Failed to create ns3");
 
-        bridge.create_veth_pair(ns1, ns2, &manager).expect("Failed to create veth1");
-        bridge.create_veth_pair(ns2, ns3, &manager).expect("Failed to create veth2");
+        bridge
+            .create_veth_pair(ns1, ns2, &manager)
+            .expect("Failed to create veth1");
+        bridge
+            .create_veth_pair(ns2, ns3, &manager)
+            .expect("Failed to create veth2");
 
         let count = bridge.connected_namespace_count().expect("Failed to count");
         assert_eq!(count, 2);
@@ -323,10 +344,16 @@ mod tests {
         let bridge = VirtualBridgeDevice::new("br0".to_string());
         let manager = NetworkNamespaceManager::new();
 
-        let ns1 = manager.create_namespace(None).expect("Failed to create ns1");
-        let ns2 = manager.create_namespace(None).expect("Failed to create ns2");
+        let ns1 = manager
+            .create_namespace(None)
+            .expect("Failed to create ns1");
+        let ns2 = manager
+            .create_namespace(None)
+            .expect("Failed to create ns2");
 
-        bridge.create_veth_pair(ns1, ns2, &manager).expect("Failed to create veth");
+        bridge
+            .create_veth_pair(ns1, ns2, &manager)
+            .expect("Failed to create veth");
 
         let veth = bridge.get_veth_pair(ns1, ns2).expect("Failed to get veth");
         assert_eq!(veth.left_ns, ns1);
@@ -338,15 +365,27 @@ mod tests {
         let bridge = VirtualBridgeDevice::new("br0".to_string());
         let manager = NetworkNamespaceManager::new();
 
-        let ns1 = manager.create_namespace(None).expect("Failed to create ns1");
-        let ns2 = manager.create_namespace(None).expect("Failed to create ns2");
+        let ns1 = manager
+            .create_namespace(None)
+            .expect("Failed to create ns1");
+        let ns2 = manager
+            .create_namespace(None)
+            .expect("Failed to create ns2");
 
-        bridge.create_veth_pair(ns1, ns2, &manager).expect("Failed to create veth");
-        let count_before = bridge.connected_namespace_count().expect("Failed to count before");
+        bridge
+            .create_veth_pair(ns1, ns2, &manager)
+            .expect("Failed to create veth");
+        let count_before = bridge
+            .connected_namespace_count()
+            .expect("Failed to count before");
         assert_eq!(count_before, 1);
 
-        bridge.remove_veth_pair(ns1, ns2).expect("Failed to remove veth");
-        let count_after = bridge.connected_namespace_count().expect("Failed to count after");
+        bridge
+            .remove_veth_pair(ns1, ns2)
+            .expect("Failed to remove veth");
+        let count_after = bridge
+            .connected_namespace_count()
+            .expect("Failed to count after");
         assert_eq!(count_after, 0);
     }
 }

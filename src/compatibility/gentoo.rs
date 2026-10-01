@@ -360,12 +360,7 @@ impl GentooPackageMaskKeywordEngine {
     }
 
     /// Evaluates if a package atom, keyword, and license are installable under Portage rules
-    pub fn is_installable(
-        &self,
-        atom: &str,
-        keyword: &str,
-        license: &str,
-    ) -> Result<(), &'static str> {
+    pub fn is_installable(&self, atom: &str, keyword: &str, license: &str) -> Result<(), &'static str> {
         if self.hard_masks.contains(&atom.to_string()) {
             return Err("Package is hard-masked in package.mask");
         }
@@ -435,11 +430,7 @@ impl GentooConfigMergeEngine {
         file_path: &str,
         action: ConfigMergeAction,
     ) -> Result<String, &'static str> {
-        if let Some(pos) = self
-            .pending_updates
-            .iter()
-            .position(|u| u.target_file == file_path)
-        {
+        if let Some(pos) = self.pending_updates.iter().position(|u| u.target_file == file_path) {
             let update = self.pending_updates.remove(pos);
             match action {
                 ConfigMergeAction::OverwriteUserConfig => Ok(update.update_content),
@@ -689,13 +680,11 @@ mod tests {
         slot_mgr.register_subslot_dependency("dev-python/numpy", "dev-lang/python:3.11");
 
         // Install dev-lang/python version 3.11.3 subslot 3.11.3
-        let rebuilds1 =
-            slot_mgr.install_slotted_package("dev-lang/python", "3.11.3", "3.11", "3.11.3");
+        let rebuilds1 = slot_mgr.install_slotted_package("dev-lang/python", "3.11.3", "3.11", "3.11.3");
         assert!(rebuilds1.is_empty());
 
         // Update dev-lang/python version 3.11.4 subslot 3.11.4 (subslot ABI changed)
-        let rebuilds2 =
-            slot_mgr.install_slotted_package("dev-lang/python", "3.11.4", "3.11", "3.11.4");
+        let rebuilds2 = slot_mgr.install_slotted_package("dev-lang/python", "3.11.4", "3.11", "3.11.4");
         assert_eq!(rebuilds2.len(), 1);
         assert_eq!(rebuilds2[0], "dev-python/numpy");
     }
@@ -707,29 +696,19 @@ mod tests {
         mask_engine.add_mask("app-emulation/unsafe-emulator");
 
         // 1. Hard-masked package
-        assert!(mask_engine
-            .is_installable("app-emulation/unsafe-emulator", "amd64", "GPL-2")
-            .is_err());
+        assert!(mask_engine.is_installable("app-emulation/unsafe-emulator", "amd64", "GPL-2").is_err());
 
         // 2. Testing keyword ~amd64 allowed
-        assert!(mask_engine
-            .is_installable("sys-apps/coreutils", "~amd64", "GPL-3")
-            .is_ok());
+        assert!(mask_engine.is_installable("sys-apps/coreutils", "~amd64", "GPL-3").is_ok());
 
         // 3. Unaccepted keyword ~arm64
-        assert!(mask_engine
-            .is_installable("sys-apps/coreutils", "~arm64", "GPL-3")
-            .is_err());
+        assert!(mask_engine.is_installable("sys-apps/coreutils", "~arm64", "GPL-3").is_err());
     }
 
     #[test]
     fn test_gentoo_config_merge_engine() {
         let mut config_engine = GentooConfigMergeEngine::new();
-        config_engine.stage_update(
-            "/etc/portage/make.conf",
-            "CFLAGS=\"-O2\"",
-            "CFLAGS=\"-O3 -march=native\"",
-        );
+        config_engine.stage_update("/etc/portage/make.conf", "CFLAGS=\"-O2\"", "CFLAGS=\"-O3 -march=native\"");
 
         assert_eq!(config_engine.pending_updates.len(), 1);
 

@@ -2,9 +2,9 @@
 // Implements DHCP state machine (DISCOVER/OFFER/REQUEST/ACK), DNS A/AAAA query resolution,
 // and background cloud synchronization.
 
+use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DhcpState {
@@ -101,11 +101,17 @@ mod tests {
     fn test_dhcp_dns_and_cloud_sync() {
         let mut dhcp = DhcpClient::new([0x00, 0x1A, 0x2B, 0x3C, 0x4D, 0x5E]);
         assert_eq!(dhcp.send_discover(), DhcpState::Discover);
-        assert_eq!(dhcp.process_offer("192.168.1.50", "192.168.1.1"), DhcpState::Bound);
+        assert_eq!(
+            dhcp.process_offer("192.168.1.50", "192.168.1.1"),
+            DhcpState::Bound
+        );
         assert_eq!(dhcp.leased_ip.unwrap(), "192.168.1.50");
 
         let dns = DnsResolver::new();
-        assert_eq!(dns.resolve_a_record("sigmaos.org").unwrap(), "185.199.108.153");
+        assert_eq!(
+            dns.resolve_a_record("sigmaos.org").unwrap(),
+            "185.199.108.153"
+        );
 
         let mut cloud = CloudSyncEngine::new("https://cloud.sigmaos.org");
         assert_eq!(cloud.sync_directory(2048), 2048);

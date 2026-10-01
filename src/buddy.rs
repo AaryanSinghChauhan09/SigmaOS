@@ -14,7 +14,6 @@
 //! - FreeBSD `vm_phys_alloc_pages`
 //! - NetBSD `uvm_pglistalloc`
 
-
 use core::sync::atomic::{AtomicU64, Ordering};
 
 /// Maximum order (2^MAX_ORDER pages per block = 4MB with 4KB pages)
@@ -214,7 +213,8 @@ impl BuddyAllocator {
         for o in order..=MAX_ORDER {
             if let Some(frame) = self.free_lists[o].pop() {
                 self.bitmaps[o].toggle(frame.0 >> o);
-                self.free_pages.fetch_sub(1u64 << (o as u64), Ordering::Relaxed);
+                self.free_pages
+                    .fetch_sub(1u64 << (o as u64), Ordering::Relaxed);
 
                 // Split block if we got a larger one than needed
                 let mut remaining_order = o;
@@ -224,7 +224,8 @@ impl BuddyAllocator {
                     let buddy = FrameNum(remaining_frame.0.wrapping_add(1 << remaining_order));
                     self.free_lists[remaining_order].push(buddy);
                     self.bitmaps[remaining_order].toggle(buddy.0 >> remaining_order);
-                    self.free_pages.fetch_add(1u64 << remaining_order as u64, Ordering::Relaxed);
+                    self.free_pages
+                        .fetch_add(1u64 << remaining_order as u64, Ordering::Relaxed);
                 }
                 return Some(remaining_frame);
             }
@@ -262,7 +263,8 @@ impl BuddyAllocator {
         }
         // Insert the (possibly coalesced) block into the free list
         self.free_lists[order].push(frame);
-        self.free_pages.fetch_add(1u64 << order as u64, Ordering::Relaxed);
+        self.free_pages
+            .fetch_add(1u64 << order as u64, Ordering::Relaxed);
     }
 
     /// Returns the number of free pages currently managed.

@@ -2,10 +2,10 @@
 // Abstract base trait hierarchy for Linux driver absorption and OOP-based modularity
 // This enables SigmaOS to absorb Linux subsystems while maintaining sovereign identity
 
+use core::any::Any;
 use std::boxed::Box;
 use std::string::String;
 use std::vec::Vec;
-use core::any::Any;
 
 use crate::security::CapabilityToken;
 

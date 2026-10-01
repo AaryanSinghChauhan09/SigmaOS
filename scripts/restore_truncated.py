@@ -107,8 +107,10 @@ def scan_and_restore(src_dir, repo_root, min_lines=20):
     
     skip_dirs = {'.git', 'target', 'node_modules'}
     
-    for dirpath, dirnames, filenames in os.walk(src_dir):
-        dirnames[:] = [d for d in dirnames if d not in skip_dirs]
+    for dirpath, dirs, filenames in os.walk(src_dir):
+        valid_subdirs = [d for d in dirs if d not in skip_dirs]
+        dirs.clear()
+        dirs.extend(valid_subdirs)
         for filename in filenames:
             if not filename.endswith('.rs'):
                 continue

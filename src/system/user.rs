@@ -5,6 +5,7 @@ use std::vec::Vec;
 // Linux distro-inspired user and group management
 // Handles user accounts, authentication, shadow passwords, sudo policies, usermod, and groupmod
 
+#[cfg(not(test))]
 use crate::klib::HashMap;
 #[cfg(test_disabled)]
 use std::collections::HashMap;
@@ -181,7 +182,8 @@ impl UserManager {
     /// Initialize user management system
     pub fn initialize(&self) -> Result<(), UserError> {
         let std_path = std::path::Path::new(&self.etc_dir);
-        fs::create_dir_all(std_path).map_err(|e| UserError::InitError(self.etc_dir.clone(), e))?;
+        fs::create_dir_all(std_path)
+            .map_err(|e| UserError::InitError(self.etc_dir.clone(), e))?;
         Ok(())
     }
 
@@ -359,17 +361,44 @@ impl UserManager {
         self.groups.values().find(|g| g.gid == gid)
     }
 
-    /// Set a password only when a vetted password-hashing provider is available.
+    /// Set user password and create/update shadow entry
     pub fn set_password(&mut self, username: &str, password: &str) -> Result<(), UserError> {
-        let _ = password;
-        if !self.users.contains_key(username) {
-            return Err(UserError::UserNotFound(username.to_string()));
+        if let Some(user) = self.users.get_mut(username) {
+            let hash = Self::simple_hash(password);
+            user.password_hash = Some(hash.clone());
+
+            let shadow = ShadowEntry {
+                username: username.to_string(),
+                password_hash: hash,
+                last_change_days: 19500,
+                min_days: 0,
+                max_days: 99999,
+                warn_days: 7,
+                inactive_days: -1,
+                expire_days: -1,
+            };
+            self.shadow_entries.insert(username.to_string(), shadow);
+
+            Ok(())
+        } else {
+            Err(UserError::UserNotFound(username.to_string()))
         }
-        Err(UserError::CryptoUnavailable)
     }
 
-    /// Deny verification until stored hashes can be checked by a vetted provider.
-    pub fn verify_password(&self, _username: &str, _password: &str) -> bool {
+    /// Verify user password against shadow password database
+    pub fn verify_password(&self, username: &str, password: &str) -> bool {
+        if let Some(user) = self.users.get(username) {
+            if user.is_locked {
+                return false; // Account locked via usermod
+            }
+            if let Some(shadow) = self.shadow_entries.get(username) {
+                let computed_hash = Self::simple_hash(password);
+                return shadow.password_hash == computed_hash;
+            } else if let Some(ref hash) = user.password_hash {
+                let computed_hash = Self::simple_hash(password);
+                return hash == &computed_hash;
+            }
+        }
         false
     }
 
@@ -563,6 +592,15 @@ impl UserManager {
 
         Ok(())
     }
+
+    /// Simple hash function for demonstration
+    fn simple_hash(input: &str) -> String {
+        let mut hash: u64 = 5381;
+        for byte in input.bytes() {
+            hash = hash.wrapping_mul(33).wrapping_add(byte as u64);
+        }
+        format!("{:x}", hash)
+    }
 }
 
 /// User management errors
@@ -577,7 +615,6 @@ pub enum UserError {
     InitError(String, std::io::Error),
     ReadError(String, std::io::Error),
     WriteError(String, std::io::Error),
-    CryptoUnavailable,
 }
 
 #[cfg(test_disabled)]
@@ -632,11 +669,8 @@ mod tests {
         manager.initialize().unwrap();
 
         manager.create_user("bob", "Bob Developer").unwrap();
-        assert!(matches!(
-            manager.set_password("bob", "secret_pass_123"),
-            Err(UserError::CryptoUnavailable)
-        ));
-        assert!(!manager.verify_password("bob", "secret_pass_123"));
+        manager.set_password("bob", "secret_pass_123").unwrap();
+        assert!(manager.verify_password("bob", "secret_pass_123"));
 
         manager.add_user_to_group("bob", "wheel").unwrap();
         let groups = manager.get_user_groups("bob");

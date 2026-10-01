@@ -1,9 +1,6 @@
 //! Text Processing Tools (sed/awk/grep Inspiration)
 //! Stream editor, text processor, and pattern search
 
-
-
-
 /// Sed pattern
 #[derive(Debug, Clone)]
 pub struct SedPattern {
@@ -82,7 +79,9 @@ impl StreamEditor {
 
     pub fn delete_line(&self, text: &str, line_number: usize) -> String {
         let lines: Vec<&str> = text.lines().collect();
-        let result: Vec<&str> = lines.iter().enumerate()
+        let result: Vec<&str> = lines
+            .iter()
+            .enumerate()
             .filter(|(i, _)| *i != line_number - 1)
             .map(|(_, line)| *line)
             .collect();
@@ -149,7 +148,9 @@ impl TextProcessor {
     }
 
     pub fn process_line(&self, line: &str) -> Vec<String> {
-        line.split(&self.field_separator).map(|s| s.to_string()).collect()
+        line.split(&self.field_separator)
+            .map(|s| s.to_string())
+            .collect()
     }
 
     pub fn print_field(&self, line: &str, field: usize) -> Option<String> {

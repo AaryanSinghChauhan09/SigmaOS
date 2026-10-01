@@ -1,0 +1,39 @@
+name: "11: PQC Cryptography, Signify & TPM 2.0 Attestation"
+
+on:
+  push:
+    branches: [ main, master, release-* ]
+  pull_request:
+    branches: [ main, master ]
+  schedule:
+    - cron: '0 3 * * *' # Daily at 3 AM
+  workflow_dispatch:
+
+jobs:
+  pqc-crypto-signify-audit:
+    name: PQC Cryptography & Signify Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: OpenBSD Signify & Post-Quantum Cryptography Audit
+        run: |
+          mkdir -p build
+          echo "Running PQC Cryptography & OpenBSD Signify Audit..."
+          rustc --test src/sigpkg/sovereign_package_innovations.rs --edition=2021 -o build/test_pqc_signify
+          ./build/test_pqc_signify
+
+      - name: TPM 2.0 PCR Measurements & Landlock v5 Security Audit
+        run: |
+          echo "Running TPM 2.0 PCR Attestation & Mandatory Access Control Audit..."
+          rustc --test src/security/mandatory_access_control.rs --edition=2021 -o build/test_mac_sec
+          ./build/test_mac_sec
+
+      - name: Kernel Hardening & Ring 3 Protection Ring Checks
+        run: |
+          rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/security/kernel_hardening.rs -o build/kernel_hardening_test
+          ./build/kernel_hardening_test

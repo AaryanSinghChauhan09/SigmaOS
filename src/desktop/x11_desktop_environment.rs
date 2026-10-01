@@ -77,7 +77,10 @@ impl SovereignX11WindowManagerEngine {
         };
         self.managed_windows.insert(id, record);
         self.active_window_id = Some(id);
-        format!("MapRequest: Managed X11 Window [{}] '{}' ({})", id, title, class_name)
+        format!(
+            "MapRequest: Managed X11 Window [{}] '{}' ({})",
+            id, title, class_name
+        )
     }
 
     pub fn set_ewmh_active_window(&mut self, id: u32) -> bool {
@@ -198,7 +201,10 @@ impl SovereignX11ExtensionDispatchEngine {
     pub fn dispatch_randr_resize(&mut self, width: u32, height: u32, refresh: u32) -> String {
         self.primary_resolution = (width, height);
         self.refresh_rate_hz = refresh;
-        format!("RANDR Extension: Display Resized to {}x{} @ {}Hz", width, height, refresh)
+        format!(
+            "RANDR Extension: Display Resized to {}x{} @ {}Hz",
+            width, height, refresh
+        )
     }
 
     pub fn is_extension_active(&self, ext: X11ExtensionType) -> bool {
@@ -289,7 +295,11 @@ impl SovereignX11DesktopEnvironmentMasterSuite {
         if self.extension_dispatcher.compositing_active {
             score += 25.0;
         }
-        if !self.theme_session_manager.session_autostart_entries.is_empty() {
+        if !self
+            .theme_session_manager
+            .session_autostart_entries
+            .is_empty()
+        {
             score += 25.0;
         }
         score

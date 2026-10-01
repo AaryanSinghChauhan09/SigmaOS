@@ -2,22 +2,21 @@
 // Implements the Sovereign Agent System as described in AGENTS.md
 // Replaces traditional background daemons and systemd services with Autonomous Agents
 
-
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Agent types in the hierarchy
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AgentType {
-    Governance = 0,      // Enforce security policies and resource quotas
-    Maintenance = 1,     // Perform self-healing, log rotation, and cache purging
-    Observation = 2,    // Monitor silicon health and network entropy
-    Interface = 3,       // Suggest workflows and optimize the Zenith UI
-    Bridge = 4,          // Manage legacy compatibility (e.g., Linux translation)
+    Governance = 0,  // Enforce security policies and resource quotas
+    Maintenance = 1, // Perform self-healing, log rotation, and cache purging
+    Observation = 2, // Monitor silicon health and network entropy
+    Interface = 3,   // Suggest workflows and optimize the Zenith UI
+    Bridge = 4,      // Manage legacy compatibility (e.g., Linux translation)
 }
 
 /// Intent structure for goal-based execution
@@ -68,23 +67,19 @@ impl SovereignEvent {
     pub fn new(source_agent: u32, event_type: &[u8], payload: &[u8]) -> Self {
         let mut type_array = [0u8; 64];
         let mut payload_array = [0u8; 1024];
-        
+
         let type_len = event_type.len().min(63);
         let payload_len = payload.len().min(1023);
-        
+
         unsafe {
-            core::ptr::copy_nonoverlapping(
-                event_type.as_ptr(),
-                type_array.as_mut_ptr(),
-                type_len,
-            );
+            core::ptr::copy_nonoverlapping(event_type.as_ptr(), type_array.as_mut_ptr(), type_len);
             core::ptr::copy_nonoverlapping(
                 payload.as_ptr(),
                 payload_array.as_mut_ptr(),
                 payload_len,
             );
         }
-        
+
         SovereignEvent {
             source_agent,
             event_type: type_array,
@@ -144,7 +139,7 @@ impl WatchdogShard {
     pub fn monitor_agent(&mut self, agent_id: u32, initial_state: &[u8]) {
         self.monitored_agents.push(agent_id);
         self.crash_count.push(0);
-        
+
         let mut state_array = [0u8; 256];
         let state_len = initial_state.len().min(255);
         unsafe {
@@ -548,16 +543,16 @@ mod tests {
     fn test_autonomous_agent_hierarchy() {
         let governance = GovernanceAgent::new(1);
         assert_eq!(governance.agent_type(), AgentType::Governance);
-        
+
         let maintenance = MaintenanceAgent::new(2);
         assert_eq!(maintenance.agent_type(), AgentType::Maintenance);
-        
+
         let observation = ObservationAgent::new(3);
         assert_eq!(observation.agent_type(), AgentType::Observation);
-        
+
         let interface = InterfaceAgent::new(4);
         assert_eq!(interface.agent_type(), AgentType::Interface);
-        
+
         let bridge = BridgeAgent::new(5);
         assert_eq!(bridge.agent_type(), AgentType::Bridge);
     }
@@ -567,10 +562,10 @@ mod tests {
         let mut event_bus = SovereignEventBus::new();
         event_bus.subscribe(1);
         event_bus.subscribe(2);
-        
+
         let event = SovereignEvent::new(1, b"test_event", b"test_payload");
         event_bus.publish(event);
-        
+
         let events_for_agent2 = event_bus.get_events_for_agent(2);
         assert_eq!(events_for_agent2.len(), 1);
     }
@@ -579,10 +574,10 @@ mod tests {
     fn test_watchdog_shard() {
         let mut watchdog = WatchdogShard::new();
         watchdog.monitor_agent(1, b"initial_state");
-        
+
         let still_stable = watchdog.report_crash(1);
         assert!(still_stable);
-        
+
         let state = watchdog.rollback_state(1);
         assert!(state.is_some());
     }
@@ -592,7 +587,7 @@ mod tests {
         let mut token = CapabilityToken::new(0);
         token.grant_capability(0b0001);
         assert!(token.has_capability(0b0001));
-        
+
         token.revoke_capability(0b0001);
         assert!(!token.has_capability(0b0001));
     }
@@ -600,13 +595,13 @@ mod tests {
     #[test]
     fn test_sovereign_monitor() {
         let mut monitor = SovereignMonitor::new();
-        
+
         let governance = Box::new(GovernanceAgent::new(1)) as Box<dyn AgentBase>;
         monitor.register_agent(governance);
-        
+
         let maintenance = Box::new(MaintenanceAgent::new(2)) as Box<dyn AgentBase>;
         monitor.register_agent(maintenance);
-        
+
         let intent = Intent::new(b"test_intent", 1);
         let result = monitor.dispatch_intent(1, &intent);
         assert_eq!(result, Ok(()));
@@ -616,7 +611,7 @@ mod tests {
     fn test_intent_creation() {
         let intent = Intent::new(b"Minimize latency for gaming", 1);
         assert_eq!(intent.priority, 1);
-        
+
         let intent_with_context = intent.with_context(b"User is gaming");
         assert_ne!(intent_with_context.context[0], 0);
     }

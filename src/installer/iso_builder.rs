@@ -1,14 +1,13 @@
-use std::vec;
 use std::format;
+use std::vec;
 // SigmaOS Bootable ISO Builder
 // Finalizes the bootable ISO implementation with advanced features
 // Integrates with existing installer components
 // Enhanced with Linux Caldera/Debian installer and BSD bootloader features
 
-
+use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
-use std::collections::BTreeMap;
 
 /// ISO Boot Configuration
 #[derive(Debug, Clone)]
@@ -20,8 +19,8 @@ pub struct IsoBootConfig {
     pub initrd_path: String,
     pub boot_parameters: Vec<String>,
     pub installer_mode: bool, // Caldera/Debian installer mode
-    pub rescue_mode: bool, // BSD rescue mode
-    pub debug_mode: bool, // Debug boot mode
+    pub rescue_mode: bool,    // BSD rescue mode
+    pub debug_mode: bool,     // Debug boot mode
 }
 
 impl IsoBootConfig {
@@ -60,7 +59,8 @@ impl IsoBootConfig {
     pub fn enable_installer_mode(&mut self) {
         self.installer_mode = true;
         self.boot_parameters.push(String::from("installer"));
-        self.boot_parameters.push(String::from("automatic-ubiquity"));
+        self.boot_parameters
+            .push(String::from("automatic-ubiquity"));
     }
 
     /// Enable rescue mode (BSD rescue mode)
@@ -160,8 +160,7 @@ impl IsoBuilder {
     }
 
     pub fn add_directory(&mut self, source: &str, iso: &str) {
-        let entry = IsoFileEntry::new(source, iso)
-            .with_permissions(0o755);
+        let entry = IsoFileEntry::new(source, iso).with_permissions(0o755);
         self.add_file(entry);
     }
 
@@ -172,25 +171,25 @@ impl IsoBuilder {
     /// Generate GRUB configuration for ISO boot
     pub fn generate_grub_config(&self) -> String {
         let mut config = String::new();
-        
+
         config.push_str("set timeout=5\n");
         config.push_str("set default=0\n\n");
         config.push_str("menuentry \"SigmaOS Live\" {\n");
         config.push_str("    set root=(cd0)\n");
         config.push_str("    linux ");
         config.push_str(&self.config.kernel_path);
-        
+
         for param in &self.config.boot_parameters {
             config.push_str(" ");
             config.push_str(param);
         }
-        
+
         config.push_str("\n");
         config.push_str("    initrd ");
         config.push_str(&self.config.initrd_path);
         config.push_str("\n");
         config.push_str("}\n\n");
-        
+
         config.push_str("menuentry \"SigmaOS Live (Text Mode)\" {\n");
         config.push_str("    set root=(cd0)\n");
         config.push_str("    linux ");
@@ -207,22 +206,22 @@ impl IsoBuilder {
     /// Generate Syslinux configuration for ISO boot
     pub fn generate_syslinux_config(&self) -> String {
         let mut config = String::new();
-        
+
         config.push_str("DEFAULT sigmaos\n");
         config.push_str("PROMPT 0\n");
         config.push_str("TIMEOUT 50\n\n");
-        
+
         config.push_str("LABEL sigmaos\n");
         config.push_str("    KERNEL /boot/vmlinuz-sigma\n");
         config.push_str("    APPEND ");
-        
+
         for param in &self.config.boot_parameters {
             config.push_str(param);
             config.push_str(" ");
         }
-        
+
         config.push_str("initrd=/boot/initrd-sigma\n\n");
-        
+
         config.push_str("LABEL sigmaos-text\n");
         config.push_str("    KERNEL /boot/vmlinuz-sigma\n");
         config.push_str("    APPEND textonly initrd=/boot/initrd-sigma\n");
@@ -238,7 +237,7 @@ impl IsoBuilder {
             IsoFilesystem::SquashFS => 3, // 3:1 compression
             _ => 1,
         };
-        
+
         (base_size + files_size) / compression_factor
     }
 
@@ -247,11 +246,11 @@ impl IsoBuilder {
         if self.config.kernel_path.is_empty() {
             return Err(IsoValidationError::MissingKernel);
         }
-        
+
         if self.config.initrd_path.is_empty() {
             return Err(IsoValidationError::MissingInitrd);
         }
-        
+
         if self.files.is_empty() {
             return Err(IsoValidationError::NoFiles);
         }
@@ -330,7 +329,7 @@ impl HybridIsoBuilder {
 
     pub fn build_hybrid_config(&self) -> String {
         let mut config = String::new();
-        
+
         config.push_str("# Hybrid ISO Configuration\n");
         config.push_str(&format!("UEFI: {}\n", self.uefi_enabled));
         config.push_str(&format!("BIOS: {}\n", self.bios_enabled));
@@ -380,11 +379,11 @@ impl IsoMetadata {
 /// Partition scheme (Linux installer-inspired)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PartitionScheme {
-    Auto, // Automatic partitioning
+    Auto,   // Automatic partitioning
     Manual, // Manual partitioning
-    Lvm, // LVM-based partitioning
-    Btrfs, // Btrfs subvolumes
-    Zfs, // ZFS pools (BSD-inspired)
+    Lvm,    // LVM-based partitioning
+    Btrfs,  // Btrfs subvolumes
+    Zfs,    // ZFS pools (BSD-inspired)
 }
 
 /// Filesystem type
@@ -436,7 +435,7 @@ impl IsoBuildSystem {
 
     pub fn build_iso(&mut self) -> Result<String, &'static str> {
         self.log("Starting ISO build process...");
-        
+
         // Validate configuration
         if let Err(e) = self.builder.base_builder.validate() {
             return Err("ISO validation failed");
@@ -448,7 +447,7 @@ impl IsoBuildSystem {
         let hybrid_config = self.builder.build_hybrid_config();
 
         self.log("Generated boot configurations");
-        
+
         // Calculate size
         let size = self.builder.base_builder.calculate_size();
         self.log(&format!("Estimated ISO size: {} MB", size / (1024 * 1024)));
@@ -459,7 +458,7 @@ impl IsoBuildSystem {
         self.log(&format!("Volume ID: {}", volume_id));
 
         self.log("ISO build completed successfully");
-        
+
         Ok(format!("SigmaOS-{}.iso", self.metadata.version))
     }
 
@@ -474,7 +473,13 @@ impl IsoBuildSystem {
     }
 
     /// Add partition configuration
-    pub fn add_partition(&mut self, mount_point: &str, size_mb: u64, filesystem: FilesystemType, boot_flag: bool) {
+    pub fn add_partition(
+        &mut self,
+        mount_point: &str,
+        size_mb: u64,
+        filesystem: FilesystemType,
+        boot_flag: bool,
+    ) {
         let partition = PartitionConfig {
             mount_point: String::from(mount_point),
             size_mb,
@@ -482,7 +487,10 @@ impl IsoBuildSystem {
             boot_flag,
         };
         self.partitions.push(partition);
-        self.log(&format!("Added partition: {} ({} MB, {:?})", mount_point, size_mb, filesystem));
+        self.log(&format!(
+            "Added partition: {} ({} MB, {:?})",
+            mount_point, size_mb, filesystem
+        ));
     }
 
     /// Generate default partition layout (Linux installer-inspired)
@@ -610,7 +618,7 @@ mod tests {
     fn test_iso_builder() {
         let mut builder = IsoBuilder::new();
         builder.add_file(IsoFileEntry::new("/test", "/test"));
-        
+
         assert_eq!(builder.files.len(), 1);
         assert!(builder.validate().is_ok());
     }
@@ -619,7 +627,7 @@ mod tests {
     fn test_grub_config_generation() {
         let builder = IsoBuilder::new();
         let config = builder.generate_grub_config();
-        
+
         assert!(config.contains("menuentry"));
         assert!(config.contains("SigmaOS Live"));
     }
@@ -628,7 +636,7 @@ mod tests {
     fn test_hybrid_builder() {
         let builder = HybridIsoBuilder::new();
         let config = builder.build_hybrid_config();
-        
+
         assert!(config.contains("Hybrid ISO Configuration"));
         assert!(config.contains("UEFI"));
     }
@@ -636,7 +644,7 @@ mod tests {
     #[test]
     fn test_iso_build_system() {
         let mut system = IsoBuildSystem::new("SigmaOS", "1.0");
-        
+
         assert!(system.build_iso().is_ok());
         assert!(!system.build_log.is_empty());
     }
@@ -717,17 +725,27 @@ mod tests {
         let mut system = IsoBuildSystem::new("SigmaOS", "1.0");
 
         system.generate_package_selection("desktop");
-        assert!(system.installer_packages.contains(&String::from("sigma-desktop")));
-        assert!(system.installer_packages.contains(&String::from("sigma-zenith")));
+        assert!(system
+            .installer_packages
+            .contains(&String::from("sigma-desktop")));
+        assert!(system
+            .installer_packages
+            .contains(&String::from("sigma-zenith")));
 
         system.installer_packages.clear();
         system.generate_package_selection("server");
-        assert!(system.installer_packages.contains(&String::from("sigma-server")));
-        assert!(system.installer_packages.contains(&String::from("sigma-ssh")));
+        assert!(system
+            .installer_packages
+            .contains(&String::from("sigma-server")));
+        assert!(system
+            .installer_packages
+            .contains(&String::from("sigma-ssh")));
 
         system.installer_packages.clear();
         system.generate_package_selection("minimal");
-        assert!(system.installer_packages.contains(&String::from("sigma-core")));
+        assert!(system
+            .installer_packages
+            .contains(&String::from("sigma-core")));
     }
 
     #[test]

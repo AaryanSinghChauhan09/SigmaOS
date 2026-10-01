@@ -12,11 +12,11 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::vec;
 use std::boxed::Box;
-use std::string::{String, ToString};
-use std::vec::Vec;
 use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 // SigmaOS Built-in Torrent Client
 // OOP-based BitTorrent client with peer management

@@ -1,9 +1,6 @@
 //! Window Manager (i3/sway Inspiration)
 //! Tiling window manager with workspaces and containers
 
-
-
-
 /// Window
 #[derive(Debug, Clone)]
 pub struct Window {
@@ -182,7 +179,11 @@ impl TilingWindowManager {
         }
     }
 
-    pub fn move_window_to_workspace(&mut self, window_id: &str, workspace_num: u32) -> Result<(), WMError> {
+    pub fn move_window_to_workspace(
+        &mut self,
+        window_id: &str,
+        workspace_num: u32,
+    ) -> Result<(), WMError> {
         if let Some(window) = self.get_window(window_id) {
             window.set_workspace(workspace_num);
             Ok(())
@@ -191,7 +192,11 @@ impl TilingWindowManager {
         }
     }
 
-    pub fn split_container(&mut self, container_id: &str, layout: LayoutType) -> Result<(), WMError> {
+    pub fn split_container(
+        &mut self,
+        container_id: &str,
+        layout: LayoutType,
+    ) -> Result<(), WMError> {
         if let Some(container) = self.containers.iter_mut().find(|c| c.id == container_id) {
             container.layout = layout;
             Ok(())

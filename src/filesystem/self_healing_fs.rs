@@ -90,7 +90,12 @@ impl SovereignFilesystem {
     }
 
     /// Stages a write transaction inside the transaction log journal (Copy-on-Write)
-    pub fn prepare_write(&mut self, inode_id: u32, offset: u32, data: &[u8]) -> Result<u32, &'static str> {
+    pub fn prepare_write(
+        &mut self,
+        inode_id: u32,
+        offset: u32,
+        data: &[u8],
+    ) -> Result<u32, &'static str> {
         let inode = self.inodes[inode_id as usize].ok_or("Inode not found")?;
         if data.len() > 32 {
             return Err("SovereignFS: Transaction payload segment exceeds maximum (32 bytes)");
@@ -202,13 +207,16 @@ impl SovereignFilesystem {
                         let mut recovered = false;
                         for entry in self.journal.iter().rev() {
                             if let Some(ref tx) = entry {
-                                if tx.inode_id == inode.inode_id && tx.status == TransactionStatus::Committed {
+                                if tx.inode_id == inode.inode_id
+                                    && tx.status == TransactionStatus::Committed
+                                {
                                     let write_len = tx.size as usize;
                                     let offset = tx.offset as usize;
                                     self.data_blocks[block_idx][offset..(offset + write_len)]
                                         .copy_from_slice(&tx.data[..write_len]);
 
-                                    inode.merkle_hash = Self::calculate_checksum(&self.data_blocks[block_idx]);
+                                    inode.merkle_hash =
+                                        Self::calculate_checksum(&self.data_blocks[block_idx]);
                                     heal_count += 1;
                                     recovered = true;
                                     break;
@@ -218,7 +226,8 @@ impl SovereignFilesystem {
 
                         if !recovered {
                             self.data_blocks[block_idx].fill(0);
-                            inode.merkle_hash = Self::calculate_checksum(&self.data_blocks[block_idx]);
+                            inode.merkle_hash =
+                                Self::calculate_checksum(&self.data_blocks[block_idx]);
                             inode.size = 0;
                             heal_count += 1;
                         }

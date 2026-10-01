@@ -4,8 +4,6 @@
 #![allow(clippy::new_without_default)]
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-
-
 // SigmaOS Sovereign Function Tracer (ftrace)
 // Implements Linux ftrace-style kernel function tracing in 100% safe Rust.
 //
@@ -16,14 +14,12 @@
 //   - Latency histograms (hist triggers)
 //   - Per-CPU ring buffers
 //   - Filtering by function, pid, cpu
-
-
 #[cfg(any(feature = "standalone_test", test))]
+use std::string::{String, ToString};
+#[cfg(not(any(feature = "standalone_test", test)))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::vec::Vec;
 
@@ -31,33 +27,33 @@ use std::vec::Vec;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum TraceEventKind {
-    FunctionEntry,   // function tracer: func enter
-    FunctionReturn,  // function graph: func return
-    Tracepoint,      // static tracepoint (like TRACE_EVENT macro)
-    KprobeHit,       // dynamic kprobe
-    UprobeHit,       // dynamic uprobe
-    SchedSwitch,     // sched:sched_switch tracepoint
-    SchedWakeup,     // sched:sched_wakeup
-    IrqEntry,        // irq:irq_handler_entry
-    IrqExit,         // irq:irq_handler_exit
-    SyscallEntry,    // raw_syscalls:sys_enter
-    SyscallExit,     // raw_syscalls:sys_exit
+    FunctionEntry,  // function tracer: func enter
+    FunctionReturn, // function graph: func return
+    Tracepoint,     // static tracepoint (like TRACE_EVENT macro)
+    KprobeHit,      // dynamic kprobe
+    UprobeHit,      // dynamic uprobe
+    SchedSwitch,    // sched:sched_switch tracepoint
+    SchedWakeup,    // sched:sched_wakeup
+    IrqEntry,       // irq:irq_handler_entry
+    IrqExit,        // irq:irq_handler_exit
+    SyscallEntry,   // raw_syscalls:sys_enter
+    SyscallExit,    // raw_syscalls:sys_exit
 }
 
 impl TraceEventKind {
     pub fn name(&self) -> &'static str {
         match self {
-            TraceEventKind::FunctionEntry  => "funcentry",
+            TraceEventKind::FunctionEntry => "funcentry",
             TraceEventKind::FunctionReturn => "funcreturn",
-            TraceEventKind::Tracepoint     => "tracepoint",
-            TraceEventKind::KprobeHit      => "kprobe",
-            TraceEventKind::UprobeHit      => "uprobe",
-            TraceEventKind::SchedSwitch    => "sched_switch",
-            TraceEventKind::SchedWakeup    => "sched_wakeup",
-            TraceEventKind::IrqEntry       => "irq_entry",
-            TraceEventKind::IrqExit        => "irq_exit",
-            TraceEventKind::SyscallEntry   => "sys_enter",
-            TraceEventKind::SyscallExit    => "sys_exit",
+            TraceEventKind::Tracepoint => "tracepoint",
+            TraceEventKind::KprobeHit => "kprobe",
+            TraceEventKind::UprobeHit => "uprobe",
+            TraceEventKind::SchedSwitch => "sched_switch",
+            TraceEventKind::SchedWakeup => "sched_wakeup",
+            TraceEventKind::IrqEntry => "irq_entry",
+            TraceEventKind::IrqExit => "irq_exit",
+            TraceEventKind::SyscallEntry => "sys_enter",
+            TraceEventKind::SyscallExit => "sys_exit",
         }
     }
 }
@@ -70,11 +66,11 @@ pub struct TraceEvent {
     pub timestamp_ns: u64,
     pub cpu: u8,
     pub pid: u32,
-    pub comm: String,         // task name (up to 16 chars like Linux comm)
-    pub func_name: String,    // function or tracepoint name
-    pub duration_ns: u64,     // for FunctionReturn: call duration
-    pub depth: u8,            // call stack depth (function graph)
-    pub return_value: i64,    // for SyscallExit / FunctionReturn
+    pub comm: String,      // task name (up to 16 chars like Linux comm)
+    pub func_name: String, // function or tracepoint name
+    pub duration_ns: u64,  // for FunctionReturn: call duration
+    pub depth: u8,         // call stack depth (function graph)
+    pub return_value: i64, // for SyscallExit / FunctionReturn
 }
 
 impl TraceEvent {
@@ -92,7 +88,16 @@ impl TraceEvent {
         }
     }
 
-    pub fn function_return(ts: u64, cpu: u8, pid: u32, comm: &str, func: &str, depth: u8, duration: u64, retval: i64) -> Self {
+    pub fn function_return(
+        ts: u64,
+        cpu: u8,
+        pid: u32,
+        comm: &str,
+        func: &str,
+        depth: u8,
+        duration: u64,
+        retval: i64,
+    ) -> Self {
         TraceEvent {
             kind: TraceEventKind::FunctionReturn,
             timestamp_ns: ts,
@@ -106,7 +111,14 @@ impl TraceEvent {
         }
     }
 
-    pub fn sched_switch(ts: u64, cpu: u8, prev_pid: u32, next_pid: u32, prev_comm: &str, next_comm: &str) -> Self {
+    pub fn sched_switch(
+        ts: u64,
+        cpu: u8,
+        prev_pid: u32,
+        next_pid: u32,
+        prev_comm: &str,
+        next_comm: &str,
+    ) -> Self {
         let mut func = String::from(prev_comm);
         func.push_str("->");
         func.push_str(next_comm);
@@ -153,7 +165,7 @@ pub struct TraceRingBuffer {
     pub capacity: usize,
     pub total_written: u64,
     pub total_dropped: u64,
-    pub overwrite: bool,  // true = overwrite oldest (like trace_pipe)
+    pub overwrite: bool, // true = overwrite oldest (like trace_pipe)
 }
 
 impl TraceRingBuffer {
@@ -187,7 +199,9 @@ impl TraceRingBuffer {
         out
     }
 
-    pub fn available(&self) -> usize { self.events.len() }
+    pub fn available(&self) -> usize {
+        self.events.len()
+    }
 }
 
 // ─── Tracer Filter ────────────────────────────────────────────────────────────
@@ -212,13 +226,19 @@ impl TracerFilter {
 
     pub fn passes(&self, event: &TraceEvent) -> bool {
         if let Some(pid) = self.pid_filter {
-            if event.pid != pid { return false; }
+            if event.pid != pid {
+                return false;
+            }
         }
         if let Some(ref prefix) = self.func_prefix {
-            if !event.func_name.starts_with(prefix.as_str()) { return false; }
+            if !event.func_name.starts_with(prefix.as_str()) {
+                return false;
+            }
         }
         if let Some(min_dur) = self.min_duration_ns {
-            if event.duration_ns < min_dur { return false; }
+            if event.duration_ns < min_dur {
+                return false;
+            }
         }
         if !self.event_kinds.is_empty() && !self.event_kinds.contains(&event.kind) {
             return false;
@@ -270,7 +290,9 @@ impl LatencyHistogram {
     }
 
     pub fn avg_ns(&self) -> u64 {
-        if self.total_samples == 0 { return 0; }
+        if self.total_samples == 0 {
+            return 0;
+        }
         self.sum_ns / self.total_samples
     }
 }
@@ -279,7 +301,7 @@ impl LatencyHistogram {
 
 pub struct SovereignFtracer {
     pub enabled: bool,
-    pub buffers: Vec<TraceRingBuffer>,   // one per CPU
+    pub buffers: Vec<TraceRingBuffer>, // one per CPU
     pub filter: TracerFilter,
     pub histograms: Vec<LatencyHistogram>,
     pub total_events: u64,
@@ -299,17 +321,25 @@ impl SovereignFtracer {
         }
     }
 
-    pub fn enable(&mut self)  { self.enabled = true; }
-    pub fn disable(&mut self) { self.enabled = false; }
+    pub fn enable(&mut self) {
+        self.enabled = true;
+    }
+    pub fn disable(&mut self) {
+        self.enabled = false;
+    }
 
     pub fn trace(&mut self, event: TraceEvent) {
-        if !self.enabled { return; }
-        if !self.filter.passes(&event) { return; }
+        if !self.enabled {
+            return;
+        }
+        if !self.filter.passes(&event) {
+            return;
+        }
 
         // Record in histogram if applicable
         if event.kind == TraceEventKind::FunctionReturn && event.duration_ns > 0 {
             let func = event.func_name.clone();
-            let dur  = event.duration_ns;
+            let dur = event.duration_ns;
             if let Some(hist) = self.histograms.iter_mut().find(|h| h.func_name == func) {
                 hist.record(dur);
             }
@@ -329,7 +359,9 @@ impl SovereignFtracer {
     pub fn read_events(&mut self, cpu: u8) -> Vec<TraceEvent> {
         if let Some(buf) = self.buffers.get_mut(cpu as usize) {
             buf.read_all()
-        } else { Vec::new() }
+        } else {
+            Vec::new()
+        }
     }
 
     pub fn total_available(&self) -> usize {
@@ -365,9 +397,13 @@ mod tests {
         let mut tracer = SovereignFtracer::new(4, 1024);
         tracer.filter.pid_filter = Some(42);
         tracer.enable();
-        tracer.trace(TraceEvent::function_entry(1000, 0, 99, "bash", "vfs_read", 0));
+        tracer.trace(TraceEvent::function_entry(
+            1000, 0, 99, "bash", "vfs_read", 0,
+        ));
         assert_eq!(tracer.total_available(), 0); // wrong PID filtered
-        tracer.trace(TraceEvent::function_entry(2000, 0, 42, "bash", "vfs_read", 0));
+        tracer.trace(TraceEvent::function_entry(
+            2000, 0, 42, "bash", "vfs_read", 0,
+        ));
         assert_eq!(tracer.total_available(), 1); // correct PID passes
     }
 
@@ -375,19 +411,26 @@ mod tests {
     fn test_ring_buffer_overwrite() {
         let mut buf = TraceRingBuffer::new(0, 3, true);
         for i in 0..5u64 {
-            buf.write(TraceEvent::function_entry(i * 100, 0, i as u32, "proc", "func", 0));
+            buf.write(TraceEvent::function_entry(
+                i * 100,
+                0,
+                i as u32,
+                "proc",
+                "func",
+                0,
+            ));
         }
-        assert_eq!(buf.available(), 3);   // oldest overwritten
+        assert_eq!(buf.available(), 3); // oldest overwritten
         assert_eq!(buf.total_written, 5); // 5 written total
     }
 
     #[test]
     fn test_latency_histogram() {
         let mut hist = LatencyHistogram::new("vfs_read");
-        hist.record(500);          // 0.5µs — first bucket (≤1µs)
-        hist.record(5_000);        // 5µs — second bucket (≤10µs)
-        hist.record(50_000);       // 50µs — third bucket (≤100µs)
-        hist.record(5_000_000);    // 5ms — fifth bucket (≤10ms)
+        hist.record(500); // 0.5µs — first bucket (≤1µs)
+        hist.record(5_000); // 5µs — second bucket (≤10µs)
+        hist.record(50_000); // 50µs — third bucket (≤100µs)
+        hist.record(5_000_000); // 5ms — fifth bucket (≤10ms)
         assert_eq!(hist.total_samples, 4);
         assert_eq!(hist.max_ns, 5_000_000);
         assert_eq!(hist.min_ns, 500);
@@ -399,13 +442,33 @@ mod tests {
         let mut tracer = SovereignFtracer::new(2, 512);
         tracer.add_histogram("do_sys_open");
         tracer.enable();
-        tracer.trace(TraceEvent::function_entry(1000, 0, 1, "bash", "do_sys_open", 1));
-        tracer.trace(TraceEvent::function_return(5000, 0, 1, "bash", "do_sys_open", 1, 4000, 3));
+        tracer.trace(TraceEvent::function_entry(
+            1000,
+            0,
+            1,
+            "bash",
+            "do_sys_open",
+            1,
+        ));
+        tracer.trace(TraceEvent::function_return(
+            5000,
+            0,
+            1,
+            "bash",
+            "do_sys_open",
+            1,
+            4000,
+            3,
+        ));
         let evs = tracer.read_events(0);
         assert_eq!(evs.len(), 2);
         assert_eq!(evs[1].duration_ns, 4000);
         // Histogram was recorded
-        let hist = tracer.histograms.iter().find(|h| h.func_name == "do_sys_open").unwrap();
+        let hist = tracer
+            .histograms
+            .iter()
+            .find(|h| h.func_name == "do_sys_open")
+            .unwrap();
         assert_eq!(hist.total_samples, 1);
     }
 

@@ -149,7 +149,10 @@ impl SovereignModularKernelEngine {
         value: &str,
     ) -> Result<(), &'static str> {
         let module = self.modules.get_mut(module_name).ok_or("ModuleNotFound")?;
-        module.manifest.params.insert(key.to_string(), value.to_string());
+        module
+            .manifest
+            .params
+            .insert(key.to_string(), value.to_string());
         Ok(())
     }
 
@@ -323,7 +326,7 @@ pub struct SovereignProcessControlManager {
     pub processes: BTreeMap<u64, ProcessControlEntry>,
     pub cgroups: BTreeMap<String, ResourceQuotaCgroup>,
     pub futex_waiters: BTreeMap<u64, Vec<u64>>, // futex_addr -> vec of pids
-    pub kqueue_events: Vec<(u64, String)>,       // (pid, event_type)
+    pub kqueue_events: Vec<(u64, String)>,      // (pid, event_type)
     pub isolation_policies: BTreeMap<String, EnterpriseProcessIsolationPolicy>,
 }
 
@@ -411,12 +414,17 @@ impl SovereignProcessControlManager {
             },
         );
 
-        self.kqueue_events.push((pid, "EVFILT_PROC_CREATE".to_string()));
+        self.kqueue_events
+            .push((pid, "EVFILT_PROC_CREATE".to_string()));
         Ok(())
     }
 
     /// FreeBSD Capsicum capability mode enter
-    pub fn enter_capsicum_sandbox(&mut self, pid: u64, rights_mask: u64) -> Result<(), &'static str> {
+    pub fn enter_capsicum_sandbox(
+        &mut self,
+        pid: u64,
+        rights_mask: u64,
+    ) -> Result<(), &'static str> {
         let proc_entry = self.processes.get_mut(&pid).ok_or("ProcessNotFound")?;
         proc_entry.in_capsicum_sandbox = true;
         proc_entry.allowed_rights_mask = rights_mask;
@@ -511,12 +519,7 @@ impl SovereignNetworkStackManager {
         }
     }
 
-    pub fn register_mesh_vpn_route(
-        &mut self,
-        iface: &str,
-        vip: &str,
-        pubkey: &str,
-    ) {
+    pub fn register_mesh_vpn_route(&mut self, iface: &str, vip: &str, pubkey: &str) {
         self.mesh_vpn_routes.insert(
             iface.to_string(),
             MeshVpnNetworkRoute {
@@ -816,7 +819,10 @@ mod step1_tests {
 
         let base_addr = engine.kldload_insmod(base_manifest, 0x2000).unwrap();
         assert!(base_addr > 0);
-        assert_eq!(engine.resolve_symbol("azx_sound_init"), Some("snd_hda_core".to_string()));
+        assert_eq!(
+            engine.resolve_symbol("azx_sound_init"),
+            Some("snd_hda_core".to_string())
+        );
 
         let drv_addr = engine.kldload_insmod(driver_manifest, 0x3000).unwrap();
         assert!(drv_addr > base_addr);
@@ -855,10 +861,22 @@ mod step1_tests {
 
         let matched = mgr.device_hotplug_add(dev_node).unwrap();
         assert_eq!(matched, "nvme_driver");
-        assert_eq!(mgr.registered_drivers.get("nvme_driver").unwrap().active_instances, 1);
+        assert_eq!(
+            mgr.registered_drivers
+                .get("nvme_driver")
+                .unwrap()
+                .active_instances,
+            1
+        );
 
         assert!(mgr.device_hotplug_remove("nvme0n1").is_ok());
-        assert_eq!(mgr.registered_drivers.get("nvme_driver").unwrap().active_instances, 0);
+        assert_eq!(
+            mgr.registered_drivers
+                .get("nvme_driver")
+                .unwrap()
+                .active_instances,
+            0
+        );
     }
 }
 
@@ -871,7 +889,9 @@ mod step2_tests {
         let mut proc_mgr = SovereignProcessControlManager::new();
 
         proc_mgr.create_cgroup("sandboxed_app", 50, 1024 * 1024 * 512, 10);
-        proc_mgr.spawn_process(101, "zenith_app", "sandboxed_app", 100).unwrap();
+        proc_mgr
+            .spawn_process(101, "zenith_app", "sandboxed_app", 100)
+            .unwrap();
 
         assert!(proc_mgr.enter_capsicum_sandbox(101, 0x05).is_ok());
         let proc_entry = proc_mgr.processes.get(&101).unwrap();
@@ -880,11 +900,17 @@ mod step2_tests {
 
         // Futex blocking & waking
         assert!(proc_mgr.futex_wait(101, 0x7FFF_0000).is_ok());
-        assert_eq!(proc_mgr.processes.get(&101).unwrap().state, ProcessState::FutexBlocked(0x7FFF_0000));
+        assert_eq!(
+            proc_mgr.processes.get(&101).unwrap().state,
+            ProcessState::FutexBlocked(0x7FFF_0000)
+        );
 
         let woken = proc_mgr.futex_wake(0x7FFF_0000, 1);
         assert_eq!(woken, 1);
-        assert_eq!(proc_mgr.processes.get(&101).unwrap().state, ProcessState::Ready);
+        assert_eq!(
+            proc_mgr.processes.get(&101).unwrap().state,
+            ProcessState::Ready
+        );
     }
 
     #[test]
@@ -908,8 +934,14 @@ mod step2_tests {
             payload: vec![1, 2, 3],
         };
 
-        assert_eq!(net_mgr.evaluate_and_route_packet(valid_pkt), PacketAction::Pass);
-        assert_eq!(net_mgr.evaluate_and_route_packet(blocked_pkt), PacketAction::Block);
+        assert_eq!(
+            net_mgr.evaluate_and_route_packet(valid_pkt),
+            PacketAction::Pass
+        );
+        assert_eq!(
+            net_mgr.evaluate_and_route_packet(blocked_pkt),
+            PacketAction::Block
+        );
         assert_eq!(net_mgr.packet_ring_buffer.len(), 1);
     }
 }
@@ -972,11 +1004,24 @@ mod step3_tests {
         let mut proc_mgr = SovereignProcessControlManager::new();
         proc_mgr.register_isolation_policy("1Password", true, 0x1F, true);
         assert!(proc_mgr.isolation_policies.contains_key("1Password"));
-        assert!(proc_mgr.isolation_policies.get("1Password").unwrap().is_memory_locked);
+        assert!(
+            proc_mgr
+                .isolation_policies
+                .get("1Password")
+                .unwrap()
+                .is_memory_locked
+        );
 
         let mut net_mgr = SovereignNetworkStackManager::new();
         net_mgr.register_mesh_vpn_route("tailscale0", "100.64.0.1", "pubkey_abc123");
         assert!(net_mgr.mesh_vpn_routes.contains_key("tailscale0"));
-        assert_eq!(net_mgr.mesh_vpn_routes.get("tailscale0").unwrap().virtual_ip, "100.64.0.1");
+        assert_eq!(
+            net_mgr
+                .mesh_vpn_routes
+                .get("tailscale0")
+                .unwrap()
+                .virtual_ip,
+            "100.64.0.1"
+        );
     }
 }

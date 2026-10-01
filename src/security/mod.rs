@@ -1,42 +1,46 @@
 // SigmaOS Security Subsystem
+pub mod memory_protection;
 pub mod address_sanitizer;
 pub mod capability_enforcer;
-pub mod memory_protection;
 pub use address_sanitizer::{
-    AddressSanitizer, AsanConfig, AsanRegion, AsanStatistics, ShadowState,
+    AddressSanitizer, AsanRegion, AsanConfig, AsanStatistics, ShadowState,
 };
-pub mod audit;
-pub mod bsd_hardening;
 pub mod capability;
 pub mod capsicum;
-pub mod capsicum_wrapper;
 pub mod filesystem_encryption;
 pub mod governance;
 pub mod hardware_privilege;
-pub mod pledge_unveil;
 pub mod pqc_enclave;
+pub mod governance;
+pub mod audit;
+pub mod system_audit;
+pub mod filesystem_encryption;
+pub mod bsd_hardening;
 pub mod sigma_pledge;
 pub mod sigma_unveil;
-pub mod system_audit;
 pub mod vault;
 pub mod vpn;
+pub mod capsicum;
+pub mod capsicum_wrapper;
+pub mod pledge_unveil;
 
 // SigmaOS Security Subsystem
+pub mod seccomp;
+pub mod seccomp_ebpf;
+pub mod syscall_filter;
 pub mod defensive_audit;
 pub mod hardening;
 pub mod kernel_hardening;
 pub mod seccomp;
 pub mod seccomp_ebpf;
-pub mod seccomp_filter;
 pub mod syscall_filter;
 pub mod user_namespace;
 
 pub mod bridge;
-pub mod capability_based_security;
 pub mod capability_token;
+pub mod capability_based_security;
 pub mod cleaner;
 pub mod clipboard;
-pub mod crypto_utils;
 pub mod deobfuscation;
 pub mod forensics;
 pub mod integrity;
@@ -44,13 +48,10 @@ pub mod intrusion;
 pub mod libgksu;
 pub mod mac;
 pub mod openbsd_karl;
-pub mod pam;
 pub mod password;
 pub mod pledge;
 pub use deobfuscation::ArithmeticSubstitutionDeobfuscator;
-pub mod kali_components;
 pub mod kali_stack;
-pub mod landlock;
 pub mod parrot;
 pub mod parrot_kali;
 pub mod parrot_linux;
@@ -66,10 +67,20 @@ pub mod selinux;
 pub mod selinux_advanced;
 pub mod unveil;
 pub mod vulnerability;
+pub mod kali_components;
+pub mod landlock;
 pub use landlock::{LandlockEngine, LandlockPathBeneathAttr, LandlockRuleset};
 pub mod landlock_sovereign;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
+pub use system_audit::{
+    AuditEventType as SystemAuditEventType, AuditEvent as SystemAuditEvent, AuditRule, AuditAction, AuditConfig,
+    SystemAuditManager,
+};
+pub use filesystem_encryption::{
+    EncryptionType as FsEncryptionType, EncryptionAlgorithm as FsEncryptionAlgorithm, EncryptionStatus as FsEncryptionStatus, FscryptDirectory, LuksDevice,
+    FilesystemEncryptionManager,
+};
 pub use bsd_hardening::{
     AslrEngine, BsdHardeningSuite, CapsicumCapability, CapsicumManager, MemoryPermission,
     PaxMprotect, PledgeManager as BsdPledgeManager, PledgePromise as BsdPledgePromise,
@@ -79,9 +90,7 @@ pub use bsd_hardening::{
 pub use capability::{
     CapabilityGate, CapabilityToken, LinuxCapability, LinuxCapabilitySet, Permission,
 };
-pub use capability_enforcer::{
-    CapabilityEnforcer, CapabilitySet, ResourcePermission, ResourceType,
-};
+pub use capability_enforcer::{CapabilityEnforcer, CapabilitySet, ResourceType, ResourcePermission};
 pub use capability_token::{
     CapabilityToken as AndroidStyleCapabilityToken,
     SecurityEnforcer as AndroidStyleSecurityEnforcer, PORT_ALLOW_SSL, PORT_ALLOW_TCP,
@@ -91,12 +100,16 @@ pub use clipboard::{
     SecureClipboardManager, SecurityLevel as ClipboardSecurityLevel, XorEncryption,
 };
 pub use defensive_audit::*;
-pub use filesystem_encryption::{
-    EncryptionAlgorithm as FsEncryptionAlgorithm, EncryptionStatus as FsEncryptionStatus,
-    EncryptionType as FsEncryptionType, FilesystemEncryptionManager, FscryptDirectory, LuksDevice,
-};
 pub use forensics::*;
-pub use hardening::{MemoryProtectionState, RelroState, SecurityHardeningConfig, StackCanary};
+pub use hardening::{
+    MemoryProtectionState, RelroState, SecurityHardeningConfig, StackCanary,
+};
+pub use kernel_hardening::{
+    GdtSegmentDescriptor, HardenedSyscallDispatcher, HardenedSyscallError, MemoryAccessError,
+    PagePermissions, PledgePromise as KernelPledgePromise, PrivilegeRing,
+    RetpolineKptiMitigationEngine, SmepSmapEnforcer, SovereignKaslrEngine,
+    SovereignRing3UserModeTssEngine, SyscallCategory, TaskStateSegment64,
+};
 pub use intrusion::{
     AnomalyDetection, DetectionResult, DetectionRule, DetectionStrategy, EventType, IdsError,
     IntrusionDetectionSystem, RuleAction, SecurityEvent, Severity, SignatureDetection,
@@ -108,46 +121,31 @@ pub use kali_stack::{
     PluggableAuthenticationModule, SudoPrivilegeEscalation, SwapSpaceManager, TmuxMultiplexer,
     TmuxPane, UndercoverDisguiseTheme, WifiFrameType,
 };
-pub use kernel_hardening::{
-    GdtSegmentDescriptor, HardenedSyscallDispatcher, HardenedSyscallError, MemoryAccessError,
-    PagePermissions, PledgePromise as KernelPledgePromise, PrivilegeRing,
-    RetpolineKptiMitigationEngine, SmepSmapEnforcer, SovereignKaslrEngine,
-    SovereignRing3UserModeTssEngine, SyscallCategory, TaskStateSegment64,
-};
-pub use system_audit::{
-    AuditAction, AuditConfig, AuditEvent as SystemAuditEvent,
-    AuditEventType as SystemAuditEventType, AuditRule, SystemAuditManager,
-};
 
-pub use crate::security::vulnerability::{
-    ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
-};
-pub use crate::security::vulnerability::{SimpleVulnerability, SimpleVulnerabilityScanner};
-pub use capability_based_security::{CapabilityGrant, CapabilityManager, CapabilityType};
 pub use libgksu::{
     GksuAuthBackend, GksuDisplayServer, GksuExecutionRequest, GksuExecutionResult,
     GksuSecurityGuard, LibGksuGraphicalSudoEngine,
 };
 pub use openbsd_karl::{KarlKernelRelinker, KernelBinarySection, KernelSectionKind};
-pub use parrot::ParrotSecurityFingerprintEngine;
 pub use parrot_kali::{
     AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, GLOBAL_ANONSURF,
     GLOBAL_FORENSIC, GLOBAL_SANDBOX,
 };
+pub use parrot::ParrotSecurityFingerprintEngine;
 pub use password::{
     BiometricAuth, BiometricResult, BiometricType, FaceIdAuth, FingerprintAuth, PasswordCategory,
     PasswordEntry, PasswordError, PasswordManager, PasswordManagerResult,
 };
 pub use pledge::{
-    promises, PledgeError, PledgeManager, PledgeManager as OriginalPledgeManager, PledgePromise,
+    promises, PledgeError, PledgeManager, PledgePromise, PledgeManager as OriginalPledgeManager,
     PledgePromise as OriginalPledgePromise,
 };
+pub use qubes_isolation::*;
+pub use root_improvement::*;
 pub use pqc_measurement::{
     Dilithium5KernelSignatureVerifier, FedoraCryptoPolicyProfile, HybridPqcMeasurementEngine,
     SovereignFirmitasAttestationEngine, Tpm2PcrBank, Tpm2PcrRegister, TPM2_PCR_COUNT,
 };
-pub use qubes_isolation::*;
-pub use root_improvement::*;
 pub use rules::{
     AuditAccessType, AuditSyscallRule, AuditWatchRule, PfAction, PfFilterRule, PledgeRule,
     SecurelevelState, SovereignAuditRuleEngine, SovereignNetworkFilterRulesEngine,
@@ -173,6 +171,13 @@ pub use vpn::{
     VpnConfig, VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics,
     WireGuardHandler,
 };
+pub use capability_based_security::{
+    CapabilityType, CapabilityGrant, CapabilityManager,
+};
+pub use crate::security::vulnerability::{
+    ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
+};
+pub use crate::security::vulnerability::{SimpleVulnerability, SimpleVulnerabilityScanner};
 
 // ─── Capability Monitor (pledge + unveil + Capsicum) ─────────────────────────
 pub mod capability_monitor;
@@ -181,17 +186,18 @@ pub mod phase_audit;
 pub use hardware_privilege::*;
 
 pub use capsicum::{CapEntry, CapMode, CapRight, CapabilitySandbox};
-pub use capsicum_wrapper::{
-    CapRights, CapSandboxMode, CapsicumFdEntry, CapsicumManager as CapsicumWrapperManager,
-    CapsicumStatistics,
-};
 pub use memory_protection::{
     AslrConfig, MemoryProtectionManager, MemoryProtectionMode, StackCanaryConfig,
 };
 pub use pledge_unveil::{
     PledgePromise as OpenBsdPledgePromise, PledgeSandbox, Sandbox, UnveilPermission, UnveilSandbox,
 };
-pub use seccomp_filter::{
-    BpfInstruction, SeccompAction, SeccompArgFilter, SeccompCompareOp, SeccompCompileError,
-    SeccompCompiler, SeccompRule, SeccompStatistics,
+pub use capsicum::{
+    CapRight, CapMode, CapEntry, CapabilitySandbox,
 };
+pub use capsicum_wrapper::{
+    CapsicumManager as CapsicumWrapperManager, CapRights, CapsicumFdEntry, CapSandboxMode,
+    CapsicumStatistics,
+};
+pub use memory_protection::{MemoryProtectionManager, MemoryProtectionMode, AslrConfig, StackCanaryConfig};
+pub use pledge_unveil::{PledgePromise as OpenBsdPledgePromise, PledgeSandbox, UnveilPermission, UnveilSandbox, Sandbox};

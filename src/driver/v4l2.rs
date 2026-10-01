@@ -1,8 +1,6 @@
 // V4L2 Webcam Driver Paradigm Implementation for SigmaOS
 // Provides zero-dependency Video4Linux2 capture buffer management and format negotiation.
 
-
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PixelFormat {
     YUYV,

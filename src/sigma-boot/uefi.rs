@@ -3,7 +3,6 @@
 //! Supports Secure Boot with PQC/Dilithium-5 certificates
 //! Multi-arch: x86_64, ARM64, RISC-V
 
-
 use core::panic::PanicInfo;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -94,10 +93,10 @@ impl UefiBootloader {
     /// Initialize UEFI bootloader
     pub fn init(&mut self) -> Result<(), BootError> {
         self.state.store(1, Ordering::SeqCst);
-        
+
         // Check for Secure Boot support
         self.secure_boot_enabled = self.check_secure_boot();
-        
+
         Ok(())
     }
 
@@ -111,13 +110,13 @@ impl UefiBootloader {
     /// Load kernel image
     pub fn load_kernel(&self, kernel_data: &[u8]) -> Result<(), BootError> {
         self.state.store(2, Ordering::SeqCst);
-        
+
         // Validate PE32+ format
         self.validate_pe32(kernel_data)?;
-        
+
         // Load kernel into memory
         // In real implementation, would use UEFI LoadImage protocol
-        
+
         Ok(())
     }
 
@@ -126,12 +125,12 @@ impl UefiBootloader {
         if data.len() < 64 {
             return Err(BootError::InvalidImage);
         }
-        
+
         // Check PE signature (MZ header)
         if data[0] != 0x4D || data[1] != 0x5A {
             return Err(BootError::InvalidImage);
         }
-        
+
         Ok(())
     }
 
@@ -140,20 +139,20 @@ impl UefiBootloader {
         if !self.secure_boot_enabled {
             return Ok(()); // Skip verification if Secure Boot disabled
         }
-        
+
         // Dilithium-5 signature verification
         // In real implementation, would use post-quantum crypto library
-        
+
         Ok(())
     }
 
     /// Boot the kernel
     pub fn boot_kernel(&self) -> ! {
         self.state.store(3, Ordering::SeqCst);
-        
+
         // Jump to kernel entry point
         // In real implementation, would use UEFI StartImage protocol
-        
+
         loop {}
     }
 
@@ -185,11 +184,11 @@ fn panic(_info: &core::panic::PanicInfo) -> ! {
 #[no_mangle]
 pub extern "C" fn efi_main() -> ! {
     let mut bootloader = UefiBootloader::new(Architecture::X86_64);
-    
+
     match bootloader.init() {
-        Ok(_) => {},
+        Ok(_) => {}
         Err(_) => loop {},
     }
-    
+
     bootloader.boot_kernel();
 }

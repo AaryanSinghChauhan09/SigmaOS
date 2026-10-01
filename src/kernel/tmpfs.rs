@@ -159,7 +159,11 @@ impl Tmpfs {
 
     /// Create file
     pub fn create_file(&mut self, path: &str, permissions: u32) -> Result<(), String> {
-        let parts: Vec<String> = path.split('/').filter(|s| !s.is_empty()).map(|s| s.to_string()).collect();
+        let parts: Vec<String> = path
+            .split('/')
+            .filter(|s| !s.is_empty())
+            .map(|s| s.to_string())
+            .collect();
         if parts.is_empty() {
             return Err("Invalid path".to_string());
         }
@@ -175,7 +179,11 @@ impl Tmpfs {
 
     /// Write file
     pub fn write_file(&mut self, path: &str, data: Vec<u8>) -> Result<(), String> {
-        let parts: Vec<String> = path.split('/').filter(|s| !s.is_empty()).map(|s| s.to_string()).collect();
+        let parts: Vec<String> = path
+            .split('/')
+            .filter(|s| !s.is_empty())
+            .map(|s| s.to_string())
+            .collect();
         if parts.is_empty() {
             return Err("Invalid path".to_string());
         }
@@ -196,7 +204,11 @@ impl Tmpfs {
 
     /// Read file
     pub fn read_file(&self, path: &str) -> Result<Vec<u8>, String> {
-        let parts: Vec<String> = path.split('/').filter(|s| !s.is_empty()).map(|s| s.to_string()).collect();
+        let parts: Vec<String> = path
+            .split('/')
+            .filter(|s| !s.is_empty())
+            .map(|s| s.to_string())
+            .collect();
         if parts.is_empty() {
             return Err("Invalid path".to_string());
         }
@@ -214,7 +226,11 @@ impl Tmpfs {
 
     /// Remove file
     pub fn remove_file(&mut self, path: &str) -> Result<(), String> {
-        let parts: Vec<String> = path.split('/').filter(|s| !s.is_empty()).map(|s| s.to_string()).collect();
+        let parts: Vec<String> = path
+            .split('/')
+            .filter(|s| !s.is_empty())
+            .map(|s| s.to_string())
+            .collect();
         if parts.is_empty() {
             return Err("Invalid path".to_string());
         }
@@ -228,7 +244,11 @@ impl Tmpfs {
 
     /// Create directory
     pub fn create_directory(&mut self, path: &str) -> Result<(), String> {
-        let parts: Vec<String> = path.split('/').filter(|s| !s.is_empty()).map(|s| s.to_string()).collect();
+        let parts: Vec<String> = path
+            .split('/')
+            .filter(|s| !s.is_empty())
+            .map(|s| s.to_string())
+            .collect();
         if parts.is_empty() {
             return Err("Invalid path".to_string());
         }
@@ -244,7 +264,11 @@ impl Tmpfs {
 
     /// Remove directory
     pub fn remove_directory(&mut self, path: &str) -> Result<(), String> {
-        let parts: Vec<String> = path.split('/').filter(|s| !s.is_empty()).map(|s| s.to_string()).collect();
+        let parts: Vec<String> = path
+            .split('/')
+            .filter(|s| !s.is_empty())
+            .map(|s| s.to_string())
+            .collect();
         if parts.is_empty() {
             return Err("Invalid path".to_string());
         }
@@ -276,7 +300,10 @@ impl Tmpfs {
     }
 
     /// Navigate to directory (mutable)
-    fn navigate_to_directory_mut(&mut self, path: &[String]) -> Result<&mut TmpfsDirectory, String> {
+    fn navigate_to_directory_mut(
+        &mut self,
+        path: &[String],
+    ) -> Result<&mut TmpfsDirectory, String> {
         let mut current = &mut self.root;
 
         for part in path {

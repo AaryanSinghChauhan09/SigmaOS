@@ -411,14 +411,25 @@ impl Sovereign2030DistroSupremacyMasterSuite {
         let mut score = 50u32; // Base baseline score
 
         // 1. Systemd 260 systemd-exec AI sandboxing (+10)
-        self.systemd_exec_ai_engine.register_service_profile("daemon_core", "/usr/bin/daemon", 0x07);
-        if self.systemd_exec_ai_engine.validate_capability_access("daemon_core", 1) {
+        self.systemd_exec_ai_engine.register_service_profile(
+            "daemon_core",
+            "/usr/bin/daemon",
+            0x07,
+        );
+        if self
+            .systemd_exec_ai_engine
+            .validate_capability_access("daemon_core", 1)
+        {
             score += 10;
         }
 
         // 2. Linux 6.16 eBPF sched_ext quantum predictive governor (+10)
-        self.quantum_sched_governor.register_task(200, "quantum_worker");
-        if self.quantum_sched_governor.optimize_quantum_schedule(200, 20) {
+        self.quantum_sched_governor
+            .register_task(200, "quantum_worker");
+        if self
+            .quantum_sched_governor
+            .optimize_quantum_schedule(200, 20)
+        {
             score += 10;
         }
 
@@ -430,13 +441,18 @@ impl Sovereign2030DistroSupremacyMasterSuite {
         }
 
         // 4. FreeBSD 16.0 Netlink VNET Jail (+10)
-        self.freebsd16_netlink_engine.spawn_netlink_vnet_jail(1, "vnet_jail_0");
-        if self.freebsd16_netlink_engine.process_netlink_xdp_msg(1, 128) {
+        self.freebsd16_netlink_engine
+            .spawn_netlink_vnet_jail(1, "vnet_jail_0");
+        if self
+            .freebsd16_netlink_engine
+            .process_netlink_xdp_msg(1, 128)
+        {
             score += 10;
         }
 
         // 5. Wayland 1.26 direct KMS scanout pipeline (+10)
-        self.wayland126_kms_engine.submit_scanout_frame_2030(1, 99, 360);
+        self.wayland126_kms_engine
+            .submit_scanout_frame_2030(1, 99, 360);
         if self.wayland126_kms_engine.direct_kms_hits > 0 {
             score += 10;
         }

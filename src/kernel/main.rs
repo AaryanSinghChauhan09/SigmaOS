@@ -10,7 +10,18 @@ use std::string::ToString;
 
 use sigmaos::arch::x86_64;
 use sigmaos::compatibility::{OpenRcManager, OpenRcRunlevel, OpenRcService};
-use sigmaos::kernel::{BuddyAllocator, Priority, Process, RoundRobinScheduler as Scheduler};
+use sigmaos::kernel::process::Process;
+use sigmaos::kernel::scheduler::ProcessTask;
+use sigmaos::kernel::{BuddyAllocator, Priority, RoundRobinScheduler as Scheduler};
+use sigmaos::kernel::{BuddyAllocator, Priority, ProcessTask, RoundRobinScheduler as Scheduler};
+use sigmaos::kernel::{
+    BuddyAllocator, Priority, ProcessTask, RoundRobinScheduler as Scheduler, SchedulerPolicy,
+};
+use sigmaos::kernel::{BuddyAllocator, Priority, ProcessTask, RoundRobinScheduler as Scheduler};
+use sigmaos::kernel::{
+    BuddyAllocator, Priority, ProcessState, ProcessTask, RoundRobinScheduler as Scheduler,
+    SchedulerPolicy,
+};
 use sigmaos::memory::paging::SimpleVMM;
 
 pub static EARLY_CPU_STATE: core::sync::atomic::AtomicUsize = AtomicUsize::new(0);
@@ -32,8 +43,34 @@ pub fn start_kernel(
     EARLY_CPU_STATE.store(2, Ordering::SeqCst);
 
     // Stage 3: Scheduler bootstrap
-    let idle_proc = Process::new(0, "idle".to_string(), Priority::Idle);
+    let idle_proc = Process::new(0, "idle");
+    let idle_task = sigmaos::kernel::ProcessTask {
+        pid: idle_proc.pid.0,
+        priority: Priority::Idle,
+        policy: sigmaos::kernel::SchedulerPolicy::Batch,
+        state: sigmaos::kernel::ProcessState::Runnable,
+    let idle_proc = ProcessTask {
+        pid: 0,
+        priority: Priority::Idle,
+        policy: SchedulerPolicy::Idle,
+        state: sigmaos::kernel::ProcessState::Ready,
+    let idle_proc = ProcessTask {
+        pid: 1,
+        priority: Priority::Idle,
+        policy: SchedulerPolicy::Idle,
+        state: ProcessState::Runnable,
+        vruntime: 0,
+        exec_start: 0,
+        exec_duration: 0,
+        cpu_time: 0,
+        slice: 10,
+    };
+    let idle_task = ProcessTask::new(0, "idle".to_string(), Priority::Idle);
+    scheduler.add_process(idle_task);
+    let idle_proc = ProcessTask::new(0, Priority::Idle);
     scheduler.add_process(idle_proc);
+    let idle_proc = ProcessTask::new(0, Priority::Idle);
+    let _ = scheduler.add_process(idle_proc);
 
     // Stage 4: Open early userland runlevels (OpenRC)
     let udev = OpenRcService::new("udev").with_runlevel(OpenRcRunlevel::SingleUser);

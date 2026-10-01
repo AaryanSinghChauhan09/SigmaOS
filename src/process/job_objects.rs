@@ -4,19 +4,30 @@ use std::vec;
 // Integrates Windows Job Objects with Linux cgroups v2 resource controllers, FreeBSD rctl limits,
 // and OpenBSD pledge/unveil sandboxing for process group governance.
 
-
+use core::sync::atomic::{AtomicU64, Ordering};
 use std::boxed::Box;
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::sync::atomic::{AtomicU64, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum JobLimitViolation {
-    CpuQuotaExceeded { used_us: u64, limit_us: u64 },
-    MemoryMaxExceeded { current_bytes: u64, limit_bytes: u64 },
-    MaxProcessesExceeded { current_count: usize, max_count: usize },
-    IoWeightThrottled { requested_weight: u32, limit_weight: u32 },
+    CpuQuotaExceeded {
+        used_us: u64,
+        limit_us: u64,
+    },
+    MemoryMaxExceeded {
+        current_bytes: u64,
+        limit_bytes: u64,
+    },
+    MaxProcessesExceeded {
+        current_count: usize,
+        max_count: usize,
+    },
+    IoWeightThrottled {
+        requested_weight: u32,
+        limit_weight: u32,
+    },
     CapabilityDenied(&'static str),
 }
 
@@ -99,7 +110,9 @@ impl SovereignJobObject {
     /// Attaches a process PID to this job object
     pub fn attach_process(&mut self, pid: usize) -> Result<(), JobLimitViolation> {
         if self.state == JobState::Terminated {
-            return Err(JobLimitViolation::CapabilityDenied("Cannot attach process to terminated Job Object"));
+            return Err(JobLimitViolation::CapabilityDenied(
+                "Cannot attach process to terminated Job Object",
+            ));
         }
 
         if let Some(max_pids) = self.limits.max_pids {
@@ -132,13 +145,19 @@ impl SovereignJobObject {
     }
 
     /// Inherits child process automatically when a process in the job spawns a child
-    pub fn handle_fork(&mut self, parent_pid: usize, child_pid: usize) -> Result<(), JobLimitViolation> {
+    pub fn handle_fork(
+        &mut self,
+        parent_pid: usize,
+        child_pid: usize,
+    ) -> Result<(), JobLimitViolation> {
         if !self.member_pids.contains(&parent_pid) {
             return Ok(());
         }
 
         if !self.limits.allow_child_process_creation {
-            return Err(JobLimitViolation::CapabilityDenied("Child process creation disallowed by Job Object limits"));
+            return Err(JobLimitViolation::CapabilityDenied(
+                "Child process creation disallowed by Job Object limits",
+            ));
         }
 
         self.attach_process(child_pid)
@@ -222,7 +241,11 @@ impl JobObjectManager {
     }
 
     /// Creates a new Sovereign Job Object
-    pub fn create_job(&mut self, name: &str, parent_job_id: Option<u64>) -> Result<u64, &'static str> {
+    pub fn create_job(
+        &mut self,
+        name: &str,
+        parent_job_id: Option<u64>,
+    ) -> Result<u64, &'static str> {
         if let Some(parent_id) = parent_job_id {
             if !self.jobs.contains_key(&parent_id) {
                 return Err("Parent Job Object not found");
@@ -236,20 +259,35 @@ impl JobObjectManager {
     }
 
     /// Configures limits on an existing Job Object
-    pub fn set_job_limits(&mut self, job_id: u64, limits: JobObjectLimits) -> Result<(), &'static str> {
+    pub fn set_job_limits(
+        &mut self,
+        job_id: u64,
+        limits: JobObjectLimits,
+    ) -> Result<(), &'static str> {
         let job = self.jobs.get_mut(&job_id).ok_or("Job Object not found")?;
         job.limits = limits;
         Ok(())
     }
 
     /// Attaches a process to a Job Object
-    pub fn attach_process_to_job(&mut self, job_id: u64, pid: usize) -> Result<(), JobLimitViolation> {
-        let job = self.jobs.get_mut(&job_id).ok_or(JobLimitViolation::CapabilityDenied("Job Object not found"))?;
+    pub fn attach_process_to_job(
+        &mut self,
+        job_id: u64,
+        pid: usize,
+    ) -> Result<(), JobLimitViolation> {
+        let job = self
+            .jobs
+            .get_mut(&job_id)
+            .ok_or(JobLimitViolation::CapabilityDenied("Job Object not found"))?;
         job.attach_process(pid)
     }
 
     /// Handles process fork across all job objects to propagate membership
-    pub fn notify_fork(&mut self, parent_pid: usize, child_pid: usize) -> Vec<(u64, Result<(), JobLimitViolation>)> {
+    pub fn notify_fork(
+        &mut self,
+        parent_pid: usize,
+        child_pid: usize,
+    ) -> Vec<(u64, Result<(), JobLimitViolation>)> {
         let mut results = Vec::new();
         for (job_id, job) in self.jobs.iter_mut() {
             if job.member_pids.contains(&parent_pid) {
@@ -287,7 +325,10 @@ mod tests {
         assert_eq!(job.accounting.active_process_count, 2);
 
         let err = job.attach_process(103);
-        assert!(matches!(err, Err(JobLimitViolation::MaxProcessesExceeded { .. })));
+        assert!(matches!(
+            err,
+            Err(JobLimitViolation::MaxProcessesExceeded { .. })
+        ));
 
         assert!(job.detach_process(101));
         assert_eq!(job.accounting.active_process_count, 1);
@@ -320,10 +361,16 @@ mod tests {
         assert_eq!(job.state, JobState::Throttled);
 
         let mem_err = job.update_memory_usage(3 * 1024 * 1024);
-        assert!(matches!(mem_err, Err(JobLimitViolation::MemoryMaxExceeded { .. })));
+        assert!(matches!(
+            mem_err,
+            Err(JobLimitViolation::MemoryMaxExceeded { .. })
+        ));
 
         let cpu_err = job.update_cpu_time(60_000);
-        assert!(matches!(cpu_err, Err(JobLimitViolation::CpuQuotaExceeded { .. })));
+        assert!(matches!(
+            cpu_err,
+            Err(JobLimitViolation::CpuQuotaExceeded { .. })
+        ));
     }
 
     #[test]
@@ -335,6 +382,9 @@ mod tests {
 
         let terminated_pids = manager.terminate_job_object(job_id).unwrap();
         assert_eq!(terminated_pids, vec![301, 302]);
-        assert_eq!(manager.jobs.get(&job_id).unwrap().state, JobState::Terminated);
+        assert_eq!(
+            manager.jobs.get(&job_id).unwrap().state,
+            JobState::Terminated
+        );
     }
 }

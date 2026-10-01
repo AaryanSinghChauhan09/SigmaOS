@@ -2,11 +2,11 @@
 // Inspired by Linux (link/unlink/linkat/symlinkat, atomic symlink swaps, ELOOP cycle protection)
 // and DragonFly BSD / OpenBSD (Variant Symlinks - varsyms: $SYS, $ARCH, $USER, $ZONE expansion).
 
-use std::string::{String, ToString};
-use std::vec::Vec;
-use std::vec;
-use std::format;
 use std::collections::{BTreeMap, BTreeSet};
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 pub const AT_FDCWD: i32 = -100;
 pub const MAX_SYMLINK_DEPTH: usize = 12;
@@ -36,7 +36,7 @@ pub struct SovereignLinkEngine {
     pub inodes: BTreeMap<u64, InodeRecord>,
     pub vfs_entries: BTreeMap<String, DirectoryEntry>, // path -> dentry
     pub dirfds: BTreeMap<i32, String>,                 // dirfd -> dir_path
-    pub varsym_vars: BTreeMap<String, String>,        // $SYS -> "Linux", $ARCH -> "x86_64"
+    pub varsym_vars: BTreeMap<String, String>,         // $SYS -> "Linux", $ARCH -> "x86_64"
     next_ino: u64,
 }
 
@@ -88,16 +88,24 @@ impl SovereignLinkEngine {
 
     /// Hard Link creation (link / linkat parity)
     pub fn create_hard_link(&mut self, old_path: &str, new_path: &str) -> Result<(), String> {
-        let old_dentry = self.vfs_entries.get(old_path).ok_or_else(|| format!("ENOENT: Old path {} not found", old_path))?;
+        let old_dentry = self
+            .vfs_entries
+            .get(old_path)
+            .ok_or_else(|| format!("ENOENT: Old path {} not found", old_path))?;
         let target_ino = old_dentry.inode;
 
-        let inode = self.inodes.get_mut(&target_ino).ok_or_else(|| format!("ENOENT: Inode {} not found", target_ino))?;
+        let inode = self
+            .inodes
+            .get_mut(&target_ino)
+            .ok_or_else(|| format!("ENOENT: Inode {} not found", target_ino))?;
         inode.hard_link_count += 1;
 
         let new_dentry = DirectoryEntry {
             name: new_path.to_string(),
             inode: target_ino,
-            link_type: LinkType::HardLink { target_inode: target_ino },
+            link_type: LinkType::HardLink {
+                target_inode: target_ino,
+            },
         };
         self.vfs_entries.insert(new_path.to_string(), new_dentry);
 
@@ -106,7 +114,10 @@ impl SovereignLinkEngine {
 
     /// Unlink (hard link deletion & inode cleanup)
     pub fn unlink(&mut self, path: &str) -> Result<(), String> {
-        let dentry = self.vfs_entries.remove(path).ok_or_else(|| format!("ENOENT: Path {} not found", path))?;
+        let dentry = self
+            .vfs_entries
+            .remove(path)
+            .ok_or_else(|| format!("ENOENT: Path {} not found", path))?;
 
         if let Some(inode) = self.inodes.get_mut(&dentry.inode) {
             if inode.hard_link_count > 0 {
@@ -138,7 +149,11 @@ impl SovereignLinkEngine {
     }
 
     /// DragonFly BSD / OpenBSD Variant Symlink creation (varsyms)
-    pub fn create_variant_symlink(&mut self, template_path: &str, link_path: &str) -> Result<(), String> {
+    pub fn create_variant_symlink(
+        &mut self,
+        template_path: &str,
+        link_path: &str,
+    ) -> Result<(), String> {
         let ino = self.next_ino;
         self.next_ino += 1;
 
@@ -156,7 +171,10 @@ impl SovereignLinkEngine {
 
     /// Atomic Symlink Swap (updates symlink target atomically without broken window)
     pub fn swap_symlink_atomic(&mut self, link_path: &str, new_target: &str) -> Result<(), String> {
-        let dentry = self.vfs_entries.get_mut(link_path).ok_or_else(|| format!("ENOENT: Symlink {} not found", link_path))?;
+        let dentry = self
+            .vfs_entries
+            .get_mut(link_path)
+            .ok_or_else(|| format!("ENOENT: Symlink {} not found", link_path))?;
         dentry.link_type = LinkType::SymLink {
             target_path: new_target.to_string(),
         };
@@ -181,11 +199,17 @@ impl SovereignLinkEngine {
 
         loop {
             if depth >= MAX_SYMLINK_DEPTH {
-                return Err(format!("ELOOP: Excessive symlink recursion level ({})", depth));
+                return Err(format!(
+                    "ELOOP: Excessive symlink recursion level ({})",
+                    depth
+                ));
             }
 
             if visited.contains(&current_path) {
-                return Err(format!("ELOOP: Symlink loop detected for path: {}", current_path));
+                return Err(format!(
+                    "ELOOP: Symlink loop detected for path: {}",
+                    current_path
+                ));
             }
 
             visited.insert(current_path.clone());
@@ -225,7 +249,9 @@ mod tests {
         let ino = engine.create_file("/var/log/syslog", b"log_data");
         assert_eq!(engine.inodes.get(&ino).unwrap().hard_link_count, 1);
 
-        engine.create_hard_link("/var/log/syslog", "/var/log/syslog.hard").unwrap();
+        engine
+            .create_hard_link("/var/log/syslog", "/var/log/syslog.hard")
+            .unwrap();
         assert_eq!(engine.inodes.get(&ino).unwrap().hard_link_count, 2);
 
         engine.unlink("/var/log/syslog").unwrap();
@@ -240,7 +266,9 @@ mod tests {
     fn test_variant_symlinks_varsyms() {
         let mut engine = SovereignLinkEngine::new();
         engine.create_file("/lib/x86_64/libc.so", b"elf_data");
-        engine.create_variant_symlink("/lib/$ARCH/libc.so", "/lib/libc.so").unwrap();
+        engine
+            .create_variant_symlink("/lib/$ARCH/libc.so", "/lib/libc.so")
+            .unwrap();
 
         let resolved = engine.resolve_path("/lib/libc.so").unwrap();
         assert_eq!(resolved, "/lib/x86_64/libc.so");
@@ -263,7 +291,9 @@ mod tests {
         engine.create_symlink("/v1/app", "/app/current").unwrap();
         assert_eq!(engine.resolve_path("/app/current").unwrap(), "/v1/app");
 
-        engine.swap_symlink_atomic("/app/current", "/v2/app").unwrap();
+        engine
+            .swap_symlink_atomic("/app/current", "/v2/app")
+            .unwrap();
         assert_eq!(engine.resolve_path("/app/current").unwrap(), "/v2/app");
     }
 }

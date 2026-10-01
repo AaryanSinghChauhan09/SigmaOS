@@ -2,10 +2,9 @@
 // Wayland-inspired compositor with OOP design
 // Inspired by Mutter, KWin, Sway, and wlroots from popular Linux distributions.
 
-
-use std::vec::Vec;
 use std::string::String;
 use std::string::ToString;
+use std::vec::Vec;
 
 pub const SCREEN_WIDTH: u32 = 1920;
 pub const SCREEN_HEIGHT: u32 = 1080;
@@ -201,7 +200,15 @@ impl ZenithCompositor {
     // ==============================================================================
     // wl_subsurface-style Parent/Child Layering (Menus, Tooltips)
     // ==============================================================================
-    pub fn register_sub_surface(&mut self, parent_id: u32, sub_id: u32, x_offset: i32, y_offset: i32, w: u32, h: u32) -> bool {
+    pub fn register_sub_surface(
+        &mut self,
+        parent_id: u32,
+        sub_id: u32,
+        x_offset: i32,
+        y_offset: i32,
+        w: u32,
+        h: u32,
+    ) -> bool {
         if self.get_window(parent_id).is_none() {
             return false;
         }
@@ -236,13 +243,17 @@ impl ZenithCompositor {
     // Sway/i3-style Tiling window layout calculations
     // ==============================================================================
     pub fn execute_tiling_layout(&mut self, split_vertical: bool) {
-        let active_count = self.windows.iter().filter(|w| {
-            if let Some(win) = w {
-                win.state != WindowState::Minimized
-            } else {
-                false
-            }
-        }).count();
+        let active_count = self
+            .windows
+            .iter()
+            .filter(|w| {
+                if let Some(win) = w {
+                    win.state != WindowState::Minimized
+                } else {
+                    false
+                }
+            })
+            .count();
 
         if active_count == 0 {
             return;
@@ -301,7 +312,8 @@ impl GamescopeDirectScanoutEngine {
 
     pub fn try_enable_direct_scanout(&mut self, window_id: u32, geom: Geometry) -> bool {
         // Direct scanout is eligible if window is fullscreen (covers 1920x1080)
-        if geom.x == 0 && geom.y == 0 && geom.width >= SCREEN_WIDTH && geom.height >= SCREEN_HEIGHT {
+        if geom.x == 0 && geom.y == 0 && geom.width >= SCREEN_WIDTH && geom.height >= SCREEN_HEIGHT
+        {
             self.active_scanout_window_id = Some(window_id);
             self.direct_scanout_active = true;
             self.bypass_compositing_passes += 1;
@@ -416,7 +428,11 @@ pub struct CursorTracker {
 
 impl CursorTracker {
     pub fn new() -> Self {
-        Self { x: 0, y: 0, last_hot_corner_triggered: 0 }
+        Self {
+            x: 0,
+            y: 0,
+            last_hot_corner_triggered: 0,
+        }
     }
 
     pub fn update_cursor(&mut self, x: i32, y: i32) -> u32 {
@@ -452,7 +468,10 @@ pub struct VsyncController {
 
 impl VsyncController {
     pub fn new(refresh_rate: u32) -> Self {
-        Self { monitor_refresh_rate: refresh_rate, frame_counter: 0 }
+        Self {
+            monitor_refresh_rate: refresh_rate,
+            frame_counter: 0,
+        }
     }
 
     pub fn block_until_vsync_ticks(&mut self) -> bool {
@@ -470,7 +489,9 @@ pub struct DamageTracker {
 
 impl DamageTracker {
     pub fn new() -> Self {
-        Self { damaged_rects: Vec::new() }
+        Self {
+            damaged_rects: Vec::new(),
+        }
     }
 
     pub fn add_damage(&mut self, rect: Geometry) {
@@ -640,8 +661,18 @@ mod tests {
     #[test]
     fn test_gamescope_direct_scanout_engine() {
         let mut scanout = GamescopeDirectScanoutEngine::new();
-        let fs_geom = Geometry { x: 0, y: 0, width: 1920, height: 1080 };
-        let win_geom = Geometry { x: 100, y: 100, width: 800, height: 600 };
+        let fs_geom = Geometry {
+            x: 0,
+            y: 0,
+            width: 1920,
+            height: 1080,
+        };
+        let win_geom = Geometry {
+            x: 100,
+            y: 100,
+            width: 800,
+            height: 600,
+        };
 
         assert!(scanout.try_enable_direct_scanout(1, fs_geom));
         assert!(scanout.direct_scanout_active);

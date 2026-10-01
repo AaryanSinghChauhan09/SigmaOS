@@ -200,12 +200,20 @@ impl E1000Driver {
 
     /// Get RX ring status
     pub fn get_rx_status(&self) -> (usize, usize, usize) {
-        (self.rx_ring.head, self.rx_ring.tail, self.rx_ring.available())
+        (
+            self.rx_ring.head,
+            self.rx_ring.tail,
+            self.rx_ring.available(),
+        )
     }
 
     /// Get TX ring status
     pub fn get_tx_status(&self) -> (usize, usize, usize) {
-        (self.tx_ring.head, self.tx_ring.tail, self.tx_ring.available())
+        (
+            self.tx_ring.head,
+            self.tx_ring.tail,
+            self.tx_ring.available(),
+        )
     }
 }
 
@@ -292,7 +300,7 @@ impl PeripheralDevice for E1000Driver {
 
             // Find the buffer index based on head position
             let buffer_idx = (self.rx_ring.head - 1) % NUM_RX_DESCRIPTORS;
-            
+
             // Copy received data to user buffer
             buffer[..length].copy_from_slice(&self.rx_buffers[buffer_idx][..length]);
 
@@ -338,7 +346,9 @@ impl PeripheralDevice for E1000Driver {
 
             // Spin-wait until hardware completes transmission
             let mut timeout = 1000;
-            while (read_volatile(&self.tx_ring.descriptors[self.tx_ring.head].status) & 0x01) == 0 && timeout > 0 {
+            while (read_volatile(&self.tx_ring.descriptors[self.tx_ring.head].status) & 0x01) == 0
+                && timeout > 0
+            {
                 core::hint::spin_loop();
                 timeout -= 1;
             }
@@ -377,10 +387,10 @@ mod tests {
             errors: 0,
             special: 0,
         };
-        
+
         let mut ring = DescriptorRing::new(64, default_desc);
         assert_eq!(ring.available(), 64);
-        
+
         let desc = RxDescriptor {
             buffer_addr: 0x1000,
             length: 512,
@@ -389,10 +399,10 @@ mod tests {
             errors: 0,
             special: 0,
         };
-        
+
         assert!(ring.enqueue(desc).is_ok());
         assert_eq!(ring.available(), 63);
-        
+
         let dequeued = ring.dequeue();
         assert!(dequeued.is_some());
         assert_eq!(dequeued.unwrap().buffer_addr, 0x1000);
@@ -401,10 +411,10 @@ mod tests {
     #[test]
     fn test_msix_configuration() {
         let mut driver = unsafe { E1000Driver::new(0xF0000000, CapabilityToken::new(0x02)) };
-        
+
         assert!(driver.configure_msix(1).is_ok());
         assert_eq!(driver.msix_count(), 1);
-        
+
         assert!(driver.configure_msix(2).is_ok());
         assert_eq!(driver.msix_count(), 2);
     }
@@ -412,7 +422,7 @@ mod tests {
     #[test]
     fn test_ring_status() {
         let mut driver = unsafe { E1000Driver::new(0xF0000000, CapabilityToken::new(0x02)) };
-        
+
         let (head, tail, available) = driver.get_rx_status();
         assert_eq!(head, 0);
         assert_eq!(tail, 0);

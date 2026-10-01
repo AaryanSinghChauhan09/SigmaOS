@@ -13,25 +13,28 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
 /// OOP-based GPS Location for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 341
 /// Implements GPS positioning and tracking
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type LocationID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum LocationError { Success = 0, NoFix = 1, NotFound = 2 }
+pub enum LocationError {
+    Success = 0,
+    NoFix = 1,
+    NotFound = 2,
+}
 
 pub trait Location {
     fn latitude(&self) -> f64;
@@ -64,11 +67,21 @@ impl SimpleLocation {
 }
 
 impl Location for SimpleLocation {
-    fn latitude(&self) -> f64 { (self.latitude.load(Ordering::SeqCst) as f64) / 1000000.0 }
-    fn longitude(&self) -> f64 { (self.longitude.load(Ordering::SeqCst) as f64) / 1000000.0 }
-    fn altitude(&self) -> f64 { (self.altitude.load(Ordering::SeqCst) as f64) / 100.0 }
-    fn accuracy(&self) -> f64 { (self.accuracy.load(Ordering::SeqCst) as f64) / 100.0 }
-    fn timestamp(&self) -> u64 { self.timestamp.load(Ordering::SeqCst) as u64 }
+    fn latitude(&self) -> f64 {
+        (self.latitude.load(Ordering::SeqCst) as f64) / 1000000.0
+    }
+    fn longitude(&self) -> f64 {
+        (self.longitude.load(Ordering::SeqCst) as f64) / 1000000.0
+    }
+    fn altitude(&self) -> f64 {
+        (self.altitude.load(Ordering::SeqCst) as f64) / 100.0
+    }
+    fn accuracy(&self) -> f64 {
+        (self.accuracy.load(Ordering::SeqCst) as f64) / 100.0
+    }
+    fn timestamp(&self) -> u64 {
+        self.timestamp.load(Ordering::SeqCst) as u64
+    }
 }
 
 pub trait GPS {
@@ -96,14 +109,26 @@ impl SimpleGPS {
 }
 
 impl GPS for SimpleGPS {
-    fn id(&self) -> LocationID { self.id }
-    fn has_fix(&self) -> bool { self.has_fix.load(Ordering::SeqCst) == 1 }
-    fn get_location(&self) -> &dyn Location { &self.location }
+    fn id(&self) -> LocationID {
+        self.id
+    }
+    fn has_fix(&self) -> bool {
+        self.has_fix.load(Ordering::SeqCst) == 1
+    }
+    fn get_location(&self) -> &dyn Location {
+        &self.location
+    }
 
     fn update_location(&mut self, lat: f64, lon: f64, alt: f64) {
-        self.location.latitude.store((lat * 1000000.0) as usize, Ordering::SeqCst);
-        self.location.longitude.store((lon * 1000000.0) as usize, Ordering::SeqCst);
-        self.location.altitude.store((alt * 100.0) as usize, Ordering::SeqCst);
+        self.location
+            .latitude
+            .store((lat * 1000000.0) as usize, Ordering::SeqCst);
+        self.location
+            .longitude
+            .store((lon * 1000000.0) as usize, Ordering::SeqCst);
+        self.location
+            .altitude
+            .store((alt * 100.0) as usize, Ordering::SeqCst);
         self.has_fix.store(1, Ordering::SeqCst);
     }
 }
@@ -154,7 +179,9 @@ impl LocationTracker for SimpleLocationTracker {
     fn get_gps(&self, id: LocationID) -> Option<&dyn GPS> {
         for gps_option in &self.gps_devices {
             if let Some(ref gps) = *gps_option {
-                if gps.id() == id { return Some(gps.as_ref()); }
+                if gps.id() == id {
+                    return Some(gps.as_ref());
+                }
             }
         }
         None
@@ -166,13 +193,25 @@ impl LocationTracker for SimpleLocationTracker {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -180,19 +219,29 @@ impl<T> Vec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -224,7 +273,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;

@@ -48,7 +48,11 @@ impl JupyterNotebook {
     }
 
     pub fn execute_cell(&mut self, cell_id: u32) -> Result<String, &'static str> {
-        let cell = self.cells.iter_mut().find(|c| c.id == cell_id).ok_or("Cell not found")?;
+        let cell = self
+            .cells
+            .iter_mut()
+            .find(|c| c.id == cell_id)
+            .ok_or("Cell not found")?;
         let output = if cell.cell_type == CellType::Code {
             format!("Out [{}]: Executed {}", cell_id, cell.source)
         } else {

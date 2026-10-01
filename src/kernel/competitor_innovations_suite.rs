@@ -49,7 +49,11 @@ impl ZswapTransparentPageCompressionEngine {
     }
 
     /// Compress page using Run-Length Encoding / LZ-style compression simulation
-    pub fn compress_and_store_page(&mut self, page_id: u64, page_data: &[u8]) -> Result<usize, &'static str> {
+    pub fn compress_and_store_page(
+        &mut self,
+        page_id: u64,
+        page_data: &[u8],
+    ) -> Result<usize, &'static str> {
         let original_size = page_data.len();
         if original_size == 0 {
             return Err("Cannot compress empty page");
@@ -164,7 +168,11 @@ impl NumaMultiSocketMemoryEngine {
     }
 
     /// Allocates memory on the preferred local NUMA node or falls back to lowest-latency node
-    pub fn allocate_numa_memory(&mut self, preferred_node: u32, size_mb: usize) -> Result<u32, &'static str> {
+    pub fn allocate_numa_memory(
+        &mut self,
+        preferred_node: u32,
+        size_mb: usize,
+    ) -> Result<u32, &'static str> {
         if let Some(node) = self.numa_nodes.get_mut(&preferred_node) {
             if node.allocated_memory_mb + size_mb <= node.total_memory_mb {
                 node.allocated_memory_mb += size_mb;

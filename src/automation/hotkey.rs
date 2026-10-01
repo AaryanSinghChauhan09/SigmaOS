@@ -162,10 +162,10 @@ impl HotkeyManager for SimpleHotkeyManager {
 /// Linux & BSD Window Manager Shortcut Preset Profiles
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum WindowManagerProfileType {
-    I3Sway,          // i3wm / Sway tiling window manager shortcuts
-    Hyprland,        // Hyprland Wayland compositor shortcuts
+    I3Sway,           // i3wm / Sway tiling window manager shortcuts
+    Hyprland,         // Hyprland Wayland compositor shortcuts
     FreeBsdXmonadDwm, // FreeBSD xmonad / dwm keyboard shortcuts
-    MacOsParity,     // macOS desktop hotkeys
+    MacOsParity,      // macOS desktop hotkeys
 }
 
 #[derive(Debug, Clone)]
@@ -210,11 +210,17 @@ impl SovereignWindowManagerHotkeyEngine {
             }
             WindowManagerProfileType::Hyprland => {
                 // Hyprland shortcuts: Super+Q (Terminal), Super+C (Kill), Super+M (Exit)
-                self.add_binding("terminal", MOD_SUPER, b'q', "exec hyprctl dispatch exec kitty");
+                self.add_binding(
+                    "terminal",
+                    MOD_SUPER,
+                    b'q',
+                    "exec hyprctl dispatch exec kitty",
+                );
                 self.add_binding("kill_window", MOD_SUPER, b'c', "killactive");
                 self.add_binding("exit_hyprland", MOD_SUPER | MOD_SHIFT, b'm', "exit");
                 self.add_binding("toggle_floating", MOD_SUPER, b'v', "togglefloating");
-                self.add_binding("screenshot", MOD_NONE, 110, "exec hyprshot -m region"); // F10 screenshot
+                self.add_binding("screenshot", MOD_NONE, 110, "exec hyprshot -m region");
+                // F10 screenshot
             }
             WindowManagerProfileType::FreeBsdXmonadDwm => {
                 // xmonad / dwm: Alt+Shift+Enter (Terminal), Alt+Shift+C (Close)
@@ -239,7 +245,9 @@ impl SovereignWindowManagerHotkeyEngine {
             key,
             action_command: command.to_string(),
         };
-        let _ = self.manager.register_hotkey(modifiers, key, command.as_bytes());
+        let _ = self
+            .manager
+            .register_hotkey(modifiers, key, command.as_bytes());
         self.loaded_bindings.push(binding);
     }
 

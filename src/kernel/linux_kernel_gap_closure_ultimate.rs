@@ -1,8 +1,8 @@
 // SigmaOS Linux Kernel Gap Closure Ultimate Subsystem
 // Zero-dependency Rust implementation covering Seccomp BPF syscall filtering, Perf Events PMC hardware counters, Netfilter IPtables hook chains, and OverlayFS Copy-On-Write layer stacking.
 
-use std::string::String;
 use crate::klib::vec::Vec;
+use std::string::String;
 
 /// Seccomp BPF Syscall Action Decision
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -46,8 +46,13 @@ impl LinuxKernelSeccompBpfEngine {
     }
 
     pub fn evaluate_syscall(&mut self, syscall_number: u32) -> SeccompAction {
-        if let Some(rule) = self.rules.iter().find(|r| r.syscall_number == syscall_number) {
-            if rule.action == SeccompAction::KillProcess || rule.action == SeccompAction::KillThread {
+        if let Some(rule) = self
+            .rules
+            .iter()
+            .find(|r| r.syscall_number == syscall_number)
+        {
+            if rule.action == SeccompAction::KillProcess || rule.action == SeccompAction::KillThread
+            {
                 self.blocked_syscalls_count += 1;
             }
             rule.action
@@ -151,7 +156,13 @@ impl LinuxKernelNetfilterIptablesEngine {
         }
     }
 
-    pub fn add_iptables_rule(&mut self, chain: NetfilterHookChain, protocol: &str, dest_port: u16, target: NetfilterRuleTarget) {
+    pub fn add_iptables_rule(
+        &mut self,
+        chain: NetfilterHookChain,
+        protocol: &str,
+        dest_port: u16,
+        target: NetfilterRuleTarget,
+    ) {
         self.rules.push(NetfilterRuleSpec {
             chain,
             protocol: String::from(protocol),
@@ -160,9 +171,20 @@ impl LinuxKernelNetfilterIptablesEngine {
         });
     }
 
-    pub fn evaluate_packet(&mut self, chain: NetfilterHookChain, protocol: &str, dest_port: u16) -> NetfilterRuleTarget {
-        if let Some(rule) = self.rules.iter().find(|r| r.chain == chain && r.protocol == protocol && r.dest_port == dest_port) {
-            if rule.target == NetfilterRuleTarget::Drop || rule.target == NetfilterRuleTarget::Reject {
+    pub fn evaluate_packet(
+        &mut self,
+        chain: NetfilterHookChain,
+        protocol: &str,
+        dest_port: u16,
+    ) -> NetfilterRuleTarget {
+        if let Some(rule) = self
+            .rules
+            .iter()
+            .find(|r| r.chain == chain && r.protocol == protocol && r.dest_port == dest_port)
+        {
+            if rule.target == NetfilterRuleTarget::Drop
+                || rule.target == NetfilterRuleTarget::Reject
+            {
                 self.packets_dropped_count += 1;
             }
             rule.target
@@ -245,11 +267,21 @@ impl SovereignLinuxKernelGapClosureUltimateSuite {
         self.seccomp.add_rule(314, SeccompAction::KillProcess); // block unsafe syscall
         let sec_act = self.seccomp.evaluate_syscall(314);
         let ipc = self.perf.calculate_ipc();
-        self.netfilter.add_iptables_rule(NetfilterHookChain::Input, "tcp", 23, NetfilterRuleTarget::Drop);
-        let nf_act = self.netfilter.evaluate_packet(NetfilterHookChain::Input, "tcp", 23);
+        self.netfilter.add_iptables_rule(
+            NetfilterHookChain::Input,
+            "tcp",
+            23,
+            NetfilterRuleTarget::Drop,
+        );
+        let nf_act = self
+            .netfilter
+            .evaluate_packet(NetfilterHookChain::Input, "tcp", 23);
         let cow_ok = self.overlayfs.perform_copy_up("/etc/resolv.conf");
 
-        sec_act == SeccompAction::KillProcess && ipc > 1.0 && nf_act == NetfilterRuleTarget::Drop && cow_ok
+        sec_act == SeccompAction::KillProcess
+            && ipc > 1.0
+            && nf_act == NetfilterRuleTarget::Drop
+            && cow_ok
     }
 }
 

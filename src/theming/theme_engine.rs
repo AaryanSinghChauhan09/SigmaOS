@@ -11,9 +11,9 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
+use alloc::collections::BTreeMap;
 use core::fmt;
 
 use crate::ai::agent_runtime::{AgentId, SovereignAgentRuntime};
@@ -316,8 +316,7 @@ impl ThemeEngine {
     }
 
     pub fn set_active_theme(&mut self, name: &str) -> Result<(), ThemeError> {
-        let theme = self
-            .themes
+        let theme = self.themes
             .get(name)
             .ok_or(ThemeError::ThemeNotFound)?
             .clone();
@@ -367,6 +366,9 @@ impl ThemeEngine {
 
         // Sort by luminance
         colors.sort_by(|a, b| a.luminance().partial_cmp(&b.luminance()).unwrap());
+        colors.sort_by(|a, b| {
+            a.luminance().partial_cmp(&b.luminance()).unwrap()
+        });
 
         // Pick dark/light and accent colors
         let background = colors.first().copied().unwrap_or(Color::rgb(30, 30, 30));
@@ -375,6 +377,7 @@ impl ThemeEngine {
             .get(colors.len() / 2)
             .copied()
             .unwrap_or(Color::rgb(100, 149, 237));
+        let accent = colors.get(colors.len() / 2).copied().unwrap_or(Color::rgb(100, 149, 237));
 
         Ok(ColorScheme {
             background,

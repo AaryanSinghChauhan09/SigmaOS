@@ -110,7 +110,11 @@ impl SovereignPingEngine {
         }
     }
 
-    pub fn process_echo_reply(&mut self, reply: &IcmpPacket, rtt_ms: f64) -> Result<bool, &'static str> {
+    pub fn process_echo_reply(
+        &mut self,
+        reply: &IcmpPacket,
+        rtt_ms: f64,
+    ) -> Result<bool, &'static str> {
         if reply.icmp_type != IcmpType::EchoReply {
             return Err("Not an ICMP Echo Reply");
         }
@@ -218,13 +222,19 @@ impl SovereignPingEngine {
         }
 
         idx = write_int(min_int, &mut out, idx);
-        if idx < 128 { out[idx] = b'/'; idx += 1; }
+        if idx < 128 {
+            out[idx] = b'/';
+            idx += 1;
+        }
         idx = write_int(avg_int, &mut out, idx);
-        if idx < 128 { out[idx] = b'/'; idx += 1; }
+        if idx < 128 {
+            out[idx] = b'/';
+            idx += 1;
+        }
         idx = write_int(max_int, &mut out, idx);
         if idx + 2 < 128 {
             out[idx] = b'm';
-            out[idx+1] = b's';
+            out[idx + 1] = b's';
             idx += 2;
         }
 
@@ -243,7 +253,7 @@ pub fn compute_icmp_checksum(header: &[u8], payload: &[u8]) -> u16 {
 
     let mut i = 0;
     while i + 1 < header.len() {
-        let word = ((header[i] as u32) << 8) | (header[i+1] as u32);
+        let word = ((header[i] as u32) << 8) | (header[i + 1] as u32);
         sum += word;
         i += 2;
     }
@@ -253,7 +263,7 @@ pub fn compute_icmp_checksum(header: &[u8], payload: &[u8]) -> u16 {
 
     let mut j = 0;
     while j + 1 < payload.len() {
-        let word = ((payload[j] as u32) << 8) | (payload[j+1] as u32);
+        let word = ((payload[j] as u32) << 8) | (payload[j + 1] as u32);
         sum += word;
         j += 2;
     }

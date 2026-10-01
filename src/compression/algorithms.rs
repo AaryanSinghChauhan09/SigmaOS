@@ -1,10 +1,8 @@
-
+use std::boxed::Box;
 /// Custom Compression Algorithms for SigmaOS
 /// Implements compression without relying on external compression libraries
 /// Includes DEFLATE, LZ77, and Huffman coding
-
 use std::vec::Vec;
-use std::boxed::Box;
 
 /// LZ77 match
 #[repr(C)]
@@ -16,10 +14,7 @@ pub struct LZ77Match {
 
 impl LZ77Match {
     pub fn new(offset: u16, length: u16) -> Self {
-        LZ77Match {
-            offset,
-            length,
-        }
+        LZ77Match { offset, length }
     }
 }
 
@@ -102,8 +97,15 @@ impl LZ77Compressor {
 
 /// Huffman node
 pub enum HuffmanNode {
-    Leaf { value: u8, frequency: u32 },
-    Internal { left: Box<HuffmanNode>, right: Box<HuffmanNode>, frequency: u32 },
+    Leaf {
+        value: u8,
+        frequency: u32,
+    },
+    Internal {
+        left: Box<HuffmanNode>,
+        right: Box<HuffmanNode>,
+        frequency: u32,
+    },
 }
 
 impl HuffmanNode {
@@ -122,9 +124,7 @@ pub struct HuffmanTree {
 
 impl HuffmanTree {
     pub fn new() -> Self {
-        HuffmanTree {
-            root: None,
-        }
+        HuffmanTree { root: None }
     }
 
     pub fn build_from_frequencies(&mut self, frequencies: &[u32; 256]) {
@@ -132,7 +132,12 @@ impl HuffmanTree {
             .iter()
             .enumerate()
             .filter(|(_, &freq)| freq > 0)
-            .map(|(value, &freq)| Box::new(HuffmanNode::Leaf { value: value as u8, frequency: freq }))
+            .map(|(value, &freq)| {
+                Box::new(HuffmanNode::Leaf {
+                    value: value as u8,
+                    frequency: freq,
+                })
+            })
             .collect();
 
         while nodes.len() > 1 {
@@ -144,7 +149,11 @@ impl HuffmanTree {
             let right = nodes.remove(0);
             let frequency = left.frequency() + right.frequency();
 
-            let internal = Box::new(HuffmanNode::Internal { left, right, frequency });
+            let internal = Box::new(HuffmanNode::Internal {
+                left,
+                right,
+                frequency,
+            });
             nodes.push(internal);
         }
 
@@ -168,7 +177,12 @@ impl HuffmanTree {
         encoded
     }
 
-    fn generate_codes(&self, node: &HuffmanNode, current_code: &[bool], codes: &mut [Option<Vec<bool>>; 256]) {
+    fn generate_codes(
+        &self,
+        node: &HuffmanNode,
+        current_code: &[bool],
+        codes: &mut [Option<Vec<bool>>; 256],
+    ) {
         match node {
             HuffmanNode::Leaf { value, .. } => {
                 codes[*value as usize] = Some(current_code.to_vec());

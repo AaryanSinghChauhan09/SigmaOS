@@ -10,14 +10,14 @@ use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ArmExecutionState {
-    ArmMode = 0,    // 32-bit ARM instruction set
-    ThumbMode = 1,  // 16-bit / 32-bit Thumb-2 instruction set
+    ArmMode = 0,   // 32-bit ARM instruction set
+    ThumbMode = 1, // 16-bit / 32-bit Thumb-2 instruction set
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BranchExchangeType {
-    BxReg,   // BX Rm (Branch and Exchange)
-    BlxReg,  // BLX Rm (Branch, Link, and Exchange)
+    BxReg,  // BX Rm (Branch and Exchange)
+    BlxReg, // BLX Rm (Branch, Link, and Exchange)
     Invalid,
 }
 
@@ -43,13 +43,15 @@ impl ArmBxBranchExchangeDecoder {
         let instruction_type = match sub_mask {
             0x012FFF10 => BranchExchangeType::BxReg,
             0x012FFF30 => BranchExchangeType::BlxReg,
-            _ => if base_mask == 0x012FFF10 || base_mask == 0x012FFF00 {
-                BranchExchangeType::BxReg
-            } else if base_mask == 0x012FFF30 {
-                BranchExchangeType::BlxReg
-            } else {
-                BranchExchangeType::Invalid
-            },
+            _ => {
+                if base_mask == 0x012FFF10 || base_mask == 0x012FFF00 {
+                    BranchExchangeType::BxReg
+                } else if base_mask == 0x012FFF30 {
+                    BranchExchangeType::BlxReg
+                } else {
+                    BranchExchangeType::Invalid
+                }
+            }
         };
 
         // If the least significant bit (LSB) of target address is 1, switch to Thumb mode; otherwise ARM mode
@@ -151,7 +153,9 @@ impl SovereignBytecodeEncryptor {
 
         for (idx, &byte) in payload.iter().enumerate() {
             let key_byte = key[idx % key.len()];
-            rolling_state = rolling_state.wrapping_mul(6364136223846793005).wrapping_add(key_byte as u64);
+            rolling_state = rolling_state
+                .wrapping_mul(6364136223846793005)
+                .wrapping_add(key_byte as u64);
             let mask = (rolling_state >> 24) as u8 ^ key_byte;
             output.push(byte ^ mask);
         }
@@ -176,7 +180,10 @@ mod tests {
         assert_eq!(decoded_bx.instruction_type, BranchExchangeType::BxReg);
         assert_eq!(decoded_bx.target_register, 1);
         assert_eq!(decoded_bx.target_address, 0x00010000);
-        assert_eq!(decoded_bx.next_execution_state, ArmExecutionState::ThumbMode);
+        assert_eq!(
+            decoded_bx.next_execution_state,
+            ArmExecutionState::ThumbMode
+        );
 
         // BLX R3 instruction opcode: 0xE12FFF33 (Condition AL, BLX, Rm=3)
         // R3 holds 0x00020000 (LSB is 0 -> ARM mode transition to 0x00020000)
@@ -190,17 +197,20 @@ mod tests {
     #[test]
     fn test_word_dword_qword_formatter() {
         let val_32: u32 = 0x12345678;
-        let le_bytes = SovereignDataWordFormatter::format_dword(val_32, DataEndianness::LittleEndian);
+        let le_bytes =
+            SovereignDataWordFormatter::format_dword(val_32, DataEndianness::LittleEndian);
         assert_eq!(le_bytes, [0x78, 0x56, 0x34, 0x12]);
 
-        let parsed_32 = SovereignDataWordFormatter::parse_dword(&le_bytes, DataEndianness::LittleEndian);
+        let parsed_32 =
+            SovereignDataWordFormatter::parse_dword(&le_bytes, DataEndianness::LittleEndian);
         assert_eq!(parsed_32, val_32);
 
         let val_64: u64 = 0x1122334455667788;
         let be_bytes = SovereignDataWordFormatter::format_qword(val_64, DataEndianness::BigEndian);
         assert_eq!(be_bytes, [0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88]);
 
-        let parsed_64 = SovereignDataWordFormatter::parse_qword(&be_bytes, DataEndianness::BigEndian);
+        let parsed_64 =
+            SovereignDataWordFormatter::parse_qword(&be_bytes, DataEndianness::BigEndian);
         assert_eq!(parsed_64, val_64);
     }
 

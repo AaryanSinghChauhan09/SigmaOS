@@ -9,11 +9,11 @@
 use core::fmt;
 
 #[cfg(any(feature = "standalone_test", test))]
+use std::collections::HashMap;
+#[cfg(any(feature = "standalone_test", test))]
 use std::string::String;
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
-#[cfg(any(feature = "standalone_test", test))]
-use std::collections::HashMap;
 
 // =========================================================================
 // 1. AMD SEV-SNP & ZEN AVX-512 CONFIDENTIAL COMPUTE ENGINE
@@ -23,8 +23,8 @@ use std::collections::HashMap;
 pub enum AmdSevSecurityLevel {
     StandardNonEncrypted,
     AmdSevLegacy,
-    AmdSevEs,      // Encrypted State (VMSA)
-    AmdSevSnp,     // Secure Nested Paging & Reverse Map Table (RMP)
+    AmdSevEs,  // Encrypted State (VMSA)
+    AmdSevSnp, // Secure Nested Paging & Reverse Map Table (RMP)
 }
 
 #[derive(Debug, Clone)]
@@ -50,7 +50,12 @@ impl AmdSevSnpConfidentialComputeEngine {
     }
 
     /// Validates memory page table state against the AMD SEV-SNP Reverse Map Table (RMP)
-    pub fn validate_rmp_entry(&self, phys_addr: u64, gpa: u64, is_guest_assigned: bool) -> Result<AmdSevAttestationReport, &'static str> {
+    pub fn validate_rmp_entry(
+        &self,
+        phys_addr: u64,
+        gpa: u64,
+        is_guest_assigned: bool,
+    ) -> Result<AmdSevAttestationReport, &'static str> {
         if phys_addr & 0xFFF != 0 || gpa & 0xFFF != 0 {
             return Err("Unaligned physical or guest physical address for RMP validation");
         }
@@ -237,7 +242,11 @@ impl IntelArchitectureSgxEngine {
     }
 
     /// Creates an Intel SGX Enclave Page Cache (EPC) allocation
-    pub fn create_enclave(&self, enclave_id: u64, epc_size: usize) -> Result<IntelSgxEnclaveMetadata, &'static str> {
+    pub fn create_enclave(
+        &self,
+        enclave_id: u64,
+        epc_size: usize,
+    ) -> Result<IntelSgxEnclaveMetadata, &'static str> {
         if epc_size < 4096 || epc_size & 0xFFF != 0 {
             return Err("EPC size must be a non-zero multiple of 4KB page size");
         }
@@ -291,7 +300,11 @@ impl SmpNumaAffinitySchedulerEngine {
 
     /// Selects optimal CPU core for task based on NUMA home node memory affinity
     pub fn schedule_task_numa_affine(&self, preferred_numa_node: usize) -> usize {
-        if let Some(node) = self.numa_nodes.iter().find(|n| n.numa_node_id == preferred_numa_node) {
+        if let Some(node) = self
+            .numa_nodes
+            .iter()
+            .find(|n| n.numa_node_id == preferred_numa_node)
+        {
             node.cpu_cores[0]
         } else {
             0
@@ -310,7 +323,9 @@ pub struct UniprocessorUpOptimizerEngine {
 
 impl UniprocessorUpOptimizerEngine {
     pub fn new() -> Self {
-        Self { interrupts_enabled: true }
+        Self {
+            interrupts_enabled: true,
+        }
     }
 
     /// Simulates zero-overhead UP spinlock (CLI - disable interrupts)

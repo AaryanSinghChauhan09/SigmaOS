@@ -2,9 +2,9 @@
 // SigmaOS elementaryOS Parity Subsystem: Granite UI, Switchboard, Contractor & ScreenTime
 // Inspired by elementaryOS Granite toolkit, Switchboard Control Center, Contractor Service, and Parental Controls
 
-use std::vec::Vec;
 use std::format;
 use std::string::String;
+use std::vec::Vec;
 
 // ============================================================================
 // 1. Granite UI Toolkit & Toast Manager
@@ -214,12 +214,18 @@ impl ContractorService {
     pub fn get_actions_for_mime(&self, mime_type: &str) -> Vec<ContractorAction> {
         self.actions
             .iter()
-            .filter(|a| a.target_mime_type == "application/octet-stream" || a.target_mime_type == mime_type)
+            .filter(|a| {
+                a.target_mime_type == "application/octet-stream" || a.target_mime_type == mime_type
+            })
             .cloned()
             .collect()
     }
 
-    pub fn execute_contract(&self, action_name: &str, target_file: &str) -> Result<&'static str, &'static str> {
+    pub fn execute_contract(
+        &self,
+        action_name: &str,
+        target_file: &str,
+    ) -> Result<&'static str, &'static str> {
         if target_file.is_empty() {
             return Err("Target file path is empty");
         }
@@ -283,9 +289,11 @@ impl ScreenTimeParentalGovernor {
     pub fn is_curfew_active(&self, current_hour: u8) -> bool {
         if self.quota.curfew_start_hour > self.quota.curfew_end_hour {
             // Overnight curfew e.g. 21:00 to 07:00
-            current_hour >= self.quota.curfew_start_hour || current_hour < self.quota.curfew_end_hour
+            current_hour >= self.quota.curfew_start_hour
+                || current_hour < self.quota.curfew_end_hour
         } else {
-            current_hour >= self.quota.curfew_start_hour && current_hour < self.quota.curfew_end_hour
+            current_hour >= self.quota.curfew_start_hour
+                && current_hour < self.quota.curfew_end_hour
         }
     }
 
@@ -418,8 +426,12 @@ mod tests {
         let text_actions = service.get_actions_for_mime("text/plain");
         assert!(text_actions.len() >= 2);
 
-        assert!(service.execute_contract("Print to PDF", "/home/user/doc.txt").is_ok());
-        assert!(service.execute_contract("NonExistentAction", "/home/user/doc.txt").is_err());
+        assert!(service
+            .execute_contract("Print to PDF", "/home/user/doc.txt")
+            .is_ok());
+        assert!(service
+            .execute_contract("NonExistentAction", "/home/user/doc.txt")
+            .is_err());
     }
 
     #[test]

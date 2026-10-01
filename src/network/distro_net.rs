@@ -1,7 +1,7 @@
-use std::vec;
-use std::string::{String, ToString};
-use std::vec::Vec;
 use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 // Distro Network Enhancements for SigmaOS
 // Inspired by Linux SYN Cookies (syncookies), WireGuard Noise protocol, Netfilter iptables, and eBPF SO_ATTACH_FILTER.
 
@@ -22,7 +22,13 @@ impl SynCookieEngine {
     }
 
     /// Generate SYN cookie sequence number for incoming TCP SYN packet
-    pub fn generate_cookie(&mut self, src_ip: [u8; 4], src_port: u16, dst_port: u16, client_seq: u32) -> u32 {
+    pub fn generate_cookie(
+        &mut self,
+        src_ip: [u8; 4],
+        src_port: u16,
+        dst_port: u16,
+        client_seq: u32,
+    ) -> u32 {
         self.active_cookie_count += 1;
         let ip_val = u32::from_be_bytes(src_ip);
         let hash = ip_val ^ (((src_port as u32) << 16) | (dst_port as u32)) ^ self.secret_key;
@@ -30,9 +36,17 @@ impl SynCookieEngine {
     }
 
     /// Validate SYN cookie returned in client ACK packet
-    pub fn validate_cookie(&self, src_ip: [u8; 4], src_port: u16, dst_port: u16, client_ack_seq: u32, original_client_seq: u32) -> bool {
+    pub fn validate_cookie(
+        &self,
+        src_ip: [u8; 4],
+        src_port: u16,
+        dst_port: u16,
+        client_ack_seq: u32,
+        original_client_seq: u32,
+    ) -> bool {
         let ip_val = u32::from_be_bytes(src_ip);
-        let expected_hash = ip_val ^ (((src_port as u32) << 16) | (dst_port as u32)) ^ self.secret_key;
+        let expected_hash =
+            ip_val ^ (((src_port as u32) << 16) | (dst_port as u32)) ^ self.secret_key;
         let expected_cookie = original_client_seq.wrapping_add(expected_hash);
         client_ack_seq == expected_cookie.wrapping_add(1)
     }
@@ -148,7 +162,14 @@ impl LinuxDistroNetEngine {
         }
     }
 
-    pub fn create_wireguard_interface(&mut self, name: &str, pubkey: &str, privkey: &str, endpoint: &str, port: u16) {
+    pub fn create_wireguard_interface(
+        &mut self,
+        name: &str,
+        pubkey: &str,
+        privkey: &str,
+        endpoint: &str,
+        port: u16,
+    ) {
         let mut wg = WireguardTunnel::new(name, pubkey, privkey, endpoint, port);
         wg.initiate_handshake();
         self.wireguard_tunnels.insert(name.to_string(), wg);
@@ -179,18 +200,40 @@ mod tests {
         let dst_port = 443;
         let client_seq = 10000;
 
-        let cookie = net_engine.syn_cookies.generate_cookie(src_ip, src_port, dst_port, client_seq);
-        assert!(net_engine.syn_cookies.validate_cookie(src_ip, src_port, dst_port, cookie + 1, client_seq));
+        let cookie = net_engine
+            .syn_cookies
+            .generate_cookie(src_ip, src_port, dst_port, client_seq);
+        assert!(net_engine.syn_cookies.validate_cookie(
+            src_ip,
+            src_port,
+            dst_port,
+            cookie + 1,
+            client_seq
+        ));
 
         // 2. Test WireGuard Tunnel
-        net_engine.create_wireguard_interface("wg0", "pubkey_abc123", "privkey_xyz789", "203.0.113.1:51820", 51820);
+        net_engine.create_wireguard_interface(
+            "wg0",
+            "pubkey_abc123",
+            "privkey_xyz789",
+            "203.0.113.1:51820",
+            51820,
+        );
         let wg = net_engine.wireguard_tunnels.get_mut("wg0").unwrap();
         assert!(wg.is_handshake_complete);
         assert_eq!(wg.send_packet(b"GET / HTTP/1.1\r\n").unwrap(), 16);
         assert_eq!(wg.tx_bytes, 16);
 
         // 3. Test eBPF Socket Filter
-        let bpf_filter = EbpfSocketFilter::new("http_filter", vec![BpfInstruction { code: 0x6, jt: 0, jf: 0, k: 65535 }]);
+        let bpf_filter = EbpfSocketFilter::new(
+            "http_filter",
+            vec![BpfInstruction {
+                code: 0x6,
+                jt: 0,
+                jf: 0,
+                k: 65535,
+            }],
+        );
         net_engine.attach_ebpf_socket_filter("sock_filter_1", bpf_filter);
 
         let filter = net_engine.socket_filters.get_mut("sock_filter_1").unwrap();

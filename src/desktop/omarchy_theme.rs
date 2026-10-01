@@ -1,12 +1,10 @@
 //! Omarchy-inspired Theme System
-//! 
+//!
 //! This module implements a theme system inspired by Omarchy Linux, which features
 //! a visual theme switcher with live previews, semantic color systems, and
 //! coordinated theming across desktop, terminal, editor, and applications.
 
 #![allow(dead_code)]
-
-
 
 use std::collections::BTreeMap;
 use std::format;
@@ -103,28 +101,28 @@ impl Color {
         let r = u8::from_str_radix(&hex_clean[0..2], 16).unwrap_or(0);
         let g = u8::from_str_radix(&hex_clean[2..4], 16).unwrap_or(0);
         let b = u8::from_str_radix(&hex_clean[4..6], 16).unwrap_or(0);
-        
+
         let (h, s, l) = Self::rgb_to_hsl(r, g, b);
-        
+
         Self {
             hex: hex.to_string(),
             rgb: (r, g, b),
             hsl: (h, s, l),
         }
     }
-    
+
     /// Convert RGB to HSL
     fn rgb_to_hsl(r: u8, g: u8, b: u8) -> (f32, f32, f32) {
         let r_f = r as f32 / 255.0;
         let g_f = g as f32 / 255.0;
         let b_f = b as f32 / 255.0;
-        
+
         let max = r_f.max(g_f).max(b_f);
         let min = r_f.min(g_f).min(b_f);
         let delta = max - min;
-        
+
         let l = (max + min) / 2.0;
-        
+
         let h = if delta == 0.0 {
             0.0
         } else if max == r_f {
@@ -134,13 +132,13 @@ impl Color {
         } else {
             60.0 * (((r_f - g_f) / delta) + 4.0)
         };
-        
+
         let s = if delta == 0.0 {
             0.0
         } else {
             delta / (1.0 - (2.0 * l - 1.0).abs())
         };
-        
+
         (h, s, l)
     }
 }
@@ -183,35 +181,35 @@ impl Theme {
             animation_speed: 5,
         }
     }
-    
+
     /// Set a semantic color
     pub fn set_color(&mut self, semantic: SemanticColor, color: Color) {
         self.colors.insert(semantic, color);
     }
-    
+
     /// Get a semantic color
     pub fn get_color(&self, semantic: SemanticColor) -> Option<&Color> {
         self.colors.get(&semantic)
     }
-    
+
     /// Generate CSS variables
     pub fn generate_css_vars(&self) -> String {
         let mut css = String::new();
-        
+
         for (semantic, color) in &self.colors {
             css.push_str(&format!("  {}: {};\n", semantic.css_var(), color.hex));
         }
-        
+
         css
     }
-    
+
     /// Generate CSS for specific component
     pub fn generate_component_css(&self, component: ThemeComponent) -> String {
         let mut css = String::new();
-        
+
         css.push_str(&format!("/* {} */\n", format!("{:?}", component)));
         css.push_str(&self.generate_css_vars());
-        
+
         css
     }
 }
@@ -236,42 +234,42 @@ impl OmarchyThemeManager {
             theme_history: Vec::new(),
         }
     }
-    
+
     /// Add a theme
     pub fn add_theme(&mut self, theme: Theme) {
         self.themes.push(theme);
     }
-    
+
     /// Remove a theme
     pub fn remove_theme(&mut self, theme_id: &str) -> Result<(), String> {
         if self.active_theme.as_ref() == Some(&theme_id.to_string()) {
             return Err("Cannot remove active theme".to_string());
         }
-        
+
         let original_len = self.themes.len();
         self.themes.retain(|t| t.id != theme_id);
-        
+
         if self.themes.len() == original_len {
             Err("Theme not found".to_string())
         } else {
             Ok(())
         }
     }
-    
+
     /// Set active theme
     pub fn set_active_theme(&mut self, theme_id: String) -> Result<(), String> {
         if !self.themes.iter().any(|t| t.id == theme_id) {
             return Err("Theme not found".to_string());
         }
-        
+
         if let Some(current) = &self.active_theme {
             self.theme_history.push(current.clone());
         }
-        
+
         self.active_theme = Some(theme_id);
         Ok(())
     }
-    
+
     /// Get active theme
     pub fn get_active_theme(&self) -> Option<&Theme> {
         if let Some(id) = &self.active_theme {
@@ -280,22 +278,22 @@ impl OmarchyThemeManager {
             None
         }
     }
-    
+
     /// Get theme by ID
     pub fn get_theme(&self, theme_id: &str) -> Option<&Theme> {
         self.themes.iter().find(|t| t.id == theme_id)
     }
-    
+
     /// Get dark themes
     pub fn get_dark_themes(&self) -> Vec<&Theme> {
         self.themes.iter().filter(|t| t.dark).collect()
     }
-    
+
     /// Get light themes
     pub fn get_light_themes(&self) -> Vec<&Theme> {
         self.themes.iter().filter(|t| !t.dark).collect()
     }
-    
+
     /// Search themes by name
     pub fn search_themes(&self, query: &str) -> Vec<&Theme> {
         let query_lower = query.to_lowercase();
@@ -308,7 +306,7 @@ impl OmarchyThemeManager {
             })
             .collect()
     }
-    
+
     /// Undo last theme change
     pub fn undo_theme_change(&mut self) -> Result<(), String> {
         if let Some(previous) = self.theme_history.pop() {
@@ -318,7 +316,7 @@ impl OmarchyThemeManager {
             Err("No theme history to undo".to_string())
         }
     }
-    
+
     /// Apply theme to specific component
     pub fn apply_to_component(&self, component: ThemeComponent) -> Result<String, String> {
         if let Some(theme) = self.get_active_theme() {
@@ -327,7 +325,7 @@ impl OmarchyThemeManager {
             Err("No active theme".to_string())
         }
     }
-    
+
     /// Apply theme to all components
     pub fn apply_to_all(&self) -> Result<String, String> {
         if let Some(theme) = self.get_active_theme() {
@@ -340,7 +338,7 @@ impl OmarchyThemeManager {
             Err("No active theme".to_string())
         }
     }
-    
+
     /// Create default themes
     pub fn create_default_themes(&mut self) {
         // Dark theme
@@ -352,7 +350,7 @@ impl OmarchyThemeManager {
         dark_theme.set_color(SemanticColor::Primary, Color::from_hex("#cba6f7"));
         dark_theme.set_color(SemanticColor::Accent, Color::from_hex("#89b4fa"));
         self.add_theme(dark_theme);
-        
+
         // Light theme
         let mut light_theme = Theme::new("Light".to_string(), "light".to_string(), false);
         light_theme.description = "Light theme for daytime use".to_string();
@@ -374,13 +372,13 @@ impl Default for OmarchyThemeManager {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_theme_manager_creation() {
         let manager = OmarchyThemeManager::new();
         assert_eq!(manager.themes.len(), 0);
     }
-    
+
     #[test]
     fn test_add_theme() {
         let mut manager = OmarchyThemeManager::new();
@@ -388,40 +386,40 @@ mod tests {
         manager.add_theme(theme);
         assert_eq!(manager.themes.len(), 1);
     }
-    
+
     #[test]
     fn test_set_active_theme() {
         let mut manager = OmarchyThemeManager::new();
         let theme = Theme::new("Test".to_string(), "test".to_string(), true);
         manager.add_theme(theme);
-        
+
         let result = manager.set_active_theme("test".to_string());
         assert!(result.is_ok());
         assert_eq!(manager.active_theme, Some("test".to_string()));
     }
-    
+
     #[test]
     fn test_color_from_hex() {
         let color = Color::from_hex("#ff0000");
         assert_eq!(color.hex, "#ff0000");
         assert_eq!(color.rgb, (255, 0, 0));
     }
-    
+
     #[test]
     fn test_generate_css_vars() {
         let mut theme = Theme::new("Test".to_string(), "test".to_string(), true);
         theme.set_color(SemanticColor::Primary, Color::from_hex("#ff0000"));
-        
+
         let css = theme.generate_css_vars();
         assert!(css.contains("--color-primary"));
         assert!(css.contains("#ff0000"));
     }
-    
+
     #[test]
     fn test_default_themes() {
         let mut manager = OmarchyThemeManager::new();
         manager.create_default_themes();
-        
+
         assert_eq!(manager.themes.len(), 2);
         assert!(manager.get_dark_themes().len() > 0);
         assert!(manager.get_light_themes().len() > 0);

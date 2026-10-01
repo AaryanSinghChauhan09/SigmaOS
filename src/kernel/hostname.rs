@@ -180,7 +180,9 @@ mod tests {
     #[test]
     fn test_set_both() {
         let manager = HostnameManager::new();
-        manager.set_both("myhost".to_string(), "example.com".to_string()).unwrap();
+        manager
+            .set_both("myhost".to_string(), "example.com".to_string())
+            .unwrap();
 
         assert_eq!(manager.get_hostname(), "myhost");
         assert_eq!(manager.get_domainname(), "example.com");
@@ -189,6 +191,8 @@ mod tests {
     #[test]
     fn test_set_both_invalid_hostname() {
         let manager = HostnameManager::new();
-        assert!(manager.set_both("".to_string(), "example.com".to_string()).is_err());
+        assert!(manager
+            .set_both("".to_string(), "example.com".to_string())
+            .is_err());
     }
 }

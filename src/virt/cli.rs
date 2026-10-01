@@ -1,10 +1,10 @@
-use std::boxed::Box;
 use core::mem;
 /// OOP-based Virtualization Management CLI for SigmaOS
 /// Implements virtualization CLI using OOP principles with traits and structs
 /// No dependency on external CLI frameworks
 /// Based on Roadmap Item 18: Virtualization management CLI
 use core::sync::atomic::{AtomicUsize, Ordering};
+use std::boxed::Box;
 
 /// VM ID
 pub type VMID = usize;

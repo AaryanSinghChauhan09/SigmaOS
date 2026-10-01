@@ -110,15 +110,15 @@ impl MintMenu {
 
     pub fn search(&self, query: &str) -> Vec<MenuSearchResult> {
         let mut results = Vec::new();
-        
+
         for item in &self.items {
             if !item.is_visible {
                 continue;
             }
-            
+
             let name_contains = item.name.contains(query);
             let command_contains = item.command.contains(query);
-            
+
             if name_contains || command_contains {
                 let relevance = if item.name.starts_with(query) {
                     1.0
@@ -127,7 +127,7 @@ impl MintMenu {
                 } else {
                     0.5
                 };
-                
+
                 results.push(MenuSearchResult {
                     item_id: item.id.clone(),
                     relevance_score: relevance,
@@ -139,14 +139,15 @@ impl MintMenu {
                 });
             }
         }
-        
+
         results.sort_by(|a, b| b.relevance_score.partial_cmp(&a.relevance_score).unwrap());
         results
     }
 
     pub fn get_items_by_category(&self, category_id: &str) -> Vec<&MenuItem> {
         if let Some(category) = self.categories.iter().find(|c| c.id == category_id) {
-            self.items.iter()
+            self.items
+                .iter()
                 .filter(|item| category.items.contains(&item.id) && item.is_visible)
                 .collect()
         } else {
@@ -155,21 +156,25 @@ impl MintMenu {
     }
 
     pub fn get_favorites(&self) -> Vec<&MenuItem> {
-        self.items.iter()
+        self.items
+            .iter()
             .filter(|item| self.favorites.iter().any(|id| id == &item.id) && item.is_visible)
             .collect()
     }
 
     pub fn get_recent_items(&self) -> Vec<&MenuItem> {
-        self.recent_items.iter()
-            .filter_map(|id| self.items.iter().find(|item| item.id == *id && item.is_visible))
+        self.recent_items
+            .iter()
+            .filter_map(|id| {
+                self.items
+                    .iter()
+                    .find(|item| item.id == *id && item.is_visible)
+            })
             .collect()
     }
 
     pub fn get_all_items(&self) -> Vec<&MenuItem> {
-        self.items.iter()
-            .filter(|item| item.is_visible)
-            .collect()
+        self.items.iter().filter(|item| item.is_visible).collect()
     }
 
     pub fn execute_item(&self, item_id: &str) -> Result<String, String> {
@@ -181,12 +186,12 @@ impl MintMenu {
 
     pub fn display_menu(&self) -> String {
         let mut output = String::from("=== MintMenu ===\n\n");
-        
+
         if let Some(category_id) = &self.current_category {
             let items = self.get_items_by_category(category_id);
             output.push_str(&format!("Category: {}\n", category_id));
             output.push_str(&format!("Items: {}\n\n", items.len()));
-            
+
             for item in items {
                 output.push_str(&format!("  - {} ({})\n", item.name, item.command));
             }
@@ -195,18 +200,18 @@ impl MintMenu {
             for item in self.get_favorites() {
                 output.push_str(&format!("  - {}\n", item.name));
             }
-            
+
             output.push_str("\nRecent:\n");
             for item in self.get_recent_items() {
                 output.push_str(&format!("  - {}\n", item.name));
             }
-            
+
             output.push_str("\nCategories:\n");
             for category in &self.categories {
                 output.push_str(&format!("  - {} ({})\n", category.name, category.id));
             }
         }
-        
+
         output
     }
 
@@ -215,14 +220,16 @@ impl MintMenu {
         let mut output = String::from("=== Search Results ===\n\n");
         output.push_str(&format!("Query: {}\n", query));
         output.push_str(&format!("Results: {}\n\n", results.len()));
-        
+
         for result in &results {
             if let Some(item) = self.items.iter().find(|i| i.id == result.item_id) {
-                output.push_str(&format!("  - {} ({}) [relevance: {:.2}]\n", 
-                    item.name, item.command, result.relevance_score));
+                output.push_str(&format!(
+                    "  - {} ({}) [relevance: {:.2}]\n",
+                    item.name, item.command, result.relevance_score
+                ));
             }
         }
-        
+
         output
     }
 
@@ -310,7 +317,7 @@ mod tests {
             is_visible: true,
             is_favorite: false,
         };
-        
+
         menu.add_item(item);
         assert_eq!(menu.items.len(), 1);
         assert_eq!(menu.search_index.len(), 1);
@@ -329,7 +336,7 @@ mod tests {
             is_visible: true,
             is_favorite: false,
         });
-        
+
         menu.add_to_favorites("vim");
         assert!(menu.favorites.iter().any(|id| id == "vim"));
         assert!(menu.items[0].is_favorite);
@@ -349,7 +356,7 @@ mod tests {
             is_favorite: true,
         });
         menu.favorites.push(String::from("vim"));
-        
+
         menu.remove_from_favorites("vim");
         assert!(!menu.favorites.iter().any(|id| id == "vim"));
         assert!(!menu.items[0].is_favorite);
@@ -361,7 +368,7 @@ mod tests {
         menu.add_to_recent("vim");
         menu.add_to_recent("git");
         menu.add_to_recent("vim");
-        
+
         assert_eq!(menu.recent_items.len(), 2);
         assert_eq!(menu.recent_items[0], "vim");
     }
@@ -379,7 +386,7 @@ mod tests {
             is_visible: true,
             is_favorite: false,
         });
-        
+
         let results = menu.search("vim");
         assert_eq!(results.len(), 1);
         assert_eq!(results[0].item_id, "vim");
@@ -399,7 +406,7 @@ mod tests {
             is_favorite: true,
         });
         menu.favorites.push(String::from("vim"));
-        
+
         let favorites = menu.get_favorites();
         assert_eq!(favorites.len(), 1);
         assert_eq!(favorites[0].name, "Vim");
@@ -418,7 +425,7 @@ mod tests {
             is_visible: true,
             is_favorite: false,
         });
-        
+
         let result = menu.execute_item("vim");
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), "vim");
@@ -428,7 +435,7 @@ mod tests {
     fn test_initialize_default_categories() {
         let mut menu = MintMenu::new();
         menu.initialize_default_categories();
-        
+
         assert_eq!(menu.categories.len(), 8);
         assert!(menu.categories.iter().any(|c| c.id == "development"));
     }

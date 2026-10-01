@@ -13,9 +13,9 @@
 
 extern crate alloc;
 use alloc::boxed::Box;
-use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
+use alloc::collections::BTreeMap;
 use core::fmt;
 
 use crate::theming::{Color, Theme};
@@ -95,30 +95,15 @@ pub struct Spacing {
 
 impl Spacing {
     pub const fn zero() -> Self {
-        Self {
-            top: 0,
-            right: 0,
-            bottom: 0,
-            left: 0,
-        }
+        Self { top: 0, right: 0, bottom: 0, left: 0 }
     }
 
     pub const fn all(value: u32) -> Self {
-        Self {
-            top: value,
-            right: value,
-            bottom: value,
-            left: value,
-        }
+        Self { top: value, right: value, bottom: value, left: value }
     }
 
     pub const fn symmetric(vertical: u32, horizontal: u32) -> Self {
-        Self {
-            top: vertical,
-            right: horizontal,
-            bottom: vertical,
-            left: horizontal,
-        }
+        Self { top: vertical, right: horizontal, bottom: vertical, left: horizontal }
     }
 }
 
@@ -371,9 +356,7 @@ impl WidgetApi {
     }
 
     pub fn find_widget(&self, id: WidgetId) -> Option<&Widget> {
-        self.root
-            .as_ref()
-            .and_then(|root| Self::find_widget_recursive(root, id))
+        self.root.as_ref().and_then(|root| Self::find_widget_recursive(root, id))
     }
 
     fn find_widget_recursive(widget: &Widget, id: WidgetId) -> Option<&Widget> {
@@ -391,9 +374,7 @@ impl WidgetApi {
     }
 
     pub fn find_widget_mut(&mut self, id: WidgetId) -> Option<&mut Widget> {
-        self.root
-            .as_mut()
-            .and_then(|root| Self::find_widget_mut_recursive(root, id))
+        self.root.as_mut().and_then(|root| Self::find_widget_mut_recursive(root, id))
     }
 
     fn find_widget_mut_recursive(widget: &mut Widget, id: WidgetId) -> Option<&mut Widget> {
@@ -518,8 +499,8 @@ pub mod widgets {
 
 #[cfg(test)]
 mod tests {
-    use super::widgets::*;
     use super::*;
+    use super::widgets::*;
 
     #[test]
     fn test_widget_builder() {
@@ -541,6 +522,10 @@ mod tests {
         let child2 = button("Click").build();
 
         let parent = container().child(child1).child(child2).build();
+        let parent = container()
+            .child(child1)
+            .child(child2)
+            .build();
 
         assert_eq!(parent.children.len(), 2);
     }
@@ -560,6 +545,9 @@ mod tests {
         let mut api = WidgetApi::new(theme);
 
         let root = container().child(text("Test").build()).build();
+        let root = container()
+            .child(text("Test").build())
+            .build();
 
         let root_id = root.id;
         api.set_root(root);

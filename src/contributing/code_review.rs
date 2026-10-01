@@ -93,10 +93,7 @@ impl PullRequestReview {
         if self.is_approved() {
             String::from("approved")
         } else {
-            format!(
-                "pending ({} of {} reviews)",
-                self.approved_count, self.required_reviews
-            )
+            format!("pending ({} of {} reviews)", self.approved_count, self.required_reviews)
         }
     }
 
@@ -193,12 +190,7 @@ impl PreCommitVerification {
 
         for gate in &self.gates {
             let status = if gate.passed { "✓" } else { "✗" };
-            summary.push_str(&format!(
-                "  {} {}: {}\n",
-                status,
-                gate.gate.as_str(),
-                gate.message
-            ));
+            summary.push_str(&format!("  {} {}: {}\n", status, gate.gate.as_str(), gate.message));
         }
 
         summary
@@ -226,27 +218,18 @@ impl CodeReviewManager {
         Self::default()
     }
 
-    pub fn create_pr(
-        &mut self,
-        pr_number: u32,
-        title: String,
-        author: String,
-    ) -> PullRequestReview {
+    pub fn create_pr(&mut self, pr_number: u32, title: String, author: String) -> PullRequestReview {
         let pr = PullRequestReview::new(pr_number, title, author);
         self.pull_requests.push(pr.clone());
         pr
     }
 
     pub fn get_pr(&self, pr_number: u32) -> Option<&PullRequestReview> {
-        self.pull_requests
-            .iter()
-            .find(|pr| pr.pr_number == pr_number)
+        self.pull_requests.iter().find(|pr| pr.pr_number == pr_number)
     }
 
     pub fn get_pr_mut(&mut self, pr_number: u32) -> Option<&mut PullRequestReview> {
-        self.pull_requests
-            .iter_mut()
-            .find(|pr| pr.pr_number == pr_number)
+        self.pull_requests.iter_mut().find(|pr| pr.pr_number == pr_number)
     }
 
     pub fn add_reviewer(&mut self, pr_number: u32, reviewer: String) -> bool {
@@ -298,23 +281,20 @@ impl CodeReviewManager {
     }
 
     pub fn list_prs(&self) -> Vec<String> {
-        self.pull_requests
-            .iter()
+        self.pull_requests.iter()
             .map(|pr| pr.get_summary())
             .collect()
     }
 
     pub fn list_approved_prs(&self) -> Vec<String> {
-        self.pull_requests
-            .iter()
+        self.pull_requests.iter()
             .filter(|pr| pr.is_approved())
             .map(|pr| pr.get_summary())
             .collect()
     }
 
     pub fn list_pending_prs(&self) -> Vec<String> {
-        self.pull_requests
-            .iter()
+        self.pull_requests.iter()
             .filter(|pr| !pr.is_approved())
             .map(|pr| pr.get_summary())
             .collect()
@@ -370,6 +350,11 @@ mod tests {
     #[test]
     fn test_pull_request_review_creation() {
         let pr = PullRequestReview::new(123, String::from("Test PR"), String::from("author1"));
+        let pr = PullRequestReview::new(
+            123,
+            String::from("Test PR"),
+            String::from("author1"),
+        );
 
         assert_eq!(pr.pr_number, 123);
         assert_eq!(pr.author, "author1");
@@ -379,6 +364,11 @@ mod tests {
     #[test]
     fn test_pull_request_review_add_reviewer() {
         let mut pr = PullRequestReview::new(123, String::from("Test PR"), String::from("author1"));
+        let mut pr = PullRequestReview::new(
+            123,
+            String::from("Test PR"),
+            String::from("author1"),
+        );
 
         pr.add_reviewer(String::from("reviewer1"));
         assert_eq!(pr.reviewers.len(), 1);
@@ -390,6 +380,11 @@ mod tests {
     #[test]
     fn test_pull_request_review_add_comment() {
         let mut pr = PullRequestReview::new(123, String::from("Test PR"), String::from("author1"));
+        let mut pr = PullRequestReview::new(
+            123,
+            String::from("Test PR"),
+            String::from("author1"),
+        );
 
         let comment = ReviewComment::new(
             String::from("reviewer1"),
@@ -405,6 +400,11 @@ mod tests {
     #[test]
     fn test_pull_request_review_is_approved() {
         let mut pr = PullRequestReview::new(123, String::from("Test PR"), String::from("author1"));
+        let mut pr = PullRequestReview::new(
+            123,
+            String::from("Test PR"),
+            String::from("author1"),
+        );
 
         assert!(!pr.is_approved());
 
@@ -432,6 +432,11 @@ mod tests {
     #[test]
     fn test_pull_request_review_get_status() {
         let mut pr = PullRequestReview::new(123, String::from("Test PR"), String::from("author1"));
+        let mut pr = PullRequestReview::new(
+            123,
+            String::from("Test PR"),
+            String::from("author1"),
+        );
 
         assert!(pr.get_status().contains("pending"));
 
@@ -483,8 +488,7 @@ mod tests {
 
     #[test]
     fn test_quality_gate_result_failed() {
-        let result =
-            QualityGateResult::failed(QualityGate::Compilation, String::from("Compilation error"));
+        let result = QualityGateResult::failed(QualityGate::Compilation, String::from("Compilation error"));
         assert!(!result.passed);
     }
 
@@ -511,6 +515,7 @@ mod tests {
             QualityGate::UnitTests,
             String::from("Test failed"),
         ));
+        verification.add_gate(QualityGateResult::failed(QualityGate::UnitTests, String::from("Test failed")));
 
         assert!(!verification.all_passed());
     }
@@ -526,6 +531,11 @@ mod tests {
     fn test_code_review_manager_create_pr() {
         let mut manager = CodeReviewManager::new();
         let pr = manager.create_pr(123, String::from("Test PR"), String::from("author1"));
+        let pr = manager.create_pr(
+            123,
+            String::from("Test PR"),
+            String::from("author1"),
+        );
 
         assert_eq!(manager.pull_requests.len(), 1);
         assert_eq!(pr.pr_number, 123);
@@ -535,6 +545,11 @@ mod tests {
     fn test_code_review_manager_get_pr() {
         let mut manager = CodeReviewManager::new();
         manager.create_pr(123, String::from("Test PR"), String::from("author1"));
+        manager.create_pr(
+            123,
+            String::from("Test PR"),
+            String::from("author1"),
+        );
 
         let pr = manager.get_pr(123);
         assert!(pr.is_some());
@@ -545,6 +560,11 @@ mod tests {
     fn test_code_review_manager_add_reviewer() {
         let mut manager = CodeReviewManager::new();
         manager.create_pr(123, String::from("Test PR"), String::from("author1"));
+        manager.create_pr(
+            123,
+            String::from("Test PR"),
+            String::from("author1"),
+        );
 
         assert!(manager.add_reviewer(123, String::from("reviewer1")));
     }
@@ -553,6 +573,11 @@ mod tests {
     fn test_code_review_manager_approve_pr() {
         let mut manager = CodeReviewManager::new();
         manager.create_pr(123, String::from("Test PR"), String::from("author1"));
+        manager.create_pr(
+            123,
+            String::from("Test PR"),
+            String::from("author1"),
+        );
 
         assert!(manager.approve_pr(123, String::from("reviewer1")));
         assert!(manager.approve_pr(123, String::from("reviewer2")));
@@ -565,6 +590,11 @@ mod tests {
     fn test_code_review_manager_request_changes() {
         let mut manager = CodeReviewManager::new();
         manager.create_pr(123, String::from("Test PR"), String::from("author1"));
+        manager.create_pr(
+            123,
+            String::from("Test PR"),
+            String::from("author1"),
+        );
 
         assert!(manager.request_changes(
             123,
@@ -581,6 +611,11 @@ mod tests {
     fn test_code_review_manager_list_prs() {
         let mut manager = CodeReviewManager::new();
         manager.create_pr(123, String::from("Test PR"), String::from("author1"));
+        manager.create_pr(
+            123,
+            String::from("Test PR"),
+            String::from("author1"),
+        );
 
         let prs = manager.list_prs();
         assert_eq!(prs.len(), 1);
@@ -589,7 +624,11 @@ mod tests {
     #[test]
     fn test_code_review_manager_list_approved_prs() {
         let mut manager = CodeReviewManager::new();
-        manager.create_pr(123, String::from("Test PR"), String::from("author1"));
+        manager.create_pr(
+            123,
+            String::from("Test PR"),
+            String::from("author1"),
+        );
         manager.approve_pr(123, String::from("reviewer1"));
         manager.approve_pr(123, String::from("reviewer2"));
 
@@ -601,6 +640,11 @@ mod tests {
     fn test_code_review_manager_list_pending_prs() {
         let mut manager = CodeReviewManager::new();
         manager.create_pr(123, String::from("Test PR"), String::from("author1"));
+        manager.create_pr(
+            123,
+            String::from("Test PR"),
+            String::from("author1"),
+        );
 
         let pending = manager.list_pending_prs();
         assert_eq!(pending.len(), 1);

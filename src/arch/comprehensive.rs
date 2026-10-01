@@ -7,11 +7,10 @@
 //! This module forms the hybrid architectural spine of SigmaOS, facilitating dynamic
 //! virtualization, asynchronous I/O packet routing, and multi-privilege isolation.
 
-
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::string::String;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 // =========================================================================
 // 1. MULTI-ARCHITECTURE ISA MODELS (x86, x86_64, AArch64, RISC-V 64, LoongArch64, PPC64LE, s390x)
@@ -147,20 +146,44 @@ pub struct PageTableEntry {
 }
 
 impl PageTableEntry {
-    pub fn new(physical_frame: u64, present: bool, writable: bool, user: bool, no_execute: bool) -> Self {
+    pub fn new(
+        physical_frame: u64,
+        present: bool,
+        writable: bool,
+        user: bool,
+        no_execute: bool,
+    ) -> Self {
         let mut value = physical_frame & 0x000F_FFFF_FFFF_F000;
-        if present { value |= 1 << 0; }
-        if writable { value |= 1 << 1; }
-        if user { value |= 1 << 2; }
-        if no_execute { value |= 1 << 63; }
+        if present {
+            value |= 1 << 0;
+        }
+        if writable {
+            value |= 1 << 1;
+        }
+        if user {
+            value |= 1 << 2;
+        }
+        if no_execute {
+            value |= 1 << 63;
+        }
         Self { value }
     }
 
-    pub fn is_present(&self) -> bool { (self.value & (1 << 0)) != 0 }
-    pub fn is_writable(&self) -> bool { (self.value & (1 << 1)) != 0 }
-    pub fn is_user(&self) -> bool { (self.value & (1 << 2)) != 0 }
-    pub fn is_no_execute(&self) -> bool { (self.value & (1 << 63)) != 0 }
-    pub fn physical_frame(&self) -> u64 { self.value & 0x000F_FFFF_FFFF_F000 }
+    pub fn is_present(&self) -> bool {
+        (self.value & (1 << 0)) != 0
+    }
+    pub fn is_writable(&self) -> bool {
+        (self.value & (1 << 1)) != 0
+    }
+    pub fn is_user(&self) -> bool {
+        (self.value & (1 << 2)) != 0
+    }
+    pub fn is_no_execute(&self) -> bool {
+        (self.value & (1 << 63)) != 0
+    }
+    pub fn physical_frame(&self) -> u64 {
+        self.value & 0x000F_FFFF_FFFF_F000
+    }
 }
 
 /// Simulated PML4, PDPT, PD, and PT structures mapping the multi-level translation walk
@@ -186,13 +209,23 @@ impl MultiLevelPaging {
         let pt_idx = ((virtual_address >> 12) & 0x1FF) as usize;
         let offset = virtual_address & 0xFFF;
 
-        if pml4_idx >= self.pml4_entries.len() { return None; }
+        if pml4_idx >= self.pml4_entries.len() {
+            return None;
+        }
         let pml4_entry: &PageTableEntry = &self.pml4_entries[pml4_idx];
-        if !pml4_entry.is_present() { return None; }
+        if !pml4_entry.is_present() {
+            return None;
+        }
 
         // In our high-level simulator, we model physical frame linear progression
         let physical_base = pml4_entry.physical_frame();
-        Some(physical_base + (pdpt_idx as u64 * 0x40000) + (pd_idx as u64 * 0x2000) + (pt_idx as u64 * 0x1000) + offset)
+        Some(
+            physical_base
+                + (pdpt_idx as u64 * 0x40000)
+                + (pd_idx as u64 * 0x2000)
+                + (pt_idx as u64 * 0x1000)
+                + offset,
+        )
     }
 }
 
@@ -225,8 +258,12 @@ impl ArmV8ProcessorState {
     /// Safely transition exception levels mimicking ARM Exception Level Escalation / Demotion
     pub fn transition_to(&mut self, target: ArmExceptionLevel) -> Result<(), &'static str> {
         match (self.current_el, target) {
-            (ArmExceptionLevel::EL0User, _) => Err("EL0 cannot initiate manual privilege escalation"),
-            (ArmExceptionLevel::EL1Kernel, ArmExceptionLevel::EL3SecureMonitor) if !self.is_secure_state => {
+            (ArmExceptionLevel::EL0User, _) => {
+                Err("EL0 cannot initiate manual privilege escalation")
+            }
+            (ArmExceptionLevel::EL1Kernel, ArmExceptionLevel::EL3SecureMonitor)
+                if !self.is_secure_state =>
+            {
                 Err("Non-secure EL1 cannot directly jump to secure EL3")
             }
             _ => {
@@ -255,7 +292,7 @@ pub enum NtMajorFunction {
 /// Standard Windows NT I/O Status Block
 #[derive(Debug, Clone, Copy)]
 pub struct IoStatusBlock {
-    pub status: i32, // NTSTATUS code
+    pub status: i32,        // NTSTATUS code
     pub information: usize, // Bytes processed or payload info
 }
 
@@ -272,7 +309,10 @@ impl IoRequestPacket {
     pub fn new(major: NtMajorFunction, buffer: *mut u8, len: usize) -> Self {
         Self {
             major_function: major,
-            status_block: IoStatusBlock { status: 0, information: 0 },
+            status_block: IoStatusBlock {
+                status: 0,
+                information: 0,
+            },
             user_buffer: buffer,
             length: len,
             mdl_address: None,
@@ -305,10 +345,17 @@ pub struct ObjectManager {
 
 impl ObjectManager {
     pub fn new() -> Self {
-        Self { root_directory: Vec::new() }
+        Self {
+            root_directory: Vec::new(),
+        }
     }
 
-    pub fn create_object(&mut self, name: String, obj_type: ObjectType, sd: u32) -> Result<(), &'static str> {
+    pub fn create_object(
+        &mut self,
+        name: String,
+        obj_type: ObjectType,
+        sd: u32,
+    ) -> Result<(), &'static str> {
         if self.root_directory.iter().any(|obj| obj.name == name) {
             return Err("Object already exists in directory namespace");
         }
@@ -429,10 +476,7 @@ impl RcuSynchronizer {
     /// `Err(stalled_pids)` if readers are still parked there. Because the
     /// `tasks` slice is an immutable snapshot, a reader that has not yet called
     /// `read_unlock` is reported rather than spun on forever.
-    pub fn synchronize_rcu_checked(
-        &self,
-        tasks: &[TaskStruct],
-    ) -> Result<usize, Vec<usize>> {
+    pub fn synchronize_rcu_checked(&self, tasks: &[TaskStruct]) -> Result<usize, Vec<usize>> {
         let old_epoch = self.global_epoch.fetch_add(1, Ordering::SeqCst);
 
         let mut spins = 0usize;
@@ -476,12 +520,12 @@ pub enum KqueueFilter {
 /// Models BSD kevent event descriptor structure
 #[derive(Debug, Clone)]
 pub struct Kevent {
-    pub ident: usize,       // Identifier (e.g. fd or signal)
+    pub ident: usize, // Identifier (e.g. fd or signal)
     pub filter: KqueueFilter,
-    pub flags: u16,         // EV_ADD, EV_DELETE, EV_ENABLE, etc.
-    pub fflags: u32,        // Filter-specific flags
-    pub data: isize,        // Filter-specific data
-    pub udata: usize,       // User-defined token
+    pub flags: u16,   // EV_ADD, EV_DELETE, EV_ENABLE, etc.
+    pub fflags: u32,  // Filter-specific flags
+    pub data: isize,  // Filter-specific data
+    pub udata: usize, // User-defined token
 }
 
 /// FreeBSD-inspired kqueue event notification channel
@@ -500,12 +544,17 @@ impl KqueueMultiplexer {
 
     pub fn register_kevent(&mut self, event: Kevent) {
         // Remove old matching event if present
-        self.registered_events.retain(|e| !(e.ident == event.ident && e.filter == event.filter));
+        self.registered_events
+            .retain(|e| !(e.ident == event.ident && e.filter == event.filter));
         self.registered_events.push(event);
     }
 
     pub fn trigger_event(&mut self, ident: usize, filter: KqueueFilter, data: isize) {
-        if let Some(event) = self.registered_events.iter().find(|e| e.ident == ident && e.filter == filter) {
+        if let Some(event) = self
+            .registered_events
+            .iter()
+            .find(|e| e.ident == ident && e.filter == filter)
+        {
             let mut pending = event.clone();
             pending.data = data;
             self.pending_events.push(pending);
@@ -550,7 +599,10 @@ impl SysctlRegistry {
     }
 
     pub fn query_node(&self, path: &str) -> Option<i32> {
-        self.nodes.iter().find(|n| n.oid_path == path).map(|n| n.value_integer)
+        self.nodes
+            .iter()
+            .find(|n| n.oid_path == path)
+            .map(|n| n.value_integer)
     }
 
     pub fn write_node(&mut self, path: &str, value: i32) -> Result<(), &'static str> {
@@ -567,7 +619,9 @@ impl SysctlRegistry {
 }
 
 impl SysctlNode {
-    pub fn is_writable(&self) -> bool { self.is_writable }
+    pub fn is_writable(&self) -> bool {
+        self.is_writable
+    }
 }
 
 #[cfg(test_disabled)]
@@ -593,7 +647,9 @@ mod tests {
         assert_eq!(cpu.current_el, ArmExceptionLevel::EL2Hypervisor);
 
         // Transition to Secure Monitor EL3
-        assert!(cpu.transition_to(ArmExceptionLevel::EL3SecureMonitor).is_ok());
+        assert!(cpu
+            .transition_to(ArmExceptionLevel::EL3SecureMonitor)
+            .is_ok());
     }
 
     #[test]
@@ -611,8 +667,20 @@ mod tests {
     #[test]
     fn test_nt_object_manager_namespace() {
         let mut ob = ObjectManager::new();
-        assert!(ob.create_object(String::from("\\Device\\Harddisk0"), ObjectType::Device, 0x755).is_ok());
-        assert!(ob.create_object(String::from("\\Device\\Harddisk0"), ObjectType::Device, 0x755).is_err()); // Duplicate
+        assert!(ob
+            .create_object(
+                String::from("\\Device\\Harddisk0"),
+                ObjectType::Device,
+                0x755
+            )
+            .is_ok());
+        assert!(ob
+            .create_object(
+                String::from("\\Device\\Harddisk0"),
+                ObjectType::Device,
+                0x755
+            )
+            .is_err()); // Duplicate
 
         let resolved = ob.resolve_path("\\Device\\Harddisk0");
         assert!(resolved.is_some());

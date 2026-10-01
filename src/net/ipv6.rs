@@ -12,8 +12,8 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::vec;
 use std::format;
+use std::vec;
 // SigmaOS Network Protocol Layer
 
 // IPv6 Stack - Linux-style IPv6 protocol implementation
@@ -91,7 +91,12 @@ pub struct Ipv6Header {
 }
 
 impl Ipv6Header {
-    pub fn new(source: Ipv6Address, destination: Ipv6Address, payload_length: u16, next_header: u8) -> Self {
+    pub fn new(
+        source: Ipv6Address,
+        destination: Ipv6Address,
+        payload_length: u16,
+        next_header: u8,
+    ) -> Self {
         Self {
             version: 6,
             traffic_class: 0,
@@ -106,12 +111,12 @@ impl Ipv6Header {
 
     pub fn serialize(&self) -> Vec<u8> {
         let mut buffer = Vec::new();
-        
+
         // Version (4 bits) + Traffic Class (8 bits) + Flow Label (20 bits)
-        let version_tc_fl = ((self.version as u32) << 28) 
-                          | ((self.traffic_class as u32) << 20) 
-                          | (self.flow_label & 0xFFFFF);
-        
+        let version_tc_fl = ((self.version as u32) << 28)
+            | ((self.traffic_class as u32) << 20)
+            | (self.flow_label & 0xFFFFF);
+
         buffer.extend_from_slice(&version_tc_fl.to_be_bytes());
         buffer.extend_from_slice(&self.payload_length.to_be_bytes());
         buffer.push(self.next_header);
@@ -217,7 +222,11 @@ impl Icmpv6Packet {
     }
 
     /// Calculates ICMPv6 checksum using the IPv6 Pseudo-Header (RFC 4443)
-    pub fn calculate_pseudo_header_checksum(&self, source: &Ipv6Address, destination: &Ipv6Address) -> u16 {
+    pub fn calculate_pseudo_header_checksum(
+        &self,
+        source: &Ipv6Address,
+        destination: &Ipv6Address,
+    ) -> u16 {
         let payload_bytes = self.serialize();
         let payload_len = payload_bytes.len() as u32;
 
@@ -314,11 +323,19 @@ impl NdpOption {
                 buf.push(1); // Length
                 buf.extend_from_slice(mac);
             }
-            NdpOption::PrefixInformation { prefix_length, on_link, autonomous, valid_lifetime, preferred_lifetime, prefix } => {
+            NdpOption::PrefixInformation {
+                prefix_length,
+                on_link,
+                autonomous,
+                valid_lifetime,
+                preferred_lifetime,
+                prefix,
+            } => {
                 buf.push(3); // Type 3
                 buf.push(4); // Length (32 bytes)
                 buf.push(*prefix_length);
-                let flags = (if *on_link { 0x80 } else { 0 }) | (if *autonomous { 0x40 } else { 0 });
+                let flags =
+                    (if *on_link { 0x80 } else { 0 }) | (if *autonomous { 0x40 } else { 0 });
                 buf.push(flags);
                 buf.extend_from_slice(&valid_lifetime.to_be_bytes());
                 buf.extend_from_slice(&preferred_lifetime.to_be_bytes());
@@ -342,7 +359,10 @@ pub struct Dhcpv6Option {
 
 impl Dhcpv6Option {
     pub fn new(option_code: u16, option_data: Vec<u8>) -> Self {
-        Self { option_code, option_data }
+        Self {
+            option_code,
+            option_data,
+        }
     }
 
     pub fn serialize(&self) -> Vec<u8> {
@@ -400,7 +420,10 @@ impl Dhcpv6Client {
         Ok(msg)
     }
 
-    pub fn handle_advertise(&mut self, advertised_address: Ipv6Address) -> Result<Vec<u8>, &'static str> {
+    pub fn handle_advertise(
+        &mut self,
+        advertised_address: Ipv6Address,
+    ) -> Result<Vec<u8>, &'static str> {
         if self.state != Dhcpv6State::Solicit {
             return Err("DHCPv6 client not expecting Advertise");
         }
@@ -441,7 +464,11 @@ impl Ipv6MulticastRouter {
         Self { groups: Vec::new() }
     }
 
-    pub fn join_group(&mut self, group_address: Ipv6Address, interface: &str) -> Result<(), &'static str> {
+    pub fn join_group(
+        &mut self,
+        group_address: Ipv6Address,
+        interface: &str,
+    ) -> Result<(), &'static str> {
         if group_address.address_type() != Ipv6AddressType::Multicast {
             return Err("Provided address is not an IPv6 multicast address");
         }
@@ -463,7 +490,11 @@ impl Ipv6MulticastRouter {
         Ok(())
     }
 
-    pub fn forward_multicast_packet(&self, group_address: &Ipv6Address, payload: &[u8]) -> Vec<String> {
+    pub fn forward_multicast_packet(
+        &self,
+        group_address: &Ipv6Address,
+        payload: &[u8],
+    ) -> Vec<String> {
         for group in &self.groups {
             if group.group_address.bytes == group_address.bytes {
                 return group.member_interfaces.clone();
@@ -541,7 +572,12 @@ impl Ipv6Stack {
     }
 
     /// Check if an address matches a prefix
-    fn matches_prefix(&self, address: &Ipv6Address, prefix: &Ipv6Address, prefix_length: u8) -> bool {
+    fn matches_prefix(
+        &self,
+        address: &Ipv6Address,
+        prefix: &Ipv6Address,
+        prefix_length: u8,
+    ) -> bool {
         let full_bytes = (prefix_length / 8) as usize;
         let remaining_bits = prefix_length % 8;
 
@@ -562,12 +598,21 @@ impl Ipv6Stack {
     }
 
     /// Send an IPv6 packet
-    pub fn send_packet(&self, destination: Ipv6Address, payload: Vec<u8>, next_header: u8) -> Result<(), &'static str> {
-        let route = self.find_route(&destination)
+    pub fn send_packet(
+        &self,
+        destination: Ipv6Address,
+        payload: Vec<u8>,
+        next_header: u8,
+    ) -> Result<(), &'static str> {
+        let route = self
+            .find_route(&destination)
             .ok_or("No route to destination")?;
 
         let header = Ipv6Header::new(
-            route.gateway.clone().unwrap_or_else(|| route.destination.clone()),
+            route
+                .gateway
+                .clone()
+                .unwrap_or_else(|| route.destination.clone()),
             destination,
             payload.len() as u16,
             next_header,
@@ -616,10 +661,10 @@ mod tests {
     fn test_ipv6_header_serialization() {
         let source = Ipv6Address::loopback();
         let dest = Ipv6Address::unspecified();
-        
+
         let header = Ipv6Header::new(source, dest, 0, 58);
         let serialized = header.serialize();
-        
+
         assert_eq!(serialized.len(), 40);
     }
 
@@ -627,10 +672,10 @@ mod tests {
     fn test_ipv6_header_parsing() {
         let source = Ipv6Address::loopback();
         let dest = Ipv6Address::unspecified();
-        
+
         let header = Ipv6Header::new(source, dest, 0, 58);
         let serialized = header.serialize();
-        
+
         let parsed = Ipv6Header::parse(&serialized).unwrap();
         assert_eq!(parsed.version, 6);
         assert!(parsed.source.is_loopback());
@@ -639,7 +684,7 @@ mod tests {
     #[test]
     fn test_ipv6_stack() {
         let mut stack = Ipv6Stack::new();
-        
+
         let interface = Ipv6Interface {
             name: "eth0".to_string(),
             address: Ipv6Address::loopback(),
@@ -647,7 +692,7 @@ mod tests {
             mtu: 1500,
             enabled: true,
         };
-        
+
         stack.add_interface(interface).unwrap();
         assert_eq!(stack.interface_count(), 1);
     }
@@ -655,7 +700,7 @@ mod tests {
     #[test]
     fn test_ipv6_routing() {
         let mut stack = Ipv6Stack::new();
-        
+
         let route = Ipv6Route {
             destination: Ipv6Address::loopback(),
             prefix_length: 128,
@@ -663,7 +708,7 @@ mod tests {
             interface: "lo".to_string(),
             metric: 1,
         };
-        
+
         stack.add_route(route).unwrap();
         assert_eq!(stack.route_count(), 1);
     }
@@ -671,10 +716,10 @@ mod tests {
     #[test]
     fn test_prefix_matching() {
         let stack = Ipv6Stack::new();
-        
+
         let addr1 = Ipv6Address::loopback();
         let addr2 = Ipv6Address::loopback();
-        
+
         assert!(stack.matches_prefix(&addr1, &addr2, 128));
     }
 
@@ -702,7 +747,8 @@ mod tests {
         assert_eq!(client.state, Dhcpv6State::Request);
         assert_eq!(req_bytes[0], 3); // Request msg type
 
-        let assigned = Ipv6Address::new([0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100]);
+        let assigned =
+            Ipv6Address::new([0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100]);
         client.handle_reply(assigned.clone()).unwrap();
         assert_eq!(client.state, Dhcpv6State::Bound);
         assert_eq!(client.assigned_address.unwrap().bytes, assigned.bytes);

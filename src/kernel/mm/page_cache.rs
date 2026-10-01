@@ -13,12 +13,12 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 /// SigmaOS Page Cache — absorbs Linux mm/filemap.c and mm/page-writeback.c
 /// Caches file data in memory pages, tracks dirty pages, writeback pressure
 
 #[cfg(not(test))]
 use crate::klib::btreemap::BTreeMap;
+use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 
 #[cfg(test_disabled)]
 use std::collections::BTreeMap;
@@ -163,7 +163,7 @@ pub struct CachedPage {
     pub status: PageStatus,
     pub data: [u8; PAGE_SIZE],
     pub access_count: u32,
-    pub pin_count: u32, // PTE references — cannot evict if > 0
+    pub pin_count: u32,         // PTE references — cannot evict if > 0
     pub priority: PagePriority, // Debian-inspired sticky priority pinning
 }
 
@@ -197,7 +197,9 @@ impl CachedPage {
         }
     }
     pub fn can_evict(&self) -> bool {
-        self.pin_count == 0 && self.status != PageStatus::Writeback && self.priority != PagePriority::Required
+        self.pin_count == 0
+            && self.status != PageStatus::Writeback
+            && self.priority != PagePriority::Required
     }
 }
 
@@ -279,7 +281,8 @@ impl PageCache {
         }
 
         // NixOS-inspired hash-addressed deduplication registration
-        self.deduplicator.register_page(inode_id, page_idx, &page.data);
+        self.deduplicator
+            .register_page(inode_id, page_idx, &page.data);
 
         // SteamOS-inspired dynamic writeback throttle check
         if self.throttle.should_throttle(self.dirty_pages()) {

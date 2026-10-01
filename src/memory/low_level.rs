@@ -4,10 +4,10 @@
 //! Copy-on-Write (COW) Forking, x86_64 Fast Syscalls (IA32_LSTAR MSR),
 //! and Minimal POSIX Syscall Matrix.
 
-use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 
 // =========================================================================
 // 1. Two-Tier Allocator: Buddy Allocator + Slab Allocator
@@ -91,15 +91,7 @@ pub struct PackageHeader32ByteDescriptor {
 }
 
 impl PackageHeader32ByteDescriptor {
-    pub fn new(
-        magic: [u8; 4],
-        format_id: u16,
-        major: u16,
-        minor: u16,
-        patch: u16,
-        crc32: u32,
-        flags: u32,
-    ) -> Self {
+    pub fn new(magic: [u8; 4], format_id: u16, major: u16, minor: u16, patch: u16, crc32: u32, flags: u32) -> Self {
         Self {
             magic,
             format_id,
@@ -199,9 +191,7 @@ impl TwoTierMemoryAllocator {
             SlabObjectType::ProcessControlBlock => self.pcb_slab.allocate_object(&mut self.buddy),
             SlabObjectType::FileDescriptor => self.fd_slab.allocate_object(&mut self.buddy),
             SlabObjectType::InodeStruct => self.inode_slab.allocate_object(&mut self.buddy),
-            SlabObjectType::PackageHeaderDescriptor => {
-                self.pkg_hdr_slab.allocate_object(&mut self.buddy)
-            }
+            SlabObjectType::PackageHeaderDescriptor => self.pkg_hdr_slab.allocate_object(&mut self.buddy),
         }
     }
 
@@ -478,7 +468,15 @@ mod tests {
 
     #[test]
     fn test_package_header_32byte_descriptor() {
-        let descriptor = PackageHeader32ByteDescriptor::new(*b"SPKG", 1, 2, 3, 4, 0xABCD1234, 0x01);
+        let descriptor = PackageHeader32ByteDescriptor::new(
+            *b"SPKG",
+            1,
+            2,
+            3,
+            4,
+            0xABCD1234,
+            0x01,
+        );
         assert_eq!(descriptor.magic, *b"SPKG");
         assert_eq!(descriptor.format_id, 1);
         assert_eq!(descriptor.version_major, 2);

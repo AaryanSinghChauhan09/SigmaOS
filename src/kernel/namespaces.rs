@@ -63,10 +63,7 @@ impl KernelNamespace for Namespace {
     }
 
     fn metadata(&self) -> String {
-        format!(
-            "Namespace {{ id: {:?}, type: {:?} }}",
-            self.id, self.namespace_type
-        )
+        format!("Namespace {{ id: {:?}, type: {:?} }}", self.id, self.namespace_type)
     }
 }
 
@@ -173,7 +170,7 @@ impl NamespaceManager {
     pub fn new() -> Self {
         let mut manager = Self {
             namespaces: HashMap::new(),
-            next_id: AtomicU64::new(4),
+            next_id: AtomicU64::new(1),
             initial_namespaces: HashMap::new(),
         };
 
@@ -190,15 +187,9 @@ impl NamespaceManager {
         manager.namespaces.insert(mount_id, mount_ns);
         manager.namespaces.insert(pid_id, pid_ns);
 
-        manager
-            .initial_namespaces
-            .insert(NamespaceType::User, user_id);
-        manager
-            .initial_namespaces
-            .insert(NamespaceType::Mount, mount_id);
-        manager
-            .initial_namespaces
-            .insert(NamespaceType::Pid, pid_id);
+        manager.initial_namespaces.insert(NamespaceType::User, user_id);
+        manager.initial_namespaces.insert(NamespaceType::Mount, mount_id);
+        manager.initial_namespaces.insert(NamespaceType::Pid, pid_id);
 
         manager
     }
@@ -209,11 +200,7 @@ impl NamespaceManager {
     }
 
     /// Create a new namespace
-    pub fn create_namespace(
-        &mut self,
-        namespace_type: NamespaceType,
-        parent_id: Option<NamespaceId>,
-    ) -> NamespaceId {
+    pub fn create_namespace(&mut self, namespace_type: NamespaceType, parent_id: Option<NamespaceId>) -> NamespaceId {
         let id = NamespaceId(self.next_id.fetch_add(1, Ordering::SeqCst));
 
         let mut namespace = Namespace::new(id, namespace_type);
@@ -255,7 +242,7 @@ impl NamespaceManager {
     /// Delete a namespace
     pub fn delete_namespace(&mut self, id: NamespaceId) -> Result<(), &'static str> {
         // Check if it's an initial namespace
-        for (&ns_type, &initial_id) in &self.initial_namespaces {
+        for (&_ns_type, &initial_id) in &self.initial_namespaces {
             if initial_id == id {
                 return Err("Cannot delete initial namespace");
             }
@@ -284,16 +271,8 @@ impl NamespaceManager {
     }
 
     /// Add UID mapping to user namespace
-    pub fn add_uid_mapping(
-        &mut self,
-        namespace_id: NamespaceId,
-        inside_uid: u32,
-        outside_uid: u32,
-    ) -> Result<(), &'static str> {
-        let namespace = self
-            .namespaces
-            .get_mut(&namespace_id)
-            .ok_or("Namespace not found")?;
+    pub fn add_uid_mapping(&mut self, namespace_id: NamespaceId, inside_uid: u32, outside_uid: u32) -> Result<(), &'static str> {
+        let namespace = self.namespaces.get_mut(&namespace_id).ok_or("Namespace not found")?;
 
         if let Some(ref mut user_ns) = namespace.user_namespace {
             user_ns.uid_map.insert(inside_uid, outside_uid);
@@ -304,16 +283,8 @@ impl NamespaceManager {
     }
 
     /// Add GID mapping to user namespace
-    pub fn add_gid_mapping(
-        &mut self,
-        namespace_id: NamespaceId,
-        inside_gid: u32,
-        outside_gid: u32,
-    ) -> Result<(), &'static str> {
-        let namespace = self
-            .namespaces
-            .get_mut(&namespace_id)
-            .ok_or("Namespace not found")?;
+    pub fn add_gid_mapping(&mut self, namespace_id: NamespaceId, inside_gid: u32, outside_gid: u32) -> Result<(), &'static str> {
+        let namespace = self.namespaces.get_mut(&namespace_id).ok_or("Namespace not found")?;
 
         if let Some(ref mut user_ns) = namespace.user_namespace {
             user_ns.gid_map.insert(inside_gid, outside_gid);
@@ -324,15 +295,8 @@ impl NamespaceManager {
     }
 
     /// Add mount point to mount namespace
-    pub fn add_mount_point(
-        &mut self,
-        namespace_id: NamespaceId,
-        mount_point: MountPoint,
-    ) -> Result<(), &'static str> {
-        let namespace = self
-            .namespaces
-            .get_mut(&namespace_id)
-            .ok_or("Namespace not found")?;
+    pub fn add_mount_point(&mut self, namespace_id: NamespaceId, mount_point: MountPoint) -> Result<(), &'static str> {
+        let namespace = self.namespaces.get_mut(&namespace_id).ok_or("Namespace not found")?;
 
         if let Some(ref mut mount_ns) = namespace.mount_namespace {
             mount_ns.mount_points.push(mount_point);
@@ -343,15 +307,8 @@ impl NamespaceManager {
     }
 
     /// Allocate PID in PID namespace
-    pub fn allocate_pid(
-        &mut self,
-        namespace_id: NamespaceId,
-        global_pid: u64,
-    ) -> Result<u64, &'static str> {
-        let namespace = self
-            .namespaces
-            .get_mut(&namespace_id)
-            .ok_or("Namespace not found")?;
+    pub fn allocate_pid(&mut self, namespace_id: NamespaceId, global_pid: u64) -> Result<u64, &'static str> {
+        let namespace = self.namespaces.get_mut(&namespace_id).ok_or("Namespace not found")?;
 
         if let Some(ref mut pid_ns) = namespace.pid_namespace {
             let local_pid = pid_ns.last_pid.fetch_add(1, Ordering::SeqCst) + 1;

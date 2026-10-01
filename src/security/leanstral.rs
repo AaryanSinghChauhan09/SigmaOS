@@ -12,10 +12,10 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::vec;
-use std::string::{String, ToString};
-use std::vec::Vec;
 use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 // Leanstral Safe Verify Formal Verification Module
 //
@@ -46,7 +46,11 @@ impl LeanstralSafeVerify {
     }
 
     /// Simulates solving formal proof obligations (inspired by Lean 4) to verify safety properties
-    pub fn verify_safety_invariants(&self, execution_trace: &[&str], system_prompt: &str) -> FormalSafetyCertificate {
+    pub fn verify_safety_invariants(
+        &self,
+        execution_trace: &[&str],
+        system_prompt: &str,
+    ) -> FormalSafetyCertificate {
         let mut violations = 0;
         let mut proof_count = 0;
 
@@ -73,7 +77,10 @@ impl LeanstralSafeVerify {
             details: if holds_true {
                 "Formal Safety Proof Verified. Q.E.D.".to_string()
             } else {
-                format!("Safety Proof Failure: Detected {} invariants violations.", violations)
+                format!(
+                    "Safety Proof Failure: Detected {} invariants violations.",
+                    violations
+                )
             },
         }
     }

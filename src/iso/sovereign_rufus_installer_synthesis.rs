@@ -150,12 +150,14 @@ impl DualBiosUefiBootLoader {
                     Err("Missing CSM MBR boot code".to_string())
                 }
             }
-            BootTargetArch::UefiX86_64 => {
-                Ok(format!("UEFI x86_64 bootloader located at {}", self.efi_x64_path))
-            }
-            BootTargetArch::UefiArm64 => {
-                Ok(format!("UEFI ARM64 bootloader located at {}", self.efi_aa64_path))
-            }
+            BootTargetArch::UefiX86_64 => Ok(format!(
+                "UEFI x86_64 bootloader located at {}",
+                self.efi_x64_path
+            )),
+            BootTargetArch::UefiArm64 => Ok(format!(
+                "UEFI ARM64 bootloader located at {}",
+                self.efi_aa64_path
+            )),
         }
     }
 }
@@ -173,7 +175,7 @@ impl Default for DualBiosUefiBootLoader {
 /// Live USB Persistence Partition Spec
 #[derive(Debug, Clone)]
 pub struct RufusPersistenceOverlaySpec {
-    pub label: String,            // "casper-rw" or "sigma-persistent"
+    pub label: String,           // "casper-rw" or "sigma-persistent"
     pub filesystem_type: String, // "ext4", "fat32"
     pub size_mb: u64,
     pub is_created: bool,
@@ -191,7 +193,12 @@ impl RufusPersistenceOverlayEngine {
         }
     }
 
-    pub fn create_persistence_volume(&mut self, label: &str, fs_type: &str, size_mb: u64) -> Result<String, String> {
+    pub fn create_persistence_volume(
+        &mut self,
+        label: &str,
+        fs_type: &str,
+        size_mb: u64,
+    ) -> Result<String, String> {
         let spec = RufusPersistenceOverlaySpec {
             label: label.to_string(),
             filesystem_type: fs_type.to_string(),
@@ -207,7 +214,10 @@ impl RufusPersistenceOverlayEngine {
     }
 
     pub fn generate_persistence_conf(&self, label: &str) -> String {
-        format!("/ union\n# SigmaOS Live USB persistence configuration for {}\n", label)
+        format!(
+            "/ union\n# SigmaOS Live USB persistence configuration for {}\n",
+            label
+        )
     }
 }
 
@@ -279,7 +289,10 @@ impl VentoyEtcherBootCompatEngine {
     }
 
     pub fn verify_etcher_dd_signature(&self, header_bytes: &[u8]) -> bool {
-        self.etcher_raw_dd_supported && header_bytes.len() >= 512 && header_bytes[510] == 0x55 && header_bytes[511] == 0xAA
+        self.etcher_raw_dd_supported
+            && header_bytes.len() >= 512
+            && header_bytes[510] == 0x55
+            && header_bytes[511] == 0xAA
     }
 }
 
@@ -321,16 +334,25 @@ impl SovereignRufusInstallerSuite {
         results.insert("isohybrid_partitioning".to_string(), mbr_bytes.len() == 512);
 
         // 2. Bootloader check
-        let uefi_ok = self.bootloader.verify_bootloader_paths(BootTargetArch::UefiX86_64).is_ok();
+        let uefi_ok = self
+            .bootloader
+            .verify_bootloader_paths(BootTargetArch::UefiX86_64)
+            .is_ok();
         results.insert("dual_bios_uefi_boot".to_string(), uefi_ok);
 
         // 3. Persistence check
-        let overlay_ok = self.persistence.create_persistence_volume("sigma-persistent", "ext4", 2048).is_ok();
+        let overlay_ok = self
+            .persistence
+            .create_persistence_volume("sigma-persistent", "ext4", 2048)
+            .is_ok();
         results.insert("rufus_live_persistence".to_string(), overlay_ok);
 
         // 4. Autorun check
         let autorun_str = self.autorun.generate_autorun_inf();
-        results.insert("rufus_autorun_cfg".to_string(), autorun_str.contains("sigma-setup.exe"));
+        results.insert(
+            "rufus_autorun_cfg".to_string(),
+            autorun_str.contains("sigma-setup.exe"),
+        );
 
         // 5. Ventoy / Etcher check
         let header = mbr_bytes;
@@ -371,15 +393,23 @@ mod tests {
     #[test]
     fn test_dual_bios_uefi_bootloader() {
         let boot = DualBiosUefiBootLoader::new();
-        assert!(boot.verify_bootloader_paths(BootTargetArch::BiosCsmMbr).is_ok());
-        assert!(boot.verify_bootloader_paths(BootTargetArch::UefiX86_64).is_ok());
-        assert!(boot.verify_bootloader_paths(BootTargetArch::UefiArm64).is_ok());
+        assert!(boot
+            .verify_bootloader_paths(BootTargetArch::BiosCsmMbr)
+            .is_ok());
+        assert!(boot
+            .verify_bootloader_paths(BootTargetArch::UefiX86_64)
+            .is_ok());
+        assert!(boot
+            .verify_bootloader_paths(BootTargetArch::UefiArm64)
+            .is_ok());
     }
 
     #[test]
     fn test_rufus_persistence_overlay() {
         let mut persistence = RufusPersistenceOverlayEngine::new();
-        let res = persistence.create_persistence_volume("casper-rw", "ext4", 4096).unwrap();
+        let res = persistence
+            .create_persistence_volume("casper-rw", "ext4", 4096)
+            .unwrap();
         assert!(res.contains("4096MB ext4 persistent volume"));
         assert_eq!(persistence.overlays.len(), 1);
 

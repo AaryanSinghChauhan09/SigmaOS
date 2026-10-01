@@ -15,8 +15,8 @@
 
 // (no_std only applicable at crate root - removed)
 
-use std::vec;
 use std::vec::Vec;
+use std::vec;
 
 /// A high-performance `// #![no_std]  // crate-root only` Linear Algebra and Numeric Solver Engine
 /// Designed to replace GNU Octave, MATLAB, and GROMACS dependencies.
@@ -92,14 +92,7 @@ pub struct MolecularDynamics;
 
 impl MolecularDynamics {
     /// Velocity Verlet integration for n-body simulation
-    pub fn verlet_step(
-        pos: &mut [f64],
-        vel: &mut [f64],
-        acc: &mut [f64],
-        mass: f64,
-        force: f64,
-        dt: f64,
-    ) {
+    pub fn verlet_step(pos: &mut [f64], vel: &mut [f64], acc: &mut [f64], mass: f64, force: f64, dt: f64) {
         for i in 0..pos.len() {
             // Update position
             pos[i] += vel[i] * dt + 0.5 * acc[i] * dt * dt;
@@ -149,6 +142,7 @@ mod tests {
         fn exp_derivative(_t: f64, y: f64) -> f64 {
             y
         }
+        fn exp_derivative(_t: f64, y: f64) -> f64 { y }
 
         let mut y = 1.0;
         let dt = 0.1;

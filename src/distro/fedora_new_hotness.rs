@@ -6,7 +6,6 @@
 use std::vec::Vec;
 
 #[cfg(target_os = "none")]
-
 #[cfg(target_os = "none")]
 use std::collections::BTreeMap;
 #[cfg(not(target_os = "none"))]
@@ -179,8 +178,12 @@ impl FedoraNewHotnessUpstreamMonitorEngine {
         });
 
         // Register event in Pagure exporter
-        self.pagure_exporter
-            .export_issue(task1_id, &format!("Upstream {}", event.new_version), &issue_body, "the-new-hotness");
+        self.pagure_exporter.export_issue(
+            task1_id,
+            &format!("Upstream {}", event.new_version),
+            &issue_body,
+            "the-new-hotness",
+        );
 
         Ok(2)
     }
@@ -207,8 +210,14 @@ mod tests {
 
     #[test]
     fn test_fedora_new_hotness_upstream_monitor() {
-        let mut hotness = FedoraNewHotnessUpstreamMonitorEngine::new("rpms", "sigma-toolchain", "rawhide");
-        hotness.register_anitya_project(1001, "sigma-toolchain", UpstreamBackendProvider::GitHubReleases, "1.0.0");
+        let mut hotness =
+            FedoraNewHotnessUpstreamMonitorEngine::new("rpms", "sigma-toolchain", "rawhide");
+        hotness.register_anitya_project(
+            1001,
+            "sigma-toolchain",
+            UpstreamBackendProvider::GitHubReleases,
+            "1.0.0",
+        );
 
         assert_eq!(hotness.registered_projects.len(), 1);
 
@@ -217,14 +226,22 @@ mod tests {
             project_name: "sigma-toolchain".to_string(),
             new_version: "1.1.0".to_string(),
             release_url: "https://github.com/sigma/toolchain/releases/tag/v1.1.0".to_string(),
-            sha512_checksum: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855".to_string(),
+            sha512_checksum: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                .to_string(),
             timestamp: 1700000000,
         };
 
         let queued = hotness.process_upstream_release_event(event).unwrap();
         assert_eq!(queued, 2);
         assert_eq!(hotness.pending_tasks.len(), 2);
-        assert_eq!(hotness.registered_projects.get(&1001).unwrap().current_stable_version, "1.1.0");
+        assert_eq!(
+            hotness
+                .registered_projects
+                .get(&1001)
+                .unwrap()
+                .current_stable_version,
+            "1.1.0"
+        );
 
         let executed = hotness.execute_pending_tasks();
         assert_eq!(executed, 2);

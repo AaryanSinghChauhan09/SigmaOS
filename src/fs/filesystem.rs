@@ -1,14 +1,13 @@
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
+use core::mem;
 /// OOP-based Filesystem Abstraction for SigmaOS
 /// Implements filesystem using OOP principles with traits and structs
 /// No dependency on std::fs
-
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// Filesystem trait (OOP interface)
 pub trait Filesystem {
@@ -21,7 +20,12 @@ pub trait Filesystem {
     /// Write to file
     fn write(&self, handle: FileHandle, buffer: &[u8]) -> Result<usize, FilesystemError>;
     /// Seek in file
-    fn seek(&self, handle: FileHandle, offset: isize, origin: SeekOrigin) -> Result<isize, FilesystemError>;
+    fn seek(
+        &self,
+        handle: FileHandle,
+        offset: isize,
+        origin: SeekOrigin,
+    ) -> Result<isize, FilesystemError>;
     /// Create directory
     fn mkdir(&self, path: &[u8]) -> Result<(), FilesystemError>;
     /// Remove directory
@@ -207,7 +211,7 @@ impl Drop for Inode {
 /// Directory entry
 #[repr(C)]
 pub struct DirectoryEntry {
-   pub name: [u8; 256],
+    pub name: [u8; 256],
     pub inode_id: u64,
 }
 
@@ -324,7 +328,11 @@ impl<T> Vec<T> {
         }
         unsafe {
             let item = core::ptr::read(self.data.add(index));
-            core::ptr::copy(self.data.add(index + 1), self.data.add(index), self.len - index - 1);
+            core::ptr::copy(
+                self.data.add(index + 1),
+                self.data.add(index),
+                self.len - index - 1,
+            );
             self.len -= 1;
             item
         }
@@ -347,7 +355,11 @@ impl<T> Vec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {
@@ -418,7 +430,8 @@ impl MemoryFilesystem {
                 let root_dir_ptr = alloc(mem::size_of::<Directory>()) as *mut Directory;
                 if !root_dir_ptr.is_null() {
                     core::ptr::write(root_dir_ptr, root_dir);
-                    fs.directories.push(Some(NonNull::new_unchecked(root_dir_ptr)));
+                    fs.directories
+                        .push(Some(NonNull::new_unchecked(root_dir_ptr)));
                 }
             }
         }
@@ -559,7 +572,12 @@ impl Filesystem for MemoryFilesystem {
         }
     }
 
-    fn seek(&self, handle: FileHandle, offset: isize, origin: SeekOrigin) -> Result<isize, FilesystemError> {
+    fn seek(
+        &self,
+        handle: FileHandle,
+        offset: isize,
+        origin: SeekOrigin,
+    ) -> Result<isize, FilesystemError> {
         let current = handle.offset.load(Ordering::SeqCst) as isize;
         let new_offset = match origin {
             SeekOrigin::Set => offset,
@@ -599,7 +617,9 @@ impl Filesystem for MemoryFilesystem {
             }
 
             core::ptr::write(dir_ptr, dir);
-            mut_self.directories.push(Some(NonNull::new_unchecked(dir_ptr)));
+            mut_self
+                .directories
+                .push(Some(NonNull::new_unchecked(dir_ptr)));
 
             if let Some(parent_dir) = mut_self.get_directory_mut(parent_inode_id) {
                 let entry = DirectoryEntry::new(dir_name, dir_inode_id);
@@ -695,7 +715,6 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
-
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {
@@ -726,7 +745,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;

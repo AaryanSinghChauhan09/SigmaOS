@@ -34,10 +34,10 @@ pub enum ElfMachine {
 #[allow(non_camel_case_types)]
 pub enum ElfType {
     ET_NONE = 0,
-    ET_REL = 1,      // Relocatable file
-    ET_EXEC = 2,     // Executable file
-    ET_DYN = 3,      // Shared object file
-    ET_CORE = 4,     // Core file
+    ET_REL = 1,  // Relocatable file
+    ET_EXEC = 2, // Executable file
+    ET_DYN = 3,  // Shared object file
+    ET_CORE = 4, // Core file
 }
 
 /// ELF program header type
@@ -45,13 +45,13 @@ pub enum ElfType {
 #[allow(non_camel_case_types)]
 pub enum PhType {
     PT_NULL = 0,
-    PT_LOAD = 1,      // Loadable segment
-    PT_DYNAMIC = 2,   // Dynamic linking information
-    PT_INTERP = 3,    // Interpreter path
-    PT_NOTE = 4,      // Auxiliary information
-    PT_SHLIB = 5,     // Reserved
-    PT_PHDR = 6,      // Program header table
-    PT_TLS = 7,       // Thread-local storage
+    PT_LOAD = 1,    // Loadable segment
+    PT_DYNAMIC = 2, // Dynamic linking information
+    PT_INTERP = 3,  // Interpreter path
+    PT_NOTE = 4,    // Auxiliary information
+    PT_SHLIB = 5,   // Reserved
+    PT_PHDR = 6,    // Program header table
+    PT_TLS = 7,     // Thread-local storage
     PT_GNU_EH_FRAME = 0x6474e550,
     PT_GNU_STACK = 0x6474e551,
     PT_GNU_RELRO = 0x6474e552,
@@ -90,8 +90,8 @@ pub enum DynTag {
     DT_FINI_ARRAY = 26, // Termination function array
     DT_INIT_ARRAYSZ = 27,
     DT_FINI_ARRAYSZ = 28,
-    DT_RUNPATH = 29,    // Library search path
-    DT_FLAGS = 30,      // Dynamic flags
+    DT_RUNPATH = 29, // Library search path
+    DT_FLAGS = 30,   // Dynamic flags
     DT_PREINIT_ARRAY = 32,
     DT_PREINIT_ARRAYSZ = 33,
 }
@@ -123,22 +123,22 @@ pub enum SymType {
 #[allow(non_camel_case_types)]
 pub enum RelType {
     R_X86_64_NONE = 0,
-    R_X86_64_64 = 1,          // Direct 64-bit
-    R_X86_64_PC32 = 2,        // PC-relative 32-bit
-    R_X86_64_GOT32 = 3,       // 32-bit GOT entry
-    R_X86_64_PLT32 = 4,       // 32-bit PLT entry
-    R_X86_64_COPY = 5,        // Copy from shared object
-    R_X86_64_GLOB_DAT = 6,    // GOT entry for data
-    R_X86_64_JUMP_SLOT = 7,   // PLT entry for function
-    R_X86_64_RELATIVE = 8,    // Relative relocation
-    R_X86_64_GOTPCREL = 9,    // 32-bit PC-relative GOT
-    R_X86_64_32 = 10,         // Direct 32-bit
-    R_X86_64_32S = 11,        // Direct 32-bit with sign extension
-    R_X86_64_16 = 12,         // Direct 16-bit
-    R_X86_64_PC16 = 13,       // PC-relative 16-bit
-    R_X86_64_8 = 14,          // Direct 8-bit
-    R_X86_64_PC8 = 15,        // PC-relative 8-bit
-    R_X86_64_IRELATIVE = 37,  // Indirect relative
+    R_X86_64_64 = 1,         // Direct 64-bit
+    R_X86_64_PC32 = 2,       // PC-relative 32-bit
+    R_X86_64_GOT32 = 3,      // 32-bit GOT entry
+    R_X86_64_PLT32 = 4,      // 32-bit PLT entry
+    R_X86_64_COPY = 5,       // Copy from shared object
+    R_X86_64_GLOB_DAT = 6,   // GOT entry for data
+    R_X86_64_JUMP_SLOT = 7,  // PLT entry for function
+    R_X86_64_RELATIVE = 8,   // Relative relocation
+    R_X86_64_GOTPCREL = 9,   // 32-bit PC-relative GOT
+    R_X86_64_32 = 10,        // Direct 32-bit
+    R_X86_64_32S = 11,       // Direct 32-bit with sign extension
+    R_X86_64_16 = 12,        // Direct 16-bit
+    R_X86_64_PC16 = 13,      // PC-relative 16-bit
+    R_X86_64_8 = 14,         // Direct 8-bit
+    R_X86_64_PC8 = 15,       // PC-relative 8-bit
+    R_X86_64_IRELATIVE = 37, // Indirect relative
 }
 
 /// ELF symbol
@@ -299,7 +299,11 @@ impl ElfDynamicLinker {
                 // Global data or PLT jump slot: resolve symbol
                 if let Some(got_entry) = self.got.get_mut(&reloc.offset) {
                     // Look up symbol by index (simplified)
-                    if let Some((address, _)) = self.global_symbol_table.values().nth(reloc.symbol_index as usize) {
+                    if let Some((address, _)) = self
+                        .global_symbol_table
+                        .values()
+                        .nth(reloc.symbol_index as usize)
+                    {
                         got_entry.value = *address;
                         got_entry.relocated = true;
                     }
@@ -398,14 +402,20 @@ mod tests {
     #[test]
     fn test_load_library() {
         let mut linker = ElfDynamicLinker::new();
-        assert!(linker.load_library("libc.so.6".to_string(), 0x7f0000000000).is_ok());
-        assert!(linker.load_library("libc.so.6".to_string(), 0x7f0000000000).is_err());
+        assert!(linker
+            .load_library("libc.so.6".to_string(), 0x7f0000000000)
+            .is_ok());
+        assert!(linker
+            .load_library("libc.so.6".to_string(), 0x7f0000000000)
+            .is_err());
     }
 
     #[test]
     fn test_add_symbol() {
         let mut linker = ElfDynamicLinker::new();
-        linker.load_library("libc.so.6".to_string(), 0x7f0000000000).unwrap();
+        linker
+            .load_library("libc.so.6".to_string(), 0x7f0000000000)
+            .unwrap();
 
         let symbol = ElfSymbol {
             name: "printf".to_string(),
@@ -435,7 +445,9 @@ mod tests {
     #[test]
     fn test_relocation() {
         let mut linker = ElfDynamicLinker::new();
-        linker.load_library("libc.so.6".to_string(), 0x7f0000000000).unwrap();
+        linker
+            .load_library("libc.so.6".to_string(), 0x7f0000000000)
+            .unwrap();
 
         let symbol = ElfSymbol {
             name: "malloc".to_string(),
@@ -465,7 +477,9 @@ mod tests {
     #[test]
     fn test_plt_resolution() {
         let mut linker = ElfDynamicLinker::new();
-        linker.load_library("libc.so.6".to_string(), 0x7f0000000000).unwrap();
+        linker
+            .load_library("libc.so.6".to_string(), 0x7f0000000000)
+            .unwrap();
 
         let symbol = ElfSymbol {
             name: "printf".to_string(),

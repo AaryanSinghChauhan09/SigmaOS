@@ -1,7 +1,7 @@
 use std::boxed::Box;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 // SigmaOS Screen Recorder
 // OOP-based screen recording with multiple formats and quality settings
 
@@ -307,8 +307,8 @@ impl RecordingBackend for GpuAcceleratedBackend {
 
         RecordingProgress {
             duration_seconds: duration,
-            frames_captured: duration * 60,          // 60 FPS under GPU speed
-            file_size_bytes: duration * 512 * 1024,  // High compression size reduction under GPU codec
+            frames_captured: duration * 60, // 60 FPS under GPU speed
+            file_size_bytes: duration * 512 * 1024, // High compression size reduction under GPU codec
             current_bitrate_mbps: 12.0,
         }
     }

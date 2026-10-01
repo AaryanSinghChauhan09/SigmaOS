@@ -1,8 +1,9 @@
 #![cfg_attr(not(test), no_std)]
-use std::boxed::Box;
 use std::vec;
+use std::boxed::Box;
 // SigmaOS Sovereign Ecosystem Technology Integration
 // Zero external library dependency, no_std compatible
+
 
 use std::string::{String, ToString};
 use std::vec::Vec;
@@ -40,19 +41,13 @@ impl KimiCodeAssistant {
     }
 
     pub fn rank_suggestions(&self, language: &str) -> Vec<String> {
-        let mut filtered: Vec<CodeSnippet> = self
-            .snippets
-            .iter()
+        let mut filtered: Vec<CodeSnippet> = self.snippets.iter()
             .filter(|s| s.language == language)
             .cloned()
             .collect();
 
         // Sort descending by weight
-        filtered.sort_by(|a, b| {
-            b.weight
-                .partial_cmp(&a.weight)
-                .unwrap_or(core::cmp::Ordering::Equal)
-        });
+        filtered.sort_by(|a, b| b.weight.partial_cmp(&a.weight).unwrap_or(core::cmp::Ordering::Equal));
 
         filtered.into_iter().map(|s| s.snippet).collect()
     }
@@ -116,10 +111,7 @@ impl<T: Clone + core::ops::Add<Output = T>, const N: usize> NDArray<T, N> {
         for i in 0..self.data.len() {
             new_data.push(self.data[i].clone() + other.data[i].clone());
         }
-        Ok(Self {
-            data: new_data,
-            shape: self.shape,
-        })
+        Ok(Self { data: new_data, shape: self.shape })
     }
 }
 
@@ -158,17 +150,13 @@ impl<T: Clone> NDArray<T, 2> {
 
 // Numerical statistics helpers for float arrays
 pub fn numpy_mean(array: &NDArray<f32, 1>) -> f32 {
-    if array.data.is_empty() {
-        return 0.0;
-    }
+    if array.data.is_empty() { return 0.0; }
     let sum: f32 = array.data.iter().sum();
     sum / array.data.len() as f32
 }
 
 pub fn numpy_std_dev(array: &NDArray<f32, 1>) -> f32 {
-    if array.data.is_empty() {
-        return 0.0;
-    }
+    if array.data.is_empty() { return 0.0; }
     let mean = numpy_mean(array);
     let mut sum_sq_diff = 0.0;
     for &val in &array.data {
@@ -178,9 +166,7 @@ pub fn numpy_std_dev(array: &NDArray<f32, 1>) -> f32 {
     let variance = sum_sq_diff / array.data.len() as f32;
     // Square root approximation (Newton's method) for no_std
     let mut x = variance;
-    if x <= 0.0 {
-        return 0.0;
-    }
+    if x <= 0.0 { return 0.0; }
     for _ in 0..10 {
         x = 0.5 * (x + variance / x);
     }
@@ -200,12 +186,7 @@ pub struct CvImage {
 
 impl CvImage {
     pub fn new(pixels: Vec<u8>, width: usize, height: usize, channels: usize) -> Self {
-        Self {
-            pixels,
-            width,
-            height,
-            channels,
-        }
+        Self { pixels, width, height, channels }
     }
 
     pub fn to_grayscale(&self) -> Self {
@@ -265,12 +246,7 @@ impl CvImage {
                 blurred[y * w + x] = (sum / count) as u8;
             }
         }
-        Self {
-            pixels: blurred,
-            width: w,
-            height: h,
-            channels: 1,
-        }
+        Self { pixels: blurred, width: w, height: h, channels: 1 }
     }
 
     pub fn sobel_edge_detection(&self) -> Self {
@@ -281,8 +257,16 @@ impl CvImage {
         let h = self.height;
         let mut edges = vec![0u8; self.pixels.len()];
 
-        let gx_kernel = [[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]];
-        let gy_kernel = [[-1, -2, -1], [0, 0, 0], [1, 2, 1]];
+        let gx_kernel = [
+            [-1, 0, 1],
+            [-2, 0, 2],
+            [-1, 0, 1],
+        ];
+        let gy_kernel = [
+            [-1, -2, -1],
+            [ 0,  0,  0],
+            [ 1,  2,  1],
+        ];
 
         for y in 1..(h - 1) {
             for x in 1..(w - 1) {
@@ -291,9 +275,7 @@ impl CvImage {
 
                 for ky in -1..=1 {
                     for kx in -1..=1 {
-                        let px_val = self.pixels
-                            [(y as i32 + ky) as usize * w + (x as i32 + kx) as usize]
-                            as i32;
+                        let px_val = self.pixels[(y as i32 + ky) as usize * w + (x as i32 + kx) as usize] as i32;
                         val_x += px_val * gx_kernel[(ky + 1) as usize][(kx + 1) as usize];
                         val_y += px_val * gy_kernel[(ky + 1) as usize][(kx + 1) as usize];
                     }
@@ -310,12 +292,7 @@ impl CvImage {
                 edges[y * w + x] = mag.clamp(0.0, 255.0) as u8;
             }
         }
-        Self {
-            pixels: edges,
-            width: w,
-            height: h,
-            channels: 1,
-        }
+        Self { pixels: edges, width: w, height: h, channels: 1 }
     }
 
     pub fn otsus_threshold(&self) -> u8 {
@@ -337,14 +314,10 @@ impl CvImage {
 
         for i in 0..256 {
             w_b += histogram[i] as f32;
-            if w_b == 0.0 {
-                continue;
-            }
+            if w_b == 0.0 { continue; }
 
             let w_f = total - w_b;
-            if w_f == 0.0 {
-                break;
-            }
+            if w_f == 0.0 { break; }
 
             sum_b += i as f32 * histogram[i] as f32;
 
@@ -470,11 +443,7 @@ impl SigmaGrpcEngine {
         None
     }
 
-    pub fn handle_multiplexed_grpc(
-        &mut self,
-        request_path: &str,
-        request_payload: &[u8],
-    ) -> Option<Vec<u8>> {
+    pub fn handle_multiplexed_grpc(&mut self, request_path: &str, request_payload: &[u8]) -> Option<Vec<u8>> {
         self.byte_traffic_count += request_payload.len();
         for service in &self.services {
             if service.method_path == request_path {
@@ -555,12 +524,7 @@ impl SigmaFreeTypeFont {
     }
 
     /// Evaluates quadratic Bézier curve interpolation: B(t) = (1-t)^2 * P0 + 2(1-t)t * P1 + t^2 * P2
-    pub fn render_bezier_point(
-        p0: (f32, f32),
-        p1: (f32, f32),
-        p2: (f32, f32),
-        t: f32,
-    ) -> (f32, f32) {
+    pub fn render_bezier_point(p0: (f32, f32), p1: (f32, f32), p2: (f32, f32), t: f32) -> (f32, f32) {
         let t_inv = 1.0 - t;
         let c0 = t_inv * t_inv;
         let c1 = 2.0 * t_inv * t;
@@ -572,9 +536,7 @@ impl SigmaFreeTypeFont {
     }
 
     pub fn subpixel_antialiasing_grid_filter(&self, grayscale_px: u8) -> u8 {
-        if !self.subpixel_hinting {
-            return grayscale_px;
-        }
+        if !self.subpixel_hinting { return grayscale_px; }
         // Grayscale filtering mimicking RGB subpixel layout weighting
         let filtered = (grayscale_px as f32 * 0.9) + 12.0;
         filtered.clamp(0.0, 255.0) as u8
@@ -616,13 +578,7 @@ impl SpatialNavigationEngine {
     }
 
     pub fn register_ui_node(&mut self, id: u32, x: i32, y: i32, w: u32, h: u32) {
-        self.focusable_rects.push(UiRect {
-            id,
-            x,
-            y,
-            width: w,
-            height: h,
-        });
+        self.focusable_rects.push(UiRect { id, x, y, width: w, height: h });
         if self.current_focus_id.is_none() {
             self.current_focus_id = Some(id);
         }
@@ -636,9 +592,7 @@ impl SpatialNavigationEngine {
         let mut min_distance = f32::MAX;
 
         for node in &self.focusable_rects {
-            if node.id == active_id {
-                continue;
-            }
+            if node.id == active_id { continue; }
 
             // Filter candidates based on direction quadrants
             let is_candidate = match direction {
@@ -723,7 +677,10 @@ mod tests {
     #[test]
     fn test_opencv_cvimage_ops() {
         // RGB image pixels (3 channels)
-        let pixels = vec![100, 150, 50, 200, 100, 80, 50, 220, 130, 0, 128, 255];
+        let pixels = vec![
+            100, 150, 50,  200, 100, 80,
+            50,  220, 130, 0,   128, 255,
+        ];
         let img = CvImage::new(pixels, 2, 2, 3);
         let gray = img.to_grayscale();
         assert_eq!(gray.channels, 1);
@@ -767,10 +724,7 @@ mod tests {
     #[test]
     fn test_grpc_engine_varint() {
         let mut engine = SigmaGrpcEngine::new();
-        engine.register_service_stub(
-            "/sigma.SovereignService/GetSysInfo",
-            vec![0xDE, 0xAD, 0xBE, 0xEF],
-        );
+        engine.register_service_stub("/sigma.SovereignService/GetSysInfo", vec![0xDE, 0xAD, 0xBE, 0xEF]);
 
         // Varint tests
         let val = 300u64;
@@ -780,9 +734,7 @@ mod tests {
         assert_eq!(read, 2);
 
         // Dispatch tests
-        let response = engine
-            .handle_multiplexed_grpc("/sigma.SovereignService/GetSysInfo", &[1, 2, 3])
-            .unwrap();
+        let response = engine.handle_multiplexed_grpc("/sigma.SovereignService/GetSysInfo", &[1, 2, 3]).unwrap();
         assert_eq!(response, vec![0xDE, 0xAD, 0xBE, 0xEF]);
         assert_eq!(engine.byte_traffic_count, 7); // 3 request + 4 response
     }
@@ -824,23 +776,17 @@ mod tests {
         assert_eq!(nav.current_focus_id, Some(1));
 
         // Move Down
-        let target_down = nav
-            .handle_directional_navigation(NavigationDirection::Down)
-            .unwrap();
+        let target_down = nav.handle_directional_navigation(NavigationDirection::Down).unwrap();
         assert_eq!(target_down, 2);
         assert_eq!(nav.current_focus_id, Some(2));
 
         // Move Up (back to 1)
-        let target_up = nav
-            .handle_directional_navigation(NavigationDirection::Up)
-            .unwrap();
+        let target_up = nav.handle_directional_navigation(NavigationDirection::Up).unwrap();
         assert_eq!(target_up, 1);
         assert_eq!(nav.current_focus_id, Some(1));
 
         // Move Right
-        let target_right = nav
-            .handle_directional_navigation(NavigationDirection::Right)
-            .unwrap();
+        let target_right = nav.handle_directional_navigation(NavigationDirection::Right).unwrap();
         assert_eq!(target_right, 3);
         assert_eq!(nav.current_focus_id, Some(3));
     }

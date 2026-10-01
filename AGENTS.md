@@ -202,8 +202,10 @@ All data structures and algorithms should be implemented directly using:
 
 - `README.md` - Project overview and quick start
 - `AGENTS.md` - This file (agent guidelines)
+- `docs/MISSING_DISTRO_COMPONENTS_ROADMAP_AGENT.md` - Guidelines and roadmap for missing Linux & BSD components gap closure
 - `WHAT_IS_WORKING_AND_NOT_WORKING.md` - Component status tracker
 - `FUTURE-DEVELOPMENT-ROADMAP.md` - Roadmap and specifications
+- `docs/MISSING_DISTRO_COMPONENTS_ROADMAP_AGENT.md` - Missing Linux & BSD components development roadmap
 - `SIGMAOS_MASTER_PLAN_TRI_AGENT_500_REPOS_ABSORPTION.md` - Tri-agent framework details
 - `CAPABILITY_MATRIX.toml` - Machine-readable capability matrix
 - `FEATURE_STATUS.toml` - Feature implementation status
@@ -281,6 +283,47 @@ Before considering a task complete:
 3. Documentation is updated
 4. Performance is measured (if applicable)
 5. Security review is passed (if applicable)
+
+## Future Development Roadmap: Linux & BSD Missing Component Gap Closure
+
+This section defines the strategic future development roadmap for autonomous AI agents working on closing missing component gaps in SigmaOS relative to mainstream Linux distributions (Arch, Debian, Fedora, Alpine, NixOS, Gentoo, Void, CachyOS, Omarchy) and BSD operating systems (FreeBSD, OpenBSD, NetBSD, DragonFly BSD, Illumos/Solaris).
+
+### 🚀 Milestone 1: Kernel & System Architecture Gaps
+- **Linux eBPF / XDP Subsystem Enhancement**:
+  - Full x86_64 JIT compiler (`compile_x86_64_jit`) for eBPF bytecodes.
+  - Zero-copy AF_XDP socket maps (`XSK`) and BPF_MAP_TYPE_RINGBUF event passing.
+- **BSD Memory & Kernel Architecture**:
+  - OpenBSD KARL (Kernel Address Randomized Link) and W^X memory page protection allocator.
+  - NetBSD Rump Kernel userland driver host bridge for isolated device driver execution.
+  - DragonFly BSD Lockless Per-CPU Netpoll Ring & Variant Symlinks (`varsyms`) resolution.
+
+### 🛡️ Milestone 2: Security & Sandboxing Gaps
+- **Landlock v5 Network Guard & OpenBSD Pledge/Unveil**:
+  - Full path-based unveil restriction locking and socket port binding/connect controls.
+  - FreeBSD Capsicum descriptor capability rights and IOMMU DMA fault containment.
+- **Post-Quantum Cryptography & Isolation**:
+  - Dilithium / Falcon / ML-KEM PQC signature verification in package manager transactions (`sigma-pkg`).
+  - Firejail / Bubblewrap container sandboxing profiles for developer environments.
+
+### 💾 Milestone 3: Storage & Filesystem Gaps
+- **Self-Healing Copy-On-Write Storage**:
+  - Bcachefs multi-tier storage engine with automatic SSD promotion and cold HDD demotion.
+  - FreeBSD OpenZFS pool integration with Fletcher-4 checksum verification and zero-copy dataset clones.
+  - DragonFly HAMMER2 MVCC B-Tree snapshotting and cluster quorum consensus.
+
+### 📦 Milestone 4: Package Management & Build Infrastructure
+- **Universal Package Parity**:
+  - Transpilation gateway for `.deb`, `.rpm`, `PKGBUILD`, `.ebuild`, `APKBUILD`, `.xbps`, and `.nix` Flakes into native `.sigpkg`.
+  - Content-Addressed Storage (CAS) with reachability mark-and-sweep garbage collection.
+  - SAT dependency solver using Davis-Putnam-Logemann-Loveland (DPLL) with cycle detection.
+
+### 🎨 Milestone 5: Desktop & Developer Tools Gaps
+- **Wayland Direct KMS Scanout & Zenith Desktop**:
+  - Holographic 3D LUT HDR color transformations and sub-millisecond Wayland window scanout.
+  - Cinnamon/XApp desktop integration (Desklets, Warpinator LAN transfer, Timeshift snapshots, Hypnotix IPTV).
+  - Omarchy Developer Tools Suite (Theme Switcher, Stow Dotfiles Manager, Hyprland Binds, Fastfetch, Herdr AI Orchestrator).
+
+---
 
 ## Appendix: Quick Reference
 

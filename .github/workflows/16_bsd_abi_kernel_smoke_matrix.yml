@@ -1,0 +1,46 @@
+name: "16: BSD ABI Translation & Kernel Multi-Arch Matrix"
+
+on:
+  push:
+    branches: [ main, master, release-* ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  bsd-abi-translation-matrix:
+    name: BSD Kernel & ABI Parity (${{ matrix.target-persona }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target-persona:
+          - "freebsd-14-1-sysv"
+          - "openbsd-7-6-pledge"
+          - "netbsd-10-rump"
+          - "dragonflybsd-hammer2"
+          - "illumos-solaris-dtrace"
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Test Kernel ABI Translation & 50% Memory Quota
+        run: |
+          mkdir -p build
+          echo "Running ABI Translation Suite for ${{ matrix.target-persona }}..."
+          rustc --test src/compatibility/sovereign_abi_50percent_rule_engine.rs --edition=2021 -o build/test_abi_engine
+          ./build/test_abi_engine
+
+      - name: Test Kernel Innovations Suite
+        run: |
+          rustc --test src/kernel/distro_kernel_innovations.rs --edition=2021 -o build/test_kernel_innov
+          ./build/test_kernel_innov
+
+      - name: Test Universal TCP/IP & Socket Stack
+        run: |
+          rustc --test src/network/unified_tcpip_stack.rs --edition=2021 -o build/test_tcpip_stack
+          ./build/test_tcpip_stack

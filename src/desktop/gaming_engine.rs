@@ -4,9 +4,9 @@
 // Feral GameMode CPU/GPU high-performance governor, and eBPF Anti-Cheat compatibility sandboxes.
 
 use std::collections::BTreeMap;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 // ============================================================================
 // Gamescope Microcompositor Engine (FSR, Refresh Rate Cap, MangoHud)
@@ -112,10 +112,16 @@ impl ProtonDirectXTranslationShim {
     pub fn translate_draw_call(&self, api: DirectXApiVersion, draw_calls: u32) -> String {
         match api {
             DirectXApiVersion::Dx9 | DirectXApiVersion::Dx11 => {
-                format!("DXVK Translation: {} DX11 draw calls translated to Vulkan SPIR-V pipeline", draw_calls)
+                format!(
+                    "DXVK Translation: {} DX11 draw calls translated to Vulkan SPIR-V pipeline",
+                    draw_calls
+                )
             }
             DirectXApiVersion::Dx12 => {
-                format!("VKD3D-Proton Translation: {} DX12 command lists recorded to Vulkan queue", draw_calls)
+                format!(
+                    "VKD3D-Proton Translation: {} DX12 command lists recorded to Vulkan queue",
+                    draw_calls
+                )
             }
         }
     }
@@ -159,7 +165,10 @@ impl GameModeCpuGpuGovernor {
             self.sched_iso_priority = 0;
         }
 
-        Ok(format!("GameMode DEACTIVATED for PID {}: System returned to default power policy", pid))
+        Ok(format!(
+            "GameMode DEACTIVATED for PID {}: System returned to default power policy",
+            pid
+        ))
     }
 }
 

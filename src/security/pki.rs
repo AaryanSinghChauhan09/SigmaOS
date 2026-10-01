@@ -3,9 +3,9 @@
 // Based on Ideas-999-Structured: Security & Sovereignty Item 552
 // Implements certificate management and PKI operations
 
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type CertificateID = usize;
 

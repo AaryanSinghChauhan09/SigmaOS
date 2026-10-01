@@ -478,10 +478,7 @@ mod tests {
         let mut api = SimpleScriptAPI::new();
         api.register_function(b"status", dummy_func);
         assert_eq!(api.call_function(b"status").unwrap(), b"ok");
-        assert_eq!(
-            api.call_function(b"unknown").err(),
-            Some(ScriptError::NotFound)
-        );
+        assert_eq!(api.call_function(b"unknown").err(), Some(ScriptError::NotFound));
     }
 
     #[test]

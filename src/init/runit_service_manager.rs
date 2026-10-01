@@ -2,11 +2,9 @@ use std::format;
 // SigmaOS Runit-Style Service Manager (Void Linux Inspiration)
 // Advanced service supervision with watchdog monitoring, dependency management, and logging
 
-
-
-use crate::klib::{Vec, String, BTreeMap, HashSet};
-use std::string::{String, ToString};
+use crate::klib::{BTreeMap, HashSet, String, Vec};
 use core::time::Duration;
+use std::string::{String, ToString};
 
 /// Runit service states
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -36,10 +34,10 @@ pub enum RunitSignal {
 /// Service dependency type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DependencyType {
-    Requires,      // Hard dependency - must be running
-    Wants,         // Soft dependency - try to start but don't fail
-    After,         // Ordering only - start after regardless of state
-    Before,        // Ordering only - start before regardless of state
+    Requires, // Hard dependency - must be running
+    Wants,    // Soft dependency - try to start but don't fail
+    After,    // Ordering only - start after regardless of state
+    Before,   // Ordering only - start before regardless of state
 }
 
 /// Service dependency
@@ -115,7 +113,7 @@ pub struct RunitServiceManager {
 impl RunitServiceManager {
     pub fn new() -> Self {
         let mut services = BTreeMap::new();
-        
+
         // Core SigmaOS services with Void Linux inspiration
         services.insert(
             String::from("sshd"),
@@ -125,12 +123,10 @@ impl RunitServiceManager {
                 pid: Some(1234),
                 enabled: true,
                 log_enabled: true,
-                dependencies: vec![
-                    ServiceDependency {
-                        service_name: String::from("network"),
-                        dependency_type: DependencyType::Requires,
-                    },
-                ],
+                dependencies: vec![ServiceDependency {
+                    service_name: String::from("network"),
+                    dependency_type: DependencyType::Requires,
+                }],
                 start_command: String::from("/usr/sbin/sshd -D"),
                 stop_command: String::from("killall sshd"),
                 restart_command: Some(String::from("killall sshd && /usr/sbin/sshd -D")),
@@ -153,7 +149,9 @@ impl RunitServiceManager {
                 dependencies: Vec::new(),
                 start_command: String::from("/usr/bin/dbus-daemon --system"),
                 stop_command: String::from("killall dbus-daemon"),
-                restart_command: Some(String::from("killall dbus-daemon && /usr/bin/dbus-daemon --system")),
+                restart_command: Some(String::from(
+                    "killall dbus-daemon && /usr/bin/dbus-daemon --system",
+                )),
                 watchdog_enabled: true,
                 watchdog_interval: Duration::from_secs(15),
                 restart_policy: RunitRestartPolicy::OnFailure,
@@ -213,7 +211,11 @@ impl RunitServiceManager {
                 RunitSignal::Once => {
                     if self.can_start_service(service) {
                         svc.state = RunitServiceState::Up;
-                        self.log_event(service, EventType::Started, "Service started once via sv once");
+                        self.log_event(
+                            service,
+                            EventType::Started,
+                            "Service started once via sv once",
+                        );
                     } else {
                         return Err("Cannot start service: dependencies not met");
                     }
@@ -227,13 +229,21 @@ impl RunitServiceManager {
                 RunitSignal::Cont => {
                     if svc.state == RunitServiceState::Finish {
                         svc.state = RunitServiceState::Up;
-                        self.log_event(service, EventType::Started, "Service continued via sv cont");
+                        self.log_event(
+                            service,
+                            EventType::Started,
+                            "Service continued via sv cont",
+                        );
                     }
                 }
                 RunitSignal::Term => {
                     if svc.state == RunitServiceState::Up {
                         svc.state = RunitServiceState::Down;
-                        self.log_event(service, EventType::Stopped, "Service terminated via sv term");
+                        self.log_event(
+                            service,
+                            EventType::Stopped,
+                            "Service terminated via sv term",
+                        );
                     }
                 }
                 RunitSignal::Kill => {
@@ -326,11 +336,15 @@ impl RunitServiceManager {
                     self.start_service(&dep.service_name)?;
                 }
             }
-            
+
             svc.state = RunitServiceState::Up;
             svc.enabled = true;
             svc.restart_count = 0;
-            self.log_event(service, EventType::Started, "Service started with dependencies");
+            self.log_event(
+                service,
+                EventType::Started,
+                "Service started with dependencies",
+            );
             Ok(())
         } else {
             Err("Service not found")
@@ -344,19 +358,25 @@ impl RunitServiceManager {
             let mut dependents = Vec::new();
             for (name, other_svc) in &self.services {
                 for dep in &other_svc.dependencies {
-                    if dep.service_name == service && dep.dependency_type == DependencyType::Requires {
+                    if dep.service_name == service
+                        && dep.dependency_type == DependencyType::Requires
+                    {
                         dependents.push(name.clone());
                     }
                 }
             }
-            
+
             for dependent in dependents {
                 self.stop_service(&dependent)?;
             }
-            
+
             svc.state = RunitServiceState::Down;
             svc.enabled = false;
-            self.log_event(service, EventType::Stopped, "Service stopped with dependents");
+            self.log_event(
+                service,
+                EventType::Stopped,
+                "Service stopped with dependents",
+            );
             Ok(())
         } else {
             Err("Service not found")
@@ -381,29 +401,40 @@ impl RunitServiceManager {
             if service.watchdog_enabled && service.state == RunitServiceState::Up {
                 // Simulate health check
                 let is_healthy = self.check_service_health(service);
-                
+
                 if !is_healthy {
                     match service.restart_policy {
                         RunitRestartPolicy::OnFailure | RunitRestartPolicy::Always => {
                             if service.restart_count < service.max_restarts {
                                 service.restart_count += 1;
-                                self.log_event(name, EventType::WatchdogTriggered, 
-                                    &format!("Watchdog triggered restart attempt {}/{}", 
-                                    service.restart_count, service.max_restarts));
-                                
+                                self.log_event(
+                                    name,
+                                    EventType::WatchdogTriggered,
+                                    &format!(
+                                        "Watchdog triggered restart attempt {}/{}",
+                                        service.restart_count, service.max_restarts
+                                    ),
+                                );
+
                                 // Attempt restart
                                 service.state = RunitServiceState::Down;
                                 service.state = RunitServiceState::Up;
                             } else {
                                 service.state = RunitServiceState::Failed;
-                                self.log_event(name, EventType::Failed, 
-                                    "Service failed after max restart attempts");
+                                self.log_event(
+                                    name,
+                                    EventType::Failed,
+                                    "Service failed after max restart attempts",
+                                );
                             }
                         }
                         RunitRestartPolicy::Never => {
                             service.state = RunitServiceState::Failed;
-                            self.log_event(name, EventType::Failed, 
-                                "Service failed with restart policy: never");
+                            self.log_event(
+                                name,
+                                EventType::Failed,
+                                "Service failed with restart policy: never",
+                            );
                         }
                     }
                 }
@@ -427,7 +458,7 @@ impl RunitServiceManager {
             message: message.to_string(),
         };
         self.event_log.push(event);
-        
+
         // Keep log size manageable
         if self.event_log.len() > 1000 {
             self.event_log.remove(0);
@@ -441,7 +472,8 @@ impl RunitServiceManager {
 
     /// Get events for specific service
     pub fn get_service_events(&self, service: &str) -> Vec<&ServiceEvent> {
-        self.event_log.iter()
+        self.event_log
+            .iter()
             .filter(|e| e.service_name == service)
             .collect()
     }
@@ -455,14 +487,16 @@ impl RunitServiceManager {
     /// Get service dependency graph
     pub fn get_dependency_graph(&self) -> BTreeMap<String, Vec<String>> {
         let mut graph = BTreeMap::new();
-        
+
         for (name, service) in &self.services {
-            let deps: Vec<String> = service.dependencies.iter()
+            let deps: Vec<String> = service
+                .dependencies
+                .iter()
                 .map(|d| d.service_name.clone())
                 .collect();
             graph.insert(name.clone(), deps);
         }
-        
+
         graph
     }
 
@@ -505,7 +539,10 @@ impl RunitServiceManager {
                             return true;
                         }
                     } else if recursion_stack.contains(&dep.service_name) {
-                        cycles.push(format!("Cycle detected: {} -> {}", service, dep.service_name));
+                        cycles.push(format!(
+                            "Cycle detected: {} -> {}",
+                            service, dep.service_name
+                        ));
                         return true;
                     }
                 }
@@ -547,10 +584,13 @@ mod tests {
     #[test]
     fn test_sv_up_down() {
         let mut manager = RunitServiceManager::new();
-        
+
         assert!(manager.sv("sshd", RunitSignal::Down).is_ok());
-        assert_eq!(manager.status("sshd").unwrap().state, RunitServiceState::Down);
-        
+        assert_eq!(
+            manager.status("sshd").unwrap().state,
+            RunitServiceState::Down
+        );
+
         assert!(manager.sv("sshd", RunitSignal::Up).is_ok());
         assert_eq!(manager.status("sshd").unwrap().state, RunitServiceState::Up);
     }
@@ -558,11 +598,11 @@ mod tests {
     #[test]
     fn test_service_dependencies() {
         let mut manager = RunitServiceManager::new();
-        
+
         // Try to start sshd (depends on network)
         manager.sv("network", RunitSignal::Down);
         assert!(manager.sv("sshd", RunitSignal::Up).is_err());
-        
+
         // Start network first
         assert!(manager.sv("network", RunitSignal::Up).is_ok());
         assert!(manager.sv("sshd", RunitSignal::Up).is_ok());
@@ -572,7 +612,7 @@ mod tests {
     fn test_watchdog_monitoring() {
         let mut manager = RunitServiceManager::new();
         manager.watchdog_check();
-        
+
         // Services should remain healthy in simulation
         assert_eq!(manager.status("sshd").unwrap().state, RunitServiceState::Up);
     }
@@ -581,7 +621,7 @@ mod tests {
     fn test_event_logging() {
         let mut manager = RunitServiceManager::new();
         manager.sv("sshd", RunitSignal::Down);
-        
+
         let events = manager.get_service_events("sshd");
         assert!(!events.is_empty());
         assert_eq!(events.last().unwrap().event_type, EventType::Stopped);
@@ -599,7 +639,7 @@ mod tests {
         let sshd = manager.services.get_mut("sshd").unwrap();
         sshd.restart_policy = RunitRestartPolicy::OnFailure;
         sshd.max_restarts = 3;
-        
+
         assert_eq!(sshd.restart_count, 0);
     }
 }

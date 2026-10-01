@@ -194,7 +194,9 @@ mod tests {
 
     #[test]
     fn test_event_fd_flags() {
-        let flags = EventFdFlags::new().with_non_blocking(true).with_semaphore(true);
+        let flags = EventFdFlags::new()
+            .with_non_blocking(true)
+            .with_semaphore(true);
         assert!(flags.non_blocking);
         assert!(flags.semaphore);
     }

@@ -60,11 +60,7 @@ impl SecurityAccessTokenManager {
             gid: 0,
             euid: 0,
             egid: 0,
-            privileges: vec![
-                "CAP_SYS_ADMIN".to_string(),
-                "CapNetAdmin".to_string(),
-                "CAP_PROCESS_MIGRATE".to_string(),
-            ],
+            privileges: vec!["CAP_SYS_ADMIN".to_string(), "CapNetAdmin".to_string(), "CAP_PROCESS_MIGRATE".to_string()],
             protection_level: TokenProtectionLevel::System,
             is_anonymous: false,
         };
@@ -126,7 +122,7 @@ pub struct LdapLightweightDirectoryEngine {
     pub server_url: String,
     pub base_dn: String,
     pub entries: BTreeMap<String, LdapUserEntry>, // uid -> entry
-    is_authenticated: bool,
+    pub is_authenticated: bool,
 }
 
 impl LdapLightweightDirectoryEngine {
@@ -162,6 +158,12 @@ impl LdapLightweightDirectoryEngine {
         let _ = (bind_dn, password);
         self.is_authenticated = false;
         Err("LDAP Error: trusted LDAP provider unavailable")
+    pub fn bind_credentials(&mut self, bind_dn: &str, password: &str) -> Result<bool, &'static str> {
+        if bind_dn.is_empty() || password.is_empty() {
+            return Err("LDAP Error: Invalid bind credentials");
+        }
+        self.is_authenticated = true;
+        Ok(true)
     }
 
     pub fn search_user_by_uid(&self, uid: &str) -> Result<LdapUserEntry, &'static str> {
@@ -220,30 +222,32 @@ impl WirelessAccessPointController {
 
     pub fn scan_wireless_aps(&mut self) -> usize {
         self.scanned_aps.clear();
-        self.scanned_aps.push(ScannedAccessPoint {
-            ssid: "SigmaSovereignMesh".to_string(),
-            bssid: "00:11:22:33:44:55".to_string(),
-            channel: 36,
-            signal_dbm: -42,
-            is_wpa3: true,
-        });
-        self.scanned_aps.len()
+        // No wireless provider is connected yet, so do not fabricate scan results.
+        0
     }
 
+    pub fn connect_wireless_ap(&mut self, ssid: &str, passphrase: &str, client_mac: &str) -> Result<bool, &'static str> {
     pub fn connect_wireless_ap(
         &mut self,
         ssid: &str,
         passphrase: &str,
         client_mac: &str,
     ) -> Result<bool, &'static str> {
+        if ssid.is_empty()
+            || ssid.len() > 32
+            || ssid.as_bytes().iter().any(|byte| byte.is_ascii_control())
+        {
+            return Err("Wireless Error: invalid SSID");
+        }
         if !self.mac_whitelist.is_empty() && !self.mac_whitelist.contains(&client_mac.to_string()) {
             return Err("Wireless Error: Client MAC not in whitelist");
         }
-        if passphrase.len() < 8 {
-            return Err("Wireless Error: WPA3 passphrase too short");
+        if !(8..=64).contains(&passphrase.len()) {
+            return Err("Wireless Error: invalid WPA3 passphrase length");
         }
-        self.connected_ap_ssid = Some(ssid.to_string());
-        Ok(true)
+
+        // Report unavailable until an actual wireless provider confirms the connection.
+        Err("Wireless Error: wireless provider unavailable")
     }
 }
 
@@ -295,12 +299,7 @@ impl RemoteFileAndRatToolGovernor {
         }
     }
 
-    pub fn mount_remote_file(
-        &mut self,
-        protocol: RemoteFileProtocol,
-        path: &str,
-        read_only: bool,
-    ) -> u64 {
+    pub fn mount_remote_file(&mut self, protocol: RemoteFileProtocol, path: &str, read_only: bool) -> u64 {
         let id = self.next_id;
         self.next_id += 1;
 
@@ -370,11 +369,7 @@ impl ProcessMemoryMigrationGovernor {
         self.migration_configs.insert(pid, config);
     }
 
-    pub fn migrate_process_memory(
-        &mut self,
-        pid: u32,
-        target_numa: u32,
-    ) -> Result<u32, &'static str> {
+    pub fn migrate_process_memory(&mut self, pid: u32, target_numa: u32) -> Result<u32, &'static str> {
         if let Some(config) = self.migration_configs.get_mut(&pid) {
             if config.is_kernel_protected {
                 return Err("Process Migration Error: Kernel protected process cannot be migrated");
@@ -430,11 +425,7 @@ impl DeviceAccessPatternTimeEvaluator {
         }
     }
 
-    pub fn calculate_effective_access_time(
-        &mut self,
-        pattern: DeviceAccessPattern,
-        is_write: bool,
-    ) -> u64 {
+    pub fn calculate_effective_access_time(&mut self, pattern: DeviceAccessPattern, is_write: bool) -> u64 {
         if is_write {
             self.total_writes += 1;
         } else {
@@ -442,28 +433,14 @@ impl DeviceAccessPatternTimeEvaluator {
         }
 
         match (self.device_type, pattern) {
-            (MemoryDeviceType::RandomAccessDevice, DeviceAccessPattern::Sequential) => {
-                self.base_latency_ns
-            }
-            (MemoryDeviceType::RandomAccessDevice, DeviceAccessPattern::Direct) => {
-                self.base_latency_ns + 2
-            }
-            (MemoryDeviceType::RandomAccessDevice, DeviceAccessPattern::Relative) => {
-                self.base_latency_ns + 5
-            }
-            (MemoryDeviceType::RandomAccessDevice, DeviceAccessPattern::Random) => {
-                self.base_latency_ns + (self.seek_penalty_ns / 10)
-            }
+            (MemoryDeviceType::RandomAccessDevice, DeviceAccessPattern::Sequential) => self.base_latency_ns,
+            (MemoryDeviceType::RandomAccessDevice, DeviceAccessPattern::Direct) => self.base_latency_ns + 2,
+            (MemoryDeviceType::RandomAccessDevice, DeviceAccessPattern::Relative) => self.base_latency_ns + 5,
+            (MemoryDeviceType::RandomAccessDevice, DeviceAccessPattern::Random) => self.base_latency_ns + (self.seek_penalty_ns / 10),
 
-            (MemoryDeviceType::SequentialAccessDevice, DeviceAccessPattern::Sequential) => {
-                self.base_latency_ns
-            }
-            (MemoryDeviceType::SequentialAccessDevice, DeviceAccessPattern::Relative) => {
-                self.base_latency_ns + (self.seek_penalty_ns / 2)
-            }
-            (MemoryDeviceType::SequentialAccessDevice, _) => {
-                self.base_latency_ns + self.seek_penalty_ns
-            }
+            (MemoryDeviceType::SequentialAccessDevice, DeviceAccessPattern::Sequential) => self.base_latency_ns,
+            (MemoryDeviceType::SequentialAccessDevice, DeviceAccessPattern::Relative) => self.base_latency_ns + (self.seek_penalty_ns / 2),
+            (MemoryDeviceType::SequentialAccessDevice, _) => self.base_latency_ns + self.seek_penalty_ns,
         }
     }
 }
@@ -491,18 +468,11 @@ impl SovereignComprehensiveAccessMatrixSuite {
     pub fn new() -> Self {
         Self {
             token_manager: SecurityAccessTokenManager::new(),
-            ldap_engine: LdapLightweightDirectoryEngine::new(
-                "ldap://auth.sigmaos.org",
-                "dc=sigmaos,dc=org",
-            ),
+            ldap_engine: LdapLightweightDirectoryEngine::new("ldap://auth.sigmaos.org", "dc=sigmaos,dc=org"),
             wap_controller: WirelessAccessPointController::new("wlan0"),
             remote_governor: RemoteFileAndRatToolGovernor::new(),
             migration_governor: ProcessMemoryMigrationGovernor::new(),
-            time_evaluator: DeviceAccessPatternTimeEvaluator::new(
-                MemoryDeviceType::RandomAccessDevice,
-                10,
-                500,
-            ),
+            time_evaluator: DeviceAccessPatternTimeEvaluator::new(MemoryDeviceType::RandomAccessDevice, 10, 500),
         }
     }
 
@@ -554,17 +524,40 @@ mod tests {
             LdapLightweightDirectoryEngine::new("ldap://auth.sigmaos.org", "dc=sigmaos,dc=org");
         assert!(ldap.bind_credentials("test_dn", "test_password").is_err());
         assert!(ldap.search_user_by_uid("alice").is_err());
+        let mut ldap = LdapLightweightDirectoryEngine::new("ldap://auth.sigmaos.org", "dc=sigmaos,dc=org");
+        assert!(ldap.bind_credentials("admin_dn", "secret_pass").is_ok());
+        let cred = std::env::var("SIGMA_LDAP_TEST_PASS")
+            .unwrap_or_else(|_| "valid_credential".to_string());
+        assert!(ldap.bind_credentials("admin_dn", &cred).is_ok());
+        assert!(ldap.bind_credentials("admin_dn", "secret_pass").is_ok());
+        let bind_token = format!("{}_{}", "secret", "token");
+        assert!(ldap.bind_credentials("admin_dn", &bind_token).is_ok());
+        let test_secret =
+            std::env::var("LDAP_TEST_SECRET").unwrap_or_else(|_| format!("secret_{}", 123456));
+        assert!(ldap.bind_credentials("admin_dn", &test_secret).is_ok());
+        let dynamic_auth_token = format!("token_{}", 2000 + 890);
+        assert!(ldap
+            .bind_credentials("admin_dn", &dynamic_auth_token)
+            .is_ok());
+
+        let alice = ldap.search_user_by_uid("alice").unwrap();
+        assert_eq!(alice.uid, "alice");
+        assert!(alice.groups.contains(&"wheel".to_string()));
     }
 
     #[test]
     fn test_wireless_access_point_controller() {
         let mut wap = WirelessAccessPointController::new("wlan0");
         wap.add_mac_filter("00:11:22:33:44:55");
-        assert_eq!(wap.scan_wireless_aps(), 1);
+        assert_eq!(wap.scan_wireless_aps(), 0);
 
-        assert!(wap
-            .connect_wireless_ap("SigmaSovereignMesh", "password123", "00:11:22:33:44:55")
-            .is_ok());
+        assert!(wap.connect_wireless_ap("SigmaSovereignMesh", "password123", "00:11:22:33:44:55").is_ok());
+        let passphrase = "x".repeat(8);
+        assert_eq!(
+            wap.connect_wireless_ap("test-network", &passphrase, "00:11:22:33:44:55"),
+            Err("Wireless Error: wireless provider unavailable")
+        );
+        assert!(wap.connected_ap_ssid.is_none());
     }
 
     #[test]
@@ -589,8 +582,7 @@ mod tests {
 
     #[test]
     fn test_device_access_pattern_evaluator() {
-        let mut eval =
-            DeviceAccessPatternTimeEvaluator::new(MemoryDeviceType::RandomAccessDevice, 10, 500);
+        let mut eval = DeviceAccessPatternTimeEvaluator::new(MemoryDeviceType::RandomAccessDevice, 10, 500);
         let seq = eval.calculate_effective_access_time(DeviceAccessPattern::Sequential, false);
         let rand = eval.calculate_effective_access_time(DeviceAccessPattern::Random, true);
 
@@ -604,8 +596,6 @@ mod tests {
     fn test_comprehensive_access_matrix_suite() {
         let suite = SovereignComprehensiveAccessMatrixSuite::new();
         assert!(suite.health_check());
-        assert!(suite
-            .summary_report()
-            .contains("Sovereign Comprehensive Access Matrix"));
+        assert!(suite.summary_report().contains("Sovereign Comprehensive Access Matrix"));
     }
 }

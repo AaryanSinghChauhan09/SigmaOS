@@ -7,11 +7,11 @@ use std::vec::Vec;
 /// CPU frequency states for energy management
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CpuFrequency {
-    Min = 800,      // 800 MHz - minimum power
-    Low = 1200,     // 1.2 GHz - power saving
-    Nominal = 2400, // 2.4 GHz - balanced
-    Turbo = 3200,   // 3.2 GHz - performance
-    Max = 4800,     // 4.8 GHz - maximum performance
+    Min = 800,       // 800 MHz - minimum power
+    Low = 1200,      // 1.2 GHz - power saving
+    Nominal = 2400,  // 2.4 GHz - balanced
+    Turbo = 3200,     // 3.2 GHz - performance
+    Max = 4800,      // 4.8 GHz - maximum performance
 }
 
 impl CpuFrequency {
@@ -147,8 +147,7 @@ impl EnergyAwareScheduler {
 
         for (i, task) in self.tasks_pool.iter().enumerate() {
             // Calculate score: priority - energy cost factor
-            let energy_cost = (task.expected_cpu_cycles as f32 / 1_000_000.0)
-                * task.expected_temp_increase_celsius;
+            let energy_cost = (task.expected_cpu_cycles as f32 / 1_000_000.0) * task.expected_temp_increase_celsius;
             let freq_factor = self.current_frequency.power_factor();
             let adjusted_cost = energy_cost * freq_factor;
             let score = (task.priority as f32) - (adjusted_cost / energy_budget);
@@ -219,6 +218,7 @@ mod tests {
         let mut eas = EnergyAwareScheduler::new();
         eas.queue_task_with_priority(1, 10000, 1.5, 255); // high priority
         eas.queue_task_with_priority(2, 100, 0.1, 0); // low priority
+        eas.queue_task_with_priority(2, 100, 0.1, 0);   // low priority
 
         let task = eas.schedule_next_task();
         assert!(task.is_some());
@@ -241,7 +241,7 @@ mod tests {
 
     #[test]
     fn test_scheduler_stats() {
-        let mut eas = EnergyAwareScheduler::new();
+        let eas = EnergyAwareScheduler::new();
         eas.queue_task_prediction(1, 10000, 1.5);
 
         let (pool_size, freq, thermal, temp) = eas.get_stats();

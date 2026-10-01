@@ -96,10 +96,30 @@ impl OmarchyServerBbsMenuEngine {
         engine.add_door('S', "Status", "btop", "System vitals and process monitor");
         engine.add_door('D', "Docker", "lazydocker", "Container management console");
         engine.add_door('L', "Logs", "lazyjournal", "Journald log analyzer");
-        engine.add_door('U', "Update", "omarchy-update", "System update with pre-flight snapshot");
-        engine.add_door('B', "Backup", "omarchy-backup status", "Btrfs/Snapper backup controls");
-        engine.add_door('N', "Network", "ufw status verbose", "UFW firewall and interface status");
-        engine.add_door('T', "Theme", "omarchy-theme-set", "Switch system terminal theme");
+        engine.add_door(
+            'U',
+            "Update",
+            "omarchy-update",
+            "System update with pre-flight snapshot",
+        );
+        engine.add_door(
+            'B',
+            "Backup",
+            "omarchy-backup status",
+            "Btrfs/Snapper backup controls",
+        );
+        engine.add_door(
+            'N',
+            "Network",
+            "ufw status verbose",
+            "UFW firewall and interface status",
+        );
+        engine.add_door(
+            'T',
+            "Theme",
+            "omarchy-theme-set",
+            "Switch system terminal theme",
+        );
         engine.add_door('Q', "Quit", "exit", "Exit to interactive shell");
         engine
     }
@@ -118,16 +138,25 @@ impl OmarchyServerBbsMenuEngine {
 
     pub fn execute_door(&self, key: char) -> Result<String, &'static str> {
         if let Some(door) = self.doors.get(&key.to_ascii_uppercase()) {
-            Ok(format!("Launching BBS Door [{}]: {}", door.label, door.target_command))
+            Ok(format!(
+                "Launching BBS Door [{}]: {}",
+                door.label, door.target_command
+            ))
         } else {
             Err("Invalid BBS door selection")
         }
     }
 
     pub fn render_bbs_menu_art(&self) -> String {
-        let mut art = format!("=== OMARCHY SERVER BBS (Node #{}) - Sysop: {} ===\n\n", self.node_number, self.sysop_name);
+        let mut art = format!(
+            "=== OMARCHY SERVER BBS (Node #{}) - Sysop: {} ===\n\n",
+            self.node_number, self.sysop_name
+        );
         for door in self.doors.values() {
-            art.push_str(&format!(" [{}] {:<10} - {}\n", door.hotkey, door.label, door.description));
+            art.push_str(&format!(
+                " [{}] {:<10} - {}\n",
+                door.hotkey, door.label, door.description
+            ));
         }
         art.push_str("\nSelect door [S/D/L/U/B/N/T/Q]: ");
         art
@@ -263,7 +292,9 @@ mod omarchy_server_tests {
         let guard = OmarchyEditionGuard::new(OmarchyEdition::Server);
         assert!(guard.is_server());
         assert!(!guard.is_desktop());
-        assert!(guard.render_edition_file_content().contains("OMARCHY_EDITION=server"));
+        assert!(guard
+            .render_edition_file_content()
+            .contains("OMARCHY_EDITION=server"));
     }
 
     #[test]

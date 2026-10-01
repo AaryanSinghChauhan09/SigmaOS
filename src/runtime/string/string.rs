@@ -12,19 +12,18 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
 /// Custom String Handling for SigmaOS
 /// Implements string operations without relying on std::string
 /// Supports UTF-8 encoding and common string operations
-
 use core::ptr::{self, NonNull};
-use core::mem;
 
 /// Custom string structure
 #[repr(C)]
@@ -49,14 +48,14 @@ impl SigmaString {
     pub unsafe fn from_bytes(bytes: &[u8]) -> Self {
         let len = bytes.len();
         let capacity = len.next_power_of_two();
-        
+
         let data = alloc(capacity);
         if data.is_null() {
             return SigmaString::new();
         }
 
         ptr::copy_nonoverlapping(bytes.as_ptr(), data, len);
-        
+
         SigmaString {
             data: NonNull::new_unchecked(data),
             length: len,
@@ -92,15 +91,13 @@ impl SigmaString {
 
     /// Get string as bytes
     pub fn as_bytes(&self) -> &[u8] {
-        unsafe {
-            core::slice::from_raw_parts(self.data.as_ptr(), self.length)
-        }
+        unsafe { core::slice::from_raw_parts(self.data.as_ptr(), self.length) }
     }
 
     /// Append bytes to string
     pub unsafe fn push_bytes(&mut self, bytes: &[u8]) {
         let new_len = self.length + bytes.len();
-        
+
         if new_len > self.capacity {
             self.reallocate(new_len.next_power_of_two());
         }
@@ -173,7 +170,7 @@ impl SigmaString {
         }
 
         let bytes = &self.as_bytes()[self.length - len..];
-        let c = core:: String::from_utf8_unchecked(bytes).chars().next();
+        let c = core::String::from_utf8_unchecked(bytes).chars().next();
         self.length -= len;
         c
     }
@@ -256,11 +253,21 @@ impl SigmaString {
         let mut start = 0;
         let mut end = bytes.len();
 
-        while start < end && (bytes[start] == b' ' || bytes[start] == b'\t' || bytes[start] == b'\n' || bytes[start] == b'\r') {
+        while start < end
+            && (bytes[start] == b' '
+                || bytes[start] == b'\t'
+                || bytes[start] == b'\n'
+                || bytes[start] == b'\r')
+        {
             start += 1;
         }
 
-        while end > start && (bytes[end - 1] == b' ' || bytes[end - 1] == b'\t' || bytes[end - 1] == b'\n' || bytes[end - 1] == b'\r') {
+        while end > start
+            && (bytes[end - 1] == b' '
+                || bytes[end - 1] == b'\t'
+                || bytes[end - 1] == b'\n'
+                || bytes[end - 1] == b'\r')
+        {
             end -= 1;
         }
 
@@ -330,7 +337,11 @@ impl SigmaStringArray {
 
     pub unsafe fn push(&mut self, string: SigmaString) {
         if self.length >= self.capacity {
-            self.reallocate(if self.capacity == 0 { 4 } else { self.capacity * 2 });
+            self.reallocate(if self.capacity == 0 {
+                4
+            } else {
+                self.capacity * 2
+            });
         }
 
         if self.capacity > self.length {
@@ -410,7 +421,7 @@ pub unsafe fn strcmp(s1: *const i8, s2: *const i8) -> i32 {
     loop {
         let c1 = *s1.add(i) as u8;
         let c2 = *s2.add(i) as u8;
-        
+
         if c1 < c2 {
             return -1;
         } else if c1 > c2 {
@@ -426,7 +437,7 @@ pub unsafe fn strncmp(s1: *const i8, s2: *const i8, n: usize) -> i32 {
     for i in 0..n {
         let c1 = *s1.add(i) as u8;
         let c2 = *s2.add(i) as u8;
-        
+
         if c1 < c2 {
             return -1;
         } else if c1 > c2 {

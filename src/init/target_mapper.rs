@@ -58,12 +58,27 @@ pub struct RunlevelToTargetMapper {
 impl RunlevelToTargetMapper {
     pub fn new() -> Self {
         let mut map = HashMap::new();
-        map.insert("/etc/systemd/system/default.target".to_string(), "/lib/systemd/system/graphical.target".to_string());
-        map.insert("runlevel0.target".to_string(), "poweroff.target".to_string());
+        map.insert(
+            "/etc/systemd/system/default.target".to_string(),
+            "/lib/systemd/system/graphical.target".to_string(),
+        );
+        map.insert(
+            "runlevel0.target".to_string(),
+            "poweroff.target".to_string(),
+        );
         map.insert("runlevel1.target".to_string(), "rescue.target".to_string());
-        map.insert("runlevel2.target".to_string(), "multi-user-nonet.target".to_string());
-        map.insert("runlevel3.target".to_string(), "multi-user.target".to_string());
-        map.insert("runlevel5.target".to_string(), "graphical.target".to_string());
+        map.insert(
+            "runlevel2.target".to_string(),
+            "multi-user-nonet.target".to_string(),
+        );
+        map.insert(
+            "runlevel3.target".to_string(),
+            "multi-user.target".to_string(),
+        );
+        map.insert(
+            "runlevel5.target".to_string(),
+            "graphical.target".to_string(),
+        );
         map.insert("runlevel6.target".to_string(), "reboot.target".to_string());
 
         Self {
@@ -76,7 +91,11 @@ impl RunlevelToTargetMapper {
 
     pub fn resolve_default_target(&self) -> String {
         if let Some(target) = self.symlink_mapping.get(&self.default_symlink_path) {
-            target.split('/').last().unwrap_or("graphical.target").to_string()
+            target
+                .split('/')
+                .last()
+                .unwrap_or("graphical.target")
+                .to_string()
         } else {
             "graphical.target".to_string()
         }
@@ -84,12 +103,13 @@ impl RunlevelToTargetMapper {
 
     pub fn set_default_target_symlink(&mut self, target_name: &str) {
         let symlink_dest = format!("/lib/systemd/system/{}", target_name);
-        self.symlink_mapping.insert(self.default_symlink_path.clone(), symlink_dest);
+        self.symlink_mapping
+            .insert(self.default_symlink_path.clone(), symlink_dest);
     }
 
     pub fn telinit_switch(&mut self, runlevel_char: char) -> Result<String, &'static str> {
-        let new_runlevel = SysvRunlevel::from_char(runlevel_char)
-            .ok_or("Invalid runlevel character")?;
+        let new_runlevel =
+            SysvRunlevel::from_char(runlevel_char).ok_or("Invalid runlevel character")?;
 
         self.previous_runlevel = Some(self.active_runlevel);
         self.active_runlevel = new_runlevel;

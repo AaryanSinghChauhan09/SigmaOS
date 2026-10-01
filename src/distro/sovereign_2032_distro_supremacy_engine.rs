@@ -109,7 +109,8 @@ impl SovereignSystemd262PostQuantumHomedEngine {
     pub fn mount_pqc_user_home(&mut self, username: &str, provided_key_bytes: &[u8]) -> bool {
         let key_digest = fnv1a_2032_digest(provided_key_bytes);
         if let Some(user) = self.users.get_mut(username) {
-            if user.pqc_ml_kem_1024_key_fingerprint == key_digest || !provided_key_bytes.is_empty() {
+            if user.pqc_ml_kem_1024_key_fingerprint == key_digest || !provided_key_bytes.is_empty()
+            {
                 user.is_mounted = true;
                 self.homed_mount_operations += 1;
                 self.pqc_key_validations += 1;
@@ -435,19 +436,26 @@ impl Sovereign2032DistroSupremacyMasterSuite {
         let mut score = 50u32; // Base baseline score
 
         // 1. Systemd 262 PQC homed & vpick engine (+10)
-        self.homed_engine.register_pqc_user_home("admin", "/home/admin", "v2.0", 0xFF);
+        self.homed_engine
+            .register_pqc_user_home("admin", "/home/admin", "v2.0", 0xFF);
         if self.homed_engine.mount_pqc_user_home("admin", b"key_data") {
             score += 10;
         }
 
         // 2. Linux 6.18 Bcachefs Cxl tiering engine (+10)
-        self.bcachefs_cxl_engine.allocate_cxl_extent(1, "/var/db", StorageTier2032::OptaneNvmeGen5, 1024 * 1024);
+        self.bcachefs_cxl_engine.allocate_cxl_extent(
+            1,
+            "/var/db",
+            StorageTier2032::OptaneNvmeGen5,
+            1024 * 1024,
+        );
         if self.bcachefs_cxl_engine.promote_to_cxl_zswap(1) {
             score += 10;
         }
 
         // 3. OpenBSD 8.2 FineIBT CFI & pinsyscall guard (+10)
-        self.openbsd_guard.register_fine_ibt_region("sys_kernel", 0x1000, 0x9000);
+        self.openbsd_guard
+            .register_fine_ibt_region("sys_kernel", 0x1000, 0x9000);
         self.openbsd_guard.lock_path_mutations();
         if self.openbsd_guard.validate_instruction_pointer(0x2000) {
             score += 10;
@@ -466,7 +474,8 @@ impl Sovereign2032DistroSupremacyMasterSuite {
         }
 
         // 5. Wayland 1.28 direct KMS scanout pipeline (+10)
-        self.wayland_scanout_engine.submit_sub_millisecond_frame(1, 100, 480);
+        self.wayland_scanout_engine
+            .submit_sub_millisecond_frame(1, 100, 480);
         if self.wayland_scanout_engine.direct_scanout_hits > 0 {
             score += 10;
         }
@@ -521,13 +530,7 @@ mod tests {
     #[test]
     fn test_freebsd165_vnet_xdp_crdt_engine() {
         let mut engine = SovereignFreeBsd165VnetXdpCrdtEngine::new();
-        engine.spawn_vnet_micro_jail(
-            2,
-            "jail_web",
-            [10, 0, 0, 2],
-            [0; 16],
-            0x0F,
-        );
+        engine.spawn_vnet_micro_jail(2, "jail_web", [10, 0, 0, 2], [0; 16], 0x0F);
         assert!(engine.process_xdp_crdt_packet(2, 512));
         assert_eq!(engine.zero_copy_packets_processed, 1);
         assert_eq!(engine.crdt_sync_events, 1);

@@ -31,8 +31,6 @@
 
 #![allow(dead_code)]
 
-
-
 use std::string::{String, ToString};
 use std::vec::Vec;
 
@@ -60,10 +58,10 @@ pub enum PipeError {
 impl core::fmt::Display for PipeError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
-            PipeError::WouldBlock     => write!(f, "pipe: would block"),
-            PipeError::Empty          => write!(f, "pipe: empty"),
-            PipeError::BrokenPipe     => write!(f, "pipe: broken pipe (write end closed)"),
-            PipeError::ReadEndClosed  => write!(f, "pipe: read end closed"),
+            PipeError::WouldBlock => write!(f, "pipe: would block"),
+            PipeError::Empty => write!(f, "pipe: empty"),
+            PipeError::BrokenPipe => write!(f, "pipe: broken pipe (write end closed)"),
+            PipeError::ReadEndClosed => write!(f, "pipe: read end closed"),
             PipeError::ZeroLengthBuffer => write!(f, "pipe: zero-length buffer"),
             PipeError::InvalidArgument(s) => write!(f, "pipe: invalid argument: {}", s),
         }
@@ -341,7 +339,9 @@ impl SigmaPipe {
     pub fn new(capacity: usize) -> (PipeWriter, PipeReader) {
         let inner = std::rc::Rc::new(core::cell::RefCell::new(PipeInner::new(capacity)));
         (
-            PipeWriter { inner: std::rc::Rc::clone(&inner) },
+            PipeWriter {
+                inner: std::rc::Rc::clone(&inner),
+            },
             PipeReader { inner },
         )
     }
@@ -375,7 +375,11 @@ impl SigmaFifo {
     /// Create a new named pipe bound to `path` with the given `capacity`.
     pub fn create(path: String, capacity: usize) -> Self {
         let (writer, reader) = SigmaPipe::new(capacity);
-        SigmaFifo { path, writer, reader }
+        SigmaFifo {
+            path,
+            writer,
+            reader,
+        }
     }
 
     /// Returns a mutable reference to the write end.

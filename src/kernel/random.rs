@@ -51,10 +51,7 @@ pub struct RandomBytes {
 
 impl RandomBytes {
     pub fn new(data: Vec<u8>, source: RandomSource) -> Self {
-        RandomBytes {
-            data,
-            source,
-        }
+        RandomBytes { data, source }
     }
 
     pub fn data(&self) -> &[u8] {
@@ -78,9 +75,7 @@ struct RandomState {
 
 impl RandomState {
     pub fn new(seed: u64) -> Self {
-        RandomState {
-            seed,
-        }
+        RandomState { seed }
     }
 
     /// Simple XOR-shift random number generator
@@ -121,7 +116,11 @@ impl RandomManager {
     }
 
     /// Get random bytes from urandom (non-blocking)
-    pub fn getrandom_urandom(&self, len: usize, _flags: RandomFlags) -> Result<RandomBytes, String> {
+    pub fn getrandom_urandom(
+        &self,
+        len: usize,
+        _flags: RandomFlags,
+    ) -> Result<RandomBytes, String> {
         let mut state = self.urandom_state.lock().unwrap();
         let data = state.random_bytes(len);
 
@@ -137,7 +136,12 @@ impl RandomManager {
     }
 
     /// Get random bytes from specified source
-    pub fn getrandom(&self, source: RandomSource, len: usize, flags: RandomFlags) -> Result<RandomBytes, String> {
+    pub fn getrandom(
+        &self,
+        source: RandomSource,
+        len: usize,
+        flags: RandomFlags,
+    ) -> Result<RandomBytes, String> {
         match source {
             RandomSource::Urandom => self.getrandom_urandom(len, flags),
             RandomSource::Random => self.getrandom_random(len, flags),

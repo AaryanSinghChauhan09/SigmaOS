@@ -1,12 +1,9 @@
 // Terminal Emulator (gnome-terminal/konsole Inspiration)
 // Terminal sessions, profiles, and PTY management
 
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
-
-
-
 
 /// Terminal profile
 #[derive(Debug, Clone)]
@@ -90,10 +87,7 @@ impl PseudoTerminal {
         Self {
             master_fd: 0,
             slave_fd: 0,
-            size: TerminalSize {
-                rows: 24,
-                cols: 80,
-            },
+            size: TerminalSize { rows: 24, cols: 80 },
         }
     }
 

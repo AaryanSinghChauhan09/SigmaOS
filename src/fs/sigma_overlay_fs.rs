@@ -36,8 +36,8 @@
 #![allow(unused_variables)]
 
 use std::collections::{HashMap, HashSet};
-use std::vec::Vec;
 use std::string::String;
+use std::vec::Vec;
 
 // ── Error type ────────────────────────────────────────────────────────────────
 
@@ -175,12 +175,18 @@ pub struct Layer {
 impl Layer {
     /// Create a new writable layer.
     pub fn new_writable() -> Self {
-        Layer { inodes: HashMap::new(), writable: true }
+        Layer {
+            inodes: HashMap::new(),
+            writable: true,
+        }
     }
 
     /// Create a new read-only layer populated from `inodes`.
     pub fn new_readonly(inodes: HashMap<String, OverlayInode>) -> Self {
-        Layer { inodes, writable: false }
+        Layer {
+            inodes,
+            writable: false,
+        }
     }
 
     /// Look up an inode by path.
@@ -266,7 +272,9 @@ impl OverlayMount {
             return Ok(());
         }
 
-        let lower_inode = self.lower.lookup(path)
+        let lower_inode = self
+            .lower
+            .lookup(path)
             .ok_or_else(|| OverlayError::NotFound(path.to_string()))?
             .clone();
 
@@ -282,9 +290,12 @@ impl OverlayMount {
     /// Create a new file at `path` with `data` and `mode`.
     ///
     /// Returns `AlreadyExists` if the path is occupied in any visible layer.
-    pub fn create(&mut self, path: impl Into<String>, data: Vec<u8>, mode: u32)
-        -> OverlayResult<()>
-    {
+    pub fn create(
+        &mut self,
+        path: impl Into<String>,
+        data: Vec<u8>,
+        mode: u32,
+    ) -> OverlayResult<()> {
         let path = path.into();
         match self.lookup(&path) {
             Ok(_) => return Err(OverlayError::AlreadyExists(path)),
@@ -321,7 +332,10 @@ impl OverlayMount {
         // Copy-up if needed.
         self.copy_up(path)?;
 
-        let inode = self.upper.inodes.get_mut(path)
+        let inode = self
+            .upper
+            .inodes
+            .get_mut(path)
             .ok_or_else(|| OverlayError::Io("copy-up failed".to_string()))?;
 
         if inode.kind != InodeKind::File {
@@ -381,7 +395,9 @@ impl OverlayMount {
         }
 
         // Stage in work directory.
-        let mut inode = self.upper.remove(old_path)
+        let mut inode = self
+            .upper
+            .remove(old_path)
             .ok_or_else(|| OverlayError::NotFound(old_path.to_string()))?;
 
         inode.path = new_path.to_string();
@@ -437,7 +453,8 @@ impl OverlayMount {
         let result: Vec<String> = seen
             .into_iter()
             .filter(|p| {
-                self.upper.lookup(p)
+                self.upper
+                    .lookup(p)
                     .map(|i| !i.is_whiteout())
                     .unwrap_or(true)
             })
@@ -448,7 +465,8 @@ impl OverlayMount {
 
     /// Return `true` if `path` has a whiteout in the upper layer.
     pub fn is_whiteout(&self, path: &str) -> bool {
-        self.upper.lookup(path)
+        self.upper
+            .lookup(path)
             .map(|i| i.is_whiteout())
             .unwrap_or(false)
     }
@@ -481,7 +499,9 @@ mod tests {
     #[test]
     fn test_copy_up_on_write() {
         let mut mount = OverlayMount::new("/mnt", make_lower());
-        mount.write("/etc/hostname", b"new-hostname\n".to_vec()).unwrap();
+        mount
+            .write("/etc/hostname", b"new-hostname\n".to_vec())
+            .unwrap();
 
         // Upper layer now has the file.
         let upper = mount.upper.lookup("/etc/hostname").unwrap();
@@ -508,7 +528,9 @@ mod tests {
     #[test]
     fn test_create_file() {
         let mut mount = OverlayMount::new("/mnt", make_lower());
-        mount.create("/etc/motd", b"Welcome to SigmaOS\n".to_vec(), 0o644).unwrap();
+        mount
+            .create("/etc/motd", b"Welcome to SigmaOS\n".to_vec(), 0o644)
+            .unwrap();
         let inode = mount.lookup("/etc/motd").unwrap();
         assert_eq!(inode.data, b"Welcome to SigmaOS\n");
     }

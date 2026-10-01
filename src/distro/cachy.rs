@@ -1,10 +1,7 @@
 // SigmaOS CachyOS Compatibility & Performance Suite (CachyOS Parity)
 // Implements x86-64-v3/v4 Microarchitecture detection, BORE CPU Scheduler Governor, and CachyOS Kernel Variant Selector.
 
-
 #[cfg(test_disabled)]
-
-
 use std::format;
 use std::string::String;
 use std::string::ToString;
@@ -293,7 +290,10 @@ mod tests {
         auto_freq.set_power_state(false); // Battery mode
         assert!(!auto_freq.is_on_ac_power);
         assert_eq!(auto_freq.current_governor, "powersave");
-        assert_eq!(auto_freq.current_epp, EnergyPerformancePreference::BalancePower);
+        assert_eq!(
+            auto_freq.current_epp,
+            EnergyPerformancePreference::BalancePower
+        );
 
         let caps_v3 = CpuCapabilities::new_x86_64_v3_capable();
         let mut chwd = CachyOsChWDHardwareEngine::new(caps_v3);

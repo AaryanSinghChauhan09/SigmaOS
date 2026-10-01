@@ -49,7 +49,10 @@ mod tests {
         assert_eq!(x86_hal.page_levels, 4);
 
         let arm_hal = MultiArchHal::new(TargetArch::AArch64);
-        assert!(arm_hal.initialize_hardware_irqs().unwrap().contains("GICv3"));
+        assert!(arm_hal
+            .initialize_hardware_irqs()
+            .unwrap()
+            .contains("GICv3"));
 
         let riscv_hal = MultiArchHal::new(TargetArch::RiscV64);
         assert_eq!(riscv_hal.interrupt_controller, "PLIC");

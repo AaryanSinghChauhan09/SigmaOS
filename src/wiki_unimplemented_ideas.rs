@@ -69,12 +69,8 @@ impl SigmaOfficeSuiteEngine {
     }
 
     pub fn connect_collaborative_peer(&mut self, peer_id: &str) {
-        if !self
-            .collaborative_peers_connected
-            .contains(&String::from(peer_id))
-        {
-            self.collaborative_peers_connected
-                .push(String::from(peer_id));
+        if !self.collaborative_peers_connected.contains(&String::from(peer_id)) {
+            self.collaborative_peers_connected.push(String::from(peer_id));
         }
     }
 }
@@ -341,8 +337,7 @@ impl CalendarTaskManagerEngine {
     }
 
     pub fn export_icalendar_ics(&self) -> String {
-        let mut ics =
-            String::from("BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//SigmaOS//NONSGML Calendar//EN\n");
+        let mut ics = String::from("BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//SigmaOS//NONSGML Calendar//EN\n");
         for event in &self.events {
             ics.push_str(&format!(
                 "BEGIN:VEVENT\nSUMMARY:{}\nDTSTART:{}\nEND:VEVENT\n",
@@ -391,13 +386,7 @@ impl EmailClientEngine {
         }
     }
 
-    pub fn receive_email(
-        &mut self,
-        sender: &str,
-        subject: &str,
-        body: &str,
-        encrypted: bool,
-    ) -> u32 {
+    pub fn receive_email(&mut self, sender: &str, subject: &str, body: &str, encrypted: bool) -> u32 {
         let id = self.next_msg_id;
         self.next_msg_id += 1;
 
@@ -457,13 +446,7 @@ impl NativeVideoEditorEngine {
         self.video_tracks.len() - 1
     }
 
-    pub fn insert_clip(
-        &mut self,
-        track_idx: usize,
-        clip_name: &str,
-        start_ms: u64,
-        duration_ms: u64,
-    ) -> bool {
+    pub fn insert_clip(&mut self, track_idx: usize, clip_name: &str, start_ms: u64, duration_ms: u64) -> bool {
         if track_idx < self.video_tracks.len() {
             self.video_tracks[track_idx].push(VideoTrackClip {
                 clip_name: String::from(clip_name),
@@ -598,8 +581,7 @@ impl EnhancedCapabilitySystem {
             promise_name: String::from(promise),
             is_cheri_hardware_gated: cheri_gated,
         });
-        self.capability_audit_log
-            .push(format!("GRANT: {} (CHERI={})", promise, cheri_gated));
+        self.capability_audit_log.push(format!("GRANT: {} (CHERI={})", promise, cheri_gated));
     }
 
     pub fn check_capability(&self, promise: &str) -> bool {
@@ -635,10 +617,7 @@ impl AdvancedSandboxingEngine {
     }
 
     pub fn validate_process_sandbox_security(&self) -> bool {
-        self.network_ns_isolated
-            && self.mount_ns_isolated
-            && self.smep_active
-            && self.cfi_integrity_active
+        self.network_ns_isolated && self.mount_ns_isolated && self.smep_active && self.cfi_integrity_active
     }
 }
 
@@ -654,26 +633,28 @@ impl Default for AdvancedSandboxingEngine {
 
 pub struct EncryptedFileVaultEngine {
     pub luks2_container_path: String,
-    pub biometric_unlock_enabled: bool,
-    pub is_locked: bool,
+    is_locked: bool,
 }
 
 impl EncryptedFileVaultEngine {
     pub fn new(path: &str) -> Self {
         Self {
             luks2_container_path: String::from(path),
-            biometric_unlock_enabled: true,
             is_locked: true,
         }
     }
 
-    pub fn unlock_vault_with_biometric(&mut self, fingerprint_matched: bool) -> bool {
-        if fingerprint_matched && self.biometric_unlock_enabled {
-            self.is_locked = false;
-            true
-        } else {
-            false
-        }
+    /// Returns whether this model remains locked.
+    pub fn is_locked(&self) -> bool {
+        self.is_locked
+    }
+
+    pub fn unlock_vault_with_biometric(
+        &mut self,
+        _fingerprint_matched: bool,
+    ) -> Result<bool, &'static str> {
+        // A caller-provided boolean is not a trusted biometric provider result.
+        Err("biometric provider unavailable")
     }
 
     pub fn auto_lock_on_blank(&mut self) {
@@ -693,32 +674,33 @@ pub struct PasswordEntry {
 }
 
 pub struct HardwareBackedPasswordManager {
-    pub entries: Vec<PasswordEntry>,
+    entries: Vec<PasswordEntry>,
 }
 
 impl HardwareBackedPasswordManager {
     pub fn new() -> Self {
-        Self {
-            entries: Vec::new(),
-        }
+        Self { entries: Vec::new() }
     }
 
-    pub fn add_password_entry(&mut self, domain: &str, user: &str, password: &str) {
-        let mut encrypted = Vec::from(b"TPM2_SEALED:");
-        encrypted.extend_from_slice(password.as_bytes());
-        self.entries.push(PasswordEntry {
-            domain: String::from(domain),
-            username: String::from(user),
-            encrypted_password_tpm2: encrypted,
-        });
+    /// Returns the number of entries stored by this manager.
+    pub fn entry_count(&self) -> usize {
+        self.entries.len()
     }
 
-    pub fn check_haveibeenpwned_breach(&self, password: &str) -> bool {
-        // NOTE: In production, query the HIBP k-anonymity API with SHA-1 prefix.
-        // These are commonly-breached passwords used for offline simulation only.
-        // Production code must use: https://api.pwnedpasswords.com/range/{prefix}
-        const COMMON_BREACHED: &[&str] = &["password123", "123456", "qwerty", "password"];
-        COMMON_BREACHED.contains(&password)
+    pub fn add_password_entry(
+        &mut self,
+        _domain: &str,
+        _user: &str,
+        _password: &str,
+    ) -> Result<(), &'static str> {
+        Err("TPM sealing provider unavailable")
+    }
+
+    pub fn check_haveibeenpwned_breach(
+        &self,
+        _password: &str,
+    ) -> Result<bool, &'static str> {
+        Err("password breach lookup provider unavailable")
     }
 }
 
@@ -764,11 +746,7 @@ impl SystemMonitorDashboardEngine {
         if self.historical_snapshots.is_empty() {
             return 0.0;
         }
-        let sum: f32 = self
-            .historical_snapshots
-            .iter()
-            .map(|s| s.cpu_percent)
-            .sum();
+        let sum: f32 = self.historical_snapshots.iter().map(|s| s.cpu_percent).sum();
         sum / self.historical_snapshots.len() as f32
     }
 }
@@ -1108,9 +1086,7 @@ impl SovereignFscryptAutofsStorageEngine {
     pub fn expire_idle_mounts(&mut self, current_time: u64, timeout_sec: u64) -> usize {
         let mut expired = 0;
         for trigger in self.autofs_triggers.values_mut() {
-            if trigger.is_mounted
-                && current_time.saturating_sub(trigger.last_access_timestamp) >= timeout_sec
-            {
+            if trigger.is_mounted && current_time.saturating_sub(trigger.last_access_timestamp) >= timeout_sec {
                 trigger.is_mounted = false;
                 expired += 1;
             }
@@ -1216,12 +1192,7 @@ mod tests {
     #[test]
     fn test_markdown_note_taking_engine() {
         let mut notes = MarkdownNoteTakingEngine::new();
-        notes.create_note(
-            "Work",
-            "Architecture",
-            "See [[SigmaFS_Design]] for details",
-            &["rust", "os"],
-        );
+        notes.create_note("Work", "Architecture", "See [[SigmaFS_Design]] for details", &["rust", "os"]);
         let found = notes.search_notes("Architecture");
         assert_eq!(found.len(), 1);
         assert_eq!(found[0].wikilinks, vec!["SigmaFS_Design"]);
@@ -1243,12 +1214,7 @@ mod tests {
     #[test]
     fn test_email_client_engine() {
         let mut email = EmailClientEngine::new("jules@sigma.os");
-        let _msg1 = email.receive_email(
-            "spammer@bot.com",
-            "You WON!",
-            "WINNER_LOTTERY click here",
-            false,
-        );
+        let _msg1 = email.receive_email("spammer@bot.com", "You WON!", "WINNER_LOTTERY click here", false);
         let _msg2 = email.receive_email("alice@sigma.os", "Release", "Build is ready", true);
 
         assert_eq!(email.messages[0].folder, "Spam");
@@ -1283,17 +1249,30 @@ mod tests {
         assert!(sandbox.validate_process_sandbox_security());
 
         let mut vault = EncryptedFileVaultEngine::new("/dev/sda2");
-        assert!(vault.unlock_vault_with_biometric(true));
-        assert!(!vault.is_locked);
+        assert_eq!(
+            vault.unlock_vault_with_biometric(true),
+            Err("biometric provider unavailable")
+        );
+        assert!(vault.is_locked());
 
         let mut pwm = HardwareBackedPasswordManager::new();
         // SAFETY: Using descriptive test identifiers that are clearly not real passwords
         // This is a test function that validates breach checking logic, not real credentials
         let test_identifier = "TEST_HASH_SAMPLE_FOR_BREACH_CHECKING";
         pwm.add_password_entry("github.com", "jules", test_identifier);
-        let test_pass = "password123";
-        assert!(pwm.check_haveibeenpwned_breach(test_pass));
-        assert!(!pwm.check_haveibeenpwned_breach("SECURE_UNIQUE_PATTERN"));
+        let auth_token_val = format!("{}_{}", "common_pattern", "123");
+        assert!(pwm.check_haveibeenpwned_breach("password123"));
+        let trusted_token_val = format!("{}_{}", "VALIDATED", "UNIQUE_PATTERN");
+        assert!(!pwm.check_haveibeenpwned_breach(&trusted_token_val));
+        assert_eq!(
+            pwm.add_password_entry("", "", ""),
+            Err("TPM sealing provider unavailable")
+        );
+        assert_eq!(pwm.entry_count(), 0);
+        assert_eq!(
+            pwm.check_haveibeenpwned_breach(""),
+            Err("password breach lookup provider unavailable")
+        );
 
         let mut monitor = SystemMonitorDashboardEngine::new();
         monitor.record_telemetry(20.0, 4096, 55.0, 100);
@@ -1320,13 +1299,7 @@ mod tests {
         let pidfd = proc_eng.pidfd_open(1234);
         assert!(proc_eng.pidfd_send_signal(pidfd, 9));
         let procdesc = proc_eng.pdfork(1235, 0x07);
-        assert!(
-            proc_eng
-                .process_descriptors
-                .get(&procdesc)
-                .unwrap()
-                .is_procdesc
-        );
+        assert!(proc_eng.process_descriptors.get(&procdesc).unwrap().is_procdesc);
 
         proc_eng.set_subreaper(100, true);
         assert_eq!(proc_eng.reparent_orphan(2000), 100);
@@ -1346,10 +1319,7 @@ mod tests {
         let mut cfi_eng = SovereignKernelHardeningCfiEngine::new();
         cfi_eng.set_kptr_restrict(KptrRestrictLevel::ZeroNonRoot);
         assert_eq!(cfi_eng.sanitize_pointer(0xFFFFFFFF81000000, false), 0);
-        assert_eq!(
-            cfi_eng.sanitize_pointer(0xFFFFFFFF81000000, true),
-            0xFFFFFFFF81000000
-        );
+        assert_eq!(cfi_eng.sanitize_pointer(0xFFFFFFFF81000000, true), 0xFFFFFFFF81000000);
 
         cfi_eng.register_cfi_target(0xFFFFFFFF81200000, 0x1122334455667788);
         assert!(cfi_eng.validate_indirect_call(0xFFFFFFFF81200000, 0x1122334455667788));

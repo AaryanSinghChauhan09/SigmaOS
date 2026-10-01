@@ -40,13 +40,11 @@
 
 #![allow(dead_code)]
 
-
-
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::string::{String, ToString};
 use std::sync::Arc;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Error type
@@ -80,16 +78,16 @@ pub enum VfsError {
 impl core::fmt::Display for VfsError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
-            VfsError::NotFound(p)            => write!(f, "vfs: not found: {}", p),
-            VfsError::NotSupported           => write!(f, "vfs: operation not supported"),
-            VfsError::PermissionDenied       => write!(f, "vfs: permission denied"),
-            VfsError::TooManySymlinks        => write!(f, "vfs: too many symbolic links"),
-            VfsError::NotADirectory          => write!(f, "vfs: not a directory"),
-            VfsError::IsADirectory           => write!(f, "vfs: is a directory"),
-            VfsError::Io(msg)                => write!(f, "vfs: I/O error: {}", msg),
-            VfsError::ReadOnly               => write!(f, "vfs: filesystem is read-only"),
-            VfsError::AlreadyMounted         => write!(f, "vfs: already mounted"),
-            VfsError::UnknownFilesystem(fs)  => write!(f, "vfs: unknown filesystem: {}", fs),
+            VfsError::NotFound(p) => write!(f, "vfs: not found: {}", p),
+            VfsError::NotSupported => write!(f, "vfs: operation not supported"),
+            VfsError::PermissionDenied => write!(f, "vfs: permission denied"),
+            VfsError::TooManySymlinks => write!(f, "vfs: too many symbolic links"),
+            VfsError::NotADirectory => write!(f, "vfs: not a directory"),
+            VfsError::IsADirectory => write!(f, "vfs: is a directory"),
+            VfsError::Io(msg) => write!(f, "vfs: I/O error: {}", msg),
+            VfsError::ReadOnly => write!(f, "vfs: filesystem is read-only"),
+            VfsError::AlreadyMounted => write!(f, "vfs: already mounted"),
+            VfsError::UnknownFilesystem(fs) => write!(f, "vfs: unknown filesystem: {}", fs),
         }
     }
 }
@@ -388,7 +386,9 @@ pub struct VfsPath {
 impl VfsPath {
     /// Create a `VfsPath` from a string slice.
     pub fn new(path: &str) -> Self {
-        VfsPath { raw: path.to_string() }
+        VfsPath {
+            raw: path.to_string(),
+        }
     }
 
     /// Return the path as a string.
@@ -501,7 +501,8 @@ impl VfsContext {
             root,
         });
         // Keep longest-prefix first for correct resolution.
-        self.mounts.sort_by(|a, b| b.mount_point.len().cmp(&a.mount_point.len()));
+        self.mounts
+            .sort_by(|a, b| b.mount_point.len().cmp(&a.mount_point.len()));
         Ok(())
     }
 
@@ -583,8 +584,16 @@ impl VfsNode for TmpfsNode {
     }
     fn readdir(&self) -> Result<Vec<DirEntry>, VfsError> {
         Ok(std::vec![
-            DirEntry { name: ".".to_string(),  ino: 1, inode_type: InodeType::Directory },
-            DirEntry { name: "..".to_string(), ino: 1, inode_type: InodeType::Directory },
+            DirEntry {
+                name: ".".to_string(),
+                ino: 1,
+                inode_type: InodeType::Directory
+            },
+            DirEntry {
+                name: "..".to_string(),
+                ino: 1,
+                inode_type: InodeType::Directory
+            },
         ])
     }
     fn inode_type(&self) -> InodeType {
@@ -596,13 +605,17 @@ impl VfsNode for TmpfsNode {
 pub struct TmpfsSuperblock;
 
 impl VfsSuperblock for TmpfsSuperblock {
-    fn fs_type(&self) -> &str { "tmpfs" }
+    fn fs_type(&self) -> &str {
+        "tmpfs"
+    }
 
     fn mount(&self, _source: &str, _flags: MountFlags) -> Result<Arc<dyn VfsNode>, VfsError> {
         Ok(Arc::new(TmpfsNode::root()))
     }
 
-    fn umount(&self) -> Result<(), VfsError> { Ok(()) }
+    fn umount(&self) -> Result<(), VfsError> {
+        Ok(())
+    }
 
     fn statfs(&self) -> FsStats {
         FsStats {
@@ -628,7 +641,8 @@ mod tests {
     fn test_vfs_mount_and_resolve() {
         let mut ctx = VfsContext::new();
         ctx.register_filesystem(Box::new(TmpfsSuperblock));
-        ctx.mount("tmpfs", "", "/tmp", MountFlags::default()).unwrap();
+        ctx.mount("tmpfs", "", "/tmp", MountFlags::default())
+            .unwrap();
         let node = ctx.resolve("/tmp/anything").unwrap();
         let stat = node.stat().unwrap();
         assert_eq!(stat.inode_type, InodeType::Directory);
@@ -638,7 +652,8 @@ mod tests {
     fn test_vfs_double_mount_error() {
         let mut ctx = VfsContext::new();
         ctx.register_filesystem(Box::new(TmpfsSuperblock));
-        ctx.mount("tmpfs", "", "/mnt", MountFlags::default()).unwrap();
+        ctx.mount("tmpfs", "", "/mnt", MountFlags::default())
+            .unwrap();
         let res = ctx.mount("tmpfs", "", "/mnt", MountFlags::default());
         assert_eq!(res, Err(VfsError::AlreadyMounted));
     }

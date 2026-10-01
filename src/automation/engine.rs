@@ -14,21 +14,20 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 extern crate alloc;
 use alloc::boxed::Box;
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
 /// OOP-based Automation Engine for SigmaOS
 /// Implements automation using OOP principles with traits and structs
 /// No dependency on external automation frameworks
 /// Based on Roadmap Item 82: Automation engine
-
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// Task ID
 pub type TaskID = usize;
@@ -155,9 +154,7 @@ impl SimpleTask {
     }
 
     pub fn get_state(&self) -> TaskState {
-        unsafe {
-            core::mem::transmute(self.state.load(Ordering::SeqCst))
-        }
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
     }
 
     pub fn set_state(&self, state: TaskState) {
@@ -388,7 +385,10 @@ impl Workflow for SimpleWorkflow {
 /// Automation engine trait (OOP interface)
 pub trait AutomationEngine {
     /// Register workflow
-    fn register_workflow(&mut self, workflow: Box<dyn Workflow>) -> Result<WorkflowID, AutomationError>;
+    fn register_workflow(
+        &mut self,
+        workflow: Box<dyn Workflow>,
+    ) -> Result<WorkflowID, AutomationError>;
     /// Unregister workflow
     fn unregister_workflow(&mut self, id: WorkflowID) -> Result<(), AutomationError>;
     /// Execute workflow
@@ -463,7 +463,10 @@ impl SimpleAutomationEngine {
 }
 
 impl AutomationEngine for SimpleAutomationEngine {
-    fn register_workflow(&mut self, workflow: Box<dyn Workflow>) -> Result<WorkflowID, AutomationError> {
+    fn register_workflow(
+        &mut self,
+        workflow: Box<dyn Workflow>,
+    ) -> Result<WorkflowID, AutomationError> {
         if !self.capability.can_register {
             return Err(AutomationError::PermissionDenied);
         }
@@ -567,7 +570,11 @@ impl<T> Vec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {
@@ -590,7 +597,6 @@ extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
 }
-
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -622,7 +628,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;

@@ -183,8 +183,11 @@ impl ArchAlpmDatabaseMirrorRankingEngine {
     }
 
     pub fn rank_mirrors_reflector_style(&mut self) -> Vec<String> {
-        self.mirrors
-            .sort_by(|a, b| b.score.partial_cmp(&a.score).unwrap_or(std::cmp::Ordering::Equal));
+        self.mirrors.sort_by(|a, b| {
+            b.score
+                .partial_cmp(&a.score)
+                .unwrap_or(std::cmp::Ordering::Equal)
+        });
         self.mirrors.iter().map(|m| m.url.clone()).collect()
     }
 
@@ -377,7 +380,9 @@ impl OpenBsdUnveilPathAuditEngine {
         perm_req: &str,
     ) -> bool {
         if let Some(rules) = self.unveiled_paths.get(&pid) {
-            let allowed = rules.iter().any(|(p, perms)| path.starts_with(p) && perms.contains(perm_req));
+            let allowed = rules
+                .iter()
+                .any(|(p, perms)| path.starts_with(p) && perms.contains(perm_req));
             if !allowed {
                 self.audit_violations.push(UnveilViolationRecord {
                     pid,
@@ -453,7 +458,10 @@ impl NetBsdVeriexecFingerprintGovernor {
         }
 
         if self.mode == VeriexecMode::Strict {
-            self.audit_logs.push(format!("Veriexec: Unregistered binary execution denied {}", path));
+            self.audit_logs.push(format!(
+                "Veriexec: Unregistered binary execution denied {}",
+                path
+            ));
             return false;
         }
 
@@ -492,7 +500,12 @@ impl VoidXbpsSignatureContainerEngine {
         }
     }
 
-    pub fn install_xbps_package(&mut self, name: &str, ver: &str, sig: &str) -> Result<String, &'static str> {
+    pub fn install_xbps_package(
+        &mut self,
+        name: &str,
+        ver: &str,
+        sig: &str,
+    ) -> Result<String, &'static str> {
         if !sig.contains("rsa4096") && !sig.contains("ed25519") {
             return Err("XBPS: Invalid package RSA/Ed25519 signature");
         }
@@ -505,7 +518,10 @@ impl VoidXbpsSignatureContainerEngine {
         };
 
         self.packages.insert(name.to_string(), pkg);
-        Ok(format!("xbps-install: Package {}-{} signature verified and installed", name, ver))
+        Ok(format!(
+            "xbps-install: Package {}-{} signature verified and installed",
+            name, ver
+        ))
     }
 }
 
@@ -612,13 +628,19 @@ impl SovereignLinuxBsdDistroInspirationMasterSuite {
 
         let _ = self.fedora_ostree.layer_rpm_package("htop");
 
-        let _ = self.freebsd_geom.ggatec_create("gg0", "192.168.1.100", 3080, 100_000_000_000);
+        let _ = self
+            .freebsd_geom
+            .ggatec_create("gg0", "192.168.1.100", 3080, 100_000_000_000);
 
-        self.netbsd_veriexec.load_fingerprint("/bin/sh", "hash_sha256_sh");
+        self.netbsd_veriexec
+            .load_fingerprint("/bin/sh", "hash_sha256_sh");
 
-        let _ = self.void_xbps.install_xbps_package("bash", "5.2", "void-official-key-rsa4096");
+        let _ = self
+            .void_xbps
+            .install_xbps_package("bash", "5.2", "void-official-key-rsa4096");
 
-        self.gentoo_portage.register_atom("dev-libs/openssl", "0/3", "3", &["ssl", "asm"]);
+        self.gentoo_portage
+            .register_atom("dev-libs/openssl", "0/3", "3", &["ssl", "asm"]);
 
         true
     }
@@ -706,7 +728,9 @@ mod tests {
     #[test]
     fn test_void_xbps_signature() {
         let mut xbps = VoidXbpsSignatureContainerEngine::new();
-        let res = xbps.install_xbps_package("curl", "8.0", "void-official-key-rsa4096").unwrap();
+        let res = xbps
+            .install_xbps_package("curl", "8.0", "void-official-key-rsa4096")
+            .unwrap();
         assert!(res.contains("signature verified"));
 
         assert!(xbps.install_xbps_package("bad", "1.0", "unsigned").is_err());

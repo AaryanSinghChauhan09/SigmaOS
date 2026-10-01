@@ -155,7 +155,8 @@ impl MintDesktop {
 
     /// Toggle desktop effects
     pub fn toggle_desktop_effects(&mut self) {
-        self.desktop_settings.enable_desktop_effects = !self.desktop_settings.enable_desktop_effects;
+        self.desktop_settings.enable_desktop_effects =
+            !self.desktop_settings.enable_desktop_effects;
     }
 
     /// Set font size
@@ -236,30 +237,85 @@ impl MintDesktop {
     /// Display desktop settings
     pub fn display_desktop_settings(&self) -> String {
         let mut output = String::from("=== Desktop Settings ===\n\n");
-        output.push_str(&format!("Window Manager: {:?}\n", self.desktop_settings.window_manager));
-        output.push_str(&format!("Desktop Layout: {:?}\n", self.desktop_settings.desktop_layout));
-        output.push_str(&format!("Show Desktop Icons: {}\n", if self.desktop_settings.show_desktop_icons { "Yes" } else { "No" }));
-        output.push_str(&format!("Show Mounted Volumes: {}\n", if self.desktop_settings.show_mounted_volumes { "Yes" } else { "No" }));
-        output.push_str(&format!("Use Compositing: {}\n", if self.desktop_settings.use_compositing { "Yes" } else { "No" }));
-        output.push_str(&format!("Enable Desktop Effects: {}\n", if self.desktop_settings.enable_desktop_effects { "Yes" } else { "No" }));
+        output.push_str(&format!(
+            "Window Manager: {:?}\n",
+            self.desktop_settings.window_manager
+        ));
+        output.push_str(&format!(
+            "Desktop Layout: {:?}\n",
+            self.desktop_settings.desktop_layout
+        ));
+        output.push_str(&format!(
+            "Show Desktop Icons: {}\n",
+            if self.desktop_settings.show_desktop_icons {
+                "Yes"
+            } else {
+                "No"
+            }
+        ));
+        output.push_str(&format!(
+            "Show Mounted Volumes: {}\n",
+            if self.desktop_settings.show_mounted_volumes {
+                "Yes"
+            } else {
+                "No"
+            }
+        ));
+        output.push_str(&format!(
+            "Use Compositing: {}\n",
+            if self.desktop_settings.use_compositing {
+                "Yes"
+            } else {
+                "No"
+            }
+        ));
+        output.push_str(&format!(
+            "Enable Desktop Effects: {}\n",
+            if self.desktop_settings.enable_desktop_effects {
+                "Yes"
+            } else {
+                "No"
+            }
+        ));
         output.push_str(&format!("Font Size: {}\n", self.desktop_settings.font_size));
         output.push_str(&format!("Icon Size: {}\n", self.desktop_settings.icon_size));
-        output.push_str(&format!("Panel Position: {}\n", self.desktop_settings.panel_position));
-        output.push_str(&format!("Workspace Count: {}\n", self.desktop_settings.workspace_count));
+        output.push_str(&format!(
+            "Panel Position: {}\n",
+            self.desktop_settings.panel_position
+        ));
+        output.push_str(&format!(
+            "Workspace Count: {}\n",
+            self.desktop_settings.workspace_count
+        ));
         output
     }
 
     /// Display theme settings
     pub fn display_theme_settings(&self) -> String {
         let mut output = String::from("=== Theme Settings ===\n\n");
-        output.push_str(&format!("Current Theme: {}\n", self.theme_settings.current_theme));
+        output.push_str(&format!(
+            "Current Theme: {}\n",
+            self.theme_settings.current_theme
+        ));
         output.push_str(&format!("Icon Theme: {}\n", self.theme_settings.icon_theme));
-        output.push_str(&format!("Cursor Theme: {}\n", self.theme_settings.cursor_theme));
-        output.push_str(&format!("Window Theme: {}\n", self.theme_settings.window_theme));
+        output.push_str(&format!(
+            "Cursor Theme: {}\n",
+            self.theme_settings.cursor_theme
+        ));
+        output.push_str(&format!(
+            "Window Theme: {}\n",
+            self.theme_settings.window_theme
+        ));
         output.push_str(&format!("GTK Theme: {}\n", self.theme_settings.gtk_theme));
         output.push_str(&format!("Font Name: {}\n", self.theme_settings.font_name));
-        output.push_str(&format!("Document Font: {}\n", self.theme_settings.document_font));
-        output.push_str(&format!("Monospace Font: {}\n", self.theme_settings.monospace_font));
+        output.push_str(&format!(
+            "Document Font: {}\n",
+            self.theme_settings.document_font
+        ));
+        output.push_str(&format!(
+            "Monospace Font: {}\n",
+            self.theme_settings.monospace_font
+        ));
         output
     }
 
@@ -299,24 +355,30 @@ mod tests {
     fn test_set_window_manager() {
         let mut mint_desktop = MintDesktop::new();
         let result = mint_desktop.set_window_manager(WindowManager::Compiz);
-        
+
         assert!(result.is_ok());
-        assert_eq!(mint_desktop.desktop_settings.window_manager, WindowManager::Compiz);
+        assert_eq!(
+            mint_desktop.desktop_settings.window_manager,
+            WindowManager::Compiz
+        );
     }
 
     #[test]
     fn test_set_desktop_layout() {
         let mut mint_desktop = MintDesktop::new();
         mint_desktop.set_desktop_layout(DesktopLayout::Tiling);
-        
-        assert_eq!(mint_desktop.desktop_settings.desktop_layout, DesktopLayout::Tiling);
+
+        assert_eq!(
+            mint_desktop.desktop_settings.desktop_layout,
+            DesktopLayout::Tiling
+        );
     }
 
     #[test]
     fn test_toggle_desktop_icons() {
         let mut mint_desktop = MintDesktop::new();
         let initial = mint_desktop.desktop_settings.show_desktop_icons;
-        
+
         mint_desktop.toggle_desktop_icons();
         assert_ne!(mint_desktop.desktop_settings.show_desktop_icons, initial);
     }
@@ -325,7 +387,7 @@ mod tests {
     fn test_set_font_size() {
         let mut mint_desktop = MintDesktop::new();
         mint_desktop.set_font_size(14);
-        
+
         assert_eq!(mint_desktop.desktop_settings.font_size, 14);
     }
 
@@ -333,7 +395,7 @@ mod tests {
     fn test_set_theme() {
         let mut mint_desktop = MintDesktop::new();
         let result = mint_desktop.set_theme("Adwaita");
-        
+
         assert!(result.is_ok());
         assert_eq!(mint_desktop.theme_settings.current_theme, "Adwaita");
     }
@@ -342,7 +404,7 @@ mod tests {
     fn test_set_invalid_theme() {
         let mut mint_desktop = MintDesktop::new();
         let result = mint_desktop.set_theme("InvalidTheme");
-        
+
         assert!(result.is_err());
     }
 
@@ -351,7 +413,7 @@ mod tests {
         let mut mint_desktop = MintDesktop::new();
         mint_desktop.set_font_size(20);
         mint_desktop.set_workspace_count(8);
-        
+
         mint_desktop.reset_to_defaults();
         assert_eq!(mint_desktop.desktop_settings.font_size, 12);
         assert_eq!(mint_desktop.desktop_settings.workspace_count, 4);
@@ -361,7 +423,7 @@ mod tests {
     fn test_display_settings() {
         let mint_desktop = MintDesktop::new();
         let output = mint_desktop.display_desktop_settings();
-        
+
         assert!(output.contains("Desktop Settings"));
         assert!(output.contains("Window Manager"));
     }

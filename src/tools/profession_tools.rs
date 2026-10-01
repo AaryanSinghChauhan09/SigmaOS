@@ -31,7 +31,11 @@ impl BmiCalculator {
 pub struct DosageCalculator;
 
 impl DosageCalculator {
-    pub fn calculate_dose(weight_kg: f64, dose_mg_per_kg: f64, concentration_mg_per_ml: f64) -> Result<(f64, f64), &'static str> {
+    pub fn calculate_dose(
+        weight_kg: f64,
+        dose_mg_per_kg: f64,
+        concentration_mg_per_ml: f64,
+    ) -> Result<(f64, f64), &'static str> {
         if weight_kg <= 0.0 || dose_mg_per_kg <= 0.0 || concentration_mg_per_ml <= 0.0 {
             return Err("All parameters must be positive");
         }
@@ -58,7 +62,12 @@ impl MeanArterialPressureCalc {
 pub struct GlomerularFiltrationRateCalc;
 
 impl GlomerularFiltrationRateCalc {
-    pub fn cockcroft_gault(age_years: f64, weight_kg: f64, serum_creatinine_mg_dl: f64, is_female: bool) -> Result<f64, &'static str> {
+    pub fn cockcroft_gault(
+        age_years: f64,
+        weight_kg: f64,
+        serum_creatinine_mg_dl: f64,
+        is_female: bool,
+    ) -> Result<f64, &'static str> {
         if age_years <= 0.0 || weight_kg <= 0.0 || serum_creatinine_mg_dl <= 0.0 {
             return Err("Invalid parameters for eGFR calculation");
         }
@@ -74,7 +83,13 @@ impl GlomerularFiltrationRateCalc {
 pub struct ApgarScoreCalculator;
 
 impl ApgarScoreCalculator {
-    pub fn calculate(appearance: u8, pulse: u8, grimace: u8, activity: u8, respiration: u8) -> Result<(u8, &'static str), &'static str> {
+    pub fn calculate(
+        appearance: u8,
+        pulse: u8,
+        grimace: u8,
+        activity: u8,
+        respiration: u8,
+    ) -> Result<(u8, &'static str), &'static str> {
         if appearance > 2 || pulse > 2 || grimace > 2 || activity > 2 || respiration > 2 {
             return Err("Each APGAR parameter score must be between 0 and 2");
         }
@@ -98,7 +113,12 @@ impl ApgarScoreCalculator {
 pub struct ConcreteVolumeCalc;
 
 impl ConcreteVolumeCalc {
-    pub fn calculate(length_m: f64, width_m: f64, depth_m: f64, bag_size_kg: f64) -> Result<(f64, usize), &'static str> {
+    pub fn calculate(
+        length_m: f64,
+        width_m: f64,
+        depth_m: f64,
+        bag_size_kg: f64,
+    ) -> Result<(f64, usize), &'static str> {
         if length_m <= 0.0 || width_m <= 0.0 || depth_m <= 0.0 || bag_size_kg <= 0.0 {
             return Err("Dimensions and bag size must be positive");
         }
@@ -114,11 +134,17 @@ impl ConcreteVolumeCalc {
 pub struct BeamDeflectionCalc;
 
 impl BeamDeflectionCalc {
-    pub fn calculate_simply_supported(load_n_per_m: f64, length_m: f64, elasticity_pa: f64, inertia_m4: f64) -> Result<f64, &'static str> {
+    pub fn calculate_simply_supported(
+        load_n_per_m: f64,
+        length_m: f64,
+        elasticity_pa: f64,
+        inertia_m4: f64,
+    ) -> Result<f64, &'static str> {
         if length_m <= 0.0 || elasticity_pa <= 0.0 || inertia_m4 <= 0.0 {
             return Err("Length, Modulus of Elasticity, and Moment of Inertia must be positive");
         }
-        let max_deflection = (5.0 * load_n_per_m * length_m.powi(4)) / (384.0 * elasticity_pa * inertia_m4);
+        let max_deflection =
+            (5.0 * load_n_per_m * length_m.powi(4)) / (384.0 * elasticity_pa * inertia_m4);
         Ok(max_deflection)
     }
 }
@@ -127,7 +153,11 @@ impl BeamDeflectionCalc {
 pub struct RetainingWallStabilityCalc;
 
 impl RetainingWallStabilityCalc {
-    pub fn sliding_factor_of_safety(wall_weight_kn: f64, friction_coeff: f64, lateral_thrust_kn: f64) -> Result<(f64, bool), &'static str> {
+    pub fn sliding_factor_of_safety(
+        wall_weight_kn: f64,
+        friction_coeff: f64,
+        lateral_thrust_kn: f64,
+    ) -> Result<(f64, bool), &'static str> {
         if lateral_thrust_kn <= 0.0 || wall_weight_kn <= 0.0 || friction_coeff <= 0.0 {
             return Err("Forces and friction coefficient must be positive");
         }
@@ -142,7 +172,11 @@ impl RetainingWallStabilityCalc {
 pub struct AsphaltQuantityCalc;
 
 impl AsphaltQuantityCalc {
-    pub fn calculate_tonnage(length_m: f64, width_m: f64, thickness_mm: f64) -> Result<f64, &'static str> {
+    pub fn calculate_tonnage(
+        length_m: f64,
+        width_m: f64,
+        thickness_mm: f64,
+    ) -> Result<f64, &'static str> {
         if length_m <= 0.0 || width_m <= 0.0 || thickness_mm <= 0.0 {
             return Err("Dimensions must be positive");
         }
@@ -179,7 +213,9 @@ impl CronExpressionParser {
     pub fn describe(expression: &str) -> Result<String, &'static str> {
         let parts: Vec<&str> = expression.split_whitespace().collect();
         if parts.len() != 5 {
-            return Err("Cron expression must consist of exactly 5 fields (min hour dom month dow)");
+            return Err(
+                "Cron expression must consist of exactly 5 fields (min hour dom month dow)",
+            );
         }
         Ok(format!("Cron job scheduled with fields - Min: {}, Hour: {}, DayOfMonth: {}, Month: {}, DayOfWeek: {}", parts[0], parts[1], parts[2], parts[3], parts[4]))
     }
@@ -217,8 +253,16 @@ impl Base64ConverterTool {
         let mut i = 0;
         while i < data.len() {
             let b0 = data[i] as usize;
-            let b1 = if i + 1 < data.len() { data[i + 1] as usize } else { 0 };
-            let b2 = if i + 2 < data.len() { data[i + 2] as usize } else { 0 };
+            let b1 = if i + 1 < data.len() {
+                data[i + 1] as usize
+            } else {
+                0
+            };
+            let b2 = if i + 2 < data.len() {
+                data[i + 2] as usize
+            } else {
+                0
+            };
 
             let c0 = b0 >> 2;
             let c1 = ((b0 & 3) << 4) | (b1 >> 4);
@@ -227,8 +271,16 @@ impl Base64ConverterTool {
 
             out.push(CHARS[c0] as char);
             out.push(CHARS[c1] as char);
-            if i + 1 < data.len() { out.push(CHARS[c2] as char); } else { out.push('='); }
-            if i + 2 < data.len() { out.push(CHARS[c3] as char); } else { out.push('='); }
+            if i + 1 < data.len() {
+                out.push(CHARS[c2] as char);
+            } else {
+                out.push('=');
+            }
+            if i + 2 < data.len() {
+                out.push(CHARS[c3] as char);
+            } else {
+                out.push('=');
+            }
             i += 3;
         }
         out
@@ -245,9 +297,15 @@ impl SemverValidator {
         if parts.len() != 3 {
             return Err("Semver string must be in format MAJOR.MINOR.PATCH");
         }
-        let major = parts[0].parse::<u64>().map_err(|_| "Invalid major version")?;
-        let minor = parts[1].parse::<u64>().map_err(|_| "Invalid minor version")?;
-        let patch = parts[2].parse::<u64>().map_err(|_| "Invalid patch version")?;
+        let major = parts[0]
+            .parse::<u64>()
+            .map_err(|_| "Invalid major version")?;
+        let minor = parts[1]
+            .parse::<u64>()
+            .map_err(|_| "Invalid minor version")?;
+        let patch = parts[2]
+            .parse::<u64>()
+            .map_err(|_| "Invalid patch version")?;
         Ok((major, minor, patch))
     }
 }
@@ -288,7 +346,10 @@ impl ParsecToLightYearConverter {
 pub struct TelescopeMagnificationCalc;
 
 impl TelescopeMagnificationCalc {
-    pub fn calculate(objective_focal_length_mm: f64, eyepiece_focal_length_mm: f64) -> Result<f64, &'static str> {
+    pub fn calculate(
+        objective_focal_length_mm: f64,
+        eyepiece_focal_length_mm: f64,
+    ) -> Result<f64, &'static str> {
         if objective_focal_length_mm <= 0.0 || eyepiece_focal_length_mm <= 0.0 {
             return Err("Focal lengths must be positive");
         }
@@ -332,7 +393,12 @@ impl RedshiftVelocityCalc {
 pub struct CompoundInterestCalc;
 
 impl CompoundInterestCalc {
-    pub fn future_value(principal: f64, annual_rate_pct: f64, compounds_per_year: u32, years: f64) -> Result<f64, &'static str> {
+    pub fn future_value(
+        principal: f64,
+        annual_rate_pct: f64,
+        compounds_per_year: u32,
+        years: f64,
+    ) -> Result<f64, &'static str> {
         if principal < 0.0 || compounds_per_year == 0 || years < 0.0 {
             return Err("Invalid compound interest parameters");
         }
@@ -347,7 +413,11 @@ impl CompoundInterestCalc {
 pub struct AmortizationScheduleCalc;
 
 impl AmortizationScheduleCalc {
-    pub fn monthly_payment(principal: f64, annual_interest_rate_pct: f64, term_years: u32) -> Result<f64, &'static str> {
+    pub fn monthly_payment(
+        principal: f64,
+        annual_interest_rate_pct: f64,
+        term_years: u32,
+    ) -> Result<f64, &'static str> {
         if principal <= 0.0 || term_years == 0 {
             return Err("Principal and term must be positive");
         }
@@ -366,7 +436,11 @@ impl AmortizationScheduleCalc {
 pub struct BreakEvenAnalyzer;
 
 impl BreakEvenAnalyzer {
-    pub fn calculate_units(fixed_costs: f64, price_per_unit: f64, variable_cost_per_unit: f64) -> Result<(f64, f64), &'static str> {
+    pub fn calculate_units(
+        fixed_costs: f64,
+        price_per_unit: f64,
+        variable_cost_per_unit: f64,
+    ) -> Result<(f64, f64), &'static str> {
         if price_per_unit <= variable_cost_per_unit {
             return Err("Price per unit must be strictly greater than variable cost per unit");
         }
@@ -380,7 +454,11 @@ impl BreakEvenAnalyzer {
 pub struct PresentValueCalc;
 
 impl PresentValueCalc {
-    pub fn calculate(future_value: f64, discount_rate_pct: f64, years: f64) -> Result<f64, &'static str> {
+    pub fn calculate(
+        future_value: f64,
+        discount_rate_pct: f64,
+        years: f64,
+    ) -> Result<f64, &'static str> {
         if years < 0.0 {
             return Err("Years must be non-negative");
         }
@@ -422,8 +500,18 @@ impl StatuteOfLimitationsCalc {
 pub struct LegalCitationFormatter;
 
 impl LegalCitationFormatter {
-    pub fn format_us_case(plaintiff: &str, defendant: &str, volume: u32, reporter: &str, page: u32, year: u32) -> String {
-        format!("{} v. {}, {} {} {} ({})", plaintiff, defendant, volume, reporter, page, year)
+    pub fn format_us_case(
+        plaintiff: &str,
+        defendant: &str,
+        volume: u32,
+        reporter: &str,
+        page: u32,
+        year: u32,
+    ) -> String {
+        format!(
+            "{} v. {}, {} {} {} ({})",
+            plaintiff, defendant, volume, reporter, page, year
+        )
     }
 }
 
@@ -431,7 +519,11 @@ impl LegalCitationFormatter {
 pub struct ContractInterestCalc;
 
 impl ContractInterestCalc {
-    pub fn calculate_interest(principal_amount: f64, statutory_rate_pct: f64, days_overdue: u32) -> f64 {
+    pub fn calculate_interest(
+        principal_amount: f64,
+        statutory_rate_pct: f64,
+        days_overdue: u32,
+    ) -> f64 {
         let daily_rate = (statutory_rate_pct / 100.0) / 365.0;
         principal_amount * daily_rate * (days_overdue as f64)
     }
@@ -441,7 +533,11 @@ impl ContractInterestCalc {
 pub struct ChildSupportCalc;
 
 impl ChildSupportCalc {
-    pub fn estimate_monthly_obligation(combined_monthly_income: f64, obligor_income_share_pct: f64, num_children: u32) -> Result<f64, &'static str> {
+    pub fn estimate_monthly_obligation(
+        combined_monthly_income: f64,
+        obligor_income_share_pct: f64,
+        num_children: u32,
+    ) -> Result<f64, &'static str> {
         if combined_monthly_income <= 0.0 || num_children == 0 {
             return Err("Income and number of children must be positive");
         }
@@ -608,7 +704,11 @@ pub struct ContrastRatioChecker;
 
 impl ContrastRatioChecker {
     pub fn contrast_ratio(lum1: f64, lum2: f64) -> f64 {
-        let (l1, l2) = if lum1 > lum2 { (lum1, lum2) } else { (lum2, lum1) };
+        let (l1, l2) = if lum1 > lum2 {
+            (lum1, lum2)
+        } else {
+            (lum2, lum1)
+        };
         (l1 + 0.05) / (l2 + 0.05)
     }
 }
@@ -621,7 +721,10 @@ impl ContrastRatioChecker {
 pub struct FertilizerNpkCalc;
 
 impl FertilizerNpkCalc {
-    pub fn fertilizer_amount_kg(target_element_kg: f64, grade_percentage: f64) -> Result<f64, &'static str> {
+    pub fn fertilizer_amount_kg(
+        target_element_kg: f64,
+        grade_percentage: f64,
+    ) -> Result<f64, &'static str> {
         if grade_percentage <= 0.0 {
             return Err("Grade percentage must be positive");
         }
@@ -653,7 +756,11 @@ impl IrrigationRequirementCalc {
 pub struct SeedingRateCalc;
 
 impl SeedingRateCalc {
-    pub fn seeds_per_hectare(target_plants_per_ha: f64, germination_rate_pct: f64, purity_pct: f64) -> Result<f64, &'static str> {
+    pub fn seeds_per_hectare(
+        target_plants_per_ha: f64,
+        germination_rate_pct: f64,
+        purity_pct: f64,
+    ) -> Result<f64, &'static str> {
         if germination_rate_pct <= 0.0 || purity_pct <= 0.0 {
             return Err("Germination and purity rates must be positive");
         }
@@ -666,14 +773,20 @@ impl SeedingRateCalc {
 pub struct LivestockFeedRatioCalc;
 
 impl LivestockFeedRatioCalc {
-    pub fn pearson_square_parts(protein_feed1_pct: f64, protein_feed2_pct: f64, target_protein_pct: f64) -> Result<(f64, f64), &'static str> {
+    pub fn pearson_square_parts(
+        protein_feed1_pct: f64,
+        protein_feed2_pct: f64,
+        target_protein_pct: f64,
+    ) -> Result<(f64, f64), &'static str> {
         let (high, low) = if protein_feed1_pct > protein_feed2_pct {
             (protein_feed1_pct, protein_feed2_pct)
         } else {
             (protein_feed2_pct, protein_feed1_pct)
         };
         if target_protein_pct < low || target_protein_pct > high {
-            return Err("Target protein percentage must be between feed 1 and feed 2 protein percentages");
+            return Err(
+                "Target protein percentage must be between feed 1 and feed 2 protein percentages",
+            );
         }
         let parts_high = target_protein_pct - low;
         let parts_low = high - target_protein_pct;
@@ -725,7 +838,11 @@ impl PhCalculator {
 pub struct IdealGasLawCalc;
 
 impl IdealGasLawCalc {
-    pub fn calculate_pressure_pa(moles: f64, temp_kelvin: f64, volume_m3: f64) -> Result<f64, &'static str> {
+    pub fn calculate_pressure_pa(
+        moles: f64,
+        temp_kelvin: f64,
+        volume_m3: f64,
+    ) -> Result<f64, &'static str> {
         if volume_m3 <= 0.0 || temp_kelvin <= 0.0 || moles <= 0.0 {
             return Err("Moles, temperature, and volume must be positive");
         }
@@ -739,7 +856,11 @@ impl IdealGasLawCalc {
 pub struct ReactionStoichiometryCalc;
 
 impl ReactionStoichiometryCalc {
-    pub fn calculate_product_mass(mass_reactant_g: f64, molar_mass_reactant: f64, molar_mass_product: f64) -> Result<f64, &'static str> {
+    pub fn calculate_product_mass(
+        mass_reactant_g: f64,
+        molar_mass_reactant: f64,
+        molar_mass_product: f64,
+    ) -> Result<f64, &'static str> {
         if molar_mass_reactant <= 0.0 || molar_mass_product <= 0.0 {
             return Err("Molar masses must be positive");
         }
@@ -765,7 +886,11 @@ impl KineticEnergyCalc {
 pub struct HalfLifeDecayCalc;
 
 impl HalfLifeDecayCalc {
-    pub fn remaining_mass(initial_mass: f64, half_life_years: f64, elapsed_years: f64) -> Result<f64, &'static str> {
+    pub fn remaining_mass(
+        initial_mass: f64,
+        half_life_years: f64,
+        elapsed_years: f64,
+    ) -> Result<f64, &'static str> {
         if half_life_years <= 0.0 || initial_mass < 0.0 {
             return Err("Half life must be positive and initial mass non-negative");
         }
@@ -824,7 +949,11 @@ impl OhmLawCalc {
 pub struct GearRatioCalc;
 
 impl GearRatioCalc {
-    pub fn calculate(driver_teeth: u32, driven_teeth: u32, input_rpm: f64) -> Result<(f64, f64), &'static str> {
+    pub fn calculate(
+        driver_teeth: u32,
+        driven_teeth: u32,
+        input_rpm: f64,
+    ) -> Result<(f64, f64), &'static str> {
         if driver_teeth == 0 || driven_teeth == 0 {
             return Err("Teeth counts must be non-zero");
         }
@@ -937,7 +1066,11 @@ impl CrosswindComponentCalc {
 pub struct FuelBurnFlightPlanner;
 
 impl FuelBurnFlightPlanner {
-    pub fn calculate_total_fuel_gallons(flight_hours: f64, burn_rate_gph: f64, reserve_hours: f64) -> Result<f64, &'static str> {
+    pub fn calculate_total_fuel_gallons(
+        flight_hours: f64,
+        burn_rate_gph: f64,
+        reserve_hours: f64,
+    ) -> Result<f64, &'static str> {
         if flight_hours < 0.0 || burn_rate_gph <= 0.0 || reserve_hours < 0.0 {
             return Err("Invalid flight parameters");
         }
@@ -953,11 +1086,17 @@ impl FuelBurnFlightPlanner {
 pub struct FleschKincaidReadabilityCalc;
 
 impl FleschKincaidReadabilityCalc {
-    pub fn reading_ease(total_words: usize, total_sentences: usize, total_syllables: usize) -> Result<f64, &'static str> {
+    pub fn reading_ease(
+        total_words: usize,
+        total_sentences: usize,
+        total_syllables: usize,
+    ) -> Result<f64, &'static str> {
         if total_words == 0 || total_sentences == 0 {
             return Err("Word and sentence counts must be non-zero");
         }
-        let score = 206.835 - 1.015 * (total_words as f64 / total_sentences as f64) - 84.6 * (total_syllables as f64 / total_words as f64);
+        let score = 206.835
+            - 1.015 * (total_words as f64 / total_sentences as f64)
+            - 84.6 * (total_syllables as f64 / total_words as f64);
         Ok(score)
     }
 }
@@ -985,7 +1124,9 @@ impl HeadlineCapitalizer {
                 let mut c = word.chars();
                 match c.next() {
                     None => String::new(),
-                    Some(f) => f.to_uppercase().collect::<String>() + c.as_str().to_lowercase().as_str(),
+                    Some(f) => {
+                        f.to_uppercase().collect::<String>() + c.as_str().to_lowercase().as_str()
+                    }
                 }
             })
             .collect::<Vec<String>>()
@@ -1014,7 +1155,13 @@ pub struct PressReleaseFormatter;
 
 impl PressReleaseFormatter {
     pub fn format(city: &str, date: &str, title: &str, body: &str) -> String {
-        format!("FOR IMMEDIATE RELEASE\n\n{}\n\n{}, {} -- {}", title.to_uppercase(), city, date, body)
+        format!(
+            "FOR IMMEDIATE RELEASE\n\n{}\n\n{}, {} -- {}",
+            title.to_uppercase(),
+            city,
+            date,
+            body
+        )
     }
 }
 
@@ -1048,11 +1195,17 @@ pub struct TestGradingScaleCalc;
 
 impl TestGradingScaleCalc {
     pub fn percentage_to_letter(score_pct: f64) -> &'static str {
-        if score_pct >= 90.0 { "A" }
-        else if score_pct >= 80.0 { "B" }
-        else if score_pct >= 70.0 { "C" }
-        else if score_pct >= 60.0 { "D" }
-        else { "F" }
+        if score_pct >= 90.0 {
+            "A"
+        } else if score_pct >= 80.0 {
+            "B"
+        } else if score_pct >= 70.0 {
+            "C"
+        } else if score_pct >= 60.0 {
+            "D"
+        } else {
+            "F"
+        }
     }
 }
 
@@ -1060,7 +1213,10 @@ impl TestGradingScaleCalc {
 pub struct ClassroomAttendanceTracker;
 
 impl ClassroomAttendanceTracker {
-    pub fn attendance_percentage(classes_attended: usize, total_classes: usize) -> Result<f64, &'static str> {
+    pub fn attendance_percentage(
+        classes_attended: usize,
+        total_classes: usize,
+    ) -> Result<f64, &'static str> {
         if total_classes == 0 {
             return Err("Total classes cannot be zero");
         }
@@ -1090,7 +1246,8 @@ impl LessonPlanTimeAllocator {
         let intro = (total_duration_mins as f64 * 0.15).round() as u32;
         let direct_instruction = (total_duration_mins as f64 * 0.35).round() as u32;
         let guided_practice = (total_duration_mins as f64 * 0.35).round() as u32;
-        let assessment = total_duration_mins.saturating_sub(intro + direct_instruction + guided_practice);
+        let assessment =
+            total_duration_mins.saturating_sub(intro + direct_instruction + guided_practice);
         (intro, direct_instruction, guided_practice, assessment)
     }
 }
@@ -1103,7 +1260,11 @@ impl LessonPlanTimeAllocator {
 pub struct EconomicOrderQuantityCalc;
 
 impl EconomicOrderQuantityCalc {
-    pub fn calculate(annual_demand: f64, order_cost: f64, holding_cost_per_unit: f64) -> Result<f64, &'static str> {
+    pub fn calculate(
+        annual_demand: f64,
+        order_cost: f64,
+        holding_cost_per_unit: f64,
+    ) -> Result<f64, &'static str> {
         if holding_cost_per_unit <= 0.0 || annual_demand <= 0.0 || order_cost <= 0.0 {
             return Err("Costs and demand must be positive");
         }
@@ -1115,7 +1276,12 @@ impl EconomicOrderQuantityCalc {
 pub struct FreightDimensionalWeightCalc;
 
 impl FreightDimensionalWeightCalc {
-    pub fn dimensional_weight_kg(length_cm: f64, width_cm: f64, height_cm: f64, dim_divisor: f64) -> Result<f64, &'static str> {
+    pub fn dimensional_weight_kg(
+        length_cm: f64,
+        width_cm: f64,
+        height_cm: f64,
+        dim_divisor: f64,
+    ) -> Result<f64, &'static str> {
         if dim_divisor <= 0.0 {
             return Err("Divisor must be positive");
         }
@@ -1127,7 +1293,12 @@ impl FreightDimensionalWeightCalc {
 pub struct SafetyStockCalc;
 
 impl SafetyStockCalc {
-    pub fn calculate(max_daily_usage: f64, avg_daily_usage: f64, max_lead_time_days: f64, avg_lead_time_days: f64) -> f64 {
+    pub fn calculate(
+        max_daily_usage: f64,
+        avg_daily_usage: f64,
+        max_lead_time_days: f64,
+        avg_lead_time_days: f64,
+    ) -> f64 {
         (max_daily_usage * max_lead_time_days) - (avg_daily_usage * avg_lead_time_days)
     }
 }
@@ -1136,7 +1307,14 @@ impl SafetyStockCalc {
 pub struct ContainerLoadingOptimizer;
 
 impl ContainerLoadingOptimizer {
-    pub fn max_boxes_fit(container_l: u32, container_w: u32, container_h: u32, box_l: u32, box_w: u32, box_h: u32) -> Result<u32, &'static str> {
+    pub fn max_boxes_fit(
+        container_l: u32,
+        container_w: u32,
+        container_h: u32,
+        box_l: u32,
+        box_w: u32,
+        box_h: u32,
+    ) -> Result<u32, &'static str> {
         if box_l == 0 || box_w == 0 || box_h == 0 {
             return Err("Box dimensions must be non-zero");
         }
@@ -1151,7 +1329,11 @@ impl ContainerLoadingOptimizer {
 pub struct RouteDistanceFuelCostCalc;
 
 impl RouteDistanceFuelCostCalc {
-    pub fn estimate_cost(distance_miles: f64, mpg: f64, price_per_gallon: f64) -> Result<f64, &'static str> {
+    pub fn estimate_cost(
+        distance_miles: f64,
+        mpg: f64,
+        price_per_gallon: f64,
+    ) -> Result<f64, &'static str> {
         if mpg <= 0.0 {
             return Err("MPG must be positive");
         }
@@ -1282,7 +1464,11 @@ impl RoomDaylightFactorCalc {
 pub struct PaintCoverageCalc;
 
 impl PaintCoverageCalc {
-    pub fn liters_needed(wall_area_m2: f64, coats: u32, coverage_m2_per_liter: f64) -> Result<f64, &'static str> {
+    pub fn liters_needed(
+        wall_area_m2: f64,
+        coats: u32,
+        coverage_m2_per_liter: f64,
+    ) -> Result<f64, &'static str> {
         if coverage_m2_per_liter <= 0.0 || coats == 0 {
             return Err("Coverage per liter and coat count must be positive");
         }
@@ -1294,7 +1480,11 @@ impl PaintCoverageCalc {
 pub struct FlooringTileCalculator;
 
 impl FlooringTileCalculator {
-    pub fn tiles_needed(room_area_sq_m: f64, tile_area_sq_m: f64, waste_pct: f64) -> Result<usize, &'static str> {
+    pub fn tiles_needed(
+        room_area_sq_m: f64,
+        tile_area_sq_m: f64,
+        waste_pct: f64,
+    ) -> Result<usize, &'static str> {
         if tile_area_sq_m <= 0.0 {
             return Err("Tile area must be positive");
         }
@@ -1350,7 +1540,11 @@ impl PropellerPitchSpeedCalc {
 pub struct AnchorRodeLengthCalc;
 
 impl AnchorRodeLengthCalc {
-    pub fn calculate_rode_length_m(water_depth_m: f64, bow_height_m: f64, scope_ratio: f64) -> Result<f64, &'static str> {
+    pub fn calculate_rode_length_m(
+        water_depth_m: f64,
+        bow_height_m: f64,
+        scope_ratio: f64,
+    ) -> Result<f64, &'static str> {
         if scope_ratio <= 0.0 {
             return Err("Scope ratio must be positive");
         }
@@ -1363,7 +1557,11 @@ impl AnchorRodeLengthCalc {
 pub struct FuelConsumptionKnotsCalc;
 
 impl FuelConsumptionKnotsCalc {
-    pub fn estimate_daily_fuel_tons(displacement_tonnes: f64, speed_knots: f64, admiralty_coeff: f64) -> Result<f64, &'static str> {
+    pub fn estimate_daily_fuel_tons(
+        displacement_tonnes: f64,
+        speed_knots: f64,
+        admiralty_coeff: f64,
+    ) -> Result<f64, &'static str> {
         if admiralty_coeff <= 0.0 {
             return Err("Admiralty coefficient must be positive");
         }
@@ -1432,7 +1630,10 @@ impl BarometricPressureAltitudeCalc {
 pub struct RelativeHumidityCalc;
 
 impl RelativeHumidityCalc {
-    pub fn estimate_from_psychrometer(dry_bulb_c: f64, wet_bulb_c: f64) -> Result<f64, &'static str> {
+    pub fn estimate_from_psychrometer(
+        dry_bulb_c: f64,
+        wet_bulb_c: f64,
+    ) -> Result<f64, &'static str> {
         if wet_bulb_c > dry_bulb_c {
             return Err("Wet bulb temperature cannot exceed dry bulb temperature");
         }
@@ -1459,9 +1660,14 @@ mod tests {
     fn test_healthcare_tools() {
         assert!(BmiCalculator::calculate(70.0, 1.75).is_ok());
         assert!(DosageCalculator::calculate_dose(20.0, 5.0, 10.0).is_ok());
-        assert!((MeanArterialPressureCalc::calculate(120.0, 80.0).unwrap() - 93.3333333).abs() < 1e-4);
+        assert!(
+            (MeanArterialPressureCalc::calculate(120.0, 80.0).unwrap() - 93.3333333).abs() < 1e-4
+        );
         assert!(GlomerularFiltrationRateCalc::cockcroft_gault(50.0, 70.0, 1.0, false).is_ok());
-        assert_eq!(ApgarScoreCalculator::calculate(2, 2, 2, 2, 2).unwrap().0, 10);
+        assert_eq!(
+            ApgarScoreCalculator::calculate(2, 2, 2, 2, 2).unwrap().0,
+            10
+        );
     }
 
     #[test]
@@ -1485,8 +1691,14 @@ mod tests {
     #[test]
     fn test_astronomy_tools() {
         assert!(SchwarzschildRadiusCalc::calculate(1.989e30).is_ok()); // Sun mass
-        assert_eq!(ParsecToLightYearConverter::parsec_to_light_years(1.0), 3.26156);
-        assert_eq!(TelescopeMagnificationCalc::calculate(1000.0, 10.0).unwrap(), 100.0);
+        assert_eq!(
+            ParsecToLightYearConverter::parsec_to_light_years(1.0),
+            3.26156
+        );
+        assert_eq!(
+            TelescopeMagnificationCalc::calculate(1000.0, 10.0).unwrap(),
+            100.0
+        );
         assert_eq!(KeplerThirdLawCalc::orbital_period_years(1.0).unwrap(), 1.0);
         assert!(RedshiftVelocityCalc::recession_velocity_km_s(0.1).is_ok());
     }
@@ -1495,15 +1707,26 @@ mod tests {
     fn test_finance_tools() {
         assert!(CompoundInterestCalc::future_value(1000.0, 5.0, 12, 10.0).is_ok());
         assert!(AmortizationScheduleCalc::monthly_payment(200000.0, 4.5, 30).is_ok());
-        assert_eq!(BreakEvenAnalyzer::calculate_units(10000.0, 50.0, 30.0).unwrap().0, 500.0);
+        assert_eq!(
+            BreakEvenAnalyzer::calculate_units(10000.0, 50.0, 30.0)
+                .unwrap()
+                .0,
+            500.0
+        );
         assert!(PresentValueCalc::calculate(1000.0, 5.0, 5.0).is_ok());
         assert_eq!(TaxWithholdingCalc::calculate_simple_tax(10000.0), 1000.0);
     }
 
     #[test]
     fn test_legal_tools() {
-        assert_eq!(StatuteOfLimitationsCalc::calculate_expiration_year(2020, 3), 2023);
-        assert!(LegalCitationFormatter::format_us_case("Roe", "Wade", 410, "U.S.", 113, 1973).contains("Roe v. Wade"));
+        assert_eq!(
+            StatuteOfLimitationsCalc::calculate_expiration_year(2020, 3),
+            2023
+        );
+        assert!(
+            LegalCitationFormatter::format_us_case("Roe", "Wade", 410, "U.S.", 113, 1973)
+                .contains("Roe v. Wade")
+        );
         assert!(ContractInterestCalc::calculate_interest(10000.0, 6.0, 30) > 0.0);
         assert!(ChildSupportCalc::estimate_monthly_obligation(5000.0, 60.0, 2).is_ok());
         assert!(CourtDeadlineCalc::add_business_days(1, 5) > 1);
@@ -1512,18 +1735,39 @@ mod tests {
     #[test]
     fn test_audio_tools() {
         assert!(DbSPLToPressureConverter::spl_to_pascals(94.0) > 0.0);
-        assert_eq!(DelayTimeBpmCalc::quarter_note_delay_ms(120.0).unwrap(), 500.0);
-        assert_eq!(SampleRateNyquistCalc::nyquist_frequency_hz(44100.0).unwrap(), 22050.0);
-        assert_eq!(SpeakerImpedanceCalc::parallel_impedance(&[8.0, 8.0]).unwrap(), 4.0);
-        assert_eq!(AudioFrequenciesToNoteCalc::freq_to_midi_note(440.0).unwrap(), 69);
+        assert_eq!(
+            DelayTimeBpmCalc::quarter_note_delay_ms(120.0).unwrap(),
+            500.0
+        );
+        assert_eq!(
+            SampleRateNyquistCalc::nyquist_frequency_hz(44100.0).unwrap(),
+            22050.0
+        );
+        assert_eq!(
+            SpeakerImpedanceCalc::parallel_impedance(&[8.0, 8.0]).unwrap(),
+            4.0
+        );
+        assert_eq!(
+            AudioFrequenciesToNoteCalc::freq_to_midi_note(440.0).unwrap(),
+            69
+        );
     }
 
     #[test]
     fn test_graphic_design_tools() {
-        assert_eq!(ColorHexRgbConverter::hex_to_rgb("#FF0000").unwrap(), (255, 0, 0));
+        assert_eq!(
+            ColorHexRgbConverter::hex_to_rgb("#FF0000").unwrap(),
+            (255, 0, 0)
+        );
         assert!(GoldenRatioGridCalc::split_length(100.0).is_ok());
-        assert_eq!(AspectRatioCalc::calculate_height(1920, 16, 9).unwrap(), 1080);
-        assert_eq!(PrintDpiResCalc::required_pixels(8.5, 11.0, 300), (2550, 3300));
+        assert_eq!(
+            AspectRatioCalc::calculate_height(1920, 16, 9).unwrap(),
+            1080
+        );
+        assert_eq!(
+            PrintDpiResCalc::required_pixels(8.5, 11.0, 300),
+            (2550, 3300)
+        );
         assert!(ContrastRatioChecker::contrast_ratio(1.0, 0.0) > 1.0);
     }
 
@@ -1532,7 +1776,10 @@ mod tests {
         let amt = FertilizerNpkCalc::fertilizer_amount_kg(50.0, 46.0).unwrap();
         assert!((amt - 108.695652).abs() < 1e-4);
         assert!(CropYieldEstimator::estimate_bushels_per_acre(30000.0, 500.0) > 0.0);
-        assert_eq!(IrrigationRequirementCalc::water_volume_liters(100.0, 5.0), 500.0);
+        assert_eq!(
+            IrrigationRequirementCalc::water_volume_liters(100.0, 5.0),
+            500.0
+        );
         assert!(SeedingRateCalc::seeds_per_hectare(100000.0, 90.0, 95.0).is_ok());
         assert!(LivestockFeedRatioCalc::pearson_square_parts(44.0, 10.0, 16.0).is_ok());
     }
@@ -1540,7 +1787,10 @@ mod tests {
     #[test]
     fn test_chemistry_tools() {
         assert!(MolarMassCalc::simple_water_molar_mass() > 18.0);
-        assert_eq!(SolutionDilutionCalc::calculate_initial_volume(10.0, 1.0, 100.0).unwrap(), 10.0);
+        assert_eq!(
+            SolutionDilutionCalc::calculate_initial_volume(10.0, 1.0, 100.0).unwrap(),
+            10.0
+        );
         assert_eq!(PhCalculator::calculate_ph(1e-7).unwrap(), 7.0);
         assert!(IdealGasLawCalc::calculate_pressure_pa(1.0, 298.15, 0.024).is_ok());
         assert!(ReactionStoichiometryCalc::calculate_product_mass(18.0, 18.0, 44.0).is_ok());
@@ -1549,7 +1799,10 @@ mod tests {
     #[test]
     fn test_physics_tools() {
         assert_eq!(KineticEnergyCalc::calculate_joules(2.0, 3.0), 9.0);
-        assert_eq!(HalfLifeDecayCalc::remaining_mass(100.0, 5.0, 5.0).unwrap(), 50.0);
+        assert_eq!(
+            HalfLifeDecayCalc::remaining_mass(100.0, 5.0, 5.0).unwrap(),
+            50.0
+        );
         assert!(PhotonEnergyCalc::energy_from_wavelength_nm(500.0).is_ok());
         assert!(RelativisticTimeDilationCalc::dilated_time(10.0, 1000.0).is_ok());
         assert_eq!(OhmLawCalc::voltage(2.0, 5.0), 10.0);
@@ -1569,43 +1822,84 @@ mod tests {
     fn test_aerospace_tools() {
         assert!(MachNumberCalc::mach_number(340.0, 288.15).is_ok());
         assert_eq!(DensityAltitudeCalc::estimate_feet(5000.0, 10.0), 6200.0);
-        assert_eq!(AircraftCenterOfGravityCalc::center_of_gravity_arm(&[(100.0, 10.0), (100.0, 20.0)]).unwrap(), 15.0);
+        assert_eq!(
+            AircraftCenterOfGravityCalc::center_of_gravity_arm(&[(100.0, 10.0), (100.0, 20.0)])
+                .unwrap(),
+            15.0
+        );
         assert!(CrosswindComponentCalc::calculate(20.0, 30.0).0 > 0.0);
-        assert_eq!(FuelBurnFlightPlanner::calculate_total_fuel_gallons(2.0, 10.0, 0.5).unwrap(), 25.0);
+        assert_eq!(
+            FuelBurnFlightPlanner::calculate_total_fuel_gallons(2.0, 10.0, 0.5).unwrap(),
+            25.0
+        );
     }
 
     #[test]
     fn test_journalism_tools() {
         assert!(FleschKincaidReadabilityCalc::reading_ease(100, 5, 150).is_ok());
-        assert_eq!(WordCountEstimator::estimate_reading_minutes(400, 200).unwrap(), 2.0);
-        assert_eq!(HeadlineCapitalizer::to_title_case("breaking news report"), "Breaking News Report");
-        assert!(PlagiarismSimilarityChecker::jaccard_similarity("hello world", "hello world") == 1.0);
-        assert!(PressReleaseFormatter::format("NEW YORK", "2026", "LAUNCH", "Content").contains("FOR IMMEDIATE RELEASE"));
+        assert_eq!(
+            WordCountEstimator::estimate_reading_minutes(400, 200).unwrap(),
+            2.0
+        );
+        assert_eq!(
+            HeadlineCapitalizer::to_title_case("breaking news report"),
+            "Breaking News Report"
+        );
+        assert!(
+            PlagiarismSimilarityChecker::jaccard_similarity("hello world", "hello world") == 1.0
+        );
+        assert!(
+            PressReleaseFormatter::format("NEW YORK", "2026", "LAUNCH", "Content")
+                .contains("FOR IMMEDIATE RELEASE")
+        );
     }
 
     #[test]
     fn test_education_tools() {
-        assert_eq!(GpaCalculatorTool::calculate_gpa(&[(4.0, 3.0), (3.0, 3.0)]).unwrap(), 3.5);
+        assert_eq!(
+            GpaCalculatorTool::calculate_gpa(&[(4.0, 3.0), (3.0, 3.0)]).unwrap(),
+            3.5
+        );
         assert_eq!(TestGradingScaleCalc::percentage_to_letter(95.0), "A");
-        assert_eq!(ClassroomAttendanceTracker::attendance_percentage(18, 20).unwrap(), 90.0);
-        assert_eq!(RubricScoreCalc::rubric_total_pct(&[4, 4, 4], 4).unwrap(), 100.0);
+        assert_eq!(
+            ClassroomAttendanceTracker::attendance_percentage(18, 20).unwrap(),
+            90.0
+        );
+        assert_eq!(
+            RubricScoreCalc::rubric_total_pct(&[4, 4, 4], 4).unwrap(),
+            100.0
+        );
         assert_eq!(LessonPlanTimeAllocator::allocate_minutes(60).0, 9);
     }
 
     #[test]
     fn test_logistics_tools() {
         assert!(EconomicOrderQuantityCalc::calculate(1000.0, 50.0, 2.0).is_ok());
-        assert!(FreightDimensionalWeightCalc::dimensional_weight_kg(50.0, 40.0, 30.0, 5000.0).is_ok());
+        assert!(
+            FreightDimensionalWeightCalc::dimensional_weight_kg(50.0, 40.0, 30.0, 5000.0).is_ok()
+        );
         assert_eq!(SafetyStockCalc::calculate(100.0, 80.0, 10.0, 7.0), 440.0);
-        assert_eq!(ContainerLoadingOptimizer::max_boxes_fit(100, 100, 100, 10, 10, 10).unwrap(), 1000);
-        assert_eq!(RouteDistanceFuelCostCalc::estimate_cost(100.0, 20.0, 3.50).unwrap(), 17.50);
+        assert_eq!(
+            ContainerLoadingOptimizer::max_boxes_fit(100, 100, 100, 10, 10, 10).unwrap(),
+            1000
+        );
+        assert_eq!(
+            RouteDistanceFuelCostCalc::estimate_cost(100.0, 20.0, 3.50).unwrap(),
+            17.50
+        );
     }
 
     #[test]
     fn test_genetics_tools() {
         assert_eq!(DnaReverseComplementTool::reverse_complement("ATGC"), "GCAT");
-        assert_eq!(GcContentCalculator::calculate_gc_pct("GCGC").unwrap(), 100.0);
-        assert_eq!(CodonToAminoAcidTranslator::translate_codon("AUG"), "M (Met - Start)");
+        assert_eq!(
+            GcContentCalculator::calculate_gc_pct("GCGC").unwrap(),
+            100.0
+        );
+        assert_eq!(
+            CodonToAminoAcidTranslator::translate_codon("AUG"),
+            "M (Met - Start)"
+        );
         assert_eq!(PcrAnnealingTempCalc::wallace_rule_tm("ATGC"), 12.0);
         assert_eq!(ProteinMolecularWeightCalc::estimate_mw_da(100), 11000.0);
     }
@@ -1613,9 +1907,18 @@ mod tests {
     #[test]
     fn test_architecture_tools() {
         assert!(StairRiserTreadCalc::calculate_steps(280.0).is_ok());
-        assert_eq!(RoomDaylightFactorCalc::glazing_ratio_pct(5.0, 25.0).unwrap(), 20.0);
-        assert_eq!(PaintCoverageCalc::liters_needed(100.0, 2, 10.0).unwrap(), 20.0);
-        assert_eq!(FlooringTileCalculator::tiles_needed(10.0, 1.0, 10.0).unwrap(), 11);
+        assert_eq!(
+            RoomDaylightFactorCalc::glazing_ratio_pct(5.0, 25.0).unwrap(),
+            20.0
+        );
+        assert_eq!(
+            PaintCoverageCalc::liters_needed(100.0, 2, 10.0).unwrap(),
+            20.0
+        );
+        assert_eq!(
+            FlooringTileCalculator::tiles_needed(10.0, 1.0, 10.0).unwrap(),
+            11
+        );
         assert!(HVACLoadCalculator::cooling_btu_required(50.0, 4) > 0.0);
     }
 
@@ -1625,7 +1928,10 @@ mod tests {
         assert!((disp - 102.5).abs() < 1e-4);
         assert_eq!(MetacentricHeightCalc::calculate_gm(5.0, 3.5), 1.5);
         assert!(PropellerPitchSpeedCalc::theoretical_speed_knots(2000.0, 20.0) > 0.0);
-        assert_eq!(AnchorRodeLengthCalc::calculate_rode_length_m(10.0, 2.0, 5.0).unwrap(), 60.0);
+        assert_eq!(
+            AnchorRodeLengthCalc::calculate_rode_length_m(10.0, 2.0, 5.0).unwrap(),
+            60.0
+        );
         assert!(FuelConsumptionKnotsCalc::estimate_daily_fuel_tons(10000.0, 20.0, 50000.0).is_ok());
     }
 

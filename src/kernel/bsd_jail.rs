@@ -259,7 +259,10 @@ mod tests {
             .with_securelevel(2);
 
         assert_eq!(config.hostname, "jail.example.com");
-        assert_eq!(config.ip4, Some(IpAddr::V4(Ipv4Addr::new(192, 168, 1, 100))));
+        assert_eq!(
+            config.ip4,
+            Some(IpAddr::V4(Ipv4Addr::new(192, 168, 1, 100)))
+        );
         assert_eq!(config.securelevel, 2);
     }
 

@@ -180,7 +180,12 @@ impl SovereignPcieNvmeDriver {
         Ok(())
     }
 
-    pub fn read_blocks(&mut self, lba: u64, count: u16, buffer_addr: u64) -> Result<u16, &'static str> {
+    pub fn read_blocks(
+        &mut self,
+        lba: u64,
+        count: u16,
+        buffer_addr: u64,
+    ) -> Result<u16, &'static str> {
         if !self.controller_ready || self.io_queues.is_empty() {
             return Err("NVMe Controller not ready or IO queue missing");
         }
@@ -195,7 +200,12 @@ impl SovereignPcieNvmeDriver {
         Ok(cid)
     }
 
-    pub fn write_blocks(&mut self, lba: u64, count: u16, buffer_addr: u64) -> Result<u16, &'static str> {
+    pub fn write_blocks(
+        &mut self,
+        lba: u64,
+        count: u16,
+        buffer_addr: u64,
+    ) -> Result<u16, &'static str> {
         if !self.controller_ready || self.io_queues.is_empty() {
             return Err("NVMe Controller not ready or IO queue missing");
         }

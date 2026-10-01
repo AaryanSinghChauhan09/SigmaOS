@@ -1,13 +1,12 @@
 use std::boxed::Box;
 
+use core::mem;
 /// OOP-Based Cluster Orchestration for SigmaOS (Rancher, k3s, and Harvester Parity)
 /// Implements dynamic multi-node pod scheduling, virtual overlay networks (CNI Shards),
 /// Raft-style distributed consensus, and active CARP-inspired failover routing.
 
 #[cfg(test_disabled)]
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 #[cfg(test_disabled)]
 
@@ -160,8 +159,10 @@ impl ClusterNode for SimpleClusterNode {
             return Err(ClusterError::ResourceStarvation);
         }
 
-        self.allocated_cpu.store(cur_cpu + pod.required_cpu_mhz, Ordering::SeqCst);
-        self.allocated_ram.store(cur_ram + pod.required_ram_bytes, Ordering::SeqCst);
+        self.allocated_cpu
+            .store(cur_cpu + pod.required_cpu_mhz, Ordering::SeqCst);
+        self.allocated_ram
+            .store(cur_ram + pod.required_ram_bytes, Ordering::SeqCst);
         self.scheduled_pods.push(pod);
         Ok(())
     }

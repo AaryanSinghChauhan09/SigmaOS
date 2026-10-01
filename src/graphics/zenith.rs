@@ -426,9 +426,16 @@ impl ZenithCompositor {
             }
             let triggered = match corner.position {
                 HotCornerPosition::TopLeft => cursor_x == 0 && cursor_y == 0,
-                HotCornerPosition::TopRight => cursor_x >= self.framebuffer_width.saturating_sub(1) && cursor_y == 0,
-                HotCornerPosition::BottomLeft => cursor_x == 0 && cursor_y >= self.framebuffer_height.saturating_sub(1),
-                HotCornerPosition::BottomRight => cursor_x >= self.framebuffer_width.saturating_sub(1) && cursor_y >= self.framebuffer_height.saturating_sub(1),
+                HotCornerPosition::TopRight => {
+                    cursor_x >= self.framebuffer_width.saturating_sub(1) && cursor_y == 0
+                }
+                HotCornerPosition::BottomLeft => {
+                    cursor_x == 0 && cursor_y >= self.framebuffer_height.saturating_sub(1)
+                }
+                HotCornerPosition::BottomRight => {
+                    cursor_x >= self.framebuffer_width.saturating_sub(1)
+                        && cursor_y >= self.framebuffer_height.saturating_sub(1)
+                }
             };
             if triggered {
                 return Some(corner.action_command.clone());
@@ -706,7 +713,10 @@ mod tests {
     fn test_gnome_hot_corner_gestures() {
         let mut compositor = ZenithCompositor::new(1920, 1080);
         compositor.add_hot_corner(HotCornerPosition::TopLeft, "overview");
-        assert_eq!(compositor.check_hot_corner(0, 0), Some("overview".to_string()));
+        assert_eq!(
+            compositor.check_hot_corner(0, 0),
+            Some("overview".to_string())
+        );
         assert_eq!(compositor.check_hot_corner(500, 500), None);
     }
 

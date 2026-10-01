@@ -1,6 +1,7 @@
 /// SigmaOS RAMFS / Tmpfs Implementation
 /// Inspired by Linux's tmpfs and FreeBSD's tmpfs, this module provides
 /// the volatile memory-backed file system required for early boot and /dev/.
+
 use std::collections::HashMap;
 use std::string::String;
 use std::vec::Vec;
@@ -52,12 +53,7 @@ impl RamFileSystem {
         fs
     }
 
-    pub fn create_file(
-        &mut self,
-        parent_inode: usize,
-        name: &str,
-        mode: u16,
-    ) -> Result<usize, &'static str> {
+    pub fn create_file(&mut self, parent_inode: usize, name: &str, mode: u16) -> Result<usize, &'static str> {
         let inode_num = self.next_inode;
         self.next_inode += 1;
 

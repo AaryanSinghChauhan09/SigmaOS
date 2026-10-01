@@ -1,5 +1,5 @@
-use std::vec::Vec;
 use core::ptr;
+use std::vec::Vec;
 
 const HBA_PxCMD_ST: u32 = 0x0001;
 const HBA_PxCMD_FRE: u32 = 0x0010;
@@ -56,16 +56,19 @@ impl AhciHba {
     pub fn new(abar_addr: u32) -> Self {
         let abar = abar_addr as *mut HbaMem;
         let ports_implemented = unsafe { (*abar).pi };
-        Self { abar, ports_implemented }
+        Self {
+            abar,
+            ports_implemented,
+        }
     }
-    
+
     pub fn init(&mut self) {
         unsafe {
             // Enable AHCI mode and global interrupts
             (*self.abar).ghc |= (1 << 31) | (1 << 1);
         }
     }
-    
+
     pub fn start_cmd(&self, port_idx: usize) {
         unsafe {
             let port = &mut (*self.abar).ports[port_idx];
@@ -74,7 +77,7 @@ impl AhciHba {
             port.cmd |= HBA_PxCMD_ST;
         }
     }
-    
+
     pub fn stop_cmd(&self, port_idx: usize) {
         unsafe {
             let port = &mut (*self.abar).ports[port_idx];
@@ -83,12 +86,18 @@ impl AhciHba {
             while (port.cmd & (HBA_PxCMD_CR | HBA_PxCMD_FR)) != 0 {}
         }
     }
-    
+
     pub fn identify_device(&self, port_idx: usize) {
         // Construct Command FIS for IDENTIFY
     }
-    
-    pub fn read_dma(&self, port_idx: usize, lba: u64, count: u16, buf: &mut [u8]) -> Result<(), &'static str> {
+
+    pub fn read_dma(
+        &self,
+        port_idx: usize,
+        lba: u64,
+        count: u16,
+        buf: &mut [u8],
+    ) -> Result<(), &'static str> {
         // Command table construction and PRDTs
         Ok(())
     }

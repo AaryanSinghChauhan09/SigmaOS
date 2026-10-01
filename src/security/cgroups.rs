@@ -1,7 +1,6 @@
-
+use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CgroupController {
@@ -32,7 +31,7 @@ pub struct Cgroup {
     pub pids: Vec<u32>,
     pub children: Vec<Cgroup>,
     pub controllers: Vec<CgroupController>,
-    
+
     // Limits
     pub cpu: Option<CpuLimit>,
     pub memory: Option<MemoryLimit>,
@@ -82,12 +81,12 @@ impl Cgroup {
         }
         Ok(())
     }
-    
+
     pub fn freeze(&mut self) {
         self.frozen = true;
         // In a real OS, this would send signals to all PIDs in self.pids
     }
-    
+
     pub fn unfreeze(&mut self) {
         self.frozen = false;
     }

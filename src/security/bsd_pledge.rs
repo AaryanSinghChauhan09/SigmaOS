@@ -1,6 +1,6 @@
 //! BSD Pledge inspired security mechanism
-use std::vec::Vec;
 use std::string::String;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum PledgePromise {

@@ -16,8 +16,8 @@
 
 // (no_std only applicable at crate root - removed)
 
-use std::vec::Vec;
 use std::string::String;
+use std::vec::Vec;
 
 /// Tor Parity: Onion Routing Tunnel Management
 /// Manages encrypted circuits through multi-hop relays.
@@ -76,11 +76,20 @@ mod tests {
     #[test]
     fn test_tor_circuit_building() {
         let mut circuit = TorCircuit::new(101);
-        circuit.extend_circuit(TorRelay { ip_address: String::from("1.1.1.1"), fingerprint: String::from("A") });
+        circuit.extend_circuit(TorRelay {
+            ip_address: String::from("1.1.1.1"),
+            fingerprint: String::from("A"),
+        });
         assert_eq!(circuit.is_built, false);
-        
-        circuit.extend_circuit(TorRelay { ip_address: String::from("2.2.2.2"), fingerprint: String::from("B") });
-        circuit.extend_circuit(TorRelay { ip_address: String::from("3.3.3.3"), fingerprint: String::from("C") });
+
+        circuit.extend_circuit(TorRelay {
+            ip_address: String::from("2.2.2.2"),
+            fingerprint: String::from("B"),
+        });
+        circuit.extend_circuit(TorRelay {
+            ip_address: String::from("3.3.3.3"),
+            fingerprint: String::from("C"),
+        });
         assert_eq!(circuit.is_built, true);
 
         let data = b"Secret Payload";

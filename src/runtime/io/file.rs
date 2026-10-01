@@ -1,8 +1,6 @@
-
 /// Custom File I/O for SigmaOS
 /// Implements file operations without relying on std::fs
 /// Uses capability-based access control
-
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -136,7 +134,11 @@ impl FileManager {
     /// Pre-allocates file descriptors 0, 1, 2 for stdin, stdout, stderr (mimics Linux standard streams)
     unsafe fn allocate_standard_streams(&mut self) {
         for fd in 0..3 {
-            let mut flags = if fd == 0 { FileFlags::read_only() } else { FileFlags::write_only() };
+            let mut flags = if fd == 0 {
+                FileFlags::read_only()
+            } else {
+                FileFlags::write_only()
+            };
             // Set stdin/stdout as line buffered by default (Linux/BSD stdio paradigm)
             if fd == 1 || fd == 2 {
                 flags.is_line_buffered = true;
@@ -273,7 +275,7 @@ impl FileManager {
 
         let offset = fd.offset.load(Ordering::SeqCst);
         let bytes_read = self.sys_read(fd.fd.load(Ordering::SeqCst), buffer, size, offset);
-        
+
         if bytes_read > 0 {
             fd.offset.fetch_add(bytes_read as usize, Ordering::SeqCst);
         }
@@ -294,9 +296,10 @@ impl FileManager {
         };
 
         let bytes_written = self.sys_write(fd.fd.load(Ordering::SeqCst), buffer, size, offset);
-        
+
         if bytes_written > 0 {
-            fd.offset.fetch_add(bytes_written as usize, Ordering::SeqCst);
+            fd.offset
+                .fetch_add(bytes_written as usize, Ordering::SeqCst);
         }
 
         bytes_written

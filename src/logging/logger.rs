@@ -19,12 +19,11 @@
 /// OOP-based Logging System for SigmaOS
 /// Implements dmesg logs by taking inspiration from Linux distributions.
 /// No dependency on external logging frameworks.
-
 use std::boxed::Box;
 
+use core::mem;
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// Log level
 #[repr(C)]
@@ -186,16 +185,52 @@ impl MemoryAppender {
 
     fn prepopulate_dmesg(&mut self) {
         let boot_logs: &[(&[u8], &[u8], u64)] = &[
-            (b"Initializing SigmaOS Sovereign Microkernel Core...", b"kern", 0),
-            (b"BIOS-provided physical RAM map: 64GB detected", b"kern", 12045),
-            (b"ACPI: RSDP at 0x00000000000f0240, parsing FADT and MADT tables...", b"acpi", 45012),
-            (b"Symmetric Multiprocessing (SMP): 64 logical CPU cores discovered", b"cpu", 88124),
+            (
+                b"Initializing SigmaOS Sovereign Microkernel Core...",
+                b"kern",
+                0,
+            ),
+            (
+                b"BIOS-provided physical RAM map: 64GB detected",
+                b"kern",
+                12045,
+            ),
+            (
+                b"ACPI: RSDP at 0x00000000000f0240, parsing FADT and MADT tables...",
+                b"acpi",
+                45012,
+            ),
+            (
+                b"Symmetric Multiprocessing (SMP): 64 logical CPU cores discovered",
+                b"cpu",
+                88124,
+            ),
             (b"PCI Host Bridge registered at 0000:00", b"pci", 156102),
-            (b"USB xHCI host controller integrated successfully", b"usb", 204560),
-            (b"SovereignFS: Mounting system root on /dev/sda1 (Resilient Mode)", b"fs", 452103),
-            (b"SInit Supervisor: Spawning systemd-grade target targets...", b"systemd", 812456),
-            (b"Verified Boot: All Kyber-1024 / Dilithium-5 certificates verified successfully", b"security", 992451),
-            (b"Sovereign Zenith Graphical Desktop environment started successfully.", b"zenith", 1200451),
+            (
+                b"USB xHCI host controller integrated successfully",
+                b"usb",
+                204560,
+            ),
+            (
+                b"SovereignFS: Mounting system root on /dev/sda1 (Resilient Mode)",
+                b"fs",
+                452103,
+            ),
+            (
+                b"SInit Supervisor: Spawning systemd-grade target targets...",
+                b"systemd",
+                812456,
+            ),
+            (
+                b"Verified Boot: All Kyber-1024 / Dilithium-5 certificates verified successfully",
+                b"security",
+                992451,
+            ),
+            (
+                b"Sovereign Zenith Graphical Desktop environment started successfully.",
+                b"zenith",
+                1200451,
+            ),
         ];
 
         for &(msg, module, timestamp_ns) in boot_logs {
@@ -217,12 +252,7 @@ impl LogAppender for MemoryAppender {
             return Err(LogError::BufferFull);
         }
 
-        let mut entry_copy = LogEntry::new(
-            entry.level,
-            &entry.message,
-            &entry.module,
-            entry.line,
-        );
+        let mut entry_copy = LogEntry::new(entry.level, &entry.message, &entry.module, entry.line);
         entry_copy.timestamp_ns = entry.timestamp_ns;
 
         self.entries.push(Some(entry_copy));
@@ -457,7 +487,11 @@ impl<T> Vec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {
@@ -480,7 +514,6 @@ extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
 }
-
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -512,7 +545,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;

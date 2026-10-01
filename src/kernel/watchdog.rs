@@ -106,7 +106,7 @@ pub struct SovereignDaemonShard {
     pub state: DaemonState,
     pub fail_count: u32,
     pub restart_limit: u32,
-    pub cpu_budget: f32, // percentage cap
+    pub cpu_budget: f32,    // percentage cap
     pub memory_budget: f32, // percentage cap
     pub restart_policy: DaemonRestartPolicy,
     pub restart_delay_sec: u32,
@@ -624,7 +624,14 @@ mod tests {
         let activated = daemon.trigger_socket_activity();
         assert!(activated);
         assert_eq!(daemon.state, DaemonState::Running);
-        assert_eq!(daemon.socket_activation.as_ref().unwrap().active_connections, 1);
+        assert_eq!(
+            daemon
+                .socket_activation
+                .as_ref()
+                .unwrap()
+                .active_connections,
+            1
+        );
     }
 
     #[test]
@@ -632,7 +639,11 @@ mod tests {
         let mut kdump = SovereignKdumpEngine::default();
         assert!(kdump.transmit_netconsole_packet().is_err());
 
-        let dump_len = kdump.capture_panic_dump("Kernel Panic: Page Fault", 0xFFFFFFFF81001000, 0x7FFFFFFF0000);
+        let dump_len = kdump.capture_panic_dump(
+            "Kernel Panic: Page Fault",
+            0xFFFFFFFF81001000,
+            0x7FFFFFFF0000,
+        );
         assert!(dump_len > 0);
         assert!(kdump.panic_occurred);
 

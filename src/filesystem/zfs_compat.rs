@@ -1,5 +1,5 @@
-use std::string::{String, ToString};
 use std::format;
+use std::string::{String, ToString};
 // SigmaOS — ZFS-Compatible Filesystem Features
 //
 // Inspired by Sun/OpenZFS: copy-on-write semantics, per-block checksumming,
@@ -94,17 +94,17 @@ impl SnapshotInfo {
 /// A ZFS-style dataset — the primary unit of filesystem management.
 pub struct Dataset {
     /// Dataset name (e.g. `"sigma/home"`, `"sigma/data@snap"`).
-    name:        [u8; 256],
-    name_len:    usize,
-    pub kind:    DatasetKind,
-    pub checksum:    ChecksumAlgo,
+    name: [u8; 256],
+    name_len: usize,
+    pub kind: DatasetKind,
+    pub checksum: ChecksumAlgo,
     pub compression: CompressionAlgo,
     /// Total bytes used on-disk.
-    pub used_bytes:  u64,
+    pub used_bytes: u64,
     /// Available space (inherited from pool quota).
     pub avail_bytes: u64,
     /// Bytes referenced (including shared data with snapshots).
-    pub referenced:  u64,
+    pub referenced: u64,
     /// Compression ratio × 100 (e.g. 200 = 2.0×).
     pub compress_ratio_x100: u32,
     /// Snapshots attached to this dataset.
@@ -134,8 +134,12 @@ impl Dataset {
         }
     }
 
-    pub fn name(&self) -> &[u8] { &self.name[..self.name_len] }
-    pub fn cow_enabled(&self) -> bool { self.cow_enabled }
+    pub fn name(&self) -> &[u8] {
+        &self.name[..self.name_len]
+    }
+    pub fn cow_enabled(&self) -> bool {
+        self.cow_enabled
+    }
 
     // ── Checksum computation ──────────────────────────────────────────────────
 
@@ -157,7 +161,7 @@ impl Dataset {
         let mut v: u32 = 0;
         let mut i = 0usize;
         while i + 3 < data.len() {
-            v ^= u32::from_le_bytes([data[i], data[i+1], data[i+2], data[i+3]]);
+            v ^= u32::from_le_bytes([data[i], data[i + 1], data[i + 2], data[i + 3]]);
             i += 4;
         }
         while i < data.len() {
@@ -195,10 +199,9 @@ impl Dataset {
                     // Swap-remove (O(1)).
                     let last = self.snapshots.len() - 1;
                     if i != last {
-                        if let (Some(last_snap), Some(slot)) = (
-                            self.snapshots.get(last).cloned(),
-                            self.snapshots.get_mut(i)
-                        ) {
+                        if let (Some(last_snap), Some(slot)) =
+                            (self.snapshots.get(last).cloned(), self.snapshots.get_mut(i))
+                        {
                             *slot = last_snap;
                         }
                     }
@@ -222,7 +225,9 @@ impl Dataset {
         None
     }
 
-    pub fn snapshot_count(&self) -> usize { self.snapshots.len() }
+    pub fn snapshot_count(&self) -> usize {
+        self.snapshots.len()
+    }
 
     // ── Space tracking ────────────────────────────────────────────────────────
 
@@ -246,11 +251,11 @@ impl Dataset {
 /// A ZFS storage pool — a named collection of datasets sharing a common
 /// storage backend.
 pub struct Pool {
-    name:       [u8; 64],
-    name_len:   usize,
+    name: [u8; 64],
+    name_len: usize,
     pub total_bytes: u64,
-    pub used_bytes:  u64,
-    datasets:   Vec<Dataset>,
+    pub used_bytes: u64,
+    datasets: Vec<Dataset>,
 }
 
 impl Pool {
@@ -258,10 +263,18 @@ impl Pool {
         let len = name.len().min(63);
         let mut n = [0u8; 64];
         n[..len].copy_from_slice(&name[..len]);
-        Self { name: n, name_len: len, total_bytes, used_bytes: 0, datasets: Vec::new() }
+        Self {
+            name: n,
+            name_len: len,
+            total_bytes,
+            used_bytes: 0,
+            datasets: Vec::new(),
+        }
     }
 
-    pub fn name(&self) -> &[u8] { &self.name[..self.name_len] }
+    pub fn name(&self) -> &[u8] {
+        &self.name[..self.name_len]
+    }
 
     pub fn avail_bytes(&self) -> u64 {
         self.total_bytes.saturating_sub(self.used_bytes)
@@ -280,7 +293,9 @@ impl Pool {
         Ok(())
     }
 
-    pub fn dataset_count(&self) -> usize { self.datasets.len() }
+    pub fn dataset_count(&self) -> usize {
+        self.datasets.len()
+    }
 
     pub fn get_dataset(&self, name: &[u8]) -> Option<&Dataset> {
         for i in 0..self.datasets.len() {
@@ -353,16 +368,23 @@ mod tests {
     #[test]
     fn test_cannot_snapshot_snapshot() {
         let mut ds = Dataset::new(b"sigma/home@old", DatasetKind::Snapshot);
-        assert_eq!(ds.snapshot(b"nested", 0), Err(ZfsError::CannotSnapshotSnapshot));
+        assert_eq!(
+            ds.snapshot(b"nested", 0),
+            Err(ZfsError::CannotSnapshotSnapshot)
+        );
     }
 
     #[test]
     fn test_pool_create_dataset() {
         let mut pool = Pool::new(b"sigma", 1 << 30);
-        pool.create_dataset(b"sigma/home", DatasetKind::FileSystem).unwrap();
-        pool.create_dataset(b"sigma/data", DatasetKind::FileSystem).unwrap();
+        pool.create_dataset(b"sigma/home", DatasetKind::FileSystem)
+            .unwrap();
+        pool.create_dataset(b"sigma/data", DatasetKind::FileSystem)
+            .unwrap();
         assert_eq!(pool.dataset_count(), 2);
-        assert!(pool.create_dataset(b"sigma/home", DatasetKind::FileSystem).is_err());
+        assert!(pool
+            .create_dataset(b"sigma/home", DatasetKind::FileSystem)
+            .is_err());
     }
 
     #[test]

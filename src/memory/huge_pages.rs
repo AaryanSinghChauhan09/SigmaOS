@@ -128,7 +128,11 @@ impl SovereignHugePageEngine {
         }
 
         // Verify all 512 pages are strictly contiguous
-        for (idx, &phys) in contiguous_4k_pages.iter().take(PAGES_PER_2MB_HUGE_PAGE).enumerate() {
+        for (idx, &phys) in contiguous_4k_pages
+            .iter()
+            .take(PAGES_PER_2MB_HUGE_PAGE)
+            .enumerate()
+        {
             if phys != base_phys + (idx * PAGE_SIZE_4KB) as u64 {
                 return None; // Non-contiguous gap found
             }

@@ -86,16 +86,30 @@ impl LibinputTrackpadGestureEngine {
         }
     }
 
-    pub fn process_raw_touch_contact(&mut self, fingers: u8, touch_major_mm: f32, dx: f32, dy: f32) -> Option<LibinputGestureEvent> {
+    pub fn process_raw_touch_contact(
+        &mut self,
+        fingers: u8,
+        touch_major_mm: f32,
+        dx: f32,
+        dy: f32,
+    ) -> Option<LibinputGestureEvent> {
         // Palm rejection: large contact area (> 18mm) triggers palm suppression
         if self.config.palm_rejection_enabled && touch_major_mm > 18.0 {
             self.palm_suppressed_count += 1;
             return None;
         }
 
-        let direction_mult = if self.config.natural_scrolling { -1.0 } else { 1.0 };
+        let direction_mult = if self.config.natural_scrolling {
+            -1.0
+        } else {
+            1.0
+        };
         let event = LibinputGestureEvent {
-            gesture_type: if fingers >= 3 { LibinputGestureType::SwipeUpdate } else { LibinputGestureType::TapToClick },
+            gesture_type: if fingers >= 3 {
+                LibinputGestureType::SwipeUpdate
+            } else {
+                LibinputGestureType::TapToClick
+            },
             finger_count: fingers,
             delta_x: dx * direction_mult,
             delta_y: dy * direction_mult,
@@ -153,7 +167,13 @@ impl AsahiAppleMagicTrackpadEngine {
         }
     }
 
-    pub fn update_touch_slot(&mut self, slot: u8, x: u32, y: u32, force: u16) -> Option<MagicTrackpadHapticMode> {
+    pub fn update_touch_slot(
+        &mut self,
+        slot: u8,
+        x: u32,
+        y: u32,
+        force: u16,
+    ) -> Option<MagicTrackpadHapticMode> {
         let touch = MagicTrackpadTouchSlot {
             slot_id: slot,
             pos_x: x,
@@ -185,8 +205,8 @@ impl Default for AsahiAppleMagicTrackpadEngine {
 /// Fusuma / Touchegg Directional Gesture Command
 #[derive(Debug, Clone)]
 pub struct FusumaGestureBinding {
-    pub fingers: u8,          // 3 or 4
-    pub direction: String,     // "up", "down", "left", "right", "in", "out"
+    pub fingers: u8,            // 3 or 4
+    pub direction: String,      // "up", "down", "left", "right", "in", "out"
     pub action_command: String, // e.g. "hyprctl dispatch workspace e+1"
 }
 
@@ -197,7 +217,9 @@ pub struct FusumaToucheggGestureMapper {
 
 impl FusumaToucheggGestureMapper {
     pub fn new() -> Self {
-        let mut mapper = Self { bindings: Vec::new() };
+        let mut mapper = Self {
+            bindings: Vec::new(),
+        };
         mapper.load_defaults();
         mapper
     }
@@ -258,7 +280,10 @@ impl FreeBsdWmtPsmTrackpadTranslator {
         }
     }
 
-    pub fn decode_raw_packet(&mut self, packet_bytes: &[u8]) -> Result<(i16, i16, bool, bool), String> {
+    pub fn decode_raw_packet(
+        &mut self,
+        packet_bytes: &[u8],
+    ) -> Result<(i16, i16, bool, bool), String> {
         if packet_bytes.len() < 3 {
             return Err("Incomplete trackpad hardware packet".to_string());
         }
@@ -356,11 +381,17 @@ impl SovereignTrackpadSubsystemSuite {
 
         // 2. Magic trackpad haptic check
         let haptic = self.magic_trackpad.update_touch_slot(0, 500, 400, 150);
-        results.insert("magic_trackpad_haptics".to_string(), haptic == Some(MagicTrackpadHapticMode::MediumClick));
+        results.insert(
+            "magic_trackpad_haptics".to_string(),
+            haptic == Some(MagicTrackpadHapticMode::MediumClick),
+        );
 
         // 3. Fusuma check
         let action = self.fusuma.lookup_action(3, "up");
-        results.insert("fusuma_touchegg_gestures".to_string(), action == Some("workspace_overview".to_string()));
+        results.insert(
+            "fusuma_touchegg_gestures".to_string(),
+            action == Some("workspace_overview".to_string()),
+        );
 
         // 4. FreeBSD decoder check
         let decoded = self.freebsd_pckt.decode_raw_packet(&[0x01, 0x05, 0x0A]);
@@ -368,7 +399,10 @@ impl SovereignTrackpadSubsystemSuite {
 
         // 5. OpenBSD wsmouse check
         let (scroll, is_edge) = self.openbsd_wsmouse.filter_mouse_movement(1800, 12);
-        results.insert("openbsd_wsmouse_edgescroll".to_string(), is_edge && scroll == 12);
+        results.insert(
+            "openbsd_wsmouse_edgescroll".to_string(),
+            is_edge && scroll == 12,
+        );
 
         results
     }
@@ -414,8 +448,14 @@ mod tests {
     #[test]
     fn test_fusuma_touchegg_mapper() {
         let mapper = FusumaToucheggGestureMapper::new();
-        assert_eq!(mapper.lookup_action(3, "up"), Some("workspace_overview".to_string()));
-        assert_eq!(mapper.lookup_action(4, "up"), Some("toggle_fullscreen".to_string()));
+        assert_eq!(
+            mapper.lookup_action(3, "up"),
+            Some("workspace_overview".to_string())
+        );
+        assert_eq!(
+            mapper.lookup_action(4, "up"),
+            Some("toggle_fullscreen".to_string())
+        );
     }
 
     #[test]

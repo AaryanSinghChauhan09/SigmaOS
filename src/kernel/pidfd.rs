@@ -125,7 +125,7 @@ impl PidfdProcDescManager {
     }
 
     /// Send signal via pidfd
-    pub fn pidfd_send_signal(&self, fd: u64, signal: u32) -> Result<(), &'static str> {
+    pub fn pidfd_send_signal(&self, fd: u64, _signal: u32) -> Result<(), &'static str> {
         let pidfd = self.pidfds.get(&fd).ok_or("Pidfd not found")?;
 
         if !pidfd.capabilities.can_send_signal {
@@ -149,28 +149,25 @@ impl PidfdProcDescManager {
     }
 
     /// Fork with procdesc (FreeBSD pdfork-inspired)
-    pub fn pdfork(
-        &mut self,
-        parent_pid: u64,
-        capabilities: ProcDescCapabilities,
-    ) -> Result<(u64, ProcDesc), &'static str> {
+    pub fn pdfork(&mut self, parent_pid: u64, capabilities: ProcDescCapabilities) -> Result<(u64, ProcDesc), &'static str> {
         let pid = self.next_pid.fetch_add(1, Ordering::SeqCst);
 
         let procdesc = ProcDesc { pid, capabilities };
+        let procdesc = ProcDesc {
+            pid,
+            capabilities,
+        };
 
         self.procdescs.insert(pid, procdesc.clone());
 
         // Add to process tree
-        self.process_tree
-            .entry(parent_pid)
-            .or_insert_with(Vec::new)
-            .push(pid);
+        self.process_tree.entry(parent_pid).or_insert_with(Vec::new).push(pid);
 
         Ok((pid, procdesc))
     }
 
     /// Kill process via procdesc
-    pub fn pdkill(&self, pid: u64, signal: u32) -> Result<(), &'static str> {
+    pub fn pdkill(&self, pid: u64, _signal: u32) -> Result<(), &'static str> {
         let procdesc = self.procdescs.get(&pid).ok_or("Procdesc not found")?;
 
         if !procdesc.capabilities.can_kill {
@@ -246,6 +243,7 @@ impl PidfdProcDescManager {
             .entry(subreaper_pid)
             .or_insert_with(Vec::new)
             .push(orphan_pid);
+        self.process_tree.entry(subreaper_pid).or_insert_with(Vec::new).push(orphan_pid);
 
         Ok(subreaper_pid)
     }
@@ -278,6 +276,7 @@ mod tests {
     #[test]
     fn test_pidfd_open() {
         let mut manager = PidfdProcDescManager::new();
+        let manager = PidfdProcDescManager::new();
 
         let pidfd = manager.pidfd_open(1, 0x01).unwrap();
         assert_eq!(pidfd.pid, 1);
@@ -288,6 +287,7 @@ mod tests {
     #[test]
     fn test_pidfd_send_signal() {
         let mut manager = PidfdProcDescManager::new();
+        let manager = PidfdProcDescManager::new();
 
         let pidfd = manager.pidfd_open(1, 0x01).unwrap();
         assert!(manager.pidfd_send_signal(pidfd.fd, 9).is_ok());
@@ -296,6 +296,7 @@ mod tests {
     #[test]
     fn test_pidfd_restricted() {
         let mut manager = PidfdProcDescManager::new();
+        let manager = PidfdProcDescManager::new();
 
         let pidfd = manager.pidfd_open(1, 0x00).unwrap();
         assert!(!pidfd.capabilities.can_send_signal);

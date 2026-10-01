@@ -1,11 +1,10 @@
 // SigmaOS OpenBSD-grade Packet Filter (PF) Stateful Firewall Subsystem
 // Zero-dependency, #![no_std] compliant, highly-optimized for low-overhead routing.
 
-
-use std::string::String;
-use std::vec::Vec;
-use std::string::ToString;
 use core::cell::RefCell;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FilterAction {
@@ -61,7 +60,16 @@ impl OpenBsdPacketFilter {
         *self.rules.borrow_mut() = rules;
     }
 
-    pub fn check_packet(&self, dir: TrafficDirection, interface: &str, proto: &str, src_ip: &str, dst_ip: &str, src_port: u16, dst_port: u16) -> FilterAction {
+    pub fn check_packet(
+        &self,
+        dir: TrafficDirection,
+        interface: &str,
+        proto: &str,
+        src_ip: &str,
+        dst_ip: &str,
+        src_port: u16,
+        dst_port: u16,
+    ) -> FilterAction {
         if !self.is_enabled.load(core::sync::atomic::Ordering::Relaxed) {
             return FilterAction::Pass;
         }
@@ -71,8 +79,14 @@ impl OpenBsdPacketFilter {
             let states = self.states.borrow();
             for state in states.iter() {
                 if state.proto == proto
-                    && ((state.src_ip == src_ip && state.dst_ip == dst_ip && state.src_port == src_port && state.dst_port == dst_port)
-                        || (state.src_ip == dst_ip && state.dst_ip == src_ip && state.src_port == dst_port && state.dst_port == src_port))
+                    && ((state.src_ip == src_ip
+                        && state.dst_ip == dst_ip
+                        && state.src_port == src_port
+                        && state.dst_port == dst_port)
+                        || (state.src_ip == dst_ip
+                            && state.dst_ip == src_ip
+                            && state.src_port == dst_port
+                            && state.dst_port == src_port))
                 {
                     return FilterAction::Pass; // Fast path for established connections
                 }

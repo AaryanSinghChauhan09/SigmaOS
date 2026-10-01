@@ -85,12 +85,7 @@ impl RipgrepFastSearch {
         Self { case_sensitive }
     }
 
-    pub fn search_content(
-        &self,
-        filepath: &str,
-        content: &str,
-        query: &str,
-    ) -> Vec<RipgrepMatch> {
+    pub fn search_content(&self, filepath: &str, content: &str, query: &str) -> Vec<RipgrepMatch> {
         let mut matches = Vec::new();
         let target_query = if self.case_sensitive {
             query.to_string()
@@ -166,7 +161,10 @@ impl FzfFuzzyMatcher {
         }
 
         results.sort_by_key(|&(_, pos)| pos);
-        results.into_iter().map(|(cand, _)| cand.to_string()).collect()
+        results
+            .into_iter()
+            .map(|(cand, _)| cand.to_string())
+            .collect()
     }
 }
 

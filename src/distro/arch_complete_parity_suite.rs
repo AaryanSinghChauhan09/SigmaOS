@@ -112,7 +112,14 @@ impl ArchAuditSecurityChecker {
         }
     }
 
-    pub fn add_advisory(&mut self, pkg: &str, ver: &str, fixed: Option<&str>, cve: &str, severity: &str) {
+    pub fn add_advisory(
+        &mut self,
+        pkg: &str,
+        ver: &str,
+        fixed: Option<&str>,
+        cve: &str,
+        severity: &str,
+    ) {
         self.advisories_db.push(VulnerabilityAdvisory {
             pkg_name: pkg.to_string(),
             installed_version: ver.to_string(),
@@ -123,7 +130,10 @@ impl ArchAuditSecurityChecker {
     }
 
     /// Audits installed packages against known security advisories
-    pub fn audit_installed_packages(&self, installed_pkgs: &BTreeMap<String, String>) -> Vec<VulnerabilityAdvisory> {
+    pub fn audit_installed_packages(
+        &self,
+        installed_pkgs: &BTreeMap<String, String>,
+    ) -> Vec<VulnerabilityAdvisory> {
         let mut findings = Vec::new();
 
         for advisory in &self.advisories_db {
@@ -172,9 +182,24 @@ impl ArchPacmanKeyringManager {
     /// Initializes standard Arch Linux master keys (archlinux keyring)
     pub fn init_keyring(&mut self) {
         self.master_keys_initialized = true;
-        self.add_key("3B9453FE", "Pierre Schmitz <pierre@archlinux.org>", "marginal", false);
-        self.add_key("9760103B", "Allan McRae <allan@archlinux.org>", "full", false);
-        self.add_key("AB14839E", "Sven-Hendrik Haase <svenstaro@archlinux.org>", "full", false);
+        self.add_key(
+            "3B9453FE",
+            "Pierre Schmitz <pierre@archlinux.org>",
+            "marginal",
+            false,
+        );
+        self.add_key(
+            "9760103B",
+            "Allan McRae <allan@archlinux.org>",
+            "full",
+            false,
+        );
+        self.add_key(
+            "AB14839E",
+            "Sven-Hendrik Haase <svenstaro@archlinux.org>",
+            "full",
+            false,
+        );
     }
 
     pub fn add_key(&mut self, key_id: &str, uid: &str, trust: &str, revoked: bool) {
@@ -313,6 +338,7 @@ mod tests {
         let content = MkinitcpioPresetGenerator::generate_preset_content(&preset);
         assert!(content.contains("ALL_kver=\"/boot/vmlinuz-linux\""));
         assert!(content.contains("default_image=\"/boot/initramfs-linux.img\""));
-        assert!(content.contains("HOOKS=(base udev autodetect modconf block filesystems keyboard fsck)"));
+        assert!(content
+            .contains("HOOKS=(base udev autodetect modconf block filesystems keyboard fsck)"));
     }
 }

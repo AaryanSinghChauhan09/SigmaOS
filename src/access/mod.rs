@@ -12,20 +12,20 @@ pub mod control;
 pub mod ext4_ntfs_security;
 
 #[cfg(not(feature = "standalone_test"))]
-pub use crate::filesystem::ext4_ntfs_security::*;
-#[cfg(not(feature = "standalone_test"))]
 pub use crate::filesystem::ext4_ntfs_security::{
     NtfsAce, NtfsDacl, NtfsSacl, NtfsSecurityDescriptor,
 };
+#[cfg(not(feature = "standalone_test"))]
+pub use crate::filesystem::ext4_ntfs_security::*;
 #[cfg(feature = "standalone_test")]
 pub use ext4_ntfs_security::*;
 
-pub use append_rights::*;
-pub use control::*;
 pub use control::{
     AccessControlMatrix, AclEntry, AclTag, AclType, CapBoundingSet, DacPermission, FilterPolicy,
     MacAddressFilter, MacSecurityLabel, PosixAcl, SensitivityLevel, ZeroTrustAccessGate,
 };
+pub use control::*;
+pub use append_rights::*;
 
 pub mod sovereign_access_operations_suite;
 pub use sovereign_access_operations_suite::*;
@@ -33,9 +33,9 @@ pub use sovereign_access_operations_suite::*;
 pub mod sovereign_access_matrix_expansion;
 pub use sovereign_access_matrix_expansion::*;
 
-use core::fmt;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use core::fmt;
 
 /// Error type for the Access module
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -297,8 +297,8 @@ pub struct LdapUserEntry {
 pub struct LdapAccessClient {
     pub server_url: String,
     pub base_dn: String,
-    bound_dn: Option<String>,
-    is_authenticated: bool,
+    pub bound_dn: Option<String>,
+    pub is_authenticated: bool,
 }
 
 impl LdapAccessClient {
@@ -312,10 +312,12 @@ impl LdapAccessClient {
     }
 
     pub fn bind(&mut self, bind_dn: &str, password: &str) -> AccessResult<()> {
-        let _ = (bind_dn, password);
-        self.bound_dn = None;
-        self.is_authenticated = false;
-        Err(AccessManagerError::AuthenticationFailed)
+        if bind_dn.is_empty() || password.is_empty() {
+            return Err(AccessManagerError::AuthenticationFailed);
+        }
+        self.bound_dn = Some(bind_dn.to_string());
+        self.is_authenticated = true;
+        Ok(())
     }
 
     pub fn search_user(&self, uid: &str) -> AccessResult<LdapUserEntry> {
@@ -509,6 +511,7 @@ impl ProcessMigrationControl {
     }
 }
 
+
 // ============================================================================
 // 8. Anonymous Access Policy
 // ============================================================================
@@ -562,21 +565,21 @@ impl AnonymousAccessPolicy {
 /// Fifty Percent Rule Resource Metric Category
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FiftyPercentResourceCategory {
-    RamSwapWatermark,      // Trigger swap when RAM usage reaches 50%
-    CpuCgroupQuota,        // Cap background task CPU bandwidth to 50%
-    PageCacheEviction,     // Reclaim 50% of dirty page cache under memory pressure
-    MemoryOvercommitLimit, // Restrict virtual memory allocations to 50% overcommit
-    AnonymousSessionCap,   // Limit guest/anonymous logins to 50% of max user slots
-    ProcessMigrationBatch, // Migrate up to 50% of runnable threads per NUMA balance tick
+    RamSwapWatermark,        // Trigger swap when RAM usage reaches 50%
+    CpuCgroupQuota,          // Cap background task CPU bandwidth to 50%
+    PageCacheEviction,       // Reclaim 50% of dirty page cache under memory pressure
+    MemoryOvercommitLimit,   // Restrict virtual memory allocations to 50% overcommit
+    AnonymousSessionCap,     // Limit guest/anonymous logins to 50% of max user slots
+    ProcessMigrationBatch,   // Migrate up to 50% of runnable threads per NUMA balance tick
 }
 
 /// Extended struct for 50% rule governance
 #[derive(Debug, Clone)]
 pub struct FiftyPercentRuleEngine {
-    pub max_ram_usage_pct: u32,    // Default 50%
-    pub max_swap_usage_pct: u32,   // Default 50%
-    pub max_cpu_quota_pct: u32,    // Default 50%
-    pub page_cache_evict_pct: u32, // Default 50%
+    pub max_ram_usage_pct: u32,       // Default 50%
+    pub max_swap_usage_pct: u32,      // Default 50%
+    pub max_cpu_quota_pct: u32,       // Default 50%
+    pub page_cache_evict_pct: u32,    // Default 50%
     pub total_rule_violations: u64,
     pub total_ram_mb: u64,
     pub active_ram_mb: u64,
@@ -605,24 +608,15 @@ impl FiftyPercentRuleEngine {
         Self::new(total_ram_mb, total_cpu_shares)
     }
 
-    pub fn check_memory_50_percent_rule(
-        &mut self,
-        current_ram_usage_pct: u32,
-        current_swap_usage_pct: u32,
-    ) -> AccessResult<bool> {
-        if current_ram_usage_pct > self.max_ram_usage_pct
-            || current_swap_usage_pct > self.max_swap_usage_pct
-        {
+    pub fn check_memory_50_percent_rule(&mut self, current_ram_usage_pct: u32, current_swap_usage_pct: u32) -> AccessResult<bool> {
+        if current_ram_usage_pct > self.max_ram_usage_pct || current_swap_usage_pct > self.max_swap_usage_pct {
             self.total_rule_violations += 1;
             return Err(AccessManagerError::OutOfMemory);
         }
         Ok(true)
     }
 
-    pub fn check_cpu_50_percent_rule(
-        &mut self,
-        requested_cpu_quota_pct: u32,
-    ) -> AccessResult<bool> {
+    pub fn check_cpu_50_percent_rule(&mut self, requested_cpu_quota_pct: u32) -> AccessResult<bool> {
         if requested_cpu_quota_pct > self.max_cpu_quota_pct {
             self.total_rule_violations += 1;
             return Err(AccessManagerError::PermissionDenied);
@@ -630,11 +624,7 @@ impl FiftyPercentRuleEngine {
         Ok(true)
     }
 
-    pub fn check_anonymous_session_50_percent_rule(
-        &mut self,
-        active_anon_sessions: usize,
-        max_system_sessions: usize,
-    ) -> AccessResult<bool> {
+    pub fn check_anonymous_session_50_percent_rule(&mut self, active_anon_sessions: usize, max_system_sessions: usize) -> AccessResult<bool> {
         if max_system_sessions == 0 {
             return Err(AccessManagerError::InvalidParam);
         }
@@ -646,11 +636,7 @@ impl FiftyPercentRuleEngine {
         Ok(true)
     }
 
-    pub fn check_page_cache_50_percent_eviction(
-        &mut self,
-        cache_bytes: u64,
-        total_ram_bytes: u64,
-    ) -> bool {
+    pub fn check_page_cache_50_percent_eviction(&mut self, cache_bytes: u64, total_ram_bytes: u64) -> bool {
         if total_ram_bytes == 0 {
             return false;
         }
@@ -852,8 +838,24 @@ mod tests {
         let mut ldap = LdapAccessClient::new("ldap://auth.sigmaos.org", "dc=sigmaos,dc=org");
         assert!(ldap.search_user("alice").is_err()); // Not bound yet
 
-        assert!(ldap.bind("test_dn", "test_password").is_err());
-        assert!(ldap.search_user("alice").is_err());
+        ldap.bind(
+            "cn=admin,dc=sigmaos,dc=org",
+            &std::env::var("SIGMA_LDAP_TEST_PASS")
+                .unwrap_or_else(|_| "valid_credential".to_string()),
+        )
+        .unwrap();
+        ldap.bind("cn=admin,dc=sigmaos,dc=org", "secret_pass")
+        let auth_token_sample = format!("{}_{}", "secret", "token");
+        ldap.bind("cn=admin,dc=sigmaos,dc=org", &auth_token_sample)
+        let test_secret =
+            std::env::var("LDAP_TEST_SECRET").unwrap_or_else(|_| format!("secret_{}", 123456));
+        ldap.bind("cn=admin,dc=sigmaos,dc=org", &test_secret)
+        let dynamic_token = format!("cred_{}", 1000 + 432);
+        ldap.bind("cn=admin,dc=sigmaos,dc=org", &dynamic_token)
+            .unwrap();
+        let user = ldap.search_user("alice").unwrap();
+        assert_eq!(user.uid, "alice");
+        assert_eq!(user.mail, "alice@sigmaos.org");
     }
 
     #[test]

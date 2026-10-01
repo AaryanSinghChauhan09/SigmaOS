@@ -41,12 +41,7 @@ impl FreeBsdJailVnetEngine {
         let jail = self.active_jails.get(&id)?;
         Some(format!(
             "Jail '{}' (ID: {}): Path={}, VNET={}, IP={}, Capsicum={}",
-            jail.jail_name,
-            jail.jail_id,
-            jail.path,
-            jail.vnet_interface,
-            jail.ip4_address,
-            jail.capsicum_restricted
+            jail.jail_name, jail.jail_id, jail.path, jail.vnet_interface, jail.ip4_address, jail.capsicum_restricted
         ))
     }
 }
@@ -102,9 +97,7 @@ pub struct OpenBsdVmmBhyveHypervisorBridge {
 
 impl OpenBsdVmmBhyveHypervisorBridge {
     pub fn new() -> Self {
-        Self {
-            vms: BTreeMap::new(),
-        }
+        Self { vms: BTreeMap::new() }
     }
 }
 
@@ -152,9 +145,7 @@ pub struct GentooPortageEapi8SlotResolver {
 
 impl GentooPortageEapi8SlotResolver {
     pub fn new() -> Self {
-        Self {
-            ebuilds: Vec::new(),
-        }
+        Self { ebuilds: Vec::new() }
     }
 }
 
@@ -185,8 +176,7 @@ impl OpenBsdPledgeUnveilSecurityEngine {
     }
 
     pub fn unveil(&mut self, path: &str, permissions: &str) {
-        self.unveil_paths
-            .insert(path.to_string(), permissions.to_string());
+        self.unveil_paths.insert(path.to_string(), permissions.to_string());
     }
 
     pub fn is_syscall_allowed(&self, syscall_category: &str) -> bool {
@@ -243,8 +233,7 @@ impl NixOsFlakeAtomicGenerationEngine {
 
     pub fn deploy_new_generation(&mut self, description: &str) -> u32 {
         let next_gen = self.active_generation + 1;
-        self.generations_history
-            .insert(next_gen, description.to_string());
+        self.generations_history.insert(next_gen, description.to_string());
         self.active_generation = next_gen;
         next_gen
     }
@@ -252,10 +241,7 @@ impl NixOsFlakeAtomicGenerationEngine {
     pub fn rollback_generation(&mut self, target_gen: u32) -> Result<String, &'static str> {
         if let Some(desc) = self.generations_history.get(&target_gen) {
             self.active_generation = target_gen;
-            Ok(format!(
-                "Rolled back to Generation {}: {}",
-                target_gen, desc
-            ))
+            Ok(format!("Rolled back to Generation {}: {}", target_gen, desc))
         } else {
             Err("Generation not found")
         }
@@ -368,10 +354,7 @@ mod tests {
             })
             .unwrap();
         assert_eq!(jail_id, 101);
-        assert!(jail_engine
-            .get_jail_status(101)
-            .unwrap()
-            .contains("web_jail"));
+        assert!(jail_engine.get_jail_status(101).unwrap().contains("web_jail"));
 
         // 2. OpenBSD Pledge & Unveil
         let mut pledge_engine = OpenBsdPledgeUnveilSecurityEngine::new();
@@ -402,10 +385,7 @@ mod tests {
             slot: "0/3.0".to_string(),
             enabled_use_flags: flags,
         });
-        assert_eq!(
-            gentoo_engine.get_installed_slots("dev-libs/openssl"),
-            vec!["0/3.0"]
-        );
+        assert_eq!(gentoo_engine.get_installed_slots("dev-libs/openssl"), vec!["0/3.0"]);
 
         // 5. Illumos Zone Virtualization
         let mut zone_engine = IllumosZoneVirtualizationEngine::new();

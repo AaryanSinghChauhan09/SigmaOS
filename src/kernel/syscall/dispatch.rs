@@ -2,7 +2,6 @@
 //! 30+ Essential Syscalls with pledge/unveil and PQC syscalls
 //! Core syscalls: read, write, open, close, mmap, munmap, fork, execve, exit, etc.
 
-
 pub mod ioctl_helper;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -112,7 +111,9 @@ impl SyscallDispatcher {
     /// Register syscall handler
     pub fn register(&mut self, number: usize, handler: usize) {
         if number < 256 {
-            self.syscall_table[number].handler.store(handler, Ordering::SeqCst);
+            self.syscall_table[number]
+                .handler
+                .store(handler, Ordering::SeqCst);
         }
     }
 
@@ -135,11 +136,11 @@ impl SyscallDispatcher {
         }
 
         let result = self.default_handler(ctx, number);
-        
+
         if result < 0 {
             self.error_count.fetch_add(1, Ordering::SeqCst);
         }
-        
+
         result
     }
 
@@ -243,7 +244,7 @@ extern "C" fn sys_read(ctx: &mut SyscallContext) -> isize {
     let fd = ctx.get_arg(0);
     let buf = ctx.get_arg(1);
     let count = ctx.get_arg(2);
-    
+
     // Stub: return count as if read succeeded
     ctx.set_return(count);
     count as isize
@@ -253,7 +254,7 @@ extern "C" fn sys_write(ctx: &mut SyscallContext) -> isize {
     let fd = ctx.get_arg(0);
     let buf = ctx.get_arg(1);
     let count = ctx.get_arg(2);
-    
+
     // Stub: return count as if write succeeded
     ctx.set_return(count);
     count as isize
@@ -263,7 +264,7 @@ extern "C" fn sys_open(ctx: &mut SyscallContext) -> isize {
     let pathname = ctx.get_arg(0);
     let flags = ctx.get_arg(1);
     let mode = ctx.get_arg(2);
-    
+
     // Stub: return fd 3
     ctx.set_return(3);
     3
@@ -281,7 +282,7 @@ extern "C" fn sys_mmap(ctx: &mut SyscallContext) -> isize {
     let flags = ctx.get_arg(3);
     let fd = ctx.get_arg(4);
     let offset = ctx.get_arg(5);
-    
+
     // Stub: return fake address
     ctx.set_return(0x10000000);
     0x10000000 as isize
@@ -316,7 +317,7 @@ extern "C" fn sys_waitpid(ctx: &mut SyscallContext) -> isize {
     let pid = ctx.get_arg(0);
     let status = ctx.get_arg(1);
     let options = ctx.get_arg(2);
-    
+
     // Stub: return PID
     ctx.set_return(pid);
     pid as isize
@@ -332,7 +333,7 @@ extern "C" fn sys_socket(ctx: &mut SyscallContext) -> isize {
     let domain = ctx.get_arg(0);
     let type_ = ctx.get_arg(1);
     let protocol = ctx.get_arg(2);
-    
+
     // Stub: return fd 4
     ctx.set_return(4);
     4
@@ -362,7 +363,7 @@ extern "C" fn sys_accept(ctx: &mut SyscallContext) -> isize {
     let sockfd = ctx.get_arg(0);
     let addr = ctx.get_arg(1);
     let addrlen = ctx.get_arg(2);
-    
+
     // Stub: return new fd
     ctx.set_return(5);
     5
@@ -373,7 +374,7 @@ extern "C" fn sys_send(ctx: &mut SyscallContext) -> isize {
     let buf = ctx.get_arg(1);
     let len = ctx.get_arg(2);
     let flags = ctx.get_arg(3);
-    
+
     ctx.set_return(len);
     len as isize
 }
@@ -383,7 +384,7 @@ extern "C" fn sys_recv(ctx: &mut SyscallContext) -> isize {
     let buf = ctx.get_arg(1);
     let len = ctx.get_arg(2);
     let flags = ctx.get_arg(3);
-    
+
     ctx.set_return(len);
     len as isize
 }
@@ -490,8 +491,8 @@ pub struct FastSyscallRegisters {
     pub rsi: u64, // Arg 2
     pub rdx: u64, // Arg 3
     pub r10: u64, // Arg 4 (Linux fast syscall convention)
-    pub r8:  u64, // Arg 5
-    pub r9:  u64, // Arg 6
+    pub r8: u64,  // Arg 5
+    pub r9: u64,  // Arg 6
     pub rcx: u64, // Saved RIP (overwritten by hardware `syscall`)
     pub r11: u64, // Saved RFLAGS (overwritten by hardware `syscall`)
     pub rbx: u64,

@@ -151,28 +151,60 @@ impl Procfs {
 
     fn create_standard_structure(&mut self) {
         // /proc
-        self.create_entry("/proc".to_string(), ProcEntryType::Directory, "".to_string());
+        self.create_entry(
+            "/proc".to_string(),
+            ProcEntryType::Directory,
+            "".to_string(),
+        );
 
         // /proc/cpuinfo
-        self.create_entry("/proc/cpuinfo".to_string(), ProcEntryType::File, self.generate_cpuinfo());
+        self.create_entry(
+            "/proc/cpuinfo".to_string(),
+            ProcEntryType::File,
+            self.generate_cpuinfo(),
+        );
 
         // /proc/meminfo
-        self.create_entry("/proc/meminfo".to_string(), ProcEntryType::File, self.generate_meminfo());
+        self.create_entry(
+            "/proc/meminfo".to_string(),
+            ProcEntryType::File,
+            self.generate_meminfo(),
+        );
 
         // /proc/stat
-        self.create_entry("/proc/stat".to_string(), ProcEntryType::File, self.generate_stat());
+        self.create_entry(
+            "/proc/stat".to_string(),
+            ProcEntryType::File,
+            self.generate_stat(),
+        );
 
         // /proc/version
-        self.create_entry("/proc/version".to_string(), ProcEntryType::File, "SigmaOS version 1.0.0".to_string());
+        self.create_entry(
+            "/proc/version".to_string(),
+            ProcEntryType::File,
+            "SigmaOS version 1.0.0".to_string(),
+        );
 
         // /proc/uptime
-        self.create_entry("/proc/uptime".to_string(), ProcEntryType::File, "1000.0 5000.0".to_string());
+        self.create_entry(
+            "/proc/uptime".to_string(),
+            ProcEntryType::File,
+            "1000.0 5000.0".to_string(),
+        );
 
         // /proc/loadavg
-        self.create_entry("/proc/loadavg".to_string(), ProcEntryType::File, "0.50 0.45 0.40 1/100 1234".to_string());
+        self.create_entry(
+            "/proc/loadavg".to_string(),
+            ProcEntryType::File,
+            "0.50 0.45 0.40 1/100 1234".to_string(),
+        );
 
         // /proc/self
-        self.create_entry("/proc/self".to_string(), ProcEntryType::Symlink, "1".to_string());
+        self.create_entry(
+            "/proc/self".to_string(),
+            ProcEntryType::Symlink,
+            "1".to_string(),
+        );
 
         // /proc/1 (init process)
         self.create_process_entry(1, "init".to_string());
@@ -208,7 +240,12 @@ impl Procfs {
         )
     }
 
-    pub fn create_entry(&mut self, path: String, entry_type: ProcEntryType, value: String) -> Arc<Mutex<ProcEntry>> {
+    pub fn create_entry(
+        &mut self,
+        path: String,
+        entry_type: ProcEntryType,
+        value: String,
+    ) -> Arc<Mutex<ProcEntry>> {
         let entry = Arc::new(Mutex::new(ProcEntry::new(
             path.split('/').last().unwrap_or(&path).to_string(),
             entry_type,
@@ -230,24 +267,46 @@ impl Procfs {
 
     pub fn create_process_entry(&mut self, pid: u32, name: String) {
         let process_dir = format!("/proc/{}", pid);
-        self.create_entry(process_dir.clone(), ProcEntryType::Directory, "".to_string());
+        self.create_entry(
+            process_dir.clone(),
+            ProcEntryType::Directory,
+            "".to_string(),
+        );
 
         // /proc/{pid}/status
         let status = ProcessStatus::new(pid, name.clone());
         self.processes.insert(pid, status.clone());
-        self.create_entry(format!("{}/status", process_dir), ProcEntryType::File, self.generate_status(&status));
+        self.create_entry(
+            format!("{}/status", process_dir),
+            ProcEntryType::File,
+            self.generate_status(&status),
+        );
 
         // /proc/{pid}/cmdline
-        self.create_entry(format!("{}/cmdline", process_dir), ProcEntryType::File, status.cmdline.clone());
+        self.create_entry(
+            format!("{}/cmdline", process_dir),
+            ProcEntryType::File,
+            status.cmdline.clone(),
+        );
 
         // /proc/{pid}/exe
-        self.create_entry(format!("{}/exe", process_dir), ProcEntryType::Symlink, format!("/bin/{}", name));
+        self.create_entry(
+            format!("{}/exe", process_dir),
+            ProcEntryType::Symlink,
+            format!("/bin/{}", name),
+        );
     }
 
     fn generate_status(&self, status: &ProcessStatus) -> String {
         format!(
             "Name:\t{}\nState:\t{}\nPid:\t{}\nPPid:\t{}\nUid:\t{}\nGid:\t{}\nThreads:\t{}\n",
-            status.name, status.state, status.pid, status.ppid, status.uid, status.gid, status.threads
+            status.name,
+            status.state,
+            status.pid,
+            status.ppid,
+            status.uid,
+            status.gid,
+            status.threads
         )
     }
 
@@ -256,7 +315,9 @@ impl Procfs {
     }
 
     pub fn read_entry(&self, path: &str) -> Result<String, String> {
-        let entry = self.entries.get(path)
+        let entry = self
+            .entries
+            .get(path)
             .ok_or_else(|| format!("Entry not found: {}", path))?;
 
         let entry_guard = entry.lock().unwrap();
@@ -268,7 +329,9 @@ impl Procfs {
     }
 
     pub fn list_directory(&self, path: &str) -> Result<Vec<String>, String> {
-        let entry = self.entries.get(path)
+        let entry = self
+            .entries
+            .get(path)
             .ok_or_else(|| format!("Entry not found: {}", path))?;
 
         let entry_guard = entry.lock().unwrap();

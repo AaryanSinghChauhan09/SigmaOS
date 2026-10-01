@@ -113,7 +113,13 @@ impl FineGrainedAccessControlMatrix {
     }
 
     /// Set permission for app and scope
-    pub fn set_grant(&mut self, app_id: &str, scope: PortalPermissionScope, state: PermissionGrantState, current_time_sec: u64) {
+    pub fn set_grant(
+        &mut self,
+        app_id: &str,
+        scope: PortalPermissionScope,
+        state: PermissionGrantState,
+        current_time_sec: u64,
+    ) {
         // Update existing record if found
         for record in &mut self.records {
             if record.app_id == app_id && record.scope == scope {
@@ -132,7 +138,12 @@ impl FineGrainedAccessControlMatrix {
     }
 
     /// Evaluate permission grant state for app and scope
-    pub fn evaluate_permission(&mut self, app_id: &str, scope: PortalPermissionScope, current_time_sec: u64) -> PermissionGrantState {
+    pub fn evaluate_permission(
+        &mut self,
+        app_id: &str,
+        scope: PortalPermissionScope,
+        current_time_sec: u64,
+    ) -> PermissionGrantState {
         for record in &mut self.records {
             if record.app_id == app_id && record.scope == scope {
                 match record.grant_state {
@@ -150,14 +161,17 @@ impl FineGrainedAccessControlMatrix {
                     PermissionGrantState::OneTimeUse { consumed } => {
                         if !consumed {
                             // Consume the single-use token
-                            record.grant_state = PermissionGrantState::OneTimeUse { consumed: true };
+                            record.grant_state =
+                                PermissionGrantState::OneTimeUse { consumed: true };
                             return PermissionGrantState::Allowed;
                         } else {
                             return PermissionGrantState::Denied;
                         }
                     }
                     PermissionGrantState::PromptUser => return PermissionGrantState::PromptUser,
-                    PermissionGrantState::SandboxedRestricted => return PermissionGrantState::SandboxedRestricted,
+                    PermissionGrantState::SandboxedRestricted => {
+                        return PermissionGrantState::SandboxedRestricted
+                    }
                 }
             }
         }
@@ -206,9 +220,16 @@ impl SovereignPublicationInspiredPermissionEngine {
     }
 
     /// Authorize a portal scope request with audit metrics tracking
-    pub fn check_portal_access(&mut self, app_id: &str, scope: PortalPermissionScope, current_time_sec: u64) -> bool {
+    pub fn check_portal_access(
+        &mut self,
+        app_id: &str,
+        scope: PortalPermissionScope,
+        current_time_sec: u64,
+    ) -> bool {
         self.total_evaluations += 1;
-        let grant = self.acl_matrix.evaluate_permission(app_id, scope, current_time_sec);
+        let grant = self
+            .acl_matrix
+            .evaluate_permission(app_id, scope, current_time_sec);
 
         match grant {
             PermissionGrantState::Allowed
@@ -230,18 +251,37 @@ impl SovereignPublicationInspiredPermissionEngine {
     }
 
     /// Grant temporary permission for specified duration (seconds)
-    pub fn grant_temporal_permission(&mut self, app_id: &str, scope: PortalPermissionScope, duration_sec: u64, current_time_sec: u64) {
+    pub fn grant_temporal_permission(
+        &mut self,
+        app_id: &str,
+        scope: PortalPermissionScope,
+        duration_sec: u64,
+        current_time_sec: u64,
+    ) {
         let expires_at_sec = current_time_sec.saturating_add(duration_sec);
-        self.acl_matrix.set_grant(app_id, scope, PermissionGrantState::TemporalGranted { expires_at_sec }, current_time_sec);
+        self.acl_matrix.set_grant(
+            app_id,
+            scope,
+            PermissionGrantState::TemporalGranted { expires_at_sec },
+            current_time_sec,
+        );
     }
 
     /// Verify USB hardware peripheral bounds (TechPowerUp / Phoronix)
     pub fn check_usb_device_permission(&self, vendor_id: u16) -> bool {
-        if self.acl_matrix.hardware_bounds.allow_usb_vendor_ids.is_empty() {
+        if self
+            .acl_matrix
+            .hardware_bounds
+            .allow_usb_vendor_ids
+            .is_empty()
+        {
             // No restriction list defined -> default allow
             return true;
         }
-        self.acl_matrix.hardware_bounds.allow_usb_vendor_ids.contains(&vendor_id)
+        self.acl_matrix
+            .hardware_bounds
+            .allow_usb_vendor_ids
+            .contains(&vendor_id)
     }
 
     /// Verify GPU memory usage against hardware limits
@@ -269,7 +309,12 @@ mod tests {
         assert!(!engine.check_portal_access(app, PortalPermissionScope::CameraAccess, 1000));
 
         // Explicitly allow camera access
-        engine.acl_matrix.set_grant(app, PortalPermissionScope::CameraAccess, PermissionGrantState::Allowed, 1000);
+        engine.acl_matrix.set_grant(
+            app,
+            PortalPermissionScope::CameraAccess,
+            PermissionGrantState::Allowed,
+            1000,
+        );
         assert!(engine.check_portal_access(app, PortalPermissionScope::CameraAccess, 1000));
     }
 
@@ -310,7 +355,11 @@ mod tests {
     #[test]
     fn test_hardware_peripheral_bounds() {
         let mut engine = SovereignPublicationInspiredPermissionEngine::new();
-        engine.acl_matrix.hardware_bounds.allow_usb_vendor_ids.push(0x1234);
+        engine
+            .acl_matrix
+            .hardware_bounds
+            .allow_usb_vendor_ids
+            .push(0x1234);
         engine.acl_matrix.hardware_bounds.max_gpu_compute_memory_mb = 1024;
 
         assert!(engine.check_usb_device_permission(0x1234));
@@ -327,7 +376,9 @@ mod tests {
 
         // Test DefaultDeny policy default
         assert_eq!(
-            engine.acl_matrix.evaluate_permission(app, PortalPermissionScope::PreciseLocation, 100),
+            engine
+                .acl_matrix
+                .evaluate_permission(app, PortalPermissionScope::PreciseLocation, 100),
             PermissionGrantState::Denied
         );
 

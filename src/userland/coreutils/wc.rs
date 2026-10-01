@@ -75,9 +75,7 @@ pub fn count_reader<R: Read>(reader: &mut R) -> Result<WcStats, String> {
 
     loop {
         line_buf.clear();
-        let bytes_read = buf_reader
-            .read_line(&mut line_buf)
-            .map_err(|e| format!("wc: {}", e))?;
+        let bytes_read = buf_reader.read_line(&mut line_buf).map_err(|e| format!("wc: {}", e))?;
         if bytes_read == 0 {
             break;
         }

@@ -19,17 +19,21 @@
 /// OOP-based USB RNDIS for SigmaOS
 /// Implements NDIS (Network Device Interface Specification) model ethernet and Wi-Fi drivers.
 /// Inspired by Linux sk_buff, BSD mbuf, and standard NDIS OID state queries.
-
 use std::boxed::Box;
 
-use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type RNDISID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum RNDISError { Success = 0, NotFound = 1, InvalidOid = 2, BufferOverflow = 3 }
+pub enum RNDISError {
+    Success = 0,
+    NotFound = 1,
+    InvalidOid = 2,
+    BufferOverflow = 3,
+}
 
 pub trait USBRNDIS {
     fn id(&self) -> RNDISID;
@@ -53,10 +57,15 @@ impl SimpleUSBRNDIS {
 }
 
 impl USBRNDIS for SimpleUSBRNDIS {
-    fn id(&self) -> RNDISID { self.id }
-    fn is_connected(&self) -> bool { self.connected.load(Ordering::SeqCst) == 1 }
+    fn id(&self) -> RNDISID {
+        self.id
+    }
+    fn is_connected(&self) -> bool {
+        self.connected.load(Ordering::SeqCst) == 1
+    }
     fn set_connected(&self, value: bool) {
-        self.connected.store(if value { 1 } else { 0 }, Ordering::SeqCst);
+        self.connected
+            .store(if value { 1 } else { 0 }, Ordering::SeqCst);
     }
 }
 
@@ -96,7 +105,7 @@ impl RNDISController for SimpleRNDISController {
         }
         Err(RNDISError::NotFound)
     }
-    
+
     fn send_packet(&self, rndis_id: RNDISID, _packet: &[u8]) -> Result<usize, RNDISError> {
         if self.get_rndis(rndis_id).is_some() {
             Ok(0)
@@ -104,21 +113,25 @@ impl RNDISController for SimpleRNDISController {
             Err(RNDISError::NotFound)
         }
     }
-    
+
     fn receive_packet(&self, rndis_id: RNDISID, buffer: &mut [u8]) -> Result<usize, RNDISError> {
         if self.get_rndis(rndis_id).is_some() {
-            for byte in buffer.iter_mut() { *byte = 0; }
+            for byte in buffer.iter_mut() {
+                *byte = 0;
+            }
             Ok(buffer.len())
         } else {
             Err(RNDISError::NotFound)
         }
     }
-    
+
     fn get_rndis(&self, id: RNDISID) -> Option<&dyn USBRNDIS> {
         for rndis_option in &self.rndis_devices {
             if let Some(ref rndis) = *rndis_option {
                 let dev_ref: &dyn USBRNDIS = rndis.as_ref();
-                if dev_ref.id() == id { return Some(dev_ref); }
+                if dev_ref.id() == id {
+                    return Some(dev_ref);
+                }
             }
         }
         None
@@ -127,7 +140,8 @@ impl RNDISController for SimpleRNDISController {
 
 pub trait RNDISMessage {
     fn send_msg(&self, rndis_id: RNDISID, msg_id: u32, data: &[u8]) -> Result<(), RNDISError>;
-    fn receive_msg(&self, rndis_id: RNDISID, buffer: &mut [u8]) -> Result<(u32, usize), RNDISError>;
+    fn receive_msg(&self, rndis_id: RNDISID, buffer: &mut [u8])
+        -> Result<(u32, usize), RNDISError>;
 }
 
 #[repr(C)]
@@ -149,10 +163,16 @@ impl RNDISMessage for SimpleRNDISMessage {
             Err(RNDISError::NotFound)
         }
     }
-    
-    fn receive_msg(&self, rndis_id: RNDISID, buffer: &mut [u8]) -> Result<(u32, usize), RNDISError> {
+
+    fn receive_msg(
+        &self,
+        rndis_id: RNDISID,
+        buffer: &mut [u8],
+    ) -> Result<(u32, usize), RNDISError> {
         if self.controller.get_rndis(rndis_id).is_some() {
-            for byte in buffer.iter_mut() { *byte = 0; }
+            for byte in buffer.iter_mut() {
+                *byte = 0;
+            }
             Ok((0, buffer.len()))
         } else {
             Err(RNDISError::NotFound)
@@ -201,7 +221,7 @@ pub const OID_802_11_SSID: u32 = 0x0d010102;
 
 #[repr(C)]
 pub struct RndisOidManager {
-    pub physical_medium: u32,  // 1 = Ethernet, 2 = Wi-Fi
+    pub physical_medium: u32, // 1 = Ethernet, 2 = Wi-Fi
     pub link_speed_bps: u64,
     pub mac_address: [u8; 6],
 }
@@ -218,18 +238,24 @@ impl RndisOidManager {
     pub fn query_oid(&self, oid: u32, out_buffer: &mut [u8]) -> Result<usize, RNDISError> {
         match oid {
             OID_GEN_PHYSICAL_MEDIUM => {
-                if out_buffer.len() < 4 { return Err(RNDISError::BufferOverflow); }
+                if out_buffer.len() < 4 {
+                    return Err(RNDISError::BufferOverflow);
+                }
                 out_buffer[0] = self.physical_medium as u8;
                 Ok(4)
             }
             OID_GEN_LINK_SPEED => {
-                if out_buffer.len() < 8 { return Err(RNDISError::BufferOverflow); }
+                if out_buffer.len() < 8 {
+                    return Err(RNDISError::BufferOverflow);
+                }
                 let bytes = self.link_speed_bps.to_le_bytes();
                 out_buffer[..8].copy_from_slice(&bytes);
                 Ok(8)
             }
             OID_802_3_CURRENT_ADDRESS => {
-                if out_buffer.len() < 6 { return Err(RNDISError::BufferOverflow); }
+                if out_buffer.len() < 6 {
+                    return Err(RNDISError::BufferOverflow);
+                }
                 out_buffer[..6].copy_from_slice(&self.mac_address);
                 Ok(6)
             }
@@ -290,13 +316,25 @@ impl Default for WifiStateManager {
 // ==============================================================================
 // Vec Implementation
 // ==============================================================================
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -304,19 +342,29 @@ impl<T> Vec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -348,7 +396,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;

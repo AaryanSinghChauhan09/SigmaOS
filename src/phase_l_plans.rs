@@ -28,7 +28,6 @@ use std::vec;
 //   7. S-COSMOS — Cross-Platform Binary Translator (CROSS_PLATFORM_COMPATIBILITY_PLAN.md)
 // ============================================================================
 
-
 // ============================================================================
 // 1. ZENITHNET — Zero-Copy Sovereign Networking Stack
 // ============================================================================
@@ -389,11 +388,11 @@ pub mod zenithnet {
 // ============================================================================
 
 pub mod roadmap_innovations {
-    
-use std::vec::Vec;
+
+    use std::collections::BTreeSet;
     use std::string::String;
     use std::string::ToString;
-    use std::collections::BTreeSet;
+    use std::vec::Vec;
 
     // 8.1 Kernel Profiles
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -632,13 +631,15 @@ use std::vec::Vec;
 
         #[test]
         fn test_package_manager() {
-            let mut pm = SigmaPackageManager::new(PackageBackend::Native, DependencyResolver::SatSolver);
+            let mut pm =
+                SigmaPackageManager::new(PackageBackend::Native, DependencyResolver::SatSolver);
             assert_eq!(pm.backend, PackageBackend::Native);
             pm.install_package(PackageMetadata {
                 name: "test-pkg".to_string(),
                 version: "1.0.0".to_string(),
                 dependencies: vec![],
-            }).unwrap();
+            })
+            .unwrap();
             assert_eq!(pm.installed.len(), 1);
         }
 
@@ -648,7 +649,10 @@ use std::vec::Vec;
             seccomp.insert(1); // sys_read
             seccomp.insert(2); // sys_write
             let sandbox = EnhancedSandbox {
-                cpu_limit: Some(ResourceLimit { value: 80, soft: false }),
+                cpu_limit: Some(ResourceLimit {
+                    value: 80,
+                    soft: false,
+                }),
                 memory_limit: None,
                 network_isolation: NetworkIsolation::IsolatedNamespace,
                 seccomp_allowed: seccomp,
@@ -2491,4 +2495,3 @@ pub mod s_cosmos {
         }
     }
 }
-

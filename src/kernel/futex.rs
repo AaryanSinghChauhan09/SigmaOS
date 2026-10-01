@@ -2,8 +2,8 @@
 // Userspace synchronization primitive for SigmaOS
 
 use std::collections::BTreeMap;
-use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
 
 /// Futex operation (Linux futex.h)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -135,11 +135,20 @@ impl FutexManager {
     }
 
     /// Wait on a futex
-    pub fn wait(&mut self, address: u64, _expected_value: u32, pid: u32, flags: FutexFlags) -> Result<(), String> {
+    pub fn wait(
+        &mut self,
+        address: u64,
+        _expected_value: u32,
+        pid: u32,
+        flags: FutexFlags,
+    ) -> Result<(), String> {
         // In a real implementation, this would check the actual memory value
         // For now, we just add the waiter to the queue
 
-        let queue = self.queues.entry(address).or_insert_with(|| FutexQueue::new(address));
+        let queue = self
+            .queues
+            .entry(address)
+            .or_insert_with(|| FutexQueue::new(address));
         let waiter = Arc::new(FutexWaiter::new(address, pid, flags));
         queue.add_waiter(waiter);
 
@@ -148,7 +157,9 @@ impl FutexManager {
 
     /// Wake waiters on a futex
     pub fn wake(&mut self, address: u64, max_waiters: usize) -> Result<usize, String> {
-        let queue = self.queues.get_mut(&address)
+        let queue = self
+            .queues
+            .get_mut(&address)
             .ok_or_else(|| format!("No waiters on address: {}", address))?;
 
         let mut woken_count = 0;
@@ -172,7 +183,9 @@ impl FutexManager {
 
     /// Wake all waiters on a futex
     pub fn wake_all(&mut self, address: u64) -> Result<usize, String> {
-        let queue = self.queues.get_mut(&address)
+        let queue = self
+            .queues
+            .get_mut(&address)
             .ok_or_else(|| format!("No waiters on address: {}", address))?;
 
         let woken = queue.wake_all();
@@ -189,10 +202,17 @@ impl FutexManager {
     }
 
     /// Requeue waiters from one address to another
-    pub fn requeue(&mut self, src_address: u64, dst_address: u64, max_waiters: usize) -> Result<usize, String> {
+    pub fn requeue(
+        &mut self,
+        src_address: u64,
+        dst_address: u64,
+        max_waiters: usize,
+    ) -> Result<usize, String> {
         // First, collect PIDs to requeue
         let to_requeue_pids = {
-            let src_queue = self.queues.get(&src_address)
+            let src_queue = self
+                .queues
+                .get(&src_address)
                 .ok_or_else(|| format!("No waiters on source address: {}", src_address))?;
 
             let mut pids = Vec::new();
@@ -211,7 +231,9 @@ impl FutexManager {
 
         // Remove from source
         if let Some(src_queue) = self.queues.get_mut(&src_address) {
-            src_queue.waiters.retain(|w| !to_requeue_pids.contains(&w.pid));
+            src_queue
+                .waiters
+                .retain(|w| !to_requeue_pids.contains(&w.pid));
 
             // Clean up empty source queue
             if src_queue.waiter_count() == 0 {
@@ -220,7 +242,10 @@ impl FutexManager {
         }
 
         // Add to destination
-        let dst_queue = self.queues.entry(dst_address).or_insert_with(|| FutexQueue::new(dst_address));
+        let dst_queue = self
+            .queues
+            .entry(dst_address)
+            .or_insert_with(|| FutexQueue::new(dst_address));
         for pid in to_requeue_pids {
             let new_waiter = Arc::new(FutexWaiter::new(dst_address, pid, FutexFlags::new()));
             dst_queue.add_waiter(new_waiter);
@@ -231,7 +256,8 @@ impl FutexManager {
 
     /// Get waiter count for an address
     pub fn waiter_count(&self, address: u64) -> usize {
-        self.queues.get(&address)
+        self.queues
+            .get(&address)
             .map(|q| q.waiter_count())
             .unwrap_or(0)
     }

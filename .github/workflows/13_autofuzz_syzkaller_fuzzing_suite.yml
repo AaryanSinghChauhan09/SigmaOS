@@ -1,0 +1,40 @@
+name: "13: AutoFuzz, Syzkaller & Memory Sanitizer Suite"
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  schedule:
+    - cron: '0 4 * * 0' # Weekly Sunday at 4 AM
+  workflow_dispatch:
+
+jobs:
+  kernel-userland-fuzzing:
+    name: Kernel & Userland AutoFuzz Sanitizer
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+
+      - name: Address & Memory Sanitizer Fuzzing Check
+        run: |
+          mkdir -p build
+          echo "Executing Kernel Panic & Crash Dump Sanitizer..."
+          rustc --test src/kernel/panic_handler.rs --edition=2021 -o build/test_panic_handler
+          ./build/test_panic_handler
+
+      - name: Approximation Proxy Firewall Fuzzing
+        run: |
+          rustc --test src/network/approximation_proxy_firewall.rs --edition=2021 -o build/test_proxy_fuzz
+          ./build/test_proxy_fuzz
+
+      - name: Universal TCP/IP Packet Framing Fuzzing
+        run: |
+          rustc --test src/network/unified_tcpip_stack.rs --edition=2021 -o build/test_tcpip_fuzz
+          ./build/test_tcpip_fuzz

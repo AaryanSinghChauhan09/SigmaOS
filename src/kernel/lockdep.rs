@@ -5,7 +5,7 @@
 #![allow(dead_code)]
 
 use std::collections::{BTreeMap, BTreeSet};
-use std::sync::atomic::{AtomicU64, AtomicU32, Ordering};
+use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 
 /// Lock class ID
 pub type LockClassId = u64;
@@ -93,19 +93,26 @@ impl LockdepSubsystem {
         let instance_id = self.next_instance_id.fetch_add(1, Ordering::SeqCst);
         self.held_locks.insert(instance_id, class_id);
         self.lock_depth.fetch_add(1, Ordering::SeqCst);
-        
+
         Ok(instance_id)
     }
 
     /// Release a lock
     pub fn release_lock(&mut self, instance_id: LockInstanceId) -> Result<(), LockdepError> {
-        let class_id = self.held_locks.remove(&instance_id).ok_or(LockdepError::NotHeld)?;
+        let class_id = self
+            .held_locks
+            .remove(&instance_id)
+            .ok_or(LockdepError::NotHeld)?;
         self.lock_depth.fetch_sub(1, Ordering::SeqCst);
         Ok(())
     }
 
     /// Add lock dependency (lock ordering rule)
-    pub fn add_dependency(&mut self, from: LockClassId, to: LockClassId) -> Result<(), LockdepError> {
+    pub fn add_dependency(
+        &mut self,
+        from: LockClassId,
+        to: LockClassId,
+    ) -> Result<(), LockdepError> {
         if !self.lock_classes.contains_key(&from) || !self.lock_classes.contains_key(&to) {
             return Err(LockdepError::InvalidLockClass);
         }
@@ -128,7 +135,12 @@ impl LockdepSubsystem {
         self.check_circular_helper(to, from, &mut visited)
     }
 
-    fn check_circular_helper(&self, current: LockClassId, target: LockClassId, visited: &mut BTreeSet<LockClassId>) -> bool {
+    fn check_circular_helper(
+        &self,
+        current: LockClassId,
+        target: LockClassId,
+        visited: &mut BTreeSet<LockClassId>,
+    ) -> bool {
         if current == target {
             return true;
         }
@@ -179,10 +191,10 @@ mod tests {
     #[test]
     fn test_lock_class_registration() {
         let mut lockdep = LockdepSubsystem::new();
-        
+
         let id1 = lockdep.register_lock_class("mutex".to_string());
         let id2 = lockdep.register_lock_class("rwlock".to_string());
-        
+
         assert!(id1 > 0);
         assert!(id2 > id1);
         assert_eq!(lockdep.lock_class_count(), 2);
@@ -191,13 +203,13 @@ mod tests {
     #[test]
     fn test_lock_acquire_release() {
         let mut lockdep = LockdepSubsystem::new();
-        
+
         let class_id = lockdep.register_lock_class("mutex".to_string());
-        
+
         let instance_id = lockdep.acquire_lock(class_id).unwrap();
         assert_eq!(lockdep.lock_depth(), 1);
         assert_eq!(lockdep.held_lock_count(), 1);
-        
+
         lockdep.release_lock(instance_id).unwrap();
         assert_eq!(lockdep.lock_depth(), 0);
         assert_eq!(lockdep.held_lock_count(), 0);
@@ -206,26 +218,26 @@ mod tests {
     #[test]
     fn test_lock_dependency() {
         let mut lockdep = LockdepSubsystem::new();
-        
+
         let id1 = lockdep.register_lock_class("mutex".to_string());
         let id2 = lockdep.register_lock("rwlock".to_string());
-        
+
         assert!(lockdep.add_dependency(id1, id2).is_ok());
     }
 
     #[test]
     fn test_circular_detection() {
         let mut lockdep = lockdep = LockdepSubsystem::new();
-        
+
         let id1 = lockdep.register_lock_class("mutex".to_string());
         let id2 = lockdep.register_lock("rwlock".to_string());
-        
+
         lockdep.add_dependency(id1, id2).unwrap();
         lockdep.add_dependency(id2, id1).unwrap(); // Circular
-        
+
         lockdep.acquire_lock(id1).unwrap();
         let result = lockdep.acquire_lock(id2);
-        
+
         assert!(result.is_err());
     }
 }

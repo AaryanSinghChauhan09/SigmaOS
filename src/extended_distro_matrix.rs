@@ -11,7 +11,6 @@
 //! - **DragonFly BSD**: HAMMER2 filesystem snapshot transaction log model
 use std::vec;
 
-
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
@@ -69,7 +68,8 @@ impl UrpmiMedia {
     }
 
     pub fn add_pkg(&mut self, name: &str, ver: &str) {
-        self.package_versions.insert(name.to_string(), ver.to_string());
+        self.package_versions
+            .insert(name.to_string(), ver.to_string());
     }
 
     pub fn lookup(&self, name: &str) -> Option<&String> {
@@ -234,7 +234,12 @@ mod tests {
 
     #[test]
     fn test_tiling_and_power() {
-        let screen = WindowRect { x: 0, y: 0, width: 1920, height: 1080 };
+        let screen = WindowRect {
+            x: 0,
+            y: 0,
+            width: 1920,
+            height: 1080,
+        };
         let (l, r) = AutoTilingLayout::tile_horizontal(screen);
         assert_eq!(l.width, 960);
         assert_eq!(r.width, 960);

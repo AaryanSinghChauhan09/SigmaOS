@@ -1,7 +1,6 @@
 //! Tmpfs (In-Memory Virtual File System) Subsystem
 //! Inspired by Linux's on-demand VM allocations and FreeBSD's swap-backed tmpfs mechanics.
 
-
 pub const MAX_TMPFS_INODES: usize = 32;
 
 /// Linux & BSD standard "50% rule" ratio for default tmpfs maximum RAM size allocation
@@ -45,10 +44,10 @@ impl TmpfsConfig {
 pub struct TmpfsInode {
     pub id: usize,
     pub file_type: TmpfsFileType,
-    pub apparent_size: usize,  // Size of file content
-    pub is_swapbacked: bool,   // True if paged out to anonymous swap space
-    pub link_count: u32,       // Hard link count reference
-    pub mtime: u64,            // Modification time
+    pub apparent_size: usize, // Size of file content
+    pub is_swapbacked: bool,  // True if paged out to anonymous swap space
+    pub link_count: u32,      // Hard link count reference
+    pub mtime: u64,           // Modification time
     pub uid: u32,
     pub gid: u32,
     pub mode: u32,
@@ -95,7 +94,9 @@ impl TmpfsFileSystem {
         mtime: u64,
     ) -> Result<usize, &'static str> {
         // 1. Enforce max inodes boundary limit
-        if self.current_inodes_used >= self.config.max_inodes || self.current_inodes_used >= MAX_TMPFS_INODES {
+        if self.current_inodes_used >= self.config.max_inodes
+            || self.current_inodes_used >= MAX_TMPFS_INODES
+        {
             return Err("Tmpfs reached maximum inode capacity limit");
         }
 
@@ -158,7 +159,11 @@ impl TmpfsFileSystem {
                         return Ok(());
                     } else {
                         // link_count is 1, so decrementing drops it to 0 (delete/reclaim)
-                        reclaim_bytes = if inode.is_swapbacked { 0 } else { inode.apparent_size };
+                        reclaim_bytes = if inode.is_swapbacked {
+                            0
+                        } else {
+                            inode.apparent_size
+                        };
                         index = Some(i);
                         is_deleted = true;
                         break;
@@ -189,7 +194,8 @@ impl TmpfsFileSystem {
                     }
                     inode.is_swapbacked = true;
                     // Reclaim physical RAM footprint by paging out to disk block swap mappings
-                    self.current_bytes_used = self.current_bytes_used.saturating_sub(inode.apparent_size);
+                    self.current_bytes_used =
+                        self.current_bytes_used.saturating_sub(inode.apparent_size);
                     return Ok(());
                 }
             }
@@ -244,12 +250,16 @@ mod tests {
         let mut fs = TmpfsFileSystem::new(config);
 
         // Allocate a 4KB file - succeeds
-        let f1 = fs.create_node(TmpfsFileType::Regular, 4096, 1625100000).unwrap();
+        let f1 = fs
+            .create_node(TmpfsFileType::Regular, 4096, 1625100000)
+            .unwrap();
         assert_eq!(fs.current_bytes_used, 4096);
         assert_eq!(fs.current_inodes_used, 1);
 
         // Allocate another 4KB file - succeeds
-        let f2 = fs.create_node(TmpfsFileType::Regular, 4096, 1625100005).unwrap();
+        let f2 = fs
+            .create_node(TmpfsFileType::Regular, 4096, 1625100005)
+            .unwrap();
         assert_eq!(fs.current_bytes_used, 8192);
 
         // Allocate a third 1KB file - fails with exceeds memory limits
@@ -261,7 +271,9 @@ mod tests {
         assert_eq!(fs.current_bytes_used, 4096);
 
         // Try allocating f3 again - now succeeds!
-        let f3_ok = fs.create_node(TmpfsFileType::Regular, 1024, 1625100010).unwrap();
+        let f3_ok = fs
+            .create_node(TmpfsFileType::Regular, 1024, 1625100010)
+            .unwrap();
         assert_eq!(fs.current_bytes_used, 5120);
     }
 
@@ -321,7 +333,10 @@ mod tests {
 
         // Trying to swap in fid must fail because it would exceed limits (4KB + 4KB > 4KB max_bytes)
         let swap_in_res = fs.swap_in_node(fid);
-        assert_eq!(swap_in_res, Err("Insufficient Tmpfs memory to page in node"));
+        assert_eq!(
+            swap_in_res,
+            Err("Insufficient Tmpfs memory to page in node")
+        );
 
         // Delete fid2
         fs.unlink_node(fid2).unwrap();

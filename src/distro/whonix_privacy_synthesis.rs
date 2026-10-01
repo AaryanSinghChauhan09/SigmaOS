@@ -157,7 +157,8 @@ impl WhonixGatewayRoutingEngine {
             return Err("Blocked potential clearnet leak attempt on Workstation".to_string());
         }
 
-        let tag = tag.unwrap_or_else(|| StreamIsolationTag::new("default_app", 1, "default_circuit"));
+        let tag =
+            tag.unwrap_or_else(|| StreamIsolationTag::new("default_app", 1, "default_circuit"));
 
         // Match existing circuit or allocate new stream-isolated circuit
         let circuit_id = match self
@@ -175,17 +176,30 @@ impl WhonixGatewayRoutingEngine {
         }
 
         let route_info = if dest_port == 53 {
-            format!("Routed via Whonix DNS TransPort :{}", self.config.transparent_dns_port)
+            format!(
+                "Routed via Whonix DNS TransPort :{}",
+                self.config.transparent_dns_port
+            )
         } else if dest_port == self.config.socks5_proxy_port {
-            format!("Routed via Whonix SOCKS5 Proxy :{}", self.config.socks5_proxy_port)
+            format!(
+                "Routed via Whonix SOCKS5 Proxy :{}",
+                self.config.socks5_proxy_port
+            )
         } else {
-            format!("Routed via Whonix TransPort :{}", self.config.transparent_transport_port)
+            format!(
+                "Routed via Whonix TransPort :{}",
+                self.config.transparent_transport_port
+            )
         };
 
         Ok((circuit_id, route_info))
     }
 
-    pub fn wipe_workstation_amnesic_ram(&mut self, workstation_id: &str, ram_buffer: &mut [u8]) -> Result<usize, String> {
+    pub fn wipe_workstation_amnesic_ram(
+        &mut self,
+        workstation_id: &str,
+        ram_buffer: &mut [u8],
+    ) -> Result<usize, String> {
         let ws = self
             .workstations
             .get_mut(workstation_id)
@@ -223,8 +237,12 @@ impl SovereignWhonixPrivacySuite {
         let tag1 = StreamIsolationTag::new("browser", 101, "session_a");
         let tag2 = StreamIsolationTag::new("git", 101, "session_b");
 
-        let res1 = self.gateway_engine.route_traffic("ws-sys-1", "onion.tor", 80, 512, Some(tag1));
-        let res2 = self.gateway_engine.route_traffic("ws-sys-1", "github.tor", 443, 1024, Some(tag2));
+        let res1 = self
+            .gateway_engine
+            .route_traffic("ws-sys-1", "onion.tor", 80, 512, Some(tag1));
+        let res2 =
+            self.gateway_engine
+                .route_traffic("ws-sys-1", "github.tor", 443, 1024, Some(tag2));
 
         if res1.is_err() || res2.is_err() {
             return false;
@@ -254,13 +272,10 @@ mod tests {
         assert!(suite.verify_isolation_guarantee());
 
         // Test clearnet leak blocking
-        let leak_res = suite.gateway_engine.route_traffic(
-            "ws-sys-1",
-            "raw_ip:1.1.1.1",
-            80,
-            64,
-            None,
-        );
+        let leak_res =
+            suite
+                .gateway_engine
+                .route_traffic("ws-sys-1", "raw_ip:1.1.1.1", 80, 64, None);
         assert!(leak_res.is_err());
         assert_eq!(suite.gateway_engine.leaked_packet_attempts, 1);
 

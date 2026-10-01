@@ -1,13 +1,12 @@
 extern crate alloc;
 use alloc::boxed::Box;
 
+use core::mem;
 /// OOP-based Advanced Asynchronous Timer, APC, DPC & IOCTL Execution Engine for SigmaOS
 /// Implements high-fidelity timer management, Windows-inspired Asynchronous Procedure Calls (APC),
 /// Deferred Procedure Calls (DPC), and standard Linux/BSD IOCTL handlers.
-
 use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicU64, AtomicUsize, AtomicBool, Ordering};
-use core::mem;
+use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 
 /// Timer ID
 pub type TimerID = usize;
@@ -103,7 +102,12 @@ pub struct TimerDescriptor {
 }
 
 impl TimerDescriptor {
-    pub fn new(id: TimerID, timer_type: TimerType, interval: Timestamp, capability: TimerCapability) -> Self {
+    pub fn new(
+        id: TimerID,
+        timer_type: TimerType,
+        interval: Timestamp,
+        capability: TimerCapability,
+    ) -> Self {
         TimerDescriptor {
             id,
             timer_type,
@@ -141,7 +145,8 @@ impl Timer for TimerDescriptor {
         }
 
         self.start_time.store(get_current_time(), Ordering::SeqCst);
-        self.remaining.store(self.interval.load(Ordering::SeqCst), Ordering::SeqCst);
+        self.remaining
+            .store(self.interval.load(Ordering::SeqCst), Ordering::SeqCst);
         self.is_running.store(true, Ordering::SeqCst);
         Ok(())
     }
@@ -165,8 +170,9 @@ impl Timer for TimerDescriptor {
         }
 
         let was_running = self.is_running.load(Ordering::SeqCst);
-        self.remaining.store(self.interval.load(Ordering::SeqCst), Ordering::SeqCst);
-        
+        self.remaining
+            .store(self.interval.load(Ordering::SeqCst), Ordering::SeqCst);
+
         if was_running {
             self.start_time.store(get_current_time(), Ordering::SeqCst);
         }
@@ -309,7 +315,12 @@ impl TimerStats {
 }
 
 pub trait TimerManager {
-    fn create_timer(&mut self, timer_type: TimerType, interval: Timestamp, capability: TimerCapability) -> Result<TimerID, TimerError>;
+    fn create_timer(
+        &mut self,
+        timer_type: TimerType,
+        interval: Timestamp,
+        capability: TimerCapability,
+    ) -> Result<TimerID, TimerError>;
     fn delete_timer(&mut self, id: TimerID) -> Result<(), TimerError>;
     fn start_timer(&mut self, id: TimerID) -> Result<(), TimerError>;
     fn stop_timer(&mut self, id: TimerID) -> Result<(), TimerError>;
@@ -363,10 +374,12 @@ impl SimpleTimerManager {
         }
     }
 
+    /// SAFETY: Caller must ensure pointer validity and unique borrow semantics
     unsafe fn get_timer_mut(&mut self, id: TimerID) -> Option<&mut TimerDescriptor> {
         for timer_option in &mut self.timers {
             if let Some(timer_ptr) = *timer_option {
-                let timer = &mut *timer_ptr.as_ptr();
+                // SAFETY: timer_ptr points to a valid heap-allocated TimerDescriptor
+                let timer = unsafe { &mut *timer_ptr.as_ptr() };
                 if timer.id == id {
                     return Some(timer);
                 }
@@ -375,10 +388,12 @@ impl SimpleTimerManager {
         None
     }
 
+    /// SAFETY: Caller must ensure pointer validity and shared borrow semantics
     unsafe fn get_timer(&self, id: TimerID) -> Option<&TimerDescriptor> {
         for timer_option in &self.timers {
             if let Some(timer_ptr) = *timer_option {
-                let timer = &*timer_ptr.as_ptr();
+                // SAFETY: timer_ptr points to a valid heap-allocated TimerDescriptor
+                let timer = unsafe { &*timer_ptr.as_ptr() };
                 if timer.id == id {
                     return Some(timer);
                 }
@@ -389,7 +404,12 @@ impl SimpleTimerManager {
 }
 
 impl TimerManager for SimpleTimerManager {
-    fn create_timer(&mut self, timer_type: TimerType, interval: Timestamp, capability: TimerCapability) -> Result<TimerID, TimerError> {
+    fn create_timer(
+        &mut self,
+        timer_type: TimerType,
+        interval: Timestamp,
+        capability: TimerCapability,
+    ) -> Result<TimerID, TimerError> {
         if !self.capability.can_create {
             return Err(TimerError::PermissionDenied);
         }
@@ -397,6 +417,7 @@ impl TimerManager for SimpleTimerManager {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let timer = TimerDescriptor::new(id, timer_type, interval, capability);
 
+        // SAFETY: Allocates exact layout for TimerDescriptor and writes valid instance before NonNull construction
         let timer_ptr = unsafe {
             let ptr = alloc(mem::size_of::<TimerDescriptor>()) as *mut TimerDescriptor;
             if ptr.is_null() {
@@ -416,29 +437,31 @@ impl TimerManager for SimpleTimerManager {
             return Err(TimerError::PermissionDenied);
         }
 
-        unsafe {
-            let mut index = None;
-            for (i, timer_option) in self.timers.iter().enumerate() {
-                if let Some(timer_ptr) = *timer_option {
-                    let timer = &*timer_ptr.as_ptr();
-                    if timer.id == id {
-                        index = Some(i);
-                        break;
-                    }
+        let mut index = None;
+        for (i, timer_option) in self.timers.iter().enumerate() {
+            if let Some(timer_ptr) = *timer_option {
+                // SAFETY: timer_ptr points to a valid heap-allocated TimerDescriptor
+                let timer = unsafe { &*timer_ptr.as_ptr() };
+                if timer.id == id {
+                    index = Some(i);
+                    break;
                 }
             }
+        }
 
-            if let Some(i) = index {
-                if let Some(timer_ptr) = self.timers[i] {
+        if let Some(i) = index {
+            if let Some(timer_ptr) = self.timers[i] {
+                // SAFETY: timer_ptr is non-null, properly allocated and initialized
+                unsafe {
                     core::ptr::drop_in_place(timer_ptr.as_ptr());
                     free(timer_ptr.as_ptr() as *mut u8);
                 }
-                self.timers[i] = None;
-                self.stats.total_timers -= 1;
-                Ok(())
-            } else {
-                Err(TimerError::TimerExpired)
             }
+            self.timers[i] = None;
+            self.stats.total_timers -= 1;
+            Ok(())
+        } else {
+            Err(TimerError::TimerExpired)
         }
     }
 
@@ -447,12 +470,11 @@ impl TimerManager for SimpleTimerManager {
             return Err(TimerError::PermissionDenied);
         }
 
-        unsafe {
-            if let Some(timer) = self.get_timer_mut(id) {
-                timer.start()
-            } else {
-                Err(TimerError::TimerExpired)
-            }
+        // SAFETY: self is uniquely borrowed, timer pointers in self.timers are valid
+        if let Some(timer) = unsafe { self.get_timer_mut(id) } {
+            timer.start()
+        } else {
+            Err(TimerError::TimerExpired)
         }
     }
 
@@ -461,12 +483,11 @@ impl TimerManager for SimpleTimerManager {
             return Err(TimerError::PermissionDenied);
         }
 
-        unsafe {
-            if let Some(timer) = self.get_timer_mut(id) {
-                timer.stop()
-            } else {
-                Err(TimerError::TimerExpired)
-            }
+        // SAFETY: self is uniquely borrowed, timer pointers in self.timers are valid
+        if let Some(timer) = unsafe { self.get_timer_mut(id) } {
+            timer.stop()
+        } else {
+            Err(TimerError::TimerExpired)
         }
     }
 
@@ -479,24 +500,31 @@ impl TimerManager for SimpleTimerManager {
             for timer_option in &mut self.timers {
                 if let Some(timer_ptr) = *timer_option {
                     let timer = &mut *timer_ptr.as_ptr();
-                    
+
                     if timer.is_running.load(Ordering::SeqCst) {
                         let elapsed = current_time - timer.start_time.load(Ordering::SeqCst);
                         let interval = timer.interval.load(Ordering::SeqCst);
+        for timer_option in &mut self.timers {
+            if let Some(timer_ptr) = *timer_option {
+                // SAFETY: timer_ptr is valid and uniquely accessed during update cycle
+                let timer = unsafe { &mut *timer_ptr.as_ptr() };
 
-                        if elapsed >= interval {
-                            timer.is_running.store(false, Ordering::SeqCst);
-                            expired.push(timer.id);
-                            self.stats.expired_timers += 1;
+                if timer.is_running.load(Ordering::SeqCst) {
+                    let elapsed = current_time - timer.start_time.load(Ordering::SeqCst);
+                    let interval = timer.interval.load(Ordering::SeqCst);
 
-                            if let Some(callback) = timer.callback {
-                                callback(timer.id);
-                            }
+                    if elapsed >= interval {
+                        timer.is_running.store(false, Ordering::SeqCst);
+                        expired.push(timer.id);
+                        self.stats.expired_timers += 1;
 
-                            if timer.timer_type == TimerType::Periodic {
-                                timer.start_time.store(current_time, Ordering::SeqCst);
-                                timer.is_running.store(true, Ordering::SeqCst);
-                            }
+                        if let Some(callback) = timer.callback {
+                            callback(timer.id);
+                        }
+
+                        if timer.timer_type == TimerType::Periodic {
+                            timer.start_time.store(current_time, Ordering::SeqCst);
+                            timer.is_running.store(true, Ordering::SeqCst);
                         }
                     }
                 }
@@ -507,22 +535,20 @@ impl TimerManager for SimpleTimerManager {
     }
 
     fn get_timer_info(&self, id: TimerID) -> Option<TimerInfo> {
-        unsafe {
-            self.get_timer(id).map(|timer| timer.info())
-        }
+        // SAFETY: self is borrowed, timer pointers in self.timers are valid
+        unsafe { self.get_timer(id).map(|timer| timer.info()) }
     }
 
     fn stats(&self) -> TimerStats {
         let mut stats = self.stats;
         stats.active_timers = 0;
 
-        unsafe {
-            for timer_option in &self.timers {
-                if let Some(timer_ptr) = *timer_option {
-                    let timer = &*timer_ptr.as_ptr();
-                    if timer.is_running.load(Ordering::SeqCst) {
-                        stats.active_timers += 1;
-                    }
+        for timer_option in &self.timers {
+            if let Some(timer_ptr) = *timer_option {
+                // SAFETY: timer_ptr points to valid TimerDescriptor
+                let timer = unsafe { &*timer_ptr.as_ptr() };
+                if timer.is_running.load(Ordering::SeqCst) {
+                    stats.active_timers += 1;
                 }
             }
         }
@@ -535,6 +561,7 @@ impl TimerManager for SimpleTimerManager {
 fn get_current_time() -> Timestamp {
     // In a real implementation, this would read from hardware timer
     static mut COUNTER: u64 = 0;
+    // SAFETY: Single-threaded time tick simulation counter access
     unsafe {
         COUNTER += 1_000_000; // Simulate 1ms per tick
         COUNTER
@@ -551,9 +578,9 @@ impl<T: Clone> Clone for Vec<T> {
     fn clone(&self) -> Self {
         let mut new_vec = Vec::new();
         for i in 0..self.len {
-            unsafe {
-                new_vec.push((*self.data.add(i)).clone());
-            }
+            // SAFETY: i is within bounds 0..self.len and data points to initialized elements
+            let element = unsafe { (*self.data.add(i)).clone() };
+            new_vec.push(element);
         }
         new_vec
     }
@@ -569,15 +596,17 @@ impl<T> Vec<T> {
     }
 
     fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
+        if self.len >= self.capacity {
+            // SAFETY: Grow vector buffer if at capacity
+            unsafe { self.grow() };
+        }
 
-            if self.capacity > self.len {
+        if self.capacity > self.len {
+            // SAFETY: data + len is within allocated capacity
+            unsafe {
                 core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
             }
+            self.len += 1;
         }
     }
 
@@ -590,6 +619,7 @@ impl<T> Vec<T> {
     }
 
     fn remove(&mut self, index: usize) -> T {
+        // SAFETY: index is within bounds and memory range is valid
         unsafe {
             let item = core::ptr::read(self.data.add(index));
             for i in index..self.len - 1 {
@@ -601,7 +631,11 @@ impl<T> Vec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {
@@ -625,13 +659,13 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
-
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {
         if self.data.is_null() {
             &[]
         } else {
+            // SAFETY: self.data points to self.len initialized elements
             unsafe { core::slice::from_raw_parts(self.data, self.len) }
         }
     }
@@ -642,6 +676,7 @@ impl<T> core::ops::DerefMut for Vec<T> {
         if self.data.is_null() {
             &mut []
         } else {
+            // SAFETY: self.data points to self.len initialized elements
             unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
         }
     }
@@ -656,7 +691,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;

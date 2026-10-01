@@ -1,14 +1,13 @@
-use std::boxed::Box;
+use crate::klib::HashMap;
 use core::sync::atomic::{AtomicU64, Ordering};
+use std::boxed::Box;
 /// SigmaOS System Call Table — Phase K expansion
 /// Absorbs Linux & BSD syscall interface: POSIX-complete table with 300+ syscalls
 /// Categories: fs, mm, proc, net, time, signal, ipc, sched, crypto, io_uring, epoll, futex, bsd
 /// Improved with Windows-inspired System Service Descriptor Table (SSDT) structures,
 /// kernel-symbol export tables, and active Anti-Rootkit guard hooks detectors.
-
 use std::string::{String, ToString};
 use std::vec::Vec;
-use crate::klib::HashMap;
 
 // ── Syscall numbers (Linux-compatible subset + BSD + SigmaOS extensions) ──
 
@@ -506,14 +505,16 @@ impl AntiRootkitGuard {
     /// Backups a pristine snapshot of the SSDT pointers
     pub fn snapshot_pristine_table(&mut self, active_ssdt: &[SsdtEntry]) {
         for entry in active_ssdt {
-            self.shadow_ssdt.insert(entry.service_number, entry.service_routine_address);
+            self.shadow_ssdt
+                .insert(entry.service_number, entry.service_routine_address);
         }
     }
 
     /// Backups a pristine snapshot of the IDT handler pointers (anti IDT hooking)
     pub fn snapshot_pristine_idt(&mut self, active_idt: &[IdtEntry]) {
         for entry in active_idt {
-            self.shadow_idt.insert(entry.interrupt_vector, entry.handler_address);
+            self.shadow_idt
+                .insert(entry.interrupt_vector, entry.handler_address);
         }
     }
 
@@ -547,7 +548,11 @@ impl AntiRootkitGuard {
     /// Detects Direct Kernel Object Manipulation (DKOM) process-hiding rootkits.
     /// Walks the active scheduler thread queue and verifies if any process is missing
     /// from the high-level process manager catalog.
-    pub fn audit_dkom_process_hiding(&self, scheduler_pids: &[u64], catalog_pids: &[u64]) -> Vec<u64> {
+    pub fn audit_dkom_process_hiding(
+        &self,
+        scheduler_pids: &[u64],
+        catalog_pids: &[u64],
+    ) -> Vec<u64> {
         let mut hidden_pids = Vec::new();
         for &pid in scheduler_pids {
             if !catalog_pids.contains(&pid) {
@@ -609,13 +614,34 @@ mod tests {
     fn test_linux_and_bsd_syscalls() {
         let table = SyscallTable::new();
 
-        assert_eq!(table.dispatch(&make_args(SyscallNr::Futex)), SyscallResult::Ok(0));
-        assert_eq!(table.dispatch(&make_args(SyscallNr::EpollCreate1)), SyscallResult::Ok(10));
-        assert_eq!(table.dispatch(&make_args(SyscallNr::Eventfd2)), SyscallResult::Ok(11));
-        assert_eq!(table.dispatch(&make_args(SyscallNr::MemfdCreate)), SyscallResult::Ok(12));
-        assert_eq!(table.dispatch(&make_args(SyscallNr::Kqueue)), SyscallResult::Ok(13));
-        assert_eq!(table.dispatch(&make_args(SyscallNr::Pledge)), SyscallResult::Ok(0));
-        assert_eq!(table.dispatch(&make_args(SyscallNr::Unveil)), SyscallResult::Ok(0));
+        assert_eq!(
+            table.dispatch(&make_args(SyscallNr::Futex)),
+            SyscallResult::Ok(0)
+        );
+        assert_eq!(
+            table.dispatch(&make_args(SyscallNr::EpollCreate1)),
+            SyscallResult::Ok(10)
+        );
+        assert_eq!(
+            table.dispatch(&make_args(SyscallNr::Eventfd2)),
+            SyscallResult::Ok(11)
+        );
+        assert_eq!(
+            table.dispatch(&make_args(SyscallNr::MemfdCreate)),
+            SyscallResult::Ok(12)
+        );
+        assert_eq!(
+            table.dispatch(&make_args(SyscallNr::Kqueue)),
+            SyscallResult::Ok(13)
+        );
+        assert_eq!(
+            table.dispatch(&make_args(SyscallNr::Pledge)),
+            SyscallResult::Ok(0)
+        );
+        assert_eq!(
+            table.dispatch(&make_args(SyscallNr::Unveil)),
+            SyscallResult::Ok(0)
+        );
 
         let mut copy_args = make_args(SyscallNr::CopyFileRange);
         copy_args.a4 = 4096;
@@ -695,8 +721,14 @@ mod tests {
     #[test]
     fn test_ssdt_anti_rootkit_tampering_guard() {
         let pristine_ssdt = [
-            SsdtEntry { service_number: 0, service_routine_address: 0x801000 }, // NtRead
-            SsdtEntry { service_number: 1, service_routine_address: 0x802000 }, // NtWrite
+            SsdtEntry {
+                service_number: 0,
+                service_routine_address: 0x801000,
+            }, // NtRead
+            SsdtEntry {
+                service_number: 1,
+                service_routine_address: 0x802000,
+            }, // NtWrite
         ];
 
         let mut guard = AntiRootkitGuard::new();
@@ -708,8 +740,14 @@ mod tests {
 
         // Simulate rootkit hooking NtWrite (service_number 1 redirecting address to rootkit_jmp_cave)
         let hooked_ssdt = [
-            SsdtEntry { service_number: 0, service_routine_address: 0x801000 },
-            SsdtEntry { service_number: 1, service_routine_address: 0x909090 }, // Redirection!
+            SsdtEntry {
+                service_number: 0,
+                service_routine_address: 0x801000,
+            },
+            SsdtEntry {
+                service_number: 1,
+                service_routine_address: 0x909090,
+            }, // Redirection!
         ];
 
         let hooked_violations = guard.audit_system_service_table(&hooked_ssdt);
@@ -720,8 +758,14 @@ mod tests {
     #[test]
     fn test_idt_hooking_audits() {
         let pristine_idt = [
-            IdtEntry { interrupt_vector: 0x03, handler_address: 0x1010 }, // Breakpoint
-            IdtEntry { interrupt_vector: 0x0E, handler_address: 0x2020 }, // Page Fault
+            IdtEntry {
+                interrupt_vector: 0x03,
+                handler_address: 0x1010,
+            }, // Breakpoint
+            IdtEntry {
+                interrupt_vector: 0x0E,
+                handler_address: 0x2020,
+            }, // Page Fault
         ];
 
         let mut guard = AntiRootkitGuard::new();
@@ -732,8 +776,14 @@ mod tests {
 
         // Simulate IDT Hooking of Breakpoint handler by a rootkit
         let hooked_idt = [
-            IdtEntry { interrupt_vector: 0x03, handler_address: 0x6660 }, // Redirected!
-            IdtEntry { interrupt_vector: 0x0E, handler_address: 0x2020 },
+            IdtEntry {
+                interrupt_vector: 0x03,
+                handler_address: 0x6660,
+            }, // Redirected!
+            IdtEntry {
+                interrupt_vector: 0x0E,
+                handler_address: 0x2020,
+            },
         ];
 
         let hooked_idt_violations = guard.audit_interrupt_table(&hooked_idt);

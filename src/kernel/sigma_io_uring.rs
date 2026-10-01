@@ -13,7 +13,6 @@
 #![allow(dead_code)]
 #![allow(clippy::new_without_default)]
 
-
 use std::collections::{BTreeMap, VecDeque};
 use std::string::String;
 use std::vec::Vec;

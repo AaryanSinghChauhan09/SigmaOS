@@ -1,24 +1,32 @@
 use std::boxed::Box;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
+use core::mem;
 /// OOP-based Camera Capture for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 281
 /// Implements camera device management and capture
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type CameraID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum CameraFormat { RGB24 = 0, YUYV = 1, MJPEG = 2, H264 = 3 }
+pub enum CameraFormat {
+    RGB24 = 0,
+    YUYV = 1,
+    MJPEG = 2,
+    H264 = 3,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum CameraError { Success = 0, NotFound = 1, CaptureFailed = 2 }
+pub enum CameraError {
+    Success = 0,
+    NotFound = 1,
+    CaptureFailed = 2,
+}
 
 pub trait Camera {
     fn id(&self) -> CameraID;
@@ -55,14 +63,22 @@ impl SimpleCamera {
 }
 
 impl Camera for SimpleCamera {
-    fn id(&self) -> CameraID { self.id }
+    fn id(&self) -> CameraID {
+        self.id
+    }
     fn name(&self) -> &[u8] {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-    fn width(&self) -> u32 { self.width.load(Ordering::SeqCst) as u32 }
-    fn height(&self) -> u32 { self.height.load(Ordering::SeqCst) as u32 }
-    fn format(&self) -> CameraFormat { unsafe { core::mem::transmute(self.format.load(Ordering::SeqCst)) } }
+    fn width(&self) -> u32 {
+        self.width.load(Ordering::SeqCst) as u32
+    }
+    fn height(&self) -> u32 {
+        self.height.load(Ordering::SeqCst) as u32
+    }
+    fn format(&self) -> CameraFormat {
+        unsafe { core::mem::transmute(self.format.load(Ordering::SeqCst)) }
+    }
 }
 
 pub trait CameraManager {
@@ -109,7 +125,9 @@ impl CameraManager for SimpleCameraManager {
     fn get_camera(&self, id: CameraID) -> Option<&dyn Camera> {
         for camera_option in &self.cameras {
             if let Some(ref camera) = *camera_option {
-                if camera.id() == id { return Some(camera.as_ref()); }
+                if camera.id() == id {
+                    return Some(camera.as_ref());
+                }
             }
         }
         None
@@ -148,9 +166,13 @@ impl CameraManager for SimpleCameraManager {
 pub enum WebcamEffectType {
     None,
     ChromaKey {
-        key_r: u8, key_g: u8, key_b: u8,
+        key_r: u8,
+        key_g: u8,
+        key_b: u8,
         tolerance: u8,
-        replace_r: u8, replace_g: u8, replace_b: u8,
+        replace_r: u8,
+        replace_g: u8,
+        replace_b: u8,
     },
     Grayscale,
     Sepia,
@@ -181,8 +203,16 @@ impl SigmaWebcamEffectsProcessor {
         }
 
         match self.active_effect {
-            WebcamEffectType::None => {},
-            WebcamEffectType::ChromaKey { key_r, key_g, key_b, tolerance, replace_r, replace_g, replace_b } => {
+            WebcamEffectType::None => {}
+            WebcamEffectType::ChromaKey {
+                key_r,
+                key_g,
+                key_b,
+                tolerance,
+                replace_r,
+                replace_g,
+                replace_b,
+            } => {
                 for i in 0..pixel_count {
                     let offset = i * 3;
                     let r = frame_buffer[offset];
@@ -194,7 +224,10 @@ impl SigmaWebcamEffectsProcessor {
                     let diff_g = (g as i32 - key_g as i32).abs();
                     let diff_b = (b as i32 - key_b as i32).abs();
 
-                    if diff_r <= tolerance as i32 && diff_g <= tolerance as i32 && diff_b <= tolerance as i32 {
+                    if diff_r <= tolerance as i32
+                        && diff_g <= tolerance as i32
+                        && diff_b <= tolerance as i32
+                    {
                         frame_buffer[offset] = replace_r;
                         frame_buffer[offset + 1] = replace_g;
                         frame_buffer[offset + 2] = replace_b;
@@ -298,13 +331,25 @@ impl VideoRecorder for SimpleVideoRecorder {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -322,18 +367,29 @@ impl<T> Vec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 #[cfg(test_disabled)]
 mod tests {
@@ -346,14 +402,18 @@ mod tests {
 
         // Test Green Screen Chroma Key replacement
         processor.set_effect(WebcamEffectType::ChromaKey {
-            key_r: 0, key_g: 255, key_b: 0, // Green key
+            key_r: 0,
+            key_g: 255,
+            key_b: 0, // Green key
             tolerance: 10,
-            replace_r: 42, replace_g: 42, replace_b: 42, // Gray replacement
+            replace_r: 42,
+            replace_g: 42,
+            replace_b: 42, // Gray replacement
         });
 
         let mut frame = [
-            0, 255, 0,    // Pixel 1: Pure Green (matched)
-            100, 100, 100 // Pixel 2: Gray (not matched)
+            0, 255, 0, // Pixel 1: Pure Green (matched)
+            100, 100, 100, // Pixel 2: Gray (not matched)
         ];
 
         processor.apply_effect(2, 1, &mut frame);
@@ -374,9 +434,7 @@ mod tests {
 
         // Test Negative filter
         processor.set_effect(WebcamEffectType::Negative);
-        let mut frame_neg = [
-            100, 200, 50,
-        ];
+        let mut frame_neg = [100, 200, 50];
         processor.apply_effect(1, 1, &mut frame_neg);
         assert_eq!(frame_neg[0], 155);
         assert_eq!(frame_neg[1], 55);

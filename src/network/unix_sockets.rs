@@ -1,6 +1,6 @@
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 // UNIX Domain Sockets (AF_UNIX / PF_LOCAL IPC)
 // Native path-based and abstract inter-process socket communication inspired by Linux and BSD.
 
@@ -106,10 +106,17 @@ impl UnixSocketRegistry {
     }
 
     /// Connect a client socket to a listening server socket
-    pub fn connect(&mut self, client_addr: UnixSocketAddress, server_addr: UnixSocketAddress) -> Result<(), &'static str> {
+    pub fn connect(
+        &mut self,
+        client_addr: UnixSocketAddress,
+        server_addr: UnixSocketAddress,
+    ) -> Result<(), &'static str> {
         // 1. Ensure server is listening
         {
-            let server = self.sockets.get(&server_addr).ok_or("Server socket not found")?;
+            let server = self
+                .sockets
+                .get(&server_addr)
+                .ok_or("Server socket not found")?;
             if server.state != UnixSocketState::Listening {
                 return Err("Server socket is not listening");
             }
@@ -133,7 +140,11 @@ impl UnixSocketRegistry {
     }
 
     /// Helper to bridge / pipe data packets from client TX buffer to server peer RX buffer
-    pub fn pipe_packets(&mut self, sender_addr: &UnixSocketAddress, receiver_addr: &UnixSocketAddress) -> Result<usize, &'static str> {
+    pub fn pipe_packets(
+        &mut self,
+        sender_addr: &UnixSocketAddress,
+        receiver_addr: &UnixSocketAddress,
+    ) -> Result<usize, &'static str> {
         let mut data = Vec::new();
         if let Some(sender) = self.sockets.get_mut(sender_addr) {
             data = sender.tx_buffer.drain(..).collect();
@@ -185,7 +196,9 @@ mod tests {
         registry.listen(&server_addr).unwrap();
 
         // 2. Connect client to server
-        registry.connect(client_addr.clone(), server_addr.clone()).unwrap();
+        registry
+            .connect(client_addr.clone(), server_addr.clone())
+            .unwrap();
 
         // Check client is connected
         let client = registry.sockets.get(&client_addr).unwrap();
@@ -198,7 +211,9 @@ mod tests {
 
         // 4. Pipe packets to server peer
         let server_peer_addr = UnixSocketAddress::Abstract(format!("peer-{:?}", server_addr));
-        registry.pipe_packets(&client_addr, &server_peer_addr).unwrap();
+        registry
+            .pipe_packets(&client_addr, &server_peer_addr)
+            .unwrap();
 
         // 5. Read data on server peer
         let server_peer = registry.sockets.get_mut(&server_peer_addr).unwrap();

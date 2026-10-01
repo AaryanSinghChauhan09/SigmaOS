@@ -2,9 +2,9 @@
 // Zero-dependency Rust #![no_std] / std implementation of strategic missing distro abstractions:
 // OpenSUSE YaST2, Void xbps-src, Alpine LBU, FreeBSD VNET, NetBSD Rump, OpenBSD Pledge/Unveil, NixOS Flakes.
 
+use std::format;
 use std::string::String;
 use std::vec::Vec;
-use std::format;
 
 /// OpenSUSE YaST2 Declarative System Control Engine
 #[derive(Debug, Clone)]
@@ -30,7 +30,8 @@ impl OpenSuseYast2ControlEngine {
     }
 
     pub fn set_sysconfig(&mut self, key: &str, value: &str) {
-        self.sysconfig_settings.push((String::from(key), String::from(value)));
+        self.sysconfig_settings
+            .push((String::from(key), String::from(value)));
     }
 
     pub fn get_sysconfig(&self, key: &str) -> Option<String> {
@@ -73,7 +74,10 @@ impl VoidXbpsSrcTemplateEngine {
     }
 
     pub fn generate_xbps_binary(&self) -> String {
-        format!("{}-{}_{}.x86_64.xbps", self.pkgname, self.version, self.revision)
+        format!(
+            "{}-{}_{}.x86_64.xbps",
+            self.pkgname, self.version, self.revision
+        )
     }
 }
 
@@ -195,7 +199,8 @@ impl OpenBsdPledgeUnveilSentinelEngine {
         if self.is_locked {
             return false;
         }
-        self.unveiled_paths.push((String::from(path), String::from(permissions)));
+        self.unveiled_paths
+            .push((String::from(path), String::from(permissions)));
         true
     }
 
@@ -561,7 +566,9 @@ impl SovereignMissingLinuxBsdSuite {
             vnet: FreeBsdVnetStackEngine::new(101),
             rump: NetBsdRumpKernelDriverEngine::new(),
             sentinel: OpenBsdPledgeUnveilSentinelEngine::new(),
-            flake: NixOsFlakeHermeticEngine::new("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
+            flake: NixOsFlakeHermeticEngine::new(
+                "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            ),
             hammer2: DragonFlyHammer2FsEngine::new(),
             illumos: IllumosZfsDtraceBridgeEngine::new(1024 * 1024 * 1024),
             portage: GentooPortageEapi8Solver::new(),
@@ -592,7 +599,10 @@ impl SovereignMissingLinuxBsdSuite {
         let sys76_ok = self.system76.switch_graphics("discrete");
 
         self.yast2.verify_module("yast2-hardware")
-            && self.xbps_src.generate_xbps_binary().contains("sigmaos-core")
+            && self
+                .xbps_src
+                .generate_xbps_binary()
+                .contains("sigmaos-core")
             && !self.lbu.commit_apkovl().is_empty()
             && self.vnet.is_vnet_isolated()
             && self.rump.dispatch_hypercall("rumpvfs", 1) > 0
@@ -615,20 +625,46 @@ impl SovereignMissingLinuxBsdSuite {
             "control" | "yast2" => format!("YaST2 modules: {:?}", self.yast2.active_modules),
             "build" | "xbps" => self.xbps_src.generate_xbps_binary(),
             "overlay" | "lbu" => self.lbu.commit_apkovl(),
-            "vnet" | "network_stack" => format!("VNET ID: {}, isolated: {}", self.vnet.jail_vnet_id, self.vnet.is_vnet_isolated()),
-            "rump" | "anykernel" => format!("Rump hypercalls dispatched: {}", self.rump.hypercalls_dispatched),
-            "pledge" | "unveil" => format!("Pledges: {}, Unveils: {}", self.sentinel.active_pledges.len(), self.sentinel.unveiled_paths.len()),
+            "vnet" | "network_stack" => format!(
+                "VNET ID: {}, isolated: {}",
+                self.vnet.jail_vnet_id,
+                self.vnet.is_vnet_isolated()
+            ),
+            "rump" | "anykernel" => format!(
+                "Rump hypercalls dispatched: {}",
+                self.rump.hypercalls_dispatched
+            ),
+            "pledge" | "unveil" => format!(
+                "Pledges: {}, Unveils: {}",
+                self.sentinel.active_pledges.len(),
+                self.sentinel.unveiled_paths.len()
+            ),
             "flake" | "nix" => format!("Flake lock valid: {}", self.flake.evaluate_flake()),
             "hammer2" | "pfs" => format!("PFS subvolumes: {}", self.hammer2.pfs_subvolumes.len()),
-            "zfs" | "dtrace" => format!("DTrace probes registered: {}", self.illumos.dtrace_probes_registered),
+            "zfs" | "dtrace" => format!(
+                "DTrace probes registered: {}",
+                self.illumos.dtrace_probes_registered
+            ),
             "portage" | "eapi" => format!("Portage USE flags: {:?}", self.portage.use_flags),
             "bedrock" | "strata" => format!("Active stratum: {}", self.bedrock.active_stratum),
-            "moss" | "solus" => format!("Moss packages: {}", self.moss.installed_stone_packages.len()),
-            "clear" | "stateless" => format!("Stateless clean: {}", self.clear_stateless.is_stateless_clean),
+            "moss" | "solus" => format!(
+                "Moss packages: {}",
+                self.moss.installed_stone_packages.len()
+            ),
+            "clear" | "stateless" => format!(
+                "Stateless clean: {}",
+                self.clear_stateless.is_stateless_clean
+            ),
             "urpmi" | "mageia" => format!("Media sources: {}", self.urpmi.media_sources.len()),
             "pax" | "hardened" => format!("PaX ASLR bits: {}", self.pax.aslr_entropy_bits),
-            "tuxedo" | "hardware_control" => format!("Tuxedo profile: {}, fan RPM: {}", self.tuxedo.active_profile, self.tuxedo.fan_speed_rpm),
-            "system76" | "cosmic_power" => format!("System76 graphics: {}, power: {}", self.system76.graphics_mode, self.system76.power_profile),
+            "tuxedo" | "hardware_control" => format!(
+                "Tuxedo profile: {}, fan RPM: {}",
+                self.tuxedo.active_profile, self.tuxedo.fan_speed_rpm
+            ),
+            "system76" | "cosmic_power" => format!(
+                "System76 graphics: {}, power: {}",
+                self.system76.graphics_mode, self.system76.power_profile
+            ),
             _ => format!("Default resolver active for subsystem: {}", subsystem),
         }
     }
@@ -649,7 +685,10 @@ mod tests {
         let mut suite = SovereignMissingLinuxBsdSuite::new();
         assert!(suite.verify_suite());
         assert_eq!(suite.yast2.get_sysconfig("NETWORKING").unwrap(), "yes");
-        assert_eq!(suite.xbps_src.generate_xbps_binary(), "sigmaos-core-1.0.0_1.x86_64.xbps");
+        assert_eq!(
+            suite.xbps_src.generate_xbps_binary(),
+            "sigmaos-core-1.0.0_1.x86_64.xbps"
+        );
         assert!(suite.lbu.apkovl_committed);
         assert!(suite.vnet.is_vnet_isolated());
         assert!(suite.flake.evaluate_flake());

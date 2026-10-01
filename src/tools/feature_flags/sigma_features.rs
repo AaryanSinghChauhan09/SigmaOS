@@ -3,7 +3,6 @@
 // Inspired by Gentoo Portage USE flags, OpenBSD pledge/unveil, and FreeBSD Capsicum rights
 // Fine-grained control over package compilation, system configuration, and kernel sandboxing
 
-
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
@@ -85,7 +84,8 @@ impl FeatureFlag {
 pub const MAX_FEATURE_FLAGS: usize = 512;
 
 /// Global feature flags registry
-static mut FEATURE_FLAGS: [FeatureFlag; MAX_FEATURE_FLAGS] = [FeatureFlag::empty(); MAX_FEATURE_FLAGS];
+static mut FEATURE_FLAGS: [FeatureFlag; MAX_FEATURE_FLAGS] =
+    [FeatureFlag::empty(); MAX_FEATURE_FLAGS];
 static mut FLAG_COUNT: usize = 0;
 
 /// Feature flag configuration entry
@@ -210,7 +210,10 @@ impl FeatureFlagResolver {
         // Check for circular dependencies
         if let Some(&in_progress) = visited.get(flag_name) {
             if in_progress {
-                return Err(format!("Circular dependency detected for flag {}", flag_name));
+                return Err(format!(
+                    "Circular dependency detected for flag {}",
+                    flag_name
+                ));
             }
             return Ok(()); // Already resolved
         }
@@ -218,7 +221,9 @@ impl FeatureFlagResolver {
         visited.insert(flag_name.to_string(), true);
 
         // Get flag configuration
-        let config = self.flags.get(flag_name)
+        let config = self
+            .flags
+            .get(flag_name)
             .ok_or_else(|| format!("Feature flag {} not found", flag_name))?;
 
         if config.enabled {
@@ -259,7 +264,10 @@ impl FeatureFlagResolver {
         if self.masked_flags.contains(&flag_name.to_string()) {
             return false;
         }
-        self.flags.get(flag_name).map(|c| c.enabled).unwrap_or(false)
+        self.flags
+            .get(flag_name)
+            .map(|c| c.enabled)
+            .unwrap_or(false)
     }
 
     /// Enable a flag

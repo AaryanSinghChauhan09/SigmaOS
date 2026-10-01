@@ -13,9 +13,9 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 // SigmaOS Integrated Terminal
 // OOP-based terminal emulator with shell integration

@@ -16,13 +16,12 @@
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
 /// Custom Threading Primitives for SigmaOS
 /// Implements threading without relying on std::thread
 /// Uses capability-based access control
-
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
-use core::mem;
 
 /// Thread ID
 pub type ThreadID = usize;
@@ -65,12 +64,8 @@ impl ThreadStack {
         }
 
         let top = base.add(size);
-        
-        Some(ThreadStack {
-            base,
-            size,
-            top,
-        })
+
+        Some(ThreadStack { base, size, top })
     }
 
     pub unsafe fn push(&mut self, value: usize) {
@@ -109,8 +104,8 @@ pub struct ThreadContext {
     pub rdi: usize,
     pub rbp: usize,
     pub rsp: usize,
-    pub r8:  usize,
-    pub r9:  usize,
+    pub r8: usize,
+    pub r9: usize,
     pub r10: usize,
     pub r11: usize,
     pub r12: usize,
@@ -123,28 +118,47 @@ pub struct ThreadContext {
     pub rflags: usize, // Processor Status Flags (e.g. alignment, trap, interrupt enable)
 
     // 3. Segment Selector Registers (privileged segment management)
-    pub cs: u16,       // Code Segment
-    pub ss: u16,       // Stack Segment
-    pub ds: u16,       // Data Segment
-    pub es: u16,       // Extra Segment
-    pub fs: u16,       // FS Segment (Thread-Local Storage)
-    pub gs: u16,       // GS Segment (Kernel/User context boundary)
+    pub cs: u16, // Code Segment
+    pub ss: u16, // Stack Segment
+    pub ds: u16, // Data Segment
+    pub es: u16, // Extra Segment
+    pub fs: u16, // FS Segment (Thread-Local Storage)
+    pub gs: u16, // GS Segment (Kernel/User context boundary)
 
     // 4. Advanced FPU/SSE/AVX Floating Point Control (lazy saving indicators)
-    pub mxcsr: u32,    // SIMD Control and Status
-    pub fcw: u16,      // FPU Control Word
-    pub fsw: u16,      // FPU Status Word
+    pub mxcsr: u32, // SIMD Control and Status
+    pub fcw: u16,   // FPU Control Word
+    pub fsw: u16,   // FPU Status Word
 }
 
 impl ThreadContext {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         ThreadContext {
-            rax: 0, rbx: 0, rcx: 0, rdx: 0, rsi: 0, rdi: 0, rbp: 0, rsp: 0,
-            r8: 0, r9: 0, r10: 0, r11: 0, r12: 0, r13: 0, r14: 0, r15: 0,
+            rax: 0,
+            rbx: 0,
+            rcx: 0,
+            rdx: 0,
+            rsi: 0,
+            rdi: 0,
+            rbp: 0,
+            rsp: 0,
+            r8: 0,
+            r9: 0,
+            r10: 0,
+            r11: 0,
+            r12: 0,
+            r13: 0,
+            r14: 0,
+            r15: 0,
             rip: 0,
             rflags: 0x202, // Standard Interrupt Enable flag set (IF = 1)
-            cs: 0, ss: 0, ds: 0, es: 0, fs: 0, gs: 0,
+            cs: 0,
+            ss: 0,
+            ds: 0,
+            es: 0,
+            fs: 0,
+            gs: 0,
             mxcsr: 0x1F80, // SSE default control state (all exceptions masked)
             fcw: 0x037F,   // FPU default control state
             fsw: 0,
@@ -199,9 +213,14 @@ impl ThreadCapability {
 }
 
 impl Thread {
-    pub unsafe fn new(id: ThreadID, entry: extern "C" fn(), stack_size: usize, capability: ThreadCapability) -> Option<Self> {
+    pub unsafe fn new(
+        id: ThreadID,
+        entry: extern "C" fn(),
+        stack_size: usize,
+        capability: ThreadCapability,
+    ) -> Option<Self> {
         let stack = ThreadStack::new(stack_size)?;
-        
+
         // Set up initial stack context
         let mut context = ThreadContext::new();
         context.rsp = stack.top as usize;
@@ -219,9 +238,7 @@ impl Thread {
     }
 
     pub fn get_state(&self) -> ThreadState {
-        unsafe {
-            core::mem::transmute(self.state.load(Ordering::SeqCst))
-        }
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
     }
 
     pub fn set_state(&self, state: ThreadState) {
@@ -287,7 +304,11 @@ impl Mutex {
         }
 
         // Try to acquire lock
-        while self.locked.compare_exchange(false, true, Ordering::Acquire, Ordering::Relaxed).is_err() {
+        while self
+            .locked
+            .compare_exchange(false, true, Ordering::Acquire, Ordering::Relaxed)
+            .is_err()
+        {
             // In a real implementation, this would yield to scheduler
             // For now, spin
             core::hint::spin_loop();
@@ -316,7 +337,11 @@ impl Mutex {
             return false;
         }
 
-        if self.locked.compare_exchange(false, true, Ordering::Acquire, Ordering::Relaxed).is_ok() {
+        if self
+            .locked
+            .compare_exchange(false, true, Ordering::Acquire, Ordering::Relaxed)
+            .is_ok()
+        {
             self.owner.store(get_current_thread_id(), Ordering::SeqCst);
             true
         } else {
@@ -364,7 +389,11 @@ impl SemaphoreCapability {
 }
 
 impl Semaphore {
-    pub unsafe fn new(initial_count: usize, max_count: usize, capability: SemaphoreCapability) -> Self {
+    pub unsafe fn new(
+        initial_count: usize,
+        max_count: usize,
+        capability: SemaphoreCapability,
+    ) -> Self {
         Semaphore {
             count: AtomicUsize::new(initial_count),
             max_count,
@@ -488,7 +517,11 @@ impl RwLock {
         }
 
         // Acquire writer lock
-        while self.writer.compare_exchange(false, true, Ordering::Acquire, Ordering::Relaxed).is_err() {
+        while self
+            .writer
+            .compare_exchange(false, true, Ordering::Acquire, Ordering::Relaxed)
+            .is_err()
+        {
             core::hint::spin_loop();
         }
 
@@ -540,7 +573,12 @@ impl ThreadManager {
         }
     }
 
-    pub unsafe fn create_thread(&mut self, entry: extern "C" fn(), stack_size: usize, capability: ThreadCapability) -> Option<ThreadID> {
+    pub unsafe fn create_thread(
+        &mut self,
+        entry: extern "C" fn(),
+        stack_size: usize,
+        capability: ThreadCapability,
+    ) -> Option<ThreadID> {
         let id = self.next_thread_id.fetch_add(1, Ordering::SeqCst);
         if id >= 256 {
             return None;
@@ -629,7 +667,11 @@ pub unsafe fn get_current_thread_id() -> ThreadID {
 }
 
 /// Create thread
-pub unsafe fn create_thread(entry: extern "C" fn(), stack_size: usize, capability: ThreadCapability) -> Option<ThreadID> {
+pub unsafe fn create_thread(
+    entry: extern "C" fn(),
+    stack_size: usize,
+    capability: ThreadCapability,
+) -> Option<ThreadID> {
     if let Some(ref mut manager) = GLOBAL_THREAD_MANAGER {
         manager.create_thread(entry, stack_size, capability)
     } else {
@@ -682,7 +724,7 @@ mod tests {
         assert_eq!(ctx.rflags, 0x202); // Interrupt Enable active
         assert_eq!(ctx.cs, 0);
         assert_eq!(ctx.mxcsr, 0x1F80); // Default SSE masked state
-        assert_eq!(ctx.fcw, 0x037F);   // Default FPU control state
+        assert_eq!(ctx.fcw, 0x037F); // Default FPU control state
     }
 
     #[test]

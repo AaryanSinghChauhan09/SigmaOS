@@ -5,7 +5,7 @@
 #![allow(dead_code)]
 
 use std::collections::VecDeque;
-use std::sync::atomic::{AtomicU64, AtomicU32, Ordering};
+use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 
 /// Work ID type
 pub type WorkId = u64;
@@ -54,7 +54,13 @@ pub struct WorkItem {
 }
 
 impl WorkItem {
-    pub fn new(id: WorkId, priority: WorkPriority, callback: WorkCallback, user_data: u64, queued_at: u64) -> Self {
+    pub fn new(
+        id: WorkId,
+        priority: WorkPriority,
+        callback: WorkCallback,
+        user_data: u64,
+        queued_at: u64,
+    ) -> Self {
         WorkItem {
             id,
             priority,
@@ -104,7 +110,8 @@ impl Worker {
     }
 
     pub fn set_busy(&self, busy: bool) {
-        self.is_busy.store(if busy { 1 } else { 0 }, Ordering::SeqCst);
+        self.is_busy
+            .store(if busy { 1 } else { 0 }, Ordering::SeqCst);
     }
 }
 
@@ -146,15 +153,20 @@ impl WorkqueueSubsystem {
     }
 
     /// Submit work to the workqueue
-    pub fn submit_work(&mut self, priority: WorkPriority, callback: WorkCallback, user_data: u64) -> WorkId {
+    pub fn submit_work(
+        &mut self,
+        priority: WorkPriority,
+        callback: WorkCallback,
+        user_data: u64,
+    ) -> WorkId {
         let id = self.next_work_id.fetch_add(1, Ordering::SeqCst);
         let now = self.current_time_ns.load(Ordering::SeqCst);
-        
+
         let work = WorkItem::new(id, priority, callback, user_data, now);
-        
+
         // Push to back (worker will pick highest priority)
         self.pending_work.push_back(work);
-        
+
         id
     }
 
@@ -165,36 +177,40 @@ impl WorkqueueSubsystem {
 
         // Find available worker
         let worker_idx = self.workers.iter().position(|w| !w.is_busy());
-        
+
         if let Some(idx) = worker_idx {
             // Find highest priority work
             let mut highest_priority_idx = None;
             let mut highest_priority = WorkPriority::Low;
-            
+
             for (i, work) in self.pending_work.iter().enumerate() {
                 if work.priority >= highest_priority {
                     highest_priority = work.priority;
                     highest_priority_idx = Some(i);
                 }
             }
-            
+
             if let Some(work_idx) = highest_priority_idx {
                 let mut work = self.pending_work.remove(work_idx).unwrap();
                 work.set_state(WorkState::Running);
                 work.started_at.store(now, Ordering::SeqCst);
                 self.workers[idx].set_busy(true);
                 self.workers[idx].work_count.fetch_add(1, Ordering::SeqCst);
-                
+
                 let work_id = work.id;
                 let user_data = work.user_data;
-                
+
                 if let Some(callback) = work.callback {
                     let result = callback(work_id, user_data);
-                    
-                    work.set_state(if result.is_ok() { WorkState::Completed } else { WorkState::Failed });
+
+                    work.set_state(if result.is_ok() {
+                        WorkState::Completed
+                    } else {
+                        WorkState::Failed
+                    });
                     work.completed_at.store(now, Ordering::SeqCst);
                 }
-                
+
                 self.workers[idx].set_busy(false);
                 completed.push(work_id);
                 self.completed_work.push_back(work);
@@ -226,7 +242,10 @@ impl WorkqueueSubsystem {
 
     /// Get total work processed
     pub fn total_work_processed(&self) -> u64 {
-        self.workers.iter().map(|w| w.work_count.load(Ordering::SeqCst)).sum()
+        self.workers
+            .iter()
+            .map(|w| w.work_count.load(Ordering::SeqCst))
+            .sum()
     }
 }
 
@@ -243,7 +262,7 @@ mod tests {
     #[test]
     fn test_workqueue_creation() {
         let mut wq = WorkqueueSubsystem::new(4);
-        
+
         assert_eq!(wq.add_worker().unwrap(), 1);
         assert_eq!(wq.add_worker().unwrap(), 2);
         assert_eq!(wq.worker_count(), 2);
@@ -253,10 +272,10 @@ mod tests {
     fn test_work_submission() {
         let mut wq = WorkqueueSubsystem::new(4);
         wq.add_worker().unwrap();
-        
+
         let callback: WorkCallback = |_id, _data| Ok(());
         let id = wq.submit_work(WorkPriority::Normal, callback, 42);
-        
+
         assert_eq!(wq.pending_count(), 1);
         assert!(id > 0);
     }
@@ -265,10 +284,10 @@ mod tests {
     fn test_work_processing() {
         let mut wq = WorkqueueSubsystem::new(4);
         wq.add_worker().unwrap();
-        
+
         let callback: WorkCallback = |_id, _data| Ok(());
         wq.submit_work(WorkPriority::Normal, callback, 42);
-        
+
         let completed = wq.process_work();
         assert_eq!(completed.len(), 1);
         assert_eq!(wq.pending_count(), 0);
@@ -279,14 +298,14 @@ mod tests {
     fn test_priority_ordering() {
         let mut wq = WorkqueueSubsystem::new(4);
         wq.add_worker().unwrap();
-        
+
         let callback: WorkCallback = |_id, _data| Ok(());
         wq.submit_work(WorkPriority::Low, callback, 1);
         wq.submit_work(WorkPriority::High, callback, 2);
         wq.submit_work(WorkPriority::Normal, callback, 3);
-        
+
         assert_eq!(wq.pending_count(), 3);
-        
+
         // Process one work item
         let completed = wq.process_work();
         assert_eq!(completed.len(), 1);
@@ -299,7 +318,7 @@ mod tests {
         let mut wq = WorkqueueSubsystem::new(2);
         wq.add_worker().unwrap();
         wq.add_worker().unwrap();
-        
+
         assert!(wq.add_worker().is_err());
     }
 }

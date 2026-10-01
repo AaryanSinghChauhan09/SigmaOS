@@ -80,7 +80,10 @@ impl GarudaAssistantSnapperEngine {
         id
     }
 
-    pub fn trigger_auto_rollback(&mut self, target_snapshot_id: u64) -> Result<String, &'static str> {
+    pub fn trigger_auto_rollback(
+        &mut self,
+        target_snapshot_id: u64,
+    ) -> Result<String, &'static str> {
         if let Some(snap) = self.snapshots.get(&target_snapshot_id) {
             Ok(format!(
                 "GarudaSnapper: Successfully rolled back filesystem root to snapshot '{}' ({})",
@@ -257,7 +260,14 @@ impl GhostBsdNetmgrStationEngine {
         }
     }
 
-    pub fn add_scanned_station(&mut self, ssid: &str, bssid: &str, rssi: i32, chan: u32, sec: WifiSecurityAuth) {
+    pub fn add_scanned_station(
+        &mut self,
+        ssid: &str,
+        bssid: &str,
+        rssi: i32,
+        chan: u32,
+        sec: WifiSecurityAuth,
+    ) {
         let record = WifiStationRecord {
             ssid: ssid.to_string(),
             bssid: bssid.to_string(),
@@ -271,7 +281,10 @@ impl GhostBsdNetmgrStationEngine {
     pub fn connect_station(&mut self, ssid: &str) -> Result<String, &'static str> {
         if self.stations.contains_key(ssid) {
             self.current_connected_ssid = Some(ssid.to_string());
-            Ok(format!("GhostBSD Netmgr: Associated with SSID '{}' on {}", ssid, self.interface_name))
+            Ok(format!(
+                "GhostBSD Netmgr: Associated with SSID '{}' on {}",
+                ssid, self.interface_name
+            ))
         } else {
             Err("GhostBSD Netmgr: Target SSID not found in station probe list")
         }
@@ -359,9 +372,10 @@ impl GuixShepherdServiceEngine {
     pub fn eval_dependency_satisfaction(&self, name: &str) -> bool {
         if let Some(node) = self.services.get(name) {
             for req in &node.requirement {
-                let satisfied = self.services.values().any(|s| {
-                    s.provision.contains(req) && s.state == ShepherdServiceState::Running
-                });
+                let satisfied = self
+                    .services
+                    .values()
+                    .any(|s| s.provision.contains(req) && s.state == ShepherdServiceState::Running);
                 if !satisfied {
                     return false;
                 }
@@ -420,7 +434,10 @@ impl ClearLinuxAutoFdoThermalEngine {
         self.fdo_profile_samples += count;
     }
 
-    pub fn adjust_pstate_for_temperature(&mut self, current_temp_celsius: f32) -> EnergyPerformancePreference {
+    pub fn adjust_pstate_for_temperature(
+        &mut self,
+        current_temp_celsius: f32,
+    ) -> EnergyPerformancePreference {
         if current_temp_celsius > 85.0 {
             self.current_epp = EnergyPerformancePreference::Power;
         } else if current_temp_celsius > 70.0 {
@@ -467,8 +484,12 @@ impl SovereignDistroInnovationsSynthesisSuite {
         };
 
         // Initialize default configuration and services
-        suite.guix_shepherd.register_service("syslog", &["syslogd"], &[], false);
-        suite.guix_shepherd.register_service("networking", &["net"], &["syslogd"], true);
+        suite
+            .guix_shepherd
+            .register_service("syslog", &["syslogd"], &[], false);
+        suite
+            .guix_shepherd
+            .register_service("networking", &["net"], &["syslogd"], true);
         suite.ghostbsd_netmgr.add_scanned_station(
             "SigmaOS-HQ",
             "00:11:22:33:44:55",
@@ -481,21 +502,31 @@ impl SovereignDistroInnovationsSynthesisSuite {
     }
 
     pub fn verify_distro_innovations_suite(&mut self) -> bool {
-        let snap_id = self.garuda_snapper.create_pre_package_snapshot("pacman -Syu");
+        let snap_id = self
+            .garuda_snapper
+            .create_pre_package_snapshot("pacman -Syu");
         let rollback_ok = self.garuda_snapper.trigger_auto_rollback(snap_id).is_ok();
 
-        let staged_slot = self.vanilla_abroot.stage_transaction("2.1.0", "1234567890ab");
+        let staged_slot = self
+            .vanilla_abroot
+            .stage_transaction("2.1.0", "1234567890ab");
         let switch_ok = self.vanilla_abroot.commit_and_switch_slot().is_ok();
 
         let connect_ok = self.ghostbsd_netmgr.connect_station("SigmaOS-HQ").is_ok();
 
         let _ = self.guix_shepherd.start_service("syslog");
-        let dep_ok = self.guix_shepherd.eval_dependency_satisfaction("networking");
+        let dep_ok = self
+            .guix_shepherd
+            .eval_dependency_satisfaction("networking");
 
         self.clear_autofdo.record_fdo_samples(10_000);
         let epp = self.clear_autofdo.adjust_pstate_for_temperature(45.0);
 
-        rollback_ok && switch_ok && connect_ok && dep_ok && epp == EnergyPerformancePreference::Performance
+        rollback_ok
+            && switch_ok
+            && connect_ok
+            && dep_ok
+            && epp == EnergyPerformancePreference::Performance
     }
 }
 
@@ -543,8 +574,20 @@ mod tests {
     #[test]
     fn test_ghostbsd_netmgr_station() {
         let mut netmgr = GhostBsdNetmgrStationEngine::new("wlan0");
-        netmgr.add_scanned_station("HomeWiFi", "AA:BB:CC:DD:EE:FF", -80, 6, WifiSecurityAuth::Wpa2Psk);
-        netmgr.add_scanned_station("FastWiFi", "11:22:33:44:55:66", -50, 149, WifiSecurityAuth::Wpa3EnterpriseEap);
+        netmgr.add_scanned_station(
+            "HomeWiFi",
+            "AA:BB:CC:DD:EE:FF",
+            -80,
+            6,
+            WifiSecurityAuth::Wpa2Psk,
+        );
+        netmgr.add_scanned_station(
+            "FastWiFi",
+            "11:22:33:44:55:66",
+            -50,
+            149,
+            WifiSecurityAuth::Wpa3EnterpriseEap,
+        );
 
         assert!(netmgr.connect_station("HomeWiFi").is_ok());
         let roam = netmgr.evaluate_roaming();

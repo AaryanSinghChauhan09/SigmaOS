@@ -3,8 +3,6 @@
 
 #![allow(dead_code)]
 
-
-
 use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
@@ -49,7 +47,9 @@ impl AptPinningMultiArchResolver {
 
     pub fn resolve_package_priority(&self, pkg_name: &str, origin: &str) -> i32 {
         for rule in &self.pin_rules {
-            if (rule.package_pattern == "*" || rule.package_pattern == pkg_name) && rule.pin_origin == origin {
+            if (rule.package_pattern == "*" || rule.package_pattern == pkg_name)
+                && rule.pin_origin == origin
+            {
                 return rule.priority;
             }
         }
@@ -95,7 +95,10 @@ impl AlpmParallelSyncEngine {
     }
 
     pub fn get_fastest_mirror(&self) -> Option<String> {
-        self.mirrors.iter().find(|m| m.is_active).map(|m| m.url.clone())
+        self.mirrors
+            .iter()
+            .find(|m| m.is_active)
+            .map(|m| m.url.clone())
     }
 }
 
@@ -206,7 +209,8 @@ impl OpenBsdMonotonicSandbox {
                 return Err("OpenBSD pledge violation: Cannot expand promises monotonically");
             }
         }
-        self.active_pledges.retain(|p| new_promises.contains(&p.as_str()));
+        self.active_pledges
+            .retain(|p| new_promises.contains(&p.as_str()));
         self.is_pledged = true;
         Ok(())
     }
@@ -215,7 +219,8 @@ impl OpenBsdMonotonicSandbox {
         if self.is_pledged && !self.active_pledges.contains(&"unveil".to_string()) {
             return Err("OpenBSD unveil violation: unveil promise not active in pledge");
         }
-        self.unveiled_paths.push((path.to_string(), permissions.to_string()));
+        self.unveiled_paths
+            .push((path.to_string(), permissions.to_string()));
         Ok(())
     }
 
@@ -252,8 +257,14 @@ mod tests {
         assert!(resolver.is_architecture_supported("i386"));
         assert!(!resolver.is_architecture_supported("arm64"));
 
-        assert_eq!(resolver.resolve_package_priority("wine", "deb.debian.org"), 1001);
-        assert_eq!(resolver.resolve_package_priority("gcc", "deb.debian.org"), 500);
+        assert_eq!(
+            resolver.resolve_package_priority("wine", "deb.debian.org"),
+            1001
+        );
+        assert_eq!(
+            resolver.resolve_package_priority("gcc", "deb.debian.org"),
+            500
+        );
     }
 
     #[test]
@@ -264,7 +275,10 @@ mod tests {
         engine.add_mirror("https://mirror.rackspace.com", 80);
 
         engine.sort_mirrors_by_speed();
-        assert_eq!(engine.get_fastest_mirror().unwrap(), "https://geo.mirror.pkg.archlinux.org");
+        assert_eq!(
+            engine.get_fastest_mirror().unwrap(),
+            "https://geo.mirror.pkg.archlinux.org"
+        );
     }
 
     #[test]

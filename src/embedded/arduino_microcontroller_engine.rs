@@ -15,8 +15,8 @@ pub enum ArduinoBoardArchitecture {
     AvrAtmega328p, // Arduino Uno / Nano
     AvrAtmega2560, // Arduino Mega 2560
     AvrAtmega32u4, // Arduino Leonardo / Micro
-    Esp32,          // ESP32 WROOM / S3
-    Rp2040,         // Raspberry Pi Pico / Arduino Nano RP2040 Connect
+    Esp32,         // ESP32 WROOM / S3
+    Rp2040,        // Raspberry Pi Pico / Arduino Nano RP2040 Connect
 }
 
 /// Detailed profile for an Arduino board
@@ -148,7 +148,12 @@ impl ArduinoUsbVidPidProbe {
     }
 
     /// Probe device node matching vendor and product IDs
-    pub fn probe_device(&self, vendor_id: u16, product_id: u16, dev_index: usize) -> Option<ArduinoDiscoveredDevice> {
+    pub fn probe_device(
+        &self,
+        vendor_id: u16,
+        product_id: u16,
+        dev_index: usize,
+    ) -> Option<ArduinoDiscoveredDevice> {
         for record in &self.known_bridges {
             if record.vendor_id == vendor_id && record.product_id == product_id {
                 let linux_device = format!("/dev/ttyUSB{}", dev_index);
@@ -282,7 +287,8 @@ impl ArduinoStk500FlashingEngine {
                     return Err("Flash write address out of bounds");
                 }
 
-                self.flash_memory[addr..addr + page_size].copy_from_slice(&payload[data_start..data_end]);
+                self.flash_memory[addr..addr + page_size]
+                    .copy_from_slice(&payload[data_start..data_end]);
 
                 response.push(stk500_constants::STK_INSYNC);
                 response.push(stk500_constants::STK_OK);
@@ -411,7 +417,10 @@ mod tests {
         let probe = ArduinoUsbVidPidProbe::new();
         let official_uno = probe.probe_device(0x2341, 0x0043, 0).unwrap();
         assert_eq!(official_uno.bridge_chip, "ATmega16U2 (Official Arduino)");
-        assert_eq!(official_uno.architecture, ArduinoBoardArchitecture::AvrAtmega328p);
+        assert_eq!(
+            official_uno.architecture,
+            ArduinoBoardArchitecture::AvrAtmega328p
+        );
         assert_eq!(official_uno.sigma_dev_alias, "/dev/arduino0");
 
         let ch340_clone = probe.probe_device(0x1A86, 0x7523, 1).unwrap();
@@ -426,7 +435,10 @@ mod tests {
         // Send GET_SYNC
         let sync_cmd = vec![stk500_constants::STK_GET_SYNC, stk500_constants::CRC_EOP];
         let sync_resp = engine.process_command(&sync_cmd).unwrap();
-        assert_eq!(sync_resp, vec![stk500_constants::STK_INSYNC, stk500_constants::STK_OK]);
+        assert_eq!(
+            sync_resp,
+            vec![stk500_constants::STK_INSYNC, stk500_constants::STK_OK]
+        );
         assert!(engine.is_synced);
 
         // Read Signature
@@ -457,7 +469,10 @@ mod tests {
         prog_cmd.push(stk500_constants::CRC_EOP);
 
         let prog_resp = engine.process_command(&prog_cmd).unwrap();
-        assert_eq!(prog_resp, vec![stk500_constants::STK_INSYNC, stk500_constants::STK_OK]);
+        assert_eq!(
+            prog_resp,
+            vec![stk500_constants::STK_INSYNC, stk500_constants::STK_OK]
+        );
         assert_eq!(&engine.flash_memory[0..4], &[0x11, 0x22, 0x33, 0x44]);
     }
 

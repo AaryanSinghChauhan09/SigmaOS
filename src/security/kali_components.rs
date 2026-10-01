@@ -10,9 +10,10 @@
 //! - `KaliRamMemoryForensics`: Volatility-style RAM memory artifact & process list analyzer.
 //! - `KaliHashcatCracker`: Multi-algorithm hash identifier & accelerated cracker.
 
-use core::sync::atomic::{AtomicUsize, Ordering};
+
 use std::string::String;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Port Scan Type (Nmap inspired)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -95,16 +96,7 @@ impl KaliExploitEncoder {
     pub fn encode_shellcode(&self, raw_bytes: &[u8]) -> Vec<u8> {
         let mut encoded = Vec::with_capacity(raw_bytes.len() + 8);
         // Prepend simulated decoder stub header
-        encoded.extend_from_slice(&[
-            0xEB,
-            0x08,
-            0x5E,
-            0x31,
-            0xC9,
-            0xB1,
-            raw_bytes.len() as u8,
-            0x80,
-        ]);
+        encoded.extend_from_slice(&[0xEB, 0x08, 0x5E, 0x31, 0xC9, 0xB1, raw_bytes.len() as u8, 0x80]);
         for &byte in raw_bytes {
             encoded.push(byte ^ self.key);
         }
@@ -173,16 +165,8 @@ impl KaliPcapDissector {
         }
         let src_ip = [raw[12], raw[13], raw[14], raw[15]];
         let dst_ip = [raw[16], raw[17], raw[18], raw[19]];
-        let src_port = if raw.len() >= 24 {
-            ((raw[20] as u16) << 8) | (raw[21] as u16)
-        } else {
-            0
-        };
-        let dst_port = if raw.len() >= 24 {
-            ((raw[22] as u16) << 8) | (raw[23] as u16)
-        } else {
-            0
-        };
+        let src_port = if raw.len() >= 24 { ((raw[20] as u16) << 8) | (raw[21] as u16) } else { 0 };
+        let dst_port = if raw.len() >= 24 { ((raw[22] as u16) << 8) | (raw[23] as u16) } else { 0 };
         let protocol = raw[9];
         let payload = if raw.len() > 24 { &raw[24..] } else { &[] };
 
@@ -299,10 +283,7 @@ pub struct KaliHashcatCracker;
 
 impl KaliHashcatCracker {
     pub fn identify_hash(hash_str: &str) -> HashType {
-        if hash_str.starts_with("$2a$")
-            || hash_str.starts_with("$2b$")
-            || hash_str.starts_with("$2y$")
-        {
+        if hash_str.starts_with("$2a$") || hash_str.starts_with("$2b$") || hash_str.starts_with("$2y$") {
             return HashType::Bcrypt;
         }
         match hash_str.len() {
@@ -323,12 +304,8 @@ mod tests {
         let scanner = KaliNmapPortScanner::new([127, 0, 0, 1], ScanType::SynStealth);
         let results = scanner.scan_range(20, 90);
         assert!(!results.is_empty());
-        assert!(results
-            .iter()
-            .any(|r| r.port == 22 && r.service_name == "ssh"));
-        assert!(results
-            .iter()
-            .any(|r| r.port == 80 && r.service_name == "http"));
+        assert!(results.iter().any(|r| r.port == 22 && r.service_name == "ssh"));
+        assert!(results.iter().any(|r| r.port == 80 && r.service_name == "http"));
     }
 
     #[test]
@@ -370,23 +347,12 @@ mod tests {
 
     #[test]
     fn test_kali_web_vuln_scanner() {
-        let payloads = [
-            "admin",
-            "' OR '1'='1",
-            "<script>alert(1)</script>",
-            "; cat /etc/passwd",
-        ];
+        let payloads = ["admin", "' OR '1'='1", "<script>alert(1)</script>", "; cat /etc/passwd"];
         let reports = KaliWebVulnScanner::scan_parameter("username", &payloads);
         assert_eq!(reports.len(), 3);
-        assert!(reports
-            .iter()
-            .any(|r| r.vuln_type == VulnType::SqlInjection));
-        assert!(reports
-            .iter()
-            .any(|r| r.vuln_type == VulnType::CrossSiteScripting));
-        assert!(reports
-            .iter()
-            .any(|r| r.vuln_type == VulnType::CommandInjection));
+        assert!(reports.iter().any(|r| r.vuln_type == VulnType::SqlInjection));
+        assert!(reports.iter().any(|r| r.vuln_type == VulnType::CrossSiteScripting));
+        assert!(reports.iter().any(|r| r.vuln_type == VulnType::CommandInjection));
     }
 
     #[test]
@@ -394,26 +360,13 @@ mod tests {
         let ram_dump = [0xFFu8; 128];
         let artifacts = KaliRamMemoryForensics::analyze_memory_dump(&ram_dump);
         assert!(!artifacts.is_empty());
-        assert!(artifacts
-            .iter()
-            .any(|a| a.is_hidden && a.name == "rootkit_daemon"));
+        assert!(artifacts.iter().any(|a| a.is_hidden && a.name == "rootkit_daemon"));
     }
 
     #[test]
     fn test_kali_hashcat_cracker() {
-        assert_eq!(
-            KaliHashcatCracker::identify_hash("5d41402abc4b2a76b9719d911017c592"),
-            HashType::Md5
-        );
-        assert_eq!(
-            KaliHashcatCracker::identify_hash("2fd4e1c67a2d28fced849ee1bb76e7391b93eb12"),
-            HashType::Sha1
-        );
-        assert_eq!(
-            KaliHashcatCracker::identify_hash(
-                "$2b$12$e8Y.1p1T8vX90X2p6m9qOu12345678901234567890123456789012"
-            ),
-            HashType::Bcrypt
-        );
+        assert_eq!(KaliHashcatCracker::identify_hash("5d41402abc4b2a76b9719d911017c592"), HashType::Md5);
+        assert_eq!(KaliHashcatCracker::identify_hash("2fd4e1c67a2d28fced849ee1bb76e7391b93eb12"), HashType::Sha1);
+        assert_eq!(KaliHashcatCracker::identify_hash("$2b$12$e8Y.1p1T8vX90X2p6m9qOu12345678901234567890123456789012"), HashType::Bcrypt);
     }
 }

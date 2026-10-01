@@ -1,8 +1,8 @@
 // POSIX Signal Delivery Infrastructure
 // Implements POSIX.1-2017 signal handling (sigaction, sigprocmask, signal delivery)
 
-use std::sync::atomic::{AtomicU64, Ordering};
 use std::collections::BTreeMap;
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Arc;
 use std::vec::Vec;
 
@@ -10,37 +10,37 @@ use std::vec::Vec;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(u32)]
 pub enum PosixSignal {
-    SIGHUP = 1,    // Hangup detected on controlling terminal
-    SIGINT = 2,    // Interrupt from keyboard (Ctrl+C)
-    SIGQUIT = 3,   // Quit from keyboard (Ctrl+\)
-    SIGILL = 4,    // Illegal Instruction
-    SIGTRAP = 5,   // Trace/breakpoint trap
-    SIGABRT = 6,   // Abort (usually SIGIOT)
-    SIGBUS = 7,    // Bus error (bad memory access)
-    SIGFPE = 8,    // Floating point exception
-    SIGKILL = 9,   // Kill signal (cannot be caught or ignored)
-    SIGUSR1 = 10,  // User-defined signal 1
-    SIGSEGV = 11,  // Invalid memory reference
-    SIGUSR2 = 12,  // User-defined signal 2
-    SIGPIPE = 13,  // Broken pipe: write to pipe with no readers
-    SIGALRM = 14,  // Timer signal from alarm(2)
-    SIGTERM = 15,  // Termination signal
+    SIGHUP = 1,     // Hangup detected on controlling terminal
+    SIGINT = 2,     // Interrupt from keyboard (Ctrl+C)
+    SIGQUIT = 3,    // Quit from keyboard (Ctrl+\)
+    SIGILL = 4,     // Illegal Instruction
+    SIGTRAP = 5,    // Trace/breakpoint trap
+    SIGABRT = 6,    // Abort (usually SIGIOT)
+    SIGBUS = 7,     // Bus error (bad memory access)
+    SIGFPE = 8,     // Floating point exception
+    SIGKILL = 9,    // Kill signal (cannot be caught or ignored)
+    SIGUSR1 = 10,   // User-defined signal 1
+    SIGSEGV = 11,   // Invalid memory reference
+    SIGUSR2 = 12,   // User-defined signal 2
+    SIGPIPE = 13,   // Broken pipe: write to pipe with no readers
+    SIGALRM = 14,   // Timer signal from alarm(2)
+    SIGTERM = 15,   // Termination signal
     SIGSTKFLT = 16, // Stack fault on coprocessor (unused)
-    SIGCHLD = 17,  // Child stopped or terminated
-    SIGCONT = 18,  // Continue if stopped
-    SIGSTOP = 19,  // Stop process (cannot be caught or ignored)
-    SIGTSTP = 20,  // Stop typed at terminal (Ctrl+Z)
-    SIGTTIN = 21,  // Background read from tty
-    SIGTTOU = 22,  // Background write to tty
-    SIGURG = 23,   // Urgent condition on socket
-    SIGXCPU = 24,  // CPU time limit exceeded
-    SIGXFSZ = 25,  // File size limit exceeded
+    SIGCHLD = 17,   // Child stopped or terminated
+    SIGCONT = 18,   // Continue if stopped
+    SIGSTOP = 19,   // Stop process (cannot be caught or ignored)
+    SIGTSTP = 20,   // Stop typed at terminal (Ctrl+Z)
+    SIGTTIN = 21,   // Background read from tty
+    SIGTTOU = 22,   // Background write to tty
+    SIGURG = 23,    // Urgent condition on socket
+    SIGXCPU = 24,   // CPU time limit exceeded
+    SIGXFSZ = 25,   // File size limit exceeded
     SIGVTALRM = 26, // Virtual timer expired
-    SIGPROF = 27,  // Profiling timer expired
-    SIGWINCH = 28, // Window size change
-    SIGIO = 29,    // I/O now possible
-    SIGPWR = 30,   // Power failure restart
-    SIGSYS = 31,   // Bad system call (SVr4)
+    SIGPROF = 27,   // Profiling timer expired
+    SIGWINCH = 28,  // Window size change
+    SIGIO = 29,     // I/O now possible
+    SIGPWR = 30,    // Power failure restart
+    SIGSYS = 31,    // Bad system call (SVr4)
 }
 
 impl PosixSignal {
@@ -160,14 +160,14 @@ impl SignalMask {
 /// Signal action flags (sigaction sa_flags)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SignalFlags {
-    pub no_cld_stop: bool,    // No SIGCHLD when child stops
-    pub no_cld_wait: bool,    // No SIGCHLD when child terminates
-    pub sig_info: bool,      // Provide signal info to handler
-    pub restart_sys: bool,    // Restart interrupted syscalls
-    pub on_stack: bool,       // Use alternate signal stack
-    pub def_handler: bool,    // Use default handler
-    pub no_defer: bool,       // Don't defer signals
-    pub resume: bool,          // Resume if stopped
+    pub no_cld_stop: bool, // No SIGCHLD when child stops
+    pub no_cld_wait: bool, // No SIGCHLD when child terminates
+    pub sig_info: bool,    // Provide signal info to handler
+    pub restart_sys: bool, // Restart interrupted syscalls
+    pub on_stack: bool,    // Use alternate signal stack
+    pub def_handler: bool, // Use default handler
+    pub no_defer: bool,    // Don't defer signals
+    pub resume: bool,      // Resume if stopped
 }
 
 impl Default for SignalFlags {
@@ -280,7 +280,11 @@ impl SignalDispositionTable {
     }
 
     /// Set signal action (sigaction system call)
-    pub fn set_action(&mut self, signal: PosixSignal, action: SignalAction) -> Result<(), &'static str> {
+    pub fn set_action(
+        &mut self,
+        signal: PosixSignal,
+        action: SignalAction,
+    ) -> Result<(), &'static str> {
         if !signal.can_catch() {
             return Err("Cannot set handler for SIGKILL or SIGSTOP");
         }
@@ -399,7 +403,11 @@ impl PosixSignalDeliveryEngine {
     }
 
     /// Set signal action (sigaction system call)
-    pub fn sigaction(&mut self, signal: PosixSignal, action: SignalAction) -> Result<(), &'static str> {
+    pub fn sigaction(
+        &mut self,
+        signal: PosixSignal,
+        action: SignalAction,
+    ) -> Result<(), &'static str> {
         let mut table = (*self.disposition_table).clone();
         let result = table.set_action(signal, action);
         self.disposition_table = Arc::new(table);
@@ -412,9 +420,15 @@ impl PosixSignalDeliveryEngine {
     }
 
     /// Set signal mask (sigprocmask system call)
-    pub fn sigprocmask(&mut self, thread_id: usize, operation: SigprocmaskOp, mask: SignalMask) -> Result<SignalMask, &'static str> {
+    pub fn sigprocmask(
+        &mut self,
+        thread_id: usize,
+        operation: SigprocmaskOp,
+        mask: SignalMask,
+    ) -> Result<SignalMask, &'static str> {
         if thread_id >= self.thread_masks.len() {
-            self.thread_masks.resize(thread_id + 1, ThreadSignalMask::default());
+            self.thread_masks
+                .resize(thread_id + 1, ThreadSignalMask::default());
         }
 
         let old_mask = self.thread_masks[thread_id].get_mask();
@@ -492,9 +506,9 @@ impl Default for PosixSignalDeliveryEngine {
 /// sigprocmask operation
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SigprocmaskOp {
-    Block,      // SIG_BLOCK: add signals to block set
-    Unblock,    // SIG_UNBLOCK: remove signals from block set
-    SetMask,    // SIG_SETMASK: set block set to given mask
+    Block,   // SIG_BLOCK: add signals to block set
+    Unblock, // SIG_UNBLOCK: remove signals from block set
+    SetMask, // SIG_SETMASK: set block set to given mask
 }
 
 /// Signal statistics
@@ -552,7 +566,9 @@ mod tests {
             restorer: None,
         };
 
-        assert!(table.set_action(PosixSignal::SIGINT, action.clone()).is_ok());
+        assert!(table
+            .set_action(PosixSignal::SIGINT, action.clone())
+            .is_ok());
         assert!(table.set_action(PosixSignal::SIGKILL, action).is_err());
 
         table.mark_pending(PosixSignal::SIGINT);
@@ -563,7 +579,9 @@ mod tests {
     fn test_thread_signal_mask() {
         let mut mask = ThreadSignalMask::new();
 
-        let block_mask = SignalMask { bits: 1u64 << (PosixSignal::SIGINT as u32) };
+        let block_mask = SignalMask {
+            bits: 1u64 << (PosixSignal::SIGINT as u32),
+        };
         mask.block(block_mask);
 
         assert!(mask.is_blocked(PosixSignal::SIGINT));

@@ -2,11 +2,11 @@
 // Zero-dependency Rust #![no_std] / std implementation of privilege delegation & authentication.
 
 #[cfg(not(test))]
+use alloc::format;
+#[cfg(not(test))]
 use alloc::string::{String, ToString};
 #[cfg(not(test))]
 use alloc::vec::Vec;
-#[cfg(not(test))]
-use alloc::format;
 
 #[cfg(test)]
 use std::string::String;
@@ -19,6 +19,27 @@ pub enum SudoAuthResult {
     Authorized,
     AuthenticationRequired,
     PermissionDenied,
+}
+
+fn is_allowed_environment_key(key: &str) -> bool {
+    matches!(
+        key,
+        "TERM"
+            | "LANG"
+            | "LC_ALL"
+            | "LC_ADDRESS"
+            | "LC_COLLATE"
+            | "LC_CTYPE"
+            | "LC_IDENTIFICATION"
+            | "LC_MEASUREMENT"
+            | "LC_MESSAGES"
+            | "LC_MONETARY"
+            | "LC_NAME"
+            | "LC_NUMERIC"
+            | "LC_PAPER"
+            | "LC_TELEPHONE"
+            | "LC_TIME"
+    )
 }
 
 /// Sudoers & Doas Rule Entry
@@ -63,7 +84,13 @@ impl SovereignSudoEngine {
     }
 
     /// Evaluates if a user is authorized to run a command as a target user
-    pub fn authorize(&self, user: &str, groups: &[&str], target_user: &str, command: &str) -> SudoAuthResult {
+    pub fn authorize(
+        &self,
+        user: &str,
+        groups: &[&str],
+        target_user: &str,
+        command: &str,
+    ) -> SudoAuthResult {
         for rule in &self.rules {
             let entity_match = if rule.entity.starts_with('%') || rule.entity.starts_with(':') {
                 let group_name = &rule.entity[1..];
@@ -87,12 +114,12 @@ impl SovereignSudoEngine {
         SudoAuthResult::PermissionDenied
     }
 
-    /// Sanitizes environment variables for elevated execution
+    /// Keeps only explicitly permitted environment variable names for elevated execution.
+    /// This does not validate associated values; the executor must set trusted PATH and HOME values.
     pub fn sanitize_environment(&self, env_keys: &[&str]) -> Vec<String> {
-        let dangerous_keys = ["LD_PRELOAD", "LD_LIBRARY_PATH", "PYTHONPATH", "RUBYLIB"];
         env_keys
             .iter()
-            .filter(|&&k| !dangerous_keys.contains(&k))
+            .filter(|&&key| is_allowed_environment_key(key))
             .map(|&k| String::from(k))
             .collect()
     }
@@ -133,8 +160,32 @@ mod tests {
         assert_eq!(res_unauth, SudoAuthResult::PermissionDenied);
 
         // Test environment sanitization
-        let clean_env = engine.sanitize_environment(&["PATH", "LD_PRELOAD", "HOME"]);
-        assert!(clean_env.contains(&String::from("PATH")));
+        let clean_env = engine.sanitize_environment(&[
+            "TERM",
+            "LANG",
+            "LC_CTYPE",
+            "LD_PRELOAD",
+            "HOME",
+            "GCONV_PATH",
+            "PERL5LIB",
+            "IFS",
+            "NODE_OPTIONS",
+            "BASH_ENV",
+            "LC_CUSTOM",
+            "LC_BAD-NAME",
+        ]);
+        assert!(clean_env.contains(&String::from("TERM")));
+        assert!(clean_env.contains(&String::from("LANG")));
+        assert!(clean_env.contains(&String::from("LC_CTYPE")));
+        assert!(!clean_env.contains(&String::from("PATH")));
+        assert!(!clean_env.contains(&String::from("HOME")));
         assert!(!clean_env.contains(&String::from("LD_PRELOAD")));
+        assert!(!clean_env.contains(&String::from("GCONV_PATH")));
+        assert!(!clean_env.contains(&String::from("PERL5LIB")));
+        assert!(!clean_env.contains(&String::from("IFS")));
+        assert!(!clean_env.contains(&String::from("NODE_OPTIONS")));
+        assert!(!clean_env.contains(&String::from("BASH_ENV")));
+        assert!(!clean_env.contains(&String::from("LC_CUSTOM")));
+        assert!(!clean_env.contains(&String::from("LC_BAD-NAME")));
     }
 }

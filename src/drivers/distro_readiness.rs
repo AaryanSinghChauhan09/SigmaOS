@@ -5,9 +5,9 @@
 //! - OpenBSD DRM/KMS Mode-setting & Framebuffer Controller (`OpenBsdDrmKmsController`)
 //! - Universal USB xHCI Transfer Ring Buffer Manager (`UniversalXhciRingEngine`)
 
+use crate::klib::{HashMap, Vec};
 use std::string::String;
 use std::string::ToString;
-use crate::klib::{Vec, HashMap};
 
 // ==========================================
 // 1. Linux PCI Bus Autoprobing & BAR Allocator
@@ -65,7 +65,9 @@ impl LinuxPciBusGovernor {
     }
 
     pub fn find_by_vendor_device(&self, vendor_id: u16, device_id: u16) -> Option<&PciDeviceNode> {
-        self.devices.iter().find(|d| d.vendor_id == vendor_id && d.device_id == device_id)
+        self.devices
+            .iter()
+            .find(|d| d.vendor_id == vendor_id && d.device_id == device_id)
     }
 }
 
@@ -105,7 +107,13 @@ impl FreeBsdGeomDiskEngine {
         }
     }
 
-    pub fn add_partition(&mut self, name: &str, start_lba: u64, block_count: u64, fs_label: &str) -> Result<u32, &'static str> {
+    pub fn add_partition(
+        &mut self,
+        name: &str,
+        start_lba: u64,
+        block_count: u64,
+        fs_label: &str,
+    ) -> Result<u32, &'static str> {
         if start_lba + block_count > self.total_blocks {
             return Err("Partition exceeds physical disk capacity");
         }
@@ -123,9 +131,10 @@ impl FreeBsdGeomDiskEngine {
     }
 
     pub fn partition_size_mb(&self, partition_index: u32) -> Option<u64> {
-        self.partitions.iter().find(|p| p.partition_index == partition_index).map(|p| {
-            (p.block_count * self.sector_size as u64) / (1024 * 1024)
-        })
+        self.partitions
+            .iter()
+            .find(|p| p.partition_index == partition_index)
+            .map(|p| (p.block_count * self.sector_size as u64) / (1024 * 1024))
     }
 }
 
@@ -278,8 +287,12 @@ mod tests {
     fn test_freebsd_geom_disk() {
         let mut geom = FreeBsdGeomDiskEngine::new("ada0", 100_000_000, 512);
 
-        let p1 = geom.add_partition("ada0p1", 2048, 1_000_000, "boot").unwrap();
-        let p2 = geom.add_partition("ada0p2", 1002048, 50_000_000, "sysroot").unwrap();
+        let p1 = geom
+            .add_partition("ada0p1", 2048, 1_000_000, "boot")
+            .unwrap();
+        let p2 = geom
+            .add_partition("ada0p2", 1002048, 50_000_000, "sysroot")
+            .unwrap();
 
         assert_eq!(p1, 1);
         assert_eq!(p2, 2);

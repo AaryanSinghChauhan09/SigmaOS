@@ -14,7 +14,6 @@
 #![allow(dead_code)]
 #![allow(clippy::new_without_default)]
 
-
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
@@ -36,8 +35,12 @@ pub struct PrivateKey(pub [u8; 32]);
 pub struct PresharedKey(pub [u8; 32]);
 
 impl PublicKey {
-    pub fn zero() -> Self { Self([0u8; 32]) }
-    pub fn as_bytes(&self) -> &[u8; 32] { &self.0 }
+    pub fn zero() -> Self {
+        Self([0u8; 32])
+    }
+    pub fn as_bytes(&self) -> &[u8; 32] {
+        &self.0
+    }
     pub fn to_hex(&self) -> String {
         self.0.iter().map(|b| std::format!("{:02x}", b)).collect()
     }
@@ -50,7 +53,8 @@ pub fn derive_public_key(private: &PrivateKey) -> PublicKey {
     for (i, b) in private.0.iter().enumerate() {
         pk[i] = b.wrapping_mul(0x41).wrapping_add(0x57); // deterministic stub
     }
-    pk[0] &= 0xF8; pk[31] = (pk[31] & 0x7F) | 0x40; // Curve25519 clamping
+    pk[0] &= 0xF8;
+    pk[31] = (pk[31] & 0x7F) | 0x40; // Curve25519 clamping
     PublicKey(pk)
 }
 
@@ -70,25 +74,48 @@ impl AllowedIp {
     pub fn ipv4(a: u8, b: u8, c: u8, d: u8, prefix: u8) -> Self {
         let mut addr = [0u8; 16];
         // IPv4-mapped IPv6 prefix: ::ffff:x.x.x.x
-        addr[10] = 0xFF; addr[11] = 0xFF;
-        addr[12] = a; addr[13] = b; addr[14] = c; addr[15] = d;
-        Self { addr, prefix_len: prefix + 96, is_ipv6: false }
+        addr[10] = 0xFF;
+        addr[11] = 0xFF;
+        addr[12] = a;
+        addr[13] = b;
+        addr[14] = c;
+        addr[15] = d;
+        Self {
+            addr,
+            prefix_len: prefix + 96,
+            is_ipv6: false,
+        }
     }
 
     pub fn ipv6(addr: [u8; 16], prefix: u8) -> Self {
-        Self { addr, prefix_len: prefix, is_ipv6: true }
+        Self {
+            addr,
+            prefix_len: prefix,
+            is_ipv6: true,
+        }
     }
 
-    pub fn any_ipv4() -> Self { Self::ipv4(0, 0, 0, 0, 0) }
+    pub fn any_ipv4() -> Self {
+        Self::ipv4(0, 0, 0, 0, 0)
+    }
 
     pub fn matches_ipv4(&self, ip: [u8; 4]) -> bool {
-        if self.is_ipv6 { return false; }
+        if self.is_ipv6 {
+            return false;
+        }
         let prefix = self.prefix_len.saturating_sub(96);
-        if prefix == 0 { return true; }
+        if prefix == 0 {
+            return true;
+        }
         let mask_bits = prefix as u32;
-        let self_ip = u32::from_be_bytes([self.addr[12], self.addr[13], self.addr[14], self.addr[15]]);
+        let self_ip =
+            u32::from_be_bytes([self.addr[12], self.addr[13], self.addr[14], self.addr[15]]);
         let target = u32::from_be_bytes(ip);
-        let mask = if mask_bits >= 32 { u32::MAX } else { !((1u32 << (32 - mask_bits)) - 1) };
+        let mask = if mask_bits >= 32 {
+            u32::MAX
+        } else {
+            !((1u32 << (32 - mask_bits)) - 1)
+        };
         (self_ip & mask) == (target & mask)
     }
 }
@@ -171,9 +198,12 @@ pub struct WgSessionKeys {
 impl WgSessionKeys {
     pub fn new(sending: [u8; 32], receiving: [u8; 32], is_init: bool, now_ns: u64) -> Self {
         Self {
-            sending_key: sending, receiving_key: receiving,
-            sending_counter: 0, receiving_bitmap: 0,
-            receiving_counter: 0, created_at_ns: now_ns,
+            sending_key: sending,
+            receiving_key: receiving,
+            sending_counter: 0,
+            receiving_bitmap: 0,
+            receiving_counter: 0,
+            created_at_ns: now_ns,
             is_initiator: is_init,
         }
     }
@@ -192,16 +222,23 @@ impl WgSessionKeys {
 
     /// Validate and record a received counter (anti-replay).
     pub fn check_replay(&mut self, counter: u64) -> bool {
-        if counter + 64 <= self.receiving_counter { return false; } // Too old
+        if counter + 64 <= self.receiving_counter {
+            return false;
+        } // Too old
         if counter > self.receiving_counter {
             // Advance window
             let shift = counter - self.receiving_counter;
-            if shift >= 64 { self.receiving_bitmap = 0; }
-            else { self.receiving_bitmap <<= shift; }
+            if shift >= 64 {
+                self.receiving_bitmap = 0;
+            } else {
+                self.receiving_bitmap <<= shift;
+            }
             self.receiving_counter = counter;
         }
         let bit = 1u64 << (self.receiving_counter - counter);
-        if self.receiving_bitmap & bit != 0 { return false; } // Replay
+        if self.receiving_bitmap & bit != 0 {
+            return false;
+        } // Replay
         self.receiving_bitmap |= bit;
         true
     }
@@ -245,30 +282,53 @@ pub struct WgEndpoint {
 
 impl WgEndpoint {
     pub fn new(a: u8, b: u8, c: u8, d: u8, port: u16) -> Self {
-        Self { ip: [a, b, c, d], port }
+        Self {
+            ip: [a, b, c, d],
+            port,
+        }
     }
 
     pub fn to_string(&self) -> String {
-        std::format!("{}.{}.{}.{}:{}", self.ip[0], self.ip[1], self.ip[2], self.ip[3], self.port)
+        std::format!(
+            "{}.{}.{}.{}:{}",
+            self.ip[0],
+            self.ip[1],
+            self.ip[2],
+            self.ip[3],
+            self.port
+        )
     }
 }
 
 impl WgPeer {
     pub fn new(public_key: PublicKey) -> Self {
         Self {
-            public_key, preshared_key: None, endpoint: None,
-            allowed_ips: Vec::new(), persistent_keepalive: 0,
-            handshake: None, session: None, last_handshake_ns: 0,
-            tx_bytes: 0, rx_bytes: 0,
+            public_key,
+            preshared_key: None,
+            endpoint: None,
+            allowed_ips: Vec::new(),
+            persistent_keepalive: 0,
+            handshake: None,
+            session: None,
+            last_handshake_ns: 0,
+            tx_bytes: 0,
+            rx_bytes: 0,
         }
     }
 
-    pub fn add_allowed_ip(&mut self, ip: AllowedIp) { self.allowed_ips.push(ip); }
+    pub fn add_allowed_ip(&mut self, ip: AllowedIp) {
+        self.allowed_ips.push(ip);
+    }
 
-    pub fn set_endpoint(&mut self, ep: WgEndpoint) { self.endpoint = Some(ep); }
+    pub fn set_endpoint(&mut self, ep: WgEndpoint) {
+        self.endpoint = Some(ep);
+    }
 
     pub fn has_valid_session(&self, now_ns: u64) -> bool {
-        self.session.as_ref().map(|s| !s.is_expired(now_ns)).unwrap_or(false)
+        self.session
+            .as_ref()
+            .map(|s| !s.is_expired(now_ns))
+            .unwrap_or(false)
     }
 
     pub fn route_matches(&self, dst_ip: [u8; 4]) -> bool {
@@ -310,9 +370,17 @@ impl WgDevice {
     pub fn new(name: &str, private_key: PrivateKey, listen_port: u16) -> Self {
         let public_key = derive_public_key(&private_key);
         Self {
-            name: name.into(), private_key, public_key, listen_port, fwmark: 0,
-            peers: BTreeMap::new(), route_table: Vec::new(),
-            interface_ip: None, mtu: 1420, rx_packets: 0, tx_packets: 0,
+            name: name.into(),
+            private_key,
+            public_key,
+            listen_port,
+            fwmark: 0,
+            peers: BTreeMap::new(),
+            route_table: Vec::new(),
+            interface_ip: None,
+            mtu: 1420,
+            rx_packets: 0,
+            tx_packets: 0,
         }
     }
 
@@ -344,8 +412,14 @@ impl WgDevice {
     /// Simulate encapsulating a plaintext packet for a peer.
     ///
     /// In production: ChaCha20-Poly1305 encrypt + UDP wrap.
-    pub fn encapsulate(&mut self, dst_ip: [u8; 4], payload: &[u8]) -> Result<Vec<u8>, &'static str> {
-        let peer = self.peers.values_mut()
+    pub fn encapsulate(
+        &mut self,
+        dst_ip: [u8; 4],
+        payload: &[u8],
+    ) -> Result<Vec<u8>, &'static str> {
+        let peer = self
+            .peers
+            .values_mut()
             .find(|p| p.route_matches(dst_ip))
             .ok_or("no peer for destination")?;
 
@@ -376,10 +450,14 @@ impl WgDevice {
 
     /// Simulate decapsulating a received WireGuard packet.
     pub fn decapsulate(&mut self, src_ip: [u8; 4], packet: &[u8]) -> Result<Vec<u8>, &'static str> {
-        if packet.len() < 32 { return Err("packet too short"); }
+        if packet.len() < 32 {
+            return Err("packet too short");
+        }
 
         // Find peer by source IP (simplified)
-        let peer = self.peers.values_mut()
+        let peer = self
+            .peers
+            .values_mut()
             .find(|p| p.endpoint.as_ref().map(|e| e.ip == src_ip).unwrap_or(false))
             .ok_or("unknown peer")?;
 
@@ -390,11 +468,14 @@ impl WgDevice {
         counter_bytes.copy_from_slice(&packet[8..16]);
         let counter = u64::from_le_bytes(counter_bytes);
 
-        if !session.check_replay(counter) { return Err("replay attack detected"); }
+        if !session.check_replay(counter) {
+            return Err("replay attack detected");
+        }
 
         // Decrypt (stub: XOR)
         let payload = &packet[16..packet.len() - 16]; // strip MAC
-        let decrypted: Vec<u8> = payload.iter()
+        let decrypted: Vec<u8> = payload
+            .iter()
             .map(|b| b ^ session.receiving_key[counter as usize % 32])
             .collect();
 
@@ -404,7 +485,11 @@ impl WgDevice {
     }
 
     /// Initiate handshake with a peer (stub).
-    pub fn initiate_handshake(&mut self, peer_key: &PublicKey, now_ns: u64) -> Result<(), &'static str> {
+    pub fn initiate_handshake(
+        &mut self,
+        peer_key: &PublicKey,
+        now_ns: u64,
+    ) -> Result<(), &'static str> {
         let peer = self.peers.get_mut(peer_key).ok_or("peer not found")?;
         let eph = PrivateKey([0x42u8; 32]); // In production: random ephemeral key
         let sender_index = (now_ns & 0xFFFF_FFFF) as u32;
@@ -414,7 +499,11 @@ impl WgDevice {
     }
 
     /// Complete handshake and establish session (stub).
-    pub fn complete_handshake(&mut self, peer_key: &PublicKey, now_ns: u64) -> Result<(), &'static str> {
+    pub fn complete_handshake(
+        &mut self,
+        peer_key: &PublicKey,
+        now_ns: u64,
+    ) -> Result<(), &'static str> {
         let peer = self.peers.get_mut(peer_key).ok_or("peer not found")?;
         // Stub: derive session keys from hash of public keys + timestamp
         let mut send_key = [0u8; 32];
@@ -431,9 +520,15 @@ impl WgDevice {
         Ok(())
     }
 
-    pub fn peer_count(&self) -> usize { self.peers.len() }
-    pub fn get_peer(&self, key: &PublicKey) -> Option<&WgPeer> { self.peers.get(key) }
-    pub fn get_peer_mut(&mut self, key: &PublicKey) -> Option<&mut WgPeer> { self.peers.get_mut(key) }
+    pub fn peer_count(&self) -> usize {
+        self.peers.len()
+    }
+    pub fn get_peer(&self, key: &PublicKey) -> Option<&WgPeer> {
+        self.peers.get(key)
+    }
+    pub fn get_peer_mut(&mut self, key: &PublicKey) -> Option<&mut WgPeer> {
+        self.peers.get_mut(key)
+    }
 }
 
 // ============================================================
@@ -460,24 +555,35 @@ impl WgConfig {
     /// Parse a wg-quick configuration string.
     pub fn parse(config: &str) -> Self {
         let mut cfg = WgConfig {
-            interface_private_key: None, listen_port: 51820,
-            interface_address: None, dns: Vec::new(), peers: Vec::new(),
+            interface_private_key: None,
+            listen_port: 51820,
+            interface_address: None,
+            dns: Vec::new(),
+            peers: Vec::new(),
         };
         let mut current_peer: Option<WgPeerConfig> = None;
 
         for line in config.lines() {
             let line = line.trim();
-            if line.is_empty() || line.starts_with('#') { continue; }
+            if line.is_empty() || line.starts_with('#') {
+                continue;
+            }
 
             if line == "[Interface]" {
-                if let Some(p) = current_peer.take() { cfg.peers.push(p); }
+                if let Some(p) = current_peer.take() {
+                    cfg.peers.push(p);
+                }
                 continue;
             }
             if line == "[Peer]" {
-                if let Some(p) = current_peer.take() { cfg.peers.push(p); }
+                if let Some(p) = current_peer.take() {
+                    cfg.peers.push(p);
+                }
                 current_peer = Some(WgPeerConfig {
                     public_key: PublicKey::zero(),
-                    endpoint: None, allowed_ips: Vec::new(), persistent_keepalive: 0,
+                    endpoint: None,
+                    allowed_ips: Vec::new(),
+                    persistent_keepalive: 0,
                 });
                 continue;
             }
@@ -496,15 +602,20 @@ impl WgConfig {
                         "AllowedIPs" => {
                             for cidr in val.split(',') {
                                 let cidr = cidr.trim();
-                                if cidr == "0.0.0.0/0" { peer.allowed_ips.push(AllowedIp::any_ipv4()); }
+                                if cidr == "0.0.0.0/0" {
+                                    peer.allowed_ips.push(AllowedIp::any_ipv4());
+                                }
                             }
                         }
                         "Endpoint" => {
                             if let Some((ip_str, port_str)) = val.rsplit_once(':') {
                                 let port: u16 = port_str.parse().unwrap_or(51820);
-                                let parts: Vec<u8> = ip_str.split('.').filter_map(|p| p.parse().ok()).collect();
+                                let parts: Vec<u8> =
+                                    ip_str.split('.').filter_map(|p| p.parse().ok()).collect();
                                 if parts.len() == 4 {
-                                    peer.endpoint = Some(WgEndpoint::new(parts[0], parts[1], parts[2], parts[3], port));
+                                    peer.endpoint = Some(WgEndpoint::new(
+                                        parts[0], parts[1], parts[2], parts[3], port,
+                                    ));
                                 }
                             }
                         }
@@ -515,15 +626,23 @@ impl WgConfig {
                     }
                 } else {
                     match key.trim() {
-                        "ListenPort" => { cfg.listen_port = val.parse().unwrap_or(51820); }
-                        "Address" => { cfg.interface_address = Some(val.into()); }
-                        "DNS" => { cfg.dns.push(val.into()); }
+                        "ListenPort" => {
+                            cfg.listen_port = val.parse().unwrap_or(51820);
+                        }
+                        "Address" => {
+                            cfg.interface_address = Some(val.into());
+                        }
+                        "DNS" => {
+                            cfg.dns.push(val.into());
+                        }
                         _ => {}
                     }
                 }
             }
         }
-        if let Some(p) = current_peer { cfg.peers.push(p); }
+        if let Some(p) = current_peer {
+            cfg.peers.push(p);
+        }
         cfg
     }
 }

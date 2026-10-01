@@ -5,14 +5,12 @@
 #![cfg_attr(not(test), no_std)]
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-
-
+use std::format;
+#[cfg(not(any(feature = "standalone_test", test)))]
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::vec::Vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use std::format;
 
 #[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -29,16 +27,16 @@ pub enum ArchitectureClass {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CpuPageTableMode {
-    X86_4LevelPaging,   // CR3 - 48-bit Virtual Address Space
-    X86_5LevelPaging,   // CR3 - 57-bit Virtual Address Space (LA57)
-    Arm64_4Level48Bit,  // TTBR0_EL1 / TTBR1_EL1 48-bit VA
-    Arm64_5Level52Bit,  // TTBR0_EL1 52-bit LVA
-    RiscvSv39,          // SATP Sv39 39-bit VA
-    RiscvSv48,          // SATP Sv48 48-bit VA
-    RiscvSv57,          // SATP Sv57 57-bit VA
-    LoongArchLA64,      // PGDL 4-level 48-bit VA
-    PowerPCLinuxRadix,  // Radix Tree Page Table
-    S390xRegion1Table,  // 5-level Region Table
+    X86_4LevelPaging,  // CR3 - 48-bit Virtual Address Space
+    X86_5LevelPaging,  // CR3 - 57-bit Virtual Address Space (LA57)
+    Arm64_4Level48Bit, // TTBR0_EL1 / TTBR1_EL1 48-bit VA
+    Arm64_5Level52Bit, // TTBR0_EL1 52-bit LVA
+    RiscvSv39,         // SATP Sv39 39-bit VA
+    RiscvSv48,         // SATP Sv48 48-bit VA
+    RiscvSv57,         // SATP Sv57 57-bit VA
+    LoongArchLA64,     // PGDL 4-level 48-bit VA
+    PowerPCLinuxRadix, // Radix Tree Page Table
+    S390xRegion1Table, // 5-level Region Table
 }
 
 #[derive(Debug, Clone)]
@@ -228,12 +226,14 @@ impl SovereignSyscallAbiTranslator {
                 arg_regs: vec!["x0", "x1", "x2", "x3", "x4", "x5"],
                 return_reg: "x0",
             },
-            ArchitectureClass::RiscV32 | ArchitectureClass::RiscV64 => SyscallAbiCallingConvention {
-                instruction: "ecall",
-                syscall_num_reg: "a7",
-                arg_regs: vec!["a0", "a1", "a2", "a3", "a4", "a5"],
-                return_reg: "a0",
-            },
+            ArchitectureClass::RiscV32 | ArchitectureClass::RiscV64 => {
+                SyscallAbiCallingConvention {
+                    instruction: "ecall",
+                    syscall_num_reg: "a7",
+                    arg_regs: vec!["a0", "a1", "a2", "a3", "a4", "a5"],
+                    return_reg: "a0",
+                }
+            }
             ArchitectureClass::LoongArch64 => SyscallAbiCallingConvention {
                 instruction: "syscall 0",
                 syscall_num_reg: "a7",
@@ -393,17 +393,20 @@ mod tests {
 
     #[test]
     fn test_syscall_abi_translation() {
-        let x64_abi = SovereignSyscallAbiTranslator::get_calling_convention(ArchitectureClass::X86_64);
+        let x64_abi =
+            SovereignSyscallAbiTranslator::get_calling_convention(ArchitectureClass::X86_64);
         assert_eq!(x64_abi.instruction, "syscall");
         assert_eq!(x64_abi.syscall_num_reg, "rax");
         assert_eq!(x64_abi.arg_regs[0], "rdi");
 
-        let arm64_abi = SovereignSyscallAbiTranslator::get_calling_convention(ArchitectureClass::AArch64);
+        let arm64_abi =
+            SovereignSyscallAbiTranslator::get_calling_convention(ArchitectureClass::AArch64);
         assert_eq!(arm64_abi.instruction, "svc #0");
         assert_eq!(arm64_abi.syscall_num_reg, "x8");
         assert_eq!(arm64_abi.arg_regs[0], "x0");
 
-        let riscv_abi = SovereignSyscallAbiTranslator::get_calling_convention(ArchitectureClass::RiscV64);
+        let riscv_abi =
+            SovereignSyscallAbiTranslator::get_calling_convention(ArchitectureClass::RiscV64);
         assert_eq!(riscv_abi.instruction, "ecall");
         assert_eq!(riscv_abi.syscall_num_reg, "a7");
         assert_eq!(riscv_abi.arg_regs[0], "a0");

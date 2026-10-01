@@ -309,8 +309,7 @@ impl DemandPagingManager {
     /// Evict a page to swap
     fn evict_page(&mut self) -> Result<(), &'static str> {
         // Get LRU page
-        let lru_pfn = self.lru_replacer.get_lru()
-            .ok_or("No pages to evict")?;
+        let lru_pfn = self.lru_replacer.get_lru().ok_or("No pages to evict")?;
 
         // Find the page
         if let Some(page) = self.physical_pages.get(&lru_pfn) {
@@ -325,8 +324,7 @@ impl DemandPagingManager {
 
             // Allocate swap slot
             let swap_device = self.swap_device.as_mut().unwrap();
-            let swap_slot = swap_device.allocate_slot()
-                .ok_or("Swap device full")?;
+            let swap_slot = swap_device.allocate_slot().ok_or("Swap device full")?;
 
             // Create swap entry
             let swap_entry = SwapEntry {
@@ -356,7 +354,11 @@ impl DemandPagingManager {
     }
 
     /// Page in a page from swap
-    fn page_in_from_swap(&mut self, virtual_address: VirtualAddress, pfn: Pfn) -> Result<(), &'static str> {
+    fn page_in_from_swap(
+        &mut self,
+        virtual_address: VirtualAddress,
+        pfn: Pfn,
+    ) -> Result<(), &'static str> {
         // Find the page
         if let Some(page) = self.physical_pages.get_mut(&pfn) {
             if let PageState::Swapped(_swap_entry) = &page.state {
@@ -390,10 +392,14 @@ impl DemandPagingManager {
 
     /// Get memory statistics
     pub fn get_memory_stats(&self) -> DemandPagingStats {
-        let present_pages = self.physical_pages.values()
+        let present_pages = self
+            .physical_pages
+            .values()
             .filter(|p| p.is_present())
             .count() as u64;
-        let swapped_pages = self.physical_pages.values()
+        let swapped_pages = self
+            .physical_pages
+            .values()
             .filter(|p| p.is_swapped())
             .count() as u64;
 

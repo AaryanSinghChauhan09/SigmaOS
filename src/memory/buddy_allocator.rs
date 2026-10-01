@@ -1,4 +1,3 @@
-
 const MAX_ORDER: usize = 11;
 const MIN_BLOCK_SIZE: usize = 4096;
 
@@ -24,16 +23,16 @@ impl BuddyAllocator {
             if self.free_lists[current_order] > 0 {
                 // Found a block, now split it down to the requested order
                 self.free_lists[current_order] -= 1;
-                
+
                 for split_order in (order..current_order).rev() {
                     self.free_lists[split_order] += 1;
                 }
-                
+
                 // Return dummy address for now
                 return Some(MIN_BLOCK_SIZE << order);
             }
         }
-        
+
         None
     }
 

@@ -12,7 +12,6 @@
 //! - OpenBSD source: sys/kern/kern_pledge.c
 //! - Fuchsia job policy: fuchsia.dev/fuchsia-src/concepts/process/jobs
 
-
 use core::sync::atomic::{AtomicU64, Ordering};
 
 /// Pledge promise bits — each bit enables a category of syscalls.
@@ -21,51 +20,51 @@ use core::sync::atomic::{AtomicU64, Ordering};
 #[repr(u64)]
 pub enum PledgePromise {
     /// Basic stdio operations (read/write on already-open fds)
-    Stdio        = 1 << 0,
+    Stdio = 1 << 0,
     /// File-system read access
-    Rpath        = 1 << 1,
+    Rpath = 1 << 1,
     /// File-system write access
-    Wpath        = 1 << 2,
+    Wpath = 1 << 2,
     /// Create/delete files
-    Cpath        = 1 << 3,
+    Cpath = 1 << 3,
     /// DNS resolution
-    Dns          = 1 << 4,
+    Dns = 1 << 4,
     /// Network I/O (TCP/UDP)
-    Inet         = 1 << 5,
+    Inet = 1 << 5,
     /// Unix domain sockets
-    Unix         = 1 << 6,
+    Unix = 1 << 6,
     /// Process management (fork, exec, wait)
-    Proc         = 1 << 7,
+    Proc = 1 << 7,
     /// exec() a new binary
-    Exec         = 1 << 8,
+    Exec = 1 << 8,
     /// Dynamic library loading
-    Lib          = 1 << 9,
+    Lib = 1 << 9,
     /// sendfd/recvfd
-    Sendfd       = 1 << 10,
+    Sendfd = 1 << 10,
     /// Memory-mapped files
-    Mmap         = 1 << 11,
+    Mmap = 1 << 11,
     /// Tape/audio devices
-    Audio        = 1 << 12,
+    Audio = 1 << 12,
     /// Video devices
-    Video        = 1 << 13,
+    Video = 1 << 13,
     /// Virtual memory management
-    Vminfo       = 1 << 14,
+    Vminfo = 1 << 14,
     /// Hardware random number generation
-    Rndnum       = 1 << 15,
+    Rndnum = 1 << 15,
     /// Cryptographic operations
-    Crypto       = 1 << 16,
+    Crypto = 1 << 16,
     /// Error output to stderr (always enabled with Stdio)
-    Errors       = 1 << 17,
+    Errors = 1 << 17,
     /// IPC capabilities (SigmaOS extension)
-    Ipc          = 1 << 18,
+    Ipc = 1 << 18,
     /// Capability token operations (SigmaOS extension)
     Capabilities = 1 << 19,
     /// Timer and clock access
-    Clocks       = 1 << 20,
+    Clocks = 1 << 20,
     /// Block device I/O
-    Bdev         = 1 << 21,
+    Bdev = 1 << 21,
     /// All promises (before first pledge call — unrestricted)
-    All          = u64::MAX,
+    All = u64::MAX,
 }
 
 /// A set of pledge promises encoded as a bitmask
@@ -185,9 +184,7 @@ pub enum PledgeError {
         requested: PledgeSet,
     },
     /// Syscall attempted outside current promise set — process must be killed
-    Violation {
-        violated: PledgePromise,
-    },
+    Violation { violated: PledgePromise },
 }
 
 /// Parse a pledge promise string (e.g., "stdio rpath inet") into a PledgeSet.
@@ -196,28 +193,28 @@ pub fn parse_pledge_string(s: &str) -> Option<PledgeSet> {
     let mut bits: u64 = 0;
     for token in s.split_ascii_whitespace() {
         let p = match token {
-            "stdio"        => PledgePromise::Stdio,
-            "rpath"        => PledgePromise::Rpath,
-            "wpath"        => PledgePromise::Wpath,
-            "cpath"        => PledgePromise::Cpath,
-            "dns"          => PledgePromise::Dns,
-            "inet"         => PledgePromise::Inet,
-            "unix"         => PledgePromise::Unix,
-            "proc"         => PledgePromise::Proc,
-            "exec"         => PledgePromise::Exec,
-            "lib"          => PledgePromise::Lib,
-            "sendfd"       => PledgePromise::Sendfd,
-            "mmap"         => PledgePromise::Mmap,
-            "audio"        => PledgePromise::Audio,
-            "video"        => PledgePromise::Video,
-            "vminfo"       => PledgePromise::Vminfo,
-            "rndnum"       => PledgePromise::Rndnum,
-            "crypto"       => PledgePromise::Crypto,
-            "errors"       => PledgePromise::Errors,
-            "ipc"          => PledgePromise::Ipc,
+            "stdio" => PledgePromise::Stdio,
+            "rpath" => PledgePromise::Rpath,
+            "wpath" => PledgePromise::Wpath,
+            "cpath" => PledgePromise::Cpath,
+            "dns" => PledgePromise::Dns,
+            "inet" => PledgePromise::Inet,
+            "unix" => PledgePromise::Unix,
+            "proc" => PledgePromise::Proc,
+            "exec" => PledgePromise::Exec,
+            "lib" => PledgePromise::Lib,
+            "sendfd" => PledgePromise::Sendfd,
+            "mmap" => PledgePromise::Mmap,
+            "audio" => PledgePromise::Audio,
+            "video" => PledgePromise::Video,
+            "vminfo" => PledgePromise::Vminfo,
+            "rndnum" => PledgePromise::Rndnum,
+            "crypto" => PledgePromise::Crypto,
+            "errors" => PledgePromise::Errors,
+            "ipc" => PledgePromise::Ipc,
             "capabilities" => PledgePromise::Capabilities,
-            "clocks"       => PledgePromise::Clocks,
-            "bdev"         => PledgePromise::Bdev,
+            "clocks" => PledgePromise::Clocks,
+            "bdev" => PledgePromise::Bdev,
             _ => return None,
         };
         bits |= p as u64;

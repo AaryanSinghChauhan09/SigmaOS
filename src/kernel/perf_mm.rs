@@ -2,7 +2,6 @@
 // SigmaOS Memory Manager Performance Allocator Stack
 // Implements Slab Cache (<512B), Buddy Allocator (>=512B), and ACPI SRAT NUMA Topology Page Allocator.
 
-
 use std::vec::Vec;
 
 pub const SLAB_MAX_SIZE: usize = 512;
@@ -41,7 +40,14 @@ impl PerfMmAllocatorStack {
         }
     }
 
-    pub fn discover_numa_node_srat(&mut self, node_id: usize, start_cpu: usize, end_cpu: usize, ram_start: u64, ram_size: u64) {
+    pub fn discover_numa_node_srat(
+        &mut self,
+        node_id: usize,
+        start_cpu: usize,
+        end_cpu: usize,
+        ram_start: u64,
+        ram_size: u64,
+    ) {
         self.numa_nodes.push(NumaNodeTopology {
             node_id,
             start_cpu,
@@ -52,13 +58,23 @@ impl PerfMmAllocatorStack {
         });
     }
 
-    pub fn sigma_alloc(&mut self, size_bytes: usize, requesting_cpu: usize) -> (AllocationTier, u64) {
+    pub fn sigma_alloc(
+        &mut self,
+        size_bytes: usize,
+        requesting_cpu: usize,
+    ) -> (AllocationTier, u64) {
         if size_bytes < SLAB_MAX_SIZE {
             self.slab_allocations_count += 1;
-            (AllocationTier::SlabCache, 0x1000 + (self.slab_allocations_count * 64) as u64)
+            (
+                AllocationTier::SlabCache,
+                0x1000 + (self.slab_allocations_count * 64) as u64,
+            )
         } else if size_bytes < 64 * 1024 {
             self.buddy_allocations_count += 1;
-            (AllocationTier::BuddyZone, 0x10000 + (self.buddy_allocations_count * 512) as u64)
+            (
+                AllocationTier::BuddyZone,
+                0x10000 + (self.buddy_allocations_count * 512) as u64,
+            )
         } else {
             // NUMA-aware allocation closest to requesting CPU
             self.numa_allocations_count += 1;
@@ -70,8 +86,14 @@ impl PerfMmAllocatorStack {
                     break;
                 }
             }
-            let base_addr = self.numa_nodes.get(target_node_id).map_or(0x100000, |n| n.ram_start_bytes);
-            (AllocationTier::NumaTopologyPage, base_addr + (self.numa_allocations_count * PAGE_SIZE_4K) as u64)
+            let base_addr = self
+                .numa_nodes
+                .get(target_node_id)
+                .map_or(0x100000, |n| n.ram_start_bytes);
+            (
+                AllocationTier::NumaTopologyPage,
+                base_addr + (self.numa_allocations_count * PAGE_SIZE_4K) as u64,
+            )
         }
     }
 }
