@@ -1,14 +1,16 @@
 # Architecture Decision Records (ADRs)
 
-## Overview
-This document records key architectural decisions for SigmaOS.
-
-## Decision 001: Zero-Dependency Pure Rust Kernel Core
+## ADR-001: Sovereign Zero-Dependency Philosophy
 - **Status:** Accepted
-- **Context:** Core operating system components require high reliability, memory safety, and standalone execution without external dynamic libraries.
-- **Decision:** All core kernel and packaging modules use pure Rust with `#![no_std]` compatibility and zero dynamic C runtime dependencies.
+- **Context:** SigmaOS aims to be a self-sufficient, high-performance operating system surpassing legacy open-source projects.
+- **Decision:** Implement all core operating system capabilities natively in Rust under `#![no_std]` without external third-party crate dependencies.
 
-## Decision 002: Universal Multi-Format Transpilation Pipeline
+## ADR-002: Universal Package Manager Interop
 - **Status:** Accepted
-- **Context:** Support package formats across Linux, BSD, Mobile, and Desktop ecosystems.
-- **Decision:** Transpile foreign packages into native `.sigpkg` format with format-specific sandboxing and capability enforcement.
+- **Context:** Applications across various Linux distributions and BSD variants use diverse package formats (.deb, .rpm, .apk, pkg, etc.).
+- **Decision:** Provide native parsing, DPLL SAT dependency resolution, scriptlet sandboxing, and format translation for 30+ package formats into canonical `SigmaPkg`.
+
+## ADR-003: Multi-Core SMP and Modern Kernel Subsystems
+- **Status:** Accepted
+- **Context:** Modern hardware requires efficient multi-core processing, async I/O, and low-latency IPC.
+- **Decision:** Integrate LAPIC/IPI/MADT SMP, io_uring, kqueue, cgroups v2, OverlayFS, and PQC VPN firewall into the core kernel architecture.

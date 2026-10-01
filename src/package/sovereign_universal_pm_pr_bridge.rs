@@ -49,44 +49,22 @@ pub enum UniversalDistroPackageFormat {
     AlpineApk,
     VoidXbps,
     GentooEbuild,
-    BsdPkg,
+    FreeBsdPkg,
+    OpenBsdPkg,
     NetBsdPkgsrc,
-    OpenBsdPorts,
-    GuixGnuStore,
-    SolusEopkg,
-    SlackwareTxz,
-    PaldoUpd,
-    GoboLinuxRecipe,
-    HaikuHpkg,
-    HomebrewBottle,
-    MacPortsPortfile,
-    CruxPkgmk,
-    BedrockPmm,
-    MageiaUrmi,
-    PCLinuxOSAptRpm,
-    TinyCoreTcz,
-    PuppyPet,
     NixFlake,
-    GuixScm,
-    OpenWrtIpk,
-    SolusEopkg,
-    HaikuHpkg,
-    TinyCoreTcz,
-    SlaxLzm,
-    SlackwareTxz,
-    ClearSwupd,
-    BedrockStratum,
+    GuixScheme,
     FlatpakApp,
     SnapApp,
     AppImage,
+    SlackwareTxz,
+    ZypperSpec,
+    SolusEopkg,
     OpenWrtIpk,
-    SlackwareSlackbuild,
-    HomebrewBottle,
-    WindowsMsiAppx,
-    SerpentStone,
     YoctoOpkg,
     SolarisIps,
     SwupdBundle,
+    HomebrewBottle,
     AndroidAab,
     MacOsApp,
     OciContainer,
@@ -103,48 +81,18 @@ impl UniversalDistroPackageFormat {
         match self {
             Self::AptDeb => "apt (.deb)",
             Self::PacmanPkg => "pacman (.pkg.tar.zst / PKGBUILD)",
-            Self::DnfRpm => "dnf (.rpm)",
-            Self::ZypperDeltaRpm => "zypper (.drpm / DeltaRPM)",
+            Self::DnfRpm => "dnf (.rpm / spec)",
             Self::AlpineApk => "apk (.apk / APKBUILD)",
             Self::VoidXbps => "xbps (.xbps / template)",
             Self::GentooEbuild => "portage (.ebuild)",
-            Self::BsdPkg => "bsd-pkg (.pkg / ports)",
-            Self::NetBsdPkgsrc => "pkgsrc (.tar.gz / buildlink3)",
-            Self::OpenBsdPorts => "openbsd-ports (.tgz / pledge-ports)",
-            Self::GuixGnuStore => "guix (/gnu/store / scheme)",
-            Self::SolusEopkg => "eopkg (.eopkg)",
-            Self::SlackwareTxz => "pkgtool (.txz / .tgz)",
-            Self::PaldoUpd => "upd (.xml / upd-spec)",
-            Self::GoboLinuxRecipe => "gobolinux (.recipe)",
-            Self::HaikuHpkg => "hpkg (.hpkg)",
-            Self::HomebrewBottle => "homebrew (.bottle.tar.gz)",
-            Self::MacPortsPortfile => "macports (Portfile)",
-            Self::CruxPkgmk => "crux (Pkgfile / .pkg.tar.gz)",
-            Self::BedrockPmm => "bedrock-pmm (pmm stratum)",
-            Self::MageiaUrmi => "urpmi (.rpm)",
-            Self::PCLinuxOSAptRpm => "apt-rpm (.rpm)",
-            Self::TinyCoreTcz => "tcz (.tcz)",
-            Self::PuppyPet => "pet (.pet)",
+            Self::FreeBsdPkg => "freebsd-pkg (+MANIFEST / ports)",
+            Self::OpenBsdPkg => "openbsd-pkg (+CONTENTS)",
+            Self::NetBsdPkgsrc => "netbsd-pkgsrc (Makefile)",
             Self::NixFlake => "nix (flake / derivation)",
-            Self::GuixScm => "guix (.scm / .nar)",
-            Self::OpenWrtIpk => "opkg (.ipk)",
-            Self::SolusEopkg => "eopkg (.eopkg / .moss)",
-            Self::HaikuHpkg => "hpkg (.hpkg)",
-            Self::TinyCoreTcz => "tcz (.tcz)",
-            Self::SlaxLzm => "lzm (.lzm / .sfs)",
-            Self::SlackwareTxz => "slackware (.txz / .slackbuild)",
-            Self::ClearSwupd => "swupd (.swupd)",
-            Self::BedrockStratum => "stratum (.stratum)",
-            Self::FlatpakApp => "flatpak (.flatpakref)",
-            Self::SnapApp => "snap (.snap)",
+            Self::GuixScheme => "guix (scheme / nar)",
+            Self::FlatpakApp => "flatpak (.flatpakref / .flatpak)",
+            Self::SnapApp => "snap (snap.yaml / .snap)",
             Self::AppImage => "appimage (.AppImage)",
-            Self::SolusEopkg => "eopkg (.eopkg)",
-            Self::OpenWrtIpk => "opkg (.ipk)",
-            Self::SlackwareSlackbuild => "slackware (SlackBuild / .txz)",
-            Self::HomebrewBottle => "homebrew (.bottle.tar.gz)",
-            Self::WindowsMsiAppx => "winget (.msi / .appx)",
-            Self::GuixScheme => "guix (.scm / derivation)",
-            Self::SerpentStone => "moss (.stone)",
             Self::SlackwareTxz => "slackware (.txz / SlackBuild)",
             Self::ZypperSpec => "zypper (.rpm / .spec)",
             Self::SolusEopkg => "eopkg (pspec.xml / .eopkg)",
@@ -735,48 +683,115 @@ impl SovereignUniversalPmPrBridgeEngine {
         Ok(sigpkg_manifest)
     }
 
-    /// Parses CLI package manager command (e.g. `apt install nginx`, `pacman -S htop`, `dnf install curl`)
-    /// and dispatches it directly into a Pull Request submission for sigma-pkg
-    pub fn translate_cli_command_to_pr_submission(
+    /// Transpiles a raw foreign package manifest text into a normalized PR submission record
+    pub fn transpile_foreign_manifest_to_pr(
         &mut self,
         submitter: &str,
-        cli_command: &str,
-        pqc_sig: &[u8],
+        raw_manifest_text: &str,
+        pqc_signature: &[u8],
     ) -> Result<u64, &'static str> {
-        let parts: Vec<&str> = cli_command.split_whitespace().collect();
-        if parts.len() < 2 {
-            return Err("Invalid CLI command format");
+        if raw_manifest_text.trim().is_empty() {
+            return Err("Empty manifest text");
         }
 
-        let tool = parts[0];
-        let pkg_name = parts.last().unwrap_or(&"app");
+        let format = UniversalDistroPackageFormat::autodetect_format_from_manifest(raw_manifest_text);
 
-        let format = match tool {
-            "apt" | "apt-get" => UniversalDistroPackageFormat::AptDeb,
-            "pacman" => UniversalDistroPackageFormat::PacmanPkg,
-            "dnf" | "yum" => UniversalDistroPackageFormat::DnfRpm,
-            "apk" => UniversalDistroPackageFormat::AlpineApk,
-            "xbps-install" | "xbps" => UniversalDistroPackageFormat::VoidXbps,
-            "emerge" => UniversalDistroPackageFormat::GentooEbuild,
-            "pkg" => UniversalDistroPackageFormat::BsdPkg,
-            "nix" | "nix-env" => UniversalDistroPackageFormat::NixFlake,
-            "flatpak" => UniversalDistroPackageFormat::FlatpakApp,
-            "snap" => UniversalDistroPackageFormat::SnapApp,
-            _ => UniversalDistroPackageFormat::NativeSigPkg,
-        };
+        // Extract package name and version from manifest text or fallback
+        let mut extracted_name = String::new();
+        let mut extracted_version = String::new();
+        let mut extracted_deps = Vec::new();
 
-        let raw_manifest = format!("Package: {}\nVersion: 1.0.0\nCLI: {}", pkg_name, cli_command);
+        for line in raw_manifest_text.lines() {
+            let l = line.trim();
+            if l.starts_with("Package:") || l.starts_with("pkgname=") || l.starts_with("Name:") || l.starts_with("name =") {
+                let parts: Vec<&str> = l.split(&[':', '=', '"', '\''][..]).collect();
+                if parts.len() >= 2 && extracted_name.is_empty() {
+                    extracted_name = parts[1].trim().trim_matches('"').trim_matches('\'').to_string();
+                }
+            } else if l.starts_with("Version:") || l.starts_with("pkgver=") || l.starts_with("version =") {
+                let parts: Vec<&str> = l.split(&[':', '=', '"', '\''][..]).collect();
+                if parts.len() >= 2 && extracted_version.is_empty() {
+                    extracted_version = parts[1].trim().trim_matches('"').trim_matches('\'').to_string();
+                }
+            } else if l.contains("Depends:") || l.contains("depends=") || l.contains("Requires:") {
+                let parts: Vec<&str> = l.split(&[':', '='][..]).collect();
+                if parts.len() >= 2 {
+                    for dep in parts[1].split(',') {
+                        let clean_dep = dep.trim().split_whitespace().next().unwrap_or("").to_string();
+                        if !clean_dep.is_empty() && !extracted_deps.contains(&clean_dep) {
+                            extracted_deps.push(clean_dep);
+                        }
+                    }
+                }
+            }
+        }
+
+        if extracted_name.is_empty() {
+            extracted_name = "transpiled-package".to_string();
+        }
+        if extracted_version.is_empty() {
+            extracted_version = "1.0.0".to_string();
+        }
+
+        // Canonical dependency mapping (e.g., glibc/musl -> sovereign-libc)
+        let mapped_deps: Vec<String> = extracted_deps
+            .into_iter()
+            .map(|dep| {
+                let lower = dep.to_lowercase();
+                if lower.contains("glibc") || lower == "musl" || lower.contains("libc") {
+                    "sovereign-libc".to_string()
+                } else if lower.contains("ssl") || lower.contains("crypto") || lower.contains("tls") {
+                    "sovereign-openssl".to_string()
+                } else if lower.contains("zlib") || lower.contains("zstd") || lower.contains("xz") {
+                    "sovereign-compression".to_string()
+                } else {
+                    dep
+                }
+            })
+            .collect();
+
+        let dep_refs: Vec<&str> = mapped_deps.iter().map(|s| s.as_str()).collect();
+
         let pr_id = self.submit_foreign_package_pr(
             submitter,
-            pkg_name,
-            "1.0.0",
+            &extracted_name,
+            &extracted_version,
             format,
-            &raw_manifest,
-            &[],
-            pqc_sig,
+            raw_manifest_text,
+            &dep_refs,
+            pqc_signature,
         );
 
         Ok(pr_id)
+    }
+
+    /// Computes a unified line-by-line diff between two manifest texts for PR review
+    pub fn generate_pr_manifest_diff(&self, old_manifest: &str, new_manifest: &str) -> String {
+        let mut diff = String::new();
+        let old_lines: Vec<&str> = old_manifest.lines().collect();
+        let new_lines: Vec<&str> = new_manifest.lines().collect();
+
+        for line in &old_lines {
+            if !new_lines.contains(line) {
+                diff.push_str("- ");
+                diff.push_str(line);
+                diff.push('\n');
+            }
+        }
+
+        for line in &new_lines {
+            if !old_lines.contains(line) {
+                diff.push_str("+ ");
+                diff.push_str(line);
+                diff.push('\n');
+            } else {
+                diff.push_str("  ");
+                diff.push_str(line);
+                diff.push('\n');
+            }
+        }
+
+        diff
     }
 }
 
@@ -857,36 +872,17 @@ mod tests {
             (UniversalDistroPackageFormat::AlpineApk, "alpine-app", &["musl"][..]),
             (UniversalDistroPackageFormat::VoidXbps, "void-app", &["xbps"][..]),
             (UniversalDistroPackageFormat::GentooEbuild, "gentoo-app", &["portage"][..]),
-            (UniversalDistroPackageFormat::BsdPkg, "freebsd-app", &["libc"][..]),
-            (UniversalDistroPackageFormat::NetBsdPkgsrc, "netbsd-app", &["pkgsrc"][..]),
-            (UniversalDistroPackageFormat::OpenBsdPorts, "openbsd-app", &["pledge"][..]),
-            (UniversalDistroPackageFormat::GuixGnuStore, "guix-app", &["guix-store"][..]),
-            (UniversalDistroPackageFormat::SolusEopkg, "solus-app", &["eopkg"][..]),
-            (UniversalDistroPackageFormat::SlackwareTxz, "slackware-app", &["pkgtool"][..]),
-            (UniversalDistroPackageFormat::PaldoUpd, "paldo-app", &["upd"][..]),
-            (UniversalDistroPackageFormat::GoboLinuxRecipe, "gobolinux-app", &["compile"][..]),
-            (UniversalDistroPackageFormat::HaikuHpkg, "haiku-app", &["libbe"][..]),
-            (UniversalDistroPackageFormat::HomebrewBottle, "homebrew-app", &["brew"][..]),
-            (UniversalDistroPackageFormat::MacPortsPortfile, "macports-app", &["port"][..]),
-            (UniversalDistroPackageFormat::CruxPkgmk, "crux-app", &["pkgmk"][..]),
-            (UniversalDistroPackageFormat::BedrockPmm, "bedrock-app", &["pmm"][..]),
-            (UniversalDistroPackageFormat::MageiaUrmi, "mageia-app", &["urpmi"][..]),
-            (UniversalDistroPackageFormat::PCLinuxOSAptRpm, "pclinuxos-app", &["apt-rpm"][..]),
-            (UniversalDistroPackageFormat::TinyCoreTcz, "tinycore-app", &["tcz"][..]),
-            (UniversalDistroPackageFormat::PuppyPet, "puppy-app", &["pet"][..]),
+            (UniversalDistroPackageFormat::FreeBsdPkg, "freebsd-app", &["libc"][..]),
+            (UniversalDistroPackageFormat::OpenBsdPkg, "openbsd-app", &["libc"][..]),
+            (UniversalDistroPackageFormat::NetBsdPkgsrc, "netbsd-app", &["libc"][..]),
             (UniversalDistroPackageFormat::NixFlake, "nix-app", &["stdenv"][..]),
-            (UniversalDistroPackageFormat::GuixScm, "guix-app", &["gnu-store"][..]),
-            (UniversalDistroPackageFormat::OpenWrtIpk, "openwrt-app", &["uclibc"][..]),
-            (UniversalDistroPackageFormat::SolusEopkg, "solus-app", &["eopkg"][..]),
-            (UniversalDistroPackageFormat::HaikuHpkg, "haiku-app", &["libroot"][..]),
-            (UniversalDistroPackageFormat::TinyCoreTcz, "tcz-app", &["busybox"][..]),
-            (UniversalDistroPackageFormat::SlaxLzm, "slax-app", &["squashfs"][..]),
-            (UniversalDistroPackageFormat::SlackwareTxz, "slackware-app", &["pkgtool"][..]),
-            (UniversalDistroPackageFormat::ClearSwupd, "clear-app", &["swupd"][..]),
-            (UniversalDistroPackageFormat::BedrockStratum, "bedrock-app", &["stratum"][..]),
+            (UniversalDistroPackageFormat::GuixScheme, "guix-app", &["stdenv"][..]),
             (UniversalDistroPackageFormat::FlatpakApp, "flatpak-app", &["org.freedesktop.Sdk"][..]),
             (UniversalDistroPackageFormat::SnapApp, "snap-app", &["core22"][..]),
             (UniversalDistroPackageFormat::AppImage, "appimage-app", &["fuse"][..]),
+            (UniversalDistroPackageFormat::SwupdBundle, "clearlinux-app", &["swupd"][..]),
+            (UniversalDistroPackageFormat::HomebrewBottle, "homebrew-app", &["openssl"][..]),
+            (UniversalDistroPackageFormat::CargoCrate, "cargo-app", &["serde"][..]),
         ];
 
         let mut bridge = SovereignUniversalPmPrBridgeEngine::new();
@@ -908,7 +904,36 @@ mod tests {
             assert!(!fmt.as_str().is_empty());
         }
 
-        assert_eq!(bridge.total_prs_merged, 19);
+        assert_eq!(bridge.total_prs_merged, 16);
+    }
+
+    #[test]
+    fn test_autodetect_and_transpile_foreign_manifests() {
+        let mut bridge = SovereignUniversalPmPrBridgeEngine::new();
+
+        // Debian manifest text
+        let deb_text = "Package: nginx\nVersion: 1.24.0\nDepends: libc6, libssl-dev\nArchitecture: amd64";
+        let pr1 = bridge.transpile_foreign_manifest_to_pr("alice", deb_text, b"sig_pqc").unwrap();
+        assert!(bridge.validate_sat_pr_dependencies(pr1).unwrap());
+        let manifest1 = bridge.merge_pr_to_sigma_pkg(pr1).unwrap();
+        assert_eq!(manifest1.name, "nginx");
+        assert_eq!(manifest1.original_format, UniversalDistroPackageFormat::AptDeb);
+        assert!(manifest1.declared_dependencies.contains(&"sovereign-libc".to_string()));
+
+        // Arch PKGBUILD manifest text
+        let arch_text = "pkgname=ripgrep\npkgver=14.1.0\ndepends=('glibc' 'pcre2')";
+        let pr2 = bridge.transpile_foreign_manifest_to_pr("bob", arch_text, b"sig_pqc").unwrap();
+        assert!(bridge.validate_sat_pr_dependencies(pr2).unwrap());
+        let manifest2 = bridge.merge_pr_to_sigma_pkg(pr2).unwrap();
+        assert_eq!(manifest2.name, "ripgrep");
+        assert_eq!(manifest2.original_format, UniversalDistroPackageFormat::PacmanPkg);
+
+        // PR manifest diff test
+        let old_manifest = "Package: nginx\nVersion: 1.22.0\nDepends: libc6";
+        let new_manifest = "Package: nginx\nVersion: 1.24.0\nDepends: libc6, libssl-dev";
+        let diff = bridge.generate_pr_manifest_diff(old_manifest, new_manifest);
+        assert!(diff.contains("- Version: 1.22.0"));
+        assert!(diff.contains("+ Version: 1.24.0"));
     }
 
     #[test]
