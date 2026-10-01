@@ -86,6 +86,7 @@ impl BlockCipher for SimpleAES {
         iv: Option<&[u8]>,
     ) -> Result<Vec<u8>, CipherError> {
 
+
     fn encrypt(&self, plaintext: &[u8], key: &[u8], iv: Option<&[u8]>) -> Result<Vec<u8>, CipherError> {
         if key.len() != 32 {
             return Err(CipherError::InvalidKey);
