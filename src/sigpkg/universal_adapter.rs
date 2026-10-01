@@ -2328,11 +2328,6 @@ impl UniversalPmCommandDispatcher {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
-                        "-S" | "-Sy" | "install" => operation = UniversalPmOperation::Install,
-                        "-R" | "-Rns" | "-Rs" | "remove" => operation = UniversalPmOperation::Remove,
-                        "-Syu" | "-Syyu" | "update" | "upgrade" => operation = UniversalPmOperation::Upgrade,
-                        "-Ss" | "-Qs" | "search" => operation = UniversalPmOperation::Search,
-                        "-Si" | "-Qi" | "info" | "show" => operation = UniversalPmOperation::QueryInfo,
                         "-S" | "-Sy" | "install" | "-Sw" => operation = UniversalPmOperation::Install,
                         "-R" | "-Rns" | "-Rs" | "remove" => {
                             operation = UniversalPmOperation::Remove

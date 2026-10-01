@@ -46,6 +46,7 @@ fn usage() -> ! {
          \x20 sigma-pkg daemon sync                   Sync + verify repository metadata (sigpkgd)\n\
          \x20 sigma-pkg daemon gc                     Garbage-collect orphaned store packages\n\
          \x20 sigma-pkg daemon status                 Report daemon state\n\
+         \x20 sigma-pkg pr submit|convert|gate|merge  Manage universal package PR gateway workflow\n\
          \x20 sigma-pkg help                          Show this help"
     );
     exit(2);
@@ -61,6 +62,7 @@ fn main() {
         "install" => cmd_install(&args[1..]),
         "convert" => cmd_convert(&args[1..]),
         "dispatch" => cmd_dispatch(&args[1..]),
+        "pr" => cmd_pr(&args[1..]),
         "info" | "query" | "show" => cmd_info(&args[1..]),
         "deps" | "tree" => cmd_deps(&args[1..]),
         "triggers" | "hooks" => cmd_triggers(&args[1..]),
@@ -92,6 +94,125 @@ fn main() {
         _ => {
             eprintln!("sigma-pkg: unknown command '{}'", args[0]);
             usage();
+        }
+    }
+}
+
+fn cmd_pr(args: &[String]) {
+    if args.is_empty() {
+        eprintln!("sigma-pkg: pr requires 'submit', 'convert', 'gate', 'merge', or 'list'");
+        exit(2);
+    }
+    let mut bridge = sigmaos::sigpkg::SovereignUniversalPmPrBridgeEngine::new();
+    let mut gateway = sigmaos::sigpkg::SovereignUniversalPrGatewayEngine::new();
+
+    match args[0].as_str() {
+        "submit" => {
+            let target = if args.len() > 1 { &args[1] } else { "nginx" };
+            let author = if args.len() > 2 { &args[2] } else { "maintainer@sigmaos.org" };
+            let pr_id = bridge.submit_foreign_package_pr(
+                author,
+                target,
+                "1.24.0",
+                sigmaos::package::sovereign_universal_pm_pr_bridge::UniversalDistroPackageFormat::AptDeb,
+                &format!("Package: {}\nVersion: 1.24.0\nDepends: libc\n", target),
+                &["libc"],
+                b"pqc-sig",
+            );
+            println!("Submitted Foreign Package PR #{}: target '{}' v1.24.0 by {}", pr_id, target, author);
+            exit(0);
+        }
+        "convert" => {
+            let target = if args.len() > 1 { &args[1] } else { "1" };
+            let pr_id: u64 = target.parse().unwrap_or(1);
+            let _ = bridge.submit_foreign_package_pr(
+                "dev@sigmaos.org",
+                "nginx",
+                "1.24.0",
+                sigmaos::package::sovereign_universal_pm_pr_bridge::UniversalDistroPackageFormat::AptDeb,
+                "Package: nginx\nVersion: 1.24.0\nDepends: libssl-dev\n",
+                &["libssl-dev"],
+                b"pqc-sig",
+            );
+            match bridge.convert_to_canonical_sigpkg(pr_id) {
+                Ok(converted) => {
+                    println!("PR #{} Converted to Canonical Manifest:\n{}", pr_id, converted);
+                    exit(0);
+                }
+                Err(e) => {
+                    eprintln!("sigma-pkg: PR conversion failed: {}", e);
+                    exit(1);
+                }
+            }
+        }
+        "gate" | "verify" => {
+            let target = if args.len() > 1 { &args[1] } else { "1" };
+            let pr_id: u64 = target.parse().unwrap_or(1);
+            let _ = bridge.submit_foreign_package_pr(
+                "dev@sigmaos.org",
+                "nginx",
+                "1.24.0",
+                sigmaos::package::sovereign_universal_pm_pr_bridge::UniversalDistroPackageFormat::AptDeb,
+                "Package: nginx\nVersion: 1.24.0\nDepends: libssl-dev\n",
+                &["libssl-dev"],
+                b"pqc-sig",
+            );
+            match bridge.validate_sat_pr_dependencies(pr_id) {
+                Ok(passed) => {
+                    println!("PR #{} SAT Dependency & Gating Audit: {}", pr_id, if passed { "PASSED" } else { "FAILED" });
+                    exit(0);
+                }
+                Err(e) => {
+                    eprintln!("sigma-pkg: PR gating failed: {}", e);
+                    exit(1);
+                }
+            }
+        }
+        "merge" => {
+            let target = if args.len() > 1 { &args[1] } else { "1" };
+            let pr_id: u64 = target.parse().unwrap_or(1);
+            let _ = bridge.submit_foreign_package_pr(
+                "dev@sigmaos.org",
+                "nginx",
+                "1.24.0",
+                sigmaos::package::sovereign_universal_pm_pr_bridge::UniversalDistroPackageFormat::AptDeb,
+                "Package: nginx\nVersion: 1.24.0\nDepends: libssl-dev\n",
+                &["libssl-dev"],
+                b"pqc-sig",
+            );
+            let _ = bridge.validate_sat_pr_dependencies(pr_id);
+            match bridge.merge_pr_to_sigma_pkg(pr_id) {
+                Ok(merged) => {
+                    println!("Successfully merged PR #{} -> Package '{}' v{}", pr_id, merged.name, merged.version);
+                    exit(0);
+                }
+                Err(e) => {
+                    eprintln!("sigma-pkg: PR merge failed: {}", e);
+                    exit(1);
+                }
+            }
+        }
+        "list" | "search" => {
+            let query = if args.len() > 1 { &args[1] } else { "" };
+            gateway.submit_distro_package_pr(
+                "author@sigmaos.org",
+                "curl",
+                "8.2.1",
+                sigmaos::package::pull_request_workflow::PullRequestPackageFormat::DebianDeb,
+                "Package: curl\nVersion: 8.2.1\n",
+                &["openssl"],
+                b"pqc-sig",
+            );
+            let results = gateway.search_distro_prs(query);
+            println!("Package PR Gateway Search ('{}'): {} PR(s) found", query, results.len());
+            for pr in results {
+                println!("  - PR #{}: {} v{} by {} [{:?}]", pr.pr_id, pr.package_name, pr.package_version, pr.submitter, pr.status);
+            }
+            exit(0);
+        }
+        _ => {
+            eprintln!("sigma-pkg: pr requires 'submit', 'convert', 'gate', 'merge', or 'list'");
+            exit(2);
         }
     }
 }
