@@ -311,6 +311,7 @@ if [ -f "src/package/sovereign_distro_package_advancements_v6.rs" ]; then
     rustc --test src/package/sovereign_distro_package_advancements_v6.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v6_test
     ./build/sovereign_advancements_v6_test
 fi
+
 if [ -f "src/package/sovereign_distro_package_advancements_v7.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V7 test suite..."
     mkdir -p build

@@ -30,7 +30,8 @@ use std::string::{String, ToString};
 use std::vec::Vec;
 
 #[cfg(not(feature = "standalone_test"))]
-use crate::package::PackageFormat;
+use crate::package::universal::PackageFormat;
+
 
 #[cfg(feature = "standalone_test")]
 use alloc::collections::{BTreeMap, BTreeSet};
