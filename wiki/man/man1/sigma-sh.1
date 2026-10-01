@@ -1,0 +1,26 @@
+.\" SPDX-License-Identifier: MIT
+.TH SIGMA-SH 1 "March 2026" "SigmaOS 1.0" "SigmaOS User Commands"
+.SH NAME
+sigma-sh \- Sovereign Zero-Trust Command Shell for SigmaOS
+.SH SYNOPSIS
+.B sigma-sh
+[\fIOPTIONS\fR] [\fISCRIPT\fR]
+.SH DESCRIPTION
+.B sigma-sh
+is the native command-line shell for SigmaOS. It provides POSIX-compatible shell execution, eBPF-integrated privilege sandboxing, OpenBSD pledge/unveil integration, and Post-Quantum Cryptographic (PQC) binary execution verification.
+.SH OPTIONS
+.TP
+.BR \-c \ \fICOMMAND\fR
+Execute
+.I COMMAND
+and exit immediately.
+.TP
+.BR \-i
+Run shell in interactive mode.
+.TP
+.BR \-\-version
+Print version information and exit.
+.SH SEE ALSO
+.BR sigma-pkg (8)
+.SH AUTHORS
+SigmaOS Core Maintainers <maintainers@sigmaos.org>

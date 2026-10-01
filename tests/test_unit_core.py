@@ -77,26 +77,31 @@ class HeapManager:
         self.allocated_map = {}
 
     def allocate(self, size: int) -> int:
-        for block in self.blocks:
-            if block.is_free and block.size >= size:
-                block.is_free = False
-                if block.size > size:
-                    remaining_size = block.size - size
-                    new_addr = block.address + size
-                    block.size = size
-                    new_block = MemoryBlock(new_addr, remaining_size)
-                    idx = self.blocks.index(block)
-                    self.blocks.insert(idx + 1, new_block)
-                self.allocated_map[block.address] = size
-                return block.address
-        raise MemoryError("Out of memory or heap fragmentation failure")
+        target_idx = None
+        for idx, blk in enumerate(self.blocks):
+            if blk.is_free and blk.size >= size:
+                target_idx = idx
+                break
+        if target_idx is None:
+            raise MemoryError("Out of memory or heap fragmentation failure")
+
+        matched = self.blocks[target_idx]
+        matched.is_free = False
+        if matched.size > size:
+            remaining_size = matched.size - size
+            new_addr = matched.address + size
+            matched.size = size
+            new_block = MemoryBlock(new_addr, remaining_size)
+            self.blocks.insert(target_idx + 1, new_block)
+        self.allocated_map[matched.address] = size
+        return matched.address
 
     def free(self, address: int) -> bool:
         if address not in self.allocated_map:
             return False
-        for block in self.blocks:
-            if block.address == address and not block.is_free:
-                block.is_free = True
+        for idx in range(len(self.blocks)):
+            if self.blocks[idx].address == address and not self.blocks[idx].is_free:
+                self.blocks[idx].is_free = True
                 del self.allocated_map[address]
                 self._coalesce()
                 return True
@@ -173,7 +178,7 @@ def test_memory_management_alloc_free_leak():
     allocations = []
 
     # Allocate multiple chunks repeatedly
-    for i in range(10):
+    for _ in range(10):
         addr = heap.allocate(128)
         allocations.append(addr)
 
