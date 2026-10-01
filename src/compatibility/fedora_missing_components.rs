@@ -653,6 +653,7 @@ impl Default for FedoraAnacondaKickstartEngine {
 pub struct FedoraSssdFreeIpaEngine {
     pub realm: String,
     pub enrolled_hosts: Vec<String>,
+    pub is_joined: bool,
 }
 
 impl FedoraSssdFreeIpaEngine {
@@ -660,7 +661,15 @@ impl FedoraSssdFreeIpaEngine {
         Self {
             realm: String::new(),
             enrolled_hosts: Vec::new(),
+            is_joined: false,
         }
+    }
+
+    pub fn join_realm(&mut self, realm: &str, server: &str) -> Result<(), &'static str> {
+        self.realm = realm.to_string();
+        self.enrolled_hosts.push(server.to_string());
+        self.is_joined = true;
+        Ok(())
     }
 }
 
@@ -769,6 +778,14 @@ mod tests {
         let mut sssd = FedoraSssdFreeIpaEngine::new();
         assert!(sssd.join_realm("example.com", "ipa.example.com").is_ok());
         assert!(sssd.is_joined);
+    }
+
+    #[test]
+    fn test_fedora_rpmostree_atomic_engine() {
+        let mut engine = FedoraRpmostreeAtomicEngine::new();
+        let res = engine.layer_package("htop");
+        assert!(res.contains("htop"));
+        assert_eq!(engine.layered_packages, vec!["htop".to_string()]);
     }
 }
 
@@ -883,11 +900,29 @@ pub struct RpmOstreeDeployment {
 #[derive(Debug, Clone)]
 pub struct FedoraRpmostreeAtomicEngine {
     pub deployments: Vec<RpmOstreeDeployment>,
+    pub layered_packages: Vec<String>,
 }
 
 impl FedoraRpmostreeAtomicEngine {
     pub fn new() -> Self {
-        Self { deployments: Vec::new() }
+        Self {
+            deployments: Vec::new(),
+            layered_packages: Vec::new(),
+        }
+    }
+
+    pub fn layer_package(&mut self, pkg_name: &str) -> String {
+        self.layered_packages.push(pkg_name.to_string());
+        format!("Staged package layer '{}' for next boot deployment", pkg_name)
+    }
+
+    pub fn rollback_deployment(&mut self) -> Result<String, &'static str> {
+        if self.deployments.len() > 1 {
+            self.deployments.pop();
+            Ok("Rolled back to previous OSTree deployment".to_string())
+        } else {
+            Err("No previous deployment available for rollback")
+        }
     }
 }
 
