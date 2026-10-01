@@ -557,6 +557,20 @@ impl FedoraOstreeAtomicDeploymentEngine {
         self.pending_reboot = true;
         true
     }
+
+    pub fn stage_update(&mut self, new_commit: &str) -> bool {
+        self.stage_deployment(new_commit)
+    }
+
+    pub fn commit_atomic_switch(&mut self) -> bool {
+        if let Some(commit) = self.staged_commit.take() {
+            self.active_commit = commit;
+            self.pending_reboot = false;
+            true
+        } else {
+            false
+        }
+    }
 }
 
 impl Default for FedoraOstreeAtomicDeploymentEngine {
@@ -587,6 +601,10 @@ impl ManjaroPamacSoftwareCenterEngine {
     pub fn search_software(&self, query: &str) -> usize {
         if query.is_empty() { 0 } else { 12 }
     }
+
+    pub fn search_package(&self, query: &str) -> usize {
+        self.search_software(query)
+    }
 }
 
 impl Default for ManjaroPamacSoftwareCenterEngine {
@@ -615,6 +633,11 @@ impl GarudaAssistantEngine {
     pub fn run_maintenance(&mut self) -> usize {
         self.maintenance_tasks_completed += 1;
         self.maintenance_tasks_completed
+    }
+
+    pub fn apply_performance_tweaks(&mut self) -> bool {
+        self.run_maintenance();
+        true
     }
 }
 
@@ -645,6 +668,10 @@ impl PopOsCosmicLauncherEngine {
         self.auto_tiling_enabled = !self.auto_tiling_enabled;
         self.auto_tiling_enabled
     }
+
+    pub fn launch_app(&self, app_name: &str) -> bool {
+        !app_name.is_empty()
+    }
 }
 
 impl Default for PopOsCosmicLauncherEngine {
@@ -672,6 +699,10 @@ impl TailsAmnesicRamPurgeEngine {
 
     pub fn purge_memory_pages(&self) -> usize {
         1024
+    }
+
+    pub fn trigger_amnesic_shutdown(&self) -> bool {
+        self.memory_wipe_on_shutdown
     }
 }
 
@@ -763,8 +794,8 @@ impl SovereignMissingLinuxBsdSuite {
         let ostree_ok = self.ostree.commit_atomic_switch();
         let pamac_res = self.pamac.search_package("kernel");
         let garuda_ok = self.garuda.apply_performance_tweaks();
-        let cosmic_res = self.cosmic.launch_app("terminal");
-        let tails_ok = self.tails.trigger_amnesic_shutdown();
+        let cosmic_res = self.cosmic_launcher.launch_app("terminal");
+        let tails_ok = self.tails_amnesic.trigger_amnesic_shutdown();
 
         self.yast2.verify_module("yast2-hardware")
             && self

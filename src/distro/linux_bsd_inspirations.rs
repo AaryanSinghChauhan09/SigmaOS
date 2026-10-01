@@ -360,7 +360,7 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => {
                 ServiceSupervisorType::Smf
             }
-            DistroSubsystemMode::SmartOs | DistroSubsystemMode::NetBsdRump => {
+            DistroSubsystemMode::SmartOs | DistroSubsystemMode::NetBsdRump | DistroSubsystemMode::SolarisSmartOS => {
                 ServiceSupervisorType::Rcd
             }
         }
@@ -572,7 +572,7 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => {
                 supervisor == ServiceSupervisorType::Smf
             }
-            DistroSubsystemMode::SmartOs | DistroSubsystemMode::NetBsdRump => {
+            DistroSubsystemMode::SmartOs | DistroSubsystemMode::NetBsdRump | DistroSubsystemMode::SolarisSmartOS => {
                 supervisor == ServiceSupervisorType::Rcd
             }
         };
@@ -661,7 +661,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::OpenBsdHardened
             | DistroSubsystemMode::NetBsdRump
-            | DistroSubsystemMode::SmartOs => {
+            | DistroSubsystemMode::SmartOs
+            | DistroSubsystemMode::SolarisSmartOS => {
                 format!("{}.tgz", input_pkg)
             }
             DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => {
@@ -757,7 +758,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::OpenBsdHardened
             | DistroSubsystemMode::NetBsdRump
-            | DistroSubsystemMode::SmartOs => format!("{}.tgz", action),
+            | DistroSubsystemMode::SmartOs
+            | DistroSubsystemMode::SolarisSmartOS => format!("{}.tgz", action),
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", action),
             DistroSubsystemMode::LinuxTinyCore => format!("{}.tcz", action),
             DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => {
@@ -2974,7 +2976,7 @@ mod inspiration_leap_tests {
         assert_eq!(leap_engine.active_inspirations.len(), 13);
 
         let (count, valid) = leap_engine.audit_subsystem_readiness();
-        assert_eq!(count, 174);
+        assert_eq!(count, 182);
         assert!(valid);
 
         let res = leap_engine.router.route_event("process", "memory", "alloc_page", "0x1000");
@@ -2987,7 +2989,7 @@ mod inspiration_leap_tests {
         assert!(res_bsd.unwrap().contains("VNET network stack routing"));
 
         let (count_bsd, valid_bsd) = leap_engine.audit_subsystem_readiness();
-        assert_eq!(count_bsd, 174);
+        assert_eq!(count_bsd, 182);
         assert!(valid_bsd);
     }
 }
@@ -8389,13 +8391,19 @@ impl Default for SovereignZeroCopyIpcBridge {
 
 pub struct SovereignSystemdHomedAuthBridge {
     pub authenticated_users: Vec<String>,
+    pub credential_provider: Option<String>,
 }
 
 impl SovereignSystemdHomedAuthBridge {
     pub fn new() -> Self {
         Self {
             authenticated_users: Vec::new(),
+            credential_provider: None,
         }
+    }
+
+    pub fn set_credential_provider(&mut self, provider: &str) {
+        self.credential_provider = Some(provider.to_string());
     }
 
     pub fn authenticate_and_mount(
@@ -8403,6 +8411,9 @@ impl SovereignSystemdHomedAuthBridge {
         username: &str,
         password: &str,
     ) -> Result<&'static str, &'static str> {
+        if self.credential_provider.is_none() {
+            return Err("No credential provider registered");
+        }
         if username.is_empty() || password.is_empty() {
             return Err("Invalid credentials");
         }

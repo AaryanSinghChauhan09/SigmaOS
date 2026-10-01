@@ -867,7 +867,7 @@ impl CrossPlatformDeviceBridge {
             shared_clipboard_text: String::new(),
             synced_notifications: Vec::new(),
             adb_wireless_paired: true,
-            drag_and_drop_buffer: Vec::new(),
+            drag_and_drop_buffer: vec![0x1, 0x2, 0x3, 0x4],
         }
     }
 

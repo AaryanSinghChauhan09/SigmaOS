@@ -133,15 +133,25 @@ pub struct FeatureMdStatus {
     pub wiki_mirrored: bool,
 }
 
+#[derive(Debug, Clone)]
+pub struct MdSpecificationItem {
+    pub spec_filename: String,
+    pub title: String,
+    pub is_fully_implemented: bool,
+    pub synced_to_wiki_repo: bool,
+}
+
 pub struct WikiDataTransferEngine {
     pub feature_specs: BTreeMap<String, FeatureMdStatus>,
+    pub specifications: BTreeMap<String, MdSpecificationItem>,
     pub total_synced_to_wiki: u32,
-    pub specifications: Vec<String>,}
+}
 
 impl WikiDataTransferEngine {
     pub fn new() -> Self {
         let mut engine = Self {
             feature_specs: BTreeMap::new(),
+            specifications: BTreeMap::new(),
             total_synced_to_wiki: 0,
         };
         engine.seed_known_feature_md_files();
@@ -170,6 +180,8 @@ impl WikiDataTransferEngine {
                 wiki_mirrored: true,
             },
         );
+
+        self.register_spec_file("ROADMAP.md", "SigmaOS Master Development Roadmap", true);
     }
 
     pub fn register_spec_file(&mut self, filename: &str, title: &str, fully_implemented: bool) {
@@ -182,17 +194,33 @@ impl WikiDataTransferEngine {
         self.specifications.insert(filename.to_string(), spec);
     }
 
+    pub fn total_synced_specs(&self) -> u32 {
+        self.total_synced_to_wiki
+    }
+
     pub fn transfer_implemented_data_to_wiki(
         &mut self,
         filename: &str,
     ) -> Result<String, &'static str> {
+        if let Some(spec) = self.feature_specs.get_mut(filename) {
+            if !spec.is_fully_implemented {
+                return Err("WikiSync Error: Specification is not fully implemented yet");
+            }
+            spec.wiki_mirrored = true;
+            self.total_synced_to_wiki += 1;
+            return Ok(format!("wiki_repo/{}", spec.spec_name));
+        }
+
         if let Some(spec) = self.specifications.get_mut(filename) {
             if !spec.is_fully_implemented {
                 return Err("WikiSync Error: Specification is not fully implemented yet");
             }
-        } else {
-            Err("Specification key not found")
+            spec.synced_to_wiki_repo = true;
+            self.total_synced_to_wiki += 1;
+            return Ok(format!("wiki_repo/{}", spec.spec_filename));
         }
+
+        Err("Specification key not found")
     }
 }
 

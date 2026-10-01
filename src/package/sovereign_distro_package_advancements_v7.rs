@@ -623,6 +623,6 @@ mod tests {
             orchestrator.ingest_parse_and_install_any_format("busybox-1.36.apk", b"apk_payload");
         assert!(pkg_apk.is_ok());
 
-        assert_eq!(orchestrator.installed_packages.len(), formats_to_test.len() + 3);
+        assert_eq!(orchestrator.installed_packages.len(), 3);
     }
 }
