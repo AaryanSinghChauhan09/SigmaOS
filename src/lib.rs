@@ -56,16 +56,19 @@ pub use process::{
 };
 pub mod linuxmint_inspirations;
 pub use linuxmint_inspirations::{
-    AppTheme, BulkyRenamer, CaptainInstaller, CaptainSource, ConfigBackend, DebPackage,
-    DesktopIconFlags, DiagnosticField, FsFormat, HypnotixIptvPlayer, IsolationMode, IptvProvider,
-    LanPeer, LanWarpEngine, MintConfigHub, MintDesktopEngine, MintLocaleEngine, MintMenuEngine,
-    MintMenuItem, MintNannyFilter, MintReportDiagnostics, MintStickFormatter, MintStickIsoVerifier,
-    MintUpgradeEngine, MintUpgradePhase, MintWelcomeFlow, NannyDecision, PartitionScheme,
-    ProviderType, RenameConflict, RenameRule, RenamedFile, RequestIncoming, SessionControlAction,
-    StickyNote, StickyNotesManager, ThingyEntry, ThingyKind, ThingyRecentDocs, TransferOutcome,
-    TransferRequest, TvChannel, UsbDevice, WARP_AUTH_PORT, WARP_MDNS_UDP_PORT, WARP_TRANSFER_PORT,
-    WebEngineKind, Webapp, WebappManager, WelcomeStep, XAppImageViewer, XAppStatusIconBadgeManager,
-    XAppTextEditor, XAppThemeEngine, XAppTrayBadge,
+    AppTheme, BackupFileEntry, BulkyRenamer, CaptainInstaller, CaptainSource, CatalogPackage,
+    ConfigBackend, DebPackage, DesktopIconFlags, DiagnosticField, DocumentBookmark,
+    DocumentSearchMatch, DriverPackageSource, FsFormat, HypnotixIptvPlayer, IsolationMode,
+    IptvProvider, LanPeer, LanWarpEngine, MintBackupEngine, MintConfigHub, MintDesktopEngine,
+    MintDriverIsoMountEngine, MintLocaleEngine, MintMenuEngine, MintMenuItem,
+    MintMirrorSpeedTester, MintNannyFilter, MintReportDiagnostics, MintSoftwareCatalogEngine,
+    MintStickFormatter, MintStickIsoVerifier, MintUpgradeEngine, MintUpgradePhase, MintWelcomeFlow,
+    NannyDecision, PackageListEntry, PartitionScheme, ProviderType, RenameConflict, RenameRule,
+    RenamedFile, RepositoryMirror, RequestIncoming, SessionControlAction, StickyNote,
+    StickyNotesManager, ThingyEntry, ThingyKind, ThingyRecentDocs, TransferOutcome, TransferRequest,
+    TvChannel, UsbDevice, WARP_AUTH_PORT, WARP_MDNS_UDP_PORT, WARP_TRANSFER_PORT, WebEngineKind,
+    Webapp, WebappManager, WelcomeStep, XAppDocumentReader, XAppImageViewer,
+    XAppStatusIconBadgeManager, XAppTextEditor, XAppThemeEngine, XAppTrayBadge,
 };
 pub mod tools;
 pub use open_source_os_gap_closure::*;
