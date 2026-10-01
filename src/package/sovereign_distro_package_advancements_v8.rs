@@ -724,6 +724,11 @@ pub struct SovereignDistroPackageAdvancementsSuiteV8 {
     pub sat_resolver: SovereignUniversalSatDependencyResolver,
     pub sig_verifier: SovereignUniversalPackageSignatureVerifier,
     pub trigger_engine: SovereignUniversalSystemTriggerIntegratorEngine,
+    pub sandbox_engine: SovereignMicrovmHermeticPackageSandboxEngine,
+    pub trust_governor: SovereignPqcMultiKeyringPackageTrustGovernor,
+    pub mirror_governor: SovereignAiOptimizedMirrorRankingGovernor,
+    pub boot_snapshot_engine: SovereignAtomicBootEnvironmentPackageSnapshotEngine,
+    pub soname_verifier: SovereignCrossDistroSonameAbiVerifierEngine,
     pub total_packages_processed: usize,
 }
 

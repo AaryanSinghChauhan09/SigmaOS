@@ -276,6 +276,12 @@ impl HWBustersPsuRailTelemetryEngine {
             92.4
         }
     }
+
+    pub fn verify_12v_2x6_pin_thermal_safety(&self) -> bool {
+        self.sensing_12v_2x6_pin_temp_c >= 0.0
+            && self.sensing_12v_2x6_pin_temp_c <= 85.0
+            && !self.transient_spike_detected
+    }
 }
 
 impl Default for HWBustersPsuRailTelemetryEngine {

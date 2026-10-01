@@ -74,6 +74,8 @@ pub enum UniversalDistroPackageFormat {
     RubyGem,
     DotnetNuget,
     NativeSigPkg,
+    BsdPkg,
+    OpenBsdPorts,
 }
 
 impl UniversalDistroPackageFormat {
@@ -82,6 +84,7 @@ impl UniversalDistroPackageFormat {
             Self::AptDeb => "apt (.deb)",
             Self::PacmanPkg => "pacman (.pkg.tar.zst / PKGBUILD)",
             Self::DnfRpm => "dnf (.rpm / spec)",
+            Self::ZypperDeltaRpm => "zypper-delta (.drpm / .rpm)",
             Self::AlpineApk => "apk (.apk / APKBUILD)",
             Self::VoidXbps => "xbps (.xbps / template)",
             Self::GentooEbuild => "portage (.ebuild)",
@@ -110,6 +113,8 @@ impl UniversalDistroPackageFormat {
             Self::RubyGem => "ruby (.gem / gemspec)",
             Self::DotnetNuget => "dotnet (.nupkg / nuspec)",
             Self::NativeSigPkg => "sigma-pkg (.sigpkg)",
+            Self::BsdPkg => "bsd-pkg (+MANIFEST / pkg-plist)",
+            Self::OpenBsdPorts => "openbsd-ports (Makefile / ports tree)",
         }
     }
 

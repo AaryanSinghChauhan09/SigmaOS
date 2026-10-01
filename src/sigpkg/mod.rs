@@ -64,6 +64,11 @@ pub mod store;
 pub mod transaction;
 pub mod transaction_log;
 pub mod universal_adapter;
+pub use universal_adapter::{
+    DispatchedPmAction, UniversalDependencyMapper, UniversalDryRunSimulator,
+    UniversalPackageAdapter, UniversalPmCommandDispatcher, UniversalPmOperation,
+    UniversalScriptletConverter,
+};
 pub mod universal_engine;
 pub mod universal_oop_system;
 pub use universal_oop_system::*;
@@ -104,10 +109,6 @@ pub use sovereign_distro_package_advancements_v7::*;
 pub mod sovereign_distro_package_advancements_v9;
 pub use sovereign_distro_package_advancements_v9::*;
 
-#[path = "../package/sovereign_distro_package_advancements_v9.rs"]
-pub mod sovereign_distro_package_advancements_v9;
-pub use sovereign_distro_package_advancements_v9::*;
-
 #[path = "../package/bsd_linux_package_innovations.rs"]
 pub mod bsd_linux_package_innovations;
 pub use bsd_linux_package_innovations::{
@@ -135,7 +136,6 @@ pub use zero_alloc_resolver::{
 
 pub use crate::package::sovereign_pr_package_gateway::SovereignUniversalPrGatewayEngine;
 pub use crate::package::sovereign_universal_pm_pr_bridge::SovereignUniversalPmPrBridgeEngine;
-pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
 
 pub use alpine_apk_engine::{AlpineCommunityRepo, ApkIndexParser, ApkPackage};
 pub use arch_compat::{
