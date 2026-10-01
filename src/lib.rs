@@ -83,11 +83,26 @@ pub use kernel::{
 pub use process::{
     AdvancedIpcHub, BsdRusage, CancellationType, CoreDumpMetadata, EventFd,
     JobControlLifecycleEngine, JobState, PosixMessage, PosixMessageQueue, ProcessCancelState,
-    ProcessCancellationAndTerminationManager, ProcessControlError, ProcessDescriptorRights,
-    ProcessFileDescriptor, ProcessJobEntry, ProcessVmReadWriteEngine,
-    ProcessWaiterAndRusageCollector, SigQueuePayload, SovereignPidfdProcdescEngine,
-    SovereignProcess, SovereignProcessManager, SovereignProcessState, SubreaperProcessEntry,
-    WaitStatus, ZeroCopyIpcChannel, WCONTINUED, WNOHANG, WUNTRACED,
+    ProcessCancellationAndTerminationManager, ProcessControlError, ProcessJobEntry,
+    ProcessVmReadWriteEngine, ProcessWaiterAndRusageCollector, SigQueuePayload, SovereignProcess,
+    SovereignProcessManager, SovereignProcessState, WaitStatus, ZeroCopyIpcChannel, WCONTINUED,
+    WNOHANG, WUNTRACED,
+};
+pub mod linuxmint_inspirations;
+pub use linuxmint_inspirations::{
+    AppTheme, BackupFileEntry, BulkyRenamer, CaptainInstaller, CaptainSource, CatalogPackage,
+    ConfigBackend, DebPackage, DesktopIconFlags, DiagnosticField, DocumentBookmark,
+    DocumentSearchMatch, DriverPackageSource, FsFormat, HypnotixIptvPlayer, IsolationMode,
+    IptvProvider, LanPeer, LanWarpEngine, MintBackupEngine, MintConfigHub, MintDesktopEngine,
+    MintDriverIsoMountEngine, MintLocaleEngine, MintMenuEngine, MintMenuItem,
+    MintMirrorSpeedTester, MintNannyFilter, MintReportDiagnostics, MintSoftwareCatalogEngine,
+    MintStickFormatter, MintStickIsoVerifier, MintUpgradeEngine, MintUpgradePhase, MintWelcomeFlow,
+    NannyDecision, PackageListEntry, PartitionScheme, ProviderType, RenameConflict, RenameRule,
+    RenamedFile, RepositoryMirror, RequestIncoming, SessionControlAction, StickyNote,
+    StickyNotesManager, ThingyEntry, ThingyKind, ThingyRecentDocs, TransferOutcome, TransferRequest,
+    TvChannel, UsbDevice, WARP_AUTH_PORT, WARP_MDNS_UDP_PORT, WARP_TRANSFER_PORT, WebEngineKind,
+    Webapp, WebappManager, WelcomeStep, XAppDocumentReader, XAppImageViewer,
+    XAppStatusIconBadgeManager, XAppTextEditor, XAppThemeEngine, XAppTrayBadge,
 };
 pub mod access;
 pub mod open_source_obsoletion;
