@@ -114,6 +114,7 @@ pub use custom_string::SigmaString;
 
 pub mod vec {
     pub use super::Vec;
+    pub type SigmaVec<T> = super::Vec<T>;
 }
 
 /// SigmaOS kernel library prelude.

@@ -15,10 +15,7 @@
 
 pub mod aes;
 pub mod encryption;
-pub mod hash;
-pub mod kdf;
 pub mod keys;
-pub mod libsodium;
 pub mod post_quantum;
 pub mod postquantum;
 pub mod pqc_dilithium;

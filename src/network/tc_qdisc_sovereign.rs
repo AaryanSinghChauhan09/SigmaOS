@@ -2,6 +2,7 @@
 #![allow(unused_imports)]
 #![allow(unexpected_cfgs)]
 #![allow(clippy::new_without_default)]
+use std::collections::VecDeque;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 
@@ -46,6 +47,7 @@ impl Packet {
 // ─── TBF — Token Bucket Filter ────────────────────────────────────────────────
 
 pub struct TbfQdisc {
+    pub refill_remainder: u64,
     pub rate_bps: u64,       // bytes per second
     pub burst_bytes: u64,    // bucket capacity
     pub tokens: u64,         // current token count (bytes)
@@ -70,6 +72,7 @@ impl TbfQdisc {
             dropped: 0,
             queue: Vec::new(),
             queue_limit,
+            refill_remainder: 0,
         }
     }
 
@@ -114,7 +117,7 @@ impl TbfQdisc {
 
     /// Dequeue if tokens allow.
     pub fn dequeue(&mut self) -> Option<Packet> {
-        let pkt_len = self.queue.front()?.len as u64;
+        let pkt_len = self.queue.first().cloned()?.len as u64;
         if self.queue.is_empty() {
             return None;
         }
@@ -136,9 +139,6 @@ impl TbfQdisc {
         }
         let used = self.burst_bytes.saturating_sub(self.tokens) as u128;
         ((used * 100) / self.burst_bytes as u128) as u32
-        if self.burst_bytes == 0 { return 0; }
-        let used = self.burst_bytes - self.tokens;
-        ((used * 100) / self.burst_bytes) as u32
     }
 }
 
@@ -213,9 +213,6 @@ impl HtbClass {
             tokens: burst,
             ctokens: ceil_bps / 8,
             prio,
-            queue: VecDeque::new(),
-            queue: Vec::new(),
-            enqueued: 0, dequeued: 0, lended: 0, dropped: 0,
             queue: Vec::new(),
             enqueued: 0,
             dequeued: 0,
@@ -243,7 +240,7 @@ impl HtbClass {
     }
 
     pub fn try_dequeue(&mut self) -> Option<Packet> {
-        let len = self.queue.front()?.len as u64;
+        let len = self.queue.first().cloned()?.len as u64;
         if self.queue.is_empty() {
             return None;
         }
@@ -328,10 +325,6 @@ pub struct FqCodelQdisc {
     pub interval_ns: u64,     // CoDel interval (default 100ms)
     pub quantum: u32,         // FQ quantum in bytes
     pub flows: Vec<VecDeque<Packet>>,
-    pub target_delay_ns: u64,  // target queue latency (default 5ms)
-    pub interval_ns: u64,      // CoDel interval (default 100ms)
-    pub quantum: u32,          // FQ quantum in bytes
-    pub flows: Vec<Vec<Packet>>,
     pub flow_count: usize,
     pub drop_count: u64,
     pub ecn_marks: u64,
@@ -340,7 +333,7 @@ pub struct FqCodelQdisc {
 
 impl FqCodelQdisc {
     pub fn new(flow_count: usize) -> Self {
-        let flows = (0..flow_count).map(|_| Vec::new()).collect();
+        let flows = (0..flow_count).map(|_| std::collections::VecDeque::new()).collect();
         FqCodelQdisc {
             target_delay_ns: 5_000_000,    // 5ms
             interval_ns: 100_000_000,       // 100ms
@@ -357,11 +350,6 @@ impl FqCodelQdisc {
         if self.flow_count == 0 {
             return false;
         }
-        let flow_idx = (pkt.flow_id as usize) % flow_count;
-        if self.flow_count == 0 {
-            return false;
-        }
-        if self.flow_count == 0 { return false; }
         let flow_idx = (pkt.flow_id as usize) % self.flow_count;
         // CoDel: if sojourn time > target, mark/drop
         // (simplified: if flow queue is deep, mark ECN)
@@ -372,7 +360,7 @@ impl FqCodelQdisc {
             self.drop_count = self.drop_count.saturating_add(1);
             return false; // Drop tail
         }
-        self.flows[flow_idx].push(pkt);
+        self.flows[flow_idx].push_back(pkt);
         true
     }
 
@@ -381,19 +369,12 @@ impl FqCodelQdisc {
         if self.flow_count == 0 {
             return None;
         }
-        let start = self.round_robin_idx % flow_count;
-        for i in 0..flow_count {
-            let idx = (start + i) % flow_count;
-        if self.flow_count == 0 {
-            return None;
-        }
-        if self.flow_count == 0 { return None; }
         let start = self.round_robin_idx;
         for i in 0..self.flow_count {
             let idx = (start + i) % self.flow_count;
             if !self.flows[idx].is_empty() {
                 self.round_robin_idx = (idx + 1) % self.flow_count;
-                return Some(self.flows[idx].remove(0));
+                return self.flows[idx].pop_front();
             }
         }
         None

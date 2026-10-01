@@ -25,9 +25,6 @@ pub struct BuddyAllocator {
 
 impl BuddyAllocator {
     pub fn new(total_memory: usize, min_block_size: usize) -> Self {
-        let max_order = (total_memory / min_block_size)
-            .next_power_of_two()
-            .trailing_zeros() as usize;
         let max_order = (total_memory / min_block_size).next_power_of_two().trailing_zeros() as usize;
 
         let mut free_lists = vec![Vec::new(); max_order + 1];
@@ -114,8 +111,6 @@ impl BuddyAllocator {
         let mut block = self.free_lists[current_order]
             .pop()
             .ok_or("Block not found")?;
-    fn split_block(&mut self, current_order: usize, required_order: usize) -> Result<MemoryBlock, &'static str> {
-        let mut block = self.free_lists[current_order].pop().ok_or("Block not found")?;
 
         while block.order > required_order {
             let new_order = block.order - 1;
@@ -145,9 +140,6 @@ impl BuddyAllocator {
 
     /// Merge block with its buddy
     fn merge_buddy(&mut self, block: MemoryBlock) {
-        let block_size = (self.min_block_size as u64) << block.order;
-        let relative_start = block.start.saturating_sub(self.base_address);
-        let buddy_address = self.base_address + (relative_start ^ block_size);
         let buddy_address = block.start ^ (1 << block.order);
 
         // Find buddy in free list
@@ -259,12 +251,6 @@ impl SlabCache {
 
     /// Grow slab cache
     fn grow_slab(&mut self) {
-        let base_address =
-            (self.slabs.len() as u64 * self.object_size as u64 * self.objects_per_slab as u64)
-                + self.object_size as u64;
-            self.slabs.len() as u64 * self.object_size as u64 * self.objects_per_slab as u64;
-        let base_address = self.slabs.len() as u64 * self.object_size as u64 * self.objects_per_slab as u64;
-            self.slabs.len() as u64 * self.object_size as u64 * self.objects_per_slab as u64;
         let base_address = self.slabs.len() as u64 * self.object_size as u64 * self.objects_per_slab as u64;
 
         let mut slab = Vec::new();
@@ -277,7 +263,6 @@ impl SlabCache {
 
         self.free_objects
             .fetch_add(self.objects_per_slab, Ordering::SeqCst);
-        self.free_objects.fetch_add(self.objects_per_slab, Ordering::SeqCst);
         self.slabs.push(slab);
     }
 

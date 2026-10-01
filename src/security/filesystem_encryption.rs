@@ -183,9 +183,6 @@ impl FilesystemEncryptionManager {
             .find(|d| d.path == path)
             .ok_or_else(|| format!("Directory {} not found", path))?;
 
-        if directory.status != EncryptionStatus::Encrypted
-            && directory.status != EncryptionStatus::Locked
-        {
         if directory.status != EncryptionStatus::Encrypted && directory.status != EncryptionStatus::Locked {
             return Err(format!("Directory {} is not encrypted or locked", path));
         }
@@ -214,8 +211,6 @@ impl FilesystemEncryptionManager {
             .find(|d| d.device_path == device_path)
             .ok_or_else(|| format!("Device {} not found", device_path))?;
 
-        if device.status != EncryptionStatus::Encrypted && device.status != EncryptionStatus::Locked
-        {
         if device.status != EncryptionStatus::Encrypted && device.status != EncryptionStatus::Locked {
             return Err(format!("Device {} is not encrypted or locked", device_path));
         }
@@ -270,10 +265,6 @@ impl FilesystemEncryptionManager {
         let encrypted_dirs = self
             .fscrypt_directories
             .iter()
-            .filter(|d| {
-                d.status == EncryptionStatus::Encrypted || d.status == EncryptionStatus::Locked
-            })
-        let encrypted_dirs = self.fscrypt_directories.iter()
             .filter(|d| d.status == EncryptionStatus::Encrypted || d.status == EncryptionStatus::Locked)
             .count();
         let unlocked_dirs = self.fscrypt_directories.iter()
@@ -283,10 +274,6 @@ impl FilesystemEncryptionManager {
         let encrypted_devices = self
             .luks_devices
             .iter()
-            .filter(|d| {
-                d.status == EncryptionStatus::Encrypted || d.status == EncryptionStatus::Locked
-            })
-        let encrypted_devices = self.luks_devices.iter()
             .filter(|d| d.status == EncryptionStatus::Encrypted || d.status == EncryptionStatus::Locked)
             .count();
         let unlocked_devices = self.luks_devices.iter()
@@ -305,10 +292,6 @@ impl FilesystemEncryptionManager {
             encrypted_devices,
             unlocked_devices
         ));
-        stats.push_str(&format!("Fscrypt directories: {} total, {} encrypted, {} unlocked\n",
-            self.fscrypt_directories.len(), encrypted_dirs, unlocked_dirs));
-        stats.push_str(&format!("LUKS devices: {} total, {} encrypted, {} unlocked\n",
-            self.luks_devices.len(), encrypted_devices, unlocked_devices));
 
         stats
     }

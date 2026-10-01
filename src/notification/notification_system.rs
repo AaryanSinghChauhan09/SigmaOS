@@ -246,8 +246,6 @@ impl NotificationSystem {
 
         // Always allow critical if configured
         if self.dnd_config.allow_critical && notification.priority == Priority::Critical {
-        if self.dnd_config.allow_critical &&
-           notification.priority == Priority::Critical {
             return false;
         }
 
@@ -355,7 +353,6 @@ impl NotificationSystem {
 
         self.history
             .iter()
-        self.history.iter()
             .filter_map(|id| self.notifications.get(id))
             .filter(|n| {
                 n.summary.to_lowercase().contains(&query) ||

@@ -14,13 +14,10 @@
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
-use alloc::string::String;
 use alloc::vec;
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
-use alloc::format;
 use core::fmt;
 
 /// Case-insensitive equality without allocation for ASCII text.
@@ -100,25 +97,25 @@ impl AppEntry {
         let query = query.to_lowercase();
 
         // Check name
-        if contains_ignore_case(&self.name, query) {
+        if contains_ignore_case(&self.name, &query) {
             return true;
         }
 
         // Check description
-        if contains_ignore_case(&self.description, query) {
+        if contains_ignore_case(&self.description, &query) {
             return true;
         }
 
         // Check keywords
         for keyword in &self.keywords {
-            if contains_ignore_case(keyword, query) {
+            if contains_ignore_case(keyword, &query) {
                 return true;
             }
         }
 
         // Check categories
         for category in &self.categories {
-            if contains_ignore_case(category, query) {
+            if contains_ignore_case(category, &query) {
                 return true;
             }
         }
@@ -135,41 +132,25 @@ impl AppEntry {
             return 900; // Prefix match
         }
 
-        if contains_ignore_case(&self.name, query) {
-        let query = query.to_lowercase();
-        let name = self.name.to_lowercase();
-
-        if name == query {
-            return 1000;  // Exact match
-        }
-
-        if name.starts_with(&query) {
-            return 900;  // Prefix match
-        }
-
-        if name.contains(&query) {
-            return 800;  // Substring match
+        if contains_ignore_case(&self.name, &query) {
+            return 800; // Substring match
         }
 
         // Check word boundaries
         for word in self.name.split_whitespace() {
             if starts_with_ignore_case(word, query) {
-        let words: Vec<&str> = name.split_whitespace().collect();
-        for word in words {
-            if word.starts_with(&query) {
-                return 700;  // Word start match
+                return 700; // Word start match
             }
         }
 
         // Keyword match
         for keyword in &self.keywords {
-            if contains_ignore_case(keyword, query) {
+            if contains_ignore_case(keyword, &query) {
                 return 600;
             }
         }
 
         0 // No match
-        0  // No match
     }
 }
 
@@ -364,11 +345,7 @@ impl AppLauncher {
         for command in &self.commands {
             if contains_ignore_case(&command.name, query)
                 || contains_ignore_case(&command.description, query)
-            if command.name.to_lowercase().contains(&query)
-                || command.description.to_lowercase().contains(&query)
             {
-            if command.name.to_lowercase().contains(&query) ||
-               command.description.to_lowercase().contains(&query) {
                 results.push(command.clone());
             }
         }
@@ -501,11 +478,6 @@ mod tests {
 
         assert!(app.matches_query("ÜB"));
         assert_eq!(app.fuzzy_score("ÜBER TERMINAL"), 1000);
-    }
-
-        assert_eq!(app.fuzzy_score("firefox browser"), 1000);  // Exact
-        assert_eq!(app.fuzzy_score("firefox"), 900);  // Prefix
-        assert!(app.fuzzy_score("fox") > 0);  // Fuzzy
     }
 
     #[test]

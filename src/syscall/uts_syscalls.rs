@@ -3,6 +3,8 @@
 //! Implements Linux-compatible UTS namespace syscalls:
 //! - sys_sethostname(2)
 //! - sys_gethostname(2)
+//! - sys_setdomainname(2)
+//! - sys_getdomainname(2)
 //! - sys_clone with CLONE_NEWUTS support
 
 use crate::kernel::uts_namespace::{UtsNamespaceManager, NamespaceId};
@@ -23,54 +25,38 @@ pub const CLONE_NEWUTS: u32 = 0x04000000;
 ///
 /// Args:
 /// - namespace_id: ID of the namespace to modify
-/// - hostname_ptr: Pointer to hostname string
+/// - hostname_ptr: Pointer to hostname string (must be readable for `len` bytes)
 /// - len: Length of hostname (max 255)
 ///
 /// Returns:
 /// - 0 on success
-/// - -1 (EINVAL) on invalid arguments
-/// - -EFAULT on bad pointer
-/// - -EPERM on permission denied
-pub fn sys_sethostname(
-    namespace_id: u64,
-    hostname_ptr: *const u8,
-    len: usize,
-) -> i32 {
-/// - -EFAULT on a null pointer (non-null pointer validity is the caller's safety obligation)
+/// - -22 (EINVAL) on invalid arguments
+/// - -14 (EFAULT) on null pointer
+/// - -2 (ENOENT) if namespace not found
 ///
 /// # Safety
 /// `hostname_ptr` must be readable for `len` bytes for the duration of this call.
-/// A syscall entry point must validate/copy user memory before calling this helper;
-/// checking for null does not validate an arbitrary user pointer.
+/// A syscall entry point must validate/copy user memory before calling this helper.
 pub unsafe fn sys_sethostname(namespace_id: u64, hostname_ptr: *const u8, len: usize) -> i32 {
-    // Validate hostname length (max 255 bytes)
-    if len > 255 {
+    // Validate hostname length (max 255 bytes, Linux compatible)
+    if len > 255 || len == 0 {
         return -22; // EINVAL
     }
 
-    if len == 0 {
-        return -22; // EINVAL - empty hostname
-    }
-
-    // Validate pointer (would need actual memory validation in real implementation)
+    // Validate pointer
     if hostname_ptr.is_null() {
         return -14; // EFAULT
     }
 
-    // Convert bytes to String
-    let hostname_bytes = unsafe {
-        std::slice::from_raw_parts(hostname_ptr, len)
-    };
     // SAFETY: guaranteed by this function's contract; the length checks above
     // also ensure `len` is nonzero and within the hostname limit.
     let hostname_bytes = unsafe { std::slice::from_raw_parts(hostname_ptr, len) };
 
     let hostname = match String::from_utf8(hostname_bytes.to_vec()) {
         Ok(h) => h,
-        Err(_) => return -22, // EINVAL
+        Err(_) => return -22, // EINVAL - not valid UTF-8
     };
 
-    // Get namespace manager and set hostname
     let manager = get_uts_manager();
     let ns_id = NamespaceId::new(namespace_id);
 
@@ -84,24 +70,17 @@ pub unsafe fn sys_sethostname(namespace_id: u64, hostname_ptr: *const u8, len: u
 ///
 /// Args:
 /// - namespace_id: ID of the namespace to query
-/// - hostname_ptr: Pointer to buffer for hostname
+/// - hostname_ptr: Pointer to buffer for hostname (must be writable for `len` bytes)
 /// - len: Buffer size
 ///
 /// Returns:
 /// - 0 on success
-/// - -1 (EINVAL) on invalid arguments
-/// - -EFAULT on bad pointer
-pub fn sys_gethostname(
-    namespace_id: u64,
-    hostname_ptr: *mut u8,
-    len: usize,
-) -> i32 {
-/// - -EFAULT on a null pointer (non-null pointer validity is the caller's safety obligation)
+/// - -22 (EINVAL) on invalid arguments
+/// - -14 (EFAULT) on null pointer
+/// - -2 (ENOENT) if namespace not found
 ///
 /// # Safety
 /// `hostname_ptr` must be writable for `len` bytes for the duration of this call.
-/// A syscall entry point must validate/copy user memory before calling this helper;
-/// checking for null does not validate an arbitrary user pointer.
 pub unsafe fn sys_gethostname(namespace_id: u64, hostname_ptr: *mut u8, len: usize) -> i32 {
     if len == 0 {
         return -22; // EINVAL
@@ -111,7 +90,6 @@ pub unsafe fn sys_gethostname(namespace_id: u64, hostname_ptr: *mut u8, len: usi
         return -14; // EFAULT
     }
 
-    // Get namespace manager and retrieve hostname
     let manager = get_uts_manager();
     let ns_id = NamespaceId::new(namespace_id);
 
@@ -120,16 +98,13 @@ pub unsafe fn sys_gethostname(namespace_id: u64, hostname_ptr: *mut u8, len: usi
         Err(_) => return -2, // ENOENT - namespace not found
     };
 
-    // Copy hostname to buffer
+    // Copy hostname to buffer, leaving room for NUL terminator
     let copy_len = std::cmp::min(len - 1, hostname.len());
+
     // SAFETY: guaranteed by this function's contract; `copy_len < len`, so
     // the payload and trailing NUL fit in the caller-provided output buffer.
     unsafe {
-        std::ptr::copy_nonoverlapping(
-            hostname.as_ptr(),
-            hostname_ptr,
-            copy_len,
-        );
+        std::ptr::copy_nonoverlapping(hostname.as_ptr(), hostname_ptr, copy_len);
         // Null terminate
         *hostname_ptr.add(copy_len) = 0;
     }
@@ -141,24 +116,19 @@ pub unsafe fn sys_gethostname(namespace_id: u64, hostname_ptr: *mut u8, len: usi
 ///
 /// Args:
 /// - namespace_id: ID of the namespace to modify
-/// - domainname_ptr: Pointer to domainname string
+/// - domainname_ptr: Pointer to domainname string (must be readable for `len` bytes)
 /// - len: Length of domainname (max 255)
-pub fn sys_setdomainname(
-    namespace_id: u64,
-    domainname_ptr: *const u8,
-    len: usize,
-) -> i32 {
+///
+/// Returns:
+/// - 0 on success
+/// - -22 (EINVAL) on invalid arguments
+/// - -14 (EFAULT) on null pointer
+/// - -2 (ENOENT) if namespace not found
 ///
 /// # Safety
 /// `domainname_ptr` must be readable for `len` bytes for the duration of this call.
-/// A syscall entry point must validate/copy user memory before calling this helper;
-/// checking for null does not validate an arbitrary user pointer.
 pub unsafe fn sys_setdomainname(namespace_id: u64, domainname_ptr: *const u8, len: usize) -> i32 {
-    if len > 255 {
-        return -22; // EINVAL
-    }
-
-    if len == 0 {
+    if len > 255 || len == 0 {
         return -22; // EINVAL
     }
 
@@ -166,9 +136,6 @@ pub unsafe fn sys_setdomainname(namespace_id: u64, domainname_ptr: *const u8, le
         return -14; // EFAULT
     }
 
-    let domainname_bytes = unsafe {
-        std::slice::from_raw_parts(domainname_ptr, len)
-    };
     // SAFETY: guaranteed by this function's contract; the length checks above
     // also ensure `len` is nonzero and within the domainname limit.
     let domainname_bytes = unsafe { std::slice::from_raw_parts(domainname_ptr, len) };
@@ -188,16 +155,9 @@ pub unsafe fn sys_setdomainname(namespace_id: u64, domainname_ptr: *const u8, le
 }
 
 /// sys_getdomainname(2) - Get domainname from current UTS namespace
-pub fn sys_getdomainname(
-    namespace_id: u64,
-    domainname_ptr: *mut u8,
-    len: usize,
-) -> i32 {
 ///
 /// # Safety
 /// `domainname_ptr` must be writable for `len` bytes for the duration of this call.
-/// A syscall entry point must validate/copy user memory before calling this helper;
-/// checking for null does not validate an arbitrary user pointer.
 pub unsafe fn sys_getdomainname(namespace_id: u64, domainname_ptr: *mut u8, len: usize) -> i32 {
     if len == 0 {
         return -22; // EINVAL
@@ -216,14 +176,11 @@ pub unsafe fn sys_getdomainname(namespace_id: u64, domainname_ptr: *mut u8, len:
     };
 
     let copy_len = std::cmp::min(len - 1, domainname.len());
+
     // SAFETY: guaranteed by this function's contract; `copy_len < len`, so
     // the payload and trailing NUL fit in the caller-provided output buffer.
     unsafe {
-        std::ptr::copy_nonoverlapping(
-            domainname.as_ptr(),
-            domainname_ptr,
-            copy_len,
-        );
+        std::ptr::copy_nonoverlapping(domainname.as_ptr(), domainname_ptr, copy_len);
         *domainname_ptr.add(copy_len) = 0;
     }
 
@@ -280,7 +237,9 @@ mod tests {
         let result = unsafe { sys_gethostname(ns.raw(), buffer.as_mut_ptr(), 256) };
         assert_eq!(result, 0);
 
-        let retrieved = String::from_utf8(buffer.iter().copied().take_while(|&b| b != 0).collect()).unwrap();
+        let retrieved = String::from_utf8(
+            buffer.iter().copied().take_while(|&b| b != 0).collect()
+        ).unwrap();
         assert_eq!(retrieved, "test-host");
     }
 

@@ -9,28 +9,31 @@ use std::sync::{Arc, Mutex, atomic::{AtomicU32, AtomicU64, Ordering}};
 // Handle Rights (capability enforcement)
 // ─────────────────────────────────────────────────────────────────────────────
 
-bitflags::bitflags! {
-    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub struct Rights: u32 {
-        const NONE       = 0;
-        const DUPLICATE  = 1 << 0;
-        const TRANSFER   = 1 << 1;
-        const READ       = 1 << 2;
-        const WRITE      = 1 << 3;
-        const EXECUTE    = 1 << 4;
-        const MAP        = 1 << 5;
-        const GET_PROP   = 1 << 6;
-        const SET_PROP   = 1 << 7;
-        const ENUMERATE  = 1 << 8;
-        const DESTROY    = 1 << 9;
-        const SET_POLICY = 1 << 10;
-        const GET_CHILD  = 1 << 11;
-        const SIGNAL     = 1 << 12;
-        const WAIT       = 1 << 13;
-        const INSPECT    = 1 << 14;
-        const SAME_RIGHTS = 1 << 31;
-    }
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub struct Rights(pub u32);
+impl Rights {
+    pub const NONE: Rights = Rights(0);
+    pub const DUPLICATE: Rights = Rights(1);
+    pub const TRANSFER: Rights = Rights(1);
+    pub const READ: Rights = Rights(1);
+    pub const WRITE: Rights = Rights(1);
+    pub const EXECUTE: Rights = Rights(1);
+    pub const MAP: Rights = Rights(1);
+    pub const GET_PROP: Rights = Rights(1);
+    pub const SET_PROP: Rights = Rights(1);
+    pub const ENUMERATE: Rights = Rights(1);
+    pub const DESTROY: Rights = Rights(1);
+    pub const SET_POLICY: Rights = Rights(1);
+    pub const GET_CHILD: Rights = Rights(1);
+    pub const SIGNAL: Rights = Rights(1);
+    pub const WAIT: Rights = Rights(1);
+    pub const INSPECT: Rights = Rights(1);
+    pub const SAME_RIGHTS: Rights = Rights(1);
+    pub fn contains(self, other: Rights) -> bool { (self.0 & other.0) == other.0 }
+    pub fn bits(self) -> u32 { self.0 }
 }
+impl core::ops::BitOr for Rights { type Output = Self; fn bitor(self, r: Self) -> Self { Rights(self.0|r.0) } }
+impl core::ops::BitAnd for Rights { type Output = Self; fn bitand(self, r: Self) -> Self { Rights(self.0&r.0) } }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Kernel Object Types
@@ -60,20 +63,24 @@ fn new_koid() -> Koid { KOID_COUNTER.fetch_add(1, Ordering::SeqCst) }
 // Signals
 // ─────────────────────────────────────────────────────────────────────────────
 
-bitflags::bitflags! {
-    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub struct Signals: u32 {
-        const NONE             = 0;
-        const READABLE         = 1 << 0;  // ZX_CHANNEL_READABLE
-        const WRITABLE         = 1 << 1;  // ZX_CHANNEL_WRITABLE
-        const PEER_CLOSED      = 1 << 2;  // ZX_CHANNEL_PEER_CLOSED
-        const SIGNALED         = 1 << 3;  // ZX_EVENT_SIGNALED
-        const FIFO_READABLE    = 1 << 4;
-        const FIFO_WRITABLE    = 1 << 5;
-        const HANDLE_CLOSED    = 1 << 23; // ZX_SIGNAL_HANDLE_CLOSED
-        const LAST_HANDLE      = 1 << 24;
-    }
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub struct Signals(pub u32);
+impl Signals {
+    pub fn from_bits_truncate(bits: u32) -> Self { Signals(bits) }
+    pub const NONE: Signals = Signals(0);
+    pub const READABLE: Signals = Signals(1);
+    pub const WRITABLE: Signals = Signals(1);
+    pub const PEER_CLOSED: Signals = Signals(1);
+    pub const SIGNALED: Signals = Signals(1);
+    pub const FIFO_READABLE: Signals = Signals(1);
+    pub const FIFO_WRITABLE: Signals = Signals(1);
+    pub const HANDLE_CLOSED: Signals = Signals(1);
+    pub const LAST_HANDLE: Signals = Signals(1);
+    pub fn contains(self, other: Signals) -> bool { (self.0 & other.0) == other.0 }
+    pub fn bits(self) -> u32 { self.0 }
 }
+impl core::ops::BitOr for Signals { type Output = Self; fn bitor(self, r: Self) -> Self { Signals(self.0|r.0) } }
+impl core::ops::BitAnd for Signals { type Output = Self; fn bitand(self, r: Self) -> Self { Signals(self.0&r.0) } }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Channel Message

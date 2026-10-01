@@ -6,7 +6,6 @@ pub use tiling::{
     TilingStatistics,
     TilingWindowGeometry,
 };
-pub use tiling::{TilingLayout, TilingWindow, TilingWindowManager, WindowArea, Workspace};
 pub mod onboarding;
 pub mod shortcuts;
 

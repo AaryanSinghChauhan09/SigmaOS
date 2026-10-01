@@ -251,7 +251,6 @@ impl ZeroCopyRingBuffer {
 
     /// Get number of packets in ring
     pub fn len(&self) -> usize {
-        self.count.load(Ordering::SeqCst)
         let head = self.head.load(Ordering::SeqCst);
         let tail = self.tail.load(Ordering::SeqCst);
 

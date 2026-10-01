@@ -91,13 +91,7 @@ impl MemoryProtectionManager {
         let mask = (1u64 << config.randomization_bits) - 1;
         let random = (timestamp as u64) & mask;
 
-        // Align to a power-of-two boundary; saturating the configurable input
-        // above avoids zero-alignment underflow and invalid shifts.
-        random & !(alignment - 1)
-        let mask = (1u64 << config.randomization_bits) - 1;
-        let random = (timestamp as u64) & mask;
-
-        // Align to page boundary
+        // Align to a power-of-two boundary
         (random + config.page_alignment) & !(config.page_alignment - 1)
     }
 

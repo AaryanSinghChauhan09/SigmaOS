@@ -107,20 +107,12 @@ impl PQCContext {
         okm: &mut [u8],
     ) -> Result<(), PQCError> {
         if okm.is_empty() || ikm.is_empty() {
-    pub fn derive_key(&self, ikm: &[u8], salt: Option<&[u8]>, info: &[u8], okm: &mut [u8]) -> Result<(), PQCError> {
-        if okm.is_empty() {
             return Err(PQCError::InvalidOutputLength);
         }
 
         // In real implementation, would use SHA3-256 based HKDF
         // This is a stub that generates deterministic keys
         let salt_bytes = salt.filter(|s| !s.is_empty()).unwrap_or(&self.hkdf.salt);
-        let salt_bytes = if let Some(s) = salt {
-            s
-        } else {
-            &self.hkdf.salt
-        };
-        let salt_bytes = if let Some(s) = salt { s } else { &self.hkdf.salt };
 
         for i in 0..okm.len() {
             okm[i] = ikm[i % ikm.len()]

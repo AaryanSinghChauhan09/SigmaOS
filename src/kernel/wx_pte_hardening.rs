@@ -9,28 +9,41 @@ use std::sync::{Arc, Mutex};
 // Page Permission Model
 // ─────────────────────────────────────────────────────────────────────────────
 
-bitflags::bitflags! {
-    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub struct PageFlags: u64 {
-        /// PTE Present bit
-        const PRESENT    = 1 << 0;
-        /// Page is writable (PTE_W on x86, PTE_DBM on ARM64)
-        const WRITE      = 1 << 1;
-        /// Page is user-accessible
-        const USER       = 1 << 2;
-        /// Page Table Walk: Write-Through caching
-        const PWT        = 1 << 3;
-        /// Page Table Walk: Cache-Disable
-        const PCD        = 1 << 4;
-        /// Accessed by CPU (hardware sets this)
-        const ACCESSED   = 1 << 5;
-        /// Page has been written (hardware sets this)
-        const DIRTY      = 1 << 6;
-        /// 4 MiB / 2 MiB huge page (PSE bit)
-        const HUGE       = 1 << 7;
-        /// No-Execute bit (NX/XD on x86, UXN on ARM64) — bit 63 in real PTE
-        const NO_EXECUTE = 1 << 63;
-    }
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub struct PageFlags(pub u64);
+impl PageFlags {
+    pub const PRESENT:          PageFlags = PageFlags(1 << 0);
+    pub const WRITE:            PageFlags = PageFlags(1 << 1);
+    pub const WRITABLE:         PageFlags = PageFlags(1 << 1);
+    pub const USER:             PageFlags = PageFlags(1 << 2);
+    pub const WRITE_THROUGH:    PageFlags = PageFlags(1 << 3);
+    pub const CACHE_DISABLE:    PageFlags = PageFlags(1 << 4);
+    pub const ACCESSED:         PageFlags = PageFlags(1 << 5);
+    pub const DIRTY:            PageFlags = PageFlags(1 << 6);
+    pub const HUGE_PAGE:        PageFlags = PageFlags(1 << 7);
+    pub const GLOBAL:           PageFlags = PageFlags(1 << 8);
+    pub const EXECUTE:          PageFlags = PageFlags(1 << 9);
+    pub const NO_EXECUTE:       PageFlags = PageFlags(1 << 63);
+    pub const NO_EXEC:          PageFlags = PageFlags(1 << 63);
+
+    pub fn contains(self, other: PageFlags) -> bool { (self.0 & other.0) == other.0 }
+    pub fn bits(self) -> u64 { self.0 }
+    pub fn insert(&mut self, other: PageFlags) { self.0 |= other.0; }
+    pub fn remove(&mut self, other: PageFlags) { self.0 &= !other.0; }
+    pub fn from_bits_truncate(bits: u64) -> Self { PageFlags(bits) }
+    pub fn is_empty(self) -> bool { self.0 == 0 }
+}
+impl core::ops::BitOr for PageFlags {
+    type Output = Self;
+    fn bitor(self, rhs: Self) -> Self { PageFlags(self.0 | rhs.0) }
+}
+impl core::ops::BitAnd for PageFlags {
+    type Output = Self;
+    fn bitand(self, rhs: Self) -> Self { PageFlags(self.0 & rhs.0) }
+}
+impl core::ops::Not for PageFlags {
+    type Output = Self;
+    fn not(self) -> Self { PageFlags(!self.0) }
 }
 
 impl PageFlags {

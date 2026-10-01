@@ -19,35 +19,7 @@ pub use sovereign_screen_recorder::{
     CaptureSource, GpuEncoderType, RecorderState, RecordingStats, SovereignScreenRecorder,
 };
 
-pub use browser::{
-    ArcBoostDomainStylingEngine, ArcBoostScript, ArcBrowserBoostEngine, BraveAdblockEngine,
-    BraveScriptletInjectionEngine, BraveShieldsEngine, BrowserContainerType, BrowserProcess,
-    BrowserProcessType, BrowserTabInstance, ChromiumBlinkCssFlexLayoutEngine,
-    ChromiumBlinkLayoutEngine, ChromiumIpcChannelEngine, ChromiumIpcMessage,
-    DeclarativeNetRequestEngine, DnrActionType, DohEchEncryptionEngine, DuckAssistPrivacyEngine,
-    FirefoxContainerJarManager, FirefoxGeckoViewLayoutEngine, FloorpWorkspacesSplitViewEngine,
-    GlobalPrivacyControl, LadybirdLibWebCssParserEngine,
-    LibreWolfStrictFingerprintingProtectionEngine, MullvadPrivacyIsolationEngine, OnionCircuitNode,
-    OrionWebExtensionCompatibilityEngine, QuantumWebRenderEngine, ResistFingerprintingEngine,
-    SearchEngineType, SearchSwitcher, SecureStorageContainer, SigmaWebBrowser,
-    SovereignBrowserEngine, TabMemoryOptimizer, TelemetryAndTrackerStripper, TorCircuitManager,
-    TorOnionRoutingTunnelEngine, TorSecurityLevel, TrackerTrustGrade, UBlockOriginFilterEngine,
-    UngoogledChromiumPrivacyHardeningEngine, VivaldiSpatialNavigationEngine, ZenWorkspaceTreeEngine,
-    ChromiumPartitionAllocSlotGuardEngine, DeclarativeNetRequestEngine, DnrActionType,
-    DohEchEncryptionEngine, DuckAssistPrivacyEngine, DuckDuckGoAiAssistSummarizerEngine,
-    FirefoxContainerJarManager, FirefoxContentSecurityPolicyEngine, FirefoxGeckoFlexboxLayoutEngine,
-    FirefoxGeckoViewLayoutEngine, FirefoxTotalCookieProtectionEngine, FloorpSplitViewManagerEngine,
-    FloorpWorkspacesSplitViewEngine, GlobalPrivacyControl, LadybirdLibWebCss3ParserEngine,
-    LadybirdLibWebCssParserEngine, LibreWolfStrictFingerprintingProtectionEngine,
-    LibreWolfWebRtcProtectionEngine, MullvadODohRelayEngine, MullvadPrivacyIsolationEngine,
-    OnionCircuitNode, OrionWebExtensionCompatibilityEngine, QuantumWebRenderEngine,
-    ResistFingerprintingEngine, SearchEngineType, SearchSwitcher, SecureStorageContainer,
-    SigmaWebBrowser, SovereignBrowserEngine, TabMemoryOptimizer, TelemetryAndTrackerStripper,
-    TorCircuitManager, TorObfs4PacketFramingEngine, TorOnionRoutingTunnelEngine, TorSecurityLevel,
-    TrackerTrustGrade, UBlockOriginFilterEngine, UngoogledChromiumHostIpProtectionEngine,
-    UngoogledChromiumPrivacyHardeningEngine, VivaldiSpatialNavigationEngine,
-    VivaldiSpatialVectorNavEngine, ZenWorkspaceTreeEngine,
-};
+pub use browser::{ArcBoostDomainStylingEngine, ArcBoostScript, ArcBrowserBoostEngine, BraveAdblockEngine, BraveScriptletInjectionEngine, BraveShieldsEngine, BrowserContainerType, BrowserProcess, BrowserProcessType, BrowserTabInstance, ChromiumBlinkCssFlexLayoutEngine, ChromiumBlinkLayoutEngine, ChromiumIpcChannelEngine, ChromiumIpcMessage, DeclarativeNetRequestEngine, DnrActionType, DohEchEncryptionEngine, DuckAssistPrivacyEngine, FirefoxContainerJarManager, FirefoxGeckoViewLayoutEngine, FloorpWorkspacesSplitViewEngine, GlobalPrivacyControl, LadybirdLibWebCssParserEngine, LibreWolfStrictFingerprintingProtectionEngine, MullvadPrivacyIsolationEngine, OnionCircuitNode, OrionWebExtensionCompatibilityEngine, QuantumWebRenderEngine, ResistFingerprintingEngine, SearchEngineType, SearchSwitcher, SecureStorageContainer, SigmaWebBrowser, SovereignBrowserEngine, TabMemoryOptimizer, TelemetryAndTrackerStripper, TorCircuitManager, TorOnionRoutingTunnelEngine, TorSecurityLevel, TrackerTrustGrade, UBlockOriginFilterEngine, UngoogledChromiumPrivacyHardeningEngine, VivaldiSpatialNavigationEngine, ZenWorkspaceTreeEngine, ChromiumPartitionAllocSlotGuardEngine, DuckDuckGoAiAssistSummarizerEngine, FirefoxContentSecurityPolicyEngine, FirefoxGeckoFlexboxLayoutEngine, FirefoxTotalCookieProtectionEngine, FloorpSplitViewManagerEngine, LadybirdLibWebCss3ParserEngine, LibreWolfWebRtcProtectionEngine, MullvadODohRelayEngine, TorObfs4PacketFramingEngine, UngoogledChromiumHostIpProtectionEngine, VivaldiSpatialVectorNavEngine};
 
 pub use sovereign_video_player::{
     CGroup, CGroupController, CodecType, DnsResolver, InitService, NtpClient, PageTable,

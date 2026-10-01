@@ -151,6 +151,7 @@ pub enum DistroGuidelineStandard {
     FreeBsdCapsicumJails,
     OpenBsdPledgeUnveil,
     NixHermeticCasStore,
+    OpenBsdPledge,
 }
 
 /// Linux & BSD Distro Guidelines Rules Evaluator

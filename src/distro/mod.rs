@@ -365,9 +365,6 @@ pub use additional_linux_bsd_components::*;
 pub mod sovereign_media_and_distro_unimplemented_innovations;
 pub use sovereign_media_and_distro_unimplemented_innovations::*;
 
-pub mod sovereign_linux_bsd_media_wiki_unimplemented_ideas_engine;
-pub use sovereign_linux_bsd_media_wiki_unimplemented_ideas_engine::*;
-
 pub mod sovereign_2050_distro_supremacy_engine;
 pub use sovereign_2050_distro_supremacy_engine::*;
 
@@ -385,3 +382,6 @@ pub use sovereign_linux_bsd_ecosystem_pinnacle_suite::*;
 
 pub mod sovereign_linux_bsd_ecosystem_leap_suite;
 pub use sovereign_linux_bsd_ecosystem_leap_suite::*;
+
+pub mod sovereign_github_wiki_complete_deployment;
+pub mod sovereign_linux_bsd_distro_next_gen_innovations;

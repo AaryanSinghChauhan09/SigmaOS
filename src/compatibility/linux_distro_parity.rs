@@ -265,25 +265,11 @@ impl LinuxPamAuthenticationEngine {
         if username.is_empty() {
             return Err("PAM Authentication Error: Username empty");
         }
-
-        let _ = password;
         // Simulate pam_unix.so credential check
         // NOTE: Production authentication must use /etc/shadow with bcrypt/argon2
         // and must NOT use hardcoded credentials. This is a PAM simulation stub.
         let expected_hash = std::env::var("SIGMA_PAM_TEST_HASH")
             .unwrap_or_else(|_| String::from("__UNSET__"));
-        // Only allow auth if the env var is set and matches; never hardcode passwords
-        let is_valid = !expected_hash.is_empty()
-            && expected_hash != "__UNSET__"
-            && password == expected_hash;
-        // Simulate pam_unix.so credential check
-        // NOTE: Production authentication must use /etc/shadow with bcrypt/argon2
-        // and must NOT use hardcoded credentials. This is a PAM simulation stub.
-        let expected_hash =
-            std::env::var("SIGMA_PAM_TEST_HASH").unwrap_or_else(|_| String::from("__UNSET__"));
-        // Only allow auth if the env var is set and matches; never hardcode passwords
-        let is_valid =
-            !expected_hash.is_empty() && expected_hash != "__UNSET__" && password == expected_hash;
         // Only allow auth if the env var is set and matches; never hardcode credentials
         let is_valid = !expected_hash.is_empty()
             && expected_hash != "__UNSET__"

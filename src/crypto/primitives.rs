@@ -82,18 +82,12 @@ impl SHA256 {
 
     pub fn finalize(mut self) -> SHA256Hash {
         // Append padding
-        let bit_len = self.total_len.wrapping_mul(8);
         let bit_len = self.total_len * 8;
         let padding = [
             0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        let bit_len = self.total_len * 8;
-        let padding = [
-            0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0,
         ];
 
         let mut offset = 0;
@@ -372,11 +366,24 @@ pub fn sha256_hash(data: &[u8]) -> SHA256Hash {
     hasher.finalize()
 }
 
+/// Error type for cryptographic primitives.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PrimitiveError {
+    /// The entropy provider has not been integrated yet.
+    ProviderNotIntegrated,
+    /// Input buffer is too short.
+    BufferTooShort,
+    /// Invalid key or parameter.
+    InvalidParameter,
+}
+
 /// Secure randomness is unavailable until a real entropy provider is wired in.
 pub fn random_bytes(_buf: &mut [u8]) -> Result<(), PrimitiveError> {
     Err(PrimitiveError::ProviderNotIntegrated)
+}
+
 /// Generate random bytes with enhanced entropy collection
-pub fn random_bytes(buf: &mut [u8]) {
+pub fn random_bytes_with_entropy(buf: &mut [u8]) {
     static mut RNG: Option<XorshiftRNG> = None;
 
     unsafe {
@@ -431,29 +438,5 @@ pub fn random_key() -> AES256Key {
 pub fn xor_bytes(a: &[u8], b: &[u8], out: &mut [u8]) {
     for i in 0..out.len() {
         out[i] = a[i] ^ b[i];
-    }
-}
-
-#[cfg(test_disabled)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_primitives_dynamic_entropy() {
-        let key1 = random_key();
-        let mut key2 = AES256Key::new();
-        // Since random_bytes initializes RNG as a static mut thread-unsafe Option,
-        // let's confirm the bytes produced are initialized and filled.
-        random_bytes(&mut key2.data);
-
-        // Verify key length is 32 bytes (256-bit)
-        assert_eq!(key1.data.len(), 32);
-        assert_eq!(key2.data.len(), 32);
-
-        // Verify the key data has been modified from default zero state
-        let all_zeros_1 = key1.data.iter().all(|&b| b == 0);
-        let all_zeros_2 = key2.data.iter().all(|&b| b == 0);
-        assert!(!all_zeros_1);
-        assert!(!all_zeros_2);
     }
 }

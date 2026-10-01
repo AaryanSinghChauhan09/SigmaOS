@@ -269,57 +269,49 @@ impl KeyboardShortcutsManager {
             ShortcutCategory::Global => self
                 .shortcuts
                 .iter()
-                .filter(|s| {
-                    matches!(
-                        s.action,
-                        KeyAction::OpenLauncher
-                            | KeyAction::OpenTerminal
-                            | KeyAction::OpenFileManager
-                            | KeyAction::OpenWebBrowser
-                            | KeyAction::ShowDesktop
-                            | KeyAction::LockScreen
-                            | KeyAction::Screenshot
-                            | KeyAction::ScreenRecording
-                            | KeyAction::ToggleTheme
-                    )
-                })
+                .filter(|s| matches!(
+                    s.action,
+                    KeyAction::OpenLauncher
+                        | KeyAction::OpenTerminal
+                        | KeyAction::OpenFileManager
+                        | KeyAction::OpenWebBrowser
+                        | KeyAction::ShowDesktop
+                        | KeyAction::LockScreen
+                        | KeyAction::Screenshot
+                        | KeyAction::ScreenRecording
+                        | KeyAction::ToggleTheme
+                ))
                 .cloned()
                 .collect(),
             ShortcutCategory::WindowManagement => self
                 .shortcuts
                 .iter()
-                .filter(|s| {
-                    matches!(
-                        s.action,
-            ShortcutCategory::Global => {
-                self.shortcuts.iter()
-                    .filter(|s| matches!(s.action,
-                        KeyAction::OpenLauncher | KeyAction::OpenTerminal | KeyAction::OpenFileManager |
-                        KeyAction::OpenWebBrowser | KeyAction::ShowDesktop | KeyAction::LockScreen |
-                        KeyAction::Screenshot | KeyAction::ScreenRecording | KeyAction::ToggleTheme
-                    ))
-                    .cloned()
-                    .collect()
-            }
-            ShortcutCategory::WindowManagement => {
-                self.shortcuts.iter()
-                    .filter(|s| matches!(s.action,
-                        KeyAction::MaximizeWindow | KeyAction::TileWindow | KeyAction::CloseWindow
-                    ))
-                    .cloned()
-                    .collect()
-            }
-            ShortcutCategory::Application => {
-                self.shortcuts.iter()
-                    .filter(|s| !matches!(s.action,
-                        KeyAction::OpenLauncher | KeyAction::OpenTerminal | KeyAction::OpenFileManager |
-                        KeyAction::OpenWebBrowser | KeyAction::ShowDesktop | KeyAction::LockScreen |
-                        KeyAction::Screenshot | KeyAction::ScreenRecording | KeyAction::ToggleTheme |
-                        KeyAction::MaximizeWindow | KeyAction::TileWindow | KeyAction::CloseWindow
-                    ))
-                    .cloned()
-                    .collect()
-            }
+                .filter(|s| matches!(
+                    s.action,
+                    KeyAction::MaximizeWindow | KeyAction::TileWindow | KeyAction::CloseWindow
+                ))
+                .cloned()
+                .collect(),
+            ShortcutCategory::Application => self
+                .shortcuts
+                .iter()
+                .filter(|s| !matches!(
+                    s.action,
+                    KeyAction::OpenLauncher
+                        | KeyAction::OpenTerminal
+                        | KeyAction::OpenFileManager
+                        | KeyAction::OpenWebBrowser
+                        | KeyAction::ShowDesktop
+                        | KeyAction::LockScreen
+                        | KeyAction::Screenshot
+                        | KeyAction::ScreenRecording
+                        | KeyAction::ToggleTheme
+                        | KeyAction::MaximizeWindow
+                        | KeyAction::TileWindow
+                        | KeyAction::CloseWindow
+                ))
+                .cloned()
+                .collect(),
         }
     }
 

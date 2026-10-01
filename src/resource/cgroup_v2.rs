@@ -270,8 +270,6 @@ impl CgroupV2Manager {
             .cgroups
             .get_mut(cgroup_name)
             .ok_or("Cgroup not found")?;
-    pub fn add_memory_controller(&mut self, cgroup_name: &str, limit: u64, swap_limit: u64) -> Result<(), &'static str> {
-        let cgroup = self.cgroups.get_mut(cgroup_name).ok_or("Cgroup not found")?;
 
         let memory_controller = MemoryController {
             limit,
@@ -295,8 +293,6 @@ impl CgroupV2Manager {
             .cgroups
             .get_mut(cgroup_name)
             .ok_or("Cgroup not found")?;
-    pub fn add_cpu_controller(&mut self, cgroup_name: &str, shares: u64, max: Option<u64>) -> Result<(), &'static str> {
-        let cgroup = self.cgroups.get_mut(cgroup_name).ok_or("Cgroup not found")?;
 
         let cpu_controller = CpuController {
             shares,
@@ -315,7 +311,6 @@ impl CgroupV2Manager {
             .cgroups
             .get_mut(cgroup_name)
             .ok_or("Cgroup not found")?;
-        let cgroup = self.cgroups.get_mut(cgroup_name).ok_or("Cgroup not found")?;
 
         let pids_controller = PidsController {
             max,
@@ -332,7 +327,6 @@ impl CgroupV2Manager {
             .cgroups
             .get_mut(cgroup_name)
             .ok_or("Cgroup not found")?;
-        let cgroup = self.cgroups.get_mut(cgroup_name).ok_or("Cgroup not found")?;
 
         cgroup.add_process(pid);
         Ok(())

@@ -246,7 +246,6 @@ impl PostQuantumCryptoManager {
         &mut self,
         seed: &[u8; DILITHIUM_SEED_BYTES],
     ) -> Result<(DilithiumPublicKey, DilithiumSecretKey), &'static str> {
-        Err("ML-DSA provider unavailable; refusing to generate placeholder keys")
         // In real implementation:
         // 1. Use seed to expand with SHAKE256
         // 2. Generate matrix A and vectors s1, s2
@@ -262,8 +261,6 @@ impl PostQuantumCryptoManager {
         let public_key = DilithiumPublicKey::new(&pk_data)?;
 
         self.dilithium_keys.push((public_key.clone(), secret_key.clone()));
-        self.dilithium_keys
-            .push((public_key.clone(), secret_key.clone()));
         self.key_count.fetch_add(1, Ordering::SeqCst);
 
         Ok((public_key, secret_key))
@@ -273,7 +270,6 @@ impl PostQuantumCryptoManager {
         &mut self,
         seed: &[u8; KYBER_SEED_BYTES],
     ) -> Result<(KyberPublicKey, KyberSecretKey), &'static str> {
-        Err("ML-KEM provider unavailable; refusing to generate placeholder keys")
         // In real implementation:
         // 1. Use seed with SHAKE256
         // 2. Generate polynomial ring elements
@@ -291,8 +287,6 @@ impl PostQuantumCryptoManager {
         let public_key = KyberPublicKey::new(&pk_data)?;
 
         self.kyber_keys.push((public_key.clone(), secret_key.clone()));
-        self.kyber_keys
-            .push((public_key.clone(), secret_key.clone()));
         self.key_count.fetch_add(1, Ordering::SeqCst);
 
         Ok((public_key, secret_key))
