@@ -331,6 +331,7 @@ impl NetworkBondingManager {
         for slave in &bond.slaves {
             status.push_str(&format!(
                 "  - {}: {} ({} Mbps){}\n",
+            status.push_str(&format!("  - {}: {} ({} Mbps){}\n",
                 slave.name,
                 slave.status.as_str(),
                 slave.link_speed_mbps,
@@ -365,6 +366,7 @@ impl NetworkBondingManager {
             .iter()
             .filter(|b| b.status == BondStatus::Active)
             .count();
+        let active_bonds = self.bonds.iter().filter(|b| b.status == BondStatus::Active).count();
         stats.push_str(&format!("Active bonds: {}\n", active_bonds));
 
         stats

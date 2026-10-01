@@ -762,6 +762,9 @@ mod tests {
         assert_eq!(km.active_kernel, CachyKernelVariant::LinuxCachyosSchedExt);
     }
 
+
+
+
     #[test]
     fn test_bore_scheduler_ticks() {
         let bore = BoreSchedulerGovernor::new();

@@ -443,6 +443,7 @@ impl SovereignAgentRuntime {
         &self,
         capability: AgentCapability,
     ) -> Result<AgentId, AgentError> {
+    fn find_agent_for_capability(&self, capability: AgentCapability) -> Result<AgentId, AgentError> {
         self.capability_registry
             .get(&capability)
             .and_then(|agents| agents.first().copied())
@@ -473,6 +474,11 @@ impl SovereignAgentRuntime {
     }
 
     fn generate_code(&self, _agent_id: AgentId, spec: &PluginSpec) -> Result<String, AgentError> {
+    fn generate_code(
+        &self,
+        _agent_id: AgentId,
+        spec: &PluginSpec,
+    ) -> Result<String, AgentError> {
         let template = match spec.language {
             PluginLanguage::Rust => self.generate_rust_template(spec),
             PluginLanguage::Zig => self.generate_zig_template(spec),
@@ -576,6 +582,10 @@ mod tests {
         let agent_id = runtime
             .spawn_agent(AgentCapability::SystemAnalysis, AgentPriority::High)
             .unwrap();
+        let agent_id = runtime.spawn_agent(
+            AgentCapability::SystemAnalysis,
+            AgentPriority::High
+        ).unwrap();
 
         assert!(runtime.agents.contains_key(&agent_id));
     }
@@ -586,6 +596,10 @@ mod tests {
         let _agent_id = runtime
             .spawn_agent(AgentCapability::SystemAnalysis, AgentPriority::Critical)
             .unwrap();
+        let _agent_id = runtime.spawn_agent(
+            AgentCapability::SystemAnalysis,
+            AgentPriority::Critical
+        ).unwrap();
 
         let crash_dump = CrashDump {
             process_id: ProcessId(1234),
@@ -606,6 +620,10 @@ mod tests {
         let _agent_id = runtime
             .spawn_agent(AgentCapability::CodeGeneration, AgentPriority::Normal)
             .unwrap();
+        let _agent_id = runtime.spawn_agent(
+            AgentCapability::CodeGeneration,
+            AgentPriority::Normal
+        ).unwrap();
 
         let spec = PluginSpec {
             name: "TestWidget".into(),

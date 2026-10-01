@@ -142,6 +142,7 @@ impl DependencyGraph {
     pub fn add_service(&mut self, name: &str, dependencies: Vec<String>) {
         self.services
             .insert(String::from(name), dependencies.clone());
+        self.services.insert(String::from(name), dependencies.clone());
 
         for dep in &dependencies {
             self.reverse_deps
@@ -500,6 +501,7 @@ mod tests {
             "sshd",
             vec![String::from("network"), String::from("syslog")],
         );
+        graph.add_service("sshd", vec![String::from("network"), String::from("syslog")]);
 
         let order = graph.topological_sort().unwrap();
         assert!(order.len() == 3);
@@ -516,6 +518,8 @@ mod tests {
         let mut supervisor = Supervisor::new();
 
         let network = Service::new("network").with_command(vec![String::from("/bin/network")]);
+        let network = Service::new("network")
+            .with_command(vec![String::from("/bin/network")]);
 
         let sshd = Service::new("sshd")
             .with_command(vec![String::from("/bin/sshd")])
@@ -540,6 +544,8 @@ mod tests {
         let mut init = SigmaInit::new();
 
         let syslog = Service::new("syslog").with_command(vec![String::from("/bin/syslog")]);
+        let syslog = Service::new("syslog")
+            .with_command(vec![String::from("/bin/syslog")]);
 
         let network = Service::new("network")
             .with_command(vec![String::from("/bin/network")])

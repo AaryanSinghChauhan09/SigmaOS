@@ -274,6 +274,9 @@ impl SystemAuditManager {
             .iter()
             .filter(|e| e.event_type == AuditEventType::SecurityViolation)
             .count();
+        let auth_count = self.events.iter().filter(|e| e.event_type == AuditEventType::Authentication).count();
+        let file_count = self.events.iter().filter(|e| e.event_type == AuditEventType::FileAccess).count();
+        let security_count = self.events.iter().filter(|e| e.event_type == AuditEventType::SecurityViolation).count();
 
         stats.push_str(&format!("Authentication events: {}\n", auth_count));
         stats.push_str(&format!("File access events: {}\n", file_count));
@@ -290,6 +293,7 @@ impl SystemAuditManager {
             "Retention: {} days\n\n",
             self.config.retention_days
         ));
+        log.push_str(&format!("Retention: {} days\n\n", self.config.retention_days));
 
         for event in &self.events {
             log.push_str(&format!("{}\n", event.get_summary()));

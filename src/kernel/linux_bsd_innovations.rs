@@ -4572,6 +4572,7 @@ impl OpenSuseSnapperEngine {
 mod linux_bsd_extra_tests {
     use super::*;
 
+
     #[test]
     fn test_linux_landlock_lsm_rules() {
         let mut landlock = LinuxLandlockLsmRuleEngine::new(0x07);

@@ -29,6 +29,7 @@ impl BuddyAllocator {
         let max_order = (total_memory / min_block_size)
             .next_power_of_two()
             .trailing_zeros() as usize;
+        let max_order = (total_memory / min_block_size).next_power_of_two().trailing_zeros() as usize;
 
         let mut free_lists = vec![Vec::new(); max_order + 1];
 
@@ -117,6 +118,8 @@ impl BuddyAllocator {
         let mut block = self.free_lists[current_order]
             .pop()
             .ok_or("Block not found")?;
+    fn split_block(&mut self, current_order: usize, required_order: usize) -> Result<MemoryBlock, &'static str> {
+        let mut block = self.free_lists[current_order].pop().ok_or("Block not found")?;
 
         while block.order > required_order {
             let new_order = block.order - 1;
@@ -269,6 +272,7 @@ impl SlabCache {
             (self.slabs.len() as u64 * self.object_size as u64 * self.objects_per_slab as u64)
                 + self.object_size as u64;
             self.slabs.len() as u64 * self.object_size as u64 * self.objects_per_slab as u64;
+        let base_address = self.slabs.len() as u64 * self.object_size as u64 * self.objects_per_slab as u64;
 
         let mut slab = Vec::new();
         for i in 0..self.objects_per_slab {
@@ -280,6 +284,7 @@ impl SlabCache {
 
         self.free_objects
             .fetch_add(self.objects_per_slab, Ordering::SeqCst);
+        self.free_objects.fetch_add(self.objects_per_slab, Ordering::SeqCst);
         self.slabs.push(slab);
     }
 

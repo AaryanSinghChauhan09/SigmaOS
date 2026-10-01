@@ -332,6 +332,7 @@ impl TilingLayoutEngine {
                     width,
                     height,
                 };
+                window.geometry = Geometry { x, y, width, height };
 
                 // Split for next window
                 if horizontal {

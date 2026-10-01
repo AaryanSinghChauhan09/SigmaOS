@@ -541,6 +541,10 @@ mod tests {
         let child2 = button("Click").build();
 
         let parent = container().child(child1).child(child2).build();
+        let parent = container()
+            .child(child1)
+            .child(child2)
+            .build();
 
         assert_eq!(parent.children.len(), 2);
     }
@@ -560,6 +564,9 @@ mod tests {
         let mut api = WidgetApi::new(theme);
 
         let root = container().child(text("Test").build()).build();
+        let root = container()
+            .child(text("Test").build())
+            .build();
 
         let root_id = root.id;
         api.set_root(root);

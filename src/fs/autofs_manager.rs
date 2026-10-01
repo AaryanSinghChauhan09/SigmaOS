@@ -325,6 +325,10 @@ impl AutoFsManager {
             .iter()
             .filter(|e| e.state == AutoFsState::Failed)
             .count();
+        let mounted = self.entries.iter().filter(|e| e.state == AutoFsState::Mounted).count();
+        let idle = self.entries.iter().filter(|e| e.state == AutoFsState::Idle).count();
+        let triggered = self.entries.iter().filter(|e| e.state == AutoFsState::Triggered).count();
+        let failed = self.entries.iter().filter(|e| e.state == AutoFsState::Failed).count();
 
         AutoFsStats {
             total_entries: self.entries.len(),
@@ -382,6 +386,7 @@ mod tests {
             String::from("ext4"),
         )
         .with_option(String::from("noatime"));
+        ).with_option(String::from("noatime"));
 
         assert!(trigger.options.contains(&String::from("noatime")));
     }

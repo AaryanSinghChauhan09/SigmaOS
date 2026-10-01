@@ -571,6 +571,7 @@ mod tests {
             String::from("ESTABLISHED"),
         )
         .with_pid(1234);
+        ).with_pid(1234);
 
         assert_eq!(conn.pid, Some(1234));
     }

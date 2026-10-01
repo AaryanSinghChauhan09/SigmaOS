@@ -194,6 +194,7 @@ impl FilesystemEncryptionManager {
         if directory.status != EncryptionStatus::Encrypted
             && directory.status != EncryptionStatus::Locked
         {
+        if directory.status != EncryptionStatus::Encrypted && directory.status != EncryptionStatus::Locked {
             return Err(format!("Directory {} is not encrypted or locked", path));
         }
 
@@ -234,6 +235,7 @@ impl FilesystemEncryptionManager {
 
         if device.status != EncryptionStatus::Encrypted && device.status != EncryptionStatus::Locked
         {
+        if device.status != EncryptionStatus::Encrypted && device.status != EncryptionStatus::Locked {
             return Err(format!("Device {} is not encrypted or locked", device_path));
         }
 
@@ -311,6 +313,8 @@ impl FilesystemEncryptionManager {
             .filter(|d| {
                 d.status == EncryptionStatus::Encrypted || d.status == EncryptionStatus::Locked
             })
+        let encrypted_dirs = self.fscrypt_directories.iter()
+            .filter(|d| d.status == EncryptionStatus::Encrypted || d.status == EncryptionStatus::Locked)
             .count();
         let unlocked_dirs = self
             .fscrypt_directories
@@ -324,6 +328,8 @@ impl FilesystemEncryptionManager {
             .filter(|d| {
                 d.status == EncryptionStatus::Encrypted || d.status == EncryptionStatus::Locked
             })
+        let encrypted_devices = self.luks_devices.iter()
+            .filter(|d| d.status == EncryptionStatus::Encrypted || d.status == EncryptionStatus::Locked)
             .count();
         let unlocked_devices = self
             .luks_devices
@@ -343,6 +349,10 @@ impl FilesystemEncryptionManager {
             encrypted_devices,
             unlocked_devices
         ));
+        stats.push_str(&format!("Fscrypt directories: {} total, {} encrypted, {} unlocked\n",
+            self.fscrypt_directories.len(), encrypted_dirs, unlocked_dirs));
+        stats.push_str(&format!("LUKS devices: {} total, {} encrypted, {} unlocked\n",
+            self.luks_devices.len(), encrypted_devices, unlocked_devices));
 
         stats
     }

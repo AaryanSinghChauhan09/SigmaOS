@@ -151,6 +151,11 @@ impl JournalViewer {
             output.push_str(&format!(
                 "{} {} {}: {}\n",
                 entry.timestamp, entry.priority as u8, entry.service, entry.message
+            output.push_str(&format!("{} {} {}: {}\n",
+                entry.timestamp,
+                entry.priority as u8,
+                entry.service,
+                entry.message
             ));
         }
         Ok(output)

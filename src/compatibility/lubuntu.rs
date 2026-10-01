@@ -949,6 +949,8 @@ mod tests {
         assert_eq!(mgr.widgets.len(), 5);
     }
 
+
+
     #[test]
     fn test_lubuntu_system_diagnostics() {
         let manager = LubuntuSystemManager::new();

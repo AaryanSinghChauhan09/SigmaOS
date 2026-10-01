@@ -149,6 +149,7 @@ mod tests {
         fn exp_derivative(_t: f64, y: f64) -> f64 {
             y
         }
+        fn exp_derivative(_t: f64, y: f64) -> f64 { y }
 
         let mut y = 1.0;
         let dt = 0.1;

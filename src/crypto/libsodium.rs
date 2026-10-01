@@ -113,6 +113,7 @@ impl Auth {
         // Placeholder for actual HMAC-SHA256
         // This would use the SHA256 implementation from the hash module
 
+
         let mut combined = key.to_vec();
         combined.extend_from_slice(message);
 
@@ -367,6 +368,7 @@ impl Sign {
     ) {
         let mut public_key = [0u8; constants::CRYPTO_SIGN_PUBLICKEYBYTES];
         let secret_key = [0u8; constants::CRYPTO_SIGN_SECRETKEYBYTES];
+
 
         for _i in 0..constants::CRYPTO_SIGN_SECRETKEYBYTES {
             // secret_key[i] = random::random_byte(); // removed - not available

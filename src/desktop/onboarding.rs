@@ -550,6 +550,8 @@ mod tests {
         assert!(config.validate().is_ok());
 
         let invalid_config = OnboardingConfig::new().with_username(String::from("ab"));
+        let invalid_config = OnboardingConfig::new()
+            .with_username(String::from("ab"));
         assert!(invalid_config.validate().is_err());
     }
 

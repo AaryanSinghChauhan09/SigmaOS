@@ -259,6 +259,7 @@ mod tests {
         assert!(manager
             .handle_button_press(device.id, GamepadButton::A)
             .is_ok());
+        assert!(manager.handle_button_press(device.id, GamepadButton::A).is_ok());
 
         let state = manager.get_button_state(device.id, GamepadButton::A);
         assert_eq!(state, Some(true));
@@ -275,6 +276,8 @@ mod tests {
         assert!(manager
             .handle_button_release(device.id, GamepadButton::A)
             .is_ok());
+        manager.handle_button_press(device.id, GamepadButton::A).unwrap();
+        assert!(manager.handle_button_release(device.id, GamepadButton::A).is_ok());
 
         let state = manager.get_button_state(device.id, GamepadButton::A);
         assert_eq!(state, Some(false));
@@ -288,6 +291,7 @@ mod tests {
         assert!(manager
             .handle_axis_move(device.id, GamepadAxis::LeftStickX, 100)
             .is_ok());
+        assert!(manager.handle_axis_move(device.id, GamepadAxis::LeftStickX, 100).is_ok());
 
         let value = manager.get_axis_value(device.id, GamepadAxis::LeftStickX);
         assert_eq!(value, Some(100));
@@ -301,6 +305,7 @@ mod tests {
         manager
             .handle_button_press(device.id, GamepadButton::A)
             .unwrap();
+        manager.handle_button_press(device.id, GamepadButton::A).unwrap();
 
         assert_eq!(manager.event_count(), 1);
 

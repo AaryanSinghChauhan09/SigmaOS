@@ -432,6 +432,8 @@ mod tests {
 
         let builder_release =
             KernelModuleBuilder::new(String::from("test")).with_build_type(BuildType::Release);
+        let builder_release = KernelModuleBuilder::new(String::from("test"))
+            .with_build_type(BuildType::Release);
         assert_eq!(builder_release.build_type, BuildType::Release);
     }
 

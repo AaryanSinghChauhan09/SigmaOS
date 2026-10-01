@@ -602,6 +602,8 @@ mod tests {
         dispatcher
             .dispatch(LinuxSyscallNumber::Getppid as u64, &[])
             .unwrap();
+        dispatcher.dispatch(LinuxSyscallNumber::Getpid as u64, &[]).unwrap();
+        dispatcher.dispatch(LinuxSyscallNumber::Getppid as u64, &[]).unwrap();
 
         assert_eq!(dispatcher.syscall_count(), 2);
     }

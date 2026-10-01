@@ -246,6 +246,7 @@ mod tests {
         let endpoint = bus.register_endpoint(1, vec!["test.interface".to_string()]);
         bus.request_name("org.test".to_string(), endpoint.id)
             .unwrap();
+        bus.request_name("org.test".to_string(), endpoint.id).unwrap();
 
         assert!(bus.unregister_endpoint(endpoint.id).is_ok());
         assert_eq!(bus.endpoint_count(), 0);

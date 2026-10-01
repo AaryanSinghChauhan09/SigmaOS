@@ -321,6 +321,7 @@ impl PeripheralManager {
 
         self.devices
             .store(peripherals.len() as u32, Ordering::SeqCst);
+        self.devices.store(peripherals.len() as u32, Ordering::SeqCst);
         Ok(peripherals)
     }
 

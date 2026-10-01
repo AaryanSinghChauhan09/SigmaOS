@@ -157,6 +157,10 @@ impl PidfdProcDescManager {
         let pid = self.next_pid.fetch_add(1, Ordering::SeqCst);
 
         let procdesc = ProcDesc { pid, capabilities };
+        let procdesc = ProcDesc {
+            pid,
+            capabilities,
+        };
 
         self.procdescs.insert(pid, procdesc.clone());
 
@@ -246,6 +250,7 @@ impl PidfdProcDescManager {
             .entry(subreaper_pid)
             .or_insert_with(Vec::new)
             .push(orphan_pid);
+        self.process_tree.entry(subreaper_pid).or_insert_with(Vec::new).push(orphan_pid);
 
         Ok(subreaper_pid)
     }

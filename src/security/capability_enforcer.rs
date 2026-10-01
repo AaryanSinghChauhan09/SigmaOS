@@ -331,6 +331,7 @@ mod tests {
         enforcer
             .grant(ctx.id, LinuxCapability::DacOverride)
             .unwrap();
+        enforcer.grant(ctx.id, LinuxCapability::DacOverride).unwrap();
 
         assert!(enforcer.check_access(ctx.id, ResourceType::File, ResourcePermission::Write));
     }
@@ -353,6 +354,7 @@ mod tests {
         enforcer
             .grant(ctx.id, LinuxCapability::NetBindService)
             .unwrap();
+        enforcer.grant(ctx.id, LinuxCapability::NetBindService).unwrap();
 
         assert!(enforcer.check_access(ctx.id, ResourceType::Network, ResourcePermission::Bind));
     }

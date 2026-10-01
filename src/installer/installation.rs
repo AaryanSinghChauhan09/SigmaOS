@@ -215,6 +215,7 @@ impl InstallationConfig {
             " -drive file=sigmaos.qcow2,format=qcow2,size={}G",
             self.storage_gb
         ));
+        cmd.push_str(&format!(" -drive file=sigmaos.qcow2,format=qcow2,size={}G", self.storage_gb));
 
         if self.enable_kvm {
             cmd.push_str(" -enable-kvm");
@@ -400,6 +401,10 @@ mod tests {
         let config =
             InstallationConfig::new(InstallationMethod::VirtualMachine, Architecture::X86_64)
                 .with_vm_type(VmType::QEMU);
+        let config = InstallationConfig::new(
+            InstallationMethod::VirtualMachine,
+            Architecture::X86_64,
+        ).with_vm_type(VmType::QEMU);
 
         assert_eq!(config.vm_type, Some(VmType::QEMU));
         assert_eq!(config.memory_mb, 4096);
@@ -411,6 +416,10 @@ mod tests {
         let config =
             InstallationConfig::new(InstallationMethod::VirtualMachine, Architecture::X86_64)
                 .with_memory(8192);
+        let config = InstallationConfig::new(
+            InstallationMethod::VirtualMachine,
+            Architecture::X86_64,
+        ).with_memory(8192);
 
         assert_eq!(config.memory_mb, 8192);
     }
@@ -420,6 +429,10 @@ mod tests {
         let config =
             InstallationConfig::new(InstallationMethod::VirtualMachine, Architecture::X86_64)
                 .with_vm_type(VmType::QEMU);
+        let config = InstallationConfig::new(
+            InstallationMethod::VirtualMachine,
+            Architecture::X86_64,
+        ).with_vm_type(VmType::QEMU);
 
         let cmd = config.generate_qemu_command();
         assert!(cmd.contains("qemu-system-x86_64"));
@@ -445,6 +458,10 @@ mod tests {
         let invalid_config =
             InstallationConfig::new(InstallationMethod::BareMetal, Architecture::X86_64)
                 .with_memory(512);
+        let invalid_config = InstallationConfig::new(
+            InstallationMethod::BareMetal,
+            Architecture::X86_64,
+        ).with_memory(512);
         assert!(invalid_config.validate().is_err());
     }
 

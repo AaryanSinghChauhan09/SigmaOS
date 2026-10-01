@@ -219,6 +219,7 @@ mod tests {
         let mut eas = EnergyAwareScheduler::new();
         eas.queue_task_with_priority(1, 10000, 1.5, 255); // high priority
         eas.queue_task_with_priority(2, 100, 0.1, 0); // low priority
+        eas.queue_task_with_priority(2, 100, 0.1, 0);   // low priority
 
         let task = eas.schedule_next_task();
         assert!(task.is_some());

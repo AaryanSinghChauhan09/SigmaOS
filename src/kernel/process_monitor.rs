@@ -126,6 +126,7 @@ impl ProcessTreeNode {
             self.process.name,
             self.process.state.as_str()
         ));
+        output.push_str(&format!("{}[{}] {} ({})\n", prefix, self.process.pid, self.process.name, self.process.state.as_str()));
 
         for child in &self.children {
             output.push_str(&child.print_tree(indent + 1));
@@ -256,6 +257,7 @@ impl ProcessMonitor {
         let mut nodes: Vec<ProcessTreeNode> = Vec::new();
         let mut by_pid: std::collections::HashMap<u32, ProcessTreeNode> =
             std::collections::HashMap::new();
+        let mut by_pid: std::collections::HashMap<u32, ProcessTreeNode> = std::collections::HashMap::new();
 
         for process in &self.processes {
             by_pid.insert(process.pid, ProcessTreeNode::new(process.clone()));
@@ -335,6 +337,10 @@ impl ProcessMonitor {
             .iter()
             .filter(|p| p.state == MonitoredProcessState::Zombie)
             .count();
+        let running = self.processes.iter().filter(|p| p.state == MonitoredProcessState::Running).count();
+        let sleeping = self.processes.iter().filter(|p| p.state == MonitoredProcessState::Sleeping).count();
+        let stopped = self.processes.iter().filter(|p| p.state == MonitoredProcessState::Stopped).count();
+        let zombie = self.processes.iter().filter(|p| p.state == MonitoredProcessState::Zombie).count();
 
         stats.push_str(&format!("Running: {}\n", running));
         stats.push_str(&format!("Sleeping: {}\n", sleeping));

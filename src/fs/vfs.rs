@@ -413,6 +413,7 @@ mod tests {
 
         vfs.mount("/".to_string(), "ext4".to_string(), "/dev/sda1".to_string())
             .unwrap();
+        vfs.mount("/".to_string(), "ext4".to_string(), "/dev/sda1".to_string()).unwrap();
         assert_eq!(vfs.mount_count(), 1);
     }
 }

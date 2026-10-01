@@ -182,6 +182,10 @@ impl FstabEntry {
         let fs_type = FsType::from_str(parts[2]);
 
         let options: Vec<MountOption> = parts[3].split(',').map(MountOption::from_str).collect();
+        let options: Vec<MountOption> = parts[3]
+            .split(',')
+            .map(MountOption::from_str)
+            .collect();
 
         let dump = if parts.len() > 4 {
             parts[4].parse().unwrap_or(0)
@@ -350,6 +354,9 @@ mod tests {
         .with_options(vec![MountOption::Noatime, MountOption::Ssd])
         .with_dump(0)
         .with_fsck_order(2);
+        ).with_options(vec![MountOption::Noatime, MountOption::Ssd])
+         .with_dump(0)
+         .with_fsck_order(2);
 
         assert_eq!(entry.options.len(), 2);
         assert_eq!(entry.dump, 0);
@@ -366,6 +373,9 @@ mod tests {
         .with_options(vec![MountOption::Defaults])
         .with_dump(0)
         .with_fsck_order(2);
+        ).with_options(vec![MountOption::Defaults])
+         .with_dump(0)
+         .with_fsck_order(2);
 
         let line = entry.to_fstab_line();
         assert!(line.contains("/dev/sda1"));
@@ -503,6 +513,9 @@ mod tests {
         .with_options(vec![MountOption::Noatime, MountOption::Ssd])
         .with_dump(0)
         .with_fsck_order(2);
+        ).with_options(vec![MountOption::Noatime, MountOption::Ssd])
+         .with_dump(0)
+         .with_fsck_order(2);
 
         let line = original.to_fstab_line();
         let parsed = FstabEntry::from_fstab_line(&line).unwrap();

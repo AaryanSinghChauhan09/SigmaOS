@@ -1412,6 +1412,8 @@ mod tests {
         assert!(emerge.emerge_world_rebuild().contains("3 atoms"));
     }
 
+
+
     #[test]
     fn test_rolling_release_manager() {
         let mut manager = SigmaRollingReleaseManager::new("arch-sigma");

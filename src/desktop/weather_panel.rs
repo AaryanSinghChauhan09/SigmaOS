@@ -114,6 +114,7 @@ impl WeatherPanel {
                     "Condition: {}\n",
                     self.condition_to_string(&weather.condition)
                 ));
+                output.push_str(&format!("Condition: {}\n", self.condition_to_string(&weather.condition)));
 
                 if self.units_metric {
                     output.push_str(&format!(
@@ -172,6 +173,7 @@ impl WeatherPanel {
                 "   Condition: {}\n",
                 self.condition_to_string(&forecast.condition)
             ));
+            output.push_str(&format!("   Condition: {}\n", self.condition_to_string(&forecast.condition)));
             output.push_str("\n");
         }
 

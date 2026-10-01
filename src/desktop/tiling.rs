@@ -664,6 +664,12 @@ mod tests {
         assert_eq!(geom.width, 800);
         assert_eq!(geom.height, 600);
         assert_eq!(geom.area(), 480000);
+    fn test_create_workspace() {
+        let mut manager = TilingWindowManager::new();
+
+        let workspace = manager.create_workspace("1".to_string(), TilingLayout::Spiral);
+        assert_eq!(workspace.id, 1);
+        assert_eq!(manager.workspace_count(), 1);
     }
 
     #[test]
@@ -757,6 +763,7 @@ mod tests {
             width: 800,
             height: 600,
         };
+        let area = WindowArea { x: 0, y: 0, width: 800, height: 600 };
 
         let window = manager.add_window(workspace.id, area);
         assert_eq!(window.id, 1);
@@ -774,6 +781,7 @@ mod tests {
             width: 800,
             height: 600,
         };
+        let area = WindowArea { x: 0, y: 0, width: 800, height: 600 };
 
         let window = manager.add_window(workspace.id, area);
         assert!(manager.remove_window(window.id).is_ok());

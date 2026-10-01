@@ -304,6 +304,13 @@ impl KernelModuleLoadingController {
                     }
                 )
             })
+        self.modules.iter()
+            .map(|m| format!("{} {} ({}, {})",
+                m.name,
+                m.version,
+                if m.loaded { "loaded" } else { "not loaded" },
+                if m.signature_verified { "signed" } else { "unsigned" }
+            ))
             .collect()
     }
 
@@ -319,6 +326,12 @@ impl KernelModuleLoadingController {
                     r.requires_signature
                 )
             })
+        self.rules.iter()
+            .map(|r| format!("{}: {} (signature required: {})",
+                r.module_name,
+                if r.allowed { "allowed" } else { "denied" },
+                r.requires_signature
+            ))
             .collect()
     }
 
@@ -338,6 +351,8 @@ impl KernelModuleLoadingController {
                 "disabled"
             }
         ));
+        stats.push_str(&format!("Loading policy: {}\n", self.loading_policy.as_str()));
+        stats.push_str(&format!("Signature checking: {}\n", if self.signature_checking_enabled { "enabled" } else { "disabled" }));
 
         let total_modules = self.modules.len();
         let loaded_modules = self.modules.iter().filter(|m| m.loaded).count();

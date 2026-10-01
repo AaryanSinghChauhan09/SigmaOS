@@ -328,6 +328,9 @@ impl FilesystemMonitor {
             "Inode tables monitored: {}\n",
             self.inode_usage.len()
         ));
+        stats.push_str(&format!("Filesystems monitored: {}\n", self.disk_usage.len()));
+        stats.push_str(&format!("Directories monitored: {}\n", self.directory_sizes.len()));
+        stats.push_str(&format!("Inode tables monitored: {}\n", self.inode_usage.len()));
 
         let total_usage = self.get_total_disk_usage();
         let total_capacity = self.get_total_disk_capacity();
@@ -342,6 +345,7 @@ impl FilesystemMonitor {
             "High usage filesystems (>90%): {}\n",
             high_usage.len()
         ));
+        stats.push_str(&format!("High usage filesystems (>90%): {}\n", high_usage.len()));
 
         let high_inode = self.get_high_inode_usage(90.0);
         stats.push_str(&format!("High inode usage (>90%): {}\n", high_inode.len()));
@@ -504,6 +508,7 @@ mod tests {
             String::from("/dev/sda2"),
             String::from("ext4"),
         );
+        let mut usage2 = DiskUsage::new(String::from("/home"), String::from("/dev/sda2"), String::from("ext4"));
         usage2.usage_percent = 50.0;
         monitor.add_disk_usage(usage2);
 
@@ -534,6 +539,7 @@ mod tests {
             String::from("/dev/sda2"),
             String::from("ext4"),
         );
+        let mut usage2 = DiskUsage::new(String::from("/home"), String::from("/dev/sda2"), String::from("ext4"));
         usage2.usage_percent = 50.0;
         monitor.add_disk_usage(usage2);
 

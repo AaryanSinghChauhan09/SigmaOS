@@ -556,6 +556,8 @@ mod tests {
         assert_eq!(reset, UndercoverDisguiseTheme::DefaultKali);
     }
 
+
+
     #[test]
     fn test_pam_and_sudo_escalations() {
         let root_pash_hash = [0x77u8; 16];

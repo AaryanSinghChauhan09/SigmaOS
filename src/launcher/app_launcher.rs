@@ -167,6 +167,7 @@ impl AppEntry {
         }
 
         0 // No match
+        0  // No match
     }
 }
 
@@ -496,6 +497,11 @@ mod tests {
 
         assert!(app.matches_query("ÜB"));
         assert_eq!(app.fuzzy_score("ÜBER TERMINAL"), 1000);
+    }
+
+        assert_eq!(app.fuzzy_score("firefox browser"), 1000);  // Exact
+        assert_eq!(app.fuzzy_score("firefox"), 900);  // Prefix
+        assert!(app.fuzzy_score("fox") > 0);  // Fuzzy
     }
 
     #[test]

@@ -367,6 +367,9 @@ impl ThemeEngine {
 
         // Sort by luminance
         colors.sort_by(|a, b| a.luminance().partial_cmp(&b.luminance()).unwrap());
+        colors.sort_by(|a, b| {
+            a.luminance().partial_cmp(&b.luminance()).unwrap()
+        });
 
         // Pick dark/light and accent colors
         let background = colors.first().copied().unwrap_or(Color::rgb(30, 30, 30));
@@ -375,6 +378,7 @@ impl ThemeEngine {
             .get(colors.len() / 2)
             .copied()
             .unwrap_or(Color::rgb(100, 149, 237));
+        let accent = colors.get(colors.len() / 2).copied().unwrap_or(Color::rgb(100, 149, 237));
 
         Ok(ColorScheme {
             background,

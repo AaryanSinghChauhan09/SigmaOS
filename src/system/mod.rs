@@ -109,3 +109,7 @@ pub use state::{
 };
 pub use syslog::{LogAction, LogEntry, LogFacility, LogLevel, LogRule, SyslogError, SyslogManager};
 pub use user::{Group, ShadowEntry, SudoPolicyEngine, SudoersRule, User, UserError, UserManager};
+pub use service_manager::{
+    SystemServiceState, SystemServiceType, SystemRestartPolicy,
+    SystemServiceConfig, SystemService, SystemServiceManager,
+};

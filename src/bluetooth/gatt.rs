@@ -246,6 +246,12 @@ mod tests {
         assert!(client
             .write_characteristic(device.id, char_handle, value.clone())
             .is_ok());
+        client.discover_characteristics(device.id, service_handle).unwrap();
+
+        let char_handle = client.get_device(device.id).unwrap().services[0].characteristics[0].handle;
+        let value = vec![1, 2, 3, 4];
+
+        assert!(client.write_characteristic(device.id, char_handle, value.clone()).is_ok());
 
         let read_value = client.read_characteristic(device.id, char_handle).unwrap();
         assert_eq!(read_value, value);

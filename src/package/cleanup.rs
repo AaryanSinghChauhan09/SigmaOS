@@ -447,6 +447,8 @@ mod tests {
             String::from("1.0.0"),
             2048,
         ));
+        manager.add_orphan(OrphanPackage::new(String::from("test1"), String::from("1.0.0"), 1024));
+        manager.add_orphan(OrphanPackage::new(String::from("test2"), String::from("1.0.0"), 2048));
 
         let result = manager.autoremove();
         assert_eq!(result.packages_removed.len(), 2);
@@ -506,6 +508,7 @@ mod tests {
             String::from("1.0.0"),
             1024,
         ));
+        manager.add_orphan(OrphanPackage::new(String::from("test1"), String::from("1.0.0"), 1024));
 
         let result = manager.remove_orphans();
         assert_eq!(result.packages_removed.len(), 1);

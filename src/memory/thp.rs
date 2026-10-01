@@ -199,6 +199,15 @@ impl ThpManager {
         let total_1gb = self
             .allocations
             .values()
+        let active_allocations = self.allocations.values()
+            .filter(|a| a.allocated)
+            .count();
+
+        let total_2mb = self.allocations.values()
+            .filter(|a| a.allocated && a.page_size == HugePageSize::Size2MB)
+            .count();
+
+        let total_1gb = self.allocations.values()
             .filter(|a| a.allocated && a.page_size == HugePageSize::Size1GB)
             .count();
 
@@ -237,6 +246,7 @@ mod tests {
         let addr = thp
             .allocate(2 * 1024 * 1024, HugePageSize::Size2MB)
             .unwrap();
+        let addr = thp.allocate(2 * 1024 * 1024, HugePageSize::Size2MB).unwrap();
         assert!(addr > 0);
         assert_eq!(thp.allocation_count(), 1);
     }
@@ -248,6 +258,7 @@ mod tests {
         let addr = thp
             .allocate(2 * 1024 * 1024, HugePageSize::Size2MB)
             .unwrap();
+        let addr = thp.allocate(2 * 1024 * 1024, HugePageSize::Size2MB).unwrap();
         assert!(thp.free(addr).is_ok());
     }
 
@@ -270,6 +281,7 @@ mod tests {
         let addr = thp
             .allocate(2 * 1024 * 1024, HugePageSize::Size2MB)
             .unwrap();
+        let addr = thp.allocate(2 * 1024 * 1024, HugePageSize::Size2MB).unwrap();
         assert!(addr > 0);
     }
 
@@ -309,6 +321,8 @@ mod tests {
             .unwrap();
         thp.allocate(1024 * 1024 * 1024, HugePageSize::Size1GB)
             .unwrap();
+        thp.allocate(2 * 1024 * 1024, HugePageSize::Size2MB).unwrap();
+        thp.allocate(1024 * 1024 * 1024, HugePageSize::Size1GB).unwrap();
 
         let stats = thp.get_stats();
         assert_eq!(stats.total_2mb, 1);
@@ -321,6 +335,7 @@ mod tests {
 
         thp.allocate(2 * 1024 * 1024, HugePageSize::Size2MB)
             .unwrap();
+        thp.allocate(2 * 1024 * 1024, HugePageSize::Size2MB).unwrap();
 
         let total = thp.total_huge_memory();
         assert_eq!(total, 2 * 1024 * 1024);

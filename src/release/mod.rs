@@ -290,6 +290,8 @@ impl VersionManager {
         let minor = parts[1]
             .parse::<u32>()
             .map_err(|_| VersionError::InvalidNumber)?;
+        let major = parts[0].parse::<u32>().map_err(|_| VersionError::InvalidNumber)?;
+        let minor = parts[1].parse::<u32>().map_err(|_| VersionError::InvalidNumber)?;
 
         let patch_str = parts[2].split('-').next().unwrap_or(parts[2]);
         let patch_str = patch_str.split('+').next().unwrap_or(patch_str);

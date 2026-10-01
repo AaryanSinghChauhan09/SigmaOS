@@ -281,6 +281,8 @@ impl CgroupV2Manager {
             .cgroups
             .get_mut(cgroup_name)
             .ok_or("Cgroup not found")?;
+    pub fn add_memory_controller(&mut self, cgroup_name: &str, limit: u64, swap_limit: u64) -> Result<(), &'static str> {
+        let cgroup = self.cgroups.get_mut(cgroup_name).ok_or("Cgroup not found")?;
 
         let memory_controller = MemoryController {
             limit,
@@ -304,6 +306,8 @@ impl CgroupV2Manager {
             .cgroups
             .get_mut(cgroup_name)
             .ok_or("Cgroup not found")?;
+    pub fn add_cpu_controller(&mut self, cgroup_name: &str, shares: u64, max: Option<u64>) -> Result<(), &'static str> {
+        let cgroup = self.cgroups.get_mut(cgroup_name).ok_or("Cgroup not found")?;
 
         let cpu_controller = CpuController {
             shares,
@@ -322,6 +326,7 @@ impl CgroupV2Manager {
             .cgroups
             .get_mut(cgroup_name)
             .ok_or("Cgroup not found")?;
+        let cgroup = self.cgroups.get_mut(cgroup_name).ok_or("Cgroup not found")?;
 
         let pids_controller = PidsController {
             max,
@@ -338,6 +343,7 @@ impl CgroupV2Manager {
             .cgroups
             .get_mut(cgroup_name)
             .ok_or("Cgroup not found")?;
+        let cgroup = self.cgroups.get_mut(cgroup_name).ok_or("Cgroup not found")?;
 
         cgroup.add_process(pid);
         Ok(())
@@ -365,6 +371,7 @@ mod tests {
         assert!(manager
             .create_cgroup("/test".to_string(), Some("/".to_string()))
             .is_ok());
+        assert!(manager.create_cgroup("/test".to_string(), Some("/".to_string())).is_ok());
         assert_eq!(manager.cgroup_count(), 2);
     }
 
@@ -375,6 +382,7 @@ mod tests {
         manager
             .create_cgroup("/test".to_string(), Some("/".to_string()))
             .unwrap();
+        manager.create_cgroup("/test".to_string(), Some("/".to_string())).unwrap();
         assert!(manager.delete_cgroup("/test").is_ok());
         assert_eq!(manager.cgroup_count(), 1);
     }
@@ -396,6 +404,8 @@ mod tests {
         assert!(manager
             .add_memory_controller("/test", 1024 * 1024 * 1024, 512 * 1024 * 1024)
             .is_ok());
+        manager.create_cgroup("/test".to_string(), Some("/".to_string())).unwrap();
+        assert!(manager.add_memory_controller("/test", 1024 * 1024 * 1024, 512 * 1024 * 1024).is_ok());
     }
 
     #[test]
@@ -408,6 +418,8 @@ mod tests {
         assert!(manager
             .add_cpu_controller("/test", 1024, Some(500000))
             .is_ok());
+        manager.create_cgroup("/test".to_string(), Some("/".to_string())).unwrap();
+        assert!(manager.add_cpu_controller("/test", 1024, Some(500000)).is_ok());
     }
 
     #[test]
@@ -417,6 +429,7 @@ mod tests {
         manager
             .create_cgroup("/test".to_string(), Some("/".to_string()))
             .unwrap();
+        manager.create_cgroup("/test".to_string(), Some("/".to_string())).unwrap();
         assert!(manager.add_pids_controller("/test", 100).is_ok());
     }
 
@@ -427,6 +440,7 @@ mod tests {
         manager
             .create_cgroup("/test".to_string(), Some("/".to_string()))
             .unwrap();
+        manager.create_cgroup("/test".to_string(), Some("/".to_string())).unwrap();
         assert!(manager.move_process("/test", 1234).is_ok());
 
         let cgroup = manager.get_cgroup("/test").unwrap();
@@ -440,6 +454,7 @@ mod tests {
         manager
             .create_cgroup("/test".to_string(), Some("/".to_string()))
             .unwrap();
+        manager.create_cgroup("/test".to_string(), Some("/".to_string())).unwrap();
 
         let cgroup = manager.get_cgroup_mut("/test").unwrap();
         cgroup.disable();

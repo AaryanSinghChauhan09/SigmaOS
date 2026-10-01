@@ -151,6 +151,8 @@ impl ComplianceOverviewDashboard {
             + environmental_score
             + banking_score)
             / 5.0;
+        self.overall_compliance_score = (governance_score + taxation_score + labour_score
+            + environmental_score + banking_score) / 5.0;
     }
 
     pub fn add_alert(&mut self, severity: AlertSeverity, message: String, deadline: String) {
@@ -622,6 +624,11 @@ mod tests {
         let mut dashboard = ComplianceOverviewDashboard::new();
 
         dashboard.add_deadline("GSTR-3B Filing".to_string(), "2026-08-20".to_string(), 14);
+        dashboard.add_deadline(
+            "GSTR-3B Filing".to_string(),
+            "2026-08-20".to_string(),
+            14,
+        );
 
         assert_eq!(dashboard.upcoming_deadlines.len(), 1);
         assert_eq!(dashboard.upcoming_deadlines[0].days_remaining, 14);

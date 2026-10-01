@@ -845,6 +845,7 @@ mod tests {
         assert_eq!(zram.total_compressed_bytes, 2048);
     }
 
+
     #[test]
     fn test_linux_compat_spec() {
         let spec = LinuxCompatSpec::default();

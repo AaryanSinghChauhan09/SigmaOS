@@ -258,6 +258,7 @@ impl RtScheduler {
         // Sort by priority (lower value = higher priority)
         self.runnable_tasks
             .sort_by(|a, b| a.priority.cmp(&b.priority));
+        self.runnable_tasks.sort_by(|a, b| a.priority.cmp(&b.priority));
 
         if let Some(current) = self.current_task.take() {
             if current.state == ProcessState::Running {

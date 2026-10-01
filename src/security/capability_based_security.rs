@@ -93,6 +93,7 @@ impl CapabilityManager {
         // Remove existing grant for same capability
         self.grants
             .retain(|g| !(g.process_name == process_name && g.capability == capability));
+        self.grants.retain(|g| !(g.process_name == process_name && g.capability == capability));
 
         let grant = CapabilityGrant::new(process_name, capability);
         self.grants.push(grant);
@@ -200,6 +201,10 @@ mod tests {
         let mut manager = CapabilityManager::new();
         manager.grant(String::from("test_process"), CapabilityType::Read);
         assert!(manager.revoke(String::from("test_process"), CapabilityType::Read,));
+        assert!(manager.revoke(
+            String::from("test_process"),
+            CapabilityType::Read,
+        ));
 
         let grant = manager.grants.first().unwrap();
         assert!(!grant.is_granted());

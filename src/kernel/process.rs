@@ -472,6 +472,7 @@ impl ProcessManager {
             mask: 0,
             flags: 0,
         });
+        p.sig_actions = core::array::from_fn(|_| SigAction { handler: 0, mask: 0, flags: 0 });
 
         Ok(ehdr.e_entry)
     }

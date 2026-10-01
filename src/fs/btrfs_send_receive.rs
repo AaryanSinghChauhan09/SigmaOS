@@ -218,6 +218,10 @@ impl BtrfsSendReceiveManager {
                 .unwrap_or_default()
                 .as_nanos()
         );
+        let uuid = format!("{}-{}", id, std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_nanos());
 
         let subvol = BtrfsSubvolume {
             id,
