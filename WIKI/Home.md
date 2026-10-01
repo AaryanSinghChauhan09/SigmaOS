@@ -306,7 +306,7 @@ git push origin feature/your-feature
 
 | Document | Description |
 |----------|-------------|
-| [SOVEREIGN_OS_ULTRA_ENCYCLOPEDIA_V40.md](../docs/SOVEREIGN_OS_ABSOLUTE_OMNIPRESENT_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA_V40.md) | Absolute Omnipresent Self-Sufficiency Ultra Encyclopedia V40 |
+| [SOVEREIGN_OS_ULTRA_ENCYCLOPEDIA_V41.md](../docs/SOVEREIGN_OS_ABSOLUTE_OMNIPRESENT_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA_V41.md) | Absolute Omnipresent Self-Sufficiency Ultra Encyclopedia V41 |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Detailed system architecture guide |
 | [docs/PRODUCT_VISION.md](docs/PRODUCT_VISION.md) | Product vision and manifesto |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Master execution roadmap |
