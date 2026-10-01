@@ -1,10 +1,8 @@
 //! System Update Functions (apt/dnf Inspiration)
 //! Package manager, update manager, and repository manager
 
-
-
-use std::vec::Vec;
 use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Package
 #[derive(Debug, Clone)]
@@ -145,7 +143,10 @@ impl PackageManager {
     }
 
     pub fn search(&self, query: &str) -> Vec<&Package> {
-        self.packages.iter().filter(|p| p.name.contains(query)).collect()
+        self.packages
+            .iter()
+            .filter(|p| p.name.contains(query))
+            .collect()
     }
 
     pub fn get_info(&self, package_name: &str) -> Option<&Package> {

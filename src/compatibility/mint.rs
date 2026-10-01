@@ -72,13 +72,15 @@ impl MintUpdateManager {
     }
 
     pub fn get_security_updates(&self) -> Vec<&UpdatePackage> {
-        self.available_updates.iter()
+        self.available_updates
+            .iter()
             .filter(|u| u.level == UpdateLevel::Security)
             .collect()
     }
 
     pub fn get_recommended_updates(&self) -> Vec<&UpdatePackage> {
-        self.available_updates.iter()
+        self.available_updates
+            .iter()
             .filter(|u| u.level == UpdateLevel::Recommended)
             .collect()
     }
@@ -98,7 +100,7 @@ impl MintUpdateManager {
         let security_count = self.get_security_updates().len();
         let recommended_count = self.get_recommended_updates().len();
         let total_size = self.calculate_total_update_size();
-        
+
         std::format!(
             "MintUpdate Summary:\n\
              Security updates: {}\n\
@@ -110,7 +112,11 @@ impl MintUpdateManager {
             recommended_count,
             self.flatpak_updates.len(),
             total_size / (1024 * 1024),
-            if self.auto_update_enabled { "Enabled" } else { "Disabled" }
+            if self.auto_update_enabled {
+                "Enabled"
+            } else {
+                "Disabled"
+            }
         )
     }
 }
@@ -182,20 +188,25 @@ impl MintInstallManager {
     }
 
     pub fn search_packages(&self, query: &str) -> Vec<&SoftwarePackage> {
-        self.packages.iter()
-            .filter(|p| p.name.to_lowercase().contains(&query.to_lowercase()) 
-                || p.description.to_lowercase().contains(&query.to_lowercase()))
+        self.packages
+            .iter()
+            .filter(|p| {
+                p.name.to_lowercase().contains(&query.to_lowercase())
+                    || p.description.to_lowercase().contains(&query.to_lowercase())
+            })
             .collect()
     }
 
     pub fn get_category_packages(&self, category: &str) -> Vec<&SoftwarePackage> {
-        self.packages.iter()
+        self.packages
+            .iter()
             .filter(|p| p.category == category)
             .collect()
     }
 
     pub fn get_flatpak_match(&self, apt_package: &str) -> Option<&SoftwarePackage> {
-        self.packages.iter()
+        self.packages
+            .iter()
             .find(|p| p.source == PackageSource::Flatpak && p.name == apt_package)
     }
 }
@@ -406,13 +417,16 @@ impl LinuxMintIntegrationEngine {
     }
 
     pub fn configure_desktop(&mut self) {
-        self.desktop_manager.add_panel(CinnamonPanelPosition::Bottom, 48);
-        self.desktop_manager.add_panel(CinnamonPanelPosition::Top, 32);
+        self.desktop_manager
+            .add_panel(CinnamonPanelPosition::Bottom, 48);
+        self.desktop_manager
+            .add_panel(CinnamonPanelPosition::Top, 32);
     }
 
     pub fn apply_mint_defaults(&mut self) {
         self.xapp_preferences.set_dark_mode(false);
-        self.system_config.set_update_level(UpdateLevel::Recommended);
+        self.system_config
+            .set_update_level(UpdateLevel::Recommended);
     }
 
     pub fn generate_integration_report(&self) -> String {
@@ -445,7 +459,7 @@ mod tests {
     #[test]
     fn test_mint_update_manager() {
         let mut manager = MintUpdateManager::new();
-        
+
         let security_update = UpdatePackage {
             name: "linux-kernel".to_string(),
             old_version: "5.15.0".to_string(),
@@ -454,10 +468,10 @@ mod tests {
             size: 10 * 1024 * 1024, // 10MB
             description: "Critical security fix".to_string(),
         };
-        
+
         manager.add_update(security_update);
         manager.enable_auto_security_updates();
-        
+
         assert_eq!(manager.get_security_updates().len(), 1);
         assert!(manager.auto_update_enabled);
     }
@@ -465,7 +479,7 @@ mod tests {
     #[test]
     fn test_mint_install_manager() {
         let mut manager = MintInstallManager::new();
-        
+
         let vim = SoftwarePackage {
             name: "vim".to_string(),
             version: "8.2".to_string(),
@@ -476,7 +490,7 @@ mod tests {
             rating: 4.5,
             icon_path: "/usr/share/icons/vim.png".to_string(),
         };
-        
+
         manager.add_package(vim);
         assert!(manager.install_package("vim").is_ok());
         assert!(manager.installed_packages.contains(&"vim".to_string()));
@@ -487,9 +501,11 @@ mod tests {
         let mut desktop = CinnamonDesktopManager::new();
         desktop.add_panel(CinnamonPanelPosition::Bottom, 48);
         desktop.add_applet_to_panel(0, "menu@cinnamon");
-        
+
         assert_eq!(desktop.get_panel_count(), 1);
-        assert!(desktop.panels[0].applets.contains(&"menu@cinnamon".to_string()));
+        assert!(desktop.panels[0]
+            .applets
+            .contains(&"menu@cinnamon".to_string()));
     }
 
     #[test]
@@ -497,7 +513,7 @@ mod tests {
         let mut prefs = XAppPreferences::new();
         prefs.set_dark_mode(true);
         prefs.set_accent_color("#ff6b6b");
-        
+
         assert!(prefs.dark_mode);
         assert_eq!(prefs.accent_color, "#ff6b6b");
     }
@@ -507,7 +523,7 @@ mod tests {
         let mut mint = LinuxMintIntegrationEngine::new();
         mint.apply_mint_defaults();
         mint.configure_desktop();
-        
+
         let report = mint.generate_integration_report();
         assert!(report.contains("Linux Mint Integration Report"));
         assert!(report.contains("Panels: 2"));

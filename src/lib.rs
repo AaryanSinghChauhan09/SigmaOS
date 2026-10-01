@@ -3,7 +3,6 @@
 
 extern crate alloc;
 
-
 // Core working modules
 pub mod accessibility;
 pub mod ai;
@@ -22,10 +21,10 @@ pub mod distro;
 pub mod driver;
 pub mod drivers;
 pub use drivers::sovereign_comprehensive_drivers::*;
-pub mod governance;
 pub mod crypto;
 pub mod filesystem;
 pub mod futuristic_modules;
+pub mod governance;
 pub mod kernel;
 pub mod klib;
 pub mod memory;
@@ -43,30 +42,32 @@ pub mod runtime;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
-pub use package::{
-    SovereignUniversalPackageFormatMasterEngine, UniversalPackageFormatKind,
-};
-pub use sigpkg::{
-    SovereignUniversalPackageManagerInteropEngine, SovereignUniversalPackageTranslationBridge,
-};
 pub use filesystem::{
     AutofsMountTrigger, EphemeralTmpfsMountGovernor, FscryptInodeRecord, FscryptPolicy,
     SovereignAtomicGenerationRootfsGuard, SovereignCanonicalFhsResolver,
     SovereignFscryptAutofsEngine, SovereignMultiDistroFhsHierarchyEngine,
     SyntheticProcSysfsProvider,
 };
-pub mod storage;
-pub mod thread;
-pub mod system;
+pub use package::{SovereignUniversalPackageFormatMasterEngine, UniversalPackageFormatKind};
+pub use sigpkg::{
+    SovereignUniversalPackageManagerInteropEngine, SovereignUniversalPackageTranslationBridge,
+};
 pub mod hardware;
 pub mod installer;
-pub mod ml;
-pub mod virtualization;
 pub mod interrupt;
+pub mod ml;
+pub mod storage;
+pub mod system;
+pub mod thread;
+pub mod virtualization;
 pub use desktop::{
-    Gnome46MutterEngine, KdePlasma6Engine, LuminaBsdDesktopEngine, SwayRegolithWmEngine, Xfce418Engine,
-    CachyosGamescopeHandheldOverlay, ItsFossQuickShareAndBackupHud, PhoronixPerformanceBenchmarkWidget,
-    PopOsKdeTilingWorkspaceGridEngine, SovereignUxMasterEngine, WindowsCopilotAiAssistantSidebar,
+    CachyosGamescopeHandheldOverlay, Gnome46MutterEngine, ItsFossQuickShareAndBackupHud,
+    KdePlasma6Engine, LuminaBsdDesktopEngine, PhoronixPerformanceBenchmarkWidget,
+    PopOsKdeTilingWorkspaceGridEngine, SovereignUxMasterEngine, SwayRegolithWmEngine,
+    WindowsCopilotAiAssistantSidebar, Xfce418Engine,
+};
+pub use kernel::{
+    CfiFunctionSignature, KptrRestrictLevel, SovereignHardenedSecurityMitigationsEngine,
 };
 pub use process::{
     AdvancedIpcHub, BsdRusage, CancellationType, CoreDumpMetadata, EventFd,
@@ -77,31 +78,27 @@ pub use process::{
     SovereignProcess, SovereignProcessManager, SovereignProcessState, SubreaperProcessEntry,
     WaitStatus, ZeroCopyIpcChannel, WCONTINUED, WNOHANG, WUNTRACED,
 };
-pub use kernel::{
-    CfiFunctionSignature, KptrRestrictLevel, SovereignHardenedSecurityMitigationsEngine,
-};
 pub mod access;
 pub mod open_source_obsoletion;
 pub mod tools;
-pub use open_source_obsoletion::open_source_os_gap_closure::*;
-pub use kernel::tss_ring3_user_mode::*;
-pub use tools::tech_media_extended_suite::*;
-pub use distro::sovereign_linux_bsd_master_synthesis::*;
 pub use distro::additional_linux_bsd_components::*;
-pub use distro::sovereign_media_and_distro_unimplemented_innovations::*;
 pub use distro::sovereign_2050_distro_supremacy_engine::*;
 pub use distro::sovereign_2055_distro_supremacy_engine::*;
 pub use distro::sovereign_2060_distro_supremacy_engine::*;
+pub use distro::sovereign_linux_bsd_master_synthesis::*;
+pub use distro::sovereign_media_and_distro_unimplemented_innovations::*;
+pub use kernel::tss_ring3_user_mode::*;
+pub use open_source_obsoletion::open_source_os_gap_closure::*;
+pub use tools::tech_media_extended_suite::*;
 pub mod sovereign_wiki_master_engine;
 pub use sovereign_wiki_master_engine::*;
 pub mod unimplemented_features;
 pub mod unimplemented_tools;
 pub mod wiki_unimplemented_ideas;
 pub use wiki_unimplemented_ideas::*;
-pub mod userland;
 pub mod arch;
 pub mod compiler;
-
+pub mod userland;
 
 pub mod audio;
 pub mod audit;

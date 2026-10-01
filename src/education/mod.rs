@@ -1,7 +1,7 @@
 // SigmaOS Education Module
+pub mod ncert_maths;
 pub mod ncert_science_teacher;
 pub mod outreach;
-pub mod ncert_maths;
 
 pub use ncert_science_teacher::{
     BloomsTaxonomyLevel, NcertChapterTopic, NcertGrade, NcertLessonPlan, NcertQuestionItem,
@@ -12,9 +12,8 @@ pub use outreach::{
 };
 
 pub use ncert_maths::{
-    NcertClassGrade, NcertMathsDomain, NcertChapterSpec, NcertMathsFormulaRepository,
-    Phase5E, NcertLessonPlanStep, NcertLessonPlanGenerator,
-    NcertQuestionType, NcertQuestion, NcertQuestionBankManager,
-    StepByStepSolution, NcertStepByStepSolutionSolver, StudentAssessmentEntry,
-    NcertTeacherAnalyticsEngine,
+    NcertChapterSpec, NcertClassGrade, NcertLessonPlanGenerator, NcertLessonPlanStep,
+    NcertMathsDomain, NcertMathsFormulaRepository, NcertQuestion, NcertQuestionBankManager,
+    NcertQuestionType, NcertStepByStepSolutionSolver, NcertTeacherAnalyticsEngine, Phase5E,
+    StepByStepSolution, StudentAssessmentEntry,
 };

@@ -2,7 +2,6 @@
 //! Atomic upgrades, system generation tracking, configuration modules, and instant rollbacks.
 use std::vec;
 
-
 use std::string::{String, ToString};
 use std::vec::Vec;
 
@@ -53,7 +52,11 @@ impl ConfigManager {
     }
 
     pub fn add_module_to_active(&mut self, module: ConfigModule) {
-        if let Some(gen) = self.generations.iter_mut().find(|g| g.generation_id == self.active_generation_id) {
+        if let Some(gen) = self
+            .generations
+            .iter_mut()
+            .find(|g| g.generation_id == self.active_generation_id)
+        {
             gen.modules.push(module);
         }
     }
@@ -61,7 +64,9 @@ impl ConfigManager {
     pub fn commit_atomic_generation(&mut self, timestamp: u64) -> u32 {
         let new_id = self.generations.len() as u32 + 1;
 
-        let current_modules = self.generations.iter()
+        let current_modules = self
+            .generations
+            .iter()
             .find(|g| g.generation_id == self.active_generation_id)
             .map(|g| g.modules.clone())
             .unwrap_or_default();
@@ -94,7 +99,11 @@ impl ConfigManager {
     }
 
     pub fn rollback(&mut self, target_generation_id: u32) -> Result<(), &'static str> {
-        if let Some(target) = self.generations.iter().find(|g| g.generation_id == target_generation_id) {
+        if let Some(target) = self
+            .generations
+            .iter()
+            .find(|g| g.generation_id == target_generation_id)
+        {
             let _ = target;
             for g in &mut self.generations {
                 if g.generation_id == target_generation_id {

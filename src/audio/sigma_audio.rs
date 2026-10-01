@@ -1,10 +1,8 @@
 //! Audio/Media System (PipeWire/Jack2 Inspiration)
 //! Professional audio graph with low-latency processing and device management
 
-
-
-use std::vec::Vec;
 use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Audio node type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -282,7 +280,10 @@ impl SoundEventThemeDispatcher {
             SoundEventType::NotificationAlert => "message-new-instant.ogg",
             SoundEventType::BatteryLow => "battery-low.ogg",
         };
-        format!("/usr/share/sounds/{}/stereo/{}", self.current_theme, file_name)
+        format!(
+            "/usr/share/sounds/{}/stereo/{}",
+            self.current_theme, file_name
+        )
     }
 }
 
@@ -303,7 +304,11 @@ impl IndicatorSoundController {
     }
 
     pub fn set_master_volume(&mut self, volume: u8) {
-        let max_vol = if self.allow_overamplification { 150 } else { 100 };
+        let max_vol = if self.allow_overamplification {
+            150
+        } else {
+            100
+        };
         self.master_volume_percent = volume.min(max_vol);
     }
 
@@ -418,7 +423,9 @@ impl SigmaAudio {
     }
 
     pub fn get_session(&mut self, id: &str) -> Option<&mut AudioSession> {
-        self.sessions.iter_mut().find(|s| s.id == id || s.name == id)
+        self.sessions
+            .iter_mut()
+            .find(|s| s.id == id || s.name == id)
     }
 
     pub fn start_audio(&mut self) -> Result<(), AudioError> {
@@ -436,12 +443,26 @@ impl SigmaAudio {
     pub fn get_audio_stats(&self) -> AudioStats {
         AudioStats {
             total_nodes: self.graph.nodes.len(),
-            active_nodes: self.graph.nodes.iter().filter(|n| n.state == NodeState::Running).count(),
+            active_nodes: self
+                .graph
+                .nodes
+                .iter()
+                .filter(|n| n.state == NodeState::Running)
+                .count(),
             total_links: self.graph.links.len(),
-            active_links: self.graph.links.iter().filter(|l| l.state == LinkState::Active).count(),
+            active_links: self
+                .graph
+                .links
+                .iter()
+                .filter(|l| l.state == LinkState::Active)
+                .count(),
             total_devices: self.devices.len(),
             total_sessions: self.sessions.len(),
-            active_sessions: self.sessions.iter().filter(|s| s.state == SessionState::Active).count(),
+            active_sessions: self
+                .sessions
+                .iter()
+                .filter(|s| s.state == SessionState::Active)
+                .count(),
         }
     }
 

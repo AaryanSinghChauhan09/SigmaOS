@@ -1,7 +1,7 @@
 // dev_workspace.rs
 
-use std::path::{Path, PathBuf};
 use std::collections::HashMap;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum ProjectType {
@@ -45,10 +45,16 @@ pub struct GitTuiIntegration {
 
 impl GitTuiIntegration {
     pub fn new(path: &Path) -> Self {
-        Self { repository: path.to_path_buf() }
+        Self {
+            repository: path.to_path_buf(),
+        }
     }
-    pub fn stage_all(&self) -> bool { true }
-    pub fn commit(&self, _message: &str) -> bool { true }
+    pub fn stage_all(&self) -> bool {
+        true
+    }
+    pub fn commit(&self, _message: &str) -> bool {
+        true
+    }
 }
 
 pub struct VersionManagerBridge {
@@ -57,10 +63,13 @@ pub struct VersionManagerBridge {
 
 impl VersionManagerBridge {
     pub fn new() -> Self {
-        Self { active_versions: HashMap::new() }
+        Self {
+            active_versions: HashMap::new(),
+        }
     }
     pub fn set_version(&mut self, lang: &str, version: &str) {
-        self.active_versions.insert(lang.to_string(), version.to_string());
+        self.active_versions
+            .insert(lang.to_string(), version.to_string());
     }
     pub fn get_version(&self, lang: &str) -> Option<&String> {
         self.active_versions.get(lang)
@@ -77,18 +86,25 @@ impl DiffViewer {
 pub struct ProjectDetector;
 impl ProjectDetector {
     pub fn detect_project(&self, dir: &Path) -> ProjectType {
-        if dir.join("Cargo.toml").exists() { ProjectType::Rust }
-        else if dir.join("package.json").exists() { ProjectType::Node }
-        else if dir.join("requirements.txt").exists() { ProjectType::Python }
-        else if dir.join("go.mod").exists() { ProjectType::Go }
-        else { ProjectType::Unknown }
+        if dir.join("Cargo.toml").exists() {
+            ProjectType::Rust
+        } else if dir.join("package.json").exists() {
+            ProjectType::Node
+        } else if dir.join("requirements.txt").exists() {
+            ProjectType::Python
+        } else if dir.join("go.mod").exists() {
+            ProjectType::Go
+        } else {
+            ProjectType::Unknown
+        }
     }
 }
 
 pub struct DevContainerSupport;
 impl DevContainerSupport {
     pub fn has_devcontainer(&self, dir: &Path) -> bool {
-        dir.join(".devcontainer.json").exists() || dir.join(".devcontainer/devcontainer.json").exists()
+        dir.join(".devcontainer.json").exists()
+            || dir.join(".devcontainer/devcontainer.json").exists()
     }
 }
 
@@ -154,7 +170,10 @@ mod tests {
     #[test]
     fn test_project_detector() {
         let detector = ProjectDetector;
-        assert_eq!(detector.detect_project(Path::new("/nonexistent")), ProjectType::Unknown);
+        assert_eq!(
+            detector.detect_project(Path::new("/nonexistent")),
+            ProjectType::Unknown
+        );
     }
 
     #[test]
@@ -166,6 +185,9 @@ mod tests {
     #[test]
     fn test_diff_viewer() {
         let viewer = DiffViewer;
-        assert_eq!(viewer.view_diff(Path::new("test.txt")), "syntax-highlighted side-by-side diff");
+        assert_eq!(
+            viewer.view_diff(Path::new("test.txt")),
+            "syntax-highlighted side-by-side diff"
+        );
     }
 }

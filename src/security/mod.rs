@@ -1,28 +1,28 @@
 // SigmaOS Security Subsystem
-pub mod memory_protection;
 pub mod address_sanitizer;
 pub mod capability_enforcer;
+pub mod memory_protection;
 pub use address_sanitizer::{AddressSanitizer, MemoryRegion};
-pub mod capability;
-pub mod hardware_privilege;
-pub mod pqc_enclave;
-pub mod governance;
 pub mod audit;
 pub mod bsd_hardening;
+pub mod capability;
+pub mod capsicum;
+pub mod governance;
+pub mod hardware_privilege;
+pub mod pledge_unveil;
+pub mod pqc_enclave;
 pub mod sigma_pledge;
 pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
-pub mod capsicum;
-pub mod pledge_unveil;
 
 // SigmaOS Security Subsystem
-pub mod seccomp;
-pub mod seccomp_ebpf;
-pub mod syscall_filter;
 pub mod defensive_audit;
 pub mod hardening;
 pub mod kernel_hardening;
+pub mod seccomp;
+pub mod seccomp_ebpf;
+pub mod syscall_filter;
 pub mod user_namespace;
 
 pub mod bridge;
@@ -39,7 +39,9 @@ pub mod openbsd_karl;
 pub mod password;
 pub mod pledge;
 pub use deobfuscation::ArithmeticSubstitutionDeobfuscator;
+pub mod kali_components;
 pub mod kali_stack;
+pub mod landlock;
 pub mod parrot;
 pub mod parrot_kali;
 pub mod parrot_linux;
@@ -55,8 +57,6 @@ pub mod selinux;
 pub mod selinux_advanced;
 pub mod unveil;
 pub mod vulnerability;
-pub mod kali_components;
-pub mod landlock;
 pub use landlock::{LandlockEngine, LandlockPathBeneathAttr, LandlockRuleset};
 pub mod landlock_sovereign;
 
@@ -70,7 +70,9 @@ pub use bsd_hardening::{
 pub use capability::{
     CapabilityGate, CapabilityToken, LinuxCapability, LinuxCapabilitySet, Permission,
 };
-pub use capability_enforcer::{CapabilityEnforcer, CapabilitySet, ResourceType, ResourcePermission};
+pub use capability_enforcer::{
+    CapabilityEnforcer, CapabilitySet, ResourcePermission, ResourceType,
+};
 pub use capability_token::{
     CapabilityToken as AndroidStyleCapabilityToken,
     SecurityEnforcer as AndroidStyleSecurityEnforcer, PORT_ALLOW_SSL, PORT_ALLOW_TCP,
@@ -81,15 +83,7 @@ pub use clipboard::{
 };
 pub use defensive_audit::*;
 pub use forensics::*;
-pub use hardening::{
-    MemoryProtectionState, RelroState, SecurityHardeningConfig, StackCanary,
-};
-pub use kernel_hardening::{
-    GdtSegmentDescriptor, HardenedSyscallDispatcher, HardenedSyscallError, MemoryAccessError,
-    PagePermissions, PledgePromise as KernelPledgePromise, PrivilegeRing,
-    RetpolineKptiMitigationEngine, SmepSmapEnforcer, SovereignKaslrEngine,
-    SovereignRing3UserModeTssEngine, SyscallCategory, TaskStateSegment64,
-};
+pub use hardening::{MemoryProtectionState, RelroState, SecurityHardeningConfig, StackCanary};
 pub use intrusion::{
     AnomalyDetection, DetectionResult, DetectionRule, DetectionStrategy, EventType, IdsError,
     IntrusionDetectionSystem, RuleAction, SecurityEvent, Severity, SignatureDetection,
@@ -101,31 +95,41 @@ pub use kali_stack::{
     PluggableAuthenticationModule, SudoPrivilegeEscalation, SwapSpaceManager, TmuxMultiplexer,
     TmuxPane, UndercoverDisguiseTheme, WifiFrameType,
 };
+pub use kernel_hardening::{
+    GdtSegmentDescriptor, HardenedSyscallDispatcher, HardenedSyscallError, MemoryAccessError,
+    PagePermissions, PledgePromise as KernelPledgePromise, PrivilegeRing,
+    RetpolineKptiMitigationEngine, SmepSmapEnforcer, SovereignKaslrEngine,
+    SovereignRing3UserModeTssEngine, SyscallCategory, TaskStateSegment64,
+};
 
+pub use crate::security::vulnerability::{
+    ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
+};
+pub use crate::security::vulnerability::{SimpleVulnerability, SimpleVulnerabilityScanner};
 pub use libgksu::{
     GksuAuthBackend, GksuDisplayServer, GksuExecutionRequest, GksuExecutionResult,
     GksuSecurityGuard, LibGksuGraphicalSudoEngine,
 };
 pub use openbsd_karl::{KarlKernelRelinker, KernelBinarySection, KernelSectionKind};
+pub use parrot::ParrotSecurityFingerprintEngine;
 pub use parrot_kali::{
     AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, GLOBAL_ANONSURF,
     GLOBAL_FORENSIC, GLOBAL_SANDBOX,
 };
-pub use parrot::ParrotSecurityFingerprintEngine;
 pub use password::{
     BiometricAuth, BiometricResult, BiometricType, FaceIdAuth, FingerprintAuth, PasswordCategory,
     PasswordEntry, PasswordError, PasswordManager, PasswordManagerResult,
 };
 pub use pledge::{
-    promises, PledgeError, PledgeManager, PledgePromise, PledgeManager as OriginalPledgeManager,
+    promises, PledgeError, PledgeManager, PledgeManager as OriginalPledgeManager, PledgePromise,
     PledgePromise as OriginalPledgePromise,
 };
-pub use qubes_isolation::*;
-pub use root_improvement::*;
 pub use pqc_measurement::{
     Dilithium5KernelSignatureVerifier, FedoraCryptoPolicyProfile, HybridPqcMeasurementEngine,
     SovereignFirmitasAttestationEngine, Tpm2PcrBank, Tpm2PcrRegister, TPM2_PCR_COUNT,
 };
+pub use qubes_isolation::*;
+pub use root_improvement::*;
 pub use rules::{
     AuditAccessType, AuditSyscallRule, AuditWatchRule, PfAction, PfFilterRule, PledgeRule,
     SecurelevelState, SovereignAuditRuleEngine, SovereignNetworkFilterRulesEngine,
@@ -151,10 +155,6 @@ pub use vpn::{
     VpnConfig, VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics,
     WireGuardHandler,
 };
-pub use crate::security::vulnerability::{
-    ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
-};
-pub use crate::security::vulnerability::{SimpleVulnerability, SimpleVulnerabilityScanner};
 
 // ─── Capability Monitor (pledge + unveil + Capsicum) ─────────────────────────
 pub mod capability_monitor;
@@ -162,8 +162,10 @@ pub mod phase_audit;
 
 pub use hardware_privilege::*;
 
-pub use capsicum::{
-    CapRight, CapMode, CapEntry, CapabilitySandbox,
+pub use capsicum::{CapEntry, CapMode, CapRight, CapabilitySandbox};
+pub use memory_protection::{
+    AslrConfig, MemoryProtectionManager, MemoryProtectionMode, StackCanaryConfig,
 };
-pub use memory_protection::{MemoryProtectionManager, MemoryProtectionMode, AslrConfig, StackCanaryConfig};
-pub use pledge_unveil::{PledgePromise as OpenBsdPledgePromise, PledgeSandbox, UnveilPermission, UnveilSandbox, Sandbox};
+pub use pledge_unveil::{
+    PledgePromise as OpenBsdPledgePromise, PledgeSandbox, Sandbox, UnveilPermission, UnveilSandbox,
+};

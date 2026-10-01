@@ -3,17 +3,16 @@
 // Data compression algorithms & archive management
 // Zero-dependency implementation - no external libraries required
 
-
 pub mod archive;
 
 pub use archive::{
     ArchiveEntry, ArchiveFormat, ArchiveImage, ArchiveManager, CompressionCodec, EntryType,
 };
 
-use std::vec::Vec;
-use std::string::{String, ToString};
-use std::boxed::Box;
 use core::fmt;
+use std::boxed::Box;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Error type for the Compression module
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -60,17 +59,17 @@ impl Compressor {
             enabled: false,
         }
     }
-    
+
     pub fn enable(&mut self) -> CompressionResult<()> {
         self.enabled = true;
         Ok(())
     }
-    
+
     pub fn disable(&mut self) -> CompressionResult<()> {
         self.enabled = false;
         Ok(())
     }
-    
+
     pub fn is_enabled(&self) -> bool {
         self.enabled
     }
@@ -90,12 +89,12 @@ impl Decompressor {
             initialized: false,
         }
     }
-    
+
     pub fn init(&mut self) -> CompressionResult<()> {
         self.initialized = true;
         Ok(())
     }
-    
+
     pub fn add(&mut self, resource: Compressor) -> CompressionResult<u64> {
         if !self.initialized {
             return Err(CompressError::NotSupported);
@@ -104,23 +103,23 @@ impl Decompressor {
         self.resources.push(resource);
         Ok(id)
     }
-    
+
     pub fn get(&self, id: u64) -> Option<&Compressor> {
         self.resources.get(id as usize)
     }
-    
+
     pub fn get_mut(&mut self, id: u64) -> Option<&mut Compressor> {
         self.resources.get_mut(id as usize)
     }
-    
+
     pub fn list(&self) -> &[Compressor] {
         &self.resources
     }
-    
+
     pub fn is_initialized(&self) -> bool {
         self.initialized
     }
-    
+
     pub fn shutdown(&mut self) -> CompressionResult<()> {
         self.initialized = false;
         self.resources.clear();
@@ -137,7 +136,7 @@ impl Default for Decompressor {
 #[cfg(test_disabled)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_compression_manager_init() {
         let mut manager = Decompressor::new();
@@ -145,7 +144,7 @@ mod tests {
         assert!(manager.init().is_ok());
         assert!(manager.is_initialized());
     }
-    
+
     #[test]
     fn test_compression_resource_add() {
         let mut manager = Decompressor::new();

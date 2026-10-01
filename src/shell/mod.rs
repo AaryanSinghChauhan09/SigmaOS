@@ -15,9 +15,9 @@ pub mod terminal_emulator;
 pub mod zsh_bash_parity;
 
 pub use self::command::{ShellCommand, SimpleShellSession};
+pub use self::repl::ShellRepl;
 pub use self::sigma_sh::*;
 pub use self::zsh_bash_parity::*;
-pub use self::repl::ShellRepl;
 
 // Optional FFI bindings to Nim SigmaShell with native Rust fallback
 #[cfg(feature = "nim_ffi")]
@@ -46,7 +46,10 @@ impl SigmaShell {
             unsafe {
                 let handle = sigma_shell_create();
                 if !handle.is_null() {
-                    return Some(Self { handle, running: false });
+                    return Some(Self {
+                        handle,
+                        running: false,
+                    });
                 }
             }
         }
@@ -56,7 +59,7 @@ impl SigmaShell {
             running: false,
         })
     }
-    
+
     pub fn run(&mut self) {
         self.running = true;
         #[cfg(feature = "nim_ffi")]
@@ -88,7 +91,7 @@ impl Drop for SigmaShell {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_shell_creation() {
         let shell = SigmaShell::new();

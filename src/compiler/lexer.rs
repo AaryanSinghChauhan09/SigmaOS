@@ -147,11 +147,11 @@ pub enum TokenKind {
     MinusEq,
     StarEq,
     SlashEq,
-    Arrow,       // ->
-    FatArrow,    // =>
-    DotDot,      // ..
-    DotDotEq,    // ..=
-    ColonColon,  // ::
+    Arrow,      // ->
+    FatArrow,   // =>
+    DotDot,     // ..
+    DotDotEq,   // ..=
+    ColonColon, // ::
 
     // Delimiters
     LParen,
@@ -291,7 +291,10 @@ impl Lexer {
             if next == 'x' || next == 'X' {
                 self.advance();
                 self.advance();
-                while self.peek().map_or(false, |c| c.is_ascii_hexdigit() || c == '_') {
+                while self
+                    .peek()
+                    .map_or(false, |c| c.is_ascii_hexdigit() || c == '_')
+                {
                     self.advance();
                 }
                 let lexeme: String = self.source[start..self.pos].iter().collect();
@@ -306,7 +309,10 @@ impl Lexer {
             if next == 'b' || next == 'B' {
                 self.advance();
                 self.advance();
-                while self.peek().map_or(false, |c| c == '0' || c == '1' || c == '_') {
+                while self
+                    .peek()
+                    .map_or(false, |c| c == '0' || c == '1' || c == '_')
+                {
                     self.advance();
                 }
                 let lexeme: String = self.source[start..self.pos].iter().collect();
@@ -320,17 +326,24 @@ impl Lexer {
             }
         }
 
-        while self.peek().map_or(false, |c| c.is_ascii_digit() || c == '_') {
+        while self
+            .peek()
+            .map_or(false, |c| c.is_ascii_digit() || c == '_')
+        {
             self.advance();
         }
 
         // Check for decimal point
-        if self.peek() == Some('.') && self.pos + 1 < self.source.len()
+        if self.peek() == Some('.')
+            && self.pos + 1 < self.source.len()
             && self.source[self.pos + 1].is_ascii_digit()
         {
             is_float = true;
             self.advance(); // consume '.'
-            while self.peek().map_or(false, |c| c.is_ascii_digit() || c == '_') {
+            while self
+                .peek()
+                .map_or(false, |c| c.is_ascii_digit() || c == '_')
+            {
                 self.advance();
             }
         }
@@ -368,7 +381,10 @@ impl Lexer {
     }
 
     fn lex_identifier(&mut self, start: usize) -> Token {
-        while self.peek().map_or(false, |c| c == '_' || c.is_ascii_alphanumeric()) {
+        while self
+            .peek()
+            .map_or(false, |c| c == '_' || c.is_ascii_alphanumeric())
+        {
             self.advance();
         }
         let lexeme: String = self.source[start..self.pos].iter().collect();
@@ -402,12 +418,30 @@ impl Lexer {
                 Some('\\') => {
                     self.advance();
                     match self.peek() {
-                        Some('n') => { value.push('\n'); self.advance(); }
-                        Some('t') => { value.push('\t'); self.advance(); }
-                        Some('r') => { value.push('\r'); self.advance(); }
-                        Some('\\') => { value.push('\\'); self.advance(); }
-                        Some('"') => { value.push('"'); self.advance(); }
-                        Some('0') => { value.push('\0'); self.advance(); }
+                        Some('n') => {
+                            value.push('\n');
+                            self.advance();
+                        }
+                        Some('t') => {
+                            value.push('\t');
+                            self.advance();
+                        }
+                        Some('r') => {
+                            value.push('\r');
+                            self.advance();
+                        }
+                        Some('\\') => {
+                            value.push('\\');
+                            self.advance();
+                        }
+                        Some('"') => {
+                            value.push('"');
+                            self.advance();
+                        }
+                        Some('0') => {
+                            value.push('\0');
+                            self.advance();
+                        }
                         _ => {
                             return Err(LexError {
                                 message: String::from("invalid escape sequence"),
@@ -484,21 +518,66 @@ impl Lexer {
         let next = self.peek();
 
         let (kind, extra) = match (ch, next) {
-            ('+', Some('=')) => { self.advance(); (TokenKind::PlusEq, true) }
-            ('-', Some('>')) => { self.advance(); (TokenKind::Arrow, true) }
-            ('-', Some('=')) => { self.advance(); (TokenKind::MinusEq, true) }
-            ('*', Some('=')) => { self.advance(); (TokenKind::StarEq, true) }
-            ('/', Some('=')) => { self.advance(); (TokenKind::SlashEq, true) }
-            ('=', Some('>')) => { self.advance(); (TokenKind::FatArrow, true) }
-            ('=', Some('=')) => { self.advance(); (TokenKind::EqEq, true) }
-            ('!', Some('=')) => { self.advance(); (TokenKind::BangEq, true) }
-            ('<', Some('=')) => { self.advance(); (TokenKind::LtEq, true) }
-            ('<', Some('<')) => { self.advance(); (TokenKind::LtLt, true) }
-            ('>', Some('=')) => { self.advance(); (TokenKind::GtEq, true) }
-            ('>', Some('>')) => { self.advance(); (TokenKind::GtGt, true) }
-            ('&', Some('&')) => { self.advance(); (TokenKind::AmpAmp, true) }
-            ('|', Some('|')) => { self.advance(); (TokenKind::PipePipe, true) }
-            (':', Some(':')) => { self.advance(); (TokenKind::ColonColon, true) }
+            ('+', Some('=')) => {
+                self.advance();
+                (TokenKind::PlusEq, true)
+            }
+            ('-', Some('>')) => {
+                self.advance();
+                (TokenKind::Arrow, true)
+            }
+            ('-', Some('=')) => {
+                self.advance();
+                (TokenKind::MinusEq, true)
+            }
+            ('*', Some('=')) => {
+                self.advance();
+                (TokenKind::StarEq, true)
+            }
+            ('/', Some('=')) => {
+                self.advance();
+                (TokenKind::SlashEq, true)
+            }
+            ('=', Some('>')) => {
+                self.advance();
+                (TokenKind::FatArrow, true)
+            }
+            ('=', Some('=')) => {
+                self.advance();
+                (TokenKind::EqEq, true)
+            }
+            ('!', Some('=')) => {
+                self.advance();
+                (TokenKind::BangEq, true)
+            }
+            ('<', Some('=')) => {
+                self.advance();
+                (TokenKind::LtEq, true)
+            }
+            ('<', Some('<')) => {
+                self.advance();
+                (TokenKind::LtLt, true)
+            }
+            ('>', Some('=')) => {
+                self.advance();
+                (TokenKind::GtEq, true)
+            }
+            ('>', Some('>')) => {
+                self.advance();
+                (TokenKind::GtGt, true)
+            }
+            ('&', Some('&')) => {
+                self.advance();
+                (TokenKind::AmpAmp, true)
+            }
+            ('|', Some('|')) => {
+                self.advance();
+                (TokenKind::PipePipe, true)
+            }
+            (':', Some(':')) => {
+                self.advance();
+                (TokenKind::ColonColon, true)
+            }
             ('.', Some('.')) => {
                 self.advance();
                 if self.peek() == Some('=') {
@@ -578,7 +657,10 @@ impl Lexer {
     fn skip_whitespace_and_comments(&mut self) {
         loop {
             // Skip whitespace (except newlines — those are tokens)
-            while self.peek().map_or(false, |c| c == ' ' || c == '\t' || c == '\r') {
+            while self
+                .peek()
+                .map_or(false, |c| c == ' ' || c == '\t' || c == '\r')
+            {
                 self.advance();
             }
             // Line comments
@@ -643,7 +725,10 @@ mod tests {
         assert!(matches!(tokens[1].kind, TokenKind::Keyword(Keyword::Let)));
         assert!(matches!(tokens[2].kind, TokenKind::Keyword(Keyword::If)));
         assert!(matches!(tokens[3].kind, TokenKind::Keyword(Keyword::Else)));
-        assert!(matches!(tokens[4].kind, TokenKind::Keyword(Keyword::Return)));
+        assert!(matches!(
+            tokens[4].kind,
+            TokenKind::Keyword(Keyword::Return)
+        ));
     }
 
     #[test]

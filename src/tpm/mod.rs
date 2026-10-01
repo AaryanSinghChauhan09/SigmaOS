@@ -5,16 +5,16 @@
 
 pub mod tpm2_implementation;
 
-use std::vec::Vec;
-use std::string::{String, ToString};
-use std::boxed::Box;
 use core::fmt;
+use std::boxed::Box;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 pub use tpm2_implementation::{
-    Tpm2, Pcr, PcrBank, TpmKey, TpmKeyStore, TpmCommandHeader, TpmResponseHeader,
-    TpmStartupType, TPM_PCR_COUNT, TPM_ALG_SHA256, TPM_ALG_RSA, SHA256_DIGEST_SIZE,
-    TPM_CC_STARTUP, TPM_CC_SHUTDOWN, TPM_CC_PCR_READ, TPM_CC_PCR_EXTEND,
-    TPM_CC_CREATE_PRIMARY, TPM_RC_SUCCESS, TPM_ST_NO_SESSIONS,
+    Pcr, PcrBank, Tpm2, TpmCommandHeader, TpmKey, TpmKeyStore, TpmResponseHeader, TpmStartupType,
+    SHA256_DIGEST_SIZE, TPM_ALG_RSA, TPM_ALG_SHA256, TPM_CC_CREATE_PRIMARY, TPM_CC_PCR_EXTEND,
+    TPM_CC_PCR_READ, TPM_CC_SHUTDOWN, TPM_CC_STARTUP, TPM_PCR_COUNT, TPM_RC_SUCCESS,
+    TPM_ST_NO_SESSIONS,
 };
 
 /// Error type for the Tpm module
@@ -73,19 +73,19 @@ impl TpmDriver {
             enabled: false,
         }
     }
-    
+
     /// Enable this resource
     pub fn enable(&mut self) -> TpmResult<()> {
         self.enabled = true;
         Ok(())
     }
-    
+
     /// Disable this resource
     pub fn disable(&mut self) -> TpmResult<()> {
         self.enabled = false;
         Ok(())
     }
-    
+
     /// Check if enabled
     pub fn is_enabled(&self) -> bool {
         self.enabled
@@ -107,13 +107,13 @@ impl TpmManager {
             initialized: false,
         }
     }
-    
+
     /// Initialize the Tpm subsystem
     pub fn init(&mut self) -> TpmResult<()> {
         self.initialized = true;
         Ok(())
     }
-    
+
     /// Add a resource
     pub fn add(&mut self, resource: TpmDriver) -> TpmResult<u64> {
         if !self.initialized {
@@ -123,27 +123,27 @@ impl TpmManager {
         self.resources.push(resource);
         Ok(id)
     }
-    
+
     /// Get resource by ID
     pub fn get(&self, id: u64) -> Option<&TpmDriver> {
         self.resources.get(id as usize)
     }
-    
+
     /// Get mutable resource by ID
     pub fn get_mut(&mut self, id: u64) -> Option<&mut TpmDriver> {
         self.resources.get_mut(id as usize)
     }
-    
+
     /// List all resources
     pub fn list(&self) -> &[TpmDriver] {
         &self.resources
     }
-    
+
     /// Check if initialized
     pub fn is_initialized(&self) -> bool {
         self.initialized
     }
-    
+
     /// Shutdown the subsystem
     pub fn shutdown(&mut self) -> TpmResult<()> {
         self.initialized = false;
@@ -161,7 +161,7 @@ impl Default for TpmManager {
 #[cfg(test_disabled)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_tpm_manager_init() {
         let mut manager = TpmManager::new();
@@ -169,7 +169,7 @@ mod tests {
         assert!(manager.init().is_ok());
         assert!(manager.is_initialized());
     }
-    
+
     #[test]
     fn test_tpm_resource_add() {
         let mut manager = TpmManager::new();

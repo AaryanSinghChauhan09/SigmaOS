@@ -77,7 +77,8 @@ impl RepositoryConfigManager {
             String::from("https://community.sigmaos.org"),
         );
         community.set_priority(500);
-        self.repositories.insert(String::from("community"), community);
+        self.repositories
+            .insert(String::from("community"), community);
 
         // Testing repository (disabled by default)
         let mut testing = RepoConfig::new(
@@ -136,7 +137,8 @@ impl RepositoryConfigManager {
     }
 
     pub fn get_repositories_by_priority(&self) -> Vec<RepoConfig> {
-        let mut repos: Vec<RepoConfig> = self.repositories
+        let mut repos: Vec<RepoConfig> = self
+            .repositories
             .values()
             .filter(|repo| repo.enabled)
             .cloned()
@@ -239,10 +241,7 @@ mod tests {
 
     #[test]
     fn test_repository_gpg_settings() {
-        let mut repo = RepoConfig::new(
-            String::from("test"),
-            String::from("https://test.repo.org"),
-        );
+        let mut repo = RepoConfig::new(String::from("test"), String::from("https://test.repo.org"));
         assert!(repo.gpg_verify);
 
         repo.set_gpg_verify(false);

@@ -83,10 +83,21 @@ impl DisplayManager {
         self.users.insert(profile.username.clone(), profile);
     }
 
-    pub fn toggle_accessibility(&mut self, high_contrast: Option<bool>, screen_reader: Option<bool>, on_screen_keyboard: Option<bool>) {
-        if let Some(hc) = high_contrast { self.accessibility.high_contrast = hc; }
-        if let Some(sr) = screen_reader { self.accessibility.screen_reader = sr; }
-        if let Some(osk) = on_screen_keyboard { self.accessibility.on_screen_keyboard = osk; }
+    pub fn toggle_accessibility(
+        &mut self,
+        high_contrast: Option<bool>,
+        screen_reader: Option<bool>,
+        on_screen_keyboard: Option<bool>,
+    ) {
+        if let Some(hc) = high_contrast {
+            self.accessibility.high_contrast = hc;
+        }
+        if let Some(sr) = screen_reader {
+            self.accessibility.screen_reader = sr;
+        }
+        if let Some(osk) = on_screen_keyboard {
+            self.accessibility.on_screen_keyboard = osk;
+        }
     }
 
     pub fn set_monitors(&mut self, monitors: Vec<MonitorConfig>) {
@@ -96,7 +107,9 @@ impl DisplayManager {
     pub fn authenticate(&mut self, username: &str, password_hash: &str) -> AuthenticationResult {
         if let Some(user) = self.users.get(username) {
             if user.is_guest || password_hash == "valid_hash" {
-                AuthenticationResult::Success { session_token: format!("token_{}", username) }
+                AuthenticationResult::Success {
+                    session_token: format!("token_{}", username),
+                }
             } else {
                 AuthenticationResult::Failure("Invalid credentials".to_string())
             }
@@ -105,14 +118,22 @@ impl DisplayManager {
         }
     }
 
-    pub fn start_session(&mut self, username: &str, session: LoginSession) -> Result<String, String> {
+    pub fn start_session(
+        &mut self,
+        username: &str,
+        session: LoginSession,
+    ) -> Result<String, String> {
         if !self.users.contains_key(username) {
             return Err("Unknown user".to_string());
         }
-        self.session_history.insert(username.to_string(), session.clone());
-        Ok(format!("Started {:?} session for {}", session.desktop, username))
+        self.session_history
+            .insert(username.to_string(), session.clone());
+        Ok(format!(
+            "Started {:?} session for {}",
+            session.desktop, username
+        ))
     }
-    
+
     pub fn get_last_session(&self, username: &str) -> Option<&LoginSession> {
         self.session_history.get(username)
     }
@@ -199,8 +220,16 @@ mod tests {
     fn test_monitor_layout() {
         let mut dm = DisplayManager::new(default_theme());
         dm.set_monitors(vec![
-            MonitorConfig { id: 1, resolution: (1920, 1080), is_primary: true },
-            MonitorConfig { id: 2, resolution: (1920, 1080), is_primary: false },
+            MonitorConfig {
+                id: 1,
+                resolution: (1920, 1080),
+                is_primary: true,
+            },
+            MonitorConfig {
+                id: 2,
+                resolution: (1920, 1080),
+                is_primary: false,
+            },
         ]);
         assert_eq!(dm.multi_monitor_layout.len(), 2);
         assert!(dm.multi_monitor_layout[0].is_primary);
