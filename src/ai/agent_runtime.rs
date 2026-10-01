@@ -436,10 +436,6 @@ impl SovereignAgentRuntime {
 
     // Internal helpers
 
-    fn find_agent_for_capability(
-        &self,
-        capability: AgentCapability,
-    ) -> Result<AgentId, AgentError> {
     fn find_agent_for_capability(&self, capability: AgentCapability) -> Result<AgentId, AgentError> {
         self.capability_registry
             .get(&capability)
@@ -471,7 +467,6 @@ impl SovereignAgentRuntime {
         })
     }
 
-    fn generate_code(&self, _agent_id: AgentId, spec: &PluginSpec) -> Result<String, AgentError> {
     fn generate_code(
         &self,
         _agent_id: AgentId,

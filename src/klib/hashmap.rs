@@ -148,15 +148,13 @@ where
         }
 
         let hash = self.hash_key(&key);
-        if self.buckets[hash].is_none() {
-            let mut bucket = Vec::with_capacity(4);
+        let bucket = self.buckets[hash].get_or_insert_with(|| Vec::with_capacity(4));
+        if bucket.is_empty() {
             bucket.push((key, value));
-            self.buckets[hash] = Some(bucket);
             self.len += 1;
-            return &mut self.buckets[hash].as_mut().unwrap()[0].1;
+            return &mut bucket[0].1;
         }
 
-        let bucket = self.buckets[hash].as_mut().unwrap();
         // Bolt ⚡: Single-pass linear position lookup avoids redundant enumerate/variable-assignment loops
         if let Some(pos) = bucket.iter().position(|(k, _)| *k == key) {
             bucket[pos].1 = value;
