@@ -131,48 +131,23 @@ impl SigmaOsConfig {
         }
     }
 
-    pub fn add_module_to_active(&mut self, module: ConfigModule) {
-        if let Some(gen) = self
-            .generations
-            .iter_mut()
-            .find(|g| g.generation_id == self.active_generation_id)
-        {
-            gen.modules.push(module);
-        }
-    }
-
+    /// Parse config from a key=value format string
+    pub fn parse_config(config_str: &str) -> Self {
+        let mut cfg = Self::new();
         for line in config_str.lines() {
             let line = line.trim();
-
-        let current_modules = self
-            .generations
-            .iter()
-            .find(|g| g.generation_id == self.active_generation_id)
-            .map(|g| g.modules.clone())
-            .unwrap_or_default();
-
-        let mut hash = [0u8; 32];
-        for (i, m) in current_modules.iter().enumerate() {
-            for &b in m.module_name.as_bytes() {
-                hash[i % 32] ^= b;
-            }
-
-            // Handle key-value pairs
             if let Some((key, value)) = line.split_once('=') {
                 let key = key.trim();
                 let value = value.trim().trim_matches('"');
-
-        let new_gen = SystemGeneration {
-            generation_id: new_id,
-            created_at_timestamp: timestamp,
-            config_hash: hash,
-            modules: current_modules,
-            state: ConfigState::Active,
-        };
-
-        self.generations.push(new_gen);
-        self.active_generation_id = new_id;
-        new_id
+                match key {
+                    "hostname" => cfg.system.hostname = value.to_string(),
+                    "timezone" => cfg.system.timezone = value.to_string(),
+                    "compositor" => cfg.desktop.compositor = value.to_string(),
+                    _ => {} // Ignore unknown keys
+                }
+            }
+        }
+        cfg
     }
 
     pub fn rollback(&mut self, target_generation_id: u32) -> Result<(), &'static str> {

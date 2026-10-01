@@ -12,6 +12,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+pub mod service_manager;
 
 // SigmaOS System Utilities Module
 // System-level utilities and tools

@@ -131,15 +131,6 @@ pub use bsd_linux_package_innovations::{
     ZypperRepository,
 };
 pub use sovereign_sigpkg::*;
-pub use universal_adapter::{
-    AppImageContainer, AptDebManifest, DispatchedPmAction, FlatpakManifest, FreeBsdUclManifest,
-    MappedScriptletHook, NetBsdPkgsrcManifest, OpenBsdContentsManifest, PackageFormatAdapter,
-    PackagePriority, PacmanPkgbuild, RpmSpecManifest, SigPkgUniversalBridgeEngine,
-    SigmaPkgHookType, SlackwarePkgManifest, SnapcraftManifest, UniversalDependencyMapper,
-    UniversalDryRunResult, UniversalDryRunSimulator, UniversalFormatConverter,
-    UniversalPackageAdapter, UniversalPmCommandDispatcher, UniversalPmOperation,
-    UniversalScriptletConverter, ZypperSpecManifest,
-};
 
 pub use crate::package::sovereign_pr_package_gateway::SovereignUniversalPrGatewayEngine;
 pub use crate::package::sovereign_universal_pm_pr_bridge::SovereignUniversalPmPrBridgeEngine;

@@ -75,13 +75,9 @@ pub enum UniversalDistroPackageFormat {
     RubyGem,
     DotnetNuget,
     NativeSigPkg,
-    OpenWrtIpk,
-    SolusEopkg,
     PuppyPet,
-    SlackwareTxz,
     ClearBundle,
     IllumosP5p,
-    SwupdBundle,
     StarlingPackage,
     MacOsHomebrewBottle,
     IosIpaBundle,
@@ -91,15 +87,9 @@ pub enum UniversalDistroPackageFormat {
     CachyOsPkg,
     AdobeAir,
     AppleIpa,
-    MacOsApp,
     SlaxLzm,
     PuppyPup,
     OciContainerImage,
-    SystemdSysext,
-    PythonWheel,
-    CargoCrate,
-    RubyGem,
-    DotnetNuget,
     QemuQcow2VmImage,
     RawDiskVmImage,
     VagrantVmBox,
@@ -888,7 +878,6 @@ impl Default for SovereignUniversalPmPrBridgeEngine {
 
 /// Foreign Package Metadata Converter Engine
 #[derive(Debug)]
-pub struct LinuxBsdPackageFormatConverterEngine;
 
 impl LinuxBsdPackageFormatConverterEngine {
     /// Parses raw metadata content into a normalized `UniversalDistroPackageManifest`
@@ -1004,7 +993,6 @@ pub fn translate_cli_command_to_pr_submission(
 
 /// Automated PR Reviewer and Security Auditor
 #[derive(Debug)]
-pub struct UniversalPmPrAutomatedReviewer;
 
 impl UniversalPmPrAutomatedReviewer {
     pub fn audit_pr_transaction(

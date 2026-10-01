@@ -17,7 +17,6 @@ pub mod paging;
 pub mod quota;
 pub mod segmentation_paging;
 pub mod sovereign_address_translation;
-pub mod thp;
 pub mod tlb_associative;
 pub mod zone;
 pub use sovereign_address_translation::*;

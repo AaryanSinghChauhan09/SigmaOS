@@ -21,9 +21,7 @@ use core::mem;
 use core::ops::{Deref, DerefMut};
 
 #[cfg(not(test))]
-use core::mem;
 #[cfg(not(test))]
-use core::ops::{Deref, DerefMut};
 /// OOP-based Crash Reporting Pipeline for SigmaOS
 /// Implements crash reporting using OOP principles with traits and structs
 /// Inspired by Linux (coredump(5), ABRT, Apport) and FreeBSD (coredump(5))
@@ -35,13 +33,9 @@ use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[cfg(test_disabled)]
-use core::mem;
 #[cfg(test_disabled)]
-use core::ops::{Deref, DerefMut};
 #[cfg(test_disabled)]
-use core::ptr::{self, NonNull};
 #[cfg(test_disabled)]
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Report ID
 pub type ReportID = usize;
@@ -656,101 +650,6 @@ fn get_current_time() -> u64 {
     }
 }
 
-/// Simple Vec implementation for no_std
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-
-            if self.capacity > self.len {
-                ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-
-    fn len(&self) -> usize {
-        self.len
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-// External allocator functions
-#[cfg(not(test))]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-#[cfg(test_disabled)]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc, Layout};
-    let layout = Layout::from_size_align_unchecked(size, 8);
-    std::alloc::alloc(layout)
-}
-
-#[cfg(test_disabled)]
-unsafe fn free(_ptr: *mut u8) {
-    // No-op for test stub allocation
-}
-
-impl<T> Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &[T] {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut [T] {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
 
 impl<'a, T> IntoIterator for &'a Vec<T> {
     type Item = &'a T;
