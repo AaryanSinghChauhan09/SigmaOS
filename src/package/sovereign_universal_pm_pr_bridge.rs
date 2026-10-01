@@ -3,9 +3,12 @@
 // (`src/package/sovereign_universal_pm_pr_bridge.rs`)
 //
 // Zero-dependency, `#![no_std]` compliant Rust engine bridging multi-distro Linux & BSD
-// package formats (Apt .deb, Pacman .pkg.tar.zst / PKGBUILD, Dnf .rpm, Alpine .apk, Void .xbps,
-// Gentoo .ebuild, FreeBSD/OpenBSD .pkg, Nix Flakes, Flatpak, Snap, AppImage) into `sigma-pkg`
-// through automated Pull Request submission workflows, SAT dependency resolution, and PQC verification.
+// package formats (Apt .deb, Pacman .pkg.tar.zst / PKGBUILD, Dnf .rpm, Zypper DeltaRPM,
+// Alpine .apk, Void .xbps, Gentoo .ebuild, FreeBSD/OpenBSD .pkg, NetBSD pkgsrc, Guix store,
+// Solus eopkg, Slackware txz, Paldo upd, GoboLinux Recipe, Haiku hpkg, Homebrew bottle,
+// MacPorts Portfile, CRUX pkgmk, Bedrock pmm, Mageia urpmi, TinyCore tcz, Puppy pet,
+// Nix Flakes, Flatpak, Snap, AppImage) into `sigma-pkg` through automated Pull Request
+// submission workflows, SAT dependency resolution, and PQC verification.
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
@@ -32,16 +35,33 @@ use std::vec::Vec;
 // 1. Universal Package Formats & Normalized Manifests
 // ============================================================================
 
-/// Supported foreign Linux & BSD package formats
+/// Supported foreign Linux, BSD, and Unix package formats
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum UniversalDistroPackageFormat {
     AptDeb,
     PacmanPkg,
     DnfRpm,
+    ZypperDeltaRpm,
     AlpineApk,
     VoidXbps,
     GentooEbuild,
     BsdPkg,
+    NetBsdPkgsrc,
+    OpenBsdPorts,
+    GuixGnuStore,
+    SolusEopkg,
+    SlackwareTxz,
+    PaldoUpd,
+    GoboLinuxRecipe,
+    HaikuHpkg,
+    HomebrewBottle,
+    MacPortsPortfile,
+    CruxPkgmk,
+    BedrockPmm,
+    MageiaUrmi,
+    PCLinuxOSAptRpm,
+    TinyCoreTcz,
+    PuppyPet,
     NixFlake,
     FlatpakApp,
     SnapApp,
@@ -55,10 +75,27 @@ impl UniversalDistroPackageFormat {
             Self::AptDeb => "apt (.deb)",
             Self::PacmanPkg => "pacman (.pkg.tar.zst / PKGBUILD)",
             Self::DnfRpm => "dnf (.rpm)",
+            Self::ZypperDeltaRpm => "zypper (.drpm / DeltaRPM)",
             Self::AlpineApk => "apk (.apk / APKBUILD)",
             Self::VoidXbps => "xbps (.xbps)",
             Self::GentooEbuild => "portage (.ebuild)",
             Self::BsdPkg => "bsd-pkg (.pkg / ports)",
+            Self::NetBsdPkgsrc => "pkgsrc (.tar.gz / buildlink3)",
+            Self::OpenBsdPorts => "openbsd-ports (.tgz / pledge-ports)",
+            Self::GuixGnuStore => "guix (/gnu/store / scheme)",
+            Self::SolusEopkg => "eopkg (.eopkg)",
+            Self::SlackwareTxz => "pkgtool (.txz / .tgz)",
+            Self::PaldoUpd => "upd (.xml / upd-spec)",
+            Self::GoboLinuxRecipe => "gobolinux (.recipe)",
+            Self::HaikuHpkg => "hpkg (.hpkg)",
+            Self::HomebrewBottle => "homebrew (.bottle.tar.gz)",
+            Self::MacPortsPortfile => "macports (Portfile)",
+            Self::CruxPkgmk => "crux (Pkgfile / .pkg.tar.gz)",
+            Self::BedrockPmm => "bedrock-pmm (pmm stratum)",
+            Self::MageiaUrmi => "urpmi (.rpm)",
+            Self::PCLinuxOSAptRpm => "apt-rpm (.rpm)",
+            Self::TinyCoreTcz => "tcz (.tcz)",
+            Self::PuppyPet => "pet (.pet)",
             Self::NixFlake => "nix (flake / derivation)",
             Self::FlatpakApp => "flatpak (.flatpakref)",
             Self::SnapApp => "snap (.snap)",
@@ -140,6 +177,12 @@ impl SovereignUniversalPmPrBridgeEngine {
         self.total_prs_submitted += 1;
         let pr_id = self.total_prs_submitted;
 
+        let sandbox_lvl = match format {
+            UniversalDistroPackageFormat::BsdPkg | UniversalDistroPackageFormat::OpenBsdPorts => 3,
+            UniversalDistroPackageFormat::FlatpakApp | UniversalDistroPackageFormat::SnapApp => 2,
+            _ => 2,
+        };
+
         let normalized_manifest = UniversalDistroPackageManifest {
             name: name.to_string(),
             version: version.to_string(),
@@ -147,7 +190,7 @@ impl SovereignUniversalPmPrBridgeEngine {
             raw_manifest_content: manifest_data.to_string(),
             declared_dependencies: dependencies.iter().map(|s| s.to_string()).collect(),
             provides_capabilities: vec![name.to_string()],
-            sandbox_level: 2,
+            sandbox_level: sandbox_lvl,
         };
 
         let pqc_valid = !pqc_sig_bytes.is_empty();
@@ -243,7 +286,8 @@ mod tests {
             b"valid_pqc_sig",
         );
 
-        assert_eq!(pr1, 1);        assert!(bridge.validate_sat_pr_dependencies(pr1).unwrap());
+        assert_eq!(pr1, 1);
+        assert!(bridge.validate_sat_pr_dependencies(pr1).unwrap());
         let merged = bridge.merge_pr_to_sigma_pkg(pr1).unwrap();
         assert_eq!(merged.name, "nginx");
         assert_eq!(bridge.total_prs_merged, 1);
@@ -251,14 +295,32 @@ mod tests {
     }
 
     #[test]
-    fn test_multi_format_package_conversions() {
+    fn test_all_28_distro_package_format_conversions() {
         let formats = [
+            (UniversalDistroPackageFormat::AptDeb, "debian-app", &["libc6"][..]),
             (UniversalDistroPackageFormat::PacmanPkg, "arch-app", &["glibc"][..]),
             (UniversalDistroPackageFormat::DnfRpm, "fedora-app", &["systemd"][..]),
+            (UniversalDistroPackageFormat::ZypperDeltaRpm, "opensuse-app", &["libzypp"][..]),
             (UniversalDistroPackageFormat::AlpineApk, "alpine-app", &["musl"][..]),
             (UniversalDistroPackageFormat::VoidXbps, "void-app", &["xbps"][..]),
             (UniversalDistroPackageFormat::GentooEbuild, "gentoo-app", &["portage"][..]),
             (UniversalDistroPackageFormat::BsdPkg, "freebsd-app", &["libc"][..]),
+            (UniversalDistroPackageFormat::NetBsdPkgsrc, "netbsd-app", &["pkgsrc"][..]),
+            (UniversalDistroPackageFormat::OpenBsdPorts, "openbsd-app", &["pledge"][..]),
+            (UniversalDistroPackageFormat::GuixGnuStore, "guix-app", &["guix-store"][..]),
+            (UniversalDistroPackageFormat::SolusEopkg, "solus-app", &["eopkg"][..]),
+            (UniversalDistroPackageFormat::SlackwareTxz, "slackware-app", &["pkgtool"][..]),
+            (UniversalDistroPackageFormat::PaldoUpd, "paldo-app", &["upd"][..]),
+            (UniversalDistroPackageFormat::GoboLinuxRecipe, "gobolinux-app", &["compile"][..]),
+            (UniversalDistroPackageFormat::HaikuHpkg, "haiku-app", &["libbe"][..]),
+            (UniversalDistroPackageFormat::HomebrewBottle, "homebrew-app", &["brew"][..]),
+            (UniversalDistroPackageFormat::MacPortsPortfile, "macports-app", &["port"][..]),
+            (UniversalDistroPackageFormat::CruxPkgmk, "crux-app", &["pkgmk"][..]),
+            (UniversalDistroPackageFormat::BedrockPmm, "bedrock-app", &["pmm"][..]),
+            (UniversalDistroPackageFormat::MageiaUrmi, "mageia-app", &["urpmi"][..]),
+            (UniversalDistroPackageFormat::PCLinuxOSAptRpm, "pclinuxos-app", &["apt-rpm"][..]),
+            (UniversalDistroPackageFormat::TinyCoreTcz, "tinycore-app", &["tcz"][..]),
+            (UniversalDistroPackageFormat::PuppyPet, "puppy-app", &["pet"][..]),
             (UniversalDistroPackageFormat::NixFlake, "nix-app", &["stdenv"][..]),
             (UniversalDistroPackageFormat::FlatpakApp, "flatpak-app", &["org.freedesktop.Sdk"][..]),
             (UniversalDistroPackageFormat::SnapApp, "snap-app", &["core22"][..]),
@@ -281,9 +343,10 @@ mod tests {
             assert!(bridge.validate_sat_pr_dependencies(pr).unwrap());
             let manifest = bridge.merge_pr_to_sigma_pkg(pr).unwrap();
             assert_eq!(manifest.original_format, fmt);
+            assert!(!manifest.original_format.as_str().is_empty());
         }
 
-        assert_eq!(bridge.total_prs_merged, 10);
+        assert_eq!(bridge.total_prs_merged, 28);
     }
 
     #[test]
