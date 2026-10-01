@@ -108,9 +108,16 @@ impl SovereignTrustZoneEngine {
     }
 
     /// Perform Secure Monitor Call (SMC) context switch between execution worlds
-    pub fn secure_monitor_call(&mut self, target_world: TrustZoneLevel, smc_fid: u32) -> Result<String, String> {
+    pub fn secure_monitor_call(
+        &mut self,
+        target_world: TrustZoneLevel,
+        smc_fid: u32,
+    ) -> Result<String, String> {
         if self.current_world == target_world {
-            return Ok(format!("Already in target world {:?} (FID 0x{:X})", target_world, smc_fid));
+            return Ok(format!(
+                "Already in target world {:?} (FID 0x{:X})",
+                target_world, smc_fid
+            ));
         }
 
         self.smc_dispatch_counter += 1;
@@ -126,7 +133,13 @@ impl SovereignTrustZoneEngine {
     }
 
     /// Evaluate memory access permissions across TrustZone boundaries
-    pub fn validate_trust_zone_access(&self, zone_id: u32, address: u64, size: u64, is_dma: bool) -> bool {
+    pub fn validate_trust_zone_access(
+        &self,
+        zone_id: u32,
+        address: u64,
+        size: u64,
+        is_dma: bool,
+    ) -> bool {
         if let Some(zone) = self.active_zones.get(&zone_id) {
             if is_dma && !zone.allow_dma {
                 return false; // DMA blocked in secure zone
@@ -150,7 +163,9 @@ mod tests {
         let mut tz = SovereignTrustZoneEngine::new();
         assert_eq!(tz.current_world, TrustZoneLevel::NormalWorldNonSecure);
 
-        let res = tz.secure_monitor_call(TrustZoneLevel::SecureWorldIsolated, 0x84000001).unwrap();
+        let res = tz
+            .secure_monitor_call(TrustZoneLevel::SecureWorldIsolated, 0x84000001)
+            .unwrap();
         assert!(res.contains("Switched from NormalWorldNonSecure to SecureWorldIsolated"));
         assert_eq!(tz.current_world, TrustZoneLevel::SecureWorldIsolated);
     }
@@ -163,7 +178,8 @@ mod tests {
         assert!(tz.validate_trust_zone_access(1, 0x1000_0000, 4096, true));
 
         // Switch to Secure World
-        tz.secure_monitor_call(TrustZoneLevel::SecureWorldIsolated, 0x84000001).unwrap();
+        tz.secure_monitor_call(TrustZoneLevel::SecureWorldIsolated, 0x84000001)
+            .unwrap();
 
         // Secure World DMA access should be denied
         assert!(!tz.validate_trust_zone_access(2, 0x1_0000_0000, 4096, true));

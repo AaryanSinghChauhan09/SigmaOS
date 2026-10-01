@@ -9,7 +9,6 @@
 //!
 //! Inspired by Linux kernel (SELinux/AppArmor/WireGuard/LUKS2) and BSD (Pledge/Unveil/Capsicum/Audit).
 
-
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
@@ -57,7 +56,8 @@ impl DefaultSecurePosture {
     }
 
     pub fn disable_service(&mut self, service_name: &str) {
-        self.enabled_services.insert(service_name.to_string(), false);
+        self.enabled_services
+            .insert(service_name.to_string(), false);
     }
 
     pub fn is_service_active(&self, service_name: &str) -> bool {
@@ -260,7 +260,10 @@ impl ZeroTrustNetworkPolicyEngine {
             if policy.force_wireguard_tunnel && !self.wireguard_active {
                 return false;
             }
-            let endpoint_ok = policy.allowed_endpoints.iter().any(|e| e == "*" || e == endpoint);
+            let endpoint_ok = policy
+                .allowed_endpoints
+                .iter()
+                .any(|e| e == "*" || e == endpoint);
             let port_ok = policy.allowed_ports.contains(&port);
             endpoint_ok && port_ok
         } else {
@@ -300,16 +303,26 @@ impl RuntimeSandboxController {
     }
 
     pub fn spawn_sandbox(&mut self, config: SandboxConfig) {
-        self.active_sandboxes.insert(config.app_name.clone(), config);
+        self.active_sandboxes
+            .insert(config.app_name.clone(), config);
     }
 
     pub fn can_access_file(&self, app_name: &str, path: &str, write_access: bool) -> bool {
         if let Some(config) = self.active_sandboxes.get(app_name) {
             if write_access {
-                config.allowed_paths_write.iter().any(|p| path.starts_with(p))
+                config
+                    .allowed_paths_write
+                    .iter()
+                    .any(|p| path.starts_with(p))
             } else {
-                config.allowed_paths_read.iter().any(|p| path.starts_with(p))
-                    || config.allowed_paths_write.iter().any(|p| path.starts_with(p))
+                config
+                    .allowed_paths_read
+                    .iter()
+                    .any(|p| path.starts_with(p))
+                    || config
+                        .allowed_paths_write
+                        .iter()
+                        .any(|p| path.starts_with(p))
             }
         } else {
             false // Unregistered apps cannot bypass sandbox
@@ -347,13 +360,17 @@ impl SystemIntegrityMonitor {
     pub fn verify_file_integrity(&mut self, path: &str, current_hash: u64) -> bool {
         if let Some(&expected) = self.baseline_hashes.get(path) {
             if expected != current_hash {
-                self.tamper_alerts.push(format!("File modified: {} (expected {}, got {})", path, expected, current_hash));
+                self.tamper_alerts.push(format!(
+                    "File modified: {} (expected {}, got {})",
+                    path, expected, current_hash
+                ));
                 false
             } else {
                 true
             }
         } else {
-            self.tamper_alerts.push(format!("New untracked binary detected: {}", path));
+            self.tamper_alerts
+                .push(format!("New untracked binary detected: {}", path));
             false
         }
     }
@@ -422,7 +439,8 @@ impl ImmutableAuditLogger {
             if entry.previous_entry_hash != prev {
                 return false;
             }
-            let expected_hash = prev.wrapping_add(entry.id).wrapping_add(entry.timestamp) ^ 0xDEAD_BEEF_CAFE_BABE;
+            let expected_hash =
+                prev.wrapping_add(entry.id).wrapping_add(entry.timestamp) ^ 0xDEAD_BEEF_CAFE_BABE;
             if entry.current_hash != expected_hash {
                 return false;
             }
@@ -538,8 +556,16 @@ impl SecureUpdateChannel {
         self.staged_rollouts.push(pkg);
     }
 
-    pub fn apply_update(&mut self, version: &str, target_stage: RolloutStage) -> Result<(), &'static str> {
-        if let Some(pkg) = self.staged_rollouts.iter().find(|p| p.version == version && p.stage == target_stage) {
+    pub fn apply_update(
+        &mut self,
+        version: &str,
+        target_stage: RolloutStage,
+    ) -> Result<(), &'static str> {
+        if let Some(pkg) = self
+            .staged_rollouts
+            .iter()
+            .find(|p| p.version == version && p.stage == target_stage)
+        {
             if pkg.signature_ed25519.is_empty() {
                 return Err("Invalid unsigned update package");
             }
@@ -600,7 +626,8 @@ impl IncidentResponsePlaybookEngine {
             }
         };
 
-        self.playbooks_executed.push((incident, action_summary.to_string()));
+        self.playbooks_executed
+            .push((incident, action_summary.to_string()));
         action_summary.to_string()
     }
 }
@@ -669,7 +696,9 @@ impl Default for VulnerabilityDisclosureManager {
 
 impl VulnerabilityDisclosureManager {
     pub fn new() -> Self {
-        Self { reports: Vec::new() }
+        Self {
+            reports: Vec::new(),
+        }
     }
 
     pub fn submit_report(&mut self, cve: &str, cvss: f32, title: &str, bounty: u32) {
@@ -810,7 +839,10 @@ impl SupplyChainSbomGenerator {
     }
 
     pub fn generate_spdx_json(&self) -> String {
-        format!("{{\"spdxVersion\":\"SPDX-2.3\",\"componentsCount\":{}}}", self.components.len())
+        format!(
+            "{{\"spdxVersion\":\"SPDX-2.3\",\"componentsCount\":{}}}",
+            self.components.len()
+        )
     }
 }
 
@@ -930,7 +962,11 @@ impl ComplianceProfileTemplates {
         }
     }
 
-    pub fn verify_compliance_readiness(&self, posture: &DefaultSecurePosture, audit_integrity: bool) -> bool {
+    pub fn verify_compliance_readiness(
+        &self,
+        posture: &DefaultSecurePosture,
+        audit_integrity: bool,
+    ) -> bool {
         match self.active_standard {
             ComplianceStandard::Gdpr | ComplianceStandard::IndianDpdp2023 => {
                 posture.evaluate_posture_score() >= 80 && audit_integrity
@@ -967,7 +1003,10 @@ impl Default for GovernanceCharter {
 impl GovernanceCharter {
     pub fn new() -> Self {
         let mut roles = BTreeMap::new();
-        roles.insert("AaryanSinghChauhan09".to_string(), ContributorRole::Maintainer);
+        roles.insert(
+            "AaryanSinghChauhan09".to_string(),
+            ContributorRole::Maintainer,
+        );
 
         Self {
             roles,
@@ -980,7 +1019,10 @@ impl GovernanceCharter {
     }
 
     pub fn get_role(&self, handle: &str) -> ContributorRole {
-        *self.roles.get(handle).unwrap_or(&ContributorRole::Contributor)
+        *self
+            .roles
+            .get(handle)
+            .unwrap_or(&ContributorRole::Contributor)
     }
 }
 
@@ -1008,18 +1050,30 @@ impl Default for LegalLicensingAuditor {
 impl LegalLicensingAuditor {
     pub fn new() -> Self {
         let mut licenses = BTreeMap::new();
-        licenses.insert("sigmaos-kernel".to_string(), ("MIT".to_string(), LicenseCategory::Permissive));
-        licenses.insert("sigmaos-init".to_string(), ("MIT".to_string(), LicenseCategory::Permissive));
+        licenses.insert(
+            "sigmaos-kernel".to_string(),
+            ("MIT".to_string(), LicenseCategory::Permissive),
+        );
+        licenses.insert(
+            "sigmaos-init".to_string(),
+            ("MIT".to_string(), LicenseCategory::Permissive),
+        );
 
-        Self { component_licenses: licenses }
+        Self {
+            component_licenses: licenses,
+        }
     }
 
     pub fn register_component(&mut self, name: &str, spdx: &str, category: LicenseCategory) {
-        self.component_licenses.insert(name.to_string(), (spdx.to_string(), category));
+        self.component_licenses
+            .insert(name.to_string(), (spdx.to_string(), category));
     }
 
     pub fn check_compliance(&self) -> bool {
-        !self.component_licenses.values().any(|(_, cat)| *cat == LicenseCategory::NonFree)
+        !self
+            .component_licenses
+            .values()
+            .any(|(_, cat)| *cat == LicenseCategory::NonFree)
     }
 }
 
@@ -1159,7 +1213,9 @@ mod tests {
             stage: RolloutStage::GeneralAvailability,
         });
 
-        assert!(update.apply_update("1.1.0", RolloutStage::GeneralAvailability).is_ok());
+        assert!(update
+            .apply_update("1.1.0", RolloutStage::GeneralAvailability)
+            .is_ok());
         assert_eq!(update.installed_version, "1.1.0");
     }
 
@@ -1196,7 +1252,9 @@ mod tests {
     fn test_container_security_policy() {
         let policy = ContainerSecurityPolicyEngine::new();
         assert!(policy.validate_container_launch(true, true, false).is_ok());
-        assert!(policy.validate_container_launch(false, true, false).is_err());
+        assert!(policy
+            .validate_container_launch(false, true, false)
+            .is_err());
     }
 
     #[test]

@@ -10,33 +10,33 @@ use std::collections::BTreeMap;
 use std::vec::Vec;
 
 pub mod flags {
-    pub const O_RDONLY: u32   = 0x0000;
-    pub const O_WRONLY: u32   = 0x0001;
-    pub const O_RDWR: u32     = 0x0002;
-    pub const O_APPEND: u32   = 0x0400;
+    pub const O_RDONLY: u32 = 0x0000;
+    pub const O_WRONLY: u32 = 0x0001;
+    pub const O_RDWR: u32 = 0x0002;
+    pub const O_APPEND: u32 = 0x0400;
     pub const O_NONBLOCK: u32 = 0x0800;
-    pub const O_SYNC: u32     = 0x1000;
-    pub const O_CLOEXEC: u32  = 0x80000;
+    pub const O_SYNC: u32 = 0x1000;
+    pub const O_CLOEXEC: u32 = 0x80000;
 }
 
 pub mod cap_rights {
-    pub const CAP_READ: u64    = 1 << 0;
-    pub const CAP_WRITE: u64   = 1 << 1;
-    pub const CAP_SEEK: u64    = 1 << 2;
-    pub const CAP_FCNTL: u64   = 1 << 3;
-    pub const CAP_MMAP: u64    = 1 << 4;
-    pub const CAP_ACCEPT: u64  = 1 << 5;
-    pub const CAP_BIND: u64    = 1 << 6;
+    pub const CAP_READ: u64 = 1 << 0;
+    pub const CAP_WRITE: u64 = 1 << 1;
+    pub const CAP_SEEK: u64 = 1 << 2;
+    pub const CAP_FCNTL: u64 = 1 << 3;
+    pub const CAP_MMAP: u64 = 1 << 4;
+    pub const CAP_ACCEPT: u64 = 1 << 5;
+    pub const CAP_BIND: u64 = 1 << 6;
     pub const CAP_CONNECT: u64 = 1 << 7;
-    pub const CAP_ALL: u64     = 0xFFFFFFFFFFFFFFFF;
+    pub const CAP_ALL: u64 = 0xFFFFFFFFFFFFFFFF;
 }
 
 pub mod fcntl_cmd {
-    pub const F_DUPFD: i32         = 0;
-    pub const F_GETFD: i32         = 1;
-    pub const F_SETFD: i32         = 2;
-    pub const F_GETFL: i32         = 3;
-    pub const F_SETFL: i32         = 4;
+    pub const F_DUPFD: i32 = 0;
+    pub const F_GETFD: i32 = 1;
+    pub const F_SETFD: i32 = 2;
+    pub const F_GETFL: i32 = 3;
+    pub const F_SETFL: i32 = 4;
     pub const F_DUPFD_CLOEXEC: i32 = 1030;
 }
 
@@ -116,7 +116,11 @@ impl SovereignFdTable {
     }
 
     pub fn dup(&mut self, old_fd: i32) -> Result<i32, &'static str> {
-        let old_desc = self.descriptors.get(&old_fd).ok_or("Bad file descriptor")?.clone();
+        let old_desc = self
+            .descriptors
+            .get(&old_fd)
+            .ok_or("Bad file descriptor")?
+            .clone();
         let new_fd = self.allocate_lowest_fd()?;
         // dup clears O_CLOEXEC on duplicated descriptor
         let mut new_desc = old_desc;
@@ -134,7 +138,11 @@ impl SovereignFdTable {
             }
         }
 
-        let old_desc = self.descriptors.get(&old_fd).ok_or("Bad file descriptor")?.clone();
+        let old_desc = self
+            .descriptors
+            .get(&old_fd)
+            .ok_or("Bad file descriptor")?
+            .clone();
         self.close_descriptor(new_fd);
 
         let mut new_desc = old_desc;
@@ -148,7 +156,11 @@ impl SovereignFdTable {
             return Err("dup3 oldfd and newfd cannot be equal");
         }
 
-        let old_desc = self.descriptors.get(&old_fd).ok_or("Bad file descriptor")?.clone();
+        let old_desc = self
+            .descriptors
+            .get(&old_fd)
+            .ok_or("Bad file descriptor")?
+            .clone();
         self.close_descriptor(new_fd);
 
         let mut new_desc = old_desc;
@@ -202,7 +214,8 @@ impl SovereignFdTable {
 
     /// Execve close-on-exec descriptor sweep
     pub fn exec_cloexec_sweep(&mut self) -> usize {
-        let to_remove: Vec<i32> = self.descriptors
+        let to_remove: Vec<i32> = self
+            .descriptors
             .iter()
             .filter(|(_, desc)| desc.is_cloexec())
             .map(|(&fd, _)| fd)
@@ -229,7 +242,9 @@ mod tests {
     #[test]
     fn test_fd_table_dup_dup2_dup3() {
         let mut table = SovereignFdTable::new();
-        let fd = table.open_descriptor(100, flags::O_RDWR | flags::O_CLOEXEC).unwrap();
+        let fd = table
+            .open_descriptor(100, flags::O_RDWR | flags::O_CLOEXEC)
+            .unwrap();
         assert_eq!(fd, 3);
 
         let dup_fd = table.dup(fd).unwrap();
@@ -254,15 +269,22 @@ mod tests {
         table.fcntl(fd, fcntl_cmd::F_SETFD, 1).unwrap();
         assert_eq!(table.fcntl(fd, fcntl_cmd::F_GETFD, 0).unwrap(), 1);
 
-        table.fcntl(fd, fcntl_cmd::F_SETFL, flags::O_NONBLOCK).unwrap();
-        assert_ne!(table.get_descriptor(fd).unwrap().flags & flags::O_NONBLOCK, 0);
+        table
+            .fcntl(fd, fcntl_cmd::F_SETFL, flags::O_NONBLOCK)
+            .unwrap();
+        assert_ne!(
+            table.get_descriptor(fd).unwrap().flags & flags::O_NONBLOCK,
+            0
+        );
     }
 
     #[test]
     fn test_cloexec_sweep() {
         let mut table = SovereignFdTable::new();
         table.open_descriptor(300, flags::O_RDONLY).unwrap(); // FD 3
-        table.open_descriptor(301, flags::O_RDWR | flags::O_CLOEXEC).unwrap(); // FD 4
+        table
+            .open_descriptor(301, flags::O_RDWR | flags::O_CLOEXEC)
+            .unwrap(); // FD 4
 
         let removed = table.exec_cloexec_sweep();
         assert_eq!(removed, 1);
@@ -275,12 +297,26 @@ mod tests {
         let mut table = SovereignFdTable::new();
         let fd = table.open_descriptor(400, flags::O_RDWR).unwrap();
 
-        assert!(table.get_descriptor(fd).unwrap().has_capability(cap_rights::CAP_READ));
-        assert!(table.get_descriptor(fd).unwrap().has_capability(cap_rights::CAP_WRITE));
+        assert!(table
+            .get_descriptor(fd)
+            .unwrap()
+            .has_capability(cap_rights::CAP_READ));
+        assert!(table
+            .get_descriptor(fd)
+            .unwrap()
+            .has_capability(cap_rights::CAP_WRITE));
 
-        table.cap_rights_limit(fd, cap_rights::CAP_READ | cap_rights::CAP_SEEK).unwrap();
-        assert!(table.get_descriptor(fd).unwrap().has_capability(cap_rights::CAP_READ));
-        assert!(!table.get_descriptor(fd).unwrap().has_capability(cap_rights::CAP_WRITE));
+        table
+            .cap_rights_limit(fd, cap_rights::CAP_READ | cap_rights::CAP_SEEK)
+            .unwrap();
+        assert!(table
+            .get_descriptor(fd)
+            .unwrap()
+            .has_capability(cap_rights::CAP_READ));
+        assert!(!table
+            .get_descriptor(fd)
+            .unwrap()
+            .has_capability(cap_rights::CAP_WRITE));
 
         // Expanding rights fails
         assert!(table.cap_rights_limit(fd, cap_rights::CAP_ALL).is_err());

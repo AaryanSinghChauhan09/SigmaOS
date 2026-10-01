@@ -54,10 +54,12 @@ impl SovereignLinuxulatorAbiBridge {
 
     /// Translates a Linux syscall number into a native SigmaOS syscall handler name
     pub fn translate_linux_syscall(&self, linux_nr: u32) -> Result<String, String> {
-        self.syscall_table
-            .get(&linux_nr)
-            .cloned()
-            .ok_or_else(|| format!("ENOSYS: Linux syscall number {} not supported in Linuxulator bridge", linux_nr))
+        self.syscall_table.get(&linux_nr).cloned().ok_or_else(|| {
+            format!(
+                "ENOSYS: Linux syscall number {} not supported in Linuxulator bridge",
+                linux_nr
+            )
+        })
     }
 }
 
@@ -142,7 +144,10 @@ impl OpenBsdPledgeUnveilApplicationInterface {
             }
         }
 
-        Err(format!("ENOENT: Path '{}' concealed by unveil policy", path))
+        Err(format!(
+            "ENOENT: Path '{}' concealed by unveil policy",
+            path
+        ))
     }
 }
 
@@ -238,9 +243,10 @@ impl SovereignUniversalAppInterfaceManager {
             ApplicationPersonality::LinuxX86_64 => {
                 self.linuxulator.translate_linux_syscall(syscall_nr)
             }
-            ApplicationPersonality::NativeSigmaOS | ApplicationPersonality::FreeBsdNative | ApplicationPersonality::OpenBsdNative | ApplicationPersonality::NetBsdNative => {
-                Ok(format!("sys_native_{}", syscall_nr))
-            }
+            ApplicationPersonality::NativeSigmaOS
+            | ApplicationPersonality::FreeBsdNative
+            | ApplicationPersonality::OpenBsdNative
+            | ApplicationPersonality::NetBsdNative => Ok(format!("sys_native_{}", syscall_nr)),
         }
     }
 }

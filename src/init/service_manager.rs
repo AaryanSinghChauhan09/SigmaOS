@@ -2,10 +2,8 @@
 //! Implements service management, logging, and network configuration
 use std::vec;
 
-
-
-use std::vec::Vec;
 use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Service unit types (systemd inspiration)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -81,15 +79,15 @@ impl ServiceUnit {
         if self.state == ServiceState::Running {
             return Err(ServiceError::AlreadyRunning);
         }
-        
+
         self.state = ServiceState::Starting;
-        
+
         // Execute start commands
         for command in &self.exec_start {
             // Execute command (Linux systemd inspiration)
             println!("Executing: {}", command);
         }
-        
+
         self.state = ServiceState::Running;
         Ok(())
     }
@@ -98,14 +96,14 @@ impl ServiceUnit {
         if self.state == ServiceState::Stopped {
             return Err(ServiceError::AlreadyStopped);
         }
-        
+
         self.state = ServiceState::Stopping;
-        
+
         // Execute stop commands
         for command in &self.exec_stop {
             println!("Executing: {}", command);
         }
-        
+
         self.state = ServiceState::Stopped;
         Ok(())
     }
@@ -350,7 +348,11 @@ impl NetworkManager {
         self.interfaces.push(interface);
     }
 
-    pub fn configure_interface(&mut self, name: &str, config: NetworkConfig) -> Result<(), NetworkError> {
+    pub fn configure_interface(
+        &mut self,
+        name: &str,
+        config: NetworkConfig,
+    ) -> Result<(), NetworkError> {
         if let Some(interface) = self.interfaces.iter_mut().find(|i| i.name == name) {
             interface.ip_address = config.ip_address;
             interface.netmask = config.netmask;

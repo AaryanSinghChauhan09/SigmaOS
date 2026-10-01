@@ -107,7 +107,9 @@ impl SovereignSystemd270AutonomousServiceEngine {
     pub fn activate_service(&mut self, service_name: &str, signature_bytes: &[u8]) -> bool {
         let sig_digest = fnv1a_2040_digest(signature_bytes);
         if let Some(service) = self.services.get_mut(service_name) {
-            if service.ml_dsa_1024_signature_fingerprint == sig_digest || !signature_bytes.is_empty() {
+            if service.ml_dsa_1024_signature_fingerprint == sig_digest
+                || !signature_bytes.is_empty()
+            {
                 service.is_active = true;
                 self.pqc_signature_verifications += 1;
                 true
@@ -448,21 +450,30 @@ impl Sovereign2040DistroSupremacyMasterSuite {
         let mut score = 50u32; // Base baseline score
 
         // 1. Systemd 270 ML-DSA-1024 autonomous service engine (+10)
-        self.service_engine.register_autonomous_service("sigma-core", "/usr/bin/sigma-core", 0xFF);
-        if self.service_engine.activate_service("sigma-core", b"sig_data")
+        self.service_engine
+            .register_autonomous_service("sigma-core", "/usr/bin/sigma-core", 0xFF);
+        if self
+            .service_engine
+            .activate_service("sigma-core", b"sig_data")
             && self.service_engine.heal_service_failure("sigma-core")
         {
             score += 10;
         }
 
         // 2. Linux 8.0 Bcachefs CXL 4.0 optical mesh engine (+10)
-        self.bcachefs_mesh_engine.allocate_optical_extent(1, "/var/db/mesh", StorageTier2040::OptaneNvmeGen7, 2 * 1024 * 1024);
+        self.bcachefs_mesh_engine.allocate_optical_extent(
+            1,
+            "/var/db/mesh",
+            StorageTier2040::OptaneNvmeGen7,
+            2 * 1024 * 1024,
+        );
         if self.bcachefs_mesh_engine.promote_to_optical_mesh(1) {
             score += 10;
         }
 
         // 3. OpenBSD 9.0 HyperFineIBT CFI & unveil v10 guard (+10)
-        self.openbsd_guard.register_hyper_ibt_region("sys_kernel_hyper", 0x2000, 0xB000);
+        self.openbsd_guard
+            .register_hyper_ibt_region("sys_kernel_hyper", 0x2000, 0xB000);
         self.openbsd_guard.lock_unveil_v10_paths();
         if self.openbsd_guard.validate_instruction_pointer(0x3000) {
             score += 10;
@@ -481,7 +492,8 @@ impl Sovereign2040DistroSupremacyMasterSuite {
         }
 
         // 5. Wayland 1.35 zero-copy direct KMS display pipeline (+10)
-        self.wayland_display_engine.submit_zero_copy_frame(1, 101, 600);
+        self.wayland_display_engine
+            .submit_zero_copy_frame(1, 101, 600);
         if self.wayland_display_engine.direct_scanout_hits > 0 {
             score += 10;
         }
@@ -537,13 +549,7 @@ mod tests {
     #[test]
     fn test_freebsd180_quantum_vnet_xdp_engine() {
         let mut engine = SovereignFreeBsd180QuantumVnetXdpEngine::new();
-        engine.spawn_quantum_vnet_jail(
-            5,
-            "quantum_jail",
-            [10, 10, 0, 1],
-            [0; 16],
-            0xFF,
-        );
+        engine.spawn_quantum_vnet_jail(5, "quantum_jail", [10, 10, 0, 1], [0; 16], 0xFF);
         assert!(engine.process_xdp_quantum_packet(5, 1024));
         assert_eq!(engine.zero_copy_packets_processed, 1);
         assert_eq!(engine.pqc_mesh_tunnels_established, 1);

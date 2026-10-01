@@ -54,7 +54,13 @@ pub struct MountPoint {
 }
 
 impl MountPoint {
-    pub fn new(source: String, target: String, filesystem_type: String, flags: MountFlags, options: String) -> Self {
+    pub fn new(
+        source: String,
+        target: String,
+        filesystem_type: String,
+        flags: MountFlags,
+        options: String,
+    ) -> Self {
         MountPoint {
             source,
             target,
@@ -103,13 +109,24 @@ impl MountNamespace {
     }
 
     /// Mount a filesystem
-    pub fn mount(&mut self, source: String, target: String, filesystem_type: String, flags: MountFlags, options: String) -> Result<(), String> {
+    pub fn mount(
+        &mut self,
+        source: String,
+        target: String,
+        filesystem_type: String,
+        flags: MountFlags,
+        options: String,
+    ) -> Result<(), String> {
         if self.mounts.contains_key(&target) {
             return Err(format!("Mount point already exists: {}", target));
         }
 
         let mount_point = Arc::new(Mutex::new(MountPoint::new(
-            source, target.clone(), filesystem_type, flags, options,
+            source,
+            target.clone(),
+            filesystem_type,
+            flags,
+            options,
         )));
         mount_point.lock().unwrap().mount();
 
@@ -119,7 +136,9 @@ impl MountNamespace {
 
     /// Unmount a filesystem
     pub fn unmount(&mut self, target: &str) -> Result<(), String> {
-        let mount_point = self.mounts.remove(target)
+        let mount_point = self
+            .mounts
+            .remove(target)
             .ok_or_else(|| format!("Mount point not found: {}", target))?;
 
         let mut mount_guard = mount_point.lock().unwrap();
@@ -209,13 +228,15 @@ mod tests {
     fn test_mount_namespace_mount() {
         let mut namespace = MountNamespace::new();
 
-        namespace.mount(
-            "/dev/sda1".to_string(),
-            "/mnt/data".to_string(),
-            "ext4".to_string(),
-            MountFlags::new(),
-            "".to_string(),
-        ).unwrap();
+        namespace
+            .mount(
+                "/dev/sda1".to_string(),
+                "/mnt/data".to_string(),
+                "ext4".to_string(),
+                MountFlags::new(),
+                "".to_string(),
+            )
+            .unwrap();
 
         assert_eq!(namespace.mount_count(), 2);
     }
@@ -224,13 +245,15 @@ mod tests {
     fn test_mount_namespace_mount_duplicate() {
         let mut namespace = MountNamespace::new();
 
-        namespace.mount(
-            "/dev/sda1".to_string(),
-            "/mnt/data".to_string(),
-            "ext4".to_string(),
-            MountFlags::new(),
-            "".to_string(),
-        ).unwrap();
+        namespace
+            .mount(
+                "/dev/sda1".to_string(),
+                "/mnt/data".to_string(),
+                "ext4".to_string(),
+                MountFlags::new(),
+                "".to_string(),
+            )
+            .unwrap();
 
         let result = namespace.mount(
             "/dev/sda2".to_string(),
@@ -247,13 +270,15 @@ mod tests {
     fn test_mount_namespace_unmount() {
         let mut namespace = MountNamespace::new();
 
-        namespace.mount(
-            "/dev/sda1".to_string(),
-            "/mnt/data".to_string(),
-            "ext4".to_string(),
-            MountFlags::new(),
-            "".to_string(),
-        ).unwrap();
+        namespace
+            .mount(
+                "/dev/sda1".to_string(),
+                "/mnt/data".to_string(),
+                "ext4".to_string(),
+                MountFlags::new(),
+                "".to_string(),
+            )
+            .unwrap();
 
         namespace.unmount("/mnt/data").unwrap();
         assert_eq!(namespace.mount_count(), 1);
@@ -271,13 +296,15 @@ mod tests {
     fn test_mount_namespace_get_mount() {
         let mut namespace = MountNamespace::new();
 
-        namespace.mount(
-            "/dev/sda1".to_string(),
-            "/mnt/data".to_string(),
-            "ext4".to_string(),
-            MountFlags::new(),
-            "".to_string(),
-        ).unwrap();
+        namespace
+            .mount(
+                "/dev/sda1".to_string(),
+                "/mnt/data".to_string(),
+                "ext4".to_string(),
+                MountFlags::new(),
+                "".to_string(),
+            )
+            .unwrap();
 
         let mount = namespace.get_mount("/mnt/data");
         assert!(mount.is_some());
@@ -287,13 +314,15 @@ mod tests {
     fn test_mount_namespace_list_mounts() {
         let mut namespace = MountNamespace::new();
 
-        namespace.mount(
-            "/dev/sda1".to_string(),
-            "/mnt/data".to_string(),
-            "ext4".to_string(),
-            MountFlags::new(),
-            "".to_string(),
-        ).unwrap();
+        namespace
+            .mount(
+                "/dev/sda1".to_string(),
+                "/mnt/data".to_string(),
+                "ext4".to_string(),
+                MountFlags::new(),
+                "".to_string(),
+            )
+            .unwrap();
 
         let mounts = namespace.list_mounts();
         assert_eq!(mounts.len(), 2);

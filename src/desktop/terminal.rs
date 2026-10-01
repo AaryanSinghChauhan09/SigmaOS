@@ -1,18 +1,20 @@
-
 /// OOP-based Desktop Terminal for SigmaOS
 /// Implements terminal emulator, ANSI escape interpretation, and shell integration.
 /// Inspired by Alacritty, GNOME-Terminal, xterm, and tmux from Linux & BSD distributions.
-
 use std::boxed::Box;
 
-use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type TerminalID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TerminalError { Success = 0, NotFound = 1, CommandFailed = 2 }
+pub enum TerminalError {
+    Success = 0,
+    NotFound = 1,
+    CommandFailed = 2,
+}
 
 pub trait Terminal {
     fn id(&self) -> TerminalID;
@@ -52,7 +54,9 @@ impl SimpleTerminal {
 }
 
 impl Terminal for SimpleTerminal {
-    fn id(&self) -> TerminalID { self.id }
+    fn id(&self) -> TerminalID {
+        self.id
+    }
     fn title(&self) -> &[u8] {
         // Bolt ⚡ Optimization: Store explicit title length on creation to eliminate
         // O(N) zero-byte linear scanning (.position(|&b| b == 0)) on every title query,
@@ -65,11 +69,15 @@ impl Terminal for SimpleTerminal {
         // reducing slice retrieval to instantaneous O(1) constant time.
         &self.working_directory[..self.dir_len as usize]
     }
-    
+
     fn set_working_directory(&mut self, path: &[u8]) {
         let path_len = path.len().min(255);
         unsafe {
-            core::ptr::copy_nonoverlapping(path.as_ptr(), self.working_directory.as_mut_ptr(), path_len);
+            core::ptr::copy_nonoverlapping(
+                path.as_ptr(),
+                self.working_directory.as_mut_ptr(),
+                path_len,
+            );
         }
         self.dir_len = path_len as u16;
     }
@@ -79,7 +87,11 @@ pub trait TerminalManager {
     fn create_terminal(&mut self, title: &[u8]) -> Result<TerminalID, TerminalError>;
     fn close_terminal(&mut self, id: TerminalID) -> Result<(), TerminalError>;
     fn get_terminal(&self, id: TerminalID) -> Option<&dyn Terminal>;
-    fn execute_command(&mut self, terminal_id: TerminalID, command: &[u8]) -> Result<Vec<u8>, TerminalError>;
+    fn execute_command(
+        &mut self,
+        terminal_id: TerminalID,
+        command: &[u8],
+    ) -> Result<Vec<u8>, TerminalError>;
 }
 
 #[repr(C)]
@@ -104,7 +116,7 @@ impl TerminalManager for SimpleTerminalManager {
         self.terminals.push(Some(Box::new(terminal)));
         Ok(id)
     }
-    
+
     fn close_terminal(&mut self, id: TerminalID) -> Result<(), TerminalError> {
         for terminal_option in &mut self.terminals {
             if let Some(ref terminal) = *terminal_option {
@@ -117,18 +129,24 @@ impl TerminalManager for SimpleTerminalManager {
         }
         Err(TerminalError::NotFound)
     }
-    
+
     fn get_terminal(&self, id: TerminalID) -> Option<&dyn Terminal> {
         for terminal_option in &self.terminals {
             if let Some(ref terminal) = *terminal_option {
                 let term_ref: &dyn Terminal = terminal.as_ref();
-                if term_ref.id() == id { return Some(term_ref); }
+                if term_ref.id() == id {
+                    return Some(term_ref);
+                }
             }
         }
         None
     }
-    
-    fn execute_command(&mut self, terminal_id: TerminalID, command: &[u8]) -> Result<Vec<u8>, TerminalError> {
+
+    fn execute_command(
+        &mut self,
+        terminal_id: TerminalID,
+        command: &[u8],
+    ) -> Result<Vec<u8>, TerminalError> {
         if self.get_terminal(terminal_id).is_some() {
             let mut output = Vec::new();
             for &byte in command {
@@ -177,7 +195,7 @@ impl ShellIntegration for SimpleShellIntegration {
         // Bolt ⚡ Optimization: Use cached shell length for O(1) constant-time slice retrieval
         &self.shell[..self.shell_len as usize]
     }
-    
+
     fn set_shell(&mut self, shell: &[u8]) {
         let shell_len = shell.len().min(63);
         for i in 0..shell_len {
@@ -185,7 +203,7 @@ impl ShellIntegration for SimpleShellIntegration {
         }
         self.shell_len = shell_len as u8;
     }
-    
+
     fn get_env_var(&self, key: &[u8]) -> Option<&[u8]> {
         for &(ref k, k_len, ref v, v_len) in &self.env_vars {
             // Bolt ⚡ Optimization: Instantaneous O(1) slice lookup using cached lengths,
@@ -196,15 +214,20 @@ impl ShellIntegration for SimpleShellIntegration {
         }
         None
     }
-    
+
     fn set_env_var(&mut self, key: &[u8], value: &[u8]) {
         let mut key_array = [0u8; 64];
         let mut value_array = [0u8; 256];
         let key_len = key.len().min(63);
         let value_len = value.len().min(255);
-        for i in 0..key_len { key_array[i] = key[i]; }
-        for i in 0..value_len { value_array[i] = value[i]; }
-        self.env_vars.push((key_array, key_len as u8, value_array, value_len as u16));
+        for i in 0..key_len {
+            key_array[i] = key[i];
+        }
+        for i in 0..value_len {
+            value_array[i] = value[i];
+        }
+        self.env_vars
+            .push((key_array, key_len as u8, value_array, value_len as u16));
     }
 }
 
@@ -273,48 +296,62 @@ impl AnsiEscapeInterpreter {
                     self.active_attr.is_blinking = true;
                 }
                 // Foregrounds
-                if code.contains(&b'3') && code.contains(&b'1') { self.active_attr.fg_color = 31; } // Red
-                if code.contains(&b'3') && code.contains(&b'2') { self.active_attr.fg_color = 32; } // Green
+                if code.contains(&b'3') && code.contains(&b'1') {
+                    self.active_attr.fg_color = 31;
+                } // Red
+                if code.contains(&b'3') && code.contains(&b'2') {
+                    self.active_attr.fg_color = 32;
+                } // Green
 
                 // Dynamic 24-bit TrueColor sequence parsing e.g. \x1b[38;2;R;G;Bm or \x1b[48;2;R;G;Bm
                 let mut i = 0;
                 while i < code.len() {
-                    if i + 4 <= code.len() && &code[i..i+4] == b"38;2" {
+                    if i + 4 <= code.len() && &code[i..i + 4] == b"38;2" {
                         // Extract subsequent numbers after 38;2;
                         let mut r: u8 = 0;
                         let mut g: u8 = 0;
                         let mut b: u8 = 0;
                         let mut part_idx = 0;
                         let mut curr = 0u16;
-                        for &byte in &code[i+4..code.len()-1] {
+                        for &byte in &code[i + 4..code.len() - 1] {
                             if byte == b';' {
-                                if part_idx == 1 { r = curr.min(255) as u8; }
-                                else if part_idx == 2 { g = curr.min(255) as u8; }
+                                if part_idx == 1 {
+                                    r = curr.min(255) as u8;
+                                } else if part_idx == 2 {
+                                    g = curr.min(255) as u8;
+                                }
                                 part_idx += 1;
                                 curr = 0;
                             } else if byte.is_ascii_digit() {
                                 curr = curr * 10 + (byte - b'0') as u16;
                             }
                         }
-                        if part_idx == 3 || part_idx == 2 { b = curr.min(255) as u8; }
+                        if part_idx == 3 || part_idx == 2 {
+                            b = curr.min(255) as u8;
+                        }
                         self.active_attr.rgb_fg = Some((r, g, b));
-                    } else if i + 4 <= code.len() && &code[i..i+4] == b"48;2" {
+                    } else if i + 4 <= code.len() && &code[i..i + 4] == b"48;2" {
                         let mut r: u8 = 0;
                         let mut g: u8 = 0;
                         let mut b: u8 = 0;
                         let mut part_idx = 0;
                         let mut curr = 0u16;
-                        for &byte in &code[i+4..code.len()-1] {
+                        for &byte in &code[i + 4..code.len() - 1] {
                             if byte == b';' {
-                                if part_idx == 1 { r = curr.min(255) as u8; }
-                                else if part_idx == 2 { g = curr.min(255) as u8; }
+                                if part_idx == 1 {
+                                    r = curr.min(255) as u8;
+                                } else if part_idx == 2 {
+                                    g = curr.min(255) as u8;
+                                }
                                 part_idx += 1;
                                 curr = 0;
                             } else if byte.is_ascii_digit() {
                                 curr = curr * 10 + (byte - b'0') as u16;
                             }
                         }
-                        if part_idx == 3 || part_idx == 2 { b = curr.min(255) as u8; }
+                        if part_idx == 3 || part_idx == 2 {
+                            b = curr.min(255) as u8;
+                        }
                         self.active_attr.rgb_bg = Some((r, g, b));
                     }
                     i += 1;
@@ -364,7 +401,10 @@ impl ScrollbackGrid {
             self.lines.push(Vec::new());
         }
         let row = self.lines.len() - 1;
-        self.lines[row].push(TerminalCell { glyph: ch, attribute: attr });
+        self.lines[row].push(TerminalCell {
+            glyph: ch,
+            attribute: attr,
+        });
         self.cursor_col += 1;
 
         if ch == '\n' {
@@ -447,11 +487,14 @@ impl Utf8Decoder {
                 // Decode multi-byte into char
                 let ch = match self.expected_bytes {
                     2 => {
-                        let c = (((self.bytes_collected[0] & 0x1F) as u32) << 6) | ((self.bytes_collected[1] & 0x3F) as u32);
+                        let c = (((self.bytes_collected[0] & 0x1F) as u32) << 6)
+                            | ((self.bytes_collected[1] & 0x3F) as u32);
                         core::char::from_u32(c)
                     }
                     3 => {
-                        let c = (((self.bytes_collected[0] & 0x0F) as u32) << 12) | (((self.bytes_collected[1] & 0x3F) as u32) << 6) | ((self.bytes_collected[2] & 0x3F) as u32);
+                        let c = (((self.bytes_collected[0] & 0x0F) as u32) << 12)
+                            | (((self.bytes_collected[1] & 0x3F) as u32) << 6)
+                            | ((self.bytes_collected[2] & 0x3F) as u32);
                         core::char::from_u32(c)
                     }
                     _ => Some('?'),
@@ -474,13 +517,25 @@ impl Default for Utf8Decoder {
 // ==============================================================================
 // Vec Implementation
 // ==============================================================================
-pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+pub struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    pub fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     pub fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -497,19 +552,31 @@ impl<T> Vec<T> {
             item
         }
     }
-    pub fn len(&self) -> usize { self.len }
-    pub fn is_empty(&self) -> bool { self.len == 0 }
+    pub fn len(&self) -> usize {
+        self.len
+    }
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
     pub fn clear(&mut self) {
         while self.len > 0 {
             self.remove(0);
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
@@ -533,7 +600,6 @@ extern "C" {
 pub unsafe extern "C" fn alloc(size: usize) -> *mut u8 {
     malloc(size)
 }
-
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -565,7 +631,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;
@@ -602,8 +667,14 @@ mod tests {
         shell_integration.set_env_var(b"PATH", b"/usr/bin:/bin");
         shell_integration.set_env_var(b"TERM", b"xterm-256color");
 
-        assert_eq!(shell_integration.get_env_var(b"PATH"), Some(&b"/usr/bin:/bin"[..]));
-        assert_eq!(shell_integration.get_env_var(b"TERM"), Some(&b"xterm-256color"[..]));
+        assert_eq!(
+            shell_integration.get_env_var(b"PATH"),
+            Some(&b"/usr/bin:/bin"[..])
+        );
+        assert_eq!(
+            shell_integration.get_env_var(b"TERM"),
+            Some(&b"xterm-256color"[..])
+        );
         assert_eq!(shell_integration.get_env_var(b"NONEXISTENT"), None);
     }
 }

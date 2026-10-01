@@ -97,8 +97,12 @@ impl ZorinExecGuardPolicyEngine {
         // System defaults
         engine.verified_system_binaries.push("/bin/sh".to_string());
         engine.verified_system_binaries.push("/bin/ls".to_string());
-        engine.verified_system_binaries.push("/usr/bin/sigma-browser".to_string());
-        engine.verified_system_binaries.push("/usr/bin/zenith".to_string());
+        engine
+            .verified_system_binaries
+            .push("/usr/bin/sigma-browser".to_string());
+        engine
+            .verified_system_binaries
+            .push("/usr/bin/zenith".to_string());
 
         // Default alternative suggestions
         engine.alternative_suggestions.insert(
@@ -163,7 +167,11 @@ impl ZorinExecGuardPolicyEngine {
         let filename = binary_path.split('/').last().unwrap_or(binary_path);
 
         // 1. Check system verified binaries
-        if self.verified_system_binaries.iter().any(|b| b == binary_path) {
+        if self
+            .verified_system_binaries
+            .iter()
+            .any(|b| b == binary_path)
+        {
             return ExecDecision::Allow {
                 capabilities: vec![
                     ExecCapability::FileRead,
@@ -179,7 +187,11 @@ impl ZorinExecGuardPolicyEngine {
 
         // 2. Check trusted certificates
         if let Some(thumbprint) = cert_thumbprint {
-            if let Some(cert) = self.trusted_certificates.iter().find(|c| c.thumbprint == thumbprint) {
+            if let Some(cert) = self
+                .trusted_certificates
+                .iter()
+                .find(|c| c.thumbprint == thumbprint)
+            {
                 return ExecDecision::Allow {
                     capabilities: cert.actions.clone(),
                     trust_source: format!("Certificate Issuer: {}", cert.issuer),
@@ -189,7 +201,11 @@ impl ZorinExecGuardPolicyEngine {
 
         // 3. Check binary overrides
         if let Some(hash) = sha256_hash {
-            if let Some(over) = self.binary_overrides.iter().find(|b| b.override_hash == hash || b.binary_name == filename) {
+            if let Some(over) = self
+                .binary_overrides
+                .iter()
+                .find(|b| b.override_hash == hash || b.binary_name == filename)
+            {
                 return ExecDecision::Allow {
                     capabilities: vec![
                         ExecCapability::FileRead,
@@ -216,7 +232,10 @@ impl ZorinExecGuardPolicyEngine {
                         if rule.allow_unsigned_execution {
                             return ExecDecision::Allow {
                                 capabilities: rule.allowed_capabilities.clone(),
-                                trust_source: format!("Developer Workspace Rule: {}", rule.path_prefix),
+                                trust_source: format!(
+                                    "Developer Workspace Rule: {}",
+                                    rule.path_prefix
+                                ),
                             };
                         }
                     }
@@ -225,13 +244,18 @@ impl ZorinExecGuardPolicyEngine {
         }
 
         // 5. Unrecognized execution fallback logic
-        let suggested_alt = self.alternative_suggestions.get(filename)
+        let suggested_alt = self
+            .alternative_suggestions
+            .get(filename)
             .cloned()
             .unwrap_or_else(|| format!("sigpkg search {}", filename));
 
         if self.developer_mode.interactive_prompts {
             if self.developer_mode.log_violations {
-                self.violation_journal.push(format!("VIOLATION_PROMPT: Binary '{}' requested execution", binary_path));
+                self.violation_journal.push(format!(
+                    "VIOLATION_PROMPT: Binary '{}' requested execution",
+                    binary_path
+                ));
             }
             ExecDecision::PromptDeveloper {
                 binary_path: binary_path.to_string(),
@@ -240,7 +264,10 @@ impl ZorinExecGuardPolicyEngine {
             }
         } else {
             if self.developer_mode.log_violations {
-                self.violation_journal.push(format!("VIOLATION_DENY: Binary '{}' blocked by default-deny policy", binary_path));
+                self.violation_journal.push(format!(
+                    "VIOLATION_DENY: Binary '{}' blocked by default-deny policy",
+                    binary_path
+                ));
             }
             ExecDecision::HardDeny {
                 reason: "Default-Deny policy blocked untrusted binary execution".to_string(),
@@ -286,19 +313,17 @@ mod tests {
                 ExecCapability::FileWrite,
                 ExecCapability::ProcessExec,
             ],
-            blocked_capabilities: vec![
-                ExecCapability::NetworkTcp,
-                ExecCapability::DisplayAccess,
-            ],
+            blocked_capabilities: vec![ExecCapability::NetworkTcp, ExecCapability::DisplayAccess],
         });
 
-        let decision = engine.evaluate_execution(
-            "/home/developer/workspace/my_test_app",
-            None,
-            None,
-        );
+        let decision =
+            engine.evaluate_execution("/home/developer/workspace/my_test_app", None, None);
 
-        if let ExecDecision::Allow { capabilities, trust_source } = decision {
+        if let ExecDecision::Allow {
+            capabilities,
+            trust_source,
+        } = decision
+        {
             assert!(capabilities.contains(&ExecCapability::FileRead));
             assert!(!capabilities.contains(&ExecCapability::NetworkTcp));
             assert!(trust_source.contains("Developer Workspace Rule"));
@@ -313,7 +338,11 @@ mod tests {
         engine.developer_mode.interactive_prompts = false;
 
         let decision = engine.evaluate_execution("/tmp/photoshop.exe", None, None);
-        if let ExecDecision::HardDeny { suggested_alternative, .. } = decision {
+        if let ExecDecision::HardDeny {
+            suggested_alternative,
+            ..
+        } = decision
+        {
             assert!(suggested_alternative.contains("photopea"));
         } else {
             panic!("Expected HardDeny decision");
@@ -337,11 +366,16 @@ mod tests {
         assert!(matches!(decision_exact, ExecDecision::Allow { .. }));
 
         // Child path with separator boundary
-        let decision_child = engine.evaluate_execution("/home/developer/app/bin/runner", None, None);
+        let decision_child =
+            engine.evaluate_execution("/home/developer/app/bin/runner", None, None);
         assert!(matches!(decision_child, ExecDecision::Allow { .. }));
 
         // Sibling path prefix confusion attack (e.g. /home/developer/app_evil/payload) must NOT match!
-        let decision_sibling = engine.evaluate_execution("/home/developer/app_evil/payload", None, None);
-        assert!(matches!(decision_sibling, ExecDecision::PromptDeveloper { .. }));
+        let decision_sibling =
+            engine.evaluate_execution("/home/developer/app_evil/payload", None, None);
+        assert!(matches!(
+            decision_sibling,
+            ExecDecision::PromptDeveloper { .. }
+        ));
     }
 }

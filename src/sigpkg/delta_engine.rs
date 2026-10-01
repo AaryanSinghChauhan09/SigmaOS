@@ -14,10 +14,10 @@
 
 #![allow(dead_code)]
 
-use std::vec::Vec;
 use std::collections::BTreeMap;
-use std::string::{String, ToString};
 use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // ─── Chunk Classification ─────────────────────────────────────────────────────
 

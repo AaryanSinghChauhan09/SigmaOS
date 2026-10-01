@@ -40,8 +40,12 @@ impl XbpsDatabase {
     pub fn new() -> Self {
         let mut repos = Vec::new();
         repos.push(String::from("https://repo-default.voidlinux.org/current"));
-        repos.push(String::from("https://repo-default.voidlinux.org/current/musl"));
-        repos.push(String::from("https://repo-default.voidlinux.org/current/nonfree"));
+        repos.push(String::from(
+            "https://repo-default.voidlinux.org/current/musl",
+        ));
+        repos.push(String::from(
+            "https://repo-default.voidlinux.org/current/nonfree",
+        ));
 
         Self {
             installed: BTreeMap::new(),
@@ -195,8 +199,9 @@ impl XbpsDatabase {
         // Check for available updates
         for (name, installed_pkg) in &self.installed {
             if let Some(available_pkg) = self.available.get(name) {
-                if available_pkg.version != installed_pkg.version || 
-                   available_pkg.revision != installed_pkg.revision {
+                if available_pkg.version != installed_pkg.version
+                    || available_pkg.revision != installed_pkg.revision
+                {
                     to_upgrade.push(name.clone());
                 }
             }
@@ -230,17 +235,28 @@ impl XbpsPackageVerifier {
         let mut digests = BTreeMap::new();
         digests.insert(
             "xbps".to_string(),
-            concat!("e3b0c44298fc1c149afbf4c8996fb924", "27ae41e4649b934ca495991b7852b855").to_string(),
+            concat!(
+                "e3b0c44298fc1c149afbf4c8996fb924",
+                "27ae41e4649b934ca495991b7852b855"
+            )
+            .to_string(),
         );
         digests.insert(
             "musl".to_string(),
-            concat!("ca978112ca1bbdcafac231b39a23dac4", "ed703a08a47f3001851e3f8a0a81ed68").to_string(),
+            concat!(
+                "ca978112ca1bbdcafac231b39a23dac4",
+                "ed703a08a47f3001851e3f8a0a81ed68"
+            )
+            .to_string(),
         );
-        Self { known_digests: digests }
+        Self {
+            known_digests: digests,
+        }
     }
 
     pub fn register_digest(&mut self, pkg_name: &str, sha256_hex: &str) {
-        self.known_digests.insert(pkg_name.to_string(), sha256_hex.to_string());
+        self.known_digests
+            .insert(pkg_name.to_string(), sha256_hex.to_string());
     }
 
     pub fn verify_digest(&self, pkg_name: &str, computed_sha256: &str) -> Result<bool, XbpsError> {
@@ -314,7 +330,7 @@ pub struct RinitInitSystem {
 impl RinitInitSystem {
     pub fn new() -> Self {
         let mut services = BTreeMap::new();
-        
+
         // Core Void Linux services
         services.insert(
             String::from("sshd"),
@@ -440,23 +456,28 @@ impl RunitStageManager {
     /// Execute Stage 1: One-time system initialization
     pub fn run_stage_1_boot(&mut self) -> RunitStage {
         self.active_stage = RunitStage::Stage1Boot;
-        self.stage_logs.push("STAGE1: Mounting essential filesystems (/proc, /sys, /dev)".to_string());
-        self.stage_logs.push("STAGE1: Initializing device nodes & hostname".to_string());
+        self.stage_logs
+            .push("STAGE1: Mounting essential filesystems (/proc, /sys, /dev)".to_string());
+        self.stage_logs
+            .push("STAGE1: Initializing device nodes & hostname".to_string());
         RunitStage::Stage1Boot
     }
 
     /// Execute Stage 2: Main service execution loop (runsvdir)
     pub fn run_stage_2_services(&mut self) -> RunitStage {
         self.active_stage = RunitStage::Stage2Running;
-        self.stage_logs.push("STAGE2: Spawning runsvdir on /var/service".to_string());
+        self.stage_logs
+            .push("STAGE2: Spawning runsvdir on /var/service".to_string());
         RunitStage::Stage2Running
     }
 
     /// Execute Stage 3: Shutdown and unmount tasks
     pub fn run_stage_3_shutdown(&mut self) -> RunitStage {
         self.active_stage = RunitStage::Stage3Shutdown;
-        self.stage_logs.push("STAGE3: Stopping active runit services".to_string());
-        self.stage_logs.push("STAGE3: Syncing drives & unmounting filesystems".to_string());
+        self.stage_logs
+            .push("STAGE3: Stopping active runit services".to_string());
+        self.stage_logs
+            .push("STAGE3: Syncing drives & unmounting filesystems".to_string());
         RunitStage::Stage3Shutdown
     }
 }
@@ -496,7 +517,7 @@ impl VoidMuslToolchain {
 
     pub fn get_toolchain_env(&self) -> BTreeMap<String, String> {
         let mut env = BTreeMap::new();
-        
+
         if self.default_libc == "musl" {
             env.insert(String::from("CC"), String::from("musl-gcc"));
             env.insert(String::from("CXX"), String::from("musl-g++"));
@@ -582,7 +603,15 @@ mod tests {
     #[test]
     fn test_xbps_verifier() {
         let verifier = XbpsPackageVerifier::new();
-        let ok = verifier.verify_digest("xbps", concat!("e3b0c44298fc1c149afbf4c8996fb924", "27ae41e4649b934ca495991b7852b855")).unwrap();
+        let ok = verifier
+            .verify_digest(
+                "xbps",
+                concat!(
+                    "e3b0c44298fc1c149afbf4c8996fb924",
+                    "27ae41e4649b934ca495991b7852b855"
+                ),
+            )
+            .unwrap();
         assert!(ok);
 
         let err = verifier.verify_digest("xbps", "bad_hash");
@@ -592,10 +621,10 @@ mod tests {
     #[test]
     fn test_rinit_service_control() {
         let mut rinit = RinitInitSystem::new();
-        
+
         assert!(rinit.sv("sshd", RunitSignal::Down).is_ok());
         assert_eq!(rinit.status("sshd").unwrap().state, RunitServiceState::Down);
-        
+
         assert!(rinit.sv("sshd", RunitSignal::Up).is_ok());
         assert_eq!(rinit.status("sshd").unwrap().state, RunitServiceState::Up);
     }
@@ -612,12 +641,12 @@ mod tests {
     #[test]
     fn test_void_musl_toolchain() {
         let mut toolchain = VoidMuslToolchain::new();
-        
+
         assert!(toolchain.is_musl_system());
-        
+
         toolchain.set_default_libc("glibc");
         assert!(!toolchain.is_musl_system());
-        
+
         let env = toolchain.get_toolchain_env();
         assert_eq!(env.get("CC"), Some(&String::from("gcc")));
     }

@@ -11,8 +11,8 @@ pub const MAX_HOSTNAME_LEN: usize = 253;
 pub const MAX_COMMAND_LEN: usize = 65536;
 pub const MAX_ENV_VAR_LEN: usize = 32768;
 pub const MAX_ENV_KEY_LEN: usize = 256;
-pub const MAX_IPV4_LEN: usize = 15;    // "255.255.255.255"
-pub const MAX_IPV6_LEN: usize = 39;    // full IPv6 text
+pub const MAX_IPV4_LEN: usize = 15; // "255.255.255.255"
+pub const MAX_IPV6_LEN: usize = 39; // full IPv6 text
 
 /// Errors produced by input validation routines.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -265,7 +265,11 @@ pub fn usize_to_u32_saturating(v: usize) -> u32 {
 /// Checked cast from `usize` to `u16` — returns `None` if out of range.
 #[inline(always)]
 pub fn usize_to_u16(v: usize) -> Option<u16> {
-    if v > u16::MAX as usize { None } else { Some(v as u16) }
+    if v > u16::MAX as usize {
+        None
+    } else {
+        Some(v as u16)
+    }
 }
 
 // ── Log sanitisation ───────────────────────────────────────────────────────
@@ -276,7 +280,11 @@ pub fn sanitize_for_log(input: &[u8], out: &mut [u8]) -> usize {
     let max = out.len().min(input.len());
     for i in 0..max {
         let b = input[i];
-        out[i] = if b.is_ascii_graphic() || b == b' ' { b } else { b'?' };
+        out[i] = if b.is_ascii_graphic() || b == b' ' {
+            b
+        } else {
+            b'?'
+        };
     }
     max
 }
@@ -329,7 +337,9 @@ pub fn validate_ipv4(addr: &[u8]) -> Result<(), ValidationError> {
             if octet_len == 0 && b == b'0' {
                 octet_has_leading_zero = true;
             }
-            octet_val = octet_val.saturating_mul(10).saturating_add((b - b'0') as u32);
+            octet_val = octet_val
+                .saturating_mul(10)
+                .saturating_add((b - b'0') as u32);
             octet_len += 1;
             if octet_len > 3 {
                 return Err(ValidationError::OutOfRange);
@@ -339,7 +349,11 @@ pub fn validate_ipv4(addr: &[u8]) -> Result<(), ValidationError> {
         }
     }
     // Validate last octet and total count.
-    if octet_val > 255 || octet_len == 0 || octet_count != 3 || (octet_len > 1 && octet_has_leading_zero) {
+    if octet_val > 255
+        || octet_len == 0
+        || octet_count != 3
+        || (octet_len > 1 && octet_has_leading_zero)
+    {
         return Err(ValidationError::OutOfRange);
     }
     Ok(())
@@ -437,11 +451,23 @@ mod tests {
         assert!(validate_path(b"file:../secret.txt").is_err());
 
         // Multi-dot segment path traversal bypass prevention (`...`, `....`, `.....`)
-        assert_eq!(validate_path(b"/.../etc/passwd"), Err(ValidationError::PathTraversal));
-        assert_eq!(validate_path(b"/..../etc/passwd"), Err(ValidationError::PathTraversal));
-        assert_eq!(validate_path(b"C:....\\secret.txt"), Err(ValidationError::PathTraversal));
+        assert_eq!(
+            validate_path(b"/.../etc/passwd"),
+            Err(ValidationError::PathTraversal)
+        );
+        assert_eq!(
+            validate_path(b"/..../etc/passwd"),
+            Err(ValidationError::PathTraversal)
+        );
+        assert_eq!(
+            validate_path(b"C:....\\secret.txt"),
+            Err(ValidationError::PathTraversal)
+        );
         assert_eq!(validate_path(b"..."), Err(ValidationError::PathTraversal));
-        assert_eq!(validate_path(b"foo/.../bar"), Err(ValidationError::PathTraversal));
+        assert_eq!(
+            validate_path(b"foo/.../bar"),
+            Err(ValidationError::PathTraversal)
+        );
     }
 
     #[test]
@@ -458,17 +484,44 @@ mod tests {
         assert_eq!(validate_filename(b".env"), Ok(()));
         assert_eq!(validate_filename(b""), Err(ValidationError::EmptyInput));
         assert_eq!(validate_filename(b"."), Err(ValidationError::PathTraversal));
-        assert_eq!(validate_filename(b".."), Err(ValidationError::PathTraversal));
-        assert_eq!(validate_filename(b"dir/file"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_filename(b"dir\\file"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_filename(&[b'a', 0, b'b']), Err(ValidationError::NullByte));
+        assert_eq!(
+            validate_filename(b".."),
+            Err(ValidationError::PathTraversal)
+        );
+        assert_eq!(
+            validate_filename(b"dir/file"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_filename(b"dir\\file"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_filename(&[b'a', 0, b'b']),
+            Err(ValidationError::NullByte)
+        );
 
         // ASCII control character injection prevention (prevents log injection and ANSI escape sequence hijacking)
-        assert_eq!(validate_filename(b"file\nname.txt"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_filename(b"file\rname.txt"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_filename(b"file\tname.txt"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_filename(b"file\x1b[31m.txt"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_filename(b"file\x7f.txt"), Err(ValidationError::InvalidChars));
+        assert_eq!(
+            validate_filename(b"file\nname.txt"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_filename(b"file\rname.txt"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_filename(b"file\tname.txt"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_filename(b"file\x1b[31m.txt"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_filename(b"file\x7f.txt"),
+            Err(ValidationError::InvalidChars)
+        );
 
         let long_name = [b'a'; MAX_FILENAME_LEN + 1];
         assert_eq!(validate_filename(&long_name), Err(ValidationError::TooLong));
@@ -476,10 +529,22 @@ mod tests {
 
     #[test]
     fn test_path_control_char_rejected() {
-        assert_eq!(validate_path(b"/usr/bin/foo\nbar"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_path(b"/var/log/app\r.log"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_path(b"/etc/config\x1b[31m"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_path(b"/tmp/file\x7f"), Err(ValidationError::InvalidChars));
+        assert_eq!(
+            validate_path(b"/usr/bin/foo\nbar"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_path(b"/var/log/app\r.log"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_path(b"/etc/config\x1b[31m"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_path(b"/tmp/file\x7f"),
+            Err(ValidationError::InvalidChars)
+        );
     }
 
     #[test]
@@ -509,27 +574,51 @@ mod tests {
         assert_eq!(validate_hostname(b"node-123"), Ok(()));
 
         // Command-line option injection prevention (leading hyphen in label)
-        assert_eq!(validate_hostname(b"-oProxyCommand"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_hostname(b"sub.-domain.com"), Err(ValidationError::InvalidChars));
+        assert_eq!(
+            validate_hostname(b"-oProxyCommand"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_hostname(b"sub.-domain.com"),
+            Err(ValidationError::InvalidChars)
+        );
 
         // Trailing hyphen in label
-        assert_eq!(validate_hostname(b"domain-.com"), Err(ValidationError::InvalidChars));
+        assert_eq!(
+            validate_hostname(b"domain-.com"),
+            Err(ValidationError::InvalidChars)
+        );
 
         // Empty labels / consecutive dots / leading or trailing dot
-        assert_eq!(validate_hostname(b"example..com"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_hostname(b".example.com"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_hostname(b"example.com."), Err(ValidationError::InvalidChars));
+        assert_eq!(
+            validate_hostname(b"example..com"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_hostname(b".example.com"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_hostname(b"example.com."),
+            Err(ValidationError::InvalidChars)
+        );
 
         // Empty input
         assert_eq!(validate_hostname(b""), Err(ValidationError::EmptyInput));
 
         // Label length > 63
         let long_label = [b'a'; 64];
-        assert_eq!(validate_hostname(&long_label), Err(ValidationError::TooLong));
+        assert_eq!(
+            validate_hostname(&long_label),
+            Err(ValidationError::TooLong)
+        );
 
         // Total hostname length > 253
         let long_hostname = [b'a'; MAX_HOSTNAME_LEN + 1];
-        assert_eq!(validate_hostname(&long_hostname), Err(ValidationError::TooLong));
+        assert_eq!(
+            validate_hostname(&long_hostname),
+            Err(ValidationError::TooLong)
+        );
     }
 
     #[test]
@@ -540,15 +629,36 @@ mod tests {
         assert_eq!(validate_env_key(b"A"), Ok(()));
 
         // Disallow leading digit or hyphen or dot
-        assert_eq!(validate_env_key(b"123KEY"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_env_key(b"-KEY"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_env_key(b".KEY"), Err(ValidationError::InvalidChars));
+        assert_eq!(
+            validate_env_key(b"123KEY"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_env_key(b"-KEY"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_env_key(b".KEY"),
+            Err(ValidationError::InvalidChars)
+        );
 
         // Disallow special characters inside key
-        assert_eq!(validate_env_key(b"KEY=VAL"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_env_key(b"KEY-NAME"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_env_key(b"KEY.NAME"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_env_key(b"KEY@NAME"), Err(ValidationError::InvalidChars));
+        assert_eq!(
+            validate_env_key(b"KEY=VAL"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_env_key(b"KEY-NAME"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_env_key(b"KEY.NAME"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_env_key(b"KEY@NAME"),
+            Err(ValidationError::InvalidChars)
+        );
 
         // Empty and too long
         assert_eq!(validate_env_key(b""), Err(ValidationError::EmptyInput));
@@ -564,16 +674,34 @@ mod tests {
         assert_eq!(validate_username(b"user123"), Ok(()));
 
         // Command-line option injection prevention (leading dash/hyphen)
-        assert_eq!(validate_username(b"-option"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_username(b"--help"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_username(b"-rf"), Err(ValidationError::InvalidChars));
+        assert_eq!(
+            validate_username(b"-option"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_username(b"--help"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_username(b"-rf"),
+            Err(ValidationError::InvalidChars)
+        );
 
         // POSIX compliance (leading digit disallowed)
-        assert_eq!(validate_username(b"123user"), Err(ValidationError::InvalidChars));
+        assert_eq!(
+            validate_username(b"123user"),
+            Err(ValidationError::InvalidChars)
+        );
 
         // Disallowed special characters
-        assert_eq!(validate_username(b"alice@domain"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_username(b"alice;id"), Err(ValidationError::InvalidChars));
+        assert_eq!(
+            validate_username(b"alice@domain"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_username(b"alice;id"),
+            Err(ValidationError::InvalidChars)
+        );
 
         // Empty and length checks
         assert_eq!(validate_username(b""), Err(ValidationError::EmptyInput));
@@ -593,9 +721,18 @@ mod tests {
         assert!(validate_ipv4(b"192.168.1").is_err());
 
         // Reject multi-digit octets with leading zeros (prevents octal SSRF bypass)
-        assert_eq!(validate_ipv4(b"010.0.0.1"), Err(ValidationError::OutOfRange));
-        assert_eq!(validate_ipv4(b"192.168.01.1"), Err(ValidationError::OutOfRange));
-        assert_eq!(validate_ipv4(b"001.1.1.1"), Err(ValidationError::OutOfRange));
+        assert_eq!(
+            validate_ipv4(b"010.0.0.1"),
+            Err(ValidationError::OutOfRange)
+        );
+        assert_eq!(
+            validate_ipv4(b"192.168.01.1"),
+            Err(ValidationError::OutOfRange)
+        );
+        assert_eq!(
+            validate_ipv4(b"001.1.1.1"),
+            Err(ValidationError::OutOfRange)
+        );
     }
 
     #[test]
@@ -611,7 +748,10 @@ mod tests {
         // Empty input
         assert_eq!(validate_ipv6(b""), Err(ValidationError::EmptyInput));
         // Too long
-        assert_eq!(validate_ipv6(b"2001:0db8:85a3:0000:0000:8a2e:0370:7334:9999"), Err(ValidationError::TooLong));
+        assert_eq!(
+            validate_ipv6(b"2001:0db8:85a3:0000:0000:8a2e:0370:7334:9999"),
+            Err(ValidationError::TooLong)
+        );
         // Block length > 4
         assert!(validate_ipv6(b"20011:db8::1").is_err());
         // Multiple double colons
@@ -628,8 +768,14 @@ mod tests {
         assert!(validate_ipv6(b"2001:db8:85a3:0:0:8a2e:370:7334:1234").is_err());
 
         // Over-length compressed IPv6 addresses (8 or more explicit blocks with double colon)
-        assert_eq!(validate_ipv6(b"1:2:3:4:5:6:7::8"), Err(ValidationError::OutOfRange));
-        assert_eq!(validate_ipv6(b"1::2:3:4:5:6:7:8"), Err(ValidationError::OutOfRange));
+        assert_eq!(
+            validate_ipv6(b"1:2:3:4:5:6:7::8"),
+            Err(ValidationError::OutOfRange)
+        );
+        assert_eq!(
+            validate_ipv6(b"1::2:3:4:5:6:7:8"),
+            Err(ValidationError::OutOfRange)
+        );
     }
 
     #[test]

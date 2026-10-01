@@ -1,8 +1,6 @@
 // S-SEC CAPABILITY-BASED SANDBOX
 // Android/AOSP-style permissions and capability-based security enforcement
 
-
-
 pub const PORT_ALLOW_TCP: u16 = 80;
 pub const PORT_ALLOW_SSL: u16 = 443;
 
@@ -88,7 +86,7 @@ mod tests {
             is_fs_read_allowed: true,
             is_fs_write_allowed: false,
         };
-        
+
         let result = enforcer.assign_token(token);
         assert!(result.is_ok());
         assert!(enforcer.tokens[0].is_some());
@@ -103,9 +101,9 @@ mod tests {
             is_fs_read_allowed: true,
             is_fs_write_allowed: false,
         };
-        
+
         enforcer.assign_token(token).unwrap();
-        
+
         let found = enforcer.find_token(100);
         assert!(found.is_some());
         assert_eq!(found.unwrap().process_id, 100);
@@ -120,12 +118,12 @@ mod tests {
             is_fs_read_allowed: true,
             is_fs_write_allowed: false,
         };
-        
+
         enforcer.assign_token(token).unwrap();
-        
+
         // Should allow read access
         assert!(enforcer.validate_filesystem_access(100, false));
-        
+
         // Should deny write access
         assert!(!enforcer.validate_filesystem_access(100, true));
     }
@@ -139,9 +137,9 @@ mod tests {
             is_fs_read_allowed: true,
             is_fs_write_allowed: true,
         };
-        
+
         enforcer.assign_token(token).unwrap();
-        
+
         // Should allow both read and write access
         assert!(enforcer.validate_filesystem_access(100, false));
         assert!(enforcer.validate_filesystem_access(100, true));
@@ -156,15 +154,15 @@ mod tests {
             is_fs_read_allowed: true,
             is_fs_write_allowed: false,
         };
-        
+
         enforcer.assign_token(token).unwrap();
-        
+
         // Should allow TCP port 80
         assert!(enforcer.validate_network_access(100, PORT_ALLOW_TCP));
-        
+
         // Should allow SSL port 443
         assert!(enforcer.validate_network_access(100, PORT_ALLOW_SSL));
-        
+
         // Should deny other ports
         assert!(!enforcer.validate_network_access(100, 8080));
     }
@@ -178,9 +176,9 @@ mod tests {
             is_fs_read_allowed: true,
             is_fs_write_allowed: false,
         };
-        
+
         enforcer.assign_token(token).unwrap();
-        
+
         // Should deny all network access
         assert!(!enforcer.validate_network_access(100, PORT_ALLOW_TCP));
         assert!(!enforcer.validate_network_access(100, PORT_ALLOW_SSL));
@@ -189,7 +187,7 @@ mod tests {
     #[test]
     fn test_access_without_token() {
         let enforcer = CapabilitySandboxEnforcer::new();
-        
+
         // Should deny all access for unknown PID
         assert!(!enforcer.validate_filesystem_access(999, false));
         assert!(!enforcer.validate_filesystem_access(999, true));
@@ -199,7 +197,7 @@ mod tests {
     #[test]
     fn test_token_capacity_exhaustion() {
         let mut enforcer = CapabilitySandboxEnforcer::new();
-        
+
         // Fill all 32 token slots
         for i in 0..32 {
             let token = SandboxCapabilityToken {
@@ -210,7 +208,7 @@ mod tests {
             };
             enforcer.assign_token(token).unwrap();
         }
-        
+
         // Try to assign one more token (should fail)
         let extra_token = SandboxCapabilityToken {
             process_id: 100,
@@ -231,7 +229,7 @@ mod tests {
             is_fs_read_allowed: false,
             is_fs_write_allowed: false,
         };
-        
+
         assert_eq!(token.process_id, 123);
         assert!(token.is_network_allowed);
         assert!(!token.is_fs_read_allowed);

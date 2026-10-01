@@ -15,8 +15,8 @@
 
 // (no_std only applicable at crate root - removed)
 
-use std::vec::Vec;
 use core::f64;
+use std::vec::Vec;
 
 /// 3D Raytracing Engine (Blender Parity)
 /// Simple real-time path tracing with ray intersections.

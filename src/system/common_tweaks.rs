@@ -3,9 +3,9 @@
 // FreeBSD network buffer scaling, and low-latency gaming I/O scheduler profiles.
 
 use std::collections::BTreeMap;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 // ============================================================================
 // Linux & BSD sysctl Kernel Tunable Matrix Engine
@@ -32,7 +32,10 @@ impl DistroSysctlTweaksEngine {
         sysctls.insert("vm.dirty_ratio".to_string(), "10".to_string());
         sysctls.insert("vm.dirty_background_ratio".to_string(), "5".to_string());
         sysctls.insert("net.core.somaxconn".to_string(), "4096".to_string());
-        sysctls.insert("net.ipv4.tcp_congestion_control".to_string(), "bbr".to_string());
+        sysctls.insert(
+            "net.ipv4.tcp_congestion_control".to_string(),
+            "bbr".to_string(),
+        );
         sysctls.insert("fs.file-max".to_string(), "2097152".to_string());
 
         Self {
@@ -197,7 +200,9 @@ mod tests {
         let mut engine = DistroSysctlTweaksEngine::new();
         assert_eq!(engine.get_sysctl("vm.swappiness").unwrap(), "15");
 
-        let applied = engine.apply_recommended_preset("cachyos_performance").unwrap();
+        let applied = engine
+            .apply_recommended_preset("cachyos_performance")
+            .unwrap();
         assert_eq!(applied, 4);
         assert_eq!(engine.get_sysctl("vm.swappiness").unwrap(), "10");
     }

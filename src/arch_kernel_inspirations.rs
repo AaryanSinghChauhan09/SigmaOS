@@ -2,7 +2,6 @@
 // SigmaOS ArchLinux & Linux Kernel Inspiration Subsystem
 // (`src/arch_kernel_inspirations.rs`)
 
-
 //
 // Sovereign `#![no_std]` reimplementations of distinctive ideas drawn from the
 // Arch Linux organization (https://github.com/archlinux) and the Linux kernel
@@ -17,7 +16,6 @@
 //   - arch-rebuild-order              -> `RebuildOrderSolver`
 //   - arch-signoff                    -> `PackageSignoff`
 //   - arch-repro-status (reproducible)-> `ReproducibleBuildVerdict`
-
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::format;
@@ -85,7 +83,10 @@ impl KUnitEngine {
     pub fn run_suite(
         &mut self,
         suite_name: &str,
-        cases: Vec<(String, std::boxed::Box<dyn FnOnce(&mut Vec<Expectation>) + Send>)>,
+        cases: Vec<(
+            String,
+            std::boxed::Box<dyn FnOnce(&mut Vec<Expectation>) + Send>,
+        )>,
     ) -> KUnitSuiteResult {
         let mut passed = 0;
         let mut failed = 0;
@@ -115,7 +116,14 @@ impl KUnitEngine {
     }
 
     /// Helper to evaluate a single expectation by kind.
-    pub fn evaluate(&mut self, kind: ExpectationKind, left: &str, right: &str, file: &str, line: u32) -> Expectation {
+    pub fn evaluate(
+        &mut self,
+        kind: ExpectationKind,
+        left: &str,
+        right: &str,
+        file: &str,
+        line: u32,
+    ) -> Expectation {
         let passed = match kind {
             ExpectationKind::Eq => left == right,
             ExpectationKind::NotEq => left != right,
@@ -222,9 +230,10 @@ impl AlpmTransactionEngine {
 
     /// Add a package (by provides-name or exact name) to the transaction.
     pub fn add_install(&mut self, target: &str) -> Result<(), AlpmResolutionError> {
-        let pkg = self.available.iter().find(|p| {
-            p.name == target || p.provides.iter().any(|pr| pr == target)
-        });
+        let pkg = self
+            .available
+            .iter()
+            .find(|p| p.name == target || p.provides.iter().any(|pr| pr == target));
         let pkg = match pkg {
             Some(p) => p.clone(),
             None => return Err(AlpmResolutionError::MissingDependency),
@@ -417,7 +426,9 @@ pub struct SecurityAdvisoryTracker {
 
 impl SecurityAdvisoryTracker {
     pub fn new() -> Self {
-        Self { advisories: Vec::new() }
+        Self {
+            advisories: Vec::new(),
+        }
     }
 
     pub fn add(&mut self, a: SecurityAdvisory) {
@@ -432,7 +443,9 @@ impl SecurityAdvisoryTracker {
             .filter(|a| {
                 a.package == package
                     && a.affected_versions.contains(&installed_version.to_string())
-                    && a.fixed_version.as_deref().map_or(true, |f| f != installed_version)
+                    && a.fixed_version
+                        .as_deref()
+                        .map_or(true, |f| f != installed_version)
             })
             .collect()
     }
@@ -463,7 +476,11 @@ impl SecurityAdvisoryTracker {
         let affected_list = self.affected(package, installed_version);
         if !affected_list.is_empty() {
             VulnerabilityState::Vulnerable
-        } else if self.advisories.iter().any(|a| a.package == package && a.fixed_version.as_deref() == Some(installed_version)) {
+        } else if self
+            .advisories
+            .iter()
+            .any(|a| a.package == package && a.fixed_version.as_deref() == Some(installed_version))
+        {
             VulnerabilityState::Fixed
         } else {
             VulnerabilityState::Unaffected
@@ -472,7 +489,10 @@ impl SecurityAdvisoryTracker {
 
     /// Query advisories matching target severity
     pub fn by_severity(&self, severity: AdvisorySeverity) -> Vec<&SecurityAdvisory> {
-        self.advisories.iter().filter(|a| a.severity == severity).collect()
+        self.advisories
+            .iter()
+            .filter(|a| a.severity == severity)
+            .collect()
     }
 
     pub fn critical_count(&self) -> usize {
@@ -739,9 +759,7 @@ impl MkinitcpioHookFramework {
                     HookAction::AddFile { source, dest } => {
                         out.push(format!("file {} -> {}", source, dest))
                     }
-                    HookAction::AddModule { module } => {
-                        out.push(format!("module {}", module))
-                    }
+                    HookAction::AddModule { module } => out.push(format!("module {}", module)),
                     HookAction::AddFirmware { fw } => out.push(format!("firmware {}", fw)),
                     HookAction::RunCmd { cmd } => out.push(format!("run {}", cmd)),
                 }
@@ -795,7 +813,8 @@ impl RebuildOrderSolver {
     }
 
     pub fn add_dependency(&mut self, dependent: &str, dependency: &str) {
-        self.depends_on.push((dependent.to_string(), dependency.to_string()));
+        self.depends_on
+            .push((dependent.to_string(), dependency.to_string()));
         self.add_package(dependent);
         self.add_package(dependency);
     }
@@ -938,11 +957,15 @@ impl PackageSignoff {
     }
 
     pub fn ready(&self, package: &str) -> bool {
-        self.entries.iter().find(|e| e.package == package).map_or(false, |e| {
-            let quorum_met = e.signoffs.maintainer || e.signoffs.community >= self.required_signoffs;
-            let verifications_met = e.qa_tested && e.build_reproducible && e.security_audited;
-            quorum_met && verifications_met
-        })
+        self.entries
+            .iter()
+            .find(|e| e.package == package)
+            .map_or(false, |e| {
+                let quorum_met =
+                    e.signoffs.maintainer || e.signoffs.community >= self.required_signoffs;
+                let verifications_met = e.qa_tested && e.build_reproducible && e.security_audited;
+                quorum_met && verifications_met
+            })
     }
 }
 
@@ -982,7 +1005,9 @@ pub struct ReproducibleBuildVerdict {
 
 impl ReproducibleBuildVerdict {
     pub fn new() -> Self {
-        Self { records: Vec::new() }
+        Self {
+            records: Vec::new(),
+        }
     }
 
     pub fn record(&mut self, package: &str, status: ReproducibleStatus) {
@@ -1021,7 +1046,8 @@ impl ReproducibleBuildVerdict {
     }
 
     pub fn reproducible_count(&self) -> usize {
-        self.filter_by_status(ReproducibleStatus::Reproducible).len()
+        self.filter_by_status(ReproducibleStatus::Reproducible)
+            .len()
     }
 
     pub fn ratio(&self) -> f32 {
@@ -1050,7 +1076,10 @@ mod tests {
     #[test]
     fn kunit_suite_reports_failures() {
         let mut eng = KUnitEngine::new();
-        let cases: Vec<(String, std::boxed::Box<dyn FnOnce(&mut Vec<Expectation>) + Send>)> = vec![
+        let cases: Vec<(
+            String,
+            std::boxed::Box<dyn FnOnce(&mut Vec<Expectation>) + Send>,
+        )> = vec![
             (
                 "test_ok".to_string(),
                 std::boxed::Box::new(|e: &mut Vec<Expectation>| {
@@ -1161,7 +1190,10 @@ mod tests {
 
         assert_eq!(t.affected("openssl", "1.1.1").len(), 1);
         assert_eq!(t.affected("openssl", "3.0.1").len(), 0);
-        assert_eq!(t.recommended_upgrades("openssl", "1.1.1"), vec!["3.0.1".to_string()]);
+        assert_eq!(
+            t.recommended_upgrades("openssl", "1.1.1"),
+            vec!["3.0.1".to_string()]
+        );
         assert_eq!(t.critical_count(), 1);
 
         // Verify CVSS risk score calculation and high risk filtering
@@ -1216,7 +1248,9 @@ mod tests {
         assert_eq!(signstar.hardware_backed_signatures_count(), 1);
 
         // Second optional signature arrives: quorum threshold 2 met
-        assert!(signstar.record_signature_at("security-team", 1700000000).is_ok());
+        assert!(signstar
+            .record_signature_at("security-team", 1700000000)
+            .is_ok());
         assert!(signstar.fully_signed);
         assert_eq!(signstar.valid_signatures_count(), 2);
     }
@@ -1239,7 +1273,10 @@ mod tests {
 
         assert_eq!(verifier.reproducible_count(), 1);
         assert_eq!(verifier.audit_reports.len(), 2);
-        assert_eq!(verifier.audit_reports[1].discrepancies[0], DiscrepancyKind::SizeMismatch);
+        assert_eq!(
+            verifier.audit_reports[1].discrepancies[0],
+            DiscrepancyKind::SizeMismatch
+        );
         assert_eq!(verifier.ratio(), 0.5);
     }
 }

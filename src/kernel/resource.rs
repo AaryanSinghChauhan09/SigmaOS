@@ -35,7 +35,15 @@ impl CpuStats {
 
     /// Calculate total CPU time
     pub fn total(&self) -> u64 {
-        self.user + self.nice + self.system + self.idle + self.iowait + self.irq + self.softirq + self.steal + self.guest
+        self.user
+            + self.nice
+            + self.system
+            + self.idle
+            + self.iowait
+            + self.irq
+            + self.softirq
+            + self.steal
+            + self.guest
     }
 
     /// Calculate CPU usage percentage (based on idle time)

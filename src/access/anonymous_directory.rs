@@ -79,7 +79,8 @@ impl EphemeralAnonymousDir {
         }
 
         self.used_storage_bytes = self.used_storage_bytes - existing_bytes + new_bytes;
-        self.stored_files.insert(filename.to_string(), data.to_vec());
+        self.stored_files
+            .insert(filename.to_string(), data.to_vec());
         Ok(data.len())
     }
 

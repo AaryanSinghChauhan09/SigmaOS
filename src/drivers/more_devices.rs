@@ -4,10 +4,8 @@ use std::vec;
 // SigmaOS More Devices — Ancient & Newer OOP Drivers
 // This file implements 12 distinct drivers spanning ancient/legacy era to state-of-the-art modern hardware.
 
-
-
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
-use core::result::Result::{self, Ok, Err};
+use core::result::Result::{self, Err, Ok};
 use std::boxed::Box;
 use std::format;
 use std::string::String;
@@ -117,7 +115,7 @@ impl PeripheralDevice for FloppyDiskDriver {
 pub struct Ufs4StorageDriver {
     is_initialized: bool,
     power_state: PowerState,
-    gear: u8, // M-PHY Gear 5
+    gear: u8,  // M-PHY Gear 5
     lanes: u8, // 2 lanes
     storage_size_bytes: u64,
     device_data: Vec<u8>,

@@ -126,7 +126,8 @@ impl PhoronixComparisonTable {
     }
 
     pub fn add_row(&mut self, row: &[&str]) {
-        self.rows.push(row.iter().map(|&r| String::from(r)).collect());
+        self.rows
+            .push(row.iter().map(|&r| String::from(r)).collect());
     }
 
     /// Render formatted unicode comparison table string
@@ -261,7 +262,11 @@ impl TreeNode {
     fn render_recursive(&self, prefix: &str, _is_last: bool, output: &mut String) {
         for (i, child) in self.children.iter().enumerate() {
             let child_is_last = i == self.children.len() - 1;
-            let branch = if child_is_last { "└── " } else { "├── " };
+            let branch = if child_is_last {
+                "└── "
+            } else {
+                "├── "
+            };
             output.push_str(&format!("{}{}{}\n", prefix, branch, child.label));
 
             let new_prefix = format!("{}{}", prefix, if child_is_last { "    " } else { "│   " });
@@ -328,13 +333,26 @@ impl SovereignPublicationStdoutEngine {
     }
 
     /// Render HW Busters Telemetry Gauge: `[Power: 450W / 600W] [85°C] [||||||||--]`
-    pub fn render_telemetry_gauge(&self, label: &str, value: u32, max_val: u32, unit: &str) -> String {
-        let pct = if max_val == 0 { 0 } else { (value * 100) / max_val };
+    pub fn render_telemetry_gauge(
+        &self,
+        label: &str,
+        value: u32,
+        max_val: u32,
+        unit: &str,
+    ) -> String {
+        let pct = if max_val == 0 {
+            0
+        } else {
+            (value * 100) / max_val
+        };
         let bar_len = (pct as usize) / 10;
         let filled = "|".repeat(bar_len);
         let empty = "-".repeat(10usize.saturating_sub(bar_len));
 
-        format!("{}: {}{} / {}{} [{}{}] ({}%)", label, value, unit, max_val, unit, filled, empty, pct)
+        format!(
+            "{}: {}{} / {}{} [{}{}] ({}%)",
+            label, value, unit, max_val, unit, filled, empty, pct
+        )
     }
 }
 
@@ -355,7 +373,8 @@ mod tests {
 
     #[test]
     fn test_phoronix_table_rendering() {
-        let mut table = PhoronixComparisonTable::new("Kernel Benchmark", &["Workload", "Linux 6.8", "SigmaOS"]);
+        let mut table =
+            PhoronixComparisonTable::new("Kernel Benchmark", &["Workload", "Linux 6.8", "SigmaOS"]);
         table.add_row(&["Context Switch", "1.2 us", "0.4 us"]);
         table.add_row(&["Zero-Copy I/O", "45 GB/s", "120 GB/s"]);
 

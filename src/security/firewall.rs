@@ -1,17 +1,33 @@
-
-use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::collections::BTreeMap;
 use std::string::String;
-use core::sync::atomic::{AtomicUsize, Ordering};
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum Protocol { Tcp, Udp, Icmp, Any }
+pub enum Protocol {
+    Tcp,
+    Udp,
+    Icmp,
+    Any,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Action { Accept, Drop, Reject, Log, NatSnat(u32), NatDnat(u32) }
+pub enum Action {
+    Accept,
+    Drop,
+    Reject,
+    Log,
+    NatSnat(u32),
+    NatDnat(u32),
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ConnectionState { New, Established, Related, Invalid }
+pub enum ConnectionState {
+    New,
+    Established,
+    Related,
+    Invalid,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Ipv4Address(pub u32);
@@ -28,11 +44,29 @@ pub struct MatchCriteria {
 
 impl MatchCriteria {
     pub fn matches(&self, packet: &PacketInfo, state: ConnectionState) -> bool {
-        if let Some(sip) = &self.source_ip { if packet.source_ip.0 != sip.0 { return false; } }
-        if let Some(dip) = &self.dest_ip { if packet.dest_ip.0 != dip.0 { return false; } }
-        if let Some(dport) = self.dest_port { if packet.dest_port != dport { return false; } }
-        if self.protocol != Protocol::Any && self.protocol != packet.protocol { return false; }
-        if let Some(req_state) = self.state { if req_state != state { return false; } }
+        if let Some(sip) = &self.source_ip {
+            if packet.source_ip.0 != sip.0 {
+                return false;
+            }
+        }
+        if let Some(dip) = &self.dest_ip {
+            if packet.dest_ip.0 != dip.0 {
+                return false;
+            }
+        }
+        if let Some(dport) = self.dest_port {
+            if packet.dest_port != dport {
+                return false;
+            }
+        }
+        if self.protocol != Protocol::Any && self.protocol != packet.protocol {
+            return false;
+        }
+        if let Some(req_state) = self.state {
+            if req_state != state {
+                return false;
+            }
+        }
         true
     }
 }
@@ -53,7 +87,11 @@ pub struct PacketInfo {
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ConnectionTuple {
-    pub sip: u32, pub dip: u32, pub sport: u16, pub dport: u16, pub proto: Protocol,
+    pub sip: u32,
+    pub dip: u32,
+    pub sport: u16,
+    pub dport: u16,
+    pub proto: Protocol,
 }
 
 pub struct ConnectionEntry {
@@ -71,7 +109,10 @@ pub struct RateLimiter {
 impl RateLimiter {
     pub fn allow(&mut self, now: u64) -> bool {
         let elapsed = now - self.last_update;
-        self.tokens = core::cmp::min(self.capacity, self.tokens + (elapsed as usize * self.fill_rate));
+        self.tokens = core::cmp::min(
+            self.capacity,
+            self.tokens + (elapsed as usize * self.fill_rate),
+        );
         self.last_update = now;
         if self.tokens > 0 {
             self.tokens -= 1;
@@ -139,7 +180,8 @@ impl QosTrafficShaper {
     pub fn shape_packet_bandwidth(&mut self, packet_size_bytes: u64, now_secs: u64) -> bool {
         let elapsed = now_secs.saturating_sub(self.last_refill_timestamp);
         let refill_amount = elapsed.saturating_mul(self.rate_bytes_per_sec);
-        self.available_tokens = (self.available_tokens.saturating_add(refill_amount)).min(self.burst_capacity_bytes);
+        self.available_tokens =
+            (self.available_tokens.saturating_add(refill_amount)).min(self.burst_capacity_bytes);
         self.last_refill_timestamp = now_secs;
 
         if self.available_tokens >= packet_size_bytes {
@@ -171,15 +213,22 @@ impl Firewall {
             nat_rules: Vec::new(),
             default_action: Action::Drop,
             conntrack: BTreeMap::new(),
-            rate_limiter: RateLimiter { tokens: 100, capacity: 100, fill_rate: 10, last_update: 0 },
+            rate_limiter: RateLimiter {
+                tokens: 100,
+                capacity: 100,
+                fill_rate: 10,
+                last_update: 0,
+            },
             qos_shaper: Some(QosTrafficShaper::new(10_000_000, 1_000_000)), // 10MB/s rate, 1MB burst
         }
     }
 
     pub fn track_connection(&mut self, packet: &PacketInfo, now: u64) -> ConnectionState {
         let tuple = ConnectionTuple {
-            sip: packet.source_ip.0, dip: packet.dest_ip.0,
-            sport: packet.source_port, dport: packet.dest_port,
+            sip: packet.source_ip.0,
+            dip: packet.dest_ip.0,
+            sport: packet.source_port,
+            dport: packet.dest_port,
             proto: packet.protocol,
         };
         if let Some(entry) = self.conntrack.get_mut(&tuple) {
@@ -187,7 +236,13 @@ impl Firewall {
             entry.state = ConnectionState::Established;
             ConnectionState::Established
         } else {
-            self.conntrack.insert(tuple, ConnectionEntry { state: ConnectionState::New, last_seen: now });
+            self.conntrack.insert(
+                tuple,
+                ConnectionEntry {
+                    state: ConnectionState::New,
+                    last_seen: now,
+                },
+            );
             ConnectionState::New
         }
     }
@@ -213,7 +268,11 @@ impl Firewall {
         self.nat_rules.push(rule);
     }
 
-    pub fn translate_nat(&self, packet: &PacketInfo, state: ConnectionState) -> Option<(PacketInfo, NatType)> {
+    pub fn translate_nat(
+        &self,
+        packet: &PacketInfo,
+        state: ConnectionState,
+    ) -> Option<(PacketInfo, NatType)> {
         for nat_rule in &self.nat_rules {
             if nat_rule.match_criteria.matches(packet, state) {
                 let mut translated = packet.clone();
@@ -221,7 +280,10 @@ impl Firewall {
                     NatType::Snat { new_src_ip } => {
                         translated.source_ip = Ipv4Address(*new_src_ip);
                     }
-                    NatType::Dnat { new_dst_ip, new_dst_port } => {
+                    NatType::Dnat {
+                        new_dst_ip,
+                        new_dst_port,
+                    } => {
                         translated.dest_ip = Ipv4Address(*new_dst_ip);
                         translated.dest_port = *new_dst_port;
                     }
@@ -312,7 +374,13 @@ mod tests {
         let (new_pkt, nat_type) = translated.unwrap();
         assert_eq!(new_pkt.dest_ip, Ipv4Address(0xC0A80164));
         assert_eq!(new_pkt.dest_port, 80);
-        assert_eq!(nat_type, NatType::Dnat { new_dst_ip: 0xC0A80164, new_dst_port: 80 });
+        assert_eq!(
+            nat_type,
+            NatType::Dnat {
+                new_dst_ip: 0xC0A80164,
+                new_dst_port: 80
+            }
+        );
     }
 
     #[test]

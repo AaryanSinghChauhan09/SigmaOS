@@ -10,20 +10,19 @@ extern crate alloc;
 // Completely replaces userland C++ utilities, Python maintenance scripts, Shell installers, and HTML/CSS UI.
 // 100% Safe Rust `#![no_std]` compliant with zero external dependencies.
 
-
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::format;
 
+#[cfg(any(feature = "standalone_test", test))]
+use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
-#[cfg(any(feature = "standalone_test", test))]
-use std::format;
 
 use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 
@@ -275,7 +274,9 @@ impl MasterNativeUserlandReplacements {
     pub fn verify_all_replacements(&mut self) -> bool {
         self.voice_daemon.start().is_ok()
             && self.installer.execute_installation().is_ok()
-            && self.pkg_parser.verify_and_parse_package(b"kernel", &[1u8; 32])
+            && self
+                .pkg_parser
+                .verify_and_parse_package(b"kernel", &[1u8; 32])
             && self.stress_bench.run_benchmark(100) == 100
     }
 }
@@ -314,7 +315,10 @@ mod tests {
     fn test_native_installer() {
         let installer = NativeSystemInstallerEngine::new();
         assert!(installer.execute_installation().is_ok());
-        assert_eq!(installer.install_progress_percent.load(Ordering::SeqCst), 100);
+        assert_eq!(
+            installer.install_progress_percent.load(Ordering::SeqCst),
+            100
+        );
     }
 
     #[test]

@@ -1,9 +1,6 @@
 //! Session Manager (systemd-logind Inspiration)
 //! Session tracking, seat management, and device assignment
 
-
-
-
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
@@ -165,36 +162,36 @@ impl LoginManager {
         let session_id = format!("session-{}", self.sessions.len());
         let mut session = Session::new(&session_id, user_id, seat);
         session.activate();
-        
+
         self.add_session(session);
-        
+
         // Add to seat
         if let Some(seat_obj) = self.get_seat(seat) {
             seat_obj.add_session(&session_id);
         }
-        
+
         // Add to user
         if let Some(user) = self.get_user(user_id) {
             user.add_session(&session_id);
         }
-        
+
         Ok(session_id)
     }
 
     pub fn terminate_session(&mut self, session_id: &str) -> Result<(), SessionError> {
         if let Some(session) = self.get_session(session_id) {
             session.close();
-            
+
             // Remove from seat
             for seat in &mut self.seats {
                 seat.remove_session(session_id);
             }
-            
+
             // Remove from user
             for user in &mut self.users {
                 user.sessions.retain(|s| s != session_id);
             }
-            
+
             Ok(())
         } else {
             Err(SessionError::SessionNotFound)
@@ -211,11 +208,17 @@ impl LoginManager {
     }
 
     pub fn get_active_sessions(&self) -> Vec<&Session> {
-        self.sessions.iter().filter(|s| s.state == SessionState::Active).collect()
+        self.sessions
+            .iter()
+            .filter(|s| s.state == SessionState::Active)
+            .collect()
     }
 
     pub fn get_sessions_by_user(&self, user_id: u32) -> Vec<&Session> {
-        self.sessions.iter().filter(|s| s.user_id == user_id).collect()
+        self.sessions
+            .iter()
+            .filter(|s| s.user_id == user_id)
+            .collect()
     }
 }
 
@@ -282,7 +285,11 @@ impl DeviceManager {
         self.devices.push(device);
     }
 
-    pub fn assign_device_to_session(&mut self, device_name: &str, session_id: &str) -> Result<(), SessionError> {
+    pub fn assign_device_to_session(
+        &mut self,
+        device_name: &str,
+        session_id: &str,
+    ) -> Result<(), SessionError> {
         if let Some(device) = self.devices.iter_mut().find(|d| d.name == device_name) {
             device.assign_to_session(session_id);
             Ok(())
@@ -292,7 +299,10 @@ impl DeviceManager {
     }
 
     pub fn get_devices_by_session(&self, session_id: &str) -> Vec<&Device> {
-        self.devices.iter().filter(|d| d.session.as_ref() == Some(&session_id.to_string())).collect()
+        self.devices
+            .iter()
+            .filter(|d| d.session.as_ref() == Some(&session_id.to_string()))
+            .collect()
     }
 }
 
@@ -356,7 +366,12 @@ mod tests {
     #[test]
     fn test_sovereign_session_inhibitor() {
         let mut manager = SovereignSessionInhibitorManager::new();
-        let id = manager.take_inhibitor("update_mgr", InhibitWhat::Shutdown, InhibitMode::Block, "Applying system updates");
+        let id = manager.take_inhibitor(
+            "update_mgr",
+            InhibitWhat::Shutdown,
+            InhibitMode::Block,
+            "Applying system updates",
+        );
         assert_eq!(id, 1);
         assert!(manager.is_shutdown_inhibited());
 
@@ -404,7 +419,13 @@ impl SovereignSessionInhibitorManager {
         }
     }
 
-    pub fn take_inhibitor(&mut self, who: &str, what: InhibitWhat, mode: InhibitMode, reason: &str) -> u32 {
+    pub fn take_inhibitor(
+        &mut self,
+        who: &str,
+        what: InhibitWhat,
+        mode: InhibitMode,
+        reason: &str,
+    ) -> u32 {
         let id = self.next_id;
         self.next_id += 1;
         self.inhibitors.push(SovereignSessionInhibitor {
@@ -428,7 +449,9 @@ impl SovereignSessionInhibitorManager {
     }
 
     pub fn is_shutdown_inhibited(&self) -> bool {
-        self.inhibitors.iter().any(|i| i.what == InhibitWhat::Shutdown)
+        self.inhibitors
+            .iter()
+            .any(|i| i.what == InhibitWhat::Shutdown)
     }
 
     pub fn is_sleep_inhibited(&self) -> bool {

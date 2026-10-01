@@ -159,7 +159,13 @@ impl SovereignDrmKmsEngine {
         }
     }
 
-    pub fn initialize_gop_fallback(&mut self, base_addr: u64, width: u32, height: u32, pitch: u32) -> u32 {
+    pub fn initialize_gop_fallback(
+        &mut self,
+        base_addr: u64,
+        width: u32,
+        height: u32,
+        pitch: u32,
+    ) -> u32 {
         let fb_id = (self.framebuffers.len() as u32) + 1;
         let fb = DrmFramebuffer {
             fb_id,

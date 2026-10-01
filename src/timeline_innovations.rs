@@ -1,10 +1,10 @@
-use std::format;
-use std::vec::Vec;
-use std::string::{String, ToString};
-use std::collections::BTreeMap;
-use core::result::Result::{self, Ok, Err};
-use core::option::Option::{self, Some, None};
 use core::default::Default;
+use core::option::Option::{self, None, Some};
+use core::result::Result::{self, Err, Ok};
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // =========================================================================
 // 1. CROSS-PLATFORM SDK (RUST, NIM, ZIG COMPATIBILITY ENVELOPES)
@@ -220,7 +220,11 @@ impl EnergyOptimizer {
             };
             cores.push(CoreFrequencyState {
                 core_group: group,
-                active_frequency_mhz: if group == CoreGroup::LittlePowerSave { 1000 } else { 2400 },
+                active_frequency_mhz: if group == CoreGroup::LittlePowerSave {
+                    1000
+                } else {
+                    2400
+                },
                 deep_sleep_active: false,
             });
         }
@@ -239,7 +243,11 @@ impl EnergyOptimizer {
                 }
             } else {
                 core.deep_sleep_active = false;
-                core.active_frequency_mhz = if core.core_group == CoreGroup::LittlePowerSave { 1000 } else { 2400 };
+                core.active_frequency_mhz = if core.core_group == CoreGroup::LittlePowerSave {
+                    1000
+                } else {
+                    2400
+                };
             }
         }
     }
@@ -277,12 +285,18 @@ impl ApkPackageRegistry {
 
     /// Verifies post-quantum signature (must contain "dilithium-5") and resolves dependencies
     pub fn install_with_pqc_verification(&mut self, pkg_name: &str) -> Result<(), &'static str> {
-        let pkg = self.available.iter().find(|p| p.name == pkg_name)
-            .ok_or("Package not found in available repositories")?.clone();
+        let pkg = self
+            .available
+            .iter()
+            .find(|p| p.name == pkg_name)
+            .ok_or("Package not found in available repositories")?
+            .clone();
 
         // PQC Signature validation
         if !pkg.pqc_signature.contains("dilithium-5") {
-            return Err("Security Violation: Package lacks a secure Dilithium-5 post-quantum signature");
+            return Err(
+                "Security Violation: Package lacks a secure Dilithium-5 post-quantum signature",
+            );
         }
 
         // Install dependencies recursively
@@ -364,7 +378,10 @@ impl FunctionalConfigEngine {
 
     /// Rollback the configuration state to a previous generation ID (<1s atomic swap)
     pub fn rollback_to_generation(&mut self, gen_id: u32) -> Result<(), &'static str> {
-        let generation = self.history.iter().find(|g| g.generation_id == gen_id)
+        let generation = self
+            .history
+            .iter()
+            .find(|g| g.generation_id == gen_id)
             .ok_or("NixOS Generation ID not found in system checkpoint log")?;
 
         self.current_settings = generation.settings.clone();
@@ -475,7 +492,8 @@ impl MultiArchResolver {
     }
 
     pub fn add_foreign_architecture(&mut self, arch: &str) {
-        if arch != self.native_architecture && !self.foreign_architectures.iter().any(|a| a == arch) {
+        if arch != self.native_architecture && !self.foreign_architectures.iter().any(|a| a == arch)
+        {
             self.foreign_architectures.push(arch.to_string());
         }
     }
@@ -515,7 +533,8 @@ impl AptPackageResolver {
     }
 
     pub fn set_pin_priority(&mut self, package_pattern: &str, priority: i32) {
-        self.pinned_priorities.insert(package_pattern.to_string(), priority);
+        self.pinned_priorities
+            .insert(package_pattern.to_string(), priority);
     }
 
     pub fn register_available_package(&mut self, mut pkg: AptPackageMetadata) {
@@ -534,7 +553,9 @@ impl AptPackageResolver {
             return Err("APT install failed: Architecture not supported (Multi-Arch not configured for target)");
         }
 
-        let mut candidates: Vec<AptPackageMetadata> = self.available_packages.iter()
+        let mut candidates: Vec<AptPackageMetadata> = self
+            .available_packages
+            .iter()
             .filter(|p| p.name == name && p.architecture == arch)
             .cloned()
             .collect();
@@ -554,9 +575,16 @@ impl AptPackageResolver {
 
         let chosen_candidate = &candidates[0];
 
-        if let Some(installed) = self.installed_packages.iter().find(|p| p.name == name && p.architecture == arch) {
-            if chosen_candidate.version < installed.version && chosen_candidate.pin_priority <= 1000 {
-                return Err("APT install failed: Pinned priority prevents downgrade of installed package");
+        if let Some(installed) = self
+            .installed_packages
+            .iter()
+            .find(|p| p.name == name && p.architecture == arch)
+        {
+            if chosen_candidate.version < installed.version && chosen_candidate.pin_priority <= 1000
+            {
+                return Err(
+                    "APT install failed: Pinned priority prevents downgrade of installed package",
+                );
             }
         }
 
@@ -566,7 +594,8 @@ impl AptPackageResolver {
             }
         }
 
-        self.installed_packages.retain(|p| !(p.name == name && p.architecture == arch));
+        self.installed_packages
+            .retain(|p| !(p.name == name && p.architecture == arch));
         self.installed_packages.push(chosen_candidate.clone());
 
         Ok(())
@@ -635,7 +664,8 @@ impl DebianPolicyEnforcer {
         license: &str,
         install_paths: &[&str],
     ) -> Result<(), &'static str> {
-        if self.social_contract.open_source_only && !self.social_contract.is_dfsg_compliant(license) {
+        if self.social_contract.open_source_only && !self.social_contract.is_dfsg_compliant(license)
+        {
             return Err("Debian Policy Violation: License is not DFSG-compliant (Non-Free archive restricted)");
         }
 
@@ -677,7 +707,9 @@ pub struct SigmaOsComparativeTimelineRoadmapEngine {
 
 impl SigmaOsComparativeTimelineRoadmapEngine {
     pub fn new() -> Self {
-        let mut engine = Self { milestones: Vec::new() };
+        let mut engine = Self {
+            milestones: Vec::new(),
+        };
         engine.init_roadmap_timeline();
         engine
     }
@@ -693,7 +725,8 @@ impl SigmaOsComparativeTimelineRoadmapEngine {
 
         self.milestones.push(RoadmapMilestoneRecord {
             year_range: "2028-2029".to_string(),
-            sigmaos_milestone: "Sandboxed drivers, firmware bridge, temporal filesystem".to_string(),
+            sigmaos_milestone: "Sandboxed drivers, firmware bridge, temporal filesystem"
+                .to_string(),
             linux_milestone: "Cloud-native Linux, stronger SELinux/AppArmor".to_string(),
             windows_milestone: "AI-native Windows, Snapdragon X2 ecosystem".to_string(),
             macos_milestone: "AR/VR integration, Vision Pro OS layering".to_string(),
@@ -701,7 +734,8 @@ impl SigmaOsComparativeTimelineRoadmapEngine {
 
         self.milestones.push(RoadmapMilestoneRecord {
             year_range: "2030-2031".to_string(),
-            sigmaos_milestone: "Clustered peripherals, programmable scheduler, immutable userland".to_string(),
+            sigmaos_milestone: "Clustered peripherals, programmable scheduler, immutable userland"
+                .to_string(),
             linux_milestone: "Cross-architecture portability (ARM, RISC-V)".to_string(),
             windows_milestone: "Enterprise AI orchestration, deeper cloud tie-ins".to_string(),
             macos_milestone: "Expanded AR/VR ecosystem, tighter iOS/macOS convergence".to_string(),
@@ -709,7 +743,9 @@ impl SigmaOsComparativeTimelineRoadmapEngine {
 
         self.milestones.push(RoadmapMilestoneRecord {
             year_range: "2032-2035".to_string(),
-            sigmaos_milestone: "Cryptographic boot chain, network-native OS state, hardware sovereignty".to_string(),
+            sigmaos_milestone:
+                "Cryptographic boot chain, network-native OS state, hardware sovereignty"
+                    .to_string(),
             linux_milestone: "Decentralized Linux distributions, sovereign computing".to_string(),
             windows_milestone: "AI-first OS, subscription-driven ecosystem".to_string(),
             macos_milestone: "Full Apple ecosystem lock-in, AR-native macOS".to_string(),
@@ -734,8 +770,8 @@ impl SigmaOsComparativeTimelineRoadmapEngine {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SovereigntyPhase {
     Phase1CompatibilityFoundation, // Years 1-2
-    Phase2SovereigntyAndSecurity,   // Years 3-5
-    Phase3SovereignExpansion,       // Years 5+
+    Phase2SovereigntyAndSecurity,  // Years 3-5
+    Phase3SovereignExpansion,      // Years 5+
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -751,31 +787,75 @@ pub struct MultiPhaseHardwareSovereigntyEngine {
 
 impl MultiPhaseHardwareSovereigntyEngine {
     pub fn new() -> Self {
-        let mut engine = Self { features: BTreeMap::new() };
+        let mut engine = Self {
+            features: BTreeMap::new(),
+        };
         engine.init_sovereignty_features();
         engine
     }
 
     fn init_sovereignty_features(&mut self) {
         // Phase 1: Compatibility Foundation
-        self.register_feature("driver_shards", SovereigntyPhase::Phase1CompatibilityFoundation);
-        self.register_feature("cross_os_driver_compat", SovereigntyPhase::Phase1CompatibilityFoundation);
-        self.register_feature("declarative_driver_configs", SovereigntyPhase::Phase1CompatibilityFoundation);
-        self.register_feature("hotplug_orchestration", SovereigntyPhase::Phase1CompatibilityFoundation);
+        self.register_feature(
+            "driver_shards",
+            SovereigntyPhase::Phase1CompatibilityFoundation,
+        );
+        self.register_feature(
+            "cross_os_driver_compat",
+            SovereigntyPhase::Phase1CompatibilityFoundation,
+        );
+        self.register_feature(
+            "declarative_driver_configs",
+            SovereigntyPhase::Phase1CompatibilityFoundation,
+        );
+        self.register_feature(
+            "hotplug_orchestration",
+            SovereigntyPhase::Phase1CompatibilityFoundation,
+        );
 
         // Phase 2: Sovereignty & Security
-        self.register_feature("sandboxed_hardware_modules", SovereigntyPhase::Phase2SovereigntyAndSecurity);
-        self.register_feature("universal_firmware_bridge", SovereigntyPhase::Phase2SovereigntyAndSecurity);
-        self.register_feature("firmware_free_drivers", SovereigntyPhase::Phase2SovereigntyAndSecurity);
-        self.register_feature("secure_peripheral_isolation", SovereigntyPhase::Phase2SovereigntyAndSecurity);
-        self.register_feature("driver_layering_system", SovereigntyPhase::Phase2SovereigntyAndSecurity);
+        self.register_feature(
+            "sandboxed_hardware_modules",
+            SovereigntyPhase::Phase2SovereigntyAndSecurity,
+        );
+        self.register_feature(
+            "universal_firmware_bridge",
+            SovereigntyPhase::Phase2SovereigntyAndSecurity,
+        );
+        self.register_feature(
+            "firmware_free_drivers",
+            SovereigntyPhase::Phase2SovereigntyAndSecurity,
+        );
+        self.register_feature(
+            "secure_peripheral_isolation",
+            SovereigntyPhase::Phase2SovereigntyAndSecurity,
+        );
+        self.register_feature(
+            "driver_layering_system",
+            SovereigntyPhase::Phase2SovereigntyAndSecurity,
+        );
 
         // Phase 3: Sovereign Expansion
-        self.register_feature("clustered_device_pooling", SovereigntyPhase::Phase3SovereignExpansion);
-        self.register_feature("programmable_io_stack", SovereigntyPhase::Phase3SovereignExpansion);
-        self.register_feature("cross_architecture_portability", SovereigntyPhase::Phase3SovereignExpansion);
-        self.register_feature("declarative_hardware_policies", SovereigntyPhase::Phase3SovereignExpansion);
-        self.register_feature("cryptographic_boot_chain", SovereigntyPhase::Phase3SovereignExpansion);
+        self.register_feature(
+            "clustered_device_pooling",
+            SovereigntyPhase::Phase3SovereignExpansion,
+        );
+        self.register_feature(
+            "programmable_io_stack",
+            SovereigntyPhase::Phase3SovereignExpansion,
+        );
+        self.register_feature(
+            "cross_architecture_portability",
+            SovereigntyPhase::Phase3SovereignExpansion,
+        );
+        self.register_feature(
+            "declarative_hardware_policies",
+            SovereigntyPhase::Phase3SovereignExpansion,
+        );
+        self.register_feature(
+            "cryptographic_boot_chain",
+            SovereigntyPhase::Phase3SovereignExpansion,
+        );
     }
 
     fn register_feature(&mut self, name: &str, phase: SovereigntyPhase) {
@@ -852,7 +932,9 @@ mod tests {
     #[test]
     fn test_gpu_compute_runtime() {
         let mut engine = GpuComputeEngine::new();
-        assert!(engine.compile_gpu_program("MatrixAdd", "__kernel void add() {}").is_ok());
+        assert!(engine
+            .compile_gpu_program("MatrixAdd", "__kernel void add() {}")
+            .is_ok());
         assert!(engine.compile_gpu_program("MatrixAdd", "").is_err());
 
         assert!(engine.allocate_gpu_vram(4 * 1024 * 1024 * 1024).is_ok()); // 4GB OK
@@ -929,9 +1011,15 @@ mod tests {
         let mut engine = FunctionalConfigEngine::new();
 
         // 1. Initial declarative configurations
-        engine.set_option("boot.loader.systemd-boot.enable", NixConfigValue::Boolean(true));
+        engine.set_option(
+            "boot.loader.systemd-boot.enable",
+            NixConfigValue::Boolean(true),
+        );
         engine.set_option("services.openssh.ports", NixConfigValue::Integer(22));
-        engine.set_option("networking.hostName", NixConfigValue::Text("sigmaos-workspace".to_string()));
+        engine.set_option(
+            "networking.hostName",
+            NixConfigValue::Text("sigmaos-workspace".to_string()),
+        );
 
         assert_eq!(
             engine.get_option("networking.hostName"),
@@ -943,7 +1031,10 @@ mod tests {
         assert_eq!(gen1, 1);
 
         // 3. Mutate declarative state to a new state and commit Generation 2
-        engine.set_option("networking.hostName", NixConfigValue::Text("sigmaos-production".to_string()));
+        engine.set_option(
+            "networking.hostName",
+            NixConfigValue::Text("sigmaos-production".to_string()),
+        );
         engine.set_option("services.openssh.ports", NixConfigValue::Integer(2222));
         let gen2 = engine.commit_generation(1716005000);
         assert_eq!(gen2, 2);
@@ -971,28 +1062,32 @@ mod tests {
         let mut resolver = PortageSlotResolver::new();
 
         // 1. Merge Python 3.10 into slot "3.10"
-        assert!(resolver.merge_package(EbuildPackage {
-            name: "python".to_string(),
-            version: "3.10.12".to_string(),
-            slot: "3.10".to_string(),
-            use_flags: {
-                let mut v = Vec::new();
-                v.push("gdbm".to_string());
-                v
-            },
-        }).is_ok());
+        assert!(resolver
+            .merge_package(EbuildPackage {
+                name: "python".to_string(),
+                version: "3.10.12".to_string(),
+                slot: "3.10".to_string(),
+                use_flags: {
+                    let mut v = Vec::new();
+                    v.push("gdbm".to_string());
+                    v
+                },
+            })
+            .is_ok());
 
         // 2. Merge Python 3.11 into slot "3.11" (different slot, can coexist!)
-        assert!(resolver.merge_package(EbuildPackage {
-            name: "python".to_string(),
-            version: "3.11.4".to_string(),
-            slot: "3.11".to_string(),
-            use_flags: {
-                let mut v = Vec::new();
-                v.push("gdbm".to_string());
-                v
-            },
-        }).is_ok());
+        assert!(resolver
+            .merge_package(EbuildPackage {
+                name: "python".to_string(),
+                version: "3.11.4".to_string(),
+                slot: "3.11".to_string(),
+                use_flags: {
+                    let mut v = Vec::new();
+                    v.push("gdbm".to_string());
+                    v
+                },
+            })
+            .is_ok());
 
         assert_eq!(resolver.active_packages.len(), 2);
 
@@ -1021,7 +1116,10 @@ mod tests {
 
         // 1. Add repository source
         resolver.add_source_repository("deb https://deb.debian.org/debian bookworm main");
-        assert_eq!(resolver.sources_list[0], "deb https://deb.debian.org/debian bookworm main");
+        assert_eq!(
+            resolver.sources_list[0],
+            "deb https://deb.debian.org/debian bookworm main"
+        );
 
         // 2. Setup Multi-Arch foreign architecture support
         assert!(!resolver.multiarch.is_architecture_supported("i386"));
@@ -1066,7 +1164,11 @@ mod tests {
         assert!(resolver.apt_get_install("curl", "i386").is_ok());
 
         assert_eq!(resolver.installed_packages.len(), 2);
-        let ssl_installed = resolver.installed_packages.iter().find(|p| p.name == "libssl").unwrap();
+        let ssl_installed = resolver
+            .installed_packages
+            .iter()
+            .find(|p| p.name == "libssl")
+            .unwrap();
         assert_eq!(ssl_installed.version, "1.1.1");
         assert_eq!(ssl_installed.pin_priority, 990);
 
@@ -1083,9 +1185,18 @@ mod tests {
 
         // Downgrade becomes allowed if priority is set > 1000
         resolver.set_pin_priority("libssl=1.1.0", 1005);
-        resolver.available_packages.iter_mut().find(|p| p.name == "libssl" && p.version == "1.1.0").unwrap().pin_priority = 1005;
+        resolver
+            .available_packages
+            .iter_mut()
+            .find(|p| p.name == "libssl" && p.version == "1.1.0")
+            .unwrap()
+            .pin_priority = 1005;
         assert!(resolver.apt_get_install("libssl", "i386").is_ok());
-        let ssl_downgraded = resolver.installed_packages.iter().find(|p| p.name == "libssl").unwrap();
+        let ssl_downgraded = resolver
+            .installed_packages
+            .iter()
+            .find(|p| p.name == "libssl")
+            .unwrap();
         assert_eq!(ssl_downgraded.version, "1.1.0");
     }
 
@@ -1094,13 +1205,19 @@ mod tests {
         let enforcer = DebianPolicyEnforcer::new();
 
         // 1. DFSG Compliant (GPL-3.0) and FHS Compliant paths (/usr/bin) -> Compliant
-        assert!(enforcer.evaluate_package_compliance("grep", "GPL-3.0", &["/usr/bin/grep", "/etc/grep.conf"]).is_ok());
+        assert!(enforcer
+            .evaluate_package_compliance("grep", "GPL-3.0", &["/usr/bin/grep", "/etc/grep.conf"])
+            .is_ok());
 
         // 2. Proprietary license (non-free) -> Non-compliant
-        assert!(enforcer.evaluate_package_compliance("nvidia-driver", "Proprietary", &["/usr/lib/nvidia/"]).is_err());
+        assert!(enforcer
+            .evaluate_package_compliance("nvidia-driver", "Proprietary", &["/usr/lib/nvidia/"])
+            .is_err());
 
         // 3. FHS Non-compliant path (/opt/mycustomapp) -> Non-compliant
-        assert!(enforcer.evaluate_package_compliance("custom-app", "MIT", &["/opt/custom/app"]).is_err());
+        assert!(enforcer
+            .evaluate_package_compliance("custom-app", "MIT", &["/opt/custom/app"])
+            .is_err());
     }
 
     #[test]
@@ -1114,7 +1231,9 @@ mod tests {
 
         let m_2035 = timeline.evaluate_roadmap_milestone(2034).unwrap();
         assert_eq!(m_2035.year_range, "2032-2035");
-        assert!(m_2035.sigmaos_milestone.contains("Cryptographic boot chain"));
+        assert!(m_2035
+            .sigmaos_milestone
+            .contains("Cryptographic boot chain"));
     }
 
     #[test]

@@ -2,31 +2,31 @@
 // SigmaOS Comprehensive TTY/PTY Subsystem
 // Includes full Termios line discipline, signaling, and ANSI buffering
 
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::collections::VecDeque;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 // POSIX Termios Constants
 pub const IGNBRK: u32 = 0o000001;
 pub const BRKINT: u32 = 0o000002;
 pub const IGNPAR: u32 = 0o000004;
 pub const PARMRK: u32 = 0o000010;
-pub const INPCK:  u32 = 0o000020;
+pub const INPCK: u32 = 0o000020;
 pub const ISTRIP: u32 = 0o000040;
-pub const INLCR:  u32 = 0o000100;
-pub const IGNCR:  u32 = 0o000200;
-pub const ICRNL:  u32 = 0o000400;
-pub const IXON:   u32 = 0o002000;
-pub const IXOFF:  u32 = 0o010000;
+pub const INLCR: u32 = 0o000100;
+pub const IGNCR: u32 = 0o000200;
+pub const ICRNL: u32 = 0o000400;
+pub const IXON: u32 = 0o002000;
+pub const IXOFF: u32 = 0o010000;
 
-pub const OPOST:  u32 = 0o000001;
-pub const ONLCR:  u32 = 0o000004;
+pub const OPOST: u32 = 0o000001;
+pub const ONLCR: u32 = 0o000004;
 
-pub const ISIG:   u32 = 0o000001;
+pub const ISIG: u32 = 0o000001;
 pub const ICANON: u32 = 0o000002;
-pub const ECHO:   u32 = 0o000010;
-pub const ECHOE:  u32 = 0o000020;
-pub const ECHOK:  u32 = 0o000040;
+pub const ECHO: u32 = 0o000010;
+pub const ECHOE: u32 = 0o000020;
+pub const ECHOK: u32 = 0o000040;
 pub const ECHONL: u32 = 0o000100;
 pub const NOFLSH: u32 = 0o000200;
 pub const TOSTOP: u32 = 0o000400;
@@ -74,17 +74,17 @@ pub struct Termios {
 impl Termios {
     pub fn default() -> Self {
         let mut cc = [0; 32];
-        cc[VINTR] = 3;   // Ctrl-C
-        cc[VQUIT] = 28;  // Ctrl-\
-        cc[VERASE] = 127;// Backspace
-        cc[VKILL] = 21;  // Ctrl-U
-        cc[VEOF] = 4;    // Ctrl-D
+        cc[VINTR] = 3; // Ctrl-C
+        cc[VQUIT] = 28; // Ctrl-\
+        cc[VERASE] = 127; // Backspace
+        cc[VKILL] = 21; // Ctrl-U
+        cc[VEOF] = 4; // Ctrl-D
         cc[VSTART] = 17; // Ctrl-Q
-        cc[VSTOP] = 19;  // Ctrl-S
-        cc[VSUSP] = 26;  // Ctrl-Z
+        cc[VSTOP] = 19; // Ctrl-S
+        cc[VSUSP] = 26; // Ctrl-Z
         cc[VMIN] = 1;
         cc[VTIME] = 0;
-        
+
         Self {
             c_iflag: ICRNL | IXON,
             c_oflag: OPOST | ONLCR,
@@ -115,8 +115,15 @@ mod tests {
 
         tty1.winsize.ws_row = 50;
         tty1.winsize.ws_col = 120;
-        let mut ws = Winsize { ws_row: 0, ws_col: 0, ws_xpixel: 0, ws_ypixel: 0 };
-        assert!(tty1.ioctl(TIOCGWINSZ, &mut ws as *mut Winsize as usize).is_ok());
+        let mut ws = Winsize {
+            ws_row: 0,
+            ws_col: 0,
+            ws_xpixel: 0,
+            ws_ypixel: 0,
+        };
+        assert!(tty1
+            .ioctl(TIOCGWINSZ, &mut ws as *mut Winsize as usize)
+            .is_ok());
         assert_eq!(ws.ws_row, 50);
         assert_eq!(ws.ws_col, 120);
     }
@@ -159,7 +166,7 @@ pub struct Tty {
     pub termios: Termios,
     pub foreground_pgid: u64,
     pub session_id: u64,
-    
+
     // Internal state
     pub stopped: bool,
 }
@@ -173,7 +180,12 @@ impl Tty {
             input_buffer: VecDeque::new(),
             canonical_buffer: Vec::new(),
             output_buffer: VecDeque::new(),
-            winsize: Winsize { ws_row: 24, ws_col: 80, ws_xpixel: 0, ws_ypixel: 0 },
+            winsize: Winsize {
+                ws_row: 24,
+                ws_col: 80,
+                ws_xpixel: 0,
+                ws_ypixel: 0,
+            },
             termios: Termios::default(),
             foreground_pgid: 0,
             session_id: 0,
@@ -325,33 +337,33 @@ impl Tty {
             self.output_buffer.push_back(b);
         }
     }
-    
+
     pub fn ioctl(&mut self, request: usize, arg: usize) -> Result<usize, &'static str> {
         match request {
             TIOCGWINSZ => {
                 unsafe { *(arg as *mut Winsize) = self.winsize };
                 Ok(0)
-            },
+            }
             TIOCSWINSZ => {
                 unsafe { self.winsize = *(arg as *const Winsize) };
                 Ok(0)
-            },
+            }
             TCGETS => {
                 unsafe { *(arg as *mut Termios) = self.termios };
                 Ok(0)
-            },
+            }
             TCSETS => {
                 unsafe { self.termios = *(arg as *const Termios) };
                 Ok(0)
-            },
+            }
             TIOCGPGRP => {
                 unsafe { *(arg as *mut u64) = self.foreground_pgid };
                 Ok(0)
-            },
+            }
             TIOCSPGRP => {
                 unsafe { self.foreground_pgid = *(arg as *const u64) };
                 Ok(0)
-            },
+            }
             _ => Err("Invalid ioctl"),
         }
     }

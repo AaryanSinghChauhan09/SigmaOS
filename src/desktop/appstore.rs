@@ -1,5 +1,5 @@
-use std::vec::Vec;
 use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AppReview {
@@ -83,7 +83,14 @@ pub struct AppStoreItem {
 }
 
 impl AppStoreItem {
-    pub fn new(name: &str, version: &str, developer: &str, description: &str, category: &str, size: u64) -> Self {
+    pub fn new(
+        name: &str,
+        version: &str,
+        developer: &str,
+        description: &str,
+        category: &str,
+        size: u64,
+    ) -> Self {
         Self {
             name: name.to_string(),
             version: version.to_string(),
@@ -204,13 +211,27 @@ mod tests {
 
     #[test]
     fn test_app_monetization_tier() {
-        let app = AppStoreItem::new("GIMP", "2.10", "GIMP Team", "Image Editor", "Graphics", 120_000_000);
+        let app = AppStoreItem::new(
+            "GIMP",
+            "2.10",
+            "GIMP Team",
+            "Image Editor",
+            "Graphics",
+            120_000_000,
+        );
         assert_eq!(app.monetization_tier, AppMonetizationTier::Free);
     }
 
     #[test]
     fn test_build_from_source_config() {
-        let app = AppStoreItem::new("Neovim", "0.9", "Neovim Core", "Text Editor", "Development", 15_000_000);
+        let app = AppStoreItem::new(
+            "Neovim",
+            "0.9",
+            "Neovim Core",
+            "Text Editor",
+            "Development",
+            15_000_000,
+        );
         assert_eq!(app.build_from_source.custom_cflags, "-O2 -pipe");
         assert_eq!(app.build_from_source.make_jobs, 4);
     }

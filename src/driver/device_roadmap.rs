@@ -2,7 +2,6 @@
 // SigmaOS Device Integration Roadmap Subsystem
 // Native zero-dependency Rust implementation of Short-, Mid-, and Long-Term device support architecture
 
-
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
@@ -37,12 +36,19 @@ impl DriverShardManager {
         self.shards.insert(shard.shard_id.clone(), shard);
     }
 
-    pub fn hot_swap_shard(&mut self, shard_id: &str, new_version: &str) -> Result<String, &'static str> {
+    pub fn hot_swap_shard(
+        &mut self,
+        shard_id: &str,
+        new_version: &str,
+    ) -> Result<String, &'static str> {
         if let Some(shard) = self.shards.get_mut(shard_id) {
             let old_ver = shard.version.clone();
             shard.version = new_version.to_string();
             shard.is_active = true;
-            Ok(format!("Hot-swapped driver shard '{}' from v{} to v{}", shard_id, old_ver, new_version))
+            Ok(format!(
+                "Hot-swapped driver shard '{}' from v{} to v{}",
+                shard_id, old_ver, new_version
+            ))
         } else {
             Err("DriverShardManager: Specified shard ID not found")
         }
@@ -73,8 +79,14 @@ impl DeclarativeDriverConfigEngine {
         self.profiles.insert(profile.profile_name.clone(), profile);
     }
 
-    pub fn auto_resolve_profile(&self, vendor_id: u16, device_id: u16) -> Option<&HardwareProfileSpec> {
-        self.profiles.values().find(|p| p.vendor_id == vendor_id && p.device_id == device_id)
+    pub fn auto_resolve_profile(
+        &self,
+        vendor_id: u16,
+        device_id: u16,
+    ) -> Option<&HardwareProfileSpec> {
+        self.profiles
+            .values()
+            .find(|p| p.vendor_id == vendor_id && p.device_id == device_id)
     }
 }
 
@@ -91,13 +103,15 @@ impl CrossOsDriverBridge {
 
     pub fn adapt_linux_driver(&mut self, driver_name: &str) -> String {
         let adapter_sym = format!("linux_shim_{}", driver_name);
-        self.adapted_drivers.insert(driver_name.to_string(), "Linux".to_string());
+        self.adapted_drivers
+            .insert(driver_name.to_string(), "Linux".to_string());
         adapter_sym
     }
 
     pub fn adapt_bsd_driver(&mut self, driver_name: &str) -> String {
         let adapter_sym = format!("bsd_rump_{}", driver_name);
-        self.adapted_drivers.insert(driver_name.to_string(), "BSD".to_string());
+        self.adapted_drivers
+            .insert(driver_name.to_string(), "BSD".to_string());
         adapter_sym
     }
 }
@@ -137,7 +151,11 @@ impl SandboxedHardwareModuleManager {
         );
     }
 
-    pub fn execute_isolated_irp(&self, container_id: &str, opcode: u32) -> Result<u32, &'static str> {
+    pub fn execute_isolated_irp(
+        &self,
+        container_id: &str,
+        opcode: u32,
+    ) -> Result<u32, &'static str> {
         if let Some(cont) = self.containers.get(container_id) {
             if cont.is_isolated {
                 Ok(opcode ^ 0x5A5A)
@@ -184,7 +202,10 @@ impl UniversalFirmwareBridge {
     pub fn translate_vendor_blob(&mut self, blob_id: &str) -> Result<String, &'static str> {
         if let Some(blob) = self.blobs.get_mut(blob_id) {
             blob.translated = true;
-            Ok(format!("UniversalFirmware: Translated vendor blob '{}' ({})", blob_id, blob.vendor))
+            Ok(format!(
+                "UniversalFirmware: Translated vendor blob '{}' ({})",
+                blob_id, blob.vendor
+            ))
         } else {
             Err("UniversalFirmware: Blob ID not registered")
         }
@@ -275,7 +296,11 @@ impl ClusterAwarePeripheralRouter {
         );
     }
 
-    pub fn share_peripheral_node(&mut self, res_id: &str, target_node: &str) -> Result<(), &'static str> {
+    pub fn share_peripheral_node(
+        &mut self,
+        res_id: &str,
+        target_node: &str,
+    ) -> Result<(), &'static str> {
         if let Some(res) = self.resources.get_mut(res_id) {
             if !res.shared_with_nodes.contains(&target_node.to_string()) {
                 res.shared_with_nodes.push(target_node.to_string());
@@ -355,7 +380,11 @@ impl CryptographicBootChain {
         });
     }
 
-    pub fn measure_and_verify_stage(&mut self, name: &str, actual_hash: &str) -> Result<bool, &'static str> {
+    pub fn measure_and_verify_stage(
+        &mut self,
+        name: &str,
+        actual_hash: &str,
+    ) -> Result<bool, &'static str> {
         if let Some(stage) = self.stages.iter_mut().find(|s| s.stage_name == name) {
             if stage.expected_measurement_hash == actual_hash {
                 stage.verified = true;
@@ -463,14 +492,18 @@ mod tests {
 
         let mut registry = CommunityDriverRegistry::new();
         registry.add_trusted_pubkey("PUBKEY123");
-        assert!(registry.verify_and_register_driver("sound-card", "2.0", "SIG123", "PUBKEY123").unwrap());
+        assert!(registry
+            .verify_and_register_driver("sound-card", "2.0", "SIG123", "PUBKEY123")
+            .unwrap());
     }
 
     #[test]
     fn test_long_term_phase() {
         let mut cluster = ClusterAwarePeripheralRouter::new();
         cluster.register_cluster_resource("gpu-cluster-01", "GPU", "node-alpha");
-        assert!(cluster.share_peripheral_node("gpu-cluster-01", "node-beta").is_ok());
+        assert!(cluster
+            .share_peripheral_node("gpu-cluster-01", "node-beta")
+            .is_ok());
 
         let mut io_stack = ProgrammableIoStack::new();
         io_stack.register_io_script("gpio-trigger", "GPIO", &[1, 2, 3]);
@@ -479,7 +512,9 @@ mod tests {
 
         let mut boot_chain = CryptographicBootChain::new();
         boot_chain.register_stage("stage1", "hash123");
-        assert!(boot_chain.measure_and_verify_stage("stage1", "hash123").unwrap());
+        assert!(boot_chain
+            .measure_and_verify_stage("stage1", "hash123")
+            .unwrap());
         assert!(boot_chain.is_boot_chain_trusted());
     }
 

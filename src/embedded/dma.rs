@@ -1,19 +1,20 @@
-
-
+use core::mem;
 /// OOP-based DMA for SigmaOS
 /// Based on Ideas-999-Structured: Embedded & Firmware Item 1146
 /// Implements DMA transfers with Linux and BSD-inspired safety wrappers.
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
-use std::vec::Vec;
 use std::boxed::Box;
+use std::vec::Vec;
 
 pub type ChannelID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum DMADirection { MemoryToMemory = 0, MemoryToPeripheral = 1, PeripheralToMemory = 2 }
+pub enum DMADirection {
+    MemoryToMemory = 0,
+    MemoryToPeripheral = 1,
+    PeripheralToMemory = 2,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -24,7 +25,7 @@ pub enum DMAError {
     InvalidParameter = 3,
     UnalignedAddress = 4,
     OutOfBounds = 5,
-    PermissionDenied = 6
+    PermissionDenied = 6,
 }
 
 pub trait DMAChannel {
@@ -48,13 +49,24 @@ impl SimpleDMAChannel {
 }
 
 impl DMAChannel for SimpleDMAChannel {
-    fn id(&self) -> ChannelID { self.id }
-    fn is_busy(&self) -> bool { self.busy.load(Ordering::SeqCst) == 1 }
+    fn id(&self) -> ChannelID {
+        self.id
+    }
+    fn is_busy(&self) -> bool {
+        self.busy.load(Ordering::SeqCst) == 1
+    }
 }
 
 pub trait DMAController {
-    fn configure(&mut self, channel_id: ChannelID, direction: DMADirection) -> Result<(), DMAError>;
-    fn start_transfer(&mut self, channel_id: ChannelID, src: u32, dst: u32, size: u32) -> Result<(), DMAError>;
+    fn configure(&mut self, channel_id: ChannelID, direction: DMADirection)
+        -> Result<(), DMAError>;
+    fn start_transfer(
+        &mut self,
+        channel_id: ChannelID,
+        src: u32,
+        dst: u32,
+        size: u32,
+    ) -> Result<(), DMAError>;
     fn is_complete(&self, channel_id: ChannelID) -> bool;
 }
 
@@ -74,13 +86,23 @@ impl SimpleDMAController {
 }
 
 impl DMAController for SimpleDMAController {
-    fn configure(&mut self, channel_id: ChannelID, _direction: DMADirection) -> Result<(), DMAError> {
+    fn configure(
+        &mut self,
+        channel_id: ChannelID,
+        _direction: DMADirection,
+    ) -> Result<(), DMAError> {
         let channel = SimpleDMAChannel::new(channel_id);
         self.channels.push(Some(Box::new(channel)));
         Ok(())
     }
-    
-    fn start_transfer(&mut self, channel_id: ChannelID, src: u32, dst: u32, size: u32) -> Result<(), DMAError> {
+
+    fn start_transfer(
+        &mut self,
+        channel_id: ChannelID,
+        src: u32,
+        dst: u32,
+        size: u32,
+    ) -> Result<(), DMAError> {
         if size == 0 {
             return Err(DMAError::InvalidParameter);
         }
@@ -105,7 +127,7 @@ impl DMAController for SimpleDMAController {
         }
         Err(DMAError::NotFound)
     }
-    
+
     fn is_complete(&self, channel_id: ChannelID) -> bool {
         for i in 0..self.channels.len() {
             if let Some(ref channel) = self.channels[i] {
@@ -158,7 +180,7 @@ impl CircularBuffer for SimpleCircularBuffer {
         }
         written
     }
-    
+
     fn read(&mut self, buffer: &mut [u8]) -> usize {
         let mut read = 0;
         for byte in buffer.iter_mut() {
@@ -175,7 +197,7 @@ impl CircularBuffer for SimpleCircularBuffer {
         }
         read
     }
-    
+
     fn available(&self) -> usize {
         let head = self.head.load(Ordering::SeqCst);
         let tail = self.tail.load(Ordering::SeqCst);
@@ -194,7 +216,9 @@ mod tests {
     #[test]
     fn test_dma_controller_success() {
         let mut controller = SimpleDMAController::new();
-        assert!(controller.configure(1, DMADirection::MemoryToMemory).is_ok());
+        assert!(controller
+            .configure(1, DMADirection::MemoryToMemory)
+            .is_ok());
 
         // 4-byte aligned safe transfer
         assert!(controller.start_transfer(1, 0x1000, 0x2000, 64).is_ok());
@@ -204,18 +228,28 @@ mod tests {
     #[test]
     fn test_dma_alignment_violations() {
         let mut controller = SimpleDMAController::new();
-        assert!(controller.configure(2, DMADirection::MemoryToPeripheral).is_ok());
+        assert!(controller
+            .configure(2, DMADirection::MemoryToPeripheral)
+            .is_ok());
 
         // Unaligned source (0x1001)
-        assert_eq!(controller.start_transfer(2, 0x1001, 0x2000, 64), Err(DMAError::UnalignedAddress));
+        assert_eq!(
+            controller.start_transfer(2, 0x1001, 0x2000, 64),
+            Err(DMAError::UnalignedAddress)
+        );
     }
 
     #[test]
     fn test_dma_bounds_violations() {
         let mut controller = SimpleDMAController::new();
-        assert!(controller.configure(3, DMADirection::PeripheralToMemory).is_ok());
+        assert!(controller
+            .configure(3, DMADirection::PeripheralToMemory)
+            .is_ok());
 
         // Out-of-bounds address (0xF0000000)
-        assert_eq!(controller.start_transfer(3, 0x1000, 0xF0000000, 64), Err(DMAError::OutOfBounds));
+        assert_eq!(
+            controller.start_transfer(3, 0x1000, 0xF0000000, 64),
+            Err(DMAError::OutOfBounds)
+        );
     }
 }

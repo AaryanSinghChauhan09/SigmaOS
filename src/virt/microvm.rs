@@ -1,10 +1,10 @@
-use std::boxed::Box;
 use core::mem;
 /// OOP-based MicroVM Sandboxing Foundation for SigmaOS
 /// Implements microVM sandboxing using OOP principles with traits and structs
 /// No dependency on external virtualization frameworks
 /// Based on Roadmap Item 19: MicroVM sandboxing foundation
 use core::sync::atomic::{AtomicUsize, Ordering};
+use std::boxed::Box;
 
 /// MicroVM ID
 pub type MicroVMID = usize;
@@ -277,9 +277,12 @@ pub struct VcpuRegisterState {
 impl VcpuRegisterState {
     pub fn new() -> Self {
         Self {
-            rax: 0, rbx: 0, rcx: 0, rdx: 0,
+            rax: 0,
+            rbx: 0,
+            rcx: 0,
+            rdx: 0,
             rip: 0x1000,
-            rflags: 0x202, // Interrupts enabled
+            rflags: 0x202,   // Interrupts enabled
             cr0: 0x80000001, // Paging + Protected mode enabled
             cr3: 0x2000,
             cr4: 0x20, // PAE enabled
@@ -298,7 +301,11 @@ impl Default for VcpuRegisterState {
 pub enum KvmIoctl {
     CreateVm,
     CreateVcpu(u32),
-    SetUserMemoryRegion { slot: u32, guest_phys_addr: u64, memory_size: u64 },
+    SetUserMemoryRegion {
+        slot: u32,
+        guest_phys_addr: u64,
+        memory_size: u64,
+    },
     RunVcpu(u32),
     GetRegs(u32),
     SetRegs(u32),
@@ -314,7 +321,11 @@ pub struct VirtioNetAccelerator {
 
 impl VirtioNetAccelerator {
     pub fn new() -> Self {
-        Self { rx_ring_head: 0, tx_ring_head: 0, packets_processed: 0 }
+        Self {
+            rx_ring_head: 0,
+            tx_ring_head: 0,
+            packets_processed: 0,
+        }
     }
 
     pub fn process_tx_ring(&mut self, descriptor_chain_len: usize) -> usize {

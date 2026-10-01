@@ -3,7 +3,7 @@ use std::boxed::Box;
 #[cfg(not(target_os = "none"))]
 use std_std::boxed::Box;
 
-
+use core::mem;
 /// OOP-based Advanced Metrics, Telemetry & Diagnostics Collection for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 151
 /// Implements:
@@ -18,19 +18,26 @@ use std_std::boxed::Box;
 /// - Automatic OpenTelemetry Export (W3C traceparent headers) & Cross-Machine Trace Stitching
 /// - NUMA Miss Counter & CPU Pressure Stall Information (PSI)
 /// - Jitter Histograms for Real-Time workloads
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type MetricID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum MetricType { Counter = 0, Gauge = 1, Histogram = 2, Summary = 3 }
+pub enum MetricType {
+    Counter = 0,
+    Gauge = 1,
+    Histogram = 2,
+    Summary = 3,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum MetricError { Success = 0, NotFound = 1, InvalidType = 2 }
+pub enum MetricError {
+    Success = 0,
+    NotFound = 1,
+    InvalidType = 2,
+}
 
 pub trait Metric {
     fn id(&self) -> MetricID;
@@ -67,16 +74,23 @@ impl SimpleMetric {
 }
 
 impl Metric for SimpleMetric {
-    fn id(&self) -> MetricID { self.id }
+    fn id(&self) -> MetricID {
+        self.id
+    }
     fn name(&self) -> &[u8] {
         // Use stored explicit name length for O(1) constant-time slicing
         &self.name[..self.name_len as usize]
     }
-    fn metric_type(&self) -> MetricType { unsafe { core::mem::transmute(self.metric_type.load(Ordering::SeqCst)) } }
-    fn value(&self) -> f64 { (self.value.load(Ordering::SeqCst) as f64) / 10000.0 }
+    fn metric_type(&self) -> MetricType {
+        unsafe { core::mem::transmute(self.metric_type.load(Ordering::SeqCst)) }
+    }
+    fn value(&self) -> f64 {
+        (self.value.load(Ordering::SeqCst) as f64) / 10000.0
+    }
 
     fn set_value(&mut self, value: f64) {
-        self.value.store((value * 10000.0) as usize, Ordering::SeqCst);
+        self.value
+            .store((value * 10000.0) as usize, Ordering::SeqCst);
     }
 }
 
@@ -124,7 +138,9 @@ impl MetricsCollector for SimpleMetricsCollector {
     fn get_metric(&self, id: MetricID) -> Option<&dyn Metric> {
         for metric_option in &self.metrics {
             if let Some(ref metric) = *metric_option {
-                if metric.id() == id { return Some(metric.as_ref()); }
+                if metric.id() == id {
+                    return Some(metric.as_ref());
+                }
             }
         }
         None
@@ -187,7 +203,7 @@ pub struct PowerThermalTracker {
     pub power_consumption_w: f32, // RAPL Attributed Watts
     pub core_temperature_c: u32,
     pub throttling_predicted_100ms: bool,
-    pub energy_efficiency_score: f32, // Work-per-watt score
+    pub energy_efficiency_score: f32,          // Work-per-watt score
     pub battery_discharge_remaining_mins: u32, // ML-style prediction
 }
 
@@ -228,7 +244,9 @@ impl OpenTelemetryExporter {
 
     /// Serializes to W3C Trace Context Header string bytes (e.g. 00-traceid-parentid-01)
     pub fn serialize_w3c(&self, out_buf: &mut [u8]) -> usize {
-        if out_buf.len() < 55 { return 0; }
+        if out_buf.len() < 55 {
+            return 0;
+        }
 
         out_buf[0] = b'0';
         out_buf[1] = b'0';
@@ -314,9 +332,15 @@ impl PerformanceBaselineDatabase {
         self.entries.push(entry);
     }
 
-    pub fn get_normalized_baseline(&self, commit: &[u8; 20], cpu: &[u8; 32], ram: u32) -> Option<u64> {
+    pub fn get_normalized_baseline(
+        &self,
+        commit: &[u8; 20],
+        cpu: &[u8; 32],
+        ram: u32,
+    ) -> Option<u64> {
         for entry in self.entries.iter() {
-            if &entry.commit_hash == commit && &entry.cpu_model == cpu && entry.ram_speed_mhz == ram {
+            if &entry.commit_hash == commit && &entry.cpu_model == cpu && entry.ram_speed_mhz == ram
+            {
                 return Some(entry.benchmark_latency_us);
             }
         }
@@ -518,11 +542,15 @@ impl MetricsExporter for SimpleMetricsExporter {
                 let name = metric.name();
                 let value = metric.value();
 
-                for &byte in name { output.push(byte); }
+                for &byte in name {
+                    output.push(byte);
+                }
                 output.push(b' ');
 
                 let value_str = format_simple(value);
-                for &byte in &value_str { output.push(byte); }
+                for &byte in &value_str {
+                    output.push(byte);
+                }
                 output.push(b'\n');
             }
         }
@@ -557,8 +585,12 @@ fn format_simple(value: f64) -> Vec<u8> {
     if frac_part != 0 {
         result.push(b'.');
         let frac_abs = frac_part.abs();
-        if frac_abs < 100 { result.push(b'0'); }
-        if frac_abs < 10 { result.push(b'0'); }
+        if frac_abs < 100 {
+            result.push(b'0');
+        }
+        if frac_abs < 10 {
+            result.push(b'0');
+        }
         let mut n = frac_abs;
         let mut digits = Vec::new();
         while n > 0 {
@@ -573,7 +605,11 @@ fn format_simple(value: f64) -> Vec<u8> {
     result
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T: Clone> Clone for Vec<T> {
     fn clone(&self) -> Self {
@@ -588,17 +624,27 @@ impl<T: Clone> Clone for Vec<T> {
 }
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
         }
     }
-    fn is_empty(&self) -> bool { self.len == 0 }
+    fn is_empty(&self) -> bool {
+        self.len == 0
+    }
     fn pop(&mut self) -> Option<T> {
         if self.len > 0 {
             self.len -= 1;
@@ -607,21 +653,33 @@ impl<T> Vec<T> {
             None
         }
     }
-    fn len(&self) -> usize { self.len }
+    fn len(&self) -> usize {
+        self.len
+    }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -653,7 +711,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;
@@ -700,16 +757,13 @@ mod tests {
 
     #[test]
     fn test_opentelemetry_w3c_serialization() {
-        let opentelemetry = OpenTelemetryExporter::new(
-            [0x1a; 16],
-            [0x2b; 8],
-        );
+        let opentelemetry = OpenTelemetryExporter::new([0x1a; 16], [0x2b; 8]);
         let mut buf = [0u8; 100];
         let bytes_written = opentelemetry.serialize_w3c(&mut buf);
         assert_eq!(bytes_written, 55);
 
         // Parse serialized traceparent string to verify
-        let serialized_str = core:: String::from_utf8(&buf[..bytes_written]).unwrap();
+        let serialized_str = core::String::from_utf8(&buf[..bytes_written]).unwrap();
         assert!(serialized_str.starts_with("00-"));
         assert!(serialized_str.contains("1a1a1a1a"));
         assert!(serialized_str.contains("2b2b2b2b"));
@@ -749,11 +803,15 @@ mod tests {
 
         db.register_baseline(entry);
 
-        let registered_lat = db.get_normalized_baseline(&commit, &cpu, ram_speed).unwrap();
+        let registered_lat = db
+            .get_normalized_baseline(&commit, &cpu, ram_speed)
+            .unwrap();
         assert_eq!(registered_lat, 85);
 
         // Fetch unknown target should be None
-        assert!(db.get_normalized_baseline(&[0; 20], &cpu, ram_speed).is_none());
+        assert!(db
+            .get_normalized_baseline(&[0; 20], &cpu, ram_speed)
+            .is_none());
     }
 
     #[test]

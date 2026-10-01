@@ -1,4 +1,3 @@
-
 use core::mem;
 /// Advanced Enterprise Networking Suite for SigmaOS
 /// Provides sovereign enterprise network features including IPv6 addressing and VPN encrypted tunneling.

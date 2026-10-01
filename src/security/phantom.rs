@@ -6,11 +6,16 @@ use crate::security::unveil::{SecurityError, SigmaError};
 
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum SecurityError { PrivilegeEscalationDetected, AccessDenied }
+pub enum SecurityError {
+    PrivilegeEscalationDetected,
+    AccessDenied,
+}
 
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum SigmaError { Security(SecurityError) }
+pub enum SigmaError {
+    Security(SecurityError),
+}
 use core::marker::PhantomData;
 
 /// Runtime-generated capability escalation tokens (not hard-coded)
@@ -19,13 +24,14 @@ use core::marker::PhantomData;
 /// - /dev/urandom or getrandom() syscall
 /// - Hardware RNG (RDRAND/RDSEED on x86_64)
 /// - Post-quantum secure key derivation
-/// 
+///
 /// For testing/compilation, we use placeholder values that must be
 /// replaced with proper runtime token generation before deployment.
 pub const KERNEL_ESCALATION_TOKEN: &str = "test_kernel_token_replace_in_production";
 pub const MASTER_ADMIN_TOKEN: &str = "test_admin_token_replace_in_production";
 
-static KERNEL_ESCALATION_TOKEN_RUNTIME: std::sync::Mutex<Option<[u8; 32]>> = std::sync::Mutex::new(None);
+static KERNEL_ESCALATION_TOKEN_RUNTIME: std::sync::Mutex<Option<[u8; 32]>> =
+    std::sync::Mutex::new(None);
 static MASTER_ADMIN_TOKEN_RUNTIME: std::sync::Mutex<Option<[u8; 32]>> = std::sync::Mutex::new(None);
 
 /// User-level privilege marker
@@ -100,7 +106,7 @@ impl CapabilityContext<UserLevel> {
 
     /// Explicitly request upgrade to Kernel Level using a high-privilege validation token.
     /// If validation fails, privilege escalation is caught and returned as a typed error.
-    /// 
+    ///
     /// SECURITY NOTE: This uses constant-time comparison to prevent timing attacks
     #[cfg(test)]
     pub fn escalate_to_kernel(
@@ -117,7 +123,7 @@ impl CapabilityContext<UserLevel> {
             ))
         }
     }
-    
+
     /// Explicitly request upgrade to Kernel Level using a high-privilege validation token.
     /// Non-test version uses runtime-generated tokens
     #[cfg(not(test))]

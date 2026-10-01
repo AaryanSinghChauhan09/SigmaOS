@@ -7,14 +7,14 @@ use std::sync::{Arc, Mutex};
 /// Syslog severity levels
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum SyslogSeverity {
-    Emergency = 0,  // System is unusable
-    Alert = 1,      // Action must be taken immediately
-    Critical = 2,   // Critical conditions
-    Error = 3,      // Error conditions
-    Warning = 4,    // Warning conditions
-    Notice = 5,     // Normal but significant condition
-    Info = 6,       // Informational
-    Debug = 7,      // Debug-level messages
+    Emergency = 0, // System is unusable
+    Alert = 1,     // Action must be taken immediately
+    Critical = 2,  // Critical conditions
+    Error = 3,     // Error conditions
+    Warning = 4,   // Warning conditions
+    Notice = 5,    // Normal but significant condition
+    Info = 6,      // Informational
+    Debug = 7,     // Debug-level messages
 }
 
 impl SyslogSeverity {

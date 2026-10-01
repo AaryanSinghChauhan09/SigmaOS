@@ -5,10 +5,10 @@
 // Enhanced with OpenBSD/FreeBSD W^X (Write XOR Execute) security, FreeBSD wired/pinned page protection,
 // and Linux kswapd-inspired active/inactive LRU page reclaimer scanning.
 
-use std::boxed::Box;
-use std::vec::Vec;
 use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
+use std::boxed::Box;
+use std::vec::Vec;
 
 /// Page size (4KB)
 const PAGE_SIZE: usize = 4096;
@@ -96,15 +96,33 @@ impl PageTableEntryFlags {
 
     pub fn to_u64(&self) -> u64 {
         let mut flags = 0u64;
-        if self.present { flags |= 1 << 0; }
-        if self.writable { flags |= 1 << 1; }
-        if self.user_accessible { flags |= 1 << 2; }
-        if self.write_through { flags |= 1 << 3; }
-        if self.cache_disabled { flags |= 1 << 4; }
-        if self.accessed { flags |= 1 << 5; }
-        if self.dirty { flags |= 1 << 6; }
-        if self.global { flags |= 1 << 8; }
-        if self.is_wired { flags |= 1 << 9; }
+        if self.present {
+            flags |= 1 << 0;
+        }
+        if self.writable {
+            flags |= 1 << 1;
+        }
+        if self.user_accessible {
+            flags |= 1 << 2;
+        }
+        if self.write_through {
+            flags |= 1 << 3;
+        }
+        if self.cache_disabled {
+            flags |= 1 << 4;
+        }
+        if self.accessed {
+            flags |= 1 << 5;
+        }
+        if self.dirty {
+            flags |= 1 << 6;
+        }
+        if self.global {
+            flags |= 1 << 8;
+        }
+        if self.is_wired {
+            flags |= 1 << 9;
+        }
         flags
     }
 }
@@ -180,7 +198,12 @@ impl PageTable {
         }
     }
 
-    pub unsafe fn map_page(&mut self, virtual_addr: VirtualAddress, physical_addr: PhysicalAddress, flags: PageTableEntryFlags) -> Result<(), MemoryError> {
+    pub unsafe fn map_page(
+        &mut self,
+        virtual_addr: VirtualAddress,
+        physical_addr: PhysicalAddress,
+        flags: PageTableEntryFlags,
+    ) -> Result<(), MemoryError> {
         if !self.capability.can_map {
             return Err(MemoryError::PermissionDenied);
         }
@@ -207,7 +230,11 @@ impl PageTable {
         Ok(())
     }
 
-    pub unsafe fn protect_page(&mut self, virtual_addr: VirtualAddress, flags: PageTableEntryFlags) -> Result<(), MemoryError> {
+    pub unsafe fn protect_page(
+        &mut self,
+        virtual_addr: VirtualAddress,
+        flags: PageTableEntryFlags,
+    ) -> Result<(), MemoryError> {
         if !self.capability.can_protect {
             return Err(MemoryError::PermissionDenied);
         }
@@ -454,7 +481,12 @@ impl MemoryRegionCapability {
 }
 
 impl MemoryRegion {
-    pub fn new(start: VirtualAddress, end: VirtualAddress, permissions: MemoryPermissions, capability: MemoryRegionCapability) -> Self {
+    pub fn new(
+        start: VirtualAddress,
+        end: VirtualAddress,
+        permissions: MemoryPermissions,
+        capability: MemoryRegionCapability,
+    ) -> Self {
         MemoryRegion {
             start,
             end,
@@ -479,7 +511,10 @@ impl MemoryRegion {
         Ok(())
     }
 
-    pub unsafe fn change_permissions(&mut self, permissions: MemoryPermissions) -> Result<(), MemoryError> {
+    pub unsafe fn change_permissions(
+        &mut self,
+        permissions: MemoryPermissions,
+    ) -> Result<(), MemoryError> {
         if !self.capability.can_change_permissions {
             return Err(MemoryError::PermissionDenied);
         }
@@ -512,15 +547,29 @@ pub enum MemoryError {
 /// Virtual memory manager trait (OOP interface)
 pub trait VirtualMemoryManager {
     /// Allocate virtual memory
-    fn allocate(&mut self, size: usize, permissions: MemoryPermissions) -> Result<VirtualAddress, MemoryError>;
+    fn allocate(
+        &mut self,
+        size: usize,
+        permissions: MemoryPermissions,
+    ) -> Result<VirtualAddress, MemoryError>;
     /// Free virtual memory
     fn free(&mut self, addr: VirtualAddress) -> Result<(), MemoryError>;
     /// Map physical memory
-    fn map_physical(&mut self, virtual_addr: VirtualAddress, physical_addr: PhysicalAddress, size: usize, permissions: MemoryPermissions) -> Result<(), MemoryError>;
+    fn map_physical(
+        &mut self,
+        virtual_addr: VirtualAddress,
+        physical_addr: PhysicalAddress,
+        size: usize,
+        permissions: MemoryPermissions,
+    ) -> Result<(), MemoryError>;
     /// Unmap memory
     fn unmap(&mut self, virtual_addr: VirtualAddress) -> Result<(), MemoryError>;
     /// Protect memory
-    fn protect(&mut self, virtual_addr: VirtualAddress, permissions: MemoryPermissions) -> Result<(), MemoryError>;
+    fn protect(
+        &mut self,
+        virtual_addr: VirtualAddress,
+        permissions: MemoryPermissions,
+    ) -> Result<(), MemoryError>;
     /// Get memory info
     fn info(&self, virtual_addr: VirtualAddress) -> Option<MemoryInfo>;
 }
@@ -595,7 +644,12 @@ impl SimpleVirtualMemoryManager {
         }
     }
 
-    unsafe fn allocate_region(&mut self, start: VirtualAddress, size: usize, permissions: MemoryPermissions) -> Result<NonNull<MemoryRegion>, MemoryError> {
+    unsafe fn allocate_region(
+        &mut self,
+        start: VirtualAddress,
+        size: usize,
+        permissions: MemoryPermissions,
+    ) -> Result<NonNull<MemoryRegion>, MemoryError> {
         if !is_canonical_address(start) || !is_canonical_address(start + size) {
             return Err(MemoryError::InvalidAddress);
         }
@@ -605,11 +659,17 @@ impl SimpleVirtualMemoryManager {
             return Err(MemoryError::WxViolation);
         }
 
-        let region = MemoryRegion::new(start, start + size, permissions, MemoryRegionCapability::full());
+        let region = MemoryRegion::new(
+            start,
+            start + size,
+            permissions,
+            MemoryRegionCapability::full(),
+        );
         let region_box = Box::new(region);
         let region_ptr = Box::into_raw(region_box);
 
-        self.memory_regions.push(Some(NonNull::new_unchecked(region_ptr)));
+        self.memory_regions
+            .push(Some(NonNull::new_unchecked(region_ptr)));
 
         Ok(NonNull::new_unchecked(region_ptr))
     }
@@ -640,13 +700,19 @@ impl SimpleVirtualMemoryManager {
 }
 
 impl VirtualMemoryManager for SimpleVirtualMemoryManager {
-    fn allocate(&mut self, size: usize, permissions: MemoryPermissions) -> Result<VirtualAddress, MemoryError> {
+    fn allocate(
+        &mut self,
+        size: usize,
+        permissions: MemoryPermissions,
+    ) -> Result<VirtualAddress, MemoryError> {
         if !self.capability.can_allocate {
             return Err(MemoryError::PermissionDenied);
         }
 
         let aligned_size = (size + PAGE_SIZE - 1) & !(PAGE_SIZE - 1);
-        let addr = self.next_virtual_address.fetch_add(aligned_size, Ordering::SeqCst);
+        let addr = self
+            .next_virtual_address
+            .fetch_add(aligned_size, Ordering::SeqCst);
 
         unsafe {
             self.allocate_region(addr, aligned_size, permissions)?;
@@ -690,7 +756,13 @@ impl VirtualMemoryManager for SimpleVirtualMemoryManager {
         }
     }
 
-    fn map_physical(&mut self, virtual_addr: VirtualAddress, physical_addr: PhysicalAddress, size: usize, permissions: MemoryPermissions) -> Result<(), MemoryError> {
+    fn map_physical(
+        &mut self,
+        virtual_addr: VirtualAddress,
+        physical_addr: PhysicalAddress,
+        size: usize,
+        permissions: MemoryPermissions,
+    ) -> Result<(), MemoryError> {
         if !self.capability.can_map_physical {
             return Err(MemoryError::PermissionDenied);
         }
@@ -722,7 +794,7 @@ impl VirtualMemoryManager for SimpleVirtualMemoryManager {
 
             for offset in (0..aligned_size).step_by(PAGE_SIZE) {
                 let page_table_base = (virtual_addr + offset) & !(PAGE_SIZE * 512 - 1);
-                
+
                 let mut pt_idx = None;
                 for (idx, slot) in self.page_tables.iter().enumerate() {
                     if let Some(pt_ptr) = slot {
@@ -736,7 +808,8 @@ impl VirtualMemoryManager for SimpleVirtualMemoryManager {
                 let idx = match pt_idx {
                     Some(i) => i,
                     None => {
-                        let page_table = PageTable::new(page_table_base, PageTableCapability::full());
+                        let page_table =
+                            PageTable::new(page_table_base, PageTableCapability::full());
                         let pt_box = Box::new(page_table);
                         let pt_ptr = Box::into_raw(pt_box);
                         self.page_tables.push(Some(NonNull::new_unchecked(pt_ptr)));
@@ -789,7 +862,11 @@ impl VirtualMemoryManager for SimpleVirtualMemoryManager {
         }
     }
 
-    fn protect(&mut self, virtual_addr: VirtualAddress, permissions: MemoryPermissions) -> Result<(), MemoryError> {
+    fn protect(
+        &mut self,
+        virtual_addr: VirtualAddress,
+        permissions: MemoryPermissions,
+    ) -> Result<(), MemoryError> {
         if !is_canonical_address(virtual_addr) {
             return Err(MemoryError::InvalidAddress);
         }
@@ -888,7 +965,10 @@ impl SovereignPageReclaimer {
     }
 
     /// Scans page tables, aging accessed bits and identifying unaccessed dirty pages for swap-out
-    pub unsafe fn scan_and_reclaim(&mut self, page_tables: &mut [Option<NonNull<PageTable>>]) -> usize {
+    pub unsafe fn scan_and_reclaim(
+        &mut self,
+        page_tables: &mut [Option<NonNull<PageTable>>],
+    ) -> usize {
         let mut reclaimed = 0;
 
         for slot in page_tables.iter_mut() {
@@ -931,10 +1011,16 @@ mod tests {
     #[test]
     fn test_canonical_address_verifications() {
         assert!(is_canonical_address(0x0000_0000_1000_0000));
-        assert_eq!(get_canonical_half(0x0000_0000_1000_0000), Some(CanonicalHalf::Lower));
+        assert_eq!(
+            get_canonical_half(0x0000_0000_1000_0000),
+            Some(CanonicalHalf::Lower)
+        );
 
         assert!(is_canonical_address(0xFFFF_8000_0000_1000));
-        assert_eq!(get_canonical_half(0xFFFF_8000_0000_1000), Some(CanonicalHalf::Upper));
+        assert_eq!(
+            get_canonical_half(0xFFFF_8000_0000_1000),
+            Some(CanonicalHalf::Upper)
+        );
 
         assert!(!is_canonical_address(0x0001_8000_0000_0000));
         assert_eq!(get_canonical_half(0x0001_8000_0000_0000), None);
@@ -942,7 +1028,10 @@ mod tests {
         let raw_addr = 0x0000_8000_0000_0123;
         let canonical_addr = canonicalize_address(raw_addr);
         assert!(is_canonical_address(canonical_addr));
-        assert_eq!(get_canonical_half(canonical_addr), Some(CanonicalHalf::Upper));
+        assert_eq!(
+            get_canonical_half(canonical_addr),
+            Some(CanonicalHalf::Upper)
+        );
     }
 
     #[test]
@@ -974,7 +1063,10 @@ mod tests {
             pt.map_page(0x0000_0000_1000_0000, 0x100000, flags).unwrap();
 
             // Attempting to unmap a wired page returns WiredPageLocked error!
-            assert_eq!(pt.unmap_page(0x0000_0000_1000_0000), Err(MemoryError::WiredPageLocked));
+            assert_eq!(
+                pt.unmap_page(0x0000_0000_1000_0000),
+                Err(MemoryError::WiredPageLocked)
+            );
         }
     }
 
@@ -1021,7 +1113,8 @@ mod tests {
 
         unsafe {
             // Translate virtual address 0x1000_0123 -> physical address 0x2000_0123
-            let phys = LinearPageTranslator::translate_address(&pt_slice, 0x0000_0000_1000_0123).unwrap();
+            let phys =
+                LinearPageTranslator::translate_address(&pt_slice, 0x0000_0000_1000_0123).unwrap();
             assert_eq!(phys, 0x0020_0123);
         }
     }
@@ -1032,14 +1125,23 @@ mod tests {
 
         // 1-to-1 Mapping
         tracker.register_page_mapping(0x5000, 0x1000_0000, false);
-        assert_eq!(tracker.get_relationship(0x5000), Some(PageMappingRelationship::OneToOne));
+        assert_eq!(
+            tracker.get_relationship(0x5000),
+            Some(PageMappingRelationship::OneToOne)
+        );
 
         // 1-to-N Mapping
         tracker.register_page_mapping(0x5000, 0x2000_0000, false);
-        assert_eq!(tracker.get_relationship(0x5000), Some(PageMappingRelationship::OneToMany));
+        assert_eq!(
+            tracker.get_relationship(0x5000),
+            Some(PageMappingRelationship::OneToMany)
+        );
 
         // N-to-N CoW Mapping
         tracker.register_page_mapping(0x6000, 0x3000_0000, true);
-        assert_eq!(tracker.get_relationship(0x6000), Some(PageMappingRelationship::ManyToMany));
+        assert_eq!(
+            tracker.get_relationship(0x6000),
+            Some(PageMappingRelationship::ManyToMany)
+        );
     }
 }

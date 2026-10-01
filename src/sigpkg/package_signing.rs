@@ -19,9 +19,9 @@
 #![allow(dead_code)]
 
 use std::collections::BTreeMap;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 // ─── Trust Level ─────────────────────────────────────────────────────────────
 
@@ -111,9 +111,13 @@ impl PublisherPublicKey {
 
     /// Returns true if this key is valid (not revoked, not expired) at the given time
     pub fn is_valid_at(&self, timestamp: u64) -> bool {
-        if self.revoked { return false; }
+        if self.revoked {
+            return false;
+        }
         if let Some(exp) = self.expires_at {
-            if timestamp > exp { return false; }
+            if timestamp > exp {
+                return false;
+            }
         }
         true
     }
@@ -222,10 +226,9 @@ impl SigmaSigningAuthority {
         let mut auth = Self::new();
         // Built-in SigmaOS root key (derived from project identity seed)
         let root_key_bytes: [u8; 32] = [
-            0x51, 0x16, 0x2a, 0x4f, 0x7e, 0x3b, 0x9c, 0x1d,
-            0x8e, 0xd0, 0xc4, 0xf2, 0x60, 0x7a, 0x83, 0x5e,
-            0x21, 0x4d, 0x9b, 0x36, 0xc7, 0x8f, 0x12, 0xe5,
-            0x73, 0xa9, 0x0b, 0x4c, 0xd1, 0x6e, 0xf4, 0x28,
+            0x51, 0x16, 0x2a, 0x4f, 0x7e, 0x3b, 0x9c, 0x1d, 0x8e, 0xd0, 0xc4, 0xf2, 0x60, 0x7a,
+            0x83, 0x5e, 0x21, 0x4d, 0x9b, 0x36, 0xc7, 0x8f, 0x12, 0xe5, 0x73, 0xa9, 0x0b, 0x4c,
+            0xd1, 0x6e, 0xf4, 0x28,
         ];
         let root_key = PublisherPublicKey::new(
             root_key_bytes,
@@ -248,7 +251,10 @@ impl SigmaSigningAuthority {
     pub fn revoke_key(&mut self, fingerprint: &str) -> bool {
         if let Some(key) = self.trusted_keys.get_mut(fingerprint) {
             key.revoked = true;
-            if !self.revoked_fingerprints.contains(&String::from(fingerprint)) {
+            if !self
+                .revoked_fingerprints
+                .contains(&String::from(fingerprint))
+            {
                 self.revoked_fingerprints.push(String::from(fingerprint));
             }
             return true;
@@ -284,11 +290,15 @@ impl SigmaSigningAuthority {
     ) -> Result<PackageSignature, String> {
         // Verify the signer key exists in our keyring
         if !self.trusted_keys.contains_key(signer_fingerprint) {
-            return Err(format!("Unknown signer fingerprint: {}", signer_fingerprint));
+            return Err(format!(
+                "Unknown signer fingerprint: {}",
+                signer_fingerprint
+            ));
         }
 
         // Compute signature using Dilithium-5 (FNV-1a simulated)
-        let sig_bytes = self.dilithium_sign(secret_seed, package_name, package_version, content_hash);
+        let sig_bytes =
+            self.dilithium_sign(secret_seed, package_name, package_version, content_hash);
 
         let signature = PackageSignature {
             signature_bytes: sig_bytes,
@@ -328,7 +338,8 @@ impl SigmaSigningAuthority {
         }
 
         // 2. Look up the signer key
-        let key = self.trusted_keys
+        let key = self
+            .trusted_keys
             .get(&signature.signer_fingerprint)
             .ok_or_else(|| format!("Unknown signer: {}", signature.signer_fingerprint))?
             .clone();
@@ -336,7 +347,10 @@ impl SigmaSigningAuthority {
         // 3. Check key validity
         if !key.is_valid_at(timestamp) {
             self.verification_failures += 1;
-            return Err(format!("Signing key {} is revoked or expired", &key.fingerprint[..8]));
+            return Err(format!(
+                "Signing key {} is revoked or expired",
+                &key.fingerprint[..8]
+            ));
         }
 
         // 4. Check trust level
@@ -378,9 +392,18 @@ impl SigmaSigningAuthority {
     ) -> [u8; 64] {
         const FNV_PRIME: u64 = 0x00000100000001B3;
         let mut h: u64 = 0xcbf29ce484222325;
-        for &b in secret { h ^= b as u64; h = h.wrapping_mul(FNV_PRIME); }
-        for &b in pkg_name.as_bytes() { h ^= b as u64; h = h.wrapping_mul(FNV_PRIME); }
-        for &b in pkg_ver.as_bytes() { h ^= b as u64; h = h.wrapping_mul(FNV_PRIME); }
+        for &b in secret {
+            h ^= b as u64;
+            h = h.wrapping_mul(FNV_PRIME);
+        }
+        for &b in pkg_name.as_bytes() {
+            h ^= b as u64;
+            h = h.wrapping_mul(FNV_PRIME);
+        }
+        for &b in pkg_ver.as_bytes() {
+            h ^= b as u64;
+            h = h.wrapping_mul(FNV_PRIME);
+        }
         h ^= content_hash;
         h = h.wrapping_mul(FNV_PRIME);
         let mut sig = [0u8; 64];
@@ -405,9 +428,18 @@ impl SigmaSigningAuthority {
         let mut h: u64 = 0xcbf29ce484222325;
         // Simulate sk from pk in our test setup: secret = pk XOR 0xA5
         let secret: Vec<u8> = public.iter().map(|&b| b ^ 0xA5).collect();
-        for &b in &secret { h ^= b as u64; h = h.wrapping_mul(FNV_PRIME); }
-        for &b in pkg_name.as_bytes() { h ^= b as u64; h = h.wrapping_mul(FNV_PRIME); }
-        for &b in pkg_ver.as_bytes() { h ^= b as u64; h = h.wrapping_mul(FNV_PRIME); }
+        for &b in &secret {
+            h ^= b as u64;
+            h = h.wrapping_mul(FNV_PRIME);
+        }
+        for &b in pkg_name.as_bytes() {
+            h ^= b as u64;
+            h = h.wrapping_mul(FNV_PRIME);
+        }
+        for &b in pkg_ver.as_bytes() {
+            h ^= b as u64;
+            h = h.wrapping_mul(FNV_PRIME);
+        }
         h ^= content_hash;
         h = h.wrapping_mul(FNV_PRIME);
         let mut sig = [0u8; 64];
@@ -423,8 +455,16 @@ impl SigmaSigningAuthority {
     /// Returns a summary of the keyring
     pub fn keyring_summary(&self) -> String {
         let total = self.trusted_keys.len();
-        let ultimate = self.trusted_keys.values().filter(|k| k.trust_level == TrustLevel::Ultimate).count();
-        let full = self.trusted_keys.values().filter(|k| k.trust_level == TrustLevel::Full).count();
+        let ultimate = self
+            .trusted_keys
+            .values()
+            .filter(|k| k.trust_level == TrustLevel::Ultimate)
+            .count();
+        let full = self
+            .trusted_keys
+            .values()
+            .filter(|k| k.trust_level == TrustLevel::Full)
+            .count();
         let revoked = self.revoked_fingerprints.len();
         format!(
             "Keyring: {} keys ({} ultimate, {} full, {} revoked) | {} signed | {} verified | {} failed",
@@ -515,7 +555,9 @@ mod signing_tests {
 
         let pkg_data = b"real package bytes";
         let hash = content_hash(pkg_data);
-        let sig = auth.sign_package(&secret, &fp, "glibc", "2.39", hash, 3, None).unwrap();
+        let sig = auth
+            .sign_package(&secret, &fp, "glibc", "2.39", hash, 3, None)
+            .unwrap();
         let result = auth.verify_package(&sig, hash, 0);
         assert!(result.is_ok(), "Verification should succeed: {:?}", result);
     }
@@ -529,7 +571,9 @@ mod signing_tests {
 
         let pkg_data = b"original content";
         let hash = content_hash(pkg_data);
-        let sig = auth.sign_package(&secret, &fp, "curl", "8.5.0", hash, 1, None).unwrap();
+        let sig = auth
+            .sign_package(&secret, &fp, "curl", "8.5.0", hash, 1, None)
+            .unwrap();
 
         // Tamper: compute hash of different content
         let tampered_hash = content_hash(b"tampered content");
@@ -552,7 +596,10 @@ mod signing_tests {
         let data = b"SigmaOS package";
         assert_eq!(content_hash(data), content_hash(data));
         // Different content → different hash
-        assert_ne!(content_hash(b"SigmaOS package v2"), content_hash(b"SigmaOS package v3"));
+        assert_ne!(
+            content_hash(b"SigmaOS package v2"),
+            content_hash(b"SigmaOS package v3")
+        );
     }
 
     #[test]

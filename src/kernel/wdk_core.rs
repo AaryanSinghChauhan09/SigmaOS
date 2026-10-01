@@ -3,7 +3,6 @@
 // Inspired by: x86-64/ARM kernel architectures, Windows Driver Kit, Linux, and BSD.
 // Zero external library dependency, no_std compatible.
 
-
 use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;
@@ -14,11 +13,11 @@ use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Irql {
-    PassiveLevel = 0,   // User-mode & standard kernel execution
-    ApcLevel = 1,       // Asynchronous Procedure Calls
-    DispatchLevel = 2,  // Deferred Procedure Calls & scheduler
-    Dirql = 3,          // Device Interrupt Request Level
-    HighLevel = 4,      // Highest hardware priority / NMI
+    PassiveLevel = 0,  // User-mode & standard kernel execution
+    ApcLevel = 1,      // Asynchronous Procedure Calls
+    DispatchLevel = 2, // Deferred Procedure Calls & scheduler
+    Dirql = 3,         // Device Interrupt Request Level
+    HighLevel = 4,     // Highest hardware priority / NMI
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -152,7 +151,7 @@ impl WdkThread {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EventType {
-    NotificationEvent, // Manual-reset (stays signalled until cleared)
+    NotificationEvent,    // Manual-reset (stays signalled until cleared)
     SynchronizationEvent, // Auto-reset (resets to non-signalled after one waiter)
 }
 
@@ -452,7 +451,11 @@ impl Prcb {
         core::mem::swap(&mut self.dpc_queue, &mut pending);
 
         for dpc in pending {
-            (dpc.routine)(dpc.deferred_context, dpc.system_argument1, dpc.system_argument2);
+            (dpc.routine)(
+                dpc.deferred_context,
+                dpc.system_argument1,
+                dpc.system_argument2,
+            );
             count += 1;
         }
 
@@ -467,9 +470,9 @@ impl Prcb {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PoolType {
-    NonPagedPool,       // Guaranteed to remain in physical RAM (no page faults, safe for high IRQL)
-    PagedPool,          // Can be paged to disk (only safe for PASSIVE_LEVEL / APC_LEVEL)
-    NonPagedPoolNx,     // NonPagedPool with No-Execute permission
+    NonPagedPool, // Guaranteed to remain in physical RAM (no page faults, safe for high IRQL)
+    PagedPool,    // Can be paged to disk (only safe for PASSIVE_LEVEL / APC_LEVEL)
+    NonPagedPoolNx, // NonPagedPool with No-Execute permission
 }
 
 pub struct PoolAllocation {
@@ -494,7 +497,12 @@ impl KernelPoolMemory {
         }
     }
 
-    pub fn ex_allocate_pool(&mut self, pool_type: PoolType, size: usize, tag: [u8; 4]) -> Result<usize, &'static str> {
+    pub fn ex_allocate_pool(
+        &mut self,
+        pool_type: PoolType,
+        size: usize,
+        tag: [u8; 4],
+    ) -> Result<usize, &'static str> {
         if pool_type == PoolType::NonPagedPool && self.active_bytes + size > self.non_paged_limit {
             return Err("ExAllocatePoolWithTag: NonPagedPool limit exceeded!");
         }
@@ -664,7 +672,10 @@ impl AlpcZeroCopyPortQueue {
     }
 
     /// Receives the next priority-dequeued message payload if caller holds Receive right
-    pub fn receive_message(&mut self, caller_right: MachPortRight) -> Result<AlpcMessagePayload, &'static str> {
+    pub fn receive_message(
+        &mut self,
+        caller_right: MachPortRight,
+    ) -> Result<AlpcMessagePayload, &'static str> {
         if caller_right != MachPortRight::Receive {
             return Err("ALPC: Caller lacks Receive right for this port");
         }
@@ -716,7 +727,9 @@ mod tests {
 
     #[test]
     fn test_wdk_threads_and_apcs() {
-        unsafe { APC_TRIGGERED = 0; }
+        unsafe {
+            APC_TRIGGERED = 0;
+        }
         let token = SecurityToken::new("S-1-5-18", 0xFFFF, true);
         let mut thread = WdkThread::new(101, true, token);
         assert_eq!(thread.token.sid, "S-1-5-18");
@@ -747,7 +760,9 @@ mod tests {
 
     #[test]
     fn test_prcb_and_dpcs() {
-        unsafe { DPC_TRIGGERED = 0; }
+        unsafe {
+            DPC_TRIGGERED = 0;
+        }
         let mut prcb = Prcb::new(0);
         assert_eq!(prcb.current_irql, Irql::PassiveLevel);
 
@@ -892,11 +907,15 @@ mod tests {
     #[test]
     fn test_pool_allocations() {
         let mut pool = KernelPoolMemory::new(4096);
-        let addr = pool.ex_allocate_pool(PoolType::NonPagedPool, 1024, *b"TEST").unwrap();
+        let addr = pool
+            .ex_allocate_pool(PoolType::NonPagedPool, 1024, *b"TEST")
+            .unwrap();
         assert_eq!(pool.active_bytes, 1024);
 
         // Exceed limit
-        assert!(pool.ex_allocate_pool(PoolType::NonPagedPool, 4000, *b"FAIL").is_err());
+        assert!(pool
+            .ex_allocate_pool(PoolType::NonPagedPool, 4000, *b"FAIL")
+            .is_err());
 
         assert!(pool.ex_free_pool(addr).is_ok());
         assert_eq!(pool.active_bytes, 0);
@@ -919,7 +938,9 @@ mod tests {
 
     #[test]
     fn test_work_items() {
-        unsafe { WORK_TRIGGERED = 0; }
+        unsafe {
+            WORK_TRIGGERED = 0;
+        }
         let work = WorkItem {
             routine: test_work_routine,
             parameter: 42,

@@ -1,9 +1,9 @@
 // SigmaOS MLflow & DVC Experiment Tracking and Data Version Control Engine
 // Binds model experiment tracking hooks into VFS and sigpkg to snapshot model states.
 
+use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::collections::BTreeMap;
 
 #[derive(Debug, Clone)]
 pub struct MlflowRun {
@@ -53,7 +53,8 @@ impl DvcDataVersionControl {
     }
 
     pub fn track_dataset(&mut self, dataset_path: &str, hash: &str) {
-        self.dataset_hashes.insert(dataset_path.to_string(), hash.to_string());
+        self.dataset_hashes
+            .insert(dataset_path.to_string(), hash.to_string());
     }
 }
 
@@ -66,10 +67,22 @@ mod tests {
         let mut tracker = MlflowTracker::new();
         tracker.start_run("run_001", "scheduler_tuning");
         tracker.log_metric("run_001", "latency_ms", 12.4);
-        assert_eq!(*tracker.active_runs.get("run_001").unwrap().metrics.get("latency_ms").unwrap(), 12.4);
+        assert_eq!(
+            *tracker
+                .active_runs
+                .get("run_001")
+                .unwrap()
+                .metrics
+                .get("latency_ms")
+                .unwrap(),
+            12.4
+        );
 
         let mut dvc = DvcDataVersionControl::new();
         dvc.track_dataset("/data/telemetry.csv", "sha256:abc12345");
-        assert_eq!(dvc.dataset_hashes.get("/data/telemetry.csv").unwrap(), "sha256:abc12345");
+        assert_eq!(
+            dvc.dataset_hashes.get("/data/telemetry.csv").unwrap(),
+            "sha256:abc12345"
+        );
     }
 }

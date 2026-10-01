@@ -244,7 +244,9 @@ mod tests {
 
     #[test]
     fn test_pipe_flags() {
-        let flags = PipeFlags::new().with_non_blocking(true).with_close_on_exec(true);
+        let flags = PipeFlags::new()
+            .with_non_blocking(true)
+            .with_close_on_exec(true);
         assert!(flags.non_blocking);
         assert!(flags.close_on_exec);
     }

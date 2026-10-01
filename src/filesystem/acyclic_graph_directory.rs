@@ -145,7 +145,10 @@ impl SovereignAcyclicGraphDirectoryEngine {
     pub fn topological_sort(&self) -> Result<Vec<u64>, String> {
         let mut in_degrees: BTreeMap<u64, u32> = BTreeMap::new();
         for &node_id in self.nodes.keys() {
-            let parent_count = self.child_to_parents.get(&node_id).map_or(0, |p| p.len() as u32);
+            let parent_count = self
+                .child_to_parents
+                .get(&node_id)
+                .map_or(0, |p| p.len() as u32);
             in_degrees.insert(node_id, parent_count);
         }
 

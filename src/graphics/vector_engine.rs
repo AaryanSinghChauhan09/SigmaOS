@@ -3,10 +3,9 @@ use std::boxed::Box;
 // Defines 2D paths, Bézier curves, layers, groups, masks, SVG import/export, and real-time path manipulation.
 // Inspiration: Inkscape, Blender's grease pencil.
 
-
-use std::vec::Vec;
-use std::string::String;
 use std::format;
+use std::string::String;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Point2D {
@@ -59,7 +58,12 @@ impl VectorPath {
     }
 
     /// Real-time manipulate a specific control point of the bezier curve
-    pub fn manipulate_control_point(&mut self, command_idx: usize, control_num: u8, new_pos: Point2D) -> bool {
+    pub fn manipulate_control_point(
+        &mut self,
+        command_idx: usize,
+        control_num: u8,
+        new_pos: Point2D,
+    ) -> bool {
         if command_idx >= self.commands.len() {
             return false;
         }
@@ -80,14 +84,25 @@ impl VectorPath {
                     false
                 }
             }
-            PathCommand::CubicBezier { control1, control2, end } => {
-                match control_num {
-                    1 => { *control1 = new_pos; true }
-                    2 => { *control2 = new_pos; true }
-                    3 => { *end = new_pos; true }
-                    _ => false,
+            PathCommand::CubicBezier {
+                control1,
+                control2,
+                end,
+            } => match control_num {
+                1 => {
+                    *control1 = new_pos;
+                    true
                 }
-            }
+                2 => {
+                    *control2 = new_pos;
+                    true
+                }
+                3 => {
+                    *end = new_pos;
+                    true
+                }
+                _ => false,
+            },
             PathCommand::ClosePath => false,
         }
     }
@@ -144,7 +159,8 @@ pub struct SvgConverter;
 impl SvgConverter {
     /// Export list of paths into standard SVG XML string
     pub fn export_to_svg(paths: &[VectorPath]) -> String {
-        let mut svg = String::from("<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\">\n");
+        let mut svg =
+            String::from("<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\">\n");
         for path in paths {
             svg.push_str("  <path d=\"");
             for (idx, cmd) in path.commands.iter().enumerate() {
@@ -158,8 +174,15 @@ impl SvgConverter {
                     PathCommand::LineTo(p) => {
                         svg.push_str(&format!("L {} {}", p.x, p.y));
                     }
-                    PathCommand::CubicBezier { control1, control2, end } => {
-                        svg.push_str(&format!("C {} {}, {} {}, {} {}", control1.x, control1.y, control2.x, control2.y, end.x, end.y));
+                    PathCommand::CubicBezier {
+                        control1,
+                        control2,
+                        end,
+                    } => {
+                        svg.push_str(&format!(
+                            "C {} {}, {} {}, {} {}",
+                            control1.x, control1.y, control2.x, control2.y, end.x, end.y
+                        ));
                     }
                     PathCommand::ClosePath => {
                         svg.push('Z');
@@ -189,19 +212,23 @@ impl SvgConverter {
                     match parts[i] {
                         "M" => {
                             if i + 2 < parts.len() {
-                                let x: f64 = parts[i+1].parse().unwrap_or(0.0);
-                                let y: f64 = parts[i+2].parse().unwrap_or(0.0);
+                                let x: f64 = parts[i + 1].parse().unwrap_or(0.0);
+                                let y: f64 = parts[i + 2].parse().unwrap_or(0.0);
                                 path.move_to(x, y);
                                 i += 3;
-                            } else { i += 1; }
+                            } else {
+                                i += 1;
+                            }
                         }
                         "L" => {
                             if i + 2 < parts.len() {
-                                let x: f64 = parts[i+1].parse().unwrap_or(0.0);
-                                let y: f64 = parts[i+2].parse().unwrap_or(0.0);
+                                let x: f64 = parts[i + 1].parse().unwrap_or(0.0);
+                                let y: f64 = parts[i + 2].parse().unwrap_or(0.0);
                                 path.line_to(x, y);
                                 i += 3;
-                            } else { i += 1; }
+                            } else {
+                                i += 1;
+                            }
                         }
                         "Z" => {
                             path.close();
@@ -279,7 +306,13 @@ impl SovereignGameEngine {
 
     fn process_physics_node(node: &mut SceneNode, delta: f64, gravity: f64) {
         match node {
-            SceneNode::RigidBody2D { position, velocity, mass: _, children, .. } => {
+            SceneNode::RigidBody2D {
+                position,
+                velocity,
+                mass: _,
+                children,
+                ..
+            } => {
                 // Apply gravity acceleration: v = v + g * dt
                 velocity.y += gravity * delta;
                 // Apply velocity translation: p = p + v * dt
@@ -352,7 +385,10 @@ mod tests {
         // Run 1 second physics process step (dt = 1.0)
         engine.physics_tick(1.0);
 
-        if let Some(SceneNode::RigidBody2D { position, velocity, .. }) = engine.root_node {
+        if let Some(SceneNode::RigidBody2D {
+            position, velocity, ..
+        }) = engine.root_node
+        {
             // v_y = 0 + 10 * 1 = 10
             // p_x = 0 + 5 * 1 = 5
             // p_y = 0 + 10 * 1 = 10
@@ -387,7 +423,9 @@ mod tests {
         let mut mask_path = VectorPath::new();
         mask_path.move_to(0.0, 0.0);
         mask_path.line_to(10.0, 10.0);
-        layer.mask = Some(VectorMask { clip_path: mask_path });
+        layer.mask = Some(VectorMask {
+            clip_path: mask_path,
+        });
 
         group.layers.push(layer);
         assert_eq!(group.layers[0].name, "Outline Layer");

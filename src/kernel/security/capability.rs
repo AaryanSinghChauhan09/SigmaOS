@@ -1,7 +1,6 @@
 // Capability Token System for SigmaOS Security Framework
 // Location: src/kernel/security/capability.rs
 
-
 pub const CAP_READ: u64 = 1 << 0;
 pub const CAP_WRITE: u64 = 1 << 1;
 pub const CAP_EXECUTE: u64 = 1 << 2;
@@ -114,7 +113,9 @@ mod tests {
         assert!(manager.grant_token(parent_tok).is_ok());
         assert!(manager.verify_access(100, 5001, CAP_READ, 500));
 
-        let child_tok = parent_tok.delegate(CAP_READ, 800, 101).expect("Delegation should succeed");
+        let child_tok = parent_tok
+            .delegate(CAP_READ, 800, 101)
+            .expect("Delegation should succeed");
         assert_eq!(child_tok.permissions, CAP_READ);
         assert_eq!(child_tok.expiry, 800);
 

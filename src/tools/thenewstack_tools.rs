@@ -97,7 +97,10 @@ impl WasmComponentModelEngine {
     }
 
     pub fn instantiate_component(&mut self, name: &str) -> Result<bool, &'static str> {
-        let comp = self.components.get_mut(name).ok_or("WASM component not found")?;
+        let comp = self
+            .components
+            .get_mut(name)
+            .ok_or("WASM component not found")?;
         comp.is_instantiated = true;
         Ok(true)
     }
@@ -130,7 +133,14 @@ impl OpenTelemetryDistributedTracingEngine {
         }
     }
 
-    pub fn start_span(&mut self, trace_id: &str, span_id: &str, parent_span_id: Option<&str>, op: &str, duration_ms: u64) {
+    pub fn start_span(
+        &mut self,
+        trace_id: &str,
+        span_id: &str,
+        parent_span_id: Option<&str>,
+        op: &str,
+        duration_ms: u64,
+    ) {
         self.active_spans.push(OtelSpan {
             trace_id: trace_id.to_string(),
             span_id: span_id.to_string(),
@@ -172,7 +182,12 @@ impl MicroVmFirecrackerSupervisor {
         }
     }
 
-    pub fn spawn_microvm(&mut self, id: &str, vcpu_count: u32, memory_mb: u32) -> Result<u64, &'static str> {
+    pub fn spawn_microvm(
+        &mut self,
+        id: &str,
+        vcpu_count: u32,
+        memory_mb: u32,
+    ) -> Result<u64, &'static str> {
         let boot_time_ms = 8; // Sub-10ms Firecracker boot
         let instance = MicroVmInstance {
             id: id.to_string(),
@@ -243,9 +258,7 @@ pub struct CiliumNetworkPolicyEnforcer {
 
 impl CiliumNetworkPolicyEnforcer {
     pub fn new() -> Self {
-        Self {
-            rules: Vec::new(),
-        }
+        Self { rules: Vec::new() }
     }
 
     pub fn add_policy(&mut self, rule_id: &str, src_id: u32, dst_id: u32, port: u16) {
@@ -258,7 +271,11 @@ impl CiliumNetworkPolicyEnforcer {
     }
 
     pub fn evaluate_ingress(&self, src_id: u32, dst_id: u32, port: u16) -> bool {
-        self.rules.iter().any(|r| r.source_identity == src_id && r.destination_identity == dst_id && r.allowed_port == port)
+        self.rules.iter().any(|r| {
+            r.source_identity == src_id
+                && r.destination_identity == dst_id
+                && r.allowed_port == port
+        })
     }
 }
 
@@ -323,7 +340,9 @@ impl PlatformEngineeringSelfServicePortal {
     }
 
     pub fn destroy_environment(&mut self, env_id: &str) -> Result<(), &'static str> {
-        self.active_environments.remove(env_id).ok_or("Environment not found")?;
+        self.active_environments
+            .remove(env_id)
+            .ok_or("Environment not found")?;
         Ok(())
     }
 }
@@ -348,7 +367,11 @@ impl WasiNNInferenceEngine {
         }
     }
 
-    pub fn load_graph(&mut self, model_name: &str, _graph_bytes: &[u8]) -> Result<(), &'static str> {
+    pub fn load_graph(
+        &mut self,
+        model_name: &str,
+        _graph_bytes: &[u8],
+    ) -> Result<(), &'static str> {
         self.model_name = model_name.to_string();
         self.loaded = true;
         Ok(())
@@ -411,7 +434,11 @@ impl FinOpsCostOptimizationGovernor {
         }
     }
 
-    pub fn analyze_and_right_size(&mut self, cpu_utilization_pct: f64, current_monthly_cost: f64) -> f64 {
+    pub fn analyze_and_right_size(
+        &mut self,
+        cpu_utilization_pct: f64,
+        current_monthly_cost: f64,
+    ) -> f64 {
         if cpu_utilization_pct < 20.0 {
             let potential_savings = current_monthly_cost * 0.40;
             self.total_savings_dollars += potential_savings;
@@ -524,14 +551,18 @@ mod tests {
     #[test]
     fn test_confidential_enclave() {
         let mut enclave = ConfidentialComputingEnclave::new("enclave-01");
-        assert!(enclave.verify_hardware_attestation(b"SEV_SNP_QUOTE").unwrap());
+        assert!(enclave
+            .verify_hardware_attestation(b"SEV_SNP_QUOTE")
+            .unwrap());
         assert!(enclave.is_attested);
     }
 
     #[test]
     fn test_platform_portal() {
         let mut portal = PlatformEngineeringSelfServicePortal::new();
-        assert!(portal.provision_environment("dev-env-01", "dev_user").is_ok());
+        assert!(portal
+            .provision_environment("dev-env-01", "dev_user")
+            .is_ok());
         assert_eq!(portal.active_environments.len(), 1);
         assert!(portal.destroy_environment("dev-env-01").is_ok());
     }
@@ -564,7 +595,17 @@ mod tests {
     fn test_kubeedge_orchestrator() {
         let mut kubeedge = KubeEdgeOrchestrator::new();
         kubeedge.register_edge_node("edge-node-01");
-        assert!(kubeedge.sync_pod_to_edge("edge-node-01", "sensor-collector").is_ok());
-        assert_eq!(kubeedge.nodes.get("edge-node-01").unwrap().synced_pods.len(), 1);
+        assert!(kubeedge
+            .sync_pod_to_edge("edge-node-01", "sensor-collector")
+            .is_ok());
+        assert_eq!(
+            kubeedge
+                .nodes
+                .get("edge-node-01")
+                .unwrap()
+                .synced_pods
+                .len(),
+            1
+        );
     }
 }

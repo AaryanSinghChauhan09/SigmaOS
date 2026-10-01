@@ -136,7 +136,11 @@ impl CapsicumSandbox {
     }
 
     /// Restrict an existing capability's rights
-    pub fn restrict_capability(&mut self, fd: i32, new_rights: CapsicumRights) -> Result<(), String> {
+    pub fn restrict_capability(
+        &mut self,
+        fd: i32,
+        new_rights: CapsicumRights,
+    ) -> Result<(), String> {
         match self.capabilities.get_mut(&fd) {
             Some(cap) => {
                 cap.restrict(new_rights);
@@ -301,7 +305,8 @@ mod tests {
 
     #[test]
     fn test_capsicum_capability_restrict() {
-        let mut cap = CapsicumCapability::new(3, CapsicumRights::CAP_READ.union(CapsicumRights::CAP_WRITE));
+        let mut cap =
+            CapsicumCapability::new(3, CapsicumRights::CAP_READ.union(CapsicumRights::CAP_WRITE));
         cap.restrict(CapsicumRights::CAP_READ);
 
         assert!(cap.allows(CapsicumRights::CAP_READ));
@@ -332,8 +337,13 @@ mod tests {
         let mut sandbox = CapsicumSandbox::new();
         sandbox.enter_capability_mode();
 
-        sandbox.add_capability(CapsicumCapability::new(3, CapsicumRights::CAP_READ.union(CapsicumRights::CAP_WRITE)));
-        sandbox.restrict_capability(3, CapsicumRights::CAP_READ).unwrap();
+        sandbox.add_capability(CapsicumCapability::new(
+            3,
+            CapsicumRights::CAP_READ.union(CapsicumRights::CAP_WRITE),
+        ));
+        sandbox
+            .restrict_capability(3, CapsicumRights::CAP_READ)
+            .unwrap();
 
         assert!(sandbox.check_rights(3, CapsicumRights::CAP_READ));
         assert!(!sandbox.check_rights(3, CapsicumRights::CAP_WRITE));
@@ -347,7 +357,12 @@ mod tests {
         assert_eq!(sandbox_id, 1);
 
         manager.enter_capability_mode(sandbox_id).unwrap();
-        manager.add_capability(sandbox_id, CapsicumCapability::new(3, CapsicumRights::CAP_READ)).unwrap();
+        manager
+            .add_capability(
+                sandbox_id,
+                CapsicumCapability::new(3, CapsicumRights::CAP_READ),
+            )
+            .unwrap();
 
         assert!(manager.check_rights(sandbox_id, 3, CapsicumRights::CAP_READ));
         assert!(!manager.check_rights(sandbox_id, 3, CapsicumRights::CAP_WRITE));
@@ -366,10 +381,20 @@ mod tests {
         let sandbox_id2 = manager.create_sandbox();
 
         manager.enter_capability_mode(sandbox_id1).unwrap();
-        manager.add_capability(sandbox_id1, CapsicumCapability::new(3, CapsicumRights::CAP_READ)).unwrap();
+        manager
+            .add_capability(
+                sandbox_id1,
+                CapsicumCapability::new(3, CapsicumRights::CAP_READ),
+            )
+            .unwrap();
 
         manager.enter_capability_mode(sandbox_id2).unwrap();
-        manager.add_capability(sandbox_id2, CapsicumCapability::new(4, CapsicumRights::CAP_WRITE)).unwrap();
+        manager
+            .add_capability(
+                sandbox_id2,
+                CapsicumCapability::new(4, CapsicumRights::CAP_WRITE),
+            )
+            .unwrap();
 
         assert!(manager.check_rights(sandbox_id1, 3, CapsicumRights::CAP_READ));
         assert!(!manager.check_rights(sandbox_id2, 3, CapsicumRights::CAP_READ));

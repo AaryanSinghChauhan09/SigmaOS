@@ -2,7 +2,6 @@ use std::vec;
 // Sovereign /proc Virtual Filesystem (procfs) for SigmaOS
 // Inspired by Linux procfs, providing a dynamic programmatic interface to kernel memory, hardware, and active processes.
 
-
 use crate::filesystem::vfs::FsError;
 use std::collections::BTreeMap;
 use std::format;
@@ -189,9 +188,18 @@ mod tests {
         // System stat, loadavg, filesystems, swaps, mounts
         assert!(procfs.read_file("/proc/stat").unwrap().contains("ctxt"));
         assert!(procfs.read_file("/proc/loadavg").unwrap().contains("0.15"));
-        assert!(procfs.read_file("/proc/filesystems").unwrap().contains("sigmafs"));
-        assert!(procfs.read_file("/proc/swaps").unwrap().contains("/dev/zram0"));
-        assert!(procfs.read_file("/proc/mounts").unwrap().contains("sigmafs"));
+        assert!(procfs
+            .read_file("/proc/filesystems")
+            .unwrap()
+            .contains("sigmafs"));
+        assert!(procfs
+            .read_file("/proc/swaps")
+            .unwrap()
+            .contains("/dev/zram0"));
+        assert!(procfs
+            .read_file("/proc/mounts")
+            .unwrap()
+            .contains("sigmafs"));
     }
 
     #[test]
@@ -204,17 +212,32 @@ mod tests {
         assert!(status.contains("State\t\t: R (running)"));
 
         // Read cmdline, cwd, exe, io, environ
-        assert!(procfs.read_file("/proc/42/cmdline").unwrap().contains("userspace-shell"));
+        assert!(procfs
+            .read_file("/proc/42/cmdline")
+            .unwrap()
+            .contains("userspace-shell"));
         assert_eq!(procfs.read_file("/proc/42/cwd").unwrap(), "/\n");
-        assert_eq!(procfs.read_file("/proc/42/exe").unwrap(), "/bin/userspace-shell\n");
-        assert!(procfs.read_file("/proc/42/io").unwrap().contains("read_bytes"));
-        assert!(procfs.read_file("/proc/42/environ").unwrap().contains("PATH"));
+        assert_eq!(
+            procfs.read_file("/proc/42/exe").unwrap(),
+            "/bin/userspace-shell\n"
+        );
+        assert!(procfs
+            .read_file("/proc/42/io")
+            .unwrap()
+            .contains("read_bytes"));
+        assert!(procfs
+            .read_file("/proc/42/environ")
+            .unwrap()
+            .contains("PATH"));
 
         // Register custom process
         let mut entry = ProcProcessEntry::new(100, "worker_daemon");
         entry.ppid = 1;
         procfs.register_process(entry);
-        assert!(procfs.read_file("/proc/100/status").unwrap().contains("worker_daemon"));
+        assert!(procfs
+            .read_file("/proc/100/status")
+            .unwrap()
+            .contains("worker_daemon"));
 
         // Unregister process
         procfs.unregister_process(100);

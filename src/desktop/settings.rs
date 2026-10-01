@@ -16,23 +16,31 @@
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::sync::atomic::{AtomicUsize, Ordering};
+use std::boxed::Box;
 /// OOP-based Desktop Settings for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 776
 /// Implements desktop settings and preferences
-
 use std::vec::Vec;
-use std::boxed::Box;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type SettingID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SettingType { String = 0, Integer = 1, Boolean = 2, Color = 3 }
+pub enum SettingType {
+    String = 0,
+    Integer = 1,
+    Boolean = 2,
+    Color = 3,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SettingsError { Success = 0, NotFound = 1, InvalidType = 2 }
+pub enum SettingsError {
+    Success = 0,
+    NotFound = 1,
+    InvalidType = 2,
+}
 
 pub trait Setting {
     fn id(&self) -> SettingID;
@@ -74,7 +82,9 @@ impl SimpleSetting {
 }
 
 impl Setting for SimpleSetting {
-    fn id(&self) -> SettingID { self.id }
+    fn id(&self) -> SettingID {
+        self.id
+    }
     fn key(&self) -> &[u8] {
         // O(1) constant-time slice lookup using cached key_len, avoiding O(N) zero-byte linear scan (.position(|&b| b == 0))
         &self.key[..self.key_len as usize]
@@ -129,7 +139,9 @@ impl SettingsManager for SimpleSettingsManager {
     fn get_setting(&self, key: &[u8]) -> Option<&dyn Setting> {
         for setting_option in &self.settings {
             if let Some(ref setting) = *setting_option {
-                if setting.key() == key { return Some(setting.as_ref()); }
+                if setting.key() == key {
+                    return Some(setting.as_ref());
+                }
             }
         }
         None
@@ -259,7 +271,10 @@ pub struct KconfigCascadingStore {
 }
 
 impl KconfigCascadingStore {
-    pub fn new(global_defaults: SimpleSettingsManager, user_overrides: SimpleSettingsManager) -> Self {
+    pub fn new(
+        global_defaults: SimpleSettingsManager,
+        user_overrides: SimpleSettingsManager,
+    ) -> Self {
         KconfigCascadingStore {
             user_overrides,
             global_defaults,
@@ -317,17 +332,28 @@ impl RcConfSettingsOverlay {
     }
 }
 
-
 #[cfg(test_disabled)]
 mod tests {
     use super::*;
 
     #[test]
     fn test_gsettings_schema_validation() {
-        assert!(GsettingsSchemaValidator::validate_setting(SettingType::Boolean, b"true"));
-        assert!(!GsettingsSchemaValidator::validate_setting(SettingType::Boolean, b"invalid"));
-        assert!(GsettingsSchemaValidator::validate_setting(SettingType::Integer, b"100"));
-        assert!(GsettingsSchemaValidator::validate_setting(SettingType::Color, b"#FF0000"));
+        assert!(GsettingsSchemaValidator::validate_setting(
+            SettingType::Boolean,
+            b"true"
+        ));
+        assert!(!GsettingsSchemaValidator::validate_setting(
+            SettingType::Boolean,
+            b"invalid"
+        ));
+        assert!(GsettingsSchemaValidator::validate_setting(
+            SettingType::Integer,
+            b"100"
+        ));
+        assert!(GsettingsSchemaValidator::validate_setting(
+            SettingType::Color,
+            b"#FF0000"
+        ));
     }
 
     #[test]
@@ -355,7 +381,12 @@ mod tests {
     #[test]
     fn test_rc_conf_overlay() {
         let mut overlay = RcConfSettingsOverlay::new();
-        assert!(overlay.apply_override(b"kern.ipc.maxsockbuf", b"2097152").is_ok());
-        assert!(overlay.sysctl_overrides.get_setting(b"kern.ipc.maxsockbuf").is_some());
+        assert!(overlay
+            .apply_override(b"kern.ipc.maxsockbuf", b"2097152")
+            .is_ok());
+        assert!(overlay
+            .sysctl_overrides
+            .get_setting(b"kern.ipc.maxsockbuf")
+            .is_some());
     }
 }

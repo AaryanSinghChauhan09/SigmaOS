@@ -12,10 +12,10 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::vec;
-use std::string::{String, ToString};
-use std::vec::Vec;
 use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 // Awesome-Code-AI Local Registry Module
 //
@@ -46,19 +46,24 @@ impl AwesomeCodeAiRegistry {
             AwesomeToolInfo {
                 name: "Sourcegraph Cody".to_string(),
                 category: "Code assistants and search".to_string(),
-                description: "Uses your codebase as context for completions, edits, and search.".to_string(),
+                description: "Uses your codebase as context for completions, edits, and search."
+                    .to_string(),
                 url: "https://about.sourcegraph.com/cody".to_string(),
             },
             AwesomeToolInfo {
                 name: "GitHub Copilot".to_string(),
                 category: "Code completion tools".to_string(),
-                description: "Pair programmer that offers autocomplete-style suggestions as you code.".to_string(),
+                description:
+                    "Pair programmer that offers autocomplete-style suggestions as you code."
+                        .to_string(),
                 url: "https://github.com/features/copilot".to_string(),
             },
             AwesomeToolInfo {
                 name: "Continue".to_string(),
                 category: "Code completion tools".to_string(),
-                description: "Open Source autopilot for VS Code and JetBrains that connects to any LLM.".to_string(),
+                description:
+                    "Open Source autopilot for VS Code and JetBrains that connects to any LLM."
+                        .to_string(),
                 url: "https://continue.dev/".to_string(),
             },
             AwesomeToolInfo {
@@ -70,7 +75,9 @@ impl AwesomeCodeAiRegistry {
             AwesomeToolInfo {
                 name: "Aider".to_string(),
                 category: "Code assistants and search".to_string(),
-                description: "Pair programming tool in your terminal that works with local git repos.".to_string(),
+                description:
+                    "Pair programming tool in your terminal that works with local git repos."
+                        .to_string(),
                 url: "https://aider.chat".to_string(),
             },
         ];

@@ -1,7 +1,7 @@
 use std::boxed::Box;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 // 1. LINUX FILE TYPE AND METADATA COMPATIBILITY LAYER
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -18,14 +18,21 @@ pub enum LinuxFileType {
 pub struct LinuxFileMetadata {
     pub name: String,
     pub file_type: LinuxFileType,
-    pub mode: u32,       // Unix permission bits
-    pub uid: u32,        // User identity
-    pub gid: u32,        // Group identity
+    pub mode: u32,          // Unix permission bits
+    pub uid: u32,           // User identity
+    pub gid: u32,           // Group identity
     pub package_id: String, // Affiliated SigmaOS Package ID
 }
 
 impl LinuxFileMetadata {
-    pub fn new(name: &str, file_type: LinuxFileType, mode: u32, uid: u32, gid: u32, package_id: &str) -> Self {
+    pub fn new(
+        name: &str,
+        file_type: LinuxFileType,
+        mode: u32,
+        uid: u32,
+        gid: u32,
+        package_id: &str,
+    ) -> Self {
         Self {
             name: name.to_string(),
             file_type,
@@ -66,7 +73,11 @@ impl NixosGenerationManager {
     }
 
     /// Registers a new immutable configuration snapshot node
-    pub fn create_generation(&mut self, root_inode: u64, timestamp: u64) -> Result<u32, &'static str> {
+    pub fn create_generation(
+        &mut self,
+        root_inode: u64,
+        timestamp: u64,
+    ) -> Result<u32, &'static str> {
         let next_id = (self.generations.len() + 1) as u32;
         let gen = Generation {
             id: next_id,
@@ -147,7 +158,12 @@ impl ArchSatSolver {
         self.check_cycles(name, &mut visited, &mut visit_idx)
     }
 
-    fn check_cycles(&self, name: &'static str, visited: &mut [&'static str; 16], idx: &mut usize) -> bool {
+    fn check_cycles(
+        &self,
+        name: &'static str,
+        visited: &mut [&'static str; 16],
+        idx: &mut usize,
+    ) -> bool {
         // Cycle detected
         for i in 0..*idx {
             if visited[i] == name {
@@ -213,9 +229,7 @@ pub struct AndroidSecurityEnforcer {
 impl AndroidSecurityEnforcer {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self {
-            tokens: [None; 32],
-        }
+        Self { tokens: [None; 32] }
     }
 
     pub fn assign_token(&mut self, token: CapabilityToken) -> Result<(), &'static str> {
@@ -369,7 +383,7 @@ mod tests {
             0o755,
             0,
             0,
-            "bash-package"
+            "bash-package",
         );
         assert!(meta.is_executable_binary());
         assert_eq!(meta.package_id, "bash-package");
@@ -380,14 +394,20 @@ mod tests {
             0o666,
             1000,
             1000,
-            "mysql-package"
+            "mysql-package",
         );
         assert!(!non_exec.is_executable_binary());
 
         // 2. NixOS Atomic Generation Pointer-Swaps
         let mut nix_manager = NixosGenerationManager::new();
-        assert_eq!(nix_manager.create_generation(0x1000, 1718900000).unwrap(), 1);
-        assert_eq!(nix_manager.create_generation(0x2000, 1718910000).unwrap(), 2);
+        assert_eq!(
+            nix_manager.create_generation(0x1000, 1718900000).unwrap(),
+            1
+        );
+        assert_eq!(
+            nix_manager.create_generation(0x2000, 1718910000).unwrap(),
+            2
+        );
 
         let active_inode = nix_manager.swap_active_generation(2).unwrap();
         assert_eq!(active_inode, 0x2000);
@@ -455,9 +475,21 @@ mod tests {
         assert_eq!(tracer.buffer[0].unwrap().payload, 0x999);
 
         // 6. BusyBox Multicall Invocations
-        assert_eq!(BusyBoxMultiCallParser::parse_multicall_invocation("busybox-echo"), SysCommandType::Echo);
-        assert_eq!(BusyBoxMultiCallParser::parse_multicall_invocation("sigma-whoami"), SysCommandType::WhoAmI);
-        assert_eq!(BusyBoxMultiCallParser::parse_multicall_invocation("busybox-pwd"), SysCommandType::Pwd);
-        assert_eq!(BusyBoxMultiCallParser::parse_multicall_invocation("sudo"), SysCommandType::Unsupported);
+        assert_eq!(
+            BusyBoxMultiCallParser::parse_multicall_invocation("busybox-echo"),
+            SysCommandType::Echo
+        );
+        assert_eq!(
+            BusyBoxMultiCallParser::parse_multicall_invocation("sigma-whoami"),
+            SysCommandType::WhoAmI
+        );
+        assert_eq!(
+            BusyBoxMultiCallParser::parse_multicall_invocation("busybox-pwd"),
+            SysCommandType::Pwd
+        );
+        assert_eq!(
+            BusyBoxMultiCallParser::parse_multicall_invocation("sudo"),
+            SysCommandType::Unsupported
+        );
     }
 }

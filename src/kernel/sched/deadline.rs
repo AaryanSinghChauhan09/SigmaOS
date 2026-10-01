@@ -5,18 +5,18 @@
 
 #![allow(dead_code)]
 
-use std::collections::BinaryHeap;
+use core::sync::atomic::{AtomicU32, AtomicU64, Ordering as AtomicOrdering};
 use std::cmp::Ordering as CmpOrdering;
-use core::sync::atomic::{AtomicU64, AtomicU32, Ordering as AtomicOrdering};
+use std::collections::BinaryHeap;
 
 /// SCHED_DEADLINE Real-Time Task Parameters
 #[derive(Debug, Clone)]
 pub struct SchedDeadlineParams {
     pub pid: u64,
-    pub runtime_ns: u64,      // Executable budget per period
-    pub deadline_ns: u64,     // Relative deadline
-    pub period_ns: u64,       // Recurrence period
-    pub preemptible: bool,    // Whether task can be preempted
+    pub runtime_ns: u64,   // Executable budget per period
+    pub deadline_ns: u64,  // Relative deadline
+    pub period_ns: u64,    // Recurrence period
+    pub preemptible: bool, // Whether task can be preempted
 }
 
 /// Active Real-Time Task Instance with EEVDF virtual deadline
@@ -25,7 +25,7 @@ pub struct DeadlineTaskInstance {
     pub pid: u64,
     pub remaining_runtime_ns: u64,
     pub absolute_deadline_ns: u64,
-    pub virtual_deadline_ns: u64,  // EEVDF virtual deadline
+    pub virtual_deadline_ns: u64, // EEVDF virtual deadline
     pub params: SchedDeadlineParams,
 }
 
@@ -40,7 +40,9 @@ impl Eq for DeadlineTaskInstance {}
 // Reverse ordering for Min-Heap (Earliest Virtual Deadline First - EEVDF)
 impl Ord for DeadlineTaskInstance {
     fn cmp(&self, other: &Self) -> CmpOrdering {
-        other.virtual_deadline_ns.cmp(&self.virtual_deadline_ns)
+        other
+            .virtual_deadline_ns
+            .cmp(&self.virtual_deadline_ns)
             .then_with(|| self.pid.cmp(&other.pid))
     }
 }
@@ -172,21 +174,25 @@ mod tests {
     #[test]
     fn test_sched_deadline_edf_ordering() {
         let mut sched = SovereignSchedDeadlineEngine::new();
-        sched.register_task(SchedDeadlineParams {
-            pid: 100,
-            runtime_ns: 2000,
-            deadline_ns: 10000,
-            period_ns: 10000,
-            preemptible: true,
-        }).unwrap();
+        sched
+            .register_task(SchedDeadlineParams {
+                pid: 100,
+                runtime_ns: 2000,
+                deadline_ns: 10000,
+                period_ns: 10000,
+                preemptible: true,
+            })
+            .unwrap();
 
-        sched.register_task(SchedDeadlineParams {
-            pid: 200,
-            runtime_ns: 1000,
-            deadline_ns: 5000,
-            period_ns: 5000,
-            preemptible: true,
-        }).unwrap();
+        sched
+            .register_task(SchedDeadlineParams {
+                pid: 200,
+                runtime_ns: 1000,
+                deadline_ns: 5000,
+                period_ns: 5000,
+                preemptible: true,
+            })
+            .unwrap();
 
         // Earliest virtual deadline (PID 200) must be scheduled first
         assert_eq!(sched.pick_next_task(), Some(200));
@@ -198,13 +204,15 @@ mod tests {
     #[test]
     fn test_hard_preemption() {
         let mut sched = SovereignSchedDeadlineEngine::new();
-        sched.register_task(SchedDeadlineParams {
-            pid: 100,
-            runtime_ns: 2000,
-            deadline_ns: 10000,
-            period_ns: 10000,
-            preemptible: true,
-        }).unwrap();
+        sched
+            .register_task(SchedDeadlineParams {
+                pid: 100,
+                runtime_ns: 2000,
+                deadline_ns: 10000,
+                period_ns: 10000,
+                preemptible: true,
+            })
+            .unwrap();
 
         assert!(sched.preempt_current());
         assert_eq!(sched.get_preemption_count(), 1);
@@ -214,13 +222,15 @@ mod tests {
     #[test]
     fn test_eevdf_virtual_deadline() {
         let mut sched = SovereignSchedDeadlineEngine::new();
-        sched.register_task(SchedDeadlineParams {
-            pid: 100,
-            runtime_ns: 2000,
-            deadline_ns: 10000,
-            period_ns: 10000,
-            preemptible: true,
-        }).unwrap();
+        sched
+            .register_task(SchedDeadlineParams {
+                pid: 100,
+                runtime_ns: 2000,
+                deadline_ns: 10000,
+                period_ns: 10000,
+                preemptible: true,
+            })
+            .unwrap();
 
         // Update virtual deadline
         assert!(sched.update_virtual_deadline(100, 15000));
@@ -229,24 +239,28 @@ mod tests {
     #[test]
     fn test_bandwidth_admission_control() {
         let mut sched = SovereignSchedDeadlineEngine::new();
-        
+
         // First task: 50% bandwidth
-        sched.register_task(SchedDeadlineParams {
-            pid: 100,
-            runtime_ns: 5000,
-            deadline_ns: 10000,
-            period_ns: 10000,
-            preemptible: true,
-        }).unwrap();
+        sched
+            .register_task(SchedDeadlineParams {
+                pid: 100,
+                runtime_ns: 5000,
+                deadline_ns: 10000,
+                period_ns: 10000,
+                preemptible: true,
+            })
+            .unwrap();
 
         // Second task: 40% bandwidth (total 90%)
-        sched.register_task(SchedDeadlineParams {
-            pid: 200,
-            runtime_ns: 4000,
-            deadline_ns: 10000,
-            period_ns: 10000,
-            preemptible: true,
-        }).unwrap();
+        sched
+            .register_task(SchedDeadlineParams {
+                pid: 200,
+                runtime_ns: 4000,
+                deadline_ns: 10000,
+                period_ns: 10000,
+                preemptible: true,
+            })
+            .unwrap();
 
         // Third task: 10% bandwidth (total 100% - should fail)
         let result = sched.register_task(SchedDeadlineParams {

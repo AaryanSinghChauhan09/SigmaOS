@@ -250,7 +250,8 @@ impl PciBus {
     pub fn parse_msi_capability(&self, dev: &PciDevice) {
         let status = Self::read_config_32(dev.bus, dev.slot, dev.func, 0x04) >> 16;
         if (status & 0x10) != 0 {
-            let mut cap_ptr = (Self::read_config_32(dev.bus, dev.slot, dev.func, 0x34) & 0xFF) as u8;
+            let mut cap_ptr =
+                (Self::read_config_32(dev.bus, dev.slot, dev.func, 0x34) & 0xFF) as u8;
             while cap_ptr != 0 {
                 let cap = Self::read_config_32(dev.bus, dev.slot, dev.func, cap_ptr);
                 let cap_id = (cap & 0xFF) as u8;

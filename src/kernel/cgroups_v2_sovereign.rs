@@ -4,21 +4,17 @@
 #![allow(clippy::new_without_default)]
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-
-
 // SigmaOS Sovereign cgroups v2 Resource Accounting
 // Implements Linux cgroups v2 unified hierarchy resource controller
 // in 100% safe Rust with no external dependencies.
 //
 // Inspired by Linux kernel cgroups v2 (Linux 4.5+) unified hierarchy.
-
-
 #[cfg(any(feature = "standalone_test", test))]
+use std::string::{String, ToString};
+#[cfg(not(any(feature = "standalone_test", test)))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::vec::Vec;
 
@@ -39,14 +35,14 @@ pub enum CgroupController {
 impl CgroupController {
     pub fn name(&self) -> &'static str {
         match self {
-            CgroupController::Cpu     => "cpu",
-            CgroupController::CpuSet  => "cpuset",
-            CgroupController::Io      => "io",
-            CgroupController::Memory  => "memory",
-            CgroupController::Pids    => "pids",
-            CgroupController::Rdma    => "rdma",
+            CgroupController::Cpu => "cpu",
+            CgroupController::CpuSet => "cpuset",
+            CgroupController::Io => "io",
+            CgroupController::Memory => "memory",
+            CgroupController::Pids => "pids",
+            CgroupController::Rdma => "rdma",
             CgroupController::HugeTlb => "hugetlb",
-            CgroupController::Misc    => "misc",
+            CgroupController::Misc => "misc",
         }
     }
 }
@@ -93,24 +89,26 @@ impl CpuAccounting {
     /// Record a scheduling quantum of `delta_us` µs in user mode.
     pub fn record_user(&mut self, delta_us: u64) {
         self.usage_usec = self.usage_usec.saturating_add(delta_us);
-        self.user_usec  = self.user_usec.saturating_add(delta_us);
-        self.nr_periods  = self.nr_periods.saturating_add(1);
+        self.user_usec = self.user_usec.saturating_add(delta_us);
+        self.nr_periods = self.nr_periods.saturating_add(1);
         // Throttle check: if quota exceeded, accumulate throttled time
         if self.quota_us != u64::MAX && delta_us > self.quota_us {
             let excess = delta_us - self.quota_us;
             self.throttled_usec = self.throttled_usec.saturating_add(excess);
-            self.nr_throttled   = self.nr_throttled.saturating_add(1);
+            self.nr_throttled = self.nr_throttled.saturating_add(1);
         }
     }
 
     /// Record a scheduling quantum of `delta_us` µs in kernel mode.
     pub fn record_system(&mut self, delta_us: u64) {
-        self.usage_usec  = self.usage_usec.saturating_add(delta_us);
+        self.usage_usec = self.usage_usec.saturating_add(delta_us);
         self.system_usec = self.system_usec.saturating_add(delta_us);
     }
 
     pub fn throttle_ratio(&self) -> f64 {
-        if self.nr_periods == 0 { return 0.0; }
+        if self.nr_periods == 0 {
+            return 0.0;
+        }
         self.nr_throttled as f64 / self.nr_periods as f64
     }
 }
@@ -197,7 +195,12 @@ pub struct PidAccounting {
 
 impl PidAccounting {
     pub fn new(max_pids: u64) -> Self {
-        PidAccounting { max_pids, current_pids: 0, fork_events: 0, reject_events: 0 }
+        PidAccounting {
+            max_pids,
+            current_pids: 0,
+            fork_events: 0,
+            reject_events: 0,
+        }
     }
 
     pub fn try_fork(&mut self) -> bool {
@@ -206,7 +209,7 @@ impl PidAccounting {
             return false;
         }
         self.current_pids = self.current_pids.saturating_add(1);
-        self.fork_events  = self.fork_events.saturating_add(1);
+        self.fork_events = self.fork_events.saturating_add(1);
         true
     }
 
@@ -251,7 +254,9 @@ impl CgroupNode {
     }
 
     pub fn set_cpu_weight(&mut self, weight: u32) -> bool {
-        if weight == 0 || weight > 10_000 { return false; }
+        if weight == 0 || weight > 10_000 {
+            return false;
+        }
         self.cpu.weight = weight;
         true
     }
@@ -260,8 +265,12 @@ impl CgroupNode {
         self.memory.limit_bytes = bytes;
     }
 
-    pub fn freeze(&mut self) { self.frozen = true; }
-    pub fn thaw(&mut self)   { self.frozen = false; }
+    pub fn freeze(&mut self) {
+        self.frozen = true;
+    }
+    pub fn thaw(&mut self) {
+        self.frozen = false;
+    }
 
     pub fn stat_summary(&self) -> String {
         let mut s = String::new();
@@ -314,7 +323,9 @@ impl SovereignCgroupsV2Manager {
     pub fn create_cgroup(&mut self, name: &str, parent_path: &str, max_pids: u64) -> bool {
         // Verify parent exists
         let parent_exists = self.cgroups.iter().any(|c| c.path == parent_path);
-        if !parent_exists { return false; }
+        if !parent_exists {
+            return false;
+        }
 
         let path = if parent_path == "/" {
             let mut p = String::from("/");
@@ -328,7 +339,9 @@ impl SovereignCgroupsV2Manager {
         };
 
         // Prevent duplicate
-        if self.cgroups.iter().any(|c| c.path == path) { return false; }
+        if self.cgroups.iter().any(|c| c.path == path) {
+            return false;
+        }
 
         // Add child reference to parent
         if let Some(parent) = self.cgroups.iter_mut().find(|c| c.path == parent_path) {
@@ -349,25 +362,37 @@ impl SovereignCgroupsV2Manager {
             cg.cpu.record_user(user_us);
             cg.cpu.record_system(sys_us);
             true
-        } else { false }
+        } else {
+            false
+        }
     }
 
     pub fn try_alloc_memory(&mut self, path: &str, bytes: u64) -> bool {
         if let Some(cg) = self.get_cgroup_mut(path) {
             cg.memory.try_alloc(bytes)
-        } else { false }
+        } else {
+            false
+        }
     }
 
     pub fn try_fork(&mut self, path: &str) -> bool {
         if let Some(cg) = self.get_cgroup_mut(path) {
-            if cg.frozen { return false; }
+            if cg.frozen {
+                return false;
+            }
             let ok = cg.pids.try_fork();
-            if ok { self.total_fork_count = self.total_fork_count.saturating_add(1); }
+            if ok {
+                self.total_fork_count = self.total_fork_count.saturating_add(1);
+            }
             ok
-        } else { false }
+        } else {
+            false
+        }
     }
 
-    pub fn cgroup_count(&self) -> usize { self.cgroups.len() }
+    pub fn cgroup_count(&self) -> usize {
+        self.cgroups.len()
+    }
 
     pub fn full_dump(&self) -> String {
         let mut out = String::from("=== SigmaOS cgroups v2 Hierarchy ===\n");
@@ -409,7 +434,7 @@ mod tests {
         if let Some(cg) = mgr.get_cgroup_mut("/limited") {
             cg.set_memory_limit(1024 * 1024);
         }
-        assert!(mgr.try_alloc_memory("/limited", 512 * 1024));  // 512KB — OK
+        assert!(mgr.try_alloc_memory("/limited", 512 * 1024)); // 512KB — OK
         assert!(!mgr.try_alloc_memory("/limited", 600 * 1024)); // 600KB — exceeds 1MB total
     }
 
@@ -435,15 +460,15 @@ mod tests {
         if let Some(cg) = mgr.get_cgroup_mut("/freeze_test") {
             cg.thaw();
         }
-        assert!(mgr.try_fork("/freeze_test"));  // Thawed — permit
+        assert!(mgr.try_fork("/freeze_test")); // Thawed — permit
     }
 
     #[test]
     fn test_cpu_weight_validation() {
         let mut cg = CgroupNode::new("test", "/test", 100);
         assert!(cg.set_cpu_weight(500));
-        assert!(!cg.set_cpu_weight(0));       // Invalid
-        assert!(!cg.set_cpu_weight(10_001));  // Invalid
+        assert!(!cg.set_cpu_weight(0)); // Invalid
+        assert!(!cg.set_cpu_weight(10_001)); // Invalid
         assert_eq!(cg.cpu.weight, 500);
     }
 }

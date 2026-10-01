@@ -172,7 +172,10 @@ impl SocketStatsCommand {
     }
 
     pub fn filter_by_state(&self, filter_state: TcpState) -> Vec<&SocketStatsEntry> {
-        self.sockets.iter().filter(|s| s.state == filter_state).collect()
+        self.sockets
+            .iter()
+            .filter(|s| s.state == filter_state)
+            .collect()
     }
 
     /// Dumps all currently active socket allocations with PID/Process association (`ss -tulpn`)
@@ -237,7 +240,10 @@ impl PingCommand {
                 self.packets_received.fetch_add(1, Ordering::SeqCst);
                 let rtt = 4.0 + (seq as f32 * 0.2);
                 rtts.push(rtt);
-                println!("  -> Received 64 bytes: icmp_seq={} ttl=64 time={:.2} ms", seq, rtt);
+                println!(
+                    "  -> Received 64 bytes: icmp_seq={} ttl=64 time={:.2} ms",
+                    seq, rtt
+                );
             } else {
                 println!("  -> Request timeout for icmp_seq={}", seq);
             }
@@ -256,7 +262,8 @@ impl PingCommand {
             let max = rtts.iter().copied().fold(f32::NEG_INFINITY, f32::max);
             let sum: f32 = rtts.iter().sum();
             let avg = sum / rtts.len() as f32;
-            let variance: f32 = rtts.iter().map(|r| (r - avg) * (r - avg)).sum::<f32>() / rtts.len() as f32;
+            let variance: f32 =
+                rtts.iter().map(|r| (r - avg) * (r - avg)).sum::<f32>() / rtts.len() as f32;
             (min, max, avg, variance)
         } else {
             (0.0, 0.0, 0.0, 0.0)
@@ -677,7 +684,7 @@ mod tests {
         ip_cmd.set_mtu(9000);
 
         ip_cmd.add_route(0xC0A80100, 24, 0x00000000, 100); // 192.168.1.0/24 direct
-        ip_cmd.add_route(0x00000000, 0, 0xC0A80101, 200);  // 0.0.0.0/0 default via 192.168.1.1
+        ip_cmd.add_route(0x00000000, 0, 0xC0A80101, 200); // 0.0.0.0/0 default via 192.168.1.1
 
         ip_cmd.add_neighbor(0xC0A80101, [0x00, 0x11, 0x22, 0x33, 0x44, 0x55]);
 
@@ -688,7 +695,10 @@ mod tests {
         assert_eq!(default_match.gateway, 0xC0A80101);
 
         assert_eq!(ip_cmd.neighbors.len(), 1);
-        assert_eq!(ip_cmd.neighbors[0].mac, [0x00, 0x11, 0x22, 0x33, 0x44, 0x55]);
+        assert_eq!(
+            ip_cmd.neighbors[0].mac,
+            [0x00, 0x11, 0x22, 0x33, 0x44, 0x55]
+        );
     }
 
     #[test]

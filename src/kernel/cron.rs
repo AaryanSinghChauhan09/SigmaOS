@@ -22,7 +22,8 @@ impl CronField {
         }
 
         if s.starts_with("*/") {
-            let step: u32 = s[2..].parse()
+            let step: u32 = s[2..]
+                .parse()
                 .map_err(|_| format!("Invalid step value: {}", s))?;
             if step == 0 {
                 return Err("Step value cannot be zero".to_string());
@@ -35,9 +36,11 @@ impl CronField {
             if parts.len() != 2 {
                 return Err(format!("Invalid range: {}", s));
             }
-            let start: u32 = parts[0].parse()
+            let start: u32 = parts[0]
+                .parse()
                 .map_err(|_| format!("Invalid range start: {}", parts[0]))?;
-            let end: u32 = parts[1].parse()
+            let end: u32 = parts[1]
+                .parse()
                 .map_err(|_| format!("Invalid range end: {}", parts[1]))?;
             if start < min || end > max || start > end {
                 return Err(format!("Range out of bounds: {}", s));
@@ -46,9 +49,7 @@ impl CronField {
         }
 
         if s.contains(',') {
-            let values: Result<Vec<u32>, _> = s.split(',')
-                .map(|v| v.parse::<u32>())
-                .collect();
+            let values: Result<Vec<u32>, _> = s.split(',').map(|v| v.parse::<u32>()).collect();
             let values = values.map_err(|_| format!("Invalid list: {}", s))?;
             for &v in &values {
                 if v < min || v > max {
@@ -58,7 +59,8 @@ impl CronField {
             return Ok(CronField::List(values));
         }
 
-        let value: u32 = s.parse()
+        let value: u32 = s
+            .parse()
             .map_err(|_| format!("Invalid field value: {}", s))?;
         if value < min || value > max {
             return Err(format!("Value out of bounds: {}", value));
@@ -112,7 +114,14 @@ impl CronSchedule {
     }
 
     /// Check if a given time matches this schedule
-    pub fn matches(&self, minute: u32, hour: u32, day_of_month: u32, month: u32, day_of_week: u32) -> bool {
+    pub fn matches(
+        &self,
+        minute: u32,
+        hour: u32,
+        day_of_month: u32,
+        month: u32,
+        day_of_week: u32,
+    ) -> bool {
         self.minute.matches(minute)
             && self.hour.matches(hour)
             && self.day_of_month.matches(day_of_month)
@@ -146,8 +155,18 @@ impl CronJob {
     }
 
     /// Check if this job should run at the given time
-    pub fn should_run(&self, minute: u32, hour: u32, day_of_month: u32, month: u32, day_of_week: u32) -> bool {
-        self.enabled && self.schedule.matches(minute, hour, day_of_month, month, day_of_week)
+    pub fn should_run(
+        &self,
+        minute: u32,
+        hour: u32,
+        day_of_month: u32,
+        month: u32,
+        day_of_week: u32,
+    ) -> bool {
+        self.enabled
+            && self
+                .schedule
+                .matches(minute, hour, day_of_month, month, day_of_week)
     }
 }
 
@@ -219,7 +238,14 @@ impl CronManager {
     }
 
     /// Get jobs that should run at the given time
-    pub fn get_jobs_to_run(&self, minute: u32, hour: u32, day_of_month: u32, month: u32, day_of_week: u32) -> Vec<CronJob> {
+    pub fn get_jobs_to_run(
+        &self,
+        minute: u32,
+        hour: u32,
+        day_of_month: u32,
+        month: u32,
+        day_of_week: u32,
+    ) -> Vec<CronJob> {
         let jobs = self.jobs.lock().unwrap();
         jobs.values()
             .filter(|job| job.should_run(minute, hour, day_of_month, month, day_of_week))
@@ -327,8 +353,7 @@ mod tests {
     #[test]
     fn test_cron_job_disabled() {
         let schedule = CronSchedule::parse("0 * * * *").unwrap();
-        let job = CronJob::new(1, schedule, "echo test".to_string())
-            .with_enabled(false);
+        let job = CronJob::new(1, schedule, "echo test".to_string()).with_enabled(false);
 
         assert!(!job.should_run(0, 12, 1, 1, 0));
     }

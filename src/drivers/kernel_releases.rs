@@ -2,8 +2,6 @@
 // SigmaOS Kernel-Release Inspired OOP Drivers
 // This file implements 9 concrete drivers aligned with active Linux kernel releases on kernel.org.
 
-
-
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 use std::boxed::Box;
 use std::format;

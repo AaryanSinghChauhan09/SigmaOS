@@ -627,8 +627,8 @@ pub struct ExtFileSystem {
     pub has_extents: bool,
     pub extent_root_blocks: Vec<u32>,
     pub jbd2_journal_mode: &'static str, // JBD2: Ordered, Writeback, Journal
-    pub mballoc_group_count: u32,       // Linux mballoc multiblock group count
-    pub metadata_checksum_seed: u32,    // CRC32C seed
+    pub mballoc_group_count: u32,        // Linux mballoc multiblock group count
+    pub metadata_checksum_seed: u32,     // CRC32C seed
     pub extended_attributes: Vec<(u32, Ext4Xattr)>, // Extended Attributes (xattr) mapping (inode_id, xattr)
 }
 
@@ -649,7 +649,11 @@ impl ExtFileSystem {
             log_block_size: 2, // 4096 bytes
             has_journal: journal,
             has_extents: extents,
-            extent_root_blocks: if extents { vec![1024, 2048, 4096] } else { Vec::new() },
+            extent_root_blocks: if extents {
+                vec![1024, 2048, 4096]
+            } else {
+                Vec::new()
+            },
             jbd2_journal_mode: if journal { "ordered" } else { "none" },
             mballoc_group_count: if extents { 64 } else { 0 },
             metadata_checksum_seed: 0xEDB88320,
@@ -659,7 +663,8 @@ impl ExtFileSystem {
 
     /// Attaches an extended attribute (xattr) to an inode (e.g. "system.posix_acl_access")
     pub fn set_xattr(&mut self, inode_id: u32, name: &[u8], value: &[u8]) {
-        self.extended_attributes.push((inode_id, Ext4Xattr::new(name, value)));
+        self.extended_attributes
+            .push((inode_id, Ext4Xattr::new(name, value)));
     }
 
     /// Evaluates Linux ext4 access permissions following root check -> POSIX ACL xattrs -> mode bits flow
@@ -698,7 +703,11 @@ impl ExtFileSystem {
     }
 
     /// Emulates Linux Ext4 mballoc (multiblock allocator) which allocates multiple blocks concurrently
-    pub fn allocate_multiblock(&mut self, goal_block: u32, count: u32) -> Result<Vec<u32>, &'static str> {
+    pub fn allocate_multiblock(
+        &mut self,
+        goal_block: u32,
+        count: u32,
+    ) -> Result<Vec<u32>, &'static str> {
         if !self.has_extents {
             return Err("mballoc requires ext4 extents tree capabilities");
         }

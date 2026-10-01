@@ -4,8 +4,6 @@ use std::vec;
 // Linux distro-inspired installation framework
 // Handles system installation, bootloader configuration, and system setup
 
-
-
 use std::string::String;
 use std::vec::Vec;
 
@@ -89,33 +87,37 @@ impl SystemInstaller {
     pub fn install(&mut self) -> Result<(), InstallError> {
         self.update_progress(InstallStage::Preparation, 5, "Preparing installation");
         self.prepare_installation()?;
-        
+
         self.update_progress(InstallStage::Partitioning, 15, "Partitioning disk");
         self.partition_disk()?;
-        
+
         self.update_progress(InstallStage::Formatting, 25, "Formatting partitions");
         self.format_partitions()?;
-        
+
         self.update_progress(InstallStage::BaseInstallation, 40, "Installing base system");
         self.install_base_system()?;
-        
+
         self.update_progress(InstallStage::PackageInstallation, 60, "Installing packages");
         self.install_packages()?;
-        
-        self.update_progress(InstallStage::BootloaderInstallation, 80, "Installing bootloader");
+
+        self.update_progress(
+            InstallStage::BootloaderInstallation,
+            80,
+            "Installing bootloader",
+        );
         self.install_bootloader()?;
-        
+
         self.update_progress(InstallStage::SystemConfiguration, 90, "Configuring system");
         self.configure_system()?;
-        
+
         self.update_progress(InstallStage::UserSetup, 95, "Setting up user");
         self.setup_user()?;
-        
+
         self.update_progress(InstallStage::Finalization, 98, "Finalizing installation");
         self.finalize_installation()?;
-        
+
         self.update_progress(InstallStage::Complete, 100, "Installation complete");
-        
+
         Ok(())
     }
 
@@ -175,11 +177,11 @@ impl SystemInstaller {
             String::from("sigmaos-shell"),
             String::from("zenith-desktop"),
         ];
-        
+
         for package in base_packages {
             self.install_package(&package)?;
         }
-        
+
         Ok(())
     }
 
@@ -330,7 +332,7 @@ mod tests {
             bootloader: BootloaderType::GRUB2,
             packages: vec![],
         };
-        
+
         let mut installer = SystemInstaller::new(config);
         assert!(installer.install().is_ok());
         assert!(installer.is_complete());

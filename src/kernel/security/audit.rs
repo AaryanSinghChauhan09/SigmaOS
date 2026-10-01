@@ -1,7 +1,6 @@
 // Capability Audit Logging Subsystem for SigmaOS Security
 // Location: src/kernel/security/audit.rs
 
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CapabilityAuditEventType {
     Grant,
@@ -40,7 +39,14 @@ impl CapabilityAuditLogger {
         }
     }
 
-    pub fn log_event(&mut self, timestamp: u64, token_id: u64, event_type: CapabilityAuditEventType, resource_id: u64, actor_pid: u32) {
+    pub fn log_event(
+        &mut self,
+        timestamp: u64,
+        token_id: u64,
+        event_type: CapabilityAuditEventType,
+        resource_id: u64,
+        actor_pid: u32,
+    ) {
         if self.log_count < MAX_AUDIT_LOGS {
             self.logs[self.log_count] = CapabilityAuditEvent {
                 timestamp,
@@ -54,7 +60,10 @@ impl CapabilityAuditLogger {
     }
 
     pub fn count_violations(&self) -> usize {
-        self.logs[..self.log_count].iter().filter(|e| e.event_type == CapabilityAuditEventType::Violation).count()
+        self.logs[..self.log_count]
+            .iter()
+            .filter(|e| e.event_type == CapabilityAuditEventType::Violation)
+            .count()
     }
 
     pub fn get_logs_count(&self) -> usize {

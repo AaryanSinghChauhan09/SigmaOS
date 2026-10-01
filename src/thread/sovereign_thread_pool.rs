@@ -28,11 +28,11 @@ use std::collections::{BTreeMap, HashMap, HashSet};
 /// Thread Pool Category / Execution Paradigm
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum ThreadPoolKind {
-    FixedWorkerPool,      // Linux system_wq / fixed worker count
-    WorkStealingPool,     // Rayon / Tokio work-stealing deque scheduler
-    UnboundDynamicPool,   // Linux unbound_wq / auto-scaling thread pool
-    PriorityTaskQueue,    // FreeBSD taskqueue_create_fast / GCD priority queue
-    AffinityPinnedPool,   // Per-CPU core pinned workers (NUMA / PREEMPT_RT)
+    FixedWorkerPool,    // Linux system_wq / fixed worker count
+    WorkStealingPool,   // Rayon / Tokio work-stealing deque scheduler
+    UnboundDynamicPool, // Linux unbound_wq / auto-scaling thread pool
+    PriorityTaskQueue,  // FreeBSD taskqueue_create_fast / GCD priority queue
+    AffinityPinnedPool, // Per-CPU core pinned workers (NUMA / PREEMPT_RT)
 }
 
 /// Task Priority Levels
@@ -112,7 +112,12 @@ pub struct SovereignThreadPool {
 }
 
 impl SovereignThreadPool {
-    pub fn new(pool_id: &str, kind: ThreadPoolKind, min_workers: usize, max_workers: usize) -> Self {
+    pub fn new(
+        pool_id: &str,
+        kind: ThreadPoolKind,
+        min_workers: usize,
+        max_workers: usize,
+    ) -> Self {
         let mut workers = Vec::new();
         for i in 0..min_workers {
             let affinity = match kind {
@@ -162,7 +167,8 @@ impl SovereignThreadPool {
         self.task_queue.insert(insert_idx, task);
 
         // Dynamic worker expansion if pool is unbound and queue is backing up
-        if self.kind == ThreadPoolKind::UnboundDynamicPool && self.workers.len() < self.max_workers {
+        if self.kind == ThreadPoolKind::UnboundDynamicPool && self.workers.len() < self.max_workers
+        {
             let next_id = self.workers.len();
             self.workers.push(SovereignWorkerThread::new(next_id, None));
         }
@@ -255,7 +261,13 @@ impl SovereignThreadPoolEngine {
         );
     }
 
-    pub fn create_pool(&mut self, pool_id: &str, kind: ThreadPoolKind, min_workers: usize, max_workers: usize) {
+    pub fn create_pool(
+        &mut self,
+        pool_id: &str,
+        kind: ThreadPoolKind,
+        min_workers: usize,
+        max_workers: usize,
+    ) {
         self.pools.insert(
             pool_id.to_string(),
             SovereignThreadPool::new(pool_id, kind, min_workers, max_workers),
@@ -283,7 +295,10 @@ impl SovereignThreadPoolEngine {
         Ok(pool.submit_task(name, priority, f))
     }
 
-    pub fn process_pool_tasks(&mut self, pool_id: &str) -> Result<Vec<Result<String, String>>, String> {
+    pub fn process_pool_tasks(
+        &mut self,
+        pool_id: &str,
+    ) -> Result<Vec<Result<String, String>>, String> {
         let pool = self
             .pools
             .get_mut(pool_id)

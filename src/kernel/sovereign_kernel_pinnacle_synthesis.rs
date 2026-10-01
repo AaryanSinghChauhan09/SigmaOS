@@ -360,20 +360,28 @@ impl SovereignKernelPinnacleSuite {
 
         // 1. BPF_LSM check
         self.bpf_lsm.attach_hook(BpfLsmHookTarget::FileOpen);
-        let lsm_ok = self.bpf_lsm.evaluate_hook_policy(BpfLsmHookTarget::FileOpen, 101, "/etc/passwd");
+        let lsm_ok =
+            self.bpf_lsm
+                .evaluate_hook_policy(BpfLsmHookTarget::FileOpen, 101, "/etc/passwd");
         results.insert("linux_bpf_lsm".to_string(), lsm_ok);
 
         // 2. VNET check
         let stack = self.vnet.create_vnet_jail_stack(5, "10.0.0.5");
-        results.insert("freebsd_vnet_jail".to_string(), stack.is_isolated && stack.epair_interface_a == "epair5a");
+        results.insert(
+            "freebsd_vnet_jail".to_string(),
+            stack.is_isolated && stack.epair_interface_a == "epair5a",
+        );
 
         // 3. Pinsyscall check
-        self.pinsyscall.register_pinned_region(1, "sys_exit", 0x7FFF0000, 0x1000);
+        self.pinsyscall
+            .register_pinned_region(1, "sys_exit", 0x7FFF0000, 0x1000);
         let pin_ok = self.pinsyscall.validate_syscall_instruction(1, 0x7FFF0500);
         results.insert("openbsd_pinsyscall".to_string(), pin_ok);
 
         // 4. HAMMER2 check
-        let tx_id = self.hammer2.commit_pfs_transaction("ROOT_PFS", b"PAYLOAD_BLOCK");
+        let tx_id = self
+            .hammer2
+            .commit_pfs_transaction("ROOT_PFS", b"PAYLOAD_BLOCK");
         results.insert("dragonfly_hammer2_pfs".to_string(), tx_id >= 1001);
 
         // 5. EEVDF check

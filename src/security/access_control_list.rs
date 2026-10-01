@@ -35,55 +35,55 @@ pub enum AclModel {
 /// ACL Tag Identifier inspired by Linux POSIX.1e and FreeBSD `acl_tag_t`
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum AclTag {
-    UserOwner,           // ACL_USER_OBJ / owner@
-    GroupOwner,          // ACL_GROUP_OBJ / group@
-    Other,               // ACL_OTHER / everyone@
-    Mask,                // ACL_MASK (POSIX.1e effective mask)
-    NamedUser(u32),      // ACL_USER (uid)
-    NamedGroup(u32),     // ACL_GROUP (gid)
-    Everyone,            // NFSv4 everyone@
-    SpecialOwner,        // NFSv4 owner@
-    SpecialGroup,        // NFSv4 group@
+    UserOwner,       // ACL_USER_OBJ / owner@
+    GroupOwner,      // ACL_GROUP_OBJ / group@
+    Other,           // ACL_OTHER / everyone@
+    Mask,            // ACL_MASK (POSIX.1e effective mask)
+    NamedUser(u32),  // ACL_USER (uid)
+    NamedGroup(u32), // ACL_GROUP (gid)
+    Everyone,        // NFSv4 everyone@
+    SpecialOwner,    // NFSv4 owner@
+    SpecialGroup,    // NFSv4 group@
 }
 
 /// NFSv4 / ZFS ACL Entry Type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum AclEntryType {
-    Allow,  // ACCESS_ALLOWED
-    Deny,   // ACCESS_DENIED
-    Audit,  // SYSTEM_AUDIT
-    Alarm,  // SYSTEM_ALARM
+    Allow, // ACCESS_ALLOWED
+    Deny,  // ACCESS_DENIED
+    Audit, // SYSTEM_AUDIT
+    Alarm, // SYSTEM_ALARM
 }
 
 /// POSIX & NFSv4 Granular Permission Bits
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum AclPermission {
-    ReadData,          // 'r' / READ_DATA
-    WriteData,         // 'w' / WRITE_DATA
-    Execute,           // 'x' / EXECUTE
-    AppendData,        // APPEND_DATA
-    Delete,            // DELETE
-    DeleteChild,       // DELETE_CHILD
-    ReadAttributes,    // READ_ATTRIBUTES
-    WriteAttributes,   // WRITE_ATTRIBUTES
-    ReadNamedAttrs,    // READ_NAMED_ATTRS
-    WriteNamedAttrs,   // WRITE_NAMED_ATTRS
-    ReadAcl,           // READ_ACL
-    WriteAcl,          // WRITE_ACL
-    WriteOwner,        // WRITE_OWNER
-    Synchronize,       // SYNCHRONIZE
+    ReadData,        // 'r' / READ_DATA
+    WriteData,       // 'w' / WRITE_DATA
+    Execute,         // 'x' / EXECUTE
+    AppendData,      // APPEND_DATA
+    Delete,          // DELETE
+    DeleteChild,     // DELETE_CHILD
+    ReadAttributes,  // READ_ATTRIBUTES
+    WriteAttributes, // WRITE_ATTRIBUTES
+    ReadNamedAttrs,  // READ_NAMED_ATTRS
+    WriteNamedAttrs, // WRITE_NAMED_ATTRS
+    ReadAcl,         // READ_ACL
+    WriteAcl,        // WRITE_ACL
+    WriteOwner,      // WRITE_OWNER
+    Synchronize,     // SYNCHRONIZE
 }
 
 /// NFSv4 / ZFS Inheritance & Control Flags
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum AclInheritanceFlag {
-    FileInherit,       // FILE_INHERIT_ACE (inherited by files)
-    DirectoryInherit,  // DIRECTORY_INHERIT_ACE (inherited by subdirs)
-    NoPropagate,       // NO_PROPAGATE_INHERIT_ACE
-    InheritOnly,       // INHERIT_ONLY_ACE
-    SuccessfulAccess,  // SUCCESSFUL_ACCESS_ACE_FLAG (Audit/Alarm)
-    FailedAccess,      // FAILED_ACCESS_ACE_FLAG (Audit/Alarm)
-    Inherited,         // INHERITED_ACE (indicates entry was inherited)
+    FileInherit,      // FILE_INHERIT_ACE (inherited by files)
+    DirectoryInherit, // DIRECTORY_INHERIT_ACE (inherited by subdirs)
+    NoPropagate,      // NO_PROPAGATE_INHERIT_ACE
+    InheritOnly,      // INHERIT_ONLY_ACE
+    SuccessfulAccess, // SUCCESSFUL_ACCESS_ACE_FLAG (Audit/Alarm)
+    FailedAccess,     // FAILED_ACCESS_ACE_FLAG (Audit/Alarm)
+    Inherited,        // INHERITED_ACE (indicates entry was inherited)
 }
 
 /// An Access Control Entry (ACE)
@@ -182,9 +182,20 @@ impl SovereignAccessControlList {
         let o_w = (mode & 0o002) != 0;
         let o_x = (mode & 0o001) != 0;
 
-        acl.entries.push(SovereignAclEntry::new_posix(AclTag::UserOwner, u_r, u_w, u_x));
-        acl.entries.push(SovereignAclEntry::new_posix(AclTag::GroupOwner, g_r, g_w, g_x));
-        acl.entries.push(SovereignAclEntry::new_posix(AclTag::Other, o_r, o_w, o_x));
+        acl.entries.push(SovereignAclEntry::new_posix(
+            AclTag::UserOwner,
+            u_r,
+            u_w,
+            u_x,
+        ));
+        acl.entries.push(SovereignAclEntry::new_posix(
+            AclTag::GroupOwner,
+            g_r,
+            g_w,
+            g_x,
+        ));
+        acl.entries
+            .push(SovereignAclEntry::new_posix(AclTag::Other, o_r, o_w, o_x));
 
         acl
     }
@@ -370,8 +381,12 @@ impl SovereignAccessControlListEngine {
         };
 
         match acl.model {
-            AclModel::Posix1e => self.evaluate_posix_1e(subject, acl, owner_uid, owner_gid, requested_permission),
-            AclModel::Nfsv4Zfs | AclModel::RichAcl => self.evaluate_nfsv4(subject, acl, owner_uid, owner_gid, requested_permission),
+            AclModel::Posix1e => {
+                self.evaluate_posix_1e(subject, acl, owner_uid, owner_gid, requested_permission)
+            }
+            AclModel::Nfsv4Zfs | AclModel::RichAcl => {
+                self.evaluate_nfsv4(subject, acl, owner_uid, owner_gid, requested_permission)
+            }
         }
     }
 
@@ -394,7 +409,11 @@ impl SovereignAccessControlListEngine {
         }
 
         // 2. Named user check
-        if let Some(named_user) = acl.entries.iter().find(|e| e.tag == AclTag::NamedUser(subject.uid)) {
+        if let Some(named_user) = acl
+            .entries
+            .iter()
+            .find(|e| e.tag == AclTag::NamedUser(subject.uid))
+        {
             let user_allowed = named_user.has_permission(requested_permission);
             if let Some(m) = mask {
                 return user_allowed && m.has_permission(requested_permission);
@@ -403,7 +422,9 @@ impl SovereignAccessControlListEngine {
         }
 
         // 3. Group check (owner group or supplementary groups)
-        let is_in_group = |gid: u32| gid == owner_gid || subject.gid == gid || subject.supplementary_gids.contains(&gid);
+        let is_in_group = |gid: u32| {
+            gid == owner_gid || subject.gid == gid || subject.supplementary_gids.contains(&gid)
+        };
 
         let mut group_matched = false;
         let mut group_allowed = false;
@@ -462,7 +483,9 @@ impl SovereignAccessControlListEngine {
                 }
                 AclTag::Other | AclTag::Everyone => true,
                 AclTag::NamedUser(uid) => subject.uid == uid,
-                AclTag::NamedGroup(gid) => subject.gid == gid || subject.supplementary_gids.contains(&gid),
+                AclTag::NamedGroup(gid) => {
+                    subject.gid == gid || subject.supplementary_gids.contains(&gid)
+                }
                 AclTag::Mask => false,
             };
 
@@ -479,7 +502,11 @@ impl SovereignAccessControlListEngine {
     }
 
     /// Inherit default ACL when creating a new child object inside a directory
-    pub fn inherit_default_acl(&self, parent_dir: &str, is_directory: bool) -> Option<SovereignAccessControlList> {
+    pub fn inherit_default_acl(
+        &self,
+        parent_dir: &str,
+        is_directory: bool,
+    ) -> Option<SovereignAccessControlList> {
         let default_acl = self.default_acls.get(parent_dir)?;
         let mut child_acl = SovereignAccessControlList::new(default_acl.model);
 
@@ -487,18 +514,28 @@ impl SovereignAccessControlListEngine {
             let mut inherit = false;
             let mut child_flags = Vec::new();
 
-            if is_directory && entry.inheritance_flags.contains(&AclInheritanceFlag::DirectoryInherit) {
+            if is_directory
+                && entry
+                    .inheritance_flags
+                    .contains(&AclInheritanceFlag::DirectoryInherit)
+            {
                 inherit = true;
                 child_flags.push(AclInheritanceFlag::DirectoryInherit);
                 child_flags.push(AclInheritanceFlag::FileInherit);
-            } else if !is_directory && entry.inheritance_flags.contains(&AclInheritanceFlag::FileInherit) {
+            } else if !is_directory
+                && entry
+                    .inheritance_flags
+                    .contains(&AclInheritanceFlag::FileInherit)
+            {
                 inherit = true;
             }
 
             if inherit {
                 let mut child_entry = entry.clone();
                 child_entry.inheritance_flags = child_flags;
-                child_entry.inheritance_flags.push(AclInheritanceFlag::Inherited);
+                child_entry
+                    .inheritance_flags
+                    .push(AclInheritanceFlag::Inherited);
                 child_acl.entries.push(child_entry);
             }
         }
@@ -540,7 +577,11 @@ mod acl_tests {
         let acl = SovereignAccessControlList::from_setfacl_text(text).unwrap();
         assert_eq!(acl.entries.len(), 5);
 
-        let named_user = acl.entries.iter().find(|e| e.tag == AclTag::NamedUser(1001)).unwrap();
+        let named_user = acl
+            .entries
+            .iter()
+            .find(|e| e.tag == AclTag::NamedUser(1001))
+            .unwrap();
         assert!(named_user.is_readable());
         assert!(named_user.is_writable());
         assert!(!named_user.is_executable());
@@ -550,23 +591,48 @@ mod acl_tests {
     fn test_posix_1e_acl_evaluation_flow() {
         let mut engine = SovereignAccessControlListEngine::new();
         let acl = SovereignAccessControlList::from_setfacl_text(
-            "u::rwx,g::r--,o::---,u:2000:r-x,g:3000:-w-,m::rwx"
-        ).unwrap();
+            "u::rwx,g::r--,o::---,u:2000:r-x,g:3000:-w-,m::rwx",
+        )
+        .unwrap();
 
         engine.set_acl("/srv/data/file.txt", acl);
 
         // Subject 1: Owner (UID 1000)
         let sub_owner = SovereignSecuritySubject::new(1000, 1000);
-        assert!(engine.evaluate_access(&sub_owner, "/srv/data/file.txt", 1000, 1000, AclPermission::WriteData));
+        assert!(engine.evaluate_access(
+            &sub_owner,
+            "/srv/data/file.txt",
+            1000,
+            1000,
+            AclPermission::WriteData
+        ));
 
         // Subject 2: Named User (UID 2000)
         let sub_named_user = SovereignSecuritySubject::new(2000, 1000);
-        assert!(engine.evaluate_access(&sub_named_user, "/srv/data/file.txt", 1000, 1000, AclPermission::ReadData));
-        assert!(!engine.evaluate_access(&sub_named_user, "/srv/data/file.txt", 1000, 1000, AclPermission::WriteData));
+        assert!(engine.evaluate_access(
+            &sub_named_user,
+            "/srv/data/file.txt",
+            1000,
+            1000,
+            AclPermission::ReadData
+        ));
+        assert!(!engine.evaluate_access(
+            &sub_named_user,
+            "/srv/data/file.txt",
+            1000,
+            1000,
+            AclPermission::WriteData
+        ));
 
         // Subject 3: Superuser (UID 0)
         let sub_root = SovereignSecuritySubject::new(0, 0);
-        assert!(engine.evaluate_access(&sub_root, "/srv/data/file.txt", 1000, 1000, AclPermission::WriteData));
+        assert!(engine.evaluate_access(
+            &sub_root,
+            "/srv/data/file.txt",
+            1000,
+            1000,
+            AclPermission::WriteData
+        ));
     }
 
     #[test]
@@ -579,7 +645,10 @@ mod acl_tests {
             AclTag::NamedUser(1002),
             AclEntryType::Deny,
             vec![AclPermission::WriteData],
-            vec![AclInheritanceFlag::FileInherit, AclInheritanceFlag::DirectoryInherit],
+            vec![
+                AclInheritanceFlag::FileInherit,
+                AclInheritanceFlag::DirectoryInherit,
+            ],
         ));
         parent_acl.entries.push(SovereignAclEntry::new_nfsv4(
             AclTag::Everyone,
@@ -596,7 +665,19 @@ mod acl_tests {
         let sub_denied = SovereignSecuritySubject::new(1002, 1002);
         let sub_allowed = SovereignSecuritySubject::new(1003, 1003);
 
-        assert!(!engine.evaluate_access(&sub_denied, "/srv/shared/child.txt", 1000, 1000, AclPermission::WriteData));
-        assert!(engine.evaluate_access(&sub_allowed, "/srv/shared/child.txt", 1000, 1000, AclPermission::WriteData));
+        assert!(!engine.evaluate_access(
+            &sub_denied,
+            "/srv/shared/child.txt",
+            1000,
+            1000,
+            AclPermission::WriteData
+        ));
+        assert!(engine.evaluate_access(
+            &sub_allowed,
+            "/srv/shared/child.txt",
+            1000,
+            1000,
+            AclPermission::WriteData
+        ));
     }
 }

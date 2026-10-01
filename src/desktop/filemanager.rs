@@ -13,31 +13,38 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
+use core::sync::atomic::{AtomicUsize, Ordering};
+use std::boxed::Box;
 /// OOP-based File Manager for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 766
 /// Implements file browser and management
-
 use std::vec::Vec;
-use std::boxed::Box;
-use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type FileID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FileType { Directory = 0, File = 1, Symlink = 2 }
+pub enum FileType {
+    Directory = 0,
+    File = 1,
+    Symlink = 2,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum FileManagerError { Success = 0, NotFound = 1, PermissionDenied = 2 }
+pub enum FileManagerError {
+    Success = 0,
+    NotFound = 1,
+    PermissionDenied = 2,
+}
 
 pub trait FileEntry {
     fn id(&self) -> FileID;
@@ -74,7 +81,9 @@ impl SimpleFileEntry {
 }
 
 impl FileEntry for SimpleFileEntry {
-    fn id(&self) -> FileID { self.id }
+    fn id(&self) -> FileID {
+        self.id
+    }
     fn name(&self) -> &[u8] {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(256);
         &self.name[..len]
@@ -86,8 +95,12 @@ impl FileEntry for SimpleFileEntry {
             _ => FileType::Symlink,
         }
     }
-    fn size(&self) -> u64 { self.size.load(Ordering::SeqCst) as u64 }
-    fn is_hidden(&self) -> bool { self.hidden.load(Ordering::SeqCst) == 1 }
+    fn size(&self) -> u64 {
+        self.size.load(Ordering::SeqCst) as u64
+    }
+    fn is_hidden(&self) -> bool {
+        self.hidden.load(Ordering::SeqCst) == 1
+    }
 }
 
 pub trait FileManager {
@@ -287,7 +300,13 @@ pub struct FileSnapshotDiff {
 }
 
 impl FileSnapshotDiff {
-    pub fn compare(snapshot_a_id: u64, snapshot_b_id: u64, file_id: FileID, size_a: u64, size_b: u64) -> Self {
+    pub fn compare(
+        snapshot_a_id: u64,
+        snapshot_b_id: u64,
+        file_id: FileID,
+        size_a: u64,
+        size_b: u64,
+    ) -> Self {
         FileSnapshotDiff {
             snapshot_a_id,
             snapshot_b_id,
@@ -344,7 +363,6 @@ impl FileSearch for SimpleFileSearch {
         results
     }
 }
-
 
 #[cfg(test_disabled)]
 mod tests {

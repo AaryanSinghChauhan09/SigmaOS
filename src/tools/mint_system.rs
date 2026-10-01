@@ -72,9 +72,9 @@ impl MintSystem {
         } else {
             format!("apt {} {}", command_str, packages.join(" "))
         };
-        
+
         self.apt_command_history.push(full_command.clone());
-        
+
         let result = match command {
             AptCommand::Install => self.apt_install(packages),
             AptCommand::Remove => self.apt_remove(packages),
@@ -102,7 +102,7 @@ impl MintSystem {
             AptCommand::MarkAuto => self.apt_mark_auto(packages),
             AptCommand::UnmarkAuto => self.apt_unmark_auto(packages),
         };
-        
+
         result
     }
 
@@ -129,10 +129,19 @@ impl MintSystem {
     /// Display system information
     pub fn display_system_info(&self) -> String {
         let mut output = String::from("=== MintSystem Information ===\n\n");
-        output.push_str(&format!("Command History Size: {}\n", self.apt_command_history.len()));
+        output.push_str(&format!(
+            "Command History Size: {}\n",
+            self.apt_command_history.len()
+        ));
         output.push_str(&format!("Held Packages: {}\n", self.held_packages.len()));
-        output.push_str(&format!("Auto-Installed Packages: {}\n", self.auto_installed_packages.len()));
-        output.push_str(&format!("Package Cache Size: {}\n", self.package_cache.len()));
+        output.push_str(&format!(
+            "Auto-Installed Packages: {}\n",
+            self.auto_installed_packages.len()
+        ));
+        output.push_str(&format!(
+            "Package Cache Size: {}\n",
+            self.package_cache.len()
+        ));
         output
     }
 
@@ -212,11 +221,12 @@ impl MintSystem {
     }
 
     fn apt_search(&self, packages: &[String]) -> AptResult {
-        let results: Vec<String> = packages.iter()
+        let results: Vec<String> = packages
+            .iter()
             .filter(|pkg| self.package_cache.contains(pkg))
             .cloned()
             .collect();
-        
+
         AptResult {
             success: true,
             output: format!("Found {} packages", results.len()),
@@ -238,12 +248,13 @@ impl MintSystem {
         let filtered: Vec<String> = if packages.is_empty() {
             self.package_cache.clone()
         } else {
-            self.package_cache.iter()
+            self.package_cache
+                .iter()
                 .filter(|pkg| packages.iter().any(|p| pkg.contains(p)))
                 .cloned()
                 .collect()
         };
-        
+
         AptResult {
             success: true,
             output: format!("Listed {} packages", filtered.len()),
@@ -459,8 +470,11 @@ mod tests {
     #[test]
     fn test_apt_install() {
         let mut mint_system = MintSystem::new();
-        let result = mint_system.execute_apt(AptCommand::Install, &vec![String::from("vim"), String::from("git")]);
-        
+        let result = mint_system.execute_apt(
+            AptCommand::Install,
+            &vec![String::from("vim"), String::from("git")],
+        );
+
         assert!(result.success);
         assert_eq!(mint_system.package_cache.len(), 2);
         assert!(mint_system.package_cache.contains(&String::from("vim")));
@@ -470,7 +484,7 @@ mod tests {
     fn test_apt_remove() {
         let mut mint_system = MintSystem::new();
         mint_system.execute_apt(AptCommand::Install, &vec![String::from("vim")]);
-        
+
         let result = mint_system.execute_apt(AptCommand::Remove, &vec![String::from("vim")]);
         assert!(result.success);
         assert!(!mint_system.package_cache.contains(&String::from("vim")));
@@ -480,7 +494,7 @@ mod tests {
     fn test_apt_hold() {
         let mut mint_system = MintSystem::new();
         let result = mint_system.execute_apt(AptCommand::Hold, &vec![String::from("vim")]);
-        
+
         assert!(result.success);
         assert!(mint_system.held_packages.contains(&String::from("vim")));
     }
@@ -489,7 +503,7 @@ mod tests {
     fn test_apt_unhold() {
         let mut mint_system = MintSystem::new();
         mint_system.execute_apt(AptCommand::Hold, &vec![String::from("vim")]);
-        
+
         let result = mint_system.execute_apt(AptCommand::Unhold, &vec![String::from("vim")]);
         assert!(result.success);
         assert!(!mint_system.held_packages.contains(&String::from("vim")));
@@ -499,9 +513,11 @@ mod tests {
     fn test_apt_mark_auto() {
         let mut mint_system = MintSystem::new();
         let result = mint_system.execute_apt(AptCommand::MarkAuto, &vec![String::from("vim")]);
-        
+
         assert!(result.success);
-        assert!(mint_system.auto_installed_packages.contains(&String::from("vim")));
+        assert!(mint_system
+            .auto_installed_packages
+            .contains(&String::from("vim")));
     }
 
     #[test]
@@ -509,7 +525,7 @@ mod tests {
         let mut mint_system = MintSystem::new();
         mint_system.execute_apt(AptCommand::Update, &vec![]);
         mint_system.execute_apt(AptCommand::Upgrade, &vec![]);
-        
+
         let history = mint_system.get_command_history();
         assert_eq!(history.len(), 2);
     }
@@ -518,7 +534,7 @@ mod tests {
     fn test_display_system_info() {
         let mint_system = MintSystem::new();
         let info = mint_system.display_system_info();
-        
+
         assert!(info.contains("MintSystem Information"));
         assert!(info.contains("Command History Size"));
     }
@@ -526,8 +542,11 @@ mod tests {
     #[test]
     fn test_apt_search() {
         let mut mint_system = MintSystem::new();
-        mint_system.execute_apt(AptCommand::Install, &vec![String::from("vim"), String::from("git")]);
-        
+        mint_system.execute_apt(
+            AptCommand::Install,
+            &vec![String::from("vim"), String::from("git")],
+        );
+
         let result = mint_system.execute_apt(AptCommand::Search, &vec![String::from("vim")]);
         assert!(result.success);
         assert_eq!(result.packages_affected.len(), 1);

@@ -120,7 +120,11 @@ impl FdTable {
 
     /// Duplicate a file descriptor
     pub fn dup(&mut self, old_fd: i32) -> Result<i32, String> {
-        let entry = self.entries.get(&old_fd).ok_or_else(|| format!("File descriptor {} not found", old_fd))?.clone();
+        let entry = self
+            .entries
+            .get(&old_fd)
+            .ok_or_else(|| format!("File descriptor {} not found", old_fd))?
+            .clone();
 
         let new_fd = self.next_fd;
         self.next_fd += 1;
@@ -133,7 +137,11 @@ impl FdTable {
 
     /// Duplicate a file descriptor to a specific fd
     pub fn dup2(&mut self, old_fd: i32, new_fd: i32) -> Result<i32, String> {
-        let entry = self.entries.get(&old_fd).ok_or_else(|| format!("File descriptor {} not found", old_fd))?.clone();
+        let entry = self
+            .entries
+            .get(&old_fd)
+            .ok_or_else(|| format!("File descriptor {} not found", old_fd))?
+            .clone();
 
         // Close the new_fd if it exists
         if self.entries.contains_key(&new_fd) {
@@ -207,7 +215,12 @@ impl FdTableManager {
     }
 
     /// Allocate a file descriptor
-    pub fn allocate(&self, table_id: u64, file_type: String, flags: FdFlags) -> Result<i32, String> {
+    pub fn allocate(
+        &self,
+        table_id: u64,
+        file_type: String,
+        flags: FdFlags,
+    ) -> Result<i32, String> {
         let mut tables = self.tables.lock().unwrap();
         match tables.get_mut(&table_id) {
             Some(table) => Ok(table.allocate(file_type, flags)),
@@ -364,7 +377,9 @@ mod tests {
 
         let table_id = manager.create_table();
         let flags = FdFlags::new();
-        let fd = manager.allocate(table_id, "file".to_string(), flags).unwrap();
+        let fd = manager
+            .allocate(table_id, "file".to_string(), flags)
+            .unwrap();
 
         assert_eq!(fd, 3);
     }
@@ -375,7 +390,9 @@ mod tests {
 
         let table_id = manager.create_table();
         let flags = FdFlags::new();
-        let fd = manager.allocate(table_id, "file".to_string(), flags).unwrap();
+        let fd = manager
+            .allocate(table_id, "file".to_string(), flags)
+            .unwrap();
 
         manager.close(table_id, fd).unwrap();
     }
@@ -386,7 +403,9 @@ mod tests {
 
         let table_id = manager.create_table();
         let flags = FdFlags::new();
-        let old_fd = manager.allocate(table_id, "file".to_string(), flags).unwrap();
+        let old_fd = manager
+            .allocate(table_id, "file".to_string(), flags)
+            .unwrap();
 
         let new_fd = manager.dup(table_id, old_fd).unwrap();
         assert_eq!(new_fd, 4);
@@ -395,7 +414,9 @@ mod tests {
     #[test]
     fn test_fd_table_manager_invalid() {
         let manager = FdTableManager::new();
-        assert!(manager.allocate(999, "file".to_string(), FdFlags::new()).is_err());
+        assert!(manager
+            .allocate(999, "file".to_string(), FdFlags::new())
+            .is_err());
         assert!(manager.close(999, 3).is_err());
     }
 }

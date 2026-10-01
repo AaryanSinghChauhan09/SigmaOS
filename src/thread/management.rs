@@ -1,10 +1,9 @@
+use core::mem;
+use core::sync::atomic::{AtomicI32, AtomicUsize, Ordering};
 /// OOP-based Thread Management for SigmaOS
 /// Based on Roadmap Item 12: Thread management
 /// Absorbing Linux interruptible/alertable state concepts, CPU affinity, and nice prioritization values
-
 use std::boxed::Box;
-use core::mem;
-use core::sync::atomic::{AtomicI32, AtomicUsize, Ordering};
 
 pub type ThreadID = usize;
 
@@ -258,7 +257,6 @@ extern "C" {
 }
 
 #[cfg(test_disabled)]
-
 #[cfg(test_disabled)]
 unsafe fn alloc(size: usize) -> *mut u8 {
     std::alloc::alloc(std::alloc::Layout::from_size_align_unchecked(size, 8))

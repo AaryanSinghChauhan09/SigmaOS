@@ -2,7 +2,6 @@
 // Reduces fragmentation by caching freed objects of similar sizes
 // Enhanced with Linux-inspired size-bucketed kmalloc/kfree and sub-16MB legacy DMA pools for ancient devices.
 
-
 use std::collections::BTreeMap;
 use std::string::String;
 use std::string::ToString;
@@ -305,7 +304,8 @@ impl LegacyDevicePool {
     /// Allocate a contiguous buffer in the ISA DMA-compliant zone (< 16MB)
     pub fn alloc_dma_buffer(&mut self, size: usize) -> Result<*mut u8, &'static str> {
         let aligned_size = (size + 15) & !15; // 16-byte alignment
-        if self.reserved_start_addr + self.next_alloc_offset + aligned_size > self.reserved_end_addr {
+        if self.reserved_start_addr + self.next_alloc_offset + aligned_size > self.reserved_end_addr
+        {
             return Err("Legacy DMA memory pool exhausted");
         }
 

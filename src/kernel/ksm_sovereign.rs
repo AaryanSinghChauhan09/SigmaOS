@@ -4,8 +4,6 @@
 #![allow(clippy::new_without_default)]
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-
-
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
@@ -76,7 +74,11 @@ impl SovereignKsmEngine {
         let candidate = KsmPage::new(pid, virt_addr, data);
 
         // 1. Check Stable Tree for existing merged identical page
-        if let Some(stable_page) = self.stable_tree.iter_mut().find(|p| p.content_hash == candidate.content_hash) {
+        if let Some(stable_page) = self
+            .stable_tree
+            .iter_mut()
+            .find(|p| p.content_hash == candidate.content_hash)
+        {
             stable_page.shared_count = stable_page.shared_count.saturating_add(1);
             self.pages_merged = self.pages_merged.saturating_add(1);
             self.bytes_saved = self.bytes_saved.saturating_add(self.page_size as u64);
@@ -84,7 +86,11 @@ impl SovereignKsmEngine {
         }
 
         // 2. Check Unstable Tree for duplicate candidate
-        if let Some(pos) = self.unstable_tree.iter().position(|p| p.content_hash == candidate.content_hash) {
+        if let Some(pos) = self
+            .unstable_tree
+            .iter()
+            .position(|p| p.content_hash == candidate.content_hash)
+        {
             let mut matched = self.unstable_tree.remove(pos);
             matched.is_cow = true;
             matched.shared_count = 2; // Matched candidate + new candidate
@@ -102,7 +108,11 @@ impl SovereignKsmEngine {
 
     /// Break CoW sharing when a process writes to a shared page
     pub fn break_cow(&mut self, content_hash: u64) -> bool {
-        if let Some(pos) = self.stable_tree.iter().position(|p| p.content_hash == content_hash) {
+        if let Some(pos) = self
+            .stable_tree
+            .iter()
+            .position(|p| p.content_hash == content_hash)
+        {
             let page = &mut self.stable_tree[pos];
             if page.shared_count > 2 {
                 page.shared_count -= 1;
@@ -122,7 +132,10 @@ impl SovereignKsmEngine {
     }
 
     pub fn pages_sharing(&self) -> u32 {
-        self.stable_tree.iter().map(|p| p.shared_count.saturating_sub(1)).sum()
+        self.stable_tree
+            .iter()
+            .map(|p| p.shared_count.saturating_sub(1))
+            .sum()
     }
 }
 

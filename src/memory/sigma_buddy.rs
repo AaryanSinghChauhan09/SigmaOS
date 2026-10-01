@@ -16,8 +16,8 @@
 // SigmaOS GlueBuddy Memory Subsystem
 // Linux & BSD inspired Buddy Allocator Glue, Migration Types, CMA, Watermarks, and FreeBSD VM Page Queues
 
-use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
+use std::vec::Vec;
 
 use super::{BuddyAllocator as KernelBuddyAllocator, MemoryBlock, PAGE_SIZE};
 use crate::klib::buddy_allocator::{BuddyAllocator, SimpleBuddyAllocator};
@@ -71,10 +71,10 @@ pub enum VmZone {
 /// Migration policies for physical memory zones (DMA32, Normal, HighMem)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ZoneFallbackPolicy {
-    StrictNoFallback,       // Fail allocation if requested zone is exhausted
-    FallbackToNormal,       // Fallback HighMem -> Normal
-    FallbackToDma32,        // Fallback Normal -> DMA32 (emergency only)
-    CascadingFallback,      // Cascading HighMem -> Normal -> DMA32
+    StrictNoFallback,  // Fail allocation if requested zone is exhausted
+    FallbackToNormal,  // Fallback HighMem -> Normal
+    FallbackToDma32,   // Fallback Normal -> DMA32 (emergency only)
+    CascadingFallback, // Cascading HighMem -> Normal -> DMA32
 }
 
 /// Zone Compaction and Reclaim Migration Policy
@@ -130,7 +130,9 @@ impl ZoneMigrationPolicyEngine {
             VmZone::Dma32 => {
                 if is_zone_available(dma32_zone) {
                     Ok(VmZone::Dma32)
-                } else if self.policy.fallback_policy != ZoneFallbackPolicy::StrictNoFallback && is_zone_available(normal_zone) {
+                } else if self.policy.fallback_policy != ZoneFallbackPolicy::StrictNoFallback
+                    && is_zone_available(normal_zone)
+                {
                     Ok(VmZone::Normal)
                 } else {
                     Err("Out of memory in DMA32 zone and fallback exhausted")
@@ -139,7 +141,9 @@ impl ZoneMigrationPolicyEngine {
             VmZone::Normal => {
                 if is_zone_available(normal_zone) {
                     Ok(VmZone::Normal)
-                } else if self.policy.fallback_policy == ZoneFallbackPolicy::CascadingFallback || self.policy.fallback_policy == ZoneFallbackPolicy::FallbackToDma32 {
+                } else if self.policy.fallback_policy == ZoneFallbackPolicy::CascadingFallback
+                    || self.policy.fallback_policy == ZoneFallbackPolicy::FallbackToDma32
+                {
                     if is_zone_available(dma32_zone) {
                         Ok(VmZone::Dma32)
                     } else {
@@ -155,7 +159,9 @@ impl ZoneMigrationPolicyEngine {
                 } else if self.policy.fallback_policy != ZoneFallbackPolicy::StrictNoFallback {
                     if is_zone_available(normal_zone) {
                         Ok(VmZone::Normal)
-                    } else if self.policy.fallback_policy == ZoneFallbackPolicy::CascadingFallback && is_zone_available(dma32_zone) {
+                    } else if self.policy.fallback_policy == ZoneFallbackPolicy::CascadingFallback
+                        && is_zone_available(dma32_zone)
+                    {
                         Ok(VmZone::Dma32)
                     } else {
                         Err("Out of memory in HighMem zone and all fallbacks exhausted")
@@ -182,10 +188,18 @@ impl ZoneMigrationPolicyEngine {
         if migrate_count == 0 {
             return Err("No inactive pages available for zone migration");
         }
-        from_zone.inactive_pages.fetch_sub(migrate_count, Ordering::SeqCst);
-        from_zone.free_pages.fetch_add(migrate_count, Ordering::SeqCst);
-        to_zone.free_pages.fetch_sub(migrate_count, Ordering::SeqCst);
-        to_zone.active_pages.fetch_add(migrate_count, Ordering::SeqCst);
+        from_zone
+            .inactive_pages
+            .fetch_sub(migrate_count, Ordering::SeqCst);
+        from_zone
+            .free_pages
+            .fetch_add(migrate_count, Ordering::SeqCst);
+        to_zone
+            .free_pages
+            .fetch_sub(migrate_count, Ordering::SeqCst);
+        to_zone
+            .active_pages
+            .fetch_add(migrate_count, Ordering::SeqCst);
         Ok(migrate_count)
     }
 }
@@ -289,7 +303,6 @@ impl CmaBuddyReservationGlue {
     }
 }
 
-
 /// SigmaOS Buddy Allocator Wrapper
 ///
 /// Wraps the klib buddy allocator and exposes a kernel-friendly interface.
@@ -311,7 +324,10 @@ impl SigmaBuddyAllocator {
             base_addr,
             total_size,
             allocated: AtomicUsize::new(0),
-            cma_glue: Some(CmaBuddyReservationGlue::new(base_addr + (total_size / 2), total_pages / 4)),
+            cma_glue: Some(CmaBuddyReservationGlue::new(
+                base_addr + (total_size / 2),
+                total_pages / 4,
+            )),
             bsd_zone: Some(BsdVmZoneAllocator::new(VmZone::Normal, total_pages)),
         }
     }
@@ -321,7 +337,11 @@ impl SigmaBuddyAllocator {
     }
 
     /// Allocates memory block with specified Linux migration type
-    pub fn allocate_typed(&mut self, size: usize, migrate_type: MigrateType) -> Option<MemoryBlock> {
+    pub fn allocate_typed(
+        &mut self,
+        size: usize,
+        migrate_type: MigrateType,
+    ) -> Option<MemoryBlock> {
         if size == 0 || size > self.total_size {
             return None;
         }
@@ -331,7 +351,8 @@ impl SigmaBuddyAllocator {
             if let Some(ref cma) = self.cma_glue {
                 let pages = size.div_ceil(PAGE_SIZE);
                 if let Ok(phys_addr) = cma.allocate_contiguous(pages) {
-                    self.allocated.fetch_add(pages * PAGE_SIZE, Ordering::SeqCst);
+                    self.allocated
+                        .fetch_add(pages * PAGE_SIZE, Ordering::SeqCst);
                     use core::ptr::NonNull;
                     return NonNull::new(phys_addr as *mut u8).map(|addr| MemoryBlock {
                         addr,
@@ -357,7 +378,8 @@ impl SigmaBuddyAllocator {
                 self.allocated.fetch_add(actual_size, Ordering::SeqCst);
 
                 if let Some(ref zone) = self.bsd_zone {
-                    let _ = zone.transition_queue(PageQueueType::Free, PageQueueType::Active, pages);
+                    let _ =
+                        zone.transition_queue(PageQueueType::Free, PageQueueType::Active, pages);
                 }
 
                 use core::ptr::NonNull;
@@ -376,7 +398,9 @@ impl SigmaBuddyAllocator {
 
         // Check if block was allocated in CMA region
         if let Some(ref cma) = self.cma_glue {
-            if addr >= cma.cma_base_addr && addr < cma.cma_base_addr + (cma.cma_total_pages * PAGE_SIZE) {
+            if addr >= cma.cma_base_addr
+                && addr < cma.cma_base_addr + (cma.cma_total_pages * PAGE_SIZE)
+            {
                 let _ = cma.release_contiguous(addr, pages);
                 self.allocated.fetch_sub(block.size, Ordering::SeqCst);
                 return;
@@ -399,9 +423,9 @@ impl SigmaBuddyAllocator {
         let used_pages = self.allocated.load(Ordering::SeqCst) / PAGE_SIZE;
         let free_pages = total_pages.saturating_sub(used_pages);
 
-        let min_pages = total_pages / 20;  // 5% min threshold
-        let low_pages = total_pages / 10;  // 10% low threshold
-        let high_pages = total_pages / 5;  // 20% high threshold
+        let min_pages = total_pages / 20; // 5% min threshold
+        let low_pages = total_pages / 10; // 10% low threshold
+        let high_pages = total_pages / 5; // 20% high threshold
 
         let level = if free_pages < min_pages {
             WatermarkLevel::WatermarkMin
@@ -493,11 +517,15 @@ mod tests {
         let zone = BsdVmZoneAllocator::new(VmZone::Normal, 100);
         assert_eq!(zone.free_pages.load(Ordering::SeqCst), 100);
 
-        assert!(zone.transition_queue(PageQueueType::Free, PageQueueType::Active, 20).is_ok());
+        assert!(zone
+            .transition_queue(PageQueueType::Free, PageQueueType::Active, 20)
+            .is_ok());
         assert_eq!(zone.free_pages.load(Ordering::SeqCst), 80);
         assert_eq!(zone.active_pages.load(Ordering::SeqCst), 20);
 
-        assert!(zone.transition_queue(PageQueueType::Active, PageQueueType::Wired, 5).is_ok());
+        assert!(zone
+            .transition_queue(PageQueueType::Active, PageQueueType::Wired, 5)
+            .is_ok());
         assert_eq!(zone.active_pages.load(Ordering::SeqCst), 15);
         assert_eq!(zone.wired_pages.load(Ordering::SeqCst), 5);
     }

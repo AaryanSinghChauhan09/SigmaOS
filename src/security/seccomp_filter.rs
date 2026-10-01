@@ -270,6 +270,18 @@ impl SeccompCompiler {
     pub fn allow_syscall(&mut self, syscall: u32) {
         let rule = SeccompRule::new(syscall, SeccompAction::Allow);
         self.add_rule(rule);
+    /// Remove a rule by syscall number
+    pub fn remove_rule(&mut self, syscall_number: u64) -> bool {
+        if let Some(pos) = self
+            .rules
+            .iter()
+            .position(|r| r.syscall_number == syscall_number)
+        {
+            self.rules.remove(pos);
+            true
+        } else {
+            false
+        }
     }
 
     /// Add a deny rule for a syscall
@@ -305,6 +317,33 @@ impl SeccompCompiler {
             for arg in &rule.args {
                 if arg.arg_index >= 6 {
                     return Err(SeccompCompileError::InvalidArgumentIndex(arg.arg_index));
+            if rule.syscall_number == syscall_number {
+                // Check argument filters
+                let matches = rule.arg_filters.iter().all(|filter| {
+                    let arg_value = if (filter.arg_num as usize) < args.len() {
+                        args[filter.arg_num as usize]
+                    } else {
+                        0
+                    };
+
+                    let masked_value = arg_value & filter.value_mask;
+                    let masked_target = filter.value & filter.value_mask;
+
+                    match filter.op {
+                        SeccompCmpOp::Equal => masked_value == masked_target,
+                        SeccompCmpOp::NotEqual => masked_value != masked_target,
+                        SeccompCmpOp::LessThan => masked_value < masked_target,
+                        SeccompCmpOp::LessThanOrEqual => masked_value <= masked_target,
+                        SeccompCmpOp::GreaterThanOrEqual => masked_value >= masked_target,
+                        SeccompCmpOp::GreaterThan => masked_value > masked_target,
+                        SeccompCmpOp::MaskedEqual => {
+                            (arg_value & filter.value_mask) == filter.value
+                        }
+                    }
+                });
+
+                if matches {
+                    return rule.action;
                 }
             }
         }
@@ -448,6 +487,61 @@ fn emit_arg_comparison(
                 asm.branch(BpfInstruction::jgt(0, 0, high), success, equal);
                 asm.mark(equal);
                 asm.branch(BpfInstruction::jeq(0, 0, high), low_half, failure);
+    /// Create a new filter
+    pub fn create_filter(
+        &mut self,
+        name: String,
+        default_action: SeccompAction,
+        architecture: String,
+    ) -> Result<(), &'static str> {
+        if self.filters.contains_key(&name) {
+            return Err("Filter already exists");
+        }
+
+        let filter = SeccompFilter::new(name.clone(), default_action, architecture);
+        self.filters.insert(name, filter);
+
+        Ok(())
+    }
+
+    /// Delete a filter
+    pub fn delete_filter(&mut self, name: &str) -> Result<(), &'static str> {
+        if self.active_filter.as_ref() == Some(&name.to_string()) {
+            return Err("Cannot delete active filter");
+        }
+
+        if self.filters.remove(name).is_some() {
+            Ok(())
+        } else {
+            Err("Filter not found")
+        }
+    }
+
+    /// Get a filter
+    pub fn get_filter(&self, name: &str) -> Option<&SeccompFilter> {
+        self.filters.get(name)
+    }
+
+    /// Get mutable filter
+    pub fn get_filter_mut(&mut self, name: &str) -> Option<&mut SeccompFilter> {
+        self.filters.get_mut(name)
+    }
+
+    /// Set active filter
+    pub fn set_active_filter(&mut self, name: String) -> Result<(), &'static str> {
+        if !self.filters.contains_key(&name) {
+            return Err("Filter not found");
+        }
+
+        self.active_filter = Some(name);
+        Ok(())
+    }
+
+    /// Filter a syscall using active filter
+    pub fn filter_syscall(&self, syscall_number: u64, args: &[u64]) -> SeccompAction {
+        if let Some(ref active_name) = self.active_filter {
+            if let Some(filter) = self.filters.get(active_name) {
+                return filter.filter_syscall(syscall_number, args);
             }
             SeccompCompareOp::Lt | SeccompCompareOp::Le => {
                 let equal = asm.new_label();
@@ -468,6 +562,48 @@ fn emit_arg_comparison(
             SeccompCompareOp::Lt => asm.branch(BpfInstruction::jge(0, 0, low), failure, success),
             SeccompCompareOp::Le => asm.branch(BpfInstruction::jgt(0, 0, low), failure, success),
             SeccompCompareOp::MaskedEq => unreachable!(),
+
+        // No active filter - allow by default
+        SeccompAction::Allow
+    }
+
+    /// Get active filter name
+    pub fn active_filter(&self) -> Option<&str> {
+        self.active_filter.as_deref()
+    }
+
+    /// Get filter count
+    pub fn filter_count(&self) -> usize {
+        self.filters.len()
+    }
+
+    /// List all filters
+    pub fn list_filters(&self) -> Vec<String> {
+        self.filters.keys().cloned().collect()
+    }
+
+    /// Create a strict filter (deny all except allowed)
+    pub fn create_strict_filter(
+        &mut self,
+        name: String,
+        allowed_syscalls: Vec<u64>,
+    ) -> Result<(), &'static str> {
+        self.create_filter(
+            name.clone(),
+            SeccompAction::KillProcess,
+            "x86_64".to_string(),
+        )?;
+
+        let filter = self.get_filter_mut(&name).unwrap();
+
+        // Add allow rules for allowed syscalls
+        for syscall_num in allowed_syscalls {
+            let rule = SeccompRule {
+                syscall_number: syscall_num,
+                action: SeccompAction::Allow,
+                arg_filters: Vec::new(),
+            };
+            filter.add_rule(rule);
         }
     }
     asm.mark(success);
@@ -512,6 +648,41 @@ mod tests {
             SeccompAction::from_u32(0x7fff0000),
             Some(SeccompAction::Allow)
         );
+    fn test_create_filter() {
+        let mut manager = SeccompManager::new();
+
+        assert!(manager
+            .create_filter(
+                "test".to_string(),
+                SeccompAction::KillProcess,
+                "x86_64".to_string()
+            )
+            .is_ok());
+        assert_eq!(manager.filter_count(), 1);
+    }
+
+    #[test]
+    fn test_add_rule() {
+        let mut manager = SeccompManager::new();
+
+        manager
+            .create_filter(
+                "test".to_string(),
+                SeccompAction::KillProcess,
+                "x86_64".to_string(),
+            )
+            .unwrap();
+
+        let rule = SeccompRule {
+            syscall_number: 1,
+            action: SeccompAction::Allow,
+            arg_filters: Vec::new(),
+        };
+
+        let filter = manager.get_filter_mut("test").unwrap();
+        filter.add_rule(rule);
+
+        assert_eq!(filter.rule_count(), 1);
     }
 
     #[test]
@@ -547,6 +718,92 @@ mod tests {
         let compiler = SeccompCompiler::new(SeccompAction::Kill);
         assert_eq!(compiler.rule_count(), 0);
         assert_eq!(compiler.default_action, SeccompAction::Kill);
+        manager
+            .create_filter(
+                "test".to_string(),
+                SeccompAction::KillProcess,
+                "x86_64".to_string(),
+            )
+            .unwrap();
+
+        let rule = SeccompRule {
+            syscall_number: 1,
+            action: SeccompAction::Allow,
+            arg_filters: Vec::new(),
+        };
+
+        let filter = manager.get_filter_mut("test").unwrap();
+        filter.add_rule(rule);
+
+        let action = filter.filter_syscall(1, &[]);
+        assert_eq!(action, SeccompAction::Allow);
+
+        let action = filter.filter_syscall(2, &[]);
+        assert_eq!(action, SeccompAction::KillProcess);
+    }
+
+    #[test]
+    fn test_arg_filter() {
+        let mut manager = SeccompManager::new();
+
+        manager
+            .create_filter(
+                "test".to_string(),
+                SeccompAction::KillProcess,
+                "x86_64".to_string(),
+            )
+            .unwrap();
+
+        let arg_filter = SeccompArgFilter {
+            arg_num: 0,
+            op: SeccompCmpOp::Equal,
+            value: 100,
+            value_mask: u64::MAX,
+        };
+
+        let rule = SeccompRule {
+            syscall_number: 1,
+            action: SeccompAction::Allow,
+            arg_filters: vec![arg_filter],
+        };
+
+        let filter = manager.get_filter_mut("test").unwrap();
+        filter.add_rule(rule);
+
+        let action = filter.filter_syscall(1, &[100]);
+        assert_eq!(action, SeccompAction::Allow);
+
+        let action = filter.filter_syscall(1, &[200]);
+        assert_eq!(action, SeccompAction::KillProcess);
+    }
+
+    #[test]
+    fn test_set_active_filter() {
+        let mut manager = SeccompManager::new();
+
+        manager
+            .create_filter(
+                "test".to_string(),
+                SeccompAction::KillProcess,
+                "x86_64".to_string(),
+            )
+            .unwrap();
+        assert!(manager.set_active_filter("test".to_string()).is_ok());
+
+        assert_eq!(manager.active_filter(), Some("test"));
+    }
+
+    #[test]
+    fn test_strict_filter() {
+        let mut manager = SeccompManager::new();
+
+        assert!(manager
+            .create_strict_filter("strict".to_string(), vec![1, 2, 3])
+            .is_ok());
+
+        let filter = manager.get_filter("strict").unwrap();
+        assert_eq!(filter.default_action, SeccompAction::KillProcess);
+        assert_eq!(filter.rule_count(), 3);
     }
 
     #[test]
@@ -564,6 +821,13 @@ mod tests {
         assert!(!instructions.is_empty());
         assert!(compiler.instruction_count() > 0);
     }
+        manager
+            .create_filter(
+                "test".to_string(),
+                SeccompAction::KillProcess,
+                "x86_64".to_string(),
+            )
+            .unwrap();
 
     #[test]
     fn test_seccomp_compiler_compile_with_args() {

@@ -163,15 +163,28 @@ impl UniversalShellScriptTranspiler {
         }
 
         // Signature heuristics
-        if script.contains("config.fish") || script.contains("fish_add_path") || script.contains("string replace") {
+        if script.contains("config.fish")
+            || script.contains("fish_add_path")
+            || script.contains("string replace")
+        {
             ShellSystemFormat::Fish
-        } else if script.contains("setenv ") || script.contains("endsw") || script.contains("foreach ") {
+        } else if script.contains("setenv ")
+            || script.contains("endsw")
+            || script.contains("foreach ")
+        {
             ShellSystemFormat::Tcsh
-        } else if script.contains("Get-Process") || script.contains("Get-ChildItem") || script.contains("$env:") {
+        } else if script.contains("Get-Process")
+            || script.contains("Get-ChildItem")
+            || script.contains("$env:")
+        {
             ShellSystemFormat::PowerShell
         } else if script.contains("where size >") || script.contains("ls | sort-by") {
             ShellSystemFormat::Nushell
-        } else if script.contains("fn ") && script.contains("{") && script.contains("}") && script.contains("var ") {
+        } else if script.contains("fn ")
+            && script.contains("{")
+            && script.contains("}")
+            && script.contains("var ")
+        {
             ShellSystemFormat::Elvish
         } else if script.contains("${(U)") || script.contains("${(L)") {
             ShellSystemFormat::Zsh
@@ -200,10 +213,14 @@ impl UniversalShellScriptTranspiler {
             }
 
             let translated = match format {
-                ShellSystemFormat::Fish => Self::transpile_fish_line(line, &mut in_function, &mut exported_vars),
+                ShellSystemFormat::Fish => {
+                    Self::transpile_fish_line(line, &mut in_function, &mut exported_vars)
+                }
                 ShellSystemFormat::Tcsh => Self::transpile_tcsh_line(line, &mut exported_vars),
                 ShellSystemFormat::Ksh => Self::transpile_ksh_line(line, &mut exported_vars),
-                ShellSystemFormat::PowerShell => Self::transpile_pwsh_line(line, &mut exported_vars),
+                ShellSystemFormat::PowerShell => {
+                    Self::transpile_pwsh_line(line, &mut exported_vars)
+                }
                 ShellSystemFormat::Nushell => Self::transpile_nu_line(line),
                 ShellSystemFormat::Rc => Self::transpile_rc_line(line, &mut exported_vars),
                 ShellSystemFormat::Ion => Self::transpile_ion_line(line, &mut exported_vars),
@@ -211,7 +228,9 @@ impl UniversalShellScriptTranspiler {
                 ShellSystemFormat::Xonsh => Self::transpile_xonsh_line(line, &mut exported_vars),
                 ShellSystemFormat::Oil => Self::transpile_oil_line(line, &mut exported_vars),
                 ShellSystemFormat::Zsh => Self::transpile_zsh_line(line, &mut exported_vars),
-                ShellSystemFormat::Bash | ShellSystemFormat::Dash => Self::transpile_bash_posix_line(line, &mut exported_vars),
+                ShellSystemFormat::Bash | ShellSystemFormat::Dash => {
+                    Self::transpile_bash_posix_line(line, &mut exported_vars)
+                }
             };
 
             posix_lines.push(translated);
@@ -228,19 +247,29 @@ impl UniversalShellScriptTranspiler {
         }
     }
 
-    fn transpile_fish_line(line: &str, in_func: &mut bool, vars: &mut BTreeMap<String, String>) -> String {
+    fn transpile_fish_line(
+        line: &str,
+        in_func: &mut bool,
+        vars: &mut BTreeMap<String, String>,
+    ) -> String {
         let l = line.to_string();
 
         if l == "begin" {
             return "{".to_string();
         }
         if l.starts_with("fish_add_path ") {
-            let path = l.trim_start_matches("fish_add_path ").trim().trim_matches('"').trim_matches('\'');
+            let path = l
+                .trim_start_matches("fish_add_path ")
+                .trim()
+                .trim_matches('"')
+                .trim_matches('\'');
             vars.insert("PATH".to_string(), format!("{}:$PATH", path));
             return format!("export PATH=\"{}:$PATH\"", path);
         }
         if l.starts_with("set -gx ") || l.starts_with("set -x ") {
-            let rest = l.trim_start_matches("set -gx ").trim_start_matches("set -x ");
+            let rest = l
+                .trim_start_matches("set -gx ")
+                .trim_start_matches("set -x ");
             if let Some(space) = rest.find(' ') {
                 let key = rest[..space].trim();
                 let val = rest[space + 1..].trim();
@@ -261,7 +290,11 @@ impl UniversalShellScriptTranspiler {
             }
         }
         if l.starts_with("math ") {
-            let expr = l.trim_start_matches("math ").trim().trim_matches('"').trim_matches('\'');
+            let expr = l
+                .trim_start_matches("math ")
+                .trim()
+                .trim_matches('"')
+                .trim_matches('\'');
             return format!("echo $(( {} ))", expr);
         }
         if l.starts_with("function ") {
@@ -305,7 +338,11 @@ impl UniversalShellScriptTranspiler {
         }
         if l.starts_with("set path = (") {
             if let (Some(open), Some(close)) = (l.find('('), l.find(')')) {
-                let items = l[open + 1..close].trim().split_whitespace().collect::<Vec<&str>>().join(":");
+                let items = l[open + 1..close]
+                    .trim()
+                    .split_whitespace()
+                    .collect::<Vec<&str>>()
+                    .join(":");
                 vars.insert("PATH".to_string(), items.clone());
                 return format!("export PATH=\"{}\"", items);
             }
@@ -337,7 +374,8 @@ impl UniversalShellScriptTranspiler {
         let l = line.to_string();
 
         if l.starts_with("typeset ") || l.starts_with("integer ") {
-            let rest = l.trim_start_matches("typeset ")
+            let rest = l
+                .trim_start_matches("typeset ")
                 .trim_start_matches("-i ")
                 .trim_start_matches("integer ")
                 .trim();
@@ -382,7 +420,12 @@ impl UniversalShellScriptTranspiler {
             return l.replace("Get-Content", "cat");
         }
         if l.starts_with("Write-Output") || l.starts_with("Write-Host") {
-            return format!("echo {}", l.trim_start_matches("Write-Output").trim_start_matches("Write-Host").trim());
+            return format!(
+                "echo {}",
+                l.trim_start_matches("Write-Output")
+                    .trim_start_matches("Write-Host")
+                    .trim()
+            );
         }
         l
     }
@@ -448,7 +491,10 @@ impl UniversalShellScriptTranspiler {
     fn transpile_elvish_line(line: &str, vars: &mut BTreeMap<String, String>) -> String {
         let l = line.to_string();
         if l.starts_with("var ") || l.starts_with("set ") {
-            let rest = l.trim_start_matches("var ").trim_start_matches("set ").trim();
+            let rest = l
+                .trim_start_matches("var ")
+                .trim_start_matches("set ")
+                .trim();
             if let Some(eq) = rest.find('=') {
                 let k = rest[..eq].trim();
                 let v = rest[eq + 1..].trim();
@@ -481,7 +527,10 @@ impl UniversalShellScriptTranspiler {
     fn transpile_oil_line(line: &str, vars: &mut BTreeMap<String, String>) -> String {
         let l = line.to_string();
         if l.starts_with("var ") || l.starts_with("const ") {
-            let rest = l.trim_start_matches("var ").trim_start_matches("const ").trim();
+            let rest = l
+                .trim_start_matches("var ")
+                .trim_start_matches("const ")
+                .trim();
             if let Some(eq) = rest.find('=') {
                 let k = rest[..eq].trim();
                 let v = rest[eq + 1..].trim();
@@ -535,7 +584,13 @@ impl UniversalShellScriptTranspiler {
         let mut stages = Vec::new();
         for line in script.lines() {
             let l = line.trim();
-            if l.is_empty() || l.starts_with('#') || l.starts_with('{') || l == "}" || l == "done" || l == "fi" {
+            if l.is_empty()
+                || l.starts_with('#')
+                || l.starts_with('{')
+                || l == "}"
+                || l == "done"
+                || l == "fi"
+            {
                 continue;
             }
 
@@ -573,11 +628,11 @@ impl UniversalShellScriptTranspiler {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum OptionStyle {
-    GnuLong,        // --color=auto, --extended-regexp
+    GnuLong,          // --color=auto, --extended-regexp
     BsdShortCombined, // aux, xvf, -G
-    PosixSingleDash, // -la, -rn
-    PowerShellCmdlet,// Get-Process, Select-Object -Property
-    NushellQuery,    // where size > 1MB
+    PosixSingleDash,  // -la, -rn
+    PowerShellCmdlet, // Get-Process, Select-Object -Property
+    NushellQuery,     // where size > 1MB
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -699,7 +754,10 @@ pub struct UniversalShellConfigLoader;
 
 impl UniversalShellConfigLoader {
     /// Loads and merges shell config files (`.bashrc`, `.zshrc`, `config.fish`, `.tcshrc`, `.kshrc`, `config.nu`, `.profile`, `.envrc`, `.ps1`)
-    pub fn parse_config_content(content: &str, format: ShellSystemFormat) -> SovereignUniversalShellContext {
+    pub fn parse_config_content(
+        content: &str,
+        format: ShellSystemFormat,
+    ) -> SovereignUniversalShellContext {
         let mut ctx = SovereignUniversalShellContext::default();
 
         for line in content.lines() {
@@ -709,13 +767,17 @@ impl UniversalShellConfigLoader {
             }
 
             match format {
-                ShellSystemFormat::Bash | ShellSystemFormat::Zsh | ShellSystemFormat::Dash | ShellSystemFormat::Ksh => {
+                ShellSystemFormat::Bash
+                | ShellSystemFormat::Zsh
+                | ShellSystemFormat::Dash
+                | ShellSystemFormat::Ksh => {
                     if l.starts_with("export ") {
                         let rest = l[7..].trim();
                         if let Some(eq) = rest.find('=') {
                             let k = rest[..eq].trim();
                             let v = rest[eq + 1..].trim().trim_matches('"').trim_matches('\'');
-                            ctx.environment_variables.insert(k.to_string(), v.to_string());
+                            ctx.environment_variables
+                                .insert(k.to_string(), v.to_string());
                             if k == "PATH" {
                                 for p in v.split(':') {
                                     ctx.path_directories.push(p.to_string());
@@ -727,7 +789,8 @@ impl UniversalShellConfigLoader {
                         if let Some(eq) = rest.find('=') {
                             let alias_name = rest[..eq].trim();
                             let target = rest[eq + 1..].trim().trim_matches('"').trim_matches('\'');
-                            ctx.aliases.insert(alias_name.to_string(), target.to_string());
+                            ctx.aliases
+                                .insert(alias_name.to_string(), target.to_string());
                         }
                     } else if l.starts_with("PS1=") {
                         let prompt = l[4..].trim().trim_matches('"').trim_matches('\'');
@@ -736,17 +799,26 @@ impl UniversalShellConfigLoader {
                 }
                 ShellSystemFormat::Fish => {
                     if l.starts_with("set -gx ") || l.starts_with("set -x ") {
-                        let rest = l.trim_start_matches("set -gx ").trim_start_matches("set -x ");
+                        let rest = l
+                            .trim_start_matches("set -gx ")
+                            .trim_start_matches("set -x ");
                         if let Some(space) = rest.find(' ') {
                             let k = rest[..space].trim();
-                            let v = rest[space + 1..].trim().trim_matches('"').trim_matches('\'');
-                            ctx.environment_variables.insert(k.to_string(), v.to_string());
+                            let v = rest[space + 1..]
+                                .trim()
+                                .trim_matches('"')
+                                .trim_matches('\'');
+                            ctx.environment_variables
+                                .insert(k.to_string(), v.to_string());
                         }
                     } else if l.starts_with("alias ") {
                         let rest = l[6..].trim();
                         if let Some(space) = rest.find(' ') {
                             let k = rest[..space].trim();
-                            let v = rest[space + 1..].trim().trim_matches('"').trim_matches('\'');
+                            let v = rest[space + 1..]
+                                .trim()
+                                .trim_matches('"')
+                                .trim_matches('\'');
                             ctx.aliases.insert(k.to_string(), v.to_string());
                         }
                     }
@@ -756,7 +828,8 @@ impl UniversalShellConfigLoader {
                         let rest = l[7..].trim();
                         let parts: Vec<&str> = rest.split_whitespace().collect();
                         if parts.len() >= 2 {
-                            ctx.environment_variables.insert(parts[0].to_string(), parts[1..].join(" "));
+                            ctx.environment_variables
+                                .insert(parts[0].to_string(), parts[1..].join(" "));
                         }
                     } else if l.starts_with("alias ") {
                         let rest = l[6..].trim();
@@ -773,13 +846,15 @@ impl UniversalShellConfigLoader {
                         if let Some(eq) = rest.find('=') {
                             let k = rest[..eq].trim();
                             let v = rest[eq + 1..].trim().trim_matches('"').trim_matches('\'');
-                            ctx.environment_variables.insert(k.to_string(), v.to_string());
+                            ctx.environment_variables
+                                .insert(k.to_string(), v.to_string());
                         }
                     } else if l.starts_with("Set-Alias ") {
                         let rest = l[10..].trim();
                         let parts: Vec<&str> = rest.split_whitespace().collect();
                         if parts.len() >= 2 {
-                            ctx.aliases.insert(parts[0].to_string(), parts[1].to_string());
+                            ctx.aliases
+                                .insert(parts[0].to_string(), parts[1].to_string());
                         }
                     }
                 }
@@ -787,7 +862,8 @@ impl UniversalShellConfigLoader {
                     if let Some(eq) = l.find('=') {
                         let k = l[..eq].trim();
                         let v = l[eq + 1..].trim().trim_matches('"').trim_matches('\'');
-                        ctx.environment_variables.insert(k.to_string(), v.to_string());
+                        ctx.environment_variables
+                            .insert(k.to_string(), v.to_string());
                     }
                 }
             }
@@ -810,9 +886,15 @@ pub struct SovereignUniversalCliShellSystemEngine {
 impl SovereignUniversalCliShellSystemEngine {
     pub fn new(format: ShellSystemFormat) -> Self {
         let mut context = SovereignUniversalShellContext::default();
-        context.environment_variables.insert("USER".to_string(), "sovereign".to_string());
-        context.environment_variables.insert("HOSTNAME".to_string(), "sigmaos".to_string());
-        context.environment_variables.insert("SHELL".to_string(), "/bin/sigma-sh".to_string());
+        context
+            .environment_variables
+            .insert("USER".to_string(), "sovereign".to_string());
+        context
+            .environment_variables
+            .insert("HOSTNAME".to_string(), "sigmaos".to_string());
+        context
+            .environment_variables
+            .insert("SHELL".to_string(), "/bin/sigma-sh".to_string());
         context.prompt_template = "%n@%m:%~ %# ".to_string();
 
         Self {
@@ -852,8 +934,18 @@ impl SovereignUniversalCliShellSystemEngine {
 
     /// Renders custom prompt for the active format
     pub fn render_prompt(&self) -> String {
-        let user = self.context.environment_variables.get("USER").cloned().unwrap_or("sovereign".to_string());
-        let host = self.context.environment_variables.get("HOSTNAME").cloned().unwrap_or("sigmaos".to_string());
+        let user = self
+            .context
+            .environment_variables
+            .get("USER")
+            .cloned()
+            .unwrap_or("sovereign".to_string());
+        let host = self
+            .context
+            .environment_variables
+            .get("HOSTNAME")
+            .cloned()
+            .unwrap_or("sigmaos".to_string());
         format!("{}@{}:~# ", user, host)
     }
 }
@@ -875,31 +967,52 @@ mod tests {
     #[test]
     fn test_shell_system_format_detection() {
         let bash_script = "#!/bin/bash\necho hello";
-        assert_eq!(UniversalShellScriptTranspiler::detect_format(bash_script), ShellSystemFormat::Bash);
+        assert_eq!(
+            UniversalShellScriptTranspiler::detect_format(bash_script),
+            ShellSystemFormat::Bash
+        );
 
         let fish_script = "#!/usr/bin/env fish\nset -gx PATH /bin";
-        assert_eq!(UniversalShellScriptTranspiler::detect_format(fish_script), ShellSystemFormat::Fish);
+        assert_eq!(
+            UniversalShellScriptTranspiler::detect_format(fish_script),
+            ShellSystemFormat::Fish
+        );
 
         let tcsh_script = "#!/bin/tcsh\nsetenv PORT 8080";
-        assert_eq!(UniversalShellScriptTranspiler::detect_format(tcsh_script), ShellSystemFormat::Tcsh);
+        assert_eq!(
+            UniversalShellScriptTranspiler::detect_format(tcsh_script),
+            ShellSystemFormat::Tcsh
+        );
 
         let pwsh_script = "$env:NODE_ENV = 'production'\nGet-Process";
-        assert_eq!(UniversalShellScriptTranspiler::detect_format(pwsh_script), ShellSystemFormat::PowerShell);
+        assert_eq!(
+            UniversalShellScriptTranspiler::detect_format(pwsh_script),
+            ShellSystemFormat::PowerShell
+        );
 
         let nu_script = "ls | where size > 100K";
-        assert_eq!(UniversalShellScriptTranspiler::detect_format(nu_script), ShellSystemFormat::Nushell);
+        assert_eq!(
+            UniversalShellScriptTranspiler::detect_format(nu_script),
+            ShellSystemFormat::Nushell
+        );
     }
 
     #[test]
     fn test_fish_script_transpilation() {
-        let script = "#!/usr/bin/env fish\nfish_add_path /opt/bin\nset -gx PORT 8080\nmath \"5 * 10\"";
+        let script =
+            "#!/usr/bin/env fish\nfish_add_path /opt/bin\nset -gx PORT 8080\nmath \"5 * 10\"";
         let plan = UniversalShellScriptTranspiler::transpile_script(script);
 
         assert_eq!(plan.target_format, ShellSystemFormat::Fish);
-        assert!(plan.posix_sh_script.contains("export PATH=\"/opt/bin:$PATH\""));
+        assert!(plan
+            .posix_sh_script
+            .contains("export PATH=\"/opt/bin:$PATH\""));
         assert!(plan.posix_sh_script.contains("export PORT=8080"));
         assert!(plan.posix_sh_script.contains("echo $(( 5 * 10 ))"));
-        assert_eq!(plan.exported_variables.get("PORT"), Some(&"8080".to_string()));
+        assert_eq!(
+            plan.exported_variables.get("PORT"),
+            Some(&"8080".to_string())
+        );
     }
 
     #[test]
@@ -909,7 +1022,9 @@ mod tests {
 
         assert_eq!(plan.target_format, ShellSystemFormat::Tcsh);
         assert!(plan.posix_sh_script.contains("export HOST=myhost"));
-        assert!(plan.posix_sh_script.contains("export PATH=\"/usr/bin:/bin\""));
+        assert!(plan
+            .posix_sh_script
+            .contains("export PATH=\"/usr/bin:/bin\""));
         assert!(plan.posix_sh_script.contains("x=$(( 10 + 20 ))"));
     }
 
@@ -934,7 +1049,10 @@ mod tests {
 
         let tar_bsd = UniversalCliOptionTranslator::translate_command("tar xvf archive.tar");
         assert_eq!(tar_bsd.canonical_command, "tar");
-        assert_eq!(tar_bsd.translated_args, vec!["-x", "-v", "-f", "archive.tar"]);
+        assert_eq!(
+            tar_bsd.translated_args,
+            vec!["-x", "-v", "-f", "archive.tar"]
+        );
 
         let pwsh_proc = UniversalCliOptionTranslator::translate_command("Get-Process");
         assert_eq!(pwsh_proc.canonical_command, "ps");
@@ -943,13 +1061,21 @@ mod tests {
     #[test]
     fn test_config_loader_parsing() {
         let bash_config = "export EDITOR=vim\nalias ll='ls -la'\nPS1='\\u@\\h:\\w\\$ '";
-        let ctx_bash = UniversalShellConfigLoader::parse_config_content(bash_config, ShellSystemFormat::Bash);
-        assert_eq!(ctx_bash.environment_variables.get("EDITOR"), Some(&"vim".to_string()));
+        let ctx_bash =
+            UniversalShellConfigLoader::parse_config_content(bash_config, ShellSystemFormat::Bash);
+        assert_eq!(
+            ctx_bash.environment_variables.get("EDITOR"),
+            Some(&"vim".to_string())
+        );
         assert_eq!(ctx_bash.aliases.get("ll"), Some(&"ls -la".to_string()));
 
         let tcsh_config = "setenv LANG C.UTF-8\nalias dir ls -l";
-        let ctx_tcsh = UniversalShellConfigLoader::parse_config_content(tcsh_config, ShellSystemFormat::Tcsh);
-        assert_eq!(ctx_tcsh.environment_variables.get("LANG"), Some(&"C.UTF-8".to_string()));
+        let ctx_tcsh =
+            UniversalShellConfigLoader::parse_config_content(tcsh_config, ShellSystemFormat::Tcsh);
+        assert_eq!(
+            ctx_tcsh.environment_variables.get("LANG"),
+            Some(&"C.UTF-8".to_string())
+        );
         assert_eq!(ctx_tcsh.aliases.get("dir"), Some(&"ls -l".to_string()));
     }
 

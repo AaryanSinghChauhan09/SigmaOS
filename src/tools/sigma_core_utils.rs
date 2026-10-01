@@ -3,7 +3,6 @@ use std::boxed::Box;
 // Exposes robust, memory-safe Rust alternatives to BusyBox, systemd, syslog, cron, sudo/doas, and man pages.
 // Aligns perfectly with the core Sovereign replacement table.
 
-
 use std::collections::{BTreeMap as HashMap, BTreeSet as HashSet};
 use std::format;
 use std::string::{String, ToString};
@@ -155,9 +154,7 @@ impl SovereignDocBrowser {
             "sigma-priv: Capability-based privilege manager (replaces sudo/doas).\nUsage: sigma-priv exec <capability> <command>".to_string(),
         );
 
-        Self {
-            doc_pages: pages,
-        }
+        Self { doc_pages: pages }
     }
 
     pub fn fetch_tldr_guide(&self, command: &str) -> Option<&str> {
@@ -192,12 +189,14 @@ impl SovereignCoreUtils {
         if self.virtual_filesystem.contains_key(path) {
             return Err("Directory or file already exists");
         }
-        self.virtual_filesystem.insert(path.to_string(), "DIR".to_string());
+        self.virtual_filesystem
+            .insert(path.to_string(), "DIR".to_string());
         Ok(())
     }
 
     pub fn execute_touch(&mut self, path: &str) -> Result<(), &'static str> {
-        self.virtual_filesystem.insert(path.to_string(), String::new());
+        self.virtual_filesystem
+            .insert(path.to_string(), String::new());
         Ok(())
     }
 }
@@ -225,7 +224,8 @@ impl SovereignShell {
     }
 
     pub fn register_alias(&mut self, shortcut: &str, expansion: &str) {
-        self.aliases.insert(shortcut.to_string(), expansion.to_string());
+        self.aliases
+            .insert(shortcut.to_string(), expansion.to_string());
     }
 
     pub fn evaluate_input(&self, input: &str) -> String {
@@ -267,9 +267,15 @@ impl SovereignInitSystem {
     }
 
     pub fn get_boot_report(&self) -> String {
-        let mut report = format!("=== INIT BOOT REPORT (Supervisor: {:?}) ===\n", self.active_supervisor);
+        let mut report = format!(
+            "=== INIT BOOT REPORT (Supervisor: {:?}) ===\n",
+            self.active_supervisor
+        );
         for service in &self.booted_services {
-            report.push_str(&format!("  [OK] Service '{}' spawned successfully\n", service));
+            report.push_str(&format!(
+                "  [OK] Service '{}' spawned successfully\n",
+                service
+            ));
         }
         report
     }
@@ -283,8 +289,16 @@ mod tests {
     fn test_sovereign_logger() {
         let mut logger = SovereignLogger::new(2);
         logger.log_event(SovereignLogLevel::Info, 100, "VFS subsystem loaded");
-        logger.log_event(SovereignLogLevel::Warning, 105, "Low memory threshold warning");
-        logger.log_event(SovereignLogLevel::Critical, 110, "PCI device panic triggered");
+        logger.log_event(
+            SovereignLogLevel::Warning,
+            105,
+            "Low memory threshold warning",
+        );
+        logger.log_event(
+            SovereignLogLevel::Critical,
+            110,
+            "PCI device panic triggered",
+        );
 
         // Info should have been rotated since capacity is 2
         let critical_logs = logger.query_logs_by_level(SovereignLogLevel::Critical);
@@ -325,7 +339,10 @@ mod tests {
     fn test_sovereign_doc_browser() {
         let browser = SovereignDocBrowser::new();
         assert!(browser.fetch_tldr_guide("sigma-sh").is_some());
-        assert!(browser.fetch_tldr_guide("sigma-sh").unwrap().contains("Sovereign shell replacement"));
+        assert!(browser
+            .fetch_tldr_guide("sigma-sh")
+            .unwrap()
+            .contains("Sovereign shell replacement"));
         assert!(browser.fetch_tldr_guide("nonexistent").is_none());
     }
 
@@ -344,7 +361,10 @@ mod tests {
         let mut sh = SovereignShell::new("dr_aaryan");
         sh.register_alias("ll", "ls -la");
 
-        assert_eq!(sh.evaluate_input("ll"), "Expanding alias 'll' -> executing 'ls -la'");
+        assert_eq!(
+            sh.evaluate_input("ll"),
+            "Expanding alias 'll' -> executing 'ls -la'"
+        );
         assert_eq!(sh.evaluate_input("pwd"), "Executing shell command: 'pwd'");
     }
 

@@ -143,11 +143,17 @@ impl OmarchyExpandedTheme {
     }
 
     pub fn is_light_theme(&self) -> bool {
-        matches!(self, Self::FlexokiLight | Self::CatppuccinLatte | Self::White)
+        matches!(
+            self,
+            Self::FlexokiLight | Self::CatppuccinLatte | Self::White
+        )
     }
 
     pub fn unlock_preview_asset(&self) -> String {
-        format!("/usr/share/omarchy/themes/{}/preview-unlock.png", self.name())
+        format!(
+            "/usr/share/omarchy/themes/{}/preview-unlock.png",
+            self.name()
+        )
     }
 }
 
@@ -192,7 +198,8 @@ impl OmarchyHotkeyThemeTriggerEngine {
                 "Launched Omarchy Direct Theme Selector (Super+Ctrl+Shift+Space)".to_string()
             }
             OmarchyThemeHotkeyAction::CycleWallpaperBackground => {
-                self.active_wallpaper_index = (self.active_wallpaper_index + 1) % self.available_wallpapers.len();
+                self.active_wallpaper_index =
+                    (self.active_wallpaper_index + 1) % self.available_wallpapers.len();
                 format!(
                     "Switched background wallpaper to '{}' for theme '{}' (Super+Ctrl+Space)",
                     self.available_wallpapers[self.active_wallpaper_index],
@@ -303,15 +310,24 @@ impl SovereignOmarchyThemeUnlockSuite {
         results.insert("omarchy_22_themes_catalog".to_string(), theme_count == 22);
 
         // 2. Hotkeys check
-        let hotkey_msg = self.hotkey_trigger.handle_hotkey_trigger(OmarchyThemeHotkeyAction::CycleWallpaperBackground);
-        results.insert("omarchy_theme_hotkeys".to_string(), hotkey_msg.contains("wallpaper-02.png"));
+        let hotkey_msg = self
+            .hotkey_trigger
+            .handle_hotkey_trigger(OmarchyThemeHotkeyAction::CycleWallpaperBackground);
+        results.insert(
+            "omarchy_theme_hotkeys".to_string(),
+            hotkey_msg.contains("wallpaper-02.png"),
+        );
 
         // 3. Boot Unlock check
-        let unlock_msg = self.boot_unlock.apply_boot_unlock_theme(OmarchyExpandedTheme::Catppuccin);
+        let unlock_msg = self
+            .boot_unlock
+            .apply_boot_unlock_theme(OmarchyExpandedTheme::Catppuccin);
         let plymouth_script = self.boot_unlock.generate_plymouth_theme_script();
         results.insert(
             "omarchy_boot_unlock_decryption".to_string(),
-            unlock_msg.contains("catppuccin") && plymouth_script.contains("catppuccin") && self.boot_unlock.active_boot_unlock.is_plymouth_applied,
+            unlock_msg.contains("catppuccin")
+                && plymouth_script.contains("catppuccin")
+                && self.boot_unlock.active_boot_unlock.is_plymouth_applied,
         );
 
         results
@@ -362,7 +378,9 @@ mod tests {
         assert_eq!(themes.len(), 22);
         assert!(OmarchyExpandedTheme::FlexokiLight.is_light_theme());
         assert!(!OmarchyExpandedTheme::TokyoNight.is_light_theme());
-        assert!(OmarchyExpandedTheme::Nord.unlock_preview_asset().contains("nord/preview-unlock.png"));
+        assert!(OmarchyExpandedTheme::Nord
+            .unlock_preview_asset()
+            .contains("nord/preview-unlock.png"));
     }
 
     #[test]
@@ -371,7 +389,8 @@ mod tests {
         let msg = engine.handle_hotkey_trigger(OmarchyThemeHotkeyAction::OpenThemeSelectorDirect);
         assert!(msg.contains("Super+Ctrl+Shift+Space"));
 
-        let wall_msg = engine.handle_hotkey_trigger(OmarchyThemeHotkeyAction::CycleWallpaperBackground);
+        let wall_msg =
+            engine.handle_hotkey_trigger(OmarchyThemeHotkeyAction::CycleWallpaperBackground);
         assert!(wall_msg.contains("wallpaper-02.png"));
     }
 
@@ -394,7 +413,11 @@ mod tests {
         let health = suite.verify_suite();
         assert_eq!(health.len(), 3);
         for (k, v) in health {
-            assert!(v, "Omarchy theme unlock suite health check failed for: {}", k);
+            assert!(
+                v,
+                "Omarchy theme unlock suite health check failed for: {}",
+                k
+            );
         }
     }
 }

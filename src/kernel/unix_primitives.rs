@@ -28,9 +28,9 @@
 //! - SMR (safe memory reclamation epochs)
 use std::vec;
 
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 use core::cmp::Ordering as CmpOrdering;
 use core::sync::atomic::{AtomicBool, AtomicI32, AtomicU32, AtomicU64, AtomicUsize, Ordering};
@@ -500,7 +500,8 @@ impl FutexTable {
         if current_val != expected {
             return Err(FutexError::WouldBlock);
         }
-        self.bucket_mut(uaddr).push(FutexWaiter { pid, uaddr, bitset });
+        self.bucket_mut(uaddr)
+            .push(FutexWaiter { pid, uaddr, bitset });
         Ok(())
     }
 
@@ -1286,7 +1287,13 @@ impl CalloutWheel {
         self.ticks
     }
 
-    pub fn reset(&mut self, ticks_from_now: u64, period: Option<u64>, func: CalloutFn, arg: u64) -> u64 {
+    pub fn reset(
+        &mut self,
+        ticks_from_now: u64,
+        period: Option<u64>,
+        func: CalloutFn,
+        arg: u64,
+    ) -> u64 {
         let id = self.next_id;
         self.next_id += 1;
         self.callouts.push(Callout {
@@ -1419,7 +1426,7 @@ impl Sbuf {
             return Err("sbuf overflow");
         }
         self.finished = true;
-        core:: String::from_utf8(&self.buf).map_err(|_| "sbuf invalid utf8")
+        core::String::from_utf8(&self.buf).map_err(|_| "sbuf invalid utf8")
     }
 
     pub fn as_bytes(&self) -> &[u8] {
@@ -1434,7 +1441,7 @@ impl Sbuf {
 fn int_to_str(mut v: i64, buf: &mut [u8; 32]) -> &str {
     if v == 0 {
         buf[0] = b'0';
-        return core:: String::from_utf8(&buf[..1]).unwrap();
+        return core::String::from_utf8(&buf[..1]).unwrap();
     }
     let neg = v < 0;
     if neg {
@@ -1450,7 +1457,7 @@ fn int_to_str(mut v: i64, buf: &mut [u8; 32]) -> &str {
         i -= 1;
         buf[i] = b'-';
     }
-    core:: String::from_utf8(&buf[i..]).unwrap()
+    core::String::from_utf8(&buf[i..]).unwrap()
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1758,7 +1765,10 @@ impl NetlinkBus {
         msg.pid = from;
         msg.seq = self.seq.fetch_add(1, Ordering::Relaxed);
         // Kernel port is 0
-        if let Some((_, _, inbox)) = self.sockets.iter_mut().find(|(p, f, _)| *p == 0 && *f == msg.family)
+        if let Some((_, _, inbox)) = self
+            .sockets
+            .iter_mut()
+            .find(|(p, f, _)| *p == 0 && *f == msg.family)
         {
             inbox.push(msg);
             Ok(())
@@ -2099,9 +2109,7 @@ mod tests {
         let limited = r.limit(CapRights::new(CapRights::READ)).unwrap();
         assert!(limited.contains(CapRights::READ));
         assert!(!limited.contains(CapRights::WRITE));
-        assert!(limited
-            .limit(CapRights::new(CapRights::WRITE))
-            .is_err());
+        assert!(limited.limit(CapRights::new(CapRights::WRITE)).is_err());
     }
 
     #[test]

@@ -1,8 +1,8 @@
-use std::vec;
 use std::boxed::Box;
-use std::string::{String, ToString};
-use std::vec::Vec;
 use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 // Advanced Code Obfuscation, Anti-Analysis, and White-Box Cryptography Engine
 // Designed to thwart static analysis, linear sweep disassemblers, and runtime memory dumping.
 
@@ -11,12 +11,12 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 /// Custom Virtual Machine instruction set for Virtual Machine-based Obfuscation (VMO)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VmOpcode {
-    LoadConst = 0x1A,  // Load constant into register
-    AddReg = 0x2B,     // Add registers
-    XorReg = 0x3C,     // XOR registers
-    JumpIf = 0x4D,     // Conditional jump
-    OutValue = 0x5E,   // Output register value
-    Halt = 0xFF,       // Terminate VM
+    LoadConst = 0x1A, // Load constant into register
+    AddReg = 0x2B,    // Add registers
+    XorReg = 0x3C,    // XOR registers
+    JumpIf = 0x4D,    // Conditional jump
+    OutValue = 0x5E,  // Output register value
+    Halt = 0xFF,      // Terminate VM
 }
 
 /// Dynamic Opaque Predicates
@@ -223,7 +223,10 @@ impl ObfuscatedVM {
                         return Err("Invalid register index".to_string());
                     }
                     // Apply MBA Obfuscation dynamically during addition
-                    self.registers[dest] = DataFlowObfuscator::obfuscate_add_mba(self.registers[dest], self.registers[src]);
+                    self.registers[dest] = DataFlowObfuscator::obfuscate_add_mba(
+                        self.registers[dest],
+                        self.registers[src],
+                    );
                 }
                 0x3C => {
                     // XorReg <dest_reg> <src_reg>
@@ -356,11 +359,7 @@ mod tests {
         // 4. OutValue r[0]               -> 5E, 00
         // 5. Halt                        -> FF
         let program = vec![
-            0x1A, 0x00, 0x2A, 0x00,
-            0x1A, 0x01, 0x0A, 0x00,
-            0x2B, 0x00, 0x01,
-            0x5E, 0x00,
-            0xFF
+            0x1A, 0x00, 0x2A, 0x00, 0x1A, 0x01, 0x0A, 0x00, 0x2B, 0x00, 0x01, 0x5E, 0x00, 0xFF,
         ];
 
         let res = vm.execute(&program);

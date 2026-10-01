@@ -12,8 +12,8 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::vec;
 use std::boxed::Box;
+use std::vec;
 // SigmaOS Network Protocol Layer
 
 // ZenithNet - Zero-copy networking stack
@@ -21,8 +21,8 @@ use std::boxed::Box;
 
 // (no_std only applicable at crate root - removed)
 
-use std::vec::Vec;
 use std::collections::BTreeMap;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NetworkError {
@@ -251,12 +251,19 @@ impl NetworkDriverManager {
     }
 
     /// Register a network driver
-    pub fn register_driver(&mut self, driver_type: NetworkDriverType, driver: Box<dyn NetworkDriverDevice>) {
+    pub fn register_driver(
+        &mut self,
+        driver_type: NetworkDriverType,
+        driver: Box<dyn NetworkDriverDevice>,
+    ) {
         self.drivers.insert(driver_type, driver);
     }
 
     /// Set active driver
-    pub fn set_active_driver(&mut self, driver_type: NetworkDriverType) -> Result<(), NetworkError> {
+    pub fn set_active_driver(
+        &mut self,
+        driver_type: NetworkDriverType,
+    ) -> Result<(), NetworkError> {
         if !self.drivers.contains_key(&driver_type) {
             return Err(NetworkError::DriverNotFound);
         }
@@ -267,7 +274,10 @@ impl NetworkDriverManager {
     /// Transmit packet using active driver
     pub fn transmit(&mut self, payload: &[u8]) -> Result<(), NetworkError> {
         let driver_type = self.active_driver.ok_or(NetworkError::DriverNotFound)?;
-        let driver = self.drivers.get_mut(&driver_type).ok_or(NetworkError::DriverNotFound)?;
+        let driver = self
+            .drivers
+            .get_mut(&driver_type)
+            .ok_or(NetworkError::DriverNotFound)?;
         driver.transmit_packet(payload)
     }
 
@@ -281,7 +291,10 @@ impl NetworkDriverManager {
     /// Configure DMA ring for active driver
     pub fn configure_dma(&mut self, rx_base: u64, tx_base: u64) -> Result<(), NetworkError> {
         let driver_type = self.active_driver.ok_or(NetworkError::DriverNotFound)?;
-        let driver = self.drivers.get_mut(&driver_type).ok_or(NetworkError::DriverNotFound)?;
+        let driver = self
+            .drivers
+            .get_mut(&driver_type)
+            .ok_or(NetworkError::DriverNotFound)?;
         driver.configure_dma_ring(rx_base, tx_base)
     }
 
@@ -305,7 +318,7 @@ mod tests {
     fn test_e1000_driver() {
         let mut driver = E1000NetworkDriver::new();
         assert!(!driver.initialized);
-        
+
         driver.configure_dma_ring(0x1000, 0x2000).unwrap();
         assert!(driver.initialized);
         assert_eq!(driver.get_driver_type(), NetworkDriverType::E1000);
@@ -315,7 +328,7 @@ mod tests {
     fn test_rtl8139_driver() {
         let mut driver = Rtl8139NetworkDriver::new();
         assert!(!driver.initialized);
-        
+
         driver.configure_dma_ring(0x3000, 0x4000).unwrap();
         assert!(driver.initialized);
         assert_eq!(driver.get_driver_type(), NetworkDriverType::Rtl8139);
@@ -324,16 +337,16 @@ mod tests {
     #[test]
     fn test_zero_copy_ring() {
         let mut ring = ZeroCopyPacketRing::new(4);
-        
+
         let packet = NetworkPacketFrame {
             data: vec![0xDE, 0xAD, 0xBE, 0xEF],
             length: 4,
             timestamp: 100,
         };
-        
+
         ring.enqueue_tx(packet.clone()).unwrap();
         assert_eq!(ring.tx_count(), 1);
-        
+
         let retrieved = ring.dequeue_tx().unwrap();
         assert_eq!(retrieved.data, packet.data);
     }
@@ -341,26 +354,26 @@ mod tests {
     #[test]
     fn test_ring_buffer_full() {
         let mut ring = ZeroCopyPacketRing::new(2);
-        
+
         let packet = NetworkPacketFrame {
             data: vec![0x01],
             length: 1,
             timestamp: 0,
         };
-        
+
         ring.enqueue_tx(packet.clone()).unwrap();
         ring.enqueue_tx(packet.clone()).unwrap();
-        
+
         assert!(ring.enqueue_tx(packet).is_err());
     }
 
     #[test]
     fn test_network_driver_manager() {
         let mut manager = NetworkDriverManager::new();
-        
+
         let e1000: Box<dyn NetworkDriverDevice> = Box::new(E1000NetworkDriver::new());
         manager.register_driver(NetworkDriverType::E1000, e1000);
-        
+
         manager.set_active_driver(NetworkDriverType::E1000).unwrap();
         assert_eq!(manager.active_driver_type(), Some(NetworkDriverType::E1000));
     }
@@ -368,7 +381,7 @@ mod tests {
     #[test]
     fn test_driver_not_found() {
         let mut manager = NetworkDriverManager::new();
-        
+
         let result = manager.set_active_driver(NetworkDriverType::VirtioNet);
         assert!(result.is_err());
     }

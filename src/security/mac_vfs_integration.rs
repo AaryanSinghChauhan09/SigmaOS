@@ -4,16 +4,13 @@ use std::format;
 // Integrates Mandatory Access Control with VFS layer
 // Solves BUG-014: MAC enforcement not wired into VFS call sites
 
-
-
 use std::boxed::Box;
-use std::vec::Vec;
 use std::string::String;
+use std::vec::Vec;
 
 use crate::security::mac::{
-    SecurityContext, SecurityLevel, SecurityDomain, ContextCapability,
-    SecurityOperation, MACPolicy, ContextID, MLSPolicy, SimpleMACEngine,
-    EngineCapability, MACError
+    ContextCapability, ContextID, EngineCapability, MACError, MACPolicy, MLSPolicy,
+    SecurityContext, SecurityDomain, SecurityLevel, SecurityOperation, SimpleMACEngine,
 };
 
 /// VFS operation with MAC enforcement
@@ -54,7 +51,7 @@ impl MacVfsIntegration {
     pub fn new() -> Self {
         let capability = EngineCapability::full();
         let mac_engine = SimpleMACEngine::new(capability);
-        
+
         Self {
             mac_engine,
             file_labels: Vec::new(),
@@ -107,7 +104,7 @@ impl MacVfsIntegration {
     ) -> bool {
         // Get file security label
         let file_label = self.get_file_label(file_path);
-        
+
         // Determine required security level and domain for the operation
         let (required_level, required_domain) = match file_label {
             Some(label) => (label.security_level, label.security_domain),
@@ -160,7 +157,11 @@ impl MacVfsIntegration {
     }
 
     /// Enforce MAC on file execute operation
-    pub fn enforce_file_execute(&self, context_id: ContextID, file_path: &str) -> Result<(), String> {
+    pub fn enforce_file_execute(
+        &self,
+        context_id: ContextID,
+        file_path: &str,
+    ) -> Result<(), String> {
         if self.check_vfs_access(context_id, VFSOperation::ExecuteFile, file_path) {
             Ok(())
         } else {
@@ -169,7 +170,11 @@ impl MacVfsIntegration {
     }
 
     /// Enforce MAC on file delete operation
-    pub fn enforce_file_delete(&self, context_id: ContextID, file_path: &str) -> Result<(), String> {
+    pub fn enforce_file_delete(
+        &self,
+        context_id: ContextID,
+        file_path: &str,
+    ) -> Result<(), String> {
         if self.check_vfs_access(context_id, VFSOperation::DeleteFile, file_path) {
             Ok(())
         } else {
@@ -187,9 +192,9 @@ impl MacVfsIntegration {
         // Add MLS policy with medium strictness
         let mls_policy = MLSPolicy::new(
             SecurityLevel::Medium,
-            crate::security::mac::PolicyCapability::full()
+            crate::security::mac::PolicyCapability::full(),
         );
-        
+
         if let Err(e) = self.add_policy(Box::new(mls_policy)) {
             // Handle error in production
         }
@@ -254,16 +259,12 @@ pub fn initialize_mac_vfs() {
 
 /// Get global MAC-VFS integration instance
 pub fn get_mac_vfs() -> Option<&'static MacVfsIntegration> {
-    unsafe {
-        GLOBAL_MAC_VFS.as_ref()
-    }
+    unsafe { GLOBAL_MAC_VFS.as_ref() }
 }
 
 /// Get mutable global MAC-VFS integration instance
 pub fn get_mac_vfs_mut() -> Option<&'static mut MacVfsIntegration> {
-    unsafe {
-        GLOBAL_MAC_VFS.as_mut()
-    }
+    unsafe { GLOBAL_MAC_VFS.as_mut() }
 }
 
 #[cfg(test_disabled)]
@@ -274,23 +275,23 @@ mod tests {
     fn test_mac_vfs_initialization() {
         let mut integration = MacVfsIntegration::new();
         integration.initialize_default_policies();
-        
+
         assert!(!integration.file_labels.is_empty());
     }
 
     #[test]
     fn test_file_label_retrieval() {
         let mut integration = MacVfsIntegration::new();
-        
+
         let label = FileSecurityLabel {
             path: String::from("/test/file"),
             security_level: SecurityLevel::High,
             security_domain: SecurityDomain::System,
             allowed_contexts: Vec::new(),
         };
-        
+
         integration.add_file_label(label);
-        
+
         let retrieved = integration.get_file_label("/test/file");
         assert!(retrieved.is_some());
         assert_eq!(retrieved.unwrap().security_level, SecurityLevel::High);
@@ -299,27 +300,27 @@ mod tests {
     #[test]
     fn test_process_context_creation() {
         let mut integration = MacVfsIntegration::new();
-        
+
         let capability = ContextCapability::full();
         let context_id = integration.create_process_context(
             SecurityLevel::Medium,
             SecurityDomain::User,
-            capability
+            capability,
         );
-        
+
         assert!(context_id.is_ok());
     }
 
     #[test]
     fn test_vfs_operation_conversion() {
         let integration = MacVfsIntegration::new();
-        
+
         let mac_op = integration.vfs_to_mac_operation(VFSOperation::OpenFile);
         assert_eq!(mac_op, SecurityOperation::Read);
-        
+
         let mac_op = integration.vfs_to_mac_operation(VFSOperation::WriteFile);
         assert_eq!(mac_op, SecurityOperation::Write);
-        
+
         let mac_op = integration.vfs_to_mac_operation(VFSOperation::ExecuteFile);
         assert_eq!(mac_op, SecurityOperation::Execute);
     }
@@ -328,14 +329,12 @@ mod tests {
     fn test_mac_enforcement() {
         let mut integration = MacVfsIntegration::new();
         integration.initialize_default_policies();
-        
+
         let capability = ContextCapability::full();
-        let context_id = integration.create_process_context(
-            SecurityLevel::High,
-            SecurityDomain::System,
-            capability
-        ).unwrap();
-        
+        let context_id = integration
+            .create_process_context(SecurityLevel::High, SecurityDomain::System, capability)
+            .unwrap();
+
         // High security context should be able to access system files
         let result = integration.enforce_file_open(context_id, "/etc/passwd");
         assert!(result.is_ok());
@@ -344,10 +343,10 @@ mod tests {
     #[test]
     fn test_global_mac_vfs() {
         initialize_mac_vfs();
-        
+
         let integration = get_mac_vfs();
         assert!(integration.is_some());
-        
+
         let integration_mut = get_mac_vfs_mut();
         assert!(integration_mut.is_some());
     }

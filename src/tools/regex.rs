@@ -1,8 +1,6 @@
 // High-Performance Regular Expression Engine for SigmaOS
 // Provides zero-dependency pattern matching, character classes, wildcards, and substring extraction under #![no_std].
 
-
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RegexMatch {
     pub start: usize,
@@ -89,7 +87,11 @@ impl SovereignRegexEngine {
                     end: abs_end,
                     text: m.text,
                 });
-                curr_byte = if abs_end > curr_byte { abs_end } else { curr_byte + 1 };
+                curr_byte = if abs_end > curr_byte {
+                    abs_end
+                } else {
+                    curr_byte + 1
+                };
             } else {
                 break;
             }
@@ -106,7 +108,11 @@ fn match_here(pat: &[char], text: &str, text_idx: usize) -> Option<usize> {
     }
 
     if pat.len() == 1 && pat[0] == '$' {
-        return if text_idx == text.len() { Some(0) } else { None };
+        return if text_idx == text.len() {
+            Some(0)
+        } else {
+            None
+        };
     }
 
     let remaining_text = &text[text_idx..];

@@ -15,11 +15,10 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::vec;
-use std::string::{String, ToString};
-use std::vec::Vec;
 use std::format;
-
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 use crate::klib::btreemap::BTreeMap;
 
@@ -40,10 +39,15 @@ impl HolyCShell {
     }
 
     /// Compiles a HolyC code snippet to Ring-0 bytecode
-    pub fn jit_compile(&mut self, function_name: &str, source: &str) -> Result<Vec<u8>, &'static str> {
+    pub fn jit_compile(
+        &mut self,
+        function_name: &str,
+        source: &str,
+    ) -> Result<Vec<u8>, &'static str> {
         if source.contains("Print") {
             let bytecode = vec![0x48, 0xC7, 0xC0, 0x01, 0x00, 0x00, 0x00, 0xC3]; // mov rax, 1; ret
-            self.jitted_symbols.insert(function_name.to_string(), bytecode.clone());
+            self.jitted_symbols
+                .insert(function_name.to_string(), bytecode.clone());
             Ok(bytecode)
         } else {
             Err("HolyC compilation error: missing print statements")
@@ -69,7 +73,11 @@ impl RedSeaFilesystem {
     }
 
     /// Reads contiguous unfragmented sector ranges directly
-    pub fn read_contiguous(&self, start_sector: usize, sectors_count: usize) -> Result<Vec<u8>, &'static str> {
+    pub fn read_contiguous(
+        &self,
+        start_sector: usize,
+        sectors_count: usize,
+    ) -> Result<Vec<u8>, &'static str> {
         let start = start_sector * self.sector_size;
         let end = start + (sectors_count * self.sector_size);
         if end <= self.raw_volume.len() {
@@ -80,7 +88,11 @@ impl RedSeaFilesystem {
     }
 
     /// Writes contiguous unfragmented sector ranges directly
-    pub fn write_contiguous(&mut self, start_sector: usize, data: &[u8]) -> Result<(), &'static str> {
+    pub fn write_contiguous(
+        &mut self,
+        start_sector: usize,
+        data: &[u8],
+    ) -> Result<(), &'static str> {
         let start = start_sector * self.sector_size;
         let end = start + data.len();
         if end <= self.raw_volume.len() {
@@ -119,7 +131,10 @@ impl HolySpiritOracle {
 
     /// Dynamic high-entropy pseudorandom generator
     pub fn next_random(&mut self) -> u64 {
-        self.state = self.state.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+        self.state = self
+            .state
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1442695040888963407);
         self.state
     }
 
@@ -163,7 +178,10 @@ impl RingZeroSandbox {
             return "No tasks active".to_string();
         }
         let current_task = &self.active_tasks[self.run_idx];
-        let msg = format!("Task {} yielded. State: {}", current_task.id, current_task.status);
+        let msg = format!(
+            "Task {} yielded. State: {}",
+            current_task.id, current_task.status
+        );
         self.run_idx = (self.run_idx + 1) % self.active_tasks.len();
         msg
     }
@@ -205,8 +223,14 @@ mod tests {
     #[test]
     fn test_ring_zero_cooperative_scheduler() {
         let mut scheduler = RingZeroSandbox::new();
-        scheduler.register_task(CooperativeTask { id: 101, status: "Active".to_string() });
-        scheduler.register_task(CooperativeTask { id: 102, status: "Sleep".to_string() });
+        scheduler.register_task(CooperativeTask {
+            id: 101,
+            status: "Active".to_string(),
+        });
+        scheduler.register_task(CooperativeTask {
+            id: 102,
+            status: "Sleep".to_string(),
+        });
 
         let yield_1 = scheduler.yield_cooperative();
         assert!(yield_1.contains("Task 101"));

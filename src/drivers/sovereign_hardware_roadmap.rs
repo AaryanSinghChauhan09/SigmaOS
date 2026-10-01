@@ -142,7 +142,11 @@ impl SigmaFirmwareBridge {
         }
     }
 
-    pub fn translate_vendor_blob(&mut self, blob_magic: u32, payload: &[u8]) -> Result<Vec<u8>, &'static str> {
+    pub fn translate_vendor_blob(
+        &mut self,
+        blob_magic: u32,
+        payload: &[u8],
+    ) -> Result<Vec<u8>, &'static str> {
         if payload.is_empty() {
             return Err("Firmware payload is empty");
         }
@@ -390,7 +394,12 @@ impl SovereignNvmeDriver {
         Ok(())
     }
 
-    pub fn submit_passthrough_cmd(&mut self, opcode: u8, lba: u64, blocks: u32) -> Result<u64, &'static str> {
+    pub fn submit_passthrough_cmd(
+        &mut self,
+        opcode: u8,
+        lba: u64,
+        blocks: u32,
+    ) -> Result<u64, &'static str> {
         if !self.is_initialized {
             return Err("NVMe driver not initialized");
         }
@@ -510,10 +519,13 @@ mod tests {
     #[test]
     fn test_phase2_sandbox_and_layering() {
         let mut bridge = SigmaFirmwareBridge::new();
-        let native = bridge.translate_vendor_blob(0x1234, b"VENDOR_FIRMWARE").unwrap();
+        let native = bridge
+            .translate_vendor_blob(0x1234, b"VENDOR_FIRMWARE")
+            .unwrap();
         assert_eq!(&native[0..5], b"SIGMA");
 
-        let mut layering = SigmaDriverLayeringSystem::new("nvidia_blob", "nouveau_open", "vesa_generic");
+        let mut layering =
+            SigmaDriverLayeringSystem::new("nvidia_blob", "nouveau_open", "vesa_generic");
         assert_eq!(layering.resolve_active_driver(), "nvidia_blob");
 
         layering.trigger_primary_failure();
@@ -563,7 +575,8 @@ mod tests {
         assert_eq!(gpus.len(), 1);
         assert_eq!(gpus[0].node_ip, "10.0.0.1");
 
-        let policy = SigmaHardwarePolicyEngine::new(DriverSovereigntyPolicy::Strict100PercentFreeOnly);
+        let policy =
+            SigmaHardwarePolicyEngine::new(DriverSovereigntyPolicy::Strict100PercentFreeOnly);
         assert!(policy.is_driver_allowed(true));
         assert!(!policy.is_driver_allowed(false));
 

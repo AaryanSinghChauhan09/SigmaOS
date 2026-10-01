@@ -5,7 +5,7 @@
 #![allow(dead_code)]
 
 use std::collections::BTreeMap;
-use std::sync::atomic::{AtomicU64, AtomicU32, Ordering};
+use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 use std::time::{Duration, Instant};
 
 /// Timer ID type
@@ -62,7 +62,13 @@ pub struct TimerDescriptor {
 }
 
 impl TimerDescriptor {
-    pub fn new(id: TimerId, mode: TimerMode, interval_ns: u64, callback: TimerCallback, user_data: u64) -> Self {
+    pub fn new(
+        id: TimerId,
+        mode: TimerMode,
+        interval_ns: u64,
+        callback: TimerCallback,
+        user_data: u64,
+    ) -> Self {
         TimerDescriptor {
             id,
             mode,
@@ -108,7 +114,13 @@ impl KernelTimerSubsystem {
     }
 
     /// Create a new timer
-    pub fn create_timer(&mut self, mode: TimerMode, interval_ns: u64, callback: TimerCallback, user_data: u64) -> TimerId {
+    pub fn create_timer(
+        &mut self,
+        mode: TimerMode,
+        interval_ns: u64,
+        callback: TimerCallback,
+        user_data: u64,
+    ) -> TimerId {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let timer = TimerDescriptor::new(id, mode, interval_ns, callback, user_data);
         self.timers.insert(id, timer);
@@ -118,7 +130,7 @@ impl KernelTimerSubsystem {
     /// Arm a timer
     pub fn arm_timer(&mut self, id: TimerId) -> Result<(), TimerError> {
         let timer = self.timers.get_mut(&id).ok_or(TimerError::InvalidTimerId)?;
-        
+
         if timer.get_state() == TimerState::Armed {
             return Err(TimerError::TimerAlreadyArmed);
         }
@@ -132,7 +144,7 @@ impl KernelTimerSubsystem {
     /// Disarm a timer
     pub fn disarm_timer(&mut self, id: TimerId) -> Result<(), TimerError> {
         let timer = self.timers.get_mut(&id).ok_or(TimerError::InvalidTimerId)?;
-        
+
         if timer.get_state() != TimerState::Armed {
             return Err(TimerError::TimerNotArmed);
         }
@@ -162,7 +174,7 @@ impl KernelTimerSubsystem {
             if timer.get_state() == TimerState::Armed && timer.expires_at <= now {
                 timer.set_state(TimerState::Executing);
                 timer.fire_count.fetch_add(1, Ordering::SeqCst);
-                
+
                 if let Some(callback) = timer.callback {
                     if callback(*id, timer.user_data).is_ok() {
                         expired.push(*id);
@@ -190,7 +202,10 @@ impl KernelTimerSubsystem {
 
     /// Get active timer count
     pub fn active_timer_count(&self) -> usize {
-        self.timers.iter().filter(|(_, t)| t.get_state() == TimerState::Armed).count()
+        self.timers
+            .iter()
+            .filter(|(_, t)| t.get_state() == TimerState::Armed)
+            .count()
     }
 }
 
@@ -207,10 +222,10 @@ mod tests {
     #[test]
     fn test_timer_creation() {
         let mut subsystem = KernelTimerSubsystem::new();
-        
+
         let callback: TimerCallback = |_id, _data| Ok(());
         let id = subsystem.create_timer(TimerMode::OneShot, 1000, callback, 42);
-        
+
         assert!(id > 0);
         assert_eq!(subsystem.active_timer_count(), 0);
     }
@@ -218,13 +233,13 @@ mod tests {
     #[test]
     fn test_timer_arm_disarm() {
         let mut subsystem = KernelTimerSubsystem::new();
-        
+
         let callback: TimerCallback = |_id, _data| Ok(());
         let id = subsystem.create_timer(TimerMode::OneShot, 1000, callback, 42);
-        
+
         assert!(subsystem.arm_timer(id).is_ok());
         assert_eq!(subsystem.active_timer_count(), 1);
-        
+
         assert!(subsystem.disarm_timer(id).is_ok());
         assert_eq!(subsystem.active_timer_count(), 0);
     }
@@ -232,13 +247,13 @@ mod tests {
     #[test]
     fn test_timer_expiration() {
         let mut subsystem = KernelTimerSubsystem::new();
-        
+
         let callback: TimerCallback = |_id, _data| Ok(());
         let id = subsystem.create_timer(TimerMode::OneShot, 100, callback, 42);
-        
+
         subsystem.arm_timer(id).unwrap();
         let expired = subsystem.tick(150);
-        
+
         assert!(expired.contains(&id));
         assert_eq!(subsystem.get_fire_count(id).unwrap(), 1);
     }
@@ -246,14 +261,14 @@ mod tests {
     #[test]
     fn test_periodic_timer() {
         let mut subsystem = KernelTimerSubsystem::new();
-        
+
         let callback: TimerCallback = |_id, _data| Ok(());
         let id = subsystem.create_timer(TimerMode::Periodic, 100, callback, 42);
-        
+
         subsystem.arm_timer(id).unwrap();
         subsystem.tick(150);
         subsystem.tick(100);
-        
+
         assert_eq!(subsystem.get_fire_count(id).unwrap(), 2);
         assert_eq!(subsystem.active_timer_count(), 1);
     }
@@ -261,10 +276,10 @@ mod tests {
     #[test]
     fn test_timer_deletion() {
         let mut subsystem = KernelTimerSubsystem::new();
-        
+
         let callback: TimerCallback = |_id, _data| Ok(());
         let id = subsystem.create_timer(TimerMode::OneShot, 1000, callback, 42);
-        
+
         assert!(subsystem.delete_timer(id).is_ok());
         assert!(subsystem.arm_timer(id).is_err());
     }

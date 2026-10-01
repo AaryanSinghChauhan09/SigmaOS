@@ -146,7 +146,10 @@ impl OmarchyPowerProfileManager {
                 self.epp_setting = "power".to_string();
             }
         }
-        format!("Switched power profile to {:?} ({})", profile, self.cpu_governor)
+        format!(
+            "Switched power profile to {:?} ({})",
+            profile, self.cpu_governor
+        )
     }
 }
 
@@ -172,8 +175,14 @@ pub struct OmarchyDotfilesBackupRestoreEngine {
 impl OmarchyDotfilesBackupRestoreEngine {
     pub fn new() -> Self {
         let mut tracked = HashMap::new();
-        tracked.insert("hyprland.conf".to_string(), "~/.config/hypr/hyprland.conf".to_string());
-        tracked.insert("alacritty.toml".to_string(), "~/.config/alacritty/alacritty.toml".to_string());
+        tracked.insert(
+            "hyprland.conf".to_string(),
+            "~/.config/hypr/hyprland.conf".to_string(),
+        );
+        tracked.insert(
+            "alacritty.toml".to_string(),
+            "~/.config/alacritty/alacritty.toml".to_string(),
+        );
 
         Self {
             backups: Vec::new(),
@@ -219,7 +228,10 @@ mod tests {
 
         applet.select_next();
         assert_eq!(applet.selected_index, 1);
-        assert_eq!(applet.get_selected_item().unwrap().title, "Launch Herdr Agent");
+        assert_eq!(
+            applet.get_selected_item().unwrap().title,
+            "Launch Herdr Agent"
+        );
     }
 
     #[test]

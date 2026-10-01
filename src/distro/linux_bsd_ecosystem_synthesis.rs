@@ -168,7 +168,10 @@ impl DeepinLinglongSandboxEngine {
         permissions: LinglongPermissions,
     ) -> Result<String, String> {
         if !self.runtimes.contains_key(runtime_id) {
-            return Err(format!("Linglong runtime '{}' is not registered", runtime_id));
+            return Err(format!(
+                "Linglong runtime '{}' is not registered",
+                runtime_id
+            ));
         }
 
         let container = LinglongAppContainer {
@@ -246,8 +249,10 @@ impl SolusLsiSteamCompatEngine {
 
         self.environment_overrides
             .insert("STEAM_RUNTIME".to_string(), "0".to_string());
-        self.environment_overrides
-            .insert("LD_PRELOAD".to_string(), "/usr/lib/liblsi-intercept.so".to_string());
+        self.environment_overrides.insert(
+            "LD_PRELOAD".to_string(),
+            "/usr/lib/liblsi-intercept.so".to_string(),
+        );
     }
 
     pub fn register_redirect(&mut self, lib_name: &str, sys_path: &str, force_native: bool) {
@@ -331,7 +336,10 @@ impl PclinuxosDrakLiveEngine {
         };
 
         self.active_snapshots.insert(snapshot_id.to_string(), spec);
-        Ok(format!("DraKlive captured system state for '{}'", snapshot_id))
+        Ok(format!(
+            "DraKlive captured system state for '{}'",
+            snapshot_id
+        ))
     }
 
     pub fn generate_mylivecd_iso(&mut self, snapshot_id: &str) -> Result<String, String> {
@@ -413,7 +421,10 @@ impl PuppyLinuxSfsOverlayEngine {
     }
 
     pub fn active_sfs_count(&self) -> usize {
-        self.loaded_sfs_modules.values().filter(|m| m.is_mounted).count()
+        self.loaded_sfs_modules
+            .values()
+            .filter(|m| m.is_mounted)
+            .count()
     }
 }
 
@@ -470,7 +481,10 @@ impl SovereignLinuxBsdEcosystemSynthesisSuite {
 
         // 3. Solus LSI check
         let lsi_lib = self.lsi.resolve_library_path("libGL.so.1");
-        results.insert("solus_lsi_compat".to_string(), lsi_lib == "/usr/lib/libGL.so.1");
+        results.insert(
+            "solus_lsi_compat".to_string(),
+            lsi_lib == "/usr/lib/libGL.so.1",
+        );
 
         // 4. DraKlive check
         self.draklive
@@ -481,7 +495,10 @@ impl SovereignLinuxBsdEcosystemSynthesisSuite {
 
         // 5. Puppy Linux SFS check
         self.sfs.load_sfs_module("devx_2026.sfs", 5).ok();
-        results.insert("puppy_sfs_overlay".to_string(), self.sfs.active_sfs_count() == 1);
+        results.insert(
+            "puppy_sfs_overlay".to_string(),
+            self.sfs.active_sfs_count() == 1,
+        );
 
         results
     }
@@ -532,7 +549,13 @@ mod tests {
             .is_ok());
 
         assert!(engine.start_container("org.deepin.music").is_ok());
-        assert!(engine.containers.get("org.deepin.music").unwrap().is_running);
+        assert!(
+            engine
+                .containers
+                .get("org.deepin.music")
+                .unwrap()
+                .is_running
+        );
     }
 
     #[test]

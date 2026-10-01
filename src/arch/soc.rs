@@ -3,8 +3,11 @@ use std::boxed::Box;
 // Absorbs legacy mainline SoC forks (Xiaomi SM8250, HiSilicon Hi6250, Mediatek MTK, clk-meson)
 // Maps clock routing and pin multiplexing under Unified Pin/Clock Controller Traits
 
-use crate::drivers::soc::{ClockController, PinController, PinDirection, PinPull, GenericPin, GenericClock, ClockError, PinError};
-use crate::driver::device::{UdfInterpreter, LegacyDevice};
+use crate::driver::device::{LegacyDevice, UdfInterpreter};
+use crate::drivers::soc::{
+    ClockController, ClockError, GenericClock, GenericPin, PinController, PinDirection, PinError,
+    PinPull,
+};
 
 /// Polymorphic SoC interface (OOP Abstract Class)
 pub trait SoC: Send + Sync {
@@ -21,10 +24,17 @@ pub trait SoC: Send + Sync {
     fn configure_clocks(&mut self, clock_ctrl: &mut dyn ClockController) -> Result<(), ClockError>;
 
     /// Executes secure power rail routing / scaling via a UdfInterpreter bytecode block (e.g., Xiaomi SM8250 power management rails)
-    fn execute_pm_udf(&mut self, bytecode: &[u8], regs: &mut [u32; 4], base_port: u16) -> Result<(), &'static str> {
+    fn execute_pm_udf(
+        &mut self,
+        bytecode: &[u8],
+        regs: &mut [u32; 4],
+        base_port: u16,
+    ) -> Result<(), &'static str> {
         let mut dev = LegacyDevice::new(999, self.platform_name().as_bytes(), base_port);
         let interpreter = UdfInterpreter::new(bytecode);
-        interpreter.execute(&mut dev, regs).map_err(|_| "UDF Power Management Execution Failed")?;
+        interpreter
+            .execute(&mut dev, regs)
+            .map_err(|_| "UDF Power Management Execution Failed")?;
         Ok(())
     }
 }
@@ -106,7 +116,9 @@ pub struct MediatekMtkSoC {
 
 impl MediatekMtkSoC {
     pub fn new() -> Self {
-        Self { vcore_active: false }
+        Self {
+            vcore_active: false,
+        }
     }
 }
 
@@ -169,7 +181,7 @@ impl SoC for AmlogicMesonSoC {
 #[cfg(test_disabled)]
 mod tests {
     use super::*;
-    use crate::drivers::soc::{SocPinController, SocClockController};
+    use crate::drivers::soc::{SocClockController, SocPinController};
 
     #[test]
     fn test_polymorphic_soc_initialization() {

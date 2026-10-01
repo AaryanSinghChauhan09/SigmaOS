@@ -100,7 +100,10 @@ impl LegacyFSAdapter {
 
     pub fn mount(&mut self) -> Result<(), ()> {
         self.is_mounted = true;
-        if self.fs_type == LegacyFsType::MinixV3 || self.fs_type == LegacyFsType::MinixV1 || self.fs_type == LegacyFsType::MinixV2 {
+        if self.fs_type == LegacyFsType::MinixV3
+            || self.fs_type == LegacyFsType::MinixV1
+            || self.fs_type == LegacyFsType::MinixV2
+        {
             self.minix_sb = Some(MinixSuperBlock {
                 ninodes: 2048,
                 nzones: 16384,

@@ -3,17 +3,16 @@ use std::vec;
 // Finalizes the remaining components for Phase G completion
 // This module completes the VMM implementation with advanced features
 
-
-use std::vec::Vec;
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Page Reclamation Watermarks (Linux kswapd-style)
 #[derive(Debug, Clone, Copy)]
 pub struct PageReclaimWatermarks {
-    pub pages_low: usize,    // Start reclaiming when free pages fall below this
-    pub pages_min: usize,    // Aggressive reclaiming when free pages fall below this
-    pub pages_high: usize,   // Stop reclaiming when free pages reach this
+    pub pages_low: usize,  // Start reclaiming when free pages fall below this
+    pub pages_min: usize,  // Aggressive reclaiming when free pages fall below this
+    pub pages_high: usize, // Stop reclaiming when free pages reach this
 }
 
 impl PageReclaimWatermarks {
@@ -22,7 +21,7 @@ impl PageReclaimWatermarks {
         let pages_min = total_pages * 2 / 100;
         let pages_low = total_pages * 5 / 100;
         let pages_high = total_pages * 10 / 100;
-        
+
         Self {
             pages_low,
             pages_min,
@@ -34,7 +33,7 @@ impl PageReclaimWatermarks {
 /// Sovereign Page Reclaimer (Linux kswapd parity)
 pub struct SovereignPageReclaimer {
     pub watermarks: PageReclaimWatermarks,
-    pub active_pages: Vec<u64>,      // Virtual addresses of active pages
+    pub active_pages: Vec<u64>, // Virtual addresses of active pages
     pub reclaimed_pages: usize,
     pub scan_rounds: usize,
     pub is_active: bool,
@@ -154,9 +153,9 @@ impl MemoryPressureMonitor {
     pub fn update(&mut self, free_pages: usize, cached_pages: usize) {
         self.free_pages = free_pages;
         self.cached_pages = cached_pages;
-        
+
         let available_ratio = (free_pages + cached_pages) as f64 / self.total_pages as f64;
-        
+
         self.pressure_level = if available_ratio > 0.5 {
             MemoryPressure::Low
         } else if available_ratio > 0.3 {
@@ -235,7 +234,7 @@ impl MemoryCgroup {
         if self.usage_in_bytes + size > self.limit_in_bytes {
             return Err("Memory cgroup limit exceeded");
         }
-        
+
         if self.memsw_usage_in_bytes + size > self.memsw_limit_in_bytes {
             return Err("Memory+swap cgroup limit exceeded");
         }
@@ -277,9 +276,9 @@ pub struct CgroupUsage {
 
 /// Memory Compaction Engine (Linux memory compaction parity)
 pub struct MemoryCompaction {
-    pub migrate_pages: Vec<u64>,     // Pages to migrate
-    pub free_pages: Vec<u64>,       // Target free pages
-    pub compaction_score: u32,      // 0-100, higher = more fragmentation
+    pub migrate_pages: Vec<u64>, // Pages to migrate
+    pub free_pages: Vec<u64>,    // Target free pages
+    pub compaction_score: u32,   // 0-100, higher = more fragmentation
 }
 
 impl MemoryCompaction {
@@ -301,7 +300,7 @@ impl MemoryCompaction {
         // Simple fragmentation metric: count of free page fragments
         let fragments = free_pages.len();
         let total = free_pages.len() as u32;
-        
+
         // Score: 0 (no fragmentation) to 100 (highly fragmented)
         self.compaction_score = if total <= 1 {
             0
@@ -334,7 +333,7 @@ impl MemoryCompaction {
         }
 
         let migrate_count = self.migrate_pages.len().min(self.free_pages.len());
-        
+
         // Simulate migration
         for _ in 0..migrate_count {
             self.migrate_pages.pop();
@@ -377,10 +376,14 @@ impl AdvancedMemoryManager {
     }
 
     /// Perform background memory management
-    pub fn manage_memory(&mut self, free_pages: usize, cached_pages: usize) -> MemoryManagementResult {
+    pub fn manage_memory(
+        &mut self,
+        free_pages: usize,
+        cached_pages: usize,
+    ) -> MemoryManagementResult {
         // Update pressure monitor
         self.pressure_monitor.update(free_pages, cached_pages);
-        
+
         let mut reclaimed = 0;
         let mut compacted = 0;
 
@@ -432,7 +435,7 @@ mod tests {
         let mut reclaimer = SovereignPageReclaimer::new(1000);
         reclaimer.track_page(0x1000);
         reclaimer.track_page(0x2000);
-        
+
         assert_eq!(reclaimer.active_pages.len(), 2);
         assert!(reclaimer.should_start_reclaim(10)); // 10 < 50 (5% of 1000)
     }
@@ -441,14 +444,14 @@ mod tests {
     fn test_pressure_monitor() {
         let mut monitor = MemoryPressureMonitor::new(1000);
         monitor.update(300, 200); // 500/1000 = 50% available
-        
+
         assert_eq!(monitor.get_pressure(), MemoryPressure::Medium);
     }
 
     #[test]
     fn test_cgroup_limits() {
         let mut cgroup = MemoryCgroup::new("test".to_string(), 1000);
-        
+
         assert!(cgroup.try_allocate(500).is_ok());
         assert!(cgroup.try_allocate(600).is_err()); // Exceeds limit
     }
@@ -457,7 +460,7 @@ mod tests {
     fn test_compaction_score() {
         let mut compaction = MemoryCompaction::new();
         let free_pages = vec![0x1000, 0x2000, 0x3000, 0x4000];
-        
+
         let score = compaction.calculate_fragmentation(&free_pages);
         assert!(score > 0); // Some fragmentation
     }
@@ -466,8 +469,11 @@ mod tests {
     fn test_advanced_manager() {
         let mut manager = AdvancedMemoryManager::new(1000);
         manager.create_cgroup("test".to_string(), 500);
-        
+
         let result = manager.manage_memory(100, 50);
-        assert!(matches!(result.pressure_level, MemoryPressure::High | MemoryPressure::Critical));
+        assert!(matches!(
+            result.pressure_level,
+            MemoryPressure::High | MemoryPressure::Critical
+        ));
     }
 }

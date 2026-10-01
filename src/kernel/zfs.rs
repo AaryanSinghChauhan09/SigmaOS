@@ -184,8 +184,13 @@ impl ZfsPool {
     }
 
     /// Create a snapshot of a dataset
-    pub fn create_snapshot(&mut self, dataset_name: &str, snapshot_name: &str) -> Result<(), String> {
-        let dataset = self.get_dataset(dataset_name)
+    pub fn create_snapshot(
+        &mut self,
+        dataset_name: &str,
+        snapshot_name: &str,
+    ) -> Result<(), String> {
+        let dataset = self
+            .get_dataset(dataset_name)
             .ok_or_else(|| format!("Dataset {} not found", dataset_name))?
             .clone();
 
@@ -205,8 +210,11 @@ impl ZfsPool {
 
     /// List snapshots of a dataset
     pub fn list_snapshots(&self, dataset_name: &str) -> Vec<&ZfsDataset> {
-        self.datasets.values()
-            .filter(|d| d.is_snapshot() && d.snapshot_of.as_ref() == Some(&dataset_name.to_string()))
+        self.datasets
+            .values()
+            .filter(|d| {
+                d.is_snapshot() && d.snapshot_of.as_ref() == Some(&dataset_name.to_string())
+            })
             .collect()
     }
 
@@ -302,7 +310,12 @@ impl ZfsManager {
     }
 
     /// Create snapshot in a pool
-    pub fn create_snapshot(&self, pool_id: u64, dataset_name: &str, snapshot_name: &str) -> Result<(), String> {
+    pub fn create_snapshot(
+        &self,
+        pool_id: u64,
+        dataset_name: &str,
+        snapshot_name: &str,
+    ) -> Result<(), String> {
         let mut pools = self.pools.lock().unwrap();
         match pools.get_mut(&pool_id) {
             Some(pool) => pool.create_snapshot(dataset_name, snapshot_name),

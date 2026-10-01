@@ -1,6 +1,6 @@
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 // SigmaOS Sovereign Self-Healing Kernel
 // Deploys active system integrity checkers, memory quarantine, and AI-generated hot patches
 
@@ -14,7 +14,7 @@ pub struct SovereignSelfHealingKernel {
     pub quarantined_memory_nodes: Vec<usize>,
     pub hot_patches_applied: usize,
     pub config_backups: HashMap<String, String>, // config file paths -> pristine default config content
-    pub driver_history: HashMap<usize, String>,   // driver ID -> previously stable version string
+    pub driver_history: HashMap<usize, String>,  // driver ID -> previously stable version string
 }
 
 impl SovereignSelfHealingKernel {
@@ -27,11 +27,18 @@ impl SovereignSelfHealingKernel {
             driver_history: HashMap::new(),
         };
         // Baseline hashes
-        kernel.integrity_hashes.insert("/boot/kernel".to_string(), "pristine_hash_111".to_string());
-        kernel.integrity_hashes.insert("/sbin/init".to_string(), "pristine_hash_222".to_string());
+        kernel
+            .integrity_hashes
+            .insert("/boot/kernel".to_string(), "pristine_hash_111".to_string());
+        kernel
+            .integrity_hashes
+            .insert("/sbin/init".to_string(), "pristine_hash_222".to_string());
 
         // Baseline config backups
-        kernel.config_backups.insert("/etc/network.conf".to_string(), "IP=192.168.1.1\nPORT=80".to_string());
+        kernel.config_backups.insert(
+            "/etc/network.conf".to_string(),
+            "IP=192.168.1.1\nPORT=80".to_string(),
+        );
 
         // Baseline driver stable history
         kernel.driver_history.insert(101, "nvme-v1.4.0".to_string());
@@ -51,7 +58,11 @@ impl SovereignSelfHealingKernel {
     }
 
     /// Auto-repair corrupted configurations (Inspired by Windows 'Reset this PC' and iOS 'Restore')
-    pub fn auto_repair_configuration(&self, path: &str, current_content: &str) -> Result<String, &'static str> {
+    pub fn auto_repair_configuration(
+        &self,
+        path: &str,
+        current_content: &str,
+    ) -> Result<String, &'static str> {
         if current_content.is_empty() || current_content.contains("TAMPERED") {
             if let Some(backup) = self.config_backups.get(path) {
                 println!("Self-Healing: Corrupted config '{}' auto-repaired to pristine default backup content.", path);
@@ -102,13 +113,31 @@ mod tests {
 
         // 1. Config auto-repair checks
         let intact_content = "IP=10.0.0.1\nPORT=443";
-        assert_eq!(kernel.auto_repair_configuration("/etc/network.conf", intact_content).unwrap(), intact_content.to_string());
+        assert_eq!(
+            kernel
+                .auto_repair_configuration("/etc/network.conf", intact_content)
+                .unwrap(),
+            intact_content.to_string()
+        );
 
-        assert_eq!(kernel.auto_repair_configuration("/etc/network.conf", "").unwrap(), "IP=192.168.1.1\nPORT=80".to_string());
-        assert_eq!(kernel.auto_repair_configuration("/etc/network.conf", "TAMPERED_CONTENT").unwrap(), "IP=192.168.1.1\nPORT=80".to_string());
+        assert_eq!(
+            kernel
+                .auto_repair_configuration("/etc/network.conf", "")
+                .unwrap(),
+            "IP=192.168.1.1\nPORT=80".to_string()
+        );
+        assert_eq!(
+            kernel
+                .auto_repair_configuration("/etc/network.conf", "TAMPERED_CONTENT")
+                .unwrap(),
+            "IP=192.168.1.1\nPORT=80".to_string()
+        );
 
         // 2. Driver rollback checks
-        assert_eq!(kernel.rollback_driver_on_failure(101).unwrap(), "nvme-v1.4.0".to_string());
+        assert_eq!(
+            kernel.rollback_driver_on_failure(101).unwrap(),
+            "nvme-v1.4.0".to_string()
+        );
         assert!(kernel.rollback_driver_on_failure(999).is_err());
     }
 }

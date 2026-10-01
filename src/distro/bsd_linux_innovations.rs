@@ -795,7 +795,9 @@ impl BsdLinuxDistroGuidelinePolicy {
     }
 
     pub fn verify_all_pillars(&self) -> bool {
-        self.active_pillars.iter().all(|&p| self.evaluate_pillar_compliance(p))
+        self.active_pillars
+            .iter()
+            .all(|&p| self.evaluate_pillar_compliance(p))
     }
 }
 

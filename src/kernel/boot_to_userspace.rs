@@ -139,9 +139,14 @@ impl SecureBootEngine {
 
     pub fn extend_pcr(&mut self, pcr_index: usize, data: &[u8]) {
         if pcr_index < self.pcr_registers.len() {
-            let hash = data.iter().fold(5381u64, |acc, &b| acc.wrapping_mul(33).wrapping_add(b as u64));
+            let hash = data.iter().fold(5381u64, |acc, &b| {
+                acc.wrapping_mul(33).wrapping_add(b as u64)
+            });
             self.pcr_registers[pcr_index] ^= hash;
-            self.measured_log.push(format!("PCR[{}] extended with hash 0x{:016X}", pcr_index, hash));
+            self.measured_log.push(format!(
+                "PCR[{}] extended with hash 0x{:016X}",
+                pcr_index, hash
+            ));
         }
     }
 
@@ -150,7 +155,9 @@ impl SecureBootEngine {
             return false;
         }
         // Simulated signature check against authorized keys database
-        let digest = binary.iter().fold(0u64, |acc, &b| acc.wrapping_add(b as u64));
+        let digest = binary
+            .iter()
+            .fold(0u64, |acc, &b| acc.wrapping_add(b as u64));
         digest % 2 == 0
     }
 }
@@ -465,7 +472,8 @@ impl SystemClockTimer {
     }
 
     pub fn advance_tick(&self, millis: u64) {
-        self.monotonic_nanos.fetch_add(millis * 1_000_000, Ordering::Relaxed);
+        self.monotonic_nanos
+            .fetch_add(millis * 1_000_000, Ordering::Relaxed);
     }
 
     pub fn get_monotonic_millis(&self) -> u64 {
@@ -519,7 +527,13 @@ impl AddressSpaceSeparationManager {
         (KERNEL_SPACE_MIN..=KERNEL_SPACE_MAX).contains(&vaddr)
     }
 
-    pub fn map_user_page(&mut self, vaddr: u64, paddr: u64, writable: bool, executable: bool) -> Result<(), &'static str> {
+    pub fn map_user_page(
+        &mut self,
+        vaddr: u64,
+        paddr: u64,
+        writable: bool,
+        executable: bool,
+    ) -> Result<(), &'static str> {
         if !Self::is_user_address(vaddr) {
             return Err("Address outside user space boundaries");
         }
@@ -534,7 +548,12 @@ impl AddressSpaceSeparationManager {
         Ok(())
     }
 
-    pub fn map_kernel_page(&mut self, vaddr: u64, paddr: u64, writable: bool) -> Result<(), &'static str> {
+    pub fn map_kernel_page(
+        &mut self,
+        vaddr: u64,
+        paddr: u64,
+        writable: bool,
+    ) -> Result<(), &'static str> {
         if !Self::is_kernel_address(vaddr) {
             return Err("Address outside kernel space boundaries");
         }
@@ -542,7 +561,8 @@ impl AddressSpaceSeparationManager {
         if writable {
             flags |= page_flags::WRITABLE;
         }
-        self.mapped_kernel_pages.insert(vaddr & !0xFFF, paddr | flags);
+        self.mapped_kernel_pages
+            .insert(vaddr & !0xFFF, paddr | flags);
         Ok(())
     }
 }
@@ -606,7 +626,10 @@ impl Elf64Loader {
             memsz: 0x1000,
             filesz: 0x1000,
             flags: PF_R | PF_X,
-            data: elf_data.get(0..core::cmp::min(0x1000, elf_data.len())).unwrap_or(&[]).to_vec(),
+            data: elf_data
+                .get(0..core::cmp::min(0x1000, elf_data.len()))
+                .unwrap_or(&[])
+                .to_vec(),
         });
 
         // Data segment
@@ -625,11 +648,25 @@ impl Elf64Loader {
         })
     }
 
-    pub fn build_user_stack(&self, stack_top: u64, _args: &[&str], _envs: &[&str]) -> (u64, Vec<AuxVectorEntry>) {
+    pub fn build_user_stack(
+        &self,
+        stack_top: u64,
+        _args: &[&str],
+        _envs: &[&str],
+    ) -> (u64, Vec<AuxVectorEntry>) {
         let mut auxv = Vec::new();
-        auxv.push(AuxVectorEntry { key: AT_ENTRY, val: self.entry_point });
-        auxv.push(AuxVectorEntry { key: AT_PAGESZ, val: 4096 });
-        auxv.push(AuxVectorEntry { key: AT_PHNUM, val: self.segments.len() as u64 });
+        auxv.push(AuxVectorEntry {
+            key: AT_ENTRY,
+            val: self.entry_point,
+        });
+        auxv.push(AuxVectorEntry {
+            key: AT_PAGESZ,
+            val: 4096,
+        });
+        auxv.push(AuxVectorEntry {
+            key: AT_PHNUM,
+            val: self.segments.len() as u64,
+        });
 
         let rsp = stack_top - 0x100;
         (rsp, auxv)
@@ -679,7 +716,8 @@ impl SyscallDispatcher {
     }
 
     pub fn dispatch(&self, frame: &mut SyscallFrame) -> i64 {
-        self.total_syscalls_dispatched.fetch_add(1, Ordering::Relaxed);
+        self.total_syscalls_dispatched
+            .fetch_add(1, Ordering::Relaxed);
         match frame.rax {
             SYS_READ => {
                 // Return read count (simulated)
@@ -689,7 +727,7 @@ impl SyscallDispatcher {
                 // Return write count (simulated)
                 frame.rdx as i64
             }
-            SYS_OPEN => 3, // FD 3
+            SYS_OPEN => 3,  // FD 3
             SYS_CLOSE => 0, // Success
             SYS_EXIT => 0,
             SYS_EXECVE => 0,
@@ -880,13 +918,20 @@ impl ProcDiagnosticsFs {
     }
 
     pub fn cmdline(cmdline: &KernelCmdline) -> String {
-        format!("root={} init={} smp={}\n", cmdline.root_device, cmdline.init_path, cmdline.smp_cpus)
+        format!(
+            "root={} init={} smp={}\n",
+            cmdline.root_device, cmdline.init_path, cmdline.smp_cpus
+        )
     }
 
     pub fn proc_status(pcb: &ProcessControlBlock) -> String {
         format!(
             "Name:\t{}\nPid:\t{}\nPPid:\t{}\nState:\t{:?}\nFDs:\t{}\n",
-            pcb.name, pcb.pid, pcb.ppid, pcb.state, pcb.fd_table.descriptors.len()
+            pcb.name,
+            pcb.pid,
+            pcb.ppid,
+            pcb.state,
+            pcb.fd_table.descriptors.len()
         )
     }
 }
@@ -918,7 +963,13 @@ impl KernelPanicRecoveryEngine {
         }
     }
 
-    pub fn trigger_panic(&mut self, message: &str, rip: u64, rsp: u64, pid: u32) -> KernelPanicDump {
+    pub fn trigger_panic(
+        &mut self,
+        message: &str,
+        rip: u64,
+        rsp: u64,
+        pid: u32,
+    ) -> KernelPanicDump {
         let dump = KernelPanicDump {
             panic_message: message.to_string(),
             fault_rip: rip,
@@ -1084,7 +1135,9 @@ mod tests {
 
     #[test]
     fn test_bootloader_config_and_cmdline() {
-        let config = BootloaderConfig::parse("default=TestOS\ntimeout=10\ncmdline=root=/dev/sda1 init=/bin/sh smp=8 quiet\n");
+        let config = BootloaderConfig::parse(
+            "default=TestOS\ntimeout=10\ncmdline=root=/dev/sda1 init=/bin/sh smp=8 quiet\n",
+        );
         assert_eq!(config.default_entry, "TestOS");
         assert_eq!(config.timeout_seconds, 10);
 
@@ -1111,11 +1164,17 @@ mod tests {
 
     #[test]
     fn test_address_space_separation_and_elf_loader() {
-        assert!(AddressSpaceSeparationManager::is_user_address(0x0000_0000_0040_0000));
-        assert!(AddressSpaceSeparationManager::is_kernel_address(0xFFFF_8000_0000_0000));
+        assert!(AddressSpaceSeparationManager::is_user_address(
+            0x0000_0000_0040_0000
+        ));
+        assert!(AddressSpaceSeparationManager::is_kernel_address(
+            0xFFFF_8000_0000_0000
+        ));
 
         let mut addr_space = AddressSpaceSeparationManager::new();
-        assert!(addr_space.map_user_page(0x0000_0000_0040_0000, 0x1000, false, true).is_ok());
+        assert!(addr_space
+            .map_user_page(0x0000_0000_0040_0000, 0x1000, false, true)
+            .is_ok());
 
         let mock_elf = b"\x7FELF_MOCK_HEADER_DATA_1234567890_PADDING_DATA_FOR_64_BYTES_LEN_MOCK";
         let elf = Elf64Loader::parse_and_load(mock_elf).unwrap();

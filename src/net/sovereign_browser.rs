@@ -19,9 +19,9 @@
 
 // (no_std only applicable at crate root - removed)
 
-use std::vec::Vec;
-use std::string::{String, ToString};
 use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BrowserError {
@@ -126,7 +126,10 @@ pub struct AdBlockRule {
 
 impl AdBlockRule {
     pub fn new(pattern: String, is_whitelist: bool) -> Self {
-        Self { pattern, is_whitelist }
+        Self {
+            pattern,
+            is_whitelist,
+        }
     }
 
     pub fn matches(&self, url: &str) -> bool {
@@ -282,7 +285,9 @@ impl SovereignBrowser {
 
     /// Load URL in a tab
     pub fn load_url(&mut self, tab_id: u64, url: String) -> Result<(), BrowserError> {
-        let tab = self.tabs.get_mut(&tab_id)
+        let tab = self
+            .tabs
+            .get_mut(&tab_id)
             .ok_or(BrowserError::ScriptError)?;
 
         // Check adblock
@@ -304,11 +309,19 @@ impl SovereignBrowser {
     }
 
     /// Assign tab to container
-    pub fn assign_tab_to_container(&mut self, tab_id: u64, container_id: u64) -> Result<(), BrowserError> {
-        let tab = self.tabs.get_mut(&tab_id)
+    pub fn assign_tab_to_container(
+        &mut self,
+        tab_id: u64,
+        container_id: u64,
+    ) -> Result<(), BrowserError> {
+        let tab = self
+            .tabs
+            .get_mut(&tab_id)
             .ok_or(BrowserError::ScriptError)?;
 
-        let container = self.containers.get_mut(&container_id)
+        let container = self
+            .containers
+            .get_mut(&container_id)
             .ok_or(BrowserError::ScriptError)?;
 
         tab.set_container(container_id);
@@ -318,8 +331,14 @@ impl SovereignBrowser {
     }
 
     /// Set security profile for tab
-    pub fn set_tab_security_profile(&mut self, tab_id: u64, profile: SecurityProfile) -> Result<(), BrowserError> {
-        let tab = self.tabs.get_mut(&tab_id)
+    pub fn set_tab_security_profile(
+        &mut self,
+        tab_id: u64,
+        profile: SecurityProfile,
+    ) -> Result<(), BrowserError> {
+        let tab = self
+            .tabs
+            .get_mut(&tab_id)
             .ok_or(BrowserError::ScriptError)?;
 
         tab.set_security_profile(profile);
@@ -335,7 +354,8 @@ impl SovereignBrowser {
 
     /// Add adblock rule
     pub fn add_adblock_rule(&mut self, pattern: String, is_whitelist: bool) {
-        self.shield.add_rule(AdBlockRule::new(pattern, is_whitelist));
+        self.shield
+            .add_rule(AdBlockRule::new(pattern, is_whitelist));
     }
 
     /// Enable/disable adblock
@@ -359,8 +379,7 @@ impl SovereignBrowser {
 
     /// Close tab
     pub fn close_tab(&mut self, tab_id: u64) -> Result<(), BrowserError> {
-        let tab = self.tabs.remove(&tab_id)
-            .ok_or(BrowserError::ScriptError)?;
+        let tab = self.tabs.remove(&tab_id).ok_or(BrowserError::ScriptError)?;
 
         // Remove from container
         if let Some(container_id) = tab.container_id {
@@ -471,7 +490,9 @@ mod tests {
         let tab_id = browser.create_tab();
         let container_id = browser.create_container("Work".to_string());
 
-        browser.assign_tab_to_container(tab_id, container_id).unwrap();
+        browser
+            .assign_tab_to_container(tab_id, container_id)
+            .unwrap();
 
         let tab = browser.get_tab(tab_id).unwrap();
         assert_eq!(tab.container_id, Some(container_id));
@@ -485,7 +506,9 @@ mod tests {
         let mut browser = SovereignBrowser::new();
         let tab_id = browser.create_tab();
 
-        browser.set_tab_security_profile(tab_id, SecurityProfile::Incognito).unwrap();
+        browser
+            .set_tab_security_profile(tab_id, SecurityProfile::Incognito)
+            .unwrap();
 
         let tab = browser.get_tab(tab_id).unwrap();
         assert!(tab.is_incognito());
@@ -508,7 +531,9 @@ mod tests {
         let tab_id = browser.create_tab();
         let container_id = browser.create_container("Test".to_string());
 
-        browser.assign_tab_to_container(tab_id, container_id).unwrap();
+        browser
+            .assign_tab_to_container(tab_id, container_id)
+            .unwrap();
         browser.close_tab(tab_id).unwrap();
 
         assert_eq!(browser.tab_count(), 0);

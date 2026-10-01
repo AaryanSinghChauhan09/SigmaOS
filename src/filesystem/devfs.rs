@@ -1,5 +1,5 @@
+use crate::filesystem::vfs::{FilePermissions, FileType, Inode};
 use std::vec::Vec;
-use crate::filesystem::vfs::{Inode, FileType, FilePermissions};
 
 pub struct DevFs {
     devices: Vec<DeviceNode>,
@@ -14,7 +14,9 @@ pub struct DeviceNode {
 
 impl DevFs {
     pub fn new() -> Self {
-        let mut devfs = Self { devices: Vec::new() };
+        let mut devfs = Self {
+            devices: Vec::new(),
+        };
         devfs.register_device("null", 1, 3, false);
         devfs.register_device("zero", 1, 5, false);
         devfs.register_device("full", 1, 7, false);
@@ -32,6 +34,11 @@ impl DevFs {
     }
 
     pub fn register_device(&mut self, name: &'static str, major: u32, minor: u32, is_block: bool) {
-        self.devices.push(DeviceNode { name, major, minor, is_block });
+        self.devices.push(DeviceNode {
+            name,
+            major,
+            minor,
+            is_block,
+        });
     }
 }

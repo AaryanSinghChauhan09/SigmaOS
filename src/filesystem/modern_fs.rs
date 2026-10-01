@@ -2,9 +2,9 @@
 // Provides BTRFS CoW subvolume snapshotting, ZFS storage pool vdev management,
 // XFS B+ tree extents, and LUKS2 AES-XTS volume encryption.
 
+use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::collections::BTreeMap;
 
 #[derive(Debug, Clone)]
 pub struct BtrfsSubvolume {
@@ -24,25 +24,35 @@ impl BtrfsEngine {
             subvolumes: BTreeMap::new(),
             next_id: 256, // Standard top-level subvolume ID
         };
-        engine.subvolumes.insert(256, BtrfsSubvolume {
-            id: 256,
-            name: "@rootfs".to_string(),
-            parent_snapshot_id: None,
-        });
+        engine.subvolumes.insert(
+            256,
+            BtrfsSubvolume {
+                id: 256,
+                name: "@rootfs".to_string(),
+                parent_snapshot_id: None,
+            },
+        );
         engine
     }
 
-    pub fn create_cow_snapshot(&mut self, parent_id: u64, snapshot_name: &str) -> Result<u64, &'static str> {
+    pub fn create_cow_snapshot(
+        &mut self,
+        parent_id: u64,
+        snapshot_name: &str,
+    ) -> Result<u64, &'static str> {
         if !self.subvolumes.contains_key(&parent_id) {
             return Err("Parent subvolume not found");
         }
         self.next_id += 1;
         let snap_id = self.next_id;
-        self.subvolumes.insert(snap_id, BtrfsSubvolume {
-            id: snap_id,
-            name: snapshot_name.to_string(),
-            parent_snapshot_id: Some(parent_id),
-        });
+        self.subvolumes.insert(
+            snap_id,
+            BtrfsSubvolume {
+                id: snap_id,
+                name: snapshot_name.to_string(),
+                parent_snapshot_id: Some(parent_id),
+            },
+        );
         Ok(snap_id)
     }
 }
@@ -103,7 +113,11 @@ mod tests {
         let snap_id = btrfs.create_cow_snapshot(256, "@snap_2026_01").unwrap();
         assert_eq!(snap_id, 257);
 
-        let zpool = ZfsZpool::new("tank", vec!["/dev/sda".to_string(), "/dev/sdb".to_string()], 204800);
+        let zpool = ZfsZpool::new(
+            "tank",
+            vec!["/dev/sda".to_string(), "/dev/sdb".to_string()],
+            204800,
+        );
         assert_eq!(zpool.vdev_disks.len(), 2);
 
         let mut luks = Luks2CryptVolume::new("sovereign_vault");

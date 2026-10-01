@@ -16,8 +16,8 @@ use std::vec;
 
 // (no_std only applicable at crate root - removed)
 
-use std::vec::Vec;
 use core::sync::atomic::{AtomicU32, Ordering};
+use std::vec::Vec;
 
 /// Kernel parameter to be tuned
 #[derive(Debug, Clone, Copy)]
@@ -190,7 +190,9 @@ impl KernelGeneticAutotuner {
             if (*rng as f64 / u64::MAX as f64) < self.mutation_rate {
                 let range = self.params[i].max - self.params[i].min;
                 let delta = ((*rng % range) as i64) - (range as i64) / 2;
-                let new_val = (*param as i64 + delta).clamp(self.params[i].min as i64, self.params[i].max as i64) as u64;
+                let new_val = (*param as i64 + delta)
+                    .clamp(self.params[i].min as i64, self.params[i].max as i64)
+                    as u64;
                 *param = new_val;
             }
             *rng = rng.wrapping_mul(6364136223846793005).wrapping_add(1);
@@ -213,8 +215,20 @@ mod tests {
     #[test]
     fn test_autotuner_creation() {
         let params = vec![
-            KernelParam { id: 1, name: "quantum", min: 1, max: 1000, current: 100 },
-            KernelParam { id: 2, name: "swappiness", min: 0, max: 100, current: 60 },
+            KernelParam {
+                id: 1,
+                name: "quantum",
+                min: 1,
+                max: 1000,
+                current: 100,
+            },
+            KernelParam {
+                id: 2,
+                name: "swappiness",
+                min: 0,
+                max: 100,
+                current: 60,
+            },
         ];
         let tuner = KernelGeneticAutotuner::new(params, 10);
         assert_eq!(tuner.population.len(), 10);
@@ -222,9 +236,13 @@ mod tests {
 
     #[test]
     fn test_autotuner_evolution() {
-        let params = vec![
-            KernelParam { id: 1, name: "quantum", min: 1, max: 1000, current: 100 },
-        ];
+        let params = vec![KernelParam {
+            id: 1,
+            name: "quantum",
+            min: 1,
+            max: 1000,
+            current: 100,
+        }];
         let mut tuner = KernelGeneticAutotuner::new(params, 8);
         tuner.evaluate(|genes| FitnessScore {
             throughput: genes[0] as f64 / 1000.0,

@@ -158,7 +158,9 @@ impl FanotifyManager {
 
     /// Report an event to a watch
     pub fn report_event(&self, watch_id: u64, event: FanotifyEvent) -> Result<(), String> {
-        let watch = self.watches.get(&watch_id)
+        let watch = self
+            .watches
+            .get(&watch_id)
             .ok_or_else(|| format!("Watch not found: {}", watch_id))?;
 
         let mut watch_guard = watch.lock().unwrap();
@@ -169,7 +171,9 @@ impl FanotifyManager {
 
     /// Get events from watch
     pub fn get_events(&self, watch_id: u64) -> Result<Vec<FanotifyEvent>, String> {
-        let watch = self.watches.get(&watch_id)
+        let watch = self
+            .watches
+            .get(&watch_id)
             .ok_or_else(|| format!("Watch not found: {}", watch_id))?;
 
         let watch_guard = watch.lock().unwrap();
@@ -178,7 +182,9 @@ impl FanotifyManager {
 
     /// Clear events from watch
     pub fn clear_events(&self, watch_id: u64) -> Result<(), String> {
-        let watch = self.watches.get(&watch_id)
+        let watch = self
+            .watches
+            .get(&watch_id)
             .ok_or_else(|| format!("Watch not found: {}", watch_id))?;
 
         let mut watch_guard = watch.lock().unwrap();
@@ -189,7 +195,8 @@ impl FanotifyManager {
 
     /// Remove watch
     pub fn remove_watch(&mut self, watch_id: u64) -> Result<(), String> {
-        self.watches.remove(&watch_id)
+        self.watches
+            .remove(&watch_id)
             .ok_or_else(|| format!("Watch not found: {}", watch_id))?;
         Ok(())
     }

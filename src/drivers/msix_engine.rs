@@ -78,7 +78,12 @@ impl SovereignMsixVectorEngine {
         }
     }
 
-    pub fn configure_vector(&mut self, index: u16, vector: u8, target_cpu_apic_id: u32) -> Result<(), &'static str> {
+    pub fn configure_vector(
+        &mut self,
+        index: u16,
+        vector: u8,
+        target_cpu_apic_id: u32,
+    ) -> Result<(), &'static str> {
         if index >= self.table_size {
             return Err("MSI-X vector index out of bounds");
         }

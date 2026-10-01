@@ -4,36 +4,36 @@
 // inspired by NixOS's functional package management approach.
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use std::vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use std::boxed::Box;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use std::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use std::vec::Vec;
+use std::vec;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use std::format;
+use std::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
-#[cfg(any(feature = "standalone_test", test))]
-use std::vec;
-#[cfg(any(feature = "standalone_test", test))]
 use std::boxed::Box;
-#[cfg(any(feature = "standalone_test", test))]
-use std::string::{String, ToString};
-#[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
-#[cfg(any(feature = "standalone_test", test))]
-use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::HashMap;
 #[cfg(any(feature = "standalone_test", test))]
+use std::format;
+#[cfg(any(feature = "standalone_test", test))]
 use std::path::{Path, PathBuf};
+#[cfg(any(feature = "standalone_test", test))]
+use std::string::{String, ToString};
+#[cfg(any(feature = "standalone_test", test))]
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec;
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use crate::klib::HashMap;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use crate::klib::path::{Path, PathBuf};
+#[cfg(not(any(feature = "standalone_test", test)))]
+use crate::klib::HashMap;
 #[derive(Debug, Clone)]
 pub struct PackageDerivation {
     pub name: String,
@@ -110,7 +110,13 @@ impl NixLikeStore {
         derivation: &PackageDerivation,
     ) -> Result<PathBuf, Box<dyn std::error::Error>> {
         let store_str = self.store_path.to_string_lossy();
-        let output_path = PathBuf::from(format!("{}/{}-{}-{}", store_str, &derivation.hash[..8], derivation.name, derivation.version));
+        let output_path = PathBuf::from(format!(
+            "{}/{}-{}-{}",
+            store_str,
+            &derivation.hash[..8],
+            derivation.name,
+            derivation.version
+        ));
 
         if output_path.exists() {
             // Package already built, return cached result
@@ -292,7 +298,13 @@ impl NixLikeStore {
         for (hash, derivation) in self.derivations.clone().into_iter() {
             if !referenced.iter().any(|h| h.as_str() == hash.as_str()) {
                 let store_str = self.store_path.to_string_lossy();
-                let package_path = PathBuf::from(format!("{}/{}-{}-{}", store_str, &hash[..8], derivation.name, derivation.version));
+                let package_path = PathBuf::from(format!(
+                    "{}/{}-{}-{}",
+                    store_str,
+                    &hash[..8],
+                    derivation.name,
+                    derivation.version
+                ));
 
                 if package_path.exists() {
                     Err("fs not available")?;
@@ -423,7 +435,10 @@ impl SourceDateEpochNormalizer {
 
     pub fn sanitize_env_vars(&self) -> HashMap<String, String> {
         let mut env = HashMap::new();
-        env.insert("SOURCE_DATE_EPOCH".to_string(), self.source_date_epoch.to_string());
+        env.insert(
+            "SOURCE_DATE_EPOCH".to_string(),
+            self.source_date_epoch.to_string(),
+        );
         env.insert("CFLAGS".to_string(), self.debug_prefix_map.clone());
         env.insert("CXXFLAGS".to_string(), self.debug_prefix_map.clone());
         env.insert("LANG".to_string(), "C".to_string());
@@ -464,8 +479,11 @@ pub struct ReproducibleBuildAuditMatrix {
 
 impl ReproducibleBuildAuditMatrix {
     pub fn evaluate(env: &HashMap<String, String>, binary_a: &[u8], binary_b: &[u8]) -> Self {
-        let env_ok = env.contains_key("SOURCE_DATE_EPOCH") && env.get("LANG").map(|s| s.as_str()) == Some("C");
-        let path_ok = env.get("CFLAGS").map_or(false, |c| c.contains("-fdebug-prefix-map"));
+        let env_ok = env.contains_key("SOURCE_DATE_EPOCH")
+            && env.get("LANG").map(|s| s.as_str()) == Some("C");
+        let path_ok = env
+            .get("CFLAGS")
+            .map_or(false, |c| c.contains("-fdebug-prefix-map"));
         let bit_ok = BsdPkgChecksumVerifier::verify_bit_for_bit_identity(binary_a, binary_b);
 
         Self {
@@ -483,7 +501,7 @@ impl ReproducibleBuildAuditMatrix {
 #[cfg(test_disabled)]
 mod tests {
     use super::*;
-    
+
     // Simple temporary directory implementation for testing
     struct TestTempDir {
         path: PathBuf,
@@ -561,8 +579,12 @@ mod tests {
 
         let hash1 = BsdPkgChecksumVerifier::compute_sha256_hex(bin1);
         assert!(!hash1.is_empty());
-        assert!(BsdPkgChecksumVerifier::verify_bit_for_bit_identity(bin1, bin2));
-        assert!(!BsdPkgChecksumVerifier::verify_bit_for_bit_identity(bin1, bin3));
+        assert!(BsdPkgChecksumVerifier::verify_bit_for_bit_identity(
+            bin1, bin2
+        ));
+        assert!(!BsdPkgChecksumVerifier::verify_bit_for_bit_identity(
+            bin1, bin3
+        ));
     }
 
     #[test]

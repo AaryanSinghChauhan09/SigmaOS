@@ -11,13 +11,13 @@ use std::vec::Vec;
 
 pub const MAX_X86_PCID: u16 = 4095;
 pub const KPTI_USER_PCID_MASK: u16 = 0x800; // Bit 11 toggled for user vs kernel Page Tables
-pub const CR3_NOFLUSH_BIT: u64 = 1 << 63;   // CR3 bit 63 prevents TLB flush on CR3 write
+pub const CR3_NOFLUSH_BIT: u64 = 1 << 63; // CR3 bit 63 prevents TLB flush on CR3 write
 
 /// INVPCID Execution Modes (x86_64 Architecture)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InvpcidMode {
-    IndividualAddress = 0, // Invalidate single address for specific PCID
-    SingleContext = 1,      // Invalidate all addresses for specific PCID
+    IndividualAddress = 0,          // Invalidate single address for specific PCID
+    SingleContext = 1,              // Invalidate all addresses for specific PCID
     AllContextsIncludingGlobal = 2, // Invalidate all contexts including global
     AllContextsExcludingGlobal = 3, // Invalidate all non-global contexts
 }
@@ -56,7 +56,12 @@ impl AddressSpaceIdentifierEngine {
     }
 
     /// Allocate or retrieve a PCID/ASID descriptor for a process
-    pub fn allocate_process_pcid(&mut self, pid: u32, cr3_phys: u64, kpti_required: bool) -> PcidDescriptor {
+    pub fn allocate_process_pcid(
+        &mut self,
+        pid: u32,
+        cr3_phys: u64,
+        kpti_required: bool,
+    ) -> PcidDescriptor {
         if let Some(existing) = self.active_pcids.get_mut(&pid) {
             // Check generation validity
             if existing.generation == self.current_generation {
@@ -120,20 +125,35 @@ impl AddressSpaceIdentifierEngine {
     pub fn rollover_asid_generation(&mut self) {
         self.current_generation += 1;
         self.next_available_pcid = 1; // Reset PCID pool counter
-        self.active_pcids.clear();    // Flush old stale PCID descriptors
+        self.active_pcids.clear(); // Flush old stale PCID descriptors
     }
 
     /// Dispatch INVPCID instruction simulation for selective TLB invalidation
-    pub fn execute_invpcid(&mut self, mode: InvpcidMode, pcid: u16, vaddr: u64) -> Result<String, &'static str> {
+    pub fn execute_invpcid(
+        &mut self,
+        mode: InvpcidMode,
+        pcid: u16,
+        vaddr: u64,
+    ) -> Result<String, &'static str> {
         if !self.invpcid_supported {
             return Err("INVPCID instruction not supported by CPU topology");
         }
 
         match mode {
-            InvpcidMode::IndividualAddress => Ok(format!("INVPCID: Invalidated vaddr {:#x} for PCID {}", vaddr, pcid)),
-            InvpcidMode::SingleContext => Ok(format!("INVPCID: Invalidated all TLB entries for PCID {}", pcid)),
-            InvpcidMode::AllContextsIncludingGlobal => Ok("INVPCID: Invalidated all TLB contexts including global pages".to_string()),
-            InvpcidMode::AllContextsExcludingGlobal => Ok("INVPCID: Invalidated all non-global TLB contexts".to_string()),
+            InvpcidMode::IndividualAddress => Ok(format!(
+                "INVPCID: Invalidated vaddr {:#x} for PCID {}",
+                vaddr, pcid
+            )),
+            InvpcidMode::SingleContext => Ok(format!(
+                "INVPCID: Invalidated all TLB entries for PCID {}",
+                pcid
+            )),
+            InvpcidMode::AllContextsIncludingGlobal => {
+                Ok("INVPCID: Invalidated all TLB contexts including global pages".to_string())
+            }
+            InvpcidMode::AllContextsExcludingGlobal => {
+                Ok("INVPCID: Invalidated all non-global TLB contexts".to_string())
+            }
         }
     }
 }
@@ -186,7 +206,9 @@ mod tests {
     #[test]
     fn test_invpcid_dispatching() {
         let mut engine = AddressSpaceIdentifierEngine::new();
-        let res = engine.execute_invpcid(InvpcidMode::SingleContext, 5, 0).unwrap();
+        let res = engine
+            .execute_invpcid(InvpcidMode::SingleContext, 5, 0)
+            .unwrap();
         assert!(res.contains("PCID 5"));
     }
 }

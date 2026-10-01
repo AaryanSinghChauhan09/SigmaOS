@@ -12,13 +12,13 @@ use alloc::vec::Vec;
 /// Task Scheduling Policy / Class inspired by Linux & BSD schedulers
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum SchedulerClass {
-    SchedDeadline = 0,   // Earliest Deadline First (EDF) - highest priority
-    SchedFifo = 1,       // Real-time FIFO
-    SchedRr = 2,         // Real-time Round Robin
-    SchedEevdf = 3,      // Linux 6.6+ Earliest Eligible Virtual Deadline First
-    SchedBore = 4,       // CachyOS Burst-Oriented Response Enhancer
-    BsdUleInteractive = 5,// FreeBSD ULE Interactivity-Boosted Queue
-    SchedIdle = 6,       // Low-priority background task
+    SchedDeadline = 0,     // Earliest Deadline First (EDF) - highest priority
+    SchedFifo = 1,         // Real-time FIFO
+    SchedRr = 2,           // Real-time Round Robin
+    SchedEevdf = 3,        // Linux 6.6+ Earliest Eligible Virtual Deadline First
+    SchedBore = 4,         // CachyOS Burst-Oriented Response Enhancer
+    BsdUleInteractive = 5, // FreeBSD ULE Interactivity-Boosted Queue
+    SchedIdle = 6,         // Low-priority background task
 }
 
 /// Schedulable Task Entity
@@ -27,10 +27,10 @@ pub struct SchedulerTask {
     pub pid: u64,
     pub name: String,
     pub policy: SchedulerClass,
-    pub priority: u8,            // 0..255 (lower = higher priority)
-    pub virtual_runtime_ns: u64, // Virtual runtime for EEVDF
-    pub virtual_deadline_ns: u64,// Virtual deadline for EEVDF
-    pub burst_score: u8,         // Interactivity / burstiness score (0..100)
+    pub priority: u8,             // 0..255 (lower = higher priority)
+    pub virtual_runtime_ns: u64,  // Virtual runtime for EEVDF
+    pub virtual_deadline_ns: u64, // Virtual deadline for EEVDF
+    pub burst_score: u8,          // Interactivity / burstiness score (0..100)
     pub assigned_cpu: usize,
 }
 
@@ -71,7 +71,9 @@ impl CpuRunqueue {
                 best_idx = i;
             } else if task.policy == current_best.policy {
                 match task.policy {
-                    SchedulerClass::SchedEevdf | SchedulerClass::SchedBore | SchedulerClass::BsdUleInteractive => {
+                    SchedulerClass::SchedEevdf
+                    | SchedulerClass::SchedBore
+                    | SchedulerClass::BsdUleInteractive => {
                         if task.virtual_deadline_ns < current_best.virtual_deadline_ns {
                             best_idx = i;
                         }
@@ -86,7 +88,9 @@ impl CpuRunqueue {
         }
 
         let task = self.tasks.remove(best_idx);
-        self.total_load_weight = self.total_load_weight.saturating_sub(256 - task.priority as u64);
+        self.total_load_weight = self
+            .total_load_weight
+            .saturating_sub(256 - task.priority as u64);
         Some(task)
     }
 }
@@ -103,12 +107,18 @@ impl SovereignMultiQueueSchedulerGovernor {
         for i in 0..num_cpus {
             queues.push(CpuRunqueue::new(i));
         }
-        Self { per_cpu_queues: queues }
+        Self {
+            per_cpu_queues: queues,
+        }
     }
 
     pub fn submit_task(&mut self, task: SchedulerTask) {
         // Enqueue onto CPU with minimal load weight (load balancing)
-        if let Some(rq) = self.per_cpu_queues.iter_mut().min_by_key(|q| q.total_load_weight) {
+        if let Some(rq) = self
+            .per_cpu_queues
+            .iter_mut()
+            .min_by_key(|q| q.total_load_weight)
+        {
             rq.enqueue_task(task);
         }
     }
@@ -125,17 +135,23 @@ impl SovereignMultiQueueSchedulerGovernor {
         let mut min_cpu = 0;
 
         for i in 1..num_cpus {
-            if self.per_cpu_queues[i].total_load_weight > self.per_cpu_queues[max_cpu].total_load_weight {
+            if self.per_cpu_queues[i].total_load_weight
+                > self.per_cpu_queues[max_cpu].total_load_weight
+            {
                 max_cpu = i;
             }
-            if self.per_cpu_queues[i].total_load_weight < self.per_cpu_queues[min_cpu].total_load_weight {
+            if self.per_cpu_queues[i].total_load_weight
+                < self.per_cpu_queues[min_cpu].total_load_weight
+            {
                 min_cpu = i;
             }
         }
 
         if max_cpu != min_cpu && self.per_cpu_queues[max_cpu].tasks.len() > 1 {
             if let Some(task) = self.per_cpu_queues[max_cpu].tasks.pop() {
-                self.per_cpu_queues[max_cpu].total_load_weight = self.per_cpu_queues[max_cpu].total_load_weight.saturating_sub(256 - task.priority as u64);
+                self.per_cpu_queues[max_cpu].total_load_weight = self.per_cpu_queues[max_cpu]
+                    .total_load_weight
+                    .saturating_sub(256 - task.priority as u64);
                 self.per_cpu_queues[min_cpu].enqueue_task(task);
                 stolen_count += 1;
             }

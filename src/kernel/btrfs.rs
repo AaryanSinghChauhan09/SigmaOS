@@ -297,8 +297,8 @@ mod tests {
 
     #[test]
     fn test_btrfs_subvolume_with_parent() {
-        let subvol = BtrfsSubvolume::new(6, "snap".to_string(), BtrfsSubvolumeType::Snapshot)
-            .with_parent(5);
+        let subvol =
+            BtrfsSubvolume::new(6, "snap".to_string(), BtrfsSubvolumeType::Snapshot).with_parent(5);
         assert_eq!(subvol.parent_id, Some(5));
     }
 
@@ -330,7 +330,9 @@ mod tests {
         let mut fs = BtrfsFilesystem::new(1, "main".to_string(), 1024 * 1024 * 1024);
 
         let subvol_id = fs.create_subvolume("data".to_string()).unwrap();
-        let snap_id = fs.create_snapshot(subvol_id, "data_snap".to_string()).unwrap();
+        let snap_id = fs
+            .create_snapshot(subvol_id, "data_snap".to_string())
+            .unwrap();
 
         assert_eq!(snap_id, 6);
         assert_eq!(fs.subvolume_count(), 2);

@@ -65,11 +65,24 @@ impl UnifiedSettingsManager {
         };
 
         // Seed default admin account
-        usm.register_account("admin", "Sovereign Administrator", "/bin/sigma-sh", "en_IN", "us-qwerty");
+        usm.register_account(
+            "admin",
+            "Sovereign Administrator",
+            "/bin/sigma-sh",
+            "en_IN",
+            "us-qwerty",
+        );
         usm
     }
 
-    pub fn register_account(&mut self, username: &str, full_name: &str, shell: &str, lang: &str, input_method: &str) {
+    pub fn register_account(
+        &mut self,
+        username: &str,
+        full_name: &str,
+        shell: &str,
+        lang: &str,
+        input_method: &str,
+    ) {
         self.accounts.insert(
             username.to_string(),
             UserAccount {

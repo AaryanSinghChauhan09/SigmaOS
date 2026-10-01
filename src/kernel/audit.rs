@@ -38,7 +38,16 @@ pub struct AuditEvent {
 }
 
 impl AuditEvent {
-    pub fn new(id: u64, event_type: AuditEventType, timestamp: u64, pid: u32, uid: u32, gid: u32, result: AuditEventResult, message: String) -> Self {
+    pub fn new(
+        id: u64,
+        event_type: AuditEventType,
+        timestamp: u64,
+        pid: u32,
+        uid: u32,
+        gid: u32,
+        result: AuditEventResult,
+        message: String,
+    ) -> Self {
         AuditEvent {
             id,
             event_type,
@@ -164,14 +173,28 @@ impl AuditManager {
     }
 
     /// Log an event
-    pub fn log_event(&mut self, log_id: u64, event_type: AuditEventType, timestamp: u64, pid: u32, uid: u32, gid: u32, result: AuditEventResult, message: String) -> Result<u64, String> {
-        let log = self.logs.get(&log_id)
+    pub fn log_event(
+        &mut self,
+        log_id: u64,
+        event_type: AuditEventType,
+        timestamp: u64,
+        pid: u32,
+        uid: u32,
+        gid: u32,
+        result: AuditEventResult,
+        message: String,
+    ) -> Result<u64, String> {
+        let log = self
+            .logs
+            .get(&log_id)
             .ok_or_else(|| format!("Audit log not found: {}", log_id))?;
 
         let event_id = self.next_event_id;
         self.next_event_id += 1;
 
-        let event = AuditEvent::new(event_id, event_type, timestamp, pid, uid, gid, result, message);
+        let event = AuditEvent::new(
+            event_id, event_type, timestamp, pid, uid, gid, result, message,
+        );
 
         let mut log_guard = log.lock().unwrap();
         log_guard.add_event(event);
@@ -181,7 +204,9 @@ impl AuditManager {
 
     /// Get events from log
     pub fn get_events(&self, log_id: u64) -> Result<Vec<AuditEvent>, String> {
-        let log = self.logs.get(&log_id)
+        let log = self
+            .logs
+            .get(&log_id)
             .ok_or_else(|| format!("Audit log not found: {}", log_id))?;
 
         let log_guard = log.lock().unwrap();
@@ -190,7 +215,9 @@ impl AuditManager {
 
     /// Clear audit log
     pub fn clear_log(&self, log_id: u64) -> Result<(), String> {
-        let log = self.logs.get(&log_id)
+        let log = self
+            .logs
+            .get(&log_id)
             .ok_or_else(|| format!("Audit log not found: {}", log_id))?;
 
         let mut log_guard = log.lock().unwrap();
@@ -201,7 +228,8 @@ impl AuditManager {
 
     /// Remove audit log
     pub fn remove_log(&mut self, log_id: u64) -> Result<(), String> {
-        self.logs.remove(&log_id)
+        self.logs
+            .remove(&log_id)
             .ok_or_else(|| format!("Audit log not found: {}", log_id))?;
         Ok(())
     }
@@ -232,7 +260,7 @@ mod tests {
             0,
             0,
             AuditEventResult::Success,
-            "test syscall".to_string()
+            "test syscall".to_string(),
         );
 
         assert_eq!(event.id(), 1);
@@ -258,7 +286,7 @@ mod tests {
             0,
             0,
             AuditEventResult::Success,
-            "test syscall".to_string()
+            "test syscall".to_string(),
         );
 
         log.add_event(event);
@@ -269,9 +297,36 @@ mod tests {
     fn test_audit_log_max_size() {
         let mut log = AuditLog::new(1, "test_log".to_string(), 2);
 
-        log.add_event(AuditEvent::new(1, AuditEventType::Syscall, 1, 100, 0, 0, AuditEventResult::Success, "event1".to_string()));
-        log.add_event(AuditEvent::new(2, AuditEventType::Syscall, 2, 100, 0, 0, AuditEventResult::Success, "event2".to_string()));
-        log.add_event(AuditEvent::new(3, AuditEventType::Syscall, 3, 100, 0, 0, AuditEventResult::Success, "event3".to_string()));
+        log.add_event(AuditEvent::new(
+            1,
+            AuditEventType::Syscall,
+            1,
+            100,
+            0,
+            0,
+            AuditEventResult::Success,
+            "event1".to_string(),
+        ));
+        log.add_event(AuditEvent::new(
+            2,
+            AuditEventType::Syscall,
+            2,
+            100,
+            0,
+            0,
+            AuditEventResult::Success,
+            "event2".to_string(),
+        ));
+        log.add_event(AuditEvent::new(
+            3,
+            AuditEventType::Syscall,
+            3,
+            100,
+            0,
+            0,
+            AuditEventResult::Success,
+            "event3".to_string(),
+        ));
 
         assert_eq!(log.event_count(), 2); // Oldest event removed
     }
@@ -279,7 +334,16 @@ mod tests {
     #[test]
     fn test_audit_log_clear() {
         let mut log = AuditLog::new(1, "test_log".to_string(), 100);
-        log.add_event(AuditEvent::new(1, AuditEventType::Syscall, 1, 100, 0, 0, AuditEventResult::Success, "event1".to_string()));
+        log.add_event(AuditEvent::new(
+            1,
+            AuditEventType::Syscall,
+            1,
+            100,
+            0,
+            0,
+            AuditEventResult::Success,
+            "event1".to_string(),
+        ));
 
         log.clear();
         assert_eq!(log.event_count(), 0);
@@ -305,16 +369,18 @@ mod tests {
         let mut manager = AuditManager::new();
         let log_id = manager.create_log("test_log".to_string(), 100);
 
-        let event_id = manager.log_event(
-            log_id,
-            AuditEventType::Syscall,
-            1234567890,
-            100,
-            0,
-            0,
-            AuditEventResult::Success,
-            "test syscall".to_string()
-        ).unwrap();
+        let event_id = manager
+            .log_event(
+                log_id,
+                AuditEventType::Syscall,
+                1234567890,
+                100,
+                0,
+                0,
+                AuditEventResult::Success,
+                "test syscall".to_string(),
+            )
+            .unwrap();
 
         assert_eq!(event_id, 1);
     }
@@ -324,16 +390,18 @@ mod tests {
         let mut manager = AuditManager::new();
         let log_id = manager.create_log("test_log".to_string(), 100);
 
-        manager.log_event(
-            log_id,
-            AuditEventType::Syscall,
-            1234567890,
-            100,
-            0,
-            0,
-            AuditEventResult::Success,
-            "test syscall".to_string()
-        ).unwrap();
+        manager
+            .log_event(
+                log_id,
+                AuditEventType::Syscall,
+                1234567890,
+                100,
+                0,
+                0,
+                AuditEventResult::Success,
+                "test syscall".to_string(),
+            )
+            .unwrap();
 
         let events = manager.get_events(log_id).unwrap();
         assert_eq!(events.len(), 1);
@@ -344,16 +412,18 @@ mod tests {
         let mut manager = AuditManager::new();
         let log_id = manager.create_log("test_log".to_string(), 100);
 
-        manager.log_event(
-            log_id,
-            AuditEventType::Syscall,
-            1234567890,
-            100,
-            0,
-            0,
-            AuditEventResult::Success,
-            "test syscall".to_string()
-        ).unwrap();
+        manager
+            .log_event(
+                log_id,
+                AuditEventType::Syscall,
+                1234567890,
+                100,
+                0,
+                0,
+                AuditEventResult::Success,
+                "test syscall".to_string(),
+            )
+            .unwrap();
 
         assert!(manager.clear_log(log_id).is_ok());
     }

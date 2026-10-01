@@ -40,8 +40,10 @@ impl ProcessInfo {
 
     /// Format as /proc/[pid]/stat
     pub fn format_stat(&self) -> String {
-        format!("{} ({}) {} 0 0 0 0 0 0 0 0 {} {}",
-            self.pid, self.comm, self.state, self.utime, self.stime)
+        format!(
+            "{} ({}) {} 0 0 0 0 0 0 0 0 {} {}",
+            self.pid, self.comm, self.state, self.utime, self.stime
+        )
     }
 
     /// Format as /proc/[pid]/status

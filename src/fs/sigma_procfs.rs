@@ -37,11 +37,10 @@
 
 #![allow(dead_code)]
 
-
+use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::collections::BTreeMap;
 
 // ============================================================
 // Process State
@@ -69,8 +68,12 @@ pub enum ProcProcessState {
 impl ProcProcessState {
     pub fn as_char(self) -> char {
         match self {
-            Self::Running => 'R', Self::Sleeping => 'S', Self::DiskSleep => 'D',
-            Self::Zombie => 'Z', Self::Stopped => 'T', Self::TracingStop => 't',
+            Self::Running => 'R',
+            Self::Sleeping => 'S',
+            Self::DiskSleep => 'D',
+            Self::Zombie => 'Z',
+            Self::Stopped => 'T',
+            Self::TracingStop => 't',
             Self::Dead => 'X',
         }
     }
@@ -118,7 +121,8 @@ pub struct ProcMemMap {
 
 impl ProcMemMap {
     fn perms_str(&self) -> String {
-        format!("{}{}{}{}",
+        format!(
+            "{}{}{}{}",
             if self.readable { 'r' } else { '-' },
             if self.writable { 'w' } else { '-' },
             if self.executable { 'x' } else { '-' },
@@ -153,15 +157,38 @@ impl Default for ProcCpuInfo {
             processor_id: 0,
             vendor_id: "SigmaOS".into(),
             model_name: "SigmaOS Sovereign Processor".into(),
-            cpu_family: 6, model: 85, stepping: 7,
-            mhz: 3600.0, cache_size_kb: 8192, cpu_cores: 4, siblings: 8,
+            cpu_family: 6,
+            model: 85,
+            stepping: 7,
+            mhz: 3600.0,
+            cache_size_kb: 8192,
+            cpu_cores: 4,
+            siblings: 8,
             flags: vec![
-                "fpu".into(), "vme".into(), "de".into(), "pse".into(),
-                "tsc".into(), "msr".into(), "pae".into(), "mce".into(),
-                "cx8".into(), "apic".into(), "sep".into(), "mtrr".into(),
-                "pge".into(), "mca".into(), "cmov".into(), "pat".into(),
-                "pse36".into(), "mmx".into(), "sse".into(), "sse2".into(),
-                "sse4_2".into(), "avx".into(), "avx2".into(), "aes".into(),
+                "fpu".into(),
+                "vme".into(),
+                "de".into(),
+                "pse".into(),
+                "tsc".into(),
+                "msr".into(),
+                "pae".into(),
+                "mce".into(),
+                "cx8".into(),
+                "apic".into(),
+                "sep".into(),
+                "mtrr".into(),
+                "pge".into(),
+                "mca".into(),
+                "cmov".into(),
+                "pat".into(),
+                "pse36".into(),
+                "mmx".into(),
+                "sse".into(),
+                "sse2".into(),
+                "sse4_2".into(),
+                "avx".into(),
+                "avx2".into(),
+                "aes".into(),
             ],
         }
     }
@@ -265,30 +292,45 @@ impl ProcfsMount {
     pub fn new(hostname: &str, kernel_version: &str) -> Self {
         let mut mounts = Vec::new();
         mounts.push(ProcMount {
-            device: "sysfs".into(), mount_point: "/sys".into(),
-            fs_type: "sysfs".into(), options: "rw,nosuid,nodev,noexec,relatime".into(),
+            device: "sysfs".into(),
+            mount_point: "/sys".into(),
+            fs_type: "sysfs".into(),
+            options: "rw,nosuid,nodev,noexec,relatime".into(),
         });
         mounts.push(ProcMount {
-            device: "proc".into(), mount_point: "/proc".into(),
-            fs_type: "proc".into(), options: "rw,nosuid,nodev,noexec,relatime".into(),
+            device: "proc".into(),
+            mount_point: "/proc".into(),
+            fs_type: "proc".into(),
+            options: "rw,nosuid,nodev,noexec,relatime".into(),
         });
         mounts.push(ProcMount {
-            device: "devtmpfs".into(), mount_point: "/dev".into(),
-            fs_type: "devtmpfs".into(), options: "rw,nosuid,size=8192k,nr_inodes=4096".into(),
+            device: "devtmpfs".into(),
+            mount_point: "/dev".into(),
+            fs_type: "devtmpfs".into(),
+            options: "rw,nosuid,size=8192k,nr_inodes=4096".into(),
         });
         mounts.push(ProcMount {
-            device: "/dev/sda1".into(), mount_point: "/".into(),
-            fs_type: "sigma_ext".into(), options: "rw,relatime".into(),
+            device: "/dev/sda1".into(),
+            mount_point: "/".into(),
+            fs_type: "sigma_ext".into(),
+            options: "rw,relatime".into(),
         });
         mounts.push(ProcMount {
-            device: "tmpfs".into(), mount_point: "/tmp".into(),
-            fs_type: "tmpfs".into(), options: "rw,nosuid,nodev".into(),
+            device: "tmpfs".into(),
+            mount_point: "/tmp".into(),
+            fs_type: "tmpfs".into(),
+            options: "rw,nosuid,nodev".into(),
         });
         Self {
             uptime_secs: 0.0,
             cpuinfo: vec![ProcCpuInfo::default()],
-            meminfo: ProcMemInfo { mem_total_kb: 16 * 1024 * 1024, mem_free_kb: 8 * 1024 * 1024,
-                mem_available_kb: 12 * 1024 * 1024, hugepage_size_kb: 2048, ..Default::default() },
+            meminfo: ProcMemInfo {
+                mem_total_kb: 16 * 1024 * 1024,
+                mem_free_kb: 8 * 1024 * 1024,
+                mem_available_kb: 12 * 1024 * 1024,
+                hugepage_size_kb: 2048,
+                ..Default::default()
+            },
             stat: ProcStat::default(),
             processes: BTreeMap::new(),
             mounts,
@@ -311,7 +353,9 @@ impl ProcfsMount {
     }
 
     /// Update system uptime.
-    pub fn set_uptime(&mut self, secs: f64) { self.uptime_secs = secs; }
+    pub fn set_uptime(&mut self, secs: f64) {
+        self.uptime_secs = secs;
+    }
 
     /// Update load averages.
     pub fn set_loadavg(&mut self, a1: f64, a5: f64, a15: f64) {
@@ -324,13 +368,13 @@ impl ProcfsMount {
     pub fn read(&self, path: &str) -> Result<Vec<u8>, &'static str> {
         let path = path.trim_start_matches("/proc/").trim_start_matches('/');
         match path {
-            "cpuinfo"    => Ok(self.gen_cpuinfo().into_bytes()),
-            "meminfo"    => Ok(self.gen_meminfo().into_bytes()),
-            "uptime"     => Ok(self.gen_uptime().into_bytes()),
-            "loadavg"    => Ok(self.gen_loadavg().into_bytes()),
-            "stat"       => Ok(self.gen_stat().into_bytes()),
-            "mounts"     => Ok(self.gen_mounts().into_bytes()),
-            "version"    => Ok(self.gen_version().into_bytes()),
+            "cpuinfo" => Ok(self.gen_cpuinfo().into_bytes()),
+            "meminfo" => Ok(self.gen_meminfo().into_bytes()),
+            "uptime" => Ok(self.gen_uptime().into_bytes()),
+            "loadavg" => Ok(self.gen_loadavg().into_bytes()),
+            "stat" => Ok(self.gen_stat().into_bytes()),
+            "mounts" => Ok(self.gen_mounts().into_bytes()),
+            "version" => Ok(self.gen_version().into_bytes()),
             "hostname" | "sys/kernel/hostname" => Ok(format!("{}\n", self.hostname).into_bytes()),
             _ if path.starts_with("net/") => self.read_net(path),
             _ => {
@@ -353,19 +397,30 @@ impl ProcfsMount {
         match path {
             "" | "/" => {
                 let mut entries = vec![
-                    "cpuinfo".into(), "meminfo".into(), "uptime".into(),
-                    "loadavg".into(), "stat".into(), "mounts".into(),
-                    "version".into(), "net".into(), "sys".into(),
+                    "cpuinfo".into(),
+                    "meminfo".into(),
+                    "uptime".into(),
+                    "loadavg".into(),
+                    "stat".into(),
+                    "mounts".into(),
+                    "version".into(),
+                    "net".into(),
+                    "sys".into(),
                 ];
                 for pid in self.processes.keys() {
                     entries.push(pid.to_string());
                 }
                 Ok(entries)
             }
-            p if p.chars().all(|c| c.is_ascii_digit()) => {
-                Ok(vec!["status".into(), "stat".into(), "cmdline".into(),
-                        "environ".into(), "maps".into(), "fd".into(), "statm".into()])
-            }
+            p if p.chars().all(|c| c.is_ascii_digit()) => Ok(vec![
+                "status".into(),
+                "stat".into(),
+                "cmdline".into(),
+                "environ".into(),
+                "maps".into(),
+                "fd".into(),
+                "statm".into(),
+            ]),
             _ => Err("not a directory"),
         }
     }
@@ -413,12 +468,25 @@ impl ProcfsMount {
              HugePages_Total:{:>10}\n\
              HugePages_Free: {:>10}\n\
              Hugepagesize:   {:>10} kB\n",
-            m.mem_total_kb, m.mem_free_kb, m.mem_available_kb,
-            m.buffers_kb, m.cached_kb, m.swap_cached_kb,
-            m.active_kb, m.inactive_kb, m.swap_total_kb, m.swap_free_kb,
-            m.dirty_kb, m.writeback_kb, m.slab_kb, m.page_tables_kb,
-            m.vmalloc_total_kb, m.vmalloc_used_kb,
-            m.hugepages_total, m.hugepages_free, m.hugepage_size_kb,
+            m.mem_total_kb,
+            m.mem_free_kb,
+            m.mem_available_kb,
+            m.buffers_kb,
+            m.cached_kb,
+            m.swap_cached_kb,
+            m.active_kb,
+            m.inactive_kb,
+            m.swap_total_kb,
+            m.swap_free_kb,
+            m.dirty_kb,
+            m.writeback_kb,
+            m.slab_kb,
+            m.page_tables_kb,
+            m.vmalloc_total_kb,
+            m.vmalloc_used_kb,
+            m.hugepages_total,
+            m.hugepages_free,
+            m.hugepage_size_kb,
         )
     }
 
@@ -428,9 +496,16 @@ impl ProcfsMount {
 
     fn gen_loadavg(&self) -> String {
         let (a1, a5, a15) = self.loadavg;
-        let running = self.processes.values().filter(|p| p.state == ProcProcessState::Running).count();
+        let running = self
+            .processes
+            .values()
+            .filter(|p| p.state == ProcProcessState::Running)
+            .count();
         let total = self.processes.len();
-        format!("{:.2} {:.2} {:.2} {}/{} {}\n", a1, a5, a15, running, total, self.last_pid)
+        format!(
+            "{:.2} {:.2} {:.2} {}/{} {}\n",
+            a1, a5, a15, running, total, self.last_pid
+        )
     }
 
     fn gen_stat(&self) -> String {
@@ -456,13 +531,22 @@ impl ProcfsMount {
     }
 
     fn gen_mounts(&self) -> String {
-        self.mounts.iter().map(|m| {
-            format!("{} {} {} {} 0 0\n", m.device, m.mount_point, m.fs_type, m.options)
-        }).collect()
+        self.mounts
+            .iter()
+            .map(|m| {
+                format!(
+                    "{} {} {} {} 0 0\n",
+                    m.device, m.mount_point, m.fs_type, m.options
+                )
+            })
+            .collect()
     }
 
     fn gen_version(&self) -> String {
-        format!("Linux version {} (sigma@sigmaos) (Rust compiler) #1 SMP\n", self.kernel_version)
+        format!(
+            "Linux version {} (sigma@sigmaos) (Rust compiler) #1 SMP\n",
+            self.kernel_version
+        )
     }
 
     fn read_net(&self, path: &str) -> Result<Vec<u8>, &'static str> {
@@ -482,11 +566,16 @@ impl ProcfsMount {
         let info = self.processes.get(&pid).ok_or("no such process")?;
         match sub {
             "status" => Ok(self.gen_pid_status(info).into_bytes()),
-            "stat"   => Ok(self.gen_pid_stat(info).into_bytes()),
+            "stat" => Ok(self.gen_pid_stat(info).into_bytes()),
             "cmdline" => Ok(info.cmdline.as_bytes().to_vec()),
-            "statm"  => Ok(self.gen_pid_statm(info).into_bytes()),
-            "maps"   => Ok(self.gen_pid_maps(info).into_bytes()),
-            "fd"     => Ok(info.open_fds.iter().map(|f| format!("{}\n", f)).collect::<String>().into_bytes()),
+            "statm" => Ok(self.gen_pid_statm(info).into_bytes()),
+            "maps" => Ok(self.gen_pid_maps(info).into_bytes()),
+            "fd" => Ok(info
+                .open_fds
+                .iter()
+                .map(|f| format!("{}\n", f))
+                .collect::<String>()
+                .into_bytes()),
             _ => Err("no such file"),
         }
     }
@@ -495,21 +584,41 @@ impl ProcfsMount {
         format!(
             "Name:\t{}\nState:\t{} ({})\nPid:\t{}\nPPid:\t{}\nUid:\t{}\nGid:\t{}\n\
              VmPeak:\t{} kB\nVmSize:\t{} kB\nVmRSS:\t{} kB\nThreads:\t{}\n",
-            p.name, p.state.as_char(),
-            match p.state { ProcProcessState::Running => "running", ProcProcessState::Sleeping => "sleeping",
-                _ => "other" },
-            p.pid, p.ppid, p.uid, p.gid,
-            p.vm_peak_kb, p.vm_size_kb, p.vm_rss_kb, p.threads
+            p.name,
+            p.state.as_char(),
+            match p.state {
+                ProcProcessState::Running => "running",
+                ProcProcessState::Sleeping => "sleeping",
+                _ => "other",
+            },
+            p.pid,
+            p.ppid,
+            p.uid,
+            p.gid,
+            p.vm_peak_kb,
+            p.vm_size_kb,
+            p.vm_rss_kb,
+            p.threads
         )
     }
 
     fn gen_pid_stat(&self, p: &ProcProcessInfo) -> String {
         format!(
             "{} ({}) {} {} {} 0 0 0 0 0 0 {} {} {} {} {} {} 0 0 -1 0 {} 0 {} {} 0 0\n",
-            p.pid, p.name, p.state.as_char(), p.ppid, p.pid,
-            p.utime_ticks, p.stime_ticks, p.utime_ticks, p.stime_ticks,
-            p.priority, p.nice, p.start_time_ticks,
-            p.vm_size_kb * 1024, p.vm_rss_kb * 4
+            p.pid,
+            p.name,
+            p.state.as_char(),
+            p.ppid,
+            p.pid,
+            p.utime_ticks,
+            p.stime_ticks,
+            p.utime_ticks,
+            p.stime_ticks,
+            p.priority,
+            p.nice,
+            p.start_time_ticks,
+            p.vm_size_kb * 1024,
+            p.vm_rss_kb * 4
         )
     }
 
@@ -520,10 +629,19 @@ impl ProcfsMount {
     }
 
     fn gen_pid_maps(&self, p: &ProcProcessInfo) -> String {
-        p.mem_maps.iter().map(|m| {
-            format!("{:016x}-{:016x} {} {:08x} 00:00 0\t\t{}\n",
-                m.start, m.end, m.perms_str(), m.offset, m.name)
-        }).collect()
+        p.mem_maps
+            .iter()
+            .map(|m| {
+                format!(
+                    "{:016x}-{:016x} {} {:08x} 00:00 0\t\t{}\n",
+                    m.start,
+                    m.end,
+                    m.perms_str(),
+                    m.offset,
+                    m.name
+                )
+            })
+            .collect()
     }
 }
 
@@ -540,18 +658,33 @@ mod tests {
         pfs.set_uptime(12345.67);
         pfs.set_loadavg(0.42, 0.35, 0.28);
         pfs.add_process(ProcProcessInfo {
-            pid: 1, ppid: 0, name: "init".into(),
+            pid: 1,
+            ppid: 0,
+            name: "init".into(),
             state: ProcProcessState::Sleeping,
-            uid: 0, gid: 0, vm_rss_kb: 4096, vm_size_kb: 16384,
-            vm_peak_kb: 20000, threads: 1,
-            utime_ticks: 100, stime_ticks: 50,
-            cmdline: "/sbin/init".into(), start_time_ticks: 0,
-            nice: 0, priority: 20, open_fds: vec![0, 1, 2],
-            mem_maps: vec![
-                ProcMemMap { start: 0x400000, end: 0x401000, readable: true,
-                    writable: false, executable: true, shared: false,
-                    offset: 0, name: "/sbin/init".into() }
-            ],
+            uid: 0,
+            gid: 0,
+            vm_rss_kb: 4096,
+            vm_size_kb: 16384,
+            vm_peak_kb: 20000,
+            threads: 1,
+            utime_ticks: 100,
+            stime_ticks: 50,
+            cmdline: "/sbin/init".into(),
+            start_time_ticks: 0,
+            nice: 0,
+            priority: 20,
+            open_fds: vec![0, 1, 2],
+            mem_maps: vec![ProcMemMap {
+                start: 0x400000,
+                end: 0x401000,
+                readable: true,
+                writable: false,
+                executable: true,
+                shared: false,
+                offset: 0,
+                name: "/sbin/init".into(),
+            }],
         });
         pfs
     }

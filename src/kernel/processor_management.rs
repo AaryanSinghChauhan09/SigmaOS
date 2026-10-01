@@ -1,7 +1,7 @@
-use std::vec;
-use std::string::{String, ToString};
-use std::vec::Vec;
 use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 // Linux & BSD Inspired Comprehensive Processor Management Subsystem for SigmaOS
 // Features Multi-core SMP Topology, NUMA Affinity Mapping, Hardware SMEP/SMAP Execution Protection,
 // and Hardware Performance Monitoring Counters (PMC)
@@ -62,12 +62,20 @@ impl SmpTopologyManager {
                 core_id: i,
                 socket_id,
                 numa_node,
-                core_type: if is_p_core { CoreType::Performance } else { CoreType::Efficiency },
+                core_type: if is_p_core {
+                    CoreType::Performance
+                } else {
+                    CoreType::Efficiency
+                },
                 current_frequency_mhz: 3200,
                 max_frequency_mhz: 4800,
                 is_online: true,
                 is_hyperthread_sibling: false,
-                sibling_core_id: if i + 1 < total_cores { Some(i + 1) } else { None },
+                sibling_core_id: if i + 1 < total_cores {
+                    Some(i + 1)
+                } else {
+                    None
+                },
             };
             cores.insert(i, descriptor);
         }
@@ -134,11 +142,11 @@ impl Default for NumaAffinityMap {
 /// OpenBSD / Linux CPU Hardware Security Protections (SMEP/SMAP/MPK/CFI)
 #[derive(Debug, Clone)]
 pub struct CpuHardwareProtectionEngine {
-    pub smep_enabled: bool, // Supervisor Mode Execution Prevention
-    pub smap_enabled: bool, // Supervisor Mode Access Prevention
+    pub smep_enabled: bool,   // Supervisor Mode Execution Prevention
+    pub smap_enabled: bool,   // Supervisor Mode Access Prevention
     pub nx_bit_enabled: bool, // No-Execute / Execute Disable Bit
-    pub mpk_enabled: bool,  // Memory Protection Keys (pku)
-    pub ibt_enabled: bool,  // Indirect Branch Tracking (CET)
+    pub mpk_enabled: bool,    // Memory Protection Keys (pku)
+    pub ibt_enabled: bool,    // Indirect Branch Tracking (CET)
 }
 
 impl CpuHardwareProtectionEngine {
@@ -156,11 +164,31 @@ impl CpuHardwareProtectionEngine {
     pub fn status_summary(&self) -> String {
         format!(
             "CPU Security Engine: SMEP={}, SMAP={}, NX/XD={}, MPK={}, IBT={}",
-            if self.smep_enabled { "Enforced" } else { "Disabled" },
-            if self.smap_enabled { "Enforced" } else { "Disabled" },
-            if self.nx_bit_enabled { "Active" } else { "Disabled" },
-            if self.mpk_enabled { "Active" } else { "Disabled" },
-            if self.ibt_enabled { "Active" } else { "Disabled" }
+            if self.smep_enabled {
+                "Enforced"
+            } else {
+                "Disabled"
+            },
+            if self.smap_enabled {
+                "Enforced"
+            } else {
+                "Disabled"
+            },
+            if self.nx_bit_enabled {
+                "Active"
+            } else {
+                "Disabled"
+            },
+            if self.mpk_enabled {
+                "Active"
+            } else {
+                "Disabled"
+            },
+            if self.ibt_enabled {
+                "Active"
+            } else {
+                "Disabled"
+            }
         )
     }
 }

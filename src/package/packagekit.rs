@@ -118,7 +118,9 @@ impl PackageKitDaemon {
 
     /// Executes 'RefreshCache' role
     pub fn refresh_cache(&mut self, transaction_id: u64) -> Result<(), &'static str> {
-        let tx = self.active_transactions.get_mut(&transaction_id)
+        let tx = self
+            .active_transactions
+            .get_mut(&transaction_id)
             .ok_or("PackageKit: Invalid transaction ID.")?;
 
         tx.status = PackageKitStatus::Downloading;
@@ -150,7 +152,9 @@ impl PackageKitDaemon {
     /// Executes 'InstallPackages' role
     pub fn install_packages(&mut self, transaction_id: u64) -> Result<usize, &'static str> {
         let targets = {
-            let tx = self.active_transactions.get_mut(&transaction_id)
+            let tx = self
+                .active_transactions
+                .get_mut(&transaction_id)
                 .ok_or("PackageKit: Invalid transaction ID.")?;
             tx.status = PackageKitStatus::Installing;
             tx.target_packages.clone()
@@ -174,7 +178,9 @@ impl PackageKitDaemon {
 
     /// Cancels an in-progress transaction
     pub fn cancel_transaction(&mut self, transaction_id: u64) -> Result<(), &'static str> {
-        let tx = self.active_transactions.get_mut(&transaction_id)
+        let tx = self
+            .active_transactions
+            .get_mut(&transaction_id)
             .ok_or("PackageKit: Invalid transaction ID.")?;
 
         if tx.status == PackageKitStatus::Finished {
@@ -211,10 +217,8 @@ mod tests {
     #[test]
     fn test_packagekit_transaction_workflow() {
         let mut daemon = PackageKitDaemon::new();
-        let tx_id = daemon.create_transaction(
-            PackageKitRole::InstallPackages,
-            vec!["firefox".to_string()],
-        );
+        let tx_id =
+            daemon.create_transaction(PackageKitRole::InstallPackages, vec!["firefox".to_string()]);
         assert_eq!(tx_id, 101);
 
         let install_res = daemon.install_packages(tx_id);
@@ -232,10 +236,7 @@ mod tests {
     #[test]
     fn test_packagekit_cancel_transaction() {
         let mut daemon = PackageKitDaemon::new();
-        let tx_id = daemon.create_transaction(
-            PackageKitRole::RefreshCache,
-            Vec::new(),
-        );
+        let tx_id = daemon.create_transaction(PackageKitRole::RefreshCache, Vec::new());
 
         assert!(daemon.cancel_transaction(tx_id).is_ok());
         let tx = daemon.active_transactions.get(&tx_id).unwrap();

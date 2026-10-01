@@ -248,11 +248,17 @@ impl LinuxFoundationSecurityPolicyDaemon {
     }
 
     pub fn is_cve_patched(&self, cve_id: &str) -> bool {
-        self.active_patches.get(cve_id).map(|p| p.is_applied).unwrap_or(false)
+        self.active_patches
+            .get(cve_id)
+            .map(|p| p.is_applied)
+            .unwrap_or(false)
     }
 
     pub fn get_applied_patch_count(&self) -> usize {
-        self.active_patches.values().filter(|p| p.is_applied).count()
+        self.active_patches
+            .values()
+            .filter(|p| p.is_applied)
+            .count()
     }
 }
 
@@ -289,7 +295,8 @@ impl SovereignTechMediaDaemonsSuite {
     pub fn synthesize_and_verify_all(&mut self) -> bool {
         // Verify Thermal Governor
         let prof = self.thermal_governor.poll_thermal_sensors(90.0, 150.0);
-        let thermal_ok = prof == PowerGovernorProfile::ExtremeCooling && self.thermal_governor.is_throttling;
+        let thermal_ok =
+            prof == PowerGovernorProfile::ExtremeCooling && self.thermal_governor.is_throttling;
 
         // Verify AI Inference
         self.ai_inference.submit_inference_job(1001, 128);
@@ -297,17 +304,22 @@ impl SovereignTechMediaDaemonsSuite {
         let ai_ok = processed == Some(1001) && self.ai_inference.get_pending_job_count() == 0;
 
         // Verify Housekeeping
-        let freed = self.housekeeping.trigger_journal_vacuum(100 * 1024 * 1024, 1700000000);
+        let freed = self
+            .housekeeping
+            .trigger_journal_vacuum(100 * 1024 * 1024, 1700000000);
         let house_ok = freed > 0 && self.housekeeping.get_total_cleaned_bytes() > 0;
 
         // Verify Device Sync
-        self.device_sync.pair_companion_device("phone-01", "Pixel_8_Pro", 85);
+        self.device_sync
+            .pair_companion_device("phone-01", "Pixel_8_Pro", 85);
         self.device_sync.sync_clipboard("https://sigmaos.org");
         let sync_ok = self.device_sync.get_connected_device_count() == 1;
 
         // Verify Security Policy
-        self.security_policy.apply_live_kernel_patch("CVE-2026-9999", "Kernel eBPF boundary bypass fix");
-        let sec_ok = self.security_policy.is_cve_patched("CVE-2026-9999") && self.security_policy.get_applied_patch_count() == 1;
+        self.security_policy
+            .apply_live_kernel_patch("CVE-2026-9999", "Kernel eBPF boundary bypass fix");
+        let sec_ok = self.security_policy.is_cve_patched("CVE-2026-9999")
+            && self.security_policy.get_applied_patch_count() == 1;
 
         thermal_ok && ai_ok && house_ok && sync_ok && sec_ok
     }

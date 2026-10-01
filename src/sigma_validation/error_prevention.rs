@@ -19,10 +19,9 @@
 
 // (no_std only applicable at crate root - removed)
 
-
 // ─── Kernel Primitive Types ─────────────────────────────────────────────────
 
-type SigmaU8  = u8;
+type SigmaU8 = u8;
 type SigmaU16 = u16;
 type SigmaU32 = u32;
 type SigmaU64 = u64;
@@ -34,6 +33,4 @@ type SigmaUsize = usize;
 // ─── Module: Sigma::error_prevention ─────────────────────
 
 #[no_mangle]
-pub unsafe extern "C" fn sigma_print_error_log() {
-}
-
+pub unsafe extern "C" fn sigma_print_error_log() {}

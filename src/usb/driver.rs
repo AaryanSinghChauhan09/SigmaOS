@@ -13,29 +13,39 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
 /// OOP-based USB Driver for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 101
 /// Implements USB device detection and management
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type USBDeviceID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum USBDeviceType { HID = 0, MassStorage = 1, Network = 2, Audio = 3, Unknown = 4 }
+pub enum USBDeviceType {
+    HID = 0,
+    MassStorage = 1,
+    Network = 2,
+    Audio = 3,
+    Unknown = 4,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum USBError { Success = 0, NotFound = 1, InitFailed = 2, TransferFailed = 3 }
+pub enum USBError {
+    Success = 0,
+    NotFound = 1,
+    InitFailed = 2,
+    TransferFailed = 3,
+}
 
 pub trait USBDevice {
     fn id(&self) -> USBDeviceID;
@@ -54,7 +64,12 @@ pub struct SimpleUSBDevice {
 }
 
 impl SimpleUSBDevice {
-    pub fn new(id: USBDeviceID, vendor_id: u16, product_id: u16, device_type: USBDeviceType) -> Self {
+    pub fn new(
+        id: USBDeviceID,
+        vendor_id: u16,
+        product_id: u16,
+        device_type: USBDeviceType,
+    ) -> Self {
         SimpleUSBDevice {
             id,
             vendor_id: AtomicUsize::new(vendor_id as usize),
@@ -65,10 +80,18 @@ impl SimpleUSBDevice {
 }
 
 impl USBDevice for SimpleUSBDevice {
-    fn id(&self) -> USBDeviceID { self.id }
-    fn vendor_id(&self) -> u16 { self.vendor_id.load(Ordering::SeqCst) as u16 }
-    fn product_id(&self) -> u16 { self.product_id.load(Ordering::SeqCst) as u16 }
-    fn device_type(&self) -> USBDeviceType { unsafe { core::mem::transmute(self.device_type.load(Ordering::SeqCst)) } }
+    fn id(&self) -> USBDeviceID {
+        self.id
+    }
+    fn vendor_id(&self) -> u16 {
+        self.vendor_id.load(Ordering::SeqCst) as u16
+    }
+    fn product_id(&self) -> u16 {
+        self.product_id.load(Ordering::SeqCst) as u16
+    }
+    fn device_type(&self) -> USBDeviceType {
+        unsafe { core::mem::transmute(self.device_type.load(Ordering::SeqCst)) }
+    }
 
     fn initialize(&mut self) -> Result<(), USBError> {
         Ok(())
@@ -129,7 +152,9 @@ impl USBController for SimpleUSBController {
     fn get_device(&self, id: USBDeviceID) -> Option<&dyn USBDevice> {
         for device_option in &self.devices {
             if let Some(ref device) = *device_option {
-                if device.id() == id { return Some(device.as_ref()); }
+                if device.id() == id {
+                    return Some(device.as_ref());
+                }
             }
         }
         None
@@ -137,8 +162,22 @@ impl USBController for SimpleUSBController {
 }
 
 pub trait USBTransfer {
-    fn bulk_transfer(&mut self, device_id: USBDeviceID, endpoint: u8, data: &mut [u8], direction: bool) -> Result<usize, USBError>;
-    fn control_transfer(&mut self, device_id: USBDeviceID, request_type: u8, request: u8, value: u16, index: u16, data: &mut [u8]) -> Result<(), USBError>;
+    fn bulk_transfer(
+        &mut self,
+        device_id: USBDeviceID,
+        endpoint: u8,
+        data: &mut [u8],
+        direction: bool,
+    ) -> Result<usize, USBError>;
+    fn control_transfer(
+        &mut self,
+        device_id: USBDeviceID,
+        request_type: u8,
+        request: u8,
+        value: u16,
+        index: u16,
+        data: &mut [u8],
+    ) -> Result<(), USBError>;
 }
 
 #[repr(C)]
@@ -153,7 +192,13 @@ impl SimpleUSBTransfer {
 }
 
 impl USBTransfer for SimpleUSBTransfer {
-    fn bulk_transfer(&mut self, device_id: USBDeviceID, _endpoint: u8, _data: &mut [u8], _direction: bool) -> Result<usize, USBError> {
+    fn bulk_transfer(
+        &mut self,
+        device_id: USBDeviceID,
+        _endpoint: u8,
+        _data: &mut [u8],
+        _direction: bool,
+    ) -> Result<usize, USBError> {
         if self.controller.get_device(device_id).is_some() {
             Ok(512)
         } else {
@@ -161,7 +206,15 @@ impl USBTransfer for SimpleUSBTransfer {
         }
     }
 
-    fn control_transfer(&mut self, device_id: USBDeviceID, _request_type: u8, _request: u8, _value: u16, _index: u16, _data: &mut [u8]) -> Result<(), USBError> {
+    fn control_transfer(
+        &mut self,
+        device_id: USBDeviceID,
+        _request_type: u8,
+        _request: u8,
+        _value: u16,
+        _index: u16,
+        _data: &mut [u8],
+    ) -> Result<(), USBError> {
         if self.controller.get_device(device_id).is_some() {
             Ok(())
         } else {
@@ -184,9 +237,7 @@ pub struct SimpleUSBHub {
 impl SimpleUSBHub {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        SimpleUSBHub {
-            ports: Vec::new(),
-        }
+        SimpleUSBHub { ports: Vec::new() }
     }
 }
 
@@ -214,13 +265,25 @@ impl USBHub for SimpleUSBHub {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -248,19 +311,29 @@ impl<T> Vec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -292,7 +365,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;

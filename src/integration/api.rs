@@ -13,29 +13,37 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
 /// OOP-based API Gateway for SigmaOS
 /// Based on Ideas-999-Structured: Integration & Interoperability Item 926
 /// Implements REST API and web service integration
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type EndpointID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum HTTPMethod { GET = 0, POST = 1, PUT = 2, DELETE = 3 }
+pub enum HTTPMethod {
+    GET = 0,
+    POST = 1,
+    PUT = 2,
+    DELETE = 3,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum APIError { Success = 0, NotFound = 1, RequestFailed = 2 }
+pub enum APIError {
+    Success = 0,
+    NotFound = 1,
+    RequestFailed = 2,
+}
 
 pub trait APIEndpoint {
     fn id(&self) -> EndpointID;
@@ -66,16 +74,24 @@ impl SimpleAPIEndpoint {
 }
 
 impl APIEndpoint for SimpleAPIEndpoint {
-    fn id(&self) -> EndpointID { self.id }
+    fn id(&self) -> EndpointID {
+        self.id
+    }
     fn path(&self) -> &[u8] {
         let len = self.path.iter().position(|&b| b == 0).unwrap_or(128);
         &self.path[..len]
     }
-    fn method(&self) -> HTTPMethod { unsafe { core::mem::transmute(self.method.load(Ordering::SeqCst)) } }
+    fn method(&self) -> HTTPMethod {
+        unsafe { core::mem::transmute(self.method.load(Ordering::SeqCst)) }
+    }
 }
 
 pub trait APIGateway {
-    fn register_endpoint(&mut self, path: &[u8], method: HTTPMethod) -> Result<EndpointID, APIError>;
+    fn register_endpoint(
+        &mut self,
+        path: &[u8],
+        method: HTTPMethod,
+    ) -> Result<EndpointID, APIError>;
     fn unregister_endpoint(&mut self, id: EndpointID) -> Result<(), APIError>;
     fn handle_request(&self, path: &[u8], method: HTTPMethod) -> Result<Vec<u8>, APIError>;
 }
@@ -97,13 +113,17 @@ impl SimpleAPIGateway {
 }
 
 impl APIGateway for SimpleAPIGateway {
-    fn register_endpoint(&mut self, path: &[u8], method: HTTPMethod) -> Result<EndpointID, APIError> {
+    fn register_endpoint(
+        &mut self,
+        path: &[u8],
+        method: HTTPMethod,
+    ) -> Result<EndpointID, APIError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let endpoint = SimpleAPIEndpoint::new(id, path, method);
         self.endpoints.push(Some(Box::new(endpoint)));
         Ok(id)
     }
-    
+
     fn unregister_endpoint(&mut self, id: EndpointID) -> Result<(), APIError> {
         for endpoint_option in &mut self.endpoints {
             if let Some(ref endpoint) = *endpoint_option {
@@ -114,7 +134,7 @@ impl APIGateway for SimpleAPIGateway {
         }
         Err(APIError::NotFound)
     }
-    
+
     fn handle_request(&self, path: &[u8], method: HTTPMethod) -> Result<Vec<u8>, APIError> {
         for endpoint_option in &self.endpoints {
             if let Some(ref endpoint) = *endpoint_option {
@@ -160,7 +180,7 @@ impl RESTClient for SimpleRESTClient {
         response.push(0x7D);
         Ok(response)
     }
-    
+
     fn post(&self, _url: &[u8], _data: &[u8]) -> Result<Vec<u8>, APIError> {
         let mut response = Vec::new();
         response.push(0x7B);
@@ -169,13 +189,25 @@ impl RESTClient for SimpleRESTClient {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -183,19 +215,29 @@ impl<T> Vec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -227,7 +269,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;

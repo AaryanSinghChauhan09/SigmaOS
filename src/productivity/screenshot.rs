@@ -1,7 +1,7 @@
 use std::boxed::Box;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 // SigmaOS Screenshot Tool
 // OOP-based screenshot capture with multiple modes and formats
 
@@ -365,9 +365,15 @@ impl OcrEngine {
         }
     }
 
-    pub fn extract_text_from_region(&self, _result: &ScreenshotResult, region: &CaptureRegion) -> Result<String, ScreenshotError> {
+    pub fn extract_text_from_region(
+        &self,
+        _result: &ScreenshotResult,
+        region: &CaptureRegion,
+    ) -> Result<String, ScreenshotError> {
         if region.width == 0 || region.height == 0 {
-            return Err(ScreenshotError::InvalidRegion("Target area cannot be empty".to_string()));
+            return Err(ScreenshotError::InvalidRegion(
+                "Target area cannot be empty".to_string(),
+            ));
         }
 
         // Simulating highly performant local OCR text extraction
@@ -473,7 +479,10 @@ mod tests {
         assert_eq!(annotator.annotations.len(), 5);
         assert_eq!(step1, 1);
         assert_eq!(step2, 2);
-        assert_eq!(annotator.annotations[4].annotation_type, AnnotationType::StepSticker(2));
+        assert_eq!(
+            annotator.annotations[4].annotation_type,
+            AnnotationType::StepSticker(2)
+        );
     }
 
     #[test]
@@ -488,15 +497,36 @@ mod tests {
             capture_time_ms: 20,
         };
 
-        let empty_region = CaptureRegion { x: 0, y: 0, width: 0, height: 0 };
-        assert!(ocr.extract_text_from_region(&result, &empty_region).is_err());
+        let empty_region = CaptureRegion {
+            x: 0,
+            y: 0,
+            width: 0,
+            height: 0,
+        };
+        assert!(ocr
+            .extract_text_from_region(&result, &empty_region)
+            .is_err());
 
-        let target_region = CaptureRegion { x: 100, y: 200, width: 400, height: 100 };
-        let text = ocr.extract_text_from_region(&result, &target_region).unwrap();
+        let target_region = CaptureRegion {
+            x: 100,
+            y: 200,
+            width: 400,
+            height: 100,
+        };
+        let text = ocr
+            .extract_text_from_region(&result, &target_region)
+            .unwrap();
         assert_eq!(text, "SigmaOS Sovereign Kernel Subsystem");
 
-        let generic_region = CaptureRegion { x: 50, y: 50, width: 200, height: 200 };
-        let generic_text = ocr.extract_text_from_region(&result, &generic_region).unwrap();
+        let generic_region = CaptureRegion {
+            x: 50,
+            y: 50,
+            width: 200,
+            height: 200,
+        };
+        let generic_text = ocr
+            .extract_text_from_region(&result, &generic_region)
+            .unwrap();
         assert!(generic_text.contains("Extracted unicode text stream"));
     }
 }

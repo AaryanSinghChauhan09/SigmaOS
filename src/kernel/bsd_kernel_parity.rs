@@ -7,8 +7,6 @@
 //! - `BsdPfPacketFilter`: OpenBSD PF packet filter with stateful firewall rules, NAT translation, and tables
 //! - `BsdSoftUpdatesEngine`: FreeBSD FFS Soft Updates metadata dependency ordering for file system journaling
 
-
-
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
@@ -50,7 +48,11 @@ impl BsdKqueueEngine {
     }
 
     pub fn kevent_register(&mut self, ev: Kevent) {
-        if let Some(pos) = self.registered_events.iter().position(|e| e.ident == ev.ident && e.filter == ev.filter) {
+        if let Some(pos) = self
+            .registered_events
+            .iter()
+            .position(|e| e.ident == ev.ident && e.filter == ev.filter)
+        {
             self.registered_events[pos] = ev;
         } else {
             self.registered_events.push(ev);
@@ -285,12 +287,21 @@ impl BsdSoftUpdatesEngine {
     }
 
     pub fn commit_op(&mut self, op_id: u64) -> Result<(), &'static str> {
-        let pos = self.pending_ops.iter().position(|op| op.op_id == op_id).ok_or("Metadata operation not found")?;
+        let pos = self
+            .pending_ops
+            .iter()
+            .position(|op| op.op_id == op_id)
+            .ok_or("Metadata operation not found")?;
 
         if let Some(parent_id) = self.pending_ops[pos].depends_on_op_id {
-            let parent_committed = self.pending_ops.iter().any(|op| op.op_id == parent_id && op.committed);
+            let parent_committed = self
+                .pending_ops
+                .iter()
+                .any(|op| op.op_id == parent_id && op.committed);
             if !parent_committed {
-                return Err("Soft Updates ordering error: Parent metadata dependency not committed yet!");
+                return Err(
+                    "Soft Updates ordering error: Parent metadata dependency not committed yet!",
+                );
             }
         }
 
@@ -352,8 +363,14 @@ mod tests {
         let mut pf = BsdPfPacketFilter::new();
         pf.add_rule(PfAction::Block, "*", "192.168.1.100", 80);
 
-        assert_eq!(pf.evaluate_packet("10.0.0.1", "192.168.1.100", 80), PfAction::Block);
-        assert_eq!(pf.evaluate_packet("10.0.0.1", "192.168.1.101", 80), PfAction::Pass);
+        assert_eq!(
+            pf.evaluate_packet("10.0.0.1", "192.168.1.100", 80),
+            PfAction::Block
+        );
+        assert_eq!(
+            pf.evaluate_packet("10.0.0.1", "192.168.1.101", 80),
+            PfAction::Pass
+        );
     }
 
     #[test]

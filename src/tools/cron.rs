@@ -1,9 +1,6 @@
 //! Cron/Scheduler (cronie/cron Inspiration)
 //! Cron daemon, job scheduling, and job execution
 
-
-
-
 /// Cron schedule
 #[derive(Debug, Clone)]
 pub struct CronSchedule {

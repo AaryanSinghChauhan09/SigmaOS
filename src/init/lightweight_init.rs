@@ -1,7 +1,7 @@
-use std::vec;
-use std::string::{String, ToString};
-use std::vec::Vec;
 use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 // Lightweight Init System for SigmaOS
 // Inspired by Void Linux `runit`, Alpine Linux `OpenRC`, and `s6` systemd alternatives
 // Provides ultra-fast PID 1 process supervision, parallel runlevel targets, dependency tracking,
@@ -12,11 +12,11 @@ use crate::klib::HashMap;
 /// Runlevel targets inspired by SysVInit / OpenRC
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum RunlevelTarget {
-    SingleUser,  // Runlevel 1: Recovery / maintenance
-    MultiUser,   // Runlevel 3: Standard multi-user text console
-    Graphical,   // Runlevel 5: Full desktop environment
-    Reboot,      // Runlevel 6: Reboot system
-    Poweroff,    // Runlevel 0: Shutdown system
+    SingleUser, // Runlevel 1: Recovery / maintenance
+    MultiUser,  // Runlevel 3: Standard multi-user text console
+    Graphical,  // Runlevel 5: Full desktop environment
+    Reboot,     // Runlevel 6: Reboot system
+    Poweroff,   // Runlevel 0: Shutdown system
 }
 
 /// Service status state in runit supervision
@@ -87,9 +87,16 @@ impl RunsvSupervisor {
 
     /// Start a service (`sv up <service>`)
     pub fn start_service(&mut self, name: &str) -> Result<String, &'static str> {
-        let service = self.managed_services.get_mut(name).ok_or("Service not found")?;
+        let service = self
+            .managed_services
+            .get_mut(name)
+            .ok_or("Service not found")?;
         if service.state == ServiceSupervisionState::Up {
-            return Ok(format!("Service '{}' is already running (PID {}).", name, service.pid.unwrap_or(0)));
+            return Ok(format!(
+                "Service '{}' is already running (PID {}).",
+                name,
+                service.pid.unwrap_or(0)
+            ));
         }
 
         let assigned_pid = self.next_pid;
@@ -99,12 +106,18 @@ impl RunsvSupervisor {
         service.state = ServiceSupervisionState::Up;
         service.uptime_seconds = 1;
 
-        Ok(format!("runsv: Started service '{}' [PID {}]", name, assigned_pid))
+        Ok(format!(
+            "runsv: Started service '{}' [PID {}]",
+            name, assigned_pid
+        ))
     }
 
     /// Stop a service (`sv down <service>`)
     pub fn stop_service(&mut self, name: &str) -> Result<String, &'static str> {
-        let service = self.managed_services.get_mut(name).ok_or("Service not found")?;
+        let service = self
+            .managed_services
+            .get_mut(name)
+            .ok_or("Service not found")?;
         let pid = service.pid;
 
         service.pid = None;
@@ -117,7 +130,10 @@ impl RunsvSupervisor {
     /// Restart a service (`sv restart <service>`)
     pub fn restart_service(&mut self, name: &str) -> Result<String, &'static str> {
         self.stop_service(name)?;
-        let service = self.managed_services.get_mut(name).ok_or("Service not found")?;
+        let service = self
+            .managed_services
+            .get_mut(name)
+            .ok_or("Service not found")?;
         service.restart_count += 1;
         self.start_service(name)
     }
@@ -155,7 +171,8 @@ impl LightweightInitDaemon {
 
         // Populate default essential Lightweight System Services
         let udev = ServiceDescriptor::new("udevd", "/sbin/udevd --daemon");
-        let net = ServiceDescriptor::new("networking", "/etc/init.d/networking start").with_dependency("udevd");
+        let net = ServiceDescriptor::new("networking", "/etc/init.d/networking start")
+            .with_dependency("udevd");
         let syslog = ServiceDescriptor::new("syslogd", "/sbin/syslogd -n");
 
         supervisor.register_service(udev);
@@ -172,14 +189,18 @@ impl LightweightInitDaemon {
     pub fn switch_runlevel(&mut self, target: RunlevelTarget) -> String {
         self.current_runlevel = target;
         match target {
-            RunlevelTarget::SingleUser => "Init: Switched to Single-User maintenance mode.".to_string(),
+            RunlevelTarget::SingleUser => {
+                "Init: Switched to Single-User maintenance mode.".to_string()
+            }
             RunlevelTarget::MultiUser => {
                 self.supervisor.start_service("udevd").ok();
                 self.supervisor.start_service("networking").ok();
                 self.supervisor.start_service("syslogd").ok();
                 "Init: Switched to Multi-User runlevel (parallel services active).".to_string()
             }
-            RunlevelTarget::Graphical => "Init: Switched to Graphical runlevel (Wayland compositor ready).".to_string(),
+            RunlevelTarget::Graphical => {
+                "Init: Switched to Graphical runlevel (Wayland compositor ready).".to_string()
+            }
             RunlevelTarget::Reboot => "Init: System reboot requested.".to_string(),
             RunlevelTarget::Poweroff => "Init: System poweroff requested.".to_string(),
         }
@@ -188,7 +209,12 @@ impl LightweightInitDaemon {
     /// Summary of lightweight init status
     pub fn status_summary(&self) -> String {
         let total = self.supervisor.managed_services.len();
-        let running = self.supervisor.managed_services.values().filter(|s| s.state == ServiceSupervisionState::Up).count();
+        let running = self
+            .supervisor
+            .managed_services
+            .values()
+            .filter(|s| s.state == ServiceSupervisionState::Up)
+            .count();
         format!(
             "Lightweight Init (PID 1): Current Runlevel: {:?}, Services: {}/{} running",
             self.current_runlevel, running, total

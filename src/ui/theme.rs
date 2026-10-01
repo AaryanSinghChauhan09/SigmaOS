@@ -13,25 +13,28 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
 /// OOP-based Theme System for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 706
 /// Implements theme management and color schemes
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type ThemeID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum ThemeError { Success = 0, NotFound = 1, InvalidColor = 2 }
+pub enum ThemeError {
+    Success = 0,
+    NotFound = 1,
+    InvalidColor = 2,
+}
 
 pub trait Color {
     fn r(&self) -> u8;
@@ -61,10 +64,18 @@ impl SimpleColor {
 }
 
 impl Color for SimpleColor {
-    fn r(&self) -> u8 { self.r.load(Ordering::SeqCst) as u8 }
-    fn g(&self) -> u8 { self.g.load(Ordering::SeqCst) as u8 }
-    fn b(&self) -> u8 { self.b.load(Ordering::SeqCst) as u8 }
-    fn a(&self) -> u8 { self.a.load(Ordering::SeqCst) as u8 }
+    fn r(&self) -> u8 {
+        self.r.load(Ordering::SeqCst) as u8
+    }
+    fn g(&self) -> u8 {
+        self.g.load(Ordering::SeqCst) as u8
+    }
+    fn b(&self) -> u8 {
+        self.b.load(Ordering::SeqCst) as u8
+    }
+    fn a(&self) -> u8 {
+        self.a.load(Ordering::SeqCst) as u8
+    }
 
     fn to_rgba(&self) -> u32 {
         (self.r() as u32) << 24 | (self.g() as u32) << 16 | (self.b() as u32) << 8 | self.a() as u32
@@ -103,7 +114,9 @@ impl SimpleTheme {
 }
 
 impl Theme for SimpleTheme {
-    fn id(&self) -> ThemeID { self.id }
+    fn id(&self) -> ThemeID {
+        self.id
+    }
     fn name(&self) -> &[u8] {
         // O(1) slice lookup using cached name_len, avoiding O(N) zero-byte linear scan (.position(|&b| b == 0))
         &self.name[..self.name_len as usize]
@@ -167,7 +180,9 @@ impl ThemeManager for SimpleThemeManager {
     fn get_theme(&self, id: ThemeID) -> Option<&dyn Theme> {
         for theme_option in &self.themes {
             if let Some(ref theme) = *theme_option {
-                if theme.id() == id { return Some(theme.as_ref()); }
+                if theme.id() == id {
+                    return Some(theme.as_ref());
+                }
             }
         }
         None
@@ -195,13 +210,25 @@ impl ThemeManager for SimpleThemeManager {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -209,19 +236,29 @@ impl<T> Vec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -253,7 +290,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;
@@ -310,16 +346,16 @@ impl SovereignThemeEngine {
     pub fn set_preset(&mut self, preset: DistroDesktopThemePreset) {
         self.active_preset = preset;
         match preset {
-            DistroDesktopThemePreset::UbuntuYaruDark |
-            DistroDesktopThemePreset::PopOsTealDark |
-            DistroDesktopThemePreset::FedoraAdwaitaDark |
-            DistroDesktopThemePreset::FreeBsdDaemonDark |
-            DistroDesktopThemePreset::OpenBsdOnyx |
-            DistroDesktopThemePreset::ArchCyanDark => {
+            DistroDesktopThemePreset::UbuntuYaruDark
+            | DistroDesktopThemePreset::PopOsTealDark
+            | DistroDesktopThemePreset::FedoraAdwaitaDark
+            | DistroDesktopThemePreset::FreeBsdDaemonDark
+            | DistroDesktopThemePreset::OpenBsdOnyx
+            | DistroDesktopThemePreset::ArchCyanDark => {
                 self.is_dark_mode = true;
             }
-            DistroDesktopThemePreset::LinuxMintMintY |
-            DistroDesktopThemePreset::ElementaryOsGranite => {
+            DistroDesktopThemePreset::LinuxMintMintY
+            | DistroDesktopThemePreset::ElementaryOsGranite => {
                 self.is_dark_mode = false;
             }
         }
@@ -412,15 +448,24 @@ mod tests {
     #[test]
     fn test_distro_desktop_theme_presets() {
         let mut engine = SovereignThemeEngine::new();
-        assert_eq!(engine.active_preset, DistroDesktopThemePreset::UbuntuYaruDark);
+        assert_eq!(
+            engine.active_preset,
+            DistroDesktopThemePreset::UbuntuYaruDark
+        );
         assert!(engine.is_dark_mode);
 
         engine.set_preset(DistroDesktopThemePreset::PopOsTealDark);
-        assert_eq!(engine.active_preset, DistroDesktopThemePreset::PopOsTealDark);
+        assert_eq!(
+            engine.active_preset,
+            DistroDesktopThemePreset::PopOsTealDark
+        );
         assert!(engine.is_dark_mode);
 
         engine.set_preset(DistroDesktopThemePreset::LinuxMintMintY);
-        assert_eq!(engine.active_preset, DistroDesktopThemePreset::LinuxMintMintY);
+        assert_eq!(
+            engine.active_preset,
+            DistroDesktopThemePreset::LinuxMintMintY
+        );
         assert!(!engine.is_dark_mode);
     }
 

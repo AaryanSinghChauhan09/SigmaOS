@@ -17,11 +17,10 @@ use std::vec;
 // SigmaOS India Stack Integration
 // ABDM FHIR client, UPI payments, GST/IRN generation, e-RUPI voucher
 
-
+use std::fmt;
+use std::format;
 use std::string::String;
 use std::vec::Vec;
-use std::format;
-use std::fmt;
 
 /// India Stack service types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -225,7 +224,10 @@ impl IndiaStackClient {
         })
     }
 
-    pub fn initiate_upi_payment(&self, req: UpiPaymentRequest) -> Result<UpiPaymentResponse, IndiaStackError> {
+    pub fn initiate_upi_payment(
+        &self,
+        req: UpiPaymentRequest,
+    ) -> Result<UpiPaymentResponse, IndiaStackError> {
         if req.vpa.is_empty() || req.amount == 0 {
             return Err(IndiaStackError::InvalidPayload);
         }
@@ -246,7 +248,10 @@ impl IndiaStackClient {
         })
     }
 
-    pub fn generate_gst_invoice(&self, req: GstInvoiceRequest) -> Result<GstInvoiceResponse, IndiaStackError> {
+    pub fn generate_gst_invoice(
+        &self,
+        req: GstInvoiceRequest,
+    ) -> Result<GstInvoiceResponse, IndiaStackError> {
         if !validate_gstin(&req.seller_gstin) || !validate_gstin(&req.buyer_gstin) {
             return Err(IndiaStackError::InvalidPayload);
         }
@@ -274,7 +279,10 @@ impl IndiaStackClient {
         let ack_date = String::from("07/08/2026 10:00:00");
 
         let status = if is_intrastate {
-            format!("SUCCESS (CGST:{:.2}, SGST:{:.2}, Total:{:.2})", cgst, sgst, grand_total)
+            format!(
+                "SUCCESS (CGST:{:.2}, SGST:{:.2}, Total:{:.2})",
+                cgst, sgst, grand_total
+            )
         } else {
             format!("SUCCESS (IGST:{:.2}, Total:{:.2})", igst, grand_total)
         };
@@ -288,7 +296,10 @@ impl IndiaStackClient {
     }
 
     pub fn create_erupi_voucher(&self, voucher: ERupiVoucher) -> Result<String, IndiaStackError> {
-        if voucher.amount == 0 || voucher.purpose.is_empty() || voucher.beneficiary_mobile.len() != 10 {
+        if voucher.amount == 0
+            || voucher.purpose.is_empty()
+            || voucher.beneficiary_mobile.len() != 10
+        {
             return Err(IndiaStackError::InvalidPayload);
         }
         for c in voucher.beneficiary_mobile.chars() {
@@ -296,8 +307,14 @@ impl IndiaStackClient {
                 return Err(IndiaStackError::InvalidPayload);
             }
         }
-        let token_hash = simple_hash(&format!("{}{}{}", voucher.beneficiary_mobile, voucher.purpose, voucher.amount));
-        let token = format!("ERUPI-VCHR-{:08x}-{:08x}", token_hash, voucher.expiry_timestamp);
+        let token_hash = simple_hash(&format!(
+            "{}{}{}",
+            voucher.beneficiary_mobile, voucher.purpose, voucher.amount
+        ));
+        let token = format!(
+            "ERUPI-VCHR-{:08x}-{:08x}",
+            token_hash, voucher.expiry_timestamp
+        );
         Ok(token)
     }
 
@@ -413,7 +430,7 @@ mod tests {
         assert!(validate_gstin("27AABCU9603R1ZM"));
         assert!(!validate_gstin("00AABCU9603R1ZM")); // Invalid state code 00
         assert!(!validate_gstin("98AABCU9603R1ZM")); // State code 98 too high
-        assert!(!validate_gstin("27AABCU9603R1Z"));   // Too short
+        assert!(!validate_gstin("27AABCU9603R1Z")); // Too short
     }
 
     #[test]

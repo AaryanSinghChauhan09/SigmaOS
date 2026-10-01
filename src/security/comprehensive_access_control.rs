@@ -220,7 +220,11 @@ impl SovereignComprehensiveAccessControlSuite {
     }
 
     pub fn detect_rogue_wap(&mut self, bssid: &str) -> bool {
-        if let Some(ap) = self.wireless_access_points.iter_mut().find(|a| a.bssid == bssid) {
+        if let Some(ap) = self
+            .wireless_access_points
+            .iter_mut()
+            .find(|a| a.bssid == bssid)
+        {
             if ap.security_protocol != "WPA3-Enterprise" {
                 ap.is_rogue_suspect = true;
                 return true;
@@ -243,7 +247,9 @@ mod tests {
     #[test]
     fn test_ldap_authentication() {
         let ldap = SovereignLdapAccessEngine::new("dc=sigmaos,dc=org");
-        let user = ldap.authenticate("admin").expect("Admin entry should exist");
+        let user = ldap
+            .authenticate("admin")
+            .expect("Admin entry should exist");
         assert_eq!(user.email, "admin@sigmaos.org");
         assert!(user.member_groups.contains(&"wheel".to_string()));
     }

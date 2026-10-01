@@ -13,10 +13,10 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+use crate::kernel::proc::process_lifecycle::ProcessLifecycleManager;
 /// SigmaOS POSIX signals implementation
 /// Based on early and modern Linux signals design
 use crate::klib::btreemap::BTreeMap;
-use crate::kernel::proc::process_lifecycle::{ProcessLifecycleManager};
 use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -195,15 +195,22 @@ impl SignalManager {
 
     pub fn set_oom_score_adj(&mut self, pid: u64, adj: OomScoreAdjustment) {
         let clamped_val = adj.0.clamp(-1000, 1000);
-        self.oom_score_adj.insert(pid, OomScoreAdjustment(clamped_val));
+        self.oom_score_adj
+            .insert(pid, OomScoreAdjustment(clamped_val));
     }
 
     pub fn get_oom_score_adj(&self, pid: u64) -> OomScoreAdjustment {
-        self.oom_score_adj.get(&pid).copied().unwrap_or(OomScoreAdjustment(0))
+        self.oom_score_adj
+            .get(&pid)
+            .copied()
+            .unwrap_or(OomScoreAdjustment(0))
     }
 
     /// Trigger Linux-style Out-Of-Memory (OOM) killer to select and terminate the highest score process
-    pub fn trigger_oom_killer(&mut self, process_memory_usage: &BTreeMap<u64, usize>) -> Option<u64> {
+    pub fn trigger_oom_killer(
+        &mut self,
+        process_memory_usage: &BTreeMap<u64, usize>,
+    ) -> Option<u64> {
         let mut highest_pid = None;
         let mut highest_score: i64 = -10000;
 
@@ -250,7 +257,12 @@ impl SignalManager {
     }
 
     /// Propagates a signal to an entire Process Group (PGID), mimicking Linux signal groups
-    pub fn propagate_group_signal(&mut self, pgid: u32, sig: Signal, lifecycle: &ProcessLifecycleManager) {
+    pub fn propagate_group_signal(
+        &mut self,
+        pgid: u32,
+        sig: Signal,
+        lifecycle: &ProcessLifecycleManager,
+    ) {
         for (&pid, &group) in &lifecycle.group_ids {
             if group == pgid {
                 self.send_signal(pid, sig);
@@ -281,8 +293,8 @@ impl Default for SignalManager {
 #[cfg(test_disabled)]
 mod tests {
     use super::*;
-    use crate::kernel::proc::process_lifecycle::{ProcessLifecycleManager};
     use crate::kernel::proc::process_lifecycle::mock_scheduler::{Priority, Process};
+    use crate::kernel::proc::process_lifecycle::ProcessLifecycleManager;
 
     extern "C" fn mock_handler(_sig: u32) {}
 

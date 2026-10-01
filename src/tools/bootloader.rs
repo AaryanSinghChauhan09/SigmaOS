@@ -1,12 +1,10 @@
 //! Bootloader & Dual-Boot Manager (GRUB2 / systemd-boot / Calamares Inspiration)
 //! Boot menu, multi-OS detection, chainloading, and UEFI support
 
-
-
-use crate::klib::{Vec, String, ToString};
+use crate::klib::{String, ToString, Vec};
+use std::format;
 use std::string::String;
 use std::vec::Vec;
-use std::format;
 
 /// Target Operating System Type for Dual-Boot Chainloading
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -202,7 +200,11 @@ impl Bootloader {
         };
 
         // Add default SigmaOS entry
-        let mut main_entry = BootEntry::new("SigmaOS Sovereign Edition", "/boot/vmlinuz-sigma", "/boot/initramfs-sigma.img");
+        let mut main_entry = BootEntry::new(
+            "SigmaOS Sovereign Edition",
+            "/boot/vmlinuz-sigma",
+            "/boot/initramfs-sigma.img",
+        );
         main_entry.add_option("root=/dev/nvme0n1p4");
         main_entry.add_option("quiet");
         main_entry.add_option("splash");
@@ -226,7 +228,12 @@ impl Bootloader {
     }
 
     pub fn boot_entry(&self, entry_id: &str) -> Result<(), BootloaderError> {
-        if self.configuration.entries.iter().any(|e| e.id == entry_id || e.name == entry_id) {
+        if self
+            .configuration
+            .entries
+            .iter()
+            .any(|e| e.id == entry_id || e.name == entry_id)
+        {
             Ok(())
         } else {
             Err(BootloaderError::EntryNotFound)
@@ -239,7 +246,10 @@ impl Bootloader {
 
     pub fn generate_grub_cfg(&self) -> String {
         let mut cfg = String::new();
-        cfg.push_str(&format!("set timeout={}\n", self.configuration.global_settings.timeout));
+        cfg.push_str(&format!(
+            "set timeout={}\n",
+            self.configuration.global_settings.timeout
+        ));
         cfg.push_str("set default=0\n\n");
 
         for entry in &self.configuration.entries {

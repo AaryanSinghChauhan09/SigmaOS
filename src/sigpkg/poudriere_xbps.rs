@@ -2,11 +2,10 @@
 // SigmaOS Poudriere Bulk Builder, Void xbps-src Chroot Builder, and Slackpkg Patch Engine Subsystem
 // Native Rust implementation of FreeBSD poudriere, Void Linux xbps-src, and Slackware slackpkg parity
 
-
-use std::string::{String, ToString};
-use std::vec::Vec;
-use std::vec;
 use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 // ============================================================================
 // 1. PoudriereBulkBuildQueue (FreeBSD poudriere parity)
@@ -262,7 +261,10 @@ impl SlackpkgPatchEngine {
 
     /// Generates canonical Slackware package tarball filename e.g. `zsh-5.9-x86_64-1_SBo.txz`
     pub fn generate_txz_filename(&self, spec: &SlackBuildSpec, arch: &str) -> String {
-        format!("{}-{}-{}-{}{}.txz", spec.prgnam, spec.version, arch, spec.build, spec.tag)
+        format!(
+            "{}-{}-{}-{}{}.txz",
+            spec.prgnam, spec.version, arch, spec.build, spec.tag
+        )
     }
 }
 
@@ -279,7 +281,9 @@ mod tests {
         let mut poudriere = PoudriereBulkBuildQueue::new();
         poudriere.register_jail("13_2_RELEASE_amd64");
 
-        assert!(poudriere.enqueue_port("sysutils/ripgrep", "13_2_RELEASE_amd64").is_ok());
+        assert!(poudriere
+            .enqueue_port("sysutils/ripgrep", "13_2_RELEASE_amd64")
+            .is_ok());
         assert_eq!(poudriere.jobs.len(), 1);
 
         let built_count = poudriere.execute_bulk_build();
@@ -298,7 +302,9 @@ mod tests {
 
         let builder = XbpsSrcChrootBuilder::new("/void-packages");
         let result = builder.build_pkg(&template);
-        assert!(result.binary_xbps_path.contains("neofetch-7.1.0_2.x86_64.xbps"));
+        assert!(result
+            .binary_xbps_path
+            .contains("neofetch-7.1.0_2.x86_64.xbps"));
     }
 
     #[test]

@@ -1,8 +1,6 @@
 // Sovereign GPU Acceleration & DRM/KMS Framework for SigmaOS
 // Provides zero-dependency GPU mode setting, display pipeline control, and buffer object management.
 
-
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GpuVendor {
     Nvidia,

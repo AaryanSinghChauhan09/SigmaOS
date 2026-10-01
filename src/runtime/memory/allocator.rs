@@ -19,7 +19,6 @@
 /// Custom Memory Allocator for SigmaOS
 /// Implements memory allocation without relying on std::alloc
 /// Uses buddy system algorithm for efficient memory management
-
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
@@ -65,7 +64,7 @@ impl BuddyAllocator {
         while remaining >= BLOCK_SIZE {
             let order = Self::calculate_order(remaining);
             let block_size = BLOCK_SIZE * (1 << order);
-            
+
             let block = current as *mut MemoryBlock;
             (*block).size = block_size;
             (*block).used.store(false, Ordering::SeqCst);
@@ -163,7 +162,8 @@ impl BuddyAllocator {
         }
 
         (*block.as_ptr()).used.store(true, Ordering::SeqCst);
-        self.used_memory.fetch_add((*block.as_ptr()).size, Ordering::SeqCst);
+        self.used_memory
+            .fetch_add((*block.as_ptr()).size, Ordering::SeqCst);
 
         (block.as_ptr() as *mut u8).add(core::mem::size_of::<MemoryBlock>())
     }
@@ -171,7 +171,7 @@ impl BuddyAllocator {
     /// Deallocate memory
     pub unsafe fn deallocate(&mut self, ptr: *mut u8) {
         let block = (ptr as *mut u8).sub(core::mem::size_of::<MemoryBlock>()) as *mut MemoryBlock;
-        
+
         if !(*block).used.load(Ordering::SeqCst) {
             return; // Already freed
         }
@@ -188,7 +188,7 @@ impl BuddyAllocator {
 
         while current_order < MAX_ORDER {
             let buddy = Self::get_buddy(current_block, current_order);
-            
+
             if (*buddy).used.load(Ordering::SeqCst) || (*buddy).size != (*current_block).size {
                 break;
             }
@@ -223,7 +223,8 @@ impl BuddyAllocator {
         MemoryStats {
             total: self.total_memory.load(Ordering::SeqCst),
             used: self.used_memory.load(Ordering::SeqCst),
-            free: self.total_memory.load(Ordering::SeqCst) - self.used_memory.load(Ordering::SeqCst),
+            free: self.total_memory.load(Ordering::SeqCst)
+                - self.used_memory.load(Ordering::SeqCst),
         }
     }
 }

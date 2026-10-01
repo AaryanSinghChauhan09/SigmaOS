@@ -1,12 +1,11 @@
 // SigmaOS Hardened Sysctl Implementation
 // Inspired by HardenedBSD security hardening approaches
 
-
+use core::sync::atomic::{AtomicBool, Ordering};
+use std::collections::BTreeMap;
 use std::format;
 use std::string::String;
 use std::vec::Vec;
-use std::collections::BTreeMap;
-use core::sync::atomic::{AtomicBool, Ordering};
 
 /// Hardened sysctl configuration
 #[derive(Debug, Clone)]
@@ -38,12 +37,12 @@ impl HardenedSysctlManager {
             sysctls: BTreeMap::new(),
             locked: AtomicBool::new(false),
         };
-        
+
         // Initialize with HardenedBSD-inspired security defaults
         manager.init_hardened_defaults();
         manager
     }
-    
+
     fn init_hardened_defaults(&mut self) {
         // HardenedBSD-inspired security settings
         self.register_sysctl(SysctlConfig {
@@ -53,7 +52,7 @@ impl HardenedSysctlManager {
             read_only: true,
             security_critical: true,
         });
-        
+
         self.register_sysctl(SysctlConfig {
             name: String::from("security.bsd.unprivileged_kenv_read"),
             value: SysctlValue::Bool(false), // Restrict kernel environment reading
@@ -61,7 +60,7 @@ impl HardenedSysctlManager {
             read_only: true,
             security_critical: true,
         });
-        
+
         self.register_sysctl(SysctlConfig {
             name: String::from("hbsd.late_kld_prohibition_value"),
             value: SysctlValue::U32(1), // Prohibit late KLD loading
@@ -69,7 +68,7 @@ impl HardenedSysctlManager {
             read_only: true,
             security_critical: true,
         });
-        
+
         self.register_sysctl(SysctlConfig {
             name: String::from("security.bbsd.stack_auto_init"),
             value: SysctlValue::Bool(true), // Enable stack auto-initialization
@@ -77,7 +76,7 @@ impl HardenedSysctlManager {
             read_only: true,
             security_critical: true,
         });
-        
+
         self.register_sysctl(SysctlConfig {
             name: String::from("security.bbsd.ptrace_hardening"),
             value: SysctlValue::Bool(true), // Enable ptrace hardening
@@ -85,7 +84,7 @@ impl HardenedSysctlManager {
             read_only: true,
             security_critical: true,
         });
-        
+
         self.register_sysctl(SysctlConfig {
             name: String::from("security.bbsd.random_relink"),
             value: SysctlValue::Bool(true), // Enable random relinking
@@ -93,7 +92,7 @@ impl HardenedSysctlManager {
             read_only: false,
             security_critical: true,
         });
-        
+
         self.register_sysctl(SysctlConfig {
             name: String::from("vm.phys_fictitious_segs"),
             value: SysctlValue::Bool(false), // Restrict physical fictitious segments
@@ -101,7 +100,7 @@ impl HardenedSysctlManager {
             read_only: true,
             security_critical: true,
         });
-        
+
         self.register_sysctl(SysctlConfig {
             name: String::from("security.bbsd.aslr"),
             value: SysctlValue::Bool(true), // Enable ASLR
@@ -109,7 +108,7 @@ impl HardenedSysctlManager {
             read_only: false,
             security_critical: true,
         });
-        
+
         self.register_sysctl(SysctlConfig {
             name: String::from("security.bbsd.stack_protector"),
             value: SysctlValue::Bool(true), // Enable stack protector
@@ -118,20 +117,20 @@ impl HardenedSysctlManager {
             security_critical: true,
         });
     }
-    
+
     pub fn register_sysctl(&mut self, config: SysctlConfig) {
         self.sysctls.insert(config.name.clone(), config);
     }
-    
+
     pub fn get_sysctl(&self, name: &str) -> Option<&SysctlConfig> {
         self.sysctls.get(name)
     }
-    
+
     pub fn set_sysctl(&mut self, name: &str, value: SysctlValue) -> Result<(), SysctlError> {
         if self.locked.load(Ordering::SeqCst) {
             return Err(SysctlError::Locked);
         }
-        
+
         if let Some(config) = self.sysctls.get_mut(name) {
             if config.read_only {
                 return Err(SysctlError::ReadOnly);
@@ -142,12 +141,12 @@ impl HardenedSysctlManager {
             Err(SysctlError::NotFound)
         }
     }
-    
+
     pub fn lock_security_critical(&self) {
         // Lock all security-critical sysctls
         self.locked.store(true, Ordering::SeqCst);
     }
-    
+
     pub fn apply_hardened_defaults(&self) -> Result<(), SysctlError> {
         // Apply all hardened security defaults
         for (_name, config) in &self.sysctls {
@@ -161,10 +160,10 @@ impl HardenedSysctlManager {
         }
         Ok(())
     }
-    
+
     pub fn security_audit(&self) -> Vec<String> {
         let mut issues = Vec::new();
-        
+
         for (name, config) in &self.sysctls {
             if config.security_critical {
                 let is_insecure = match (name.as_str(), config.value) {
@@ -177,17 +176,26 @@ impl HardenedSysctlManager {
                     ("security.bbsd.random_relink", SysctlValue::Bool(false)) => true,
                     ("security.bbsd.aslr", SysctlValue::Bool(false)) => true,
                     ("security.bbsd.stack_protector", SysctlValue::Bool(false)) => true,
-                    (n, SysctlValue::Bool(false)) if !n.starts_with("security.bsd.allow") && !n.starts_with("security.bsd.unprivileged") && !n.starts_with("vm.phys_fictitious") => true,
+                    (n, SysctlValue::Bool(false))
+                        if !n.starts_with("security.bsd.allow")
+                            && !n.starts_with("security.bsd.unprivileged")
+                            && !n.starts_with("vm.phys_fictitious") =>
+                    {
+                        true
+                    }
                     (_, SysctlValue::U32(0)) => true,
                     _ => false,
                 };
 
                 if is_insecure {
-                    issues.push(format!("Security-critical sysctl {} is set to an insecure value", name));
+                    issues.push(format!(
+                        "Security-critical sysctl {} is set to an insecure value",
+                        name
+                    ));
                 }
             }
         }
-        
+
         issues
     }
 }
@@ -254,7 +262,7 @@ mod tests {
     fn test_locking() {
         let mut manager = HardenedSysctlManager::new();
         manager.lock_security_critical();
-        
+
         // Try to modify a non-read-only sysctl after locking
         let result = manager.set_sysctl("security.bbsd.random_relink", SysctlValue::Bool(false));
         assert_eq!(result, Err(SysctlError::Locked));

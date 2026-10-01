@@ -32,7 +32,6 @@
 
 #![allow(dead_code)]
 
-
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
@@ -92,10 +91,19 @@ impl AttrValue {
     pub fn parse_write(s: &str, current: &Self) -> Result<Self, &'static str> {
         let s = s.trim();
         match current {
-            Self::Integer(_) => s.parse::<i64>().map(Self::Integer).map_err(|_| "invalid integer"),
-            Self::Unsigned(_) => s.parse::<u64>().map(Self::Unsigned).map_err(|_| "invalid integer"),
-            Self::Bool(_) => match s { "0" | "false" | "off" => Ok(Self::Bool(false)),
-                "1" | "true" | "on" => Ok(Self::Bool(true)), _ => Err("invalid bool") },
+            Self::Integer(_) => s
+                .parse::<i64>()
+                .map(Self::Integer)
+                .map_err(|_| "invalid integer"),
+            Self::Unsigned(_) => s
+                .parse::<u64>()
+                .map(Self::Unsigned)
+                .map_err(|_| "invalid integer"),
+            Self::Bool(_) => match s {
+                "0" | "false" | "off" => Ok(Self::Bool(false)),
+                "1" | "true" | "on" => Ok(Self::Bool(true)),
+                _ => Err("invalid bool"),
+            },
             Self::Text(_) => Ok(Self::Text(s.into())),
             Self::Hex(_) => {
                 let n = if let Some(h) = s.strip_prefix("0x") {
@@ -130,30 +138,73 @@ pub struct SysfsNode {
 
 impl SysfsNode {
     fn new_dir(id: KobjId, name: &str, parent: Option<KobjId>) -> Self {
-        Self { id, name: name.into(), node_type: SysfsNodeType::Directory,
-            parent, children: Vec::new(), value: None, symlink_target: None, subsystem: None }
+        Self {
+            id,
+            name: name.into(),
+            node_type: SysfsNodeType::Directory,
+            parent,
+            children: Vec::new(),
+            value: None,
+            symlink_target: None,
+            subsystem: None,
+        }
     }
 
     fn new_attr(id: KobjId, name: &str, parent: KobjId, value: AttrValue, rw: bool) -> Self {
-        let node_type = if rw { SysfsNodeType::AttrReadWrite } else { SysfsNodeType::AttrReadOnly };
-        Self { id, name: name.into(), node_type, parent: Some(parent),
-            children: Vec::new(), value: Some(value), symlink_target: None, subsystem: None }
+        let node_type = if rw {
+            SysfsNodeType::AttrReadWrite
+        } else {
+            SysfsNodeType::AttrReadOnly
+        };
+        Self {
+            id,
+            name: name.into(),
+            node_type,
+            parent: Some(parent),
+            children: Vec::new(),
+            value: Some(value),
+            symlink_target: None,
+            subsystem: None,
+        }
     }
 
     fn new_symlink(id: KobjId, name: &str, parent: KobjId, target: &str) -> Self {
-        Self { id, name: name.into(), node_type: SysfsNodeType::Symlink,
-            parent: Some(parent), children: Vec::new(), value: None,
-            symlink_target: Some(target.into()), subsystem: None }
+        Self {
+            id,
+            name: name.into(),
+            node_type: SysfsNodeType::Symlink,
+            parent: Some(parent),
+            children: Vec::new(),
+            value: None,
+            symlink_target: Some(target.into()),
+            subsystem: None,
+        }
     }
 
-    pub fn name(&self) -> &str { &self.name }
-    pub fn node_type(&self) -> SysfsNodeType { self.node_type }
-    pub fn id(&self) -> KobjId { self.id }
-    pub fn parent(&self) -> Option<KobjId> { self.parent }
-    pub fn children(&self) -> &[KobjId] { &self.children }
-    pub fn value(&self) -> Option<&AttrValue> { self.value.as_ref() }
-    pub fn symlink_target(&self) -> Option<&str> { self.symlink_target.as_deref() }
-    pub fn subsystem(&self) -> Option<&str> { self.subsystem.as_deref() }
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+    pub fn node_type(&self) -> SysfsNodeType {
+        self.node_type
+    }
+    pub fn id(&self) -> KobjId {
+        self.id
+    }
+    pub fn parent(&self) -> Option<KobjId> {
+        self.parent
+    }
+    pub fn children(&self) -> &[KobjId] {
+        &self.children
+    }
+    pub fn value(&self) -> Option<&AttrValue> {
+        self.value.as_ref()
+    }
+    pub fn symlink_target(&self) -> Option<&str> {
+        self.symlink_target.as_deref()
+    }
+    pub fn subsystem(&self) -> Option<&str> {
+        self.subsystem.as_deref()
+    }
 }
 
 // ============================================================
@@ -198,7 +249,9 @@ impl SigmaSysfs {
         self.path_index.insert("/".into(), KobjId(1));
 
         // Create top-level directories
-        for dir in &["block", "bus", "class", "dev", "devices", "firmware", "fs", "kernel", "module"] {
+        for dir in &[
+            "block", "bus", "class", "dev", "devices", "firmware", "fs", "kernel", "module",
+        ] {
             self.mkdir_at(KobjId(1), dir).ok();
         }
 
@@ -225,14 +278,22 @@ impl SigmaSysfs {
         let class_id = self.find_path("/sys/class").unwrap_or(KobjId(1));
         let net_id = self.mkdir_at(class_id, "net").unwrap_or(class_id);
         let lo_id = self.mkdir_at(net_id, "lo").unwrap_or(net_id);
-        self.add_attr_ro(lo_id, "address", AttrValue::Text("00:00:00:00:00:00".into()));
+        self.add_attr_ro(
+            lo_id,
+            "address",
+            AttrValue::Text("00:00:00:00:00:00".into()),
+        );
         self.add_attr_ro(lo_id, "mtu", AttrValue::Integer(65536));
         self.add_attr_rw(lo_id, "flags", AttrValue::Hex(0x49));
         self.add_attr_ro(lo_id, "speed", AttrValue::Integer(-1));
         self.add_attr_ro(lo_id, "operstate", AttrValue::Text("unknown".into()));
 
         let eth0_id = self.mkdir_at(net_id, "eth0").unwrap_or(net_id);
-        self.add_attr_ro(eth0_id, "address", AttrValue::Text("02:42:ac:11:00:02".into()));
+        self.add_attr_ro(
+            eth0_id,
+            "address",
+            AttrValue::Text("02:42:ac:11:00:02".into()),
+        );
         self.add_attr_ro(eth0_id, "mtu", AttrValue::Integer(1500));
         self.add_attr_rw(eth0_id, "flags", AttrValue::Hex(0x1043));
         self.add_attr_ro(eth0_id, "speed", AttrValue::Integer(1000));
@@ -304,16 +365,16 @@ impl SigmaSysfs {
         let id = self.find_path(path).ok_or("no such attribute")?;
         let node = self.nodes.get(&id).ok_or("node not found")?;
         match &node.node_type {
-            SysfsNodeType::AttrReadOnly | SysfsNodeType::AttrReadWrite => {
-                node.value.as_ref()
-                    .map(|v| v.to_sysfs_string().into_bytes())
-                    .ok_or("no value")
-            }
-            SysfsNodeType::Symlink => {
-                node.symlink_target.as_ref()
-                    .map(|t| t.as_bytes().to_vec())
-                    .ok_or("no target")
-            }
+            SysfsNodeType::AttrReadOnly | SysfsNodeType::AttrReadWrite => node
+                .value
+                .as_ref()
+                .map(|v| v.to_sysfs_string().into_bytes())
+                .ok_or("no value"),
+            SysfsNodeType::Symlink => node
+                .symlink_target
+                .as_ref()
+                .map(|t| t.as_bytes().to_vec())
+                .ok_or("no target"),
             _ => Err("is a directory"),
         }
     }
@@ -324,8 +385,8 @@ impl SigmaSysfs {
         let node = self.nodes.get_mut(&id).ok_or("node not found")?;
         match node.node_type {
             SysfsNodeType::AttrWriteOnly | SysfsNodeType::AttrReadWrite => {
-                let new_val = AttrValue::parse_write(data,
-                    node.value.as_ref().ok_or("no current value")?)?;
+                let new_val =
+                    AttrValue::parse_write(data, node.value.as_ref().ok_or("no current value")?)?;
                 node.value = Some(new_val);
                 Ok(())
             }
@@ -341,7 +402,9 @@ impl SigmaSysfs {
         if node.node_type != SysfsNodeType::Directory {
             return Err("not a directory");
         }
-        Ok(node.children.iter()
+        Ok(node
+            .children
+            .iter()
             .filter_map(|c| self.nodes.get(c))
             .map(|n| n.name.clone())
             .collect())
@@ -350,22 +413,37 @@ impl SigmaSysfs {
     /// Find a node ID by path.
     pub fn find_path(&self, path: &str) -> Option<KobjId> {
         // Normalise path
-        let p = if path.starts_with("/sys") { path.into() }
-                else { format!("/sys/{}", path.trim_start_matches('/')) };
-        self.path_index.get(&p).copied()
+        let p = if path.starts_with("/sys") {
+            path.into()
+        } else {
+            format!("/sys/{}", path.trim_start_matches('/'))
+        };
+        self.path_index
+            .get(&p)
+            .copied()
             .or_else(|| self.path_index.get(path).copied())
     }
 
     fn id_to_path(&self, id: KobjId) -> String {
         for (path, &nid) in &self.path_index {
-            if nid == id { return path.clone(); }
+            if nid == id {
+                return path.clone();
+            }
         }
         "/sys".into()
     }
 
     /// Register a PCI device kobject.
-    pub fn register_pci_device(&mut self, bus: u8, dev: u8, func: u8,
-                                vendor: u16, device: u16, class: u32, name: &str) -> KobjId {
+    pub fn register_pci_device(
+        &mut self,
+        bus: u8,
+        dev: u8,
+        func: u8,
+        vendor: u16,
+        device: u16,
+        class: u32,
+        name: &str,
+    ) -> KobjId {
         let devices_id = self.find_path("/sys/devices").unwrap_or(self.root_id);
         let pci_path = format!("0000:{:02x}:{:02x}.{}", bus, dev, func);
         let pci_id = self.mkdir_at(devices_id, &pci_path).unwrap_or(devices_id);
@@ -381,13 +459,21 @@ impl SigmaSysfs {
         pci_id
     }
 
-    pub fn root_id(&self) -> KobjId { self.root_id }
-    pub fn node_count(&self) -> usize { self.nodes.len() }
-    pub fn get_node(&self, id: KobjId) -> Option<&SysfsNode> { self.nodes.get(&id) }
+    pub fn root_id(&self) -> KobjId {
+        self.root_id
+    }
+    pub fn node_count(&self) -> usize {
+        self.nodes.len()
+    }
+    pub fn get_node(&self, id: KobjId) -> Option<&SysfsNode> {
+        self.nodes.get(&id)
+    }
 }
 
 impl Default for SigmaSysfs {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // ============================================================
@@ -410,9 +496,7 @@ mod tests {
     #[test]
     fn test_read_attr() {
         let sysfs = SigmaSysfs::new();
-        let content = String::from_utf8(
-            sysfs.read("/sys/kernel/mm/swappiness").unwrap()
-        ).unwrap();
+        let content = String::from_utf8(sysfs.read("/sys/kernel/mm/swappiness").unwrap()).unwrap();
         assert!(content.trim() == "60");
     }
 
@@ -420,16 +504,16 @@ mod tests {
     fn test_write_attr() {
         let mut sysfs = SigmaSysfs::new();
         sysfs.write("/sys/kernel/mm/swappiness", "10").unwrap();
-        let content = String::from_utf8(
-            sysfs.read("/sys/kernel/mm/swappiness").unwrap()
-        ).unwrap();
+        let content = String::from_utf8(sysfs.read("/sys/kernel/mm/swappiness").unwrap()).unwrap();
         assert!(content.trim() == "10");
     }
 
     #[test]
     fn test_write_readonly_fails() {
         let mut sysfs = SigmaSysfs::new();
-        assert!(sysfs.write("/sys/class/net/eth0/address", "ff:ff:ff:ff:ff:ff").is_err());
+        assert!(sysfs
+            .write("/sys/class/net/eth0/address", "ff:ff:ff:ff:ff:ff")
+            .is_err());
     }
 
     #[test]

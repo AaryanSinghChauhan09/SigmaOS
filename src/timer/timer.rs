@@ -1,13 +1,12 @@
 extern crate alloc;
 use alloc::boxed::Box;
 
+use core::mem;
 /// OOP-based Advanced Asynchronous Timer, APC, DPC & IOCTL Execution Engine for SigmaOS
 /// Implements high-fidelity timer management, Windows-inspired Asynchronous Procedure Calls (APC),
 /// Deferred Procedure Calls (DPC), and standard Linux/BSD IOCTL handlers.
-
 use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicU64, AtomicUsize, AtomicBool, Ordering};
-use core::mem;
+use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 
 /// Timer ID
 pub type TimerID = usize;
@@ -103,7 +102,12 @@ pub struct TimerDescriptor {
 }
 
 impl TimerDescriptor {
-    pub fn new(id: TimerID, timer_type: TimerType, interval: Timestamp, capability: TimerCapability) -> Self {
+    pub fn new(
+        id: TimerID,
+        timer_type: TimerType,
+        interval: Timestamp,
+        capability: TimerCapability,
+    ) -> Self {
         TimerDescriptor {
             id,
             timer_type,
@@ -141,7 +145,8 @@ impl Timer for TimerDescriptor {
         }
 
         self.start_time.store(get_current_time(), Ordering::SeqCst);
-        self.remaining.store(self.interval.load(Ordering::SeqCst), Ordering::SeqCst);
+        self.remaining
+            .store(self.interval.load(Ordering::SeqCst), Ordering::SeqCst);
         self.is_running.store(true, Ordering::SeqCst);
         Ok(())
     }
@@ -165,8 +170,9 @@ impl Timer for TimerDescriptor {
         }
 
         let was_running = self.is_running.load(Ordering::SeqCst);
-        self.remaining.store(self.interval.load(Ordering::SeqCst), Ordering::SeqCst);
-        
+        self.remaining
+            .store(self.interval.load(Ordering::SeqCst), Ordering::SeqCst);
+
         if was_running {
             self.start_time.store(get_current_time(), Ordering::SeqCst);
         }
@@ -309,7 +315,12 @@ impl TimerStats {
 }
 
 pub trait TimerManager {
-    fn create_timer(&mut self, timer_type: TimerType, interval: Timestamp, capability: TimerCapability) -> Result<TimerID, TimerError>;
+    fn create_timer(
+        &mut self,
+        timer_type: TimerType,
+        interval: Timestamp,
+        capability: TimerCapability,
+    ) -> Result<TimerID, TimerError>;
     fn delete_timer(&mut self, id: TimerID) -> Result<(), TimerError>;
     fn start_timer(&mut self, id: TimerID) -> Result<(), TimerError>;
     fn stop_timer(&mut self, id: TimerID) -> Result<(), TimerError>;
@@ -389,7 +400,12 @@ impl SimpleTimerManager {
 }
 
 impl TimerManager for SimpleTimerManager {
-    fn create_timer(&mut self, timer_type: TimerType, interval: Timestamp, capability: TimerCapability) -> Result<TimerID, TimerError> {
+    fn create_timer(
+        &mut self,
+        timer_type: TimerType,
+        interval: Timestamp,
+        capability: TimerCapability,
+    ) -> Result<TimerID, TimerError> {
         if !self.capability.can_create {
             return Err(TimerError::PermissionDenied);
         }
@@ -479,7 +495,7 @@ impl TimerManager for SimpleTimerManager {
             for timer_option in &mut self.timers {
                 if let Some(timer_ptr) = *timer_option {
                     let timer = &mut *timer_ptr.as_ptr();
-                    
+
                     if timer.is_running.load(Ordering::SeqCst) {
                         let elapsed = current_time - timer.start_time.load(Ordering::SeqCst);
                         let interval = timer.interval.load(Ordering::SeqCst);
@@ -507,9 +523,7 @@ impl TimerManager for SimpleTimerManager {
     }
 
     fn get_timer_info(&self, id: TimerID) -> Option<TimerInfo> {
-        unsafe {
-            self.get_timer(id).map(|timer| timer.info())
-        }
+        unsafe { self.get_timer(id).map(|timer| timer.info()) }
     }
 
     fn stats(&self) -> TimerStats {
@@ -601,7 +615,11 @@ impl<T> Vec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {
@@ -624,7 +642,6 @@ extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
 }
-
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -656,7 +673,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;

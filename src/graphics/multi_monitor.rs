@@ -1,6 +1,6 @@
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 // Multi-Monitor Display Manager for SigmaOS (XrandR & DisplayFusion Parity)
 // Supports multi-display layout positioning, scaling, refresh rates, bezel compensation,
 // independent monitor taskbars, wallpaper profiles, and ultra-wide virtual monitor splits.
@@ -18,7 +18,7 @@ pub enum DisplayRotation {
 #[derive(Debug, Clone, PartialEq)]
 pub struct DisplayOutput {
     pub id: u32,
-    pub name: String, // e.g. "HDMI-1", "DP-1", "eDP-1"
+    pub name: String,           // e.g. "HDMI-1", "DP-1", "eDP-1"
     pub resolution: (u32, u32), // (width, height) e.g. (1920, 1080)
     pub position: (i32, i32),   // (x, y) coordinates in virtual canvas
     pub refresh_rate_hz: u32,   // e.g. 60, 144, 240
@@ -94,7 +94,10 @@ impl MultiMonitorManager {
         rotation: DisplayRotation,
         scale: f32,
     ) -> Result<(), &'static str> {
-        let output = self.outputs.get_mut(&output_id).ok_or("Display output ID not found")?;
+        let output = self
+            .outputs
+            .get_mut(&output_id)
+            .ok_or("Display output ID not found")?;
         output.resolution = resolution;
         output.position = position;
         output.rotation = rotation;
@@ -103,17 +106,31 @@ impl MultiMonitorManager {
     }
 
     /// Assigns a unique wallpaper to a specific monitor (DisplayFusion feature)
-    pub fn set_monitor_wallpaper(&mut self, output_id: u32, wallpaper_path: &str) -> Result<(), &'static str> {
+    pub fn set_monitor_wallpaper(
+        &mut self,
+        output_id: u32,
+        wallpaper_path: &str,
+    ) -> Result<(), &'static str> {
         if !self.outputs.contains_key(&output_id) {
             return Err("Display output ID not found");
         }
-        self.wallpaper_profiles.insert(output_id, wallpaper_path.to_string());
+        self.wallpaper_profiles
+            .insert(output_id, wallpaper_path.to_string());
         Ok(())
     }
 
     /// Splits an ultra-wide monitor into virtual sub-monitors (DisplayFusion Monitor Splitting)
-    pub fn split_into_virtual_monitors(&mut self, output_id: u32, cols: u32, rows: u32) -> Result<Vec<u32>, &'static str> {
-        let source_output = self.outputs.get(&output_id).ok_or("Source display output ID not found")?.clone();
+    pub fn split_into_virtual_monitors(
+        &mut self,
+        output_id: u32,
+        cols: u32,
+        rows: u32,
+    ) -> Result<Vec<u32>, &'static str> {
+        let source_output = self
+            .outputs
+            .get(&output_id)
+            .ok_or("Source display output ID not found")?
+            .clone();
         if cols == 0 || rows == 0 {
             return Err("Columns and rows must be greater than zero");
         }
@@ -197,7 +214,9 @@ mod tests {
         assert!(manager.outputs.get(&1).unwrap().is_primary);
 
         // Position DP-1 to the right of HDMI-1
-        manager.configure_output(2, (2560, 1440), (1920, 0), DisplayRotation::Normal, 1.0).unwrap();
+        manager
+            .configure_output(2, (2560, 1440), (1920, 0), DisplayRotation::Normal, 1.0)
+            .unwrap();
         manager.set_primary(2).unwrap();
 
         assert!(manager.outputs.get(&2).unwrap().is_primary);
@@ -217,8 +236,13 @@ mod tests {
         manager.add_output(ultrawide);
 
         // Set unique wallpaper
-        manager.set_monitor_wallpaper(10, "/usr/share/backgrounds/space.png").unwrap();
-        assert_eq!(manager.wallpaper_profiles.get(&10).unwrap(), "/usr/share/backgrounds/space.png");
+        manager
+            .set_monitor_wallpaper(10, "/usr/share/backgrounds/space.png")
+            .unwrap();
+        assert_eq!(
+            manager.wallpaper_profiles.get(&10).unwrap(),
+            "/usr/share/backgrounds/space.png"
+        );
 
         // Split ultrawide into 2 virtual 1920x1080 side-by-side monitors
         let virt_ids = manager.split_into_virtual_monitors(10, 2, 1).unwrap();

@@ -62,10 +62,13 @@ impl SysfsTree {
             .devices
             .get_mut(&path)
             .ok_or("Device not found in sysfs")?;
-        node.attributes.insert(attr.to_string(), SysfsLikeAttribute {
-            name: attr.to_string(),
-            value: value.to_string(),
-        });
+        node.attributes.insert(
+            attr.to_string(),
+            SysfsLikeAttribute {
+                name: attr.to_string(),
+                value: value.to_string(),
+            },
+        );
         Ok(())
     }
 

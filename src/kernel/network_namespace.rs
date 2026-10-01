@@ -163,7 +163,8 @@ mod tests {
 
     #[test]
     fn test_network_device() {
-        let device = NetworkDevice::new("eth0".to_string(), 1, "00:11:22:33:44:55".to_string(), 1500);
+        let device =
+            NetworkDevice::new("eth0".to_string(), 1, "00:11:22:33:44:55".to_string(), 1500);
         assert_eq!(device.name, "eth0");
         assert_eq!(device.index, 1);
         assert_eq!(device.mtu, 1500);
@@ -186,7 +187,8 @@ mod tests {
     fn test_network_namespace_add_device() {
         let mut namespace = NetworkNamespace::new(1);
 
-        let device = NetworkDevice::new("eth0".to_string(), 1, "00:11:22:33:44:55".to_string(), 1500);
+        let device =
+            NetworkDevice::new("eth0".to_string(), 1, "00:11:22:33:44:55".to_string(), 1500);
         namespace.add_device(device).unwrap();
 
         assert_eq!(namespace.device_count(), 1);
@@ -196,7 +198,8 @@ mod tests {
     fn test_network_namespace_duplicate_device() {
         let mut namespace = NetworkNamespace::new(1);
 
-        let device = NetworkDevice::new("eth0".to_string(), 1, "00:11:22:33:44:55".to_string(), 1500);
+        let device =
+            NetworkDevice::new("eth0".to_string(), 1, "00:11:22:33:44:55".to_string(), 1500);
         namespace.add_device(device.clone()).unwrap();
         assert!(namespace.add_device(device).is_err());
     }
@@ -205,7 +208,8 @@ mod tests {
     fn test_network_namespace_remove_device() {
         let mut namespace = NetworkNamespace::new(1);
 
-        let device = NetworkDevice::new("eth0".to_string(), 1, "00:11:22:33:44:55".to_string(), 1500);
+        let device =
+            NetworkDevice::new("eth0".to_string(), 1, "00:11:22:33:44:55".to_string(), 1500);
         namespace.add_device(device).unwrap();
 
         namespace.remove_device("eth0").unwrap();
@@ -219,7 +223,8 @@ mod tests {
         let namespace_id = manager.create_namespace(None);
         assert_eq!(namespace_id, 1);
 
-        let device = NetworkDevice::new("eth0".to_string(), 1, "00:11:22:33:44:55".to_string(), 1500);
+        let device =
+            NetworkDevice::new("eth0".to_string(), 1, "00:11:22:33:44:55".to_string(), 1500);
         manager.add_device(namespace_id, device).unwrap();
 
         assert_eq!(manager.namespace_count(), 1);
@@ -259,6 +264,11 @@ mod tests {
     #[test]
     fn test_network_namespace_manager_invalid() {
         let manager = NetworkNamespaceManager::new();
-        assert!(manager.add_device(999, NetworkDevice::new("eth0".to_string(), 1, "00:11:22:33:44:55".to_string(), 1500)).is_err());
+        assert!(manager
+            .add_device(
+                999,
+                NetworkDevice::new("eth0".to_string(), 1, "00:11:22:33:44:55".to_string(), 1500)
+            )
+            .is_err());
     }
 }

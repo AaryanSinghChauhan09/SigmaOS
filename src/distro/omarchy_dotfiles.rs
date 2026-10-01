@@ -98,7 +98,10 @@ impl OmarchyDotfileManagerEngine {
         self.registered_hooks.clear();
         self.menu_extensions.clear();
         self.autostart_commands.clear();
-        Ok(format!("Successfully restored dotfiles from {} to {}", self.sys_share_dir, self.user_config_dir))
+        Ok(format!(
+            "Successfully restored dotfiles from {} to {}",
+            self.sys_share_dir, self.user_config_dir
+        ))
     }
 }
 
@@ -135,14 +138,8 @@ mod tests {
             "~/.config/omarchy/hooks/theme-set.d/20-waybar.sh rose-pine"
         );
 
-        assert_eq!(
-            OmarchyHookEvent::ThemeSet.directory_name(),
-            "theme-set.d"
-        );
-        assert_eq!(
-            OmarchyHookEvent::PostBoot.directory_name(),
-            "post-boot.d"
-        );
+        assert_eq!(OmarchyHookEvent::ThemeSet.directory_name(), "theme-set.d");
+        assert_eq!(OmarchyHookEvent::PostBoot.directory_name(), "post-boot.d");
     }
 
     #[test]

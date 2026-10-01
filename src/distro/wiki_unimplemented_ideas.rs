@@ -59,9 +59,17 @@ impl EnergyAwareSchedulingEngine {
         Self { cores }
     }
 
-    pub fn select_optimal_core(&mut self, is_latency_sensitive: bool, estimated_load_pct: u8) -> u32 {
+    pub fn select_optimal_core(
+        &mut self,
+        is_latency_sensitive: bool,
+        estimated_load_pct: u8,
+    ) -> u32 {
         if is_latency_sensitive || estimated_load_pct > 70 {
-            for core in self.cores.iter_mut().filter(|c| c.core_type == CpuCoreType::PerformanceCore) {
+            for core in self
+                .cores
+                .iter_mut()
+                .filter(|c| c.core_type == CpuCoreType::PerformanceCore)
+            {
                 if core.active_load_pct < 80 {
                     core.active_load_pct += estimated_load_pct.min(100 - core.active_load_pct);
                     return core.core_id;
@@ -69,7 +77,11 @@ impl EnergyAwareSchedulingEngine {
             }
         }
 
-        for core in self.cores.iter_mut().filter(|c| c.core_type == CpuCoreType::EfficiencyCore) {
+        for core in self
+            .cores
+            .iter_mut()
+            .filter(|c| c.core_type == CpuCoreType::EfficiencyCore)
+        {
             if core.active_load_pct < 80 {
                 core.active_load_pct += estimated_load_pct.min(100 - core.active_load_pct);
                 return core.core_id;
@@ -162,13 +174,20 @@ impl PqcWireguardVpnMesh {
         );
     }
 
-    pub fn complete_pqc_handshake(&mut self, peer_id: &str, ciphertext: &[u8]) -> Result<String, &'static str> {
+    pub fn complete_pqc_handshake(
+        &mut self,
+        peer_id: &str,
+        ciphertext: &[u8],
+    ) -> Result<String, &'static str> {
         if ciphertext.is_empty() {
             return Err("PQC VPN: Invalid empty Kyber ciphertext");
         }
         if let Some(peer) = self.peers.get_mut(peer_id) {
             peer.handshake_completed = true;
-            Ok(format!("PQC Noise Session established with {}", peer.endpoint_ip))
+            Ok(format!(
+                "PQC Noise Session established with {}",
+                peer.endpoint_ip
+            ))
         } else {
             Err("PQC VPN: Peer not found in mesh catalog")
         }
@@ -219,7 +238,10 @@ impl EbpfKernelLivepatchEngine {
 
         self.active_patches.insert(patch_id.to_string(), patch);
         self.total_trampolines_installed += 1;
-        Ok(format!("Installed eBPF trampoline: {} -> {}", target_sym, replacement_sym))
+        Ok(format!(
+            "Installed eBPF trampoline: {} -> {}",
+            target_sym, replacement_sym
+        ))
     }
 
     pub fn revert_livepatch(&mut self, patch_id: &str) -> bool {
@@ -271,7 +293,12 @@ impl SigmaStoreCasEngine {
         }
     }
 
-    pub fn commit_new_generation(&mut self, sha256_hash: &str, pkg_name: &str, timestamp: u64) -> u32 {
+    pub fn commit_new_generation(
+        &mut self,
+        sha256_hash: &str,
+        pkg_name: &str,
+        timestamp: u64,
+    ) -> u32 {
         let next_num = (self.generations.len() + 1) as u32;
         let path = format!("{}/{}-{}", self.store_base_path, sha256_hash, pkg_name);
         self.generations.push(SystemGeneration {
@@ -284,9 +311,16 @@ impl SigmaStoreCasEngine {
     }
 
     pub fn rollback_generation(&mut self, generation_number: u32) -> Result<String, &'static str> {
-        if let Some(pos) = self.generations.iter().position(|g| g.generation_number == generation_number) {
+        if let Some(pos) = self
+            .generations
+            .iter()
+            .position(|g| g.generation_number == generation_number)
+        {
             self.current_generation_idx = pos;
-            Ok(format!("Swapped active symlink to generation #{}: {}", generation_number, self.generations[pos].store_path))
+            Ok(format!(
+                "Swapped active symlink to generation #{}: {}",
+                generation_number, self.generations[pos].store_path
+            ))
         } else {
             Err("SigmaStore: Target generation number not found")
         }
@@ -386,11 +420,20 @@ impl SovereignWikiUnimplementedIdeasMasterSuite {
 
     pub fn compute_wiki_completion_score(&mut self) -> u32 {
         let _opt_core = self.eas_engine.select_optimal_core(true, 50);
-        let _dma = self.gpudirect_engine.transfer_nvme_to_vram(0x1000, 0x8000, 1024);
-        self.pqc_vpn_mesh.add_peer("peer-node-01", "10.0.0.2", "Kyber1024Pub");
-        let _handshake = self.pqc_vpn_mesh.complete_pqc_handshake("peer-node-01", b"CiphertextData");
-        let _patch = self.livepatch_engine.apply_livepatch("patch-001", "sys_open", "sys_open_secure");
-        let _gen = self.store_cas_engine.commit_new_generation("hash12345", "coreutils", 1700000000);
+        let _dma = self
+            .gpudirect_engine
+            .transfer_nvme_to_vram(0x1000, 0x8000, 1024);
+        self.pqc_vpn_mesh
+            .add_peer("peer-node-01", "10.0.0.2", "Kyber1024Pub");
+        let _handshake = self
+            .pqc_vpn_mesh
+            .complete_pqc_handshake("peer-node-01", b"CiphertextData");
+        let _patch =
+            self.livepatch_engine
+                .apply_livepatch("patch-001", "sys_open", "sys_open_secure");
+        let _gen =
+            self.store_cas_engine
+                .commit_new_generation("hash12345", "coreutils", 1700000000);
         self.gamescope_engine.record_frametime(16.6);
 
         100 // 100% Wiki Completion

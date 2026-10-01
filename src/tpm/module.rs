@@ -13,25 +13,28 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
 /// OOP-based TPM Module for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 582
 /// Implements Trusted Platform Module operations
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type TPMID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum TPMError { Success = 0, NotFound = 1, OperationFailed = 2 }
+pub enum TPMError {
+    Success = 0,
+    NotFound = 1,
+    OperationFailed = 2,
+}
 
 pub trait TPM {
     fn id(&self) -> TPMID;
@@ -54,7 +57,11 @@ impl SimpleTPM {
         let mut manuf_array = [0u8; 32];
         let manuf_len = manufacturer.len().min(31);
         unsafe {
-            core::ptr::copy_nonoverlapping(manufacturer.as_ptr(), manuf_array.as_mut_ptr(), manuf_len);
+            core::ptr::copy_nonoverlapping(
+                manufacturer.as_ptr(),
+                manuf_array.as_mut_ptr(),
+                manuf_len,
+            );
         }
         SimpleTPM {
             id,
@@ -67,13 +74,19 @@ impl SimpleTPM {
 }
 
 impl TPM for SimpleTPM {
-    fn id(&self) -> TPMID { self.id }
+    fn id(&self) -> TPMID {
+        self.id
+    }
     fn manufacturer(&self) -> &[u8] {
         // Performance optimization: explicit manufacturer_len u8 field avoids $O(N)$ linear byte scans
         &self.manufacturer[..self.manufacturer_len as usize]
     }
-    fn version(&self) -> u32 { self.version.load(Ordering::SeqCst) as u32 }
-    fn is_ready(&self) -> bool { self.ready.load(Ordering::SeqCst) == 1 }
+    fn version(&self) -> u32 {
+        self.version.load(Ordering::SeqCst) as u32
+    }
+    fn is_ready(&self) -> bool {
+        self.ready.load(Ordering::SeqCst) == 1
+    }
 }
 
 #[cfg(test_disabled)]
@@ -181,13 +194,25 @@ impl Attestation for SimpleAttestation {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -195,19 +220,29 @@ impl<T> Vec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -239,7 +274,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;

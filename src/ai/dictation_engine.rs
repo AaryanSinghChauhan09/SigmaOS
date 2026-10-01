@@ -2,11 +2,11 @@
 // Zero-dependency Rust #![no_std] / std implementation of local voice dictation & punctuation formatting.
 
 #[cfg(not(test))]
+use alloc::format;
+#[cfg(not(test))]
 use alloc::string::{String, ToString};
 #[cfg(not(test))]
 use alloc::vec::Vec;
-#[cfg(not(test))]
-use alloc::format;
 
 #[cfg(test)]
 use std::string::String;
@@ -108,7 +108,12 @@ mod tests {
         assert_eq!(engine.state, DictationState::Idle);
 
         // Test formatting rules
-        let formatted = engine.format_dictated_text("hello world period new line welcome to sigmaos comma enjoy your stay");
-        assert_eq!(formatted, "hello world.\nwelcome to sigmaos, enjoy your stay");
+        let formatted = engine.format_dictated_text(
+            "hello world period new line welcome to sigmaos comma enjoy your stay",
+        );
+        assert_eq!(
+            formatted,
+            "hello world.\nwelcome to sigmaos, enjoy your stay"
+        );
     }
 }

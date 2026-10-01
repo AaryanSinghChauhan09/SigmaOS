@@ -4,12 +4,11 @@
 // Provides inter-process communication without any external library dependencies
 // Inspired by D-Bus, HeLin IPC (HeliOS), and Mach ports (macOS/GNU Mach)
 
-
-use std::vec::Vec;
-use std::string::String;
-use std::format;
+use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::collections::BTreeMap;
-use core::sync::atomic::{AtomicU64, AtomicBool, Ordering};
+use std::format;
+use std::string::String;
+use std::vec::Vec;
 
 /// Maximum message payload size (inspired by D-Bus's 134MB, but kernel-safe at 4KB)
 pub const SIGMA_BUS_MAX_PAYLOAD: usize = 4096;
@@ -18,26 +17,26 @@ pub const SIGMA_BUS_MAX_PAYLOAD: usize = 4096;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
 pub enum MessageType {
-    MethodCall   = 1,  // Request from client to service
-    MethodReturn = 2,  // Return value from method
-    Error        = 3,  // Error reply
-    Signal       = 4,  // Broadcast notification (no reply expected)
+    MethodCall = 1,   // Request from client to service
+    MethodReturn = 2, // Return value from method
+    Error = 3,        // Error reply
+    Signal = 4,       // Broadcast notification (no reply expected)
 }
 
 /// A SigmaBus message header (fixed-size, cache-line aligned)
 #[derive(Debug, Clone)]
-#[repr(C, align(64))]  // Cache-line aligned for performance
+#[repr(C, align(64))] // Cache-line aligned for performance
 pub struct MessageHeader {
     pub msg_type: MessageType,
-    pub serial: u64,        // Unique message ID (monotonically increasing)
-    pub reply_serial: u64,  // Serial of the message we're replying to (0 if N/A)
-    pub sender: u64,        // Sender's bus name hash
-    pub destination: u64,   // Destination's bus name hash (0 = broadcast)
+    pub serial: u64,         // Unique message ID (monotonically increasing)
+    pub reply_serial: u64,   // Serial of the message we're replying to (0 if N/A)
+    pub sender: u64,         // Sender's bus name hash
+    pub destination: u64,    // Destination's bus name hash (0 = broadcast)
     pub interface_hash: u64, // Hash of interface name (e.g., "org.sigma.FileManager")
-    pub member_hash: u64,   // Hash of method/signal name (e.g., "OpenFile")
-    pub payload_len: u32,   // Length of payload in bytes
-    pub flags: u16,         // Flags (e.g., NO_REPLY_EXPECTED, NO_AUTO_START)
-    pub version: u8,        // Protocol version (currently 1)
+    pub member_hash: u64,    // Hash of method/signal name (e.g., "OpenFile")
+    pub payload_len: u32,    // Length of payload in bytes
+    pub flags: u16,          // Flags (e.g., NO_REPLY_EXPECTED, NO_AUTO_START)
+    pub version: u8,         // Protocol version (currently 1)
     _pad: u8,
 }
 
@@ -130,7 +129,12 @@ pub struct BusFilter {
 
 impl BusFilter {
     pub fn any() -> Self {
-        Self { msg_type: None, interface_hash: None, member_hash: None, sender: None }
+        Self {
+            msg_type: None,
+            interface_hash: None,
+            member_hash: None,
+            sender: None,
+        }
     }
 
     pub fn signal(interface: &str, member: &str) -> Self {
@@ -144,16 +148,24 @@ impl BusFilter {
 
     pub fn matches(&self, msg: &SigmaMessage) -> bool {
         if let Some(t) = self.msg_type {
-            if msg.header.msg_type != t { return false; }
+            if msg.header.msg_type != t {
+                return false;
+            }
         }
         if let Some(ih) = self.interface_hash {
-            if msg.header.interface_hash != ih { return false; }
+            if msg.header.interface_hash != ih {
+                return false;
+            }
         }
         if let Some(mh) = self.member_hash {
-            if msg.header.member_hash != mh { return false; }
+            if msg.header.member_hash != mh {
+                return false;
+            }
         }
         if let Some(s) = self.sender {
-            if msg.header.sender != s { return false; }
+            if msg.header.sender != s {
+                return false;
+            }
         }
         true
     }
@@ -173,7 +185,7 @@ pub struct SigmaBus {
 #[derive(Debug, Clone)]
 pub struct BusServiceInfo {
     pub name: String,
-    pub owner: u64,  // Process/task ID that owns this service name
+    pub owner: u64,      // Process/task ID that owns this service name
     pub is_unique: bool, // Is this a unique name (like :1.42) vs. well-known?
 }
 
@@ -192,11 +204,14 @@ impl SigmaBus {
         if self.services.contains_key(&hash) {
             return Err(BusError::NameAlreadyRegistered);
         }
-        self.services.insert(hash, BusServiceInfo {
-            name: String::from(name),
-            owner,
-            is_unique: false,
-        });
+        self.services.insert(
+            hash,
+            BusServiceInfo {
+                name: String::from(name),
+                owner,
+                is_unique: false,
+            },
+        );
         Ok(())
     }
 
@@ -206,7 +221,9 @@ impl SigmaBus {
 
         if msg.header.msg_type == MessageType::Signal {
             // Broadcast to all matching subscriptions
-            let matching: Vec<u64> = self.subscriptions.iter()
+            let matching: Vec<u64> = self
+                .subscriptions
+                .iter()
                 .filter(|(_, filter)| filter.matches(&msg))
                 .map(|(subscriber, _)| *subscriber)
                 .collect();
@@ -225,13 +242,9 @@ impl SigmaBus {
             }
 
             // Find the queue for the destination service
-            let _service = self.services.get(&dest)
-                .ok_or(BusError::ServiceNotFound)?;
+            let _service = self.services.get(&dest).ok_or(BusError::ServiceNotFound)?;
 
-            self.queues
-                .entry(dest)
-                .or_insert_with(Vec::new)
-                .push(msg);
+            self.queues.entry(dest).or_insert_with(Vec::new).push(msg);
         }
 
         Ok(serial)
@@ -253,7 +266,9 @@ impl SigmaBus {
 }
 
 impl Default for SigmaBus {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 /// Error types for SigmaBus
@@ -323,8 +338,14 @@ mod tests {
         let subscriber_a = fnv1a_hash("subscriber.A");
         let subscriber_b = fnv1a_hash("subscriber.B");
 
-        bus.subscribe(subscriber_a, BusFilter::signal("org.sigma.SystemEvents", "Shutdown"));
-        bus.subscribe(subscriber_b, BusFilter::signal("org.sigma.SystemEvents", "Shutdown"));
+        bus.subscribe(
+            subscriber_a,
+            BusFilter::signal("org.sigma.SystemEvents", "Shutdown"),
+        );
+        bus.subscribe(
+            subscriber_b,
+            BusFilter::signal("org.sigma.SystemEvents", "Shutdown"),
+        );
 
         let signal = SigmaMessage::new_signal(
             fnv1a_hash("org.sigma.Init"),

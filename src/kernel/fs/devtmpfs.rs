@@ -1,7 +1,6 @@
 /// SigmaOS devtmpfs (/dev) pseudo-filesystem
 /// Automatically registers and creates device files when drivers boot.
 /// Improved with Linux-inspired udev rules, permissions, and symlink mappings.
-
 use crate::klib::HashMap;
 use crate::klib::Vec;
 use std::string::{String, ToString};
@@ -18,9 +17,9 @@ pub struct DeviceNode {
     pub class: DeviceClass,
     pub major: u32,
     pub minor: u32,
-    pub mode: u32,       // Unix permission mode (e.g., 0o666)
-    pub uid: u32,        // Owner User ID
-    pub gid: u32,        // Owner Group ID
+    pub mode: u32,             // Unix permission mode (e.g., 0o666)
+    pub uid: u32,              // Owner User ID
+    pub gid: u32,              // Owner Group ID
     pub symlinks: Vec<String>, // Symlink aliases inside /dev
 }
 
@@ -68,7 +67,11 @@ impl DevTmpFs {
         }
 
         // Default Linux-style permissions
-        let mut mode = if class == DeviceClass::Char { 0o600 } else { 0o660 };
+        let mut mode = if class == DeviceClass::Char {
+            0o600
+        } else {
+            0o660
+        };
         let mut uid = 0; // root
         let mut gid = 0; // root
         let mut symlink_aliases = Vec::new();
@@ -155,7 +158,8 @@ impl DevTmpFs {
         let _ = self.register_device_with_perms("tty", DeviceClass::Char, 5, 0, 0o666, 0, 0);
 
         // Disk sda should be root/disk group accessible (0o660)
-        let _ = self.register_device_with_perms("sda", DeviceClass::Block, 8, 0, 0o660, 0, 6); // 6 = disk group id
+        let _ = self.register_device_with_perms("sda", DeviceClass::Block, 8, 0, 0o660, 0, 6);
+        // 6 = disk group id
     }
 
     /// Helper to register a device node with specific permissions directly
@@ -202,8 +206,10 @@ mod tests {
     #[test]
     fn test_devtmpfs_basic() {
         let mut dev = DevTmpFs::new();
-        dev.register_device("null", DeviceClass::Char, 1, 3).unwrap();
-        dev.register_device("sda", DeviceClass::Block, 8, 0).unwrap();
+        dev.register_device("null", DeviceClass::Char, 1, 3)
+            .unwrap();
+        dev.register_device("sda", DeviceClass::Block, 8, 0)
+            .unwrap();
 
         assert_eq!(dev.get_device("null").unwrap().major, 1);
         assert_eq!(dev.get_device("sda").unwrap().class, DeviceClass::Block);
@@ -226,7 +232,8 @@ mod tests {
             create_symlink: Some("disk/by-label/%k".to_string()),
         });
 
-        dev.register_device("sda", DeviceClass::Block, 8, 0).unwrap();
+        dev.register_device("sda", DeviceClass::Block, 8, 0)
+            .unwrap();
 
         // Verify that sda node has updated permissions and symlink alias
         let sda_node = dev.get_device("sda").unwrap();

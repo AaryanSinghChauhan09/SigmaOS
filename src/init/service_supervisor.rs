@@ -147,7 +147,11 @@ impl ServiceSupervisor {
                 service.status = ServiceStatus::Running;
                 true
             } else {
-                service.status = if failed { ServiceStatus::Failed } else { ServiceStatus::Stopped };
+                service.status = if failed {
+                    ServiceStatus::Failed
+                } else {
+                    ServiceStatus::Stopped
+                };
                 service.pid = None;
                 false
             }
@@ -263,6 +267,9 @@ mod tests {
         let timed_out_late = supervisor.check_watchdog_probes(115);
         assert_eq!(timed_out_late, vec!["db_daemon".to_string()]);
         assert_eq!(supervisor.services["db_daemon"].restart_count, 1);
-        assert_eq!(supervisor.services["db_daemon"].status, ServiceStatus::Running);
+        assert_eq!(
+            supervisor.services["db_daemon"].status,
+            ServiceStatus::Running
+        );
     }
 }

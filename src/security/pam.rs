@@ -297,6 +297,20 @@ mod tests {
             Err(PamError::AuthenticationFailed)
         );
         assert!(manager.users.is_empty());
+        // Register user
+        let uid = manager
+            .register_user("aaryan", "super-secret-pass", "wheel")
+            .unwrap();
+        assert_eq!(uid, 1000);
+
+        // Authenticate user successfully
+        assert!(manager.authenticate("aaryan", "super-secret-pass").is_ok());
+
+        // Fail authentication with wrong password
+        assert_eq!(
+            manager.authenticate("aaryan", "wrong-pass"),
+            Err(PamError::AuthenticationFailed)
+        );
     }
 
     #[test]
@@ -319,6 +333,10 @@ mod tests {
             Err(PamError::AuthenticationFailed)
         );
         assert!(manager.users.is_empty());
+        // Attempt strong password registration -> passes
+        assert!(manager
+            .register_user("bob", "strongpassword", "users")
+            .is_ok());
     }
 
     #[test]
@@ -333,5 +351,19 @@ mod tests {
             Err(PamError::AuthenticationFailed)
         );
         assert!(manager.users.is_empty());
+        manager
+            .register_user("alice", "validpass123", "users")
+            .unwrap();
+
+        // 3 consecutive failed attempts
+        assert!(manager.authenticate("alice", "bad").is_err());
+        assert!(manager.authenticate("alice", "bad").is_err());
+        assert!(manager.authenticate("alice", "bad").is_err());
+
+        // Account is locked! Even valid password fails now
+        assert_eq!(
+            manager.authenticate("alice", "validpass123"),
+            Err(PamError::AccountLocked)
+        );
     }
 }

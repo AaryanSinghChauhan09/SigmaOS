@@ -1,6 +1,6 @@
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 // SigmaOS Wireshark Parity Implementation
 // Implements network packet capture, analysis, and protocol dissection
 
@@ -115,7 +115,9 @@ impl ProtocolDissector {
         let dest_ip = String::from("0.0.0.0");
         let source_port = 0;
         let dest_port = 0;
-        let protocol = self.analyze_packet(raw_data).unwrap_or(ProtocolType::Unknown);
+        let protocol = self
+            .analyze_packet(raw_data)
+            .unwrap_or(ProtocolType::Unknown);
         let payload_size = raw_data.len();
         let flags = 0;
 
@@ -145,8 +147,16 @@ impl NetworkStatistics {
             total_packets: Cell::new(0),
             total_bytes: Cell::new(0),
             protocol_counts: [
-                Cell::new(0), Cell::new(0), Cell::new(0), Cell::new(0), Cell::new(0),
-                Cell::new(0), Cell::new(0), Cell::new(0), Cell::new(0), Cell::new(0),
+                Cell::new(0),
+                Cell::new(0),
+                Cell::new(0),
+                Cell::new(0),
+                Cell::new(0),
+                Cell::new(0),
+                Cell::new(0),
+                Cell::new(0),
+                Cell::new(0),
+                Cell::new(0),
             ],
         }
     }
@@ -154,7 +164,8 @@ impl NetworkStatistics {
     /// Record packet statistics
     pub fn record_packet(&self, packet: &WiresharkPacket) {
         self.total_packets.set(self.total_packets.get() + 1);
-        self.total_bytes.set(self.total_bytes.get() + packet.payload_size as u64);
+        self.total_bytes
+            .set(self.total_bytes.get() + packet.payload_size as u64);
 
         let protocol_index = match packet.protocol {
             ProtocolType::Ethernet => 0,

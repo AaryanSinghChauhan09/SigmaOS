@@ -45,7 +45,11 @@ impl FedoraMockChrootBuildEngine {
         }
     }
 
-    pub fn build_srpm_in_chroot(&mut self, spec_file: &str, srpm_path: &str) -> Result<String, &'static str> {
+    pub fn build_srpm_in_chroot(
+        &mut self,
+        spec_file: &str,
+        srpm_path: &str,
+    ) -> Result<String, &'static str> {
         if spec_file.is_empty() {
             return Err("MOCK_BUILD: Empty RPM spec file");
         }
@@ -92,7 +96,11 @@ impl FedoraAnacondaInstallerEngine {
                 root_password_hash: "$6$rounds=65536$salt$hash".to_string(),
                 bootloader_location: "mbr".to_string(),
                 autopart_type: "btrfs".to_string(),
-                packages: vec!["@core".to_string(), "@standard".to_string(), "kernel".to_string()],
+                packages: vec![
+                    "@core".to_string(),
+                    "@standard".to_string(),
+                    "kernel".to_string(),
+                ],
             },
         }
     }
@@ -117,7 +125,10 @@ impl FedoraAnacondaInstallerEngine {
         ks.push_str(&format!("lang {}\n", self.ks_config.lang));
         ks.push_str(&format!("keyboard {}\n", self.ks_config.keyboard));
         ks.push_str(&format!("timezone {}\n", self.ks_config.timezone));
-        ks.push_str(&format!("autopart --type={}\n", self.ks_config.autopart_type));
+        ks.push_str(&format!(
+            "autopart --type={}\n",
+            self.ks_config.autopart_type
+        ));
         ks.push_str("%packages\n");
         for pkg in &self.ks_config.packages {
             ks.push_str(&format!("{}\n", pkg));
@@ -172,7 +183,11 @@ impl FedoraCoprBuildRepositoryEngine {
         );
     }
 
-    pub fn trigger_copr_build(&mut self, owner: &str, project_name: &str) -> Result<u32, &'static str> {
+    pub fn trigger_copr_build(
+        &mut self,
+        owner: &str,
+        project_name: &str,
+    ) -> Result<u32, &'static str> {
         let key = format!("{}/{}", owner, project_name);
         if let Some(proj) = self.projects.get_mut(&key) {
             proj.builds_queued += 1;
@@ -203,7 +218,7 @@ pub struct SelinuxMlsContext {
     pub user: String,
     pub role: String,
     pub type_label: String,
-    pub sensitivity_level: u32, // e.g. s0
+    pub sensitivity_level: u32,  // e.g. s0
     pub category_mask: Vec<u32>, // e.g. c0.c1023
 }
 
@@ -221,7 +236,10 @@ impl FedoraSelinuxMlsPolicyGovernorEngine {
         }
     }
 
-    pub fn parse_context_string(&self, raw_context: &str) -> Result<SelinuxMlsContext, &'static str> {
+    pub fn parse_context_string(
+        &self,
+        raw_context: &str,
+    ) -> Result<SelinuxMlsContext, &'static str> {
         let parts: Vec<&str> = raw_context.split(':').collect();
         if parts.len() < 4 {
             return Err("SELINUX_MLS: Malformed security context label");
@@ -236,7 +254,11 @@ impl FedoraSelinuxMlsPolicyGovernorEngine {
         })
     }
 
-    pub fn evaluate_mls_dominance(&self, subject: &SelinuxMlsContext, object: &SelinuxMlsContext) -> bool {
+    pub fn evaluate_mls_dominance(
+        &self,
+        subject: &SelinuxMlsContext,
+        object: &SelinuxMlsContext,
+    ) -> bool {
         // Simple Dominance rule: Subject sensitivity >= Object sensitivity
         if !self.is_enforcing {
             return true;
@@ -275,22 +297,33 @@ impl SovereignFedoraGapClosureSuite {
 
     pub fn synthesize_and_verify_all(&mut self) -> bool {
         // Verify Mock
-        let mock_res = self.mock_builder.build_srpm_in_chroot("kernel.spec", "kernel-6.8.0.src.rpm");
+        let mock_res = self
+            .mock_builder
+            .build_srpm_in_chroot("kernel.spec", "kernel-6.8.0.src.rpm");
         let mock_ok = mock_res.is_ok() && self.mock_builder.get_build_log_count() == 1;
 
         // Verify Anaconda
-        let parsed = self.anaconda.parse_kickstart_cfg("lang en_US.UTF-8\ntimezone UTC\n");
+        let parsed = self
+            .anaconda
+            .parse_kickstart_cfg("lang en_US.UTF-8\ntimezone UTC\n");
         let ks_out = self.anaconda.generate_kickstart_file();
         let ana_ok = parsed == 2 && ks_out.contains("lang en_US.UTF-8");
 
         // Verify COPR
-        self.copr.create_copr_project("developer", "kernel-zen", &["fedora-40-x86_64"]);
+        self.copr
+            .create_copr_project("developer", "kernel-zen", &["fedora-40-x86_64"]);
         let copr_res = self.copr.trigger_copr_build("developer", "kernel-zen");
         let copr_ok = copr_res.is_ok() && self.copr.get_project_count() == 1;
 
         // Verify SELinux MLS
-        let subj = self.selinux_mls.parse_context_string("unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023").unwrap();
-        let obj = self.selinux_mls.parse_context_string("system_u:object_r:etc_t:s0").unwrap();
+        let subj = self
+            .selinux_mls
+            .parse_context_string("unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023")
+            .unwrap();
+        let obj = self
+            .selinux_mls
+            .parse_context_string("system_u:object_r:etc_t:s0")
+            .unwrap();
         let mls_ok = self.selinux_mls.evaluate_mls_dominance(&subj, &obj);
 
         mock_ok && ana_ok && copr_ok && mls_ok
@@ -326,7 +359,9 @@ mod tests {
         assert!(copr.trigger_copr_build("myuser", "myrepo").is_ok());
 
         let mls = FedoraSelinuxMlsPolicyGovernorEngine::new();
-        let ctx = mls.parse_context_string("system_u:system_r:init_t:s0").unwrap();
+        let ctx = mls
+            .parse_context_string("system_u:system_r:init_t:s0")
+            .unwrap();
         assert_eq!(ctx.user, "system_u");
     }
 

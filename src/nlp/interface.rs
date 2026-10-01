@@ -12,29 +12,39 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
 /// OOP-based Natural Language Interface for SigmaOS
 /// Based on Ideas-999-Structured: AI & Automation Item 356
 /// Implements NL→CLI translator with intent classification
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type IntentID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum IntentType { ExecuteCommand = 0, QuerySystem = 1, Configure = 2, Help = 3, Unknown = 4 }
+pub enum IntentType {
+    ExecuteCommand = 0,
+    QuerySystem = 1,
+    Configure = 2,
+    Help = 3,
+    Unknown = 4,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum NLLError { Success = 0, ParseFailed = 1, ClassificationFailed = 2, TranslationFailed = 3 }
+pub enum NLLError {
+    Success = 0,
+    ParseFailed = 1,
+    ClassificationFailed = 2,
+    TranslationFailed = 3,
+}
 
 pub trait Intent {
     fn id(&self) -> IntentID;
@@ -64,10 +74,18 @@ impl SimpleIntent {
 }
 
 impl Intent for SimpleIntent {
-    fn id(&self) -> IntentID { self.id }
-    fn intent_type(&self) -> IntentType { unsafe { core::mem::transmute(self.intent_type.load(Ordering::SeqCst)) } }
-    fn confidence(&self) -> f32 { (self.confidence.load(Ordering::SeqCst) as f32) / 100.0 }
-    fn parameters(&self) -> &[[u8; 64]] { &self.parameters }
+    fn id(&self) -> IntentID {
+        self.id
+    }
+    fn intent_type(&self) -> IntentType {
+        unsafe { core::mem::transmute(self.intent_type.load(Ordering::SeqCst)) }
+    }
+    fn confidence(&self) -> f32 {
+        (self.confidence.load(Ordering::SeqCst) as f32) / 100.0
+    }
+    fn parameters(&self) -> &[[u8; 64]] {
+        &self.parameters
+    }
 }
 
 pub trait Tokenizer {
@@ -80,7 +98,9 @@ pub struct SimpleTokenizer;
 
 impl SimpleTokenizer {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { SimpleTokenizer }
+    pub fn new() -> Self {
+        SimpleTokenizer
+    }
 }
 
 impl Tokenizer for SimpleTokenizer {
@@ -283,23 +303,38 @@ impl NLInterface for SimpleNLInterface {
         let intent_type = self.classifier.classify(&tokens)?;
         let parameters = self.classifier.extract_parameters(&tokens, intent_type);
 
-        let mut intent = SimpleIntent::new(self.next_id.fetch_add(1, Ordering::SeqCst), intent_type, 0.95);
+        let mut intent = SimpleIntent::new(
+            self.next_id.fetch_add(1, Ordering::SeqCst),
+            intent_type,
+            0.95,
+        );
         intent.parameters = parameters;
 
         self.translator.translate(&intent)
     }
 
-    fn add_training_example(&mut self, _input: &[u8], _expected_intent: IntentType) {
-    }
+    fn add_training_example(&mut self, _input: &[u8], _expected_intent: IntentType) {}
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -307,19 +342,29 @@ impl<T> Vec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -351,7 +396,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;

@@ -15,8 +15,8 @@ pub enum SocketDomain {
 /// Socket type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SocketType {
-    Stream = 1,    // TCP
-    Datagram = 2,   // UDP
+    Stream = 1,   // TCP
+    Datagram = 2, // UDP
     Raw = 3,
 }
 
@@ -60,7 +60,12 @@ pub struct Socket {
 }
 
 impl Socket {
-    pub fn new(id: u64, domain: SocketDomain, socket_type: SocketType, protocol: SocketProtocol) -> Self {
+    pub fn new(
+        id: u64,
+        domain: SocketDomain,
+        socket_type: SocketType,
+        protocol: SocketProtocol,
+    ) -> Self {
         Self {
             id,
             domain,
@@ -108,12 +113,8 @@ impl Socket {
         }
 
         // Simulate accepting a connection
-        let mut new_socket = Socket::new(
-            self.id + 1000,
-            self.domain,
-            self.socket_type,
-            self.protocol,
-        );
+        let mut new_socket =
+            Socket::new(self.id + 1000, self.domain, self.socket_type, self.protocol);
         new_socket.local_address = self.local_address.clone();
         new_socket.local_port = self.local_port;
         new_socket.state = SocketState::Established;
@@ -197,7 +198,12 @@ impl SocketManager {
     }
 
     /// Create a new socket
-    pub fn create_socket(&self, domain: SocketDomain, socket_type: SocketType, protocol: SocketProtocol) -> u64 {
+    pub fn create_socket(
+        &self,
+        domain: SocketDomain,
+        socket_type: SocketType,
+        protocol: SocketProtocol,
+    ) -> u64 {
         let mut next_id = self.next_socket_id.lock().unwrap();
         let socket_id = *next_id;
         *next_id += 1;
@@ -315,14 +321,24 @@ mod tests {
 
     #[test]
     fn test_socket() {
-        let socket = Socket::new(1, SocketDomain::IPv4, SocketType::Stream, SocketProtocol::TCP);
+        let socket = Socket::new(
+            1,
+            SocketDomain::IPv4,
+            SocketType::Stream,
+            SocketProtocol::TCP,
+        );
         assert_eq!(socket.id, 1);
         assert_eq!(socket.state, SocketState::Closed);
     }
 
     #[test]
     fn test_socket_bind() {
-        let mut socket = Socket::new(1, SocketDomain::IPv4, SocketType::Stream, SocketProtocol::TCP);
+        let mut socket = Socket::new(
+            1,
+            SocketDomain::IPv4,
+            SocketType::Stream,
+            SocketProtocol::TCP,
+        );
         socket.bind("127.0.0.1".to_string(), 8080).unwrap();
 
         assert_eq!(socket.local_address, "127.0.0.1");
@@ -331,14 +347,24 @@ mod tests {
 
     #[test]
     fn test_socket_bind_not_closed() {
-        let mut socket = Socket::new(1, SocketDomain::IPv4, SocketType::Stream, SocketProtocol::TCP);
+        let mut socket = Socket::new(
+            1,
+            SocketDomain::IPv4,
+            SocketType::Stream,
+            SocketProtocol::TCP,
+        );
         socket.bind("127.0.0.1".to_string(), 8080).unwrap();
         assert!(socket.bind("127.0.0.1".to_string(), 8081).is_err());
     }
 
     #[test]
     fn test_socket_listen() {
-        let mut socket = Socket::new(1, SocketDomain::IPv4, SocketType::Stream, SocketProtocol::TCP);
+        let mut socket = Socket::new(
+            1,
+            SocketDomain::IPv4,
+            SocketType::Stream,
+            SocketProtocol::TCP,
+        );
         socket.bind("127.0.0.1".to_string(), 8080).unwrap();
         socket.listen(128).unwrap();
 
@@ -348,13 +374,23 @@ mod tests {
 
     #[test]
     fn test_socket_listen_not_stream() {
-        let mut socket = Socket::new(1, SocketDomain::IPv4, SocketType::Datagram, SocketProtocol::UDP);
+        let mut socket = Socket::new(
+            1,
+            SocketDomain::IPv4,
+            SocketType::Datagram,
+            SocketProtocol::UDP,
+        );
         assert!(socket.listen(128).is_err());
     }
 
     #[test]
     fn test_socket_connect() {
-        let mut socket = Socket::new(1, SocketDomain::IPv4, SocketType::Stream, SocketProtocol::TCP);
+        let mut socket = Socket::new(
+            1,
+            SocketDomain::IPv4,
+            SocketType::Stream,
+            SocketProtocol::TCP,
+        );
         socket.connect("192.168.1.1".to_string(), 80).unwrap();
 
         assert_eq!(socket.remote_address, "192.168.1.1");
@@ -364,7 +400,12 @@ mod tests {
 
     #[test]
     fn test_socket_send() {
-        let mut socket = Socket::new(1, SocketDomain::IPv4, SocketType::Stream, SocketProtocol::TCP);
+        let mut socket = Socket::new(
+            1,
+            SocketDomain::IPv4,
+            SocketType::Stream,
+            SocketProtocol::TCP,
+        );
         socket.connect("192.168.1.1".to_string(), 80).unwrap();
 
         let data = b"Hello";
@@ -374,14 +415,24 @@ mod tests {
 
     #[test]
     fn test_socket_send_not_connected() {
-        let socket = Socket::new(1, SocketDomain::IPv4, SocketType::Stream, SocketProtocol::TCP);
+        let socket = Socket::new(
+            1,
+            SocketDomain::IPv4,
+            SocketType::Stream,
+            SocketProtocol::TCP,
+        );
         // Socket is in Closed state, not Established
         assert!(socket.send(b"Hello").is_err());
     }
 
     #[test]
     fn test_socket_close() {
-        let mut socket = Socket::new(1, SocketDomain::IPv4, SocketType::Stream, SocketProtocol::TCP);
+        let mut socket = Socket::new(
+            1,
+            SocketDomain::IPv4,
+            SocketType::Stream,
+            SocketProtocol::TCP,
+        );
         socket.connect("192.168.1.1".to_string(), 80).unwrap();
         socket.close();
 
@@ -392,7 +443,8 @@ mod tests {
     fn test_socket_manager() {
         let manager = SocketManager::new();
 
-        let socket_id = manager.create_socket(SocketDomain::IPv4, SocketType::Stream, SocketProtocol::TCP);
+        let socket_id =
+            manager.create_socket(SocketDomain::IPv4, SocketType::Stream, SocketProtocol::TCP);
         assert_eq!(socket_id, 1);
 
         assert_eq!(manager.socket_count(), 1);
@@ -402,8 +454,11 @@ mod tests {
     fn test_socket_manager_bind_listen() {
         let manager = SocketManager::new();
 
-        let socket_id = manager.create_socket(SocketDomain::IPv4, SocketType::Stream, SocketProtocol::TCP);
-        manager.bind(socket_id, "127.0.0.1".to_string(), 8080).unwrap();
+        let socket_id =
+            manager.create_socket(SocketDomain::IPv4, SocketType::Stream, SocketProtocol::TCP);
+        manager
+            .bind(socket_id, "127.0.0.1".to_string(), 8080)
+            .unwrap();
         manager.listen(socket_id, 128).unwrap();
 
         let socket = manager.get_socket(socket_id).unwrap();
@@ -414,8 +469,11 @@ mod tests {
     fn test_socket_manager_connect() {
         let manager = SocketManager::new();
 
-        let socket_id = manager.create_socket(SocketDomain::IPv4, SocketType::Stream, SocketProtocol::TCP);
-        manager.connect(socket_id, "192.168.1.1".to_string(), 80).unwrap();
+        let socket_id =
+            manager.create_socket(SocketDomain::IPv4, SocketType::Stream, SocketProtocol::TCP);
+        manager
+            .connect(socket_id, "192.168.1.1".to_string(), 80)
+            .unwrap();
 
         let socket = manager.get_socket(socket_id).unwrap();
         assert_eq!(socket.state, SocketState::Established);
@@ -425,7 +483,8 @@ mod tests {
     fn test_socket_manager_close() {
         let manager = SocketManager::new();
 
-        let socket_id = manager.create_socket(SocketDomain::IPv4, SocketType::Stream, SocketProtocol::TCP);
+        let socket_id =
+            manager.create_socket(SocketDomain::IPv4, SocketType::Stream, SocketProtocol::TCP);
         manager.close(socket_id).unwrap();
 
         let socket = manager.get_socket(socket_id).unwrap();
@@ -436,7 +495,8 @@ mod tests {
     fn test_socket_manager_remove() {
         let manager = SocketManager::new();
 
-        let socket_id = manager.create_socket(SocketDomain::IPv4, SocketType::Stream, SocketProtocol::TCP);
+        let socket_id =
+            manager.create_socket(SocketDomain::IPv4, SocketType::Stream, SocketProtocol::TCP);
         manager.remove_socket(socket_id).unwrap();
 
         assert_eq!(manager.socket_count(), 0);
