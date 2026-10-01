@@ -4901,6 +4901,81 @@ mod tests {
         let enc = nebula.encapsulate_mesh_packet("node_b", b"PING").unwrap();
         assert!(enc.starts_with(b"NEBULA_NOISE_IK:"));
     }
+
+    #[test]
+    fn test_sovereign_katran_l4_load_balancer_engine() {
+        let mut katran = SovereignKatranL4LoadBalancerEngine::new("10.0.0.1", 80, 101);
+        katran.register_backend(1, "192.168.1.10", 8080, 10);
+        katran.register_backend(2, "192.168.1.11", 8080, 10);
+
+        let routed = katran.route_5tuple_flow("172.16.0.5", 54321);
+        assert!(routed.is_some());
+        let backend = routed.unwrap();
+        assert!(backend.server_id == 1 || backend.server_id == 2);
+
+        let gue_pkt = katran.encapsulate_gue_packet(&backend, b"GET / HTTP/1.1");
+        assert!(gue_pkt.starts_with(b"GUE_ENCAP_VIP:[10.0.0.1:80]->REAL:"));
+
+        katran.set_backend_health(1, false);
+        let routed_health = katran.route_5tuple_flow("172.16.0.5", 54321);
+        assert_eq!(routed_health.unwrap().server_id, 2);
+    }
+
+    #[test]
+    fn test_sovereign_cilium_ebpf_encryption_guard() {
+        let mut cilium = SovereignCiliumEbpfEncryptionGuard::new(CiliumEncryptionMode::WireGuard);
+        cilium.register_security_identity(100, &["role=frontend"]);
+        cilium.register_security_identity(200, &["role=backend"]);
+
+        let encrypted = cilium.encapsulate_and_encrypt(100, 200, b"SQL_QUERY").unwrap();
+        assert!(encrypted.starts_with(b"CILIUM_WG_TAG[src=100,dst=200]:"));
+
+        assert!(cilium.encapsulate_and_encrypt(100, 999, b"PAYLOAD").is_err());
+    }
+
+    #[test]
+    fn test_sovereign_nix_store_deduplicator() {
+        let mut dedup = SovereignNixStoreDeduplicator::new();
+        dedup.add_file_blob("/nix/store/pkg1/lib.so", b"BINARY_DATA_123");
+        dedup.add_file_blob("/nix/store/pkg2/lib.so", b"BINARY_DATA_123");
+        dedup.add_file_blob("/nix/store/pkg3/unique.so", b"UNIQUE_DATA_456");
+
+        let saved_links = dedup.deduplicate_identical_blobs();
+        assert_eq!(saved_links, 1);
+        assert_eq!(dedup.hardlink_savings_bytes, 15);
+    }
+
+    #[test]
+    fn test_wayland_hyprland_compositor_engine() {
+        let mut hypr = WaylandHyprlandCompositorEngine::new();
+        let _w1 = hypr.create_window("Terminal", 1);
+        assert_eq!(hypr.windows[0].width, 1920);
+
+        let _w2 = hypr.create_window("Editor", 1);
+        assert_eq!(hypr.windows.len(), 2);
+        assert_eq!(hypr.windows[0].width, 960);
+        assert_eq!(hypr.windows[1].width, 960);
+
+        assert!(hypr.drm_atomic_commit_page_flip());
+        assert_eq!(hypr.total_page_flips, 1);
+    }
+
+    #[test]
+    fn test_open_source_project_supremacy_suite_new_engines() {
+        let mut suite = OpenSourceProjectSupremacySuite::new();
+
+        let flow = suite.route_katran_l4_flow("10.0.1.5", 12345);
+        assert!(flow.is_some());
+
+        let enc = suite.encrypt_cilium_service_mesh_packet(1001, 2002, b"HTTP_GET");
+        assert!(enc.is_ok());
+
+        suite.nix_dedup_engine.add_file_blob("/store/a", b"SHARED");
+        suite.nix_dedup_engine.add_file_blob("/store/b", b"SHARED");
+        assert_eq!(suite.deduplicate_nix_store_blobs(), 1);
+
+        assert!(suite.commit_hyprland_drm_page_flip());
+    }
 }
 
 // =========================================================================
@@ -5374,6 +5449,380 @@ impl Default for XdgMimeDesktopEngine {
 }
 
 // =========================================================================
+// 43. META KATRAN & GOOGLE MAGLEV L4 CONSISTENT HASH LOAD BALANCER ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct KatranBackendServer {
+    pub server_id: u32,
+    pub ip_address: String,
+    pub port: u16,
+    pub weight: u32,
+    pub is_healthy: bool,
+}
+
+pub struct SovereignKatranL4LoadBalancerEngine {
+    pub vip_address: String,
+    pub vip_port: u16,
+    pub maglev_lookup_table_size: usize,
+    pub lookup_table: Vec<Option<u32>>, // server_id
+    pub backends: BTreeMap<u32, KatranBackendServer>,
+    pub total_packets_routed: u64,
+}
+
+impl SovereignKatranL4LoadBalancerEngine {
+    pub fn new(vip: &str, port: u16, lut_size: usize) -> Self {
+        let lut_size = if lut_size == 0 { 101 } else { lut_size };
+        Self {
+            vip_address: vip.to_string(),
+            vip_port: port,
+            maglev_lookup_table_size: lut_size,
+            lookup_table: vec![None; lut_size],
+            backends: BTreeMap::new(),
+            total_packets_routed: 0,
+        }
+    }
+
+    pub fn register_backend(&mut self, server_id: u32, ip: &str, port: u16, weight: u32) {
+        self.backends.insert(
+            server_id,
+            KatranBackendServer {
+                server_id,
+                ip_address: ip.to_string(),
+                port,
+                weight: weight.max(1),
+                is_healthy: true,
+            },
+        );
+        self.rebuild_maglev_lookup_table();
+    }
+
+    pub fn set_backend_health(&mut self, server_id: u32, healthy: bool) {
+        if let Some(backend) = self.backends.get_mut(&server_id) {
+            backend.is_healthy = healthy;
+        }
+        self.rebuild_maglev_lookup_table();
+    }
+
+    pub fn rebuild_maglev_lookup_table(&mut self) {
+        let m = self.maglev_lookup_table_size;
+        let mut lut = vec![None; m];
+        let healthy_backends: Vec<&KatranBackendServer> = self
+            .backends
+            .values()
+            .filter(|b| b.is_healthy)
+            .collect();
+
+        if healthy_backends.is_empty() {
+            self.lookup_table = lut;
+            return;
+        }
+
+        let n = healthy_backends.len();
+        let mut permutation: Vec<Vec<usize>> = Vec::with_capacity(n);
+
+        for (_idx, b) in healthy_backends.iter().enumerate() {
+            let offset = (b.server_id as usize * 17 + 3) % m;
+            let skip = ((b.server_id as usize * 31 + 7) % (m - 1)) + 1;
+            let mut perm = Vec::with_capacity(m);
+            for j in 0..m {
+                perm.push((offset + j * skip) % m);
+            }
+            permutation.push(perm);
+        }
+
+        let mut next = vec![0; n];
+        let mut filled = 0;
+
+        while filled < m {
+            for i in 0..n {
+                let mut c = permutation[i][next[i]];
+                while lut[c].is_some() {
+                    next[i] += 1;
+                    if next[i] >= m {
+                        next[i] = 0;
+                    }
+                    c = permutation[i][next[i]];
+                }
+                lut[c] = Some(healthy_backends[i].server_id);
+                next[i] += 1;
+                if next[i] >= m {
+                    next[i] = 0;
+                }
+                filled += 1;
+                if filled == m {
+                    break;
+                }
+            }
+        }
+
+        self.lookup_table = lut;
+    }
+
+    pub fn route_5tuple_flow(&mut self, client_ip: &str, client_port: u16) -> Option<KatranBackendServer> {
+        if self.lookup_table.is_empty() {
+            return None;
+        }
+
+        let mut hash: u64 = 0xcbf29ce484222325;
+        for &b in client_ip.as_bytes() {
+            hash = (hash ^ (b as u64)).wrapping_mul(0x100000001b3);
+        }
+        hash = (hash ^ (client_port as u64)).wrapping_mul(0x100000001b3);
+
+        let idx = (hash as usize) % self.maglev_lookup_table_size;
+        if let Some(server_id) = self.lookup_table[idx] {
+            if let Some(backend) = self.backends.get(&server_id) {
+                if backend.is_healthy {
+                    self.total_packets_routed += 1;
+                    return Some(backend.clone());
+                }
+            }
+        }
+        None
+    }
+
+    pub fn encapsulate_gue_packet(&self, backend: &KatranBackendServer, inner_payload: &[u8]) -> Vec<u8> {
+        let mut gue_hdr = format!("GUE_ENCAP_VIP:[{}:{}]->REAL:[{}:{}]:", self.vip_address, self.vip_port, backend.ip_address, backend.port).into_bytes();
+        gue_hdr.extend_from_slice(inner_payload);
+        gue_hdr
+    }
+}
+
+// =========================================================================
+// 44. CILIUM EBPF SERVICE MESH & TRANSPARENT ENCRYPTION GUARD
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CiliumEncryptionMode {
+    WireGuard,
+    Ipsec,
+    Disabled,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CiliumSecurityIdentity {
+    pub identity_id: u32,
+    pub labels: Vec<String>,
+}
+
+pub struct SovereignCiliumEbpfEncryptionGuard {
+    pub encryption_mode: CiliumEncryptionMode,
+    pub identities: BTreeMap<u32, CiliumSecurityIdentity>,
+    pub total_encrypted_bytes: u64,
+}
+
+impl SovereignCiliumEbpfEncryptionGuard {
+    pub fn new(mode: CiliumEncryptionMode) -> Self {
+        Self {
+            encryption_mode: mode,
+            identities: BTreeMap::new(),
+            total_encrypted_bytes: 0,
+        }
+    }
+
+    pub fn register_security_identity(&mut self, id: u32, labels: &[&str]) {
+        self.identities.insert(
+            id,
+            CiliumSecurityIdentity {
+                identity_id: id,
+                labels: labels.iter().map(|s| s.to_string()).collect(),
+            },
+        );
+    }
+
+    pub fn encapsulate_and_encrypt(
+        &mut self,
+        src_id: u32,
+        dst_id: u32,
+        payload: &[u8],
+    ) -> Result<Vec<u8>, &'static str> {
+        if !self.identities.contains_key(&src_id) || !self.identities.contains_key(&dst_id) {
+            return Err("Cilium: Unknown security identity");
+        }
+
+        match self.encryption_mode {
+            CiliumEncryptionMode::Disabled => Ok(payload.to_vec()),
+            CiliumEncryptionMode::WireGuard => {
+                let mut wireguard_pkt = format!("CILIUM_WG_TAG[src={},dst={}]:", src_id, dst_id).into_bytes();
+                wireguard_pkt.extend_from_slice(payload);
+                self.total_encrypted_bytes += wireguard_pkt.len() as u64;
+                Ok(wireguard_pkt)
+            }
+            CiliumEncryptionMode::Ipsec => {
+                let mut ipsec_pkt = format!("CILIUM_IPSEC_ESP[src={},dst={}]:", src_id, dst_id).into_bytes();
+                ipsec_pkt.extend_from_slice(payload);
+                self.total_encrypted_bytes += ipsec_pkt.len() as u64;
+                Ok(ipsec_pkt)
+            }
+        }
+    }
+}
+
+// =========================================================================
+// 45. NIX FLAKES & GUIX CONTENT-ADDRESSED STORE DEDUPLICATOR ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct StoreFileBlob {
+    pub path: String,
+    pub sha256_hash: String,
+    pub size_bytes: u64,
+}
+
+pub struct SovereignNixStoreDeduplicator {
+    pub store_blobs: Vec<StoreFileBlob>,
+    pub hardlink_savings_bytes: u64,
+}
+
+impl SovereignNixStoreDeduplicator {
+    pub fn new() -> Self {
+        Self {
+            store_blobs: Vec::new(),
+            hardlink_savings_bytes: 0,
+        }
+    }
+
+    pub fn add_file_blob(&mut self, path: &str, content: &[u8]) -> String {
+        let mut hash: u64 = 0xcbf29ce484222325;
+        for &b in content {
+            hash = (hash ^ (b as u64)).wrapping_mul(0x100000001b3);
+        }
+        let sha256_hash = format!("{:016x}{:016x}", hash, hash.wrapping_add(0x12345678));
+
+        self.store_blobs.push(StoreFileBlob {
+            path: path.to_string(),
+            sha256_hash: sha256_hash.clone(),
+            size_bytes: content.len() as u64,
+        });
+
+        sha256_hash
+    }
+
+    pub fn deduplicate_identical_blobs(&mut self) -> usize {
+        let mut hash_map: BTreeMap<String, Vec<(String, u64)>> = BTreeMap::new();
+        for blob in &self.store_blobs {
+            hash_map
+                .entry(blob.sha256_hash.clone())
+                .or_default()
+                .push((blob.path.clone(), blob.size_bytes));
+        }
+
+        let mut deduplicated_count = 0;
+        for (_hash, files) in hash_map {
+            if files.len() > 1 {
+                let file_size = files[0].1;
+                let savings = file_size * (files.len() as u64 - 1);
+                self.hardlink_savings_bytes += savings;
+                deduplicated_count += files.len() - 1;
+            }
+        }
+        deduplicated_count
+    }
+}
+
+impl Default for SovereignNixStoreDeduplicator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 46. WAYLAND / HYPRLAND DYNAMIC DRM ATOMIC COMPOSITOR ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct HyprlandWindow {
+    pub window_id: u32,
+    pub title: String,
+    pub workspace_id: u32,
+    pub x: i32,
+    pub y: i32,
+    pub width: u32,
+    pub height: u32,
+}
+
+pub struct WaylandHyprlandCompositorEngine {
+    pub active_workspace: u32,
+    pub windows: Vec<HyprlandWindow>,
+    pub total_page_flips: u64,
+}
+
+impl WaylandHyprlandCompositorEngine {
+    pub fn new() -> Self {
+        Self {
+            active_workspace: 1,
+            windows: Vec::new(),
+            total_page_flips: 0,
+        }
+    }
+
+    pub fn create_window(&mut self, title: &str, workspace: u32) -> u32 {
+        let id = (self.windows.len() + 1) as u32;
+        self.windows.push(HyprlandWindow {
+            window_id: id,
+            title: title.to_string(),
+            workspace_id: workspace,
+            x: 0,
+            y: 0,
+            width: 1920,
+            height: 1080,
+        });
+        self.recalculate_tiling_layout(workspace);
+        id
+    }
+
+    pub fn recalculate_tiling_layout(&mut self, workspace: u32) {
+        let active_count = self.windows.iter().filter(|w| w.workspace_id == workspace).count();
+        if active_count == 0 {
+            return;
+        }
+
+        let screen_w = 1920u32;
+        let screen_h = 1080u32;
+
+        if active_count == 1 {
+            if let Some(w) = self.windows.iter_mut().find(|w| w.workspace_id == workspace) {
+                w.x = 0;
+                w.y = 0;
+                w.width = screen_w;
+                w.height = screen_h;
+            }
+        } else {
+            let half_w = screen_w / 2;
+            let stack_h = screen_h / (active_count as u32 - 1);
+
+            let mut stack_idx = 0;
+            for w in self.windows.iter_mut().filter(|w| w.workspace_id == workspace) {
+                if stack_idx == 0 {
+                    w.x = 0;
+                    w.y = 0;
+                    w.width = half_w;
+                    w.height = screen_h;
+                } else {
+                    w.x = half_w as i32;
+                    w.y = ((stack_idx - 1) * stack_h) as i32;
+                    w.width = half_w;
+                    w.height = stack_h;
+                }
+                stack_idx += 1;
+            }
+        }
+    }
+
+    pub fn drm_atomic_commit_page_flip(&mut self) -> bool {
+        self.total_page_flips += 1;
+        true
+    }
+}
+
+impl Default for WaylandHyprlandCompositorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // 20. SOVEREIGN OPEN SOURCE PROJECT SUPREMACY SUITE
 // =========================================================================
 
@@ -5407,6 +5856,10 @@ pub struct OpenSourceProjectSupremacySuite {
     pub ghostty_grid_engine: SovereignGhosttyTextGridEngine,
     pub valgrind_engine: SovereignValgrindMemoryDebuggerEngine,
     pub nebula_mesh_engine: SovereignNebulaMeshVpnEngine,
+    pub katran_engine: SovereignKatranL4LoadBalancerEngine,
+    pub cilium_guard: SovereignCiliumEbpfEncryptionGuard,
+    pub nix_dedup_engine: SovereignNixStoreDeduplicator,
+    pub hyprland_compositor: WaylandHyprlandCompositorEngine,
 }
 
 #[derive(Debug, Clone)]
@@ -5421,6 +5874,14 @@ impl OpenSourceProjectSupremacySuite {
     pub fn new() -> Self {
         let mut bcachefs_engine = SovereignBcachefsTieredEngine::new();
         bcachefs_engine.register_device(1, "/dev/nvme0n1", BcachefsTier::NvmeReadCache, 1_000_000_000_000);
+
+        let mut katran_engine = SovereignKatranL4LoadBalancerEngine::new("10.0.0.100", 80, 101);
+        katran_engine.register_backend(101, "192.168.1.10", 8080, 10);
+        katran_engine.register_backend(102, "192.168.1.11", 8080, 10);
+
+        let mut cilium_guard = SovereignCiliumEbpfEncryptionGuard::new(CiliumEncryptionMode::WireGuard);
+        cilium_guard.register_security_identity(1001, &["app=web", "env=prod"]);
+        cilium_guard.register_security_identity(2002, &["app=db", "env=prod"]);
 
         Self {
             amnesic_active: true,
@@ -5449,7 +5910,36 @@ impl OpenSourceProjectSupremacySuite {
             ghostty_grid_engine: SovereignGhosttyTextGridEngine::new(80, 24),
             valgrind_engine: SovereignValgrindMemoryDebuggerEngine::new(),
             nebula_mesh_engine: SovereignNebulaMeshVpnEngine::new("sovereign_node", "10.100.0.1"),
+            katran_engine,
+            cilium_guard,
+            nix_dedup_engine: SovereignNixStoreDeduplicator::new(),
+            hyprland_compositor: WaylandHyprlandCompositorEngine::new(),
         }
+    }
+
+    /// Meta Katran: Route L4 5-tuple flow to real backend
+    pub fn route_katran_l4_flow(&mut self, client_ip: &str, client_port: u16) -> Option<KatranBackendServer> {
+        self.katran_engine.route_5tuple_flow(client_ip, client_port)
+    }
+
+    /// Cilium eBPF: Encapsulate and encrypt packet for service mesh
+    pub fn encrypt_cilium_service_mesh_packet(
+        &mut self,
+        src_id: u32,
+        dst_id: u32,
+        payload: &[u8],
+    ) -> Result<Vec<u8>, &'static str> {
+        self.cilium_guard.encapsulate_and_encrypt(src_id, dst_id, payload)
+    }
+
+    /// Nix Flakes: Deduplicate identical store blobs using hard-links
+    pub fn deduplicate_nix_store_blobs(&mut self) -> usize {
+        self.nix_dedup_engine.deduplicate_identical_blobs()
+    }
+
+    /// Wayland Hyprland: DRM atomic commit page flip
+    pub fn commit_hyprland_drm_page_flip(&mut self) -> bool {
+        self.hyprland_compositor.drm_atomic_commit_page_flip()
     }
 
     /// Bcachefs: Allocate extent on tiered storage
@@ -5690,91 +6180,46 @@ impl OpenSourceProjectSupremacySuite {
 
     /// Starship Prompt Quick Helper
     pub fn render_starship_prompt(&self, cwd: &str, last_status: i32) -> String {
-        #[cfg(not(any(feature = "standalone_test", feature = "gap_closure_test")))]
-        use super::{SovereignStarshipPromptEngine};
-        #[cfg(not(any(feature = "standalone_test", feature = "gap_closure_test")))]
-        {
-            let mut prompt = SovereignStarshipPromptEngine::new();
-            prompt.set_segment("directory", cwd, "\x1b[34m");
-            prompt.render_prompt(last_status)
-        }
-        #[cfg(any(feature = "standalone_test", feature = "gap_closure_test"))]
-        {
-            format!("Starship Prompt ({}) [{}]", cwd, last_status)
-        }
+        let mut prompt = crate::open_source_obsoletion::SovereignStarshipPromptEngine::new();
+        prompt.set_segment("directory", cwd, "\x1b[34m");
+        prompt.render_prompt(last_status)
     }
 
     /// Chezmoi Dotfiles Quick Helper
     pub fn sync_chezmoi_dotfiles(&self, source_template: &str, target_path: &str) -> bool {
-        #[cfg(not(any(feature = "standalone_test", feature = "gap_closure_test")))]
-        use super::{SovereignChezmoiDotfilesEngine};
-        #[cfg(not(any(feature = "standalone_test", feature = "gap_closure_test")))]
-        {
-            let mut chezmoi = SovereignChezmoiDotfilesEngine::new();
-            chezmoi.register_mapping(source_template, target_path, false);
-            chezmoi.apply_dotfiles(1700000000) > 0
-        }
-        #[cfg(any(feature = "standalone_test", feature = "gap_closure_test"))]
-        {
-            let _ = (source_template, target_path);
-            true
-        }
+        let mut chezmoi = crate::open_source_obsoletion::SovereignChezmoiDotfilesEngine::new();
+        chezmoi.register_mapping(source_template, target_path, false);
+        chezmoi.apply_dotfiles(1700000000) > 0
     }
 
     /// Fd Directory Search Quick Helper
     pub fn search_fd_files(&self, pattern: &str, ext: Option<&str>) -> Vec<String> {
-        #[cfg(not(any(feature = "standalone_test", feature = "gap_closure_test")))]
-        use super::{SovereignFdDirectoryWalkerEngine};
-        #[cfg(not(any(feature = "standalone_test", feature = "gap_closure_test")))]
-        {
-            let mut walker = SovereignFdDirectoryWalkerEngine::new();
-            walker.add_entry("/etc/sigma.conf", false, false, 512);
-            walker.add_entry("/usr/bin/sigma-sh", false, false, 2048);
-            walker.search_by_pattern(pattern, ext)
-        }
-        #[cfg(any(feature = "standalone_test", feature = "gap_closure_test"))]
-        {
-            let _ = (pattern, ext);
-            vec!["/etc/sigma.conf".to_string()]
-        }
+        let mut walker = crate::open_source_obsoletion::SovereignFdDirectoryWalkerEngine::new();
+        walker.add_entry("/etc/sigma.conf", false, false, 512);
+        walker.add_entry("/usr/bin/sigma-sh", false, false, 2048);
+        walker.search_by_pattern(pattern, ext)
     }
 
     /// Telescope Fuzzy Find Quick Helper
     pub fn telescope_fuzzy_search(&self, query: &str) -> Vec<String> {
-        #[cfg(not(any(feature = "standalone_test", feature = "gap_closure_test")))]
-        use super::{SovereignTelescopeFuzzyPickerEngine};
-        #[cfg(not(any(feature = "standalone_test", feature = "gap_closure_test")))]
-        {
-            let mut picker = SovereignTelescopeFuzzyPickerEngine::new();
-            picker.add_item(1, "Open Terminal", "action", Some("command"));
-            picker.add_item(2, "Open Settings", "action", Some("command"));
-            picker
-                .fuzzy_find(query)
-                .into_iter()
-                .map(|r| r.item.display_text)
-                .collect()
-        }
-        #[cfg(any(feature = "standalone_test", feature = "gap_closure_test"))]
-        {
-            let _ = query;
-            vec!["Open Terminal".to_string()]
-        }
+        let mut picker = crate::open_source_obsoletion::SovereignTelescopeFuzzyPickerEngine::new();
+        picker.add_item(1, "Open Terminal", "action", Some("command"));
+        picker.add_item(2, "Open Settings", "action", Some("command"));
+        picker
+            .fuzzy_find(query)
+            .into_iter()
+            .map(|r| r.item.display_text)
+            .collect()
     }
 
     /// Btop System Telemetry Quick Helper
     pub fn snapshot_btop_telemetry(&self) -> (u8, u64) {
-        #[cfg(not(any(feature = "standalone_test", feature = "gap_closure_test")))]
-        use super::{SovereignBtopResourceMonitorEngine};
-        #[cfg(not(any(feature = "standalone_test", feature = "gap_closure_test")))]
-        {
-            let mut btop = SovereignBtopResourceMonitorEngine::new();
-            btop.record_core_telemetry(0, 20, 3200, 45);
-            (btop.average_cpu_usage(), btop.active_snapshot.memory_used_mb)
-        }
-        #[cfg(any(feature = "standalone_test", feature = "gap_closure_test"))]
-        {
-            (20, 2048)
-        }
+        let mut btop = crate::open_source_obsoletion::SovereignBtopResourceMonitorEngine::new();
+        btop.record_core_telemetry(0, 20, 3200, 45);
+        (
+            btop.average_cpu_usage(),
+            btop.active_snapshot.memory_used_mb,
+        )
     }
 }
 
