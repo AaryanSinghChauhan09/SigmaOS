@@ -2,14 +2,11 @@
 // Implements PKGBUILD parsing, makepkg compiler parity, ALPM database,
 // Pacman engine, mkinitcpio initramfs builder, archiso, and reflector mirror ranker.
 
-
-
-
+use core::cell::Cell;
 use std::collections::BTreeMap;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
-use core::cell::Cell;
 
 /// PKGBUILD representation following Arch Linux standards
 #[derive(Debug, Clone)]
@@ -738,7 +735,6 @@ impl Default for ReflectorMirrorRanker {
     }
 }
 
-
 #[derive(Debug, Clone)]
 pub struct ArchChrootProfile {
     pub target: String,
@@ -778,8 +774,6 @@ impl ArchCdevtoolsEngine {
             Err("ArchCdevtoolsEngine: Unknown build target profile")
         }
     }
-
-
 }
 
 #[derive(Debug, Clone)]
@@ -806,7 +800,10 @@ impl ArchPkgctlEngine {
     }
 
     pub fn split_package_repo(&self, pkg_name: &str) -> String {
-        format!("https://gitlab.archlinux.org/archlinux/packaging/packages/{}.git", pkg_name)
+        format!(
+            "https://gitlab.archlinux.org/archlinux/packaging/packages/{}.git",
+            pkg_name
+        )
     }
 
     pub fn release_package(&self, pkg_name: &str, tag: &str) -> String {
@@ -970,7 +967,9 @@ impl ArchWikiOfflineEngine {
         let q = query.to_lowercase();
         self.articles
             .iter()
-            .filter(|a| a.title.to_lowercase().contains(&q) || a.content.to_lowercase().contains(&q))
+            .filter(|a| {
+                a.title.to_lowercase().contains(&q) || a.content.to_lowercase().contains(&q)
+            })
             .collect()
     }
 
@@ -1022,7 +1021,9 @@ mod tests {
     #[test]
     fn test_arch_devtools_pkgctl_archweb_archinstall_wiki() {
         let devtools = ArchCdevtoolsEngine::new();
-        let cmd = devtools.build_in_chroot("extra-x86_64-build", "curl").unwrap();
+        let cmd = devtools
+            .build_in_chroot("extra-x86_64-build", "curl")
+            .unwrap();
         assert!(cmd.contains("arch-nspawn"));
 
         let mut pkgctl = ArchPkgctlEngine::new();
@@ -1506,7 +1507,11 @@ impl ArchMkinitcpioGeneratorEngine {
         if self.hooks.is_empty() {
             return Err("mkinitcpio: No hooks configured");
         }
-        Ok(format!("Generated /boot/initramfs-{}.img with {} hooks", preset_name, self.hooks.len()))
+        Ok(format!(
+            "Generated /boot/initramfs-{}.img with {} hooks",
+            preset_name,
+            self.hooks.len()
+        ))
     }
 }
 
@@ -1529,7 +1534,12 @@ impl ArchPowerpillParallelDownloadEngine {
     pub fn prepare_parallel_download_urls(&self, package_names: &[&str]) -> Vec<String> {
         package_names
             .iter()
-            .map(|pkg| format!("https://geo.mirror.pkgbuild.com/core/os/x86_64/{}.pkg.tar.zst", pkg))
+            .map(|pkg| {
+                format!(
+                    "https://geo.mirror.pkgbuild.com/core/os/x86_64/{}.pkg.tar.zst",
+                    pkg
+                )
+            })
             .collect()
     }
 }

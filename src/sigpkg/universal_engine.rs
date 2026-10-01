@@ -138,7 +138,10 @@ impl PackageFormat {
             Some(PackageFormat::OpenBsdPkg)
         } else if normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
             Some(PackageFormat::TarGz)
-        } else if normalized.ends_with(".txz") || normalized.ends_with(".tar.xz") || normalized.ends_with(".xz") {
+        } else if normalized.ends_with(".txz")
+            || normalized.ends_with(".tar.xz")
+            || normalized.ends_with(".xz")
+        {
             Some(PackageFormat::TarXz)
         } else if normalized.ends_with(".xbps") {
             Some(PackageFormat::Xbps)
@@ -170,7 +173,8 @@ impl PackageFormat {
             Some(PackageFormat::Pacman)
         } else if normalized.ends_with(".dports") {
             Some(PackageFormat::Dports)
-        } else if name.ends_with(".slackbuild") || name.ends_with(".tlz") || name.ends_with(".tbz") {
+        } else if name.ends_with(".slackbuild") || name.ends_with(".tlz") || name.ends_with(".tbz")
+        {
             Some(PackageFormat::SlackBuild)
         } else if normalized.ends_with(".crux") || normalized.ends_with(".pkgfile") {
             Some(PackageFormat::Crux)
@@ -228,7 +232,6 @@ impl PackageFormat {
     }
 }
 
-
 #[derive(Debug, Clone)]
 pub struct PackageContext {
     pub name: String,
@@ -238,7 +241,6 @@ pub struct PackageContext {
     pub files: Vec<String>,
     pub hash: [u8; 32],
 }
-
 
 pub trait IPackageAdapter {
     fn format(&self) -> PackageFormat;
@@ -604,7 +606,9 @@ impl PackageAdapterFactory {
             PackageFormat::Apt | PackageFormat::Deb => Box::new(AptPackageAdapter),
             PackageFormat::Yum | PackageFormat::Rpm => Box::new(YumPackageAdapter),
             PackageFormat::Pacman => Box::new(PacmanPackageAdapter),
-            PackageFormat::Portage | PackageFormat::Ebuild => Box::new(EbuildPackageAdapter::new(Vec::new())),
+            PackageFormat::Portage | PackageFormat::Ebuild => {
+                Box::new(EbuildPackageAdapter::new(Vec::new()))
+            }
             PackageFormat::Sovereign | PackageFormat::Sigma => Box::new(SovereignPackageAdapter),
             PackageFormat::Nix => Box::new(NixPackageAdapter),
             PackageFormat::Apk => Box::new(ApkPackageAdapter),
@@ -686,8 +690,15 @@ impl IPackageAdapter for SwupdPackageAdapter {
             hash: [0x41; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Swupd Adapter: Extracted Clear Linux bundle to: {}", store_path);
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "Swupd Adapter: Extracted Clear Linux bundle to: {}",
+            store_path
+        );
         Ok(())
     }
 }
@@ -710,8 +721,15 @@ impl IPackageAdapter for StarlingPackageAdapter {
             hash: [0x42; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Starling Adapter: Extracted Starling package to: {}", store_path);
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "Starling Adapter: Extracted Starling package to: {}",
+            store_path
+        );
         Ok(())
     }
 }
@@ -765,7 +783,11 @@ impl IPackageAdapter for SpackPackageAdapter {
             hash: [0x38; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
         println!("Spack Adapter: Extracted Spack package to: {}", store_path);
         Ok(())
     }
@@ -789,7 +811,11 @@ impl IPackageAdapter for ConanPackageAdapter {
             hash: [0x39; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
         println!("Conan Adapter: Extracted Conan package to: {}", store_path);
         Ok(())
     }
@@ -813,7 +839,11 @@ impl IPackageAdapter for WheelPackageAdapter {
             hash: [0x3a; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
         println!("Wheel Adapter: Extracted Wheel package to: {}", store_path);
         Ok(())
     }
@@ -837,7 +867,11 @@ impl IPackageAdapter for CratePackageAdapter {
             hash: [0x3b; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
         println!("Crate Adapter: Extracted Cargo crate to: {}", store_path);
         Ok(())
     }
@@ -861,7 +895,11 @@ impl IPackageAdapter for GemPackageAdapter {
             hash: [0x3c; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
         println!("Gem Adapter: Extracted RubyGem to: {}", store_path);
         Ok(())
     }
@@ -885,7 +923,11 @@ impl IPackageAdapter for NupkgPackageAdapter {
             hash: [0x3d; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
         println!("Nupkg Adapter: Extracted NuGet package to: {}", store_path);
         Ok(())
     }
@@ -909,7 +951,11 @@ impl IPackageAdapter for VcpkgPackageAdapter {
             hash: [0x3e; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
         println!("Vcpkg Adapter: Extracted Vcpkg package to: {}", store_path);
         Ok(())
     }
@@ -933,8 +979,15 @@ impl IPackageAdapter for NarInfoPackageAdapter {
             hash: [0x3f; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("NarInfo Adapter: Extracted NarInfo manifest to: {}", store_path);
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "NarInfo Adapter: Extracted NarInfo manifest to: {}",
+            store_path
+        );
         Ok(())
     }
 }
@@ -957,8 +1010,15 @@ impl IPackageAdapter for SysupdatePackageAdapter {
             hash: [0x40; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Sysupdate Adapter: Extracted Sysupdate definition to: {}", store_path);
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "Sysupdate Adapter: Extracted Sysupdate definition to: {}",
+            store_path
+        );
         Ok(())
     }
 }
@@ -2404,7 +2464,11 @@ impl IPackageAdapter for IpkPackageAdapter {
             hash: [0x32; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
         println!("IPK Adapter: Extracted IPK package to: {}", store_path);
         Ok(())
     }
@@ -2428,7 +2492,11 @@ impl IPackageAdapter for OpkgPackageAdapter {
             hash: [0x34; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
         println!("OPKG Adapter: Extracted OPKG package to: {}", store_path);
         Ok(())
     }
@@ -2452,8 +2520,15 @@ impl IPackageAdapter for SolarisIpsPackageAdapter {
             hash: [0x35; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Solaris IPS Adapter: Extracted IPS package to: {}", store_path);
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "Solaris IPS Adapter: Extracted IPS package to: {}",
+            store_path
+        );
         Ok(())
     }
 }
@@ -2476,7 +2551,11 @@ impl IPackageAdapter for GuixNarPackageAdapter {
             hash: [0x36; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
         println!("Guix NAR Adapter: Extracted NAR package to: {}", store_path);
         Ok(())
     }
@@ -2500,8 +2579,15 @@ impl IPackageAdapter for OpenBsdPkgPackageAdapter {
             hash: [0x37; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("OpenBSD PKG Adapter: Extracted PKG package to: {}", store_path);
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "OpenBSD PKG Adapter: Extracted PKG package to: {}",
+            store_path
+        );
         Ok(())
     }
 }
@@ -2849,10 +2935,19 @@ impl SovereignUniversalPackageTranslationBridge {
     pub fn sandbox_and_pledge_translation(format: PackageFormat) -> Vec<String> {
         match format {
             PackageFormat::Apt | PackageFormat::Yum | PackageFormat::Zypper => {
-                vec!["stdio".to_string(), "rpath".to_string(), "wpath".to_string(), "cpath".to_string()]
+                vec![
+                    "stdio".to_string(),
+                    "rpath".to_string(),
+                    "wpath".to_string(),
+                    "cpath".to_string(),
+                ]
             }
             PackageFormat::Pacman | PackageFormat::Apk | PackageFormat::Xbps => {
-                vec!["stdio".to_string(), "rpath".to_string(), "wpath".to_string()]
+                vec![
+                    "stdio".to_string(),
+                    "rpath".to_string(),
+                    "wpath".to_string(),
+                ]
             }
             PackageFormat::Flatpak | PackageFormat::Snap | PackageFormat::AppImage => {
                 vec!["stdio".to_string(), "rpath".to_string(), "inet".to_string()]
@@ -2880,9 +2975,13 @@ impl SovereignUniversalPackageManagerInteropEngine {
         payload: &[u8],
         token: u64,
     ) -> Result<String, &'static str> {
-        let translated_ctx = SovereignUniversalPackageTranslationBridge::translate_format_to_sigpkg(format, payload)?;
+        let translated_ctx =
+            SovereignUniversalPackageTranslationBridge::translate_format_to_sigpkg(
+                format, payload,
+            )?;
         let adapter = PackageAdapterFactory::get_adapter(format);
-        self.manager.install_package(adapter.as_ref(), payload, token)?;
+        self.manager
+            .install_package(adapter.as_ref(), payload, token)?;
         Ok(format!(
             "Successfully translated and installed {} format package as {}",
             format!("{:?}", format),
@@ -2915,7 +3014,9 @@ mod universal_interop_tests {
         assert!(ctx.name.contains("sigpkg-translated"));
         assert_eq!(ctx.format, PackageFormat::Apt);
 
-        let pledges = SovereignUniversalPackageTranslationBridge::sandbox_and_pledge_translation(PackageFormat::Flatpak);
+        let pledges = SovereignUniversalPackageTranslationBridge::sandbox_and_pledge_translation(
+            PackageFormat::Flatpak,
+        );
         assert!(pledges.contains(&"inet".to_string()));
     }
 

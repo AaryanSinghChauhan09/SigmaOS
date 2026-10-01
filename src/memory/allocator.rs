@@ -25,10 +25,12 @@ pub struct BuddyAllocator {
 
 impl BuddyAllocator {
     pub fn new(total_memory: usize, min_block_size: usize) -> Self {
-        let max_order = (total_memory / min_block_size).next_power_of_two().trailing_zeros() as usize;
-        
+        let max_order = (total_memory / min_block_size)
+            .next_power_of_two()
+            .trailing_zeros() as usize;
+
         let mut free_lists = vec![Vec::new(); max_order + 1];
-        
+
         // Initialize with one large block
         let initial_block = MemoryBlock {
             start: 0,
@@ -37,7 +39,7 @@ impl BuddyAllocator {
             order: max_order,
         };
         free_lists[max_order].push(initial_block);
-        
+
         Self {
             total_memory,
             min_block_size,
@@ -51,38 +53,39 @@ impl BuddyAllocator {
     /// Allocate memory of given size
     pub fn allocate(&mut self, size: usize) -> Result<u64, &'static str> {
         let required_order = self.size_to_order(size);
-        
+
         // Find a free block of at least required order
         let order = self.find_free_block(required_order)?;
-        
+
         // Split blocks if necessary
         let block = self.split_block(order, required_order)?;
-        
+
         // Mark as allocated
         let block_id = self.next_block_id.fetch_add(1, Ordering::SeqCst);
         let mut allocated_block = block.clone();
         allocated_block.allocated = true;
-        
+
         self.allocated_blocks.insert(block_id, allocated_block);
-        
+
         Ok(block.start)
     }
 
     /// Free memory
     pub fn free(&mut self, address: u64) -> Result<(), &'static str> {
         // Find allocated block
-        let block_id = self.allocated_blocks
+        let block_id = self
+            .allocated_blocks
             .iter()
             .find(|(_, b)| b.start == address && b.allocated)
             .map(|(id, _)| *id)
             .ok_or("Block not found")?;
-        
+
         let mut block = self.allocated_blocks.remove(&block_id).unwrap();
         block.allocated = false;
-        
+
         // Merge with buddy if possible
         self.merge_buddy(block);
-        
+
         Ok(())
     }
 
@@ -103,13 +106,19 @@ impl BuddyAllocator {
     }
 
     /// Split block to required order
-    fn split_block(&mut self, current_order: usize, required_order: usize) -> Result<MemoryBlock, &'static str> {
-        let mut block = self.free_lists[current_order].pop().ok_or("Block not found")?;
-        
+    fn split_block(
+        &mut self,
+        current_order: usize,
+        required_order: usize,
+    ) -> Result<MemoryBlock, &'static str> {
+        let mut block = self.free_lists[current_order]
+            .pop()
+            .ok_or("Block not found")?;
+
         while block.order > required_order {
             let new_order = block.order - 1;
             let new_size = block.size / 2;
-            
+
             // Split into two buddies
             let buddy1 = MemoryBlock {
                 start: block.start,
@@ -117,44 +126,47 @@ impl BuddyAllocator {
                 allocated: false,
                 order: new_order,
             };
-            
+
             let buddy2 = MemoryBlock {
                 start: block.start + new_size as u64,
                 size: new_size,
                 allocated: false,
                 order: new_order,
             };
-            
+
             self.free_lists[new_order].push(buddy2);
             block = buddy1;
         }
-        
+
         Ok(block)
     }
 
     /// Merge block with its buddy
     fn merge_buddy(&mut self, block: MemoryBlock) {
         let buddy_address = block.start ^ (1 << block.order);
-        
+
         // Find buddy in free list
         for order in block.order..self.max_order {
-            if let Some(pos) = self.free_lists[order].iter().position(|b| b.start == buddy_address) {
+            if let Some(pos) = self.free_lists[order]
+                .iter()
+                .position(|b| b.start == buddy_address)
+            {
                 // Found buddy - merge
                 let buddy = self.free_lists[order].remove(pos);
-                
+
                 let merged_block = MemoryBlock {
                     start: block.start.min(buddy.start),
                     size: block.size * 2,
                     allocated: false,
                     order: order + 1,
                 };
-                
+
                 // Try to merge further
                 self.merge_buddy(merged_block);
                 return;
             }
         }
-        
+
         // No buddy found - add to free list
         self.free_lists[block.order].push(block);
     }
@@ -166,7 +178,8 @@ impl BuddyAllocator {
 
     /// Get free memory
     pub fn free_memory(&self) -> usize {
-        self.free_lists.iter()
+        self.free_lists
+            .iter()
             .flatten()
             .filter(|b| !b.allocated)
             .map(|b| b.size)
@@ -175,7 +188,8 @@ impl BuddyAllocator {
 
     /// Get allocated memory
     pub fn allocated_memory(&self) -> usize {
-        self.allocated_blocks.values()
+        self.allocated_blocks
+            .values()
             .filter(|b| b.allocated)
             .map(|b| b.size)
             .sum()
@@ -221,10 +235,10 @@ impl SlabCache {
                 }
             }
         }
-        
+
         // No free object - create new slab
         self.grow_slab();
-        
+
         // Try again
         self.allocate()
     }
@@ -245,8 +259,9 @@ impl SlabCache {
 
     /// Grow slab cache
     fn grow_slab(&mut self) {
-        let base_address = self.slabs.len() as u64 * self.object_size as u64 * self.objects_per_slab as u64;
-        
+        let base_address =
+            self.slabs.len() as u64 * self.object_size as u64 * self.objects_per_slab as u64;
+
         let mut slab = Vec::new();
         for i in 0..self.objects_per_slab {
             slab.push(SlabObject {
@@ -254,8 +269,9 @@ impl SlabCache {
                 in_use: false,
             });
         }
-        
-        self.free_objects.fetch_add(self.objects_per_slab, Ordering::SeqCst);
+
+        self.free_objects
+            .fetch_add(self.objects_per_slab, Ordering::SeqCst);
         self.slabs.push(slab);
     }
 
@@ -283,11 +299,16 @@ impl SlabAllocator {
     }
 
     /// Create a slab cache
-    pub fn create_cache(&mut self, name: String, object_size: usize, objects_per_slab: usize) -> Result<(), &'static str> {
+    pub fn create_cache(
+        &mut self,
+        name: String,
+        object_size: usize,
+        objects_per_slab: usize,
+    ) -> Result<(), &'static str> {
         if self.caches.contains_key(&name) {
             return Err("Cache already exists");
         }
-        
+
         let cache = SlabCache::new(name.clone(), object_size, objects_per_slab);
         self.caches.insert(name, cache);
         Ok(())
@@ -324,39 +345,39 @@ mod tests {
     #[test]
     fn test_buddy_allocate() {
         let mut allocator = BuddyAllocator::new(1024 * 1024, 4096);
-        
+
         let address = allocator.allocate(4096).unwrap();
         assert!(address > 0);
-        
+
         assert!(allocator.free(address).is_ok());
     }
 
     #[test]
     fn test_buddy_split() {
         let mut allocator = BuddyAllocator::new(1024 * 1024, 4096);
-        
+
         allocator.allocate(4096).unwrap();
         allocator.allocate(4096).unwrap();
-        
+
         assert!(allocator.allocated_memory() > 0);
     }
 
     #[test]
     fn test_slab_cache() {
         let mut cache = SlabCache::new("test".to_string(), 64, 10);
-        
+
         let address = cache.allocate().unwrap();
         assert!(address > 0);
-        
+
         assert!(cache.free(address).is_ok());
     }
 
     #[test]
     fn test_slab_allocator() {
         let mut allocator = SlabAllocator::new();
-        
+
         allocator.create_cache("test".to_string(), 64, 10).unwrap();
-        
+
         let address = allocator.allocate("test").unwrap();
         assert!(allocator.free("test", address).is_ok());
     }
@@ -364,10 +385,10 @@ mod tests {
     #[test]
     fn test_memory_stats() {
         let mut allocator = BuddyAllocator::new(1024 * 1024, 4096);
-        
+
         assert_eq!(allocator.total_memory(), 1024 * 1024);
         assert_eq!(allocator.free_memory(), 1024 * 1024);
-        
+
         allocator.allocate(4096).unwrap();
         assert!(allocator.allocated_memory() > 0);
     }

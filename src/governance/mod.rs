@@ -3,28 +3,28 @@ use std::vec::Vec;
 // SigmaOS Governance & Transparency enhancements
 // Foundation Model, Democratic Voting, and Release Roadmaps
 
+pub mod future_protocol;
 pub mod okr;
 pub mod rfc;
-pub mod strategic_vision;
-pub mod future_protocol;
 pub mod sovereign_task_guidelines_wiki_sync_engine;
+pub mod strategic_vision;
 
+use crate::klib::HashMap;
+use core::sync::atomic::{AtomicUsize, Ordering};
 pub use okr::*;
+pub use rfc::{
+    GovernanceError, RFCRepository, RFCStatus, SimpleRFC, SimpleRFCRepository, SimpleVotingSystem,
+    VotingSystem, RFC, RFCID,
+};
 pub use sovereign_task_guidelines_wiki_sync_engine::*;
 pub use strategic_vision::{
     AdaptiveWorkloadType, CommunityPackageAuditRecord, ComplianceAuditVerdict,
     RegulatedIndustryFramework, StrategicDifferentiationEngine, VisualDashboardOverlay,
     VisualOverlayKind,
 };
-pub use rfc::{
-    GovernanceError, RFCRepository, RFCStatus, SimpleRFC, SimpleRFCRepository, SimpleVotingSystem,
-    VotingSystem, RFC, RFCID,
-};
 pub use strategic_vision::{
     MilestoneCategory, OkrError, OkrTracker, StrategicMilestone, StrategicOkrEvaluator,
 };
-use crate::klib::HashMap;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Foundation committee member profile
 #[derive(Debug, Clone)]

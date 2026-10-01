@@ -46,7 +46,7 @@ use crate::package::universal::{PackageFormat, UnifiedPackage};
 pub mod universal;
 
 #[cfg(feature = "standalone_test")]
-pub use universal::{PackageError, UnifiedPackage};
+pub use universal::{PackageError, PackageFormat, UnifiedPackage};
 
 // =========================================================================
 // 1. Profile-Guided & Feedback-Driven Optimization Governor
@@ -99,7 +99,10 @@ impl SovereignPgoFdoOptimizationGovernor {
             OptimizationProfileMode::ProfileUse => PgoBuildSpec {
                 mode: OptimizationProfileMode::ProfileUse,
                 profile_data_path: self.profile_path.clone(),
-                extra_cflags: format!("-fprofile-use={} -fprofile-correction -flto", self.profile_path),
+                extra_cflags: format!(
+                    "-fprofile-use={} -fprofile-correction -flto",
+                    self.profile_path
+                ),
                 extra_ldflags: format!("-fprofile-use={} -flto", self.profile_path),
             },
             OptimizationProfileMode::SampleProfileUse => PgoBuildSpec {
@@ -304,7 +307,10 @@ impl SovereignTransactionalPreflightValidatorEngine {
         }
 
         if !missing.is_empty() {
-            errors.push(format!("Missing required SONAME dependencies: {:?}", missing));
+            errors.push(format!(
+                "Missing required SONAME dependencies: {:?}",
+                missing
+            ));
         }
 
         let is_valid = errors.is_empty();
@@ -413,7 +419,10 @@ impl SovereignDistroPackageAdvancementsSuiteV6 {
         }
     }
 
-    pub fn process_and_enrich_package_v6(&mut self, pkg: &mut UnifiedPackage) -> Result<(), String> {
+    pub fn process_and_enrich_package_v6(
+        &mut self,
+        pkg: &mut UnifiedPackage,
+    ) -> Result<(), String> {
         let pgo_flags = self.pgo_governor.generate_pgo_flags();
         if pgo_flags.mode != OptimizationProfileMode::Disabled {
             pkg.properties
@@ -445,7 +454,9 @@ mod tests {
         );
         let spec = governor.generate_pgo_flags();
         assert_eq!(spec.mode, OptimizationProfileMode::ProfileUse);
-        assert!(spec.extra_cflags.contains("-fprofile-use=/tmp/pgo.profdata"));
+        assert!(spec
+            .extra_cflags
+            .contains("-fprofile-use=/tmp/pgo.profdata"));
     }
 
     #[test]
@@ -487,7 +498,8 @@ mod tests {
         let mut available_sonames = BTreeSet::new();
         available_sonames.insert("libc.so.6".to_string());
 
-        let validator = SovereignTransactionalPreflightValidatorEngine::new(1024, existing, available_sonames);
+        let validator =
+            SovereignTransactionalPreflightValidatorEngine::new(1024, existing, available_sonames);
 
         let res = validator.validate_transaction(
             500,
@@ -522,7 +534,9 @@ mod tests {
 
         assert!(suite.process_and_enrich_package_v6(&mut pkg).is_ok());
         assert_eq!(
-            pkg.properties.get("v6_advancements_processed").map(|s| s.as_str()),
+            pkg.properties
+                .get("v6_advancements_processed")
+                .map(|s| s.as_str()),
             Some("true")
         );
         assert!(pkg.properties.contains_key("pgo_cflags"));

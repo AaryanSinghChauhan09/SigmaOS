@@ -54,7 +54,9 @@ impl TaskGuidelinesAndRulesGovernor {
                 name: "Zero Security Degradation".to_string(),
                 persona: AgentPersonaRule::SentinelSecurityBoundary,
                 is_mandatory: true,
-                description: "Ensure no hardcoded credentials, buffer overflows, or unsafe memory blocks.".to_string(),
+                description:
+                    "Ensure no hardcoded credentials, buffer overflows, or unsafe memory blocks."
+                        .to_string(),
             },
         );
 
@@ -65,7 +67,9 @@ impl TaskGuidelinesAndRulesGovernor {
                 name: "Consistent Desktop UI Aesthetics".to_string(),
                 persona: AgentPersonaRule::PaletteDesignSystem,
                 is_mandatory: false,
-                description: "Maintain theme color palette harmony and accessibility WCAG compliance.".to_string(),
+                description:
+                    "Maintain theme color palette harmony and accessibility WCAG compliance."
+                        .to_string(),
             },
         );
 
@@ -76,7 +80,9 @@ impl TaskGuidelinesAndRulesGovernor {
                 name: "Sub-Millisecond Execution Speed".to_string(),
                 persona: AgentPersonaRule::BoltPerformanceOptimization,
                 is_mandatory: true,
-                description: "Optimize data structures and avoid lock contention in critical paths.".to_string(),
+                description:
+                    "Optimize data structures and avoid lock contention in critical paths."
+                        .to_string(),
             },
         );
 
@@ -174,7 +180,10 @@ impl WikiDataTransferEngine {
         self.specifications.insert(filename.to_string(), spec);
     }
 
-    pub fn transfer_implemented_data_to_wiki(&mut self, filename: &str) -> Result<String, &'static str> {
+    pub fn transfer_implemented_data_to_wiki(
+        &mut self,
+        filename: &str,
+    ) -> Result<String, &'static str> {
         if let Some(spec) = self.specifications.get_mut(filename) {
             if !spec.is_fully_implemented {
                 return Err("WikiSync Error: Specification is not fully implemented yet");
@@ -261,7 +270,9 @@ mod tests {
     #[test]
     fn test_wiki_data_transfer_engine() {
         let mut sync = WikiDataTransferEngine::new();
-        let path = sync.transfer_implemented_data_to_wiki("ROADMAP.md").unwrap();
+        let path = sync
+            .transfer_implemented_data_to_wiki("ROADMAP.md")
+            .unwrap();
         assert!(path.contains("wiki_repo/"));
         assert_eq!(sync.total_synced_specs(), 1);
 

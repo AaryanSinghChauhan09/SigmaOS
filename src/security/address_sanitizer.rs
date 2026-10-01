@@ -37,50 +37,50 @@ impl AddressSanitizer {
     pub fn allocate(&mut self, size: usize) -> Result<u64, &'static str> {
         let region_id = self.next_region_id.fetch_add(1, Ordering::SeqCst);
         let total_size = size + 2 * self.redzone_size;
-        
+
         let start = region_id * 1000; // Simulated address
         let end = start + total_size as u64;
-        
+
         let canary = self.generate_canary(region_id);
-        
+
         let region = MemoryRegion {
             start,
             end,
             allocated: true,
             canary,
         };
-        
+
         // Set redzones in shadow memory
         for i in 0..self.redzone_size {
             self.shadow_memory.insert(start + i as u64, 0xFA); // Left redzone
             self.shadow_memory.insert(end - i as u64 - 1, 0xFA); // Right redzone
         }
-        
+
         // Set accessible region
         for i in self.redzone_size..(self.redzone_size + size) {
             self.shadow_memory.insert(start + i as u64, 0x00); // Accessible
         }
-        
+
         self.regions.insert(region_id, region);
-        
+
         Ok(start + self.redzone_size as u64) // Return pointer to data (after left redzone)
     }
 
     /// Free a memory region
     pub fn free(&mut self, ptr: u64) -> Result<(), &'static str> {
         let region_id = self.find_region_by_ptr(ptr)?;
-        
+
         if let Some(region) = self.regions.remove(&region_id) {
             // Check canary
             if !self.check_canary(&region) {
                 return Err("Stack corruption detected: canary mismatch");
             }
-            
+
             // Mark region as freed in shadow memory
             for addr in region.start..region.end {
                 self.shadow_memory.insert(addr, 0xFD); // Freed
             }
-            
+
             Ok(())
         } else {
             Err("Region not found")
@@ -93,10 +93,10 @@ impl AddressSanitizer {
             if !region.allocated {
                 continue;
             }
-            
+
             let data_start = region.start + self.redzone_size as u64;
             let data_end = region.end - self.redzone_size as u64;
-            
+
             if ptr >= data_start && ptr + size as u64 <= data_end {
                 // Check shadow memory
                 for i in 0..size {
@@ -109,13 +109,15 @@ impl AddressSanitizer {
                 return true;
             }
         }
-        
+
         false
     }
 
     /// Generate canary
     fn generate_canary(&self, seed: u64) -> u64 {
-        self.canary_seed.wrapping_add(seed).wrapping_mul(0x9E3779B97F4A7C15)
+        self.canary_seed
+            .wrapping_add(seed)
+            .wrapping_mul(0x9E3779B97F4A7C15)
     }
 
     /// Check canary
@@ -128,7 +130,7 @@ impl AddressSanitizer {
         for (&id, region) in &self.regions {
             let data_start = region.start + self.redzone_size as u64;
             let data_end = region.end - self.redzone_size as u64;
-            
+
             if ptr >= data_start && ptr < data_end {
                 return Ok(id);
             }
@@ -154,7 +156,7 @@ mod tests {
     #[test]
     fn test_allocate() {
         let mut asan = AddressSanitizer::new(16);
-        
+
         let ptr = asan.allocate(100).unwrap();
         assert!(ptr > 0);
         assert_eq!(asan.region_count(), 1);
@@ -163,7 +165,7 @@ mod tests {
     #[test]
     fn test_free() {
         let mut asan = AddressSanitizer::new(16);
-        
+
         let ptr = asan.allocate(100).unwrap();
         assert!(asan.free(ptr).is_ok());
         assert_eq!(asan.region_count(), 0);
@@ -172,7 +174,7 @@ mod tests {
     #[test]
     fn test_valid_access() {
         let mut asan = AddressSanitizer::new(16);
-        
+
         let ptr = asan.allocate(100).unwrap();
         assert!(asan.is_valid_access(ptr, 50));
     }
@@ -180,7 +182,7 @@ mod tests {
     #[test]
     fn test_invalid_access_redzone() {
         let mut asan = AddressSanitizer::new(16);
-        
+
         let ptr = asan.allocate(100).unwrap();
         // Access left redzone
         assert!(!asan.is_valid_access(ptr - 1, 1));
@@ -191,12 +193,12 @@ mod tests {
     #[test]
     fn test_shadow_memory() {
         let mut asan = AddressSanitizer::new(16);
-        
+
         let ptr = asan.allocate(100).unwrap();
-        
+
         // Accessible region should be 0x00
         assert_eq!(asan.get_shadow(ptr), Some(0x00));
-        
+
         // Redzone should be 0xFA
         assert_eq!(asan.get_shadow(ptr - 1), Some(0xFA));
     }
@@ -204,10 +206,10 @@ mod tests {
     #[test]
     fn test_use_after_free() {
         let mut asan = AddressSanitizer::new(16);
-        
+
         let ptr = asan.allocate(100).unwrap();
         asan.free(ptr).unwrap();
-        
+
         // Access after free should be invalid
         assert!(!asan.is_valid_access(ptr, 1));
     }

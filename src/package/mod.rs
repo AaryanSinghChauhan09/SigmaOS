@@ -42,11 +42,11 @@ pub mod resolver;
 pub mod sandbox;
 pub mod sigma_pkg;
 pub mod signing;
+pub mod sovereign_distro_package_matrix;
 pub mod spac;
 pub mod store;
 pub mod universal;
 pub mod updater;
-pub mod sovereign_distro_package_matrix;
 pub use sovereign_distro_package_matrix::*;
 pub mod sovereign_distro_package_advancements_v5;
 pub use sovereign_distro_package_advancements_v5::*;
@@ -72,14 +72,19 @@ pub mod sovereign_universal_package_format_master;
 pub use sovereign_universal_package_format_master::*;
 pub mod sovereign_distro_package_advancements_v7;
 pub use sovereign_distro_package_advancements_v7::*;
+pub mod sovereign_distro_package_advancements_v8;
+pub use sovereign_distro_package_advancements_v8::*;
 
+pub use crate::sigpkg::{
+    SovereignUniversalPackageManagerInteropEngine, SovereignUniversalPackageTranslationBridge,
+};
 pub use alpine_apk::{ApkPackage, ApkPackageManager, ApkRepository, ApkWorld};
 pub use arch_aur::{AURPackage, BuildError, SigmaAUR, PKGBUILD};
 pub use bsd_linux_package_innovations::{
     AlpineApkWorldAndVirtualPkgEngine, ApkIndexMetadata, ApkSignatureKey, ApkV3SignatureEngine,
-    AptBugReport, AptMarkRecord, AptMarkState, AptPinRule, ArchCachyosMicroarchOptimizationEngine,
-    ArchCachyOsMicroarchBuildProfileEngine, ArchSplitPackageHookRunnerEngine, CasStorePath,
-    CachedPackageFile, CommunityPackageBuildSource, CommunityRepoBackend,
+    AptBugReport, AptMarkRecord, AptMarkState, AptPinRule, ArchCachyOsMicroarchBuildProfileEngine,
+    ArchCachyosMicroarchOptimizationEngine, ArchSplitPackageHookRunnerEngine, CachedPackageFile,
+    CasStorePath, CommunityPackageBuildSource, CommunityRepoBackend,
     CoprAurBuildRepositoryGatewayEngine, DebconfPreseedEntry, DebconfQuestionType,
     DebianAptMarkPackageStateGovernor, DebianDebconfStatoverrideEngine,
     DebianDpkgTriggersAptListbugsGuardEngine, DeltaRpmSpec, DnfActionKind, DnfActionRecord,
@@ -89,15 +94,16 @@ pub use bsd_linux_package_innovations::{
     FedoraDnfHistoryRollbackJournalEngine, FlakeInputLock, FreeBsdPkgAuditEngine,
     FreeBsdPortsFlavoursAndVuxmlEngine, GentooPortageEapiSlotOperatorEngine,
     GentooPortageSubslotAndUseExpandEngine, HaikuHpkgPackageFsEngine, Hammer2PfsSnapshot,
-    MicroarchCompilerFlags, MicroarchRepoRoute, MicroarchitectureLevel, NetBsdPkginBinaryDatabaseEngine,
-    NetBsdPkgsrcOptionsFrameworkEngine, NixCasStoreGcGovernor, NixFlakesDevshellResolverEngine,
-    NixGuixCasGcProfileEngine, OpenBsdPkgAddSignifyEngine, OpenBsdSignifyBinaryIntegrityEngine,
-    OpenSuseZypperVendorStickinessEngine, PacmanGpgKey, PacmanKeyTrust, PacmanKeyringEngine,
-    PackageBuildAttestation, PackageBuildEnvironment, PkgAuditAdvisory, PkgSummaryRecord,
-    PkgsrcOptionSpec, PortageEnvProfile, PortageEapiLevel, PortagePackageEnvEngine, PpaRepository,
-    RestrictedPackageSpec, RpmDeltaReconstitutionEngine, SecurityAdvisoryDetail,
-    SignifyPqcSignatureHeader, SlackBuildInfo, SlackPackageRecord, SlackwarePkgtoolSlackBuildEngine,
-    SlotOperator, SovereignPackageBuildProvenanceEngine, UbuntuPpaAptPinningEngine, XbpsCachedPkg,
+    MicroarchCompilerFlags, MicroarchRepoRoute, MicroarchitectureLevel,
+    NetBsdPkginBinaryDatabaseEngine, NetBsdPkgsrcOptionsFrameworkEngine, NixCasStoreGcGovernor,
+    NixFlakesDevshellResolverEngine, NixGuixCasGcProfileEngine, OpenBsdPkgAddSignifyEngine,
+    OpenBsdSignifyBinaryIntegrityEngine, OpenSuseZypperVendorStickinessEngine,
+    PackageBuildAttestation, PackageBuildEnvironment, PacmanGpgKey, PacmanKeyTrust,
+    PacmanKeyringEngine, PkgAuditAdvisory, PkgSummaryRecord, PkgsrcOptionSpec, PortageEapiLevel,
+    PortageEnvProfile, PortagePackageEnvEngine, PpaRepository, RestrictedPackageSpec,
+    RpmDeltaReconstitutionEngine, SecurityAdvisoryDetail, SignifyPqcSignatureHeader,
+    SlackBuildInfo, SlackPackageRecord, SlackwarePkgtoolSlackBuildEngine, SlotOperator,
+    SovereignPackageBuildProvenanceEngine, UbuntuPpaAptPinningEngine, XbpsCachedPkg,
     XbpsDowngradeRepoEngine, XbpsRestrictedNonFreeLicenseEngine, XbpsSonameAndOrphanEngine,
     ZypperPackageOffer, ZypperRepository,
 };
@@ -125,15 +131,15 @@ pub use linux_translation::{
     LinuxTranslationService, PackageTranslationUdf, PacmanPackageDriverTranslator,
     RpmPackageDriverTranslator, GLOBAL_TRANSLATION_SERVICE, GLOBAL_TRANSLATION_UDF,
 };
+pub use mint_package::{
+    MintInstallManager, MintMirrorManager, MintPackageMetadata, MintPackageSource,
+    MintRepositoryMirror, MintSnapshotConfig, MintUpdateLevel, MintUpdateManager,
+};
 pub use nix_guix::{
     Derivation, EnvironmentScrubber, NixPackageManager, StorePath, SystemGeneration,
 };
 pub use paccache::{PaccacheConfig, PaccacheEngine, PackageCacheEntry};
 pub use pactree::{DependencyNode, PactreeEngine};
-pub use mint_package::{
-    MintInstallManager, MintMirrorManager, MintPackageMetadata, MintPackageSource, MintRepositoryMirror,
-    MintSnapshotConfig, MintUpdateLevel, MintUpdateManager,
-};
 pub use repository::{
     MirrorEntry, MirrorSyncEngine, PackagePinEngine, PackagePinRule, PackageRepository,
     PackageTransactionJournal, PinPriority, RepoError, RepositoryManager, RepositoryMetadata,
@@ -141,15 +147,14 @@ pub use repository::{
 };
 pub use repository_config::{RepoConfig, RepositoryConfigManager};
 pub use store::{
-    SigmaSoftwareStore, SoftwareRegistryEntry, /* StoreApp, StoreError, */ // store module not available
-     GLOBAL_SOFTWARE_STORE,
+    SigmaSoftwareStore,
+    SoftwareRegistryEntry, /* StoreApp, StoreError, */
+    // store module not available
+    GLOBAL_SOFTWARE_STORE,
 };
 pub use universal::{
     AptDebManifest, ConflictResolution, DependencyResolver, FreeBsdVuXmlPoudriereAuditAdapter,
-    HomebrewBottleMacPortsAdapter, PackageAdapter, PackageError, PackageFormat, PackagePriority, PackageSource,
-    SovereignUniversalDistroPackageMasterGateway, UnifiedPackage, UniversalPackageManager,
-    ZypperYastRpmDeltaPackageAdapter,
-};
-pub use crate::sigpkg::{
-    SovereignUniversalPackageManagerInteropEngine, SovereignUniversalPackageTranslationBridge,
+    HomebrewBottleMacPortsAdapter, PackageAdapter, PackageError, PackageFormat, PackagePriority,
+    PackageSource, SovereignUniversalDistroPackageMasterGateway, UnifiedPackage,
+    UniversalPackageManager, ZypperYastRpmDeltaPackageAdapter,
 };

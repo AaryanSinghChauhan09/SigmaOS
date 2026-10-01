@@ -12,39 +12,39 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
 use alloc::string::String;
-use core::sync::atomic::{AtomicU64, AtomicBool, Ordering};
+use alloc::vec::Vec;
+use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 
-use crate::klib::*;
 use crate::ai::agent_runtime::{AgentId, AgentKernelBridge};
+use crate::klib::*;
 
 /// Compositor instance (singleton per display)
 pub struct SigmaCompositor {
     /// Wayland display server
     display: WaylandDisplay,
-    
+
     /// GPU renderer (Zig FFI)
     renderer: VulkanRenderer,
-    
+
     /// Window management
     windows: BTreeMap<WindowId, Window>,
     workspaces: Vec<Workspace>,
     active_workspace: usize,
-    
+
     /// Tiling layout engine
     layout_engine: TilingLayoutEngine,
-    
+
     /// Animation engine
     animator: AnimationEngine,
-    
+
     /// Input handling
     input_manager: InputManager,
-    
+
     /// Agent integration
     agent_hooks: AgentHooks,
-    
+
     /// Performance metrics
     frame_count: AtomicU64,
     last_frame_ns: AtomicU64,
@@ -109,12 +109,12 @@ impl VulkanRenderer {
             if instance.is_null() {
                 return Err(CompositorError::RendererInitFailed);
             }
-            
+
             let device = vulkan_create_device(instance);
             if device.is_null() {
                 return Err(CompositorError::RendererInitFailed);
             }
-            
+
             Ok(Self {
                 instance,
                 device,
@@ -123,21 +123,21 @@ impl VulkanRenderer {
             })
         }
     }
-    
+
     pub fn render_frame(&mut self, windows: &[&Window]) -> Result<(), CompositorError> {
         unsafe {
             vulkan_begin_frame(self.device);
-            
+
             for window in windows {
                 self.render_window(window)?;
             }
-            
+
             vulkan_end_frame(self.device);
         }
-        
+
         Ok(())
     }
-    
+
     fn render_window(&mut self, window: &Window) -> Result<(), CompositorError> {
         unsafe {
             vulkan_render_window(
@@ -163,8 +163,10 @@ extern "C" {
     fn vulkan_render_window(
         device: *mut VulkanDevice,
         window_id: u64,
-        x: i32, y: i32,
-        width: u32, height: u32,
+        x: i32,
+        y: i32,
+        width: u32,
+        height: u32,
         buffer: *const u8,
     );
 }
@@ -227,15 +229,17 @@ pub struct Geometry {
 
 impl Geometry {
     pub fn contains(&self, x: i32, y: i32) -> bool {
-        x >= self.x && x < self.x + self.width as i32 &&
-        y >= self.y && y < self.y + self.height as i32
+        x >= self.x
+            && x < self.x + self.width as i32
+            && y >= self.y
+            && y < self.y + self.height as i32
     }
-    
+
     pub fn intersects(&self, other: &Geometry) -> bool {
-        self.x < other.x + other.width as i32 &&
-        self.x + self.width as i32 > other.x &&
-        self.y < other.y + other.height as i32 &&
-        self.y + self.height as i32 > other.y
+        self.x < other.x + other.width as i32
+            && self.x + self.width as i32 > other.x
+            && self.y < other.y + other.height as i32
+            && self.y + self.height as i32 > other.y
     }
 }
 
@@ -262,12 +266,12 @@ pub struct Workspace {
 /// Layout types for tiling
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LayoutType {
-    Dwindle,    // Fibonacci spiral
-    Master,     // Master + stack
-    Columns,    // Equal columns
-    Rows,       // Equal rows
-    Grid,       // Grid layout
-    Floating,   // No tiling
+    Dwindle,  // Fibonacci spiral
+    Master,   // Master + stack
+    Columns,  // Equal columns
+    Rows,     // Equal rows
+    Grid,     // Grid layout
+    Floating, // No tiling
 }
 
 /// Tiling layout engine
@@ -286,7 +290,7 @@ impl TilingLayoutEngine {
             master_ratio: 0.55,
         }
     }
-    
+
     pub fn layout_workspace(
         &self,
         workspace: &Workspace,
@@ -299,10 +303,10 @@ impl TilingLayoutEngine {
             LayoutType::Columns => self.layout_columns(workspace, screen_geometry, windows),
             LayoutType::Rows => self.layout_rows(workspace, screen_geometry, windows),
             LayoutType::Grid => self.layout_grid(workspace, screen_geometry, windows),
-            LayoutType::Floating => {}, // No auto-layout
+            LayoutType::Floating => {} // No auto-layout
         }
     }
-    
+
     fn layout_dwindle(
         &self,
         workspace: &Workspace,
@@ -312,18 +316,23 @@ impl TilingLayoutEngine {
         if workspace.windows.is_empty() {
             return;
         }
-        
+
         // Fibonacci spiral tiling
         let mut x = screen_geometry.x + self.gap_size as i32;
         let mut y = screen_geometry.y + self.gap_size as i32;
         let mut width = screen_geometry.width - 2 * self.gap_size;
         let mut height = screen_geometry.height - 2 * self.gap_size;
         let mut horizontal = true;
-        
+
         for window_id in &workspace.windows {
             if let Some(window) = windows.get_mut(window_id) {
-                window.geometry = Geometry { x, y, width, height };
-                
+                window.geometry = Geometry {
+                    x,
+                    y,
+                    width,
+                    height,
+                };
+
                 // Split for next window
                 if horizontal {
                     let split = (width as f32 * self.master_ratio) as u32;
@@ -334,12 +343,12 @@ impl TilingLayoutEngine {
                     height = split;
                     y += split as i32 + self.gap_size as i32;
                 }
-                
+
                 horizontal = !horizontal;
             }
         }
     }
-    
+
     fn layout_master(
         &self,
         workspace: &Workspace,
@@ -349,10 +358,10 @@ impl TilingLayoutEngine {
         if workspace.windows.is_empty() {
             return;
         }
-        
+
         let gap = self.gap_size;
         let master_width = (screen_geometry.width as f32 * self.master_ratio) as u32;
-        
+
         // First window is master
         if let Some(&master_id) = workspace.windows.first() {
             if let Some(master) = windows.get_mut(&master_id) {
@@ -364,12 +373,12 @@ impl TilingLayoutEngine {
                 };
             }
         }
-        
+
         // Stack remaining windows
         let stack_count = workspace.windows.len() - 1;
         if stack_count > 0 {
             let stack_height = screen_geometry.height / stack_count as u32;
-            
+
             for (i, &window_id) in workspace.windows.iter().skip(1).enumerate() {
                 if let Some(window) = windows.get_mut(&window_id) {
                     window.geometry = Geometry {
@@ -382,7 +391,7 @@ impl TilingLayoutEngine {
             }
         }
     }
-    
+
     fn layout_columns(
         &self,
         workspace: &Workspace,
@@ -393,9 +402,9 @@ impl TilingLayoutEngine {
         if count == 0 {
             return;
         }
-        
+
         let column_width = screen_geometry.width / count as u32;
-        
+
         for (i, &window_id) in workspace.windows.iter().enumerate() {
             if let Some(window) = windows.get_mut(&window_id) {
                 window.geometry = Geometry {
@@ -407,7 +416,7 @@ impl TilingLayoutEngine {
             }
         }
     }
-    
+
     fn layout_rows(
         &self,
         workspace: &Workspace,
@@ -418,9 +427,9 @@ impl TilingLayoutEngine {
         if count == 0 {
             return;
         }
-        
+
         let row_height = screen_geometry.height / count as u32;
-        
+
         for (i, &window_id) in workspace.windows.iter().enumerate() {
             if let Some(window) = windows.get_mut(&window_id) {
                 window.geometry = Geometry {
@@ -432,7 +441,7 @@ impl TilingLayoutEngine {
             }
         }
     }
-    
+
     fn layout_grid(
         &self,
         workspace: &Workspace,
@@ -443,18 +452,18 @@ impl TilingLayoutEngine {
         if count == 0 {
             return;
         }
-        
+
         let cols = (count as f32).sqrt().ceil() as u32;
         let rows = (count as f32 / cols as f32).ceil() as u32;
-        
+
         let cell_width = screen_geometry.width / cols;
         let cell_height = screen_geometry.height / rows;
-        
+
         for (i, &window_id) in workspace.windows.iter().enumerate() {
             if let Some(window) = windows.get_mut(&window_id) {
                 let col = (i as u32) % cols;
                 let row = (i as u32) / cols;
-                
+
                 window.geometry = Geometry {
                     x: screen_geometry.x + (col * cell_width) as i32 + self.gap_size as i32,
                     y: screen_geometry.y + (row * cell_height) as i32 + self.gap_size as i32,
@@ -482,7 +491,7 @@ impl AnimationEngine {
             target_fps,
         }
     }
-    
+
     pub fn animate_window(
         &mut self,
         window_id: WindowId,
@@ -499,11 +508,11 @@ impl AnimationEngine {
             easing: EasingFunction::EaseInOutCubic,
         });
     }
-    
+
     pub fn update(&mut self, delta_ns: u64, windows: &mut BTreeMap<WindowId, Window>) {
         self.animations.retain_mut(|anim| {
             anim.elapsed_ns += delta_ns;
-            
+
             if anim.elapsed_ns >= anim.duration_ns {
                 // Animation complete
                 if let Some(window) = windows.get_mut(&anim.window_id) {
@@ -514,7 +523,7 @@ impl AnimationEngine {
                 // Interpolate
                 let progress = anim.elapsed_ns as f32 / anim.duration_ns as f32;
                 let eased = anim.easing.ease(progress);
-                
+
                 if let Some(window) = windows.get_mut(&anim.window_id) {
                     window.geometry = anim.interpolate(eased);
                 }
@@ -537,10 +546,16 @@ struct Animation {
 impl Animation {
     fn interpolate(&self, t: f32) -> Geometry {
         Geometry {
-            x: self.start_geometry.x + ((self.end_geometry.x - self.start_geometry.x) as f32 * t) as i32,
-            y: self.start_geometry.y + ((self.end_geometry.y - self.start_geometry.y) as f32 * t) as i32,
-            width: self.start_geometry.width + ((self.end_geometry.width as i32 - self.start_geometry.width as i32) as f32 * t) as u32,
-            height: self.start_geometry.height + ((self.end_geometry.height as i32 - self.start_geometry.height as i32) as f32 * t) as u32,
+            x: self.start_geometry.x
+                + ((self.end_geometry.x - self.start_geometry.x) as f32 * t) as i32,
+            y: self.start_geometry.y
+                + ((self.end_geometry.y - self.start_geometry.y) as f32 * t) as i32,
+            width: self.start_geometry.width
+                + ((self.end_geometry.width as i32 - self.start_geometry.width as i32) as f32 * t)
+                    as u32,
+            height: self.start_geometry.height
+                + ((self.end_geometry.height as i32 - self.start_geometry.height as i32) as f32 * t)
+                    as u32,
         }
     }
 }
@@ -640,7 +655,7 @@ pub enum CompositorError {
 impl SigmaCompositor {
     pub fn new() -> Result<Self, CompositorError> {
         let renderer = VulkanRenderer::new()?;
-        
+
         Ok(Self {
             display: WaylandDisplay {
                 socket_path: "/run/user/1000/wayland-0".into(),
@@ -649,15 +664,13 @@ impl SigmaCompositor {
             },
             renderer,
             windows: BTreeMap::new(),
-            workspaces: vec![
-                Workspace {
-                    id: 0,
-                    name: "1".into(),
-                    windows: Vec::new(),
-                    layout: LayoutType::Dwindle,
-                    active_window: None,
-                }
-            ],
+            workspaces: vec![Workspace {
+                id: 0,
+                name: "1".into(),
+                windows: Vec::new(),
+                layout: LayoutType::Dwindle,
+                active_window: None,
+            }],
             active_workspace: 0,
             layout_engine: TilingLayoutEngine::new(),
             animator: AnimationEngine::new(60), // 60 FPS default
@@ -672,18 +685,18 @@ impl SigmaCompositor {
             vsync_enabled: AtomicBool::new(true),
         })
     }
-    
+
     pub fn run(&mut self) -> Result<(), CompositorError> {
         loop {
             self.render_frame()?;
         }
     }
-    
+
     fn render_frame(&mut self) -> Result<(), CompositorError> {
         // Update animations
         let delta_ns = 16_666_666; // ~60 FPS
         self.animator.update(delta_ns, &mut self.windows);
-        
+
         // Collect visible windows
         let workspace = &self.workspaces[self.active_workspace];
         let visible_windows: Vec<&Window> = workspace
@@ -691,12 +704,12 @@ impl SigmaCompositor {
             .iter()
             .filter_map(|id| self.windows.get(id))
             .collect();
-        
+
         // Render
         self.renderer.render_frame(&visible_windows)?;
-        
+
         self.frame_count.fetch_add(1, Ordering::Relaxed);
-        
+
         Ok(())
     }
 }
@@ -704,19 +717,29 @@ impl SigmaCompositor {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_geometry_intersection() {
-        let g1 = Geometry { x: 0, y: 0, width: 100, height: 100 };
-        let g2 = Geometry { x: 50, y: 50, width: 100, height: 100 };
+        let g1 = Geometry {
+            x: 0,
+            y: 0,
+            width: 100,
+            height: 100,
+        };
+        let g2 = Geometry {
+            x: 50,
+            y: 50,
+            width: 100,
+            height: 100,
+        };
         assert!(g1.intersects(&g2));
     }
-    
+
     #[test]
     fn test_easing_functions() {
         let ease = EasingFunction::Linear;
         assert_eq!(ease.ease(0.5), 0.5);
-        
+
         let ease = EasingFunction::EaseOutQuad;
         assert!(ease.ease(0.5) > 0.5);
     }
