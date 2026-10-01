@@ -41,11 +41,30 @@ pub enum UniversalDistroPackageFormat {
     AlpineApk,
     VoidXbps,
     GentooEbuild,
-    BsdPkg,
+    FreeBsdPkg,
+    OpenBsdPkg,
+    NetBsdPkgsrc,
     NixFlake,
+    GuixScheme,
     FlatpakApp,
     SnapApp,
     AppImage,
+    SlackwareTxz,
+    ZypperSpec,
+    SolusEopkg,
+    OpenWrtIpk,
+    YoctoOpkg,
+    SolarisIps,
+    SwupdBundle,
+    HomebrewBottle,
+    AndroidAab,
+    MacOsApp,
+    OciContainer,
+    SystemdSysext,
+    PythonWheel,
+    CargoCrate,
+    RubyGem,
+    DotnetNuget,
     NativeSigPkg,
 }
 
@@ -54,18 +73,87 @@ impl UniversalDistroPackageFormat {
         match self {
             Self::AptDeb => "apt (.deb)",
             Self::PacmanPkg => "pacman (.pkg.tar.zst / PKGBUILD)",
-            Self::DnfRpm => "dnf (.rpm)",
+            Self::DnfRpm => "dnf (.rpm / spec)",
             Self::AlpineApk => "apk (.apk / APKBUILD)",
-            Self::VoidXbps => "xbps (.xbps)",
+            Self::VoidXbps => "xbps (.xbps / template)",
             Self::GentooEbuild => "portage (.ebuild)",
-            Self::BsdPkg => "bsd-pkg (.pkg / ports)",
+            Self::FreeBsdPkg => "freebsd-pkg (+MANIFEST / ports)",
+            Self::OpenBsdPkg => "openbsd-pkg (+CONTENTS)",
+            Self::NetBsdPkgsrc => "netbsd-pkgsrc (Makefile)",
             Self::NixFlake => "nix (flake / derivation)",
-            Self::FlatpakApp => "flatpak (.flatpakref)",
-            Self::SnapApp => "snap (.snap)",
+            Self::GuixScheme => "guix (scheme / nar)",
+            Self::FlatpakApp => "flatpak (.flatpakref / .flatpak)",
+            Self::SnapApp => "snap (snap.yaml / .snap)",
             Self::AppImage => "appimage (.AppImage)",
+            Self::SlackwareTxz => "slackware (.txz / SlackBuild)",
+            Self::ZypperSpec => "zypper (.rpm / .spec)",
+            Self::SolusEopkg => "eopkg (pspec.xml / .eopkg)",
+            Self::OpenWrtIpk => "opkg / ipk (control / .ipk)",
+            Self::YoctoOpkg => "yocto (.opkg)",
+            Self::SolarisIps => "solaris ips (.p5p / manifest)",
+            Self::SwupdBundle => "swupd (bundle / manifest)",
+            Self::HomebrewBottle => "homebrew (.bottle.tar.gz / Formula)",
+            Self::AndroidAab => "android (.aab / .apk)",
+            Self::MacOsApp => "macos (.app / .dmg)",
+            Self::OciContainer => "oci (container image tarball)",
+            Self::SystemdSysext => "systemd-sysext (.raw / .raw.xz)",
+            Self::PythonWheel => "python (.whl / setup.py)",
+            Self::CargoCrate => "cargo (.crate / Cargo.toml)",
+            Self::RubyGem => "ruby (.gem / gemspec)",
+            Self::DotnetNuget => "dotnet (.nupkg / nuspec)",
             Self::NativeSigPkg => "sigma-pkg (.sigpkg)",
         }
     }
+
+    /// Autodetects foreign package format from raw manifest text content keywords
+    pub fn autodetect_format_from_manifest(manifest_text: &str) -> Self {
+        let lower = manifest_text.to_lowercase();
+        if lower.contains("package:") && (lower.contains("depends:") || lower.contains("architecture:")) {
+            Self::AptDeb
+        } else if lower.contains("pkgname=") || lower.contains("pkgver=") || lower.contains("arch=(") {
+            Self::PacmanPkg
+        } else if lower.contains("%description") || lower.contains("summary:") || lower.contains("%prep") {
+            Self::DnfRpm
+        } else if lower.contains("# maintainer:") && (lower.contains("pkgname=") || lower.contains("subpackages=")) {
+            Self::AlpineApk
+        } else if lower.contains("pkgname=") && lower.contains("short_desc=") {
+            Self::VoidXbps
+        } else if lower.contains("eapi=") || lower.contains("keywords=") || lower.contains("inherit ") {
+            Self::GentooEbuild
+        } else if lower.contains("name = ") && lower.contains("origin = ") {
+            Self::FreeBsdPkg
+        } else if lower.contains("@name ") || lower.contains("@cwd ") {
+            Self::OpenBsdPkg
+        } else if lower.contains("inputs.nixpkgs") || lower.contains("stdenv.mkderivation") || lower.contains("{ pkgs, ... }") {
+            Self::NixFlake
+        } else if lower.contains("define-public") && lower.contains("package-with-explicit-inputs") {
+            Self::GuixScheme
+        } else if lower.contains("app-id:") || lower.contains("runtime:") || lower.contains("sdk:") {
+            Self::FlatpakApp
+        } else if lower.contains("name:") && lower.contains("confinement:") {
+            Self::SnapApp
+        } else if lower.contains("<eopkg>") || lower.contains("<source>") || lower.contains("<package>") {
+            Self::SolusEopkg
+        } else if lower.contains("swupd") || lower.contains("bundle:") {
+            Self::SwupdBundle
+        } else if lower.contains("class ") && lower.contains("< formula") {
+            Self::HomebrewBottle
+        } else if lower.contains("[package]") && lower.contains("name =") && lower.contains("version =") {
+            Self::CargoCrate
+        } else {
+            Self::NativeSigPkg
+        }
+    }
+}
+
+/// Classification of package scriptlet triggers and hooks
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum UniversalScriptletCategory {
+    PreInstall,
+    PostInstall,
+    PreRemove,
+    PostRemove,
+    TriggerHook,
 }
 
 /// Normalized Package Manifest Representation in sigma-pkg
@@ -212,6 +300,117 @@ impl SovereignUniversalPmPrBridgeEngine {
 
         Ok(sigpkg_manifest)
     }
+
+    /// Transpiles a raw foreign package manifest text into a normalized PR submission record
+    pub fn transpile_foreign_manifest_to_pr(
+        &mut self,
+        submitter: &str,
+        raw_manifest_text: &str,
+        pqc_signature: &[u8],
+    ) -> Result<u64, &'static str> {
+        if raw_manifest_text.trim().is_empty() {
+            return Err("Empty manifest text");
+        }
+
+        let format = UniversalDistroPackageFormat::autodetect_format_from_manifest(raw_manifest_text);
+
+        // Extract package name and version from manifest text or fallback
+        let mut extracted_name = String::new();
+        let mut extracted_version = String::new();
+        let mut extracted_deps = Vec::new();
+
+        for line in raw_manifest_text.lines() {
+            let l = line.trim();
+            if l.starts_with("Package:") || l.starts_with("pkgname=") || l.starts_with("Name:") || l.starts_with("name =") {
+                let parts: Vec<&str> = l.split(&[':', '=', '"', '\''][..]).collect();
+                if parts.len() >= 2 && extracted_name.is_empty() {
+                    extracted_name = parts[1].trim().trim_matches('"').trim_matches('\'').to_string();
+                }
+            } else if l.starts_with("Version:") || l.starts_with("pkgver=") || l.starts_with("version =") {
+                let parts: Vec<&str> = l.split(&[':', '=', '"', '\''][..]).collect();
+                if parts.len() >= 2 && extracted_version.is_empty() {
+                    extracted_version = parts[1].trim().trim_matches('"').trim_matches('\'').to_string();
+                }
+            } else if l.contains("Depends:") || l.contains("depends=") || l.contains("Requires:") {
+                let parts: Vec<&str> = l.split(&[':', '='][..]).collect();
+                if parts.len() >= 2 {
+                    for dep in parts[1].split(',') {
+                        let clean_dep = dep.trim().split_whitespace().next().unwrap_or("").to_string();
+                        if !clean_dep.is_empty() && !extracted_deps.contains(&clean_dep) {
+                            extracted_deps.push(clean_dep);
+                        }
+                    }
+                }
+            }
+        }
+
+        if extracted_name.is_empty() {
+            extracted_name = "transpiled-package".to_string();
+        }
+        if extracted_version.is_empty() {
+            extracted_version = "1.0.0".to_string();
+        }
+
+        // Canonical dependency mapping (e.g., glibc/musl -> sovereign-libc)
+        let mapped_deps: Vec<String> = extracted_deps
+            .into_iter()
+            .map(|dep| {
+                let lower = dep.to_lowercase();
+                if lower.contains("glibc") || lower == "musl" || lower.contains("libc") {
+                    "sovereign-libc".to_string()
+                } else if lower.contains("ssl") || lower.contains("crypto") || lower.contains("tls") {
+                    "sovereign-openssl".to_string()
+                } else if lower.contains("zlib") || lower.contains("zstd") || lower.contains("xz") {
+                    "sovereign-compression".to_string()
+                } else {
+                    dep
+                }
+            })
+            .collect();
+
+        let dep_refs: Vec<&str> = mapped_deps.iter().map(|s| s.as_str()).collect();
+
+        let pr_id = self.submit_foreign_package_pr(
+            submitter,
+            &extracted_name,
+            &extracted_version,
+            format,
+            raw_manifest_text,
+            &dep_refs,
+            pqc_signature,
+        );
+
+        Ok(pr_id)
+    }
+
+    /// Computes a unified line-by-line diff between two manifest texts for PR review
+    pub fn generate_pr_manifest_diff(&self, old_manifest: &str, new_manifest: &str) -> String {
+        let mut diff = String::new();
+        let old_lines: Vec<&str> = old_manifest.lines().collect();
+        let new_lines: Vec<&str> = new_manifest.lines().collect();
+
+        for line in &old_lines {
+            if !new_lines.contains(line) {
+                diff.push_str("- ");
+                diff.push_str(line);
+                diff.push('\n');
+            }
+        }
+
+        for line in &new_lines {
+            if !old_lines.contains(line) {
+                diff.push_str("+ ");
+                diff.push_str(line);
+                diff.push('\n');
+            } else {
+                diff.push_str("  ");
+                diff.push_str(line);
+                diff.push('\n');
+            }
+        }
+
+        diff
+    }
 }
 
 impl Default for SovereignUniversalPmPrBridgeEngine {
@@ -258,11 +457,17 @@ mod tests {
             (UniversalDistroPackageFormat::AlpineApk, "alpine-app", &["musl"][..]),
             (UniversalDistroPackageFormat::VoidXbps, "void-app", &["xbps"][..]),
             (UniversalDistroPackageFormat::GentooEbuild, "gentoo-app", &["portage"][..]),
-            (UniversalDistroPackageFormat::BsdPkg, "freebsd-app", &["libc"][..]),
+            (UniversalDistroPackageFormat::FreeBsdPkg, "freebsd-app", &["libc"][..]),
+            (UniversalDistroPackageFormat::OpenBsdPkg, "openbsd-app", &["libc"][..]),
+            (UniversalDistroPackageFormat::NetBsdPkgsrc, "netbsd-app", &["libc"][..]),
             (UniversalDistroPackageFormat::NixFlake, "nix-app", &["stdenv"][..]),
+            (UniversalDistroPackageFormat::GuixScheme, "guix-app", &["stdenv"][..]),
             (UniversalDistroPackageFormat::FlatpakApp, "flatpak-app", &["org.freedesktop.Sdk"][..]),
             (UniversalDistroPackageFormat::SnapApp, "snap-app", &["core22"][..]),
             (UniversalDistroPackageFormat::AppImage, "appimage-app", &["fuse"][..]),
+            (UniversalDistroPackageFormat::SwupdBundle, "clearlinux-app", &["swupd"][..]),
+            (UniversalDistroPackageFormat::HomebrewBottle, "homebrew-app", &["openssl"][..]),
+            (UniversalDistroPackageFormat::CargoCrate, "cargo-app", &["serde"][..]),
         ];
 
         let mut bridge = SovereignUniversalPmPrBridgeEngine::new();
@@ -283,7 +488,36 @@ mod tests {
             assert_eq!(manifest.original_format, fmt);
         }
 
-        assert_eq!(bridge.total_prs_merged, 10);
+        assert_eq!(bridge.total_prs_merged, 16);
+    }
+
+    #[test]
+    fn test_autodetect_and_transpile_foreign_manifests() {
+        let mut bridge = SovereignUniversalPmPrBridgeEngine::new();
+
+        // Debian manifest text
+        let deb_text = "Package: nginx\nVersion: 1.24.0\nDepends: libc6, libssl-dev\nArchitecture: amd64";
+        let pr1 = bridge.transpile_foreign_manifest_to_pr("alice", deb_text, b"sig_pqc").unwrap();
+        assert!(bridge.validate_sat_pr_dependencies(pr1).unwrap());
+        let manifest1 = bridge.merge_pr_to_sigma_pkg(pr1).unwrap();
+        assert_eq!(manifest1.name, "nginx");
+        assert_eq!(manifest1.original_format, UniversalDistroPackageFormat::AptDeb);
+        assert!(manifest1.declared_dependencies.contains(&"sovereign-libc".to_string()));
+
+        // Arch PKGBUILD manifest text
+        let arch_text = "pkgname=ripgrep\npkgver=14.1.0\ndepends=('glibc' 'pcre2')";
+        let pr2 = bridge.transpile_foreign_manifest_to_pr("bob", arch_text, b"sig_pqc").unwrap();
+        assert!(bridge.validate_sat_pr_dependencies(pr2).unwrap());
+        let manifest2 = bridge.merge_pr_to_sigma_pkg(pr2).unwrap();
+        assert_eq!(manifest2.name, "ripgrep");
+        assert_eq!(manifest2.original_format, UniversalDistroPackageFormat::PacmanPkg);
+
+        // PR manifest diff test
+        let old_manifest = "Package: nginx\nVersion: 1.22.0\nDepends: libc6";
+        let new_manifest = "Package: nginx\nVersion: 1.24.0\nDepends: libc6, libssl-dev";
+        let diff = bridge.generate_pr_manifest_diff(old_manifest, new_manifest);
+        assert!(diff.contains("- Version: 1.22.0"));
+        assert!(diff.contains("+ Version: 1.24.0"));
     }
 
     #[test]

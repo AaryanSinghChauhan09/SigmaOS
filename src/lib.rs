@@ -19,6 +19,7 @@ pub mod dashboard;
 pub mod desktop;
 pub mod device;
 pub mod distro;
+pub use distro::sovereign_linux_bsd_wiki_master_engine::*;
 pub mod driver;
 pub mod drivers;
 pub use drivers::sovereign_comprehensive_drivers::*;
@@ -34,6 +35,9 @@ pub mod network;
 pub mod observability;
 pub mod orchestration;
 pub mod package;
+pub use package::{
+    SovereignDistroPackageAdvancementsSuiteV10, UniversalForeignPackageFormat,
+};
 pub mod process;
 pub mod productivity;
 pub use productivity::*;

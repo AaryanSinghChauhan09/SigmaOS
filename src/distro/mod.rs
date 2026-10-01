@@ -120,6 +120,8 @@ pub mod tiny_core;
 pub mod visual_dashboard;
 pub mod void_runit;
 pub mod wiki_ideas_implementation;
+pub mod sovereign_linux_bsd_wiki_master_engine;
+pub use sovereign_linux_bsd_wiki_master_engine::*;
 
 pub use clear_linux::{
     ClearLinuxStatelessEngine, ConfigLocation, ConfigState, SwupdBundle, SwupdUpdateManager,
