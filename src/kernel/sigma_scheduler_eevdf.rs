@@ -225,7 +225,7 @@ impl SigmaEevdfRunqueue {
             k
         } else {
             // Fallback: smallest deadline among all tasks (EEVDF lag compensation).
-            *self.tasks.keys().next().unwrap()
+            *self.tasks.keys().next()?
         };
 
         self.curr = Some(key.1);

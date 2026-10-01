@@ -215,7 +215,7 @@ impl BuddyAllocator {
         // Find the smallest available order >= requested order.
         let avail_order = (order..MAX_ORDER).find(|&o| !self.free_lists[o].is_empty())?;
 
-        let mut block = self.free_lists[avail_order].pop_front().unwrap();
+        let mut block = self.free_lists[avail_order].pop_front()?;
         self.free_pages -= 1 << avail_order;
 
         // Split down to the requested order.

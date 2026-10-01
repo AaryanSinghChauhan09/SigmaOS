@@ -191,29 +191,30 @@ impl WorkqueueSubsystem {
             }
 
             if let Some(work_idx) = highest_priority_idx {
-                let mut work = self.pending_work.remove(work_idx).unwrap();
-                work.set_state(WorkState::Running);
-                work.started_at.store(now, Ordering::SeqCst);
-                self.workers[idx].set_busy(true);
-                self.workers[idx].work_count.fetch_add(1, Ordering::SeqCst);
+                if let Some(mut work) = self.pending_work.remove(work_idx) {
+                    work.set_state(WorkState::Running);
+                    work.started_at.store(now, Ordering::SeqCst);
+                    self.workers[idx].set_busy(true);
+                    self.workers[idx].work_count.fetch_add(1, Ordering::SeqCst);
 
-                let work_id = work.id;
-                let user_data = work.user_data;
+                    let work_id = work.id;
+                    let user_data = work.user_data;
 
-                if let Some(callback) = work.callback {
-                    let result = callback(work_id, user_data);
+                    if let Some(callback) = work.callback {
+                        let result = callback(work_id, user_data);
 
-                    work.set_state(if result.is_ok() {
-                        WorkState::Completed
-                    } else {
-                        WorkState::Failed
-                    });
-                    work.completed_at.store(now, Ordering::SeqCst);
+                        work.set_state(if result.is_ok() {
+                            WorkState::Completed
+                        } else {
+                            WorkState::Failed
+                        });
+                        work.completed_at.store(now, Ordering::SeqCst);
+                    }
+
+                    self.workers[idx].set_busy(false);
+                    completed.push(work_id);
+                    self.completed_work.push_back(work);
                 }
-
-                self.workers[idx].set_busy(false);
-                completed.push(work_id);
-                self.completed_work.push_back(work);
             }
         }
 

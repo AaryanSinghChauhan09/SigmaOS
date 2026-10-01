@@ -168,7 +168,7 @@ impl Tmpfs {
             return Err("Invalid path".to_string());
         }
 
-        let filename = parts.last().unwrap();
+        let filename = parts.last().ok_or_else(|| "Invalid path".to_string())?;
         let dir_path: Vec<String> = parts[..parts.len() - 1].to_vec();
 
         let current = self.navigate_to_directory_mut(&dir_path)?;
@@ -188,7 +188,7 @@ impl Tmpfs {
             return Err("Invalid path".to_string());
         }
 
-        let filename = parts.last().unwrap();
+        let filename = parts.last().ok_or_else(|| "Invalid path".to_string())?;
         let dir_path: Vec<String> = parts[..parts.len() - 1].to_vec();
 
         let current = self.navigate_to_directory_mut(&dir_path)?;
@@ -213,7 +213,7 @@ impl Tmpfs {
             return Err("Invalid path".to_string());
         }
 
-        let filename = parts.last().unwrap();
+        let filename = parts.last().ok_or_else(|| "Invalid path".to_string())?;
         let dir_path: Vec<String> = parts[..parts.len() - 1].to_vec();
 
         let current = self.navigate_to_directory(&dir_path)?;
@@ -235,7 +235,7 @@ impl Tmpfs {
             return Err("Invalid path".to_string());
         }
 
-        let filename = parts.last().unwrap();
+        let filename = parts.last().ok_or_else(|| "Invalid path".to_string())?;
         let dir_path: Vec<String> = parts[..parts.len() - 1].to_vec();
 
         let current = self.navigate_to_directory_mut(&dir_path)?;
@@ -253,7 +253,7 @@ impl Tmpfs {
             return Err("Invalid path".to_string());
         }
 
-        let dir_name = parts.last().unwrap();
+        let dir_name = parts.last().ok_or_else(|| "Invalid path".to_string())?;
         let dir_path: Vec<String> = parts[..parts.len() - 1].to_vec();
 
         let current = self.navigate_to_directory_mut(&dir_path)?;
@@ -273,7 +273,7 @@ impl Tmpfs {
             return Err("Invalid path".to_string());
         }
 
-        let dir_name = parts.last().unwrap();
+        let dir_name = parts.last().ok_or_else(|| "Invalid path".to_string())?;
         let dir_path: Vec<String> = parts[..parts.len() - 1].to_vec();
 
         let current = self.navigate_to_directory_mut(&dir_path)?;

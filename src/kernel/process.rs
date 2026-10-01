@@ -339,7 +339,7 @@ impl ProcessManager {
             }
             if let Some(child) = self.processes.get(&cpid) {
                 if child.state == ProcessState::Zombie {
-                    let code = child.exit_code.unwrap();
+                    let code = child.exit_code.unwrap_or(0);
                     self.cleanup_zombie(cpid);
                     return Some(code);
                 }

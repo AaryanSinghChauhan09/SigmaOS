@@ -112,7 +112,7 @@ impl SlabAllocator {
 
         if let (Some(s_idx), Some(obj_idx)) = (slab_idx, obj_idx) {
             let ptr = self.allocate_memory(object_size);
-            let cache = self.caches.get_mut(cache_name).unwrap();
+            let cache = self.caches.get_mut(cache_name).ok_or("Cache not found")?;
             let slab = &mut cache.slabs[s_idx];
             slab.objects[obj_idx] = Some(ptr);
             slab.inuse += 1;
@@ -137,9 +137,9 @@ impl SlabAllocator {
             (slab, cache.objects_per_slab)
         };
 
-        let obj = new_slab.objects[0].unwrap();
+        let obj = new_slab.objects[0].ok_or("Slab object allocation failed")?;
 
-        let cache = self.caches.get_mut(cache_name).unwrap();
+        let cache = self.caches.get_mut(cache_name).ok_or("Cache not found")?;
         cache.slabs.push(new_slab);
         cache.free_objects = objects_per_slab - 1;
 

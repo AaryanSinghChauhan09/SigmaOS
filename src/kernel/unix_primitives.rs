@@ -488,7 +488,8 @@ impl FutexTable {
             return &mut self.buckets[pos].1;
         }
         self.buckets.push((uaddr, Vec::new()));
-        &mut self.buckets.last_mut().unwrap().1
+        let last_idx = self.buckets.len() - 1;
+        &mut self.buckets[last_idx].1
     }
 
     /// FUTEX_WAIT: park if `*uaddr` still equals `expected`.
@@ -1429,7 +1430,7 @@ impl Sbuf {
             return Err("sbuf overflow");
         }
         self.finished = true;
-        core::String::from_utf8(&self.buf).map_err(|_| "sbuf invalid utf8")
+        core::str::from_utf8(&self.buf).map_err(|_| "sbuf invalid utf8")
     }
 
     pub fn as_bytes(&self) -> &[u8] {
@@ -1444,7 +1445,7 @@ impl Sbuf {
 fn int_to_str(mut v: i64, buf: &mut [u8; 32]) -> &str {
     if v == 0 {
         buf[0] = b'0';
-        return core::String::from_utf8(&buf[..1]).unwrap();
+        return core::str::from_utf8(&buf[..1]).unwrap_or("0");
     }
     let neg = v < 0;
     if neg {
@@ -1460,7 +1461,7 @@ fn int_to_str(mut v: i64, buf: &mut [u8; 32]) -> &str {
         i -= 1;
         buf[i] = b'-';
     }
-    core::String::from_utf8(&buf[i..]).unwrap()
+    core::str::from_utf8(&buf[i..]).unwrap_or("")
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1548,7 +1549,8 @@ impl Witness {
             return &mut self.held[pos].1;
         }
         self.held.push((thread, Vec::new()));
-        &mut self.held.last_mut().unwrap().1
+        let last_idx = self.held.len() - 1;
+        &mut self.held[last_idx].1
     }
 
     pub fn violations(&self) -> u64 {
@@ -1593,7 +1595,7 @@ impl Turnstile {
             priority: prio,
         });
         self.propagate();
-        Err(self.owner.unwrap())
+        Err(self.owner.unwrap_or(0))
     }
 
     pub fn unlock(&mut self, tid: u64) -> Option<u64> {

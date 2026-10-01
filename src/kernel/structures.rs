@@ -270,7 +270,7 @@ impl AdvancedAlgorithmsManager {
                         None => best_idx = Some(idx),
                         Some(best) => {
                             if task.absolute_deadline
-                                < queue[best].as_ref().unwrap().absolute_deadline
+                                < queue[best].as_ref().map(|t| t.absolute_deadline).unwrap_or(u64::MAX)
                             {
                                 best_idx = Some(idx);
                             }
@@ -280,7 +280,7 @@ impl AdvancedAlgorithmsManager {
             }
         }
 
-        best_idx.map(|idx| queue[idx].unwrap())
+        best_idx.and_then(|idx| queue[idx])
     }
 
     // 2. PROBABILISTIC LOTTERY SCHEDULER

@@ -411,7 +411,7 @@ impl SigmaDmaSubsystem {
             device_id,
         };
         self.coherent_buffers.push(buf);
-        Ok(self.coherent_buffers.last().unwrap())
+        self.coherent_buffers.last().ok_or("Failed to retrieve coherent buffer")
     }
 
     /// Submit a DMA transfer on a channel.

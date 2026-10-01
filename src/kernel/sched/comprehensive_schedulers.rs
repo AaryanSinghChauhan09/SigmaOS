@@ -610,7 +610,7 @@ impl BfqCompletelyFairIoScheduler {
         let active_pids: Vec<u32> = self.process_queues.keys().copied().collect();
 
         for pid in active_pids {
-            let budget = self.process_budgets_sectors.get_mut(&pid).unwrap();
+            let budget = self.process_budgets_sectors.entry(pid).or_insert(256);
             if *budget > 0 {
                 if let Some(req_queue) = self.process_queues.get_mut(&pid) {
                     if !req_queue.is_empty() {

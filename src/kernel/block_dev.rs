@@ -144,26 +144,30 @@ impl DeadlineScheduler {
 
         // Serve reads preferentially; find next sector >= head
         if let Some((&sector, _)) = self.read_queue.range(self.head_pos..).next() {
-            let bio = self.read_queue.remove(&sector).unwrap();
-            self.head_pos = bio.end_sector();
-            return Some(bio);
+            if let Some(bio) = self.read_queue.remove(&sector) {
+                self.head_pos = bio.end_sector();
+                return Some(bio);
+            }
         }
         // Wrap around (C-SCAN)
         if let Some((&sector, _)) = self.read_queue.iter().next() {
-            let bio = self.read_queue.remove(&sector).unwrap();
-            self.head_pos = bio.end_sector();
-            return Some(bio);
+            if let Some(bio) = self.read_queue.remove(&sector) {
+                self.head_pos = bio.end_sector();
+                return Some(bio);
+            }
         }
         // Then writes
         if let Some((&sector, _)) = self.write_queue.range(self.head_pos..).next() {
-            let bio = self.write_queue.remove(&sector).unwrap();
-            self.head_pos = bio.end_sector();
-            return Some(bio);
+            if let Some(bio) = self.write_queue.remove(&sector) {
+                self.head_pos = bio.end_sector();
+                return Some(bio);
+            }
         }
         if let Some((&sector, _)) = self.write_queue.iter().next() {
-            let bio = self.write_queue.remove(&sector).unwrap();
-            self.head_pos = bio.end_sector();
-            return Some(bio);
+            if let Some(bio) = self.write_queue.remove(&sector) {
+                self.head_pos = bio.end_sector();
+                return Some(bio);
+            }
         }
         None
     }

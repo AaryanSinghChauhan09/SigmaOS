@@ -293,8 +293,8 @@ impl StdCallSimulator {
         }
 
         // Pop in reverse order
-        let arg1 = self.stack.pop().unwrap();
-        let arg2 = self.stack.pop().unwrap();
+        let arg1 = self.stack.pop().ok_or("Stack underflow during stdcall execution")?;
+        let arg2 = self.stack.pop().ok_or("Stack underflow during stdcall execution")?;
 
         // Perform the call
         let result = routine(arg1, arg2);
