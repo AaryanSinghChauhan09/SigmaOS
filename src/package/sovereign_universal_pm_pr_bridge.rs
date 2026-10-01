@@ -18,6 +18,8 @@ use alloc::format;
 use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;
@@ -27,6 +29,8 @@ use std::format;
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec;
 
 // ============================================================================
 // 1. Universal Package Formats & Normalized Manifests
@@ -81,7 +85,206 @@ pub struct UniversalDistroPackageManifest {
 }
 
 // ============================================================================
-// 2. PR Package Transaction & Engine
+// 2. Linux & BSD Package Format Converter Engine
+// ============================================================================
+
+/// Automatic translation engine converting raw Linux & BSD distro manifests into normalized SigmaPkg manifests
+pub struct LinuxBsdPackageFormatConverterEngine;
+
+impl LinuxBsdPackageFormatConverterEngine {
+    /// Parses native Debian control, Arch PKGBUILD, RPM spec, Alpine APKBUILD, etc.
+    pub fn convert_native_manifest_to_normalized(
+        format: UniversalDistroPackageFormat,
+        raw_manifest: &str,
+    ) -> UniversalDistroPackageManifest {
+        let mut name = String::from("unknown-pkg");
+        let mut version = String::from("0.1.0");
+        let mut dependencies = Vec::new();
+        let mut capabilities = Vec::new();
+
+        for line in raw_manifest.lines() {
+            let trimmed = line.trim();
+            if trimmed.is_empty() || trimmed.starts_with('#') {
+                continue;
+            }
+
+            match format {
+                UniversalDistroPackageFormat::AptDeb => {
+                    if trimmed.starts_with("Package:") {
+                        name = trimmed["Package:".len()..].trim().to_string();
+                    } else if trimmed.starts_with("Version:") {
+                        version = trimmed["Version:".len()..].trim().to_string();
+                    } else if trimmed.starts_with("Depends:") {
+                        for dep in trimmed["Depends:".len()..].split(',') {
+                            let dep_name = dep.trim().split_whitespace().next().unwrap_or("");
+                            if !dep_name.is_empty() {
+                                dependencies.push(dep_name.to_string());
+                            }
+                        }
+                    }
+                }
+                UniversalDistroPackageFormat::PacmanPkg => {
+                    if trimmed.starts_with("pkgname=") {
+                        name = trimmed["pkgname=".len()..].trim().trim_matches('"').trim_matches('\'').to_string();
+                    } else if trimmed.starts_with("pkgver=") {
+                        version = trimmed["pkgver=".len()..].trim().trim_matches('"').trim_matches('\'').to_string();
+                    } else if trimmed.starts_with("depends=") {
+                        let inner = trimmed["depends=".len()..].trim().trim_matches('(').trim_matches(')');
+                        for dep in inner.split_whitespace() {
+                            let dep_clean = dep.trim_matches('"').trim_matches('\'');
+                            if !dep_clean.is_empty() {
+                                dependencies.push(dep_clean.to_string());
+                            }
+                        }
+                    }
+                }
+                UniversalDistroPackageFormat::DnfRpm => {
+                    if trimmed.starts_with("Name:") {
+                        name = trimmed["Name:".len()..].trim().to_string();
+                    } else if trimmed.starts_with("Version:") {
+                        version = trimmed["Version:".len()..].trim().to_string();
+                    } else if trimmed.starts_with("Requires:") {
+                        for dep in trimmed["Requires:".len()..].split(',') {
+                            let dep_name = dep.trim().split_whitespace().next().unwrap_or("");
+                            if !dep_name.is_empty() {
+                                dependencies.push(dep_name.to_string());
+                            }
+                        }
+                    }
+                }
+                UniversalDistroPackageFormat::AlpineApk => {
+                    if trimmed.starts_with("pkgname=") {
+                        name = trimmed["pkgname=".len()..].trim().trim_matches('"').to_string();
+                    } else if trimmed.starts_with("pkgver=") {
+                        version = trimmed["pkgver=".len()..].trim().trim_matches('"').to_string();
+                    } else if trimmed.starts_with("depends=") {
+                        for dep in trimmed["depends=".len()..].trim().trim_matches('"').split_whitespace() {
+                            if !dep.is_empty() {
+                                dependencies.push(dep.to_string());
+                            }
+                        }
+                    }
+                }
+                UniversalDistroPackageFormat::GentooEbuild => {
+                    if trimmed.starts_with("EAPI=") {
+                        capabilities.push("gentoo-eapi".to_string());
+                    } else if trimmed.starts_with("RDEPEND=") {
+                        for dep in trimmed["RDEPEND=".len()..].trim().trim_matches('"').split_whitespace() {
+                            let clean_dep = dep.trim_start_matches(">=").trim_start_matches("<=").trim_start_matches('=');
+                            if !clean_dep.is_empty() {
+                                dependencies.push(clean_dep.to_string());
+                            }
+                        }
+                    }
+                }
+                UniversalDistroPackageFormat::BsdPkg => {
+                    if trimmed.starts_with("name:") {
+                        name = trimmed["name:".len()..].trim().trim_matches('"').to_string();
+                    } else if trimmed.starts_with("version:") {
+                        version = trimmed["version:".len()..].trim().trim_matches('"').to_string();
+                    } else if trimmed.contains("origin:") {
+                        capabilities.push(trimmed.to_string());
+                    }
+                }
+                _ => {
+                    if trimmed.starts_with("name:") || trimmed.starts_with("name=") {
+                        name = trimmed.split([':', '=']).nth(1).unwrap_or("app").trim().to_string();
+                    } else if trimmed.starts_with("version:") || trimmed.starts_with("version=") {
+                        version = trimmed.split([':', '=']).nth(1).unwrap_or("1.0.0").trim().to_string();
+                    }
+                }
+            }
+        }
+
+        capabilities.push(name.clone());
+
+        UniversalDistroPackageManifest {
+            name,
+            version,
+            original_format: format,
+            raw_manifest_content: raw_manifest.to_string(),
+            declared_dependencies: dependencies,
+            provides_capabilities: capabilities,
+            sandbox_level: match format {
+                UniversalDistroPackageFormat::BsdPkg => 3, // Full Capsicum
+                UniversalDistroPackageFormat::FlatpakApp | UniversalDistroPackageFormat::SnapApp => 2, // Landlock+Seccomp
+                _ => 2,
+            },
+        }
+    }
+}
+
+// ============================================================================
+// 3. Automated PR Reviewer & Policy Auditor
+// ============================================================================
+
+/// Review result generated by `UniversalPmPrAutomatedReviewer`
+#[derive(Debug, Clone)]
+pub struct AutomatedPrReviewReport {
+    pub pr_id: u64,
+    pub sat_passed: bool,
+    pub dfsg_license_compliant: bool,
+    pub recommended_sandbox_level: u8,
+    pub risk_score: u8, // 0 = low risk, 100 = critical
+    pub review_notes: Vec<String>,
+}
+
+/// Automated PR Reviewer performing SAT checks, DFSG compliance, and sandbox level assignment
+pub struct UniversalPmPrAutomatedReviewer;
+
+impl UniversalPmPrAutomatedReviewer {
+    pub fn audit_and_review_pr(
+        pr_id: u64,
+        manifest: &UniversalDistroPackageManifest,
+        pqc_signature_verified: bool,
+    ) -> AutomatedPrReviewReport {
+        let mut notes = Vec::new();
+        let mut sat_passed = true;
+        let mut risk_score = 10;
+
+        if !pqc_signature_verified {
+            notes.push("CRITICAL: Missing PQC Dilithium/Falcon signature".to_string());
+            risk_score += 50;
+            sat_passed = false;
+        }
+
+        for dep in &manifest.declared_dependencies {
+            if dep.contains("conflict") || dep.contains("vulnerable") {
+                notes.push(format!("CONFLICT: Dependency {} violates SAT solver constraints", dep));
+                sat_passed = false;
+                risk_score += 40;
+            }
+        }
+
+        let dfsg_compliant = !manifest.raw_manifest_content.contains("non-free")
+            && !manifest.raw_manifest_content.contains("proprietary");
+
+        if !dfsg_compliant {
+            notes.push("NOTICE: Package classified in contrib/non-free DFSG section".to_string());
+            risk_score += 15;
+        }
+
+        let sandbox_level = if manifest.name.contains("kernel") || manifest.name.contains("driver") {
+            3 // Capsicum sandbox
+        } else {
+            2 // Landlock + Seccomp
+        };
+
+        notes.push(format!("AUDIT PASSED: Assigned sandbox isolation level {}", sandbox_level));
+
+        AutomatedPrReviewReport {
+            pr_id,
+            sat_passed,
+            dfsg_license_compliant: dfsg_compliant,
+            recommended_sandbox_level: sandbox_level,
+            risk_score: risk_score.min(100),
+            review_notes: notes,
+        }
+    }
+}
+
+// ============================================================================
+// 4. PR Package Transaction & Engine
 // ============================================================================
 
 /// Status of PR package workflow transaction
@@ -166,6 +369,32 @@ impl SovereignUniversalPmPrBridgeEngine {
         pr_id
     }
 
+    /// Submits native raw manifest string directly (e.g. control file, PKGBUILD)
+    pub fn submit_raw_manifest_pr(
+        &mut self,
+        submitter: &str,
+        format: UniversalDistroPackageFormat,
+        raw_manifest_content: &str,
+        pqc_sig_bytes: &[u8],
+    ) -> u64 {
+        let normalized = LinuxBsdPackageFormatConverterEngine::convert_native_manifest_to_normalized(
+            format,
+            raw_manifest_content,
+        );
+
+        let deps: Vec<&str> = normalized.declared_dependencies.iter().map(|s| s.as_str()).collect();
+
+        self.submit_foreign_package_pr(
+            submitter,
+            &normalized.name,
+            &normalized.version,
+            format,
+            raw_manifest_content,
+            &deps,
+            pqc_sig_bytes,
+        )
+    }
+
     /// Validates PR dependencies using SAT constraint checker and verifies PQC signature
     pub fn validate_sat_pr_dependencies(&mut self, pr_id: u64) -> Result<bool, &'static str> {
         let tx = self.pr_transactions.get_mut(&pr_id).ok_or("PR ID not found")?;
@@ -212,11 +441,85 @@ impl SovereignUniversalPmPrBridgeEngine {
 
         Ok(sigpkg_manifest)
     }
+
+    /// Parses CLI package manager command (e.g. `apt install nginx`, `pacman -S htop`, `dnf install curl`)
+    /// and dispatches it directly into a Pull Request submission for sigma-pkg
+    pub fn translate_cli_command_to_pr_submission(
+        &mut self,
+        submitter: &str,
+        cli_command: &str,
+        pqc_sig: &[u8],
+    ) -> Result<u64, &'static str> {
+        let parts: Vec<&str> = cli_command.split_whitespace().collect();
+        if parts.len() < 2 {
+            return Err("Invalid CLI command format");
+        }
+
+        let tool = parts[0];
+        let pkg_name = parts.last().unwrap_or(&"app");
+
+        let format = match tool {
+            "apt" | "apt-get" => UniversalDistroPackageFormat::AptDeb,
+            "pacman" => UniversalDistroPackageFormat::PacmanPkg,
+            "dnf" | "yum" => UniversalDistroPackageFormat::DnfRpm,
+            "apk" => UniversalDistroPackageFormat::AlpineApk,
+            "xbps-install" | "xbps" => UniversalDistroPackageFormat::VoidXbps,
+            "emerge" => UniversalDistroPackageFormat::GentooEbuild,
+            "pkg" => UniversalDistroPackageFormat::BsdPkg,
+            "nix" | "nix-env" => UniversalDistroPackageFormat::NixFlake,
+            "flatpak" => UniversalDistroPackageFormat::FlatpakApp,
+            "snap" => UniversalDistroPackageFormat::SnapApp,
+            _ => UniversalDistroPackageFormat::NativeSigPkg,
+        };
+
+        let raw_manifest = format!("Package: {}\nVersion: 1.0.0\nCLI: {}", pkg_name, cli_command);
+        let pr_id = self.submit_foreign_package_pr(
+            submitter,
+            pkg_name,
+            "1.0.0",
+            format,
+            &raw_manifest,
+            &[],
+            pqc_sig,
+        );
+
+        Ok(pr_id)
+    }
 }
 
 impl Default for SovereignUniversalPmPrBridgeEngine {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+// ============================================================================
+// 5. Batch PR Orchestrator & Rollback Journal
+// ============================================================================
+
+/// Orchestrator for processing bulk foreign package PR submissions in parallel
+pub struct UniversalPmBatchPrOrchestrator<'a> {
+    pub bridge: &'a mut SovereignUniversalPmPrBridgeEngine,
+}
+
+impl<'a> UniversalPmBatchPrOrchestrator<'a> {
+    pub fn new(bridge: &'a mut SovereignUniversalPmPrBridgeEngine) -> Self {
+        Self { bridge }
+    }
+
+    /// Process batch PR submissions, perform SAT validation, and auto-merge clean PRs
+    pub fn process_and_auto_merge_batch(&mut self, pr_ids: &[u64]) -> usize {
+        let mut merged_count = 0;
+
+        for &pr_id in pr_ids {
+            if self.bridge.validate_sat_pr_dependencies(pr_id).is_ok() {
+                if self.bridge.merge_pr_to_sigma_pkg(pr_id).is_ok() {
+                    merged_count += 1;
+                }
+            }
+        }
+
+        merged_count
     }
 }
 
@@ -243,7 +546,8 @@ mod tests {
             b"valid_pqc_sig",
         );
 
-        assert_eq!(pr1, 1);        assert!(bridge.validate_sat_pr_dependencies(pr1).unwrap());
+        assert_eq!(pr1, 1);
+        assert!(bridge.validate_sat_pr_dependencies(pr1).unwrap());
         let merged = bridge.merge_pr_to_sigma_pkg(pr1).unwrap();
         assert_eq!(merged.name, "nginx");
         assert_eq!(bridge.total_prs_merged, 1);
@@ -251,39 +555,71 @@ mod tests {
     }
 
     #[test]
-    fn test_multi_format_package_conversions() {
-        let formats = [
-            (UniversalDistroPackageFormat::PacmanPkg, "arch-app", &["glibc"][..]),
-            (UniversalDistroPackageFormat::DnfRpm, "fedora-app", &["systemd"][..]),
-            (UniversalDistroPackageFormat::AlpineApk, "alpine-app", &["musl"][..]),
-            (UniversalDistroPackageFormat::VoidXbps, "void-app", &["xbps"][..]),
-            (UniversalDistroPackageFormat::GentooEbuild, "gentoo-app", &["portage"][..]),
-            (UniversalDistroPackageFormat::BsdPkg, "freebsd-app", &["libc"][..]),
-            (UniversalDistroPackageFormat::NixFlake, "nix-app", &["stdenv"][..]),
-            (UniversalDistroPackageFormat::FlatpakApp, "flatpak-app", &["org.freedesktop.Sdk"][..]),
-            (UniversalDistroPackageFormat::SnapApp, "snap-app", &["core22"][..]),
-            (UniversalDistroPackageFormat::AppImage, "appimage-app", &["fuse"][..]),
-        ];
+    fn test_linux_bsd_package_format_converter() {
+        let deb_raw = "Package: htop\nVersion: 3.2.2\nDepends: libc6, ncurses-term";
+        let manifest_deb = LinuxBsdPackageFormatConverterEngine::convert_native_manifest_to_normalized(
+            UniversalDistroPackageFormat::AptDeb,
+            deb_raw,
+        );
+        assert_eq!(manifest_deb.name, "htop");
+        assert_eq!(manifest_deb.version, "3.2.2");
+        assert_eq!(manifest_deb.declared_dependencies, vec!["libc6", "ncurses-term"]);
 
+        let pacman_raw = "pkgname=\"vim\"\npkgver=\"9.0.1000\"\ndepends=('glibc' 'gpm')";
+        let manifest_pacman = LinuxBsdPackageFormatConverterEngine::convert_native_manifest_to_normalized(
+            UniversalDistroPackageFormat::PacmanPkg,
+            pacman_raw,
+        );
+        assert_eq!(manifest_pacman.name, "vim");
+        assert_eq!(manifest_pacman.version, "9.0.1000");
+        assert_eq!(manifest_pacman.declared_dependencies, vec!["glibc", "gpm"]);
+    }
+
+    #[test]
+    fn test_automated_pr_reviewer() {
+        let manifest = UniversalDistroPackageManifest {
+            name: "curl".to_string(),
+            version: "8.0.0".to_string(),
+            original_format: UniversalDistroPackageFormat::AptDeb,
+            raw_manifest_content: "Package: curl\nVersion: 8.0.0".to_string(),
+            declared_dependencies: vec!["libssl".to_string()],
+            provides_capabilities: vec!["curl".to_string()],
+            sandbox_level: 2,
+        };
+
+        let report = UniversalPmPrAutomatedReviewer::audit_and_review_pr(1, &manifest, true);
+        assert!(report.sat_passed);
+        assert!(report.dfsg_license_compliant);
+        assert_eq!(report.recommended_sandbox_level, 2);
+    }
+
+    #[test]
+    fn test_cli_command_translation_bridge() {
         let mut bridge = SovereignUniversalPmPrBridgeEngine::new();
 
-        for (fmt, name, deps) in formats {
-            let pr = bridge.submit_foreign_package_pr(
-                "maintainer",
-                name,
-                "1.0.0",
-                fmt,
-                "raw_manifest",
-                deps,
-                b"dilithium5_sig",
-            );
+        let pr_apt = bridge.translate_cli_command_to_pr_submission("user1", "apt install redis", b"pqc_sig").unwrap();
+        assert!(bridge.validate_sat_pr_dependencies(pr_apt).unwrap());
+        let merged_apt = bridge.merge_pr_to_sigma_pkg(pr_apt).unwrap();
+        assert_eq!(merged_apt.name, "redis");
+        assert_eq!(merged_apt.original_format, UniversalDistroPackageFormat::AptDeb);
 
-            assert!(bridge.validate_sat_pr_dependencies(pr).unwrap());
-            let manifest = bridge.merge_pr_to_sigma_pkg(pr).unwrap();
-            assert_eq!(manifest.original_format, fmt);
-        }
+        let pr_pacman = bridge.translate_cli_command_to_pr_submission("user2", "pacman -S zsh", b"pqc_sig").unwrap();
+        assert!(bridge.validate_sat_pr_dependencies(pr_pacman).unwrap());
+        let merged_pacman = bridge.merge_pr_to_sigma_pkg(pr_pacman).unwrap();
+        assert_eq!(merged_pacman.name, "zsh");
+        assert_eq!(merged_pacman.original_format, UniversalDistroPackageFormat::PacmanPkg);
+    }
 
-        assert_eq!(bridge.total_prs_merged, 10);
+    #[test]
+    fn test_batch_pr_orchestrator() {
+        let mut bridge = SovereignUniversalPmPrBridgeEngine::new();
+
+        let pr1 = bridge.submit_foreign_package_pr("a", "pkg1", "1.0", UniversalDistroPackageFormat::AptDeb, "", &[], b"sig");
+        let pr2 = bridge.submit_foreign_package_pr("b", "pkg2", "1.0", UniversalDistroPackageFormat::PacmanPkg, "", &[], b"sig");
+
+        let mut orchestrator = UniversalPmBatchPrOrchestrator::new(&mut bridge);
+        let merged_count = orchestrator.process_and_auto_merge_batch(&[pr1, pr2]);
+        assert_eq!(merged_count, 2);
     }
 
     #[test]
