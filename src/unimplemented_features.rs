@@ -2180,12 +2180,160 @@ impl Default for SpecJbd2TransactionLedger {
 }
 
 pub struct Android15PrivateSpaceGovernor;
-pub struct FrappeFrameworkDocTypeEngine;
 pub struct HwbustersPowerSupplyMonitor;
 pub struct MacOsSequoiaWindowManager;
 pub struct S6ServiceInitSupervisor;
 pub struct UutilsCoreutilsZeroCopyBuffer;
 pub struct WindowsCopilotRecallAuditor;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TechMediaPortal {
+    ItsFoss,
+    NineToFiveLinux,
+    Phoronix,
+    DistroWatch,
+    XdaDevelopers,
+    TheNewStack,
+    Marktechpost,
+    LinuxCom,
+}
+
+#[derive(Debug, Clone)]
+pub struct TechMediaFeedItem {
+    pub source_portal: TechMediaPortal,
+    pub source_name: String,
+    pub title: String,
+    pub category: String,
+    pub severity_score: u8,
+    pub recommended_app: String,
+}
+
+pub struct TechMediaIntelligenceAggregatorEngine {
+    pub feed_items: Vec<TechMediaFeedItem>,
+}
+
+impl TechMediaIntelligenceAggregatorEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            feed_items: Vec::new(),
+        };
+        engine.seed_curated_media_feeds();
+        engine
+    }
+
+    pub fn seed_curated_media_feeds(&mut self) {
+        self.ingest_portal_item(
+            TechMediaPortal::ItsFoss,
+            "It's FOSS",
+            "Top 10 Essential Linux Desktop Applications",
+            "Apps",
+            2,
+            "GIMP/Kdenlive/Obsidian",
+        );
+        self.ingest_portal_item(
+            TechMediaPortal::NineToFiveLinux,
+            "9to5Linux",
+            "Linux Kernel 6.12+ Sched_Ext Improvements",
+            "Kernel",
+            3,
+            "ScxBpflandScheduler",
+        );
+        self.ingest_portal_item(
+            TechMediaPortal::Phoronix,
+            "Phoronix",
+            "AMD RDNA3 & NVIDIA OpenGSP Graphics Benchmarks",
+            "Hardware",
+            1,
+            "MesaVulkanStudio",
+        );
+        self.ingest_portal_item(
+            TechMediaPortal::DistroWatch,
+            "DistroWatch",
+            "Linux & BSD Distribution Popularity Trends",
+            "Distro",
+            2,
+            "UniversalPackageManager",
+        );
+        self.ingest_portal_item(
+            TechMediaPortal::XdaDevelopers,
+            "XDA Developers",
+            "Best Modern Terminal Emulators for Developers",
+            "Tools",
+            2,
+            "GhosttyTerminal",
+        );
+        self.ingest_portal_item(
+            TechMediaPortal::TheNewStack,
+            "The New Stack",
+            "eBPF & WebAssembly in Cloud Native Systems",
+            "Cloud",
+            3,
+            "SigmaEbpfRuntime",
+        );
+        self.ingest_portal_item(
+            TechMediaPortal::Marktechpost,
+            "Marktechpost",
+            "State of the Art Local LLMs & Coding Agents",
+            "AI",
+            4,
+            "OmarchyHerdrAiAgent",
+        );
+    }
+
+    pub fn ingest_portal_item(
+        &mut self,
+        portal: TechMediaPortal,
+        source: &str,
+        title: &str,
+        category: &str,
+        severity: u8,
+        app: &str,
+    ) {
+        self.feed_items.push(TechMediaFeedItem {
+            source_portal: portal,
+            source_name: source.to_string(),
+            title: title.to_string(),
+            category: category.to_string(),
+            severity_score: severity,
+            recommended_app: app.to_string(),
+        });
+    }
+
+    pub fn ingest_feed_item(&mut self, source: &str, title: &str, category: &str, severity: u8) {
+        self.ingest_portal_item(
+            TechMediaPortal::LinuxCom,
+            source,
+            title,
+            category,
+            severity,
+            "SigmaPkg",
+        );
+    }
+
+    pub fn filter_by_source(&self, source: &str) -> Vec<TechMediaFeedItem> {
+        self.feed_items
+            .iter()
+            .filter(|item| item.source_name.eq_ignore_ascii_case(source))
+            .cloned()
+            .collect()
+    }
+
+    pub fn get_critical_advisories(&self, min_severity: u8) -> Vec<TechMediaFeedItem> {
+        self.feed_items
+            .iter()
+            .filter(|item| item.severity_score >= min_severity)
+            .cloned()
+            .collect()
+    }
+
+    pub fn recommend_apps_for_category(&self, category: &str) -> Vec<String> {
+        self.feed_items
+            .iter()
+            .filter(|item| item.category.eq_ignore_ascii_case(category))
+            .map(|item| item.recommended_app.clone())
+            .collect()
+    }
+}
 
 pub struct AchievementBadge {
     pub badge_id: &'static str,
@@ -4123,119 +4271,6 @@ impl FrappeFrameworkDocTypeEngine {
             is_submittable: true,
         }
     }
-
-    pub fn seed_curated_media_feeds(&mut self) {
-        self.ingest_portal_item(
-            TechMediaPortal::ItsFoss,
-            "It's FOSS",
-            "Top 10 Essential Linux Desktop Applications",
-            "Apps",
-            2,
-            "GIMP/Kdenlive/Obsidian",
-        );
-        self.ingest_portal_item(
-            TechMediaPortal::NineToFiveLinux,
-            "9to5Linux",
-            "Linux Kernel 6.12+ Sched_Ext Improvements",
-            "Kernel",
-            3,
-            "ScxBpflandScheduler",
-        );
-        self.ingest_portal_item(
-            TechMediaPortal::Phoronix,
-            "Phoronix",
-            "AMD RDNA3 & NVIDIA OpenGSP Graphics Benchmarks",
-            "Hardware",
-            1,
-            "MesaVulkanStudio",
-        );
-        self.ingest_portal_item(
-            TechMediaPortal::DistroWatch,
-            "DistroWatch",
-            "Linux & BSD Distribution Popularity Trends",
-            "Distro",
-            2,
-            "UniversalPackageManager",
-        );
-        self.ingest_portal_item(
-            TechMediaPortal::XdaDevelopers,
-            "XDA Developers",
-            "Best Modern Terminal Emulators for Developers",
-            "Tools",
-            2,
-            "GhosttyTerminal",
-        );
-        self.ingest_portal_item(
-            TechMediaPortal::TheNewStack,
-            "The New Stack",
-            "eBPF & WebAssembly in Cloud Native Systems",
-            "Cloud",
-            3,
-            "SigmaEbpfRuntime",
-        );
-        self.ingest_portal_item(
-            TechMediaPortal::Marktechpost,
-            "Marktechpost",
-            "State of the Art Local LLMs & Coding Agents",
-            "AI",
-            4,
-            "OmarchyHerdrAiAgent",
-        );
-    }
-
-    pub fn ingest_portal_item(
-        &mut self,
-        portal: TechMediaPortal,
-        source: &str,
-        title: &str,
-        category: &str,
-        severity: u8,
-        app: &str,
-    ) {
-        self.feed_items.push(TechMediaFeedItem {
-            source_portal: portal,
-            source_name: source.to_string(),
-            title: title.to_string(),
-            category: category.to_string(),
-            severity_score: severity,
-            recommended_app: app.to_string(),
-        });
-    }
-
-    pub fn ingest_feed_item(&mut self, source: &str, title: &str, category: &str, severity: u8) {
-        self.ingest_portal_item(
-            TechMediaPortal::LinuxCom,
-            source,
-            title,
-            category,
-            severity,
-            "SigmaPkg",
-        );
-    }
-
-    pub fn filter_by_source(&self, source: &str) -> Vec<TechMediaFeedItem> {
-        self.feed_items
-            .iter()
-            .filter(|item| item.source_name.eq_ignore_ascii_case(source))
-            .cloned()
-            .collect()
-    }
-
-    pub fn get_critical_advisories(&self, min_severity: u8) -> Vec<TechMediaFeedItem> {
-        self.feed_items
-            .iter()
-            .filter(|item| item.severity_score >= min_severity)
-            .cloned()
-            .collect()
-    }
-
-    pub fn recommend_apps_for_category(&self, category: &str) -> Vec<String> {
-        self.feed_items
-            .iter()
-            .filter(|item| item.category.eq_ignore_ascii_case(category))
-            .map(|item| item.recommended_app.clone())
-            .collect()
-    }
 }
 
 impl Default for TechMediaIntelligenceAggregatorEngine {
@@ -4473,7 +4508,7 @@ mod new_unimplemented_tests {
 
     #[test]
     fn test_puppy_linux_overlay_ramdisk_engine() {
-        let mut puppy = PuppyLinuxOverlayRamdiskEngine::new(2048, 2048);
+        let mut puppy = PuppyLinuxOverlayRamdiskEngine::new(2048);
         puppy.load_sfs_module("puppy_sigma_2.0.sfs");
         puppy.mount_persistence("/mnt/home/sigmasave.2fs");
         assert_eq!(puppy.loaded_sfs_modules.len(), 1);

@@ -6,6 +6,7 @@ use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
+#[cfg(not(feature = "standalone_test"))]
 pub use crate::package::manager::PackageState;
 
 // SigmaOS Universal Package Manager
@@ -571,6 +572,20 @@ pub enum PackageFormat {
     Brew,        // Homebrew formula (.brew)
     Wasm,        // WebAssembly component (.wasm)
     Oci,         // OCI container image (.oci)
+    Tazpkg,
+    SingularitySif,
+    StampedeSlp,
+    Winget,
+    Scoop,
+    Choco,
+    Pixi,
+    Nimble,
+    ZigPkg,
+    SwiftPkg,
+    DubPkg,
+    Opam,
+    Shard,
+    PltPkg,
 }
 
 impl PackageFormat {
@@ -3458,7 +3473,7 @@ mod tests {
                 v
             },
             description: "command line tool for transferring data with URLs".to_string(),
-            priority: PackagePriority::Optional,
+            priority: "optional".to_string(),
         };
 
         let _pkgbuild = PacmanPkgbuild {
