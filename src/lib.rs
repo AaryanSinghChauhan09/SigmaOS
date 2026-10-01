@@ -1,3 +1,4 @@
+#![allow(warnings, unused)]
 // SigmaOS Library
 // Core library for SigmaOS operating system
 

@@ -18,9 +18,6 @@ pub use crate::security::Permission;
 #[cfg(feature = "standalone_test")]
 pub use crate::sigpkg::universal_oop_system;
 
-
-
-
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ArchPkgInfoManifest {

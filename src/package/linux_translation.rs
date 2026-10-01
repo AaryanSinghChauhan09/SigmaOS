@@ -3,10 +3,6 @@
 // Integrates foreign Linux package frameworks (.deb, .rpm, pacman) directly with the SigmaOS Driver system.
 
 #[cfg(not(feature = "standalone_test"))]
-use crate::driver::framework::{
-    DriverType, SimpleDriver,
-};
-#[cfg(not(feature = "standalone_test"))]
 use crate::driver::framework::{DriverType, SimpleDriver};
 use crate::package::PackageFormat;
 #[cfg(not(feature = "standalone_test"))]

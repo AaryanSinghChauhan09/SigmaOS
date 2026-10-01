@@ -10,9 +10,6 @@ use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
-
-
-#[cfg(not(feature = "standalone_test"))]
 #[path = "open_source_os_gap_closure.rs"]
 pub mod open_source_os_gap_closure;
 
