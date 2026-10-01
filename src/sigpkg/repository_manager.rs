@@ -30,6 +30,7 @@ pub struct RepositoryGpgKey {
     pub key_id: String,
     pub owner: String,
     pub is_valid: bool,
+    pub fingerprint: String,
 }
 
 impl RepositoryGpgKey {
@@ -38,6 +39,7 @@ impl RepositoryGpgKey {
             key_id: key_id.to_string(),
             owner: owner.to_string(),
             is_valid: true,
+            fingerprint: key_id.to_string(),
         }
     }
 }
@@ -96,19 +98,6 @@ impl MirrorBenchmarkEngine {
 }
 
 /// Repository configuration (Debian sources.list inspiration)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum OfficialArchiveSource {
-    Main,
-    Universe,
-    Multiverse,
-    Restricted,
-}
-
-#[derive(Debug, Clone)]
-pub struct RepositoryGpgKey {
-    pub key_id: String,
-    pub fingerprint: String,
-}
 
 pub struct Repository {
     pub name: String,

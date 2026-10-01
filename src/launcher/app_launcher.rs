@@ -96,25 +96,25 @@ impl AppEntry {
         let query = query.to_lowercase();
 
         // Check name
-        if contains_ignore_case(&self.name, query) {
+        if contains_ignore_case(&self.name, &query) {
             return true;
         }
 
         // Check description
-        if contains_ignore_case(&self.description, query) {
+        if contains_ignore_case(&self.description, &query) {
             return true;
         }
 
         // Check keywords
         for keyword in &self.keywords {
-            if contains_ignore_case(keyword, query) {
+            if contains_ignore_case(keyword, &query) {
                 return true;
             }
         }
 
         // Check categories
         for category in &self.categories {
-            if contains_ignore_case(category, query) {
+            if contains_ignore_case(category, &query) {
                 return true;
             }
         }
@@ -148,7 +148,7 @@ impl AppEntry {
 
         // Keyword match
         for keyword in &self.keywords {
-            if contains_ignore_case(keyword, query) {
+            if contains_ignore_case(keyword, &query) {
                 return 600;
             }
         }

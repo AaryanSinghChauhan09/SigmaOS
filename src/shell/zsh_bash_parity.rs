@@ -1455,7 +1455,7 @@ impl UniversalScriptTranspiler {
 
             let converted_line = match dialect {
                 ShellDialect::Fish => Self::transpile_fish_line(trimmed, &mut in_function),
-                ShellDialect::Tcsh => Self::transpile_tcsh_line(trimmed),
+                ShellDialect::Tcsh | ShellDialect::Csh => Self::transpile_tcsh_line(trimmed),
                 ShellDialect::Bash
                 | ShellDialect::Zsh
                 | ShellDialect::Ksh
