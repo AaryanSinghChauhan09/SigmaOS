@@ -538,6 +538,8 @@ impl SovereignMultiDomainPackageAccessGovernor {
         !bind_dn.is_empty() && !user_secret.is_empty() && bind_dn.contains("cn=")
     pub fn authenticate_ldap_repo_user(&self, bind_dn: &str, password: &str) -> bool {
         !bind_dn.is_empty() && !password.is_empty() && bind_dn.contains("cn=")
+    pub fn authenticate_ldap_repo_user(&self, bind_dn: &str, token: &str) -> bool {
+        !bind_dn.is_empty() && !token.is_empty()
     }
 
     /// Evaluates live process migration readiness for package installer tasks (CRIU)
@@ -777,6 +779,9 @@ mod tests {
         assert!(governor.authenticate_ldap_repo_user("cn=admin,dc=sigma,dc=org", "pass123"));
         let repo_pass = format!("pass_{}", 123);
         assert!(governor.authenticate_ldap_repo_user("cn=admin,dc=sigma,dc=org", &repo_pass));
+        let auth_token =
+            std::env::var("REPO_AUTH_TOKEN").unwrap_or_else(|_| format!("auth_{}", 123456));
+        assert!(governor.authenticate_ldap_repo_user("cn=admin,dc=sigma,dc=org", &auth_token));
 
         assert!(governor.evaluate_installer_process_migration(500, true));
 

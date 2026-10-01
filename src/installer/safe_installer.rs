@@ -225,6 +225,8 @@ mod tests {
         assert!(!inst.config.password_hash.contains("secret"));
         assert!(inst.config.password_hash.starts_with("$argon2id$"));
         assert!(!inst.config.password_hash.contains("secret"));
+        assert!(inst.config.password_hash.starts_with("$argon2id$"));
+        assert!(!inst.config.password_hash.contains("secret"));
     }
 
     #[test]

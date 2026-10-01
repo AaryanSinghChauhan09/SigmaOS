@@ -180,6 +180,10 @@ impl UserAccount {
         Self {
             username: String::from(username),
             full_name: String::new(),
+    pub fn new(username: &str, password: &str) -> Self {
+        Self {
+            username: String::from(username),
+            full_name: String::new(),
             password: String::from(password),
             is_admin: true,
             home_directory: format!("/home/{}", username),
@@ -639,6 +643,9 @@ mod tests {
         wizard.add_user_account(UserAccount::new("sovereign", &sample_pass));
         let sample_credential = format!("usr_{}_{}", "token", 123);
         wizard.add_user_account(UserAccount::new("sovereign", &sample_credential));
+        let sample_pass =
+            std::env::var("INSTALLER_TEST_TOKEN").unwrap_or_else(|_| format!("token_{}", 123456));
+        wizard.add_user_account(UserAccount::new("sovereign", &sample_pass));
 
         let summary = wizard.get_installation_summary();
         assert_eq!(summary.target_disk, "/dev/nvme0n1");

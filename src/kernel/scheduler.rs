@@ -139,6 +139,22 @@ impl PartialOrd for ProcessTask {
     }
 }
 
+impl ProcessTask {
+    pub fn new(pid: u64, priority: Priority) -> Self {
+        Self {
+            pid,
+            priority,
+            policy: SchedulerPolicy::Normal,
+            state: ProcessState::Ready,
+            vruntime: 0,
+            exec_start: 0,
+            exec_duration: 0,
+            cpu_time: 0,
+            slice: 10,
+        }
+    }
+}
+
 /// CFS scheduler
 pub struct CfsScheduler {
     runnable_tasks: BinaryHeap<ProcessTask>,

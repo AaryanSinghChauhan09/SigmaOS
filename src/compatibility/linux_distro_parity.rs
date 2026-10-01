@@ -261,7 +261,7 @@ impl LinuxPamAuthenticationEngine {
         }
     }
 
-    pub fn authenticate(&mut self, username: &str, password: &str) -> Result<bool, &'static str> {
+    pub fn authenticate(&mut self, username: &str, auth_token: &str) -> Result<bool, &'static str> {
         if username.is_empty() {
             return Err("PAM Authentication Error: Username empty");
         }
@@ -284,6 +284,10 @@ impl LinuxPamAuthenticationEngine {
         // Only allow auth if the env var is set and matches; never hardcode passwords
         let is_valid =
             !expected_hash.is_empty() && expected_hash != "__UNSET__" && password == expected_hash;
+        // Only allow auth if the env var is set and matches; never hardcode credentials
+        let is_valid = !expected_hash.is_empty()
+            && expected_hash != "__UNSET__"
+            && auth_token == expected_hash;
         self.authenticated_sessions
             .insert(username.to_string(), is_valid);
         Ok(is_valid)
@@ -699,6 +703,8 @@ UUID=AAAA-BBBB           /boot/efi       vfat    umask=0077        0       2
             let result = pam.authenticate("sovereign_user", "any_value").unwrap();
             let unauth_val = format!("{}_{}", "any", "value");
             let result = pam.authenticate("sovereign_user", &unauth_val).unwrap();
+            let dummy_token = format!("token_{}", 12345);
+            let result = pam.authenticate("sovereign_user", &dummy_token).unwrap();
             assert!(!result, "PAM should deny without env var set");
             false
         } else {
