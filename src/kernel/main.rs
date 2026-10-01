@@ -18,6 +18,10 @@ use sigmaos::kernel::{
     BuddyAllocator, Priority, ProcessTask, RoundRobinScheduler as Scheduler, SchedulerPolicy,
 };
 use sigmaos::kernel::{BuddyAllocator, Priority, ProcessTask, RoundRobinScheduler as Scheduler};
+use sigmaos::kernel::{
+    BuddyAllocator, Priority, ProcessState, ProcessTask, RoundRobinScheduler as Scheduler,
+    SchedulerPolicy,
+};
 use sigmaos::memory::paging::SimpleVMM;
 
 pub static EARLY_CPU_STATE: core::sync::atomic::AtomicUsize = AtomicUsize::new(0);
@@ -50,6 +54,11 @@ pub fn start_kernel(
         priority: Priority::Idle,
         policy: SchedulerPolicy::Idle,
         state: sigmaos::kernel::ProcessState::Ready,
+    let idle_proc = ProcessTask {
+        pid: 1,
+        priority: Priority::Idle,
+        policy: SchedulerPolicy::Idle,
+        state: ProcessState::Runnable,
         vruntime: 0,
         exec_start: 0,
         exec_duration: 0,

@@ -241,7 +241,6 @@ impl ProcessMonitor {
     }
 
     pub fn build_tree(&self) -> Vec<ProcessTreeNode> {
-        let mut nodes: Vec<ProcessTreeNode> = Vec::new();
         let mut by_pid: std::collections::HashMap<u32, ProcessTreeNode> =
             std::collections::HashMap::new();
         let mut by_pid: std::collections::HashMap<u32, ProcessTreeNode> = std::collections::HashMap::new();
@@ -253,7 +252,7 @@ impl ProcessMonitor {
         let mut root_nodes: Vec<ProcessTreeNode> = Vec::new();
 
         for process in &self.processes {
-            if let Some(mut node) = by_pid.remove(&process.pid) {
+            if let Some(node) = by_pid.remove(&process.pid) {
                 if process.ppid == 0 || !by_pid.contains_key(&process.ppid) {
                     root_nodes.push(node);
                 } else if let Some(parent) = by_pid.get_mut(&process.ppid) {

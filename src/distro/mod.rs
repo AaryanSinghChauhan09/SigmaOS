@@ -379,3 +379,6 @@ pub use sovereign_2065_distro_supremacy_engine::*;
 
 pub mod sovereign_linux_bsd_ecosystem_pinnacle_suite;
 pub use sovereign_linux_bsd_ecosystem_pinnacle_suite::*;
+
+pub mod sovereign_linux_bsd_ecosystem_leap_suite;
+pub use sovereign_linux_bsd_ecosystem_leap_suite::*;

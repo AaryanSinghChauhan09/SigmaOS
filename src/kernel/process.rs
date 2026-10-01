@@ -368,7 +368,7 @@ impl ProcessManager {
     }
 
     pub fn exit_process(&mut self, pid: ProcessId, code: i32) {
-        let mut children = Vec::new();
+        let children;
         let ppid = if let Some(p) = self.processes.get_mut(&pid) {
             p.state = ProcessState::Zombie;
             p.exit_code = Some(code);

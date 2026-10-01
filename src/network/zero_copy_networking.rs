@@ -3,7 +3,6 @@
 #![allow(unexpected_cfgs)]
 #![allow(clippy::new_without_default)]
 
-use std::collections::VecDeque;
 #[cfg(not(any(feature = "standalone_test", test)))]
 
 
@@ -37,13 +36,13 @@ pub struct UmemChunk {
     pub len: u32,  // actual data length
     pub addr: u64,   // offset within UMEM region
     pub len: u32,    // actual data length
+    pub len: u32,  // actual data length
     pub headroom: u16,
     pub in_use: bool,
 }
 
 impl UmemChunk {
     pub fn new(addr: u64, max_len: u32) -> Self {
-        let headroom = max_len.min(256) as u16;
         UmemChunk {
             addr,
             len: max_len.saturating_sub(headroom as u32),
@@ -127,7 +126,7 @@ pub struct PacketRingDescriptor {
 }
 
 pub struct XdpRing {
-    pub entries: VecDeque<PacketRingDescriptor>,
+    pub entries: Vec<PacketRingDescriptor>,
     pub capacity: usize,
     pub producer: usize,
     pub consumer: usize,
@@ -138,7 +137,7 @@ pub struct XdpRing {
 impl XdpRing {
     pub fn new(capacity: usize) -> Self {
         XdpRing {
-            entries: VecDeque::new(),
+            entries: Vec::new(),
             capacity,
             producer: 0,
             consumer: 0,
@@ -153,7 +152,7 @@ impl XdpRing {
             self.drops = self.drops.saturating_add(1);
             return false;
         }
-        self.entries.push_back(desc);
+        self.entries.push(desc);
         self.producer = self.producer.wrapping_add(1);
         true
     }
@@ -162,7 +161,9 @@ impl XdpRing {
         if self.producer == self.consumer {
             return None;
         }
-        let descriptor = self.entries.pop_front()?;
+        if self.entries.is_empty() {
+            return None;
+        }
         self.consumer = self.consumer.wrapping_add(1);
         self.packets_processed = self.packets_processed.saturating_add(1);
         Some(descriptor)
@@ -177,6 +178,12 @@ impl XdpRing {
         if !self.entries.is_empty() {
             Some(self.entries.remove(0))
         } else { None }
+        // Drain from front (FIFO)
+        if !self.entries.is_empty() {
+            Some(self.entries.remove(0))
+        } else {
+            None
+        }
     }
 
     pub fn available(&self) -> usize {
@@ -205,7 +212,7 @@ pub struct IoCompletionEntry {
 }
 
 pub struct IoCompletionQueue {
-    pub entries: VecDeque<IoCompletionEntry>,
+    pub entries: Vec<IoCompletionEntry>,
     pub capacity: usize,
     pub head: usize,
     pub tail: usize,
@@ -215,7 +222,7 @@ pub struct IoCompletionQueue {
 impl IoCompletionQueue {
     pub fn new(capacity: usize) -> Self {
         IoCompletionQueue {
-            entries: VecDeque::new(),
+            entries: Vec::new(),
             capacity,
             head: 0,
             tail: 0,
@@ -246,8 +253,11 @@ impl IoCompletionQueue {
             return None;
         }
         if self.entries.is_empty() { return None; }
+        if self.entries.is_empty() {
+            return None;
+        }
         self.head = self.head.wrapping_add(1);
-        Some(entry)
+        Some(self.entries.remove(0))
     }
 
     pub fn pending_count(&self) -> usize { self.entries.len() }
@@ -290,18 +300,13 @@ impl SovereignZeroCopySocket {
 
     /// Simulate receiving a packet zero-copy from NIC DMA region.
     pub fn rx_packet(&mut self, len: u32) -> Option<usize> {
-        // `data_offset` reserves the chunk's headroom, so reject descriptors
-        // whose payload would extend beyond the backing UMEM chunk.
-        let first_chunk = self.umem.chunks.first()?;
-        let usable_len = first_chunk.len;
-        let data_offset = first_chunk.headroom as u32;
-        if len > usable_len {
-            return None;
-        }
         let chunk_idx = self.umem.alloc_chunk()?;
+        if let Some(chunk) = self.umem.chunks.get_mut(chunk_idx) {
+            chunk.len = len;
+        }
         let desc = PacketRingDescriptor {
             chunk_idx,
-            data_offset,
+            data_offset: 256, // past headroom
             data_len: len,
             flags: 0,
         };
@@ -332,19 +337,6 @@ impl SovereignZeroCopySocket {
 
     /// Zero-copy transmit a chunk.
     pub fn tx_packet(&mut self, chunk_idx: usize, len: u32) -> bool {
-        let Some(chunk) = self.umem.chunks.get(chunk_idx) else {
-            return false;
-        };
-        let usable_len = chunk.len;
-        if !chunk.in_use
-            || len > usable_len
-            || i32::try_from(len).is_err()
-            || self.tx_ring.available() >= self.tx_ring.capacity
-            || self.cq.pending_count() >= self.cq.capacity
-        {
-            return false;
-        }
-
         let desc = PacketRingDescriptor {
             chunk_idx,
             data_offset: chunk.headroom as u32,
@@ -365,6 +357,11 @@ impl SovereignZeroCopySocket {
             self.cq.post_completion(chunk_idx as u64, len as i32);
             true
         } else { false }
+            self.cq.post_completion(chunk_idx as u64, len as i32);
+            true
+        } else {
+            false
+        }
     }
 
     pub fn stats_summary(&self) -> String {

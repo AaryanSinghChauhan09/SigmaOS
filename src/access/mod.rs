@@ -850,6 +850,8 @@ mod tests {
         let test_secret =
             std::env::var("LDAP_TEST_SECRET").unwrap_or_else(|_| format!("secret_{}", 123456));
         ldap.bind("cn=admin,dc=sigmaos,dc=org", &test_secret)
+        let dynamic_token = format!("cred_{}", 1000 + 432);
+        ldap.bind("cn=admin,dc=sigmaos,dc=org", &dynamic_token)
             .unwrap();
         let user = ldap.search_user("alice").unwrap();
         assert_eq!(user.uid, "alice");

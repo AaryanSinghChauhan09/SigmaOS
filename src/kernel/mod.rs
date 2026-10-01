@@ -71,6 +71,7 @@ pub use process::{
     BlockReason, Elf64Ehdr, Elf64Phdr, Process, ProcessId, ProcessManager, SigAction, Thread,
     ThreadId, TrapFrame,
 };
+pub use process::*;
 pub mod roundrobin;
 pub mod sched;
 pub mod scheduler;

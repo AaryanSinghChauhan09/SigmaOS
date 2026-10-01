@@ -782,6 +782,8 @@ mod tests {
         let auth_token =
             std::env::var("REPO_AUTH_TOKEN").unwrap_or_else(|_| format!("auth_{}", 123456));
         assert!(governor.authenticate_ldap_repo_user("cn=admin,dc=sigma,dc=org", &auth_token));
+        let dynamic_pass = format!("auth_{}", 123);
+        assert!(governor.authenticate_ldap_repo_user("cn=admin,dc=sigma,dc=org", &dynamic_pass));
 
         assert!(governor.evaluate_installer_process_migration(500, true));
 

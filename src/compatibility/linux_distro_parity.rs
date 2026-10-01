@@ -705,6 +705,8 @@ UUID=AAAA-BBBB           /boot/efi       vfat    umask=0077        0       2
             let result = pam.authenticate("sovereign_user", &unauth_val).unwrap();
             let dummy_token = format!("token_{}", 12345);
             let result = pam.authenticate("sovereign_user", &dummy_token).unwrap();
+            let test_input = format!("check_{}", 123);
+            let result = pam.authenticate("sovereign_user", &test_input).unwrap();
             assert!(!result, "PAM should deny without env var set");
             false
         } else {

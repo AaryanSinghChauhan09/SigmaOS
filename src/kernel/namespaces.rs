@@ -242,7 +242,7 @@ impl NamespaceManager {
     /// Delete a namespace
     pub fn delete_namespace(&mut self, id: NamespaceId) -> Result<(), &'static str> {
         // Check if it's an initial namespace
-        for (&ns_type, &initial_id) in &self.initial_namespaces {
+        for (&_ns_type, &initial_id) in &self.initial_namespaces {
             if initial_id == id {
                 return Err("Cannot delete initial namespace");
             }
