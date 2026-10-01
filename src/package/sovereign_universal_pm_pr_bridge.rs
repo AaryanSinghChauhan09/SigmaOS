@@ -43,6 +43,15 @@ pub enum UniversalDistroPackageFormat {
     GentooEbuild,
     BsdPkg,
     NixFlake,
+    GuixScm,
+    OpenWrtIpk,
+    SolusEopkg,
+    HaikuHpkg,
+    TinyCoreTcz,
+    SlaxLzm,
+    SlackwareTxz,
+    ClearSwupd,
+    BedrockStratum,
     FlatpakApp,
     SnapApp,
     AppImage,
@@ -60,6 +69,15 @@ impl UniversalDistroPackageFormat {
             Self::GentooEbuild => "portage (.ebuild)",
             Self::BsdPkg => "bsd-pkg (.pkg / ports)",
             Self::NixFlake => "nix (flake / derivation)",
+            Self::GuixScm => "guix (.scm / .nar)",
+            Self::OpenWrtIpk => "opkg (.ipk)",
+            Self::SolusEopkg => "eopkg (.eopkg / .moss)",
+            Self::HaikuHpkg => "hpkg (.hpkg)",
+            Self::TinyCoreTcz => "tcz (.tcz)",
+            Self::SlaxLzm => "lzm (.lzm / .sfs)",
+            Self::SlackwareTxz => "slackware (.txz / .slackbuild)",
+            Self::ClearSwupd => "swupd (.swupd)",
+            Self::BedrockStratum => "stratum (.stratum)",
             Self::FlatpakApp => "flatpak (.flatpakref)",
             Self::SnapApp => "snap (.snap)",
             Self::AppImage => "appimage (.AppImage)",
@@ -260,6 +278,15 @@ mod tests {
             (UniversalDistroPackageFormat::GentooEbuild, "gentoo-app", &["portage"][..]),
             (UniversalDistroPackageFormat::BsdPkg, "freebsd-app", &["libc"][..]),
             (UniversalDistroPackageFormat::NixFlake, "nix-app", &["stdenv"][..]),
+            (UniversalDistroPackageFormat::GuixScm, "guix-app", &["gnu-store"][..]),
+            (UniversalDistroPackageFormat::OpenWrtIpk, "openwrt-app", &["uclibc"][..]),
+            (UniversalDistroPackageFormat::SolusEopkg, "solus-app", &["eopkg"][..]),
+            (UniversalDistroPackageFormat::HaikuHpkg, "haiku-app", &["libroot"][..]),
+            (UniversalDistroPackageFormat::TinyCoreTcz, "tcz-app", &["busybox"][..]),
+            (UniversalDistroPackageFormat::SlaxLzm, "slax-app", &["squashfs"][..]),
+            (UniversalDistroPackageFormat::SlackwareTxz, "slackware-app", &["pkgtool"][..]),
+            (UniversalDistroPackageFormat::ClearSwupd, "clear-app", &["swupd"][..]),
+            (UniversalDistroPackageFormat::BedrockStratum, "bedrock-app", &["stratum"][..]),
             (UniversalDistroPackageFormat::FlatpakApp, "flatpak-app", &["org.freedesktop.Sdk"][..]),
             (UniversalDistroPackageFormat::SnapApp, "snap-app", &["core22"][..]),
             (UniversalDistroPackageFormat::AppImage, "appimage-app", &["fuse"][..]),
@@ -281,9 +308,10 @@ mod tests {
             assert!(bridge.validate_sat_pr_dependencies(pr).unwrap());
             let manifest = bridge.merge_pr_to_sigma_pkg(pr).unwrap();
             assert_eq!(manifest.original_format, fmt);
+            assert!(!fmt.as_str().is_empty());
         }
 
-        assert_eq!(bridge.total_prs_merged, 10);
+        assert_eq!(bridge.total_prs_merged, 19);
     }
 
     #[test]
